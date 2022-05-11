@@ -99,7 +99,8 @@
 /// and MSVC implemented this later than everything else. This appears to be
 /// corrected in MSVC 2019 but not MSVC 2017.
 #ifndef LLVM_HAS_RVALUE_REFERENCE_THIS
-#if __has_feature(cxx_rvalue_references) || LLVM_GNUC_PREREQ(4, 8, 1)
+#if __has_feature(cxx_rvalue_references) || LLVM_GNUC_PREREQ(4, 8, 1) ||       \
+    LLVM_MSC_PREREQ(1920)
 #define LLVM_HAS_RVALUE_REFERENCE_THIS 1
 #else
 #define LLVM_HAS_RVALUE_REFERENCE_THIS 0

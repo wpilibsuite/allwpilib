@@ -1,7 +1,7 @@
-From 4534fe28972a103d27b3b9e8a23c6ca84916e742 Mon Sep 17 00:00:00 2001
+From 9b5db55e5b69ed953baac9d8e782cbe9503b4fd6 Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Tue, 3 May 2022 22:08:59 -0400
-Subject: [PATCH 15/36] Remove format provider
+Subject: [PATCH 15/35] Remove format provider
 
 ---
  llvm/include/llvm/Support/Chrono.h      | 109 ---------
@@ -11,7 +11,7 @@ Subject: [PATCH 15/36] Remove format provider
  4 files changed, 11 insertions(+), 532 deletions(-)
 
 diff --git a/llvm/include/llvm/Support/Chrono.h b/llvm/include/llvm/Support/Chrono.h
-index 7ae0991400a6..06829d1fbe14 100644
+index 004519a883fd..06829d1fbe14 100644
 --- a/llvm/include/llvm/Support/Chrono.h
 +++ b/llvm/include/llvm/Support/Chrono.h
 @@ -10,7 +10,6 @@
@@ -40,9 +40,21 @@ index 7ae0991400a6..06829d1fbe14 100644
 -                     StringRef Style);
 -};
 -
+-namespace detail {
+-template <typename Period> struct unit { static const char value[]; };
+-template <typename Period> const char unit<Period>::value[] = "";
+-
+-template <> struct unit<std::ratio<3600>> { static const char value[]; };
+-template <> struct unit<std::ratio<60>> { static const char value[]; };
+-template <> struct unit<std::ratio<1>> { static const char value[]; };
+-template <> struct unit<std::milli> { static const char value[]; };
+-template <> struct unit<std::micro> { static const char value[]; };
+-template <> struct unit<std::nano> { static const char value[]; };
+-} // namespace detail
+-
 -/// Implementation of format_provider<T> for duration types.
 -///
--/// The options string of a duration  type has the grammar:
+-/// The options string of a duration type has the grammar:
 -///
 -///   duration_options  ::= [unit][show_unit [number_options]]
 -///   unit              ::= `h`|`m`|`s`|`ms|`us`|`ns`
@@ -63,18 +75,6 @@ index 7ae0991400a6..06829d1fbe14 100644
 -///  If the unit of the duration type is not one of the units specified above,
 -///  it is still possible to format it, provided you explicitly request a
 -///  display unit or you request that the unit is not displayed.
--
--namespace detail {
--template <typename Period> struct unit { static const char value[]; };
--template <typename Period> const char unit<Period>::value[] = "";
--
--template <> struct unit<std::ratio<3600>> { static const char value[]; };
--template <> struct unit<std::ratio<60>> { static const char value[]; };
--template <> struct unit<std::ratio<1>> { static const char value[]; };
--template <> struct unit<std::milli> { static const char value[]; };
--template <> struct unit<std::micro> { static const char value[]; };
--template <> struct unit<std::nano> { static const char value[]; };
--} // namespace detail
 -
 -template <typename Rep, typename Period>
 -struct format_provider<std::chrono::duration<Rep, Period>> {
@@ -138,10 +138,10 @@ index 7ae0991400a6..06829d1fbe14 100644
  
  #endif // LLVM_SUPPORT_CHRONO_H
 diff --git a/llvm/include/llvm/Support/raw_ostream.h b/llvm/include/llvm/Support/raw_ostream.h
-index d85e2ba6e4a3..99ff192edc5c 100644
+index 027c04ff24ba..212cd945758f 100644
 --- a/llvm/include/llvm/Support/raw_ostream.h
 +++ b/llvm/include/llvm/Support/raw_ostream.h
-@@ -27,13 +27,6 @@
+@@ -29,13 +29,6 @@
  
  namespace llvm {
  
@@ -155,7 +155,7 @@ index d85e2ba6e4a3..99ff192edc5c 100644
  namespace sys {
  namespace fs {
  enum FileAccess : unsigned;
-@@ -77,7 +70,6 @@ private:
+@@ -79,7 +72,6 @@ private:
    /// for a \see write_impl() call to handle the data which has been put into
    /// this buffer.
    char *OutBufStart, *OutBufEnd, *OutBufCur;
@@ -163,7 +163,7 @@ index d85e2ba6e4a3..99ff192edc5c 100644
  
    /// Optional stream this stream is tied to. If this stream is written to, the
    /// tied-to stream will be flushed first.
-@@ -245,32 +237,6 @@ public:
+@@ -254,32 +246,6 @@ public:
      return write(Str.data(), Str.size());
    }
  
@@ -196,7 +196,7 @@ index d85e2ba6e4a3..99ff192edc5c 100644
    /// Output \p Str, turning '\\', '\t', '\n', '"', and anything that doesn't
    /// satisfy llvm::isPrint into an escape sequence.
    raw_ostream &write_escaped(std::string_view Str, bool UseHexEscapes = false);
-@@ -278,21 +244,6 @@ public:
+@@ -287,21 +253,6 @@ public:
    raw_ostream &write(unsigned char C);
    raw_ostream &write(const char *Ptr, size_t Size);
  
@@ -218,7 +218,7 @@ index d85e2ba6e4a3..99ff192edc5c 100644
    /// indent - Insert 'NumSpaces' spaces.
    raw_ostream &indent(unsigned NumSpaces);
  
-@@ -306,15 +257,21 @@ public:
+@@ -315,15 +266,21 @@ public:
    /// @param Bold bold/brighter text, default false
    /// @param BG if true change the background, default: change foreground
    /// @returns itself so it can be used within << invocations
@@ -244,7 +244,7 @@ index d85e2ba6e4a3..99ff192edc5c 100644
  
    /// This function determines if this stream is connected to a "tty" or
    /// "console" window. That is, the output would be displayed to the user
-@@ -327,7 +284,7 @@ public:
+@@ -336,7 +293,7 @@ public:
  
    // Enable or disable colors. Once enable_colors(false) is called,
    // changeColor() has no effect until enable_colors(true) is called.
@@ -253,7 +253,7 @@ index d85e2ba6e4a3..99ff192edc5c 100644
  
    /// Tie this stream to the specified stream. Replaces any existing tied-to
    /// stream. Specifying a nullptr unties the stream.
-@@ -387,10 +344,6 @@ private:
+@@ -396,10 +353,6 @@ private:
    /// unused bytes in the buffer.
    void copy_to_buffer(const char *Ptr, size_t Size);
  
@@ -264,7 +264,7 @@ index d85e2ba6e4a3..99ff192edc5c 100644
    /// Flush the tied-to stream (if present) and then write the required data.
    void flush_tied_then_write(const char *Ptr, size_t Size);
  
-@@ -515,10 +468,6 @@ public:
+@@ -524,10 +477,6 @@ public:
    /// to the offset specified from the beginning of the file.
    uint64_t seek(uint64_t off);
  
@@ -276,7 +276,7 @@ index d85e2ba6e4a3..99ff192edc5c 100644
  
    /// Return the value of the flag in this raw_fd_ostream indicating whether an
 diff --git a/llvm/lib/Support/raw_ostream.cpp b/llvm/lib/Support/raw_ostream.cpp
-index 543b895e268b..8dcac30388a0 100644
+index 5a9cf40dcb1d..440213004632 100644
 --- a/llvm/lib/Support/raw_ostream.cpp
 +++ b/llvm/lib/Support/raw_ostream.cpp
 @@ -117,49 +117,6 @@ void raw_ostream::SetBufferAndMode(char *BufferStart, size_t Size,
@@ -584,7 +584,7 @@ index 543b895e268b..8dcac30388a0 100644
  //===----------------------------------------------------------------------===//
  //  raw_fd_ostream
  //===----------------------------------------------------------------------===//
-@@ -852,31 +577,6 @@ size_t raw_fd_ostream::preferred_buffer_size() const {
+@@ -850,31 +575,6 @@ size_t raw_fd_ostream::preferred_buffer_size() const {
  #endif
  }
  

@@ -1,19 +1,19 @@
-From 5ca95255bc32bf678d5fc7ef111673d36cb861cc Mon Sep 17 00:00:00 2001
+From dfa83035377c994fc33d206e429a8d9707809ab7 Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Tue, 3 May 2022 20:07:25 -0400
-Subject: [PATCH 04/36] Fix warnings for casting, wrap min/max for windows
+Subject: [PATCH 04/35] Fix warnings for casting, wrap min/max for windows
 
 ---
  llvm/include/llvm/ADT/DenseMap.h       |  4 ++--
  llvm/include/llvm/ADT/DenseMapInfo.h   |  2 +-
  llvm/include/llvm/ADT/SmallVector.h    | 12 ++++++------
  llvm/include/llvm/Support/ConvertUTF.h |  2 +-
- llvm/include/llvm/Support/MathExtras.h | 24 ++++++++++++------------
+ llvm/include/llvm/Support/MathExtras.h | 22 +++++++++++-----------
  llvm/lib/Support/SmallVector.cpp       |  2 +-
- 6 files changed, 23 insertions(+), 23 deletions(-)
+ 6 files changed, 22 insertions(+), 22 deletions(-)
 
 diff --git a/llvm/include/llvm/ADT/DenseMap.h b/llvm/include/llvm/ADT/DenseMap.h
-index de9f57db8af4..334292a969bb 100644
+index fc79bdb01d7d..5e5c020adf0b 100644
 --- a/llvm/include/llvm/ADT/DenseMap.h
 +++ b/llvm/include/llvm/ADT/DenseMap.h
 @@ -359,7 +359,7 @@ protected:
@@ -35,10 +35,10 @@ index de9f57db8af4..334292a969bb 100644
        this->BaseT::initEmpty();
        return;
 diff --git a/llvm/include/llvm/ADT/DenseMapInfo.h b/llvm/include/llvm/ADT/DenseMapInfo.h
-index 8271b9334b86..1837e5a57147 100644
+index d276acbfa6a6..0040ac36217e 100644
 --- a/llvm/include/llvm/ADT/DenseMapInfo.h
 +++ b/llvm/include/llvm/ADT/DenseMapInfo.h
-@@ -345,7 +345,7 @@ template <typename T> struct DenseMapInfo<ArrayRef<T>> {
+@@ -285,7 +285,7 @@ template <typename... Ts> struct DenseMapInfo<std::tuple<Ts...>> {
  template <> struct DenseMapInfo<hash_code> {
    static inline hash_code getEmptyKey() { return hash_code(-1); }
    static inline hash_code getTombstoneKey() { return hash_code(-2); }
@@ -48,7 +48,7 @@ index 8271b9334b86..1837e5a57147 100644
  };
  
 diff --git a/llvm/include/llvm/ADT/SmallVector.h b/llvm/include/llvm/ADT/SmallVector.h
-index e960b272db04..0f993853f9b6 100644
+index b8a11030fc33..602fcc5b7a98 100644
 --- a/llvm/include/llvm/ADT/SmallVector.h
 +++ b/llvm/include/llvm/ADT/SmallVector.h
 @@ -49,12 +49,12 @@ protected:
@@ -116,10 +116,10 @@ index 1add185330fa..c83ba81fa2e2 100644
  /* Some fundamental constants */
  #define UNI_REPLACEMENT_CHAR (UTF32)0x0000FFFD
 diff --git a/llvm/include/llvm/Support/MathExtras.h b/llvm/include/llvm/Support/MathExtras.h
-index 33b9065261e8..a65edc71415c 100644
+index 753b1998c40c..db9fbc148ae3 100644
 --- a/llvm/include/llvm/Support/MathExtras.h
 +++ b/llvm/include/llvm/Support/MathExtras.h
-@@ -98,7 +98,7 @@ template <typename T, std::size_t SizeOfT> struct TrailingZerosCounter {
+@@ -97,7 +97,7 @@ template <typename T, std::size_t SizeOfT> struct TrailingZerosCounter {
      // Bisection method.
      unsigned ZeroBits = 0;
      T Shift = std::numeric_limits<T>::digits >> 1;
@@ -128,7 +128,7 @@ index 33b9065261e8..a65edc71415c 100644
      while (Shift) {
        if ((Val & Mask) == 0) {
          Val >>= Shift;
-@@ -239,7 +239,7 @@ unsigned countLeadingZeros(T Val, ZeroBehavior ZB = ZB_Width) {
+@@ -238,7 +238,7 @@ unsigned countLeadingZeros(T Val, ZeroBehavior ZB = ZB_Width) {
  ///   valid arguments.
  template <typename T> T findFirstSet(T Val, ZeroBehavior ZB = ZB_Max) {
    if (ZB == ZB_Max && Val == 0)
@@ -137,7 +137,7 @@ index 33b9065261e8..a65edc71415c 100644
  
    return countTrailingZeros(Val, ZB_Undefined);
  }
-@@ -280,7 +280,7 @@ template <typename T> T maskLeadingZeros(unsigned N) {
+@@ -279,7 +279,7 @@ template <typename T> T maskLeadingZeros(unsigned N) {
  ///   valid arguments.
  template <typename T> T findLastSet(T Val, ZeroBehavior ZB = ZB_Max) {
    if (ZB == ZB_Max && Val == 0)
@@ -146,7 +146,7 @@ index 33b9065261e8..a65edc71415c 100644
  
    // Use ^ instead of - because both gcc and llvm can remove the associated ^
    // in the __builtin_clz intrinsic on x86.
-@@ -595,26 +595,26 @@ inline double Log2(double Value) {
+@@ -594,26 +594,26 @@ inline double Log2(double Value) {
  /// (32 bit edition.)
  /// Ex. Log2_32(32) == 5, Log2_32(1) == 0, Log2_32(0) == -1, Log2_32(6) == 2
  inline unsigned Log2_32(uint32_t Value) {
@@ -177,16 +177,7 @@ index 33b9065261e8..a65edc71415c 100644
  }
  
  /// Return the greatest common divisor of the values using Euclid's algorithm.
-@@ -793,7 +793,7 @@ inline int64_t SignExtend64(uint64_t X, unsigned B) {
- /// value of the result.
- template <typename T>
- std::enable_if_t<std::is_unsigned<T>::value, T> AbsoluteDifference(T X, T Y) {
--  return std::max(X, Y) - std::min(X, Y);
-+  return (std::max)(X, Y) - (std::min)(X, Y);
- }
- 
- /// Add two unsigned integers, X and Y, of type T.  Clamp the result to the
-@@ -808,7 +808,7 @@ SaturatingAdd(T X, T Y, bool *ResultOverflowed = nullptr) {
+@@ -807,7 +807,7 @@ SaturatingAdd(T X, T Y, bool *ResultOverflowed = nullptr) {
    T Z = X + Y;
    Overflowed = (Z < X || Z < Y);
    if (Overflowed)
@@ -195,7 +186,7 @@ index 33b9065261e8..a65edc71415c 100644
    else
      return Z;
  }
-@@ -833,7 +833,7 @@ SaturatingMultiply(T X, T Y, bool *ResultOverflowed = nullptr) {
+@@ -832,7 +832,7 @@ SaturatingMultiply(T X, T Y, bool *ResultOverflowed = nullptr) {
    // Special case: if X or Y is 0, Log2_64 gives -1, and Log2Z
    // will necessarily be less than Log2Max as desired.
    int Log2Z = Log2_64(X) + Log2_64(Y);
@@ -204,7 +195,7 @@ index 33b9065261e8..a65edc71415c 100644
    int Log2Max = Log2_64(Max);
    if (Log2Z < Log2Max) {
      return X * Y;
-@@ -953,9 +953,9 @@ std::enable_if_t<std::is_signed<T>::value, T> MulOverflow(T X, T Y, T &Result) {
+@@ -952,9 +952,9 @@ std::enable_if_t<std::is_signed<T>::value, T> MulOverflow(T X, T Y, T &Result) {
    // Check how the max allowed absolute value (2^n for negative, 2^(n-1) for
    // positive) divided by an argument compares to the other.
    if (IsNegative)

@@ -1,15 +1,15 @@
-From a8735102bfca181d68800ca1d3342f5bfd918ebe Mon Sep 17 00:00:00 2001
+From 64b545ba40baef601d1cda96fd2e059218f129a9 Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Wed, 4 May 2022 01:56:39 -0400
-Subject: [PATCH 31/36] Random fixes. Sigh
+Subject: [PATCH 31/35] Random fixes. Sigh
 
 ---
  .../llvm/Support/Windows/WindowsSupport.h     |  4 ++
- llvm/lib/Support/MemoryBuffer.cpp             | 59 ++++++++++---------
- llvm/lib/Support/raw_ostream.cpp              | 23 +++++---
- llvm/unittests/ADT/StringMapTest.cpp          | 20 +------
+ llvm/lib/Support/MemoryBuffer.cpp             | 45 +++++++++++++------
+ llvm/lib/Support/raw_ostream.cpp              | 23 ++++++----
+ llvm/unittests/ADT/StringMapTest.cpp          | 20 +--------
  llvm/unittests/Support/ConvertUTFTest.cpp     |  1 +
- 5 files changed, 53 insertions(+), 54 deletions(-)
+ 5 files changed, 52 insertions(+), 41 deletions(-)
 
 diff --git a/llvm/include/llvm/Support/Windows/WindowsSupport.h b/llvm/include/llvm/Support/Windows/WindowsSupport.h
 index 201cb25b0dce..50b0843beb29 100644
@@ -28,32 +28,26 @@ index 201cb25b0dce..50b0843beb29 100644
  // Must be included after windows.h
  #include <wincrypt.h>
 diff --git a/llvm/lib/Support/MemoryBuffer.cpp b/llvm/lib/Support/MemoryBuffer.cpp
-index 35a15868fea0..299610233405 100644
+index 3fbc17a894c7..949c459250c1 100644
 --- a/llvm/lib/Support/MemoryBuffer.cpp
 +++ b/llvm/lib/Support/MemoryBuffer.cpp
-@@ -22,27 +22,37 @@
+@@ -22,9 +22,12 @@
  #define WIN32_LEAN_AND_MEAN
  #endif
  
--#include "llvm/ADT/SmallString.h"
--#include "llvm/Config/config.h"
--#include "llvm/Support/Errc.h"
--#include "llvm/Support/Errno.h"
--#include "llvm/Support/FileSystem.h"
--#include "llvm/Support/MathExtras.h"
--#include "llvm/Support/Path.h"
--#include "llvm/Support/Process.h"
--#include "llvm/Support/Program.h"
--#include "llvm/Support/SmallVectorMemoryBuffer.h"
--#include <cassert>
--#include <cerrno>
--#include <cstring>
--#include <new>
 +#include <windows.h>  // NOLINT(build/include_order)
 +
 +#endif
 +
-+#include <sys/stat.h>
+ #include "llvm/ADT/SmallString.h"
+ #include "llvm/Config/config.h"
+-#include "llvm/Support/AutoConvert.h"
+ #include "llvm/Support/Errc.h"
+ #include "llvm/Support/Errno.h"
+ #include "llvm/Support/FileSystem.h"
+@@ -38,12 +41,31 @@
+ #include <cstring>
+ #include <new>
  #include <sys/types.h>
 -#include <system_error>
 +
@@ -84,8 +78,8 @@ index 35a15868fea0..299610233405 100644
  using namespace llvm;
  
  //===----------------------------------------------------------------------===//
-@@ -81,11 +91,8 @@ struct NamedBufferAlloc {
- }
+@@ -82,11 +104,8 @@ struct NamedBufferAlloc {
+ } // namespace
  
  void *operator new(size_t N, const NamedBufferAlloc &Alloc) {
 -  SmallString<256> NameBuf;
@@ -98,7 +92,7 @@ index 35a15868fea0..299610233405 100644
    return Mem;
  }
  
-@@ -295,16 +302,14 @@ WritableMemoryBuffer::getNewUninitMemBuffer(size_t Size, std::string_view Buffer
+@@ -295,16 +314,14 @@ WritableMemoryBuffer::getNewUninitMemBuffer(size_t Size, std::string_view Buffer
    // that MemoryBuffer and data are aligned so PointerIntPair works with them.
    // TODO: Is 16-byte alignment enough?  We copy small object files with large
    // alignment expectations into this buffer.
@@ -117,7 +111,7 @@ index 35a15868fea0..299610233405 100644
  
    // The buffer begins after the name and must be aligned.
    uint8_t *Buf = Mem + AlignedStringLen;
-@@ -426,8 +431,8 @@ getOpenFileImpl(sys::fs::file_t FD, std::string_view Filename, uint64_t FileSize
+@@ -426,8 +443,8 @@ getOpenFileImpl(sys::fs::file_t FD, std::string_view Filename, uint64_t FileSize
      MapSize = FileSize;
    }
  
@@ -128,7 +122,7 @@ index 35a15868fea0..299610233405 100644
      std::error_code EC;
      std::unique_ptr<MB> Result(
          new (NamedBufferAlloc(Filename)) MemoryBufferMMapFile<MB>(
-@@ -503,7 +508,7 @@ MemoryBuffer::getFileAsStream(const std::string_view &Filename) {
+@@ -503,7 +520,7 @@ MemoryBuffer::getFileAsStream(const std::string_view &Filename) {
  }
  
  MemoryBufferRef MemoryBuffer::getMemBufferRef() const {

@@ -14,7 +14,6 @@
 #define WPIUTIL_WPI_MATHEXTRAS_H
 
 #include "wpi/Compiler.h"
-#include <algorithm>
 #include <cassert>
 #include <cmath>
 #include <climits>
@@ -363,7 +362,7 @@ constexpr inline std::enable_if_t<(N < 64), bool> isUInt(uint64_t X) {
   return X < (UINT64_C(1) << (N));
 }
 template <unsigned N>
-constexpr inline std::enable_if_t<N >= 64, bool> isUInt(uint64_t X) {
+constexpr inline std::enable_if_t<N >= 64, bool> isUInt(uint64_t) {
   return true;
 }
 
@@ -740,7 +739,7 @@ template <unsigned B> constexpr inline int32_t SignExtend32(uint32_t X) {
 }
 
 /// Sign-extend the number in the bottom B bits of X to a 32-bit integer.
-/// Requires 0 < B < 32.
+/// Requires 0 < B <= 32.
 inline int32_t SignExtend32(uint32_t X, unsigned B) {
   assert(B > 0 && "Bit width can't be 0.");
   assert(B <= 32 && "Bit width out of range.");
@@ -748,7 +747,7 @@ inline int32_t SignExtend32(uint32_t X, unsigned B) {
 }
 
 /// Sign-extend the number in the bottom B bits of X to a 64-bit integer.
-/// Requires 0 < B < 64.
+/// Requires 0 < B <= 64.
 template <unsigned B> constexpr inline int64_t SignExtend64(uint64_t x) {
   static_assert(B > 0, "Bit width can't be 0.");
   static_assert(B <= 64, "Bit width out of range.");
@@ -756,7 +755,7 @@ template <unsigned B> constexpr inline int64_t SignExtend64(uint64_t x) {
 }
 
 /// Sign-extend the number in the bottom B bits of X to a 64-bit integer.
-/// Requires 0 < B < 64.
+/// Requires 0 < B <= 64.
 inline int64_t SignExtend64(uint64_t X, unsigned B) {
   assert(B > 0 && "Bit width can't be 0.");
   assert(B <= 64 && "Bit width out of range.");
@@ -767,7 +766,7 @@ inline int64_t SignExtend64(uint64_t X, unsigned B) {
 /// value of the result.
 template <typename T>
 std::enable_if_t<std::is_unsigned<T>::value, T> AbsoluteDifference(T X, T Y) {
-  return (std::max)(X, Y) - (std::min)(X, Y);
+  return X > Y ? (X - Y) : (Y - X);
 }
 
 /// Add two unsigned integers, X and Y, of type T.  Clamp the result to the

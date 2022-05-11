@@ -1,7 +1,7 @@
-From bc510ba59d710cf66b628009cb8c74d2bc822945 Mon Sep 17 00:00:00 2001
+From fbd1c824c8f847d16654ed6ce0889f30cf509457 Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Tue, 3 May 2022 20:40:33 -0400
-Subject: [PATCH 08/36] Remove header dependency for endian
+Subject: [PATCH 08/35] Remove header dependency for endian
 
 ---
  llvm/include/llvm/ADT/Hashing.h    | 1 +
@@ -9,7 +9,7 @@ Subject: [PATCH 08/36] Remove header dependency for endian
  2 files changed, 7 insertions(+)
 
 diff --git a/llvm/include/llvm/ADT/Hashing.h b/llvm/include/llvm/ADT/Hashing.h
-index cb53b7fa7469..9b85801d6720 100644
+index e296c1c53ebd..d794e2f3ba16 100644
 --- a/llvm/include/llvm/ADT/Hashing.h
 +++ b/llvm/include/llvm/ADT/Hashing.h
 @@ -46,6 +46,7 @@

@@ -1,28 +1,31 @@
-From ebd503d8f92848e3d142231f2a8b580e243e5dd8 Mon Sep 17 00:00:00 2001
+From e723453db031d7e2b1b657120cf9319cd2ba4836 Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Wed, 4 May 2022 18:52:17 -0400
-Subject: [PATCH 32/36] Fix documentation warnings
+Subject: [PATCH 32/35] Fix documentation warnings
 
 ---
- llvm/include/llvm/Support/MemoryBuffer.h | 8 --------
- 1 file changed, 8 deletions(-)
+ llvm/include/llvm/Support/MemoryBuffer.h | 11 -----------
+ 1 file changed, 11 deletions(-)
 
 diff --git a/llvm/include/llvm/Support/MemoryBuffer.h b/llvm/include/llvm/Support/MemoryBuffer.h
-index 143799a4d982..7865dd4b2583 100644
+index bdaf98664ff1..cb49838181af 100644
 --- a/llvm/include/llvm/Support/MemoryBuffer.h
 +++ b/llvm/include/llvm/Support/MemoryBuffer.h
-@@ -85,10 +85,6 @@ public:
-   /// if successful, otherwise returning null. If FileSize is specified, this
-   /// means that the client knows that the file exists and that it has the
-   /// specified size.
+@@ -83,13 +83,6 @@ public:
+ 
+   /// Open the specified file as a MemoryBuffer, returning a new MemoryBuffer
+   /// if successful, otherwise returning null.
+-  ///
+-  /// \param IsText Set to true to indicate that the file should be read in
+-  /// text mode.
 -  ///
 -  /// \param IsVolatile Set to true to indicate that the contents of the file
 -  /// can change outside the user's control, e.g. when libclang tries to parse
 -  /// while the user is editing/updating the file or if the file is on an NFS.
    static ErrorOr<std::unique_ptr<MemoryBuffer>>
-   getFile(const std::string_view &Filename, int64_t FileSize = -1,
+   getFile(const std::string_view &Filename, bool IsText = false,
            bool RequiresNullTerminator = true, bool IsVolatile = false);
-@@ -108,10 +104,6 @@ public:
+@@ -109,10 +102,6 @@ public:
  
    /// Given an already-open file descriptor, read the file and return a
    /// MemoryBuffer.

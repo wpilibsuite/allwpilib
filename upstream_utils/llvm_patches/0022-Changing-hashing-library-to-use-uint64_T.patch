@@ -1,7 +1,7 @@
-From e84c514ad1703f419683bc7b1c1fcc409524c1ce Mon Sep 17 00:00:00 2001
+From cf3eceaab981fbaa33847ed44fc3f73ccb172f9c Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Tue, 3 May 2022 23:04:38 -0400
-Subject: [PATCH 22/36] Changing hashing library to use uint64_T
+Subject: [PATCH 22/35] Changing hashing library to use uint64_T
 
 ---
  llvm/include/llvm/ADT/Hashing.h    | 13 +++++++++----
@@ -9,7 +9,7 @@ Subject: [PATCH 22/36] Changing hashing library to use uint64_T
  2 files changed, 11 insertions(+), 5 deletions(-)
 
 diff --git a/llvm/include/llvm/ADT/Hashing.h b/llvm/include/llvm/ADT/Hashing.h
-index 87a1e9778fed..ca3562a6d7b7 100644
+index 3d61efb8032c..e9fd9cbb4d69 100644
 --- a/llvm/include/llvm/ADT/Hashing.h
 +++ b/llvm/include/llvm/ADT/Hashing.h
 @@ -201,7 +201,7 @@ inline uint64_t hash_1to3_bytes(const char *s, size_t len, uint64_t seed) {

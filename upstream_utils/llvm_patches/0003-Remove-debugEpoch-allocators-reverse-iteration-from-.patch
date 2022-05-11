@@ -1,20 +1,20 @@
-From a82eff3fd13ec091feb16626838b188549e4b29c Mon Sep 17 00:00:00 2001
+From edbc7101e822e67a4fe7c03b93a81a9dc8f09fca Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Tue, 3 May 2022 19:58:29 -0400
-Subject: [PATCH 03/36] Remove debugEpoch, allocators, reverse iteration from
+Subject: [PATCH 03/35] Remove debugEpoch, allocators, reverse iteration from
  collections
 
 ---
  llvm/include/llvm/ADT/DenseMap.h       | 74 ++++----------------------
  llvm/include/llvm/ADT/SmallPtrSet.h    | 35 ++----------
  llvm/include/llvm/ADT/StringMap.h      | 33 ++++--------
- llvm/include/llvm/ADT/StringMapEntry.h | 13 ++---
+ llvm/include/llvm/ADT/StringMapEntry.h | 25 +++------
  llvm/lib/Support/SmallPtrSet.cpp       |  1 -
  llvm/unittests/ADT/StringMapTest.cpp   | 12 ++---
- 6 files changed, 34 insertions(+), 134 deletions(-)
+ 6 files changed, 37 insertions(+), 143 deletions(-)
 
 diff --git a/llvm/include/llvm/ADT/DenseMap.h b/llvm/include/llvm/ADT/DenseMap.h
-index ce0b05db840c..de9f57db8af4 100644
+index 595eabd0ffb4..fc79bdb01d7d 100644
 --- a/llvm/include/llvm/ADT/DenseMap.h
 +++ b/llvm/include/llvm/ADT/DenseMap.h
 @@ -76,8 +76,6 @@ public:
@@ -167,7 +167,7 @@ index ce0b05db840c..de9f57db8af4 100644
      return const_iterator(P, E, Epoch, NoAdvance);
    }
  
-@@ -1211,10 +1173,6 @@ public:
+@@ -1214,10 +1176,6 @@ public:
      assert(isHandleInSync() && "invalid construction!");
  
      if (NoAdvance) return;
@@ -178,7 +178,7 @@ index ce0b05db840c..de9f57db8af4 100644
      AdvancePastEmptyBuckets();
    }
  
-@@ -1229,16 +1187,10 @@ public:
+@@ -1232,16 +1190,10 @@ public:
  
    reference operator*() const {
      assert(isHandleInSync() && "invalid iterator access!");
@@ -195,7 +195,7 @@ index ce0b05db840c..de9f57db8af4 100644
      return Ptr;
    }
  
-@@ -1258,12 +1210,6 @@ public:
+@@ -1261,12 +1213,6 @@ public:
  
    inline DenseMapIterator& operator++() {  // Preincrement
      assert(isHandleInSync() && "invalid iterator access!");
@@ -209,7 +209,7 @@ index ce0b05db840c..de9f57db8af4 100644
      AdvancePastEmptyBuckets();
      return *this;
 diff --git a/llvm/include/llvm/ADT/SmallPtrSet.h b/llvm/include/llvm/ADT/SmallPtrSet.h
-index 57dd8f6b695d..2565678eb932 100644
+index 981b741669b0..2edc1f5e2066 100644
 --- a/llvm/include/llvm/ADT/SmallPtrSet.h
 +++ b/llvm/include/llvm/ADT/SmallPtrSet.h
 @@ -14,7 +14,6 @@
@@ -305,7 +305,7 @@ index 57dd8f6b695d..2565678eb932 100644
      ++Bucket;
      AdvanceIfNotValid();
      return *this;
-@@ -393,8 +372,6 @@ public:
+@@ -400,8 +379,6 @@ public:
    }
  
    iterator begin() const {
@@ -314,7 +314,7 @@ index 57dd8f6b695d..2565678eb932 100644
      return makeIterator(CurArray);
    }
    iterator end() const { return makeIterator(EndPointer()); }
-@@ -402,9 +379,7 @@ public:
+@@ -409,9 +386,7 @@ public:
  private:
    /// Create an iterator that dereferences to same place as the given pointer.
    iterator makeIterator(const void *const *P) const {
@@ -434,10 +434,43 @@ index a82afc9a817c..a97b5660da53 100644
  
    bool erase(StringRef Key) {
 diff --git a/llvm/include/llvm/ADT/StringMapEntry.h b/llvm/include/llvm/ADT/StringMapEntry.h
-index ea3aad6f1cb1..e46e00b2f842 100644
+index 8bfad5540230..633404af394d 100644
 --- a/llvm/include/llvm/ADT/StringMapEntry.h
 +++ b/llvm/include/llvm/ADT/StringMapEntry.h
-@@ -87,18 +87,17 @@ public:
+@@ -32,22 +32,14 @@ protected:
+   /// Helper to tail-allocate \p Key. It'd be nice to generalize this so it
+   /// could be reused elsewhere, maybe even taking an llvm::function_ref to
+   /// type-erase the allocator and put it in a source file.
+-  template <typename AllocatorTy>
+   static void *allocateWithKey(size_t EntrySize, size_t EntryAlign,
+-                               StringRef Key, AllocatorTy &Allocator);
+-};
+-
+-// Define out-of-line to dissuade inlining.
+-template <typename AllocatorTy>
+-void *StringMapEntryBase::allocateWithKey(size_t EntrySize, size_t EntryAlign,
+-                                          StringRef Key,
+-                                          AllocatorTy &Allocator) {
++                               StringRef Key) {
+   size_t KeyLength = Key.size();
+ 
+   // Allocate a new item with space for the string at the end and a null
+   // terminator.
+   size_t AllocSize = EntrySize + KeyLength + 1;
+-  void *Allocation = Allocator.Allocate(AllocSize, EntryAlign);
++  void *Allocation = safe_malloc(AllocSize);
+   assert(Allocation && "Unhandled out-of-memory");
+ 
+   // Copy the string information.
+@@ -57,6 +49,7 @@ void *StringMapEntryBase::allocateWithKey(size_t EntrySize, size_t EntryAlign,
+   Buffer[KeyLength] = 0; // Null terminate for convenience of clients.
+   return Allocation;
+ }
++};
+ 
+ /// StringMapEntryStorage - Holds the value in a StringMapEntry.
+ ///
+@@ -116,11 +109,11 @@ public:
  
    /// Create a StringMapEntry for the specified key construct the value using
    /// \p InitiVals.
@@ -446,20 +479,13 @@ index ea3aad6f1cb1..e46e00b2f842 100644
 +  template <typename... InitTy>
 +  static StringMapEntry *Create(StringRef key,
                                  InitTy &&... initVals) {
-     size_t keyLength = key.size();
+     return new (StringMapEntryBase::allocateWithKey(
+-        sizeof(StringMapEntry), alignof(StringMapEntry), key, allocator))
++        sizeof(StringMapEntry), alignof(StringMapEntry), key))
+         StringMapEntry(key.size(), std::forward<InitTy>(initVals)...);
+   }
  
-     // Allocate a new item with space for the string at the end and a null
-     // terminator.
-     size_t allocSize = sizeof(StringMapEntry) + keyLength + 1;
--    size_t alignment = alignof(StringMapEntry);
- 
-     StringMapEntry *newItem =
--        static_cast<StringMapEntry *>(allocator.Allocate(allocSize, alignment));
-+        static_cast<StringMapEntry *>(safe_malloc(allocSize));
-     assert(newItem && "Unhandled out-of-memory");
- 
-     // Construct the value.
-@@ -121,12 +120,10 @@ public:
+@@ -133,12 +126,10 @@ public:
  
    /// Destroy - Destroy this StringMapEntry, releasing memory back to the
    /// specified allocator.
@@ -475,10 +501,10 @@ index ea3aad6f1cb1..e46e00b2f842 100644
  };
  
 diff --git a/llvm/lib/Support/SmallPtrSet.cpp b/llvm/lib/Support/SmallPtrSet.cpp
-index f60464c8e756..930ebdde2cc1 100644
+index f6e2dfb8a6c9..4549db08e3ee 100644
 --- a/llvm/lib/Support/SmallPtrSet.cpp
 +++ b/llvm/lib/Support/SmallPtrSet.cpp
-@@ -58,7 +58,6 @@ SmallPtrSetImplBase::insert_imp_big(const void *Ptr) {
+@@ -59,7 +59,6 @@ SmallPtrSetImplBase::insert_imp_big(const void *Ptr) {
    else
      ++NumNonEmpty; // Track density.
    *Bucket = Ptr;

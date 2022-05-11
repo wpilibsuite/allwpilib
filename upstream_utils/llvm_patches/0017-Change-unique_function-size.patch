@@ -1,17 +1,17 @@
-From 8439fa2cefa02eaf3d4303e04fde00b08bcf1d5b Mon Sep 17 00:00:00 2001
+From 96a7faab1db75c05f052d50c93ac8d2eabd050fa Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Tue, 3 May 2022 22:34:13 -0400
-Subject: [PATCH 17/36] Change unique_function size
+Subject: [PATCH 17/35] Change unique_function size
 
 ---
  llvm/include/llvm/ADT/FunctionExtras.h | 4 ++--
  1 file changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/llvm/include/llvm/ADT/FunctionExtras.h b/llvm/include/llvm/ADT/FunctionExtras.h
-index c6ce4eb5c3be..dba5cc241086 100644
+index a120848f24bd..9fdc235bc994 100644
 --- a/llvm/include/llvm/ADT/FunctionExtras.h
 +++ b/llvm/include/llvm/ADT/FunctionExtras.h
-@@ -62,7 +62,7 @@ using EnableIfTrivial =
+@@ -72,7 +72,7 @@ using EnableIfCallable =
  
  template <typename ReturnT, typename... ParamTs> class UniqueFunctionBase {
  protected:
@@ -20,7 +20,7 @@ index c6ce4eb5c3be..dba5cc241086 100644
  
    template <typename T, class = void>
    struct IsSizeLessThanThresholdT : std::false_type {};
-@@ -130,7 +130,7 @@ protected:
+@@ -151,7 +151,7 @@ protected:
          "Should always use all of the out-of-line storage for inline storage!");
  
      // For in-line storage, we just provide an aligned character buffer. We

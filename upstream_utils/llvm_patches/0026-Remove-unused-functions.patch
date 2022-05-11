@@ -1,22 +1,22 @@
-From 28e98105868d85b054c1eb359e2e986e2630d7ef Mon Sep 17 00:00:00 2001
+From d2e5ad80f0f97e569d91a5bb264f91776d7e4404 Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Wed, 4 May 2022 00:10:48 -0400
-Subject: [PATCH 26/36] Remove unused functions
+Subject: [PATCH 26/35] Remove unused functions
 
 ---
  llvm/include/llvm/ADT/SmallString.h       | 88 ++---------------------
  llvm/include/llvm/Support/ConvertUTF.h    |  7 --
  llvm/include/llvm/Support/Errno.h         |  9 ---
- llvm/include/llvm/Support/VersionTuple.h  | 11 ---
- llvm/include/llvm/Support/raw_ostream.h   | 43 -----------
+ llvm/include/llvm/Support/VersionTuple.h  | 35 ---------
+ llvm/include/llvm/Support/raw_ostream.h   | 54 --------------
  llvm/lib/Support/ConvertUTFWrapper.cpp    | 36 ----------
  llvm/lib/Support/ErrorHandling.cpp        | 16 -----
- llvm/lib/Support/raw_ostream.cpp          | 10 ---
+ llvm/lib/Support/raw_ostream.cpp          | 38 ----------
  llvm/unittests/Support/ConvertUTFTest.cpp | 70 ------------------
- 9 files changed, 5 insertions(+), 285 deletions(-)
+ 9 files changed, 5 insertions(+), 348 deletions(-)
 
 diff --git a/llvm/include/llvm/ADT/SmallString.h b/llvm/include/llvm/ADT/SmallString.h
-index 23e22742f2b2..d3d469d45d15 100644
+index 8112741dd01d..d3d469d45d15 100644
 --- a/llvm/include/llvm/ADT/SmallString.h
 +++ b/llvm/include/llvm/ADT/SmallString.h
 @@ -86,48 +86,12 @@ public:
@@ -30,8 +30,8 @@ index 23e22742f2b2..d3d469d45d15 100644
 -  }
 -
 -  /// Check for string equality, ignoring case.
--  bool equals_lower(std::string_view RHS) const {
--    return str().equals_lower(RHS);
+-  bool equals_insensitive(std::string_view RHS) const {
+-    return str().equals_insensitive(RHS);
 -  }
 -
    /// Compare two strings; the result is -1, 0, or 1 if this string is
@@ -40,9 +40,9 @@ index 23e22742f2b2..d3d469d45d15 100644
      return str().compare(RHS);
    }
  
--  /// compare_lower - Compare two strings, ignoring case.
--  int compare_lower(std::string_view RHS) const {
--    return str().compare_lower(RHS);
+-  /// compare_insensitive - Compare two strings, ignoring case.
+-  int compare_insensitive(std::string_view RHS) const {
+-    return str().compare_insensitive(RHS);
 -  }
 -
 -  /// compare_numeric - Compare two strings, treating sequences of digits as
@@ -153,7 +153,7 @@ index 48435fbb6f30..75529de5fca2 100644
   * Convert an Unicode code point to UTF8 sequence.
   *
 diff --git a/llvm/include/llvm/Support/Errno.h b/llvm/include/llvm/Support/Errno.h
-index dc3b3322ed98..0156e283fa08 100644
+index 07df6765d9db..d9bf68bb369e 100644
 --- a/llvm/include/llvm/Support/Errno.h
 +++ b/llvm/include/llvm/Support/Errno.h
 @@ -20,15 +20,6 @@
@@ -173,18 +173,19 @@ index dc3b3322ed98..0156e283fa08 100644
  inline decltype(auto) RetryAfterSignal(const FailT &Fail, const Fun &F,
                                         const Args &... As) {
 diff --git a/llvm/include/llvm/Support/VersionTuple.h b/llvm/include/llvm/Support/VersionTuple.h
-index fb1ab4987564..f0051c4bfb1d 100644
+index 0eb464678d7e..9afae7cdd1fc 100644
 --- a/llvm/include/llvm/Support/VersionTuple.h
 +++ b/llvm/include/llvm/Support/VersionTuple.h
-@@ -14,7 +14,6 @@
+@@ -14,8 +14,6 @@
  #ifndef LLVM_SUPPORT_VERSIONTUPLE_H
  #define LLVM_SUPPORT_VERSIONTUPLE_H
  
--#include "llvm/Support/raw_ostream.h"
+-#include "llvm/ADT/DenseMapInfo.h"
+-#include "llvm/ADT/Hashing.h"
  #include <optional>
  #include <string>
  #include <tuple>
-@@ -144,17 +143,7 @@ public:
+@@ -159,39 +157,6 @@ public:
    friend bool operator>=(const VersionTuple &X, const VersionTuple &Y) {
      return !(X < Y);
    }
@@ -195,18 +196,40 @@ index fb1ab4987564..f0051c4bfb1d 100644
 -
 -  /// Retrieve a string representation of the version number.
 -  std::string getAsString() const;
- };
- 
+-};
+-
 -/// Print a version number.
 -raw_ostream &operator<<(raw_ostream &Out, const VersionTuple &V);
 -
+-// Provide DenseMapInfo for version tuples.
+-template <> struct DenseMapInfo<VersionTuple> {
+-  static inline VersionTuple getEmptyKey() { return VersionTuple(0x7FFFFFFF); }
+-  static inline VersionTuple getTombstoneKey() {
+-    return VersionTuple(0x7FFFFFFE);
+-  }
+-  static unsigned getHashValue(const VersionTuple &Value) {
+-    unsigned Result = Value.getMajor();
+-    if (auto Minor = Value.getMinor())
+-      Result = detail::combineHashValue(Result, *Minor);
+-    if (auto Subminor = Value.getSubminor())
+-      Result = detail::combineHashValue(Result, *Subminor);
+-    if (auto Build = Value.getBuild())
+-      Result = detail::combineHashValue(Result, *Build);
+-
+-    return Result;
+-  }
+-
+-  static bool isEqual(const VersionTuple &LHS, const VersionTuple &RHS) {
+-    return LHS == RHS;
+-  }
+ };
+ 
  } // end namespace llvm
- #endif // LLVM_SUPPORT_VERSIONTUPLE_H
 diff --git a/llvm/include/llvm/Support/raw_ostream.h b/llvm/include/llvm/Support/raw_ostream.h
-index 013367654a70..cd321821ef3d 100644
+index bb2fa96ed36a..16753efa7511 100644
 --- a/llvm/include/llvm/Support/raw_ostream.h
 +++ b/llvm/include/llvm/Support/raw_ostream.h
-@@ -484,38 +484,6 @@ public:
+@@ -493,38 +493,6 @@ public:
    ///      - from The Zen of Python, by Tim Peters
    ///
    void clear_error() { EC = std::error_code(); }
@@ -245,7 +268,7 @@ index 013367654a70..cd321821ef3d 100644
  };
  
  /// This returns a reference to a raw_fd_ostream for standard output. Use it
-@@ -545,17 +513,6 @@ public:
+@@ -554,17 +522,6 @@ public:
    /// immediately destroyed.
    raw_fd_stream(std::string_view Filename, std::error_code &EC);
  
@@ -263,6 +286,24 @@ index 013367654a70..cd321821ef3d 100644
    /// Check if \p OS is a pointer of type raw_fd_stream*.
    static bool classof(const raw_ostream *OS);
  };
+@@ -678,17 +635,6 @@ public:
+   ~buffer_unique_ostream() override { *OS << str(); }
+ };
+ 
+-class Error;
+-
+-/// This helper creates an output stream and then passes it to \p Write.
+-/// The stream created is based on the specified \p OutputFileName:
+-/// llvm::outs for "-", raw_null_ostream for "/dev/null", and raw_fd_ostream
+-/// for other names. For raw_fd_ostream instances, the stream writes to
+-/// a temporary file. The final output file is atomically replaced with the
+-/// temporary file after the \p Write function is finished.
+-Error writeToOutput(StringRef OutputFileName,
+-                    std::function<Error(raw_ostream &)> Write);
+-
+ } // end namespace llvm
+ 
+ #endif // LLVM_SUPPORT_RAW_OSTREAM_H
 diff --git a/llvm/lib/Support/ConvertUTFWrapper.cpp b/llvm/lib/Support/ConvertUTFWrapper.cpp
 index d8bcc9770c06..ecf72e64c15c 100644
 --- a/llvm/lib/Support/ConvertUTFWrapper.cpp
@@ -337,10 +378,10 @@ index 553a68de4e3d..9db381b04247 100644
  
  #include <system_error>
 diff --git a/llvm/lib/Support/raw_ostream.cpp b/llvm/lib/Support/raw_ostream.cpp
-index a2153dbaf937..403bddb96d78 100644
+index 9a65ae315693..40176bb35d1d 100644
 --- a/llvm/lib/Support/raw_ostream.cpp
 +++ b/llvm/lib/Support/raw_ostream.cpp
-@@ -627,16 +627,6 @@ raw_fd_stream::raw_fd_stream(std::string_view Filename, std::error_code &EC)
+@@ -625,16 +625,6 @@ raw_fd_stream::raw_fd_stream(std::string_view Filename, std::error_code &EC)
      EC = std::make_error_code(std::errc::invalid_argument);
  }
  
@@ -357,6 +398,38 @@ index a2153dbaf937..403bddb96d78 100644
  bool raw_fd_stream::classof(const raw_ostream *OS) {
    return OS->get_kind() == OStreamKind::OK_FDStream;
  }
+@@ -694,31 +684,3 @@ void raw_pwrite_stream::anchor() {}
+ void buffer_ostream::anchor() {}
+ 
+ void buffer_unique_ostream::anchor() {}
+-
+-Error llvm::writeToOutput(StringRef OutputFileName,
+-                          std::function<Error(raw_ostream &)> Write) {
+-  if (OutputFileName == "-")
+-    return Write(outs());
+-
+-  if (OutputFileName == "/dev/null") {
+-    raw_null_ostream Out;
+-    return Write(Out);
+-  }
+-
+-  unsigned Mode = sys::fs::all_read | sys::fs::all_write | sys::fs::all_exe;
+-  Expected<sys::fs::TempFile> Temp =
+-      sys::fs::TempFile::create(OutputFileName + ".temp-stream-%%%%%%", Mode);
+-  if (!Temp)
+-    return createFileError(OutputFileName, Temp.takeError());
+-
+-  raw_fd_ostream Out(Temp->FD, false);
+-
+-  if (Error E = Write(Out)) {
+-    if (Error DiscardError = Temp->discard())
+-      return joinErrors(std::move(E), std::move(DiscardError));
+-    return E;
+-  }
+-  Out.flush();
+-
+-  return Temp->keep(OutputFileName);
+-}
 diff --git a/llvm/unittests/Support/ConvertUTFTest.cpp b/llvm/unittests/Support/ConvertUTFTest.cpp
 index 28d71414db6d..5188ca2e9e29 100644
 --- a/llvm/unittests/Support/ConvertUTFTest.cpp

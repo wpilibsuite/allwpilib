@@ -1,44 +1,42 @@
-From 2d6c552570e4b3196b41c8eaa6321005320aaa6e Mon Sep 17 00:00:00 2001
+From 93af57ce33bb21449c9cd89a6128ab7b48a622c2 Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Tue, 3 May 2022 21:56:02 -0400
-Subject: [PATCH 12/36] Prefer std:: over llvm::
+Subject: [PATCH 12/35] Prefer std:: over llvm::
 
 ---
  llvm/include/llvm/ADT/FunctionExtras.h  |   6 +-
  llvm/include/llvm/ADT/PointerIntPair.h  |  13 ---
  llvm/include/llvm/ADT/SmallVector.h     |   4 +-
- llvm/include/llvm/ADT/StringMapEntry.h  |   2 +-
  llvm/include/llvm/Support/MathExtras.h  |   2 +-
  llvm/include/llvm/Support/type_traits.h | 117 ------------------------
  llvm/lib/Support/ErrorHandling.cpp      |   3 +-
- llvm/lib/Support/ManagedStatic.cpp      |   4 +-
  llvm/unittests/ADT/SmallPtrSetTest.cpp  |   2 +-
- 9 files changed, 12 insertions(+), 141 deletions(-)
+ 7 files changed, 9 insertions(+), 138 deletions(-)
 
 diff --git a/llvm/include/llvm/ADT/FunctionExtras.h b/llvm/include/llvm/ADT/FunctionExtras.h
-index 7f8fb103f148..c6ce4eb5c3be 100644
+index e67ef7377c88..a120848f24bd 100644
 --- a/llvm/include/llvm/ADT/FunctionExtras.h
 +++ b/llvm/include/llvm/ADT/FunctionExtras.h
-@@ -57,7 +57,7 @@ namespace detail {
+@@ -58,7 +58,7 @@ namespace detail {
  
  template <typename T>
  using EnableIfTrivial =
 -    std::enable_if_t<llvm::is_trivially_move_constructible<T>::value &&
 +    std::enable_if_t<std::is_trivially_move_constructible<T>::value &&
                       std::is_trivially_destructible<T>::value>;
- 
- template <typename ReturnT, typename... ParamTs> class UniqueFunctionBase {
-@@ -83,8 +83,8 @@ protected:
-   template <typename T>
-   using AdjustedParamT = typename std::conditional<
-       !std::is_reference<T>::value &&
--          llvm::is_trivially_copy_constructible<T>::value &&
--          llvm::is_trivially_move_constructible<T>::value &&
-+          std::is_trivially_copy_constructible<T>::value &&
-+          std::is_trivially_move_constructible<T>::value &&
-           IsSizeLessThanThresholdT<T>::value,
-       T, T &>::type;
- 
+ template <typename CallableT, typename ThisT>
+ using EnableUnlessSameType =
+@@ -94,8 +94,8 @@ protected:
+     static_assert(!std::is_reference<T>::value,
+                   "references should be handled by template specialization");
+     using type = typename std::conditional<
+-        llvm::is_trivially_copy_constructible<T>::value &&
+-            llvm::is_trivially_move_constructible<T>::value &&
++        std::is_trivially_copy_constructible<T>::value &&
++            std::is_trivially_move_constructible<T>::value &&
+             IsSizeLessThanThresholdT<T>::value,
+         T, T &>::type;
+   };
 diff --git a/llvm/include/llvm/ADT/PointerIntPair.h b/llvm/include/llvm/ADT/PointerIntPair.h
 index cb8b202c48b7..7c9cebb6754b 100644
 --- a/llvm/include/llvm/ADT/PointerIntPair.h
@@ -64,7 +62,7 @@ index cb8b202c48b7..7c9cebb6754b 100644
  struct PointerIntPairInfo {
    static_assert(PtrTraits::NumLowBitsAvailable <
 diff --git a/llvm/include/llvm/ADT/SmallVector.h b/llvm/include/llvm/ADT/SmallVector.h
-index 0f993853f9b6..15a91519462d 100644
+index 602fcc5b7a98..af0b28eb14a9 100644
 --- a/llvm/include/llvm/ADT/SmallVector.h
 +++ b/llvm/include/llvm/ADT/SmallVector.h
 @@ -309,8 +309,8 @@ public:
@@ -78,24 +76,11 @@ index 0f993853f9b6..15a91519462d 100644
                               std::is_trivially_destructible<T>::value>
  class SmallVectorTemplateBase : public SmallVectorTemplateCommon<T> {
    friend class SmallVectorTemplateCommon<T>;
-diff --git a/llvm/include/llvm/ADT/StringMapEntry.h b/llvm/include/llvm/ADT/StringMapEntry.h
-index afc829de53d0..253cb4b02152 100644
---- a/llvm/include/llvm/ADT/StringMapEntry.h
-+++ b/llvm/include/llvm/ADT/StringMapEntry.h
-@@ -107,7 +107,7 @@ public:
-     // Copy the string information.
-     char *strBuffer = const_cast<char *>(newItem->getKeyData());
-     if (keyLength > 0)
--      memcpy(strBuffer, key.data(), keyLength);
-+      std::memcpy(strBuffer, key.data(), keyLength);
-     strBuffer[keyLength] = 0; // Null terminate for convenience of clients.
-     return newItem;
-   }
 diff --git a/llvm/include/llvm/Support/MathExtras.h b/llvm/include/llvm/Support/MathExtras.h
-index a65edc71415c..c3ad4a13b422 100644
+index db9fbc148ae3..da843ef79ff9 100644
 --- a/llvm/include/llvm/Support/MathExtras.h
 +++ b/llvm/include/llvm/Support/MathExtras.h
-@@ -587,7 +587,7 @@ inline double Log2(double Value) {
+@@ -586,7 +586,7 @@ inline double Log2(double Value) {
  #if defined(__ANDROID_API__) && __ANDROID_API__ < 18
    return __builtin_log(Value) / __builtin_log(2.0);
  #else
@@ -251,29 +236,8 @@ index 4b91f214c841..0420b54b0a85 100644
  
  std::error_code llvm::mapWindowsError(unsigned EV) {
    switch (EV) {
-diff --git a/llvm/lib/Support/ManagedStatic.cpp b/llvm/lib/Support/ManagedStatic.cpp
-index bf7e0074d26e..339eccdac1bd 100644
---- a/llvm/lib/Support/ManagedStatic.cpp
-+++ b/llvm/lib/Support/ManagedStatic.cpp
-@@ -19,14 +19,14 @@ using namespace llvm;
- 
- static const ManagedStaticBase *StaticList = nullptr;
- static llvm::mutex *ManagedStaticMutex = nullptr;
--static llvm::once_flag mutex_init_flag;
-+static std::once_flag mutex_init_flag;
- 
- static void initializeMutex() {
-   ManagedStaticMutex = new llvm::mutex();
- }
- 
- static llvm::mutex* getManagedStaticMutex() {
--  llvm::call_once(mutex_init_flag, initializeMutex);
-+  std::call_once(mutex_init_flag, initializeMutex);
-   return ManagedStaticMutex;
- }
- 
 diff --git a/llvm/unittests/ADT/SmallPtrSetTest.cpp b/llvm/unittests/ADT/SmallPtrSetTest.cpp
-index eacd62ffc6ff..dc5c2b7ea230 100644
+index 6f3c94eed273..531f81ab5b3f 100644
 --- a/llvm/unittests/ADT/SmallPtrSetTest.cpp
 +++ b/llvm/unittests/ADT/SmallPtrSetTest.cpp
 @@ -298,7 +298,7 @@ TEST(SmallPtrSetTest, dereferenceAndIterate) {

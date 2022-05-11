@@ -1,7 +1,7 @@
-From 9c63476412acb8448aff7dd78ba50f6500fef9c1 Mon Sep 17 00:00:00 2001
+From c30b8d0c0bdf59c3a7913c89f6f8eb14248621e0 Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Tue, 3 May 2022 21:49:20 -0400
-Subject: [PATCH 11/36] Remove DJB dep
+Subject: [PATCH 11/35] Remove DJB dep
 
 ---
  llvm/lib/Support/StringMap.cpp | 21 ++++++++++++++++++---

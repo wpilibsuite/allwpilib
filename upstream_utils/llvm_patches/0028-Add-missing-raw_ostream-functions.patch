@@ -1,7 +1,7 @@
-From 33d9466d50620c09d44cc261a89a7e97130793c6 Mon Sep 17 00:00:00 2001
+From bceae7639ee0570c0a5a474f78a99e4f7ec0c45a Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Wed, 4 May 2022 00:25:03 -0400
-Subject: [PATCH 28/36] Add missing raw_ostream functions
+Subject: [PATCH 28/35] Add missing raw_ostream functions
 
 ---
  llvm/include/llvm/Support/raw_ostream.h | 4 +++-
@@ -9,10 +9,10 @@ Subject: [PATCH 28/36] Add missing raw_ostream functions
  2 files changed, 6 insertions(+), 1 deletion(-)
 
 diff --git a/llvm/include/llvm/Support/raw_ostream.h b/llvm/include/llvm/Support/raw_ostream.h
-index 81c65e117782..b1aa670549c0 100644
+index bb948d269664..a72dc7570cad 100644
 --- a/llvm/include/llvm/Support/raw_ostream.h
 +++ b/llvm/include/llvm/Support/raw_ostream.h
-@@ -321,6 +321,9 @@ private:
+@@ -330,6 +330,9 @@ private:
    /// \invariant { Size > 0 }
    virtual void write_impl(const char *Ptr, size_t Size) = 0;
  
@@ -22,7 +22,7 @@ index 81c65e117782..b1aa670549c0 100644
    /// Return the current position within the stream, not counting the bytes
    /// currently in the buffer.
    virtual uint64_t current_pos() const = 0;
-@@ -405,7 +408,6 @@ class raw_fd_ostream : public raw_pwrite_stream {
+@@ -414,7 +417,6 @@ class raw_fd_ostream : public raw_pwrite_stream {
    int FD;
    bool ShouldClose;
    bool SupportsSeeking = false;
@@ -31,7 +31,7 @@ index 81c65e117782..b1aa670549c0 100644
  #ifdef _WIN32
    /// True if this fd refers to a Windows console device. Mintty and other
 diff --git a/llvm/lib/Support/raw_ostream.cpp b/llvm/lib/Support/raw_ostream.cpp
-index 5051ff4e8d06..941240c832dd 100644
+index 99c83f945de5..6914211315d5 100644
 --- a/llvm/lib/Support/raw_ostream.cpp
 +++ b/llvm/lib/Support/raw_ostream.cpp
 @@ -90,6 +90,9 @@ raw_ostream::~raw_ostream() {

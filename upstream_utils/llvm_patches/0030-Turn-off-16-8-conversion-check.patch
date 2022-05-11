@@ -1,7 +1,7 @@
-From b728ecfd9fcf0608017762aca5c616e04ac0c4a1 Mon Sep 17 00:00:00 2001
+From 78b28ae885d61b94625c51f154c65e3c7ff1103c Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Wed, 4 May 2022 02:59:09 -0400
-Subject: [PATCH 30/36] Turn off 16-> 8 conversion check
+Subject: [PATCH 30/35] Turn off 16-> 8 conversion check
 
 ---
  llvm/lib/Support/ConvertUTFWrapper.cpp | 4 ----

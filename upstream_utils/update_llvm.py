@@ -150,7 +150,7 @@ def overwrite_tests(wpiutil_root, llvm_root):
 
 def main():
     root, repo = setup_upstream_repo("https://github.com/llvm/llvm-project",
-                                     "llvmorg-12.0.0")
+                                     "llvmorg-13.0.0")
     wpiutil = os.path.join(root, "wpiutil")
 
     patch_root = os.path.join(root, "upstream_utils/llvm_patches")
@@ -188,10 +188,9 @@ def main():
         os.path.join(patch_root, "0030-Turn-off-16-8-conversion-check.patch"),
         os.path.join(patch_root, "0031-Random-fixes.-Sigh.patch"),
         os.path.join(patch_root, "0032-Fix-documentation-warnings.patch"),
-        os.path.join(patch_root, "0033-Fix-Gtest-warnings.patch"),
-        os.path.join(patch_root, "0034-Fix-athena-compilation-error.patch"),
-        os.path.join(patch_root, "0035-Delete-numbers-from-mathextras.patch"),
-        os.path.join(patch_root, "0036-Detemplatize-small-vector-base.patch"),
+        os.path.join(patch_root, "0033-Fix-athena-compilation-error.patch"),
+        os.path.join(patch_root, "0034-Delete-numbers-from-mathextras.patch"),
+        os.path.join(patch_root, "0035-Detemplatize-small-vector-base.patch"),
     ]
     # yapf: enable
     am_patches(repo, frontend_patches, use_threeway=True)

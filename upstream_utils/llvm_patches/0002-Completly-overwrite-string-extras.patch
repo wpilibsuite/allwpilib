@@ -1,24 +1,25 @@
-From 374e21451a828b42749e2ed35128f55d672044a4 Mon Sep 17 00:00:00 2001
+From a878cdc3c7caee591e4959e46c142b733820c889 Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Tue, 3 May 2022 21:50:29 -0400
-Subject: [PATCH 02/36] Completly overwrite string extras
+Subject: [PATCH 02/35] Completly overwrite string extras
 
 ---
- llvm/include/llvm/ADT/StringExtras.h | 982 ++++++++++++++++-----------
- llvm/lib/Support/StringExtras.cpp    | 446 ++++++++----
- 2 files changed, 929 insertions(+), 499 deletions(-)
+ llvm/include/llvm/ADT/StringExtras.h | 994 ++++++++++++++++-----------
+ llvm/lib/Support/StringExtras.cpp    | 446 +++++++++---
+ 2 files changed, 929 insertions(+), 511 deletions(-)
 
 diff --git a/llvm/include/llvm/ADT/StringExtras.h b/llvm/include/llvm/ADT/StringExtras.h
-index 68e89508cba9..36cd45bd6f76 100644
+index 6bda25b85313..36cd45bd6f76 100644
 --- a/llvm/include/llvm/ADT/StringExtras.h
 +++ b/llvm/include/llvm/ADT/StringExtras.h
-@@ -10,102 +10,60 @@
+@@ -10,103 +10,60 @@
  //
  //===----------------------------------------------------------------------===//
  
 -#ifndef LLVM_ADT_STRINGEXTRAS_H
 -#define LLVM_ADT_STRINGEXTRAS_H
 -
+-#include "llvm/ADT/APSInt.h"
 -#include "llvm/ADT/ArrayRef.h"
 -#include "llvm/ADT/SmallString.h"
 -#include "llvm/ADT/StringRef.h"
@@ -136,7 +137,7 @@ index 68e89508cba9..36cd45bd6f76 100644
        return false;
    return true;
  }
-@@ -114,7 +72,7 @@ inline bool isASCII(llvm::StringRef S) {
+@@ -115,7 +72,7 @@ inline bool isASCII(llvm::StringRef S) {
  ///
  /// Locale-independent version of the C standard library isprint whose results
  /// may differ on different platforms.
@@ -145,7 +146,7 @@ index 68e89508cba9..36cd45bd6f76 100644
    unsigned char UC = static_cast<unsigned char>(C);
    return (0x20 <= UC) && (UC <= 0x7E);
  }
-@@ -128,20 +86,20 @@ inline bool isSpace(char C) {
+@@ -129,20 +86,20 @@ inline bool isSpace(char C) {
  }
  
  /// Returns the corresponding lowercase character if \p x is uppercase.
@@ -169,7 +170,7 @@ index 68e89508cba9..36cd45bd6f76 100644
    char Buffer[17];
    char *BufPtr = std::end(Buffer);
  
-@@ -156,339 +114,593 @@ inline std::string utohexstr(uint64_t X, bool LowerCase = false) {
+@@ -157,350 +114,593 @@ inline std::string utohexstr(uint64_t X, bool LowerCase = false) {
    return std::string(BufPtr, std::end(Buffer));
  }
  
@@ -562,6 +563,17 @@ index 68e89508cba9..36cd45bd6f76 100644
 -    return utostr(static_cast<uint64_t>(1) + ~static_cast<uint64_t>(X), true);
 -  else
 -    return utostr(static_cast<uint64_t>(X));
+-}
+-
+-inline std::string toString(const APInt &I, unsigned Radix, bool Signed,
+-                            bool formatAsCLiteral = false) {
+-  SmallString<40> S;
+-  I.toString(S, Radix, Signed, formatAsCLiteral);
+-  return std::string(S.str());
+-}
+-
+-inline std::string toString(const APSInt &I, unsigned Radix) {
+-  return toString(I, Radix, I.isSigned());
 -}
 -
 -/// StrInStrNoCase - Portable version of strcasestr.  Locates the first
@@ -1082,7 +1094,7 @@ index 68e89508cba9..36cd45bd6f76 100644
 +
 +#endif // WPIUTIL_WPI_STRINGEXTRAS_H
 diff --git a/llvm/lib/Support/StringExtras.cpp b/llvm/lib/Support/StringExtras.cpp
-index c206bd214519..a65d763d6900 100644
+index 8abf9f7ce0f1..a65d763d6900 100644
 --- a/llvm/lib/Support/StringExtras.cpp
 +++ b/llvm/lib/Support/StringExtras.cpp
 @@ -10,128 +10,346 @@
@@ -1104,7 +1116,7 @@ index c206bd214519..a65d763d6900 100644
 -  if (N > M)
 -    return StringRef::npos;
 -  for (size_t i = 0, e = M - N + 1; i != e; ++i)
--    if (s1.substr(i, N).equals_lower(s2))
+-    if (s1.substr(i, N).equals_insensitive(s2))
 +#include "wpi/StringExtras.h"
 +
 +#include <algorithm>

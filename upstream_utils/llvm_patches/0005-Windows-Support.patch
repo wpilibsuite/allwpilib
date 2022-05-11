@@ -1,7 +1,7 @@
-From 05e7209a635f17bfd2c1554ddfed21b5dfc84188 Mon Sep 17 00:00:00 2001
+From 28f6248c202c58401a69799067af5aa00d1a10f7 Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Tue, 3 May 2022 20:22:38 -0400
-Subject: [PATCH 05/36] Windows Support
+Subject: [PATCH 05/35] Windows Support
 
 ---
  .../llvm/Support/Windows/WindowsSupport.h     | 39 +++++---
@@ -10,7 +10,7 @@ Subject: [PATCH 05/36] Windows Support
  3 files changed, 122 insertions(+), 16 deletions(-)
 
 diff --git a/llvm/include/llvm/Support/Windows/WindowsSupport.h b/llvm/include/llvm/Support/Windows/WindowsSupport.h
-index bd5a90c2c3f0..eff608d795a3 100644
+index a45eeaba4ad5..c972f10dcaa7 100644
 --- a/llvm/include/llvm/Support/Windows/WindowsSupport.h
 +++ b/llvm/include/llvm/Support/Windows/WindowsSupport.h
 @@ -53,11 +53,35 @@
@@ -184,10 +184,10 @@ index e24a918c5c89..b4c7fffee8f7 100644
  
  ConvertUTF_RESTORE_WARNINGS
 diff --git a/llvm/lib/Support/MemoryBuffer.cpp b/llvm/lib/Support/MemoryBuffer.cpp
-index 248fb72c4968..dca541d1dd5d 100644
+index bcf13d828a5d..cddad9ca0660 100644
 --- a/llvm/lib/Support/MemoryBuffer.cpp
 +++ b/llvm/lib/Support/MemoryBuffer.cpp
-@@ -223,8 +223,8 @@ public:
+@@ -225,8 +225,8 @@ public:
  
  static ErrorOr<std::unique_ptr<WritableMemoryBuffer>>
  getMemoryBufferForStream(sys::fs::file_t FD, const Twine &BufferName) {

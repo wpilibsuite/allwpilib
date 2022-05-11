@@ -1,7 +1,7 @@
-From f7014c5f0388ab098492b9a78657800b75d99027 Mon Sep 17 00:00:00 2001
+From 69b8dc6e075b0534c60522bb8a7b4c3f975b3da5 Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Tue, 3 May 2022 22:07:37 -0400
-Subject: [PATCH 14/36] Prefer uint8_t for buffers
+Subject: [PATCH 14/35] Prefer uint8_t for buffers
 
 ---
  llvm/include/llvm/Support/MemoryBuffer.h      | 26 +++++++++----------
@@ -11,7 +11,7 @@ Subject: [PATCH 14/36] Prefer uint8_t for buffers
  4 files changed, 24 insertions(+), 24 deletions(-)
 
 diff --git a/llvm/include/llvm/Support/MemoryBuffer.h b/llvm/include/llvm/Support/MemoryBuffer.h
-index 0a6f8b639dc2..12f301b9d791 100644
+index 98a48aaaa5cc..52a154ed957f 100644
 --- a/llvm/include/llvm/Support/MemoryBuffer.h
 +++ b/llvm/include/llvm/Support/MemoryBuffer.h
 @@ -46,13 +46,13 @@ using file_t = int;
@@ -42,7 +42,7 @@ index 0a6f8b639dc2..12f301b9d791 100644
    size_t getBufferSize() const { return BufferEnd-BufferStart; }
  
    span<const uint8_t> getBuffer() const {
-@@ -167,11 +167,11 @@ public:
+@@ -168,11 +168,11 @@ public:
  
    // const_cast is well-defined here, because the underlying buffer is
    // guaranteed to have been initialized with a mutable buffer.
@@ -90,7 +90,7 @@ index 34fa70bc6f8e..fd9896f6fd55 100644
  
    /// Check pointer identity (not value) of identifier and data.
 diff --git a/llvm/include/llvm/Support/SmallVectorMemoryBuffer.h b/llvm/include/llvm/Support/SmallVectorMemoryBuffer.h
-index fe9bf46d12a5..89fa409f94ba 100644
+index 924ed77510fe..237d2e8009bb 100644
 --- a/llvm/include/llvm/Support/SmallVectorMemoryBuffer.h
 +++ b/llvm/include/llvm/Support/SmallVectorMemoryBuffer.h
 @@ -36,14 +36,14 @@ public:
@@ -120,10 +120,10 @@ index fe9bf46d12a5..89fa409f94ba 100644
  };
  
 diff --git a/llvm/lib/Support/MemoryBuffer.cpp b/llvm/lib/Support/MemoryBuffer.cpp
-index 9d0050aebfad..59b3b703d76a 100644
+index 5a176249f427..b296f06264de 100644
 --- a/llvm/lib/Support/MemoryBuffer.cpp
 +++ b/llvm/lib/Support/MemoryBuffer.cpp
-@@ -42,7 +42,7 @@ MemoryBuffer::~MemoryBuffer() { }
+@@ -43,7 +43,7 @@ MemoryBuffer::~MemoryBuffer() { }
  
  /// init - Initialize this MemoryBuffer as a reference to externally allocated
  /// memory, memory that we know is already null terminated.
@@ -132,7 +132,7 @@ index 9d0050aebfad..59b3b703d76a 100644
                          bool RequiresNullTerminator) {
    assert((!RequiresNullTerminator || BufEnd[0] == 0) &&
           "Buffer is not null terminated!");
-@@ -56,7 +56,7 @@ void MemoryBuffer::init(const char *BufStart, const char *BufEnd,
+@@ -57,7 +57,7 @@ void MemoryBuffer::init(const char *BufStart, const char *BufEnd,
  
  /// CopyStringView - Copies contents of a std::string_view into a block of memory and
  /// null-terminates it.
@@ -141,7 +141,7 @@ index 9d0050aebfad..59b3b703d76a 100644
    if (!Data.empty())
      memcpy(Memory, Data.data(), Data.size());
    Memory[Data.size()] = 0; // Null terminate string.
-@@ -191,7 +191,7 @@ class MemoryBufferMMapFile : public MB {
+@@ -193,7 +193,7 @@ class MemoryBufferMMapFile : public MB {
      return Len + (Offset - getLegalMapOffset(Offset));
    }
  
@@ -150,7 +150,7 @@ index 9d0050aebfad..59b3b703d76a 100644
      return MFR.const_data() + (Offset - getLegalMapOffset(Offset));
    }
  
-@@ -201,7 +201,7 @@ public:
+@@ -203,7 +203,7 @@ public:
        : MFR(FD, Mapmode<MB>, getLegalMapSize(Len, Offset),
              getLegalMapOffset(Offset), EC) {
      if (!EC) {
@@ -159,7 +159,7 @@ index 9d0050aebfad..59b3b703d76a 100644
        MemoryBuffer::init(Start, Start + Len, RequiresNullTerminator);
      }
    }
-@@ -295,7 +295,7 @@ WritableMemoryBuffer::getNewUninitMemBuffer(size_t Size, std::string_view Buffer
+@@ -296,7 +296,7 @@ WritableMemoryBuffer::getNewUninitMemBuffer(size_t Size, std::string_view Buffer
    std::string_view NameRef = BufferName.tostd::string_view(NameBuf);
    size_t AlignedStringLen = alignTo(sizeof(MemBuffer) + NameRef.size() + 1, 16);
    size_t RealLen = AlignedStringLen + Size + 1;
@@ -168,7 +168,7 @@ index 9d0050aebfad..59b3b703d76a 100644
    if (!Mem)
      return nullptr;
  
-@@ -303,7 +303,7 @@ WritableMemoryBuffer::getNewUninitMemBuffer(size_t Size, std::string_view Buffer
+@@ -304,7 +304,7 @@ WritableMemoryBuffer::getNewUninitMemBuffer(size_t Size, std::string_view Buffer
    CopyStringView(Mem + sizeof(MemBuffer), NameRef);
  
    // The buffer begins after the name and must be aligned.

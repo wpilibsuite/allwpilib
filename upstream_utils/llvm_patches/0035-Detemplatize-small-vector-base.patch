@@ -1,7 +1,7 @@
-From f92e0d0871f540deee2271773239b7ac31ceded5 Mon Sep 17 00:00:00 2001
+From be85b8a87637e4738a5f19b9aeb0da2cc871877c Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Thu, 5 May 2022 23:18:34 -0400
-Subject: [PATCH 36/36] Detemplatize small vector base
+Subject: [PATCH 35/35] Detemplatize small vector base
 
 ---
  llvm/include/llvm/ADT/SmallVector.h | 21 +++++++-----------
@@ -9,7 +9,7 @@ Subject: [PATCH 36/36] Detemplatize small vector base
  2 files changed, 13 insertions(+), 42 deletions(-)
 
 diff --git a/llvm/include/llvm/ADT/SmallVector.h b/llvm/include/llvm/ADT/SmallVector.h
-index eed2685c5936..5af920291e1c 100644
+index 58efd533c8ea..8cad1e3fc946 100644
 --- a/llvm/include/llvm/ADT/SmallVector.h
 +++ b/llvm/include/llvm/ADT/SmallVector.h
 @@ -50,14 +50,14 @@ namespace llvm {

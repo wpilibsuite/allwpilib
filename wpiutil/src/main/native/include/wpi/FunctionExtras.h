@@ -29,11 +29,12 @@
 ///
 //===----------------------------------------------------------------------===//
 
-#ifndef WPIUTIL_WPI_FUNCTION_EXTRAS_H
-#define WPIUTIL_WPI_FUNCTION_EXTRAS_H
+#ifndef WPIUTIL_WPI_FUNCTIONEXTRAS_H
+#define WPIUTIL_WPI_FUNCTIONEXTRAS_H
 
 #include "wpi/PointerIntPair.h"
 #include "wpi/PointerUnion.h"
+#include "wpi/STLForwardCompat.h"
 #include "wpi/MemAlloc.h"
 #include "wpi/type_traits.h"
 #include <memory>
@@ -65,6 +66,15 @@ template <typename T>
 using EnableIfTrivial =
     std::enable_if_t<std::is_trivially_move_constructible<T>::value &&
                      std::is_trivially_destructible<T>::value>;
+template <typename CallableT, typename ThisT>
+using EnableUnlessSameType =
+    std::enable_if_t<!std::is_same<remove_cvref_t<CallableT>, ThisT>::value>;
+template <typename CallableT, typename Ret, typename... Params>
+using EnableIfCallable =
+    std::enable_if_t<std::is_void<Ret>::value ||
+                     std::is_convertible<decltype(std::declval<CallableT>()(
+                                             std::declval<Params>()...)),
+                                         Ret>::value>;
 
 template <typename ReturnT, typename... ParamTs> class UniqueFunctionBase {
 protected:
@@ -86,13 +96,24 @@ protected:
   // The heuristic used is related to common ABI register passing conventions.
   // It doesn't have to be exact though, and in one way it is more strict
   // because we want to still be able to observe either moves *or* copies.
+  template <typename T> struct AdjustedParamTBase {
+    static_assert(!std::is_reference<T>::value,
+                  "references should be handled by template specialization");
+    using type = typename std::conditional<
+        std::is_trivially_copy_constructible<T>::value &&
+            std::is_trivially_move_constructible<T>::value &&
+            IsSizeLessThanThresholdT<T>::value,
+        T, T &>::type;
+  };
+
+  // This specialization ensures that 'AdjustedParam<V<T>&>' or
+  // 'AdjustedParam<V<T>&&>' does not trigger a compile-time error when 'T' is
+  // an incomplete type and V a templated type.
+  template <typename T> struct AdjustedParamTBase<T &> { using type = T &; };
+  template <typename T> struct AdjustedParamTBase<T &&> { using type = T &; };
+
   template <typename T>
-  using AdjustedParamT = typename std::conditional<
-      !std::is_reference<T>::value &&
-          std::is_trivially_copy_constructible<T>::value &&
-          std::is_trivially_move_constructible<T>::value &&
-          IsSizeLessThanThresholdT<T>::value,
-      T, T &>::type;
+  using AdjustedParamT = typename AdjustedParamTBase<T>::type;
 
   // The type of the erased function pointer we use as a callback to dispatch to
   // the stored callable when it is trivial to move and destroy.
@@ -352,7 +373,10 @@ public:
   unique_function &operator=(const unique_function &) = delete;
 
   template <typename CallableT>
-  unique_function(CallableT Callable)
+  unique_function(
+      CallableT Callable,
+      detail::EnableUnlessSameType<CallableT, unique_function> * = nullptr,
+      detail::EnableIfCallable<CallableT, R, P...> * = nullptr)
       : Base(std::forward<CallableT>(Callable),
              typename Base::template CalledAs<CallableT>{}) {}
 
@@ -375,7 +399,10 @@ public:
   unique_function &operator=(const unique_function &) = delete;
 
   template <typename CallableT>
-  unique_function(CallableT Callable)
+  unique_function(
+      CallableT Callable,
+      detail::EnableUnlessSameType<CallableT, unique_function> * = nullptr,
+      detail::EnableIfCallable<const CallableT, R, P...> * = nullptr)
       : Base(std::forward<CallableT>(Callable),
              typename Base::template CalledAs<const CallableT>{}) {}
 
@@ -390,4 +417,4 @@ public:
 
 } // end namespace wpi
 
-#endif // WPIUTIL_WPI_FUNCTION_H
+#endif // WPIUTIL_WPI_FUNCTIONEXTRAS_H

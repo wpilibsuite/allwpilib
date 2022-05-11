@@ -24,7 +24,6 @@
 #include "wpi/iterator_range.h"
 #include "wpi/Compiler.h"
 #include "wpi/ErrorHandling.h"
-#include "wpi/MathExtras.h"
 #include "wpi/MemAlloc.h"
 #include "wpi/type_traits.h"
 #include <algorithm>
@@ -32,6 +31,7 @@
 #include <cstddef>
 #include <cstdlib>
 #include <cstring>
+#include <functional>
 #include <initializer_list>
 #include <iterator>
 #include <limits>

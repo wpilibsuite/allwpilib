@@ -1,13 +1,13 @@
-From 88e25df0a88aedbc0a8c650891297cb3b0244548 Mon Sep 17 00:00:00 2001
+From 2f5478a63ecb1cb5cb6a7a6097b135206e666b5c Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Wed, 4 May 2022 00:59:50 -0400
-Subject: [PATCH 29/36] OS dependent changes
+Subject: [PATCH 29/35] OS dependent changes
 
 ---
  llvm/lib/Support/ErrorHandling.cpp |   6 ++
  llvm/lib/Support/MemoryBuffer.cpp  | 117 ++++++++++++++++++++---------
- llvm/lib/Support/raw_ostream.cpp   |  20 ++---
- 3 files changed, 98 insertions(+), 45 deletions(-)
+ llvm/lib/Support/raw_ostream.cpp   |  22 +++---
+ 3 files changed, 100 insertions(+), 45 deletions(-)
 
 diff --git a/llvm/lib/Support/ErrorHandling.cpp b/llvm/lib/Support/ErrorHandling.cpp
 index 9db381b04247..7ea605f0add5 100644
@@ -30,10 +30,10 @@ index 9db381b04247..7ea605f0add5 100644
  }
  
 diff --git a/llvm/lib/Support/MemoryBuffer.cpp b/llvm/lib/Support/MemoryBuffer.cpp
-index df18f4a282ab..35a15868fea0 100644
+index 6320176ac912..3fbc17a894c7 100644
 --- a/llvm/lib/Support/MemoryBuffer.cpp
 +++ b/llvm/lib/Support/MemoryBuffer.cpp
-@@ -222,17 +222,25 @@ static ErrorOr<std::unique_ptr<WritableMemoryBuffer>>
+@@ -223,17 +223,25 @@ static ErrorOr<std::unique_ptr<WritableMemoryBuffer>>
  getMemoryBufferForStream(sys::fs::file_t FD, std::string_view BufferName) {
    constexpr size_t ChunkSize = 4096*4;
    SmallVector<uint8_t, ChunkSize> Buffer;
@@ -194,15 +194,17 @@ index df18f4a282ab..35a15868fea0 100644
  
    return std::move(Buf);
 diff --git a/llvm/lib/Support/raw_ostream.cpp b/llvm/lib/Support/raw_ostream.cpp
-index 941240c832dd..16e8fc5de488 100644
+index 6914211315d5..16e8fc5de488 100644
 --- a/llvm/lib/Support/raw_ostream.cpp
 +++ b/llvm/lib/Support/raw_ostream.cpp
-@@ -310,8 +310,11 @@ static int getFD(std::string_view Filename, std::error_code &EC,
+@@ -308,8 +308,13 @@ static int getFD(std::string_view Filename, std::error_code &EC,
+   // the owner of stdout and may set the "binary" flag globally based on Flags.
+   if (Filename == "-") {
      EC = std::error_code();
-     // If user requested binary then put stdout into binary mode if
-     // possible.
--    if (!(Flags & sys::fs::OF_Text))
--      sys::ChangeStdoutToBinary();
+-    // Change stdout's text/binary mode based on the Flags.
+-    sys::ChangeStdoutMode(Flags);
++    // If user requested binary then put stdout into binary mode if
++    // possible.
 +    if (!(Flags & sys::fs::OF_Text)) {
 +#if defined(_WIN32)
 +      _setmode(_fileno(stdout), _O_BINARY);
@@ -211,7 +213,7 @@ index 941240c832dd..16e8fc5de488 100644
      return STDOUT_FILENO;
    }
  
-@@ -383,10 +386,7 @@ raw_fd_ostream::raw_fd_ostream(int fd, bool shouldClose, bool unbuffered,
+@@ -381,10 +386,7 @@ raw_fd_ostream::raw_fd_ostream(int fd, bool shouldClose, bool unbuffered,
    // Get the starting position.
    off_t loc = ::lseek(FD, 0, SEEK_CUR);
  #ifdef _WIN32
@@ -223,7 +225,7 @@ index 941240c832dd..16e8fc5de488 100644
  #else
    SupportsSeeking = loc != (off_t)-1;
  #endif
-@@ -435,7 +435,7 @@ raw_fd_ostream::~raw_fd_ostream() {
+@@ -433,7 +435,7 @@ raw_fd_ostream::~raw_fd_ostream() {
  // the input is UTF-8 or transcode from the local codepage to UTF-8 before
  // quoting it. If they don't, this may mess up the encoding, but this is still
  // probably the best compromise we can make.
@@ -232,7 +234,7 @@ index 941240c832dd..16e8fc5de488 100644
    SmallVector<wchar_t, 256> WideText;
  
    // Fall back to ::write if it wasn't valid UTF-8.
-@@ -495,7 +495,11 @@ void raw_fd_ostream::write_impl(const char *Ptr, size_t Size) {
+@@ -493,7 +495,11 @@ void raw_fd_ostream::write_impl(const char *Ptr, size_t Size) {
  
    do {
      size_t ChunkSize = std::min(Size, MaxWriteSize);
@@ -244,7 +246,7 @@ index 941240c832dd..16e8fc5de488 100644
  
      if (ret < 0) {
        // If it's a recoverable error, swallow it and retry the write.
-@@ -540,8 +544,6 @@ uint64_t raw_fd_ostream::seek(uint64_t off) {
+@@ -538,8 +544,6 @@ uint64_t raw_fd_ostream::seek(uint64_t off) {
    flush();
  #ifdef _WIN32
    pos = ::_lseeki64(FD, off, SEEK_SET);

@@ -1,7 +1,7 @@
-From b7512a29923a4ea5d9a485b7cee03750b91e96ac Mon Sep 17 00:00:00 2001
+From d66e62f18967eab3914ceec51b5e30666f56c0bc Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Wed, 4 May 2022 00:21:58 -0400
-Subject: [PATCH 27/36] Add vector to raw_ostream
+Subject: [PATCH 27/35] Add vector to raw_ostream
 
 ---
  llvm/include/llvm/Support/raw_ostream.h | 115 ++++++++++++++++++++++++
@@ -9,18 +9,18 @@ Subject: [PATCH 27/36] Add vector to raw_ostream
  2 files changed, 162 insertions(+)
 
 diff --git a/llvm/include/llvm/Support/raw_ostream.h b/llvm/include/llvm/Support/raw_ostream.h
-index cd321821ef3d..81c65e117782 100644
+index 16753efa7511..bb948d269664 100644
 --- a/llvm/include/llvm/Support/raw_ostream.h
 +++ b/llvm/include/llvm/Support/raw_ostream.h
-@@ -24,6 +24,7 @@
- #include <string_view>
+@@ -26,6 +26,7 @@
+ #endif
  #include <system_error>
  #include <type_traits>
 +#include <vector>
  
  namespace fs {
  enum FileAccess : unsigned;
-@@ -235,12 +236,24 @@ public:
+@@ -244,12 +245,24 @@ public:
      return write(Str.data(), Str.size());
    }
  
@@ -45,8 +45,8 @@ index cd321821ef3d..81c65e117782 100644
  
    /// indent - Insert 'NumSpaces' spaces.
    raw_ostream &indent(unsigned NumSpaces);
-@@ -580,6 +593,108 @@ public:
-   std::string_view str() const { return std::string_view(OS.data(), OS.size()); }
+@@ -597,6 +610,108 @@ public:
+   }
  };
  
 +/// A raw_ostream that writes to a vector.  This is a
@@ -155,10 +155,10 @@ index cd321821ef3d..81c65e117782 100644
  class raw_null_ostream : public raw_pwrite_stream {
    /// See raw_ostream::write_impl.
 diff --git a/llvm/lib/Support/raw_ostream.cpp b/llvm/lib/Support/raw_ostream.cpp
-index 403bddb96d78..5051ff4e8d06 100644
+index 40176bb35d1d..99c83f945de5 100644
 --- a/llvm/lib/Support/raw_ostream.cpp
 +++ b/llvm/lib/Support/raw_ostream.cpp
-@@ -658,6 +658,53 @@ void raw_svector_ostream::pwrite_impl(const char *Ptr, size_t Size,
+@@ -656,6 +656,53 @@ void raw_svector_ostream::pwrite_impl(const char *Ptr, size_t Size,
    memcpy(OS.data() + Offset, Ptr, Size);
  }
  

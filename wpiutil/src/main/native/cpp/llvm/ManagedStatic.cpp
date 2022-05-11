@@ -17,16 +17,10 @@
 using namespace wpi;
 
 static const ManagedStaticBase *StaticList = nullptr;
-static wpi::mutex *ManagedStaticMutex = nullptr;
-static std::once_flag mutex_init_flag;
 
-static void initializeMutex() {
-  ManagedStaticMutex = new wpi::mutex();
-}
-
-static wpi::mutex* getManagedStaticMutex() {
-  std::call_once(mutex_init_flag, initializeMutex);
-  return ManagedStaticMutex;
+static wpi::mutex *getManagedStaticMutex() {
+  static wpi::mutex m;
+  return &m;
 }
 
 void ManagedStaticBase::RegisterManagedStatic(void *(*Creator)(),
@@ -65,9 +59,10 @@ void ManagedStaticBase::destroy() const {
 }
 
 /// wpi_shutdown - Deallocate and destroy all ManagedStatic variables.
+/// IMPORTANT: it's only safe to call wpi_shutdown() in single thread,
+/// without any other threads executing LLVM APIs.
+/// wpi_shutdown() should be the last use of LLVM APIs.
 void wpi::wpi_shutdown() {
-  std::scoped_lock Lock(*getManagedStaticMutex());
-
   while (StaticList)
     StaticList->destroy();
 }

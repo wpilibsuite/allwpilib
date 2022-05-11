@@ -1,10 +1,9 @@
-From 0678e1ec717946f9ec243a710e186a12678f4251 Mon Sep 17 00:00:00 2001
+From 2fb2c5336bc9f734353028e4f84c7127e977f5aa Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Tue, 3 May 2022 23:06:16 -0400
-Subject: [PATCH 23/36] Fixup includes
+Subject: [PATCH 23/35] Fixup includes
 
 ---
- llvm/include/llvm/ADT/DenseMapInfo.h               | 1 -
  llvm/include/llvm/ADT/StringMap.h                  | 7 ++++++-
  llvm/include/llvm/ADT/StringMapEntry.h             | 4 ++++
  llvm/include/llvm/Support/MathExtras.h             | 1 +
@@ -13,23 +12,10 @@ Subject: [PATCH 23/36] Fixup includes
  llvm/include/llvm/Support/Windows/WindowsSupport.h | 2 --
  llvm/lib/Support/ConvertUTFWrapper.cpp             | 1 +
  llvm/lib/Support/ErrorHandling.cpp                 | 7 +++----
- llvm/lib/Support/SmallPtrSet.cpp                   | 1 +
  llvm/lib/Support/raw_ostream.cpp                   | 6 ++++--
  llvm/unittests/ADT/SmallPtrSetTest.cpp             | 1 +
- 12 files changed, 23 insertions(+), 10 deletions(-)
+ 10 files changed, 22 insertions(+), 9 deletions(-)
 
-diff --git a/llvm/include/llvm/ADT/DenseMapInfo.h b/llvm/include/llvm/ADT/DenseMapInfo.h
-index be9620dbd50e..80a62d77946f 100644
---- a/llvm/include/llvm/ADT/DenseMapInfo.h
-+++ b/llvm/include/llvm/ADT/DenseMapInfo.h
-@@ -18,7 +18,6 @@
- #include "llvm/ADT/Hashing.h"
- #include "llvm/ADT/span.h"
- #include "llvm/Support/PointerLikeTypeTraits.h"
--#include "llvm/Support/TypeSize.h"
- #include <cassert>
- #include <cstddef>
- #include <cstdint>
 diff --git a/llvm/include/llvm/ADT/StringMap.h b/llvm/include/llvm/ADT/StringMap.h
 index ce4e807b51f4..1f1855338626 100644
 --- a/llvm/include/llvm/ADT/StringMap.h
@@ -52,7 +38,7 @@ index ce4e807b51f4..1f1855338626 100644
  namespace llvm {
  
 diff --git a/llvm/include/llvm/ADT/StringMapEntry.h b/llvm/include/llvm/ADT/StringMapEntry.h
-index 253cb4b02152..ede4b3967373 100644
+index 66a30698d787..1201bb8e69d4 100644
 --- a/llvm/include/llvm/ADT/StringMapEntry.h
 +++ b/llvm/include/llvm/ADT/StringMapEntry.h
 @@ -15,6 +15,10 @@
@@ -67,19 +53,19 @@ index 253cb4b02152..ede4b3967373 100644
  #include <string_view>
  
 diff --git a/llvm/include/llvm/Support/MathExtras.h b/llvm/include/llvm/Support/MathExtras.h
-index f72d70f0b671..c363c7e9118f 100644
+index 7df689193c3f..f4e7ed2c18bd 100644
 --- a/llvm/include/llvm/Support/MathExtras.h
 +++ b/llvm/include/llvm/Support/MathExtras.h
-@@ -16,6 +16,7 @@
+@@ -15,6 +15,7 @@
+ 
  #include "llvm/Support/Compiler.h"
- #include <algorithm>
  #include <cassert>
 +#include <cmath>
  #include <climits>
  #include <cmath>
  #include <cstdint>
 diff --git a/llvm/include/llvm/Support/MemoryBuffer.h b/llvm/include/llvm/Support/MemoryBuffer.h
-index 918752587424..f77e873fe13d 100644
+index c624573455eb..98923edfb269 100644
 --- a/llvm/include/llvm/Support/MemoryBuffer.h
 +++ b/llvm/include/llvm/Support/MemoryBuffer.h
 @@ -15,6 +15,7 @@
@@ -147,20 +133,8 @@ index 2cd427bbd344..553a68de4e3d 100644
  #endif
  
  using namespace llvm;
-diff --git a/llvm/lib/Support/SmallPtrSet.cpp b/llvm/lib/Support/SmallPtrSet.cpp
-index 930ebdde2cc1..da65ee31ce5c 100644
---- a/llvm/lib/Support/SmallPtrSet.cpp
-+++ b/llvm/lib/Support/SmallPtrSet.cpp
-@@ -14,6 +14,7 @@
- #include "llvm/ADT/SmallPtrSet.h"
- #include "llvm/ADT/DenseMapInfo.h"
- #include "llvm/Support/MathExtras.h"
-+#include "llvm/Support/MemAlloc.h"
- #include "llvm/Support/ErrorHandling.h"
- #include <algorithm>
- #include <cassert>
 diff --git a/llvm/lib/Support/raw_ostream.cpp b/llvm/lib/Support/raw_ostream.cpp
-index fb4df18d364a..a2153dbaf937 100644
+index 0bd146b1487d..9a65ae315693 100644
 --- a/llvm/lib/Support/raw_ostream.cpp
 +++ b/llvm/lib/Support/raw_ostream.cpp
 @@ -15,7 +15,8 @@
@@ -191,7 +165,7 @@ index fb4df18d364a..a2153dbaf937 100644
  
  using namespace llvm;
 diff --git a/llvm/unittests/ADT/SmallPtrSetTest.cpp b/llvm/unittests/ADT/SmallPtrSetTest.cpp
-index dc5c2b7ea230..104e21949468 100644
+index 531f81ab5b3f..833e43ed7b90 100644
 --- a/llvm/unittests/ADT/SmallPtrSetTest.cpp
 +++ b/llvm/unittests/ADT/SmallPtrSetTest.cpp
 @@ -14,6 +14,7 @@

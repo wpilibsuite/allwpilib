@@ -1,7 +1,7 @@
-From 78d6516ace3e43bed98489f3c7dd0aa4906103ba Mon Sep 17 00:00:00 2001
+From 6e1e33c51bcc21ce8ddbcab531ef38dbdb51988f Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Tue, 3 May 2022 19:53:22 -0400
-Subject: [PATCH 01/36] Fix spelling errors
+Subject: [PATCH 01/35] Fix spelling errors
 
 ---
  llvm/include/llvm/Support/Chrono.h        | 2 +-
@@ -10,7 +10,7 @@ Subject: [PATCH 01/36] Fix spelling errors
  3 files changed, 4 insertions(+), 4 deletions(-)
 
 diff --git a/llvm/include/llvm/Support/Chrono.h b/llvm/include/llvm/Support/Chrono.h
-index 098512dce783..7ae0991400a6 100644
+index f478549a7e4e..004519a883fd 100644
 --- a/llvm/include/llvm/Support/Chrono.h
 +++ b/llvm/include/llvm/Support/Chrono.h
 @@ -22,7 +22,7 @@ class raw_ostream;
@@ -36,7 +36,7 @@ index 0ec0242d569d..dd85a5892e01 100644
  
    /// ScopedFatalErrorHandler - This is a simple helper class which just
 diff --git a/llvm/include/llvm/Support/MemoryBuffer.h b/llvm/include/llvm/Support/MemoryBuffer.h
-index 9e6ee2536c5e..fb3d03dd5454 100644
+index c9ceeedbf3dc..96b836591c46 100644
 --- a/llvm/include/llvm/Support/MemoryBuffer.h
 +++ b/llvm/include/llvm/Support/MemoryBuffer.h
 @@ -203,7 +203,7 @@ public:

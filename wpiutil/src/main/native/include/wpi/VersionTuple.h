@@ -94,6 +94,20 @@ public:
     return *this;
   }
 
+  /// Return a version tuple that contains only components that are non-zero.
+  VersionTuple normalize() const {
+    VersionTuple Result = *this;
+    if (Result.Build == 0) {
+      Result.HasBuild = false;
+      if (Result.Subminor == 0) {
+        Result.HasSubminor = false;
+        if (Result.Minor == 0)
+          Result.HasMinor = false;
+      }
+    }
+    return Result;
+  }
+
   /// Determine if two version numbers are equivalent. If not
   /// provided, minor and subminor version numbers are considered to be zero.
   friend bool operator==(const VersionTuple &X, const VersionTuple &Y) {

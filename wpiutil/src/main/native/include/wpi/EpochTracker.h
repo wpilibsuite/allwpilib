@@ -12,8 +12,8 @@
 //
 //===----------------------------------------------------------------------===//
 
-#ifndef WPIUTIL_WPI_EPOCH_TRACKER_H
-#define WPIUTIL_WPI_EPOCH_TRACKER_H
+#ifndef WPIUTIL_WPI_EPOCHTRACKER_H
+#define WPIUTIL_WPI_EPOCHTRACKER_H
 
 
 #include <cstdint>

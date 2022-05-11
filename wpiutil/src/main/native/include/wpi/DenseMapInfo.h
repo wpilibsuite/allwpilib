@@ -13,11 +13,7 @@
 #ifndef WPIUTIL_WPI_DENSEMAPINFO_H
 #define WPIUTIL_WPI_DENSEMAPINFO_H
 
-#include "wpi/APInt.h"
-#include "wpi/APSInt.h"
 #include "wpi/Hashing.h"
-#include "wpi/span.h"
-#include "wpi/PointerLikeTypeTraits.h"
 #include <cassert>
 #include <cstddef>
 #include <cstdint>
@@ -259,7 +255,7 @@ template <typename... Ts> struct DenseMapInfo<std::tuple<Ts...>> {
   }
 
   template <unsigned I>
-  static unsigned getHashValueImpl(const Tuple &values, std::true_type) {
+  static unsigned getHashValueImpl(const Tuple &, std::true_type) {
     return 0;
   }
 
@@ -277,7 +273,7 @@ template <typename... Ts> struct DenseMapInfo<std::tuple<Ts...>> {
   }
 
   template <unsigned I>
-  static bool isEqualImpl(const Tuple &lhs, const Tuple &rhs, std::true_type) {
+  static bool isEqualImpl(const Tuple &, const Tuple &, std::true_type) {
     return true;
   }
 
@@ -287,110 +283,11 @@ template <typename... Ts> struct DenseMapInfo<std::tuple<Ts...>> {
   }
 };
 
-// Provide DenseMapInfo for std::string_views.
-template <> struct DenseMapInfo<std::string_view> {
-  static inline std::string_view getEmptyKey() {
-    return std::string_view(reinterpret_cast<const char *>(~static_cast<uintptr_t>(0)),
-                     0);
-  }
-
-  static inline std::string_view getTombstoneKey() {
-    return std::string_view(reinterpret_cast<const char *>(~static_cast<uintptr_t>(1)),
-                     0);
-  }
-
-  static unsigned getHashValue(std::string_view Val) {
-    assert(Val.data() != getEmptyKey().data() && "Cannot hash the empty key!");
-    assert(Val.data() != getTombstoneKey().data() &&
-           "Cannot hash the tombstone key!");
-    return (unsigned)(hash_value(Val));
-  }
-
-  static bool isEqual(std::string_view LHS, std::string_view RHS) {
-    if (RHS.data() == getEmptyKey().data())
-      return LHS.data() == getEmptyKey().data();
-    if (RHS.data() == getTombstoneKey().data())
-      return LHS.data() == getTombstoneKey().data();
-    return LHS == RHS;
-  }
-};
-
-// Provide DenseMapInfo for spans.
-template <typename T> struct DenseMapInfo<span<T>> {
-  static inline span<T> getEmptyKey() {
-    return span<T>(reinterpret_cast<const T *>(~static_cast<uintptr_t>(0)),
-                       size_t(0));
-  }
-
-  static inline span<T> getTombstoneKey() {
-    return span<T>(reinterpret_cast<const T *>(~static_cast<uintptr_t>(1)),
-                       size_t(0));
-  }
-
-  static unsigned getHashValue(span<T> Val) {
-    assert(Val.data() != getEmptyKey().data() && "Cannot hash the empty key!");
-    assert(Val.data() != getTombstoneKey().data() &&
-           "Cannot hash the tombstone key!");
-    return (unsigned)(hash_value(Val));
-  }
-
-  static bool isEqual(span<T> LHS, span<T> RHS) {
-    if (RHS.data() == getEmptyKey().data())
-      return LHS.data() == getEmptyKey().data();
-    if (RHS.data() == getTombstoneKey().data())
-      return LHS.data() == getTombstoneKey().data();
-    return LHS == RHS;
-  }
-};
-
 template <> struct DenseMapInfo<hash_code> {
   static inline hash_code getEmptyKey() { return hash_code(-1); }
   static inline hash_code getTombstoneKey() { return hash_code(-2); }
   static unsigned getHashValue(hash_code val) { return static_cast<unsigned>(val); }
   static bool isEqual(hash_code LHS, hash_code RHS) { return LHS == RHS; }
-};
-
-/// Provide DenseMapInfo for APInt.
-template <> struct DenseMapInfo<APInt> {
-  static inline APInt getEmptyKey() {
-    APInt V(nullptr, 0);
-    V.U.VAL = 0;
-    return V;
-  }
-
-  static inline APInt getTombstoneKey() {
-    APInt V(nullptr, 0);
-    V.U.VAL = 1;
-    return V;
-  }
-
-  static unsigned getHashValue(const APInt &Key) {
-    return static_cast<unsigned>(hash_value(Key));
-  }
-
-  static bool isEqual(const APInt &LHS, const APInt &RHS) {
-    return LHS.getBitWidth() == RHS.getBitWidth() && LHS == RHS;
-  }
-};
-
-/// Provide DenseMapInfo for APSInt, using the DenseMapInfo for APInt.
-template <> struct DenseMapInfo<APSInt> {
-  static inline APSInt getEmptyKey() {
-    return APSInt(DenseMapInfo<APInt>::getEmptyKey());
-  }
-
-  static inline APSInt getTombstoneKey() {
-    return APSInt(DenseMapInfo<APInt>::getTombstoneKey());
-  }
-
-  static unsigned getHashValue(const APSInt &Key) {
-    return static_cast<unsigned>(hash_value(Key));
-  }
-
-  static bool isEqual(const APSInt &LHS, const APSInt &RHS) {
-    return LHS.getBitWidth() == RHS.getBitWidth() &&
-           LHS.isUnsigned() == RHS.isUnsigned() && LHS == RHS;
-  }
 };
 
 } // end namespace wpi

@@ -1,12 +1,12 @@
-From 7f713581cb2301b052dc4fc5dabac096b78a8dde Mon Sep 17 00:00:00 2001
+From e7bbfc5135c9d6e46fc95a10644eec8b78e69c46 Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Tue, 3 May 2022 20:50:32 -0400
-Subject: [PATCH 09/36] Prefer scoped lock, wpi mutex
+Subject: [PATCH 09/35] Prefer scoped lock, wpi mutex
 
 ---
  llvm/lib/Support/ErrorHandling.cpp | 12 ++++++------
- llvm/lib/Support/ManagedStatic.cpp | 21 ++++++---------------
- 2 files changed, 12 insertions(+), 21 deletions(-)
+ llvm/lib/Support/ManagedStatic.cpp | 17 ++++-------------
+ 2 files changed, 10 insertions(+), 19 deletions(-)
 
 diff --git a/llvm/lib/Support/ErrorHandling.cpp b/llvm/lib/Support/ErrorHandling.cpp
 index 37e4e33d17c5..756814416b91 100644
@@ -65,10 +65,10 @@ index 37e4e33d17c5..756814416b91 100644
      HandlerData = BadAllocErrorHandlerUserData;
    }
 diff --git a/llvm/lib/Support/ManagedStatic.cpp b/llvm/lib/Support/ManagedStatic.cpp
-index 053493f72fb5..bf7e0074d26e 100644
+index a6ae67066ea0..4e958b31c6d6 100644
 --- a/llvm/lib/Support/ManagedStatic.cpp
 +++ b/llvm/lib/Support/ManagedStatic.cpp
-@@ -12,20 +12,20 @@
+@@ -12,15 +12,15 @@
  
  #include "llvm/Support/ManagedStatic.h"
  #include "llvm/Config/config.h"
@@ -79,21 +79,15 @@ index 053493f72fb5..bf7e0074d26e 100644
  using namespace llvm;
  
  static const ManagedStaticBase *StaticList = nullptr;
--static std::recursive_mutex *ManagedStaticMutex = nullptr;
-+static llvm::mutex *ManagedStaticMutex = nullptr;
- static llvm::once_flag mutex_init_flag;
- 
- static void initializeMutex() {
--  ManagedStaticMutex = new std::recursive_mutex();
-+  ManagedStaticMutex = new llvm::mutex();
- }
  
 -static std::recursive_mutex *getManagedStaticMutex() {
-+static llvm::mutex* getManagedStaticMutex() {
-   llvm::call_once(mutex_init_flag, initializeMutex);
-   return ManagedStaticMutex;
+-  static std::recursive_mutex m;
++static llvm::mutex *getManagedStaticMutex() {
++  static llvm::mutex m;
+   return &m;
  }
-@@ -34,7 +34,7 @@ void ManagedStaticBase::RegisterManagedStatic(void *(*Creator)(),
+ 
+@@ -28,7 +28,7 @@ void ManagedStaticBase::RegisterManagedStatic(void *(*Creator)(),
                                                void (*Deleter)(void*)) const {
    assert(Creator);
    if (llvm_is_multithreaded()) {
@@ -102,7 +96,7 @@ index 053493f72fb5..bf7e0074d26e 100644
  
      if (!Ptr.load(std::memory_order_relaxed)) {
        void *Tmp = Creator();
-@@ -46,15 +46,6 @@ void ManagedStaticBase::RegisterManagedStatic(void *(*Creator)(),
+@@ -40,15 +40,6 @@ void ManagedStaticBase::RegisterManagedStatic(void *(*Creator)(),
        Next = StaticList;
        StaticList = this;
      }
@@ -118,15 +112,6 @@ index 053493f72fb5..bf7e0074d26e 100644
    }
  }
  
-@@ -76,7 +67,7 @@ void ManagedStaticBase::destroy() const {
- 
- /// llvm_shutdown - Deallocate and destroy all ManagedStatic variables.
- void llvm::llvm_shutdown() {
--  std::lock_guard<std::recursive_mutex> Lock(*getManagedStaticMutex());
-+  std::scoped_lock Lock(*getManagedStaticMutex());
- 
-   while (StaticList)
-     StaticList->destroy();
 -- 
 2.20.1.windows.1
 
