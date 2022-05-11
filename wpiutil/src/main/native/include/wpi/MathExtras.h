@@ -15,7 +15,6 @@
 
 #include "wpi/Compiler.h"
 #include <cassert>
-#include <cmath>
 #include <climits>
 #include <cmath>
 #include <cstdint>

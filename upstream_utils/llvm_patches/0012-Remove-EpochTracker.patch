@@ -1,0 +1,91 @@
+From eae675490f6a8c54cfc389eb72045b17026a3c19 Mon Sep 17 00:00:00 2001
+From: PJ Reiniger <pj.reiniger@gmail.com>
+Date: Sat, 7 May 2022 23:08:15 -0400
+Subject: [PATCH 12/29] Remove EpochTracker
+
+---
+ llvm/include/llvm/ADT/SmallPtrSet.h | 14 ++++----------
+ llvm/lib/Support/SmallPtrSet.cpp    |  1 -
+ 2 files changed, 4 insertions(+), 11 deletions(-)
+
+diff --git a/llvm/include/llvm/ADT/SmallPtrSet.h b/llvm/include/llvm/ADT/SmallPtrSet.h
+index e46a5171e301..2edc1f5e2066 100644
+--- a/llvm/include/llvm/ADT/SmallPtrSet.h
++++ b/llvm/include/llvm/ADT/SmallPtrSet.h
+@@ -14,7 +14,6 @@
+ #ifndef LLVM_ADT_SMALLPTRSET_H
+ #define LLVM_ADT_SMALLPTRSET_H
+ 
+-#include "llvm/ADT/EpochTracker.h"
+ #include "llvm/Support/Compiler.h"
+ #include "llvm/Support/ReverseIteration.h"
+ #include "llvm/Support/type_traits.h"
+@@ -46,7 +45,7 @@ namespace llvm {
+ /// (-2), to allow deletion.  The hash table is resized when the table is 3/4 or
+ /// more.  When this happens, the table is doubled in size.
+ ///
+-class SmallPtrSetImplBase : public DebugEpochBase {
++class SmallPtrSetImplBase {
+   friend class SmallPtrSetIteratorImpl;
+ 
+ protected:
+@@ -92,7 +91,6 @@ public:
+   size_type size() const { return NumNonEmpty - NumTombstones; }
+ 
+   void clear() {
+-    incrementEpoch();
+     // If the capacity of the array is huge, and the # elements used is small,
+     // shrink the array.
+     if (!isSmall()) {
+@@ -139,14 +137,12 @@ protected:
+       if (LastTombstone != nullptr) {
+         *LastTombstone = Ptr;
+         --NumTombstones;
+-        incrementEpoch();
+         return std::make_pair(LastTombstone, true);
+       }
+ 
+       // Nope, there isn't.  If we stay small, just 'pushback' now.
+       if (NumNonEmpty < CurArraySize) {
+         SmallArray[NumNonEmpty++] = Ptr;
+-        incrementEpoch();
+         return std::make_pair(SmallArray + (NumNonEmpty - 1), true);
+       }
+       // Otherwise, hit the big set case, which will call grow.
+@@ -259,8 +255,7 @@ protected:
+ 
+ /// SmallPtrSetIterator - This implements a const_iterator for SmallPtrSet.
+ template <typename PtrTy>
+-class SmallPtrSetIterator : public SmallPtrSetIteratorImpl,
+-                            DebugEpochBase::HandleBase {
++class SmallPtrSetIterator : public SmallPtrSetIteratorImpl {
+   using PtrTraits = PointerLikeTypeTraits<PtrTy>;
+ 
+ public:
+@@ -270,9 +265,8 @@ public:
+   using difference_type = std::ptrdiff_t;
+   using iterator_category = std::forward_iterator_tag;
+ 
+-  explicit SmallPtrSetIterator(const void *const *BP, const void *const *E,
+-                               const DebugEpochBase &Epoch)
+-      : SmallPtrSetIteratorImpl(BP, E), DebugEpochBase::HandleBase(&Epoch) {}
++  explicit SmallPtrSetIterator(const void *const *BP, const void *const *E)
++      : SmallPtrSetIteratorImpl(BP, E) {}
+ 
+   // Most methods are provided by the base class.
+ 
+diff --git a/llvm/lib/Support/SmallPtrSet.cpp b/llvm/lib/Support/SmallPtrSet.cpp
+index f6e2dfb8a6c9..4549db08e3ee 100644
+--- a/llvm/lib/Support/SmallPtrSet.cpp
++++ b/llvm/lib/Support/SmallPtrSet.cpp
+@@ -59,7 +59,6 @@ SmallPtrSetImplBase::insert_imp_big(const void *Ptr) {
+   else
+     ++NumNonEmpty; // Track density.
+   *Bucket = Ptr;
+-  incrementEpoch();
+   return std::make_pair(Bucket, true);
+ }
+ 
+-- 
+2.20.1.windows.1
+

@@ -69,6 +69,36 @@ struct const_pointer_or_const_ref<T,
   using type = typename add_const_past_pointer<T>::type;
 };
 
+namespace detail {
+/// Internal utility to detect trivial copy construction.
+template<typename T> union copy_construction_triviality_helper {
+    T t;
+    copy_construction_triviality_helper() = default;
+    copy_construction_triviality_helper(const copy_construction_triviality_helper&) = default;
+    ~copy_construction_triviality_helper() = default;
+};
+/// Internal utility to detect trivial move construction.
+template<typename T> union move_construction_triviality_helper {
+    T t;
+    move_construction_triviality_helper() = default;
+    move_construction_triviality_helper(move_construction_triviality_helper&&) = default;
+    ~move_construction_triviality_helper() = default;
+};
+
+template<class T>
+union trivial_helper {
+    T t;
+};
+
+} // end namespace detail
+
+template <typename T>
+using is_trivially_move_constructible = std::is_trivially_move_constructible<T>;
+
+template <typename T>
+using is_trivially_copy_constructible = std::is_trivially_copy_constructible<T>;
+
+
 } // end namespace wpi
 
 #endif // WPIUTIL_WPI_TYPE_TRAITS_H

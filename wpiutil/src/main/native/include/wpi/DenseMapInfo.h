@@ -17,7 +17,6 @@
 #include <cassert>
 #include <cstddef>
 #include <cstdint>
-#include <string_view>
 #include <utility>
 
 namespace wpi {

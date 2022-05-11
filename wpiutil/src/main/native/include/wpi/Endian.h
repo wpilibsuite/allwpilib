@@ -15,17 +15,11 @@
 
 #include "wpi/Compiler.h"
 #include "wpi/SwapByteOrder.h"
-
-#if defined(__linux__) || defined(__GNU__)
-#include <endian.h>
-#endif
-
 #include <cassert>
 #include <cstddef>
 #include <cstdint>
 #include <cstring>
 #include <type_traits>
-
 
 namespace wpi {
 namespace support {

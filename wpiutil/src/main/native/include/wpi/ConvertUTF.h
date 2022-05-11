@@ -186,10 +186,35 @@ unsigned getNumBytesForUTF8(UTF8 firstByte);
 template <typename T> class SmallVectorImpl;
 
 /**
+ * Convert an UTF8 string_view to UTF8, UTF16, or UTF32 depending on
+ * WideCharWidth. The converted data is written to ResultPtr, which needs to
+ * point to at least WideCharWidth * (Source.Size() + 1) bytes. On success,
+ * ResultPtr will point one after the end of the copied string. On failure,
+ * ResultPtr will not be changed, and ErrorPtr will be set to the location of
+ * the first character which could not be converted.
+ * \return true on success.
+ */
+bool ConvertUTF8toWide(unsigned WideCharWidth, std::string_view Source,
+                       char *&ResultPtr, const UTF8 *&ErrorPtr);
+
+/**
+* Converts a UTF-8 string_view to a std::wstring.
+* \return true on success.
+*/
+bool ConvertUTF8toWide(std::string_view Source, std::wstring &Result);
+
+/**
 * Converts a UTF-8 C-string to a std::wstring.
 * \return true on success.
 */
 bool ConvertUTF8toWide(const char *Source, std::wstring &Result);
+
+/**
+* Converts a std::wstring to a UTF-8 encoded std::string.
+* \return true on success.
+*/
+bool convertWideToUTF8(const std::wstring &Source, SmallVectorImpl<char> &Result);
+
 
 /**
  * Convert an Unicode code point to UTF8 sequence.
@@ -243,8 +268,16 @@ bool hasUTF16ByteOrderMark(span<const char> SrcBytes);
  * \param [out] Out Converted UTF-8 is stored here on success.
  * \returns true on success
  */
-bool convertUTF16ToUTF8String(span<const UTF16> SrcBytes,
-                              SmallVectorImpl<char> &Out);
+bool convertUTF16ToUTF8String(span<const char> SrcBytes, SmallVectorImpl<char> &Out);
+
+/**
+* Converts a UTF16 string into a UTF8 std::string.
+*
+* \param [in] Src A buffer of UTF-16 encoded text.
+* \param [out] Out Converted UTF-8 is stored here on success.
+* \returns true on success
+*/
+bool convertUTF16ToUTF8String(span<const UTF16> Src, SmallVectorImpl<char> &Out);
 
 /**
  * Converts a UTF-8 string into a UTF-16 string with native endianness.

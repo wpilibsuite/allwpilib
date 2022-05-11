@@ -19,10 +19,8 @@
 #include "wpi/iterator.h"
 #include "wpi/iterator_range.h"
 #include "wpi/PointerLikeTypeTraits.h"
-#include <algorithm>
 #include <initializer_list>
 #include <iterator>
-#include <string_view>
 
 namespace wpi {
 
@@ -176,7 +174,7 @@ public:
       for (unsigned I = 0, E = NumBuckets; I != E; ++I) {
         StringMapEntryBase *Bucket = TheTable[I];
         if (Bucket && Bucket != getTombstoneVal()) {
-          static_cast<MapEntryTy*>(Bucket)->Destroy();
+          static_cast<MapEntryTy *>(Bucket)->Destroy();
         }
       }
     }
@@ -329,7 +327,7 @@ public:
     for (unsigned I = 0, E = NumBuckets; I != E; ++I) {
       StringMapEntryBase *&Bucket = TheTable[I];
       if (Bucket && Bucket != getTombstoneVal()) {
-        static_cast<MapEntryTy*>(Bucket)->Destroy();
+        static_cast<MapEntryTy *>(Bucket)->Destroy();
       }
       Bucket = nullptr;
     }

@@ -14,13 +14,14 @@
 #ifndef WPIUTIL_WPI_VERSIONTUPLE_H
 #define WPIUTIL_WPI_VERSIONTUPLE_H
 
+#include "wpi/DenseMapInfo.h"
+#include "wpi/Hashing.h"
 #include <optional>
 #include <string>
 #include <tuple>
 
 namespace wpi {
 class raw_ostream;
-class StringRef;
 
 /// Represents a version number in the form major[.minor[.subminor[.build]]].
 class VersionTuple {

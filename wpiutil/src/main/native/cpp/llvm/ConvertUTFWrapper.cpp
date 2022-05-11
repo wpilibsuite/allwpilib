@@ -84,15 +84,19 @@ bool hasUTF16ByteOrderMark(span<const char> S) {
            (S[0] == '\xfe' && S[1] == '\xff')));
 }
 
-bool convertUTF16ToUTF8String(span<const UTF16> SrcBytes, SmallVectorImpl<char> &Out) {
+bool convertUTF16ToUTF8String(span<const char> SrcBytes, SmallVectorImpl<char> &Out) {
   assert(Out.empty());
+
+  // Error out on an uneven byte count.
+  if (SrcBytes.size() % 2)
+    return false;
 
   // Avoid OOB by returning early on empty input.
   if (SrcBytes.empty())
     return true;
 
-  const UTF16 *Src = SrcBytes.begin();
-  const UTF16 *SrcEnd = SrcBytes.end();
+  const UTF16 *Src = reinterpret_cast<const UTF16 *>(SrcBytes.begin());
+  const UTF16 *SrcEnd = reinterpret_cast<const UTF16 *>(SrcBytes.end());
 
   assert((uintptr_t)Src % sizeof(UTF16) == 0);
 
@@ -129,6 +133,13 @@ bool convertUTF16ToUTF8String(span<const UTF16> SrcBytes, SmallVectorImpl<char> 
   Out.push_back(0);
   Out.pop_back();
   return true;
+}
+
+bool convertUTF16ToUTF8String(span<const UTF16> Src, SmallVectorImpl<char> &Out)
+{
+  return convertUTF16ToUTF8String(
+      span<const char>(reinterpret_cast<const char *>(Src.data()),
+      Src.size() * sizeof(UTF16)), Out);
 }
 
 bool convertUTF8ToUTF16String(std::string_view SrcUTF8,
@@ -200,6 +211,42 @@ bool ConvertUTF8toWide(const char *Source, std::wstring &Result) {
     return true;
   }
   return ConvertUTF8toWide(std::string_view(Source), Result);
+}
+
+bool convertWideToUTF8(const std::wstring &Source, SmallVectorImpl<char> &Result) {
+  if (sizeof(wchar_t) == 1) {
+    const UTF8 *Start = reinterpret_cast<const UTF8 *>(Source.data());
+    const UTF8 *End =
+        reinterpret_cast<const UTF8 *>(Source.data() + Source.size());
+    if (!isLegalUTF8String(&Start, End))
+      return false;
+    Result.resize(Source.size());
+    memcpy(&Result[0], Source.data(), Source.size());
+    return true;
+  } else if (sizeof(wchar_t) == 2) {
+    return convertUTF16ToUTF8String(
+        span<const UTF16>(reinterpret_cast<const UTF16 *>(Source.data()),
+                              Source.size()),
+        Result);
+  } else if (sizeof(wchar_t) == 4) {
+    const UTF32 *Start = reinterpret_cast<const UTF32 *>(Source.data());
+    const UTF32 *End =
+        reinterpret_cast<const UTF32 *>(Source.data() + Source.size());
+    Result.resize(UNI_MAX_UTF8_BYTES_PER_CODE_POINT * Source.size());
+    UTF8 *ResultPtr = reinterpret_cast<UTF8 *>(&Result[0]);
+    UTF8 *ResultEnd = reinterpret_cast<UTF8 *>(&Result[0] + Result.size());
+    if (ConvertUTF32toUTF8(&Start, End, &ResultPtr, ResultEnd,
+                           strictConversion) == conversionOK) {
+      Result.resize(reinterpret_cast<char *>(ResultPtr) - &Result[0]);
+      return true;
+    } else {
+      Result.clear();
+      return false;
+    }
+  } else {
+    wpi_unreachable(
+        "Control should never reach this point; see static_assert further up");
+  }
 }
 
 } // end namespace wpi

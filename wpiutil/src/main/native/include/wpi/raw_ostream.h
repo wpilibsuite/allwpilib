@@ -28,6 +28,7 @@
 #include <type_traits>
 #include <vector>
 
+
 namespace fs {
 enum FileAccess : unsigned;
 enum OpenFlags : unsigned;
@@ -277,9 +278,8 @@ public:
   /// @param Bold bold/brighter text, default false
   /// @param BG if true change the background, default: change foreground
   /// @returns itself so it can be used within << invocations
-  virtual raw_ostream &changeColor(enum Colors Color,
-                                   bool Bold = false,
-                                   bool BG = false) {
+  virtual raw_ostream &changeColor(enum Colors Color, bool Bold = false,
+                                   bool BG = false)  {
     (void)Color;
     (void)Bold;
     (void)BG;
@@ -329,9 +329,6 @@ private:
   ///
   /// \invariant { Size > 0 }
   virtual void write_impl(const char *Ptr, size_t Size) = 0;
-
-  // An out of line virtual method to provide a home for the class vtable.
-  virtual void handle();
 
   /// Return the current position within the stream, not counting the bytes
   /// currently in the buffer.

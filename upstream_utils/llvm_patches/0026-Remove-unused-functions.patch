@@ -1,360 +1,41 @@
-From d2e5ad80f0f97e569d91a5bb264f91776d7e4404 Mon Sep 17 00:00:00 2001
+From ec0a21f9d3bc16f8e4b0e0981d7a30817bb9f793 Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
-Date: Wed, 4 May 2022 00:10:48 -0400
-Subject: [PATCH 26/35] Remove unused functions
+Date: Sun, 8 May 2022 19:16:51 -0400
+Subject: [PATCH 26/29] Remove unused functions
 
 ---
- llvm/include/llvm/ADT/SmallString.h       | 88 ++---------------------
- llvm/include/llvm/Support/ConvertUTF.h    |  7 --
- llvm/include/llvm/Support/Errno.h         |  9 ---
- llvm/include/llvm/Support/VersionTuple.h  | 35 ---------
- llvm/include/llvm/Support/raw_ostream.h   | 54 --------------
- llvm/lib/Support/ConvertUTFWrapper.cpp    | 36 ----------
- llvm/lib/Support/ErrorHandling.cpp        | 16 -----
- llvm/lib/Support/raw_ostream.cpp          | 38 ----------
- llvm/unittests/Support/ConvertUTFTest.cpp | 70 ------------------
- 9 files changed, 5 insertions(+), 348 deletions(-)
+ llvm/include/llvm/Support/raw_ostream.h |  3 +-
+ llvm/lib/Support/ErrorHandling.cpp      | 16 -----
+ llvm/lib/Support/raw_ostream.cpp        | 48 +++++++--------
+ llvm/unittests/ADT/SmallStringTest.cpp  | 81 -------------------------
+ 4 files changed, 22 insertions(+), 126 deletions(-)
 
-diff --git a/llvm/include/llvm/ADT/SmallString.h b/llvm/include/llvm/ADT/SmallString.h
-index 8112741dd01d..d3d469d45d15 100644
---- a/llvm/include/llvm/ADT/SmallString.h
-+++ b/llvm/include/llvm/ADT/SmallString.h
-@@ -86,48 +86,12 @@ public:
-   /// @name String Comparison
-   /// @{
- 
--  /// Check for string equality.  This is more efficient than compare() when
--  /// the relative ordering of inequal strings isn't needed.
--  bool equals(std::string_view RHS) const {
--    return str().equals(RHS);
--  }
--
--  /// Check for string equality, ignoring case.
--  bool equals_insensitive(std::string_view RHS) const {
--    return str().equals_insensitive(RHS);
--  }
--
-   /// Compare two strings; the result is -1, 0, or 1 if this string is
-   /// lexicographically less than, equal to, or greater than the \p RHS.
-   int compare(std::string_view RHS) const {
-     return str().compare(RHS);
-   }
- 
--  /// compare_insensitive - Compare two strings, ignoring case.
--  int compare_insensitive(std::string_view RHS) const {
--    return str().compare_insensitive(RHS);
--  }
--
--  /// compare_numeric - Compare two strings, treating sequences of digits as
--  /// numbers.
--  int compare_numeric(std::string_view RHS) const {
--    return str().compare_numeric(RHS);
--  }
--
--  /// @}
--  /// @name String Predicates
--  /// @{
--
--  /// startswith - Check if this string starts with the given \p Prefix.
--  bool startswith(std::string_view Prefix) const {
--    return str().startswith(Prefix);
--  }
--
--  /// endswith - Check if this string ends with the given \p Suffix.
--  bool endswith(std::string_view Suffix) const {
--    return str().endswith(Suffix);
--  }
--
-   /// @}
-   /// @name String Searching
-   /// @{
-@@ -208,50 +172,6 @@ public:
-   }
- 
-   /// @}
--  /// @name Helpful Algorithms
--  /// @{
--
--  /// Return the number of occurrences of \p C in the string.
--  size_t count(char C) const {
--    return str().count(C);
--  }
--
--  /// Return the number of non-overlapped occurrences of \p Str in the
--  /// string.
--  size_t count(std::string_view Str) const {
--    return str().count(Str);
--  }
--
--  /// @}
--  /// @name Substring Operations
--  /// @{
--
--  /// Return a reference to the substring from [Start, Start + N).
--  ///
--  /// \param Start The index of the starting character in the substring; if
--  /// the index is npos or greater than the length of the string then the
--  /// empty substring will be returned.
--  ///
--  /// \param N The number of characters to included in the substring. If \p N
--  /// exceeds the number of characters remaining in the string, the string
--  /// suffix (starting with \p Start) will be returned.
--  std::string_view substr(size_t Start, size_t N = std::string_view::npos) const {
--    return str().substr(Start, N);
--  }
--
--  /// Return a reference to the substring from [Start, End).
--  ///
--  /// \param Start The index of the starting character in the substring; if
--  /// the index is npos or greater than the length of the string then the
--  /// empty substring will be returned.
--  ///
--  /// \param End The index following the last character to include in the
--  /// substring. If this is npos, or less than \p Start, or exceeds the
--  /// number of characters remaining in the string, the string suffix
--  /// (starting with \p Start) will be returned.
--  std::string_view slice(size_t Start, size_t End) const {
--    return str().slice(Start, End);
--  }
- 
-   // Extra methods.
- 
-@@ -268,9 +188,11 @@ public:
-   /// Implicit conversion to std::string_view.
-   operator std::string_view() const { return str(); }
- 
--  explicit operator std::string() const {
--    return std::string(this->data(), this->size());
--  }
-+  /// Explicit conversion to std::string.
-+  std::string string() const { return {this->begin(), this->size()}; }
-+
-+  /// Implicit conversion to std::string.
-+  operator std::string() const { return string(); }
- 
-   // Extra operators.
-   SmallString &operator=(std::string_view RHS) {
-diff --git a/llvm/include/llvm/Support/ConvertUTF.h b/llvm/include/llvm/Support/ConvertUTF.h
-index 48435fbb6f30..75529de5fca2 100644
---- a/llvm/include/llvm/Support/ConvertUTF.h
-+++ b/llvm/include/llvm/Support/ConvertUTF.h
-@@ -191,13 +191,6 @@ template <typename T> class SmallVectorImpl;
- */
- bool ConvertUTF8toWide(const char *Source, std::wstring &Result);
- 
--/**
--* Converts a std::wstring to a UTF-8 encoded std::string.
--* \return true on success.
--*/
--bool convertWideToUTF8(const std::wstring &Source, std::string &Result);
--
--
- /**
-  * Convert an Unicode code point to UTF8 sequence.
-  *
-diff --git a/llvm/include/llvm/Support/Errno.h b/llvm/include/llvm/Support/Errno.h
-index 07df6765d9db..d9bf68bb369e 100644
---- a/llvm/include/llvm/Support/Errno.h
-+++ b/llvm/include/llvm/Support/Errno.h
-@@ -20,15 +20,6 @@
- namespace llvm {
- namespace sys {
- 
--/// Returns a string representation of the errno value, using whatever
--/// thread-safe variant of strerror() is available.  Be sure to call this
--/// immediately after the function that set errno, or errno may have been
--/// overwritten by an intervening call.
--std::string StrError();
--
--/// Like the no-argument version above, but uses \p errnum instead of errno.
--std::string StrError(int errnum);
--
- template <typename FailT, typename Fun, typename... Args>
- inline decltype(auto) RetryAfterSignal(const FailT &Fail, const Fun &F,
-                                        const Args &... As) {
-diff --git a/llvm/include/llvm/Support/VersionTuple.h b/llvm/include/llvm/Support/VersionTuple.h
-index 0eb464678d7e..9afae7cdd1fc 100644
---- a/llvm/include/llvm/Support/VersionTuple.h
-+++ b/llvm/include/llvm/Support/VersionTuple.h
-@@ -14,8 +14,6 @@
- #ifndef LLVM_SUPPORT_VERSIONTUPLE_H
- #define LLVM_SUPPORT_VERSIONTUPLE_H
- 
--#include "llvm/ADT/DenseMapInfo.h"
--#include "llvm/ADT/Hashing.h"
- #include <optional>
- #include <string>
- #include <tuple>
-@@ -159,39 +157,6 @@ public:
-   friend bool operator>=(const VersionTuple &X, const VersionTuple &Y) {
-     return !(X < Y);
-   }
--
--  friend llvm::hash_code hash_value(const VersionTuple &VT) {
--    return llvm::hash_combine(VT.Major, VT.Minor, VT.Subminor, VT.Build);
--  }
--
--  /// Retrieve a string representation of the version number.
--  std::string getAsString() const;
--};
--
--/// Print a version number.
--raw_ostream &operator<<(raw_ostream &Out, const VersionTuple &V);
--
--// Provide DenseMapInfo for version tuples.
--template <> struct DenseMapInfo<VersionTuple> {
--  static inline VersionTuple getEmptyKey() { return VersionTuple(0x7FFFFFFF); }
--  static inline VersionTuple getTombstoneKey() {
--    return VersionTuple(0x7FFFFFFE);
--  }
--  static unsigned getHashValue(const VersionTuple &Value) {
--    unsigned Result = Value.getMajor();
--    if (auto Minor = Value.getMinor())
--      Result = detail::combineHashValue(Result, *Minor);
--    if (auto Subminor = Value.getSubminor())
--      Result = detail::combineHashValue(Result, *Subminor);
--    if (auto Build = Value.getBuild())
--      Result = detail::combineHashValue(Result, *Build);
--
--    return Result;
--  }
--
--  static bool isEqual(const VersionTuple &LHS, const VersionTuple &RHS) {
--    return LHS == RHS;
--  }
- };
- 
- } // end namespace llvm
 diff --git a/llvm/include/llvm/Support/raw_ostream.h b/llvm/include/llvm/Support/raw_ostream.h
-index bb2fa96ed36a..16753efa7511 100644
+index 27fb5c03e474..d228b05f4f9b 100644
 --- a/llvm/include/llvm/Support/raw_ostream.h
 +++ b/llvm/include/llvm/Support/raw_ostream.h
-@@ -493,38 +493,6 @@ public:
-   ///      - from The Zen of Python, by Tim Peters
-   ///
-   void clear_error() { EC = std::error_code(); }
--
--  /// Locks the underlying file.
--  ///
--  /// @returns RAII object that releases the lock upon leaving the scope, if the
--  ///          locking was successful. Otherwise returns corresponding
--  ///          error code.
--  ///
--  /// The function blocks the current thread until the lock become available or
--  /// error occurs.
--  ///
--  /// Possible use of this function may be as follows:
--  ///
--  ///   @code{.cpp}
--  ///   if (auto L = stream.lock()) {
--  ///     // ... do action that require file to be locked.
--  ///   } else {
--  ///     handleAllErrors(std::move(L.takeError()), [&](ErrorInfoBase &EIB) {
--  ///       // ... handle lock error.
--  ///     });
--  ///   }
--  ///   @endcode
--  LLVM_NODISCARD Expected<sys::fs::FileLocker> lock();
--
--  /// Tries to lock the underlying file within the specified period.
--  ///
--  /// @returns RAII object that releases the lock upon leaving the scope, if the
--  ///          locking was successful. Otherwise returns corresponding
--  ///          error code.
--  ///
--  /// It is used as @ref lock.
--  LLVM_NODISCARD
--  Expected<sys::fs::FileLocker> tryLockFor(std::chrono::milliseconds Timeout);
- };
+@@ -72,7 +72,6 @@ private:
+   /// for a \see write_impl() call to handle the data which has been put into
+   /// this buffer.
+   char *OutBufStart, *OutBufEnd, *OutBufCur;
+-  bool ColorEnabled = false;
  
- /// This returns a reference to a raw_fd_ostream for standard output. Use it
-@@ -554,17 +522,6 @@ public:
-   /// immediately destroyed.
-   raw_fd_stream(std::string_view Filename, std::error_code &EC);
+   /// Optional stream this stream is tied to. If this stream is written to, the
+   /// tied-to stream will be flushed first.
+@@ -305,7 +304,7 @@ public:
  
--  /// This reads the \p Size bytes into a buffer pointed by \p Ptr.
--  ///
--  /// \param Ptr The start of the buffer to hold data to be read.
--  ///
--  /// \param Size The number of bytes to be read.
--  ///
--  /// On success, the number of bytes read is returned, and the file position is
--  /// advanced by this number. On error, -1 is returned, use error() to get the
--  /// error code.
--  ssize_t read(char *Ptr, size_t Size);
--
-   /// Check if \p OS is a pointer of type raw_fd_stream*.
-   static bool classof(const raw_ostream *OS);
- };
-@@ -678,17 +635,6 @@ public:
-   ~buffer_unique_ostream() override { *OS << str(); }
- };
+   // Enable or disable colors. Once enable_colors(false) is called,
+   // changeColor() has no effect until enable_colors(true) is called.
+-  virtual void enable_colors(bool enable) { ColorEnabled = enable; }
++  virtual void enable_colors(bool /*enable*/) {}
  
--class Error;
--
--/// This helper creates an output stream and then passes it to \p Write.
--/// The stream created is based on the specified \p OutputFileName:
--/// llvm::outs for "-", raw_null_ostream for "/dev/null", and raw_fd_ostream
--/// for other names. For raw_fd_ostream instances, the stream writes to
--/// a temporary file. The final output file is atomically replaced with the
--/// temporary file after the \p Write function is finished.
--Error writeToOutput(StringRef OutputFileName,
--                    std::function<Error(raw_ostream &)> Write);
--
- } // end namespace llvm
- 
- #endif // LLVM_SUPPORT_RAW_OSTREAM_H
-diff --git a/llvm/lib/Support/ConvertUTFWrapper.cpp b/llvm/lib/Support/ConvertUTFWrapper.cpp
-index d8bcc9770c06..ecf72e64c15c 100644
---- a/llvm/lib/Support/ConvertUTFWrapper.cpp
-+++ b/llvm/lib/Support/ConvertUTFWrapper.cpp
-@@ -206,41 +206,5 @@ bool ConvertUTF8toWide(const char *Source, std::wstring &Result) {
-   return ConvertUTF8toWide(std::string_view(Source), Result);
- }
- 
--bool convertWideToUTF8(const std::wstring &Source, std::string &Result) {
--  if (sizeof(wchar_t) == 1) {
--    const UTF8 *Start = reinterpret_cast<const UTF8 *>(Source.data());
--    const UTF8 *End =
--        reinterpret_cast<const UTF8 *>(Source.data() + Source.size());
--    if (!isLegalUTF8String(&Start, End))
--      return false;
--    Result.resize(Source.size());
--    memcpy(&Result[0], Source.data(), Source.size());
--    return true;
--  } else if (sizeof(wchar_t) == 2) {
--    return convertUTF16ToUTF8String(
--        llvm::ArrayRef<UTF16>(reinterpret_cast<const UTF16 *>(Source.data()),
--                              Source.size()),
--        Result);
--  } else if (sizeof(wchar_t) == 4) {
--    const UTF32 *Start = reinterpret_cast<const UTF32 *>(Source.data());
--    const UTF32 *End =
--        reinterpret_cast<const UTF32 *>(Source.data() + Source.size());
--    Result.resize(UNI_MAX_UTF8_BYTES_PER_CODE_POINT * Source.size());
--    UTF8 *ResultPtr = reinterpret_cast<UTF8 *>(&Result[0]);
--    UTF8 *ResultEnd = reinterpret_cast<UTF8 *>(&Result[0] + Result.size());
--    if (ConvertUTF32toUTF8(&Start, End, &ResultPtr, ResultEnd,
--                           strictConversion) == conversionOK) {
--      Result.resize(reinterpret_cast<char *>(ResultPtr) - &Result[0]);
--      return true;
--    } else {
--      Result.clear();
--      return false;
--    }
--  } else {
--    llvm_unreachable(
--        "Control should never reach this point; see static_assert further up");
--  }
--}
--
- } // end namespace llvm
- 
+   /// Tie this stream to the specified stream. Replaces any existing tied-to
+   /// stream. Specifying a nullptr unties the stream.
 diff --git a/llvm/lib/Support/ErrorHandling.cpp b/llvm/lib/Support/ErrorHandling.cpp
-index 553a68de4e3d..9db381b04247 100644
+index fc04018039e0..781044c6c5e2 100644
 --- a/llvm/lib/Support/ErrorHandling.cpp
 +++ b/llvm/lib/Support/ErrorHandling.cpp
-@@ -173,22 +173,6 @@ void llvm::llvm_unreachable_internal(const char *msg, const char *file,
+@@ -178,22 +178,6 @@ void llvm::llvm_unreachable_internal(const char *msg, const char *file,
  #endif
  }
  
@@ -376,155 +57,210 @@ index 553a68de4e3d..9db381b04247 100644
 -
  #ifdef _WIN32
  
- #include <system_error>
+ #include <winerror.h>
 diff --git a/llvm/lib/Support/raw_ostream.cpp b/llvm/lib/Support/raw_ostream.cpp
-index 9a65ae315693..40176bb35d1d 100644
+index 6b9e5f9e44bd..6fa250a68ed8 100644
 --- a/llvm/lib/Support/raw_ostream.cpp
 +++ b/llvm/lib/Support/raw_ostream.cpp
-@@ -625,16 +625,6 @@ raw_fd_stream::raw_fd_stream(std::string_view Filename, std::error_code &EC)
-     EC = std::make_error_code(std::errc::invalid_argument);
+@@ -169,16 +169,6 @@ raw_ostream &raw_ostream::write_escaped(std::string_view Str,
+   return *this;
  }
  
--ssize_t raw_fd_stream::read(char *Ptr, size_t Size) {
--  assert(get_fd() >= 0 && "File already closed.");
--  ssize_t Ret = ::read(get_fd(), (void *)Ptr, Size);
--  if (Ret >= 0)
--    inc_pos(Ret);
--  else
--    error_detected(std::error_code(errno, std::generic_category()));
--  return Ret;
+-raw_ostream &raw_ostream::operator<<(const void *P) {
+-  llvm::write_hex(*this, (uintptr_t)P, HexPrintStyle::PrefixLower);
+-  return *this;
 -}
 -
- bool raw_fd_stream::classof(const raw_ostream *OS) {
-   return OS->get_kind() == OStreamKind::OK_FDStream;
- }
-@@ -694,31 +684,3 @@ void raw_pwrite_stream::anchor() {}
- void buffer_ostream::anchor() {}
+-raw_ostream &raw_ostream::operator<<(double N) {
+-  llvm::write_double(*this, N, FloatStyle::Exponent);
+-  return *this;
+-}
+-
+ void raw_ostream::flush_nonempty() {
+   assert(OutBufCur > OutBufStart && "Invalid call to flush_nonempty.");
+   size_t Length = OutBufCur - OutBufStart;
+@@ -323,15 +313,22 @@ static int getFD(std::string_view Filename, std::error_code &EC,
+   if (Filename == "-") {
+     EC = std::error_code();
+     // Change stdout's text/binary mode based on the Flags.
+-    sys::ChangeStdoutMode(Flags);
++    if (!(Flags & fs::OF_Text)) {
++#if defined(_WIN32)
++      _setmode(_fileno(stdout), _O_BINARY);
++#endif
++    }
+     return STDOUT_FILENO;
+   }
  
- void buffer_unique_ostream::anchor() {}
--
--Error llvm::writeToOutput(StringRef OutputFileName,
--                          std::function<Error(raw_ostream &)> Write) {
--  if (OutputFileName == "-")
--    return Write(outs());
--
--  if (OutputFileName == "/dev/null") {
--    raw_null_ostream Out;
--    return Write(Out);
--  }
--
--  unsigned Mode = sys::fs::all_read | sys::fs::all_write | sys::fs::all_exe;
--  Expected<sys::fs::TempFile> Temp =
--      sys::fs::TempFile::create(OutputFileName + ".temp-stream-%%%%%%", Mode);
--  if (!Temp)
--    return createFileError(OutputFileName, Temp.takeError());
--
--  raw_fd_ostream Out(Temp->FD, false);
--
--  if (Error E = Write(Out)) {
--    if (Error DiscardError = Temp->discard())
--      return joinErrors(std::move(E), std::move(DiscardError));
--    return E;
--  }
--  Out.flush();
--
--  return Temp->keep(OutputFileName);
--}
-diff --git a/llvm/unittests/Support/ConvertUTFTest.cpp b/llvm/unittests/Support/ConvertUTFTest.cpp
-index 28d71414db6d..5188ca2e9e29 100644
---- a/llvm/unittests/Support/ConvertUTFTest.cpp
-+++ b/llvm/unittests/Support/ConvertUTFTest.cpp
-@@ -13,28 +13,6 @@
+-  int FD;
+-  if (Access & sys::fs::FA_Read)
+-    EC = sys::fs::openFileForReadWrite(Filename, FD, Disp, Flags);
++  fs::file_t F;
++  if (Access & fs::FA_Read)
++    F = fs::OpenFileForReadWrite(fs::path{std::string_view{Filename.data(), Filename.size()}}, EC, Disp, Flags);
+   else
+-    EC = sys::fs::openFileForWrite(Filename, FD, Disp, Flags);
++    F = fs::OpenFileForWrite(fs::path{std::string_view{Filename.data(), Filename.size()}}, EC, Disp, Flags);
++  if (EC)
++    return -1;
++  int FD = fs::FileToFd(F, EC, Flags);
+   if (EC)
+     return -1;
  
- using namespace llvm;
+@@ -392,10 +389,7 @@ raw_fd_ostream::raw_fd_ostream(int fd, bool shouldClose, bool unbuffered,
+   // Get the starting position.
+   off_t loc = ::lseek(FD, 0, SEEK_CUR);
+ #ifdef _WIN32
+-  // MSVCRT's _lseek(SEEK_CUR) doesn't return -1 for pipes.
+-  sys::fs::file_status Status;
+-  std::error_code EC = status(FD, Status);
+-  SupportsSeeking = !EC && Status.type() == sys::fs::file_type::regular_file;
++  SupportsSeeking = loc != (off_t)-1 && ::GetFileType(reinterpret_cast<HANDLE>(::_get_osfhandle(FD))) != FILE_TYPE_PIPE;
+ #else
+   SupportsSeeking = loc != (off_t)-1;
+ #endif
+@@ -408,10 +402,8 @@ raw_fd_ostream::raw_fd_ostream(int fd, bool shouldClose, bool unbuffered,
+ raw_fd_ostream::~raw_fd_ostream() {
+   if (FD >= 0) {
+     flush();
+-    if (ShouldClose) {
+-      if (auto EC = sys::Process::SafelyCloseFileDescriptor(FD))
+-        error_detected(EC);
+-    }
++    if (ShouldClose && ::close(FD) < 0)
++      error_detected(std::error_code(errno, std::generic_category()));
+   }
  
--TEST(ConvertUTFTest, ConvertUTF16LittleEndianToUTF8String) {
--  // Src is the look of disapproval.
--  alignas(UTF16) static const char Src[] = "\xff\xfe\xa0\x0c_\x00\xa0\x0c";
--  ArrayRef<char> Ref(Src, sizeof(Src) - 1);
--  std::string Result;
--  bool Success = convertUTF16ToUTF8String(Ref, Result);
--  EXPECT_TRUE(Success);
--  std::string Expected("\xe0\xb2\xa0_\xe0\xb2\xa0");
--  EXPECT_EQ(Expected, Result);
--}
--
--TEST(ConvertUTFTest, ConvertUTF16BigEndianToUTF8String) {
--  // Src is the look of disapproval.
--  alignas(UTF16) static const char Src[] = "\xfe\xff\x0c\xa0\x00_\x0c\xa0";
--  ArrayRef<char> Ref(Src, sizeof(Src) - 1);
--  std::string Result;
--  bool Success = convertUTF16ToUTF8String(Ref, Result);
--  EXPECT_TRUE(Success);
--  std::string Expected("\xe0\xb2\xa0_\xe0\xb2\xa0");
--  EXPECT_EQ(Expected, Result);
--}
--
- TEST(ConvertUTFTest, ConvertUTF8ToUTF16String) {
-   // Src is the look of disapproval.
-   static const char Src[] = "\xe0\xb2\xa0_\xe0\xb2\xa0";
-@@ -48,19 +26,6 @@ TEST(ConvertUTFTest, ConvertUTF8ToUTF16String) {
-     EXPECT_EQ(Expected[I], Result[I]);
- }
+ #ifdef __MINGW32__
+@@ -506,7 +498,11 @@ void raw_fd_ostream::write_impl(const char *Ptr, size_t Size) {
  
--TEST(ConvertUTFTest, OddLengthInput) {
--  std::string Result;
--  bool Success = convertUTF16ToUTF8String(makeArrayRef("xxxxx", 5), Result);
--  EXPECT_FALSE(Success);
--}
--
--TEST(ConvertUTFTest, Empty) {
--  std::string Result;
--  bool Success = convertUTF16ToUTF8String(llvm::ArrayRef<char>(None), Result);
--  EXPECT_TRUE(Success);
--  EXPECT_TRUE(Result.empty());
--}
--
- TEST(ConvertUTFTest, HasUTF16BOM) {
-   bool HasBOM = hasUTF16ByteOrderMark("\xff\xfe");
-   EXPECT_TRUE(HasBOM);
-@@ -77,41 +42,6 @@ TEST(ConvertUTFTest, HasUTF16BOM) {
-   EXPECT_FALSE(HasBOM);
+   do {
+     size_t ChunkSize = std::min(Size, MaxWriteSize);
++#ifdef _WIN32
++    int ret = ::_write(FD, Ptr, ChunkSize);
++#else
+     ssize_t ret = ::write(FD, Ptr, ChunkSize);
++#endif
+ 
+     if (ret < 0) {
+       // If it's a recoverable error, swallow it and retry the write.
+@@ -541,8 +537,8 @@ void raw_fd_ostream::close() {
+   assert(ShouldClose);
+   ShouldClose = false;
+   flush();
+-  if (auto EC = sys::Process::SafelyCloseFileDescriptor(FD))
+-    error_detected(EC);
++  if (::close(FD) < 0)
++    error_detected(std::error_code(errno, std::generic_category()));
+   FD = -1;
  }
  
--TEST(ConvertUTFTest, UTF16WrappersForConvertUTF16ToUTF8String) {
--  // Src is the look of disapproval.
--  alignas(UTF16) static const char Src[] = "\xff\xfe\xa0\x0c_\x00\xa0\x0c";
--  ArrayRef<UTF16> SrcRef = makeArrayRef((const UTF16 *)Src, 4);
--  std::string Result;
--  bool Success = convertUTF16ToUTF8String(SrcRef, Result);
--  EXPECT_TRUE(Success);
--  std::string Expected("\xe0\xb2\xa0_\xe0\xb2\xa0");
--  EXPECT_EQ(Expected, Result);
+@@ -551,8 +547,6 @@ uint64_t raw_fd_ostream::seek(uint64_t off) {
+   flush();
+ #ifdef _WIN32
+   pos = ::_lseeki64(FD, off, SEEK_SET);
+-#elif defined(HAVE_LSEEK64)
+-  pos = ::lseek64(FD, off, SEEK_SET);
+ #else
+   pos = ::lseek(FD, off, SEEK_SET);
+ #endif
+diff --git a/llvm/unittests/ADT/SmallStringTest.cpp b/llvm/unittests/ADT/SmallStringTest.cpp
+index bee3875d11c9..87600ea4704b 100644
+--- a/llvm/unittests/ADT/SmallStringTest.cpp
++++ b/llvm/unittests/ADT/SmallStringTest.cpp
+@@ -129,23 +129,6 @@ TEST_F(SmallStringTest, StdStringConversion) {
+   EXPECT_EQ("abc", theStdString);
+ }
+ 
+-TEST_F(SmallStringTest, Substr) {
+-  theString = "hello";
+-  EXPECT_EQ("lo", theString.substr(3));
+-  EXPECT_EQ("", theString.substr(100));
+-  EXPECT_EQ("hello", theString.substr(0, 100));
+-  EXPECT_EQ("o", theString.substr(4, 10));
 -}
 -
--TEST(ConvertUTFTest, ConvertUTF8toWide) {
--  // Src is the look of disapproval.
--  static const char Src[] = "\xe0\xb2\xa0_\xe0\xb2\xa0";
--  std::wstring Result;
--  bool Success = ConvertUTF8toWide((const char*)Src, Result);
--  EXPECT_TRUE(Success);
--  std::wstring Expected(L"\x0ca0_\x0ca0");
--  EXPECT_EQ(Expected, Result);
--  Result.clear();
--  Success = ConvertUTF8toWide(StringRef(Src, 7), Result);
--  EXPECT_TRUE(Success);
--  EXPECT_EQ(Expected, Result);
+-TEST_F(SmallStringTest, Slice) {
+-  theString = "hello";
+-  EXPECT_EQ("l", theString.slice(2, 3));
+-  EXPECT_EQ("ell", theString.slice(1, 4));
+-  EXPECT_EQ("llo", theString.slice(2, 100));
+-  EXPECT_EQ("", theString.slice(2, 1));
+-  EXPECT_EQ("", theString.slice(10, 20));
 -}
 -
--TEST(ConvertUTFTest, convertWideToUTF8) {
--  // Src is the look of disapproval.
--  static const wchar_t Src[] = L"\x0ca0_\x0ca0";
--  std::string Result;
--  bool Success = convertWideToUTF8(Src, Result);
--  EXPECT_TRUE(Success);
--  std::string Expected("\xe0\xb2\xa0_\xe0\xb2\xa0");
--  EXPECT_EQ(Expected, Result);
+ TEST_F(SmallStringTest, Find) {
+   theString = "hello";
+   EXPECT_EQ(2U, theString.find('l'));
+@@ -180,68 +163,4 @@ TEST_F(SmallStringTest, Find) {
+   EXPECT_EQ(0U, theString.find(""));
+ }
+ 
+-TEST_F(SmallStringTest, Count) {
+-  theString = "hello";
+-  EXPECT_EQ(2U, theString.count('l'));
+-  EXPECT_EQ(1U, theString.count('o'));
+-  EXPECT_EQ(0U, theString.count('z'));
+-  EXPECT_EQ(0U, theString.count("helloworld"));
+-  EXPECT_EQ(1U, theString.count("hello"));
+-  EXPECT_EQ(1U, theString.count("ello"));
+-  EXPECT_EQ(0U, theString.count("zz"));
 -}
 -
- struct ConvertUTFResultContainer {
-   ConversionResult ErrorCode;
-   std::vector<unsigned> UnicodeScalars;
+-TEST_F(SmallStringTest, Realloc) {
+-  theString = "abcd";
+-  theString.reserve(100);
+-  EXPECT_EQ("abcd", theString);
+-  unsigned const N = 100000;
+-  theString.reserve(N);
+-  for (unsigned i = 0; i < N - 4; ++i)
+-    theString.push_back('y');
+-  EXPECT_EQ("abcdyyy", theString.slice(0, 7));
+-}
+-
+-TEST_F(SmallStringTest, Comparisons) {
+-  EXPECT_EQ(-1, SmallString<10>("aab").compare("aad"));
+-  EXPECT_EQ( 0, SmallString<10>("aab").compare("aab"));
+-  EXPECT_EQ( 1, SmallString<10>("aab").compare("aaa"));
+-  EXPECT_EQ(-1, SmallString<10>("aab").compare("aabb"));
+-  EXPECT_EQ( 1, SmallString<10>("aab").compare("aa"));
+-  EXPECT_EQ( 1, SmallString<10>("\xFF").compare("\1"));
+-
+-  EXPECT_EQ(-1, SmallString<10>("AaB").compare_insensitive("aAd"));
+-  EXPECT_EQ( 0, SmallString<10>("AaB").compare_insensitive("aab"));
+-  EXPECT_EQ( 1, SmallString<10>("AaB").compare_insensitive("AAA"));
+-  EXPECT_EQ(-1, SmallString<10>("AaB").compare_insensitive("aaBb"));
+-  EXPECT_EQ( 1, SmallString<10>("AaB").compare_insensitive("aA"));
+-  EXPECT_EQ( 1, SmallString<10>("\xFF").compare_insensitive("\1"));
+-
+-  EXPECT_EQ(-1, SmallString<10>("aab").compare_numeric("aad"));
+-  EXPECT_EQ( 0, SmallString<10>("aab").compare_numeric("aab"));
+-  EXPECT_EQ( 1, SmallString<10>("aab").compare_numeric("aaa"));
+-  EXPECT_EQ(-1, SmallString<10>("aab").compare_numeric("aabb"));
+-  EXPECT_EQ( 1, SmallString<10>("aab").compare_numeric("aa"));
+-  EXPECT_EQ(-1, SmallString<10>("1").compare_numeric("10"));
+-  EXPECT_EQ( 0, SmallString<10>("10").compare_numeric("10"));
+-  EXPECT_EQ( 0, SmallString<10>("10a").compare_numeric("10a"));
+-  EXPECT_EQ( 1, SmallString<10>("2").compare_numeric("1"));
+-  EXPECT_EQ( 0, SmallString<10>("llvm_v1i64_ty").compare_numeric("llvm_v1i64_ty"));
+-  EXPECT_EQ( 1, SmallString<10>("\xFF").compare_numeric("\1"));
+-  EXPECT_EQ( 1, SmallString<10>("V16").compare_numeric("V1_q0"));
+-  EXPECT_EQ(-1, SmallString<10>("V1_q0").compare_numeric("V16"));
+-  EXPECT_EQ(-1, SmallString<10>("V8_q0").compare_numeric("V16"));
+-  EXPECT_EQ( 1, SmallString<10>("V16").compare_numeric("V8_q0"));
+-  EXPECT_EQ(-1, SmallString<10>("V1_q0").compare_numeric("V8_q0"));
+-  EXPECT_EQ( 1, SmallString<10>("V8_q0").compare_numeric("V1_q0"));
+-}
+-
+-// Check gtest prints SmallString as a string instead of a container of chars.
+-// The code is in utils/unittest/googletest/internal/custom/gtest-printers.h
+-TEST_F(SmallStringTest, GTestPrinter) {
+-  EXPECT_EQ(R"("foo")", ::testing::PrintToString(SmallString<1>("foo")));
+-  const SmallVectorImpl<char> &ErasedSmallString = SmallString<1>("foo");
+-  EXPECT_EQ(R"("foo")", ::testing::PrintToString(ErasedSmallString));
+-}
+-
+ } // namespace
 -- 
 2.20.1.windows.1
 

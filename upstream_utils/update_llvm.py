@@ -94,7 +94,10 @@ def flattened_llvm_files(llvm, dirs_to_keep):
 def find_wpiutil_llvm_files(wpiutil_root, subfolder):
 
     # These files have substantial changes, not worth managing with the patching process
-    ignore_list = ["StringExtras.h", "StringExtras.cpp", "MemoryBuffer.cpp", "MemoryBuffer.h", "SmallVectorMemoryBuffer.h"]
+    ignore_list = [
+        "StringExtras.h", "StringExtras.cpp", "MemoryBuffer.cpp",
+        "MemoryBuffer.h", "SmallVectorMemoryBuffer.h"
+    ]
 
     wpiutil_files = []
     for root, _, files in os.walk(os.path.join(wpiutil_root, subfolder)):
@@ -128,9 +131,8 @@ def overwrite_source(wpiutil_root, llvm_root):
         "llvm/include/llvm/Support/", "llvm/lib/Support/"
     ])
     wpi_files = find_wpiutil_llvm_files(
-        wpiutil_root, "src/main/native/include/wpi"
-    ) + find_wpiutil_llvm_files(wpiutil_root,
-                                "src/main/native/cpp/llvm")
+        wpiutil_root, "src/main/native/include/wpi") + find_wpiutil_llvm_files(
+            wpiutil_root, "src/main/native/cpp/llvm")
 
     overwrite_files(wpi_files, llvm_files)
     run_global_replacements(wpi_files)
@@ -156,41 +158,35 @@ def main():
     patch_root = os.path.join(root, "upstream_utils/llvm_patches")
     # yapf: disable
     frontend_patches = [
-        os.path.join(patch_root, "0001-Fix-spelling-errors.patch"),
-        os.path.join(patch_root, "0002-Completly-overwrite-string-extras.patch"),
-        os.path.join(patch_root, "0003-Remove-debugEpoch-allocators-reverse-iteration-from-.patch"),
-        os.path.join(patch_root, "0004-Fix-warnings-for-casting-wrap-min-max-for-windows.patch"),
-        os.path.join(patch_root, "0005-Windows-Support.patch"),
-        os.path.join(patch_root, "0006-Remove-LLVM_ENABLE_THREADS-gaurds.patch"),
-        os.path.join(patch_root, "0007-Safe-define-guards-in-Compiler.h.patch"),
-        os.path.join(patch_root, "0008-Remove-header-dependency-for-endian.patch"),
-        os.path.join(patch_root, "0009-Prefer-scoped-lock-wpi-mutex.patch"),
-        os.path.join(patch_root, "0010-Remove-StringRef-ArrayRef-Optional.patch"),
-        os.path.join(patch_root, "0011-Remove-DJB-dep.patch"),
-        os.path.join(patch_root, "0012-Prefer-std-over-llvm.patch"),
-        os.path.join(patch_root, "0013-Prefer-fmtlib.patch"),
-        os.path.join(patch_root, "0014-Prefer-uint8_t-for-buffers.patch"),
-        os.path.join(patch_root, "0015-Remove-format-provider.patch"),
-        os.path.join(patch_root, "0016-Extra-collections-features.patch"),
-        os.path.join(patch_root, "0017-Change-unique_function-size.patch"),
-        os.path.join(patch_root, "0018-Compiler-warning-pragmas.patch"),
-        os.path.join(patch_root, "0019-Add-lerp-and-sgn.patch"),
-        os.path.join(patch_root, "0020-Prefer-fs-file_t.patch"),
-        os.path.join(patch_root, "0021-Something-Something-Something.patch"),
-        os.path.join(patch_root, "0022-Changing-hashing-library-to-use-uint64_T.patch"),
-        os.path.join(patch_root, "0023-Fixup-includes.patch"),
-        os.path.join(patch_root, "0024-use-wpilib-memmap.patch"),
-        os.path.join(patch_root, "0025-EpochTracker-abi-macro.patch"),
+        os.path.join(patch_root, "0001-Fix-spelling-language-errors.patch"),
+        os.path.join(patch_root, "0002-Remove-StringRef-ArrayRef-and-Optional.patch"),
+        os.path.join(patch_root, "0003-Wrap-std-min-max-calls-in-parens-for-windows-warning.patch"),
+        os.path.join(patch_root, "0004-Change-uniqe_function-storage-size.patch"),
+        os.path.join(patch_root, "0005-Threading-updates.patch"),
+        os.path.join(patch_root, "0006-Remove-DJB-hash-dependency.patch"),
+        os.path.join(patch_root, "0007-ifdef-guard-safety.patch"),
+        os.path.join(patch_root, "0008-Explicitly-use-std.patch"),
+        os.path.join(patch_root, "0009-Remove-format_provider.patch"),
+        os.path.join(patch_root, "0010-Remove-reverse-iterator.patch"),
+        os.path.join(patch_root, "0011-Remove-allocator-from-collections.patch"),
+        os.path.join(patch_root, "0012-Remove-EpochTracker.patch"),
+        os.path.join(patch_root, "0013-Add-compiler-warning-pragrams.patch"),
+        os.path.join(patch_root, "0014-Remove-unused-functions.patch"),
+        os.path.join(patch_root, "0015-Detemplatize-small-vector-base.patch"),
+        os.path.join(patch_root, "0016-Add-vectors-to-raw_ostream.patch"),
+        os.path.join(patch_root, "0017-Extra-collections-features.patch"),
+        os.path.join(patch_root, "0018-EpochTracker-abi-macro.patch"),
+        os.path.join(patch_root, "0019-Delete-numbers-from-mathextras.patch"),
+        os.path.join(patch_root, "0020-Add-lerp-and-sgn.patch"),
+        os.path.join(patch_root, "0021-Fixup-includes.patch"),
+        os.path.join(patch_root, "0022-use-std-is_trivially_copy_constructible.patch"),
+        os.path.join(patch_root, "0023-Windows-Support.patch"),
+        os.path.join(patch_root, "0024-Prefer-fmtlib.patch"),
+        os.path.join(patch_root, "0025-prefer-wpi-s-fs.h.patch"),
         os.path.join(patch_root, "0026-Remove-unused-functions.patch"),
-        os.path.join(patch_root, "0027-Add-vector-to-raw_ostream.patch"),
-        os.path.join(patch_root, "0028-Add-missing-raw_ostream-functions.patch"),
-        os.path.join(patch_root, "0029-OS-dependent-changes.patch"),
-        os.path.join(patch_root, "0030-Turn-off-16-8-conversion-check.patch"),
-        os.path.join(patch_root, "0031-Random-fixes.-Sigh.patch"),
-        os.path.join(patch_root, "0032-Fix-documentation-warnings.patch"),
-        os.path.join(patch_root, "0033-Fix-athena-compilation-error.patch"),
-        os.path.join(patch_root, "0034-Delete-numbers-from-mathextras.patch"),
-        os.path.join(patch_root, "0035-Detemplatize-small-vector-base.patch"),
+        os.path.join(patch_root, "0027-Add-convienence-feature-to-SmallString.patch"),
+        os.path.join(patch_root, "0028-OS-specific-changes.patch"),
+        os.path.join(patch_root, "0029-Use-smallvector-for-UTF-conversion.patch"),
     ]
     # yapf: enable
     am_patches(repo, frontend_patches, use_threeway=True)

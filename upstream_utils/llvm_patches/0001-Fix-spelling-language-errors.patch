@@ -1,0 +1,39 @@
+From 371dddf66e42d4d8c2c5bb09dfae08edb503b470 Mon Sep 17 00:00:00 2001
+From: PJ Reiniger <pj.reiniger@gmail.com>
+Date: Sat, 7 May 2022 20:50:26 -0400
+Subject: [PATCH 01/29] Fix spelling / language errors
+
+---
+ llvm/include/llvm/Support/Chrono.h        | 2 +-
+ llvm/include/llvm/Support/ErrorHandling.h | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/llvm/include/llvm/Support/Chrono.h b/llvm/include/llvm/Support/Chrono.h
+index f478549a7e4e..004519a883fd 100644
+--- a/llvm/include/llvm/Support/Chrono.h
++++ b/llvm/include/llvm/Support/Chrono.h
+@@ -22,7 +22,7 @@ class raw_ostream;
+ namespace sys {
+ 
+ /// A time point on the system clock. This is provided for two reasons:
+-/// - to insulate us agains subtle differences in behavoir to differences in
++/// - to insulate us against subtle differences in behavior to differences in
+ ///   system clock precision (which is implementation-defined and differs between
+ ///   platforms).
+ /// - to shorten the type name
+diff --git a/llvm/include/llvm/Support/ErrorHandling.h b/llvm/include/llvm/Support/ErrorHandling.h
+index 0ec0242d569d..dd85a5892e01 100644
+--- a/llvm/include/llvm/Support/ErrorHandling.h
++++ b/llvm/include/llvm/Support/ErrorHandling.h
+@@ -45,7 +45,7 @@ class StringRef;
+   void install_fatal_error_handler(fatal_error_handler_t handler,
+                                    void *user_data = nullptr);
+ 
+-  /// Restores default error handling behaviour.
++  /// Restores default error handling behavior.
+   void remove_fatal_error_handler();
+ 
+   /// ScopedFatalErrorHandler - This is a simple helper class which just
+-- 
+2.20.1.windows.1
+

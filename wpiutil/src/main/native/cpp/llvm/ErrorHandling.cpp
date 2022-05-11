@@ -174,7 +174,6 @@ void wpi::wpi_unreachable_internal(const char *msg, const char *file,
 
 #ifdef _WIN32
 
-#include <system_error>
 #include <winerror.h>
 
 // I'd rather not double the line count of the following.

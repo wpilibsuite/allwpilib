@@ -22,7 +22,6 @@
 #include "wpi/ErrorHandling.h"
 #include "wpi/fs.h"
 #include "wpi/MathExtras.h"
-#include "wpi/WindowsError.h"
 #include <algorithm>
 #include <cctype>
 #include <cerrno>
@@ -31,7 +30,7 @@
 #include <sys/stat.h>
 
 // <fcntl.h> may provide O_BINARY.
-#include <fcntl.h>
+# include <fcntl.h>
 
 #ifndef _WIN32
 #include <unistd.h>
@@ -90,9 +89,6 @@ raw_ostream::~raw_ostream() {
   if (BufferMode == BufferKind::InternalBuffer)
     delete [] OutBufStart;
 }
-
-// An out of line virtual method to provide a home for the class vtable.
-void raw_ostream::handle() {}
 
 size_t raw_ostream::preferred_buffer_size() const {
   // BUFSIZ is intended to be a reasonable default.
@@ -262,6 +258,7 @@ void raw_ostream::flush_tied_then_write(const char *Ptr, size_t Size) {
   write_impl(Ptr, Size);
 }
 
+
 template <char C>
 static raw_ostream &write_padding(raw_ostream &OS, unsigned NumChars) {
   static const char Chars[] = {C, C, C, C, C, C, C, C, C, C, C, C, C, C, C, C,
@@ -309,8 +306,7 @@ static int getFD(std::string_view Filename, std::error_code &EC,
   // the owner of stdout and may set the "binary" flag globally based on Flags.
   if (Filename == "-") {
     EC = std::error_code();
-    // If user requested binary then put stdout into binary mode if
-    // possible.
+    // Change stdout's text/binary mode based on the Flags.
     if (!(Flags & fs::OF_Text)) {
 #if defined(_WIN32)
       _setmode(_fileno(stdout), _O_BINARY);

@@ -1,0 +1,34 @@
+From 2ebc1360dd36102ad009b79e1171577d968f5bc3 Mon Sep 17 00:00:00 2001
+From: PJ Reiniger <pj.reiniger@gmail.com>
+Date: Sat, 7 May 2022 22:13:55 -0400
+Subject: [PATCH 04/29] Change uniqe_function storage size
+
+---
+ llvm/include/llvm/ADT/FunctionExtras.h | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/llvm/include/llvm/ADT/FunctionExtras.h b/llvm/include/llvm/ADT/FunctionExtras.h
+index e67ef7377c88..1a26cb702cae 100644
+--- a/llvm/include/llvm/ADT/FunctionExtras.h
++++ b/llvm/include/llvm/ADT/FunctionExtras.h
+@@ -72,7 +72,7 @@ using EnableIfCallable =
+ 
+ template <typename ReturnT, typename... ParamTs> class UniqueFunctionBase {
+ protected:
+-  static constexpr size_t InlineStorageSize = sizeof(void *) * 3;
++  static constexpr size_t InlineStorageSize = sizeof(void *) * 4;
+ 
+   template <typename T, class = void>
+   struct IsSizeLessThanThresholdT : std::false_type {};
+@@ -151,7 +151,7 @@ protected:
+         "Should always use all of the out-of-line storage for inline storage!");
+ 
+     // For in-line storage, we just provide an aligned character buffer. We
+-    // provide three pointers worth of storage here.
++    // provide four pointers worth of storage here.
+     // This is mutable as an inlined `const unique_function<void() const>` may
+     // still modify its own mutable members.
+     mutable
+-- 
+2.20.1.windows.1
+

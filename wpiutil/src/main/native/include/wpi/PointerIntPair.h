@@ -127,6 +127,7 @@ public:
   }
 };
 
+
 template <typename PointerT, unsigned IntBits, typename PtrTraits>
 struct PointerIntPairInfo {
   static_assert(PtrTraits::NumLowBitsAvailable <
