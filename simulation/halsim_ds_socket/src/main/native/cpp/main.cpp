@@ -21,12 +21,12 @@
 #include <DSCommPacket.h>
 #include <fmt/format.h>
 #include <hal/Extensions.h>
-#include <wpi/EventLoopRunner.h>
-#include <wpi/raw_uv_ostream.h>
-#include <wpi/uv/Tcp.h>
-#include <wpi/uv/Timer.h>
-#include <wpi/uv/Udp.h>
-#include <wpi/uv/util.h>
+#include <wpinet/EventLoopRunner.h>
+#include <wpinet/raw_uv_ostream.h>
+#include <wpinet/uv/Tcp.h>
+#include <wpinet/uv/Timer.h>
+#include <wpinet/uv/Udp.h>
+#include <wpinet/uv/util.h>
 
 #if defined(Win32) || defined(_WIN32)
 #pragma comment(lib, "Ws2_32.lib")

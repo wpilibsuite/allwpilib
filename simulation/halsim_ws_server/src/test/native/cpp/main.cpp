@@ -9,7 +9,7 @@
 #include <hal/HALBase.h>
 #include <hal/Main.h>
 #include <hal/simulation/DIOData.h>
-#include <wpi/uv/Loop.h>
+#include <wpinet/uv/Loop.h>
 
 #include "HALSimWSServer.h"
 #include "WebServerClientTest.h"

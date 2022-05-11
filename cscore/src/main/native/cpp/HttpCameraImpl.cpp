@@ -6,8 +6,8 @@
 
 #include <wpi/MemAlloc.h>
 #include <wpi/StringExtras.h>
-#include <wpi/TCPConnector.h>
 #include <wpi/timestamp.h>
+#include <wpinet/TCPConnector.h>
 
 #include "Handle.h"
 #include "Instance.h"

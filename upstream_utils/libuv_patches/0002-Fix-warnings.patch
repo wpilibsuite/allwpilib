@@ -1,0 +1,251 @@
+From c2390ddd8fa648c87adf279ed5b3489a42c07e67 Mon Sep 17 00:00:00 2001
+From: PJ Reiniger <pj.reiniger@gmail.com>
+Date: Tue, 26 Apr 2022 15:09:43 -0400
+Subject: [PATCH 2/6] Fix warnings
+
+---
+ include/uv/win.h    |  5 +++++
+ src/idna.c          |  2 +-
+ src/inet.c          |  4 ++++
+ src/threadpool.c    |  4 ++++
+ src/unix/core.c     | 12 ++++++++++--
+ src/unix/internal.h |  4 ++--
+ src/unix/thread.c   |  6 ------
+ src/uv-common.c     |  8 ++++++++
+ src/win/fs-event.c  |  2 ++
+ src/win/fs.c        |  3 ++-
+ src/win/pipe.c      |  2 ++
+ src/win/process.c   |  2 ++
+ src/win/tty.c       |  2 ++
+ 13 files changed, 44 insertions(+), 12 deletions(-)
+
+diff --git a/include/uv/win.h b/include/uv/win.h
+index acbd958b..354e0989 100644
+--- a/include/uv/win.h
++++ b/include/uv/win.h
+@@ -194,11 +194,16 @@ typedef int (WSAAPI* LPFN_WSARECVFROM)
+              LPWSAOVERLAPPED overlapped,
+              LPWSAOVERLAPPED_COMPLETION_ROUTINE completion_routine);
+ 
++#pragma warning(push)
++#pragma warning(disable : 28251)
++
+ #ifndef _NTDEF_
+   typedef LONG NTSTATUS;
+   typedef NTSTATUS *PNTSTATUS;
+ #endif
+ 
++#pragma warning(pop)
++
+ #ifndef RTL_CONDITION_VARIABLE_INIT
+   typedef PVOID CONDITION_VARIABLE, *PCONDITION_VARIABLE;
+ #endif
+diff --git a/src/idna.c b/src/idna.c
+index 13ffac6b..6b2406ca 100644
+--- a/src/idna.c
++++ b/src/idna.c
+@@ -103,7 +103,7 @@ static int uv__idna_toascii_label(const char* s, const char* se,
+                                   char** d, char* de) {
+   static const char alphabet[] = "abcdefghijklmnopqrstuvwxyz0123456789";
+   const char* ss;
+-  unsigned c;
++  unsigned c = 0;
+   unsigned h;
+   unsigned k;
+   unsigned n;
+diff --git a/src/inet.c b/src/inet.c
+index 7e208b53..167ec118 100644
+--- a/src/inet.c
++++ b/src/inet.c
+@@ -27,6 +27,10 @@
+ #include "uv.h"
+ #include "uv-common.h"
+ 
++#ifdef _WIN32
++#pragma warning(disable : 6001)
++#endif
++
+ #define UV__INET_ADDRSTRLEN         16
+ #define UV__INET6_ADDRSTRLEN        46
+ 
+diff --git a/src/threadpool.c b/src/threadpool.c
+index 9cb863e7..515bf407 100644
+--- a/src/threadpool.c
++++ b/src/threadpool.c
+@@ -27,6 +27,10 @@
+ 
+ #include <stdlib.h>
+ 
++#ifdef _WIN32
++#pragma warning(disable: 6001 6011)
++#endif
++
+ #define MAX_THREADPOOL_SIZE 1024
+ 
+ static uv_once_t once = UV_ONCE_INIT;
+diff --git a/src/unix/core.c b/src/unix/core.c
+index ef98b6ce..adb278bc 100644
+--- a/src/unix/core.c
++++ b/src/unix/core.c
+@@ -513,6 +513,16 @@ skip:
+   }
+ }
+ 
++#if defined(__APPLE__)
++#pragma GCC diagnostic push
++#pragma GCC diagnostic ignored "-Wdollar-in-identifier-extension"
++#if defined(__LP64__)
++  extern "C" int close$NOCANCEL(int);
++#else
++  extern "C" int close$NOCANCEL$UNIX2003(int);
++#endif
++#pragma GCC diagnostic pop
++#endif
+ 
+ /* close() on macos has the "interesting" quirk that it fails with EINTR
+  * without closing the file descriptor when a thread is in the cancel state.
+@@ -527,10 +537,8 @@ int uv__close_nocancel(int fd) {
+ #pragma GCC diagnostic push
+ #pragma GCC diagnostic ignored "-Wdollar-in-identifier-extension"
+ #if defined(__LP64__)
+-  extern int close$NOCANCEL(int);
+   return close$NOCANCEL(fd);
+ #else
+-  extern int close$NOCANCEL$UNIX2003(int);
+   return close$NOCANCEL$UNIX2003(fd);
+ #endif
+ #pragma GCC diagnostic pop
+diff --git a/src/unix/internal.h b/src/unix/internal.h
+index 26061647..2db30350 100644
+--- a/src/unix/internal.h
++++ b/src/unix/internal.h
+@@ -301,8 +301,8 @@ UV_UNUSED(static void uv__update_time(uv_loop_t* loop)) {
+   loop->time = uv__hrtime(UV_CLOCK_FAST) / 1000000;
+ }
+ 
+-UV_UNUSED(static char* uv__basename_r(const char* path)) {
+-  char* s;
++UV_UNUSED(static const char* uv__basename_r(const char* path)) {
++  const char* s;
+ 
+   s = strrchr(path, '/');
+   if (s == NULL)
+diff --git a/src/unix/thread.c b/src/unix/thread.c
+index c702d418..c753be9b 100644
+--- a/src/unix/thread.c
++++ b/src/unix/thread.c
+@@ -222,12 +222,6 @@ int uv_thread_create_ex(uv_thread_t* tid,
+   size_t pagesize;
+   size_t stack_size;
+ 
+-  /* Used to squelch a -Wcast-function-type warning. */
+-  union {
+-    void (*in)(void*);
+-    void* (*out)(void*);
+-  } f;
+-
+   stack_size =
+       params->flags & UV_THREAD_HAS_STACK_SIZE ? params->stack_size : 0;
+ 
+diff --git a/src/uv-common.c b/src/uv-common.c
+index 47473346..b61a703d 100644
+--- a/src/uv-common.c
++++ b/src/uv-common.c
+@@ -698,6 +698,10 @@ void uv__fs_readdir_cleanup(uv_fs_t* req) {
+   }
+ }
+ 
++#ifdef __clang__
++# pragma clang diagnostic push
++# pragma clang diagnostic ignored "-Wvarargs"
++#endif
+ 
+ int uv_loop_configure(uv_loop_t* loop, uv_loop_option option, ...) {
+   va_list ap;
+@@ -711,6 +715,10 @@ int uv_loop_configure(uv_loop_t* loop, uv_loop_option option, ...) {
+   return err;
+ }
+ 
++#ifdef __clang__
++# pragma clang diagnostic pop
++#endif
++
+ 
+ static uv_loop_t default_loop_struct;
+ static uv_loop_t* default_loop_ptr;
+diff --git a/src/win/fs-event.c b/src/win/fs-event.c
+index 78741bfe..b9ec0256 100644
+--- a/src/win/fs-event.c
++++ b/src/win/fs-event.c
+@@ -19,6 +19,8 @@
+  * IN THE SOFTWARE.
+  */
+ 
++#define _CRT_NONSTDC_NO_WARNINGS
++
+ #include <assert.h>
+ #include <errno.h>
+ #include <stdio.h>
+diff --git a/src/win/fs.c b/src/win/fs.c
+index dc0b8984..5434698b 100644
+--- a/src/win/fs.c
++++ b/src/win/fs.c
+@@ -19,6 +19,8 @@
+  * IN THE SOFTWARE.
+  */
+ 
++#define _CRT_NONSTDC_NO_WARNINGS
++
+ #include <assert.h>
+ #include <stdlib.h>
+ #include <direct.h>
+@@ -1563,7 +1565,6 @@ static void fs__ftruncate(uv_fs_t* req) {
+ static void fs__copyfile(uv_fs_t* req) {
+   int flags;
+   int overwrite;
+-  DWORD error;
+   uv_stat_t statbuf;
+   uv_stat_t new_statbuf;
+ 
+diff --git a/src/win/pipe.c b/src/win/pipe.c
+index 138f9ed6..0c03a065 100644
+--- a/src/win/pipe.c
++++ b/src/win/pipe.c
+@@ -19,6 +19,8 @@
+  * IN THE SOFTWARE.
+  */
+ 
++#define _CRT_NONSTDC_NO_WARNINGS
++
+ #include <assert.h>
+ #include <io.h>
+ #include <stdio.h>
+diff --git a/src/win/process.c b/src/win/process.c
+index f3c9a43e..15f3b65e 100644
+--- a/src/win/process.c
++++ b/src/win/process.c
+@@ -19,6 +19,8 @@
+  * IN THE SOFTWARE.
+  */
+ 
++#define _CRT_NONSTDC_NO_WARNINGS
++
+ #include <assert.h>
+ #include <io.h>
+ #include <stdio.h>
+diff --git a/src/win/tty.c b/src/win/tty.c
+index a5d58bf7..deec66fe 100644
+--- a/src/win/tty.c
++++ b/src/win/tty.c
+@@ -19,6 +19,8 @@
+  * IN THE SOFTWARE.
+  */
+ 
++#define _CRT_NONSTDC_NO_WARNINGS
++
+ #include <assert.h>
+ #include <io.h>
+ #include <string.h>
+-- 
+2.20.1.windows.1
+

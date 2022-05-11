@@ -8,8 +8,8 @@
 
 #include <DSCommJoystickPacket.h>
 #include <hal/simulation/DriverStationData.h>
-#include <wpi/raw_uv_ostream.h>
 #include <wpi/span.h>
+#include <wpinet/raw_uv_ostream.h>
 
 class DSCommPacketTest;
 

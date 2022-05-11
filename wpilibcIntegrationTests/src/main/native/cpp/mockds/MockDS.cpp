@@ -12,7 +12,7 @@
 #include <hal/cpp/fpga_clock.h>
 #include <wpi/Logger.h>
 #include <wpi/SmallVector.h>
-#include <wpi/UDPClient.h>
+#include <wpinet/UDPClient.h>
 
 static void LoggerFunc(unsigned int level, const char* file, unsigned int line,
                        const char* msg) {

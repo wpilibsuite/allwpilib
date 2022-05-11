@@ -86,7 +86,9 @@ if (project.hasProperty('onlylinuxathena') || project.hasProperty('onlylinuxrasp
 }
 
 repositories {
-    mavenCentral()
+    maven {
+        url = 'https://frcmaven.wpi.edu/artifactory/ex-mvn'
+    }
     //maven.url "https://oss.sonatype.org/content/repositories/snapshots/"
 }
 

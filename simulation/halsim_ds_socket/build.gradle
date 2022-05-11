@@ -44,8 +44,13 @@ model {
         }
     }
     binaries {
+        all {
+            lib project: ':wpinet', library: 'wpinet', linkage: 'shared'
+            lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
+        }
         withType(GoogleTestTestSuiteBinarySpec) {
             project(':hal').addHalDependency(it, 'shared')
+            lib project: ':wpinet', library: 'wpinet', linkage: 'shared'
             lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
             lib library: pluginName, linkage: 'shared'
             if (it.targetPlatform.name == nativeUtils.wpi.platforms.roborio) {
