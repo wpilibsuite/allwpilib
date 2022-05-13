@@ -10,6 +10,7 @@
 #include "frc/geometry/CoordinateAxis.h"
 #include "frc/geometry/Pose3d.h"
 #include "frc/geometry/Rotation3d.h"
+#include "frc/geometry/Translation3d.h"
 
 namespace frc {
 
@@ -51,6 +52,30 @@ class WPILIB_DLLEXPORT CoordinateSystem {
    * Returns an instance of the NED coordinate system.
    */
   static CoordinateSystem NED();
+
+  /**
+   * Converts the given translation from one coordinate system to another.
+   *
+   * @param translation The translation to convert.
+   * @param from The coordinate system the translation starts in.
+   * @param to The coordinate system to which to convert.
+   * @return The given translation in the desired coordinate system.
+   */
+  static Translation3d Convert(const Translation3d& translation,
+                               const CoordinateSystem& from,
+                               const CoordinateSystem& to);
+
+  /**
+   * Converts the given rotation from one coordinate system to another.
+   *
+   * @param rotation The rotation to convert.
+   * @param from The coordinate system the rotation starts in.
+   * @param to The coordinate system to which to convert.
+   * @return The given rotation in the desired coordinate system.
+   */
+  static Rotation3d Convert(const Rotation3d& rotation,
+                            const CoordinateSystem& from,
+                            const CoordinateSystem& to);
 
   /**
    * Converts the given pose from one coordinate system to another.

@@ -24,8 +24,8 @@ CoordinateSystem::CoordinateSystem(const CoordinateAxis& positiveX,
   R.block<3, 1>(0, 2) = positiveZ.m_axis;
 
   // Require that the change of basis matrix is special orthogonal. This is true
-  // if the axes used are orthogonal and normalized. The Axis class already
-  // normalizes itself, so we just need to check for orthogonality.
+  // if the axes used are orthogonal and normalized. The CoordinateAxis class
+  // already normalizes itself, so we just need to check for orthogonality.
   if (R * R.transpose() != Matrixd<3, 3>::Identity()) {
     throw std::domain_error("Coordinate system isn't special orthogonal");
   }
@@ -82,6 +82,18 @@ CoordinateSystem CoordinateSystem::EDN() {
 CoordinateSystem CoordinateSystem::NED() {
   return CoordinateSystem{CoordinateAxis::N(), CoordinateAxis::E(),
                           CoordinateAxis::D()};
+}
+
+Translation3d CoordinateSystem::Convert(const Translation3d& translation,
+                                        const CoordinateSystem& from,
+                                        const CoordinateSystem& to) {
+  return translation.RotateBy(from.m_rotation - to.m_rotation);
+}
+
+Rotation3d CoordinateSystem::Convert(const Rotation3d& rotation,
+                                     const CoordinateSystem& from,
+                                     const CoordinateSystem& to) {
+  return rotation.RotateBy(from.m_rotation - to.m_rotation);
 }
 
 Pose3d CoordinateSystem::Convert(const Pose3d& pose,
