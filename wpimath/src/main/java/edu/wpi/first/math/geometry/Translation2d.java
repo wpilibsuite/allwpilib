@@ -99,7 +99,7 @@ public class Translation2d implements Interpolatable<Translation2d> {
 
   /**
    * Returns the angle this translation forms with the positive X axis.
-   * 
+   *
    * @return The angle of the translation
    */
   public Rotation2d getAngle() {

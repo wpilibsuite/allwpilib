@@ -82,7 +82,7 @@ class WPILIB_DLLEXPORT Translation2d {
 
   /**
    * Returns the angle this translation forms with the positive X axis.
-   * 
+   *
    * @return The angle of the translation
    */
   Rotation2d Rotation() const;
