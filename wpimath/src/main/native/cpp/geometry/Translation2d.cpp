@@ -25,7 +25,7 @@ units::meter_t Translation2d::Norm() const {
 }
 
 Rotation2d Translation2d::Angle() const {
-  return Rotation2d(static_cast<double>(m_x), static_cast<double>(m_y));
+  return Rotation2d{m_x.value(), m_y.value()};
 }
 
 Translation2d Translation2d::RotateBy(const Rotation2d& other) const {
