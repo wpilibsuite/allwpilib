@@ -4,6 +4,9 @@
 
 #pragma once
 
+#include "frc/geometry/Translation2d.h"
+#include "frc/geometry/Translation3d.h"
+#include "units/length.h"
 #include "units/math.h"
 
 namespace frc {

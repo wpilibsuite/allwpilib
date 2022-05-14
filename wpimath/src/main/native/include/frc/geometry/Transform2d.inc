@@ -6,6 +6,10 @@
 
 #include <utility>
 
+#include "frc/geometry/Rotation2d.h"
+#include "frc/geometry/Transform2d.h"
+#include "frc/geometry/Translation2d.h"
+
 namespace frc {
 
 constexpr Transform2d::Transform2d(Translation2d translation,

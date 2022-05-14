@@ -56,11 +56,11 @@ TEST(Pose2dTest, Minus) {
 
 TEST(Pose2dTest, Constexpr) {
   constexpr Pose2d defaultConstructed;
-  constexpr Pose2d translationRotation{Translation2d{0_m, 0_m},
+  constexpr Pose2d translationRotation{Translation2d{0_m, 1_m},
                                        Rotation2d{0_deg}};
   constexpr Pose2d coordRotation{0_m, 0_m, Rotation2d{45_deg}};
 
   static_assert(defaultConstructed.X() == 0_m);
-  static_assert(defaultConstructed.Y() == 0_m);
-  static_assert(defaultConstructed.Rotation().Degrees() == 0_deg);
+  static_assert(translationRotation.Y() == 1_m);
+  static_assert(coordRotation.Rotation().Degrees() == 45_deg);
 }

@@ -4,6 +4,9 @@
 
 #pragma once
 
+#include "frc/geometry/Translation2d.h"
+#include "units/length.h"
+
 namespace frc {
 
 constexpr Translation2d::Translation2d(units::meter_t x, units::meter_t y)

@@ -6,6 +6,10 @@
 
 #include <utility>
 
+#include "frc/geometry/Pose2d.h"
+#include "frc/geometry/Rotation2d.h"
+#include "units/length.h"
+
 namespace frc {
 
 constexpr Pose2d::Pose2d(Translation2d translation, Rotation2d rotation)

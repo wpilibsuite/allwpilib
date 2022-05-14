@@ -4,6 +4,9 @@
 
 #pragma once
 
+#include "frc/geometry/Rotation2d.h"
+#include "units/angle.h"
+
 namespace frc {
 
 constexpr Rotation2d::Rotation2d(units::radian_t value) : m_value(value)
