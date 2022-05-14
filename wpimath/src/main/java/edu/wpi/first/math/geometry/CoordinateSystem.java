@@ -78,9 +78,11 @@ public class CoordinateSystem {
   }
 
   /**
-   * Returns an instance of the NWU coordinate system.
+   * Returns an instance of the North-West-Up (NWU) coordinate system.
    *
-   * @return An instance of the NWU coordinate system.
+   * <p>The +X axis is north, the +Y axis is west, and the +Z axis is up.
+   *
+   * @return An instance of the North-West-Up (NWU) coordinate system.
    */
   @SuppressWarnings("MethodName")
   public static CoordinateSystem NWU() {
@@ -88,9 +90,11 @@ public class CoordinateSystem {
   }
 
   /**
-   * Returns an instance of the EDN coordinate system.
+   * Returns an instance of the East-Down-North (EDN) coordinate system.
    *
-   * @return An instance of the EDN coordinate system.
+   * <p>The +X axis is east, the +Y axis is down, and the +Z axis is north.
+   *
+   * @return An instance of the East-Down-North (EDN) coordinate system.
    */
   @SuppressWarnings("MethodName")
   public static CoordinateSystem EDN() {
@@ -98,9 +102,11 @@ public class CoordinateSystem {
   }
 
   /**
-   * Returns an instance of the NED coordinate system.
+   * Returns an instance of the North-East-Down (NED) coordinate system.
    *
-   * @return An instance of the NED coordinate system.
+   * <p>The +X axis is north, the +Y axis is east, and the +Z axis is down.
+   *
+   * @return An instance of the North-East-Down (NED) coordinate system.
    */
   @SuppressWarnings("MethodName")
   public static CoordinateSystem NED() {
