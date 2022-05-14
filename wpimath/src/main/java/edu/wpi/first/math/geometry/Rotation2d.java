@@ -154,24 +154,6 @@ public class Rotation2d implements Interpolatable<Rotation2d> {
   }
 
   /**
-   * Returns the absolute value of the Rotation2d.
-   *
-   * @return The new absolute value Rotation2d
-   */
-  public Rotation2d abs() {
-    return new Rotation2d(Math.abs(m_value));
-  }
-
-  /**
-   * Flips the Rotation2d to the opposite direction.
-   *
-   * @return The new flipped Rotation2d
-   */
-  public Rotation2d flip() {
-    return rotateBy(new Rotation2d(Math.PI));
-  }
-
-  /**
    * Returns the radian value of the Rotation2d.
    *
    * @return The radian value of the Rotation2d.

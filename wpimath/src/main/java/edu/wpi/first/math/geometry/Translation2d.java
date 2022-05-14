@@ -107,7 +107,6 @@ public class Translation2d implements Interpolatable<Translation2d> {
   }
 
   /**
-   * Applies a rotation to the translation in 2d space.
    * Applies a rotation to the translation in 2D space.
    *
    * <p>This multiplies the translation vector by a counterclockwise rotation matrix of the given

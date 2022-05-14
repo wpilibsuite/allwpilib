@@ -88,7 +88,6 @@ class WPILIB_DLLEXPORT Translation2d {
   Rotation2d Angle() const;
 
   /**
-   * Applies a rotation to the translation in 2d space.
    * Applies a rotation to the translation in 2D space.
    *
    * This multiplies the translation vector by a counterclockwise rotation
