@@ -66,7 +66,7 @@ TEST(Twist2dTest, Pose2dLog) {
 }
 
 TEST(Twist2dTest, Constexpr) {
-  constexpr Twist2d defaultCtor{};
+  constexpr Twist2d defaultCtor;
   constexpr Twist2d componentCtor{1_m, 2_m, 3_rad};
   constexpr auto multiplied = componentCtor * 2;
 

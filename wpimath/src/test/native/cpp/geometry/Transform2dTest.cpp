@@ -42,7 +42,7 @@ TEST(Transform2dTest, Composition) {
 }
 
 TEST(Transform2dTest, Constexpr) {
-  constexpr Transform2d defaultCtor{};
+  constexpr Transform2d defaultCtor;
   constexpr Transform2d translationRotationCtor{Translation2d{},
                                                 Rotation2d{10_deg}};
   constexpr auto multiplied = translationRotationCtor * 5;

@@ -95,7 +95,7 @@ TEST(Translation2dTest, PolarConstructor) {
 }
 
 TEST(Translation2dTest, Constexpr) {
-  constexpr Translation2d defaultCtor{};
+  constexpr Translation2d defaultCtor;
   constexpr Translation2d componentCtor{1_m, 2_m};
   constexpr auto added = defaultCtor + componentCtor;
   constexpr auto subtracted = defaultCtor - componentCtor;

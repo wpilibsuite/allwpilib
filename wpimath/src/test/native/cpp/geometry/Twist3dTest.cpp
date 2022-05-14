@@ -117,7 +117,7 @@ TEST(Twist3dTest, Pose3dLogZ) {
 }
 
 TEST(Twist3dTest, Constexpr) {
-  constexpr Twist3d defaultCtor{};
+  constexpr Twist3d defaultCtor;
   constexpr Twist3d componentCtor{1_m, 2_m, 3_m, 4_rad, 5_rad, 6_rad};
   constexpr auto multiplied = componentCtor * 2;
 

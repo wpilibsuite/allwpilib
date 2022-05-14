@@ -65,7 +65,7 @@ TEST(Rotation2dTest, Inequality) {
 }
 
 TEST(Rotation2dTest, Constexpr) {
-  constexpr Rotation2d defaultCtor{};
+  constexpr Rotation2d defaultCtor;
   constexpr Rotation2d radianCtor{5_rad};
   constexpr Rotation2d degreeCtor{270_deg};
 
