@@ -45,7 +45,14 @@ typedef struct pollfd {
 #endif
 
 #include <mswsock.h>
+// Disable the typedef in mstcpip.h of MinGW.
+#define _TCP_INITIAL_RTO_PARAMETERS _TCP_INITIAL_RTO_PARAMETERS__AVOID
+#define TCP_INITIAL_RTO_PARAMETERS TCP_INITIAL_RTO_PARAMETERS__AVOID
+#define PTCP_INITIAL_RTO_PARAMETERS PTCP_INITIAL_RTO_PARAMETERS__AVOID
 #include <ws2tcpip.h>
+#undef _TCP_INITIAL_RTO_PARAMETERS
+#undef TCP_INITIAL_RTO_PARAMETERS
+#undef PTCP_INITIAL_RTO_PARAMETERS
 #include <windows.h>
 
 #include <process.h>
@@ -217,7 +224,7 @@ typedef struct _AFD_POLL_INFO {
   AFD_POLL_HANDLE_INFO Handles[1];
 } AFD_POLL_INFO, *PAFD_POLL_INFO;
 
-#define UV_MSAFD_PROVIDER_COUNT 3
+#define UV_MSAFD_PROVIDER_COUNT 4
 
 
 /**
@@ -257,21 +264,14 @@ typedef union {
   } unused_; /* TODO: retained for ABI compatibility; remove me in v2.x. */
 } uv_cond_t;
 
-typedef union {
-  struct {
-    unsigned int num_readers_;
-    CRITICAL_SECTION num_readers_lock_;
-    HANDLE write_semaphore_;
-  } state_;
-  /* TODO: remove me in v2.x. */
-  struct {
-    SRWLOCK unused_;
-  } unused1_;
-  /* TODO: remove me in v2.x. */
-  struct {
-    uv_mutex_t unused1_;
-    uv_mutex_t unused2_;
-  } unused2_;
+typedef struct {
+  SRWLOCK read_write_lock_;
+  /* TODO: retained for ABI compatibility; remove me in v2.x */
+#ifdef _WIN64
+  unsigned char padding_[72];
+#else
+  unsigned char padding_[44];
+#endif
 } uv_rwlock_t;
 
 typedef struct {
@@ -518,7 +518,7 @@ typedef struct {
       /* eol conversion state */                                              \
       unsigned char previous_eol;                                             \
       /* ansi parser state */                                                 \
-      unsigned char ansi_parser_state;                                        \
+      unsigned short ansi_parser_state;                                       \
       unsigned char ansi_csi_argc;                                            \
       unsigned short ansi_csi_argv[4];                                        \
       COORD saved_position;                                                   \
@@ -669,6 +669,7 @@ typedef struct {
 #define UV_FS_O_APPEND       _O_APPEND
 #define UV_FS_O_CREAT        _O_CREAT
 #define UV_FS_O_EXCL         _O_EXCL
+#define UV_FS_O_FILEMAP      0x20000000
 #define UV_FS_O_RANDOM       _O_RANDOM
 #define UV_FS_O_RDONLY       _O_RDONLY
 #define UV_FS_O_RDWR         _O_RDWR

@@ -1,29 +1,30 @@
-From 6a2f0c13071618ae8cbf84bff2e659b862e57ecd Mon Sep 17 00:00:00 2001
+From 88809724759b5322eaaf080e31a0fc16baae65cc Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Tue, 26 Apr 2022 15:09:43 -0400
 Subject: [PATCH 2/7] Fix warnings
 
 ---
- include/uv/win.h    |  5 +++++
- src/idna.c          |  2 +-
- src/inet.c          |  4 ++++
- src/threadpool.c    |  4 ++++
- src/unix/core.c     | 12 ++++++++++--
- src/unix/internal.h |  4 ++--
- src/unix/thread.c   |  6 ------
- src/uv-common.c     |  8 ++++++++
- src/win/fs-event.c  |  2 ++
- src/win/fs.c        |  3 ++-
- src/win/pipe.c      |  2 ++
- src/win/process.c   |  2 ++
- src/win/tty.c       |  2 ++
- 13 files changed, 44 insertions(+), 12 deletions(-)
+ include/uv/win.h    |   5 +++
+ src/idna.c          |   2 +-
+ src/inet.c          |   4 ++
+ src/threadpool.c    |   4 ++
+ src/unix/core.c     |  12 ++++-
+ src/unix/darwin.c   | 106 +++++++++++++++++++++++---------------------
+ src/unix/internal.h |   4 +-
+ src/unix/thread.c   |   6 ---
+ src/uv-common.c     |   8 ++++
+ src/win/fs-event.c  |   2 +
+ src/win/fs.c        |   2 +
+ src/win/pipe.c      |   2 +
+ src/win/process.c   |   2 +
+ src/win/tty.c       |   2 +
+ 14 files changed, 99 insertions(+), 62 deletions(-)
 
 diff --git a/include/uv/win.h b/include/uv/win.h
-index acbd958b..354e0989 100644
+index 62be4b04..fe36a532 100644
 --- a/include/uv/win.h
 +++ b/include/uv/win.h
-@@ -194,11 +194,16 @@ typedef int (WSAAPI* LPFN_WSARECVFROM)
+@@ -201,11 +201,16 @@ typedef int (WSAAPI* LPFN_WSARECVFROM)
               LPWSAOVERLAPPED overlapped,
               LPWSAOVERLAPPED_COMPLETION_ROUTINE completion_routine);
  
@@ -41,10 +42,10 @@ index acbd958b..354e0989 100644
    typedef PVOID CONDITION_VARIABLE, *PCONDITION_VARIABLE;
  #endif
 diff --git a/src/idna.c b/src/idna.c
-index 13ffac6b..6b2406ca 100644
+index 93d982ca..36a39a08 100644
 --- a/src/idna.c
 +++ b/src/idna.c
-@@ -103,7 +103,7 @@ static int uv__idna_toascii_label(const char* s, const char* se,
+@@ -106,7 +106,7 @@ static int uv__idna_toascii_label(const char* s, const char* se,
                                    char** d, char* de) {
    static const char alphabet[] = "abcdefghijklmnopqrstuvwxyz0123456789";
    const char* ss;
@@ -54,7 +55,7 @@ index 13ffac6b..6b2406ca 100644
    unsigned k;
    unsigned n;
 diff --git a/src/inet.c b/src/inet.c
-index 7e208b53..167ec118 100644
+index ca8b6ac8..1b190255 100644
 --- a/src/inet.c
 +++ b/src/inet.c
 @@ -27,6 +27,10 @@
@@ -69,7 +70,7 @@ index 7e208b53..167ec118 100644
  #define UV__INET6_ADDRSTRLEN        46
  
 diff --git a/src/threadpool.c b/src/threadpool.c
-index 9cb863e7..515bf407 100644
+index 1241ace1..718972c3 100644
 --- a/src/threadpool.c
 +++ b/src/threadpool.c
 @@ -27,6 +27,10 @@
@@ -84,11 +85,11 @@ index 9cb863e7..515bf407 100644
  
  static uv_once_t once = UV_ONCE_INIT;
 diff --git a/src/unix/core.c b/src/unix/core.c
-index ef98b6ce..adb278bc 100644
+index c59e5352..be2ad1fc 100644
 --- a/src/unix/core.c
 +++ b/src/unix/core.c
-@@ -513,6 +513,16 @@ skip:
-   }
+@@ -524,6 +524,16 @@ int uv__accept(int sockfd) {
+   return peerfd;
  }
  
 +#if defined(__APPLE__)
@@ -104,10 +105,10 @@ index ef98b6ce..adb278bc 100644
  
  /* close() on macos has the "interesting" quirk that it fails with EINTR
   * without closing the file descriptor when a thread is in the cancel state.
-@@ -527,10 +537,8 @@ int uv__close_nocancel(int fd) {
+@@ -538,10 +548,8 @@ int uv__close_nocancel(int fd) {
  #pragma GCC diagnostic push
  #pragma GCC diagnostic ignored "-Wdollar-in-identifier-extension"
- #if defined(__LP64__)
+ #if defined(__LP64__) || TARGET_OS_IPHONE
 -  extern int close$NOCANCEL(int);
    return close$NOCANCEL(fd);
  #else
@@ -115,11 +116,135 @@ index ef98b6ce..adb278bc 100644
    return close$NOCANCEL$UNIX2003(fd);
  #endif
  #pragma GCC diagnostic pop
+diff --git a/src/unix/darwin.c b/src/unix/darwin.c
+index 5fbf7342..eeb35720 100644
+--- a/src/unix/darwin.c
++++ b/src/unix/darwin.c
+@@ -253,64 +253,68 @@ static int uv__get_cpu_speed(uint64_t* speed) {
+ 
+ #define S(s) pCFStringCreateWithCString(NULL, (s), kCFStringEncodingUTF8)
+ 
+-  kr = pIOMasterPort(MACH_PORT_NULL, &mach_port);
+-  assert(kr == KERN_SUCCESS);
+-  CFMutableDictionaryRef classes_to_match
+-      = pIOServiceMatching("IOPlatformDevice");
+-  kr = pIOServiceGetMatchingServices(mach_port, classes_to_match, &it);
+-  assert(kr == KERN_SUCCESS);
+-  service = pIOIteratorNext(it);
+-
+-  CFStringRef device_type_str = S("device_type");
+-  CFStringRef clock_frequency_str = S("clock-frequency");
+-
+-  while (service != 0) {
+-    CFDataRef data;
+-    data = pIORegistryEntryCreateCFProperty(service,
+-                                            device_type_str,
+-                                            NULL,
+-                                            0);
+-    if (data) {
+-      const UInt8* raw = pCFDataGetBytePtr(data);
+-      if (strncmp((char*)raw, "cpu", 3) == 0 ||
+-          strncmp((char*)raw, "processor", 9) == 0) {
+-        CFDataRef freq_ref;
+-        freq_ref = pIORegistryEntryCreateCFProperty(service,
+-                                                    clock_frequency_str,
+-                                                    NULL,
+-                                                    0);
+-        if (freq_ref) {
+-          const UInt8* freq_ref_ptr = pCFDataGetBytePtr(freq_ref);
+-          CFIndex len = pCFDataGetLength(freq_ref);
+-          if (len == 8)
+-            memcpy(speed, freq_ref_ptr, 8);
+-          else if (len == 4) {
+-            uint32_t v;
+-            memcpy(&v, freq_ref_ptr, 4);
+-            *speed = v;
+-          } else {
+-            *speed = 0;
+-          }
++  // Braces ensure goto doesn't jump into device_type_str's and
++  // clock_frequency_str's lifetimes after their initialization
++  {
++    kr = pIOMasterPort(MACH_PORT_NULL, &mach_port);
++    assert(kr == KERN_SUCCESS);
++    CFMutableDictionaryRef classes_to_match
++        = pIOServiceMatching("IOPlatformDevice");
++    kr = pIOServiceGetMatchingServices(mach_port, classes_to_match, &it);
++    assert(kr == KERN_SUCCESS);
++    service = pIOIteratorNext(it);
+ 
+-          pCFRelease(freq_ref);
+-          pCFRelease(data);
+-          break;
++    CFStringRef device_type_str = S("device_type");
++    CFStringRef clock_frequency_str = S("clock-frequency");
++
++    while (service != 0) {
++      CFDataRef data;
++      data = pIORegistryEntryCreateCFProperty(service,
++                                              device_type_str,
++                                              NULL,
++                                              0);
++      if (data) {
++        const UInt8* raw = pCFDataGetBytePtr(data);
++        if (strncmp((char*)raw, "cpu", 3) == 0 ||
++            strncmp((char*)raw, "processor", 9) == 0) {
++          CFDataRef freq_ref;
++          freq_ref = pIORegistryEntryCreateCFProperty(service,
++                                                      clock_frequency_str,
++                                                      NULL,
++                                                      0);
++          if (freq_ref) {
++            const UInt8* freq_ref_ptr = pCFDataGetBytePtr(freq_ref);
++            CFIndex len = pCFDataGetLength(freq_ref);
++            if (len == 8)
++              memcpy(speed, freq_ref_ptr, 8);
++            else if (len == 4) {
++              uint32_t v;
++              memcpy(&v, freq_ref_ptr, 4);
++              *speed = v;
++            } else {
++              *speed = 0;
++            }
++
++            pCFRelease(freq_ref);
++            pCFRelease(data);
++            break;
++          }
+         }
++        pCFRelease(data);
+       }
+-      pCFRelease(data);
+-    }
+ 
+-    service = pIOIteratorNext(it);
+-  }
++      service = pIOIteratorNext(it);
++    }
+ 
+-  pIOObjectRelease(it);
++    pIOObjectRelease(it);
+ 
+-  err = 0;
++    err = 0;
+ 
+-  if (device_type_str != NULL)
+-    pCFRelease(device_type_str);
+-  if (clock_frequency_str != NULL)
+-    pCFRelease(clock_frequency_str);
++    if (device_type_str != NULL)
++      pCFRelease(device_type_str);
++    if (clock_frequency_str != NULL)
++      pCFRelease(clock_frequency_str);
++  }
+ 
+ out:
+   if (core_foundation_handle != NULL)
 diff --git a/src/unix/internal.h b/src/unix/internal.h
-index 26061647..2db30350 100644
+index f418572d..5a867db7 100644
 --- a/src/unix/internal.h
 +++ b/src/unix/internal.h
-@@ -301,8 +301,8 @@ UV_UNUSED(static void uv__update_time(uv_loop_t* loop)) {
+@@ -313,8 +313,8 @@ UV_UNUSED(static void uv__update_time(uv_loop_t* loop)) {
    loop->time = uv__hrtime(UV_CLOCK_FAST) / 1000000;
  }
  
@@ -131,12 +256,12 @@ index 26061647..2db30350 100644
    s = strrchr(path, '/');
    if (s == NULL)
 diff --git a/src/unix/thread.c b/src/unix/thread.c
-index c702d418..c753be9b 100644
+index 759cd0c2..64726bd6 100644
 --- a/src/unix/thread.c
 +++ b/src/unix/thread.c
-@@ -222,12 +222,6 @@ int uv_thread_create_ex(uv_thread_t* tid,
-   size_t pagesize;
+@@ -244,12 +244,6 @@ int uv_thread_create_ex(uv_thread_t* tid,
    size_t stack_size;
+   size_t min_stack_size;
  
 -  /* Used to squelch a -Wcast-function-type warning. */
 -  union {
@@ -148,10 +273,10 @@ index c702d418..c753be9b 100644
        params->flags & UV_THREAD_HAS_STACK_SIZE ? params->stack_size : 0;
  
 diff --git a/src/uv-common.c b/src/uv-common.c
-index 47473346..b61a703d 100644
+index 73d19caf..c287246f 100644
 --- a/src/uv-common.c
 +++ b/src/uv-common.c
-@@ -698,6 +698,10 @@ void uv__fs_readdir_cleanup(uv_fs_t* req) {
+@@ -756,6 +756,10 @@ void uv__fs_readdir_cleanup(uv_fs_t* req) {
    }
  }
  
@@ -162,7 +287,7 @@ index 47473346..b61a703d 100644
  
  int uv_loop_configure(uv_loop_t* loop, uv_loop_option option, ...) {
    va_list ap;
-@@ -711,6 +715,10 @@ int uv_loop_configure(uv_loop_t* loop, uv_loop_option option, ...) {
+@@ -769,6 +773,10 @@ int uv_loop_configure(uv_loop_t* loop, uv_loop_option option, ...) {
    return err;
  }
  
@@ -174,7 +299,7 @@ index 47473346..b61a703d 100644
  static uv_loop_t default_loop_struct;
  static uv_loop_t* default_loop_ptr;
 diff --git a/src/win/fs-event.c b/src/win/fs-event.c
-index 78741bfe..b9ec0256 100644
+index 15046731..3244a4e4 100644
 --- a/src/win/fs-event.c
 +++ b/src/win/fs-event.c
 @@ -19,6 +19,8 @@
@@ -187,7 +312,7 @@ index 78741bfe..b9ec0256 100644
  #include <errno.h>
  #include <stdio.h>
 diff --git a/src/win/fs.c b/src/win/fs.c
-index dc0b8984..5434698b 100644
+index 8374012f..f71b3c04 100644
 --- a/src/win/fs.c
 +++ b/src/win/fs.c
 @@ -19,6 +19,8 @@
@@ -199,16 +324,8 @@ index dc0b8984..5434698b 100644
  #include <assert.h>
  #include <stdlib.h>
  #include <direct.h>
-@@ -1563,7 +1565,6 @@ static void fs__ftruncate(uv_fs_t* req) {
- static void fs__copyfile(uv_fs_t* req) {
-   int flags;
-   int overwrite;
--  DWORD error;
-   uv_stat_t statbuf;
-   uv_stat_t new_statbuf;
- 
 diff --git a/src/win/pipe.c b/src/win/pipe.c
-index 138f9ed6..0c03a065 100644
+index 9fb73b4e..ff4e8d25 100644
 --- a/src/win/pipe.c
 +++ b/src/win/pipe.c
 @@ -19,6 +19,8 @@
@@ -221,7 +338,7 @@ index 138f9ed6..0c03a065 100644
  #include <io.h>
  #include <stdio.h>
 diff --git a/src/win/process.c b/src/win/process.c
-index f3c9a43e..15f3b65e 100644
+index e857db3e..a49016f6 100644
 --- a/src/win/process.c
 +++ b/src/win/process.c
 @@ -19,6 +19,8 @@
@@ -234,7 +351,7 @@ index f3c9a43e..15f3b65e 100644
  #include <io.h>
  #include <stdio.h>
 diff --git a/src/win/tty.c b/src/win/tty.c
-index a5d58bf7..deec66fe 100644
+index 98c58883..f6131d45 100644
 --- a/src/win/tty.c
 +++ b/src/win/tty.c
 @@ -19,6 +19,8 @@

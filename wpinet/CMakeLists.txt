@@ -87,6 +87,8 @@ set(uv_unix_src
     src/main/native/thirdparty/libuv/src/unix/pipe.cpp
     src/main/native/thirdparty/libuv/src/unix/poll.cpp
     src/main/native/thirdparty/libuv/src/unix/process.cpp
+    src/main/native/thirdparty/libuv/src/unix/random-getentropy.cpp
+    src/main/native/thirdparty/libuv/src/unix/random-getrandom.cpp
     src/main/native/thirdparty/libuv/src/unix/signal.cpp
     src/main/native/thirdparty/libuv/src/unix/stream.cpp
     src/main/native/thirdparty/libuv/src/unix/tcp.cpp
@@ -105,12 +107,14 @@ set(uv_darwin_src
 )
 
 set(uv_linux_src
+    src/main/native/thirdparty/libuv/src/unix/epoll.cpp
     src/main/native/thirdparty/libuv/src/unix/linux-core.cpp
     src/main/native/thirdparty/libuv/src/unix/linux-inotify.cpp
     src/main/native/thirdparty/libuv/src/unix/linux-syscalls.cpp
     src/main/native/thirdparty/libuv/src/unix/procfs-exepath.cpp
     src/main/native/thirdparty/libuv/src/unix/proctitle.cpp
-    src/main/native/thirdparty/libuv/src/unix/sysinfo-loadavg.cpp
+    src/main/native/thirdparty/libuv/src/unix/random-devurandom.cpp
+    src/main/native/thirdparty/libuv/src/unix/random-sysctl-linux.cpp
 )
 
 add_library(wpinet ${wpinet_native_src} ${wpinet_resources_src})
