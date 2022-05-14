@@ -163,12 +163,11 @@ public class Rotation2d implements Interpolatable<Rotation2d> {
   }
 
   /**
-   * Inverts the Rotation2d, unlike `unaryMinus`, which is a flip across the x-axis,
-   * this rotates the angle 180 degrees about the origin.
+   * Flips the Rotation2d to the opposite direction.
    *
-   * @return The new inverted Rotation2d
+   * @return The new flipped Rotation2d
    */
-  public Rotation2d invert() {
+  public Rotation2d flip() {
     return rotateBy(new Rotation2d(Math.PI));
   }
 
