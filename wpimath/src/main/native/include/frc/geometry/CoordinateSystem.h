@@ -38,17 +38,23 @@ class WPILIB_DLLEXPORT CoordinateSystem {
   CoordinateSystem& operator=(CoordinateSystem&&) = default;
 
   /**
-   * Returns an instance of the NWU coordinate system.
+   * Returns an instance of the North-West-Up (NWU) coordinate system.
+   *
+   * The +X axis is north, the +Y axis is west, and the +Z axis is up.
    */
   static CoordinateSystem NWU();
 
   /**
-   * Returns an instance of the EDN coordinate system.
+   * Returns an instance of the East-Down-North (EDN) coordinate system.
+   *
+   * The +X axis is east, the +Y axis is down, and the +Z axis is north.
    */
   static CoordinateSystem EDN();
 
   /**
    * Returns an instance of the NED coordinate system.
+   *
+   * The +X axis is north, the +Y axis is east, and the +Z axis is down.
    */
   static CoordinateSystem NED();
 
