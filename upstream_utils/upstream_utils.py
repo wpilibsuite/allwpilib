@@ -118,6 +118,8 @@ def copy_to(files, root):
         # Rename .cc file to .cpp
         if dest_file.endswith(".cc"):
             dest_file = os.path.splitext(dest_file)[0] + ".cpp"
+        if dest_file.endswith(".c"):
+            dest_file = os.path.splitext(dest_file)[0] + ".cpp"
 
         # Make leading directory
         dest_dir = os.path.dirname(dest_file)
@@ -199,3 +201,24 @@ def apply_patches(root, patches):
     os.chdir(root)
     for patch in patches:
         subprocess.check_output(["git", "apply", patch])
+
+
+def am_patches(root, patches, use_threeway=False):
+    """Apply list of patches to the destination Git repository.
+
+    Keyword arguments:
+    root -- the root directory of the destination Git repository
+    patches -- list of patch files relative to the root
+    """
+    if len(patches) == 0:
+        raise Exception("Must provide at least one patch")
+
+    os.chdir(root)
+    args = ["git", "am"]
+    if use_threeway:
+        args.append("-3")
+
+    for patch in patches:
+        args.append(patch)
+
+    subprocess.check_output(args)

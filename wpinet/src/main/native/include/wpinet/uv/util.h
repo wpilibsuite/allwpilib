@@ -67,7 +67,7 @@ int AddrToName(const sockaddr_storage& addr, T* ip, unsigned int* port) {
   if (addr.ss_family == AF_INET6) {
     return AddrToName(reinterpret_cast<const sockaddr_in6&>(addr), ip, port);
   }
-  char name[1];
+  char name[1] = {'\0'};
   ip->assign(name, name);
   return -1;
 }

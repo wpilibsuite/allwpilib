@@ -36,7 +36,9 @@ mainClassName = 'frc.robot.Main'
 apply plugin: 'com.github.johnrengelman.shadow'
 
 repositories {
-    mavenCentral()
+    maven {
+        url = 'https://frcmaven.wpi.edu/artifactory/ex-mvn'
+    }
 }
 
 dependencies {
