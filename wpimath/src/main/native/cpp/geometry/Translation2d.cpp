@@ -24,7 +24,7 @@ units::meter_t Translation2d::Norm() const {
   return units::math::hypot(m_x, m_y);
 }
 
-Rotation2d Translation2d::Rotation() const {
+Rotation2d Translation2d::Angle() const {
   return Rotation2d(static_cast<double>(m_x), static_cast<double>(m_y));
 }
 

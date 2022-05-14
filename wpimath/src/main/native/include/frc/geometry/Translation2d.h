@@ -85,7 +85,7 @@ class WPILIB_DLLEXPORT Translation2d {
    *
    * @return The angle of the translation
    */
-  Rotation2d Rotation() const;
+  Rotation2d Angle() const;
 
   /**
    * Applies a rotation to the translation in 2d space.
