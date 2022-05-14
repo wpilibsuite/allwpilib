@@ -460,7 +460,7 @@ int DriverStation::GetJoystickAxisType(int stick, int axis) {
   HAL_JoystickDescriptor descriptor;
   HAL_GetJoystickDescriptor(stick, &descriptor);
 
-  return static_cast<bool>(descriptor.axisTypes);
+  return descriptor.axisTypes[axis];
 }
 
 bool DriverStation::IsJoystickConnected(int stick) {
