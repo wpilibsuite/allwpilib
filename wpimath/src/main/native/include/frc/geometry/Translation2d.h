@@ -81,6 +81,13 @@ class WPILIB_DLLEXPORT Translation2d {
   units::meter_t Norm() const;
 
   /**
+   * Returns the angle this translation forms with the positive X axis.
+   *
+   * @return The angle of the translation
+   */
+  Rotation2d Angle() const;
+
+  /**
    * Applies a rotation to the translation in 2D space.
    *
    * This multiplies the translation vector by a counterclockwise rotation

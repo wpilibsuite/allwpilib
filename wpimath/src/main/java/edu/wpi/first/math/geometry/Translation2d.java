@@ -98,6 +98,15 @@ public class Translation2d implements Interpolatable<Translation2d> {
   }
 
   /**
+   * Returns the angle this translation forms with the positive X axis.
+   *
+   * @return The angle of the translation
+   */
+  public Rotation2d getAngle() {
+    return new Rotation2d(m_x, m_y);
+  }
+
+  /**
    * Applies a rotation to the translation in 2D space.
    *
    * <p>This multiplies the translation vector by a counterclockwise rotation matrix of the given
