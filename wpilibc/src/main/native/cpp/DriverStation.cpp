@@ -456,6 +456,10 @@ int DriverStation::GetJoystickAxisType(int stick, int axis) {
     FRC_ReportError(warn::BadJoystickIndex, "stick {} out of range", stick);
     return -1;
   }
+  if (axis < 0 || axis >= HAL_kMaxJoystickAxes) {
+    FRC_ReportError(warn::BadJoystickAxis, "axis {} out of range", axis);
+    return -1;
+  }
 
   HAL_JoystickDescriptor descriptor;
   HAL_GetJoystickDescriptor(stick, &descriptor);
