@@ -95,14 +95,12 @@ public class SlewRateLimiter {
     }
     /**
      * Gets the maximum rate of change.
-     * @return m_forwardRateLimit
      */
     public double getForwardRateLimit(){
         return m_forwardRateLimit;
     }
     /**
      * Gets the minimum rate of change.
-     * @return m_backwardRateLimit
      */
     public double getBackwardRateLimit(){
         return m_backwardRateLimit;
