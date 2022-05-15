@@ -70,6 +70,14 @@ public class SlewRateLimiter {
         return m_prevVal;
     }
 
+    public double calculate(double input) {
+        double currentTime = WPIUtilJNI.now() * 1e-6;
+        double elapsedTime = currentTime - m_prevTime;
+        m_prevVal +=
+                MathUtil.clamp(input - m_prevVal, -m_rateLimit * elapsedTime, m_rateLimit * elapsedTime);
+        m_prevTime = currentTime;
+        return m_prevVal;
+    }
     /**
      * Filters the input to limit the slew rate for backward and forward.
      *
