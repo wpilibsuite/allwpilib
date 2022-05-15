@@ -93,4 +93,30 @@ public class SlewRateLimiter {
         m_prevVal = value;
         m_prevTime = WPIUtilJNI.now() * 1e-6;
     }
+    /**
+     * Gets the maximum rate of change.
+     * @return m_forwardRateLimit
+     */
+    public double getForwardRateLimit(){
+        return m_forwardRateLimit;
+    }
+    /**
+     * Gets the minimum rate of change.
+     * @return m_backwardRateLimit
+     */
+    public double getBackwardRateLimit(){
+        return m_backwardRateLimit;
+    }
+    /**
+     * Sets the maximum rate of change.
+     */
+    public void setForwardRateLimit(double forwardVal){
+        m_forwardRateLimit = forwardVal;
+    }
+    /**
+     * Sets the minimum rate of change.
+     */
+    public void setBackwardRatelimit(double backwardVal){
+        m_backwardRateLimit = backwardVal;
+    }
 
