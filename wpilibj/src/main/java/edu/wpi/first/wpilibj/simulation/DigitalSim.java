@@ -11,7 +11,7 @@ import edu.wpi.first.wpilibj.DigitalOutput;
 
 /** Class to control a simulated digital input or output. */
 public class DigitalSim {
-  protected final int m_index;
+  private final int m_index;
 
   /**
    * Constructs from a DigitalInput object.
