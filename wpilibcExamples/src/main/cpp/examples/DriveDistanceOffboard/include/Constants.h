@@ -4,12 +4,13 @@
 
 #pragma once
 
+#include <numbers>
+
 #include <units/acceleration.h>
 #include <units/length.h>
 #include <units/time.h>
 #include <units/velocity.h>
 #include <units/voltage.h>
-#include <wpi/numbers>
 
 /**
  * The Constants header provides a convenient place for teams to hold robot-wide

@@ -5,6 +5,8 @@
 #include <frc2/command/Subsystem.h>
 #include <frc2/command/SwerveControllerCommand.h>
 
+#include <numbers>
+
 #include <frc/Timer.h>
 #include <frc/controller/PIDController.h>
 #include <frc/controller/ProfiledPIDController.h>
@@ -15,7 +17,6 @@
 #include <frc/kinematics/SwerveModuleState.h>
 #include <frc/simulation/SimHooks.h>
 #include <frc/trajectory/TrajectoryGenerator.h>
-#include <wpi/numbers>
 
 #include "gtest/gtest.h"
 

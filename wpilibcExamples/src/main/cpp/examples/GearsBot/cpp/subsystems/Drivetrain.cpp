@@ -4,10 +4,11 @@
 
 #include "subsystems/Drivetrain.h"
 
+#include <numbers>
+
 #include <frc/Joystick.h>
 #include <frc/smartdashboard/SmartDashboard.h>
 #include <units/length.h>
-#include <wpi/numbers>
 
 Drivetrain::Drivetrain() {
   // We need to invert one side of the drivetrain so that positive voltages
@@ -26,9 +27,9 @@ Drivetrain::Drivetrain() {
 #else
   // Circumference = diameter * pi. 360 tick simulated encoders.
   m_leftEncoder.SetDistancePerPulse(units::foot_t{4_in}.value() *
-                                    wpi::numbers::pi / 360.0);
+                                    std::numbers::pi / 360.0);
   m_rightEncoder.SetDistancePerPulse(units::foot_t{4_in}.value() *
-                                     wpi::numbers::pi / 360.0);
+                                     std::numbers::pi / 360.0);
 #endif
   SetName("Drivetrain");
   // Let's show everything on the LiveWindow

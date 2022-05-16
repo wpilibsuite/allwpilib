@@ -6,9 +6,9 @@
 
 #include <algorithm>
 #include <cmath>
+#include <numbers>
 
 #include <hal/FRCUsageReporting.h>
-#include <wpi/numbers>
 #include <wpi/sendable/SendableBuilder.h>
 #include <wpi/sendable/SendableRegistry.h>
 
@@ -30,12 +30,12 @@ KilloughDrive::KilloughDrive(MotorController& leftMotor,
     : m_leftMotor(&leftMotor),
       m_rightMotor(&rightMotor),
       m_backMotor(&backMotor) {
-  m_leftVec = {std::cos(leftMotorAngle * (wpi::numbers::pi / 180.0)),
-               std::sin(leftMotorAngle * (wpi::numbers::pi / 180.0))};
-  m_rightVec = {std::cos(rightMotorAngle * (wpi::numbers::pi / 180.0)),
-                std::sin(rightMotorAngle * (wpi::numbers::pi / 180.0))};
-  m_backVec = {std::cos(backMotorAngle * (wpi::numbers::pi / 180.0)),
-               std::sin(backMotorAngle * (wpi::numbers::pi / 180.0))};
+  m_leftVec = {std::cos(leftMotorAngle * (std::numbers::pi / 180.0)),
+               std::sin(leftMotorAngle * (std::numbers::pi / 180.0))};
+  m_rightVec = {std::cos(rightMotorAngle * (std::numbers::pi / 180.0)),
+                std::sin(rightMotorAngle * (std::numbers::pi / 180.0))};
+  m_backVec = {std::cos(backMotorAngle * (std::numbers::pi / 180.0)),
+               std::sin(backMotorAngle * (std::numbers::pi / 180.0))};
   wpi::SendableRegistry::AddChild(this, m_leftMotor);
   wpi::SendableRegistry::AddChild(this, m_rightMotor);
   wpi::SendableRegistry::AddChild(this, m_backMotor);
@@ -73,8 +73,8 @@ void KilloughDrive::DrivePolar(double magnitude, double angle,
     reported = true;
   }
 
-  DriveCartesian(magnitude * std::sin(angle * (wpi::numbers::pi / 180.0)),
-                 magnitude * std::cos(angle * (wpi::numbers::pi / 180.0)),
+  DriveCartesian(magnitude * std::sin(angle * (std::numbers::pi / 180.0)),
+                 magnitude * std::cos(angle * (std::numbers::pi / 180.0)),
                  zRotation, 0.0);
 }
 
