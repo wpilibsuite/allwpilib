@@ -9,20 +9,17 @@ import edu.wpi.first.hal.simulation.NotifyCallback;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DigitalOutput;
 
-/**
- * Class to control a simulated digital input or output.
- *
- * @deprecated Use {@link edu.wpi.first.wpilibj.simulation.DigitalSim}. instead.
- */
-@Deprecated(since = "2022", forRemoval = true)
-public class DIOSim extends DigitalSim {
+/** Class to control a simulated digital input or output. */
+public class DigitalSim {
+  protected final int m_index;
+
   /**
    * Constructs from a DigitalInput object.
    *
    * @param input DigitalInput to simulate
    */
-  public DIOSim(DigitalInput input) {
-    super(input);
+  public DigitalSim(DigitalInput input) {
+    m_index = input.getChannel();
   }
 
   /**
@@ -30,8 +27,8 @@ public class DIOSim extends DigitalSim {
    *
    * @param output DigitalOutput to simulate
    */
-  public DIOSim(DigitalOutput output) {
-    super(output);
+  public DigitalSim(DigitalOutput output) {
+    m_index = output.getChannel();
   }
 
   /**
@@ -39,8 +36,8 @@ public class DIOSim extends DigitalSim {
    *
    * @param channel Channel number
    */
-  public DIOSim(int channel) {
-    super(channel);
+  public DigitalSim(int channel) {
+    m_index = channel;
   }
 
   /**
@@ -51,7 +48,6 @@ public class DIOSim extends DigitalSim {
    * @return the {@link CallbackStore} object associated with this callback. Save a reference to
    *     this object so GC doesn't cancel the callback.
    */
-  @Override
   public CallbackStore registerInitializedCallback(NotifyCallback callback, boolean initialNotify) {
     int uid = DIODataJNI.registerInitializedCallback(m_index, callback, initialNotify);
     return new CallbackStore(m_index, uid, DIODataJNI::cancelInitializedCallback);
@@ -62,7 +58,6 @@ public class DIOSim extends DigitalSim {
    *
    * @return true if initialized
    */
-  @Override
   public boolean getInitialized() {
     return DIODataJNI.getInitialized(m_index);
   }
@@ -72,7 +67,6 @@ public class DIOSim extends DigitalSim {
    *
    * @param initialized whether this object is initialized
    */
-  @Override
   public void setInitialized(boolean initialized) {
     DIODataJNI.setInitialized(m_index, initialized);
   }
@@ -85,7 +79,6 @@ public class DIOSim extends DigitalSim {
    * @return the {@link CallbackStore} object associated with this callback. Save a reference to
    *     this object so GC doesn't cancel the callback.
    */
-  @Override
   public CallbackStore registerValueCallback(NotifyCallback callback, boolean initialNotify) {
     int uid = DIODataJNI.registerValueCallback(m_index, callback, initialNotify);
     return new CallbackStore(m_index, uid, DIODataJNI::cancelValueCallback);
@@ -96,7 +89,6 @@ public class DIOSim extends DigitalSim {
    *
    * @return the DIO value
    */
-  @Override
   public boolean getValue() {
     return DIODataJNI.getValue(m_index);
   }
@@ -106,7 +98,6 @@ public class DIOSim extends DigitalSim {
    *
    * @param value the new value
    */
-  @Override
   public void setValue(boolean value) {
     DIODataJNI.setValue(m_index, value);
   }
@@ -119,7 +110,6 @@ public class DIOSim extends DigitalSim {
    * @return the {@link CallbackStore} object associated with this callback. Save a reference to
    *     this object so GC doesn't cancel the callback.
    */
-  @Override
   public CallbackStore registerPulseLengthCallback(NotifyCallback callback, boolean initialNotify) {
     int uid = DIODataJNI.registerPulseLengthCallback(m_index, callback, initialNotify);
     return new CallbackStore(m_index, uid, DIODataJNI::cancelPulseLengthCallback);
@@ -130,7 +120,6 @@ public class DIOSim extends DigitalSim {
    *
    * @return the pulse length of this DIO port
    */
-  @Override
   public double getPulseLength() {
     return DIODataJNI.getPulseLength(m_index);
   }
@@ -140,7 +129,6 @@ public class DIOSim extends DigitalSim {
    *
    * @param pulseLength the new pulse length
    */
-  @Override
   public void setPulseLength(double pulseLength) {
     DIODataJNI.setPulseLength(m_index, pulseLength);
   }
@@ -153,7 +141,6 @@ public class DIOSim extends DigitalSim {
    * @return the {@link CallbackStore} object associated with this callback. Save a reference to
    *     this object so GC doesn't cancel the callback.
    */
-  @Override
   public CallbackStore registerIsInputCallback(NotifyCallback callback, boolean initialNotify) {
     int uid = DIODataJNI.registerIsInputCallback(m_index, callback, initialNotify);
     return new CallbackStore(m_index, uid, DIODataJNI::cancelIsInputCallback);
@@ -164,7 +151,6 @@ public class DIOSim extends DigitalSim {
    *
    * @return true if Input
    */
-  @Override
   public boolean getIsInput() {
     return DIODataJNI.getIsInput(m_index);
   }
@@ -174,7 +160,6 @@ public class DIOSim extends DigitalSim {
    *
    * @param isInput whether this DIO should be an Input
    */
-  @Override
   public void setIsInput(boolean isInput) {
     DIODataJNI.setIsInput(m_index, isInput);
   }
@@ -187,7 +172,6 @@ public class DIOSim extends DigitalSim {
    * @return the {@link CallbackStore} object associated with this callback. Save a reference to
    *     this object so GC doesn't cancel the callback.
    */
-  @Override
   public CallbackStore registerFilterIndexCallback(NotifyCallback callback, boolean initialNotify) {
     int uid = DIODataJNI.registerFilterIndexCallback(m_index, callback, initialNotify);
     return new CallbackStore(m_index, uid, DIODataJNI::cancelFilterIndexCallback);
@@ -198,7 +182,6 @@ public class DIOSim extends DigitalSim {
    *
    * @return the filter index of this DIO port
    */
-  @Override
   public int getFilterIndex() {
     return DIODataJNI.getFilterIndex(m_index);
   }
@@ -208,13 +191,11 @@ public class DIOSim extends DigitalSim {
    *
    * @param filterIndex the new filter index
    */
-  @Override
   public void setFilterIndex(int filterIndex) {
     DIODataJNI.setFilterIndex(m_index, filterIndex);
   }
 
   /** Reset all simulation data of this object. */
-  @Override
   public void resetData() {
     DIODataJNI.resetData(m_index);
   }
