@@ -89,10 +89,10 @@ TEST_F(CommandDecoratorTest, AndThen) {
   EXPECT_TRUE(finished);
 }
 
-TEST_F(CommandDecoratorTest, Perpetually) {
+TEST_F(CommandDecoratorTest, Endlessly) {
   CommandScheduler scheduler = GetScheduler();
 
-  auto command = InstantCommand([] {}, {}).Perpetually();
+  auto command = InstantCommand([] {}, {}).Endlessly();
 
   scheduler.Schedule(&command);
 
@@ -100,4 +100,18 @@ TEST_F(CommandDecoratorTest, Perpetually) {
   scheduler.Run();
 
   EXPECT_TRUE(scheduler.IsScheduled(&command));
+}
+
+TEST_F(CommandDecoratorTest, Unless) {
+  CommandScheduler scheduler = GetScheduler();
+
+  bool hasRun = false;
+  bool unlessBool = true;
+
+  auto command = InstantCommand([] { hasRun = true; }, {}).unless([&unlessBool] { return unlessBool; });
+
+  scheduler.Schedule(&command) EXPECT_FALSE(hasRun);
+
+  unlessBool = false;
+  scheduler.Schedule(&command) EXPECT_TRUE(hasRun);
 }

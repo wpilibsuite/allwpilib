@@ -168,11 +168,11 @@ class CommandDecoratorTest extends CommandTestBase {
   }
 
   @Test
-  void perpetuallyTest() {
+  void endlesslyTest() {
     try (CommandScheduler scheduler = new CommandScheduler()) {
       Command command = new InstantCommand();
 
-      Command perpetual = command.perpetually();
+      Command perpetual = command.endlessly();
 
       scheduler.schedule(perpetual);
       scheduler.run();
@@ -180,6 +180,27 @@ class CommandDecoratorTest extends CommandTestBase {
       scheduler.run();
 
       assertTrue(scheduler.isScheduled(perpetual));
+    }
+  }
+
+  @Test
+  void unlessTest() {
+    try (CommandScheduler scheduler = new CommandScheduler()) {
+      ConditionHolder unlessCondition = new ConditionHolder();
+      ConditionHolder hasRunCondition = new ConditionHolder();
+      hasRunCondition.setCondition(false);
+
+      Command command = new InstantCommand(() -> hasRunCondition.setCondition(true)).unless(unlessCondition::getCondition);
+
+      unlessCondition.setCondition(true);
+      scheduler.schedule(command);
+      scheduler.run();
+      assertFalse(hasRunCondition.getCondition());
+
+      unlessCondition.setCondition(false);
+      scheduler.schedule(command);
+      scheduler.run();
+      assertTrue(hasRunCondition.getCondition());
     }
   }
 }
