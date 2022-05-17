@@ -5,6 +5,7 @@
 #include <frc/simulation/SimHooks.h>
 
 #include "CommandTestBase.h"
+#include "frc2/command/ConditionalCommand.h"
 #include "frc2/command/InstantCommand.h"
 #include "frc2/command/ParallelRaceGroup.h"
 #include "frc2/command/PerpetualCommand.h"
@@ -109,14 +110,16 @@ TEST_F(CommandDecoratorTest, Unless) {
   bool unlessBool = true;
 
   auto command =
-      InstantCommand([] { hasRun = true; }, {}).unless([&unlessBool] {
+      InstantCommand([&hasRun] { hasRun = true; }, {}).Unless([&unlessBool] {
         return unlessBool;
       });
 
   scheduler.Schedule(&command);
+  scheduler.Run();
   EXPECT_FALSE(hasRun);
 
   unlessBool = false;
   scheduler.Schedule(&command);
+  scheduler.Run();
   EXPECT_TRUE(hasRun);
 }
