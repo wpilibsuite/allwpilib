@@ -1,4 +1,4 @@
-From 91f8cf4b192ecc2924d219f470f0be45f1bec485 Mon Sep 17 00:00:00 2001
+From 154d6a1790c75b637cb5c0f1fdb97ffeace83f2d Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Sun, 8 May 2022 16:46:20 -0400
 Subject: [PATCH 24/29] Prefer fmtlib
@@ -8,7 +8,7 @@ Subject: [PATCH 24/29] Prefer fmtlib
  1 file changed, 6 insertions(+), 14 deletions(-)
 
 diff --git a/llvm/lib/Support/ErrorHandling.cpp b/llvm/lib/Support/ErrorHandling.cpp
-index aa60d5471af0..fc04018039e0 100644
+index 4b6ddd30c6e4..9ee52a02c214 100644
 --- a/llvm/lib/Support/ErrorHandling.cpp
 +++ b/llvm/lib/Support/ErrorHandling.cpp
 @@ -22,7 +22,7 @@
@@ -20,7 +20,7 @@ index aa60d5471af0..fc04018039e0 100644
  #include <cassert>
  #include <cstdlib>
  #include <mutex>
-@@ -93,15 +93,7 @@ void llvm::report_fatal_error(const std::string_view &Reason, bool GenCrashDiag)
+@@ -93,15 +93,7 @@ void llvm::report_fatal_error(std::string_view Reason, bool GenCrashDiag) {
    if (handler) {
      handler(handlerData, std::string{Reason}, GenCrashDiag);
    } else {

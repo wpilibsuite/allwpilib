@@ -1,4 +1,4 @@
-From 45f5d2158e7984e545570cf06efb32cd76730b5f Mon Sep 17 00:00:00 2001
+From 938e3e0ae42783f2d815e647fefa98c7f0cde75b Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Sun, 8 May 2022 16:38:11 -0400
 Subject: [PATCH 21/29] Fixup includes
@@ -71,7 +71,7 @@ index 090ebb0f5af8..87da616b75d4 100644
  #include "llvm/Support/SwapByteOrder.h"
  #include <string>
 diff --git a/llvm/lib/Support/ErrorHandling.cpp b/llvm/lib/Support/ErrorHandling.cpp
-index 9a0bc9c0a78b..aa60d5471af0 100644
+index 9c0c6fb868f2..4b6ddd30c6e4 100644
 --- a/llvm/lib/Support/ErrorHandling.cpp
 +++ b/llvm/lib/Support/ErrorHandling.cpp
 @@ -28,12 +28,11 @@

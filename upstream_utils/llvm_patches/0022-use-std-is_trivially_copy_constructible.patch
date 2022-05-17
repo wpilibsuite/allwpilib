@@ -1,4 +1,4 @@
-From bd2a7e77d4c6d9268422b0ccdd807b1d576308f0 Mon Sep 17 00:00:00 2001
+From d4f3da9cf9dfdb4f26fcb91bb63d9ee064d5de63 Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Sun, 8 May 2022 16:42:09 -0400
 Subject: [PATCH 22/29] use std is_trivially_copy_constructible

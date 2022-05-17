@@ -1,4 +1,4 @@
-From 4e8e327d0619fd4a0c23fd8326b29eecfd3a8da1 Mon Sep 17 00:00:00 2001
+From 19f7f03cf69f4b3965e55b3a5ad33249bf52e2d2 Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Sat, 7 May 2022 22:09:18 -0400
 Subject: [PATCH 02/29] Remove StringRef, ArrayRef, and Optional
@@ -1048,7 +1048,7 @@ index d8d46712a593..090ebb0f5af8 100644
          Result);
    } else if (sizeof(wchar_t) == 4) {
 diff --git a/llvm/lib/Support/ErrorHandling.cpp b/llvm/lib/Support/ErrorHandling.cpp
-index ce6344284f06..531ba3310946 100644
+index ce6344284f06..19d1fd77af12 100644
 --- a/llvm/lib/Support/ErrorHandling.cpp
 +++ b/llvm/lib/Support/ErrorHandling.cpp
 @@ -14,7 +14,6 @@
@@ -1077,7 +1077,7 @@ index ce6344284f06..531ba3310946 100644
 -}
 -
 -void llvm::report_fatal_error(const Twine &Reason, bool GenCrashDiag) {
-+void llvm::report_fatal_error(const std::string_view &Reason, bool GenCrashDiag) {
++void llvm::report_fatal_error(std::string_view Reason, bool GenCrashDiag) {
    llvm::fatal_error_handler_t handler = nullptr;
    void* handlerData = nullptr;
    {

@@ -1,4 +1,4 @@
-From 3d1c9b169a9af2461ffdcc391677286b3c706578 Mon Sep 17 00:00:00 2001
+From 01bbb28bc197058393ac1d34a03fc8949e8bc1e3 Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Sat, 7 May 2022 22:24:34 -0400
 Subject: [PATCH 06/29] Remove DJB hash dependency

@@ -1,4 +1,4 @@
-From dc2132f5dd47fefabfd8cb861a93f27ad205b859 Mon Sep 17 00:00:00 2001
+From cf6e2dbe9352e04af28419669e2728f2403f2ef8 Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Sat, 7 May 2022 22:17:19 -0400
 Subject: [PATCH 05/29] Threading updates
@@ -36,7 +36,7 @@ index f4d6612fe074..989d25bb03b9 100644
  /// \macro LLVM_ENABLE_EXCEPTIONS
  /// Whether LLVM is built with exception support.
 diff --git a/llvm/lib/Support/ErrorHandling.cpp b/llvm/lib/Support/ErrorHandling.cpp
-index 531ba3310946..773d6ded1116 100644
+index 19d1fd77af12..2403db9c80f1 100644
 --- a/llvm/lib/Support/ErrorHandling.cpp
 +++ b/llvm/lib/Support/ErrorHandling.cpp
 @@ -44,7 +44,6 @@ static void *ErrorHandlerUserData = nullptr;
@@ -72,7 +72,7 @@ index 531ba3310946..773d6ded1116 100644
    ErrorHandler = nullptr;
    ErrorHandlerUserData = nullptr;
  }
-@@ -92,9 +86,7 @@ void llvm::report_fatal_error(const std::string_view &Reason, bool GenCrashDiag)
+@@ -92,9 +86,7 @@ void llvm::report_fatal_error(std::string_view Reason, bool GenCrashDiag) {
    {
      // Only acquire the mutex while reading the handler, so as not to invoke a
      // user-supplied callback under a lock.
@@ -83,7 +83,7 @@ index 531ba3310946..773d6ded1116 100644
      handler = ErrorHandler;
      handlerData = ErrorHandlerUserData;
    }
-@@ -123,18 +115,14 @@ void llvm::report_fatal_error(const std::string_view &Reason, bool GenCrashDiag)
+@@ -123,18 +115,14 @@ void llvm::report_fatal_error(std::string_view Reason, bool GenCrashDiag) {
  
  void llvm::install_bad_alloc_error_handler(fatal_error_handler_t handler,
                                             void *user_data) {
