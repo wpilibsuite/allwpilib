@@ -37,32 +37,32 @@ class WPILIB_DLLEXPORT CoordinateAxis {
   /**
    * Returns a coordinate axis corresponding to +X in the NWU coordinate system.
    */
-  static CoordinateAxis N();
+  static const CoordinateAxis& N();
 
   /**
    * Returns a coordinate axis corresponding to -X in the NWU coordinate system.
    */
-  static CoordinateAxis S();
+  static const CoordinateAxis& S();
 
   /**
    * Returns a coordinate axis corresponding to -Y in the NWU coordinate system.
    */
-  static CoordinateAxis E();
+  static const CoordinateAxis& E();
 
   /**
    * Returns a coordinate axis corresponding to +Y in the NWU coordinate system.
    */
-  static CoordinateAxis W();
+  static const CoordinateAxis& W();
 
   /**
    * Returns a coordinate axis corresponding to +Z in the NWU coordinate system.
    */
-  static CoordinateAxis U();
+  static const CoordinateAxis& U();
 
   /**
    * Returns a coordinate axis corresponding to -Z in the NWU coordinate system.
    */
-  static CoordinateAxis D();
+  static const CoordinateAxis& D();
 
  private:
   friend class CoordinateSystem;
