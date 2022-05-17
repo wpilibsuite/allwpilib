@@ -70,18 +70,21 @@ CoordinateSystem::CoordinateSystem(const CoordinateAxis& positiveX,
 }
 
 CoordinateSystem CoordinateSystem::NWU() {
-  return CoordinateSystem{CoordinateAxis::N(), CoordinateAxis::W(),
-                          CoordinateAxis::U()};
+  static CoordinateSystem instance{CoordinateAxis::N(), CoordinateAxis::W(),
+                                   CoordinateAxis::U()};
+  return instance;
 }
 
 CoordinateSystem CoordinateSystem::EDN() {
-  return CoordinateSystem{CoordinateAxis::E(), CoordinateAxis::D(),
-                          CoordinateAxis::N()};
+  static CoordinateSystem instance{CoordinateAxis::E(), CoordinateAxis::D(),
+                                   CoordinateAxis::N()};
+  return instance;
 }
 
 CoordinateSystem CoordinateSystem::NED() {
-  return CoordinateSystem{CoordinateAxis::N(), CoordinateAxis::E(),
-                          CoordinateAxis::D()};
+  static CoordinateSystem instance{CoordinateAxis::N(), CoordinateAxis::E(),
+                                   CoordinateAxis::D()};
+  return instance;
 }
 
 Pose3d CoordinateSystem::Convert(const Pose3d& pose,

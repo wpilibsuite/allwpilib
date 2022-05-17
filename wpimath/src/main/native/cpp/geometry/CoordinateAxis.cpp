@@ -11,25 +11,31 @@ CoordinateAxis::CoordinateAxis(double x, double y, double z) : m_axis{x, y, z} {
 }
 
 CoordinateAxis CoordinateAxis::N() {
-  return CoordinateAxis{1.0, 0.0, 0.0};
+  static CoordinateAxis instance{1.0, 0.0, 0.0};
+  return instance;
 }
 
 CoordinateAxis CoordinateAxis::S() {
-  return CoordinateAxis{-1.0, 0.0, 0.0};
+  static CoordinateAxis instance{-1.0, 0.0, 0.0};
+  return instance;
 }
 
 CoordinateAxis CoordinateAxis::E() {
-  return CoordinateAxis{0.0, -1.0, 0.0};
+  static CoordinateAxis instance{0.0, -1.0, 0.0};
+  return instance;
 }
 
 CoordinateAxis CoordinateAxis::W() {
-  return CoordinateAxis{0.0, 1.0, 0.0};
+  static CoordinateAxis instance{0.0, 1.0, 0.0};
+  return instance;
 }
 
 CoordinateAxis CoordinateAxis::U() {
-  return CoordinateAxis{0.0, 0.0, 1.0};
+  static CoordinateAxis instance{0.0, 0.0, 1.0};
+  return instance;
 }
 
 CoordinateAxis CoordinateAxis::D() {
-  return CoordinateAxis{0.0, 0.0, -1.0};
+  static CoordinateAxis instance{0.0, 0.0, -1.0};
+  return instance;
 }
