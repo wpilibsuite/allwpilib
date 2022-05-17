@@ -6,7 +6,7 @@
 
 #include <frc/controller/PIDController.h>
 
-#include "frc2/command/SubsystemBase.h"
+#include "frc2/command/Subsystem.h"
 
 namespace frc2 {
 /**
@@ -17,7 +17,7 @@ namespace frc2 {
  *
  * @see PIDController
  */
-class PIDSubsystem : public SubsystemBase {
+class PIDSubsystem : public Subsystem {
  public:
   /**
    * Creates a new PIDSubsystem.

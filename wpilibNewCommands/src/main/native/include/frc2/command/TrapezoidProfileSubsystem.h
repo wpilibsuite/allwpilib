@@ -7,7 +7,7 @@
 #include <frc/trajectory/TrapezoidProfile.h>
 #include <units/time.h>
 
-#include "frc2/command/SubsystemBase.h"
+#include "frc2/command/Subsystem.h"
 
 namespace frc2 {
 /**
@@ -18,7 +18,7 @@ namespace frc2 {
  * This class is provided by the NewCommands VendorDep
  */
 template <class Distance>
-class TrapezoidProfileSubsystem : public SubsystemBase {
+class TrapezoidProfileSubsystem : public Subsystem {
   using Distance_t = units::unit_t<Distance>;
   using Velocity =
       units::compound_unit<Distance, units::inverse<units::seconds>>;

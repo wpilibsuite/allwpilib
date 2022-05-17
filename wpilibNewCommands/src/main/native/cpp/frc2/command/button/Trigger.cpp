@@ -28,13 +28,13 @@ Trigger Trigger::WhenActive(Command* command, bool interruptible) {
 }
 
 Trigger Trigger::WhenActive(std::function<void()> toRun,
-                            std::initializer_list<Subsystem*> requirements) {
+                            std::initializer_list<void*> requirements) {
   return WhenActive(std::move(toRun),
                     {requirements.begin(), requirements.end()});
 }
 
 Trigger Trigger::WhenActive(std::function<void()> toRun,
-                            wpi::span<Subsystem* const> requirements) {
+                            wpi::span<void* const> requirements) {
   return WhenActive(InstantCommand(std::move(toRun), requirements));
 }
 
@@ -56,13 +56,13 @@ Trigger Trigger::WhileActiveContinous(Command* command, bool interruptible) {
 
 Trigger Trigger::WhileActiveContinous(
     std::function<void()> toRun,
-    std::initializer_list<Subsystem*> requirements) {
+    std::initializer_list<void*> requirements) {
   return WhileActiveContinous(std::move(toRun),
                               {requirements.begin(), requirements.end()});
 }
 
 Trigger Trigger::WhileActiveContinous(
-    std::function<void()> toRun, wpi::span<Subsystem* const> requirements) {
+    std::function<void()> toRun, wpi::span<void* const> requirements) {
   return WhileActiveContinous(InstantCommand(std::move(toRun), requirements));
 }
 
@@ -97,13 +97,13 @@ Trigger Trigger::WhenInactive(Command* command, bool interruptible) {
 }
 
 Trigger Trigger::WhenInactive(std::function<void()> toRun,
-                              std::initializer_list<Subsystem*> requirements) {
+                              std::initializer_list<void*> requirements) {
   return WhenInactive(std::move(toRun),
                       {requirements.begin(), requirements.end()});
 }
 
 Trigger Trigger::WhenInactive(std::function<void()> toRun,
-                              wpi::span<Subsystem* const> requirements) {
+                              wpi::span<void* const> requirements) {
   return WhenInactive(InstantCommand(std::move(toRun), requirements));
 }
 

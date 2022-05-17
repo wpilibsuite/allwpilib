@@ -33,7 +33,7 @@ class StartEndCommand : public CommandHelper<CommandBase, StartEndCommand> {
    * @param requirements the subsystems required by this command
    */
   StartEndCommand(std::function<void()> onInit, std::function<void()> onEnd,
-                  std::initializer_list<Subsystem*> requirements);
+                  std::initializer_list<void*> requirements);
 
   /**
    * Creates a new StartEndCommand.  Will run the given runnables when the
@@ -44,7 +44,7 @@ class StartEndCommand : public CommandHelper<CommandBase, StartEndCommand> {
    * @param requirements the subsystems required by this command
    */
   StartEndCommand(std::function<void()> onInit, std::function<void()> onEnd,
-                  wpi::span<Subsystem* const> requirements = {});
+                  wpi::span<void* const> requirements = {});
 
   StartEndCommand(StartEndCommand&& other) = default;
 

@@ -40,7 +40,7 @@ class PIDCommand : public CommandHelper<CommandBase, PIDCommand> {
              std::function<double()> measurementSource,
              std::function<double()> setpointSource,
              std::function<void(double)> useOutput,
-             std::initializer_list<Subsystem*> requirements);
+             std::initializer_list<void*> requirements);
 
   /**
    * Creates a new PIDCommand, which controls the given output with a
@@ -56,7 +56,7 @@ class PIDCommand : public CommandHelper<CommandBase, PIDCommand> {
              std::function<double()> measurementSource,
              std::function<double()> setpointSource,
              std::function<void(double)> useOutput,
-             wpi::span<Subsystem* const> requirements = {});
+             wpi::span<void* const> requirements = {});
 
   /**
    * Creates a new PIDCommand, which controls the given output with a
@@ -71,7 +71,7 @@ class PIDCommand : public CommandHelper<CommandBase, PIDCommand> {
   PIDCommand(PIDController controller,
              std::function<double()> measurementSource, double setpoint,
              std::function<void(double)> useOutput,
-             std::initializer_list<Subsystem*> requirements);
+             std::initializer_list<void*> requirements);
 
   /**
    * Creates a new PIDCommand, which controls the given output with a
@@ -86,7 +86,7 @@ class PIDCommand : public CommandHelper<CommandBase, PIDCommand> {
   PIDCommand(PIDController controller,
              std::function<double()> measurementSource, double setpoint,
              std::function<void(double)> useOutput,
-             wpi::span<Subsystem* const> requirements = {});
+             wpi::span<void* const> requirements = {});
 
   PIDCommand(PIDCommand&& other) = default;
 

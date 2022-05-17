@@ -17,7 +17,7 @@ RamseteCommand::RamseteCommand(
     std::function<frc::DifferentialDriveWheelSpeeds()> wheelSpeeds,
     frc2::PIDController leftController, frc2::PIDController rightController,
     std::function<void(volt_t, volt_t)> output,
-    std::initializer_list<Subsystem*> requirements)
+    std::initializer_list<void*> requirements)
     : m_trajectory(std::move(trajectory)),
       m_pose(std::move(pose)),
       m_controller(controller),
@@ -39,7 +39,7 @@ RamseteCommand::RamseteCommand(
     std::function<frc::DifferentialDriveWheelSpeeds()> wheelSpeeds,
     frc2::PIDController leftController, frc2::PIDController rightController,
     std::function<void(volt_t, volt_t)> output,
-    wpi::span<Subsystem* const> requirements)
+    wpi::span<void* const> requirements)
     : m_trajectory(std::move(trajectory)),
       m_pose(std::move(pose)),
       m_controller(controller),
@@ -59,7 +59,7 @@ RamseteCommand::RamseteCommand(
     frc::DifferentialDriveKinematics kinematics,
     std::function<void(units::meters_per_second_t, units::meters_per_second_t)>
         output,
-    std::initializer_list<Subsystem*> requirements)
+    std::initializer_list<void*> requirements)
     : m_trajectory(std::move(trajectory)),
       m_pose(std::move(pose)),
       m_controller(controller),
@@ -75,7 +75,7 @@ RamseteCommand::RamseteCommand(
     frc::DifferentialDriveKinematics kinematics,
     std::function<void(units::meters_per_second_t, units::meters_per_second_t)>
         output,
-    wpi::span<Subsystem* const> requirements)
+    wpi::span<void* const> requirements)
     : m_trajectory(std::move(trajectory)),
       m_pose(std::move(pose)),
       m_controller(controller),

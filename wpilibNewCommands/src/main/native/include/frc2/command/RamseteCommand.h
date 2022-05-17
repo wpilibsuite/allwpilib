@@ -79,7 +79,7 @@ class RamseteCommand : public CommandHelper<CommandBase, RamseteCommand> {
                  frc2::PIDController leftController,
                  frc2::PIDController rightController,
                  std::function<void(units::volt_t, units::volt_t)> output,
-                 std::initializer_list<Subsystem*> requirements);
+                 std::initializer_list<void*> requirements);
 
   /**
    * Constructs a new RamseteCommand that, when executed, will follow the
@@ -116,7 +116,7 @@ class RamseteCommand : public CommandHelper<CommandBase, RamseteCommand> {
                  frc2::PIDController leftController,
                  frc2::PIDController rightController,
                  std::function<void(units::volt_t, units::volt_t)> output,
-                 wpi::span<Subsystem* const> requirements = {});
+                 wpi::span<void* const> requirements = {});
 
   /**
    * Constructs a new RamseteCommand that, when executed, will follow the
@@ -140,7 +140,7 @@ class RamseteCommand : public CommandHelper<CommandBase, RamseteCommand> {
                  std::function<void(units::meters_per_second_t,
                                     units::meters_per_second_t)>
                      output,
-                 std::initializer_list<Subsystem*> requirements);
+                 std::initializer_list<void*> requirements);
 
   /**
    * Constructs a new RamseteCommand that, when executed, will follow the
@@ -164,7 +164,7 @@ class RamseteCommand : public CommandHelper<CommandBase, RamseteCommand> {
                  std::function<void(units::meters_per_second_t,
                                     units::meters_per_second_t)>
                      output,
-                 wpi::span<Subsystem* const> requirements = {});
+                 wpi::span<void* const> requirements = {});
 
   void Initialize() override;
 

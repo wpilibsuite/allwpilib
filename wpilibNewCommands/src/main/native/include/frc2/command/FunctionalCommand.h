@@ -38,7 +38,7 @@ class FunctionalCommand : public CommandHelper<CommandBase, FunctionalCommand> {
                     std::function<void()> onExecute,
                     std::function<void(bool)> onEnd,
                     std::function<bool()> isFinished,
-                    std::initializer_list<Subsystem*> requirements);
+                    std::initializer_list<void*> requirements);
 
   /**
    * Creates a new FunctionalCommand.
@@ -54,7 +54,7 @@ class FunctionalCommand : public CommandHelper<CommandBase, FunctionalCommand> {
                     std::function<void()> onExecute,
                     std::function<void(bool)> onEnd,
                     std::function<bool()> isFinished,
-                    wpi::span<Subsystem* const> requirements = {});
+                    wpi::span<void* const> requirements = {});
 
   FunctionalCommand(FunctionalCommand&& other) = default;
 

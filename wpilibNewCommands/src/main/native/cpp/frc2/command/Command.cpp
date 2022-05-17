@@ -55,13 +55,13 @@ ParallelRaceGroup Command::WithInterrupt(std::function<bool()> condition) && {
 
 SequentialCommandGroup Command::BeforeStarting(
     std::function<void()> toRun,
-    std::initializer_list<Subsystem*> requirements) && {
+    std::initializer_list<void*> requirements) && {
   return std::move(*this).BeforeStarting(
       std::move(toRun), {requirements.begin(), requirements.end()});
 }
 
 SequentialCommandGroup Command::BeforeStarting(
-    std::function<void()> toRun, wpi::span<Subsystem* const> requirements) && {
+    std::function<void()> toRun, wpi::span<void* const> requirements) && {
   std::vector<std::unique_ptr<Command>> temp;
   temp.emplace_back(
       std::make_unique<InstantCommand>(std::move(toRun), requirements));
@@ -71,13 +71,13 @@ SequentialCommandGroup Command::BeforeStarting(
 
 SequentialCommandGroup Command::AndThen(
     std::function<void()> toRun,
-    std::initializer_list<Subsystem*> requirements) && {
+    std::initializer_list<void*> requirements) && {
   return std::move(*this).AndThen(std::move(toRun),
                                   {requirements.begin(), requirements.end()});
 }
 
 SequentialCommandGroup Command::AndThen(
-    std::function<void()> toRun, wpi::span<Subsystem* const> requirements) && {
+    std::function<void()> toRun, wpi::span<void* const> requirements) && {
   std::vector<std::unique_ptr<Command>> temp;
   temp.emplace_back(std::move(*this).TransferOwnership());
   temp.emplace_back(
@@ -113,7 +113,7 @@ bool Command::IsScheduled() const {
   return CommandScheduler::GetInstance().IsScheduled(this);
 }
 
-bool Command::HasRequirement(Subsystem* requirement) const {
+bool Command::HasRequirement(void* requirement) const {
   bool hasRequirement = false;
   for (auto&& subsystem : GetRequirements()) {
     hasRequirement |= requirement == subsystem;

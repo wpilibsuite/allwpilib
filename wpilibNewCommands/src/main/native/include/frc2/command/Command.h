@@ -101,7 +101,7 @@ class Command {
    *
    * @return the set of subsystems that are required
    */
-  virtual wpi::SmallSet<Subsystem*, 4> GetRequirements() const = 0;
+  virtual wpi::SmallSet<void*, 4> GetRequirements() const = 0;
 
   /**
    * Decorates this command with a timeout.  If the specified timeout is
@@ -145,7 +145,7 @@ class Command {
    */
   virtual SequentialCommandGroup BeforeStarting(
       std::function<void()> toRun,
-      std::initializer_list<Subsystem*> requirements) &&;
+      std::initializer_list<void*> requirements) &&;
 
   /**
    * Decorates this command with a runnable to run before this command starts.
@@ -156,7 +156,7 @@ class Command {
    */
   virtual SequentialCommandGroup BeforeStarting(
       std::function<void()> toRun,
-      wpi::span<Subsystem* const> requirements = {}) &&;
+      wpi::span<void* const> requirements = {}) &&;
 
   /**
    * Decorates this command with a runnable to run after the command finishes.
@@ -167,7 +167,7 @@ class Command {
    */
   virtual SequentialCommandGroup AndThen(
       std::function<void()> toRun,
-      std::initializer_list<Subsystem*> requirements) &&;
+      std::initializer_list<void*> requirements) &&;
 
   /**
    * Decorates this command with a runnable to run after the command finishes.
@@ -178,7 +178,7 @@ class Command {
    */
   virtual SequentialCommandGroup AndThen(
       std::function<void()> toRun,
-      wpi::span<Subsystem* const> requirements = {}) &&;
+      wpi::span<void* const> requirements = {}) &&;
 
   /**
    * Decorates this command to run perpetually, ignoring its ordinary end
@@ -252,7 +252,7 @@ class Command {
    * @param requirement the subsystem to inquire about
    * @return whether the subsystem is required
    */
-  bool HasRequirement(Subsystem* requirement) const;
+  bool HasRequirement(void* requirement) const;
 
   /**
    * Whether the command is currently grouped in a command group.  Used as extra

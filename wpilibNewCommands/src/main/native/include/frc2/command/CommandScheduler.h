@@ -180,7 +180,7 @@ class CommandScheduler final : public nt::NTSendable,
    */
   template <class T, typename = std::enable_if_t<std::is_base_of_v<
                          Command, std::remove_reference_t<T>>>>
-  void SetDefaultCommand(Subsystem* subsystem, T&& defaultCommand) {
+  void SetDefaultCommand(void* subsystem, T&& defaultCommand) {
     if (!defaultCommand.HasRequirement(subsystem)) {
       throw FRC_MakeError(frc::err::CommandIllegalUse, "{}",
                           "Default commands must require their subsystem!");
@@ -201,7 +201,7 @@ class CommandScheduler final : public nt::NTSendable,
    * @param subsystem the subsystem to inquire about
    * @return the default command associated with the subsystem
    */
-  Command* GetDefaultCommand(const Subsystem* subsystem) const;
+  Command* GetDefaultCommand(const void* subsystem) const;
 
   /**
    * Cancels commands. The scheduler will only call Command::End()
@@ -292,7 +292,7 @@ class CommandScheduler final : public nt::NTSendable,
    * @param subsystem the subsystem to be inquired about
    * @return the command currently requiring the subsystem
    */
-  Command* Requiring(const Subsystem* subsystem) const;
+  Command* Requiring(const void* subsystem) const;
 
   /**
    * Disables the command scheduler.
@@ -340,7 +340,7 @@ class CommandScheduler final : public nt::NTSendable,
   // Constructor; private as this is a singleton
   CommandScheduler();
 
-  void SetDefaultCommandImpl(Subsystem* subsystem,
+  void SetDefaultCommandImpl(void* subsystem,
                              std::unique_ptr<Command> command);
 
   class Impl;

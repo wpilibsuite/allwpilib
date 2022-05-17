@@ -43,7 +43,7 @@ class TrapezoidProfileCommand
    */
   TrapezoidProfileCommand(frc::TrapezoidProfile<Distance> profile,
                           std::function<void(State)> output,
-                          std::initializer_list<Subsystem*> requirements)
+                          std::initializer_list<void*> requirements)
       : m_profile(profile), m_output(output) {
     this->AddRequirements(requirements);
   }
@@ -58,7 +58,7 @@ class TrapezoidProfileCommand
    */
   TrapezoidProfileCommand(frc::TrapezoidProfile<Distance> profile,
                           std::function<void(State)> output,
-                          wpi::span<Subsystem* const> requirements = {})
+                          wpi::span<void* const> requirements = {})
       : m_profile(profile), m_output(output) {
     this->AddRequirements(requirements);
   }

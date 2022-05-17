@@ -30,7 +30,7 @@ class InstantCommand : public CommandHelper<CommandBase, InstantCommand> {
    * @param requirements the subsystems required by this command
    */
   InstantCommand(std::function<void()> toRun,
-                 std::initializer_list<Subsystem*> requirements);
+                 std::initializer_list<void*> requirements);
 
   /**
    * Creates a new InstantCommand that runs the given Runnable with the given
@@ -40,7 +40,7 @@ class InstantCommand : public CommandHelper<CommandBase, InstantCommand> {
    * @param requirements the subsystems required by this command
    */
   explicit InstantCommand(std::function<void()> toRun,
-                          wpi::span<Subsystem* const> requirements = {});
+                          wpi::span<void* const> requirements = {});
 
   InstantCommand(InstantCommand&& other) = default;
 

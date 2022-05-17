@@ -12,7 +12,7 @@ PIDCommand::PIDCommand(PIDController controller,
                        std::function<double()> measurementSource,
                        std::function<double()> setpointSource,
                        std::function<void(double)> useOutput,
-                       std::initializer_list<Subsystem*> requirements)
+                       std::initializer_list<void*> requirements)
     : m_controller{std::move(controller)},
       m_measurement{std::move(measurementSource)},
       m_setpoint{std::move(setpointSource)},
@@ -24,7 +24,7 @@ PIDCommand::PIDCommand(PIDController controller,
                        std::function<double()> measurementSource,
                        std::function<double()> setpointSource,
                        std::function<void(double)> useOutput,
-                       wpi::span<Subsystem* const> requirements)
+                       wpi::span<void* const> requirements)
     : m_controller{std::move(controller)},
       m_measurement{std::move(measurementSource)},
       m_setpoint{std::move(setpointSource)},
@@ -35,7 +35,7 @@ PIDCommand::PIDCommand(PIDController controller,
 PIDCommand::PIDCommand(PIDController controller,
                        std::function<double()> measurementSource,
                        double setpoint, std::function<void(double)> useOutput,
-                       std::initializer_list<Subsystem*> requirements)
+                       std::initializer_list<void*> requirements)
     : PIDCommand(
           controller, measurementSource, [setpoint] { return setpoint; },
           useOutput, requirements) {}
@@ -43,7 +43,7 @@ PIDCommand::PIDCommand(PIDController controller,
 PIDCommand::PIDCommand(PIDController controller,
                        std::function<double()> measurementSource,
                        double setpoint, std::function<void(double)> useOutput,
-                       wpi::span<Subsystem* const> requirements)
+                       wpi::span<void* const> requirements)
     : PIDCommand(
           controller, measurementSource, [setpoint] { return setpoint; },
           useOutput, requirements) {}

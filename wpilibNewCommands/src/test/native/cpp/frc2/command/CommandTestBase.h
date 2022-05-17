@@ -12,7 +12,7 @@
 #include "frc2/command/CommandGroupBase.h"
 #include "frc2/command/CommandScheduler.h"
 #include "frc2/command/SetUtilities.h"
-#include "frc2/command/SubsystemBase.h"
+#include "frc2/command/Subsystem.h"
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
 #include "make_vector.h"
@@ -22,12 +22,12 @@ class CommandTestBase : public ::testing::Test {
  public:
   CommandTestBase();
 
-  class TestSubsystem : public SubsystemBase {};
+  class TestSubsystem : public Subsystem {};
 
  protected:
   class MockCommand : public Command {
    public:
-    MOCK_CONST_METHOD0(GetRequirements, wpi::SmallSet<Subsystem*, 4>());
+    MOCK_CONST_METHOD0(GetRequirements, wpi::SmallSet<void*, 4>());
     MOCK_METHOD0(IsFinished, bool());
     MOCK_CONST_METHOD0(RunsWhenDisabled, bool());
     MOCK_METHOD0(Initialize, void());
@@ -43,7 +43,7 @@ class CommandTestBase : public ::testing::Test {
           .WillRepeatedly(::testing::Return(true));
     }
 
-    MockCommand(std::initializer_list<Subsystem*> requirements,
+    MockCommand(std::initializer_list<void*> requirements,
                 bool finished = false, bool runWhenDisabled = true) {
       m_requirements.insert(requirements.begin(), requirements.end());
       EXPECT_CALL(*this, GetRequirements())
@@ -82,7 +82,7 @@ class CommandTestBase : public ::testing::Test {
     }
 
    private:
-    wpi::SmallSet<Subsystem*, 4> m_requirements;
+    wpi::SmallSet<void*, 4> m_requirements;
   };
 
   CommandScheduler GetScheduler();

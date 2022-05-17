@@ -31,7 +31,7 @@ class RunCommand : public CommandHelper<CommandBase, RunCommand> {
    * @param requirements the subsystems to require
    */
   RunCommand(std::function<void()> toRun,
-             std::initializer_list<Subsystem*> requirements);
+             std::initializer_list<void*> requirements);
 
   /**
    * Creates a new RunCommand.  The Runnable will be run continuously until the
@@ -41,7 +41,7 @@ class RunCommand : public CommandHelper<CommandBase, RunCommand> {
    * @param requirements the subsystems to require
    */
   explicit RunCommand(std::function<void()> toRun,
-                      wpi::span<Subsystem* const> requirements = {});
+                      wpi::span<void* const> requirements = {});
 
   RunCommand(RunCommand&& other) = default;
 

@@ -90,12 +90,12 @@ class SequentialCommandGroup
 
   SequentialCommandGroup BeforeStarting(
       std::function<void()> toRun,
-      wpi::span<Subsystem* const> requirements = {}) &&
+      wpi::span<void* const> requirements = {}) &&
       override;
 
   SequentialCommandGroup AndThen(
       std::function<void()> toRun,
-      wpi::span<Subsystem* const> requirements = {}) &&
+      wpi::span<void* const> requirements = {}) &&
       override;
 
  private:

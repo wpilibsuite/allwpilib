@@ -102,7 +102,7 @@ class MecanumControllerCommand
       std::function<void(units::volt_t, units::volt_t, units::volt_t,
                          units::volt_t)>
           output,
-      std::initializer_list<Subsystem*> requirements);
+      std::initializer_list<void*> requirements);
 
   /**
    * Constructs a new MecanumControllerCommand that when executed will follow
@@ -155,7 +155,7 @@ class MecanumControllerCommand
       std::function<void(units::volt_t, units::volt_t, units::volt_t,
                          units::volt_t)>
           output,
-      std::initializer_list<Subsystem*> requirements);
+      std::initializer_list<void*> requirements);
 
   /**
    * Constructs a new MecanumControllerCommand that when executed will follow
@@ -206,7 +206,7 @@ class MecanumControllerCommand
       std::function<void(units::volt_t, units::volt_t, units::volt_t,
                          units::volt_t)>
           output,
-      wpi::span<Subsystem* const> requirements = {});
+      wpi::span<void* const> requirements = {});
 
   /**
    * Constructs a new MecanumControllerCommand that when executed will follow
@@ -259,7 +259,7 @@ class MecanumControllerCommand
       std::function<void(units::volt_t, units::volt_t, units::volt_t,
                          units::volt_t)>
           output,
-      wpi::span<Subsystem* const> requirements = {});
+      wpi::span<void* const> requirements = {});
 
   /**
    * Constructs a new MecanumControllerCommand that when executed will follow
@@ -297,7 +297,7 @@ class MecanumControllerCommand
                          units::meters_per_second_t,
                          units::meters_per_second_t)>
           output,
-      std::initializer_list<Subsystem*> requirements);
+      std::initializer_list<void*> requirements);
 
   /**
    * Constructs a new MecanumControllerCommand that when executed will follow
@@ -337,7 +337,7 @@ class MecanumControllerCommand
                          units::meters_per_second_t,
                          units::meters_per_second_t)>
           output,
-      std::initializer_list<Subsystem*> requirements);
+      std::initializer_list<void*> requirements);
 
   /**
    * Constructs a new MecanumControllerCommand that when executed will follow
@@ -375,7 +375,7 @@ class MecanumControllerCommand
                          units::meters_per_second_t,
                          units::meters_per_second_t)>
           output,
-      wpi::span<Subsystem* const> requirements = {});
+      wpi::span<void* const> requirements = {});
 
   /**
    * Constructs a new MecanumControllerCommand that when executed will follow
@@ -415,7 +415,7 @@ class MecanumControllerCommand
                          units::meters_per_second_t,
                          units::meters_per_second_t)>
           output,
-      wpi::span<Subsystem* const> requirements = {});
+      wpi::span<void* const> requirements = {});
 
   void Initialize() override;
 

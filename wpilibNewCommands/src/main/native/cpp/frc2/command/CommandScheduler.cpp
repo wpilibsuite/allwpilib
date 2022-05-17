@@ -5,6 +5,7 @@
 #include "frc2/command/CommandScheduler.h"
 
 #include <cstdio>
+#include <set>
 
 #include <frc/RobotBase.h>
 #include <frc/RobotState.h>
@@ -32,11 +33,13 @@ class CommandScheduler::Impl {
 
   // A map from required subsystems to their requiring commands.  Also used as a
   // set of the currently-required subsystems.
-  wpi::DenseMap<Subsystem*, Command*> requirements;
+  wpi::DenseMap<void*, Command*> requirements;
 
-  // A map from subsystems registered with the scheduler to their default
-  // commands.  Also used as a list of currently-registered subsystems.
-  wpi::DenseMap<Subsystem*, std::unique_ptr<Command>> subsystems;
+  // A map from subsystems to their default commands.
+  wpi::DenseMap<void*, std::unique_ptr<Command>> defaultCommands;
+
+  // A set of currently-registered subsystems.
+  std::set<Subsystem*> subsystems;
 
   // The set of currently-registered buttons that will be polled every
   // iteration.
@@ -192,10 +195,10 @@ void CommandScheduler::Run() {
   m_watchdog.Reset();
 
   // Run the periodic method of all registered subsystems.
-  for (auto&& subsystem : m_impl->subsystems) {
-    subsystem.getFirst()->Periodic();
+  for (auto subsystem : m_impl->subsystems) {
+    subsystem->Periodic();
     if constexpr (frc::RobotBase::IsSimulation()) {
-      subsystem.getFirst()->SimulationPeriodic();
+      subsystem->SimulationPeriodic();
     }
     m_watchdog.AddEpoch("Subsystem Periodic()");
   }
@@ -251,9 +254,9 @@ void CommandScheduler::Run() {
   m_impl->toCancel.clear();
 
   // Add default commands for un-required registered subsystems.
-  for (auto&& subsystem : m_impl->subsystems) {
-    auto s = m_impl->requirements.find(subsystem.getFirst());
-    if (s == m_impl->requirements.end() && subsystem.getSecond()) {
+  for (auto&& subsystem : m_impl->defaultCommands) {
+    auto s = m_impl->defaultCommands.find(subsystem.getFirst());
+    if (s == m_impl->defaultCommands.end() && subsystem.getSecond()) {
       Schedule({subsystem.getSecond().get()});
     }
   }
@@ -265,7 +268,7 @@ void CommandScheduler::Run() {
 }
 
 void CommandScheduler::RegisterSubsystem(Subsystem* subsystem) {
-  m_impl->subsystems[subsystem] = nullptr;
+  m_impl->subsystems.insert(subsystem);
 }
 
 void CommandScheduler::UnregisterSubsystem(Subsystem* subsystem) {
@@ -303,9 +306,9 @@ void CommandScheduler::UnregisterSubsystem(
   }
 }
 
-Command* CommandScheduler::GetDefaultCommand(const Subsystem* subsystem) const {
-  auto&& find = m_impl->subsystems.find(subsystem);
-  if (find != m_impl->subsystems.end()) {
+Command* CommandScheduler::GetDefaultCommand(const void* subsystem) const {
+  auto&& find = m_impl->defaultCommands.find(subsystem);
+  if (find != m_impl->defaultCommands.end()) {
     return find->second.get();
   } else {
     return nullptr;
@@ -393,7 +396,7 @@ bool CommandScheduler::IsScheduled(const Command* command) const {
          m_impl->scheduledCommands.end();
 }
 
-Command* CommandScheduler::Requiring(const Subsystem* subsystem) const {
+Command* CommandScheduler::Requiring(const void* subsystem) const {
   auto find = m_impl->requirements.find(subsystem);
   if (find != m_impl->requirements.end()) {
     return find->second;
@@ -458,7 +461,7 @@ void CommandScheduler::InitSendable(nt::NTSendableBuilder& builder) {
   });
 }
 
-void CommandScheduler::SetDefaultCommandImpl(Subsystem* subsystem,
+void CommandScheduler::SetDefaultCommandImpl(void* subsystem,
                                              std::unique_ptr<Command> command) {
-  m_impl->subsystems[subsystem] = std::move(command);
+  m_impl->defaultCommands[subsystem] = std::move(command);
 }

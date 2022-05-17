@@ -4,13 +4,20 @@
 
 #pragma once
 
+#include <string>
+#include <string_view>
 #include <type_traits>
 #include <utility>
 
+#include <wpi/sendable/Sendable.h>
+#include <wpi/sendable/SendableHelper.h>
+
 #include "frc2/command/CommandScheduler.h"
+#include "frc2/command/Subsystem.h"
 
 namespace frc2 {
 class Command;
+
 /**
  * A robot subsystem.  Subsystems are the basic unit of robot organization in
  * the Command-based framework; they encapsulate low-level hardware objects
@@ -24,21 +31,18 @@ class Command;
  *
  * <p>Subsystems must be registered with the scheduler with the
  * CommandScheduler.RegisterSubsystem() method in order for the
- * Periodic() method to be called.  It is recommended that this method be called
- * from the constructor of users' Subsystem implementations.  The
- * SubsystemBase class offers a simple base for user implementations
- * that handles this.
+ * Periodic() method to be called. This is done in the Subsystem constructor but
+ * must be done again after calling CommandScheduler.UnregisterSubsystem().
  *
  * This class is provided by the NewCommands VendorDep
  *
  * @see Command
  * @see CommandScheduler
- * @see SubsystemBase
  */
-class Subsystem {
+class Subsystem : public wpi::Sendable,
+                      public wpi::SendableHelper<Subsystem> {
  public:
-  ~Subsystem();
-  /**
+ /**
    * This method is called periodically by the CommandScheduler.  Useful for
    * updating subsystem-specific state that you don't want to offload to a
    * Command.  Teams should try to be consistent within their own codebases
@@ -92,5 +96,47 @@ class Subsystem {
    * Periodic() method to be called when the scheduler runs.
    */
   void Register();
+
+  void InitSendable(wpi::SendableBuilder& builder) override;
+
+  /**
+   * Gets the name of this Subsystem.
+   *
+   * @return Name
+   */
+  std::string GetName() const;
+
+  /**
+   * Sets the name of this Subsystem.
+   *
+   * @param name name
+   */
+  void SetName(std::string_view name);
+
+  /**
+   * Gets the subsystem name of this Subsystem.
+   *
+   * @return Subsystem name
+   */
+  std::string GetSubsystem() const;
+
+  /**
+   * Sets the subsystem name of this Subsystem.
+   *
+   * @param name subsystem name
+   */
+  void SetSubsystem(std::string_view name);
+
+  /**
+   * Associate a Sendable with this Subsystem.
+   * Also update the child's name.
+   *
+   * @param name name to give child
+   * @param child sendable
+   */
+  void AddChild(std::string name, wpi::Sendable* child);
+
+ protected:
+  Subsystem();
 };
 }  // namespace frc2

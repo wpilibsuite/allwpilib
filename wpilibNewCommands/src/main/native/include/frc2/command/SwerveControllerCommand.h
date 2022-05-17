@@ -94,7 +94,7 @@ class SwerveControllerCommand
       std::function<frc::Rotation2d()> desiredRotation,
       std::function<void(std::array<frc::SwerveModuleState, NumModules>)>
           output,
-      std::initializer_list<Subsystem*> requirements);
+      std::initializer_list<void*> requirements);
 
   /**
    * Constructs a new SwerveControllerCommand that when executed will follow the
@@ -132,7 +132,7 @@ class SwerveControllerCommand
       frc::ProfiledPIDController<units::radians> thetaController,
       std::function<void(std::array<frc::SwerveModuleState, NumModules>)>
           output,
-      std::initializer_list<Subsystem*> requirements);
+      std::initializer_list<void*> requirements);
 
   /**
    * Constructs a new SwerveControllerCommand that when executed will follow the
@@ -169,7 +169,7 @@ class SwerveControllerCommand
       std::function<frc::Rotation2d()> desiredRotation,
       std::function<void(std::array<frc::SwerveModuleState, NumModules>)>
           output,
-      wpi::span<Subsystem* const> requirements = {});
+      wpi::span<void* const> requirements = {});
 
   /**
    * Constructs a new SwerveControllerCommand that when executed will follow the
@@ -207,7 +207,7 @@ class SwerveControllerCommand
       frc::ProfiledPIDController<units::radians> thetaController,
       std::function<void(std::array<frc::SwerveModuleState, NumModules>)>
           output,
-      wpi::span<Subsystem* const> requirements = {});
+      wpi::span<void* const> requirements = {});
 
   void Initialize() override;
 

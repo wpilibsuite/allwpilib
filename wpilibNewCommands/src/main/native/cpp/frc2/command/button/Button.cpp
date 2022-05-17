@@ -14,13 +14,13 @@ Button Button::WhenPressed(Command* command, bool interruptible) {
 }
 
 Button Button::WhenPressed(std::function<void()> toRun,
-                           std::initializer_list<Subsystem*> requirements) {
+                           std::initializer_list<void*> requirements) {
   WhenActive(std::move(toRun), requirements);
   return *this;
 }
 
 Button Button::WhenPressed(std::function<void()> toRun,
-                           wpi::span<Subsystem* const> requirements) {
+                           wpi::span<void* const> requirements) {
   WhenActive(std::move(toRun), requirements);
   return *this;
 }
@@ -31,13 +31,13 @@ Button Button::WhileHeld(Command* command, bool interruptible) {
 }
 
 Button Button::WhileHeld(std::function<void()> toRun,
-                         std::initializer_list<Subsystem*> requirements) {
+                         std::initializer_list<void*> requirements) {
   WhileActiveContinous(std::move(toRun), requirements);
   return *this;
 }
 
 Button Button::WhileHeld(std::function<void()> toRun,
-                         wpi::span<Subsystem* const> requirements) {
+                         wpi::span<void* const> requirements) {
   WhileActiveContinous(std::move(toRun), requirements);
   return *this;
 }
@@ -53,13 +53,13 @@ Button Button::WhenReleased(Command* command, bool interruptible) {
 }
 
 Button Button::WhenReleased(std::function<void()> toRun,
-                            std::initializer_list<Subsystem*> requirements) {
+                            std::initializer_list<void*> requirements) {
   WhenInactive(std::move(toRun), requirements);
   return *this;
 }
 
 Button Button::WhenReleased(std::function<void()> toRun,
-                            wpi::span<Subsystem* const> requirements) {
+                            wpi::span<void* const> requirements) {
   WhenInactive(std::move(toRun), requirements);
   return *this;
 }

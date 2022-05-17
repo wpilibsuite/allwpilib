@@ -14,23 +14,23 @@ CommandBase::CommandBase() {
 }
 
 void CommandBase::AddRequirements(
-    std::initializer_list<Subsystem*> requirements) {
+    std::initializer_list<void*> requirements) {
   m_requirements.insert(requirements.begin(), requirements.end());
 }
 
-void CommandBase::AddRequirements(wpi::span<Subsystem* const> requirements) {
+void CommandBase::AddRequirements(wpi::span<void* const> requirements) {
   m_requirements.insert(requirements.begin(), requirements.end());
 }
 
-void CommandBase::AddRequirements(wpi::SmallSet<Subsystem*, 4> requirements) {
+void CommandBase::AddRequirements(wpi::SmallSet<void*, 4> requirements) {
   m_requirements.insert(requirements.begin(), requirements.end());
 }
 
-void CommandBase::AddRequirements(Subsystem* requirement) {
+void CommandBase::AddRequirements(void* requirement) {
   m_requirements.insert(requirement);
 }
 
-wpi::SmallSet<Subsystem*, 4> CommandBase::GetRequirements() const {
+wpi::SmallSet<void*, 4> CommandBase::GetRequirements() const {
   return m_requirements;
 }
 

@@ -14,12 +14,12 @@
 #include <frc/kinematics/SwerveDriveKinematics.h>
 #include <frc/kinematics/SwerveDriveOdometry.h>
 #include <frc/motorcontrol/PWMSparkMax.h>
-#include <frc2/command/SubsystemBase.h>
+#include <frc2/command/Subsystem.h>
 
 #include "Constants.h"
 #include "SwerveModule.h"
 
-class DriveSubsystem : public frc2::SubsystemBase {
+class DriveSubsystem : public frc2::Subsystem {
  public:
   DriveSubsystem();
 

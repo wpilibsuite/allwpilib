@@ -71,7 +71,7 @@ class SwerveControllerCommandTest : public ::testing::Test {
 };
 
 TEST_F(SwerveControllerCommandTest, ReachesReference) {
-  frc2::Subsystem subsystem;
+  class : frc2::Subsystem {} subsystem;
 
   auto waypoints =
       std::vector{frc::Pose2d{0_m, 0_m, 0_rad}, frc::Pose2d{1_m, 5_m, 3_rad}};

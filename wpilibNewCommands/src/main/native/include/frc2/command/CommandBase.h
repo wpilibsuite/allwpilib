@@ -30,35 +30,35 @@ class CommandBase : public Command,
    *
    * @param requirements the Subsystem requirements to add
    */
-  void AddRequirements(std::initializer_list<Subsystem*> requirements);
+  void AddRequirements(std::initializer_list<void*> requirements);
 
   /**
    * Adds the specified Subsystem requirements to the command.
    *
    * @param requirements the Subsystem requirements to add
    */
-  void AddRequirements(wpi::span<Subsystem* const> requirements);
+  void AddRequirements(wpi::span<void* const> requirements);
 
   /**
    * Adds the specified Subsystem requirements to the command.
    *
    * @param requirements the Subsystem requirements to add
    */
-  void AddRequirements(wpi::SmallSet<Subsystem*, 4> requirements);
+  void AddRequirements(wpi::SmallSet<void*, 4> requirements);
 
   /**
    * Adds the specified Subsystem requirement to the command.
    *
    * @param requirement the Subsystem requirement to add
    */
-  void AddRequirements(Subsystem* requirement);
+  void AddRequirements(void* requirement);
 
   /**
    * Gets the Subsystem requirements of the command.
    *
    * @return the Command's Subsystem requirements
    */
-  wpi::SmallSet<Subsystem*, 4> GetRequirements() const override;
+  wpi::SmallSet<void*, 4> GetRequirements() const override;
 
   /**
    * Sets the name of this Command.
@@ -92,6 +92,6 @@ class CommandBase : public Command,
 
  protected:
   CommandBase();
-  wpi::SmallSet<Subsystem*, 4> m_requirements;
+  wpi::SmallSet<void*, 4> m_requirements;
 };
 }  // namespace frc2
