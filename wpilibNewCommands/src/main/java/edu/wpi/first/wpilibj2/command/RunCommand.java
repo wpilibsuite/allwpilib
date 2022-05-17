@@ -25,7 +25,7 @@ public class RunCommand extends CommandBase {
    * @param toRun the Runnable to run
    * @param requirements the subsystems to require
    */
-  public RunCommand(Runnable toRun, Subsystem... requirements) {
+  public RunCommand(Runnable toRun, Object... requirements) {
     m_toRun = requireNonNullParam(toRun, "toRun", "RunCommand");
     addRequirements(requirements);
   }

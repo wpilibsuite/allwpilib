@@ -16,7 +16,7 @@ import java.util.Set;
  * <p>This class is provided by the NewCommands VendorDep
  */
 public abstract class CommandBase implements Sendable, Command {
-  protected Set<Subsystem> m_requirements = new HashSet<>();
+  protected Set<Object> m_requirements = new HashSet<>();
 
   protected CommandBase() {
     String name = getClass().getName();
@@ -28,12 +28,12 @@ public abstract class CommandBase implements Sendable, Command {
    *
    * @param requirements the requirements to add
    */
-  public final void addRequirements(Subsystem... requirements) {
+  public final void addRequirements(Object... requirements) {
     m_requirements.addAll(Set.of(requirements));
   }
 
   @Override
-  public Set<Subsystem> getRequirements() {
+  public Set<Object> getRequirements() {
     return m_requirements;
   }
 

@@ -71,7 +71,7 @@ public class SwerveControllerCommand extends CommandBase {
       ProfiledPIDController thetaController,
       Supplier<Rotation2d> desiredRotation,
       Consumer<SwerveModuleState[]> outputModuleStates,
-      Subsystem... requirements) {
+      Object... requirements) {
     m_trajectory = requireNonNullParam(trajectory, "trajectory", "SwerveControllerCommand");
     m_pose = requireNonNullParam(pose, "pose", "SwerveControllerCommand");
     m_kinematics = requireNonNullParam(kinematics, "kinematics", "SwerveControllerCommand");
@@ -123,7 +123,7 @@ public class SwerveControllerCommand extends CommandBase {
       PIDController yController,
       ProfiledPIDController thetaController,
       Consumer<SwerveModuleState[]> outputModuleStates,
-      Subsystem... requirements) {
+      Object... requirements) {
     this(
         trajectory,
         pose,

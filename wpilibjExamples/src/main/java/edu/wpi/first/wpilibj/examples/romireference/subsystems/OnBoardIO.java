@@ -8,7 +8,7 @@ import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DigitalOutput;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.Subsystem;
 
 /**
  * This class represents the onboard IO of the Romi reference robot. This includes the pushbuttons
@@ -17,7 +17,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
  * <p>DIO 0 - Button A (input only) DIO 1 - Button B (input) or Green LED (output) DIO 2 - Button C
  * (input) or Red LED (output) DIO 3 - Yellow LED (output only)
  */
-public class OnBoardIO extends SubsystemBase {
+public class OnBoardIO extends Subsystem {
   private final DigitalInput m_buttonA = new DigitalInput(0);
   private final DigitalOutput m_yellowLed = new DigitalOutput(3);
 

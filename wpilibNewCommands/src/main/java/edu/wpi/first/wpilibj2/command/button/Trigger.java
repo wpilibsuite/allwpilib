@@ -10,7 +10,6 @@ import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.Subsystem;
 import java.util.function.BooleanSupplier;
 
 /**
@@ -121,7 +120,7 @@ public class Trigger implements BooleanSupplier {
    * @param requirements the required subsystems
    * @return this trigger, so calls can be chained
    */
-  public Trigger whenActive(final Runnable toRun, Subsystem... requirements) {
+  public Trigger whenActive(final Runnable toRun, Object... requirements) {
     return whenActive(new InstantCommand(toRun, requirements));
   }
 
@@ -179,7 +178,7 @@ public class Trigger implements BooleanSupplier {
    * @param requirements the required subsystems
    * @return this trigger, so calls can be chained
    */
-  public Trigger whileActiveContinuous(final Runnable toRun, Subsystem... requirements) {
+  public Trigger whileActiveContinuous(final Runnable toRun, Object... requirements) {
     return whileActiveContinuous(new InstantCommand(toRun, requirements));
   }
 
@@ -272,7 +271,7 @@ public class Trigger implements BooleanSupplier {
    * @param requirements the required subsystems
    * @return this trigger, so calls can be chained
    */
-  public Trigger whenInactive(final Runnable toRun, Subsystem... requirements) {
+  public Trigger whenInactive(final Runnable toRun, Object... requirements) {
     return whenInactive(new InstantCommand(toRun, requirements));
   }
 

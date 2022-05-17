@@ -19,6 +19,7 @@ import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
@@ -32,7 +33,9 @@ import java.util.function.Consumer;
  * CommandScheduler#run()} on the singleton instance in its periodic block in order to run commands
  * synchronously from the main loop. Subsystems should be registered with the scheduler using {@link
  * CommandScheduler#registerSubsystem(Subsystem...)} in order for their {@link Subsystem#periodic()}
- * methods to be called and for their default commands to be scheduled.
+ * methods to be called and for their default commands to be scheduled. This is done in the
+ * constructor but must be done again after calling {@link
+ * CommandScheduler#unregisterSubsystem(Subsystem...)}
  *
  * <p>This class is provided by the NewCommands VendorDep
  */
@@ -58,11 +61,13 @@ public final class CommandScheduler implements NTSendable, AutoCloseable {
 
   // A map from required subsystems to their requiring commands.  Also used as a set of the
   // currently-required subsystems.
-  private final Map<Subsystem, Command> m_requirements = new LinkedHashMap<>();
+  private final Map<Object, Command> m_requirements = new LinkedHashMap<>();
 
-  // A map from subsystems registered with the scheduler to their default commands.  Also used
-  // as a list of currently-registered subsystems.
-  private final Map<Subsystem, Command> m_subsystems = new LinkedHashMap<>();
+  // A map from subsystems registered with the scheduler to their default commands.
+  private final Map<Object, Command> m_defaultCommands = new LinkedHashMap<>();
+
+  // A set of currently-registered Subsystems.
+  private final Set<Subsystem> m_subsystems = new HashSet<>();
 
   // The set of currently-registered buttons that will be polled every iteration.
   private final Collection<Runnable> m_buttons = new LinkedHashSet<>();
@@ -135,11 +140,11 @@ public final class CommandScheduler implements NTSendable, AutoCloseable {
    * @param interruptible Whether the command is interruptible
    * @param requirements The command requirements
    */
-  private void initCommand(Command command, boolean interruptible, Set<Subsystem> requirements) {
+  private void initCommand(Command command, boolean interruptible, Set<Object> requirements) {
     CommandState scheduledCommand = new CommandState(interruptible);
     m_scheduledCommands.put(command, scheduledCommand);
     command.initialize();
-    for (Subsystem requirement : requirements) {
+    for (Object requirement : requirements) {
       m_requirements.put(requirement, command);
     }
     for (Consumer<Command> action : m_initActions) {
@@ -177,7 +182,7 @@ public final class CommandScheduler implements NTSendable, AutoCloseable {
       return;
     }
 
-    Set<Subsystem> requirements = command.getRequirements();
+    Set<Object> requirements = command.getRequirements();
 
     // Schedule the command if the requirements are not currently in-use.
     if (Collections.disjoint(m_requirements.keySet(), requirements)) {
@@ -185,13 +190,13 @@ public final class CommandScheduler implements NTSendable, AutoCloseable {
     } else {
       // Else check if the requirements that are in use have all have interruptible commands,
       // and if so, interrupt those commands and schedule the new command.
-      for (Subsystem requirement : requirements) {
+      for (Object requirement : requirements) {
         if (m_requirements.containsKey(requirement)
             && !m_scheduledCommands.get(m_requirements.get(requirement)).isInterruptible()) {
           return;
         }
       }
-      for (Subsystem requirement : requirements) {
+      for (Object requirement : requirements) {
         if (m_requirements.containsKey(requirement)) {
           cancel(m_requirements.get(requirement));
         }
@@ -246,7 +251,7 @@ public final class CommandScheduler implements NTSendable, AutoCloseable {
     m_watchdog.reset();
 
     // Run the periodic method of all registered subsystems.
-    for (Subsystem subsystem : m_subsystems.keySet()) {
+    for (Subsystem subsystem : m_subsystems) {
       subsystem.periodic();
       if (RobotBase.isSimulation()) {
         subsystem.simulationPeriodic();
@@ -308,12 +313,12 @@ public final class CommandScheduler implements NTSendable, AutoCloseable {
     m_toCancel.clear();
 
     // Add default commands for un-required registered subsystems.
-    for (Map.Entry<Subsystem, Command> subsystemCommand : m_subsystems.entrySet()) {
-      if (!m_requirements.containsKey(subsystemCommand.getKey())
-          && subsystemCommand.getValue() != null) {
-        schedule(subsystemCommand.getValue());
-      }
-    }
+    m_defaultCommands.forEach(
+        (subsystem, command) -> {
+          if (!m_requirements.containsKey(subsystem)) {
+            schedule(command);
+          }
+        });
 
     m_watchdog.disable();
     if (m_watchdog.isExpired()) {
@@ -331,7 +336,7 @@ public final class CommandScheduler implements NTSendable, AutoCloseable {
    */
   public void registerSubsystem(Subsystem... subsystems) {
     for (Subsystem subsystem : subsystems) {
-      m_subsystems.put(subsystem, null);
+      m_subsystems.add(subsystem);
     }
   }
 
@@ -342,7 +347,7 @@ public final class CommandScheduler implements NTSendable, AutoCloseable {
    * @param subsystems the subsystem to un-register
    */
   public void unregisterSubsystem(Subsystem... subsystems) {
-    m_subsystems.keySet().removeAll(Set.of(subsystems));
+    m_subsystems.removeAll(Set.of(subsystems));
   }
 
   /**
@@ -355,7 +360,11 @@ public final class CommandScheduler implements NTSendable, AutoCloseable {
    * @param subsystem the subsystem whose default command will be set
    * @param defaultCommand the default command to associate with the subsystem
    */
-  public void setDefaultCommand(Subsystem subsystem, Command defaultCommand) {
+  public void setDefaultCommand(Object subsystem, Command defaultCommand) {
+    if (defaultCommand == null) {
+      throw new IllegalArgumentException("Default commands must not be null!");
+    }
+
     if (!defaultCommand.getRequirements().contains(subsystem)) {
       throw new IllegalArgumentException("Default commands must require their subsystem!");
     }
@@ -364,7 +373,7 @@ public final class CommandScheduler implements NTSendable, AutoCloseable {
       throw new IllegalArgumentException("Default commands should not end!");
     }
 
-    m_subsystems.put(subsystem, defaultCommand);
+    m_defaultCommands.put(subsystem, defaultCommand);
   }
 
   /**
@@ -374,8 +383,8 @@ public final class CommandScheduler implements NTSendable, AutoCloseable {
    * @param subsystem the subsystem to inquire about
    * @return the default command associated with the subsystem
    */
-  public Command getDefaultCommand(Subsystem subsystem) {
-    return m_subsystems.get(subsystem);
+  public Command getDefaultCommand(Object subsystem) {
+    return m_defaultCommands.get(subsystem);
   }
 
   /**
@@ -452,7 +461,7 @@ public final class CommandScheduler implements NTSendable, AutoCloseable {
    * @return the command currently requiring the subsystem, or null if no command is currently
    *     scheduled
    */
-  public Command requiring(Subsystem subsystem) {
+  public Command requiring(Object subsystem) {
     return m_requirements.get(subsystem);
   }
 

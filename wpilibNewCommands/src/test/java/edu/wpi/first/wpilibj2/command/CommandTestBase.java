@@ -41,12 +41,12 @@ public class CommandTestBase {
     }
   }
 
-  public static class TestSubsystem extends SubsystemBase {}
+  public static class TestSubsystem extends Subsystem {}
 
   public static class MockCommandHolder {
     private final Command m_mockCommand = mock(Command.class);
 
-    public MockCommandHolder(boolean runWhenDisabled, Subsystem... requirements) {
+    public MockCommandHolder(boolean runWhenDisabled, Object... requirements) {
       when(m_mockCommand.getRequirements()).thenReturn(Set.of(requirements));
       when(m_mockCommand.isFinished()).thenReturn(false);
       when(m_mockCommand.runsWhenDisabled()).thenReturn(runWhenDisabled);

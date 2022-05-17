@@ -14,7 +14,7 @@ import edu.wpi.first.math.controller.PIDController;
  *
  * <p>This class is provided by the NewCommands VendorDep
  */
-public abstract class PIDSubsystem extends SubsystemBase {
+public abstract class PIDSubsystem extends Subsystem {
   protected final PIDController m_controller;
   protected boolean m_enabled;
 

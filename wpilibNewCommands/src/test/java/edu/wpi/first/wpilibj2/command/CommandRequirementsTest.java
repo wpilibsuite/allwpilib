@@ -15,7 +15,7 @@ class CommandRequirementsTest extends CommandTestBase {
   @Test
   void requirementInterruptTest() {
     try (CommandScheduler scheduler = new CommandScheduler()) {
-      Subsystem requirement = new TestSubsystem();
+      Object requirement = new TestSubsystem();
 
       MockCommandHolder interruptedHolder = new MockCommandHolder(true, requirement);
       Command interrupted = interruptedHolder.getMock();
@@ -42,7 +42,7 @@ class CommandRequirementsTest extends CommandTestBase {
   @Test
   void requirementUninterruptibleTest() {
     try (CommandScheduler scheduler = new CommandScheduler()) {
-      Subsystem requirement = new TestSubsystem();
+      Object requirement = new TestSubsystem();
 
       MockCommandHolder interruptedHolder = new MockCommandHolder(true, requirement);
       Command notInterrupted = interruptedHolder.getMock();

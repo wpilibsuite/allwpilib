@@ -37,7 +37,7 @@ public class FunctionalCommand extends CommandBase {
       Runnable onExecute,
       Consumer<Boolean> onEnd,
       BooleanSupplier isFinished,
-      Subsystem... requirements) {
+      Object... requirements) {
     m_onInit = requireNonNullParam(onInit, "onInit", "FunctionalCommand");
     m_onExecute = requireNonNullParam(onExecute, "onExecute", "FunctionalCommand");
     m_onEnd = requireNonNullParam(onEnd, "onEnd", "FunctionalCommand");

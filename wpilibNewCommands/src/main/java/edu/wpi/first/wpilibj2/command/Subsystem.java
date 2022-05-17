@@ -4,6 +4,10 @@
 
 package edu.wpi.first.wpilibj2.command;
 
+import edu.wpi.first.util.sendable.Sendable;
+import edu.wpi.first.util.sendable.SendableBuilder;
+import edu.wpi.first.util.sendable.SendableRegistry;
+
 /**
  * A robot subsystem. Subsystems are the basic unit of robot organization in the Command-based
  * framework; they encapsulate low-level hardware objects (motor controllers, sensors, etc) and
@@ -15,27 +19,33 @@ package edu.wpi.first.wpilibj2.command;
  *
  * <p>Subsystems must be registered with the scheduler with the {@link
  * CommandScheduler#registerSubsystem(Subsystem...)} method in order for the {@link
- * Subsystem#periodic()} method to be called. It is recommended that this method be called from the
- * constructor of users' Subsystem implementations. The {@link SubsystemBase} class offers a simple
- * base for user implementations that handles this.
+ * Subsystem#periodic()} method to be called. This is done in the Subsystem constructor but must be
+ * done again after calling {@link CommandScheduler#unregisterSubsystem(Subsystem...)}.
  *
  * <p>This class is provided by the NewCommands VendorDep
  */
-public interface Subsystem {
+public abstract class Subsystem implements Sendable {
+  /** Constructor. */
+  public Subsystem() {
+    String name = this.getClass().getSimpleName();
+    SendableRegistry.addLW(this, name, name);
+    CommandScheduler.getInstance().registerSubsystem(this);
+  }
+
   /**
    * This method is called periodically by the {@link CommandScheduler}. Useful for updating
    * subsystem-specific state that you don't want to offload to a {@link Command}. Teams should try
    * to be consistent within their own codebases about which responsibilities will be handled by
    * Commands, and which will be handled here.
    */
-  default void periodic() {}
+  public void periodic() {}
 
   /**
    * This method is called periodically by the {@link CommandScheduler}. Useful for updating
    * subsystem-specific state that needs to be maintained for simulations, such as for updating
    * {@link edu.wpi.first.wpilibj.simulation} classes and setting simulated sensor readings.
    */
-  default void simulationPeriodic() {}
+  public void simulationPeriodic() {}
 
   /**
    * Sets the default {@link Command} of the subsystem. The default command will be automatically
@@ -46,7 +56,7 @@ public interface Subsystem {
    *
    * @param defaultCommand the default command to associate with this subsystem
    */
-  default void setDefaultCommand(Command defaultCommand) {
+  public final void setDefaultCommand(Command defaultCommand) {
     CommandScheduler.getInstance().setDefaultCommand(this, defaultCommand);
   }
 
@@ -56,7 +66,7 @@ public interface Subsystem {
    *
    * @return the default command associated with this subsystem
    */
-  default Command getDefaultCommand() {
+  public final Command getDefaultCommand() {
     return CommandScheduler.getInstance().getDefaultCommand(this);
   }
 
@@ -66,7 +76,7 @@ public interface Subsystem {
    *
    * @return the scheduled command currently requiring this subsystem
    */
-  default Command getCurrentCommand() {
+  public final Command getCurrentCommand() {
     return CommandScheduler.getInstance().requiring(this);
   }
 
@@ -74,7 +84,69 @@ public interface Subsystem {
    * Registers this subsystem with the {@link CommandScheduler}, allowing its {@link
    * Subsystem#periodic()} method to be called when the scheduler runs.
    */
-  default void register() {
+  public final void register() {
     CommandScheduler.getInstance().registerSubsystem(this);
+  }
+
+  /**
+   * Gets the name of this Subsystem.
+   *
+   * @return Name
+   */
+  public String getName() {
+    return SendableRegistry.getName(this);
+  }
+
+  /**
+   * Sets the name of this Subsystem.
+   *
+   * @param name name
+   */
+  public void setName(String name) {
+    SendableRegistry.setName(this, name);
+  }
+
+  /**
+   * Gets the subsystem name of this Subsystem.
+   *
+   * @return Subsystem name
+   */
+  public String getSubsystem() {
+    return SendableRegistry.getSubsystem(this);
+  }
+
+  /**
+   * Sets the subsystem name of this Subsystem.
+   *
+   * @param subsystem subsystem name
+   */
+  public void setSubsystem(String subsystem) {
+    SendableRegistry.setSubsystem(this, subsystem);
+  }
+
+  /**
+   * Associates a {@link Sendable} with this Subsystem. Also update the child's name.
+   *
+   * @param name name to give child
+   * @param child sendable
+   */
+  public void addChild(String name, Sendable child) {
+    SendableRegistry.addLW(child, getSubsystem(), name);
+  }
+
+  @Override
+  public void initSendable(SendableBuilder builder) {
+    builder.setSmartDashboardType("Subsystem");
+
+    builder.addBooleanProperty(".hasDefault", () -> getDefaultCommand() != null, null);
+    builder.addStringProperty(
+        ".default",
+        () -> getDefaultCommand() != null ? getDefaultCommand().getName() : "none",
+        null);
+    builder.addBooleanProperty(".hasCommand", () -> getCurrentCommand() != null, null);
+    builder.addStringProperty(
+        ".command",
+        () -> getCurrentCommand() != null ? getCurrentCommand().getName() : "none",
+        null);
   }
 }

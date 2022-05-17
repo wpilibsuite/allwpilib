@@ -31,7 +31,7 @@ public class TrapezoidProfileCommand extends CommandBase {
    * @param requirements The subsystems required by this command.
    */
   public TrapezoidProfileCommand(
-      TrapezoidProfile profile, Consumer<State> output, Subsystem... requirements) {
+      TrapezoidProfile profile, Consumer<State> output, Object... requirements) {
     m_profile = requireNonNullParam(profile, "profile", "TrapezoidProfileCommand");
     m_output = requireNonNullParam(output, "output", "TrapezoidProfileCommand");
     addRequirements(requirements);

@@ -56,7 +56,7 @@ public interface Command {
    *
    * @return the set of subsystems that are required
    */
-  Set<Subsystem> getRequirements();
+  Set<Object> getRequirements();
 
   /**
    * Decorates this command with a timeout. If the specified timeout is exceeded before the command
@@ -127,7 +127,7 @@ public interface Command {
    * @param requirements the required subsystems
    * @return the decorated command
    */
-  default SequentialCommandGroup beforeStarting(Runnable toRun, Subsystem... requirements) {
+  default SequentialCommandGroup beforeStarting(Runnable toRun, Object... requirements) {
     return beforeStarting(new InstantCommand(toRun, requirements));
   }
 
@@ -160,7 +160,7 @@ public interface Command {
    * @param requirements the required subsystems
    * @return the decorated command
    */
-  default SequentialCommandGroup andThen(Runnable toRun, Subsystem... requirements) {
+  default SequentialCommandGroup andThen(Runnable toRun, Object... requirements) {
     return andThen(new InstantCommand(toRun, requirements));
   }
 
@@ -341,7 +341,7 @@ public interface Command {
    * @param requirement the subsystem to inquire about
    * @return whether the subsystem is required
    */
-  default boolean hasRequirement(Subsystem requirement) {
+  default boolean hasRequirement(Object requirement) {
     return getRequirements().contains(requirement);
   }
 

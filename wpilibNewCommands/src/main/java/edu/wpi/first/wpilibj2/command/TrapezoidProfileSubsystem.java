@@ -14,7 +14,7 @@ import edu.wpi.first.math.trajectory.TrapezoidProfile;
  *
  * <p>This class is provided by the NewCommands VendorDep
  */
-public abstract class TrapezoidProfileSubsystem extends SubsystemBase {
+public abstract class TrapezoidProfileSubsystem extends Subsystem {
   private final double m_period;
   private final TrapezoidProfile.Constraints m_constraints;
 

@@ -26,7 +26,7 @@ public class StartEndCommand extends CommandBase {
    * @param onEnd the Runnable to run on command end
    * @param requirements the subsystems required by this command
    */
-  public StartEndCommand(Runnable onInit, Runnable onEnd, Subsystem... requirements) {
+  public StartEndCommand(Runnable onInit, Runnable onEnd, Object... requirements) {
     m_onInit = requireNonNullParam(onInit, "onInit", "StartEndCommand");
     m_onEnd = requireNonNullParam(onEnd, "onEnd", "StartEndCommand");
 

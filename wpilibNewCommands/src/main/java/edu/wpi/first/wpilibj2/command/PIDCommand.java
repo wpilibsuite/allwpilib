@@ -38,7 +38,7 @@ public class PIDCommand extends CommandBase {
       DoubleSupplier measurementSource,
       DoubleSupplier setpointSource,
       DoubleConsumer useOutput,
-      Subsystem... requirements) {
+      Object... requirements) {
     requireNonNullParam(controller, "controller", "PIDCommand");
     requireNonNullParam(measurementSource, "measurementSource", "PIDCommand");
     requireNonNullParam(setpointSource, "setpointSource", "PIDCommand");
@@ -65,7 +65,7 @@ public class PIDCommand extends CommandBase {
       DoubleSupplier measurementSource,
       double setpoint,
       DoubleConsumer useOutput,
-      Subsystem... requirements) {
+      Object... requirements) {
     this(controller, measurementSource, () -> setpoint, useOutput, requirements);
   }
 

@@ -28,7 +28,7 @@ public class NotifierCommand extends CommandBase {
    * @param period the period at which the notifier should run, in seconds
    * @param requirements the subsystems required by this command
    */
-  public NotifierCommand(Runnable toRun, double period, Subsystem... requirements) {
+  public NotifierCommand(Runnable toRun, double period, Object... requirements) {
     m_notifier = new Notifier(toRun);
     m_period = period;
     addRequirements(requirements);

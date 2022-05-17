@@ -4,9 +4,9 @@
 
 package edu.wpi.first.wpilibj.templates.commandbased.subsystems;
 
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.Subsystem;
 
-public class ExampleSubsystem extends SubsystemBase {
+public class ExampleSubsystem extends Subsystem {
   /** Creates a new ExampleSubsystem. */
   public ExampleSubsystem() {}
 

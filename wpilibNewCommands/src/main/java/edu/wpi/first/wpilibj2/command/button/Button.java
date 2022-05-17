@@ -5,7 +5,6 @@
 package edu.wpi.first.wpilibj2.command.button;
 
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Subsystem;
 import java.util.function.BooleanSupplier;
 
 /**
@@ -65,7 +64,7 @@ public class Button extends Trigger {
    * @param requirements the required subsystems
    * @return this button, so calls can be chained
    */
-  public Button whenPressed(final Runnable toRun, Subsystem... requirements) {
+  public Button whenPressed(final Runnable toRun, Object... requirements) {
     whenActive(toRun, requirements);
     return this;
   }
@@ -106,7 +105,7 @@ public class Button extends Trigger {
    * @param requirements the required subsystems
    * @return this button, so calls can be chained
    */
-  public Button whileHeld(final Runnable toRun, Subsystem... requirements) {
+  public Button whileHeld(final Runnable toRun, Object... requirements) {
     whileActiveContinuous(toRun, requirements);
     return this;
   }
@@ -167,7 +166,7 @@ public class Button extends Trigger {
    * @param requirements the required subsystems
    * @return this button, so calls can be chained
    */
-  public Button whenReleased(final Runnable toRun, Subsystem... requirements) {
+  public Button whenReleased(final Runnable toRun, Object... requirements) {
     whenInactive(toRun, requirements);
     return this;
   }
