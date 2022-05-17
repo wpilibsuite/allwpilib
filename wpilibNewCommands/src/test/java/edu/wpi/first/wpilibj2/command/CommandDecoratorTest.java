@@ -7,6 +7,8 @@ package edu.wpi.first.wpilibj2.command;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.util.concurrent.atomic.AtomicBoolean;
+
 import edu.wpi.first.hal.HAL;
 import edu.wpi.first.wpilibj.simulation.SimHooks;
 import org.junit.jupiter.api.Test;
@@ -168,11 +170,11 @@ class CommandDecoratorTest extends CommandTestBase {
   }
 
   @Test
-  void endlesslyTest() {
+  void perpetuallyTest() {
     try (CommandScheduler scheduler = new CommandScheduler()) {
       Command command = new InstantCommand();
 
-      Command perpetual = command.endlessly();
+      Command perpetual = command.perpetually();
 
       scheduler.schedule(perpetual);
       scheduler.run();
@@ -186,23 +188,23 @@ class CommandDecoratorTest extends CommandTestBase {
   @Test
   void unlessTest() {
     try (CommandScheduler scheduler = new CommandScheduler()) {
-      ConditionHolder unlessCondition = new ConditionHolder();
-      ConditionHolder hasRunCondition = new ConditionHolder();
-      hasRunCondition.setCondition(false);
+      AtomicBoolean unlessCondition = new AtomicBoolean();
+      AtomicBoolean hasRunCondition = new AtomicBoolean();
+      hasRunCondition.set(false);
 
       Command command =
-          new InstantCommand(() -> hasRunCondition.setCondition(true))
-              .unless(unlessCondition::getCondition);
+          new InstantCommand(() -> hasRunCondition.set(true))
+              .unless(unlessCondition::get);
 
-      unlessCondition.setCondition(true);
+      unlessCondition.set(true);
       scheduler.schedule(command);
       scheduler.run();
-      assertFalse(hasRunCondition.getCondition());
+      assertFalse(hasRunCondition.get());
 
-      unlessCondition.setCondition(false);
+      unlessCondition.set(false);
       scheduler.schedule(command);
       scheduler.run();
-      assertTrue(hasRunCondition.getCondition());
+      assertTrue(hasRunCondition.get());
     }
   }
 }
