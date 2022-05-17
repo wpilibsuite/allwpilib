@@ -32,27 +32,27 @@ class SequentialCommandGroup;
 class PerpetualCommand;
 class ProxyScheduleCommand;
 class RepeatCommand;
-class ConditionalCommand
+class ConditionalCommand;
 
-    /**
-     * A state machine representing a complete action to be performed by the
-     * robot. Commands are run by the CommandScheduler, and can be composed into
-     * CommandGroups to allow users to build complicated multi-step actions
-     * without the need to roll the state machine logic themselves.
-     *
-     * <p>Commands are run synchronously from the main robot loop; no
-     * multithreading is used, unless specified explicitly from the command
-     * implementation.
-     *
-     * <p>Note: ALWAYS create a subclass by extending CommandHelper<Base,
-     * Subclass>, or decorators will not function!
-     *
-     * This class is provided by the NewCommands VendorDep
-     *
-     * @see CommandScheduler
-     * @see CommandHelper
-     */
-    class Command {
+/**
+ * A state machine representing a complete action to be performed by the
+ * robot. Commands are run by the CommandScheduler, and can be composed into
+ * CommandGroups to allow users to build complicated multi-step actions
+ * without the need to roll the state machine logic themselves.
+ *
+ * <p>Commands are run synchronously from the main robot loop; no
+ * multithreading is used, unless specified explicitly from the command
+ * implementation.
+ *
+ * <p>Note: ALWAYS create a subclass by extending CommandHelper<Base,
+ * Subclass>, or decorators will not function!
+ *
+ * This class is provided by the NewCommands VendorDep
+ *
+ * @see CommandScheduler
+ * @see CommandHelper
+ */
+class Command {
  public:
   Command() = default;
   virtual ~Command();

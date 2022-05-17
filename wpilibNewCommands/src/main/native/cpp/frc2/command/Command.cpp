@@ -102,7 +102,7 @@ ProxyScheduleCommand Command::AsProxy() {
   return ProxyScheduleCommand(this);
 }
 
-ConditionalCommand Command::Unless(std::function<bool()> condition) {
+ConditionalCommand Command::Unless(std::function<bool()> condition) && {
   return ConditionalCommand(std::make_unique<InstantCommand>(),
                             std::move(*this).TransferOwnership(),
                             std::move(condition));

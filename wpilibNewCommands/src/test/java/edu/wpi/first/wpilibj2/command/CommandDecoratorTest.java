@@ -190,7 +190,9 @@ class CommandDecoratorTest extends CommandTestBase {
       ConditionHolder hasRunCondition = new ConditionHolder();
       hasRunCondition.setCondition(false);
 
-      Command command = new InstantCommand(() -> hasRunCondition.setCondition(true)).unless(unlessCondition::getCondition);
+      Command command =
+          new InstantCommand(() -> hasRunCondition.setCondition(true))
+              .unless(unlessCondition::getCondition);
 
       unlessCondition.setCondition(true);
       scheduler.schedule(command);

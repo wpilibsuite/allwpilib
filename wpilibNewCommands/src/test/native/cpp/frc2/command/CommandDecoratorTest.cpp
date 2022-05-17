@@ -108,7 +108,10 @@ TEST_F(CommandDecoratorTest, Unless) {
   bool hasRun = false;
   bool unlessBool = true;
 
-  auto command = InstantCommand([] { hasRun = true; }, {}).unless([&unlessBool] { return unlessBool; });
+  auto command =
+      InstantCommand([] { hasRun = true; }, {}).unless([&unlessBool] {
+        return unlessBool;
+      });
 
   scheduler.Schedule(&command) EXPECT_FALSE(hasRun);
 
