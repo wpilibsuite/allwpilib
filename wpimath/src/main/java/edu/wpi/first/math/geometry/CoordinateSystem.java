@@ -9,6 +9,13 @@ import edu.wpi.first.math.Nat;
 
 /** A helper class that converts Pose3d objects between different standard coordinate frames. */
 public class CoordinateSystem {
+  private static final CoordinateSystem m_nwu =
+      new CoordinateSystem(CoordinateAxis.N(), CoordinateAxis.W(), CoordinateAxis.U());
+  private static final CoordinateSystem m_edn =
+      new CoordinateSystem(CoordinateAxis.E(), CoordinateAxis.D(), CoordinateAxis.N());
+  private static final CoordinateSystem m_ned =
+      new CoordinateSystem(CoordinateAxis.N(), CoordinateAxis.E(), CoordinateAxis.D());
+
   // Rotation from this coordinate system to NWU coordinate system
   private final Rotation3d m_rotation;
 
@@ -86,7 +93,7 @@ public class CoordinateSystem {
    */
   @SuppressWarnings("MethodName")
   public static CoordinateSystem NWU() {
-    return new CoordinateSystem(CoordinateAxis.N(), CoordinateAxis.W(), CoordinateAxis.U());
+    return m_nwu;
   }
 
   /**
@@ -98,7 +105,7 @@ public class CoordinateSystem {
    */
   @SuppressWarnings("MethodName")
   public static CoordinateSystem EDN() {
-    return new CoordinateSystem(CoordinateAxis.E(), CoordinateAxis.D(), CoordinateAxis.N());
+    return m_edn;
   }
 
   /**
@@ -110,7 +117,7 @@ public class CoordinateSystem {
    */
   @SuppressWarnings("MethodName")
   public static CoordinateSystem NED() {
-    return new CoordinateSystem(CoordinateAxis.N(), CoordinateAxis.E(), CoordinateAxis.D());
+    return m_ned;
   }
 
   /**

@@ -42,21 +42,21 @@ class WPILIB_DLLEXPORT CoordinateSystem {
    *
    * The +X axis is north, the +Y axis is west, and the +Z axis is up.
    */
-  static CoordinateSystem NWU();
+  static const CoordinateSystem& NWU();
 
   /**
    * Returns an instance of the East-Down-North (EDN) coordinate system.
    *
    * The +X axis is east, the +Y axis is down, and the +Z axis is north.
    */
-  static CoordinateSystem EDN();
+  static const CoordinateSystem& EDN();
 
   /**
    * Returns an instance of the NED coordinate system.
    *
    * The +X axis is north, the +Y axis is east, and the +Z axis is down.
    */
-  static CoordinateSystem NED();
+  static const CoordinateSystem& NED();
 
   /**
    * Converts the given pose from one coordinate system to another.

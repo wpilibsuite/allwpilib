@@ -69,19 +69,22 @@ CoordinateSystem::CoordinateSystem(const CoordinateAxis& positiveX,
   m_rotation = Rotation3d{Quaternion{w, x, y, z}};
 }
 
-CoordinateSystem CoordinateSystem::NWU() {
-  return CoordinateSystem{CoordinateAxis::N(), CoordinateAxis::W(),
-                          CoordinateAxis::U()};
+const CoordinateSystem& CoordinateSystem::NWU() {
+  static const CoordinateSystem instance{
+      CoordinateAxis::N(), CoordinateAxis::W(), CoordinateAxis::U()};
+  return instance;
 }
 
-CoordinateSystem CoordinateSystem::EDN() {
-  return CoordinateSystem{CoordinateAxis::E(), CoordinateAxis::D(),
-                          CoordinateAxis::N()};
+const CoordinateSystem& CoordinateSystem::EDN() {
+  static const CoordinateSystem instance{
+      CoordinateAxis::E(), CoordinateAxis::D(), CoordinateAxis::N()};
+  return instance;
 }
 
-CoordinateSystem CoordinateSystem::NED() {
-  return CoordinateSystem{CoordinateAxis::N(), CoordinateAxis::E(),
-                          CoordinateAxis::D()};
+const CoordinateSystem& CoordinateSystem::NED() {
+  static const CoordinateSystem instance{
+      CoordinateAxis::N(), CoordinateAxis::E(), CoordinateAxis::D()};
+  return instance;
 }
 
 Pose3d CoordinateSystem::Convert(const Pose3d& pose,
