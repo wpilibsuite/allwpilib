@@ -1,7 +1,18 @@
-diff --git a/wpiutil/src/main/native/fmtlib/include/fmt/format-inl.h b/wpiutil/src/main/native/fmtlib/include/fmt/format-inl.h
-index 2c51c50ae..cc89abdd3 100644
---- a/wpiutil/src/main/native/fmtlib/include/fmt/format-inl.h
-+++ b/wpiutil/src/main/native/fmtlib/include/fmt/format-inl.h
+From e92e91d28f2475b38f32f92d24b65eec195254a6 Mon Sep 17 00:00:00 2001
+From: Tyler Veness <calcmogul@gmail.com>
+Date: Wed, 18 May 2022 10:21:49 -0700
+Subject: [PATCH] Don't throw on write failure
+
+---
+ include/fmt/format-inl.h | 3 +--
+ include/fmt/xchar.h      | 3 +--
+ src/os.cc                | 3 +--
+ 3 files changed, 3 insertions(+), 6 deletions(-)
+
+diff --git a/include/fmt/format-inl.h b/include/fmt/format-inl.h
+index 2c51c50a..cc89abdd 100644
+--- a/include/fmt/format-inl.h
++++ b/include/fmt/format-inl.h
 @@ -92,8 +92,7 @@ FMT_FUNC void report_error(format_func func, int error_code,
  // A wrapper around fwrite that throws on error.
  inline void fwrite_fully(const void* ptr, size_t size, size_t count,
@@ -12,10 +23,10 @@ index 2c51c50ae..cc89abdd3 100644
  }
  
  #ifndef FMT_STATIC_THOUSANDS_SEPARATOR
-diff --git a/wpiutil/src/main/native/fmtlib/include/fmt/xchar.h b/wpiutil/src/main/native/fmtlib/include/fmt/xchar.h
-index 55825077f..9acb893fa 100644
---- a/wpiutil/src/main/native/fmtlib/include/fmt/xchar.h
-+++ b/wpiutil/src/main/native/fmtlib/include/fmt/xchar.h
+diff --git a/include/fmt/xchar.h b/include/fmt/xchar.h
+index 55825077..9acb893f 100644
+--- a/include/fmt/xchar.h
++++ b/include/fmt/xchar.h
 @@ -207,8 +207,7 @@ inline void vprint(std::FILE* f, wstring_view fmt, wformat_args args) {
    wmemory_buffer buffer;
    detail::vformat_to(buffer, fmt, args);
@@ -26,10 +37,10 @@ index 55825077f..9acb893fa 100644
  }
  
  inline void vprint(wstring_view fmt, wformat_args args) {
-diff --git a/wpiutil/src/main/native/fmtlib/src/os.cpp b/wpiutil/src/main/native/fmtlib/src/os.cpp
-index 04b4dc506..4eb3e1fdd 100644
---- a/wpiutil/src/main/native/fmtlib/src/os.cpp
-+++ b/wpiutil/src/main/native/fmtlib/src/os.cpp
+diff --git a/src/os.cc b/src/os.cc
+index 04b4dc50..4eb3e1fd 100644
+--- a/src/os.cc
++++ b/src/os.cc
 @@ -277,8 +277,7 @@ std::size_t file::read(void* buffer, std::size_t count) {
  std::size_t file::write(const void* buffer, std::size_t count) {
    rwresult result = 0;
@@ -40,3 +51,6 @@ index 04b4dc506..4eb3e1fdd 100644
  }
  
  file file::dup(int fd) {
+-- 
+2.36.1
+
