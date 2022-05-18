@@ -1,7 +1,7 @@
-From 80055296378f0a8ad0eec823fd2d0209a447fd22 Mon Sep 17 00:00:00 2001
+From b2ce6f41afa612eb31a8c8ac3e5f23783fb81d5f Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Tue, 26 Apr 2022 15:19:14 -0400
-Subject: [PATCH 3/6] Preprocessor cleanup
+Subject: [PATCH 3/7] Preprocessor cleanup
 
 ---
  include/uv.h        | 18 +-----------------
@@ -198,5 +198,5 @@ index 5820ba9c..918acaf5 100644
  /* Whether there are any non-IFS LSPs stacked on TCP */
  int uv_tcp_non_ifs_lsp_ipv4;
 -- 
-2.20.1.windows.1
+2.36.1
 
