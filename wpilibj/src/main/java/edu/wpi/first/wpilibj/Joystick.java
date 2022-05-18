@@ -6,6 +6,8 @@ package edu.wpi.first.wpilibj;
 
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
+import edu.wpi.first.wpilibj.event.BooleanEvent;
+import edu.wpi.first.wpilibj.event.EventLoop;
 
 /**
  * Handle input from Flight Joysticks connected to the Driver Station.
@@ -234,6 +236,17 @@ public class Joystick extends GenericHID {
   }
 
   /**
+   * Constructs an event instance around the trigger button's digital signal.
+   *
+   * @param loop the event loop instance to attach the event to.
+   * @return an event instance representing the trigger button's digital signal attached to the
+   *     given loop.
+   */
+  public BooleanEvent trigger(EventLoop loop) {
+    return new BooleanEvent(loop, this::getTrigger);
+  }
+
+  /**
    * Read the state of the top button on the joystick.
    *
    * @return The state of the top button.
@@ -258,6 +271,17 @@ public class Joystick extends GenericHID {
    */
   public boolean getTopReleased() {
     return getRawButtonReleased(ButtonType.kTop.value);
+  }
+
+  /**
+   * Constructs an event instance around the top button's digital signal.
+   *
+   * @param loop the event loop instance to attach the event to.
+   * @return an event instance representing the top button's digital signal attached to the given
+   *     loop.
+   */
+  public BooleanEvent top(EventLoop loop) {
+    return new BooleanEvent(loop, this::getTop);
   }
 
   /**
