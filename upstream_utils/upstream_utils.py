@@ -192,7 +192,8 @@ def comment_out_invalid_includes(filename, include_roots):
 
 
 def apply_patches(root, patches):
-    """Apply list of patches to the destination Git repository.
+    """Apply list of patches to the destination Git repository using "git
+    apply".
 
     Keyword arguments:
     root -- the root directory of the destination Git repository
@@ -204,21 +205,16 @@ def apply_patches(root, patches):
 
 
 def am_patches(root, patches, use_threeway=False):
-    """Apply list of patches to the destination Git repository.
+    """Apply list of patches to the destination Git repository using "git am".
 
     Keyword arguments:
     root -- the root directory of the destination Git repository
     patches -- list of patch files relative to the root
     """
-    if len(patches) == 0:
-        raise Exception("Must provide at least one patch")
-
     os.chdir(root)
     args = ["git", "am"]
     if use_threeway:
         args.append("-3")
 
     for patch in patches:
-        args.append(patch)
-
-    subprocess.check_output(args)
+        subprocess.check_output(args + [patch])
