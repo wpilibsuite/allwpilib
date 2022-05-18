@@ -932,7 +932,16 @@ static void uv__write_callbacks(uv_stream_t* stream) {
   if (QUEUE_EMPTY(&stream->write_completed_queue))
     return;
 
+// FIXME: GCC 12.1 gives a possibly real warning, but we don't know how to fix
+// it
+#if __GNUC__ >= 12
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdangling-pointer="
+#endif  // __GNUC__ >= 12
   QUEUE_MOVE(&stream->write_completed_queue, &pq);
+#if __GNUC__ >= 12
+#pragma GCC diagnostic pop
+#endif  // __GNUC__ >= 12
 
   while (!QUEUE_EMPTY(&pq)) {
     /* Pop a req off write_completed_queue. */

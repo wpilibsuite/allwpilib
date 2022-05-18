@@ -444,7 +444,16 @@ void uv_walk(uv_loop_t* loop, uv_walk_cb walk_cb, void* arg) {
   QUEUE* q;
   uv_handle_t* h;
 
+// FIXME: GCC 12.1 gives a possibly real warning, but we don't know how to fix
+// it
+#if __GNUC__ >= 12
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdangling-pointer="
+#endif  // __GNUC__ >= 12
   QUEUE_MOVE(&loop->handle_queue, &queue);
+#if __GNUC__ >= 12
+#pragma GCC diagnostic pop
+#endif  // __GNUC__ >= 12
   while (!QUEUE_EMPTY(&queue)) {
     q = QUEUE_HEAD(&queue);
     h = QUEUE_DATA(q, uv_handle_t, handle_queue);

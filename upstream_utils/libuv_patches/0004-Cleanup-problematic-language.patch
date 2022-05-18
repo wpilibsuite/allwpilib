@@ -1,7 +1,7 @@
-From 5649a07d496fecd1812265b86b329186af78c3fc Mon Sep 17 00:00:00 2001
+From ea00b73593e7146c01df4320e3e2e345665fd1c3 Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Tue, 26 Apr 2022 15:24:47 -0400
-Subject: [PATCH 4/6] Cleanup problematic language
+Subject: [PATCH 4/7] Cleanup problematic language
 
 ---
  src/unix/tty.c | 21 +++++++++++----------
@@ -60,5 +60,5 @@ index 74d3d75d..5f681406 100644
      else
        r = -1;
 -- 
-2.20.1.windows.1
+2.36.1
 

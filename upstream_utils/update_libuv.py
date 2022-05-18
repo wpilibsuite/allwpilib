@@ -20,6 +20,7 @@ def main():
         os.path.join(root, "upstream_utils/libuv_patches/0004-Cleanup-problematic-language.patch"),
         os.path.join(root, "upstream_utils/libuv_patches/0005-Use-roborio-time.patch"),
         os.path.join(root, "upstream_utils/libuv_patches/0006-Style-comments-cleanup.patch"),
+        os.path.join(root, "upstream_utils/libuv_patches/0007-Squelch-GCC-12.1-warnings.patch"),
     ])
     # yapf: enable
 

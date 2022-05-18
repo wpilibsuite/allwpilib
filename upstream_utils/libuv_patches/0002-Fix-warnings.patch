@@ -1,7 +1,7 @@
-From c2390ddd8fa648c87adf279ed5b3489a42c07e67 Mon Sep 17 00:00:00 2001
+From 6a2f0c13071618ae8cbf84bff2e659b862e57ecd Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Tue, 26 Apr 2022 15:09:43 -0400
-Subject: [PATCH 2/6] Fix warnings
+Subject: [PATCH 2/7] Fix warnings
 
 ---
  include/uv/win.h    |  5 +++++
@@ -247,5 +247,5 @@ index a5d58bf7..deec66fe 100644
  #include <io.h>
  #include <string.h>
 -- 
-2.20.1.windows.1
+2.36.1
 
