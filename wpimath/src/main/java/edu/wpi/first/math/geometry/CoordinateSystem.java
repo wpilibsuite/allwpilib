@@ -92,7 +92,7 @@ public class CoordinateSystem {
    * @return An instance of the North-West-Up (NWU) coordinate system.
    */
   @SuppressWarnings("MethodName")
-  public static final CoordinateSystem NWU() {
+  public static CoordinateSystem NWU() {
     return m_nwu;
   }
 
@@ -104,7 +104,7 @@ public class CoordinateSystem {
    * @return An instance of the East-Down-North (EDN) coordinate system.
    */
   @SuppressWarnings("MethodName")
-  public static final CoordinateSystem EDN() {
+  public static CoordinateSystem EDN() {
     return m_edn;
   }
 
@@ -116,7 +116,7 @@ public class CoordinateSystem {
    * @return An instance of the North-East-Down (NED) coordinate system.
    */
   @SuppressWarnings("MethodName")
-  public static final CoordinateSystem NED() {
+  public static CoordinateSystem NED() {
     return m_ned;
   }
 
