@@ -8,21 +8,21 @@ from upstream_utils import setup_upstream_repo, comment_out_invalid_includes, wa
 
 
 def main():
-    root, repo = setup_upstream_repo("http://github.com/libuv/libuv", "v1.30.1")
+    root, repo = setup_upstream_repo("https://github.com/libuv/libuv",
+                                     "v1.30.1")
     wpinet = os.path.join(root, "wpinet")
 
-    # yapf: disable
     # Apply patches to original git repo
+    prefix = os.path.join(root, "upstream_utils/libuv_patches")
     am_patches(repo, [
-        os.path.join(root, "upstream_utils/libuv_patches/0001-Fix-missing-casts.patch"),
-        os.path.join(root, "upstream_utils/libuv_patches/0002-Fix-warnings.patch"),
-        os.path.join(root, "upstream_utils/libuv_patches/0003-Preprocessor-cleanup.patch"),
-        os.path.join(root, "upstream_utils/libuv_patches/0004-Cleanup-problematic-language.patch"),
-        os.path.join(root, "upstream_utils/libuv_patches/0005-Use-roborio-time.patch"),
-        os.path.join(root, "upstream_utils/libuv_patches/0006-Style-comments-cleanup.patch"),
-        os.path.join(root, "upstream_utils/libuv_patches/0007-Squelch-GCC-12.1-warnings.patch"),
+        os.path.join(prefix, "0001-Fix-missing-casts.patch"),
+        os.path.join(prefix, "0002-Fix-warnings.patch"),
+        os.path.join(prefix, "0003-Preprocessor-cleanup.patch"),
+        os.path.join(prefix, "0004-Cleanup-problematic-language.patch"),
+        os.path.join(prefix, "0005-Use-roborio-time.patch"),
+        os.path.join(prefix, "0006-Style-comments-cleanup.patch"),
+        os.path.join(prefix, "0007-Squelch-GCC-12.1-warnings.patch"),
     ])
-    # yapf: enable
 
     # Delete old install
     for d in ["src/main/native/thirdparty/libuv"]:
