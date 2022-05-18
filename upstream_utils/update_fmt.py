@@ -3,12 +3,17 @@
 import os
 import shutil
 
-from upstream_utils import setup_upstream_repo, comment_out_invalid_includes, walk_cwd_and_copy_if, apply_patches
+from upstream_utils import setup_upstream_repo, comment_out_invalid_includes, walk_cwd_and_copy_if, am_patches
 
 
 def main():
     root, repo = setup_upstream_repo("https://github.com/fmtlib/fmt", "8.1.1")
     wpiutil = os.path.join(root, "wpiutil")
+
+    # Apply patches to original git repo
+    prefix = os.path.join(root, "upstream_utils/fmt_patches")
+    am_patches(
+        repo, [os.path.join(prefix, "0001-Don-t-throw-on-write-failure.patch")])
 
     # Delete old install
     for d in ["src/main/native/fmtlib/src", "src/main/native/fmtlib/include"]:
@@ -30,9 +35,6 @@ def main():
     for f in include_files:
         comment_out_invalid_includes(
             f, [os.path.join(wpiutil, "src/main/native/fmtlib/include")])
-
-    apply_patches(root,
-                  ["upstream_utils/fmt-dont-throw-on-write-failure.patch"])
 
 
 if __name__ == "__main__":

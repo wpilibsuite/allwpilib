@@ -1,7 +1,16 @@
-diff --git b/wpimath/src/main/native/include/drake/math/discrete_algebraic_riccati_equation.h a/wpimath/src/main/native/include/drake/math/discrete_algebraic_riccati_equation.h
-index df7a58b2b..55b8442bf 100644
---- b/wpimath/src/main/native/include/drake/math/discrete_algebraic_riccati_equation.h
-+++ a/wpimath/src/main/native/include/drake/math/discrete_algebraic_riccati_equation.h
+From 7dfb527524f42488a00cf156ada36c51d5e13b3f Mon Sep 17 00:00:00 2001
+From: Tyler Veness <calcmogul@gmail.com>
+Date: Wed, 18 May 2022 11:15:27 -0700
+Subject: [PATCH 2/2] Add WPILIB_DLLEXPORT to DARE function declarations
+
+---
+ math/discrete_algebraic_riccati_equation.h | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/math/discrete_algebraic_riccati_equation.h b/math/discrete_algebraic_riccati_equation.h
+index df7a58b2b8..55b8442bf4 100644
+--- a/math/discrete_algebraic_riccati_equation.h
++++ b/math/discrete_algebraic_riccati_equation.h
 @@ -4,6 +4,7 @@
  #include <cstdlib>
  
@@ -26,3 +35,6 @@ index df7a58b2b..55b8442bf 100644
  Eigen::MatrixXd DiscreteAlgebraicRiccatiEquation(
      const Eigen::Ref<const Eigen::MatrixXd>& A,
      const Eigen::Ref<const Eigen::MatrixXd>& B,
+-- 
+2.36.1
+

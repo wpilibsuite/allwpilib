@@ -3,13 +3,21 @@
 import os
 import shutil
 
-from upstream_utils import setup_upstream_repo, comment_out_invalid_includes, walk_cwd_and_copy_if, apply_patches
+from upstream_utils import setup_upstream_repo, comment_out_invalid_includes, walk_cwd_and_copy_if, am_patches
 
 
 def main():
     root, repo = setup_upstream_repo("https://github.com/RobotLocomotion/drake",
                                      "v0.37.0")
     wpimath = os.path.join(root, "wpimath")
+
+    prefix = os.path.join(root, "upstream_utils/drake_patches")
+    am_patches(repo, [
+        os.path.join(prefix, "0001-Replace-Eigen-Dense-with-Eigen-Core.patch"),
+        os.path.join(
+            prefix,
+            "0002-Add-WPILIB_DLLEXPORT-to-DARE-function-declarations.patch")
+    ])
 
     # Delete old install
     for d in [
@@ -60,11 +68,6 @@ def main():
             os.path.join(wpimath, "src/main/native/include"),
             os.path.join(wpimath, "src/test/native/include")
         ])
-
-    apply_patches(root, [
-        "upstream_utils/drake-replace-dense-with-core.patch",
-        "upstream_utils/drake-dllexport-dare.patch"
-    ])
 
 
 if __name__ == "__main__":
