@@ -221,7 +221,9 @@ class Command {
   /**
    * Decorates this command to only run if this condition is not met. If the
    * command is already running and the condition changes to true, the command
-   * will not stop running
+   * will not stop running. The requirements of this command will be kept for
+   * the new conditonal command. If this is undesirable consider using the
+   * AsProxy decorator before this.
    *
    * @param condition the condition that will prevent the command from running
    * @return the decorated command
