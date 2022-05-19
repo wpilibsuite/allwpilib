@@ -47,7 +47,7 @@ constexpr endianness system_endianness() {
 
 template <typename value_type>
 inline value_type byte_swap(value_type value, endianness endian) {
-  if constexpr ((endian != native) && (endian != system_endianness()))
+  if ((endian != native) && (endian != system_endianness()))
     sys::swapByteOrder(value);
   return value;
 }

@@ -597,13 +597,13 @@ raw_fd_ostream &wpi::outs() {
   std::error_code EC;
   static raw_fd_ostream* S = new raw_fd_ostream("-", EC, fs::OF_None);
   assert(!EC);
-  return S;
+  return *S;
 }
 
 raw_fd_ostream &wpi::errs() {
   // Set standard error to be unbuffered and tied to outs() by default.
   static raw_fd_ostream* S = new raw_fd_ostream(STDERR_FILENO, false, true);
-  return S;
+  return *S;
 }
 
 /// nulls() - This returns a reference to a raw_ostream which discards output.
