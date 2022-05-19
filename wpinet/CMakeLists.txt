@@ -87,6 +87,7 @@ set(uv_unix_src
     src/main/native/thirdparty/libuv/src/unix/pipe.cpp
     src/main/native/thirdparty/libuv/src/unix/poll.cpp
     src/main/native/thirdparty/libuv/src/unix/process.cpp
+    src/main/native/thirdparty/libuv/src/unix/random-devurandom.cpp
     src/main/native/thirdparty/libuv/src/unix/random-getentropy.cpp
     src/main/native/thirdparty/libuv/src/unix/random-getrandom.cpp
     src/main/native/thirdparty/libuv/src/unix/signal.cpp
@@ -113,7 +114,6 @@ set(uv_linux_src
     src/main/native/thirdparty/libuv/src/unix/linux-syscalls.cpp
     src/main/native/thirdparty/libuv/src/unix/procfs-exepath.cpp
     src/main/native/thirdparty/libuv/src/unix/proctitle.cpp
-    src/main/native/thirdparty/libuv/src/unix/random-devurandom.cpp
     src/main/native/thirdparty/libuv/src/unix/random-sysctl-linux.cpp
 )
 

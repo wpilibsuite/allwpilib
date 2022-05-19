@@ -63,7 +63,9 @@
 
 
 /* A RtlGenRandom() by any other name... */
+extern "C" {
 extern BOOLEAN NTAPI SystemFunction036(PVOID Buffer, ULONG BufferLength);
+}
 
 /* Cached copy of the process title, plus a mutex guarding it. */
 static char *process_title;

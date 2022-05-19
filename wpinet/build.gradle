@@ -51,6 +51,7 @@ ext {
                             'pipe.cpp',
                             'poll.cpp',
                             'process.cpp',
+                            'random-devurandom.cpp',
                             'random-getentropy.cpp',
                             'random-getrandom.cpp',
                             'signal.cpp',
@@ -144,7 +145,6 @@ ext {
                             'linux-syscalls.cpp',
                             'procfs-exepath.cpp',
                             'proctitle.cpp',
-                            'random-devurandom.cpp',
                             'random-sysctl-linux.cpp',
                         ]
                     }

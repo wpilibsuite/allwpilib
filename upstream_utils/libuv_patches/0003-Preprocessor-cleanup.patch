@@ -1,4 +1,4 @@
-From 7112e7093049606d455c017f8d4625ace1d99a94 Mon Sep 17 00:00:00 2001
+From 20120ec8cb9310e243a71fe5bf9bee37eac7614b Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Tue, 26 Apr 2022 15:19:14 -0400
 Subject: [PATCH 3/7] Preprocessor cleanup
@@ -10,9 +10,9 @@ Subject: [PATCH 3/7] Preprocessor cleanup
  src/unix/internal.h |  2 ++
  src/win/fs.c        |  1 +
  src/win/tty.c       |  2 ++
- src/win/util.c      |  6 ++++++
+ src/win/util.c      |  8 ++++++++
  src/win/winsock.c   |  1 +
- 8 files changed, 14 insertions(+), 30 deletions(-)
+ 8 files changed, 16 insertions(+), 30 deletions(-)
 
 diff --git a/include/uv.h b/include/uv.h
 index ee1c94cc..dbaeb1e9 100644
@@ -141,10 +141,18 @@ index f6131d45..54c6c290 100644
  # define InterlockedOr _InterlockedOr
  #endif
 diff --git a/src/win/util.c b/src/win/util.c
-index c655f532..dfa00e8f 100644
+index c655f532..7a5dd2ef 100644
 --- a/src/win/util.c
 +++ b/src/win/util.c
-@@ -69,6 +69,12 @@ extern BOOLEAN NTAPI SystemFunction036(PVOID Buffer, ULONG BufferLength);
+@@ -63,12 +63,20 @@
+ 
+ 
+ /* A RtlGenRandom() by any other name... */
++extern "C" {
+ extern BOOLEAN NTAPI SystemFunction036(PVOID Buffer, ULONG BufferLength);
++}
+ 
+ /* Cached copy of the process title, plus a mutex guarding it. */
  static char *process_title;
  static CRITICAL_SECTION process_title_lock;
  
