@@ -39,8 +39,8 @@ public class CoordinateSystem {
     R.assignBlock(0, 2, positiveZ.m_axis);
 
     // Require that the change of basis matrix is special orthogonal. This is true
-    // if the axes used are orthogonal and normalized. The Axis class already
-    // normalizes itself, so we just need to check for orthogonality.
+    // if the axes used are orthogonal and normalized. The CoordinateAxis class
+    // already normalizes itself, so we just need to check for orthogonality.
     if (!R.times(R.transpose()).equals(Matrix.eye(Nat.N3()))) {
       throw new IllegalArgumentException("Coordinate system isn't special orthogonal");
     }
@@ -118,6 +118,32 @@ public class CoordinateSystem {
   @SuppressWarnings("MethodName")
   public static CoordinateSystem NED() {
     return m_ned;
+  }
+
+  /**
+   * Converts the given translation from one coordinate system to another.
+   *
+   * @param translation The translation to convert.
+   * @param from The coordinate system the pose starts in.
+   * @param to The coordinate system to which to convert.
+   * @return The given translation in the desired coordinate system.
+   */
+  public static Translation3d convert(
+      Translation3d translation, CoordinateSystem from, CoordinateSystem to) {
+    return translation.rotateBy(from.m_rotation.minus(to.m_rotation));
+  }
+
+  /**
+   * Converts the given rotation from one coordinate system to another.
+   *
+   * @param rotation The rotation to convert.
+   * @param from The coordinate system the rotation starts in.
+   * @param to The coordinate system to which to convert.
+   * @return The given rotation in the desired coordinate system.
+   */
+  public static Rotation3d convert(
+      Rotation3d rotation, CoordinateSystem from, CoordinateSystem to) {
+    return rotation.rotateBy(from.m_rotation.minus(to.m_rotation));
   }
 
   /**

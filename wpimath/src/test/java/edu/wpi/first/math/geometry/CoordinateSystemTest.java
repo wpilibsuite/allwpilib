@@ -10,119 +10,124 @@ import edu.wpi.first.math.util.Units;
 import org.junit.jupiter.api.Test;
 
 class CoordinateSystemTest {
+  private void checkConvert(
+      Pose3d poseFrom, Pose3d poseTo, CoordinateSystem coordFrom, CoordinateSystem coordTo) {
+    // "from" to "to"
+    assertEquals(
+        poseTo.getTranslation(),
+        CoordinateSystem.convert(poseFrom.getTranslation(), coordFrom, coordTo));
+    assertEquals(
+        poseTo.getRotation(), CoordinateSystem.convert(poseFrom.getRotation(), coordFrom, coordTo));
+    assertEquals(poseTo, CoordinateSystem.convert(poseFrom, coordFrom, coordTo));
+
+    // "to" to "from"
+    assertEquals(
+        poseFrom.getTranslation(),
+        CoordinateSystem.convert(poseTo.getTranslation(), coordTo, coordFrom));
+    assertEquals(
+        poseFrom.getRotation(), CoordinateSystem.convert(poseTo.getRotation(), coordTo, coordFrom));
+    assertEquals(poseFrom, CoordinateSystem.convert(poseTo, coordTo, coordFrom));
+  }
+
+  @SuppressWarnings("PMD.JUnitTestsShouldIncludeAssert")
   @Test
   void testEDNtoNWU() {
-    var edn1 = new Pose3d(1.0, 2.0, 3.0, new Rotation3d());
-    var nwu1 =
+    // No rotation from EDN to NWU
+    checkConvert(
+        new Pose3d(1.0, 2.0, 3.0, new Rotation3d()),
         new Pose3d(
             3.0,
             -1.0,
             -2.0,
-            new Rotation3d(-Units.degreesToRadians(90.0), 0.0, -Units.degreesToRadians(90.0)));
+            new Rotation3d(Units.degreesToRadians(-90.0), 0.0, Units.degreesToRadians(-90.0))),
+        CoordinateSystem.EDN(),
+        CoordinateSystem.NWU());
 
-    assertEquals(
-        nwu1, CoordinateSystem.convert(edn1, CoordinateSystem.EDN(), CoordinateSystem.NWU()));
-    assertEquals(
-        edn1, CoordinateSystem.convert(nwu1, CoordinateSystem.NWU(), CoordinateSystem.EDN()));
-
-    var edn2 = new Pose3d(1.0, 2.0, 3.0, new Rotation3d(Units.degreesToRadians(45.0), 0.0, 0.0));
-    var nwu2 =
+    // 45° roll from EDN to NWU
+    checkConvert(
+        new Pose3d(1.0, 2.0, 3.0, new Rotation3d(Units.degreesToRadians(45.0), 0.0, 0.0)),
         new Pose3d(
             3.0,
             -1.0,
             -2.0,
-            new Rotation3d(-Units.degreesToRadians(45.0), 0.0, -Units.degreesToRadians(90.0)));
+            new Rotation3d(Units.degreesToRadians(-45.0), 0.0, Units.degreesToRadians(-90.0))),
+        CoordinateSystem.EDN(),
+        CoordinateSystem.NWU());
 
-    assertEquals(
-        nwu2, CoordinateSystem.convert(edn2, CoordinateSystem.EDN(), CoordinateSystem.NWU()));
-    assertEquals(
-        edn2, CoordinateSystem.convert(nwu2, CoordinateSystem.NWU(), CoordinateSystem.EDN()));
-
-    var edn3 = new Pose3d(1.0, 2.0, 3.0, new Rotation3d(0.0, Units.degreesToRadians(45.0), 0.0));
-    var nwu3 =
+    // 45° pitch from EDN to NWU
+    checkConvert(
+        new Pose3d(1.0, 2.0, 3.0, new Rotation3d(0.0, Units.degreesToRadians(45.0), 0.0)),
         new Pose3d(
             3.0,
             -1.0,
             -2.0,
-            new Rotation3d(-Units.degreesToRadians(90.0), 0.0, -Units.degreesToRadians(135.0)));
+            new Rotation3d(Units.degreesToRadians(-90.0), 0.0, Units.degreesToRadians(-135.0))),
+        CoordinateSystem.EDN(),
+        CoordinateSystem.NWU());
 
-    assertEquals(
-        nwu3, CoordinateSystem.convert(edn3, CoordinateSystem.EDN(), CoordinateSystem.NWU()));
-    assertEquals(
-        edn3, CoordinateSystem.convert(nwu3, CoordinateSystem.NWU(), CoordinateSystem.EDN()));
-
-    var edn4 = new Pose3d(1.0, 2.0, 3.0, new Rotation3d(0.0, 0.0, Units.degreesToRadians(45.0)));
-    var nwu4 =
+    // 45° yaw from EDN to NWU
+    checkConvert(
+        new Pose3d(1.0, 2.0, 3.0, new Rotation3d(0.0, 0.0, Units.degreesToRadians(45.0))),
         new Pose3d(
             3.0,
             -1.0,
             -2.0,
             new Rotation3d(
-                -Units.degreesToRadians(90.0),
+                Units.degreesToRadians(-90.0),
                 Units.degreesToRadians(45.0),
-                -Units.degreesToRadians(90.0)));
-
-    assertEquals(
-        nwu4, CoordinateSystem.convert(edn4, CoordinateSystem.EDN(), CoordinateSystem.NWU()));
-    assertEquals(
-        edn4, CoordinateSystem.convert(nwu4, CoordinateSystem.NWU(), CoordinateSystem.EDN()));
+                Units.degreesToRadians(-90.0))),
+        CoordinateSystem.EDN(),
+        CoordinateSystem.NWU());
   }
 
+  @SuppressWarnings("PMD.JUnitTestsShouldIncludeAssert")
   @Test
   void testEDNtoNED() {
-    var edn1 = new Pose3d(1.0, 2.0, 3.0, new Rotation3d());
-    var ned1 =
+    // No rotation from EDN to NED
+    checkConvert(
+        new Pose3d(1.0, 2.0, 3.0, new Rotation3d()),
         new Pose3d(
             3.0,
             1.0,
             2.0,
-            new Rotation3d(Units.degreesToRadians(90.0), 0.0, Units.degreesToRadians(90.0)));
+            new Rotation3d(Units.degreesToRadians(90.0), 0.0, Units.degreesToRadians(90.0))),
+        CoordinateSystem.EDN(),
+        CoordinateSystem.NED());
 
-    assertEquals(
-        ned1, CoordinateSystem.convert(edn1, CoordinateSystem.EDN(), CoordinateSystem.NED()));
-    assertEquals(
-        edn1, CoordinateSystem.convert(ned1, CoordinateSystem.NED(), CoordinateSystem.EDN()));
-
-    var edn2 = new Pose3d(1.0, 2.0, 3.0, new Rotation3d(Units.degreesToRadians(45.0), 0.0, 0.0));
-    var ned2 =
+    // 45° roll from EDN to NED
+    checkConvert(
+        new Pose3d(1.0, 2.0, 3.0, new Rotation3d(Units.degreesToRadians(45.0), 0.0, 0.0)),
         new Pose3d(
             3.0,
             1.0,
             2.0,
-            new Rotation3d(Units.degreesToRadians(135.0), 0.0, Units.degreesToRadians(90.0)));
+            new Rotation3d(Units.degreesToRadians(135.0), 0.0, Units.degreesToRadians(90.0))),
+        CoordinateSystem.EDN(),
+        CoordinateSystem.NED());
 
-    assertEquals(
-        ned2, CoordinateSystem.convert(edn2, CoordinateSystem.EDN(), CoordinateSystem.NED()));
-    assertEquals(
-        edn2, CoordinateSystem.convert(ned2, CoordinateSystem.NED(), CoordinateSystem.EDN()));
-
-    var edn3 = new Pose3d(1.0, 2.0, 3.0, new Rotation3d(0.0, Units.degreesToRadians(45.0), 0.0));
-    var ned3 =
+    // 45° pitch from EDN to NED
+    checkConvert(
+        new Pose3d(1.0, 2.0, 3.0, new Rotation3d(0.0, Units.degreesToRadians(45.0), 0.0)),
         new Pose3d(
             3.0,
             1.0,
             2.0,
-            new Rotation3d(Units.degreesToRadians(90.0), 0.0, Units.degreesToRadians(135.0)));
+            new Rotation3d(Units.degreesToRadians(90.0), 0.0, Units.degreesToRadians(135.0))),
+        CoordinateSystem.EDN(),
+        CoordinateSystem.NED());
 
-    assertEquals(
-        ned3, CoordinateSystem.convert(edn3, CoordinateSystem.EDN(), CoordinateSystem.NED()));
-    assertEquals(
-        edn3, CoordinateSystem.convert(ned3, CoordinateSystem.NED(), CoordinateSystem.EDN()));
-
-    var edn4 = new Pose3d(1.0, 2.0, 3.0, new Rotation3d(0.0, 0.0, Units.degreesToRadians(45.0)));
-    var ned4 =
+    // 45° yaw from EDN to NED
+    checkConvert(
+        new Pose3d(1.0, 2.0, 3.0, new Rotation3d(0.0, 0.0, Units.degreesToRadians(45.0))),
         new Pose3d(
             3.0,
             1.0,
             2.0,
             new Rotation3d(
                 Units.degreesToRadians(90.0),
-                -Units.degreesToRadians(45.0),
-                Units.degreesToRadians(90.0)));
-
-    assertEquals(
-        ned4, CoordinateSystem.convert(edn4, CoordinateSystem.EDN(), CoordinateSystem.NED()));
-    assertEquals(
-        edn4, CoordinateSystem.convert(ned4, CoordinateSystem.NED(), CoordinateSystem.EDN()));
+                Units.degreesToRadians(-45.0),
+                Units.degreesToRadians(90.0))),
+        CoordinateSystem.EDN(),
+        CoordinateSystem.NED());
   }
 }
