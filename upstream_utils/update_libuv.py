@@ -9,7 +9,7 @@ from upstream_utils import setup_upstream_repo, comment_out_invalid_includes, wa
 
 def main():
     root, repo = setup_upstream_repo("https://github.com/libuv/libuv",
-                                     "v1.30.1")
+                                     "v1.44.1")
     wpinet = os.path.join(root, "wpinet")
 
     # Apply patches to original git repo
@@ -43,11 +43,16 @@ def main():
         "aix-common.c",
         "aix.c",
         "bsd-proctitle.c",
+        "darwin-stub.c",
         "haiku.c",
+        "hurd.c",
+        "os390-proctitle.c",
         "os390-syscalls.c",
         "os390-syscalls.h",
         "os390.c",
+        "qnx.c",
         "sunos.c",
+        "sysinfo-loadavg.c",
         "sysinfo-memory.c",
     ]
     src_files = walk_cwd_and_copy_if(

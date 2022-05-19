@@ -36,10 +36,6 @@ UV_UNUSED(static int cmpxchgi(int* ptr, int oldval, int newval)) {
                         : "r" (newval), "0" (oldval)
                         : "memory");
   return out;
-#elif defined(_AIX) && defined(__xlC__)
-  const int out = (*(volatile int*) ptr);
-  __compare_and_swap(ptr, &oldval, newval);
-  return out;
 #elif defined(__MVS__)
   unsigned int op4;
   if (__plo_CSST(ptr, (unsigned int*) &oldval, newval,
@@ -56,7 +52,11 @@ UV_UNUSED(static int cmpxchgi(int* ptr, int oldval, int newval)) {
 
 UV_UNUSED(static void cpu_relax(void)) {
 #if defined(__i386__) || defined(__x86_64__)
-  __asm__ __volatile__ ("rep; nop");  /* a.k.a. PAUSE */
+  __asm__ __volatile__ ("rep; nop" ::: "memory");  /* a.k.a. PAUSE */
+#elif (defined(__arm__) && __ARM_ARCH >= 7) || defined(__aarch64__)
+  __asm__ __volatile__ ("yield" ::: "memory");
+#elif defined(__powerpc64__) || defined(__ppc64__) || defined(__PPC64__)
+  __asm__ __volatile__ ("or 1,1,1; or 2,2,2" ::: "memory");
 #endif
 }
 

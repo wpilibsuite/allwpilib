@@ -1,22 +1,21 @@
-From b2ce6f41afa612eb31a8c8ac3e5f23783fb81d5f Mon Sep 17 00:00:00 2001
+From 20120ec8cb9310e243a71fe5bf9bee37eac7614b Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Tue, 26 Apr 2022 15:19:14 -0400
 Subject: [PATCH 3/7] Preprocessor cleanup
 
 ---
  include/uv.h        | 18 +-----------------
- include/uv/unix.h   |  6 ------
+ include/uv/unix.h   |  8 --------
  include/uv/win.h    |  6 +-----
- src/unix/internal.h |  4 ++++
- src/unix/poll.c     |  5 +++--
+ src/unix/internal.h |  2 ++
  src/win/fs.c        |  1 +
  src/win/tty.c       |  2 ++
- src/win/util.c      |  6 ++++++
+ src/win/util.c      |  8 ++++++++
  src/win/winsock.c   |  1 +
- 9 files changed, 19 insertions(+), 30 deletions(-)
+ 8 files changed, 16 insertions(+), 30 deletions(-)
 
 diff --git a/include/uv.h b/include/uv.h
-index f97801ce..ccf62c8f 100644
+index ee1c94cc..dbaeb1e9 100644
 --- a/include/uv.h
 +++ b/include/uv.h
 @@ -23,9 +23,6 @@
@@ -27,9 +26,9 @@ index f97801ce..ccf62c8f 100644
 -extern "C" {
 -#endif
  
- #ifdef _WIN32
-   /* Windows - set up dll import/export decorators. */
-@@ -50,11 +47,7 @@ extern "C" {
+ #if defined(BUILDING_UV_SHARED) && defined(USING_UV_SHARED)
+ #error "Define either BUILDING_UV_SHARED or USING_UV_SHARED, not both."
+@@ -56,11 +53,7 @@ extern "C" {
  #include <stddef.h>
  #include <stdio.h>
  
@@ -42,9 +41,9 @@ index f97801ce..ccf62c8f 100644
  
  #if defined(_WIN32)
  # include "uv/win.h"
-@@ -692,16 +685,10 @@ UV_EXTERN int uv_tty_set_mode(uv_tty_t*, uv_tty_mode_t mode);
- UV_EXTERN int uv_tty_reset_mode(void);
- UV_EXTERN int uv_tty_get_winsize(uv_tty_t*, int* width, int* height);
+@@ -767,16 +760,10 @@ UV_EXTERN int uv_tty_get_winsize(uv_tty_t*, int* width, int* height);
+ UV_EXTERN void uv_tty_set_vterm_state(uv_tty_vtermstate_t state);
+ UV_EXTERN int uv_tty_get_vterm_state(uv_tty_vtermstate_t* state);
  
 -#ifdef __cplusplus
 -extern "C++" {
@@ -59,7 +58,7 @@ index f97801ce..ccf62c8f 100644
  UV_EXTERN uv_handle_type uv_guess_handle(uv_file file);
  
  /*
-@@ -1693,7 +1680,4 @@ UV_EXTERN void uv_loop_set_data(uv_loop_t*, void* data);
+@@ -1844,7 +1831,4 @@ UV_EXTERN void uv_loop_set_data(uv_loop_t*, void* data);
  #undef UV_LOOP_PRIVATE_PLATFORM_FIELDS
  #undef UV__ERR
  
@@ -68,15 +67,17 @@ index f97801ce..ccf62c8f 100644
 -#endif
  #endif /* UV_H */
 diff --git a/include/uv/unix.h b/include/uv/unix.h
-index a647593a..504bab7c 100644
+index 420be86c..256fef37 100644
 --- a/include/uv/unix.h
 +++ b/include/uv/unix.h
-@@ -47,12 +47,6 @@
+@@ -47,14 +47,6 @@
  
  #if defined(__linux__)
  # include "uv/linux.h"
 -#elif defined (__MVS__)
 -# include "uv/os390.h"
+-#elif defined(__PASE__)  /* __PASE__ and _AIX are both defined on IBM i */
+-# include "uv/posix.h"  /* IBM i needs uv/posix.h, not uv/aix.h */
 -#elif defined(_AIX)
 -# include "uv/aix.h"
 -#elif defined(__sun)
@@ -85,10 +86,10 @@ index a647593a..504bab7c 100644
  # include "uv/darwin.h"
  #elif defined(__DragonFly__)       || \
 diff --git a/include/uv/win.h b/include/uv/win.h
-index 354e0989..ca5242f7 100644
+index fe36a532..7b013173 100644
 --- a/include/uv/win.h
 +++ b/include/uv/win.h
-@@ -53,11 +53,7 @@ typedef struct pollfd {
+@@ -60,11 +60,7 @@ typedef struct pollfd {
  #include <fcntl.h>
  #include <sys/stat.h>
  
@@ -102,22 +103,10 @@ index 354e0989..ca5242f7 100644
  #include "uv/tree.h"
  #include "uv/threadpool.h"
 diff --git a/src/unix/internal.h b/src/unix/internal.h
-index 2db30350..13ca2e63 100644
+index 5a867db7..7e1d408f 100644
 --- a/src/unix/internal.h
 +++ b/src/unix/internal.h
-@@ -168,9 +168,11 @@ struct uv__stream_queued_fds_s {
-     defined(__NetBSD__)
- #define uv__cloexec uv__cloexec_ioctl
- #define uv__nonblock uv__nonblock_ioctl
-+#define UV__NONBLOCK_IS_IOCTL
- #else
- #define uv__cloexec uv__cloexec_fcntl
- #define uv__nonblock uv__nonblock_fcntl
-+#define UV__NONBLOCK_IS_FCNTL
- #endif
- 
- /* On Linux, uv__nonblock_fcntl() and uv__nonblock_ioctl() do not commute
-@@ -183,6 +185,8 @@ struct uv__stream_queued_fds_s {
+@@ -192,6 +192,8 @@ struct uv__stream_queued_fds_s {
  #if defined(__linux__) && O_NDELAY != O_NONBLOCK
  #undef uv__nonblock
  #define uv__nonblock uv__nonblock_fcntl
@@ -126,37 +115,20 @@ index 2db30350..13ca2e63 100644
  #endif
  
  /* core */
-diff --git a/src/unix/poll.c b/src/unix/poll.c
-index 3d5022b2..d578611e 100644
---- a/src/unix/poll.c
-+++ b/src/unix/poll.c
-@@ -79,9 +79,10 @@ int uv_poll_init(uv_loop_t* loop, uv_poll_t* handle, int fd) {
-    * Workaround for e.g. kqueue fds not supporting ioctls.
-    */
-   err = uv__nonblock(fd, 1);
-+#ifdef UV__NONBLOCK_IS_IOCTL
-   if (err == UV_ENOTTY)
--    if (uv__nonblock == uv__nonblock_ioctl)
--      err = uv__nonblock_fcntl(fd, 1);
-+    err = uv__nonblock_fcntl(fd, 1);
-+#endif
- 
-   if (err)
-     return err;
 diff --git a/src/win/fs.c b/src/win/fs.c
-index 5434698b..6b9e37b0 100644
+index f71b3c04..71c9b169 100644
 --- a/src/win/fs.c
 +++ b/src/win/fs.c
-@@ -39,6 +39,7 @@
- 
- #include <wincrypt.h>
+@@ -38,6 +38,7 @@
+ #include "handle-inl.h"
+ #include "fs-fd-hash-inl.h"
  
 +#pragma comment(lib, "Advapi32.lib")
  
  #define UV_FS_FREE_PATHS         0x0002
  #define UV_FS_FREE_PTR           0x0008
 diff --git a/src/win/tty.c b/src/win/tty.c
-index deec66fe..e4d7ac96 100644
+index f6131d45..54c6c290 100644
 --- a/src/win/tty.c
 +++ b/src/win/tty.c
 @@ -42,6 +42,8 @@
@@ -169,10 +141,18 @@ index deec66fe..e4d7ac96 100644
  # define InterlockedOr _InterlockedOr
  #endif
 diff --git a/src/win/util.c b/src/win/util.c
-index d1cd19ba..b5afb1d8 100644
+index c655f532..7a5dd2ef 100644
 --- a/src/win/util.c
 +++ b/src/win/util.c
-@@ -67,6 +67,12 @@
+@@ -63,12 +63,20 @@
+ 
+ 
+ /* A RtlGenRandom() by any other name... */
++extern "C" {
+ extern BOOLEAN NTAPI SystemFunction036(PVOID Buffer, ULONG BufferLength);
++}
+ 
+ /* Cached copy of the process title, plus a mutex guarding it. */
  static char *process_title;
  static CRITICAL_SECTION process_title_lock;
  
@@ -182,11 +162,11 @@ index d1cd19ba..b5afb1d8 100644
 +#pragma comment(lib, "Userenv.lib")
 +#pragma comment(lib, "kernel32.lib")
 +
- /* Interval (in seconds) of the high-resolution clock. */
- static double hrtime_interval_ = 0;
+ /* Frequency of the high-resolution clock. */
+ static uint64_t hrtime_frequency_ = 0;
  
 diff --git a/src/win/winsock.c b/src/win/winsock.c
-index 5820ba9c..918acaf5 100644
+index a68b0953..7843e9f1 100644
 --- a/src/win/winsock.c
 +++ b/src/win/winsock.c
 @@ -25,6 +25,7 @@

@@ -51,6 +51,9 @@ ext {
                             'pipe.cpp',
                             'poll.cpp',
                             'process.cpp',
+                            'random-devurandom.cpp',
+                            'random-getentropy.cpp',
+                            'random-getrandom.cpp',
                             'signal.cpp',
                             'stream.cpp',
                             'tcp.cpp',
@@ -136,12 +139,13 @@ ext {
                     source {
                         srcDirs 'src/main/native/thirdparty/libuv/src/unix'
                         includes = [
+                            'epoll.cpp',
                             'linux-core.cpp',
                             'linux-inotify.cpp',
                             'linux-syscalls.cpp',
                             'procfs-exepath.cpp',
                             'proctitle.cpp',
-                            'sysinfo-loadavg.cpp',
+                            'random-sysctl-linux.cpp',
                         ]
                     }
                     exportedHeaders {

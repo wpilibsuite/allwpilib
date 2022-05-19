@@ -34,6 +34,7 @@ sNtSetInformationFile pNtSetInformationFile;
 sNtQueryVolumeInformationFile pNtQueryVolumeInformationFile;
 sNtQueryDirectoryFile pNtQueryDirectoryFile;
 sNtQuerySystemInformation pNtQuerySystemInformation;
+sNtQueryInformationProcess pNtQueryInformationProcess;
 
 /* Kernel32 function pointers */
 sGetQueuedCompletionStatusEx pGetQueuedCompletionStatusEx;
@@ -44,12 +45,15 @@ sPowerRegisterSuspendResumeNotification pPowerRegisterSuspendResumeNotification;
 /* User32.dll function pointer */
 sSetWinEventHook pSetWinEventHook;
 
+/* ws2_32.dll function pointer */
+uv_sGetHostNameW pGetHostNameW;
 
-void uv_winapi_init(void) {
+void uv__winapi_init(void) {
   HMODULE ntdll_module;
   HMODULE powrprof_module;
   HMODULE user32_module;
   HMODULE kernel32_module;
+  HMODULE ws2_32_module;
 
   ntdll_module = GetModuleHandleA("ntdll.dll");
   if (ntdll_module == NULL) {
@@ -106,6 +110,13 @@ void uv_winapi_init(void) {
     uv_fatal_error(GetLastError(), "GetProcAddress");
   }
 
+  pNtQueryInformationProcess = (sNtQueryInformationProcess) GetProcAddress(
+      ntdll_module,
+      "NtQueryInformationProcess");
+  if (pNtQueryInformationProcess == NULL) {
+    uv_fatal_error(GetLastError(), "GetProcAddress");
+  }
+
   kernel32_module = GetModuleHandleA("kernel32.dll");
   if (kernel32_module == NULL) {
     uv_fatal_error(GetLastError(), "GetModuleHandleA");
@@ -115,16 +126,22 @@ void uv_winapi_init(void) {
       kernel32_module,
       "GetQueuedCompletionStatusEx");
 
-  powrprof_module = LoadLibraryA("powrprof.dll");
+  powrprof_module = LoadLibraryExA("powrprof.dll", NULL, LOAD_LIBRARY_SEARCH_SYSTEM32);
   if (powrprof_module != NULL) {
     pPowerRegisterSuspendResumeNotification = (sPowerRegisterSuspendResumeNotification)
       GetProcAddress(powrprof_module, "PowerRegisterSuspendResumeNotification");
   }
 
-  user32_module = LoadLibraryA("user32.dll");
+  user32_module = GetModuleHandleA("user32.dll");
   if (user32_module != NULL) {
     pSetWinEventHook = (sSetWinEventHook)
       GetProcAddress(user32_module, "SetWinEventHook");
   }
 
+  ws2_32_module = GetModuleHandleA("ws2_32.dll");
+  if (ws2_32_module != NULL) {
+    pGetHostNameW = (uv_sGetHostNameW) GetProcAddress(
+        ws2_32_module,
+        "GetHostNameW");
+  }
 }
