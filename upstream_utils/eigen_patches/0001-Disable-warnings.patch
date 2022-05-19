@@ -1,4 +1,4 @@
-From 6257b7a01bb498bd895e27146528f9362152e447 Mon Sep 17 00:00:00 2001
+From bfd3aa822ff70908c44ad2880b91d9a8dbc1ce7e Mon Sep 17 00:00:00 2001
 From: Tyler Veness <calcmogul@gmail.com>
 Date: Wed, 18 May 2022 09:14:24 -0700
 Subject: [PATCH] Disable warnings
@@ -8,14 +8,14 @@ Subject: [PATCH] Disable warnings
  1 file changed, 8 insertions(+)
 
 diff --git a/Eigen/src/Core/util/DisableStupidWarnings.h b/Eigen/src/Core/util/DisableStupidWarnings.h
-index fe0cfec0b..f489c3add 100755
+index fe0cfec0b..9e8a0e7a9 100755
 --- a/Eigen/src/Core/util/DisableStupidWarnings.h
 +++ b/Eigen/src/Core/util/DisableStupidWarnings.h
 @@ -71,6 +71,14 @@
      // See: https://gcc.gnu.org/bugzilla/show_bug.cgi?id=89325
      #pragma GCC diagnostic ignored "-Wattributes"
    #endif
-+  #if __GNUC__==11
++  #if __GNUC__>=11
 +    // This warning is a false positive
 +    #pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
 +  #endif
