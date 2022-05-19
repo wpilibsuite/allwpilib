@@ -1,7 +1,7 @@
-From d920c2cc4ab268f4c8bf04db961131c5330d5b12 Mon Sep 17 00:00:00 2001
+From 07c6faa1892da24f3b88e9071baa5724f1f2721e Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Sat, 7 May 2022 23:07:38 -0400
-Subject: [PATCH 11/29] Remove allocator from collections
+Subject: [PATCH 11/31] Remove allocator from collections
 
 ---
  llvm/include/llvm/ADT/StringMap.h      | 33 +++++++-------------------

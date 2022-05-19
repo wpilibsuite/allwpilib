@@ -1,7 +1,7 @@
-From c1d77066abd34a9df47d4ccb0058de314707b1b0 Mon Sep 17 00:00:00 2001
+From ed6c3fca21055aa50949424ecd1a65dd071294d0 Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Tue, 3 May 2022 22:50:24 -0400
-Subject: [PATCH 20/29] Add lerp and sgn
+Subject: [PATCH 20/31] Add lerp and sgn
 
 ---
  llvm/include/llvm/Support/MathExtras.h | 20 ++++++++++++++++++++

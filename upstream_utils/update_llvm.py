@@ -187,6 +187,9 @@ def main():
         os.path.join(patch_root, "0027-Add-convienence-feature-to-SmallString.patch"),
         os.path.join(patch_root, "0028-OS-specific-changes.patch"),
         os.path.join(patch_root, "0029-Use-smallvector-for-UTF-conversion.patch"),
+        os.path.join(patch_root, "0030-Prefer-to-use-static-pointers-in-raw_ostream.patch"),
+        os.path.join(patch_root, "0031-constexpr-endian-byte-swap.patch"),
+
     ]
     # yapf: enable
     am_patches(repo, frontend_patches, use_threeway=True)

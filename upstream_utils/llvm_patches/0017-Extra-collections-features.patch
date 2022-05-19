@@ -1,7 +1,7 @@
-From f08984485aa4df8284e094da22e3283d202be515 Mon Sep 17 00:00:00 2001
+From bad1c79ba908476793b16156441e86d25e2c2ddd Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Tue, 3 May 2022 22:16:10 -0400
-Subject: [PATCH 17/29] Extra collections features
+Subject: [PATCH 17/31] Extra collections features
 
 ---
  llvm/include/llvm/ADT/StringMap.h | 103 +++++++++++++++++++++++++++++-

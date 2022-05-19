@@ -1,7 +1,7 @@
-From ee353839ad369bbc36eff39a3f40f3e2877d5db7 Mon Sep 17 00:00:00 2001
+From 792be2e38ef8819824cc1a009e90f2e7eda70952 Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Mon, 9 May 2022 00:04:30 -0400
-Subject: [PATCH 29/29] Use smallvector for UTF conversion
+Subject: [PATCH 29/31] Use smallvector for UTF conversion
 
 ---
  llvm/include/llvm/Support/ConvertUTF.h    |  6 +++---

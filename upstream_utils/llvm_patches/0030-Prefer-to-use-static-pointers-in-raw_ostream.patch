@@ -1,0 +1,34 @@
+From b135735d7470eea869a867e7a9db3c9482e94306 Mon Sep 17 00:00:00 2001
+From: PJ Reiniger <pj.reiniger@gmail.com>
+Date: Thu, 19 May 2022 00:58:36 -0400
+Subject: [PATCH 30/31] Prefer to use static pointers in raw_ostream
+
+See #1401
+---
+ llvm/lib/Support/raw_ostream.cpp | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/llvm/lib/Support/raw_ostream.cpp b/llvm/lib/Support/raw_ostream.cpp
+index 6fa250a68ed8..b4cdf6a5ccb5 100644
+--- a/llvm/lib/Support/raw_ostream.cpp
++++ b/llvm/lib/Support/raw_ostream.cpp
+@@ -601,14 +601,14 @@ void raw_fd_ostream::anchor() {}
+ raw_fd_ostream &llvm::outs() {
+   // Set buffer settings to model stdout behavior.
+   std::error_code EC;
+-  static raw_fd_ostream S("-", EC, sys::fs::OF_None);
++  static raw_fd_ostream* S = new raw_fd_ostream("-", EC, sys::fs::OF_None);
+   assert(!EC);
+   return S;
+ }
+ 
+ raw_fd_ostream &llvm::errs() {
+   // Set standard error to be unbuffered and tied to outs() by default.
+-  static raw_fd_ostream S(STDERR_FILENO, false, true);
++  static raw_fd_ostream* S = new raw_fd_ostream(STDERR_FILENO, false, true);
+   return S;
+ }
+ 
+-- 
+2.20.1.windows.1
+

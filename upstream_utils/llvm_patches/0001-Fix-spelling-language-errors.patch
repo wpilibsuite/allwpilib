@@ -1,7 +1,7 @@
-From 5da51d0f9118dc28cab5e7f6ac87bab42b4dd84d Mon Sep 17 00:00:00 2001
+From ae2ea746f9e0f5a3846f8963a3a3887f93fc7913 Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Sat, 7 May 2022 20:50:26 -0400
-Subject: [PATCH 01/29] Fix spelling / language errors
+Subject: [PATCH 01/31] Fix spelling / language errors
 
 ---
  llvm/include/llvm/Support/Chrono.h        | 2 +-

@@ -1,7 +1,7 @@
-From 02b022a267aa5ae8a0a05f64c0a43fdc52b92447 Mon Sep 17 00:00:00 2001
+From ab72fc29ad6fafaa48a1e175805806f0170214bd Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Sat, 7 May 2022 22:28:13 -0400
-Subject: [PATCH 07/29] #ifdef guard safety
+Subject: [PATCH 07/31] #ifdef guard safety
 
 Prevents redefinition if someone is pulling in real LLVM, since the macros are in global namespace
 ---

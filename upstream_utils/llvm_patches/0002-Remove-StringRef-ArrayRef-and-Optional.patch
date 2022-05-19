@@ -1,7 +1,7 @@
-From 19f7f03cf69f4b3965e55b3a5ad33249bf52e2d2 Mon Sep 17 00:00:00 2001
+From 1f4c6492e907f3f903a43aff7eeaac0983be8dc3 Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Sat, 7 May 2022 22:09:18 -0400
-Subject: [PATCH 02/29] Remove StringRef, ArrayRef, and Optional
+Subject: [PATCH 02/31] Remove StringRef, ArrayRef, and Optional
 
 ---
  llvm/include/llvm/ADT/SmallSet.h              | 12 +--

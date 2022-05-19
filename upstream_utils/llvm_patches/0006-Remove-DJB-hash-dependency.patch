@@ -1,7 +1,7 @@
-From 01bbb28bc197058393ac1d34a03fc8949e8bc1e3 Mon Sep 17 00:00:00 2001
+From faf1a72e9607c4b42b8349b06fe8345ccec6b97b Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Sat, 7 May 2022 22:24:34 -0400
-Subject: [PATCH 06/29] Remove DJB hash dependency
+Subject: [PATCH 06/31] Remove DJB hash dependency
 
 ---
  llvm/lib/Support/StringMap.cpp | 21 ++++++++++++++++++---

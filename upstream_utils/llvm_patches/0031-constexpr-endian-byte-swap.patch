@@ -1,0 +1,36 @@
+From a8e9560bc9eed0380f250857929512d83bc36e06 Mon Sep 17 00:00:00 2001
+From: PJ Reiniger <pj.reiniger@gmail.com>
+Date: Thu, 19 May 2022 01:12:41 -0400
+Subject: [PATCH 31/31] constexpr endian byte swap
+
+---
+ llvm/include/llvm/Support/Endian.h | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
+
+diff --git a/llvm/include/llvm/Support/Endian.h b/llvm/include/llvm/Support/Endian.h
+index 5e7c1e961b9d..fe557f625d7d 100644
+--- a/llvm/include/llvm/Support/Endian.h
++++ b/llvm/include/llvm/Support/Endian.h
+@@ -47,7 +47,7 @@ constexpr endianness system_endianness() {
+ 
+ template <typename value_type>
+ inline value_type byte_swap(value_type value, endianness endian) {
+-  if ((endian != native) && (endian != system_endianness()))
++  if constexpr ((endian != native) && (endian != system_endianness()))
+     sys::swapByteOrder(value);
+   return value;
+ }
+@@ -55,7 +55,9 @@ inline value_type byte_swap(value_type value, endianness endian) {
+ /// Swap the bytes of value to match the given endianness.
+ template<typename value_type, endianness endian>
+ inline value_type byte_swap(value_type value) {
+-  return byte_swap(value, endian);
++  if constexpr ((endian != native) && (endian != system_endianness()))
++    sys::swapByteOrder(value);
++  return value;
+ }
+ 
+ /// Read a value of a particular endianness from memory.
+-- 
+2.20.1.windows.1
+

@@ -1,7 +1,7 @@
-From 938e3e0ae42783f2d815e647fefa98c7f0cde75b Mon Sep 17 00:00:00 2001
+From ab5d9430bff78b0b8a99b97530d03e3976789ce2 Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Sun, 8 May 2022 16:38:11 -0400
-Subject: [PATCH 21/29] Fixup includes
+Subject: [PATCH 21/31] Fixup includes
 
 ---
  llvm/include/llvm/ADT/StringMap.h                 |  5 ++++-
