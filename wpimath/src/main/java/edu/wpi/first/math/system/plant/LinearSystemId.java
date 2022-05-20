@@ -211,7 +211,7 @@ public final class LinearSystemId {
   }
 
   /**
-   * Identify a velocity system from it's kV (volts/(unit/sec)) and kA (volts/(unit/sec^2). These
+   * Identify a velocity system from it's kV (volts/(unit/sec)) and kA (volts/(unit/sec²). These
    * constants cam be found using SysId. The states of the system are [velocity], inputs are
    * [voltage], and outputs are [velocity].
    *
@@ -241,7 +241,7 @@ public final class LinearSystemId {
   }
 
   /**
-   * Identify a position system from it's kV (volts/(unit/sec)) and kA (volts/(unit/sec^2). These
+   * Identify a position system from it's kV (volts/(unit/sec)) and kA (volts/(unit/sec²). These
    * constants cam be found using SysId. The states of the system are [position, velocity]ᵀ, inputs
    * are [voltage], and outputs are [position].
    *
@@ -272,8 +272,8 @@ public final class LinearSystemId {
 
   /**
    * Identify a standard differential drive drivetrain, given the drivetrain's kV and kA in both
-   * linear (volts/(meter/sec) and volts/(meter/sec^2)) and angular (volts/(meter/sec) and
-   * volts/(meter/sec^2)) cases. This can be found using SysId. The states of the system are [left
+   * linear (volts/(meter/sec) and volts/(meter/sec²)) and angular (volts/(meter/sec) and
+   * volts/(meter/sec²)) cases. This can be found using SysId. The states of the system are [left
    * velocity, right velocity]ᵀ, inputs are [left voltage, right voltage]ᵀ, and outputs are [left
    * velocity, right velocity]ᵀ.
    *
@@ -316,8 +316,8 @@ public final class LinearSystemId {
 
   /**
    * Identify a standard differential drive drivetrain, given the drivetrain's kV and kA in both
-   * linear (volts/(meter/sec) and volts/(meter/sec^2)) and angular (volts/(radian/sec) and
-   * volts/(radian/sec^2)) cases. This can be found using SysId. The states of the system are [left
+   * linear (volts/(meter/sec) and volts/(meter/sec²)) and angular (volts/(radian/sec) and
+   * volts/(radian/sec²)) cases. This can be found using SysId. The states of the system are [left
    * velocity, right velocity]ᵀ, inputs are [left voltage, right voltage]ᵀ, and outputs are [left
    * velocity, right velocity]ᵀ.
    *

@@ -46,7 +46,7 @@ Trajectory::State Trajectory::State::Interpolate(State endValue,
   const units::meters_per_second_t newV = velocity + (acceleration * deltaT);
 
   // Calculate the change in position.
-  // delta_s = v_0 t + 0.5 at^2
+  // delta_s = v_0 t + 0.5at²
   const units::meter_t newS =
       (velocity * deltaT + 0.5 * acceleration * deltaT * deltaT) *
       (reversing ? -1.0 : 1.0);
