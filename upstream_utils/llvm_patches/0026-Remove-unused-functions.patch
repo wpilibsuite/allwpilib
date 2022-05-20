@@ -1,0 +1,266 @@
+From 7bac24e5310d67d6828b687aec2043966a955093 Mon Sep 17 00:00:00 2001
+From: PJ Reiniger <pj.reiniger@gmail.com>
+Date: Sun, 8 May 2022 19:16:51 -0400
+Subject: [PATCH 26/31] Remove unused functions
+
+---
+ llvm/include/llvm/Support/raw_ostream.h |  3 +-
+ llvm/lib/Support/ErrorHandling.cpp      | 16 -----
+ llvm/lib/Support/raw_ostream.cpp        | 48 +++++++--------
+ llvm/unittests/ADT/SmallStringTest.cpp  | 81 -------------------------
+ 4 files changed, 22 insertions(+), 126 deletions(-)
+
+diff --git a/llvm/include/llvm/Support/raw_ostream.h b/llvm/include/llvm/Support/raw_ostream.h
+index 27fb5c03e474..d228b05f4f9b 100644
+--- a/llvm/include/llvm/Support/raw_ostream.h
++++ b/llvm/include/llvm/Support/raw_ostream.h
+@@ -72,7 +72,6 @@ private:
+   /// for a \see write_impl() call to handle the data which has been put into
+   /// this buffer.
+   char *OutBufStart, *OutBufEnd, *OutBufCur;
+-  bool ColorEnabled = false;
+ 
+   /// Optional stream this stream is tied to. If this stream is written to, the
+   /// tied-to stream will be flushed first.
+@@ -305,7 +304,7 @@ public:
+ 
+   // Enable or disable colors. Once enable_colors(false) is called,
+   // changeColor() has no effect until enable_colors(true) is called.
+-  virtual void enable_colors(bool enable) { ColorEnabled = enable; }
++  virtual void enable_colors(bool /*enable*/) {}
+ 
+   /// Tie this stream to the specified stream. Replaces any existing tied-to
+   /// stream. Specifying a nullptr unties the stream.
+diff --git a/llvm/lib/Support/ErrorHandling.cpp b/llvm/lib/Support/ErrorHandling.cpp
+index 9ee52a02c214..77c3a37475d0 100644
+--- a/llvm/lib/Support/ErrorHandling.cpp
++++ b/llvm/lib/Support/ErrorHandling.cpp
+@@ -178,22 +178,6 @@ void llvm::llvm_unreachable_internal(const char *msg, const char *file,
+ #endif
+ }
+ 
+-static void bindingsErrorHandler(void *user_data, const std::string& reason,
+-                                 bool gen_crash_diag) {
+-  LLVMFatalErrorHandler handler =
+-      LLVM_EXTENSION reinterpret_cast<LLVMFatalErrorHandler>(user_data);
+-  handler(reason.c_str());
+-}
+-
+-void LLVMInstallFatalErrorHandler(LLVMFatalErrorHandler Handler) {
+-  install_fatal_error_handler(bindingsErrorHandler,
+-                              LLVM_EXTENSION reinterpret_cast<void *>(Handler));
+-}
+-
+-void LLVMResetFatalErrorHandler() {
+-  remove_fatal_error_handler();
+-}
+-
+ #ifdef _WIN32
+ 
+ #include <winerror.h>
+diff --git a/llvm/lib/Support/raw_ostream.cpp b/llvm/lib/Support/raw_ostream.cpp
+index 6b9e5f9e44bd..6fa250a68ed8 100644
+--- a/llvm/lib/Support/raw_ostream.cpp
++++ b/llvm/lib/Support/raw_ostream.cpp
+@@ -169,16 +169,6 @@ raw_ostream &raw_ostream::write_escaped(std::string_view Str,
+   return *this;
+ }
+ 
+-raw_ostream &raw_ostream::operator<<(const void *P) {
+-  llvm::write_hex(*this, (uintptr_t)P, HexPrintStyle::PrefixLower);
+-  return *this;
+-}
+-
+-raw_ostream &raw_ostream::operator<<(double N) {
+-  llvm::write_double(*this, N, FloatStyle::Exponent);
+-  return *this;
+-}
+-
+ void raw_ostream::flush_nonempty() {
+   assert(OutBufCur > OutBufStart && "Invalid call to flush_nonempty.");
+   size_t Length = OutBufCur - OutBufStart;
+@@ -323,15 +313,22 @@ static int getFD(std::string_view Filename, std::error_code &EC,
+   if (Filename == "-") {
+     EC = std::error_code();
+     // Change stdout's text/binary mode based on the Flags.
+-    sys::ChangeStdoutMode(Flags);
++    if (!(Flags & fs::OF_Text)) {
++#if defined(_WIN32)
++      _setmode(_fileno(stdout), _O_BINARY);
++#endif
++    }
+     return STDOUT_FILENO;
+   }
+ 
+-  int FD;
+-  if (Access & sys::fs::FA_Read)
+-    EC = sys::fs::openFileForReadWrite(Filename, FD, Disp, Flags);
++  fs::file_t F;
++  if (Access & fs::FA_Read)
++    F = fs::OpenFileForReadWrite(fs::path{std::string_view{Filename.data(), Filename.size()}}, EC, Disp, Flags);
+   else
+-    EC = sys::fs::openFileForWrite(Filename, FD, Disp, Flags);
++    F = fs::OpenFileForWrite(fs::path{std::string_view{Filename.data(), Filename.size()}}, EC, Disp, Flags);
++  if (EC)
++    return -1;
++  int FD = fs::FileToFd(F, EC, Flags);
+   if (EC)
+     return -1;
+ 
+@@ -392,10 +389,7 @@ raw_fd_ostream::raw_fd_ostream(int fd, bool shouldClose, bool unbuffered,
+   // Get the starting position.
+   off_t loc = ::lseek(FD, 0, SEEK_CUR);
+ #ifdef _WIN32
+-  // MSVCRT's _lseek(SEEK_CUR) doesn't return -1 for pipes.
+-  sys::fs::file_status Status;
+-  std::error_code EC = status(FD, Status);
+-  SupportsSeeking = !EC && Status.type() == sys::fs::file_type::regular_file;
++  SupportsSeeking = loc != (off_t)-1 && ::GetFileType(reinterpret_cast<HANDLE>(::_get_osfhandle(FD))) != FILE_TYPE_PIPE;
+ #else
+   SupportsSeeking = loc != (off_t)-1;
+ #endif
+@@ -408,10 +402,8 @@ raw_fd_ostream::raw_fd_ostream(int fd, bool shouldClose, bool unbuffered,
+ raw_fd_ostream::~raw_fd_ostream() {
+   if (FD >= 0) {
+     flush();
+-    if (ShouldClose) {
+-      if (auto EC = sys::Process::SafelyCloseFileDescriptor(FD))
+-        error_detected(EC);
+-    }
++    if (ShouldClose && ::close(FD) < 0)
++      error_detected(std::error_code(errno, std::generic_category()));
+   }
+ 
+ #ifdef __MINGW32__
+@@ -506,7 +498,11 @@ void raw_fd_ostream::write_impl(const char *Ptr, size_t Size) {
+ 
+   do {
+     size_t ChunkSize = std::min(Size, MaxWriteSize);
++#ifdef _WIN32
++    int ret = ::_write(FD, Ptr, ChunkSize);
++#else
+     ssize_t ret = ::write(FD, Ptr, ChunkSize);
++#endif
+ 
+     if (ret < 0) {
+       // If it's a recoverable error, swallow it and retry the write.
+@@ -541,8 +537,8 @@ void raw_fd_ostream::close() {
+   assert(ShouldClose);
+   ShouldClose = false;
+   flush();
+-  if (auto EC = sys::Process::SafelyCloseFileDescriptor(FD))
+-    error_detected(EC);
++  if (::close(FD) < 0)
++    error_detected(std::error_code(errno, std::generic_category()));
+   FD = -1;
+ }
+ 
+@@ -551,8 +547,6 @@ uint64_t raw_fd_ostream::seek(uint64_t off) {
+   flush();
+ #ifdef _WIN32
+   pos = ::_lseeki64(FD, off, SEEK_SET);
+-#elif defined(HAVE_LSEEK64)
+-  pos = ::lseek64(FD, off, SEEK_SET);
+ #else
+   pos = ::lseek(FD, off, SEEK_SET);
+ #endif
+diff --git a/llvm/unittests/ADT/SmallStringTest.cpp b/llvm/unittests/ADT/SmallStringTest.cpp
+index bee3875d11c9..87600ea4704b 100644
+--- a/llvm/unittests/ADT/SmallStringTest.cpp
++++ b/llvm/unittests/ADT/SmallStringTest.cpp
+@@ -129,23 +129,6 @@ TEST_F(SmallStringTest, StdStringConversion) {
+   EXPECT_EQ("abc", theStdString);
+ }
+ 
+-TEST_F(SmallStringTest, Substr) {
+-  theString = "hello";
+-  EXPECT_EQ("lo", theString.substr(3));
+-  EXPECT_EQ("", theString.substr(100));
+-  EXPECT_EQ("hello", theString.substr(0, 100));
+-  EXPECT_EQ("o", theString.substr(4, 10));
+-}
+-
+-TEST_F(SmallStringTest, Slice) {
+-  theString = "hello";
+-  EXPECT_EQ("l", theString.slice(2, 3));
+-  EXPECT_EQ("ell", theString.slice(1, 4));
+-  EXPECT_EQ("llo", theString.slice(2, 100));
+-  EXPECT_EQ("", theString.slice(2, 1));
+-  EXPECT_EQ("", theString.slice(10, 20));
+-}
+-
+ TEST_F(SmallStringTest, Find) {
+   theString = "hello";
+   EXPECT_EQ(2U, theString.find('l'));
+@@ -180,68 +163,4 @@ TEST_F(SmallStringTest, Find) {
+   EXPECT_EQ(0U, theString.find(""));
+ }
+ 
+-TEST_F(SmallStringTest, Count) {
+-  theString = "hello";
+-  EXPECT_EQ(2U, theString.count('l'));
+-  EXPECT_EQ(1U, theString.count('o'));
+-  EXPECT_EQ(0U, theString.count('z'));
+-  EXPECT_EQ(0U, theString.count("helloworld"));
+-  EXPECT_EQ(1U, theString.count("hello"));
+-  EXPECT_EQ(1U, theString.count("ello"));
+-  EXPECT_EQ(0U, theString.count("zz"));
+-}
+-
+-TEST_F(SmallStringTest, Realloc) {
+-  theString = "abcd";
+-  theString.reserve(100);
+-  EXPECT_EQ("abcd", theString);
+-  unsigned const N = 100000;
+-  theString.reserve(N);
+-  for (unsigned i = 0; i < N - 4; ++i)
+-    theString.push_back('y');
+-  EXPECT_EQ("abcdyyy", theString.slice(0, 7));
+-}
+-
+-TEST_F(SmallStringTest, Comparisons) {
+-  EXPECT_EQ(-1, SmallString<10>("aab").compare("aad"));
+-  EXPECT_EQ( 0, SmallString<10>("aab").compare("aab"));
+-  EXPECT_EQ( 1, SmallString<10>("aab").compare("aaa"));
+-  EXPECT_EQ(-1, SmallString<10>("aab").compare("aabb"));
+-  EXPECT_EQ( 1, SmallString<10>("aab").compare("aa"));
+-  EXPECT_EQ( 1, SmallString<10>("\xFF").compare("\1"));
+-
+-  EXPECT_EQ(-1, SmallString<10>("AaB").compare_insensitive("aAd"));
+-  EXPECT_EQ( 0, SmallString<10>("AaB").compare_insensitive("aab"));
+-  EXPECT_EQ( 1, SmallString<10>("AaB").compare_insensitive("AAA"));
+-  EXPECT_EQ(-1, SmallString<10>("AaB").compare_insensitive("aaBb"));
+-  EXPECT_EQ( 1, SmallString<10>("AaB").compare_insensitive("aA"));
+-  EXPECT_EQ( 1, SmallString<10>("\xFF").compare_insensitive("\1"));
+-
+-  EXPECT_EQ(-1, SmallString<10>("aab").compare_numeric("aad"));
+-  EXPECT_EQ( 0, SmallString<10>("aab").compare_numeric("aab"));
+-  EXPECT_EQ( 1, SmallString<10>("aab").compare_numeric("aaa"));
+-  EXPECT_EQ(-1, SmallString<10>("aab").compare_numeric("aabb"));
+-  EXPECT_EQ( 1, SmallString<10>("aab").compare_numeric("aa"));
+-  EXPECT_EQ(-1, SmallString<10>("1").compare_numeric("10"));
+-  EXPECT_EQ( 0, SmallString<10>("10").compare_numeric("10"));
+-  EXPECT_EQ( 0, SmallString<10>("10a").compare_numeric("10a"));
+-  EXPECT_EQ( 1, SmallString<10>("2").compare_numeric("1"));
+-  EXPECT_EQ( 0, SmallString<10>("llvm_v1i64_ty").compare_numeric("llvm_v1i64_ty"));
+-  EXPECT_EQ( 1, SmallString<10>("\xFF").compare_numeric("\1"));
+-  EXPECT_EQ( 1, SmallString<10>("V16").compare_numeric("V1_q0"));
+-  EXPECT_EQ(-1, SmallString<10>("V1_q0").compare_numeric("V16"));
+-  EXPECT_EQ(-1, SmallString<10>("V8_q0").compare_numeric("V16"));
+-  EXPECT_EQ( 1, SmallString<10>("V16").compare_numeric("V8_q0"));
+-  EXPECT_EQ(-1, SmallString<10>("V1_q0").compare_numeric("V8_q0"));
+-  EXPECT_EQ( 1, SmallString<10>("V8_q0").compare_numeric("V1_q0"));
+-}
+-
+-// Check gtest prints SmallString as a string instead of a container of chars.
+-// The code is in utils/unittest/googletest/internal/custom/gtest-printers.h
+-TEST_F(SmallStringTest, GTestPrinter) {
+-  EXPECT_EQ(R"("foo")", ::testing::PrintToString(SmallString<1>("foo")));
+-  const SmallVectorImpl<char> &ErasedSmallString = SmallString<1>("foo");
+-  EXPECT_EQ(R"("foo")", ::testing::PrintToString(ErasedSmallString));
+-}
+-
+ } // namespace
+-- 
+2.20.1.windows.1
+

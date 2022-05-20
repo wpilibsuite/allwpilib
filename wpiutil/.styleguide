@@ -48,6 +48,8 @@ generatedFileExclude {
   src/main/native/include/wpi/SmallString\.h$
   src/main/native/include/wpi/SmallVector\.h$
   src/main/native/include/wpi/StringMap\.h$
+  src/main/native/include/wpi/StringMapEntry\.h$
+  src/main/native/include/wpi/STLForwardCompat\.h$
   src/main/native/include/wpi/StringRef\.h$
   src/main/native/include/wpi/SwapByteOrder\.h$
   src/main/native/include/wpi/Twine\.h$
