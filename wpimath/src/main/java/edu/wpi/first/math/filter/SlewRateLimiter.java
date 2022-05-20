@@ -14,7 +14,6 @@ import edu.wpi.first.util.WPIUtilJNI;
  * edu.wpi.first.math.trajectory.TrapezoidProfile} instead.
  */
 public class SlewRateLimiter {
-    private final double m_rateLimit;
     private double m_prevVal;
     private double m_prevTime;
     private double m_forwardRateLimit;
@@ -22,30 +21,32 @@ public class SlewRateLimiter {
 
     /**
      * Creates a new SlewRateLimiter with the given rate limit and initial value.
+     * Sets the given rate limit to both the forward and backward limits.
      *
      * @param rateLimit    The rate-of-change limit, in units per second.
      * @param initialValue The initial value of the input.
      */
     public SlewRateLimiter(double rateLimit, double initialValue) {
-        m_rateLimit = rateLimit;
+        m_forwardRateLimit = rateLimit;
+        m_backwardRateLimit = rateLimit;
         m_prevVal = initialValue;
         m_prevTime = WPIUtilJNI.now() * 1e-6;
     }
 
     /**
-     * Creates a new SlewRateLimiter with the given rate limit and an initial value of zero.
+     * Creates a new SlewRateLimiter with the given rate limit and an initial value of the given value.
      *
      * @param rateLimit The rate-of-change limit, in units per second.
      */
     public SlewRateLimiter(double rateLimit) {
-        this(rateLimit, 0);
+        this(rateLimit, rateLimit);
     }
 
     /**
      * Creates a new SlewRateLimiter with the given forward rate and backward rate.
      *
-     * @param forward_Rate
-     * @param backwardRateLimit
+     * @param forwardRateLimit  The rate-of-change limit for the forward direction, in units per second.
+     * @param backwardRateLimit The rate-of-change limit for the backward direction, in units per second.
      */
     public SlewRateLimiter(double forwardRateLimit, double backwardRateLimit) {
         m_forwardRateLimit = forwardRateLimit;
@@ -55,29 +56,6 @@ public class SlewRateLimiter {
 
 }
 
-    /**
-     * Filters the input to limit its slew rate.
-     *
-     * @param input The input value whose slew rate is to be limited.
-     * @return The filtered value, which will not change faster than the slew rate.
-     */
-    public double calculate(double input) {
-        double currentTime = WPIUtilJNI.now() * 1e-6;
-        double elapsedTime = currentTime - m_prevTime;
-        m_prevVal +=
-                MathUtil.clamp(input - m_prevVal, -m_rateLimit * elapsedTime, m_rateLimit * elapsedTime);
-        m_prevTime = currentTime;
-        return m_prevVal;
-    }
-
-    public double calculate(double input) {
-        double currentTime = WPIUtilJNI.now() * 1e-6;
-        double elapsedTime = currentTime - m_prevTime;
-        m_prevVal +=
-                MathUtil.clamp(input - m_prevVal, -m_rateLimit * elapsedTime, m_rateLimit * elapsedTime);
-        m_prevTime = currentTime;
-        return m_prevVal;
-    }
     /**
      * Filters the input to limit the slew rate for backward and forward.
      *
@@ -101,28 +79,32 @@ public class SlewRateLimiter {
         m_prevVal = value;
         m_prevTime = WPIUtilJNI.now() * 1e-6;
     }
+
     /**
      * Gets the maximum rate of change.
      */
-    public double getForwardRateLimit(){
+    public double getForwardRateLimit() {
         return m_forwardRateLimit;
     }
+
     /**
      * Gets the minimum rate of change.
      */
-    public double getBackwardRateLimit(){
+    public double getBackwardRateLimit() {
         return m_backwardRateLimit;
     }
+
     /**
      * Sets the maximum rate of change.
      */
-    public void setForwardRateLimit(double forwardVal){
+    public void setForwardRateLimit(double forwardVal) {
         m_forwardRateLimit = forwardVal;
     }
+
     /**
      * Sets the minimum rate of change.
      */
-    public void setBackwardRatelimit(double backwardVal){
+    public void setBackwardRatelimit(double backwardVal) {
         m_backwardRateLimit = backwardVal;
     }
 
