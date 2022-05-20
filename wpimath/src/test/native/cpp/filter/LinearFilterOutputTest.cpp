@@ -207,14 +207,14 @@ TEST(LinearFilterOutputTest, CentralFiniteDifference) {
         return std::log(x);
       },
       [](double x) {
-        // df/dx = 1 / x
+        // df/dx = 1/x
         return 1.0 / x;
       },
       h, 1.0, 20.0);
 
   AssertCentralResults<2, 5>(
       [](double x) {
-        // f(x) = x^2
+        // f(x) = x²
         return x * x;
       },
       [](double x) {
@@ -240,7 +240,7 @@ TEST(LinearFilterOutputTest, CentralFiniteDifference) {
         return std::log(x);
       },
       [](double x) {
-        // d²f/dx² = -1 / x²
+        // d²f/dx² = -1/x²
         return -1.0 / (x * x);
       },
       h, 1.0, 20.0);
@@ -280,14 +280,14 @@ TEST(LinearFilterOutputTest, BackwardFiniteDifference) {
         return std::log(x);
       },
       [](double x) {
-        // df/dx = 1 / x
+        // df/dx = 1/x
         return 1.0 / x;
       },
       h, 1.0, 20.0);
 
   AssertBackwardResults<2, 4>(
       [](double x) {
-        // f(x) = x^2
+        // f(x) = x²
         return x * x;
       },
       [](double x) {
@@ -313,7 +313,7 @@ TEST(LinearFilterOutputTest, BackwardFiniteDifference) {
         return std::log(x);
       },
       [](double x) {
-        // d²f/dx² = -1 / x²
+        // d²f/dx² = -1/x²
         return -1.0 / (x * x);
       },
       h, 1.0, 20.0);

@@ -37,7 +37,7 @@ class WPILIB_DLLEXPORT ArmFeedforward {
    * @param kS   The static gain, in volts.
    * @param kG The gravity gain, in volts.
    * @param kV   The velocity gain, in volt seconds per radian.
-   * @param kA   The acceleration gain, in volt seconds^2 per radian.
+   * @param kA   The acceleration gain, in volt seconds² per radian.
    */
   constexpr ArmFeedforward(
       units::volt_t kS, units::volt_t kG, units::unit_t<kv_unit> kV,
@@ -49,7 +49,7 @@ class WPILIB_DLLEXPORT ArmFeedforward {
    *
    * @param angle        The angle setpoint, in radians.
    * @param velocity     The velocity setpoint, in radians per second.
-   * @param acceleration The acceleration setpoint, in radians per second^2.
+   * @param acceleration The acceleration setpoint, in radians per second².
    * @return The computed feedforward, in volts.
    */
   units::volt_t Calculate(units::unit_t<Angle> angle,

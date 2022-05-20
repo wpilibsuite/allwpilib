@@ -10,18 +10,17 @@
 
 namespace {
 frc::Vectord<1> RungeKuttaTimeVaryingSolution(double t) {
-  return frc::Vectord<1>{12.0 * std::exp(t) /
-                         (std::pow(std::exp(t) + 1.0, 2.0))};
+  return frc::Vectord<1>{12.0 * std::exp(t) / std::pow(std::exp(t) + 1.0, 2.0)};
 }
 }  // namespace
 
 // Tests RK4 with a time varying solution. From
 // http://www2.hawaii.edu/~jmcfatri/math407/RungeKuttaTest.html:
-//   x' = x (2 / (e^t + 1) - 1)
+//   x' = x (2/(eᵗ + 1) - 1)
 //
 // The true (analytical) solution is:
 //
-// x(t) = 12 * e^t / ((e^t + 1)^2)
+// x(t) = 12eᵗ/((eᵗ + 1)²)
 TEST(RungeKuttaTimeVaryingTest, RungeKuttaTimeVarying) {
   frc::Vectord<1> y0 = RungeKuttaTimeVaryingSolution(5.0);
 
