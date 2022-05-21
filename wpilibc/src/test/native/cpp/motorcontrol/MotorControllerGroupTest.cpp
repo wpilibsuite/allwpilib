@@ -7,8 +7,8 @@
 #include <memory>
 #include <vector>
 
-#include "MockMotorController.h"
 #include "gtest/gtest.h"
+#include "motorcontrol/MockMotorController.h"
 
 using namespace frc;
 

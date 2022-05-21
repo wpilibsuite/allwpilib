@@ -4,9 +4,9 @@
 
 #include <cmath>
 
-#include "MockMotorController.h"
 #include "frc/drive/KilloughDrive.h"
 #include "gtest/gtest.h"
+#include "motorcontrol/MockMotorController.h"
 
 TEST(KilloughDriveTest, CartesianIK) {
   frc::MockMotorController left;
