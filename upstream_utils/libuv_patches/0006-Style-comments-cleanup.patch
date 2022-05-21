@@ -1,7 +1,7 @@
-From 6399ee267f6cc4cafda478b277c8888ee0b08632 Mon Sep 17 00:00:00 2001
+From 1131c424a6f54e3904eed0e2efb138ce4cce9c84 Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Tue, 26 Apr 2022 15:28:52 -0400
-Subject: [PATCH 6/7] Style / comments cleanup
+Subject: [PATCH 6/8] Style / comments cleanup
 
 ---
  src/fs-poll.c     | 1 +

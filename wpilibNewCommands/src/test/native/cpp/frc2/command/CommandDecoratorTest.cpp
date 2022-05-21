@@ -5,6 +5,7 @@
 #include <frc/simulation/SimHooks.h>
 
 #include "CommandTestBase.h"
+#include "frc2/command/EndlessCommand.h"
 #include "frc2/command/InstantCommand.h"
 #include "frc2/command/ParallelRaceGroup.h"
 #include "frc2/command/PerpetualCommand.h"
@@ -89,10 +90,34 @@ TEST_F(CommandDecoratorTest, AndThen) {
   EXPECT_TRUE(finished);
 }
 
+#ifdef __GNUC__
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#elif defined(_WIN32)
+#pragma warning(disable : 4996)
+#endif
 TEST_F(CommandDecoratorTest, Perpetually) {
   CommandScheduler scheduler = GetScheduler();
 
   auto command = InstantCommand([] {}, {}).Perpetually();
+
+  scheduler.Schedule(&command);
+
+  scheduler.Run();
+  scheduler.Run();
+
+  EXPECT_TRUE(scheduler.IsScheduled(&command));
+}
+#ifdef __GNUC__
+#pragma GCC diagnostic pop
+#elif defined(_WIN32)
+#pragma warning(default : 4996)
+#endif
+
+TEST_F(CommandDecoratorTest, Endlessly) {
+  CommandScheduler scheduler = GetScheduler();
+
+  auto command = InstantCommand([] {}, {}).Endlessly();
 
   scheduler.Schedule(&command);
 

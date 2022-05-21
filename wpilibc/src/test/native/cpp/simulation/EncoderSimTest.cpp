@@ -10,6 +10,12 @@
 #include "frc/Encoder.h"
 #include "gtest/gtest.h"
 
+#ifdef __GNUC__
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#elif defined(_WIN32)
+#pragma warning(disable : 4996)
+#endif
+
 namespace frc::sim {
 
 namespace {

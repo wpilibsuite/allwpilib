@@ -85,9 +85,20 @@ SequentialCommandGroup Command::AndThen(
   return SequentialCommandGroup(std::move(temp));
 }
 
+#ifdef __GNUC__
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#elif defined(_WIN32)
+#pragma warning(disable : 4996)
+#endif
 PerpetualCommand Command::Perpetually() && {
   return PerpetualCommand(std::move(*this).TransferOwnership());
 }
+#ifdef __GNUC__
+#pragma GCC diagnostic pop
+#elif defined(_WIN32)
+#pragma warning(default : 4996)
+#endif
 
 EndlessCommand Command::Endlessly() && {
   return EndlessCommand(std::move(*this).TransferOwnership());

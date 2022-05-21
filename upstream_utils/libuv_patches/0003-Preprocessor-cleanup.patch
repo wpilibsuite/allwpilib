@@ -1,7 +1,7 @@
-From 20120ec8cb9310e243a71fe5bf9bee37eac7614b Mon Sep 17 00:00:00 2001
+From e9c7588e574cbf1fe99c0de7f9fcbb2910f03dd8 Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Tue, 26 Apr 2022 15:19:14 -0400
-Subject: [PATCH 3/7] Preprocessor cleanup
+Subject: [PATCH 3/8] Preprocessor cleanup
 
 ---
  include/uv.h        | 18 +-----------------

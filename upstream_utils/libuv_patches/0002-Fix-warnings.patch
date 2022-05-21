@@ -1,7 +1,7 @@
-From f6b4cd53205fabd10ed0e2b275f3882aa0017061 Mon Sep 17 00:00:00 2001
+From 7727474439a3a3dc2b74c9c7ae4b1c36a11fdce2 Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Tue, 26 Apr 2022 15:09:43 -0400
-Subject: [PATCH 2/7] Fix warnings
+Subject: [PATCH 2/8] Fix warnings
 
 ---
  include/uv/win.h    |   5 +++

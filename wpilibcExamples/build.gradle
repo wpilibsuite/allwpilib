@@ -34,11 +34,6 @@ templatesTree.list(new FilenameFilter() {
             templatesMap.put(it, [])
         }
 
-nativeUtils.platformConfigs.named(nativeUtils.wpi.platforms.roborio).configure {
-    cppCompiler.args.remove('-Wno-error=deprecated-declarations')
-    cppCompiler.args.add('-Werror=deprecated-declarations')
-}
-
 nativeUtils.platformConfigs.named(nativeUtils.wpi.platforms.windowsx64).configure {
     linker.args.remove('/DEBUG:FULL')
     cppCompiler.debugArgs.remove('/Zi')
@@ -149,13 +144,6 @@ model {
                     lib project: ':cameraserver', library: 'cameraserver', linkage: 'shared'
                     lib project: ':wpinet', library: 'wpinet', linkage: 'shared'
                     lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
-                    binary.tasks.withType(CppCompile) {
-                        if (!(binary.toolChain in VisualCpp)) {
-                            cppCompiler.args "-Wno-error=deprecated-declarations"
-                        } else {
-                            cppCompiler.args "/wd4996"
-                        }
-                    }
                     if (binary.targetPlatform.name == nativeUtils.wpi.platforms.roborio) {
                         nativeUtils.useRequiredLibrary(binary, 'ni_link_libraries', 'ni_runtime_libraries')
                     }
