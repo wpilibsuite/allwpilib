@@ -5,7 +5,7 @@ import subprocess
 import tempfile
 
 
-def clone_repo(url, treeish):
+def clone_repo(url, treeish, shallow=True):
     """Clones a git repo at the given URL into a temp folder and checks out the
     given tree-ish (either branch or tag).
 
@@ -14,6 +14,7 @@ def clone_repo(url, treeish):
     Keyword argument:
     url -- The URL of the git repo
     treeish -- The tree-ish to check out (branch or tag)
+    shallow -- Whether to do a shallow clone
     """
     os.chdir(tempfile.gettempdir())
 
@@ -22,7 +23,10 @@ def clone_repo(url, treeish):
 
     # Clone Git repository into current directory or update it
     if not os.path.exists(dest):
-        subprocess.run(["git", "clone", url, dest])
+        cmd = ["git", "clone"]
+        if shallow:
+            cmd += ["--branch", treeish, "--depth", "1"]
+        subprocess.run(cmd + [url, dest])
         os.chdir(dest)
     else:
         os.chdir(dest)
