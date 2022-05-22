@@ -187,14 +187,12 @@ class CommandDecoratorTest extends CommandTestBase {
   @Test
   void unlessTest() {
     try (CommandScheduler scheduler = new CommandScheduler()) {
-      AtomicBoolean unlessCondition = new AtomicBoolean();
-      AtomicBoolean hasRunCondition = new AtomicBoolean();
-      hasRunCondition.set(false);
+      AtomicBoolean unlessCondition = new AtomicBoolean(true);
+      AtomicBoolean hasRunCondition = new AtomicBoolean(false);
 
       Command command =
           new InstantCommand(() -> hasRunCondition.set(true)).unless(unlessCondition::get);
 
-      unlessCondition.set(true);
       scheduler.schedule(command);
       scheduler.run();
       assertFalse(hasRunCondition.get());
