@@ -137,8 +137,8 @@ class ParallelRaceGroupTest extends CommandTestBase {
     Command command1 = command1Holder.getMock();
     MockCommandHolder command2Holder = new MockCommandHolder(true, system2);
     Command command2 = command2Holder.getMock();
-    MockCommandHolder perpetualCommandHolder = new MockCommandHolder(true);
-    Command command3 = new PerpetualCommand(perpetualCommandHolder.getMock());
+    MockCommandHolder endlessCommandHolder = new MockCommandHolder(true);
+    Command command3 = new EndlessCommand(endlessCommandHolder.getMock());
 
     Command group1 = new SequentialCommandGroup(command1, command2);
     assertNotNull(group1);
