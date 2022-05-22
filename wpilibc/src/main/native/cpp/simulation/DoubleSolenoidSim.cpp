@@ -43,7 +43,6 @@ void DoubleSolenoidSim::Set(DoubleSolenoid::Value output) {
   m_module->SetSolenoidOutput(m_rev, output == DoubleSolenoid::Value::kReverse);
 }
 
-const std::shared_ptr<PneumaticsBaseSim> DoubleSolenoidSim::GetModuleSim()
-    const {
+std::shared_ptr<PneumaticsBaseSim> DoubleSolenoidSim::GetModuleSim() const {
   return m_module;
 }

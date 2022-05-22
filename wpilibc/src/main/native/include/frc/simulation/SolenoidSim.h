@@ -32,11 +32,11 @@ class SolenoidSim {
   [[nodiscard]] virtual std::unique_ptr<CallbackStore> RegisterOutputCallback(
       NotifyCallback callback, bool initialNotify);
 
-  const std::shared_ptr<PneumaticsBaseSim> GetModuleSim() const;
+  std::shared_ptr<PneumaticsBaseSim> GetModuleSim() const;
 
  private:
-  const std::shared_ptr<PneumaticsBaseSim> m_module;
-  const int m_channel;
+  std::shared_ptr<PneumaticsBaseSim> m_module;
+  int m_channel;
 };
 
 }  // namespace frc::sim

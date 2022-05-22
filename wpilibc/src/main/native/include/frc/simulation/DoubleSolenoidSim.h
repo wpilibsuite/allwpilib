@@ -22,12 +22,12 @@ class DoubleSolenoidSim {
   DoubleSolenoid::Value Get() const;
   void Set(DoubleSolenoid::Value output);
 
-  const std::shared_ptr<PneumaticsBaseSim> GetModuleSim() const;
+  std::shared_ptr<PneumaticsBaseSim> GetModuleSim() const;
 
  private:
-  const std::shared_ptr<PneumaticsBaseSim> m_module;
-  const int m_fwd;
-  const int m_rev;
+  std::shared_ptr<PneumaticsBaseSim> m_module;
+  int m_fwd;
+  int m_rev;
 };
 
 }  // namespace frc::sim

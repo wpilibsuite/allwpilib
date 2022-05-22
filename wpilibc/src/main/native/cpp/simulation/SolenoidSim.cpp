@@ -36,6 +36,6 @@ std::unique_ptr<CallbackStore> SolenoidSim::RegisterOutputCallback(
                                                   initialNotify);
 }
 
-const std::shared_ptr<PneumaticsBaseSim> SolenoidSim::GetModuleSim() const {
+std::shared_ptr<PneumaticsBaseSim> SolenoidSim::GetModuleSim() const {
   return m_module;
 }
