@@ -103,7 +103,11 @@ tasks.withType(JavaCompile).configureEach {
         '-encoding',
         'UTF8',
         "-Werror",
-        "-Xlint:deprecation,removal",
+        "-Xlint:all",
+        // ignore AutoCloseable warnings
+        "-Xlint:-try",
+        // ignore missing serialVersionUID warnings
+        "-Xlint:-serial",
     ]
 }
 

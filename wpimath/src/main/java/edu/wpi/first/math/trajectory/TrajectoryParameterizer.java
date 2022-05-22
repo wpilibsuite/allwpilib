@@ -320,7 +320,6 @@ public final class TrajectoryParameterizer {
     }
   }
 
-  @SuppressWarnings("serial")
   public static class TrajectoryGenerationException extends RuntimeException {
     public TrajectoryGenerationException(String message) {
       super(message);
