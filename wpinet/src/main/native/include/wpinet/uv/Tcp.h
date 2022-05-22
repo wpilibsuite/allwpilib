@@ -338,6 +338,14 @@ class Tcp final : public NetworkStreamImpl<Tcp, uv_tcp_t> {
   void Connect6(std::string_view ip, unsigned int port,
                 std::function<void()> callback);
 
+  /**
+   * Resets a TCP connection by sending a RST packet. This is accomplished by
+   * setting the SO_LINGER socket option with a linger interval of zero and then
+   * calling Close(). Due to some platform inconsistencies, mixing of
+   * Shutdown() and CloseReset() calls is not allowed.
+   */
+  void CloseReset();
+
  private:
   Tcp* DoAccept() override;
 

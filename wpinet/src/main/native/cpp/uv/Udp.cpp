@@ -117,6 +117,17 @@ void Udp::SetMembership(std::string_view multicastAddr,
          interfaceAddrBuf.c_str(), membership);
 }
 
+void Udp::SetSourceMembership(std::string_view multicastAddr,
+                              std::string_view interfaceAddr,
+                              std::string_view sourceAddr,
+                              uv_membership membership) {
+  SmallString<128> multicastAddrBuf{multicastAddr};
+  SmallString<128> interfaceAddrBuf{interfaceAddr};
+  SmallString<128> sourceAddrBuf{sourceAddr};
+  Invoke(&uv_udp_set_source_membership, GetRaw(), multicastAddrBuf.c_str(),
+         interfaceAddrBuf.c_str(), sourceAddrBuf.c_str(), membership);
+}
+
 void Udp::SetMulticastInterface(std::string_view interfaceAddr) {
   SmallString<128> interfaceAddrBuf{interfaceAddr};
   Invoke(&uv_udp_set_multicast_interface, GetRaw(), interfaceAddrBuf.c_str());
