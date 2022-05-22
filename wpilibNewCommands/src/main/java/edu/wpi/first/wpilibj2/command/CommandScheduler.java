@@ -13,6 +13,7 @@ import edu.wpi.first.networktables.NTSendable;
 import edu.wpi.first.networktables.NTSendableBuilder;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.util.sendable.SendableRegistry;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.RobotState;
 import edu.wpi.first.wpilibj.TimedRobot;
@@ -26,6 +27,7 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.function.Consumer;
 
@@ -153,7 +155,7 @@ public final class CommandScheduler implements NTSendable, AutoCloseable {
    */
   @Deprecated(since = "2023")
   public void addButton(Runnable button) {
-    m_activeButtonLoop.bind(() -> true, button);
+    m_activeButtonLoop.bind(() -> true, requireNonNullParam(button, "button", "addButton"));
   }
 
   /**
@@ -176,10 +178,10 @@ public final class CommandScheduler implements NTSendable, AutoCloseable {
   private void initCommand(Command command, boolean interruptible, Set<Subsystem> requirements) {
     CommandState scheduledCommand = new CommandState(interruptible);
     m_scheduledCommands.put(command, scheduledCommand);
-    command.initialize();
     for (Subsystem requirement : requirements) {
       m_requirements.put(requirement, command);
     }
+    command.initialize();
     for (Consumer<Command> action : m_initActions) {
       action.accept(command);
     }
@@ -193,10 +195,15 @@ public final class CommandScheduler implements NTSendable, AutoCloseable {
    * using those requirements have been scheduled as interruptible. If this is the case, they will
    * be interrupted and the command will be scheduled.
    *
-   * @param interruptible whether this command can be interrupted
-   * @param command the command to schedule
+   * @param interruptible whether this command can be interrupted.
+   * @param command the command to schedule. If null, no-op.
    */
   private void schedule(boolean interruptible, Command command) {
+    if (command == null) {
+      DriverStation.reportWarning("Tried to schedule a null command", true);
+      return;
+    }
+
     if (m_inRunLoop) {
       m_toSchedule.put(command, interruptible);
       return;
@@ -211,7 +218,7 @@ public final class CommandScheduler implements NTSendable, AutoCloseable {
     // run when disabled, or the command is already scheduled.
     if (m_disabled
         || RobotState.isDisabled() && !command.runsWhenDisabled()
-        || m_scheduledCommands.containsKey(command)) {
+        || isScheduled(command)) {
       return;
     }
 
@@ -224,14 +231,18 @@ public final class CommandScheduler implements NTSendable, AutoCloseable {
       // Else check if the requirements that are in use have all have interruptible commands,
       // and if so, interrupt those commands and schedule the new command.
       for (Subsystem requirement : requirements) {
-        if (m_requirements.containsKey(requirement)
-            && !m_scheduledCommands.get(m_requirements.get(requirement)).isInterruptible()) {
+        Command requiring = requiring(requirement);
+        if (requiring != null
+            && !Optional.ofNullable(m_scheduledCommands.get(requiring))
+                .map(CommandState::isInterruptible)
+                .orElse(true)) {
           return;
         }
       }
       for (Subsystem requirement : requirements) {
-        if (m_requirements.containsKey(requirement)) {
-          cancel(m_requirements.get(requirement));
+        Command requiring = requiring(requirement);
+        if (requiring != null) {
+          cancel(requiring);
         }
       }
       initCommand(command, interruptible, requirements);
@@ -245,7 +256,7 @@ public final class CommandScheduler implements NTSendable, AutoCloseable {
    * they will be interrupted and the command will be scheduled.
    *
    * @param interruptible whether the commands should be interruptible
-   * @param commands the commands to schedule
+   * @param commands the commands to schedule. No-op if null.
    */
   public void schedule(boolean interruptible, Command... commands) {
     for (Command command : commands) {
@@ -257,7 +268,7 @@ public final class CommandScheduler implements NTSendable, AutoCloseable {
    * Schedules multiple commands for execution, with interruptible defaulted to true. Does nothing
    * if the command is already scheduled.
    *
-   * @param commands the commands to schedule
+   * @param commands the commands to schedule. No-op on null.
    */
   public void schedule(Command... commands) {
     schedule(true, commands);
@@ -370,6 +381,10 @@ public final class CommandScheduler implements NTSendable, AutoCloseable {
    */
   public void registerSubsystem(Subsystem... subsystems) {
     for (Subsystem subsystem : subsystems) {
+      if (subsystem == null) {
+        DriverStation.reportWarning("Tried to register a null subsystem", true);
+        continue;
+      }
       m_subsystems.put(subsystem, null);
     }
   }
@@ -395,6 +410,15 @@ public final class CommandScheduler implements NTSendable, AutoCloseable {
    * @param defaultCommand the default command to associate with the subsystem
    */
   public void setDefaultCommand(Subsystem subsystem, Command defaultCommand) {
+    if (subsystem == null) {
+      DriverStation.reportWarning("Tried to set a default command for a null subsystem", true);
+      return;
+    }
+    if (defaultCommand == null) {
+      DriverStation.reportWarning("Tried to set a null default command", true);
+      return;
+    }
+
     if (!defaultCommand.getRequirements().contains(subsystem)) {
       throw new IllegalArgumentException("Default commands must require their subsystem!");
     }
@@ -433,16 +457,20 @@ public final class CommandScheduler implements NTSendable, AutoCloseable {
     }
 
     for (Command command : commands) {
-      if (!m_scheduledCommands.containsKey(command)) {
+      if (command == null) {
+        DriverStation.reportWarning("Tried to cancel a null command", true);
+        continue;
+      }
+      if (!isScheduled(command)) {
         continue;
       }
 
+      m_scheduledCommands.remove(command);
+      m_requirements.keySet().removeAll(command.getRequirements());
       command.end(true);
       for (Consumer<Command> action : m_interruptActions) {
         action.accept(command);
       }
-      m_scheduledCommands.remove(command);
-      m_requirements.keySet().removeAll(command.getRequirements());
       m_watchdog.addEpoch(command.getName() + ".end(true)");
     }
   }
@@ -511,7 +539,7 @@ public final class CommandScheduler implements NTSendable, AutoCloseable {
    * @param action the action to perform
    */
   public void onCommandInitialize(Consumer<Command> action) {
-    m_initActions.add(action);
+    m_initActions.add(requireNonNullParam(action, "action", "onCommandInitialize"));
   }
 
   /**
@@ -520,7 +548,7 @@ public final class CommandScheduler implements NTSendable, AutoCloseable {
    * @param action the action to perform
    */
   public void onCommandExecute(Consumer<Command> action) {
-    m_executeActions.add(action);
+    m_executeActions.add(requireNonNullParam(action, "action", "onCommandExecute"));
   }
 
   /**
@@ -529,7 +557,7 @@ public final class CommandScheduler implements NTSendable, AutoCloseable {
    * @param action the action to perform
    */
   public void onCommandInterrupt(Consumer<Command> action) {
-    m_interruptActions.add(action);
+    m_interruptActions.add(requireNonNullParam(action, "action", "onCommandInterrupt"));
   }
 
   /**
@@ -538,7 +566,7 @@ public final class CommandScheduler implements NTSendable, AutoCloseable {
    * @param action the action to perform
    */
   public void onCommandFinish(Consumer<Command> action) {
-    m_finishActions.add(action);
+    m_finishActions.add(requireNonNullParam(action, "action", "onCommandFinish"));
   }
 
   @Override
