@@ -14,19 +14,18 @@ from upstream_utils import setup_upstream_repo, comment_out_invalid_includes, wa
 def main():
     root, repo = setup_upstream_repo(
         "https://github.com/JochenKalmbach/StackWalker",
-        "42e7a6e056a9e7aca911a7e9e54e2e4f90bc2652")
+        "42e7a6e056a9e7aca911a7e9e54e2e4f90bc2652",
+        shallow=False)
     wpiutil = os.path.join(root, "wpiutil")
 
-    pr35_url = "http://patch-diff.githubusercontent.com/raw/JochenKalmbach/StackWalker/pull/35.patch"
-    pr35_patch_download_path = os.path.join(tempfile.gettempdir(),
-                                            "stackwalker.patch")
-
-    response = urllib.request.urlopen(pr35_url)
-
-    with open(pr35_patch_download_path, 'wb') as f:
-        f.write(response.read())
-
-    am_patches(repo, [pr35_patch_download_path])
+    # Apply patches to original git repo
+    patch_dir = os.path.join(root, "upstream_utils/stack_walker_patches")
+    am_patches(repo, [
+        os.path.join(patch_dir, "0001-Apply-PR-35.patch"),
+        os.path.join(patch_dir, "0002-Remove-_M_IX86-checks.patch"),
+        os.path.join(patch_dir, "0003-Add-advapi-pragma.patch"),
+    ],
+               ignore_whitespce=True)
 
     shutil.copy(os.path.join("Main", "StackWalker", "StackWalker.h"),
                 os.path.join(wpiutil, "src/main/native/windows/StackWalker.h"))

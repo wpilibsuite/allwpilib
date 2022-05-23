@@ -62,7 +62,7 @@ def get_repo_root():
     return ""
 
 
-def setup_upstream_repo(url, treeish):
+def setup_upstream_repo(url, treeish, shallow=True):
     """Clones the given upstream repository, then returns the root of the
     destination Git repository as well as the cloned upstream Git repository.
 
@@ -78,7 +78,7 @@ def setup_upstream_repo(url, treeish):
     repo -- root directory of cloned upstream Git repository
     """
     root = get_repo_root()
-    clone_repo(url, treeish)
+    clone_repo(url, treeish, shallow=shallow)
     return root, os.getcwd()
 
 
@@ -208,7 +208,7 @@ def apply_patches(root, patches):
         subprocess.check_output(["git", "apply", patch])
 
 
-def am_patches(root, patches, use_threeway=False):
+def am_patches(root, patches, use_threeway=False, ignore_whitespce=False):
     """Apply list of patches to the destination Git repository using "git am".
 
     Keyword arguments:
@@ -219,6 +219,8 @@ def am_patches(root, patches, use_threeway=False):
     args = ["git", "am"]
     if use_threeway:
         args.append("-3")
+    if ignore_whitespce:
+        args.append("--ignore-whitespace")
 
     for patch in patches:
         subprocess.check_output(args + [patch])
