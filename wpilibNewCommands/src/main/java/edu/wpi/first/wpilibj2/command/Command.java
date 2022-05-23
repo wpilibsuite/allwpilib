@@ -318,8 +318,8 @@ public interface Command {
   }
 
   /**
-   * Cancels this command. Will call the command's interrupted() method. Commands will be canceled
-   * even if they are not marked as interruptible.
+   * Cancels this command. Will call the command's end() method with interrupted=true. 
+   * Commands will be canceled even if they are not marked as interruptible.
    */
   default void cancel() {
     CommandScheduler.getInstance().cancel(this);
