@@ -212,6 +212,34 @@ class Stream : public Handle {
   }
 
   /**
+   * Same as TryWrite() and extended write function for sending handles over a
+   * pipe.
+   *
+   * Try to send a handle is not supported on Windows, where it returns
+   * UV_EAGAIN.
+   *
+   * @param bufs The buffers to be written to the stream.
+   * @param send send stream
+   * @return Number of bytes written.
+   */
+  int TryWrite2(span<const Buffer> bufs, Stream& send);
+
+  /**
+   * Same as TryWrite() and extended write function for sending handles over a
+   * pipe.
+   *
+   * Try to send a handle is not supported on Windows, where it returns
+   * UV_EAGAIN.
+   *
+   * @param bufs The buffers to be written to the stream.
+   * @param send send stream
+   * @return Number of bytes written.
+   */
+  int TryWrite2(std::initializer_list<Buffer> bufs, Stream& send) {
+    return TryWrite2({bufs.begin(), bufs.end()}, send);
+  }
+
+  /**
    * Check if the stream is readable.
    * @return True if the stream is readable, false otherwise.
    */

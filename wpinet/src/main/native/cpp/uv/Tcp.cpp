@@ -167,4 +167,15 @@ void Tcp::Connect6(std::string_view ip, unsigned int port,
   }
 }
 
+void Tcp::CloseReset() {
+  if (!IsClosing()) {
+    uv_tcp_close_reset(GetRaw(), [](uv_handle_t* handle) {
+      Tcp& h = *static_cast<Tcp*>(handle->data);
+      h.closed();
+      h.Release();  // free ourselves
+    });
+    ForceClosed();
+  }
+}
+
 }  // namespace wpi::uv

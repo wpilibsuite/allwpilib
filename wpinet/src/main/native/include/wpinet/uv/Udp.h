@@ -173,6 +173,19 @@ class Udp final : public HandleImpl<Udp, uv_udp_t> {
                      std::string_view interfaceAddr, uv_membership membership);
 
   /**
+   * Set membership for a source-specific multicast group.
+   *
+   * @param multicastAddr Multicast address to set membership for
+   * @param interfaceAddr Interface address
+   * @param sourceAddr Source address
+   * @param membership Should be UV_JOIN_GROUP or UV_LEAVE_GROUP
+   */
+  void SetSourceMembership(std::string_view multicastAddr,
+                           std::string_view interfaceAddr,
+                           std::string_view sourceAddr,
+                           uv_membership membership);
+
+  /**
    * Set IP multicast loop flag.  Makes multicast packets loop back to local
    * sockets.
    *
@@ -352,6 +365,13 @@ class Udp final : public HandleImpl<Udp, uv_udp_t> {
    * Stop listening for incoming datagrams.
    */
   void StopRecv() { Invoke(&uv_udp_recv_stop, GetRaw()); }
+
+  /**
+   * Returns true if the UDP handle was created with the UV_UDP_RECVMMSG flag
+   * and the platform supports recvmmsg(2), false otherwise.
+   * @return True if the UDP handle is using recvmmsg.
+   */
+  bool IsUsingRecvmmsg() const { return uv_udp_using_recvmmsg(GetRaw()); }
 
   /**
    * Gets the amount of queued bytes waiting to be sent.
