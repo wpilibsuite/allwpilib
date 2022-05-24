@@ -16,7 +16,7 @@
 
 #include "wpi/EpochTracker.h"
 #include "wpi/Compiler.h"
-#include "wpi/PointerLikeTypeTraits.h"
+#include "wpi/ReverseIteration.h"
 #include "wpi/type_traits.h"
 #include <cassert>
 #include <cstddef>
@@ -226,6 +226,10 @@ protected:
 public:
   explicit SmallPtrSetIteratorImpl(const void *const *BP, const void*const *E)
     : Bucket(BP), End(E) {
+    if (shouldReverseIterate()) {
+      RetreatIfNotValid();
+      return;
+    }
     AdvanceIfNotValid();
   }
 
@@ -277,11 +281,22 @@ public:
   // Most methods are provided by the base class.
 
   const PtrTy operator*() const {
+    assert(isHandleInSync() && "invalid iterator access!");
+    if (shouldReverseIterate()) {
+      assert(Bucket > End);
+      return PtrTraits::getFromVoidPointer(const_cast<void *>(Bucket[-1]));
+    }
     assert(Bucket < End);
     return PtrTraits::getFromVoidPointer(const_cast<void*>(*Bucket));
   }
 
   inline SmallPtrSetIterator& operator++() {          // Preincrement
+    assert(isHandleInSync() && "invalid iterator access!");
+    if (shouldReverseIterate()) {
+      --Bucket;
+      RetreatIfNotValid();
+      return *this;
+    }
     ++Bucket;
     AdvanceIfNotValid();
     return *this;
@@ -385,6 +400,8 @@ public:
   }
 
   iterator begin() const {
+    if (shouldReverseIterate())
+      return makeIterator(EndPointer() - 1);
     return makeIterator(CurArray);
   }
   iterator end() const { return makeIterator(EndPointer()); }
@@ -392,6 +409,8 @@ public:
 private:
   /// Create an iterator that dereferences to same place as the given pointer.
   iterator makeIterator(const void *const *P) const {
+    if (shouldReverseIterate())
+      return iterator(P == EndPointer() ? CurArray : P + 1, CurArray, *this);
     return iterator(P, EndPointer(), *this);
   }
 };

@@ -54,8 +54,8 @@ def run_global_replacements(wpiutil_llvm_files):
         # Replace wpi/FileSystem.h with wpi/fs.h
         content = content.replace("include \"wpi/FileSystem.h\"",
                                   "include \"wpi/fs.h\"")
-        content = content.replace("#include \"wpi/ReverseIteration.h\"",
-                                  "#include \"wpi/PointerLikeTypeTraits.h\"")
+        # content = content.replace("#include \"wpi/ReverseIteration.h\"",
+        #                           "#include \"wpi/PointerLikeTypeTraits.h\"")
 
         # Replace llvm_unreachable() with wpi_unreachable()
         content = content.replace("llvm_unreachable", "wpi_unreachable")
@@ -167,7 +167,7 @@ def main():
         os.path.join(patch_root, "0007-ifdef-guard-safety.patch"),
         os.path.join(patch_root, "0008-Explicitly-use-std.patch"),
         os.path.join(patch_root, "0009-Remove-format_provider.patch"),
-        os.path.join(patch_root, "0010-Remove-reverse-iterator.patch"),
+        # os.path.join(patch_root, "0010-Remove-reverse-iterator.patch"),
         os.path.join(patch_root, "0011-Remove-allocator-from-collections.patch"),
         # os.path.join(patch_root, "0012-Remove-EpochTracker.patch"),
         os.path.join(patch_root, "0013-Add-compiler-warning-pragrams.patch"),
