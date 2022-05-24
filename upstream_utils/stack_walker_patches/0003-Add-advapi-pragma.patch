@@ -1,4 +1,4 @@
-From 813edc726d4b50892baf05c291ac5bab4cb10d47 Mon Sep 17 00:00:00 2001
+From 61646f76602a77059c18298caa575b95b702c94c Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Tue, 24 May 2022 01:24:31 -0400
 Subject: [PATCH 3/3] Add advapi pragma

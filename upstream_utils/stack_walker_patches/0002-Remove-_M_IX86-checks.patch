@@ -1,4 +1,4 @@
-From cb08f60ab046ec3f63880a86a529fc641c4084f8 Mon Sep 17 00:00:00 2001
+From 238eda525de70b57bade634447c967f4f92bc96d Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Mon, 23 May 2022 00:06:45 -0400
 Subject: [PATCH 2/3] Remove _M_IX86 checks
