@@ -9,6 +9,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import edu.wpi.first.hal.HAL;
 import edu.wpi.first.wpilibj.simulation.SimHooks;
+import java.util.concurrent.atomic.AtomicBoolean;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.parallel.ResourceLock;
 
@@ -180,6 +181,26 @@ class CommandDecoratorTest extends CommandTestBase {
       scheduler.run();
 
       assertTrue(scheduler.isScheduled(perpetual));
+    }
+  }
+
+  @Test
+  void unlessTest() {
+    try (CommandScheduler scheduler = new CommandScheduler()) {
+      AtomicBoolean unlessCondition = new AtomicBoolean(true);
+      AtomicBoolean hasRunCondition = new AtomicBoolean(false);
+
+      Command command =
+          new InstantCommand(() -> hasRunCondition.set(true)).unless(unlessCondition::get);
+
+      scheduler.schedule(command);
+      scheduler.run();
+      assertFalse(hasRunCondition.get());
+
+      unlessCondition.set(false);
+      scheduler.schedule(command);
+      scheduler.run();
+      assertTrue(hasRunCondition.get());
     }
   }
 }

@@ -303,6 +303,18 @@ public interface Command {
   }
 
   /**
+   * Decorates this command to only run if this condition is not met. If the command is already
+   * running and the condition changes to true, the command will not stop running. The requirements
+   * of this command will be kept for the new conditonal command.
+   *
+   * @param condition the condition that will prevent the command from running
+   * @return the decorated command
+   */
+  default ConditionalCommand unless(BooleanSupplier condition) {
+    return new ConditionalCommand(new InstantCommand(), this, condition);
+  }
+
+  /**
    * Schedules this command.
    *
    * @param interruptible whether this command can be interrupted by another command that shares one
