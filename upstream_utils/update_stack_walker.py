@@ -2,11 +2,6 @@
 
 import os
 import shutil
-import re
-import requests
-import tempfile
-import urllib
-import subprocess
 
 from upstream_utils import setup_upstream_repo, comment_out_invalid_includes, walk_cwd_and_copy_if, am_patches, walk_if, copy_to
 
