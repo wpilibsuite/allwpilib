@@ -1,7 +1,7 @@
-From 644521f5d44152e0196cb630864d37ba79c8a39e Mon Sep 17 00:00:00 2001
+From 1a02de906b6182af54eeafff465d51364c0bbcc4 Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Tue, 26 Apr 2022 15:24:47 -0400
-Subject: [PATCH 4/7] Cleanup problematic language
+Subject: [PATCH 4/8] Cleanup problematic language
 
 ---
  src/unix/tty.c | 21 +++++++++++----------

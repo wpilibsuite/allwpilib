@@ -87,7 +87,9 @@ SequentialCommandGroup Command::AndThen(
 }
 
 PerpetualCommand Command::Perpetually() && {
+  WPI_IGNORE_DEPRECATED
   return PerpetualCommand(std::move(*this).TransferOwnership());
+  WPI_UNIGNORE_DEPRECATED
 }
 
 EndlessCommand Command::Endlessly() && {

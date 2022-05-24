@@ -22,6 +22,7 @@ def main():
         os.path.join(prefix, "0005-Use-roborio-time.patch"),
         os.path.join(prefix, "0006-Style-comments-cleanup.patch"),
         os.path.join(prefix, "0007-Squelch-GCC-12.1-warnings.patch"),
+        os.path.join(prefix, "0008-Fix-Win32-warning-suppression-pragma.patch"),
     ])
 
     # Delete old install

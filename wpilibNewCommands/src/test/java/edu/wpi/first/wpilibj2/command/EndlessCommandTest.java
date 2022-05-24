@@ -8,12 +8,11 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.Test;
 
-class PerpetualCommandTest extends CommandTestBase {
-  @SuppressWarnings("removal") // PerpetualCommand
+class EndlessCommandTest extends CommandTestBase {
   @Test
-  void perpetualCommandScheduleTest() {
+  void endlessCommandScheduleTest() {
     try (CommandScheduler scheduler = new CommandScheduler()) {
-      PerpetualCommand command = new PerpetualCommand(new InstantCommand());
+      EndlessCommand command = new EndlessCommand(new InstantCommand());
 
       scheduler.schedule(command);
       scheduler.run();

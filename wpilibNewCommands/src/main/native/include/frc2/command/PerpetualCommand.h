@@ -31,8 +31,7 @@ namespace frc2 {
  *
  * @deprecated replace with EndlessCommand
  */
-class WPI_DEPRECATED("Replace with EndlessCommand") PerpetualCommand
-    : public CommandHelper<CommandBase, PerpetualCommand> {
+class PerpetualCommand : public CommandHelper<CommandBase, PerpetualCommand> {
  public:
   /**
    * Creates a new PerpetualCommand.  Will run another command in perpetuity,
@@ -41,8 +40,10 @@ class WPI_DEPRECATED("Replace with EndlessCommand") PerpetualCommand
    *
    * @param command the command to run perpetually
    */
+  WPI_DEPRECATED("Replace with EndlessCommand")
   explicit PerpetualCommand(std::unique_ptr<Command>&& command);
 
+  WPI_IGNORE_DEPRECATED
   /**
    * Creates a new PerpetualCommand.  Will run another command in perpetuity,
    * ignoring that command's end conditions, unless this command itself is
@@ -52,9 +53,11 @@ class WPI_DEPRECATED("Replace with EndlessCommand") PerpetualCommand
    */
   template <class T, typename = std::enable_if_t<std::is_base_of_v<
                          Command, std::remove_reference_t<T>>>>
+  WPI_DEPRECATED("Replace with EndlessCommand")
   explicit PerpetualCommand(T&& command)
       : PerpetualCommand(std::make_unique<std::remove_reference_t<T>>(
             std::forward<T>(command))) {}
+  WPI_UNIGNORE_DEPRECATED
 
   PerpetualCommand(PerpetualCommand&& other) = default;
 

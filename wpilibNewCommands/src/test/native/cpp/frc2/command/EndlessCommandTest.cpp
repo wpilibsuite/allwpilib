@@ -3,20 +3,18 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #include "CommandTestBase.h"
+#include "frc2/command/EndlessCommand.h"
 #include "frc2/command/InstantCommand.h"
-#include "frc2/command/PerpetualCommand.h"
 
 using namespace frc2;
-class PerpetualCommandTest : public CommandTestBase {};
+class EndlessCommandTest : public CommandTestBase {};
 
-TEST_F(PerpetualCommandTest, PerpetualCommandSchedule) {
+TEST_F(EndlessCommandTest, EndlessCommandSchedule) {
   CommandScheduler scheduler = GetScheduler();
 
   bool check = false;
 
-  WPI_IGNORE_DEPRECATED
-  PerpetualCommand command{InstantCommand([&check] { check = true; }, {})};
-  WPI_UNIGNORE_DEPRECATED
+  EndlessCommand command{InstantCommand([&check] { check = true; }, {})};
 
   scheduler.Schedule(&command);
   scheduler.Run();

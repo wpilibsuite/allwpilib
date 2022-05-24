@@ -254,6 +254,7 @@ public interface Command {
    * @return the decorated command
    * @deprecated use {@link #endlessly()} instead.
    */
+  @SuppressWarnings("removal") // PerpetualCommand
   @Deprecated(forRemoval = true, since = "2023")
   default PerpetualCommand perpetually() {
     return new PerpetualCommand(this);

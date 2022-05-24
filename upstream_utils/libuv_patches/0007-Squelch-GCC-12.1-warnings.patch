@@ -1,7 +1,7 @@
-From aa760b0bb41c8052f47f9d49eb100340c1c76634 Mon Sep 17 00:00:00 2001
+From 82d952b117b770bbefebd5308416ab767eb58234 Mon Sep 17 00:00:00 2001
 From: Tyler Veness <calcmogul@gmail.com>
 Date: Tue, 17 May 2022 21:36:57 -0700
-Subject: [PATCH 7/7] Squelch GCC 12.1 warnings
+Subject: [PATCH 7/8] Squelch GCC 12.1 warnings
 
 ---
  src/unix/stream.c | 9 +++++++++
