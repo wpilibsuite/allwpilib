@@ -12,25 +12,10 @@
 
 #include "wpi/StringMap.h"
 #include "wpi/StringExtras.h"
-#include "wpi/Compiler.h"
+#include "wpi/DJB.h"
 #include "wpi/MathExtras.h"
 
 using namespace wpi;
-
-/// HashString - Hash function for strings.
-///
-/// This is the Bernstein hash function.
-//
-// FIXME: Investigate whether a modified bernstein hash function performs
-// better: http://eternallyconfuzzled.com/tuts/algorithms/jsw_tut_hashing.aspx
-//   X*33+c -> X*33^c
-static inline unsigned HashString(std::string_view str,
-                                  unsigned result = 0) noexcept {
-  for (std::string_view::size_type i = 0, e = str.size(); i != e; ++i) {
-    result = result * 33 + static_cast<unsigned char>(str[i]);
-  }
-  return result;
-}
 
 /// Returns the number of buckets to allocate to ensure that the DenseMap can
 /// accommodate \p NumEntries without need to grow().
@@ -92,7 +77,7 @@ unsigned StringMapImpl::LookupBucketFor(std::string_view Name) {
     init(16);
     HTSize = NumBuckets;
   }
-  unsigned FullHashValue = HashString(Name);
+  unsigned FullHashValue = djbHash(Name, 0);
   unsigned BucketNo = FullHashValue & (HTSize - 1);
   unsigned *HashTable = (unsigned *)(TheTable + NumBuckets + 1);
 
@@ -148,7 +133,7 @@ int StringMapImpl::FindKey(std::string_view Key) const {
   unsigned HTSize = NumBuckets;
   if (HTSize == 0)
     return -1; // Really empty table?
-  unsigned FullHashValue = HashString(Key);
+  unsigned FullHashValue = djbHash(Key, 0);
   unsigned BucketNo = FullHashValue & (HTSize - 1);
   unsigned *HashTable = (unsigned *)(TheTable + NumBuckets + 1);
 

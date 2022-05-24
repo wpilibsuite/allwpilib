@@ -163,7 +163,7 @@ def main():
         os.path.join(patch_root, "0003-Wrap-std-min-max-calls-in-parens-for-windows-warning.patch"),
         os.path.join(patch_root, "0004-Change-uniqe_function-storage-size.patch"),
         os.path.join(patch_root, "0005-Threading-updates.patch"),
-        os.path.join(patch_root, "0006-Remove-DJB-hash-dependency.patch"),
+        # os.path.join(patch_root, "0006-Remove-DJB-hash-dependency.patch"),
         os.path.join(patch_root, "0007-ifdef-guard-safety.patch"),
         os.path.join(patch_root, "0008-Explicitly-use-std.patch"),
         os.path.join(patch_root, "0009-Remove-format_provider.patch"),
