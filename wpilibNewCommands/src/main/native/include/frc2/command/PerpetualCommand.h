@@ -43,12 +43,7 @@ class PerpetualCommand : public CommandHelper<CommandBase, PerpetualCommand> {
   WPI_DEPRECATED("Replace with EndlessCommand")
   explicit PerpetualCommand(std::unique_ptr<Command>&& command);
 
-#ifdef __GNUC__
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#elif defined(_WIN32)
-#pragma warning(disable : 4996)
-#endif
+  WPI_IGNORE_DEPRECATED
   /**
    * Creates a new PerpetualCommand.  Will run another command in perpetuity,
    * ignoring that command's end conditions, unless this command itself is
@@ -62,11 +57,7 @@ class PerpetualCommand : public CommandHelper<CommandBase, PerpetualCommand> {
   explicit PerpetualCommand(T&& command)
       : PerpetualCommand(std::make_unique<std::remove_reference_t<T>>(
             std::forward<T>(command))) {}
-#ifdef __GNUC__
-#pragma GCC diagnostic pop
-#elif defined(_WIN32)
-#pragma warning(default : 4996)
-#endif
+  WPI_UNIGNORE_DEPRECATED
 
   PerpetualCommand(PerpetualCommand&& other) = default;
 

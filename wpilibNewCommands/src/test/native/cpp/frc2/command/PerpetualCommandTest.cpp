@@ -9,18 +9,14 @@
 using namespace frc2;
 class PerpetualCommandTest : public CommandTestBase {};
 
-#ifdef __GNUC__
-#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#elif defined(_WIN32)
-#pragma warning(disable : 4996)
-#endif
-
 TEST_F(PerpetualCommandTest, PerpetualCommandSchedule) {
   CommandScheduler scheduler = GetScheduler();
 
   bool check = false;
 
+  WPI_IGNORE_DEPRECATED
   PerpetualCommand command{InstantCommand([&check] { check = true; }, {})};
+  WPI_UNIGNORE_DEPRECATED
 
   scheduler.Schedule(&command);
   scheduler.Run();

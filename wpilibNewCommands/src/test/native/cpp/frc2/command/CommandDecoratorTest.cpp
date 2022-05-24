@@ -91,16 +91,12 @@ TEST_F(CommandDecoratorTest, AndThen) {
   EXPECT_TRUE(finished);
 }
 
-#ifdef __GNUC__
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#elif defined(_WIN32)
-#pragma warning(disable : 4996)
-#endif
 TEST_F(CommandDecoratorTest, Perpetually) {
   CommandScheduler scheduler = GetScheduler();
 
+  WPI_IGNORE_DEPRECATED
   auto command = InstantCommand([] {}, {}).Perpetually();
+  WPI_UNIGNORE_DEPRECATED
 
   scheduler.Schedule(&command);
 
@@ -109,11 +105,6 @@ TEST_F(CommandDecoratorTest, Perpetually) {
 
   EXPECT_TRUE(scheduler.IsScheduled(&command));
 }
-#ifdef __GNUC__
-#pragma GCC diagnostic pop
-#elif defined(_WIN32)
-#pragma warning(default : 4996)
-#endif
 
 TEST_F(CommandDecoratorTest, Endlessly) {
   CommandScheduler scheduler = GetScheduler();

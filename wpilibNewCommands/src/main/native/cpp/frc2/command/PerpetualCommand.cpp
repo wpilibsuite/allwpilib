@@ -6,12 +6,6 @@
 
 using namespace frc2;
 
-#ifdef __GNUC__
-#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#elif defined(_WIN32)
-#pragma warning(disable : 4996)
-#endif
-
 PerpetualCommand::PerpetualCommand(std::unique_ptr<Command>&& command) {
   if (!CommandGroupBase::RequireUngrouped(*command)) {
     return;
