@@ -106,4 +106,14 @@ int Stream::TryWrite(span<const Buffer> bufs) {
   return val;
 }
 
+int Stream::TryWrite2(span<const Buffer> bufs, Stream& send) {
+  int val = uv_try_write2(GetRawStream(), bufs.data(), bufs.size(),
+                          send.GetRawStream());
+  if (val < 0) {
+    this->ReportError(val);
+    return 0;
+  }
+  return val;
+}
+
 }  // namespace wpi::uv
