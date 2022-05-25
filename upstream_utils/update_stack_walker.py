@@ -6,6 +6,7 @@ import subprocess
 
 from upstream_utils import setup_upstream_repo, comment_out_invalid_includes, walk_cwd_and_copy_if, am_patches, walk_if, copy_to
 
+
 def crlf_to_lf(stackwalker_dir):
     for root, _, files in os.walk(stackwalker_dir):
         if ".git" in root:
@@ -23,6 +24,7 @@ def crlf_to_lf(stackwalker_dir):
 
     subprocess.check_call(["git", "add", "-A"])
     subprocess.check_call(["git", "commit", "-m", "Fix line endings"])
+
 
 def main():
     root, repo = setup_upstream_repo(
