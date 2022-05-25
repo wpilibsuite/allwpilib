@@ -37,14 +37,22 @@ protected:
   /// Helper to tail-allocate \p Key. It'd be nice to generalize this so it
   /// could be reused elsewhere, maybe even taking an wpi::function_ref to
   /// type-erase the allocator and put it in a source file.
+  template <typename AllocatorTy>
   static void *allocateWithKey(size_t EntrySize, size_t EntryAlign,
-                               std::string_view Key) {
+                               std::string_view Key, AllocatorTy &Allocator);
+};
+
+// Define out-of-line to dissuade inlining.
+template <typename AllocatorTy>
+void *StringMapEntryBase::allocateWithKey(size_t EntrySize, size_t EntryAlign,
+                                          std::string_view Key,
+                                          AllocatorTy &Allocator) {
   size_t KeyLength = Key.size();
 
   // Allocate a new item with space for the string at the end and a null
   // terminator.
   size_t AllocSize = EntrySize + KeyLength + 1;
-  void *Allocation = safe_malloc(AllocSize);
+  void *Allocation = Allocator.Allocate(AllocSize, EntryAlign);
   assert(Allocation && "Unhandled out-of-memory");
 
   // Copy the string information.
@@ -54,7 +62,6 @@ protected:
   Buffer[KeyLength] = 0; // Null terminate for convenience of clients.
   return Allocation;
 }
-};
 
 /// StringMapEntryStorage - Holds the value in a StringMapEntry.
 ///
@@ -114,11 +121,11 @@ public:
 
   /// Create a StringMapEntry for the specified key construct the value using
   /// \p InitiVals.
-  template <typename... InitTy>
-  static StringMapEntry *Create(std::string_view key,
+  template <typename AllocatorTy, typename... InitTy>
+  static StringMapEntry *Create(std::string_view key, AllocatorTy &allocator,
                                 InitTy &&... initVals) {
     return new (StringMapEntryBase::allocateWithKey(
-        sizeof(StringMapEntry), alignof(StringMapEntry), key))
+        sizeof(StringMapEntry), alignof(StringMapEntry), key, allocator))
         StringMapEntry(key.size(), std::forward<InitTy>(initVals)...);
   }
 
@@ -131,10 +138,12 @@ public:
 
   /// Destroy - Destroy this StringMapEntry, releasing memory back to the
   /// specified allocator.
-  void Destroy() {
+  template <typename AllocatorTy> void Destroy(AllocatorTy &allocator) {
     // Free memory referenced by the item.
+    size_t AllocSize = sizeof(StringMapEntry) + this->getKeyLength() + 1;
     this->~StringMapEntry();
-    std::free(static_cast<void *>(this));
+    allocator.Deallocate(static_cast<void *>(this), AllocSize,
+                         alignof(StringMapEntry));
   }
 };
 

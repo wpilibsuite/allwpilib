@@ -13,6 +13,7 @@
 #ifndef WPIUTIL_WPI_STRINGMAP_H
 #define WPIUTIL_WPI_STRINGMAP_H
 
+#include "wpi/AllocatorBase.h"
 #include "wpi/StringMapEntry.h"
 #include "wpi/MemAlloc.h"
 #include "wpi/SmallVector.h"
@@ -107,8 +108,10 @@ public:
 /// keys that are "strings", which are basically ranges of bytes. This does some
 /// funky memory allocation and hashing things to make it extremely efficient,
 /// storing the string data *after* the value in the map.
-template<typename ValueTy>
+template <typename ValueTy, typename AllocatorTy = MallocAllocator>
 class StringMap : public StringMapImpl {
+  AllocatorTy Allocator;
+
 public:
   using MapEntryTy = StringMapEntry<ValueTy>;
 
@@ -116,6 +119,14 @@ public:
 
   explicit StringMap(unsigned InitialSize)
       : StringMapImpl(InitialSize, static_cast<unsigned>(sizeof(MapEntryTy))) {}
+
+  explicit StringMap(AllocatorTy A)
+      : StringMapImpl(static_cast<unsigned>(sizeof(MapEntryTy))), Allocator(A) {
+  }
+
+  StringMap(unsigned InitialSize, AllocatorTy A)
+      : StringMapImpl(InitialSize, static_cast<unsigned>(sizeof(MapEntryTy))),
+        Allocator(A) {}
 
   StringMap(std::initializer_list<std::pair<std::string_view, ValueTy>> List)
       : StringMapImpl(List.size(), static_cast<unsigned>(sizeof(MapEntryTy))) {
@@ -125,10 +136,11 @@ public:
   }
 
   StringMap(StringMap &&RHS)
-      : StringMapImpl(std::move(RHS)) {}
+      : StringMapImpl(std::move(RHS)), Allocator(std::move(RHS.Allocator)) {}
 
-  StringMap(const StringMap &RHS) :
-    StringMapImpl(static_cast<unsigned>(sizeof(MapEntryTy))) {
+  StringMap(const StringMap &RHS)
+      : StringMapImpl(static_cast<unsigned>(sizeof(MapEntryTy))),
+        Allocator(RHS.Allocator) {
     if (RHS.empty())
       return;
 
@@ -148,7 +160,7 @@ public:
       }
 
       TheTable[I] = MapEntryTy::Create(
-          static_cast<MapEntryTy *>(Bucket)->getKey(),
+          static_cast<MapEntryTy *>(Bucket)->getKey(), Allocator,
           static_cast<MapEntryTy *>(Bucket)->getValue());
       HashTable[I] = RHSHashTable[I];
     }
@@ -163,6 +175,7 @@ public:
 
   StringMap &operator=(StringMap RHS) {
     StringMapImpl::swap(RHS);
+    std::swap(Allocator, RHS.Allocator);
     return *this;
   }
 
@@ -174,12 +187,15 @@ public:
       for (unsigned I = 0, E = NumBuckets; I != E; ++I) {
         StringMapEntryBase *Bucket = TheTable[I];
         if (Bucket && Bucket != getTombstoneVal()) {
-          static_cast<MapEntryTy *>(Bucket)->Destroy();
+          static_cast<MapEntryTy *>(Bucket)->Destroy(Allocator);
         }
       }
     }
     free(TheTable);
   }
+
+  AllocatorTy &getAllocator() { return Allocator; }
+  const AllocatorTy &getAllocator() const { return Allocator; }
 
   using key_type = const char *;
   using mapped_type = ValueTy;
@@ -309,7 +325,7 @@ public:
 
     if (Bucket == getTombstoneVal())
       --NumTombstones;
-    Bucket = MapEntryTy::Create(Key, std::forward<ArgsTy>(Args)...);
+    Bucket = MapEntryTy::Create(Key, Allocator, std::forward<ArgsTy>(Args)...);
     ++NumItems;
     assert(NumItems + NumTombstones <= NumBuckets);
 
@@ -327,7 +343,7 @@ public:
     for (unsigned I = 0, E = NumBuckets; I != E; ++I) {
       StringMapEntryBase *&Bucket = TheTable[I];
       if (Bucket && Bucket != getTombstoneVal()) {
-        static_cast<MapEntryTy *>(Bucket)->Destroy();
+        static_cast<MapEntryTy *>(Bucket)->Destroy(Allocator);
       }
       Bucket = nullptr;
     }
@@ -343,7 +359,7 @@ public:
   void erase(iterator I) {
     MapEntryTy &V = *I;
     remove(&V);
-    V.Destroy();
+    V.Destroy(Allocator);
   }
 
   bool erase(std::string_view Key) {
