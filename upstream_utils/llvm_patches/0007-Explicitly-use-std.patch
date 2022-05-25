@@ -1,7 +1,7 @@
-From 945a1d5a54ad830f857625417da414d05d367a37 Mon Sep 17 00:00:00 2001
+From 6098845aed7416fde8a9c1f276571c8a1bc27799 Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Sat, 7 May 2022 22:37:34 -0400
-Subject: [PATCH 08/31] Explicitly use std::
+Subject: [PATCH 07/27] Explicitly use std::
 
 ---
  llvm/include/llvm/ADT/SmallSet.h       | 2 +-
@@ -64,7 +64,7 @@ index 6f3c94eed273..531f81ab5b3f 100644
      EXPECT_EQ(F - Found + 1, *F);
  }
 diff --git a/llvm/unittests/ADT/StringMapTest.cpp b/llvm/unittests/ADT/StringMapTest.cpp
-index 4c4aec2184b7..5211f01bbd73 100644
+index 18beb3878067..081b699adee3 100644
 --- a/llvm/unittests/ADT/StringMapTest.cpp
 +++ b/llvm/unittests/ADT/StringMapTest.cpp
 @@ -308,7 +308,7 @@ TEST_F(StringMapTest, IterMapKeys) {

@@ -1,7 +1,7 @@
-From 96ace137b394c0af8b3f1d9f3862cdf171adcfa4 Mon Sep 17 00:00:00 2001
+From 9d6e5efbd4b77747387b35a45d0c591126f7c08c Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Sun, 8 May 2022 19:30:43 -0400
-Subject: [PATCH 28/31] OS specific changes
+Subject: [PATCH 24/27] OS specific changes
 
 ---
  llvm/lib/Support/ErrorHandling.cpp | 13 +++++++------

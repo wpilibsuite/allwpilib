@@ -1,7 +1,7 @@
-From 81df3d81b0bffd848890d7c01d946e65744fb649 Mon Sep 17 00:00:00 2001
+From 48f55e6aa592d66f46f392330317e4efe0502faf Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Sat, 7 May 2022 22:12:41 -0400
-Subject: [PATCH 03/31] Wrap std::min/max calls in parens, for windows warnings
+Subject: [PATCH 03/27] Wrap std::min/max calls in parens, for windows warnings
 
 ---
  llvm/include/llvm/ADT/DenseMap.h       |  4 ++--

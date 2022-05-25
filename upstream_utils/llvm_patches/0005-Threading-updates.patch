@@ -1,7 +1,7 @@
-From a53483a33c8d5778e5594a49376b5bafe742d126 Mon Sep 17 00:00:00 2001
+From 5ca3ff668002f9bf89c134aec9976526c61929da Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Sat, 7 May 2022 22:17:19 -0400
-Subject: [PATCH 05/31] Threading updates
+Subject: [PATCH 05/27] Threading updates
 
 - Remove guards for threads and exception
 - Prefer scope gaurd over lock gaurd

@@ -13,8 +13,8 @@
 #ifndef WPIUTIL_WPI_STRINGMAP_H
 #define WPIUTIL_WPI_STRINGMAP_H
 
-#include "wpi/AllocatorBase.h"
 #include "wpi/StringMapEntry.h"
+#include "wpi/AllocatorBase.h"
 #include "wpi/MemAlloc.h"
 #include "wpi/SmallVector.h"
 #include "wpi/iterator.h"

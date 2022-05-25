@@ -1,7 +1,7 @@
-From 63e46567fe7f9d3e48beaca7827125bfe06e1004 Mon Sep 17 00:00:00 2001
+From 34652f999acd319bb507ca4d504050ec90981e18 Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Thu, 19 May 2022 01:12:41 -0400
-Subject: [PATCH 31/31] constexpr endian byte swap
+Subject: [PATCH 27/27] constexpr endian byte swap
 
 ---
  llvm/include/llvm/Support/Endian.h | 4 +++-

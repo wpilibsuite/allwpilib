@@ -1,15 +1,30 @@
-From 7bac24e5310d67d6828b687aec2043966a955093 Mon Sep 17 00:00:00 2001
+From 8536e1f23d515eac3cbc0680f27aa6ab740b4796 Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Sun, 8 May 2022 19:16:51 -0400
-Subject: [PATCH 26/31] Remove unused functions
+Subject: [PATCH 22/27] Remove unused functions
 
 ---
+ llvm/include/llvm/Support/DJB.h         |  3 -
  llvm/include/llvm/Support/raw_ostream.h |  3 +-
  llvm/lib/Support/ErrorHandling.cpp      | 16 -----
  llvm/lib/Support/raw_ostream.cpp        | 48 +++++++--------
  llvm/unittests/ADT/SmallStringTest.cpp  | 81 -------------------------
- 4 files changed, 22 insertions(+), 126 deletions(-)
+ 5 files changed, 22 insertions(+), 129 deletions(-)
 
+diff --git a/llvm/include/llvm/Support/DJB.h b/llvm/include/llvm/Support/DJB.h
+index 8737cd144c37..67b0ae91b4b1 100644
+--- a/llvm/include/llvm/Support/DJB.h
++++ b/llvm/include/llvm/Support/DJB.h
+@@ -24,9 +24,6 @@ inline uint32_t djbHash(std::string_view Buffer, uint32_t H = 5381) {
+   return H;
+ }
+ 
+-/// Computes the Bernstein hash after folding the input according to the Dwarf 5
+-/// standard case folding rules.
+-uint32_t caseFoldingDjbHash(StringRef Buffer, uint32_t H = 5381);
+ } // namespace llvm
+ 
+ #endif // LLVM_SUPPORT_DJB_H
 diff --git a/llvm/include/llvm/Support/raw_ostream.h b/llvm/include/llvm/Support/raw_ostream.h
 index 27fb5c03e474..d228b05f4f9b 100644
 --- a/llvm/include/llvm/Support/raw_ostream.h

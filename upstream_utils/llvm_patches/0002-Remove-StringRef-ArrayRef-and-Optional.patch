@@ -1,7 +1,7 @@
-From 3b9d1af2e3a1b031554e3f3b9d0eda4aa55d8b15 Mon Sep 17 00:00:00 2001
+From 8799ad77758b93e742394699451009a8d3fc7bb7 Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Sat, 7 May 2022 22:09:18 -0400
-Subject: [PATCH 02/31] Remove StringRef, ArrayRef, and Optional
+Subject: [PATCH 02/27] Remove StringRef, ArrayRef, and Optional
 
 ---
  llvm/include/llvm/ADT/SmallSet.h              | 12 +--
@@ -11,6 +11,7 @@ Subject: [PATCH 02/31] Remove StringRef, ArrayRef, and Optional
  llvm/include/llvm/Support/Chrono.h            | 10 +--
  llvm/include/llvm/Support/Compiler.h          |  2 +-
  llvm/include/llvm/Support/ConvertUTF.h        | 25 +++---
+ llvm/include/llvm/Support/DJB.h               |  6 +-
  llvm/include/llvm/Support/ErrorHandling.h     |  7 +-
  .../llvm/Support/SmallVectorMemoryBuffer.h    |  6 +-
  llvm/include/llvm/Support/VersionTuple.h      | 20 ++---
@@ -27,7 +28,7 @@ Subject: [PATCH 02/31] Remove StringRef, ArrayRef, and Optional
  llvm/unittests/ADT/SmallVectorTest.cpp        | 20 +----
  llvm/unittests/ADT/StringMapTest.cpp          | 27 ++++---
  llvm/unittests/Support/ConvertUTFTest.cpp     | 37 +++++----
- 23 files changed, 234 insertions(+), 285 deletions(-)
+ 24 files changed, 237 insertions(+), 288 deletions(-)
 
 diff --git a/llvm/include/llvm/ADT/SmallSet.h b/llvm/include/llvm/ADT/SmallSet.h
 index 0600e528ee69..e4c209c5f2a9 100644
@@ -689,6 +690,27 @@ index 1add185330fa..7f1527f51cdf 100644
  std::error_code UTF16ToUTF8(const wchar_t *utf16, size_t utf16_len,
                              SmallVectorImpl<char> &utf8);
  /// Convert from UTF16 to the current code page used in the system
+diff --git a/llvm/include/llvm/Support/DJB.h b/llvm/include/llvm/Support/DJB.h
+index 8a04a324a5dc..8737cd144c37 100644
+--- a/llvm/include/llvm/Support/DJB.h
++++ b/llvm/include/llvm/Support/DJB.h
+@@ -13,13 +13,13 @@
+ #ifndef LLVM_SUPPORT_DJB_H
+ #define LLVM_SUPPORT_DJB_H
+ 
+-#include "llvm/ADT/StringRef.h"
++#include <string_view>
+ 
+ namespace llvm {
+ 
+ /// The Bernstein hash function used by the DWARF accelerator tables.
+-inline uint32_t djbHash(StringRef Buffer, uint32_t H = 5381) {
+-  for (unsigned char C : Buffer.bytes())
++inline uint32_t djbHash(std::string_view Buffer, uint32_t H = 5381) {
++  for (unsigned char C : Buffer)
+     H = (H << 5) + H + C;
+   return H;
+ }
 diff --git a/llvm/include/llvm/Support/ErrorHandling.h b/llvm/include/llvm/Support/ErrorHandling.h
 index dd85a5892e01..411c78a81b24 100644
 --- a/llvm/include/llvm/Support/ErrorHandling.h
@@ -1506,7 +1528,7 @@ index 06b98efe66ef..1914f38fac6c 100644
  class SmallVectorReferenceInvalidationTest : public SmallVectorTestBase {
  protected:
 diff --git a/llvm/unittests/ADT/StringMapTest.cpp b/llvm/unittests/ADT/StringMapTest.cpp
-index 98fbd6e1df5a..4c4aec2184b7 100644
+index 98fbd6e1df5a..18beb3878067 100644
 --- a/llvm/unittests/ADT/StringMapTest.cpp
 +++ b/llvm/unittests/ADT/StringMapTest.cpp
 @@ -7,7 +7,6 @@
@@ -1561,7 +1583,7 @@ index 98fbd6e1df5a..4c4aec2184b7 100644
    StringMap<uint32_t>::value_type *entry =
        StringMap<uint32_t>::value_type::Create(
 -          StringRef(testKeyFirst, testKeyLength), Allocator, 1u);
-+          std::string_view(testKeyFirst, testKeyLength), 1u);
++          std::string_view(testKeyFirst, testKeyLength), Allocator, 1u);
    EXPECT_STREQ(testKey, entry->first().data());
    EXPECT_EQ(1u, entry->second);
    entry->Destroy(Allocator);
