@@ -72,6 +72,7 @@ def setup_upstream_repo(url, treeish, shallow=True):
     Keyword arguments:
     url -- The URL of the git repo
     treeish -- The tree-ish to check out (branch or tag)
+    shallow -- Whether to do a shallow clone
 
     Returns:
     root -- root directory of destination Git repository
