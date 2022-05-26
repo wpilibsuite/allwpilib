@@ -82,8 +82,8 @@ def unsupported_inclusions(dp, f):
     if f == "CMakeLists.txt" or "README" in f:
         return False
 
-    # Include the AutoDiff and MatrixFunctions modules
-    return "AutoDiff" in abspath or "MatrixFunctions" in abspath
+    # Include the MatrixFunctions module
+    return "MatrixFunctions" in abspath
 
 
 def main():
