@@ -1,7 +1,7 @@
-From f2b2850258fe3aed54c64f8afac2565b00ddf4b0 Mon Sep 17 00:00:00 2001
+From bb8c33904fba6099ca17ddecd84fa20272c5a20c Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Thu, 5 May 2022 18:09:45 -0400
-Subject: [PATCH 19/31] Delete numbers from mathextras
+Subject: [PATCH 15/27] Delete numbers from mathextras
 
 ---
  llvm/include/llvm/Support/MathExtras.h | 36 --------------------------

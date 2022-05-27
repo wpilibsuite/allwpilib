@@ -1,7 +1,7 @@
-From e8352137c16b81ab7af248e608eca3a1d8221e37 Mon Sep 17 00:00:00 2001
+From 1354697da0c8661ef6030eb6355a680bbed7b752 Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Sun, 8 May 2022 13:43:50 -0400
-Subject: [PATCH 14/31] Remove unused functions
+Subject: [PATCH 10/27] Remove unused functions
 
 ---
  llvm/include/llvm/ADT/SmallString.h      |  80 ------

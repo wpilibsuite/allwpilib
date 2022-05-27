@@ -1,7 +1,7 @@
-From 2e9ec7d3e5c58424fde4312784e2a9faab58fe2c Mon Sep 17 00:00:00 2001
+From a55cc2394a9fca533d8d07e3b61e47fedb99cd1b Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Sun, 8 May 2022 13:34:07 -0400
-Subject: [PATCH 13/31] Add compiler warning pragrams
+Subject: [PATCH 09/27] Add compiler warning pragrams
 
 ---
  llvm/include/llvm/ADT/FunctionExtras.h | 10 ++++++++++

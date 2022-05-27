@@ -1,10 +1,10 @@
-From b013523b36cba3c8fc0ced2ca013a8763573d5a0 Mon Sep 17 00:00:00 2001
+From 8e868fdb545f3facb646418b5e127e360fe88a99 Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Sun, 8 May 2022 16:38:11 -0400
-Subject: [PATCH 21/31] Fixup includes
+Subject: [PATCH 17/27] Fixup includes
 
 ---
- llvm/include/llvm/ADT/StringMap.h                 |  5 ++++-
+ llvm/include/llvm/ADT/StringMap.h                 |  4 ++++
  llvm/include/llvm/ADT/StringMapEntry.h            |  4 ++++
  llvm/include/llvm/Support/PointerLikeTypeTraits.h |  1 +
  llvm/lib/Support/ConvertUTFWrapper.cpp            |  1 +
@@ -13,17 +13,16 @@ Subject: [PATCH 21/31] Fixup includes
  llvm/unittests/ADT/SmallPtrSetTest.cpp            |  2 ++
  llvm/unittests/ADT/StringMapTest.cpp              |  1 +
  llvm/unittests/Support/ConvertUTFTest.cpp         |  2 ++
- 9 files changed, 24 insertions(+), 11 deletions(-)
+ 9 files changed, 24 insertions(+), 10 deletions(-)
 
 diff --git a/llvm/include/llvm/ADT/StringMap.h b/llvm/include/llvm/ADT/StringMap.h
-index af4be84e469d..c41057cb6792 100644
+index ac0d4b363145..f7bf5ad9c063 100644
 --- a/llvm/include/llvm/ADT/StringMap.h
 +++ b/llvm/include/llvm/ADT/StringMap.h
-@@ -14,7 +14,10 @@
- #define LLVM_ADT_STRINGMAP_H
+@@ -15,6 +15,10 @@
  
  #include "llvm/ADT/StringMapEntry.h"
--#include "llvm/Support/AllocatorBase.h"
+ #include "llvm/Support/AllocatorBase.h"
 +#include "llvm/Support/MemAlloc.h"
 +#include "llvm/Support/SmallVector.h"
 +#include "llvm/Support/iterator.h"
@@ -32,7 +31,7 @@ index af4be84e469d..c41057cb6792 100644
  #include <initializer_list>
  #include <iterator>
 diff --git a/llvm/include/llvm/ADT/StringMapEntry.h b/llvm/include/llvm/ADT/StringMapEntry.h
-index 66a30698d787..1201bb8e69d4 100644
+index 93e13b5bb16c..cdf11d627200 100644
 --- a/llvm/include/llvm/ADT/StringMapEntry.h
 +++ b/llvm/include/llvm/ADT/StringMapEntry.h
 @@ -15,6 +15,10 @@
@@ -143,7 +142,7 @@ index 531f81ab5b3f..3db8b6e37d31 100644
  
  TEST(SmallPtrSetTest, Assignment) {
 diff --git a/llvm/unittests/ADT/StringMapTest.cpp b/llvm/unittests/ADT/StringMapTest.cpp
-index 28d710fe69e9..60571cff6927 100644
+index 081b699adee3..64bb8f85c4b9 100644
 --- a/llvm/unittests/ADT/StringMapTest.cpp
 +++ b/llvm/unittests/ADT/StringMapTest.cpp
 @@ -9,6 +9,7 @@

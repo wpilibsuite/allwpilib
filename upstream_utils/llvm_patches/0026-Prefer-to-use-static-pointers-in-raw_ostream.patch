@@ -1,7 +1,7 @@
-From 6f0f7e6e4256d642673e3441468f44f6bd94fe12 Mon Sep 17 00:00:00 2001
+From 7bdbcabd3271aebb692ef06a950d1ec59341ddf9 Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Thu, 19 May 2022 00:58:36 -0400
-Subject: [PATCH 30/31] Prefer to use static pointers in raw_ostream
+Subject: [PATCH 26/27] Prefer to use static pointers in raw_ostream
 
 See #1401
 ---

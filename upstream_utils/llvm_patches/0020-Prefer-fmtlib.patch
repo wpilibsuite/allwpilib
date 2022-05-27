@@ -1,7 +1,7 @@
-From c67b1c2baf278050fb43bee7a7241392d64fbb0d Mon Sep 17 00:00:00 2001
+From 2a480ee8e89b322b91f596a5a9d63aa6b9a76af0 Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Sun, 8 May 2022 16:46:20 -0400
-Subject: [PATCH 24/31] Prefer fmtlib
+Subject: [PATCH 20/27] Prefer fmtlib
 
 ---
  llvm/lib/Support/ErrorHandling.cpp | 20 ++++++--------------
