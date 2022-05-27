@@ -54,8 +54,6 @@ def run_global_replacements(wpiutil_llvm_files):
         # Replace wpi/FileSystem.h with wpi/fs.h
         content = content.replace("include \"wpi/FileSystem.h\"",
                                   "include \"wpi/fs.h\"")
-        # content = content.replace("#include \"wpi/ReverseIteration.h\"",
-        #                           "#include \"wpi/PointerLikeTypeTraits.h\"")
 
         # Replace llvm_unreachable() with wpi_unreachable()
         content = content.replace("llvm_unreachable", "wpi_unreachable")
