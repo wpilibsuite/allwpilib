@@ -12,23 +12,23 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - container: wpilib/roborio-cross-ubuntu:2022-18.04
+          - container: wpilib/roborio-cross-ubuntu:2022-20.04
             artifact-name: Athena
             build-options: "-Ponlylinuxathena"
-          - container: wpilib/raspbian-cross-ubuntu:10-18.04
+          - container: wpilib/raspbian-cross-ubuntu:10-20.04
             artifact-name: Raspbian
             build-options: "-Ponlylinuxraspbian"
-          - container: wpilib/aarch64-cross-ubuntu:bionic-18.04
+          - container: wpilib/aarch64-cross-ubuntu:bionic-20.04
             artifact-name: Aarch64
             build-options: "-Ponlylinuxaarch64bionic"
-          - container: wpilib/ubuntu-base:18.04
+          - container: wpilib/ubuntu-base:20.04
             artifact-name: Linux
             build-options: "-Ponlylinuxx86-64"
     name: "Build - ${{ matrix.artifact-name }}"
     runs-on: ubuntu-latest
     container: ${{ matrix.container }}
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           fetch-depth: 0
       - name: Set release environment variable
@@ -60,7 +60,7 @@ jobs:
     name: "Build - ${{ matrix.artifact-name }}"
     runs-on: ${{ matrix.os }}
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           fetch-depth: 0
       - uses: actions/setup-java@v1
@@ -104,7 +104,7 @@ jobs:
     name: "Build - Documentation"
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           fetch-depth: 0
       - uses: actions/setup-java@v1
@@ -130,7 +130,7 @@ jobs:
     needs: [build-docker, build-host, build-documentation]
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           repository: wpilibsuite/build-tools
       - uses: actions/download-artifact@v2
