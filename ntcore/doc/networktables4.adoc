@@ -48,7 +48,7 @@ MessagePack messages use numeric IDs for topics to reduce data size; these IDs h
 [[topic-names]]
 === Topic Names
 
-Topic have UTF-8 string names.  Names starting with $ are reserved for use by the server (see <<meta-topics>>).  Otherwise names are unrestricted, but convention is for them to start with `/` and be `/`-separated (without consecutive `//`) to make a Unix-path-like structure.
+Topic have UTF-8 string names.  Names starting with `$` are reserved for use by the server (see <<meta-topics>>).  Otherwise names are unrestricted, but convention is for them to start with `/` and be `/`-separated (without consecutive `//`) to make a Unix-path-like structure.
 
 [[timestamps]]
 === Timestamps
@@ -59,11 +59,11 @@ Timestamps in messages always use the server time base.  The server time base is
 
 Implementations should expose the actual timestamps for messages as well as provide methods to convert from server time base to local time to facilitate applications that prefer the server time base (e.g. a dashboard showing robot events might prefer to use server time instead of wall clock time).
 
-The topic ID of -1 is reserved for timestamp communication.  Clients shall periodically (e.g. every few seconds) send, in a manner that minimizes transmission delays, a MessagePack message with ID of -1, a timestamp of 0, and an implementation-selected type and data value (typically int or float 64) containing its (the client’s) current local time.
+The topic ID of -1 is reserved for timestamp communication.  Clients shall periodically (e.g. every few seconds) send, in a manner that minimizes transmission delays, a MessagePack message with ID of -1, a timestamp of 0, and an implementation-selected type and data value (typically int or float 64) containing its (the client's) current local time.
 
-When the server receives an -1 ID message from a client, it shall respond to the client, in a manner that minimizes transmission delays, with a MessagePack message with ID=-1, a timestamp of its (the server’s) current local time (in microseconds), and the client-provided data value.
+When the server receives an -1 ID message from a client, it shall respond to the client, in a manner that minimizes transmission delays, with a MessagePack message with ID=-1, a timestamp of its (the server's) current local time (in microseconds), and the client-provided data value.
 
-When the client receives an -1 ID message from the server, it shall compute the round trip time (RTT) from the delta between the message’s data value and the current local time.  If the RTT is less than that from previous measurements, the client shall use the timestamp in the message plus ½ the RTT as the server time equivalent to the current local time, and use this equivalence to compute server time base timestamps from local time for future messages.
+When the client receives an -1 ID message from the server, it shall compute the round trip time (RTT) from the delta between the message's data value and the current local time.  If the RTT is less than that from previous measurements, the client shall use the timestamp in the message plus ½ the RTT as the server time equivalent to the current local time, and use this equivalence to compute server time base timestamps from local time for future messages.
 
 Due to the fact there can be multiple publishers for a single topic and unpredictable network delays / clock drift, there is no global total order for timestamps either globally or on a per-topic basis.  While single publishers for real-time data will be the norm, and in that case the timestamps will usually be in order, applications that use timestamps need to be able to handle out-of-order timestamps.
 
@@ -99,8 +99,8 @@ Note: the previous paragraphs enable offline, multi-publisher operation under ne
 * If the coprocessor reconnects first:
 ** The coprocessor client only ever called "set default", so it sends the cached data (the user-set value) with timestamp 0.
 ** If the dashboard never reconnects, no new values are published, so the user-set value is active
-** If the dashboard reconnects, it sends a message with timestamp 1 ("strong" set).  This propagates but does not change the value (it’s the same user-set as before).
-* If the dashboard updates the value while offline, it’s still a "strong set" and wins the tie
+** If the dashboard reconnects, it sends a message with timestamp 1 ("strong" set).  This propagates but does not change the value (it's the same user-set as before).
+* If the dashboard updates the value while offline, it's still a "strong set" and wins the tie
 
 A second use case:
 
@@ -131,10 +131,12 @@ Clients are responsible for keeping server connections established (e.g. via ret
 
 Except for offline-published values with timestamps of 0, the client shall not send any other published values to the server until its clock is synchronized with the server per the <<timestamps>> section.
 
+Clients may publish a value at any time following clock synchronization.  Clients may subscribe to meta-topics to determine whether or not to publish a value change (e.g. based on whether there are any subscribers, or based on specific <<sub-options>>).
+
 [[meta-topics]]
 === Server-Published Meta Topics
 
-The server shall publish a standard set of topics with information about server state.  Clients may subscribe to these topics for diagnostics purposes.  These topics are hidden--they are only announced to clients that have subscribed to them.
+The server shall publish a standard set of topics with information about server state.  Clients may subscribe to these topics for diagnostics purposes or to determine when to publish value changes.  These topics are hidden--they are only announced to clients that have subscribed to them.
 
 [cols="1,1,2", options="header"]
 |===
@@ -198,9 +200,9 @@ The MessagePack contents shall be an array of maps.  Each map in the array shall
 |One or more topic prefixes to start receiving messages for.
 
 |`options`
-|Object
+|Map
 |Options
-|Subscription options, see `subscribe`
+|<<sub-options>>
 |===
 
 [[meta-server-sub]]
@@ -231,6 +233,11 @@ The MessagePack contents shall be an array of maps.  Each map in the array shall
 |Integer
 |Subscription UID
 |A client-generated unique identifier for this subscription.
+
+|`options`
+|Map
+|Options
+|<<sub-options>>
 |===
 
 [[meta-client-pub]]
@@ -371,7 +378,35 @@ Each published topic may also have properties associated to it.  Properties are 
 |Property|Type|Description|Notes
 |`persistent`|boolean|Persistent Flag|If true, the last set value will be periodically saved to persistent storage on the server and be restored during server startup.  Topics with this property set to true will not be deleted by the server when the last publisher stops publishing.
 |`retained`|boolean|Retained Flag|Topics with this property set to true will not be deleted by the server when the last publisher stops publishing.
-|`hidden`|boolean|Hidden Flag|If true, the topic will not be announced to a client until the client subscribes to it.  Note the topic will still be visible via the `$clientpub` meta-topic.
+|`hidden`|boolean|Hidden Flag|If true, the topic will not be announced to a client until the client subscribes to it.  Note the topic will still be visible via the <<meta-client-pub,`$clientpub`>> meta-topic.
+|===
+
+[[sub-options]]
+== Subscription Options
+
+Each subscription may have options set.  The following options have a defined meaning in this spec.  Servers shall preserve arbitrary options, as servers and clients may support arbitrary options outside of this set.  Options are set using <<msg-subscribe>> and cannot be changed.
+
+[cols="1,1,2,6",options="header"]
+|===
+|Key
+|Value type
+|Description
+|Notes
+
+|`immediate` (optional)
+|Boolean
+|Immediate Flag
+|If true, value updates seen by the server should be immediately sent to this client, rather than waiting for a periodic "sweep" of changed values. Note this will increase network bandwidth utilization--use with caution!  If not specified, defaults to false.
+
+|`periodic` (optional)
+|Number
+|Periodic sweep time (in seconds)
+|How frequently the server should send changes (if not immediate).  The server may send more frequently than this (e.g. use a combined minimum period for all values) or apply a restricted range to this value. The default if unspecified (and the `immediate` flag is false) is 100 ms (same as NT 3.0).
+
+|`logging` (optional)
+|Boolean
+|Logging Flag
+|If true, the server should send all value changes over the wire regardless of the `immediate` and `periodic` settings.  If false, only the most recent value is sent (same as NT 3.0 behavior).  If not specified, defaults to true.
 |===
 
 [[text-frames]]
@@ -401,17 +436,17 @@ Clients and servers shall ignore JSON messages that:
 |<<msg-publish,`publish`>>
 |Publish Request
 |Client to Server
-|`announce`
+|<<msg-announce,`announce`>>
 
 |<<msg-unpublish,`unpublish`>>
 |Publish Release
 |Client to Server
-|`unannounce` (if topic deleted)
+|<<msg-unannounce,`unannounce`>> (if topic deleted)
 
 |<<msg-setproperties,`setproperties`>>
 |Set Properties
 |Client to Server
-|`announce`
+|<<msg-properties,`properties`>>
 
 4+|Value/Subscription Messages (Client to Server)
 
@@ -439,6 +474,11 @@ Clients and servers shall ignore JSON messages that:
 
 |<<msg-unannounce,`unannounce`>>
 |Topic Removed
+|Server to Client
+|---
+
+|<<msg-properties,`properties`>>
+|Properties Changed
 |Server to Client
 |---
 |===
@@ -475,16 +515,16 @@ The `publish` JSON message shall contain the following parameters:
 |Type of data
 |The requested data type (as a string).
 
-If the topic is newly created (e.g. there are no other publishers) this sets the value type.  If the topic was previously published, this is ignored.  The `announce` message contains the actual topic value type that the client shall use when publishing values.
+If the topic is newly created (e.g. there are no other publishers) this sets the value type.  If the topic was previously published, this is ignored.  The <<msg-announce,`announce`>> message contains the actual topic value type that the client shall use when publishing values.
 
 Implementations should indicate an error if the user tries to publish an incompatible type to that already set for the topic.
 
 |`properties`
-|Object
+|Map
 |Properties
 |Initial topic properties.
 
-If the topic is newly created (e.g. there are no other publishers) this sets the topic properties.  If the topic was previously published, this is ignored.  The `announce` message contains the actual topic properties.  Clients can use the `setproperties` message to change properties after topic creation.
+If the topic is newly created (e.g. there are no other publishers) this sets the topic properties.  If the topic was previously published, this is ignored.  The <<msg-announce,`announce`>> message contains the actual topic properties.  Clients can use the <<msg-setproperties,`setproperties`>> message to change properties after topic creation.
 |===
 
 [[msg-unpublish]]
@@ -506,13 +546,13 @@ The `unpublish` JSON message shall contain the following parameters:
 |`pubuid`
 |Integer
 |Publisher UID
-|The same unique identifier passed to the `publish` message
+|The same unique identifier passed to the <<msg-publish,`publish`>> message
 |===
 
 [[msg-setproperties]]
 ==== Set Properties Message (`setproperties`)
 
-Sent from a client to the server to change properties (see <<properties>>) for a given topic.  The server will respond with an updated <<msg-announce>> (if the topic is published).  This message shall be ignored by the server if the topic is not published.
+Sent from a client to the server to change properties (see <<properties>>) for a given topic.  The server will respond with a <<msg-properties>> (if the topic is published).  This message shall be ignored by the server if the topic is not published.
 
 The `setproperties` JSON message shall contain the following parameters:
 
@@ -526,12 +566,16 @@ The `setproperties` JSON message shall contain the following parameters:
 |String
 |Topic name
 
+|`uid`
+|Integer
+|A client-generated unique identifier for this properties change.  This is provided in the <<msg-properties>> back to the client.
+
 |`update`
-|Object
+|Map
 |Properties to update
 |===
 
-If a property is not included in the update object, its value is not changed.  If a property is provided in the update object with a value of null, the property is deleted.
+If a property is not included in the update map, its value is not changed.  If a property is provided in the update map with a value of null, the property is deleted.
 
 [[subscription-messages]]
 === Value/Subscription Messages (Client to Server)
@@ -539,7 +583,7 @@ If a property is not included in the update object, its value is not changed.  I
 [[msg-getvalues]]
 ==== Get Values Message (`getvalues`)
 
-Sent from a client to the server to indicate the client wants to get the current values for the specified topics / groups of topics.  The server shall treat this identically to a `subscribe` message, except only send the values once.  The server shall send announcement messages (for virtual topics) and MessagePack messages containing the current values immediately upon receipt.  While this message could theoretically be used to poll for value updates, it is much better to use a <<msg-subscribe>> to request push updates.
+Sent from a client to the server to indicate the client wants to get the current values for the specified topics / groups of topics.  The server shall treat this identically to a <<msg-subscribe>>, except only send the values once.  The server shall send announcement messages (for virtual topics) and MessagePack messages containing the current values immediately upon receipt.  While this message could theoretically be used to poll for value updates, it is much better to use a `subscribe` to request push updates.
 
 The `getvalues` JSON message shall contain the following parameters:
 
@@ -583,34 +627,9 @@ The `subscribe` JSON message shall contain the following parameters:
 |A client-generated unique identifier for this subscription.  Use the same UID later to unsubscribe.
 
 |`options`
-|Object
+|Map
 |Options
-|Subscription options, see below
-|===
-
-If present, the `options` object shall contain zero or more of the following keys/values:
-
-[cols="1,1,2,6",options="header"]
-|===
-|Key
-|Value type
-|Description
-|Notes
-
-|`immediate` (optional)
-|Boolean
-|Immediate Flag
-|If true, value updates seen by the server should be immediately sent to this client, rather than waiting for a periodic "sweep" of changed values. Note this will increase network bandwidth utilization--use with caution!  If not specified, defaults to false.
-
-|`periodic` (optional)
-|Number
-|Periodic sweep time (in seconds)
-|How frequently the server should send changes (if not immediate).  The server may send more frequently than this (e.g. use a combined minimum period for all values) or apply a restricted range to this value. The default if unspecified (and the `immediate` flag is false) is 100 ms (same as NT 3.0).
-
-|`logging` (optional)
-|Boolean
-|Logging Flag
-|If true, the server should send all value changes over the wire regardless of the `immediate` and `periodic` settings.  If false, only the most recent value is sent (same as NT 3.0 behavior).  If not specified, defaults to true.
+|<<sub-options>>
 |===
 
 [[msg-unsubscribe]]
@@ -630,7 +649,7 @@ The `unsubscribe` JSON message shall contain the following parameters:
 |`subuid`
 |Integer
 |Subscription UID
-|The same unique identifier passed to the `subscribe` message
+|The same unique identifier passed to the <<msg-subscribe,`subscribe`>> message
 |===
 
 [[announcement-messages]]
@@ -639,7 +658,15 @@ The `unsubscribe` JSON message shall contain the following parameters:
 [[msg-announce]]
 ==== Topic Announcement Message (`announce`)
 
-The server shall send this message for each existing topic to a client when it initially connects.  It shall also send this message to all clients when a topic is created, or when any topic properties are changed.  Additionally the server shall send this message to a client in response to an `publish` message.
+The server shall send this message for each of the following conditions:
+
+- For each existing topic to a client when that client initially connects
+
+- To all clients when a topic is created
+
+- To a client in response to an <<msg-publish>> from that client
+
+- To a client when it subscribes to a hidden topic
 
 The `announce` JSON message shall contain the following parameters:
 
@@ -668,12 +695,12 @@ The `announce` JSON message shall contain the following parameters:
 |`pubuid` (optional)
 |Integer
 |Publisher UID
-|If this message was sent in response to a `publish` message, the Publisher UID provided in that message.  Otherwise absent.
+|If this message was sent in response to a <<msg-publish,`publish`>> message, the Publisher UID provided in that message.  Otherwise absent.
 
 |`properties`
-|Object
+|Map
 |Properties
-|Topic properties (see `setproperties` message)
+|Topic <<properties>>
 |===
 
 [[msg-unannounce]]
@@ -699,6 +726,36 @@ The `unannounce` JSON message shall contain the following parameters:
 |Integer
 |Topic ID
 |The identifier that the server was using for value updates
+|===
+
+[[msg-properties]]
+==== Properties Changed Message (`properties`)
+
+The server shall send this message when a previously announced (via a <<msg-announce>>) topic has its properties changed via a <<msg-setproperties>>.
+
+The `properties` JSON message shall contain the following parameters:
+
+[cols="1,1,2,6",options="header"]
+|===
+|Key
+|Value type
+|Description
+|Notes
+
+|`id`
+|Integer
+|Topic ID
+|The identifier that the server was using for value updates
+
+|`uid` (optional)
+|Integer
+|Unique ID
+|If this message was sent in response to a <<msg-setproperties,`setproperties`>> message, the UID provided in that message.  Otherwise absent.
+
+|`properties`
+|Map
+|Properties
+|Topic <<properties>>
 |===
 
 [[binary-frames]]
