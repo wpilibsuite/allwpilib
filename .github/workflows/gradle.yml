@@ -28,7 +28,7 @@ jobs:
     runs-on: ubuntu-latest
     container: ${{ matrix.container }}
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           fetch-depth: 0
       - name: Set release environment variable
@@ -60,7 +60,7 @@ jobs:
     name: "Build - ${{ matrix.artifact-name }}"
     runs-on: ${{ matrix.os }}
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           fetch-depth: 0
       - uses: actions/setup-java@v1
@@ -104,7 +104,7 @@ jobs:
     name: "Build - Documentation"
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           fetch-depth: 0
       - uses: actions/setup-java@v1
@@ -130,7 +130,7 @@ jobs:
     needs: [build-docker, build-host, build-documentation]
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           repository: wpilibsuite/build-tools
       - uses: actions/download-artifact@v2
