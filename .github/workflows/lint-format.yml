@@ -80,8 +80,12 @@ jobs:
     container: wpilib/ubuntu-base:20.04
     steps:
       - uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
+      - name: Fetch all history and metadata
+        run: |
+          git config --global --add safe.directory /__w/allwpilib/allwpilib
+          git fetch --prune --unshallow
+          git checkout -b pr
+          git branch -f main origin/main
       - name: Run Java format
         run: ./gradlew javaFormat spotbugsMain spotbugsTest spotbugsDev
       - name: Check output
