@@ -52,8 +52,8 @@ static bool gKeyEdit = false;
 static int* gEnterKey;
 static void (*gPrevKeyCallback)(GLFWwindow*, int, int, int, int);
 
-static void RemapEnterKeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods)
-{
+static void RemapEnterKeyCallback(GLFWwindow* window, int key, int scancode,
+                                  int action, int mods) {
   if (action == GLFW_PRESS || action == GLFW_RELEASE) {
     if (gKeyEdit) {
       *gEnterKey = key;
