@@ -64,7 +64,7 @@ endif()
 
 GENERATE_RESOURCES(src/main/native/resources generated/main/cpp WPI wpi wpinet_resources_src)
 
-file(GLOB_RECURSE wpinet_native_src src/main/native/cpp/*.cpp)
+file(GLOB_RECURSE wpinet_native_src src/main/native/cpp/*.cpp src/main/native/thirdparty/tcpsockets/cpp/*.cpp)
 list(REMOVE_ITEM wpinet_native_src ${wpinet_jni_src})
 file(GLOB_RECURSE wpinet_unix_src src/main/native/unix/*.cpp)
 file(GLOB_RECURSE wpinet_linux_src src/main/native/linux/*.cpp)
@@ -166,6 +166,9 @@ endif()
 
 target_include_directories(wpinet PUBLIC
                             $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/include>
+                            $<INSTALL_INTERFACE:${include_dest}/wpinet>)
+target_include_directories(wpinet PUBLIC
+                            $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/thirdparty/tcpsockets/include>
                             $<INSTALL_INTERFACE:${include_dest}/wpinet>)
 
 install(TARGETS wpinet EXPORT wpinet DESTINATION "${main_lib_dest}")
