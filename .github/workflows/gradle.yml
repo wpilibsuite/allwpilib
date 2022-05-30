@@ -52,8 +52,9 @@ jobs:
       matrix:
         include:
           - os: windows-2019
-            artifact-name: Win64
+            artifact-name: Win64Debug
             architecture: x64
+            build-options: "-PciDebugOnly"
           - os: macOS-11
             artifact-name: macOS
             architecture: x64
@@ -100,6 +101,39 @@ jobs:
           name: ${{ matrix.artifact-name }}
           path: build/allOutputs
 
+  build-host-2:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: windows-2019
+            artifact-name: Win64Release
+            architecture: x64
+            build-options: "-PciReleaseOnly"
+    name: "Build - ${{ matrix.artifact-name }}"
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-java@v1
+        with:
+          java-version: 11
+          architecture: ${{ matrix.architecture }}
+      - name: Set release environment variable
+        run: echo "EXTRA_GRADLE_ARGS=-PreleaseMode" >> $GITHUB_ENV
+        shell: bash
+        if: startsWith(github.ref, 'refs/tags/v')
+      - name: Build with Gradle
+        run: ./gradlew copyAllOutputs --build-cache -PbuildServer -PskipJavaFormat ${{ env.EXTRA_GRADLE_ARGS }}
+        env:
+          ARTIFACTORY_PUBLISH_USERNAME: ${{ secrets.ARTIFACTORY_USERNAME }}
+          ARTIFACTORY_PUBLISH_PASSWORD: ${{ secrets.ARTIFACTORY_PASSWORD }}
+      - uses: actions/upload-artifact@v2
+        with:
+          name: ${{ matrix.artifact-name }}
+          path: build/allOutputs
+
   build-documentation:
     name: "Build - Documentation"
     runs-on: ubuntu-latest
@@ -127,7 +161,7 @@ jobs:
 
   combine:
     name: Combine
-    needs: [build-docker, build-host, build-documentation]
+    needs: [build-docker, build-host, build-documentation, build-host-2]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3

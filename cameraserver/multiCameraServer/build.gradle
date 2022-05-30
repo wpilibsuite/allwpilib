@@ -41,7 +41,7 @@ dependencies {
 model {
     components {
         multiCameraServerCpp(NativeExecutableSpec) {
-            targetBuildTypes 'release'
+            //targetBuildTypes 'release'
             sources {
                 cpp {
                     source {
