@@ -24,33 +24,33 @@ constexpr empty_array_t empty_array;
 template <typename T, size_t N>
 class array : public std::array<T, N> {
  public:
-  explicit array(empty_array_t) {}
+  constexpr explicit array(empty_array_t) {}
 
   template <typename... Ts>
-  array(T arg, Ts&&... args)  // NOLINT
+  constexpr array(T arg, Ts&&... args)  // NOLINT
       : std::array<T, N>{std::forward<T>(arg), std::forward<Ts>(args)...} {
     static_assert(1 + sizeof...(args) == N, "Dimension mismatch");
   }
 
-  array(const array<T, N>&) = default;
-  array& operator=(const array<T, N>&) = default;
-  array(array<T, N>&&) = default;
-  array& operator=(array<T, N>&&) = default;
+  constexpr array(const array<T, N>&) = default;
+  constexpr array& operator=(const array<T, N>&) = default;
+  constexpr array(array<T, N>&&) = default;
+  constexpr array& operator=(array<T, N>&&) = default;
 
-  array(const std::array<T, N>& rhs) {  // NOLINT
+  constexpr array(const std::array<T, N>& rhs) {  // NOLINT
     *static_cast<std::array<T, N>*>(this) = rhs;
   }
 
-  array& operator=(const std::array<T, N>& rhs) {
+  constexpr array& operator=(const std::array<T, N>& rhs) {
     *static_cast<std::array<T, N>*>(this) = rhs;
     return *this;
   }
 
-  array(std::array<T, N>&& rhs) {  // NOLINT
+  constexpr array(std::array<T, N>&& rhs) {  // NOLINT
     *static_cast<std::array<T, N>*>(this) = rhs;
   }
 
-  array& operator=(std::array<T, N>&& rhs) {
+  constexpr array& operator=(std::array<T, N>&& rhs) {
     *static_cast<std::array<T, N>*>(this) = rhs;
     return *this;
   }
