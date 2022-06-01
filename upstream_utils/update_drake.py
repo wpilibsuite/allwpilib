@@ -8,7 +8,7 @@ from upstream_utils import setup_upstream_repo, comment_out_invalid_includes, wa
 
 def main():
     root, repo = setup_upstream_repo("https://github.com/RobotLocomotion/drake",
-                                     "v0.37.0")
+                                     "v1.3.0")
     wpimath = os.path.join(root, "wpimath")
 
     prefix = os.path.join(root, "upstream_utils/drake_patches")
