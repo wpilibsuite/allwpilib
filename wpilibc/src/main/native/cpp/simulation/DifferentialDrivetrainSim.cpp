@@ -129,7 +129,7 @@ void DifferentialDrivetrainSim::SetPose(const frc::Pose2d& pose) {
 
 Vectord<7> DifferentialDrivetrainSim::Dynamics(const Vectord<7>& x,
                                                const Vectord<2>& u) {
-  // Because G^2 can be factored out of A, we can divide by the old ratio
+  // Because G² can be factored out of A, we can divide by the old ratio
   // squared and multiply by the new ratio squared to get a new drivetrain
   // model.
   Matrixd<4, 2> B;

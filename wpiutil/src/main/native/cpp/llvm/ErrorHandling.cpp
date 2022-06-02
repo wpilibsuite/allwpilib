@@ -1,9 +1,8 @@
 //===- lib/Support/ErrorHandling.cpp - Callbacks for errors ---------------===//
 //
-//                     The LLVM Compiler Infrastructure
-//
-// This file is distributed under the University of Illinois Open Source
-// License. See LICENSE.TXT for details.
+// Part of the LLVM Project, under the Apache License v2.0 with LLVM Exceptions.
+// See https://llvm.org/LICENSE.txt for license information.
+// SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 //
 //===----------------------------------------------------------------------===//
 //
@@ -14,10 +13,10 @@
 
 #include "wpi/ErrorHandling.h"
 #include "wpi/SmallVector.h"
+#include "wpi/Errc.h"
 #include "wpi/WindowsError.h"
 #include "fmt/format.h"
 #include <cassert>
-#include <cstdio>
 #include <cstdlib>
 #include <mutex>
 #include <new>
@@ -25,7 +24,6 @@
 #ifndef _WIN32
 #include <unistd.h>
 #endif
-
 #if defined(_MSC_VER)
 #include <io.h>
 #endif
@@ -53,7 +51,7 @@ static std::mutex ErrorHandlerMutex;
 static std::mutex BadAllocErrorHandlerMutex;
 
 void wpi::install_fatal_error_handler(fatal_error_handler_t handler,
-                                      void *user_data) {
+                                       void *user_data) {
   std::scoped_lock Lock(ErrorHandlerMutex);
   assert(!ErrorHandler && "Error handler already registered!\n");
   ErrorHandler = handler;
@@ -95,7 +93,7 @@ void wpi::report_fatal_error(std::string_view Reason, bool GenCrashDiag) {
 }
 
 void wpi::install_bad_alloc_error_handler(fatal_error_handler_t handler,
-                                          void *user_data) {
+                                           void *user_data) {
   std::scoped_lock Lock(BadAllocErrorHandlerMutex);
   assert(!ErrorHandler && "Bad alloc error handler already registered!\n");
   BadAllocErrorHandler = handler;
@@ -126,13 +124,17 @@ void wpi::report_bad_alloc_error(const char *Reason, bool GenCrashDiag) {
 
   // Don't call the normal error handler. It may allocate memory. Directly write
   // an OOM to stderr and abort.
-  char OOMMessage[] = "LLVM ERROR: out of memory\n";
+  const char *OOMMessage = "LLVM ERROR: out of memory\n";
+  const char *Newline = "\n";
 #ifdef _WIN32
-  int written = ::_write(2, OOMMessage, strlen(OOMMessage));
+  (void)!::_write(2, OOMMessage, strlen(OOMMessage));
+  (void)!::_write(2, Reason, strlen(Reason));
+  (void)!::_write(2, Newline, strlen(Newline));
 #else
-  ssize_t written = ::write(2, OOMMessage, strlen(OOMMessage));
+  (void)!::write(2, OOMMessage, strlen(OOMMessage));
+  (void)!::write(2, Reason, strlen(Reason));
+  (void)!::write(2, Newline, strlen(Newline));
 #endif
-  (void)written;
   abort();
 }
 
@@ -142,28 +144,17 @@ static void out_of_memory_new_handler() {
   wpi::report_bad_alloc_error("Allocation failed");
 }
 
-// Installs new handler that causes crash on allocation failure. It does not
-// need to be called explicitly, if this file is linked to application, because
-// in this case it is called during construction of 'new_handler_installer'.
+// Installs new handler that causes crash on allocation failure. It is called by
+// InitLLVM.
 void wpi::install_out_of_memory_new_handler() {
-  static bool out_of_memory_new_handler_installed = false;
-  if (!out_of_memory_new_handler_installed) {
-    std::set_new_handler(out_of_memory_new_handler);
-    out_of_memory_new_handler_installed = true;
-  }
+  std::new_handler old = std::set_new_handler(out_of_memory_new_handler);
+  (void)old;
+  assert((old == nullptr || old == out_of_memory_new_handler) &&
+         "new-handler already installed");
 }
 
-// Static object that causes installation of 'out_of_memory_new_handler' before
-// execution of 'main'.
-static class NewHandlerInstaller {
-public:
-  NewHandlerInstaller() {
-    install_out_of_memory_new_handler();
-  }
-} new_handler_installer;
-
 void wpi::wpi_unreachable_internal(const char *msg, const char *file,
-                                   unsigned line) {
+                                     unsigned line) {
   // This code intentionally doesn't call the ErrorHandler callback, because
   // wpi_unreachable is intended to be used to indicate "impossible"
   // situations, and not legitimate runtime errors.
@@ -183,7 +174,6 @@ void wpi::wpi_unreachable_internal(const char *msg, const char *file,
 
 #ifdef _WIN32
 
-#include <system_error>
 #include <winerror.h>
 
 // I'd rather not double the line count of the following.

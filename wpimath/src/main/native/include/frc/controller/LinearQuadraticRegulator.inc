@@ -6,6 +6,7 @@
 
 #include <frc/fmt/Eigen.h>
 
+#include <stdexcept>
 #include <string>
 
 #include "Eigen/Cholesky"

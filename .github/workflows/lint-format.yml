@@ -15,9 +15,10 @@ jobs:
     name: "wpiformat"
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - name: Fetch all history and metadata
         run: |
+          git config --global --add safe.directory /__w/allwpilib/allwpilib
           git fetch --prune --unshallow
           git checkout -b pr
           git branch -f main origin/main
@@ -49,9 +50,10 @@ jobs:
     runs-on: ubuntu-latest
     container: wpilib/roborio-cross-ubuntu:2022-20.04
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - name: Fetch all history and metadata
         run: |
+          git config --global --add safe.directory /__w/allwpilib/allwpilib
           git fetch --prune --unshallow
           git checkout -b pr
           git branch -f main origin/main
@@ -75,11 +77,15 @@ jobs:
   javaformat:
     name: "Java format"
     runs-on: ubuntu-latest
-    container: wpilib/ubuntu-base:18.04
+    container: wpilib/ubuntu-base:20.04
     steps:
-      - uses: actions/checkout@v2
-        with:
-          fetch-depth: 0
+      - uses: actions/checkout@v3
+      - name: Fetch all history and metadata
+        run: |
+          git config --global --add safe.directory /__w/allwpilib/allwpilib
+          git fetch --prune --unshallow
+          git checkout -b pr
+          git branch -f main origin/main
       - name: Run Java format
         run: ./gradlew javaFormat spotbugsMain spotbugsTest spotbugsDev
       - name: Check output
@@ -91,7 +97,7 @@ jobs:
     name: "Documentation"
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           fetch-depth: 0
       - uses: actions/setup-java@v1

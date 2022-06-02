@@ -87,9 +87,21 @@ template <typename T, HAL_Value (*MakeValue)(T), const char* (*GetName)(),
           T (*GetDefault)() = nullptr>
 class SimDataValue final : public impl::SimDataValueBase<T, MakeValue> {
  public:
+// FIXME: GCC 12.1 gives the false positive "the address of <GetDefault> will
+// never be NULL" because it doesn't realize the default template parameter can
+// make GetDefault nullptr. In C++20, replace "T (*GetDefault)() = nullptr" with
+// "T (*GetDefault)() = [] { return T(); }" and unconditionally call
+// GetDefault() to fix the warning.
+#if __GNUC__ >= 12
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Waddress"
+#endif  // __GNUC__ >= 12
   SimDataValue()
       : impl::SimDataValueBase<T, MakeValue>(
             GetDefault != nullptr ? GetDefault() : T()) {}
+#if __GNUC__ >= 12
+#pragma GCC diagnostic pop
+#endif  // __GNUC__ >= 12
   explicit SimDataValue(T value)
       : impl::SimDataValueBase<T, MakeValue>(value) {}
 

@@ -1,9 +1,8 @@
 //===- llvm/ADT/SmallPtrSet.cpp - 'Normally small' pointer set ------------===//
 //
-//                     The LLVM Compiler Infrastructure
-//
-// This file is distributed under the University of Illinois Open Source
-// License. See LICENSE.TXT for details.
+// Part of the LLVM Project, under the Apache License v2.0 with LLVM Exceptions.
+// See https://llvm.org/LICENSE.txt for license information.
+// SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 //
 //===----------------------------------------------------------------------===//
 //
@@ -14,9 +13,9 @@
 
 #include "wpi/SmallPtrSet.h"
 #include "wpi/DenseMapInfo.h"
+#include "wpi/ErrorHandling.h"
 #include "wpi/MathExtras.h"
 #include "wpi/MemAlloc.h"
-#include "wpi/ErrorHandling.h"
 #include <algorithm>
 #include <cassert>
 #include <cstdlib>
@@ -60,6 +59,7 @@ SmallPtrSetImplBase::insert_imp_big(const void *Ptr) {
   else
     ++NumNonEmpty; // Track density.
   *Bucket = Ptr;
+  incrementEpoch();
   return std::make_pair(Bucket, true);
 }
 

@@ -40,7 +40,7 @@ struct sockaddr_in6 uv_addr_ip6_any_;
 /*
  * Retrieves the pointer to a winsock extension function.
  */
-static BOOL uv_get_extension_function(SOCKET socket, GUID guid,
+static BOOL uv__get_extension_function(SOCKET socket, GUID guid,
     void **target) {
   int result;
   DWORD bytes;
@@ -64,25 +64,20 @@ static BOOL uv_get_extension_function(SOCKET socket, GUID guid,
 }
 
 
-BOOL uv_get_acceptex_function(SOCKET socket, LPFN_ACCEPTEX* target) {
+BOOL uv__get_acceptex_function(SOCKET socket, LPFN_ACCEPTEX* target) {
   const GUID wsaid_acceptex = WSAID_ACCEPTEX;
-  return uv_get_extension_function(socket, wsaid_acceptex, (void**)target);
+  return uv__get_extension_function(socket, wsaid_acceptex, (void**)target);
 }
 
 
-BOOL uv_get_connectex_function(SOCKET socket, LPFN_CONNECTEX* target) {
+BOOL uv__get_connectex_function(SOCKET socket, LPFN_CONNECTEX* target) {
   const GUID wsaid_connectex = WSAID_CONNECTEX;
-  return uv_get_extension_function(socket, wsaid_connectex, (void**)target);
+  return uv__get_extension_function(socket, wsaid_connectex, (void**)target);
 }
 
 
-static int error_means_no_support(DWORD error) {
-  return error == WSAEPROTONOSUPPORT || error == WSAESOCKTNOSUPPORT ||
-         error == WSAEPFNOSUPPORT || error == WSAEAFNOSUPPORT;
-}
 
-
-void uv_winsock_init(void) {
+void uv__winsock_init(void) {
   WSADATA wsa_data;
   int errorno;
   SOCKET dummy;
@@ -107,55 +102,41 @@ void uv_winsock_init(void) {
     uv_fatal_error(errorno, "WSAStartup");
   }
 
-  /* Detect non-IFS LSPs */
+  /* Try to detect non-IFS LSPs */
+  uv_tcp_non_ifs_lsp_ipv4 = 1;
   dummy = socket(AF_INET, SOCK_STREAM, IPPROTO_IP);
-
   if (dummy != INVALID_SOCKET) {
     opt_len = (int) sizeof protocol_info;
     if (getsockopt(dummy,
                    SOL_SOCKET,
                    SO_PROTOCOL_INFOW,
                    (char*) &protocol_info,
-                   &opt_len) == SOCKET_ERROR)
-      uv_fatal_error(WSAGetLastError(), "getsockopt");
-
-    if (!(protocol_info.dwServiceFlags1 & XP1_IFS_HANDLES))
-      uv_tcp_non_ifs_lsp_ipv4 = 1;
-
-    if (closesocket(dummy) == SOCKET_ERROR)
-      uv_fatal_error(WSAGetLastError(), "closesocket");
-
-  } else if (!error_means_no_support(WSAGetLastError())) {
-    /* Any error other than "socket type not supported" is fatal. */
-    uv_fatal_error(WSAGetLastError(), "socket");
+                   &opt_len) == 0) {
+      if (protocol_info.dwServiceFlags1 & XP1_IFS_HANDLES)
+        uv_tcp_non_ifs_lsp_ipv4 = 0;
+    }
+    closesocket(dummy);
   }
 
-  /* Detect IPV6 support and non-IFS LSPs */
+  /* Try to detect IPV6 support and non-IFS LSPs */
+  uv_tcp_non_ifs_lsp_ipv6 = 1;
   dummy = socket(AF_INET6, SOCK_STREAM, IPPROTO_IP);
-
   if (dummy != INVALID_SOCKET) {
     opt_len = (int) sizeof protocol_info;
     if (getsockopt(dummy,
                    SOL_SOCKET,
                    SO_PROTOCOL_INFOW,
                    (char*) &protocol_info,
-                   &opt_len) == SOCKET_ERROR)
-      uv_fatal_error(WSAGetLastError(), "getsockopt");
-
-    if (!(protocol_info.dwServiceFlags1 & XP1_IFS_HANDLES))
-      uv_tcp_non_ifs_lsp_ipv6 = 1;
-
-    if (closesocket(dummy) == SOCKET_ERROR)
-      uv_fatal_error(WSAGetLastError(), "closesocket");
-
-  } else if (!error_means_no_support(WSAGetLastError())) {
-    /* Any error other than "socket type not supported" is fatal. */
-    uv_fatal_error(WSAGetLastError(), "socket");
+                   &opt_len) == 0) {
+      if (protocol_info.dwServiceFlags1 & XP1_IFS_HANDLES)
+        uv_tcp_non_ifs_lsp_ipv6 = 0;
+    }
+    closesocket(dummy);
   }
 }
 
 
-int uv_ntstatus_to_winsock_error(NTSTATUS status) {
+int uv__ntstatus_to_winsock_error(NTSTATUS status) {
   switch (status) {
     case STATUS_SUCCESS:
       return ERROR_SUCCESS;
@@ -288,7 +269,7 @@ int uv_ntstatus_to_winsock_error(NTSTATUS status) {
  * the user to use the default msafd driver, doesn't work when other LSPs are
  * stacked on top of it.
  */
-int WSAAPI uv_wsarecv_workaround(SOCKET socket, WSABUF* buffers,
+int WSAAPI uv__wsarecv_workaround(SOCKET socket, WSABUF* buffers,
     DWORD buffer_count, DWORD* bytes, DWORD* flags, WSAOVERLAPPED *overlapped,
     LPWSAOVERLAPPED_COMPLETION_ROUTINE completion_routine) {
   NTSTATUS status;
@@ -367,7 +348,7 @@ int WSAAPI uv_wsarecv_workaround(SOCKET socket, WSABUF* buffers,
       break;
 
     default:
-      error = uv_ntstatus_to_winsock_error(status);
+      error = uv__ntstatus_to_winsock_error(status);
       break;
   }
 
@@ -381,8 +362,8 @@ int WSAAPI uv_wsarecv_workaround(SOCKET socket, WSABUF* buffers,
 }
 
 
-/* See description of uv_wsarecv_workaround. */
-int WSAAPI uv_wsarecvfrom_workaround(SOCKET socket, WSABUF* buffers,
+/* See description of uv__wsarecv_workaround. */
+int WSAAPI uv__wsarecvfrom_workaround(SOCKET socket, WSABUF* buffers,
     DWORD buffer_count, DWORD* bytes, DWORD* flags, struct sockaddr* addr,
     int* addr_len, WSAOVERLAPPED *overlapped,
     LPWSAOVERLAPPED_COMPLETION_ROUTINE completion_routine) {
@@ -465,7 +446,7 @@ int WSAAPI uv_wsarecvfrom_workaround(SOCKET socket, WSABUF* buffers,
       break;
 
     default:
-      error = uv_ntstatus_to_winsock_error(status);
+      error = uv__ntstatus_to_winsock_error(status);
       break;
   }
 
@@ -479,7 +460,7 @@ int WSAAPI uv_wsarecvfrom_workaround(SOCKET socket, WSABUF* buffers,
 }
 
 
-int WSAAPI uv_msafd_poll(SOCKET socket, AFD_POLL_INFO* info_in,
+int WSAAPI uv__msafd_poll(SOCKET socket, AFD_POLL_INFO* info_in,
     AFD_POLL_INFO* info_out, OVERLAPPED* overlapped) {
   IO_STATUS_BLOCK iosb;
   IO_STATUS_BLOCK* iosb_ptr;
@@ -552,7 +533,7 @@ int WSAAPI uv_msafd_poll(SOCKET socket, AFD_POLL_INFO* info_in,
       break;
 
     default:
-      error = uv_ntstatus_to_winsock_error(status);
+      error = uv__ntstatus_to_winsock_error(status);
       break;
   }
 

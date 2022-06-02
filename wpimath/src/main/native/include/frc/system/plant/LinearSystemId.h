@@ -116,7 +116,7 @@ class WPILIB_DLLEXPORT LinearSystemId {
    * u = K_v v + K_a a
    *
    * @param kV The velocity gain, in volt seconds per distance.
-   * @param kA The acceleration gain, in volt seconds^2 per distance.
+   * @param kA The acceleration gain, in volt seconds² per distance.
    * @throws std::domain_error if kV <= 0 or kA <= 0.
    */
   template <typename Distance, typename = std::enable_if_t<
@@ -158,7 +158,7 @@ class WPILIB_DLLEXPORT LinearSystemId {
    * u = K_v v + K_a a
    *
    * @param kV The velocity gain, in volt seconds per distance.
-   * @param kA The acceleration gain, in volt seconds^2 per distance.
+   * @param kA The acceleration gain, in volt seconds² per distance.
    * @throws std::domain_error if kV <= 0 or kA <= 0.
    */
   template <typename Distance, typename = std::enable_if_t<

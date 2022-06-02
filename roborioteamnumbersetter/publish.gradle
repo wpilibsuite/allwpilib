@@ -23,7 +23,7 @@ model {
         $.components.each { component ->
             component.binaries.each { binary ->
                 if (binary in NativeExecutableBinarySpec && binary.component.name.contains("roborioteamnumbersetter")) {
-                    if (binary.buildable && binary.name.contains("Release")) {
+                    if (binary.buildable && (binary.name.contains('Release') || binary.name.contains('release'))) {
                         // We are now in the binary that we want.
                         // This is the default application path for the ZIP task.
                         def applicationPath = binary.executable.file

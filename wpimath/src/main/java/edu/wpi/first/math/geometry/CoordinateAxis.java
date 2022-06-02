@@ -10,6 +10,13 @@ import edu.wpi.first.math.numbers.N3;
 
 /** A class representing a coordinate system axis within the NWU coordinate system. */
 public class CoordinateAxis {
+  private static final CoordinateAxis m_n = new CoordinateAxis(1.0, 0.0, 0.0);
+  private static final CoordinateAxis m_s = new CoordinateAxis(-1.0, 0.0, 0.0);
+  private static final CoordinateAxis m_e = new CoordinateAxis(0.0, -1.0, 0.0);
+  private static final CoordinateAxis m_w = new CoordinateAxis(0.0, 1.0, 0.0);
+  private static final CoordinateAxis m_u = new CoordinateAxis(0.0, 0.0, 1.0);
+  private static final CoordinateAxis m_d = new CoordinateAxis(0.0, 0.0, -1.0);
+
   final Vector<N3> m_axis;
 
   /**
@@ -31,7 +38,7 @@ public class CoordinateAxis {
    */
   @SuppressWarnings("MethodName")
   public static CoordinateAxis N() {
-    return new CoordinateAxis(1.0, 0.0, 0.0);
+    return m_n;
   }
 
   /**
@@ -41,7 +48,7 @@ public class CoordinateAxis {
    */
   @SuppressWarnings("MethodName")
   public static CoordinateAxis S() {
-    return new CoordinateAxis(-1.0, 0.0, 0.0);
+    return m_s;
   }
 
   /**
@@ -51,7 +58,7 @@ public class CoordinateAxis {
    */
   @SuppressWarnings("MethodName")
   public static CoordinateAxis E() {
-    return new CoordinateAxis(0.0, -1.0, 0.0);
+    return m_e;
   }
 
   /**
@@ -61,7 +68,7 @@ public class CoordinateAxis {
    */
   @SuppressWarnings("MethodName")
   public static CoordinateAxis W() {
-    return new CoordinateAxis(0.0, 1.0, 0.0);
+    return m_w;
   }
 
   /**
@@ -71,7 +78,7 @@ public class CoordinateAxis {
    */
   @SuppressWarnings("MethodName")
   public static CoordinateAxis U() {
-    return new CoordinateAxis(0.0, 0.0, 1.0);
+    return m_u;
   }
 
   /**
@@ -81,6 +88,6 @@ public class CoordinateAxis {
    */
   @SuppressWarnings("MethodName")
   public static CoordinateAxis D() {
-    return new CoordinateAxis(0.0, 0.0, -1.0);
+    return m_d;
   }
 }

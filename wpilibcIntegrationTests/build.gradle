@@ -39,11 +39,6 @@ model {
                             }
                         }
                     }
-                    binary.tasks.withType(CppCompile) {
-                        cppCompiler.args "-Wno-missing-field-initializers"
-                        cppCompiler.args "-Wno-unused-variable"
-                        cppCompiler.args "-Wno-error=deprecated-declarations"
-                    }
                     lib project: ':wpilibc', library: 'wpilibc', linkage: 'shared'
                     lib project: ':wpimath', library: 'wpimath', linkage: 'shared'
                     lib project: ':ntcore', library: 'ntcore', linkage: 'shared'

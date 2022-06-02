@@ -1,9 +1,8 @@
 //===- Endian.h - Utilities for IO with endian specific data ----*- C++ -*-===//
 //
-//                     The LLVM Compiler Infrastructure
-//
-// This file is distributed under the University of Illinois Open Source
-// License. See LICENSE.TXT for details.
+// Part of the LLVM Project, under the Apache License v2.0 with LLVM Exceptions.
+// See https://llvm.org/LICENSE.txt for license information.
+// SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 //
 //===----------------------------------------------------------------------===//
 //
@@ -14,14 +13,8 @@
 #ifndef WPIUTIL_WPI_ENDIAN_H
 #define WPIUTIL_WPI_ENDIAN_H
 
-#include "wpi/AlignOf.h"
 #include "wpi/Compiler.h"
 #include "wpi/SwapByteOrder.h"
-
-#if defined(__linux__) || defined(__GNU__)
-#include <endian.h>
-#endif
-
 #include <cassert>
 #include <cstddef>
 #include <cstdint>
@@ -38,7 +31,7 @@ enum {aligned = 0, unaligned = 1};
 
 namespace detail {
 
-// value is either alignment, or alignof(T) if alignment is 0.
+/// ::value is either alignment, or alignof(T) if alignment is 0.
 template<class T, int alignment>
 struct PickAlignment {
  enum { value = alignment == 0 ? alignof(T) : alignment };
@@ -49,13 +42,7 @@ struct PickAlignment {
 namespace endian {
 
 constexpr endianness system_endianness() {
-#ifdef _WIN32
-  return little;
-#elif defined(__BYTE_ORDER) && defined(__BIG_ENDIAN) && __BYTE_ORDER == __BIG_ENDIAN
-  return big;
-#else
-  return little;
-#endif
+  return sys::IsBigEndianHost ? big : little;
 }
 
 template <typename value_type>
@@ -89,13 +76,7 @@ template<typename value_type,
          endianness endian,
          std::size_t alignment>
 inline value_type read(const void *memory) {
-  value_type ret;
-
-  memcpy(&ret,
-         LLVM_ASSUME_ALIGNED(
-             memory, (detail::PickAlignment<value_type, alignment>::value)),
-         sizeof(value_type));
-  return byte_swap<value_type, endian>(ret);
+  return read<value_type, alignment>(memory, endian);
 }
 
 /// Read a value of a particular endianness from a buffer, and increment the
@@ -110,9 +91,7 @@ inline value_type readNext(const CharT *&memory, endianness endian) {
 template<typename value_type, endianness endian, std::size_t alignment,
          typename CharT>
 inline value_type readNext(const CharT *&memory) {
-  value_type ret = read<value_type, endian, alignment>(memory);
-  memory += sizeof(value_type);
-  return ret;
+  return readNext<value_type, alignment, CharT>(memory, endian);
 }
 
 /// Write a value to memory with a particular endianness.
@@ -128,11 +107,11 @@ template<typename value_type,
          endianness endian,
          std::size_t alignment>
 inline void write(void *memory, value_type value) {
-  value = byte_swap<value_type, endian>(value);
-  memcpy(LLVM_ASSUME_ALIGNED(
-             memory, (detail::PickAlignment<value_type, alignment>::value)),
-         &value, sizeof(value_type));
+  write<value_type, alignment>(memory, value, endian);
 }
+
+template <typename value_type>
+using make_unsigned_t = std::make_unsigned_t<value_type>;
 
 /// Read a value of a particular endianness from memory, for a location
 /// that starts at the given bit offset within the first byte.
@@ -152,15 +131,15 @@ inline value_type readAtBitAlignment(const void *memory, uint64_t startBit) {
     val[1] = byte_swap<value_type, endian>(val[1]);
 
     // Shift bits from the lower value into place.
-    std::make_unsigned_t<value_type> lowerVal = val[0] >> startBit;
+    make_unsigned_t<value_type> lowerVal = val[0] >> startBit;
     // Mask off upper bits after right shift in case of signed type.
-    std::make_unsigned_t<value_type> numBitsFirstVal =
+    make_unsigned_t<value_type> numBitsFirstVal =
         (sizeof(value_type) * 8) - startBit;
-    lowerVal &= ((std::make_unsigned_t<value_type>)1 << numBitsFirstVal) - 1;
+    lowerVal &= ((make_unsigned_t<value_type>)1 << numBitsFirstVal) - 1;
 
     // Get the bits from the upper value.
-    std::make_unsigned_t<value_type> upperVal =
-        val[1] & (((std::make_unsigned_t<value_type>)1 << startBit) - 1);
+    make_unsigned_t<value_type> upperVal =
+        val[1] & (((make_unsigned_t<value_type>)1 << startBit) - 1);
     // Shift them in to place.
     upperVal <<= numBitsFirstVal;
 
@@ -188,15 +167,15 @@ inline void writeAtBitAlignment(void *memory, value_type value,
 
     // Mask off any existing bits in the upper part of the lower value that
     // we want to replace.
-    val[0] &= ((std::make_unsigned_t<value_type>)1 << startBit) - 1;
-    std::make_unsigned_t<value_type> numBitsFirstVal =
+    val[0] &= ((make_unsigned_t<value_type>)1 << startBit) - 1;
+    make_unsigned_t<value_type> numBitsFirstVal =
         (sizeof(value_type) * 8) - startBit;
-    std::make_unsigned_t<value_type> lowerVal = value;
+    make_unsigned_t<value_type> lowerVal = value;
     if (startBit > 0) {
       // Mask off the upper bits in the new value that are not going to go into
       // the lower value. This avoids a left shift of a negative value, which
       // is undefined behavior.
-      lowerVal &= (((std::make_unsigned_t<value_type>)1 << numBitsFirstVal) - 1);
+      lowerVal &= (((make_unsigned_t<value_type>)1 << numBitsFirstVal) - 1);
       // Now shift the new bits into place
       lowerVal <<= startBit;
     }
@@ -204,11 +183,11 @@ inline void writeAtBitAlignment(void *memory, value_type value,
 
     // Mask off any existing bits in the lower part of the upper value that
     // we want to replace.
-    val[1] &= ~(((std::make_unsigned_t<value_type>)1 << startBit) - 1);
+    val[1] &= ~(((make_unsigned_t<value_type>)1 << startBit) - 1);
     // Next shift the bits that go into the upper value into position.
-    std::make_unsigned_t<value_type> upperVal = value >> numBitsFirstVal;
+    make_unsigned_t<value_type> upperVal = value >> numBitsFirstVal;
     // Mask off upper bits after right shift in case of signed type.
-    upperVal &= ((std::make_unsigned_t<value_type>)1 << startBit) - 1;
+    upperVal &= ((make_unsigned_t<value_type>)1 << startBit) - 1;
     val[1] |= upperVal;
 
     // Finally, rewrite values.
@@ -224,10 +203,13 @@ inline void writeAtBitAlignment(void *memory, value_type value,
 
 namespace detail {
 
-template<typename value_type,
-         endianness endian,
-         std::size_t alignment>
+template <typename ValueType, endianness Endian, std::size_t Alignment,
+          std::size_t ALIGN = PickAlignment<ValueType, Alignment>::value>
 struct packed_endian_specific_integral {
+  using value_type = ValueType;
+  static constexpr endianness endian = Endian;
+  static constexpr std::size_t alignment = Alignment;
+
   packed_endian_specific_integral() = default;
 
   explicit packed_endian_specific_integral(value_type val) { *this = val; }
@@ -263,8 +245,9 @@ struct packed_endian_specific_integral {
   }
 
 private:
-  AlignedCharArray<PickAlignment<value_type, alignment>::value,
-                   sizeof(value_type)> Value;
+  struct {
+    alignas(ALIGN) char buffer[sizeof(value_type)];
+  } Value;
 
 public:
   struct ref {
@@ -354,6 +337,17 @@ using unaligned_int32_t =
     detail::packed_endian_specific_integral<int32_t, native, unaligned>;
 using unaligned_int64_t =
     detail::packed_endian_specific_integral<int64_t, native, unaligned>;
+
+template <typename T>
+using little_t = detail::packed_endian_specific_integral<T, little, unaligned>;
+template <typename T>
+using big_t = detail::packed_endian_specific_integral<T, big, unaligned>;
+
+template <typename T>
+using aligned_little_t =
+    detail::packed_endian_specific_integral<T, little, aligned>;
+template <typename T>
+using aligned_big_t = detail::packed_endian_specific_integral<T, big, aligned>;
 
 namespace endian {
 

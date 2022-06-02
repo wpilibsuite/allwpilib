@@ -126,6 +126,15 @@ class Timer final : public HandleImpl<Timer, uv_timer_t> {
   Time GetRepeat() const { return Time{uv_timer_get_repeat(GetRaw())}; }
 
   /**
+   * Get the timer due value or 0 if it has expired. The time is relative to
+   * uv_now().
+   *
+   * @return Timer due value in milliseconds (as a
+   * `std::chrono::duration<uint64_t, std::milli>`).
+   */
+  Time GetDueIn() const { return Time{uv_timer_get_due_in(GetRaw())}; }
+
+  /**
    * Signal generated when the timeout event occurs.
    */
   sig::Signal<> timeout;

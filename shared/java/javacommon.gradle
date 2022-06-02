@@ -101,7 +101,9 @@ tasks.withType(JavaCompile).configureEach {
         '--release',
         '11',
         '-encoding',
-        'UTF8'
+        'UTF8',
+        "-Werror",
+        "-Xlint:deprecation,removal",
     ]
 }
 

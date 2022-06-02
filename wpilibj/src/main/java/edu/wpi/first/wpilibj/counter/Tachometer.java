@@ -77,7 +77,7 @@ public class Tachometer implements Sendable, AutoCloseable {
     if (period == 0) {
       return 0;
     }
-    return period;
+    return 1 / period;
   }
 
   /**

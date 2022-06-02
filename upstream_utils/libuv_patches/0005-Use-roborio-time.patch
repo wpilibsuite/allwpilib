@@ -1,14 +1,14 @@
-From bb5cdf6360308dce34546f55d02f8073b88dd748 Mon Sep 17 00:00:00 2001
+From ec156359c45abbd0a0547d442788477d8fb57fa0 Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Tue, 26 Apr 2022 15:26:03 -0400
-Subject: [PATCH 5/6] Use roborio time
+Subject: [PATCH 5/8] Use roborio time
 
 ---
  src/unix/linux-core.c | 8 ++++++++
  1 file changed, 8 insertions(+)
 
 diff --git a/src/unix/linux-core.c b/src/unix/linux-core.c
-index a66bb535..8a267823 100644
+index 85f3fc01..12ed7ff1 100644
 --- a/src/unix/linux-core.c
 +++ b/src/unix/linux-core.c
 @@ -67,6 +67,10 @@
@@ -22,7 +22,7 @@ index a66bb535..8a267823 100644
  /* This is rather annoying: CLOCK_BOOTTIME lives in <linux/time.h> but we can't
   * include that file because it conflicts with <time.h>. We'll just have to
   * define it ourselves.
-@@ -424,6 +428,9 @@ update_timeout:
+@@ -118,6 +122,9 @@ void uv__platform_loop_delete(uv_loop_t* loop) {
  
  
  uint64_t uv__hrtime(uv_clocktype_t type) {
@@ -32,7 +32,7 @@ index a66bb535..8a267823 100644
    static clock_t fast_clock_id = -1;
    struct timespec t;
    clock_t clock_id;
-@@ -453,6 +460,7 @@ uint64_t uv__hrtime(uv_clocktype_t type) {
+@@ -151,6 +158,7 @@ done:
      return 0;  /* Not really possible. */
  
    return t.tv_sec * (uint64_t) 1e9 + t.tv_nsec;
@@ -41,5 +41,5 @@ index a66bb535..8a267823 100644
  
  
 -- 
-2.20.1.windows.1
+2.36.1
 

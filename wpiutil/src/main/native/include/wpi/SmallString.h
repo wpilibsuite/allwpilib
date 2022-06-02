@@ -1,9 +1,8 @@
 //===- llvm/ADT/SmallString.h - 'Normally small' strings --------*- C++ -*-===//
 //
-//                     The LLVM Compiler Infrastructure
-//
-// This file is distributed under the University of Illinois Open Source
-// License. See LICENSE.TXT for details.
+// Part of the LLVM Project, under the Apache License v2.0 with LLVM Exceptions.
+// See https://llvm.org/LICENSE.txt for license information.
+// SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 //
 //===----------------------------------------------------------------------===//
 //
@@ -29,66 +28,58 @@ public:
   SmallString() = default;
 
   /// Initialize from a std::string_view.
-  SmallString(std::string_view S)
-    : SmallVector<char, InternalLen>(S.begin(), S.end()) {}
+  SmallString(std::string_view S) : SmallVector<char, InternalLen>(S.begin(), S.end()) {}
+
+  /// Initialize by concatenating a list of std::string_views.
+  SmallString(std::initializer_list<std::string_view> Refs)
+      : SmallVector<char, InternalLen>() {
+    this->append(Refs);
+  }
 
   /// Initialize with a range.
   template<typename ItTy>
   SmallString(ItTy S, ItTy E) : SmallVector<char, InternalLen>(S, E) {}
 
-  // Note that in order to add new overloads for append & assign, we have to
-  // duplicate the inherited versions so as not to inadvertently hide them.
-
   /// @}
   /// @name String Assignment
   /// @{
 
-  /// Assign from a repeated element.
-  void assign(size_t NumElts, char Elt) {
-    this->SmallVectorImpl<char>::assign(NumElts, Elt);
-  }
-
-  /// Assign from an iterator pair.
-  template<typename in_iter>
-  void assign(in_iter S, in_iter E) {
-    this->clear();
-    SmallVectorImpl<char>::append(S, E);
-  }
+  using SmallVector<char, InternalLen>::assign;
 
   /// Assign from a std::string_view.
   void assign(std::string_view RHS) {
-    this->clear();
-    SmallVectorImpl<char>::append(RHS.begin(), RHS.end());
+    SmallVectorImpl<char>::assign(RHS.begin(), RHS.end());
   }
 
-  /// Assign from a SmallVector.
-  void assign(const SmallVectorImpl<char> &RHS) {
+  /// Assign from a list of std::string_views.
+  void assign(std::initializer_list<std::string_view> Refs) {
     this->clear();
-    SmallVectorImpl<char>::append(RHS.begin(), RHS.end());
+    append(Refs);
   }
 
   /// @}
   /// @name String Concatenation
   /// @{
 
-  /// Append from an iterator pair.
-  template<typename in_iter>
-  void append(in_iter S, in_iter E) {
-    SmallVectorImpl<char>::append(S, E);
-  }
-
-  void append(size_t NumInputs, char Elt) {
-    SmallVectorImpl<char>::append(NumInputs, Elt);
-  }
+  using SmallVector<char, InternalLen>::append;
 
   /// Append from a std::string_view.
   void append(std::string_view RHS) {
     SmallVectorImpl<char>::append(RHS.begin(), RHS.end());
   }
 
-  /// Append from a SmallVector.
-  void append(const SmallVectorImpl<char> &RHS) {
-    SmallVectorImpl<char>::append(RHS.begin(), RHS.end());
+  /// Append from a list of std::string_views.
+  void append(std::initializer_list<std::string_view> Refs) {
+    size_t SizeNeeded = this->size();
+    for (std::string_view Ref : Refs)
+      SizeNeeded += Ref.size();
+    this->reserve(SizeNeeded);
+    auto CurEnd = this->end();
+    for (std::string_view Ref : Refs) {
+      this->uninitialized_copy(Ref.begin(), Ref.end(), CurEnd);
+      CurEnd += Ref.size();
+    }
+    this->set_size(SizeNeeded);
   }
 
   /// @}
@@ -185,10 +176,7 @@ public:
   // Extra methods.
 
   /// Explicit conversion to std::string_view.
-  std::string_view str() const { return {this->begin(), this->size()}; }
-
-  /// Explicit conversion to std::string.
-  std::string string() const { return {this->begin(), this->size()}; }
+  std::string_view str() const { return std::string_view(this->begin(), this->size()); }
 
   // TODO: Make this const, if it's safe...
   const char* c_str() {
@@ -200,13 +188,16 @@ public:
   /// Implicit conversion to std::string_view.
   operator std::string_view() const { return str(); }
 
+  /// Explicit conversion to std::string.
+  std::string string() const { return {this->begin(), this->size()}; }
+
   /// Implicit conversion to std::string.
   operator std::string() const { return string(); }
 
   // Extra operators.
-  const SmallString &operator=(std::string_view RHS) {
-    this->clear();
-    return *this += RHS;
+  SmallString &operator=(std::string_view RHS) {
+    this->assign(RHS);
+    return *this;
   }
 
   SmallString &operator+=(std::string_view RHS) {
@@ -221,4 +212,4 @@ public:
 
 } // end namespace wpi
 
-#endif // LLVM_ADT_SMALLSTRING_H
+#endif // WPIUTIL_WPI_SMALLSTRING_H

@@ -13,6 +13,7 @@ cppSrcFileInclude {
 generatedFileExclude {
   src/main/native/cpp/llvm/
   src/main/native/include/llvm/
+  src/main/native/include/wpi/AllocatorBase\.h$
   src/main/native/include/wpi/AlignOf\.h$
   src/main/native/include/wpi/ArrayRef\.h$
   src/main/native/include/wpi/Chrono\.h$
@@ -20,6 +21,7 @@ generatedFileExclude {
   src/main/native/include/wpi/ConvertUTF\.h$
   src/main/native/include/wpi/DenseMap\.h$
   src/main/native/include/wpi/DenseMapInfo\.h$
+  src/main/native/include/wpi/DJB\.h$
   src/main/native/include/wpi/EpochTracker\.h$
   src/main/native/include/wpi/Endian\.h$
   src/main/native/include/wpi/Errc\.h$
@@ -41,6 +43,7 @@ generatedFileExclude {
   src/main/native/include/wpi/PointerIntPair\.h$
   src/main/native/include/wpi/PointerLikeTypeTraits\.h$
   src/main/native/include/wpi/PointerUnion\.h$
+  src/main/native/include/wpi/ReverseIteration\.h$
   src/main/native/include/wpi/STLExtras\.h$
   src/main/native/include/wpi/Signal\.h$
   src/main/native/include/wpi/SmallPtrSet\.h$
@@ -48,6 +51,8 @@ generatedFileExclude {
   src/main/native/include/wpi/SmallString\.h$
   src/main/native/include/wpi/SmallVector\.h$
   src/main/native/include/wpi/StringMap\.h$
+  src/main/native/include/wpi/StringMapEntry\.h$
+  src/main/native/include/wpi/STLForwardCompat\.h$
   src/main/native/include/wpi/StringRef\.h$
   src/main/native/include/wpi/SwapByteOrder\.h$
   src/main/native/include/wpi/Twine\.h$

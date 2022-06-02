@@ -194,6 +194,7 @@ struct RelayHandle {
   do {                                                               \
     ASSERT_EQ(status, HAL_USE_LAST_ERROR);                           \
     const char* lastErrorMessageInMacro = HAL_GetLastError(&status); \
+    static_cast<void>(lastErrorMessageInMacro);                      \
     ASSERT_EQ(status, x);                                            \
   } while (0)
 

@@ -102,8 +102,8 @@ class SwerveDriveKinematicsTest {
     var moduleStates = m_kinematics.toSwerveModuleStates(speeds);
 
     /*
-    The circumference of the wheels about the COR is pi * diameter, or 2 * pi * radius
-    the radius is the sqrt(12^2in + 12^2in), or 16.9706in, so the circumference the wheels
+    The circumference of the wheels about the COR is π * diameter, or 2π * radius
+    the radius is the √(12²in + 12²in), or 16.9706in, so the circumference the wheels
     trace out is 106.629190516in. since we want our robot to rotate at 1 rotation per second,
     our wheels must trace out 1 rotation (or 106.63 inches) per second.
       */
@@ -143,7 +143,7 @@ class SwerveDriveKinematicsTest {
     This one is a bit trickier. Because we are rotating about the front-left wheel,
     it should be parked at 0 degrees and 0 speed. The front-right and back-left wheels both travel
     an arc with radius 24 (and circumference 150.796), and the back-right wheel travels an arc with
-    radius sqrt(24^2 + 24^2) and circumference 213.2584. As for angles, the front-right wheel
+    radius √(24² + 24²) and circumference 213.2584. As for angles, the front-right wheel
     should be pointing straight forward, the back-left wheel should be pointing straight right,
     and the back-right wheel should be at a -45 degree angle
     */
@@ -169,12 +169,12 @@ class SwerveDriveKinematicsTest {
     var chassisSpeeds = m_kinematics.toChassisSpeeds(flState, frState, blState, brState);
 
     /*
-    We already know that our omega should be 2pi from the previous test. Next, we need to determine
+    We already know that our omega should be 2π from the previous test. Next, we need to determine
     the vx and vy of our chassis center. Because our COR is at a 45 degree angle from the center,
     we know that vx and vy must be the same. Furthermore, we know that the center of mass makes
     a full revolution about the center of revolution once every second. Therefore, the center of
     mass must be moving at 106.629in/sec. Recalling that the ratios of a 45/45/90 triagle are
-    1:sqrt(2)/2:sqrt(2)/2, we find that the COM vx is -75.398, and vy is 75.398.
+    1:√(2)/2:√(2)/2, we find that the COM vx is -75.398, and vy is 75.398.
     */
 
     assertAll(

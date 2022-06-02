@@ -14,7 +14,9 @@ TEST_F(PerpetualCommandTest, PerpetualCommandSchedule) {
 
   bool check = false;
 
+  WPI_IGNORE_DEPRECATED
   PerpetualCommand command{InstantCommand([&check] { check = true; }, {})};
+  WPI_UNIGNORE_DEPRECATED
 
   scheduler.Schedule(&command);
   scheduler.Run();

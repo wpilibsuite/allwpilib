@@ -5,6 +5,7 @@
 #include "frc2/command/Command.h"
 
 #include "frc2/command/CommandScheduler.h"
+#include "frc2/command/ConditionalCommand.h"
 #include "frc2/command/EndlessCommand.h"
 #include "frc2/command/InstantCommand.h"
 #include "frc2/command/ParallelCommandGroup.h"
@@ -86,7 +87,9 @@ SequentialCommandGroup Command::AndThen(
 }
 
 PerpetualCommand Command::Perpetually() && {
+  WPI_IGNORE_DEPRECATED
   return PerpetualCommand(std::move(*this).TransferOwnership());
+  WPI_UNIGNORE_DEPRECATED
 }
 
 EndlessCommand Command::Endlessly() && {
@@ -99,6 +102,12 @@ RepeatCommand Command::Repeat() && {
 
 ProxyScheduleCommand Command::AsProxy() {
   return ProxyScheduleCommand(this);
+}
+
+ConditionalCommand Command::Unless(std::function<bool()> condition) && {
+  return ConditionalCommand(std::make_unique<InstantCommand>(),
+                            std::move(*this).TransferOwnership(),
+                            std::move(condition));
 }
 
 void Command::Schedule(bool interruptible) {

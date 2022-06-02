@@ -4,7 +4,7 @@ import os
 import re
 import shutil
 
-from upstream_utils import setup_upstream_repo, comment_out_invalid_includes, walk_cwd_and_copy_if, apply_patches
+from upstream_utils import setup_upstream_repo, comment_out_invalid_includes, walk_cwd_and_copy_if, am_patches
 
 
 def eigen_inclusions(dp, f):
@@ -82,14 +82,18 @@ def unsupported_inclusions(dp, f):
     if f == "CMakeLists.txt" or "README" in f:
         return False
 
-    # Include the AutoDiff and MatrixFunctions modules
-    return "AutoDiff" in abspath or "MatrixFunctions" in abspath
+    # Include the MatrixFunctions module
+    return "MatrixFunctions" in abspath
 
 
 def main():
     root, repo = setup_upstream_repo("https://gitlab.com/libeigen/eigen.git",
                                      "3.4.0")
     wpimath = os.path.join(root, "wpimath")
+
+    # Apply patches to original git repo
+    prefix = os.path.join(root, "upstream_utils/eigen_patches")
+    am_patches(repo, [os.path.join(prefix, "0001-Disable-warnings.patch")])
 
     # Delete old install
     for d in [
@@ -113,8 +117,6 @@ def main():
     for f in unsupported_files:
         comment_out_invalid_includes(
             f, [os.path.join(wpimath, "src/main/native/eigeninclude")])
-
-    apply_patches(root, ["upstream_utils/eigen-maybe-uninitialized.patch"])
 
 
 if __name__ == "__main__":

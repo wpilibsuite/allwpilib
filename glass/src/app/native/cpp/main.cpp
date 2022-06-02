@@ -49,6 +49,24 @@ static glass::MainMenuBar gMainMenu;
 static bool gAbout = false;
 static bool gSetEnterKey = false;
 static bool gKeyEdit = false;
+static int* gEnterKey;
+static void (*gPrevKeyCallback)(GLFWwindow*, int, int, int, int);
+
+static void RemapEnterKeyCallback(GLFWwindow* window, int key, int scancode,
+                                  int action, int mods) {
+  if (action == GLFW_PRESS || action == GLFW_RELEASE) {
+    if (gKeyEdit) {
+      *gEnterKey = key;
+      gKeyEdit = false;
+    } else if (*gEnterKey == key) {
+      key = GLFW_KEY_ENTER;
+    }
+  }
+
+  if (gPrevKeyCallback) {
+    gPrevKeyCallback(window, key, scancode, action, mods);
+  }
+}
 
 static void NtInitialize() {
   // update window title when connection status changes
@@ -237,11 +255,6 @@ int main(int argc, char** argv) {
       ImGui::EndPopup();
     }
 
-    int& enterKey = glass::GetStorageRoot().GetInt("enterKey", GLFW_KEY_ENTER);
-
-    ImGuiIO& io = ImGui::GetIO();
-    io.KeyMap[ImGuiKey_Enter] = enterKey;
-
     if (gSetEnterKey) {
       ImGui::OpenPopup("Set Enter Key");
       gSetEnterKey = false;
@@ -251,24 +264,13 @@ int main(int argc, char** argv) {
       ImGui::Text("This is useful to edit values without the DS disabling");
       ImGui::Separator();
 
-      if (gKeyEdit) {
-        for (int i = 0; i < IM_ARRAYSIZE(io.KeysDown); ++i) {
-          if (io.KeysDown[i]) {
-            // remove all other uses
-            enterKey = i;
-            gKeyEdit = false;
-            break;
-          }
-        }
-      }
-
       ImGui::Text("Key:");
       ImGui::SameLine();
       char editLabel[40];
       char nameBuf[32];
-      const char* name = glfwGetKeyName(enterKey, 0);
+      const char* name = glfwGetKeyName(*gEnterKey, 0);
       if (!name) {
-        std::snprintf(nameBuf, sizeof(nameBuf), "%d", enterKey);
+        std::snprintf(nameBuf, sizeof(nameBuf), "%d", *gEnterKey);
         name = nameBuf;
       }
       std::snprintf(editLabel, sizeof(editLabel), "%s###edit",
@@ -278,7 +280,7 @@ int main(int argc, char** argv) {
       }
       ImGui::SameLine();
       if (ImGui::SmallButton("Reset")) {
-        enterKey = GLFW_KEY_ENTER;
+        *gEnterKey = GLFW_KEY_ENTER;
       }
 
       if (ImGui::Button("Close")) {
@@ -290,6 +292,10 @@ int main(int argc, char** argv) {
   });
 
   gui::Initialize("Glass - DISCONNECTED", 1024, 768);
+  gEnterKey = &glass::GetStorageRoot().GetInt("enterKey", GLFW_KEY_ENTER);
+  if (auto win = gui::GetSystemWindow()) {
+    gPrevKeyCallback = glfwSetKeyCallback(win, RemapEnterKeyCallback);
+  }
   gui::Main();
 
   gNetworkTablesSettingsWindow.reset();

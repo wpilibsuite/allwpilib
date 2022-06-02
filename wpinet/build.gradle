@@ -51,6 +51,9 @@ ext {
                             'pipe.cpp',
                             'poll.cpp',
                             'process.cpp',
+                            'random-devurandom.cpp',
+                            'random-getentropy.cpp',
+                            'random-getrandom.cpp',
                             'signal.cpp',
                             'stream.cpp',
                             'tcp.cpp',
@@ -136,12 +139,13 @@ ext {
                     source {
                         srcDirs 'src/main/native/thirdparty/libuv/src/unix'
                         includes = [
+                            'epoll.cpp',
                             'linux-core.cpp',
                             'linux-inotify.cpp',
                             'linux-syscalls.cpp',
                             'procfs-exepath.cpp',
                             'proctitle.cpp',
-                            'sysinfo-loadavg.cpp',
+                            'random-sysctl-linux.cpp',
                         ]
                     }
                     exportedHeaders {
@@ -177,19 +181,6 @@ apply from: "${rootDir}/shared/jni/setupBuild.gradle"
 
 nativeUtils.exportsConfigs {
     wpinet {
-        x86ExcludeSymbols = [
-            '_CT??_R0?AV_System_error',
-            '_CT??_R0?AVexception',
-            '_CT??_R0?AVfailure',
-            '_CT??_R0?AVruntime_error',
-            '_CT??_R0?AVsystem_error',
-            '_CTA5?AVfailure',
-            '_TI5?AVfailure',
-            '_CT??_R0?AVout_of_range',
-            '_CTA3?AVout_of_range',
-            '_TI3?AVout_of_range',
-            '_CT??_R0?AVbad_cast'
-        ]
         x64ExcludeSymbols = [
             '_CT??_R0?AV_System_error',
             '_CT??_R0?AVexception',
