@@ -58,6 +58,8 @@ void DifferentialDrivePoseEstimator::ResetPosition(
 
   m_observer.SetXhat(FillStateVector(pose, 0_m, 0_m));
 
+  m_prevTime = -1_s;
+
   m_gyroOffset = GetEstimatedPosition().Rotation() - gyroAngle;
   m_previousAngle = pose.Rotation();
 }
