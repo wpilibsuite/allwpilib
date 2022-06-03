@@ -190,6 +190,8 @@ public class MecanumDrivePoseEstimator {
 
     m_observer.setXhat(StateSpaceUtil.poseTo3dVector(poseMeters));
 
+    m_prevTimeSeconds = -1;
+
     m_gyroOffset = getEstimatedPosition().getRotation().minus(gyroAngle);
     m_previousAngle = poseMeters.getRotation();
   }
