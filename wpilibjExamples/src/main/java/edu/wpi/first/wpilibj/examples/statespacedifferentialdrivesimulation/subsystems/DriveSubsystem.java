@@ -194,11 +194,6 @@ public class DriveSubsystem extends SubsystemBase {
    * @param rightVolts the commanded right output
    */
   public void tankDriveVolts(double leftVolts, double rightVolts) {
-    var batteryVoltage = RobotController.getBatteryVoltage();
-    if (Math.max(Math.abs(leftVolts), Math.abs(rightVolts)) > batteryVoltage) {
-      leftVolts *= batteryVoltage / 12.0;
-      rightVolts *= batteryVoltage / 12.0;
-    }
     m_leftMotors.setVoltage(leftVolts);
     m_rightMotors.setVoltage(rightVolts);
     m_drive.feed();

@@ -9,5 +9,5 @@
 using namespace frc;
 
 void MotorController::SetVoltage(units::volt_t output) {
-  Set(output / units::volt_t(RobotController::GetInputVoltage()));
+  Set(output / RobotController::GetBatteryVoltage());
 }
