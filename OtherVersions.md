@@ -6,9 +6,9 @@ This article contains instructions on building projects using a development buil
 
 ## Development Build
 
-Development builds are the per-commit build hosted everytime a commit is pushed to the [allwpilib](https://github.com/wpilibsuite/allwpilib/) repository. These builds are then hosted on [artifactory](https://frcmaven.wpi.edu/artifactory/webapp/#/home).
+Development builds are the per-commit build hosted every time a commit is pushed to the [allwpilib](https://github.com/wpilibsuite/allwpilib/) repository. These builds are then hosted on [artifactory](https://frcmaven.wpi.edu/artifactory/webapp/#/home).
 
-In order to build a project using a development build, find the build.gradle file and open it. Then, add the following code below the plugin section and replace YEAR with the year of the development version.
+In order to build a project using a development build, find the build.gradle file and open it. Then, add the following code below the plugin section and replace YEAR with the year of the development version. It is also necessary to use a 2023 GradleRIO version, ie `2023.0.0-alpha-1`
 
 ```groovy
 wpi.maven.useLocal = false
@@ -23,13 +23,13 @@ Java
 ```groovy
 plugins {
   id "java"
-  id "edu.wpi.first.GradleRIO" version "2022.1.1"
+  id "edu.wpi.first.GradleRIO" version "2023.0.0-alpha-1"
 }
 
 wpi.maven.useLocal = false
 wpi.maven.useDevelopment = true
-wpi.versions.wpilibVersion = '2022.+'
-wpi.versions.wpimathVersion = '2022.+'
+wpi.versions.wpilibVersion = '2023.+'
+wpi.versions.wpimathVersion = '2023.+'
 ```
 
 C++
@@ -37,13 +37,13 @@ C++
 plugins {
   id "cpp"
   id "google-test-test-suite"
-  id "edu.wpi.first.GradleRIO" version "2022.1.1"
+  id "edu.wpi.first.GradleRIO" version "2023.0.0-alpha-1"
 }
 
 wpi.maven.useLocal = false
 wpi.maven.useDevelopment = true
-wpi.versions.wpilibVersion = '2022.+'
-wpi.versions.wpimathVersion = '2022.+'
+wpi.versions.wpilibVersion = '2023.+'
+wpi.versions.wpimathVersion = '2023.+'
 ```
 
 ## Local Build
@@ -54,7 +54,7 @@ Java
 ```groovy
 plugins {
   id "java"
-  id "edu.wpi.first.GradleRIO" version "2022.1.1"
+  id "edu.wpi.first.GradleRIO" version "2023.0.0-alpha-1"
 }
 
 wpi.maven.useLocal = false
@@ -68,7 +68,7 @@ C++
 plugins {
   id "cpp"
   id "google-test-test-suite"
-  id "edu.wpi.first.GradleRIO" version "2022.1.1"
+  id "edu.wpi.first.GradleRIO" version "2023.0.0-alpha-1"
 }
 
 wpi.maven.useLocal = false
