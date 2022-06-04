@@ -11,13 +11,7 @@ cppSrcFileInclude {
 }
 
 generatedFileExclude {
-  src/main/native/thirdparty/fmtlib/
-  src/main/native/thirdparty/ghc/
-  src/main/native/thirdparty/json
-  src/main/native/thirdparty/llvm
-  src/main/native/thirdparty/mpack
-  src/main/native/thirdparty/sigslot
-  src/main/native/thirdparty/tcb_span
+  src/main/native/thirdparty/
 
   src/main/native/resources/
   src/main/native/windows/StackWalker
