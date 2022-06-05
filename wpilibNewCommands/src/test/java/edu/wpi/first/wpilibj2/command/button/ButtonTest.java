@@ -16,6 +16,7 @@ import edu.wpi.first.wpilibj.simulation.SimHooks;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.CommandTestBase;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.BooleanSupplier;
 import org.junit.jupiter.api.Test;
 
@@ -145,11 +146,11 @@ class ButtonTest extends CommandTestBase {
     buttonWhileHeld.setPressed(true);
     buttonWhenReleased.setPressed(true);
 
-    Counter counter = new Counter();
+    AtomicInteger counter = new AtomicInteger(0);
 
-    buttonWhenPressed.whenPressed(counter::increment);
-    buttonWhileHeld.whileHeld(counter::increment);
-    buttonWhenReleased.whenReleased(counter::increment);
+    buttonWhenPressed.whenPressed(counter::incrementAndGet);
+    buttonWhileHeld.whileHeld(counter::incrementAndGet);
+    buttonWhenReleased.whenReleased(counter::incrementAndGet);
 
     CommandScheduler scheduler = CommandScheduler.getInstance();
 
@@ -158,7 +159,7 @@ class ButtonTest extends CommandTestBase {
     buttonWhenReleased.setPressed(false);
     scheduler.run();
 
-    assertEquals(counter.m_counter, 4);
+    assertEquals(counter.get(), 4);
   }
 
   @Test
