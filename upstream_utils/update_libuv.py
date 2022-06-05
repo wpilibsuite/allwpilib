@@ -23,6 +23,7 @@ def main():
         os.path.join(prefix, "0006-Style-comments-cleanup.patch"),
         os.path.join(prefix, "0007-Squelch-GCC-12.1-warnings.patch"),
         os.path.join(prefix, "0008-Fix-Win32-warning-suppression-pragma.patch"),
+        os.path.join(prefix, "0009-Avoid-unused-variable-warning-on-Mac.patch"),
     ])
 
     # Delete old install
