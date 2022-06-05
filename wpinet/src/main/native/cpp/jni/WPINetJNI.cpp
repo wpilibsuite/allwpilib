@@ -25,7 +25,7 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM* vm, void* reserved) {
     return JNI_ERR;
   }
 
-  serviceDataCls = JClass{env, "edu/wpi/first/util/ServiceData"};
+  serviceDataCls = JClass{env, "edu/wpi/first/net/ServiceData"};
   if (!serviceDataCls) {
     return JNI_ERR;
   }
