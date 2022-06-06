@@ -136,7 +136,7 @@ jobs:
 
   combine:
     name: Combine
-    needs: [build-docker, build-host, build-documentation, build-host-2]
+    needs: [build-docker, build-host, build-documentation]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
