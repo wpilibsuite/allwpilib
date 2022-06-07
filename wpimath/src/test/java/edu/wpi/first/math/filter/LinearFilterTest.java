@@ -141,7 +141,7 @@ class LinearFilterTest {
         3,
         // f(x) = ln(x)
         (double x) -> Math.log(x),
-        // df/dx = 1 / x
+        // df/dx = 1/x
         (double x) -> 1.0 / x,
         h,
         1.0,
@@ -174,7 +174,7 @@ class LinearFilterTest {
         5,
         // f(x) = ln(x)
         (double x) -> Math.log(x),
-        // d²f/dx² = -1 / x²
+        // d²f/dx² = -1/x²
         (double x) -> -1.0 / (x * x),
         h,
         1.0,
@@ -213,7 +213,7 @@ class LinearFilterTest {
         2,
         // f(x) = ln(x)
         (double x) -> Math.log(x),
-        // df/dx = 1 / x
+        // df/dx = 1/x
         (double x) -> 1.0 / x,
         h,
         1.0,
@@ -246,7 +246,7 @@ class LinearFilterTest {
         4,
         // f(x) = ln(x)
         (double x) -> Math.log(x),
-        // d²f/dx² = -1 / x²
+        // d²f/dx² = -1/x²
         (double x) -> -1.0 / (x * x),
         h,
         1.0,

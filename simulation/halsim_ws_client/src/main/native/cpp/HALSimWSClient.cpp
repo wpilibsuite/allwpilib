@@ -19,7 +19,7 @@
 #include <WSProvider_SimDevice.h>
 #include <WSProvider_Solenoid.h>
 #include <WSProvider_dPWM.h>
-#include <wpi/EventLoopRunner.h>
+#include <wpinet/EventLoopRunner.h>
 
 using namespace wpilibws;
 

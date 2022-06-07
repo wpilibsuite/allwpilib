@@ -1,9 +1,8 @@
 //===--- raw_ostream.cpp - Implement the raw_ostream classes --------------===//
 //
-//                     The LLVM Compiler Infrastructure
-//
-// This file is distributed under the University of Illinois Open Source
-// License. See LICENSE.TXT for details.
+// Part of the LLVM Project, under the Apache License v2.0 with LLVM Exceptions.
+// See https://llvm.org/LICENSE.txt for license information.
+// SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 //
 //===----------------------------------------------------------------------===//
 //
@@ -21,19 +20,17 @@
 #include "wpi/StringExtras.h"
 #include "wpi/Compiler.h"
 #include "wpi/ErrorHandling.h"
-#include "wpi/MathExtras.h"
-#include "wpi/WindowsError.h"
 #include "wpi/fs.h"
+#include "wpi/MathExtras.h"
 #include <algorithm>
 #include <cctype>
 #include <cerrno>
 #include <cstdio>
 #include <iterator>
 #include <sys/stat.h>
-#include <system_error>
 
 // <fcntl.h> may provide O_BINARY.
-#include <fcntl.h>
+# include <fcntl.h>
 
 #ifndef _WIN32
 #include <unistd.h>
@@ -64,6 +61,17 @@
 
 using namespace wpi;
 
+constexpr raw_ostream::Colors raw_ostream::BLACK;
+constexpr raw_ostream::Colors raw_ostream::RED;
+constexpr raw_ostream::Colors raw_ostream::GREEN;
+constexpr raw_ostream::Colors raw_ostream::YELLOW;
+constexpr raw_ostream::Colors raw_ostream::BLUE;
+constexpr raw_ostream::Colors raw_ostream::MAGENTA;
+constexpr raw_ostream::Colors raw_ostream::CYAN;
+constexpr raw_ostream::Colors raw_ostream::WHITE;
+constexpr raw_ostream::Colors raw_ostream::SAVEDCOLOR;
+constexpr raw_ostream::Colors raw_ostream::RESET;
+
 namespace {
 // Find the length of an array.
 template <class T, std::size_t N>
@@ -78,12 +86,9 @@ raw_ostream::~raw_ostream() {
   assert(OutBufCur == OutBufStart &&
          "raw_ostream destructor called with non-empty buffer!");
 
-  if (BufferMode == InternalBuffer)
+  if (BufferMode == BufferKind::InternalBuffer)
     delete [] OutBufStart;
 }
-
-// An out of line virtual method to provide a home for the class vtable.
-void raw_ostream::handle() {}
 
 size_t raw_ostream::preferred_buffer_size() const {
   // BUFSIZ is intended to be a reasonable default.
@@ -101,14 +106,14 @@ void raw_ostream::SetBuffered() {
 
 void raw_ostream::SetBufferAndMode(char *BufferStart, size_t Size,
                                    BufferKind Mode) {
-  assert(((Mode == Unbuffered && !BufferStart && Size == 0) ||
-          (Mode != Unbuffered && BufferStart && Size != 0)) &&
+  assert(((Mode == BufferKind::Unbuffered && !BufferStart && Size == 0) ||
+          (Mode != BufferKind::Unbuffered && BufferStart && Size != 0)) &&
          "stream must be unbuffered or have at least one byte");
   // Make sure the current buffer is free of content (we can't flush here; the
   // child buffer management logic will be in write_impl).
   assert(GetNumBytesInBuffer() == 0 && "Current buffer is non-empty!");
 
-  if (BufferMode == InternalBuffer)
+  if (BufferMode == BufferKind::InternalBuffer)
     delete [] OutBufStart;
   OutBufStart = BufferStart;
   OutBufEnd = OutBufStart+Size;
@@ -162,15 +167,15 @@ void raw_ostream::flush_nonempty() {
   assert(OutBufCur > OutBufStart && "Invalid call to flush_nonempty.");
   size_t Length = OutBufCur - OutBufStart;
   OutBufCur = OutBufStart;
-  write_impl(OutBufStart, Length);
+  flush_tied_then_write(OutBufStart, Length);
 }
 
 raw_ostream &raw_ostream::write(unsigned char C) {
   // Group exceptional cases into a single branch.
   if (LLVM_UNLIKELY(OutBufCur >= OutBufEnd)) {
     if (LLVM_UNLIKELY(!OutBufStart)) {
-      if (BufferMode == Unbuffered) {
-        write_impl(reinterpret_cast<char*>(&C), 1);
+      if (BufferMode == BufferKind::Unbuffered) {
+        flush_tied_then_write(reinterpret_cast<char *>(&C), 1);
         return *this;
       }
       // Set up a buffer and start over.
@@ -189,8 +194,8 @@ raw_ostream &raw_ostream::write(const char *Ptr, size_t Size) {
   // Group exceptional cases into a single branch.
   if (LLVM_UNLIKELY(size_t(OutBufEnd - OutBufCur) < Size)) {
     if (LLVM_UNLIKELY(!OutBufStart)) {
-      if (BufferMode == Unbuffered) {
-        write_impl(Ptr, Size);
+      if (BufferMode == BufferKind::Unbuffered) {
+        flush_tied_then_write(Ptr, Size);
         return *this;
       }
       // Set up a buffer and start over.
@@ -206,7 +211,7 @@ raw_ostream &raw_ostream::write(const char *Ptr, size_t Size) {
     if (LLVM_UNLIKELY(OutBufCur == OutBufStart)) {
       assert(NumBytes != 0 && "undefined behavior");
       size_t BytesToWrite = Size - (Size % NumBytes);
-      write_impl(Ptr, BytesToWrite);
+      flush_tied_then_write(Ptr, BytesToWrite);
       size_t BytesRemaining = Size - BytesToWrite;
       if (BytesRemaining > size_t(OutBufEnd - OutBufCur)) {
         // Too much left over to copy into our buffer.
@@ -246,6 +251,13 @@ void raw_ostream::copy_to_buffer(const char *Ptr, size_t Size) {
 
   OutBufCur += Size;
 }
+
+void raw_ostream::flush_tied_then_write(const char *Ptr, size_t Size) {
+  if (TiedStream)
+    TiedStream->flush();
+  write_impl(Ptr, Size);
+}
+
 
 template <char C>
 static raw_ostream &write_padding(raw_ostream &OS, unsigned NumChars) {
@@ -294,8 +306,7 @@ static int getFD(std::string_view Filename, std::error_code &EC,
   // the owner of stdout and may set the "binary" flag globally based on Flags.
   if (Filename == "-") {
     EC = std::error_code();
-    // If user requested binary then put stdout into binary mode if
-    // possible.
+    // Change stdout's text/binary mode based on the Flags.
     if (!(Flags & fs::OF_Text)) {
 #if defined(_WIN32)
       _setmode(_fileno(stdout), _O_BINARY);
@@ -305,11 +316,10 @@ static int getFD(std::string_view Filename, std::error_code &EC,
   }
 
   fs::file_t F;
-  if (Access & fs::FA_Read) {
+  if (Access & fs::FA_Read)
     F = fs::OpenFileForReadWrite(fs::path{std::string_view{Filename.data(), Filename.size()}}, EC, Disp, Flags);
-  } else {
+  else
     F = fs::OpenFileForWrite(fs::path{std::string_view{Filename.data(), Filename.size()}}, EC, Disp, Flags);
-  }
   if (EC)
     return -1;
   int FD = fs::FileToFd(F, EC, Flags);
@@ -345,12 +355,15 @@ raw_fd_ostream::raw_fd_ostream(std::string_view Filename, std::error_code &EC,
 
 /// FD is the file descriptor that this writes to.  If ShouldClose is true, this
 /// closes the file when the stream is destroyed.
-raw_fd_ostream::raw_fd_ostream(int fd, bool shouldClose, bool unbuffered)
-    : raw_pwrite_stream(unbuffered), FD(fd), ShouldClose(shouldClose) {
+raw_fd_ostream::raw_fd_ostream(int fd, bool shouldClose, bool unbuffered,
+                               OStreamKind K)
+    : raw_pwrite_stream(unbuffered, K), FD(fd), ShouldClose(shouldClose) {
   if (FD < 0 ) {
     ShouldClose = false;
     return;
   }
+
+  enable_colors(true);
 
   // Do not attempt to close stdout or stderr. We used to try to maintain the
   // property that tools that support writing file to stdout should not also
@@ -370,7 +383,6 @@ raw_fd_ostream::raw_fd_ostream(int fd, bool shouldClose, bool unbuffered)
   // Get the starting position.
   off_t loc = ::lseek(FD, 0, SEEK_CUR);
 #ifdef _WIN32
-  // MSVCRT's _lseek(SEEK_CUR) doesn't return -1 for pipes.
   SupportsSeeking = loc != (off_t)-1 && ::GetFileType(reinterpret_cast<HANDLE>(::_get_osfhandle(FD))) != FILE_TYPE_PIPE;
 #else
   SupportsSeeking = loc != (off_t)-1;
@@ -402,7 +414,7 @@ raw_fd_ostream::~raw_fd_ostream() {
   // destructing raw_ostream objects which may have errors.
   if (has_error())
     report_fatal_error("IO failure on output stream: " + error().message(),
-                       /*GenCrashDiag=*/false);
+                       /*gen_crash_diag=*/false);
 }
 
 #if defined(_WIN32)
@@ -565,7 +577,7 @@ size_t raw_fd_ostream::preferred_buffer_size() const {
   // If this is a terminal, don't use buffering. Line buffering
   // would be a more traditional thing to do, but it's not worth
   // the complexity.
-  if (S_ISCHR(statbuf.st_mode) && isatty(FD))
+  if (S_ISCHR(statbuf.st_mode) && is_displayed())
     return 0;
   // Return the preferred block size.
   return statbuf.st_blksize;
@@ -580,28 +592,45 @@ void raw_fd_ostream::anchor() {}
 //  outs(), errs(), nulls()
 //===----------------------------------------------------------------------===//
 
-/// outs() - This returns a reference to a raw_ostream for standard output.
-/// Use it like: outs() << "foo" << "bar";
-raw_ostream &wpi::outs() {
+raw_fd_ostream &wpi::outs() {
   // Set buffer settings to model stdout behavior.
   std::error_code EC;
-  static raw_fd_ostream* S = new raw_fd_ostream("-", EC, fs::F_None);
+  static raw_fd_ostream* S = new raw_fd_ostream("-", EC, fs::OF_None);
   assert(!EC);
   return *S;
 }
 
-/// errs() - This returns a reference to a raw_ostream for standard error.
-/// Use it like: errs() << "foo" << "bar";
-raw_ostream &wpi::errs() {
-  // Set standard error to be unbuffered by default.
+raw_fd_ostream &wpi::errs() {
+  // Set standard error to be unbuffered and tied to outs() by default.
   static raw_fd_ostream* S = new raw_fd_ostream(STDERR_FILENO, false, true);
   return *S;
 }
 
 /// nulls() - This returns a reference to a raw_ostream which discards output.
 raw_ostream &wpi::nulls() {
-  static raw_null_ostream* S = new raw_null_ostream;
-  return *S;
+  static raw_null_ostream S;
+  return S;
+}
+
+//===----------------------------------------------------------------------===//
+// File Streams
+//===----------------------------------------------------------------------===//
+
+raw_fd_stream::raw_fd_stream(std::string_view Filename, std::error_code &EC)
+    : raw_fd_ostream(getFD(Filename, EC, fs::CD_CreateAlways,
+                           fs::FA_Write | fs::FA_Read,
+                           fs::OF_None),
+                     true, false, OStreamKind::OK_FDStream) {
+  if (EC)
+    return;
+
+  // Do not support non-seekable files.
+  if (!supportsSeeking())
+    EC = std::make_error_code(std::errc::invalid_argument);
+}
+
+bool raw_fd_stream::classof(const raw_ostream *OS) {
+  return OS->get_kind() == OStreamKind::OK_FDStream;
 }
 
 //===----------------------------------------------------------------------===//
@@ -691,15 +720,18 @@ raw_null_ostream::~raw_null_ostream() {
 #endif
 }
 
-void raw_null_ostream::write_impl(const char * /*Ptr*/, size_t /*Size*/) {}
+void raw_null_ostream::write_impl(const char *Ptr, size_t Size) {
+}
 
 uint64_t raw_null_ostream::current_pos() const {
   return 0;
 }
 
-void raw_null_ostream::pwrite_impl(const char * /*Ptr*/, size_t /*Size*/,
-                                   uint64_t /*Offset*/) {}
+void raw_null_ostream::pwrite_impl(const char *Ptr, size_t Size,
+                                   uint64_t Offset) {}
 
 void raw_pwrite_stream::anchor() {}
 
 void buffer_ostream::anchor() {}
+
+void buffer_unique_ostream::anchor() {}

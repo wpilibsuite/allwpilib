@@ -38,11 +38,30 @@ class Input {
 };
 
 LTVUnicycleController::LTVUnicycleController(
+    units::second_t dt, units::meters_per_second_t maxVelocity)
+    : LTVUnicycleController{{0.0625, 0.125, 2.0}, {1.0, 2.0}, dt, maxVelocity} {
+}
+
+LTVUnicycleController::LTVUnicycleController(
     const wpi::array<double, 3>& Qelems, const wpi::array<double, 2>& Relems,
-    units::second_t dt)
-    : m_dt{dt} {
-  m_Q = frc::MakeCostMatrix(Qelems);
-  m_R = frc::MakeCostMatrix(Relems);
+    units::second_t dt, units::meters_per_second_t maxVelocity) {
+  Matrixd<3, 3> A = Matrixd<3, 3>::Zero();
+  Matrixd<3, 2> B{{1.0, 0.0}, {0.0, 0.0}, {0.0, 1.0}};
+  Matrixd<3, 3> Q = frc::MakeCostMatrix(Qelems);
+  Matrixd<2, 2> R = frc::MakeCostMatrix(Relems);
+
+  for (auto velocity = -maxVelocity; velocity < maxVelocity;
+       velocity += 0.01_mps) {
+    // The DARE is ill-conditioned if the velocity is close to zero, so don't
+    // let the system stop.
+    if (units::math::abs(velocity) < 1e-4_mps) {
+      m_table.insert(velocity, Matrixd<2, 3>::Zero());
+    } else {
+      A(State::kY, State::kHeading) = velocity.value();
+      m_table.insert(velocity,
+                     frc::LinearQuadraticRegulator<3, 2>{A, B, Q, R, dt}.K());
+    }
+  }
 }
 
 bool LTVUnicycleController::AtReference() const {
@@ -69,15 +88,10 @@ ChassisSpeeds LTVUnicycleController::Calculate(
 
   m_poseError = poseRef.RelativeTo(currentPose);
 
-  if (units::math::abs(linearVelocityRef) < 1e-4_mps) {
-    m_A(State::kY, State::kHeading) = 1e-4;
-  } else {
-    m_A(State::kY, State::kHeading) = linearVelocityRef.value();
-  }
+  const auto& K = m_table[linearVelocityRef];
   Vectord<3> e{m_poseError.X().value(), m_poseError.Y().value(),
                m_poseError.Rotation().Radians().value()};
-  Vectord<2> u =
-      frc::LinearQuadraticRegulator<3, 2>{m_A, m_B, m_Q, m_R, m_dt}.K() * e;
+  Vectord<2> u = K * e;
 
   return ChassisSpeeds{linearVelocityRef + units::meters_per_second_t{u(0)},
                        0_mps,

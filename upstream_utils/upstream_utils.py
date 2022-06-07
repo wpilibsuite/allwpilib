@@ -5,7 +5,7 @@ import subprocess
 import tempfile
 
 
-def clone_repo(url, treeish):
+def clone_repo(url, treeish, shallow=True):
     """Clones a git repo at the given URL into a temp folder and checks out the
     given tree-ish (either branch or tag).
 
@@ -14,15 +14,21 @@ def clone_repo(url, treeish):
     Keyword argument:
     url -- The URL of the git repo
     treeish -- The tree-ish to check out (branch or tag)
+    shallow -- Whether to do a shallow clone
     """
     os.chdir(tempfile.gettempdir())
 
     repo = os.path.basename(url)
-    dest = os.path.join(os.getcwd(), repo).removesuffix(".git")
+    dest = os.path.join(os.getcwd(), repo)
+    if dest.endswith(".git"):
+        dest = dest[:-4]
 
     # Clone Git repository into current directory or update it
     if not os.path.exists(dest):
-        subprocess.run(["git", "clone", url, dest])
+        cmd = ["git", "clone"]
+        if shallow:
+            cmd += ["--branch", treeish, "--depth", "1"]
+        subprocess.run(cmd + [url, dest])
         os.chdir(dest)
     else:
         os.chdir(dest)
@@ -58,7 +64,7 @@ def get_repo_root():
     return ""
 
 
-def setup_upstream_repo(url, treeish):
+def setup_upstream_repo(url, treeish, shallow=True):
     """Clones the given upstream repository, then returns the root of the
     destination Git repository as well as the cloned upstream Git repository.
 
@@ -68,13 +74,14 @@ def setup_upstream_repo(url, treeish):
     Keyword arguments:
     url -- The URL of the git repo
     treeish -- The tree-ish to check out (branch or tag)
+    shallow -- Whether to do a shallow clone
 
     Returns:
     root -- root directory of destination Git repository
     repo -- root directory of cloned upstream Git repository
     """
     root = get_repo_root()
-    clone_repo(url, treeish)
+    clone_repo(url, treeish, shallow=shallow)
     return root, os.getcwd()
 
 
@@ -117,6 +124,8 @@ def copy_to(files, root):
 
         # Rename .cc file to .cpp
         if dest_file.endswith(".cc"):
+            dest_file = os.path.splitext(dest_file)[0] + ".cpp"
+        if dest_file.endswith(".c"):
             dest_file = os.path.splitext(dest_file)[0] + ".cpp"
 
         # Make leading directory
@@ -190,7 +199,8 @@ def comment_out_invalid_includes(filename, include_roots):
 
 
 def apply_patches(root, patches):
-    """Apply list of patches to the destination Git repository.
+    """Apply list of patches to the destination Git repository using "git
+    apply".
 
     Keyword arguments:
     root -- the root directory of the destination Git repository
@@ -199,3 +209,21 @@ def apply_patches(root, patches):
     os.chdir(root)
     for patch in patches:
         subprocess.check_output(["git", "apply", patch])
+
+
+def am_patches(root, patches, use_threeway=False, ignore_whitespce=False):
+    """Apply list of patches to the destination Git repository using "git am".
+
+    Keyword arguments:
+    root -- the root directory of the destination Git repository
+    patches -- list of patch files relative to the root
+    """
+    os.chdir(root)
+    args = ["git", "am"]
+    if use_threeway:
+        args.append("-3")
+    if ignore_whitespce:
+        args.append("--ignore-whitespace")
+
+    for patch in patches:
+        subprocess.check_output(args + [patch])

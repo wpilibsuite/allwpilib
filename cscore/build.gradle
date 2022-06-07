@@ -45,6 +45,7 @@ model {
                     return
                 }
                 lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
+                lib project: ':wpinet', library: 'wpinet', linkage: 'shared'
 
                 if (it.targetPlatform.operatingSystem.linux) {
                     it.linker.args '-Wl,--version-script=' + file('src/main/native/LinuxSymbolScript.txt')
@@ -53,6 +54,15 @@ model {
                     it.linker.args file('src/main/native/MacSymbolScript.txt').toString()
                 }
             }
+        }
+    }
+    binaries {
+        all {
+            if (!it.buildable || !(it instanceof NativeBinarySpec)) {
+                return
+            }
+            lib project: ':wpinet', library: 'wpinet', linkage: 'shared'
+            lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
         }
     }
 }
@@ -144,19 +154,6 @@ Action<List<String>> symbolFilter = { symbols ->
 
 nativeUtils.exportsConfigs {
     cscore {
-        x86ExcludeSymbols = [
-            '_CT??_R0?AV_System_error',
-            '_CT??_R0?AVexception',
-            '_CT??_R0?AVfailure',
-            '_CT??_R0?AVruntime_error',
-            '_CT??_R0?AVsystem_error',
-            '_CTA5?AVfailure',
-            '_TI5?AVfailure',
-            '_CT??_R0?AVout_of_range',
-            '_CTA3?AVout_of_range',
-            '_TI3?AVout_of_range',
-            '_CT??_R0?AVbad_cast'
-        ]
         x64ExcludeSymbols = [
             '_CT??_R0?AV_System_error',
             '_CT??_R0?AVexception',
@@ -172,11 +169,9 @@ nativeUtils.exportsConfigs {
         ]
     }
     cscoreJNI {
-        x86SymbolFilter = symbolFilter
         x64SymbolFilter = symbolFilter
     }
     cscoreJNICvStatic {
-        x86SymbolFilter = symbolFilter
         x64SymbolFilter = symbolFilter
     }
 }
@@ -190,6 +185,7 @@ model {
                         targetBuildTypes 'debug'
                         binaries.all {
                             lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
+                            lib project: ':wpinet', library: 'wpinet', linkage: 'shared'
                             lib project: ':wpigui', library: 'wpigui', linkage: 'static'
                             lib library: 'cscore', linkage: 'shared'
                             nativeUtils.useRequiredLibrary(it, 'imgui_static')
@@ -220,6 +216,7 @@ model {
                     targetBuildTypes 'debug'
                     binaries.all {
                         lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
+                        lib project: ':wpinet', library: 'wpinet', linkage: 'shared'
                         lib library: 'cscore', linkage: 'shared'
                     }
                     sources {

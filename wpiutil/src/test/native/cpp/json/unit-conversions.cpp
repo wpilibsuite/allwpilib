@@ -38,6 +38,7 @@ SOFTWARE.
 using wpi::json;
 using wpi::JsonTest;
 
+#include <cmath>
 #include <deque>
 //#include <forward_list>
 #include <list>

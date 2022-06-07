@@ -38,6 +38,7 @@ public class SwerveDriveKinematics {
 
   private final int m_numModules;
   private final Translation2d[] m_modules;
+  private final SwerveModuleState[] m_moduleStates;
   private Translation2d m_prevCoR = new Translation2d();
 
   /**
@@ -54,6 +55,8 @@ public class SwerveDriveKinematics {
     }
     m_numModules = wheelsMeters.length;
     m_modules = Arrays.copyOf(wheelsMeters, m_numModules);
+    m_moduleStates = new SwerveModuleState[m_numModules];
+    Arrays.fill(m_moduleStates, new SwerveModuleState());
     m_inverseKinematics = new SimpleMatrix(m_numModules * 2, 3);
 
     for (int i = 0; i < m_numModules; i++) {
@@ -74,6 +77,9 @@ public class SwerveDriveKinematics {
    * argument is defaulted to that use case. However, if you wish to change the center of rotation
    * for evasive maneuvers, vision alignment, or for any other use case, you can do so.
    *
+   * <p>In the case that the desired chassis speeds are zero (i.e. the robot will be stationary),
+   * the previously calculated module angle will be maintained.
+   *
    * @param chassisSpeeds The desired chassis speed.
    * @param centerOfRotationMeters The center of rotation. For example, if you set the center of
    *     rotation at one corner of the robot and provide a chassis speed that only has a dtheta
@@ -83,9 +89,19 @@ public class SwerveDriveKinematics {
    *     attainable max velocity. Use the {@link #desaturateWheelSpeeds(SwerveModuleState[], double)
    *     DesaturateWheelSpeeds} function to rectify this issue.
    */
-  @SuppressWarnings("LocalVariableName")
+  @SuppressWarnings({"LocalVariableName", "PMD.MethodReturnsInternalArray"})
   public SwerveModuleState[] toSwerveModuleStates(
       ChassisSpeeds chassisSpeeds, Translation2d centerOfRotationMeters) {
+    if (chassisSpeeds.vxMetersPerSecond == 0.0
+        && chassisSpeeds.vyMetersPerSecond == 0.0
+        && chassisSpeeds.omegaRadiansPerSecond == 0.0) {
+      for (int i = 0; i < m_numModules; i++) {
+        m_moduleStates[i].speedMetersPerSecond = 0.0;
+      }
+
+      return m_moduleStates;
+    }
+
     if (!centerOfRotationMeters.equals(m_prevCoR)) {
       for (int i = 0; i < m_numModules; i++) {
         m_inverseKinematics.setRow(
@@ -113,7 +129,6 @@ public class SwerveDriveKinematics {
         chassisSpeeds.omegaRadiansPerSecond);
 
     var moduleStatesMatrix = m_inverseKinematics.mult(chassisSpeedsVector);
-    SwerveModuleState[] moduleStates = new SwerveModuleState[m_numModules];
 
     for (int i = 0; i < m_numModules; i++) {
       double x = moduleStatesMatrix.get(i * 2, 0);
@@ -122,10 +137,10 @@ public class SwerveDriveKinematics {
       double speed = Math.hypot(x, y);
       Rotation2d angle = new Rotation2d(x, y);
 
-      moduleStates[i] = new SwerveModuleState(speed, angle);
+      m_moduleStates[i] = new SwerveModuleState(speed, angle);
     }
 
-    return moduleStates;
+    return m_moduleStates;
   }
 
   /**

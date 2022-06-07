@@ -1,9 +1,8 @@
-//===- llvm/Support/Errc.h - Defines the llvm::errc enum --------*- C++ -*-===//
+//===- llvm/Support/Errc.h - Defines the wpi::errc enum --------*- C++ -*-===//
 //
-//                     The LLVM Compiler Infrastructure
-//
-// This file is distributed under the University of Illinois Open Source
-// License. See LICENSE.TXT for details.
+// Part of the LLVM Project, under the Apache License v2.0 with LLVM Exceptions.
+// See https://llvm.org/LICENSE.txt for license information.
+// SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 //
 //===----------------------------------------------------------------------===//
 //
@@ -11,7 +10,7 @@
 // some problems with std::errc that can be avoided by using our own
 // enumeration:
 //
-// * std::errc is a namespace in some implementations. That meas that ADL
+// * std::errc is a namespace in some implementations. That means that ADL
 //   doesn't work and it is sometimes necessary to write std::make_error_code
 //   or in templates:
 //   using std::make_error_code;
@@ -23,7 +22,7 @@
 //   the intersection of all the ones we support.
 //
 // * std::errc is just marked with is_error_condition_enum. This means that
-//   common patters like AnErrorCode == errc::no_such_file_or_directory take
+//   common patterns like AnErrorCode == errc::no_such_file_or_directory take
 //   4 virtual calls instead of two comparisons.
 //===----------------------------------------------------------------------===//
 

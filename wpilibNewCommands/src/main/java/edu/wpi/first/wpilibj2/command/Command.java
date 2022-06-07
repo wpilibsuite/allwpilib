@@ -254,6 +254,7 @@ public interface Command {
    * @return the decorated command
    * @deprecated use {@link #endlessly()} instead.
    */
+  @SuppressWarnings("removal") // PerpetualCommand
   @Deprecated(forRemoval = true, since = "2023")
   default PerpetualCommand perpetually() {
     return new PerpetualCommand(this);
@@ -303,6 +304,18 @@ public interface Command {
   }
 
   /**
+   * Decorates this command to only run if this condition is not met. If the command is already
+   * running and the condition changes to true, the command will not stop running. The requirements
+   * of this command will be kept for the new conditonal command.
+   *
+   * @param condition the condition that will prevent the command from running
+   * @return the decorated command
+   */
+  default ConditionalCommand unless(BooleanSupplier condition) {
+    return new ConditionalCommand(new InstantCommand(), this, condition);
+  }
+
+  /**
    * Schedules this command.
    *
    * @param interruptible whether this command can be interrupted by another command that shares one
@@ -318,8 +331,8 @@ public interface Command {
   }
 
   /**
-   * Cancels this command. Will call the command's interrupted() method. Commands will be canceled
-   * even if they are not marked as interruptible.
+   * Cancels this command. Will call the command's end() method with interrupted=true. Commands will
+   * be canceled even if they are not marked as interruptible.
    */
   default void cancel() {
     CommandScheduler.getInstance().cancel(this);

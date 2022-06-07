@@ -25,7 +25,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     container: ${{ matrix.container }}
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
 
       - name: Install opencv (macOS)
         run: brew install opencv
@@ -56,7 +56,7 @@ jobs:
     name: "Build - Windows"
     runs-on: windows-2019
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
 
       - name: Install CMake
         uses: lukka/get-cmake@v3.23.0

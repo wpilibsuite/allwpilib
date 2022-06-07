@@ -255,7 +255,7 @@ class DifferentialDrivetrainSim {
   static DifferentialDrivetrainSim CreateKitbotSim(
       frc::DCMotor motor, double gearing, units::meter_t wheelSize,
       const std::array<double, 7>& measurementStdDevs = {}) {
-    // MOI estimation -- note that I = m r^2 for point masses
+    // MOI estimation -- note that I = mr² for point masses
     units::kilogram_square_meter_t batteryMoi = 12.5_lb * 10_in * 10_in;
     units::kilogram_square_meter_t gearboxMoi = (2.8_lb + 2.0_lb) *
                                                 2  // CIM plus toughbox per side

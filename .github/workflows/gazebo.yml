@@ -10,9 +10,9 @@ jobs:
   build:
     name: "Build"
     runs-on: ubuntu-latest
-    container: wpilib/gazebo-ubuntu:18.04
+    container: wpilib/gazebo-ubuntu:20.04
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           fetch-depth: 0
       - name: Build with Gradle

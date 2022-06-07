@@ -12,6 +12,7 @@
 #include <units/time.h>
 #include <wpi/Demangle.h>
 #include <wpi/SmallSet.h>
+#include <wpi/deprecated.h>
 #include <wpi/span.h>
 
 #include "frc2/command/Subsystem.h"
@@ -31,6 +32,7 @@ class SequentialCommandGroup;
 class PerpetualCommand;
 class ProxyScheduleCommand;
 class RepeatCommand;
+class ConditionalCommand;
 
 /**
  * A state machine representing a complete action to be performed by the robot.
@@ -38,8 +40,9 @@ class RepeatCommand;
  * CommandGroups to allow users to build complicated multi-step actions without
  * the need to roll the state machine logic themselves.
  *
- * <p>Commands are run synchronously from the main robot loop; no multithreading
- * is used, unless specified explicitly from the command implementation.
+ * <p>Commands are run synchronously from the main robot loop; no
+ * multithreading is used, unless specified explicitly from the command
+ * implementation.
  *
  * <p>Note: ALWAYS create a subclass by extending CommandHelper<Base, Subclass>,
  * or decorators will not function!
@@ -214,6 +217,17 @@ class Command {
    * @return the decorated command
    */
   virtual ProxyScheduleCommand AsProxy();
+
+  /**
+   * Decorates this command to only run if this condition is not met. If the
+   * command is already running and the condition changes to true, the command
+   * will not stop running. The requirements of this command will be kept for
+   * the new conditonal command.
+   *
+   * @param condition the condition that will prevent the command from running
+   * @return the decorated command
+   */
+  virtual ConditionalCommand Unless(std::function<bool()> condition) &&;
 
   /**
    * Schedules this command.

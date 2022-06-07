@@ -91,10 +91,10 @@ class ParallelRaceGroupTest extends CommandTestBase {
 
   @Test
   void parallelRaceRequirementTest() {
-    Subsystem system1 = new TestSubsystem();
-    Subsystem system2 = new TestSubsystem();
-    Subsystem system3 = new TestSubsystem();
-    Subsystem system4 = new TestSubsystem();
+    Subsystem system1 = new SubsystemBase() {};
+    Subsystem system2 = new SubsystemBase() {};
+    Subsystem system3 = new SubsystemBase() {};
+    Subsystem system4 = new SubsystemBase() {};
 
     try (CommandScheduler scheduler = new CommandScheduler()) {
       MockCommandHolder command1Holder = new MockCommandHolder(true, system1, system2);
@@ -116,9 +116,9 @@ class ParallelRaceGroupTest extends CommandTestBase {
 
   @Test
   void parallelRaceRequirementErrorTest() {
-    Subsystem system1 = new TestSubsystem();
-    Subsystem system2 = new TestSubsystem();
-    Subsystem system3 = new TestSubsystem();
+    Subsystem system1 = new SubsystemBase() {};
+    Subsystem system2 = new SubsystemBase() {};
+    Subsystem system3 = new SubsystemBase() {};
 
     MockCommandHolder command1Holder = new MockCommandHolder(true, system1, system2);
     Command command1 = command1Holder.getMock();
@@ -130,15 +130,15 @@ class ParallelRaceGroupTest extends CommandTestBase {
 
   @Test
   void parallelRaceOnlyCallsEndOnceTest() {
-    Subsystem system1 = new TestSubsystem();
-    Subsystem system2 = new TestSubsystem();
+    Subsystem system1 = new SubsystemBase() {};
+    Subsystem system2 = new SubsystemBase() {};
 
     MockCommandHolder command1Holder = new MockCommandHolder(true, system1);
     Command command1 = command1Holder.getMock();
     MockCommandHolder command2Holder = new MockCommandHolder(true, system2);
     Command command2 = command2Holder.getMock();
-    MockCommandHolder perpetualCommandHolder = new MockCommandHolder(true);
-    Command command3 = new PerpetualCommand(perpetualCommandHolder.getMock());
+    MockCommandHolder endlessCommandHolder = new MockCommandHolder(true);
+    Command command3 = new EndlessCommand(endlessCommandHolder.getMock());
 
     Command group1 = new SequentialCommandGroup(command1, command2);
     assertNotNull(group1);

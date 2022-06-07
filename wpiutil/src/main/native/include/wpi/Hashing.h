@@ -1,9 +1,8 @@
 //===-- llvm/ADT/Hashing.h - Utilities for hashing --------------*- C++ -*-===//
 //
-//                     The LLVM Compiler Infrastructure
-//
-// This file is distributed under the University of Illinois Open Source
-// License. See LICENSE.TXT for details.
+// Part of the LLVM Project, under the Apache License v2.0 with LLVM Exceptions.
+// See https://llvm.org/LICENSE.txt for license information.
+// SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 //
 //===----------------------------------------------------------------------===//
 //
@@ -45,15 +44,14 @@
 #ifndef WPIUTIL_WPI_HASHING_H
 #define WPIUTIL_WPI_HASHING_H
 
-#include "wpi/Endian.h"
+#include "wpi/ErrorHandling.h"
 #include "wpi/SwapByteOrder.h"
 #include "wpi/type_traits.h"
-#include <stdint.h>
 #include <algorithm>
 #include <cassert>
 #include <cstring>
 #include <string>
-#include <string_view>
+#include <tuple>
 #include <utility>
 
 #ifdef _WIN32
@@ -108,8 +106,7 @@ public:
 /// differing argument types even if they would implicit promote to a common
 /// type without changing the value.
 template <typename T>
-typename std::enable_if<is_integral_or_enum<T>::value, hash_code>::type
-hash_value(T value);
+std::enable_if_t<is_integral_or_enum<T>::value, hash_code> hash_value(T value);
 
 /// Compute a hash_code for a pointer's address.
 ///
@@ -119,6 +116,10 @@ template <typename T> hash_code hash_value(const T *ptr);
 /// Compute a hash_code for a pair of objects.
 template <typename T, typename U>
 hash_code hash_value(const std::pair<T, U> &arg);
+
+/// Compute a hash_code for a tuple.
+template <typename... Ts>
+hash_code hash_value(const std::tuple<Ts...> &arg);
 
 /// Compute a hash_code for a standard string.
 template <typename T>
@@ -151,7 +152,7 @@ namespace detail {
 inline uint64_t fetch64(const char *p) {
   uint64_t result;
   memcpy(&result, p, sizeof(result));
-  if (support::endian::system_endianness() == support::big)
+  if (sys::IsBigEndianHost)
     sys::swapByteOrder(result);
   return result;
 }
@@ -159,16 +160,16 @@ inline uint64_t fetch64(const char *p) {
 inline uint32_t fetch32(const char *p) {
   uint32_t result;
   memcpy(&result, p, sizeof(result));
-  if (support::endian::system_endianness() == support::big)
+  if (sys::IsBigEndianHost)
     sys::swapByteOrder(result);
   return result;
 }
 
 /// Some primes between 2^63 and 2^64 for various uses.
-static const uint64_t k0 = 0xc3a5c85c97cb3127ULL;
-static const uint64_t k1 = 0xb492b66fbe98f273ULL;
-static const uint64_t k2 = 0x9ae16a3b2f90404fULL;
-static const uint64_t k3 = 0xc949d7c7509e6557ULL;
+static constexpr uint64_t k0 = 0xc3a5c85c97cb3127ULL;
+static constexpr uint64_t k1 = 0xb492b66fbe98f273ULL;
+static constexpr uint64_t k2 = 0x9ae16a3b2f90404fULL;
+static constexpr uint64_t k3 = 0xc949d7c7509e6557ULL;
 
 /// Bitwise right rotate.
 /// Normally this will compile to a single instruction, especially if the
@@ -198,7 +199,7 @@ inline uint64_t hash_1to3_bytes(const char *s, size_t len, uint64_t seed) {
   uint8_t b = s[len >> 1];
   uint8_t c = s[len - 1];
   uint32_t y = static_cast<uint32_t>(a) + (static_cast<uint32_t>(b) << 8);
-  uint32_t z = static_cast<uint32_t>(len + (static_cast<uint64_t>(c) << 2));
+  uint32_t z = static_cast<uint32_t>(len) + (static_cast<uint32_t>(c) << 2);
   return shift_mix(y * k2 ^ z * k3 ^ seed) * k2;
 }
 
@@ -264,7 +265,7 @@ inline uint64_t hash_short(const char *s, size_t length, uint64_t seed) {
 /// Currently, the algorithm for computing hash codes is based on CityHash and
 /// keeps 56 bytes of arbitrary state.
 struct hash_state {
-  uint64_t h0, h1, h2, h3, h4, h5, h6;
+  uint64_t h0 = 0, h1 = 0, h2 = 0, h3 = 0, h4 = 0, h5 = 0, h6 = 0;
 
   /// Create a new hash_state structure and initialize it based on the
   /// seed and the first 64-byte chunk.
@@ -367,7 +368,7 @@ template <typename T, typename U> struct is_hashable_data<std::pair<T, U> >
 /// Helper to get the hashable data representation for a type.
 /// This variant is enabled when the type itself can be used.
 template <typename T>
-typename std::enable_if<is_hashable_data<T>::value, T>::type
+std::enable_if_t<is_hashable_data<T>::value, T>
 get_hashable_data(const T &value) {
   return value;
 }
@@ -375,7 +376,7 @@ get_hashable_data(const T &value) {
 /// This variant is enabled when we must first call hash_value and use the
 /// result as our data.
 template <typename T>
-typename std::enable_if<!is_hashable_data<T>::value, size_t>::type
+std::enable_if_t<!is_hashable_data<T>::value, size_t>
 get_hashable_data(const T &value) {
   using ::wpi::hash_value;
   return hash_value(value);
@@ -449,7 +450,7 @@ hash_code hash_combine_range_impl(InputIteratorT first, InputIteratorT last) {
 /// are stored in contiguous memory, this routine avoids copying each value
 /// and directly reads from the underlying memory.
 template <typename ValueT>
-typename std::enable_if<is_hashable_data<ValueT>::value, hash_code>::type
+std::enable_if_t<is_hashable_data<ValueT>::value, hash_code>
 hash_combine_range_impl(ValueT *first, ValueT *last) {
   const uint64_t seed = get_execution_seed();
   const char *s_begin = reinterpret_cast<const char *>(first);
@@ -499,7 +500,7 @@ namespace detail {
 /// useful at minimizing the code in the recursive calls to ease the pain
 /// caused by a lack of variadic functions.
 struct hash_combine_recursive_helper {
-  char buffer[64];
+  char buffer[64] = {};
   hash_state state;
   const uint64_t seed;
 
@@ -547,7 +548,7 @@ public:
       // store types smaller than the buffer.
       if (!store_and_advance(buffer_ptr, buffer_end, data,
                              partial_store_size))
-        abort();
+        wpi_unreachable("buffer smaller than stored type");
     }
     return buffer_ptr;
   }
@@ -574,7 +575,7 @@ public:
     // Check whether the entire set of values fit in the buffer. If so, we'll
     // use the optimized short hashing routine and skip state entirely.
     if (length == 0)
-      return static_cast<size_t>(hash_short(buffer, buffer_ptr - buffer, seed));
+      return hash_short(buffer, buffer_ptr - buffer, seed);
 
     // Mix the final buffer, rotating it if we did a partial fill in order to
     // simulate doing a mix of the last 64-bytes. That is how the algorithm
@@ -586,7 +587,7 @@ public:
     state.mix(buffer);
     length += buffer_ptr - buffer;
 
-    return static_cast<size_t>(state.finalize(length));
+    return state.finalize(length);
   }
 };
 
@@ -625,7 +626,7 @@ inline hash_code hash_integer_value(uint64_t value) {
   const uint64_t seed = get_execution_seed();
   const char *s = reinterpret_cast<const char *>(&value);
   const uint64_t a = fetch32(s);
-  return static_cast<size_t>(hash_16_bytes(seed + (a << 3), fetch32(s + 4)));
+  return hash_16_bytes(seed + (a << 3), fetch32(s + 4));
 }
 
 } // namespace detail
@@ -634,8 +635,7 @@ inline hash_code hash_integer_value(uint64_t value) {
 // Declared and documented above, but defined here so that any of the hashing
 // infrastructure is available.
 template <typename T>
-typename std::enable_if<is_integral_or_enum<T>::value, hash_code>::type
-hash_value(T value) {
+std::enable_if_t<is_integral_or_enum<T>::value, hash_code> hash_value(T value) {
   return ::wpi::hashing::detail::hash_integer_value(
       static_cast<uint64_t>(value));
 }
@@ -654,15 +654,30 @@ hash_code hash_value(const std::pair<T, U> &arg) {
   return hash_combine(arg.first, arg.second);
 }
 
+// Implementation details for the hash_value overload for std::tuple<...>(...).
+namespace hashing {
+namespace detail {
+
+template <typename... Ts, std::size_t... Indices>
+hash_code hash_value_tuple_helper(const std::tuple<Ts...> &arg,
+                                  std::index_sequence<Indices...>) {
+  return hash_combine(std::get<Indices>(arg)...);
+}
+
+} // namespace detail
+} // namespace hashing
+
+template <typename... Ts>
+hash_code hash_value(const std::tuple<Ts...> &arg) {
+  // TODO: Use std::apply when LLVM starts using C++17.
+  return ::wpi::hashing::detail::hash_value_tuple_helper(
+      arg, typename std::index_sequence_for<Ts...>());
+}
+
 // Declared and documented above, but defined here so that any of the hashing
 // infrastructure is available.
 template <typename T>
 hash_code hash_value(const std::basic_string<T> &arg) {
-  return hash_combine_range(arg.begin(), arg.end());
-}
-
-template <typename T>
-hash_code hash_value(const std::basic_string_view<T> &arg) {
   return hash_combine_range(arg.begin(), arg.end());
 }
 

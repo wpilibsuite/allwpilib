@@ -21,20 +21,6 @@ public class DifferentialDriveAccelerationLimiter {
   private final double m_maxLinearAccel;
   private final double m_maxAngularAccel;
 
-  /** Motor voltages for a differential drive. */
-  @SuppressWarnings("MemberName")
-  public static class WheelVoltages {
-    public double left;
-    public double right;
-
-    private WheelVoltages() {}
-
-    public WheelVoltages(double left, double right) {
-      this.left = left;
-      this.right = right;
-    }
-  }
-
   /**
    * Constructs a DifferentialDriveAccelerationLimiter.
    *
@@ -64,7 +50,7 @@ public class DifferentialDriveAccelerationLimiter {
    * @return The constrained wheel voltages.
    */
   @SuppressWarnings("LocalVariableName")
-  public WheelVoltages calculate(
+  public DifferentialDriveWheelVoltages calculate(
       double leftVelocity, double rightVelocity, double leftVoltage, double rightVoltage) {
     var u = new MatBuilder<>(Nat.N2(), Nat.N1()).fill(leftVoltage, rightVoltage);
 
@@ -99,6 +85,6 @@ public class DifferentialDriveAccelerationLimiter {
     // u = B⁻¹(dx/dt - Ax)
     u = m_system.getB().solve(dxdt.minus(m_system.getA().times(x)));
 
-    return new WheelVoltages(u.get(0, 0), u.get(1, 0));
+    return new DifferentialDriveWheelVoltages(u.get(0, 0), u.get(1, 0));
   }
 }

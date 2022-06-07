@@ -226,6 +226,8 @@ public class DifferentialDrivePoseEstimator {
 
     m_observer.setXhat(fillStateVector(poseMeters, 0.0, 0.0));
 
+    m_prevTimeSeconds = -1;
+
     m_gyroOffset = getEstimatedPosition().getRotation().minus(gyroAngle);
     m_previousAngle = poseMeters.getRotation();
   }

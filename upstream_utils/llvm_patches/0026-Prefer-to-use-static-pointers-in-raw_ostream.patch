@@ -1,0 +1,37 @@
+From 7bdbcabd3271aebb692ef06a950d1ec59341ddf9 Mon Sep 17 00:00:00 2001
+From: PJ Reiniger <pj.reiniger@gmail.com>
+Date: Thu, 19 May 2022 00:58:36 -0400
+Subject: [PATCH 26/27] Prefer to use static pointers in raw_ostream
+
+See #1401
+---
+ llvm/lib/Support/raw_ostream.cpp | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/llvm/lib/Support/raw_ostream.cpp b/llvm/lib/Support/raw_ostream.cpp
+index 6fa250a68ed8..6be6809ad951 100644
+--- a/llvm/lib/Support/raw_ostream.cpp
++++ b/llvm/lib/Support/raw_ostream.cpp
+@@ -601,15 +601,15 @@ void raw_fd_ostream::anchor() {}
+ raw_fd_ostream &llvm::outs() {
+   // Set buffer settings to model stdout behavior.
+   std::error_code EC;
+-  static raw_fd_ostream S("-", EC, sys::fs::OF_None);
++  static raw_fd_ostream* S = new raw_fd_ostream("-", EC, sys::fs::OF_None);
+   assert(!EC);
+-  return S;
++  return *S;
+ }
+ 
+ raw_fd_ostream &llvm::errs() {
+   // Set standard error to be unbuffered and tied to outs() by default.
+-  static raw_fd_ostream S(STDERR_FILENO, false, true);
+-  return S;
++  static raw_fd_ostream* S = new raw_fd_ostream(STDERR_FILENO, false, true);
++  return *S;
+ }
+ 
+ /// nulls() - This returns a reference to a raw_ostream which discards output.
+-- 
+2.20.1.windows.1
+

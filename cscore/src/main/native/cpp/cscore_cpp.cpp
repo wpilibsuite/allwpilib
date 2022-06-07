@@ -5,8 +5,8 @@
 #include "cscore_cpp.h"
 
 #include <wpi/SmallString.h>
-#include <wpi/hostname.h>
 #include <wpi/json.h>
+#include <wpinet/hostname.h>
 
 #include "Handle.h"
 #include "Instance.h"

@@ -11,9 +11,9 @@ cppSrcFileInclude {
 }
 
 generatedFileExclude {
-  src/main/native/cpp/http_parser\.cpp$
   src/main/native/cpp/llvm/
   src/main/native/include/llvm/
+  src/main/native/include/wpi/AllocatorBase\.h$
   src/main/native/include/wpi/AlignOf\.h$
   src/main/native/include/wpi/ArrayRef\.h$
   src/main/native/include/wpi/Chrono\.h$
@@ -21,6 +21,7 @@ generatedFileExclude {
   src/main/native/include/wpi/ConvertUTF\.h$
   src/main/native/include/wpi/DenseMap\.h$
   src/main/native/include/wpi/DenseMapInfo\.h$
+  src/main/native/include/wpi/DJB\.h$
   src/main/native/include/wpi/EpochTracker\.h$
   src/main/native/include/wpi/Endian\.h$
   src/main/native/include/wpi/Errc\.h$
@@ -42,6 +43,7 @@ generatedFileExclude {
   src/main/native/include/wpi/PointerIntPair\.h$
   src/main/native/include/wpi/PointerLikeTypeTraits\.h$
   src/main/native/include/wpi/PointerUnion\.h$
+  src/main/native/include/wpi/ReverseIteration\.h$
   src/main/native/include/wpi/STLExtras\.h$
   src/main/native/include/wpi/Signal\.h$
   src/main/native/include/wpi/SmallPtrSet\.h$
@@ -49,12 +51,13 @@ generatedFileExclude {
   src/main/native/include/wpi/SmallString\.h$
   src/main/native/include/wpi/SmallVector\.h$
   src/main/native/include/wpi/StringMap\.h$
+  src/main/native/include/wpi/StringMapEntry\.h$
+  src/main/native/include/wpi/STLForwardCompat\.h$
   src/main/native/include/wpi/StringRef\.h$
   src/main/native/include/wpi/SwapByteOrder\.h$
   src/main/native/include/wpi/Twine\.h$
   src/main/native/include/wpi/VersionTuple\.h$
   src/main/native/include/wpi/WindowsError\.h$
-  src/main/native/include/wpi/http_parser\.h$
   src/main/native/include/wpi/iterator\.h$
   src/main/native/include/wpi/iterator_range\.h$
   src/main/native/include/wpi/raw_os_ostream\.h$
@@ -70,28 +73,18 @@ generatedFileExclude {
   src/main/native/cpp/json
   src/main/native/include/wpi/json
   src/test/native/cpp/json/
-  src/main/native/include/uv\.h$
-  src/main/native/include/uv/
-  src/main/native/libuv/
   src/main/native/fmtlib/
   src/main/native/resources/
   src/test/native/cpp/llvm/
   src/main/native/windows/StackWalker
-  src/main/native/linux/AvahiClient
 }
 
 licenseUpdateExclude {
   src/main/native/cpp/Base64\.cpp$
   src/main/native/cpp/sha1\.cpp$
-  src/main/native/cpp/TCPAcceptor\.cpp$
-  src/main/native/cpp/TCPConnector\.cpp$
-  src/main/native/cpp/TCPStream\.cpp$
   src/main/native/include/wpi/ConcurrentQueue\.h$
   src/main/native/include/wpi/Path\.h$
   src/main/native/include/wpi/sha1\.h$
-  src/main/native/include/wpi/TCPAcceptor\.h$
-  src/main/native/include/wpi/TCPConnector\.h$
-  src/main/native/include/wpi/TCPStream\.h$
 }
 
 repoRootNameOverride {

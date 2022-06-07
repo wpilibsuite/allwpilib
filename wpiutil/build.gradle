@@ -15,15 +15,6 @@ ext {
             dependsOn generateTask
         }
         it.sources {
-            libuvCpp(CppSourceSet) {
-                source {
-                    srcDirs 'src/main/native/libuv/src'
-                    include '*.cpp'
-                }
-                exportedHeaders {
-                    srcDirs 'src/main/native/include', 'src/main/native/libuv/include', 'src/main/native/libuv/src'
-                }
-            }
             fmtlibCpp(CppSourceSet) {
                 source {
                     srcDirs 'src/main/native/fmtlib/src'
@@ -46,34 +37,6 @@ ext {
         if (!it.targetPlatform.operatingSystem.isWindows()) {
             it.cppCompiler.define '_GNU_SOURCE'
             it.sources {
-                libuvUnixCpp(CppSourceSet) {
-                    source {
-                        srcDirs 'src/main/native/libuv/src/unix'
-                        includes = [
-                            'async.cpp',
-                            'core.cpp',
-                            'dl.cpp',
-                            'fs.cpp',
-                            'getaddrinfo.cpp',
-                            'getnameinfo.cpp',
-                            'loop-watcher.cpp',
-                            'loop.cpp',
-                            'pipe.cpp',
-                            'poll.cpp',
-                            'process.cpp',
-                            'signal.cpp',
-                            'stream.cpp',
-                            'tcp.cpp',
-                            'thread.cpp',
-                            'timer.cpp',
-                            'tty.cpp',
-                            'udp.cpp',
-                        ]
-                    }
-                    exportedHeaders {
-                        srcDirs 'src/main/native/include', 'src/main/native/libuv/include', 'src/main/native/libuv/src'
-                    }
-                }
                 wpiutilUnixCpp(CppSourceSet) {
                     source {
                         srcDirs 'src/main/native/unix'
@@ -87,19 +50,7 @@ ext {
             }
         }
         if (it.targetPlatform.operatingSystem.isWindows()) {
-            if (it in SharedLibraryBinarySpec) {
-                it.cppCompiler.define 'BUILDING_UV_SHARED'
-            }
             it.sources {
-                libuvWindowsCpp(CppSourceSet) {
-                    source {
-                        srcDirs 'src/main/native/libuv/src/win'
-                        include '*.cpp'
-                    }
-                    exportedHeaders {
-                        srcDirs 'src/main/native/include', 'src/main/native/libuv/include', 'src/main/native/libuv/src'
-                    }
-                }
                 wpiutilWindowsCpp(CppSourceSet) {
                     source {
                         srcDirs 'src/main/native/windows'
@@ -113,22 +64,6 @@ ext {
             }
         } else if (it.targetPlatform.operatingSystem.isMacOsX()) {
             it.sources {
-                libuvMacCpp(CppSourceSet) {
-                    source {
-                        srcDirs 'src/main/native/libuv/src/unix'
-                        includes = [
-                            'bsd-ifaddrs.cpp',
-                            'darwin.cpp',
-                            'darwin-proctitle.cpp',
-                            'fsevents.cpp',
-                            'kqueue.cpp',
-                            'proctitle.cpp'
-                        ]
-                    }
-                    exportedHeaders {
-                        srcDirs 'src/main/native/include', 'src/main/native/libuv/include', 'src/main/native/libuv/src'
-                    }
-                }
                 wpiutilmacOSCpp(CppSourceSet) {
                     source {
                         srcDirs 'src/main/native/macOS'
@@ -142,22 +77,6 @@ ext {
             }
         } else {
             it.sources {
-                libuvLinuxCpp(CppSourceSet) {
-                    source {
-                        srcDirs 'src/main/native/libuv/src/unix'
-                        includes = [
-                            'linux-core.cpp',
-                            'linux-inotify.cpp',
-                            'linux-syscalls.cpp',
-                            'procfs-exepath.cpp',
-                            'proctitle.cpp',
-                            'sysinfo-loadavg.cpp',
-                        ]
-                    }
-                    exportedHeaders {
-                        srcDirs 'src/main/native/include', 'src/main/native/libuv/include', 'src/main/native/libuv/src'
-                    }
-                }
                 wpiutilLinuxCpp(CppSourceSet) {
                     source {
                         srcDirs 'src/main/native/linux'
@@ -187,19 +106,6 @@ apply from: "${rootDir}/shared/jni/setupBuild.gradle"
 
 nativeUtils.exportsConfigs {
     wpiutil {
-        x86ExcludeSymbols = [
-            '_CT??_R0?AV_System_error',
-            '_CT??_R0?AVexception',
-            '_CT??_R0?AVfailure',
-            '_CT??_R0?AVruntime_error',
-            '_CT??_R0?AVsystem_error',
-            '_CTA5?AVfailure',
-            '_TI5?AVfailure',
-            '_CT??_R0?AVout_of_range',
-            '_CTA3?AVout_of_range',
-            '_TI3?AVout_of_range',
-            '_CT??_R0?AVbad_cast'
-        ]
         x64ExcludeSymbols = [
             '_CT??_R0?AV_System_error',
             '_CT??_R0?AVexception',
@@ -217,9 +123,6 @@ nativeUtils.exportsConfigs {
 }
 
 cppHeadersZip {
-    from('src/main/native/libuv/include') {
-        into '/'
-    }
     from('src/main/native/fmtlib/include') {
         into '/'
     }
@@ -230,7 +133,7 @@ model {
         all {
             it.sources.each {
                 it.exportedHeaders {
-                    srcDirs 'src/main/native/include', 'src/main/native/libuv/include', 'src/main/native/libuv/src', 'src/main/native/fmtlib/include'
+                    srcDirs 'src/main/native/include', 'src/main/native/fmtlib/include'
                 }
             }
         }
@@ -253,41 +156,6 @@ model {
                         }
                     }
                 }
-            }
-        }
-        netconsoleServer(NativeExecutableSpec) {
-            targetBuildTypes 'release'
-            sources {
-                cpp {
-                    source {
-                        srcDirs = [
-                            'src/netconsoleServer/native/cpp'
-                        ]
-                        includes = ['**/*.cpp']
-                    }
-                }
-            }
-            binaries.all { binary ->
-                lib project: ':wpiutil', library: 'wpiutil', linkage: 'static'
-                if (binary.targetPlatform.operatingSystem.isLinux()) {
-                    linker.args "-lutil"
-                }
-            }
-        }
-        netconsoleTee(NativeExecutableSpec) {
-            targetBuildTypes 'release'
-            sources {
-                cpp {
-                    source {
-                        srcDirs = [
-                            'src/netconsoleTee/native/cpp'
-                        ]
-                        includes = ['**/*.cpp']
-                    }
-                }
-            }
-            binaries.all { binary ->
-                lib project: ':wpiutil', library: 'wpiutil', linkage: 'static'
             }
         }
     }

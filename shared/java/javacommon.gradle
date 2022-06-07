@@ -86,7 +86,9 @@ if (project.hasProperty('onlylinuxathena') || project.hasProperty('onlylinuxrasp
 }
 
 repositories {
-    mavenCentral()
+    maven {
+        url = 'https://frcmaven.wpi.edu/artifactory/ex-mvn'
+    }
     //maven.url "https://oss.sonatype.org/content/repositories/snapshots/"
 }
 
@@ -99,7 +101,13 @@ tasks.withType(JavaCompile).configureEach {
         '--release',
         '11',
         '-encoding',
-        'UTF8'
+        'UTF8',
+        "-Werror",
+        "-Xlint:all",
+        // ignore AutoCloseable warnings
+        "-Xlint:-try",
+        // ignore missing serialVersionUID warnings
+        "-Xlint:-serial",
     ]
 }
 

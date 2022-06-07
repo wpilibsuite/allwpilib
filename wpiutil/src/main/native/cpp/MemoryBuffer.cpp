@@ -49,6 +49,7 @@
 #include "wpi/Errc.h"
 #include "wpi/Errno.h"
 #include "wpi/MappedFileRegion.h"
+#include "wpi/MathExtras.h"
 #include "wpi/SmallVector.h"
 #include "wpi/SmallVectorMemoryBuffer.h"
 #include "wpi/fs.h"

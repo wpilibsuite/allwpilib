@@ -1,9 +1,8 @@
 //===-- ManagedStatic.cpp - Static Global wrapper -------------------------===//
 //
-//                     The LLVM Compiler Infrastructure
-//
-// This file is distributed under the University of Illinois Open Source
-// License. See LICENSE.TXT for details.
+// Part of the LLVM Project, under the Apache License v2.0 with LLVM Exceptions.
+// See https://llvm.org/LICENSE.txt for license information.
+// SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 //
 //===----------------------------------------------------------------------===//
 //
@@ -18,43 +17,32 @@
 using namespace wpi;
 
 static const ManagedStaticBase *StaticList = nullptr;
-static wpi::mutex *ManagedStaticMutex = nullptr;
-static std::once_flag mutex_init_flag;
 
-static void initializeMutex() {
-  ManagedStaticMutex = new wpi::mutex();
-}
-
-static wpi::mutex* getManagedStaticMutex() {
-  std::call_once(mutex_init_flag, initializeMutex);
-  return ManagedStaticMutex;
-}
-
-void ManagedStaticBase::RegisterManagedStatic(void* created,
-                                              void (*Deleter)(void*)) const {
-  std::scoped_lock Lock(*getManagedStaticMutex());
-
-  if (!Ptr.load(std::memory_order_relaxed)) {
-    void *Tmp = created;
-
-    Ptr.store(Tmp, std::memory_order_release);
-    DeleterFn = Deleter;
-
-    // Add to list of managed statics.
-    Next = StaticList;
-    StaticList = this;
-  }
+static wpi::mutex *getManagedStaticMutex() {
+  static wpi::mutex m;
+  return &m;
 }
 
 void ManagedStaticBase::RegisterManagedStatic(void *(*Creator)(),
                                               void (*Deleter)(void*)) const {
   assert(Creator);
-  std::scoped_lock Lock(*getManagedStaticMutex());
+  if (1) {
+    std::scoped_lock Lock(*getManagedStaticMutex());
 
-  if (!Ptr.load(std::memory_order_relaxed)) {
-    void *Tmp = Creator();
+    if (!Ptr.load(std::memory_order_relaxed)) {
+      void *Tmp = Creator();
 
-    Ptr.store(Tmp, std::memory_order_release);
+      Ptr.store(Tmp, std::memory_order_release);
+      DeleterFn = Deleter;
+
+      // Add to list of managed statics.
+      Next = StaticList;
+      StaticList = this;
+    }
+  } else {
+    assert(!Ptr && !DeleterFn && !Next &&
+           "Partially initialized ManagedStatic!?");
+    Ptr = Creator();
     DeleterFn = Deleter;
 
     // Add to list of managed statics.
@@ -80,9 +68,10 @@ void ManagedStaticBase::destroy() const {
 }
 
 /// wpi_shutdown - Deallocate and destroy all ManagedStatic variables.
+/// IMPORTANT: it's only safe to call wpi_shutdown() in single thread,
+/// without any other threads executing LLVM APIs.
+/// wpi_shutdown() should be the last use of LLVM APIs.
 void wpi::wpi_shutdown() {
-  std::scoped_lock Lock(*getManagedStaticMutex());
-
   while (StaticList)
     StaticList->destroy();
 }

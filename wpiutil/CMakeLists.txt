@@ -96,48 +96,6 @@ file(GLOB_RECURSE wpiutil_windows_src src/main/native/windows/*.cpp)
 
 file(GLOB fmtlib_native_src src/main/native/fmtlib/src/*.cpp)
 
-file(GLOB uv_native_src src/main/native/libuv/src/*.cpp)
-
-file(GLOB uv_windows_src src/main/native/libuv/src/win/*.cpp)
-
-set(uv_unix_src
-    src/main/native/libuv/src/unix/async.cpp
-    src/main/native/libuv/src/unix/core.cpp
-    src/main/native/libuv/src/unix/dl.cpp
-    src/main/native/libuv/src/unix/fs.cpp
-    src/main/native/libuv/src/unix/getaddrinfo.cpp
-    src/main/native/libuv/src/unix/getnameinfo.cpp
-    src/main/native/libuv/src/unix/loop-watcher.cpp
-    src/main/native/libuv/src/unix/loop.cpp
-    src/main/native/libuv/src/unix/pipe.cpp
-    src/main/native/libuv/src/unix/poll.cpp
-    src/main/native/libuv/src/unix/process.cpp
-    src/main/native/libuv/src/unix/signal.cpp
-    src/main/native/libuv/src/unix/stream.cpp
-    src/main/native/libuv/src/unix/tcp.cpp
-    src/main/native/libuv/src/unix/thread.cpp
-    src/main/native/libuv/src/unix/tty.cpp
-    src/main/native/libuv/src/unix/udp.cpp
-)
-
-set(uv_darwin_src
-    src/main/native/libuv/src/unix/bsd-ifaddrs.cpp
-    src/main/native/libuv/src/unix/darwin.cpp
-    src/main/native/libuv/src/unix/darwin-proctitle.cpp
-    src/main/native/libuv/src/unix/fsevents.cpp
-    src/main/native/libuv/src/unix/kqueue.cpp
-    src/main/native/libuv/src/unix/proctitle.cpp
-)
-
-set(uv_linux_src
-    src/main/native/libuv/src/unix/linux-core.cpp
-    src/main/native/libuv/src/unix/linux-inotify.cpp
-    src/main/native/libuv/src/unix/linux-syscalls.cpp
-    src/main/native/libuv/src/unix/procfs-exepath.cpp
-    src/main/native/libuv/src/unix/proctitle.cpp
-    src/main/native/libuv/src/unix/sysinfo-loadavg.cpp
-)
-
 add_library(wpiutil ${wpiutil_native_src} ${fmtlib_native_src} ${wpiutil_resources_src})
 set_target_properties(wpiutil PROPERTIES DEBUG_POSTFIX "d")
 
@@ -165,33 +123,6 @@ if (NOT USE_VCPKG_FMTLIB)
 else()
     find_package(fmt CONFIG REQUIRED)
     target_link_libraries(wpiutil fmt::fmt)
-endif()
-
-if (NOT USE_VCPKG_LIBUV)
-    target_sources(wpiutil PRIVATE ${uv_native_src})
-    install(DIRECTORY src/main/native/libuv/include/ DESTINATION "${include_dest}/wpiutil")
-    target_include_directories(wpiutil PRIVATE
-        src/main/native/libuv/src)
-    target_include_directories(wpiutil PUBLIC
-                            $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/libuv/include>
-                            $<INSTALL_INTERFACE:${include_dest}/wpiutil>)
-    if(NOT MSVC)
-        target_sources(wpiutil PRIVATE ${uv_unix_src})
-        if (APPLE)
-            target_sources(wpiutil PRIVATE ${uv_darwin_src})
-        else()
-            target_sources(wpiutil PRIVATE ${uv_linux_src})
-        endif()
-        target_compile_definitions(wpiutil PRIVATE -D_GNU_SOURCE)
-    else()
-        target_sources(wpiutil PRIVATE ${uv_windows_src})
-        if(BUILD_SHARED_LIBS)
-            target_compile_definitions(wpiutil PRIVATE -DBUILDING_UV_SHARED)
-        endif()
-    endif()
-else()
-    find_package(unofficial-libuv CONFIG REQUIRED)
-    target_link_libraries(wpiutil unofficial::libuv::libuv)
 endif()
 
 if (MSVC)
@@ -237,27 +168,8 @@ foreach(example ${wpiutil_examples})
     endif()
 endforeach()
 
-if (UNIX AND NOT APPLE)
-    set (LIBUTIL -lutil)
-else()
-    set (LIBUTIL)
-endif()
-
-file(GLOB netconsoleServer_src src/netconsoleServer/native/cpp/*.cpp)
-add_executable(netconsoleServer ${netconsoleServer_src})
-wpilib_target_warnings(netconsoleServer)
-target_link_libraries(netconsoleServer wpiutil ${LIBUTIL})
-
-file(GLOB netconsoleTee_src src/netconsoleTee/native/cpp/*.cpp)
-add_executable(netconsoleTee ${netconsoleTee_src})
-wpilib_target_warnings(netconsoleTee)
-target_link_libraries(netconsoleTee wpiutil)
-
-set_property(TARGET netconsoleServer PROPERTY FOLDER "examples")
-set_property(TARGET netconsoleTee PROPERTY FOLDER "examples")
-
 if (WITH_TESTS)
     wpilib_add_test(wpiutil src/test/native/cpp)
     target_include_directories(wpiutil_test PRIVATE src/test/native/include)
-    target_link_libraries(wpiutil_test wpiutil ${LIBUTIL} gmock_main)
+    target_link_libraries(wpiutil_test wpiutil gmock_main)
 endif()

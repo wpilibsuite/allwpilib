@@ -1,9 +1,8 @@
 //===- iterator.h - Utilities for using and defining iterators --*- C++ -*-===//
 //
-//                     The LLVM Compiler Infrastructure
-//
-// This file is distributed under the University of Illinois Open Source
-// License. See LICENSE.TXT for details.
+// Part of the LLVM Project, under the Apache License v2.0 with LLVM Exceptions.
+// See https://llvm.org/LICENSE.txt for license information.
+// SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 //
 //===----------------------------------------------------------------------===//
 
@@ -11,7 +10,6 @@
 #define WPIUTIL_WPI_ITERATOR_H
 
 #include "wpi/iterator_range.h"
-#include <algorithm>
 #include <cstddef>
 #include <iterator>
 #include <type_traits>
@@ -65,9 +63,14 @@ namespace wpi {
 template <typename DerivedT, typename IteratorCategoryT, typename T,
           typename DifferenceTypeT = std::ptrdiff_t, typename PointerT = T *,
           typename ReferenceT = T &>
-class iterator_facade_base
-    : public std::iterator<IteratorCategoryT, T, DifferenceTypeT, PointerT,
-                           ReferenceT> {
+class iterator_facade_base {
+public:
+  using iterator_category = IteratorCategoryT;
+  using value_type = T;
+  using difference_type = DifferenceTypeT;
+  using pointer = PointerT;
+  using reference = ReferenceT;
+
 protected:
   enum {
     IsRandomAccess = std::is_base_of<std::random_access_iterator_tag,
@@ -143,28 +146,30 @@ public:
     return tmp;
   }
 
+#ifndef __cpp_impl_three_way_comparison
   bool operator!=(const DerivedT &RHS) const {
-    return !static_cast<const DerivedT *>(this)->operator==(RHS);
+    return !(static_cast<const DerivedT &>(*this) == RHS);
   }
+#endif
 
   bool operator>(const DerivedT &RHS) const {
     static_assert(
         IsRandomAccess,
         "Relational operators are only defined for random access iterators.");
-    return !static_cast<const DerivedT *>(this)->operator<(RHS) &&
-           !static_cast<const DerivedT *>(this)->operator==(RHS);
+    return !(static_cast<const DerivedT &>(*this) < RHS) &&
+           !(static_cast<const DerivedT &>(*this) == RHS);
   }
   bool operator<=(const DerivedT &RHS) const {
     static_assert(
         IsRandomAccess,
         "Relational operators are only defined for random access iterators.");
-    return !static_cast<const DerivedT *>(this)->operator>(RHS);
+    return !(static_cast<const DerivedT &>(*this) > RHS);
   }
   bool operator>=(const DerivedT &RHS) const {
     static_assert(
         IsRandomAccess,
         "Relational operators are only defined for random access iterators.");
-    return !static_cast<const DerivedT *>(this)->operator<(RHS);
+    return !(static_cast<const DerivedT &>(*this) < RHS);
   }
 
   PointerT operator->() { return &static_cast<DerivedT *>(this)->operator*(); }
@@ -195,14 +200,14 @@ template <
     typename T = typename std::iterator_traits<WrappedIteratorT>::value_type,
     typename DifferenceTypeT =
         typename std::iterator_traits<WrappedIteratorT>::difference_type,
-    typename PointerT = typename std::conditional<
+    typename PointerT = std::conditional_t<
         std::is_same<T, typename std::iterator_traits<
                             WrappedIteratorT>::value_type>::value,
-        typename std::iterator_traits<WrappedIteratorT>::pointer, T *>::type,
-    typename ReferenceT = typename std::conditional<
+        typename std::iterator_traits<WrappedIteratorT>::pointer, T *>,
+    typename ReferenceT = std::conditional_t<
         std::is_same<T, typename std::iterator_traits<
                             WrappedIteratorT>::value_type>::value,
-        typename std::iterator_traits<WrappedIteratorT>::reference, T &>::type>
+        typename std::iterator_traits<WrappedIteratorT>::reference, T &>>
 class iterator_adaptor_base
     : public iterator_facade_base<DerivedT, IteratorCategoryT, T,
                                   DifferenceTypeT, PointerT, ReferenceT> {
@@ -261,12 +266,16 @@ public:
     return *static_cast<DerivedT *>(this);
   }
 
-  bool operator==(const DerivedT &RHS) const { return I == RHS.I; }
-  bool operator<(const DerivedT &RHS) const {
+  friend bool operator==(const iterator_adaptor_base &LHS,
+                         const iterator_adaptor_base &RHS) {
+    return LHS.I == RHS.I;
+  }
+  friend bool operator<(const iterator_adaptor_base &LHS,
+                        const iterator_adaptor_base &RHS) {
     static_assert(
         BaseT::IsRandomAccess,
         "Relational operators are only defined for random access iterators.");
-    return I < RHS.I;
+    return LHS.I < RHS.I;
   }
 
   ReferenceT operator*() const { return *I; }
@@ -282,8 +291,8 @@ public:
 ///   using iterator = pointee_iterator<SmallVectorImpl<T *>::iterator>;
 /// \endcode
 template <typename WrappedIteratorT,
-          typename T = typename std::remove_reference<
-              decltype(**std::declval<WrappedIteratorT>())>::type>
+          typename T = std::remove_reference_t<decltype(
+              **std::declval<WrappedIteratorT>())>>
 struct pointee_iterator
     : iterator_adaptor_base<
           pointee_iterator<WrappedIteratorT, T>, WrappedIteratorT,
@@ -334,6 +343,13 @@ make_pointer_range(RangeT &&Range) {
                     PointerIteratorT(std::end(std::forward<RangeT>(Range))));
 }
 
+template <typename WrappedIteratorT,
+          typename T1 = std::remove_reference_t<decltype(
+              **std::declval<WrappedIteratorT>())>,
+          typename T2 = std::add_pointer_t<T1>>
+using raw_pointer_iterator =
+    pointer_iterator<pointee_iterator<WrappedIteratorT, T1>, T2>;
+
 } // end namespace wpi
 
-#endif // LLVM_ADT_ITERATOR_H
+#endif // WPIUTIL_WPI_ITERATOR_H

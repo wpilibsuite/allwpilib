@@ -6,6 +6,7 @@
 
 #include <wpi/SymbolExports.h>
 #include <wpi/array.h>
+#include <wpi/interpolating_map.h>
 
 #include "frc/EigenCore.h"
 #include "frc/geometry/Pose2d.h"
@@ -28,15 +29,29 @@ namespace frc {
 class WPILIB_DLLEXPORT LTVUnicycleController {
  public:
   /**
+   * Constructs a linear time-varying unicycle controller with default maximum
+   * desired error tolerances of (0.0625 m, 0.125 m, 2 rad) and default maximum
+   * desired control effort of (1 m/s, 2 rad/s).
+   *
+   * @param dt Discretization timestep.
+   * @param maxVelocity The maximum velocity for the controller gain lookup
+   *                    table.
+   */
+  explicit LTVUnicycleController(
+      units::second_t dt, units::meters_per_second_t maxVelocity = 9_mps);
+
+  /**
    * Constructs a linear time-varying unicycle controller.
    *
    * @param Qelems The maximum desired error tolerance for each state.
    * @param Relems The maximum desired control effort for each input.
    * @param dt     Discretization timestep.
+   * @param maxVelocity The maximum velocity for the controller gain lookup
+   *                    table.
    */
   LTVUnicycleController(const wpi::array<double, 3>& Qelems,
-                        const wpi::array<double, 2>& Relems,
-                        units::second_t dt);
+                        const wpi::array<double, 2>& Relems, units::second_t dt,
+                        units::meters_per_second_t maxVelocity = 9_mps);
 
   /**
    * Move constructor.
@@ -97,11 +112,8 @@ class WPILIB_DLLEXPORT LTVUnicycleController {
   void SetEnabled(bool enabled);
 
  private:
-  Matrixd<3, 3> m_A = Matrixd<3, 3>::Zero();
-  Matrixd<3, 2> m_B{{1.0, 0.0}, {0.0, 0.0}, {0.0, 1.0}};
-  Matrixd<3, 3> m_Q;
-  Matrixd<2, 2> m_R;
-  units::second_t m_dt;
+  // LUT from drivetrain linear velocity to LQR gain
+  wpi::interpolating_map<units::meters_per_second_t, Matrixd<2, 3>> m_table;
 
   Pose2d m_poseError;
   Pose2d m_poseTolerance;

@@ -65,10 +65,6 @@ bool Timer::HasElapsed(units::second_t period) const {
   return Get() >= period;
 }
 
-bool Timer::HasPeriodPassed(units::second_t period) {
-  return AdvanceIfElapsed(period);
-}
-
 bool Timer::AdvanceIfElapsed(units::second_t period) {
   if (Get() >= period) {
     // Advance the start time by the period.
