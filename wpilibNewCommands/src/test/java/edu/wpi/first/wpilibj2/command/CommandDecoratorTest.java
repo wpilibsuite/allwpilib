@@ -42,14 +42,14 @@ class CommandDecoratorTest extends CommandTestBase {
   @Test
   void untilTest() {
     try (CommandScheduler scheduler = new CommandScheduler()) {
-      ConditionHolder condition = new ConditionHolder();
+      AtomicBoolean condition = new AtomicBoolean();
 
-      Command command = new WaitCommand(10).until(condition::getCondition);
+      Command command = new WaitCommand(10).until(condition::get);
 
       scheduler.schedule(command);
       scheduler.run();
       assertTrue(scheduler.isScheduled(command));
-      condition.setCondition(true);
+      condition.set(true);
       scheduler.run();
       assertFalse(scheduler.isScheduled(command));
     }
@@ -58,61 +58,61 @@ class CommandDecoratorTest extends CommandTestBase {
   @Test
   void beforeStartingTest() {
     try (CommandScheduler scheduler = new CommandScheduler()) {
-      ConditionHolder condition = new ConditionHolder();
-      condition.setCondition(false);
+      AtomicBoolean condition = new AtomicBoolean();
+      condition.set(false);
 
       Command command = new InstantCommand();
 
-      scheduler.schedule(command.beforeStarting(() -> condition.setCondition(true)));
+      scheduler.schedule(command.beforeStarting(() -> condition.set(true)));
 
-      assertTrue(condition.getCondition());
+      assertTrue(condition.get());
     }
   }
 
   @Test
   void andThenLambdaTest() {
     try (CommandScheduler scheduler = new CommandScheduler()) {
-      ConditionHolder condition = new ConditionHolder();
-      condition.setCondition(false);
+      AtomicBoolean condition = new AtomicBoolean();
+      condition.set(false);
 
       Command command = new InstantCommand();
 
-      scheduler.schedule(command.andThen(() -> condition.setCondition(true)));
+      scheduler.schedule(command.andThen(() -> condition.set(true)));
 
-      assertFalse(condition.getCondition());
+      assertFalse(condition.get());
 
       scheduler.run();
 
-      assertTrue(condition.getCondition());
+      assertTrue(condition.get());
     }
   }
 
   @Test
   void andThenTest() {
     try (CommandScheduler scheduler = new CommandScheduler()) {
-      ConditionHolder condition = new ConditionHolder();
-      condition.setCondition(false);
+      AtomicBoolean condition = new AtomicBoolean();
+      condition.set(false);
 
       Command command1 = new InstantCommand();
-      Command command2 = new InstantCommand(() -> condition.setCondition(true));
+      Command command2 = new InstantCommand(() -> condition.set(true));
 
       scheduler.schedule(command1.andThen(command2));
 
-      assertFalse(condition.getCondition());
+      assertFalse(condition.get());
 
       scheduler.run();
 
-      assertTrue(condition.getCondition());
+      assertTrue(condition.get());
     }
   }
 
   @Test
   void deadlineWithTest() {
     try (CommandScheduler scheduler = new CommandScheduler()) {
-      ConditionHolder condition = new ConditionHolder();
-      condition.setCondition(false);
+      AtomicBoolean condition = new AtomicBoolean();
+      condition.set(false);
 
-      Command dictator = new WaitUntilCommand(condition::getCondition);
+      Command dictator = new WaitUntilCommand(condition::get);
       Command endsBefore = new InstantCommand();
       Command endsAfter = new WaitUntilCommand(() -> false);
 
@@ -123,7 +123,7 @@ class CommandDecoratorTest extends CommandTestBase {
 
       assertTrue(scheduler.isScheduled(group));
 
-      condition.setCondition(true);
+      condition.set(true);
       scheduler.run();
 
       assertFalse(scheduler.isScheduled(group));
@@ -133,10 +133,10 @@ class CommandDecoratorTest extends CommandTestBase {
   @Test
   void alongWithTest() {
     try (CommandScheduler scheduler = new CommandScheduler()) {
-      ConditionHolder condition = new ConditionHolder();
-      condition.setCondition(false);
+      AtomicBoolean condition = new AtomicBoolean();
+      condition.set(false);
 
-      Command command1 = new WaitUntilCommand(condition::getCondition);
+      Command command1 = new WaitUntilCommand(condition::get);
       Command command2 = new InstantCommand();
 
       Command group = command1.alongWith(command2);
@@ -146,7 +146,7 @@ class CommandDecoratorTest extends CommandTestBase {
 
       assertTrue(scheduler.isScheduled(group));
 
-      condition.setCondition(true);
+      condition.set(true);
       scheduler.run();
 
       assertFalse(scheduler.isScheduled(group));

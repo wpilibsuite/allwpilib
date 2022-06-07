@@ -7,17 +7,17 @@ package edu.wpi.first.wpilibj2.command;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.util.concurrent.atomic.AtomicBoolean;
 import org.junit.jupiter.api.Test;
 
 class StartEndCommandTest extends CommandTestBase {
   @Test
   void startEndCommandScheduleTest() {
     try (CommandScheduler scheduler = new CommandScheduler()) {
-      ConditionHolder cond1 = new ConditionHolder();
-      ConditionHolder cond2 = new ConditionHolder();
+      AtomicBoolean cond1 = new AtomicBoolean();
+      AtomicBoolean cond2 = new AtomicBoolean();
 
-      StartEndCommand command =
-          new StartEndCommand(() -> cond1.setCondition(true), () -> cond2.setCondition(true));
+      StartEndCommand command = new StartEndCommand(() -> cond1.set(true), () -> cond2.set(true));
 
       scheduler.schedule(command);
       scheduler.run();
@@ -27,8 +27,8 @@ class StartEndCommandTest extends CommandTestBase {
       scheduler.cancel(command);
 
       assertFalse(scheduler.isScheduled(command));
-      assertTrue(cond1.getCondition());
-      assertTrue(cond2.getCondition());
+      assertTrue(cond1.get());
+      assertTrue(cond2.get());
     }
   }
 }
