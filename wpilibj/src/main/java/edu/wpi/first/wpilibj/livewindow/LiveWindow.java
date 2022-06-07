@@ -17,7 +17,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableBuilderImpl;
 public final class LiveWindow {
   private static class Component {
     boolean m_firstTime = true;
-    boolean m_telemetryEnabled = false;
+    boolean m_telemetryEnabled;
   }
 
   private static final int dataHandle = SendableRegistry.getDataHandle();
@@ -27,7 +27,7 @@ public final class LiveWindow {
   private static final NetworkTableEntry enabledEntry = statusTable.getEntry("LW Enabled");
   private static boolean startLiveWindow;
   private static boolean liveWindowEnabled;
-  private static boolean telemetryEnabled = false;
+  private static boolean telemetryEnabled;
 
   private static Runnable enabledListener;
   private static Runnable disabledListener;
