@@ -19,7 +19,9 @@ def clone_repo(url, treeish, shallow=True):
     os.chdir(tempfile.gettempdir())
 
     repo = os.path.basename(url)
-    dest = os.path.join(os.getcwd(), repo).removesuffix(".git")
+    dest = os.path.join(os.getcwd(), repo)
+    if dest.endswith(".git"):
+        dest = dest[:-4]
 
     # Clone Git repository into current directory or update it
     if not os.path.exists(dest):
