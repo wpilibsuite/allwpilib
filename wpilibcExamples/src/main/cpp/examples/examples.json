@@ -85,6 +85,16 @@
     "commandversion": 2
   },
   {
+    "name": "EventLoop",
+    "description": "Demonstrate managing a ball system using EventLoop and BooleanEvent.",
+    "tags": [
+      "EventLoop"
+    ],
+    "foldername": "EventLoop",
+    "gradlebase": "cpp",
+    "commandversion": 2
+  },
+  {
     "name": "Arcade Drive",
     "description": "An example program which demonstrates the use of Arcade Drive with the DifferentialDrive class",
     "tags": [

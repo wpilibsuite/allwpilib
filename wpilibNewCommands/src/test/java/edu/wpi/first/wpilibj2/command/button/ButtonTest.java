@@ -170,10 +170,10 @@ class ButtonTest extends CommandTestBase {
     button1.setPressed(true);
     button2.setPressed(false);
 
-    assertFalse(button1.and(button2).get());
-    assertTrue(button1.or(button2).get());
-    assertFalse(button1.negate().get());
-    assertTrue(button1.and(button2.negate()).get());
+    assertFalse(button1.and(button2).getAsBoolean());
+    assertTrue(button1.or(button2).getAsBoolean());
+    assertFalse(button1.negate().getAsBoolean());
+    assertTrue(button1.and(button2.negate()).getAsBoolean());
   }
 
   @Test
@@ -183,8 +183,8 @@ class ButtonTest extends CommandTestBase {
 
     button1.setPressed(true);
 
-    assertFalse(button1.and(booleanSupplier).get());
-    assertTrue(button1.or(booleanSupplier).get());
+    assertFalse(button1.and(booleanSupplier).getAsBoolean());
+    assertTrue(button1.or(booleanSupplier).getAsBoolean());
   }
 
   @Test
