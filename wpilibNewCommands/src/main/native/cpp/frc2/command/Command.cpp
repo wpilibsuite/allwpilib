@@ -4,6 +4,7 @@
 
 #include "frc2/command/Command.h"
 
+#include "frc2/command/CommandHelper.h"
 #include "frc2/command/CommandScheduler.h"
 #include "frc2/command/ConditionalCommand.h"
 #include "frc2/command/EndlessCommand.h"
@@ -17,6 +18,7 @@
 #include "frc2/command/SequentialCommandGroup.h"
 #include "frc2/command/WaitCommand.h"
 #include "frc2/command/WaitUntilCommand.h"
+#include "frc2/command/WrapperCommand.h"
 
 using namespace frc2;
 
@@ -45,6 +47,25 @@ ParallelRaceGroup Command::Until(std::function<bool()> condition) && {
   temp.emplace_back(std::make_unique<WaitUntilCommand>(std::move(condition)));
   temp.emplace_back(std::move(*this).TransferOwnership());
   return ParallelRaceGroup(std::move(temp));
+}
+
+std::unique_ptr<Command> Command::WithRunsWhenDisabled(
+    bool doesRunWhenDisabled) && {
+  class RunsWhenDisabledCommand
+      : public CommandHelper<WrapperCommand, RunsWhenDisabledCommand> {
+   public:
+    RunsWhenDisabledCommand(std::unique_ptr<Command>&& command,
+                            bool doesRunWhenDisabled)
+        : CommandHelper(std::move(command)),
+          m_runsWhenDisabled(doesRunWhenDisabled) {}
+    bool RunsWhenDisabled() const override { return m_runsWhenDisabled; }
+
+   private:
+    bool m_runsWhenDisabled;
+  };
+
+  return std::make_unique<RunsWhenDisabledCommand>(
+      std::move(*this).TransferOwnership(), doesRunWhenDisabled);
 }
 
 ParallelRaceGroup Command::WithInterrupt(std::function<bool()> condition) && {

@@ -316,6 +316,21 @@ public interface Command {
   }
 
   /**
+   * Decorates this command to run or stop when disabled.
+   *
+   * @param doesRunWhenDisabled true to run when disabled.
+   * @return the decorated command
+   */
+  default WrapperCommand withRunsWhenDisabled(boolean doesRunWhenDisabled) {
+    return new WrapperCommand(this) {
+      @Override
+      public boolean runsWhenDisabled() {
+        return doesRunWhenDisabled;
+      }
+    };
+  }
+
+  /**
    * Schedules this command.
    *
    * @param interruptible whether this command can be interrupted by another command that shares one

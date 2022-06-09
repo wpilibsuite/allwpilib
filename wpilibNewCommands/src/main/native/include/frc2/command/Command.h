@@ -230,6 +230,15 @@ class Command {
   virtual ConditionalCommand Unless(std::function<bool()> condition) &&;
 
   /**
+   * Decorates this command to run or stop when disabled.
+   *
+   * @param doesRunWhenDisabled true to run when disabled.
+   * @return the decorated command
+   */
+  virtual std::unique_ptr<Command> WithRunsWhenDisabled(
+      bool doesRunWhenDisabled) &&;
+
+  /**
    * Schedules this command.
    *
    * @param interruptible whether this command can be interrupted by another

@@ -54,6 +54,19 @@ TEST_F(CommandDecoratorTest, Until) {
   EXPECT_FALSE(scheduler.IsScheduled(&command));
 }
 
+TEST_F(CommandDecoratorTest, WithRunsWhenDisabled) {
+  CommandScheduler scheduler = GetScheduler();
+
+  auto command = RunCommand([] {}, {}).WithRunsWhenDisabled(true);
+
+  SetDSEnabled(false);
+
+  scheduler.Schedule(command.get());
+
+  scheduler.Run();
+  EXPECT_TRUE(scheduler.IsScheduled(command.get()));
+}
+
 TEST_F(CommandDecoratorTest, BeforeStarting) {
   CommandScheduler scheduler = GetScheduler();
 

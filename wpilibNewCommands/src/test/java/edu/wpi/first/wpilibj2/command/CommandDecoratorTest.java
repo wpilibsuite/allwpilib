@@ -56,6 +56,20 @@ class CommandDecoratorTest extends CommandTestBase {
   }
 
   @Test
+  void withRunsWhenDisabledTest() {
+    try (CommandScheduler scheduler = new CommandScheduler()) {
+      var command = new RunCommand(() -> {}).withRunsWhenDisabled(true);
+
+      setDSEnabled(false);
+
+      scheduler.schedule(command);
+
+      scheduler.run();
+      assertTrue(scheduler.isScheduled(command));
+    }
+  }
+
+  @Test
   void beforeStartingTest() {
     try (CommandScheduler scheduler = new CommandScheduler()) {
       AtomicBoolean condition = new AtomicBoolean();
