@@ -5,7 +5,6 @@
 #pragma once
 
 #include <functional>
-#include <list>
 
 #include <wpi/FunctionExtras.h>
 #include <wpi/SmallVector.h>
@@ -43,6 +42,6 @@ class EventLoop {
 
     void Poll();
   };
-  std::list<Binding> m_bindings;
+  wpi::SmallVector<Binding> m_bindings;
 };
 }  // namespace frc
