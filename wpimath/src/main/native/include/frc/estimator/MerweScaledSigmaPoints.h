@@ -6,7 +6,6 @@
 
 #include <cmath>
 
-#include "Eigen/Cholesky"
 #include "frc/EigenCore.h"
 
 namespace frc {
@@ -52,20 +51,21 @@ class MerweScaledSigmaPoints {
 
   /**
    * Computes the sigma points for an unscented Kalman filter given the mean
-   * (x) and covariance(P) of the filter.
+   * (x) and square-root covariance(S) of the filter.
    *
    * @param x An array of the means.
-   * @param P Covariance of the filter.
+   * @param S Square-root covariance of the filter.
    *
    * @return Two dimensional array of sigma points. Each column contains all of
    *         the sigmas for one dimension in the problem space. Ordered by
    *         Xi_0, Xi_{1..n}, Xi_{n+1..2n}.
    *
    */
-  Matrixd<States, 2 * States + 1> SigmaPoints(
-      const Vectord<States>& x, const Matrixd<States, States>& P) {
+  Matrixd<States, 2 * States + 1> SquareRootSigmaPoints(
+      const Vectord<States>& x, const Matrixd<States, States>& S) {
     double lambda = std::pow(m_alpha, 2) * (States + m_kappa) - States;
-    Matrixd<States, States> U = ((lambda + States) * P).llt().matrixL();
+    double eta = std::sqrt(lambda + States);
+    Matrixd<States, States> U = eta * S;
 
     Matrixd<States, 2 * States + 1> sigmas;
     sigmas.template block<States, 1>(0, 0) = x;

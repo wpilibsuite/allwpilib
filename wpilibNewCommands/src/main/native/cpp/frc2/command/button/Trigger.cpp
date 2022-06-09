@@ -8,22 +8,14 @@
 
 #include "frc2/command/InstantCommand.h"
 
+using namespace frc;
 using namespace frc2;
 
 Trigger::Trigger(const Trigger& other) = default;
 
 Trigger Trigger::WhenActive(Command* command, bool interruptible) {
-  CommandScheduler::GetInstance().AddButton(
-      [pressedLast = m_isActive(), *this, command, interruptible]() mutable {
-        bool pressed = m_isActive();
-
-        if (!pressedLast && pressed) {
-          command->Schedule(interruptible);
-        }
-
-        pressedLast = pressed;
-      });
-
+  this->Rising().IfHigh(
+      [command, interruptible] { command->Schedule(interruptible); });
   return *this;
 }
 
@@ -39,18 +31,8 @@ Trigger Trigger::WhenActive(std::function<void()> toRun,
 }
 
 Trigger Trigger::WhileActiveContinous(Command* command, bool interruptible) {
-  CommandScheduler::GetInstance().AddButton(
-      [pressedLast = m_isActive(), *this, command, interruptible]() mutable {
-        bool pressed = m_isActive();
-
-        if (pressed) {
-          command->Schedule(interruptible);
-        } else if (pressedLast && !pressed) {
-          command->Cancel();
-        }
-
-        pressedLast = pressed;
-      });
+  this->IfHigh([command, interruptible] { command->Schedule(interruptible); });
+  this->Falling().IfHigh([command] { command->Cancel(); });
   return *this;
 }
 
@@ -67,32 +49,15 @@ Trigger Trigger::WhileActiveContinous(
 }
 
 Trigger Trigger::WhileActiveOnce(Command* command, bool interruptible) {
-  CommandScheduler::GetInstance().AddButton(
-      [pressedLast = m_isActive(), *this, command, interruptible]() mutable {
-        bool pressed = m_isActive();
-
-        if (!pressedLast && pressed) {
-          command->Schedule(interruptible);
-        } else if (pressedLast && !pressed) {
-          command->Cancel();
-        }
-
-        pressedLast = pressed;
-      });
+  this->Rising().IfHigh(
+      [command, interruptible] { command->Schedule(interruptible); });
+  this->Falling().IfHigh([command] { command->Cancel(); });
   return *this;
 }
 
 Trigger Trigger::WhenInactive(Command* command, bool interruptible) {
-  CommandScheduler::GetInstance().AddButton(
-      [pressedLast = m_isActive(), *this, command, interruptible]() mutable {
-        bool pressed = m_isActive();
-
-        if (pressedLast && !pressed) {
-          command->Schedule(interruptible);
-        }
-
-        pressedLast = pressed;
-      });
+  this->Falling().IfHigh(
+      [command, interruptible] { command->Schedule(interruptible); });
   return *this;
 }
 
@@ -108,41 +73,17 @@ Trigger Trigger::WhenInactive(std::function<void()> toRun,
 }
 
 Trigger Trigger::ToggleWhenActive(Command* command, bool interruptible) {
-  CommandScheduler::GetInstance().AddButton(
-      [pressedLast = m_isActive(), *this, command, interruptible]() mutable {
-        bool pressed = m_isActive();
-
-        if (!pressedLast && pressed) {
-          if (command->IsScheduled()) {
-            command->Cancel();
-          } else {
-            command->Schedule(interruptible);
-          }
-        }
-
-        pressedLast = pressed;
-      });
+  this->Rising().IfHigh([command, interruptible] {
+    if (command->IsScheduled()) {
+      command->Cancel();
+    } else {
+      command->Schedule(interruptible);
+    }
+  });
   return *this;
 }
 
 Trigger Trigger::CancelWhenActive(Command* command) {
-  CommandScheduler::GetInstance().AddButton(
-      [pressedLast = m_isActive(), *this, command]() mutable {
-        bool pressed = m_isActive();
-
-        if (!pressedLast && pressed) {
-          command->Cancel();
-        }
-
-        pressedLast = pressed;
-      });
+  this->Rising().IfHigh([command] { command->Cancel(); });
   return *this;
-}
-
-Trigger Trigger::Debounce(units::second_t debounceTime,
-                          frc::Debouncer::DebounceType type) {
-  return Trigger(
-      [debouncer = frc::Debouncer(debounceTime, type), *this]() mutable {
-        return debouncer.Calculate(m_isActive());
-      });
 }

@@ -18,7 +18,7 @@ using namespace frc;
 namespace {
 struct Component {
   bool firstTime = true;
-  bool telemetryEnabled = true;
+  bool telemetryEnabled = false;
 };
 
 struct Instance {
@@ -39,7 +39,7 @@ struct Instance {
 
   bool startLiveWindow = false;
   bool liveWindowEnabled = false;
-  bool telemetryEnabled = true;
+  bool telemetryEnabled = false;
 
   std::function<void()> enabled;
   std::function<void()> disabled;

@@ -8,6 +8,7 @@
 
 #include <wpi/jni_util.h>
 
+#include "Eigen/Cholesky"
 #include "Eigen/Core"
 #include "Eigen/Eigenvalues"
 #include "Eigen/QR"
@@ -305,6 +306,62 @@ Java_edu_wpi_first_math_WPIMathJNI_serializeTrajectory
     }
     return nullptr;
   }
+}
+
+/*
+ * Class:     edu_wpi_first_math_WPIMathJNI
+ * Method:    rankUpdate
+ * Signature: ([DI[DDZ)V
+ */
+JNIEXPORT void JNICALL
+Java_edu_wpi_first_math_WPIMathJNI_rankUpdate
+  (JNIEnv* env, jclass, jdoubleArray mat, jint rows, jdoubleArray vec,
+   jdouble sigma, jboolean lowerTriangular)
+{
+  jdouble* matBody = env->GetDoubleArrayElements(mat, nullptr);
+  jdouble* vecBody = env->GetDoubleArrayElements(vec, nullptr);
+
+  Eigen::Map<
+      Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor>>
+      L{matBody, rows, rows};
+  Eigen::Map<Eigen::Vector<double, Eigen::Dynamic>> v{vecBody, rows};
+
+  if (lowerTriangular == JNI_TRUE) {
+    Eigen::internal::llt_inplace<double, Eigen::Lower>::rankUpdate(L, v, sigma);
+  } else {
+    Eigen::internal::llt_inplace<double, Eigen::Upper>::rankUpdate(L, v, sigma);
+  }
+
+  env->ReleaseDoubleArrayElements(mat, matBody, 0);
+  env->ReleaseDoubleArrayElements(vec, vecBody, 0);
+}
+
+/*
+ * Class:     edu_wpi_first_math_WPIMathJNI
+ * Method:    solveFullPivHouseholderQr
+ * Signature: ([DII[DII[D)V
+ */
+JNIEXPORT void JNICALL
+Java_edu_wpi_first_math_WPIMathJNI_solveFullPivHouseholderQr
+  (JNIEnv* env, jclass, jdoubleArray A, jint Arows, jint Acols, jdoubleArray B,
+   jint Brows, jint Bcols, jdoubleArray dst)
+{
+  jdouble* nativeA = env->GetDoubleArrayElements(A, nullptr);
+  jdouble* nativeB = env->GetDoubleArrayElements(B, nullptr);
+
+  Eigen::Map<
+      Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor>>
+      Amat{nativeA, Arows, Acols};
+  Eigen::Map<
+      Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor>>
+      Bmat{nativeB, Brows, Bcols};
+
+  Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor> Xmat =
+      Amat.fullPivHouseholderQr().solve(Bmat);
+
+  env->ReleaseDoubleArrayElements(A, nativeA, 0);
+  env->ReleaseDoubleArrayElements(B, nativeB, 0);
+  env->SetDoubleArrayRegion(dst, 0, Brows * Bcols, Xmat.data());
 }
 
 }  // extern "C"

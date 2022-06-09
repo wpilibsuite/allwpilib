@@ -127,6 +127,8 @@ class SwerveDrivePoseEstimator {
 
     m_observer.SetXhat(PoseTo3dVector(pose));
 
+    m_prevTime = -1_s;
+
     m_gyroOffset = pose.Rotation() - gyroAngle;
     m_previousAngle = pose.Rotation();
   }

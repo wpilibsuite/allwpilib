@@ -87,7 +87,12 @@ task copyAllOutputs(type: Copy) {
 build.dependsOn copyAllOutputs
 copyAllOutputs.dependsOn outputVersions
 
+def copyReleaseOnly = project.hasProperty('ciReleaseOnly')
+
 ext.addTaskToCopyAllOutputs = { task ->
+    if (copyReleaseOnly && task.name.contains('debug')) {
+        return
+    }
     copyAllOutputs.dependsOn task
     copyAllOutputs.inputs.file task.archivePath
     copyAllOutputs.from task.archivePath

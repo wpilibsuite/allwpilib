@@ -8,6 +8,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.verify;
 
+import java.util.concurrent.atomic.AtomicBoolean;
 import org.junit.jupiter.api.Test;
 
 class ProxyScheduleCommandTest extends CommandTestBase {
@@ -28,9 +29,9 @@ class ProxyScheduleCommandTest extends CommandTestBase {
   @Test
   void proxyScheduleCommandEndTest() {
     try (CommandScheduler scheduler = CommandScheduler.getInstance()) {
-      ConditionHolder cond = new ConditionHolder();
+      AtomicBoolean cond = new AtomicBoolean();
 
-      WaitUntilCommand command = new WaitUntilCommand(cond::getCondition);
+      WaitUntilCommand command = new WaitUntilCommand(cond::get);
 
       ProxyScheduleCommand scheduleCommand = new ProxyScheduleCommand(command);
 
@@ -39,7 +40,7 @@ class ProxyScheduleCommandTest extends CommandTestBase {
       scheduler.run();
       assertTrue(scheduler.isScheduled(scheduleCommand));
 
-      cond.setCondition(true);
+      cond.set(true);
       scheduler.run();
       scheduler.run();
       assertFalse(scheduler.isScheduled(scheduleCommand));
