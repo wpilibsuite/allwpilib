@@ -55,7 +55,7 @@ jobs:
             artifact-name: Win64Debug
             architecture: x64
             task: "build"
-            build-options: "-PciDebugOnly"
+            build-options: "-PciDebugOnly --max-workers 1"
           - os: windows-2019
             artifact-name: Win64Release
             architecture: x64

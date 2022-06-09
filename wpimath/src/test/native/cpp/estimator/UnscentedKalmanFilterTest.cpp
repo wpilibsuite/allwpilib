@@ -23,7 +23,7 @@ namespace {
 frc::Vectord<5> Dynamics(const frc::Vectord<5>& x, const frc::Vectord<2>& u) {
   auto motors = frc::DCMotor::CIM(2);
 
-  // constexpr double Glow = 15.32;       // Low gear ratio
+  // constexpr double Glow = 15.32;    // Low gear ratio
   constexpr double Ghigh = 7.08;       // High gear ratio
   constexpr auto rb = 0.8382_m / 2.0;  // Robot radius
   constexpr auto r = 0.0746125_m;      // Wheel radius
@@ -71,6 +71,11 @@ TEST(UnscentedKalmanFilterTest, Init) {
                                                LocalMeasurementModel,
                                                {0.5, 0.5, 10.0, 1.0, 1.0},
                                                {0.0001, 0.01, 0.01},
+                                               frc::AngleMean<5, 5>(2),
+                                               frc::AngleMean<3, 5>(0),
+                                               frc::AngleResidual<5>(2),
+                                               frc::AngleResidual<3>(0),
+                                               frc::AngleAdd<5>(2),
                                                dt};
   frc::Vectord<2> u{12.0, 12.0};
   observer.Predict(u, dt);
@@ -93,6 +98,11 @@ TEST(UnscentedKalmanFilterTest, Convergence) {
                                                LocalMeasurementModel,
                                                {0.5, 0.5, 10.0, 1.0, 1.0},
                                                {0.0001, 0.5, 0.5},
+                                               frc::AngleMean<5, 5>(2),
+                                               frc::AngleMean<3, 5>(0),
+                                               frc::AngleResidual<5>(2),
+                                               frc::AngleResidual<3>(0),
+                                               frc::AngleAdd<5>(2),
                                                dt};
 
   auto waypoints =
@@ -150,12 +160,28 @@ TEST(UnscentedKalmanFilterTest, Convergence) {
   );
 
   auto finalPosition = trajectory.Sample(trajectory.TotalTime());
-  ASSERT_NEAR(finalPosition.pose.Translation().X().value(), observer.Xhat(0),
-              1.0);
-  ASSERT_NEAR(finalPosition.pose.Translation().Y().value(), observer.Xhat(1),
-              1.0);
-  ASSERT_NEAR(finalPosition.pose.Rotation().Radians().value(), observer.Xhat(2),
-              1.0);
-  ASSERT_NEAR(0.0, observer.Xhat(3), 1.0);
-  ASSERT_NEAR(0.0, observer.Xhat(4), 1.0);
+  EXPECT_NEAR(finalPosition.pose.Translation().X().value(), observer.Xhat(0),
+              0.055);
+  EXPECT_NEAR(finalPosition.pose.Translation().Y().value(), observer.Xhat(1),
+              0.15);
+  EXPECT_NEAR(finalPosition.pose.Rotation().Radians().value(), observer.Xhat(2),
+              0.000005);
+  EXPECT_NEAR(0.0, observer.Xhat(3), 0.1);
+  EXPECT_NEAR(0.0, observer.Xhat(4), 0.1);
+}
+
+TEST(UnscentedKalmanFilterTest, RoundTripP) {
+  constexpr auto dt = 5_ms;
+
+  frc::UnscentedKalmanFilter<2, 2, 2> observer{
+      [](const frc::Vectord<2>& x, const frc::Vectord<2>& u) { return x; },
+      [](const frc::Vectord<2>& x, const frc::Vectord<2>& u) { return x; },
+      {0.0, 0.0},
+      {0.0, 0.0},
+      dt};
+
+  frc::Matrixd<2, 2> P({{2, 1}, {1, 2}});
+  observer.SetP(P);
+
+  ASSERT_TRUE(observer.P().isApprox(P));
 }

@@ -76,21 +76,22 @@ void UnscentedKalmanFilter<States, Inputs, Outputs>::Predict(
       NumericalJacobianX<States, States, Inputs>(m_f, m_xHat, u);
   StateMatrix discA;
   StateMatrix discQ;
-  DiscretizeAQTaylor<States>(contA, m_contQ, dt, &discA, &discQ);
+  DiscretizeAQTaylor<States>(contA, m_contQ, m_dt, &discA, &discQ);
+  Eigen::internal::llt_inplace<double, Eigen::Lower>::blocked(discQ);
 
-  Matrixd<States, 2 * States + 1> sigmas = m_pts.SigmaPoints(m_xHat, m_P);
+  Matrixd<States, 2 * States + 1> sigmas =
+      m_pts.SquareRootSigmaPoints(m_xHat, m_S);
 
   for (int i = 0; i < m_pts.NumSigmas(); ++i) {
     StateVector x = sigmas.template block<States, 1>(0, i);
     m_sigmasF.template block<States, 1>(0, i) = RK4(m_f, x, u, dt);
   }
 
-  auto ret = UnscentedTransform<States, States>(
-      m_sigmasF, m_pts.Wm(), m_pts.Wc(), m_meanFuncX, m_residualFuncX);
-  m_xHat = std::get<0>(ret);
-  m_P = std::get<1>(ret);
-
-  m_P += discQ;
+  auto [xHat, S] = SquareRootUnscentedTransform<States, States>(
+      m_sigmasF, m_pts.Wm(), m_pts.Wc(), m_meanFuncX, m_residualFuncX,
+      discQ.template triangularView<Eigen::Lower>());
+  m_xHat = xHat;
+  m_S = S;
 }
 
 template <int States, int Inputs, int Outputs>
@@ -123,20 +124,22 @@ void UnscentedKalmanFilter<States, Inputs, Outputs>::Correct(
         residualFuncX,
     std::function<StateVector(const StateVector&, const StateVector&)>
         addFuncX) {
-  const Matrixd<Rows, Rows> discR = DiscretizeR<Rows>(R, m_dt);
+  Matrixd<Rows, Rows> discR = DiscretizeR<Rows>(R, m_dt);
+  Eigen::internal::llt_inplace<double, Eigen::Lower>::blocked(discR);
 
   // Transform sigma points into measurement space
   Matrixd<Rows, 2 * States + 1> sigmasH;
-  Matrixd<States, 2 * States + 1> sigmas = m_pts.SigmaPoints(m_xHat, m_P);
+  Matrixd<States, 2 * States + 1> sigmas =
+      m_pts.SquareRootSigmaPoints(m_xHat, m_S);
   for (int i = 0; i < m_pts.NumSigmas(); ++i) {
     sigmasH.template block<Rows, 1>(0, i) =
         h(sigmas.template block<States, 1>(0, i), u);
   }
 
   // Mean and covariance of prediction passed through UT
-  auto [yHat, Py] = UnscentedTransform<Rows, States>(
-      sigmasH, m_pts.Wm(), m_pts.Wc(), meanFuncY, residualFuncY);
-  Py += discR;
+  auto [yHat, Sy] = SquareRootUnscentedTransform<Rows, States>(
+      sigmasH, m_pts.Wm(), m_pts.Wc(), meanFuncY, residualFuncY,
+      discR.template triangularView<Eigen::Lower>());
 
   // Compute cross covariance of the state and the measurements
   Matrixd<States, Rows> Pxy;
@@ -149,19 +152,23 @@ void UnscentedKalmanFilter<States, Inputs, Outputs>::Correct(
                .transpose();
   }
 
-  // K = P_{xy} P_y⁻¹
-  // Kᵀ = P_yᵀ⁻¹ P_{xy}ᵀ
-  // P_yᵀKᵀ = P_{xy}ᵀ
-  // Kᵀ = P_yᵀ.solve(P_{xy}ᵀ)
-  // K = (P_yᵀ.solve(P_{xy}ᵀ)ᵀ
+  // K = (P_{xy} / S_yᵀ) / S_y
+  // K = (S_y \ P_{xy}ᵀ)ᵀ / S_y
+  // K = (S_yᵀ \ (S_y \ P_{xy}ᵀ))ᵀ
   Matrixd<States, Rows> K =
-      Py.transpose().ldlt().solve(Pxy.transpose()).transpose();
+      Sy.transpose()
+          .fullPivHouseholderQr()
+          .solve(Sy.fullPivHouseholderQr().solve(Pxy.transpose()))
+          .transpose();
 
   // x̂ₖ₊₁⁺ = x̂ₖ₊₁⁻ + K(y − ŷ)
   m_xHat = addFuncX(m_xHat, K * residualFuncY(y, yHat));
 
-  // Pₖ₊₁⁺ = Pₖ₊₁⁻ − KP_yKᵀ
-  m_P -= K * Py * K.transpose();
+  Matrixd<States, Rows> U = K * Sy;
+  for (int i = 0; i < Rows; i++) {
+    Eigen::internal::llt_inplace<double, Eigen::Upper>::rankUpdate(
+        m_S, U.template block<States, 1>(0, i), -1);
+  }
 }
 
 }  // namespace frc
