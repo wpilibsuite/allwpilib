@@ -9,7 +9,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 
 import edu.wpi.first.hal.HAL;
-import edu.wpi.first.wpilibj.simulation.DIOSim;
+import edu.wpi.first.wpilibj.simulation.DigitalSim;
 import org.junit.jupiter.api.Test;
 
 class DigitalOutputTest {
@@ -37,7 +37,7 @@ class DigitalOutputTest {
     HAL.initialize(500, 0);
 
     try (DigitalOutput output = new DigitalOutput(0)) {
-      DIOSim sim = new DIOSim(output);
+      DigitalSim sim = new DigitalSim(output);
       assertEquals(0, sim.getPulseLength());
 
       output.enablePWM(0.5);

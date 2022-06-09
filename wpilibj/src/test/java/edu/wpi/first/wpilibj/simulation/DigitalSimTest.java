@@ -13,10 +13,10 @@ import edu.wpi.first.wpilibj.DigitalOutput;
 import edu.wpi.first.wpilibj.simulation.testutils.BooleanCallback;
 import org.junit.jupiter.api.Test;
 
-class DIOSimTest {
+class DigitalSimTest {
   @Test
   void testInitialization() {
-    DIOSim sim = new DIOSim(2);
+    DigitalSim sim = new DigitalSim(2);
     assertFalse(sim.getInitialized());
 
     BooleanCallback initializedCallback = new BooleanCallback();
@@ -45,7 +45,7 @@ class DIOSimTest {
     HAL.initialize(500, 0);
 
     try (DigitalInput input = new DigitalInput(0)) {
-      DIOSim sim = new DIOSim(input);
+      DigitalSim sim = new DigitalSim(input);
       assertTrue(sim.getIsInput());
 
       BooleanCallback valueCallback = new BooleanCallback();
@@ -66,7 +66,7 @@ class DIOSimTest {
   void testOutput() {
     HAL.initialize(500, 0);
     try (DigitalOutput output = new DigitalOutput(0)) {
-      DIOSim sim = new DIOSim(output);
+      DigitalSim sim = new DigitalSim(output);
       assertFalse(sim.getIsInput());
 
       BooleanCallback valueCallback = new BooleanCallback();

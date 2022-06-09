@@ -7,7 +7,7 @@ package edu.wpi.first.wpilibj;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import edu.wpi.first.wpilibj.simulation.DIOSim;
+import edu.wpi.first.wpilibj.simulation.DigitalSim;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import org.junit.jupiter.api.Test;
@@ -28,7 +28,7 @@ class InterruptTest {
                 })) {
       interrupt.enable();
       Timer.delay(0.5);
-      DIOSim digitalSim = new DIOSim(di);
+      DigitalSim digitalSim = new DigitalSim(di);
       digitalSim.setValue(false);
       Timer.delay(0.01);
       digitalSim.setValue(true);
