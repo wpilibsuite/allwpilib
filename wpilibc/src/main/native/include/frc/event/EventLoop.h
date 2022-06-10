@@ -5,9 +5,9 @@
 #pragma once
 
 #include <functional>
+#include <vector>
 
 #include <wpi/FunctionExtras.h>
-#include <wpi/SmallVector.h>
 
 namespace frc {
 /** The loop polling BooleanEvent objects and executing the actions bound to
@@ -42,6 +42,6 @@ class EventLoop {
 
     void Poll();
   };
-  wpi::SmallVector<Binding> m_bindings;
+  std::vector<Binding> m_bindings;
 };
 }  // namespace frc
