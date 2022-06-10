@@ -70,6 +70,16 @@ ext {
                     srcDirs 'src/main/native/thirdparty/tcb_span/include'
                 }
             }
+            memoryCpp(CppSourceSet) {
+                source {
+                    srcDirs 'src/main/native/thirdparty/memory/src', 'src/main/native/thirdparty/memory/include/wpi/memory'
+                    include '**/*.cpp'
+                }
+                exportedHeaders {
+                    srcDirs 'src/main/native/thirdparty/memory/include'
+                    include '**/*.hpp'
+                }
+            }
             resourcesCpp(CppSourceSet) {
                 source {
                     srcDirs "$buildDir/generated/main/cpp", "$rootDir/shared/singlelib"
