@@ -1,7 +1,7 @@
-From 7727474439a3a3dc2b74c9c7ae4b1c36a11fdce2 Mon Sep 17 00:00:00 2001
+From 1cf6a9b2eee7a9364a3827cc85f84172e1eaea4d Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Tue, 26 Apr 2022 15:09:43 -0400
-Subject: [PATCH 2/8] Fix warnings
+Subject: [PATCH 2/9] Fix warnings
 
 ---
  include/uv/win.h    |   5 +++
@@ -21,7 +21,7 @@ Subject: [PATCH 2/8] Fix warnings
  14 files changed, 99 insertions(+), 62 deletions(-)
 
 diff --git a/include/uv/win.h b/include/uv/win.h
-index 62be4b04..fe36a532 100644
+index 62be4b0..fe36a53 100644
 --- a/include/uv/win.h
 +++ b/include/uv/win.h
 @@ -201,11 +201,16 @@ typedef int (WSAAPI* LPFN_WSARECVFROM)
@@ -42,7 +42,7 @@ index 62be4b04..fe36a532 100644
    typedef PVOID CONDITION_VARIABLE, *PCONDITION_VARIABLE;
  #endif
 diff --git a/src/idna.c b/src/idna.c
-index 93d982ca..36a39a08 100644
+index 93d982c..36a39a0 100644
 --- a/src/idna.c
 +++ b/src/idna.c
 @@ -106,7 +106,7 @@ static int uv__idna_toascii_label(const char* s, const char* se,
@@ -55,7 +55,7 @@ index 93d982ca..36a39a08 100644
    unsigned k;
    unsigned n;
 diff --git a/src/inet.c b/src/inet.c
-index ca8b6ac8..1b190255 100644
+index ca8b6ac..1b19025 100644
 --- a/src/inet.c
 +++ b/src/inet.c
 @@ -27,6 +27,10 @@
@@ -70,7 +70,7 @@ index ca8b6ac8..1b190255 100644
  #define UV__INET6_ADDRSTRLEN        46
  
 diff --git a/src/threadpool.c b/src/threadpool.c
-index 1241ace1..718972c3 100644
+index 1241ace..718972c 100644
 --- a/src/threadpool.c
 +++ b/src/threadpool.c
 @@ -27,6 +27,10 @@
@@ -85,7 +85,7 @@ index 1241ace1..718972c3 100644
  
  static uv_once_t once = UV_ONCE_INIT;
 diff --git a/src/unix/core.c b/src/unix/core.c
-index c59e5352..be2ad1fc 100644
+index c59e535..be2ad1f 100644
 --- a/src/unix/core.c
 +++ b/src/unix/core.c
 @@ -524,6 +524,16 @@ int uv__accept(int sockfd) {
@@ -117,7 +117,7 @@ index c59e5352..be2ad1fc 100644
  #endif
  #pragma GCC diagnostic pop
 diff --git a/src/unix/darwin.c b/src/unix/darwin.c
-index 5fbf7342..eeb35720 100644
+index 5fbf734..eeb3572 100644
 --- a/src/unix/darwin.c
 +++ b/src/unix/darwin.c
 @@ -253,64 +253,68 @@ static int uv__get_cpu_speed(uint64_t* speed) {
@@ -241,7 +241,7 @@ index 5fbf7342..eeb35720 100644
  out:
    if (core_foundation_handle != NULL)
 diff --git a/src/unix/internal.h b/src/unix/internal.h
-index f418572d..5a867db7 100644
+index f418572..5a867db 100644
 --- a/src/unix/internal.h
 +++ b/src/unix/internal.h
 @@ -313,8 +313,8 @@ UV_UNUSED(static void uv__update_time(uv_loop_t* loop)) {
@@ -256,7 +256,7 @@ index f418572d..5a867db7 100644
    s = strrchr(path, '/');
    if (s == NULL)
 diff --git a/src/unix/thread.c b/src/unix/thread.c
-index 759cd0c2..64726bd6 100644
+index 759cd0c..64726bd 100644
 --- a/src/unix/thread.c
 +++ b/src/unix/thread.c
 @@ -244,12 +244,6 @@ int uv_thread_create_ex(uv_thread_t* tid,
@@ -273,7 +273,7 @@ index 759cd0c2..64726bd6 100644
        params->flags & UV_THREAD_HAS_STACK_SIZE ? params->stack_size : 0;
  
 diff --git a/src/uv-common.c b/src/uv-common.c
-index 73d19caf..c287246f 100644
+index 73d19ca..c287246 100644
 --- a/src/uv-common.c
 +++ b/src/uv-common.c
 @@ -756,6 +756,10 @@ void uv__fs_readdir_cleanup(uv_fs_t* req) {
@@ -299,7 +299,7 @@ index 73d19caf..c287246f 100644
  static uv_loop_t default_loop_struct;
  static uv_loop_t* default_loop_ptr;
 diff --git a/src/win/fs-event.c b/src/win/fs-event.c
-index 15046731..3244a4e4 100644
+index 1504673..3244a4e 100644
 --- a/src/win/fs-event.c
 +++ b/src/win/fs-event.c
 @@ -19,6 +19,8 @@
@@ -312,7 +312,7 @@ index 15046731..3244a4e4 100644
  #include <errno.h>
  #include <stdio.h>
 diff --git a/src/win/fs.c b/src/win/fs.c
-index 8374012f..f71b3c04 100644
+index 8374012..f71b3c0 100644
 --- a/src/win/fs.c
 +++ b/src/win/fs.c
 @@ -19,6 +19,8 @@
@@ -325,7 +325,7 @@ index 8374012f..f71b3c04 100644
  #include <stdlib.h>
  #include <direct.h>
 diff --git a/src/win/pipe.c b/src/win/pipe.c
-index 9fb73b4e..ff4e8d25 100644
+index 9fb73b4..ff4e8d2 100644
 --- a/src/win/pipe.c
 +++ b/src/win/pipe.c
 @@ -19,6 +19,8 @@
@@ -338,7 +338,7 @@ index 9fb73b4e..ff4e8d25 100644
  #include <io.h>
  #include <stdio.h>
 diff --git a/src/win/process.c b/src/win/process.c
-index e857db3e..a49016f6 100644
+index e857db3..a49016f 100644
 --- a/src/win/process.c
 +++ b/src/win/process.c
 @@ -19,6 +19,8 @@
@@ -351,7 +351,7 @@ index e857db3e..a49016f6 100644
  #include <io.h>
  #include <stdio.h>
 diff --git a/src/win/tty.c b/src/win/tty.c
-index 98c58883..f6131d45 100644
+index 98c5888..f6131d4 100644
 --- a/src/win/tty.c
 +++ b/src/win/tty.c
 @@ -19,6 +19,8 @@
@@ -364,5 +364,5 @@ index 98c58883..f6131d45 100644
  #include <io.h>
  #include <string.h>
 -- 
-2.36.1
+2.25.1
 

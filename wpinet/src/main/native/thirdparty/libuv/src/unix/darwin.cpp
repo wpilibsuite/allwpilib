@@ -257,6 +257,7 @@ static int uv__get_cpu_speed(uint64_t* speed) {
   // clock_frequency_str's lifetimes after their initialization
   {
     kr = pIOMasterPort(MACH_PORT_NULL, &mach_port);
+    (void) kr;
     assert(kr == KERN_SUCCESS);
     CFMutableDictionaryRef classes_to_match
         = pIOServiceMatching("IOPlatformDevice");
