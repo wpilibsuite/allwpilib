@@ -13,12 +13,10 @@ modifiableFileExclude {
 }
 
 generatedFileExclude {
-  src/main/native/cpp/drake/
-  src/main/native/eigeninclude/
-  src/main/native/include/drake/
   src/main/native/include/units/base\.h$
   src/main/native/include/units/units\.h$
   src/main/native/include/unsupported/
+  src/main/native/thirdparty/
   src/test/native/cpp/UnitsTest\.cpp$
   src/test/native/cpp/drake/
   src/test/native/include/drake/
