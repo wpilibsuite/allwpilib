@@ -97,26 +97,29 @@ def main():
 
     # Delete old install
     for d in [
-            "src/main/native/eigeninclude/Eigen",
-            "src/main/native/eigeninclude/unsupported"
+            "src/main/native/thirdparty/eigen/include/Eigen",
+            "src/main/native/thirdparty/eigen/include/unsupported"
     ]:
         shutil.rmtree(os.path.join(wpimath, d), ignore_errors=True)
 
     # Copy Eigen headers into allwpilib
     eigen_files = walk_cwd_and_copy_if(
-        eigen_inclusions, os.path.join(wpimath, "src/main/native/eigeninclude"))
+        eigen_inclusions,
+        os.path.join(wpimath, "src/main/native/thirdparty/eigen/include"))
 
     # Copy unsupported headers into allwpilib
     unsupported_files = walk_cwd_and_copy_if(
         unsupported_inclusions,
-        os.path.join(wpimath, "src/main/native/eigeninclude"))
+        os.path.join(wpimath, "src/main/native/thirdparty/eigen/include"))
 
     for f in eigen_files:
         comment_out_invalid_includes(
-            f, [os.path.join(wpimath, "src/main/native/eigeninclude")])
+            f,
+            [os.path.join(wpimath, "src/main/native/thirdparty/eigen/include")])
     for f in unsupported_files:
         comment_out_invalid_includes(
-            f, [os.path.join(wpimath, "src/main/native/eigeninclude")])
+            f,
+            [os.path.join(wpimath, "src/main/native/thirdparty/eigen/include")])
 
 
 if __name__ == "__main__":
