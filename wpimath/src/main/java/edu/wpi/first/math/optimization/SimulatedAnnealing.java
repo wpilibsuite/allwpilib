@@ -1,3 +1,7 @@
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
+
 package edu.wpi.first.math.optimization;
 
 import edu.wpi.first.math.Num;
@@ -6,10 +10,9 @@ import java.util.function.Function;
 
 /**
  * An implementation of the Simulated Annealing stochastic nonlinear optimization method for finding
- * the global minimum cost
+ * the global minimum cost.
  */
 public class SimulatedAnnealing {
-
   /**
    * Runs the Simulated Annealing algorithm on a Vector that defines the state.
    *
@@ -27,7 +30,6 @@ public class SimulatedAnnealing {
       double initialTemperature,
       Function<Vector<T>, Vector<T>> getNeighbor,
       Function<Vector<T>, Double> getCost) {
-
     double min = Double.MAX_VALUE;
     Vector<T> minState = initialGuess;
 
