@@ -10,11 +10,11 @@ A pub/sub WebSockets API for accessing NetworkTables.
 [[motivation]]
 == Motivation
 
-Currently in NetworkTables there is no way to synchronize user value updates and NT update sweeps, and if user value updates occur more frequently than NT update sweeps, the intermediate values are lost.  This prevents NetworkTables from being a viable transport layer for data logging at rates higher than the NetworkTables update rate (e.g. for capturing high frequency PID changes).  While custom code can work around the second issue, it is more difficult to work around the first issue (unless full timestamps are also sent).
+Currently in NetworkTables there is no way to synchronize user value updates and NT update sweeps, and if user value updates occur more frequently than NT update sweeps, the intermediate values are lost.  This prevents NetworkTables from being a viable transport layer for seeing all value changes (e.g. for plotting) at rates higher than the NetworkTables update rate (e.g. for capturing high frequency PID changes).  While custom code can work around the second issue, it is more difficult to work around the first issue (unless full timestamps are also sent).
 
 Adding built-in support for capturing and communicating all timestamped data value changes with minimal additional user code changes will make it much easier for inexperienced teams to get high resolution, accurate data to dashboard displays with the minimal possible bandwidth and airtime usage.  Assuming the dashboard performs record and playback of NT updates, this also meets the desire to provide teams a robust data capture and playback mechanism.
 
-Migration to a pub/sub style protocol layer where the client can request only its desired topics and the frequency in which it wants to receive value changes provides some mitigation for increased network utilization due to the data logging changes.
+Migration to a pub/sub style protocol layer where the client can request only its desired topics and the frequency in which it wants to receive value changes provides some mitigation for increased network utilization due to other changes.
 
 Using WebSockets (RFC 6455) as the transport layer along with JSON and MessagePack data encoding enables browser-based dashboards and other web technologies to easily access the protocol and minimizes the amount of custom wire protocol implementation required.  Support for this protocol can easily be added in parallel to the existing NetworkTables protocol stack in order to maintain compatibility with older clients/servers and facilitate a gradual transition.
 
@@ -403,9 +403,9 @@ Each subscription may have options set.  The following options have a defined me
 |Periodic sweep time (in seconds)
 |How frequently the server should send changes (if not immediate).  The server may send more frequently than this (e.g. use a combined minimum period for all values) or apply a restricted range to this value. The default if unspecified (and the `immediate` flag is false) is 100 ms (same as NT 3.0).
 
-|`logging` (optional)
+|`all` (optional)
 |Boolean
-|Logging Flag
+|All Changes Flag
 |If true, the server should send all value changes over the wire regardless of the `immediate` and `periodic` settings.  If false, only the most recent value is sent (same as NT 3.0 behavior).  If not specified, defaults to true.
 |===
 
@@ -816,7 +816,7 @@ This protocol continues the previous NT approach of having all traffic go throug
 [[alt-do-nothing]]
 === Do nothing
 
-The major features in this proposal (accessibility to web technologies and timestamping and data logging) would not be made available to users.  Users would continue to need to deal with these issues manually or by using third-party workarounds.
+The major features in this proposal (accessibility to web technologies and timestamping and sending all changes) would not be made available to users.  Users would continue to need to deal with these issues manually or by using third-party workarounds.
 
 [[alt-raw-protocol]]
 === Update the raw NetworkTables protocol (without using WebSockets)
@@ -826,7 +826,7 @@ This does not provide one of the major benefits to moving to a WebSockets protoc
 [[alt-encapsulation]]
 === Encapsulate the current NT 3.0 protocol in WebSockets
 
-While this makes the current protocol more easily accessible to web technologies, the current protocol does not have integrated support for timestamping or data logging.  It also requires substantially more custom decoder implementation work than MessagePack, and does not offer human-readable control messages.
+While this makes the current protocol more easily accessible to web technologies, the current protocol does not have integrated support for timestamping or sending all changes.  It also requires substantially more custom decoder implementation work than MessagePack, and does not offer human-readable control messages.
 
 [[alt-mqtt]]
 === Use MQTT or another existing protocol
