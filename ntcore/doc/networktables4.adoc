@@ -5,7 +5,7 @@ Protocol Revision 4.0, 2/14/2021
 :toc-placement: preamble
 :sectanchors:
 
-A pub/sub WebSockets API for accessing NetworkTables.
+A pub/sub WebSockets protocol based on NetworkTables concepts.
 
 [[motivation]]
 == Motivation
