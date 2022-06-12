@@ -6,7 +6,7 @@ import java.util.function.Function;
 
 /**
  * An implementation of the Simulated Annealing stochastic nonlinear optimization method for finding
- * global extrema
+ * the global minimum cost
  */
 public class SimulatedAnnealing {
 
