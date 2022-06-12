@@ -5,10 +5,11 @@
 #include "CommandTestBase.h"
 #include "frc2/command/CommandHelper.h"
 #include "frc2/command/RunCommand.h"
+#include "gtest/gtest.h"
 
 using namespace frc2;
-class SchedulingRecursionTest : public CommandTestBase,
-                                public testing::WithParamInterface<bool> {};
+
+class SchedulingRecursionTest : public CommandTestBaseWithParam<bool> {};
 
 class SelfCancellingCommand
     : public CommandHelper<CommandBase, SelfCancellingCommand> {
@@ -28,7 +29,7 @@ class SelfCancellingCommand
  * Checks <a
  * href="https://github.com/wpilibsuite/allwpilib/issues/4259">wpilibsuite/allwpilib#4259</a>.
  */
-TEST_P(SchedulingRecursionTest, CancelFromInitializeTest) {
+TEST_P(SchedulingRecursionTest, CancelFromInitialize) {
   CommandScheduler scheduler = GetScheduler();
   bool hasOtherRun = false;
   TestSubsystem requirement;
@@ -47,10 +48,7 @@ TEST_P(SchedulingRecursionTest, CancelFromInitializeTest) {
   EXPECT_TRUE(hasOtherRun);
 }
 
-INSTANTIATE_TEST_SUITE_P(SchedulingRecursionTest, CancelFromInitializeTest,
-                         testing::Bool());
-
-TEST_P(SchedulingRecursionTest, DefaultCommandTest) {
+TEST_P(SchedulingRecursionTest, DefaultCommand) {
   CommandScheduler scheduler = GetScheduler();
   bool hasOtherRun = false;
   TestSubsystem requirement;
@@ -68,9 +66,6 @@ TEST_P(SchedulingRecursionTest, DefaultCommandTest) {
   EXPECT_TRUE(hasOtherRun);
 }
 
-INSTANTIATE_TEST_SUITE_P(SchedulingRecursionTest, DefaultCommandTest,
-                         testing::Bool());
-
 class CancelEndCommand : public CommandHelper<CommandBase, CancelEndCommand> {
  public:
   CancelEndCommand(CommandScheduler* scheduler, int& counter)
@@ -86,7 +81,7 @@ class CancelEndCommand : public CommandHelper<CommandBase, CancelEndCommand> {
   int& m_counter;
 };
 
-TEST_F(SchedulingRecursionTest, CancelFromEndTest) {
+TEST_F(SchedulingRecursionTest, CancelFromEnd) {
   CommandScheduler scheduler = GetScheduler();
   int counter = 0;
   CancelEndCommand selfCancels{&scheduler, counter};
@@ -97,3 +92,6 @@ TEST_F(SchedulingRecursionTest, CancelFromEndTest) {
   EXPECT_EQ(1, counter);
   EXPECT_TRUE(scheduler.IsScheduled(&selfCancels));
 }
+
+INSTANTIATE_TEST_SUITE_P(SchedulingRecursionTests, SchedulingRecursionTest,
+                         testing::Bool());

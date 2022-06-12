@@ -367,5 +367,8 @@ class CommandScheduler final : public nt::NTSendable,
   frc::Watchdog m_watchdog;
 
   friend class CommandTestBase;
+
+  template <typename T>
+  friend class CommandTestBaseWithParam;
 };
 }  // namespace frc2
