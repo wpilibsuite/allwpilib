@@ -71,16 +71,16 @@ public class MerweScaledSigmaPoints<S extends Num> {
    * of the filter.
    *
    * @param x An array of the means.
-   * @param P Covariance of the filter.
+   * @param s Square-root covariance of the filter.
    * @return Two dimensional array of sigma points. Each column contains all of the sigmas for one
    *     dimension in the problem space. Ordered by Xi_0, Xi_{1..n}, Xi_{n+1..2n}.
    */
   @SuppressWarnings({"ParameterName", "LocalVariableName"})
-  public Matrix<S, ?> sigmaPoints(Matrix<S, N1> x, Matrix<S, S> P) {
+  public Matrix<S, ?> squareRootSigmaPoints(Matrix<S, N1> x, Matrix<S, S> s) {
     double lambda = Math.pow(m_alpha, 2) * (m_states.getNum() + m_kappa) - m_states.getNum();
+    double eta = Math.sqrt(lambda + m_states.getNum());
 
-    var intermediate = P.times(lambda + m_states.getNum());
-    var U = intermediate.lltDecompose(true); // Lower triangular
+    Matrix<S, S> U = s.times(eta);
 
     // 2 * states + 1 by states
     Matrix<S, ?> sigmas =

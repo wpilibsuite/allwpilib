@@ -144,7 +144,7 @@ public class DataLogReader implements Iterable<DataLogRecord> {
 
     int size = 0;
     for (int i = 0; i < sizeLen; i++) {
-      size |= ((int) (m_buf.get(pos + 1 + entryLen + i) & 0xff)) << (i * 8);
+      size |= (m_buf.get(pos + 1 + entryLen + i) & 0xff) << (i * 8);
     }
     return pos + headerLen + size;
   }

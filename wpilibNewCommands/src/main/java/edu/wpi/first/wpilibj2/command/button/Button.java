@@ -20,9 +20,11 @@ import java.util.function.BooleanSupplier;
  */
 public class Button extends Trigger {
   /**
-   * Default constructor; creates a button that is never pressed (unless {@link Button#get()} is
-   * overridden).
+   * Default constructor; creates a button that is never pressed.
+   *
+   * @deprecated Replace with {@code new Button(() -> false) }.
    */
+  @Deprecated(since = "2023")
   public Button() {}
 
   /**

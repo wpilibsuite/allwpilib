@@ -9,12 +9,30 @@ ext {
 
     nativeName = 'wpimath'
     devMain = 'edu.wpi.first.math.DevMain'
+
+    splitSetup = {
+        it.sources {
+            drakeCpp(CppSourceSet) {
+                source {
+                    srcDirs 'src/main/native/thirdparty/drake/src'
+                    include '**/*.cpp'
+                }
+                exportedHeaders {
+                    srcDirs 'src/main/native/thirdparty/drake/include',
+                            'src/main/native/thirdparty/eigen/include'
+                }
+            }
+        }
+    }
 }
 
 apply from: "${rootDir}/shared/jni/setupBuild.gradle"
 
 cppHeadersZip {
-    from('src/main/native/eigeninclude') {
+    from('src/main/native/thirdparty/drake/include') {
+        into '/'
+    }
+    from('src/main/native/thirdparty/eigen/include') {
         into '/'
     }
 }
@@ -24,7 +42,9 @@ model {
         all {
             it.sources.each {
                 it.exportedHeaders {
-                    srcDirs 'src/main/native/include', 'src/main/native/eigeninclude'
+                    srcDirs 'src/main/native/include',
+                            'src/main/native/thirdparty/drake/include',
+                            'src/main/native/thirdparty/eigen/include'
                 }
             }
         }

@@ -21,7 +21,8 @@ def main():
 
     # Delete old install
     for d in [
-            "src/main/native/cpp/drake", "src/main/native/include/drake",
+            "src/main/native/thirdparty/drake/src",
+            "src/main/native/thirdparty/drake/include",
             "src/test/native/cpp/drake", "src/test/native/include/drake"
     ]:
         shutil.rmtree(os.path.join(wpimath, d), ignore_errors=True)
@@ -30,7 +31,7 @@ def main():
     src_files = walk_cwd_and_copy_if(
         lambda dp, f: f in
         ["drake_assert_and_throw.cc", "discrete_algebraic_riccati_equation.cc"],
-        os.path.join(wpimath, "src/main/native/cpp/drake"))
+        os.path.join(wpimath, "src/main/native/thirdparty/drake/src"))
 
     # Copy drake header files into allwpilib
     include_files = walk_cwd_and_copy_if(
@@ -38,7 +39,8 @@ def main():
             "drake_assert.h", "drake_assertion_error.h",
             "is_approx_equal_abstol.h", "never_destroyed.h", "drake_copyable.h",
             "drake_throw.h", "discrete_algebraic_riccati_equation.h"
-        ], os.path.join(wpimath, "src/main/native/include/drake"))
+        ],
+        os.path.join(wpimath, "src/main/native/thirdparty/drake/include/drake"))
 
     # Copy drake test source files into allwpilib
     os.chdir(os.path.join(repo, "math/test"))
@@ -54,18 +56,20 @@ def main():
 
     for f in src_files:
         comment_out_invalid_includes(
-            f, [os.path.join(wpimath, "src/main/native/include")])
+            f,
+            [os.path.join(wpimath, "src/main/native/thirdparty/drake/include")])
     for f in include_files:
         comment_out_invalid_includes(
-            f, [os.path.join(wpimath, "src/main/native/include")])
+            f,
+            [os.path.join(wpimath, "src/main/native/thirdparty/drake/include")])
     for f in test_src_files:
         comment_out_invalid_includes(f, [
-            os.path.join(wpimath, "src/main/native/include"),
+            os.path.join(wpimath, "src/main/native/thirdparty/drake/include"),
             os.path.join(wpimath, "src/test/native/include")
         ])
     for f in test_include_files:
         comment_out_invalid_includes(f, [
-            os.path.join(wpimath, "src/main/native/include"),
+            os.path.join(wpimath, "src/main/native/thirdparty/drake/include"),
             os.path.join(wpimath, "src/test/native/include")
         ])
 

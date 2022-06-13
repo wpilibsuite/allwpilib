@@ -247,7 +247,6 @@ model {
             }
         }
         netconsoleServer(NativeExecutableSpec) {
-            targetBuildTypes 'release'
             sources {
                 cpp {
                     source {
@@ -267,7 +266,6 @@ model {
             }
         }
         netconsoleTee(NativeExecutableSpec) {
-            targetBuildTypes 'release'
             sources {
                 cpp {
                     source {

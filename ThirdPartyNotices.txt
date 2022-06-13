@@ -32,8 +32,7 @@ Feather Icons         wpinet/src/main/native/resources/feather-*
 jQuery                wpinet/src/main/native/resources/jquery-*
 popper.js             wpinet/src/main/native/resources/popper-*
 units                 wpimath/src/main/native/include/units/
-Eigen                 wpimath/src/main/native/eigeninclude/
-                      wpimath/src/main/native/include/unsupported/
+Eigen                 wpimath/src/main/native/thirdparty/eigen/include/
 StackWalker           wpiutil/src/main/native/windows/StackWalker.*
 TCB span              wpiutil/src/main/native/thirdparty/include/wpi/span.h
                       wpiutil/src/test/native/cpp/span/
@@ -44,8 +43,9 @@ Team 254 Library      wpilibj/src/main/java/edu/wpi/first/wpilibj/spline/SplineP
                       wpilibc/src/main/native/include/trajectory/TrajectoryParameterizer.h
                       wpilibc/src/main/native/cpp/trajectory/TrajectoryParameterizer.cpp
 Portable File Dialogs wpigui/src/main/native/include/portable-file-dialogs.h
-Drake                 wpimath/src/main/native/cpp/drake/common/drake_assert_and_throw.cpp
-                      wpimath/src/main/native/cpp/drake/math/discrete_algebraic_riccati_equation.cpp
+Drake                 wpimath/src/main/native/thirdparty/drake/
+                      wpimath/src/test/native/cpp/drake/
+                      wpimath/src/test/native/include/drake/
 V8 export-template    wpiutil/src/main/native/include/wpi/SymbolExports.h
 
 ==============================================================================

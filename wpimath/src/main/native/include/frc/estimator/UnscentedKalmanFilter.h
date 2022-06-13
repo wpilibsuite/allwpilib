@@ -35,6 +35,10 @@ namespace frc {
  * https://file.tavsys.net/control/controls-engineering-in-frc.pdf chapter 9
  * "Stochastic control theory".
  *
+ * <p> This class implements a square-root-form unscented Kalman filter
+ * (SR-UKF). For more information about the SR-UKF, see
+ * https://www.researchgate.net/publication/3908304.
+ *
  * @tparam States The number of states.
  * @tparam Inputs The number of inputs.
  * @tparam Outputs The number of outputs.
@@ -111,24 +115,37 @@ class UnscentedKalmanFilter {
       units::second_t dt);
 
   /**
-   * Returns the error covariance matrix P.
+   * Returns the square-root error covariance matrix S.
    */
-  const StateMatrix& P() const { return m_P; }
+  const StateMatrix& S() const { return m_S; }
 
   /**
-   * Returns an element of the error covariance matrix P.
+   * Returns an element of the square-root error covariance matrix S.
    *
-   * @param i Row of P.
-   * @param j Column of P.
+   * @param i Row of S.
+   * @param j Column of S.
    */
-  double P(int i, int j) const { return m_P(i, j); }
+  double S(int i, int j) const { return m_S(i, j); }
 
   /**
-   * Set the current error covariance matrix P.
+   * Set the current square-root error covariance matrix S.
+   *
+   * @param S The square-root error covariance matrix S.
+   */
+  void SetS(const StateMatrix& S) { m_S = S; }
+
+  /**
+   * Returns the reconstructed error covariance matrix P.
+   */
+  StateMatrix P() const { return m_S.transpose() * m_S; }
+
+  /**
+   * Set the current square-root error covariance matrix S by taking the square
+   * root of P.
    *
    * @param P The error covariance matrix P.
    */
-  void SetP(const StateMatrix& P) { m_P = P; }
+  void SetP(const StateMatrix& P) { m_S = P.llt().matrixU(); }
 
   /**
    * Returns the state estimate x-hat.
@@ -162,7 +179,7 @@ class UnscentedKalmanFilter {
    */
   void Reset() {
     m_xHat.setZero();
-    m_P.setZero();
+    m_S.setZero();
     m_sigmasF.setZero();
   }
 
@@ -254,7 +271,7 @@ class UnscentedKalmanFilter {
       m_residualFuncY;
   std::function<StateVector(const StateVector&, const StateVector&)> m_addFuncX;
   StateVector m_xHat;
-  StateMatrix m_P;
+  StateMatrix m_S;
   StateMatrix m_contQ;
   Matrixd<Outputs, Outputs> m_contR;
   Matrixd<States, 2 * States + 1> m_sigmasF;

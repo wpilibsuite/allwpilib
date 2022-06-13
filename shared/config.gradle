@@ -2,6 +2,10 @@ import org.gradle.internal.os.OperatingSystem
 
 nativeUtils.skipInstallPdb = project.hasProperty('buildServer')
 
+if (project.hasProperty('ciDebugOnly')) {
+    toolchainsPlugin.registerReleaseBuildType = false
+}
+
 nativeUtils.addWpiNativeUtils()
 nativeUtils.withRoboRIO()
 nativeUtils.withRaspbian()
