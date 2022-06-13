@@ -61,7 +61,7 @@ TEST_P(SchedulingRecursionTest, DefaultCommand) {
   scheduler.Run();
   scheduler.Run();
   EXPECT_FALSE(scheduler.IsScheduled(&selfCancels));
-  EXPECT_TRUE(scheduler.IsScheduled(&other));
+  EXPECT_TRUE(scheduler.IsScheduled(scheduler.GetDefaultCommand(&requirement)));
   scheduler.Run();
   EXPECT_TRUE(hasOtherRun);
 }
@@ -90,7 +90,7 @@ TEST_F(SchedulingRecursionTest, CancelFromEnd) {
 
   EXPECT_NO_THROW({ scheduler.Cancel(&selfCancels); });
   EXPECT_EQ(1, counter);
-  EXPECT_TRUE(scheduler.IsScheduled(&selfCancels));
+  EXPECT_FALSE(scheduler.IsScheduled(&selfCancels));
 }
 
 INSTANTIATE_TEST_SUITE_P(SchedulingRecursionTests, SchedulingRecursionTest,
