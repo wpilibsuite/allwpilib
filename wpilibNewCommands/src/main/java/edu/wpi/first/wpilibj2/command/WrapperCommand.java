@@ -17,7 +17,7 @@ import java.util.Set;
  * them to a group will throw an exception.
  */
 public abstract class WrapperCommand implements Command {
-  private final Command m_command;
+  protected final Command m_command;
 
   /**
    * Wrap a command.
