@@ -29,7 +29,10 @@ public class Robot extends TimedRobot {
   private final PowerDistribution m_powerDistribution = new PowerDistribution();
 
   /** Used to calculate the resistance of channel 1. */
-  private final ResistanceCalculator m_resistCalc = new ResistanceCalculator();
+  private final ResistanceCalculator m_resistCalc1 = new ResistanceCalculator();
+  
+  /** Used to calculate the total resistance of the robot. */
+  private final ResistanceCalculator m_resistCalcTotal = new ResistanceCalculator();
 
   /** The motor plugged into channel 1. */
   private final MotorController m_motor = new PWMSparkMax(0);
@@ -46,9 +49,14 @@ public class Robot extends TimedRobot {
     var chan1Current = m_powerDistribution.getCurrent(kChannel);
     // Get the voltage given to the motor plugged into channel 1.
     var chan1Voltage = m_motor.get() * RobotController.getBatteryVoltage();
+    
+    var robotCurrent = m_powerDistribution.getTotalCurrent();
+    var robotVoltage = m_powerDistribution.getVoltage();
 
     // Calculate and log channel 1's resistance
     SmartDashboard.putNumber(
-        "Channel 1 resistance", m_resistCalc.calculate(chan1Current, chan1Voltage));
+        "Channel 1 resistance", m_resistCalc1.calculate(chan1Current, chan1Voltage));
+    SmartDashboard.putNumber(
+        "Robot resistance", m_resistCalcTotal.calculate(robotCurrent, robotVoltage));
   }
 }
