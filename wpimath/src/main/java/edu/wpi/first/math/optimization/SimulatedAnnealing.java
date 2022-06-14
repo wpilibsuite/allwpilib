@@ -12,7 +12,10 @@ import java.util.function.Function;
  * An implementation of the Simulated Annealing stochastic nonlinear optimization method for finding
  * the global minimum cost.
  */
-public class SimulatedAnnealing {
+public final class SimulatedAnnealing {
+
+  private SimulatedAnnealing() {}
+
   /**
    * Runs the Simulated Annealing algorithm on a Vector that defines the state.
    *
@@ -42,7 +45,7 @@ public class SimulatedAnnealing {
 
     Vector<T> state = initialGuess;
 
-    while (epoch++ < epochs) {
+    while (epoch < epochs) {
       temperature = initialTemperature / epoch;
 
       Vector<T> proposedState = getNeighbor.apply(state);
@@ -60,6 +63,8 @@ public class SimulatedAnnealing {
         min = proposedStateCost;
         minState = proposedState;
       }
+
+      epoch++;
     }
     return minState;
   }
