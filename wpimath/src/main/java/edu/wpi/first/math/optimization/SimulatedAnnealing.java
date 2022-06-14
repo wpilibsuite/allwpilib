@@ -17,12 +17,13 @@ public class SimulatedAnnealing {
    * Runs the Simulated Annealing algorithm on a Vector that defines the state.
    *
    * @param initialGuess The initial state.
-   * @param epochs Number of iterations to run where a random neighbor state will be generated everytime and
-   *               will become the new state with some probability defined by temperature and the cost delta.
-   * @param initialTemperature The initial temperature that will inversely decrease and is used
-   *                           to generate the probability that a worse state is accepted during iteration.
-   * @param getNeighbor Function to generate a random neighbor of current state vector which is defined as
-   *                    another state that is derived from the current one with some randomness.
+   * @param epochs Number of iterations to run where a random neighbor state will be generated
+   *     everytime and will become the new state with some probability defined by temperature and
+   *     the cost delta.
+   * @param initialTemperature The initial temperature that will inversely decrease and is used to
+   *     generate the probability that a worse state is accepted during iteration.
+   * @param getNeighbor Function to generate a random neighbor of current state vector which is
+   *     defined as another state that is derived from the current one with some randomness.
    * @param getCost Function to get the double cost of a state vector.
    * @param <T> Natural number defining the number of rows in the state vector.
    * @return The optimized state vector.
