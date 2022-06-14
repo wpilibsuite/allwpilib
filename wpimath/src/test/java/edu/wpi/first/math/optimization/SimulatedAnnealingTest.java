@@ -16,7 +16,7 @@ import org.junit.jupiter.api.Test;
 class SimulatedAnnealingTest {
   @Test
   void testDoubleFunctionOptimizationHeartBeat() {
-    DoubleFunction<Double> function = (x) -> -(x + Math.sin(x)) * Math.exp(-x * x) + 1;
+    DoubleFunction<Double> function = x -> -(x + Math.sin(x)) * Math.exp(-x * x) + 1;
 
     double stepSize = 10.0;
 
@@ -25,17 +25,17 @@ class SimulatedAnnealingTest {
             VecBuilder.fill(-1),
             5000,
             2.0,
-            (x) ->
+            x ->
                 VecBuilder.fill(
                     MathUtil.clamp(x.get(0, 0) + (Math.random() - 0.5) * stepSize, -3, 3)),
-            (x) -> function.apply(x.get(0, 0)));
+            x -> function.apply(x.get(0, 0)));
 
     assertTrue(ans.isEqual(VecBuilder.fill(0.68), 1E-1));
   }
 
   @Test
   void testDoubleFunctionOptimizationMultimodal() {
-    DoubleFunction<Double> function = (x) -> Math.sin(x) + Math.sin((10.0 / 3.0) * x);
+    DoubleFunction<Double> function = x -> Math.sin(x) + Math.sin((10.0 / 3.0) * x);
 
     double stepSize = 10.0;
 
@@ -44,10 +44,10 @@ class SimulatedAnnealingTest {
             VecBuilder.fill(-1),
             5000,
             2.0,
-            (x) ->
+            x ->
                 VecBuilder.fill(
                     MathUtil.clamp(x.get(0, 0) + (Math.random() - 0.5) * stepSize, 0, 7)),
-            (x) -> function.apply(x.get(0, 0)));
+            x -> function.apply(x.get(0, 0)));
 
     assertTrue(ans.isEqual(VecBuilder.fill(5.146), 1E-1));
   }
