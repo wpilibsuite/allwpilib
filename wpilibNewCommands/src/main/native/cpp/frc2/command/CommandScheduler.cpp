@@ -19,16 +19,14 @@
 #include <wpi/sendable/SendableRegistry.h>
 
 #include "frc2/command/CommandGroupBase.h"
-#include "frc2/command/CommandState.h"
 #include "frc2/command/Subsystem.h"
 
 using namespace frc2;
 
 class CommandScheduler::Impl {
  public:
-  // A map from commands to their scheduling state.  Also used as a set of the
-  // currently-running commands.
-  wpi::DenseMap<Command*, CommandState> scheduledCommands;
+  // A set of the currently-running commands.
+  wpi::SmallSet<Command*, 12> scheduledCommands;
 
   // A map from required subsystems to their requiring commands.  Also used as a
   // set of the currently-required subsystems.
@@ -56,7 +54,7 @@ class CommandScheduler::Impl {
   // scheduled/canceled during run
 
   bool inRunLoop = false;
-  wpi::DenseMap<Command*, bool> toSchedule;
+  wpi::SmallVector<Command*, 4> toSchedule;
   wpi::SmallVector<Command*, 4> toCancel;
 };
 
@@ -112,9 +110,9 @@ void CommandScheduler::ClearButtons() {
   m_impl->activeButtonLoop->Clear();
 }
 
-void CommandScheduler::Schedule(bool interruptible, Command* command) {
+void CommandScheduler::Schedule(Command* command) {
   if (m_impl->inRunLoop) {
-    m_impl->toSchedule.try_emplace(command, interruptible);
+    m_impl->toSchedule.emplace_back(command);
     return;
   }
 
@@ -126,7 +124,7 @@ void CommandScheduler::Schedule(bool interruptible, Command* command) {
   }
   if (m_impl->disabled ||
       (frc::RobotState::IsDisabled() && !command->RunsWhenDisabled()) ||
-      ContainsKey(m_impl->scheduledCommands, command)) {
+      m_impl->scheduledCommands.contains(command)) {
     return;
   }
 
@@ -139,8 +137,8 @@ void CommandScheduler::Schedule(bool interruptible, Command* command) {
   for (auto&& i1 : m_impl->requirements) {
     if (requirements.find(i1.first) != requirements.end()) {
       isDisjoint = false;
-      allInterruptible &=
-          m_impl->scheduledCommands[i1.second].IsInterruptible();
+      allInterruptible &= (i1.second->GetInterruptionBehavior() ==
+                           Command::InterruptionBehavior::kCancelSelf);
       intersection.emplace_back(i1.second);
     }
   }
@@ -151,7 +149,7 @@ void CommandScheduler::Schedule(bool interruptible, Command* command) {
         Cancel(cmdToCancel);
       }
     }
-    m_impl->scheduledCommands[command] = CommandState{interruptible};
+    m_impl->scheduledCommands.insert(command);
     for (auto&& requirement : requirements) {
       m_impl->requirements[requirement] = command;
     }
@@ -163,33 +161,15 @@ void CommandScheduler::Schedule(bool interruptible, Command* command) {
   }
 }
 
-void CommandScheduler::Schedule(Command* command) {
-  Schedule(true, command);
-}
-
-void CommandScheduler::Schedule(bool interruptible,
-                                wpi::span<Command* const> commands) {
-  for (auto command : commands) {
-    Schedule(interruptible, command);
-  }
-}
-
-void CommandScheduler::Schedule(bool interruptible,
-                                std::initializer_list<Command*> commands) {
-  for (auto command : commands) {
-    Schedule(interruptible, command);
-  }
-}
-
 void CommandScheduler::Schedule(wpi::span<Command* const> commands) {
   for (auto command : commands) {
-    Schedule(true, command);
+    Schedule(command);
   }
 }
 
 void CommandScheduler::Schedule(std::initializer_list<Command*> commands) {
   for (auto command : commands) {
-    Schedule(true, command);
+    Schedule(command);
   }
 }
 
@@ -218,10 +198,7 @@ void CommandScheduler::Run() {
 
   m_impl->inRunLoop = true;
   // Run scheduled commands, remove finished commands.
-  for (auto iterator = m_impl->scheduledCommands.begin();
-       iterator != m_impl->scheduledCommands.end(); iterator++) {
-    Command* command = iterator->getFirst();
-
+  for (Command* command : m_impl->scheduledCommands) {
     if (!command->RunsWhenDisabled() && frc::RobotState::IsDisabled()) {
       Cancel(command);
       continue;
@@ -243,14 +220,14 @@ void CommandScheduler::Run() {
         m_impl->requirements.erase(requirement);
       }
 
-      m_impl->scheduledCommands.erase(iterator);
+      m_impl->scheduledCommands.erase(command);
       m_watchdog.AddEpoch(command->GetName() + ".End(false)");
     }
   }
   m_impl->inRunLoop = false;
 
-  for (auto&& commandInterruptible : m_impl->toSchedule) {
-    Schedule(commandInterruptible.second, commandInterruptible.first);
+  for (Command* command : m_impl->toSchedule) {
+    Schedule(command);
   }
 
   for (auto&& command : m_impl->toCancel) {
@@ -336,7 +313,7 @@ void CommandScheduler::Cancel(Command* command) {
   if (find == m_impl->scheduledCommands.end()) {
     return;
   }
-  m_impl->scheduledCommands.erase(find);
+  m_impl->scheduledCommands.erase(*find);
   for (auto&& requirement : m_impl->requirements) {
     if (requirement.second == command) {
       m_impl->requirements.erase(requirement.first);
@@ -364,20 +341,11 @@ void CommandScheduler::Cancel(std::initializer_list<Command*> commands) {
 void CommandScheduler::CancelAll() {
   wpi::SmallVector<Command*, 16> commands;
   for (auto&& command : m_impl->scheduledCommands) {
-    commands.emplace_back(command.first);
+    commands.emplace_back(command);
   }
   Cancel(commands);
 }
 
-units::second_t CommandScheduler::TimeSinceScheduled(
-    const Command* command) const {
-  auto find = m_impl->scheduledCommands.find(command);
-  if (find != m_impl->scheduledCommands.end()) {
-    return find->second.TimeSinceInitialized();
-  } else {
-    return -1_s;
-  }
-}
 bool CommandScheduler::IsScheduled(
     wpi::span<const Command* const> commands) const {
   for (auto command : commands) {
@@ -399,8 +367,7 @@ bool CommandScheduler::IsScheduled(
 }
 
 bool CommandScheduler::IsScheduled(const Command* command) const {
-  return m_impl->scheduledCommands.find(command) !=
-         m_impl->scheduledCommands.end();
+  return m_impl->scheduledCommands.contains(command);
 }
 
 Command* CommandScheduler::Requiring(const Subsystem* subsystem) const {
@@ -458,9 +425,9 @@ void CommandScheduler::InitSendable(nt::NTSendableBuilder& builder) {
 
     wpi::SmallVector<std::string, 8> names;
     wpi::SmallVector<double, 8> ids;
-    for (auto&& command : m_impl->scheduledCommands) {
-      names.emplace_back(command.first->GetName());
-      uintptr_t ptrTmp = reinterpret_cast<uintptr_t>(command.first);
+    for (Command* command : m_impl->scheduledCommands) {
+      names.emplace_back(command->GetName());
+      uintptr_t ptrTmp = reinterpret_cast<uintptr_t>(command);
       ids.emplace_back(static_cast<double>(ptrTmp));
     }
     nt::NetworkTableEntry(namesEntry).SetStringArray(names);

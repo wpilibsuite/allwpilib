@@ -95,6 +95,11 @@ public abstract class WrapperCommand implements Command {
     return m_command.runsWhenDisabled();
   }
 
+  @Override
+  public InterruptionBehavior getInterruptionBehavior() {
+    return m_command.getInterruptionBehavior();
+  }
+
   /**
    * Gets the name of this Command.
    *

@@ -9,19 +9,20 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.ValueSource;
+import org.junit.jupiter.params.provider.EnumSource;
 
 class SchedulingRecursionTest extends CommandTestBase {
   /**
    * <a href="https://github.com/wpilibsuite/allwpilib/issues/4259">wpilibsuite/allwpilib#4259</a>.
    */
-  @ValueSource(booleans = {true, false})
+  @EnumSource(InterruptionBehavior.class)
   @ParameterizedTest
-  void cancelFromInitialize(boolean interruptible) {
+  void cancelFromInitialize(InterruptionBehavior interruptionBehavior) {
     try (CommandScheduler scheduler = new CommandScheduler()) {
       AtomicBoolean hasOtherRun = new AtomicBoolean();
       Subsystem requirement = new SubsystemBase() {};
@@ -35,14 +36,18 @@ class SchedulingRecursionTest extends CommandTestBase {
             public void initialize() {
               scheduler.cancel(this);
             }
+
+            @Override
+            public InterruptionBehavior getInterruptionBehavior() {
+              return interruptionBehavior;
+            }
           };
       Command other = new RunCommand(() -> hasOtherRun.set(true), requirement);
 
       assertDoesNotThrow(
           () -> {
-            scheduler.schedule(interruptible, selfCancels);
+            scheduler.schedule(selfCancels);
             scheduler.run();
-            // interruptibility of new arrival isn't checked
             scheduler.schedule(other);
           });
       assertFalse(scheduler.isScheduled(selfCancels));
@@ -52,9 +57,9 @@ class SchedulingRecursionTest extends CommandTestBase {
     }
   }
 
-  @ValueSource(booleans = {true, false})
+  @EnumSource(InterruptionBehavior.class)
   @ParameterizedTest
-  void defaultCommand(boolean interruptible) {
+  void defaultCommand(InterruptionBehavior interruptionBehavior) {
     try (CommandScheduler scheduler = new CommandScheduler()) {
       AtomicBoolean hasOtherRun = new AtomicBoolean();
       Subsystem requirement = new SubsystemBase() {};
@@ -68,13 +73,18 @@ class SchedulingRecursionTest extends CommandTestBase {
             public void initialize() {
               scheduler.cancel(this);
             }
+
+            @Override
+            public InterruptionBehavior getInterruptionBehavior() {
+              return interruptionBehavior;
+            }
           };
       Command other = new RunCommand(() -> hasOtherRun.set(true), requirement);
       scheduler.setDefaultCommand(requirement, other);
 
       assertDoesNotThrow(
           () -> {
-            scheduler.schedule(interruptible, selfCancels);
+            scheduler.schedule(selfCancels);
             scheduler.run();
           });
       scheduler.run();
@@ -161,12 +171,13 @@ class SchedulingRecursionTest extends CommandTestBase {
   }
 
   @ParameterizedTest
-  @ValueSource(booleans = {true, false})
-  void scheduleInitializeFromDefaultCommand(boolean interruptible) {
+  @EnumSource(InterruptionBehavior.class)
+  void scheduleInitializeFromDefaultCommand(InterruptionBehavior interruptionBehavior) {
     try (CommandScheduler scheduler = new CommandScheduler()) {
       AtomicInteger counter = new AtomicInteger();
       Subsystem requirement = new SubsystemBase() {};
-      Command other = new InstantCommand(() -> {}, requirement);
+      Command other =
+          new InstantCommand(() -> {}, requirement).withInterruptBehavior(interruptionBehavior);
       Command defaultCommand =
           new CommandBase() {
             {
@@ -176,7 +187,7 @@ class SchedulingRecursionTest extends CommandTestBase {
             @Override
             public void initialize() {
               counter.incrementAndGet();
-              scheduler.schedule(interruptible, other);
+              scheduler.schedule(other);
             }
           };
 

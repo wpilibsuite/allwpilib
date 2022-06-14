@@ -13,9 +13,8 @@ using namespace frc2;
 
 Trigger::Trigger(const Trigger& other) = default;
 
-Trigger Trigger::WhenActive(Command* command, bool interruptible) {
-  this->Rising().IfHigh(
-      [command, interruptible] { command->Schedule(interruptible); });
+Trigger Trigger::WhenActive(Command* command) {
+  this->Rising().IfHigh([command] { command->Schedule(); });
   return *this;
 }
 
@@ -30,8 +29,8 @@ Trigger Trigger::WhenActive(std::function<void()> toRun,
   return WhenActive(InstantCommand(std::move(toRun), requirements));
 }
 
-Trigger Trigger::WhileActiveContinous(Command* command, bool interruptible) {
-  this->IfHigh([command, interruptible] { command->Schedule(interruptible); });
+Trigger Trigger::WhileActiveContinous(Command* command) {
+  this->IfHigh([command] { command->Schedule(); });
   this->Falling().IfHigh([command] { command->Cancel(); });
   return *this;
 }
@@ -48,16 +47,14 @@ Trigger Trigger::WhileActiveContinous(
   return WhileActiveContinous(InstantCommand(std::move(toRun), requirements));
 }
 
-Trigger Trigger::WhileActiveOnce(Command* command, bool interruptible) {
-  this->Rising().IfHigh(
-      [command, interruptible] { command->Schedule(interruptible); });
+Trigger Trigger::WhileActiveOnce(Command* command) {
+  this->Rising().IfHigh([command] { command->Schedule(); });
   this->Falling().IfHigh([command] { command->Cancel(); });
   return *this;
 }
 
-Trigger Trigger::WhenInactive(Command* command, bool interruptible) {
-  this->Falling().IfHigh(
-      [command, interruptible] { command->Schedule(interruptible); });
+Trigger Trigger::WhenInactive(Command* command) {
+  this->Falling().IfHigh([command] { command->Schedule(); });
   return *this;
 }
 
@@ -72,12 +69,12 @@ Trigger Trigger::WhenInactive(std::function<void()> toRun,
   return WhenInactive(InstantCommand(std::move(toRun), requirements));
 }
 
-Trigger Trigger::ToggleWhenActive(Command* command, bool interruptible) {
-  this->Rising().IfHigh([command, interruptible] {
+Trigger Trigger::ToggleWhenActive(Command* command) {
+  this->Rising().IfHigh([command] {
     if (command->IsScheduled()) {
       command->Cancel();
     } else {
-      command->Schedule(interruptible);
+      command->Schedule();
     }
   });
   return *this;

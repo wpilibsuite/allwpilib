@@ -4,6 +4,8 @@
 
 #include "frc2/command/WrapperCommand.h"
 
+#include "frc2/command/Command.h"
+
 using namespace frc2;
 
 WrapperCommand::WrapperCommand(std::unique_ptr<Command>&& command) {
@@ -32,4 +34,12 @@ void WrapperCommand::End(bool interrupted) {
 
 bool WrapperCommand::RunsWhenDisabled() const {
   return m_command->RunsWhenDisabled();
+}
+
+Command::InterruptionBehavior WrapperCommand::GetInterruptionBehavior() const {
+  return m_command->GetInterruptionBehavior();
+}
+
+wpi::SmallSet<Subsystem*, 4> WrapperCommand::GetRequirements() const {
+  return m_command->GetRequirements();
 }

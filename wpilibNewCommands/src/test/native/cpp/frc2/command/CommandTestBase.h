@@ -10,6 +10,7 @@
 #include <frc/simulation/DriverStationSim.h>
 
 #include "frc2/command/CommandGroupBase.h"
+#include "frc2/command/CommandHelper.h"
 #include "frc2/command/CommandScheduler.h"
 #include "frc2/command/SetUtilities.h"
 #include "frc2/command/SubsystemBase.h"
@@ -26,7 +27,7 @@ class CommandTestBase : public ::testing::Test {
   class TestSubsystem : public SubsystemBase {};
 
  protected:
-  class MockCommand : public Command {
+  class MockCommand : public CommandHelper<CommandBase, MockCommand> {
    public:
     MOCK_CONST_METHOD0(GetRequirements, wpi::SmallSet<Subsystem*, 4>());
     MOCK_METHOD0(IsFinished, bool());
@@ -65,7 +66,7 @@ class CommandTestBase : public ::testing::Test {
           .WillRepeatedly(::testing::Return(m_requirements));
     }
 
-    MockCommand(const MockCommand& other) : Command{other} {}
+    MockCommand(const MockCommand& other) : CommandHelper{other} {}
 
     void SetFinished(bool finished) {
       EXPECT_CALL(*this, IsFinished())
@@ -75,11 +76,6 @@ class CommandTestBase : public ::testing::Test {
     ~MockCommand() {  // NOLINT
       auto& scheduler = CommandScheduler::GetInstance();
       scheduler.Cancel(this);
-    }
-
-   protected:
-    std::unique_ptr<Command> TransferOwnership() && {  // NOLINT
-      return std::make_unique<MockCommand>(std::move(*this));
     }
 
    private:
