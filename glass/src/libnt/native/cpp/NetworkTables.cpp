@@ -381,8 +381,11 @@ static void EmitEntryValueReadonly(NetworkTablesModel::Entry& entry,
       break;
     case NT_DOUBLE: {
       unsigned char precision = (flags & NetworkTablesFlags_Precision) >> 6;
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wformat-nonliteral"
       ImGui::LabelText("double", fmt::format("%.{}f", precision).c_str(),
                        val->GetDouble());
+#pragma GCC diagnostic pop
       break;
     }
     case NT_STRING: {
@@ -441,11 +444,14 @@ static void EmitEntryValueEditable(NetworkTablesModel::Entry& entry,
     case NT_DOUBLE: {
       double v = val->GetDouble();
       unsigned char precision = (flags & NetworkTablesFlags_Precision) >> 6;
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wformat-nonliteral"
       if (ImGui::InputDouble("double", &v, 0, 0,
                              fmt::format("%.{}f", precision).c_str(),
                              ImGuiInputTextFlags_EnterReturnsTrue)) {
         nt::SetEntryValue(entry.entry, nt::NetworkTableValue::MakeDouble(v));
       }
+#pragma GCC diagnostic pop
       break;
     }
     case NT_STRING: {
