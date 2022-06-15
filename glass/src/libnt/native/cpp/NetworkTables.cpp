@@ -380,8 +380,8 @@ static void EmitEntryValueReadonly(NetworkTablesModel::Entry& entry,
       ImGui::LabelText("boolean", "%s", val->GetBoolean() ? "true" : "false");
       break;
     case NT_DOUBLE: {
-      unsigned char precision =
-          (flags & NetworkTablesFlags_Precision) >> kNetworkTablesFlags_PrecisionBitShift;
+      unsigned char precision = (flags & NetworkTablesFlags_Precision) >>
+                                kNetworkTablesFlags_PrecisionBitShift;
 #ifdef __GNUC__
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wformat-nonliteral"
@@ -448,8 +448,8 @@ static void EmitEntryValueEditable(NetworkTablesModel::Entry& entry,
     }
     case NT_DOUBLE: {
       double v = val->GetDouble();
-      unsigned char precision =
-          (flags & NetworkTablesFlags_Precision) >> kNetworkTablesFlags_PrecisionBitShift;
+      unsigned char precision = (flags & NetworkTablesFlags_Precision) >>
+                                kNetworkTablesFlags_PrecisionBitShift;
 #ifdef __GNUC__
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wformat-nonliteral"
@@ -459,7 +459,7 @@ static void EmitEntryValueEditable(NetworkTablesModel::Entry& entry,
                              ImGuiInputTextFlags_EnterReturnsTrue)) {
         nt::SetEntryValue(entry.entry, nt::NetworkTableValue::MakeDouble(v));
       }
-#ifdef __GNUC__ 
+#ifdef __GNUC__
 #pragma GCC diagnostic pop
 #endif
       break;
@@ -767,8 +767,8 @@ void NetworkTablesFlagsSettings::Update() {
         "createNonCanonical",
         m_defaultFlags & NetworkTablesFlags_CreateNoncanonicalKeys);
     m_pPrecision = &storage.GetInt(
-        "precision",
-        (m_defaultFlags & NetworkTablesFlags_Precision) >> kNetworkTablesFlags_PrecisionBitShift);
+        "precision", (m_defaultFlags & NetworkTablesFlags_Precision) >>
+                         kNetworkTablesFlags_PrecisionBitShift);
   }
 
   m_flags &= ~(
