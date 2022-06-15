@@ -380,7 +380,8 @@ static void EmitEntryValueReadonly(NetworkTablesModel::Entry& entry,
       ImGui::LabelText("boolean", "%s", val->GetBoolean() ? "true" : "false");
       break;
     case NT_DOUBLE: {
-      unsigned char precision = (flags & NetworkTablesFlags_Precision) >> kPrecisionBitShift;
+      unsigned char precision =
+          (flags & NetworkTablesFlags_Precision) >> kPrecisionBitShift;
 #ifdef __GCC__
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wformat-nonliteral"
@@ -447,7 +448,8 @@ static void EmitEntryValueEditable(NetworkTablesModel::Entry& entry,
     }
     case NT_DOUBLE: {
       double v = val->GetDouble();
-      unsigned char precision = (flags & NetworkTablesFlags_Precision) >> kPrecisionBitShift;
+      unsigned char precision =
+          (flags & NetworkTablesFlags_Precision) >> kPrecisionBitShift;
 #ifdef __GCC__
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wformat-nonliteral"
@@ -765,7 +767,8 @@ void NetworkTablesFlagsSettings::Update() {
         "createNonCanonical",
         m_defaultFlags & NetworkTablesFlags_CreateNoncanonicalKeys);
     m_pPrecision = &storage.GetInt(
-        "precision", (m_defaultFlags & NetworkTablesFlags_Precision) >> kPrecisionBitShift);
+        "precision",
+        (m_defaultFlags & NetworkTablesFlags_Precision) >> kPrecisionBitShift);
   }
 
   m_flags &= ~(
