@@ -95,8 +95,9 @@ enum NetworkTablesFlags_ {
   NetworkTablesFlags_ShowFlags = 1 << 3,
   NetworkTablesFlags_ShowTimestamp = 1 << 4,
   NetworkTablesFlags_CreateNoncanonicalKeys = 1 << 5,
-  NetworkTablesFlags_Default = 1 & ~NetworkTablesFlags_ReadOnly &
-                               ~NetworkTablesFlags_CreateNoncanonicalKeys
+  NetworkTablesFlags_Precision = 0xff << 6,
+  NetworkTablesFlags_Default = (1 & ~NetworkTablesFlags_ReadOnly &
+                               ~NetworkTablesFlags_CreateNoncanonicalKeys) | (6 << 6),
 };
 
 void DisplayNetworkTables(
@@ -120,6 +121,7 @@ class NetworkTablesFlagsSettings {
   bool* m_pShowFlags = nullptr;
   bool* m_pShowTimestamp = nullptr;
   bool* m_pCreateNoncanonicalKeys = nullptr;
+  unsigned char m_precision;
   NetworkTablesFlags m_defaultFlags;  // NOLINT
   NetworkTablesFlags m_flags;         // NOLINT
 };

@@ -368,7 +368,7 @@ static std::shared_ptr<nt::Value> StringToStringArray(std::string_view in) {
   return nt::NetworkTableValue::MakeStringArray(std::move(out));
 }
 
-static void EmitEntryValueReadonly(NetworkTablesModel::Entry& entry) {
+static void EmitEntryValueReadonly(NetworkTablesModel::Entry& entry, NetworkTablesFlags flags) {
   auto& val = entry.value;
   if (!val) {
     return;
@@ -378,9 +378,11 @@ static void EmitEntryValueReadonly(NetworkTablesModel::Entry& entry) {
     case NT_BOOLEAN:
       ImGui::LabelText("boolean", "%s", val->GetBoolean() ? "true" : "false");
       break;
-    case NT_DOUBLE:
-      ImGui::LabelText("double", "%.6f", val->GetDouble());
+    case NT_DOUBLE: {
+      unsigned char precision = (flags & NetworkTablesFlags_Precision) >> 6;
+      ImGui::LabelText("double", fmt::format("%.{}f", precision).c_str(), val->GetDouble());
       break;
+    }
     case NT_STRING: {
       // GetString() comes from a std::string, so it's null terminated
       ImGui::LabelText("string", "%s", val->GetString().data());
@@ -417,7 +419,7 @@ static char* GetTextBuffer(std::string_view in) {
   return textBuffer;
 }
 
-static void EmitEntryValueEditable(NetworkTablesModel::Entry& entry) {
+static void EmitEntryValueEditable(NetworkTablesModel::Entry& entry, NetworkTablesFlags flags) {
   auto& val = entry.value;
   if (!val) {
     return;
@@ -435,8 +437,8 @@ static void EmitEntryValueEditable(NetworkTablesModel::Entry& entry) {
     }
     case NT_DOUBLE: {
       double v = val->GetDouble();
-      if (ImGui::InputDouble("double", &v, 0, 0, "%.6f",
-                             ImGuiInputTextFlags_EnterReturnsTrue)) {
+      unsigned char precision = (flags & NetworkTablesFlags_Precision) >> 6;
+      if (ImGui::InputDouble("double", &v, 0, 0, fmt::format("%.{}f", precision).c_str(), ImGuiInputTextFlags_EnterReturnsTrue)) {
         nt::SetEntryValue(entry.entry, nt::NetworkTableValue::MakeDouble(v));
       }
       break;
@@ -600,9 +602,9 @@ static void EmitEntry(NetworkTablesModel::Entry& entry, const char* name,
   ImGui::NextColumn();
 
   if (flags & NetworkTablesFlags_ReadOnly) {
-    EmitEntryValueReadonly(entry);
+    EmitEntryValueReadonly(entry, flags);
   } else {
-    EmitEntryValueEditable(entry);
+    EmitEntryValueEditable(entry, flags);
   }
   ImGui::NextColumn();
 
@@ -743,19 +745,22 @@ void NetworkTablesFlagsSettings::Update() {
     m_pCreateNoncanonicalKeys = &storage.GetBool(
         "createNonCanonical",
         m_defaultFlags & NetworkTablesFlags_CreateNoncanonicalKeys);
+    m_precision = storage.GetInt(
+        "precision", (m_defaultFlags & NetworkTablesFlags_Precision) >> 6);
   }
 
   m_flags &=
       ~(NetworkTablesFlags_TreeView | NetworkTablesFlags_ShowConnections |
         NetworkTablesFlags_ShowFlags | NetworkTablesFlags_ShowTimestamp |
-        NetworkTablesFlags_CreateNoncanonicalKeys);
+        NetworkTablesFlags_CreateNoncanonicalKeys | NetworkTablesFlags_Precision);
   m_flags |=
       (*m_pTreeView ? NetworkTablesFlags_TreeView : 0) |
       (*m_pShowConnections ? NetworkTablesFlags_ShowConnections : 0) |
       (*m_pShowFlags ? NetworkTablesFlags_ShowFlags : 0) |
       (*m_pShowTimestamp ? NetworkTablesFlags_ShowTimestamp : 0) |
       (*m_pCreateNoncanonicalKeys ? NetworkTablesFlags_CreateNoncanonicalKeys
-                                  : 0);
+                                  : 0) | 
+      (m_precision << 6);
 }
 
 void NetworkTablesFlagsSettings::DisplayMenu() {
@@ -766,6 +771,14 @@ void NetworkTablesFlagsSettings::DisplayMenu() {
   ImGui::MenuItem("Show Connections", "", m_pShowConnections);
   ImGui::MenuItem("Show Flags", "", m_pShowFlags);
   ImGui::MenuItem("Show Timestamp", "", m_pShowTimestamp);
+  if (ImGui::BeginMenu("Decimal Precision")) {
+    for (unsigned char i = 1; i <= 10; i++) {
+      if (ImGui::MenuItem(fmt::format("{}", i).c_str(), nullptr, i == m_precision)) {
+        m_precision = i;
+      }
+    }
+    ImGui::EndMenu();
+  }
   ImGui::Separator();
   ImGui::MenuItem("Allow creation of non-canonical keys", "",
                   m_pCreateNoncanonicalKeys);
