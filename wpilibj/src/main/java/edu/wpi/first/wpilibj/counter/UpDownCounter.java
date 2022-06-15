@@ -66,7 +66,7 @@ public class UpDownCounter implements Sendable, AutoCloseable {
   }
 
   @Override
-  public void close() throws Exception {
+  public void close() {
     SendableRegistry.remove(this);
     CounterJNI.freeCounter(m_handle);
     CounterJNI.suppressUnused(m_upSource);
