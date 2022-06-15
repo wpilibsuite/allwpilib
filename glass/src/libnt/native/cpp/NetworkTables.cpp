@@ -794,13 +794,12 @@ void NetworkTablesFlagsSettings::DisplayMenu() {
   ImGui::MenuItem("Show Flags", "", m_pShowFlags);
   ImGui::MenuItem("Show Timestamp", "", m_pShowTimestamp);
   if (ImGui::BeginMenu("Decimal Precision")) {
-    static const int precisionOptionAmounts = 10;
-    static const int precisionOptions[] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
-    for (int i = 0; i < precisionOptionAmounts; i++) {
-      const int precisionOption = precisionOptions[i];
-      if (ImGui::MenuItem(fmt::format("{}", precisionOption).c_str(), nullptr,
-                          precisionOption == *m_pPrecision)) {
-        *m_pPrecision = precisionOption;
+    static const char* precisionOptions[] = {"1", "2", "3", "4", "5",
+                                             "6", "7", "8", "9", "10"};
+    for (int i = 1; i <= 10; i++) {
+      if (ImGui::MenuItem(precisionOptions[i - 1], nullptr,
+                          i == *m_pPrecision)) {
+        *m_pPrecision = i;
       }
     }
     ImGui::EndMenu();
