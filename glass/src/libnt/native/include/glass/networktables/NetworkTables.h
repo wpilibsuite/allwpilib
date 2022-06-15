@@ -97,7 +97,8 @@ enum NetworkTablesFlags_ {
   NetworkTablesFlags_CreateNoncanonicalKeys = 1 << 5,
   NetworkTablesFlags_Precision = 0xff << 6,
   NetworkTablesFlags_Default = (1 & ~NetworkTablesFlags_ReadOnly &
-                               ~NetworkTablesFlags_CreateNoncanonicalKeys) | (6 << 6),
+                                ~NetworkTablesFlags_CreateNoncanonicalKeys) |
+                               (6 << 6),
 };
 
 void DisplayNetworkTables(

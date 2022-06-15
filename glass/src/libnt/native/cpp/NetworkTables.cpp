@@ -368,7 +368,8 @@ static std::shared_ptr<nt::Value> StringToStringArray(std::string_view in) {
   return nt::NetworkTableValue::MakeStringArray(std::move(out));
 }
 
-static void EmitEntryValueReadonly(NetworkTablesModel::Entry& entry, NetworkTablesFlags flags) {
+static void EmitEntryValueReadonly(NetworkTablesModel::Entry& entry,
+                                   NetworkTablesFlags flags) {
   auto& val = entry.value;
   if (!val) {
     return;
@@ -380,7 +381,8 @@ static void EmitEntryValueReadonly(NetworkTablesModel::Entry& entry, NetworkTabl
       break;
     case NT_DOUBLE: {
       unsigned char precision = (flags & NetworkTablesFlags_Precision) >> 6;
-      ImGui::LabelText("double", fmt::format("%.{}f", precision).c_str(), val->GetDouble());
+      ImGui::LabelText("double", fmt::format("%.{}f", precision).c_str(),
+                       val->GetDouble());
       break;
     }
     case NT_STRING: {
@@ -419,7 +421,8 @@ static char* GetTextBuffer(std::string_view in) {
   return textBuffer;
 }
 
-static void EmitEntryValueEditable(NetworkTablesModel::Entry& entry, NetworkTablesFlags flags) {
+static void EmitEntryValueEditable(NetworkTablesModel::Entry& entry,
+                                   NetworkTablesFlags flags) {
   auto& val = entry.value;
   if (!val) {
     return;
@@ -438,7 +441,9 @@ static void EmitEntryValueEditable(NetworkTablesModel::Entry& entry, NetworkTabl
     case NT_DOUBLE: {
       double v = val->GetDouble();
       unsigned char precision = (flags & NetworkTablesFlags_Precision) >> 6;
-      if (ImGui::InputDouble("double", &v, 0, 0, fmt::format("%.{}f", precision).c_str(), ImGuiInputTextFlags_EnterReturnsTrue)) {
+      if (ImGui::InputDouble("double", &v, 0, 0,
+                             fmt::format("%.{}f", precision).c_str(),
+                             ImGuiInputTextFlags_EnterReturnsTrue)) {
         nt::SetEntryValue(entry.entry, nt::NetworkTableValue::MakeDouble(v));
       }
       break;
@@ -749,17 +754,17 @@ void NetworkTablesFlagsSettings::Update() {
         "precision", (m_defaultFlags & NetworkTablesFlags_Precision) >> 6);
   }
 
-  m_flags &=
-      ~(NetworkTablesFlags_TreeView | NetworkTablesFlags_ShowConnections |
-        NetworkTablesFlags_ShowFlags | NetworkTablesFlags_ShowTimestamp |
-        NetworkTablesFlags_CreateNoncanonicalKeys | NetworkTablesFlags_Precision);
+  m_flags &= ~(
+      NetworkTablesFlags_TreeView | NetworkTablesFlags_ShowConnections |
+      NetworkTablesFlags_ShowFlags | NetworkTablesFlags_ShowTimestamp |
+      NetworkTablesFlags_CreateNoncanonicalKeys | NetworkTablesFlags_Precision);
   m_flags |=
       (*m_pTreeView ? NetworkTablesFlags_TreeView : 0) |
       (*m_pShowConnections ? NetworkTablesFlags_ShowConnections : 0) |
       (*m_pShowFlags ? NetworkTablesFlags_ShowFlags : 0) |
       (*m_pShowTimestamp ? NetworkTablesFlags_ShowTimestamp : 0) |
       (*m_pCreateNoncanonicalKeys ? NetworkTablesFlags_CreateNoncanonicalKeys
-                                  : 0) | 
+                                  : 0) |
       (m_precision << 6);
 }
 
@@ -773,7 +778,8 @@ void NetworkTablesFlagsSettings::DisplayMenu() {
   ImGui::MenuItem("Show Timestamp", "", m_pShowTimestamp);
   if (ImGui::BeginMenu("Decimal Precision")) {
     for (unsigned char i = 1; i <= 10; i++) {
-      if (ImGui::MenuItem(fmt::format("{}", i).c_str(), nullptr, i == m_precision)) {
+      if (ImGui::MenuItem(fmt::format("{}", i).c_str(), nullptr,
+                          i == m_precision)) {
         m_precision = i;
       }
     }
