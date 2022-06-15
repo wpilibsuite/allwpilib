@@ -381,14 +381,14 @@ static void EmitEntryValueReadonly(NetworkTablesModel::Entry& entry,
       break;
     case NT_DOUBLE: {
       unsigned char precision =
-          (flags & NetworkTablesFlags_Precision) >> kPrecisionBitShift;
-#ifdef __GCC__
+          (flags & NetworkTablesFlags_Precision) >> kNetworkTablesFlags_PrecisionBitShift;
+#ifdef __GNUC__
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wformat-nonliteral"
 #endif
       ImGui::LabelText("double", fmt::format("%.{}f", precision).c_str(),
                        val->GetDouble());
-#ifdef __GCC__
+#ifdef __GNUC__
 #pragma GCC diagnostic pop
 #endif
       break;
@@ -449,8 +449,8 @@ static void EmitEntryValueEditable(NetworkTablesModel::Entry& entry,
     case NT_DOUBLE: {
       double v = val->GetDouble();
       unsigned char precision =
-          (flags & NetworkTablesFlags_Precision) >> kPrecisionBitShift;
-#ifdef __GCC__
+          (flags & NetworkTablesFlags_Precision) >> kNetworkTablesFlags_PrecisionBitShift;
+#ifdef __GNUC__
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wformat-nonliteral"
 #endif
@@ -459,7 +459,7 @@ static void EmitEntryValueEditable(NetworkTablesModel::Entry& entry,
                              ImGuiInputTextFlags_EnterReturnsTrue)) {
         nt::SetEntryValue(entry.entry, nt::NetworkTableValue::MakeDouble(v));
       }
-#ifdef __GCC__
+#ifdef __GNUC__ 
 #pragma GCC diagnostic pop
 #endif
       break;
@@ -768,7 +768,7 @@ void NetworkTablesFlagsSettings::Update() {
         m_defaultFlags & NetworkTablesFlags_CreateNoncanonicalKeys);
     m_pPrecision = &storage.GetInt(
         "precision",
-        (m_defaultFlags & NetworkTablesFlags_Precision) >> kPrecisionBitShift);
+        (m_defaultFlags & NetworkTablesFlags_Precision) >> kNetworkTablesFlags_PrecisionBitShift);
   }
 
   m_flags &= ~(
@@ -782,7 +782,7 @@ void NetworkTablesFlagsSettings::Update() {
       (*m_pShowTimestamp ? NetworkTablesFlags_ShowTimestamp : 0) |
       (*m_pCreateNoncanonicalKeys ? NetworkTablesFlags_CreateNoncanonicalKeys
                                   : 0) |
-      (*m_pPrecision << kPrecisionBitShift);
+      (*m_pPrecision << kNetworkTablesFlags_PrecisionBitShift);
 }
 
 void NetworkTablesFlagsSettings::DisplayMenu() {
