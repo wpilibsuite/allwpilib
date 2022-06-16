@@ -151,11 +151,11 @@ void CommandScheduler::Schedule(bool interruptible, Command* command) {
         Cancel(cmdToCancel);
       }
     }
-    command->Initialize();
     m_impl->scheduledCommands[command] = CommandState{interruptible};
     for (auto&& requirement : requirements) {
       m_impl->requirements[requirement] = command;
     }
+    command->Initialize();
     for (auto&& action : m_impl->initActions) {
       action(*command);
     }
@@ -336,17 +336,17 @@ void CommandScheduler::Cancel(Command* command) {
   if (find == m_impl->scheduledCommands.end()) {
     return;
   }
-  command->End(true);
-  for (auto&& action : m_impl->interruptActions) {
-    action(*command);
-  }
-  m_watchdog.AddEpoch(command->GetName() + ".End(true)");
   m_impl->scheduledCommands.erase(find);
   for (auto&& requirement : m_impl->requirements) {
     if (requirement.second == command) {
       m_impl->requirements.erase(requirement.first);
     }
   }
+  command->End(true);
+  for (auto&& action : m_impl->interruptActions) {
+    action(*command);
+  }
+  m_watchdog.AddEpoch(command->GetName() + ".End(true)");
 }
 
 void CommandScheduler::Cancel(wpi::span<Command* const> commands) {
