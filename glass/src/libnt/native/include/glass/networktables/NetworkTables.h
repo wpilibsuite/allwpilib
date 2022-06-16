@@ -124,7 +124,7 @@ class NetworkTablesFlagsSettings {
   bool* m_pShowFlags = nullptr;
   bool* m_pShowTimestamp = nullptr;
   bool* m_pCreateNoncanonicalKeys = nullptr;
-  int* m_pPrecision;
+  int* m_pPrecision = nullptr;
   NetworkTablesFlags m_defaultFlags;  // NOLINT
   NetworkTablesFlags m_flags;         // NOLINT
 };
