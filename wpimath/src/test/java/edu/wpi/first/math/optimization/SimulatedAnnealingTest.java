@@ -20,15 +20,16 @@ class SimulatedAnnealingTest {
 
     double stepSize = 10.0;
 
-    Vector<N1> ans =
-        SimulatedAnnealing.minimize(
-            VecBuilder.fill(-1),
+    SimulatedAnnealing<N1> simulatedAnnealing =
+        new SimulatedAnnealing<>(
             5000,
             2.0,
             x ->
                 VecBuilder.fill(
                     MathUtil.clamp(x.get(0, 0) + (Math.random() - 0.5) * stepSize, -3, 3)),
             x -> function.apply(x.get(0, 0)));
+
+    Vector<N1> ans = simulatedAnnealing.minimize(VecBuilder.fill(-1));
 
     assertTrue(ans.isEqual(VecBuilder.fill(0.68), 1E-1));
   }
@@ -39,15 +40,16 @@ class SimulatedAnnealingTest {
 
     double stepSize = 10.0;
 
-    Vector<N1> ans =
-        SimulatedAnnealing.minimize(
-            VecBuilder.fill(-1),
+    SimulatedAnnealing<N1> simulatedAnnealing =
+        new SimulatedAnnealing<>(
             5000,
             2.0,
             x ->
                 VecBuilder.fill(
                     MathUtil.clamp(x.get(0, 0) + (Math.random() - 0.5) * stepSize, 0, 7)),
             x -> function.apply(x.get(0, 0)));
+
+    Vector<N1> ans = simulatedAnnealing.minimize(VecBuilder.fill(-1));
 
     assertTrue(ans.isEqual(VecBuilder.fill(5.146), 1E-1));
   }
