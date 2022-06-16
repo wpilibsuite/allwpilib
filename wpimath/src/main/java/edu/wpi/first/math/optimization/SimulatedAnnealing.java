@@ -13,7 +13,6 @@ import java.util.function.Function;
  * the global minimum cost.
  */
 public final class SimulatedAnnealing<T extends Num> {
-
   private final int m_epochs;
   private final double m_initialTemperature;
   private final Function<Vector<T>, Vector<T>> m_getNeighbor;
