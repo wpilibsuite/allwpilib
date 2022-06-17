@@ -235,8 +235,7 @@ class Command {
    * @param doesRunWhenDisabled true to run when disabled.
    * @return the decorated command
    */
-  virtual std::unique_ptr<Command> WithRunsWhenDisabled(
-      bool doesRunWhenDisabled) &&;
+  virtual std::unique_ptr<Command> IgnoringDisable(bool doesRunWhenDisabled) &&;
 
   /**
    * Schedules this command.

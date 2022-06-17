@@ -49,8 +49,7 @@ ParallelRaceGroup Command::Until(std::function<bool()> condition) && {
   return ParallelRaceGroup(std::move(temp));
 }
 
-std::unique_ptr<Command> Command::WithRunsWhenDisabled(
-    bool doesRunWhenDisabled) && {
+std::unique_ptr<Command> Command::IgnoringDisable(bool doesRunWhenDisabled) && {
   class RunsWhenDisabledCommand
       : public CommandHelper<WrapperCommand, RunsWhenDisabledCommand> {
    public:

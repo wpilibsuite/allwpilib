@@ -56,9 +56,9 @@ class CommandDecoratorTest extends CommandTestBase {
   }
 
   @Test
-  void withRunsWhenDisabledTest() {
+  void ignoringDisableTest() {
     try (CommandScheduler scheduler = new CommandScheduler()) {
-      var command = new RunCommand(() -> {}).withRunsWhenDisabled(true);
+      var command = new RunCommand(() -> {}).ignoringDisable(true);
 
       setDSEnabled(false);
 

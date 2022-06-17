@@ -321,7 +321,7 @@ public interface Command {
    * @param doesRunWhenDisabled true to run when disabled.
    * @return the decorated command
    */
-  default WrapperCommand withRunsWhenDisabled(boolean doesRunWhenDisabled) {
+  default WrapperCommand ignoringDisable(boolean doesRunWhenDisabled) {
     return new WrapperCommand(this) {
       @Override
       public boolean runsWhenDisabled() {
