@@ -7,17 +7,17 @@ if (project.hasProperty('ciDebugOnly')) {
 }
 
 nativeUtils.addWpiNativeUtils()
-nativeUtils.withRoboRIO()
-nativeUtils.withRaspbian()
-nativeUtils.withBionic()
+nativeUtils.withCrossRoboRIO()
+nativeUtils.withCrossLinuxArm32()
+nativeUtils.withCrossLinuxArm64()
 nativeUtils {
     wpi {
         configureDependencies {
             wpiVersion = "-1"
             niLibVersion = "2022.4.0"
-            opencvVersion = "4.5.2-1"
-            googleTestVersion = "1.9.0-5-437e100-1"
-            imguiVersion = "1.86-1"
+            opencvVersion = "4.5.5-1"
+            googleTestVersion = "1.11.0-2"
+            imguiVersion = "1.87-2"
             wpimathVersion = "-1"
         }
     }
@@ -38,7 +38,7 @@ nativeUtils.platformConfigs.each {
         return
     }
     it.linker.args << '-Wl,-rpath,\'$ORIGIN\''
-    if (it.name == 'osxx86-64') {
+    if (it.name == 'osxx86-64' || it.name == 'osxarm64') {
         it.linker.args << "-headerpad_max_install_names"
     }
 }

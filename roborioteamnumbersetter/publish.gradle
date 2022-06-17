@@ -30,7 +30,7 @@ model {
                         def icon = file("$project.projectDir/src/main/native/mac/rtns.icns")
 
                         // Create the macOS bundle.
-                        def bundleTask = project.tasks.create("bundleroboRIOTeamNumberSetterOsxApp", Copy) {
+                        def bundleTask = project.tasks.create("bundleroboRIOTeamNumberSetterOsxApp" + binary.targetPlatform.architecture.name, Copy) {
                             description("Creates a macOS application bundle for roboRIO Team Number Setter")
                             from(file("$project.projectDir/Info.plist"))
                             into(file("$project.buildDir/outputs/bundles/roboRIOTeamNumberSetter.app/Contents"))

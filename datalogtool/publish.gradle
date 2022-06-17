@@ -30,7 +30,7 @@ model {
                         def icon = file("$project.projectDir/src/main/native/mac/datalogtool.icns")
 
                         // Create the macOS bundle.
-                        def bundleTask = project.tasks.create("bundleDataLogToolOsxApp", Copy) {
+                        def bundleTask = project.tasks.create("bundleDataLogToolOsxApp" + binary.targetPlatform.architecture.name, Copy) {
                             description("Creates a macOS application bundle for DataLogTool")
                             from(file("$project.projectDir/Info.plist"))
                             into(file("$project.buildDir/outputs/bundles/DataLogTool.app/Contents"))

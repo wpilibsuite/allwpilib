@@ -57,7 +57,7 @@ if (!project.hasProperty('onlylinuxathena')) {
                     }
                 }
                 binaries.all {
-                    if (!project.hasProperty('onlylinuxathena') && !project.hasProperty('onlylinuxraspbian')  && !project.hasProperty('onlylinuxaarch64bionic')) {
+                    if (!project.hasProperty('onlylinuxathena') && !project.hasProperty('onlylinuxarm32')  && !project.hasProperty('onlylinuxarm64')) {
                         project(':hal').addHalDependency(it, 'shared')
                         lib library: pluginName
                         if (project.hasProperty('includeNtCore')) {
@@ -84,7 +84,7 @@ if (!project.hasProperty('onlylinuxathena')) {
 model {
     tasks {
         def c = $.components
-        if (!project.hasProperty('onlylinuxathena') && !project.hasProperty('onlylinuxraspbian') && !project.hasProperty('onlylinuxaarch64bionic')) {
+        if (!project.hasProperty('onlylinuxathena') && !project.hasProperty('onlylinuxarm32') && !project.hasProperty('onlylinuxarm64')) {
             project.tasks.create('runCpp', Exec) {
                 group = 'WPILib'
                 description = "Run the ${pluginName}Dev executable"

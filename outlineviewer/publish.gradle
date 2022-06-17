@@ -30,7 +30,7 @@ model {
                         def icon = file("$project.projectDir/src/main/native/mac/ov.icns")
 
                         // Create the macOS bundle.
-                        def bundleTask = project.tasks.create("bundleOutlineViewerOsxApp", Copy) {
+                        def bundleTask = project.tasks.create("bundleOutlineViewerOsxApp" + binary.targetPlatform.architecture.name, Copy) {
                             description("Creates a macOS application bundle for OutlineViewer")
                             from(file("$project.projectDir/Info.plist"))
                             into(file("$project.buildDir/outputs/bundles/OutlineViewer.app/Contents"))
