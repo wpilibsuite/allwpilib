@@ -117,7 +117,7 @@ model {
                         }
 
                         // Create the ZIP.
-                        def task = project.tasks.create("copyGlassExecutable", Zip) {
+                        def task = project.tasks.create("copyGlassExecutable" + binary.targetPlatform.architecture.name, Zip) {
                             description("Copies the Glass executable to the outputs directory.")
                             destinationDirectory = outputsFolder
 

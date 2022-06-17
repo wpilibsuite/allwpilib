@@ -63,7 +63,7 @@ model {
                         }
 
                         // Create the ZIP.
-                        def task = project.tasks.create("copyOutlineViewerExecutable", Zip) {
+                        def task = project.tasks.create("copyOutlineViewerExecutable" + binary.targetPlatform.architecture.name, Zip) {
                             description("Copies the OutlineViewer executable to the outputs directory.")
                             destinationDirectory = outputsFolder
 
