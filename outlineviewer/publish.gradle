@@ -10,7 +10,7 @@ model {
     tasks {
         // Create the run task.
         $.components.outlineviewer.binaries.each { bin ->
-            if (bin.buildable && bin.name.toLowerCase().contains("debug")) {
+            if (bin.buildable && bin.name.toLowerCase().contains("debug") && nativeUtils.isNativeDesktopPlatform(bin.targetPlatform)) {
                 Task run = project.tasks.create("run", Exec) {
                     commandLine bin.tasks.install.runScriptFile.get().asFile.toString()
                 }
