@@ -378,19 +378,6 @@ std::string path::home()
     auto user_profile = internal::getenv("USERPROFILE");
     if (user_profile.size() > 0)
         return user_profile;
-    // Otherwise, try GetUserProfileDirectory()
-    HANDLE token = nullptr;
-    DWORD len = MAX_PATH;
-    char buf[MAX_PATH] = { '\0' };
-    if (OpenProcessToken(GetCurrentProcess(), TOKEN_QUERY, &token))
-    {
-        dll userenv("userenv.dll");
-        dll::proc<BOOL WINAPI (HANDLE, LPSTR, LPDWORD)> get_user_profile_directory(userenv, "GetUserProfileDirectoryA");
-        get_user_profile_directory(token, buf, &len);
-        CloseHandle(token);
-        if (*buf)
-            return buf;
-    }
 #elif __EMSCRIPTEN__
     return "/";
 #else
