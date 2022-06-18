@@ -1,3 +1,7 @@
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
+
 package edu.wpi.first.math.path;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -25,10 +29,7 @@ class TravelingSalesmanTest {
     // ...................
 
     TravelingSalesman<N5> traveler =
-        new TravelingSalesman<>(
-            (a, b) ->
-                Math.sqrt(Math.pow(a.getX() - b.getX(), 2) + Math.pow(a.getY() - b.getY(), 2)),
-            poses);
+        new TravelingSalesman<>(TravelingSalesman.distanceCostFunction, poses);
 
     Vector<N5> sol = traveler.solve(1000);
 
@@ -56,10 +57,7 @@ class TravelingSalesmanTest {
     // ...................
 
     TravelingSalesman<N5> traveler =
-            new TravelingSalesman<>(
-                    (a, b) ->
-                            Math.sqrt(Math.pow(a.getX() - b.getX(), 2) + Math.pow(a.getY() - b.getY(), 2)),
-                    poses);
+        new TravelingSalesman<>(TravelingSalesman.distanceCostFunction, poses);
 
     Vector<N5> sol = traveler.solve(1000);
 
