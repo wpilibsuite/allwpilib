@@ -42,7 +42,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
  *   <li>testPeriodic()
  * </ul>
  *
- * <p>final() functions -- each of the following functions is called once when the appropriate mode
+ * <p>exit() functions -- each of the following functions is called once when the appropriate mode
  * is exited:
  *
  * <ul>
