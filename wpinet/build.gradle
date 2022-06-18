@@ -23,6 +23,15 @@ ext {
                     srcDirs 'src/main/native/include', 'src/main/native/thirdparty/libuv/include', 'src/main/native/thirdparty/libuv/src'
                 }
             }
+            tcpsocketsCpp(CppSourceSet) {
+                source {
+                    srcDirs 'src/main/native/thirdparty/tcpsockets/cpp'
+                    include '*.cpp'
+                }
+                exportedHeaders {
+                    srcDirs 'src/main/native/include', 'src/main/native/thirdparty/tcpsockets/include'
+                }
+            }
             resourcesCpp(CppSourceSet) {
                 source {
                     srcDirs "$buildDir/generated/main/cpp", "$rootDir/shared/singlelib"
@@ -201,6 +210,9 @@ cppHeadersZip {
     from('src/main/native/thirdparty/libuv/include') {
         into '/'
     }
+    from('src/main/native/third_party/tcpsockets/include') {
+        into '/'
+    }
 }
 
 model {
@@ -208,7 +220,7 @@ model {
         all {
             it.sources.each {
                 it.exportedHeaders {
-                    srcDirs 'src/main/native/include', 'src/main/native/thirdparty/libuv/include', 'src/main/native/thirdparty/libuv/src'
+                    srcDirs 'src/main/native/include', 'src/main/native/thirdparty/libuv/include', 'src/main/native/thirdparty/tcpsockets/include', 'src/main/native/thirdparty/libuv/src'
                 }
             }
         }
