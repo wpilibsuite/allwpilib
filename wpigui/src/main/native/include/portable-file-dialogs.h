@@ -123,61 +123,6 @@ namespace internal
 // Process wait timeout, in milliseconds
 constexpr int default_wait_timeout = 20;
 
-class platform
-{
-public:
-#if _WIN32
-    // Helper class around LoadLibraryA() and GetProcAddress() with some safety
-    class dll
-    {
-    public:
-        explicit dll(std::string const &name);
-        ~dll();
-
-        template<typename T> class proc
-        {
-        public:
-            proc(dll const &lib, std::string const &sym)
-              : m_proc(reinterpret_cast<T *>((void *)::GetProcAddress(lib.handle, sym.c_str())))
-            {}
-
-            operator bool() const { return m_proc != nullptr; }
-            operator T *() const { return m_proc; }
-
-        private:
-            T *m_proc;
-        };
-
-    private:
-        HMODULE handle;
-    };
-
-    // Helper class around CoInitialize() and CoUnInitialize()
-    class ole32_dll : public dll
-    {
-    public:
-        ole32_dll();
-        ~ole32_dll();
-        bool is_initialized();
-
-    private:
-        HRESULT m_state;
-    };
-
-    // Helper class around CreateActCtx() and ActivateActCtx()
-    class new_style_context
-    {
-    public:
-        new_style_context();
-        ~new_style_context();
-
-    private:
-        HANDLE create();
-        ULONG_PTR m_cookie = 0;
-    };
-#endif
-};
-
 class executor;
 
 class dialog : protected settings
@@ -226,17 +171,6 @@ protected:
 };
 
 } // namespace internal
-
-//
-// The path class provides some platform-specific path constants
-//
-
-class path : protected internal::platform
-{
-public:
-    static std::string home();
-    static std::string separator();
-};
 
 //
 // The notify widget
