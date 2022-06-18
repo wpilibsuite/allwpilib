@@ -1218,18 +1218,18 @@ std::string internal::file_dialog::Impl::select_folder_vista(IFileDialog *ifd, b
             if (SUCCEEDED(item->GetDisplayName(SIGDN_FILESYSPATH, &wname)))
             {
                 result = internal::wstr2str(std::wstring(wname));
-                dll::proc<void WINAPI (LPVOID)>(ole32_dll(), "CoTaskMemFree")(wname);
+                internal::platform::dll::proc<void WINAPI (LPVOID)>(internal::platform::ole32_dll(), "CoTaskMemFree")(wname);
             }
             else
             {
                 if (SUCCEEDED(item->GetDisplayName(SIGDN_NORMALDISPLAY, &wname)))
                 {
                     auto name = internal::wstr2str(std::wstring(wname));
-                    dll::proc<void WINAPI (LPVOID)>(ole32_dll(), "CoTaskMemFree")(wname);
-                    std::cerr << "pfd: failed to get path for " << name << std::endl;
+                    internal::platform::dll::proc<void WINAPI (LPVOID)>(internal::platform::ole32_dll(), "CoTaskMemFree")(wname);
+                    fputs("pfd: failed to get path\n", stderr);
                 }
                 else
-                    std::cerr << "pfd: item of unknown type selected" << std::endl;
+                    fputs("pfd: item of unknown type selected\n", stderr);
             }
 
             item->Release();
