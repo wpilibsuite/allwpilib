@@ -11,79 +11,21 @@ cppSrcFileInclude {
 }
 
 generatedFileExclude {
-  src/main/native/cpp/llvm/
-  src/main/native/include/llvm/
-  src/main/native/include/wpi/AllocatorBase\.h$
-  src/main/native/include/wpi/AlignOf\.h$
-  src/main/native/include/wpi/ArrayRef\.h$
-  src/main/native/include/wpi/Chrono\.h$
-  src/main/native/include/wpi/Compiler\.h$
-  src/main/native/include/wpi/ConvertUTF\.h$
-  src/main/native/include/wpi/DenseMap\.h$
-  src/main/native/include/wpi/DenseMapInfo\.h$
-  src/main/native/include/wpi/DJB\.h$
-  src/main/native/include/wpi/EpochTracker\.h$
-  src/main/native/include/wpi/Endian\.h$
-  src/main/native/include/wpi/Errc\.h$
-  src/main/native/include/wpi/Errno\.h$
-  src/main/native/include/wpi/Error\.h$
-  src/main/native/include/wpi/ErrorHandling\.h$
-  src/main/native/include/wpi/ErrorOr\.h$
-  src/main/native/include/wpi/FileSystem\.h$
-  src/main/native/include/wpi/Format\.h$
-  src/main/native/include/wpi/FunctionExtras\.h$
-  src/main/native/include/wpi/Hashing\.h$
-  src/main/native/include/wpi/IntrusiveRefCntPtr\.h$
-  src/main/native/include/wpi/ManagedStatic\.h$
-  src/main/native/include/wpi/MapVector\.h$
-  src/main/native/include/wpi/MathExtras\.h$
-  src/main/native/include/wpi/MemAlloc\.h$
-  src/main/native/include/wpi/NativeFormatting\.h$
-  src/main/native/include/wpi/Path\.h$
-  src/main/native/include/wpi/PointerIntPair\.h$
-  src/main/native/include/wpi/PointerLikeTypeTraits\.h$
-  src/main/native/include/wpi/PointerUnion\.h$
-  src/main/native/include/wpi/ReverseIteration\.h$
-  src/main/native/include/wpi/STLExtras\.h$
-  src/main/native/include/wpi/Signal\.h$
-  src/main/native/include/wpi/SmallPtrSet\.h$
-  src/main/native/include/wpi/SmallSet\.h$
-  src/main/native/include/wpi/SmallString\.h$
-  src/main/native/include/wpi/SmallVector\.h$
-  src/main/native/include/wpi/StringMap\.h$
-  src/main/native/include/wpi/StringMapEntry\.h$
-  src/main/native/include/wpi/STLForwardCompat\.h$
-  src/main/native/include/wpi/StringRef\.h$
-  src/main/native/include/wpi/SwapByteOrder\.h$
-  src/main/native/include/wpi/Twine\.h$
-  src/main/native/include/wpi/VersionTuple\.h$
-  src/main/native/include/wpi/WindowsError\.h$
-  src/main/native/include/wpi/iterator\.h$
-  src/main/native/include/wpi/iterator_range\.h$
-  src/main/native/include/wpi/raw_os_ostream\.h$
-  src/main/native/include/wpi/raw_ostream\.h$
-  src/main/native/include/wpi/span\.h$
+  src/main/native/thirdparty/
+
   src/main/native/include/wpi/fs\.h$
-  src/main/native/include/wpi/mpack\.h$
   src/main/native/cpp/fs\.cpp$
-  src/main/native/cpp/mpack\.cpp$
-  src/main/native/include/wpi/ghc/
-  src/test/native/cpp/span/
-  src/main/native/include/wpi/type_traits\.h$
-  src/main/native/cpp/json
-  src/main/native/include/wpi/json
-  src/test/native/cpp/json/
-  src/main/native/fmtlib/
   src/main/native/resources/
-  src/test/native/cpp/llvm/
   src/main/native/windows/StackWalker
+  src/test/native/cpp/llvm/
+  src/test/native/cpp/span/
+  src/test/native/cpp/json/
 }
 
 licenseUpdateExclude {
   src/main/native/cpp/Base64\.cpp$
   src/main/native/cpp/sha1\.cpp$
   src/main/native/include/wpi/ConcurrentQueue\.h$
-  src/main/native/include/wpi/Path\.h$
   src/main/native/include/wpi/sha1\.h$
 }
 

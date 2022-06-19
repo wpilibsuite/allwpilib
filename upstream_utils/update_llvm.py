@@ -102,10 +102,7 @@ def find_wpiutil_llvm_files(wpiutil_root, subfolder):
         for f in files:
             if f not in ignore_list:
                 full_file = os.path.join(root, f)
-                with open(full_file, 'r') as ff:
-                    contents = ff.read()
-                    if "LLVM Compiler" in contents or "LLVM Project" in contents:
-                        wpiutil_files.append(full_file)
+                wpiutil_files.append(full_file)
 
     return wpiutil_files
 
@@ -129,8 +126,9 @@ def overwrite_source(wpiutil_root, llvm_root):
         "llvm/include/llvm/Support/", "llvm/lib/Support/"
     ])
     wpi_files = find_wpiutil_llvm_files(
-        wpiutil_root, "src/main/native/include/wpi") + find_wpiutil_llvm_files(
-            wpiutil_root, "src/main/native/cpp/llvm")
+        wpiutil_root, "src/main/native/thirdparty/llvm/include/wpi"
+    ) + find_wpiutil_llvm_files(wpiutil_root,
+                                "src/main/native/thirdparty/llvm/cpp/llvm")
 
     overwrite_files(wpi_files, llvm_files)
     run_global_replacements(wpi_files)
