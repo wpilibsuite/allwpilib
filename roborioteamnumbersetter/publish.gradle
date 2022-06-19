@@ -33,7 +33,7 @@ model {
                         def bundleTask = project.tasks.create("bundleroboRIOTeamNumberSetterOsxApp" + binary.targetPlatform.architecture.name, Copy) {
                             description("Creates a macOS application bundle for roboRIO Team Number Setter")
                             from(file("$project.projectDir/Info.plist"))
-                            into(file("$project.buildDir/outputs/bundles/roboRIOTeamNumberSetter.app/Contents"))
+                            into(file("$project.buildDir/outputs/bundles/$binary.targetPlatform.architecture.name/roboRIOTeamNumberSetter.app/Contents"))
                             into("MacOS") { with copySpec { from binary.executable.file } }
                             into("Resources") { with copySpec { from icon } }
 
@@ -48,7 +48,7 @@ model {
                                             "codesign --force --strict --deep " +
                                             "--timestamp --options=runtime " +
                                             "--verbose -s ${project.findProperty("developerID")} " +
-                                            "$project.buildDir/outputs/bundles/roboRIOTeamNumberSetter.app/"
+                                            "$project.buildDir/outputs/bundles/$binary.targetPlatform.architecture.name/roboRIOTeamNumberSetter.app/"
                                         ]
                                         commandLine args
                                     }
@@ -58,7 +58,7 @@ model {
 
                         // Reset the application path if we are creating a bundle.
                         if (binary.targetPlatform.operatingSystem.isMacOsX()) {
-                            applicationPath = file("$project.buildDir/outputs/bundles")
+                            applicationPath = file("$project.buildDir/outputs/bundles/$binary.targetPlatform.architecture.name")
                             project.build.dependsOn bundleTask
                         }
 
