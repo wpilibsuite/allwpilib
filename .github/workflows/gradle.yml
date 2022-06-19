@@ -59,7 +59,7 @@ jobs:
           - os: windows-2019
             artifact-name: Win64Release
             architecture: x64
-            build-options: "-PciReleaseOnly"
+            build-options: "-PciReleaseOnly --max-workers 1"
             task: "copyAllOutputs"
           - os: macOS-11
             artifact-name: macOS
