@@ -54,7 +54,7 @@ Using Gradle makes building WPILib very straightforward. It only has a few depen
     - Run `./gradlew installRoboRioToolchain` after cloning this repository
     - If the WPILib installer was used, this toolchain is already installed
 - Raspberry Pi toolchain (optional)
-    - Run `./gradlew installRaspbianToolchain` after cloning this repository
+    - Run `./gradlew installArm32Toolchain` after cloning this repository
 
 ## Setup
 

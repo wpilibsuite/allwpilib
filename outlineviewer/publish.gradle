@@ -10,7 +10,7 @@ model {
     tasks {
         // Create the run task.
         $.components.outlineviewer.binaries.each { bin ->
-            if (bin.buildable && bin.name.toLowerCase().contains("debug")) {
+            if (bin.buildable && bin.name.toLowerCase().contains("debug") && nativeUtils.isNativeDesktopPlatform(bin.targetPlatform)) {
                 Task run = project.tasks.create("run", Exec) {
                     commandLine bin.tasks.install.runScriptFile.get().asFile.toString()
                 }
@@ -30,10 +30,10 @@ model {
                         def icon = file("$project.projectDir/src/main/native/mac/ov.icns")
 
                         // Create the macOS bundle.
-                        def bundleTask = project.tasks.create("bundleOutlineViewerOsxApp", Copy) {
+                        def bundleTask = project.tasks.create("bundleOutlineViewerOsxApp" + binary.targetPlatform.architecture.name, Copy) {
                             description("Creates a macOS application bundle for OutlineViewer")
                             from(file("$project.projectDir/Info.plist"))
-                            into(file("$project.buildDir/outputs/bundles/OutlineViewer.app/Contents"))
+                            into(file("$project.buildDir/outputs/bundles/$binary.targetPlatform.architecture.name/OutlineViewer.app/Contents"))
                             into("MacOS") { with copySpec { from binary.executable.file } }
                             into("Resources") { with copySpec { from icon } }
 
@@ -48,7 +48,7 @@ model {
                                             "codesign --force --strict --deep " +
                                             "--timestamp --options=runtime " +
                                             "--verbose -s ${project.findProperty("developerID")} " +
-                                            "$project.buildDir/outputs/bundles/OutlineViewer.app/"
+                                            "$project.buildDir/outputs/bundles/$binary.targetPlatform.architecture.name/OutlineViewer.app/"
                                         ]
                                         commandLine args
                                     }
@@ -58,12 +58,12 @@ model {
 
                         // Reset the application path if we are creating a bundle.
                         if (binary.targetPlatform.operatingSystem.isMacOsX()) {
-                            applicationPath = file("$project.buildDir/outputs/bundles")
+                            applicationPath = file("$project.buildDir/outputs/bundles/$binary.targetPlatform.architecture.name")
                             project.build.dependsOn bundleTask
                         }
 
                         // Create the ZIP.
-                        def task = project.tasks.create("copyOutlineViewerExecutable", Zip) {
+                        def task = project.tasks.create("copyOutlineViewerExecutable" + binary.targetPlatform.architecture.name, Zip) {
                             description("Copies the OutlineViewer executable to the outputs directory.")
                             destinationDirectory = outputsFolder
 

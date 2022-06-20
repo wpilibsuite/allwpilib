@@ -4,7 +4,7 @@ apply plugin: 'edu.wpi.first.NativeUtils'
 apply plugin: 'cpp'
 
 ext.skiplinuxathena = true
-ext.skiplinuxraspbian = true
+ext.skiplinuxarm32 = true
 ext.pluginName = 'halsim_gazebo'
 
 /* If gz_msgs or gazebo is not available, do not attempt a build */
