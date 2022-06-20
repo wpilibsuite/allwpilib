@@ -15,7 +15,7 @@ nativeUtils {
         configureDependencies {
             wpiVersion = "-1"
             niLibVersion = "2022.4.0"
-            opencvVersion = "4.5.5-2"
+            opencvVersion = "4.5.5-3"
             googleTestVersion = "1.11.0-2"
             imguiVersion = "1.87-2"
             wpimathVersion = "-1"
