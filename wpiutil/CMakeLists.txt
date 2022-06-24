@@ -90,7 +90,7 @@ GENERATE_RESOURCES(src/main/native/resources generated/main/cpp WPI wpi wpiutil_
 file(GLOB_RECURSE wpiutil_native_src src/main/native/cpp/*.cpp
                                      src/main/native/thirdparty/json/cpp/*.cpp
                                      src/main/native/thirdparty/llvm/cpp/*.cpp
-                                     src/main/native/thirdparty/mpack/cpp/*.cpp)
+                                     src/main/native/thirdparty/mpack/src/*.cpp)
 list(REMOVE_ITEM wpiutil_native_src ${wpiutil_jni_src})
 file(GLOB_RECURSE wpiutil_unix_src src/main/native/unix/*.cpp)
 file(GLOB_RECURSE wpiutil_linux_src src/main/native/linux/*.cpp)
