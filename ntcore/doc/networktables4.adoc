@@ -446,7 +446,7 @@ Clients and servers shall ignore JSON messages that:
 |<<msg-setproperties,`setproperties`>>
 |Set Properties
 |Client to Server
-|<<msg-properties,`properties`>>
+|<<msg-announce,`announce`>>
 
 4+|Value/Subscription Messages (Client to Server)
 
@@ -474,11 +474,6 @@ Clients and servers shall ignore JSON messages that:
 
 |<<msg-unannounce,`unannounce`>>
 |Topic Removed
-|Server to Client
-|---
-
-|<<msg-properties,`properties`>>
-|Properties Changed
 |Server to Client
 |---
 |===
@@ -552,7 +547,7 @@ The `unpublish` JSON message shall contain the following parameters:
 [[msg-setproperties]]
 ==== Set Properties Message (`setproperties`)
 
-Sent from a client to the server to change properties (see <<properties>>) for a given topic.  The server will respond with a <<msg-properties>> (if the topic is published).  This message shall be ignored by the server if the topic is not published.
+Sent from a client to the server to change properties (see <<properties>>) for a given topic.  The server will respond with an updated <<msg-announce>> (if the topic is published).  This message shall be ignored by the server if the topic is not published.
 
 The `setproperties` JSON message shall contain the following parameters:
 
@@ -565,10 +560,6 @@ The `setproperties` JSON message shall contain the following parameters:
 |`name`
 |String
 |Topic name
-
-|`uid`
-|Integer
-|A client-generated unique identifier for this properties change.  This is provided in the <<msg-properties>> back to the client.
 
 |`update`
 |Map
@@ -726,36 +717,6 @@ The `unannounce` JSON message shall contain the following parameters:
 |Integer
 |Topic ID
 |The identifier that the server was using for value updates
-|===
-
-[[msg-properties]]
-==== Properties Changed Message (`properties`)
-
-The server shall send this message when a previously announced (via a <<msg-announce>>) topic has its properties changed via a <<msg-setproperties>>.
-
-The `properties` JSON message shall contain the following parameters:
-
-[cols="1,1,2,6",options="header"]
-|===
-|Key
-|Value type
-|Description
-|Notes
-
-|`id`
-|Integer
-|Topic ID
-|The identifier that the server was using for value updates
-
-|`uid` (optional)
-|Integer
-|Unique ID
-|If this message was sent in response to a <<msg-setproperties,`setproperties`>> message, the UID provided in that message.  Otherwise absent.
-
-|`properties`
-|Map
-|Properties
-|Topic <<properties>>
 |===
 
 [[binary-frames]]
