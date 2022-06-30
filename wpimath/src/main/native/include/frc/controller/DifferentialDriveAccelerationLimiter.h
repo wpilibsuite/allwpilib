@@ -30,7 +30,8 @@ class WPILIB_DLLEXPORT DifferentialDriveAccelerationLimiter {
    * Constructs a DifferentialDriveAccelerationLimiter.
    *
    * @param system The differential drive dynamics.
-   * @param trackwidth The trackwidth.
+   * @param trackwidth The distance between the differential drive's left and
+   *                   right wheels.
    * @param maxLinearAccel The maximum linear acceleration.
    * @param maxAngularAccel The maximum angular acceleration.
    */
