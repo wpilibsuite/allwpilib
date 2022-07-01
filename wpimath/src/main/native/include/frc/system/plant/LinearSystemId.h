@@ -183,11 +183,13 @@ class WPILIB_DLLEXPORT LinearSystemId {
   }
 
   /**
-   * Constructs the state-space model for a 2 DOF drivetrain velocity system
-   * from system identification data.
+   * Identify a differential drive drivetrain given the drivetrain's kV and kA
+   * in both linear (volts/(meter/sec) and volts/(meter/sec²)) and angular
+   * (volts/(radian/sec) and volts/(radian/sec²)) cases. This can be found using
+   * SysId.
    *
-   * States: [[left velocity], [right velocity]]
-   * Inputs: [[left voltage], [right voltage]]
+   * States: [[left velocity], [right velocity]]<br>
+   * Inputs: [[left voltage], [right voltage]]<br>
    * Outputs: [[left velocity], [right velocity]]
    *
    * @param kVlinear  The linear velocity gain in volts per (meter per second).
@@ -231,11 +233,13 @@ class WPILIB_DLLEXPORT LinearSystemId {
   }
 
   /**
-   * Constructs the state-space model for a 2 DOF drivetrain velocity system
-   * from system identification data.
+   * Identify a differential drive drivetrain given the drivetrain's kV and kA
+   * in both linear (volts/(meter/sec) and volts/(meter/sec²)) and angular
+   * (volts/(radian/sec) and volts/(radian/sec²)) cases. This can be found using
+   * SysId.
    *
-   * States: [[left velocity], [right velocity]]
-   * Inputs: [[left voltage], [right voltage]]
+   * States: [[left velocity], [right velocity]]<br>
+   * Inputs: [[left voltage], [right voltage]]<br>
    * Outputs: [[left velocity], [right velocity]]
    *
    * @param kVlinear   The linear velocity gain in volts per (meter per second).
@@ -245,7 +249,8 @@ class WPILIB_DLLEXPORT LinearSystemId {
    *                   second).
    * @param kAangular  The angular acceleration gain in volts per (radian per
    *                   second squared).
-   * @param trackwidth The width of the drivetrain.
+   * @param trackwidth The distance between the differential drive's left and
+   *                   right wheels.
    * @throws domain_error if kVlinear <= 0, kAlinear <= 0, kVangular <= 0,
    *         kAangular <= 0, or trackwidth <= 0.
    */
