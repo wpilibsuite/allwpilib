@@ -25,7 +25,8 @@ public class DifferentialDriveAccelerationLimiter {
    * Constructs a DifferentialDriveAccelerationLimiter.
    *
    * @param system The differential drive dynamics.
-   * @param trackwidth The trackwidth.
+   * @param trackwidth The distance between the differential drive's left and right wheels in
+   *     meters.
    * @param maxLinearAccel The maximum linear acceleration in meters per second squared.
    * @param maxAngularAccel The maximum angular acceleration in radians per second squared.
    */
@@ -58,16 +59,24 @@ public class DifferentialDriveAccelerationLimiter {
     var x = new MatBuilder<>(Nat.N2(), Nat.N1()).fill(leftVelocity, rightVelocity);
     var dxdt = m_system.getA().times(x).plus(m_system.getB().times(u));
 
-    // Converts from wheel accelerations to linear and angular acceleration
-    // a = (dxdt(0) + dxdt(1)) / 2.0
-    // alpha = (dxdt(1) - dxdt(0)) / trackwidth
+    // Convert from wheel accelerations to linear and angular accelerations
+    //
+    // a = (dxdt(0) + dx/dt(1)) / 2
+    //   = 0.5 dxdt(0) + 0.5 dxdt(1)
+    //
+    // α = (dxdt(1) - dxdt(0)) / trackwidth
+    //   = -1/trackwidth dxdt(0) + 1/trackwidth dxdt(1)
+    //
+    // [a] = [          0.5           0.5][dxdt(0)]
+    // [α]   [-1/trackwidth  1/trackwidth][dxdt(1)]
+    //
+    // accels = M dxdt where M = [0.5, 0.5; -1/trackwidth, 1/trackwidth]
     var M =
         new MatBuilder<>(Nat.N2(), Nat.N2())
             .fill(0.5, 0.5, -1.0 / m_trackwidth, 1.0 / m_trackwidth);
-
-    // Convert to linear and angular accelerations, constrain them, then convert
-    // back
     var accels = M.times(dxdt);
+
+    // Constrain the linear and angular accelerations
     if (accels.get(0, 0) > m_maxLinearAccel) {
       accels.set(0, 0, m_maxLinearAccel);
     } else if (accels.get(0, 0) < -m_maxLinearAccel) {
@@ -78,9 +87,13 @@ public class DifferentialDriveAccelerationLimiter {
     } else if (accels.get(1, 0) < -m_maxAngularAccel) {
       accels.set(1, 0, -m_maxAngularAccel);
     }
+
+    // Convert the constrained linear and angular accelerations back to wheel
+    // accelerations
     dxdt = M.solve(accels);
 
     // Find voltages for the given wheel accelerations
+    //
     // dx/dt = Ax + Bu
     // u = B⁻¹(dx/dt - Ax)
     u = m_system.getB().solve(dxdt.minus(m_system.getA().times(x)));
