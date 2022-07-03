@@ -42,8 +42,6 @@ class WebSocket : public std::enable_shared_from_this<WebSocket> {
   static constexpr uint8_t kOpPong = 0x0A;
   static constexpr uint8_t kOpMask = 0x0F;
   static constexpr uint8_t kFlagFin = 0x80;
-  static constexpr uint8_t kFlagMasking = 0x80;
-  static constexpr uint8_t kLenMask = 0x7f;
 
  public:
   WebSocket(uv::Stream& stream, bool server, const private_init&);
@@ -80,6 +78,23 @@ class WebSocket : public std::enable_shared_from_this<WebSocket> {
 
     /** Additional headers to include in handshake. */
     span<const std::pair<std::string_view, std::string_view>> extraHeaders;
+  };
+
+  /**
+   * Frame.  Used by SendFrames().
+   */
+  struct Frame {
+    static constexpr uint8_t kText = kFlagFin | kOpText;
+    static constexpr uint8_t kBinary = kFlagFin | kOpBinary;
+    static constexpr uint8_t kTextFragment = kOpText;
+    static constexpr uint8_t kBinaryFragment = kOpBinary;
+    static constexpr uint8_t kFragment = kOpCont;
+    static constexpr uint8_t kFinalFragment = kFlagFin | kOpCont;
+    static constexpr uint8_t kPing = kFlagFin | kOpPing;
+    static constexpr uint8_t kPong = kFlagFin | kOpPong;
+
+    uint8_t opcode;
+    span<const uv::Buffer> data;
   };
 
   /**
@@ -364,6 +379,15 @@ class WebSocket : public std::enable_shared_from_this<WebSocket> {
   }
 
   /**
+   * Send multiple frames.
+   *
+   * @param frames Frame type/data pairs
+   * @param callback Callback which is invoked when the write completes.
+   */
+  void SendFrames(span<const Frame> frames,
+                  std::function<void(span<uv::Buffer>, uv::Error)> callback);
+
+  /**
    * Fail the connection.
    */
   void Fail(uint16_t code = 1002, std::string_view reason = "protocol error");
@@ -470,7 +494,9 @@ class WebSocket : public std::enable_shared_from_this<WebSocket> {
   void SetClosed(uint16_t code, std::string_view reason, bool failed = false);
   void HandleIncoming(uv::Buffer& buf, size_t size);
   void Send(uint8_t opcode, span<const uv::Buffer> data,
-            std::function<void(span<uv::Buffer>, uv::Error)> callback);
+            std::function<void(span<uv::Buffer>, uv::Error)> callback) {
+    SendFrames({{Frame{opcode, data}}}, std::move(callback));
+  }
 };
 
 }  // namespace wpi

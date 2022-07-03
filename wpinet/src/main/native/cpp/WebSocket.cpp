@@ -27,19 +27,21 @@ class WebSocketWriteReq : public uv::WriteReq {
       std::function<void(span<uv::Buffer>, uv::Error)> callback)
       : m_callback{std::move(callback)} {
     finish.connect([this](uv::Error err) {
-      span<uv::Buffer> bufs{m_bufs};
-      for (auto&& buf : bufs.subspan(0, m_startUser)) {
+      for (auto&& buf : m_internalBufs) {
         buf.Deallocate();
       }
-      m_callback(bufs.subspan(m_startUser), err);
+      m_callback(m_userBufs, err);
     });
   }
 
   std::function<void(span<uv::Buffer>, uv::Error)> m_callback;
-  SmallVector<uv::Buffer, 4> m_bufs;
-  size_t m_startUser;
+  SmallVector<uv::Buffer, 4> m_internalBufs;
+  SmallVector<uv::Buffer, 4> m_userBufs;
 };
 }  // namespace
+
+static constexpr uint8_t kFlagMasking = 0x80;
+static constexpr uint8_t kLenMask = 0x7f;
 
 class WebSocket::ClientHandshakeData {
  public:
@@ -588,28 +590,19 @@ void WebSocket::HandleIncoming(uv::Buffer& buf, size_t size) {
   }
 }
 
-void WebSocket::Send(
-    uint8_t opcode, span<const uv::Buffer> data,
-    std::function<void(span<uv::Buffer>, uv::Error)> callback) {
-  // If we're not open, emit an error and don't send the data
-  if (m_state != OPEN) {
-    int err;
-    if (m_state == CONNECTING) {
-      err = UV_EAGAIN;
-    } else {
-      err = UV_ESHUTDOWN;
-    }
-    SmallVector<uv::Buffer, 4> bufs{data.begin(), data.end()};
-    callback(bufs, uv::Error{err});
-    return;
-  }
-  if (opcode & kOpText) {
+static void WriteFrame(WebSocketWriteReq& req,
+                       SmallVectorImpl<uv::Buffer>& bufs, bool server,
+                       uint8_t opcode, span<const uv::Buffer> data) {
+  SmallVector<uv::Buffer, 4> internalBufs;
+  raw_uv_ostream os{internalBufs, 4096};
+
+  if ((opcode & 0x7f) == 0x01) {
     SmallString<128> str;
     for (auto&& d : data) {
       str.append(std::string_view(d.base, d.len));
     }
     fmt::print("WS SendText({})\n", str.str());
-  } else {
+  } else if ((opcode & 0x7f) == 0x02) {
     SmallString<128> str;
     raw_svector_ostream stros{str};
     for (auto&& d : data) {
@@ -620,9 +613,6 @@ void WebSocket::Send(
     fmt::print("WS SendBinary({})\n", str.str());
   }
 
-  auto req = std::make_shared<WebSocketWriteReq>(std::move(callback));
-  raw_uv_ostream os{req->m_bufs, 4096};
-
   // opcode (includes FIN bit)
   os << static_cast<unsigned char>(opcode);
 
@@ -632,14 +622,14 @@ void WebSocket::Send(
     size += buf.len;
   }
   if (size < 126) {
-    os << static_cast<unsigned char>((m_server ? 0x00 : kFlagMasking) | size);
+    os << static_cast<unsigned char>((server ? 0x00 : kFlagMasking) | size);
   } else if (size <= 0xffff) {
-    os << static_cast<unsigned char>((m_server ? 0x00 : kFlagMasking) | 126);
+    os << static_cast<unsigned char>((server ? 0x00 : kFlagMasking) | 126);
     const uint8_t sizeMsb[] = {static_cast<uint8_t>((size >> 8) & 0xff),
                                static_cast<uint8_t>(size & 0xff)};
     os << span{sizeMsb};
   } else {
-    os << static_cast<unsigned char>((m_server ? 0x00 : kFlagMasking) | 127);
+    os << static_cast<unsigned char>((server ? 0x00 : kFlagMasking) | 127);
     const uint8_t sizeMsb[] = {static_cast<uint8_t>((size >> 56) & 0xff),
                                static_cast<uint8_t>((size >> 48) & 0xff),
                                static_cast<uint8_t>((size >> 40) & 0xff),
@@ -652,7 +642,7 @@ void WebSocket::Send(
   }
 
   // clients need to mask the input data
-  if (!m_server) {
+  if (!server) {
     // generate masking key
     static std::random_device rd;
     static std::default_random_engine gen{rd()};
@@ -672,14 +662,40 @@ void WebSocket::Send(
         }
       }
     }
-    req->m_startUser = req->m_bufs.size();
-    req->m_bufs.append(data.begin(), data.end());
+    bufs.append(internalBufs.begin(), internalBufs.end());
     // don't send the user bufs as we copied their data
-    m_stream.Write(span{req->m_bufs}.subspan(0, req->m_startUser), req);
   } else {
+    bufs.append(internalBufs.begin(), internalBufs.end());
     // servers can just send the buffers directly without masking
-    req->m_startUser = req->m_bufs.size();
-    req->m_bufs.append(data.begin(), data.end());
-    m_stream.Write(req->m_bufs, req);
+    bufs.append(data.begin(), data.end());
   }
+  req.m_internalBufs.append(internalBufs.begin(), internalBufs.end());
+  req.m_userBufs.append(data.begin(), data.end());
+}
+
+void WebSocket::SendFrames(
+    span<const Frame> frames,
+    std::function<void(span<uv::Buffer>, uv::Error)> callback) {
+  // If we're not open, emit an error and don't send the data
+  if (m_state != OPEN) {
+    int err;
+    if (m_state == CONNECTING) {
+      err = UV_EAGAIN;
+    } else {
+      err = UV_ESHUTDOWN;
+    }
+    SmallVector<uv::Buffer, 4> bufs;
+    for (auto&& frame : frames) {
+      bufs.append(frame.data.begin(), frame.data.end());
+    }
+    callback(bufs, uv::Error{err});
+    return;
+  }
+
+  auto req = std::make_shared<WebSocketWriteReq>(std::move(callback));
+  SmallVector<uv::Buffer, 4> bufs;
+  for (auto&& frame : frames) {
+    WriteFrame(*req, bufs, m_server, frame.opcode, frame.data);
+  }
+  m_stream.Write(bufs, req);
 }
