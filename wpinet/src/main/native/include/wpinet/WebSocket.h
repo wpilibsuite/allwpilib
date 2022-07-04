@@ -93,6 +93,9 @@ class WebSocket : public std::enable_shared_from_this<WebSocket> {
     static constexpr uint8_t kPing = kFlagFin | kOpPing;
     static constexpr uint8_t kPong = kFlagFin | kOpPong;
 
+    Frame(uint8_t opcode, span<const uv::Buffer> data)
+        : opcode{opcode}, data{data} {}
+
     uint8_t opcode;
     span<const uv::Buffer> data;
   };
