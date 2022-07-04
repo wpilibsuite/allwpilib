@@ -406,7 +406,7 @@ Each subscription may have options set.  The following options have a defined me
 |`all` (optional)
 |Boolean
 |All Changes Flag
-|If true, the server should send all value changes over the wire regardless of the `immediate` and `periodic` settings.  If false, only the most recent value is sent (same as NT 3.0 behavior).  If not specified, defaults to true.
+|If true, the server should send all value changes over the wire regardless of the `immediate` and `periodic` settings.  If false, only the most recent value is sent (same as NT 3.0 behavior).  If not specified, defaults to false.
 |===
 
 [[text-frames]]
