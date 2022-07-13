@@ -50,6 +50,7 @@ public class Robot extends TimedRobot {
 
     // if the thumb button is not held
     intakeButton
+        .negate()
         // or there is a ball in the kicker
         .or(isBallAtKicker)
         // stop the intake
