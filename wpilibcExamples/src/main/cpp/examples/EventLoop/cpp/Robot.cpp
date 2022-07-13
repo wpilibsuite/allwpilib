@@ -59,7 +59,7 @@ class Robot : public frc::TimedRobot {
                              ff.Calculate(SHOT_VELOCITY));
         });
     // if not, stop
-    !shootTrigger.IfHigh([&shooter = m_shooter] { shooter.Set(0.0); });
+    (!shootTrigger).IfHigh([&shooter = m_shooter] { shooter.Set(0.0); });
 
     frc::BooleanEvent atTargetVelocity =
         frc::BooleanEvent(
