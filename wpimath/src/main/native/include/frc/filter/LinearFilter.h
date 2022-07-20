@@ -180,7 +180,7 @@ class LinearFilter {
    * @tparam Derivative The order of the derivative to compute.
    * @tparam Samples    The number of samples to use to compute the given
    *                    derivative. This must be one more than the order of
-   *                    derivative or higher.
+   *                    the derivative or higher.
    * @param stencil     List of stencil points.
    * @param period      The period in seconds between samples taken by the user.
    */

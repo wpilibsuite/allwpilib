@@ -282,7 +282,7 @@ class LinearFilterTest {
       stencil[i] = -(samples - 1) / 2 + i;
     }
 
-    var filter = LinearFilter.finiteDifference(derivative, samples, stencil, h);
+    var filter = LinearFilter.finiteDifference(derivative, stencil, h);
 
     for (int i = (int) (min / h); i < (int) (max / h); ++i) {
       // Let filter initialize
