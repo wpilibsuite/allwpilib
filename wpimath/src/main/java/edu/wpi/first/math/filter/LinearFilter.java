@@ -144,7 +144,7 @@ public class LinearFilter {
    * <p>Stencil points are the indices of the samples to use in the finite difference. 0 is the
    * current sample, -1 is the previous sample, -2 is the sample before that, etc. Don't use
    * positive stencil points (samples from the future) if the LinearFilter will be used for
-   * stream-based online filtering.
+   * stream-based online filtering (e.g., taking derivative of encoder samples in real-time).
    *
    * @param derivative The order of the derivative to compute.
    * @param samples The number of samples to use to compute the given derivative. This must be one
