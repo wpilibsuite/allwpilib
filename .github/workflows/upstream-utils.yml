@@ -37,6 +37,10 @@ jobs:
         run: |
           cd upstream_utils
           ./update_eigen.py
+      - name: Run update_fmt.py
+        run: |
+          cd upstream_utils
+          ./update_fmt.py
       - name: Run update_libuv.py
         run: |
           cd upstream_utils
