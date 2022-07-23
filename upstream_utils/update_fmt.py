@@ -20,28 +20,31 @@ def main():
     am_patches(repo, [os.path.join(prefix, "0001-Don-t-throw-on-write-failure.patch")])
 
     # Delete old install
-    for d in ["src/main/native/fmtlib/src", "src/main/native/fmtlib/include"]:
+    for d in [
+        "src/main/native/thirdparty/fmtlib/src",
+        "src/main/native/thirdparty/fmtlib/include",
+    ]:
         shutil.rmtree(os.path.join(wpiutil, d), ignore_errors=True)
 
     # Copy fmt source files into allwpilib
     src_files = walk_cwd_and_copy_if(
         lambda dp, f: dp.endswith("src") and f.endswith(".cc") and f != "fmt.cc",
-        os.path.join(wpiutil, "src/main/native/fmtlib"),
+        os.path.join(wpiutil, "src/main/native/thirdparty/fmtlib"),
     )
 
     # Copy fmt header files into allwpilib
     include_files = walk_cwd_and_copy_if(
         lambda dp, f: dp.endswith("include/fmt"),
-        os.path.join(wpiutil, "src/main/native/fmtlib"),
+        os.path.join(wpiutil, "src/main/native/thirdparty/fmtlib"),
     )
 
     for f in src_files:
         comment_out_invalid_includes(
-            f, [os.path.join(wpiutil, "src/main/native/fmtlib/include")]
+            f, [os.path.join(wpiutil, "src/main/native/thirdparty/fmtlib/include")]
         )
     for f in include_files:
         comment_out_invalid_includes(
-            f, [os.path.join(wpiutil, "src/main/native/fmtlib/include")]
+            f, [os.path.join(wpiutil, "src/main/native/thirdparty/fmtlib/include")]
         )
 
 
