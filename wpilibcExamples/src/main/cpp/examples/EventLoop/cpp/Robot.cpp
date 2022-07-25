@@ -40,7 +40,7 @@ class Robot : public frc::TimedRobot {
         .IfHigh([&intake = m_intake] { intake.Set(0.5); });
 
     // if the thumb button is not held
-    (intakeButton
+    (!intakeButton
      // or there is a ball in the kicker
      || isBallAtKicker)
         // stop the intake
@@ -59,7 +59,7 @@ class Robot : public frc::TimedRobot {
                              ff.Calculate(SHOT_VELOCITY));
         });
     // if not, stop
-    shootTrigger.IfHigh([&shooter = m_shooter] { shooter.Set(0.0); });
+    (!shootTrigger).IfHigh([&shooter = m_shooter] { shooter.Set(0.0); });
 
     frc::BooleanEvent atTargetVelocity =
         frc::BooleanEvent(

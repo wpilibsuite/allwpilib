@@ -50,6 +50,7 @@ public class Robot extends TimedRobot {
 
     // if the thumb button is not held
     intakeButton
+        .negate()
         // or there is a ball in the kicker
         .or(isBallAtKicker)
         // stop the intake
@@ -66,7 +67,7 @@ public class Robot extends TimedRobot {
                 m_controller.calculate(m_shooterEncoder.getRate(), SHOT_VELOCITY)
                     + m_ff.calculate(SHOT_VELOCITY)));
     // if not, stop
-    shootTrigger.ifHigh(m_shooter::stopMotor);
+    shootTrigger.negate().ifHigh(m_shooter::stopMotor);
 
     BooleanEvent atTargetVelocity =
         new BooleanEvent(m_loop, m_controller::atSetpoint)
