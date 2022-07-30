@@ -4,11 +4,11 @@
 
 #pragma once
 
-#include <frc2/command/TrapezoidProfileSubsystem.h>
+#include <frc/command/TrapezoidProfileSubsystem.h>
 #include <units/length.h>
 
 class ReplaceMeTrapezoidProfileSubsystem
-    : frc2::TrapezoidProfileSubsystem<units::meters> {
+    : frc::TrapezoidProfileSubsystem<units::meters> {
  public:
   ReplaceMeTrapezoidProfileSubsystem();
 

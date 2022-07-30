@@ -4,8 +4,8 @@
 
 #pragma once
 
-#include <frc2/command/CommandHelper.h>
-#include <frc2/command/ProfiledPIDCommand.h>
+#include <frc/command/CommandHelper.h>
+#include <frc/command/ProfiledPIDCommand.h>
 
 #include "subsystems/DriveSubsystem.h"
 
@@ -14,8 +14,8 @@
  * profile.
  */
 class TurnToAngleProfiled
-    : public frc2::CommandHelper<frc2::ProfiledPIDCommand<units::radians>,
-                                 TurnToAngleProfiled> {
+    : public frc::CommandHelper<frc::ProfiledPIDCommand<units::radians>,
+                                TurnToAngleProfiled> {
  public:
   /**
    * Turns to robot to the specified angle using a motion profile.

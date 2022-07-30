@@ -4,10 +4,10 @@
 
 package edu.wpi.first.wpilibj.examples.gearsbot.commands;
 
+import edu.wpi.first.wpilibj.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj.examples.gearsbot.subsystems.Claw;
 import edu.wpi.first.wpilibj.examples.gearsbot.subsystems.Elevator;
 import edu.wpi.first.wpilibj.examples.gearsbot.subsystems.Wrist;
-import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 
 /**
  * Pickup a soda can (if one is between the open claws) and get it in a safe state to drive around.

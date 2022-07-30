@@ -4,13 +4,13 @@
 
 #pragma once
 
-#include <frc2/command/CommandBase.h>
-#include <frc2/command/CommandHelper.h>
+#include <frc/command/CommandBase.h>
+#include <frc/command/CommandHelper.h>
 
 #include "subsystems/Drivetrain.h"
 
 class TeleopArcadeDrive
-    : public frc2::CommandHelper<frc2::CommandBase, TeleopArcadeDrive> {
+    : public frc::CommandHelper<frc::CommandBase, TeleopArcadeDrive> {
  public:
   TeleopArcadeDrive(Drivetrain* subsystem,
                     std::function<double()> xaxisSpeedSupplier,

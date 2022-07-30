@@ -4,8 +4,8 @@
 
 #pragma once
 
-#include <frc2/command/CommandHelper.h>
-#include <frc2/command/SequentialCommandGroup.h>
+#include <frc/command/CommandHelper.h>
+#include <frc/command/SequentialCommandGroup.h>
 
 #include "subsystems/Claw.h"
 #include "subsystems/Elevator.h"
@@ -14,8 +14,8 @@
 /**
  * Make sure the robot is in a state to pickup soda cans.
  */
-class PrepareToPickup : public frc2::CommandHelper<frc2::SequentialCommandGroup,
-                                                   PrepareToPickup> {
+class PrepareToPickup
+    : public frc::CommandHelper<frc::SequentialCommandGroup, PrepareToPickup> {
  public:
   PrepareToPickup(Claw& claw, Wrist& wrist, Elevator& elevator);
 };

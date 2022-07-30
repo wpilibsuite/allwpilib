@@ -12,7 +12,6 @@ includeOtherLibs {
   ^cameraserver/
   ^cscore
   ^frc/
-  ^frc2/
   ^hal/
   ^networktables/
   ^ntcore

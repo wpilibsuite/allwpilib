@@ -6,14 +6,14 @@
 
 #include <frc/BuiltInAccelerometer.h>
 #include <frc/Encoder.h>
+#include <frc/command/SubsystemBase.h>
 #include <frc/drive/DifferentialDrive.h>
 #include <frc/motorcontrol/Spark.h>
-#include <frc2/command/SubsystemBase.h>
 #include <units/length.h>
 
 #include "sensors/RomiGyro.h"
 
-class Drivetrain : public frc2::SubsystemBase {
+class Drivetrain : public frc::SubsystemBase {
  public:
   static constexpr double kCountsPerRevolution = 1440.0;
   static constexpr units::meter_t kWheelDiameter = 70_mm;

@@ -5,8 +5,8 @@
 #pragma once
 
 #include <frc/AnalogPotentiometer.h>
+#include <frc/command/PIDSubsystem.h>
 #include <frc/motorcontrol/PWMSparkMax.h>
-#include <frc2/command/PIDSubsystem.h>
 
 /**
  * The elevator subsystem uses PID to go to a given height. Unfortunately, in
@@ -14,7 +14,7 @@
  * state PID values for simulation are different than in the real world do to
  * minor differences.
  */
-class Elevator : public frc2::PIDSubsystem {
+class Elevator : public frc::PIDSubsystem {
  public:
   Elevator();
 

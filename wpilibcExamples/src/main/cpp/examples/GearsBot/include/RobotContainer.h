@@ -5,7 +5,7 @@
 #pragma once
 
 #include <frc/XboxController.h>
-#include <frc2/command/Command.h>
+#include <frc/command/Command.h>
 
 #include "commands/Autonomous.h"
 #include "subsystems/Claw.h"
@@ -24,7 +24,7 @@ class RobotContainer {
  public:
   RobotContainer();
 
-  frc2::Command* GetAutonomousCommand();
+  frc::Command* GetAutonomousCommand();
 
  private:
   // The robot's subsystems and commands are defined here...

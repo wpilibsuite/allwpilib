@@ -59,7 +59,7 @@ class Robot : public frc::TimedRobot {
   frc::PWMSparkMax m_right{kRightMotorPort};
   frc::DifferentialDrive m_robotDrive{m_left, m_right};
 
-  frc2::PIDController m_pidController{kP, kI, kD};
+  frc::PIDController m_pidController{kP, kI, kD};
 };
 
 #ifndef RUNNING_FRC_TESTS

@@ -4,7 +4,7 @@
 
 package edu.wpi.first.wpilibj.commands.instantcommand;
 
-import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj.command.InstantCommand;
 
 // NOTE:  Consider using this command inline, rather than writing a subclass.  For more
 // information, see:

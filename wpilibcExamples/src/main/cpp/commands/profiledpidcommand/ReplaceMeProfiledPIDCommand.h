@@ -4,13 +4,13 @@
 
 #pragma once
 
-#include <frc2/command/CommandHelper.h>
-#include <frc2/command/ProfiledPIDCommand.h>
+#include <frc/command/CommandHelper.h>
+#include <frc/command/ProfiledPIDCommand.h>
 #include <units/length.h>
 
 class ReplaceMeProfiledPIDCommand
-    : public frc2::CommandHelper<frc2::ProfiledPIDCommand<units::meters>,
-                                 ReplaceMeProfiledPIDCommand> {
+    : public frc::CommandHelper<frc::ProfiledPIDCommand<units::meters>,
+                                ReplaceMeProfiledPIDCommand> {
  public:
   ReplaceMeProfiledPIDCommand();
 

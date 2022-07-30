@@ -4,15 +4,15 @@
 
 #pragma once
 
-#include <frc2/command/CommandBase.h>
-#include <frc2/command/CommandHelper.h>
+#include <frc/command/CommandBase.h>
+#include <frc/command/CommandHelper.h>
 
 #include "subsystems/Drivetrain.h"
 
 /**
  * Have the robot drive tank style using the PS3 Joystick until interrupted.
  */
-class TankDrive : public frc2::CommandHelper<frc2::CommandBase, TankDrive> {
+class TankDrive : public frc::CommandHelper<frc::CommandBase, TankDrive> {
  public:
   TankDrive(std::function<double()> left, std::function<double()> right,
             Drivetrain& drivetrain);

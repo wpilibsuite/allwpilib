@@ -4,15 +4,15 @@
 
 #pragma once
 
-#include <frc2/command/CommandHelper.h>
-#include <frc2/command/SequentialCommandGroup.h>
+#include <frc/command/CommandHelper.h>
+#include <frc/command/SequentialCommandGroup.h>
 
 #include "commands/DriveTime.h"
 #include "commands/TurnTime.h"
 #include "subsystems/Drivetrain.h"
 
 class AutonomousTime
-    : public frc2::CommandHelper<frc2::SequentialCommandGroup, AutonomousTime> {
+    : public frc::CommandHelper<frc::SequentialCommandGroup, AutonomousTime> {
  public:
   explicit AutonomousTime(Drivetrain* drive) {
     AddCommands(DriveTime(-0.6, 2_s, drive), TurnTime(-0.5, 1.3_s, drive),

@@ -6,6 +6,7 @@
 
 #include <frc/ADXRS450_Gyro.h>
 #include <frc/Encoder.h>
+#include <frc/command/SubsystemBase.h>
 #include <frc/drive/DifferentialDrive.h>
 #include <frc/geometry/Pose2d.h>
 #include <frc/kinematics/DifferentialDriveOdometry.h>
@@ -15,12 +16,11 @@
 #include <frc/simulation/DifferentialDrivetrainSim.h>
 #include <frc/simulation/EncoderSim.h>
 #include <frc/smartdashboard/Field2d.h>
-#include <frc2/command/SubsystemBase.h>
 #include <units/voltage.h>
 
 #include "Constants.h"
 
-class DriveSubsystem : public frc2::SubsystemBase {
+class DriveSubsystem : public frc::SubsystemBase {
  public:
   DriveSubsystem();
 

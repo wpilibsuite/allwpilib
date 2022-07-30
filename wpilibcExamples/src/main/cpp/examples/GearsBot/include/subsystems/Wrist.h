@@ -5,14 +5,14 @@
 #pragma once
 
 #include <frc/AnalogPotentiometer.h>
+#include <frc/command/PIDSubsystem.h>
 #include <frc/motorcontrol/PWMSparkMax.h>
-#include <frc2/command/PIDSubsystem.h>
 
 /**
  * The wrist subsystem is like the elevator, but with a rotational joint instead
  * of a linear joint.
  */
-class Wrist : public frc2::PIDSubsystem {
+class Wrist : public frc::PIDSubsystem {
  public:
   Wrist();
 

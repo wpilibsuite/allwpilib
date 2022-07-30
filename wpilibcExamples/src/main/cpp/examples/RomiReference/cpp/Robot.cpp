@@ -4,7 +4,7 @@
 
 #include "Robot.h"
 
-#include <frc2/command/CommandScheduler.h>
+#include <frc/command/CommandScheduler.h>
 
 void Robot::RobotInit() {}
 
@@ -17,7 +17,7 @@ void Robot::RobotInit() {}
  * LiveWindow and SmartDashboard integrated updating.
  */
 void Robot::RobotPeriodic() {
-  frc2::CommandScheduler::GetInstance().Run();
+  frc::CommandScheduler::GetInstance().Run();
 }
 
 /**

@@ -4,8 +4,8 @@
 
 #pragma once
 
-#include <frc2/command/CommandHelper.h>
-#include <frc2/command/SequentialCommandGroup.h>
+#include <frc/command/CommandHelper.h>
+#include <frc/command/SequentialCommandGroup.h>
 
 #include "subsystems/Claw.h"
 #include "subsystems/Elevator.h"
@@ -15,8 +15,7 @@
  * Pickup a soda can (if one is between the open claws) and
  * get it in a safe state to drive around.
  */
-class Pickup
-    : public frc2::CommandHelper<frc2::SequentialCommandGroup, Pickup> {
+class Pickup : public frc::CommandHelper<frc::SequentialCommandGroup, Pickup> {
  public:
   Pickup(Claw& claw, Wrist& wrist, Elevator& elevator);
 };

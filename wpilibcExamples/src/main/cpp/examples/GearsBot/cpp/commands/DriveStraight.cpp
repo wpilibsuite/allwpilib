@@ -9,8 +9,8 @@
 #include "Robot.h"
 
 DriveStraight::DriveStraight(double distance, Drivetrain& drivetrain)
-    : frc2::CommandHelper<frc2::PIDCommand, DriveStraight>{
-          frc2::PIDController{4, 0, 0},
+    : frc::CommandHelper<frc::PIDCommand, DriveStraight>{
+          frc::PIDController{4, 0, 0},
           [&drivetrain] { return drivetrain.GetDistance(); },
           distance,
           [&drivetrain](double output) { drivetrain.Drive(output, output); },
@@ -23,7 +23,7 @@ DriveStraight::DriveStraight(double distance, Drivetrain& drivetrain)
 void DriveStraight::Initialize() {
   // Get everything in a safe starting state.
   m_drivetrain->Reset();
-  frc2::PIDCommand::Initialize();
+  frc::PIDCommand::Initialize();
 }
 
 bool DriveStraight::IsFinished() {

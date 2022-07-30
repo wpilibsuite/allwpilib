@@ -4,8 +4,8 @@
 
 #include "RobotContainer.h"
 
+#include <frc/command/button/JoystickButton.h>
 #include <frc/shuffleboard/Shuffleboard.h>
-#include <frc2/command/button/JoystickButton.h>
 
 #include "commands/DefaultDrive.h"
 #include "commands/GrabHatch.h"
@@ -40,18 +40,18 @@ void RobotContainer::ConfigureButtonBindings() {
   // stack-allocated and declared as members of RobotContainer.
 
   // Grab the hatch when the 'A' button is pressed.
-  frc2::JoystickButton(&m_driverController, frc::XboxController::Button::kA)
+  frc::JoystickButton(&m_driverController, frc::XboxController::Button::kA)
       .WhenPressed(new GrabHatch(&m_hatch));
   // Release the hatch when the 'B' button is pressed.
-  frc2::JoystickButton(&m_driverController, frc::XboxController::Button::kB)
+  frc::JoystickButton(&m_driverController, frc::XboxController::Button::kB)
       .WhenPressed(new ReleaseHatch(&m_hatch));
   // While holding the shoulder button, drive at half speed
-  frc2::JoystickButton(&m_driverController,
-                       frc::XboxController::Button::kRightBumper)
+  frc::JoystickButton(&m_driverController,
+                      frc::XboxController::Button::kRightBumper)
       .WhenHeld(new HalveDriveSpeed(&m_drive));
 }
 
-frc2::Command* RobotContainer::GetAutonomousCommand() {
+frc::Command* RobotContainer::GetAutonomousCommand() {
   // Runs the chosen command in autonomous
   return m_chooser.GetSelected();
 }

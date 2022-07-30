@@ -139,7 +139,7 @@ TEST_P(MotorEncoderTest, ClampSpeed) {
 TEST_P(MotorEncoderTest, PositionPIDController) {
   Reset();
   double goal = 1000;
-  frc2::PIDController pidController(0.001, 0.01, 0.0);
+  frc::PIDController pidController(0.001, 0.01, 0.0);
   pidController.SetTolerance(50.0);
   pidController.SetIntegratorRange(-0.2, 0.2);
   pidController.SetSetpoint(goal);
@@ -166,7 +166,7 @@ TEST_P(MotorEncoderTest, PositionPIDController) {
 TEST_P(MotorEncoderTest, VelocityPIDController) {
   Reset();
 
-  frc2::PIDController pidController(1e-5, 0.0, 0.0006);
+  frc::PIDController pidController(1e-5, 0.0, 0.0006);
   pidController.SetTolerance(200.0);
   pidController.SetSetpoint(600);
 

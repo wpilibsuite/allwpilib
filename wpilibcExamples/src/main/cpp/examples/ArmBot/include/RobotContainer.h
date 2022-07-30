@@ -5,15 +5,15 @@
 #pragma once
 
 #include <frc/XboxController.h>
+#include <frc/command/Command.h>
+#include <frc/command/ConditionalCommand.h>
+#include <frc/command/InstantCommand.h>
+#include <frc/command/ParallelRaceGroup.h>
+#include <frc/command/RunCommand.h>
+#include <frc/command/SequentialCommandGroup.h>
+#include <frc/command/WaitCommand.h>
+#include <frc/command/WaitUntilCommand.h>
 #include <frc/smartdashboard/SendableChooser.h>
-#include <frc2/command/Command.h>
-#include <frc2/command/ConditionalCommand.h>
-#include <frc2/command/InstantCommand.h>
-#include <frc2/command/ParallelRaceGroup.h>
-#include <frc2/command/RunCommand.h>
-#include <frc2/command/SequentialCommandGroup.h>
-#include <frc2/command/WaitCommand.h>
-#include <frc2/command/WaitUntilCommand.h>
 
 #include "Constants.h"
 #include "subsystems/ArmSubsystem.h"
@@ -38,7 +38,7 @@ class RobotContainer {
    */
   void DisablePIDSubsystems();
 
-  frc2::Command* GetAutonomousCommand();
+  frc::Command* GetAutonomousCommand();
 
  private:
   // The driver's controller

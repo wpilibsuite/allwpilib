@@ -4,11 +4,11 @@
 
 #pragma once
 
-#include <frc2/command/CommandHelper.h>
-#include <frc2/command/PIDCommand.h>
+#include <frc/command/CommandHelper.h>
+#include <frc/command/PIDCommand.h>
 
 class ReplaceMePIDCommand
-    : public frc2::CommandHelper<frc2::PIDCommand, ReplaceMePIDCommand> {
+    : public frc::CommandHelper<frc::PIDCommand, ReplaceMePIDCommand> {
  public:
   ReplaceMePIDCommand();
 

@@ -4,16 +4,16 @@
 
 #include "commands/ComplexAuto.h"
 
-#include <frc2/command/FunctionalCommand.h>
-#include <frc2/command/InstantCommand.h>
-#include <frc2/command/ParallelRaceGroup.h>
+#include <frc/command/FunctionalCommand.h>
+#include <frc/command/InstantCommand.h>
+#include <frc/command/ParallelRaceGroup.h>
 
 using namespace AutoConstants;
 
 ComplexAuto::ComplexAuto(DriveSubsystem* drive, HatchSubsystem* hatch) {
   AddCommands(
       // Drive forward the specified distance
-      frc2::FunctionalCommand(
+      frc::FunctionalCommand(
           // Reset encoders on command start
           [&] { drive->ResetEncoders(); },
           // Drive forward while the command is executing
@@ -29,10 +29,10 @@ ComplexAuto::ComplexAuto(DriveSubsystem* drive, HatchSubsystem* hatch) {
           // Requires the drive subsystem
           {drive}),
       // Release the hatch
-      frc2::InstantCommand([hatch] { hatch->ReleaseHatch(); }, {hatch}),
+      frc::InstantCommand([hatch] { hatch->ReleaseHatch(); }, {hatch}),
       // Drive backward the specified distance
       // Drive forward the specified distance
-      frc2::FunctionalCommand(
+      frc::FunctionalCommand(
           // Reset encoders on command start
           [&] { drive->ResetEncoders(); },
           // Drive backward while the command is executing

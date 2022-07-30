@@ -4,14 +4,14 @@
 
 #pragma once
 
-#include <frc2/command/CommandHelper.h>
-#include <frc2/command/TrapezoidProfileCommand.h>
+#include <frc/command/CommandHelper.h>
+#include <frc/command/TrapezoidProfileCommand.h>
 
 #include "subsystems/DriveSubsystem.h"
 
 class DriveDistanceProfiled
-    : public frc2::CommandHelper<frc2::TrapezoidProfileCommand<units::meters>,
-                                 DriveDistanceProfiled> {
+    : public frc::CommandHelper<frc::TrapezoidProfileCommand<units::meters>,
+                                DriveDistanceProfiled> {
  public:
   DriveDistanceProfiled(units::meter_t distance, DriveSubsystem* drive);
 };

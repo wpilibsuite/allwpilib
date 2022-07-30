@@ -6,15 +6,15 @@
 
 #include <frc/ADXRS450_Gyro.h>
 #include <frc/Encoder.h>
+#include <frc/command/SubsystemBase.h>
 #include <frc/drive/DifferentialDrive.h>
 #include <frc/motorcontrol/MotorControllerGroup.h>
 #include <frc/motorcontrol/PWMSparkMax.h>
-#include <frc2/command/SubsystemBase.h>
 #include <units/angle.h>
 
 #include "Constants.h"
 
-class DriveSubsystem : public frc2::SubsystemBase {
+class DriveSubsystem : public frc::SubsystemBase {
  public:
   DriveSubsystem();
 

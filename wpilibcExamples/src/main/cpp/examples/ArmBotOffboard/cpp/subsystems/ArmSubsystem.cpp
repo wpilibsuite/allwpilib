@@ -10,7 +10,7 @@ using namespace ArmConstants;
 using State = frc::TrapezoidProfile<units::radians>::State;
 
 ArmSubsystem::ArmSubsystem()
-    : frc2::TrapezoidProfileSubsystem<units::radians>(
+    : frc::TrapezoidProfileSubsystem<units::radians>(
           {kMaxVelocity, kMaxAcceleration}, kArmOffset),
       m_motor(kMotorPort),
       m_feedforward(kS, kG, kV, kA) {

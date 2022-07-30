@@ -5,12 +5,12 @@
 #pragma once
 
 #include <frc/Encoder.h>
+#include <frc/command/PIDSubsystem.h>
 #include <frc/controller/SimpleMotorFeedforward.h>
 #include <frc/motorcontrol/PWMSparkMax.h>
-#include <frc2/command/PIDSubsystem.h>
 #include <units/angle.h>
 
-class ShooterSubsystem : public frc2::PIDSubsystem {
+class ShooterSubsystem : public frc::PIDSubsystem {
  public:
   ShooterSubsystem();
 

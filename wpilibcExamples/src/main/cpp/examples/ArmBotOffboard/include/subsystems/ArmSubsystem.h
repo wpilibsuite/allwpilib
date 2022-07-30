@@ -4,8 +4,8 @@
 
 #pragma once
 
+#include <frc/command/TrapezoidProfileSubsystem.h>
 #include <frc/controller/ArmFeedforward.h>
-#include <frc2/command/TrapezoidProfileSubsystem.h>
 #include <units/angle.h>
 
 #include "ExampleSmartMotorController.h"
@@ -13,7 +13,7 @@
 /**
  * A robot arm subsystem that moves with a motion profile.
  */
-class ArmSubsystem : public frc2::TrapezoidProfileSubsystem<units::radians> {
+class ArmSubsystem : public frc::TrapezoidProfileSubsystem<units::radians> {
   using State = frc::TrapezoidProfile<units::radians>::State;
 
  public:

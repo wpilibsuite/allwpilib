@@ -4,11 +4,11 @@
 
 #pragma once
 
-#include <frc2/command/ProfiledPIDSubsystem.h>
+#include <frc/command/ProfiledPIDSubsystem.h>
 #include <units/length.h>
 
 class ReplaceMeProfiledPIDSubsystem
-    : public frc2::ProfiledPIDSubsystem<units::meters> {
+    : public frc::ProfiledPIDSubsystem<units::meters> {
  public:
   ReplaceMeProfiledPIDSubsystem();
 

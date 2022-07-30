@@ -4,10 +4,10 @@
 
 package edu.wpi.first.wpilibj.examples.gearsbot.commands;
 
+import edu.wpi.first.wpilibj.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj.examples.gearsbot.subsystems.Claw;
 import edu.wpi.first.wpilibj.examples.gearsbot.subsystems.Elevator;
 import edu.wpi.first.wpilibj.examples.gearsbot.subsystems.Wrist;
-import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 
 /** Make sure the robot is in a state to pickup soda cans. */
 public class PrepareToPickup extends SequentialCommandGroup {

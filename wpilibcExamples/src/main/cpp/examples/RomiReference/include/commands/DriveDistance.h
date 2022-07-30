@@ -4,14 +4,14 @@
 
 #pragma once
 
-#include <frc2/command/CommandBase.h>
-#include <frc2/command/CommandHelper.h>
+#include <frc/command/CommandBase.h>
+#include <frc/command/CommandHelper.h>
 #include <units/length.h>
 
 #include "subsystems/Drivetrain.h"
 
 class DriveDistance
-    : public frc2::CommandHelper<frc2::CommandBase, DriveDistance> {
+    : public frc::CommandHelper<frc::CommandBase, DriveDistance> {
  public:
   DriveDistance(double speed, units::meter_t distance, Drivetrain* drive)
       : m_speed(speed), m_distance(distance), m_drive(drive) {

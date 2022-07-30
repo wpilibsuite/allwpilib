@@ -4,8 +4,8 @@
 
 #pragma once
 
-#include <frc2/command/CommandHelper.h>
-#include <frc2/command/WaitCommand.h>
+#include <frc/command/CommandHelper.h>
+#include <frc/command/WaitCommand.h>
 
 #include "subsystems/Claw.h"
 
@@ -13,7 +13,7 @@
  * Opens the claw for one second. Real robots should use sensors, stalling
  * motors is BAD!
  */
-class OpenClaw : public frc2::CommandHelper<frc2::WaitCommand, OpenClaw> {
+class OpenClaw : public frc::CommandHelper<frc::WaitCommand, OpenClaw> {
  public:
   explicit OpenClaw(Claw& claw);
   void Initialize() override;

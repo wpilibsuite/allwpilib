@@ -13,7 +13,7 @@
 
 #include "units/time.h"
 
-namespace frc2 {
+namespace frc {
 
 /**
  * Implements a PID control loop.
@@ -239,11 +239,5 @@ class WPILIB_DLLEXPORT PIDController
   double m_setpoint = 0;
   double m_measurement = 0;
 };
-
-}  // namespace frc2
-
-namespace frc {
-
-using frc2::PIDController;
 
 }  // namespace frc

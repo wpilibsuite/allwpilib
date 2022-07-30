@@ -8,7 +8,7 @@
 
 #include <frc/DigitalInput.h>
 #include <frc/DigitalOutput.h>
-#include <frc2/command/SubsystemBase.h>
+#include <frc/command/SubsystemBase.h>
 
 /**
  * This class represents the onboard IO of the Romi
@@ -20,7 +20,7 @@
  * DIO 2 - Button C (input) or Red LED (output)
  * DIO 3 - Yellow LED (output only)
  */
-class OnBoardIO : public frc2::SubsystemBase {
+class OnBoardIO : public frc::SubsystemBase {
  public:
   enum ChannelMode { INPUT, OUTPUT };
   OnBoardIO(OnBoardIO::ChannelMode dio1, OnBoardIO::ChannelMode dio2);

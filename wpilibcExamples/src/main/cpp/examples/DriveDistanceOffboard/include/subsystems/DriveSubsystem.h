@@ -5,16 +5,16 @@
 #pragma once
 
 #include <frc/Encoder.h>
+#include <frc/command/SubsystemBase.h>
 #include <frc/controller/SimpleMotorFeedforward.h>
 #include <frc/drive/DifferentialDrive.h>
 #include <frc/trajectory/TrapezoidProfile.h>
-#include <frc2/command/SubsystemBase.h>
 #include <units/length.h>
 
 #include "Constants.h"
 #include "ExampleSmartMotorController.h"
 
-class DriveSubsystem : public frc2::SubsystemBase {
+class DriveSubsystem : public frc::SubsystemBase {
  public:
   DriveSubsystem();
 

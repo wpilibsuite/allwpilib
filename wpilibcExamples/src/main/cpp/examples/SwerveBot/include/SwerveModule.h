@@ -39,7 +39,7 @@ class SwerveModule {
   frc::Encoder m_driveEncoder;
   frc::Encoder m_turningEncoder;
 
-  frc2::PIDController m_drivePIDController{1.0, 0, 0};
+  frc::PIDController m_drivePIDController{1.0, 0, 0};
   frc::ProfiledPIDController<units::radians> m_turningPIDController{
       1.0,
       0.0,

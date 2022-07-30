@@ -4,8 +4,8 @@
 
 package edu.wpi.first.wpilibj.examples.hatchbottraditional.commands;
 
+import edu.wpi.first.wpilibj.command.InstantCommand;
 import edu.wpi.first.wpilibj.examples.hatchbottraditional.subsystems.HatchSubsystem;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
 
 /** A command that releases the hatch. */
 public class ReleaseHatch extends InstantCommand {

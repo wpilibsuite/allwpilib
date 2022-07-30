@@ -62,7 +62,7 @@ TEST(DCMotorSimTest, PositionFeedbackControl) {
   frc::sim::DCMotorSim sim{gearbox, 1.0,
                            units::kilogram_square_meter_t{0.0005}};
 
-  frc2::PIDController controller{0.04, 0.0, 0.001};
+  frc::PIDController controller{0.04, 0.0, 0.001};
 
   frc::Encoder encoder{0, 1};
   frc::sim::EncoderSim encoderSim{encoder};

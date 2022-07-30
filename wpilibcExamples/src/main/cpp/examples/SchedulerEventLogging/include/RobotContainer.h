@@ -5,9 +5,9 @@
 #pragma once
 
 #include <frc/XboxController.h>
-#include <frc2/command/Command.h>
-#include <frc2/command/InstantCommand.h>
-#include <frc2/command/WaitCommand.h>
+#include <frc/command/Command.h>
+#include <frc/command/InstantCommand.h>
+#include <frc/command/WaitCommand.h>
 
 #include "Constants.h"
 
@@ -22,7 +22,7 @@ class RobotContainer {
  public:
   RobotContainer();
 
-  frc2::Command* GetAutonomousCommand();
+  frc::Command* GetAutonomousCommand();
 
  private:
   // The robot's subsystems and commands are defined here...
@@ -31,9 +31,9 @@ class RobotContainer {
   frc::XboxController m_driverController{OIConstants::kDriverControllerPort};
 
   // Three commands that do nothing; for demonstration purposes.
-  frc2::InstantCommand m_instantCommand1;
-  frc2::InstantCommand m_instantCommand2;
-  frc2::WaitCommand m_waitCommand{5_s};
+  frc::InstantCommand m_instantCommand1;
+  frc::InstantCommand m_instantCommand2;
+  frc::WaitCommand m_waitCommand{5_s};
 
   void ConfigureButtonBindings();
 };

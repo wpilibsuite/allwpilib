@@ -22,7 +22,7 @@
 TEST(ElevatorSimTest, StateSpaceSim) {
   frc::sim::ElevatorSim sim(frc::DCMotor::Vex775Pro(4), 14.67, 8_kg, 0.75_in,
                             0_m, 3_m, true, {0.01});
-  frc2::PIDController controller(10, 0.0, 0.0);
+  frc::PIDController controller(10, 0.0, 0.0);
 
   frc::PWMVictorSPX motor(0);
   frc::Encoder encoder(0, 1);

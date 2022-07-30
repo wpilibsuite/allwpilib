@@ -51,7 +51,7 @@ class Robot : public frc::TimedRobot {
   frc::DCMotor m_armGearbox = frc::DCMotor::Vex775Pro(2);
 
   // Standard classes for controlling our arm
-  frc2::PIDController m_controller{kArmKp, 0, 0};
+  frc::PIDController m_controller{kArmKp, 0, 0};
   frc::Encoder m_encoder{kEncoderAChannel, kEncoderBChannel};
   frc::PWMSparkMax m_motor{kMotorPort};
   frc::Joystick m_joystick{kJoystickPort};

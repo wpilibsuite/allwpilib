@@ -52,7 +52,7 @@ class Robot : public frc::TimedRobot {
   frc::DCMotor m_elevatorGearbox = frc::DCMotor::Vex775Pro(4);
 
   // Standard classes for controlling our elevator
-  frc2::PIDController m_controller{kElevatorKp, 0, 0};
+  frc::PIDController m_controller{kElevatorKp, 0, 0};
   frc::Encoder m_encoder{kEncoderAChannel, kEncoderBChannel};
   frc::PWMSparkMax m_motor{kMotorPort};
   frc::Joystick m_joystick{kJoystickPort};

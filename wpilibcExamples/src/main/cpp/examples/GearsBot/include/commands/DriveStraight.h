@@ -4,8 +4,8 @@
 
 #pragma once
 
-#include <frc2/command/CommandHelper.h>
-#include <frc2/command/PIDCommand.h>
+#include <frc/command/CommandHelper.h>
+#include <frc/command/PIDCommand.h>
 
 #include "subsystems/Drivetrain.h"
 
@@ -16,7 +16,7 @@
  * values of the left and right encoders.
  */
 class DriveStraight
-    : public frc2::CommandHelper<frc2::PIDCommand, DriveStraight> {
+    : public frc::CommandHelper<frc::PIDCommand, DriveStraight> {
  public:
   explicit DriveStraight(double distance, Drivetrain& drivetrain);
   void Initialize() override;

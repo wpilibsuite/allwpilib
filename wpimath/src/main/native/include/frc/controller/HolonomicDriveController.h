@@ -42,7 +42,7 @@ class WPILIB_DLLEXPORT HolonomicDriveController {
    * angle.
    */
   HolonomicDriveController(
-      frc2::PIDController xController, frc2::PIDController yController,
+      PIDController xController, PIDController yController,
       ProfiledPIDController<units::radian> thetaController);
 
   /**
@@ -103,8 +103,8 @@ class WPILIB_DLLEXPORT HolonomicDriveController {
   Pose2d m_poseTolerance;
   bool m_enabled = true;
 
-  frc2::PIDController m_xController;
-  frc2::PIDController m_yController;
+  PIDController m_xController;
+  PIDController m_yController;
   ProfiledPIDController<units::radian> m_thetaController;
 
   bool m_firstRun = true;

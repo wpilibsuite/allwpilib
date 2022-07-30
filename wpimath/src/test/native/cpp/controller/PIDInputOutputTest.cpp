@@ -7,9 +7,9 @@
 
 class PIDInputOutputTest : public testing::Test {
  protected:
-  frc2::PIDController* controller;
+  frc::PIDController* controller;
 
-  void SetUp() override { controller = new frc2::PIDController{0, 0, 0}; }
+  void SetUp() override { controller = new frc::PIDController{0, 0, 0}; }
 
   void TearDown() override { delete controller; }
 };

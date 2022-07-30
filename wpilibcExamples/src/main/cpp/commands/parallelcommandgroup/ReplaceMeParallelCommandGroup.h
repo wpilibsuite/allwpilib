@@ -4,12 +4,12 @@
 
 #pragma once
 
-#include <frc2/command/CommandHelper.h>
-#include <frc2/command/ParallelCommandGroup.h>
+#include <frc/command/CommandHelper.h>
+#include <frc/command/ParallelCommandGroup.h>
 
 class ReplaceMeParallelCommandGroup
-    : public frc2::CommandHelper<frc2::ParallelCommandGroup,
-                                 ReplaceMeParallelCommandGroup> {
+    : public frc::CommandHelper<frc::ParallelCommandGroup,
+                                ReplaceMeParallelCommandGroup> {
  public:
   ReplaceMeParallelCommandGroup();
 };

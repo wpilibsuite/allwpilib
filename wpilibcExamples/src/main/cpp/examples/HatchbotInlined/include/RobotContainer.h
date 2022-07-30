@@ -5,13 +5,13 @@
 #pragma once
 
 #include <frc/PS4Controller.h>
+#include <frc/command/Command.h>
+#include <frc/command/FunctionalCommand.h>
+#include <frc/command/InstantCommand.h>
+#include <frc/command/ParallelRaceGroup.h>
+#include <frc/command/RunCommand.h>
+#include <frc/command/SequentialCommandGroup.h>
 #include <frc/smartdashboard/SendableChooser.h>
-#include <frc2/command/Command.h>
-#include <frc2/command/FunctionalCommand.h>
-#include <frc2/command/InstantCommand.h>
-#include <frc2/command/ParallelRaceGroup.h>
-#include <frc2/command/RunCommand.h>
-#include <frc2/command/SequentialCommandGroup.h>
 
 #include "Constants.h"
 #include "commands/ComplexAuto.h"
@@ -31,7 +31,7 @@ class RobotContainer {
  public:
   RobotContainer();
 
-  frc2::Command* GetAutonomousCommand();
+  frc::Command* GetAutonomousCommand();
 
  private:
   // The driver's controller
@@ -44,7 +44,7 @@ class RobotContainer {
   HatchSubsystem m_hatch;
 
   // The autonomous routines
-  frc2::FunctionalCommand m_simpleAuto = frc2::FunctionalCommand(
+  frc::FunctionalCommand m_simpleAuto = frc::FunctionalCommand(
       // Reset encoders on command start
       [this] { m_drive.ResetEncoders(); },
       // Drive forward while the command is executing
@@ -63,16 +63,15 @@ class RobotContainer {
 
   // Assorted commands to be bound to buttons
 
-  frc2::InstantCommand m_grabHatch{[this] { m_hatch.GrabHatch(); }, {&m_hatch}};
-  frc2::InstantCommand m_releaseHatch{[this] { m_hatch.ReleaseHatch(); },
-                                      {&m_hatch}};
-  frc2::InstantCommand m_driveHalfSpeed{[this] { m_drive.SetMaxOutput(0.5); },
-                                        {}};
-  frc2::InstantCommand m_driveFullSpeed{[this] { m_drive.SetMaxOutput(1); },
-                                        {}};
+  frc::InstantCommand m_grabHatch{[this] { m_hatch.GrabHatch(); }, {&m_hatch}};
+  frc::InstantCommand m_releaseHatch{[this] { m_hatch.ReleaseHatch(); },
+                                     {&m_hatch}};
+  frc::InstantCommand m_driveHalfSpeed{[this] { m_drive.SetMaxOutput(0.5); },
+                                       {}};
+  frc::InstantCommand m_driveFullSpeed{[this] { m_drive.SetMaxOutput(1); }, {}};
 
   // The chooser for the autonomous routines
-  frc::SendableChooser<frc2::Command*> m_chooser;
+  frc::SendableChooser<frc::Command*> m_chooser;
 
   void ConfigureButtonBindings();
 };

@@ -11,7 +11,7 @@
 using namespace frc;
 
 HolonomicDriveController::HolonomicDriveController(
-    frc2::PIDController xController, frc2::PIDController yController,
+    PIDController xController, PIDController yController,
     ProfiledPIDController<units::radian> thetaController)
     : m_xController(std::move(xController)),
       m_yController(std::move(yController)),

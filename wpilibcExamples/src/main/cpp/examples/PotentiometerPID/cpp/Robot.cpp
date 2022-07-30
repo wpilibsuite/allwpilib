@@ -64,7 +64,7 @@ class Robot : public frc::TimedRobot {
   frc::Joystick m_joystick{kJoystickChannel};
   frc::PWMSparkMax m_elevatorMotor{kMotorChannel};
 
-  frc2::PIDController m_pidController{kP, kI, kD};
+  frc::PIDController m_pidController{kP, kI, kD};
 };
 
 constexpr std::array<double, 3> Robot::kSetPoints;

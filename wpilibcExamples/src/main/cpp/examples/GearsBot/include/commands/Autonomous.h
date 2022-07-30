@@ -4,8 +4,8 @@
 
 #pragma once
 
-#include <frc2/command/CommandHelper.h>
-#include <frc2/command/SequentialCommandGroup.h>
+#include <frc/command/CommandHelper.h>
+#include <frc/command/SequentialCommandGroup.h>
 
 #include "subsystems/Claw.h"
 #include "subsystems/Drivetrain.h"
@@ -16,7 +16,7 @@
  * The main autonomous command to pickup and deliver the soda to the box.
  */
 class Autonomous
-    : public frc2::CommandHelper<frc2::SequentialCommandGroup, Autonomous> {
+    : public frc::CommandHelper<frc::SequentialCommandGroup, Autonomous> {
  public:
   Autonomous(Claw& claw, Wrist& wrist, Elevator& elevator,
              Drivetrain& drivetrain);

@@ -4,8 +4,8 @@
 
 package edu.wpi.first.wpilibj.examples.gearsbot.commands;
 
+import edu.wpi.first.wpilibj.command.WaitCommand;
 import edu.wpi.first.wpilibj.examples.gearsbot.subsystems.Claw;
-import edu.wpi.first.wpilibj2.command.WaitCommand;
 
 /** Opens the claw for one second. Real robots should use sensors, stalling motors is BAD! */
 public class OpenClaw extends WaitCommand {

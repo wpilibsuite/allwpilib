@@ -5,7 +5,7 @@
 package edu.wpi.first.wpilibj.commands.trapezoidprofilesubsystem;
 
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
-import edu.wpi.first.wpilibj2.command.TrapezoidProfileSubsystem;
+import edu.wpi.first.wpilibj.command.TrapezoidProfileSubsystem;
 
 public class ReplaceMeTrapezoidProfileSubsystem extends TrapezoidProfileSubsystem {
   /** Creates a new ReplaceMeTrapezoidProfileSubsystem. */

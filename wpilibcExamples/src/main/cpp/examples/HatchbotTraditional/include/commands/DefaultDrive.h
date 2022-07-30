@@ -4,8 +4,8 @@
 
 #pragma once
 
-#include <frc2/command/CommandBase.h>
-#include <frc2/command/CommandHelper.h>
+#include <frc/command/CommandBase.h>
+#include <frc/command/CommandHelper.h>
 
 #include "subsystems/DriveSubsystem.h"
 
@@ -16,8 +16,7 @@
  *
  * @see RunCommand
  */
-class DefaultDrive
-    : public frc2::CommandHelper<frc2::CommandBase, DefaultDrive> {
+class DefaultDrive : public frc::CommandHelper<frc::CommandBase, DefaultDrive> {
  public:
   /**
    * Creates a new DefaultDrive.

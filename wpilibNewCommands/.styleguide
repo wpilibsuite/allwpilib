@@ -16,7 +16,7 @@ includeOtherLibs {
   ^cameraserver/
   ^cscore
   ^fmt/
-  ^frc/
+  ^frc/(?!command/)
   ^hal/
   ^imgui
   ^mockdata/

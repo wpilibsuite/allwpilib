@@ -4,8 +4,8 @@
 
 #include "RobotContainer.h"
 
+#include <frc/command/button/JoystickButton.h>
 #include <frc/smartdashboard/SmartDashboard.h>
-#include <frc2/command/button/JoystickButton.h>
 
 #include "commands/CloseClaw.h"
 #include "commands/OpenClaw.h"
@@ -32,23 +32,23 @@ RobotContainer::RobotContainer()
 
 void RobotContainer::ConfigureButtonBindings() {
   // Configure your button bindings here
-  frc2::JoystickButton(&m_joy, 5).WhenPressed(
+  frc::JoystickButton(&m_joy, 5).WhenPressed(
       SetElevatorSetpoint(0.25, m_elevator));
-  frc2::JoystickButton(&m_joy, 6).WhenPressed(CloseClaw(m_claw));
-  frc2::JoystickButton(&m_joy, 7).WhenPressed(
+  frc::JoystickButton(&m_joy, 6).WhenPressed(CloseClaw(m_claw));
+  frc::JoystickButton(&m_joy, 7).WhenPressed(
       SetElevatorSetpoint(0.0, m_elevator));
-  frc2::JoystickButton(&m_joy, 8).WhenPressed(OpenClaw(m_claw));
-  frc2::JoystickButton(&m_joy, 9).WhenPressed(
+  frc::JoystickButton(&m_joy, 8).WhenPressed(OpenClaw(m_claw));
+  frc::JoystickButton(&m_joy, 9).WhenPressed(
       Autonomous(m_claw, m_wrist, m_elevator, m_drivetrain));
-  frc2::JoystickButton(&m_joy, 10)
+  frc::JoystickButton(&m_joy, 10)
       .WhenPressed(Pickup(m_claw, m_wrist, m_elevator));
-  frc2::JoystickButton(&m_joy, 11)
+  frc::JoystickButton(&m_joy, 11)
       .WhenPressed(Place(m_claw, m_wrist, m_elevator));
-  frc2::JoystickButton(&m_joy, 12)
+  frc::JoystickButton(&m_joy, 12)
       .WhenPressed(PrepareToPickup(m_claw, m_wrist, m_elevator));
 }
 
-frc2::Command* RobotContainer::GetAutonomousCommand() {
+frc::Command* RobotContainer::GetAutonomousCommand() {
   // An example command will be run in autonomous
   return &m_autonomousCommand;
 }

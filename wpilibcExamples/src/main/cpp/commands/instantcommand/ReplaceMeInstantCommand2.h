@@ -4,12 +4,11 @@
 
 #pragma once
 
-#include <frc2/command/CommandHelper.h>
-#include <frc2/command/InstantCommand.h>
+#include <frc/command/CommandHelper.h>
+#include <frc/command/InstantCommand.h>
 
 class ReplaceMeInstantCommand2
-    : public frc2::CommandHelper<frc2::InstantCommand,
-                                 ReplaceMeInstantCommand2> {
+    : public frc::CommandHelper<frc::InstantCommand, ReplaceMeInstantCommand2> {
  public:
   ReplaceMeInstantCommand2();
 

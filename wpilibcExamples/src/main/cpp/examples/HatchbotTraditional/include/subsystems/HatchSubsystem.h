@@ -6,11 +6,11 @@
 
 #include <frc/DoubleSolenoid.h>
 #include <frc/PneumaticsControlModule.h>
-#include <frc2/command/SubsystemBase.h>
+#include <frc/command/SubsystemBase.h>
 
 #include "Constants.h"
 
-class HatchSubsystem : public frc2::SubsystemBase {
+class HatchSubsystem : public frc::SubsystemBase {
  public:
   HatchSubsystem();
 

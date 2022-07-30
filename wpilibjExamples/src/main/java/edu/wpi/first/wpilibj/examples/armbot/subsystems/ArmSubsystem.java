@@ -8,9 +8,9 @@ import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj.Encoder;
+import edu.wpi.first.wpilibj.command.ProfiledPIDSubsystem;
 import edu.wpi.first.wpilibj.examples.armbot.Constants.ArmConstants;
 import edu.wpi.first.wpilibj.motorcontrol.PWMSparkMax;
-import edu.wpi.first.wpilibj2.command.ProfiledPIDSubsystem;
 
 /** A robot arm subsystem that moves with a motion profile. */
 public class ArmSubsystem extends ProfiledPIDSubsystem {

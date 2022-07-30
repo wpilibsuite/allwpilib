@@ -4,16 +4,16 @@
 
 #pragma once
 
-#include <frc2/command/CommandHelper.h>
-#include <frc2/command/SequentialCommandGroup.h>
+#include <frc/command/CommandHelper.h>
+#include <frc/command/SequentialCommandGroup.h>
 
 #include "commands/DriveDistance.h"
 #include "commands/TurnDegrees.h"
 #include "subsystems/Drivetrain.h"
 
 class AutonomousDistance
-    : public frc2::CommandHelper<frc2::SequentialCommandGroup,
-                                 AutonomousDistance> {
+    : public frc::CommandHelper<frc::SequentialCommandGroup,
+                                AutonomousDistance> {
  public:
   explicit AutonomousDistance(Drivetrain* drive) {
     AddCommands(

@@ -6,15 +6,15 @@
 
 #include <utility>
 
+#include <frc/command/InstantCommand.h>
+#include <frc/command/SequentialCommandGroup.h>
+#include <frc/command/SwerveControllerCommand.h>
+#include <frc/command/button/JoystickButton.h>
 #include <frc/controller/PIDController.h>
 #include <frc/geometry/Translation2d.h>
 #include <frc/shuffleboard/Shuffleboard.h>
 #include <frc/trajectory/Trajectory.h>
 #include <frc/trajectory/TrajectoryGenerator.h>
-#include <frc2/command/InstantCommand.h>
-#include <frc2/command/SequentialCommandGroup.h>
-#include <frc2/command/SwerveControllerCommand.h>
-#include <frc2/command/button/JoystickButton.h>
 #include <units/angle.h>
 #include <units/velocity.h>
 
@@ -32,7 +32,7 @@ RobotContainer::RobotContainer() {
   // Set up default drive command
   // The left stick controls translation of the robot.
   // Turning is controlled by the X axis of the right stick.
-  m_drive.SetDefaultCommand(frc2::RunCommand(
+  m_drive.SetDefaultCommand(frc::RunCommand(
       [this] {
         m_drive.Drive(
             units::meters_per_second_t{m_driverController.GetLeftY()},
@@ -44,7 +44,7 @@ RobotContainer::RobotContainer() {
 
 void RobotContainer::ConfigureButtonBindings() {}
 
-frc2::Command* RobotContainer::GetAutonomousCommand() {
+frc::Command* RobotContainer::GetAutonomousCommand() {
   // Set up config for trajectory
   frc::TrajectoryConfig config(AutoConstants::kMaxSpeed,
                                AutoConstants::kMaxAcceleration);
@@ -69,13 +69,13 @@ frc2::Command* RobotContainer::GetAutonomousCommand() {
   thetaController.EnableContinuousInput(units::radian_t{-wpi::numbers::pi},
                                         units::radian_t{wpi::numbers::pi});
 
-  frc2::SwerveControllerCommand<4> swerveControllerCommand(
+  frc::SwerveControllerCommand<4> swerveControllerCommand(
       exampleTrajectory, [this]() { return m_drive.GetPose(); },
 
       m_drive.kDriveKinematics,
 
-      frc2::PIDController{AutoConstants::kPXController, 0, 0},
-      frc2::PIDController{AutoConstants::kPYController, 0, 0}, thetaController,
+      frc::PIDController{AutoConstants::kPXController, 0, 0},
+      frc::PIDController{AutoConstants::kPYController, 0, 0}, thetaController,
 
       [this](auto moduleStates) { m_drive.SetModuleStates(moduleStates); },
 
@@ -85,8 +85,8 @@ frc2::Command* RobotContainer::GetAutonomousCommand() {
   m_drive.ResetOdometry(exampleTrajectory.InitialPose());
 
   // no auto
-  return new frc2::SequentialCommandGroup(
+  return new frc::SequentialCommandGroup(
       std::move(swerveControllerCommand),
-      frc2::InstantCommand(
+      frc::InstantCommand(
           [this]() { m_drive.Drive(0_mps, 0_mps, 0_rad_per_s, false); }, {}));
 }

@@ -4,9 +4,9 @@
 
 #pragma once
 
-#include <frc2/command/PIDSubsystem.h>
+#include <frc/command/PIDSubsystem.h>
 
-class ReplaceMePIDSubsystem2 : public frc2::PIDSubsystem {
+class ReplaceMePIDSubsystem2 : public frc::PIDSubsystem {
  public:
   ReplaceMePIDSubsystem2();
 

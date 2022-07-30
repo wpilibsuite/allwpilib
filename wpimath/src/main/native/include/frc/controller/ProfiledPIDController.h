@@ -356,7 +356,7 @@ class ProfiledPIDController
   }
 
  private:
-  frc2::PIDController m_controller;
+  PIDController m_controller;
   Distance_t m_minimumInput{0};
   Distance_t m_maximumInput{0};
   typename frc::TrapezoidProfile<Distance>::State m_goal;

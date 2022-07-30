@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include <frc2/command/Command.h>
+#include <frc/command/Command.h>
 
 #include "commands/ExampleCommand.h"
 #include "subsystems/ExampleSubsystem.h"
@@ -20,7 +20,7 @@ class RobotContainer {
  public:
   RobotContainer();
 
-  frc2::Command* GetAutonomousCommand();
+  frc::Command* GetAutonomousCommand();
 
  private:
   // The robot's subsystems and commands are defined here...

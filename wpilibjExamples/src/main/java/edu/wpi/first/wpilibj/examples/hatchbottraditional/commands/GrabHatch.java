@@ -4,13 +4,13 @@
 
 package edu.wpi.first.wpilibj.examples.hatchbottraditional.commands;
 
+import edu.wpi.first.wpilibj.command.CommandBase;
 import edu.wpi.first.wpilibj.examples.hatchbottraditional.subsystems.HatchSubsystem;
-import edu.wpi.first.wpilibj2.command.CommandBase;
 
 /**
  * A simple command that grabs a hatch with the {@link HatchSubsystem}. Written explicitly for
  * pedagogical purposes. Actual code should inline a command this simple with {@link
- * edu.wpi.first.wpilibj2.command.InstantCommand}.
+ * edu.wpi.first.wpilibj.command.InstantCommand}.
  */
 public class GrabHatch extends CommandBase {
   // The subsystem the command runs on

@@ -6,16 +6,16 @@
 
 #include <utility>
 
+#include <frc/command/InstantCommand.h>
+#include <frc/command/RamseteCommand.h>
+#include <frc/command/SequentialCommandGroup.h>
+#include <frc/command/button/JoystickButton.h>
 #include <frc/controller/PIDController.h>
 #include <frc/controller/RamseteController.h>
 #include <frc/shuffleboard/Shuffleboard.h>
 #include <frc/trajectory/Trajectory.h>
 #include <frc/trajectory/TrajectoryGenerator.h>
 #include <frc/trajectory/constraint/DifferentialDriveVoltageConstraint.h>
-#include <frc2/command/InstantCommand.h>
-#include <frc2/command/RamseteCommand.h>
-#include <frc2/command/SequentialCommandGroup.h>
-#include <frc2/command/button/JoystickButton.h>
 
 #include "Constants.h"
 
@@ -26,7 +26,7 @@ RobotContainer::RobotContainer() {
   ConfigureButtonBindings();
 
   // Set up default drive command
-  m_drive.SetDefaultCommand(frc2::RunCommand(
+  m_drive.SetDefaultCommand(frc::RunCommand(
       [this] {
         m_drive.ArcadeDrive(m_driverController.GetLeftY(),
                             m_driverController.GetRightX());
@@ -38,12 +38,12 @@ void RobotContainer::ConfigureButtonBindings() {
   // Configure your button bindings here
 
   // While holding the shoulder button, drive at half speed
-  frc2::JoystickButton{&m_driverController, 6}
+  frc::JoystickButton{&m_driverController, 6}
       .WhenPressed(&m_driveHalfSpeed)
       .WhenReleased(&m_driveFullSpeed);
 }
 
-frc2::Command* RobotContainer::GetAutonomousCommand() {
+frc::Command* RobotContainer::GetAutonomousCommand() {
   // Create a voltage constraint to ensure we don't accelerate too fast
   frc::DifferentialDriveVoltageConstraint autoVoltageConstraint{
       frc::SimpleMotorFeedforward<units::meters>{
@@ -69,7 +69,7 @@ frc2::Command* RobotContainer::GetAutonomousCommand() {
       // Pass the config
       config);
 
-  frc2::RamseteCommand ramseteCommand{
+  frc::RamseteCommand ramseteCommand{
       exampleTrajectory,
       [this]() { return m_drive.GetPose(); },
       frc::RamseteController{AutoConstants::kRamseteB,
@@ -78,8 +78,8 @@ frc2::Command* RobotContainer::GetAutonomousCommand() {
           DriveConstants::ks, DriveConstants::kv, DriveConstants::ka},
       DriveConstants::kDriveKinematics,
       [this] { return m_drive.GetWheelSpeeds(); },
-      frc2::PIDController{DriveConstants::kPDriveVel, 0, 0},
-      frc2::PIDController{DriveConstants::kPDriveVel, 0, 0},
+      frc::PIDController{DriveConstants::kPDriveVel, 0, 0},
+      frc::PIDController{DriveConstants::kPDriveVel, 0, 0},
       [this](auto left, auto right) { m_drive.TankDriveVolts(left, right); },
       {&m_drive}};
 
@@ -87,7 +87,7 @@ frc2::Command* RobotContainer::GetAutonomousCommand() {
   m_drive.ResetOdometry(exampleTrajectory.InitialPose());
 
   // no auto
-  return new frc2::SequentialCommandGroup(
+  return new frc::SequentialCommandGroup(
       std::move(ramseteCommand),
-      frc2::InstantCommand([this] { m_drive.TankDriveVolts(0_V, 0_V); }, {}));
+      frc::InstantCommand([this] { m_drive.TankDriveVolts(0_V, 0_V); }, {}));
 }

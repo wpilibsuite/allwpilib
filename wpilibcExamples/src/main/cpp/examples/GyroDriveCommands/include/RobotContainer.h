@@ -5,10 +5,10 @@
 #pragma once
 
 #include <frc/PS4Controller.h>
+#include <frc/command/Command.h>
+#include <frc/command/InstantCommand.h>
 #include <frc/controller/PIDController.h>
 #include <frc/smartdashboard/SendableChooser.h>
-#include <frc2/command/Command.h>
-#include <frc2/command/InstantCommand.h>
 
 #include "Constants.h"
 #include "commands/TurnToAngle.h"
@@ -28,7 +28,7 @@ class RobotContainer {
  public:
   RobotContainer();
 
-  frc2::Command* GetAutonomousCommand();
+  frc::Command* GetAutonomousCommand();
 
  private:
   // The driver's controller
@@ -40,7 +40,7 @@ class RobotContainer {
   DriveSubsystem m_drive;
 
   // The chooser for the autonomous routines
-  frc::SendableChooser<frc2::Command*> m_chooser;
+  frc::SendableChooser<frc::Command*> m_chooser;
 
   void ConfigureButtonBindings();
 };

@@ -4,8 +4,8 @@
 
 #pragma once
 
-#include <frc2/command/CommandHelper.h>
-#include <frc2/command/SequentialCommandGroup.h>
+#include <frc/command/CommandHelper.h>
+#include <frc/command/SequentialCommandGroup.h>
 
 #include "subsystems/Claw.h"
 #include "subsystems/Elevator.h"
@@ -14,7 +14,7 @@
 /**
  * Place a held soda can onto the platform.
  */
-class Place : public frc2::CommandHelper<frc2::SequentialCommandGroup, Place> {
+class Place : public frc::CommandHelper<frc::SequentialCommandGroup, Place> {
  public:
   Place(Claw& claw, Wrist& wrist, Elevator& elevator);
 };

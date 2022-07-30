@@ -4,12 +4,12 @@
 
 #pragma once
 
-#include <frc2/command/CommandHelper.h>
-#include <frc2/command/ParallelDeadlineGroup.h>
+#include <frc/command/CommandHelper.h>
+#include <frc/command/ParallelDeadlineGroup.h>
 
 class ReplaceMeParallelDeadlineGroup
-    : public frc2::CommandHelper<frc2::ParallelDeadlineGroup,
-                                 ReplaceMeParallelDeadlineGroup> {
+    : public frc::CommandHelper<frc::ParallelDeadlineGroup,
+                                ReplaceMeParallelDeadlineGroup> {
  public:
   ReplaceMeParallelDeadlineGroup();
 };

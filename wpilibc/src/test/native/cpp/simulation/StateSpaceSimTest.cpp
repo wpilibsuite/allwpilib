@@ -27,7 +27,7 @@ TEST(StateSpaceSimTest, FlywheelSim) {
       frc::LinearSystemId::IdentifyVelocitySystem<units::radian>(
           0.02_V / 1_rad_per_s, 0.01_V / 1_rad_per_s_sq);
   frc::sim::FlywheelSim sim{plant, frc::DCMotor::NEO(2), 1.0};
-  frc2::PIDController controller{0.2, 0.0, 0.0};
+  frc::PIDController controller{0.2, 0.0, 0.0};
   frc::SimpleMotorFeedforward<units::radian> feedforward{
       0_V, 0.02_V / 1_rad_per_s, 0.01_V / 1_rad_per_s_sq};
   frc::Encoder encoder{0, 1};

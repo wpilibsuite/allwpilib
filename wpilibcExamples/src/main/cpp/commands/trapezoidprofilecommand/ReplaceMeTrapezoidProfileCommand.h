@@ -4,13 +4,13 @@
 
 #pragma once
 
-#include <frc2/command/CommandHelper.h>
-#include <frc2/command/TrapezoidProfileCommand.h>
+#include <frc/command/CommandHelper.h>
+#include <frc/command/TrapezoidProfileCommand.h>
 #include <units/length.h>
 
 class ReplaceMeTrapezoidProfileCommand
-    : public frc2::CommandHelper<frc2::TrapezoidProfileCommand<units::meters>,
-                                 ReplaceMeTrapezoidProfileCommand> {
+    : public frc::CommandHelper<frc::TrapezoidProfileCommand<units::meters>,
+                                ReplaceMeTrapezoidProfileCommand> {
  public:
   ReplaceMeTrapezoidProfileCommand();
 };

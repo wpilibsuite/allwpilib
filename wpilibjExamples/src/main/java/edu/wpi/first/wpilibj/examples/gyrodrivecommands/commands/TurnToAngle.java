@@ -5,9 +5,9 @@
 package edu.wpi.first.wpilibj.examples.gyrodrivecommands.commands;
 
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.wpilibj.command.PIDCommand;
 import edu.wpi.first.wpilibj.examples.gyrodrivecommands.Constants.DriveConstants;
 import edu.wpi.first.wpilibj.examples.gyrodrivecommands.subsystems.DriveSubsystem;
-import edu.wpi.first.wpilibj2.command.PIDCommand;
 
 /** A command that will turn the robot to the specified angle. */
 public class TurnToAngle extends PIDCommand {

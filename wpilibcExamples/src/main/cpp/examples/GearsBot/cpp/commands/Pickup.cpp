@@ -4,7 +4,7 @@
 
 #include "commands/Pickup.h"
 
-#include <frc2/command/ParallelCommandGroup.h>
+#include <frc/command/ParallelCommandGroup.h>
 
 #include "commands/CloseClaw.h"
 #include "commands/SetElevatorSetpoint.h"
@@ -13,6 +13,6 @@
 Pickup::Pickup(Claw& claw, Wrist& wrist, Elevator& elevator) {
   SetName("Pickup");
   AddCommands(CloseClaw(claw),
-              frc2::ParallelCommandGroup(SetWristSetpoint(-45, wrist),
-                                         SetElevatorSetpoint(0.25, elevator)));
+              frc::ParallelCommandGroup(SetWristSetpoint(-45, wrist),
+                                        SetElevatorSetpoint(0.25, elevator)));
 }

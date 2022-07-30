@@ -1,0 +1,195 @@
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
+
+#include "frc/command/Command.h"
+
+#include "frc/command/CommandHelper.h"
+#include "frc/command/CommandScheduler.h"
+#include "frc/command/ConditionalCommand.h"
+#include "frc/command/EndlessCommand.h"
+#include "frc/command/InstantCommand.h"
+#include "frc/command/ParallelCommandGroup.h"
+#include "frc/command/ParallelDeadlineGroup.h"
+#include "frc/command/ParallelRaceGroup.h"
+#include "frc/command/PerpetualCommand.h"
+#include "frc/command/ProxyScheduleCommand.h"
+#include "frc/command/RepeatCommand.h"
+#include "frc/command/SequentialCommandGroup.h"
+#include "frc/command/WaitCommand.h"
+#include "frc/command/WaitUntilCommand.h"
+#include "frc/command/WrapperCommand.h"
+
+using namespace frc;
+
+Command::~Command() {
+  CommandScheduler::GetInstance().Cancel(this);
+}
+
+Command& Command::operator=(const Command& rhs) {
+  m_isGrouped = false;
+  return *this;
+}
+
+void Command::Initialize() {}
+void Command::Execute() {}
+void Command::End(bool interrupted) {}
+
+ParallelRaceGroup Command::WithTimeout(units::second_t duration) && {
+  std::vector<std::unique_ptr<Command>> temp;
+  temp.emplace_back(std::make_unique<WaitCommand>(duration));
+  temp.emplace_back(std::move(*this).TransferOwnership());
+  return ParallelRaceGroup(std::move(temp));
+}
+
+ParallelRaceGroup Command::Until(std::function<bool()> condition) && {
+  std::vector<std::unique_ptr<Command>> temp;
+  temp.emplace_back(std::make_unique<WaitUntilCommand>(std::move(condition)));
+  temp.emplace_back(std::move(*this).TransferOwnership());
+  return ParallelRaceGroup(std::move(temp));
+}
+
+std::unique_ptr<Command> Command::IgnoringDisable(bool doesRunWhenDisabled) && {
+  class RunsWhenDisabledCommand
+      : public CommandHelper<WrapperCommand, RunsWhenDisabledCommand> {
+   public:
+    RunsWhenDisabledCommand(std::unique_ptr<Command>&& command,
+                            bool doesRunWhenDisabled)
+        : CommandHelper(std::move(command)),
+          m_runsWhenDisabled(doesRunWhenDisabled) {}
+    bool RunsWhenDisabled() const override { return m_runsWhenDisabled; }
+
+   private:
+    bool m_runsWhenDisabled;
+  };
+
+  return std::make_unique<RunsWhenDisabledCommand>(
+      std::move(*this).TransferOwnership(), doesRunWhenDisabled);
+}
+
+std::unique_ptr<Command> Command::WithInterruptBehavior(
+    InterruptionBehavior interruptBehavior) && {
+  class InterruptBehaviorCommand
+      : public CommandHelper<WrapperCommand, InterruptBehaviorCommand> {
+   public:
+    InterruptBehaviorCommand(std::unique_ptr<Command>&& command,
+                             InterruptionBehavior interruptBehavior)
+        : CommandHelper(std::move(command)),
+          m_interruptBehavior(interruptBehavior) {}
+    InterruptionBehavior GetInterruptionBehavior() const override {
+      return m_interruptBehavior;
+    }
+
+   private:
+    InterruptionBehavior m_interruptBehavior;
+  };
+
+  return std::make_unique<InterruptBehaviorCommand>(
+      std::move(*this).TransferOwnership(), interruptBehavior);
+}
+
+ParallelRaceGroup Command::WithInterrupt(std::function<bool()> condition) && {
+  std::vector<std::unique_ptr<Command>> temp;
+  temp.emplace_back(std::make_unique<WaitUntilCommand>(std::move(condition)));
+  temp.emplace_back(std::move(*this).TransferOwnership());
+  return ParallelRaceGroup(std::move(temp));
+}
+
+SequentialCommandGroup Command::BeforeStarting(
+    std::function<void()> toRun,
+    std::initializer_list<Subsystem*> requirements) && {
+  return std::move(*this).BeforeStarting(
+      std::move(toRun), {requirements.begin(), requirements.end()});
+}
+
+SequentialCommandGroup Command::BeforeStarting(
+    std::function<void()> toRun, wpi::span<Subsystem* const> requirements) && {
+  std::vector<std::unique_ptr<Command>> temp;
+  temp.emplace_back(
+      std::make_unique<InstantCommand>(std::move(toRun), requirements));
+  temp.emplace_back(std::move(*this).TransferOwnership());
+  return SequentialCommandGroup(std::move(temp));
+}
+
+SequentialCommandGroup Command::AndThen(
+    std::function<void()> toRun,
+    std::initializer_list<Subsystem*> requirements) && {
+  return std::move(*this).AndThen(std::move(toRun),
+                                  {requirements.begin(), requirements.end()});
+}
+
+SequentialCommandGroup Command::AndThen(
+    std::function<void()> toRun, wpi::span<Subsystem* const> requirements) && {
+  std::vector<std::unique_ptr<Command>> temp;
+  temp.emplace_back(std::move(*this).TransferOwnership());
+  temp.emplace_back(
+      std::make_unique<InstantCommand>(std::move(toRun), requirements));
+  return SequentialCommandGroup(std::move(temp));
+}
+
+PerpetualCommand Command::Perpetually() && {
+  WPI_IGNORE_DEPRECATED
+  return PerpetualCommand(std::move(*this).TransferOwnership());
+  WPI_UNIGNORE_DEPRECATED
+}
+
+EndlessCommand Command::Endlessly() && {
+  return EndlessCommand(std::move(*this).TransferOwnership());
+}
+
+RepeatCommand Command::Repeatedly() && {
+  return RepeatCommand(std::move(*this).TransferOwnership());
+}
+
+ProxyScheduleCommand Command::AsProxy() {
+  return ProxyScheduleCommand(this);
+}
+
+ConditionalCommand Command::Unless(std::function<bool()> condition) && {
+  return ConditionalCommand(std::make_unique<InstantCommand>(),
+                            std::move(*this).TransferOwnership(),
+                            std::move(condition));
+}
+
+void Command::Schedule() {
+  CommandScheduler::GetInstance().Schedule(this);
+}
+
+void Command::Cancel() {
+  CommandScheduler::GetInstance().Cancel(this);
+}
+
+bool Command::IsScheduled() const {
+  return CommandScheduler::GetInstance().IsScheduled(this);
+}
+
+bool Command::HasRequirement(Subsystem* requirement) const {
+  bool hasRequirement = false;
+  for (auto&& subsystem : GetRequirements()) {
+    hasRequirement |= requirement == subsystem;
+  }
+  return hasRequirement;
+}
+
+std::string Command::GetName() const {
+  return GetTypeName(*this);
+}
+
+bool Command::IsGrouped() const {
+  return m_isGrouped;
+}
+
+void Command::SetGrouped(bool grouped) {
+  m_isGrouped = grouped;
+}
+
+namespace frc {
+bool RequirementsDisjoint(Command* first, Command* second) {
+  bool disjoint = true;
+  auto&& requirements = second->GetRequirements();
+  for (auto&& requirement : first->GetRequirements()) {
+    disjoint &= requirements.find(requirement) == requirements.end();
+  }
+  return disjoint;
+}
+}  // namespace frc

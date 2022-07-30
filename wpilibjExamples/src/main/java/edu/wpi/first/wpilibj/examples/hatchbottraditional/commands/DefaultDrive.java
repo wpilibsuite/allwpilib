@@ -4,14 +4,14 @@
 
 package edu.wpi.first.wpilibj.examples.hatchbottraditional.commands;
 
+import edu.wpi.first.wpilibj.command.CommandBase;
 import edu.wpi.first.wpilibj.examples.hatchbottraditional.subsystems.DriveSubsystem;
-import edu.wpi.first.wpilibj2.command.CommandBase;
 import java.util.function.DoubleSupplier;
 
 /**
  * A command to drive the robot with joystick input (passed in as {@link DoubleSupplier}s). Written
  * explicitly for pedagogical purposes - actual code should inline a command this simple with {@link
- * edu.wpi.first.wpilibj2.command.RunCommand}.
+ * edu.wpi.first.wpilibj.command.RunCommand}.
  */
 public class DefaultDrive extends CommandBase {
   private final DriveSubsystem m_drive;

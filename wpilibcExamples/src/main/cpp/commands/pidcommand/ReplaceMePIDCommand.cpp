@@ -8,7 +8,7 @@
 // For more information, see:
 // https://docs.wpilib.org/en/stable/docs/software/commandbased/convenience-features.html
 ReplaceMePIDCommand::ReplaceMePIDCommand()
-    : CommandHelper{frc2::PIDController{0, 0, 0},
+    : CommandHelper{frc::PIDController{0, 0, 0},
                     // This should return the measurement
                     [] { return 0; },
                     // This should return the setpoint (can also be a constant)

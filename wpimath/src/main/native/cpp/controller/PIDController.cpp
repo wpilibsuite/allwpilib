@@ -13,7 +13,7 @@
 #include "frc/MathUtil.h"
 #include "wpimath/MathShared.h"
 
-using namespace frc2;
+using namespace frc;
 
 PIDController::PIDController(double Kp, double Ki, double Kd,
                              units::second_t period)

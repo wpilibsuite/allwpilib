@@ -4,7 +4,7 @@
 
 package edu.wpi.first.wpilibj.commands.parallelcommandgroup;
 
-import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
+import edu.wpi.first.wpilibj.command.ParallelCommandGroup;
 
 // NOTE:  Consider using this command inline, rather than writing a subclass.  For more
 // information, see:

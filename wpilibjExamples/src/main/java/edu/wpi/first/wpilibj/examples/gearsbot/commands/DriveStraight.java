@@ -5,8 +5,8 @@
 package edu.wpi.first.wpilibj.examples.gearsbot.commands;
 
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.wpilibj.command.PIDCommand;
 import edu.wpi.first.wpilibj.examples.gearsbot.subsystems.Drivetrain;
-import edu.wpi.first.wpilibj2.command.PIDCommand;
 
 /**
  * Drive the given distance straight (negative values go backwards). Uses a local PID controller to

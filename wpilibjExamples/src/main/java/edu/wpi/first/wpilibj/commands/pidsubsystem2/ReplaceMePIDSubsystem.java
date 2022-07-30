@@ -5,7 +5,7 @@
 package edu.wpi.first.wpilibj.commands.pidsubsystem2;
 
 import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.wpilibj2.command.PIDSubsystem;
+import edu.wpi.first.wpilibj.command.PIDSubsystem;
 
 public class ReplaceMePIDSubsystem extends PIDSubsystem {
   /** Creates a new ReplaceMePIDSubsystem. */

@@ -4,7 +4,7 @@
 
 #include "commands/Autonomous.h"
 
-#include <frc2/command/ParallelCommandGroup.h>
+#include <frc/command/ParallelCommandGroup.h>
 
 #include "commands/CloseClaw.h"
 #include "commands/DriveStraight.h"
@@ -26,7 +26,7 @@ Autonomous::Autonomous(Claw& claw, Wrist& wrist, Elevator& elevator,
       Place(claw, wrist, elevator),
       SetDistanceToBox(0.6, drivetrain),
       // DriveStraight(-2, drivetrain) // Use encoders if ultrasonic is broken
-      frc2::ParallelCommandGroup(SetWristSetpoint(-45, wrist),
+      frc::ParallelCommandGroup(SetWristSetpoint(-45, wrist),
                                  CloseClaw(claw)));
   // clang-format on
 }
