@@ -18,7 +18,13 @@ import edu.wpi.first.wpilibj.interfaces.Accelerometer;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
-/** ADXL345 I2C Accelerometer. */
+/**
+ * ADXL345 I2C Accelerometer.
+ *
+ * <p>The Onboard I2C port is subject to system lockups. See <a
+ * href="https://docs.wpilib.org/en/stable/docs/yearly-overview/known-issues.html#onboard-i2c-causing-system-lockups">
+ * WPILib Known Issues</a> page for details.
+ */
 @SuppressWarnings({"TypeName", "PMD.UnusedPrivateField"})
 public class ADXL345_I2C implements Accelerometer, NTSendable, AutoCloseable {
   private static final byte kAddress = 0x1D;
