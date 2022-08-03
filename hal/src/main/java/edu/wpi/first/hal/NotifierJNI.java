@@ -52,7 +52,7 @@ public class NotifierJNI extends JNIWrapper {
   public static native void cleanNotifier(int notifierHandle);
 
   /**
-   * Sets the notifier to wakeup the waiter in another triggerTime microseconds.
+   * Sets the notifier to wake up the waiter at triggerTime microseconds.
    *
    * @param notifierHandle Notifier handle.
    * @param triggerTime Trigger time in microseconds.

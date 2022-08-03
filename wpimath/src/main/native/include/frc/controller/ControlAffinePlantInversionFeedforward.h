@@ -7,8 +7,8 @@
 #include <array>
 #include <functional>
 
-#include "Eigen/Core"
 #include "Eigen/QR"
+#include "frc/EigenCore.h"
 #include "frc/system/NumericalJacobian.h"
 #include "units/time.h"
 
@@ -39,6 +39,9 @@ namespace frc {
 template <int States, int Inputs>
 class ControlAffinePlantInversionFeedforward {
  public:
+  using StateVector = Vectord<States>;
+  using InputVector = Vectord<Inputs>;
+
   /**
    * Constructs a feedforward with given model dynamics as a function
    * of state and input.
@@ -50,15 +53,11 @@ class ControlAffinePlantInversionFeedforward {
    * @param dt The timestep between calls of calculate().
    */
   ControlAffinePlantInversionFeedforward(
-      std::function<
-          Eigen::Vector<double, States>(const Eigen::Vector<double, States>&,
-                                        const Eigen::Vector<double, Inputs>&)>
-          f,
+      std::function<StateVector(const StateVector&, const InputVector&)> f,
       units::second_t dt)
       : m_dt(dt), m_f(f) {
-    m_B = NumericalJacobianU<States, States, Inputs>(
-        f, Eigen::Vector<double, States>::Zero(),
-        Eigen::Vector<double, Inputs>::Zero());
+    m_B = NumericalJacobianU<States, States, Inputs>(f, StateVector::Zero(),
+                                                     InputVector::Zero());
 
     Reset();
   }
@@ -73,14 +72,12 @@ class ControlAffinePlantInversionFeedforward {
    * @param dt The timestep between calls of calculate().
    */
   ControlAffinePlantInversionFeedforward(
-      std::function<
-          Eigen::Vector<double, States>(const Eigen::Vector<double, States>&)>
-          f,
-      const Eigen::Matrix<double, States, Inputs>& B, units::second_t dt)
+      std::function<StateVector(const StateVector&)> f,
+      const Matrixd<States, Inputs>& B, units::second_t dt)
       : m_B(B), m_dt(dt) {
-    m_f = [=](const Eigen::Vector<double, States>& x,
-              const Eigen::Vector<double, Inputs>& u)
-        -> Eigen::Vector<double, States> { return f(x); };
+    m_f = [=](const StateVector& x, const InputVector& u) -> StateVector {
+      return f(x);
+    };
 
     Reset();
   }
@@ -95,7 +92,7 @@ class ControlAffinePlantInversionFeedforward {
    *
    * @return The calculated feedforward.
    */
-  const Eigen::Vector<double, Inputs>& Uff() const { return m_uff; }
+  const InputVector& Uff() const { return m_uff; }
 
   /**
    * Returns an element of the previously calculated feedforward.
@@ -104,14 +101,14 @@ class ControlAffinePlantInversionFeedforward {
    *
    * @return The row of the calculated feedforward.
    */
-  double Uff(int i) const { return m_uff(i, 0); }
+  double Uff(int i) const { return m_uff(i); }
 
   /**
    * Returns the current reference vector r.
    *
    * @return The current reference vector.
    */
-  const Eigen::Vector<double, States>& R() const { return m_r; }
+  const StateVector& R() const { return m_r; }
 
   /**
    * Returns an element of the reference vector r.
@@ -120,14 +117,14 @@ class ControlAffinePlantInversionFeedforward {
    *
    * @return The row of the current reference vector.
    */
-  double R(int i) const { return m_r(i, 0); }
+  double R(int i) const { return m_r(i); }
 
   /**
    * Resets the feedforward with a specified initial state vector.
    *
    * @param initialState The initial state vector.
    */
-  void Reset(const Eigen::Vector<double, States>& initialState) {
+  void Reset(const StateVector& initialState) {
     m_r = initialState;
     m_uff.setZero();
   }
@@ -146,15 +143,14 @@ class ControlAffinePlantInversionFeedforward {
    * reference.
    *
    * If this method is used the initial state of the system is the one set using
-   * Reset(const Eigen::Vector<double, States>&). If the initial state is not
+   * Reset(const StateVector&). If the initial state is not
    * set it defaults to a zero vector.
    *
    * @param nextR The reference state of the future timestep (k + dt).
    *
    * @return The calculated feedforward.
    */
-  Eigen::Vector<double, Inputs> Calculate(
-      const Eigen::Vector<double, States>& nextR) {
+  InputVector Calculate(const StateVector& nextR) {
     return Calculate(m_r, nextR);
   }
 
@@ -166,36 +162,30 @@ class ControlAffinePlantInversionFeedforward {
    *
    * @return The calculated feedforward.
    */
-  Eigen::Vector<double, Inputs> Calculate(
-      const Eigen::Vector<double, States>& r,
-      const Eigen::Vector<double, States>& nextR) {
-    Eigen::Vector<double, States> rDot = (nextR - r) / m_dt.value();
+  InputVector Calculate(const StateVector& r, const StateVector& nextR) {
+    StateVector rDot = (nextR - r) / m_dt.value();
 
-    m_uff = m_B.householderQr().solve(
-        rDot - m_f(r, Eigen::Vector<double, Inputs>::Zero()));
+    m_uff = m_B.householderQr().solve(rDot - m_f(r, InputVector::Zero()));
 
     m_r = nextR;
     return m_uff;
   }
 
  private:
-  Eigen::Matrix<double, States, Inputs> m_B;
+  Matrixd<States, Inputs> m_B;
 
   units::second_t m_dt;
 
   /**
    * The model dynamics.
    */
-  std::function<Eigen::Vector<double, States>(
-      const Eigen::Vector<double, States>&,
-      const Eigen::Vector<double, Inputs>&)>
-      m_f;
+  std::function<StateVector(const StateVector&, const InputVector&)> m_f;
 
   // Current reference
-  Eigen::Vector<double, States> m_r;
+  StateVector m_r;
 
   // Computed feedforward
-  Eigen::Vector<double, Inputs> m_uff;
+  InputVector m_uff;
 };
 
 }  // namespace frc

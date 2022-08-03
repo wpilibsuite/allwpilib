@@ -485,6 +485,12 @@ static void ValueToCsv(wpi::raw_ostream& os, const Entry& entry,
       fmt::print(os, "{}", val);
       return;
     }
+  } else if (entry.type == "boolean[]") {
+    std::vector<int> val;
+    if (record.GetBooleanArray(&val)) {
+      fmt::print(os, "{}", fmt::join(val, ";"));
+      return;
+    }
   } else if (entry.type == "double[]") {
     std::vector<double> val;
     if (record.GetDoubleArray(&val)) {

@@ -5,7 +5,6 @@
 #include <frc/Encoder.h>
 #include <frc/TimedRobot.h>
 #include <frc/XboxController.h>
-#include <frc/controller/LinearPlantInversionFeedforward.h>
 #include <frc/controller/LinearQuadraticRegulator.h>
 #include <frc/drive/DifferentialDrive.h>
 #include <frc/estimator/KalmanFilter.h>
@@ -98,8 +97,7 @@ class Robot : public frc::TimedRobot {
   }
 
   void TeleopInit() override {
-    m_loop.Reset(
-        Eigen::Vector<double, 2>{m_encoder.GetDistance(), m_encoder.GetRate()});
+    m_loop.Reset(frc::Vectord<2>{m_encoder.GetDistance(), m_encoder.GetRate()});
 
     m_lastProfiledReference = {
         units::radian_t(m_encoder.GetDistance()),
@@ -122,12 +120,11 @@ class Robot : public frc::TimedRobot {
                                                m_lastProfiledReference))
             .Calculate(20_ms);
 
-    m_loop.SetNextR(
-        Eigen::Vector<double, 2>{m_lastProfiledReference.position.value(),
-                                 m_lastProfiledReference.velocity.value()});
+    m_loop.SetNextR(frc::Vectord<2>{m_lastProfiledReference.position.value(),
+                                    m_lastProfiledReference.velocity.value()});
 
     // Correct our Kalman filter's state vector estimate with encoder data.
-    m_loop.Correct(Eigen::Vector<double, 1>{m_encoder.GetDistance()});
+    m_loop.Correct(frc::Vectord<1>{m_encoder.GetDistance()});
 
     // Update our LQR to generate new voltage commands and use the voltages to
     // predict the next state with out Kalman filter.

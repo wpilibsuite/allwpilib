@@ -69,6 +69,7 @@ class EncoderSimTest {
     }
   }
 
+  @SuppressWarnings("deprecation") // Encoder.getPeriod()
   @Test
   void testPeriod() {
     HAL.initialize(500, 0);

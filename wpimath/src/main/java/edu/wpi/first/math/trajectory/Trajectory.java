@@ -332,7 +332,7 @@ public class Trajectory {
       final double newV = velocityMetersPerSecond + (accelerationMetersPerSecondSq * deltaT);
 
       // Calculate the change in position.
-      // delta_s = v_0 t + 0.5 at^2
+      // delta_s = v_0 t + 0.5at²
       final double newS =
           (velocityMetersPerSecond * deltaT
                   + 0.5 * accelerationMetersPerSecondSq * Math.pow(deltaT, 2))

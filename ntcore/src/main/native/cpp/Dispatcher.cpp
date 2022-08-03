@@ -9,11 +9,11 @@
 
 #include <wpi/SmallVector.h>
 #include <wpi/StringExtras.h>
-#include <wpi/TCPAcceptor.h>
-#include <wpi/TCPConnector.h>
 #include <wpi/json_serializer.h>
 #include <wpi/raw_ostream.h>
 #include <wpi/timestamp.h>
+#include <wpinet/TCPAcceptor.h>
+#include <wpinet/TCPConnector.h>
 
 #include "IConnectionNotifier.h"
 #include "IStorage.h"

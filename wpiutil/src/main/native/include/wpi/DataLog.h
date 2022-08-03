@@ -46,6 +46,22 @@ enum ControlRecordType {
  *
  * The data log is periodically flushed to disk.  It can also be explicitly
  * flushed to disk by using the Flush() function.
+ *
+ * Finish() is needed only to indicate in the log that a particular entry is
+ * no longer being used (it releases the name to ID mapping).  Finish() is not
+ * required to be called for data to be flushed to disk; entries in the log
+ * are written as Append() calls are being made.  In fact, Finish() does not
+ * need to be called at all; this is helpful to avoid shutdown races where the
+ * DataLog object might be destroyed before other objects.  It's often not a
+ * good idea to call Finish() from destructors for this reason.
+ *
+ * DataLog calls are thread safe.  DataLog uses a typical multiple-supplier,
+ * single-consumer setup.  Writes to the log are atomic, but there is no
+ * guaranteed order in the log when multiple threads are writing to it;
+ * whichever thread grabs the write mutex first will get written first.
+ * For this reason (as well as the fact that timestamps can be set to
+ * arbitrary values), records in the log are not guaranteed to be sorted by
+ * timestamp.
  */
 class DataLog final {
  public:

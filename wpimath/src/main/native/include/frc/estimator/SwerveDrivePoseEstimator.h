@@ -6,16 +6,17 @@
 
 #include <limits>
 
+#include <wpi/SymbolExports.h>
 #include <wpi/array.h>
 #include <wpi/timestamp.h>
 
-#include "Eigen/Core"
+#include "frc/EigenCore.h"
 #include "frc/StateSpaceUtil.h"
 #include "frc/estimator/AngleStatistics.h"
-#include "frc/estimator/KalmanFilterLatencyCompensator.h"
 #include "frc/estimator/UnscentedKalmanFilter.h"
 #include "frc/geometry/Pose2d.h"
 #include "frc/geometry/Rotation2d.h"
+#include "frc/interpolation/TimeInterpolatableBuffer.h"
 #include "frc/kinematics/SwerveDriveKinematics.h"
 #include "units/time.h"
 
@@ -62,11 +63,10 @@ class SwerveDrivePoseEstimator {
    *                                 model's state estimates less. This matrix
    *                                 is in the form [x, y, theta]ᵀ, with units
    *                                 in meters and radians.
-   * @param localMeasurementStdDevs  Standard deviations of the encoder and gyro
-   *                                 measurements. Increase these numbers to
-   *                                 trust sensor readings from encoders
-   *                                 and gyros less. This matrix is in the form
-   *                                 [theta], with units in radians.
+   * @param localMeasurementStdDevs  Standard deviation of the gyro measurement.
+   *                                 Increase this number to trust sensor
+   *                                 readings from the gyro less. This matrix is
+   *                                 in the form [theta], with units in radians.
    * @param visionMeasurementStdDevs Standard deviations of the vision
    *                                 measurements. Increase these numbers to
    *                                 trust global measurements from vision
@@ -83,10 +83,8 @@ class SwerveDrivePoseEstimator {
       const wpi::array<double, 1>& localMeasurementStdDevs,
       const wpi::array<double, 3>& visionMeasurementStdDevs,
       units::second_t nominalDt = 0.02_s)
-      : m_observer([](const Eigen::Vector<double, 3>& x,
-                      const Eigen::Vector<double, 3>& u) { return u; },
-                   [](const Eigen::Vector<double, 3>& x,
-                      const Eigen::Vector<double, 3>& u) {
+      : m_observer([](const Vectord<3>& x, const Vectord<3>& u) { return u; },
+                   [](const Vectord<3>& x, const Vectord<3>& u) {
                      return x.block<1, 1>(2, 0);
                    },
                    stateStdDevs, localMeasurementStdDevs,
@@ -98,12 +96,9 @@ class SwerveDrivePoseEstimator {
     SetVisionMeasurementStdDevs(visionMeasurementStdDevs);
 
     // Create correction mechanism for vision measurements.
-    m_visionCorrect = [&](const Eigen::Vector<double, 3>& u,
-                          const Eigen::Vector<double, 3>& y) {
+    m_visionCorrect = [&](const Vectord<3>& u, const Vectord<3>& y) {
       m_observer.Correct<3>(
-          u, y,
-          [](const Eigen::Vector<double, 3>& x,
-             const Eigen::Vector<double, 3>& u) { return x; },
+          u, y, [](const Vectord<3>& x, const Vectord<3>& u) { return x; },
           m_visionContR, frc::AngleMean<3, 3>(2), frc::AngleResidual<3>(2),
           frc::AngleResidual<3>(2), frc::AngleAdd<3>(2));
     };
@@ -128,9 +123,11 @@ class SwerveDrivePoseEstimator {
   void ResetPosition(const Pose2d& pose, const Rotation2d& gyroAngle) {
     // Reset state estimate and error covariance
     m_observer.Reset();
-    m_latencyCompensator.Reset();
+    m_poseBuffer.Clear();
 
     m_observer.SetXhat(PoseTo3dVector(pose));
+
+    m_prevTime = -1_s;
 
     m_gyroOffset = pose.Rotation() - gyroAngle;
     m_previousAngle = pose.Rotation();
@@ -172,6 +169,10 @@ class SwerveDrivePoseEstimator {
    * This method can be called as infrequently as you want, as long as you are
    * calling Update() every loop.
    *
+   * To promote stability of the pose estimate and make it robust to bad vision
+   * data, we recommend only adding vision measurements that are already within
+   * one meter or so of the current pose estimate.
+   *
    * @param visionRobotPose The pose of the robot as measured by the vision
    *                        camera.
    * @param timestamp       The timestamp of the vision measurement in seconds.
@@ -185,9 +186,11 @@ class SwerveDrivePoseEstimator {
    */
   void AddVisionMeasurement(const Pose2d& visionRobotPose,
                             units::second_t timestamp) {
-    m_latencyCompensator.ApplyPastGlobalMeasurement<3>(
-        &m_observer, m_nominalDt, PoseTo3dVector(visionRobotPose),
-        m_visionCorrect, timestamp);
+    if (auto sample = m_poseBuffer.Sample(timestamp)) {
+      m_visionCorrect(Vectord<3>::Zero(),
+                      PoseTo3dVector(GetEstimatedPosition().TransformBy(
+                          visionRobotPose - sample.value())));
+    }
   }
 
   /**
@@ -196,6 +199,10 @@ class SwerveDrivePoseEstimator {
    *
    * This method can be called as infrequently as you want, as long as you are
    * calling Update() every loop.
+   *
+   * To promote stability of the pose estimate and make it robust to bad vision
+   * data, we recommend only adding vision measurements that are already within
+   * one meter or so of the current pose estimate.
    *
    * Note that the vision measurement standard deviations passed into this
    * method will continue to apply to future measurements until a subsequent
@@ -270,13 +277,13 @@ class SwerveDrivePoseEstimator {
         Translation2d(chassisSpeeds.vx * 1_s, chassisSpeeds.vy * 1_s)
             .RotateBy(angle);
 
-    Eigen::Vector<double, 3> u{fieldRelativeSpeeds.X().value(),
-                               fieldRelativeSpeeds.Y().value(), omega.value()};
+    Vectord<3> u{fieldRelativeSpeeds.X().value(),
+                 fieldRelativeSpeeds.Y().value(), omega.value()};
 
-    Eigen::Vector<double, 1> localY{angle.Radians().value()};
+    Vectord<1> localY{angle.Radians().value()};
     m_previousAngle = angle;
 
-    m_latencyCompensator.AddObserverState(m_observer, u, localY, currentTime);
+    m_poseBuffer.AddSample(currentTime, GetEstimatedPosition());
 
     m_observer.Predict(u, dt);
     m_observer.Correct(u, localY);
@@ -287,11 +294,8 @@ class SwerveDrivePoseEstimator {
  private:
   UnscentedKalmanFilter<3, 3, 1> m_observer;
   SwerveDriveKinematics<NumModules>& m_kinematics;
-  KalmanFilterLatencyCompensator<3, 3, 1, UnscentedKalmanFilter<3, 3, 1>>
-      m_latencyCompensator;
-  std::function<void(const Eigen::Vector<double, 3>& u,
-                     const Eigen::Vector<double, 3>& y)>
-      m_visionCorrect;
+  TimeInterpolatableBuffer<Pose2d> m_poseBuffer{1.5_s};
+  std::function<void(const Vectord<3>& u, const Vectord<3>& y)> m_visionCorrect;
 
   Eigen::Matrix3d m_visionContR;
 
@@ -303,7 +307,7 @@ class SwerveDrivePoseEstimator {
 
   template <int Dim>
   static wpi::array<double, Dim> StdDevMatrixToArray(
-      const Eigen::Vector<double, Dim>& vector) {
+      const Vectord<Dim>& vector) {
     wpi::array<double, Dim> array;
     for (size_t i = 0; i < Dim; ++i) {
       array[i] = vector(i);
@@ -311,5 +315,8 @@ class SwerveDrivePoseEstimator {
     return array;
   }
 };
+
+extern template class EXPORT_TEMPLATE_DECLARE(WPILIB_DLLEXPORT)
+    SwerveDrivePoseEstimator<4>;
 
 }  // namespace frc

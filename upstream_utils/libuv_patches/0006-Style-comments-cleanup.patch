@@ -1,0 +1,105 @@
+From 93249980c4c2848dabd35bdc5ba4bc21ff108450 Mon Sep 17 00:00:00 2001
+From: PJ Reiniger <pj.reiniger@gmail.com>
+Date: Tue, 26 Apr 2022 15:28:52 -0400
+Subject: [PATCH 6/9] Style / comments cleanup
+
+---
+ src/fs-poll.c     | 1 +
+ src/unix/core.c   | 1 +
+ src/unix/thread.c | 3 +--
+ src/uv-common.c   | 1 +
+ src/win/process.c | 1 -
+ src/win/winsock.c | 1 +
+ 6 files changed, 5 insertions(+), 3 deletions(-)
+
+diff --git a/src/fs-poll.c b/src/fs-poll.c
+index 5a39dae..1a7ca70 100644
+--- a/src/fs-poll.c
++++ b/src/fs-poll.c
+@@ -34,6 +34,7 @@
+ #include <stdlib.h>
+ #include <string.h>
+ 
++
+ struct poll_ctx {
+   uv_fs_poll_t* parent_handle;
+   int busy_polling;
+diff --git a/src/unix/core.c b/src/unix/core.c
+index be2ad1f..fde43d4 100644
+--- a/src/unix/core.c
++++ b/src/unix/core.c
+@@ -524,6 +524,7 @@ int uv__accept(int sockfd) {
+   return peerfd;
+ }
+ 
++
+ #if defined(__APPLE__)
+ #pragma GCC diagnostic push
+ #pragma GCC diagnostic ignored "-Wdollar-in-identifier-extension"
+diff --git a/src/unix/thread.c b/src/unix/thread.c
+index 64726bd..392a071 100644
+--- a/src/unix/thread.c
++++ b/src/unix/thread.c
+@@ -85,7 +85,6 @@ error2:
+   return rc;
+ }
+ 
+-
+ int uv_barrier_wait(uv_barrier_t* barrier) {
+   struct _uv_barrier* b;
+   int last;
+@@ -94,6 +93,7 @@ int uv_barrier_wait(uv_barrier_t* barrier) {
+     return UV_EINVAL;
+ 
+   b = barrier->b;
++  /* Lock the mutex*/
+   uv_mutex_lock(&b->mutex);
+ 
+   if (++b->in == b->threshold) {
+@@ -113,7 +113,6 @@ int uv_barrier_wait(uv_barrier_t* barrier) {
+   return last;
+ }
+ 
+-
+ void uv_barrier_destroy(uv_barrier_t* barrier) {
+   struct _uv_barrier* b;
+ 
+diff --git a/src/uv-common.c b/src/uv-common.c
+index c287246..534119c 100644
+--- a/src/uv-common.c
++++ b/src/uv-common.c
+@@ -756,6 +756,7 @@ void uv__fs_readdir_cleanup(uv_fs_t* req) {
+   }
+ }
+ 
++
+ #ifdef __clang__
+ # pragma clang diagnostic push
+ # pragma clang diagnostic ignored "-Wvarargs"
+diff --git a/src/win/process.c b/src/win/process.c
+index a49016f..8e7835a 100644
+--- a/src/win/process.c
++++ b/src/win/process.c
+@@ -35,7 +35,6 @@
+ #include "handle-inl.h"
+ #include "req-inl.h"
+ 
+-
+ #define SIGKILL         9
+ 
+ 
+diff --git a/src/win/winsock.c b/src/win/winsock.c
+index 7843e9f..cda82bc 100644
+--- a/src/win/winsock.c
++++ b/src/win/winsock.c
+@@ -25,6 +25,7 @@
+ #include "uv.h"
+ #include "internal.h"
+ 
++
+ #pragma comment(lib, "Ws2_32.lib")
+ 
+ /* Whether there are any non-IFS LSPs stacked on TCP */
+-- 
+2.25.1
+

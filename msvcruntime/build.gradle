@@ -36,28 +36,12 @@ if (OperatingSystem.current().isWindows()) {
     if (runtimeVerNumber != null) {
         runtimeLocation = file("$runtimeLocation\\$runtimeVerNumber")
 
-        def x86Folder = null
-
-        file("$runtimeLocation\\x86").eachFile {
-            if (it.name.endsWith('.CRT')) {
-                x86Folder = it
-            }
-        }
-
         def x64Folder = null
 
         file("$runtimeLocation\\x64").eachFile {
             if (it.name.endsWith('.CRT')) {
                 x64Folder = it
             }
-        }
-
-        def x86ZipTask = tasks.create('x86RuntimeZip', Zip) {
-            destinationDirectory = outputsFolder
-            archiveBaseName = zipBaseName
-            classifier = 'x86'
-
-            from x86Folder
         }
 
         def x64ZipTask = tasks.create('x64RuntimeZip', Zip) {
@@ -68,17 +52,14 @@ if (OperatingSystem.current().isWindows()) {
             from x64Folder
         }
 
-        addTaskToCopyAllOutputs(x86ZipTask)
         addTaskToCopyAllOutputs(x64ZipTask)
 
-        build.dependsOn x86ZipTask
         build.dependsOn x64ZipTask
 
         publishing {
             publications {
 
                 runtime(MavenPublication) {
-                    artifact x86ZipTask
                     artifact x64ZipTask
 
                     artifactId = "${baseArtifactId}"

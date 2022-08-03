@@ -59,29 +59,24 @@ class Compressor : public wpi::Sendable,
   Compressor& operator=(Compressor&&) = default;
 
   /**
-   * Starts closed-loop control. Note that closed loop control is enabled by
-   * default.
-   *
-   * @deprecated Use EnableDigital() instead.
-   */
-  WPI_DEPRECATED("Use EnableDigital() instead")
-  void Start();
-
-  /**
-   * Stops closed-loop control. Note that closed loop control is enabled by
-   * default.
-   *
-   * @deprecated Use Disable() instead.
-   */
-  WPI_DEPRECATED("Use Disable() instead")
-  void Stop();
-
-  /**
    * Check if compressor output is active.
+   * To (re)enable the compressor use EnableDigital() or EnableAnalog(...).
    *
-   * @return true if the compressor is on
+   * @return true if the compressor is on.
+   * @deprecated To avoid confusion in thinking this (re)enables the compressor
+   * use IsEnabled().
    */
+  WPI_DEPRECATED(
+      "To avoid confusion in thinking this (re)enables the compressor use "
+      "IsEnabled()")
   bool Enabled() const;
+
+  /**
+   * Returns whether the compressor is active or not.
+   *
+   * @return true if the compressor is on - otherwise false.
+   */
+  bool IsEnabled() const;
 
   /**
    * Check if the pressure switch is triggered.

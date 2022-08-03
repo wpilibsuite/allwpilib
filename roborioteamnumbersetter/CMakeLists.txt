@@ -19,7 +19,7 @@ endif()
 
 add_executable(roborioteamnumbersetter ${rtns_src} ${rtns_resources_src} ${rtns_rc} ${APP_ICON_MACOSX})
 wpilib_link_macos_gui(roborioteamnumbersetter)
-target_link_libraries(roborioteamnumbersetter libglass ${LIBSSH_LIBRARIES})
+target_link_libraries(roborioteamnumbersetter libglass wpinet ${LIBSSH_LIBRARIES})
 target_include_directories(roborioteamnumbersetter PRIVATE ${LIBSSH_INCLUDE_DIRS})
 
 if (WIN32)

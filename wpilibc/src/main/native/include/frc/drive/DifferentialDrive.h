@@ -13,18 +13,7 @@
 
 namespace frc {
 
-#if defined(_MSC_VER)
-#pragma warning(push)
-#pragma warning(disable : 4996)  // was declared deprecated
-#elif defined(__clang__)
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wdeprecated-declarations"
-#elif defined(__GNUC__)
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-
-class SpeedController;
+class MotorController;
 
 /**
  * A class for driving differential drive/skid-steer drive platforms such as
@@ -81,9 +70,8 @@ class SpeedController;
  * |       |
  * </pre>
  *
- * Each Drive() function provides different inverse kinematic relations for a
- * differential drive robot. Motor outputs for the right side are negated, so
- * motor direction inversion by the user is usually unnecessary.
+ * Each drive function provides different inverse kinematic relations for a
+ * differential drive robot.
  *
  * This library uses the NED axes convention (North-East-Down as external
  * reference in the world frame):
@@ -96,6 +84,10 @@ class SpeedController;
  * Inputs smaller then 0.02 will be set to 0, and larger values will be scaled
  * so that the full range is still used. This deadband value can be changed
  * with SetDeadband().
+ *
+ * MotorSafety is enabled by default. The tankDrive, arcadeDrive,
+ * or curvatureDrive methods should be called periodically to avoid Motor
+ * Safety timeouts.
  */
 class DifferentialDrive : public RobotDriveBase,
                           public wpi::Sendable,
@@ -117,7 +109,7 @@ class DifferentialDrive : public RobotDriveBase,
    * To pass multiple motors per side, use a MotorControllerGroup. If a motor
    * needs to be inverted, do so before passing it in.
    */
-  DifferentialDrive(SpeedController& leftMotor, SpeedController& rightMotor);
+  DifferentialDrive(MotorController& leftMotor, MotorController& rightMotor);
 
   ~DifferentialDrive() override = default;
 
@@ -220,16 +212,8 @@ class DifferentialDrive : public RobotDriveBase,
   void InitSendable(wpi::SendableBuilder& builder) override;
 
  private:
-  SpeedController* m_leftMotor;
-  SpeedController* m_rightMotor;
+  MotorController* m_leftMotor;
+  MotorController* m_rightMotor;
 };
-
-#if defined(_MSC_VER)
-#pragma warning(pop)
-#elif defined(__clang__)
-#pragma clang diagnostic pop
-#elif defined(__GNUC__)
-#pragma GCC diagnostic pop
-#endif
 
 }  // namespace frc

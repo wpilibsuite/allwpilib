@@ -144,20 +144,18 @@ public class LinearFilter {
    * <p>Stencil points are the indices of the samples to use in the finite difference. 0 is the
    * current sample, -1 is the previous sample, -2 is the sample before that, etc. Don't use
    * positive stencil points (samples from the future) if the LinearFilter will be used for
-   * stream-based online filtering.
+   * stream-based online filtering (e.g., taking derivative of encoder samples in real-time).
    *
    * @param derivative The order of the derivative to compute.
-   * @param samples The number of samples to use to compute the given derivative. This must be one
-   *     more than the order of derivative or higher.
-   * @param stencil List of stencil points.
+   * @param stencil List of stencil points. Its length is the number of samples to use to compute
+   *     the given derivative. This must be one more than the order of the derivative or higher.
    * @param period The period in seconds between samples taken by the user.
    * @return Linear filter.
    * @throws IllegalArgumentException if derivative &lt; 1, samples &lt;= 0, or derivative &gt;=
    *     samples.
    */
   @SuppressWarnings("LocalVariableName")
-  public static LinearFilter finiteDifference(
-      int derivative, int samples, int[] stencil, double period) {
+  public static LinearFilter finiteDifference(int derivative, int[] stencil, double period) {
     // See
     // https://en.wikipedia.org/wiki/Finite_difference_coefficient#Arbitrary_stencil_points
     //
@@ -178,6 +176,8 @@ public class LinearFilter {
       throw new IllegalArgumentException(
           "Order of derivative must be greater than or equal to one.");
     }
+
+    int samples = stencil.length;
 
     if (samples <= 0) {
       throw new IllegalArgumentException("Number of samples must be greater than zero.");
@@ -236,7 +236,7 @@ public class LinearFilter {
       stencil[i] = -(samples - 1) + i;
     }
 
-    return finiteDifference(derivative, samples, stencil, period);
+    return finiteDifference(derivative, stencil, period);
   }
 
   /** Reset the filter state. */

@@ -5,7 +5,7 @@ apply plugin: 'cpp'
 apply plugin: "google-test"
 
 ext.skiplinuxathena = true
-ext.skiplinuxraspbian = true
+ext.skiplinuxarm32 = true
 
 apply from: "${rootDir}/shared/config.gradle"
 

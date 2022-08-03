@@ -7,45 +7,46 @@ package edu.wpi.first.wpilibj2.command;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import java.util.concurrent.atomic.AtomicInteger;
 import org.junit.jupiter.api.Test;
 
 class SchedulerTest extends CommandTestBase {
   @Test
   void schedulerLambdaTestNoInterrupt() {
     try (CommandScheduler scheduler = new CommandScheduler()) {
-      Counter counter = new Counter();
+      AtomicInteger counter = new AtomicInteger();
 
-      scheduler.onCommandInitialize(command -> counter.increment());
-      scheduler.onCommandExecute(command -> counter.increment());
-      scheduler.onCommandFinish(command -> counter.increment());
+      scheduler.onCommandInitialize(command -> counter.incrementAndGet());
+      scheduler.onCommandExecute(command -> counter.incrementAndGet());
+      scheduler.onCommandFinish(command -> counter.incrementAndGet());
 
       scheduler.schedule(new InstantCommand());
       scheduler.run();
 
-      assertEquals(counter.m_counter, 3);
+      assertEquals(counter.get(), 3);
     }
   }
 
   @Test
   void schedulerInterruptLambdaTest() {
     try (CommandScheduler scheduler = new CommandScheduler()) {
-      Counter counter = new Counter();
+      AtomicInteger counter = new AtomicInteger();
 
-      scheduler.onCommandInterrupt(command -> counter.increment());
+      scheduler.onCommandInterrupt(command -> counter.incrementAndGet());
 
       Command command = new WaitCommand(10);
 
       scheduler.schedule(command);
       scheduler.cancel(command);
 
-      assertEquals(counter.m_counter, 1);
+      assertEquals(counter.get(), 1);
     }
   }
 
   @Test
   void unregisterSubsystemTest() {
     try (CommandScheduler scheduler = new CommandScheduler()) {
-      Subsystem system = new TestSubsystem();
+      Subsystem system = new SubsystemBase() {};
 
       scheduler.registerSubsystem(system);
       assertDoesNotThrow(() -> scheduler.unregisterSubsystem(system));
@@ -55,9 +56,9 @@ class SchedulerTest extends CommandTestBase {
   @Test
   void schedulerCancelAllTest() {
     try (CommandScheduler scheduler = new CommandScheduler()) {
-      Counter counter = new Counter();
+      AtomicInteger counter = new AtomicInteger();
 
-      scheduler.onCommandInterrupt(command -> counter.increment());
+      scheduler.onCommandInterrupt(command -> counter.incrementAndGet());
 
       Command command = new WaitCommand(10);
       Command command2 = new WaitCommand(10);
@@ -66,7 +67,7 @@ class SchedulerTest extends CommandTestBase {
       scheduler.schedule(command2);
       scheduler.cancelAll();
 
-      assertEquals(counter.m_counter, 2);
+      assertEquals(counter.get(), 2);
     }
   }
 }

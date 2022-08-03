@@ -20,7 +20,7 @@ class SendableBuilder;
  * The SendableRegistry class is the public interface for registering sensors
  * and actuators for use on dashboards and LiveWindow.
  */
-class SendableRegistry {
+class SendableRegistry final {
  public:
   SendableRegistry() = delete;
 

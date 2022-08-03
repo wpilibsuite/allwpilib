@@ -14,18 +14,7 @@
 
 namespace frc {
 
-#if defined(_MSC_VER)
-#pragma warning(push)
-#pragma warning(disable : 4996)  // was declared deprecated
-#elif defined(__clang__)
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wdeprecated-declarations"
-#elif defined(__GNUC__)
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-
-class SpeedController;
+class MotorController;
 
 /**
  * A class for driving Mecanum drive platforms.
@@ -57,15 +46,8 @@ class SpeedController;
  * so that the full range is still used. This deadband value can be changed
  * with SetDeadband().
  *
- * RobotDrive porting guide:
- * <br>DriveCartesian(double, double, double, double) is equivalent to
- * RobotDrive's MecanumDrive_Cartesian(double, double, double, double)
- * if a deadband of 0 is used, and the ySpeed and gyroAngle values are inverted
- * compared to RobotDrive (eg DriveCartesian(xSpeed, -ySpeed, zRotation,
- * -gyroAngle).
- * <br>DrivePolar(double, double, double) is equivalent to
- * RobotDrive's MecanumDrive_Polar(double, double, double) if a
- * deadband of 0 is used.
+ * MotorSafety is enabled by default. The DriveCartesian or DrivePolar
+ * methods should be called periodically to avoid Motor Safety timeouts.
  */
 class MecanumDrive : public RobotDriveBase,
                      public wpi::Sendable,
@@ -88,9 +70,9 @@ class MecanumDrive : public RobotDriveBase,
    *
    * If a motor needs to be inverted, do so before passing it in.
    */
-  MecanumDrive(SpeedController& frontLeftMotor, SpeedController& rearLeftMotor,
-               SpeedController& frontRightMotor,
-               SpeedController& rearRightMotor);
+  MecanumDrive(MotorController& frontLeftMotor, MotorController& rearLeftMotor,
+               MotorController& frontRightMotor,
+               MotorController& rearRightMotor);
 
   ~MecanumDrive() override = default;
 
@@ -155,20 +137,12 @@ class MecanumDrive : public RobotDriveBase,
   void InitSendable(wpi::SendableBuilder& builder) override;
 
  private:
-  SpeedController* m_frontLeftMotor;
-  SpeedController* m_rearLeftMotor;
-  SpeedController* m_frontRightMotor;
-  SpeedController* m_rearRightMotor;
+  MotorController* m_frontLeftMotor;
+  MotorController* m_rearLeftMotor;
+  MotorController* m_frontRightMotor;
+  MotorController* m_rearRightMotor;
 
   bool reported = false;
 };
-
-#if defined(_MSC_VER)
-#pragma warning(pop)
-#elif defined(__clang__)
-#pragma clang diagnostic pop
-#elif defined(__GNUC__)
-#pragma GCC diagnostic pop
-#endif
 
 }  // namespace frc

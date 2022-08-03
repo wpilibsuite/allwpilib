@@ -5,6 +5,8 @@
 package edu.wpi.first.wpilibj;
 
 import edu.wpi.first.hal.HAL;
+import edu.wpi.first.wpilibj.event.BooleanEvent;
+import edu.wpi.first.wpilibj.event.EventLoop;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -117,6 +119,17 @@ public class GenericHID {
    */
   public boolean getRawButtonReleased(int button) {
     return DriverStation.getStickButtonReleased(m_port, button);
+  }
+
+  /**
+   * Constructs an event instance around this button's digital signal.
+   *
+   * @param button the button index
+   * @param loop the event loop instance to attach the event to.
+   * @return an event instance representing the button's digital signal attached to the given loop.
+   */
+  public BooleanEvent button(int button, EventLoop loop) {
+    return new BooleanEvent(loop, () -> getRawButton(button));
   }
 
   /**

@@ -12,6 +12,7 @@
 #include <units/time.h>
 #include <wpi/Demangle.h>
 #include <wpi/SmallSet.h>
+#include <wpi/deprecated.h>
 #include <wpi/span.h>
 
 #include "frc2/command/Subsystem.h"
@@ -23,12 +24,15 @@ std::string GetTypeName(const T& type) {
   return wpi::Demangle(typeid(type).name());
 }
 
+class EndlessCommand;
 class ParallelCommandGroup;
 class ParallelRaceGroup;
 class ParallelDeadlineGroup;
 class SequentialCommandGroup;
 class PerpetualCommand;
 class ProxyScheduleCommand;
+class RepeatCommand;
+class ConditionalCommand;
 
 /**
  * A state machine representing a complete action to be performed by the robot.
@@ -36,8 +40,9 @@ class ProxyScheduleCommand;
  * CommandGroups to allow users to build complicated multi-step actions without
  * the need to roll the state machine logic themselves.
  *
- * <p>Commands are run synchronously from the main robot loop; no multithreading
- * is used, unless specified explicitly from the command implementation.
+ * <p>Commands are run synchronously from the main robot loop; no
+ * multithreading is used, unless specified explicitly from the command
+ * implementation.
  *
  * <p>Note: ALWAYS create a subclass by extending CommandHelper<Base, Subclass>,
  * or decorators will not function!
@@ -182,8 +187,26 @@ class Command {
    * conditions.  The decorated command can still be interrupted or canceled.
    *
    * @return the decorated command
+   * @deprecated replace with EndlessCommand
    */
+  WPI_DEPRECATED("Replace with Endlessly()")
   virtual PerpetualCommand Perpetually() &&;
+
+  /**
+   * Decorates this command to run endlessly, ignoring its ordinary end
+   * conditions. The decorated command can still be interrupted or canceled.
+   *
+   * @return the decorated command
+   */
+  virtual EndlessCommand Endlessly() &&;
+
+  /**
+   * Decorates this command to run repeatedly, restarting it when it ends, until
+   * this command is interrupted. The decorated command can still be canceled.
+   *
+   * @return the decorated command
+   */
+  virtual RepeatCommand Repeat() &&;
 
   /**
    * Decorates this command to run "by proxy" by wrapping it in a
@@ -194,6 +217,25 @@ class Command {
    * @return the decorated command
    */
   virtual ProxyScheduleCommand AsProxy();
+
+  /**
+   * Decorates this command to only run if this condition is not met. If the
+   * command is already running and the condition changes to true, the command
+   * will not stop running. The requirements of this command will be kept for
+   * the new conditonal command.
+   *
+   * @param condition the condition that will prevent the command from running
+   * @return the decorated command
+   */
+  virtual ConditionalCommand Unless(std::function<bool()> condition) &&;
+
+  /**
+   * Decorates this command to run or stop when disabled.
+   *
+   * @param doesRunWhenDisabled true to run when disabled.
+   * @return the decorated command
+   */
+  virtual std::unique_ptr<Command> IgnoringDisable(bool doesRunWhenDisabled) &&;
 
   /**
    * Schedules this command.

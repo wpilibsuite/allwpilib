@@ -10,9 +10,11 @@
 
 #include <frc/Errors.h>
 #include <frc/Watchdog.h>
+#include <frc/event/EventLoop.h>
 #include <networktables/NTSendable.h>
 #include <units/time.h>
 #include <wpi/FunctionExtras.h>
+#include <wpi/deprecated.h>
 #include <wpi/sendable/SendableHelper.h>
 #include <wpi/span.h>
 
@@ -52,16 +54,32 @@ class CommandScheduler final : public nt::NTSendable,
   void SetPeriod(units::second_t period);
 
   /**
-   * Adds a button binding to the scheduler, which will be polled to schedule
-   * commands.
+   * Get the active button poll.
    *
-   * @param button The button to add
+   * @return a reference to the current {@link frc::EventLoop} object polling
+   * buttons.
    */
-  void AddButton(wpi::unique_function<void()> button);
+  frc::EventLoop* GetActiveButtonLoop() const;
+
+  /**
+   * Replace the button poll with another one.
+   *
+   * @param loop the new button polling loop object.
+   */
+  void SetActiveButtonLoop(frc::EventLoop* loop);
+
+  /**
+   * Get the default button poll.
+   *
+   * @return a reference to the default {@link frc::EventLoop} object polling
+   * buttons.
+   */
+  frc::EventLoop* GetDefaultButtonLoop() const;
 
   /**
    * Removes all button bindings from the scheduler.
    */
+  WPI_DEPRECATED("Call Clear on the EventLoop instance directly!")
   void ClearButtons();
 
   /**
@@ -349,5 +367,8 @@ class CommandScheduler final : public nt::NTSendable,
   frc::Watchdog m_watchdog;
 
   friend class CommandTestBase;
+
+  template <typename T>
+  friend class CommandTestBaseWithParam;
 };
 }  // namespace frc2

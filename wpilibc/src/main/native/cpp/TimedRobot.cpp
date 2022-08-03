@@ -70,8 +70,6 @@ void TimedRobot::EndCompetition() {
   HAL_StopNotifier(m_notifier, &status);
 }
 
-TimedRobot::TimedRobot(double period) : TimedRobot(units::second_t(period)) {}
-
 TimedRobot::TimedRobot(units::second_t period) : IterativeRobotBase(period) {
   m_startTime = Timer::GetFPGATimestamp();
   AddPeriodic([=] { LoopFunc(); }, period);

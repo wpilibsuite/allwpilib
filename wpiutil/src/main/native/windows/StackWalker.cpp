@@ -1,4 +1,4 @@
-/**********************************************************************
+﻿/**********************************************************************
  *
  * StackWalker.cpp
  * https://github.com/JochenKalmbach/StackWalker
@@ -485,8 +485,8 @@ private:
       if (hToolhelp == NULL)
         continue;
       createToolhelp32Snapshot = (tCT32S)GetProcAddress(hToolhelp, "CreateToolhelp32Snapshot");
-      module32First = (tM32F)GetProcAddress(hToolhelp, strModule32First);
-      module32Next = (tM32N)GetProcAddress(hToolhelp, strModule32Next);
+      module32First = (tM32F)GetProcAddress(hToolhelp, strModule32First);  
+      module32Next = (tM32N)GetProcAddress(hToolhelp, strModule32Next); 
       if ((createToolhelp32Snapshot != NULL) && (module32First != NULL) && (module32Next != NULL))
         break; // found the functions!
       FreeLibrary(hToolhelp);

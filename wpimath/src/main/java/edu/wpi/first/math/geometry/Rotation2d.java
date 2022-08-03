@@ -10,9 +10,10 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.interpolation.Interpolatable;
+import edu.wpi.first.math.util.Units;
 import java.util.Objects;
 
-/** A rotation in a 2d coordinate frame represented a point on the unit circle (cosine and sine). */
+/** A rotation in a 2D coordinate frame represented a point on the unit circle (cosine and sine). */
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonAutoDetect(getterVisibility = JsonAutoDetect.Visibility.NONE)
 public class Rotation2d implements Interpolatable<Rotation2d> {
@@ -28,7 +29,7 @@ public class Rotation2d implements Interpolatable<Rotation2d> {
   }
 
   /**
-   * Constructs a Rotation2d with the given radian value. The x and y don't have to be normalized.
+   * Constructs a Rotation2d with the given radian value.
    *
    * @param value The value of the angle in radians.
    */
@@ -58,6 +59,16 @@ public class Rotation2d implements Interpolatable<Rotation2d> {
   }
 
   /**
+   * Constructs and returns a Rotation2d with the given radian value.
+   *
+   * @param radians The value of the angle in degrees.
+   * @return The rotation object with the desired angle value.
+   */
+  public static Rotation2d fromRadians(double radians) {
+    return new Rotation2d(radians);
+  }
+
+  /**
    * Constructs and returns a Rotation2d with the given degree value.
    *
    * @param degrees The value of the angle in degrees.
@@ -68,10 +79,20 @@ public class Rotation2d implements Interpolatable<Rotation2d> {
   }
 
   /**
+   * Constructs and returns a Rotation2d with the given number of rotations.
+   *
+   * @param rotations The value of the angle in rotations.
+   * @return The rotation object with the desired angle value.
+   */
+  public static Rotation2d fromRotations(double rotations) {
+    return new Rotation2d(Units.rotationsToRadians(rotations));
+  }
+
+  /**
    * Adds two rotations together, with the result being bounded between -pi and pi.
    *
    * <p>For example, <code>Rotation2d.fromDegrees(30).plus(Rotation2d.fromDegrees(60))</code> equals
-   * <code>Rotation2d.fromRadians(Math.PI/2.0)</code>
+   * <code>Rotation2d(Math.PI/2.0)</code>
    *
    * @param other The rotation to add.
    * @return The sum of the two rotations.
@@ -84,7 +105,7 @@ public class Rotation2d implements Interpolatable<Rotation2d> {
    * Subtracts the new rotation from the current rotation and returns the new rotation.
    *
    * <p>For example, <code>Rotation2d.fromDegrees(10).minus(Rotation2d.fromDegrees(100))</code>
-   * equals <code>Rotation2d.fromRadians(-Math.PI/2.0)</code>
+   * equals <code>Rotation2d(-Math.PI/2.0)</code>
    *
    * @param other The rotation to subtract.
    * @return The difference between the two rotations.
@@ -133,9 +154,9 @@ public class Rotation2d implements Interpolatable<Rotation2d> {
   }
 
   /**
-   * Returns the radian value of the rotation.
+   * Returns the radian value of the Rotation2d.
    *
-   * @return The radian value of the rotation.
+   * @return The radian value of the Rotation2d.
    */
   @JsonProperty
   public double getRadians() {
@@ -143,36 +164,45 @@ public class Rotation2d implements Interpolatable<Rotation2d> {
   }
 
   /**
-   * Returns the degree value of the rotation.
+   * Returns the degree value of the Rotation2d.
    *
-   * @return The degree value of the rotation.
+   * @return The degree value of the Rotation2d.
    */
   public double getDegrees() {
     return Math.toDegrees(m_value);
   }
 
   /**
-   * Returns the cosine of the rotation.
+   * Returns the number of rotations of the Rotation2d.
    *
-   * @return The cosine of the rotation.
+   * @return The number of rotations of the Rotation2d.
+   */
+  public double getRotations() {
+    return Units.radiansToRotations(m_value);
+  }
+
+  /**
+   * Returns the cosine of the Rotation2d.
+   *
+   * @return The cosine of the Rotation2d.
    */
   public double getCos() {
     return m_cos;
   }
 
   /**
-   * Returns the sine of the rotation.
+   * Returns the sine of the Rotation2d.
    *
-   * @return The sine of the rotation.
+   * @return The sine of the Rotation2d.
    */
   public double getSin() {
     return m_sin;
   }
 
   /**
-   * Returns the tangent of the rotation.
+   * Returns the tangent of the Rotation2d.
    *
-   * @return The tangent of the rotation.
+   * @return The tangent of the Rotation2d.
    */
   public double getTan() {
     return m_sin / m_cos;
@@ -206,6 +236,6 @@ public class Rotation2d implements Interpolatable<Rotation2d> {
   @Override
   @SuppressWarnings("ParameterName")
   public Rotation2d interpolate(Rotation2d endValue, double t) {
-    return new Rotation2d(MathUtil.interpolate(this.getRadians(), endValue.getRadians(), t));
+    return plus(endValue.minus(this).times(MathUtil.clamp(t, 0, 1)));
   }
 }

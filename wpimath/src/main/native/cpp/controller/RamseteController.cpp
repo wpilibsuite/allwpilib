@@ -24,10 +24,6 @@ static decltype(1 / 1_rad) Sinc(units::radian_t x) {
   }
 }
 
-RamseteController::RamseteController(double b, double zeta)
-    : RamseteController(units::unit_t<b_unit>{b},
-                        units::unit_t<zeta_unit>{zeta}) {}
-
 RamseteController::RamseteController(units::unit_t<b_unit> b,
                                      units::unit_t<zeta_unit> zeta)
     : m_b{b}, m_zeta{zeta} {}

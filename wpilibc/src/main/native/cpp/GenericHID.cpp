@@ -8,6 +8,7 @@
 
 #include "frc/DriverStation.h"
 #include "frc/Errors.h"
+#include "frc/event/BooleanEvent.h"
 
 using namespace frc;
 
@@ -28,6 +29,11 @@ bool GenericHID::GetRawButtonPressed(int button) {
 
 bool GenericHID::GetRawButtonReleased(int button) {
   return DriverStation::GetStickButtonReleased(m_port, button);
+}
+
+BooleanEvent GenericHID::Button(int button, EventLoop* loop) const {
+  return BooleanEvent(loop,
+                      [this, button]() { return this->GetRawButton(button); });
 }
 
 double GenericHID::GetRawAxis(int axis) const {

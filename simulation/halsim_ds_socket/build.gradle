@@ -21,7 +21,7 @@ apply from: "${rootDir}/shared/plugins/setupBuild.gradle"
 model {
     testSuites {
         def comps = $.components
-        if (!project.hasProperty('onlylinuxathena') && !project.hasProperty('onlylinuxraspbian') && !project.hasProperty('onlylinuxaarch64bionic')) {
+        if (!project.hasProperty('onlylinuxathena') && !project.hasProperty('onlylinuxarm32') && !project.hasProperty('onlylinuxarm64')) {
             "${pluginName}Test"(GoogleTestTestSuiteSpec) {
                 for(NativeComponentSpec c : comps) {
                     if (c.name == pluginName) {
@@ -44,8 +44,13 @@ model {
         }
     }
     binaries {
+        all {
+            lib project: ':wpinet', library: 'wpinet', linkage: 'shared'
+            lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
+        }
         withType(GoogleTestTestSuiteBinarySpec) {
             project(':hal').addHalDependency(it, 'shared')
+            lib project: ':wpinet', library: 'wpinet', linkage: 'shared'
             lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
             lib library: pluginName, linkage: 'shared'
             if (it.targetPlatform.name == nativeUtils.wpi.platforms.roborio) {

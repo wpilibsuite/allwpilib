@@ -13,7 +13,7 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.util.sendable.SendableRegistry;
-import edu.wpi.first.wpilibj.SpeedController;
+import edu.wpi.first.wpilibj.motorcontrol.MotorController;
 
 /**
  * A class for driving Mecanum drive platforms.
@@ -47,22 +47,16 @@ import edu.wpi.first.wpilibj.SpeedController;
  * be set to 0, and larger values will be scaled so that the full range is still used. This deadband
  * value can be changed with {@link #setDeadband}.
  *
- * <p>RobotDrive porting guide: <br>
- * {@link #driveCartesian(double, double, double, double)} is equivalent to RobotDrive's
- * mecanumDrive_Cartesian(double, double, double, double) if a deadband of 0 is used, and the ySpeed
- * and gyroAngle values are inverted compared to RobotDrive (eg driveCartesian(xSpeed, -ySpeed,
- * zRotation, -gyroAngle). <br>
- * {@link #drivePolar(double, double, double)} is equivalent to RobotDrive's
- * mecanumDrive_Polar(double, double, double)} if a deadband of 0 is used.
+ * <p>{@link edu.wpi.first.wpilibj.MotorSafety} is enabled by default. The driveCartesian or
+ * drivePolar methods should be called periodically to avoid Motor Safety timeouts.
  */
-@SuppressWarnings("removal")
 public class MecanumDrive extends RobotDriveBase implements Sendable, AutoCloseable {
   private static int instances;
 
-  private final SpeedController m_frontLeftMotor;
-  private final SpeedController m_rearLeftMotor;
-  private final SpeedController m_frontRightMotor;
-  private final SpeedController m_rearRightMotor;
+  private final MotorController m_frontLeftMotor;
+  private final MotorController m_rearLeftMotor;
+  private final MotorController m_frontRightMotor;
+  private final MotorController m_rearRightMotor;
 
   private boolean m_reported;
 
@@ -108,10 +102,10 @@ public class MecanumDrive extends RobotDriveBase implements Sendable, AutoClosea
    * @param rearRightMotor The motor on the rear-right corner.
    */
   public MecanumDrive(
-      SpeedController frontLeftMotor,
-      SpeedController rearLeftMotor,
-      SpeedController frontRightMotor,
-      SpeedController rearRightMotor) {
+      MotorController frontLeftMotor,
+      MotorController rearLeftMotor,
+      MotorController frontRightMotor,
+      MotorController rearRightMotor) {
     requireNonNull(frontLeftMotor, "Front-left motor cannot be null");
     requireNonNull(rearLeftMotor, "Rear-left motor cannot be null");
     requireNonNull(frontRightMotor, "Front-right motor cannot be null");

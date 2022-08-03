@@ -1,6 +1,6 @@
 import org.gradle.internal.os.OperatingSystem
 
-if (!project.hasProperty('onlylinuxathena') && !project.hasProperty('onlylinuxraspbian') && !project.hasProperty('onlylinuxaarch64bionic')) {
+if (!project.hasProperty('onlylinuxathena') && !project.hasProperty('onlylinuxarm32') && !project.hasProperty('onlylinuxarm64')) {
 
     description = "roboRIO Team Number Setter"
 
@@ -27,12 +27,12 @@ if (!project.hasProperty('onlylinuxathena') && !project.hasProperty('onlylinuxra
     nativeUtils {
         nativeDependencyContainer {
             libssh(getNativeDependencyTypeClass('WPIStaticMavenDependency')) {
-                groupId = "edu.wpi.first.thirdparty.frc2022"
+                groupId = "edu.wpi.first.thirdparty.frc2023"
                 artifactId = "libssh"
                 headerClassifier = "headers"
                 sourceClassifier = "sources"
                 ext = "zip"
-                version = '0.95-1'
+                version = '0.95-3'
                 targetPlatforms.addAll(nativeUtils.wpi.platforms.desktopPlatforms)
             }
         }
@@ -107,12 +107,13 @@ if (!project.hasProperty('onlylinuxathena') && !project.hasProperty('onlylinuxra
                     }
                 }
                 binaries.all {
-                    if (it.targetPlatform.name == nativeUtils.wpi.platforms.roborio || it.targetPlatform.name == nativeUtils.wpi.platforms.raspbian || it.targetPlatform.name == nativeUtils.wpi.platforms.aarch64bionic) {
+                    if (it.targetPlatform.name == nativeUtils.wpi.platforms.roborio || it.targetPlatform.name == nativeUtils.wpi.platforms.linuxarm32 || it.targetPlatform.name == nativeUtils.wpi.platforms.linuxarm64) {
                         it.buildable = false
                         return
                     }
                     it.cppCompiler.define("LIBSSH_STATIC")
                     lib project: ':glass', library: 'glass', linkage: 'static'
+                    lib project: ':wpinet', library: 'wpinet', linkage: 'static'
                     lib project: ':wpiutil', library: 'wpiutil', linkage: 'static'
                     lib project: ':wpigui', library: 'wpigui', linkage: 'static'
                     nativeUtils.useRequiredLibrary(it, 'imgui_static', 'libssh')

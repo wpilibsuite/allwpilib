@@ -392,8 +392,7 @@ public class ADIS16470_IMU implements AutoCloseable, NTSendable {
    * @return
    */
   private static int toInt(int... buf) {
-    return (int)
-        ((buf[0] & 0xFF) << 24 | (buf[1] & 0xFF) << 16 | (buf[2] & 0xFF) << 8 | (buf[3] & 0xFF));
+    return (buf[0] & 0xFF) << 24 | (buf[1] & 0xFF) << 16 | (buf[2] & 0xFF) << 8 | (buf[3] & 0xFF);
   }
 
   /**

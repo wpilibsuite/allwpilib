@@ -252,9 +252,44 @@ public interface Command {
    * decorated without issue.
    *
    * @return the decorated command
+   * @deprecated use {@link #endlessly()} instead.
    */
+  @SuppressWarnings("removal") // PerpetualCommand
+  @Deprecated(forRemoval = true, since = "2023")
   default PerpetualCommand perpetually() {
     return new PerpetualCommand(this);
+  }
+
+  /**
+   * Decorates this command to run endlessly, ignoring its ordinary end conditions. The decorated
+   * command can still be interrupted or canceled.
+   *
+   * <p>Note: This decorator works by composing this command within a CommandGroup. The command
+   * cannot be used independently after being decorated, or be re-decorated with a different
+   * decorator, unless it is manually cleared from the list of grouped commands with {@link
+   * CommandGroupBase#clearGroupedCommand(Command)}. The decorated command can, however, be further
+   * decorated without issue.
+   *
+   * @return the decorated command
+   */
+  default EndlessCommand endlessly() {
+    return new EndlessCommand(this);
+  }
+
+  /**
+   * Decorates this command to run repeatedly, restarting it when it ends, until this command is
+   * interrupted. The decorated command can still be canceled.
+   *
+   * <p>Note: This decorator works by composing this command within a CommandGroup. The command
+   * cannot be used independently after being decorated, or be re-decorated with a different
+   * decorator, unless it is manually cleared from the list of grouped commands with {@link
+   * CommandGroupBase#clearGroupedCommand(Command)}. The decorated command can, however, be further
+   * decorated without issue.
+   *
+   * @return the decorated command
+   */
+  default RepeatCommand repeat() {
+    return new RepeatCommand(this);
   }
 
   /**
@@ -266,6 +301,33 @@ public interface Command {
    */
   default ProxyScheduleCommand asProxy() {
     return new ProxyScheduleCommand(this);
+  }
+
+  /**
+   * Decorates this command to only run if this condition is not met. If the command is already
+   * running and the condition changes to true, the command will not stop running. The requirements
+   * of this command will be kept for the new conditonal command.
+   *
+   * @param condition the condition that will prevent the command from running
+   * @return the decorated command
+   */
+  default ConditionalCommand unless(BooleanSupplier condition) {
+    return new ConditionalCommand(new InstantCommand(), this, condition);
+  }
+
+  /**
+   * Decorates this command to run or stop when disabled.
+   *
+   * @param doesRunWhenDisabled true to run when disabled.
+   * @return the decorated command
+   */
+  default WrapperCommand ignoringDisable(boolean doesRunWhenDisabled) {
+    return new WrapperCommand(this) {
+      @Override
+      public boolean runsWhenDisabled() {
+        return doesRunWhenDisabled;
+      }
+    };
   }
 
   /**
@@ -284,8 +346,8 @@ public interface Command {
   }
 
   /**
-   * Cancels this command. Will call the command's interrupted() method. Commands will be canceled
-   * even if they are not marked as interruptible.
+   * Cancels this command. Will call the command's end() method with interrupted=true. Commands will
+   * be canceled even if they are not marked as interruptible.
    */
   default void cancel() {
     CommandScheduler.getInstance().cancel(this);

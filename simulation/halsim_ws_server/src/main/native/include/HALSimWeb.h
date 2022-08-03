@@ -11,9 +11,9 @@
 #include <WSBaseProvider.h>
 #include <WSProviderContainer.h>
 #include <WSProvider_SimDevice.h>
-#include <wpi/uv/Async.h>
-#include <wpi/uv/Loop.h>
-#include <wpi/uv/Tcp.h>
+#include <wpinet/uv/Async.h>
+#include <wpinet/uv/Loop.h>
+#include <wpinet/uv/Tcp.h>
 
 namespace wpi {
 class json;

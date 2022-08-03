@@ -63,39 +63,23 @@ public class Compressor implements Sendable, AutoCloseable {
   }
 
   /**
-   * Start the compressor running in closed loop control mode.
-   *
-   * <p>Use the method in cases where you would like to manually stop and start the compressor for
-   * applications such as conserving battery or making sure that the compressor motor doesn't start
-   * during critical operations.
-   *
-   * @deprecated Use enableDigital() instead.
-   */
-  @Deprecated(since = "2022", forRemoval = true)
-  public void start() {
-    enableDigital();
-  }
-
-  /**
-   * Stop the compressor from running in closed loop control mode.
-   *
-   * <p>Use the method in cases where you would like to manually stop and start the compressor for
-   * applications such as conserving battery or making sure that the compressor motor doesn't start
-   * during critical operations.
-   *
-   * @deprecated Use disable() instead.
-   */
-  @Deprecated(since = "2022", forRemoval = true)
-  public void stop() {
-    disable();
-  }
-
-  /**
-   * Get the status of the compressor.
+   * Get the status of the compressor. To (re)enable the compressor use enableDigital() or
+   * enableAnalog(...).
    *
    * @return true if the compressor is on
+   * @deprecated To avoid confusion in thinking this (re)enables the compressor use IsEnabled().
    */
+  @Deprecated(since = "2023", forRemoval = true)
   public boolean enabled() {
+    return isEnabled();
+  }
+
+  /**
+   * Returns whether the compressor is active or not.
+   *
+   * @return true if the compressor is on - otherwise false.
+   */
+  public boolean isEnabled() {
     return m_module.getCompressor();
   }
 
@@ -184,7 +168,7 @@ public class Compressor implements Sendable, AutoCloseable {
   @Override
   public void initSendable(SendableBuilder builder) {
     builder.setSmartDashboardType("Compressor");
-    builder.addBooleanProperty("Enabled", this::enabled, null);
+    builder.addBooleanProperty("Enabled", this::isEnabled, null);
     builder.addBooleanProperty("Pressure switch", this::getPressureSwitchValue, null);
   }
 }

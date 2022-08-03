@@ -4,14 +4,8 @@
 
 #include <jni.h>
 
-#include "../MulticastHandleManager.h"
 #include "edu_wpi_first_util_WPIUtilJNI.h"
-#include "wpi/DenseMap.h"
-#include "wpi/MulticastServiceAnnouncer.h"
-#include "wpi/MulticastServiceResolver.h"
-#include "wpi/PortForwarder.h"
 #include "wpi/Synchronization.h"
-#include "wpi/UidVector.h"
 #include "wpi/jni_util.h"
 #include "wpi/timestamp.h"
 
@@ -21,8 +15,6 @@ static bool mockTimeEnabled = false;
 static uint64_t mockNow = 0;
 
 static JException interruptedEx;
-static JClass serviceDataCls;
-static JGlobal<jobjectArray> serviceDataEmptyArray;
 
 extern "C" {
 
@@ -37,17 +29,6 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM* vm, void* reserved) {
     return JNI_ERR;
   }
 
-  serviceDataCls = JClass{env, "edu/wpi/first/util/ServiceData"};
-  if (!serviceDataCls) {
-    return JNI_ERR;
-  }
-
-  serviceDataEmptyArray = JGlobal<jobjectArray>{
-      env, env->NewObjectArray(0, serviceDataCls, nullptr)};
-  if (serviceDataEmptyArray == nullptr) {
-    return JNI_ERR;
-  }
-
   return JNI_VERSION_1_6;
 }
 
@@ -57,8 +38,6 @@ JNIEXPORT void JNICALL JNI_OnUnload(JavaVM* vm, void* reserved) {
     return;
   }
 
-  serviceDataEmptyArray.free(env);
-  serviceDataCls.free(env);
   interruptedEx.free(env);
 }
 
@@ -126,32 +105,6 @@ Java_edu_wpi_first_util_WPIUtilJNI_getSystemTime
   (JNIEnv*, jclass)
 {
   return wpi::GetSystemTime();
-}
-
-/*
- * Class:     edu_wpi_first_util_WPIUtilJNI
- * Method:    addPortForwarder
- * Signature: (ILjava/lang/String;I)V
- */
-JNIEXPORT void JNICALL
-Java_edu_wpi_first_util_WPIUtilJNI_addPortForwarder
-  (JNIEnv* env, jclass, jint port, jstring remoteHost, jint remotePort)
-{
-  wpi::PortForwarder::GetInstance().Add(static_cast<unsigned int>(port),
-                                        JStringRef{env, remoteHost}.str(),
-                                        static_cast<unsigned int>(remotePort));
-}
-
-/*
- * Class:     edu_wpi_first_util_WPIUtilJNI
- * Method:    removePortForwarder
- * Signature: (I)V
- */
-JNIEXPORT void JNICALL
-Java_edu_wpi_first_util_WPIUtilJNI_removePortForwarder
-  (JNIEnv* env, jclass, jint port)
-{
-  wpi::PortForwarder::GetInstance().Remove(port);
 }
 
 /*

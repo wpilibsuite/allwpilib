@@ -24,7 +24,7 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 /** Provide access to the network communication data to / from the Driver Station. */
-public class DriverStation {
+public final class DriverStation {
   /** Number of Joystick Ports. */
   public static final int kJoystickPorts = 6;
 
@@ -398,8 +398,6 @@ public class DriverStation {
     final JoystickLogSender[] m_joysticks;
   }
 
-  private static DriverStation instance = new DriverStation();
-
   // Joystick User Data
   private static HALJoystickAxes[] m_joystickAxes = new HALJoystickAxes[kJoystickPorts];
   private static HALJoystickPOVs[] m_joystickPOVs = new HALJoystickPOVs[kJoystickPorts];
@@ -447,17 +445,6 @@ public class DriverStation {
   private static final ReentrantLock m_controlWordMutex = new ReentrantLock();
   private static final ControlWord m_controlWordCache;
   private static long m_lastControlWordUpdate;
-
-  /**
-   * Gets an instance of the DriverStation.
-   *
-   * @return The DriverStation.
-   * @deprecated Use the static methods
-   */
-  @Deprecated
-  public static DriverStation getInstance() {
-    return DriverStation.instance;
-  }
 
   /**
    * DriverStation constructor.
@@ -990,33 +977,9 @@ public class DriverStation {
    * operator-controlled mode.
    *
    * @return True if operator-controlled mode should be enabled, false otherwise.
-   * @deprecated Use isTeleop() instead.
-   */
-  @Deprecated(since = "2022", forRemoval = true)
-  public static boolean isOperatorControl() {
-    return isTeleop();
-  }
-
-  /**
-   * Gets a value indicating whether the Driver Station requires the robot to be running in
-   * operator-controlled mode.
-   *
-   * @return True if operator-controlled mode should be enabled, false otherwise.
    */
   public static boolean isTeleop() {
     return !(isAutonomous() || isTest());
-  }
-
-  /**
-   * Gets a value indicating whether the Driver Station requires the robot to be running in
-   * operator-controller mode and enabled.
-   *
-   * @return True if operator-controlled mode should be set and the robot should be enabled.
-   * @deprecated Use isTeleopEnabled() instead.
-   */
-  @Deprecated(since = "2022", forRemoval = true)
-  public static boolean isOperatorControlEnabled() {
-    return isTeleopEnabled();
   }
 
   /**
@@ -1332,18 +1295,6 @@ public class DriverStation {
    */
   public static void inAutonomous(boolean entering) {
     m_userInAutonomous = entering;
-  }
-
-  /**
-   * Only to be used to tell the Driver Station what code you claim to be executing for diagnostic
-   * purposes only.
-   *
-   * @param entering If true, starting teleop code; if false, leaving teleop code
-   * @deprecated Use {@link #inTeleop(boolean)} instead.
-   */
-  @Deprecated(since = "2022", forRemoval = true)
-  public static void inOperatorControl(boolean entering) {
-    m_userInTeleop = entering;
   }
 
   /**

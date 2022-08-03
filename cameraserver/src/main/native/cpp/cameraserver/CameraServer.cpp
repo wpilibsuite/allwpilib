@@ -52,12 +52,6 @@ static Instance& GetInstance() {
   return instance;
 }
 
-CameraServer* CameraServer::GetInstance() {
-  ::GetInstance();
-  static CameraServer instance;
-  return &instance;
-}
-
 static std::string_view MakeSourceValue(CS_Source source,
                                         wpi::SmallVectorImpl<char>& buf) {
   CS_Status status = 0;

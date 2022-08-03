@@ -14,10 +14,10 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableBuilderImpl;
 /**
  * The LiveWindow class is the public interface for putting sensors and actuators on the LiveWindow.
  */
-public class LiveWindow {
+public final class LiveWindow {
   private static class Component {
     boolean m_firstTime = true;
-    boolean m_telemetryEnabled = true;
+    boolean m_telemetryEnabled;
   }
 
   private static final int dataHandle = SendableRegistry.getDataHandle();
@@ -27,7 +27,7 @@ public class LiveWindow {
   private static final NetworkTableEntry enabledEntry = statusTable.getEntry("LW Enabled");
   private static boolean startLiveWindow;
   private static boolean liveWindowEnabled;
-  private static boolean telemetryEnabled = true;
+  private static boolean telemetryEnabled;
 
   private static Runnable enabledListener;
   private static Runnable disabledListener;

@@ -31,7 +31,6 @@ public class Relay extends MotorSafety implements Sendable, AutoCloseable {
    * This class represents errors in trying to set relay values contradictory to the direction to
    * which the relay is set.
    */
-  @SuppressWarnings("serial")
   public static class InvalidValueException extends RuntimeException {
     /**
      * Create a new exception with the given message.

@@ -13,7 +13,7 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.util.sendable.SendableRegistry;
-import edu.wpi.first.wpilibj.SpeedController;
+import edu.wpi.first.wpilibj.motorcontrol.MotorController;
 
 /**
  * A class for driving Killough drive platforms.
@@ -39,8 +39,10 @@ import edu.wpi.first.wpilibj.SpeedController;
  * <p>The positive X axis points ahead, the positive Y axis points right, and the positive Z axis
  * points down. Rotations follow the right-hand rule, so clockwise rotation around the Z axis is
  * positive.
+ *
+ * <p>{@link edu.wpi.first.wpilibj.MotorSafety} is enabled by default. The driveCartesian or
+ * drivePolar methods should be called periodically to avoid Motor Safety timeouts.
  */
-@SuppressWarnings("removal")
 public class KilloughDrive extends RobotDriveBase implements Sendable, AutoCloseable {
   public static final double kDefaultLeftMotorAngle = 60.0;
   public static final double kDefaultRightMotorAngle = 120.0;
@@ -48,9 +50,9 @@ public class KilloughDrive extends RobotDriveBase implements Sendable, AutoClose
 
   private static int instances;
 
-  private SpeedController m_leftMotor;
-  private SpeedController m_rightMotor;
-  private SpeedController m_backMotor;
+  private MotorController m_leftMotor;
+  private MotorController m_rightMotor;
+  private MotorController m_backMotor;
 
   private Vector2d m_leftVec;
   private Vector2d m_rightVec;
@@ -99,7 +101,7 @@ public class KilloughDrive extends RobotDriveBase implements Sendable, AutoClose
    * @param backMotor The motor on the back corner.
    */
   public KilloughDrive(
-      SpeedController leftMotor, SpeedController rightMotor, SpeedController backMotor) {
+      MotorController leftMotor, MotorController rightMotor, MotorController backMotor) {
     this(
         leftMotor,
         rightMotor,
@@ -122,9 +124,9 @@ public class KilloughDrive extends RobotDriveBase implements Sendable, AutoClose
    * @param backMotorAngle The angle of the back wheel's forward direction of travel.
    */
   public KilloughDrive(
-      SpeedController leftMotor,
-      SpeedController rightMotor,
-      SpeedController backMotor,
+      MotorController leftMotor,
+      MotorController rightMotor,
+      MotorController backMotor,
       double leftMotorAngle,
       double rightMotorAngle,
       double backMotorAngle) {

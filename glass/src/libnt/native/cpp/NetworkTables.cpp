@@ -368,7 +368,8 @@ static std::shared_ptr<nt::Value> StringToStringArray(std::string_view in) {
   return nt::NetworkTableValue::MakeStringArray(std::move(out));
 }
 
-static void EmitEntryValueReadonly(NetworkTablesModel::Entry& entry) {
+static void EmitEntryValueReadonly(NetworkTablesModel::Entry& entry,
+                                   NetworkTablesFlags flags) {
   auto& val = entry.value;
   if (!val) {
     return;
@@ -378,9 +379,20 @@ static void EmitEntryValueReadonly(NetworkTablesModel::Entry& entry) {
     case NT_BOOLEAN:
       ImGui::LabelText("boolean", "%s", val->GetBoolean() ? "true" : "false");
       break;
-    case NT_DOUBLE:
-      ImGui::LabelText("double", "%.6f", val->GetDouble());
+    case NT_DOUBLE: {
+      unsigned char precision = (flags & NetworkTablesFlags_Precision) >>
+                                kNetworkTablesFlags_PrecisionBitShift;
+#ifdef __GNUC__
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wformat-nonliteral"
+#endif
+      ImGui::LabelText("double", fmt::format("%.{}f", precision).c_str(),
+                       val->GetDouble());
+#ifdef __GNUC__
+#pragma GCC diagnostic pop
+#endif
       break;
+    }
     case NT_STRING: {
       // GetString() comes from a std::string, so it's null terminated
       ImGui::LabelText("string", "%s", val->GetString().data());
@@ -417,7 +429,8 @@ static char* GetTextBuffer(std::string_view in) {
   return textBuffer;
 }
 
-static void EmitEntryValueEditable(NetworkTablesModel::Entry& entry) {
+static void EmitEntryValueEditable(NetworkTablesModel::Entry& entry,
+                                   NetworkTablesFlags flags) {
   auto& val = entry.value;
   if (!val) {
     return;
@@ -435,10 +448,20 @@ static void EmitEntryValueEditable(NetworkTablesModel::Entry& entry) {
     }
     case NT_DOUBLE: {
       double v = val->GetDouble();
-      if (ImGui::InputDouble("double", &v, 0, 0, "%.6f",
+      unsigned char precision = (flags & NetworkTablesFlags_Precision) >>
+                                kNetworkTablesFlags_PrecisionBitShift;
+#ifdef __GNUC__
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wformat-nonliteral"
+#endif
+      if (ImGui::InputDouble("double", &v, 0, 0,
+                             fmt::format("%.{}f", precision).c_str(),
                              ImGuiInputTextFlags_EnterReturnsTrue)) {
         nt::SetEntryValue(entry.entry, nt::NetworkTableValue::MakeDouble(v));
       }
+#ifdef __GNUC__
+#pragma GCC diagnostic pop
+#endif
       break;
     }
     case NT_STRING: {
@@ -600,9 +623,9 @@ static void EmitEntry(NetworkTablesModel::Entry& entry, const char* name,
   ImGui::NextColumn();
 
   if (flags & NetworkTablesFlags_ReadOnly) {
-    EmitEntryValueReadonly(entry);
+    EmitEntryValueReadonly(entry, flags);
   } else {
-    EmitEntryValueEditable(entry);
+    EmitEntryValueEditable(entry, flags);
   }
   ImGui::NextColumn();
 
@@ -743,19 +766,23 @@ void NetworkTablesFlagsSettings::Update() {
     m_pCreateNoncanonicalKeys = &storage.GetBool(
         "createNonCanonical",
         m_defaultFlags & NetworkTablesFlags_CreateNoncanonicalKeys);
+    m_pPrecision = &storage.GetInt(
+        "precision", (m_defaultFlags & NetworkTablesFlags_Precision) >>
+                         kNetworkTablesFlags_PrecisionBitShift);
   }
 
-  m_flags &=
-      ~(NetworkTablesFlags_TreeView | NetworkTablesFlags_ShowConnections |
-        NetworkTablesFlags_ShowFlags | NetworkTablesFlags_ShowTimestamp |
-        NetworkTablesFlags_CreateNoncanonicalKeys);
+  m_flags &= ~(
+      NetworkTablesFlags_TreeView | NetworkTablesFlags_ShowConnections |
+      NetworkTablesFlags_ShowFlags | NetworkTablesFlags_ShowTimestamp |
+      NetworkTablesFlags_CreateNoncanonicalKeys | NetworkTablesFlags_Precision);
   m_flags |=
       (*m_pTreeView ? NetworkTablesFlags_TreeView : 0) |
       (*m_pShowConnections ? NetworkTablesFlags_ShowConnections : 0) |
       (*m_pShowFlags ? NetworkTablesFlags_ShowFlags : 0) |
       (*m_pShowTimestamp ? NetworkTablesFlags_ShowTimestamp : 0) |
       (*m_pCreateNoncanonicalKeys ? NetworkTablesFlags_CreateNoncanonicalKeys
-                                  : 0);
+                                  : 0) |
+      (*m_pPrecision << kNetworkTablesFlags_PrecisionBitShift);
 }
 
 void NetworkTablesFlagsSettings::DisplayMenu() {
@@ -766,6 +793,17 @@ void NetworkTablesFlagsSettings::DisplayMenu() {
   ImGui::MenuItem("Show Connections", "", m_pShowConnections);
   ImGui::MenuItem("Show Flags", "", m_pShowFlags);
   ImGui::MenuItem("Show Timestamp", "", m_pShowTimestamp);
+  if (ImGui::BeginMenu("Decimal Precision")) {
+    static const char* precisionOptions[] = {"1", "2", "3", "4", "5",
+                                             "6", "7", "8", "9", "10"};
+    for (int i = 1; i <= 10; i++) {
+      if (ImGui::MenuItem(precisionOptions[i - 1], nullptr,
+                          i == *m_pPrecision)) {
+        *m_pPrecision = i;
+      }
+    }
+    ImGui::EndMenu();
+  }
   ImGui::Separator();
   ImGui::MenuItem("Allow creation of non-canonical keys", "",
                   m_pCreateNoncanonicalKeys);
