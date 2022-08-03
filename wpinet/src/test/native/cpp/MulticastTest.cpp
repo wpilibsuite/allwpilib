@@ -2,9 +2,10 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include <wpi/MulticastServiceAnnouncer.h>
-#include <wpi/MulticastServiceResolver.h>
+#include <wpinet/MulticastServiceAnnouncer.h>
+#include <wpinet/MulticastServiceResolver.h>
 #include <wpi/timestamp.h>
+#include <thread>
 
 #include "gtest/gtest.h"
 
@@ -20,6 +21,9 @@ TEST(MulticastServiceAnnouncerTest, EmptyText) {
     resolver.Start();
 
     std::this_thread::sleep_for(std::chrono::seconds(1));
+
+    resolver.Stop();
+    announcer.Stop();
   }
 }
 

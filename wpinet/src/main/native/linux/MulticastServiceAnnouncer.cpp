@@ -16,7 +16,7 @@ using namespace wpi;
 struct MulticastServiceAnnouncer::Impl {
   AvahiFunctionTable& table = AvahiFunctionTable::Get();
   std::shared_ptr<AvahiThread> thread = AvahiThread::Get();
-  AvahiClient* client;
+  AvahiClient* client = nullptr;
   AvahiEntryGroup* group = nullptr;
   std::string serviceName;
   std::string serviceType;
