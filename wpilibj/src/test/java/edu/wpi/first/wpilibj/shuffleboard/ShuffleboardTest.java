@@ -9,8 +9,8 @@ import static org.junit.jupiter.api.Assertions.assertSame;
 import edu.wpi.first.wpilibj.UtilityClassTest;
 import org.junit.jupiter.api.Test;
 
-public class ShuffleboardTest extends UtilityClassTest<Shuffleboard> {
-  public ShuffleboardTest() {
+class ShuffleboardTest extends UtilityClassTest<Shuffleboard> {
+  ShuffleboardTest() {
     super(Shuffleboard.class);
   }
 

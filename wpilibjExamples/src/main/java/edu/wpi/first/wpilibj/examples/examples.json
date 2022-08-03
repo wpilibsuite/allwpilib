@@ -90,6 +90,17 @@
     "commandversion": 2
   },
   {
+    "name": "EventLoop",
+    "description": "Demonstrate managing a ball system using EventLoop and BooleanEvent.",
+    "tags": [
+      "EventLoop"
+    ],
+    "foldername": "eventloop",
+    "gradlebase": "java",
+    "mainclass": "Main",
+    "commandversion": 2
+  },
+  {
     "name": "Relay",
     "description": "Demonstrate controlling a Relay from Joystick buttons.",
     "tags": [
@@ -701,7 +712,8 @@
       "Sensors",
       "Simulation",
       "Physics",
-      "Mechanism2d"
+      "Mechanism2d",
+      "Preferences"
     ],
     "foldername": "armsimulation",
     "gradlebase": "java",
@@ -770,5 +782,27 @@
     "gradlebase": "javaromi",
     "mainclass": "Main",
     "commandversion": 2
+  },
+  {
+    "name": "Digital Communication Sample",
+    "description": "An example program that communicates with external devices (such as an Arduino) using the roboRIO's DIO",
+    "tags": [
+      "Digital"
+    ],
+    "foldername": "digitalcommunication",
+    "gradlebase": "java",
+    "commandversion": 2,
+    "mainclass": "Main"
+  },
+  {
+    "name": "I2C Communication Sample",
+    "description": "An example program that communicates with external devices (such as an Arduino) using the roboRIO's I2C port",
+    "tags": [
+      "I2C"
+    ],
+    "foldername": "i2ccommunication",
+    "gradlebase": "java",
+    "commandversion": 2,
+    "mainclass": "Main"
   }
 ]

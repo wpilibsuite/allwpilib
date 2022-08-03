@@ -9,11 +9,11 @@
 #include <wpi/SymbolExports.h>
 #include <wpi/array.h>
 
-#include "Eigen/Core"
-#include "frc/estimator/KalmanFilterLatencyCompensator.h"
+#include "frc/EigenCore.h"
 #include "frc/estimator/UnscentedKalmanFilter.h"
 #include "frc/geometry/Pose2d.h"
 #include "frc/geometry/Rotation2d.h"
+#include "frc/interpolation/TimeInterpolatableBuffer.h"
 #include "frc/kinematics/MecanumDriveKinematics.h"
 #include "units/time.h"
 
@@ -38,8 +38,8 @@ namespace frc {
  * <strong> x = [x, y, theta]ᵀ </strong> in the field coordinate system
  * containing x position, y position, and heading.
  *
- * <strong> u = [v_l, v_r, dtheta]ᵀ </strong> containing left wheel velocity,
- * right wheel velocity, and change in gyro heading.
+ * <strong> u = [v_x, v_y, omega]ᵀ </strong> containing x velocity, y velocity,
+ * and angular velocity in the field coordinate system.
  *
  * <strong> y = [x, y, theta]ᵀ </strong> from vision containing x position, y
  * position, and heading; or <strong> y = [theta]ᵀ </strong> containing gyro
@@ -59,11 +59,10 @@ class WPILIB_DLLEXPORT MecanumDrivePoseEstimator {
    *                                 model's state estimates less. This matrix
    *                                 is in the form [x, y, theta]ᵀ, with units
    *                                 in meters and radians.
-   * @param localMeasurementStdDevs  Standard deviations of the encoder and gyro
-   *                                 measurements. Increase these numbers to
-   *                                 trust sensor readings from encoders
-   *                                 and gyros less. This matrix is in the form
-   *                                 [theta], with units in radians.
+   * @param localMeasurementStdDevs  Standard deviation of the gyro measurement.
+   *                                 Increase this number to trust sensor
+   *                                 readings from the gyro less. This matrix is
+   *                                 in the form [theta], with units in radians.
    * @param visionMeasurementStdDevs Standard deviations of the vision
    *                                 measurements. Increase these numbers to
    *                                 trust global measurements from vision
@@ -124,6 +123,10 @@ class WPILIB_DLLEXPORT MecanumDrivePoseEstimator {
    * This method can be called as infrequently as you want, as long as you are
    * calling Update() every loop.
    *
+   * To promote stability of the pose estimate and make it robust to bad vision
+   * data, we recommend only adding vision measurements that are already within
+   * one meter or so of the current pose estimate.
+   *
    * @param visionRobotPose The pose of the robot as measured by the vision
    *                        camera.
    * @param timestamp       The timestamp of the vision measurement in seconds.
@@ -144,6 +147,10 @@ class WPILIB_DLLEXPORT MecanumDrivePoseEstimator {
    *
    * This method can be called as infrequently as you want, as long as you are
    * calling Update() every loop.
+   *
+   * To promote stability of the pose estimate and make it robust to bad vision
+   * data, we recommend only adding vision measurements that are already within
+   * one meter or so of the current pose estimate.
    *
    * Note that the vision measurement standard deviations passed into this
    * method will continue to apply to future measurements until a subsequent
@@ -205,11 +212,8 @@ class WPILIB_DLLEXPORT MecanumDrivePoseEstimator {
  private:
   UnscentedKalmanFilter<3, 3, 1> m_observer;
   MecanumDriveKinematics m_kinematics;
-  KalmanFilterLatencyCompensator<3, 3, 1, UnscentedKalmanFilter<3, 3, 1>>
-      m_latencyCompensator;
-  std::function<void(const Eigen::Vector<double, 3>& u,
-                     const Eigen::Vector<double, 3>& y)>
-      m_visionCorrect;
+  TimeInterpolatableBuffer<Pose2d> m_poseBuffer{1.5_s};
+  std::function<void(const Vectord<3>& u, const Vectord<3>& y)> m_visionCorrect;
 
   Eigen::Matrix3d m_visionContR;
 
@@ -221,7 +225,7 @@ class WPILIB_DLLEXPORT MecanumDrivePoseEstimator {
 
   template <int Dim>
   static wpi::array<double, Dim> StdDevMatrixToArray(
-      const Eigen::Vector<double, Dim>& vector) {
+      const Vectord<Dim>& vector) {
     wpi::array<double, Dim> array;
     for (size_t i = 0; i < Dim; ++i) {
       array[i] = vector(i);

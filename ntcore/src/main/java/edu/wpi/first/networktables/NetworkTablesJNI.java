@@ -5,6 +5,7 @@
 package edu.wpi.first.networktables;
 
 import edu.wpi.first.util.RuntimeLoader;
+import edu.wpi.first.util.datalog.DataLog;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -254,6 +255,22 @@ public final class NetworkTablesJNI {
       throws PersistentException; // returns warnings
 
   public static native long now();
+
+  private static native int startEntryDataLog(int inst, long log, String prefix, String logPrefix);
+
+  public static int startEntryDataLog(int inst, DataLog log, String prefix, String logPrefix) {
+    return startEntryDataLog(inst, log.getImpl(), prefix, logPrefix);
+  }
+
+  public static native void stopEntryDataLog(int logger);
+
+  private static native int startConnectionDataLog(int inst, long log, String name);
+
+  public static int startConnectionDataLog(int inst, DataLog log, String name) {
+    return startConnectionDataLog(inst, log.getImpl(), name);
+  }
+
+  public static native void stopConnectionDataLog(int logger);
 
   public static native int createLoggerPoller(int inst);
 

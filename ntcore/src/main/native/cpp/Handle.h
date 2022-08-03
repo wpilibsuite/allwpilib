@@ -28,7 +28,9 @@ class Handle {
     kLogger,
     kLoggerPoller,
     kRpcCall,
-    kRpcCallPoller
+    kRpcCallPoller,
+    kDataLogger,
+    kConnectionDataLogger
   };
   enum { kIndexMax = 0xfffff };
 

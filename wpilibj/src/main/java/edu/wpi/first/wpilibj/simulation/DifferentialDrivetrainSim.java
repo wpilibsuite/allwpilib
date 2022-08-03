@@ -323,7 +323,7 @@ public class DifferentialDrivetrainSim {
     var B = new Matrix<>(Nat.N4(), Nat.N2());
     B.assignBlock(0, 0, m_plant.getB().times(this.m_currentGearing / this.m_originalGearing));
 
-    // Because G^2 can be factored out of A, we can divide by the old ratio squared and multiply
+    // Because G² can be factored out of A, we can divide by the old ratio squared and multiply
     // by the new ratio squared to get a new drivetrain model.
     var A = new Matrix<>(Nat.N4(), Nat.N4());
     A.assignBlock(
@@ -360,7 +360,7 @@ public class DifferentialDrivetrainSim {
    * @return The normalized input.
    */
   protected Matrix<N2, N1> clampInput(Matrix<N2, N1> u) {
-    return StateSpaceUtil.normalizeInputVector(u, RobotController.getBatteryVoltage());
+    return StateSpaceUtil.desaturateInputVector(u, RobotController.getBatteryVoltage());
   }
 
   /** Represents the different states of the drivetrain. */
@@ -407,7 +407,11 @@ public class DifferentialDrivetrainSim {
     kSingleCIMPerSide(DCMotor.getCIM(1)),
     kDualCIMPerSide(DCMotor.getCIM(2)),
     kSingleMiniCIMPerSide(DCMotor.getMiniCIM(1)),
-    kDualMiniCIMPerSide(DCMotor.getMiniCIM(2));
+    kDualMiniCIMPerSide(DCMotor.getMiniCIM(2)),
+    kSingleFalcon500PerSide(DCMotor.getFalcon500(1)),
+    kDoubleFalcon500PerSide(DCMotor.getFalcon500(2)),
+    kSingleNEOPerSide(DCMotor.getNEO(1)),
+    kDoubleNEOPerSide(DCMotor.getNEO(2));
 
     @SuppressWarnings("MemberName")
     public final DCMotor value;
@@ -422,14 +426,7 @@ public class DifferentialDrivetrainSim {
   public enum KitbotWheelSize {
     kSixInch(Units.inchesToMeters(6)),
     kEightInch(Units.inchesToMeters(8)),
-    kTenInch(Units.inchesToMeters(10)),
-
-    @Deprecated
-    SixInch(Units.inchesToMeters(6)),
-    @Deprecated
-    EightInch(Units.inchesToMeters(8)),
-    @Deprecated
-    TenInch(Units.inchesToMeters(10));
+    kTenInch(Units.inchesToMeters(10));
 
     @SuppressWarnings("MemberName")
     public final double value;
@@ -458,7 +455,7 @@ public class DifferentialDrivetrainSim {
       KitbotGearing gearing,
       KitbotWheelSize wheelSize,
       Matrix<N7, N1> measurementStdDevs) {
-    // MOI estimation -- note that I = m r^2 for point masses
+    // MOI estimation -- note that I = mr² for point masses
     var batteryMoi = 12.5 / 2.2 * Math.pow(Units.inchesToMeters(10), 2);
     var gearboxMoi =
         (2.8 /* CIM motor */ * 2 / 2.2 + 2.0 /* Toughbox Mini- ish */)

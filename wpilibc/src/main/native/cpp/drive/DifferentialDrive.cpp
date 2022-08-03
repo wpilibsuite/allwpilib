@@ -12,20 +12,12 @@
 #include <wpi/sendable/SendableRegistry.h>
 
 #include "frc/MathUtil.h"
-#include "frc/SpeedController.h"
+#include "frc/motorcontrol/MotorController.h"
 
 using namespace frc;
 
-#if defined(_MSC_VER)
-#pragma warning(disable : 4996)  // was declared deprecated
-#elif defined(__clang__)
-#pragma clang diagnostic ignored "-Wdeprecated-declarations"
-#elif defined(__GNUC__)
-#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-
-DifferentialDrive::DifferentialDrive(SpeedController& leftMotor,
-                                     SpeedController& rightMotor)
+DifferentialDrive::DifferentialDrive(MotorController& leftMotor,
+                                     MotorController& rightMotor)
     : m_leftMotor(&leftMotor), m_rightMotor(&rightMotor) {
   wpi::SendableRegistry::AddChild(this, m_leftMotor);
   wpi::SendableRegistry::AddChild(this, m_rightMotor);
@@ -112,9 +104,10 @@ DifferentialDrive::WheelSpeeds DifferentialDrive::ArcadeDriveIK(
   double maxInput =
       std::copysign(std::max(std::abs(xSpeed), std::abs(zRotation)), xSpeed);
 
-  if (xSpeed >= 0.0) {
+  // Sign is used because `xSpeed >= 0.0` succeeds for -0.0
+  if (!std::signbit(xSpeed)) {
     // First quadrant, else second quadrant
-    if (zRotation >= 0.0) {
+    if (!std::signbit(zRotation)) {
       leftSpeed = maxInput;
       rightSpeed = xSpeed - zRotation;
     } else {
@@ -123,7 +116,7 @@ DifferentialDrive::WheelSpeeds DifferentialDrive::ArcadeDriveIK(
     }
   } else {
     // Third quadrant, else fourth quadrant
-    if (zRotation >= 0.0) {
+    if (!std::signbit(zRotation)) {
       leftSpeed = xSpeed + zRotation;
       rightSpeed = maxInput;
     } else {

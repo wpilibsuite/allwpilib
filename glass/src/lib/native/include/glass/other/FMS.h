@@ -47,7 +47,7 @@ class FMSModel : public Model {
  * @param matchTimeEnabled If not null, a checkbox is displayed for
  *                         "enable match time" linked to this value
  */
-void DisplayFMS(FMSModel* model, bool* matchTimeEnabled = nullptr);
+void DisplayFMS(FMSModel* model);
 void DisplayFMSReadOnly(FMSModel* model);
 
 }  // namespace glass

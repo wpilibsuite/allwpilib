@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include "Eigen/Core"
+#include "frc/EigenCore.h"
 #include "units/time.h"
 #include "unsupported/Eigen/MatrixFunctions"
 
@@ -19,9 +19,8 @@ namespace frc {
  * @param discA Storage for discrete system matrix.
  */
 template <int States>
-void DiscretizeA(const Eigen::Matrix<double, States, States>& contA,
-                 units::second_t dt,
-                 Eigen::Matrix<double, States, States>* discA) {
+void DiscretizeA(const Matrixd<States, States>& contA, units::second_t dt,
+                 Matrixd<States, States>* discA) {
   *discA = (contA * dt.value()).exp();
 }
 
@@ -37,19 +36,18 @@ void DiscretizeA(const Eigen::Matrix<double, States, States>& contA,
  * @param discB Storage for discrete input matrix.
  */
 template <int States, int Inputs>
-void DiscretizeAB(const Eigen::Matrix<double, States, States>& contA,
-                  const Eigen::Matrix<double, States, Inputs>& contB,
-                  units::second_t dt,
-                  Eigen::Matrix<double, States, States>* discA,
-                  Eigen::Matrix<double, States, Inputs>* discB) {
+void DiscretizeAB(const Matrixd<States, States>& contA,
+                  const Matrixd<States, Inputs>& contB, units::second_t dt,
+                  Matrixd<States, States>* discA,
+                  Matrixd<States, Inputs>* discB) {
   // Matrices are blocked here to minimize matrix exponentiation calculations
-  Eigen::Matrix<double, States + Inputs, States + Inputs> Mcont;
+  Matrixd<States + Inputs, States + Inputs> Mcont;
   Mcont.setZero();
   Mcont.template block<States, States>(0, 0) = contA * dt.value();
   Mcont.template block<States, Inputs>(0, States) = contB * dt.value();
 
   // Discretize A and B with the given timestep
-  Eigen::Matrix<double, States + Inputs, States + Inputs> Mdisc = Mcont.exp();
+  Matrixd<States + Inputs, States + Inputs> Mdisc = Mcont.exp();
   *discA = Mdisc.template block<States, States>(0, 0);
   *discB = Mdisc.template block<States, Inputs>(0, States);
 }
@@ -65,29 +63,26 @@ void DiscretizeAB(const Eigen::Matrix<double, States, States>& contA,
  * @param discQ Storage for discrete process noise covariance matrix.
  */
 template <int States>
-void DiscretizeAQ(const Eigen::Matrix<double, States, States>& contA,
-                  const Eigen::Matrix<double, States, States>& contQ,
-                  units::second_t dt,
-                  Eigen::Matrix<double, States, States>* discA,
-                  Eigen::Matrix<double, States, States>* discQ) {
+void DiscretizeAQ(const Matrixd<States, States>& contA,
+                  const Matrixd<States, States>& contQ, units::second_t dt,
+                  Matrixd<States, States>* discA,
+                  Matrixd<States, States>* discQ) {
   // Make continuous Q symmetric if it isn't already
-  Eigen::Matrix<double, States, States> Q = (contQ + contQ.transpose()) / 2.0;
+  Matrixd<States, States> Q = (contQ + contQ.transpose()) / 2.0;
 
   // Set up the matrix M = [[-A, Q], [0, A.T]]
-  Eigen::Matrix<double, 2 * States, 2 * States> M;
+  Matrixd<2 * States, 2 * States> M;
   M.template block<States, States>(0, 0) = -contA;
   M.template block<States, States>(0, States) = Q;
   M.template block<States, States>(States, 0).setZero();
   M.template block<States, States>(States, States) = contA.transpose();
 
-  Eigen::Matrix<double, 2 * States, 2 * States> phi = (M * dt.value()).exp();
+  Matrixd<2 * States, 2 * States> phi = (M * dt.value()).exp();
 
   // Phi12 = phi[0:States,        States:2*States]
   // Phi22 = phi[States:2*States, States:2*States]
-  Eigen::Matrix<double, States, States> phi12 =
-      phi.block(0, States, States, States);
-  Eigen::Matrix<double, States, States> phi22 =
-      phi.block(States, States, States, States);
+  Matrixd<States, States> phi12 = phi.block(0, States, States, States);
+  Matrixd<States, States> phi22 = phi.block(States, States, States, States);
 
   *discA = phi22.transpose();
 
@@ -117,21 +112,20 @@ void DiscretizeAQ(const Eigen::Matrix<double, States, States>& contA,
  * @param discQ Storage for discrete process noise covariance matrix.
  */
 template <int States>
-void DiscretizeAQTaylor(const Eigen::Matrix<double, States, States>& contA,
-                        const Eigen::Matrix<double, States, States>& contQ,
-                        units::second_t dt,
-                        Eigen::Matrix<double, States, States>* discA,
-                        Eigen::Matrix<double, States, States>* discQ) {
+void DiscretizeAQTaylor(const Matrixd<States, States>& contA,
+                        const Matrixd<States, States>& contQ,
+                        units::second_t dt, Matrixd<States, States>* discA,
+                        Matrixd<States, States>* discQ) {
   // Make continuous Q symmetric if it isn't already
-  Eigen::Matrix<double, States, States> Q = (contQ + contQ.transpose()) / 2.0;
+  Matrixd<States, States> Q = (contQ + contQ.transpose()) / 2.0;
 
-  Eigen::Matrix<double, States, States> lastTerm = Q;
+  Matrixd<States, States> lastTerm = Q;
   double lastCoeff = dt.value();
 
   // Aᵀⁿ
-  Eigen::Matrix<double, States, States> Atn = contA.transpose();
+  Matrixd<States, States> Atn = contA.transpose();
 
-  Eigen::Matrix<double, States, States> phi12 = lastTerm * lastCoeff;
+  Matrixd<States, States> phi12 = lastTerm * lastCoeff;
 
   // i = 6 i.e. 5th order should be enough precision
   for (int i = 2; i < 6; ++i) {
@@ -159,8 +153,8 @@ void DiscretizeAQTaylor(const Eigen::Matrix<double, States, States>& contA,
  * @param dt Discretization timestep.
  */
 template <int Outputs>
-Eigen::Matrix<double, Outputs, Outputs> DiscretizeR(
-    const Eigen::Matrix<double, Outputs, Outputs>& R, units::second_t dt) {
+Matrixd<Outputs, Outputs> DiscretizeR(const Matrixd<Outputs, Outputs>& R,
+                                      units::second_t dt) {
   return R / dt.value();
 }
 

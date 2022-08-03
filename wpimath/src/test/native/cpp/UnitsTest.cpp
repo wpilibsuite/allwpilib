@@ -164,8 +164,8 @@ class CaseStudies : public ::testing::Test {
 }  // namespace
 
 TEST_F(TypeTraits, isRatio) {
-  EXPECT_TRUE(traits::is_ratio<std::ratio<1>>::value);
-  EXPECT_FALSE(traits::is_ratio<double>::value);
+  EXPECT_TRUE(traits::is_ratio_v<std::ratio<1>>);
+  EXPECT_FALSE(traits::is_ratio_v<double>);
 }
 
 TEST_F(TypeTraits, ratio_sqrt) {
@@ -210,77 +210,77 @@ TEST_F(TypeTraits, ratio_sqrt) {
             5e-9);
 }
 
-TEST_F(TypeTraits, is_unit) {
-  EXPECT_FALSE(traits::is_unit<std::ratio<1>>::value);
-  EXPECT_FALSE(traits::is_unit<double>::value);
-  EXPECT_TRUE(traits::is_unit<meters>::value);
-  EXPECT_TRUE(traits::is_unit<feet>::value);
-  EXPECT_TRUE(traits::is_unit<degrees_squared>::value);
-  EXPECT_FALSE(traits::is_unit<meter_t>::value);
+TEST_F(TypeTraits, is_unit_v) {
+  EXPECT_FALSE(traits::is_unit_v<std::ratio<1>>);
+  EXPECT_FALSE(traits::is_unit_v<double>);
+  EXPECT_TRUE(traits::is_unit_v<meters>);
+  EXPECT_TRUE(traits::is_unit_v<feet>);
+  EXPECT_TRUE(traits::is_unit_v<degrees_squared>);
+  EXPECT_FALSE(traits::is_unit_v<meter_t>);
 }
 
 TEST_F(TypeTraits, is_unit_t) {
-  EXPECT_FALSE(traits::is_unit_t<std::ratio<1>>::value);
-  EXPECT_FALSE(traits::is_unit_t<double>::value);
-  EXPECT_FALSE(traits::is_unit_t<meters>::value);
-  EXPECT_FALSE(traits::is_unit_t<feet>::value);
-  EXPECT_FALSE(traits::is_unit_t<degrees_squared>::value);
-  EXPECT_TRUE(traits::is_unit_t<meter_t>::value);
+  EXPECT_FALSE(traits::is_unit_t_v<std::ratio<1>>);
+  EXPECT_FALSE(traits::is_unit_t_v<double>);
+  EXPECT_FALSE(traits::is_unit_t_v<meters>);
+  EXPECT_FALSE(traits::is_unit_t_v<feet>);
+  EXPECT_FALSE(traits::is_unit_t_v<degrees_squared>);
+  EXPECT_TRUE(traits::is_unit_t_v<meter_t>);
 }
 
 TEST_F(TypeTraits, unit_traits) {
   EXPECT_TRUE(
-      (std::is_same<void,
-                    traits::unit_traits<double>::conversion_ratio>::value));
-  EXPECT_FALSE(
-      (std::is_same<void,
-                    traits::unit_traits<meters>::conversion_ratio>::value));
+      (std::is_same_v<void,
+                    traits::unit_traits<double>::conversion_ratio>));
+  EXPECT_TRUE(
+      !(std::is_same_v<void,
+                    traits::unit_traits<meters>::conversion_ratio>));
 }
 
 TEST_F(TypeTraits, unit_t_traits) {
   EXPECT_TRUE(
-      (std::is_same<void,
-                    traits::unit_t_traits<double>::underlying_type>::value));
+      (std::is_same_v<void,
+                    traits::unit_t_traits<double>::underlying_type>));
   EXPECT_TRUE(
-      (std::is_same<UNIT_LIB_DEFAULT_TYPE,
-                    traits::unit_t_traits<meter_t>::underlying_type>::value));
+      (std::is_same_v<UNIT_LIB_DEFAULT_TYPE,
+                    traits::unit_t_traits<meter_t>::underlying_type>));
   EXPECT_TRUE(
-      (std::is_same<void, traits::unit_t_traits<double>::value_type>::value));
+      (std::is_same_v<void, traits::unit_t_traits<double>::value_type>));
   EXPECT_TRUE(
-      (std::is_same<UNIT_LIB_DEFAULT_TYPE,
-                    traits::unit_t_traits<meter_t>::value_type>::value));
+      (std::is_same_v<UNIT_LIB_DEFAULT_TYPE,
+                    traits::unit_t_traits<meter_t>::value_type>));
 }
 
 TEST_F(TypeTraits, all_true) {
-  EXPECT_TRUE(all_true<true>::type::value);
-  EXPECT_TRUE((all_true<true, true>::type::value));
-  EXPECT_TRUE((all_true<true, true, true>::type::value));
-  EXPECT_FALSE(all_true<false>::type::value);
-  EXPECT_FALSE((all_true<true, false>::type::value));
-  EXPECT_FALSE((all_true<true, true, false>::type::value));
-  EXPECT_FALSE((all_true<false, false, false>::type::value));
+  EXPECT_TRUE(all_true_t_v<true>);
+  EXPECT_TRUE((all_true_t_v<true, true>));
+  EXPECT_TRUE((all_true_t_v<true, true, true>));
+  EXPECT_FALSE(all_true_t_v<false>);
+  EXPECT_FALSE((all_true_t_v<true, false>));
+  EXPECT_FALSE((all_true_t_v<true, true, false>));
+  EXPECT_FALSE((all_true_t_v<false, false, false>));
 }
 
 TEST_F(TypeTraits, is_convertible_unit) {
-  EXPECT_TRUE((traits::is_convertible_unit<meters, meters>::value));
-  EXPECT_TRUE((traits::is_convertible_unit<meters, astronicalUnits>::value));
-  EXPECT_TRUE((traits::is_convertible_unit<meters, parsecs>::value));
+  EXPECT_TRUE((traits::is_convertible_unit_v<meters, meters>));
+  EXPECT_TRUE((traits::is_convertible_unit_v<meters, astronicalUnits>));
+  EXPECT_TRUE((traits::is_convertible_unit_v<meters, parsecs>));
 
-  EXPECT_TRUE((traits::is_convertible_unit<meters, meters>::value));
-  EXPECT_TRUE((traits::is_convertible_unit<astronicalUnits, meters>::value));
-  EXPECT_TRUE((traits::is_convertible_unit<parsecs, meters>::value));
-  EXPECT_TRUE((traits::is_convertible_unit<years, weeks>::value));
+  EXPECT_TRUE((traits::is_convertible_unit_v<meters, meters>));
+  EXPECT_TRUE((traits::is_convertible_unit_v<astronicalUnits, meters>));
+  EXPECT_TRUE((traits::is_convertible_unit_v<parsecs, meters>));
+  EXPECT_TRUE((traits::is_convertible_unit_v<years, weeks>));
 
-  EXPECT_FALSE((traits::is_convertible_unit<meters, seconds>::value));
-  EXPECT_FALSE((traits::is_convertible_unit<seconds, meters>::value));
-  EXPECT_FALSE((traits::is_convertible_unit<years, meters>::value));
+  EXPECT_FALSE((traits::is_convertible_unit_v<meters, seconds>));
+  EXPECT_FALSE((traits::is_convertible_unit_v<seconds, meters>));
+  EXPECT_FALSE((traits::is_convertible_unit_v<years, meters>));
 }
 
 TEST_F(TypeTraits, inverse) {
   double test;
 
   using htz = inverse<seconds>;
-  bool shouldBeTrue = std::is_same<htz, hertz>::value;
+  bool shouldBeTrue = std::is_same_v<htz, hertz>;
   EXPECT_TRUE(shouldBeTrue);
 
   test = convert<inverse<celsius>, inverse<fahrenheit>>(1.0);
@@ -292,564 +292,564 @@ TEST_F(TypeTraits, inverse) {
 
 TEST_F(TypeTraits, base_unit_of) {
   using base = traits::base_unit_of<years>;
-  bool shouldBeTrue = std::is_same<base, category::time_unit>::value;
+  bool shouldBeTrue = std::is_same_v<base, category::time_unit>;
 
   EXPECT_TRUE(shouldBeTrue);
 }
 
 TEST_F(TypeTraits, has_linear_scale) {
-  EXPECT_TRUE((traits::has_linear_scale<scalar_t>::value));
-  EXPECT_TRUE((traits::has_linear_scale<meter_t>::value));
-  EXPECT_TRUE((traits::has_linear_scale<foot_t>::value));
-  EXPECT_TRUE((traits::has_linear_scale<watt_t, scalar_t>::value));
-  EXPECT_TRUE((traits::has_linear_scale<scalar_t, meter_t>::value));
-  EXPECT_TRUE((traits::has_linear_scale<meters_per_second_t>::value));
-  EXPECT_FALSE((traits::has_linear_scale<dB_t>::value));
-  EXPECT_FALSE((traits::has_linear_scale<dB_t, meters_per_second_t>::value));
+  EXPECT_TRUE((traits::has_linear_scale_v<scalar_t>));
+  EXPECT_TRUE((traits::has_linear_scale_v<meter_t>));
+  EXPECT_TRUE((traits::has_linear_scale_v<foot_t>));
+  EXPECT_TRUE((traits::has_linear_scale_v<watt_t, scalar_t>));
+  EXPECT_TRUE((traits::has_linear_scale_v<scalar_t, meter_t>));
+  EXPECT_TRUE((traits::has_linear_scale_v<meters_per_second_t>));
+  EXPECT_FALSE((traits::has_linear_scale_v<dB_t>));
+  EXPECT_FALSE((traits::has_linear_scale_v<dB_t, meters_per_second_t>));
 }
 
 TEST_F(TypeTraits, has_decibel_scale) {
-  EXPECT_FALSE((traits::has_decibel_scale<scalar_t>::value));
-  EXPECT_FALSE((traits::has_decibel_scale<meter_t>::value));
-  EXPECT_FALSE((traits::has_decibel_scale<foot_t>::value));
-  EXPECT_TRUE((traits::has_decibel_scale<dB_t>::value));
-  EXPECT_TRUE((traits::has_decibel_scale<dBW_t>::value));
+  EXPECT_FALSE((traits::has_decibel_scale_v<scalar_t>));
+  EXPECT_FALSE((traits::has_decibel_scale_v<meter_t>));
+  EXPECT_FALSE((traits::has_decibel_scale_v<foot_t>));
+  EXPECT_TRUE((traits::has_decibel_scale_v<dB_t>));
+  EXPECT_TRUE((traits::has_decibel_scale_v<dBW_t>));
 
-  EXPECT_TRUE((traits::has_decibel_scale<dBW_t, dB_t>::value));
-  EXPECT_TRUE((traits::has_decibel_scale<dBW_t, dBm_t>::value));
-  EXPECT_TRUE((traits::has_decibel_scale<dB_t, dB_t>::value));
-  EXPECT_TRUE((traits::has_decibel_scale<dB_t, dB_t, dB_t>::value));
-  EXPECT_FALSE((traits::has_decibel_scale<dB_t, dB_t, meter_t>::value));
-  EXPECT_FALSE((traits::has_decibel_scale<meter_t, dB_t>::value));
+  EXPECT_TRUE((traits::has_decibel_scale_v<dBW_t, dB_t>));
+  EXPECT_TRUE((traits::has_decibel_scale_v<dBW_t, dBm_t>));
+  EXPECT_TRUE((traits::has_decibel_scale_v<dB_t, dB_t>));
+  EXPECT_TRUE((traits::has_decibel_scale_v<dB_t, dB_t, dB_t>));
+  EXPECT_FALSE((traits::has_decibel_scale_v<dB_t, dB_t, meter_t>));
+  EXPECT_FALSE((traits::has_decibel_scale_v<meter_t, dB_t>));
 }
 
 TEST_F(TypeTraits, is_same_scale) {
-  EXPECT_TRUE((traits::is_same_scale<scalar_t, dimensionless_t>::value));
-  EXPECT_TRUE((traits::is_same_scale<dB_t, dBW_t>::value));
-  EXPECT_FALSE((traits::is_same_scale<dB_t, scalar_t>::value));
+  EXPECT_TRUE((traits::is_same_scale_v<scalar_t, dimensionless_t>));
+  EXPECT_TRUE((traits::is_same_scale_v<dB_t, dBW_t>));
+  EXPECT_FALSE((traits::is_same_scale_v<dB_t, scalar_t>));
 }
 
 TEST_F(TypeTraits, is_dimensionless_unit) {
-  EXPECT_TRUE((traits::is_dimensionless_unit<scalar_t>::value));
-  EXPECT_TRUE((traits::is_dimensionless_unit<const scalar_t>::value));
-  EXPECT_TRUE((traits::is_dimensionless_unit<const scalar_t&>::value));
-  EXPECT_TRUE((traits::is_dimensionless_unit<dimensionless_t>::value));
-  EXPECT_TRUE((traits::is_dimensionless_unit<dB_t>::value));
-  EXPECT_TRUE((traits::is_dimensionless_unit<dB_t, scalar_t>::value));
-  EXPECT_TRUE((traits::is_dimensionless_unit<ppm_t>::value));
-  EXPECT_FALSE((traits::is_dimensionless_unit<meter_t>::value));
-  EXPECT_FALSE((traits::is_dimensionless_unit<dBW_t>::value));
-  EXPECT_FALSE((traits::is_dimensionless_unit<dBW_t, scalar_t>::value));
+  EXPECT_TRUE((traits::is_dimensionless_unit_v<scalar_t>));
+  EXPECT_TRUE((traits::is_dimensionless_unit_v<const scalar_t>));
+  EXPECT_TRUE((traits::is_dimensionless_unit_v<const scalar_t&>));
+  EXPECT_TRUE((traits::is_dimensionless_unit_v<dimensionless_t>));
+  EXPECT_TRUE((traits::is_dimensionless_unit_v<dB_t>));
+  EXPECT_TRUE((traits::is_dimensionless_unit_v<dB_t, scalar_t>));
+  EXPECT_TRUE((traits::is_dimensionless_unit_v<ppm_t>));
+  EXPECT_FALSE((traits::is_dimensionless_unit_v<meter_t>));
+  EXPECT_FALSE((traits::is_dimensionless_unit_v<dBW_t>));
+  EXPECT_FALSE((traits::is_dimensionless_unit_v<dBW_t, scalar_t>));
 }
 
 TEST_F(TypeTraits, is_length_unit) {
-  EXPECT_TRUE((traits::is_length_unit<meter>::value));
-  EXPECT_TRUE((traits::is_length_unit<cubit>::value));
-  EXPECT_FALSE((traits::is_length_unit<year>::value));
-  EXPECT_FALSE((traits::is_length_unit<double>::value));
+  EXPECT_TRUE((traits::is_length_unit_v<meter>));
+  EXPECT_TRUE((traits::is_length_unit_v<cubit>));
+  EXPECT_FALSE((traits::is_length_unit_v<year>));
+  EXPECT_FALSE((traits::is_length_unit_v<double>));
 
-  EXPECT_TRUE((traits::is_length_unit<meter_t>::value));
-  EXPECT_TRUE((traits::is_length_unit<const meter_t>::value));
-  EXPECT_TRUE((traits::is_length_unit<const meter_t&>::value));
-  EXPECT_TRUE((traits::is_length_unit<cubit_t>::value));
-  EXPECT_FALSE((traits::is_length_unit<year_t>::value));
-  EXPECT_TRUE((traits::is_length_unit<meter_t, cubit_t>::value));
-  EXPECT_FALSE((traits::is_length_unit<meter_t, year_t>::value));
+  EXPECT_TRUE((traits::is_length_unit_v<meter_t>));
+  EXPECT_TRUE((traits::is_length_unit_v<const meter_t>));
+  EXPECT_TRUE((traits::is_length_unit_v<const meter_t&>));
+  EXPECT_TRUE((traits::is_length_unit_v<cubit_t>));
+  EXPECT_FALSE((traits::is_length_unit_v<year_t>));
+  EXPECT_TRUE((traits::is_length_unit_v<meter_t, cubit_t>));
+  EXPECT_FALSE((traits::is_length_unit_v<meter_t, year_t>));
 }
 
 TEST_F(TypeTraits, is_mass_unit) {
-  EXPECT_TRUE((traits::is_mass_unit<kilogram>::value));
-  EXPECT_TRUE((traits::is_mass_unit<stone>::value));
-  EXPECT_FALSE((traits::is_mass_unit<meter>::value));
-  EXPECT_FALSE((traits::is_mass_unit<double>::value));
+  EXPECT_TRUE((traits::is_mass_unit_v<kilogram>));
+  EXPECT_TRUE((traits::is_mass_unit_v<stone>));
+  EXPECT_FALSE((traits::is_mass_unit_v<meter>));
+  EXPECT_FALSE((traits::is_mass_unit_v<double>));
 
-  EXPECT_TRUE((traits::is_mass_unit<kilogram_t>::value));
-  EXPECT_TRUE((traits::is_mass_unit<const kilogram_t>::value));
-  EXPECT_TRUE((traits::is_mass_unit<const kilogram_t&>::value));
-  EXPECT_TRUE((traits::is_mass_unit<stone_t>::value));
-  EXPECT_FALSE((traits::is_mass_unit<meter_t>::value));
-  EXPECT_TRUE((traits::is_mass_unit<kilogram_t, stone_t>::value));
-  EXPECT_FALSE((traits::is_mass_unit<kilogram_t, meter_t>::value));
+  EXPECT_TRUE((traits::is_mass_unit_v<kilogram_t>));
+  EXPECT_TRUE((traits::is_mass_unit_v<const kilogram_t>));
+  EXPECT_TRUE((traits::is_mass_unit_v<const kilogram_t&>));
+  EXPECT_TRUE((traits::is_mass_unit_v<stone_t>));
+  EXPECT_FALSE((traits::is_mass_unit_v<meter_t>));
+  EXPECT_TRUE((traits::is_mass_unit_v<kilogram_t, stone_t>));
+  EXPECT_FALSE((traits::is_mass_unit_v<kilogram_t, meter_t>));
 }
 
 TEST_F(TypeTraits, is_time_unit) {
-  EXPECT_TRUE((traits::is_time_unit<second>::value));
-  EXPECT_TRUE((traits::is_time_unit<year>::value));
-  EXPECT_FALSE((traits::is_time_unit<meter>::value));
-  EXPECT_FALSE((traits::is_time_unit<double>::value));
+  EXPECT_TRUE((traits::is_time_unit_v<second>));
+  EXPECT_TRUE((traits::is_time_unit_v<year>));
+  EXPECT_FALSE((traits::is_time_unit_v<meter>));
+  EXPECT_FALSE((traits::is_time_unit_v<double>));
 
-  EXPECT_TRUE((traits::is_time_unit<second_t>::value));
-  EXPECT_TRUE((traits::is_time_unit<const second_t>::value));
-  EXPECT_TRUE((traits::is_time_unit<const second_t&>::value));
-  EXPECT_TRUE((traits::is_time_unit<year_t>::value));
-  EXPECT_FALSE((traits::is_time_unit<meter_t>::value));
-  EXPECT_TRUE((traits::is_time_unit<second_t, year_t>::value));
-  EXPECT_FALSE((traits::is_time_unit<second_t, meter_t>::value));
+  EXPECT_TRUE((traits::is_time_unit_v<second_t>));
+  EXPECT_TRUE((traits::is_time_unit_v<const second_t>));
+  EXPECT_TRUE((traits::is_time_unit_v<const second_t&>));
+  EXPECT_TRUE((traits::is_time_unit_v<year_t>));
+  EXPECT_FALSE((traits::is_time_unit_v<meter_t>));
+  EXPECT_TRUE((traits::is_time_unit_v<second_t, year_t>));
+  EXPECT_FALSE((traits::is_time_unit_v<second_t, meter_t>));
 }
 
 TEST_F(TypeTraits, is_angle_unit) {
-  EXPECT_TRUE((traits::is_angle_unit<angle::radian>::value));
-  EXPECT_TRUE((traits::is_angle_unit<angle::degree>::value));
-  EXPECT_FALSE((traits::is_angle_unit<watt>::value));
-  EXPECT_FALSE((traits::is_angle_unit<double>::value));
+  EXPECT_TRUE((traits::is_angle_unit_v<angle::radian>));
+  EXPECT_TRUE((traits::is_angle_unit_v<angle::degree>));
+  EXPECT_FALSE((traits::is_angle_unit_v<watt>));
+  EXPECT_FALSE((traits::is_angle_unit_v<double>));
 
-  EXPECT_TRUE((traits::is_angle_unit<angle::radian_t>::value));
-  EXPECT_TRUE((traits::is_angle_unit<const angle::radian_t>::value));
-  EXPECT_TRUE((traits::is_angle_unit<const angle::radian_t&>::value));
-  EXPECT_TRUE((traits::is_angle_unit<angle::degree_t>::value));
-  EXPECT_FALSE((traits::is_angle_unit<watt_t>::value));
-  EXPECT_TRUE((traits::is_angle_unit<angle::radian_t, angle::degree_t>::value));
-  EXPECT_FALSE((traits::is_angle_unit<angle::radian_t, watt_t>::value));
+  EXPECT_TRUE((traits::is_angle_unit_v<angle::radian_t>));
+  EXPECT_TRUE((traits::is_angle_unit_v<const angle::radian_t>));
+  EXPECT_TRUE((traits::is_angle_unit_v<const angle::radian_t&>));
+  EXPECT_TRUE((traits::is_angle_unit_v<angle::degree_t>));
+  EXPECT_FALSE((traits::is_angle_unit_v<watt_t>));
+  EXPECT_TRUE((traits::is_angle_unit_v<angle::radian_t, angle::degree_t>));
+  EXPECT_FALSE((traits::is_angle_unit_v<angle::radian_t, watt_t>));
 }
 
 TEST_F(TypeTraits, is_current_unit) {
-  EXPECT_TRUE((traits::is_current_unit<current::ampere>::value));
-  EXPECT_FALSE((traits::is_current_unit<volt>::value));
-  EXPECT_FALSE((traits::is_current_unit<double>::value));
+  EXPECT_TRUE((traits::is_current_unit_v<current::ampere>));
+  EXPECT_FALSE((traits::is_current_unit_v<volt>));
+  EXPECT_FALSE((traits::is_current_unit_v<double>));
 
-  EXPECT_TRUE((traits::is_current_unit<current::ampere_t>::value));
-  EXPECT_TRUE((traits::is_current_unit<const current::ampere_t>::value));
-  EXPECT_TRUE((traits::is_current_unit<const current::ampere_t&>::value));
-  EXPECT_FALSE((traits::is_current_unit<volt_t>::value));
-  EXPECT_TRUE((traits::is_current_unit<current::ampere_t,
-                                       current::milliampere_t>::value));
-  EXPECT_FALSE((traits::is_current_unit<current::ampere_t, volt_t>::value));
+  EXPECT_TRUE((traits::is_current_unit_v<current::ampere_t>));
+  EXPECT_TRUE((traits::is_current_unit_v<const current::ampere_t>));
+  EXPECT_TRUE((traits::is_current_unit_v<const current::ampere_t&>));
+  EXPECT_FALSE((traits::is_current_unit_v<volt_t>));
+  EXPECT_TRUE((traits::is_current_unit_v<current::ampere_t,
+                                       current::milliampere_t>));
+  EXPECT_FALSE((traits::is_current_unit_v<current::ampere_t, volt_t>));
 }
 
 TEST_F(TypeTraits, is_temperature_unit) {
-  EXPECT_TRUE((traits::is_temperature_unit<fahrenheit>::value));
-  EXPECT_TRUE((traits::is_temperature_unit<kelvin>::value));
-  EXPECT_FALSE((traits::is_temperature_unit<cubit>::value));
-  EXPECT_FALSE((traits::is_temperature_unit<double>::value));
+  EXPECT_TRUE((traits::is_temperature_unit_v<fahrenheit>));
+  EXPECT_TRUE((traits::is_temperature_unit_v<kelvin>));
+  EXPECT_FALSE((traits::is_temperature_unit_v<cubit>));
+  EXPECT_FALSE((traits::is_temperature_unit_v<double>));
 
-  EXPECT_TRUE((traits::is_temperature_unit<fahrenheit_t>::value));
-  EXPECT_TRUE((traits::is_temperature_unit<const fahrenheit_t>::value));
-  EXPECT_TRUE((traits::is_temperature_unit<const fahrenheit_t&>::value));
-  EXPECT_TRUE((traits::is_temperature_unit<kelvin_t>::value));
-  EXPECT_FALSE((traits::is_temperature_unit<cubit_t>::value));
-  EXPECT_TRUE((traits::is_temperature_unit<fahrenheit_t, kelvin_t>::value));
-  EXPECT_FALSE((traits::is_temperature_unit<cubit_t, fahrenheit_t>::value));
+  EXPECT_TRUE((traits::is_temperature_unit_v<fahrenheit_t>));
+  EXPECT_TRUE((traits::is_temperature_unit_v<const fahrenheit_t>));
+  EXPECT_TRUE((traits::is_temperature_unit_v<const fahrenheit_t&>));
+  EXPECT_TRUE((traits::is_temperature_unit_v<kelvin_t>));
+  EXPECT_FALSE((traits::is_temperature_unit_v<cubit_t>));
+  EXPECT_TRUE((traits::is_temperature_unit_v<fahrenheit_t, kelvin_t>));
+  EXPECT_FALSE((traits::is_temperature_unit_v<cubit_t, fahrenheit_t>));
 }
 
 TEST_F(TypeTraits, is_substance_unit) {
-  EXPECT_TRUE((traits::is_substance_unit<substance::mol>::value));
-  EXPECT_FALSE((traits::is_substance_unit<year>::value));
-  EXPECT_FALSE((traits::is_substance_unit<double>::value));
+  EXPECT_TRUE((traits::is_substance_unit_v<substance::mol>));
+  EXPECT_FALSE((traits::is_substance_unit_v<year>));
+  EXPECT_FALSE((traits::is_substance_unit_v<double>));
 
-  EXPECT_TRUE((traits::is_substance_unit<substance::mole_t>::value));
-  EXPECT_TRUE((traits::is_substance_unit<const substance::mole_t>::value));
-  EXPECT_TRUE((traits::is_substance_unit<const substance::mole_t&>::value));
-  EXPECT_FALSE((traits::is_substance_unit<year_t>::value));
+  EXPECT_TRUE((traits::is_substance_unit_v<substance::mole_t>));
+  EXPECT_TRUE((traits::is_substance_unit_v<const substance::mole_t>));
+  EXPECT_TRUE((traits::is_substance_unit_v<const substance::mole_t&>));
+  EXPECT_FALSE((traits::is_substance_unit_v<year_t>));
   EXPECT_TRUE(
-      (traits::is_substance_unit<substance::mole_t, substance::mole_t>::value));
-  EXPECT_FALSE((traits::is_substance_unit<year_t, substance::mole_t>::value));
+      (traits::is_substance_unit_v<substance::mole_t, substance::mole_t>));
+  EXPECT_FALSE((traits::is_substance_unit_v<year_t, substance::mole_t>));
 }
 
 TEST_F(TypeTraits, is_luminous_intensity_unit) {
-  EXPECT_TRUE((traits::is_luminous_intensity_unit<candela>::value));
+  EXPECT_TRUE((traits::is_luminous_intensity_unit_v<candela>));
   EXPECT_FALSE(
-      (traits::is_luminous_intensity_unit<units::radiation::rad>::value));
-  EXPECT_FALSE((traits::is_luminous_intensity_unit<double>::value));
+      (traits::is_luminous_intensity_unit_v<units::radiation::rad>));
+  EXPECT_FALSE((traits::is_luminous_intensity_unit_v<double>));
 
-  EXPECT_TRUE((traits::is_luminous_intensity_unit<candela_t>::value));
-  EXPECT_TRUE((traits::is_luminous_intensity_unit<const candela_t>::value));
-  EXPECT_TRUE((traits::is_luminous_intensity_unit<const candela_t&>::value));
-  EXPECT_FALSE((traits::is_luminous_intensity_unit<rad_t>::value));
+  EXPECT_TRUE((traits::is_luminous_intensity_unit_v<candela_t>));
+  EXPECT_TRUE((traits::is_luminous_intensity_unit_v<const candela_t>));
+  EXPECT_TRUE((traits::is_luminous_intensity_unit_v<const candela_t&>));
+  EXPECT_FALSE((traits::is_luminous_intensity_unit_v<rad_t>));
   EXPECT_TRUE(
-      (traits::is_luminous_intensity_unit<candela_t, candela_t>::value));
-  EXPECT_FALSE((traits::is_luminous_intensity_unit<rad_t, candela_t>::value));
+      (traits::is_luminous_intensity_unit_v<candela_t, candela_t>));
+  EXPECT_FALSE((traits::is_luminous_intensity_unit_v<rad_t, candela_t>));
 }
 
 TEST_F(TypeTraits, is_solid_angle_unit) {
-  EXPECT_TRUE((traits::is_solid_angle_unit<steradian>::value));
-  EXPECT_TRUE((traits::is_solid_angle_unit<degree_squared>::value));
-  EXPECT_FALSE((traits::is_solid_angle_unit<angle::degree>::value));
-  EXPECT_FALSE((traits::is_solid_angle_unit<double>::value));
+  EXPECT_TRUE((traits::is_solid_angle_unit_v<steradian>));
+  EXPECT_TRUE((traits::is_solid_angle_unit_v<degree_squared>));
+  EXPECT_FALSE((traits::is_solid_angle_unit_v<angle::degree>));
+  EXPECT_FALSE((traits::is_solid_angle_unit_v<double>));
 
-  EXPECT_TRUE((traits::is_solid_angle_unit<steradian_t>::value));
-  EXPECT_TRUE((traits::is_solid_angle_unit<const steradian_t>::value));
-  EXPECT_TRUE((traits::is_solid_angle_unit<const degree_squared_t&>::value));
-  EXPECT_FALSE((traits::is_solid_angle_unit<angle::degree_t>::value));
+  EXPECT_TRUE((traits::is_solid_angle_unit_v<steradian_t>));
+  EXPECT_TRUE((traits::is_solid_angle_unit_v<const steradian_t>));
+  EXPECT_TRUE((traits::is_solid_angle_unit_v<const degree_squared_t&>));
+  EXPECT_FALSE((traits::is_solid_angle_unit_v<angle::degree_t>));
   EXPECT_TRUE(
-      (traits::is_solid_angle_unit<degree_squared_t, steradian_t>::value));
+      (traits::is_solid_angle_unit_v<degree_squared_t, steradian_t>));
   EXPECT_FALSE(
-      (traits::is_solid_angle_unit<angle::degree_t, steradian_t>::value));
+      (traits::is_solid_angle_unit_v<angle::degree_t, steradian_t>));
 }
 
 TEST_F(TypeTraits, is_frequency_unit) {
-  EXPECT_TRUE((traits::is_frequency_unit<hertz>::value));
-  EXPECT_FALSE((traits::is_frequency_unit<second>::value));
-  EXPECT_FALSE((traits::is_frequency_unit<double>::value));
+  EXPECT_TRUE((traits::is_frequency_unit_v<hertz>));
+  EXPECT_FALSE((traits::is_frequency_unit_v<second>));
+  EXPECT_FALSE((traits::is_frequency_unit_v<double>));
 
-  EXPECT_TRUE((traits::is_frequency_unit<hertz_t>::value));
-  EXPECT_TRUE((traits::is_frequency_unit<const hertz_t>::value));
-  EXPECT_TRUE((traits::is_frequency_unit<const hertz_t&>::value));
-  EXPECT_FALSE((traits::is_frequency_unit<second_t>::value));
-  EXPECT_TRUE((traits::is_frequency_unit<const hertz_t&, gigahertz_t>::value));
-  EXPECT_FALSE((traits::is_frequency_unit<second_t, hertz_t>::value));
+  EXPECT_TRUE((traits::is_frequency_unit_v<hertz_t>));
+  EXPECT_TRUE((traits::is_frequency_unit_v<const hertz_t>));
+  EXPECT_TRUE((traits::is_frequency_unit_v<const hertz_t&>));
+  EXPECT_FALSE((traits::is_frequency_unit_v<second_t>));
+  EXPECT_TRUE((traits::is_frequency_unit_v<const hertz_t&, gigahertz_t>));
+  EXPECT_FALSE((traits::is_frequency_unit_v<second_t, hertz_t>));
 }
 
 TEST_F(TypeTraits, is_velocity_unit) {
-  EXPECT_TRUE((traits::is_velocity_unit<meters_per_second>::value));
-  EXPECT_TRUE((traits::is_velocity_unit<miles_per_hour>::value));
-  EXPECT_FALSE((traits::is_velocity_unit<meters_per_second_squared>::value));
-  EXPECT_FALSE((traits::is_velocity_unit<double>::value));
+  EXPECT_TRUE((traits::is_velocity_unit_v<meters_per_second>));
+  EXPECT_TRUE((traits::is_velocity_unit_v<miles_per_hour>));
+  EXPECT_FALSE((traits::is_velocity_unit_v<meters_per_second_squared>));
+  EXPECT_FALSE((traits::is_velocity_unit_v<double>));
 
-  EXPECT_TRUE((traits::is_velocity_unit<meters_per_second_t>::value));
-  EXPECT_TRUE((traits::is_velocity_unit<const meters_per_second_t>::value));
-  EXPECT_TRUE((traits::is_velocity_unit<const meters_per_second_t&>::value));
-  EXPECT_TRUE((traits::is_velocity_unit<miles_per_hour_t>::value));
-  EXPECT_FALSE((traits::is_velocity_unit<meters_per_second_squared_t>::value));
+  EXPECT_TRUE((traits::is_velocity_unit_v<meters_per_second_t>));
+  EXPECT_TRUE((traits::is_velocity_unit_v<const meters_per_second_t>));
+  EXPECT_TRUE((traits::is_velocity_unit_v<const meters_per_second_t&>));
+  EXPECT_TRUE((traits::is_velocity_unit_v<miles_per_hour_t>));
+  EXPECT_FALSE((traits::is_velocity_unit_v<meters_per_second_squared_t>));
   EXPECT_TRUE(
-      (traits::is_velocity_unit<miles_per_hour_t, meters_per_second_t>::value));
-  EXPECT_FALSE((traits::is_velocity_unit<meters_per_second_squared_t,
-                                         meters_per_second_t>::value));
+      (traits::is_velocity_unit_v<miles_per_hour_t, meters_per_second_t>));
+  EXPECT_FALSE((traits::is_velocity_unit_v<meters_per_second_squared_t,
+                                         meters_per_second_t>));
 }
 
 TEST_F(TypeTraits, is_acceleration_unit) {
-  EXPECT_TRUE((traits::is_acceleration_unit<meters_per_second_squared>::value));
+  EXPECT_TRUE((traits::is_acceleration_unit_v<meters_per_second_squared>));
   EXPECT_TRUE(
-      (traits::is_acceleration_unit<acceleration::standard_gravity>::value));
-  EXPECT_FALSE((traits::is_acceleration_unit<inch>::value));
-  EXPECT_FALSE((traits::is_acceleration_unit<double>::value));
+      (traits::is_acceleration_unit_v<acceleration::standard_gravity>));
+  EXPECT_FALSE((traits::is_acceleration_unit_v<inch>));
+  EXPECT_FALSE((traits::is_acceleration_unit_v<double>));
 
   EXPECT_TRUE(
-      (traits::is_acceleration_unit<meters_per_second_squared_t>::value));
+      (traits::is_acceleration_unit_v<meters_per_second_squared_t>));
   EXPECT_TRUE(
-      (traits::is_acceleration_unit<const meters_per_second_squared_t>::value));
+      (traits::is_acceleration_unit_v<const meters_per_second_squared_t>));
   EXPECT_TRUE((
-      traits::is_acceleration_unit<const meters_per_second_squared_t&>::value));
-  EXPECT_TRUE((traits::is_acceleration_unit<standard_gravity_t>::value));
-  EXPECT_FALSE((traits::is_acceleration_unit<inch_t>::value));
+      traits::is_acceleration_unit_v<const meters_per_second_squared_t&>));
+  EXPECT_TRUE((traits::is_acceleration_unit_v<standard_gravity_t>));
+  EXPECT_FALSE((traits::is_acceleration_unit_v<inch_t>));
   EXPECT_TRUE(
-      (traits::is_acceleration_unit<standard_gravity_t,
-                                    meters_per_second_squared_t>::value));
+      (traits::is_acceleration_unit_v<standard_gravity_t,
+                                    meters_per_second_squared_t>));
   EXPECT_FALSE(
-      (traits::is_acceleration_unit<inch_t,
-                                    meters_per_second_squared_t>::value));
+      (traits::is_acceleration_unit_v<inch_t,
+                                    meters_per_second_squared_t>));
 }
 
 TEST_F(TypeTraits, is_force_unit) {
-  EXPECT_TRUE((traits::is_force_unit<units::force::newton>::value));
-  EXPECT_TRUE((traits::is_force_unit<units::force::dynes>::value));
-  EXPECT_FALSE((traits::is_force_unit<meter>::value));
-  EXPECT_FALSE((traits::is_force_unit<double>::value));
+  EXPECT_TRUE((traits::is_force_unit_v<units::force::newton>));
+  EXPECT_TRUE((traits::is_force_unit_v<units::force::dynes>));
+  EXPECT_FALSE((traits::is_force_unit_v<meter>));
+  EXPECT_FALSE((traits::is_force_unit_v<double>));
 
-  EXPECT_TRUE((traits::is_force_unit<units::force::newton_t>::value));
-  EXPECT_TRUE((traits::is_force_unit<const units::force::newton_t>::value));
-  EXPECT_TRUE((traits::is_force_unit<const units::force::newton_t&>::value));
-  EXPECT_TRUE((traits::is_force_unit<units::force::dyne_t>::value));
-  EXPECT_FALSE((traits::is_force_unit<watt_t>::value));
-  EXPECT_TRUE((traits::is_force_unit<units::force::dyne_t,
-                                     units::force::newton_t>::value));
-  EXPECT_FALSE((traits::is_force_unit<watt_t, units::force::newton_t>::value));
+  EXPECT_TRUE((traits::is_force_unit_v<units::force::newton_t>));
+  EXPECT_TRUE((traits::is_force_unit_v<const units::force::newton_t>));
+  EXPECT_TRUE((traits::is_force_unit_v<const units::force::newton_t&>));
+  EXPECT_TRUE((traits::is_force_unit_v<units::force::dyne_t>));
+  EXPECT_FALSE((traits::is_force_unit_v<watt_t>));
+  EXPECT_TRUE((traits::is_force_unit_v<units::force::dyne_t,
+                                     units::force::newton_t>));
+  EXPECT_FALSE((traits::is_force_unit_v<watt_t, units::force::newton_t>));
 }
 
 TEST_F(TypeTraits, is_pressure_unit) {
-  EXPECT_TRUE((traits::is_pressure_unit<pressure::pascals>::value));
-  EXPECT_TRUE((traits::is_pressure_unit<atmosphere>::value));
-  EXPECT_FALSE((traits::is_pressure_unit<year>::value));
-  EXPECT_FALSE((traits::is_pressure_unit<double>::value));
+  EXPECT_TRUE((traits::is_pressure_unit_v<pressure::pascals>));
+  EXPECT_TRUE((traits::is_pressure_unit_v<atmosphere>));
+  EXPECT_FALSE((traits::is_pressure_unit_v<year>));
+  EXPECT_FALSE((traits::is_pressure_unit_v<double>));
 
-  EXPECT_TRUE((traits::is_pressure_unit<pascal_t>::value));
-  EXPECT_TRUE((traits::is_pressure_unit<const pascal_t>::value));
-  EXPECT_TRUE((traits::is_pressure_unit<const pascal_t&>::value));
-  EXPECT_TRUE((traits::is_pressure_unit<atmosphere_t>::value));
-  EXPECT_FALSE((traits::is_pressure_unit<year_t>::value));
+  EXPECT_TRUE((traits::is_pressure_unit_v<pascal_t>));
+  EXPECT_TRUE((traits::is_pressure_unit_v<const pascal_t>));
+  EXPECT_TRUE((traits::is_pressure_unit_v<const pascal_t&>));
+  EXPECT_TRUE((traits::is_pressure_unit_v<atmosphere_t>));
+  EXPECT_FALSE((traits::is_pressure_unit_v<year_t>));
   EXPECT_TRUE(
-      (traits::is_pressure_unit<atmosphere_t, pressure::pascal_t>::value));
-  EXPECT_FALSE((traits::is_pressure_unit<year_t, pressure::pascal_t>::value));
+      (traits::is_pressure_unit_v<atmosphere_t, pressure::pascal_t>));
+  EXPECT_FALSE((traits::is_pressure_unit_v<year_t, pressure::pascal_t>));
 }
 
 TEST_F(TypeTraits, is_charge_unit) {
-  EXPECT_TRUE((traits::is_charge_unit<coulomb>::value));
-  EXPECT_FALSE((traits::is_charge_unit<watt>::value));
-  EXPECT_FALSE((traits::is_charge_unit<double>::value));
+  EXPECT_TRUE((traits::is_charge_unit_v<coulomb>));
+  EXPECT_FALSE((traits::is_charge_unit_v<watt>));
+  EXPECT_FALSE((traits::is_charge_unit_v<double>));
 
-  EXPECT_TRUE((traits::is_charge_unit<coulomb_t>::value));
-  EXPECT_TRUE((traits::is_charge_unit<const coulomb_t>::value));
-  EXPECT_TRUE((traits::is_charge_unit<const coulomb_t&>::value));
-  EXPECT_FALSE((traits::is_charge_unit<watt_t>::value));
-  EXPECT_TRUE((traits::is_charge_unit<const coulomb_t&, coulomb_t>::value));
-  EXPECT_FALSE((traits::is_charge_unit<watt_t, coulomb_t>::value));
+  EXPECT_TRUE((traits::is_charge_unit_v<coulomb_t>));
+  EXPECT_TRUE((traits::is_charge_unit_v<const coulomb_t>));
+  EXPECT_TRUE((traits::is_charge_unit_v<const coulomb_t&>));
+  EXPECT_FALSE((traits::is_charge_unit_v<watt_t>));
+  EXPECT_TRUE((traits::is_charge_unit_v<const coulomb_t&, coulomb_t>));
+  EXPECT_FALSE((traits::is_charge_unit_v<watt_t, coulomb_t>));
 }
 
 TEST_F(TypeTraits, is_energy_unit) {
-  EXPECT_TRUE((traits::is_energy_unit<joule>::value));
-  EXPECT_TRUE((traits::is_energy_unit<calorie>::value));
-  EXPECT_FALSE((traits::is_energy_unit<watt>::value));
-  EXPECT_FALSE((traits::is_energy_unit<double>::value));
+  EXPECT_TRUE((traits::is_energy_unit_v<joule>));
+  EXPECT_TRUE((traits::is_energy_unit_v<calorie>));
+  EXPECT_FALSE((traits::is_energy_unit_v<watt>));
+  EXPECT_FALSE((traits::is_energy_unit_v<double>));
 
-  EXPECT_TRUE((traits::is_energy_unit<joule_t>::value));
-  EXPECT_TRUE((traits::is_energy_unit<const joule_t>::value));
-  EXPECT_TRUE((traits::is_energy_unit<const joule_t&>::value));
-  EXPECT_TRUE((traits::is_energy_unit<calorie_t>::value));
-  EXPECT_FALSE((traits::is_energy_unit<watt_t>::value));
-  EXPECT_TRUE((traits::is_energy_unit<calorie_t, joule_t>::value));
-  EXPECT_FALSE((traits::is_energy_unit<watt_t, joule_t>::value));
+  EXPECT_TRUE((traits::is_energy_unit_v<joule_t>));
+  EXPECT_TRUE((traits::is_energy_unit_v<const joule_t>));
+  EXPECT_TRUE((traits::is_energy_unit_v<const joule_t&>));
+  EXPECT_TRUE((traits::is_energy_unit_v<calorie_t>));
+  EXPECT_FALSE((traits::is_energy_unit_v<watt_t>));
+  EXPECT_TRUE((traits::is_energy_unit_v<calorie_t, joule_t>));
+  EXPECT_FALSE((traits::is_energy_unit_v<watt_t, joule_t>));
 }
 
 TEST_F(TypeTraits, is_power_unit) {
-  EXPECT_TRUE((traits::is_power_unit<watt>::value));
-  EXPECT_FALSE((traits::is_power_unit<henry>::value));
-  EXPECT_FALSE((traits::is_power_unit<double>::value));
+  EXPECT_TRUE((traits::is_power_unit_v<watt>));
+  EXPECT_FALSE((traits::is_power_unit_v<henry>));
+  EXPECT_FALSE((traits::is_power_unit_v<double>));
 
-  EXPECT_TRUE((traits::is_power_unit<watt_t>::value));
-  EXPECT_TRUE((traits::is_power_unit<const watt_t>::value));
-  EXPECT_TRUE((traits::is_power_unit<const watt_t&>::value));
-  EXPECT_FALSE((traits::is_power_unit<henry_t>::value));
-  EXPECT_TRUE((traits::is_power_unit<const watt_t&, watt_t>::value));
-  EXPECT_FALSE((traits::is_power_unit<henry_t, watt_t>::value));
+  EXPECT_TRUE((traits::is_power_unit_v<watt_t>));
+  EXPECT_TRUE((traits::is_power_unit_v<const watt_t>));
+  EXPECT_TRUE((traits::is_power_unit_v<const watt_t&>));
+  EXPECT_FALSE((traits::is_power_unit_v<henry_t>));
+  EXPECT_TRUE((traits::is_power_unit_v<const watt_t&, watt_t>));
+  EXPECT_FALSE((traits::is_power_unit_v<henry_t, watt_t>));
 }
 
 TEST_F(TypeTraits, is_voltage_unit) {
-  EXPECT_TRUE((traits::is_voltage_unit<volt>::value));
-  EXPECT_FALSE((traits::is_voltage_unit<henry>::value));
-  EXPECT_FALSE((traits::is_voltage_unit<double>::value));
+  EXPECT_TRUE((traits::is_voltage_unit_v<volt>));
+  EXPECT_FALSE((traits::is_voltage_unit_v<henry>));
+  EXPECT_FALSE((traits::is_voltage_unit_v<double>));
 
-  EXPECT_TRUE((traits::is_voltage_unit<volt_t>::value));
-  EXPECT_TRUE((traits::is_voltage_unit<const volt_t>::value));
-  EXPECT_TRUE((traits::is_voltage_unit<const volt_t&>::value));
-  EXPECT_FALSE((traits::is_voltage_unit<henry_t>::value));
-  EXPECT_TRUE((traits::is_voltage_unit<const volt_t&, volt_t>::value));
-  EXPECT_FALSE((traits::is_voltage_unit<henry_t, volt_t>::value));
+  EXPECT_TRUE((traits::is_voltage_unit_v<volt_t>));
+  EXPECT_TRUE((traits::is_voltage_unit_v<const volt_t>));
+  EXPECT_TRUE((traits::is_voltage_unit_v<const volt_t&>));
+  EXPECT_FALSE((traits::is_voltage_unit_v<henry_t>));
+  EXPECT_TRUE((traits::is_voltage_unit_v<const volt_t&, volt_t>));
+  EXPECT_FALSE((traits::is_voltage_unit_v<henry_t, volt_t>));
 }
 
 TEST_F(TypeTraits, is_capacitance_unit) {
-  EXPECT_TRUE((traits::is_capacitance_unit<farad>::value));
-  EXPECT_FALSE((traits::is_capacitance_unit<ohm>::value));
-  EXPECT_FALSE((traits::is_capacitance_unit<double>::value));
+  EXPECT_TRUE((traits::is_capacitance_unit_v<farad>));
+  EXPECT_FALSE((traits::is_capacitance_unit_v<ohm>));
+  EXPECT_FALSE((traits::is_capacitance_unit_v<double>));
 
-  EXPECT_TRUE((traits::is_capacitance_unit<farad_t>::value));
-  EXPECT_TRUE((traits::is_capacitance_unit<const farad_t>::value));
-  EXPECT_TRUE((traits::is_capacitance_unit<const farad_t&>::value));
-  EXPECT_FALSE((traits::is_capacitance_unit<ohm_t>::value));
+  EXPECT_TRUE((traits::is_capacitance_unit_v<farad_t>));
+  EXPECT_TRUE((traits::is_capacitance_unit_v<const farad_t>));
+  EXPECT_TRUE((traits::is_capacitance_unit_v<const farad_t&>));
+  EXPECT_FALSE((traits::is_capacitance_unit_v<ohm_t>));
   EXPECT_TRUE(
-      (traits::is_capacitance_unit<const farad_t&, millifarad_t>::value));
-  EXPECT_FALSE((traits::is_capacitance_unit<ohm_t, farad_t>::value));
+      (traits::is_capacitance_unit_v<const farad_t&, millifarad_t>));
+  EXPECT_FALSE((traits::is_capacitance_unit_v<ohm_t, farad_t>));
 }
 
 TEST_F(TypeTraits, is_impedance_unit) {
-  EXPECT_TRUE((traits::is_impedance_unit<ohm>::value));
-  EXPECT_FALSE((traits::is_impedance_unit<farad>::value));
-  EXPECT_FALSE((traits::is_impedance_unit<double>::value));
+  EXPECT_TRUE((traits::is_impedance_unit_v<ohm>));
+  EXPECT_FALSE((traits::is_impedance_unit_v<farad>));
+  EXPECT_FALSE((traits::is_impedance_unit_v<double>));
 
-  EXPECT_TRUE((traits::is_impedance_unit<ohm_t>::value));
-  EXPECT_TRUE((traits::is_impedance_unit<const ohm_t>::value));
-  EXPECT_TRUE((traits::is_impedance_unit<const ohm_t&>::value));
-  EXPECT_FALSE((traits::is_impedance_unit<farad_t>::value));
-  EXPECT_TRUE((traits::is_impedance_unit<const ohm_t&, milliohm_t>::value));
-  EXPECT_FALSE((traits::is_impedance_unit<farad_t, ohm_t>::value));
+  EXPECT_TRUE((traits::is_impedance_unit_v<ohm_t>));
+  EXPECT_TRUE((traits::is_impedance_unit_v<const ohm_t>));
+  EXPECT_TRUE((traits::is_impedance_unit_v<const ohm_t&>));
+  EXPECT_FALSE((traits::is_impedance_unit_v<farad_t>));
+  EXPECT_TRUE((traits::is_impedance_unit_v<const ohm_t&, milliohm_t>));
+  EXPECT_FALSE((traits::is_impedance_unit_v<farad_t, ohm_t>));
 }
 
 TEST_F(TypeTraits, is_conductance_unit) {
-  EXPECT_TRUE((traits::is_conductance_unit<siemens>::value));
-  EXPECT_FALSE((traits::is_conductance_unit<volt>::value));
-  EXPECT_FALSE((traits::is_conductance_unit<double>::value));
+  EXPECT_TRUE((traits::is_conductance_unit_v<siemens>));
+  EXPECT_FALSE((traits::is_conductance_unit_v<volt>));
+  EXPECT_FALSE((traits::is_conductance_unit_v<double>));
 
-  EXPECT_TRUE((traits::is_conductance_unit<siemens_t>::value));
-  EXPECT_TRUE((traits::is_conductance_unit<const siemens_t>::value));
-  EXPECT_TRUE((traits::is_conductance_unit<const siemens_t&>::value));
-  EXPECT_FALSE((traits::is_conductance_unit<volt_t>::value));
+  EXPECT_TRUE((traits::is_conductance_unit_v<siemens_t>));
+  EXPECT_TRUE((traits::is_conductance_unit_v<const siemens_t>));
+  EXPECT_TRUE((traits::is_conductance_unit_v<const siemens_t&>));
+  EXPECT_FALSE((traits::is_conductance_unit_v<volt_t>));
   EXPECT_TRUE(
-      (traits::is_conductance_unit<const siemens_t&, millisiemens_t>::value));
-  EXPECT_FALSE((traits::is_conductance_unit<volt_t, siemens_t>::value));
+      (traits::is_conductance_unit_v<const siemens_t&, millisiemens_t>));
+  EXPECT_FALSE((traits::is_conductance_unit_v<volt_t, siemens_t>));
 }
 
 TEST_F(TypeTraits, is_magnetic_flux_unit) {
-  EXPECT_TRUE((traits::is_magnetic_flux_unit<weber>::value));
-  EXPECT_TRUE((traits::is_magnetic_flux_unit<maxwell>::value));
-  EXPECT_FALSE((traits::is_magnetic_flux_unit<inch>::value));
-  EXPECT_FALSE((traits::is_magnetic_flux_unit<double>::value));
+  EXPECT_TRUE((traits::is_magnetic_flux_unit_v<weber>));
+  EXPECT_TRUE((traits::is_magnetic_flux_unit_v<maxwell>));
+  EXPECT_FALSE((traits::is_magnetic_flux_unit_v<inch>));
+  EXPECT_FALSE((traits::is_magnetic_flux_unit_v<double>));
 
-  EXPECT_TRUE((traits::is_magnetic_flux_unit<weber_t>::value));
-  EXPECT_TRUE((traits::is_magnetic_flux_unit<const weber_t>::value));
-  EXPECT_TRUE((traits::is_magnetic_flux_unit<const weber_t&>::value));
-  EXPECT_TRUE((traits::is_magnetic_flux_unit<maxwell_t>::value));
-  EXPECT_FALSE((traits::is_magnetic_flux_unit<inch_t>::value));
-  EXPECT_TRUE((traits::is_magnetic_flux_unit<maxwell_t, weber_t>::value));
-  EXPECT_FALSE((traits::is_magnetic_flux_unit<inch_t, weber_t>::value));
+  EXPECT_TRUE((traits::is_magnetic_flux_unit_v<weber_t>));
+  EXPECT_TRUE((traits::is_magnetic_flux_unit_v<const weber_t>));
+  EXPECT_TRUE((traits::is_magnetic_flux_unit_v<const weber_t&>));
+  EXPECT_TRUE((traits::is_magnetic_flux_unit_v<maxwell_t>));
+  EXPECT_FALSE((traits::is_magnetic_flux_unit_v<inch_t>));
+  EXPECT_TRUE((traits::is_magnetic_flux_unit_v<maxwell_t, weber_t>));
+  EXPECT_FALSE((traits::is_magnetic_flux_unit_v<inch_t, weber_t>));
 }
 
 TEST_F(TypeTraits, is_magnetic_field_strength_unit) {
-  EXPECT_TRUE((traits::is_magnetic_field_strength_unit<
-               units::magnetic_field_strength::tesla>::value));
-  EXPECT_TRUE((traits::is_magnetic_field_strength_unit<gauss>::value));
-  EXPECT_FALSE((traits::is_magnetic_field_strength_unit<volt>::value));
-  EXPECT_FALSE((traits::is_magnetic_field_strength_unit<double>::value));
+  EXPECT_TRUE((traits::is_magnetic_field_strength_unit_v<
+               units::magnetic_field_strength::tesla>));
+  EXPECT_TRUE((traits::is_magnetic_field_strength_unit_v<gauss>));
+  EXPECT_FALSE((traits::is_magnetic_field_strength_unit_v<volt>));
+  EXPECT_FALSE((traits::is_magnetic_field_strength_unit_v<double>));
 
-  EXPECT_TRUE((traits::is_magnetic_field_strength_unit<tesla_t>::value));
-  EXPECT_TRUE((traits::is_magnetic_field_strength_unit<const tesla_t>::value));
-  EXPECT_TRUE((traits::is_magnetic_field_strength_unit<const tesla_t&>::value));
-  EXPECT_TRUE((traits::is_magnetic_field_strength_unit<gauss_t>::value));
-  EXPECT_FALSE((traits::is_magnetic_field_strength_unit<volt_t>::value));
+  EXPECT_TRUE((traits::is_magnetic_field_strength_unit_v<tesla_t>));
+  EXPECT_TRUE((traits::is_magnetic_field_strength_unit_v<const tesla_t>));
+  EXPECT_TRUE((traits::is_magnetic_field_strength_unit_v<const tesla_t&>));
+  EXPECT_TRUE((traits::is_magnetic_field_strength_unit_v<gauss_t>));
+  EXPECT_FALSE((traits::is_magnetic_field_strength_unit_v<volt_t>));
   EXPECT_TRUE(
-      (traits::is_magnetic_field_strength_unit<gauss_t, tesla_t>::value));
+      (traits::is_magnetic_field_strength_unit_v<gauss_t, tesla_t>));
   EXPECT_FALSE(
-      (traits::is_magnetic_field_strength_unit<volt_t, tesla_t>::value));
+      (traits::is_magnetic_field_strength_unit_v<volt_t, tesla_t>));
 }
 
 TEST_F(TypeTraits, is_inductance_unit) {
-  EXPECT_TRUE((traits::is_inductance_unit<henry>::value));
-  EXPECT_FALSE((traits::is_inductance_unit<farad>::value));
-  EXPECT_FALSE((traits::is_inductance_unit<double>::value));
+  EXPECT_TRUE((traits::is_inductance_unit_v<henry>));
+  EXPECT_FALSE((traits::is_inductance_unit_v<farad>));
+  EXPECT_FALSE((traits::is_inductance_unit_v<double>));
 
-  EXPECT_TRUE((traits::is_inductance_unit<henry_t>::value));
-  EXPECT_TRUE((traits::is_inductance_unit<const henry_t>::value));
-  EXPECT_TRUE((traits::is_inductance_unit<const henry_t&>::value));
-  EXPECT_FALSE((traits::is_inductance_unit<farad_t>::value));
+  EXPECT_TRUE((traits::is_inductance_unit_v<henry_t>));
+  EXPECT_TRUE((traits::is_inductance_unit_v<const henry_t>));
+  EXPECT_TRUE((traits::is_inductance_unit_v<const henry_t&>));
+  EXPECT_FALSE((traits::is_inductance_unit_v<farad_t>));
   EXPECT_TRUE(
-      (traits::is_inductance_unit<const henry_t&, millihenry_t>::value));
-  EXPECT_FALSE((traits::is_inductance_unit<farad_t, henry_t>::value));
+      (traits::is_inductance_unit_v<const henry_t&, millihenry_t>));
+  EXPECT_FALSE((traits::is_inductance_unit_v<farad_t, henry_t>));
 }
 
 TEST_F(TypeTraits, is_luminous_flux_unit) {
-  EXPECT_TRUE((traits::is_luminous_flux_unit<lumen>::value));
-  EXPECT_FALSE((traits::is_luminous_flux_unit<pound>::value));
-  EXPECT_FALSE((traits::is_luminous_flux_unit<double>::value));
+  EXPECT_TRUE((traits::is_luminous_flux_unit_v<lumen>));
+  EXPECT_FALSE((traits::is_luminous_flux_unit_v<pound>));
+  EXPECT_FALSE((traits::is_luminous_flux_unit_v<double>));
 
-  EXPECT_TRUE((traits::is_luminous_flux_unit<lumen_t>::value));
-  EXPECT_TRUE((traits::is_luminous_flux_unit<const lumen_t>::value));
-  EXPECT_TRUE((traits::is_luminous_flux_unit<const lumen_t&>::value));
-  EXPECT_FALSE((traits::is_luminous_flux_unit<pound_t>::value));
+  EXPECT_TRUE((traits::is_luminous_flux_unit_v<lumen_t>));
+  EXPECT_TRUE((traits::is_luminous_flux_unit_v<const lumen_t>));
+  EXPECT_TRUE((traits::is_luminous_flux_unit_v<const lumen_t&>));
+  EXPECT_FALSE((traits::is_luminous_flux_unit_v<pound_t>));
   EXPECT_TRUE(
-      (traits::is_luminous_flux_unit<const lumen_t&, millilumen_t>::value));
-  EXPECT_FALSE((traits::is_luminous_flux_unit<pound_t, lumen_t>::value));
+      (traits::is_luminous_flux_unit_v<const lumen_t&, millilumen_t>));
+  EXPECT_FALSE((traits::is_luminous_flux_unit_v<pound_t, lumen_t>));
 }
 
 TEST_F(TypeTraits, is_illuminance_unit) {
-  EXPECT_TRUE((traits::is_illuminance_unit<illuminance::footcandle>::value));
-  EXPECT_TRUE((traits::is_illuminance_unit<illuminance::lux>::value));
-  EXPECT_FALSE((traits::is_illuminance_unit<meter>::value));
-  EXPECT_FALSE((traits::is_illuminance_unit<double>::value));
+  EXPECT_TRUE((traits::is_illuminance_unit_v<illuminance::footcandle>));
+  EXPECT_TRUE((traits::is_illuminance_unit_v<illuminance::lux>));
+  EXPECT_FALSE((traits::is_illuminance_unit_v<meter>));
+  EXPECT_FALSE((traits::is_illuminance_unit_v<double>));
 
-  EXPECT_TRUE((traits::is_illuminance_unit<footcandle_t>::value));
-  EXPECT_TRUE((traits::is_illuminance_unit<const footcandle_t>::value));
-  EXPECT_TRUE((traits::is_illuminance_unit<const footcandle_t&>::value));
-  EXPECT_TRUE((traits::is_illuminance_unit<lux_t>::value));
-  EXPECT_FALSE((traits::is_illuminance_unit<meter_t>::value));
-  EXPECT_TRUE((traits::is_illuminance_unit<lux_t, footcandle_t>::value));
-  EXPECT_FALSE((traits::is_illuminance_unit<meter_t, footcandle_t>::value));
+  EXPECT_TRUE((traits::is_illuminance_unit_v<footcandle_t>));
+  EXPECT_TRUE((traits::is_illuminance_unit_v<const footcandle_t>));
+  EXPECT_TRUE((traits::is_illuminance_unit_v<const footcandle_t&>));
+  EXPECT_TRUE((traits::is_illuminance_unit_v<lux_t>));
+  EXPECT_FALSE((traits::is_illuminance_unit_v<meter_t>));
+  EXPECT_TRUE((traits::is_illuminance_unit_v<lux_t, footcandle_t>));
+  EXPECT_FALSE((traits::is_illuminance_unit_v<meter_t, footcandle_t>));
 }
 
 TEST_F(TypeTraits, is_radioactivity_unit) {
-  EXPECT_TRUE((traits::is_radioactivity_unit<becquerel>::value));
-  EXPECT_FALSE((traits::is_radioactivity_unit<year>::value));
-  EXPECT_FALSE((traits::is_radioactivity_unit<double>::value));
+  EXPECT_TRUE((traits::is_radioactivity_unit_v<becquerel>));
+  EXPECT_FALSE((traits::is_radioactivity_unit_v<year>));
+  EXPECT_FALSE((traits::is_radioactivity_unit_v<double>));
 
-  EXPECT_TRUE((traits::is_radioactivity_unit<becquerel_t>::value));
-  EXPECT_TRUE((traits::is_radioactivity_unit<const becquerel_t>::value));
-  EXPECT_TRUE((traits::is_radioactivity_unit<const becquerel_t&>::value));
-  EXPECT_FALSE((traits::is_radioactivity_unit<year_t>::value));
-  EXPECT_TRUE((traits::is_radioactivity_unit<const becquerel_t&,
-                                             millibecquerel_t>::value));
-  EXPECT_FALSE((traits::is_radioactivity_unit<year_t, becquerel_t>::value));
+  EXPECT_TRUE((traits::is_radioactivity_unit_v<becquerel_t>));
+  EXPECT_TRUE((traits::is_radioactivity_unit_v<const becquerel_t>));
+  EXPECT_TRUE((traits::is_radioactivity_unit_v<const becquerel_t&>));
+  EXPECT_FALSE((traits::is_radioactivity_unit_v<year_t>));
+  EXPECT_TRUE((traits::is_radioactivity_unit_v<const becquerel_t&,
+                                             millibecquerel_t>));
+  EXPECT_FALSE((traits::is_radioactivity_unit_v<year_t, becquerel_t>));
 }
 
 TEST_F(TypeTraits, is_torque_unit) {
-  EXPECT_TRUE((traits::is_torque_unit<torque::newton_meter>::value));
-  EXPECT_TRUE((traits::is_torque_unit<torque::foot_pound>::value));
-  EXPECT_FALSE((traits::is_torque_unit<volume::cubic_meter>::value));
-  EXPECT_FALSE((traits::is_torque_unit<double>::value));
+  EXPECT_TRUE((traits::is_torque_unit_v<torque::newton_meter>));
+  EXPECT_TRUE((traits::is_torque_unit_v<torque::foot_pound>));
+  EXPECT_FALSE((traits::is_torque_unit_v<volume::cubic_meter>));
+  EXPECT_FALSE((traits::is_torque_unit_v<double>));
 
-  EXPECT_TRUE((traits::is_torque_unit<torque::newton_meter_t>::value));
-  EXPECT_TRUE((traits::is_torque_unit<const torque::newton_meter_t>::value));
-  EXPECT_TRUE((traits::is_torque_unit<const torque::newton_meter_t&>::value));
-  EXPECT_TRUE((traits::is_torque_unit<torque::foot_pound_t>::value));
-  EXPECT_FALSE((traits::is_torque_unit<volume::cubic_meter_t>::value));
-  EXPECT_TRUE((traits::is_torque_unit<torque::foot_pound_t,
-                                      torque::newton_meter_t>::value));
-  EXPECT_FALSE((traits::is_torque_unit<volume::cubic_meter_t,
-                                       torque::newton_meter_t>::value));
+  EXPECT_TRUE((traits::is_torque_unit_v<torque::newton_meter_t>));
+  EXPECT_TRUE((traits::is_torque_unit_v<const torque::newton_meter_t>));
+  EXPECT_TRUE((traits::is_torque_unit_v<const torque::newton_meter_t&>));
+  EXPECT_TRUE((traits::is_torque_unit_v<torque::foot_pound_t>));
+  EXPECT_FALSE((traits::is_torque_unit_v<volume::cubic_meter_t>));
+  EXPECT_TRUE((traits::is_torque_unit_v<torque::foot_pound_t,
+                                      torque::newton_meter_t>));
+  EXPECT_FALSE((traits::is_torque_unit_v<volume::cubic_meter_t,
+                                       torque::newton_meter_t>));
 }
 
 TEST_F(TypeTraits, is_area_unit) {
-  EXPECT_TRUE((traits::is_area_unit<square_meter>::value));
-  EXPECT_TRUE((traits::is_area_unit<hectare>::value));
-  EXPECT_FALSE((traits::is_area_unit<astronicalUnit>::value));
-  EXPECT_FALSE((traits::is_area_unit<double>::value));
+  EXPECT_TRUE((traits::is_area_unit_v<square_meter>));
+  EXPECT_TRUE((traits::is_area_unit_v<hectare>));
+  EXPECT_FALSE((traits::is_area_unit_v<astronicalUnit>));
+  EXPECT_FALSE((traits::is_area_unit_v<double>));
 
-  EXPECT_TRUE((traits::is_area_unit<square_meter_t>::value));
-  EXPECT_TRUE((traits::is_area_unit<const square_meter_t>::value));
-  EXPECT_TRUE((traits::is_area_unit<const square_meter_t&>::value));
-  EXPECT_TRUE((traits::is_area_unit<hectare_t>::value));
-  EXPECT_FALSE((traits::is_area_unit<astronicalUnit_t>::value));
-  EXPECT_TRUE((traits::is_area_unit<hectare_t, square_meter_t>::value));
-  EXPECT_FALSE((traits::is_area_unit<astronicalUnit_t, square_meter_t>::value));
+  EXPECT_TRUE((traits::is_area_unit_v<square_meter_t>));
+  EXPECT_TRUE((traits::is_area_unit_v<const square_meter_t>));
+  EXPECT_TRUE((traits::is_area_unit_v<const square_meter_t&>));
+  EXPECT_TRUE((traits::is_area_unit_v<hectare_t>));
+  EXPECT_FALSE((traits::is_area_unit_v<astronicalUnit_t>));
+  EXPECT_TRUE((traits::is_area_unit_v<hectare_t, square_meter_t>));
+  EXPECT_FALSE((traits::is_area_unit_v<astronicalUnit_t, square_meter_t>));
 }
 
 TEST_F(TypeTraits, is_volume_unit) {
-  EXPECT_TRUE((traits::is_volume_unit<cubic_meter>::value));
-  EXPECT_TRUE((traits::is_volume_unit<cubic_foot>::value));
-  EXPECT_FALSE((traits::is_volume_unit<square_feet>::value));
-  EXPECT_FALSE((traits::is_volume_unit<double>::value));
+  EXPECT_TRUE((traits::is_volume_unit_v<cubic_meter>));
+  EXPECT_TRUE((traits::is_volume_unit_v<cubic_foot>));
+  EXPECT_FALSE((traits::is_volume_unit_v<square_feet>));
+  EXPECT_FALSE((traits::is_volume_unit_v<double>));
 
-  EXPECT_TRUE((traits::is_volume_unit<cubic_meter_t>::value));
-  EXPECT_TRUE((traits::is_volume_unit<const cubic_meter_t>::value));
-  EXPECT_TRUE((traits::is_volume_unit<const cubic_meter_t&>::value));
-  EXPECT_TRUE((traits::is_volume_unit<cubic_inch_t>::value));
-  EXPECT_FALSE((traits::is_volume_unit<foot_t>::value));
-  EXPECT_TRUE((traits::is_volume_unit<cubic_inch_t, cubic_meter_t>::value));
-  EXPECT_FALSE((traits::is_volume_unit<foot_t, cubic_meter_t>::value));
+  EXPECT_TRUE((traits::is_volume_unit_v<cubic_meter_t>));
+  EXPECT_TRUE((traits::is_volume_unit_v<const cubic_meter_t>));
+  EXPECT_TRUE((traits::is_volume_unit_v<const cubic_meter_t&>));
+  EXPECT_TRUE((traits::is_volume_unit_v<cubic_inch_t>));
+  EXPECT_FALSE((traits::is_volume_unit_v<foot_t>));
+  EXPECT_TRUE((traits::is_volume_unit_v<cubic_inch_t, cubic_meter_t>));
+  EXPECT_FALSE((traits::is_volume_unit_v<foot_t, cubic_meter_t>));
 }
 
 TEST_F(TypeTraits, is_density_unit) {
-  EXPECT_TRUE((traits::is_density_unit<kilograms_per_cubic_meter>::value));
-  EXPECT_TRUE((traits::is_density_unit<ounces_per_cubic_foot>::value));
-  EXPECT_FALSE((traits::is_density_unit<year>::value));
-  EXPECT_FALSE((traits::is_density_unit<double>::value));
+  EXPECT_TRUE((traits::is_density_unit_v<kilograms_per_cubic_meter>));
+  EXPECT_TRUE((traits::is_density_unit_v<ounces_per_cubic_foot>));
+  EXPECT_FALSE((traits::is_density_unit_v<year>));
+  EXPECT_FALSE((traits::is_density_unit_v<double>));
 
-  EXPECT_TRUE((traits::is_density_unit<kilograms_per_cubic_meter_t>::value));
+  EXPECT_TRUE((traits::is_density_unit_v<kilograms_per_cubic_meter_t>));
   EXPECT_TRUE(
-      (traits::is_density_unit<const kilograms_per_cubic_meter_t>::value));
+      (traits::is_density_unit_v<const kilograms_per_cubic_meter_t>));
   EXPECT_TRUE(
-      (traits::is_density_unit<const kilograms_per_cubic_meter_t&>::value));
-  EXPECT_TRUE((traits::is_density_unit<ounces_per_cubic_foot_t>::value));
-  EXPECT_FALSE((traits::is_density_unit<year_t>::value));
-  EXPECT_TRUE((traits::is_density_unit<ounces_per_cubic_foot_t,
-                                       kilograms_per_cubic_meter_t>::value));
+      (traits::is_density_unit_v<const kilograms_per_cubic_meter_t&>));
+  EXPECT_TRUE((traits::is_density_unit_v<ounces_per_cubic_foot_t>));
+  EXPECT_FALSE((traits::is_density_unit_v<year_t>));
+  EXPECT_TRUE((traits::is_density_unit_v<ounces_per_cubic_foot_t,
+                                       kilograms_per_cubic_meter_t>));
   EXPECT_FALSE(
-      (traits::is_density_unit<year_t, kilograms_per_cubic_meter_t>::value));
+      (traits::is_density_unit_v<year_t, kilograms_per_cubic_meter_t>));
 }
 
 TEST_F(TypeTraits, is_data_unit) {
-  EXPECT_TRUE((traits::is_data_unit<bit>::value));
-  EXPECT_TRUE((traits::is_data_unit<byte>::value));
-  EXPECT_TRUE((traits::is_data_unit<exabit>::value));
-  EXPECT_TRUE((traits::is_data_unit<exabyte>::value));
-  EXPECT_FALSE((traits::is_data_unit<year>::value));
-  EXPECT_FALSE((traits::is_data_unit<double>::value));
+  EXPECT_TRUE((traits::is_data_unit_v<bit>));
+  EXPECT_TRUE((traits::is_data_unit_v<byte>));
+  EXPECT_TRUE((traits::is_data_unit_v<exabit>));
+  EXPECT_TRUE((traits::is_data_unit_v<exabyte>));
+  EXPECT_FALSE((traits::is_data_unit_v<year>));
+  EXPECT_FALSE((traits::is_data_unit_v<double>));
 
-  EXPECT_TRUE((traits::is_data_unit<bit_t>::value));
-  EXPECT_TRUE((traits::is_data_unit<const bit_t>::value));
-  EXPECT_TRUE((traits::is_data_unit<const bit_t&>::value));
-  EXPECT_TRUE((traits::is_data_unit<byte_t>::value));
-  EXPECT_FALSE((traits::is_data_unit<year_t>::value));
-  EXPECT_TRUE((traits::is_data_unit<bit_t, byte_t>::value));
-  EXPECT_FALSE((traits::is_data_unit<year_t, byte_t>::value));
+  EXPECT_TRUE((traits::is_data_unit_v<bit_t>));
+  EXPECT_TRUE((traits::is_data_unit_v<const bit_t>));
+  EXPECT_TRUE((traits::is_data_unit_v<const bit_t&>));
+  EXPECT_TRUE((traits::is_data_unit_v<byte_t>));
+  EXPECT_FALSE((traits::is_data_unit_v<year_t>));
+  EXPECT_TRUE((traits::is_data_unit_v<bit_t, byte_t>));
+  EXPECT_FALSE((traits::is_data_unit_v<year_t, byte_t>));
 }
 
 TEST_F(TypeTraits, is_data_transfer_rate_unit) {
-  EXPECT_TRUE((traits::is_data_transfer_rate_unit<Gbps>::value));
-  EXPECT_TRUE((traits::is_data_transfer_rate_unit<GBps>::value));
-  EXPECT_FALSE((traits::is_data_transfer_rate_unit<year>::value));
-  EXPECT_FALSE((traits::is_data_transfer_rate_unit<double>::value));
+  EXPECT_TRUE((traits::is_data_transfer_rate_unit_v<Gbps>));
+  EXPECT_TRUE((traits::is_data_transfer_rate_unit_v<GBps>));
+  EXPECT_FALSE((traits::is_data_transfer_rate_unit_v<year>));
+  EXPECT_FALSE((traits::is_data_transfer_rate_unit_v<double>));
 
   EXPECT_TRUE(
-      (traits::is_data_transfer_rate_unit<gigabits_per_second_t>::value));
+      (traits::is_data_transfer_rate_unit_v<gigabits_per_second_t>));
   EXPECT_TRUE((
-      traits::is_data_transfer_rate_unit<const gigabytes_per_second_t>::value));
-  EXPECT_TRUE((traits::is_data_transfer_rate_unit<
-               const gigabytes_per_second_t&>::value));
+      traits::is_data_transfer_rate_unit_v<const gigabytes_per_second_t>));
+  EXPECT_TRUE((traits::is_data_transfer_rate_unit_v<
+               const gigabytes_per_second_t&>));
   EXPECT_TRUE(
-      (traits::is_data_transfer_rate_unit<gigabytes_per_second_t>::value));
-  EXPECT_FALSE((traits::is_data_transfer_rate_unit<year_t>::value));
+      (traits::is_data_transfer_rate_unit_v<gigabytes_per_second_t>));
+  EXPECT_FALSE((traits::is_data_transfer_rate_unit_v<year_t>));
   EXPECT_TRUE(
-      (traits::is_data_transfer_rate_unit<gigabits_per_second_t,
-                                          gigabytes_per_second_t>::value));
+      (traits::is_data_transfer_rate_unit_v<gigabits_per_second_t,
+                                          gigabytes_per_second_t>));
   EXPECT_FALSE(
-      (traits::is_data_transfer_rate_unit<year_t,
-                                          gigabytes_per_second_t>::value));
+      (traits::is_data_transfer_rate_unit_v<year_t,
+                                          gigabytes_per_second_t>));
 }
 
 TEST_F(UnitManipulators, squared) {
@@ -861,8 +861,8 @@ TEST_F(UnitManipulators, squared) {
   using scalar_2 = squared<scalar>;  // this is actually nonsensical, and should
                                      // also result in a scalar.
   bool isSame =
-      std::is_same<typename std::decay<scalar_t>::type,
-                   typename std::decay<unit_t<scalar_2>>::type>::value;
+      std::is_same_v<typename std::decay_t<scalar_t>,
+                   typename std::decay_t<unit_t<scalar_2>>>;
   EXPECT_TRUE(isSame);
 }
 
@@ -877,9 +877,9 @@ TEST_F(UnitManipulators, square_root) {
   double test;
 
   test = convert<square_root<square_kilometer>, meter>(1.0);
-  EXPECT_TRUE((traits::is_convertible_unit<
-               typename std::decay<square_root<square_kilometer>>::type,
-               kilometer>::value));
+  EXPECT_TRUE((traits::is_convertible_unit_v<
+               typename std::decay_t<square_root<square_kilometer>>,
+               kilometer>));
   EXPECT_NEAR(1000.0, test, 5.0e-13);
 }
 
@@ -893,10 +893,10 @@ TEST_F(UnitManipulators, compound_unit) {
   using acceleration4 = compound_unit<meters, inverse<squared<seconds>>>;
   using acceleration5 = compound_unit<meters, squared<inverse<seconds>>>;
 
-  bool areSame12 = std::is_same<acceleration1, acceleration2>::value;
-  bool areSame23 = std::is_same<acceleration2, acceleration3>::value;
-  bool areSame34 = std::is_same<acceleration3, acceleration4>::value;
-  bool areSame45 = std::is_same<acceleration4, acceleration5>::value;
+  bool areSame12 = std::is_same_v<acceleration1, acceleration2>;
+  bool areSame23 = std::is_same_v<acceleration2, acceleration3>;
+  bool areSame34 = std::is_same_v<acceleration3, acceleration4>;
+  bool areSame45 = std::is_same_v<acceleration4, acceleration5>;
 
   EXPECT_TRUE(areSame12);
   EXPECT_TRUE(areSame23);
@@ -907,7 +907,7 @@ TEST_F(UnitManipulators, compound_unit) {
   using arbitrary1 = compound_unit<meters, inverse<celsius>>;
   using arbitrary2 = compound_unit<meters, celsius>;
   using arbitrary3 = compound_unit<arbitrary1, arbitrary2>;
-  EXPECT_TRUE((std::is_same<square_meters, arbitrary3>::value));
+  EXPECT_TRUE((std::is_same_v<square_meters, arbitrary3>));
 }
 
 TEST_F(UnitManipulators, dimensionalAnalysis) {
@@ -916,47 +916,47 @@ TEST_F(UnitManipulators, dimensionalAnalysis) {
   // template parameters), as you can get the resulting unit of the operation.
 
   using velocity = units::detail::unit_divide<meters, second>;
-  bool shouldBeTrue = std::is_same<meters_per_second, velocity>::value;
+  bool shouldBeTrue = std::is_same_v<meters_per_second, velocity>;
   EXPECT_TRUE(shouldBeTrue);
 
   using acceleration1 = unit<std::ratio<1>, category::acceleration_unit>;
   using acceleration2 = units::detail::unit_divide<
       meters, units::detail::unit_multiply<seconds, seconds>>;
-  shouldBeTrue = std::is_same<acceleration1, acceleration2>::value;
+  shouldBeTrue = std::is_same_v<acceleration1, acceleration2>;
   EXPECT_TRUE(shouldBeTrue);
 }
 
 #ifdef _MSC_VER
 #if (_MSC_VER >= 1900)
 TEST_F(UnitContainer, trivial) {
-  EXPECT_TRUE((std::is_trivial<meter_t>::value));
-  EXPECT_TRUE((std::is_trivially_assignable<meter_t, meter_t>::value));
-  EXPECT_TRUE((std::is_trivially_constructible<meter_t>::value));
-  EXPECT_TRUE((std::is_trivially_copy_assignable<meter_t>::value));
-  EXPECT_TRUE((std::is_trivially_copy_constructible<meter_t>::value));
-  EXPECT_TRUE((std::is_trivially_copyable<meter_t>::value));
-  EXPECT_TRUE((std::is_trivially_default_constructible<meter_t>::value));
-  EXPECT_TRUE((std::is_trivially_destructible<meter_t>::value));
-  EXPECT_TRUE((std::is_trivially_move_assignable<meter_t>::value));
-  EXPECT_TRUE((std::is_trivially_move_constructible<meter_t>::value));
+  EXPECT_TRUE((std::is_trivial_v<meter_t>));
+  EXPECT_TRUE((std::is_trivially_assignable_v<meter_t, meter_t>));
+  EXPECT_TRUE((std::is_trivially_constructible_v<meter_t>));
+  EXPECT_TRUE((std::is_trivially_copy_assignable_v<meter_t>));
+  EXPECT_TRUE((std::is_trivially_copy_constructible_v<meter_t>));
+  EXPECT_TRUE((std::is_trivially_copyable_v<meter_t>));
+  EXPECT_TRUE((std::is_trivially_default_constructible_v<meter_t>));
+  EXPECT_TRUE((std::is_trivially_destructible_v<meter_t>));
+  EXPECT_TRUE((std::is_trivially_move_assignable_v<meter_t>));
+  EXPECT_TRUE((std::is_trivially_move_constructible_v<meter_t>));
 
-  EXPECT_TRUE((std::is_trivial<dB_t>::value));
-  EXPECT_TRUE((std::is_trivially_assignable<dB_t, dB_t>::value));
-  EXPECT_TRUE((std::is_trivially_constructible<dB_t>::value));
-  EXPECT_TRUE((std::is_trivially_copy_assignable<dB_t>::value));
-  EXPECT_TRUE((std::is_trivially_copy_constructible<dB_t>::value));
-  EXPECT_TRUE((std::is_trivially_copyable<dB_t>::value));
-  EXPECT_TRUE((std::is_trivially_default_constructible<dB_t>::value));
-  EXPECT_TRUE((std::is_trivially_destructible<dB_t>::value));
-  EXPECT_TRUE((std::is_trivially_move_assignable<dB_t>::value));
-  EXPECT_TRUE((std::is_trivially_move_constructible<dB_t>::value));
+  EXPECT_TRUE((std::is_trivial_v<dB_t>));
+  EXPECT_TRUE((std::is_trivially_assignable_v<dB_t, dB_t>));
+  EXPECT_TRUE((std::is_trivially_constructible_v<dB_t>));
+  EXPECT_TRUE((std::is_trivially_copy_assignable_v<dB_t>));
+  EXPECT_TRUE((std::is_trivially_copy_constructible_v<dB_t>));
+  EXPECT_TRUE((std::is_trivially_copyable_v<dB_t>));
+  EXPECT_TRUE((std::is_trivially_default_constructible_v<dB_t>));
+  EXPECT_TRUE((std::is_trivially_destructible_v<dB_t>));
+  EXPECT_TRUE((std::is_trivially_move_assignable_v<dB_t>));
+  EXPECT_TRUE((std::is_trivially_move_constructible_v<dB_t>));
 }
 #endif
 #endif
 
 TEST_F(UnitContainer, has_value_member) {
-  EXPECT_TRUE((traits::has_value_member<linear_scale<double>, double>::value));
-  EXPECT_FALSE((traits::has_value_member<meter, double>::value));
+  EXPECT_TRUE((traits::has_value_member_v<linear_scale<double>, double>));
+  EXPECT_FALSE((traits::has_value_member_v<meter, double>));
 }
 
 TEST_F(UnitContainer, make_unit) {
@@ -1162,7 +1162,7 @@ TEST_F(UnitContainer, unitTypeScalarMultiplication) {
   result_m = a_m * 4.0;
   EXPECT_NEAR(4.0, result_m(), 5.0e-5);
 
-  bool isSame = std::is_same<decltype(result_m), meter_t>::value;
+  bool isSame = std::is_same_v<decltype(result_m), meter_t>;
   EXPECT_TRUE(isSame);
 }
 
@@ -1174,27 +1174,27 @@ TEST_F(UnitContainer, unitTypeDivision) {
 
   auto c = a_m / a_ft;
   EXPECT_NEAR(1.0, c, 5.0e-5);
-  isSame = std::is_same<decltype(c), scalar_t>::value;
+  isSame = std::is_same_v<decltype(c), scalar_t>;
   EXPECT_TRUE(isSame);
 
   c = a_m / b_m;
   EXPECT_NEAR(0.5, c, 5.0e-5);
-  isSame = std::is_same<decltype(c), scalar_t>::value;
+  isSame = std::is_same_v<decltype(c), scalar_t>;
   EXPECT_TRUE(isSame);
 
   c = a_ft / a_m;
   EXPECT_NEAR(1.0, c, 5.0e-5);
-  isSame = std::is_same<decltype(c), scalar_t>::value;
+  isSame = std::is_same_v<decltype(c), scalar_t>;
   EXPECT_TRUE(isSame);
 
   c = scalar_t(1.0) / 2.0;
   EXPECT_NEAR(0.5, c, 5.0e-5);
-  isSame = std::is_same<decltype(c), scalar_t>::value;
+  isSame = std::is_same_v<decltype(c), scalar_t>;
   EXPECT_TRUE(isSame);
 
   c = 1.0 / scalar_t(2.0);
   EXPECT_NEAR(0.5, c, 5.0e-5);
-  isSame = std::is_same<decltype(c), scalar_t>::value;
+  isSame = std::is_same_v<decltype(c), scalar_t>;
   EXPECT_TRUE(isSame);
 
   double d = scalar_t(1.0) / 2.0;
@@ -1202,17 +1202,17 @@ TEST_F(UnitContainer, unitTypeDivision) {
 
   auto e = a_m / a_sec;
   EXPECT_NEAR(0.1, e(), 5.0e-5);
-  isSame = std::is_same<decltype(e), meters_per_second_t>::value;
+  isSame = std::is_same_v<decltype(e), meters_per_second_t>;
   EXPECT_TRUE(isSame);
 
   auto f = a_m / 8.0;
   EXPECT_NEAR(0.125, f(), 5.0e-5);
-  isSame = std::is_same<decltype(f), meter_t>::value;
+  isSame = std::is_same_v<decltype(f), meter_t>;
   EXPECT_TRUE(isSame);
 
   auto g = 4.0 / b_m;
   EXPECT_NEAR(2.0, g(), 5.0e-5);
-  isSame = std::is_same<decltype(g), unit_t<inverse<meters>>>::value;
+  isSame = std::is_same_v<decltype(g), unit_t<inverse<meters>>>;
   EXPECT_TRUE(isSame);
 
   auto mph = mile_t(60.0) / hour_t(1.0);
@@ -1329,7 +1329,7 @@ TEST_F(UnitContainer, valueMethod) {
 
   auto test2 = meter_t(4.0).value();
   EXPECT_DOUBLE_EQ(4.0, test2);
-  EXPECT_TRUE((std::is_same<decltype(test2), double>::value));
+  EXPECT_TRUE((std::is_same_v<decltype(test2), double>));
 }
 
 TEST_F(UnitContainer, convertMethod) {
@@ -1613,7 +1613,7 @@ TEST_F(UnitContainer, dBAddition) {
   EXPECT_NEAR(40.0, result_dbw(), 5.0e-5);
   result_dbw = dB_t(12.0) + dBW_t(30.0);
   EXPECT_NEAR(42.0, result_dbw(), 5.0e-5);
-  isSame = std::is_same<decltype(result_dbw), dBW_t>::value;
+  isSame = std::is_same_v<decltype(result_dbw), dBW_t>;
   EXPECT_TRUE(isSame);
 
   auto result_dbm = dB_t(30.0) + dBm_t(20.0);
@@ -1623,8 +1623,8 @@ TEST_F(UnitContainer, dBAddition) {
   // it works...
   auto result_dBW2 = dBW_t(10.0) + dBm_t(40.0);
   EXPECT_NEAR(20.0, result_dBW2(), 5.0e-5);
-  isSame = std::is_same<decltype(result_dBW2),
-                        unit_t<squared<watts>, double, decibel_scale>>::value;
+  isSame = std::is_same_v<decltype(result_dBW2),
+                        unit_t<squared<watts>, double, decibel_scale>>;
   EXPECT_TRUE(isSame);
 }
 
@@ -1633,22 +1633,22 @@ TEST_F(UnitContainer, dBSubtraction) {
 
   auto result_dbw = dBW_t(10.0) - dB_t(30.0);
   EXPECT_NEAR(-20.0, result_dbw(), 5.0e-5);
-  isSame = std::is_same<decltype(result_dbw), dBW_t>::value;
+  isSame = std::is_same_v<decltype(result_dbw), dBW_t>;
   EXPECT_TRUE(isSame);
 
   auto result_dbm = dBm_t(100.0) - dB_t(30.0);
   EXPECT_NEAR(70.0, result_dbm(), 5.0e-5);
-  isSame = std::is_same<decltype(result_dbm), dBm_t>::value;
+  isSame = std::is_same_v<decltype(result_dbm), dBm_t>;
   EXPECT_TRUE(isSame);
 
   auto result_db = dBW_t(100.0) - dBW_t(80.0);
   EXPECT_NEAR(20.0, result_db(), 5.0e-5);
-  isSame = std::is_same<decltype(result_db), dB_t>::value;
+  isSame = std::is_same_v<decltype(result_db), dB_t>;
   EXPECT_TRUE(isSame);
 
   result_db = dB_t(100.0) - dB_t(80.0);
   EXPECT_NEAR(20.0, result_db(), 5.0e-5);
-  isSame = std::is_same<decltype(result_db), dB_t>::value;
+  isSame = std::is_same_v<decltype(result_db), dB_t>;
   EXPECT_TRUE(isSame);
 }
 
@@ -1666,25 +1666,25 @@ TEST_F(UnitContainer, unit_cast) {
   EXPECT_EQ(iResult2, unit_cast<int>(test2));
 
   EXPECT_TRUE(
-      (std::is_same<double, decltype(unit_cast<double>(test1))>::value));
-  EXPECT_TRUE((std::is_same<int, decltype(unit_cast<int>(test2))>::value));
+      (std::is_same_v<double, decltype(unit_cast<double>(test1))>));
+  EXPECT_TRUE((std::is_same_v<int, decltype(unit_cast<int>(test2))>));
 }
 
 // literal syntax is only supported in GCC 4.7+ and MSVC2015+
 #if !defined(_MSC_VER) || _MSC_VER > 1800
 TEST_F(UnitContainer, literals) {
   // basic functionality testing
-  EXPECT_TRUE((std::is_same<decltype(16.2_m), meter_t>::value));
+  EXPECT_TRUE((std::is_same_v<decltype(16.2_m), meter_t>));
   EXPECT_TRUE(meter_t(16.2) == 16.2_m);
   EXPECT_TRUE(meter_t(16) == 16_m);
 
-  EXPECT_TRUE((std::is_same<decltype(11.2_ft), foot_t>::value));
+  EXPECT_TRUE((std::is_same_v<decltype(11.2_ft), foot_t>));
   EXPECT_TRUE(foot_t(11.2) == 11.2_ft);
   EXPECT_TRUE(foot_t(11) == 11_ft);
 
   // auto using literal syntax
   auto x = 10.0_m;
-  EXPECT_TRUE((std::is_same<decltype(x), meter_t>::value));
+  EXPECT_TRUE((std::is_same_v<decltype(x), meter_t>));
   EXPECT_TRUE(meter_t(10) == x);
 
   // conversion using literal syntax
@@ -1920,8 +1920,8 @@ TEST_F(UnitConversion, solid_angle) {
   double test;
   bool same;
 
-  same = std::is_same<traits::base_unit_of<steradians>,
-                      traits::base_unit_of<degrees_squared>>::value;
+  same = std::is_same_v<traits::base_unit_of<steradians>,
+                      traits::base_unit_of<degrees_squared>>;
   EXPECT_TRUE(same);
 
   test = convert<steradians, steradians>(72.0);
@@ -1961,10 +1961,10 @@ TEST_F(UnitConversion, velocity) {
   double test;
   bool same;
 
-  same = std::is_same<meters_per_second,
-                      unit<std::ratio<1>, category::velocity_unit>>::value;
+  same = std::is_same_v<meters_per_second,
+                      unit<std::ratio<1>, category::velocity_unit>>;
   EXPECT_TRUE(same);
-  same = traits::is_convertible_unit<miles_per_hour, meters_per_second>::value;
+  same = traits::is_convertible_unit_v<miles_per_hour, meters_per_second>;
   EXPECT_TRUE(same);
 
   test = convert<meters_per_second, miles_per_hour>(1250.0);
@@ -1984,10 +1984,10 @@ TEST_F(UnitConversion, angular_velocity) {
   bool same;
 
   same =
-      std::is_same<radians_per_second,
-                   unit<std::ratio<1>, category::angular_velocity_unit>>::value;
+      std::is_same_v<radians_per_second,
+                   unit<std::ratio<1>, category::angular_velocity_unit>>;
   EXPECT_TRUE(same);
-  same = traits::is_convertible_unit<rpm, radians_per_second>::value;
+  same = traits::is_convertible_unit_v<rpm, radians_per_second>;
   EXPECT_TRUE(same);
 
   test = convert<radians_per_second, milliarcseconds_per_year>(1.0);
@@ -2612,8 +2612,8 @@ TEST_F(UnitConversion, data_transfer_rate) {
 
 TEST_F(UnitConversion, pi) {
   EXPECT_TRUE(
-      units::traits::is_dimensionless_unit<decltype(constants::pi)>::value);
-  EXPECT_TRUE(units::traits::is_dimensionless_unit<constants::PI>::value);
+      units::traits::is_dimensionless_unit_v<decltype(constants::pi)>);
+  EXPECT_TRUE(units::traits::is_dimensionless_unit_v<constants::PI>);
 
   // implicit conversion/arithmetic
   EXPECT_NEAR(3.14159, constants::pi, 5.0e-6);
@@ -2635,9 +2635,9 @@ TEST_F(UnitConversion, pi) {
 
   // auto multiplication
   EXPECT_TRUE(
-      (std::is_same<meter_t, decltype(constants::pi * meter_t(1))>::value));
+      (std::is_same_v<meter_t, decltype(constants::pi * meter_t(1))>));
   EXPECT_TRUE(
-      (std::is_same<meter_t, decltype(meter_t(1) * constants::pi)>::value));
+      (std::is_same_v<meter_t, decltype(meter_t(1) * constants::pi)>));
 
   EXPECT_NEAR(constants::detail::PI_VAL,
               (constants::pi * meter_t(1)).value(), 5.0e-10);
@@ -2653,9 +2653,9 @@ TEST_F(UnitConversion, pi) {
 
   // auto division
   EXPECT_TRUE(
-      (std::is_same<hertz_t, decltype(constants::pi / second_t(1))>::value));
+      (std::is_same_v<hertz_t, decltype(constants::pi / second_t(1))>));
   EXPECT_TRUE(
-      (std::is_same<second_t, decltype(second_t(1) / constants::pi)>::value));
+      (std::is_same_v<second_t, decltype(second_t(1) / constants::pi)>));
 
   EXPECT_NEAR(constants::detail::PI_VAL,
               (constants::pi / second_t(1)).value(), 5.0e-10);
@@ -2745,35 +2745,35 @@ TEST_F(UnitMath, max) {
 }
 
 TEST_F(UnitMath, cos) {
-  EXPECT_TRUE((std::is_same<typename std::decay<scalar_t>::type,
-                            typename std::decay<decltype(
-                                cos(angle::radian_t(0)))>::type>::value));
+  EXPECT_TRUE((std::is_same_v<typename std::decay_t<scalar_t>,
+                            typename std::decay_t<decltype(
+                                cos(angle::radian_t(0)))>>));
   EXPECT_NEAR(scalar_t(-0.41614683654), cos(angle::radian_t(2)), 5.0e-11);
   EXPECT_NEAR(scalar_t(-0.70710678118), cos(angle::degree_t(135)),
               5.0e-11);
 }
 
 TEST_F(UnitMath, sin) {
-  EXPECT_TRUE((std::is_same<typename std::decay<scalar_t>::type,
-                            typename std::decay<decltype(
-                                sin(angle::radian_t(0)))>::type>::value));
+  EXPECT_TRUE((std::is_same_v<typename std::decay_t<scalar_t>,
+                            typename std::decay_t<decltype(
+                                sin(angle::radian_t(0)))>>));
   EXPECT_NEAR(scalar_t(0.90929742682), sin(angle::radian_t(2)), 5.0e-11);
   EXPECT_NEAR(scalar_t(0.70710678118), sin(angle::degree_t(135)), 5.0e-11);
 }
 
 TEST_F(UnitMath, tan) {
-  EXPECT_TRUE((std::is_same<typename std::decay<scalar_t>::type,
-                            typename std::decay<decltype(
-                                tan(angle::radian_t(0)))>::type>::value));
+  EXPECT_TRUE((std::is_same_v<typename std::decay_t<scalar_t>,
+                            typename std::decay_t<decltype(
+                                tan(angle::radian_t(0)))>>));
   EXPECT_NEAR(scalar_t(-2.18503986326), tan(angle::radian_t(2)), 5.0e-11);
   EXPECT_NEAR(scalar_t(-1.0), tan(angle::degree_t(135)), 5.0e-11);
 }
 
 TEST_F(UnitMath, acos) {
   EXPECT_TRUE(
-      (std::is_same<
-          typename std::decay<angle::radian_t>::type,
-          typename std::decay<decltype(acos(scalar_t(0)))>::type>::value));
+      (std::is_same_v<
+          typename std::decay_t<angle::radian_t>,
+          typename std::decay_t<decltype(acos(scalar_t(0)))>>));
   EXPECT_NEAR(angle::radian_t(2).value(),
               acos(scalar_t(-0.41614683654)).value(), 5.0e-11);
   EXPECT_NEAR(
@@ -2785,9 +2785,9 @@ TEST_F(UnitMath, acos) {
 
 TEST_F(UnitMath, asin) {
   EXPECT_TRUE(
-      (std::is_same<
-          typename std::decay<angle::radian_t>::type,
-          typename std::decay<decltype(asin(scalar_t(0)))>::type>::value));
+      (std::is_same_v<
+          typename std::decay_t<angle::radian_t>,
+          typename std::decay_t<decltype(asin(scalar_t(0)))>>));
   EXPECT_NEAR(angle::radian_t(1.14159265).value(),
               asin(scalar_t(0.90929742682)).value(), 5.0e-9);
   EXPECT_NEAR(
@@ -2799,9 +2799,9 @@ TEST_F(UnitMath, asin) {
 
 TEST_F(UnitMath, atan) {
   EXPECT_TRUE(
-      (std::is_same<
-          typename std::decay<angle::radian_t>::type,
-          typename std::decay<decltype(atan(scalar_t(0)))>::type>::value));
+      (std::is_same_v<
+          typename std::decay_t<angle::radian_t>,
+          typename std::decay_t<decltype(atan(scalar_t(0)))>>));
   EXPECT_NEAR(angle::radian_t(-1.14159265).value(),
               atan(scalar_t(-2.18503986326)).value(), 5.0e-9);
   EXPECT_NEAR(angle::degree_t(-45).value(),
@@ -2809,9 +2809,9 @@ TEST_F(UnitMath, atan) {
 }
 
 TEST_F(UnitMath, atan2) {
-  EXPECT_TRUE((std::is_same<typename std::decay<angle::radian_t>::type,
-                            typename std::decay<decltype(atan2(
-                                scalar_t(1), scalar_t(1)))>::type>::value));
+  EXPECT_TRUE((std::is_same_v<typename std::decay_t<angle::radian_t>,
+                            typename std::decay_t<decltype(atan2(
+                                scalar_t(1), scalar_t(1)))>>));
   EXPECT_NEAR(angle::radian_t(constants::detail::PI_VAL / 4).value(),
               atan2(scalar_t(2), scalar_t(2)).value(), 5.0e-12);
   EXPECT_NEAR(
@@ -2819,9 +2819,9 @@ TEST_F(UnitMath, atan2) {
       angle::degree_t(atan2(scalar_t(2), scalar_t(2))).value(),
       5.0e-12);
 
-  EXPECT_TRUE((std::is_same<typename std::decay<angle::radian_t>::type,
-                            typename std::decay<decltype(atan2(
-                                scalar_t(1), scalar_t(1)))>::type>::value));
+  EXPECT_TRUE((std::is_same_v<typename std::decay_t<angle::radian_t>,
+                            typename std::decay_t<decltype(atan2(
+                                scalar_t(1), scalar_t(1)))>>));
   EXPECT_NEAR(angle::radian_t(constants::detail::PI_VAL / 6).value(),
               atan2(scalar_t(1), scalar_t(std::sqrt(3))).value(),
               5.0e-12);
@@ -2832,33 +2832,33 @@ TEST_F(UnitMath, atan2) {
 }
 
 TEST_F(UnitMath, cosh) {
-  EXPECT_TRUE((std::is_same<typename std::decay<scalar_t>::type,
-                            typename std::decay<decltype(
-                                cosh(angle::radian_t(0)))>::type>::value));
+  EXPECT_TRUE((std::is_same_v<typename std::decay_t<scalar_t>,
+                            typename std::decay_t<decltype(
+                                cosh(angle::radian_t(0)))>>));
   EXPECT_NEAR(scalar_t(3.76219569108), cosh(angle::radian_t(2)), 5.0e-11);
   EXPECT_NEAR(scalar_t(5.32275215), cosh(angle::degree_t(135)), 5.0e-9);
 }
 
 TEST_F(UnitMath, sinh) {
-  EXPECT_TRUE((std::is_same<typename std::decay<scalar_t>::type,
-                            typename std::decay<decltype(
-                                sinh(angle::radian_t(0)))>::type>::value));
+  EXPECT_TRUE((std::is_same_v<typename std::decay_t<scalar_t>,
+                            typename std::decay_t<decltype(
+                                sinh(angle::radian_t(0)))>>));
   EXPECT_NEAR(scalar_t(3.62686040785), sinh(angle::radian_t(2)), 5.0e-11);
   EXPECT_NEAR(scalar_t(5.22797192), sinh(angle::degree_t(135)), 5.0e-9);
 }
 
 TEST_F(UnitMath, tanh) {
-  EXPECT_TRUE((std::is_same<typename std::decay<scalar_t>::type,
-                            typename std::decay<decltype(
-                                tanh(angle::radian_t(0)))>::type>::value));
+  EXPECT_TRUE((std::is_same_v<typename std::decay_t<scalar_t>,
+                            typename std::decay_t<decltype(
+                                tanh(angle::radian_t(0)))>>));
   EXPECT_NEAR(scalar_t(0.96402758007), tanh(angle::radian_t(2)), 5.0e-11);
   EXPECT_NEAR(scalar_t(0.98219338), tanh(angle::degree_t(135)), 5.0e-11);
 }
 
 TEST_F(UnitMath, acosh) {
-  EXPECT_TRUE((std::is_same<typename std::decay<angle::radian_t>::type,
-                            typename std::decay<decltype(
-                                acosh(scalar_t(0)))>::type>::value));
+  EXPECT_TRUE((std::is_same_v<typename std::decay_t<angle::radian_t>,
+                            typename std::decay_t<decltype(
+                                acosh(scalar_t(0)))>>));
   EXPECT_NEAR(angle::radian_t(1.316957896924817).value(),
               acosh(scalar_t(2.0)).value(), 5.0e-11);
   EXPECT_NEAR(angle::degree_t(75.456129290216893).value(),
@@ -2866,9 +2866,9 @@ TEST_F(UnitMath, acosh) {
 }
 
 TEST_F(UnitMath, asinh) {
-  EXPECT_TRUE((std::is_same<typename std::decay<angle::radian_t>::type,
-                            typename std::decay<decltype(
-                                asinh(scalar_t(0)))>::type>::value));
+  EXPECT_TRUE((std::is_same_v<typename std::decay_t<angle::radian_t>,
+                            typename std::decay_t<decltype(
+                                asinh(scalar_t(0)))>>));
   EXPECT_NEAR(angle::radian_t(1.443635475178810).value(),
               asinh(scalar_t(2)).value(), 5.0e-9);
   EXPECT_NEAR(angle::degree_t(82.714219883108939).value(),
@@ -2876,9 +2876,9 @@ TEST_F(UnitMath, asinh) {
 }
 
 TEST_F(UnitMath, atanh) {
-  EXPECT_TRUE((std::is_same<typename std::decay<angle::radian_t>::type,
-                            typename std::decay<decltype(
-                                atanh(scalar_t(0)))>::type>::value));
+  EXPECT_TRUE((std::is_same_v<typename std::decay_t<angle::radian_t>,
+                            typename std::decay_t<decltype(
+                                atanh(scalar_t(0)))>>));
   EXPECT_NEAR(angle::radian_t(0.549306144334055).value(),
               atanh(scalar_t(0.5)).value(), 5.0e-9);
   EXPECT_NEAR(angle::degree_t(31.472923730945389).value(),
@@ -2934,38 +2934,38 @@ TEST_F(UnitMath, pow) {
 
   auto sq = pow<2>(value);
   EXPECT_NEAR(100.0, sq(), 5.0e-2);
-  isSame = std::is_same<decltype(sq), square_meter_t>::value;
+  isSame = std::is_same_v<decltype(sq), square_meter_t>;
   EXPECT_TRUE(isSame);
 
   auto cube = pow<3>(value);
   EXPECT_NEAR(1000.0, cube(), 5.0e-2);
-  isSame = std::is_same<decltype(cube), unit_t<cubed<meter>>>::value;
+  isSame = std::is_same_v<decltype(cube), unit_t<cubed<meter>>>;
   EXPECT_TRUE(isSame);
 
   auto fourth = pow<4>(value);
   EXPECT_NEAR(10000.0, fourth(), 5.0e-2);
-  isSame = std::is_same<
+  isSame = std::is_same_v<
       decltype(fourth),
-      unit_t<compound_unit<squared<meter>, squared<meter>>>>::value;
+      unit_t<compound_unit<squared<meter>, squared<meter>>>>;
   EXPECT_TRUE(isSame);
 }
 
 TEST_F(UnitMath, sqrt) {
-  EXPECT_TRUE((std::is_same<typename std::decay<meter_t>::type,
-                            typename std::decay<decltype(sqrt(
-                                square_meter_t(4.0)))>::type>::value));
+  EXPECT_TRUE((std::is_same_v<typename std::decay_t<meter_t>,
+                            typename std::decay_t<decltype(sqrt(
+                                square_meter_t(4.0)))>>));
   EXPECT_NEAR(meter_t(2.0).value(),
               sqrt(square_meter_t(4.0)).value(), 5.0e-9);
 
-  EXPECT_TRUE((std::is_same<typename std::decay<angle::radian_t>::type,
-                            typename std::decay<decltype(
-                                sqrt(steradian_t(16.0)))>::type>::value));
+  EXPECT_TRUE((std::is_same_v<typename std::decay_t<angle::radian_t>,
+                            typename std::decay_t<decltype(
+                                sqrt(steradian_t(16.0)))>>));
   EXPECT_NEAR(angle::radian_t(4.0).value(),
               sqrt(steradian_t(16.0)).value(), 5.0e-9);
 
-  EXPECT_TRUE((std::is_convertible<typename std::decay<foot_t>::type,
-                                   typename std::decay<decltype(sqrt(
-                                       square_foot_t(10.0)))>::type>::value));
+  EXPECT_TRUE((std::is_convertible_v<typename std::decay_t<foot_t>,
+                                   typename std::decay_t<decltype(sqrt(
+                                       square_foot_t(10.0)))>>));
 
   // for rational conversion (i.e. no integral root) let's check a bunch of
   // different ways this could go wrong
@@ -2978,15 +2978,15 @@ TEST_F(UnitMath, sqrt) {
 }
 
 TEST_F(UnitMath, hypot) {
-  EXPECT_TRUE((std::is_same<typename std::decay<meter_t>::type,
-                            typename std::decay<decltype(hypot(
-                                meter_t(3.0), meter_t(4.0)))>::type>::value));
+  EXPECT_TRUE((std::is_same_v<typename std::decay_t<meter_t>,
+                            typename std::decay_t<decltype(hypot(
+                                meter_t(3.0), meter_t(4.0)))>>));
   EXPECT_NEAR(meter_t(5.0).value(),
               (hypot(meter_t(3.0), meter_t(4.0))).value(), 5.0e-9);
 
-  EXPECT_TRUE((std::is_same<typename std::decay<foot_t>::type,
-                            typename std::decay<decltype(hypot(
-                                foot_t(3.0), meter_t(1.2192)))>::type>::value));
+  EXPECT_TRUE((std::is_same_v<typename std::decay_t<foot_t>,
+                            typename std::decay_t<decltype(hypot(
+                                foot_t(3.0), meter_t(1.2192)))>>));
   EXPECT_NEAR(foot_t(5.0).value(),
               (hypot(foot_t(3.0), meter_t(1.2192))).value(), 5.0e-9);
 }
@@ -2994,9 +2994,9 @@ TEST_F(UnitMath, hypot) {
 TEST_F(UnitMath, ceil) {
   double val = 101.1;
   EXPECT_EQ(std::ceil(val), ceil(meter_t(val)).value());
-  EXPECT_TRUE((std::is_same<typename std::decay<meter_t>::type,
-                            typename std::decay<decltype(
-                                ceil(meter_t(val)))>::type>::value));
+  EXPECT_TRUE((std::is_same_v<typename std::decay_t<meter_t>,
+                            typename std::decay_t<decltype(
+                                ceil(meter_t(val)))>>));
 }
 
 TEST_F(UnitMath, floor) {
@@ -3063,14 +3063,17 @@ TEST_F(Constexpr, construction) {
   constexpr meter_t result0(0);
   constexpr auto result1 = make_unit<meter_t>(1);
   constexpr auto result2 = meter_t(2);
+  constexpr auto result3 = -3_m;
 
   EXPECT_EQ(meter_t(0), result0);
   EXPECT_EQ(meter_t(1), result1);
   EXPECT_EQ(meter_t(2), result2);
+  EXPECT_EQ(meter_t(-3), result3);
 
   EXPECT_TRUE(noexcept(result0));
   EXPECT_TRUE(noexcept(result1));
   EXPECT_TRUE(noexcept(result2));
+  EXPECT_TRUE(noexcept(result3));
 }
 
 TEST_F(Constexpr, constants) {
@@ -3158,32 +3161,32 @@ TEST_F(Constexpr, stdArray) {
 #endif
 
 TEST_F(CompileTimeArithmetic, unit_value_t) {
-  typedef unit_value_t<meters, 3, 2> mRatio;
+  using mRatio = unit_value_t<meters, 3, 2>;
   EXPECT_EQ(meter_t(1.5), mRatio::value());
 }
 
 TEST_F(CompileTimeArithmetic, is_unit_value_t) {
   using mRatio = unit_value_t<meters, 3, 2>;
 
-  EXPECT_TRUE((traits::is_unit_value_t<mRatio>::value));
-  EXPECT_FALSE((traits::is_unit_value_t<meter_t>::value));
-  EXPECT_FALSE((traits::is_unit_value_t<double>::value));
+  EXPECT_TRUE((traits::is_unit_value_t_v<mRatio>));
+  EXPECT_FALSE((traits::is_unit_value_t_v<meter_t>));
+  EXPECT_FALSE((traits::is_unit_value_t_v<double>));
 
-  EXPECT_TRUE((traits::is_unit_value_t<mRatio, meters>::value));
-  EXPECT_FALSE((traits::is_unit_value_t<meter_t, meters>::value));
-  EXPECT_FALSE((traits::is_unit_value_t<double, meters>::value));
+  EXPECT_TRUE((traits::is_unit_value_t_v<mRatio, meters>));
+  EXPECT_FALSE((traits::is_unit_value_t_v<meter_t, meters>));
+  EXPECT_FALSE((traits::is_unit_value_t_v<double, meters>));
 }
 
 TEST_F(CompileTimeArithmetic, is_unit_value_t_category) {
   using mRatio = unit_value_t<feet, 3, 2>;
   EXPECT_TRUE(
-      (traits::is_unit_value_t_category<category::length_unit, mRatio>::value));
+      (traits::is_unit_value_t_category_v<category::length_unit, mRatio>));
   EXPECT_FALSE(
-      (traits::is_unit_value_t_category<category::angle_unit, mRatio>::value));
+      (traits::is_unit_value_t_category_v<category::angle_unit, mRatio>));
   EXPECT_FALSE((
-      traits::is_unit_value_t_category<category::length_unit, meter_t>::value));
+      traits::is_unit_value_t_category_v<category::length_unit, meter_t>));
   EXPECT_FALSE(
-      (traits::is_unit_value_t_category<category::length_unit, double>::value));
+      (traits::is_unit_value_t_category_v<category::length_unit, double>));
 }
 
 TEST_F(CompileTimeArithmetic, unit_value_add) {
@@ -3192,39 +3195,39 @@ TEST_F(CompileTimeArithmetic, unit_value_add) {
   using sum = unit_value_add<mRatio, mRatio>;
   EXPECT_EQ(meter_t(3.0), sum::value());
   EXPECT_TRUE(
-      (traits::is_unit_value_t_category<category::length_unit, sum>::value));
+      (traits::is_unit_value_t_category_v<category::length_unit, sum>));
 
   using ftRatio = unit_value_t<feet, 1>;
 
   using sumf = unit_value_add<ftRatio, mRatio>;
   EXPECT_TRUE((
-      std::is_same<typename std::decay<foot_t>::type,
-                   typename std::decay<decltype(sumf::value())>::type>::value));
+      std::is_same_v<typename std::decay_t<foot_t>,
+                   typename std::decay_t<decltype(sumf::value())>>));
   EXPECT_NEAR(5.92125984, sumf::value().value(), 5.0e-8);
   EXPECT_TRUE(
-      (traits::is_unit_value_t_category<category::length_unit, sumf>::value));
+      (traits::is_unit_value_t_category_v<category::length_unit, sumf>));
 
   using cRatio = unit_value_t<celsius, 1>;
   using fRatio = unit_value_t<fahrenheit, 2>;
 
   using sumc = unit_value_add<cRatio, fRatio>;
   EXPECT_TRUE((
-      std::is_same<typename std::decay<celsius_t>::type,
-                   typename std::decay<decltype(sumc::value())>::type>::value));
+      std::is_same_v<typename std::decay_t<celsius_t>,
+                   typename std::decay_t<decltype(sumc::value())>>));
   EXPECT_NEAR(2.11111111111, sumc::value().value(), 5.0e-8);
-  EXPECT_TRUE((traits::is_unit_value_t_category<category::temperature_unit,
-                                                sumc>::value));
+  EXPECT_TRUE((traits::is_unit_value_t_category_v<category::temperature_unit,
+                                                sumc>));
 
   using rRatio = unit_value_t<angle::radian, 1>;
   using dRatio = unit_value_t<angle::degree, 3>;
 
   using sumr = unit_value_add<rRatio, dRatio>;
   EXPECT_TRUE((
-      std::is_same<typename std::decay<angle::radian_t>::type,
-                   typename std::decay<decltype(sumr::value())>::type>::value));
+      std::is_same_v<typename std::decay_t<angle::radian_t>,
+                   typename std::decay_t<decltype(sumr::value())>>));
   EXPECT_NEAR(1.05235988, sumr::value().value(), 5.0e-8);
   EXPECT_TRUE(
-      (traits::is_unit_value_t_category<category::angle_unit, sumr>::value));
+      (traits::is_unit_value_t_category_v<category::angle_unit, sumr>));
 }
 
 TEST_F(CompileTimeArithmetic, unit_value_subtract) {
@@ -3233,39 +3236,39 @@ TEST_F(CompileTimeArithmetic, unit_value_subtract) {
   using diff = unit_value_subtract<mRatio, mRatio>;
   EXPECT_EQ(meter_t(0), diff::value());
   EXPECT_TRUE(
-      (traits::is_unit_value_t_category<category::length_unit, diff>::value));
+      (traits::is_unit_value_t_category_v<category::length_unit, diff>));
 
   using ftRatio = unit_value_t<feet, 1>;
 
   using difff = unit_value_subtract<ftRatio, mRatio>;
-  EXPECT_TRUE((std::is_same<
-               typename std::decay<foot_t>::type,
-               typename std::decay<decltype(difff::value())>::type>::value));
+  EXPECT_TRUE((std::is_same_v<
+               typename std::decay_t<foot_t>,
+               typename std::decay_t<decltype(difff::value())>>));
   EXPECT_NEAR(-3.92125984, difff::value().value(), 5.0e-8);
   EXPECT_TRUE(
-      (traits::is_unit_value_t_category<category::length_unit, difff>::value));
+      (traits::is_unit_value_t_category_v<category::length_unit, difff>));
 
   using cRatio = unit_value_t<celsius, 1>;
   using fRatio = unit_value_t<fahrenheit, 2>;
 
   using diffc = unit_value_subtract<cRatio, fRatio>;
-  EXPECT_TRUE((std::is_same<
-               typename std::decay<celsius_t>::type,
-               typename std::decay<decltype(diffc::value())>::type>::value));
+  EXPECT_TRUE((std::is_same_v<
+               typename std::decay_t<celsius_t>,
+               typename std::decay_t<decltype(diffc::value())>>));
   EXPECT_NEAR(-0.11111111111, diffc::value().value(), 5.0e-8);
-  EXPECT_TRUE((traits::is_unit_value_t_category<category::temperature_unit,
-                                                diffc>::value));
+  EXPECT_TRUE((traits::is_unit_value_t_category_v<category::temperature_unit,
+                                                diffc>));
 
   using rRatio = unit_value_t<angle::radian, 1>;
   using dRatio = unit_value_t<angle::degree, 3>;
 
   using diffr = unit_value_subtract<rRatio, dRatio>;
-  EXPECT_TRUE((std::is_same<
-               typename std::decay<angle::radian_t>::type,
-               typename std::decay<decltype(diffr::value())>::type>::value));
+  EXPECT_TRUE((std::is_same_v<
+               typename std::decay_t<angle::radian_t>,
+               typename std::decay_t<decltype(diffr::value())>>));
   EXPECT_NEAR(0.947640122, diffr::value().value(), 5.0e-8);
   EXPECT_TRUE(
-      (traits::is_unit_value_t_category<category::angle_unit, diffr>::value));
+      (traits::is_unit_value_t_category_v<category::angle_unit, diffr>));
 }
 
 TEST_F(CompileTimeArithmetic, unit_value_multiply) {
@@ -3275,63 +3278,63 @@ TEST_F(CompileTimeArithmetic, unit_value_multiply) {
   using product = unit_value_multiply<mRatio, mRatio>;
   EXPECT_EQ(square_meter_t(4), product::value());
   EXPECT_TRUE(
-      (traits::is_unit_value_t_category<category::area_unit, product>::value));
+      (traits::is_unit_value_t_category_v<category::area_unit, product>));
 
   using productM = unit_value_multiply<mRatio, ftRatio>;
 
-  EXPECT_TRUE((std::is_same<
-               typename std::decay<square_meter_t>::type,
-               typename std::decay<decltype(productM::value())>::type>::value));
+  EXPECT_TRUE((std::is_same_v<
+               typename std::decay_t<square_meter_t>,
+               typename std::decay_t<decltype(productM::value())>>));
   EXPECT_NEAR(4.0, productM::value().value(), 5.0e-7);
   EXPECT_TRUE(
-      (traits::is_unit_value_t_category<category::area_unit, productM>::value));
+      (traits::is_unit_value_t_category_v<category::area_unit, productM>));
 
   using productF = unit_value_multiply<ftRatio, mRatio>;
-  EXPECT_TRUE((std::is_same<
-               typename std::decay<square_foot_t>::type,
-               typename std::decay<decltype(productF::value())>::type>::value));
+  EXPECT_TRUE((std::is_same_v<
+               typename std::decay_t<square_foot_t>,
+               typename std::decay_t<decltype(productF::value())>>));
   EXPECT_NEAR(43.0556444224, productF::value().value(), 5.0e-6);
   EXPECT_TRUE(
-      (traits::is_unit_value_t_category<category::area_unit, productF>::value));
+      (traits::is_unit_value_t_category_v<category::area_unit, productF>));
 
   using productF2 = unit_value_multiply<ftRatio, ftRatio>;
   EXPECT_TRUE(
-      (std::is_same<
-          typename std::decay<square_foot_t>::type,
-          typename std::decay<decltype(productF2::value())>::type>::value));
+      (std::is_same_v<
+          typename std::decay_t<square_foot_t>,
+          typename std::decay_t<decltype(productF2::value())>>));
   EXPECT_NEAR(43.0556444224, productF2::value().value(), 5.0e-8);
   EXPECT_TRUE((
-      traits::is_unit_value_t_category<category::area_unit, productF2>::value));
+      traits::is_unit_value_t_category_v<category::area_unit, productF2>));
 
   using nRatio = unit_value_t<units::force::newton, 5>;
 
   using productN = unit_value_multiply<nRatio, ftRatio>;
   EXPECT_FALSE(
-      (std::is_same<
-          typename std::decay<torque::newton_meter_t>::type,
-          typename std::decay<decltype(productN::value())>::type>::value));
-  EXPECT_TRUE((std::is_convertible<
-               typename std::decay<torque::newton_meter_t>::type,
-               typename std::decay<decltype(productN::value())>::type>::value));
+      (std::is_same_v<
+          typename std::decay_t<torque::newton_meter_t>,
+          typename std::decay_t<decltype(productN::value())>>));
+  EXPECT_TRUE((std::is_convertible_v<
+               typename std::decay_t<torque::newton_meter_t>,
+               typename std::decay_t<decltype(productN::value())>>));
   EXPECT_NEAR(32.8084, productN::value().value(), 5.0e-8);
   EXPECT_NEAR(10.0, (productN::value().convert<newton_meter>().value()),
               5.0e-7);
-  EXPECT_TRUE((traits::is_unit_value_t_category<category::torque_unit,
-                                                productN>::value));
+  EXPECT_TRUE((traits::is_unit_value_t_category_v<category::torque_unit,
+                                                productN>));
 
   using r1Ratio = unit_value_t<angle::radian, 11, 10>;
   using r2Ratio = unit_value_t<angle::radian, 22, 10>;
 
   using productR = unit_value_multiply<r1Ratio, r2Ratio>;
-  EXPECT_TRUE((std::is_same<
-               typename std::decay<steradian_t>::type,
-               typename std::decay<decltype(productR::value())>::type>::value));
+  EXPECT_TRUE((std::is_same_v<
+               typename std::decay_t<steradian_t>,
+               typename std::decay_t<decltype(productR::value())>>));
   EXPECT_NEAR(2.42, productR::value().value(), 5.0e-8);
   EXPECT_NEAR(7944.39137,
               (productR::value().convert<degrees_squared>().value()),
               5.0e-6);
-  EXPECT_TRUE((traits::is_unit_value_t_category<category::solid_angle_unit,
-                                                productR>::value));
+  EXPECT_TRUE((traits::is_unit_value_t_category_v<category::solid_angle_unit,
+                                                productR>));
 }
 
 TEST_F(CompileTimeArithmetic, unit_value_divide) {
@@ -3341,116 +3344,116 @@ TEST_F(CompileTimeArithmetic, unit_value_divide) {
   using product = unit_value_divide<mRatio, mRatio>;
   EXPECT_EQ(scalar_t(1), product::value());
   EXPECT_TRUE((
-      traits::is_unit_value_t_category<category::scalar_unit, product>::value));
+      traits::is_unit_value_t_category_v<category::scalar_unit, product>));
 
   using productM = unit_value_divide<mRatio, ftRatio>;
 
-  EXPECT_TRUE((std::is_same<
-               typename std::decay<scalar_t>::type,
-               typename std::decay<decltype(productM::value())>::type>::value));
+  EXPECT_TRUE((std::is_same_v<
+               typename std::decay_t<scalar_t>,
+               typename std::decay_t<decltype(productM::value())>>));
   EXPECT_NEAR(1, productM::value().value(), 5.0e-7);
-  EXPECT_TRUE((traits::is_unit_value_t_category<category::scalar_unit,
-                                                productM>::value));
+  EXPECT_TRUE((traits::is_unit_value_t_category_v<category::scalar_unit,
+                                                productM>));
 
   using productF = unit_value_divide<ftRatio, mRatio>;
-  EXPECT_TRUE((std::is_same<
-               typename std::decay<scalar_t>::type,
-               typename std::decay<decltype(productF::value())>::type>::value));
+  EXPECT_TRUE((std::is_same_v<
+               typename std::decay_t<scalar_t>,
+               typename std::decay_t<decltype(productF::value())>>));
   EXPECT_NEAR(1.0, productF::value().value(), 5.0e-6);
-  EXPECT_TRUE((traits::is_unit_value_t_category<category::scalar_unit,
-                                                productF>::value));
+  EXPECT_TRUE((traits::is_unit_value_t_category_v<category::scalar_unit,
+                                                productF>));
 
   using productF2 = unit_value_divide<ftRatio, ftRatio>;
   EXPECT_TRUE(
-      (std::is_same<
-          typename std::decay<scalar_t>::type,
-          typename std::decay<decltype(productF2::value())>::type>::value));
+      (std::is_same_v<
+          typename std::decay_t<scalar_t>,
+          typename std::decay_t<decltype(productF2::value())>>));
   EXPECT_NEAR(1.0, productF2::value().value(), 5.0e-8);
-  EXPECT_TRUE((traits::is_unit_value_t_category<category::scalar_unit,
-                                                productF2>::value));
+  EXPECT_TRUE((traits::is_unit_value_t_category_v<category::scalar_unit,
+                                                productF2>));
 
   using sRatio = unit_value_t<seconds, 10>;
 
   using productMS = unit_value_divide<mRatio, sRatio>;
   EXPECT_TRUE(
-      (std::is_same<
-          typename std::decay<meters_per_second_t>::type,
-          typename std::decay<decltype(productMS::value())>::type>::value));
+      (std::is_same_v<
+          typename std::decay_t<meters_per_second_t>,
+          typename std::decay_t<decltype(productMS::value())>>));
   EXPECT_NEAR(0.2, productMS::value().value(), 5.0e-8);
-  EXPECT_TRUE((traits::is_unit_value_t_category<category::velocity_unit,
-                                                productMS>::value));
+  EXPECT_TRUE((traits::is_unit_value_t_category_v<category::velocity_unit,
+                                                productMS>));
 
   using rRatio = unit_value_t<angle::radian, 20>;
 
   using productRS = unit_value_divide<rRatio, sRatio>;
   EXPECT_TRUE(
-      (std::is_same<
-          typename std::decay<radians_per_second_t>::type,
-          typename std::decay<decltype(productRS::value())>::type>::value));
+      (std::is_same_v<
+          typename std::decay_t<radians_per_second_t>,
+          typename std::decay_t<decltype(productRS::value())>>));
   EXPECT_NEAR(2, productRS::value().value(), 5.0e-8);
   EXPECT_NEAR(114.592,
               (productRS::value().convert<degrees_per_second>().value()),
               5.0e-4);
-  EXPECT_TRUE((traits::is_unit_value_t_category<category::angular_velocity_unit,
-                                                productRS>::value));
+  EXPECT_TRUE((traits::is_unit_value_t_category_v<category::angular_velocity_unit,
+                                                productRS>));
 }
 
 TEST_F(CompileTimeArithmetic, unit_value_power) {
   using mRatio = unit_value_t<meters, 2>;
 
   using sq = unit_value_power<mRatio, 2>;
-  EXPECT_TRUE((std::is_convertible<
-               typename std::decay<square_meter_t>::type,
-               typename std::decay<decltype(sq::value())>::type>::value));
+  EXPECT_TRUE((std::is_convertible_v<
+               typename std::decay_t<square_meter_t>,
+               typename std::decay_t<decltype(sq::value())>>));
   EXPECT_NEAR(4, sq::value().value(), 5.0e-8);
   EXPECT_TRUE(
-      (traits::is_unit_value_t_category<category::area_unit, sq>::value));
+      (traits::is_unit_value_t_category_v<category::area_unit, sq>));
 
   using rRatio = unit_value_t<angle::radian, 18, 10>;
 
   using sqr = unit_value_power<rRatio, 2>;
-  EXPECT_TRUE((std::is_convertible<
-               typename std::decay<steradian_t>::type,
-               typename std::decay<decltype(sqr::value())>::type>::value));
+  EXPECT_TRUE((std::is_convertible_v<
+               typename std::decay_t<steradian_t>,
+               typename std::decay_t<decltype(sqr::value())>>));
   EXPECT_NEAR(3.24, sqr::value().value(), 5.0e-8);
   EXPECT_NEAR(10636.292574038049895092690529904,
               (sqr::value().convert<degrees_squared>().value()), 5.0e-10);
-  EXPECT_TRUE((traits::is_unit_value_t_category<category::solid_angle_unit,
-                                                sqr>::value));
+  EXPECT_TRUE((traits::is_unit_value_t_category_v<category::solid_angle_unit,
+                                                sqr>));
 }
 
 TEST_F(CompileTimeArithmetic, unit_value_sqrt) {
   using mRatio = unit_value_t<square_meters, 10>;
 
   using root = unit_value_sqrt<mRatio>;
-  EXPECT_TRUE((std::is_convertible<
-               typename std::decay<meter_t>::type,
-               typename std::decay<decltype(root::value())>::type>::value));
+  EXPECT_TRUE((std::is_convertible_v<
+               typename std::decay_t<meter_t>,
+               typename std::decay_t<decltype(root::value())>>));
   EXPECT_NEAR(3.16227766017, root::value().value(), 5.0e-9);
   EXPECT_TRUE(
-      (traits::is_unit_value_t_category<category::length_unit, root>::value));
+      (traits::is_unit_value_t_category_v<category::length_unit, root>));
 
   using hRatio = unit_value_t<hectare, 51, 7>;
 
   using rooth = unit_value_sqrt<hRatio, 100000000>;
-  EXPECT_TRUE((std::is_convertible<
-               typename std::decay<mile_t>::type,
-               typename std::decay<decltype(rooth::value())>::type>::value));
+  EXPECT_TRUE((std::is_convertible_v<
+               typename std::decay_t<mile_t>,
+               typename std::decay_t<decltype(rooth::value())>>));
   EXPECT_NEAR(2.69920623253, rooth::value().value(), 5.0e-8);
   EXPECT_NEAR(269.920623, rooth::value().convert<meters>().value(),
               5.0e-6);
   EXPECT_TRUE(
-      (traits::is_unit_value_t_category<category::length_unit, rooth>::value));
+      (traits::is_unit_value_t_category_v<category::length_unit, rooth>));
 
   using rRatio = unit_value_t<steradian, 18, 10>;
 
   using rootr = unit_value_sqrt<rRatio>;
-  EXPECT_TRUE((traits::is_angle_unit<decltype(rootr::value())>::value));
+  EXPECT_TRUE((traits::is_angle_unit_v<decltype(rootr::value())>));
   EXPECT_NEAR(1.3416407865, rootr::value().value(), 5.0e-8);
   EXPECT_NEAR(76.870352574,
               rootr::value().convert<angle::degrees>().value(), 5.0e-6);
   EXPECT_TRUE(
-      (traits::is_unit_value_t_category<category::angle_unit, rootr>::value));
+      (traits::is_unit_value_t_category_v<category::angle_unit, rootr>));
 }
 
 TEST_F(CaseStudies, radarRangeEquation) {

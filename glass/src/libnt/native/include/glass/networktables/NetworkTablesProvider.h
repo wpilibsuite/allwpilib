@@ -9,14 +9,13 @@
 #include <string_view>
 #include <vector>
 
+#include <ntcore_c.h>
 #include <ntcore_cpp.h>
 #include <wpi/StringMap.h>
 
 #include "glass/Model.h"
 #include "glass/Provider.h"
 #include "glass/networktables/NetworkTablesHelper.h"
-#include "glass/support/IniSaverInfo.h"
-#include "glass/support/IniSaverString.h"
 
 namespace glass {
 
@@ -41,8 +40,8 @@ class NetworkTablesProvider : private Provider<detail::NTProviderFunctions> {
   using Provider::CreateModelFunc;
   using Provider::CreateViewFunc;
 
-  explicit NetworkTablesProvider(std::string_view iniName);
-  NetworkTablesProvider(std::string_view iniName, NT_Inst inst);
+  explicit NetworkTablesProvider(Storage& storage);
+  NetworkTablesProvider(Storage& storage, NT_Inst inst);
 
   /**
    * Get the NetworkTables instance being used for this provider.
@@ -55,7 +54,7 @@ class NetworkTablesProvider : private Provider<detail::NTProviderFunctions> {
    * Perform global initialization.  This should be called prior to
    * wpi::gui::Initialize().
    */
-  void GlobalInit() override;
+  void GlobalInit() override { Provider::GlobalInit(); }
 
   /**
    * Displays menu contents as a tree of available NetworkTables views.
@@ -72,15 +71,14 @@ class NetworkTablesProvider : private Provider<detail::NTProviderFunctions> {
   void Register(std::string_view typeName, CreateModelFunc createModel,
                 CreateViewFunc createView);
 
-  using WindowManager::AddWindow;
-
  private:
   void Update() override;
 
   NetworkTablesHelper m_nt;
+  NT_EntryListener m_listener{0};
 
   // cached mapping from table name to type string
-  IniSaverString<NameInfo> m_typeCache;
+  Storage& m_typeCache;
 
   struct Builder {
     CreateModelFunc createModel;

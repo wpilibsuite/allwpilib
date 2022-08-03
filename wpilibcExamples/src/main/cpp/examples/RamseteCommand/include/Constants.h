@@ -5,6 +5,7 @@
 #include <frc/kinematics/DifferentialDriveKinematics.h>
 #include <frc/trajectory/constraint/DifferentialDriveKinematicsConstraint.h>
 #include <units/acceleration.h>
+#include <units/angle.h>
 #include <units/length.h>
 #include <units/time.h>
 #include <units/velocity.h>
@@ -58,12 +59,12 @@ constexpr double kPDriveVel = 8.5;
 
 namespace AutoConstants {
 constexpr auto kMaxSpeed = 3_mps;
-constexpr auto kMaxAcceleration = 3_mps_sq;
+constexpr auto kMaxAcceleration = 1_mps_sq;
 
 // Reasonable baseline values for a RAMSETE follower in units of meters and
 // seconds
-constexpr double kRamseteB = 2;
-constexpr double kRamseteZeta = 0.7;
+constexpr auto kRamseteB = 2.0 * 1_rad * 1_rad / (1_m * 1_m);
+constexpr auto kRamseteZeta = 0.7 / 1_rad;
 }  // namespace AutoConstants
 
 namespace OIConstants {

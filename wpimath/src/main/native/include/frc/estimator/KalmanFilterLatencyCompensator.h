@@ -10,7 +10,7 @@
 #include <utility>
 #include <vector>
 
-#include "Eigen/Core"
+#include "frc/EigenCore.h"
 #include "units/math.h"
 #include "units/time.h"
 
@@ -20,16 +20,15 @@ template <int States, int Inputs, int Outputs, typename KalmanFilterType>
 class KalmanFilterLatencyCompensator {
  public:
   struct ObserverSnapshot {
-    Eigen::Vector<double, States> xHat;
-    Eigen::Matrix<double, States, States> errorCovariances;
-    Eigen::Vector<double, Inputs> inputs;
-    Eigen::Vector<double, Outputs> localMeasurements;
+    Vectord<States> xHat;
+    Matrixd<States, States> squareRootErrorCovariances;
+    Vectord<Inputs> inputs;
+    Vectord<Outputs> localMeasurements;
 
-    ObserverSnapshot(const KalmanFilterType& observer,
-                     const Eigen::Vector<double, Inputs>& u,
-                     const Eigen::Vector<double, Outputs>& localY)
+    ObserverSnapshot(const KalmanFilterType& observer, const Vectord<Inputs>& u,
+                     const Vectord<Outputs>& localY)
         : xHat(observer.Xhat()),
-          errorCovariances(observer.P()),
+          squareRootErrorCovariances(observer.S()),
           inputs(u),
           localMeasurements(localY) {}
   };
@@ -47,10 +46,8 @@ class KalmanFilterLatencyCompensator {
    * @param localY    The local output at the timestamp
    * @param timestamp The timesnap of the state.
    */
-  void AddObserverState(const KalmanFilterType& observer,
-                        Eigen::Vector<double, Inputs> u,
-                        Eigen::Vector<double, Outputs> localY,
-                        units::second_t timestamp) {
+  void AddObserverState(const KalmanFilterType& observer, Vectord<Inputs> u,
+                        Vectord<Outputs> localY, units::second_t timestamp) {
     // Add the new state into the vector.
     m_pastObserverSnapshots.emplace_back(timestamp,
                                          ObserverSnapshot{observer, u, localY});
@@ -74,10 +71,8 @@ class KalmanFilterLatencyCompensator {
    */
   template <int Rows>
   void ApplyPastGlobalMeasurement(
-      KalmanFilterType* observer, units::second_t nominalDt,
-      Eigen::Vector<double, Rows> y,
-      std::function<void(const Eigen::Vector<double, Inputs>& u,
-                         const Eigen::Vector<double, Rows>& y)>
+      KalmanFilterType* observer, units::second_t nominalDt, Vectord<Rows> y,
+      std::function<void(const Vectord<Inputs>& u, const Vectord<Rows>& y)>
           globalMeasurementCorrect,
       units::second_t timestamp) {
     if (m_pastObserverSnapshots.size() == 0) {
@@ -86,26 +81,46 @@ class KalmanFilterLatencyCompensator {
       return;
     }
 
-    // We will perform a binary search to find the index of the element in the
-    // vector that has a timestamp that is equal to or greater than the vision
-    // measurement timestamp.
-    auto lowerBoundIter = std::lower_bound(
+    // Perform a binary search to find the index of first snapshot whose
+    // timestamp is greater than or equal to the global measurement timestamp
+    auto it = std::lower_bound(
         m_pastObserverSnapshots.cbegin(), m_pastObserverSnapshots.cend(),
         timestamp,
         [](const auto& entry, const auto& ts) { return entry.first < ts; });
-    int index = std::distance(m_pastObserverSnapshots.cbegin(), lowerBoundIter);
 
-    // High and Low should be the same. The sampled timestamp is greater than or
-    // equal to the vision pose timestamp. We will now find the entry which is
-    // closest in time to the requested timestamp.
+    size_t indexOfClosestEntry;
 
-    size_t indexOfClosestEntry =
-        units::math::abs(
-            timestamp - m_pastObserverSnapshots[std::max(index - 1, 0)].first) <
-                units::math::abs(timestamp -
-                                 m_pastObserverSnapshots[index].first)
-            ? index - 1
-            : index;
+    if (it == m_pastObserverSnapshots.cbegin()) {
+      // If the global measurement is older than any snapshot, throw out the
+      // measurement because there's no state estimate into which to incorporate
+      // the measurement
+      if (timestamp < it->first) {
+        return;
+      }
+
+      // If the first snapshot has same timestamp as the global measurement, use
+      // that snapshot
+      indexOfClosestEntry = 0;
+    } else if (it == m_pastObserverSnapshots.cend()) {
+      // If all snapshots are older than the global measurement, use the newest
+      // snapshot
+      indexOfClosestEntry = m_pastObserverSnapshots.size() - 1;
+    } else {
+      // Index of snapshot taken after the global measurement
+      int nextIdx = std::distance(m_pastObserverSnapshots.cbegin(), it);
+
+      // Index of snapshot taken before the global measurement. Since we already
+      // handled the case where the index points to the first snapshot, this
+      // computation is guaranteed to be nonnegative.
+      int prevIdx = nextIdx - 1;
+
+      // Find the snapshot closest in time to global measurement
+      units::second_t prevTimeDiff =
+          units::math::abs(timestamp - m_pastObserverSnapshots[prevIdx].first);
+      units::second_t nextTimeDiff =
+          units::math::abs(timestamp - m_pastObserverSnapshots[nextIdx].first);
+      indexOfClosestEntry = prevTimeDiff < nextTimeDiff ? prevIdx : nextIdx;
+    }
 
     units::second_t lastTimestamp =
         m_pastObserverSnapshots[indexOfClosestEntry].first - nominalDt;
@@ -120,7 +135,7 @@ class KalmanFilterLatencyCompensator {
       auto& [key, snapshot] = m_pastObserverSnapshots[i];
 
       if (i == indexOfClosestEntry) {
-        observer->SetP(snapshot.errorCovariances);
+        observer->SetS(snapshot.squareRootErrorCovariances);
         observer->SetXhat(snapshot.xHat);
       }
 

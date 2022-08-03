@@ -210,7 +210,7 @@ private:
 class open_file : public internal::file_dialog
 {
 public:
-    open_file(std::string const &title,
+    explicit open_file(std::string const &title,
               std::string const &default_path = "",
               std::vector<std::string> const &filters = { "All Files", "*" },
               opt options = opt::none)
@@ -223,7 +223,7 @@ public:
 class save_file : public internal::file_dialog
 {
 public:
-    save_file(std::string const &title,
+    explicit save_file(std::string const &title,
               std::string const &default_path = "",
               std::vector<std::string> const &filters = { "All Files", "*" },
               opt options = opt::none)
@@ -236,7 +236,7 @@ public:
 class select_folder : public internal::file_dialog
 {
 public:
-    select_folder(std::string const &title,
+    explicit select_folder(std::string const &title,
                   std::string const &default_path = "",
                   opt options = opt::none)
       : file_dialog(type::folder, title, default_path, {}, options)
@@ -246,4 +246,3 @@ public:
 };
 
 } // namespace pfd
-

@@ -7,6 +7,7 @@
 #include <wpi/SmallVector.h>
 
 #include "glass/Context.h"
+#include "glass/Storage.h"
 #include "glass/support/ExtraGuiWidgets.h"
 
 using namespace glass;
@@ -25,27 +26,27 @@ void glass::DisplayLEDDisplay(LEDDisplayModel* model, int index) {
   bool running = model->IsRunning();
   auto& storage = GetStorage();
 
-  int* numColumns = storage.GetIntRef("columns", 10);
-  bool* serpentine = storage.GetBoolRef("serpentine", false);
-  int* order = storage.GetIntRef("order", LEDConfig::RowMajor);
-  int* start = storage.GetIntRef("start", LEDConfig::UpperLeft);
+  int& numColumns = storage.GetInt("columns", 10);
+  bool& serpentine = storage.GetBool("serpentine", false);
+  int& order = storage.GetInt("order", LEDConfig::RowMajor);
+  int& start = storage.GetInt("start", LEDConfig::UpperLeft);
 
   ImGui::PushItemWidth(ImGui::GetFontSize() * 6);
   ImGui::LabelText("Length", "%d", length);
   ImGui::LabelText("Running", "%s", running ? "Yes" : "No");
-  ImGui::InputInt("Columns", numColumns);
+  ImGui::InputInt("Columns", &numColumns);
   {
     static const char* options[] = {"Row Major", "Column Major"};
-    ImGui::Combo("Order", order, options, 2);
+    ImGui::Combo("Order", &order, options, 2);
   }
   {
     static const char* options[] = {"Upper Left", "Lower Left", "Upper Right",
                                     "Lower Right"};
-    ImGui::Combo("Start", start, options, 4);
+    ImGui::Combo("Start", &start, options, 4);
   }
-  ImGui::Checkbox("Serpentine", serpentine);
-  if (*numColumns < 1) {
-    *numColumns = 1;
+  ImGui::Checkbox("Serpentine", &serpentine);
+  if (numColumns < 1) {
+    numColumns = 1;
   }
   ImGui::PopItemWidth();
 
@@ -74,12 +75,12 @@ void glass::DisplayLEDDisplay(LEDDisplayModel* model, int index) {
   }
 
   LEDConfig config;
-  config.serpentine = *serpentine;
-  config.order = static_cast<LEDConfig::Order>(*order);
-  config.start = static_cast<LEDConfig::Start>(*start);
+  config.serpentine = serpentine;
+  config.order = static_cast<LEDConfig::Order>(order);
+  config.start = static_cast<LEDConfig::Start>(start);
 
-  DrawLEDs(iData->values.data(), length, *numColumns, iData->colors.data(), 0,
-           0, config);
+  DrawLEDs(iData->values.data(), length, numColumns, iData->colors.data(), 0, 0,
+           config);
 }
 
 void glass::DisplayLEDDisplays(LEDDisplaysModel* model) {

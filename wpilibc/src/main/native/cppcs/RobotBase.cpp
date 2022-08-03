@@ -192,16 +192,8 @@ bool RobotBase::IsAutonomousEnabled() const {
   return DriverStation::IsAutonomousEnabled();
 }
 
-bool RobotBase::IsOperatorControl() const {
-  return DriverStation::IsTeleop();
-}
-
 bool RobotBase::IsTeleop() const {
   return DriverStation::IsTeleop();
-}
-
-bool RobotBase::IsOperatorControlEnabled() const {
-  return DriverStation::IsTeleopEnabled();
 }
 
 bool RobotBase::IsTeleopEnabled() const {
@@ -250,6 +242,9 @@ RobotBase::RobotBase() {
       std::fclose(file);
     }
   }
+
+  // Call DriverStation::InDisabled() to kick off DS thread
+  DriverStation::InDisabled(true);
 
   // First and one-time initialization
   inst.GetTable("LiveWindow")

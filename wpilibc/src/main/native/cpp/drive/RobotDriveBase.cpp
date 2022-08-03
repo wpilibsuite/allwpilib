@@ -10,7 +10,6 @@
 
 #include <hal/FRCUsageReporting.h>
 
-#include "frc/MathUtil.h"
 #include "frc/motorcontrol/MotorController.h"
 
 using namespace frc;
@@ -31,11 +30,7 @@ void RobotDriveBase::FeedWatchdog() {
   Feed();
 }
 
-double RobotDriveBase::ApplyDeadband(double value, double deadband) {
-  return frc::ApplyDeadband(value, deadband);
-}
-
-void RobotDriveBase::Normalize(wpi::span<double> wheelSpeeds) {
+void RobotDriveBase::Desaturate(wpi::span<double> wheelSpeeds) {
   double maxMagnitude = std::abs(wheelSpeeds[0]);
   for (size_t i = 1; i < wheelSpeeds.size(); i++) {
     double temp = std::abs(wheelSpeeds[i]);

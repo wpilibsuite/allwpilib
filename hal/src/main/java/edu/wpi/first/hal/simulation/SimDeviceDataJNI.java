@@ -76,7 +76,6 @@ public class SimDeviceDataJNI extends JNIWrapper {
         String name, int handle, int direction, int type, long value1, double value2) {
       this.name = name;
       this.handle = handle;
-      this.readonly = direction == 1;
       this.direction = direction;
       this.value = HALValue.fromNative(type, value1, value2);
     }
@@ -86,10 +85,6 @@ public class SimDeviceDataJNI extends JNIWrapper {
 
     @SuppressWarnings("MemberName")
     public int handle;
-
-    @SuppressWarnings("MemberName")
-    @Deprecated
-    public boolean readonly;
 
     @SuppressWarnings("MemberName")
     public int direction;

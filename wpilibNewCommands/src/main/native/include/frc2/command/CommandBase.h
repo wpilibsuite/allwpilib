@@ -18,6 +18,8 @@
 namespace frc2 {
 /**
  * A Sendable base class for Commands.
+ *
+ * This class is provided by the NewCommands VendorDep
  */
 class CommandBase : public Command,
                     public wpi::Sendable,

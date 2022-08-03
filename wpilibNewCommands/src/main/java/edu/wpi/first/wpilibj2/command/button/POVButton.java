@@ -8,12 +8,12 @@ import static edu.wpi.first.wpilibj.util.ErrorMessages.requireNonNullParam;
 
 import edu.wpi.first.wpilibj.GenericHID;
 
-/** A {@link Button} that gets its state from a POV on a {@link GenericHID}. */
+/**
+ * A {@link Button} that gets its state from a POV on a {@link GenericHID}.
+ *
+ * <p>This class is provided by the NewCommands VendorDep
+ */
 public class POVButton extends Button {
-  private final GenericHID m_joystick;
-  private final int m_angle;
-  private final int m_povNumber;
-
   /**
    * Creates a POV button for triggering commands.
    *
@@ -22,11 +22,8 @@ public class POVButton extends Button {
    * @param povNumber The POV number (see {@link GenericHID#getPOV(int)})
    */
   public POVButton(GenericHID joystick, int angle, int povNumber) {
+    super(() -> joystick.getPOV(povNumber) == angle);
     requireNonNullParam(joystick, "joystick", "POVButton");
-
-    m_joystick = joystick;
-    m_angle = angle;
-    m_povNumber = povNumber;
   }
 
   /**
@@ -37,15 +34,5 @@ public class POVButton extends Button {
    */
   public POVButton(GenericHID joystick, int angle) {
     this(joystick, angle, 0);
-  }
-
-  /**
-   * Checks whether the current value of the POV is the target angle.
-   *
-   * @return Whether the value of the POV matches the target angle
-   */
-  @Override
-  public boolean get() {
-    return m_joystick.getPOV(m_povNumber) == m_angle;
   }
 }

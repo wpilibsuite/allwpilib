@@ -42,7 +42,7 @@ void DriveSubsystem::SimulationPeriodic() {
   // voltages make the right side move forward.
   m_drivetrainSimulator.SetInputs(units::volt_t{m_leftMotors.Get()} *
                                       frc::RobotController::GetInputVoltage(),
-                                  units::volt_t{-m_rightMotors.Get()} *
+                                  units::volt_t{m_rightMotors.Get()} *
                                       frc::RobotController::GetInputVoltage());
   m_drivetrainSimulator.Update(20_ms);
 
@@ -64,7 +64,7 @@ void DriveSubsystem::ArcadeDrive(double fwd, double rot) {
 
 void DriveSubsystem::TankDriveVolts(units::volt_t left, units::volt_t right) {
   m_leftMotors.SetVoltage(left);
-  m_rightMotors.SetVoltage(-right);
+  m_rightMotors.SetVoltage(right);
   m_drive.Feed();
 }
 

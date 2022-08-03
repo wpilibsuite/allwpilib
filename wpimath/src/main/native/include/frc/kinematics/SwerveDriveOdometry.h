@@ -8,6 +8,7 @@
 #include <cstddef>
 #include <ctime>
 
+#include <wpi/SymbolExports.h>
 #include <wpi/timestamp.h>
 
 #include "SwerveDriveKinematics.h"
@@ -111,6 +112,9 @@ class SwerveDriveOdometry {
   Rotation2d m_previousAngle;
   Rotation2d m_gyroOffset;
 };
+
+extern template class EXPORT_TEMPLATE_DECLARE(WPILIB_DLLEXPORT)
+    SwerveDriveOdometry<4>;
 
 }  // namespace frc
 

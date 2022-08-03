@@ -42,16 +42,15 @@ public class RobotContainer {
     configureButtonBindings();
 
     // Configure default commands
-    // Set the default drive command to split-stick arcade drive
     m_robotDrive.setDefaultCommand(
-        // A split-stick arcade command, with forward/backward controlled by the left
-        // hand, and turning controlled by the right.
+        // The left stick controls translation of the robot.
+        // Turning is controlled by the X axis of the right stick.
         new RunCommand(
             () ->
                 m_robotDrive.drive(
                     m_driverController.getLeftY(),
-                    m_driverController.getRightX(),
                     m_driverController.getLeftX(),
+                    m_driverController.getRightX(),
                     false),
             m_robotDrive));
   }

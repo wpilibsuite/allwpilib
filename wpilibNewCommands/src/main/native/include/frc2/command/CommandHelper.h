@@ -17,6 +17,8 @@ namespace frc2 {
  *
  * <p>Note: ALWAYS create a subclass by extending CommandHelper<Base, Subclass>,
  * or decorators will not function!
+ *
+ * This class is provided by the NewCommands VendorDep
  */
 template <typename Base, typename CRTP,
           typename = std::enable_if_t<std::is_base_of_v<Command, Base>>>

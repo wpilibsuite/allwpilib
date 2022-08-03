@@ -56,15 +56,13 @@ class WPILIB_DLLEXPORT LinearSystemId {
       throw std::domain_error("G must be greater than zero.");
     }
 
-    Eigen::Matrix<double, 2, 2> A{
-        {0.0, 1.0},
-        {0.0, (-std::pow(G, 2) * motor.Kt /
-               (motor.R * units::math::pow<2>(r) * m * motor.Kv))
-                  .value()}};
-    Eigen::Matrix<double, 2, 1> B{0.0,
-                                  (G * motor.Kt / (motor.R * r * m)).value()};
-    Eigen::Matrix<double, 1, 2> C{1.0, 0.0};
-    Eigen::Matrix<double, 1, 1> D{0.0};
+    Matrixd<2, 2> A{{0.0, 1.0},
+                    {0.0, (-std::pow(G, 2) * motor.Kt /
+                           (motor.R * units::math::pow<2>(r) * m * motor.Kv))
+                              .value()}};
+    Matrixd<2, 1> B{0.0, (G * motor.Kt / (motor.R * r * m)).value()};
+    Matrixd<1, 2> C{1.0, 0.0};
+    Matrixd<1, 1> D{0.0};
 
     return LinearSystem<2, 1, 1>(A, B, C, D);
   }
@@ -90,12 +88,12 @@ class WPILIB_DLLEXPORT LinearSystemId {
       throw std::domain_error("G must be greater than zero.");
     }
 
-    Eigen::Matrix<double, 2, 2> A{
+    Matrixd<2, 2> A{
         {0.0, 1.0},
         {0.0, (-std::pow(G, 2) * motor.Kt / (motor.Kv * motor.R * J)).value()}};
-    Eigen::Matrix<double, 2, 1> B{0.0, (G * motor.Kt / (motor.R * J)).value()};
-    Eigen::Matrix<double, 1, 2> C{1.0, 0.0};
-    Eigen::Matrix<double, 1, 1> D{0.0};
+    Matrixd<2, 1> B{0.0, (G * motor.Kt / (motor.R * J)).value()};
+    Matrixd<1, 2> C{1.0, 0.0};
+    Matrixd<1, 1> D{0.0};
 
     return LinearSystem<2, 1, 1>(A, B, C, D);
   }
@@ -118,7 +116,7 @@ class WPILIB_DLLEXPORT LinearSystemId {
    * u = K_v v + K_a a
    *
    * @param kV The velocity gain, in volt seconds per distance.
-   * @param kA The acceleration gain, in volt seconds^2 per distance.
+   * @param kA The acceleration gain, in volt seconds² per distance.
    * @throws std::domain_error if kV <= 0 or kA <= 0.
    */
   template <typename Distance, typename = std::enable_if_t<
@@ -134,10 +132,10 @@ class WPILIB_DLLEXPORT LinearSystemId {
       throw std::domain_error("Ka must be greater than zero.");
     }
 
-    Eigen::Matrix<double, 1, 1> A{-kV.value() / kA.value()};
-    Eigen::Matrix<double, 1, 1> B{1.0 / kA.value()};
-    Eigen::Matrix<double, 1, 1> C{1.0};
-    Eigen::Matrix<double, 1, 1> D{0.0};
+    Matrixd<1, 1> A{-kV.value() / kA.value()};
+    Matrixd<1, 1> B{1.0 / kA.value()};
+    Matrixd<1, 1> C{1.0};
+    Matrixd<1, 1> D{0.0};
 
     return LinearSystem<1, 1, 1>(A, B, C, D);
   }
@@ -160,7 +158,7 @@ class WPILIB_DLLEXPORT LinearSystemId {
    * u = K_v v + K_a a
    *
    * @param kV The velocity gain, in volt seconds per distance.
-   * @param kA The acceleration gain, in volt seconds^2 per distance.
+   * @param kA The acceleration gain, in volt seconds² per distance.
    * @throws std::domain_error if kV <= 0 or kA <= 0.
    */
   template <typename Distance, typename = std::enable_if_t<
@@ -176,20 +174,22 @@ class WPILIB_DLLEXPORT LinearSystemId {
       throw std::domain_error("Ka must be greater than zero.");
     }
 
-    Eigen::Matrix<double, 2, 2> A{{0.0, 1.0}, {0.0, -kV.value() / kA.value()}};
-    Eigen::Matrix<double, 2, 1> B{0.0, 1.0 / kA.value()};
-    Eigen::Matrix<double, 1, 2> C{1.0, 0.0};
-    Eigen::Matrix<double, 1, 1> D{0.0};
+    Matrixd<2, 2> A{{0.0, 1.0}, {0.0, -kV.value() / kA.value()}};
+    Matrixd<2, 1> B{0.0, 1.0 / kA.value()};
+    Matrixd<1, 2> C{1.0, 0.0};
+    Matrixd<1, 1> D{0.0};
 
     return LinearSystem<2, 1, 1>(A, B, C, D);
   }
 
   /**
-   * Constructs the state-space model for a 2 DOF drivetrain velocity system
-   * from system identification data.
+   * Identify a differential drive drivetrain given the drivetrain's kV and kA
+   * in both linear (volts/(meter/sec) and volts/(meter/sec²)) and angular
+   * (volts/(radian/sec) and volts/(radian/sec²)) cases. This can be found using
+   * SysId.
    *
-   * States: [[left velocity], [right velocity]]
-   * Inputs: [[left voltage], [right voltage]]
+   * States: [[left velocity], [right velocity]]<br>
+   * Inputs: [[left voltage], [right voltage]]<br>
    * Outputs: [[left velocity], [right velocity]]
    *
    * @param kVlinear  The linear velocity gain in volts per (meter per second).
@@ -224,22 +224,22 @@ class WPILIB_DLLEXPORT LinearSystemId {
     double B1 = 1.0 / kAlinear.value() + 1.0 / kAangular.value();
     double B2 = 1.0 / kAlinear.value() - 1.0 / kAangular.value();
 
-    Eigen::Matrix<double, 2, 2> A =
-        0.5 * Eigen::Matrix<double, 2, 2>{{A1, A2}, {A2, A1}};
-    Eigen::Matrix<double, 2, 2> B =
-        0.5 * Eigen::Matrix<double, 2, 2>{{B1, B2}, {B2, B1}};
-    Eigen::Matrix<double, 2, 2> C{{1.0, 0.0}, {0.0, 1.0}};
-    Eigen::Matrix<double, 2, 2> D{{0.0, 0.0}, {0.0, 0.0}};
+    Matrixd<2, 2> A = 0.5 * Matrixd<2, 2>{{A1, A2}, {A2, A1}};
+    Matrixd<2, 2> B = 0.5 * Matrixd<2, 2>{{B1, B2}, {B2, B1}};
+    Matrixd<2, 2> C{{1.0, 0.0}, {0.0, 1.0}};
+    Matrixd<2, 2> D{{0.0, 0.0}, {0.0, 0.0}};
 
     return LinearSystem<2, 2, 2>(A, B, C, D);
   }
 
   /**
-   * Constructs the state-space model for a 2 DOF drivetrain velocity system
-   * from system identification data.
+   * Identify a differential drive drivetrain given the drivetrain's kV and kA
+   * in both linear (volts/(meter/sec) and volts/(meter/sec²)) and angular
+   * (volts/(radian/sec) and volts/(radian/sec²)) cases. This can be found using
+   * SysId.
    *
-   * States: [[left velocity], [right velocity]]
-   * Inputs: [[left voltage], [right voltage]]
+   * States: [[left velocity], [right velocity]]<br>
+   * Inputs: [[left voltage], [right voltage]]<br>
    * Outputs: [[left velocity], [right velocity]]
    *
    * @param kVlinear   The linear velocity gain in volts per (meter per second).
@@ -249,7 +249,8 @@ class WPILIB_DLLEXPORT LinearSystemId {
    *                   second).
    * @param kAangular  The angular acceleration gain in volts per (radian per
    *                   second squared).
-   * @param trackwidth The width of the drivetrain.
+   * @param trackwidth The distance between the differential drive's left and
+   *                   right wheels.
    * @throws domain_error if kVlinear <= 0, kAlinear <= 0, kVangular <= 0,
    *         kAangular <= 0, or trackwidth <= 0.
    */
@@ -283,7 +284,7 @@ class WPILIB_DLLEXPORT LinearSystemId {
     // omega = 2/trackwidth v
     //
     // So multiplying by 2/trackwidth converts the angular gains from V/(rad/s)
-    // to V/m/s).
+    // to V/(m/s).
     return IdentifyDrivetrainSystem(kVlinear, kAlinear,
                                     kVangular * 2.0 / trackwidth * 1_rad,
                                     kAangular * 2.0 / trackwidth * 1_rad);
@@ -311,13 +312,45 @@ class WPILIB_DLLEXPORT LinearSystemId {
       throw std::domain_error("G must be greater than zero.");
     }
 
-    Eigen::Matrix<double, 1, 1> A{
+    Matrixd<1, 1> A{
         (-std::pow(G, 2) * motor.Kt / (motor.Kv * motor.R * J)).value()};
-    Eigen::Matrix<double, 1, 1> B{(G * motor.Kt / (motor.R * J)).value()};
-    Eigen::Matrix<double, 1, 1> C{1.0};
-    Eigen::Matrix<double, 1, 1> D{0.0};
+    Matrixd<1, 1> B{(G * motor.Kt / (motor.R * J)).value()};
+    Matrixd<1, 1> C{1.0};
+    Matrixd<1, 1> D{0.0};
 
     return LinearSystem<1, 1, 1>(A, B, C, D);
+  }
+
+  /**
+   * Constructs the state-space model for a DC motor motor.
+   *
+   * States: [[angular position, angular velocity]]
+   * Inputs: [[voltage]]
+   * Outputs: [[angular position, angular velocity]]
+   *
+   * @param motor Instance of DCMotor.
+   * @param J Moment of inertia.
+   * @param G Gear ratio from motor to carriage.
+   * @throws std::domain_error if J <= 0 or G <= 0.
+   */
+  static LinearSystem<2, 1, 2> DCMotorSystem(DCMotor motor,
+                                             units::kilogram_square_meter_t J,
+                                             double G) {
+    if (J <= 0_kg_sq_m) {
+      throw std::domain_error("J must be greater than zero.");
+    }
+    if (G <= 0.0) {
+      throw std::domain_error("G must be greater than zero.");
+    }
+
+    Matrixd<2, 2> A{
+        {0.0, 1.0},
+        {0.0, (-std::pow(G, 2) * motor.Kt / (motor.Kv * motor.R * J)).value()}};
+    Matrixd<2, 1> B{0.0, (G * motor.Kt / (motor.R * J)).value()};
+    Matrixd<2, 2> C{{1.0, 0.0}, {0.0, 1.0}};
+    Matrixd<2, 1> D{0.0, 0.0};
+
+    return LinearSystem<2, 1, 2>(A, B, C, D);
   }
 
   /**
@@ -359,18 +392,16 @@ class WPILIB_DLLEXPORT LinearSystemId {
               (motor.Kv * motor.R * units::math::pow<2>(r));
     auto C2 = G * motor.Kt / (motor.R * r);
 
-    Eigen::Matrix<double, 2, 2> A{
-        {((1 / m + units::math::pow<2>(rb) / J) * C1).value(),
-         ((1 / m - units::math::pow<2>(rb) / J) * C1).value()},
-        {((1 / m - units::math::pow<2>(rb) / J) * C1).value(),
-         ((1 / m + units::math::pow<2>(rb) / J) * C1).value()}};
-    Eigen::Matrix<double, 2, 2> B{
-        {((1 / m + units::math::pow<2>(rb) / J) * C2).value(),
-         ((1 / m - units::math::pow<2>(rb) / J) * C2).value()},
-        {((1 / m - units::math::pow<2>(rb) / J) * C2).value(),
-         ((1 / m + units::math::pow<2>(rb) / J) * C2).value()}};
-    Eigen::Matrix<double, 2, 2> C{{1.0, 0.0}, {0.0, 1.0}};
-    Eigen::Matrix<double, 2, 2> D{{0.0, 0.0}, {0.0, 0.0}};
+    Matrixd<2, 2> A{{((1 / m + units::math::pow<2>(rb) / J) * C1).value(),
+                     ((1 / m - units::math::pow<2>(rb) / J) * C1).value()},
+                    {((1 / m - units::math::pow<2>(rb) / J) * C1).value(),
+                     ((1 / m + units::math::pow<2>(rb) / J) * C1).value()}};
+    Matrixd<2, 2> B{{((1 / m + units::math::pow<2>(rb) / J) * C2).value(),
+                     ((1 / m - units::math::pow<2>(rb) / J) * C2).value()},
+                    {((1 / m - units::math::pow<2>(rb) / J) * C2).value(),
+                     ((1 / m + units::math::pow<2>(rb) / J) * C2).value()}};
+    Matrixd<2, 2> C{{1.0, 0.0}, {0.0, 1.0}};
+    Matrixd<2, 2> D{{0.0, 0.0}, {0.0, 0.0}};
 
     return LinearSystem<2, 2, 2>(A, B, C, D);
   }

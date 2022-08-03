@@ -140,12 +140,12 @@ public final class RuntimeLoader<T> {
     } catch (UnsatisfiedLinkError ule) {
       // Then load the hash from the input file
       String resname = RuntimeDetector.getLibraryResource(m_libraryName);
-      String hash = null;
+      String hash;
       try (InputStream is = m_loadClass.getResourceAsStream(resname)) {
         if (is == null) {
           throw new IOException(getLoadErrorMessage(ule));
         }
-        MessageDigest md = null;
+        MessageDigest md;
         try {
           md = MessageDigest.getInstance("MD5");
         } catch (NoSuchAlgorithmException nsae) {

@@ -2,36 +2,43 @@ name: Gradle
 
 on: [pull_request, push]
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.head_ref || github.ref }}
+  cancel-in-progress: true
+
 jobs:
   build-docker:
     strategy:
       fail-fast: false
       matrix:
         include:
-          - container: wpilib/roborio-cross-ubuntu:2022-18.04
+          - container: wpilib/roborio-cross-ubuntu:2022-20.04
             artifact-name: Athena
             build-options: "-Ponlylinuxathena"
-          - container: wpilib/raspbian-cross-ubuntu:10-18.04
-            artifact-name: Raspbian
-            build-options: "-Ponlylinuxraspbian"
-          - container: wpilib/aarch64-cross-ubuntu:bionic-18.04
-            artifact-name: Aarch64
-            build-options: "-Ponlylinuxaarch64bionic"
-          - container: wpilib/ubuntu-base:18.04
+          - container: wpilib/raspbian-cross-ubuntu:10-20.04
+            artifact-name: Arm32
+            build-options: "-Ponlylinuxarm32"
+          - container: wpilib/aarch64-cross-ubuntu:bionic-20.04
+            artifact-name: Arm64
+            build-options: "-Ponlylinuxarm64"
+          - container: wpilib/ubuntu-base:20.04
             artifact-name: Linux
-            build-options: "-Dorg.gradle.jvmargs=-Xmx2g"
+            build-options: "-Ponlylinuxx86-64"
     name: "Build - ${{ matrix.artifact-name }}"
     runs-on: ubuntu-latest
     container: ${{ matrix.container }}
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           fetch-depth: 0
       - name: Set release environment variable
         run: echo "EXTRA_GRADLE_ARGS=-PreleaseMode" >> $GITHUB_ENV
         if: startsWith(github.ref, 'refs/tags/v')
       - name: Build with Gradle
-        run: ./gradlew build -PbuildServer -PskipJavaFormat ${{ matrix.build-options }} ${{ env.EXTRA_GRADLE_ARGS }}
+        run: ./gradlew build --build-cache -PbuildServer -PskipJavaFormat ${{ matrix.build-options }} ${{ env.EXTRA_GRADLE_ARGS }}
+        env:
+          ARTIFACTORY_PUBLISH_USERNAME: ${{ secrets.ARTIFACTORY_USERNAME }}
+          ARTIFACTORY_PUBLISH_PASSWORD: ${{ secrets.ARTIFACTORY_PASSWORD }}
       - uses: actions/upload-artifact@v2
         with:
           name: ${{ matrix.artifact-name }}
@@ -44,19 +51,25 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - os: windows-latest
-            artifact-name: Win64
+          - os: windows-2019
+            artifact-name: Win64Debug
             architecture: x64
-          - os: windows-latest
-            artifact-name: Win32
-            architecture: x86
-          - os: macos-latest
+            task: "build"
+            build-options: "-PciDebugOnly --max-workers 1"
+          - os: windows-2019
+            artifact-name: Win64Release
+            architecture: x64
+            build-options: "-PciReleaseOnly --max-workers 1"
+            task: "copyAllOutputs"
+          - os: macOS-11
             artifact-name: macOS
             architecture: x64
+            build-options: "-Pbuildalldesktop"
+            task: "build"
     name: "Build - ${{ matrix.artifact-name }}"
     runs-on: ${{ matrix.os }}
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           fetch-depth: 0
       - uses: actions/setup-java@v1
@@ -82,9 +95,12 @@ jobs:
         shell: bash
         if: startsWith(github.ref, 'refs/tags/v')
       - name: Build with Gradle
-        run: ./gradlew build -PbuildServer -PskipJavaFormat ${{ env.EXTRA_GRADLE_ARGS }}
+        run: ./gradlew ${{ matrix.task }} --build-cache -PbuildServer -PskipJavaFormat ${{ matrix.build-options }} ${{ env.EXTRA_GRADLE_ARGS }}
+        env:
+          ARTIFACTORY_PUBLISH_USERNAME: ${{ secrets.ARTIFACTORY_USERNAME }}
+          ARTIFACTORY_PUBLISH_PASSWORD: ${{ secrets.ARTIFACTORY_PASSWORD }}
       - name: Sign Libraries with Developer ID
-        run: ./gradlew build -PbuildServer -PskipJavaFormat -PdeveloperID=${{ secrets.APPLE_DEVELOPER_ID }} ${{ env.EXTRA_GRADLE_ARGS }}
+        run: ./gradlew build -PbuildServer -PskipJavaFormat -PdeveloperID=${{ secrets.APPLE_DEVELOPER_ID }} ${{ matrix.build-options }} ${{ env.EXTRA_GRADLE_ARGS }}
         if: |
           matrix.artifact-name == 'macOS' && (github.repository_owner == 'wpilibsuite' &&
           (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v')))
@@ -97,7 +113,7 @@ jobs:
     name: "Build - Documentation"
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           fetch-depth: 0
       - uses: actions/setup-java@v1
@@ -109,7 +125,10 @@ jobs:
         run: echo "EXTRA_GRADLE_ARGS=-PreleaseMode" >> $GITHUB_ENV
         if: startsWith(github.ref, 'refs/tags/v')
       - name: Build with Gradle
-        run: ./gradlew docs:zipDocs -PbuildServer ${{ env.EXTRA_GRADLE_ARGS }}
+        run: ./gradlew docs:zipDocs --build-cache -PbuildServer ${{ env.EXTRA_GRADLE_ARGS }}
+        env:
+          ARTIFACTORY_PUBLISH_USERNAME: ${{ secrets.ARTIFACTORY_USERNAME }}
+          ARTIFACTORY_PUBLISH_PASSWORD: ${{ secrets.ARTIFACTORY_PASSWORD }}
       - uses: actions/upload-artifact@v2
         with:
           name: Documentation
@@ -120,7 +139,7 @@ jobs:
     needs: [build-docker, build-host, build-documentation]
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           repository: wpilibsuite/build-tools
       - uses: actions/download-artifact@v2

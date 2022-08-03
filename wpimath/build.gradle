@@ -9,12 +9,30 @@ ext {
 
     nativeName = 'wpimath'
     devMain = 'edu.wpi.first.math.DevMain'
+
+    splitSetup = {
+        it.sources {
+            drakeCpp(CppSourceSet) {
+                source {
+                    srcDirs 'src/main/native/thirdparty/drake/src'
+                    include '**/*.cpp'
+                }
+                exportedHeaders {
+                    srcDirs 'src/main/native/thirdparty/drake/include',
+                            'src/main/native/thirdparty/eigen/include'
+                }
+            }
+        }
+    }
 }
 
 apply from: "${rootDir}/shared/jni/setupBuild.gradle"
 
 cppHeadersZip {
-    from('src/main/native/eigeninclude') {
+    from('src/main/native/thirdparty/drake/include') {
+        into '/'
+    }
+    from('src/main/native/thirdparty/eigen/include') {
         into '/'
     }
 }
@@ -24,7 +42,9 @@ model {
         all {
             it.sources.each {
                 it.exportedHeaders {
-                    srcDirs 'src/main/native/include', 'src/main/native/eigeninclude'
+                    srcDirs 'src/main/native/include',
+                            'src/main/native/thirdparty/drake/include',
+                            'src/main/native/thirdparty/eigen/include'
                 }
             }
         }
@@ -32,10 +52,10 @@ model {
 }
 
 dependencies {
-    api "org.ejml:ejml-simple:0.38"
-    api "com.fasterxml.jackson.core:jackson-annotations:2.10.0"
-    api "com.fasterxml.jackson.core:jackson-core:2.10.0"
-    api "com.fasterxml.jackson.core:jackson-databind:2.10.0"
+    api "org.ejml:ejml-simple:0.41"
+    api "com.fasterxml.jackson.core:jackson-annotations:2.12.4"
+    api "com.fasterxml.jackson.core:jackson-core:2.12.4"
+    api "com.fasterxml.jackson.core:jackson-databind:2.12.4"
 }
 
 def wpilibNumberFileInput = file("src/generate/GenericNumber.java.jinja")

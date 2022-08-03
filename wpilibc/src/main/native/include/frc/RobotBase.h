@@ -11,7 +11,6 @@
 #include <hal/HALBase.h>
 #include <hal/Main.h>
 #include <wpi/condition_variable.h>
-#include <wpi/deprecated.h>
 #include <wpi/mutex.h>
 
 #include "frc/Errors.h"
@@ -156,28 +155,8 @@ class RobotBase {
    *
    * @return True if the robot is currently operating in Tele-Op mode as
    *         determined by the field controls.
-   * @deprecated Use IsTeleop() instead.
-   */
-  WPI_DEPRECATED("Use IsTeleop() instead")
-  bool IsOperatorControl() const;
-
-  /**
-   * Determine if the robot is currently in Operator Control mode.
-   *
-   * @return True if the robot is currently operating in Tele-Op mode as
-   *         determined by the field controls.
    */
   bool IsTeleop() const;
-
-  /**
-   * Determine if the robot is current in Operator Control mode and enabled.
-   *
-   * @return True if the robot is currently operating in Tele-Op mode while
-   *         enabled as determined by the field-controls.
-   * @deprecated Use IsTeleopEnabled() instead.
-   */
-  WPI_DEPRECATED("Use IsTeleopEnabled() instead")
-  bool IsOperatorControlEnabled() const;
 
   /**
    * Determine if the robot is current in Operator Control mode and enabled.

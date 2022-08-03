@@ -4,13 +4,19 @@
 
 package edu.wpi.first.wpilibj2.command;
 
+import static edu.wpi.first.util.ErrorMessages.requireNonNullParam;
+
 import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.util.sendable.SendableRegistry;
 import java.util.HashSet;
 import java.util.Set;
 
-/** A {@link Sendable} base class for {@link Command}s. */
+/**
+ * A {@link Sendable} base class for {@link Command}s.
+ *
+ * <p>This class is provided by the NewCommands VendorDep
+ */
 public abstract class CommandBase implements Sendable, Command {
   protected Set<Subsystem> m_requirements = new HashSet<>();
 
@@ -25,7 +31,9 @@ public abstract class CommandBase implements Sendable, Command {
    * @param requirements the requirements to add
    */
   public final void addRequirements(Subsystem... requirements) {
-    m_requirements.addAll(Set.of(requirements));
+    for (Subsystem requirement : requirements) {
+      m_requirements.add(requireNonNullParam(requirement, "requirement", "addRequirements"));
+    }
   }
 
   @Override

@@ -29,8 +29,10 @@ extern "C" {
 typedef int NT_Bool;
 
 typedef unsigned int NT_Handle;
+typedef NT_Handle NT_ConnectionDataLogger;
 typedef NT_Handle NT_ConnectionListener;
 typedef NT_Handle NT_ConnectionListenerPoller;
+typedef NT_Handle NT_DataLogger;
 typedef NT_Handle NT_Entry;
 typedef NT_Handle NT_EntryListener;
 typedef NT_Handle NT_EntryListenerPoller;

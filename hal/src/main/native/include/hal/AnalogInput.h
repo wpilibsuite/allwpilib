@@ -46,7 +46,7 @@ void HAL_FreeAnalogInputPort(HAL_AnalogInputHandle analogPortHandle);
 HAL_Bool HAL_CheckAnalogModule(int32_t module);
 
 /**
- * Checks that the analog output channel number is value.
+ * Checks that the analog output channel number is valid.
  * Verifies that the analog channel number is one of the legal channel numbers.
  * Channel numbers are 0-based.
  *

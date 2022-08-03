@@ -7,7 +7,7 @@
 #include <wpi/SymbolExports.h>
 #include <wpi/array.h>
 
-#include "Eigen/Core"
+#include "frc/EigenCore.h"
 #include "frc/spline/Spline.h"
 
 namespace frc {
@@ -40,48 +40,45 @@ class WPILIB_DLLEXPORT QuinticHermiteSpline : public Spline<5> {
    * Returns the coefficients matrix.
    * @return The coefficients matrix.
    */
-  Eigen::Matrix<double, 6, 6> Coefficients() const override {
-    return m_coefficients;
-  }
+  Matrixd<6, 6> Coefficients() const override { return m_coefficients; }
 
  private:
-  Eigen::Matrix<double, 6, 6> m_coefficients =
-      Eigen::Matrix<double, 6, 6>::Zero();
+  Matrixd<6, 6> m_coefficients = Matrixd<6, 6>::Zero();
 
   /**
    * Returns the hermite basis matrix for quintic hermite spline interpolation.
    * @return The hermite basis matrix for quintic hermite spline interpolation.
    */
-  static Eigen::Matrix<double, 6, 6> MakeHermiteBasis() {
-    // Given P(i), P'(i), P''(i), P(i+1), P'(i+1), P''(i+1), the control
-    // vectors, we want to find the coefficients of the spline
-    // P(t) = a5 * t^5 + a4 * t^4 + a3 * t^3 + a2 * t^2 + a1 * t + a0.
+  static Matrixd<6, 6> MakeHermiteBasis() {
+    // Given P(i), P'(i), P"(i), P(i+1), P'(i+1), P"(i+1), the control vectors,
+    // we want to find the coefficients of the spline
+    // P(t) = a₅t⁵ + a₄t⁴ + a₃t³ + a₂t² + a₁t + a₀.
     //
-    // P(i)     = P(0)   = a0
-    // P'(i)    = P'(0)  = a1
-    // P''(i)   = P''(0) = 2 * a2
-    // P(i+1)   = P(1)   = a5 + a4 + a3 + a2 + a1 + a0
-    // P'(i+1)  = P'(1)  = 5 * a5 + 4 * a4 + 3 * a3 + 2 * a2 + a1
-    // P''(i+1) = P''(1) = 20 * a5 + 12 * a4 + 6 * a3 + 2 * a2
+    // P(i)    = P(0)  = a₀
+    // P'(i)   = P'(0) = a₁
+    // P''(i)  = P"(0) = 2a₂
+    // P(i+1)  = P(1)  = a₅ + a₄ + a₃ + a₂ + a₁ + a₀
+    // P'(i+1) = P'(1) = 5a₅ + 4a₄ + 3a₃ + 2a₂ + a₁
+    // P"(i+1) = P"(1) = 20a₅ + 12a₄ + 6a₃ + 2a₂
     //
-    // [ P(i)     ] = [  0  0  0  0  0  1 ][ a5 ]
-    // [ P'(i)    ] = [  0  0  0  0  1  0 ][ a4 ]
-    // [ P''(i)   ] = [  0  0  0  2  0  0 ][ a3 ]
-    // [ P(i+1)   ] = [  1  1  1  1  1  1 ][ a2 ]
-    // [ P'(i+1)  ] = [  5  4  3  2  1  0 ][ a1 ]
-    // [ P''(i+1) ] = [ 20 12  6  2  0  0 ][ a0 ]
+    // [P(i)   ] = [ 0  0  0  0  0  1][a₅]
+    // [P'(i)  ] = [ 0  0  0  0  1  0][a₄]
+    // [P"(i)  ] = [ 0  0  0  2  0  0][a₃]
+    // [P(i+1) ] = [ 1  1  1  1  1  1][a₂]
+    // [P'(i+1)] = [ 5  4  3  2  1  0][a₁]
+    // [P"(i+1)] = [20 12  6  2  0  0][a₀]
     //
     // To solve for the coefficients, we can invert the 6x6 matrix and move it
     // to the other side of the equation.
     //
-    // [ a5 ] = [  -6.0  -3.0  -0.5   6.0  -3.0   0.5 ][ P(i)     ]
-    // [ a4 ] = [  15.0   8.0   1.5 -15.0   7.0  -1.0 ][ P'(i)    ]
-    // [ a3 ] = [ -10.0  -6.0  -1.5  10.0  -4.0   0.5 ][ P''(i)   ]
-    // [ a2 ] = [   0.0   0.0   0.5   0.0   0.0   0.0 ][ P(i+1)   ]
-    // [ a1 ] = [   0.0   1.0   0.0   0.0   0.0   0.0 ][ P'(i+1)  ]
-    // [ a0 ] = [   1.0   0.0   0.0   0.0   0.0   0.0 ][ P''(i+1) ]
+    // [a₅] = [ -6.0  -3.0  -0.5   6.0  -3.0   0.5][P(i)   ]
+    // [a₄] = [ 15.0   8.0   1.5 -15.0   7.0  -1.0][P'(i)  ]
+    // [a₃] = [-10.0  -6.0  -1.5  10.0  -4.0   0.5][P"(i)  ]
+    // [a₂] = [  0.0   0.0   0.5   0.0   0.0   0.0][P(i+1) ]
+    // [a₁] = [  0.0   1.0   0.0   0.0   0.0   0.0][P'(i+1)]
+    // [a₀] = [  1.0   0.0   0.0   0.0   0.0   0.0][P"(i+1)]
 
-    static const Eigen::Matrix<double, 6, 6> basis{
+    static const Matrixd<6, 6> basis{
         {-06.0, -03.0, -00.5, +06.0, -03.0, +00.5},
         {+15.0, +08.0, +01.5, -15.0, +07.0, -01.0},
         {-10.0, -06.0, -01.5, +10.0, -04.0, +00.5},
@@ -100,11 +97,10 @@ class WPILIB_DLLEXPORT QuinticHermiteSpline : public Spline<5> {
    *
    * @return The control vector matrix for a dimension.
    */
-  static Eigen::Vector<double, 6> ControlVectorFromArrays(
-      wpi::array<double, 3> initialVector, wpi::array<double, 3> finalVector) {
-    return Eigen::Vector<double, 6>{initialVector[0], initialVector[1],
-                                    initialVector[2], finalVector[0],
-                                    finalVector[1],   finalVector[2]};
+  static Vectord<6> ControlVectorFromArrays(wpi::array<double, 3> initialVector,
+                                            wpi::array<double, 3> finalVector) {
+    return Vectord<6>{initialVector[0], initialVector[1], initialVector[2],
+                      finalVector[0],   finalVector[1],   finalVector[2]};
   }
 };
 }  // namespace frc

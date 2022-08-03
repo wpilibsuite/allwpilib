@@ -13,18 +13,7 @@
 
 namespace frc {
 
-#if defined(_MSC_VER)
-#pragma warning(push)
-#pragma warning(disable : 4996)  // was declared deprecated
-#elif defined(__clang__)
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wdeprecated-declarations"
-#elif defined(__GNUC__)
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-
-class SpeedController;
+class MotorController;
 
 /**
  * A class for driving differential drive/skid-steer drive platforms such as
@@ -81,9 +70,8 @@ class SpeedController;
  * |       |
  * </pre>
  *
- * Each Drive() function provides different inverse kinematic relations for a
- * differential drive robot. Motor outputs for the right side are negated, so
- * motor direction inversion by the user is usually unnecessary.
+ * Each drive function provides different inverse kinematic relations for a
+ * differential drive robot.
  *
  * This library uses the NED axes convention (North-East-Down as external
  * reference in the world frame):
@@ -96,11 +84,20 @@ class SpeedController;
  * Inputs smaller then 0.02 will be set to 0, and larger values will be scaled
  * so that the full range is still used. This deadband value can be changed
  * with SetDeadband().
+ *
+ * MotorSafety is enabled by default. The tankDrive, arcadeDrive,
+ * or curvatureDrive methods should be called periodically to avoid Motor
+ * Safety timeouts.
  */
 class DifferentialDrive : public RobotDriveBase,
                           public wpi::Sendable,
                           public wpi::SendableHelper<DifferentialDrive> {
  public:
+  /**
+   * Wheel speeds for a differential drive.
+   *
+   * Uses normalized voltage [-1.0..1.0].
+   */
   struct WheelSpeeds {
     double left = 0.0;
     double right = 0.0;
@@ -112,7 +109,7 @@ class DifferentialDrive : public RobotDriveBase,
    * To pass multiple motors per side, use a MotorControllerGroup. If a motor
    * needs to be inverted, do so before passing it in.
    */
-  DifferentialDrive(SpeedController& leftMotor, SpeedController& rightMotor);
+  DifferentialDrive(MotorController& leftMotor, MotorController& rightMotor);
 
   ~DifferentialDrive() override = default;
 
@@ -142,10 +139,11 @@ class DifferentialDrive : public RobotDriveBase,
    *
    * @param xSpeed           The robot's speed along the X axis [-1.0..1.0].
    *                         Forward is positive.
-   * @param zRotation        The robot's rotation rate around the Z axis
-   *                         [-1.0..1.0]. Clockwise is positive.
+   * @param zRotation        The normalized curvature [-1.0..1.0]. Clockwise is
+   *                         positive.
    * @param allowTurnInPlace If set, overrides constant-curvature turning for
-   *                         turn-in-place maneuvers.
+   *                         turn-in-place maneuvers. zRotation will control
+   *                         turning rate instead of curvature.
    */
   void CurvatureDrive(double xSpeed, double zRotation, bool allowTurnInPlace);
 
@@ -171,6 +169,7 @@ class DifferentialDrive : public RobotDriveBase,
    * @param zRotation    The rotation rate of the robot around the Z axis
    *                     [-1.0..1.0]. Clockwise is positive.
    * @param squareInputs If set, decreases the input sensitivity at low speeds.
+   * @return Wheel speeds [-1.0..1.0].
    */
   static WheelSpeeds ArcadeDriveIK(double xSpeed, double zRotation,
                                    bool squareInputs = true);
@@ -184,10 +183,12 @@ class DifferentialDrive : public RobotDriveBase,
    *
    * @param xSpeed           The robot's speed along the X axis [-1.0..1.0].
    *                         Forward is positive.
-   * @param zRotation        The robot's rotation rate around the Z axis
-   *                         [-1.0..1.0]. Clockwise is positive.
+   * @param zRotation        The normalized curvature [-1.0..1.0]. Clockwise is
+   *                         positive.
    * @param allowTurnInPlace If set, overrides constant-curvature turning for
-   *                         turn-in-place maneuvers.
+   *                         turn-in-place maneuvers. zRotation will control
+   *                         turning rate instead of curvature.
+   * @return Wheel speeds [-1.0..1.0].
    */
   static WheelSpeeds CurvatureDriveIK(double xSpeed, double zRotation,
                                       bool allowTurnInPlace);
@@ -200,6 +201,7 @@ class DifferentialDrive : public RobotDriveBase,
    * @param rightSpeed   The robot right side's speed along the X axis
    *                     [-1.0..1.0]. Forward is positive.
    * @param squareInputs If set, decreases the input sensitivity at low speeds.
+   * @return Wheel speeds [-1.0..1.0].
    */
   static WheelSpeeds TankDriveIK(double leftSpeed, double rightSpeed,
                                  bool squareInputs = true);
@@ -210,16 +212,8 @@ class DifferentialDrive : public RobotDriveBase,
   void InitSendable(wpi::SendableBuilder& builder) override;
 
  private:
-  SpeedController* m_leftMotor;
-  SpeedController* m_rightMotor;
+  MotorController* m_leftMotor;
+  MotorController* m_rightMotor;
 };
-
-#if defined(_MSC_VER)
-#pragma warning(pop)
-#elif defined(__clang__)
-#pragma clang diagnostic pop
-#elif defined(__GNUC__)
-#pragma GCC diagnostic pop
-#endif
 
 }  // namespace frc

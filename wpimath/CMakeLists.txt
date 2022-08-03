@@ -13,26 +13,26 @@ if (WITH_JAVA)
   include(UseJava)
   set(CMAKE_JAVA_COMPILE_FLAGS "-encoding" "UTF8" "-Xlint:unchecked")
 
-  if(NOT EXISTS "${WPILIB_BINARY_DIR}/wpimath/thirdparty/ejml/ejml-simple-0.38.jar")
+  if(NOT EXISTS "${WPILIB_BINARY_DIR}/wpimath/thirdparty/ejml/ejml-simple-0.41.jar")
       set(BASE_URL "https://search.maven.org/remotecontent?filepath=")
       set(JAR_ROOT "${WPILIB_BINARY_DIR}/wpimath/thirdparty/ejml")
 
       message(STATUS "Downloading EJML jarfiles...")
 
-      file(DOWNLOAD "${BASE_URL}org/ejml/ejml-cdense/0.38/ejml-cdense-0.38.jar"
-          "${JAR_ROOT}/ejml-cdense-0.38.jar")
-      file(DOWNLOAD "${BASE_URL}org/ejml/ejml-core/0.38/ejml-core-0.38.jar"
-          "${JAR_ROOT}/ejml-core-0.38.jar")
-      file(DOWNLOAD "${BASE_URL}org/ejml/ejml-ddense/0.38/ejml-ddense-0.38.jar"
-          "${JAR_ROOT}/ejml-ddense-0.38.jar")
-      file(DOWNLOAD "${BASE_URL}org/ejml/ejml-dsparse/0.38/ejml-dsparse-0.38.jar"
-          "${JAR_ROOT}/ejml-dsparse-0.38.jar")
-      file(DOWNLOAD "${BASE_URL}org/ejml/ejml-fdense/0.38/ejml-fdense-0.38.jar"
-          "${JAR_ROOT}/ejml-fdense-0.38.jar")
-      file(DOWNLOAD "${BASE_URL}org/ejml/ejml-simple/0.38/ejml-simple-0.38.jar"
-          "${JAR_ROOT}/ejml-simple-0.38.jar")
-      file(DOWNLOAD "${BASE_URL}org/ejml/ejml-zdense/0.38/ejml-zdense-0.38.jar"
-          "${JAR_ROOT}/ejml-zdense-0.38.jar")
+      file(DOWNLOAD "${BASE_URL}org/ejml/ejml-cdense/0.41/ejml-cdense-0.41.jar"
+          "${JAR_ROOT}/ejml-cdense-0.41.jar")
+      file(DOWNLOAD "${BASE_URL}org/ejml/ejml-core/0.41/ejml-core-0.41.jar"
+          "${JAR_ROOT}/ejml-core-0.41.jar")
+      file(DOWNLOAD "${BASE_URL}org/ejml/ejml-ddense/0.41/ejml-ddense-0.41.jar"
+          "${JAR_ROOT}/ejml-ddense-0.41.jar")
+      file(DOWNLOAD "${BASE_URL}org/ejml/ejml-dsparse/0.41/ejml-dsparse-0.41.jar"
+          "${JAR_ROOT}/ejml-dsparse-0.41.jar")
+      file(DOWNLOAD "${BASE_URL}org/ejml/ejml-fdense/0.41/ejml-fdense-0.41.jar"
+          "${JAR_ROOT}/ejml-fdense-0.41.jar")
+      file(DOWNLOAD "${BASE_URL}org/ejml/ejml-simple/0.41/ejml-simple-0.41.jar"
+          "${JAR_ROOT}/ejml-simple-0.41.jar")
+      file(DOWNLOAD "${BASE_URL}org/ejml/ejml-zdense/0.41/ejml-zdense-0.41.jar"
+          "${JAR_ROOT}/ejml-zdense-0.41.jar")
 
       message(STATUS "All files downloaded.")
   endif()
@@ -89,7 +89,8 @@ if (WITH_JAVA)
 
 endif()
 
-file(GLOB_RECURSE wpimath_native_src src/main/native/cpp/*.cpp)
+file(GLOB_RECURSE wpimath_native_src src/main/native/cpp/*.cpp
+                                     src/main/native/thirdparty/drake/src/*.cpp)
 list(REMOVE_ITEM wpimath_native_src ${wpimath_jni_src})
 
 set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS FALSE)
@@ -108,9 +109,11 @@ wpilib_target_warnings(wpimath)
 target_link_libraries(wpimath wpiutil)
 
 if (NOT USE_VCPKG_EIGEN)
-    install(DIRECTORY src/main/native/eigeninclude/ DESTINATION "${include_dest}/wpimath")
+    install(DIRECTORY src/main/native/thirdparty/drake/include/ DESTINATION "${include_dest}/wpimath")
+    install(DIRECTORY src/main/native/thirdparty/eigen/include/ DESTINATION "${include_dest}/wpimath")
     target_include_directories(wpimath SYSTEM PUBLIC
-                            $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/eigeninclude>
+                            $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/thirdparty/drake/include>
+                            $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/thirdparty/eigen/include>
                             $<INSTALL_INTERFACE:${include_dest}/wpimath>)
 else()
     find_package(Eigen3 CONFIG REQUIRED)

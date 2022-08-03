@@ -15,7 +15,7 @@ import edu.wpi.first.math.numbers.N4;
 import org.ejml.data.SingularMatrixException;
 import org.junit.jupiter.api.Test;
 
-public class MatrixTest {
+class MatrixTest {
   @Test
   void testMatrixMultiplication() {
     var mat1 = Matrix.mat(Nat.N2(), Nat.N2()).fill(2.0, 1.0, 0.0, 1.0);

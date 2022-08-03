@@ -8,8 +8,8 @@
 
 #include <DSCommJoystickPacket.h>
 #include <hal/simulation/DriverStationData.h>
-#include <wpi/raw_uv_ostream.h>
 #include <wpi/span.h>
+#include <wpinet/raw_uv_ostream.h>
 
 class DSCommPacketTest;
 
@@ -66,7 +66,7 @@ class DSCommPacket {
   HAL_AllianceStationID m_alliance_station;
   HAL_MatchInfo matchInfo;
   std::array<DSCommJoystickPacket, HAL_kMaxJoysticks> m_joystick_packets;
-  double m_match_time;
+  double m_match_time = -1;
 };
 
 }  // namespace halsim

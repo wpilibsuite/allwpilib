@@ -22,13 +22,23 @@ class PneumaticHub : public PneumaticsBase {
 
   bool GetCompressor() const override;
 
-  void SetClosedLoopControl(bool enabled) override;
+  void DisableCompressor() override;
 
-  bool GetClosedLoopControl() const override;
+  void EnableCompressorDigital() override;
+
+  void EnableCompressorAnalog(
+      units::pounds_per_square_inch_t minPressure,
+      units::pounds_per_square_inch_t maxPressure) override;
+
+  void EnableCompressorHybrid(
+      units::pounds_per_square_inch_t minPressure,
+      units::pounds_per_square_inch_t maxPressure) override;
+
+  CompressorConfigType GetCompressorConfigType() const override;
 
   bool GetPressureSwitch() const override;
 
-  double GetCompressorCurrent() const override;
+  units::ampere_t GetCompressorCurrent() const override;
 
   void SetSolenoids(int mask, int values) override;
 
@@ -56,6 +66,70 @@ class PneumaticHub : public PneumaticsBase {
   DoubleSolenoid MakeDoubleSolenoid(int forwardChannel,
                                     int reverseChannel) override;
   Compressor MakeCompressor() override;
+
+  struct Version {
+    uint32_t FirmwareMajor;
+    uint32_t FirmwareMinor;
+    uint32_t FirmwareFix;
+    uint32_t HardwareMinor;
+    uint32_t HardwareMajor;
+    uint32_t UniqueId;
+  };
+
+  Version GetVersion() const;
+
+  struct Faults {
+    uint32_t Channel0Fault : 1;
+    uint32_t Channel1Fault : 1;
+    uint32_t Channel2Fault : 1;
+    uint32_t Channel3Fault : 1;
+    uint32_t Channel4Fault : 1;
+    uint32_t Channel5Fault : 1;
+    uint32_t Channel6Fault : 1;
+    uint32_t Channel7Fault : 1;
+    uint32_t Channel8Fault : 1;
+    uint32_t Channel9Fault : 1;
+    uint32_t Channel10Fault : 1;
+    uint32_t Channel11Fault : 1;
+    uint32_t Channel12Fault : 1;
+    uint32_t Channel13Fault : 1;
+    uint32_t Channel14Fault : 1;
+    uint32_t Channel15Fault : 1;
+    uint32_t CompressorOverCurrent : 1;
+    uint32_t CompressorOpen : 1;
+    uint32_t SolenoidOverCurrent : 1;
+    uint32_t Brownout : 1;
+    uint32_t CanWarning : 1;
+    uint32_t HardwareFault : 1;
+  };
+
+  Faults GetFaults() const;
+
+  struct StickyFaults {
+    uint32_t CompressorOverCurrent : 1;
+    uint32_t CompressorOpen : 1;
+    uint32_t SolenoidOverCurrent : 1;
+    uint32_t Brownout : 1;
+    uint32_t CanWarning : 1;
+    uint32_t CanBusOff : 1;
+    uint32_t HasReset : 1;
+  };
+
+  StickyFaults GetStickyFaults() const;
+
+  void ClearStickyFaults();
+
+  units::volt_t GetInputVoltage() const;
+
+  units::volt_t Get5VRegulatedVoltage() const;
+
+  units::ampere_t GetSolenoidsTotalCurrent() const;
+
+  units::volt_t GetSolenoidsVoltage() const;
+
+  units::volt_t GetAnalogVoltage(int channel) const override;
+
+  units::pounds_per_square_inch_t GetPressure(int channel) const override;
 
  private:
   class DataStore;

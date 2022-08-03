@@ -5,6 +5,8 @@
 #include <frc/simulation/SimHooks.h>
 
 #include "CommandTestBase.h"
+#include "frc2/command/ConditionalCommand.h"
+#include "frc2/command/EndlessCommand.h"
 #include "frc2/command/InstantCommand.h"
 #include "frc2/command/ParallelRaceGroup.h"
 #include "frc2/command/PerpetualCommand.h"
@@ -34,13 +36,12 @@ TEST_F(CommandDecoratorTest, WithTimeout) {
   frc::sim::ResumeTiming();
 }
 
-TEST_F(CommandDecoratorTest, WithInterrupt) {
+TEST_F(CommandDecoratorTest, Until) {
   CommandScheduler scheduler = GetScheduler();
 
   bool finished = false;
 
-  auto command =
-      RunCommand([] {}, {}).WithInterrupt([&finished] { return finished; });
+  auto command = RunCommand([] {}, {}).Until([&finished] { return finished; });
 
   scheduler.Schedule(&command);
 
@@ -51,6 +52,19 @@ TEST_F(CommandDecoratorTest, WithInterrupt) {
 
   scheduler.Run();
   EXPECT_FALSE(scheduler.IsScheduled(&command));
+}
+
+TEST_F(CommandDecoratorTest, IgnoringDisable) {
+  CommandScheduler scheduler = GetScheduler();
+
+  auto command = RunCommand([] {}, {}).IgnoringDisable(true);
+
+  SetDSEnabled(false);
+
+  scheduler.Schedule(command.get());
+
+  scheduler.Run();
+  EXPECT_TRUE(scheduler.IsScheduled(command.get()));
 }
 
 TEST_F(CommandDecoratorTest, BeforeStarting) {
@@ -93,7 +107,9 @@ TEST_F(CommandDecoratorTest, AndThen) {
 TEST_F(CommandDecoratorTest, Perpetually) {
   CommandScheduler scheduler = GetScheduler();
 
+  WPI_IGNORE_DEPRECATED
   auto command = InstantCommand([] {}, {}).Perpetually();
+  WPI_UNIGNORE_DEPRECATED
 
   scheduler.Schedule(&command);
 
@@ -101,4 +117,38 @@ TEST_F(CommandDecoratorTest, Perpetually) {
   scheduler.Run();
 
   EXPECT_TRUE(scheduler.IsScheduled(&command));
+}
+
+TEST_F(CommandDecoratorTest, Endlessly) {
+  CommandScheduler scheduler = GetScheduler();
+
+  auto command = InstantCommand([] {}, {}).Endlessly();
+
+  scheduler.Schedule(&command);
+
+  scheduler.Run();
+  scheduler.Run();
+
+  EXPECT_TRUE(scheduler.IsScheduled(&command));
+}
+
+TEST_F(CommandDecoratorTest, Unless) {
+  CommandScheduler scheduler = GetScheduler();
+
+  bool hasRun = false;
+  bool unlessBool = true;
+
+  auto command =
+      InstantCommand([&hasRun] { hasRun = true; }, {}).Unless([&unlessBool] {
+        return unlessBool;
+      });
+
+  scheduler.Schedule(&command);
+  scheduler.Run();
+  EXPECT_FALSE(hasRun);
+
+  unlessBool = false;
+  scheduler.Schedule(&command);
+  scheduler.Run();
+  EXPECT_TRUE(hasRun);
 }

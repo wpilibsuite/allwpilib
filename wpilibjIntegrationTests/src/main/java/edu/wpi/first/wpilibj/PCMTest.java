@@ -64,16 +64,16 @@ public class PCMTest extends AbstractComsSetup {
 
   @Before
   public void reset() {
-    pcm.setClosedLoopControl(false);
+    pcm.disableCompressor();
     fakePressureSwitch.set(false);
   }
 
   /** Test if the compressor turns on and off when the pressure switch is toggled. */
   @Test
-  public void testPressureSwitch() throws Exception {
+  public void testPressureSwitch() {
     final double range = 0.5;
     reset();
-    pcm.setClosedLoopControl(true);
+    pcm.enableCompressorDigital();
 
     // Turn on the compressor
     fakePressureSwitch.set(true);
@@ -96,7 +96,7 @@ public class PCMTest extends AbstractComsSetup {
 
   /** Test if the correct solenoids turn on and off when they should. */
   @Test
-  public void testSolenoid() throws Exception {
+  public void testSolenoid() {
     reset();
 
     Solenoid solenoid1 = new Solenoid(PneumaticsModuleType.CTREPCM, 0);
@@ -174,7 +174,7 @@ public class PCMTest extends AbstractComsSetup {
 
   /** Test if the correct solenoids turn on and off when they should. */
   @Test
-  public void testOneShot() throws Exception {
+  public void testOneShot() {
     reset();
 
     Solenoid solenoid1 = new Solenoid(PneumaticsModuleType.CTREPCM, 0);

@@ -30,12 +30,14 @@ RobotContainer::RobotContainer() {
   ConfigureButtonBindings();
 
   // Set up default drive command
+  // The left stick controls translation of the robot.
+  // Turning is controlled by the X axis of the right stick.
   m_drive.SetDefaultCommand(frc2::RunCommand(
       [this] {
         m_drive.Drive(
             units::meters_per_second_t(m_driverController.GetLeftY()),
-            units::meters_per_second_t(m_driverController.GetRightY()),
-            units::radians_per_second_t(m_driverController.GetLeftX()), false);
+            units::meters_per_second_t(m_driverController.GetLeftX()),
+            units::radians_per_second_t(m_driverController.GetRightX()), false);
       },
       {&m_drive}));
 }
@@ -84,7 +86,7 @@ frc2::Command* RobotContainer::GetAutonomousCommand() {
 
   // no auto
   return new frc2::SequentialCommandGroup(
-      std::move(swerveControllerCommand), std::move(swerveControllerCommand),
+      std::move(swerveControllerCommand),
       frc2::InstantCommand(
           [this]() {
             m_drive.Drive(units::meters_per_second_t(0),

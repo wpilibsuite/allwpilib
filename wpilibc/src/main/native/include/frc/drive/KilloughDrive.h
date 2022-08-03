@@ -15,18 +15,7 @@
 
 namespace frc {
 
-#if defined(_MSC_VER)
-#pragma warning(push)
-#pragma warning(disable : 4996)  // was declared deprecated
-#elif defined(__clang__)
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wdeprecated-declarations"
-#elif defined(__GNUC__)
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-
-class SpeedController;
+class MotorController;
 
 /**
  * A class for driving Killough drive platforms.
@@ -53,6 +42,9 @@ class SpeedController;
  * The positive X axis points ahead, the positive Y axis points right, and the
  * and the positive Z axis points down. Rotations follow the right-hand rule, so
  * clockwise rotation around the Z axis is positive.
+ *
+ * MotorSafety is enabled by default. The DriveCartesian or DrivePolar
+ * methods should be called periodically to avoid Motor Safety timeouts.
  */
 class KilloughDrive : public RobotDriveBase,
                       public wpi::Sendable,
@@ -62,6 +54,11 @@ class KilloughDrive : public RobotDriveBase,
   static constexpr double kDefaultRightMotorAngle = 120.0;
   static constexpr double kDefaultBackMotorAngle = 270.0;
 
+  /**
+   * Wheel speeds for a Killough drive.
+   *
+   * Uses normalized voltage [-1.0..1.0].
+   */
   struct WheelSpeeds {
     double left = 0.0;
     double right = 0.0;
@@ -80,8 +77,8 @@ class KilloughDrive : public RobotDriveBase,
    * @param rightMotor The motor on the right corner.
    * @param backMotor  The motor on the back corner.
    */
-  KilloughDrive(SpeedController& leftMotor, SpeedController& rightMotor,
-                SpeedController& backMotor);
+  KilloughDrive(MotorController& leftMotor, MotorController& rightMotor,
+                MotorController& backMotor);
 
   /**
    * Construct a Killough drive with the given motors.
@@ -98,8 +95,8 @@ class KilloughDrive : public RobotDriveBase,
    * @param backMotorAngle  The angle of the back wheel's forward direction of
    *                        travel.
    */
-  KilloughDrive(SpeedController& leftMotor, SpeedController& rightMotor,
-                SpeedController& backMotor, double leftMotorAngle,
+  KilloughDrive(MotorController& leftMotor, MotorController& rightMotor,
+                MotorController& backMotor, double leftMotorAngle,
                 double rightMotorAngle, double backMotorAngle);
 
   ~KilloughDrive() override = default;
@@ -154,6 +151,7 @@ class KilloughDrive : public RobotDriveBase,
    *                  Clockwise is positive.
    * @param gyroAngle The current angle reading from the gyro in degrees around
    *                  the Z axis. Use this to implement field-oriented controls.
+   * @return Wheel speeds [-1.0..1.0].
    */
   WheelSpeeds DriveCartesianIK(double ySpeed, double xSpeed, double zRotation,
                                double gyroAngle = 0.0);
@@ -164,9 +162,9 @@ class KilloughDrive : public RobotDriveBase,
   void InitSendable(wpi::SendableBuilder& builder) override;
 
  private:
-  SpeedController* m_leftMotor;
-  SpeedController* m_rightMotor;
-  SpeedController* m_backMotor;
+  MotorController* m_leftMotor;
+  MotorController* m_rightMotor;
+  MotorController* m_backMotor;
 
   Vector2d m_leftVec;
   Vector2d m_rightVec;
@@ -174,13 +172,5 @@ class KilloughDrive : public RobotDriveBase,
 
   bool reported = false;
 };
-
-#if defined(_MSC_VER)
-#pragma warning(pop)
-#elif defined(__clang__)
-#pragma clang diagnostic pop
-#elif defined(__GNUC__)
-#pragma GCC diagnostic pop
-#endif
 
 }  // namespace frc

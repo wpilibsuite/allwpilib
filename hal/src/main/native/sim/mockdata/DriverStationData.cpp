@@ -30,7 +30,7 @@ void DriverStationData::ResetData() {
   fmsAttached.Reset(false);
   dsAttached.Reset(true);
   allianceStationId.Reset(static_cast<HAL_AllianceStationID>(0));
-  matchTime.Reset(0.0);
+  matchTime.Reset(-1.0);
 
   {
     std::scoped_lock lock(m_joystickDataMutex);

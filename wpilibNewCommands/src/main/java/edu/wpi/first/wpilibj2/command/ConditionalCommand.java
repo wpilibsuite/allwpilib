@@ -21,6 +21,8 @@ import java.util.function.BooleanSupplier;
  * scheduled individually.
  *
  * <p>As a rule, CommandGroups require the union of the requirements of their component commands.
+ *
+ * <p>This class is provided by the NewCommands VendorDep
  */
 public class ConditionalCommand extends CommandBase {
   private final Command m_onTrue;

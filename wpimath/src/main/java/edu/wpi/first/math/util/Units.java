@@ -78,6 +78,46 @@ public final class Units {
   }
 
   /**
+   * Converts given radians to rotations.
+   *
+   * @param radians The radians to convert.
+   * @return rotations Converted from radians.
+   */
+  public static double radiansToRotations(double radians) {
+    return radians / (Math.PI * 2);
+  }
+
+  /**
+   * Converts given degrees to rotations.
+   *
+   * @param degrees The degrees to convert.
+   * @return rotations Converted from degrees.
+   */
+  public static double degreesToRotations(double degrees) {
+    return degrees / 360;
+  }
+
+  /**
+   * Converts given rotations to degrees.
+   *
+   * @param rotations The rotations to convert.
+   * @return degrees Converted from rotations.
+   */
+  public static double rotationsToDegrees(double rotations) {
+    return rotations * 360;
+  }
+
+  /**
+   * Converts given rotations to radians.
+   *
+   * @param rotations The rotations to convert.
+   * @return radians Converted from rotations.
+   */
+  public static double rotationsToRadians(double rotations) {
+    return rotations * 2 * Math.PI;
+  }
+
+  /**
    * Converts rotations per minute to radians per second.
    *
    * @param rpm The rotations per minute to convert to radians per second.

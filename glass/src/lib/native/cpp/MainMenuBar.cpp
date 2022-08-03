@@ -6,7 +6,11 @@
 
 #include <cstdio>
 
+#include <imgui.h>
 #include <wpigui.h>
+
+#include "glass/Context.h"
+#include "glass/ContextInternal.h"
 
 using namespace glass;
 
@@ -24,6 +28,8 @@ void MainMenuBar::AddOptionMenu(std::function<void()> menu) {
 
 void MainMenuBar::Display() {
   ImGui::BeginMainMenuBar();
+
+  WorkspaceMenu();
 
   if (!m_optionMenus.empty()) {
     if (ImGui::BeginMenu("Options")) {
@@ -54,4 +60,47 @@ void MainMenuBar::Display() {
   ImGui::Text("%s", str);
 #endif
   ImGui::EndMainMenuBar();
+}
+
+void MainMenuBar::WorkspaceMenu() {
+  if (ImGui::BeginMenu("Workspace")) {
+    if (ImGui::MenuItem("Open...")) {
+      m_openFolder =
+          std::make_unique<pfd::select_folder>("Choose folder to open");
+    }
+    if (ImGui::MenuItem("Save As...")) {
+      m_saveFolder = std::make_unique<pfd::select_folder>("Choose save folder");
+    }
+    if (ImGui::MenuItem("Save As Global", nullptr, false,
+                        !gContext->isPlatformSaveDir)) {
+      SetStorageDir(wpi::gui::GetPlatformSaveFileDir());
+      SaveStorage();
+    }
+    ImGui::Separator();
+    if (ImGui::MenuItem("Reset")) {
+      WorkspaceReset();
+    }
+    ImGui::Separator();
+    if (ImGui::MenuItem("Exit")) {
+      wpi::gui::Exit();
+    }
+    ImGui::EndMenu();
+  }
+
+  if (m_openFolder && m_openFolder->ready(0)) {
+    auto result = m_openFolder->result();
+    if (!result.empty()) {
+      LoadStorage(result);
+    }
+    m_openFolder.reset();
+  }
+
+  if (m_saveFolder && m_saveFolder->ready(0)) {
+    auto result = m_saveFolder->result();
+    if (!result.empty()) {
+      SetStorageDir(result);
+      SaveStorage(result);
+    }
+    m_saveFolder.reset();
+  }
 }

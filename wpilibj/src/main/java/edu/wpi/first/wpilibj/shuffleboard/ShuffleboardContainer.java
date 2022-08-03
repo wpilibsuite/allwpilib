@@ -62,7 +62,7 @@ public interface ShuffleboardContainer extends ShuffleboardValue {
    * @return the layout with the given title
    * @throws NoSuchElementException if no layout has yet been defined with the given title
    */
-  ShuffleboardLayout getLayout(String title) throws NoSuchElementException;
+  ShuffleboardLayout getLayout(String title);
 
   /**
    * Adds a widget to this container to display the given sendable.
@@ -73,7 +73,7 @@ public interface ShuffleboardContainer extends ShuffleboardValue {
    * @throws IllegalArgumentException if a widget already exists in this container with the given
    *     title
    */
-  ComplexWidget add(String title, Sendable sendable) throws IllegalArgumentException;
+  ComplexWidget add(String title, Sendable sendable);
 
   /**
    * Adds a widget to this container to display the given video stream.
@@ -84,7 +84,7 @@ public interface ShuffleboardContainer extends ShuffleboardValue {
    * @throws IllegalArgumentException if a widget already exists in this container with the given
    *     title
    */
-  default ComplexWidget add(String title, VideoSource video) throws IllegalArgumentException {
+  default ComplexWidget add(String title, VideoSource video) {
     return add(title, SendableCameraWrapper.wrap(video));
   }
 
@@ -120,7 +120,21 @@ public interface ShuffleboardContainer extends ShuffleboardValue {
    *     title
    * @see #addPersistent(String, Object) add(String title, Object defaultValue)
    */
-  SimpleWidget add(String title, Object defaultValue) throws IllegalArgumentException;
+  SimpleWidget add(String title, Object defaultValue);
+
+  /**
+   * Adds a widget to this container to display a video stream.
+   *
+   * @param title the title of the widget
+   * @param cameraName the name of the streamed camera
+   * @param cameraUrls the URLs with which the dashboard can access the camera stream
+   * @return a widget to display the camera stream
+   * @throws IllegalArgumentException if a widget already exists in this container with the given
+   *     title
+   */
+  default ComplexWidget addCamera(String title, String cameraName, String... cameraUrls) {
+    return add(title, SendableCameraWrapper.wrap(cameraName, cameraUrls));
+  }
 
   /**
    * Adds a widget to this container. The widget will display the data provided by the value
@@ -133,8 +147,7 @@ public interface ShuffleboardContainer extends ShuffleboardValue {
    * @throws IllegalArgumentException if a widget already exists in this container with the given
    *     title
    */
-  SuppliedValueWidget<String> addString(String title, Supplier<String> valueSupplier)
-      throws IllegalArgumentException;
+  SuppliedValueWidget<String> addString(String title, Supplier<String> valueSupplier);
 
   /**
    * Adds a widget to this container. The widget will display the data provided by the value
@@ -147,8 +160,7 @@ public interface ShuffleboardContainer extends ShuffleboardValue {
    * @throws IllegalArgumentException if a widget already exists in this container with the given
    *     title
    */
-  SuppliedValueWidget<Double> addNumber(String title, DoubleSupplier valueSupplier)
-      throws IllegalArgumentException;
+  SuppliedValueWidget<Double> addNumber(String title, DoubleSupplier valueSupplier);
 
   /**
    * Adds a widget to this container. The widget will display the data provided by the value
@@ -161,8 +173,7 @@ public interface ShuffleboardContainer extends ShuffleboardValue {
    * @throws IllegalArgumentException if a widget already exists in this container with the given
    *     title
    */
-  SuppliedValueWidget<Boolean> addBoolean(String title, BooleanSupplier valueSupplier)
-      throws IllegalArgumentException;
+  SuppliedValueWidget<Boolean> addBoolean(String title, BooleanSupplier valueSupplier);
 
   /**
    * Adds a widget to this container. The widget will display the data provided by the value
@@ -175,8 +186,7 @@ public interface ShuffleboardContainer extends ShuffleboardValue {
    * @throws IllegalArgumentException if a widget already exists in this container with the given
    *     title
    */
-  SuppliedValueWidget<String[]> addStringArray(String title, Supplier<String[]> valueSupplier)
-      throws IllegalArgumentException;
+  SuppliedValueWidget<String[]> addStringArray(String title, Supplier<String[]> valueSupplier);
 
   /**
    * Adds a widget to this container. The widget will display the data provided by the value
@@ -189,8 +199,7 @@ public interface ShuffleboardContainer extends ShuffleboardValue {
    * @throws IllegalArgumentException if a widget already exists in this container with the given
    *     title
    */
-  SuppliedValueWidget<double[]> addDoubleArray(String title, Supplier<double[]> valueSupplier)
-      throws IllegalArgumentException;
+  SuppliedValueWidget<double[]> addDoubleArray(String title, Supplier<double[]> valueSupplier);
 
   /**
    * Adds a widget to this container. The widget will display the data provided by the value
@@ -203,8 +212,7 @@ public interface ShuffleboardContainer extends ShuffleboardValue {
    * @throws IllegalArgumentException if a widget already exists in this container with the given
    *     title
    */
-  SuppliedValueWidget<boolean[]> addBooleanArray(String title, Supplier<boolean[]> valueSupplier)
-      throws IllegalArgumentException;
+  SuppliedValueWidget<boolean[]> addBooleanArray(String title, Supplier<boolean[]> valueSupplier);
 
   /**
    * Adds a widget to this container. The widget will display the data provided by the value
@@ -217,8 +225,7 @@ public interface ShuffleboardContainer extends ShuffleboardValue {
    * @throws IllegalArgumentException if a widget already exists in this container with the given
    *     title
    */
-  SuppliedValueWidget<byte[]> addRaw(String title, Supplier<byte[]> valueSupplier)
-      throws IllegalArgumentException;
+  SuppliedValueWidget<byte[]> addRaw(String title, Supplier<byte[]> valueSupplier);
 
   /**
    * Adds a widget to this container to display a simple piece of data. Unlike {@link #add(String,
@@ -232,8 +239,7 @@ public interface ShuffleboardContainer extends ShuffleboardValue {
    *     title
    * @see #add(String, Object) add(String title, Object defaultValue)
    */
-  default SimpleWidget addPersistent(String title, Object defaultValue)
-      throws IllegalArgumentException {
+  default SimpleWidget addPersistent(String title, Object defaultValue) {
     SimpleWidget widget = add(title, defaultValue);
     widget.getEntry().setPersistent();
     return widget;

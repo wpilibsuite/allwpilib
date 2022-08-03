@@ -7,6 +7,7 @@ package edu.wpi.first.wpilibj;
 import edu.wpi.first.hal.SimBoolean;
 import edu.wpi.first.hal.SimDevice;
 import edu.wpi.first.hal.SimDouble;
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.util.sendable.SendableRegistry;
@@ -26,9 +27,12 @@ public class DutyCycleEncoder implements Sendable, AutoCloseable {
   private double m_positionOffset;
   private double m_distancePerRotation = 1.0;
   private double m_lastPosition;
+  private double m_sensorMin;
+  private double m_sensorMax = 1.0;
 
   protected SimDevice m_simDevice;
   protected SimDouble m_simPosition;
+  protected SimDouble m_simAbsolutePosition;
   protected SimDouble m_simDistancePerRotation;
   protected SimBoolean m_simIsConnected;
 
@@ -72,6 +76,8 @@ public class DutyCycleEncoder implements Sendable, AutoCloseable {
       m_simPosition = m_simDevice.createDouble("position", SimDevice.Direction.kInput, 0.0);
       m_simDistancePerRotation =
           m_simDevice.createDouble("distance_per_rot", SimDevice.Direction.kOutput, 1.0);
+      m_simAbsolutePosition =
+          m_simDevice.createDouble("absPosition", SimDevice.Direction.kInput, 0.0);
       m_simIsConnected = m_simDevice.createBoolean("connected", SimDevice.Direction.kInput, true);
     } else {
       m_counter = new Counter();
@@ -82,6 +88,23 @@ public class DutyCycleEncoder implements Sendable, AutoCloseable {
     }
 
     SendableRegistry.addLW(this, "DutyCycle Encoder", m_dutyCycle.getSourceChannel());
+  }
+
+  private double mapSensorRange(double pos) {
+    // map sensor range
+    if (pos < m_sensorMin) {
+      pos = m_sensorMin;
+    }
+    if (pos > m_sensorMax) {
+      pos = m_sensorMax;
+    }
+    pos = (pos - m_sensorMin) / (m_sensorMax - m_sensorMin);
+    return pos;
+  }
+
+  private boolean doubleEquals(double a, double b) {
+    double epsilon = 0.00001d;
+    return Math.abs(a - b) < epsilon;
   }
 
   /**
@@ -104,7 +127,9 @@ public class DutyCycleEncoder implements Sendable, AutoCloseable {
       double pos = m_dutyCycle.getOutput();
       double counter2 = m_counter.get();
       double pos2 = m_dutyCycle.getOutput();
-      if (counter == counter2 && pos == pos2) {
+      if (counter == counter2 && doubleEquals(pos, pos2)) {
+        // map sensor range
+        pos = mapSensorRange(pos);
         double position = counter + pos - m_positionOffset;
         m_lastPosition = position;
         return position;
@@ -117,16 +142,60 @@ public class DutyCycleEncoder implements Sendable, AutoCloseable {
   }
 
   /**
+   * Get the absolute position of the duty cycle encoder.
+   *
+   * <p>getAbsolutePosition() - getPositionOffset() will give an encoder absolute position relative
+   * to the last reset. This could potentially be negative, which needs to be accounted for.
+   *
+   * <p>This will not account for rollovers, and will always be just the raw absolute position.
+   *
+   * @return the absolute position
+   */
+  public double getAbsolutePosition() {
+    if (m_simAbsolutePosition != null) {
+      return m_simAbsolutePosition.get();
+    }
+
+    return mapSensorRange(m_dutyCycle.getOutput());
+  }
+
+  /**
    * Get the offset of position relative to the last reset.
    *
-   * <p>getPositionInRotation() - getPositionOffset() will give an encoder absolute position
-   * relative to the last reset. This could potentially be negative, which needs to be accounted
-   * for.
+   * <p>getAbsolutePosition() - getPositionOffset() will give an encoder absolute position relative
+   * to the last reset. This could potentially be negative, which needs to be accounted for.
    *
    * @return the position offset
    */
   public double getPositionOffset() {
     return m_positionOffset;
+  }
+
+  /**
+   * Set the position offset.
+   *
+   * <p>This must be in the range of 0-1.
+   *
+   * @param offset the offset
+   */
+  public void setPositionOffset(double offset) {
+    m_positionOffset = MathUtil.clamp(offset, 0.0, 1.0);
+  }
+
+  /**
+   * Set the encoder duty cycle range. As the encoder needs to maintain a duty cycle, the duty cycle
+   * cannot go all the way to 0% or all the way to 100%. For example, an encoder with a 4096 us
+   * period might have a minimum duty cycle of 1 us / 4096 us and a maximum duty cycle of 4095 /
+   * 4096 us. Setting the range will result in an encoder duty cycle less than or equal to the
+   * minimum being output as 0 rotation, the duty cycle greater than or equal to the maximum being
+   * output as 1 rotation, and values in between linearly scaled from 0 to 1.
+   *
+   * @param min minimum duty cycle (0-1 range)
+   * @param max maximum duty cycle (0-1 range)
+   */
+  public void setDutyCycleRange(double min, double max) {
+    m_sensorMin = MathUtil.clamp(min, 0.0, 1.0);
+    m_sensorMax = MathUtil.clamp(max, 0.0, 1.0);
   }
 
   /**

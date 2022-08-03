@@ -4,12 +4,13 @@
 
 #pragma once
 
+#include <portable-file-dialogs.h>
+
 #include <functional>
+#include <memory>
 #include <vector>
 
 namespace glass {
-
-class WindowManager;
 
 /**
  * GUI main menu bar.
@@ -20,6 +21,11 @@ class MainMenuBar {
    * Displays the main menu bar.  Should be added to GUI LateExecute.
    */
   void Display();
+
+  /**
+   * Displays workspace menu.  Called by Display().
+   */
+  void WorkspaceMenu();
 
   /**
    * Adds to GUI's main menu bar.  The menu function is called from within a
@@ -43,6 +49,8 @@ class MainMenuBar {
  private:
   std::vector<std::function<void()>> m_optionMenus;
   std::vector<std::function<void()>> m_menus;
+  std::unique_ptr<pfd::select_folder> m_openFolder;
+  std::unique_ptr<pfd::select_folder> m_saveFolder;
 };
 
 }  // namespace glass

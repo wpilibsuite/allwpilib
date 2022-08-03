@@ -1,6 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <FindBugsFilter>
   <Match>
+    <Bug pattern="DCN_NULLPOINTER_EXCEPTION" />
+    <Class name="edu.wpi.first.wpilibj.test.TestSuite" />
+  </Match>
+  <Match>
     <Bug pattern="DM_DEFAULT_ENCODING" />
   </Match>
   <Match>
@@ -14,6 +18,13 @@
   </Match>
   <Match>
     <Bug pattern="EI_EXPOSE_REP2" />
+  </Match>
+  <Match>
+    <Bug pattern="FL_FLOATS_AS_LOOP_COUNTERS" />
+  </Match>
+  <Match>
+    <Bug pattern="IS2_INCONSISTENT_SYNC" />
+    <Source name="MechanismLigament2d.java" />
   </Match>
   <Match>
     <Bug pattern="MS_CANNOT_BE_FINAL" />
@@ -62,7 +73,17 @@
     <Source name="RuntimeLoader.java" />
   </Match>
   <Match>
+    <Bug pattern="SSD_DO_NOT_USE_INSTANCE_LOCK_ON_SHARED_STATIC_DATA" />
+    <Source name="Ultrasonic.java" />
+  </Match>
+  <Match>
     <Bug pattern="ST_WRITE_TO_STATIC_FROM_INSTANCE_METHOD" />
+  </Match>
+  <Match>
+    <Bug pattern="THROWS_METHOD_THROWS_CLAUSE_THROWABLE" />
+  </Match>
+  <Match>
+    <Bug pattern="THROWS_METHOD_THROWS_RUNTIMEEXCEPTION" />
   </Match>
   <Match>
     <Bug pattern="UC_USELESS_VOID_METHOD" />
@@ -71,6 +92,14 @@
   <Match>
     <Bug pattern="UC_USELESS_VOID_METHOD" />
     <Class name="edu.wpi.first.wpilibj.templates.timed.Robot" />
+  </Match>
+  <Match>
+    <Bug pattern="URF_UNREAD_FIELD" />
+    <Class name="edu.wpi.first.wpilibj.ADIS16448_IMU" />
+  </Match>
+  <Match>
+    <Bug pattern="URF_UNREAD_FIELD" />
+    <Class name="edu.wpi.first.wpilibj.ADIS16470_IMU" />
   </Match>
   <Match>
     <Bug pattern="URF_UNREAD_PUBLIC_OR_PROTECTED_FIELD" />

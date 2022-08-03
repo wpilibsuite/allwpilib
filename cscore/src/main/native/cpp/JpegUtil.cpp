@@ -4,6 +4,7 @@
 
 #include "JpegUtil.h"
 
+#include <wpi/StringExtras.h>
 #include <wpi/raw_istream.h>
 
 namespace cs {
@@ -64,7 +65,7 @@ bool GetJpegSize(std::string_view data, int* width, int* height) {
     return false;
   }
 
-  data = data.substr(2);  // Get to the first block
+  data = wpi::substr(data, 2);  // Get to the first block
   for (;;) {
     if (data.size() < 4) {
       return false;  // EOF
@@ -89,7 +90,7 @@ bool GetJpegSize(std::string_view data, int* width, int* height) {
       return true;
     }
     // Go to the next block
-    data = data.substr(bytes[2] * 256 + bytes[3] + 2);
+    data = wpi::substr(data, bytes[2] * 256 + bytes[3] + 2);
   }
 }
 
@@ -102,7 +103,7 @@ bool JpegNeedsDHT(const char* data, size_t* size, size_t* locSOF) {
   *locSOF = *size;
 
   // Search until SOS for DHT tag
-  sdata = sdata.substr(2);  // Get to the first block
+  sdata = wpi::substr(sdata, 2);  // Get to the first block
   for (;;) {
     if (sdata.size() < 4) {
       return false;  // EOF
@@ -121,7 +122,7 @@ bool JpegNeedsDHT(const char* data, size_t* size, size_t* locSOF) {
       *locSOF = sdata.data() - data;  // SOF
     }
     // Go to the next block
-    sdata = sdata.substr(bytes[2] * 256 + bytes[3] + 2);
+    sdata = wpi::substr(sdata, bytes[2] * 256 + bytes[3] + 2);
   }
 
   // Only add DHT if we also found SOF (insertion point)

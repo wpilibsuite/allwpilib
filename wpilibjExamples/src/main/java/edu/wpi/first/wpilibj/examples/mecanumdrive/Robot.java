@@ -28,10 +28,10 @@ public class Robot extends TimedRobot {
     PWMSparkMax frontRight = new PWMSparkMax(kFrontRightChannel);
     PWMSparkMax rearRight = new PWMSparkMax(kRearRightChannel);
 
-    // Invert the left side motors.
+    // Invert the right side motors.
     // You may need to change or remove this to match your robot.
-    frontLeft.setInverted(true);
-    rearLeft.setInverted(true);
+    frontRight.setInverted(true);
+    rearRight.setInverted(true);
 
     m_robotDrive = new MecanumDrive(frontLeft, rearLeft, frontRight, rearRight);
 
@@ -42,6 +42,6 @@ public class Robot extends TimedRobot {
   public void teleopPeriodic() {
     // Use the joystick X axis for lateral movement, Y axis for forward
     // movement, and Z axis for rotation.
-    m_robotDrive.driveCartesian(m_stick.getX(), m_stick.getY(), m_stick.getZ(), 0.0);
+    m_robotDrive.driveCartesian(-m_stick.getY(), m_stick.getX(), m_stick.getZ(), 0.0);
   }
 }

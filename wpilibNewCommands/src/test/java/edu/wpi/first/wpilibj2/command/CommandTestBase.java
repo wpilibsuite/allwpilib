@@ -12,15 +12,15 @@ import edu.wpi.first.wpilibj.simulation.DriverStationSim;
 import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
 
-/** Basic setup for all {@link Command tests}." */
-public abstract class CommandTestBase {
+/** Basic setup for all {@link Command tests}. */
+public class CommandTestBase {
   protected CommandTestBase() {}
 
   @BeforeEach
   void commandSetup() {
     CommandScheduler.getInstance().cancelAll();
     CommandScheduler.getInstance().enable();
-    CommandScheduler.getInstance().clearButtons();
+    CommandScheduler.getInstance().getActiveButtonLoop().clear();
     CommandGroupBase.clearGroupedCommands();
 
     setDSEnabled(true);
@@ -41,8 +41,6 @@ public abstract class CommandTestBase {
     }
   }
 
-  public static class TestSubsystem extends SubsystemBase {}
-
   public static class MockCommandHolder {
     private final Command m_mockCommand = mock(Command.class);
 
@@ -58,26 +56,6 @@ public abstract class CommandTestBase {
 
     public void setFinished(boolean finished) {
       when(m_mockCommand.isFinished()).thenReturn(finished);
-    }
-  }
-
-  public static class Counter {
-    public int m_counter;
-
-    public void increment() {
-      m_counter++;
-    }
-  }
-
-  public static class ConditionHolder {
-    private boolean m_condition;
-
-    public void setCondition(boolean condition) {
-      m_condition = condition;
-    }
-
-    public boolean getCondition() {
-      return m_condition;
     }
   }
 }

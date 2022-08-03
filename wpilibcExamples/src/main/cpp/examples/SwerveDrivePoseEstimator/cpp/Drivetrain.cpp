@@ -16,7 +16,7 @@ void Drivetrain::Drive(units::meters_per_second_t xSpeed,
                           xSpeed, ySpeed, rot, m_gyro.GetRotation2d())
                     : frc::ChassisSpeeds{xSpeed, ySpeed, rot});
 
-  m_kinematics.NormalizeWheelSpeeds(&states, kMaxSpeed);
+  m_kinematics.DesaturateWheelSpeeds(&states, kMaxSpeed);
 
   auto [fl, fr, bl, br] = states;
 

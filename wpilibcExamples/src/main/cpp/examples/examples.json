@@ -85,6 +85,16 @@
     "commandversion": 2
   },
   {
+    "name": "EventLoop",
+    "description": "Demonstrate managing a ball system using EventLoop and BooleanEvent.",
+    "tags": [
+      "EventLoop"
+    ],
+    "foldername": "EventLoop",
+    "gradlebase": "cpp",
+    "commandversion": 2
+  },
+  {
     "name": "Arcade Drive",
     "description": "An example program which demonstrates the use of Arcade Drive with the DifferentialDrive class",
     "tags": [
@@ -260,6 +270,27 @@
     "gradlebase": "cpp",
     "commandversion": 2
   },
+  {
+    "name": "I2C Communication",
+    "description": "An example program that communicates with external devices (such as an Arduino) using the roboRIO's I2C port",
+    "tags": [
+      "I2C"
+    ],
+    "foldername": "I2CCommunication",
+    "gradlebase": "cpp",
+    "commandversion": 2
+  },
+  {
+    "name": "Digital Communication Sample",
+    "description": "An example program that communicates with external devices (such as an Arduino) using the roboRIO's DIO",
+    "tags": [
+      "Digital"
+    ],
+    "foldername": "DigitalCommunication",
+    "gradlebase": "cpp",
+    "commandversion": 2
+  },
+
   {
     "name": "Axis Camera Sample",
     "description": "An example program that acquires images from an Axis network camera and adds some annotation to the image as you might do for showing operators the result of some image recognition, and sends it to the dashboard for display. This demonstrates the use of the AxisCamera class.",
@@ -692,7 +723,8 @@
       "Sensors",
       "Simulation",
       "Physics",
-      "Mechanism2d"
+      "Mechanism2d",
+      "Preferences"
     ],
     "foldername": "ArmSimulation",
     "gradlebase": "cpp",

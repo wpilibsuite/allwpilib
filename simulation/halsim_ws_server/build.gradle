@@ -21,7 +21,7 @@ apply from: "${rootDir}/shared/plugins/setupBuild.gradle"
 model {
     testSuites {
         def comps = $.components
-        if (!project.hasProperty('onlylinuxathena') && !project.hasProperty('onlylinuxraspbian') && !project.hasProperty('onlylinuxaarch64bionic')) {
+        if (!project.hasProperty('onlylinuxathena') && !project.hasProperty('onlylinuxarm32') && !project.hasProperty('onlylinuxarm64')) {
             "${pluginName}Test"(GoogleTestTestSuiteSpec) {
                 for(NativeComponentSpec c : comps) {
                     if (c.name == pluginName) {
@@ -51,6 +51,7 @@ model {
                 return
             }
 
+            lib project: ':wpinet', library: 'wpinet', linkage: 'shared'
             lib project: ":simulation:halsim_ws_core", library: "halsim_ws_core", linkage: "static"
         }
 

@@ -18,7 +18,7 @@ using namespace frc;
 namespace {
 struct Component {
   bool firstTime = true;
-  bool telemetryEnabled = true;
+  bool telemetryEnabled = false;
 };
 
 struct Instance {
@@ -39,7 +39,7 @@ struct Instance {
 
   bool startLiveWindow = false;
   bool liveWindowEnabled = false;
-  bool telemetryEnabled = true;
+  bool telemetryEnabled = false;
 
   std::function<void()> enabled;
   std::function<void()> disabled;
@@ -48,10 +48,22 @@ struct Instance {
 };
 }  // namespace
 
-static Instance& GetInstance() {
-  static Instance instance;
+static std::unique_ptr<Instance>& GetInstanceHolder() {
+  static std::unique_ptr<Instance> instance = std::make_unique<Instance>();
   return instance;
 }
+
+static Instance& GetInstance() {
+  return *GetInstanceHolder();
+}
+
+#ifndef __FRC_ROBORIO__
+namespace frc::impl {
+void ResetLiveWindow() {
+  std::make_unique<Instance>().swap(GetInstanceHolder());
+}
+}  // namespace frc::impl
+#endif
 
 std::shared_ptr<Component> Instance::GetOrAdd(wpi::Sendable* sendable) {
   auto data = std::static_pointer_cast<Component>(
@@ -61,12 +73,6 @@ std::shared_ptr<Component> Instance::GetOrAdd(wpi::Sendable* sendable) {
     wpi::SendableRegistry::SetData(sendable, dataHandle, data);
   }
   return data;
-}
-
-LiveWindow* LiveWindow::GetInstance() {
-  ::GetInstance();
-  static LiveWindow instance;
-  return &instance;
 }
 
 void LiveWindow::SetEnabledCallback(std::function<void()> func) {

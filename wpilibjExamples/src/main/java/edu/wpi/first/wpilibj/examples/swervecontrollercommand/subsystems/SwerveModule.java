@@ -36,22 +36,26 @@ public class SwerveModule {
   /**
    * Constructs a SwerveModule.
    *
-   * @param driveMotorChannel ID for the drive motor.
-   * @param turningMotorChannel ID for the turning motor.
+   * @param driveMotorChannel The channel of the drive motor.
+   * @param turningMotorChannel The channel of the turning motor.
+   * @param driveEncoderChannels The channels of the drive encoder.
+   * @param turningEncoderChannels The channels of the turning encoder.
+   * @param driveEncoderReversed Whether the drive encoder is reversed.
+   * @param turningEncoderReversed Whether the turning encoder is reversed.
    */
   public SwerveModule(
       int driveMotorChannel,
       int turningMotorChannel,
-      int[] driveEncoderPorts,
-      int[] turningEncoderPorts,
+      int[] driveEncoderChannels,
+      int[] turningEncoderChannels,
       boolean driveEncoderReversed,
       boolean turningEncoderReversed) {
     m_driveMotor = new Spark(driveMotorChannel);
     m_turningMotor = new Spark(turningMotorChannel);
 
-    this.m_driveEncoder = new Encoder(driveEncoderPorts[0], driveEncoderPorts[1]);
+    m_driveEncoder = new Encoder(driveEncoderChannels[0], driveEncoderChannels[1]);
 
-    this.m_turningEncoder = new Encoder(turningEncoderPorts[0], turningEncoderPorts[1]);
+    m_turningEncoder = new Encoder(turningEncoderChannels[0], turningEncoderChannels[1]);
 
     // Set the distance per pulse for the drive encoder. We can simply use the
     // distance traveled for one rotation of the wheel divided by the encoder
@@ -98,7 +102,7 @@ public class SwerveModule {
         m_drivePIDController.calculate(m_driveEncoder.getRate(), state.speedMetersPerSecond);
 
     // Calculate the turning motor output from the turning PID controller.
-    final var turnOutput =
+    final double turnOutput =
         m_turningPIDController.calculate(m_turningEncoder.get(), state.angle.getRadians());
 
     // Calculate the turning motor output from the turning PID controller.
@@ -106,7 +110,7 @@ public class SwerveModule {
     m_turningMotor.set(turnOutput);
   }
 
-  /** Zeros all the SwerveModule encoders. */
+  /** Zeroes all the SwerveModule encoders. */
   public void resetEncoders() {
     m_driveEncoder.reset();
     m_turningEncoder.reset();

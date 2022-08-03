@@ -74,8 +74,8 @@ constexpr auto kMaxAcceleration = 3_mps_sq;
 
 // Reasonable baseline values for a RAMSETE follower in units of meters and
 // seconds
-constexpr double kRamseteB = 2;
-constexpr double kRamseteZeta = 0.7;
+constexpr auto kRamseteB = 2 * 1_rad * 1_rad / (1_m * 1_m);
+constexpr auto kRamseteZeta = 0.7 / 1_rad;
 }  // namespace AutoConstants
 
 namespace OIConstants {

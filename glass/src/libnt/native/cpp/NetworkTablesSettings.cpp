@@ -15,6 +15,7 @@
 #include <wpi/StringExtras.h>
 
 #include "glass/Context.h"
+#include "glass/Storage.h"
 
 using namespace glass;
 
@@ -81,15 +82,12 @@ void NetworkTablesSettings::Thread::Main() {
   }
 }
 
-NetworkTablesSettings::NetworkTablesSettings(NT_Inst inst,
-                                             const char* storageName) {
-  auto& storage = glass::GetStorage(storageName);
-  m_pMode = storage.GetIntRef("mode");
-  m_pIniName = storage.GetStringRef("iniName", "networktables.ini");
-  m_pServerTeam = storage.GetStringRef("serverTeam");
-  m_pListenAddress = storage.GetStringRef("listenAddress");
-  m_pDsClient = storage.GetBoolRef("dsClient", true);
-
+NetworkTablesSettings::NetworkTablesSettings(Storage& storage, NT_Inst inst)
+    : m_mode{storage.GetString("mode"), 0, {"Disabled", "Client", "Server"}},
+      m_iniName{storage.GetString("iniName", "networktables.ini")},
+      m_serverTeam{storage.GetString("serverTeam")},
+      m_listenAddress{storage.GetString("listenAddress")},
+      m_dsClient{storage.GetBool("dsClient", true)} {
   m_thread.Start(inst);
 }
 
@@ -102,25 +100,24 @@ void NetworkTablesSettings::Update() {
   // do actual operation on thread
   auto thr = m_thread.GetThread();
   thr->m_restart = true;
-  thr->m_mode = *m_pMode;
-  thr->m_iniName = *m_pIniName;
-  thr->m_serverTeam = *m_pServerTeam;
-  thr->m_listenAddress = *m_pListenAddress;
-  thr->m_dsClient = *m_pDsClient;
+  thr->m_mode = m_mode.GetValue();
+  thr->m_iniName = m_iniName;
+  thr->m_serverTeam = m_serverTeam;
+  thr->m_listenAddress = m_listenAddress;
+  thr->m_dsClient = m_dsClient;
   thr->m_cond.notify_one();
 }
 
 bool NetworkTablesSettings::Display() {
-  static const char* modeOptions[] = {"Disabled", "Client", "Server"};
-  ImGui::Combo("Mode", m_pMode, modeOptions, m_serverOption ? 3 : 2);
-  switch (*m_pMode) {
+  m_mode.Combo("Mode", m_serverOption ? 3 : 2);
+  switch (m_mode.GetValue()) {
     case 1:
-      ImGui::InputText("Team/IP", m_pServerTeam);
-      ImGui::Checkbox("Get Address from DS", m_pDsClient);
+      ImGui::InputText("Team/IP", &m_serverTeam);
+      ImGui::Checkbox("Get Address from DS", &m_dsClient);
       break;
     case 2:
-      ImGui::InputText("Listen Address", m_pListenAddress);
-      ImGui::InputText("ini Filename", m_pIniName);
+      ImGui::InputText("Listen Address", &m_listenAddress);
+      ImGui::InputText("ini Filename", &m_iniName);
       break;
     default:
       break;

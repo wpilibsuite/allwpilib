@@ -21,10 +21,10 @@ import java.util.List;
 import java.util.Random;
 import org.junit.jupiter.api.Test;
 
-public class DifferentialDrivePoseEstimatorTest {
+class DifferentialDrivePoseEstimatorTest {
   @SuppressWarnings("LocalVariableName")
   @Test
-  public void testAccuracy() {
+  void testAccuracy() {
     var estimator =
         new DifferentialDrivePoseEstimator(
             new Rotation2d(),
@@ -110,7 +110,7 @@ public class DifferentialDrivePoseEstimatorTest {
       t += dt;
     }
 
-    assertEquals(0.0, errorSum / (traj.getTotalTimeSeconds() / dt), 0.035, "Incorrect mean error");
-    assertEquals(0.0, maxError, 0.055, "Incorrect max error");
+    assertEquals(0.0, errorSum / (traj.getTotalTimeSeconds() / dt), 0.05, "Incorrect mean error");
+    assertEquals(0.0, maxError, 0.1, "Incorrect max error");
   }
 }

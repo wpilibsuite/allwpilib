@@ -239,33 +239,9 @@ public abstract class RobotBase implements AutoCloseable {
    * controls.
    *
    * @return True if the robot is currently operating in Tele-Op mode.
-   * @deprecated Use isTeleop() instead.
-   */
-  @Deprecated(since = "2022", forRemoval = true)
-  public boolean isOperatorControl() {
-    return DriverStation.isTeleop();
-  }
-
-  /**
-   * Determine if the robot is currently in Operator Control mode as determined by the field
-   * controls.
-   *
-   * @return True if the robot is currently operating in Tele-Op mode.
    */
   public boolean isTeleop() {
     return DriverStation.isTeleop();
-  }
-
-  /**
-   * Determine if the robot is current in Operator Control mode and enabled as determined by the
-   * field controls.
-   *
-   * @return True if the robot is currently operating in Tele-Op mode while enabled.
-   * @deprecated Use isTeleopEnabled() instead.
-   */
-  @Deprecated(since = "2022", forRemoval = true)
-  public boolean isOperatorControlEnabled() {
-    return DriverStation.isTeleopEnabled();
   }
 
   /**
@@ -313,7 +289,7 @@ public abstract class RobotBase implements AutoCloseable {
   private static boolean m_suppressExitWarning;
 
   /** Run the robot main loop. */
-  @SuppressWarnings("PMD.AvoidCatchingThrowable")
+  @SuppressWarnings({"PMD.AvoidCatchingThrowable", "PMD.AvoidReassigningCatchVariables"})
   private static <T extends RobotBase> void runRobot(Supplier<T> robotSupplier) {
     System.out.println("********** Robot program starting **********");
 

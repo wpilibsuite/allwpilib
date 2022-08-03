@@ -157,20 +157,6 @@ class WPILIB_DLLEXPORT Trajectory {
  private:
   std::vector<State> m_states;
   units::second_t m_totalTime = 0_s;
-
-  /**
-   * Linearly interpolates between two values.
-   *
-   * @param startValue The start value.
-   * @param endValue The end value.
-   * @param t The fraction for interpolation.
-   *
-   * @return The interpolated value.
-   */
-  template <typename T>
-  static T Lerp(const T& startValue, const T& endValue, const double t) {
-    return startValue + (endValue - startValue) * t;
-  }
 };
 
 WPILIB_DLLEXPORT

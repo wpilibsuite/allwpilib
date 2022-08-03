@@ -11,7 +11,9 @@
 #include <wpigui.h>
 
 #include "glass/Context.h"
+#include "glass/MainMenuBar.h"
 #include "glass/Model.h"
+#include "glass/Storage.h"
 #include "glass/networktables/NetworkTables.h"
 #include "glass/networktables/NetworkTablesSettings.h"
 #include "glass/other/Log.h"
@@ -34,6 +36,7 @@ static std::unique_ptr<glass::NetworkTablesModel> gModel;
 static std::unique_ptr<glass::NetworkTablesSettings> gSettings;
 static glass::LogData gLog;
 static glass::NetworkTablesFlagsSettings gFlagsSettings;
+static glass::MainMenuBar gMainMenu;
 
 static void NtInitialize() {
   // update window title when connection status changes
@@ -87,7 +90,8 @@ static void NtInitialize() {
   gui::AddEarlyExecute([] { gModel->Update(); });
 
   // NetworkTables settings window
-  gSettings = std::make_unique<glass::NetworkTablesSettings>();
+  gSettings = std::make_unique<glass::NetworkTablesSettings>(
+      glass::GetStorageRoot().GetChild("NetworkTables Settings"));
   gui::AddEarlyExecute([] { gSettings->Update(); });
 }
 
@@ -114,6 +118,7 @@ static void DisplayGui() {
 
   // main menu
   ImGui::BeginMenuBar();
+  gMainMenu.WorkspaceMenu();
   gui::EmitViewMenu();
   if (ImGui::BeginMenu("View")) {
     gFlagsSettings.DisplayMenu();
@@ -179,6 +184,8 @@ static void DisplayGui() {
     ImGui::Text("OutlineViewer");
     ImGui::Separator();
     ImGui::Text("v%s", GetWPILibVersion());
+    ImGui::Separator();
+    ImGui::Text("Save location: %s", glass::GetStorageDir().c_str());
     if (ImGui::Button("Close")) {
       ImGui::CloseCurrentPopup();
     }
@@ -194,9 +201,16 @@ static void DisplayGui() {
 #ifdef _WIN32
 int __stdcall WinMain(void* hInstance, void* hPrevInstance, char* pCmdLine,
                       int nCmdShow) {
+  int argc = __argc;
+  char** argv = __argv;
 #else
-int main() {
+int main(int argc, char** argv) {
 #endif
+  std::string_view saveDir;
+  if (argc == 2) {
+    saveDir = argv[1];
+  }
+
   gui::CreateContext();
   glass::CreateContext();
 
@@ -208,7 +222,10 @@ int main() {
   gui::AddIcon(ov::GetResource_ov_256_png());
   gui::AddIcon(ov::GetResource_ov_512_png());
 
-  gui::ConfigurePlatformSaveFile("outlineviewer.ini");
+  glass::SetStorageName("outlineviewer");
+  glass::SetStorageDir(saveDir.empty() ? gui::GetPlatformSaveFileDir()
+                                       : saveDir);
+
   gui::AddInit(NtInitialize);
 
   gui::AddLateExecute(DisplayGui);
@@ -221,4 +238,6 @@ int main() {
 
   glass::DestroyContext();
   gui::DestroyContext();
+
+  return 0;
 }

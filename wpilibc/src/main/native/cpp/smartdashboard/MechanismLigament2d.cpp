@@ -21,7 +21,6 @@ MechanismLigament2d::MechanismLigament2d(std::string_view name, double length,
 
 void MechanismLigament2d::UpdateEntries(
     std::shared_ptr<nt::NetworkTable> table) {
-  std::scoped_lock lock(m_mutex);
   table->GetEntry(".type").SetString("line");
 
   m_colorEntry = table->GetEntry("color");
@@ -50,7 +49,20 @@ void MechanismLigament2d::SetLineWeight(double lineWidth) {
   Flush();
 }
 
+Color8Bit MechanismLigament2d::GetColor() {
+  std::scoped_lock lock(m_mutex);
+  if (m_colorEntry) {
+    auto color = m_colorEntry.GetString("");
+    std::strncpy(m_color, color.c_str(), sizeof(m_color));
+    m_color[sizeof(m_color) - 1] = '\0';
+  }
+  unsigned int r = 0, g = 0, b = 0;
+  std::sscanf(m_color, "#%02X%02X%02X", &r, &g, &b);
+  return {static_cast<int>(r), static_cast<int>(g), static_cast<int>(b)};
+}
+
 double MechanismLigament2d::GetAngle() {
+  std::scoped_lock lock(m_mutex);
   if (m_angleEntry) {
     m_angle = m_angleEntry.GetDouble(0.0);
   }
@@ -58,10 +70,19 @@ double MechanismLigament2d::GetAngle() {
 }
 
 double MechanismLigament2d::GetLength() {
+  std::scoped_lock lock(m_mutex);
   if (m_lengthEntry) {
     m_length = m_lengthEntry.GetDouble(0.0);
   }
   return m_length;
+}
+
+double MechanismLigament2d::GetLineWeight() {
+  std::scoped_lock lock(m_mutex);
+  if (m_weightEntry) {
+    m_weight = m_weightEntry.GetDouble(0.0);
+  }
+  return m_weight;
 }
 
 void MechanismLigament2d::SetLength(double length) {

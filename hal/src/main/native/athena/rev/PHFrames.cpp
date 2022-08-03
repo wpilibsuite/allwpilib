@@ -48,8 +48,24 @@ static inline uint8_t pack_left_shift_u16(
     return (uint8_t)((uint8_t)(value << shift) & mask);
 }
 
+static inline uint8_t pack_left_shift_u32(
+    uint32_t value,
+    uint8_t shift,
+    uint8_t mask)
+{
+    return (uint8_t)((uint8_t)(value << shift) & mask);
+}
+
 static inline uint8_t pack_right_shift_u16(
     uint16_t value,
+    uint8_t shift,
+    uint8_t mask)
+{
+    return (uint8_t)((uint8_t)(value >> shift) & mask);
+}
+
+static inline uint8_t pack_right_shift_u32(
+    uint32_t value,
     uint8_t shift,
     uint8_t mask)
 {
@@ -62,6 +78,14 @@ static inline uint16_t unpack_left_shift_u16(
     uint8_t mask)
 {
     return (uint16_t)((uint16_t)(value & mask) << shift);
+}
+
+static inline uint32_t unpack_left_shift_u32(
+    uint8_t value,
+    uint8_t shift,
+    uint8_t mask)
+{
+    return (uint32_t)((uint32_t)(value & mask) << shift);
 }
 
 static inline uint8_t unpack_right_shift_u8(
@@ -78,6 +102,114 @@ static inline uint16_t unpack_right_shift_u16(
     uint8_t mask)
 {
     return (uint16_t)((uint16_t)(value & mask) >> shift);
+}
+
+static inline uint32_t unpack_right_shift_u32(
+    uint8_t value,
+    uint8_t shift,
+    uint8_t mask)
+{
+    return (uint32_t)((uint32_t)(value & mask) >> shift);
+}
+
+int PH_compressor_config_pack(
+    uint8_t *dst_p,
+    const struct PH_compressor_config_t *src_p,
+    size_t size)
+{
+    if (size < 5u) {
+        return (-EINVAL);
+    }
+
+    memset(&dst_p[0], 0, 5);
+
+    dst_p[0] |= pack_left_shift_u16(src_p->minimum_tank_pressure, 0u, 0xffu);
+    dst_p[1] |= pack_right_shift_u16(src_p->minimum_tank_pressure, 8u, 0xffu);
+    dst_p[2] |= pack_left_shift_u16(src_p->maximum_tank_pressure, 0u, 0xffu);
+    dst_p[3] |= pack_right_shift_u16(src_p->maximum_tank_pressure, 8u, 0xffu);
+    dst_p[4] |= pack_left_shift_u8(src_p->force_disable, 0u, 0x01u);
+    dst_p[4] |= pack_left_shift_u8(src_p->use_digital, 1u, 0x02u);
+
+    return (5);
+}
+
+int PH_compressor_config_unpack(
+    struct PH_compressor_config_t *dst_p,
+    const uint8_t *src_p,
+    size_t size)
+{
+    if (size < 5u) {
+        return (-EINVAL);
+    }
+
+    dst_p->minimum_tank_pressure = unpack_right_shift_u16(src_p[0], 0u, 0xffu);
+    dst_p->minimum_tank_pressure |= unpack_left_shift_u16(src_p[1], 8u, 0xffu);
+    dst_p->maximum_tank_pressure = unpack_right_shift_u16(src_p[2], 0u, 0xffu);
+    dst_p->maximum_tank_pressure |= unpack_left_shift_u16(src_p[3], 8u, 0xffu);
+    dst_p->force_disable = unpack_right_shift_u8(src_p[4], 0u, 0x01u);
+    dst_p->use_digital = unpack_right_shift_u8(src_p[4], 1u, 0x02u);
+
+    return (0);
+}
+
+uint16_t PH_compressor_config_minimum_tank_pressure_encode(double value)
+{
+    return (uint16_t)(value / 0.001);
+}
+
+double PH_compressor_config_minimum_tank_pressure_decode(uint16_t value)
+{
+    return ((double)value * 0.001);
+}
+
+bool PH_compressor_config_minimum_tank_pressure_is_in_range(uint16_t value)
+{
+    return (value <= 5000u);
+}
+
+uint16_t PH_compressor_config_maximum_tank_pressure_encode(double value)
+{
+    return (uint16_t)(value / 0.001);
+}
+
+double PH_compressor_config_maximum_tank_pressure_decode(uint16_t value)
+{
+    return ((double)value * 0.001);
+}
+
+bool PH_compressor_config_maximum_tank_pressure_is_in_range(uint16_t value)
+{
+    return (value <= 5000u);
+}
+
+uint8_t PH_compressor_config_force_disable_encode(double value)
+{
+    return (uint8_t)(value);
+}
+
+double PH_compressor_config_force_disable_decode(uint8_t value)
+{
+    return ((double)value);
+}
+
+bool PH_compressor_config_force_disable_is_in_range(uint8_t value)
+{
+    return (value <= 1u);
+}
+
+uint8_t PH_compressor_config_use_digital_encode(double value)
+{
+    return (uint8_t)(value);
+}
+
+double PH_compressor_config_use_digital_decode(uint8_t value)
+{
+    return ((double)value);
+}
+
+bool PH_compressor_config_use_digital_is_in_range(uint8_t value)
+{
+    return (value <= 1u);
 }
 
 int PH_set_all_pack(
@@ -701,9 +833,9 @@ bool PH_pulse_once_pulse_length_ms_is_in_range(uint16_t value)
     return (true);
 }
 
-int PH_status0_pack(
+int PH_status_0_pack(
     uint8_t *dst_p,
-    const struct PH_status0_t *src_p,
+    const struct PH_status_0_t *src_p,
     size_t size)
 {
     if (size < 8u) {
@@ -731,11 +863,11 @@ int PH_status0_pack(
     dst_p[2] |= pack_left_shift_u8(src_p->analog_0, 0u, 0xffu);
     dst_p[3] |= pack_left_shift_u8(src_p->analog_1, 0u, 0xffu);
     dst_p[4] |= pack_left_shift_u8(src_p->digital_sensor, 0u, 0x01u);
-    dst_p[4] |= pack_left_shift_u8(src_p->brownout, 1u, 0x02u);
-    dst_p[4] |= pack_left_shift_u8(src_p->compressor_oc, 2u, 0x04u);
-    dst_p[4] |= pack_left_shift_u8(src_p->compressor_open, 3u, 0x08u);
-    dst_p[4] |= pack_left_shift_u8(src_p->solenoid_oc, 4u, 0x10u);
-    dst_p[4] |= pack_left_shift_u8(src_p->can_warning, 5u, 0x20u);
+    dst_p[4] |= pack_left_shift_u8(src_p->brownout_fault, 1u, 0x02u);
+    dst_p[4] |= pack_left_shift_u8(src_p->compressor_oc_fault, 2u, 0x04u);
+    dst_p[4] |= pack_left_shift_u8(src_p->compressor_open_fault, 3u, 0x08u);
+    dst_p[4] |= pack_left_shift_u8(src_p->solenoid_oc_fault, 4u, 0x10u);
+    dst_p[4] |= pack_left_shift_u8(src_p->can_warning_fault, 5u, 0x20u);
     dst_p[4] |= pack_left_shift_u8(src_p->hardware_fault, 6u, 0x40u);
     dst_p[5] |= pack_left_shift_u8(src_p->channel_0_fault, 0u, 0x01u);
     dst_p[5] |= pack_left_shift_u8(src_p->channel_1_fault, 1u, 0x02u);
@@ -755,12 +887,14 @@ int PH_status0_pack(
     dst_p[6] |= pack_left_shift_u8(src_p->channel_15_fault, 7u, 0x80u);
     dst_p[7] |= pack_left_shift_u8(src_p->compressor_on, 0u, 0x01u);
     dst_p[7] |= pack_left_shift_u8(src_p->system_enabled, 1u, 0x02u);
+    dst_p[7] |= pack_left_shift_u8(src_p->robo_rio_present, 2u, 0x04u);
+    dst_p[7] |= pack_left_shift_u8(src_p->compressor_config, 3u, 0x18u);
 
     return (8);
 }
 
-int PH_status0_unpack(
-    struct PH_status0_t *dst_p,
+int PH_status_0_unpack(
+    struct PH_status_0_t *dst_p,
     const uint8_t *src_p,
     size_t size)
 {
@@ -787,11 +921,11 @@ int PH_status0_unpack(
     dst_p->analog_0 = unpack_right_shift_u8(src_p[2], 0u, 0xffu);
     dst_p->analog_1 = unpack_right_shift_u8(src_p[3], 0u, 0xffu);
     dst_p->digital_sensor = unpack_right_shift_u8(src_p[4], 0u, 0x01u);
-    dst_p->brownout = unpack_right_shift_u8(src_p[4], 1u, 0x02u);
-    dst_p->compressor_oc = unpack_right_shift_u8(src_p[4], 2u, 0x04u);
-    dst_p->compressor_open = unpack_right_shift_u8(src_p[4], 3u, 0x08u);
-    dst_p->solenoid_oc = unpack_right_shift_u8(src_p[4], 4u, 0x10u);
-    dst_p->can_warning = unpack_right_shift_u8(src_p[4], 5u, 0x20u);
+    dst_p->brownout_fault = unpack_right_shift_u8(src_p[4], 1u, 0x02u);
+    dst_p->compressor_oc_fault = unpack_right_shift_u8(src_p[4], 2u, 0x04u);
+    dst_p->compressor_open_fault = unpack_right_shift_u8(src_p[4], 3u, 0x08u);
+    dst_p->solenoid_oc_fault = unpack_right_shift_u8(src_p[4], 4u, 0x10u);
+    dst_p->can_warning_fault = unpack_right_shift_u8(src_p[4], 5u, 0x20u);
     dst_p->hardware_fault = unpack_right_shift_u8(src_p[4], 6u, 0x40u);
     dst_p->channel_0_fault = unpack_right_shift_u8(src_p[5], 0u, 0x01u);
     dst_p->channel_1_fault = unpack_right_shift_u8(src_p[5], 1u, 0x02u);
@@ -811,662 +945,694 @@ int PH_status0_unpack(
     dst_p->channel_15_fault = unpack_right_shift_u8(src_p[6], 7u, 0x80u);
     dst_p->compressor_on = unpack_right_shift_u8(src_p[7], 0u, 0x01u);
     dst_p->system_enabled = unpack_right_shift_u8(src_p[7], 1u, 0x02u);
+    dst_p->robo_rio_present = unpack_right_shift_u8(src_p[7], 2u, 0x04u);
+    dst_p->compressor_config = unpack_right_shift_u8(src_p[7], 3u, 0x18u);
 
     return (0);
 }
 
-uint8_t PH_status0_channel_0_encode(double value)
+uint8_t PH_status_0_channel_0_encode(double value)
 {
     return (uint8_t)(value);
 }
 
-double PH_status0_channel_0_decode(uint8_t value)
+double PH_status_0_channel_0_decode(uint8_t value)
 {
     return ((double)value);
 }
 
-bool PH_status0_channel_0_is_in_range(uint8_t value)
+bool PH_status_0_channel_0_is_in_range(uint8_t value)
 {
     return (value <= 1u);
 }
 
-uint8_t PH_status0_channel_1_encode(double value)
+uint8_t PH_status_0_channel_1_encode(double value)
 {
     return (uint8_t)(value);
 }
 
-double PH_status0_channel_1_decode(uint8_t value)
+double PH_status_0_channel_1_decode(uint8_t value)
 {
     return ((double)value);
 }
 
-bool PH_status0_channel_1_is_in_range(uint8_t value)
+bool PH_status_0_channel_1_is_in_range(uint8_t value)
 {
     return (value <= 1u);
 }
 
-uint8_t PH_status0_channel_2_encode(double value)
+uint8_t PH_status_0_channel_2_encode(double value)
 {
     return (uint8_t)(value);
 }
 
-double PH_status0_channel_2_decode(uint8_t value)
+double PH_status_0_channel_2_decode(uint8_t value)
 {
     return ((double)value);
 }
 
-bool PH_status0_channel_2_is_in_range(uint8_t value)
+bool PH_status_0_channel_2_is_in_range(uint8_t value)
 {
     return (value <= 1u);
 }
 
-uint8_t PH_status0_channel_3_encode(double value)
+uint8_t PH_status_0_channel_3_encode(double value)
 {
     return (uint8_t)(value);
 }
 
-double PH_status0_channel_3_decode(uint8_t value)
+double PH_status_0_channel_3_decode(uint8_t value)
 {
     return ((double)value);
 }
 
-bool PH_status0_channel_3_is_in_range(uint8_t value)
+bool PH_status_0_channel_3_is_in_range(uint8_t value)
 {
     return (value <= 1u);
 }
 
-uint8_t PH_status0_channel_4_encode(double value)
+uint8_t PH_status_0_channel_4_encode(double value)
 {
     return (uint8_t)(value);
 }
 
-double PH_status0_channel_4_decode(uint8_t value)
+double PH_status_0_channel_4_decode(uint8_t value)
 {
     return ((double)value);
 }
 
-bool PH_status0_channel_4_is_in_range(uint8_t value)
+bool PH_status_0_channel_4_is_in_range(uint8_t value)
 {
     return (value <= 1u);
 }
 
-uint8_t PH_status0_channel_5_encode(double value)
+uint8_t PH_status_0_channel_5_encode(double value)
 {
     return (uint8_t)(value);
 }
 
-double PH_status0_channel_5_decode(uint8_t value)
+double PH_status_0_channel_5_decode(uint8_t value)
 {
     return ((double)value);
 }
 
-bool PH_status0_channel_5_is_in_range(uint8_t value)
+bool PH_status_0_channel_5_is_in_range(uint8_t value)
 {
     return (value <= 1u);
 }
 
-uint8_t PH_status0_channel_6_encode(double value)
+uint8_t PH_status_0_channel_6_encode(double value)
 {
     return (uint8_t)(value);
 }
 
-double PH_status0_channel_6_decode(uint8_t value)
+double PH_status_0_channel_6_decode(uint8_t value)
 {
     return ((double)value);
 }
 
-bool PH_status0_channel_6_is_in_range(uint8_t value)
+bool PH_status_0_channel_6_is_in_range(uint8_t value)
 {
     return (value <= 1u);
 }
 
-uint8_t PH_status0_channel_7_encode(double value)
+uint8_t PH_status_0_channel_7_encode(double value)
 {
     return (uint8_t)(value);
 }
 
-double PH_status0_channel_7_decode(uint8_t value)
+double PH_status_0_channel_7_decode(uint8_t value)
 {
     return ((double)value);
 }
 
-bool PH_status0_channel_7_is_in_range(uint8_t value)
+bool PH_status_0_channel_7_is_in_range(uint8_t value)
 {
     return (value <= 1u);
 }
 
-uint8_t PH_status0_channel_8_encode(double value)
+uint8_t PH_status_0_channel_8_encode(double value)
 {
     return (uint8_t)(value);
 }
 
-double PH_status0_channel_8_decode(uint8_t value)
+double PH_status_0_channel_8_decode(uint8_t value)
 {
     return ((double)value);
 }
 
-bool PH_status0_channel_8_is_in_range(uint8_t value)
+bool PH_status_0_channel_8_is_in_range(uint8_t value)
 {
     return (value <= 1u);
 }
 
-uint8_t PH_status0_channel_9_encode(double value)
+uint8_t PH_status_0_channel_9_encode(double value)
 {
     return (uint8_t)(value);
 }
 
-double PH_status0_channel_9_decode(uint8_t value)
+double PH_status_0_channel_9_decode(uint8_t value)
 {
     return ((double)value);
 }
 
-bool PH_status0_channel_9_is_in_range(uint8_t value)
+bool PH_status_0_channel_9_is_in_range(uint8_t value)
 {
     return (value <= 1u);
 }
 
-uint8_t PH_status0_channel_10_encode(double value)
+uint8_t PH_status_0_channel_10_encode(double value)
 {
     return (uint8_t)(value);
 }
 
-double PH_status0_channel_10_decode(uint8_t value)
+double PH_status_0_channel_10_decode(uint8_t value)
 {
     return ((double)value);
 }
 
-bool PH_status0_channel_10_is_in_range(uint8_t value)
+bool PH_status_0_channel_10_is_in_range(uint8_t value)
 {
     return (value <= 1u);
 }
 
-uint8_t PH_status0_channel_11_encode(double value)
+uint8_t PH_status_0_channel_11_encode(double value)
 {
     return (uint8_t)(value);
 }
 
-double PH_status0_channel_11_decode(uint8_t value)
+double PH_status_0_channel_11_decode(uint8_t value)
 {
     return ((double)value);
 }
 
-bool PH_status0_channel_11_is_in_range(uint8_t value)
+bool PH_status_0_channel_11_is_in_range(uint8_t value)
 {
     return (value <= 1u);
 }
 
-uint8_t PH_status0_channel_12_encode(double value)
+uint8_t PH_status_0_channel_12_encode(double value)
 {
     return (uint8_t)(value);
 }
 
-double PH_status0_channel_12_decode(uint8_t value)
+double PH_status_0_channel_12_decode(uint8_t value)
 {
     return ((double)value);
 }
 
-bool PH_status0_channel_12_is_in_range(uint8_t value)
+bool PH_status_0_channel_12_is_in_range(uint8_t value)
 {
     return (value <= 1u);
 }
 
-uint8_t PH_status0_channel_13_encode(double value)
+uint8_t PH_status_0_channel_13_encode(double value)
 {
     return (uint8_t)(value);
 }
 
-double PH_status0_channel_13_decode(uint8_t value)
+double PH_status_0_channel_13_decode(uint8_t value)
 {
     return ((double)value);
 }
 
-bool PH_status0_channel_13_is_in_range(uint8_t value)
+bool PH_status_0_channel_13_is_in_range(uint8_t value)
 {
     return (value <= 1u);
 }
 
-uint8_t PH_status0_channel_14_encode(double value)
+uint8_t PH_status_0_channel_14_encode(double value)
 {
     return (uint8_t)(value);
 }
 
-double PH_status0_channel_14_decode(uint8_t value)
+double PH_status_0_channel_14_decode(uint8_t value)
 {
     return ((double)value);
 }
 
-bool PH_status0_channel_14_is_in_range(uint8_t value)
+bool PH_status_0_channel_14_is_in_range(uint8_t value)
 {
     return (value <= 1u);
 }
 
-uint8_t PH_status0_channel_15_encode(double value)
+uint8_t PH_status_0_channel_15_encode(double value)
 {
     return (uint8_t)(value);
 }
 
-double PH_status0_channel_15_decode(uint8_t value)
+double PH_status_0_channel_15_decode(uint8_t value)
 {
     return ((double)value);
 }
 
-bool PH_status0_channel_15_is_in_range(uint8_t value)
+bool PH_status_0_channel_15_is_in_range(uint8_t value)
 {
     return (value <= 1u);
 }
 
-uint8_t PH_status0_analog_0_encode(double value)
+uint8_t PH_status_0_analog_0_encode(double value)
 {
     return (uint8_t)(value / 0.01961);
 }
 
-double PH_status0_analog_0_decode(uint8_t value)
+double PH_status_0_analog_0_decode(uint8_t value)
 {
     return ((double)value * 0.01961);
 }
 
-bool PH_status0_analog_0_is_in_range(uint8_t value)
+bool PH_status_0_analog_0_is_in_range(uint8_t value)
 {
     (void)value;
 
     return (true);
 }
 
-uint8_t PH_status0_analog_1_encode(double value)
+uint8_t PH_status_0_analog_1_encode(double value)
 {
     return (uint8_t)(value / 0.01961);
 }
 
-double PH_status0_analog_1_decode(uint8_t value)
+double PH_status_0_analog_1_decode(uint8_t value)
 {
     return ((double)value * 0.01961);
 }
 
-bool PH_status0_analog_1_is_in_range(uint8_t value)
+bool PH_status_0_analog_1_is_in_range(uint8_t value)
 {
     (void)value;
 
     return (true);
 }
 
-uint8_t PH_status0_digital_sensor_encode(double value)
+uint8_t PH_status_0_digital_sensor_encode(double value)
 {
     return (uint8_t)(value);
 }
 
-double PH_status0_digital_sensor_decode(uint8_t value)
+double PH_status_0_digital_sensor_decode(uint8_t value)
 {
     return ((double)value);
 }
 
-bool PH_status0_digital_sensor_is_in_range(uint8_t value)
+bool PH_status_0_digital_sensor_is_in_range(uint8_t value)
 {
     return (value <= 1u);
 }
 
-uint8_t PH_status0_brownout_encode(double value)
+uint8_t PH_status_0_brownout_fault_encode(double value)
 {
     return (uint8_t)(value);
 }
 
-double PH_status0_brownout_decode(uint8_t value)
+double PH_status_0_brownout_fault_decode(uint8_t value)
 {
     return ((double)value);
 }
 
-bool PH_status0_brownout_is_in_range(uint8_t value)
+bool PH_status_0_brownout_fault_is_in_range(uint8_t value)
 {
     return (value <= 1u);
 }
 
-uint8_t PH_status0_compressor_oc_encode(double value)
+uint8_t PH_status_0_compressor_oc_fault_encode(double value)
 {
     return (uint8_t)(value);
 }
 
-double PH_status0_compressor_oc_decode(uint8_t value)
+double PH_status_0_compressor_oc_fault_decode(uint8_t value)
 {
     return ((double)value);
 }
 
-bool PH_status0_compressor_oc_is_in_range(uint8_t value)
+bool PH_status_0_compressor_oc_fault_is_in_range(uint8_t value)
 {
     return (value <= 1u);
 }
 
-uint8_t PH_status0_compressor_open_encode(double value)
+uint8_t PH_status_0_compressor_open_fault_encode(double value)
 {
     return (uint8_t)(value);
 }
 
-double PH_status0_compressor_open_decode(uint8_t value)
+double PH_status_0_compressor_open_fault_decode(uint8_t value)
 {
     return ((double)value);
 }
 
-bool PH_status0_compressor_open_is_in_range(uint8_t value)
+bool PH_status_0_compressor_open_fault_is_in_range(uint8_t value)
 {
     return (value <= 1u);
 }
 
-uint8_t PH_status0_solenoid_oc_encode(double value)
+uint8_t PH_status_0_solenoid_oc_fault_encode(double value)
 {
     return (uint8_t)(value);
 }
 
-double PH_status0_solenoid_oc_decode(uint8_t value)
+double PH_status_0_solenoid_oc_fault_decode(uint8_t value)
 {
     return ((double)value);
 }
 
-bool PH_status0_solenoid_oc_is_in_range(uint8_t value)
+bool PH_status_0_solenoid_oc_fault_is_in_range(uint8_t value)
 {
     return (value <= 1u);
 }
 
-uint8_t PH_status0_can_warning_encode(double value)
+uint8_t PH_status_0_can_warning_fault_encode(double value)
 {
     return (uint8_t)(value);
 }
 
-double PH_status0_can_warning_decode(uint8_t value)
+double PH_status_0_can_warning_fault_decode(uint8_t value)
 {
     return ((double)value);
 }
 
-bool PH_status0_can_warning_is_in_range(uint8_t value)
+bool PH_status_0_can_warning_fault_is_in_range(uint8_t value)
 {
     return (value <= 1u);
 }
 
-uint8_t PH_status0_hardware_fault_encode(double value)
+uint8_t PH_status_0_hardware_fault_encode(double value)
 {
     return (uint8_t)(value);
 }
 
-double PH_status0_hardware_fault_decode(uint8_t value)
+double PH_status_0_hardware_fault_decode(uint8_t value)
 {
     return ((double)value);
 }
 
-bool PH_status0_hardware_fault_is_in_range(uint8_t value)
+bool PH_status_0_hardware_fault_is_in_range(uint8_t value)
 {
     return (value <= 1u);
 }
 
-uint8_t PH_status0_channel_0_fault_encode(double value)
+uint8_t PH_status_0_channel_0_fault_encode(double value)
 {
     return (uint8_t)(value);
 }
 
-double PH_status0_channel_0_fault_decode(uint8_t value)
+double PH_status_0_channel_0_fault_decode(uint8_t value)
 {
     return ((double)value);
 }
 
-bool PH_status0_channel_0_fault_is_in_range(uint8_t value)
+bool PH_status_0_channel_0_fault_is_in_range(uint8_t value)
 {
     return (value <= 1u);
 }
 
-uint8_t PH_status0_channel_1_fault_encode(double value)
+uint8_t PH_status_0_channel_1_fault_encode(double value)
 {
     return (uint8_t)(value);
 }
 
-double PH_status0_channel_1_fault_decode(uint8_t value)
+double PH_status_0_channel_1_fault_decode(uint8_t value)
 {
     return ((double)value);
 }
 
-bool PH_status0_channel_1_fault_is_in_range(uint8_t value)
+bool PH_status_0_channel_1_fault_is_in_range(uint8_t value)
 {
     return (value <= 1u);
 }
 
-uint8_t PH_status0_channel_2_fault_encode(double value)
+uint8_t PH_status_0_channel_2_fault_encode(double value)
 {
     return (uint8_t)(value);
 }
 
-double PH_status0_channel_2_fault_decode(uint8_t value)
+double PH_status_0_channel_2_fault_decode(uint8_t value)
 {
     return ((double)value);
 }
 
-bool PH_status0_channel_2_fault_is_in_range(uint8_t value)
+bool PH_status_0_channel_2_fault_is_in_range(uint8_t value)
 {
     return (value <= 1u);
 }
 
-uint8_t PH_status0_channel_3_fault_encode(double value)
+uint8_t PH_status_0_channel_3_fault_encode(double value)
 {
     return (uint8_t)(value);
 }
 
-double PH_status0_channel_3_fault_decode(uint8_t value)
+double PH_status_0_channel_3_fault_decode(uint8_t value)
 {
     return ((double)value);
 }
 
-bool PH_status0_channel_3_fault_is_in_range(uint8_t value)
+bool PH_status_0_channel_3_fault_is_in_range(uint8_t value)
 {
     return (value <= 1u);
 }
 
-uint8_t PH_status0_channel_4_fault_encode(double value)
+uint8_t PH_status_0_channel_4_fault_encode(double value)
 {
     return (uint8_t)(value);
 }
 
-double PH_status0_channel_4_fault_decode(uint8_t value)
+double PH_status_0_channel_4_fault_decode(uint8_t value)
 {
     return ((double)value);
 }
 
-bool PH_status0_channel_4_fault_is_in_range(uint8_t value)
+bool PH_status_0_channel_4_fault_is_in_range(uint8_t value)
 {
     return (value <= 1u);
 }
 
-uint8_t PH_status0_channel_5_fault_encode(double value)
+uint8_t PH_status_0_channel_5_fault_encode(double value)
 {
     return (uint8_t)(value);
 }
 
-double PH_status0_channel_5_fault_decode(uint8_t value)
+double PH_status_0_channel_5_fault_decode(uint8_t value)
 {
     return ((double)value);
 }
 
-bool PH_status0_channel_5_fault_is_in_range(uint8_t value)
+bool PH_status_0_channel_5_fault_is_in_range(uint8_t value)
 {
     return (value <= 1u);
 }
 
-uint8_t PH_status0_channel_6_fault_encode(double value)
+uint8_t PH_status_0_channel_6_fault_encode(double value)
 {
     return (uint8_t)(value);
 }
 
-double PH_status0_channel_6_fault_decode(uint8_t value)
+double PH_status_0_channel_6_fault_decode(uint8_t value)
 {
     return ((double)value);
 }
 
-bool PH_status0_channel_6_fault_is_in_range(uint8_t value)
+bool PH_status_0_channel_6_fault_is_in_range(uint8_t value)
 {
     return (value <= 1u);
 }
 
-uint8_t PH_status0_channel_7_fault_encode(double value)
+uint8_t PH_status_0_channel_7_fault_encode(double value)
 {
     return (uint8_t)(value);
 }
 
-double PH_status0_channel_7_fault_decode(uint8_t value)
+double PH_status_0_channel_7_fault_decode(uint8_t value)
 {
     return ((double)value);
 }
 
-bool PH_status0_channel_7_fault_is_in_range(uint8_t value)
+bool PH_status_0_channel_7_fault_is_in_range(uint8_t value)
 {
     return (value <= 1u);
 }
 
-uint8_t PH_status0_channel_8_fault_encode(double value)
+uint8_t PH_status_0_channel_8_fault_encode(double value)
 {
     return (uint8_t)(value);
 }
 
-double PH_status0_channel_8_fault_decode(uint8_t value)
+double PH_status_0_channel_8_fault_decode(uint8_t value)
 {
     return ((double)value);
 }
 
-bool PH_status0_channel_8_fault_is_in_range(uint8_t value)
+bool PH_status_0_channel_8_fault_is_in_range(uint8_t value)
 {
     return (value <= 1u);
 }
 
-uint8_t PH_status0_channel_9_fault_encode(double value)
+uint8_t PH_status_0_channel_9_fault_encode(double value)
 {
     return (uint8_t)(value);
 }
 
-double PH_status0_channel_9_fault_decode(uint8_t value)
+double PH_status_0_channel_9_fault_decode(uint8_t value)
 {
     return ((double)value);
 }
 
-bool PH_status0_channel_9_fault_is_in_range(uint8_t value)
+bool PH_status_0_channel_9_fault_is_in_range(uint8_t value)
 {
     return (value <= 1u);
 }
 
-uint8_t PH_status0_channel_10_fault_encode(double value)
+uint8_t PH_status_0_channel_10_fault_encode(double value)
 {
     return (uint8_t)(value);
 }
 
-double PH_status0_channel_10_fault_decode(uint8_t value)
+double PH_status_0_channel_10_fault_decode(uint8_t value)
 {
     return ((double)value);
 }
 
-bool PH_status0_channel_10_fault_is_in_range(uint8_t value)
+bool PH_status_0_channel_10_fault_is_in_range(uint8_t value)
 {
     return (value <= 1u);
 }
 
-uint8_t PH_status0_channel_11_fault_encode(double value)
+uint8_t PH_status_0_channel_11_fault_encode(double value)
 {
     return (uint8_t)(value);
 }
 
-double PH_status0_channel_11_fault_decode(uint8_t value)
+double PH_status_0_channel_11_fault_decode(uint8_t value)
 {
     return ((double)value);
 }
 
-bool PH_status0_channel_11_fault_is_in_range(uint8_t value)
+bool PH_status_0_channel_11_fault_is_in_range(uint8_t value)
 {
     return (value <= 1u);
 }
 
-uint8_t PH_status0_channel_12_fault_encode(double value)
+uint8_t PH_status_0_channel_12_fault_encode(double value)
 {
     return (uint8_t)(value);
 }
 
-double PH_status0_channel_12_fault_decode(uint8_t value)
+double PH_status_0_channel_12_fault_decode(uint8_t value)
 {
     return ((double)value);
 }
 
-bool PH_status0_channel_12_fault_is_in_range(uint8_t value)
+bool PH_status_0_channel_12_fault_is_in_range(uint8_t value)
 {
     return (value <= 1u);
 }
 
-uint8_t PH_status0_channel_13_fault_encode(double value)
+uint8_t PH_status_0_channel_13_fault_encode(double value)
 {
     return (uint8_t)(value);
 }
 
-double PH_status0_channel_13_fault_decode(uint8_t value)
+double PH_status_0_channel_13_fault_decode(uint8_t value)
 {
     return ((double)value);
 }
 
-bool PH_status0_channel_13_fault_is_in_range(uint8_t value)
+bool PH_status_0_channel_13_fault_is_in_range(uint8_t value)
 {
     return (value <= 1u);
 }
 
-uint8_t PH_status0_channel_14_fault_encode(double value)
+uint8_t PH_status_0_channel_14_fault_encode(double value)
 {
     return (uint8_t)(value);
 }
 
-double PH_status0_channel_14_fault_decode(uint8_t value)
+double PH_status_0_channel_14_fault_decode(uint8_t value)
 {
     return ((double)value);
 }
 
-bool PH_status0_channel_14_fault_is_in_range(uint8_t value)
+bool PH_status_0_channel_14_fault_is_in_range(uint8_t value)
 {
     return (value <= 1u);
 }
 
-uint8_t PH_status0_channel_15_fault_encode(double value)
+uint8_t PH_status_0_channel_15_fault_encode(double value)
 {
     return (uint8_t)(value);
 }
 
-double PH_status0_channel_15_fault_decode(uint8_t value)
+double PH_status_0_channel_15_fault_decode(uint8_t value)
 {
     return ((double)value);
 }
 
-bool PH_status0_channel_15_fault_is_in_range(uint8_t value)
+bool PH_status_0_channel_15_fault_is_in_range(uint8_t value)
 {
     return (value <= 1u);
 }
 
-uint8_t PH_status0_compressor_on_encode(double value)
+uint8_t PH_status_0_compressor_on_encode(double value)
 {
     return (uint8_t)(value);
 }
 
-double PH_status0_compressor_on_decode(uint8_t value)
+double PH_status_0_compressor_on_decode(uint8_t value)
 {
     return ((double)value);
 }
 
-bool PH_status0_compressor_on_is_in_range(uint8_t value)
+bool PH_status_0_compressor_on_is_in_range(uint8_t value)
 {
     return (value <= 1u);
 }
 
-uint8_t PH_status0_system_enabled_encode(double value)
+uint8_t PH_status_0_system_enabled_encode(double value)
 {
     return (uint8_t)(value);
 }
 
-double PH_status0_system_enabled_decode(uint8_t value)
+double PH_status_0_system_enabled_decode(uint8_t value)
 {
     return ((double)value);
 }
 
-bool PH_status0_system_enabled_is_in_range(uint8_t value)
+bool PH_status_0_system_enabled_is_in_range(uint8_t value)
 {
     return (value <= 1u);
 }
 
-int PH_status1_pack(
+uint8_t PH_status_0_robo_rio_present_encode(double value)
+{
+    return (uint8_t)(value);
+}
+
+double PH_status_0_robo_rio_present_decode(uint8_t value)
+{
+    return ((double)value);
+}
+
+bool PH_status_0_robo_rio_present_is_in_range(uint8_t value)
+{
+    return (value <= 1u);
+}
+
+uint8_t PH_status_0_compressor_config_encode(double value)
+{
+    return (uint8_t)(value);
+}
+
+double PH_status_0_compressor_config_decode(uint8_t value)
+{
+    return ((double)value);
+}
+
+bool PH_status_0_compressor_config_is_in_range(uint8_t value)
+{
+    return (value <= 3u);
+}
+
+int PH_status_1_pack(
     uint8_t *dst_p,
-    const struct PH_status1_t *src_p,
+    const struct PH_status_1_t *src_p,
     size_t size)
 {
     if (size < 8u) {
@@ -1480,21 +1646,22 @@ int PH_status1_pack(
     dst_p[2] |= pack_right_shift_u16(src_p->solenoid_voltage, 8u, 0x0fu);
     dst_p[4] |= pack_left_shift_u8(src_p->compressor_current, 0u, 0xffu);
     dst_p[5] |= pack_left_shift_u8(src_p->solenoid_current, 0u, 0xffu);
-    dst_p[6] |= pack_left_shift_u8(src_p->sticky_brownout, 0u, 0x01u);
-    dst_p[6] |= pack_left_shift_u8(src_p->sticky_compressor_over_current, 1u, 0x02u);
-    dst_p[6] |= pack_left_shift_u8(src_p->sticky_compressor_not_present, 2u, 0x04u);
-    dst_p[6] |= pack_left_shift_u8(src_p->sticky_solenoid_over_current, 3u, 0x08u);
-    dst_p[6] |= pack_left_shift_u8(src_p->sticky_can_warning, 4u, 0x10u);
-    dst_p[6] |= pack_left_shift_u8(src_p->sticky_can_bus_off, 5u, 0x20u);
+    dst_p[6] |= pack_left_shift_u8(src_p->sticky_brownout_fault, 0u, 0x01u);
+    dst_p[6] |= pack_left_shift_u8(src_p->sticky_compressor_oc_fault, 1u, 0x02u);
+    dst_p[6] |= pack_left_shift_u8(src_p->sticky_compressor_open_fault, 2u, 0x04u);
+    dst_p[6] |= pack_left_shift_u8(src_p->sticky_solenoid_oc_fault, 3u, 0x08u);
+    dst_p[6] |= pack_left_shift_u8(src_p->sticky_can_warning_fault, 4u, 0x10u);
+    dst_p[6] |= pack_left_shift_u8(src_p->sticky_can_bus_off_fault, 5u, 0x20u);
     dst_p[6] |= pack_left_shift_u8(src_p->sticky_hardware_fault, 6u, 0x40u);
     dst_p[6] |= pack_left_shift_u8(src_p->sticky_firmware_fault, 7u, 0x80u);
-    dst_p[7] |= pack_left_shift_u8(src_p->sticky_has_reset, 0u, 0x01u);
+    dst_p[7] |= pack_left_shift_u8(src_p->sticky_has_reset_fault, 0u, 0x01u);
+    dst_p[7] |= pack_left_shift_u8(src_p->supply_voltage_5_v, 1u, 0xfeu);
 
     return (8);
 }
 
-int PH_status1_unpack(
-    struct PH_status1_t *dst_p,
+int PH_status_1_unpack(
+    struct PH_status_1_t *dst_p,
     const uint8_t *src_p,
     size_t size)
 {
@@ -1507,214 +1674,398 @@ int PH_status1_unpack(
     dst_p->solenoid_voltage |= unpack_left_shift_u16(src_p[2], 8u, 0x0fu);
     dst_p->compressor_current = unpack_right_shift_u8(src_p[4], 0u, 0xffu);
     dst_p->solenoid_current = unpack_right_shift_u8(src_p[5], 0u, 0xffu);
-    dst_p->sticky_brownout = unpack_right_shift_u8(src_p[6], 0u, 0x01u);
-    dst_p->sticky_compressor_over_current = unpack_right_shift_u8(src_p[6], 1u, 0x02u);
-    dst_p->sticky_compressor_not_present = unpack_right_shift_u8(src_p[6], 2u, 0x04u);
-    dst_p->sticky_solenoid_over_current = unpack_right_shift_u8(src_p[6], 3u, 0x08u);
-    dst_p->sticky_can_warning = unpack_right_shift_u8(src_p[6], 4u, 0x10u);
-    dst_p->sticky_can_bus_off = unpack_right_shift_u8(src_p[6], 5u, 0x20u);
+    dst_p->sticky_brownout_fault = unpack_right_shift_u8(src_p[6], 0u, 0x01u);
+    dst_p->sticky_compressor_oc_fault = unpack_right_shift_u8(src_p[6], 1u, 0x02u);
+    dst_p->sticky_compressor_open_fault = unpack_right_shift_u8(src_p[6], 2u, 0x04u);
+    dst_p->sticky_solenoid_oc_fault = unpack_right_shift_u8(src_p[6], 3u, 0x08u);
+    dst_p->sticky_can_warning_fault = unpack_right_shift_u8(src_p[6], 4u, 0x10u);
+    dst_p->sticky_can_bus_off_fault = unpack_right_shift_u8(src_p[6], 5u, 0x20u);
     dst_p->sticky_hardware_fault = unpack_right_shift_u8(src_p[6], 6u, 0x40u);
     dst_p->sticky_firmware_fault = unpack_right_shift_u8(src_p[6], 7u, 0x80u);
-    dst_p->sticky_has_reset = unpack_right_shift_u8(src_p[7], 0u, 0x01u);
+    dst_p->sticky_has_reset_fault = unpack_right_shift_u8(src_p[7], 0u, 0x01u);
+    dst_p->supply_voltage_5_v = unpack_right_shift_u8(src_p[7], 1u, 0xfeu);
 
     return (0);
 }
 
-uint8_t PH_status1_v_bus_encode(double value)
+uint8_t PH_status_1_v_bus_encode(double value)
 {
     return (uint8_t)((value - 4.0) / 0.0625);
 }
 
-double PH_status1_v_bus_decode(uint8_t value)
+double PH_status_1_v_bus_decode(uint8_t value)
 {
     return (((double)value * 0.0625) + 4.0);
 }
 
-bool PH_status1_v_bus_is_in_range(uint8_t value)
+bool PH_status_1_v_bus_is_in_range(uint8_t value)
 {
     return (value <= 192u);
 }
 
-uint16_t PH_status1_solenoid_voltage_encode(double value)
+uint16_t PH_status_1_solenoid_voltage_encode(double value)
 {
     return (uint16_t)(value / 0.0078125);
 }
 
-double PH_status1_solenoid_voltage_decode(uint16_t value)
+double PH_status_1_solenoid_voltage_decode(uint16_t value)
 {
     return ((double)value * 0.0078125);
 }
 
-bool PH_status1_solenoid_voltage_is_in_range(uint16_t value)
+bool PH_status_1_solenoid_voltage_is_in_range(uint16_t value)
 {
     return (value <= 4096u);
 }
 
-uint8_t PH_status1_compressor_current_encode(double value)
+uint8_t PH_status_1_compressor_current_encode(double value)
 {
     return (uint8_t)(value / 0.125);
 }
 
-double PH_status1_compressor_current_decode(uint8_t value)
+double PH_status_1_compressor_current_decode(uint8_t value)
 {
     return ((double)value * 0.125);
 }
 
-bool PH_status1_compressor_current_is_in_range(uint8_t value)
+bool PH_status_1_compressor_current_is_in_range(uint8_t value)
 {
     (void)value;
 
     return (true);
 }
 
-uint8_t PH_status1_solenoid_current_encode(double value)
+uint8_t PH_status_1_solenoid_current_encode(double value)
 {
     return (uint8_t)(value / 0.125);
 }
 
-double PH_status1_solenoid_current_decode(uint8_t value)
+double PH_status_1_solenoid_current_decode(uint8_t value)
 {
     return ((double)value * 0.125);
 }
 
-bool PH_status1_solenoid_current_is_in_range(uint8_t value)
+bool PH_status_1_solenoid_current_is_in_range(uint8_t value)
 {
     (void)value;
 
     return (true);
 }
 
-uint8_t PH_status1_sticky_brownout_encode(double value)
+uint8_t PH_status_1_sticky_brownout_fault_encode(double value)
 {
     return (uint8_t)(value);
 }
 
-double PH_status1_sticky_brownout_decode(uint8_t value)
+double PH_status_1_sticky_brownout_fault_decode(uint8_t value)
 {
     return ((double)value);
 }
 
-bool PH_status1_sticky_brownout_is_in_range(uint8_t value)
+bool PH_status_1_sticky_brownout_fault_is_in_range(uint8_t value)
 {
     return (value <= 1u);
 }
 
-uint8_t PH_status1_sticky_compressor_over_current_encode(double value)
+uint8_t PH_status_1_sticky_compressor_oc_fault_encode(double value)
 {
     return (uint8_t)(value);
 }
 
-double PH_status1_sticky_compressor_over_current_decode(uint8_t value)
+double PH_status_1_sticky_compressor_oc_fault_decode(uint8_t value)
 {
     return ((double)value);
 }
 
-bool PH_status1_sticky_compressor_over_current_is_in_range(uint8_t value)
+bool PH_status_1_sticky_compressor_oc_fault_is_in_range(uint8_t value)
 {
     return (value <= 1u);
 }
 
-uint8_t PH_status1_sticky_compressor_not_present_encode(double value)
+uint8_t PH_status_1_sticky_compressor_open_fault_encode(double value)
 {
     return (uint8_t)(value);
 }
 
-double PH_status1_sticky_compressor_not_present_decode(uint8_t value)
+double PH_status_1_sticky_compressor_open_fault_decode(uint8_t value)
 {
     return ((double)value);
 }
 
-bool PH_status1_sticky_compressor_not_present_is_in_range(uint8_t value)
+bool PH_status_1_sticky_compressor_open_fault_is_in_range(uint8_t value)
 {
     return (value <= 1u);
 }
 
-uint8_t PH_status1_sticky_solenoid_over_current_encode(double value)
+uint8_t PH_status_1_sticky_solenoid_oc_fault_encode(double value)
 {
     return (uint8_t)(value);
 }
 
-double PH_status1_sticky_solenoid_over_current_decode(uint8_t value)
+double PH_status_1_sticky_solenoid_oc_fault_decode(uint8_t value)
 {
     return ((double)value);
 }
 
-bool PH_status1_sticky_solenoid_over_current_is_in_range(uint8_t value)
+bool PH_status_1_sticky_solenoid_oc_fault_is_in_range(uint8_t value)
 {
     return (value <= 1u);
 }
 
-uint8_t PH_status1_sticky_can_warning_encode(double value)
+uint8_t PH_status_1_sticky_can_warning_fault_encode(double value)
 {
     return (uint8_t)(value);
 }
 
-double PH_status1_sticky_can_warning_decode(uint8_t value)
+double PH_status_1_sticky_can_warning_fault_decode(uint8_t value)
 {
     return ((double)value);
 }
 
-bool PH_status1_sticky_can_warning_is_in_range(uint8_t value)
+bool PH_status_1_sticky_can_warning_fault_is_in_range(uint8_t value)
 {
     return (value <= 1u);
 }
 
-uint8_t PH_status1_sticky_can_bus_off_encode(double value)
+uint8_t PH_status_1_sticky_can_bus_off_fault_encode(double value)
 {
     return (uint8_t)(value);
 }
 
-double PH_status1_sticky_can_bus_off_decode(uint8_t value)
+double PH_status_1_sticky_can_bus_off_fault_decode(uint8_t value)
 {
     return ((double)value);
 }
 
-bool PH_status1_sticky_can_bus_off_is_in_range(uint8_t value)
+bool PH_status_1_sticky_can_bus_off_fault_is_in_range(uint8_t value)
 {
     return (value <= 1u);
 }
 
-uint8_t PH_status1_sticky_hardware_fault_encode(double value)
+uint8_t PH_status_1_sticky_hardware_fault_encode(double value)
 {
     return (uint8_t)(value);
 }
 
-double PH_status1_sticky_hardware_fault_decode(uint8_t value)
+double PH_status_1_sticky_hardware_fault_decode(uint8_t value)
 {
     return ((double)value);
 }
 
-bool PH_status1_sticky_hardware_fault_is_in_range(uint8_t value)
+bool PH_status_1_sticky_hardware_fault_is_in_range(uint8_t value)
 {
     return (value <= 1u);
 }
 
-uint8_t PH_status1_sticky_firmware_fault_encode(double value)
+uint8_t PH_status_1_sticky_firmware_fault_encode(double value)
 {
     return (uint8_t)(value);
 }
 
-double PH_status1_sticky_firmware_fault_decode(uint8_t value)
+double PH_status_1_sticky_firmware_fault_decode(uint8_t value)
 {
     return ((double)value);
 }
 
-bool PH_status1_sticky_firmware_fault_is_in_range(uint8_t value)
+bool PH_status_1_sticky_firmware_fault_is_in_range(uint8_t value)
 {
     return (value <= 1u);
 }
 
-uint8_t PH_status1_sticky_has_reset_encode(double value)
+uint8_t PH_status_1_sticky_has_reset_fault_encode(double value)
 {
     return (uint8_t)(value);
 }
 
-double PH_status1_sticky_has_reset_decode(uint8_t value)
+double PH_status_1_sticky_has_reset_fault_decode(uint8_t value)
 {
     return ((double)value);
 }
 
-bool PH_status1_sticky_has_reset_is_in_range(uint8_t value)
+bool PH_status_1_sticky_has_reset_fault_is_in_range(uint8_t value)
 {
     return (value <= 1u);
+}
+
+uint8_t PH_status_1_supply_voltage_5_v_encode(double value)
+{
+    return (uint8_t)((value - 4.5) / 0.0078125);
+}
+
+double PH_status_1_supply_voltage_5_v_decode(uint8_t value)
+{
+    return (((double)value * 0.0078125) + 4.5);
+}
+
+bool PH_status_1_supply_voltage_5_v_is_in_range(uint8_t value)
+{
+    return (value <= 128u);
+}
+
+int PH_clear_faults_pack(
+    uint8_t *dst_p,
+    const struct PH_clear_faults_t *src_p,
+    size_t size)
+{
+    (void)dst_p;
+    (void)src_p;
+    (void)size;
+
+    return (0);
+}
+
+int PH_clear_faults_unpack(
+    struct PH_clear_faults_t *dst_p,
+    const uint8_t *src_p,
+    size_t size)
+{
+    (void)dst_p;
+    (void)src_p;
+    (void)size;
+
+    return (0);
+}
+
+int PH_version_pack(
+    uint8_t *dst_p,
+    const struct PH_version_t *src_p,
+    size_t size)
+{
+    if (size < 8u) {
+        return (-EINVAL);
+    }
+
+    memset(&dst_p[0], 0, 8);
+
+    dst_p[0] |= pack_left_shift_u8(src_p->firmware_fix, 0u, 0xffu);
+    dst_p[1] |= pack_left_shift_u8(src_p->firmware_minor, 0u, 0xffu);
+    dst_p[2] |= pack_left_shift_u8(src_p->firmware_year, 0u, 0xffu);
+    dst_p[3] |= pack_left_shift_u8(src_p->hardware_minor, 0u, 0xffu);
+    dst_p[4] |= pack_left_shift_u8(src_p->hardware_major, 0u, 0xffu);
+    dst_p[5] |= pack_left_shift_u32(src_p->unique_id, 0u, 0xffu);
+    dst_p[6] |= pack_right_shift_u32(src_p->unique_id, 8u, 0xffu);
+    dst_p[7] |= pack_right_shift_u32(src_p->unique_id, 16u, 0xffu);
+
+    return (8);
+}
+
+int PH_version_unpack(
+    struct PH_version_t *dst_p,
+    const uint8_t *src_p,
+    size_t size)
+{
+    if (size < 8u) {
+        return (-EINVAL);
+    }
+
+    dst_p->firmware_fix = unpack_right_shift_u8(src_p[0], 0u, 0xffu);
+    dst_p->firmware_minor = unpack_right_shift_u8(src_p[1], 0u, 0xffu);
+    dst_p->firmware_year = unpack_right_shift_u8(src_p[2], 0u, 0xffu);
+    dst_p->hardware_minor = unpack_right_shift_u8(src_p[3], 0u, 0xffu);
+    dst_p->hardware_major = unpack_right_shift_u8(src_p[4], 0u, 0xffu);
+    dst_p->unique_id = unpack_right_shift_u32(src_p[5], 0u, 0xffu);
+    dst_p->unique_id |= unpack_left_shift_u32(src_p[6], 8u, 0xffu);
+    dst_p->unique_id |= unpack_left_shift_u32(src_p[7], 16u, 0xffu);
+
+    return (0);
+}
+
+uint8_t PH_version_firmware_fix_encode(double value)
+{
+    return (uint8_t)(value);
+}
+
+double PH_version_firmware_fix_decode(uint8_t value)
+{
+    return ((double)value);
+}
+
+bool PH_version_firmware_fix_is_in_range(uint8_t value)
+{
+    (void)value;
+
+    return (true);
+}
+
+uint8_t PH_version_firmware_minor_encode(double value)
+{
+    return (uint8_t)(value);
+}
+
+double PH_version_firmware_minor_decode(uint8_t value)
+{
+    return ((double)value);
+}
+
+bool PH_version_firmware_minor_is_in_range(uint8_t value)
+{
+    (void)value;
+
+    return (true);
+}
+
+uint8_t PH_version_firmware_year_encode(double value)
+{
+    return (uint8_t)(value);
+}
+
+double PH_version_firmware_year_decode(uint8_t value)
+{
+    return ((double)value);
+}
+
+bool PH_version_firmware_year_is_in_range(uint8_t value)
+{
+    (void)value;
+
+    return (true);
+}
+
+uint8_t PH_version_hardware_minor_encode(double value)
+{
+    return (uint8_t)(value);
+}
+
+double PH_version_hardware_minor_decode(uint8_t value)
+{
+    return ((double)value);
+}
+
+bool PH_version_hardware_minor_is_in_range(uint8_t value)
+{
+    (void)value;
+
+    return (true);
+}
+
+uint8_t PH_version_hardware_major_encode(double value)
+{
+    return (uint8_t)(value);
+}
+
+double PH_version_hardware_major_decode(uint8_t value)
+{
+    return ((double)value);
+}
+
+bool PH_version_hardware_major_is_in_range(uint8_t value)
+{
+    (void)value;
+
+    return (true);
+}
+
+uint32_t PH_version_unique_id_encode(double value)
+{
+    return (uint32_t)(value);
+}
+
+double PH_version_unique_id_decode(uint32_t value)
+{
+    return ((double)value);
+}
+
+bool PH_version_unique_id_is_in_range(uint32_t value)
+{
+    return (value <= 16777215u);
 }

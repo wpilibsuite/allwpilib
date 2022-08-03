@@ -13,7 +13,7 @@ ArmSubsystem::ArmSubsystem()
     : frc2::TrapezoidProfileSubsystem<units::radians>(
           {kMaxVelocity, kMaxAcceleration}, kArmOffset),
       m_motor(kMotorPort),
-      m_feedforward(kS, kCos, kV, kA) {
+      m_feedforward(kS, kG, kV, kA) {
   m_motor.SetPID(kP, 0, 0);
 }
 

@@ -1,3 +1,5 @@
+import groovy.io.FileType
+
 ext.createGenerateResourcesTask = { name, prefix, namespace, project ->
     def generatedOutputDir = file("$buildDir/generated/$name/cpp")
 
@@ -11,7 +13,7 @@ ext.createGenerateResourcesTask = { name, prefix, namespace, project ->
 
         doLast {
             generatedOutputDir.mkdirs()
-            inputDir.eachFile { inputFile ->
+            inputDir.eachFileRecurse (FileType.FILES) { inputFile ->
                 if (inputFile.name.startsWith('.')) return
                     def fileBytes = inputFile.bytes
                 def outputFile = file("$generatedOutputDir/${inputFile.name}.cpp")

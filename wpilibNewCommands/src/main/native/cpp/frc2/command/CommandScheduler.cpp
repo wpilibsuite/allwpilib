@@ -38,9 +38,10 @@ class CommandScheduler::Impl {
   // commands.  Also used as a list of currently-registered subsystems.
   wpi::DenseMap<Subsystem*, std::unique_ptr<Command>> subsystems;
 
+  frc::EventLoop defaultButtonLoop;
   // The set of currently-registered buttons that will be polled every
   // iteration.
-  wpi::SmallVector<wpi::unique_function<void()>, 4> buttons;
+  frc::EventLoop* activeButtonLoop{&defaultButtonLoop};
 
   bool disabled{false};
 
@@ -95,12 +96,20 @@ void CommandScheduler::SetPeriod(units::second_t period) {
   m_watchdog.SetTimeout(period);
 }
 
-void CommandScheduler::AddButton(wpi::unique_function<void()> button) {
-  m_impl->buttons.emplace_back(std::move(button));
+frc::EventLoop* CommandScheduler::GetActiveButtonLoop() const {
+  return m_impl->activeButtonLoop;
+}
+
+void CommandScheduler::SetActiveButtonLoop(frc::EventLoop* loop) {
+  m_impl->activeButtonLoop = loop;
+}
+
+frc::EventLoop* CommandScheduler::GetDefaultButtonLoop() const {
+  return &(m_impl->defaultButtonLoop);
 }
 
 void CommandScheduler::ClearButtons() {
-  m_impl->buttons.clear();
+  m_impl->activeButtonLoop->Clear();
 }
 
 void CommandScheduler::Schedule(bool interruptible, Command* command) {
@@ -142,11 +151,11 @@ void CommandScheduler::Schedule(bool interruptible, Command* command) {
         Cancel(cmdToCancel);
       }
     }
-    command->Initialize();
     m_impl->scheduledCommands[command] = CommandState{interruptible};
     for (auto&& requirement : requirements) {
       m_impl->requirements[requirement] = command;
     }
+    command->Initialize();
     for (auto&& action : m_impl->initActions) {
       action(*command);
     }
@@ -200,10 +209,11 @@ void CommandScheduler::Run() {
     m_watchdog.AddEpoch("Subsystem Periodic()");
   }
 
+  // Cache the active instance to avoid concurrency problems if SetActiveLoop()
+  // is called from inside the button bindings.
+  frc::EventLoop* loopCache = m_impl->activeButtonLoop;
   // Poll buttons for new commands to add.
-  for (auto&& button : m_impl->buttons) {
-    button();
-  }
+  loopCache->Poll();
   m_watchdog.AddEpoch("buttons.Run()");
 
   m_impl->inRunLoop = true;
@@ -326,17 +336,17 @@ void CommandScheduler::Cancel(Command* command) {
   if (find == m_impl->scheduledCommands.end()) {
     return;
   }
-  command->End(true);
-  for (auto&& action : m_impl->interruptActions) {
-    action(*command);
-  }
-  m_watchdog.AddEpoch(command->GetName() + ".End(true)");
   m_impl->scheduledCommands.erase(find);
   for (auto&& requirement : m_impl->requirements) {
     if (requirement.second == command) {
       m_impl->requirements.erase(requirement.first);
     }
   }
+  command->End(true);
+  for (auto&& action : m_impl->interruptActions) {
+    action(*command);
+  }
+  m_watchdog.AddEpoch(command->GetName() + ".End(true)");
 }
 
 void CommandScheduler::Cancel(wpi::span<Command* const> commands) {

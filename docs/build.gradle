@@ -11,7 +11,6 @@ evaluationDependsOn(':cameraserver')
 evaluationDependsOn(':wpimath')
 evaluationDependsOn(':wpilibc')
 evaluationDependsOn(':wpilibj')
-evaluationDependsOn(':wpilibOldCommands')
 evaluationDependsOn(':wpilibNewCommands')
 
 def baseArtifactIdCpp = 'documentation'
@@ -34,7 +33,6 @@ cppProjectZips.add(project(':cscore').cppHeadersZip)
 cppProjectZips.add(project(':cameraserver').cppHeadersZip)
 cppProjectZips.add(project(':wpimath').cppHeadersZip)
 cppProjectZips.add(project(':wpilibc').cppHeadersZip)
-cppProjectZips.add(project(':wpilibOldCommands').cppHeadersZip)
 cppProjectZips.add(project(':wpilibNewCommands').cppHeadersZip)
 
 doxygen {
@@ -125,9 +123,10 @@ doxygen {
     }
 
     case_sense_names false
-    extension_mapping 'inc=C++'
+    extension_mapping 'inc=C++', 'no_extension=C++'
     extract_all true
     extract_static true
+    file_patterns '*'
     full_path_names true
     generate_html true
     generate_latex false
@@ -203,7 +202,6 @@ task generateJavaDocs(type: Javadoc) {
     source project(':wpimath').sourceSets.main.java
     source project(':wpilibj').sourceSets.main.java
     source project(':cameraserver').sourceSets.main.java
-    source project(':wpilibOldCommands').sourceSets.main.java
     source project(':wpilibNewCommands').sourceSets.main.java
     source configurations.javaSource.collect { zipTree(it) }
     include '**/*.java'

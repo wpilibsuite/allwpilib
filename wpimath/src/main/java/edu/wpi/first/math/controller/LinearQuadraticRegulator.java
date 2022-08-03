@@ -104,10 +104,11 @@ public class LinearQuadraticRegulator<States extends Num, Inputs extends Num, Ou
 
     if (!StateSpaceUtil.isStabilizable(discA, discB)) {
       var builder = new StringBuilder("The system passed to the LQR is uncontrollable!\n\nA =\n");
-      builder.append(discA.getStorage().toString());
-      builder.append("\nB =\n");
-      builder.append(discB.getStorage().toString());
-      builder.append("\n");
+      builder
+          .append(discA.getStorage().toString())
+          .append("\nB =\n")
+          .append(discB.getStorage().toString())
+          .append('\n');
 
       var msg = builder.toString();
       MathSharedStore.reportError(msg, Thread.currentThread().getStackTrace());
@@ -117,8 +118,13 @@ public class LinearQuadraticRegulator<States extends Num, Inputs extends Num, Ou
     var S = Drake.discreteAlgebraicRiccatiEquation(discA, discB, Q, R);
 
     // K = (BᵀSB + R)⁻¹BᵀSA
-    var temp = discB.transpose().times(S).times(discB).plus(R);
-    m_K = temp.solve(discB.transpose().times(S).times(discA));
+    m_K =
+        discB
+            .transpose()
+            .times(S)
+            .times(discB)
+            .plus(R)
+            .solve(discB.transpose().times(S).times(discA));
 
     m_r = new Matrix<>(new SimpleMatrix(B.getNumRows(), 1));
     m_u = new Matrix<>(new SimpleMatrix(B.getNumCols(), 1));
@@ -151,8 +157,13 @@ public class LinearQuadraticRegulator<States extends Num, Inputs extends Num, Ou
     var S = Drake.discreteAlgebraicRiccatiEquation(discA, discB, Q, R, N);
 
     // K = (BᵀSB + R)⁻¹(BᵀSA + Nᵀ)
-    var temp = discB.transpose().times(S).times(discB).plus(R);
-    m_K = temp.solve(discB.transpose().times(S).times(discA).plus(N.transpose()));
+    m_K =
+        discB
+            .transpose()
+            .times(S)
+            .times(discB)
+            .plus(R)
+            .solve(discB.transpose().times(S).times(discA).plus(N.transpose()));
 
     m_r = new Matrix<>(new SimpleMatrix(B.getNumRows(), 1));
     m_u = new Matrix<>(new SimpleMatrix(B.getNumCols(), 1));

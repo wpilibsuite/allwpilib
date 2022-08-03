@@ -7,13 +7,13 @@
 #include <chrono>
 
 #include <fmt/format.h>
-#include <wpi/HttpUtil.h>
 #include <wpi/SmallString.h>
 #include <wpi/StringExtras.h>
-#include <wpi/TCPAcceptor.h>
 #include <wpi/fmt/raw_ostream.h>
-#include <wpi/raw_socket_istream.h>
-#include <wpi/raw_socket_ostream.h>
+#include <wpinet/HttpUtil.h>
+#include <wpinet/TCPAcceptor.h>
+#include <wpinet/raw_socket_istream.h>
+#include <wpinet/raw_socket_ostream.h>
 
 #include "Handle.h"
 #include "Instance.h"
@@ -797,14 +797,14 @@ void MjpegServerImpl::ConnThread::ProcessRequest() {
   // compatibility, others are for Axis camera compatibility.
   if ((pos = req.find("POST /stream")) != std::string_view::npos) {
     kind = kStream;
-    parameters = req.substr(req.find('?', pos + 12)).substr(1);
+    parameters = wpi::substr(wpi::substr(req, req.find('?', pos + 12)), 1);
   } else if ((pos = req.find("GET /?action=stream")) !=
              std::string_view::npos) {
     kind = kStream;
-    parameters = req.substr(req.find('&', pos + 19)).substr(1);
+    parameters = wpi::substr(wpi::substr(req, req.find('&', pos + 19)), 1);
   } else if ((pos = req.find("GET /stream.mjpg")) != std::string_view::npos) {
     kind = kStream;
-    parameters = req.substr(req.find('?', pos + 16)).substr(1);
+    parameters = wpi::substr(wpi::substr(req, req.find('?', pos + 16)), 1);
   } else if (req.find("GET /settings") != std::string_view::npos &&
              req.find(".json") != std::string_view::npos) {
     kind = kGetSettings;
@@ -820,7 +820,7 @@ void MjpegServerImpl::ConnThread::ProcessRequest() {
   } else if ((pos = req.find("GET /?action=command")) !=
              std::string_view::npos) {
     kind = kCommand;
-    parameters = req.substr(req.find('&', pos + 20)).substr(1);
+    parameters = wpi::substr(wpi::substr(req, req.find('&', pos + 20)), 1);
   } else if (req.find("GET / ") != std::string_view::npos || req == "GET /\n") {
     kind = kRootPage;
   } else {
@@ -833,7 +833,7 @@ void MjpegServerImpl::ConnThread::ProcessRequest() {
   pos = parameters.find_first_not_of(
       "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_"
       "-=&1234567890%./");
-  parameters = parameters.substr(0, pos);
+  parameters = wpi::substr(parameters, 0, pos);
   SDEBUG("command parameters: \"{}\"", parameters);
 
   // Read the rest of the HTTP request.

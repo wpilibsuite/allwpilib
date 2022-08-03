@@ -7,20 +7,21 @@ package edu.wpi.first.wpilibj2.command;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.util.concurrent.atomic.AtomicBoolean;
 import org.junit.jupiter.api.Test;
 
 class InstantCommandTest extends CommandTestBase {
   @Test
   void instantCommandScheduleTest() {
     try (CommandScheduler scheduler = new CommandScheduler()) {
-      ConditionHolder cond = new ConditionHolder();
+      AtomicBoolean cond = new AtomicBoolean();
 
-      InstantCommand command = new InstantCommand(() -> cond.setCondition(true));
+      InstantCommand command = new InstantCommand(() -> cond.set(true));
 
       scheduler.schedule(command);
       scheduler.run();
 
-      assertTrue(cond.getCondition());
+      assertTrue(cond.get());
       assertFalse(scheduler.isScheduled(command));
     }
   }

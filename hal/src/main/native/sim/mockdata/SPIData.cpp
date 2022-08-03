@@ -9,7 +9,7 @@ using namespace hal;
 
 namespace hal::init {
 void InitializeSPIData() {
-  static SPIData ssd[5];
+  static SPIData ssd[kSPIPorts];
   ::hal::SimSPIData = ssd;
 }
 }  // namespace hal::init

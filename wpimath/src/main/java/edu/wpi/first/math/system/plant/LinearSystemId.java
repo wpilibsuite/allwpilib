@@ -62,7 +62,7 @@ public final class LinearSystemId {
    * Create a state-space model of a flywheel system. The states of the system are [angular
    * velocity], inputs are [voltage], and outputs are [angular velocity].
    *
-   * @param motor The motor (or gearbox) attached to the arm.
+   * @param motor The motor (or gearbox) attached to the flywheel.
    * @param jKgMetersSquared The moment of inertia J of the flywheel.
    * @param G The reduction between motor and drum, as a ratio of output to input.
    * @return A LinearSystem representing the given characterized constants.
@@ -87,6 +87,42 @@ public final class LinearSystemId {
         VecBuilder.fill(G * motor.KtNMPerAmp / (motor.rOhms * jKgMetersSquared)),
         Matrix.eye(Nat.N1()),
         new Matrix<>(Nat.N1(), Nat.N1()));
+  }
+
+  /**
+   * Create a state-space model of a DC motor system. The states of the system are [angular
+   * position, angular velocity], inputs are [voltage], and outputs are [angular position, angular
+   * velocity].
+   *
+   * @param motor The motor (or gearbox) attached to the DC motor.
+   * @param jKgMetersSquared The moment of inertia J of the DC motor.
+   * @param G The reduction between motor and drum, as a ratio of output to input.
+   * @return A LinearSystem representing the given characterized constants.
+   * @throws IllegalArgumentException if jKgMetersSquared &lt;= 0 or G &lt;= 0.
+   */
+  @SuppressWarnings("ParameterName")
+  public static LinearSystem<N2, N1, N2> createDCMotorSystem(
+      DCMotor motor, double jKgMetersSquared, double G) {
+    if (jKgMetersSquared <= 0.0) {
+      throw new IllegalArgumentException("J must be greater than zero.");
+    }
+    if (G <= 0.0) {
+      throw new IllegalArgumentException("G must be greater than zero.");
+    }
+
+    return new LinearSystem<>(
+        Matrix.mat(Nat.N2(), Nat.N2())
+            .fill(
+                0,
+                1,
+                0,
+                -G
+                    * G
+                    * motor.KtNMPerAmp
+                    / (motor.KvRadPerSecPerVolt * motor.rOhms * jKgMetersSquared)),
+        VecBuilder.fill(0, G * motor.KtNMPerAmp / (motor.rOhms * jKgMetersSquared)),
+        Matrix.eye(Nat.N2()),
+        new Matrix<>(Nat.N2(), Nat.N1()));
   }
 
   /**
@@ -175,7 +211,7 @@ public final class LinearSystemId {
   }
 
   /**
-   * Identify a velocity system from it's kV (volts/(unit/sec)) and kA (volts/(unit/sec^2). These
+   * Identify a velocity system from it's kV (volts/(unit/sec)) and kA (volts/(unit/sec²). These
    * constants cam be found using SysId. The states of the system are [velocity], inputs are
    * [voltage], and outputs are [velocity].
    *
@@ -205,7 +241,7 @@ public final class LinearSystemId {
   }
 
   /**
-   * Identify a position system from it's kV (volts/(unit/sec)) and kA (volts/(unit/sec^2). These
+   * Identify a position system from it's kV (volts/(unit/sec)) and kA (volts/(unit/sec²). These
    * constants cam be found using SysId. The states of the system are [position, velocity]ᵀ, inputs
    * are [voltage], and outputs are [position].
    *
@@ -235,11 +271,13 @@ public final class LinearSystemId {
   }
 
   /**
-   * Identify a standard differential drive drivetrain, given the drivetrain's kV and kA in both
-   * linear (volts/(meter/sec) and volts/(meter/sec^2)) and angular (volts/(meter/sec) and
-   * volts/(meter/sec^2)) cases. This can be found using SysId. The states of the system are [left
-   * velocity, right velocity]ᵀ, inputs are [left voltage, right voltage]ᵀ, and outputs are [left
-   * velocity, right velocity]ᵀ.
+   * Identify a differential drive drivetrain given the drivetrain's kV and kA in both linear
+   * (volts/(meter/sec) and volts/(meter/sec²)) and angular (volts/(radian/sec) and
+   * volts/(radian/sec²)) cases. This can be found using SysId.
+   *
+   * <p>States: [[left velocity], [right velocity]]<br>
+   * Inputs: [[left voltage], [right voltage]]<br>
+   * Outputs: [[left velocity], [right velocity]]
    *
    * @param kVLinear The linear velocity gain, volts per (meter per second).
    * @param kALinear The linear acceleration gain, volts per (meter per second squared).
@@ -279,17 +317,20 @@ public final class LinearSystemId {
   }
 
   /**
-   * Identify a standard differential drive drivetrain, given the drivetrain's kV and kA in both
-   * linear (volts/(meter/sec) and volts/(meter/sec^2)) and angular (volts/(radian/sec) and
-   * volts/(radian/sec^2)) cases. This can be found using SysId. The states of the system are [left
-   * velocity, right velocity]ᵀ, inputs are [left voltage, right voltage]ᵀ, and outputs are [left
-   * velocity, right velocity]ᵀ.
+   * Identify a differential drive drivetrain given the drivetrain's kV and kA in both linear
+   * (volts/(meter/sec) and volts/(meter/sec²)) and angular (volts/(radian/sec) and
+   * volts/(radian/sec²)) cases. This can be found using SysId.
+   *
+   * <p>States: [[left velocity], [right velocity]]<br>
+   * Inputs: [[left voltage], [right voltage]]<br>
+   * Outputs: [[left velocity], [right velocity]]
    *
    * @param kVLinear The linear velocity gain, volts per (meter per second).
    * @param kALinear The linear acceleration gain, volts per (meter per second squared).
    * @param kVAngular The angular velocity gain, volts per (radians per second).
    * @param kAAngular The angular acceleration gain, volts per (radians per second squared).
-   * @param trackwidth The width of the drivetrain in meters.
+   * @param trackwidth The distance between the differential drive's left and right wheels in
+   *     meters.
    * @return A LinearSystem representing the given characterized constants.
    * @throws IllegalArgumentException if kVLinear &lt;= 0, kALinear &lt;= 0, kVAngular &lt;= 0,
    *     kAAngular &lt;= 0, or trackwidth &lt;= 0.
@@ -324,7 +365,7 @@ public final class LinearSystemId {
     // omega = 2/trackwidth v
     //
     // So multiplying by 2/trackwidth converts the angular gains from V/(rad/s)
-    // to V/m/s).
+    // to V/(m/s).
     return identifyDrivetrainSystem(
         kVLinear, kALinear, kVAngular * 2.0 / trackwidth, kAAngular * 2.0 / trackwidth);
   }

@@ -20,7 +20,14 @@
  */
 class Drivetrain {
  public:
-  Drivetrain() { m_gyro.Reset(); }
+  Drivetrain() {
+    m_gyro.Reset();
+    // We need to invert one side of the drivetrain so that positive voltages
+    // result in both sides moving forward. Depending on how your robot's
+    // gearbox is constructed, you might have to invert the left side instead.
+    m_frontRightMotor.SetInverted(true);
+    m_backRightMotor.SetInverted(true);
+  }
 
   frc::MecanumDriveWheelSpeeds GetCurrentState() const;
   void SetSpeeds(const frc::MecanumDriveWheelSpeeds& wheelSpeeds);

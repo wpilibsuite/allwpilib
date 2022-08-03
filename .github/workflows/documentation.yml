@@ -2,6 +2,10 @@ name: Documentation
 
 on: [push, workflow_dispatch]
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 env:
   BASE_PATH: allwpilib/docs
 
@@ -10,8 +14,9 @@ jobs:
     name: "Documentation - Publish"
     runs-on: ubuntu-latest
     if: github.repository_owner == 'wpilibsuite' && (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v'))
+    concurrency: ci-docs-publish
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           fetch-depth: 0
           persist-credentials: false

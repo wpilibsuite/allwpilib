@@ -9,9 +9,11 @@
 
 #include <wpi/SmallVector.h>
 #include <wpi/StringExtras.h>
-#include <wpi/TCPAcceptor.h>
-#include <wpi/TCPConnector.h>
+#include <wpi/json_serializer.h>
+#include <wpi/raw_ostream.h>
 #include <wpi/timestamp.h>
+#include <wpinet/TCPAcceptor.h>
+#include <wpinet/TCPConnector.h>
 
 #include "IConnectionNotifier.h"
 #include "IStorage.h"
@@ -19,6 +21,24 @@
 #include "NetworkConnection.h"
 
 using namespace nt;
+
+static std::string ConnInfoToJson(bool connected, const ConnectionInfo& info) {
+  std::string str;
+  wpi::raw_string_ostream os{str};
+  wpi::json::serializer s{os, ' ', 0};
+  os << "{\"connected\":" << (connected ? "true" : "false");
+  os << ",\"remote_id\":\"";
+  s.dump_escaped(info.remote_id, false);
+  os << "\",\"remote_ip\":\"";
+  s.dump_escaped(info.remote_ip, false);
+  os << "\",\"remote_port\":";
+  s.dump_integer(static_cast<uint64_t>(info.remote_port));
+  os << ",\"protocol_version\":";
+  s.dump_integer(static_cast<uint64_t>(info.protocol_version));
+  os << "}";
+  os.flush();
+  return str;
+}
 
 void Dispatcher::StartServer(std::string_view persist_filename,
                              const char* listen_address, unsigned int port) {
@@ -101,6 +121,13 @@ DispatcherBase::DispatcherBase(IStorage& storage, IConnectionNotifier& notifier,
 
 DispatcherBase::~DispatcherBase() {
   Stop();
+
+  {
+    std::scoped_lock lock(m_user_mutex);
+    for (auto&& datalog : m_dataloggers) {
+      m_notifier.Remove(datalog.notifier);
+    }
+  }
 }
 
 unsigned int DispatcherBase::GetNetworkMode() const {
@@ -300,6 +327,33 @@ unsigned int DispatcherBase::AddPolledListener(unsigned int poller_uid,
     }
   }
   return uid;
+}
+
+unsigned int DispatcherBase::StartDataLog(wpi::log::DataLog& log,
+                                          std::string_view name) {
+  std::scoped_lock lock(m_user_mutex);
+  auto now = nt::Now();
+  unsigned int uid = m_dataloggers.emplace_back(log, name, now);
+  m_dataloggers[uid].notifier =
+      m_notifier.Add([this, uid](const ConnectionNotification& n) {
+        std::scoped_lock lock(m_user_mutex);
+        if (uid < m_dataloggers.size() && m_dataloggers[uid].entry) {
+          m_dataloggers[uid].entry.Append(ConnInfoToJson(n.connected, n.conn),
+                                          nt::Now());
+        }
+      });
+  for (auto& conn : m_connections) {
+    if (conn->state() != NetworkConnection::kActive) {
+      continue;
+    }
+    m_dataloggers[uid].entry.Append(ConnInfoToJson(true, conn->info()), now);
+  }
+  return uid;
+}
+
+void DispatcherBase::StopDataLog(unsigned int logger) {
+  std::scoped_lock lock(m_user_mutex);
+  m_notifier.Remove(m_dataloggers.erase(logger).notifier);
 }
 
 void DispatcherBase::SetConnector(Connector connector) {

@@ -14,6 +14,8 @@
 #include <utility>
 #include <vector>
 
+#include <wpi/DataLog.h>
+#include <wpi/UidVector.h>
 #include <wpi/condition_variable.h>
 #include <wpi/mutex.h>
 #include <wpi/span.h>
@@ -60,6 +62,9 @@ class DispatcherBase : public IDispatcher {
       bool immediate_notify) const;
   unsigned int AddPolledListener(unsigned int poller_uid,
                                  bool immediate_notify) const;
+
+  unsigned int StartDataLog(wpi::log::DataLog& log, std::string_view name);
+  void StopDataLog(unsigned int logger);
 
   void SetConnector(Connector connector);
   void SetConnectorOverride(Connector connector);
@@ -119,6 +124,20 @@ class DispatcherBase : public IDispatcher {
   wpi::condition_variable m_reconnect_cv;
   unsigned int m_reconnect_proto_rev = 0x0300;
   bool m_do_reconnect = true;
+
+  struct DataLogger {
+    DataLogger() = default;
+    DataLogger(wpi::log::DataLog& log, std::string_view name, int64_t time)
+        : entry{log, name,
+                "{\"schema\":\"NTConnectionInfo\",\"source\":\"NT\"}", "json",
+                time} {}
+
+    explicit operator bool() const { return static_cast<bool>(entry); }
+
+    wpi::log::StringLogEntry entry;
+    unsigned int notifier = 0;
+  };
+  wpi::UidVector<DataLogger, 4> m_dataloggers;
 
  protected:
   wpi::Logger& m_logger;

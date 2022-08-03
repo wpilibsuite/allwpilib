@@ -4,8 +4,6 @@
 
 #pragma once
 
-#include <wpi/deprecated.h>
-
 namespace frc {
 
 class RobotState {
@@ -15,8 +13,6 @@ class RobotState {
   static bool IsDisabled();
   static bool IsEnabled();
   static bool IsEStopped();
-  WPI_DEPRECATED("Use IsTeleop() instead")
-  static bool IsOperatorControl();
   static bool IsTeleop();
   static bool IsAutonomous();
   static bool IsTest();

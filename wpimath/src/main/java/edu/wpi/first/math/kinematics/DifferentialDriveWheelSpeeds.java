@@ -28,15 +28,16 @@ public class DifferentialDriveWheelSpeeds {
   }
 
   /**
-   * Normalizes the wheel speeds using some max attainable speed. Sometimes, after inverse
-   * kinematics, the requested speed from a/several modules may be above the max attainable speed
-   * for the driving motor on that module. To fix this issue, one can "normalize" all the wheel
-   * speeds to make sure that all requested module speeds are below the absolute threshold, while
-   * maintaining the ratio of speeds between modules.
+   * Renormalizes the wheel speeds if any either side is above the specified maximum.
+   *
+   * <p>Sometimes, after inverse kinematics, the requested speed from one or more wheels may be
+   * above the max attainable speed for the driving motor on that wheel. To fix this issue, one can
+   * reduce all the wheel speeds to make sure that all requested module speeds are at-or-below the
+   * absolute threshold, while maintaining the ratio of speeds between wheels.
    *
    * @param attainableMaxSpeedMetersPerSecond The absolute max speed that a wheel can reach.
    */
-  public void normalize(double attainableMaxSpeedMetersPerSecond) {
+  public void desaturate(double attainableMaxSpeedMetersPerSecond) {
     double realMaxSpeed = Math.max(Math.abs(leftMetersPerSecond), Math.abs(rightMetersPerSecond));
 
     if (realMaxSpeed > attainableMaxSpeedMetersPerSecond) {

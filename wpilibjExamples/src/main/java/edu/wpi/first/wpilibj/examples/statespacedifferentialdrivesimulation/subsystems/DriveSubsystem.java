@@ -62,11 +62,11 @@ public class DriveSubsystem extends SubsystemBase {
 
   // These classes help us simulate our drivetrain
   public DifferentialDrivetrainSim m_drivetrainSimulator;
-  private EncoderSim m_leftEncoderSim;
-  private EncoderSim m_rightEncoderSim;
+  private final EncoderSim m_leftEncoderSim;
+  private final EncoderSim m_rightEncoderSim;
   // The Field2d class shows the field in the sim GUI
-  private Field2d m_fieldSim;
-  private ADXRS450_GyroSim m_gyroSim;
+  private final Field2d m_fieldSim;
+  private final ADXRS450_GyroSim m_gyroSim;
 
   /** Creates a new DriveSubsystem. */
   public DriveSubsystem() {
@@ -101,6 +101,12 @@ public class DriveSubsystem extends SubsystemBase {
       // the Field2d class lets us visualize our robot in the simulation GUI.
       m_fieldSim = new Field2d();
       SmartDashboard.putData("Field", m_fieldSim);
+    } else {
+      m_leftEncoderSim = null;
+      m_rightEncoderSim = null;
+      m_gyroSim = null;
+
+      m_fieldSim = null;
     }
   }
 
@@ -122,7 +128,7 @@ public class DriveSubsystem extends SubsystemBase {
     // move forward.
     m_drivetrainSimulator.setInputs(
         m_leftMotors.get() * RobotController.getBatteryVoltage(),
-        -m_rightMotors.get() * RobotController.getBatteryVoltage());
+        m_rightMotors.get() * RobotController.getBatteryVoltage());
     m_drivetrainSimulator.update(0.020);
 
     m_leftEncoderSim.setDistance(m_drivetrainSimulator.getLeftPositionMeters());
@@ -188,13 +194,8 @@ public class DriveSubsystem extends SubsystemBase {
    * @param rightVolts the commanded right output
    */
   public void tankDriveVolts(double leftVolts, double rightVolts) {
-    var batteryVoltage = RobotController.getBatteryVoltage();
-    if (Math.max(Math.abs(leftVolts), Math.abs(rightVolts)) > batteryVoltage) {
-      leftVolts *= batteryVoltage / 12.0;
-      rightVolts *= batteryVoltage / 12.0;
-    }
     m_leftMotors.setVoltage(leftVolts);
-    m_rightMotors.setVoltage(-rightVolts);
+    m_rightMotors.setVoltage(rightVolts);
     m_drive.feed();
   }
 

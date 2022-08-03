@@ -8,11 +8,12 @@ import static edu.wpi.first.wpilibj.util.ErrorMessages.requireNonNullParam;
 
 import edu.wpi.first.wpilibj.GenericHID;
 
-/** A {@link Button} that gets its state from a {@link GenericHID}. */
+/**
+ * A {@link Button} that gets its state from a {@link GenericHID}.
+ *
+ * <p>This class is provided by the NewCommands VendorDep
+ */
 public class JoystickButton extends Button {
-  private final GenericHID m_joystick;
-  private final int m_buttonNumber;
-
   /**
    * Creates a joystick button for triggering commands.
    *
@@ -20,19 +21,7 @@ public class JoystickButton extends Button {
    * @param buttonNumber The button number (see {@link GenericHID#getRawButton(int) }
    */
   public JoystickButton(GenericHID joystick, int buttonNumber) {
+    super(() -> joystick.getRawButton(buttonNumber));
     requireNonNullParam(joystick, "joystick", "JoystickButton");
-
-    m_joystick = joystick;
-    m_buttonNumber = buttonNumber;
-  }
-
-  /**
-   * Gets the value of the joystick button.
-   *
-   * @return The value of the joystick button
-   */
-  @Override
-  public boolean get() {
-    return m_joystick.getRawButton(m_buttonNumber);
   }
 }

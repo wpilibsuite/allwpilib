@@ -58,7 +58,7 @@ double HAL_GetAnalogOutput(HAL_AnalogOutputHandle analogOutputHandle,
                            int32_t* status);
 
 /**
- * Checks that the analog output channel number is value.
+ * Checks that the analog output channel number is valid.
  *
  * Verifies that the analog channel number is one of the legal channel numbers.
  * Channel numbers are 0-based.

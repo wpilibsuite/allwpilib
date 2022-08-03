@@ -4,11 +4,7 @@
 
 package edu.wpi.first.util;
 
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 
 public final class RuntimeDetector {
   private static String filePrefix;
@@ -22,6 +18,7 @@ public final class RuntimeDetector {
 
     boolean intel32 = is32BitIntel();
     boolean intel64 = is64BitIntel();
+    boolean arm64 = isArm64();
 
     if (isWindows()) {
       filePrefix = "";
@@ -35,7 +32,9 @@ public final class RuntimeDetector {
       filePrefix = "lib";
       fileExtension = ".dylib";
       if (intel32) {
-        filePath = "/osx/x86";
+        filePath = "/osx/x86/";
+      } else if (arm64) {
+        filePath = "/osx/arm64/";
       } else {
         filePath = "/osx/x86-64/";
       }
@@ -48,10 +47,10 @@ public final class RuntimeDetector {
         filePath = "/linux/x86-64/";
       } else if (isAthena()) {
         filePath = "/linux/athena/";
-      } else if (isRaspbian()) {
-        filePath = "/linux/raspbian/";
-      } else if (isAarch64()) {
-        filePath = "/linux/aarch64bionic/";
+      } else if (isArm32()) {
+        filePath = "/linux/arm32/";
+      } else if (arm64) {
+        filePath = "/linux/arm64/";
       } else {
         filePath = "/linux/nativearm/";
       }
@@ -128,29 +127,23 @@ public final class RuntimeDetector {
   }
 
   /**
-   * Check if OS is Raspbian.
+   * Check if OS is Arm32.
    *
-   * @return True if OS is Raspbian.
+   * @return True if OS is Arm32.
    */
-  public static boolean isRaspbian() {
-    try (BufferedReader reader = Files.newBufferedReader(Paths.get("/etc/os-release"))) {
-      String value = reader.readLine();
-      if (value == null) {
-        return false;
-      }
-      return value.contains("Raspbian");
-    } catch (IOException ex) {
-      return false;
-    }
+  public static boolean isArm32() {
+    String arch = System.getProperty("os.arch");
+    return "arm".equals(arch) || "arm32".equals(arch);
   }
 
   /**
-   * check if architecture is aarch64.
+   * check if architecture is Arm64.
    *
-   * @return if architecture is aarch64
+   * @return if architecture is Arm64
    */
-  public static boolean isAarch64() {
-    return System.getProperty("os.arch").equals("aarch64");
+  public static boolean isArm64() {
+    String arch = System.getProperty("os.arch");
+    return "aarch64".equals(arch) || "arm64".equals(arch);
   }
 
   public static boolean isLinux() {

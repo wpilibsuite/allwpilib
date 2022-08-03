@@ -18,10 +18,10 @@ import java.util.List;
 import java.util.Random;
 import org.junit.jupiter.api.Test;
 
-public class MecanumDrivePoseEstimatorTest {
+class MecanumDrivePoseEstimatorTest {
   @Test
   @SuppressWarnings("LocalVariableName")
-  public void testAccuracy() {
+  void testAccuracy() {
     var kinematics =
         new MecanumDriveKinematics(
             new Translation2d(1, 1), new Translation2d(1, -1),
@@ -111,7 +111,7 @@ public class MecanumDrivePoseEstimatorTest {
     }
 
     assertEquals(
-        0.0, errorSum / (trajectory.getTotalTimeSeconds() / dt), 0.25, "Incorrect mean error");
-    assertEquals(0.0, maxError, 0.42, "Incorrect max error");
+        0.0, errorSum / (trajectory.getTotalTimeSeconds() / dt), 0.05, "Incorrect mean error");
+    assertEquals(0.0, maxError, 0.1, "Incorrect max error");
   }
 }

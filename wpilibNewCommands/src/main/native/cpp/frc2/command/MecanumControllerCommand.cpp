@@ -81,9 +81,6 @@ MecanumControllerCommand::MecanumControllerCommand(
       m_outputVolts(std::move(output)),
       m_usePID(true) {
   AddRequirements(requirements);
-  m_desiredRotation = [&] {
-    return m_trajectory.States().back().pose.Rotation();
-  };
 }
 
 MecanumControllerCommand::MecanumControllerCommand(
@@ -158,9 +155,6 @@ MecanumControllerCommand::MecanumControllerCommand(
       m_outputVolts(std::move(output)),
       m_usePID(true) {
   AddRequirements(requirements);
-  m_desiredRotation = [&] {
-    return m_trajectory.States().back().pose.Rotation();
-  };
 }
 
 MecanumControllerCommand::MecanumControllerCommand(
@@ -203,9 +197,6 @@ MecanumControllerCommand::MecanumControllerCommand(
       m_outputVel(std::move(output)),
       m_usePID(false) {
   AddRequirements(requirements);
-  m_desiredRotation = [&] {
-    return m_trajectory.States().back().pose.Rotation();
-  };
 }
 
 MecanumControllerCommand::MecanumControllerCommand(
@@ -248,12 +239,14 @@ MecanumControllerCommand::MecanumControllerCommand(
       m_outputVel(std::move(output)),
       m_usePID(false) {
   AddRequirements(requirements);
-  m_desiredRotation = [&] {
-    return m_trajectory.States().back().pose.Rotation();
-  };
 }
 
 void MecanumControllerCommand::Initialize() {
+  if (m_desiredRotation == nullptr) {
+    m_desiredRotation = [&] {
+      return m_trajectory.States().back().pose.Rotation();
+    };
+  }
   m_prevTime = 0_s;
   auto initialState = m_trajectory.Sample(0_s);
 
@@ -285,7 +278,7 @@ void MecanumControllerCommand::Execute() {
       m_controller.Calculate(m_pose(), m_desiredState, m_desiredRotation());
   auto targetWheelSpeeds = m_kinematics.ToWheelSpeeds(targetChassisSpeeds);
 
-  targetWheelSpeeds.Normalize(m_maxWheelVelocity);
+  targetWheelSpeeds.Desaturate(m_maxWheelVelocity);
 
   auto frontLeftSpeedSetpoint = targetWheelSpeeds.frontLeft;
   auto rearLeftSpeedSetpoint = targetWheelSpeeds.rearLeft;

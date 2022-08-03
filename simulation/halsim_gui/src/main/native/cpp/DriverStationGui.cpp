@@ -4,9 +4,11 @@
 
 #include "DriverStationGui.h"
 
+#include <glass/Context.h>
+#include <glass/Storage.h>
 #include <glass/other/FMS.h>
 #include <glass/support/ExtraGuiWidgets.h>
-#include <glass/support/IniSaverInfo.h>
+#include <glass/support/NameSetting.h>
 
 #include <algorithm>
 #include <atomic>
@@ -93,7 +95,7 @@ class GlfwSystemJoystick : public SystemJoystick {
 
 class KeyboardJoystick : public SystemJoystick {
  public:
-  explicit KeyboardJoystick(int index);
+  KeyboardJoystick(glass::Storage& storage, int index);
 
   void SettingsDisplay() override;
   void Update() override;
@@ -107,9 +109,6 @@ class KeyboardJoystick : public SystemJoystick {
   void ClearKey(int key);
   virtual const char* GetKeyName(int key) const = 0;
 
-  void ReadIni(std::string_view name, std::string_view value);
-  void WriteIni(ImGuiTextBuffer* out_buf) const;
-
  protected:
   void EditKey(const char* label, int* key);
 
@@ -121,44 +120,57 @@ class KeyboardJoystick : public SystemJoystick {
 
   HALJoystickData m_data;
 
+  int& m_axisCount;
+  int& m_buttonCount;
+  int& m_povCount;
+
   struct AxisConfig {
-    int incKey = -1;
-    int decKey = -1;
-    float keyRate = 0.05f;
-    float decayRate = 0.05f;
-    float maxAbsValue = 1.0f;
+    explicit AxisConfig(glass::Storage& storage);
+
+    int& incKey;
+    int& decKey;
+    float& keyRate;
+    float& decayRate;
+    float& maxAbsValue;
   };
-  AxisConfig m_axisConfig[HAL_kMaxJoystickAxes];
+
+  std::vector<std::unique_ptr<glass::Storage>>& m_axisStorage;
+  std::vector<AxisConfig> m_axisConfig;
 
   static constexpr int kMaxButtonCount = 32;
-  int m_buttonKey[kMaxButtonCount];
+  std::vector<int>& m_buttonKey;
 
   struct PovConfig {
-    int key0 = -1;
-    int key45 = -1;
-    int key90 = -1;
-    int key135 = -1;
-    int key180 = -1;
-    int key225 = -1;
-    int key270 = -1;
-    int key315 = -1;
+    explicit PovConfig(glass::Storage& storage);
+
+    int& key0;
+    int& key45;
+    int& key90;
+    int& key135;
+    int& key180;
+    int& key225;
+    int& key270;
+    int& key315;
   };
 
-  PovConfig m_povConfig[HAL_kMaxJoystickPOVs];
+  std::vector<std::unique_ptr<glass::Storage>>& m_povStorage;
+  std::vector<PovConfig> m_povConfig;
 };
 
 class GlfwKeyboardJoystick : public KeyboardJoystick {
  public:
-  explicit GlfwKeyboardJoystick(int index, bool noDefaults = false);
+  GlfwKeyboardJoystick(glass::Storage& storage, int index);
 
   const char* GetKeyName(int key) const override;
 };
 
 struct RobotJoystick {
-  glass::NameInfo name;
-  std::string guid;
+  explicit RobotJoystick(glass::Storage& storage);
+
+  glass::NameSetting name;
+  std::string& guid;
   const SystemJoystick* sys = nullptr;
-  bool useGamepad = false;
+  bool& useGamepad;  // = false;
 
   HALJoystickData data;
 
@@ -235,8 +247,6 @@ class FMSSimModel : public glass::FMSModel {
   }
   void SetMatchTime(double val) override {
     HALSIM_SetDriverStationMatchTime(val);
-    int32_t status = 0;
-    m_startMatchTime = HAL_GetFPGATime(&status) * 1.0e-6 - val;
   }
   void SetEStop(bool val) override { HALSIM_SetDriverStationEStop(val); }
   void SetEnabled(bool val) override { HALSIM_SetDriverStationEnabled(val); }
@@ -254,8 +264,6 @@ class FMSSimModel : public glass::FMSModel {
 
   bool IsReadOnly() override;
 
-  bool m_matchTimeEnabled = true;
-
  private:
   glass::DataSource m_fmsAttached{"FMS:FMSAttached"};
   glass::DataSource m_dsAttached{"FMS:DSAttached"};
@@ -265,8 +273,7 @@ class FMSSimModel : public glass::FMSModel {
   glass::DataSource m_enabled{"FMS:RobotEnabled"};
   glass::DataSource m_test{"FMS:TestMode"};
   glass::DataSource m_autonomous{"FMS:AutonomousMode"};
-  double m_startMatchTime = 0.0;
-  double m_prevTime = 0.0;
+  double m_startMatchTime = -1.0;
 };
 
 }  // namespace
@@ -277,23 +284,24 @@ static int gNumGlfwJoysticks = 0;
 static std::vector<std::unique_ptr<GlfwKeyboardJoystick>> gKeyboardJoysticks;
 
 // robot joysticks
-static RobotJoystick gRobotJoysticks[HAL_kMaxJoysticks];
+static std::vector<RobotJoystick> gRobotJoysticks;
 static std::unique_ptr<JoystickModel> gJoystickSources[HAL_kMaxJoysticks];
 
 // FMS
 static std::unique_ptr<FMSSimModel> gFMSModel;
 
 // Window management
-DSManager DriverStationGui::dsManager{"DSManager"};
+std::unique_ptr<DSManager> DriverStationGui::dsManager;
 
-static bool gDisableDS = false;
-static bool gZeroDisconnectedJoysticks = true;
-static bool gUseEnableDisableHotkeys = false;
-static bool gUseEstopHotkey = false;
-static std::atomic<bool>* gDSSocketConnected = nullptr;
+static bool* gpDisableDS = nullptr;
+static bool* gpZeroDisconnectedJoysticks = nullptr;
+static bool* gpUseEnableDisableHotkeys = nullptr;
+static bool* gpUseEstopHotkey = nullptr;
+static std::atomic<bool>* gpDSSocketConnected = nullptr;
 
 static inline bool IsDSDisabled() {
-  return gDisableDS || (gDSSocketConnected && *gDSSocketConnected);
+  return (gpDisableDS != nullptr && *gpDisableDS) ||
+         (gpDSSocketConnected && *gpDSSocketConnected);
 }
 
 JoystickModel::JoystickModel(int index) : m_index{index} {
@@ -357,133 +365,6 @@ void JoystickModel::CallbackFunc(const char*, void* param, const HAL_Value*) {
   }
 }
 
-// read/write joystick mapping to ini file
-static void* JoystickReadOpen(ImGuiContext* ctx, ImGuiSettingsHandler* handler,
-                              const char* name) {
-  int num = wpi::parse_integer<int>(name, 10).value_or(-1);
-  if (num < 0 || num >= HAL_kMaxJoysticks) {
-    return nullptr;
-  }
-  return &gRobotJoysticks[num];
-}
-
-static void JoystickReadLine(ImGuiContext* ctx, ImGuiSettingsHandler* handler,
-                             void* entry, const char* line) {
-  RobotJoystick* joy = static_cast<RobotJoystick*>(entry);
-  // format: guid=guid or useGamepad=0/1
-  auto [name, value] = wpi::split(line, '=');
-  name = wpi::trim(name);
-  value = wpi::trim(value);
-  if (name == "guid") {
-    joy->guid = value;
-  } else if (name == "useGamepad") {
-    if (auto num = wpi::parse_integer<int>(value, 10)) {
-      joy->useGamepad = num.value();
-    }
-  } else {
-    joy->name.ReadIni(name, value);
-  }
-}
-
-static void JoystickWriteAll(ImGuiContext* ctx, ImGuiSettingsHandler* handler,
-                             ImGuiTextBuffer* out_buf) {
-  for (int i = 0; i < HAL_kMaxJoysticks; ++i) {
-    auto& joy = gRobotJoysticks[i];
-    if (!joy.name.HasName() && !joy.sys) {
-      continue;
-    }
-    out_buf->appendf("[Joystick][%d]\nuseGamepad=%d\n", i,
-                     joy.useGamepad ? 1 : 0);
-    if (joy.name.HasName()) {
-      joy.name.WriteIni(out_buf);
-    }
-    if (joy.sys) {
-      const char* guid = joy.sys->GetGUID();
-      if (guid) {
-        out_buf->appendf("guid=%s\n", guid);
-      }
-    }
-    out_buf->append("\n");
-  }
-}
-
-// read/write keyboard joystick mapping to ini file
-static void* KeyboardJoystickReadOpen(ImGuiContext* ctx,
-                                      ImGuiSettingsHandler* handler,
-                                      const char* name) {
-  int num = wpi::parse_integer<int>(name, 10).value_or(-1);
-  if (num < 0 || num >= static_cast<int>(gKeyboardJoysticks.size())) {
-    return nullptr;
-  }
-  auto joy = gKeyboardJoysticks[num].get();
-  *joy = GlfwKeyboardJoystick(num, true);
-  return joy;
-}
-
-static void KeyboardJoystickReadLine(ImGuiContext* ctx,
-                                     ImGuiSettingsHandler* handler, void* entry,
-                                     const char* line) {
-  auto joy = static_cast<KeyboardJoystick*>(entry);
-  // format: guid=guid or useGamepad=0/1
-  auto [name, value] = wpi::split(line, '=');
-  joy->ReadIni(wpi::trim(name), wpi::trim(value));
-}
-
-static void KeyboardJoystickWriteAll(ImGuiContext* ctx,
-                                     ImGuiSettingsHandler* handler,
-                                     ImGuiTextBuffer* out_buf) {
-  for (unsigned int i = 0; i < gKeyboardJoysticks.size(); ++i) {
-    out_buf->appendf("[KeyboardJoystick][%u]\n", i);
-    gKeyboardJoysticks[i]->WriteIni(out_buf);
-    out_buf->append("\n");
-  }
-}
-
-// read/write DS settings to ini file
-static void* DriverStationReadOpen(ImGuiContext* ctx,
-                                   ImGuiSettingsHandler* handler,
-                                   const char* name) {
-  if (name == std::string_view{"Main"}) {
-    return &gDisableDS;
-  }
-  return nullptr;
-}
-
-static void DriverStationReadLine(ImGuiContext* ctx,
-                                  ImGuiSettingsHandler* handler, void* entry,
-                                  const char* line) {
-  auto [name, value] = wpi::split(line, '=');
-  name = wpi::trim(name);
-  value = wpi::trim(value);
-  if (name == "disable") {
-    if (auto num = wpi::parse_integer<int>(value, 10)) {
-      gDisableDS = num.value();
-    }
-  } else if (name == "zeroDisconnectedJoysticks") {
-    if (auto num = wpi::parse_integer<int>(value, 10)) {
-      gZeroDisconnectedJoysticks = num.value();
-    }
-  } else if (name == "enableDisableKeys") {
-    if (auto num = wpi::parse_integer<int>(value, 10)) {
-      gUseEnableDisableHotkeys = num.value();
-    }
-  } else if (name == "estopKey") {
-    if (auto num = wpi::parse_integer<int>(value, 10)) {
-      gUseEstopHotkey = num.value();
-    }
-  }
-}
-
-static void DriverStationWriteAll(ImGuiContext* ctx,
-                                  ImGuiSettingsHandler* handler,
-                                  ImGuiTextBuffer* out_buf) {
-  out_buf->appendf(
-      "[DriverStation][Main]\ndisable=%d\nzeroDisconnectedJoysticks=%d\n"
-      "enableDisableKeys=%d\nestopKey=%d\n\n",
-      gDisableDS ? 1 : 0, gZeroDisconnectedJoysticks ? 1 : 0,
-      gUseEnableDisableHotkeys ? 1 : 0, gUseEstopHotkey ? 1 : 0);
-}
-
 void GlfwSystemJoystick::Update() {
   bool wasPresent = m_present;
   m_present = glfwJoystickPresent(m_index);
@@ -520,7 +401,6 @@ void GlfwSystemJoystick::Update() {
     for (auto&& joy : gRobotJoysticks) {
       if (guid == joy.guid) {
         joy.sys = this;
-        joy.guid.clear();
         break;
       }
     }
@@ -616,21 +496,84 @@ void GlfwSystemJoystick::GetData(HALJoystickData* data, bool mapGamepad) const {
   }
 }
 
-KeyboardJoystick::KeyboardJoystick(int index) : m_index{index} {
+KeyboardJoystick::AxisConfig::AxisConfig(glass::Storage& storage)
+    : incKey{storage.GetInt("incKey", -1)},
+      decKey{storage.GetInt("decKey", -1)},
+      keyRate{storage.GetFloat("keyRate", 0.05f)},
+      decayRate{storage.GetFloat("decayRate", 0.05f)},
+      maxAbsValue{storage.GetFloat("maxAbsValue", 1.0f)} {
+  // sanity check the key ranges
+  if (incKey < -1 || incKey >= IM_ARRAYSIZE(ImGuiIO::KeysDown)) {
+    incKey = -1;
+  }
+  if (decKey < -1 || decKey >= IM_ARRAYSIZE(ImGuiIO::KeysDown)) {
+    decKey = -1;
+  }
+}
+
+KeyboardJoystick::PovConfig::PovConfig(glass::Storage& storage)
+    : key0{storage.GetInt("key0", -1)},
+      key45{storage.GetInt("key45", -1)},
+      key90{storage.GetInt("key90", -1)},
+      key135{storage.GetInt("key135", -1)},
+      key180{storage.GetInt("key180", -1)},
+      key225{storage.GetInt("key225", -1)},
+      key270{storage.GetInt("key270", -1)},
+      key315{storage.GetInt("key315", -1)} {
+  // sanity check the key ranges
+  if (key0 < -1 || key0 >= IM_ARRAYSIZE(ImGuiIO::KeysDown)) {
+    key0 = -1;
+  }
+  if (key45 < -1 || key45 >= IM_ARRAYSIZE(ImGuiIO::KeysDown)) {
+    key45 = -1;
+  }
+  if (key90 < -1 || key90 >= IM_ARRAYSIZE(ImGuiIO::KeysDown)) {
+    key90 = -1;
+  }
+  if (key135 < -1 || key135 >= IM_ARRAYSIZE(ImGuiIO::KeysDown)) {
+    key135 = -1;
+  }
+  if (key180 < -1 || key180 >= IM_ARRAYSIZE(ImGuiIO::KeysDown)) {
+    key180 = -1;
+  }
+  if (key225 < -1 || key225 >= IM_ARRAYSIZE(ImGuiIO::KeysDown)) {
+    key225 = -1;
+  }
+  if (key270 < -1 || key270 >= IM_ARRAYSIZE(ImGuiIO::KeysDown)) {
+    key270 = -1;
+  }
+  if (key315 < -1 || key315 >= IM_ARRAYSIZE(ImGuiIO::KeysDown)) {
+    key315 = -1;
+  }
+}
+
+KeyboardJoystick::KeyboardJoystick(glass::Storage& storage, int index)
+    : m_index{index},
+      m_axisCount{storage.GetInt("axisCount", -1)},
+      m_buttonCount{storage.GetInt("buttonCount", -1)},
+      m_povCount{storage.GetInt("povCount", -1)},
+      m_axisStorage{storage.GetChildArray("axisConfig")},
+      m_buttonKey{storage.GetIntArray("buttonKeys")},
+      m_povStorage{storage.GetChildArray("povConfig")} {
   std::snprintf(m_name, sizeof(m_name), "Keyboard %d", index);
   std::snprintf(m_guid, sizeof(m_guid), "Keyboard%d", index);
 
   // init axes
-  m_data.axes.count = 0;
+  for (auto&& axisConfig : m_axisStorage) {
+    m_axisConfig.emplace_back(*axisConfig);
+  }
 
-  // init buttons
-  m_data.buttons.count = 0;
-  for (int i = 0; i < kMaxButtonCount; ++i) {
-    m_buttonKey[i] = -1;
+  // sanity check the button key ranges
+  for (auto&& key : m_buttonKey) {
+    if (key < -1 || key >= IM_ARRAYSIZE(ImGuiIO::KeysDown)) {
+      key = -1;
+    }
   }
 
   // init POVs
-  m_data.povs.count = 0;
+  for (auto&& povConfig : m_povStorage) {
+    m_povConfig.emplace_back(*povConfig);
+  }
 
   // init desc structure
   m_data.desc.isXbox = 0;
@@ -678,17 +621,18 @@ void KeyboardJoystick::SettingsDisplay() {
   // axes
   if (ImGui::CollapsingHeader("Axes", ImGuiTreeNodeFlags_DefaultOpen)) {
     ImGui::PushID("Axes");
-    int axisCount = m_data.axes.count;
-    if (ImGui::InputInt("Count", &axisCount)) {
-      if (axisCount < 0) {
-        axisCount = 0;
+    if (ImGui::InputInt("Count", &m_axisCount)) {
+      if (m_axisCount < 0) {
+        m_axisCount = 0;
+      } else if (m_axisCount > HAL_kMaxJoystickAxes) {
+        m_axisCount = HAL_kMaxJoystickAxes;
       }
-      if (axisCount > HAL_kMaxJoystickAxes) {
-        axisCount = HAL_kMaxJoystickAxes;
-      }
-      m_data.axes.count = axisCount;
     }
-    for (int i = 0; i < axisCount; ++i) {
+    while (m_axisCount > static_cast<int>(m_axisConfig.size())) {
+      m_axisStorage.emplace_back(std::make_unique<glass::Storage>());
+      m_axisConfig.emplace_back(*m_axisStorage.back());
+    }
+    for (int i = 0; i < m_axisCount; ++i) {
       std::snprintf(label, sizeof(label), "Axis %d", i);
       if (ImGui::TreeNodeEx(label, ImGuiTreeNodeFlags_DefaultOpen)) {
         EditKey("Increase", &m_axisConfig[i].incKey);
@@ -710,17 +654,18 @@ void KeyboardJoystick::SettingsDisplay() {
   // buttons
   if (ImGui::CollapsingHeader("Buttons", ImGuiTreeNodeFlags_DefaultOpen)) {
     ImGui::PushID("Buttons");
-    int buttonCount = m_data.buttons.count;
-    if (ImGui::InputInt("Count", &buttonCount)) {
-      if (buttonCount < 0) {
-        buttonCount = 0;
+    if (ImGui::InputInt("Count", &m_buttonCount)) {
+      if (m_buttonCount < 0) {
+        m_buttonCount = 0;
       }
-      if (buttonCount > kMaxButtonCount) {
-        buttonCount = kMaxButtonCount;
+      if (m_buttonCount > kMaxButtonCount) {
+        m_buttonCount = kMaxButtonCount;
       }
-      m_data.buttons.count = buttonCount;
     }
-    for (int i = 0; i < buttonCount; ++i) {
+    while (m_buttonCount > static_cast<int>(m_buttonKey.size())) {
+      m_buttonKey.emplace_back(-1);
+    }
+    for (int i = 0; i < m_buttonCount; ++i) {
       std::snprintf(label, sizeof(label), "Button %d", i + 1);
       EditKey(label, &m_buttonKey[i]);
     }
@@ -730,17 +675,19 @@ void KeyboardJoystick::SettingsDisplay() {
   // povs
   if (ImGui::CollapsingHeader("POVs", ImGuiTreeNodeFlags_DefaultOpen)) {
     ImGui::PushID("POVs");
-    int povCount = m_data.povs.count;
-    if (ImGui::InputInt("Count", &povCount)) {
-      if (povCount < 0) {
-        povCount = 0;
+    if (ImGui::InputInt("Count", &m_povCount)) {
+      if (m_povCount < 0) {
+        m_povCount = 0;
       }
-      if (povCount > HAL_kMaxJoystickPOVs) {
-        povCount = HAL_kMaxJoystickPOVs;
+      if (m_povCount > HAL_kMaxJoystickPOVs) {
+        m_povCount = HAL_kMaxJoystickPOVs;
       }
-      m_data.povs.count = povCount;
     }
-    for (int i = 0; i < povCount; ++i) {
+    while (m_povCount > static_cast<int>(m_povConfig.size())) {
+      m_povStorage.emplace_back(std::make_unique<glass::Storage>());
+      m_povConfig.emplace_back(*m_povStorage.back());
+    }
+    for (int i = 0; i < m_povCount; ++i) {
       std::snprintf(label, sizeof(label), "POV %d", i);
       if (ImGui::TreeNodeEx(label, ImGuiTreeNodeFlags_DefaultOpen)) {
         EditKey("  0 deg", &m_povConfig[i].key0);
@@ -766,6 +713,23 @@ static inline bool IsKeyDown(ImGuiIO& io, int key) {
 
 void KeyboardJoystick::Update() {
   ImGuiIO& io = ImGui::GetIO();
+
+  if (m_axisCount < 0) {
+    m_axisCount = 0;
+  }
+  if (m_buttonCount < 0) {
+    m_buttonCount = 0;
+  }
+  if (m_povCount < 0) {
+    m_povCount = 0;
+  }
+
+  m_data.axes.count =
+      (std::min)(m_axisCount, static_cast<int>(m_axisConfig.size()));
+  m_data.buttons.count =
+      (std::min)(m_buttonCount, static_cast<int>(m_buttonKey.size()));
+  m_data.povs.count =
+      (std::min)(m_povCount, static_cast<int>(m_povConfig.size()));
 
   if (m_data.axes.count > 0 || m_data.buttons.count > 0 ||
       m_data.povs.count > 0) {
@@ -842,7 +806,6 @@ void KeyboardJoystick::Update() {
   for (auto&& joy : gRobotJoysticks) {
     if (m_guid == joy.guid) {
       joy.sys = this;
-      joy.guid.clear();
       break;
     }
   }
@@ -895,177 +858,88 @@ void KeyboardJoystick::ClearKey(int key) {
   }
 }
 
-void KeyboardJoystick::ReadIni(std::string_view name, std::string_view value) {
-  if (wpi::starts_with(name, "axis")) {
-    name.remove_prefix(4);
-    if (name == "Count") {
-      if (auto v = wpi::parse_integer<int>(value, 10)) {
-        m_data.axes.count = (std::min)(v.value(), HAL_kMaxJoystickAxes);
-      }
-      return;
-    }
-
-    auto index = wpi::consume_integer<unsigned int>(&name, 10).value_or(
-        HAL_kMaxJoystickAxes);
-    if (index >= HAL_kMaxJoystickAxes) {
-      return;
-    }
-    if (name == "incKey") {
-      if (auto v = wpi::parse_integer<int>(value, 10)) {
-        m_axisConfig[index].incKey = v.value();
-      }
-    } else if (name == "decKey") {
-      if (auto v = wpi::parse_integer<int>(value, 10)) {
-        m_axisConfig[index].decKey = v.value();
-      }
-    } else if (name == "keyRate") {
-      if (auto v = wpi::parse_float<float>(value)) {
-        m_axisConfig[index].keyRate = v.value();
-      }
-    } else if (name == "decayRate") {
-      if (auto v = wpi::parse_float<float>(value)) {
-        m_axisConfig[index].decayRate = v.value();
-      }
-    } else if (name == "maxAbsValue") {
-      if (auto v = wpi::parse_float<float>(value)) {
-        m_axisConfig[index].maxAbsValue = v.value();
-      }
-    }
-  } else if (wpi::starts_with(name, "button")) {
-    name.remove_prefix(6);
-    if (name == "Count") {
-      if (auto v = wpi::parse_integer<int>(value, 10)) {
-        m_data.buttons.count = (std::min)(v.value(), kMaxButtonCount);
-      }
-      return;
-    }
-
-    auto index =
-        wpi::parse_integer<unsigned int>(name, 10).value_or(kMaxButtonCount);
-    if (index >= kMaxButtonCount) {
-      return;
-    }
-    int v = wpi::parse_integer<int>(value, 10).value_or(-1);
-    if (v < 0 || v >= IM_ARRAYSIZE(ImGuiIO::KeysDown)) {
-      return;
-    }
-    m_buttonKey[index] = v;
-  } else if (wpi::starts_with(name, "pov")) {
-    name.remove_prefix(3);
-    if (name == "Count") {
-      if (auto v = wpi::parse_integer<int>(value, 10)) {
-        m_data.povs.count = (std::min)(v.value(), HAL_kMaxJoystickPOVs);
-      }
-      return;
-    }
-
-    auto index = wpi::consume_integer<unsigned int>(&name, 10).value_or(
-        HAL_kMaxJoystickPOVs);
-    if (index >= HAL_kMaxJoystickPOVs) {
-      return;
-    }
-    int v = wpi::parse_integer<int>(value, 10).value_or(-1);
-    if (v < 0 || v >= IM_ARRAYSIZE(ImGuiIO::KeysDown)) {
-      return;
-    }
-    if (name == "key0") {
-      m_povConfig[index].key0 = v;
-    } else if (name == "key45") {
-      m_povConfig[index].key45 = v;
-    } else if (name == "key90") {
-      m_povConfig[index].key90 = v;
-    } else if (name == "key135") {
-      m_povConfig[index].key135 = v;
-    } else if (name == "key180") {
-      m_povConfig[index].key180 = v;
-    } else if (name == "key225") {
-      m_povConfig[index].key225 = v;
-    } else if (name == "key270") {
-      m_povConfig[index].key270 = v;
-    } else if (name == "key315") {
-      m_povConfig[index].key315 = v;
-    }
-  }
-}
-
-void KeyboardJoystick::WriteIni(ImGuiTextBuffer* out_buf) const {
-  out_buf->appendf("axisCount=%d\nbuttonCount=%d\npovCount=%d\n",
-                   m_data.axes.count, m_data.buttons.count, m_data.povs.count);
-  for (int i = 0; i < m_data.axes.count; ++i) {
-    auto& c = m_axisConfig[i];
-    out_buf->appendf(
-        "axis%dincKey=%d\naxis%ddecKey=%d\naxis%dkeyRate=%f\n"
-        "axis%ddecayRate=%f\naxis%dmaxAbsValue=%f\n",
-        i, c.incKey, i, c.decKey, i, c.keyRate, i, c.decayRate, i,
-        c.maxAbsValue);
-  }
-  for (int i = 0; i < m_data.buttons.count; ++i) {
-    out_buf->appendf("button%d=%d\n", i, m_buttonKey[i]);
-  }
-  for (int i = 0; i < m_data.povs.count; ++i) {
-    auto& c = m_povConfig[i];
-    out_buf->appendf(
-        "pov%dkey0=%d\npov%dkey45=%d\npov%dkey90=%d\npov%dkey135=%d\n"
-        "pov%dkey180=%d\npov%dkey225=%d\npov%dkey270=%d\npov%dkey315=%d\n",
-        i, c.key0, i, c.key45, i, c.key90, i, c.key135, i, c.key180, i,
-        c.key225, i, c.key270, i, c.key315);
-  }
-}
-
-GlfwKeyboardJoystick::GlfwKeyboardJoystick(int index, bool noDefaults)
-    : KeyboardJoystick{index} {
-  if (noDefaults) {
-    return;
-  }
+GlfwKeyboardJoystick::GlfwKeyboardJoystick(glass::Storage& storage, int index)
+    : KeyboardJoystick{storage, index} {
   // set up a default keyboard config for 0, 1, and 2
   if (index == 0) {
-    m_data.axes.count = 3;
-    m_axisConfig[0].incKey = GLFW_KEY_D;
-    m_axisConfig[0].decKey = GLFW_KEY_A;
-    m_axisConfig[1].incKey = GLFW_KEY_S;
-    m_axisConfig[1].decKey = GLFW_KEY_W;
-    m_axisConfig[2].incKey = GLFW_KEY_R;
-    m_axisConfig[2].decKey = GLFW_KEY_E;
-    m_axisConfig[2].keyRate = 0.01f;
-    m_axisConfig[2].decayRate = 0;  // works like a throttle
-    m_data.buttons.count = 4;
-    m_buttonKey[0] = GLFW_KEY_Z;
-    m_buttonKey[1] = GLFW_KEY_X;
-    m_buttonKey[2] = GLFW_KEY_C;
-    m_buttonKey[3] = GLFW_KEY_V;
-    m_data.povs.count = 1;
-    m_povConfig[0].key0 = GLFW_KEY_KP_8;
-    m_povConfig[0].key45 = GLFW_KEY_KP_9;
-    m_povConfig[0].key90 = GLFW_KEY_KP_6;
-    m_povConfig[0].key135 = GLFW_KEY_KP_3;
-    m_povConfig[0].key180 = GLFW_KEY_KP_2;
-    m_povConfig[0].key225 = GLFW_KEY_KP_1;
-    m_povConfig[0].key270 = GLFW_KEY_KP_4;
-    m_povConfig[0].key315 = GLFW_KEY_KP_7;
+    if (m_axisCount == -1 && m_axisStorage.empty()) {
+      m_axisCount = 3;
+      for (int i = 0; i < 3; ++i) {
+        m_axisStorage.emplace_back(std::make_unique<glass::Storage>());
+        m_axisConfig.emplace_back(*m_axisStorage.back());
+      }
+      m_axisConfig[0].incKey = GLFW_KEY_D;
+      m_axisConfig[0].decKey = GLFW_KEY_A;
+      m_axisConfig[1].incKey = GLFW_KEY_S;
+      m_axisConfig[1].decKey = GLFW_KEY_W;
+      m_axisConfig[2].incKey = GLFW_KEY_R;
+      m_axisConfig[2].decKey = GLFW_KEY_E;
+      m_axisConfig[2].keyRate = 0.01f;
+      m_axisConfig[2].decayRate = 0;  // works like a throttle
+    }
+    if (m_buttonCount == -1 && m_buttonKey.empty()) {
+      m_buttonCount = 4;
+      m_buttonKey.resize(4);
+      m_buttonKey[0] = GLFW_KEY_Z;
+      m_buttonKey[1] = GLFW_KEY_X;
+      m_buttonKey[2] = GLFW_KEY_C;
+      m_buttonKey[3] = GLFW_KEY_V;
+    }
+    if (m_povCount == -1 && m_povStorage.empty()) {
+      m_povCount = 1;
+      m_povStorage.emplace_back(std::make_unique<glass::Storage>());
+      m_povConfig.emplace_back(*m_povStorage.back());
+      m_povConfig[0].key0 = GLFW_KEY_KP_8;
+      m_povConfig[0].key45 = GLFW_KEY_KP_9;
+      m_povConfig[0].key90 = GLFW_KEY_KP_6;
+      m_povConfig[0].key135 = GLFW_KEY_KP_3;
+      m_povConfig[0].key180 = GLFW_KEY_KP_2;
+      m_povConfig[0].key225 = GLFW_KEY_KP_1;
+      m_povConfig[0].key270 = GLFW_KEY_KP_4;
+      m_povConfig[0].key315 = GLFW_KEY_KP_7;
+    }
   } else if (index == 1) {
-    m_data.axes.count = 2;
-    m_axisConfig[0].incKey = GLFW_KEY_L;
-    m_axisConfig[0].decKey = GLFW_KEY_J;
-    m_axisConfig[1].incKey = GLFW_KEY_K;
-    m_axisConfig[1].decKey = GLFW_KEY_I;
-    m_data.buttons.count = 4;
-    m_buttonKey[0] = GLFW_KEY_M;
-    m_buttonKey[1] = GLFW_KEY_COMMA;
-    m_buttonKey[2] = GLFW_KEY_PERIOD;
-    m_buttonKey[3] = GLFW_KEY_SLASH;
+    if (m_axisCount == -1 && m_axisStorage.empty()) {
+      m_axisCount = 2;
+      for (int i = 0; i < 2; ++i) {
+        m_axisStorage.emplace_back(std::make_unique<glass::Storage>());
+        m_axisConfig.emplace_back(*m_axisStorage.back());
+      }
+      m_axisConfig[0].incKey = GLFW_KEY_L;
+      m_axisConfig[0].decKey = GLFW_KEY_J;
+      m_axisConfig[1].incKey = GLFW_KEY_K;
+      m_axisConfig[1].decKey = GLFW_KEY_I;
+    }
+    if (m_buttonCount == -1 && m_buttonKey.empty()) {
+      m_buttonCount = 4;
+      m_buttonKey.resize(4);
+      m_buttonKey[0] = GLFW_KEY_M;
+      m_buttonKey[1] = GLFW_KEY_COMMA;
+      m_buttonKey[2] = GLFW_KEY_PERIOD;
+      m_buttonKey[3] = GLFW_KEY_SLASH;
+    }
   } else if (index == 2) {
-    m_data.axes.count = 2;
-    m_axisConfig[0].incKey = GLFW_KEY_RIGHT;
-    m_axisConfig[0].decKey = GLFW_KEY_LEFT;
-    m_axisConfig[1].incKey = GLFW_KEY_DOWN;
-    m_axisConfig[1].decKey = GLFW_KEY_UP;
-    m_data.buttons.count = 6;
-    m_buttonKey[0] = GLFW_KEY_INSERT;
-    m_buttonKey[1] = GLFW_KEY_HOME;
-    m_buttonKey[2] = GLFW_KEY_PAGE_UP;
-    m_buttonKey[3] = GLFW_KEY_DELETE;
-    m_buttonKey[4] = GLFW_KEY_END;
-    m_buttonKey[5] = GLFW_KEY_PAGE_DOWN;
+    if (m_axisCount == -1 && m_axisStorage.empty()) {
+      m_axisCount = 2;
+      for (int i = 0; i < 2; ++i) {
+        m_axisStorage.emplace_back(std::make_unique<glass::Storage>());
+        m_axisConfig.emplace_back(*m_axisStorage.back());
+      }
+      m_axisConfig[0].incKey = GLFW_KEY_RIGHT;
+      m_axisConfig[0].decKey = GLFW_KEY_LEFT;
+      m_axisConfig[1].incKey = GLFW_KEY_DOWN;
+      m_axisConfig[1].decKey = GLFW_KEY_UP;
+    }
+    if (m_buttonCount == -1 && m_buttonKey.empty()) {
+      m_buttonCount = 6;
+      m_buttonKey.resize(6);
+      m_buttonKey[0] = GLFW_KEY_INSERT;
+      m_buttonKey[1] = GLFW_KEY_HOME;
+      m_buttonKey[2] = GLFW_KEY_PAGE_UP;
+      m_buttonKey[3] = GLFW_KEY_DELETE;
+      m_buttonKey[4] = GLFW_KEY_END;
+      m_buttonKey[5] = GLFW_KEY_PAGE_DOWN;
+    }
   }
 }
 
@@ -1103,6 +977,11 @@ const char* GlfwKeyboardJoystick::GetKeyName(int key) const {
   return "(Unknown)";
 }
 
+RobotJoystick::RobotJoystick(glass::Storage& storage)
+    : name{storage.GetString("name")},
+      guid{storage.GetString("guid")},
+      useGamepad{storage.GetBool("useGamepad")} {}
+
 void RobotJoystick::Update() {
   Clear();
   if (sys) {
@@ -1111,7 +990,9 @@ void RobotJoystick::Update() {
 }
 
 void RobotJoystick::SetHAL(int i) {
-  if (!gZeroDisconnectedJoysticks && (!sys || !sys->IsPresent())) {
+  if ((gpZeroDisconnectedJoysticks != nullptr &&
+       !gpZeroDisconnectedJoysticks) &&
+      (!sys || !sys->IsPresent())) {
     return;
   }
   // set at HAL level
@@ -1149,11 +1030,11 @@ static void DriverStationExecute() {
 
   bool disableDS = IsDSDisabled();
   if (disableDS && !prevDisableDS) {
-    if (auto win = HALSimGui::manager.GetWindow("System Joysticks")) {
+    if (auto win = HALSimGui::manager->GetWindow("System Joysticks")) {
       win->SetVisibility(glass::Window::kDisabled);
     }
   } else if (!disableDS && prevDisableDS) {
-    if (auto win = HALSimGui::manager.GetWindow("System Joysticks")) {
+    if (auto win = HALSimGui::manager->GetWindow("System Joysticks")) {
       win->SetVisibility(glass::Window::kShow);
     }
   }
@@ -1190,7 +1071,7 @@ static void DriverStationExecute() {
     // DS hotkeys
     bool enableHotkey = false;
     bool disableHotkey = false;
-    if (gUseEnableDisableHotkeys) {
+    if (gpUseEnableDisableHotkeys != nullptr && *gpUseEnableDisableHotkeys) {
       ImGuiIO& io = ImGui::GetIO();
       if (io.KeysDown[GLFW_KEY_ENTER] || io.KeysDown[GLFW_KEY_KP_ENTER]) {
         disableHotkey = true;
@@ -1200,7 +1081,7 @@ static void DriverStationExecute() {
         enableHotkey = true;
       }
     }
-    if (gUseEstopHotkey) {
+    if (gpUseEstopHotkey != nullptr && *gpUseEstopHotkey) {
       ImGuiIO& io = ImGui::GetIO();
       if (io.KeysDown[GLFW_KEY_SPACE]) {
         HALSIM_SetDriverStationEnabled(false);
@@ -1232,7 +1113,8 @@ static void DriverStationExecute() {
   }
 
   // Update HAL
-  for (int i = 0; i < HAL_kMaxJoysticks; ++i) {
+  for (int i = 0, end = gRobotJoysticks.size();
+       i < end && i < HAL_kMaxJoysticks; ++i) {
     gRobotJoysticks[i].SetHAL(i);
   }
 
@@ -1251,6 +1133,7 @@ FMSSimModel::FMSSimModel() {
   m_enabled.SetDigital(true);
   m_test.SetDigital(true);
   m_autonomous.SetDigital(true);
+  m_matchTime.SetValue(-1.0);
 }
 
 void FMSSimModel::Update() {
@@ -1264,25 +1147,23 @@ void FMSSimModel::Update() {
   m_autonomous.SetValue(HALSIM_GetDriverStationAutonomous());
 
   double matchTime = HALSIM_GetDriverStationMatchTime();
-  if (m_matchTimeEnabled && !IsDSDisabled()) {
+  if (!IsDSDisabled() && enabled) {
     int32_t status = 0;
     double curTime = HAL_GetFPGATime(&status) * 1.0e-6;
-    if (m_startMatchTime == 0.0) {
-      m_startMatchTime = curTime;
+    if (m_startMatchTime == -1.0) {
+      m_startMatchTime = matchTime + curTime;
     }
-    if (enabled) {
-      matchTime = curTime - m_startMatchTime;
-      HALSIM_SetDriverStationMatchTime(matchTime);
-    } else {
-      if (m_prevTime == 0.0) {
-        m_prevTime = curTime;
-      }
-      m_startMatchTime += (curTime - m_prevTime);
+    matchTime = m_startMatchTime - curTime;
+    if (matchTime < 0) {
+      matchTime = -1.0;
     }
-    m_prevTime = curTime;
+    HALSIM_SetDriverStationMatchTime(matchTime);
   } else {
-    m_startMatchTime = 0.0;
-    m_prevTime = 0.0;
+    if (m_startMatchTime != -1.0) {
+      matchTime = -1.0;
+      HALSIM_SetDriverStationMatchTime(matchTime);
+    }
+    m_startMatchTime = -1.0;
   }
   m_matchTime.SetValue(matchTime);
 }
@@ -1329,7 +1210,7 @@ static void DisplaySystemJoysticks() {
       char buf[64];
       std::snprintf(buf, sizeof(buf), "%s Settings", joy->GetName());
       if (ImGui::MenuItem(buf)) {
-        if (auto win = DriverStationGui::dsManager.GetWindow(buf)) {
+        if (auto win = DriverStationGui::dsManager->GetWindow(buf)) {
           win->SetVisible(true);
         }
         ImGui::CloseCurrentPopup();
@@ -1370,10 +1251,11 @@ static void DisplayJoysticks() {
         for (auto&& joy2 : gRobotJoysticks) {
           if (joy2.sys == payload_sys) {
             joy2.sys = nullptr;
+            joy2.guid.clear();
           }
         }
         joy.sys = payload_sys;
-        joy.guid.clear();
+        joy.guid = payload_sys->GetGUID();
         std::string_view name{payload_sys->GetName()};
         joy.useGamepad =
             wpi::starts_with(name, "Xbox") || wpi::contains(name, "pad");
@@ -1453,15 +1335,23 @@ static void DisplayJoysticks() {
 }
 
 void DSManager::DisplayMenu() {
-  if (gDSSocketConnected && *gDSSocketConnected) {
+  if (gpDSSocketConnected && *gpDSSocketConnected) {
     ImGui::MenuItem("Turn off DS (real DS connected)", nullptr, true, false);
   } else {
-    ImGui::MenuItem("Turn off DS", nullptr, &gDisableDS);
-    ImGui::MenuItem("Zero disconnected joysticks", nullptr,
-                    &gZeroDisconnectedJoysticks);
-    ImGui::MenuItem("Enable on []\\ combo, Disable on Enter", nullptr,
-                    &gUseEnableDisableHotkeys);
-    ImGui::MenuItem("Disable on Spacebar", nullptr, &gUseEstopHotkey);
+    if (gpDisableDS != nullptr) {
+      ImGui::MenuItem("Turn off DS", nullptr, gpDisableDS);
+    }
+    if (gpZeroDisconnectedJoysticks != nullptr) {
+      ImGui::MenuItem("Zero disconnected joysticks", nullptr,
+                      gpZeroDisconnectedJoysticks);
+    }
+    if (gpUseEnableDisableHotkeys != nullptr) {
+      ImGui::MenuItem("Enable on []\\ combo, Disable on Enter", nullptr,
+                      gpUseEnableDisableHotkeys);
+    }
+    if (gpUseEstopHotkey != nullptr) {
+      ImGui::MenuItem("Disable on Spacebar", nullptr, gpUseEstopHotkey);
+    }
   }
   ImGui::Separator();
 
@@ -1470,85 +1360,93 @@ void DSManager::DisplayMenu() {
   }
 }
 
-static void DriverStationInitialize() {
-  // hook ini handler to save joystick settings
-  ImGuiSettingsHandler iniHandler;
-  iniHandler.TypeName = "Joystick";
-  iniHandler.TypeHash = ImHashStr(iniHandler.TypeName);
-  iniHandler.ReadOpenFn = JoystickReadOpen;
-  iniHandler.ReadLineFn = JoystickReadLine;
-  iniHandler.WriteAllFn = JoystickWriteAll;
-  ImGui::GetCurrentContext()->SettingsHandlers.push_back(iniHandler);
-
-  // hook ini handler to save keyboard settings
-  iniHandler.TypeName = "KeyboardJoystick";
-  iniHandler.TypeHash = ImHashStr(iniHandler.TypeName);
-  iniHandler.ReadOpenFn = KeyboardJoystickReadOpen;
-  iniHandler.ReadLineFn = KeyboardJoystickReadLine;
-  iniHandler.WriteAllFn = KeyboardJoystickWriteAll;
-  ImGui::GetCurrentContext()->SettingsHandlers.push_back(iniHandler);
-
-  // hook ini handler to save DS settings
-  iniHandler.TypeName = "DriverStation";
-  iniHandler.TypeHash = ImHashStr(iniHandler.TypeName);
-  iniHandler.ReadOpenFn = DriverStationReadOpen;
-  iniHandler.ReadLineFn = DriverStationReadLine;
-  iniHandler.WriteAllFn = DriverStationWriteAll;
-  ImGui::GetCurrentContext()->SettingsHandlers.push_back(iniHandler);
-}
-
 void DriverStationGui::GlobalInit() {
+  auto& storageRoot = glass::GetStorageRoot("ds");
+  dsManager = std::make_unique<DSManager>(storageRoot);
+
   // set up system joysticks (both GLFW and keyboard)
   for (int i = 0; i <= GLFW_JOYSTICK_LAST; ++i) {
     gGlfwJoysticks.emplace_back(std::make_unique<GlfwSystemJoystick>(i));
   }
-  for (int i = 0; i < 4; ++i) {
-    gKeyboardJoysticks.emplace_back(std::make_unique<GlfwKeyboardJoystick>(i));
-  }
 
-  dsManager.GlobalInit();
-
-  wpi::gui::AddInit(DriverStationInitialize);
+  dsManager->GlobalInit();
 
   gFMSModel = std::make_unique<FMSSimModel>();
 
   wpi::gui::AddEarlyExecute(DriverStationExecute);
   wpi::gui::AddEarlyExecute([] { gFMSModel->Update(); });
-  if (auto win = dsManager.AddWindow("FMS", [] {
-        DisplayFMS(gFMSModel.get(), &gFMSModel->m_matchTimeEnabled);
-      })) {
-    win->DisableRenamePopup();
-    win->SetFlags(ImGuiWindowFlags_AlwaysAutoResize);
-    win->SetDefaultPos(5, 540);
-  }
-  if (auto win =
-          dsManager.AddWindow("System Joysticks", DisplaySystemJoysticks)) {
-    win->DisableRenamePopup();
-    win->SetFlags(ImGuiWindowFlags_AlwaysAutoResize);
-    win->SetDefaultPos(5, 350);
-  }
-  if (auto win = dsManager.AddWindow("Joysticks", DisplayJoysticks)) {
-    win->DisableRenamePopup();
-    win->SetFlags(ImGuiWindowFlags_AlwaysAutoResize);
-    win->SetDefaultPos(250, 465);
-  }
-  int i = 0;
-  for (auto&& joy : gKeyboardJoysticks) {
-    char label[64];
-    std::snprintf(label, sizeof(label), "%s Settings", joy->GetName());
-    if (auto win = dsManager.AddWindow(
-            label, [j = joy.get()] { j->SettingsDisplay(); })) {
-      win->SetVisible(false);
-      win->DisableRenamePopup();
-      win->SetDefaultPos(10 + 310 * i++, 50);
-      if (i > 3) {
-        i = 0;
+
+  storageRoot.SetCustomApply([&storageRoot] {
+    gpDisableDS = &storageRoot.GetBool("disable", false);
+    gpZeroDisconnectedJoysticks =
+        &storageRoot.GetBool("zeroDisconnectedJoysticks", true);
+    gpUseEnableDisableHotkeys =
+        &storageRoot.GetBool("useEnableDisableHotkeys", false);
+    gpUseEstopHotkey = &storageRoot.GetBool("useEstopHotkey", false);
+
+    auto& keyboardStorage = storageRoot.GetChildArray("keyboardJoysticks");
+    keyboardStorage.resize(4);
+    for (int i = 0; i < 4; ++i) {
+      if (!keyboardStorage[i]) {
+        keyboardStorage[i] = std::make_unique<glass::Storage>();
       }
-      win->SetDefaultSize(300, 560);
+      gKeyboardJoysticks.emplace_back(
+          std::make_unique<GlfwKeyboardJoystick>(*keyboardStorage[i], i));
     }
-  }
+
+    auto& robotJoystickStorage = storageRoot.GetChildArray("robotJoysticks");
+    robotJoystickStorage.resize(HAL_kMaxJoysticks);
+    for (int i = 0; i < HAL_kMaxJoysticks; ++i) {
+      if (!robotJoystickStorage[i]) {
+        robotJoystickStorage[i] = std::make_unique<glass::Storage>();
+      }
+      gRobotJoysticks.emplace_back(*robotJoystickStorage[i]);
+    }
+
+    int i = 0;
+    for (auto&& joy : gKeyboardJoysticks) {
+      char label[64];
+      std::snprintf(label, sizeof(label), "%s Settings", joy->GetName());
+      if (auto win = dsManager->AddWindow(
+              label, [j = joy.get()] { j->SettingsDisplay(); },
+              glass::Window::kHide)) {
+        win->DisableRenamePopup();
+        win->SetDefaultPos(10 + 310 * i++, 50);
+        if (i > 3) {
+          i = 0;
+        }
+        win->SetDefaultSize(300, 560);
+      }
+    }
+    if (auto win =
+            dsManager->AddWindow("FMS", [] { DisplayFMS(gFMSModel.get()); })) {
+      win->DisableRenamePopup();
+      win->SetFlags(ImGuiWindowFlags_AlwaysAutoResize);
+      win->SetDefaultPos(5, 540);
+    }
+    if (auto win =
+            dsManager->AddWindow("System Joysticks", DisplaySystemJoysticks)) {
+      win->DisableRenamePopup();
+      win->SetFlags(ImGuiWindowFlags_AlwaysAutoResize);
+      win->SetDefaultPos(5, 350);
+    }
+    if (auto win = dsManager->AddWindow("Joysticks", DisplayJoysticks)) {
+      win->DisableRenamePopup();
+      win->SetFlags(ImGuiWindowFlags_AlwaysAutoResize);
+      win->SetDefaultPos(250, 465);
+    }
+  });
+
+  storageRoot.SetCustomClear([&storageRoot] {
+    dsManager->EraseWindows();
+    gKeyboardJoysticks.clear();
+    gRobotJoysticks.clear();
+    storageRoot.GetChildArray("keyboardJoysticks").clear();
+    storageRoot.GetChildArray("robotJoysticks").clear();
+    storageRoot.ClearValues();
+  });
 }
 
 void DriverStationGui::SetDSSocketExtension(void* data) {
-  gDSSocketConnected = static_cast<std::atomic<bool>*>(data);
+  gpDSSocketConnected = static_cast<std::atomic<bool>*>(data);
 }

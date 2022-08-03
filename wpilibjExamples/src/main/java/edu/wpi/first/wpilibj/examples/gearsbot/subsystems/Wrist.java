@@ -18,15 +18,11 @@ public class Wrist extends PIDSubsystem {
   private final Victor m_motor;
   private final AnalogPotentiometer m_pot;
 
-  private static final double kP_real = 1;
-  private static final double kP_simulation = 0.05;
+  private static final double kP = 1;
 
   /** Create a new wrist subsystem. */
   public Wrist() {
-    super(new PIDController(kP_real, 0, 0));
-    if (Robot.isSimulation()) { // Check for simulation and update PID values
-      getController().setPID(kP_simulation, 0, 0);
-    }
+    super(new PIDController(kP, 0, 0));
     getController().setTolerance(2.5);
 
     m_motor = new Victor(6);

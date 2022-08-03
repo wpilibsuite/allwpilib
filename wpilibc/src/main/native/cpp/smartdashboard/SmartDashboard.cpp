@@ -19,6 +19,8 @@ using namespace frc;
 
 namespace {
 struct Instance {
+  Instance() { HAL_Report(HALUsageReporting::kResourceType_SmartDashboard, 0); }
+
   detail::ListenerExecutor listenerExecutor;
   std::shared_ptr<nt::NetworkTable> table =
       nt::NetworkTableInstance::GetDefault().GetTable("SmartDashboard");
@@ -27,11 +29,22 @@ struct Instance {
 };
 }  // namespace
 
-static Instance& GetInstance() {
-  HAL_Report(HALUsageReporting::kResourceType_SmartDashboard, 0);
-  static Instance instance;
+static std::unique_ptr<Instance>& GetInstanceHolder() {
+  static std::unique_ptr<Instance> instance = std::make_unique<Instance>();
   return instance;
 }
+
+static Instance& GetInstance() {
+  return *GetInstanceHolder();
+}
+
+#ifndef __FRC_ROBORIO__
+namespace frc::impl {
+void ResetSmartDashboardInstance() {
+  std::make_unique<Instance>().swap(GetInstanceHolder());
+}
+}  // namespace frc::impl
+#endif
 
 void SmartDashboard::init() {
   GetInstance();

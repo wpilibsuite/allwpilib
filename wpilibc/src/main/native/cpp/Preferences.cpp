@@ -30,11 +30,13 @@ static Instance& GetInstance() {
   return instance;
 }
 
-Preferences* Preferences::GetInstance() {
-  ::GetInstance();
-  static Preferences instance;
-  return &instance;
+#ifndef __FRC_ROBORIO__
+namespace frc::impl {
+void ResetPreferencesInstance() {
+  GetInstance() = Instance();
 }
+}  // namespace frc::impl
+#endif
 
 std::vector<std::string> Preferences::GetKeys() {
   return ::GetInstance().table->GetKeys();
@@ -72,13 +74,10 @@ void Preferences::SetString(std::string_view key, std::string_view value) {
   entry.SetPersistent();
 }
 
-void Preferences::PutString(std::string_view key, std::string_view value) {
-  SetString(key, value);
-}
-
 void Preferences::InitString(std::string_view key, std::string_view value) {
   auto entry = ::GetInstance().table->GetEntry(key);
   entry.SetDefaultString(value);
+  entry.SetPersistent();
 }
 
 void Preferences::SetInt(std::string_view key, int value) {
@@ -87,13 +86,10 @@ void Preferences::SetInt(std::string_view key, int value) {
   entry.SetPersistent();
 }
 
-void Preferences::PutInt(std::string_view key, int value) {
-  SetInt(key, value);
-}
-
 void Preferences::InitInt(std::string_view key, int value) {
   auto entry = ::GetInstance().table->GetEntry(key);
   entry.SetDefaultDouble(value);
+  entry.SetPersistent();
 }
 
 void Preferences::SetDouble(std::string_view key, double value) {
@@ -102,13 +98,10 @@ void Preferences::SetDouble(std::string_view key, double value) {
   entry.SetPersistent();
 }
 
-void Preferences::PutDouble(std::string_view key, double value) {
-  SetDouble(key, value);
-}
-
 void Preferences::InitDouble(std::string_view key, double value) {
   auto entry = ::GetInstance().table->GetEntry(key);
   entry.SetDefaultDouble(value);
+  entry.SetPersistent();
 }
 
 void Preferences::SetFloat(std::string_view key, float value) {
@@ -117,13 +110,10 @@ void Preferences::SetFloat(std::string_view key, float value) {
   entry.SetPersistent();
 }
 
-void Preferences::PutFloat(std::string_view key, float value) {
-  SetFloat(key, value);
-}
-
 void Preferences::InitFloat(std::string_view key, float value) {
   auto entry = ::GetInstance().table->GetEntry(key);
   entry.SetDefaultDouble(value);
+  entry.SetPersistent();
 }
 
 void Preferences::SetBoolean(std::string_view key, bool value) {
@@ -132,13 +122,10 @@ void Preferences::SetBoolean(std::string_view key, bool value) {
   entry.SetPersistent();
 }
 
-void Preferences::PutBoolean(std::string_view key, bool value) {
-  SetBoolean(key, value);
-}
-
 void Preferences::InitBoolean(std::string_view key, bool value) {
   auto entry = ::GetInstance().table->GetEntry(key);
   entry.SetDefaultBoolean(value);
+  entry.SetPersistent();
 }
 
 void Preferences::SetLong(std::string_view key, int64_t value) {
@@ -147,13 +134,10 @@ void Preferences::SetLong(std::string_view key, int64_t value) {
   entry.SetPersistent();
 }
 
-void Preferences::PutLong(std::string_view key, int64_t value) {
-  SetLong(key, value);
-}
-
 void Preferences::InitLong(std::string_view key, int64_t value) {
   auto entry = ::GetInstance().table->GetEntry(key);
   entry.SetDefaultDouble(value);
+  entry.SetPersistent();
 }
 
 bool Preferences::ContainsKey(std::string_view key) {

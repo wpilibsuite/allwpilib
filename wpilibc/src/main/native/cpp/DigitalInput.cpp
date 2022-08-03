@@ -4,7 +4,6 @@
 
 #include "frc/DigitalInput.h"
 
-#include <iostream>
 #include <limits>
 
 #include <hal/DIO.h>

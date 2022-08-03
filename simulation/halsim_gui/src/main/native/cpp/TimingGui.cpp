@@ -71,7 +71,7 @@ static void DisplayTiming() {
 }
 
 void TimingGui::Initialize() {
-  HALSimGui::halProvider.Register(
+  HALSimGui::halProvider->Register(
       "Timing", [] { return true; },
       [] { return std::make_unique<TimingModel>(); },
       [](glass::Window* win, glass::Model* model) {
@@ -80,5 +80,5 @@ void TimingGui::Initialize() {
         win->SetDefaultPos(5, 150);
         return glass::MakeFunctionView(DisplayTiming);
       });
-  HALSimGui::halProvider.ShowDefault("Timing");
+  HALSimGui::halProvider->ShowDefault("Timing");
 }

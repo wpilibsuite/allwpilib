@@ -8,19 +8,20 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.interpolation.Interpolatable;
 import java.util.Objects;
 
 /**
- * Represents a translation in 2d space. This object can be used to represent a point or a vector.
+ * Represents a translation in 2D space. This object can be used to represent a point or a vector.
  *
- * <p>This assumes that you are using conventional mathematical axes. When the robot is placed on
- * the origin, facing toward the X direction, moving forward increases the X, whereas moving to the
- * left increases the Y.
+ * <p>This assumes that you are using conventional mathematical axes. When the robot is at the
+ * origin facing in the positive X direction, forward is positive X and left is positive Y.
  */
 @SuppressWarnings({"ParameterName", "MemberName"})
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonAutoDetect(getterVisibility = JsonAutoDetect.Visibility.NONE)
-public class Translation2d {
+public class Translation2d implements Interpolatable<Translation2d> {
   private final double m_x;
   private final double m_y;
 
@@ -56,10 +57,9 @@ public class Translation2d {
   }
 
   /**
-   * Calculates the distance between two translations in 2d space.
+   * Calculates the distance between two translations in 2D space.
    *
-   * <p>This function uses the pythagorean theorem to calculate the distance. distance = sqrt((x2 -
-   * x1)^2 + (y2 - y1)^2)
+   * <p>The distance between translations is defined as √((x₂−x₁)²+(y₂−y₁)²).
    *
    * @param other The translation to compute the distance to.
    * @return The distance between the two translations.
@@ -71,7 +71,7 @@ public class Translation2d {
   /**
    * Returns the X component of the translation.
    *
-   * @return The x component of the translation.
+   * @return The X component of the translation.
    */
   @JsonProperty
   public double getX() {
@@ -81,7 +81,7 @@ public class Translation2d {
   /**
    * Returns the Y component of the translation.
    *
-   * @return The y component of the translation.
+   * @return The Y component of the translation.
    */
   @JsonProperty
   public double getY() {
@@ -98,13 +98,27 @@ public class Translation2d {
   }
 
   /**
-   * Applies a rotation to the translation in 2d space.
+   * Returns the angle this translation forms with the positive X axis.
+   *
+   * @return The angle of the translation
+   */
+  public Rotation2d getAngle() {
+    return new Rotation2d(m_x, m_y);
+  }
+
+  /**
+   * Applies a rotation to the translation in 2D space.
    *
    * <p>This multiplies the translation vector by a counterclockwise rotation matrix of the given
-   * angle. [x_new] [other.cos, -other.sin][x] [y_new] = [other.sin, other.cos][y]
+   * angle.
    *
-   * <p>For example, rotating a Translation2d of {2, 0} by 90 degrees will return a Translation2d of
-   * {0, 2}.
+   * <pre>
+   * [x_new]   [other.cos, -other.sin][x]
+   * [y_new] = [other.sin,  other.cos][y]
+   * </pre>
+   *
+   * <p>For example, rotating a Translation2d of &lt;2, 0&gt; by 90 degrees will return a
+   * Translation2d of &lt;0, 2&gt;.
    *
    * @param other The rotation to rotate the translation by.
    * @return The new rotated translation.
@@ -115,9 +129,9 @@ public class Translation2d {
   }
 
   /**
-   * Adds two translations in 2d space and returns the sum. This is similar to vector addition.
+   * Returns the sum of two translations in 2D space.
    *
-   * <p>For example, Translation2d{1.0, 2.5} + Translation2d{2.0, 5.5} = Translation2d{3.0, 8.0}
+   * <p>For example, Translation3d(1.0, 2.5) + Translation3d(2.0, 5.5) = Translation3d{3.0, 8.0).
    *
    * @param other The translation to add.
    * @return The sum of the translations.
@@ -127,9 +141,9 @@ public class Translation2d {
   }
 
   /**
-   * Subtracts the other translation from the other translation and returns the difference.
+   * Returns the difference between two translations.
    *
-   * <p>For example, Translation2d{5.0, 4.0} - Translation2d{1.0, 2.0} = Translation2d{4.0, 2.0}
+   * <p>For example, Translation2d(5.0, 4.0) - Translation2d(1.0, 2.0) = Translation2d(4.0, 2.0).
    *
    * @param other The translation to subtract.
    * @return The difference between the two translations.
@@ -140,7 +154,7 @@ public class Translation2d {
 
   /**
    * Returns the inverse of the current translation. This is equivalent to rotating by 180 degrees,
-   * flipping the point over both axes, or simply negating both components of the translation.
+   * flipping the point over both axes, or negating all components of the translation.
    *
    * @return The inverse of the current translation.
    */
@@ -149,9 +163,9 @@ public class Translation2d {
   }
 
   /**
-   * Multiplies the translation by a scalar and returns the new translation.
+   * Returns the translation multiplied by a scalar.
    *
-   * <p>For example, Translation2d{2.0, 2.5} * 2 = Translation2d{4.0, 5.0}
+   * <p>For example, Translation2d(2.0, 2.5) * 2 = Translation2d(4.0, 5.0).
    *
    * @param scalar The scalar to multiply by.
    * @return The scaled translation.
@@ -161,9 +175,9 @@ public class Translation2d {
   }
 
   /**
-   * Divides the translation by a scalar and returns the new translation.
+   * Returns the translation divided by a scalar.
    *
-   * <p>For example, Translation2d{2.0, 2.5} / 2 = Translation2d{1.0, 1.25}
+   * <p>For example, Translation3d(2.0, 2.5) / 2 = Translation3d(1.0, 1.25).
    *
    * @param scalar The scalar to multiply by.
    * @return The reference to the new mutated object.
@@ -195,5 +209,12 @@ public class Translation2d {
   @Override
   public int hashCode() {
     return Objects.hash(m_x, m_y);
+  }
+
+  @Override
+  public Translation2d interpolate(Translation2d endValue, double t) {
+    return new Translation2d(
+        MathUtil.interpolate(this.getX(), endValue.getX(), t),
+        MathUtil.interpolate(this.getY(), endValue.getY(), t));
   }
 }

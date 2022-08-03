@@ -18,5 +18,5 @@
 class Pickup
     : public frc2::CommandHelper<frc2::SequentialCommandGroup, Pickup> {
  public:
-  Pickup(Claw* claw, Wrist* wrist, Elevator* elevator);
+  Pickup(Claw& claw, Wrist& wrist, Elevator& elevator);
 };

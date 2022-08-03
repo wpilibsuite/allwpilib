@@ -6,11 +6,11 @@
 
 #include <wpi/numbers>
 
-#include "Eigen/Core"
+#include "frc/EigenCore.h"
 #include "frc/estimator/AngleStatistics.h"
 
 TEST(AngleStatisticsTest, Mean) {
-  Eigen::Matrix<double, 3, 3> sigmas{
+  frc::Matrixd<3, 3> sigmas{
       {1, 1.2, 0},
       {359 * wpi::numbers::pi / 180, 3 * wpi::numbers::pi / 180, 0},
       {1, 2, 0}};

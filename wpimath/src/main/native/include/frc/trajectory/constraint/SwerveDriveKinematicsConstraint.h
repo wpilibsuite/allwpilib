@@ -32,7 +32,7 @@ class SwerveDriveKinematicsConstraint : public TrajectoryConstraint {
                             units::meters_per_second_t speed) const override;
 
  private:
-  const frc::SwerveDriveKinematics<NumModules>& m_kinematics;
+  frc::SwerveDriveKinematics<NumModules> m_kinematics;
   units::meters_per_second_t m_maxSpeed;
 };
 }  // namespace frc

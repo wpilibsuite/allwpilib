@@ -12,23 +12,53 @@
 #include <wpi/StringExtras.h>
 #include <wpigui.h>
 
+#include "glass/Storage.h"
+
 using namespace glass;
 
-NetworkTablesProvider::NetworkTablesProvider(std::string_view iniName)
-    : NetworkTablesProvider{iniName, nt::GetDefaultInstance()} {}
+NetworkTablesProvider::NetworkTablesProvider(Storage& storage)
+    : NetworkTablesProvider{storage, nt::GetDefaultInstance()} {}
 
-NetworkTablesProvider::NetworkTablesProvider(std::string_view iniName,
-                                             NT_Inst inst)
-    : Provider{fmt::format("{}Window", iniName)},
+NetworkTablesProvider::NetworkTablesProvider(Storage& storage, NT_Inst inst)
+    : Provider{storage.GetChild("windows")},
       m_nt{inst},
-      m_typeCache{iniName} {
-  m_nt.AddListener("", NT_NOTIFY_LOCAL | NT_NOTIFY_NEW | NT_NOTIFY_DELETE |
-                           NT_NOTIFY_IMMEDIATE);
-}
+      m_typeCache{storage.GetChild("types")} {
+  storage.SetCustomApply([this] {
+    m_listener =
+        m_nt.AddListener("", NT_NOTIFY_LOCAL | NT_NOTIFY_NEW |
+                                 NT_NOTIFY_DELETE | NT_NOTIFY_IMMEDIATE);
+    for (auto&& childIt : m_storage.GetChildren()) {
+      auto id = childIt.key();
+      auto typePtr = m_typeCache.FindValue(id);
+      if (!typePtr || typePtr->type != Storage::Value::kString) {
+        continue;
+      }
 
-void NetworkTablesProvider::GlobalInit() {
-  Provider::GlobalInit();
-  wpi::gui::AddInit([this] { m_typeCache.Initialize(); });
+      // only handle ones where we have a builder
+      auto builderIt = m_typeMap.find(typePtr->stringVal);
+      if (builderIt == m_typeMap.end()) {
+        continue;
+      }
+
+      auto entry = GetOrCreateView(
+          builderIt->second,
+          nt::GetEntry(m_nt.GetInstance(), fmt::format("{}/.type", id)), id);
+      if (entry) {
+        Show(entry, nullptr);
+      }
+    }
+  });
+  storage.SetCustomClear([this, &storage] {
+    nt::RemoveEntryListener(m_listener);
+    m_listener = 0;
+    for (auto&& modelEntry : m_modelEntries) {
+      modelEntry->model.reset();
+    }
+    m_viewEntries.clear();
+    m_windows.clear();
+    m_typeCache.EraseAll();
+    storage.ClearValues();
+  });
 }
 
 void NetworkTablesProvider::DisplayMenu() {
@@ -98,33 +128,7 @@ void NetworkTablesProvider::Update() {
     } else if (event.flags & NT_NOTIFY_NEW) {
       GetOrCreateView(builderIt->second, event.entry, tableName);
       // cache the type
-      m_typeCache[tableName].SetName(event.value->GetString());
-    }
-  }
-
-  // check for visible windows that need displays (typically this is due to
-  // file loading)
-  for (auto&& window : m_windows) {
-    if (!window->IsVisible() || window->HasView()) {
-      continue;
-    }
-    auto id = window->GetId();
-    auto typeIt = m_typeCache.find(id);
-    if (typeIt == m_typeCache.end()) {
-      continue;
-    }
-
-    // only handle ones where we have a builder
-    auto builderIt = m_typeMap.find(typeIt->second.GetName());
-    if (builderIt == m_typeMap.end()) {
-      continue;
-    }
-
-    auto entry = GetOrCreateView(
-        builderIt->second,
-        nt::GetEntry(m_nt.GetInstance(), fmt::format("{}/.type", id)), id);
-    if (entry) {
-      Show(entry, window.get());
+      m_typeCache.SetString(tableName, event.value->GetString());
     }
   }
 }
@@ -153,7 +157,7 @@ void NetworkTablesProvider::Show(ViewEntry* entry, Window* window) {
 
   // the window might exist and we're just not associated to it yet
   if (!window) {
-    window = GetOrAddWindow(entry->name, true);
+    window = GetOrAddWindow(entry->name, true, Window::kHide);
   }
   if (!window) {
     return;
