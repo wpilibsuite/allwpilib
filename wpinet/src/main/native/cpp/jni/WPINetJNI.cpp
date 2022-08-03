@@ -92,7 +92,7 @@ Java_edu_wpi_first_util_WPIUtilJNI_createMulticastServiceAnnouncer
   JStringRef serviceTypeRef{env, serviceType};
 
   wpi::SmallVector<std::pair<std::string, std::string>, 8> txtVec;
-  
+
   if (keys != nullptr && values != nullptr) {
     size_t keysLen = env->GetArrayLength(keys);
 

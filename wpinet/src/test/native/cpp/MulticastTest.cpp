@@ -4,8 +4,10 @@
 
 #include <wpinet/MulticastServiceAnnouncer.h>
 #include <wpinet/MulticastServiceResolver.h>
-#include <wpi/timestamp.h>
+
 #include <thread>
+
+#include <wpi/timestamp.h>
 
 #include "gtest/gtest.h"
 
