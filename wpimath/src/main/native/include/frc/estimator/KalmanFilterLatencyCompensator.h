@@ -10,7 +10,7 @@
 #include <utility>
 #include <vector>
 
-#include "Eigen/Core"
+#include "frc/EigenCore.h"
 #include "units/math.h"
 #include "units/time.h"
 
@@ -20,16 +20,15 @@ template <int States, int Inputs, int Outputs, typename KalmanFilterType>
 class KalmanFilterLatencyCompensator {
  public:
   struct ObserverSnapshot {
-    Eigen::Vector<double, States> xHat;
-    Eigen::Matrix<double, States, States> errorCovariances;
-    Eigen::Vector<double, Inputs> inputs;
-    Eigen::Vector<double, Outputs> localMeasurements;
+    Vectord<States> xHat;
+    Matrixd<States, States> squareRootErrorCovariances;
+    Vectord<Inputs> inputs;
+    Vectord<Outputs> localMeasurements;
 
-    ObserverSnapshot(const KalmanFilterType& observer,
-                     const Eigen::Vector<double, Inputs>& u,
-                     const Eigen::Vector<double, Outputs>& localY)
+    ObserverSnapshot(const KalmanFilterType& observer, const Vectord<Inputs>& u,
+                     const Vectord<Outputs>& localY)
         : xHat(observer.Xhat()),
-          errorCovariances(observer.P()),
+          squareRootErrorCovariances(observer.S()),
           inputs(u),
           localMeasurements(localY) {}
   };
@@ -47,10 +46,8 @@ class KalmanFilterLatencyCompensator {
    * @param localY    The local output at the timestamp
    * @param timestamp The timesnap of the state.
    */
-  void AddObserverState(const KalmanFilterType& observer,
-                        Eigen::Vector<double, Inputs> u,
-                        Eigen::Vector<double, Outputs> localY,
-                        units::second_t timestamp) {
+  void AddObserverState(const KalmanFilterType& observer, Vectord<Inputs> u,
+                        Vectord<Outputs> localY, units::second_t timestamp) {
     // Add the new state into the vector.
     m_pastObserverSnapshots.emplace_back(timestamp,
                                          ObserverSnapshot{observer, u, localY});
@@ -74,10 +71,8 @@ class KalmanFilterLatencyCompensator {
    */
   template <int Rows>
   void ApplyPastGlobalMeasurement(
-      KalmanFilterType* observer, units::second_t nominalDt,
-      Eigen::Vector<double, Rows> y,
-      std::function<void(const Eigen::Vector<double, Inputs>& u,
-                         const Eigen::Vector<double, Rows>& y)>
+      KalmanFilterType* observer, units::second_t nominalDt, Vectord<Rows> y,
+      std::function<void(const Vectord<Inputs>& u, const Vectord<Rows>& y)>
           globalMeasurementCorrect,
       units::second_t timestamp) {
     if (m_pastObserverSnapshots.size() == 0) {
@@ -140,7 +135,7 @@ class KalmanFilterLatencyCompensator {
       auto& [key, snapshot] = m_pastObserverSnapshots[i];
 
       if (i == indexOfClosestEntry) {
-        observer->SetP(snapshot.errorCovariances);
+        observer->SetS(snapshot.squareRootErrorCovariances);
         observer->SetXhat(snapshot.xHat);
       }
 

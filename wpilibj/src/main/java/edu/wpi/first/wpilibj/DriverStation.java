@@ -388,8 +388,6 @@ public final class DriverStation {
     final JoystickLogSender[] m_joysticks;
   }
 
-  private static DriverStation instance = new DriverStation();
-
   // Joystick User Data
   private static HALJoystickAxes[] m_joystickAxes = new HALJoystickAxes[kJoystickPorts];
   private static HALJoystickPOVs[] m_joystickPOVs = new HALJoystickPOVs[kJoystickPorts];
@@ -419,17 +417,6 @@ public final class DriverStation {
   private static final ReentrantLock m_cacheDataMutex = new ReentrantLock();
 
   private static boolean m_silenceJoystickWarning;
-
-  /**
-   * Gets an instance of the DriverStation.
-   *
-   * @return The DriverStation.
-   * @deprecated Use the static methods
-   */
-  @Deprecated
-  public static DriverStation getInstance() {
-    return DriverStation.instance;
-  }
 
   /**
    * DriverStation constructor.
@@ -743,22 +730,8 @@ public final class DriverStation {
     if (stick < 0 || stick >= kJoystickPorts) {
       throw new IllegalArgumentException("Joystick index is out of range, should be 0-5");
     }
-
-    m_cacheDataMutex.lock();
-    try {
-      return m_joystickAxes[stick].m_count;
-    } finally {
-      m_cacheDataMutex.unlock();
-    }
-  }
-
-  /**
-   * Returns the number of POVs on a given joystick port.
-   *
-   * @param stick The joystick port number
-   * @return The number of POVs on the indicated joystick
-   */
-  public static int getStickPOVCount(int stick) {
+    #include <wpi/deprecated.h>
+    #include <wpi/Synchronization.h>
     if (stick < 0 || stick >= kJoystickPorts) {
       throw new IllegalArgumentException("Joystick index is out of range, should be 0-5");
     }
@@ -934,33 +907,9 @@ public final class DriverStation {
    * operator-controlled mode.
    *
    * @return True if operator-controlled mode should be enabled, false otherwise.
-   * @deprecated Use isTeleop() instead.
-   */
-  @Deprecated(since = "2022", forRemoval = true)
-  public static boolean isOperatorControl() {
-    return isTeleop();
-  }
-
-  /**
-   * Gets a value indicating whether the Driver Station requires the robot to be running in
-   * operator-controlled mode.
-   *
-   * @return True if operator-controlled mode should be enabled, false otherwise.
    */
   public static boolean isTeleop() {
     return !(isAutonomous() || isTest());
-  }
-
-  /**
-   * Gets a value indicating whether the Driver Station requires the robot to be running in
-   * operator-controller mode and enabled.
-   *
-   * @return True if operator-controlled mode should be set and the robot should be enabled.
-   * @deprecated Use isTeleopEnabled() instead.
-   */
-  @Deprecated(since = "2022", forRemoval = true)
-  public static boolean isOperatorControlEnabled() {
-    return isTeleopEnabled();
   }
 
   /**

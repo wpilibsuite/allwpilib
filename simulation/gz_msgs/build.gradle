@@ -9,7 +9,7 @@ description = "A C++ and Java library to pass FRC Simulation Messages in and out
 
 /* The simulation does not run on real hardware; so we always skip Athena */
 ext.skiplinuxathena = true
-ext.skiplinuxraspbian = true
+ext.skiplinuxarm32 = true
 apply from: "${rootDir}/shared/config.gradle"
 
 /* Use a sort of poor man's autoconf to find the protobuf development

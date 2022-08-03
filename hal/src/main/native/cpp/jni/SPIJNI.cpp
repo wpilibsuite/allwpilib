@@ -63,6 +63,11 @@ Java_edu_wpi_first_hal_SPIJNI_spiTransactionB
   (JNIEnv* env, jclass, jint port, jbyteArray dataToSend,
    jbyteArray dataReceived, jbyte size)
 {
+  if (size < 0) {
+    ThrowIllegalArgumentException(env, "SPIJNI.spiTransactionB() size < 0");
+    return 0;
+  }
+
   wpi::SmallVector<uint8_t, 128> recvBuf;
   recvBuf.resize(size);
   jint retVal =
@@ -120,6 +125,11 @@ Java_edu_wpi_first_hal_SPIJNI_spiRead
   (JNIEnv* env, jclass, jint port, jboolean initiate, jobject dataReceived,
    jbyte size)
 {
+  if (size < 0) {
+    ThrowIllegalArgumentException(env, "SPIJNI.spiRead() size < 0");
+    return 0;
+  }
+
   uint8_t* dataReceivedPtr =
       reinterpret_cast<uint8_t*>(env->GetDirectBufferAddress(dataReceived));
   jint retVal;
@@ -145,6 +155,11 @@ Java_edu_wpi_first_hal_SPIJNI_spiReadB
   (JNIEnv* env, jclass, jint port, jboolean initiate, jbyteArray dataReceived,
    jbyte size)
 {
+  if (size < 0) {
+    ThrowIllegalArgumentException(env, "SPIJNI.spiReadB() size < 0");
+    return 0;
+  }
+
   jint retVal;
   wpi::SmallVector<uint8_t, 128> recvBuf;
   recvBuf.resize(size);
@@ -361,6 +376,12 @@ Java_edu_wpi_first_hal_SPIJNI_spiReadAutoReceivedData__I_3IID
   (JNIEnv* env, jclass, jint port, jintArray buffer, jint numToRead,
    jdouble timeout)
 {
+  if (numToRead < 0) {
+    ThrowIllegalArgumentException(
+        env, "SPIJNI.spiReadAutoReceivedData() numToRead < 0");
+    return 0;
+  }
+
   wpi::SmallVector<uint32_t, 128> recvBuf;
   recvBuf.resize(numToRead);
   int32_t status = 0;

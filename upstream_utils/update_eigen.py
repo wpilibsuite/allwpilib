@@ -4,7 +4,12 @@ import os
 import re
 import shutil
 
-from upstream_utils import setup_upstream_repo, comment_out_invalid_includes, walk_cwd_and_copy_if, apply_patches
+from upstream_utils import (
+    setup_upstream_repo,
+    comment_out_invalid_includes,
+    walk_cwd_and_copy_if,
+    am_patches,
+)
 
 
 def eigen_inclusions(dp, f):
@@ -38,8 +43,12 @@ def eigen_inclusions(dp, f):
 
     # Include architectures we care about
     if "Core/arch/" in abspath:
-        return ("arch/AVX/" in abspath or "arch/Default" in abspath or
-                "arch/NEON" in abspath or "arch/SSE" in abspath)
+        return (
+            "arch/AVX/" in abspath
+            or "arch/Default" in abspath
+            or "arch/NEON" in abspath
+            or "arch/SSE" in abspath
+        )
 
     # Include the following modules
     modules = [
@@ -82,39 +91,45 @@ def unsupported_inclusions(dp, f):
     if f == "CMakeLists.txt" or "README" in f:
         return False
 
-    # Include the AutoDiff and MatrixFunctions modules
-    return "AutoDiff" in abspath or "MatrixFunctions" in abspath
+    # Include the MatrixFunctions module
+    return "MatrixFunctions" in abspath
 
 
 def main():
-    root, repo = setup_upstream_repo("https://gitlab.com/libeigen/eigen.git",
-                                     "3.4.0")
+    root, repo = setup_upstream_repo("https://gitlab.com/libeigen/eigen.git", "3.4.0")
     wpimath = os.path.join(root, "wpimath")
+
+    # Apply patches to original git repo
+    prefix = os.path.join(root, "upstream_utils/eigen_patches")
+    am_patches(repo, [os.path.join(prefix, "0001-Disable-warnings.patch")])
 
     # Delete old install
     for d in [
-            "src/main/native/eigeninclude/Eigen",
-            "src/main/native/eigeninclude/unsupported"
+        "src/main/native/thirdparty/eigen/include/Eigen",
+        "src/main/native/thirdparty/eigen/include/unsupported",
     ]:
         shutil.rmtree(os.path.join(wpimath, d), ignore_errors=True)
 
     # Copy Eigen headers into allwpilib
     eigen_files = walk_cwd_and_copy_if(
-        eigen_inclusions, os.path.join(wpimath, "src/main/native/eigeninclude"))
+        eigen_inclusions,
+        os.path.join(wpimath, "src/main/native/thirdparty/eigen/include"),
+    )
 
     # Copy unsupported headers into allwpilib
     unsupported_files = walk_cwd_and_copy_if(
         unsupported_inclusions,
-        os.path.join(wpimath, "src/main/native/eigeninclude"))
+        os.path.join(wpimath, "src/main/native/thirdparty/eigen/include"),
+    )
 
     for f in eigen_files:
         comment_out_invalid_includes(
-            f, [os.path.join(wpimath, "src/main/native/eigeninclude")])
+            f, [os.path.join(wpimath, "src/main/native/thirdparty/eigen/include")]
+        )
     for f in unsupported_files:
         comment_out_invalid_includes(
-            f, [os.path.join(wpimath, "src/main/native/eigeninclude")])
-
-    apply_patches(root, ["upstream_utils/eigen-maybe-uninitialized.patch"])
+            f, [os.path.join(wpimath, "src/main/native/thirdparty/eigen/include")]
+        )
 
 
 if __name__ == "__main__":

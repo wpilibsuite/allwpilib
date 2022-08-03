@@ -13,7 +13,7 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.util.sendable.SendableRegistry;
-import edu.wpi.first.wpilibj.SpeedController;
+import edu.wpi.first.wpilibj.motorcontrol.MotorController;
 
 /**
  * A class for driving differential drive/skid-steer drive platforms such as the Kit of Parts drive
@@ -87,12 +87,11 @@ import edu.wpi.first.wpilibj.SpeedController;
  * <p>{@link edu.wpi.first.wpilibj.MotorSafety} is enabled by default. The tankDrive, arcadeDrive,
  * or curvatureDrive methods should be called periodically to avoid Motor Safety timeouts.
  */
-@SuppressWarnings("removal")
 public class DifferentialDrive extends RobotDriveBase implements Sendable, AutoCloseable {
   private static int instances;
 
-  private final SpeedController m_leftMotor;
-  private final SpeedController m_rightMotor;
+  private final MotorController m_leftMotor;
+  private final MotorController m_rightMotor;
 
   private boolean m_reported;
 
@@ -131,7 +130,7 @@ public class DifferentialDrive extends RobotDriveBase implements Sendable, AutoC
    * @param leftMotor Left motor.
    * @param rightMotor Right motor.
    */
-  public DifferentialDrive(SpeedController leftMotor, SpeedController rightMotor) {
+  public DifferentialDrive(MotorController leftMotor, MotorController rightMotor) {
     requireNonNull(leftMotor, "Left motor cannot be null");
     requireNonNull(rightMotor, "Right motor cannot be null");
 

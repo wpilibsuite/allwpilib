@@ -90,6 +90,17 @@
     "commandversion": 2
   },
   {
+    "name": "EventLoop",
+    "description": "Demonstrate managing a ball system using EventLoop and BooleanEvent.",
+    "tags": [
+      "EventLoop"
+    ],
+    "foldername": "eventloop",
+    "gradlebase": "java",
+    "mainclass": "Main",
+    "commandversion": 2
+  },
+  {
     "name": "Relay",
     "description": "Demonstrate controlling a Relay from Joystick buttons.",
     "tags": [

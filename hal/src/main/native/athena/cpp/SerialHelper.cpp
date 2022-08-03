@@ -193,7 +193,7 @@ void SerialHelper::QueryHubPaths(int32_t* status) {
     ViSession vSession;
     *status = viOpen(m_resourceHandle, desc, VI_NULL, VI_NULL, &vSession);
     if (*status < 0)
-      goto done;
+      continue;
     *status = 0;
 
     *status = viGetAttribute(vSession, VI_ATTR_INTF_INST_NAME, &osName);
@@ -201,9 +201,9 @@ void SerialHelper::QueryHubPaths(int32_t* status) {
     // Use a separate close variable so we can check
     ViStatus closeStatus = viClose(vSession);
     if (*status < 0)
-      goto done;
+      continue;
     if (closeStatus < 0)
-      goto done;
+      continue;
     *status = 0;
 
     // split until (/dev/

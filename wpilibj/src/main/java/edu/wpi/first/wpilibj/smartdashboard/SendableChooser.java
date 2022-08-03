@@ -70,18 +70,6 @@ public class SendableChooser<V> implements NTSendable, AutoCloseable {
   }
 
   /**
-   * Adds the given object to the list of options.
-   *
-   * @param name the name of the option
-   * @param object the option
-   * @deprecated Use {@link #addOption(String, Object)} instead.
-   */
-  @Deprecated
-  public void addObject(String name, V object) {
-    addOption(name, object);
-  }
-
-  /**
    * Adds the given object to the list of options and marks it as the default. Functionally, this is
    * very close to {@link #addOption(String, Object)} except that it will use this as the default
    * option if none other is explicitly selected.
@@ -94,18 +82,6 @@ public class SendableChooser<V> implements NTSendable, AutoCloseable {
 
     m_defaultChoice = name;
     addOption(name, object);
-  }
-
-  /**
-   * Adds the given object to the list of options and marks it as the default.
-   *
-   * @param name the name of the option
-   * @param object the option
-   * @deprecated Use {@link #setDefaultOption(String, Object)} instead.
-   */
-  @Deprecated
-  public void addDefault(String name, V object) {
-    setDefaultOption(name, object);
   }
 
   /**

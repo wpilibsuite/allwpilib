@@ -9,6 +9,8 @@
 #include <hal/FRCUsageReporting.h>
 #include <wpi/numbers>
 
+#include "frc/event/BooleanEvent.h"
+
 using namespace frc;
 
 Joystick::Joystick(int port) : GenericHID(port) {
@@ -93,6 +95,10 @@ bool Joystick::GetTriggerReleased() {
   return GetRawButtonReleased(Button::kTrigger);
 }
 
+BooleanEvent Joystick::Trigger(EventLoop* loop) const {
+  return BooleanEvent(loop, [this]() { return this->GetTrigger(); });
+}
+
 bool Joystick::GetTop() const {
   return GetRawButton(Button::kTop);
 }
@@ -103,6 +109,10 @@ bool Joystick::GetTopPressed() {
 
 bool Joystick::GetTopReleased() {
   return GetRawButtonReleased(Button::kTop);
+}
+
+BooleanEvent Joystick::Top(EventLoop* loop) const {
+  return BooleanEvent(loop, [this]() { return this->GetTop(); });
 }
 
 double Joystick::GetMagnitude() const {

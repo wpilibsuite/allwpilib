@@ -53,4 +53,9 @@ public class Color8Bit {
   public int hashCode() {
     return Objects.hash(red, green, blue);
   }
+
+  @Override
+  public String toString() {
+    return "Color8Bit{" + "red=" + red + ", green=" + green + ", blue=" + blue + '}';
+  }
 }

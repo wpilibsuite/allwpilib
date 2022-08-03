@@ -11,7 +11,7 @@ foreach(example ${EXAMPLES})
                             src/main/cpp/examples/${example}/c/*.c)
   add_executable(${example} ${sources})
   target_include_directories(${example} PUBLIC src/main/cpp/examples/${example}/include)
-  target_link_libraries(${example} wpilibc wpilibNewCommands wpilibOldCommands)
+  target_link_libraries(${example} wpilibc wpilibNewCommands)
 
   if (WITH_TESTS AND EXISTS ${CMAKE_SOURCE_DIR}/wpilibcExamples/src/test/cpp/examples/${example})
     wpilib_add_test(${example} src/test/cpp/examples/${example}/cpp)

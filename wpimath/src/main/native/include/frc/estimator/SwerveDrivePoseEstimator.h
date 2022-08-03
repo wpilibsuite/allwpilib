@@ -6,10 +6,11 @@
 
 #include <limits>
 
+#include <wpi/SymbolExports.h>
 #include <wpi/array.h>
 #include <wpi/timestamp.h>
 
-#include "Eigen/Core"
+#include "frc/EigenCore.h"
 #include "frc/StateSpaceUtil.h"
 #include "frc/estimator/AngleStatistics.h"
 #include "frc/estimator/UnscentedKalmanFilter.h"
@@ -82,10 +83,8 @@ class SwerveDrivePoseEstimator {
       const wpi::array<double, 1>& localMeasurementStdDevs,
       const wpi::array<double, 3>& visionMeasurementStdDevs,
       units::second_t nominalDt = 0.02_s)
-      : m_observer([](const Eigen::Vector<double, 3>& x,
-                      const Eigen::Vector<double, 3>& u) { return u; },
-                   [](const Eigen::Vector<double, 3>& x,
-                      const Eigen::Vector<double, 3>& u) {
+      : m_observer([](const Vectord<3>& x, const Vectord<3>& u) { return u; },
+                   [](const Vectord<3>& x, const Vectord<3>& u) {
                      return x.block<1, 1>(2, 0);
                    },
                    stateStdDevs, localMeasurementStdDevs,
@@ -97,12 +96,9 @@ class SwerveDrivePoseEstimator {
     SetVisionMeasurementStdDevs(visionMeasurementStdDevs);
 
     // Create correction mechanism for vision measurements.
-    m_visionCorrect = [&](const Eigen::Vector<double, 3>& u,
-                          const Eigen::Vector<double, 3>& y) {
+    m_visionCorrect = [&](const Vectord<3>& u, const Vectord<3>& y) {
       m_observer.Correct<3>(
-          u, y,
-          [](const Eigen::Vector<double, 3>& x,
-             const Eigen::Vector<double, 3>& u) { return x; },
+          u, y, [](const Vectord<3>& x, const Vectord<3>& u) { return x; },
           m_visionContR, frc::AngleMean<3, 3>(2), frc::AngleResidual<3>(2),
           frc::AngleResidual<3>(2), frc::AngleAdd<3>(2));
     };
@@ -130,6 +126,8 @@ class SwerveDrivePoseEstimator {
     m_poseBuffer.Clear();
 
     m_observer.SetXhat(PoseTo3dVector(pose));
+
+    m_prevTime = -1_s;
 
     m_gyroOffset = pose.Rotation() - gyroAngle;
     m_previousAngle = pose.Rotation();
@@ -189,7 +187,7 @@ class SwerveDrivePoseEstimator {
   void AddVisionMeasurement(const Pose2d& visionRobotPose,
                             units::second_t timestamp) {
     if (auto sample = m_poseBuffer.Sample(timestamp)) {
-      m_visionCorrect(Eigen::Vector<double, 3>::Zero(),
+      m_visionCorrect(Vectord<3>::Zero(),
                       PoseTo3dVector(GetEstimatedPosition().TransformBy(
                           visionRobotPose - sample.value())));
     }
@@ -279,10 +277,10 @@ class SwerveDrivePoseEstimator {
         Translation2d(chassisSpeeds.vx * 1_s, chassisSpeeds.vy * 1_s)
             .RotateBy(angle);
 
-    Eigen::Vector<double, 3> u{fieldRelativeSpeeds.X().value(),
-                               fieldRelativeSpeeds.Y().value(), omega.value()};
+    Vectord<3> u{fieldRelativeSpeeds.X().value(),
+                 fieldRelativeSpeeds.Y().value(), omega.value()};
 
-    Eigen::Vector<double, 1> localY{angle.Radians().value()};
+    Vectord<1> localY{angle.Radians().value()};
     m_previousAngle = angle;
 
     m_poseBuffer.AddSample(currentTime, GetEstimatedPosition());
@@ -297,9 +295,7 @@ class SwerveDrivePoseEstimator {
   UnscentedKalmanFilter<3, 3, 1> m_observer;
   SwerveDriveKinematics<NumModules>& m_kinematics;
   TimeInterpolatableBuffer<Pose2d> m_poseBuffer{1.5_s};
-  std::function<void(const Eigen::Vector<double, 3>& u,
-                     const Eigen::Vector<double, 3>& y)>
-      m_visionCorrect;
+  std::function<void(const Vectord<3>& u, const Vectord<3>& y)> m_visionCorrect;
 
   Eigen::Matrix3d m_visionContR;
 
@@ -311,7 +307,7 @@ class SwerveDrivePoseEstimator {
 
   template <int Dim>
   static wpi::array<double, Dim> StdDevMatrixToArray(
-      const Eigen::Vector<double, Dim>& vector) {
+      const Vectord<Dim>& vector) {
     wpi::array<double, Dim> array;
     for (size_t i = 0; i < Dim; ++i) {
       array[i] = vector(i);
@@ -319,5 +315,8 @@ class SwerveDrivePoseEstimator {
     return array;
   }
 };
+
+extern template class EXPORT_TEMPLATE_DECLARE(WPILIB_DLLEXPORT)
+    SwerveDrivePoseEstimator<4>;
 
 }  // namespace frc

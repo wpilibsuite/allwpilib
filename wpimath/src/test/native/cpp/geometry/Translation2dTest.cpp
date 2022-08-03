@@ -9,69 +9,67 @@
 
 using namespace frc;
 
-static constexpr double kEpsilon = 1E-9;
-
 TEST(Translation2dTest, Sum) {
-  const Translation2d one{1.0_m, 3.0_m};
-  const Translation2d two{2.0_m, 5.0_m};
+  const Translation2d one{1_m, 3_m};
+  const Translation2d two{2_m, 5_m};
 
   const auto sum = one + two;
 
-  EXPECT_NEAR(sum.X().value(), 3.0, kEpsilon);
-  EXPECT_NEAR(sum.Y().value(), 8.0, kEpsilon);
+  EXPECT_DOUBLE_EQ(3.0, sum.X().value());
+  EXPECT_DOUBLE_EQ(8.0, sum.Y().value());
 }
 
 TEST(Translation2dTest, Difference) {
-  const Translation2d one{1.0_m, 3.0_m};
-  const Translation2d two{2.0_m, 5.0_m};
+  const Translation2d one{1_m, 3_m};
+  const Translation2d two{2_m, 5_m};
 
   const auto difference = one - two;
 
-  EXPECT_NEAR(difference.X().value(), -1.0, kEpsilon);
-  EXPECT_NEAR(difference.Y().value(), -2.0, kEpsilon);
+  EXPECT_DOUBLE_EQ(-1.0, difference.X().value());
+  EXPECT_DOUBLE_EQ(-2.0, difference.Y().value());
 }
 
 TEST(Translation2dTest, RotateBy) {
-  const Translation2d another{3.0_m, 0.0_m};
-  const auto rotated = another.RotateBy(Rotation2d(90.0_deg));
+  const Translation2d another{3_m, 0_m};
+  const auto rotated = another.RotateBy(Rotation2d(90_deg));
 
-  EXPECT_NEAR(rotated.X().value(), 0.0, kEpsilon);
-  EXPECT_NEAR(rotated.Y().value(), 3.0, kEpsilon);
+  EXPECT_NEAR(0.0, rotated.X().value(), 1e-9);
+  EXPECT_DOUBLE_EQ(3.0, rotated.Y().value());
 }
 
 TEST(Translation2dTest, Multiplication) {
-  const Translation2d original{3.0_m, 5.0_m};
+  const Translation2d original{3_m, 5_m};
   const auto mult = original * 3;
 
-  EXPECT_NEAR(mult.X().value(), 9.0, kEpsilon);
-  EXPECT_NEAR(mult.Y().value(), 15.0, kEpsilon);
+  EXPECT_DOUBLE_EQ(9.0, mult.X().value());
+  EXPECT_DOUBLE_EQ(15.0, mult.Y().value());
 }
 
 TEST(Translation2dTest, Division) {
-  const Translation2d original{3.0_m, 5.0_m};
+  const Translation2d original{3_m, 5_m};
   const auto div = original / 2;
 
-  EXPECT_NEAR(div.X().value(), 1.5, kEpsilon);
-  EXPECT_NEAR(div.Y().value(), 2.5, kEpsilon);
+  EXPECT_DOUBLE_EQ(1.5, div.X().value());
+  EXPECT_DOUBLE_EQ(2.5, div.Y().value());
 }
 
 TEST(Translation2dTest, Norm) {
-  const Translation2d one{3.0_m, 5.0_m};
-  EXPECT_NEAR(one.Norm().value(), std::hypot(3, 5), kEpsilon);
+  const Translation2d one{3_m, 5_m};
+  EXPECT_DOUBLE_EQ(std::hypot(3.0, 5.0), one.Norm().value());
 }
 
 TEST(Translation2dTest, Distance) {
   const Translation2d one{1_m, 1_m};
   const Translation2d two{6_m, 6_m};
-  EXPECT_NEAR(one.Distance(two).value(), 5 * std::sqrt(2), kEpsilon);
+  EXPECT_DOUBLE_EQ(5.0 * std::sqrt(2.0), one.Distance(two).value());
 }
 
 TEST(Translation2dTest, UnaryMinus) {
   const Translation2d original{-4.5_m, 7_m};
   const auto inverted = -original;
 
-  EXPECT_NEAR(inverted.X().value(), 4.5, kEpsilon);
-  EXPECT_NEAR(inverted.Y().value(), -7, kEpsilon);
+  EXPECT_DOUBLE_EQ(4.5, inverted.X().value());
+  EXPECT_DOUBLE_EQ(-7.0, inverted.Y().value());
 }
 
 TEST(Translation2dTest, Equality) {
@@ -87,11 +85,11 @@ TEST(Translation2dTest, Inequality) {
 }
 
 TEST(Translation2dTest, PolarConstructor) {
-  Translation2d one{std::sqrt(2) * 1_m, Rotation2d(45_deg)};
-  EXPECT_NEAR(one.X().value(), 1.0, kEpsilon);
-  EXPECT_NEAR(one.Y().value(), 1.0, kEpsilon);
+  Translation2d one{std::sqrt(2) * 1_m, Rotation2d{45_deg}};
+  EXPECT_DOUBLE_EQ(1.0, one.X().value());
+  EXPECT_DOUBLE_EQ(1.0, one.Y().value());
 
-  Translation2d two{2_m, Rotation2d(60_deg)};
-  EXPECT_NEAR(two.X().value(), 1.0, kEpsilon);
-  EXPECT_NEAR(two.Y().value(), std::sqrt(3.0), kEpsilon);
+  Translation2d two{2_m, Rotation2d{60_deg}};
+  EXPECT_DOUBLE_EQ(1.0, two.X().value());
+  EXPECT_DOUBLE_EQ(std::sqrt(3.0), two.Y().value());
 }

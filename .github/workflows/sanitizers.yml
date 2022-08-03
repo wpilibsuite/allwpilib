@@ -15,7 +15,7 @@ jobs:
           - name: asan
             cmake-flags: "-DCMAKE_BUILD_TYPE=Asan"
             ctest-env: ""
-            ctest-flags: "-E 'wpiutil|ntcore|wpilibc'"
+            ctest-flags: "-E 'wpinet|wpiutil|ntcore|wpilibc'"
           - name: tsan
             cmake-flags: "-DCMAKE_BUILD_TYPE=Tsan"
             ctest-env: "TSAN_OPTIONS=second_deadlock_stack=1"
@@ -28,7 +28,7 @@ jobs:
     runs-on: ubuntu-latest
     container: wpilib/roborio-cross-ubuntu:2022-20.04
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
 
       - name: Install Dependencies
         run: |

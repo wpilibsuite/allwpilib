@@ -7,8 +7,6 @@
 #include <string>
 
 #include <units/time.h>
-#include <wpi/deprecated.h>
-#include <wpi/Synchronization.h>
 
 namespace wpi::log {
 class DataLog;

@@ -4,6 +4,8 @@
 
 #include "frc/PneumaticHub.h"
 
+#include <array>
+
 #include <fmt/format.h>
 #include <hal/REVPH.h>
 #include <wpi/NullDeleter.h>

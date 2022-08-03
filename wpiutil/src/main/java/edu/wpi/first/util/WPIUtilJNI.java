@@ -64,10 +64,6 @@ public class WPIUtilJNI {
 
   public static native long getSystemTime();
 
-  public static native void addPortForwarder(int port, String remoteHost, int remotePort);
-
-  public static native void removePortForwarder(int port);
-
   public static native int createEvent(boolean manualReset, boolean initialState);
 
   public static native void destroyEvent(int eventHandle);
@@ -126,29 +122,4 @@ public class WPIUtilJNI {
    */
   public static native int[] waitForObjectsTimeout(int[] handles, double timeout)
       throws InterruptedException;
-
-  public static native int createMulticastServiceAnnouncer(
-      String serviceName, String serviceType, int port, String[] keys, String[] values);
-
-  public static native void freeMulticastServiceAnnouncer(int handle);
-
-  public static native void startMulticastServiceAnnouncer(int handle);
-
-  public static native void stopMulticastServiceAnnouncer(int handle);
-
-  public static native boolean getMulticastServiceAnnouncerHasImplementation(int handle);
-
-  public static native int createMulticastServiceResolver(String serviceType);
-
-  public static native void freeMulticastServiceResolver(int handle);
-
-  public static native void startMulticastServiceResolver(int handle);
-
-  public static native void stopMulticastServiceResolver(int handle);
-
-  public static native boolean getMulticastServiceResolverHasImplementation(int handle);
-
-  public static native int getMulticastServiceResolverEventHandle(int handle);
-
-  public static native ServiceData[] getMulticastServiceResolverData(int handle);
 }

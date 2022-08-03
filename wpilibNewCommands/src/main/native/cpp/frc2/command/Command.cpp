@@ -4,7 +4,9 @@
 
 #include "frc2/command/Command.h"
 
+#include "frc2/command/CommandHelper.h"
 #include "frc2/command/CommandScheduler.h"
+#include "frc2/command/ConditionalCommand.h"
 #include "frc2/command/EndlessCommand.h"
 #include "frc2/command/InstantCommand.h"
 #include "frc2/command/ParallelCommandGroup.h"
@@ -16,6 +18,7 @@
 #include "frc2/command/SequentialCommandGroup.h"
 #include "frc2/command/WaitCommand.h"
 #include "frc2/command/WaitUntilCommand.h"
+#include "frc2/command/WrapperCommand.h"
 
 using namespace frc2;
 
@@ -44,6 +47,24 @@ ParallelRaceGroup Command::Until(std::function<bool()> condition) && {
   temp.emplace_back(std::make_unique<WaitUntilCommand>(std::move(condition)));
   temp.emplace_back(std::move(*this).TransferOwnership());
   return ParallelRaceGroup(std::move(temp));
+}
+
+std::unique_ptr<Command> Command::IgnoringDisable(bool doesRunWhenDisabled) && {
+  class RunsWhenDisabledCommand
+      : public CommandHelper<WrapperCommand, RunsWhenDisabledCommand> {
+   public:
+    RunsWhenDisabledCommand(std::unique_ptr<Command>&& command,
+                            bool doesRunWhenDisabled)
+        : CommandHelper(std::move(command)),
+          m_runsWhenDisabled(doesRunWhenDisabled) {}
+    bool RunsWhenDisabled() const override { return m_runsWhenDisabled; }
+
+   private:
+    bool m_runsWhenDisabled;
+  };
+
+  return std::make_unique<RunsWhenDisabledCommand>(
+      std::move(*this).TransferOwnership(), doesRunWhenDisabled);
 }
 
 ParallelRaceGroup Command::WithInterrupt(std::function<bool()> condition) && {
@@ -86,7 +107,9 @@ SequentialCommandGroup Command::AndThen(
 }
 
 PerpetualCommand Command::Perpetually() && {
+  WPI_IGNORE_DEPRECATED
   return PerpetualCommand(std::move(*this).TransferOwnership());
+  WPI_UNIGNORE_DEPRECATED
 }
 
 EndlessCommand Command::Endlessly() && {
@@ -99,6 +122,12 @@ RepeatCommand Command::Repeat() && {
 
 ProxyScheduleCommand Command::AsProxy() {
   return ProxyScheduleCommand(this);
+}
+
+ConditionalCommand Command::Unless(std::function<bool()> condition) && {
+  return ConditionalCommand(std::make_unique<InstantCommand>(),
+                            std::move(*this).TransferOwnership(),
+                            std::move(condition));
 }
 
 void Command::Schedule(bool interruptible) {

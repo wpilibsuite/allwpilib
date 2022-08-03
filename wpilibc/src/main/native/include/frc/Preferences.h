@@ -10,8 +10,6 @@
 #include <string_view>
 #include <vector>
 
-#include <wpi/deprecated.h>
-
 namespace frc {
 
 /**
@@ -30,15 +28,6 @@ namespace frc {
  */
 class Preferences {
  public:
-  /**
-   * Get the one and only {@link Preferences} object.
-   *
-   * @return pointer to the {@link Preferences}
-   * @deprecated Use the static methods
-   */
-  WPI_DEPRECATED("Use static methods")
-  static Preferences* GetInstance();
-
   /**
    * Returns a vector of all the keys.
    *
@@ -120,18 +109,6 @@ class Preferences {
   static void SetString(std::string_view key, std::string_view value);
 
   /**
-   * Puts the given string into the preferences table.
-   *
-   * The value may not have quotation marks, nor may the key have any whitespace
-   * nor an equals sign.
-   *
-   * @param key   the key
-   * @param value the value
-   */
-  WPI_DEPRECATED("Use SetString instead.")
-  static void PutString(std::string_view key, std::string_view value);
-
-  /**
    * Puts the given string into the preferences table if it doesn't
    * already exist.
    */
@@ -146,17 +123,6 @@ class Preferences {
    * @param value the value
    */
   static void SetInt(std::string_view key, int value);
-
-  /**
-   * Puts the given int into the preferences table.
-   *
-   * The key may not have any whitespace nor an equals sign.
-   *
-   * @param key   the key
-   * @param value the value
-   */
-  WPI_DEPRECATED("Use SetInt instead.")
-  static void PutInt(std::string_view key, int value);
 
   /**
    * Puts the given int into the preferences table if it doesn't
@@ -175,17 +141,6 @@ class Preferences {
   static void SetDouble(std::string_view key, double value);
 
   /**
-   * Puts the given double into the preferences table.
-   *
-   * The key may not have any whitespace nor an equals sign.
-   *
-   * @param key   the key
-   * @param value the value
-   */
-  WPI_DEPRECATED("Use SetDouble instead.")
-  static void PutDouble(std::string_view key, double value);
-
-  /**
    * Puts the given double into the preferences table if it doesn't
    * already exist.
    */
@@ -200,17 +155,6 @@ class Preferences {
    * @param value the value
    */
   static void SetFloat(std::string_view key, float value);
-
-  /**
-   * Puts the given float into the preferences table.
-   *
-   * The key may not have any whitespace nor an equals sign.
-   *
-   * @param key   the key
-   * @param value the value
-   */
-  WPI_DEPRECATED("Use SetFloat instead.")
-  static void PutFloat(std::string_view key, float value);
 
   /**
    * Puts the given float into the preferences table if it doesn't
@@ -229,17 +173,6 @@ class Preferences {
   static void SetBoolean(std::string_view key, bool value);
 
   /**
-   * Puts the given boolean into the preferences table.
-   *
-   * The key may not have any whitespace nor an equals sign.
-   *
-   * @param key   the key
-   * @param value the value
-   */
-  WPI_DEPRECATED("Use SetBoolean instead.")
-  static void PutBoolean(std::string_view key, bool value);
-
-  /**
    * Puts the given boolean into the preferences table if it doesn't
    * already exist.
    */
@@ -254,17 +187,6 @@ class Preferences {
    * @param value the value
    */
   static void SetLong(std::string_view key, int64_t value);
-
-  /**
-   * Puts the given long (int64_t) into the preferences table.
-   *
-   * The key may not have any whitespace nor an equals sign.
-   *
-   * @param key   the key
-   * @param value the value
-   */
-  WPI_DEPRECATED("Use SetLong instead.")
-  static void PutLong(std::string_view key, int64_t value);
 
   /**
    * Puts the given long into the preferences table if it doesn't

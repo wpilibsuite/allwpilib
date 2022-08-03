@@ -23,13 +23,16 @@ mainClassName = 'edu.wpi.Main'
 apply plugin: 'com.github.johnrengelman.shadow'
 
 repositories {
-    mavenCentral()
+    maven {
+        url = 'https://frcmaven.wpi.edu/artifactory/ex-mvn'
+    }
 }
 
 dependencies {
     implementation 'com.google.code.gson:gson:2.8.9'
 
     implementation project(':wpiutil')
+    implementation project(':wpinet')
     implementation project(':ntcore')
     implementation project(':cscore')
     implementation project(':cameraserver')
@@ -38,7 +41,6 @@ dependencies {
 model {
     components {
         multiCameraServerCpp(NativeExecutableSpec) {
-            targetBuildTypes 'release'
             sources {
                 cpp {
                     source {
@@ -55,6 +57,7 @@ model {
                 lib project: ':cameraserver', library: 'cameraserver', linkage: 'static'
                 lib project: ':ntcore', library: 'ntcore', linkage: 'static'
                 lib project: ':cscore', library: 'cscore', linkage: 'static'
+                lib project: ':wpinet', library: 'wpinet', linkage: 'static'
                 lib project: ':wpiutil', library: 'wpiutil', linkage: 'static'
             }
         }

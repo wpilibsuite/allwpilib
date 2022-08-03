@@ -2,7 +2,9 @@ import edu.wpi.first.toolchain.*
 
 buildscript {
     repositories {
-        mavenCentral()
+        maven {
+            url = 'https://frcmaven.wpi.edu/artifactory/ex-mvn'
+        }
     }
     dependencies {
         classpath 'com.hubspot.jinjava:jinjava:2.6.0'
@@ -21,7 +23,7 @@ plugins {
     id 'net.ltgt.errorprone' version '2.0.2' apply false
     id 'com.github.johnrengelman.shadow' version '7.1.2' apply false
     id 'com.diffplug.spotless' version '6.4.2' apply false
-    id 'com.github.spotbugs' version '5.0.6' apply false
+    id 'com.github.spotbugs' version '5.0.8' apply false
 }
 
 wpilibVersioning.buildServerMode = project.hasProperty('buildServer')
@@ -29,7 +31,9 @@ wpilibVersioning.releaseMode = project.hasProperty('releaseMode')
 
 allprojects {
     repositories {
-        mavenCentral()
+        maven {
+        url = 'https://frcmaven.wpi.edu/artifactory/ex-mvn'
+    }
     }
     if (project.hasProperty('releaseMode')) {
         wpilibRepositories.addAllReleaseRepositories(it)
@@ -83,7 +87,12 @@ task copyAllOutputs(type: Copy) {
 build.dependsOn copyAllOutputs
 copyAllOutputs.dependsOn outputVersions
 
+def copyReleaseOnly = project.hasProperty('ciReleaseOnly')
+
 ext.addTaskToCopyAllOutputs = { task ->
+    if (copyReleaseOnly && task.name.contains('debug')) {
+        return
+    }
     copyAllOutputs.dependsOn task
     copyAllOutputs.inputs.file task.archivePath
     copyAllOutputs.from task.archivePath
@@ -147,5 +156,5 @@ ext.getCurrentArch = {
 }
 
 wrapper {
-    gradleVersion = '7.3.3'
+    gradleVersion = '7.5-rc-2'
 }

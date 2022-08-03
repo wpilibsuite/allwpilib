@@ -211,7 +211,7 @@ public final class LinearSystemId {
   }
 
   /**
-   * Identify a velocity system from it's kV (volts/(unit/sec)) and kA (volts/(unit/sec^2). These
+   * Identify a velocity system from it's kV (volts/(unit/sec)) and kA (volts/(unit/sec²). These
    * constants cam be found using SysId. The states of the system are [velocity], inputs are
    * [voltage], and outputs are [velocity].
    *
@@ -241,7 +241,7 @@ public final class LinearSystemId {
   }
 
   /**
-   * Identify a position system from it's kV (volts/(unit/sec)) and kA (volts/(unit/sec^2). These
+   * Identify a position system from it's kV (volts/(unit/sec)) and kA (volts/(unit/sec²). These
    * constants cam be found using SysId. The states of the system are [position, velocity]ᵀ, inputs
    * are [voltage], and outputs are [position].
    *
@@ -271,11 +271,13 @@ public final class LinearSystemId {
   }
 
   /**
-   * Identify a standard differential drive drivetrain, given the drivetrain's kV and kA in both
-   * linear (volts/(meter/sec) and volts/(meter/sec^2)) and angular (volts/(meter/sec) and
-   * volts/(meter/sec^2)) cases. This can be found using SysId. The states of the system are [left
-   * velocity, right velocity]ᵀ, inputs are [left voltage, right voltage]ᵀ, and outputs are [left
-   * velocity, right velocity]ᵀ.
+   * Identify a differential drive drivetrain given the drivetrain's kV and kA in both linear
+   * (volts/(meter/sec) and volts/(meter/sec²)) and angular (volts/(radian/sec) and
+   * volts/(radian/sec²)) cases. This can be found using SysId.
+   *
+   * <p>States: [[left velocity], [right velocity]]<br>
+   * Inputs: [[left voltage], [right voltage]]<br>
+   * Outputs: [[left velocity], [right velocity]]
    *
    * @param kVLinear The linear velocity gain, volts per (meter per second).
    * @param kALinear The linear acceleration gain, volts per (meter per second squared).
@@ -315,17 +317,20 @@ public final class LinearSystemId {
   }
 
   /**
-   * Identify a standard differential drive drivetrain, given the drivetrain's kV and kA in both
-   * linear (volts/(meter/sec) and volts/(meter/sec^2)) and angular (volts/(radian/sec) and
-   * volts/(radian/sec^2)) cases. This can be found using SysId. The states of the system are [left
-   * velocity, right velocity]ᵀ, inputs are [left voltage, right voltage]ᵀ, and outputs are [left
-   * velocity, right velocity]ᵀ.
+   * Identify a differential drive drivetrain given the drivetrain's kV and kA in both linear
+   * (volts/(meter/sec) and volts/(meter/sec²)) and angular (volts/(radian/sec) and
+   * volts/(radian/sec²)) cases. This can be found using SysId.
+   *
+   * <p>States: [[left velocity], [right velocity]]<br>
+   * Inputs: [[left voltage], [right voltage]]<br>
+   * Outputs: [[left velocity], [right velocity]]
    *
    * @param kVLinear The linear velocity gain, volts per (meter per second).
    * @param kALinear The linear acceleration gain, volts per (meter per second squared).
    * @param kVAngular The angular velocity gain, volts per (radians per second).
    * @param kAAngular The angular acceleration gain, volts per (radians per second squared).
-   * @param trackwidth The width of the drivetrain in meters.
+   * @param trackwidth The distance between the differential drive's left and right wheels in
+   *     meters.
    * @return A LinearSystem representing the given characterized constants.
    * @throws IllegalArgumentException if kVLinear &lt;= 0, kALinear &lt;= 0, kVAngular &lt;= 0,
    *     kAAngular &lt;= 0, or trackwidth &lt;= 0.

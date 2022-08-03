@@ -16,49 +16,43 @@ TEST(LinearSystemIDTest, IdentifyDrivetrainVelocitySystem) {
       frc::DCMotor::NEO(4), 70_kg, 0.05_m, 0.4_m, 6.0_kg_sq_m, 6.0);
 
   ASSERT_TRUE(model.A().isApprox(
-      Eigen::Matrix<double, 2, 2>{{-10.14132, 3.06598}, {3.06598, -10.14132}},
-      0.001));
+      frc::Matrixd<2, 2>{{-10.14132, 3.06598}, {3.06598, -10.14132}}, 0.001));
   ASSERT_TRUE(model.B().isApprox(
-      Eigen::Matrix<double, 2, 2>{{4.2590, -1.28762}, {-1.2876, 4.2590}},
-      0.001));
-  ASSERT_TRUE(model.C().isApprox(
-      Eigen::Matrix<double, 2, 2>{{1.0, 0.0}, {0.0, 1.0}}, 0.001));
-  ASSERT_TRUE(model.D().isApprox(
-      Eigen::Matrix<double, 2, 2>{{0.0, 0.0}, {0.0, 0.0}}, 0.001));
+      frc::Matrixd<2, 2>{{4.2590, -1.28762}, {-1.2876, 4.2590}}, 0.001));
+  ASSERT_TRUE(
+      model.C().isApprox(frc::Matrixd<2, 2>{{1.0, 0.0}, {0.0, 1.0}}, 0.001));
+  ASSERT_TRUE(
+      model.D().isApprox(frc::Matrixd<2, 2>{{0.0, 0.0}, {0.0, 0.0}}, 0.001));
 }
 
 TEST(LinearSystemIDTest, ElevatorSystem) {
   auto model = frc::LinearSystemId::ElevatorSystem(frc::DCMotor::NEO(2), 5_kg,
                                                    0.05_m, 12);
   ASSERT_TRUE(model.A().isApprox(
-      Eigen::Matrix<double, 2, 2>{{0.0, 1.0}, {0.0, -99.05473}}, 0.001));
-  ASSERT_TRUE(
-      model.B().isApprox(Eigen::Matrix<double, 2, 1>{0.0, 20.8}, 0.001));
-  ASSERT_TRUE(model.C().isApprox(Eigen::Matrix<double, 1, 2>{1.0, 0.0}, 0.001));
-  ASSERT_TRUE(model.D().isApprox(Eigen::Matrix<double, 1, 1>{0.0}, 0.001));
+      frc::Matrixd<2, 2>{{0.0, 1.0}, {0.0, -99.05473}}, 0.001));
+  ASSERT_TRUE(model.B().isApprox(frc::Matrixd<2, 1>{0.0, 20.8}, 0.001));
+  ASSERT_TRUE(model.C().isApprox(frc::Matrixd<1, 2>{1.0, 0.0}, 0.001));
+  ASSERT_TRUE(model.D().isApprox(frc::Matrixd<1, 1>{0.0}, 0.001));
 }
 
 TEST(LinearSystemIDTest, FlywheelSystem) {
   auto model = frc::LinearSystemId::FlywheelSystem(frc::DCMotor::NEO(2),
                                                    0.00032_kg_sq_m, 1.0);
-  ASSERT_TRUE(
-      model.A().isApprox(Eigen::Matrix<double, 1, 1>{-26.87032}, 0.001));
-  ASSERT_TRUE(
-      model.B().isApprox(Eigen::Matrix<double, 1, 1>{1354.166667}, 0.001));
-  ASSERT_TRUE(model.C().isApprox(Eigen::Matrix<double, 1, 1>{1.0}, 0.001));
-  ASSERT_TRUE(model.D().isApprox(Eigen::Matrix<double, 1, 1>{0.0}, 0.001));
+  ASSERT_TRUE(model.A().isApprox(frc::Matrixd<1, 1>{-26.87032}, 0.001));
+  ASSERT_TRUE(model.B().isApprox(frc::Matrixd<1, 1>{1354.166667}, 0.001));
+  ASSERT_TRUE(model.C().isApprox(frc::Matrixd<1, 1>{1.0}, 0.001));
+  ASSERT_TRUE(model.D().isApprox(frc::Matrixd<1, 1>{0.0}, 0.001));
 }
 
 TEST(LinearSystemIDTest, DCMotorSystem) {
   auto model = frc::LinearSystemId::DCMotorSystem(frc::DCMotor::NEO(2),
                                                   0.00032_kg_sq_m, 1.0);
-  ASSERT_TRUE(model.A().isApprox(
-      Eigen::Matrix<double, 2, 2>{{0, 1}, {0, -26.87032}}, 0.001));
   ASSERT_TRUE(
-      model.B().isApprox(Eigen::Matrix<double, 2, 1>{0, 1354.166667}, 0.001));
-  ASSERT_TRUE(model.C().isApprox(
-      Eigen::Matrix<double, 2, 2>{{1.0, 0.0}, {0.0, 1.0}}, 0.001));
-  ASSERT_TRUE(model.D().isApprox(Eigen::Matrix<double, 2, 1>{0.0, 0.0}, 0.001));
+      model.A().isApprox(frc::Matrixd<2, 2>{{0, 1}, {0, -26.87032}}, 0.001));
+  ASSERT_TRUE(model.B().isApprox(frc::Matrixd<2, 1>{0, 1354.166667}, 0.001));
+  ASSERT_TRUE(
+      model.C().isApprox(frc::Matrixd<2, 2>{{1.0, 0.0}, {0.0, 1.0}}, 0.001));
+  ASSERT_TRUE(model.D().isApprox(frc::Matrixd<2, 1>{0.0, 0.0}, 0.001));
 }
 
 TEST(LinearSystemIDTest, IdentifyPositionSystem) {
@@ -70,9 +64,8 @@ TEST(LinearSystemIDTest, IdentifyPositionSystem) {
       kv * 1_V / 1_mps, ka * 1_V / 1_mps_sq);
 
   ASSERT_TRUE(model.A().isApprox(
-      Eigen::Matrix<double, 2, 2>{{0.0, 1.0}, {0.0, -kv / ka}}, 0.001));
-  ASSERT_TRUE(
-      model.B().isApprox(Eigen::Matrix<double, 2, 1>{0.0, 1.0 / ka}, 0.001));
+      frc::Matrixd<2, 2>{{0.0, 1.0}, {0.0, -kv / ka}}, 0.001));
+  ASSERT_TRUE(model.B().isApprox(frc::Matrixd<2, 1>{0.0, 1.0 / ka}, 0.001));
 }
 
 TEST(LinearSystemIDTest, IdentifyVelocitySystem) {
@@ -84,6 +77,6 @@ TEST(LinearSystemIDTest, IdentifyVelocitySystem) {
   auto model = frc::LinearSystemId::IdentifyVelocitySystem<units::meter>(
       kv * 1_V / 1_mps, ka * 1_V / 1_mps_sq);
 
-  ASSERT_TRUE(model.A().isApprox(Eigen::Matrix<double, 1, 1>{-kv / ka}, 0.001));
-  ASSERT_TRUE(model.B().isApprox(Eigen::Matrix<double, 1, 1>{1.0 / ka}, 0.001));
+  ASSERT_TRUE(model.A().isApprox(frc::Matrixd<1, 1>{-kv / ka}, 0.001));
+  ASSERT_TRUE(model.B().isApprox(frc::Matrixd<1, 1>{1.0 / ka}, 0.001));
 }
