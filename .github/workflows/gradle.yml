@@ -16,11 +16,11 @@ jobs:
             artifact-name: Athena
             build-options: "-Ponlylinuxathena"
           - container: wpilib/raspbian-cross-ubuntu:10-20.04
-            artifact-name: Raspbian
-            build-options: "-Ponlylinuxraspbian"
+            artifact-name: Arm32
+            build-options: "-Ponlylinuxarm32"
           - container: wpilib/aarch64-cross-ubuntu:bionic-20.04
-            artifact-name: Aarch64
-            build-options: "-Ponlylinuxaarch64bionic"
+            artifact-name: Arm64
+            build-options: "-Ponlylinuxarm64"
           - container: wpilib/ubuntu-base:20.04
             artifact-name: Linux
             build-options: "-Ponlylinuxx86-64"
@@ -59,12 +59,12 @@ jobs:
           - os: windows-2019
             artifact-name: Win64Release
             architecture: x64
-            build-options: "-PciReleaseOnly"
+            build-options: "-PciReleaseOnly --max-workers 1"
             task: "copyAllOutputs"
           - os: macOS-11
             artifact-name: macOS
             architecture: x64
-            build-options: ""
+            build-options: "-Pbuildalldesktop"
             task: "build"
     name: "Build - ${{ matrix.artifact-name }}"
     runs-on: ${{ matrix.os }}
@@ -100,7 +100,7 @@ jobs:
           ARTIFACTORY_PUBLISH_USERNAME: ${{ secrets.ARTIFACTORY_USERNAME }}
           ARTIFACTORY_PUBLISH_PASSWORD: ${{ secrets.ARTIFACTORY_PASSWORD }}
       - name: Sign Libraries with Developer ID
-        run: ./gradlew build -PbuildServer -PskipJavaFormat -PdeveloperID=${{ secrets.APPLE_DEVELOPER_ID }} ${{ env.EXTRA_GRADLE_ARGS }}
+        run: ./gradlew build -PbuildServer -PskipJavaFormat -PdeveloperID=${{ secrets.APPLE_DEVELOPER_ID }} ${{ matrix.build-options }} ${{ env.EXTRA_GRADLE_ARGS }}
         if: |
           matrix.artifact-name == 'macOS' && (github.repository_owner == 'wpilibsuite' &&
           (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v')))

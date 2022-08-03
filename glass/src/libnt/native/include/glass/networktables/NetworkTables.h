@@ -88,6 +88,8 @@ class NetworkTablesModel : public Model {
 
 using NetworkTablesFlags = int;
 
+static constexpr const int kNetworkTablesFlags_PrecisionBitShift = 6;
+
 enum NetworkTablesFlags_ {
   NetworkTablesFlags_TreeView = 1 << 0,
   NetworkTablesFlags_ReadOnly = 1 << 1,
@@ -95,8 +97,10 @@ enum NetworkTablesFlags_ {
   NetworkTablesFlags_ShowFlags = 1 << 3,
   NetworkTablesFlags_ShowTimestamp = 1 << 4,
   NetworkTablesFlags_CreateNoncanonicalKeys = 1 << 5,
-  NetworkTablesFlags_Default = 1 & ~NetworkTablesFlags_ReadOnly &
-                               ~NetworkTablesFlags_CreateNoncanonicalKeys
+  NetworkTablesFlags_Precision = 0xff << kNetworkTablesFlags_PrecisionBitShift,
+  NetworkTablesFlags_Default = (1 & ~NetworkTablesFlags_ReadOnly &
+                                ~NetworkTablesFlags_CreateNoncanonicalKeys) |
+                               (6 << kNetworkTablesFlags_PrecisionBitShift),
 };
 
 void DisplayNetworkTables(
@@ -120,6 +124,7 @@ class NetworkTablesFlagsSettings {
   bool* m_pShowFlags = nullptr;
   bool* m_pShowTimestamp = nullptr;
   bool* m_pCreateNoncanonicalKeys = nullptr;
+  int* m_pPrecision = nullptr;
   NetworkTablesFlags m_defaultFlags;  // NOLINT
   NetworkTablesFlags m_flags;         // NOLINT
 };

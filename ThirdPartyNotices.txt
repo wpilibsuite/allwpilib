@@ -17,41 +17,35 @@ Program               Locations
 -------               ---------
 RoboRIO Libraries     ni-libraries
 Google Test           gtest
-LLVM                  wpiutil/src/main/native/include/wpi/{various files}
-                      wpiutil/src/main/native/cpp/llvm/
-                      wpiutil/src/main/native/cpp/leb128.cpp
-                      wpiutil/src/test/native/cpp/leb128Test.cpp
-JSON for Modern C++   wpiutil/src/main/native/include/wpi/json.h
-                      wpiutil/src/main/native/cpp/json_*.cpp
+LLVM                  wpiutil/src/main/native/thirdparty/llvm
+                      wpiutil/src/test/native/cpp/llvm/
+JSON for Modern C++   wpiutil/src/main/native/thirdparty/json
                       wpiutil/src/test/native/cpp/json/
 libuv                 wpinet/src/main/native/thirdparty/libuv/
-fmtlib                wpiutil/src/main/native/fmtlib/
-sigslot               wpiutil/src/main/native/include/wpi/Signal.h
-                      wpiutil/src/test/native/cpp/sigslot/
-tcpsockets            wpiutil/src/main/native/cpp/TCP{Stream,Connector,Acceptor}.cpp
-                      wpiutil/src/main/native/include/wpi/TCP*.h
-MPack                 wpiutil/src/main/native/include/mpack.h
-                      wpiutil/src/main/native/cpp/mpack.cpp
+fmtlib                wpiutil/src/main/native/thirdparty/fmtlib/
+sigslot               wpiutil/src/main/native/thirdparty/sigslot
+tcpsockets            wpinet/src/main/native/thirdparty/tcpsockets
+MPack                 wpiutil/src/main/native/thirdparty/mpack
 Bootstrap             wpinet/src/main/native/resources/bootstrap-*
 CoreUI                wpinet/src/main/native/resources/coreui-*
 Feather Icons         wpinet/src/main/native/resources/feather-*
 jQuery                wpinet/src/main/native/resources/jquery-*
 popper.js             wpinet/src/main/native/resources/popper-*
 units                 wpimath/src/main/native/include/units/
-Eigen                 wpimath/src/main/native/eigeninclude/
-                      wpimath/src/main/native/include/unsupported/
+Eigen                 wpimath/src/main/native/thirdparty/eigen/include/
 StackWalker           wpiutil/src/main/native/windows/StackWalker.*
-TCB span              wpiutil/src/main/native/include/wpi/span.h
+TCB span              wpiutil/src/main/native/thirdparty/include/wpi/span.h
                       wpiutil/src/test/native/cpp/span/
-GHC filesystem        wpiutil/src/main/native/include/wpi/ghc/
+GHC filesystem        wpiutil/src/main/native/thirdparty/include/wpi/ghc/
 Team 254 Library      wpilibj/src/main/java/edu/wpi/first/wpilibj/spline/SplineParameterizer.java
                       wpilibj/src/main/java/edu/wpi/first/wpilibj/trajectory/TrajectoryParameterizer.java
                       wpilibc/src/main/native/include/spline/SplineParameterizer.h
                       wpilibc/src/main/native/include/trajectory/TrajectoryParameterizer.h
                       wpilibc/src/main/native/cpp/trajectory/TrajectoryParameterizer.cpp
 Portable File Dialogs wpigui/src/main/native/include/portable-file-dialogs.h
-Drake                 wpimath/src/main/native/cpp/drake/common/drake_assert_and_throw.cpp
-                      wpimath/src/main/native/cpp/drake/math/discrete_algebraic_riccati_equation.cpp
+Drake                 wpimath/src/main/native/thirdparty/drake/
+                      wpimath/src/test/native/cpp/drake/
+                      wpimath/src/test/native/include/drake/
 V8 export-template    wpiutil/src/main/native/include/wpi/SymbolExports.h
 
 ==============================================================================

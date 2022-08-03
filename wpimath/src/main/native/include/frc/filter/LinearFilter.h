@@ -175,12 +175,12 @@ class LinearFilter {
    * difference. 0 is the current sample, -1 is the previous sample, -2 is the
    * sample before that, etc. Don't use positive stencil points (samples from
    * the future) if the LinearFilter will be used for stream-based online
-   * filtering.
+   * filtering (e.g., taking derivative of encoder samples in real-time).
    *
    * @tparam Derivative The order of the derivative to compute.
    * @tparam Samples    The number of samples to use to compute the given
    *                    derivative. This must be one more than the order of
-   *                    derivative or higher.
+   *                    the derivative or higher.
    * @param stencil     List of stencil points.
    * @param period      The period in seconds between samples taken by the user.
    */

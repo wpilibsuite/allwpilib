@@ -57,8 +57,9 @@ public class LTVDifferentialDriveController {
   /**
    * Constructs a linear time-varying differential drive controller.
    *
-   * @param plant The drivetrain velocity plant.
-   * @param trackwidth The drivetrain's trackwidth in meters.
+   * @param plant The differential drive velocity plant.
+   * @param trackwidth The distance between the differential drive's left and right wheels in
+   *     meters.
    * @param qelems The maximum desired error tolerance for each state.
    * @param relems The maximum desired control effort for each input.
    * @param dt Discretization timestep in seconds.

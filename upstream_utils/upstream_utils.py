@@ -39,8 +39,7 @@ def clone_repo(url, treeish, shallow=True):
     #   From https://gitlab.com/libeigen/eigen.git
     #   77c66e368c7e355f8be299659f57b0ffcaedb505  refs/heads/3.4
     #   3e006bfd31e4389e8c5718c30409cddb65a73b04  refs/heads/master
-    ls_out = subprocess.check_output(["git", "ls-remote",
-                                      "--heads"]).decode().rstrip()
+    ls_out = subprocess.check_output(["git", "ls-remote", "--heads"]).decode().rstrip()
     heads = [x.split()[1] for x in ls_out.split("\n")[1:]]
 
     if f"refs/heads/{treeish}" in heads:
@@ -95,10 +94,7 @@ def walk_if(top, pred):
             True if the file should be included in the output list
     """
     return [
-        os.path.join(dp, f)
-        for dp, dn, fn in os.walk(top)
-        for f in fn
-        if pred(dp, f)
+        os.path.join(dp, f) for dp, dn, fn in os.walk(top) for f in fn if pred(dp, f)
     ]
 
 
@@ -175,14 +171,16 @@ def comment_out_invalid_includes(filename, include_roots):
         include = match.group(1)
 
         # Write contents from before this match
-        new_contents += old_contents[pos:match.span()[0]]
+        new_contents += old_contents[pos : match.span()[0]]
 
         # Comment out #include if the file doesn't exist in current directory or
         # include root
-        if not os.path.exists(os.path.join(
-                os.path.dirname(filename), include)) and not any(
-                    os.path.exists(os.path.join(include_root, include))
-                    for include_root in include_roots):
+        if not os.path.exists(
+            os.path.join(os.path.dirname(filename), include)
+        ) and not any(
+            os.path.exists(os.path.join(include_root, include))
+            for include_root in include_roots
+        ):
             new_contents += "// "
 
         new_contents += match.group()
