@@ -617,7 +617,7 @@ void GetData() {
     }
   }
 
-  inst.refreshEvents.wakeup();
+  inst.refreshEvents.Wakeup();
 
   SendMatchData();
   if (auto sender = inst.dataLogSender.load()) {
@@ -627,12 +627,12 @@ void GetData() {
 
 void DriverStation::ProvideRefreshedDataEventHandle(WPI_EventHandle handle) {
   auto& inst = ::GetInstance();
-  inst.refreshEvents.add(handle);
+  inst.refreshEvents.Add(handle);
 }
 
 void DriverStation::RemoveRefreshedDataEventHandle(WPI_EventHandle handle) {
   auto& inst = ::GetInstance();
-  inst.refreshEvents.remove(handle);
+  inst.refreshEvents.Remove(handle);
 }
 
 void DriverStation::SilenceJoystickConnectionWarning(bool silence) {

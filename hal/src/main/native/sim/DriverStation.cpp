@@ -283,11 +283,11 @@ void HAL_UpdateDSData(void) {
 }
 
 void HAL_ProvideNewDataEventHandle(WPI_EventHandle handle) {
-  driverStation->newDataEvents.add(handle);
+  driverStation->newDataEvents.Add(handle);
 }
 
 void HAL_RemoveNewDataEventHandle(WPI_EventHandle handle) {
-  driverStation->newDataEvents.remove(handle);
+  driverStation->newDataEvents.Remove(handle);
 }
 
 HAL_Bool HAL_GetOutputsEnabled(void) {
@@ -307,7 +307,7 @@ void NewDriverStationData() {
     std::swap(currentCache, cacheToUpdate);
     currentCache->updated = true;
   }
-  driverStation->newDataEvents.wakeup();
+  driverStation->newDataEvents.Wakeup();
   printf("Woken up\n");
   SimDriverStationData->CallNewDataCallbacks();
 }

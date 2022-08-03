@@ -9,11 +9,11 @@ struct EventVector {
   wpi::mutex mutex;
   wpi::SmallVector<WPI_EventHandle, 4> events;
 
-  void add(WPI_EventHandle handle) {
+  void Add(WPI_EventHandle handle) {
     std::scoped_lock lock{mutex};
     events.emplace_back(handle);
   }
-  void remove(WPI_EventHandle handle) {
+  void Remove(WPI_EventHandle handle) {
     std::scoped_lock lock{mutex};
     auto it = std::find_if(
         events.begin(), events.end(),
@@ -22,7 +22,7 @@ struct EventVector {
       events.erase(it);
     }
   }
-  void wakeup() {
+  void Wakeup() {
     std::scoped_lock lock{mutex};
     for (auto&& handle : events) {
       wpi::SetEvent(handle);
