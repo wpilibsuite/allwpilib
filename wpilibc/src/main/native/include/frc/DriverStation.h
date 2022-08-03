@@ -5,6 +5,7 @@
 #pragma once
 
 #include <string>
+#include <wpi/Synchronization.h>
 
 #include <units/time.h>
 

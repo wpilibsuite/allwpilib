@@ -720,7 +720,7 @@ public final class DriverStation {
     }
   }
 
-  /**
+    /**
    * Returns the number of axes on a given joystick port.
    *
    * @param stick The joystick port number
@@ -730,8 +730,28 @@ public final class DriverStation {
     if (stick < 0 || stick >= kJoystickPorts) {
       throw new IllegalArgumentException("Joystick index is out of range, should be 0-5");
     }
-    #include <wpi/deprecated.h>
-    #include <wpi/Synchronization.h>
+    if (stick < 0 || stick >= kJoystickPorts) {
+      throw new IllegalArgumentException("Joystick index is out of range, should be 0-5");
+    }
+
+    m_cacheDataMutex.lock();
+    try {
+      return m_joystickAxes[stick].m_count;
+    } finally {
+      m_cacheDataMutex.unlock();
+    }
+  }
+
+  /**
+   * Returns the number of povs on a given joystick port.
+   *
+   * @param stick The joystick port number
+   * @return The number of povs on the indicated joystick
+   */
+  public static int getStickPOVCount(int stick) {
+    if (stick < 0 || stick >= kJoystickPorts) {
+      throw new IllegalArgumentException("Joystick index is out of range, should be 0-5");
+    }
     if (stick < 0 || stick >= kJoystickPorts) {
       throw new IllegalArgumentException("Joystick index is out of range, should be 0-5");
     }
