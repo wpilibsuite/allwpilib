@@ -84,11 +84,15 @@ public class DriverStationJNI extends JNIWrapper {
   public static final int kMaxJoystickPOVs = 12;
   public static final int kMaxJoysticks = 6;
 
-  public static native short getJoystickAxes(byte joystickNum, float[] axesArray);
+  public static native int getJoystickAxes(byte joystickNum, float[] axesArray);
 
-  public static native short getJoystickPOVs(byte joystickNum, short[] povsArray);
+  public static native int getJoystickAxesRaw(byte joystickNum, int[] rawAxesArray);
+
+  public static native int getJoystickPOVs(byte joystickNum, short[] povsArray);
 
   public static native int getJoystickButtons(byte joystickNum, ByteBuffer count);
+
+  public static native int getAllJoystickData(byte joystickNum, float[] axesArray, int[] rawAxesArray, short[] povsArray, int[] buttonsAndMetadata);
 
   public static native int setJoystickOutputs(
       byte joystickNum, int outputs, short leftRumble, short rightRumble);

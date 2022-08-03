@@ -61,18 +61,19 @@ static wpi::mutex msgMutex;
 
 static int32_t HAL_GetJoystickAxesInternal(int32_t joystickNum,
                                            HAL_JoystickAxes* axes) {
-  HAL_JoystickAxesInt axesInt;
+  JoystickAxes_t netcommAxes;
 
   int retVal = FRC_NetworkCommunication_getJoystickAxes(
-      joystickNum, reinterpret_cast<JoystickAxes_t*>(&axesInt),
+      joystickNum, &netcommAxes,
       HAL_kMaxJoystickAxes);
 
   // copy integer values to double values
-  axes->count = axesInt.count;
+  axes->count = netcommAxes.count;
   // current scaling is -128 to 127, can easily be patched in the future by
   // changing this function.
-  for (int32_t i = 0; i < axesInt.count; i++) {
-    int8_t value = axesInt.axes[i];
+  for (int32_t i = 0; i < netcommAxes.count; i++) {
+    int8_t value = netcommAxes.axes[i];
+    axes->raw[i] = value;
     if (value < 0) {
       axes->axes[i] = value / 128.0;
     } else {

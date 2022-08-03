@@ -122,10 +122,41 @@ Java_edu_wpi_first_hal_DriverStationJNI_nativeGetAllianceStation(JNIEnv*,
 
 /*
  * Class:     edu_wpi_first_hal_DriverStationJNI
- * Method:    getJoystickAxes
- * Signature: (B[F)S
+ * Method:    getJoystickAxesRaw
+ * Signature: (B[I)I
  */
-JNIEXPORT jshort JNICALL
+JNIEXPORT jint JNICALL
+Java_edu_wpi_first_hal_DriverStationJNI_getJoystickAxesRaw(JNIEnv* env, jclass,
+                                                        jbyte joystickNum,
+                                                        jintArray axesRawArray) {
+  HAL_JoystickAxes axes;
+  HAL_GetJoystickAxes(joystickNum, &axes);
+
+  jsize javaSize = env->GetArrayLength(axesRawArray);
+  if (axes.count > javaSize) {
+    ThrowIllegalArgumentException(
+        env,
+        fmt::format("Native array size larger then passed in java array "
+                    "size\nNative Size: {} Java Size: {}",
+                    static_cast<int>(axes.count), static_cast<int>(javaSize)));
+    return 0;
+  }
+
+  jint raw[HAL_kMaxJoystickAxes];
+  for (int16_t i = 0; i < axes.count; i++) {
+    raw[i] = axes.raw[i];
+  }
+  env->SetIntArrayRegion(axesRawArray, 0, axes.count, raw);
+
+  return axes.count;
+}
+
+/*
+ * Class:     edu_wpi_first_hal_DriverStationJNI
+ * Method:    getJoystickAxes
+ * Signature: (B[F)I
+ */
+JNIEXPORT jint JNICALL
 Java_edu_wpi_first_hal_DriverStationJNI_getJoystickAxes(JNIEnv* env, jclass,
                                                         jbyte joystickNum,
                                                         jfloatArray axesArray) {
@@ -150,9 +181,9 @@ Java_edu_wpi_first_hal_DriverStationJNI_getJoystickAxes(JNIEnv* env, jclass,
 /*
  * Class:     edu_wpi_first_hal_DriverStationJNI
  * Method:    getJoystickPOVs
- * Signature: (B[S)S
+ * Signature: (B[S)I
  */
-JNIEXPORT jshort JNICALL
+JNIEXPORT jint JNICALL
 Java_edu_wpi_first_hal_DriverStationJNI_getJoystickPOVs(JNIEnv* env, jclass,
                                                         jbyte joystickNum,
                                                         jshortArray povsArray) {
@@ -173,6 +204,19 @@ Java_edu_wpi_first_hal_DriverStationJNI_getJoystickPOVs(JNIEnv* env, jclass,
 
   return povs.count;
 }
+
+/*
+ * Class:     edu_wpi_first_hal_DriverStationJNI
+ * Method:    getAllJoystickData
+ * Signature: (B[F[I[S[I)I
+ */
+JNIEXPORT jint JNICALL Java_edu_wpi_first_hal_DriverStationJNI_getAllJoystickData
+  (JNIEnv *env, jclass cls, jbyte joystickNum, jfloatArray axesArray, jintArray rawAxesArray, jshortArray povsArray, jintArray buttonsAndMetadata)
+  {
+    int stickCount = Java_edu_wpi_first_hal_DriverStationJNI_getJoystickAxes(env, cls, joystickNum, axesArray);
+    int povsCount = Java_edu_wpi_first_hal_DriverStationJNI_getJoystickPOVs(env, cls, joystickNum, povsArray);
+    int raw = Java_edu_wpi_first_hal_DriverStationJNI_getJoystickPOVs(env, cls, joystickNum, povsArray);
+  }
 
 /*
  * Class:     edu_wpi_first_hal_DriverStationJNI
