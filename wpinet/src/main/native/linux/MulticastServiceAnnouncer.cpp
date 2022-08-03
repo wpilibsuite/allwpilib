@@ -94,7 +94,7 @@ static void RegisterService(AvahiClient* client,
         ret = impl->table.entry_group_add_service(
             impl->group, AVAHI_IF_UNSPEC, AVAHI_PROTO_UNSPEC,
             AVAHI_PUBLISH_USE_MULTICAST, impl->serviceName.c_str(),
-            impl->serviceType.c_str(), "local", nullptr, impl->port);
+            impl->serviceType.c_str(), "local", nullptr, impl->port, nullptr);
       } else {
         ret = impl->table.entry_group_add_service_strlst(
             impl->group, AVAHI_IF_UNSPEC, AVAHI_PROTO_UNSPEC,

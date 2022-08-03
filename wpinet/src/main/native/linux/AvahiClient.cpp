@@ -58,6 +58,7 @@ AvahiFunctionTable::AvahiFunctionTable() {
   AvahiFunctionLoad(service_resolver_free);
   AvahiFunctionLoad(entry_group_new);
   AvahiFunctionLoad(entry_group_free);
+  AvahiFunctionLoad(entry_group_add_service);
   AvahiFunctionLoad(entry_group_add_service_strlst);
   AvahiFunctionLoad(entry_group_reset);
   AvahiFunctionLoad(entry_group_is_empty);

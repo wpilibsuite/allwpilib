@@ -267,7 +267,7 @@ class AvahiFunctionTable {
                 (AvahiEntryGroup * group, AvahiIfIndex interface,
                  AvahiProtocol protocol, AvahiPublishFlags flags,
                  const char* name, const char* type, const char* domain,
-                 const char* host, uint16_t port));
+                 const char* host, uint16_t port, ...));
 
   AvahiFunction(entry_group_add_service_strlst, int,
                 (AvahiEntryGroup * group, AvahiIfIndex interface,
