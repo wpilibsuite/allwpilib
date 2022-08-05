@@ -311,6 +311,14 @@ int32_t HAL_GetJoystickButtons(int32_t joystickNum,
   return 0;
 }
 
+void HAL_GetAllJoystickData(HAL_JoystickAxes* axes, HAL_JoystickPOVs* povs, HAL_JoystickButtons* buttons)
+{
+  std::scoped_lock lock{cacheMutex};
+  std::memcpy(axes, currentRead->axes, sizeof(currentRead->axes));
+  std::memcpy(povs, currentRead->povs, sizeof(currentRead->povs));
+  std::memcpy(buttons, currentRead->buttons, sizeof(currentRead->buttons));
+}
+
 int32_t HAL_GetJoystickDescriptor(int32_t joystickNum,
                                   HAL_JoystickDescriptor* desc) {
   return HAL_GetJoystickDescriptorInternal(joystickNum, desc);

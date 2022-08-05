@@ -92,7 +92,8 @@ public class DriverStationJNI extends JNIWrapper {
 
   public static native int getJoystickButtons(byte joystickNum, ByteBuffer count);
 
-  public static native int getAllJoystickData(byte joystickNum, float[] axesArray, int[] rawAxesArray, short[] povsArray, int[] buttonsAndMetadata);
+  public static native void getAllJoystickData(
+      float[] axesArray, byte[] rawAxesArray, short[] povsArray, long[] buttonsAndMetadata);
 
   public static native int setJoystickOutputs(
       byte joystickNum, int outputs, short leftRumble, short rightRumble);

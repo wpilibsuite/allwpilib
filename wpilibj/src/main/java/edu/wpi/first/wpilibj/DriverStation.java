@@ -846,13 +846,7 @@ public final class DriverStation {
    * <p>This makes a best effort guess by looking at the reported number of axis, buttons, and POVs
    * attached.
    *
-   * @param stick The joystick port number
-   * @return true if a joystick is connected
-   */
-  public static boolean isJoystickConnected(int stick) {
-    return getStickAxisCount(stick) > 0
-        || getStickButtonCount(stick) > 0
-        || getStickPOVCount(stick) > 0;
+   * @param stick The joystick port numberHAL_USER_STATUS_DATA_SIZE
   }
 
   /**

@@ -208,14 +208,35 @@ Java_edu_wpi_first_hal_DriverStationJNI_getJoystickPOVs(JNIEnv* env, jclass,
 /*
  * Class:     edu_wpi_first_hal_DriverStationJNI
  * Method:    getAllJoystickData
- * Signature: (B[F[I[S[I)I
+ * Signature: ([F[B[S[J)V
  */
-JNIEXPORT jint JNICALL Java_edu_wpi_first_hal_DriverStationJNI_getAllJoystickData
-  (JNIEnv *env, jclass cls, jbyte joystickNum, jfloatArray axesArray, jintArray rawAxesArray, jshortArray povsArray, jintArray buttonsAndMetadata)
+JNIEXPORT void JNICALL Java_edu_wpi_first_hal_DriverStationJNI_getAllJoystickData
+  (JNIEnv *env, jclass cls, jfloatArray axesArray, jbyteArray rawAxesArray, jshortArray povsArray, jlongArray buttonsAndMetadataArray)
   {
-    int stickCount = Java_edu_wpi_first_hal_DriverStationJNI_getJoystickAxes(env, cls, joystickNum, axesArray);
-    int povsCount = Java_edu_wpi_first_hal_DriverStationJNI_getJoystickPOVs(env, cls, joystickNum, povsArray);
-    int raw = Java_edu_wpi_first_hal_DriverStationJNI_getJoystickPOVs(env, cls, joystickNum, povsArray);
+    HAL_JoystickAxes axes[HAL_kMaxJoysticks];
+    HAL_JoystickPOVs povs[HAL_kMaxJoysticks];
+    HAL_JoystickButtons buttons[HAL_kMaxJoysticks];
+
+    HAL_GetAllJoystickData(axes, povs, buttons);
+
+    CriticalJFloatArrayRef jAxes(env, axesArray);
+    CriticalJByteArrayRef jRawAxes(env, rawAxesArray);
+    CriticalJShortArrayRef jPovs(env, povsArray);
+    CriticalJLongArrayRef jButtons(env, buttonsAndMetadataArray);
+
+    static_assert(sizeof(jAxes[0]) == sizeof(axes[0].axes[0]));
+    static_assert(sizeof(jRawAxes[0]) == sizeof(axes[0].raw[0]));
+    static_assert(sizeof(jPovs[0]) == sizeof(povs[0].povs[0]));
+
+    for (size_t i = 0; i < HAL_kMaxJoysticks; i++) {
+      memcpy(&jAxes[i * HAL_kMaxJoystickAxes], axes[i].axes, sizeof(axes[i].axes));
+      memcpy(&jRawAxes[i * HAL_kMaxJoystickAxes], axes[i].raw, sizeof(axes[i].raw));
+      memcpy(&jPovs[i * HAL_kMaxJoystickPOVs], povs[i].povs, sizeof(povs[i].povs));
+      jButtons[i * 4] = axes[i].count;
+      jButtons[(i * 4) + 1] = povs[i].count;
+      jButtons[(i * 4) + 2] = buttons[i].count;
+      jButtons[(i * 4) + 3] = buttons[i].buttons;
+    }
   }
 
 /*
