@@ -1,18 +1,18 @@
-From 8536e1f23d515eac3cbc0680f27aa6ab740b4796 Mon Sep 17 00:00:00 2001
+From 318c5846162b83d564c4edbacaa4952a1fa76f96 Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Sun, 8 May 2022 19:16:51 -0400
-Subject: [PATCH 22/27] Remove unused functions
+Subject: [PATCH 22/29] Remove unused functions
 
 ---
  llvm/include/llvm/Support/DJB.h         |  3 -
- llvm/include/llvm/Support/raw_ostream.h |  3 +-
+ llvm/include/llvm/Support/raw_ostream.h |  5 +-
  llvm/lib/Support/ErrorHandling.cpp      | 16 -----
- llvm/lib/Support/raw_ostream.cpp        | 48 +++++++--------
+ llvm/lib/Support/raw_ostream.cpp        | 49 +++++++--------
  llvm/unittests/ADT/SmallStringTest.cpp  | 81 -------------------------
- 5 files changed, 22 insertions(+), 129 deletions(-)
+ 5 files changed, 23 insertions(+), 131 deletions(-)
 
 diff --git a/llvm/include/llvm/Support/DJB.h b/llvm/include/llvm/Support/DJB.h
-index 8737cd144c37..67b0ae91b4b1 100644
+index 8737cd144..67b0ae91b 100644
 --- a/llvm/include/llvm/Support/DJB.h
 +++ b/llvm/include/llvm/Support/DJB.h
 @@ -24,9 +24,6 @@ inline uint32_t djbHash(std::string_view Buffer, uint32_t H = 5381) {
@@ -26,10 +26,10 @@ index 8737cd144c37..67b0ae91b4b1 100644
  
  #endif // LLVM_SUPPORT_DJB_H
 diff --git a/llvm/include/llvm/Support/raw_ostream.h b/llvm/include/llvm/Support/raw_ostream.h
-index 27fb5c03e474..d228b05f4f9b 100644
+index 256bcec25..9b3a87e1b 100644
 --- a/llvm/include/llvm/Support/raw_ostream.h
 +++ b/llvm/include/llvm/Support/raw_ostream.h
-@@ -72,7 +72,6 @@ private:
+@@ -71,7 +71,6 @@ private:
    /// for a \see write_impl() call to handle the data which has been put into
    /// this buffer.
    char *OutBufStart, *OutBufEnd, *OutBufCur;
@@ -37,28 +37,31 @@ index 27fb5c03e474..d228b05f4f9b 100644
  
    /// Optional stream this stream is tied to. If this stream is written to, the
    /// tied-to stream will be flushed first.
-@@ -305,7 +304,7 @@ public:
+@@ -304,9 +303,9 @@ public:
  
    // Enable or disable colors. Once enable_colors(false) is called,
    // changeColor() has no effect until enable_colors(true) is called.
 -  virtual void enable_colors(bool enable) { ColorEnabled = enable; }
 +  virtual void enable_colors(bool /*enable*/) {}
  
+-  bool colors_enabled() const { return ColorEnabled; }
++  bool colors_enabled() const { return false; }
+ 
    /// Tie this stream to the specified stream. Replaces any existing tied-to
    /// stream. Specifying a nullptr unties the stream.
 diff --git a/llvm/lib/Support/ErrorHandling.cpp b/llvm/lib/Support/ErrorHandling.cpp
-index 9ee52a02c214..77c3a37475d0 100644
+index f2cddf3c6..162753eb0 100644
 --- a/llvm/lib/Support/ErrorHandling.cpp
 +++ b/llvm/lib/Support/ErrorHandling.cpp
 @@ -178,22 +178,6 @@ void llvm::llvm_unreachable_internal(const char *msg, const char *file,
  #endif
  }
  
--static void bindingsErrorHandler(void *user_data, const std::string& reason,
+-static void bindingsErrorHandler(void *user_data, const char *reason,
 -                                 bool gen_crash_diag) {
 -  LLVMFatalErrorHandler handler =
 -      LLVM_EXTENSION reinterpret_cast<LLVMFatalErrorHandler>(user_data);
--  handler(reason.c_str());
+-  handler(reason);
 -}
 -
 -void LLVMInstallFatalErrorHandler(LLVMFatalErrorHandler Handler) {
@@ -74,10 +77,10 @@ index 9ee52a02c214..77c3a37475d0 100644
  
  #include <winerror.h>
 diff --git a/llvm/lib/Support/raw_ostream.cpp b/llvm/lib/Support/raw_ostream.cpp
-index 6b9e5f9e44bd..6fa250a68ed8 100644
+index 878a3a5e9..632b52235 100644
 --- a/llvm/lib/Support/raw_ostream.cpp
 +++ b/llvm/lib/Support/raw_ostream.cpp
-@@ -169,16 +169,6 @@ raw_ostream &raw_ostream::write_escaped(std::string_view Str,
+@@ -167,16 +167,6 @@ raw_ostream &raw_ostream::write_escaped(std::string_view Str,
    return *this;
  }
  
@@ -94,7 +97,7 @@ index 6b9e5f9e44bd..6fa250a68ed8 100644
  void raw_ostream::flush_nonempty() {
    assert(OutBufCur > OutBufStart && "Invalid call to flush_nonempty.");
    size_t Length = OutBufCur - OutBufStart;
-@@ -323,15 +313,22 @@ static int getFD(std::string_view Filename, std::error_code &EC,
+@@ -321,15 +311,22 @@ static int getFD(std::string_view Filename, std::error_code &EC,
    if (Filename == "-") {
      EC = std::error_code();
      // Change stdout's text/binary mode based on the Flags.
@@ -122,19 +125,21 @@ index 6b9e5f9e44bd..6fa250a68ed8 100644
    if (EC)
      return -1;
  
-@@ -392,10 +389,7 @@ raw_fd_ostream::raw_fd_ostream(int fd, bool shouldClose, bool unbuffered,
+@@ -389,12 +386,8 @@ raw_fd_ostream::raw_fd_ostream(int fd, bool shouldClose, bool unbuffered,
+ 
    // Get the starting position.
    off_t loc = ::lseek(FD, 0, SEEK_CUR);
- #ifdef _WIN32
--  // MSVCRT's _lseek(SEEK_CUR) doesn't return -1 for pipes.
 -  sys::fs::file_status Status;
 -  std::error_code EC = status(FD, Status);
--  SupportsSeeking = !EC && Status.type() == sys::fs::file_type::regular_file;
+-  IsRegularFile = Status.type() == sys::fs::file_type::regular_file;
+ #ifdef _WIN32
+-  // MSVCRT's _lseek(SEEK_CUR) doesn't return -1 for pipes.
+-  SupportsSeeking = !EC && IsRegularFile;
 +  SupportsSeeking = loc != (off_t)-1 && ::GetFileType(reinterpret_cast<HANDLE>(::_get_osfhandle(FD))) != FILE_TYPE_PIPE;
  #else
-   SupportsSeeking = loc != (off_t)-1;
+   SupportsSeeking = !EC && loc != (off_t)-1;
  #endif
-@@ -408,10 +402,8 @@ raw_fd_ostream::raw_fd_ostream(int fd, bool shouldClose, bool unbuffered,
+@@ -407,10 +400,8 @@ raw_fd_ostream::raw_fd_ostream(int fd, bool shouldClose, bool unbuffered,
  raw_fd_ostream::~raw_fd_ostream() {
    if (FD >= 0) {
      flush();
@@ -147,7 +152,7 @@ index 6b9e5f9e44bd..6fa250a68ed8 100644
    }
  
  #ifdef __MINGW32__
-@@ -506,7 +498,11 @@ void raw_fd_ostream::write_impl(const char *Ptr, size_t Size) {
+@@ -505,7 +496,11 @@ void raw_fd_ostream::write_impl(const char *Ptr, size_t Size) {
  
    do {
      size_t ChunkSize = std::min(Size, MaxWriteSize);
@@ -159,7 +164,7 @@ index 6b9e5f9e44bd..6fa250a68ed8 100644
  
      if (ret < 0) {
        // If it's a recoverable error, swallow it and retry the write.
-@@ -541,8 +537,8 @@ void raw_fd_ostream::close() {
+@@ -540,8 +535,8 @@ void raw_fd_ostream::close() {
    assert(ShouldClose);
    ShouldClose = false;
    flush();
@@ -170,7 +175,7 @@ index 6b9e5f9e44bd..6fa250a68ed8 100644
    FD = -1;
  }
  
-@@ -551,8 +547,6 @@ uint64_t raw_fd_ostream::seek(uint64_t off) {
+@@ -550,8 +545,6 @@ uint64_t raw_fd_ostream::seek(uint64_t off) {
    flush();
  #ifdef _WIN32
    pos = ::_lseeki64(FD, off, SEEK_SET);
@@ -180,7 +185,7 @@ index 6b9e5f9e44bd..6fa250a68ed8 100644
    pos = ::lseek(FD, off, SEEK_SET);
  #endif
 diff --git a/llvm/unittests/ADT/SmallStringTest.cpp b/llvm/unittests/ADT/SmallStringTest.cpp
-index bee3875d11c9..87600ea4704b 100644
+index bee3875d1..87600ea47 100644
 --- a/llvm/unittests/ADT/SmallStringTest.cpp
 +++ b/llvm/unittests/ADT/SmallStringTest.cpp
 @@ -129,23 +129,6 @@ TEST_F(SmallStringTest, StdStringConversion) {
@@ -277,5 +282,5 @@ index bee3875d11c9..87600ea4704b 100644
 -
  } // namespace
 -- 
-2.20.1.windows.1
+2.37.1
 

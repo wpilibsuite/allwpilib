@@ -60,6 +60,7 @@
 #endif
 
 namespace wpi {
+template <typename T, typename Enable> struct DenseMapInfo;
 
 /// An opaque object representing a hash code.
 ///
@@ -680,6 +681,13 @@ template <typename T>
 hash_code hash_value(const std::basic_string<T> &arg) {
   return hash_combine_range(arg.begin(), arg.end());
 }
+
+template <> struct DenseMapInfo<hash_code, void> {
+  static inline hash_code getEmptyKey() { return hash_code(-1); }
+  static inline hash_code getTombstoneKey() { return hash_code(-2); }
+  static unsigned getHashValue(hash_code val) { return val; }
+  static bool isEqual(hash_code LHS, hash_code RHS) { return LHS == RHS; }
+};
 
 } // namespace wpi
 

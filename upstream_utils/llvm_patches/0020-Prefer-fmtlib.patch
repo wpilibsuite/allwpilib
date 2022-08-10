@@ -1,14 +1,14 @@
-From 2a480ee8e89b322b91f596a5a9d63aa6b9a76af0 Mon Sep 17 00:00:00 2001
+From 1d75abbb516f8e9a23b790f0a24f803332791bda Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Sun, 8 May 2022 16:46:20 -0400
-Subject: [PATCH 20/27] Prefer fmtlib
+Subject: [PATCH 20/29] Prefer fmtlib
 
 ---
  llvm/lib/Support/ErrorHandling.cpp | 20 ++++++--------------
  1 file changed, 6 insertions(+), 14 deletions(-)
 
 diff --git a/llvm/lib/Support/ErrorHandling.cpp b/llvm/lib/Support/ErrorHandling.cpp
-index 4b6ddd30c6e4..9ee52a02c214 100644
+index fe3b5532f..f2cddf3c6 100644
 --- a/llvm/lib/Support/ErrorHandling.cpp
 +++ b/llvm/lib/Support/ErrorHandling.cpp
 @@ -22,7 +22,7 @@
@@ -20,9 +20,9 @@ index 4b6ddd30c6e4..9ee52a02c214 100644
  #include <cassert>
  #include <cstdlib>
  #include <mutex>
-@@ -93,15 +93,7 @@ void llvm::report_fatal_error(std::string_view Reason, bool GenCrashDiag) {
+@@ -93,15 +93,7 @@ void llvm::report_fatal_error(const std::string &Reason, bool GenCrashDiag) {
    if (handler) {
-     handler(handlerData, std::string{Reason}, GenCrashDiag);
+     handler(handlerData, Reason.c_str(), GenCrashDiag);
    } else {
 -    // Blast the result out to stderr.  We don't try hard to make sure this
 -    // succeeds (e.g. handling EINTR) and we can't use errs() here because
@@ -54,5 +54,5 @@ index 4b6ddd30c6e4..9ee52a02c214 100644
  #ifdef LLVM_BUILTIN_UNREACHABLE
    // Windows systems and possibly others don't declare abort() to be noreturn,
 -- 
-2.20.1.windows.1
+2.37.1
 

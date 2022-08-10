@@ -1,17 +1,17 @@
-From 9d6e5efbd4b77747387b35a45d0c591126f7c08c Mon Sep 17 00:00:00 2001
+From 07c288d77317611d57612a1219960d0fa8492b3b Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Sun, 8 May 2022 19:30:43 -0400
-Subject: [PATCH 24/27] OS specific changes
+Subject: [PATCH 24/29] OS specific changes
 
 ---
  llvm/lib/Support/ErrorHandling.cpp | 13 +++++++------
  1 file changed, 7 insertions(+), 6 deletions(-)
 
 diff --git a/llvm/lib/Support/ErrorHandling.cpp b/llvm/lib/Support/ErrorHandling.cpp
-index 77c3a37475d0..f70f15f27da4 100644
+index 162753eb0..21ff1b32f 100644
 --- a/llvm/lib/Support/ErrorHandling.cpp
 +++ b/llvm/lib/Support/ErrorHandling.cpp
-@@ -96,12 +96,7 @@ void llvm::report_fatal_error(std::string_view Reason, bool GenCrashDiag) {
+@@ -96,12 +96,7 @@ void llvm::report_fatal_error(const std::string &Reason, bool GenCrashDiag) {
      fmt::print(stderr, "LLVM ERROR: {}\n", Reason);
    }
  
@@ -42,5 +42,5 @@ index 77c3a37475d0..f70f15f27da4 100644
  }
  
 -- 
-2.20.1.windows.1
+2.37.1
 

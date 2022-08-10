@@ -1,7 +1,7 @@
-From 0afb3b1de99d7f85899d3907e5e9a503a6ac599a Mon Sep 17 00:00:00 2001
+From 27c9b4f5ea519a8a2ffa42201beacd5e63a0848b Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Thu, 5 May 2022 23:18:34 -0400
-Subject: [PATCH 11/27] Detemplatize small vector base
+Subject: [PATCH 11/29] Detemplatize small vector base
 
 ---
  llvm/include/llvm/ADT/SmallVector.h | 21 +++++++-----------
@@ -9,10 +9,10 @@ Subject: [PATCH 11/27] Detemplatize small vector base
  2 files changed, 13 insertions(+), 42 deletions(-)
 
 diff --git a/llvm/include/llvm/ADT/SmallVector.h b/llvm/include/llvm/ADT/SmallVector.h
-index 690d512a43c8..695015ae3248 100644
+index 1e311ea56..4b6bbdeb2 100644
 --- a/llvm/include/llvm/ADT/SmallVector.h
 +++ b/llvm/include/llvm/ADT/SmallVector.h
-@@ -50,14 +50,14 @@ namespace llvm {
+@@ -50,14 +50,14 @@ template <typename IteratorT> class iterator_range;
  /// Using 64 bit size is desirable for cases like SmallVector<char>, where a
  /// 32 bit size would limit the vector to ~4GB. SmallVectors are used for
  /// buffering bitcode output - which can exceed 4GB.
@@ -30,7 +30,7 @@ index 690d512a43c8..695015ae3248 100644
    }
  
    SmallVectorBase() = delete;
-@@ -95,15 +95,10 @@ public:
+@@ -91,15 +91,10 @@ protected:
    }
  };
  
@@ -48,7 +48,7 @@ index 690d512a43c8..695015ae3248 100644
    alignas(T) char FirstEl[sizeof(T)];
  };
  
-@@ -112,8 +107,8 @@ template <class T, typename = void> struct SmallVectorAlignmentAndSize {
+@@ -108,8 +103,8 @@ template <class T, typename = void> struct SmallVectorAlignmentAndSize {
  /// to avoid unnecessarily requiring T to be complete.
  template <typename T, typename = void>
  class SmallVectorTemplateCommon
@@ -59,7 +59,7 @@ index 690d512a43c8..695015ae3248 100644
  
    /// Find the address of the first element.  For this pointer math to be valid
    /// with small-size of 0 for T with lots of alignment, it's important that
-@@ -360,7 +355,7 @@ protected:
+@@ -356,7 +351,7 @@ protected:
    /// in \p NewCapacity. This is the first section of \a grow().
    T *mallocForGrow(size_t MinSize, size_t &NewCapacity) {
      return static_cast<T *>(
@@ -69,10 +69,10 @@ index 690d512a43c8..695015ae3248 100644
    }
  
 diff --git a/llvm/lib/Support/SmallVector.cpp b/llvm/lib/Support/SmallVector.cpp
-index 26901fe97d20..3fc16097bd30 100644
+index f5e7861aa..8f28ef61f 100644
 --- a/llvm/lib/Support/SmallVector.cpp
 +++ b/llvm/lib/Support/SmallVector.cpp
-@@ -41,10 +41,6 @@ static_assert(sizeof(SmallVector<void *, 1>) ==
+@@ -51,10 +51,6 @@ static_assert(sizeof(SmallVector<void *, 1>) ==
                    sizeof(unsigned) * 2 + sizeof(void *) * 2,
                "wasted space in SmallVector size 1");
  
@@ -82,8 +82,8 @@ index 26901fe97d20..3fc16097bd30 100644
 -
  /// Report that MinSize doesn't fit into this vector's size type. Throws
  /// std::length_error or calls report_fatal_error.
- LLVM_ATTRIBUTE_NORETURN
-@@ -76,9 +72,8 @@ static void report_at_maximum_capacity(size_t MaxSize) {
+ [[noreturn]] static void report_size_overflow(size_t MinSize, size_t MaxSize);
+@@ -85,9 +81,8 @@ static void report_at_maximum_capacity(size_t MaxSize) {
  }
  
  // Note: Moving this function into the header may cause performance regression.
@@ -94,7 +94,7 @@ index 26901fe97d20..3fc16097bd30 100644
  
    // Ensure we can fit the new capacity.
    // This is only going to be applicable when the capacity is 32 bit.
-@@ -99,18 +94,16 @@ static size_t getNewCapacity(size_t MinSize, size_t TSize, size_t OldCapacity) {
+@@ -108,18 +103,16 @@ static size_t getNewCapacity(size_t MinSize, size_t TSize, size_t OldCapacity) {
  }
  
  // Note: Moving this function into the header may cause performance regression.
@@ -117,7 +117,7 @@ index 26901fe97d20..3fc16097bd30 100644
    void *NewElts;
    if (BeginX == FirstEl) {
      NewElts = safe_malloc(NewCapacity * TSize);
-@@ -125,20 +118,3 @@ void SmallVectorBase<Size_T>::grow_pod(void *FirstEl, size_t MinSize,
+@@ -134,20 +127,3 @@ void SmallVectorBase<Size_T>::grow_pod(void *FirstEl, size_t MinSize,
    this->BeginX = NewElts;
    this->Capacity = NewCapacity;
  }
@@ -139,5 +139,5 @@ index 26901fe97d20..3fc16097bd30 100644
 -              "Expected SmallVectorBase<uint32_t> variant to be in use.");
 -#endif
 -- 
-2.20.1.windows.1
+2.37.1
 

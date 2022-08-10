@@ -1,14 +1,14 @@
-From bb8c33904fba6099ca17ddecd84fa20272c5a20c Mon Sep 17 00:00:00 2001
+From 8bcd7c2f97ec583be6fe620debcfb72169b3d943 Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Thu, 5 May 2022 18:09:45 -0400
-Subject: [PATCH 15/27] Delete numbers from mathextras
+Subject: [PATCH 15/29] Delete numbers from mathextras
 
 ---
  llvm/include/llvm/Support/MathExtras.h | 36 --------------------------
  1 file changed, 36 deletions(-)
 
 diff --git a/llvm/include/llvm/Support/MathExtras.h b/llvm/include/llvm/Support/MathExtras.h
-index fac12dd0e4c6..e8f1f2aca610 100644
+index fac12dd0e..e8f1f2aca 100644
 --- a/llvm/include/llvm/Support/MathExtras.h
 +++ b/llvm/include/llvm/Support/MathExtras.h
 @@ -50,42 +50,6 @@ enum ZeroBehavior {
@@ -55,5 +55,5 @@ index fac12dd0e4c6..e8f1f2aca610 100644
  template <typename T, std::size_t SizeOfT> struct TrailingZerosCounter {
    static unsigned count(T Val, ZeroBehavior) {
 -- 
-2.20.1.windows.1
+2.37.1
 

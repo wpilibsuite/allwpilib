@@ -1,17 +1,17 @@
-From 333f987aa17d7138af8bf6e41d5749041793a721 Mon Sep 17 00:00:00 2001
+From c8826c6403a4d7e485701d51733bf36fcb29f322 Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Mon, 9 May 2022 00:18:29 -0400
-Subject: [PATCH 23/27] Add convienence feature to SmallString
+Subject: [PATCH 23/29] Add convienence feature to SmallString
 
 ---
  llvm/include/llvm/ADT/SmallString.h | 8 +++++---
  1 file changed, 5 insertions(+), 3 deletions(-)
 
 diff --git a/llvm/include/llvm/ADT/SmallString.h b/llvm/include/llvm/ADT/SmallString.h
-index 85987811f3c4..d3d469d45d15 100644
+index 7bf0f5589..020022fd5 100644
 --- a/llvm/include/llvm/ADT/SmallString.h
 +++ b/llvm/include/llvm/ADT/SmallString.h
-@@ -188,9 +188,11 @@ public:
+@@ -189,9 +189,11 @@ public:
    /// Implicit conversion to std::string_view.
    operator std::string_view() const { return str(); }
  
@@ -27,5 +27,5 @@ index 85987811f3c4..d3d469d45d15 100644
    // Extra operators.
    SmallString &operator=(std::string_view RHS) {
 -- 
-2.20.1.windows.1
+2.37.1
 

@@ -16,7 +16,6 @@
 #include "wpi/SmallVector.h"
 #include "wpi/span.h"
 #include <cassert>
-#include <chrono>
 #include <cstddef>
 #include <cstdint>
 #include <cstring>
@@ -306,6 +305,8 @@ public:
   // changeColor() has no effect until enable_colors(true) is called.
   virtual void enable_colors(bool /*enable*/) {}
 
+  bool colors_enabled() const { return false; }
+
   /// Tie this stream to the specified stream. Replaces any existing tied-to
   /// stream. Specifying a nullptr unties the stream.
   void tie(raw_ostream *TieTo) { TiedStream = TieTo; }
@@ -414,6 +415,7 @@ class raw_fd_ostream : public raw_pwrite_stream {
   int FD;
   bool ShouldClose;
   bool SupportsSeeking = false;
+  bool IsRegularFile = false;
 
 #ifdef _WIN32
   /// True if this fd refers to a Windows console device. Mintty and other
@@ -483,6 +485,8 @@ public:
 
   bool supportsSeeking() const { return SupportsSeeking; }
 
+  bool isRegularFile() const { return IsRegularFile; }
+
   /// Flushes the stream and repositions the underlying file descriptor position
   /// to the offset specified from the beginning of the file.
   uint64_t seek(uint64_t off);
@@ -544,6 +548,9 @@ public:
 
 /// A raw_ostream that writes to an std::string.  This is a simple adaptor
 /// class. This class does not encounter output errors.
+/// raw_string_ostream operates without a buffer, delegating all memory
+/// management to the std::string. Thus the std::string is always up-to-date,
+/// may be used directly and there is no need to call flush().
 class raw_string_ostream : public raw_ostream {
   std::string &OS;
 
@@ -558,14 +565,11 @@ public:
   explicit raw_string_ostream(std::string &O) : OS(O) {
     SetUnbuffered();
   }
-  ~raw_string_ostream() override;
 
-  /// Flushes the stream contents to the target string and returns  the string's
-  /// reference.
-  std::string& str() {
-    flush();
-    return OS;
-  }
+  /// Returns the string's reference. In most cases it is better to simply use
+  /// the underlying std::string directly.
+  /// TODO: Consider removing this API.
+  std::string &str() { return OS; }
 
   void reserveExtraSpace(uint64_t ExtraSize) override {
     OS.reserve(tell() + ExtraSize);
@@ -745,7 +749,11 @@ class buffer_unique_ostream : public raw_svector_ostream {
 
 public:
   buffer_unique_ostream(std::unique_ptr<raw_ostream> OS)
-      : raw_svector_ostream(Buffer), OS(std::move(OS)) {}
+      : raw_svector_ostream(Buffer), OS(std::move(OS)) {
+    // Turn off buffering on OS, which we now own, to avoid allocating a buffer
+    // when the destructor writes only to be immediately flushed again.
+    this->OS->SetUnbuffered();
+  }
   ~buffer_unique_ostream() override { *OS << str(); }
 };
 

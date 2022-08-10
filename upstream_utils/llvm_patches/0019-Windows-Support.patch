@@ -1,16 +1,15 @@
-From 45d53c5dc0cc2924569a96c1ac1e4efcaaa60044 Mon Sep 17 00:00:00 2001
+From 1c244d593e4c36470722d8386e4c43062036b62b Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Tue, 3 May 2022 20:22:38 -0400
-Subject: [PATCH 19/27] Windows Support
+Subject: [PATCH 19/29] Windows Support
 
 ---
  .../llvm/Support/Windows/WindowsSupport.h     | 45 +++++----
  llvm/lib/Support/ConvertUTF.cpp               | 95 +++++++++++++++++++
- llvm/lib/Support/MemoryBuffer.cpp             |  4 +-
- 3 files changed, 126 insertions(+), 18 deletions(-)
+ 2 files changed, 124 insertions(+), 16 deletions(-)
 
 diff --git a/llvm/include/llvm/Support/Windows/WindowsSupport.h b/llvm/include/llvm/Support/Windows/WindowsSupport.h
-index 551bd199551e..50b0843beb29 100644
+index 5e13647b3..851092290 100644
 --- a/llvm/include/llvm/Support/Windows/WindowsSupport.h
 +++ b/llvm/include/llvm/Support/Windows/WindowsSupport.h
 @@ -35,8 +35,6 @@
@@ -91,7 +90,7 @@ index 551bd199551e..50b0843beb29 100644
  } // end namespace llvm.
  
 diff --git a/llvm/lib/Support/ConvertUTF.cpp b/llvm/lib/Support/ConvertUTF.cpp
-index e24a918c5c89..b4c7fffee8f7 100644
+index e24a918c5..b4c7fffee 100644
 --- a/llvm/lib/Support/ConvertUTF.cpp
 +++ b/llvm/lib/Support/ConvertUTF.cpp
 @@ -51,6 +51,11 @@
@@ -203,21 +202,6 @@ index e24a918c5c89..b4c7fffee8f7 100644
  } // namespace llvm
  
  ConvertUTF_RESTORE_WARNINGS
-diff --git a/llvm/lib/Support/MemoryBuffer.cpp b/llvm/lib/Support/MemoryBuffer.cpp
-index bcf13d828a5d..cddad9ca0660 100644
---- a/llvm/lib/Support/MemoryBuffer.cpp
-+++ b/llvm/lib/Support/MemoryBuffer.cpp
-@@ -225,8 +225,8 @@ public:
- 
- static ErrorOr<std::unique_ptr<WritableMemoryBuffer>>
- getMemoryBufferForStream(sys::fs::file_t FD, const Twine &BufferName) {
--  const ssize_t ChunkSize = 4096*4;
--  SmallString<ChunkSize> Buffer;
-+  constexpr size_t ChunkSize = 4096*4;
-+  SmallVector<uint8_t, ChunkSize> Buffer;
-   // Read into Buffer until we hit EOF.
-   for (;;) {
-     Buffer.reserve(Buffer.size() + ChunkSize);
 -- 
-2.20.1.windows.1
+2.37.1
 
