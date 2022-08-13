@@ -1,4 +1,4 @@
-From 7c961931c4aff8ba7298cb87cfb5025e7af81b7d Mon Sep 17 00:00:00 2001
+From ab919394b0a8229385cac1ad92a4511bd5e6b780 Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Sat, 7 May 2022 22:09:18 -0400
 Subject: [PATCH 02/28] Remove StringRef, ArrayRef, and Optional
@@ -6,8 +6,8 @@ Subject: [PATCH 02/28] Remove StringRef, ArrayRef, and Optional
 ---
  llvm/include/llvm/ADT/PointerUnion.h          |  1 -
  llvm/include/llvm/ADT/SmallSet.h              | 13 ++--
- llvm/include/llvm/ADT/SmallString.h           | 76 +++++++++----------
- llvm/include/llvm/ADT/StringMap.h             | 34 ++++-----
+ llvm/include/llvm/ADT/SmallString.h           | 77 ++++++++++---------
+ llvm/include/llvm/ADT/StringMap.h             | 34 ++++----
  llvm/include/llvm/ADT/StringMapEntry.h        | 25 +++---
  llvm/include/llvm/Support/Chrono.h            | 10 +--
  llvm/include/llvm/Support/Compiler.h          |  2 +-
@@ -17,7 +17,7 @@ Subject: [PATCH 02/28] Remove StringRef, ArrayRef, and Optional
  .../llvm/Support/SmallVectorMemoryBuffer.h    |  6 +-
  llvm/include/llvm/Support/VersionTuple.h      | 20 ++---
  .../llvm/Support/Windows/WindowsSupport.h     |  4 +-
- llvm/include/llvm/Support/raw_ostream.h       | 51 +++++++------
+ llvm/include/llvm/Support/raw_ostream.h       | 51 ++++++------
  llvm/lib/Support/ConvertUTFWrapper.cpp        | 32 ++++----
  llvm/lib/Support/ErrorHandling.cpp            | 13 ++--
  llvm/lib/Support/SmallVector.cpp              |  5 +-
@@ -31,7 +31,7 @@ Subject: [PATCH 02/28] Remove StringRef, ArrayRef, and Optional
  llvm/unittests/ADT/SmallVectorTest.cpp        | 20 +----
  llvm/unittests/ADT/StringMapTest.cpp          | 32 ++++----
  llvm/unittests/Support/ConvertUTFTest.cpp     | 37 +++++----
- 27 files changed, 247 insertions(+), 304 deletions(-)
+ 27 files changed, 248 insertions(+), 304 deletions(-)
 
 diff --git a/llvm/include/llvm/ADT/PointerUnion.h b/llvm/include/llvm/ADT/PointerUnion.h
 index 04d566bbc..1d4cc747c 100644
@@ -97,20 +97,21 @@ index 0eed85449..bfe93e997 100644
  
    template <typename IterT>
 diff --git a/llvm/include/llvm/ADT/SmallString.h b/llvm/include/llvm/ADT/SmallString.h
-index 874968f0a..a61230302 100644
+index 874968f0a..50cbdade4 100644
 --- a/llvm/include/llvm/ADT/SmallString.h
 +++ b/llvm/include/llvm/ADT/SmallString.h
-@@ -15,8 +15,8 @@
+@@ -15,8 +15,9 @@
  #define LLVM_ADT_SMALLSTRING_H
  
  #include "llvm/ADT/SmallVector.h"
 -#include "llvm/ADT/StringRef.h"
  #include <cstddef>
++#include <string>
 +#include <string_view>
  
  namespace llvm {
  
-@@ -28,11 +28,11 @@ public:
+@@ -28,11 +29,11 @@ public:
    /// Default ctor - Initialize to empty.
    SmallString() = default;
  
@@ -126,7 +127,7 @@ index 874968f0a..a61230302 100644
        : SmallVector<char, InternalLen>() {
      this->append(Refs);
    }
-@@ -47,13 +47,13 @@ public:
+@@ -47,13 +48,13 @@ public:
  
    using SmallVector<char, InternalLen>::assign;
  
@@ -144,7 +145,7 @@ index 874968f0a..a61230302 100644
      this->clear();
      append(Refs);
    }
-@@ -64,19 +64,19 @@ public:
+@@ -64,19 +65,19 @@ public:
  
    using SmallVector<char, InternalLen>::append;
  
@@ -170,7 +171,7 @@ index 874968f0a..a61230302 100644
        std::copy(Ref.begin(), Ref.end(), this->begin() + CurrentSize);
        CurrentSize += Ref.size();
      }
-@@ -89,29 +89,29 @@ public:
+@@ -89,29 +90,29 @@ public:
  
    /// Check for string equality.  This is more efficient than compare() when
    /// the relative ordering of inequal strings isn't needed.
@@ -205,7 +206,7 @@ index 874968f0a..a61230302 100644
      return str().compare_numeric(RHS);
    }
  
-@@ -120,12 +120,12 @@ public:
+@@ -120,12 +121,12 @@ public:
    /// @{
  
    /// startswith - Check if this string starts with the given \p Prefix.
@@ -220,7 +221,7 @@ index 874968f0a..a61230302 100644
      return str().endswith(Suffix);
    }
  
-@@ -145,7 +145,7 @@ public:
+@@ -145,7 +146,7 @@ public:
    ///
    /// \returns The index of the first occurrence of \p Str, or npos if not
    /// found.
@@ -229,7 +230,7 @@ index 874968f0a..a61230302 100644
      return str().find(Str, From);
    }
  
-@@ -153,7 +153,7 @@ public:
+@@ -153,7 +154,7 @@ public:
    ///
    /// \returns The index of the last occurrence of \p C, or npos if not
    /// found.
@@ -238,7 +239,7 @@ index 874968f0a..a61230302 100644
      return str().rfind(C, From);
    }
  
-@@ -161,7 +161,7 @@ public:
+@@ -161,7 +162,7 @@ public:
    ///
    /// \returns The index of the last occurrence of \p Str, or npos if not
    /// found.
@@ -247,7 +248,7 @@ index 874968f0a..a61230302 100644
      return str().rfind(Str);
    }
  
-@@ -175,7 +175,7 @@ public:
+@@ -175,7 +176,7 @@ public:
    /// not found.
    ///
    /// Complexity: O(size() + Chars.size())
@@ -256,7 +257,7 @@ index 874968f0a..a61230302 100644
      return str().find_first_of(Chars, From);
    }
  
-@@ -189,13 +189,13 @@ public:
+@@ -189,13 +190,13 @@ public:
    /// \p Chars, or npos if not found.
    ///
    /// Complexity: O(size() + Chars.size())
@@ -272,7 +273,7 @@ index 874968f0a..a61230302 100644
      return str().find_last_of(C, From);
    }
  
-@@ -204,7 +204,7 @@ public:
+@@ -204,7 +205,7 @@ public:
    ///
    /// Complexity: O(size() + Chars.size())
    size_t find_last_of(
@@ -281,7 +282,7 @@ index 874968f0a..a61230302 100644
      return str().find_last_of(Chars, From);
    }
  
-@@ -219,7 +219,7 @@ public:
+@@ -219,7 +220,7 @@ public:
  
    /// Return the number of non-overlapped occurrences of \p Str in the
    /// string.
@@ -290,7 +291,7 @@ index 874968f0a..a61230302 100644
      return str().count(Str);
    }
  
-@@ -236,7 +236,7 @@ public:
+@@ -236,7 +237,7 @@ public:
    /// \param N The number of characters to included in the substring. If \p N
    /// exceeds the number of characters remaining in the string, the string
    /// suffix (starting with \p Start) will be returned.
@@ -299,7 +300,7 @@ index 874968f0a..a61230302 100644
      return str().substr(Start, N);
    }
  
-@@ -250,14 +250,14 @@ public:
+@@ -250,14 +251,14 @@ public:
    /// substring. If this is npos, or less than \p Start, or exceeds the
    /// number of characters remaining in the string, the string suffix
    /// (starting with \p Start) will be returned.
@@ -317,7 +318,7 @@ index 874968f0a..a61230302 100644
  
    // TODO: Make this const, if it's safe...
    const char* c_str() {
-@@ -266,20 +266,20 @@ public:
+@@ -266,20 +267,20 @@ public:
      return this->data();
    }
  
