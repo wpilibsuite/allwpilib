@@ -1,7 +1,7 @@
-From 492ec25f2627f24fa1b57f0a060ddc530310d5a4 Mon Sep 17 00:00:00 2001
+From 10cfa9880cf380369cc83aef651327d5d1ce0cb0 Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Mon, 9 May 2022 00:18:29 -0400
-Subject: [PATCH 23/29] Add convienence feature to SmallString
+Subject: [PATCH 23/29] Add convenience feature to SmallString
 
 ---
  llvm/include/llvm/ADT/SmallString.h | 8 +++++---

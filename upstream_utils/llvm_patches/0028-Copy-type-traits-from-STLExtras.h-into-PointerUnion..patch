@@ -1,7 +1,7 @@
-From e5e475a39727a5ce599e9c99d0a6b62896e58c4d Mon Sep 17 00:00:00 2001
+From 3a6653efe4501e4e668b88efb71641a6e0ca0cd5 Mon Sep 17 00:00:00 2001
 From: Tyler Veness <calcmogul@gmail.com>
 Date: Wed, 10 Aug 2022 17:07:52 -0700
-Subject: [PATCH 28/29] Provide type traits for PointerUnion
+Subject: [PATCH 28/29] Copy type traits from STLExtras.h into PointerUnion.h
 
 ---
  llvm/include/llvm/ADT/PointerUnion.h | 46 ++++++++++++++++++++++++++++

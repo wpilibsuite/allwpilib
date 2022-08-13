@@ -1,7 +1,7 @@
-From 7c9dee4cde4b97566653b09da6059a2a51fed439 Mon Sep 17 00:00:00 2001
+From f65dac1d526bdeff88a64f905934b9c60d669041 Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Sun, 8 May 2022 16:42:09 -0400
-Subject: [PATCH 18/29] use std is_trivially_copy_constructible
+Subject: [PATCH 18/29] Use std::is_trivially_copy_constructible
 
 ---
  llvm/include/llvm/ADT/PointerIntPair.h  | 12 ----

@@ -1,7 +1,7 @@
-From 9178e3f23959489a05df2664f38e189f003a7ed6 Mon Sep 17 00:00:00 2001
+From 66f74144a711f379aada2c248544e611788acfd6 Mon Sep 17 00:00:00 2001
 From: Tyler Veness <calcmogul@gmail.com>
 Date: Wed, 10 Aug 2022 22:35:00 -0700
-Subject: [PATCH 29/29] Remove StringMap test for wpi::sort()
+Subject: [PATCH 29/29] Remove StringMap test for llvm::sort()
 
 ---
  llvm/unittests/ADT/StringMapTest.cpp | 14 --------------

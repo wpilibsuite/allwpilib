@@ -16,7 +16,6 @@
 
 #include "wpi/DenseMapInfo.h"
 #include "wpi/Hashing.h"
-#include "wpi/HashBuilder.h"
 #include <optional>
 #include <string>
 #include <tuple>
@@ -158,12 +157,6 @@ public:
   /// zero.
   friend bool operator>=(const VersionTuple &X, const VersionTuple &Y) {
     return !(X < Y);
-  }
-
-  template <typename HasherT, wpi::support::endianness Endianness>
-  friend void addHash(HashBuilderImpl<HasherT, Endianness> &HBuilder,
-                      const VersionTuple &VT) {
-    HBuilder.add(VT.Major, VT.Minor, VT.Subminor, VT.Build);
   }
 };
 

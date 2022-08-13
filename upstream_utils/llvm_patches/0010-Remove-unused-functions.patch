@@ -1,4 +1,4 @@
-From 1e5c9ddefa2bf347f009210d1ad0a375177a441c Mon Sep 17 00:00:00 2001
+From f7dc79a2c5b403a8790d97b685866a030c3a479c Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Sun, 8 May 2022 13:43:50 -0400
 Subject: [PATCH 10/29] Remove unused functions
@@ -6,10 +6,10 @@ Subject: [PATCH 10/29] Remove unused functions
 ---
  llvm/include/llvm/ADT/SmallString.h      |  80 ------
  llvm/include/llvm/Support/Errno.h        |   9 -
- llvm/include/llvm/Support/VersionTuple.h |  33 ---
+ llvm/include/llvm/Support/VersionTuple.h |  40 ---
  llvm/include/llvm/Support/raw_ostream.h  | 115 +-------
  llvm/lib/Support/raw_ostream.cpp         | 328 -----------------------
- 5 files changed, 8 insertions(+), 557 deletions(-)
+ 5 files changed, 8 insertions(+), 564 deletions(-)
 
 diff --git a/llvm/include/llvm/ADT/SmallString.h b/llvm/include/llvm/ADT/SmallString.h
 index a61230302..7bf0f5589 100644
@@ -136,22 +136,31 @@ index 07df6765d..d9bf68bb3 100644
  inline decltype(auto) RetryAfterSignal(const FailT &Fail, const Fun &F,
                                         const Args &... As) {
 diff --git a/llvm/include/llvm/Support/VersionTuple.h b/llvm/include/llvm/Support/VersionTuple.h
-index 3d6573bf5..dcb21a8fc 100644
+index 3d6573bf5..a28e12adc 100644
 --- a/llvm/include/llvm/Support/VersionTuple.h
 +++ b/llvm/include/llvm/Support/VersionTuple.h
-@@ -160,44 +160,11 @@ public:
+@@ -16,7 +16,6 @@
+ 
+ #include "llvm/ADT/DenseMapInfo.h"
+ #include "llvm/ADT/Hashing.h"
+-#include "llvm/Support/HashBuilder.h"
+ #include <optional>
+ #include <string>
+ #include <tuple>
+@@ -159,45 +158,6 @@ public:
+   friend bool operator>=(const VersionTuple &X, const VersionTuple &Y) {
      return !(X < Y);
    }
- 
+-
 -  friend llvm::hash_code hash_value(const VersionTuple &VT) {
 -    return llvm::hash_combine(VT.Major, VT.Minor, VT.Subminor, VT.Build);
 -  }
 -
-   template <typename HasherT, llvm::support::endianness Endianness>
-   friend void addHash(HashBuilderImpl<HasherT, Endianness> &HBuilder,
-                       const VersionTuple &VT) {
-     HBuilder.add(VT.Major, VT.Minor, VT.Subminor, VT.Build);
-   }
+-  template <typename HasherT, llvm::support::endianness Endianness>
+-  friend void addHash(HashBuilderImpl<HasherT, Endianness> &HBuilder,
+-                      const VersionTuple &VT) {
+-    HBuilder.add(VT.Major, VT.Minor, VT.Subminor, VT.Build);
+-  }
 -
 -  /// Retrieve a string representation of the version number.
 -  std::string getAsString() const;

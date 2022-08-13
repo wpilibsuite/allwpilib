@@ -1,7 +1,7 @@
-From bcbb58e00f5e38a0bbd7c5ab5503e1914806d612 Mon Sep 17 00:00:00 2001
+From 39f679addec58d65c4c45db51afbcb9e7501dd7f Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Thu, 5 May 2022 23:18:34 -0400
-Subject: [PATCH 11/29] Detemplatize small vector base
+Subject: [PATCH 11/29] Detemplatize SmallVectorBase
 
 ---
  llvm/include/llvm/ADT/SmallVector.h | 21 +++++++-----------
