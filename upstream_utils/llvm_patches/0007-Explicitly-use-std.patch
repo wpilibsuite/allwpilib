@@ -1,4 +1,4 @@
-From e34a1a0c38673c203e10ff9857f159c835d5aec1 Mon Sep 17 00:00:00 2001
+From f9349f908445f60b6055a180ba7083ac1bbae399 Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Sat, 7 May 2022 22:37:34 -0400
 Subject: [PATCH 07/28] Explicitly use std::
@@ -38,7 +38,7 @@ index db9fbc148..da843ef79 100644
  }
  
 diff --git a/llvm/lib/Support/ErrorHandling.cpp b/llvm/lib/Support/ErrorHandling.cpp
-index 12c239aa2..032d08123 100644
+index 89440b5ab..f80e28e87 100644
 --- a/llvm/lib/Support/ErrorHandling.cpp
 +++ b/llvm/lib/Support/ErrorHandling.cpp
 @@ -210,7 +210,7 @@ void LLVMResetFatalErrorHandler() {

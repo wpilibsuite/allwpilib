@@ -1,4 +1,4 @@
-From ab919394b0a8229385cac1ad92a4511bd5e6b780 Mon Sep 17 00:00:00 2001
+From 604a22f37f506317ca5ed9c03395fd40e91d43f4 Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Sat, 7 May 2022 22:09:18 -0400
 Subject: [PATCH 02/28] Remove StringRef, ArrayRef, and Optional
@@ -1120,7 +1120,7 @@ index 392c4c489..396ab0c65 100644
          Result);
    } else if (sizeof(wchar_t) == 4) {
 diff --git a/llvm/lib/Support/ErrorHandling.cpp b/llvm/lib/Support/ErrorHandling.cpp
-index 80c0e0043..78ff0d163 100644
+index 80c0e0043..8ae8fb8b4 100644
 --- a/llvm/lib/Support/ErrorHandling.cpp
 +++ b/llvm/lib/Support/ErrorHandling.cpp
 @@ -14,7 +14,6 @@
@@ -1155,7 +1155,7 @@ index 80c0e0043..78ff0d163 100644
  
    if (handler) {
 -    handler(handlerData, Reason.str().c_str(), GenCrashDiag);
-+    handler(handlerData, Reason.data(), GenCrashDiag);
++    handler(handlerData, std::string{Reason}.c_str(), GenCrashDiag);
    } else {
      // Blast the result out to stderr.  We don't try hard to make sure this
      // succeeds (e.g. handling EINTR) and we can't use errs() here because

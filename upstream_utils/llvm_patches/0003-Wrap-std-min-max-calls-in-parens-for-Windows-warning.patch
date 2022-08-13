@@ -1,4 +1,4 @@
-From 02b7ed418f662d37e84bff0aff71dd0da5133dd9 Mon Sep 17 00:00:00 2001
+From 1522777a3ac4a0fedf2e275592a19ca205823f8e Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Sat, 7 May 2022 22:12:41 -0400
 Subject: [PATCH 03/28] Wrap std::min/max calls in parens, for Windows warnings
