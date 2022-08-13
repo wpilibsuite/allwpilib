@@ -1,7 +1,7 @@
-From 96f8082f25eea21325376b02d06b789ff8b9da1d Mon Sep 17 00:00:00 2001
+From be165d97f5eb74e80a1d5ab24f2612a667b0088e Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Sat, 7 May 2022 20:50:26 -0400
-Subject: [PATCH 01/29] Fix spelling/language errors
+Subject: [PATCH 01/28] Fix spelling/language errors
 
 ---
  llvm/include/llvm/Support/ErrorHandling.h | 2 +-

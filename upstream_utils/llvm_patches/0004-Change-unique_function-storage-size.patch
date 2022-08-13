@@ -1,7 +1,7 @@
-From 384137a3b67a8ac2f2de2be8ee6b43a059ddf951 Mon Sep 17 00:00:00 2001
+From 1569d100bc1f826468a3b2b21334a8a1e0ceb0fc Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Sat, 7 May 2022 22:13:55 -0400
-Subject: [PATCH 04/29] Change unique_function storage size
+Subject: [PATCH 04/28] Change unique_function storage size
 
 ---
  llvm/include/llvm/ADT/FunctionExtras.h | 4 ++--

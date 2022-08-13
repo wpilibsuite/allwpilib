@@ -58,13 +58,13 @@ static std::string GetUsbNameFromFile(int vendor, int product) {
       // next vendor, but didn't match product?
       if (line[0] != '\t') {
         buf += "Unknown";
-        return buf;
+        return std::string{buf};
       }
 
       // look for product
       if (wpi::starts_with(wpi::substr(line, 1), productStr)) {
         buf += wpi::trim(wpi::substr(line, 6));
-        return buf;
+        return std::string{buf};
       }
     }
   }

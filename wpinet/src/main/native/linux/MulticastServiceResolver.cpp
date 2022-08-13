@@ -82,7 +82,7 @@ static void ResolveCallback(AvahiServiceResolver* r, AvahiIfIndex interface,
       data.ipv4Address = address->data.ipv4.address;
       data.port = port;
       data.serviceName = name;
-      data.hostName = outputHostName.string();
+      data.hostName = std::string{outputHostName};
 
       impl->onFound(std::move(data));
     }

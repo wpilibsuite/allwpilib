@@ -184,13 +184,12 @@ def main():
         os.path.join(patch_root, "0020-Prefer-fmtlib.patch"),
         os.path.join(patch_root, "0021-Prefer-wpi-s-fs.h.patch"),
         os.path.join(patch_root, "0022-Remove-unused-functions.patch"),
-        os.path.join(patch_root, "0023-Add-convenience-feature-to-SmallString.patch"),
-        os.path.join(patch_root, "0024-OS-specific-changes.patch"),
-        os.path.join(patch_root, "0025-Use-SmallVector-for-UTF-conversion.patch"),
-        os.path.join(patch_root, "0026-Prefer-to-use-static-pointers-in-raw_ostream.patch"),
-        os.path.join(patch_root, "0027-constexpr-endian-byte-swap.patch"),
-        os.path.join(patch_root, "0028-Copy-type-traits-from-STLExtras.h-into-PointerUnion..patch"),
-        os.path.join(patch_root, "0029-Remove-StringMap-test-for-llvm-sort.patch"),
+        os.path.join(patch_root, "0023-OS-specific-changes.patch"),
+        os.path.join(patch_root, "0024-Use-SmallVector-for-UTF-conversion.patch"),
+        os.path.join(patch_root, "0025-Prefer-to-use-static-pointers-in-raw_ostream.patch"),
+        os.path.join(patch_root, "0026-constexpr-endian-byte-swap.patch"),
+        os.path.join(patch_root, "0027-Copy-type-traits-from-STLExtras.h-into-PointerUnion..patch"),
+        os.path.join(patch_root, "0028-Remove-StringMap-test-for-llvm-sort.patch"),
 
     ]
     # yapf: enable

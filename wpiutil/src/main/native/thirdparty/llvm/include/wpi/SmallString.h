@@ -189,11 +189,9 @@ public:
   /// Implicit conversion to std::string_view.
   operator std::string_view() const { return str(); }
 
-  /// Explicit conversion to std::string.
-  std::string string() const { return {this->begin(), this->size()}; }
-
-  /// Implicit conversion to std::string.
-  operator std::string() const { return string(); }
+  explicit operator std::string() const {
+    return std::string(this->data(), this->size());
+  }
 
   // Extra operators.
   SmallString &operator=(std::string_view RHS) {

@@ -1,7 +1,7 @@
-From a03758aa32f8a91a921f543ad8cb32bb1a48dd23 Mon Sep 17 00:00:00 2001
+From 3c3c9aa4a088cef6c61b995dc39248aa9404aaba Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Sun, 8 May 2022 13:48:59 -0400
-Subject: [PATCH 12/29] Add vectors to raw_ostream
+Subject: [PATCH 12/28] Add vectors to raw_ostream
 
 ---
  llvm/include/llvm/Support/raw_ostream.h | 115 ++++++++++++++++++++++++
