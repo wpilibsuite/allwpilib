@@ -1,4 +1,4 @@
-From 27c9b4f5ea519a8a2ffa42201beacd5e63a0848b Mon Sep 17 00:00:00 2001
+From bcbb58e00f5e38a0bbd7c5ab5503e1914806d612 Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Thu, 5 May 2022 23:18:34 -0400
 Subject: [PATCH 11/29] Detemplatize small vector base
@@ -69,7 +69,7 @@ index 1e311ea56..4b6bbdeb2 100644
    }
  
 diff --git a/llvm/lib/Support/SmallVector.cpp b/llvm/lib/Support/SmallVector.cpp
-index f5e7861aa..8f28ef61f 100644
+index a2b4899e1..bdfc963d7 100644
 --- a/llvm/lib/Support/SmallVector.cpp
 +++ b/llvm/lib/Support/SmallVector.cpp
 @@ -51,10 +51,6 @@ static_assert(sizeof(SmallVector<void *, 1>) ==
@@ -139,5 +139,5 @@ index f5e7861aa..8f28ef61f 100644
 -              "Expected SmallVectorBase<uint32_t> variant to be in use.");
 -#endif
 -- 
-2.37.1
+2.37.2
 

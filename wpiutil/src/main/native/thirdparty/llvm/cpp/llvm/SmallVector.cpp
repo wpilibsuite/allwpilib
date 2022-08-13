@@ -62,7 +62,7 @@ static void report_size_overflow(size_t MinSize, size_t MaxSize) {
 #ifdef LLVM_ENABLE_EXCEPTIONS
   throw std::length_error(Reason);
 #else
-  report_fatal_error(std::string_view(Reason));
+  report_fatal_error(Reason);
 #endif
 }
 
@@ -76,7 +76,7 @@ static void report_at_maximum_capacity(size_t MaxSize) {
 #ifdef LLVM_ENABLE_EXCEPTIONS
   throw std::length_error(Reason);
 #else
-  report_fatal_error(std::string_view(Reason));
+  report_fatal_error(Reason);
 #endif
 }
 

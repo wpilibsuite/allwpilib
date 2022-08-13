@@ -1,4 +1,4 @@
-From 5c9239ca4aaa8f0c37c07f94b04ddf240cb887cc Mon Sep 17 00:00:00 2001
+From 49531024ee6a0010b6c7399e0c7759db2a4ec84c Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Sat, 7 May 2022 22:12:41 -0400
 Subject: [PATCH 03/29] Wrap std::min/max calls in parens, for windows warnings
@@ -194,7 +194,7 @@ index 753b1998c..db9fbc148 100644
  
  } // End llvm namespace
 diff --git a/llvm/lib/Support/SmallVector.cpp b/llvm/lib/Support/SmallVector.cpp
-index bb4b237de..f5e7861aa 100644
+index 8bad715e4..a2b4899e1 100644
 --- a/llvm/lib/Support/SmallVector.cpp
 +++ b/llvm/lib/Support/SmallVector.cpp
 @@ -104,7 +104,7 @@ static size_t getNewCapacity(size_t MinSize, size_t TSize, size_t OldCapacity) {
@@ -207,5 +207,5 @@ index bb4b237de..f5e7861aa 100644
  
  // Note: Moving this function into the header may cause performance regression.
 -- 
-2.37.1
+2.37.2
 

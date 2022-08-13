@@ -1,4 +1,4 @@
-From 8bcd7c2f97ec583be6fe620debcfb72169b3d943 Mon Sep 17 00:00:00 2001
+From 48d79e8cea3cd617a4fed965a89d83d9d17fc5ee Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Thu, 5 May 2022 18:09:45 -0400
 Subject: [PATCH 15/29] Delete numbers from mathextras
@@ -55,5 +55,5 @@ index fac12dd0e..e8f1f2aca 100644
  template <typename T, std::size_t SizeOfT> struct TrailingZerosCounter {
    static unsigned count(T Val, ZeroBehavior) {
 -- 
-2.37.1
+2.37.2
 

@@ -1,4 +1,4 @@
-From f7e7c43d097b32c97f7aadfbba0e5cf0e39555da Mon Sep 17 00:00:00 2001
+From c0b7c7c26601baebecd9b5cae0474273b6a103b7 Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Sun, 8 May 2022 13:48:59 -0400
 Subject: [PATCH 12/29] Add vectors to raw_ostream
@@ -213,5 +213,5 @@ index 875eda7ba..36faf744c 100644
  //  raw_null_ostream
  //===----------------------------------------------------------------------===//
 -- 
-2.37.1
+2.37.2
 

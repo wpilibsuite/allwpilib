@@ -1,4 +1,4 @@
-From 2f4be662e2a8d94d2b4db4c908da5030659667af Mon Sep 17 00:00:00 2001
+From 7c9dee4cde4b97566653b09da6059a2a51fed439 Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Sun, 8 May 2022 16:42:09 -0400
 Subject: [PATCH 18/29] use std is_trivially_copy_constructible
@@ -137,5 +137,5 @@ index 7b7d5d991..72a2e84ad 100644
  
  } // end namespace llvm
 -- 
-2.37.1
+2.37.2
 

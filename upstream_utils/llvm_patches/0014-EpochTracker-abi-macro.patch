@@ -1,4 +1,4 @@
-From 162fa6af8c0b57836a632a99fafd1c62ee071d2c Mon Sep 17 00:00:00 2001
+From c24f9145c66e5de13b05b1393562c476cfb5d3bd Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Wed, 4 May 2022 00:01:00 -0400
 Subject: [PATCH 14/29] EpochTracker abi macro
@@ -21,5 +21,5 @@ index b06888494..f35461d1c 100644
  /// A base class for data structure classes wishing to make iterators
  /// ("handles") pointing into themselves fail-fast.  When building without
 -- 
-2.37.1
+2.37.2
 

@@ -1,4 +1,4 @@
-From 2cb25a17b852dfe4a831c175c4035e92e6e8aa0f Mon Sep 17 00:00:00 2001
+From e5e475a39727a5ce599e9c99d0a6b62896e58c4d Mon Sep 17 00:00:00 2001
 From: Tyler Veness <calcmogul@gmail.com>
 Date: Wed, 10 Aug 2022 17:07:52 -0700
 Subject: [PATCH 28/29] Provide type traits for PointerUnion
@@ -68,5 +68,5 @@ index 1d4cc747c..7d090da59 100644
    /// Determine the number of bits required to store integers with values < n.
    /// This is ceil(log2(n)).
 -- 
-2.37.1
+2.37.2
 

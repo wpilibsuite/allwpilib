@@ -68,11 +68,11 @@ void wpi::report_fatal_error(const char *Reason, bool GenCrashDiag) {
   report_fatal_error(std::string_view(Reason), GenCrashDiag);
 }
 
-void wpi::report_fatal_error(std::string_view Reason, bool GenCrashDiag) {
-  report_fatal_error(Reason, GenCrashDiag);
+void wpi::report_fatal_error(const std::string &Reason, bool GenCrashDiag) {
+  report_fatal_error(std::string_view(Reason), GenCrashDiag);
 }
 
-void wpi::report_fatal_error(const std::string &Reason, bool GenCrashDiag) {
+void wpi::report_fatal_error(std::string_view Reason, bool GenCrashDiag) {
   wpi::fatal_error_handler_t handler = nullptr;
   void* handlerData = nullptr;
   {
@@ -84,7 +84,7 @@ void wpi::report_fatal_error(const std::string &Reason, bool GenCrashDiag) {
   }
 
   if (handler) {
-    handler(handlerData, Reason.c_str(), GenCrashDiag);
+    handler(handlerData, Reason.data(), GenCrashDiag);
   } else {
     fmt::print(stderr, "LLVM ERROR: {}\n", Reason);
   }

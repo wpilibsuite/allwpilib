@@ -1,4 +1,4 @@
-From 2a8b9e08a119d1cc129957edf5f215f36870dc1b Mon Sep 17 00:00:00 2001
+From 51d2f0de5dadd50cff2b5082a94a09ca1716cb21 Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Sun, 8 May 2022 13:34:07 -0400
 Subject: [PATCH 09/29] Add compiler warning pragmas
@@ -226,5 +226,5 @@ index f84895c18..6a50205b1 100644
  
  // Define some fixed alignment types to use in these tests.
 -- 
-2.37.1
+2.37.2
 

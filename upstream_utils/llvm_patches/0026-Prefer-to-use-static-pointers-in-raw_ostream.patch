@@ -1,4 +1,4 @@
-From 2d71d40bbad50f907b8cbcf0eca08052e6b50e2e Mon Sep 17 00:00:00 2001
+From 7951d010979bf89ec3c8e4112a201878505d3486 Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Thu, 19 May 2022 00:58:36 -0400
 Subject: [PATCH 26/29] Prefer to use static pointers in raw_ostream
@@ -33,5 +33,5 @@ index 632b52235..a703a75ed 100644
  
  /// nulls() - This returns a reference to a raw_ostream which discards output.
 -- 
-2.37.1
+2.37.2
 

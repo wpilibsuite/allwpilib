@@ -1,4 +1,4 @@
-From 318c5846162b83d564c4edbacaa4952a1fa76f96 Mon Sep 17 00:00:00 2001
+From fd2edbc6e49d0246e20fa7f07cbac0413765e7bf Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Sun, 8 May 2022 19:16:51 -0400
 Subject: [PATCH 22/29] Remove unused functions
@@ -50,7 +50,7 @@ index 256bcec25..9b3a87e1b 100644
    /// Tie this stream to the specified stream. Replaces any existing tied-to
    /// stream. Specifying a nullptr unties the stream.
 diff --git a/llvm/lib/Support/ErrorHandling.cpp b/llvm/lib/Support/ErrorHandling.cpp
-index f2cddf3c6..162753eb0 100644
+index c619de62f..ed77753a7 100644
 --- a/llvm/lib/Support/ErrorHandling.cpp
 +++ b/llvm/lib/Support/ErrorHandling.cpp
 @@ -178,22 +178,6 @@ void llvm::llvm_unreachable_internal(const char *msg, const char *file,
@@ -282,5 +282,5 @@ index bee3875d1..87600ea47 100644
 -
  } // namespace
 -- 
-2.37.1
+2.37.2
 

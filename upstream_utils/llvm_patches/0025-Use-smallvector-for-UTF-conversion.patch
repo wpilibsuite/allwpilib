@@ -1,4 +1,4 @@
-From f7f358fa64b04d263e1a43846e532fe79a218ab0 Mon Sep 17 00:00:00 2001
+From 08cd8d1fca8cdcf4469cbcb34b0a4dfabaf13f32 Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Mon, 9 May 2022 00:04:30 -0400
 Subject: [PATCH 25/29] Use smallvector for UTF conversion
@@ -151,5 +151,5 @@ index 2fee8ad5c..bbdc041cf 100644
  
  struct ConvertUTFResultContainer {
 -- 
-2.37.1
+2.37.2
 

@@ -69,9 +69,9 @@ namespace wpi {
 /// does not return.
 [[noreturn]] void report_fatal_error(const char *reason,
                                      bool gen_crash_diag = true);
-[[noreturn]] void report_fatal_error(std::string_view reason,
-                                     bool gen_crash_diag = true);
 [[noreturn]] void report_fatal_error(const std::string &reason,
+                                     bool gen_crash_diag = true);
+[[noreturn]] void report_fatal_error(std::string_view reason,
                                      bool gen_crash_diag = true);
 
 /// Installs a new bad alloc error handler that should be used whenever a

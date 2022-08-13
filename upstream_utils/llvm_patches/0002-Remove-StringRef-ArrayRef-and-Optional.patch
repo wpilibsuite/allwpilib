@@ -1,4 +1,4 @@
-From 51e1fa69fbc76af52f831482f369bd96464b2745 Mon Sep 17 00:00:00 2001
+From bd8553fce77892234cf3306f71048fd70e8d303d Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Sat, 7 May 2022 22:09:18 -0400
 Subject: [PATCH 02/29] Remove StringRef, ArrayRef, and Optional
@@ -16,7 +16,7 @@ Subject: [PATCH 02/29] Remove StringRef, ArrayRef, and Optional
  llvm/include/llvm/Support/ErrorHandling.h     |  9 +--
  .../llvm/Support/SmallVectorMemoryBuffer.h    |  6 +-
  llvm/include/llvm/Support/VersionTuple.h      | 20 ++---
- .../llvm/Support/Windows/WindowsSupport.h     |  2 -
+ .../llvm/Support/Windows/WindowsSupport.h     |  4 +-
  llvm/include/llvm/Support/raw_ostream.h       | 51 +++++++------
  llvm/lib/Support/ConvertUTFWrapper.cpp        | 32 ++++----
  llvm/lib/Support/ErrorHandling.cpp            | 13 ++--
@@ -31,7 +31,7 @@ Subject: [PATCH 02/29] Remove StringRef, ArrayRef, and Optional
  llvm/unittests/ADT/SmallVectorTest.cpp        | 20 +----
  llvm/unittests/ADT/StringMapTest.cpp          | 32 ++++----
  llvm/unittests/Support/ConvertUTFTest.cpp     | 37 +++++----
- 27 files changed, 246 insertions(+), 303 deletions(-)
+ 27 files changed, 247 insertions(+), 304 deletions(-)
 
 diff --git a/llvm/include/llvm/ADT/PointerUnion.h b/llvm/include/llvm/ADT/PointerUnion.h
 index 04d566bbc..1d4cc747c 100644
@@ -736,7 +736,7 @@ index 8a04a324a..8737cd144 100644
    return H;
  }
 diff --git a/llvm/include/llvm/Support/ErrorHandling.h b/llvm/include/llvm/Support/ErrorHandling.h
-index 6791df6be..06233e8e8 100644
+index 6791df6be..3f726d40b 100644
 --- a/llvm/include/llvm/Support/ErrorHandling.h
 +++ b/llvm/include/llvm/Support/ErrorHandling.h
 @@ -15,10 +15,10 @@
@@ -760,10 +760,10 @@ index 6791df6be..06233e8e8 100644
  [[noreturn]] void report_fatal_error(const char *reason,
                                       bool gen_crash_diag = true);
 -[[noreturn]] void report_fatal_error(StringRef reason,
-+[[noreturn]] void report_fatal_error(std::string_view reason,
++[[noreturn]] void report_fatal_error(const std::string &reason,
                                       bool gen_crash_diag = true);
 -[[noreturn]] void report_fatal_error(const Twine &reason,
-+[[noreturn]] void report_fatal_error(const std::string &reason,
++[[noreturn]] void report_fatal_error(std::string_view reason,
                                       bool gen_crash_diag = true);
  
  /// Installs a new bad alloc error handler that should be used whenever a
@@ -854,7 +854,7 @@ index 1a1072d22..3d6573bf5 100644
  
  /// Print a version number.
 diff --git a/llvm/include/llvm/Support/Windows/WindowsSupport.h b/llvm/include/llvm/Support/Windows/WindowsSupport.h
-index 917822678..5e13647b3 100644
+index 917822678..180803fbd 100644
 --- a/llvm/include/llvm/Support/Windows/WindowsSupport.h
 +++ b/llvm/include/llvm/Support/Windows/WindowsSupport.h
 @@ -35,8 +35,6 @@
@@ -866,6 +866,15 @@ index 917822678..5e13647b3 100644
  #include "llvm/Config/llvm-config.h" // Get build system configuration settings
  #include "llvm/Support/Allocator.h"
  #include "llvm/Support/Chrono.h"
+@@ -71,7 +69,7 @@ bool MakeErrMsg(std::string *ErrMsg, const std::string &prefix);
+ [[noreturn]] inline void ReportLastErrorFatal(const char *Msg) {
+   std::string ErrMsg;
+   MakeErrMsg(&ErrMsg, Msg);
+-  llvm::report_fatal_error(Twine(ErrMsg));
++  llvm::report_fatal_error(ErrMsg);
+ }
+ 
+ template <typename HandleTraits>
 diff --git a/llvm/include/llvm/Support/raw_ostream.h b/llvm/include/llvm/Support/raw_ostream.h
 index 58adb41cb..9a1dd7a60 100644
 --- a/llvm/include/llvm/Support/raw_ostream.h
@@ -1110,7 +1119,7 @@ index 392c4c489..396ab0c65 100644
          Result);
    } else if (sizeof(wchar_t) == 4) {
 diff --git a/llvm/lib/Support/ErrorHandling.cpp b/llvm/lib/Support/ErrorHandling.cpp
-index 80c0e0043..bc2992ecc 100644
+index 80c0e0043..78ff0d163 100644
 --- a/llvm/lib/Support/ErrorHandling.cpp
 +++ b/llvm/lib/Support/ErrorHandling.cpp
 @@ -14,7 +14,6 @@
@@ -1131,12 +1140,12 @@ index 80c0e0043..bc2992ecc 100644
  
 -void llvm::report_fatal_error(StringRef Reason, bool GenCrashDiag) {
 -  report_fatal_error(Twine(Reason), GenCrashDiag);
-+void llvm::report_fatal_error(std::string_view Reason, bool GenCrashDiag) {
-+  report_fatal_error(Reason, GenCrashDiag);
++void llvm::report_fatal_error(const std::string &Reason, bool GenCrashDiag) {
++  report_fatal_error(std::string_view(Reason), GenCrashDiag);
  }
  
 -void llvm::report_fatal_error(const Twine &Reason, bool GenCrashDiag) {
-+void llvm::report_fatal_error(const std::string &Reason, bool GenCrashDiag) {
++void llvm::report_fatal_error(std::string_view Reason, bool GenCrashDiag) {
    llvm::fatal_error_handler_t handler = nullptr;
    void* handlerData = nullptr;
    {
@@ -1145,7 +1154,7 @@ index 80c0e0043..bc2992ecc 100644
  
    if (handler) {
 -    handler(handlerData, Reason.str().c_str(), GenCrashDiag);
-+    handler(handlerData, Reason.c_str(), GenCrashDiag);
++    handler(handlerData, Reason.data(), GenCrashDiag);
    } else {
      // Blast the result out to stderr.  We don't try hard to make sure this
      // succeeds (e.g. handling EINTR) and we can't use errs() here because
@@ -1159,7 +1168,7 @@ index 80c0e0043..bc2992ecc 100644
      (void)written; // If something went wrong, we deliberately just give up.
    }
 diff --git a/llvm/lib/Support/SmallVector.cpp b/llvm/lib/Support/SmallVector.cpp
-index 8cafbc7fa..bb4b237de 100644
+index 8cafbc7fa..8bad715e4 100644
 --- a/llvm/lib/Support/SmallVector.cpp
 +++ b/llvm/lib/Support/SmallVector.cpp
 @@ -11,7 +11,6 @@
@@ -1175,7 +1184,7 @@ index 8cafbc7fa..bb4b237de 100644
    throw std::length_error(Reason);
  #else
 -  report_fatal_error(Twine(Reason));
-+  report_fatal_error(std::string_view(Reason));
++  report_fatal_error(Reason);
  #endif
  }
  
@@ -1184,7 +1193,7 @@ index 8cafbc7fa..bb4b237de 100644
    throw std::length_error(Reason);
  #else
 -  report_fatal_error(Twine(Reason));
-+  report_fatal_error(std::string_view(Reason));
++  report_fatal_error(Reason);
  #endif
  }
  
@@ -1883,5 +1892,5 @@ index 7bda6ea28..9c798437a 100644
    // Overlong sequences of the above.
    EXPECT_TRUE(CheckConvertUTF8ToUnicodeScalars(
 -- 
-2.37.1
+2.37.2
 

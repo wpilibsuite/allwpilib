@@ -1,4 +1,4 @@
-From 1c244d593e4c36470722d8386e4c43062036b62b Mon Sep 17 00:00:00 2001
+From 8960df2305b5392b9084ec9749c36ea0864f2dec Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Tue, 3 May 2022 20:22:38 -0400
 Subject: [PATCH 19/29] Windows Support
@@ -9,7 +9,7 @@ Subject: [PATCH 19/29] Windows Support
  2 files changed, 124 insertions(+), 16 deletions(-)
 
 diff --git a/llvm/include/llvm/Support/Windows/WindowsSupport.h b/llvm/include/llvm/Support/Windows/WindowsSupport.h
-index 5e13647b3..851092290 100644
+index 180803fbd..31120cfa0 100644
 --- a/llvm/include/llvm/Support/Windows/WindowsSupport.h
 +++ b/llvm/include/llvm/Support/Windows/WindowsSupport.h
 @@ -35,8 +35,6 @@
@@ -203,5 +203,5 @@ index e24a918c5..b4c7fffee 100644
  
  ConvertUTF_RESTORE_WARNINGS
 -- 
-2.37.1
+2.37.2
 

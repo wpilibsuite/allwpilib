@@ -1,4 +1,4 @@
-From 457b2ea0c74fd4c2d4b47f9f20323964ae9f78e0 Mon Sep 17 00:00:00 2001
+From 9178e3f23959489a05df2664f38e189f003a7ed6 Mon Sep 17 00:00:00 2001
 From: Tyler Veness <calcmogul@gmail.com>
 Date: Wed, 10 Aug 2022 22:35:00 -0700
 Subject: [PATCH 29/29] Remove StringMap test for wpi::sort()
@@ -33,5 +33,5 @@ index de6daf3da..ca41631cc 100644
    StringMap<int> Map;
    Map["A"] = 1;
 -- 
-2.37.1
+2.37.2
 
