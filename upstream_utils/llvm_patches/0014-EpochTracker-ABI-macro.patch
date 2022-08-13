@@ -1,4 +1,4 @@
-From 80fb477fbf6a526a51a14d4ad7376143373d516e Mon Sep 17 00:00:00 2001
+From bc4c2fcc26fbf103c4cbdeed0436a340a7914325 Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Wed, 4 May 2022 00:01:00 -0400
 Subject: [PATCH 14/29] EpochTracker ABI macro

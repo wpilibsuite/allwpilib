@@ -754,7 +754,7 @@ std::error_code CodePageToUTF16(unsigned codepage,
     }
 
     utf16.reserve(len + 1);
-    utf16.set_size(len);
+    utf16.resize_for_overwrite(len);
 
     len = ::MultiByteToWideChar(codepage, MB_ERR_INVALID_CHARS, original.data(),
                                 original.size(), utf16.begin(), utf16.size());
@@ -795,7 +795,7 @@ std::error_code UTF16ToCodePage(unsigned codepage, const wchar_t *utf16,
     }
 
     converted.reserve(len);
-    converted.set_size(len);
+    converted.resize_for_overwrite(len);
 
     // Now do the actual conversion.
     len = ::WideCharToMultiByte(codepage, 0, utf16, utf16_len, converted.data(),

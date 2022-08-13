@@ -1,7 +1,7 @@
-From 6cb697bde1fb69584267925bb81b76857b903c87 Mon Sep 17 00:00:00 2001
+From ac90e861f0c37ad08417b4ced24f85d67e5919b4 Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Tue, 3 May 2022 20:22:38 -0400
-Subject: [PATCH 19/29] Windows Support
+Subject: [PATCH 19/29] Windows support
 
 ---
  .../llvm/Support/Windows/WindowsSupport.h     | 45 +++++----
@@ -90,7 +90,7 @@ index 180803fbd..31120cfa0 100644
  } // end namespace llvm.
  
 diff --git a/llvm/lib/Support/ConvertUTF.cpp b/llvm/lib/Support/ConvertUTF.cpp
-index e24a918c5..b4c7fffee 100644
+index e24a918c5..c906ded91 100644
 --- a/llvm/lib/Support/ConvertUTF.cpp
 +++ b/llvm/lib/Support/ConvertUTF.cpp
 @@ -51,6 +51,11 @@
@@ -125,7 +125,7 @@ index e24a918c5..b4c7fffee 100644
 +    }
 +
 +    utf16.reserve(len + 1);
-+    utf16.set_size(len);
++    utf16.resize_for_overwrite(len);
 +
 +    len = ::MultiByteToWideChar(codepage, MB_ERR_INVALID_CHARS, original.data(),
 +                                original.size(), utf16.begin(), utf16.size());
@@ -166,7 +166,7 @@ index e24a918c5..b4c7fffee 100644
 +    }
 +
 +    converted.reserve(len);
-+    converted.set_size(len);
++    converted.resize_for_overwrite(len);
 +
 +    // Now do the actual conversion.
 +    len = ::WideCharToMultiByte(codepage, 0, utf16, utf16_len, converted.data(),

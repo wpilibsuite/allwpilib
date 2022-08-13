@@ -180,7 +180,7 @@ def main():
         os.path.join(patch_root, "0016-Add-lerp-and-sgn.patch"),
         os.path.join(patch_root, "0017-Fixup-includes.patch"),
         os.path.join(patch_root, "0018-Use-std-is_trivially_copy_constructible.patch"),
-        os.path.join(patch_root, "0019-Windows-Support.patch"),
+        os.path.join(patch_root, "0019-Windows-support.patch"),
         os.path.join(patch_root, "0020-Prefer-fmtlib.patch"),
         os.path.join(patch_root, "0021-Prefer-wpi-s-fs.h.patch"),
         os.path.join(patch_root, "0022-Remove-unused-functions.patch"),
