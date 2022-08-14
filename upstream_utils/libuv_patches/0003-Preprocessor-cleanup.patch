@@ -177,6 +177,3 @@ index a68b095..7843e9f 100644
  
  /* Whether there are any non-IFS LSPs stacked on TCP */
  int uv_tcp_non_ifs_lsp_ipv4;
--- 
-2.25.1
-

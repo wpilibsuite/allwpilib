@@ -100,6 +100,3 @@ index 7843e9f..cda82bc 100644
  #pragma comment(lib, "Ws2_32.lib")
  
  /* Whether there are any non-IFS LSPs stacked on TCP */
--- 
-2.25.1
-

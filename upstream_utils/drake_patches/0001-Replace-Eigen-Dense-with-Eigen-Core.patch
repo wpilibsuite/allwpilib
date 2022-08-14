@@ -74,6 +74,3 @@ index 533ced151d..e4ecfd2eb5 100644
  #include <gtest/gtest.h>
  
  #include "drake/common/test_utilities/eigen_matrix_compare.h"
--- 
-2.36.1
-
