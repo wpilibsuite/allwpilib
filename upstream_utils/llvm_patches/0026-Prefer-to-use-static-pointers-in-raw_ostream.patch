@@ -32,6 +32,3 @@ index 6fa250a68ed8..6be6809ad951 100644
  }
  
  /// nulls() - This returns a reference to a raw_ostream which discards output.
--- 
-2.20.1.windows.1
-

@@ -166,6 +166,3 @@ index 9c798437a12d..2fee8ad5c012 100644
  #include "gtest/gtest.h"
  #include <string>
  #include <vector>
--- 
-2.20.1.windows.1
-

@@ -76,6 +76,3 @@ index 18beb3878067..081b699adee3 100644
  
    SmallVector<std::string_view, 4> Expected = {"A", "B", "C", "D"};
    EXPECT_EQ(Expected, Keys);
--- 
-2.20.1.windows.1
-

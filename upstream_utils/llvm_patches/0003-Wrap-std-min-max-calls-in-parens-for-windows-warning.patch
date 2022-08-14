@@ -220,6 +220,3 @@ index 0005f7840912..26901fe97d20 100644
  }
  
  // Note: Moving this function into the header may cause performance regression.
--- 
-2.20.1.windows.1
-

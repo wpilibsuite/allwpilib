@@ -34,6 +34,3 @@ index 0ec0242d569d..dd85a5892e01 100644
    void remove_fatal_error_handler();
  
    /// ScopedFatalErrorHandler - This is a simple helper class which just
--- 
-2.20.1.windows.1
-

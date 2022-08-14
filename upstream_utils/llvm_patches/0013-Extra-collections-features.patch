@@ -160,6 +160,3 @@ index 3abeed3dac21..27bba0ca2f06 100644
  raw_ostream::~raw_ostream() {
    // raw_ostream's subclasses should take care to flush the buffer
    // in their destructors.
--- 
-2.20.1.windows.1
-

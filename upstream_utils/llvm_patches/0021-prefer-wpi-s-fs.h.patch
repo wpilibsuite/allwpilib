@@ -32,6 +32,3 @@ index 8008170be3e5..27fb5c03e474 100644
  
  /// This class implements an extremely fast bulk output stream that can *only*
  /// output to a stream.  It does not support seeking, reopening, rewinding, line
--- 
-2.20.1.windows.1
-

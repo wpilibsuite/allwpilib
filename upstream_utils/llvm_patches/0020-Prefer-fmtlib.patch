@@ -53,6 +53,3 @@ index 4b6ddd30c6e4..9ee52a02c214 100644
    abort();
  #ifdef LLVM_BUILTIN_UNREACHABLE
    // Windows systems and possibly others don't declare abort() to be noreturn,
--- 
-2.20.1.windows.1
-

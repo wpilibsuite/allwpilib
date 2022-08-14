@@ -50,6 +50,3 @@ index 534119c..00d0332 100644
    while (!QUEUE_EMPTY(&queue)) {
      q = QUEUE_HEAD(&queue);
      h = QUEUE_DATA(q, uv_handle_t, handle_queue);
--- 
-2.25.1
-

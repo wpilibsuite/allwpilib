@@ -138,6 +138,3 @@ index 26901fe97d20..3fc16097bd30 100644
 -static_assert(sizeof(SmallVectorSizeType<char>) == sizeof(uint32_t),
 -              "Expected SmallVectorBase<uint32_t> variant to be in use.");
 -#endif
--- 
-2.20.1.windows.1
-

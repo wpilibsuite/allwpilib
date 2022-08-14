@@ -54,6 +54,3 @@ index fac12dd0e4c6..e8f1f2aca610 100644
  namespace detail {
  template <typename T, std::size_t SizeOfT> struct TrailingZerosCounter {
    static unsigned count(T Val, ZeroBehavior) {
--- 
-2.20.1.windows.1
-

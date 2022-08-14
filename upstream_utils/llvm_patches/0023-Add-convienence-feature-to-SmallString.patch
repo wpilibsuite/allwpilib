@@ -26,6 +26,3 @@ index 85987811f3c4..d3d469d45d15 100644
  
    // Extra operators.
    SmallString &operator=(std::string_view RHS) {
--- 
-2.20.1.windows.1
-

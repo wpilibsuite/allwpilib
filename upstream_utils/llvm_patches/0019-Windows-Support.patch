@@ -218,6 +218,3 @@ index bcf13d828a5d..cddad9ca0660 100644
    // Read into Buffer until we hit EOF.
    for (;;) {
      Buffer.reserve(Buffer.size() + ChunkSize);
--- 
-2.20.1.windows.1
-

@@ -19,6 +19,3 @@ index eeb3572..ed51a6a 100644
      assert(kr == KERN_SUCCESS);
      CFMutableDictionaryRef classes_to_match
          = pIOServiceMatching("IOPlatformDevice");
--- 
-2.25.1
-

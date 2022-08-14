@@ -1779,6 +1779,3 @@ index 7bda6ea28ad6..9c798437a12d 100644
  
    // Overlong sequences of the above.
    EXPECT_TRUE(CheckConvertUTF8ToUnicodeScalars(
--- 
-2.20.1.windows.1
-
