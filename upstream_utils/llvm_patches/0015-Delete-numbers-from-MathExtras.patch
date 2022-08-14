@@ -1,4 +1,4 @@
-From 9596fc0bb6e4a96c15c39f3bac954c03407d1f50 Mon Sep 17 00:00:00 2001
+From 907608f09061ab272b0a127330b1b24e28d50a9f Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Thu, 5 May 2022 18:09:45 -0400
 Subject: [PATCH 15/28] Delete numbers from MathExtras

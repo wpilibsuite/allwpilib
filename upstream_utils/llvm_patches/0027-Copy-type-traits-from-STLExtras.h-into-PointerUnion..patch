@@ -1,4 +1,4 @@
-From 46d0b9b16b385048024184e22d8de93524f0c0cc Mon Sep 17 00:00:00 2001
+From 8f51777a3117a7b010a4cfb2ded1f5d226466f34 Mon Sep 17 00:00:00 2001
 From: Tyler Veness <calcmogul@gmail.com>
 Date: Wed, 10 Aug 2022 17:07:52 -0700
 Subject: [PATCH 27/28] Copy type traits from STLExtras.h into PointerUnion.h

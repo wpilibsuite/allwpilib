@@ -1,4 +1,4 @@
-From 818ea37273df71ef55ed40517d9889a9f0e9e744 Mon Sep 17 00:00:00 2001
+From 34f44d312c918b3b5dd69fc689ec0b628dc712f9 Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Thu, 19 May 2022 01:12:41 -0400
 Subject: [PATCH 26/28] constexpr endian byte swap

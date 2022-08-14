@@ -1,4 +1,4 @@
-From 713b4fad8017c7b1321d4ecd9d9d9d50ce860d7a Mon Sep 17 00:00:00 2001
+From f58b9bad86f61c35cc530ff113ccbb13415261c8 Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Mon, 9 May 2022 00:04:30 -0400
 Subject: [PATCH 24/28] Use SmallVector for UTF conversion

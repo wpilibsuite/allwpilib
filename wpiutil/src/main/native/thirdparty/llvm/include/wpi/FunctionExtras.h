@@ -58,6 +58,7 @@ template <typename FunctionT> class unique_function;
 // GCC warns on OutOfLineStorage
 #if defined(__GNUC__) && !defined(__clang__)
 #pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Warray-bounds"
 #pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
 #endif
 

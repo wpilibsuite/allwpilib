@@ -1,4 +1,4 @@
-From b90f8e0725d10a740d240f6a25217dd9de5fcc87 Mon Sep 17 00:00:00 2001
+From ef26f059859d3a0d08b06a70519928bcd5f9bb79 Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Thu, 5 May 2022 23:18:34 -0400
 Subject: [PATCH 11/28] Detemplatize SmallVectorBase

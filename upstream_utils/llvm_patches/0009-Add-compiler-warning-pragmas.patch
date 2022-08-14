@@ -1,10 +1,10 @@
-From b998bfedf6203db946e0bc09874d8eac144676fa Mon Sep 17 00:00:00 2001
+From 2c53d8ac36f378fda347f36ef2bc7fbc2038cb93 Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Sun, 8 May 2022 13:34:07 -0400
 Subject: [PATCH 09/28] Add compiler warning pragmas
 
 ---
- llvm/include/llvm/ADT/FunctionExtras.h | 10 ++++++++++
+ llvm/include/llvm/ADT/FunctionExtras.h | 11 +++++++++++
  llvm/include/llvm/ADT/Hashing.h        |  9 +++++++++
  llvm/include/llvm/ADT/SmallVector.h    |  8 ++++++++
  llvm/include/llvm/Support/MathExtras.h |  9 +++++++++
@@ -14,26 +14,27 @@ Subject: [PATCH 09/28] Add compiler warning pragmas
  llvm/unittests/ADT/MapVectorTest.cpp   |  7 +++++++
  llvm/unittests/ADT/SmallVectorTest.cpp |  4 ++++
  llvm/unittests/Support/AlignOfTest.cpp |  7 +++----
- 10 files changed, 71 insertions(+), 4 deletions(-)
+ 10 files changed, 72 insertions(+), 4 deletions(-)
 
 diff --git a/llvm/include/llvm/ADT/FunctionExtras.h b/llvm/include/llvm/ADT/FunctionExtras.h
-index 8a9d78f41..a55c2d77c 100644
+index 8a9d78f41..3efa73587 100644
 --- a/llvm/include/llvm/ADT/FunctionExtras.h
 +++ b/llvm/include/llvm/ADT/FunctionExtras.h
-@@ -55,6 +55,12 @@ namespace llvm {
+@@ -55,6 +55,13 @@ namespace llvm {
  ///   It can hold functions with a non-const operator(), like mutable lambdas.
  template <typename FunctionT> class unique_function;
  
 +// GCC warns on OutOfLineStorage
 +#if defined(__GNUC__) && !defined(__clang__)
 +#pragma GCC diagnostic push
++#pragma GCC diagnostic ignored "-Warray-bounds"
 +#pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
 +#endif
 +
  namespace detail {
  
  template <typename T>
-@@ -411,6 +417,10 @@ public:
+@@ -411,6 +418,10 @@ public:
    }
  };
  
