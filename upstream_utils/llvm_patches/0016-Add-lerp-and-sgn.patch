@@ -1,4 +1,4 @@
-From e03e1a67014e2adce9130582dfe610570c2e04f1 Mon Sep 17 00:00:00 2001
+From 4caca2ed0c1c09537817e023907597c885022e26 Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Tue, 3 May 2022 22:50:24 -0400
 Subject: [PATCH 16/28] Add lerp and sgn
@@ -38,6 +38,3 @@ index e8f1f2aca..8116c58bd 100644
  } // End llvm namespace
  
  #endif
--- 
-2.37.2
-

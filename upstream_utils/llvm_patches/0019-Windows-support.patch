@@ -1,4 +1,4 @@
-From 5b27855ebe2d5a64cacb0eb1b2b88f841e40cf9b Mon Sep 17 00:00:00 2001
+From 0c9a75e8d4060163a74d701310d54a8a6f233f51 Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Tue, 3 May 2022 20:22:38 -0400
 Subject: [PATCH 19/28] Windows support
@@ -202,6 +202,3 @@ index e24a918c5..c906ded91 100644
  } // namespace llvm
  
  ConvertUTF_RESTORE_WARNINGS
--- 
-2.37.2
-

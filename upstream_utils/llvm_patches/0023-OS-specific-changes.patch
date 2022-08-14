@@ -1,4 +1,4 @@
-From 5cb9bd572f9c2a71ce41e096ef192fb2f207d485 Mon Sep 17 00:00:00 2001
+From 342ac0ec03b5cd2a8b52f0855616867f6a1655d3 Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Sun, 8 May 2022 19:30:43 -0400
 Subject: [PATCH 23/28] OS-specific changes
@@ -41,6 +41,3 @@ index bc08199a1..839819094 100644
    abort();
  }
  
--- 
-2.37.2
-

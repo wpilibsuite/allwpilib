@@ -1,4 +1,4 @@
-From 14529244b3d8b45e12554a6d1049fc8d5d3df13f Mon Sep 17 00:00:00 2001
+From c03c25950efd6a10f87d9af79e616c37d4b0949c Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Sat, 7 May 2022 20:50:26 -0400
 Subject: [PATCH 01/28] Fix spelling/language errors
@@ -20,6 +20,3 @@ index f980510d3..6791df6be 100644
    void remove_fatal_error_handler();
  
    /// ScopedFatalErrorHandler - This is a simple helper class which just
--- 
-2.37.2
-

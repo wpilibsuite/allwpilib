@@ -1,4 +1,4 @@
-From 425cfbd9e692b9f10af5906bcec84cc097e92f29 Mon Sep 17 00:00:00 2001
+From 818ea37273df71ef55ed40517d9889a9f0e9e744 Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Thu, 19 May 2022 01:12:41 -0400
 Subject: [PATCH 26/28] constexpr endian byte swap
@@ -22,6 +22,3 @@ index 5e7c1e961..2e883ff05 100644
  }
  
  /// Read a value of a particular endianness from memory.
--- 
-2.37.2
-

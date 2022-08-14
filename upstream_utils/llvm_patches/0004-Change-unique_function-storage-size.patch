@@ -1,4 +1,4 @@
-From 75f826fc1ea5965ae9fb5d164cdb34d0c25ca418 Mon Sep 17 00:00:00 2001
+From 85178dfbab55a7e064a4fc48f7da58f0776b2b5c Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Sat, 7 May 2022 22:13:55 -0400
 Subject: [PATCH 04/28] Change unique_function storage size
@@ -29,6 +29,3 @@ index 5a37417dd..8a9d78f41 100644
      // This is mutable as an inlined `const unique_function<void() const>` may
      // still modify its own mutable members.
      mutable
--- 
-2.37.2
-

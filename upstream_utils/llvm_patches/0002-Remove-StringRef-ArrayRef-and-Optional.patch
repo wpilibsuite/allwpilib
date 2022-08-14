@@ -1,4 +1,4 @@
-From 604a22f37f506317ca5ed9c03395fd40e91d43f4 Mon Sep 17 00:00:00 2001
+From b4a2bd2970465ae22b33f5c7838150a2fac82f9a Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Sat, 7 May 2022 22:09:18 -0400
 Subject: [PATCH 02/28] Remove StringRef, ArrayRef, and Optional
@@ -1892,6 +1892,3 @@ index 7bda6ea28..9c798437a 100644
  
    // Overlong sequences of the above.
    EXPECT_TRUE(CheckConvertUTF8ToUnicodeScalars(
--- 
-2.37.2
-

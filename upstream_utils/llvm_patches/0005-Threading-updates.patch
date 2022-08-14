@@ -1,4 +1,4 @@
-From 53b943db5e6960598cfa343600517162658f62f4 Mon Sep 17 00:00:00 2001
+From ea6b0cd324b2d9ea1ace04b7258a90cdc08ef6f0 Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Sat, 7 May 2022 22:17:19 -0400
 Subject: [PATCH 05/28] Threading updates
@@ -183,6 +183,3 @@ index a6ae67066..fc798b7ec 100644
  
      if (!Ptr.load(std::memory_order_relaxed)) {
        void *Tmp = Creator();
--- 
-2.37.2
-

@@ -1,4 +1,4 @@
-From eaad31abd57635893d7a4400fa2251cd8a756f66 Mon Sep 17 00:00:00 2001
+From dcd13ca065b47dc13d3e8dfae56905ad8cdfa9e2 Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Tue, 3 May 2022 22:16:10 -0400
 Subject: [PATCH 13/28] Extra collections features
@@ -160,6 +160,3 @@ index 36faf744c..95152849c 100644
  raw_ostream::~raw_ostream() {
    // raw_ostream's subclasses should take care to flush the buffer
    // in their destructors.
--- 
-2.37.2
-

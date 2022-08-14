@@ -1,4 +1,4 @@
-From 801fb9521c5fa795d5bb33354a7807514ff4cd70 Mon Sep 17 00:00:00 2001
+From 3ae3647d041621f59f9d3e00025e4653ab0759dd Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Sat, 7 May 2022 22:28:13 -0400
 Subject: [PATCH 06/28] \#ifdef guard safety
@@ -339,6 +339,3 @@ index ede1cb172..8b8260b50 100644
  
  /// \macro LLVM_THREAD_LOCAL
  /// A thread-local storage specifier which can be used with globals,
--- 
-2.37.2
-

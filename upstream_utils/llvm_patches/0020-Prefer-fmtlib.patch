@@ -1,4 +1,4 @@
-From 6fa3ee512fef23706e6a31a79b2caf0634973189 Mon Sep 17 00:00:00 2001
+From 285fc66fd7a814feeae3ddf5ed481cfc7f607feb Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Sun, 8 May 2022 16:46:20 -0400
 Subject: [PATCH 20/28] Prefer fmtlib
@@ -53,6 +53,3 @@ index ec1a1633a..8de7b726d 100644
    abort();
  #ifdef LLVM_BUILTIN_UNREACHABLE
    // Windows systems and possibly others don't declare abort() to be noreturn,
--- 
-2.37.2
-

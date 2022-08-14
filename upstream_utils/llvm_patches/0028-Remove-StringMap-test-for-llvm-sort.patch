@@ -1,4 +1,4 @@
-From 4d4710515b6afc37b98bccc5421078bac070cb1c Mon Sep 17 00:00:00 2001
+From 1f9294127e95e4382b850ead84299e10ace9f9a7 Mon Sep 17 00:00:00 2001
 From: Tyler Veness <calcmogul@gmail.com>
 Date: Wed, 10 Aug 2022 22:35:00 -0700
 Subject: [PATCH 28/28] Remove StringMap test for llvm::sort()
@@ -32,6 +32,3 @@ index de6daf3da..ca41631cc 100644
  TEST_F(StringMapTest, IterMapKeysSmallVector) {
    StringMap<int> Map;
    Map["A"] = 1;
--- 
-2.37.2
-

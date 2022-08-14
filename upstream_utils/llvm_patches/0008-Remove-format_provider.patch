@@ -1,4 +1,4 @@
-From 2aa456335bdb69dff4941926ad26c40f30cb31c1 Mon Sep 17 00:00:00 2001
+From 9b7d01fd55fef90dd23d9e6fa9e2743fc73b38a3 Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Sat, 7 May 2022 22:53:50 -0400
 Subject: [PATCH 08/28] Remove format_provider
@@ -230,6 +230,3 @@ index 9a08a5c1b..3c049de18 100644
 -}
 -
  } // anonymous namespace
--- 
-2.37.2
-

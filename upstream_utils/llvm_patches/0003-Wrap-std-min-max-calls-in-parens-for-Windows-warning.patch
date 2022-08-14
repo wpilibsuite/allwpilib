@@ -1,4 +1,4 @@
-From 1522777a3ac4a0fedf2e275592a19ca205823f8e Mon Sep 17 00:00:00 2001
+From 9506be33e6c9f942e930163170b28a8700f83f30 Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Sat, 7 May 2022 22:12:41 -0400
 Subject: [PATCH 03/28] Wrap std::min/max calls in parens, for Windows warnings
@@ -206,6 +206,3 @@ index 8bad715e4..a2b4899e1 100644
  }
  
  // Note: Moving this function into the header may cause performance regression.
--- 
-2.37.2
-

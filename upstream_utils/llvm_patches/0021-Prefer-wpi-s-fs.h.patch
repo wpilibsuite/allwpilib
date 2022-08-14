@@ -1,4 +1,4 @@
-From 1426de3af13b5bb961bc90c696f72fe54a9626ba Mon Sep 17 00:00:00 2001
+From 779b0a4b934cb85ef418010b44890925e2e0d70d Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Sun, 8 May 2022 16:49:36 -0400
 Subject: [PATCH 21/28] Prefer wpi's fs.h
@@ -32,6 +32,3 @@ index bf5630ab5..256bcec25 100644
  
  /// This class implements an extremely fast bulk output stream that can *only*
  /// output to a stream.  It does not support seeking, reopening, rewinding, line
--- 
-2.37.2
-

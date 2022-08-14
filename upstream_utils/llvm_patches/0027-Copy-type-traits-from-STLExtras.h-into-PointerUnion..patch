@@ -1,4 +1,4 @@
-From 09876835c0b64eeec86c6b78fa8e0e8ce440b95d Mon Sep 17 00:00:00 2001
+From 46d0b9b16b385048024184e22d8de93524f0c0cc Mon Sep 17 00:00:00 2001
 From: Tyler Veness <calcmogul@gmail.com>
 Date: Wed, 10 Aug 2022 17:07:52 -0700
 Subject: [PATCH 27/28] Copy type traits from STLExtras.h into PointerUnion.h
@@ -67,6 +67,3 @@ index 1d4cc747c..7d090da59 100644
  namespace pointer_union_detail {
    /// Determine the number of bits required to store integers with values < n.
    /// This is ceil(log2(n)).
--- 
-2.37.2
-

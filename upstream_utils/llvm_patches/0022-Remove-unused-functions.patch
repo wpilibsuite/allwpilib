@@ -1,4 +1,4 @@
-From a572cb6934ba56824354d10002c79fe4361059ad Mon Sep 17 00:00:00 2001
+From 3e75b6e446a3aa9cb629863af62004629d1f9077 Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Sun, 8 May 2022 19:16:51 -0400
 Subject: [PATCH 22/28] Remove unused functions
@@ -281,6 +281,3 @@ index bee3875d1..87600ea47 100644
 -}
 -
  } // namespace
--- 
-2.37.2
-

@@ -1,4 +1,4 @@
-From f9349f908445f60b6055a180ba7083ac1bbae399 Mon Sep 17 00:00:00 2001
+From 1e7b9bd63c2340dab81e1499af06d81ac655b879 Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Sat, 7 May 2022 22:37:34 -0400
 Subject: [PATCH 07/28] Explicitly use std::
@@ -76,6 +76,3 @@ index 86907ab61..6d0c0942c 100644
  
    SmallVector<std::string_view, 4> Expected = {"A", "B", "C", "D"};
    EXPECT_EQ(Expected, Keys);
--- 
-2.37.2
-
