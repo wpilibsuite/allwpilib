@@ -349,6 +349,3 @@ index 989d25bb03b9..14f95ae8cc52 100644
  
  /// \macro LLVM_THREAD_LOCAL
  /// A thread-local storage specifier which can be used with globals,
--- 
-2.20.1.windows.1
-

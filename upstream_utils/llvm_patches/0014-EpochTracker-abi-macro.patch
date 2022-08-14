@@ -20,6 +20,3 @@ index 7a2e4220afec..8f98f3d582c7 100644
  
  /// A base class for data structure classes wishing to make iterators
  /// ("handles") pointing into themselves fail-fast.  When building without
--- 
-2.20.1.windows.1
-

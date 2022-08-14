@@ -183,6 +183,3 @@ index a6ae67066ea0..fc798b7ec1b7 100644
  
      if (!Ptr.load(std::memory_order_relaxed)) {
        void *Tmp = Creator();
--- 
-2.20.1.windows.1
-

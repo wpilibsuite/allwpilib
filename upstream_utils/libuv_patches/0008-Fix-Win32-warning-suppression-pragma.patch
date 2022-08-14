@@ -20,6 +20,3 @@ index 7a5dd2e..d9888ae 100644
      #endif
      if (GetVersionExW(&os_info) == 0) {
        r = uv_translate_sys_error(GetLastError());
--- 
-2.25.1
-

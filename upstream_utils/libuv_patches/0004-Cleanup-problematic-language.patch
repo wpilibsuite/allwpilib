@@ -59,6 +59,3 @@ index 9442cf1..8976688 100644
        r = uv__open_cloexec(path, mode | O_NOCTTY);
      else
        r = -1;
--- 
-2.25.1
-

@@ -29,6 +29,3 @@ index e67ef7377c88..1a26cb702cae 100644
      // This is mutable as an inlined `const unique_function<void() const>` may
      // still modify its own mutable members.
      mutable
--- 
-2.20.1.windows.1
-

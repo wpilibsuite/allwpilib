@@ -225,6 +225,3 @@ index f84895c18602..6a50205b143b 100644
  #endif
  
  // Define some fixed alignment types to use in these tests.
--- 
-2.20.1.windows.1
-

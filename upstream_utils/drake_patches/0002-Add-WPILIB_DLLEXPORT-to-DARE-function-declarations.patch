@@ -35,6 +35,3 @@ index df7a58b2b8..55b8442bf4 100644
  Eigen::MatrixXd DiscreteAlgebraicRiccatiEquation(
      const Eigen::Ref<const Eigen::MatrixXd>& A,
      const Eigen::Ref<const Eigen::MatrixXd>& B,
--- 
-2.36.1
-

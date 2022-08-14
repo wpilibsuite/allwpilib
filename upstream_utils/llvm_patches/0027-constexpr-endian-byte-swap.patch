@@ -22,6 +22,3 @@ index 5e7c1e961b9d..2e883ff05b7e 100644
  }
  
  /// Read a value of a particular endianness from memory.
--- 
-2.20.1.windows.1
-
