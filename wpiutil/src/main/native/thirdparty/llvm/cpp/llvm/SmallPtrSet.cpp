@@ -13,7 +13,6 @@
 
 #include "wpi/SmallPtrSet.h"
 #include "wpi/DenseMapInfo.h"
-#include "wpi/ErrorHandling.h"
 #include "wpi/MathExtras.h"
 #include "wpi/MemAlloc.h"
 #include <algorithm>

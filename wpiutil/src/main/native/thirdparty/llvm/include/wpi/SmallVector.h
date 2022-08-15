@@ -5,9 +5,10 @@
 // SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 //
 //===----------------------------------------------------------------------===//
-//
-// This file defines the SmallVector class.
-//
+///
+/// /file
+/// This file defines the SmallVector class.
+///
 //===----------------------------------------------------------------------===//
 
 #ifndef WPIUTIL_WPI_SMALLVECTOR_H
@@ -21,10 +22,7 @@
 #pragma GCC diagnostic warning "-Wclass-memaccess"
 #endif
 
-#include "wpi/iterator_range.h"
 #include "wpi/Compiler.h"
-#include "wpi/ErrorHandling.h"
-#include "wpi/MemAlloc.h"
 #include "wpi/type_traits.h"
 #include <algorithm>
 #include <cassert>
@@ -41,6 +39,8 @@
 #include <utility>
 
 namespace wpi {
+
+template <typename IteratorT> class iterator_range;
 
 /// This is all the stuff common to all SmallVectors.
 ///
@@ -80,15 +80,11 @@ public:
 
   LLVM_NODISCARD bool empty() const { return !Size; }
 
+protected:
   /// Set the array size to \p N, which the current array must have enough
   /// capacity for.
   ///
   /// This does not construct or destroy any elements in the vector.
-  ///
-  /// Clients can use this in conjunction with capacity() to write past the end
-  /// of the buffer when they know that more elements are available, and only
-  /// update the size later. This avoids the cost of value initializing elements
-  /// which will only be overwritten.
   void set_size(size_t N) {
     assert(N <= capacity());
     Size = static_cast<unsigned>(N);
@@ -575,6 +571,16 @@ protected:
   explicit SmallVectorImpl(unsigned N)
       : SmallVectorTemplateBase<T>(N) {}
 
+  void assignRemote(SmallVectorImpl &&RHS) {
+    this->destroy_range(this->begin(), this->end());
+    if (!this->isSmall())
+      free(this->begin());
+    this->BeginX = RHS.BeginX;
+    this->Size = RHS.Size;
+    this->Capacity = RHS.Capacity;
+    RHS.resetToSmall();
+  }
+
 public:
   SmallVectorImpl(const SmallVectorImpl &) = delete;
 
@@ -591,18 +597,25 @@ public:
   }
 
 private:
+  // Make set_size() private to avoid misuse in subclasses.
+  using SuperClass::set_size;
+
   template <bool ForOverwrite> void resizeImpl(size_type N) {
+    if (N == this->size())
+      return;
+
     if (N < this->size()) {
-      this->pop_back_n(this->size() - N);
-    } else if (N > this->size()) {
-      this->reserve(N);
-      for (auto I = this->end(), E = this->begin() + N; I != E; ++I)
-        if (ForOverwrite)
-          new (&*I) T;
-        else
-          new (&*I) T();
-      this->set_size(N);
+      this->truncate(N);
+      return;
     }
+
+    this->reserve(N);
+    for (auto I = this->end(), E = this->begin() + N; I != E; ++I)
+      if (ForOverwrite)
+        new (&*I) T;
+      else
+        new (&*I) T();
+    this->set_size(N);
   }
 
 public:
@@ -611,12 +624,19 @@ public:
   /// Like resize, but \ref T is POD, the new values won't be initialized.
   void resize_for_overwrite(size_type N) { resizeImpl<true>(N); }
 
+  /// Like resize, but requires that \p N is less than \a size().
+  void truncate(size_type N) {
+    assert(this->size() >= N && "Cannot increase size with truncate");
+    this->destroy_range(this->begin() + N, this->end());
+    this->set_size(N);
+  }
+
   void resize(size_type N, ValueParamT NV) {
     if (N == this->size())
       return;
 
     if (N < this->size()) {
-      this->pop_back_n(this->size() - N);
+      this->truncate(N);
       return;
     }
 
@@ -631,8 +651,7 @@ public:
 
   void pop_back_n(size_type NumItems) {
     assert(this->size() >= NumItems);
-    this->destroy_range(this->end() - NumItems, this->end());
-    this->set_size(this->size() - NumItems);
+    truncate(this->size() - NumItems);
   }
 
   LLVM_NODISCARD T pop_back_val() {
@@ -1026,12 +1045,7 @@ SmallVectorImpl<T> &SmallVectorImpl<T>::operator=(SmallVectorImpl<T> &&RHS) {
 
   // If the RHS isn't small, clear this vector and then steal its buffer.
   if (!RHS.isSmall()) {
-    this->destroy_range(this->begin(), this->end());
-    if (!this->isSmall()) free(this->begin());
-    this->BeginX = RHS.BeginX;
-    this->Size = RHS.Size;
-    this->Capacity = RHS.Capacity;
-    RHS.resetToSmall();
+    this->assignRemote(std::move(RHS));
     return *this;
   }
 
@@ -1222,7 +1236,20 @@ public:
   }
 
   SmallVector &operator=(SmallVector &&RHS) {
-    SmallVectorImpl<T>::operator=(::std::move(RHS));
+    if (N) {
+      SmallVectorImpl<T>::operator=(::std::move(RHS));
+      return *this;
+    }
+    // SmallVectorImpl<T>::operator= does not leverage N==0. Optimize the
+    // case.
+    if (this == &RHS)
+      return *this;
+    if (RHS.empty()) {
+      this->destroy_range(this->begin(), this->end());
+      this->Size = 0;
+    } else {
+      this->assignRemote(std::move(RHS));
+    }
     return *this;
   }
 
@@ -1242,13 +1269,22 @@ inline size_t capacity_in_bytes(const SmallVector<T, N> &X) {
   return X.capacity_in_bytes();
 }
 
+template <typename RangeType>
+using ValueTypeFromRangeType =
+    typename std::remove_const<typename std::remove_reference<
+        decltype(*std::begin(std::declval<RangeType &>()))>::type>::type;
+
 /// Given a range of type R, iterate the entire range and return a
 /// SmallVector with elements of the vector.  This is useful, for example,
 /// when you want to iterate a range and then sort the results.
 template <unsigned Size, typename R>
-SmallVector<typename std::remove_const<typename std::remove_reference<
-                decltype(*std::begin(std::declval<R &>()))>::type>::type,
-            Size>
+SmallVector<ValueTypeFromRangeType<R>, Size> to_vector(R &&Range) {
+  return {std::begin(Range), std::end(Range)};
+}
+template <typename R>
+SmallVector<ValueTypeFromRangeType<R>,
+            CalculateSmallVectorDefaultInlinedElements<
+                ValueTypeFromRangeType<R>>::value>
 to_vector(R &&Range) {
   return {std::begin(Range), std::end(Range)};
 }

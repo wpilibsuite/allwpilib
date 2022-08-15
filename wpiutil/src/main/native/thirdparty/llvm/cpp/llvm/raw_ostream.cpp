@@ -23,10 +23,8 @@
 #include "wpi/fs.h"
 #include "wpi/MathExtras.h"
 #include <algorithm>
-#include <cctype>
 #include <cerrno>
 #include <cstdio>
-#include <iterator>
 #include <sys/stat.h>
 
 // <fcntl.h> may provide O_BINARY.
@@ -148,7 +146,7 @@ raw_ostream &raw_ostream::write_escaped(std::string_view Str,
       // Write out the escaped representation.
       if (UseHexEscapes) {
         *this << '\\' << 'x';
-        *this << hexdigit((c >> 4 & 0xF));
+        *this << hexdigit((c >> 4) & 0xF);
         *this << hexdigit((c >> 0) & 0xF);
       } else {
         // Always use a full 3-character octal escape.
@@ -385,7 +383,7 @@ raw_fd_ostream::raw_fd_ostream(int fd, bool shouldClose, bool unbuffered,
 #ifdef _WIN32
   SupportsSeeking = loc != (off_t)-1 && ::GetFileType(reinterpret_cast<HANDLE>(::_get_osfhandle(FD))) != FILE_TYPE_PIPE;
 #else
-  SupportsSeeking = loc != (off_t)-1;
+  SupportsSeeking = !EC && loc != (off_t)-1;
 #endif
   if (!SupportsSeeking)
     pos = 0;
@@ -624,8 +622,7 @@ raw_fd_stream::raw_fd_stream(std::string_view Filename, std::error_code &EC)
   if (EC)
     return;
 
-  // Do not support non-seekable files.
-  if (!supportsSeeking())
+  if (!isRegularFile())
     EC = std::make_error_code(std::errc::invalid_argument);
 }
 
@@ -636,10 +633,6 @@ bool raw_fd_stream::classof(const raw_ostream *OS) {
 //===----------------------------------------------------------------------===//
 //  raw_string_ostream
 //===----------------------------------------------------------------------===//
-
-raw_string_ostream::~raw_string_ostream() {
-  flush();
-}
 
 void raw_string_ostream::write_impl(const char *Ptr, size_t Size) {
   OS.append(Ptr, Size);

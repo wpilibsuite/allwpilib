@@ -1,16 +1,16 @@
-From c7d5902712292ad85b8580437c1f09a16d79def9 Mon Sep 17 00:00:00 2001
+From f35fcb2c40caceed14437e65131e9fe1cf94deac Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Sat, 7 May 2022 22:53:50 -0400
-Subject: [PATCH 08/27] Remove format_provider
+Subject: [PATCH 08/28] Remove format_provider
 
 ---
  llvm/include/llvm/Support/Chrono.h      | 109 ------------------------
- llvm/include/llvm/Support/raw_ostream.h |   5 --
+ llvm/include/llvm/Support/raw_ostream.h |   6 --
  llvm/unittests/Support/Chrono.cpp       |  61 -------------
- 3 files changed, 175 deletions(-)
+ 3 files changed, 176 deletions(-)
 
 diff --git a/llvm/include/llvm/Support/Chrono.h b/llvm/include/llvm/Support/Chrono.h
-index 2c2869de49b6..06829d1fbe14 100644
+index a7dea19d9..9f9a2b5ca 100644
 --- a/llvm/include/llvm/Support/Chrono.h
 +++ b/llvm/include/llvm/Support/Chrono.h
 @@ -10,7 +10,6 @@
@@ -21,7 +21,7 @@ index 2c2869de49b6..06829d1fbe14 100644
  
  #include <chrono>
  #include <ctime>
-@@ -58,114 +57,6 @@ toTimePoint(std::time_t T, uint32_t nsec) {
+@@ -59,114 +58,6 @@ toTimePoint(std::time_t T, uint32_t nsec) {
  
  raw_ostream &operator<<(raw_ostream &OS, sys::TimePoint<> TP);
  
@@ -137,13 +137,14 @@ index 2c2869de49b6..06829d1fbe14 100644
  
  #endif // LLVM_SUPPORT_CHRONO_H
 diff --git a/llvm/include/llvm/Support/raw_ostream.h b/llvm/include/llvm/Support/raw_ostream.h
-index 4f6ea873304f..94d0ed66eced 100644
+index 9a1dd7a60..a25ca5b7b 100644
 --- a/llvm/include/llvm/Support/raw_ostream.h
 +++ b/llvm/include/llvm/Support/raw_ostream.h
-@@ -29,11 +29,6 @@
+@@ -28,12 +28,6 @@
  
  namespace llvm {
  
+-class Duration;
 -class formatv_object_base;
 -class format_object_base;
 -class FormattedString;
@@ -153,7 +154,7 @@ index 4f6ea873304f..94d0ed66eced 100644
  
  namespace sys {
 diff --git a/llvm/unittests/Support/Chrono.cpp b/llvm/unittests/Support/Chrono.cpp
-index 9a08a5c1bfdf..3c049de18c0a 100644
+index 9a08a5c1b..3c049de18 100644
 --- a/llvm/unittests/Support/Chrono.cpp
 +++ b/llvm/unittests/Support/Chrono.cpp
 @@ -30,37 +30,6 @@ TEST(Chrono, TimeTConversion) {

@@ -1,17 +1,17 @@
-From 1c61002f2933aedbcc64ff52de7f69666479e55a Mon Sep 17 00:00:00 2001
+From 376285281b6173ee3d6650d71148bc173e4a9f7a Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Sat, 7 May 2022 22:13:55 -0400
-Subject: [PATCH 04/27] Change uniqe_function storage size
+Subject: [PATCH 04/28] Change unique_function storage size
 
 ---
  llvm/include/llvm/ADT/FunctionExtras.h | 4 ++--
  1 file changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/llvm/include/llvm/ADT/FunctionExtras.h b/llvm/include/llvm/ADT/FunctionExtras.h
-index e67ef7377c88..1a26cb702cae 100644
+index 5a37417dd..8a9d78f41 100644
 --- a/llvm/include/llvm/ADT/FunctionExtras.h
 +++ b/llvm/include/llvm/ADT/FunctionExtras.h
-@@ -72,7 +72,7 @@ using EnableIfCallable =
+@@ -78,7 +78,7 @@ using EnableIfCallable = std::enable_if_t<llvm::disjunction<
  
  template <typename ReturnT, typename... ParamTs> class UniqueFunctionBase {
  protected:
@@ -20,7 +20,7 @@ index e67ef7377c88..1a26cb702cae 100644
  
    template <typename T, class = void>
    struct IsSizeLessThanThresholdT : std::false_type {};
-@@ -151,7 +151,7 @@ protected:
+@@ -157,7 +157,7 @@ protected:
          "Should always use all of the out-of-line storage for inline storage!");
  
      // For in-line storage, we just provide an aligned character buffer. We

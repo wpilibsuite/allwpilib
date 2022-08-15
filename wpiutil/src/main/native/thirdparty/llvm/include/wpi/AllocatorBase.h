@@ -21,6 +21,7 @@
 
 #include "wpi/Compiler.h"
 #include "wpi/MemAlloc.h"
+#include <type_traits>
 
 namespace wpi {
 

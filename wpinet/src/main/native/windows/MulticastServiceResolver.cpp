@@ -132,15 +132,16 @@ static _Function_class_(DNS_QUERY_COMPLETION_ROUTINE) VOID WINAPI
                   reinterpret_cast<const wpi::UTF16*>(wideView.data()),
                   splitIndex};
               wpi::convertUTF16ToUTF8String(wideStr, storage);
-              auto& pair = data.txt.emplace_back(
-                  std::pair<std::string, std::string>{storage.string(), {}});
+              auto& pair =
+                  data.txt.emplace_back(std::pair<std::string, std::string>{
+                      std::string{storage}, {}});
               storage.clear();
               wideStr = wpi::span<const wpi::UTF16>{
                   reinterpret_cast<const wpi::UTF16*>(wideView.data() +
                                                       splitIndex + 1),
                   wideView.size() - splitIndex - 1};
               wpi::convertUTF16ToUTF8String(wideStr, storage);
-              pair.second = storage.string();
+              pair.second = std::string{storage};
             }
           }
         }
@@ -151,7 +152,7 @@ static _Function_class_(DNS_QUERY_COMPLETION_ROUTINE) VOID WINAPI
         wpi::convertUTF16ToUTF8String(wideHostName, storage);
         storage.append(".");
 
-        data.hostName = storage.string();
+        data.hostName = std::string{storage};
         storage.clear();
 
         int len = nameHost.find(impl->serviceType.c_str());
@@ -163,7 +164,7 @@ static _Function_class_(DNS_QUERY_COMPLETION_ROUTINE) VOID WINAPI
         }
         wpi::convertUTF16ToUTF8String(wideServiceName, storage);
 
-        data.serviceName = storage.string();
+        data.serviceName = std::string{storage};
         data.port = foundSrv->Data.Srv.wPort;
         data.ipv4Address = A->Data.A.IpAddress;
 

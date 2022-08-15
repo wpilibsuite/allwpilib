@@ -1,7 +1,7 @@
-From 7bdbcabd3271aebb692ef06a950d1ec59341ddf9 Mon Sep 17 00:00:00 2001
+From 35b1a8382240732065790c88a0c515701c1a2beb Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Thu, 19 May 2022 00:58:36 -0400
-Subject: [PATCH 26/27] Prefer to use static pointers in raw_ostream
+Subject: [PATCH 25/28] Prefer to use static pointers in raw_ostream
 
 See #1401
 ---
@@ -9,10 +9,10 @@ See #1401
  1 file changed, 4 insertions(+), 4 deletions(-)
 
 diff --git a/llvm/lib/Support/raw_ostream.cpp b/llvm/lib/Support/raw_ostream.cpp
-index 6fa250a68ed8..6be6809ad951 100644
+index 632b52235..a703a75ed 100644
 --- a/llvm/lib/Support/raw_ostream.cpp
 +++ b/llvm/lib/Support/raw_ostream.cpp
-@@ -601,15 +601,15 @@ void raw_fd_ostream::anchor() {}
+@@ -599,15 +599,15 @@ void raw_fd_ostream::anchor() {}
  raw_fd_ostream &llvm::outs() {
    // Set buffer settings to model stdout behavior.
    std::error_code EC;

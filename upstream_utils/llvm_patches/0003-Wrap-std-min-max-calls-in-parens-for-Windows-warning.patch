@@ -1,22 +1,21 @@
-From 48f55e6aa592d66f46f392330317e4efe0502faf Mon Sep 17 00:00:00 2001
+From 5fccde024bea117d90d215390f09c7d779195ea5 Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Sat, 7 May 2022 22:12:41 -0400
-Subject: [PATCH 03/27] Wrap std::min/max calls in parens, for windows warnings
+Subject: [PATCH 03/28] Wrap std::min/max calls in parens, for Windows warnings
 
 ---
  llvm/include/llvm/ADT/DenseMap.h       |  4 ++--
- llvm/include/llvm/ADT/DenseMapInfo.h   |  2 +-
  llvm/include/llvm/ADT/SmallVector.h    | 12 ++++++------
  llvm/include/llvm/Support/ConvertUTF.h |  2 +-
  llvm/include/llvm/Support/MathExtras.h | 22 +++++++++++-----------
  llvm/lib/Support/SmallVector.cpp       |  2 +-
- 6 files changed, 22 insertions(+), 22 deletions(-)
+ 5 files changed, 21 insertions(+), 21 deletions(-)
 
 diff --git a/llvm/include/llvm/ADT/DenseMap.h b/llvm/include/llvm/ADT/DenseMap.h
-index 595eabd0ffb4..588c39faea2f 100644
+index 7673b66ca..975c3b97e 100644
 --- a/llvm/include/llvm/ADT/DenseMap.h
 +++ b/llvm/include/llvm/ADT/DenseMap.h
-@@ -389,7 +389,7 @@ protected:
+@@ -390,7 +390,7 @@ protected:
        return 0;
      // +1 is required because of the strict equality.
      // For example if NumEntries is 48, we need to return 401.
@@ -25,7 +24,7 @@ index 595eabd0ffb4..588c39faea2f 100644
    }
  
    void moveFromOldBuckets(BucketT *OldBucketsBegin, BucketT *OldBucketsEnd) {
-@@ -825,7 +825,7 @@ public:
+@@ -826,7 +826,7 @@ public:
      // Reduce the number of buckets.
      unsigned NewNumBuckets = 0;
      if (OldNumEntries)
@@ -34,21 +33,8 @@ index 595eabd0ffb4..588c39faea2f 100644
      if (NewNumBuckets == NumBuckets) {
        this->BaseT::initEmpty();
        return;
-diff --git a/llvm/include/llvm/ADT/DenseMapInfo.h b/llvm/include/llvm/ADT/DenseMapInfo.h
-index d276acbfa6a6..0040ac36217e 100644
---- a/llvm/include/llvm/ADT/DenseMapInfo.h
-+++ b/llvm/include/llvm/ADT/DenseMapInfo.h
-@@ -285,7 +285,7 @@ template <typename... Ts> struct DenseMapInfo<std::tuple<Ts...>> {
- template <> struct DenseMapInfo<hash_code> {
-   static inline hash_code getEmptyKey() { return hash_code(-1); }
-   static inline hash_code getTombstoneKey() { return hash_code(-2); }
--  static unsigned getHashValue(hash_code val) { return val; }
-+  static unsigned getHashValue(hash_code val) { return static_cast<unsigned>(val); }
-   static bool isEqual(hash_code LHS, hash_code RHS) { return LHS == RHS; }
- };
- 
 diff --git a/llvm/include/llvm/ADT/SmallVector.h b/llvm/include/llvm/ADT/SmallVector.h
-index b8a11030fc33..602fcc5b7a98 100644
+index a4a790323..8686f7bb5 100644
 --- a/llvm/include/llvm/ADT/SmallVector.h
 +++ b/llvm/include/llvm/ADT/SmallVector.h
 @@ -49,12 +49,12 @@ protected:
@@ -66,8 +52,8 @@ index b8a11030fc33..602fcc5b7a98 100644
  
    /// This is a helper for \a grow() that's out of line to reduce code
    /// duplication.  This function will report a fatal error if it can't grow at
-@@ -83,7 +83,7 @@ public:
-   /// which will only be overwritten.
+@@ -79,7 +79,7 @@ protected:
+   /// This does not construct or destroy any elements in the vector.
    void set_size(size_t N) {
      assert(N <= capacity());
 -    Size = N;
@@ -75,7 +61,7 @@ index b8a11030fc33..602fcc5b7a98 100644
    }
  };
  
-@@ -263,7 +263,7 @@ public:
+@@ -259,7 +259,7 @@ public:
  
    size_type size_in_bytes() const { return size() * sizeof(T); }
    size_type max_size() const {
@@ -84,7 +70,7 @@ index b8a11030fc33..602fcc5b7a98 100644
    }
  
    size_t capacity_in_bytes() const { return capacity() * sizeof(T); }
-@@ -448,7 +448,7 @@ void SmallVectorTemplateBase<T, TriviallyCopyable>::takeAllocationForGrow(
+@@ -444,7 +444,7 @@ void SmallVectorTemplateBase<T, TriviallyCopyable>::takeAllocationForGrow(
      free(this->begin());
  
    this->BeginX = NewElts;
@@ -93,7 +79,7 @@ index b8a11030fc33..602fcc5b7a98 100644
  }
  
  /// SmallVectorTemplateBase<TriviallyCopyable = true> - This is where we put
-@@ -674,7 +674,7 @@ public:
+@@ -693,7 +693,7 @@ public:
      }
  
      // Assign over existing elements.
@@ -103,7 +89,7 @@ index b8a11030fc33..602fcc5b7a98 100644
        std::uninitialized_fill_n(this->end(), NumElts - this->size(), Elt);
      else if (NumElts < this->size())
 diff --git a/llvm/include/llvm/Support/ConvertUTF.h b/llvm/include/llvm/Support/ConvertUTF.h
-index 7f1527f51cdf..b085c8a179e8 100644
+index 7f1527f51..b085c8a17 100644
 --- a/llvm/include/llvm/Support/ConvertUTF.h
 +++ b/llvm/include/llvm/Support/ConvertUTF.h
 @@ -112,7 +112,7 @@ namespace llvm {
@@ -116,7 +102,7 @@ index 7f1527f51cdf..b085c8a179e8 100644
  /* Some fundamental constants */
  #define UNI_REPLACEMENT_CHAR (UTF32)0x0000FFFD
 diff --git a/llvm/include/llvm/Support/MathExtras.h b/llvm/include/llvm/Support/MathExtras.h
-index 753b1998c40c..db9fbc148ae3 100644
+index 753b1998c..db9fbc148 100644
 --- a/llvm/include/llvm/Support/MathExtras.h
 +++ b/llvm/include/llvm/Support/MathExtras.h
 @@ -97,7 +97,7 @@ template <typename T, std::size_t SizeOfT> struct TrailingZerosCounter {
@@ -208,10 +194,10 @@ index 753b1998c40c..db9fbc148ae3 100644
  
  } // End llvm namespace
 diff --git a/llvm/lib/Support/SmallVector.cpp b/llvm/lib/Support/SmallVector.cpp
-index 0005f7840912..26901fe97d20 100644
+index 8bad715e4..a2b4899e1 100644
 --- a/llvm/lib/Support/SmallVector.cpp
 +++ b/llvm/lib/Support/SmallVector.cpp
-@@ -95,7 +95,7 @@ static size_t getNewCapacity(size_t MinSize, size_t TSize, size_t OldCapacity) {
+@@ -104,7 +104,7 @@ static size_t getNewCapacity(size_t MinSize, size_t TSize, size_t OldCapacity) {
    // In theory 2*capacity can overflow if the capacity is 64 bit, but the
    // original capacity would never be large enough for this to be a problem.
    size_t NewCapacity = 2 * OldCapacity + 1; // Always grow.

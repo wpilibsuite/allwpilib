@@ -155,7 +155,7 @@ def overwrite_tests(wpiutil_root, llvm_root):
 
 def main():
     root, repo = setup_upstream_repo(
-        "https://github.com/llvm/llvm-project", "llvmorg-13.0.0"
+        "https://github.com/llvm/llvm-project", "llvmorg-14.0.6"
     )
     wpiutil = os.path.join(root, "wpiutil")
 
@@ -164,31 +164,32 @@ def main():
     frontend_patches = [
         os.path.join(patch_root, "0001-Fix-spelling-language-errors.patch"),
         os.path.join(patch_root, "0002-Remove-StringRef-ArrayRef-and-Optional.patch"),
-        os.path.join(patch_root, "0003-Wrap-std-min-max-calls-in-parens-for-windows-warning.patch"),
-        os.path.join(patch_root, "0004-Change-uniqe_function-storage-size.patch"),
+        os.path.join(patch_root, "0003-Wrap-std-min-max-calls-in-parens-for-Windows-warning.patch"),
+        os.path.join(patch_root, "0004-Change-unique_function-storage-size.patch"),
         os.path.join(patch_root, "0005-Threading-updates.patch"),
         os.path.join(patch_root, "0006-ifdef-guard-safety.patch"),
         os.path.join(patch_root, "0007-Explicitly-use-std.patch"),
         os.path.join(patch_root, "0008-Remove-format_provider.patch"),
-        os.path.join(patch_root, "0009-Add-compiler-warning-pragrams.patch"),
+        os.path.join(patch_root, "0009-Add-compiler-warning-pragmas.patch"),
         os.path.join(patch_root, "0010-Remove-unused-functions.patch"),
-        os.path.join(patch_root, "0011-Detemplatize-small-vector-base.patch"),
+        os.path.join(patch_root, "0011-Detemplatize-SmallVectorBase.patch"),
         os.path.join(patch_root, "0012-Add-vectors-to-raw_ostream.patch"),
         os.path.join(patch_root, "0013-Extra-collections-features.patch"),
-        os.path.join(patch_root, "0014-EpochTracker-abi-macro.patch"),
-        os.path.join(patch_root, "0015-Delete-numbers-from-mathextras.patch"),
+        os.path.join(patch_root, "0014-EpochTracker-ABI-macro.patch"),
+        os.path.join(patch_root, "0015-Delete-numbers-from-MathExtras.patch"),
         os.path.join(patch_root, "0016-Add-lerp-and-sgn.patch"),
         os.path.join(patch_root, "0017-Fixup-includes.patch"),
-        os.path.join(patch_root, "0018-use-std-is_trivially_copy_constructible.patch"),
-        os.path.join(patch_root, "0019-Windows-Support.patch"),
+        os.path.join(patch_root, "0018-Use-std-is_trivially_copy_constructible.patch"),
+        os.path.join(patch_root, "0019-Windows-support.patch"),
         os.path.join(patch_root, "0020-Prefer-fmtlib.patch"),
-        os.path.join(patch_root, "0021-prefer-wpi-s-fs.h.patch"),
+        os.path.join(patch_root, "0021-Prefer-wpi-s-fs.h.patch"),
         os.path.join(patch_root, "0022-Remove-unused-functions.patch"),
-        os.path.join(patch_root, "0023-Add-convienence-feature-to-SmallString.patch"),
-        os.path.join(patch_root, "0024-OS-specific-changes.patch"),
-        os.path.join(patch_root, "0025-Use-smallvector-for-UTF-conversion.patch"),
-        os.path.join(patch_root, "0026-Prefer-to-use-static-pointers-in-raw_ostream.patch"),
-        os.path.join(patch_root, "0027-constexpr-endian-byte-swap.patch"),
+        os.path.join(patch_root, "0023-OS-specific-changes.patch"),
+        os.path.join(patch_root, "0024-Use-SmallVector-for-UTF-conversion.patch"),
+        os.path.join(patch_root, "0025-Prefer-to-use-static-pointers-in-raw_ostream.patch"),
+        os.path.join(patch_root, "0026-constexpr-endian-byte-swap.patch"),
+        os.path.join(patch_root, "0027-Copy-type-traits-from-STLExtras.h-into-PointerUnion..patch"),
+        os.path.join(patch_root, "0028-Remove-StringMap-test-for-llvm-sort.patch"),
 
     ]
     # yapf: enable

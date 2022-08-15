@@ -1,14 +1,14 @@
-From bb8c33904fba6099ca17ddecd84fa20272c5a20c Mon Sep 17 00:00:00 2001
+From 907608f09061ab272b0a127330b1b24e28d50a9f Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Thu, 5 May 2022 18:09:45 -0400
-Subject: [PATCH 15/27] Delete numbers from mathextras
+Subject: [PATCH 15/28] Delete numbers from MathExtras
 
 ---
  llvm/include/llvm/Support/MathExtras.h | 36 --------------------------
  1 file changed, 36 deletions(-)
 
 diff --git a/llvm/include/llvm/Support/MathExtras.h b/llvm/include/llvm/Support/MathExtras.h
-index fac12dd0e4c6..e8f1f2aca610 100644
+index fac12dd0e..e8f1f2aca 100644
 --- a/llvm/include/llvm/Support/MathExtras.h
 +++ b/llvm/include/llvm/Support/MathExtras.h
 @@ -50,42 +50,6 @@ enum ZeroBehavior {

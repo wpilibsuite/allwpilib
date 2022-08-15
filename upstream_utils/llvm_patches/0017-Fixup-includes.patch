@@ -1,7 +1,7 @@
-From 8e868fdb545f3facb646418b5e127e360fe88a99 Mon Sep 17 00:00:00 2001
+From aa30b80d86cb0774efc094646339b54694ab8398 Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Sun, 8 May 2022 16:38:11 -0400
-Subject: [PATCH 17/27] Fixup includes
+Subject: [PATCH 17/28] Fixup includes
 
 ---
  llvm/include/llvm/ADT/StringMap.h                 |  4 ++++
@@ -16,12 +16,12 @@ Subject: [PATCH 17/27] Fixup includes
  9 files changed, 24 insertions(+), 10 deletions(-)
 
 diff --git a/llvm/include/llvm/ADT/StringMap.h b/llvm/include/llvm/ADT/StringMap.h
-index ac0d4b363145..f7bf5ad9c063 100644
+index 16f13f048..6ae0e39a1 100644
 --- a/llvm/include/llvm/ADT/StringMap.h
 +++ b/llvm/include/llvm/ADT/StringMap.h
-@@ -15,6 +15,10 @@
- 
+@@ -17,6 +17,10 @@
  #include "llvm/ADT/StringMapEntry.h"
+ #include "llvm/ADT/iterator.h"
  #include "llvm/Support/AllocatorBase.h"
 +#include "llvm/Support/MemAlloc.h"
 +#include "llvm/Support/SmallVector.h"
@@ -31,10 +31,10 @@ index ac0d4b363145..f7bf5ad9c063 100644
  #include <initializer_list>
  #include <iterator>
 diff --git a/llvm/include/llvm/ADT/StringMapEntry.h b/llvm/include/llvm/ADT/StringMapEntry.h
-index 93e13b5bb16c..cdf11d627200 100644
+index 39976a02b..cdefc5449 100644
 --- a/llvm/include/llvm/ADT/StringMapEntry.h
 +++ b/llvm/include/llvm/ADT/StringMapEntry.h
-@@ -15,6 +15,10 @@
+@@ -16,6 +16,10 @@
  #ifndef LLVM_ADT_STRINGMAPENTRY_H
  #define LLVM_ADT_STRINGMAPENTRY_H
  
@@ -46,7 +46,7 @@ index 93e13b5bb16c..cdf11d627200 100644
  #include <string_view>
  
 diff --git a/llvm/include/llvm/Support/PointerLikeTypeTraits.h b/llvm/include/llvm/Support/PointerLikeTypeTraits.h
-index 1b15f930bd87..acadd5e89a16 100644
+index 1b15f930b..acadd5e89 100644
 --- a/llvm/include/llvm/Support/PointerLikeTypeTraits.h
 +++ b/llvm/include/llvm/Support/PointerLikeTypeTraits.h
 @@ -16,6 +16,7 @@
@@ -58,7 +58,7 @@ index 1b15f930bd87..acadd5e89a16 100644
  
  namespace llvm {
 diff --git a/llvm/lib/Support/ConvertUTFWrapper.cpp b/llvm/lib/Support/ConvertUTFWrapper.cpp
-index 090ebb0f5af8..87da616b75d4 100644
+index 396ab0c65..cff30f16c 100644
 --- a/llvm/lib/Support/ConvertUTFWrapper.cpp
 +++ b/llvm/lib/Support/ConvertUTFWrapper.cpp
 @@ -8,6 +8,7 @@
@@ -70,7 +70,7 @@ index 090ebb0f5af8..87da616b75d4 100644
  #include "llvm/Support/SwapByteOrder.h"
  #include <string>
 diff --git a/llvm/lib/Support/ErrorHandling.cpp b/llvm/lib/Support/ErrorHandling.cpp
-index 9c0c6fb868f2..4b6ddd30c6e4 100644
+index f80e28e87..ec1a1633a 100644
 --- a/llvm/lib/Support/ErrorHandling.cpp
 +++ b/llvm/lib/Support/ErrorHandling.cpp
 @@ -28,12 +28,11 @@
@@ -90,20 +90,20 @@ index 9c0c6fb868f2..4b6ddd30c6e4 100644
  
  using namespace llvm;
 diff --git a/llvm/lib/Support/raw_ostream.cpp b/llvm/lib/Support/raw_ostream.cpp
-index 27bba0ca2f06..6b9e5f9e44bd 100644
+index 95152849c..878a3a5e9 100644
 --- a/llvm/lib/Support/raw_ostream.cpp
 +++ b/llvm/lib/Support/raw_ostream.cpp
 @@ -15,7 +15,8 @@
  #endif
  
  #include "llvm/Support/raw_ostream.h"
--#include "llvm/ADT/STLExtras.h"
+-#include "llvm/ADT/STLArrayExtras.h"
 +#include "wpi/SmallString.h"
 +#include "wpi/SmallVector.h"
  #include "llvm/ADT/StringExtras.h"
  #include "llvm/Config/config.h"
  #include "llvm/Support/Compiler.h"
-@@ -35,12 +36,11 @@
+@@ -33,12 +34,11 @@
  #include <sys/stat.h>
  
  // <fcntl.h> may provide O_BINARY.
@@ -119,7 +119,7 @@ index 27bba0ca2f06..6b9e5f9e44bd 100644
  #endif
  
  #if defined(__CYGWIN__)
-@@ -62,7 +62,7 @@
+@@ -60,7 +60,7 @@
  
  #ifdef _WIN32
  #include "llvm/Support/ConvertUTF.h"
@@ -129,7 +129,7 @@ index 27bba0ca2f06..6b9e5f9e44bd 100644
  
  using namespace llvm;
 diff --git a/llvm/unittests/ADT/SmallPtrSetTest.cpp b/llvm/unittests/ADT/SmallPtrSetTest.cpp
-index 531f81ab5b3f..3db8b6e37d31 100644
+index 531f81ab5..3db8b6e37 100644
 --- a/llvm/unittests/ADT/SmallPtrSetTest.cpp
 +++ b/llvm/unittests/ADT/SmallPtrSetTest.cpp
 @@ -15,6 +15,8 @@
@@ -142,7 +142,7 @@ index 531f81ab5b3f..3db8b6e37d31 100644
  
  TEST(SmallPtrSetTest, Assignment) {
 diff --git a/llvm/unittests/ADT/StringMapTest.cpp b/llvm/unittests/ADT/StringMapTest.cpp
-index 081b699adee3..64bb8f85c4b9 100644
+index 6d0c0942c..de6daf3da 100644
 --- a/llvm/unittests/ADT/StringMapTest.cpp
 +++ b/llvm/unittests/ADT/StringMapTest.cpp
 @@ -9,6 +9,7 @@
@@ -154,7 +154,7 @@ index 081b699adee3..64bb8f85c4b9 100644
  #include <tuple>
  using namespace llvm;
 diff --git a/llvm/unittests/Support/ConvertUTFTest.cpp b/llvm/unittests/Support/ConvertUTFTest.cpp
-index 9c798437a12d..2fee8ad5c012 100644
+index 9c798437a..2fee8ad5c 100644
 --- a/llvm/unittests/Support/ConvertUTFTest.cpp
 +++ b/llvm/unittests/Support/ConvertUTFTest.cpp
 @@ -7,6 +7,8 @@

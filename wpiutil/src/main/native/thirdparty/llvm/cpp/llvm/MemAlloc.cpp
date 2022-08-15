@@ -7,6 +7,7 @@
 //===----------------------------------------------------------------------===//
 
 #include "wpi/MemAlloc.h"
+#include <new>
 
 // These are out of line to have __cpp_aligned_new not affect ABI.
 

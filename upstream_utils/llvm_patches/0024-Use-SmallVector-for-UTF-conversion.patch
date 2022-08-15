@@ -1,7 +1,7 @@
-From fa16120af5f965c13bd7b75a2e591cd250fad5fa Mon Sep 17 00:00:00 2001
+From f58b9bad86f61c35cc530ff113ccbb13415261c8 Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Mon, 9 May 2022 00:04:30 -0400
-Subject: [PATCH 25/27] Use smallvector for UTF conversion
+Subject: [PATCH 24/28] Use SmallVector for UTF conversion
 
 ---
  llvm/include/llvm/Support/ConvertUTF.h    |  6 +++---
@@ -10,7 +10,7 @@ Subject: [PATCH 25/27] Use smallvector for UTF conversion
  3 files changed, 17 insertions(+), 17 deletions(-)
 
 diff --git a/llvm/include/llvm/Support/ConvertUTF.h b/llvm/include/llvm/Support/ConvertUTF.h
-index b085c8a179e8..c82947006afb 100644
+index b085c8a17..c82947006 100644
 --- a/llvm/include/llvm/Support/ConvertUTF.h
 +++ b/llvm/include/llvm/Support/ConvertUTF.h
 @@ -213,7 +213,7 @@ bool ConvertUTF8toWide(const char *Source, std::wstring &Result);
@@ -41,7 +41,7 @@ index b085c8a179e8..c82947006afb 100644
  /**
   * Converts a UTF-8 string into a UTF-16 string with native endianness.
 diff --git a/llvm/lib/Support/ConvertUTFWrapper.cpp b/llvm/lib/Support/ConvertUTFWrapper.cpp
-index 87da616b75d4..c6c52d25adb1 100644
+index cff30f16c..d3689d92a 100644
 --- a/llvm/lib/Support/ConvertUTFWrapper.cpp
 +++ b/llvm/lib/Support/ConvertUTFWrapper.cpp
 @@ -84,7 +84,7 @@ bool hasUTF16ByteOrderMark(span<const char> S) {
@@ -72,7 +72,7 @@ index 87da616b75d4..c6c52d25adb1 100644
      const UTF8 *Start = reinterpret_cast<const UTF8 *>(Source.data());
      const UTF8 *End =
 diff --git a/llvm/unittests/Support/ConvertUTFTest.cpp b/llvm/unittests/Support/ConvertUTFTest.cpp
-index 2fee8ad5c012..bbdc041cf1d1 100644
+index 2fee8ad5c..7d7650b1c 100644
 --- a/llvm/unittests/Support/ConvertUTFTest.cpp
 +++ b/llvm/unittests/Support/ConvertUTFTest.cpp
 @@ -19,22 +19,22 @@ TEST(ConvertUTFTest, ConvertUTF16LittleEndianToUTF8String) {
@@ -85,7 +85,7 @@ index 2fee8ad5c012..bbdc041cf1d1 100644
    EXPECT_TRUE(Success);
    std::string Expected("\xe0\xb2\xa0_\xe0\xb2\xa0");
 -  EXPECT_EQ(Expected, Result);
-+  EXPECT_EQ(Expected, Result.string());
++  EXPECT_EQ(Expected, std::string{Result});
  }
  
  TEST(ConvertUTFTest, ConvertUTF16BigEndianToUTF8String) {
@@ -98,7 +98,7 @@ index 2fee8ad5c012..bbdc041cf1d1 100644
    EXPECT_TRUE(Success);
    std::string Expected("\xe0\xb2\xa0_\xe0\xb2\xa0");
 -  EXPECT_EQ(Expected, Result);
-+  EXPECT_EQ(Expected, Result.string());
++  EXPECT_EQ(Expected, std::string{Result});
  }
  
  TEST(ConvertUTFTest, ConvertUTF8ToUTF16String) {
@@ -118,7 +118,7 @@ index 2fee8ad5c012..bbdc041cf1d1 100644
    bool Success = convertUTF16ToUTF8String(span<const char>(), Result);
    EXPECT_TRUE(Success);
 -  EXPECT_TRUE(Result.empty());
-+  EXPECT_TRUE(Result.string().empty());
++  EXPECT_TRUE(std::string{Result}.empty());
  }
  
  TEST(ConvertUTFTest, HasUTF16BOM) {
@@ -132,7 +132,7 @@ index 2fee8ad5c012..bbdc041cf1d1 100644
    EXPECT_TRUE(Success);
    std::string Expected("\xe0\xb2\xa0_\xe0\xb2\xa0");
 -  EXPECT_EQ(Expected, Result);
-+  EXPECT_EQ(Expected, Result.string());
++  EXPECT_EQ(Expected, std::string{Result});
  }
  
  TEST(ConvertUTFTest, ConvertUTF8toWide) {
@@ -146,7 +146,7 @@ index 2fee8ad5c012..bbdc041cf1d1 100644
    EXPECT_TRUE(Success);
    std::string Expected("\xe0\xb2\xa0_\xe0\xb2\xa0");
 -  EXPECT_EQ(Expected, Result);
-+  EXPECT_EQ(Expected, Result.string());
++  EXPECT_EQ(Expected, std::string{Result});
  }
  
  struct ConvertUTFResultContainer {

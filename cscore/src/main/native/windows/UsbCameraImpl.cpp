@@ -1098,13 +1098,13 @@ std::vector<UsbCameraInfo> EnumerateUsbCameras(CS_Status* status) {
                             sizeof(buf) / sizeof(WCHAR), &characters);
     storage.clear();
     wpi::sys::windows::UTF16ToUTF8(buf, characters, storage);
-    info.name = storage.string();
+    info.name = std::string{storage};
     ppDevices[i]->GetString(
         MF_DEVSOURCE_ATTRIBUTE_SOURCE_TYPE_VIDCAP_SYMBOLIC_LINK, buf,
         sizeof(buf) / sizeof(WCHAR), &characters);
     storage.clear();
     wpi::sys::windows::UTF16ToUTF8(buf, characters, storage);
-    info.path = storage.string();
+    info.path = std::string{storage};
 
     // Try to parse path from symbolic link
     ParseVidAndPid(info.path, &info.productId, &info.vendorId);

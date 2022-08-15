@@ -1,21 +1,21 @@
-From 1354697da0c8661ef6030eb6355a680bbed7b752 Mon Sep 17 00:00:00 2001
+From df2dc9fdb3d57e01423104a71a6a1d1d6382644a Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Sun, 8 May 2022 13:43:50 -0400
-Subject: [PATCH 10/27] Remove unused functions
+Subject: [PATCH 10/28] Remove unused functions
 
 ---
  llvm/include/llvm/ADT/SmallString.h      |  80 ------
  llvm/include/llvm/Support/Errno.h        |   9 -
- llvm/include/llvm/Support/VersionTuple.h |  33 ---
+ llvm/include/llvm/Support/VersionTuple.h |  40 ---
  llvm/include/llvm/Support/raw_ostream.h  | 115 +-------
- llvm/lib/Support/raw_ostream.cpp         | 327 -----------------------
- 5 files changed, 8 insertions(+), 556 deletions(-)
+ llvm/lib/Support/raw_ostream.cpp         | 328 -----------------------
+ 5 files changed, 8 insertions(+), 564 deletions(-)
 
 diff --git a/llvm/include/llvm/ADT/SmallString.h b/llvm/include/llvm/ADT/SmallString.h
-index 8112741dd01d..85987811f3c4 100644
+index 50cbdade4..bfa965fd6 100644
 --- a/llvm/include/llvm/ADT/SmallString.h
 +++ b/llvm/include/llvm/ADT/SmallString.h
-@@ -86,48 +86,12 @@ public:
+@@ -88,48 +88,12 @@ public:
    /// @name String Comparison
    /// @{
  
@@ -64,7 +64,7 @@ index 8112741dd01d..85987811f3c4 100644
    /// @}
    /// @name String Searching
    /// @{
-@@ -208,50 +172,6 @@ public:
+@@ -210,50 +174,6 @@ public:
    }
  
    /// @}
@@ -116,7 +116,7 @@ index 8112741dd01d..85987811f3c4 100644
    // Extra methods.
  
 diff --git a/llvm/include/llvm/Support/Errno.h b/llvm/include/llvm/Support/Errno.h
-index 07df6765d9db..d9bf68bb369e 100644
+index 07df6765d..d9bf68bb3 100644
 --- a/llvm/include/llvm/Support/Errno.h
 +++ b/llvm/include/llvm/Support/Errno.h
 @@ -20,15 +20,6 @@
@@ -136,16 +136,30 @@ index 07df6765d9db..d9bf68bb369e 100644
  inline decltype(auto) RetryAfterSignal(const FailT &Fail, const Fun &F,
                                         const Args &... As) {
 diff --git a/llvm/include/llvm/Support/VersionTuple.h b/llvm/include/llvm/Support/VersionTuple.h
-index 85f4f1a707c7..a28e12adcc25 100644
+index 3d6573bf5..a28e12adc 100644
 --- a/llvm/include/llvm/Support/VersionTuple.h
 +++ b/llvm/include/llvm/Support/VersionTuple.h
-@@ -158,39 +158,6 @@ public:
+@@ -16,7 +16,6 @@
+ 
+ #include "llvm/ADT/DenseMapInfo.h"
+ #include "llvm/ADT/Hashing.h"
+-#include "llvm/Support/HashBuilder.h"
+ #include <optional>
+ #include <string>
+ #include <tuple>
+@@ -159,45 +158,6 @@ public:
    friend bool operator>=(const VersionTuple &X, const VersionTuple &Y) {
      return !(X < Y);
    }
 -
 -  friend llvm::hash_code hash_value(const VersionTuple &VT) {
 -    return llvm::hash_combine(VT.Major, VT.Minor, VT.Subminor, VT.Build);
+-  }
+-
+-  template <typename HasherT, llvm::support::endianness Endianness>
+-  friend void addHash(HashBuilderImpl<HasherT, Endianness> &HBuilder,
+-                      const VersionTuple &VT) {
+-    HBuilder.add(VT.Major, VT.Minor, VT.Subminor, VT.Build);
 -  }
 -
 -  /// Retrieve a string representation of the version number.
@@ -180,10 +194,10 @@ index 85f4f1a707c7..a28e12adcc25 100644
  
  } // end namespace llvm
 diff --git a/llvm/include/llvm/Support/raw_ostream.h b/llvm/include/llvm/Support/raw_ostream.h
-index 94d0ed66eced..50443e018aaf 100644
+index a25ca5b7b..d4521c8e2 100644
 --- a/llvm/include/llvm/Support/raw_ostream.h
 +++ b/llvm/include/llvm/Support/raw_ostream.h
-@@ -249,32 +249,6 @@ public:
+@@ -248,32 +248,6 @@ public:
      return write(Str.data(), Str.size());
    }
  
@@ -216,7 +230,7 @@ index 94d0ed66eced..50443e018aaf 100644
    /// Output \p Str, turning '\\', '\t', '\n', '"', and anything that doesn't
    /// satisfy llvm::isPrint into an escape sequence.
    raw_ostream &write_escaped(std::string_view Str, bool UseHexEscapes = false);
-@@ -282,21 +256,6 @@ public:
+@@ -281,21 +255,6 @@ public:
    raw_ostream &write(unsigned char C);
    raw_ostream &write(const char *Ptr, size_t Size);
  
@@ -238,7 +252,7 @@ index 94d0ed66eced..50443e018aaf 100644
    /// indent - Insert 'NumSpaces' spaces.
    raw_ostream &indent(unsigned NumSpaces);
  
-@@ -311,14 +270,19 @@ public:
+@@ -310,14 +269,19 @@ public:
    /// @param BG if true change the background, default: change foreground
    /// @returns itself so it can be used within << invocations
    virtual raw_ostream &changeColor(enum Colors Color, bool Bold = false,
@@ -261,7 +275,7 @@ index 94d0ed66eced..50443e018aaf 100644
  
    /// This function determines if this stream is connected to a "tty" or
    /// "console" window. That is, the output would be displayed to the user
-@@ -391,10 +355,6 @@ private:
+@@ -392,10 +356,6 @@ private:
    /// unused bytes in the buffer.
    void copy_to_buffer(const char *Ptr, size_t Size);
  
@@ -272,15 +286,15 @@ index 94d0ed66eced..50443e018aaf 100644
    /// Flush the tied-to stream (if present) and then write the required data.
    void flush_tied_then_write(const char *Ptr, size_t Size);
  
-@@ -445,7 +405,6 @@ class raw_fd_ostream : public raw_pwrite_stream {
-   int FD;
+@@ -447,7 +407,6 @@ class raw_fd_ostream : public raw_pwrite_stream {
    bool ShouldClose;
    bool SupportsSeeking = false;
--  mutable Optional<bool> HasColors;
+   bool IsRegularFile = false;
+-  mutable std::optional<bool> HasColors;
  
  #ifdef _WIN32
    /// True if this fd refers to a Windows console device. Mintty and other
-@@ -519,10 +478,6 @@ public:
+@@ -523,10 +482,6 @@ public:
    /// to the offset specified from the beginning of the file.
    uint64_t seek(uint64_t off);
  
@@ -291,7 +305,7 @@ index 94d0ed66eced..50443e018aaf 100644
    std::error_code error() const { return EC; }
  
    /// Return the value of the flag in this raw_fd_ostream indicating whether an
-@@ -541,38 +496,6 @@ public:
+@@ -545,38 +500,6 @@ public:
    ///      - from The Zen of Python, by Tim Peters
    ///
    void clear_error() { EC = std::error_code(); }
@@ -326,11 +340,11 @@ index 94d0ed66eced..50443e018aaf 100644
 -  ///
 -  /// It is used as @ref lock.
 -  LLVM_NODISCARD
--  Expected<sys::fs::FileLocker> tryLockFor(std::chrono::milliseconds Timeout);
+-  Expected<sys::fs::FileLocker> tryLockFor(Duration const& Timeout);
  };
  
  /// This returns a reference to a raw_fd_ostream for standard output. Use it
-@@ -602,17 +525,6 @@ public:
+@@ -606,17 +529,6 @@ public:
    /// immediately destroyed.
    raw_fd_stream(std::string_view Filename, std::error_code &EC);
  
@@ -348,7 +362,7 @@ index 94d0ed66eced..50443e018aaf 100644
    /// Check if \p OS is a pointer of type raw_fd_stream*.
    static bool classof(const raw_ostream *OS);
  };
-@@ -726,17 +638,6 @@ public:
+@@ -734,17 +646,6 @@ public:
    ~buffer_unique_ostream() override { *OS << str(); }
  };
  
@@ -367,10 +381,18 @@ index 94d0ed66eced..50443e018aaf 100644
  
  #endif // LLVM_SUPPORT_RAW_OSTREAM_H
 diff --git a/llvm/lib/Support/raw_ostream.cpp b/llvm/lib/Support/raw_ostream.cpp
-index bff7b6c9a77b..611043dc5925 100644
+index ee01a9522..875eda7ba 100644
 --- a/llvm/lib/Support/raw_ostream.cpp
 +++ b/llvm/lib/Support/raw_ostream.cpp
-@@ -121,49 +121,6 @@ void raw_ostream::SetBufferAndMode(char *BufferStart, size_t Size,
+@@ -19,7 +19,6 @@
+ #include "llvm/ADT/StringExtras.h"
+ #include "llvm/Config/config.h"
+ #include "llvm/Support/Compiler.h"
+-#include "llvm/Support/Duration.h"
+ #include "llvm/Support/ErrorHandling.h"
+ #include "llvm/Support/FileSystem.h"
+ #include "llvm/Support/Format.h"
+@@ -120,49 +119,6 @@ void raw_ostream::SetBufferAndMode(char *BufferStart, size_t Size,
    assert(OutBufStart <= OutBufEnd && "Invalid size!");
  }
  
@@ -420,7 +442,7 @@ index bff7b6c9a77b..611043dc5925 100644
  raw_ostream &raw_ostream::write_escaped(std::string_view Str,
                                          bool UseHexEscapes) {
    for (unsigned char c : Str) {
-@@ -309,172 +266,6 @@ void raw_ostream::flush_tied_then_write(const char *Ptr, size_t Size) {
+@@ -308,172 +264,6 @@ void raw_ostream::flush_tied_then_write(const char *Ptr, size_t Size) {
    write_impl(Ptr, Size);
  }
  
@@ -593,7 +615,7 @@ index bff7b6c9a77b..611043dc5925 100644
  
  template <char C>
  static raw_ostream &write_padding(raw_ostream &OS, unsigned NumChars) {
-@@ -507,63 +298,8 @@ raw_ostream &raw_ostream::write_zeros(unsigned NumZeros) {
+@@ -506,63 +296,8 @@ raw_ostream &raw_ostream::write_zeros(unsigned NumZeros) {
    return write_padding<'\0'>(*this, NumZeros);
  }
  
@@ -657,7 +679,7 @@ index bff7b6c9a77b..611043dc5925 100644
  //===----------------------------------------------------------------------===//
  //  raw_fd_ostream
  //===----------------------------------------------------------------------===//
-@@ -854,31 +590,6 @@ size_t raw_fd_ostream::preferred_buffer_size() const {
+@@ -854,31 +589,6 @@ size_t raw_fd_ostream::preferred_buffer_size() const {
  #endif
  }
  
@@ -679,8 +701,8 @@ index bff7b6c9a77b..611043dc5925 100644
 -}
 -
 -Expected<sys::fs::FileLocker>
--raw_fd_ostream::tryLockFor(std::chrono::milliseconds Timeout) {
--  std::error_code EC = sys::fs::tryLockFile(FD, Timeout);
+-raw_fd_ostream::tryLockFor(Duration const& Timeout) {
+-  std::error_code EC = sys::fs::tryLockFile(FD, Timeout.getDuration());
 -  if (!EC)
 -    return sys::fs::FileLocker(FD);
 -  return errorCodeToError(EC);
@@ -689,7 +711,7 @@ index bff7b6c9a77b..611043dc5925 100644
  void raw_fd_ostream::anchor() {}
  
  //===----------------------------------------------------------------------===//
-@@ -922,16 +633,6 @@ raw_fd_stream::raw_fd_stream(std::string_view Filename, std::error_code &EC)
+@@ -921,16 +631,6 @@ raw_fd_stream::raw_fd_stream(std::string_view Filename, std::error_code &EC)
      EC = std::make_error_code(std::errc::invalid_argument);
  }
  
@@ -706,7 +728,7 @@ index bff7b6c9a77b..611043dc5925 100644
  bool raw_fd_stream::classof(const raw_ostream *OS) {
    return OS->get_kind() == OStreamKind::OK_FDStream;
  }
-@@ -991,31 +692,3 @@ void raw_pwrite_stream::anchor() {}
+@@ -986,31 +686,3 @@ void raw_pwrite_stream::anchor() {}
  void buffer_ostream::anchor() {}
  
  void buffer_unique_ostream::anchor() {}

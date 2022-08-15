@@ -1,10 +1,10 @@
-From a55cc2394a9fca533d8d07e3b61e47fedb99cd1b Mon Sep 17 00:00:00 2001
+From 2c53d8ac36f378fda347f36ef2bc7fbc2038cb93 Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Sun, 8 May 2022 13:34:07 -0400
-Subject: [PATCH 09/27] Add compiler warning pragrams
+Subject: [PATCH 09/28] Add compiler warning pragmas
 
 ---
- llvm/include/llvm/ADT/FunctionExtras.h | 10 ++++++++++
+ llvm/include/llvm/ADT/FunctionExtras.h | 11 +++++++++++
  llvm/include/llvm/ADT/Hashing.h        |  9 +++++++++
  llvm/include/llvm/ADT/SmallVector.h    |  8 ++++++++
  llvm/include/llvm/Support/MathExtras.h |  9 +++++++++
@@ -14,26 +14,27 @@ Subject: [PATCH 09/27] Add compiler warning pragrams
  llvm/unittests/ADT/MapVectorTest.cpp   |  7 +++++++
  llvm/unittests/ADT/SmallVectorTest.cpp |  4 ++++
  llvm/unittests/Support/AlignOfTest.cpp |  7 +++----
- 10 files changed, 71 insertions(+), 4 deletions(-)
+ 10 files changed, 72 insertions(+), 4 deletions(-)
 
 diff --git a/llvm/include/llvm/ADT/FunctionExtras.h b/llvm/include/llvm/ADT/FunctionExtras.h
-index 1a26cb702cae..3b834236b8fa 100644
+index 8a9d78f41..3efa73587 100644
 --- a/llvm/include/llvm/ADT/FunctionExtras.h
 +++ b/llvm/include/llvm/ADT/FunctionExtras.h
-@@ -54,6 +54,12 @@ namespace llvm {
+@@ -55,6 +55,13 @@ namespace llvm {
  ///   It can hold functions with a non-const operator(), like mutable lambdas.
  template <typename FunctionT> class unique_function;
  
 +// GCC warns on OutOfLineStorage
 +#if defined(__GNUC__) && !defined(__clang__)
 +#pragma GCC diagnostic push
++#pragma GCC diagnostic ignored "-Warray-bounds"
 +#pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
 +#endif
 +
  namespace detail {
  
  template <typename T>
-@@ -405,6 +411,10 @@ public:
+@@ -411,6 +418,10 @@ public:
    }
  };
  
@@ -45,7 +46,7 @@ index 1a26cb702cae..3b834236b8fa 100644
  
  #endif // LLVM_ADT_FUNCTIONEXTRAS_H
 diff --git a/llvm/include/llvm/ADT/Hashing.h b/llvm/include/llvm/ADT/Hashing.h
-index e296c1c53ebd..8f90b4214b92 100644
+index 74a87a3d8..47ff1b2bc 100644
 --- a/llvm/include/llvm/ADT/Hashing.h
 +++ b/llvm/include/llvm/ADT/Hashing.h
 @@ -55,6 +55,11 @@
@@ -58,9 +59,9 @@ index e296c1c53ebd..8f90b4214b92 100644
 +#endif
 +
  namespace llvm {
+ template <typename T, typename Enable> struct DenseMapInfo;
  
- /// An opaque object representing a hash code.
-@@ -679,4 +684,8 @@ hash_code hash_value(const std::basic_string<T> &arg) {
+@@ -687,4 +692,8 @@ template <> struct DenseMapInfo<hash_code, void> {
  
  } // namespace llvm
  
@@ -70,10 +71,10 @@ index e296c1c53ebd..8f90b4214b92 100644
 +
  #endif
 diff --git a/llvm/include/llvm/ADT/SmallVector.h b/llvm/include/llvm/ADT/SmallVector.h
-index 602fcc5b7a98..690d512a43c8 100644
+index 8686f7bb5..1e311ea56 100644
 --- a/llvm/include/llvm/ADT/SmallVector.h
 +++ b/llvm/include/llvm/ADT/SmallVector.h
-@@ -13,6 +13,14 @@
+@@ -14,6 +14,14 @@
  #ifndef LLVM_ADT_SMALLVECTOR_H
  #define LLVM_ADT_SMALLVECTOR_H
  
@@ -85,11 +86,11 @@ index 602fcc5b7a98..690d512a43c8 100644
 +#pragma GCC diagnostic warning "-Wclass-memaccess"
 +#endif
 +
- #include "llvm/ADT/iterator_range.h"
  #include "llvm/Support/Compiler.h"
- #include "llvm/Support/ErrorHandling.h"
+ #include "llvm/Support/type_traits.h"
+ #include <algorithm>
 diff --git a/llvm/include/llvm/Support/MathExtras.h b/llvm/include/llvm/Support/MathExtras.h
-index da843ef79ff9..fac12dd0e4c6 100644
+index da843ef79..fac12dd0e 100644
 --- a/llvm/include/llvm/Support/MathExtras.h
 +++ b/llvm/include/llvm/Support/MathExtras.h
 @@ -435,6 +435,11 @@ inline uint64_t maxUIntN(uint64_t N) {
@@ -116,7 +117,7 @@ index da843ef79ff9..fac12dd0e4c6 100644
  inline int64_t maxIntN(int64_t N) {
    assert(N > 0 && N <= 64 && "integer width out of range");
 diff --git a/llvm/include/llvm/Support/MemAlloc.h b/llvm/include/llvm/Support/MemAlloc.h
-index d6012bd5a698..01007deb89bb 100644
+index d6012bd5a..01007deb8 100644
 --- a/llvm/include/llvm/Support/MemAlloc.h
 +++ b/llvm/include/llvm/Support/MemAlloc.h
 @@ -22,6 +22,14 @@
@@ -145,7 +146,7 @@ index d6012bd5a698..01007deb89bb 100644
 +
  #endif
 diff --git a/llvm/lib/Support/raw_ostream.cpp b/llvm/lib/Support/raw_ostream.cpp
-index 306cc981ed8f..bff7b6c9a77b 100644
+index e4c318eb8..ee01a9522 100644
 --- a/llvm/lib/Support/raw_ostream.cpp
 +++ b/llvm/lib/Support/raw_ostream.cpp
 @@ -10,6 +10,10 @@
@@ -157,10 +158,10 @@ index 306cc981ed8f..bff7b6c9a77b 100644
 +#endif
 +
  #include "llvm/Support/raw_ostream.h"
- #include "llvm/ADT/STLExtras.h"
+ #include "llvm/ADT/STLArrayExtras.h"
  #include "llvm/ADT/StringExtras.h"
 diff --git a/llvm/unittests/ADT/DenseMapTest.cpp b/llvm/unittests/ADT/DenseMapTest.cpp
-index a122f1fe3bdf..123012a3118d 100644
+index e505b1907..9fe83a45d 100644
 --- a/llvm/unittests/ADT/DenseMapTest.cpp
 +++ b/llvm/unittests/ADT/DenseMapTest.cpp
 @@ -6,6 +6,10 @@
@@ -175,7 +176,7 @@ index a122f1fe3bdf..123012a3118d 100644
  #include "gtest/gtest.h"
  #include <map>
 diff --git a/llvm/unittests/ADT/MapVectorTest.cpp b/llvm/unittests/ADT/MapVectorTest.cpp
-index 552f9956bdc2..20ebcd753bcc 100644
+index 552f9956b..20ebcd753 100644
 --- a/llvm/unittests/ADT/MapVectorTest.cpp
 +++ b/llvm/unittests/ADT/MapVectorTest.cpp
 @@ -6,6 +6,13 @@
@@ -193,7 +194,7 @@ index 552f9956bdc2..20ebcd753bcc 100644
  #include "llvm/ADT/iterator_range.h"
  #include "gtest/gtest.h"
 diff --git a/llvm/unittests/ADT/SmallVectorTest.cpp b/llvm/unittests/ADT/SmallVectorTest.cpp
-index 1914f38fac6c..387229c32d5a 100644
+index fe827546a..0e68bad6c 100644
 --- a/llvm/unittests/ADT/SmallVectorTest.cpp
 +++ b/llvm/unittests/ADT/SmallVectorTest.cpp
 @@ -17,6 +17,10 @@
@@ -208,7 +209,7 @@ index 1914f38fac6c..387229c32d5a 100644
  
  namespace {
 diff --git a/llvm/unittests/Support/AlignOfTest.cpp b/llvm/unittests/Support/AlignOfTest.cpp
-index f84895c18602..6a50205b143b 100644
+index f84895c18..6a50205b1 100644
 --- a/llvm/unittests/Support/AlignOfTest.cpp
 +++ b/llvm/unittests/Support/AlignOfTest.cpp
 @@ -31,10 +31,9 @@ namespace {
