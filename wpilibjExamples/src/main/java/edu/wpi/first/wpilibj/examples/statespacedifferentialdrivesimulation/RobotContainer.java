@@ -47,6 +47,9 @@ public class RobotContainer {
     m_robotDrive.setDefaultCommand(
         // A split-stick arcade command, with forward/backward controlled by the left
         // hand, and turning controlled by the right.
+        // If you are using the keyboard as a joystick, it is recommended that you go
+        // to the following link to read about editing the keyboard settings.
+        // https://docs.wpilib.org/en/stable/docs/software/wpilib-tools/robot-simulation/simulation-gui.html#using-the-keyboard-as-a-joystick
         new RunCommand(
             () ->
                 m_robotDrive.arcadeDrive(

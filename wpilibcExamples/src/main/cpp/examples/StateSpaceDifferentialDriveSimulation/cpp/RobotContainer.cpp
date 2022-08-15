@@ -26,6 +26,11 @@ RobotContainer::RobotContainer() {
   ConfigureButtonBindings();
 
   // Set up default drive command
+  // A split-stick arcade command, with forward/backward controlled by the left
+  // hand, and turning controlled by the right.
+  // If you are using the keyboard as a joystick, it is recommended that you go
+  // to the following link to read about editing the keyboard settings.
+  // https://docs.wpilib.org/en/stable/docs/software/wpilib-tools/robot-simulation/simulation-gui.html#using-the-keyboard-as-a-joystick
   m_drive.SetDefaultCommand(frc2::RunCommand(
       [this] {
         m_drive.ArcadeDrive(-m_driverController.GetLeftY(),
