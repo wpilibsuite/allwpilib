@@ -43,6 +43,16 @@ nativeUtils.platformConfigs.each {
     }
 }
 
+// Suppress OpenCV warning
+// https://github.com/opencv/opencv/issues/20269
+nativeUtils.platformConfigs.each {
+    if (it.name == 'linuxx86-64') {
+        it.cppCompiler.args.add("-Wno-deprecated-enum-enum-conversion")
+    } else if (it.name == 'osxx86-64' || it.name == 'osxarm64') {
+        it.cppCompiler.args.add("-Wno-deprecated-anon-enum-enum-conversion")
+    }
+}
+
 nativeUtils.platformConfigs.linuxathena.linker.args.add("-Wl,--fatal-warnings")
 
 model {
