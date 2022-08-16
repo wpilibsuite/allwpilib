@@ -73,4 +73,26 @@ class UnitsTest extends UtilityClassTest<Units> {
   void lbsToKilogramsTest() {
     assertEquals(0.453592, Units.lbsToKilograms(1), 1e-2);
   }
+
+  @Test
+  void falconCountsToDegreesTest() {
+    assertEquals(0.175781, Units.falconCountsToDegrees(1), 1e-3);
+  }
+
+  @Test
+  void degreesToFalconCountsTest() {
+    assertEquals(5.68889, Units.degreesToFalconCounts(1), 1e-2);
+  }
+
+  @Test
+  void falconVelocityToRPMTest() {
+    assertEquals(0.292969, Units.falconVelocityToRPM(1), 1e-3);
+  }
+
+  @Test
+  void rpmToFalconVelocityTest() {
+    assertEquals(3.41333, Units.rpmToFalconVelocity(1), 1e-2);
+  }
+  
+
 }
