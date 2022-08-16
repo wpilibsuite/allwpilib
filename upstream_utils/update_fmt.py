@@ -12,7 +12,7 @@ from upstream_utils import (
 
 
 def main():
-    root, repo = setup_upstream_repo("https://github.com/fmtlib/fmt", "8.1.1")
+    root, repo = setup_upstream_repo("https://github.com/fmtlib/fmt", "9.0.0")
     wpiutil = os.path.join(root, "wpiutil")
 
     # Apply patches to original git repo

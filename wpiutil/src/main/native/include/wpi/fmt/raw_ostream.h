@@ -22,7 +22,7 @@ inline void vprint(wpi::raw_ostream& os, string_view format_str,
  */
 template <typename S, typename... Args>
 void print(wpi::raw_ostream& os, const S& format_str, Args&&... args) {
-  vprint(os, format_str, fmt::make_args_checked<Args...>(format_str, args...));
+  vprint(os, format_str, fmt::make_format_args(args...));
 }
 
 FMT_END_NAMESPACE

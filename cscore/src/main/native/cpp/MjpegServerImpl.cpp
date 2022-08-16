@@ -495,7 +495,7 @@ void MjpegServerImpl::ConnThread::SendJSON(wpi::raw_ostream& os,
     auto kind = source.GetPropertyKind(prop);
     fmt::print(os, "\n\"name\": \"{}\"", name);
     fmt::print(os, ",\n\"id\": \"{}\"", prop);
-    fmt::print(os, ",\n\"type\": \"{}\"", kind);
+    fmt::print(os, ",\n\"type\": \"{}\"", static_cast<int>(kind));
     fmt::print(os, ",\n\"min\": \"{}\"", source.GetPropertyMin(prop, &status));
     fmt::print(os, ",\n\"max\": \"{}\"", source.GetPropertyMax(prop, &status));
     fmt::print(os, ",\n\"step\": \"{}\"",

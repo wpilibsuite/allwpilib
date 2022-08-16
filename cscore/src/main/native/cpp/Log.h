@@ -21,7 +21,7 @@ inline void NamedLog(wpi::Logger& logger, unsigned int level, const char* file,
                      Args&&... args) {
   if (logger.HasLogger() && level >= logger.min_level()) {
     NamedLogV(logger, level, file, line, name, format,
-              fmt::make_args_checked<Args...>(format, args...));
+              fmt::make_format_args(args...));
   }
 }
 

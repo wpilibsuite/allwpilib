@@ -20,15 +20,16 @@ SerialPort::SerialPort(int baudRate, Port port, int dataBits,
 
   m_portHandle =
       HAL_InitializeSerialPort(static_cast<HAL_SerialPort>(port), &status);
-  FRC_CheckErrorStatus(status, "Port {}", port);
+  FRC_CheckErrorStatus(status, "Port {}", static_cast<int>(port));
   HAL_SetSerialBaudRate(m_portHandle, baudRate, &status);
   FRC_CheckErrorStatus(status, "SetSerialBaudRate {}", baudRate);
   HAL_SetSerialDataBits(m_portHandle, dataBits, &status);
   FRC_CheckErrorStatus(status, "SetSerialDataBits {}", dataBits);
   HAL_SetSerialParity(m_portHandle, parity, &status);
-  FRC_CheckErrorStatus(status, "SetSerialParity {}", parity);
+  FRC_CheckErrorStatus(status, "SetSerialParity {}", static_cast<int>(parity));
   HAL_SetSerialStopBits(m_portHandle, stopBits, &status);
-  FRC_CheckErrorStatus(status, "SetSerialStopBits {}", stopBits);
+  FRC_CheckErrorStatus(status, "SetSerialStopBits {}",
+                       static_cast<int>(stopBits));
 
   // Set the default timeout to 5 seconds.
   SetTimeout(5_s);
@@ -50,15 +51,16 @@ SerialPort::SerialPort(int baudRate, std::string_view portName, Port port,
   m_portHandle =
       HAL_InitializeSerialPortDirect(static_cast<HAL_SerialPort>(port),
                                      std::string(portName).c_str(), &status);
-  FRC_CheckErrorStatus(status, "Port {}", port);
+  FRC_CheckErrorStatus(status, "Port {}", static_cast<int>(port));
   HAL_SetSerialBaudRate(m_portHandle, baudRate, &status);
   FRC_CheckErrorStatus(status, "SetSerialBaudRate {}", baudRate);
   HAL_SetSerialDataBits(m_portHandle, dataBits, &status);
   FRC_CheckErrorStatus(status, "SetSerialDataBits {}", dataBits);
   HAL_SetSerialParity(m_portHandle, parity, &status);
-  FRC_CheckErrorStatus(status, "SetSerialParity {}", parity);
+  FRC_CheckErrorStatus(status, "SetSerialParity {}", static_cast<int>(parity));
   HAL_SetSerialStopBits(m_portHandle, stopBits, &status);
-  FRC_CheckErrorStatus(status, "SetSerialStopBits {}", stopBits);
+  FRC_CheckErrorStatus(status, "SetSerialStopBits {}",
+                       static_cast<int>(stopBits));
 
   // Set the default timeout to 5 seconds.
   SetTimeout(5_s);
@@ -81,7 +83,8 @@ SerialPort::~SerialPort() {
 void SerialPort::SetFlowControl(SerialPort::FlowControl flowControl) {
   int32_t status = 0;
   HAL_SetSerialFlowControl(m_portHandle, flowControl, &status);
-  FRC_CheckErrorStatus(status, "SetFlowControl {}", flowControl);
+  FRC_CheckErrorStatus(status, "SetFlowControl {}",
+                       static_cast<int>(flowControl));
 }
 
 void SerialPort::EnableTermination(char terminator) {
@@ -143,7 +146,7 @@ void SerialPort::SetWriteBufferSize(int size) {
 void SerialPort::SetWriteBufferMode(SerialPort::WriteBufferMode mode) {
   int32_t status = 0;
   HAL_SetSerialWriteMode(m_portHandle, mode, &status);
-  FRC_CheckErrorStatus(status, "SetWriteBufferMode {}", mode);
+  FRC_CheckErrorStatus(status, "SetWriteBufferMode {}", static_cast<int>(mode));
 }
 
 void SerialPort::Flush() {

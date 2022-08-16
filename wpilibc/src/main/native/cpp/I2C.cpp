@@ -25,7 +25,7 @@ I2C::I2C(Port port, int deviceAddress)
   }
 
   HAL_InitializeI2C(m_port, &status);
-  FRC_CheckErrorStatus(status, "Port {}", port);
+  FRC_CheckErrorStatus(status, "Port {}", static_cast<int>(port));
 
   HAL_Report(HALUsageReporting::kResourceType_I2C, deviceAddress);
 }
