@@ -176,4 +176,45 @@ public final class Units {
   public static double lbsToKilograms(double lbs) {
     return lbs * kKilogramsPerLb;
   }
+
+  /**
+   * Converts falcon counts into degrees.
+   *
+   * @param counts The number of counts returned by the falcon.
+   * @return Degrees converted from falcon counts.
+   */
+  public static double falconCountsToDegrees(double counts) {
+    return counts * 360 / 2048;
+  }
+
+  /**
+   * Converts degrees into falcon counts.
+   *
+   * @param degrees The degrees to convert to falcon counts.
+   * @return Falcon counts converted from degrees.
+   */
+  public static double degreesToFalconCounts(double degrees) {
+    return degrees * 2048 / 360;
+  }
+
+  /**
+   * Converts falcon counts into RPM.
+   *
+   * @param counts The velocity returned by the falcon. (Sensor units per 100 milliseconds)
+   * @return RPMs converted from falcon velocity.
+   */
+  public static double falconVelocityToRPM(double counts) {
+    return counts * 600 / 2048;
+  }
+
+  /**
+   * Converts RPM into falcon counts.
+   *
+   * @param rpm The RPM to convert to falcon velocity (Sensor units per 100 milliseconds).
+   * @return Falcon velocity converted from RPM.
+   */
+  public static double rpmToFalconVelocity(double rpm) {
+    return rpm * 2048 / 600;
+  }
+
 }
