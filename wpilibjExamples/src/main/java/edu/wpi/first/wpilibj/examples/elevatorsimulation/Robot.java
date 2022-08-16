@@ -29,7 +29,7 @@ public class Robot extends TimedRobot {
   private static final int kEncoderBChannel = 1;
   private static final int kJoystickPort = 0;
 
-  private static final double kElevatorKp = 10;
+  private static final double kElevatorKp = 10.0;
   private static final double kElevatorKi = 4.0;
   private static final double kElevatorKd = 0.1;
   private static final double kElevatorGearing = 10.0;
@@ -111,12 +111,11 @@ public class Robot extends TimedRobot {
       m_motor.set(0.0);
     }
   }
+  // To view the Elevator Sim in the simulator, select Network Tables -> SmartDashboard -> Elevator Sim
 
   @Override
   public void disabledInit() {
     // This just makes sure that our simulation code knows that the motor's off.
     m_motor.set(0.0);
-    
-    // To view the Elevator Sim in the simulator, select Network Tables -> SmartDashboard -> Elevator Sim
   }
 }
