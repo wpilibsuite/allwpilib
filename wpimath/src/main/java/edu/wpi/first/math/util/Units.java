@@ -11,6 +11,8 @@ public final class Units {
   private static final double kSecondsPerMinute = 60;
   private static final double kMillisecondsPerSecond = 1000;
   private static final double kKilogramsPerLb = 0.453592;
+  private static final double kCountsPerRevolutionFalcon500 = 2048;
+  private static final double kDegreesPerRevolution = 360.0;
 
   /** Utility class, so constructor is private. */
   private Units() {
@@ -178,43 +180,43 @@ public final class Units {
   }
 
   /**
-   * Converts falcon counts into degrees.
+   * Converts Falcon 500 counts into degrees.
    *
-   * @param counts The number of counts returned by the falcon.
-   * @return Degrees converted from falcon counts.
+   * @param counts The number of counts returned by the Falcon 500.
+   * @return Degrees converted from Falcon 500 counts.
    */
   public static double falconCountsToDegrees(double counts) {
-    return counts * 360 / 2048;
+    return rotationsToDegrees(counts / kCountsPerRevolutionFalcon500);
   }
 
   /**
-   * Converts degrees into falcon counts.
+   * Converts degrees into Falcon 500 counts.
    *
-   * @param degrees The degrees to convert to falcon counts.
-   * @return Falcon counts converted from degrees.
+   * @param degrees The degrees to convert to Falcon 500 counts.
+   * @return Falcon 500 counts converted from degrees.
    */
   public static double degreesToFalconCounts(double degrees) {
-    return degrees * 2048 / 360;
+    return degrees * kCountsPerRevolutionFalcon500 / kDegreesPerRevolution;
   }
 
   /**
-   * Converts falcon counts into RPM.
+   * Converts Falcon 500 counts into RPM.
    *
-   * @param counts The velocity returned by the falcon. (Sensor units per 100 milliseconds)
-   * @return RPMs converted from falcon velocity.
+   * @param counts The velocity returned by the Falcon 500. (Sensor units per 100 milliseconds)
+   * @return RPMs converted from Falcon 500 velocity.
    */
   public static double falconVelocityToRPM(double counts) {
-    return counts * 600 / 2048;
+    return counts * kSecondsPerMinute * 10 / kCountsPerRevolutionFalcon500;
   }
 
   /**
-   * Converts RPM into falcon counts.
+   * Converts RPM into Falcon 500 counts.
    *
-   * @param rpm The RPM to convert to falcon velocity (Sensor units per 100 milliseconds).
-   * @return Falcon velocity converted from RPM.
+   * @param rpm The RPM to convert to Falcon 500 velocity (Sensor units per 100 milliseconds).
+   * @return Falcon 500 velocity converted from RPM.
    */
   public static double rpmToFalconVelocity(double rpm) {
-    return rpm * 2048 / 600;
+    return rpm * kCountsPerRevolutionFalcon500 / (kSecondsPerMinute * 10);
   }
 
 }
