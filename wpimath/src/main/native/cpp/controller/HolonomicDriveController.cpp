@@ -44,8 +44,8 @@ ChassisSpeeds HolonomicDriveController::Calculate(
   // Calculate feedforward velocities (field-relative)
   auto xFF = linearVelocityRef * poseRef.Rotation().Cos();
   auto yFF = linearVelocityRef * poseRef.Rotation().Sin();
-  auto thetaFF = units::radians_per_second_t(m_thetaController.Calculate(
-      currentPose.Rotation().Radians(), angleRef.Radians()));
+  auto thetaFF = units::radians_per_second_t{m_thetaController.Calculate(
+      currentPose.Rotation().Radians(), angleRef.Radians())};
 
   m_poseError = poseRef.RelativeTo(currentPose);
   m_rotationError = angleRef - currentPose.Rotation();
@@ -56,10 +56,10 @@ ChassisSpeeds HolonomicDriveController::Calculate(
   }
 
   // Calculate feedback velocities (based on position error).
-  auto xFeedback = units::meters_per_second_t(
-      m_xController.Calculate(currentPose.X().value(), poseRef.X().value()));
-  auto yFeedback = units::meters_per_second_t(
-      m_yController.Calculate(currentPose.Y().value(), poseRef.Y().value()));
+  auto xFeedback = units::meters_per_second_t{
+      m_xController.Calculate(currentPose.X().value(), poseRef.X().value())};
+  auto yFeedback = units::meters_per_second_t{
+      m_yController.Calculate(currentPose.Y().value(), poseRef.Y().value())};
 
   // Return next output.
   return ChassisSpeeds::FromFieldRelativeSpeeds(

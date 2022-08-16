@@ -13,7 +13,7 @@ using namespace frc;
 
 TEST(Twist2dTest, Straight) {
   const Twist2d straight{5_m, 0_m, 0_rad};
-  const auto straightPose = Pose2d().Exp(straight);
+  const auto straightPose = Pose2d{}.Exp(straight);
 
   EXPECT_DOUBLE_EQ(5.0, straightPose.X().value());
   EXPECT_DOUBLE_EQ(0.0, straightPose.Y().value());
@@ -52,7 +52,7 @@ TEST(Twist2dTest, Inequality) {
 }
 
 TEST(Twist2dTest, Pose2dLog) {
-  const Pose2d end{5_m, 5_m, Rotation2d{90_deg}};
+  const Pose2d end{5_m, 5_m, 90_deg};
   const Pose2d start;
 
   const auto twist = start.Log(end);

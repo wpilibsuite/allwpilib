@@ -7,7 +7,6 @@
 #include <utility>
 
 using namespace frc2;
-using namespace units;
 
 MecanumControllerCommand::MecanumControllerCommand(
     frc::Trajectory trajectory, std::function<frc::Pose2d()> pose,
@@ -269,7 +268,7 @@ void MecanumControllerCommand::Initialize() {
 }
 
 void MecanumControllerCommand::Execute() {
-  auto curTime = second_t(m_timer.Get());
+  auto curTime = m_timer.Get();
   auto dt = curTime - m_prevTime;
 
   auto m_desiredState = m_trajectory.Sample(curTime);
@@ -302,21 +301,21 @@ void MecanumControllerCommand::Execute() {
         rearRightSpeedSetpoint,
         (rearRightSpeedSetpoint - m_prevSpeeds.rearRight) / dt);
 
-    auto frontLeftOutput = volt_t(m_frontLeftController->Calculate(
+    auto frontLeftOutput = units::volt_t{m_frontLeftController->Calculate(
                                m_currentWheelSpeeds().frontLeft.value(),
-                               frontLeftSpeedSetpoint.value())) +
+                               frontLeftSpeedSetpoint.value())} +
                            frontLeftFeedforward;
-    auto rearLeftOutput = volt_t(m_rearLeftController->Calculate(
+    auto rearLeftOutput = units::volt_t{m_rearLeftController->Calculate(
                               m_currentWheelSpeeds().rearLeft.value(),
-                              rearLeftSpeedSetpoint.value())) +
+                              rearLeftSpeedSetpoint.value())} +
                           rearLeftFeedforward;
-    auto frontRightOutput = volt_t(m_frontRightController->Calculate(
+    auto frontRightOutput = units::volt_t{m_frontRightController->Calculate(
                                 m_currentWheelSpeeds().frontRight.value(),
-                                frontRightSpeedSetpoint.value())) +
+                                frontRightSpeedSetpoint.value())} +
                             frontRightFeedforward;
-    auto rearRightOutput = volt_t(m_rearRightController->Calculate(
+    auto rearRightOutput = units::volt_t{m_rearRightController->Calculate(
                                m_currentWheelSpeeds().rearRight.value(),
-                               rearRightSpeedSetpoint.value())) +
+                               rearRightSpeedSetpoint.value())} +
                            rearRightFeedforward;
 
     m_outputVolts(frontLeftOutput, rearLeftOutput, frontRightOutput,

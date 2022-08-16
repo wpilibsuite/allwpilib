@@ -129,7 +129,7 @@ class SwerveDriveKinematics {
    */
   wpi::array<SwerveModuleState, NumModules> ToSwerveModuleStates(
       const ChassisSpeeds& chassisSpeeds,
-      const Translation2d& centerOfRotation = Translation2d()) const;
+      const Translation2d& centerOfRotation = Translation2d{}) const;
 
   /**
    * Performs forward kinematics to return the resulting chassis state from the

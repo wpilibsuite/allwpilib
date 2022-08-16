@@ -40,7 +40,7 @@ TEST(DifferentialDrivetrainSimTest, Convergence) {
       frc::DifferentialDriveKinematicsConstraint(kinematics, 1_mps));
 
   auto trajectory = frc::TrajectoryGenerator::GenerateTrajectory(
-      frc::Pose2d(), {}, frc::Pose2d(2_m, 2_m, 0_rad), config);
+      frc::Pose2d{}, {}, frc::Pose2d{2_m, 2_m, 0_rad}, config);
 
   for (auto t = 0_s; t < trajectory.TotalTime(); t += 20_ms) {
     auto state = trajectory.Sample(t);
@@ -51,7 +51,7 @@ TEST(DifferentialDrivetrainSimTest, Convergence) {
         feedforward.Calculate(frc::Vectord<2>{l.value(), r.value()});
 
     // Sim periodic code.
-    sim.SetInputs(units::volt_t(voltages(0, 0)), units::volt_t(voltages(1, 0)));
+    sim.SetInputs(units::volt_t{voltages(0, 0)}, units::volt_t{voltages(1, 0)});
     sim.Update(20_ms);
 
     // Update ground truth.

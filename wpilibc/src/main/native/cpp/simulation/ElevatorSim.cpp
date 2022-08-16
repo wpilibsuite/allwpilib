@@ -49,11 +49,11 @@ bool ElevatorSim::WouldHitUpperLimit(units::meter_t elevatorHeight) const {
 }
 
 bool ElevatorSim::HasHitLowerLimit() const {
-  return WouldHitLowerLimit(units::meter_t(m_y(0)));
+  return WouldHitLowerLimit(units::meter_t{m_y(0)});
 }
 
 bool ElevatorSim::HasHitUpperLimit() const {
-  return WouldHitUpperLimit(units::meter_t(m_y(0)));
+  return WouldHitUpperLimit(units::meter_t{m_y(0)});
 }
 
 units::meter_t ElevatorSim::GetPosition() const {
@@ -96,10 +96,10 @@ Vectord<2> ElevatorSim::UpdateX(const Vectord<2>& currentXhat,
       },
       currentXhat, u, dt);
   // Check for collision after updating x-hat.
-  if (WouldHitLowerLimit(units::meter_t(updatedXhat(0)))) {
+  if (WouldHitLowerLimit(units::meter_t{updatedXhat(0)})) {
     return Vectord<2>{m_minHeight.value(), 0.0};
   }
-  if (WouldHitUpperLimit(units::meter_t(updatedXhat(0)))) {
+  if (WouldHitUpperLimit(units::meter_t{updatedXhat(0)})) {
     return Vectord<2>{m_maxHeight.value(), 0.0};
   }
   return updatedXhat;

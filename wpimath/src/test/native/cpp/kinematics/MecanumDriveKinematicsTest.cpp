@@ -61,7 +61,7 @@ TEST_F(MecanumDriveKinematicsTest, StrafeForwardKinematics) {
 
 TEST_F(MecanumDriveKinematicsTest, RotationInverseKinematics) {
   ChassisSpeeds speeds{0_mps, 0_mps,
-                       units::radians_per_second_t(2 * wpi::numbers::pi)};
+                       units::radians_per_second_t{2 * wpi::numbers::pi}};
   auto moduleStates = kinematics.ToWheelSpeeds(speeds);
 
   EXPECT_NEAR(-150.79644737, moduleStates.frontLeft.value(), 0.1);

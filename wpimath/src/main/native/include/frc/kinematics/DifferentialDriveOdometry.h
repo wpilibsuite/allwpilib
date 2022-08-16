@@ -31,7 +31,7 @@ class WPILIB_DLLEXPORT DifferentialDriveOdometry {
    * @param initialPose The starting position of the robot on the field.
    */
   explicit DifferentialDriveOdometry(const Rotation2d& gyroAngle,
-                                     const Pose2d& initialPose = Pose2d());
+                                     const Pose2d& initialPose = Pose2d{});
 
   /**
    * Resets the robot's position on the field.

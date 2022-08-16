@@ -12,7 +12,7 @@ MechanismLigament2d::MechanismLigament2d(std::string_view name, double length,
                                          units::degree_t angle,
                                          double lineWeight,
                                          const frc::Color8Bit& color)
-    : MechanismObject2d(name),
+    : MechanismObject2d{name},
       m_length{length},
       m_angle{angle.value()},
       m_weight{lineWeight} {

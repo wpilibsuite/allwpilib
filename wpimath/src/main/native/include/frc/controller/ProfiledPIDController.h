@@ -143,7 +143,7 @@ class ProfiledPIDController
    *
    * @param goal The desired unprofiled setpoint.
    */
-  void SetGoal(Distance_t goal) { m_goal = {goal, Velocity_t(0)}; }
+  void SetGoal(Distance_t goal) { m_goal = {goal, Velocity_t{0}}; }
 
   /**
    * Gets the goal for the ProfiledPIDController.
@@ -225,8 +225,8 @@ class ProfiledPIDController
    * @param velocityTolerance Velocity error which is tolerable.
    */
   void SetTolerance(Distance_t positionTolerance,
-                    Velocity_t velocityTolerance =
-                        Velocity_t(std::numeric_limits<double>::infinity())) {
+                    Velocity_t velocityTolerance = Velocity_t{
+                        std::numeric_limits<double>::infinity()}) {
     m_controller.SetTolerance(positionTolerance.value(),
                               velocityTolerance.value());
   }
@@ -237,14 +237,14 @@ class ProfiledPIDController
    * @return The error.
    */
   Distance_t GetPositionError() const {
-    return Distance_t(m_controller.GetPositionError());
+    return Distance_t{m_controller.GetPositionError()};
   }
 
   /**
    * Returns the change in error per second.
    */
   Velocity_t GetVelocityError() const {
-    return Velocity_t(m_controller.GetVelocityError());
+    return Velocity_t{m_controller.GetVelocityError()};
   }
 
   /**
@@ -339,7 +339,7 @@ class ProfiledPIDController
    * velocity is assumed to be zero.
    */
   void Reset(Distance_t measuredPosition) {
-    Reset(measuredPosition, Velocity_t(0));
+    Reset(measuredPosition, Velocity_t{0});
   }
 
   void InitSendable(wpi::SendableBuilder& builder) override {

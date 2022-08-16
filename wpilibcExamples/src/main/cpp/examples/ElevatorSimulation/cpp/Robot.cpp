@@ -74,7 +74,7 @@ class Robot : public frc::TimedRobot {
       m_mech2d.GetRoot("Elevator Root", 10, 0);
   frc::MechanismLigament2d* m_elevatorMech2d =
       m_elevatorRoot->Append<frc::MechanismLigament2d>(
-          "Elevator", units::inch_t(m_elevatorSim.GetPosition()).value(),
+          "Elevator", units::inch_t{m_elevatorSim.GetPosition()}.value(),
           90_deg);
 
  public:
@@ -103,15 +103,15 @@ class Robot : public frc::TimedRobot {
 
     // Update the Elevator length based on the simulated elevator height
     m_elevatorMech2d->SetLength(
-        units::inch_t(m_elevatorSim.GetPosition()).value());
+        units::inch_t{m_elevatorSim.GetPosition()}.value());
   }
 
   void TeleopPeriodic() override {
     if (m_joystick.GetTrigger()) {
       // Here, we run PID control like normal, with a constant setpoint of 30in.
       double pidOutput = m_controller.Calculate(m_encoder.GetDistance(),
-                                                units::meter_t(30_in).value());
-      m_motor.SetVoltage(units::volt_t(pidOutput));
+                                                units::meter_t{30_in}.value());
+      m_motor.SetVoltage(units::volt_t{pidOutput});
     } else {
       // Otherwise, we disable the motor.
       m_motor.Set(0.0);

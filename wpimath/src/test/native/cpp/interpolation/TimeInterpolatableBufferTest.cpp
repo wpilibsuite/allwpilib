@@ -13,16 +13,16 @@
 TEST(TimeInterpolatableBufferTest, Interpolation) {
   frc::TimeInterpolatableBuffer<frc::Rotation2d> buffer{10_s};
 
-  buffer.AddSample(0_s, frc::Rotation2d(0_rad));
-  EXPECT_TRUE(buffer.Sample(0_s).value() == frc::Rotation2d(0_rad));
-  buffer.AddSample(1_s, frc::Rotation2d(1_rad));
-  EXPECT_TRUE(buffer.Sample(0.5_s).value() == frc::Rotation2d(0.5_rad));
-  EXPECT_TRUE(buffer.Sample(1_s).value() == frc::Rotation2d(1_rad));
-  buffer.AddSample(3_s, frc::Rotation2d(2_rad));
-  EXPECT_TRUE(buffer.Sample(2_s).value() == frc::Rotation2d(1.5_rad));
+  buffer.AddSample(0_s, 0_rad);
+  EXPECT_TRUE(buffer.Sample(0_s).value() == 0_rad);
+  buffer.AddSample(1_s, 1_rad);
+  EXPECT_TRUE(buffer.Sample(0.5_s).value() == 0.5_rad);
+  EXPECT_TRUE(buffer.Sample(1_s).value() == 1_rad);
+  buffer.AddSample(3_s, 2_rad);
+  EXPECT_TRUE(buffer.Sample(2_s).value() == 1.5_rad);
 
-  buffer.AddSample(10.5_s, frc::Rotation2d(2_rad));
-  EXPECT_TRUE(buffer.Sample(0_s) == frc::Rotation2d(1_rad));
+  buffer.AddSample(10.5_s, 2_rad);
+  EXPECT_TRUE(buffer.Sample(0_s) == 1_rad);
 }
 
 TEST(TimeInterpolatableBufferTest, Pose2d) {

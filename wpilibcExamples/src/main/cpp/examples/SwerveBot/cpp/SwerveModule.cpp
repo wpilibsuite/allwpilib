@@ -32,19 +32,19 @@ SwerveModule::SwerveModule(const int driveMotorChannel,
   // Limit the PID Controller's input range between -pi and pi and set the input
   // to be continuous.
   m_turningPIDController.EnableContinuousInput(
-      -units::radian_t(wpi::numbers::pi), units::radian_t(wpi::numbers::pi));
+      -units::radian_t{wpi::numbers::pi}, units::radian_t{wpi::numbers::pi});
 }
 
 frc::SwerveModuleState SwerveModule::GetState() const {
   return {units::meters_per_second_t{m_driveEncoder.GetRate()},
-          frc::Rotation2d(units::radian_t(m_turningEncoder.Get()))};
+          units::radian_t{m_turningEncoder.GetDistance()}};
 }
 
 void SwerveModule::SetDesiredState(
     const frc::SwerveModuleState& referenceState) {
   // Optimize the reference state to avoid spinning further than 90 degrees
   const auto state = frc::SwerveModuleState::Optimize(
-      referenceState, units::radian_t(m_turningEncoder.Get()));
+      referenceState, units::radian_t{m_turningEncoder.GetDistance()});
 
   // Calculate the drive output from the drive PID controller.
   const auto driveOutput = m_drivePIDController.Calculate(
@@ -54,7 +54,7 @@ void SwerveModule::SetDesiredState(
 
   // Calculate the turning motor output from the turning PID controller.
   const auto turnOutput = m_turningPIDController.Calculate(
-      units::radian_t(m_turningEncoder.Get()), state.angle.Radians());
+      units::radian_t{m_turningEncoder.GetDistance()}, state.angle.Radians());
 
   const auto turnFeedforward = m_turnFeedforward.Calculate(
       m_turningPIDController.GetSetpoint().velocity);

@@ -77,7 +77,7 @@ class Gyro {
    *         based on integration of the returned rate from the gyro.
    */
   virtual Rotation2d GetRotation2d() const {
-    return Rotation2d{units::degree_t{-GetAngle()}};
+    return units::degree_t{-GetAngle()};
   }
 };
 

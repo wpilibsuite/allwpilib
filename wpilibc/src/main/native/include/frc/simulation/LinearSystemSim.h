@@ -112,9 +112,7 @@ class LinearSystemSim {
    *
    * @return The current drawn by this simulated mechanism.
    */
-  virtual units::ampere_t GetCurrentDraw() const {
-    return units::ampere_t(0.0);
-  }
+  virtual units::ampere_t GetCurrentDraw() const { return 0_A; }
 
  protected:
   /**

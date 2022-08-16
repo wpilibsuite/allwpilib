@@ -98,8 +98,8 @@ class Robot : public frc::TimedRobot {
     // Reset our loop to make sure it's in a known state.
     m_loop.Reset(frc::Vectord<2>{m_encoder.GetDistance(), m_encoder.GetRate()});
 
-    m_lastProfiledReference = {units::meter_t(m_encoder.GetDistance()),
-                               units::meters_per_second_t(m_encoder.GetRate())};
+    m_lastProfiledReference = {units::meter_t{m_encoder.GetDistance()},
+                               units::meters_per_second_t{m_encoder.GetRate()}};
   }
 
   void TeleopPeriodic() override {
@@ -131,7 +131,7 @@ class Robot : public frc::TimedRobot {
     // Send the new calculated voltage to the motors.
     // voltage = duty cycle * battery voltage, so
     // duty cycle = voltage / battery voltage
-    m_motor.SetVoltage(units::volt_t(m_loop.U(0)));
+    m_motor.SetVoltage(units::volt_t{m_loop.U(0)});
   }
 };
 

@@ -27,6 +27,5 @@ units::turn_t AnalogEncoderSim::GetTurns() {
 }
 
 frc::Rotation2d AnalogEncoderSim::GetPosition() {
-  units::radian_t rads = GetTurns();
-  return frc::Rotation2d{rads};
+  return units::radian_t{GetTurns()};
 }
