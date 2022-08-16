@@ -35,7 +35,9 @@ class Robot : public frc::TimedRobot {
   static constexpr int kEncoderBChannel = 1;
   static constexpr int kJoystickPort = 0;
 
-  static constexpr double kElevatorKp = 5.0;
+  static constexpr double kElevatorKp = 10.0;
+  static constexpr double kElevatorKi = 4.0;
+  static constexpr double kElevatorKd = 0.1;
   static constexpr double kElevatorGearing = 10.0;
   static constexpr units::meter_t kElevatorDrumRadius = 2_in;
   static constexpr units::kilogram_t kCarriageMass = 4.0_kg;
@@ -52,7 +54,7 @@ class Robot : public frc::TimedRobot {
   frc::DCMotor m_elevatorGearbox = frc::DCMotor::Vex775Pro(4);
 
   // Standard classes for controlling our elevator
-  frc2::PIDController m_controller{kElevatorKp, 0, 0};
+  frc2::PIDController m_controller{kElevatorKp, kElevatorKi, kElevatorKd};
   frc::Encoder m_encoder{kEncoderAChannel, kEncoderBChannel};
   frc::PWMSparkMax m_motor{kMotorPort};
   frc::Joystick m_joystick{kJoystickPort};
@@ -117,6 +119,7 @@ class Robot : public frc::TimedRobot {
       m_motor.Set(0.0);
     }
   }
+  // To view the Elevator Sim in the simulator, select Network Tables -> SmartDashboard -> Elevator Sim
 
   void DisabledInit() override {
     // This just makes sure that our simulation code knows that the motor's off.
