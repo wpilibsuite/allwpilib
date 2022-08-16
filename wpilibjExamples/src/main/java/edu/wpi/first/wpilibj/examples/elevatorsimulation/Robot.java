@@ -29,7 +29,9 @@ public class Robot extends TimedRobot {
   private static final int kEncoderBChannel = 1;
   private static final int kJoystickPort = 0;
 
-  private static final double kElevatorKp = 5.0;
+  private static final double kElevatorKp = 10;
+  private static final double kElevatorKi = 4.0;
+  private static final double kElevatorKd = 0.1;
   private static final double kElevatorGearing = 10.0;
   private static final double kElevatorDrumRadius = Units.inchesToMeters(2.0);
   private static final double kCarriageMass = 4.0; // kg
@@ -45,7 +47,7 @@ public class Robot extends TimedRobot {
   private final DCMotor m_elevatorGearbox = DCMotor.getVex775Pro(4);
 
   // Standard classes for controlling our elevator
-  private final PIDController m_controller = new PIDController(kElevatorKp, 0, 0);
+  private final PIDController m_controller = new PIDController(kElevatorKp, kElevatorKi, kElevatorKd);
   private final Encoder m_encoder = new Encoder(kEncoderAChannel, kEncoderBChannel);
   private final PWMSparkMax m_motor = new PWMSparkMax(kMotorPort);
   private final Joystick m_joystick = new Joystick(kJoystickPort);
@@ -114,5 +116,7 @@ public class Robot extends TimedRobot {
   public void disabledInit() {
     // This just makes sure that our simulation code knows that the motor's off.
     m_motor.set(0.0);
+    
+    // To view the Elevator Sim in the simulator, select Network Tables -> SmartDashboard -> Elevator Sim
   }
 }
