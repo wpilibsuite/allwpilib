@@ -10,9 +10,8 @@
 // For more information, see:
 // https://docs.wpilib.org/en/stable/docs/software/commandbased/convenience-features.html
 ReplaceMeParallelDeadlineGroup::ReplaceMeParallelDeadlineGroup()
-    : CommandHelper(
-          // The deadline command
-          frc2::InstantCommand([] {})) {
+    // The deadline command
+    : CommandHelper{frc2::InstantCommand{[] {}}} {
   // Add your commands here, e.g.
-  // AddCommands(FooCommand(), BarCommand());
+  // AddCommands(FooCommand{}, BarCommand{});
 }

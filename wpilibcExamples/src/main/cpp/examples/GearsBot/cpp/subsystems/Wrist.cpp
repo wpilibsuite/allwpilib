@@ -7,7 +7,7 @@
 #include <frc/controller/PIDController.h>
 #include <frc/smartdashboard/SmartDashboard.h>
 
-Wrist::Wrist() : frc2::PIDSubsystem(frc2::PIDController(kP, 0, 0)) {
+Wrist::Wrist() : frc2::PIDSubsystem{frc2::PIDController{kP, 0, 0}} {
   m_controller.SetTolerance(2.5);
 
   SetName("Wrist");

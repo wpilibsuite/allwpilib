@@ -66,8 +66,8 @@ TEST(DifferentialDriveKinematicsTest, InverseKinematicsForRotateInPlace) {
 TEST(DifferentialDriveKinematicsTest, ForwardKinematicsForRotateInPlace) {
   const DifferentialDriveKinematics kinematics{0.381_m * 2};
   const DifferentialDriveWheelSpeeds wheelSpeeds{
-      units::meters_per_second_t(+0.381 * wpi::numbers::pi),
-      units::meters_per_second_t(-0.381 * wpi::numbers::pi)};
+      units::meters_per_second_t{+0.381 * wpi::numbers::pi},
+      units::meters_per_second_t{-0.381 * wpi::numbers::pi}};
   const auto chassisSpeeds = kinematics.ToChassisSpeeds(wheelSpeeds);
 
   EXPECT_NEAR(chassisSpeeds.vx.value(), 0, kEpsilon);

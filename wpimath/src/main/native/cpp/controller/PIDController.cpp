@@ -65,7 +65,7 @@ double PIDController::GetD() const {
 }
 
 units::second_t PIDController::GetPeriod() const {
-  return units::second_t(m_period);
+  return m_period;
 }
 
 void PIDController::SetSetpoint(double setpoint) {

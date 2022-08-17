@@ -140,7 +140,7 @@ void FieldObject2d::UpdateFromEntry() const {
     for (size_t i = 0; i < size / 3; ++i) {
       m_poses[i] =
           Pose2d{units::meter_t{arr[i * 3 + 0]}, units::meter_t{arr[i * 3 + 1]},
-                 Rotation2d{units::degree_t{arr[i * 3 + 2]}}};
+                 units::degree_t{arr[i * 3 + 2]}};
     }
   } else if (val->IsRaw()) {
     // treat it simply as an array of doubles
@@ -163,8 +163,8 @@ void FieldObject2d::UpdateFromEntry() const {
       double rot = wpi::BitsToDouble(
           wpi::support::endian::readNext<uint64_t, wpi::support::big,
                                          wpi::support::unaligned>(p));
-      m_poses[i] = Pose2d{units::meter_t{x}, units::meter_t{y},
-                          Rotation2d{units::degree_t{rot}}};
+      m_poses[i] =
+          Pose2d{units::meter_t{x}, units::meter_t{y}, units::degree_t{rot}};
     }
   }
 }

@@ -22,14 +22,14 @@ class SwerveDriveOdometryTest : public ::testing::Test {
 };
 
 TEST_F(SwerveDriveOdometryTest, TwoIterations) {
-  SwerveModuleState state{5_mps, Rotation2d()};
+  SwerveModuleState state{5_mps, 0_deg};
 
-  m_odometry.ResetPosition(Pose2d(), 0_rad);
-  m_odometry.UpdateWithTime(0_s, Rotation2d(), SwerveModuleState(),
-                            SwerveModuleState(), SwerveModuleState(),
-                            SwerveModuleState());
-  auto pose = m_odometry.UpdateWithTime(0.1_s, Rotation2d(), state, state,
-                                        state, state);
+  m_odometry.ResetPosition(Pose2d{}, 0_rad);
+  m_odometry.UpdateWithTime(0_s, 0_deg, SwerveModuleState{},
+                            SwerveModuleState{}, SwerveModuleState{},
+                            SwerveModuleState{});
+  auto pose =
+      m_odometry.UpdateWithTime(0.1_s, 0_deg, state, state, state, state);
 
   EXPECT_NEAR(0.5, pose.X().value(), kEpsilon);
   EXPECT_NEAR(0.0, pose.Y().value(), kEpsilon);
@@ -37,17 +37,16 @@ TEST_F(SwerveDriveOdometryTest, TwoIterations) {
 }
 
 TEST_F(SwerveDriveOdometryTest, 90DegreeTurn) {
-  SwerveModuleState fl{18.85_mps, Rotation2d(90_deg)};
-  SwerveModuleState fr{42.15_mps, Rotation2d(26.565_deg)};
-  SwerveModuleState bl{18.85_mps, Rotation2d(-90_deg)};
-  SwerveModuleState br{42.15_mps, Rotation2d(-26.565_deg)};
+  SwerveModuleState fl{18.85_mps, 90_deg};
+  SwerveModuleState fr{42.15_mps, 26.565_deg};
+  SwerveModuleState bl{18.85_mps, -90_deg};
+  SwerveModuleState br{42.15_mps, -26.565_deg};
 
-  SwerveModuleState zero{0_mps, Rotation2d()};
+  SwerveModuleState zero{0_mps, 0_deg};
 
-  m_odometry.ResetPosition(Pose2d(), 0_rad);
-  m_odometry.UpdateWithTime(0_s, Rotation2d(), zero, zero, zero, zero);
-  auto pose =
-      m_odometry.UpdateWithTime(1_s, Rotation2d(90_deg), fl, fr, bl, br);
+  m_odometry.ResetPosition(Pose2d{}, 0_rad);
+  m_odometry.UpdateWithTime(0_s, 0_deg, zero, zero, zero, zero);
+  auto pose = m_odometry.UpdateWithTime(1_s, 90_deg, fl, fr, bl, br);
 
   EXPECT_NEAR(12.0, pose.X().value(), kEpsilon);
   EXPECT_NEAR(12.0, pose.Y().value(), kEpsilon);
@@ -55,15 +54,15 @@ TEST_F(SwerveDriveOdometryTest, 90DegreeTurn) {
 }
 
 TEST_F(SwerveDriveOdometryTest, GyroAngleReset) {
-  m_odometry.ResetPosition(Pose2d(), Rotation2d(90_deg));
+  m_odometry.ResetPosition(Pose2d{}, 90_deg);
 
-  SwerveModuleState state{5_mps, Rotation2d()};
+  SwerveModuleState state{5_mps, 0_deg};
 
-  m_odometry.UpdateWithTime(0_s, Rotation2d(90_deg), SwerveModuleState(),
-                            SwerveModuleState(), SwerveModuleState(),
-                            SwerveModuleState());
-  auto pose = m_odometry.UpdateWithTime(0.1_s, Rotation2d(90_deg), state, state,
-                                        state, state);
+  m_odometry.UpdateWithTime(0_s, 90_deg, SwerveModuleState{},
+                            SwerveModuleState{}, SwerveModuleState{},
+                            SwerveModuleState{});
+  auto pose =
+      m_odometry.UpdateWithTime(0.1_s, 90_deg, state, state, state, state);
 
   EXPECT_NEAR(0.5, pose.X().value(), kEpsilon);
   EXPECT_NEAR(0.0, pose.Y().value(), kEpsilon);

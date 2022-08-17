@@ -29,7 +29,7 @@ TEST(Rotation2dTest, DegreesToRadians) {
 
 TEST(Rotation2dTest, RotateByFromZero) {
   const Rotation2d zero;
-  auto rotated = zero + Rotation2d(90_deg);
+  auto rotated = zero + Rotation2d{90_deg};
 
   EXPECT_DOUBLE_EQ(wpi::numbers::pi / 2.0, rotated.Radians().value());
   EXPECT_DOUBLE_EQ(90.0, rotated.Degrees().value());

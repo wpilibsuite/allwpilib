@@ -75,24 +75,24 @@ frc2::Command* RobotContainer::GetAutonomousCommand() {
   // An example trajectory to follow.  All units in meters.
   auto exampleTrajectory = frc::TrajectoryGenerator::GenerateTrajectory(
       // Start at (1, 2) facing the +X direction
-      frc::Pose2d(1_m, 2_m, 0_deg),
+      frc::Pose2d{1_m, 2_m, 0_deg},
       // Pass through these two interior waypoints, making an 's' curve path
-      {frc::Translation2d(2_m, 3_m), frc::Translation2d(3_m, 1_m)},
+      {frc::Translation2d{2_m, 3_m}, frc::Translation2d{3_m, 1_m}},
       // End 3 meters straight ahead of where we started, facing forward
-      frc::Pose2d(4_m, 2_m, 0_deg),
+      frc::Pose2d{4_m, 2_m, 0_deg},
       // Pass the config
       config);
 
   frc2::RamseteCommand ramseteCommand(
       exampleTrajectory, [this] { return m_drive.GetPose(); },
-      frc::RamseteController(AutoConstants::kRamseteB,
-                             AutoConstants::kRamseteZeta),
+      frc::RamseteController{AutoConstants::kRamseteB,
+                             AutoConstants::kRamseteZeta},
       frc::SimpleMotorFeedforward<units::meters>(
           DriveConstants::ks, DriveConstants::kv, DriveConstants::ka),
       DriveConstants::kDriveKinematics,
       [this] { return m_drive.GetWheelSpeeds(); },
-      frc2::PIDController(DriveConstants::kPDriveVel, 0, 0),
-      frc2::PIDController(DriveConstants::kPDriveVel, 0, 0),
+      frc2::PIDController{DriveConstants::kPDriveVel, 0, 0},
+      frc2::PIDController{DriveConstants::kPDriveVel, 0, 0},
       [this](auto left, auto right) { m_drive.TankDriveVolts(left, right); },
       {&m_drive});
 

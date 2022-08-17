@@ -13,7 +13,7 @@ using namespace frc;
 
 TEST(Twist3dTest, StraightX) {
   const Twist3d straight{5_m, 0_m, 0_m, 0_rad, 0_rad, 0_rad};
-  const auto straightPose = Pose3d().Exp(straight);
+  const auto straightPose = Pose3d{}.Exp(straight);
 
   Pose3d expected{5_m, 0_m, 0_m, Rotation3d{}};
   EXPECT_EQ(expected, straightPose);
@@ -21,7 +21,7 @@ TEST(Twist3dTest, StraightX) {
 
 TEST(Twist3dTest, StraightY) {
   const Twist3d straight{0_m, 5_m, 0_m, 0_rad, 0_rad, 0_rad};
-  const auto straightPose = Pose3d().Exp(straight);
+  const auto straightPose = Pose3d{}.Exp(straight);
 
   Pose3d expected{0_m, 5_m, 0_m, Rotation3d{}};
   EXPECT_EQ(expected, straightPose);
@@ -29,7 +29,7 @@ TEST(Twist3dTest, StraightY) {
 
 TEST(Twist3dTest, StraightZ) {
   const Twist3d straight{0_m, 0_m, 5_m, 0_rad, 0_rad, 0_rad};
-  const auto straightPose = Pose3d().Exp(straight);
+  const auto straightPose = Pose3d{}.Exp(straight);
 
   Pose3d expected{0_m, 0_m, 5_m, Rotation3d{}};
   EXPECT_EQ(expected, straightPose);
@@ -40,8 +40,8 @@ TEST(Twist3dTest, QuarterCircle) {
 
   const Twist3d quarterCircle{
       5_m / 2.0 * wpi::numbers::pi,           0_m, 0_m, 0_rad, 0_rad,
-      units::radian_t(wpi::numbers::pi / 2.0)};
-  const auto quarterCirclePose = Pose3d().Exp(quarterCircle);
+      units::radian_t{wpi::numbers::pi / 2.0}};
+  const auto quarterCirclePose = Pose3d{}.Exp(quarterCircle);
 
   Pose3d expected{5_m, 5_m, 0_m, Rotation3d{zAxis, 90_deg}};
   EXPECT_EQ(expected, quarterCirclePose);
@@ -49,7 +49,7 @@ TEST(Twist3dTest, QuarterCircle) {
 
 TEST(Twist3dTest, DiagonalNoDtheta) {
   const Twist3d diagonal{2_m, 2_m, 0_m, 0_rad, 0_rad, 0_rad};
-  const auto diagonalPose = Pose3d().Exp(diagonal);
+  const auto diagonalPose = Pose3d{}.Exp(diagonal);
 
   Pose3d expected{2_m, 2_m, 0_m, Rotation3d{}};
   EXPECT_EQ(expected, diagonalPose);
