@@ -13,5 +13,5 @@ ReplaceMeParallelDeadlineGroup::ReplaceMeParallelDeadlineGroup()
     // The deadline command
     : CommandHelper{frc2::InstantCommand{[] {}}} {
   // Add your commands here, e.g.
-  // AddCommands(FooCommand(), BarCommand{});
+  // AddCommands(FooCommand{}, BarCommand{});
 }
