@@ -60,7 +60,6 @@ def run_global_replacements(wpiutil_llvm_files):
 
         # Replace llvm_unreachable() with wpi_unreachable()
         content = content.replace("llvm_unreachable", "wpi_unreachable")
-        content = content.replace("llvm_shutdown", "wpi_shutdown")
 
         content = content.replace("llvm_is_multithreaded()", "1")
 
