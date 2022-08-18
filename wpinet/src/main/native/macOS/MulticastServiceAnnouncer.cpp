@@ -4,6 +4,8 @@
 
 #include "wpinet/MulticastServiceAnnouncer.h"
 
+#include <arpa/inet.h>
+
 #include <wpi/SmallString.h>
 
 #include "dns_sd.h"

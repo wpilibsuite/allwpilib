@@ -99,7 +99,7 @@ class UsbCameraImpl : public SourceImpl,
         : kind(kind_), data{0}, from(std::this_thread::get_id()) {}
 
     Kind kind;
-    int data[4];
+    int data[4]{0};
     std::string dataStr;
     std::thread::id from;
   };

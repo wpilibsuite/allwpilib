@@ -98,8 +98,9 @@ void initializeDigital(int32_t* status) {
 
   // Make sure that the 9403 IONode has had a chance to initialize before
   // continuing.
-  while (pwmSystem->readLoopTiming(status) == 0)
+  while (pwmSystem->readLoopTiming(status) == 0) {
     std::this_thread::yield();
+  }
 
   if (pwmSystem->readLoopTiming(status) != kExpectedLoopTiming) {
     *status = LOOP_TIMING_ERROR;  // NOTE: Doesn't display the error
