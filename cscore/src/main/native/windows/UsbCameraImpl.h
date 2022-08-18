@@ -96,7 +96,7 @@ class UsbCameraImpl : public SourceImpl,
     };
 
     explicit Message(Kind kind_)
-        : kind(kind_), data{0}, from(std::this_thread::get_id()) {}
+        : kind(kind_), from(std::this_thread::get_id()) {}
 
     Kind kind;
     int data[4]{0};
