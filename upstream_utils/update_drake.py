@@ -13,7 +13,7 @@ from upstream_utils import (
 
 def main():
     root, repo = setup_upstream_repo(
-        "https://github.com/RobotLocomotion/drake", "v1.3.0"
+        "https://github.com/RobotLocomotion/drake", "v1.6.0"
     )
     wpimath = os.path.join(root, "wpimath")
 
