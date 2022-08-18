@@ -100,8 +100,9 @@ void TestTimingDMA(int squelch, std::pair<int, int> param) {
       auto value = HAL_GetDMASampleDigitalSource(&dmaSamples[startIndex],
                                                  dioHandle, &status);
       ASSERT_EQ(0, status);
-      if (value)
+      if (value) {
         break;
+      }
       startIndex++;
     }
     ASSERT_LT(startIndex, 6);

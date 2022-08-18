@@ -133,8 +133,9 @@ HAL_Bool HAL_CheckDIOChannel(int32_t channel) {
 void HAL_FreeDIOPort(HAL_DigitalHandle dioPortHandle) {
   auto port = digitalChannelHandles->Get(dioPortHandle, HAL_HandleEnum::DIO);
   // no status, so no need to check for a proper free.
-  if (port == nullptr)
+  if (port == nullptr) {
     return;
+  }
   digitalChannelHandles->Free(dioPortHandle, HAL_HandleEnum::DIO);
 
   // Wait for no other object to hold this handle.

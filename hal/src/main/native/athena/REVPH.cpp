@@ -236,8 +236,9 @@ HAL_REVPHHandle HAL_InitializeREVPH(int32_t module,
 
 void HAL_FreeREVPH(HAL_REVPHHandle handle) {
   auto hph = REVPHHandles->Get(handle);
-  if (hph == nullptr)
+  if (hph == nullptr) {
     return;
+  }
 
   HAL_CleanCAN(hph->hcan);
 
