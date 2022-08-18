@@ -1,4 +1,4 @@
-From d3b5b7ab0af09bb75fbb11fa6df60b973f8d313f Mon Sep 17 00:00:00 2001
+From dec4f95751a103f132e9674adf184188ec69176f Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Tue, 26 Apr 2022 15:19:14 -0400
 Subject: [PATCH 3/9] Preprocessor cleanup
@@ -15,7 +15,7 @@ Subject: [PATCH 3/9] Preprocessor cleanup
  8 files changed, 16 insertions(+), 30 deletions(-)
 
 diff --git a/include/uv.h b/include/uv.h
-index ee1c94c..dbaeb1e 100644
+index ee1c94cc..dbaeb1e9 100644
 --- a/include/uv.h
 +++ b/include/uv.h
 @@ -23,9 +23,6 @@
@@ -67,7 +67,7 @@ index ee1c94c..dbaeb1e 100644
 -#endif
  #endif /* UV_H */
 diff --git a/include/uv/unix.h b/include/uv/unix.h
-index 420be86..256fef3 100644
+index 420be86c..256fef37 100644
 --- a/include/uv/unix.h
 +++ b/include/uv/unix.h
 @@ -47,14 +47,6 @@
@@ -86,7 +86,7 @@ index 420be86..256fef3 100644
  # include "uv/darwin.h"
  #elif defined(__DragonFly__)       || \
 diff --git a/include/uv/win.h b/include/uv/win.h
-index fe36a53..7b01317 100644
+index 10d5e8f1..0a33366f 100644
 --- a/include/uv/win.h
 +++ b/include/uv/win.h
 @@ -60,11 +60,7 @@ typedef struct pollfd {
@@ -103,7 +103,7 @@ index fe36a53..7b01317 100644
  #include "uv/tree.h"
  #include "uv/threadpool.h"
 diff --git a/src/unix/internal.h b/src/unix/internal.h
-index 5a867db..7e1d408 100644
+index f9d1666d..2b654157 100644
 --- a/src/unix/internal.h
 +++ b/src/unix/internal.h
 @@ -192,6 +192,8 @@ struct uv__stream_queued_fds_s {
@@ -116,7 +116,7 @@ index 5a867db..7e1d408 100644
  
  /* core */
 diff --git a/src/win/fs.c b/src/win/fs.c
-index f71b3c0..71c9b16 100644
+index f71b3c04..71c9b169 100644
 --- a/src/win/fs.c
 +++ b/src/win/fs.c
 @@ -38,6 +38,7 @@
@@ -128,7 +128,7 @@ index f71b3c0..71c9b16 100644
  #define UV_FS_FREE_PATHS         0x0002
  #define UV_FS_FREE_PTR           0x0008
 diff --git a/src/win/tty.c b/src/win/tty.c
-index f6131d4..54c6c29 100644
+index d7522668..9753784d 100644
 --- a/src/win/tty.c
 +++ b/src/win/tty.c
 @@ -42,6 +42,8 @@
@@ -141,7 +141,7 @@ index f6131d4..54c6c29 100644
  # define InterlockedOr _InterlockedOr
  #endif
 diff --git a/src/win/util.c b/src/win/util.c
-index c655f53..7a5dd2e 100644
+index c655f532..7a5dd2ef 100644
 --- a/src/win/util.c
 +++ b/src/win/util.c
 @@ -63,12 +63,20 @@
@@ -166,7 +166,7 @@ index c655f53..7a5dd2e 100644
  static uint64_t hrtime_frequency_ = 0;
  
 diff --git a/src/win/winsock.c b/src/win/winsock.c
-index a68b095..7843e9f 100644
+index a68b0953..7843e9f1 100644
 --- a/src/win/winsock.c
 +++ b/src/win/winsock.c
 @@ -25,6 +25,7 @@

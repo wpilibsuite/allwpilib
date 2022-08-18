@@ -1,4 +1,4 @@
-/* Copyright Joyent, Inc. and other Node contributors. All rights reserved.
+/* Copyright libuv project contributors. All rights reserved.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to
@@ -19,25 +19,34 @@
  * IN THE SOFTWARE.
  */
 
-#ifndef UV_VERSION_H
-#define UV_VERSION_H
+#include <stdlib.h>
+#include "strtok.h"
 
- /*
- * Versions with the same major number are ABI stable. API is allowed to
- * evolve between minor releases, but only in a backwards compatible way.
- * Make sure you update the -soname directives in configure.ac
- * whenever you bump UV_VERSION_MAJOR or UV_VERSION_MINOR (but
- * not UV_VERSION_PATCH.)
- */
+char* uv__strtok(char* str, const char* sep, char** itr) {
+  const char* sep_itr;
+  char* tmp;
+  char* start;
 
-#define UV_VERSION_MAJOR 1
-#define UV_VERSION_MINOR 44
-#define UV_VERSION_PATCH 2
-#define UV_VERSION_IS_RELEASE 1
-#define UV_VERSION_SUFFIX ""
+  if (str == NULL)
+    start = tmp = *itr;
+  else
+    start = tmp = str;
 
-#define UV_VERSION_HEX  ((UV_VERSION_MAJOR << 16) | \
-                         (UV_VERSION_MINOR <<  8) | \
-                         (UV_VERSION_PATCH))
+  if (tmp == NULL)
+    return NULL;
 
-#endif /* UV_VERSION_H */
+  while (*tmp != '\0') {
+    sep_itr = sep;
+    while (*sep_itr != '\0') {
+      if (*tmp == *sep_itr) {
+        *itr = tmp + 1;
+        *tmp = '\0';
+        return start;
+      }
+      sep_itr++;
+    }
+    tmp++;
+  }
+  *itr = NULL;
+  return start;
+}
