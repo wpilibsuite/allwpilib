@@ -15,7 +15,7 @@ from upstream_utils import (
 
 
 def main():
-    root, repo = setup_upstream_repo("https://github.com/libuv/libuv", "v1.44.1")
+    root, repo = setup_upstream_repo("https://github.com/libuv/libuv", "v1.44.2")
     wpinet = os.path.join(root, "wpinet")
 
     # Apply patches to original git repo
