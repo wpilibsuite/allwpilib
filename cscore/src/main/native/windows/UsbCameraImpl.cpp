@@ -800,8 +800,8 @@ CS_StatusValue UsbCameraImpl::DeviceCmdSetProperty(
 
   // Check kind match
   if ((setString && prop->propKind != CS_PROP_STRING) ||
-      (!setString && (prop->propKind &
-                      (CS_PROP_BOOLEAN | CS_PROP_INTEGER | CS_PROP_ENUM)) == 0)) {
+      (!setString && (prop->propKind & (CS_PROP_BOOLEAN | CS_PROP_INTEGER |
+                                        CS_PROP_ENUM)) == 0)) {
     return CS_WRONG_PROPERTY_TYPE;
   }
 
