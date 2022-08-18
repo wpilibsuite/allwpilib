@@ -5,7 +5,12 @@
 #include <wpinet/MulticastServiceAnnouncer.h>
 #include <wpinet/MulticastServiceResolver.h>
 
+#include <array>
+#include <chrono>
+#include <string>
+#include <string_view>
 #include <thread>
+#include <utility>
 
 #include <wpi/timestamp.h>
 
