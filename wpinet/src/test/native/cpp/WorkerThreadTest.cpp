@@ -8,6 +8,10 @@
 
 #include <thread>
 
+#include <wpi/condition_variable.h>
+#include <wpi/mutex.h>
+
+#include "wpinet/EventLoopRunner.h"
 #include "wpinet/uv/Loop.h"
 
 namespace wpi {
@@ -33,37 +37,49 @@ TEST(WorkerThreadTest, FutureVoid) {
 }
 
 TEST(WorkerThreadTest, Loop) {
+  mutex m;
+  condition_variable cv;
   int callbacks = 0;
+
   WorkerThread<int(bool)> worker;
-  auto loop = uv::Loop::Create();
-  worker.SetLoop(*loop);
+  EventLoopRunner runner;
+  runner.ExecSync([&](uv::Loop& loop) { worker.SetLoop(loop); });
   worker.QueueWorkThen([](bool v) -> int { return v ? 1 : 2; },
                        [&](int v2) {
+                         std::scoped_lock lock{m};
                          ++callbacks;
-                         loop->Stop();
+                         cv.notify_all();
                          ASSERT_EQ(v2, 1);
                        },
                        true);
-  auto f = worker.QueueWork([](bool) -> int { return 2; }, true);
+  auto f = worker.QueueWork([&](bool) -> int { return 2; }, true);
   ASSERT_EQ(f.get(), 2);
-  loop->Run();
+
+  std::unique_lock lock{m};
+  cv.wait(lock, [&] { return callbacks == 1; });
   ASSERT_EQ(callbacks, 1);
 }
 
 TEST(WorkerThreadTest, LoopVoid) {
+  mutex m;
+  condition_variable cv;
   int callbacks = 0;
+
   WorkerThread<void(bool)> worker;
-  auto loop = uv::Loop::Create();
-  worker.SetLoop(*loop);
+  EventLoopRunner runner;
+  runner.ExecSync([&](uv::Loop& loop) { worker.SetLoop(loop); });
   worker.QueueWorkThen([](bool) {},
                        [&]() {
+                         std::scoped_lock lock{m};
                          ++callbacks;
-                         loop->Stop();
+                         cv.notify_all();
                        },
                        true);
   auto f = worker.QueueWork([](bool) {}, true);
   f.get();
-  loop->Run();
+
+  std::unique_lock lock{m};
+  cv.wait(lock, [&] { return callbacks == 1; });
   ASSERT_EQ(callbacks, 1);
 }
 
