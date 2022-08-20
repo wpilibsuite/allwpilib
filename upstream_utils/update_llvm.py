@@ -159,11 +159,13 @@ def main():
     wpiutil = os.path.join(root, "wpiutil")
 
     patch_root = os.path.join(root, "upstream_utils/llvm_patches")
-    # yapf: disable
     frontend_patches = [
         os.path.join(patch_root, "0001-Fix-spelling-language-errors.patch"),
         os.path.join(patch_root, "0002-Remove-StringRef-ArrayRef-and-Optional.patch"),
-        os.path.join(patch_root, "0003-Wrap-std-min-max-calls-in-parens-for-Windows-warning.patch"),
+        os.path.join(
+            patch_root,
+            "0003-Wrap-std-min-max-calls-in-parens-for-Windows-warning.patch",
+        ),
         os.path.join(patch_root, "0004-Change-unique_function-storage-size.patch"),
         os.path.join(patch_root, "0005-Threading-updates.patch"),
         os.path.join(patch_root, "0006-ifdef-guard-safety.patch"),
@@ -185,13 +187,16 @@ def main():
         os.path.join(patch_root, "0022-Remove-unused-functions.patch"),
         os.path.join(patch_root, "0023-OS-specific-changes.patch"),
         os.path.join(patch_root, "0024-Use-SmallVector-for-UTF-conversion.patch"),
-        os.path.join(patch_root, "0025-Prefer-to-use-static-pointers-in-raw_ostream.patch"),
+        os.path.join(
+            patch_root, "0025-Prefer-to-use-static-pointers-in-raw_ostream.patch"
+        ),
         os.path.join(patch_root, "0026-constexpr-endian-byte-swap.patch"),
-        os.path.join(patch_root, "0027-Copy-type-traits-from-STLExtras.h-into-PointerUnion..patch"),
+        os.path.join(
+            patch_root,
+            "0027-Copy-type-traits-from-STLExtras.h-into-PointerUnion..patch",
+        ),
         os.path.join(patch_root, "0028-Remove-StringMap-test-for-llvm-sort.patch"),
-
     ]
-    # yapf: enable
     am_patches(repo, frontend_patches, use_threeway=True)
 
     overwrite_source(wpiutil, repo)
