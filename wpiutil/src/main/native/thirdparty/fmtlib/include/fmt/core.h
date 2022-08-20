@@ -2921,7 +2921,7 @@ class format_string_checker {
       basic_string_view<Char> format_str, ErrorHandler eh)
       : context_(format_str, num_args, types_, eh),
         parse_funcs_{&parse_format_specs<Args, parse_context_type>...},
-        types_{type_constant<Args, char>::value...} {}
+        types_{type_constant<Args, char>::value...} {}  // NOLINT(clang-analyzer-optin.cplusplus.UninitializedObject)
 
   FMT_CONSTEXPR void on_text(const Char*, const Char*) {}
 

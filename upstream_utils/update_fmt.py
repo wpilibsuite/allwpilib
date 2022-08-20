@@ -17,7 +17,15 @@ def main():
 
     # Apply patches to original git repo
     prefix = os.path.join(root, "upstream_utils/fmt_patches")
-    am_patches(repo, [os.path.join(prefix, "0001-Don-t-throw-on-write-failure.patch")])
+    am_patches(
+        repo,
+        [
+            os.path.join(prefix, "0001-Don-t-throw-on-write-failure.patch"),
+            os.path.join(
+                prefix, "0002-Suppress-clang-tidy-warning-false-positive.patch"
+            ),
+        ],
+    )
 
     # Delete old install
     for d in [
