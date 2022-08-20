@@ -4,29 +4,26 @@ import os
 import shutil
 
 from upstream_utils import (
-    setup_upstream_repo,
+    get_repo_root,
+    clone_repo,
     comment_out_invalid_includes,
     walk_cwd_and_copy_if,
-    am_patches,
+    git_am,
 )
 
 
 def main():
-    root, repo = setup_upstream_repo(
-        "https://github.com/RobotLocomotion/drake", "v1.6.0"
-    )
-    wpimath = os.path.join(root, "wpimath")
+    upstream_root = clone_repo("https://github.com/RobotLocomotion/drake", "v1.6.0")
+    wpilib_root = get_repo_root()
+    wpimath = os.path.join(wpilib_root, "wpimath")
 
-    prefix = os.path.join(root, "upstream_utils/drake_patches")
-    am_patches(
-        repo,
-        [
-            os.path.join(prefix, "0001-Replace-Eigen-Dense-with-Eigen-Core.patch"),
-            os.path.join(
-                prefix, "0002-Add-WPILIB_DLLEXPORT-to-DARE-function-declarations.patch"
-            ),
-        ],
-    )
+    # Apply patches to upstream Git repo
+    os.chdir(upstream_root)
+    for f in [
+        "0001-Replace-Eigen-Dense-with-Eigen-Core.patch",
+        "0002-Add-WPILIB_DLLEXPORT-to-DARE-function-declarations.patch",
+    ]:
+        git_am(os.path.join(wpilib_root, "upstream_utils/drake_patches", f))
 
     # Delete old install
     for d in [
@@ -60,12 +57,12 @@ def main():
     )
 
     # Copy drake test source files into allwpilib
-    os.chdir(os.path.join(repo, "math/test"))
+    os.chdir(os.path.join(upstream_root, "math/test"))
     test_src_files = walk_cwd_and_copy_if(
         lambda dp, f: f == "discrete_algebraic_riccati_equation_test.cc",
         os.path.join(wpimath, "src/test/native/cpp/drake"),
     )
-    os.chdir(repo)
+    os.chdir(upstream_root)
 
     # Copy drake test header files into allwpilib
     test_include_files = walk_cwd_and_copy_if(
