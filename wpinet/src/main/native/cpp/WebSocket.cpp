@@ -505,10 +505,12 @@ void WebSocket::HandleIncoming(uv::Buffer& buf, size_t size) {
               return Fail(1002, "incomplete fragment");
             }
             if (!m_combineFragments || fin) {
+#ifdef WPINET_WEBSOCKET_VERBOSE_DEBUG
               fmt::print(
                   "WS RecvText({})\n",
                   std::string_view{reinterpret_cast<char*>(m_payload.data()),
                                    m_payload.size()});
+#endif
               text(std::string_view{reinterpret_cast<char*>(m_payload.data()),
                                     m_payload.size()},
                    fin);
@@ -522,6 +524,7 @@ void WebSocket::HandleIncoming(uv::Buffer& buf, size_t size) {
               return Fail(1002, "incomplete fragment");
             }
             if (!m_combineFragments || fin) {
+#ifdef WPINET_WEBSOCKET_VERBOSE_DEBUG
               SmallString<128> str;
               raw_svector_ostream stros{str};
               for (auto ch : m_payload) {
@@ -529,6 +532,7 @@ void WebSocket::HandleIncoming(uv::Buffer& buf, size_t size) {
                                      static_cast<unsigned int>(ch) & 0xff);
               }
               fmt::print("WS RecvBinary({})\n", str.str());
+#endif
               binary(m_payload, fin);
             }
             if (!fin) {
@@ -596,6 +600,7 @@ static void WriteFrame(WebSocketWriteReq& req,
   SmallVector<uv::Buffer, 4> internalBufs;
   raw_uv_ostream os{internalBufs, 4096};
 
+#ifdef WPINET_WEBSOCKET_VERBOSE_DEBUG
   if ((opcode & 0x7f) == 0x01) {
     SmallString<128> str;
     for (auto&& d : data) {
@@ -612,6 +617,7 @@ static void WriteFrame(WebSocketWriteReq& req,
     }
     fmt::print("WS SendBinary({})\n", str.str());
   }
+#endif
 
   // opcode (includes FIN bit)
   os << static_cast<unsigned char>(opcode);
