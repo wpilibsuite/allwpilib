@@ -46,7 +46,7 @@ nativeUtils.platformConfigs.each {
 // Suppress OpenCV warning
 // https://github.com/opencv/opencv/issues/20269
 nativeUtils.platformConfigs.each {
-    if (it.name.contains('linux')) {
+    if (it.name == nativeUtils.wpi.platforms.linuxx64) {
         it.cppCompiler.args.add("-Wno-deprecated-enum-enum-conversion")
     } else if (it.name.contains('osx')) {
         it.cppCompiler.args.add("-Wno-deprecated-anon-enum-enum-conversion")
