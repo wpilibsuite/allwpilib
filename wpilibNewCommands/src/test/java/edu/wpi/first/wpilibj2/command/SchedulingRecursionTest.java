@@ -59,7 +59,7 @@ class SchedulingRecursionTest extends CommandTestBase {
 
   @EnumSource(InterruptionBehavior.class)
   @ParameterizedTest
-  void defaultCommand(InterruptionBehavior interruptionBehavior) {
+  void defaultCommandGetsRescheduledAfterSelfCanceling(InterruptionBehavior interruptionBehavior) {
     try (CommandScheduler scheduler = new CommandScheduler()) {
       AtomicBoolean hasOtherRun = new AtomicBoolean();
       Subsystem requirement = new SubsystemBase() {};

@@ -56,7 +56,8 @@ TEST_F(SchedulingRecursionTest, CancelFromInitialize) {
   EXPECT_TRUE(hasOtherRun);
 }
 
-TEST_P(SchedulingRecursionTest, DefaultCommand) {
+TEST_P(SchedulingRecursionTest,
+       DefaultCommandGetsRescheduledAfterSelfCanceling) {
   CommandScheduler scheduler = GetScheduler();
   bool hasOtherRun = false;
   TestSubsystem requirement;
