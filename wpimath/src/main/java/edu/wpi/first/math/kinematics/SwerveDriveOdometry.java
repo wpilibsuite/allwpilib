@@ -92,17 +92,34 @@ public class SwerveDriveOdometry {
    */
   public Pose2d updateWithTime(
       double currentTimeSeconds, Rotation2d gyroAngle, SwerveModuleState... moduleStates) {
+    return updateWithTime(
+        currentTimeSeconds, gyroAngle, m_kinematics.toChassisSpeeds(moduleStates));
+  }
+
+  /**
+   * Updates the robot's position on the field using forward kinematics and integration of the pose
+   * over time. This method takes in the current time as a parameter to calculate period (difference
+   * between two timestamps). The period is used to calculate the change in distance from a
+   * velocity. This also takes in an angle parameter which is used instead of the angular rate that
+   * is calculated from forward kinematics.
+   *
+   * @param currentTimeSeconds The current time in seconds.
+   * @param gyroAngle The angle reported by the gyroscope.
+   * @param chassisSpeeds The state of the swerve modules after forward kinematics.
+   * @return The new pose of the robot.
+   */
+  public Pose2d updateWithTime(
+      double currentTimeSeconds, Rotation2d gyroAngle, ChassisSpeeds chassisSpeeds) {
     double period = m_prevTimeSeconds >= 0 ? currentTimeSeconds - m_prevTimeSeconds : 0.0;
     m_prevTimeSeconds = currentTimeSeconds;
 
     var angle = gyroAngle.plus(m_gyroOffset);
 
-    var chassisState = m_kinematics.toChassisSpeeds(moduleStates);
     var newPose =
         m_poseMeters.exp(
             new Twist2d(
-                chassisState.vxMetersPerSecond * period,
-                chassisState.vyMetersPerSecond * period,
+                chassisSpeeds.vxMetersPerSecond * period,
+                chassisSpeeds.vyMetersPerSecond * period,
                 angle.minus(m_previousAngle).getRadians()));
 
     m_previousAngle = angle;
@@ -125,5 +142,20 @@ public class SwerveDriveOdometry {
    */
   public Pose2d update(Rotation2d gyroAngle, SwerveModuleState... moduleStates) {
     return updateWithTime(WPIUtilJNI.now() * 1.0e-6, gyroAngle, moduleStates);
+  }
+
+  /**
+   * Updates the robot's position on the field using forward kinematics and integration of the pose
+   * over time. This method automatically calculates the current time to calculate period
+   * (difference between two timestamps). The period is used to calculate the change in distance
+   * from a velocity. This also takes in an angle parameter which is used instead of the angular
+   * rate that is calculated from forward kinematics.
+   *
+   * @param gyroAngle The angle reported by the gyroscope.
+   * @param chassisSpeeds The state of the swerve modules after forward kinematics.
+   * @return The new pose of the robot.
+   */
+  public Pose2d update(Rotation2d gyroAngle, ChassisSpeeds chassisSpeeds) {
+    return updateWithTime(WPIUtilJNI.now() * 1.0e-6, gyroAngle, chassisSpeeds);
   }
 }
