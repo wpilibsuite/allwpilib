@@ -27,6 +27,9 @@ class CommandTestBase : public ::testing::Test {
   class TestSubsystem : public SubsystemBase {};
 
  protected:
+  /**
+   * NOTE: Moving mock objects causes EXPECT_CALL to not work correctly!
+   */
   class MockCommand : public CommandHelper<CommandBase, MockCommand> {
    public:
     MOCK_CONST_METHOD0(GetRequirements, wpi::SmallSet<Subsystem*, 4>());
