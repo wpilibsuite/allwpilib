@@ -437,5 +437,13 @@ void CommandScheduler::InitSendable(nt::NTSendableBuilder& builder) {
 
 void CommandScheduler::SetDefaultCommandImpl(Subsystem* subsystem,
                                              std::unique_ptr<Command> command) {
+  if (command->GetInterruptionBehavior() ==
+      Command::InterruptionBehavior::kCancelIncoming) {
+    std::puts(
+        "Registering a non-interruptible default command!\n"
+        "This will likely prevent any other commands from "
+        "requiring this subsystem.");
+    // Warn, but allow -- there might be a use case for this.
+  }
   m_impl->subsystems[subsystem] = std::move(command);
 }
