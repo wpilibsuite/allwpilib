@@ -37,7 +37,11 @@ nativeUtils.platformConfigs.each {
     if (it.name.contains('windows')) {
         return
     }
-    it.linker.args << '-Wl,-rpath,\'$ORIGIN\''
+    if (it.name.contains('osx')) {
+        it.linker.args << '-Wl,-rpath,\'@loader_path\''
+    } else {
+        it.linker.args << '-Wl,-rpath,\'$ORIGIN\''
+    }
     if (it.name == 'osxx86-64' || it.name == 'osxarm64') {
         it.linker.args << "-headerpad_max_install_names"
     }
