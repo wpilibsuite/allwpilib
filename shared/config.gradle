@@ -38,7 +38,7 @@ nativeUtils.platformConfigs.each {
         return
     }
     it.linker.args << '-Wl,-rpath,\'$ORIGIN\''
-    if (it.name == 'osxx86-64' || it.name == 'osxarm64') {
+    if (it.name.contains('osx')) {
         it.linker.args << "-headerpad_max_install_names"
     }
 }
@@ -46,9 +46,9 @@ nativeUtils.platformConfigs.each {
 // Suppress OpenCV warning
 // https://github.com/opencv/opencv/issues/20269
 nativeUtils.platformConfigs.each {
-    if (it.name == 'linuxx86-64') {
+    if (it.name == nativeUtils.wpi.platforms.linuxx64) {
         it.cppCompiler.args.add("-Wno-deprecated-enum-enum-conversion")
-    } else if (it.name == 'osxx86-64' || it.name == 'osxarm64') {
+    } else if (it.name.contains('osx')) {
         it.cppCompiler.args.add("-Wno-deprecated-anon-enum-enum-conversion")
     }
 }
