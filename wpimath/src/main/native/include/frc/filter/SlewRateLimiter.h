@@ -28,7 +28,7 @@ class SlewRateLimiter {
   using Rate_t = units::unit_t<Rate>;
 
   /**
-   * Creates a new SlewRateLimiter with the given rate limit and initial value.
+   * Creates a new SlewRateLimiter with the given rate limit.
    *
    * @param rateLimit The rate-of-change limit.
    */
@@ -36,7 +36,7 @@ class SlewRateLimiter {
       : SlewRateLimiter(rateLimit, -rateLimit) {}
 
   /**
-   * Creates a new SlewRateLimiter with the given rate limit and initial value.
+   * Creates a new SlewRateLimiter with the given positive and negative rate limit and initial value.
    *
    * @param positiveRateLimit The rate-of-change limit in the positive
    * direction, in units per second.
