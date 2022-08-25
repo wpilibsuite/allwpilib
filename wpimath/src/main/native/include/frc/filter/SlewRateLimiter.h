@@ -32,16 +32,20 @@ class SlewRateLimiter {
    *
    * @param rateLimit The rate-of-change limit.
    */
-  explicit SlewRateLimiter(Rate_t rateLimit) : SlewRateLimiter(rateLimit, -rateLimit) {}
+  explicit SlewRateLimiter(Rate_t rateLimit)
+      : SlewRateLimiter(rateLimit, -rateLimit) {}
 
   /**
    * Creates a new SlewRateLimiter with the given rate limit and initial value.
    *
-   * @param positiveRateLimit The rate-of-change limit in the positive direction, in units per second.
-   * @param negativeRateLimit The rate-of-change limit in the negative direction, in units per second.
+   * @param positiveRateLimit The rate-of-change limit in the positive
+   * direction, in units per second.
+   * @param negativeRateLimit The rate-of-change limit in the negative
+   * direction, in units per second.
    * @param initialValue The initial value of the input.
    */
-  explicit SlewRateLimiter(Rate_t positiveRateLimit, Rate_t negativeRateLimit, Unit_t initialValue = Unit_t{0})
+  explicit SlewRateLimiter(Rate_t positiveRateLimit, Rate_t negativeRateLimit,
+                           Unit_t initialValue = Unit_t{0})
       : m_positiveRateLimit{positiveRateLimit},
         m_negativeRateLimit{negativeRateLimit},
         m_prevVal{initialValue},
@@ -57,8 +61,9 @@ class SlewRateLimiter {
   Unit_t Calculate(Unit_t input) {
     units::second_t currentTime = units::microsecond_t(wpi::Now());
     units::second_t elapsedTime = currentTime - m_prevTime;
-    m_prevVal += std::clamp(input - m_prevVal, m_negativeRateLimit * elapsedTime,
-                            m_positiveRateLimit * elapsedTime);
+    m_prevVal +=
+        std::clamp(input - m_prevVal, m_negativeRateLimit * elapsedTime,
+                   m_positiveRateLimit * elapsedTime);
     m_prevTime = currentTime;
     return m_prevVal;
   }

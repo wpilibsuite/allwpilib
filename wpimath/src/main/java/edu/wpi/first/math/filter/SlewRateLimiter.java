@@ -21,9 +21,11 @@ public class SlewRateLimiter {
 
   /**
    * Constructs a SlewRateLimiter with the given positive and negative rate limits and inital value.
-   * 
-   * @param positiveRateLimit The rate-of-change limit in the positive direction, in units per second.
-   * @param negativeRateLimit The rate-of-change limit in the negative direction, in units per second.
+   *
+   * @param positiveRateLimit The rate-of-change limit in the positive direction, in units per
+   *     second.
+   * @param negativeRateLimit The rate-of-change limit in the negative direction, in units per
+   *     second.
    * @param initialValue The initial value of the input.
    */
   public SlewRateLimiter(double positiveRateLimit, double negativeRateLimit, double initialValue) {
@@ -36,8 +38,10 @@ public class SlewRateLimiter {
   /**
    * Creates a new SlewRateLimiter with the given positive and negative rate limits.
    *
-   * @param positiveRateLimit The rate-of-change limit in the positive direction, in units per second.
-   * @param negativeRateLimit The rate-of-change limit in the negative direction, in units per second.
+   * @param positiveRateLimit The rate-of-change limit in the positive direction, in units per
+   *     second.
+   * @param negativeRateLimit The rate-of-change limit in the negative direction, in units per
+   *     second.
    */
   public SlewRateLimiter(double positiveRateLimit, double negativeRateLimit) {
     this(positiveRateLimit, negativeRateLimit, 0);
@@ -62,7 +66,10 @@ public class SlewRateLimiter {
     double currentTime = WPIUtilJNI.now() * 1e-6;
     double elapsedTime = currentTime - m_prevTime;
     m_prevVal +=
-        MathUtil.clamp(input - m_prevVal, m_negativeRateLimit * elapsedTime, m_positiveRateLimit * elapsedTime);
+        MathUtil.clamp(
+            input - m_prevVal,
+            m_negativeRateLimit * elapsedTime,
+            m_positiveRateLimit * elapsedTime);
     m_prevTime = currentTime;
     return m_prevVal;
   }

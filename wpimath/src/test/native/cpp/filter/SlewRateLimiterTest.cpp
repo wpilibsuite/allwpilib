@@ -45,7 +45,7 @@ TEST_F(SlewRateLimiterTest, SlewRatePositveNegativeLimit) {
   now += 1_s;
 
   EXPECT_EQ(limiter.Calculate(2_m), 1_m);
-  
+
   now += 1_s;
 
   EXPECT_EQ(limiter.Calculate(0_m), 0.5_m);
