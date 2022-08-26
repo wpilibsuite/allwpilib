@@ -46,7 +46,7 @@ public class SlewRateLimiter {
    */
   @Deprecated(since = "2023", forRemoval = true)
   public SlewRateLimiter(double rateLimit, double initalValue) {
-    this(rateLimit, -rateLimit, 0);
+    this(rateLimit, -rateLimit, initalValue);
   }
 
   /**
