@@ -41,7 +41,8 @@ public class SlewRateLimiter {
    *
    * @param rateLimit The rate-of-change limit, in units per second.
    * @param initalValue The initial value of the input.
-   * @deprecated Use SlewRateLimiter(double positiveRateLimit, double negativeRateLimit, double initalValue) instead.
+   * @deprecated Use SlewRateLimiter(double positiveRateLimit, double negativeRateLimit, double
+   *     initalValue) instead.
    */
   @Deprecated(since = "2023", forRemoval = true)
   public SlewRateLimiter(double rateLimit, double initalValue) {

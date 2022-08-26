@@ -41,7 +41,7 @@ class SlewRateLimiterTest {
 
   @Test
   void slewRatePositiveNegativeTest() {
-    var limiter = new SlewRateLimiter(1, -0.5);
+    var limiter = new SlewRateLimiter(1, -0.5, 0);
     WPIUtilJNI.setMockTime(1000000L);
     assertEquals(limiter.calculate(2), 1);
     WPIUtilJNI.setMockTime(2000000L);
