@@ -26,7 +26,7 @@ public class SlewRateLimiter {
    * @param positiveRateLimit The rate-of-change limit in the positive direction, in units per
    *     second.
    * @param negativeRateLimit The rate-of-change limit in the negative direction, in units per
-   *     second.
+   *     second. This is expected to be less than 0.
    * @param initialValue The initial value of the input.
    */
   public SlewRateLimiter(double positiveRateLimit, double negativeRateLimit, double initialValue) {
@@ -39,13 +39,13 @@ public class SlewRateLimiter {
   /**
    * Creates a new SlewRateLimiter with the given positive and negative rate limits.
    *
-   * @param positiveRateLimit The rate-of-change limit in the positive direction, in units per
-   *     second.
-   * @param negativeRateLimit The rate-of-change limit in the negative direction, in units per
-   *     second.
+   * @param rateLimit The rate-of-change limit, in units per second.
+   * @param initalValue The initial value of the input.
+   * @deprecated Use SlewRateLimiter(double positiveRateLimit, double negativeRateLimit, double initalValue) instead.
    */
-  public SlewRateLimiter(double positiveRateLimit, double negativeRateLimit) {
-    this(positiveRateLimit, negativeRateLimit, 0);
+  @Deprecated(since = "2023", forRemoval = true)
+  public SlewRateLimiter(double rateLimit, double initalValue) {
+    this(rateLimit, -rateLimit, 0);
   }
 
   /**

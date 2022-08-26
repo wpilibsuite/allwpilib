@@ -34,6 +34,16 @@ class SlewRateLimiter {
    */
   explicit SlewRateLimiter(Rate_t rateLimit)
       : SlewRateLimiter(rateLimit, -rateLimit) {}
+  
+  /**
+   * Creates a new SlewRateLimiter with the given rate limit and initial value.
+   *
+   * @param rateLimit The rate-of-change limit.
+   * @param initialValue The initial value of the input.
+   */
+  WPI_DEPRECATED("Use SlewRateLimiter(Rate_t positiveRateLimit, Rate_t negativeRateLimit, Unit_t initalValue) instead")
+  explicit SlewRateLimiter(Rate_t rateLimit, Unit_t initialValue = Unit_t{0})
+      : SlewRateLimiter(rateLimit, -rateLimit, initialValue) {}
 
   /**
    * Creates a new SlewRateLimiter with the given positive and negative rate
@@ -42,10 +52,10 @@ class SlewRateLimiter {
    * @param positiveRateLimit The rate-of-change limit in the positive
    * direction, in units per second.
    * @param negativeRateLimit The rate-of-change limit in the negative
-   * direction, in units per second.
+   * direction, in units per second. This is expected to be less than 0.
    * @param initialValue The initial value of the input.
    */
-  explicit SlewRateLimiter(Rate_t positiveRateLimit, Rate_t negativeRateLimit,
+  SlewRateLimiter(Rate_t positiveRateLimit, Rate_t negativeRateLimit,
                            Unit_t initialValue = Unit_t{0})
       : m_positiveRateLimit{positiveRateLimit},
         m_negativeRateLimit{negativeRateLimit},
