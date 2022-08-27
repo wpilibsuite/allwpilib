@@ -11,7 +11,7 @@
 #include "DigitalInternal.h"
 #include "HALInitializer.h"
 #include "HALInternal.h"
-#include "InterruptManager.h"
+#include "hal/roborio/InterruptManager.h"
 #include "PortsInternal.h"
 #include "hal/ChipObject.h"
 #include "hal/Errors.h"

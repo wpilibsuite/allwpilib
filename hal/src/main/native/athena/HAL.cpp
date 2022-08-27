@@ -23,7 +23,7 @@
 
 #include "HALInitializer.h"
 #include "HALInternal.h"
-#include "InterruptManager.h"
+#include "hal/roborio/InterruptManager.h"
 #include "hal/ChipObject.h"
 #include "hal/DriverStation.h"
 #include "hal/Errors.h"
