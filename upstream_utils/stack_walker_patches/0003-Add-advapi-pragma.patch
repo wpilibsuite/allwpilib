@@ -19,6 +19,3 @@ index 48c7c57..6f0fbf2 100644
  #pragma warning(disable : 4826)
  
  #ifdef UNICODE
--- 
-2.20.1.windows.1
-

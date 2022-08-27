@@ -110,6 +110,13 @@ TEST_F(StringMapTest, ConstEmptyMapTest) {
   EXPECT_TRUE(constTestMap.find(testKeyStr) == constTestMap.end());
 }
 
+// initializer_list ctor test; also implicitly tests initializer_list and
+// iterator overloads of insert().
+TEST_F(StringMapTest, InitializerListCtor) {
+  testMap = StringMap<uint32_t>({{"key", 1}});
+  assertSingleItemMap();
+}
+
 // A map with a single entry.
 TEST_F(StringMapTest, SingleEntryMapTest) {
   testMap[testKey] = testValue;
@@ -300,7 +307,7 @@ TEST_F(StringMapTest, InsertOrAssignTest) {
   EXPECT_EQ(0, try1.first->second.copy);
 }
 
-TEST_F(StringMapTest, IterMapKeys) {
+TEST_F(StringMapTest, IterMapKeysSmallVector) {
   StringMap<int> Map;
   Map["A"] = 1;
   Map["B"] = 2;

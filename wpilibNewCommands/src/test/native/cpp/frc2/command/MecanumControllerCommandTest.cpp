@@ -85,7 +85,7 @@ TEST_F(MecanumControllerCommandTest, ReachesReference) {
       trajectory, [&]() { return getRobotPose(); }, m_kinematics,
 
       frc2::PIDController(0.6, 0, 0), frc2::PIDController(0.6, 0, 0),
-      m_rotController, units::meters_per_second_t(8.8),
+      m_rotController, 8.8_mps,
       [&](units::meters_per_second_t frontLeft,
           units::meters_per_second_t rearLeft,
           units::meters_per_second_t frontRight,

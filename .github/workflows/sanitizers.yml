@@ -15,7 +15,7 @@ jobs:
           - name: asan
             cmake-flags: "-DCMAKE_BUILD_TYPE=Asan"
             ctest-env: ""
-            ctest-flags: "-E 'wpinet|wpiutil|ntcore|wpilibc'"
+            ctest-flags: "-E 'ntcore|wpilibc'"
           - name: tsan
             cmake-flags: "-DCMAKE_BUILD_TYPE=Tsan"
             ctest-env: "TSAN_OPTIONS=second_deadlock_stack=1"

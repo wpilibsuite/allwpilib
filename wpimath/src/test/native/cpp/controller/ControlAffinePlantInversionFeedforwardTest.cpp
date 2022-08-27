@@ -41,8 +41,8 @@ TEST(ControlAffinePlantInversionFeedforwardTest, CalculateState) {
 
   Matrixd<2, 1> B{0, 1};
 
-  frc::ControlAffinePlantInversionFeedforward<2, 1> feedforward{
-      modelDynamics, B, units::second_t(0.02)};
+  frc::ControlAffinePlantInversionFeedforward<2, 1> feedforward{modelDynamics,
+                                                                B, 20_ms};
 
   Vectord<2> r{2, 2};
   Vectord<2> nextR{3, 3};

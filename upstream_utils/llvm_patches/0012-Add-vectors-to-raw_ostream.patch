@@ -1,7 +1,7 @@
-From c01b703c5d54cb57f8a73215a4ca8aded32dd9ba Mon Sep 17 00:00:00 2001
+From 342ebd445bb3dae8b0c119a6126a318ad378a377 Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Sun, 8 May 2022 13:48:59 -0400
-Subject: [PATCH 12/27] Add vectors to raw_ostream
+Subject: [PATCH 12/28] Add vectors to raw_ostream
 
 ---
  llvm/include/llvm/Support/raw_ostream.h | 115 ++++++++++++++++++++++++
@@ -9,10 +9,10 @@ Subject: [PATCH 12/27] Add vectors to raw_ostream
  2 files changed, 162 insertions(+)
 
 diff --git a/llvm/include/llvm/Support/raw_ostream.h b/llvm/include/llvm/Support/raw_ostream.h
-index 50443e018aaf..8008170be3e5 100644
+index d4521c8e2..bf5630ab5 100644
 --- a/llvm/include/llvm/Support/raw_ostream.h
 +++ b/llvm/include/llvm/Support/raw_ostream.h
-@@ -26,6 +26,7 @@
+@@ -25,6 +25,7 @@
  #endif
  #include <system_error>
  #include <type_traits>
@@ -20,7 +20,7 @@ index 50443e018aaf..8008170be3e5 100644
  
  namespace llvm {
  
-@@ -249,12 +250,24 @@ public:
+@@ -248,12 +249,24 @@ public:
      return write(Str.data(), Str.size());
    }
  
@@ -45,7 +45,7 @@ index 50443e018aaf..8008170be3e5 100644
  
    /// indent - Insert 'NumSpaces' spaces.
    raw_ostream &indent(unsigned NumSpaces);
-@@ -600,6 +613,108 @@ public:
+@@ -604,6 +617,108 @@ public:
    }
  };
  
@@ -155,10 +155,10 @@ index 50443e018aaf..8008170be3e5 100644
  class raw_null_ostream : public raw_pwrite_stream {
    /// See raw_ostream::write_impl.
 diff --git a/llvm/lib/Support/raw_ostream.cpp b/llvm/lib/Support/raw_ostream.cpp
-index 611043dc5925..3abeed3dac21 100644
+index 875eda7ba..36faf744c 100644
 --- a/llvm/lib/Support/raw_ostream.cpp
 +++ b/llvm/lib/Support/raw_ostream.cpp
-@@ -664,6 +664,53 @@ void raw_svector_ostream::pwrite_impl(const char *Ptr, size_t Size,
+@@ -658,6 +658,53 @@ void raw_svector_ostream::pwrite_impl(const char *Ptr, size_t Size,
    memcpy(OS.data() + Offset, Ptr, Size);
  }
  
@@ -212,6 +212,3 @@ index 611043dc5925..3abeed3dac21 100644
  //===----------------------------------------------------------------------===//
  //  raw_null_ostream
  //===----------------------------------------------------------------------===//
--- 
-2.20.1.windows.1
-

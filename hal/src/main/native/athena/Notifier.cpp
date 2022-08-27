@@ -119,8 +119,9 @@ static void notifierThreadMain() {
     if (!notifierRunning) {
       break;
     }
-    if (triggeredMask == 0)
+    if (triggeredMask == 0) {
       continue;
+    }
     alarmCallback();
   }
 }
@@ -201,8 +202,9 @@ void HAL_SetNotifierName(HAL_NotifierHandle notifierHandle, const char* name,
 
 void HAL_StopNotifier(HAL_NotifierHandle notifierHandle, int32_t* status) {
   auto notifier = notifierHandles->Get(notifierHandle);
-  if (!notifier)
+  if (!notifier) {
     return;
+  }
 
   {
     std::scoped_lock lock(notifier->mutex);
@@ -215,8 +217,9 @@ void HAL_StopNotifier(HAL_NotifierHandle notifierHandle, int32_t* status) {
 
 void HAL_CleanNotifier(HAL_NotifierHandle notifierHandle, int32_t* status) {
   auto notifier = notifierHandles->Free(notifierHandle);
-  if (!notifier)
+  if (!notifier) {
     return;
+  }
 
   // Just in case HAL_StopNotifier() wasn't called...
   {
@@ -250,8 +253,9 @@ void HAL_CleanNotifier(HAL_NotifierHandle notifierHandle, int32_t* status) {
 void HAL_UpdateNotifierAlarm(HAL_NotifierHandle notifierHandle,
                              uint64_t triggerTime, int32_t* status) {
   auto notifier = notifierHandles->Get(notifierHandle);
-  if (!notifier)
+  if (!notifier) {
     return;
+  }
 
   {
     std::scoped_lock lock(notifier->mutex);
@@ -276,8 +280,9 @@ void HAL_UpdateNotifierAlarm(HAL_NotifierHandle notifierHandle,
 void HAL_CancelNotifierAlarm(HAL_NotifierHandle notifierHandle,
                              int32_t* status) {
   auto notifier = notifierHandles->Get(notifierHandle);
-  if (!notifier)
+  if (!notifier) {
     return;
+  }
 
   {
     std::scoped_lock lock(notifier->mutex);
@@ -288,8 +293,9 @@ void HAL_CancelNotifierAlarm(HAL_NotifierHandle notifierHandle,
 uint64_t HAL_WaitForNotifierAlarm(HAL_NotifierHandle notifierHandle,
                                   int32_t* status) {
   auto notifier = notifierHandles->Get(notifierHandle);
-  if (!notifier)
+  if (!notifier) {
     return 0;
+  }
   std::unique_lock lock(notifier->mutex);
   notifier->cond.wait(lock, [&] {
     return !notifier->active || notifier->triggeredTime != UINT64_MAX;

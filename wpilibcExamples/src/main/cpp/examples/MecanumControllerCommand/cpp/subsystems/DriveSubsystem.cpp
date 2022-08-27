@@ -28,7 +28,7 @@ DriveSubsystem::DriveSubsystem()
       m_rearRightEncoder{kRearRightEncoderPorts[0], kRearRightEncoderPorts[1],
                          kRearRightEncoderReversed},
 
-      m_odometry{kDriveKinematics, m_gyro.GetRotation2d(), frc::Pose2d()} {
+      m_odometry{kDriveKinematics, m_gyro.GetRotation2d(), frc::Pose2d{}} {
   // Set the distance per pulse for the encoders
   m_frontLeftEncoder.SetDistancePerPulse(kEncoderDistancePerPulse);
   m_rearLeftEncoder.SetDistancePerPulse(kEncoderDistancePerPulse);
@@ -46,10 +46,10 @@ void DriveSubsystem::Periodic() {
   m_odometry.Update(
       m_gyro.GetRotation2d(),
       frc::MecanumDriveWheelSpeeds{
-          units::meters_per_second_t(m_frontLeftEncoder.GetRate()),
-          units::meters_per_second_t(m_rearLeftEncoder.GetRate()),
-          units::meters_per_second_t(m_frontRightEncoder.GetRate()),
-          units::meters_per_second_t(m_rearRightEncoder.GetRate())});
+          units::meters_per_second_t{m_frontLeftEncoder.GetRate()},
+          units::meters_per_second_t{m_rearLeftEncoder.GetRate()},
+          units::meters_per_second_t{m_frontRightEncoder.GetRate()},
+          units::meters_per_second_t{m_rearRightEncoder.GetRate()}});
 }
 
 void DriveSubsystem::Drive(double xSpeed, double ySpeed, double rot,
@@ -96,10 +96,10 @@ frc::Encoder& DriveSubsystem::GetRearRightEncoder() {
 
 frc::MecanumDriveWheelSpeeds DriveSubsystem::getCurrentWheelSpeeds() {
   return (frc::MecanumDriveWheelSpeeds{
-      units::meters_per_second_t(m_frontLeftEncoder.GetRate()),
-      units::meters_per_second_t(m_rearLeftEncoder.GetRate()),
-      units::meters_per_second_t(m_frontRightEncoder.GetRate()),
-      units::meters_per_second_t(m_rearRightEncoder.GetRate())});
+      units::meters_per_second_t{m_frontLeftEncoder.GetRate()},
+      units::meters_per_second_t{m_rearLeftEncoder.GetRate()},
+      units::meters_per_second_t{m_frontRightEncoder.GetRate()},
+      units::meters_per_second_t{m_rearRightEncoder.GetRate()}});
 }
 
 void DriveSubsystem::SetMaxOutput(double maxOutput) {

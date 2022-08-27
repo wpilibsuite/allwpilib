@@ -10,9 +10,9 @@ using namespace DriveConstants;
 
 TurnToAngleProfiled::TurnToAngleProfiled(units::degree_t target,
                                          DriveSubsystem* drive)
-    : CommandHelper(
-          frc::ProfiledPIDController<units::radians>(
-              kTurnP, kTurnI, kTurnD, {kMaxTurnRate, kMaxTurnAcceleration}),
+    : CommandHelper{
+          frc::ProfiledPIDController<units::radians>{
+              kTurnP, kTurnI, kTurnD, {kMaxTurnRate, kMaxTurnAcceleration}},
           // Close loop on heading
           [drive] { return drive->GetHeading(); },
           // Set reference to target
@@ -22,7 +22,7 @@ TurnToAngleProfiled::TurnToAngleProfiled(units::degree_t target,
             drive->ArcadeDrive(0, output);
           },
           // Require the drive
-          {drive}) {
+          {drive}} {
   // Set the controller to be continuous (because it is an angle controller)
   GetController().EnableContinuousInput(-180_deg, 180_deg);
   // Set the controller tolerance - the delta tolerance ensures the robot is

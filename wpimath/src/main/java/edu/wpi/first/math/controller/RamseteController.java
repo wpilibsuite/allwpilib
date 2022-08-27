@@ -120,8 +120,11 @@ public class RamseteController {
     final double vRef = linearVelocityRefMeters;
     final double omegaRef = angularVelocityRefRadiansPerSecond;
 
+    // k = 2ζ√(ω_ref² + b v_ref²)
     double k = 2.0 * m_zeta * Math.sqrt(Math.pow(omegaRef, 2) + m_b * Math.pow(vRef, 2));
 
+    // v_cmd = v_ref cos(e_θ) + k e_x
+    // ω_cmd = ω_ref + k e_θ + b v_ref sinc(e_θ) e_y
     return new ChassisSpeeds(
         vRef * m_poseError.getRotation().getCos() + k * eX,
         0.0,

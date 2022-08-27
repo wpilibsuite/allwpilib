@@ -121,8 +121,9 @@ static void writeRegister(Register reg, uint8_t data) {
   // Execute and wait until it's done (up to a millisecond)
   initialTime = HAL_GetFPGATime(&status);
   while (accel->readSTAT(&status) & 1) {
-    if (HAL_GetFPGATime(&status) > initialTime + 1000)
+    if (HAL_GetFPGATime(&status) > initialTime + 1000) {
       break;
+    }
   }
 
   // Send a stop transmit/receive message with the data
@@ -133,8 +134,9 @@ static void writeRegister(Register reg, uint8_t data) {
   // Execute and wait until it's done (up to a millisecond)
   initialTime = HAL_GetFPGATime(&status);
   while (accel->readSTAT(&status) & 1) {
-    if (HAL_GetFPGATime(&status) > initialTime + 1000)
+    if (HAL_GetFPGATime(&status) > initialTime + 1000) {
       break;
+    }
   }
 }
 
@@ -151,8 +153,9 @@ static uint8_t readRegister(Register reg) {
   // Execute and wait until it's done (up to a millisecond)
   initialTime = HAL_GetFPGATime(&status);
   while (accel->readSTAT(&status) & 1) {
-    if (HAL_GetFPGATime(&status) > initialTime + 1000)
+    if (HAL_GetFPGATime(&status) > initialTime + 1000) {
       break;
+    }
   }
 
   // Receive a message with the data and stop
@@ -163,8 +166,9 @@ static uint8_t readRegister(Register reg) {
   // Execute and wait until it's done (up to a millisecond)
   initialTime = HAL_GetFPGATime(&status);
   while (accel->readSTAT(&status) & 1) {
-    if (HAL_GetFPGATime(&status) > initialTime + 1000)
+    if (HAL_GetFPGATime(&status) > initialTime + 1000) {
       break;
+    }
   }
 
   return accel->readDATI(&status);

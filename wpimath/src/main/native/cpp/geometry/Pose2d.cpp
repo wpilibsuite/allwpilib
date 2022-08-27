@@ -22,7 +22,7 @@ Pose2d Pose2d::operator+(const Transform2d& other) const {
 
 Transform2d Pose2d::operator-(const Pose2d& other) const {
   const auto pose = this->RelativeTo(other);
-  return Transform2d(pose.Translation(), pose.Rotation());
+  return Transform2d{pose.Translation(), pose.Rotation()};
 }
 
 bool Pose2d::operator==(const Pose2d& other) const {
@@ -87,7 +87,7 @@ Twist2d Pose2d::Log(const Pose2d& end) const {
           {halfThetaByTanOfHalfDtheta, -halfDtheta}) *
       std::hypot(halfThetaByTanOfHalfDtheta, halfDtheta);
 
-  return {translationPart.X(), translationPart.Y(), units::radian_t(dtheta)};
+  return {translationPart.X(), translationPart.Y(), units::radian_t{dtheta}};
 }
 
 void frc::to_json(wpi::json& json, const Pose2d& pose) {

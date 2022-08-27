@@ -9,7 +9,7 @@
 #include <frc/smartdashboard/SmartDashboard.h>
 
 Elevator::Elevator()
-    : frc2::PIDSubsystem(frc2::PIDController(kP_real, kI_real, 0)) {
+    : frc2::PIDSubsystem{frc2::PIDController{kP_real, kI_real, 0}} {
 #ifdef SIMULATION  // Check for simulation and update PID values
   GetPIDController()->SetPID(kP_simulation, kI_simulation, 0, 0);
 #endif

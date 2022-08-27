@@ -49,8 +49,7 @@ class Logger {
   void Log(unsigned int level, const char* file, unsigned int line,
            const S& format, Args&&... args) {
     if (m_func && level >= m_min_level) {
-      LogV(level, file, line, format,
-           fmt::make_args_checked<Args...>(format, args...));
+      LogV(level, file, line, format, fmt::make_format_args(args...));
     }
   }
 

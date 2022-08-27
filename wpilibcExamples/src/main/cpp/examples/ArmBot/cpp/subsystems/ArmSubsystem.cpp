@@ -26,9 +26,9 @@ void ArmSubsystem::UseOutput(double output, State setpoint) {
   units::volt_t feedforward =
       m_feedforward.Calculate(setpoint.position, setpoint.velocity);
   // Add the feedforward to the PID output to get the motor output
-  m_motor.SetVoltage(units::volt_t(output) + feedforward);
+  m_motor.SetVoltage(units::volt_t{output} + feedforward);
 }
 
 units::radian_t ArmSubsystem::GetMeasurement() {
-  return units::radian_t(m_encoder.GetDistance()) + kArmOffset;
+  return units::radian_t{m_encoder.GetDistance()} + kArmOffset;
 }

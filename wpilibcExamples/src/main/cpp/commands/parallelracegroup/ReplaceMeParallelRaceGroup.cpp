@@ -9,5 +9,5 @@
 // https://docs.wpilib.org/en/stable/docs/software/commandbased/convenience-features.html
 ReplaceMeParallelRaceGroup::ReplaceMeParallelRaceGroup() {
   // Add your commands here, e.g.
-  // AddCommands(FooCommand(), BarCommand());
+  // AddCommands(FooCommand{}, BarCommand{});
 }

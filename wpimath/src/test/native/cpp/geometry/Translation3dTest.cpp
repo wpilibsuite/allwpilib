@@ -116,12 +116,12 @@ TEST(Translation3dTest, Inequality) {
 TEST(Translation3dTest, PolarConstructor) {
   Eigen::Vector3d zAxis{0.0, 0.0, 1.0};
 
-  Translation3d one{std::sqrt(2) * 1_m, Rotation3d(zAxis, 45_deg)};
+  Translation3d one{std::sqrt(2) * 1_m, Rotation3d{zAxis, 45_deg}};
   EXPECT_NEAR(one.X().value(), 1.0, kEpsilon);
   EXPECT_NEAR(one.Y().value(), 1.0, kEpsilon);
   EXPECT_NEAR(one.Z().value(), 0.0, kEpsilon);
 
-  Translation3d two{2_m, Rotation3d(zAxis, 60_deg)};
+  Translation3d two{2_m, Rotation3d{zAxis, 60_deg}};
   EXPECT_NEAR(two.X().value(), 1.0, kEpsilon);
   EXPECT_NEAR(two.Y().value(), std::sqrt(3.0), kEpsilon);
   EXPECT_NEAR(two.Z().value(), 0.0, kEpsilon);

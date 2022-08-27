@@ -50,7 +50,7 @@ inline void ADISReportError(int32_t status, const char* file, int line,
                             const char* function, const S& format,
                             Args&&... args) {
   frc::ReportErrorV(status, file, line, function, format,
-                    fmt::make_args_checked<Args...>(format, args...));
+                    fmt::make_format_args(args...));
 }
 }  // namespace
 

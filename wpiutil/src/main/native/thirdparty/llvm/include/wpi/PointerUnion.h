@@ -5,10 +5,11 @@
 // SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 //
 //===----------------------------------------------------------------------===//
-//
-// This file defines the PointerUnion class, which is a discriminated union of
-// pointer types.
-//
+///
+/// \file
+/// This file defines the PointerUnion class, which is a discriminated union of
+/// pointer types.
+///
 //===----------------------------------------------------------------------===//
 
 #ifndef WPIUTIL_WPI_POINTERUNION_H
@@ -17,41 +18,58 @@
 #include "wpi/DenseMapInfo.h"
 #include "wpi/PointerIntPair.h"
 #include "wpi/PointerLikeTypeTraits.h"
+#include <algorithm>
 #include <cassert>
 #include <cstddef>
 #include <cstdint>
+#include <type_traits>
 
 namespace wpi {
 
-template <typename T> struct PointerUnionTypeSelectorReturn {
-  using Return = T;
-};
+namespace detail {
+template <typename T, typename... Us> struct TypesAreDistinct;
+template <typename T, typename... Us>
+struct TypesAreDistinct
+    : std::integral_constant<bool, !std::disjunction_v<std::is_same<T, Us>...> &&
+                                       TypesAreDistinct<Us...>::value> {};
+template <typename T> struct TypesAreDistinct<T> : std::true_type {};
+} // namespace detail
 
-/// Get a type based on whether two types are the same or not.
+/// Determine if all types in Ts are distinct.
 ///
-/// For:
+/// Useful to statically assert when Ts is intended to describe a non-multi set
+/// of types.
 ///
-/// \code
-///   using Ret = typename PointerUnionTypeSelector<T1, T2, EQ, NE>::Return;
-/// \endcode
-///
-/// Ret will be EQ type if T1 is same as T2 or NE type otherwise.
-template <typename T1, typename T2, typename RET_EQ, typename RET_NE>
-struct PointerUnionTypeSelector {
-  using Return = typename PointerUnionTypeSelectorReturn<RET_NE>::Return;
-};
+/// Expensive (currently quadratic in sizeof(Ts...)), and so should only be
+/// asserted once per instantiation of a type which requires it.
+template <typename... Ts> struct TypesAreDistinct;
+template <> struct TypesAreDistinct<> : std::true_type {};
+template <typename... Ts>
+struct TypesAreDistinct
+    : std::integral_constant<bool, detail::TypesAreDistinct<Ts...>::value> {};
 
-template <typename T, typename RET_EQ, typename RET_NE>
-struct PointerUnionTypeSelector<T, T, RET_EQ, RET_NE> {
-  using Return = typename PointerUnionTypeSelectorReturn<RET_EQ>::Return;
-};
+/// Find the first index where a type appears in a list of types.
+///
+/// FirstIndexOfType<T, Us...>::value is the first index of T in Us.
+///
+/// Typically only meaningful when it is otherwise statically known that the
+/// type pack has no duplicate types. This should be guaranteed explicitly with
+/// static_assert(TypesAreDistinct<Us...>::value).
+///
+/// It is a compile-time error to instantiate when T is not present in Us, i.e.
+/// if is_one_of<T, Us...>::value is false.
+template <typename T, typename... Us> struct FirstIndexOfType;
+template <typename T, typename U, typename... Us>
+struct FirstIndexOfType<T, U, Us...>
+    : std::integral_constant<size_t, 1 + FirstIndexOfType<T, Us...>::value> {};
+template <typename T, typename... Us>
+struct FirstIndexOfType<T, T, Us...> : std::integral_constant<size_t, 0> {};
 
-template <typename T1, typename T2, typename RET_EQ, typename RET_NE>
-struct PointerUnionTypeSelectorReturn<
-    PointerUnionTypeSelector<T1, T2, RET_EQ, RET_NE>> {
-  using Return =
-      typename PointerUnionTypeSelector<T1, T2, RET_EQ, RET_NE>::Return;
-};
+/// Find the type at a given index in a list of types.
+///
+/// TypeAtIndex<I, Ts...> is the type at index I in Ts.
+template <size_t I, typename... Ts>
+using TypeAtIndex = std::tuple_element_t<I, std::tuple<Ts...>>;
 
 namespace pointer_union_detail {
   /// Determine the number of bits required to store integers with values < n.
@@ -63,21 +81,6 @@ namespace pointer_union_detail {
   template <typename... Ts> constexpr int lowBitsAvailable() {
     return std::min<int>({PointerLikeTypeTraits<Ts>::NumLowBitsAvailable...});
   }
-
-  /// Find the index of a type in a list of types. TypeIndex<T, Us...>::Index
-  /// is the index of T in Us, or sizeof...(Us) if T does not appear in the
-  /// list.
-  template <typename T, typename ...Us> struct TypeIndex;
-  template <typename T, typename ...Us> struct TypeIndex<T, T, Us...> {
-    static constexpr int Index = 0;
-  };
-  template <typename T, typename U, typename... Us>
-  struct TypeIndex<T, U, Us...> {
-    static constexpr int Index = 1 + TypeIndex<T, Us...>::Index;
-  };
-  template <typename T> struct TypeIndex<T> {
-    static constexpr int Index = 0;
-  };
 
   /// Find the first type in a list of types.
   template <typename T, typename...> struct GetFirstType {
@@ -145,6 +148,7 @@ namespace pointer_union_detail {
 ///    P = (float*)0;
 ///    Y = P.get<float*>();   // ok.
 ///    X = P.get<int*>();     // runtime assertion failure.
+///    PointerUnion<int*, int*> Q; // compile time failure.
 template <typename... PTs>
 class PointerUnion
     : public pointer_union_detail::PointerUnionMembers<
@@ -153,12 +157,14 @@ class PointerUnion
               void *, pointer_union_detail::bitsRequired(sizeof...(PTs)), int,
               pointer_union_detail::PointerUnionUIntTraits<PTs...>>,
           0, PTs...> {
+  static_assert(TypesAreDistinct<PTs...>::value,
+                "PointerUnion alternative types cannot be repeated");
   // The first type is special because we want to directly cast a pointer to a
   // default-initialized union to a pointer to the first type. But we don't
   // want PointerUnion to be a 'template <typename First, typename ...Rest>'
   // because it's much more convenient to have a name for the whole pack. So
   // split off the first type here.
-  using First = typename pointer_union_detail::GetFirstType<PTs...>::type;
+  using First = TypeAtIndex<0, PTs...>;
   using Base = typename PointerUnion::PointerUnionMembers;
 
 public:
@@ -175,10 +181,7 @@ public:
 
   /// Test if the Union currently holds the type matching T.
   template <typename T> bool is() const {
-    constexpr int Index = pointer_union_detail::TypeIndex<T, PTs...>::Index;
-    static_assert(Index < sizeof...(PTs),
-                  "PointerUnion::is<T> given type not in the union");
-    return this->Val.getInt() == Index;
+    return this->Val.getInt() == FirstIndexOfType<T, PTs...>::value;
   }
 
   /// Returns the value of the specified pointer type.

@@ -14,8 +14,9 @@ void BooleanCallback::HandleCallback(std::string_view name,
     throw std::invalid_argument("Null value");
   }
   if (value->type != HAL_BOOLEAN) {
-    throw std::invalid_argument(
-        fmt::format("Wrong type '{}' for boolean", value->type).c_str());
+    throw std::invalid_argument(fmt::format("Wrong type '{}' for boolean",
+                                            static_cast<int>(value->type))
+                                    .c_str());
   }
   m_wasTriggered = true;
   m_lastValue = value->data.v_boolean;
@@ -28,7 +29,8 @@ void EnumCallback::HandleCallback(std::string_view name,
   }
   if (value->type != HAL_ENUM) {
     throw std::invalid_argument(
-        fmt::format("Wrong type '{}' for enum", value->type).c_str());
+        fmt::format("Wrong type '{}' for enum", static_cast<int>(value->type))
+            .c_str());
   }
 
   m_wasTriggered = true;
@@ -41,8 +43,9 @@ void IntCallback::HandleCallback(std::string_view name,
     throw std::invalid_argument("Null value");
   }
   if (value->type != HAL_INT) {
-    throw std::invalid_argument(
-        fmt::format("Wrong type '{}' for integer", value->type).c_str());
+    throw std::invalid_argument(fmt::format("Wrong type '{}' for integer",
+                                            static_cast<int>(value->type))
+                                    .c_str());
   }
 
   m_wasTriggered = true;
@@ -56,7 +59,8 @@ void LongCallback::HandleCallback(std::string_view name,
   }
   if (value->type != HAL_LONG) {
     throw std::invalid_argument(
-        fmt::format("Wrong type '{}' for long", value->type).c_str());
+        fmt::format("Wrong type '{}' for long", static_cast<int>(value->type))
+            .c_str());
   }
 
   m_wasTriggered = true;
@@ -70,7 +74,8 @@ void DoubleCallback::HandleCallback(std::string_view name,
   }
   if (value->type != HAL_DOUBLE) {
     throw std::invalid_argument(
-        fmt::format("Wrong type '{}' for double", value->type).c_str());
+        fmt::format("Wrong type '{}' for double", static_cast<int>(value->type))
+            .c_str());
   }
 
   m_wasTriggered = true;

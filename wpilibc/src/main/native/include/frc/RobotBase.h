@@ -216,7 +216,9 @@ class RobotBase {
    *
    * @return If the robot is running in simulation.
    */
-  static constexpr bool IsSimulation() { return !IsReal(); }
+  static constexpr bool IsSimulation() {
+    return !IsReal();
+  }
 
   /**
    * Constructor for a generic robot program.
