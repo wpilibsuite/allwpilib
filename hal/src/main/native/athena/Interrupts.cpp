@@ -97,6 +97,30 @@ int64_t HAL_WaitForInterrupt(HAL_InterruptHandle interruptHandle,
   return result;
 }
 
+int64_t HAL_WaitForMultipleInterrupts(HAL_InterruptHandle interruptHandle,
+                                      int64_t mask, double timeout,
+                                      HAL_Bool ignorePrevious,
+                                      int32_t* status) {
+  uint32_t result;
+  auto anInterrupt = interruptHandles->Get(interruptHandle);
+  if (anInterrupt == nullptr) {
+    *status = HAL_HANDLE_ERROR;
+    return 0;
+  }
+
+  result = anInterrupt->manager.WaitForInterrupt(
+      anInterrupt->irqContext, mask, ignorePrevious,
+      static_cast<uint32_t>(timeout * 1e3), status);
+
+  // Don't report a timeout as an error - the return code is enough to tell
+  // that a timeout happened.
+  if (*status == -NiFpga_Status_IrqTimeout) {
+    *status = NiFpga_Status_Success;
+  }
+
+  return result;
+}
+
 int64_t HAL_ReadInterruptRisingTimestamp(HAL_InterruptHandle interruptHandle,
                                          int32_t* status) {
   auto anInterrupt = interruptHandles->Get(interruptHandle);

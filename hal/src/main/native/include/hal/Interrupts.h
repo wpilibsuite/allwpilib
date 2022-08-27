@@ -35,7 +35,7 @@ HAL_InterruptHandle HAL_InitializeInterrupts(int32_t* status);
 void HAL_CleanInterrupts(HAL_InterruptHandle interruptHandle);
 
 /**
- * In synchronous mode, waits for the defined interrupt to occur.
+ * Waits for the defined interrupt to occur.
  *
  * @param[in] interruptHandle the interrupt handle
  * @param[in] timeout         timeout in seconds
@@ -47,6 +47,21 @@ void HAL_CleanInterrupts(HAL_InterruptHandle interruptHandle);
 int64_t HAL_WaitForInterrupt(HAL_InterruptHandle interruptHandle,
                              double timeout, HAL_Bool ignorePrevious,
                              int32_t* status);
+
+/**
+ * Waits for any interrupt covered by the mask to occur.
+ *
+ * @param[in] interruptHandle the interrupt handle to use for the context
+ * @param[in] mask            the mask of interrupts to wait for
+ * @param[in] timeout         timeout in seconds
+ * @param[in] ignorePrevious  if true, ignore interrupts that happened before
+ *                            waitForInterrupt was called
+ * @param[out] status         Error status variable. 0 on success.
+ * @return the mask of interrupts that fired
+ */
+int64_t HAL_WaitForMultipleInterrupts(HAL_InterruptHandle interruptHandle,
+                                      int64_t mask, double timeout,
+                                      HAL_Bool ignorePrevious, int32_t* status);
 
 /**
  * Returns the timestamp for the rising interrupt that occurred most recently.
