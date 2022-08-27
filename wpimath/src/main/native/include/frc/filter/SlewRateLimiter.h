@@ -30,12 +30,12 @@ class SlewRateLimiter {
 
   /**
    * Creates a new SlewRateLimiter with the given positive and negative rate
-   * limit and initial value.
+   * limits and initial value.
    *
    * @param positiveRateLimit The rate-of-change limit in the positive
-   * direction, in units per second.
+   * direction, in units per second. This is expected to be positive.
    * @param negativeRateLimit The rate-of-change limit in the negative
-   * direction, in units per second. This is expected to be less than 0.
+   * direction, in units per second. This is expected to be negative.
    * @param initialValue The initial value of the input.
    */
   SlewRateLimiter(Rate_t positiveRateLimit, Rate_t negativeRateLimit,
@@ -46,7 +46,8 @@ class SlewRateLimiter {
         m_prevTime{units::microsecond_t(wpi::Now())} {}
 
   /**
-   * Creates a new SlewRateLimiter with the given rate limit.
+   * Creates a new SlewRateLimiter with the given positive rate limit and
+   * negative rate limit of -rateLimit.
    *
    * @param rateLimit The rate-of-change limit.
    */
@@ -54,7 +55,8 @@ class SlewRateLimiter {
       : SlewRateLimiter(rateLimit, -rateLimit) {}
 
   /**
-   * Creates a new SlewRateLimiter with the given rate limit and initial value.
+   * Creates a new SlewRateLimiter with the given positive rate limit and
+   * negative rate limit of -rateLimit and initial value.
    *
    * @param rateLimit The rate-of-change limit.
    * @param initialValue The initial value of the input.

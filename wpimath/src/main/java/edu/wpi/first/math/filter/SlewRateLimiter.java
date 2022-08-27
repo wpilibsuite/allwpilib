@@ -20,13 +20,13 @@ public class SlewRateLimiter {
   private double m_prevTime;
 
   /**
-   * Creates a new SlewRateLimiter with the given positive and negative rate limit and initial
+   * Creates a new SlewRateLimiter with the given positive and negative rate limits and initial
    * value.
    *
    * @param positiveRateLimit The rate-of-change limit in the positive direction, in units per
-   *     second.
+   *     second. This is expected to be positive.
    * @param negativeRateLimit The rate-of-change limit in the negative direction, in units per
-   *     second. This is expected to be less than 0.
+   *     second. This is expected to be negative.
    * @param initialValue The initial value of the input.
    */
   public SlewRateLimiter(double positiveRateLimit, double negativeRateLimit, double initialValue) {
@@ -37,7 +37,8 @@ public class SlewRateLimiter {
   }
 
   /**
-   * Creates a new SlewRateLimiter with the given positive and negative rate limits.
+   * Creates a new SlewRateLimiter with the given positive rate limit and negative rate limit of
+   * -rateLimit and initial value.
    *
    * @param rateLimit The rate-of-change limit, in units per second.
    * @param initalValue The initial value of the input.
@@ -50,7 +51,8 @@ public class SlewRateLimiter {
   }
 
   /**
-   * Creates a new SlewRateLimiter with the given rate limit and an initial value of zero.
+   * Creates a new SlewRateLimiter with the given positive rate limit and negative rate limit of
+   * -rateLimit.
    *
    * @param rateLimit The rate-of-change limit, in units per second.
    */
