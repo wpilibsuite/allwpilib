@@ -11,13 +11,13 @@
 #include "DigitalInternal.h"
 #include "HALInitializer.h"
 #include "HALInternal.h"
-#include "hal/roborio/InterruptManager.h"
 #include "PortsInternal.h"
 #include "hal/ChipObject.h"
 #include "hal/Errors.h"
 #include "hal/HALBase.h"
 #include "hal/handles/HandlesInternal.h"
 #include "hal/handles/LimitedHandleResource.h"
+#include "hal/roborio/InterruptManager.h"
 
 using namespace hal;
 

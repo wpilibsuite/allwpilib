@@ -23,12 +23,12 @@
 
 #include "HALInitializer.h"
 #include "HALInternal.h"
-#include "hal/roborio/InterruptManager.h"
 #include "hal/ChipObject.h"
 #include "hal/DriverStation.h"
 #include "hal/Errors.h"
 #include "hal/Notifier.h"
 #include "hal/handles/HandlesInternal.h"
+#include "hal/roborio/InterruptManager.h"
 #include "visa/visa.h"
 
 using namespace hal;

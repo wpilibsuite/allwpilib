@@ -15,12 +15,12 @@
 
 #include "HALInitializer.h"
 #include "HALInternal.h"
-#include "hal/roborio/InterruptManager.h"
 #include "hal/ChipObject.h"
 #include "hal/Errors.h"
 #include "hal/HAL.h"
 #include "hal/Threads.h"
 #include "hal/handles/UnlimitedHandleResource.h"
+#include "hal/roborio/InterruptManager.h"
 
 using namespace hal;
 
