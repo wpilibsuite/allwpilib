@@ -26,7 +26,7 @@ TEST_F(RepeatCommandTest, CallsMethodsCorrectly) {
                           isFinishedCounter++;
                           return isFinishedHook;
                         })
-          .Repeat();
+          .Repeatedly();
 
   EXPECT_EQ(0, initCounter);
   EXPECT_EQ(0, exeCounter);
