@@ -206,7 +206,7 @@ class Command {
    *
    * @return the decorated command
    */
-  virtual RepeatCommand Repeat() &&;
+  virtual RepeatCommand Repeatedly() &&;
 
   /**
    * Decorates this command to run "by proxy" by wrapping it in a
