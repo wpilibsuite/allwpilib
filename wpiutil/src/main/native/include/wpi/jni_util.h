@@ -538,11 +538,23 @@ inline jbooleanArray MakeJBooleanArray(JNIEnv* env, span<const bool> arr) {
 WPI_JNI_MAKEJARRAY(jboolean, Boolean)
 WPI_JNI_MAKEJARRAY(jbyte, Byte)
 WPI_JNI_MAKEJARRAY(jshort, Short)
-WPI_JNI_MAKEJARRAY(jlong, Long)
 WPI_JNI_MAKEJARRAY(jfloat, Float)
 WPI_JNI_MAKEJARRAY(jdouble, Double)
 
 #undef WPI_JNI_MAKEJARRAY
+
+template <class T, typename = std::enable_if_t<
+                       sizeof(typename T::value_type) == sizeof(jlong) &&
+                       std::is_integral_v<typename T::value_type>>>
+inline jlongArray MakeJLongArray(JNIEnv* env, const T& arr) {
+  jlongArray jarr = env->NewLongArray(arr.size());
+  if (!jarr) {
+    return nullptr;
+  }
+  env->SetLongArrayRegion(jarr, 0, arr.size(),
+                          reinterpret_cast<const jlong*>(arr.data()));
+  return jarr;
+}
 
 /**
  * Convert an array of std::string into a jarray of jstring.
