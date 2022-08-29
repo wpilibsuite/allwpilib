@@ -288,7 +288,7 @@ public interface Command {
    *
    * @return the decorated command
    */
-  default RepeatCommand repeat() {
+  default RepeatCommand repeatedly() {
     return new RepeatCommand(this);
   }
 

@@ -116,7 +116,7 @@ EndlessCommand Command::Endlessly() && {
   return EndlessCommand(std::move(*this).TransferOwnership());
 }
 
-RepeatCommand Command::Repeat() && {
+RepeatCommand Command::Repeatedly() && {
   return RepeatCommand(std::move(*this).TransferOwnership());
 }
 
