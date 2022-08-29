@@ -26,7 +26,6 @@ class RepeatCommandTest {
     var isFinishedHook = new AtomicBoolean(false);
 
     final var command =
-        new RepeatCommand(
             new FunctionalCommand(
                 initCounter::incrementAndGet,
                 exeCounter::incrementAndGet,
@@ -34,7 +33,7 @@ class RepeatCommandTest {
                 () -> {
                   isFinishedCounter.incrementAndGet();
                   return isFinishedHook.get();
-                }));
+                }).repeatedly();
 
     assertEquals(0, initCounter.get());
     assertEquals(0, exeCounter.get());
