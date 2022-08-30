@@ -82,13 +82,13 @@ class ParallelDeadlineGroup
     AddCommands(std::move(foo));
   }
 
-  void Initialize() final override;
+  void Initialize() final;
 
-  void Execute() final override;
+  void Execute() final;
 
-  void End(bool interrupted) final override;
+  void End(bool interrupted) final;
 
-  bool IsFinished() final override;
+  bool IsFinished() final;
 
   bool RunsWhenDisabled() const override;
 
