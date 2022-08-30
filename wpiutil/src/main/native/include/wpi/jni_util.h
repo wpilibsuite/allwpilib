@@ -179,7 +179,12 @@ class JStringRef {
 namespace detail {
 
 template <typename C, typename T>
-class JArrayRefInner {};
+class JArrayRefInner {
+ public:
+  operator span<const T>() const {  // NOLINT
+    return static_cast<const C*>(this)->array();
+  }
+};
 
 /**
  * Specialization of JArrayRefBase to provide std::string_view conversion.
@@ -199,14 +204,31 @@ class JArrayRefInner<C, jbyte> {
 };
 
 /**
+ * Specialization of JArrayRefBase to handle both "long long" and "long" on
+ * 64-bit systems.
+ */
+template <typename C>
+class JArrayRefInner<C, jlong> {
+ public:
+  template <typename U,
+            typename = std::enable_if_t<sizeof(U) == sizeof(jlong) &&
+                                        std::is_integral_v<U>>>
+  operator span<const U>() const {  // NOLINT
+    auto arr = static_cast<const C*>(this)->array();
+    if (arr.empty()) {
+      return {};
+    }
+    return {reinterpret_cast<const U*>(arr.data()), arr.size()};
+  }
+};
+
+/**
  * Base class for J*ArrayRef and CriticalJ*ArrayRef
  */
 template <typename T>
 class JArrayRefBase : public JArrayRefInner<JArrayRefBase<T>, T> {
  public:
   explicit operator bool() const { return this->m_elements != nullptr; }
-
-  operator span<const T>() const { return array(); }  // NOLINT
 
   span<const T> array() const {
     if (!this->m_elements) {
