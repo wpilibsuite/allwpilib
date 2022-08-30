@@ -74,13 +74,13 @@ class ParallelCommandGroup
     AddCommands(std::move(foo));
   }
 
-  void Initialize() final;
+  void Initialize() final override;
 
-  void Execute() final;
+  void Execute() final override;
 
-  void End(bool interrupted) final;
+  void End(bool interrupted) final override;
 
-  bool IsFinished() final;
+  bool IsFinished() final override;
 
   bool RunsWhenDisabled() const override;
 
