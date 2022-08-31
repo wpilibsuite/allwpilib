@@ -227,7 +227,7 @@ class WPILIB_DLLEXPORT LinearSystemId {
    * @param mass The mass of the robot in kilograms.
    * @param r The radius of the wheels in meters.
    * @param rb The radius of the base (half of the track width), in meters.
-   * @param J The moment of inirtia of the robot.
+   * @param J The moment of inertia of the robot.
    * @param G Gear ratio from motor to wheel.
    * @throws std::domain_error if mass <= 0, r <= 0, rb <= 0, J <= 0, or
    *         G <= 0.
