@@ -45,7 +45,7 @@ class WPILIB_DLLEXPORT LinearSystemId {
                                               units::meter_t radius, double G);
 
   /**
-   * Create a state-space model of a single jointed arm system.The states of the
+   * Create a state-space model of a single-jointed arm system.The states of the
    * system are [angle, angular velocity], inputs are [voltage], and outputs are
    * [angle].
    *
