@@ -99,7 +99,7 @@ class WPILIB_DLLEXPORT LinearSystemId {
 
   /**
    * Create a state-space model for a 1 DOF position system from its kV
-   * (volts/(unit/sec)) and kA (volts/(unit/sec^2)). These constants can be
+   * (volts/(unit/sec)) and kA (volts/(unit/sec²)). These constants can be
    * found using SysId. the states of the system are [position, velocity],
    * inputs are [voltage], and outputs are [position].
    *
