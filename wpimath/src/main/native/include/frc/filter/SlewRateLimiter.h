@@ -33,9 +33,11 @@ class SlewRateLimiter {
    * limits and initial value.
    *
    * @param positiveRateLimit The rate-of-change limit in the positive
-   * direction, in units per second. This is expected to be positive.
+   *                          direction, in units per second. This is expected
+   *                          to be positive.
    * @param negativeRateLimit The rate-of-change limit in the negative
-   * direction, in units per second. This is expected to be negative.
+   *                          direction, in units per second. This is expected
+   *                          to be negative.
    * @param initialValue The initial value of the input.
    */
   SlewRateLimiter(Rate_t positiveRateLimit, Rate_t negativeRateLimit,
