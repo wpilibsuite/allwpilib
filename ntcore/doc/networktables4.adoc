@@ -70,7 +70,7 @@ Due to the fact there can be multiple publishers for a single topic and unpredic
 [[reconnection]]
 === Caching and Reconnection Handling
 
-Servers shall keep a retained value for each topic for the purposes of both <<msg-getvalues>> and <<msg-subscribe>> requests; the retained value shall be the value in the largest timestamp (greater-than or equal-to) message received for that topic.  This retained value is deleted if the topic is deleted (e.g. there are no more publishers).
+Servers shall keep a retained value for each topic for the purposes of <<msg-subscribe>> requests; the retained value shall be the value in the largest timestamp (greater-than or equal-to) message received for that topic.  This retained value is deleted if the topic is deleted (e.g. there are no more publishers).
 
 Clients may similarly keep a retained value for each topic for ease of use by user code.  If this is done, this retained value shall be updated by both locally published values and received messages for that topic with greater-than/equal-to timestamps, and the retained value shall be deleted when a <<msg-unannounce>> is received.
 
@@ -450,11 +450,6 @@ Clients and servers shall ignore JSON messages that:
 
 4+|Value/Subscription Messages (Client to Server)
 
-|<<msg-getvalues,`getvalues`>>
-|Get Values
-|Client to Server
-|<<binary-frames,MessagePack messages>>
-
 |<<msg-subscribe,`subscribe`>>
 |Subscribe
 |Client to Server
@@ -570,26 +565,6 @@ If a property is not included in the update map, its value is not changed.  If a
 
 [[subscription-messages]]
 === Value/Subscription Messages (Client to Server)
-
-[[msg-getvalues]]
-==== Get Values Message (`getvalues`)
-
-Sent from a client to the server to indicate the client wants to get the current values for the specified topics / groups of topics.  The server shall treat this identically to a <<msg-subscribe>>, except only send the values once.  The server shall send announcement messages (for virtual topics) and MessagePack messages containing the current values immediately upon receipt.  While this message could theoretically be used to poll for value updates, it is much better to use a `subscribe` to request push updates.
-
-The `getvalues` JSON message shall contain the following parameters:
-
-[cols="1,2,2,6",options="header"]
-|===
-|Key
-|Value type
-|Description
-|Notes
-
-|`prefixes`
-|Array of String
-|Array of topic prefixes
-|One or more topic prefixes
-|===
 
 [[msg-subscribe]]
 ==== Subscribe Message (`subscribe`)
