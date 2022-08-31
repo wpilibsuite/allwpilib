@@ -210,7 +210,7 @@ class WPILIB_DLLEXPORT LinearSystemId {
    * are [angular position, angular velocity].
    *
    * @param motor The motor (or gearbox) attached to the system.
-   * @param J the moment of inirtia J of the DC motor.
+   * @param J the moment of inertia J of the DC motor.
    * @param G Gear ratio from motor to output.
    * @throws std::domain_error if J <= 0 or G <= 0.
    */
