@@ -225,13 +225,18 @@ HAL_Bool HAL_GetDIODirection(HAL_DigitalHandle dioPortHandle, int32_t* status) {
   return value;
 }
 
-void HAL_Pulse(HAL_DigitalHandle dioPortHandle, double pulseLength,
+void HAL_Pulse(HAL_DigitalHandle dioPortHandle, int32_t pulseLengthMicroseconds,
                int32_t* status) {
   auto port = digitalChannelHandles->Get(dioPortHandle, HAL_HandleEnum::DIO);
   if (port == nullptr) {
     *status = HAL_HANDLE_ERROR;
     return;
   }
+  // TODO (Thad) Add this
+}
+
+void HAL_PulseMultiple(uint32_t channelMask, int32_t pulseLengthMicroseconds,
+               int32_t* status) {
   // TODO (Thad) Add this
 }
 

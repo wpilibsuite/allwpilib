@@ -22,7 +22,9 @@ public class DIOJNI extends JNIWrapper {
 
   public static native boolean getDIODirection(int dioPortHandle);
 
-  public static native void pulse(int dioPortHandle, double pulseLength);
+  public static native void pulse(int dioPortHandle, int pulseLengthMicroseconds);
+
+  public static native void pulseMultiple(long channelMask, int pulseLengthMicroseconds);
 
   public static native boolean isPulsing(int dioPortHandle);
 

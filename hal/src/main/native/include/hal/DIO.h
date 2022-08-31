@@ -150,11 +150,26 @@ HAL_Bool HAL_GetDIODirection(HAL_DigitalHandle dioPortHandle, int32_t* status);
  * single pulse going at any time.
  *
  * @param[in] dioPortHandle the digital port handle
- * @param[in] pulseLength   the active length of the pulse (in seconds)
+ * @param[in] pulseLengthMicroseconds   the active length of the pulse (in
+ * microseconds)
  * @param[out] status       Error status variable. 0 on success.
  */
-void HAL_Pulse(HAL_DigitalHandle dioPortHandle, double pulseLength,
+void HAL_Pulse(HAL_DigitalHandle dioPortHandle, int32_t pulseLengthMicroseconds,
                int32_t* status);
+
+/**
+ * Generates a single digital pulse on multiple channels.
+ *
+ * Write a pulse to the channels enabled by the mask. There can only be a
+ * single pulse going at any time.
+ *
+ * @param[in] channelMask the channel mask
+ * @param[in] pulseLengthMicroseconds   the active length of the pulse (in
+ * microseconds)
+ * @param[out] status       Error status variable. 0 on success.
+ */
+void HAL_PulseMultiple(uint32_t channelMask, int32_t pulseLengthMicroseconds,
+                       int32_t* status);
 
 /**
  * Checks a DIO line to see if it is currently generating a pulse.

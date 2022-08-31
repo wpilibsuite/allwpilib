@@ -133,14 +133,28 @@ Java_edu_wpi_first_hal_DIOJNI_getDIODirection
 /*
  * Class:     edu_wpi_first_hal_DIOJNI
  * Method:    pulse
- * Signature: (ID)V
+ * Signature: (II)V
  */
 JNIEXPORT void JNICALL
 Java_edu_wpi_first_hal_DIOJNI_pulse
-  (JNIEnv* env, jclass, jint id, jdouble value)
+  (JNIEnv* env, jclass, jint id, jint value)
 {
   int32_t status = 0;
   HAL_Pulse((HAL_DigitalHandle)id, value, &status);
+  CheckStatus(env, status);
+}
+
+/*
+ * Class:     edu_wpi_first_hal_DIOJNI
+ * Method:    pulseMultiple
+ * Signature: (JI)V
+ */
+JNIEXPORT void JNICALL
+Java_edu_wpi_first_hal_DIOJNI_pulseMultiple
+  (JNIEnv* env, jclass, jlong channelMask, jint value)
+{
+  int32_t status = 0;
+  HAL_PulseMultiple(static_cast<uint32_t>(channelMask), value, &status);
   CheckStatus(env, status);
 }
 
