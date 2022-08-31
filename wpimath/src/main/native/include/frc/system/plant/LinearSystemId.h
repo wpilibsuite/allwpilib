@@ -196,7 +196,7 @@ class WPILIB_DLLEXPORT LinearSystemId {
    * velocity].
    *
    * @param motor The motor (or gearbox) attached to the flywheel.
-   * @param J The moment of inirtia J of the flywheel.
+   * @param J The moment of inertia J of the flywheel.
    * @param G Gear ratio from motor to flywheel.
    * @throws std::domain_error if J <= 0 or G <= 0.
    */
