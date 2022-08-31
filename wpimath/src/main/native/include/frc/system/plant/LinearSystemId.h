@@ -50,7 +50,7 @@ class WPILIB_DLLEXPORT LinearSystemId {
    * [angle].
    *
    * @param motor The motor (or gearbox) attached to the arm.
-   * @param J The moment of inirtia J of the arm.
+   * @param J The moment of inertia J of the arm.
    * @param G Gear ratio from motor to arm.
    * @throws std::domain_error if J <= 0 or G <= 0.
    */
