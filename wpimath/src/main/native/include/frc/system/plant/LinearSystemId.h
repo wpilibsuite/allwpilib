@@ -113,7 +113,7 @@ class WPILIB_DLLEXPORT LinearSystemId {
    * u = K_v v + K_a a
    *
    * @param kV The velocity gain, in volts/(unit/sec).
-   * @param kA The acceleration gain, in volts/(unit/sec^2).
+   * @param kA The acceleration gain, in volts/(unit/sec²).
    *
    * @throws std::domain_error if kV <= 0 or kA <= 0.
    */
