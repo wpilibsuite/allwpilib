@@ -82,8 +82,8 @@ public class DigitalOutput extends DigitalSource implements Sendable {
   /**
    * Output a single pulse on the digital output line.
    *
-   * <p>Send a single pulse on the digital output line where the pulse duration is
-   * specified in microseconds. Maximum of 65535 microseconds
+   * <p>Send a single pulse on the digital output line where the pulse duration is specified in
+   * microseconds. Maximum of 65535 microseconds
    *
    * @param pulseLengthMicroseconds The pulse length in microseconds
    */

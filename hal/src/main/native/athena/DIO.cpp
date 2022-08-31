@@ -438,7 +438,7 @@ void HAL_Pulse(HAL_DigitalHandle dioPortHandle, int32_t pulseLengthMicroseconds,
 }
 
 void HAL_PulseMultiple(uint32_t channelMask, int32_t pulseLengthMicroseconds,
-               int32_t* status) {
+                       int32_t* status) {
   if (pulseLengthMicroseconds <= 0 || pulseLengthMicroseconds > 0xFFFF) {
     *status = PARAMETER_OUT_OF_RANGE;
     hal::SetLastError(status, "Length must be [1, 65535]");
