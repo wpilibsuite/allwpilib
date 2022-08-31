@@ -48,7 +48,7 @@ public class SequentialCommandGroup extends CommandGroupBase {
   }
 
   @Override
-  public void initialize() {
+  public final void initialize() {
     m_currentCommandIndex = 0;
 
     if (!m_commands.isEmpty()) {
@@ -57,7 +57,7 @@ public class SequentialCommandGroup extends CommandGroupBase {
   }
 
   @Override
-  public void execute() {
+  public final void execute() {
     if (m_commands.isEmpty()) {
       return;
     }
@@ -75,7 +75,7 @@ public class SequentialCommandGroup extends CommandGroupBase {
   }
 
   @Override
-  public void end(boolean interrupted) {
+  public final void end(boolean interrupted) {
     if (interrupted
         && !m_commands.isEmpty()
         && m_currentCommandIndex > -1
@@ -86,7 +86,7 @@ public class SequentialCommandGroup extends CommandGroupBase {
   }
 
   @Override
-  public boolean isFinished() {
+  public final boolean isFinished() {
     return m_currentCommandIndex == m_commands.size();
   }
 
