@@ -387,6 +387,14 @@ void ADIS16448_IMU::Reset() {
 }
 
 void ADIS16448_IMU::Close() {
+  if (m_reset_in != nullptr) {
+    delete m_reset_in;
+    m_reset_in = nullptr;
+  }
+  if (m_status_led != nullptr) {
+    delete m_status_led;
+    m_status_led = nullptr;
+  }
   if (m_thread_active) {
     m_thread_active = false;
     if (m_acquire_task.joinable()) {
@@ -409,8 +417,6 @@ void ADIS16448_IMU::Close() {
 }
 
 ADIS16448_IMU::~ADIS16448_IMU() {
-  delete m_reset_in;
-  delete m_status_led;
   Close();
 }
 
