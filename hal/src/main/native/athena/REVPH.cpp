@@ -228,8 +228,9 @@ HAL_REVPHHandle HAL_InitializeREVPH(int32_t module,
               sizeof(hph->desiredSolenoidsState));
   std::memset(&hph->versionInfo, 0, sizeof(hph->versionInfo));
 
-  // Start closed-loop compressor control by starting solenoid state updates
   int32_t can_status = 0;
+
+  // Start closed-loop compressor control by starting solenoid state updates
   HAL_SendREVPHSolenoidsState(hph.get(), &can_status);
 
   return handle;
