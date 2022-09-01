@@ -448,7 +448,7 @@ void ADIS16470_IMU::Close() {
   if (m_status_led != nullptr) {
     delete m_status_led;
     m_status_led = nullptr;
-  }  
+  }
   if (m_thread_active) {
     m_thread_active = false;
     if (m_acquire_task.joinable()) {
