@@ -80,11 +80,11 @@ class DigitalOutput : public DigitalSource,
    * Output a single pulse on the digital output line.
    *
    * Send a single pulse on the digital output line where the pulse duration is
-   * specified in microseconds. Maximum of 65535 microseconds
+   * specified in seconds. Maximum of 65535 microseconds.
    *
-   * @param pulseLength The pulse length in microseconds
+   * @param pulseLength The pulse length in seconds
    */
-  void Pulse(units::microsecond_t pulseLength);
+  void Pulse(units::second_t pulseLength);
 
   /**
    * Determine if the pulse is still going.

@@ -408,7 +408,7 @@ HAL_Bool HAL_GetDIODirection(HAL_DigitalHandle dioPortHandle, int32_t* status) {
   }
 }
 
-void HAL_Pulse(HAL_DigitalHandle dioPortHandle, int32_t pulseLengthMicroseconds,
+void HAL_Pulse(HAL_DigitalHandle dioPortHandle, double pulseLengthSeconds,
                int32_t* status) {
   auto port = digitalChannelHandles->Get(dioPortHandle, HAL_HandleEnum::DIO);
   if (port == nullptr) {
@@ -416,9 +416,11 @@ void HAL_Pulse(HAL_DigitalHandle dioPortHandle, int32_t pulseLengthMicroseconds,
     return;
   }
 
+  uint32_t pulseLengthMicroseconds = static_cast<uint32_t>(pulseLengthSeconds * 100000);
+
   if (pulseLengthMicroseconds <= 0 || pulseLengthMicroseconds > 0xFFFF) {
     *status = PARAMETER_OUT_OF_RANGE;
-    hal::SetLastError(status, "Length must be [1, 65535]");
+    hal::SetLastError(status, "Length must be between 1 and 65535 microseconds");
     return;
   }
 
@@ -437,11 +439,13 @@ void HAL_Pulse(HAL_DigitalHandle dioPortHandle, int32_t pulseLengthMicroseconds,
   digitalSystem->writePulse(pulse, status);
 }
 
-void HAL_PulseMultiple(uint32_t channelMask, int32_t pulseLengthMicroseconds,
+void HAL_PulseMultiple(uint32_t channelMask, double pulseLengthSeconds,
                        int32_t* status) {
+  uint32_t pulseLengthMicroseconds = static_cast<uint32_t>(pulseLengthSeconds * 100000);
+
   if (pulseLengthMicroseconds <= 0 || pulseLengthMicroseconds > 0xFFFF) {
     *status = PARAMETER_OUT_OF_RANGE;
-    hal::SetLastError(status, "Length must be [1, 65535]");
+    hal::SetLastError(status, "Length must be between 1 and 65535 microseconds");
     return;
   }
 
