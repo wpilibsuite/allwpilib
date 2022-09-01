@@ -5,7 +5,6 @@
 #pragma once
 
 #include <wpi/SymbolExports.h>
-#include <wpi/deprecated.h>
 
 #include "frc/geometry/Pose2d.h"
 #include "frc/kinematics/ChassisSpeeds.h"
@@ -49,17 +48,6 @@ class WPILIB_DLLEXPORT RamseteController {
       units::compound_unit<units::squared<units::radians>,
                            units::inverse<units::squared<units::meters>>>;
   using zeta_unit = units::inverse<units::radians>;
-
-  /**
-   * Construct a Ramsete unicycle controller.
-   *
-   * @param b    Tuning parameter (b > 0 rad²/m²) for which larger values make
-   *             convergence more aggressive like a proportional term.
-   * @param zeta Tuning parameter (0 rad⁻¹ < zeta < 1 rad⁻¹) for which larger
-   *             values provide more damping in response.
-   */
-  WPI_DEPRECATED("Use unit-safe constructor instead")
-  RamseteController(double b, double zeta);
 
   /**
    * Construct a Ramsete unicycle controller.

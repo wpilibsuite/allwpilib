@@ -13,7 +13,7 @@ import edu.wpi.first.math.interpolation.Interpolatable;
 import edu.wpi.first.math.util.Units;
 import java.util.Objects;
 
-/** A rotation in a 2d coordinate frame represented a point on the unit circle (cosine and sine). */
+/** A rotation in a 2D coordinate frame represented a point on the unit circle (cosine and sine). */
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonAutoDetect(getterVisibility = JsonAutoDetect.Visibility.NONE)
 public class Rotation2d implements Interpolatable<Rotation2d> {
@@ -29,7 +29,7 @@ public class Rotation2d implements Interpolatable<Rotation2d> {
   }
 
   /**
-   * Constructs a Rotation2d with the given radian value. The x and y don't have to be normalized.
+   * Constructs a Rotation2d with the given radian value.
    *
    * @param value The value of the angle in radians.
    */
@@ -56,6 +56,16 @@ public class Rotation2d implements Interpolatable<Rotation2d> {
       m_cos = 1.0;
     }
     m_value = Math.atan2(m_sin, m_cos);
+  }
+
+  /**
+   * Constructs and returns a Rotation2d with the given radian value.
+   *
+   * @param radians The value of the angle in degrees.
+   * @return The rotation object with the desired angle value.
+   */
+  public static Rotation2d fromRadians(double radians) {
+    return new Rotation2d(radians);
   }
 
   /**

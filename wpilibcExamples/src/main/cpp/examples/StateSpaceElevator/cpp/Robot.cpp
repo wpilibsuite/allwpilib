@@ -96,11 +96,10 @@ class Robot : public frc::TimedRobot {
 
   void TeleopInit() override {
     // Reset our loop to make sure it's in a known state.
-    m_loop.Reset(
-        Eigen::Vector<double, 2>{m_encoder.GetDistance(), m_encoder.GetRate()});
+    m_loop.Reset(frc::Vectord<2>{m_encoder.GetDistance(), m_encoder.GetRate()});
 
-    m_lastProfiledReference = {units::meter_t(m_encoder.GetDistance()),
-                               units::meters_per_second_t(m_encoder.GetRate())};
+    m_lastProfiledReference = {units::meter_t{m_encoder.GetDistance()},
+                               units::meters_per_second_t{m_encoder.GetRate()}};
   }
 
   void TeleopPeriodic() override {
@@ -119,12 +118,11 @@ class Robot : public frc::TimedRobot {
                                               m_lastProfiledReference))
             .Calculate(20_ms);
 
-    m_loop.SetNextR(
-        Eigen::Vector<double, 2>{m_lastProfiledReference.position.value(),
-                                 m_lastProfiledReference.velocity.value()});
+    m_loop.SetNextR(frc::Vectord<2>{m_lastProfiledReference.position.value(),
+                                    m_lastProfiledReference.velocity.value()});
 
     // Correct our Kalman filter's state vector estimate with encoder data.
-    m_loop.Correct(Eigen::Vector<double, 1>{m_encoder.GetDistance()});
+    m_loop.Correct(frc::Vectord<1>{m_encoder.GetDistance()});
 
     // Update our LQR to generate new voltage commands and use the voltages to
     // predict the next state with out Kalman filter.
@@ -133,7 +131,7 @@ class Robot : public frc::TimedRobot {
     // Send the new calculated voltage to the motors.
     // voltage = duty cycle * battery voltage, so
     // duty cycle = voltage / battery voltage
-    m_motor.SetVoltage(units::volt_t(m_loop.U(0)));
+    m_motor.SetVoltage(units::volt_t{m_loop.U(0)});
   }
 };
 

@@ -52,12 +52,6 @@ static Instance& GetInstance() {
   return instance;
 }
 
-CameraServer* CameraServer::GetInstance() {
-  ::GetInstance();
-  static CameraServer instance;
-  return &instance;
-}
-
 static std::string_view MakeSourceValue(CS_Source source,
                                         wpi::SmallVectorImpl<char>& buf) {
   CS_Status status = 0;
@@ -615,7 +609,7 @@ cs::CvSink CameraServer::GetVideo(const cs::VideoSource& camera) {
       if (kind != cs::VideoSink::kCv) {
         auto csShared = GetCameraServerShared();
         csShared->SetCameraServerError("expected OpenCV sink, but got {}",
-                                       kind);
+                                       static_cast<int>(kind));
         return cs::CvSink{};
       }
       return *static_cast<cs::CvSink*>(&it->second);

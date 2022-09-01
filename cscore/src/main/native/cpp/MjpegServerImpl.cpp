@@ -7,13 +7,13 @@
 #include <chrono>
 
 #include <fmt/format.h>
-#include <wpi/HttpUtil.h>
 #include <wpi/SmallString.h>
 #include <wpi/StringExtras.h>
-#include <wpi/TCPAcceptor.h>
 #include <wpi/fmt/raw_ostream.h>
-#include <wpi/raw_socket_istream.h>
-#include <wpi/raw_socket_ostream.h>
+#include <wpinet/HttpUtil.h>
+#include <wpinet/TCPAcceptor.h>
+#include <wpinet/raw_socket_istream.h>
+#include <wpinet/raw_socket_ostream.h>
 
 #include "Handle.h"
 #include "Instance.h"
@@ -495,7 +495,7 @@ void MjpegServerImpl::ConnThread::SendJSON(wpi::raw_ostream& os,
     auto kind = source.GetPropertyKind(prop);
     fmt::print(os, "\n\"name\": \"{}\"", name);
     fmt::print(os, ",\n\"id\": \"{}\"", prop);
-    fmt::print(os, ",\n\"type\": \"{}\"", kind);
+    fmt::print(os, ",\n\"type\": \"{}\"", static_cast<int>(kind));
     fmt::print(os, ",\n\"min\": \"{}\"", source.GetPropertyMin(prop, &status));
     fmt::print(os, ",\n\"max\": \"{}\"", source.GetPropertyMax(prop, &status));
     fmt::print(os, ",\n\"step\": \"{}\"",

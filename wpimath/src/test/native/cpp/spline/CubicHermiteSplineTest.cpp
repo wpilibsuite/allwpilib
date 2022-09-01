@@ -93,31 +93,29 @@ class CubicHermiteSplineTest : public ::testing::Test {
 }  // namespace frc
 
 TEST_F(CubicHermiteSplineTest, StraightLine) {
-  Run(Pose2d(), std::vector<Translation2d>(), Pose2d(3_m, 0_m, Rotation2d()));
+  Run(Pose2d{}, std::vector<Translation2d>(), Pose2d{3_m, 0_m, 0_deg});
 }
 
 TEST_F(CubicHermiteSplineTest, SCurve) {
-  Pose2d start{0_m, 0_m, Rotation2d(90_deg)};
-  std::vector<Translation2d> waypoints{Translation2d(1_m, 1_m),
-                                       Translation2d(2_m, -1_m)};
-  Pose2d end{3_m, 0_m, Rotation2d{90_deg}};
+  Pose2d start{0_m, 0_m, 90_deg};
+  std::vector<Translation2d> waypoints{Translation2d{1_m, 1_m},
+                                       Translation2d{2_m, -1_m}};
+  Pose2d end{3_m, 0_m, 90_deg};
   Run(start, waypoints, end);
 }
 
 TEST_F(CubicHermiteSplineTest, OneInterior) {
   Pose2d start{0_m, 0_m, 0_rad};
-  std::vector<Translation2d> waypoints{Translation2d(2_m, 0_m)};
+  std::vector<Translation2d> waypoints{Translation2d{2_m, 0_m}};
   Pose2d end{4_m, 0_m, 0_rad};
   Run(start, waypoints, end);
 }
 
 TEST_F(CubicHermiteSplineTest, ThrowsOnMalformed) {
-  EXPECT_THROW(
-      Run(Pose2d{0_m, 0_m, Rotation2d(0_deg)}, std::vector<Translation2d>{},
-          Pose2d{1_m, 0_m, Rotation2d(180_deg)}),
-      SplineParameterizer::MalformedSplineException);
-  EXPECT_THROW(
-      Run(Pose2d{10_m, 10_m, Rotation2d(90_deg)}, std::vector<Translation2d>{},
-          Pose2d{10_m, 11_m, Rotation2d(-90_deg)}),
-      SplineParameterizer::MalformedSplineException);
+  EXPECT_THROW(Run(Pose2d{0_m, 0_m, 0_deg}, std::vector<Translation2d>{},
+                   Pose2d{1_m, 0_m, 180_deg}),
+               SplineParameterizer::MalformedSplineException);
+  EXPECT_THROW(Run(Pose2d{10_m, 10_m, 90_deg}, std::vector<Translation2d>{},
+                   Pose2d{10_m, 11_m, -90_deg}),
+               SplineParameterizer::MalformedSplineException);
 }

@@ -18,13 +18,13 @@ using namespace frc::sim;
 SingleJointedArmSim::SingleJointedArmSim(
     const LinearSystem<2, 1, 1>& system, const DCMotor& gearbox, double gearing,
     units::meter_t armLength, units::radian_t minAngle,
-    units::radian_t maxAngle, units::kilogram_t mass, bool simulateGravity,
+    units::radian_t maxAngle, units::kilogram_t armMass, bool simulateGravity,
     const std::array<double, 1>& measurementStdDevs)
     : LinearSystemSim<2, 1, 1>(system, measurementStdDevs),
       m_r(armLength),
       m_minAngle(minAngle),
       m_maxAngle(maxAngle),
-      m_mass(mass),
+      m_armMass(armMass),
       m_gearbox(gearbox),
       m_gearing(gearing),
       m_simulateGravity(simulateGravity) {}
@@ -32,11 +32,11 @@ SingleJointedArmSim::SingleJointedArmSim(
 SingleJointedArmSim::SingleJointedArmSim(
     const DCMotor& gearbox, double gearing, units::kilogram_square_meter_t moi,
     units::meter_t armLength, units::radian_t minAngle,
-    units::radian_t maxAngle, units::kilogram_t mass, bool simulateGravity,
+    units::radian_t maxAngle, units::kilogram_t armMass, bool simulateGravity,
     const std::array<double, 1>& measurementStdDevs)
     : SingleJointedArmSim(
           LinearSystemId::SingleJointedArmSystem(gearbox, moi, gearing),
-          gearbox, gearing, armLength, minAngle, maxAngle, mass,
+          gearbox, gearing, armLength, minAngle, maxAngle, armMass,
           simulateGravity, measurementStdDevs) {}
 
 bool SingleJointedArmSim::WouldHitLowerLimit(units::radian_t armAngle) const {
@@ -48,11 +48,11 @@ bool SingleJointedArmSim::WouldHitUpperLimit(units::radian_t armAngle) const {
 }
 
 bool SingleJointedArmSim::HasHitLowerLimit() const {
-  return WouldHitLowerLimit(units::radian_t(m_y(0)));
+  return WouldHitLowerLimit(units::radian_t{m_y(0)});
 }
 
 bool SingleJointedArmSim::HasHitUpperLimit() const {
-  return WouldHitUpperLimit(units::radian_t(m_y(0)));
+  return WouldHitUpperLimit(units::radian_t{m_y(0)});
 }
 
 units::radian_t SingleJointedArmSim::GetAngle() const {
@@ -72,12 +72,12 @@ units::ampere_t SingleJointedArmSim::GetCurrentDraw() const {
 }
 
 void SingleJointedArmSim::SetInputVoltage(units::volt_t voltage) {
-  SetInput(Eigen::Vector<double, 1>{voltage.value()});
+  SetInput(Vectord<1>{voltage.value()});
 }
 
-Eigen::Vector<double, 2> SingleJointedArmSim::UpdateX(
-    const Eigen::Vector<double, 2>& currentXhat,
-    const Eigen::Vector<double, 1>& u, units::second_t dt) {
+Vectord<2> SingleJointedArmSim::UpdateX(const Vectord<2>& currentXhat,
+                                        const Vectord<1>& u,
+                                        units::second_t dt) {
   // Horizontal case:
   // Torque = F * r = I * alpha
   // alpha = F * r / I
@@ -88,25 +88,24 @@ Eigen::Vector<double, 2> SingleJointedArmSim::UpdateX(
   // We therefore find that f(x, u) = Ax + Bu + [[0] [m * g * r / I *
   // std::cos(theta)]]
 
-  Eigen::Vector<double, 2> updatedXhat = RKDP(
-      [&](const auto& x, const auto& u) -> Eigen::Vector<double, 2> {
-        Eigen::Vector<double, 2> xdot = m_plant.A() * x + m_plant.B() * u;
+  Vectord<2> updatedXhat = RKDP(
+      [&](const auto& x, const auto& u) -> Vectord<2> {
+        Vectord<2> xdot = m_plant.A() * x + m_plant.B() * u;
 
         if (m_simulateGravity) {
-          xdot += Eigen::Vector<double, 2>{
-              0.0, (m_mass * m_r * -9.8 * 3.0 / (m_mass * m_r * m_r) *
-                    std::cos(x(0)))
-                       .value()};
+          xdot += Vectord<2>{0.0, (m_armMass * m_r * -9.8 * 3.0 /
+                                   (m_armMass * m_r * m_r) * std::cos(x(0)))
+                                      .value()};
         }
         return xdot;
       },
       currentXhat, u, dt);
 
   // Check for collisions.
-  if (WouldHitLowerLimit(units::radian_t(updatedXhat(0)))) {
-    return Eigen::Vector<double, 2>{m_minAngle.value(), 0.0};
-  } else if (WouldHitUpperLimit(units::radian_t(updatedXhat(0)))) {
-    return Eigen::Vector<double, 2>{m_maxAngle.value(), 0.0};
+  if (WouldHitLowerLimit(units::radian_t{updatedXhat(0)})) {
+    return Vectord<2>{m_minAngle.value(), 0.0};
+  } else if (WouldHitUpperLimit(units::radian_t{updatedXhat(0)})) {
+    return Vectord<2>{m_maxAngle.value(), 0.0};
   }
   return updatedXhat;
 }

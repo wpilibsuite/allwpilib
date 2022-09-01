@@ -82,7 +82,7 @@ class TrapezoidProfile {
    * @param initial     The initial state (usually the current state).
    */
   TrapezoidProfile(Constraints constraints, State goal,
-                   State initial = State{Distance_t(0), Velocity_t(0)});
+                   State initial = State{Distance_t{0}, Velocity_t{0}});
 
   TrapezoidProfile(const TrapezoidProfile&) = default;
   TrapezoidProfile& operator=(const TrapezoidProfile&) = default;

@@ -9,11 +9,11 @@
 
 #include <wpi/SmallVector.h>
 #include <wpi/StringExtras.h>
-#include <wpi/TCPAcceptor.h>
-#include <wpi/TCPConnector.h>
 #include <wpi/json_serializer.h>
 #include <wpi/raw_ostream.h>
 #include <wpi/timestamp.h>
+#include <wpinet/TCPAcceptor.h>
+#include <wpinet/TCPConnector.h>
 
 #include "IConnectionNotifier.h"
 #include "IStorage.h"
@@ -632,7 +632,7 @@ bool DispatcherBase::ClientHandshake(
       DEBUG0(
           "client: received message ({}) other than entry assignment during "
           "initial handshake",
-          msg->type());
+          static_cast<int>(msg->type()));
       return false;
     }
     incoming.emplace_back(std::move(msg));
@@ -735,7 +735,7 @@ bool DispatcherBase::ServerHandshake(
         DEBUG0(
             "server: received message ({}) other than entry assignment during "
             "initial handshake",
-            msg->type());
+            static_cast<int>(msg->type()));
         return false;
       }
       incoming.push_back(msg);

@@ -10,6 +10,12 @@ import edu.wpi.first.hal.NotifierJNI;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.ReentrantLock;
 
+/**
+ * Notifiers run a callback function on a separate thread at a specified period.
+ *
+ * <p>If startSingle() is used, the callback will run once. If startPeriodic() is used, the callback
+ * will run repeatedly with the given period until stop() is called.
+ */
 public class Notifier implements AutoCloseable {
   // The thread waiting on the HAL alarm.
   private Thread m_thread;
@@ -29,12 +35,6 @@ public class Notifier implements AutoCloseable {
   // If periodic, the period of the calling; if just once, stores how long it
   // is until we call the handler.
   private double m_periodSeconds;
-
-  @Override
-  @SuppressWarnings("NoFinalizer")
-  protected void finalize() {
-    close();
-  }
 
   @Override
   public void close() {
@@ -183,6 +183,9 @@ public class Notifier implements AutoCloseable {
    * Register for periodic event notification. A timer event is queued for periodic event
    * notification. Each time the interrupt occurs, the event will be immediately requeued for the
    * same time interval.
+   *
+   * <p>The user-provided callback should be written in a nonblocking manner so the callback can be
+   * recalled at the next periodic event notification.
    *
    * @param periodSeconds Period in seconds to call the handler starting one period after the call
    *     to this method.

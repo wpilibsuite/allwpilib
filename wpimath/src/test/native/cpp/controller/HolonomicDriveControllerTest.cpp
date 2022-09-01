@@ -28,7 +28,7 @@ TEST(HolonomicDriveControllerTest, ReachesReference) {
               units::radians_per_second_t{2.0 * wpi::numbers::pi},
               units::radians_per_second_squared_t{wpi::numbers::pi}}}};
 
-  frc::Pose2d robotPose{2.7_m, 23_m, frc::Rotation2d{0_deg}};
+  frc::Pose2d robotPose{2.7_m, 23_m, 0_deg};
 
   auto waypoints = std::vector{frc::Pose2d{2.75_m, 22.521_m, 0_rad},
                                frc::Pose2d{24.73_m, 19.68_m, 5.846_rad}};
@@ -60,7 +60,7 @@ TEST(HolonomicDriveControllerTest, DoesNotRotateUnnecessarily) {
               4_rad_per_s, 2_rad_per_s / 1_s}}};
 
   frc::ChassisSpeeds speeds = controller.Calculate(
-      frc::Pose2d(0_m, 0_m, 1.57_rad), frc::Pose2d(), 0_mps, 1.57_rad);
+      frc::Pose2d{0_m, 0_m, 1.57_rad}, frc::Pose2d{}, 0_mps, 1.57_rad);
 
   EXPECT_EQ(0, speeds.omega.value());
 }

@@ -11,9 +11,11 @@ apply from: "${rootDir}/shared/javacpp/setupBuild.gradle"
 
 dependencies {
     implementation project(':wpiutil')
+    implementation project(':wpinet')
     implementation project(':ntcore')
     implementation project(':cscore')
     devImplementation project(':wpiutil')
+    devImplementation project(':wpinet')
     devImplementation project(':ntcore')
     devImplementation project(':cscore')
 }
@@ -32,19 +34,6 @@ apply from: "${rootDir}/shared/opencv.gradle"
 
 nativeUtils.exportsConfigs {
     cameraserver {
-        x86ExcludeSymbols = [
-            '_CT??_R0?AV_System_error',
-            '_CT??_R0?AVexception',
-            '_CT??_R0?AVfailure',
-            '_CT??_R0?AVruntime_error',
-            '_CT??_R0?AVsystem_error',
-            '_CTA5?AVfailure',
-            '_TI5?AVfailure',
-            '_CT??_R0?AVout_of_range',
-            '_CTA3?AVout_of_range',
-            '_TI3?AVout_of_range',
-            '_CT??_R0?AVbad_cast'
-        ]
         x64ExcludeSymbols = [
             '_CT??_R0?AV_System_error',
             '_CT??_R0?AVexception',
@@ -70,6 +59,7 @@ model {
             }
             lib project: ':ntcore', library: 'ntcore', linkage: 'shared'
             lib project: ':cscore', library: 'cscore', linkage: 'shared'
+            lib project: ':wpinet', library: 'wpinet', linkage: 'shared'
             lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
         }
     }

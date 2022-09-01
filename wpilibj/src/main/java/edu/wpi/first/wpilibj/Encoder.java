@@ -370,8 +370,11 @@ public class Encoder implements CounterBase, Sendable, AutoCloseable {
    *
    * @param maxPeriod The maximum time between rising and falling edges before the FPGA will report
    *     the device stopped. This is expressed in seconds.
+   * @deprecated Use setMinRate() in favor of this method. This takes unscaled periods and
+   *     setMinRate() scales using value from setDistancePerPulse().
    */
   @Override
+  @Deprecated
   public void setMaxPeriod(double maxPeriod) {
     EncoderJNI.setEncoderMaxPeriod(m_encoder, maxPeriod);
   }

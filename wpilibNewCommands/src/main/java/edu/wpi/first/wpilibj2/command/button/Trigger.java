@@ -7,43 +7,58 @@ package edu.wpi.first.wpilibj2.command.button;
 import static edu.wpi.first.wpilibj.util.ErrorMessages.requireNonNullParam;
 
 import edu.wpi.first.math.filter.Debouncer;
+import edu.wpi.first.wpilibj.event.BooleanEvent;
+import edu.wpi.first.wpilibj.event.EventLoop;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.Subsystem;
+import java.util.function.BiFunction;
 import java.util.function.BooleanSupplier;
 
 /**
- * This class provides an easy way to link commands to inputs.
- *
- * <p>It is very easy to link a button to a command. For instance, you could link the trigger button
- * of a joystick to a "score" command.
- *
- * <p>It is encouraged that teams write a subclass of Trigger if they want to have something unusual
- * (for instance, if they want to react to the user holding a button while the robot is reading a
- * certain sensor input). For this, they only have to write the {@link Trigger#get()} method to get
- * the full functionality of the Trigger class.
+ * This class is a wrapper around {@link BooleanEvent}, providing an easy way to link commands to
+ * digital inputs.
  *
  * <p>This class is provided by the NewCommands VendorDep
  */
-public class Trigger implements BooleanSupplier {
-  private final BooleanSupplier m_isActive;
-
+public class Trigger extends BooleanEvent {
   /**
-   * Creates a new trigger with the given condition determining whether it is active.
+   * Creates a new trigger with the given condition/digital signal.
    *
-   * @param isActive returns whether or not the trigger should be active
+   * @param loop the loop that polls this trigger
+   * @param signal the digital signal represented.
    */
-  public Trigger(BooleanSupplier isActive) {
-    m_isActive = isActive;
+  public Trigger(EventLoop loop, BooleanSupplier signal) {
+    super(loop, signal);
   }
 
   /**
-   * Creates a new trigger that is always inactive. Useful only as a no-arg constructor for
-   * subclasses that will be overriding {@link Trigger#get()} anyway.
+   * Copies the BooleanEvent into a Trigger object.
+   *
+   * @param toCast the BooleanEvent
+   * @return a Trigger wrapping the given BooleanEvent
+   * @see BooleanEvent#castTo(BiFunction)
    */
+  public static Trigger cast(BooleanEvent toCast) {
+    return toCast.castTo(Trigger::new);
+  }
+
+  /**
+   * Creates a new trigger with the given condition/digital signal.
+   *
+   * <p>Polled by the {@link CommandScheduler#getDefaultButtonLoop() default scheduler button loop}.
+   *
+   * @param signal the digital signal represented.
+   */
+  public Trigger(BooleanSupplier signal) {
+    this(CommandScheduler.getInstance().getDefaultButtonLoop(), signal);
+  }
+
+  /** Creates a new trigger that is always inactive. */
+  @Deprecated
   public Trigger() {
-    m_isActive = () -> false;
+    this(() -> false);
   }
 
   /**
@@ -54,64 +69,24 @@ public class Trigger implements BooleanSupplier {
    * <p>Functionally identical to {@link Trigger#getAsBoolean()}.
    *
    * @return whether or not the trigger condition is active.
+   * @deprecated use {@link #getAsBoolean()}
    */
-  public boolean get() {
-    return m_isActive.getAsBoolean();
-  }
-
-  /**
-   * Returns whether or not the trigger is active.
-   *
-   * <p>This method will be called repeatedly a command is linked to the Trigger.
-   *
-   * <p>Functionally identical to {@link Trigger#get()}.
-   *
-   * @return whether or not the trigger condition is active.
-   */
-  @Override
-  public final boolean getAsBoolean() {
-    return this.get();
+  @Deprecated
+  public final boolean get() {
+    return getAsBoolean();
   }
 
   /**
    * Starts the given command whenever the trigger just becomes active.
    *
    * @param command the command to start
-   * @param interruptible whether the command is interruptible
-   * @return this trigger, so calls can be chained
-   */
-  public Trigger whenActive(final Command command, boolean interruptible) {
-    requireNonNullParam(command, "command", "whenActive");
-
-    CommandScheduler.getInstance()
-        .addButton(
-            new Runnable() {
-              private boolean m_pressedLast = get();
-
-              @Override
-              public void run() {
-                boolean pressed = get();
-
-                if (!m_pressedLast && pressed) {
-                  command.schedule(interruptible);
-                }
-
-                m_pressedLast = pressed;
-              }
-            });
-
-    return this;
-  }
-
-  /**
-   * Starts the given command whenever the trigger just becomes active. The command is set to be
-   * interruptible.
-   *
-   * @param command the command to start
    * @return this trigger, so calls can be chained
    */
   public Trigger whenActive(final Command command) {
-    return whenActive(command, true);
+    requireNonNullParam(command, "command", "whenActive");
+
+    this.rising().ifHigh(command::schedule);
+    return this;
   }
 
   /**
@@ -128,48 +103,19 @@ public class Trigger implements BooleanSupplier {
   /**
    * Constantly starts the given command while the button is held.
    *
-   * <p>{@link Command#schedule(boolean)} will be called repeatedly while the trigger is active, and
-   * will be canceled when the trigger becomes inactive.
-   *
-   * @param command the command to start
-   * @param interruptible whether the command is interruptible
-   * @return this trigger, so calls can be chained
-   */
-  public Trigger whileActiveContinuous(final Command command, boolean interruptible) {
-    requireNonNullParam(command, "command", "whileActiveContinuous");
-
-    CommandScheduler.getInstance()
-        .addButton(
-            new Runnable() {
-              private boolean m_pressedLast = get();
-
-              @Override
-              public void run() {
-                boolean pressed = get();
-
-                if (pressed) {
-                  command.schedule(interruptible);
-                } else if (m_pressedLast) {
-                  command.cancel();
-                }
-
-                m_pressedLast = pressed;
-              }
-            });
-    return this;
-  }
-
-  /**
-   * Constantly starts the given command while the button is held.
-   *
-   * <p>{@link Command#schedule(boolean)} will be called repeatedly while the trigger is active, and
-   * will be canceled when the trigger becomes inactive. The command is set to be interruptible.
+   * <p>{@link Command#schedule()} will be called repeatedly while the trigger is active, and will
+   * be canceled when the trigger becomes inactive.
    *
    * @param command the command to start
    * @return this trigger, so calls can be chained
    */
   public Trigger whileActiveContinuous(final Command command) {
-    return whileActiveContinuous(command, true);
+    requireNonNullParam(command, "command", "whileActiveContinuous");
+
+    this.ifHigh(command::schedule);
+    this.falling().ifHigh(command::cancel);
+
+    return this;
   }
 
   /**
@@ -188,81 +134,29 @@ public class Trigger implements BooleanSupplier {
    * inactive, but does not re-start it in-between.
    *
    * @param command the command to start
-   * @param interruptible whether the command is interruptible
-   * @return this trigger, so calls can be chained
-   */
-  public Trigger whileActiveOnce(final Command command, boolean interruptible) {
-    requireNonNullParam(command, "command", "whileActiveOnce");
-
-    CommandScheduler.getInstance()
-        .addButton(
-            new Runnable() {
-              private boolean m_pressedLast = get();
-
-              @Override
-              public void run() {
-                boolean pressed = get();
-
-                if (!m_pressedLast && pressed) {
-                  command.schedule(interruptible);
-                } else if (m_pressedLast && !pressed) {
-                  command.cancel();
-                }
-
-                m_pressedLast = pressed;
-              }
-            });
-    return this;
-  }
-
-  /**
-   * Starts the given command when the trigger initially becomes active, and ends it when it becomes
-   * inactive, but does not re-start it in-between. The command is set to be interruptible.
-   *
-   * @param command the command to start
    * @return this trigger, so calls can be chained
    */
   public Trigger whileActiveOnce(final Command command) {
-    return whileActiveOnce(command, true);
+    requireNonNullParam(command, "command", "whileActiveOnce");
+
+    this.rising().ifHigh(command::schedule);
+    this.falling().ifHigh(command::cancel);
+
+    return this;
   }
 
   /**
    * Starts the command when the trigger becomes inactive.
    *
    * @param command the command to start
-   * @param interruptible whether the command is interruptible
-   * @return this trigger, so calls can be chained
-   */
-  public Trigger whenInactive(final Command command, boolean interruptible) {
-    requireNonNullParam(command, "command", "whenInactive");
-
-    CommandScheduler.getInstance()
-        .addButton(
-            new Runnable() {
-              private boolean m_pressedLast = get();
-
-              @Override
-              public void run() {
-                boolean pressed = get();
-
-                if (m_pressedLast && !pressed) {
-                  command.schedule(interruptible);
-                }
-
-                m_pressedLast = pressed;
-              }
-            });
-    return this;
-  }
-
-  /**
-   * Starts the command when the trigger becomes inactive. The command is set to be interruptible.
-   *
-   * @param command the command to start
    * @return this trigger, so calls can be chained
    */
   public Trigger whenInactive(final Command command) {
-    return whenInactive(command, true);
+    requireNonNullParam(command, "command", "whenInactive");
+
+    this.falling().ifHigh(command::schedule);
+
+    return this;
   }
 
   /**
@@ -280,43 +174,22 @@ public class Trigger implements BooleanSupplier {
    * Toggles a command when the trigger becomes active.
    *
    * @param command the command to toggle
-   * @param interruptible whether the command is interruptible
-   * @return this trigger, so calls can be chained
-   */
-  public Trigger toggleWhenActive(final Command command, boolean interruptible) {
-    requireNonNullParam(command, "command", "toggleWhenActive");
-
-    CommandScheduler.getInstance()
-        .addButton(
-            new Runnable() {
-              private boolean m_pressedLast = get();
-
-              @Override
-              public void run() {
-                boolean pressed = get();
-
-                if (!m_pressedLast && pressed) {
-                  if (command.isScheduled()) {
-                    command.cancel();
-                  } else {
-                    command.schedule(interruptible);
-                  }
-                }
-
-                m_pressedLast = pressed;
-              }
-            });
-    return this;
-  }
-
-  /**
-   * Toggles a command when the trigger becomes active. The command is set to be interruptible.
-   *
-   * @param command the command to toggle
    * @return this trigger, so calls can be chained
    */
   public Trigger toggleWhenActive(final Command command) {
-    return toggleWhenActive(command, true);
+    requireNonNullParam(command, "command", "toggleWhenActive");
+
+    this.rising()
+        .ifHigh(
+            () -> {
+              if (command.isScheduled()) {
+                command.cancel();
+              } else {
+                command.schedule();
+              }
+            });
+
+    return this;
   }
 
   /**
@@ -328,85 +201,45 @@ public class Trigger implements BooleanSupplier {
   public Trigger cancelWhenActive(final Command command) {
     requireNonNullParam(command, "command", "cancelWhenActive");
 
-    CommandScheduler.getInstance()
-        .addButton(
-            new Runnable() {
-              private boolean m_pressedLast = get();
+    this.rising().ifHigh(command::cancel);
 
-              @Override
-              public void run() {
-                boolean pressed = get();
-
-                if (!m_pressedLast && pressed) {
-                  command.cancel();
-                }
-
-                m_pressedLast = pressed;
-              }
-            });
     return this;
   }
 
-  /**
-   * Composes this trigger with another trigger, returning a new trigger that is active when both
-   * triggers are active.
-   *
-   * @param trigger the trigger to compose with
-   * @return the trigger that is active when both triggers are active
-   */
-  public Trigger and(Trigger trigger) {
-    return new Trigger(() -> get() && trigger.get());
+  /* ----------- Super method type redeclarations ----------------- */
+
+  @Override
+  public Trigger and(BooleanSupplier trigger) {
+    return cast(super.and(trigger));
   }
 
-  /**
-   * Composes this trigger with another trigger, returning a new trigger that is active when either
-   * trigger is active.
-   *
-   * @param trigger the trigger to compose with
-   * @return the trigger that is active when either trigger is active
-   */
-  public Trigger or(Trigger trigger) {
-    return new Trigger(() -> get() || trigger.get());
+  @Override
+  public Trigger or(BooleanSupplier trigger) {
+    return cast(super.or(trigger));
   }
 
-  /**
-   * Creates a new trigger that is active when this trigger is inactive, i.e. that acts as the
-   * negation of this trigger.
-   *
-   * @return the negated trigger
-   */
+  @Override
   public Trigger negate() {
-    return new Trigger(() -> !get());
+    return cast(super.negate());
   }
 
-  /**
-   * Creates a new debounced trigger from this trigger - it will become active when this trigger has
-   * been active for longer than the specified period.
-   *
-   * @param seconds The debounce period.
-   * @return The debounced trigger (rising edges debounced only)
-   */
+  @Override
   public Trigger debounce(double seconds) {
     return debounce(seconds, Debouncer.DebounceType.kRising);
   }
 
-  /**
-   * Creates a new debounced trigger from this trigger - it will become active when this trigger has
-   * been active for longer than the specified period.
-   *
-   * @param seconds The debounce period.
-   * @param type The debounce type.
-   * @return The debounced trigger.
-   */
+  @Override
   public Trigger debounce(double seconds, Debouncer.DebounceType type) {
-    return new Trigger(
-        new BooleanSupplier() {
-          Debouncer m_debouncer = new Debouncer(seconds, type);
+    return cast(super.debounce(seconds, type));
+  }
 
-          @Override
-          public boolean getAsBoolean() {
-            return m_debouncer.calculate(get());
-          }
-        });
+  @Override
+  public Trigger rising() {
+    return cast(super.rising());
+  }
+
+  @Override
+  public Trigger falling() {
+    return cast(super.falling());
   }
 }

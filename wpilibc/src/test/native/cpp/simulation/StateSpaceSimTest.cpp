@@ -40,14 +40,14 @@ TEST(StateSpaceSimTest, FlywheelSim) {
   for (int i = 0; i < 100; i++) {
     // RobotPeriodic runs first
     auto voltageOut = controller.Calculate(encoder.GetRate(), 200.0);
-    motor.SetVoltage(units::volt_t(voltageOut) +
+    motor.SetVoltage(units::volt_t{voltageOut} +
                      feedforward.Calculate(200_rad_per_s));
 
     // Then, SimulationPeriodic runs
     frc::sim::RoboRioSim::SetVInVoltage(
         frc::sim::BatterySim::Calculate({sim.GetCurrentDraw()}));
-    sim.SetInput(Eigen::Vector<double, 1>{
-        motor.Get() * frc::RobotController::GetInputVoltage()});
+    sim.SetInput(
+        frc::Vectord<1>{motor.Get() * frc::RobotController::GetInputVoltage()});
     sim.Update(20_ms);
     encoderSim.SetRate(sim.GetAngularVelocity().value());
   }

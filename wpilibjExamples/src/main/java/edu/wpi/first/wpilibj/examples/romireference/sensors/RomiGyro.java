@@ -9,12 +9,12 @@ import edu.wpi.first.hal.SimDevice.Direction;
 import edu.wpi.first.hal.SimDouble;
 
 public class RomiGyro {
-  private SimDouble m_simRateX;
-  private SimDouble m_simRateY;
-  private SimDouble m_simRateZ;
-  private SimDouble m_simAngleX;
-  private SimDouble m_simAngleY;
-  private SimDouble m_simAngleZ;
+  private final SimDouble m_simRateX;
+  private final SimDouble m_simRateY;
+  private final SimDouble m_simRateZ;
+  private final SimDouble m_simAngleX;
+  private final SimDouble m_simAngleY;
+  private final SimDouble m_simAngleZ;
 
   private double m_angleXOffset;
   private double m_angleYOffset;
@@ -32,6 +32,14 @@ public class RomiGyro {
       m_simAngleX = gyroSimDevice.createDouble("angle_x", Direction.kInput, 0.0);
       m_simAngleY = gyroSimDevice.createDouble("angle_y", Direction.kInput, 0.0);
       m_simAngleZ = gyroSimDevice.createDouble("angle_z", Direction.kInput, 0.0);
+    } else {
+      m_simRateX = null;
+      m_simRateY = null;
+      m_simRateZ = null;
+
+      m_simAngleX = null;
+      m_simAngleY = null;
+      m_simAngleZ = null;
     }
   }
 

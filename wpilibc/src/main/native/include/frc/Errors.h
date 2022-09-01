@@ -78,7 +78,7 @@ template <typename S, typename... Args>
 inline void ReportError(int32_t status, const char* fileName, int lineNumber,
                         const char* funcName, const S& format, Args&&... args) {
   ReportErrorV(status, fileName, lineNumber, funcName, format,
-               fmt::make_args_checked<Args...>(format, args...));
+               fmt::make_format_args(args...));
 }
 
 /**
@@ -106,7 +106,7 @@ template <typename S, typename... Args>
                                             const char* funcName,
                                             const S& format, Args&&... args) {
   return MakeErrorV(status, fileName, lineNumber, funcName, format,
-                    fmt::make_args_checked<Args...>(format, args...));
+                    fmt::make_format_args(args...));
 }
 
 namespace err {

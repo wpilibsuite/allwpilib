@@ -64,6 +64,7 @@ class Robot : public frc::TimedRobot {
                                       kElevatorDrumRadius,
                                       kMinElevatorHeight,
                                       kMaxElevatorHeight,
+                                      true,
                                       {0.01}};
   frc::sim::EncoderSim m_encoderSim{m_encoder};
 
@@ -73,7 +74,7 @@ class Robot : public frc::TimedRobot {
       m_mech2d.GetRoot("Elevator Root", 10, 0);
   frc::MechanismLigament2d* m_elevatorMech2d =
       m_elevatorRoot->Append<frc::MechanismLigament2d>(
-          "Elevator", units::inch_t(m_elevatorSim.GetPosition()).value(),
+          "Elevator", units::inch_t{m_elevatorSim.GetPosition()}.value(),
           90_deg);
 
  public:
@@ -87,7 +88,7 @@ class Robot : public frc::TimedRobot {
   void SimulationPeriodic() override {
     // In this method, we update our simulation of what our elevator is doing
     // First, we set our "inputs" (voltages)
-    m_elevatorSim.SetInput(Eigen::Vector<double, 1>{
+    m_elevatorSim.SetInput(frc::Vectord<1>{
         m_motor.Get() * frc::RobotController::GetInputVoltage()});
 
     // Next, we update it. The standard loop time is 20ms.
@@ -102,15 +103,15 @@ class Robot : public frc::TimedRobot {
 
     // Update the Elevator length based on the simulated elevator height
     m_elevatorMech2d->SetLength(
-        units::inch_t(m_elevatorSim.GetPosition()).value());
+        units::inch_t{m_elevatorSim.GetPosition()}.value());
   }
 
   void TeleopPeriodic() override {
     if (m_joystick.GetTrigger()) {
       // Here, we run PID control like normal, with a constant setpoint of 30in.
       double pidOutput = m_controller.Calculate(m_encoder.GetDistance(),
-                                                units::meter_t(30_in).value());
-      m_motor.SetVoltage(units::volt_t(pidOutput));
+                                                units::meter_t{30_in}.value());
+      m_motor.SetVoltage(units::volt_t{pidOutput});
     } else {
       // Otherwise, we disable the motor.
       m_motor.Set(0.0);

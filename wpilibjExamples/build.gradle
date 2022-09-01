@@ -21,7 +21,7 @@ test {
     finalizedBy jacocoTestReport
 }
 
-if (project.hasProperty('onlylinuxathena') || project.hasProperty('onlylinuxraspbian') || project.hasProperty('onlylinuxaarch64bionic')) {
+if (project.hasProperty('onlylinuxathena') || project.hasProperty('onlylinuxarm32') || project.hasProperty('onlylinuxarm64')) {
     test.enabled = false
 }
 
@@ -31,10 +31,10 @@ dependencies {
     implementation project(':wpimath')
     implementation project(':hal')
     implementation project(':wpiutil')
+    implementation project(':wpinet')
     implementation project(':ntcore')
     implementation project(':cscore')
     implementation project(':cameraserver')
-    implementation project(':wpilibOldCommands')
     implementation project(':wpilibNewCommands')
 
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.2'
@@ -43,7 +43,7 @@ dependencies {
 }
 
 jacoco {
-    toolVersion = "0.8.7"
+    toolVersion = "0.8.8"
 }
 
 jacocoTestReport {
@@ -119,6 +119,8 @@ model {
                 project(':hal').addHalJniDependency(binary)
                 lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
                 lib project: ':wpiutil', library: 'wpiutilJNI', linkage: 'shared'
+                lib project: ':wpinet', library: 'wpinet', linkage: 'shared'
+                lib project: ':wpinet', library: 'wpinetJNI', linkage: 'shared'
                 lib project: ':cameraserver', library: 'cameraserver', linkage: 'shared'
                 if (binary.targetPlatform.name == nativeUtils.wpi.platforms.roborio) {
                     nativeUtils.useRequiredLibrary(binary, 'ni_link_libraries', 'ni_runtime_libraries')

@@ -65,7 +65,7 @@ double PIDController::GetD() const {
 }
 
 units::second_t PIDController::GetPeriod() const {
-  return units::second_t(m_period);
+  return m_period;
 }
 
 void PIDController::SetSetpoint(double setpoint) {
@@ -155,8 +155,10 @@ double PIDController::Calculate(double measurement, double setpoint) {
 }
 
 void PIDController::Reset() {
+  m_positionError = 0;
   m_prevError = 0;
   m_totalError = 0;
+  m_velocityError = 0;
 }
 
 void PIDController::InitSendable(wpi::SendableBuilder& builder) {

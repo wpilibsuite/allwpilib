@@ -279,19 +279,23 @@ static bool IsPercentageProperty(std::string_view name) {
 
 void UsbCameraImpl::ProcessFrame(IMFSample* videoSample,
                                  const VideoMode& mode) {
-  if (!videoSample)
+  if (!videoSample) {
     return;
+  }
 
   ComPtr<IMFMediaBuffer> buf;
 
   if (!SUCCEEDED(videoSample->ConvertToContiguousBuffer(buf.GetAddressOf()))) {
     DWORD bcnt = 0;
-    if (!SUCCEEDED(videoSample->GetBufferCount(&bcnt)))
+    if (!SUCCEEDED(videoSample->GetBufferCount(&bcnt))) {
       return;
-    if (bcnt == 0)
+    }
+    if (bcnt == 0) {
       return;
-    if (!SUCCEEDED(videoSample->GetBufferByIndex(0, buf.GetAddressOf())))
+    }
+    if (!SUCCEEDED(videoSample->GetBufferByIndex(0, buf.GetAddressOf()))) {
       return;
+    }
   }
 
   BYTE* ptr = NULL;
@@ -474,11 +478,13 @@ static cs::VideoMode::PixelFormat GetFromGUID(const GUID& guid) {
 }
 
 bool UsbCameraImpl::DeviceConnect() {
-  if (m_mediaSource && m_sourceReader)
+  if (m_mediaSource && m_sourceReader) {
     return true;
+  }
 
-  if (m_connectVerbose)
+  if (m_connectVerbose) {
     SINFO("Connecting to USB camera on {}", m_path);
+  }
 
   SDEBUG3("{}", "opening device");
 
@@ -580,8 +586,9 @@ template void UsbCameraImpl::DeviceAddProperty(std::string_view name_,
   DeviceAddProperty(#val, CameraControl_##val, pCamControl);
 
 void UsbCameraImpl::DeviceCacheProperties() {
-  if (!m_sourceReader)
+  if (!m_sourceReader) {
     return;
+  }
 
   IAMVideoProcAmp* pProcAmp = NULL;
 
@@ -778,22 +785,25 @@ CS_StatusValue UsbCameraImpl::DeviceCmdSetProperty(
 
   // Look up
   auto prop = static_cast<UsbCameraProperty*>(GetProperty(property));
-  if (!prop)
+  if (!prop) {
     return CS_INVALID_PROPERTY;
+  }
 
   // If setting before we get, guess initial type based on set
   if (prop->propKind == CS_PROP_NONE) {
-    if (setString)
+    if (setString) {
       prop->propKind = CS_PROP_STRING;
-    else
+    } else {
       prop->propKind = CS_PROP_INTEGER;
+    }
   }
 
   // Check kind match
   if ((setString && prop->propKind != CS_PROP_STRING) ||
-      (!setString && (prop->propKind &
-                      (CS_PROP_BOOLEAN | CS_PROP_INTEGER | CS_PROP_ENUM)) == 0))
+      (!setString && (prop->propKind & (CS_PROP_BOOLEAN | CS_PROP_INTEGER |
+                                        CS_PROP_ENUM)) == 0)) {
     return CS_WRONG_PROPERTY_TYPE;
+  }
 
   // Handle percentage property
   int percentageProperty = prop->propPair;
@@ -810,8 +820,9 @@ CS_StatusValue UsbCameraImpl::DeviceCmdSetProperty(
 
   // Actually set the new value on the device (if possible)
   if (!prop->device) {
-    if (prop->id == kPropConnectVerboseId)
+    if (prop->id == kPropConnectVerboseId) {
       m_connectVerbose = value;
+    }
   } else {
     if (!prop->DeviceSet(lock, m_sourceReader.Get())) {
       return CS_PROPERTY_WRITE_FAILED;
@@ -913,11 +924,13 @@ bool UsbCameraImpl::DeviceStreamOff() {
 }
 
 void UsbCameraImpl::DeviceCacheMode() {
-  if (!m_sourceReader)
+  if (!m_sourceReader) {
     return;
+  }
 
-  if (m_windowsVideoModes.size() == 0)
+  if (m_windowsVideoModes.size() == 0) {
     return;
+  }
 
   if (!m_currentMode) {
     // First, see if our set mode is valid
@@ -982,8 +995,9 @@ CS_StatusValue UsbCameraImpl::DeviceSetMode() {
 }
 
 void UsbCameraImpl::DeviceCacheVideoModes() {
-  if (!m_sourceReader)
+  if (!m_sourceReader) {
     return;
+  }
 
   std::vector<VideoMode> modes;
   m_windowsVideoModes.clear();
@@ -1098,13 +1112,13 @@ std::vector<UsbCameraInfo> EnumerateUsbCameras(CS_Status* status) {
                             sizeof(buf) / sizeof(WCHAR), &characters);
     storage.clear();
     wpi::sys::windows::UTF16ToUTF8(buf, characters, storage);
-    info.name = storage.string();
+    info.name = std::string{storage};
     ppDevices[i]->GetString(
         MF_DEVSOURCE_ATTRIBUTE_SOURCE_TYPE_VIDCAP_SYMBOLIC_LINK, buf,
         sizeof(buf) / sizeof(WCHAR), &characters);
     storage.clear();
     wpi::sys::windows::UTF16ToUTF8(buf, characters, storage);
-    info.path = storage.string();
+    info.path = std::string{storage};
 
     // Try to parse path from symbolic link
     ParseVidAndPid(info.path, &info.productId, &info.vendorId);

@@ -59,6 +59,7 @@ public class Robot extends TimedRobot {
           kElevatorDrumRadius,
           kMinElevatorHeight,
           kMaxElevatorHeight,
+          true,
           VecBuilder.fill(0.01));
   private final EncoderSim m_encoderSim = new EncoderSim(m_encoder);
 

@@ -15,16 +15,16 @@ import org.junit.jupiter.api.Test;
 class RungeKuttaTimeVaryingTest {
   private static Matrix<N1, N1> rungeKuttaTimeVaryingSolution(double t) {
     return new MatBuilder<>(Nat.N1(), Nat.N1())
-        .fill(12.0 * Math.exp(t) / (Math.pow(Math.exp(t) + 1.0, 2.0)));
+        .fill(12.0 * Math.exp(t) / Math.pow(Math.exp(t) + 1.0, 2.0));
   }
 
   // Tests RK4 with a time varying solution. From
   // http://www2.hawaii.edu/~jmcfatri/math407/RungeKuttaTest.html:
-  //   x' = x (2 / (e^t + 1) - 1)
+  //   x' = x (2/(eᵗ + 1) - 1)
   //
   // The true (analytical) solution is:
   //
-  // x(t) = 12 * e^t / ((e^t + 1)^2)
+  // x(t) = 12eᵗ/(eᵗ + 1)²
   @Test
   void rungeKuttaTimeVaryingTest() {
     final var y0 = rungeKuttaTimeVaryingSolution(5.0);

@@ -1,0 +1,204 @@
+From 36f7f08e257f2b58b2894f165a38ff2a831aed8f Mon Sep 17 00:00:00 2001
+From: PJ Reiniger <pj.reiniger@gmail.com>
+Date: Tue, 3 May 2022 20:22:38 -0400
+Subject: [PATCH 19/28] Windows support
+
+---
+ .../llvm/Support/Windows/WindowsSupport.h     | 45 +++++----
+ llvm/lib/Support/ConvertUTF.cpp               | 95 +++++++++++++++++++
+ 2 files changed, 124 insertions(+), 16 deletions(-)
+
+diff --git a/llvm/include/llvm/Support/Windows/WindowsSupport.h b/llvm/include/llvm/Support/Windows/WindowsSupport.h
+index 180803fbd..31120cfa0 100644
+--- a/llvm/include/llvm/Support/Windows/WindowsSupport.h
++++ b/llvm/include/llvm/Support/Windows/WindowsSupport.h
+@@ -35,8 +35,6 @@
+ 
+ #include "llvm/ADT/SmallVector.h"
+ #include "llvm/ADT/StringExtras.h"
+-#include "llvm/Config/llvm-config.h" // Get build system configuration settings
+-#include "llvm/Support/Allocator.h"
+ #include "llvm/Support/Chrono.h"
+ #include "llvm/Support/Compiler.h"
+ #include "llvm/Support/ErrorHandling.h"
+@@ -44,18 +42,46 @@
+ #include <cassert>
+ #include <string>
+ #include <system_error>
++#define WIN32_NO_STATUS
+ #include <windows.h>
++#undef WIN32_NO_STATUS
++#include <winternl.h>
++#include <ntstatus.h>
+ 
+ // Must be included after windows.h
+ #include <wincrypt.h>
+ 
+ namespace llvm {
+ 
++/// Returns the Windows version as Major.Minor.0.BuildNumber. Uses
++/// RtlGetVersion or GetVersionEx under the hood depending on what is available.
++/// GetVersionEx is deprecated, but this API exposes the build number which can
++/// be useful for working around certain kernel bugs.
++inline llvm::VersionTuple GetWindowsOSVersion() {
++  typedef NTSTATUS(WINAPI* RtlGetVersionPtr)(PRTL_OSVERSIONINFOW);
++  HMODULE hMod = ::GetModuleHandleW(L"ntdll.dll");
++  if (hMod) {
++    auto getVer = (RtlGetVersionPtr)::GetProcAddress(hMod, "RtlGetVersion");
++    if (getVer) {
++      RTL_OSVERSIONINFOEXW info{};
++      info.dwOSVersionInfoSize = sizeof(info);
++      if (getVer((PRTL_OSVERSIONINFOW)&info) == ((NTSTATUS)0x00000000L)) {
++        return llvm::VersionTuple(info.dwMajorVersion, info.dwMinorVersion, 0,
++                                  info.dwBuildNumber);
++      }
++    }
++  }
++  return llvm::VersionTuple(0, 0, 0, 0);
++}
++
+ /// Determines if the program is running on Windows 8 or newer. This
+ /// reimplements one of the helpers in the Windows 8.1 SDK, which are intended
+ /// to supercede raw calls to GetVersionEx. Old SDKs, Cygwin, and MinGW don't
+ /// yet have VersionHelpers.h, so we have our own helper.
+-bool RunningWindows8OrGreater();
++inline bool RunningWindows8OrGreater() {
++  // Windows 8 is version 6.2, service pack 0.
++  return GetWindowsOSVersion() >= llvm::VersionTuple(6, 2, 0, 0);
++}
+ 
+ /// Returns the Windows version as Major.Minor.0.BuildNumber. Uses
+ /// RtlGetVersion or GetVersionEx under the hood depending on what is available.
+@@ -228,19 +254,6 @@ inline FILETIME toFILETIME(TimePoint<> TP) {
+   return Time;
+ }
+ 
+-namespace windows {
+-// Returns command line arguments. Unlike arguments given to main(),
+-// this function guarantees that the returned arguments are encoded in
+-// UTF-8 regardless of the current code page setting.
+-std::error_code GetCommandLineArguments(SmallVectorImpl<const char *> &Args,
+-                                        BumpPtrAllocator &Alloc);
+-
+-/// Convert UTF-8 path to a suitable UTF-16 path for use with the Win32 Unicode
+-/// File API.
+-std::error_code widenPath(const Twine &Path8, SmallVectorImpl<wchar_t> &Path16,
+-                          size_t MaxPathLen = MAX_PATH);
+-
+-} // end namespace windows
+ } // end namespace sys
+ } // end namespace llvm.
+ 
+diff --git a/llvm/lib/Support/ConvertUTF.cpp b/llvm/lib/Support/ConvertUTF.cpp
+index e24a918c5..c906ded91 100644
+--- a/llvm/lib/Support/ConvertUTF.cpp
++++ b/llvm/lib/Support/ConvertUTF.cpp
+@@ -51,6 +51,11 @@
+ #endif
+ #include <assert.h>
+ 
++#ifdef _WIN32
++#include "wpi/WindowsError.h"
++#include "Windows/WindowsSupport.h"
++#endif
++
+ /*
+  * This code extensively uses fall-through switches.
+  * Keep the compiler from warning about that.
+@@ -733,6 +738,96 @@ ConversionResult ConvertUTF8toUTF32(const UTF8 **sourceStart,
+ 
+    --------------------------------------------------------------------- */
+ 
++#ifdef _WIN32
++
++namespace sys {
++namespace windows {
++std::error_code CodePageToUTF16(unsigned codepage,
++                                std::string_view original,
++                                wpi::SmallVectorImpl<wchar_t> &utf16) {
++  if (!original.empty()) {
++    int len = ::MultiByteToWideChar(codepage, MB_ERR_INVALID_CHARS, original.data(),
++                                    original.size(), utf16.begin(), 0);
++
++    if (len == 0) {
++      return mapWindowsError(::GetLastError());
++    }
++
++    utf16.reserve(len + 1);
++    utf16.resize_for_overwrite(len);
++
++    len = ::MultiByteToWideChar(codepage, MB_ERR_INVALID_CHARS, original.data(),
++                                original.size(), utf16.begin(), utf16.size());
++
++    if (len == 0) {
++      return mapWindowsError(::GetLastError());
++    }
++  }
++
++  // Make utf16 null terminated.
++  utf16.push_back(0);
++  utf16.pop_back();
++
++  return std::error_code();
++}
++
++std::error_code UTF8ToUTF16(std::string_view utf8,
++                            wpi::SmallVectorImpl<wchar_t> &utf16) {
++  return CodePageToUTF16(CP_UTF8, utf8, utf16);
++}
++
++std::error_code CurCPToUTF16(std::string_view curcp,
++                            wpi::SmallVectorImpl<wchar_t> &utf16) {
++  return CodePageToUTF16(CP_ACP, curcp, utf16);
++}
++
++static
++std::error_code UTF16ToCodePage(unsigned codepage, const wchar_t *utf16,
++                                size_t utf16_len,
++                                wpi::SmallVectorImpl<char> &converted) {
++  if (utf16_len) {
++    // Get length.
++    int len = ::WideCharToMultiByte(codepage, 0, utf16, utf16_len, converted.begin(),
++                                    0, NULL, NULL);
++
++    if (len == 0) {
++      return mapWindowsError(::GetLastError());
++    }
++
++    converted.reserve(len);
++    converted.resize_for_overwrite(len);
++
++    // Now do the actual conversion.
++    len = ::WideCharToMultiByte(codepage, 0, utf16, utf16_len, converted.data(),
++                                converted.size(), NULL, NULL);
++
++    if (len == 0) {
++      return mapWindowsError(::GetLastError());
++    }
++  }
++
++  // Make the new string null terminated.
++  converted.push_back(0);
++  converted.pop_back();
++
++  return std::error_code();
++}
++
++std::error_code UTF16ToUTF8(const wchar_t *utf16, size_t utf16_len,
++                            wpi::SmallVectorImpl<char> &utf8) {
++  return UTF16ToCodePage(CP_UTF8, utf16, utf16_len, utf8);
++}
++
++std::error_code UTF16ToCurCP(const wchar_t *utf16, size_t utf16_len,
++                             wpi::SmallVectorImpl<char> &curcp) {
++  return UTF16ToCodePage(CP_ACP, utf16, utf16_len, curcp);
++}
++
++} // end namespace windows
++} // end namespace sys
++
++#endif  // _WIN32
++
+ } // namespace llvm
+ 
+ ConvertUTF_RESTORE_WARNINGS

@@ -4,9 +4,9 @@
 
 package edu.wpi.first.wpilibj.examples.gettingstarted;
 
-import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.motorcontrol.PWMSparkMax;
 
@@ -20,7 +20,7 @@ public class Robot extends TimedRobot {
   private final PWMSparkMax m_leftDrive = new PWMSparkMax(0);
   private final PWMSparkMax m_rightDrive = new PWMSparkMax(1);
   private final DifferentialDrive m_robotDrive = new DifferentialDrive(m_leftDrive, m_rightDrive);
-  private final Joystick m_stick = new Joystick(0);
+  private final XboxController m_controller = new XboxController(0);
   private final Timer m_timer = new Timer();
 
   /**
@@ -47,7 +47,8 @@ public class Robot extends TimedRobot {
   public void autonomousPeriodic() {
     // Drive for 2 seconds
     if (m_timer.get() < 2.0) {
-      m_robotDrive.arcadeDrive(0.5, 0.0); // drive forwards half speed
+      // Drive forwards half speed, make sure to turn input squaring off
+      m_robotDrive.arcadeDrive(0.5, 0.0, false);
     } else {
       m_robotDrive.stopMotor(); // stop robot
     }
@@ -60,7 +61,7 @@ public class Robot extends TimedRobot {
   /** This function is called periodically during teleoperated mode. */
   @Override
   public void teleopPeriodic() {
-    m_robotDrive.arcadeDrive(m_stick.getY(), m_stick.getX());
+    m_robotDrive.arcadeDrive(-m_controller.getLeftY(), m_controller.getRightX());
   }
 
   /** This function is called once each time the robot enters test mode. */

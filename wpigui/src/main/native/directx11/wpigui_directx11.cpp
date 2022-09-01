@@ -69,8 +69,9 @@ static bool CreateDeviceD3D(HWND hWnd) {
           nullptr, D3D_DRIVER_TYPE_HARDWARE, nullptr, createDeviceFlags,
           featureLevelArray, 2, D3D11_SDK_VERSION, &sd,
           &gPlatformContext->pSwapChain, &gPlatformContext->pd3dDevice,
-          &featureLevel, &gPlatformContext->pd3dDeviceContext) != S_OK)
+          &featureLevel, &gPlatformContext->pd3dDeviceContext) != S_OK) {
     return false;
+  }
 
   CreateRenderTarget();
   return true;

@@ -4,35 +4,28 @@
 
 package edu.wpi.first.math.geometry;
 
-import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
 import org.junit.jupiter.api.Test;
 
 class Twist2dTest {
-  private static final double kEpsilon = 1E-9;
-
   @Test
-  void testStraightLineTwist() {
+  void testStraight() {
     var straight = new Twist2d(5.0, 0.0, 0.0);
     var straightPose = new Pose2d().exp(straight);
 
-    assertAll(
-        () -> assertEquals(straightPose.getX(), 5.0, kEpsilon),
-        () -> assertEquals(straightPose.getY(), 0.0, kEpsilon),
-        () -> assertEquals(straightPose.getRotation().getRadians(), 0.0, kEpsilon));
+    var expected = new Pose2d(5.0, 0.0, new Rotation2d());
+    assertEquals(expected, straightPose);
   }
 
   @Test
-  void testQuarterCirleTwist() {
+  void testQuarterCirle() {
     var quarterCircle = new Twist2d(5.0 / 2.0 * Math.PI, 0, Math.PI / 2.0);
     var quarterCirclePose = new Pose2d().exp(quarterCircle);
 
-    assertAll(
-        () -> assertEquals(quarterCirclePose.getX(), 5.0, kEpsilon),
-        () -> assertEquals(quarterCirclePose.getY(), 5.0, kEpsilon),
-        () -> assertEquals(quarterCirclePose.getRotation().getDegrees(), 90.0, kEpsilon));
+    var expected = new Pose2d(5.0, 5.0, Rotation2d.fromDegrees(90.0));
+    assertEquals(expected, quarterCirclePose);
   }
 
   @Test
@@ -40,10 +33,8 @@ class Twist2dTest {
     var diagonal = new Twist2d(2.0, 2.0, 0.0);
     var diagonalPose = new Pose2d().exp(diagonal);
 
-    assertAll(
-        () -> assertEquals(diagonalPose.getX(), 2.0, kEpsilon),
-        () -> assertEquals(diagonalPose.getY(), 2.0, kEpsilon),
-        () -> assertEquals(diagonalPose.getRotation().getDegrees(), 0.0, kEpsilon));
+    var expected = new Pose2d(2.0, 2.0, new Rotation2d());
+    assertEquals(expected, diagonalPose);
   }
 
   @Test
@@ -67,9 +58,11 @@ class Twist2dTest {
 
     final var twist = start.log(end);
 
-    assertAll(
-        () -> assertEquals(twist.dx, 5.0 / 2.0 * Math.PI, kEpsilon),
-        () -> assertEquals(twist.dy, 0.0, kEpsilon),
-        () -> assertEquals(twist.dtheta, Math.PI / 2.0, kEpsilon));
+    var expected = new Twist2d(5.0 / 2.0 * Math.PI, 0.0, Math.PI / 2.0);
+    assertEquals(expected, twist);
+
+    // Make sure computed twist gives back original end pose
+    final var reapplied = start.exp(twist);
+    assertEquals(end, reapplied);
   }
 }

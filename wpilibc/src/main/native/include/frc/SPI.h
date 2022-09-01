@@ -10,7 +10,6 @@
 
 #include <hal/SPITypes.h>
 #include <units/time.h>
-#include <wpi/deprecated.h>
 #include <wpi/span.h>
 
 namespace frc {
@@ -75,26 +74,6 @@ class SPI {
    * changes on the leading edge.
    */
   void SetSampleDataOnTrailingEdge();
-
-  /**
-   * Configure that the data is stable on the falling edge and the data
-   * changes on the rising edge.
-   *
-   * @deprecated Use SetSampleDataOnTrailingEdge() instead.
-   *
-   */
-  WPI_DEPRECATED("Use SetSampleDataOnTrailingEdge instead.")
-  void SetSampleDataOnFalling();
-
-  /**
-   * Configure that the data is stable on the rising edge and the data
-   * changes on the falling edge.
-   *
-   * @deprecated Use SetSampleDataOnLeadingEdge() instead.
-   *
-   */
-  WPI_DEPRECATED("Use SetSampleDataOnLeadingEdge instead")
-  void SetSampleDataOnRising();
 
   /**
    * Configure the clock output line to be active low.
@@ -190,19 +169,6 @@ class SPI {
   void StartAutoRate(units::second_t period);
 
   /**
-   * Start running the automatic SPI transfer engine at a periodic rate.
-   *
-   * InitAuto() and SetAutoTransmitData() must be called before calling this
-   * function.
-   *
-   * @deprecated use unit-safe StartAutoRate(units::second_t period) instead.
-   *
-   * @param period period between transfers, in seconds (us resolution)
-   */
-  WPI_DEPRECATED("Use StartAutoRate with unit-safety instead")
-  void StartAutoRate(double period);
-
-  /**
    * Start running the automatic SPI transfer engine when a trigger occurs.
    *
    * InitAuto() and SetAutoTransmitData() must be called before calling this
@@ -285,31 +251,6 @@ class SPI {
   void InitAccumulator(units::second_t period, int cmd, int xferSize,
                        int validMask, int validValue, int dataShift,
                        int dataSize, bool isSigned, bool bigEndian);
-
-  /**
-   * Initialize the accumulator.
-   *
-   * @deprecated Use unit-safe version instead.
-   *             InitAccumulator(units::second_t period, int cmd, int <!--
-   * -->         xferSize, int validMask, int validValue, int dataShift, <!--
-   * -->         int dataSize, bool isSigned, bool bigEndian)
-   *
-   * @param period     Time between reads
-   * @param cmd        SPI command to send to request data
-   * @param xferSize   SPI transfer size, in bytes
-   * @param validMask  Mask to apply to received data for validity checking
-   * @param validValue After valid_mask is applied, required matching value for
-   *                   validity checking
-   * @param dataShift  Bit shift to apply to received data to get actual data
-   *                   value
-   * @param dataSize   Size (in bits) of data field
-   * @param isSigned   Is data field signed?
-   * @param bigEndian  Is device big endian?
-   */
-  WPI_DEPRECATED("Use InitAccumulator with unit-safety instead")
-  void InitAccumulator(double period, int cmd, int xferSize, int validMask,
-                       int validValue, int dataShift, int dataSize,
-                       bool isSigned, bool bigEndian);
 
   /**
    * Frees the accumulator.

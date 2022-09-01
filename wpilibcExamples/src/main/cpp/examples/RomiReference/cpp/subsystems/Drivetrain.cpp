@@ -49,11 +49,11 @@ int Drivetrain::GetRightEncoderCount() {
 }
 
 units::meter_t Drivetrain::GetLeftDistance() {
-  return units::meter_t(m_leftEncoder.GetDistance());
+  return units::meter_t{m_leftEncoder.GetDistance()};
 }
 
 units::meter_t Drivetrain::GetRightDistance() {
-  return units::meter_t(m_rightEncoder.GetDistance());
+  return units::meter_t{m_rightEncoder.GetDistance()};
 }
 
 units::meter_t Drivetrain::GetAverageDistance() {

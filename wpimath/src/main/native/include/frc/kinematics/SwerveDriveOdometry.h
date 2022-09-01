@@ -8,6 +8,7 @@
 #include <cstddef>
 #include <ctime>
 
+#include <wpi/SymbolExports.h>
 #include <wpi/timestamp.h>
 
 #include "SwerveDriveKinematics.h"
@@ -38,7 +39,7 @@ class SwerveDriveOdometry {
    */
   SwerveDriveOdometry(SwerveDriveKinematics<NumModules> kinematics,
                       const Rotation2d& gyroAngle,
-                      const Pose2d& initialPose = Pose2d());
+                      const Pose2d& initialPose = Pose2d{});
 
   /**
    * Resets the robot's position on the field.
@@ -111,6 +112,9 @@ class SwerveDriveOdometry {
   Rotation2d m_previousAngle;
   Rotation2d m_gyroOffset;
 };
+
+extern template class EXPORT_TEMPLATE_DECLARE(WPILIB_DLLEXPORT)
+    SwerveDriveOdometry<4>;
 
 }  // namespace frc
 

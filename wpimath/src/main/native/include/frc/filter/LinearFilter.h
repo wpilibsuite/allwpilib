@@ -14,8 +14,8 @@
 #include <wpi/circular_buffer.h>
 #include <wpi/span.h>
 
-#include "Eigen/Core"
 #include "Eigen/QR"
+#include "frc/EigenCore.h"
 #include "units/time.h"
 #include "wpimath/MathShared.h"
 
@@ -175,12 +175,12 @@ class LinearFilter {
    * difference. 0 is the current sample, -1 is the previous sample, -2 is the
    * sample before that, etc. Don't use positive stencil points (samples from
    * the future) if the LinearFilter will be used for stream-based online
-   * filtering.
+   * filtering (e.g., taking derivative of encoder samples in real-time).
    *
    * @tparam Derivative The order of the derivative to compute.
    * @tparam Samples    The number of samples to use to compute the given
    *                    derivative. This must be one more than the order of
-   *                    derivative or higher.
+   *                    the derivative or higher.
    * @param stencil     List of stencil points.
    * @param period      The period in seconds between samples taken by the user.
    */
@@ -209,7 +209,7 @@ class LinearFilter {
     static_assert(Derivative < Samples,
                   "Order of derivative must be less than number of samples.");
 
-    Eigen::Matrix<double, Samples, Samples> S;
+    Matrixd<Samples, Samples> S;
     for (int row = 0; row < Samples; ++row) {
       for (int col = 0; col < Samples; ++col) {
         S(row, col) = std::pow(stencil[col], row);
@@ -217,12 +217,12 @@ class LinearFilter {
     }
 
     // Fill in Kronecker deltas: https://en.wikipedia.org/wiki/Kronecker_delta
-    Eigen::Vector<double, Samples> d;
+    Vectord<Samples> d;
     for (int i = 0; i < Samples; ++i) {
       d(i) = (i == Derivative) ? Factorial(Derivative) : 0.0;
     }
 
-    Eigen::Vector<double, Samples> a =
+    Vectord<Samples> a =
         S.householderQr().solve(d) / std::pow(period.value(), Derivative);
 
     // Reverse gains list

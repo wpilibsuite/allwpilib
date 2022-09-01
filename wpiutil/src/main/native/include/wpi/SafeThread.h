@@ -10,6 +10,7 @@
 #include <thread>
 #include <utility>
 
+#include "wpi/Synchronization.h"
 #include "wpi/condition_variable.h"
 #include "wpi/mutex.h"
 
@@ -18,15 +19,31 @@ namespace wpi {
 /**
  * Base class for SafeThreadOwner threads.
  */
-class SafeThread {
+class SafeThreadBase {
  public:
-  virtual ~SafeThread() = default;
+  virtual ~SafeThreadBase() = default;
   virtual void Main() = 0;
+  virtual void Stop() = 0;
 
   mutable wpi::mutex m_mutex;
   std::atomic_bool m_active{true};
-  wpi::condition_variable m_cond;
   std::thread::id m_threadId;
+};
+
+class SafeThread : public SafeThreadBase {
+ public:
+  void Stop() override;
+
+  wpi::condition_variable m_cond;
+};
+
+class SafeThreadEvent : public SafeThreadBase {
+ public:
+  SafeThreadEvent() : m_stopEvent{true} {}
+
+  void Stop() override;
+
+  Event m_stopEvent;
 };
 
 namespace detail {
@@ -36,12 +53,12 @@ namespace detail {
  */
 class SafeThreadProxyBase {
  public:
-  explicit SafeThreadProxyBase(std::shared_ptr<SafeThread> thr);
+  explicit SafeThreadProxyBase(std::shared_ptr<SafeThreadBase> thr);
   explicit operator bool() const { return m_thread != nullptr; }
   std::unique_lock<wpi::mutex>& GetLock() { return m_lock; }
 
  protected:
-  std::shared_ptr<SafeThread> m_thread;
+  std::shared_ptr<SafeThreadBase> m_thread;
   std::unique_lock<wpi::mutex> m_lock;
 };
 
@@ -53,7 +70,7 @@ class SafeThreadProxyBase {
 template <typename T>
 class SafeThreadProxy : public SafeThreadProxyBase {
  public:
-  explicit SafeThreadProxy(std::shared_ptr<SafeThread> thr)
+  explicit SafeThreadProxy(std::shared_ptr<SafeThreadBase> thr)
       : SafeThreadProxyBase(std::move(thr)) {}
   T& operator*() const { return *static_cast<T*>(m_thread.get()); }
   T* operator->() const { return static_cast<T*>(m_thread.get()); }
@@ -89,13 +106,13 @@ class SafeThreadOwnerBase {
   void SetJoinAtExit(bool joinAtExit) { m_joinAtExit = joinAtExit; }
 
  protected:
-  void Start(std::shared_ptr<SafeThread> thr);
-  std::shared_ptr<SafeThread> GetThreadSharedPtr() const;
+  void Start(std::shared_ptr<SafeThreadBase> thr);
+  std::shared_ptr<SafeThreadBase> GetThreadSharedPtr() const;
 
  private:
   mutable wpi::mutex m_mutex;
   std::thread m_stdThread;
-  std::weak_ptr<SafeThread> m_thread;
+  std::weak_ptr<SafeThreadBase> m_thread;
   std::atomic_bool m_joinAtExit{true};
 };
 

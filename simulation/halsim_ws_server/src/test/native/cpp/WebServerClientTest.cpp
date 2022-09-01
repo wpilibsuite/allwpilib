@@ -8,8 +8,8 @@
 
 #include <fmt/format.h>
 #include <wpi/SmallString.h>
-#include <wpi/raw_uv_ostream.h>
-#include <wpi/uv/util.h>
+#include <wpinet/raw_uv_ostream.h>
+#include <wpinet/uv/util.h>
 
 static constexpr int kTcpConnectAttemptTimeout = 1000;
 

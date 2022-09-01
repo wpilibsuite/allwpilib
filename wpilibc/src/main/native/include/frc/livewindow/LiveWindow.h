@@ -6,8 +6,6 @@
 
 #include <functional>
 
-#include <wpi/deprecated.h>
-
 namespace wpi {
 class Sendable;
 }  // namespace wpi
@@ -18,19 +16,8 @@ namespace frc {
  * The LiveWindow class is the public interface for putting sensors and
  * actuators on the LiveWindow.
  */
-class LiveWindow {
+class LiveWindow final {
  public:
-  /**
-   * Get an instance of the LiveWindow main class.
-   *
-   * This is a singleton to guarantee that there is only a single instance
-   * regardless of how many times GetInstance is called.
-   * @deprecated Use the static methods unless guaranteeing LiveWindow is
-   * instantiated
-   */
-  WPI_DEPRECATED("Use static methods")
-  static LiveWindow* GetInstance();
-
   /**
    * Set function to be called when LiveWindow is enabled.
    *

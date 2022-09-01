@@ -18,17 +18,16 @@ TEST(SwerveDrivePoseEstimatorTest, Accuracy) {
       frc::Translation2d{-1_m, -1_m}, frc::Translation2d{-1_m, 1_m}};
 
   frc::SwerveDrivePoseEstimator<4> estimator{
-      frc::Rotation2d(), frc::Pose2d(), kinematics,
+      frc::Rotation2d{}, frc::Pose2d{}, kinematics,
       {0.1, 0.1, 0.1},   {0.05},        {0.1, 0.1, 0.1}};
 
-  frc::SwerveDriveOdometry<4> odometry{kinematics, frc::Rotation2d()};
+  frc::SwerveDriveOdometry<4> odometry{kinematics, frc::Rotation2d{}};
 
   frc::Trajectory trajectory = frc::TrajectoryGenerator::GenerateTrajectory(
-      std::vector{frc::Pose2d(0_m, 0_m, frc::Rotation2d(45_deg)),
-                  frc::Pose2d(3_m, 0_m, frc::Rotation2d(-90_deg)),
-                  frc::Pose2d(0_m, 0_m, frc::Rotation2d(135_deg)),
-                  frc::Pose2d(-3_m, 0_m, frc::Rotation2d(-90_deg)),
-                  frc::Pose2d(0_m, 0_m, frc::Rotation2d(45_deg))},
+      std::vector{frc::Pose2d{0_m, 0_m, 45_deg}, frc::Pose2d{3_m, 0_m, -90_deg},
+                  frc::Pose2d{0_m, 0_m, 135_deg},
+                  frc::Pose2d{-3_m, 0_m, -90_deg},
+                  frc::Pose2d{0_m, 0_m, 45_deg}},
       frc::TrajectoryConfig(5.0_mps, 2.0_mps_sq));
 
   std::default_random_engine generator;
@@ -50,15 +49,15 @@ TEST(SwerveDrivePoseEstimatorTest, Accuracy) {
     frc::Trajectory::State groundTruthState = trajectory.Sample(t);
 
     if (lastVisionUpdateTime + kVisionUpdateRate < t) {
-      if (lastVisionPose != frc::Pose2d()) {
+      if (lastVisionPose != frc::Pose2d{}) {
         estimator.AddVisionMeasurement(lastVisionPose, lastVisionUpdateTime);
       }
       lastVisionPose =
           groundTruthState.pose +
-          frc::Transform2d(
-              frc::Translation2d(distribution(generator) * 0.1_m,
-                                 distribution(generator) * 0.1_m),
-              frc::Rotation2d(distribution(generator) * 0.1 * 1_rad));
+          frc::Transform2d{
+              frc::Translation2d{distribution(generator) * 0.1_m,
+                                 distribution(generator) * 0.1_m},
+              frc::Rotation2d{distribution(generator) * 0.1 * 1_rad}};
       visionPoses.push_back(lastVisionPose);
       lastVisionUpdateTime = t;
     }
@@ -70,7 +69,7 @@ TEST(SwerveDrivePoseEstimatorTest, Accuracy) {
     auto xhat = estimator.UpdateWithTime(
         t,
         groundTruthState.pose.Rotation() +
-            frc::Rotation2d(distribution(generator) * 0.05_rad),
+            frc::Rotation2d{distribution(generator) * 0.05_rad},
         moduleStates[0], moduleStates[1], moduleStates[2], moduleStates[3]);
     double error = groundTruthState.pose.Translation()
                        .Distance(xhat.Translation())
@@ -84,6 +83,6 @@ TEST(SwerveDrivePoseEstimatorTest, Accuracy) {
     t += dt;
   }
 
-  EXPECT_LT(errorSum / (trajectory.TotalTime().value() / dt.value()), 0.2);
-  EXPECT_LT(maxError, 0.4);
+  EXPECT_LT(errorSum / (trajectory.TotalTime().value() / dt.value()), 0.05);
+  EXPECT_LT(maxError, 0.125);
 }

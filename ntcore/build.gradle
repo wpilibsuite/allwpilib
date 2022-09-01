@@ -5,25 +5,25 @@ ext {
 
 apply from: "${rootDir}/shared/jni/setupBuild.gradle"
 
+model {
+    components {}
+    binaries {
+        all {
+            if (!it.buildable || !(it instanceof NativeBinarySpec)) {
+                return
+            }
+            lib project: ':wpinet', library: 'wpinet', linkage: 'shared'
+            lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
+        }
+    }
+}
+
 Action<List<String>> symbolFilter = { symbols ->
     symbols.removeIf({ !it.startsWith('NT_') })
 } as Action<List<String>>;
 
 nativeUtils.exportsConfigs {
     ntcore {
-        x86ExcludeSymbols = [
-            '_CT??_R0?AV_System_error',
-            '_CT??_R0?AVexception',
-            '_CT??_R0?AVfailure',
-            '_CT??_R0?AVruntime_error',
-            '_CT??_R0?AVsystem_error',
-            '_CTA5?AVfailure',
-            '_TI5?AVfailure',
-            '_CT??_R0?AVout_of_range',
-            '_CTA3?AVout_of_range',
-            '_TI3?AVout_of_range',
-            '_CT??_R0?AVbad_cast'
-        ]
         x64ExcludeSymbols = [
             '_CT??_R0?AV_System_error',
             '_CT??_R0?AVexception',
@@ -39,7 +39,6 @@ nativeUtils.exportsConfigs {
         ]
     }
     ntcoreJNI {
-        x86SymbolFilter = symbolFilter
         x64SymbolFilter = symbolFilter
     }
 }

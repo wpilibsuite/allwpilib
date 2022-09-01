@@ -31,7 +31,7 @@ class Robot : public frc::TimedRobot {
 
     // Run controller and update motor output
     m_motor.Set(
-        m_controller.Calculate(units::meter_t(m_encoder.GetDistance())));
+        m_controller.Calculate(units::meter_t{m_encoder.GetDistance()}));
   }
 
  private:

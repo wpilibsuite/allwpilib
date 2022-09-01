@@ -15,7 +15,7 @@ class json;
 namespace frc {
 
 /**
- * A rotation in a 2d coordinate frame represented by a point on the unit circle
+ * A rotation in a 2D coordinate frame represented by a point on the unit circle
  * (cosine and sine).
  */
 class WPILIB_DLLEXPORT Rotation2d {

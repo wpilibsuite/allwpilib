@@ -16,7 +16,7 @@ class MerweScaledSigmaPointsTest {
   void testZeroMeanPoints() {
     var merweScaledSigmaPoints = new MerweScaledSigmaPoints<>(Nat.N2());
     var points =
-        merweScaledSigmaPoints.sigmaPoints(
+        merweScaledSigmaPoints.squareRootSigmaPoints(
             VecBuilder.fill(0, 0), Matrix.mat(Nat.N2(), Nat.N2()).fill(1, 0, 0, 1));
 
     assertTrue(
@@ -31,8 +31,8 @@ class MerweScaledSigmaPointsTest {
   void testNonzeroMeanPoints() {
     var merweScaledSigmaPoints = new MerweScaledSigmaPoints<>(Nat.N2());
     var points =
-        merweScaledSigmaPoints.sigmaPoints(
-            VecBuilder.fill(1, 2), Matrix.mat(Nat.N2(), Nat.N2()).fill(1, 0, 0, 10));
+        merweScaledSigmaPoints.squareRootSigmaPoints(
+            VecBuilder.fill(1, 2), Matrix.mat(Nat.N2(), Nat.N2()).fill(1, 0, 0, Math.sqrt(10)));
 
     assertTrue(
         points.isEqual(

@@ -179,8 +179,7 @@ static void ReportJoystickUnpluggedErrorV(fmt::string_view format,
 template <typename S, typename... Args>
 static inline void ReportJoystickUnpluggedError(const S& format,
                                                 Args&&... args) {
-  ReportJoystickUnpluggedErrorV(
-      format, fmt::make_args_checked<Args...>(format, args...));
+  ReportJoystickUnpluggedErrorV(format, fmt::make_format_args(args...));
 }
 
 /**
@@ -194,8 +193,7 @@ static void ReportJoystickUnpluggedWarningV(fmt::string_view format,
 template <typename S, typename... Args>
 static inline void ReportJoystickUnpluggedWarning(const S& format,
                                                   Args&&... args) {
-  ReportJoystickUnpluggedWarningV(
-      format, fmt::make_args_checked<Args...>(format, args...));
+  ReportJoystickUnpluggedWarningV(format, fmt::make_format_args(args...));
 }
 
 static int& GetDSLastCount() {
@@ -231,12 +229,6 @@ Instance::~Instance() {
   if (dataLogSender) {
     delete dataLogSender.load();
   }
-}
-
-DriverStation& DriverStation::GetInstance() {
-  ::GetInstance();
-  static DriverStation instance;
-  return instance;
 }
 
 bool DriverStation::GetStickButton(int stick, int button) {
@@ -462,11 +454,15 @@ int DriverStation::GetJoystickAxisType(int stick, int axis) {
     FRC_ReportError(warn::BadJoystickIndex, "stick {} out of range", stick);
     return -1;
   }
+  if (axis < 0 || axis >= HAL_kMaxJoystickAxes) {
+    FRC_ReportError(warn::BadJoystickAxis, "axis {} out of range", axis);
+    return -1;
+  }
 
   HAL_JoystickDescriptor descriptor;
   HAL_GetJoystickDescriptor(stick, &descriptor);
 
-  return static_cast<bool>(descriptor.axisTypes);
+  return descriptor.axisTypes[axis];
 }
 
 bool DriverStation::IsJoystickConnected(int stick) {
@@ -504,18 +500,10 @@ bool DriverStation::IsAutonomousEnabled() {
   return controlWord.autonomous && controlWord.enabled;
 }
 
-bool DriverStation::IsOperatorControl() {
-  return IsTeleop();
-}
-
 bool DriverStation::IsTeleop() {
   HAL_ControlWord controlWord;
   HAL_GetControlWord(&controlWord);
   return !(controlWord.autonomous || controlWord.test);
-}
-
-bool DriverStation::IsOperatorControlEnabled() {
-  return IsTeleopEnabled();
 }
 
 bool DriverStation::IsTeleopEnabled() {
@@ -669,10 +657,6 @@ void DriverStation::InDisabled(bool entering) {
 
 void DriverStation::InAutonomous(bool entering) {
   ::GetInstance().userInAutonomous = entering;
-}
-
-void DriverStation::InOperatorControl(bool entering) {
-  InTeleop(entering);
 }
 
 void DriverStation::InTeleop(bool entering) {

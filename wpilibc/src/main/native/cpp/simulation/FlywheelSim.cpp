@@ -38,5 +38,5 @@ units::ampere_t FlywheelSim::GetCurrentDraw() const {
 }
 
 void FlywheelSim::SetInputVoltage(units::volt_t voltage) {
-  SetInput(Eigen::Vector<double, 1>{voltage.value()});
+  SetInput(Vectord<1>{voltage.value()});
 }

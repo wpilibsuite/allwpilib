@@ -4,7 +4,10 @@
 
 #include "frc2/command/Command.h"
 
+#include "frc2/command/CommandHelper.h"
 #include "frc2/command/CommandScheduler.h"
+#include "frc2/command/ConditionalCommand.h"
+#include "frc2/command/EndlessCommand.h"
 #include "frc2/command/InstantCommand.h"
 #include "frc2/command/ParallelCommandGroup.h"
 #include "frc2/command/ParallelDeadlineGroup.h"
@@ -15,6 +18,7 @@
 #include "frc2/command/SequentialCommandGroup.h"
 #include "frc2/command/WaitCommand.h"
 #include "frc2/command/WaitUntilCommand.h"
+#include "frc2/command/WrapperCommand.h"
 
 using namespace frc2;
 
@@ -43,6 +47,45 @@ ParallelRaceGroup Command::Until(std::function<bool()> condition) && {
   temp.emplace_back(std::make_unique<WaitUntilCommand>(std::move(condition)));
   temp.emplace_back(std::move(*this).TransferOwnership());
   return ParallelRaceGroup(std::move(temp));
+}
+
+std::unique_ptr<Command> Command::IgnoringDisable(bool doesRunWhenDisabled) && {
+  class RunsWhenDisabledCommand
+      : public CommandHelper<WrapperCommand, RunsWhenDisabledCommand> {
+   public:
+    RunsWhenDisabledCommand(std::unique_ptr<Command>&& command,
+                            bool doesRunWhenDisabled)
+        : CommandHelper(std::move(command)),
+          m_runsWhenDisabled(doesRunWhenDisabled) {}
+    bool RunsWhenDisabled() const override { return m_runsWhenDisabled; }
+
+   private:
+    bool m_runsWhenDisabled;
+  };
+
+  return std::make_unique<RunsWhenDisabledCommand>(
+      std::move(*this).TransferOwnership(), doesRunWhenDisabled);
+}
+
+std::unique_ptr<Command> Command::WithInterruptBehavior(
+    InterruptionBehavior interruptBehavior) && {
+  class InterruptBehaviorCommand
+      : public CommandHelper<WrapperCommand, InterruptBehaviorCommand> {
+   public:
+    InterruptBehaviorCommand(std::unique_ptr<Command>&& command,
+                             InterruptionBehavior interruptBehavior)
+        : CommandHelper(std::move(command)),
+          m_interruptBehavior(interruptBehavior) {}
+    InterruptionBehavior GetInterruptionBehavior() const override {
+      return m_interruptBehavior;
+    }
+
+   private:
+    InterruptionBehavior m_interruptBehavior;
+  };
+
+  return std::make_unique<InterruptBehaviorCommand>(
+      std::move(*this).TransferOwnership(), interruptBehavior);
 }
 
 ParallelRaceGroup Command::WithInterrupt(std::function<bool()> condition) && {
@@ -85,10 +128,16 @@ SequentialCommandGroup Command::AndThen(
 }
 
 PerpetualCommand Command::Perpetually() && {
+  WPI_IGNORE_DEPRECATED
   return PerpetualCommand(std::move(*this).TransferOwnership());
+  WPI_UNIGNORE_DEPRECATED
 }
 
-RepeatCommand Command::Repeat() && {
+EndlessCommand Command::Endlessly() && {
+  return EndlessCommand(std::move(*this).TransferOwnership());
+}
+
+RepeatCommand Command::Repeatedly() && {
   return RepeatCommand(std::move(*this).TransferOwnership());
 }
 
@@ -96,8 +145,14 @@ ProxyScheduleCommand Command::AsProxy() {
   return ProxyScheduleCommand(this);
 }
 
-void Command::Schedule(bool interruptible) {
-  CommandScheduler::GetInstance().Schedule(interruptible, this);
+ConditionalCommand Command::Unless(std::function<bool()> condition) && {
+  return ConditionalCommand(std::make_unique<InstantCommand>(),
+                            std::move(*this).TransferOwnership(),
+                            std::move(condition));
+}
+
+void Command::Schedule() {
+  CommandScheduler::GetInstance().Schedule(this);
 }
 
 void Command::Cancel() {

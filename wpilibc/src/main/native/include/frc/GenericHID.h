@@ -10,7 +10,8 @@
 
 namespace frc {
 
-class DriverStation;
+class BooleanEvent;
+class EventLoop;
 
 /**
  * Handle input from standard HID devices connected to the Driver Station.
@@ -90,6 +91,16 @@ class GenericHID {
    * @return Whether the button was released since the last check.
    */
   bool GetRawButtonReleased(int button);
+
+  /**
+   * Constructs an event instance around this button's digital signal.
+   *
+   * @param button the button index
+   * @param loop the event loop instance to attach the event to.
+   * @return an event instance representing the button's digital signal attached
+   * to the given loop.
+   */
+  BooleanEvent Button(int button, EventLoop* loop) const;
 
   /**
    * Get the value of the axis.

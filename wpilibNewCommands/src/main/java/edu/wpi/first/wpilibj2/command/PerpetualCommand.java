@@ -16,7 +16,10 @@ import static edu.wpi.first.wpilibj2.command.CommandGroupBase.requireUngrouped;
  * <p>As a rule, CommandGroups require the union of the requirements of their component commands.
  *
  * <p>This class is provided by the NewCommands VendorDep
+ *
+ * @deprecated Replaced by {@link EndlessCommand}.
  */
+@Deprecated(forRemoval = true, since = "2023")
 public class PerpetualCommand extends CommandBase {
   protected final Command m_command;
 
@@ -53,6 +56,7 @@ public class PerpetualCommand extends CommandBase {
     return m_command.runsWhenDisabled();
   }
 
+  @SuppressWarnings("removal") // Command.perpetually()
   @Override
   public PerpetualCommand perpetually() {
     return this;

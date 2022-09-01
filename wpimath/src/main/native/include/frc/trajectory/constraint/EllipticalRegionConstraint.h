@@ -44,8 +44,8 @@ class EllipticalRegionConstraint : public TrajectoryConstraint {
     if (IsPoseInRegion(pose)) {
       return m_constraint.MaxVelocity(pose, curvature, velocity);
     } else {
-      return units::meters_per_second_t(
-          std::numeric_limits<double>::infinity());
+      return units::meters_per_second_t{
+          std::numeric_limits<double>::infinity()};
     }
   }
 
@@ -66,11 +66,16 @@ class EllipticalRegionConstraint : public TrajectoryConstraint {
    * @return Whether the robot pose is within the constraint region.
    */
   bool IsPoseInRegion(const Pose2d& pose) const {
-    // The region (disk) bounded by the ellipse is given by the equation:
-    // ((x-h)^2)/Rx^2) + ((y-k)^2)/Ry^2) <= 1
+    // The region bounded by the ellipse is given by the equation:
+    //
+    // (x−h)²/Rx² + (y−k)²/Ry² ≤ 1
+    //
+    // Multiply by Rx²Ry² for efficiency reasons:
+    //
+    // (x−h)²Ry² + (y−k)²Rx² ≤ Rx²Ry²
+    //
     // If the inequality is satisfied, then it is inside the ellipse; otherwise
     // it is outside the ellipse.
-    // Both sides have been multiplied by Rx^2 * Ry^2 for efficiency reasons.
     return units::math::pow<2>(pose.X() - m_center.X()) *
                    units::math::pow<2>(m_radii.Y()) +
                units::math::pow<2>(pose.Y() - m_center.Y()) *

@@ -1,0 +1,55 @@
+name: Comment Commands
+on:
+  issue_comment:
+    types: [ created ]
+
+jobs:
+  wpiformat:
+    if: github.event.issue.pull_request && startsWith(github.event.comment.body, '/wpiformat')
+    runs-on: ubuntu-latest
+    steps:
+      - name: React Rocket
+        uses: actions/github-script@v4
+        with:
+          script: |
+            const {owner, repo} = context.issue
+            github.reactions.createForIssueComment({
+              owner,
+              repo,
+              comment_id: context.payload.comment.id,
+              content: "rocket",
+            });
+      - uses: actions/checkout@v3
+      - name: Fetch all history and metadata
+        run: |
+          git fetch --prune --unshallow
+          git checkout -b pr
+          git branch -f main origin/main
+      - name: Checkout PR
+        run: |
+          gh pr checkout $NUMBER
+        env:
+          GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
+          NUMBER: ${{ github.event.issue.number }}
+      - name: Set up Python 3.8
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.8
+      - name: Install clang-format
+        run: |
+          wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key | sudo apt-key add -
+          sudo sh -c "echo 'deb http://apt.llvm.org/focal/ llvm-toolchain-focal-14 main' >> /etc/apt/sources.list.d/proposed-repositories.list"
+          sudo apt-get update -q
+          sudo apt-get install -y clang-format-14
+      - name: Install wpiformat
+        run: pip3 install wpiformat
+      - name: Run wpiformat
+        run: wpiformat -clang 14
+      - name: Commit
+        run: |
+          # Set credentials
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          # Commit
+          git commit -am "wpiformat"
+          git push

@@ -35,9 +35,9 @@ RobotContainer::RobotContainer() {
   m_drive.SetDefaultCommand(frc2::RunCommand(
       [this] {
         m_drive.Drive(
-            units::meters_per_second_t(m_driverController.GetLeftY()),
-            units::meters_per_second_t(m_driverController.GetLeftX()),
-            units::radians_per_second_t(m_driverController.GetRightX()), false);
+            units::meters_per_second_t{m_driverController.GetLeftY()},
+            units::meters_per_second_t{m_driverController.GetLeftX()},
+            units::radians_per_second_t{m_driverController.GetRightX()}, false);
       },
       {&m_drive}));
 }
@@ -54,11 +54,11 @@ frc2::Command* RobotContainer::GetAutonomousCommand() {
   // An example trajectory to follow.  All units in meters.
   auto exampleTrajectory = frc::TrajectoryGenerator::GenerateTrajectory(
       // Start at the origin facing the +X direction
-      frc::Pose2d(0_m, 0_m, frc::Rotation2d(0_deg)),
+      frc::Pose2d{0_m, 0_m, 0_deg},
       // Pass through these two interior waypoints, making an 's' curve path
-      {frc::Translation2d(1_m, 1_m), frc::Translation2d(2_m, -1_m)},
+      {frc::Translation2d{1_m, 1_m}, frc::Translation2d{2_m, -1_m}},
       // End 3 meters straight ahead of where we started, facing forward
-      frc::Pose2d(3_m, 0_m, frc::Rotation2d(0_deg)),
+      frc::Pose2d{3_m, 0_m, 0_deg},
       // Pass the config
       config);
 
@@ -66,16 +66,16 @@ frc2::Command* RobotContainer::GetAutonomousCommand() {
       AutoConstants::kPThetaController, 0, 0,
       AutoConstants::kThetaControllerConstraints};
 
-  thetaController.EnableContinuousInput(units::radian_t(-wpi::numbers::pi),
-                                        units::radian_t(wpi::numbers::pi));
+  thetaController.EnableContinuousInput(units::radian_t{-wpi::numbers::pi},
+                                        units::radian_t{wpi::numbers::pi});
 
   frc2::SwerveControllerCommand<4> swerveControllerCommand(
       exampleTrajectory, [this]() { return m_drive.GetPose(); },
 
       m_drive.kDriveKinematics,
 
-      frc2::PIDController(AutoConstants::kPXController, 0, 0),
-      frc2::PIDController(AutoConstants::kPYController, 0, 0), thetaController,
+      frc2::PIDController{AutoConstants::kPXController, 0, 0},
+      frc2::PIDController{AutoConstants::kPYController, 0, 0}, thetaController,
 
       [this](auto moduleStates) { m_drive.SetModuleStates(moduleStates); },
 
@@ -88,10 +88,5 @@ frc2::Command* RobotContainer::GetAutonomousCommand() {
   return new frc2::SequentialCommandGroup(
       std::move(swerveControllerCommand),
       frc2::InstantCommand(
-          [this]() {
-            m_drive.Drive(units::meters_per_second_t(0),
-                          units::meters_per_second_t(0),
-                          units::radians_per_second_t(0), false);
-          },
-          {}));
+          [this]() { m_drive.Drive(0_mps, 0_mps, 0_rad_per_s, false); }, {}));
 }

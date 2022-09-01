@@ -12,6 +12,7 @@
 #include <units/time.h>
 #include <wpi/Demangle.h>
 #include <wpi/SmallSet.h>
+#include <wpi/deprecated.h>
 #include <wpi/span.h>
 
 #include "frc2/command/Subsystem.h"
@@ -23,6 +24,7 @@ std::string GetTypeName(const T& type) {
   return wpi::Demangle(typeid(type).name());
 }
 
+class EndlessCommand;
 class ParallelCommandGroup;
 class ParallelRaceGroup;
 class ParallelDeadlineGroup;
@@ -30,6 +32,7 @@ class SequentialCommandGroup;
 class PerpetualCommand;
 class ProxyScheduleCommand;
 class RepeatCommand;
+class ConditionalCommand;
 
 /**
  * A state machine representing a complete action to be performed by the robot.
@@ -37,8 +40,9 @@ class RepeatCommand;
  * CommandGroups to allow users to build complicated multi-step actions without
  * the need to roll the state machine logic themselves.
  *
- * <p>Commands are run synchronously from the main robot loop; no multithreading
- * is used, unless specified explicitly from the command implementation.
+ * <p>Commands are run synchronously from the main robot loop; no
+ * multithreading is used, unless specified explicitly from the command
+ * implementation.
  *
  * <p>Note: ALWAYS create a subclass by extending CommandHelper<Base, Subclass>,
  * or decorators will not function!
@@ -87,19 +91,35 @@ class Command {
   virtual bool IsFinished() { return false; }
 
   /**
-   * Specifies the set of subsystems used by this command.  Two commands cannot
-   * use the same subsystem at the same time.  If the command is scheduled as
-   * interruptible and another command is scheduled that shares a requirement,
-   * the command will be interrupted.  Else, the command will not be scheduled.
-   * If no subsystems are required, return an empty set.
+   * Specifies the set of subsystems used by this command. Two commands cannot
+   * use the same subsystem at the same time. If another command is scheduled
+   * that shares a requirement, GetInterruptionBehavior() will be checked and
+   * followed. If no subsystems are required, return an empty set.
    *
    * <p>Note: it is recommended that user implementations contain the
    * requirements as a field, and return that field here, rather than allocating
    * a new set every time this is called.
    *
    * @return the set of subsystems that are required
+   * @see InterruptionBehavior
    */
   virtual wpi::SmallSet<Subsystem*, 4> GetRequirements() const = 0;
+
+  /**
+   * An enum describing the command's behavior when another command with a
+   * shared requirement is scheduled.
+   */
+  enum class InterruptionBehavior {
+    /**
+     * This command ends, End(true) is called, and the incoming command is
+     * scheduled normally.
+     *
+     * <p>This is the default behavior.
+     */
+    kCancelSelf,
+    /** This command continues, and the incoming command is not scheduled. */
+    kCancelIncoming
+  };
 
   /**
    * Decorates this command with a timeout.  If the specified timeout is
@@ -183,8 +203,18 @@ class Command {
    * conditions.  The decorated command can still be interrupted or canceled.
    *
    * @return the decorated command
+   * @deprecated replace with EndlessCommand
    */
+  WPI_DEPRECATED("Replace with Endlessly()")
   virtual PerpetualCommand Perpetually() &&;
+
+  /**
+   * Decorates this command to run endlessly, ignoring its ordinary end
+   * conditions. The decorated command can still be interrupted or canceled.
+   *
+   * @return the decorated command
+   */
+  virtual EndlessCommand Endlessly() &&;
 
   /**
    * Decorates this command to run repeatedly, restarting it when it ends, until
@@ -192,7 +222,7 @@ class Command {
    *
    * @return the decorated command
    */
-  virtual RepeatCommand Repeat() &&;
+  virtual RepeatCommand Repeatedly() &&;
 
   /**
    * Decorates this command to run "by proxy" by wrapping it in a
@@ -205,21 +235,41 @@ class Command {
   virtual ProxyScheduleCommand AsProxy();
 
   /**
-   * Schedules this command.
+   * Decorates this command to only run if this condition is not met. If the
+   * command is already running and the condition changes to true, the command
+   * will not stop running. The requirements of this command will be kept for
+   * the new conditonal command.
    *
-   * @param interruptible whether this command can be interrupted by another
-   * command that shares one of its requirements
+   * @param condition the condition that will prevent the command from running
+   * @return the decorated command
    */
-  void Schedule(bool interruptible);
+  virtual ConditionalCommand Unless(std::function<bool()> condition) &&;
 
   /**
-   * Schedules this command, defaulting to interruptible.
+   * Decorates this command to run or stop when disabled.
+   *
+   * @param doesRunWhenDisabled true to run when disabled.
+   * @return the decorated command
    */
-  void Schedule() { Schedule(true); }
+  virtual std::unique_ptr<Command> IgnoringDisable(bool doesRunWhenDisabled) &&;
 
   /**
-   * Cancels this command.  Will call the command's interrupted() method.
-   * Commands will be canceled even if they are not marked as interruptible.
+   * Decorates this command to run or stop when disabled.
+   *
+   * @param interruptBehavior true to run when disabled.
+   * @return the decorated command
+   */
+  virtual std::unique_ptr<Command> WithInterruptBehavior(
+      InterruptionBehavior interruptBehavior) &&;
+
+  /**
+   * Schedules this command.
+   */
+  void Schedule();
+
+  /**
+   * Cancels this command. Will call End(true). Commands will be canceled
+   * regardless of interruption behavior.
    */
   void Cancel();
 
@@ -262,6 +312,16 @@ class Command {
    * @return whether the command should run when the robot is disabled
    */
   virtual bool RunsWhenDisabled() const { return false; }
+
+  /**
+   * How the command behaves when another command with a shared requirement is
+   * scheduled.
+   *
+   * @return a variant of InterruptionBehavior, defaulting to kCancelSelf.
+   */
+  virtual InterruptionBehavior GetInterruptionBehavior() const {
+    return InterruptionBehavior::kCancelSelf;
+  }
 
   virtual std::string GetName() const;
 

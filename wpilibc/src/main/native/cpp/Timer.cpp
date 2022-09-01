@@ -21,9 +21,9 @@ units::second_t GetTime() {
   using std::chrono::duration_cast;
   using std::chrono::system_clock;
 
-  return units::second_t(
+  return units::second_t{
       duration_cast<duration<double>>(system_clock::now().time_since_epoch())
-          .count());
+          .count()};
 }
 
 }  // namespace frc
@@ -65,10 +65,6 @@ bool Timer::HasElapsed(units::second_t period) const {
   return Get() >= period;
 }
 
-bool Timer::HasPeriodPassed(units::second_t period) {
-  return AdvanceIfElapsed(period);
-}
-
 bool Timer::AdvanceIfElapsed(units::second_t period) {
   if (Get() >= period) {
     // Advance the start time by the period.
@@ -82,9 +78,9 @@ bool Timer::AdvanceIfElapsed(units::second_t period) {
 
 units::second_t Timer::GetFPGATimestamp() {
   // FPGA returns the timestamp in microseconds
-  return units::second_t(frc::RobotController::GetFPGATime() * 1.0e-6);
+  return units::second_t{frc::RobotController::GetFPGATime() * 1.0e-6};
 }
 
 units::second_t Timer::GetMatchTime() {
-  return units::second_t(frc::DriverStation::GetMatchTime());
+  return units::second_t{frc::DriverStation::GetMatchTime()};
 }

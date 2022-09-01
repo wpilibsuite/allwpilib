@@ -101,8 +101,8 @@ class Robot : public frc::TimedRobot {
   void SimulationPeriodic() override {
     // In this method, we update our simulation of what our arm is doing
     // First, we set our "inputs" (voltages)
-    m_armSim.SetInput(Eigen::Vector<double, 1>{
-        m_motor.Get() * frc::RobotController::GetInputVoltage()});
+    m_armSim.SetInput(frc::Vectord<1>{m_motor.Get() *
+                                      frc::RobotController::GetInputVoltage()});
 
     // Next, we update it. The standard loop time is 20ms.
     m_armSim.Update(20_ms);
@@ -120,8 +120,8 @@ class Robot : public frc::TimedRobot {
 
   void TeleopInit() override {
     // Read Preferences for Arm setpoint and kP on entering Teleop
-    armPosition = units::degree_t(
-        frc::Preferences::GetDouble(kArmPositionKey, armPosition.value()));
+    armPosition = units::degree_t{
+        frc::Preferences::GetDouble(kArmPositionKey, armPosition.value())};
     if (kArmKp != frc::Preferences::GetDouble(kArmPKey, kArmKp)) {
       kArmKp = frc::Preferences::GetDouble(kArmPKey, kArmKp);
       m_controller.SetP(kArmKp);
@@ -133,8 +133,8 @@ class Robot : public frc::TimedRobot {
       // Here, we run PID control like normal, with a setpoint read from
       // preferences in degrees.
       double pidOutput = m_controller.Calculate(
-          m_encoder.GetDistance(), (units::radian_t(armPosition).value()));
-      m_motor.SetVoltage(units::volt_t(pidOutput));
+          m_encoder.GetDistance(), (units::radian_t{armPosition}.value()));
+      m_motor.SetVoltage(units::volt_t{pidOutput});
     } else {
       // Otherwise, we disable the motor.
       m_motor.Set(0.0);

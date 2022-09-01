@@ -6,10 +6,11 @@
 
 #include <cstddef>
 
+#include <wpi/SymbolExports.h>
 #include <wpi/array.h>
 
-#include "Eigen/Core"
 #include "Eigen/QR"
+#include "frc/EigenCore.h"
 #include "frc/geometry/Rotation2d.h"
 #include "frc/geometry/Translation2d.h"
 #include "frc/kinematics/ChassisSpeeds.h"
@@ -58,7 +59,7 @@ class SwerveDriveKinematics {
    */
   template <typename... Wheels>
   explicit SwerveDriveKinematics(Translation2d wheel, Wheels&&... wheels)
-      : m_modules{wheel, wheels...} {
+      : m_modules{wheel, wheels...}, m_moduleStates(wpi::empty_array) {
     static_assert(sizeof...(wheels) >= 1,
                   "A swerve drive requires at least two modules");
 
@@ -78,7 +79,7 @@ class SwerveDriveKinematics {
 
   explicit SwerveDriveKinematics(
       const wpi::array<Translation2d, NumModules>& wheels)
-      : m_modules{wheels} {
+      : m_modules{wheels}, m_moduleStates(wpi::empty_array) {
     for (size_t i = 0; i < NumModules; i++) {
       // clang-format off
       m_inverseKinematics.template block<2, 3>(i * 2, 0) <<
@@ -106,6 +107,9 @@ class SwerveDriveKinematics {
    * However, if you wish to change the center of rotation for evasive
    * maneuvers, vision alignment, or for any other use case, you can do so.
    *
+   * In the case that the desired chassis speeds are zero (i.e. the robot will
+   * be stationary), the previously calculated module angle will be maintained.
+   *
    * @param chassisSpeeds The desired chassis speed.
    * @param centerOfRotation The center of rotation. For example, if you set the
    * center of rotation at one corner of the robot and provide a chassis speed
@@ -125,7 +129,7 @@ class SwerveDriveKinematics {
    */
   wpi::array<SwerveModuleState, NumModules> ToSwerveModuleStates(
       const ChassisSpeeds& chassisSpeeds,
-      const Translation2d& centerOfRotation = Translation2d()) const;
+      const Translation2d& centerOfRotation = Translation2d{}) const;
 
   /**
    * Performs forward kinematics to return the resulting chassis state from the
@@ -178,13 +182,17 @@ class SwerveDriveKinematics {
       units::meters_per_second_t attainableMaxSpeed);
 
  private:
-  mutable Eigen::Matrix<double, NumModules * 2, 3> m_inverseKinematics;
-  Eigen::HouseholderQR<Eigen::Matrix<double, NumModules * 2, 3>>
-      m_forwardKinematics;
+  mutable Matrixd<NumModules * 2, 3> m_inverseKinematics;
+  Eigen::HouseholderQR<Matrixd<NumModules * 2, 3>> m_forwardKinematics;
   wpi::array<Translation2d, NumModules> m_modules;
+  mutable wpi::array<SwerveModuleState, NumModules> m_moduleStates;
 
   mutable Translation2d m_previousCoR;
 };
+
+extern template class EXPORT_TEMPLATE_DECLARE(WPILIB_DLLEXPORT)
+    SwerveDriveKinematics<4>;
+
 }  // namespace frc
 
 #include "SwerveDriveKinematics.inc"
