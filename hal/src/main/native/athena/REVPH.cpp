@@ -242,7 +242,6 @@ void HAL_FreeREVPH(HAL_REVPHHandle handle) {
     HAL_CleanCAN(hph->hcan);
   }
 
-
   REVPHHandles->Free(handle);
 }
 
