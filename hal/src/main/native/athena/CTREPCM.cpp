@@ -233,9 +233,11 @@ void HAL_SetCTREPCMClosedLoopControl(HAL_CTREPCMHandle handle, HAL_Bool enabled,
     return;
   }
 
+  int32_t can_status = 0;
+
   std::scoped_lock lock{pcm->lock};
   pcm->control.bits.closedLoopEnable = enabled ? 1 : 0;
-  SendControl(pcm.get(), status);
+  SendControl(pcm.get(), &can_status);
 }
 
 HAL_Bool HAL_GetCTREPCMClosedLoopControl(HAL_CTREPCMHandle handle,
