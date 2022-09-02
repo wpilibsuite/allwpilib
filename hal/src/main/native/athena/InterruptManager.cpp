@@ -36,13 +36,13 @@ static void* NiFpgaLibrary = nullptr;
 
 using namespace hal;
 
-InterruptManager& InterruptManager::Get() {
+InterruptManager& InterruptManager::GetInstance() {
   static InterruptManager manager;
   return manager;
 }
 
 int32_t InterruptManager::Initialize(tSystemInterface* baseSystem) {
-  auto& manager = Get();
+  auto& manager = GetInstance();
   manager.fpgaSession = baseSystem->getHandle();
 
   NiFpgaLibrary = dlopen("libNiFpga.so", RTLD_LAZY);
@@ -64,7 +64,12 @@ int32_t InterruptManager::Initialize(tSystemInterface* baseSystem) {
       dlsym(NiFpgaLibrary, "NiFpgaDll_AcknowledgeIrqs"));
 #pragma GCC diagnostic pop
 
-  // TODO Actually return errors
+  if (HAL_NiFpga_ReserveIrqContext == nullptr ||
+      HAL_NiFpga_UnreserveIrqContext == nullptr ||
+      HAL_NiFpga_WaitOnIrqs == nullptr ||
+      HAL_NiFpga_AcknowledgeIrqs == nullptr) {
+      return NO_AVAILABLE_RESOURCES;
+  }
 
   return HAL_SUCCESS;
 }

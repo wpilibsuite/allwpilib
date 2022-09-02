@@ -107,7 +107,7 @@ static void alarmCallback() {
 }
 
 static void notifierThreadMain() {
-  InterruptManager& manager = InterruptManager::Get();
+  InterruptManager& manager = InterruptManager::GetInstance();
   NiFpga_IrqContext context = manager.GetContext();
   uint32_t mask = 1 << kTimerInterruptNumber;
   int32_t status = 0;

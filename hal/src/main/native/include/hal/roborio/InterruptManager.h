@@ -13,7 +13,7 @@
 namespace hal {
 class InterruptManager {
  public:
-  static InterruptManager& Get();
+  static InterruptManager& GetInstance();
   static int32_t Initialize(tSystemInterface* baseSystem);
 
   NiFpga_IrqContext GetContext() noexcept;

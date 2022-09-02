@@ -25,7 +25,7 @@ namespace {
 
 struct Interrupt {
   std::unique_ptr<tInterrupt> anInterrupt;
-  InterruptManager& manager = InterruptManager::Get();
+  InterruptManager& manager = InterruptManager::GetInstance();
   NiFpga_IrqContext irqContext = nullptr;
   uint32_t mask;
 };
