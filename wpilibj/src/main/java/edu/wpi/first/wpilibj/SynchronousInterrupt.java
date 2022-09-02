@@ -91,7 +91,7 @@ public class SynchronousInterrupt implements AutoCloseable {
    *     interrupt was read.
    * @return The raw hardware interrupt result
    */
-  int waitForInterruptRaw(double timeoutSeconds, boolean ignorePrevious) {
+  long waitForInterruptRaw(double timeoutSeconds, boolean ignorePrevious) {
     return InterruptJNI.waitForInterrupt(m_handle, timeoutSeconds, ignorePrevious);
   }
 
@@ -105,7 +105,7 @@ public class SynchronousInterrupt implements AutoCloseable {
    * @return Result of which edges were triggered, or if an timeout occurred.
    */
   public WaitResult waitForInterrupt(double timeoutSeconds, boolean ignorePrevious) {
-    int result = InterruptJNI.waitForInterrupt(m_handle, timeoutSeconds, ignorePrevious);
+    long result = InterruptJNI.waitForInterrupt(m_handle, timeoutSeconds, ignorePrevious);
 
     // Rising edge result is the interrupt bit set in the byte 0xFF
     // Falling edge result is the interrupt bit set in the byte 0xFF00
