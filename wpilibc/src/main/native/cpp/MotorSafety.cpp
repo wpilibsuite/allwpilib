@@ -8,6 +8,7 @@
 #include <utility>
 
 #include <wpi/SmallPtrSet.h>
+#include <wpi/SafeThread.h>
 
 #include "frc/DriverStation.h"
 #include "frc/Errors.h"
@@ -16,6 +17,7 @@ using namespace frc;
 
 static wpi::SmallPtrSet<MotorSafety*, 32> instanceList;
 static wpi::mutex listMutex;
+static bool threadStarted = false;
 
 #ifndef __FRC_ROBORIO__
 namespace frc::impl {
@@ -28,9 +30,9 @@ void ResetMotorSafety() {
 
 MotorSafety::MotorSafety() {
   std::scoped_lock lock(listMutex);
-  bool startThread = instanceList.empty();
   instanceList.insert(this);
-  if (startThread) {
+  if (!threadStarted) {
+    threadStarted = true;
     // TODO Threads
   }
 }
@@ -38,9 +40,6 @@ MotorSafety::MotorSafety() {
 MotorSafety::~MotorSafety() {
   std::scoped_lock lock(listMutex);
   instanceList.erase(this);
-  if (instanceList.empty()) {
-    // TODO Threads
-  }
 }
 
 MotorSafety::MotorSafety(MotorSafety&& rhs)

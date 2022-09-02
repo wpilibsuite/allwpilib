@@ -45,7 +45,7 @@ struct JoystickDataCache {
   HAL_JoystickPOVs povs[kJoystickPorts];
   HAL_JoystickButtons buttons[kJoystickPorts];
   HAL_AllianceStationID allianceStation;
-  float matchTime;
+  double matchTime;
   HAL_ControlWord controlWord;
   bool updated;
 };
@@ -307,16 +307,13 @@ HAL_Bool HAL_GetOutputsEnabled(void) {
 
 namespace hal {
 void NewDriverStationData() {
-  printf("Started to update\n");
   cacheToUpdate->Update();
-  printf("Updated \n");
     {
     std::scoped_lock lock{cacheMutex};
     std::swap(currentCache, cacheToUpdate);
     currentCache->updated = true;
   }
   driverStation->newDataEvents.Wakeup();
-  printf("Woken up\n");
   SimDriverStationData->CallNewDataCallbacks();
 }
 

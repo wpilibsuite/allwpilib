@@ -4,9 +4,8 @@
 
 #pragma once
 
-#include <climits>  // NOLINT
-
 #ifdef __cplusplus
+#include <climits>  // NOLINT
 #include <initializer_list>
 
 #include "wpi/span.h"

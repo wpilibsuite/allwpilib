@@ -160,6 +160,7 @@ void DriverStationSim::NotifyNewData() {
   HALSIM_NotifyDriverStationNewData();
   wpi::WaitForObject(waitEvent.GetHandle());
   HAL_RemoveNewDataEventHandle(waitEvent.GetHandle());
+  frc::DriverStation::RefreshData();
 }
 
 void DriverStationSim::SetSendError(bool shouldSend) {
