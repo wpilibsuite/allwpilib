@@ -43,7 +43,6 @@ SOFTWARE.
 #include <algorithm> // all_of, copy, find, for_each, generate_n, min, reverse, remove, fill, none_of, transform
 #include <array> // array
 #include <cassert> // assert
-#include <ciso646> // and, not, or
 #include <cstddef> // nullptr_t, ptrdiff_t, size_t
 #include <cstdint> // uint8_t, uint16_t, uint32_t, uint64_t
 #include <exception> // exception
