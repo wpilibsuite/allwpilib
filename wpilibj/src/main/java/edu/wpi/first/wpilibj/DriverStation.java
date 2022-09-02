@@ -41,6 +41,16 @@ public final class DriverStation {
     }
   }
 
+  private static class HALJoystickAxesRaw {
+    public int[] m_axes;
+    public int m_count;
+
+    HALJoystickAxesRaw(int count) {
+      m_axes = new int[count];
+    }
+  }
+
+
   private static class HALJoystickPOVs {
     public short[] m_povs;
     public int m_count;
@@ -390,6 +400,7 @@ public final class DriverStation {
 
   // Joystick User Data
   private static HALJoystickAxes[] m_joystickAxes = new HALJoystickAxes[kJoystickPorts];
+  private static HALJoystickAxesRaw[] m_joystickAxesRaw = new HALJoystickAxesRaw[kJoystickPorts];
   private static HALJoystickPOVs[] m_joystickPOVs = new HALJoystickPOVs[kJoystickPorts];
   private static HALJoystickButtons[] m_joystickButtons = new HALJoystickButtons[kJoystickPorts];
   private static MatchInfoData m_matchInfo = new MatchInfoData();
@@ -398,6 +409,7 @@ public final class DriverStation {
 
   // Joystick Cached Data
   private static HALJoystickAxes[] m_joystickAxesCache = new HALJoystickAxes[kJoystickPorts];
+  private static HALJoystickAxesRaw[] m_joystickAxesRawCache = new HALJoystickAxesRaw[kJoystickPorts];
   private static HALJoystickPOVs[] m_joystickPOVsCache = new HALJoystickPOVs[kJoystickPorts];
   private static HALJoystickButtons[] m_joystickButtonsCache =
       new HALJoystickButtons[kJoystickPorts];
@@ -432,10 +444,12 @@ public final class DriverStation {
     for (int i = 0; i < kJoystickPorts; i++) {
       m_joystickButtons[i] = new HALJoystickButtons();
       m_joystickAxes[i] = new HALJoystickAxes(DriverStationJNI.kMaxJoystickAxes);
+      m_joystickAxesRaw[i] = new HALJoystickAxesRaw(DriverStationJNI.kMaxJoystickAxes);
       m_joystickPOVs[i] = new HALJoystickPOVs(DriverStationJNI.kMaxJoystickPOVs);
 
       m_joystickButtonsCache[i] = new HALJoystickButtons();
       m_joystickAxesCache[i] = new HALJoystickAxes(DriverStationJNI.kMaxJoystickAxes);
+      m_joystickAxesRawCache[i] = new HALJoystickAxesRaw(DriverStationJNI.kMaxJoystickAxes);
       m_joystickPOVsCache[i] = new HALJoystickPOVs(DriverStationJNI.kMaxJoystickPOVs);
     }
 
@@ -1168,6 +1182,8 @@ public final class DriverStation {
     for (byte stick = 0; stick < kJoystickPorts; stick++) {
       m_joystickAxesCache[stick].m_count =
           DriverStationJNI.getJoystickAxes(stick, m_joystickAxesCache[stick].m_axes);
+      m_joystickAxesRawCache[stick].m_count =
+          DriverStationJNI.getJoystickAxesRaw(stick, m_joystickAxesRawCache[stick].m_axes);
       m_joystickPOVsCache[stick].m_count =
           DriverStationJNI.getJoystickPOVs(stick, m_joystickPOVsCache[stick].m_povs);
       m_joystickButtonsCache[stick].m_buttons =
@@ -1197,6 +1213,10 @@ public final class DriverStation {
       HALJoystickAxes[] currentAxes = m_joystickAxes;
       m_joystickAxes = m_joystickAxesCache;
       m_joystickAxesCache = currentAxes;
+
+      HALJoystickAxesRaw[] currentAxesRaw = m_joystickAxesRaw;
+      m_joystickAxesRaw = m_joystickAxesRawCache;
+      m_joystickAxesRawCache = currentAxesRaw;
 
       HALJoystickButtons[] currentButtons = m_joystickButtons;
       m_joystickButtons = m_joystickButtonsCache;
