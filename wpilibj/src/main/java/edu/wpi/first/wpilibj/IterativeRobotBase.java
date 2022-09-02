@@ -257,10 +257,10 @@ public abstract class IterativeRobotBase extends RobotBase {
   }
 
   protected void loopFunc() {
+    DriverStation.refreshData();
     m_watchdog.reset();
 
     // Get current mode
-    DriverStation.updateData();
     Mode mode = Mode.kNone;
     if (m_word.isDisabled()) {
       mode = Mode.kDisabled;
