@@ -76,7 +76,7 @@ public class ParallelDeadlineGroup extends CommandGroupBase {
   }
 
   @Override
-  public void initialize() {
+  public final void initialize() {
     for (Map.Entry<Command, Boolean> commandRunning : m_commands.entrySet()) {
       commandRunning.getKey().initialize();
       commandRunning.setValue(true);
@@ -85,7 +85,7 @@ public class ParallelDeadlineGroup extends CommandGroupBase {
   }
 
   @Override
-  public void execute() {
+  public final void execute() {
     for (Map.Entry<Command, Boolean> commandRunning : m_commands.entrySet()) {
       if (!commandRunning.getValue()) {
         continue;
@@ -102,7 +102,7 @@ public class ParallelDeadlineGroup extends CommandGroupBase {
   }
 
   @Override
-  public void end(boolean interrupted) {
+  public final void end(boolean interrupted) {
     for (Map.Entry<Command, Boolean> commandRunning : m_commands.entrySet()) {
       if (commandRunning.getValue()) {
         commandRunning.getKey().end(true);
@@ -111,7 +111,7 @@ public class ParallelDeadlineGroup extends CommandGroupBase {
   }
 
   @Override
-  public boolean isFinished() {
+  public final boolean isFinished() {
     return m_finished;
   }
 

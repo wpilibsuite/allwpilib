@@ -179,7 +179,12 @@ class JStringRef {
 namespace detail {
 
 template <typename C, typename T>
-class JArrayRefInner {};
+class JArrayRefInner {
+ public:
+  operator span<const T>() const {  // NOLINT
+    return static_cast<const C*>(this)->array();
+  }
+};
 
 /**
  * Specialization of JArrayRefBase to provide std::string_view conversion.
@@ -199,14 +204,31 @@ class JArrayRefInner<C, jbyte> {
 };
 
 /**
+ * Specialization of JArrayRefBase to handle both "long long" and "long" on
+ * 64-bit systems.
+ */
+template <typename C>
+class JArrayRefInner<C, jlong> {
+ public:
+  template <typename U,
+            typename = std::enable_if_t<sizeof(U) == sizeof(jlong) &&
+                                        std::is_integral_v<U>>>
+  operator span<const U>() const {  // NOLINT
+    auto arr = static_cast<const C*>(this)->array();
+    if (arr.empty()) {
+      return {};
+    }
+    return {reinterpret_cast<const U*>(arr.data()), arr.size()};
+  }
+};
+
+/**
  * Base class for J*ArrayRef and CriticalJ*ArrayRef
  */
 template <typename T>
 class JArrayRefBase : public JArrayRefInner<JArrayRefBase<T>, T> {
  public:
   explicit operator bool() const { return this->m_elements != nullptr; }
-
-  operator span<const T>() const { return array(); }  // NOLINT
 
   span<const T> array() const {
     if (!this->m_elements) {
@@ -538,11 +560,23 @@ inline jbooleanArray MakeJBooleanArray(JNIEnv* env, span<const bool> arr) {
 WPI_JNI_MAKEJARRAY(jboolean, Boolean)
 WPI_JNI_MAKEJARRAY(jbyte, Byte)
 WPI_JNI_MAKEJARRAY(jshort, Short)
-WPI_JNI_MAKEJARRAY(jlong, Long)
 WPI_JNI_MAKEJARRAY(jfloat, Float)
 WPI_JNI_MAKEJARRAY(jdouble, Double)
 
 #undef WPI_JNI_MAKEJARRAY
+
+template <class T, typename = std::enable_if_t<
+                       sizeof(typename T::value_type) == sizeof(jlong) &&
+                       std::is_integral_v<typename T::value_type>>>
+inline jlongArray MakeJLongArray(JNIEnv* env, const T& arr) {
+  jlongArray jarr = env->NewLongArray(arr.size());
+  if (!jarr) {
+    return nullptr;
+  }
+  env->SetLongArrayRegion(jarr, 0, arr.size(),
+                          reinterpret_cast<const jlong*>(arr.data()));
+  return jarr;
+}
 
 /**
  * Convert an array of std::string into a jarray of jstring.
