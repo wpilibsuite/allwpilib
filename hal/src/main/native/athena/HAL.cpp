@@ -39,7 +39,7 @@ static uint64_t dsStartTime;
 using namespace hal;
 
 namespace hal {
-  void InitializeDriverStation();
+void InitializeDriverStation();
 namespace init {
 void InitializeHAL() {
   InitializeCTREPCM();

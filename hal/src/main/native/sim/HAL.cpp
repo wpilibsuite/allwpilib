@@ -58,8 +58,8 @@ static SimPeriodicCallbackRegistry gSimPeriodicBefore;
 static SimPeriodicCallbackRegistry gSimPeriodicAfter;
 
 namespace hal {
-  void InitializeDriverStation();
-}
+void InitializeDriverStation();
+}  // namespace hal
 
 namespace hal::init {
 void InitializeHAL() {

@@ -152,7 +152,8 @@ void Thread::Main() {
 
   for (;;) {
     bool timedOut = false;
-    bool newData = wpi::WaitForObject(newDataEvent.GetHandle(), 0.25, &timedOut);
+    bool newData =
+        wpi::WaitForObject(newDataEvent.GetHandle(), 0.25, &timedOut);
     if (!m_active) {
       break;
     }

@@ -6,9 +6,10 @@
 
 #include <stdint.h>
 
+#include <wpi/Synchronization.h>
+
 #include "hal/DriverStationTypes.h"
 #include "hal/Types.h"
-#include "wpi/Synchronization.h"
 
 /**
  * @defgroup hal_driverstation Driver Station Functions
@@ -88,7 +89,8 @@ int32_t HAL_GetJoystickPOVs(int32_t joystickNum, HAL_JoystickPOVs* povs);
 int32_t HAL_GetJoystickButtons(int32_t joystickNum,
                                HAL_JoystickButtons* buttons);
 
-void HAL_GetAllJoystickData(HAL_JoystickAxes* axes, HAL_JoystickPOVs* povs, HAL_JoystickButtons* buttons);
+void HAL_GetAllJoystickData(HAL_JoystickAxes* axes, HAL_JoystickPOVs* povs,
+                            HAL_JoystickButtons* buttons);
 
 /**
  * Retrieves the Joystick Descriptor for particular slot.
@@ -189,7 +191,7 @@ double HAL_GetMatchTime(int32_t* status);
 /**
  * Gets if outputs are enabled by the control system.
  */
-HAL_Bool HAL_GetOutputsEnabled();
+HAL_Bool HAL_GetOutputsEnabled(void);
 
 /**
  * Gets info about a specific match.

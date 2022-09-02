@@ -4,9 +4,10 @@
 
 #include "frc/IterativeRobotBase.h"
 
+#include <frc/DriverStation.h>
+
 #include <fmt/format.h>
 #include <hal/DriverStation.h>
-#include <frc/DriverStation.h>
 #include <networktables/NetworkTableInstance.h>
 
 #include "frc/DSControlWord.h"

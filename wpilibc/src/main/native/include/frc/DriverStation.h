@@ -5,9 +5,9 @@
 #pragma once
 
 #include <string>
-#include <wpi/Synchronization.h>
 
 #include <units/time.h>
+#include <wpi/Synchronization.h>
 
 namespace wpi::log {
 class DataLog;

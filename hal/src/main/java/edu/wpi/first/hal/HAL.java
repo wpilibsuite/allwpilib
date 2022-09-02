@@ -13,7 +13,6 @@ import java.util.List;
  */
 @SuppressWarnings({"AbbreviationAsWordInName", "MethodName"})
 public final class HAL extends JNIWrapper {
-
   public static native boolean initialize(int timeout, int mode);
 
   public static native void shutdown();

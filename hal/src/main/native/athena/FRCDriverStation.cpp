@@ -13,11 +13,11 @@
 #include <FRC_NetworkCommunication/FRCComm.h>
 #include <FRC_NetworkCommunication/NetCommRPCProxy_Occur.h>
 #include <fmt/format.h>
+#include <wpi/EventVector.h>
 #include <wpi/SafeThread.h>
+#include <wpi/SmallVector.h>
 #include <wpi/condition_variable.h>
 #include <wpi/mutex.h>
-#include <wpi/SmallVector.h>
-#include <wpi/EventVector.h>
 
 #include "hal/DriverStation.h"
 
@@ -33,9 +33,7 @@ static constexpr int kJoystickPorts = 6;
 
 namespace {
 struct JoystickDataCache {
-  JoystickDataCache() {
-    std::memset(this, 0, sizeof(*this));
-  }
+  JoystickDataCache() { std::memset(this, 0, sizeof(*this)); }
   void Update();
 
   HAL_JoystickAxes axes[kJoystickPorts];
@@ -47,7 +45,7 @@ struct JoystickDataCache {
   bool updated;
 };
 static_assert(std::is_standard_layout_v<JoystickDataCache>);
-//static_assert(std::is_trivial_v<JoystickDataCache>);
+// static_assert(std::is_trivial_v<JoystickDataCache>);
 
 struct FRCDriverStation {
   wpi::EventVector newDataEvents;
@@ -64,8 +62,7 @@ static int32_t HAL_GetJoystickAxesInternal(int32_t joystickNum,
   JoystickAxes_t netcommAxes;
 
   int retVal = FRC_NetworkCommunication_getJoystickAxes(
-      joystickNum, &netcommAxes,
-      HAL_kMaxJoystickAxes);
+      joystickNum, &netcommAxes, HAL_kMaxJoystickAxes);
 
   // copy integer values to double values
   axes->count = netcommAxes.count;
@@ -311,8 +308,8 @@ int32_t HAL_GetJoystickButtons(int32_t joystickNum,
   return 0;
 }
 
-void HAL_GetAllJoystickData(HAL_JoystickAxes* axes, HAL_JoystickPOVs* povs, HAL_JoystickButtons* buttons)
-{
+void HAL_GetAllJoystickData(HAL_JoystickAxes* axes, HAL_JoystickPOVs* povs,
+                            HAL_JoystickButtons* buttons) {
   std::scoped_lock lock{cacheMutex};
   std::memcpy(axes, currentRead->axes, sizeof(currentRead->axes));
   std::memcpy(povs, currentRead->povs, sizeof(currentRead->povs));

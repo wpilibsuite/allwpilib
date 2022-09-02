@@ -23,10 +23,10 @@
 #include <networktables/NetworkTableEntry.h>
 #include <networktables/NetworkTableInstance.h>
 #include <wpi/DataLog.h>
+#include <wpi/EventVector.h>
 #include <wpi/condition_variable.h>
 #include <wpi/mutex.h>
 #include <wpi/timestamp.h>
-#include <wpi/EventVector.h>
 
 #include "frc/Errors.h"
 #include "frc/MotorSafety.h"

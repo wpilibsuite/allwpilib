@@ -14,9 +14,9 @@
 #include <string>
 
 #include <fmt/format.h>
+#include <wpi/EventVector.h>
 #include <wpi/condition_variable.h>
 #include <wpi/mutex.h>
-#include <wpi/EventVector.h>
 
 #include "HALInitializer.h"
 #include "hal/cpp/fpga_clock.h"
@@ -24,11 +24,10 @@
 #include "mockdata/DriverStationDataInternal.h"
 
 static wpi::mutex msgMutex;
-//static std::atomic_bool isFinalized{false};
+// static std::atomic_bool isFinalized{false};
 static std::atomic<HALSIM_SendErrorHandler> sendErrorHandler{nullptr};
 static std::atomic<HALSIM_SendConsoleLineHandler> sendConsoleLineHandler{
     nullptr};
-
 
 using namespace hal;
 
@@ -36,9 +35,7 @@ static constexpr int kJoystickPorts = 6;
 
 namespace {
 struct JoystickDataCache {
-  JoystickDataCache() {
-    std::memset(this, 0, sizeof(*this));
-  }
+  JoystickDataCache() { std::memset(this, 0, sizeof(*this)); }
   void Update();
 
   HAL_JoystickAxes axes[kJoystickPorts];
@@ -50,7 +47,7 @@ struct JoystickDataCache {
   bool updated;
 };
 static_assert(std::is_standard_layout_v<JoystickDataCache>);
-//static_assert(std::is_trivial_v<JoystickDataCache>);
+// static_assert(std::is_trivial_v<JoystickDataCache>);
 
 struct FRCDriverStation {
   wpi::EventVector newDataEvents;
@@ -202,8 +199,8 @@ int32_t HAL_GetJoystickButtons(int32_t joystickNum,
   return 0;
 }
 
-void HAL_GetAllJoystickData(HAL_JoystickAxes* axes, HAL_JoystickPOVs* povs, HAL_JoystickButtons* buttons)
-{
+void HAL_GetAllJoystickData(HAL_JoystickAxes* axes, HAL_JoystickPOVs* povs,
+                            HAL_JoystickButtons* buttons) {
   std::scoped_lock lock{cacheMutex};
   std::memcpy(axes, currentRead->axes, sizeof(currentRead->axes));
   std::memcpy(povs, currentRead->povs, sizeof(currentRead->povs));
@@ -300,7 +297,8 @@ void HAL_RemoveNewDataEventHandle(WPI_EventHandle handle) {
 
 HAL_Bool HAL_GetOutputsEnabled(void) {
   std::scoped_lock lock{cacheMutex};
-  return currentRead->controlWord.enabled && currentRead->controlWord.dsAttached;
+  return currentRead->controlWord.enabled &&
+         currentRead->controlWord.dsAttached;
 }
 
 }  // extern "C"
@@ -308,7 +306,7 @@ HAL_Bool HAL_GetOutputsEnabled(void) {
 namespace hal {
 void NewDriverStationData() {
   cacheToUpdate->Update();
-    {
+  {
     std::scoped_lock lock{cacheMutex};
     std::swap(currentCache, cacheToUpdate);
     currentCache->updated = true;

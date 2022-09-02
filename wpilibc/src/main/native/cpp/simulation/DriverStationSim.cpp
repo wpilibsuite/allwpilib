@@ -7,11 +7,11 @@
 #include <memory>
 #include <utility>
 
+#include <hal/DriverStation.h>
 #include <hal/simulation/DriverStationData.h>
 #include <hal/simulation/MockHooks.h>
 
 #include "frc/DriverStation.h"
-#include "hal/DriverStation.h"
 
 using namespace frc;
 using namespace frc::sim;

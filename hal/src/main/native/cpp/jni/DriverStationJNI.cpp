@@ -12,8 +12,8 @@
 #include "HALUtil.h"
 #include "edu_wpi_first_hal_DriverStationJNI.h"
 #include "hal/DriverStation.h"
-#include "hal/HALBase.h"
 #include "hal/FRCUsageReporting.h"
+#include "hal/HALBase.h"
 
 // TODO Static asserts
 
@@ -28,8 +28,9 @@ extern "C" {
  * Signature: ()V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_hal_DriverStationJNI_observeUserProgramStarting(JNIEnv*,
-                                                                   jclass) {
+Java_edu_wpi_first_hal_DriverStationJNI_observeUserProgramStarting
+  (JNIEnv*, jclass)
+{
   HAL_ObserveUserProgramStarting();
 }
 
@@ -39,8 +40,9 @@ Java_edu_wpi_first_hal_DriverStationJNI_observeUserProgramStarting(JNIEnv*,
  * Signature: ()V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_hal_DriverStationJNI_observeUserProgramDisabled(JNIEnv*,
-                                                                   jclass) {
+Java_edu_wpi_first_hal_DriverStationJNI_observeUserProgramDisabled
+  (JNIEnv*, jclass)
+{
   HAL_ObserveUserProgramDisabled();
 }
 
@@ -50,8 +52,9 @@ Java_edu_wpi_first_hal_DriverStationJNI_observeUserProgramDisabled(JNIEnv*,
  * Signature: ()V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_hal_DriverStationJNI_observeUserProgramAutonomous(JNIEnv*,
-                                                                     jclass) {
+Java_edu_wpi_first_hal_DriverStationJNI_observeUserProgramAutonomous
+  (JNIEnv*, jclass)
+{
   HAL_ObserveUserProgramAutonomous();
 }
 
@@ -61,8 +64,9 @@ Java_edu_wpi_first_hal_DriverStationJNI_observeUserProgramAutonomous(JNIEnv*,
  * Signature: ()V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_hal_DriverStationJNI_observeUserProgramTeleop(JNIEnv*,
-                                                                 jclass) {
+Java_edu_wpi_first_hal_DriverStationJNI_observeUserProgramTeleop
+  (JNIEnv*, jclass)
+{
   HAL_ObserveUserProgramTeleop();
 }
 
@@ -72,8 +76,9 @@ Java_edu_wpi_first_hal_DriverStationJNI_observeUserProgramTeleop(JNIEnv*,
  * Signature: ()V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_hal_DriverStationJNI_observeUserProgramTest(JNIEnv*,
-                                                               jclass) {
+Java_edu_wpi_first_hal_DriverStationJNI_observeUserProgramTest
+  (JNIEnv*, jclass)
+{
   HAL_ObserveUserProgramTest();
 }
 
@@ -82,9 +87,11 @@ Java_edu_wpi_first_hal_DriverStationJNI_observeUserProgramTest(JNIEnv*,
  * Method:    report
  * Signature: (IIILjava/lang/String;)I
  */
-JNIEXPORT jint JNICALL Java_edu_wpi_first_hal_DriverStationJNI_report(
-    JNIEnv* paramEnv, jclass, jint paramResource, jint paramInstanceNumber,
-    jint paramContext, jstring paramFeature) {
+JNIEXPORT jint JNICALL
+Java_edu_wpi_first_hal_DriverStationJNI_report
+  (JNIEnv* paramEnv, jclass, jint paramResource, jint paramInstanceNumber,
+   jint paramContext, jstring paramFeature)
+{
   JStringRef featureStr{paramEnv, paramFeature};
   jint returnValue = HAL_Report(paramResource, paramInstanceNumber,
                                 paramContext, featureStr.c_str());
@@ -97,7 +104,9 @@ JNIEXPORT jint JNICALL Java_edu_wpi_first_hal_DriverStationJNI_report(
  * Signature: ()I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_first_hal_DriverStationJNI_nativeGetControlWord(JNIEnv*, jclass) {
+Java_edu_wpi_first_hal_DriverStationJNI_nativeGetControlWord
+  (JNIEnv*, jclass)
+{
   static_assert(sizeof(HAL_ControlWord) == sizeof(jint),
                 "Java int must match the size of control word");
   HAL_ControlWord controlWord;
@@ -113,8 +122,9 @@ Java_edu_wpi_first_hal_DriverStationJNI_nativeGetControlWord(JNIEnv*, jclass) {
  * Signature: ()I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_first_hal_DriverStationJNI_nativeGetAllianceStation(JNIEnv*,
-                                                                 jclass) {
+Java_edu_wpi_first_hal_DriverStationJNI_nativeGetAllianceStation
+  (JNIEnv*, jclass)
+{
   int32_t status = 0;
   auto allianceStation = HAL_GetAllianceStation(&status);
   return static_cast<jint>(allianceStation);
@@ -126,9 +136,9 @@ Java_edu_wpi_first_hal_DriverStationJNI_nativeGetAllianceStation(JNIEnv*,
  * Signature: (B[I)I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_first_hal_DriverStationJNI_getJoystickAxesRaw(JNIEnv* env, jclass,
-                                                        jbyte joystickNum,
-                                                        jintArray axesRawArray) {
+Java_edu_wpi_first_hal_DriverStationJNI_getJoystickAxesRaw
+  (JNIEnv* env, jclass, jbyte joystickNum, jintArray axesRawArray)
+{
   HAL_JoystickAxes axes;
   HAL_GetJoystickAxes(joystickNum, &axes);
 
@@ -157,9 +167,9 @@ Java_edu_wpi_first_hal_DriverStationJNI_getJoystickAxesRaw(JNIEnv* env, jclass,
  * Signature: (B[F)I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_first_hal_DriverStationJNI_getJoystickAxes(JNIEnv* env, jclass,
-                                                        jbyte joystickNum,
-                                                        jfloatArray axesArray) {
+Java_edu_wpi_first_hal_DriverStationJNI_getJoystickAxes
+  (JNIEnv* env, jclass, jbyte joystickNum, jfloatArray axesArray)
+{
   HAL_JoystickAxes axes;
   HAL_GetJoystickAxes(joystickNum, &axes);
 
@@ -184,9 +194,9 @@ Java_edu_wpi_first_hal_DriverStationJNI_getJoystickAxes(JNIEnv* env, jclass,
  * Signature: (B[S)I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_first_hal_DriverStationJNI_getJoystickPOVs(JNIEnv* env, jclass,
-                                                        jbyte joystickNum,
-                                                        jshortArray povsArray) {
+Java_edu_wpi_first_hal_DriverStationJNI_getJoystickPOVs
+  (JNIEnv* env, jclass, jbyte joystickNum, jshortArray povsArray)
+{
   HAL_JoystickPOVs povs;
   HAL_GetJoystickPOVs(joystickNum, &povs);
 
@@ -210,34 +220,39 @@ Java_edu_wpi_first_hal_DriverStationJNI_getJoystickPOVs(JNIEnv* env, jclass,
  * Method:    getAllJoystickData
  * Signature: ([F[B[S[J)V
  */
-JNIEXPORT void JNICALL Java_edu_wpi_first_hal_DriverStationJNI_getAllJoystickData
-  (JNIEnv *env, jclass cls, jfloatArray axesArray, jbyteArray rawAxesArray, jshortArray povsArray, jlongArray buttonsAndMetadataArray)
-  {
-    HAL_JoystickAxes axes[HAL_kMaxJoysticks];
-    HAL_JoystickPOVs povs[HAL_kMaxJoysticks];
-    HAL_JoystickButtons buttons[HAL_kMaxJoysticks];
+JNIEXPORT void JNICALL
+Java_edu_wpi_first_hal_DriverStationJNI_getAllJoystickData
+  (JNIEnv* env, jclass cls, jfloatArray axesArray, jbyteArray rawAxesArray,
+   jshortArray povsArray, jlongArray buttonsAndMetadataArray)
+{
+  HAL_JoystickAxes axes[HAL_kMaxJoysticks];
+  HAL_JoystickPOVs povs[HAL_kMaxJoysticks];
+  HAL_JoystickButtons buttons[HAL_kMaxJoysticks];
 
-    HAL_GetAllJoystickData(axes, povs, buttons);
+  HAL_GetAllJoystickData(axes, povs, buttons);
 
-    CriticalJFloatArrayRef jAxes(env, axesArray);
-    CriticalJByteArrayRef jRawAxes(env, rawAxesArray);
-    CriticalJShortArrayRef jPovs(env, povsArray);
-    CriticalJLongArrayRef jButtons(env, buttonsAndMetadataArray);
+  CriticalJFloatArrayRef jAxes(env, axesArray);
+  CriticalJByteArrayRef jRawAxes(env, rawAxesArray);
+  CriticalJShortArrayRef jPovs(env, povsArray);
+  CriticalJLongArrayRef jButtons(env, buttonsAndMetadataArray);
 
-    static_assert(sizeof(jAxes[0]) == sizeof(axes[0].axes[0]));
-    static_assert(sizeof(jRawAxes[0]) == sizeof(axes[0].raw[0]));
-    static_assert(sizeof(jPovs[0]) == sizeof(povs[0].povs[0]));
+  static_assert(sizeof(jAxes[0]) == sizeof(axes[0].axes[0]));
+  static_assert(sizeof(jRawAxes[0]) == sizeof(axes[0].raw[0]));
+  static_assert(sizeof(jPovs[0]) == sizeof(povs[0].povs[0]));
 
-    for (size_t i = 0; i < HAL_kMaxJoysticks; i++) {
-      memcpy(&jAxes[i * HAL_kMaxJoystickAxes], axes[i].axes, sizeof(axes[i].axes));
-      memcpy(&jRawAxes[i * HAL_kMaxJoystickAxes], axes[i].raw, sizeof(axes[i].raw));
-      memcpy(&jPovs[i * HAL_kMaxJoystickPOVs], povs[i].povs, sizeof(povs[i].povs));
-      jButtons[i * 4] = axes[i].count;
-      jButtons[(i * 4) + 1] = povs[i].count;
-      jButtons[(i * 4) + 2] = buttons[i].count;
-      jButtons[(i * 4) + 3] = buttons[i].buttons;
-    }
+  for (size_t i = 0; i < HAL_kMaxJoysticks; i++) {
+    std::memcpy(&jAxes[i * HAL_kMaxJoystickAxes], axes[i].axes,
+                sizeof(axes[i].axes));
+    std::memcpy(&jRawAxes[i * HAL_kMaxJoystickAxes], axes[i].raw,
+                sizeof(axes[i].raw));
+    std::memcpy(&jPovs[i * HAL_kMaxJoystickPOVs], povs[i].povs,
+                sizeof(povs[i].povs));
+    jButtons[i * 4] = axes[i].count;
+    jButtons[(i * 4) + 1] = povs[i].count;
+    jButtons[(i * 4) + 2] = buttons[i].count;
+    jButtons[(i * 4) + 3] = buttons[i].buttons;
   }
+}
 
 /*
  * Class:     edu_wpi_first_hal_DriverStationJNI
@@ -245,9 +260,9 @@ JNIEXPORT void JNICALL Java_edu_wpi_first_hal_DriverStationJNI_getAllJoystickDat
  * Signature: (BLjava/lang/Object;)I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_first_hal_DriverStationJNI_getJoystickButtons(JNIEnv* env, jclass,
-                                                           jbyte joystickNum,
-                                                           jobject count) {
+Java_edu_wpi_first_hal_DriverStationJNI_getJoystickButtons
+  (JNIEnv* env, jclass, jbyte joystickNum, jobject count)
+{
   HAL_JoystickButtons joystickButtons;
   HAL_GetJoystickButtons(joystickNum, &joystickButtons);
   jbyte* countPtr =
@@ -262,11 +277,10 @@ Java_edu_wpi_first_hal_DriverStationJNI_getJoystickButtons(JNIEnv* env, jclass,
  * Signature: (BISS)I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_first_hal_DriverStationJNI_setJoystickOutputs(JNIEnv*, jclass,
-                                                           jbyte port,
-                                                           jint outputs,
-                                                           jshort leftRumble,
-                                                           jshort rightRumble) {
+Java_edu_wpi_first_hal_DriverStationJNI_setJoystickOutputs
+  (JNIEnv*, jclass, jbyte port, jint outputs, jshort leftRumble,
+   jshort rightRumble)
+{
   return HAL_SetJoystickOutputs(port, outputs, leftRumble, rightRumble);
 }
 
@@ -276,8 +290,9 @@ Java_edu_wpi_first_hal_DriverStationJNI_setJoystickOutputs(JNIEnv*, jclass,
  * Signature: (B)I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_first_hal_DriverStationJNI_getJoystickIsXbox(JNIEnv*, jclass,
-                                                          jbyte port) {
+Java_edu_wpi_first_hal_DriverStationJNI_getJoystickIsXbox
+  (JNIEnv*, jclass, jbyte port)
+{
   return HAL_GetJoystickIsXbox(port);
 }
 
@@ -286,8 +301,10 @@ Java_edu_wpi_first_hal_DriverStationJNI_getJoystickIsXbox(JNIEnv*, jclass,
  * Method:    getJoystickType
  * Signature: (B)I
  */
-JNIEXPORT jint JNICALL Java_edu_wpi_first_hal_DriverStationJNI_getJoystickType(
-    JNIEnv*, jclass, jbyte port) {
+JNIEXPORT jint JNICALL
+Java_edu_wpi_first_hal_DriverStationJNI_getJoystickType
+  (JNIEnv*, jclass, jbyte port)
+{
   return HAL_GetJoystickType(port);
 }
 
@@ -297,8 +314,9 @@ JNIEXPORT jint JNICALL Java_edu_wpi_first_hal_DriverStationJNI_getJoystickType(
  * Signature: (B)Ljava/lang/String;
  */
 JNIEXPORT jstring JNICALL
-Java_edu_wpi_first_hal_DriverStationJNI_getJoystickName(JNIEnv* env, jclass,
-                                                        jbyte port) {
+Java_edu_wpi_first_hal_DriverStationJNI_getJoystickName
+  (JNIEnv* env, jclass, jbyte port)
+{
   char* joystickName = HAL_GetJoystickName(port);
   jstring str = MakeJString(env, joystickName);
   HAL_FreeJoystickName(joystickName);
@@ -311,9 +329,9 @@ Java_edu_wpi_first_hal_DriverStationJNI_getJoystickName(JNIEnv* env, jclass,
  * Signature: (BB)I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_first_hal_DriverStationJNI_getJoystickAxisType(JNIEnv*, jclass,
-                                                            jbyte joystickNum,
-                                                            jbyte axis) {
+Java_edu_wpi_first_hal_DriverStationJNI_getJoystickAxisType
+  (JNIEnv*, jclass, jbyte joystickNum, jbyte axis)
+{
   return HAL_GetJoystickAxisType(joystickNum, axis);
 }
 
@@ -323,7 +341,9 @@ Java_edu_wpi_first_hal_DriverStationJNI_getJoystickAxisType(JNIEnv*, jclass,
  * Signature: ()D
  */
 JNIEXPORT jdouble JNICALL
-Java_edu_wpi_first_hal_DriverStationJNI_getMatchTime(JNIEnv* env, jclass) {
+Java_edu_wpi_first_hal_DriverStationJNI_getMatchTime
+  (JNIEnv* env, jclass)
+{
   int32_t status = 0;
   return HAL_GetMatchTime(&status);
 }
@@ -333,8 +353,10 @@ Java_edu_wpi_first_hal_DriverStationJNI_getMatchTime(JNIEnv* env, jclass) {
  * Method:    getMatchInfo
  * Signature: (Ljava/lang/Object;)I
  */
-JNIEXPORT jint JNICALL Java_edu_wpi_first_hal_DriverStationJNI_getMatchInfo(
-    JNIEnv* env, jclass, jobject info) {
+JNIEXPORT jint JNICALL
+Java_edu_wpi_first_hal_DriverStationJNI_getMatchInfo
+  (JNIEnv* env, jclass, jobject info)
+{
   HAL_MatchInfo matchInfo;
   auto status = HAL_GetMatchInfo(&matchInfo);
   if (status == 0) {
@@ -348,9 +370,11 @@ JNIEXPORT jint JNICALL Java_edu_wpi_first_hal_DriverStationJNI_getMatchInfo(
  * Method:    sendError
  * Signature: (ZIZLjava/lang/String;Ljava/lang/String;Ljava/lang/String;Z)I
  */
-JNIEXPORT jint JNICALL Java_edu_wpi_first_hal_DriverStationJNI_sendError(
-    JNIEnv* env, jclass, jboolean isError, jint errorCode, jboolean isLVCode,
-    jstring details, jstring location, jstring callStack, jboolean printMsg) {
+JNIEXPORT jint JNICALL
+Java_edu_wpi_first_hal_DriverStationJNI_sendError
+  (JNIEnv* env, jclass, jboolean isError, jint errorCode, jboolean isLVCode,
+   jstring details, jstring location, jstring callStack, jboolean printMsg)
+{
   JStringRef detailsStr{env, details};
   JStringRef locationStr{env, location};
   JStringRef callStackStr{env, callStack};
@@ -366,8 +390,10 @@ JNIEXPORT jint JNICALL Java_edu_wpi_first_hal_DriverStationJNI_sendError(
  * Method:    sendConsoleLine
  * Signature: (Ljava/lang/String;)I
  */
-JNIEXPORT jint JNICALL Java_edu_wpi_first_hal_DriverStationJNI_sendConsoleLine(
-    JNIEnv* env, jclass, jstring line) {
+JNIEXPORT jint JNICALL
+Java_edu_wpi_first_hal_DriverStationJNI_sendConsoleLine
+  (JNIEnv* env, jclass, jstring line)
+{
   JStringRef lineStr{env, line};
 
   jint returnValue = HAL_SendConsoleLine(lineStr.c_str());
@@ -380,7 +406,9 @@ JNIEXPORT jint JNICALL Java_edu_wpi_first_hal_DriverStationJNI_sendConsoleLine(
  * Signature: ()V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_hal_DriverStationJNI_updateDSData(JNIEnv*, jclass) {
+Java_edu_wpi_first_hal_DriverStationJNI_updateDSData
+  (JNIEnv*, jclass)
+{
   HAL_UpdateDSData();
 }
 
@@ -390,8 +418,9 @@ Java_edu_wpi_first_hal_DriverStationJNI_updateDSData(JNIEnv*, jclass) {
  * Signature: (I)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_hal_DriverStationJNI_provideNewDataEventHandle(
-    JNIEnv*, jclass, jint handle) {
+Java_edu_wpi_first_hal_DriverStationJNI_provideNewDataEventHandle
+  (JNIEnv*, jclass, jint handle)
+{
   HAL_ProvideNewDataEventHandle(handle);
 }
 
@@ -401,8 +430,9 @@ Java_edu_wpi_first_hal_DriverStationJNI_provideNewDataEventHandle(
  * Signature: (I)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_hal_DriverStationJNI_removeNewDataEventHandle(
-    JNIEnv*, jclass, jint handle) {
+Java_edu_wpi_first_hal_DriverStationJNI_removeNewDataEventHandle
+  (JNIEnv*, jclass, jint handle)
+{
   HAL_RemoveNewDataEventHandle(handle);
 }
 
@@ -411,8 +441,10 @@ Java_edu_wpi_first_hal_DriverStationJNI_removeNewDataEventHandle(
  * Method:    getOutputsActive
  * Signature: ()Z
  */
-JNIEXPORT jboolean JNICALL Java_edu_wpi_first_hal_DriverStationJNI_getOutputsActive
-  (JNIEnv *, jclass) {
+JNIEXPORT jboolean JNICALL
+Java_edu_wpi_first_hal_DriverStationJNI_getOutputsActive
+  (JNIEnv*, jclass)
+{
   return HAL_GetOutputsEnabled();
 }
-}
+}  // extern "C"

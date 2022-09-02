@@ -106,8 +106,6 @@ Java_edu_wpi_first_hal_HAL_simPeriodicAfterNative
   HAL_SimPeriodicAfter();
 }
 
-
-
 /*
  * Class:     edu_wpi_first_hal_HAL
  * Method:    getSystemActive
@@ -137,8 +135,6 @@ Java_edu_wpi_first_hal_HAL_getBrownedOut
   CheckStatus(env, status);
   return val;
 }
-
-
 
 /*
  * Class:     edu_wpi_first_hal_HAL

@@ -217,8 +217,8 @@ void DriverStationData::CallNewDataCallbacks() {
 }
 
 namespace hal {
-  void NewDriverStationData();
-}
+void NewDriverStationData();
+}  // namespace hal
 
 void DriverStationData::NotifyNewData() {
   hal::NewDriverStationData();

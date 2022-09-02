@@ -7,8 +7,8 @@
 #include <algorithm>
 #include <utility>
 
-#include <wpi/SmallPtrSet.h>
 #include <wpi/SafeThread.h>
+#include <wpi/SmallPtrSet.h>
 
 #include "frc/DriverStation.h"
 #include "frc/Errors.h"
