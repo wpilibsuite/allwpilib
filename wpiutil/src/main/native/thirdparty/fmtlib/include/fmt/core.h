@@ -2952,7 +2952,7 @@ class format_string_checker {
       basic_string_view<Char> format_str, ErrorHandler eh)
       : context_(format_str, num_args, types_, eh),
         parse_funcs_{&parse_format_specs<Args, parse_context_type>...},
-        types_{
+        types_{  // NOLINT(clang-analyzer-optin.cplusplus.UninitializedObject)
             mapped_type_constant<Args,
                                  basic_format_context<Char*, Char>>::value...} {
   }
