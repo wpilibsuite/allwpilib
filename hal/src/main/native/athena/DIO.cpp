@@ -417,7 +417,7 @@ void HAL_Pulse(HAL_DigitalHandle dioPortHandle, double pulseLengthSeconds,
   }
 
   uint32_t pulseLengthMicroseconds =
-      static_cast<uint32_t>(pulseLengthSeconds * 100000);
+      static_cast<uint32_t>(pulseLengthSeconds * 1e6);
 
   if (pulseLengthMicroseconds <= 0 || pulseLengthMicroseconds > 0xFFFF) {
     *status = PARAMETER_OUT_OF_RANGE;
@@ -444,7 +444,7 @@ void HAL_Pulse(HAL_DigitalHandle dioPortHandle, double pulseLengthSeconds,
 void HAL_PulseMultiple(uint32_t channelMask, double pulseLengthSeconds,
                        int32_t* status) {
   uint32_t pulseLengthMicroseconds =
-      static_cast<uint32_t>(pulseLengthSeconds * 100000);
+      static_cast<uint32_t>(pulseLengthSeconds * 1e6);
 
   if (pulseLengthMicroseconds <= 0 || pulseLengthMicroseconds > 0xFFFF) {
     *status = PARAMETER_OUT_OF_RANGE;
