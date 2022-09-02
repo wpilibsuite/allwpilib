@@ -83,60 +83,27 @@ class CommandScheduler final : public nt::NTSendable,
   void ClearButtons();
 
   /**
-   * Schedules a command for execution.  Does nothing if the command is already
+   * Schedules a command for execution. Does nothing if the command is already
    * scheduled. If a command's requirements are not available, it will only be
    * started if all the commands currently using those requirements have been
-   * scheduled as interruptible.  If this is the case, they will be interrupted
+   * scheduled as interruptible. If this is the case, they will be interrupted
    * and the command will be scheduled.
-   *
-   * @param interruptible whether this command can be interrupted
-   * @param command       the command to schedule
-   */
-  void Schedule(bool interruptible, Command* command);
-
-  /**
-   * Schedules a command for execution, with interruptible defaulted to true.
-   * Does nothing if the command is already scheduled.
    *
    * @param command the command to schedule
    */
   void Schedule(Command* command);
 
   /**
-   * Schedules multiple commands for execution.  Does nothing if the command is
-   * already scheduled. If a command's requirements are not available, it will
-   * only be started if all the commands currently using those requirements have
-   * been scheduled as interruptible.  If this is the case, they will be
-   * interrupted and the command will be scheduled.
-   *
-   * @param interruptible whether the commands should be interruptible
-   * @param commands      the commands to schedule
-   */
-  void Schedule(bool interruptible, wpi::span<Command* const> commands);
-
-  /**
-   * Schedules multiple commands for execution.  Does nothing if the command is
-   * already scheduled. If a command's requirements are not available, it will
-   * only be started if all the commands currently using those requirements have
-   * been scheduled as interruptible.  If this is the case, they will be
-   * interrupted and the command will be scheduled.
-   *
-   * @param interruptible whether the commands should be interruptible
-   * @param commands      the commands to schedule
-   */
-  void Schedule(bool interruptible, std::initializer_list<Command*> commands);
-
-  /**
-   * Schedules multiple commands for execution, with interruptible defaulted to
-   * true.  Does nothing if the command is already scheduled.
+   * Schedules multiple commands for execution. Does nothing for commands
+   * already scheduled.
    *
    * @param commands the commands to schedule
    */
   void Schedule(wpi::span<Command* const> commands);
 
   /**
-   * Schedules multiple commands for execution, with interruptible defaulted to
-   * true.  Does nothing if the command is already scheduled.
+   * Schedules multiple commands for execution. Does nothing for commands
+   * already scheduled.
    *
    * @param commands the commands to schedule
    */
@@ -261,17 +228,6 @@ class CommandScheduler final : public nt::NTSendable,
    * Cancels all commands that are currently scheduled.
    */
   void CancelAll();
-
-  /**
-   * Returns the time since a given command was scheduled.  Note that this only
-   * works on commands that are directly scheduled by the scheduler; it will not
-   * work on commands inside of commandgroups, as the scheduler does not see
-   * them.
-   *
-   * @param command the command to query
-   * @return the time since the command was scheduled
-   */
-  units::second_t TimeSinceScheduled(const Command* command) const;
 
   /**
    * Whether the given commands are running.  Note that this only works on

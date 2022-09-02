@@ -80,25 +80,13 @@ public class Trigger extends BooleanEvent {
    * Starts the given command whenever the trigger just becomes active.
    *
    * @param command the command to start
-   * @param interruptible whether the command is interruptible
-   * @return this trigger, so calls can be chained
-   */
-  public Trigger whenActive(final Command command, boolean interruptible) {
-    requireNonNullParam(command, "command", "whenActive");
-
-    this.rising().ifHigh(() -> command.schedule(interruptible));
-    return this;
-  }
-
-  /**
-   * Starts the given command whenever the trigger just becomes active. The command is set to be
-   * interruptible.
-   *
-   * @param command the command to start
    * @return this trigger, so calls can be chained
    */
   public Trigger whenActive(final Command command) {
-    return whenActive(command, true);
+    requireNonNullParam(command, "command", "whenActive");
+
+    this.rising().ifHigh(command::schedule);
+    return this;
   }
 
   /**
@@ -115,33 +103,19 @@ public class Trigger extends BooleanEvent {
   /**
    * Constantly starts the given command while the button is held.
    *
-   * <p>{@link Command#schedule(boolean)} will be called repeatedly while the trigger is active, and
-   * will be canceled when the trigger becomes inactive.
-   *
-   * @param command the command to start
-   * @param interruptible whether the command is interruptible
-   * @return this trigger, so calls can be chained
-   */
-  public Trigger whileActiveContinuous(final Command command, boolean interruptible) {
-    requireNonNullParam(command, "command", "whileActiveContinuous");
-
-    this.ifHigh(() -> command.schedule(interruptible));
-    this.falling().ifHigh(command::cancel);
-
-    return this;
-  }
-
-  /**
-   * Constantly starts the given command while the button is held.
-   *
-   * <p>{@link Command#schedule(boolean)} will be called repeatedly while the trigger is active, and
-   * will be canceled when the trigger becomes inactive.
+   * <p>{@link Command#schedule()} will be called repeatedly while the trigger is active, and will
+   * be canceled when the trigger becomes inactive.
    *
    * @param command the command to start
    * @return this trigger, so calls can be chained
    */
   public Trigger whileActiveContinuous(final Command command) {
-    return whileActiveContinuous(command, true);
+    requireNonNullParam(command, "command", "whileActiveContinuous");
+
+    this.ifHigh(command::schedule);
+    this.falling().ifHigh(command::cancel);
+
+    return this;
   }
 
   /**
@@ -160,52 +134,29 @@ public class Trigger extends BooleanEvent {
    * inactive, but does not re-start it in-between.
    *
    * @param command the command to start
-   * @param interruptible whether the command is interruptible
    * @return this trigger, so calls can be chained
    */
-  public Trigger whileActiveOnce(final Command command, boolean interruptible) {
+  public Trigger whileActiveOnce(final Command command) {
     requireNonNullParam(command, "command", "whileActiveOnce");
 
-    this.rising().ifHigh(() -> command.schedule(interruptible));
+    this.rising().ifHigh(command::schedule);
     this.falling().ifHigh(command::cancel);
 
     return this;
   }
 
   /**
-   * Starts the given command when the trigger initially becomes active, and ends it when it becomes
-   * inactive, but does not re-start it in-between. The command is set to be interruptible.
-   *
-   * @param command the command to start
-   * @return this trigger, so calls can be chained
-   */
-  public Trigger whileActiveOnce(final Command command) {
-    return whileActiveOnce(command, true);
-  }
-
-  /**
    * Starts the command when the trigger becomes inactive.
-   *
-   * @param command the command to start
-   * @param interruptible whether the command is interruptible
-   * @return this trigger, so calls can be chained
-   */
-  public Trigger whenInactive(final Command command, boolean interruptible) {
-    requireNonNullParam(command, "command", "whenInactive");
-
-    this.falling().ifHigh(() -> command.schedule(interruptible));
-
-    return this;
-  }
-
-  /**
-   * Starts the command when the trigger becomes inactive. The command is set to be interruptible.
    *
    * @param command the command to start
    * @return this trigger, so calls can be chained
    */
   public Trigger whenInactive(final Command command) {
-    return whenInactive(command, true);
+    requireNonNullParam(command, "command", "whenInactive");
+
+    this.falling().ifHigh(command::schedule);
+
+    return this;
   }
 
   /**
@@ -223,10 +174,9 @@ public class Trigger extends BooleanEvent {
    * Toggles a command when the trigger becomes active.
    *
    * @param command the command to toggle
-   * @param interruptible whether the command is interruptible
    * @return this trigger, so calls can be chained
    */
-  public Trigger toggleWhenActive(final Command command, boolean interruptible) {
+  public Trigger toggleWhenActive(final Command command) {
     requireNonNullParam(command, "command", "toggleWhenActive");
 
     this.rising()
@@ -235,21 +185,11 @@ public class Trigger extends BooleanEvent {
               if (command.isScheduled()) {
                 command.cancel();
               } else {
-                command.schedule(interruptible);
+                command.schedule();
               }
             });
 
     return this;
-  }
-
-  /**
-   * Toggles a command when the trigger becomes active. The command is set to be interruptible.
-   *
-   * @param command the command to toggle
-   * @return this trigger, so calls can be chained
-   */
-  public Trigger toggleWhenActive(final Command command) {
-    return toggleWhenActive(command, true);
   }
 
   /**

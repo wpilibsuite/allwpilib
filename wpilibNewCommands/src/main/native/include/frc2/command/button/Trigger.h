@@ -60,33 +60,30 @@ class Trigger : public frc::BooleanEvent {
   Trigger(const Trigger& other);
 
   /**
-   * Binds a command to start when the trigger becomes active.  Takes a
+   * Binds a command to start when the trigger becomes active. Takes a
    * raw pointer, and so is non-owning; users are responsible for the lifespan
    * of the command.
    *
    * @param command The command to bind.
-   * @param interruptible Whether the command should be interruptible.
    * @return The trigger, for chained calls.
    */
-  Trigger WhenActive(Command* command, bool interruptible = true);
+  Trigger WhenActive(Command* command);
 
   /**
-   * Binds a command to start when the trigger becomes active.  Transfers
+   * Binds a command to start when the trigger becomes active. Transfers
    * command ownership to the button scheduler, so the user does not have to
    * worry about lifespan - rvalue refs will be *moved*, lvalue refs will be
    * *copied.*
    *
    * @param command The command to bind.
-   * @param interruptible Whether the command should be interruptible.
    * @return The trigger, for chained calls.
    */
   template <class T, typename = std::enable_if_t<std::is_base_of_v<
                          Command, std::remove_reference_t<T>>>>
-  Trigger WhenActive(T&& command, bool interruptible = true) {
+  Trigger WhenActive(T&& command) {
     this->Rising().IfHigh(
         [command = std::make_unique<std::remove_reference_t<T>>(
-             std::forward<T>(command)),
-         interruptible] { command->Schedule(interruptible); });
+             std::forward<T>(command))] { command->Schedule(); });
 
     return *this;
   }
@@ -115,10 +112,9 @@ class Trigger : public frc::BooleanEvent {
    * non-owning; users are responsible for the lifespan of the command.
    *
    * @param command The command to bind.
-   * @param interruptible Whether the command should be interruptible.
    * @return The trigger, for chained calls.
    */
-  Trigger WhileActiveContinous(Command* command, bool interruptible = true);
+  Trigger WhileActiveContinous(Command* command);
 
   /**
    * Binds a command to be started repeatedly while the trigger is active, and
@@ -127,15 +123,14 @@ class Trigger : public frc::BooleanEvent {
    * rvalue refs will be *moved*, lvalue refs will be *copied.*
    *
    * @param command The command to bind.
-   * @param interruptible Whether the command should be interruptible.
    * @return The trigger, for chained calls.
    */
   template <class T, typename = std::enable_if_t<std::is_base_of_v<
                          Command, std::remove_reference_t<T>>>>
-  Trigger WhileActiveContinous(T&& command, bool interruptible = true) {
+  Trigger WhileActiveContinous(T&& command) {
     std::shared_ptr<T> ptr =
         std::make_shared<std::remove_reference_t<T>>(std::forward<T>(command));
-    this->IfHigh([ptr, interruptible] { ptr->Schedule(interruptible); });
+    this->IfHigh([ptr] { ptr->Schedule(); });
     this->Falling().IfHigh([ptr] { ptr->Cancel(); });
 
     return *this;
@@ -165,29 +160,26 @@ class Trigger : public frc::BooleanEvent {
    * non-owning; users are responsible for the lifespan of the command.
    *
    * @param command The command to bind.
-   * @param interruptible Whether the command should be interruptible.
    * @return The trigger, for chained calls.
    */
-  Trigger WhileActiveOnce(Command* command, bool interruptible = true);
+  Trigger WhileActiveOnce(Command* command);
 
   /**
    * Binds a command to be started when the trigger becomes active, and
-   * canceled when it becomes inactive.  Transfers command ownership to the
+   * canceled when it becomes inactive. Transfers command ownership to the
    * button scheduler, so the user does not have to worry about lifespan -
    * rvalue refs will be *moved*, lvalue refs will be *copied.*
    *
    * @param command The command to bind.
-   * @param interruptible Whether the command should be interruptible.
    * @return The trigger, for chained calls.
    */
   template <class T, typename = std::enable_if_t<std::is_base_of_v<
                          Command, std::remove_reference_t<T>>>>
-  Trigger WhileActiveOnce(T&& command, bool interruptible = true) {
+  Trigger WhileActiveOnce(T&& command) {
     std::shared_ptr<T> ptr =
         std::make_shared<std::remove_reference_t<T>>(std::forward<T>(command));
 
-    this->Rising().IfHigh(
-        [ptr, interruptible] { ptr->Schedule(interruptible); });
+    this->Rising().IfHigh([ptr] { ptr->Schedule(); });
     this->Falling().IfHigh([ptr] { ptr->Cancel(); });
 
     return *this;
@@ -199,10 +191,9 @@ class Trigger : public frc::BooleanEvent {
    * of the command.
    *
    * @param command The command to bind.
-   * @param interruptible Whether the command should be interruptible.
    * @return The trigger, for chained calls.
    */
-  Trigger WhenInactive(Command* command, bool interruptible = true);
+  Trigger WhenInactive(Command* command);
 
   /**
    * Binds a command to start when the trigger becomes inactive.  Transfers
@@ -211,16 +202,14 @@ class Trigger : public frc::BooleanEvent {
    * *copied.*
    *
    * @param command The command to bind.
-   * @param interruptible Whether the command should be interruptible.
    * @return The trigger, for chained calls.
    */
   template <class T, typename = std::enable_if_t<std::is_base_of_v<
                          Command, std::remove_reference_t<T>>>>
-  Trigger WhenInactive(T&& command, bool interruptible = true) {
+  Trigger WhenInactive(T&& command) {
     this->Falling().IfHigh(
         [command = std::make_unique<std::remove_reference_t<T>>(
-             std::forward<T>(command)),
-         interruptible] { command->Schedule(interruptible); });
+             std::forward<T>(command))] { command->Schedule(); });
 
     return *this;
   }
@@ -245,14 +234,13 @@ class Trigger : public frc::BooleanEvent {
 
   /**
    * Binds a command to start when the trigger becomes active, and be canceled
-   * when it again becomes active.  Takes a raw pointer, and so is non-owning;
+   * when it again becomes active. Takes a raw pointer, and so is non-owning;
    * users are responsible for the lifespan of the command.
    *
    * @param command The command to bind.
-   * @param interruptible Whether the command should be interruptible.
    * @return The trigger, for chained calls.
    */
-  Trigger ToggleWhenActive(Command* command, bool interruptible = true);
+  Trigger ToggleWhenActive(Command* command);
 
   /**
    * Binds a command to start when the trigger becomes active, and be canceled
@@ -261,18 +249,16 @@ class Trigger : public frc::BooleanEvent {
    * will be *moved*, lvalue refs will be *copied.*
    *
    * @param command The command to bind.
-   * @param interruptible Whether the command should be interruptible.
    * @return The trigger, for chained calls.
    */
   template <class T, typename = std::enable_if_t<std::is_base_of_v<
                          Command, std::remove_reference_t<T>>>>
-  Trigger ToggleWhenActive(T&& command, bool interruptible = true) {
+  Trigger ToggleWhenActive(T&& command) {
     this->Rising().IfHigh(
         [command = std::make_unique<std::remove_reference_t<T>>(
-             std::forward<T>(command)),
-         interruptible] {
+             std::forward<T>(command))] {
           if (!command->IsScheduled()) {
-            command->Schedule(interruptible);
+            command->Schedule();
           } else {
             command->Cancel();
           }

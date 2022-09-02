@@ -61,7 +61,7 @@ class Logger {
 };
 
 #define WPI_LOG(logger_inst, level, format, ...) \
-  logger_inst.Log(level, __FILE__, __LINE__, FMT_STRING(format), __VA_ARGS__)
+  (logger_inst).Log(level, __FILE__, __LINE__, FMT_STRING(format), __VA_ARGS__)
 
 #define WPI_ERROR(inst, format, ...) \
   WPI_LOG(inst, ::wpi::WPI_LOG_ERROR, format, __VA_ARGS__)

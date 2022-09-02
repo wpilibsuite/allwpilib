@@ -47,14 +47,15 @@ public interface Command {
 
   /**
    * Specifies the set of subsystems used by this command. Two commands cannot use the same
-   * subsystem at the same time. If the command is scheduled as interruptible and another command is
-   * scheduled that shares a requirement, the command will be interrupted. Else, the command will
-   * not be scheduled. If no subsystems are required, return an empty set.
+   * subsystem at the same time. If another command is scheduled that shares a requirement, {@link
+   * #getInterruptionBehavior()} will be checked and followed. If no subsystems are required, return
+   * an empty set.
    *
    * <p>Note: it is recommended that user implementations contain the requirements as a field, and
    * return that field here, rather than allocating a new set every time this is called.
    *
    * @return the set of subsystems that are required
+   * @see InterruptionBehavior
    */
   Set<Subsystem> getRequirements();
 
@@ -288,7 +289,7 @@ public interface Command {
    *
    * @return the decorated command
    */
-  default RepeatCommand repeat() {
+  default RepeatCommand repeatedly() {
     return new RepeatCommand(this);
   }
 
@@ -331,23 +332,30 @@ public interface Command {
   }
 
   /**
-   * Schedules this command.
+   * Decorates this command to have a different {@link InterruptionBehavior interruption behavior}.
    *
-   * @param interruptible whether this command can be interrupted by another command that shares one
-   *     of its requirements
+   * @param interruptBehavior the desired interrupt behavior
+   * @return the decorated command
    */
-  default void schedule(boolean interruptible) {
-    CommandScheduler.getInstance().schedule(interruptible, this);
+  default WrapperCommand withInterruptBehavior(InterruptionBehavior interruptBehavior) {
+    return new WrapperCommand(this) {
+      @Override
+      public InterruptionBehavior getInterruptionBehavior() {
+        return interruptBehavior;
+      }
+    };
   }
 
-  /** Schedules this command, defaulting to interruptible. */
+  /** Schedules this command. */
   default void schedule() {
-    schedule(true);
+    CommandScheduler.getInstance().schedule(this);
   }
 
   /**
-   * Cancels this command. Will call the command's end() method with interrupted=true. Commands will
-   * be canceled even if they are not marked as interruptible.
+   * Cancels this command. Will call {@link #end(boolean) end(true)}. Commands will be canceled
+   * regardless of {@link InterruptionBehavior interruption behavior}.
+   *
+   * @see CommandScheduler#cancel(Command...)
    */
   default void cancel() {
     CommandScheduler.getInstance().cancel(this);
@@ -374,6 +382,16 @@ public interface Command {
   }
 
   /**
+   * How the command behaves when another command with a shared requirement is scheduled.
+   *
+   * @return a variant of {@link InterruptionBehavior}, defaulting to {@link
+   *     InterruptionBehavior#kCancelSelf kCancelSelf}.
+   */
+  default InterruptionBehavior getInterruptionBehavior() {
+    return InterruptionBehavior.kCancelSelf;
+  }
+
+  /**
    * Whether the given command should run when the robot is disabled. Override to return true if the
    * command should run when disabled.
    *
@@ -390,5 +408,21 @@ public interface Command {
    */
   default String getName() {
     return this.getClass().getSimpleName();
+  }
+
+  /**
+   * An enum describing the command's behavior when another command with a shared requirement is
+   * scheduled.
+   */
+  enum InterruptionBehavior {
+    /**
+     * This command ends, {@link #end(boolean) end(true)} is called, and the incoming command is
+     * scheduled normally.
+     *
+     * <p>This is the default behavior.
+     */
+    kCancelSelf,
+    /** This command continues, and the incoming command is not scheduled. */
+    kCancelIncoming
   }
 }
