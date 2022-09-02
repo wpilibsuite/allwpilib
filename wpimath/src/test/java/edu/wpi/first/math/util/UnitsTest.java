@@ -93,6 +93,6 @@ class UnitsTest extends UtilityClassTest<Units> {
   void rpmToFalconVelocityTest() {
     assertEquals(3.41333, Units.rpmToFalconVelocity(1), 1e-2);
   }
-  
+
 
 }
