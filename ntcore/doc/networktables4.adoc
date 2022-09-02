@@ -118,8 +118,6 @@ A second use case:
 
 Topic IDs may be common across all client connections or be connection-specific.  If they are common, the server needs to be careful regarding topic ID reuse due to deleted topics, as the protocol provides no way to change a client topic ID.  Requests (e.g. <<msg-subscribe,`subscribe`>> or <<msg-publish,`publish`>>) are always specific to a single client connection.
 
-When a client initially connects, the server shall send it <<msg-announce,`announce`>> messages for each existing topic.
-
 The server shall keep a publisher count for each topic.  Persistent and retained topics have an additional implicit publisher.  When the publisher count reaches zero (which only happens for non-persistent and non-retained topics), the server shall delete the topic (including its retained value).  When a client connection is lost, the server shall handle that as an implicit <<msg-unpublish,`unpublish`>> for all topics currently published by that client.
 
 The server may operate in-process to an application (e.g. a robot program).  In this case, the application operationally behaves like a client (e.g. it sends publish requests and receives topic announcements), but of course does not need to estimate delta time, create JSON/MessagePack messages, etc, as all of the necessary operations can be performed programmatically within the same process.
@@ -136,7 +134,7 @@ Clients may publish a value at any time following clock synchronization.  Client
 [[meta-topics]]
 === Server-Published Meta Topics
 
-The server shall publish a standard set of topics with information about server state.  Clients may subscribe to these topics for diagnostics purposes or to determine when to publish value changes.  These topics are hidden--they are only announced to clients that have subscribed to them.
+The server shall publish a standard set of topics with information about server state.  Clients may subscribe to these topics for diagnostics purposes or to determine when to publish value changes.  These topics are hidden--they are not announced to subscribers to an empty prefix, only to subscribers that have subscribed to `"$"` or  longer prefixes.
 
 [cols="1,1,2", options="header"]
 |===
@@ -327,7 +325,6 @@ The following data types are supported.  Note: implementations may map integer a
 
 |3|float 32|Number (double)|`float`
 
-
 .2+|4
 .2+|str
 .2+|String
@@ -378,7 +375,6 @@ Each published topic may also have properties associated to it.  Properties are 
 |Property|Type|Description|Notes
 |`persistent`|boolean|Persistent Flag|If true, the last set value will be periodically saved to persistent storage on the server and be restored during server startup.  Topics with this property set to true will not be deleted by the server when the last publisher stops publishing.
 |`retained`|boolean|Retained Flag|Topics with this property set to true will not be deleted by the server when the last publisher stops publishing.
-|`hidden`|boolean|Hidden Flag|If true, the topic will not be announced to a client until the client subscribes to it.  Note the topic will still be visible via the <<meta-client-pub,`$clientpub`>> meta-topic.
 |===
 
 [[sub-options]]
@@ -407,6 +403,11 @@ Each subscription may have options set.  The following options have a defined me
 |Boolean
 |All Changes Flag
 |If true, the server should send all value changes over the wire regardless of the `immediate` and `periodic` settings.  If false, only the most recent value is sent (same as NT 3.0 behavior).  If not specified, defaults to false.
+
+|`topicsonly` (optional)
+|Boolean
+|No Value Changes Flag
+|If true, the server should not send any value changes over the wire regardless of other options.  This is useful for only getting topic announcements.  If false, value changes are sent in accordance with other options.  If not specified, defaults to false.
 |===
 
 [[text-frames]]
@@ -522,7 +523,7 @@ If the topic is newly created (e.g. there are no other publishers) this sets the
 
 Sent from a client to the server to indicate the client wants to stop publishing values for the given topic and publisher.  The client should stop publishing data value updates via binary MessagePack messages for this publisher prior to sending this message.
 
-When there are no remaining publishers for a non-persistent topic, the server shall delete the topic and send a <<msg-unannounce>>.
+When there are no remaining publishers for a non-persistent topic, the server shall delete the topic and send a <<msg-unannounce>> to all clients who have been sent a previous <<msg-announce>> for the topic.
 
 The `unpublish` JSON message shall contain the following parameters:
 
@@ -626,13 +627,9 @@ The `unsubscribe` JSON message shall contain the following parameters:
 
 The server shall send this message for each of the following conditions:
 
-- For each existing topic to a client when that client initially connects
-
-- To all clients when a topic is created
+- To all clients subscribed to a matching prefix when a topic is created
 
 - To a client in response to an <<msg-publish>> from that client
-
-- To a client when it subscribes to a hidden topic
 
 The `announce` JSON message shall contain the following parameters:
 
