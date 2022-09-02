@@ -49,8 +49,7 @@ class Logger {
   void Log(unsigned int level, const char* file, unsigned int line,
            const S& format, Args&&... args) {
     if (m_func && level >= m_min_level) {
-      LogV(level, file, line, format,
-           fmt::make_args_checked<Args...>(format, args...));
+      LogV(level, file, line, format, fmt::make_format_args(args...));
     }
   }
 
@@ -62,7 +61,7 @@ class Logger {
 };
 
 #define WPI_LOG(logger_inst, level, format, ...) \
-  logger_inst.Log(level, __FILE__, __LINE__, FMT_STRING(format), __VA_ARGS__)
+  (logger_inst).Log(level, __FILE__, __LINE__, FMT_STRING(format), __VA_ARGS__)
 
 #define WPI_ERROR(inst, format, ...) \
   WPI_LOG(inst, ::wpi::WPI_LOG_ERROR, format, __VA_ARGS__)

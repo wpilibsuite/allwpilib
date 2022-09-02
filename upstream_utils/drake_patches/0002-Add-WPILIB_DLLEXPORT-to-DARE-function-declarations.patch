@@ -1,4 +1,4 @@
-From 7dfb527524f42488a00cf156ada36c51d5e13b3f Mon Sep 17 00:00:00 2001
+From b208372a18b37f6cbc49dd45d15adf63c9b60755 Mon Sep 17 00:00:00 2001
 From: Tyler Veness <calcmogul@gmail.com>
 Date: Wed, 18 May 2022 11:15:27 -0700
 Subject: [PATCH 2/2] Add WPILIB_DLLEXPORT to DARE function declarations
@@ -8,7 +8,7 @@ Subject: [PATCH 2/2] Add WPILIB_DLLEXPORT to DARE function declarations
  1 file changed, 3 insertions(+)
 
 diff --git a/math/discrete_algebraic_riccati_equation.h b/math/discrete_algebraic_riccati_equation.h
-index df7a58b2b8..55b8442bf4 100644
+index df7a58b..55b8442 100644
 --- a/math/discrete_algebraic_riccati_equation.h
 +++ b/math/discrete_algebraic_riccati_equation.h
 @@ -4,6 +4,7 @@
@@ -35,6 +35,3 @@ index df7a58b2b8..55b8442bf4 100644
  Eigen::MatrixXd DiscreteAlgebraicRiccatiEquation(
      const Eigen::Ref<const Eigen::MatrixXd>& A,
      const Eigen::Ref<const Eigen::MatrixXd>& B,
--- 
-2.36.1
-

@@ -64,6 +64,10 @@ class WrapperCommand : public CommandHelper<CommandBase, WrapperCommand> {
 
   bool RunsWhenDisabled() const override;
 
+  InterruptionBehavior GetInterruptionBehavior() const override;
+
+  wpi::SmallSet<Subsystem*, 4> GetRequirements() const override;
+
  protected:
   std::unique_ptr<Command> m_command;
 };

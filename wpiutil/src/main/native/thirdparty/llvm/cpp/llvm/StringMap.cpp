@@ -11,7 +11,6 @@
 //===----------------------------------------------------------------------===//
 
 #include "wpi/StringMap.h"
-#include "wpi/StringExtras.h"
 #include "wpi/DJB.h"
 #include "wpi/MathExtras.h"
 

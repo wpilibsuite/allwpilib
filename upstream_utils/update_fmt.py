@@ -4,20 +4,25 @@ import os
 import shutil
 
 from upstream_utils import (
-    setup_upstream_repo,
+    get_repo_root,
+    clone_repo,
     comment_out_invalid_includes,
     walk_cwd_and_copy_if,
-    am_patches,
+    git_am,
 )
 
 
 def main():
-    root, repo = setup_upstream_repo("https://github.com/fmtlib/fmt", "8.1.1")
-    wpiutil = os.path.join(root, "wpiutil")
+    upstream_root = clone_repo("https://github.com/fmtlib/fmt", "9.1.0")
+    wpilib_root = get_repo_root()
+    wpiutil = os.path.join(wpilib_root, "wpiutil")
 
-    # Apply patches to original git repo
-    prefix = os.path.join(root, "upstream_utils/fmt_patches")
-    am_patches(repo, [os.path.join(prefix, "0001-Don-t-throw-on-write-failure.patch")])
+    # Apply patches to upstream Git repo
+    os.chdir(upstream_root)
+    for f in [
+        "0001-Don-t-throw-on-write-failure.patch",
+    ]:
+        git_am(os.path.join(wpilib_root, "upstream_utils/fmt_patches", f))
 
     # Delete old install
     for d in [

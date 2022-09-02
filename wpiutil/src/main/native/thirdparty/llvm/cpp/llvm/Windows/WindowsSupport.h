@@ -92,7 +92,7 @@ wpi::VersionTuple GetWindowsOSVersion();
 bool MakeErrMsg(std::string *ErrMsg, const std::string &prefix);
 
 // Include GetLastError() in a fatal error message.
-LLVM_ATTRIBUTE_NORETURN inline void ReportLastErrorFatal(const char *Msg) {
+[[noreturn]] inline void ReportLastErrorFatal(const char *Msg) {
   std::string ErrMsg;
   MakeErrMsg(&ErrMsg, Msg);
   wpi::report_fatal_error(ErrMsg);

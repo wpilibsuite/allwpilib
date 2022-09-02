@@ -1,0 +1,24 @@
+From 34f44d312c918b3b5dd69fc689ec0b628dc712f9 Mon Sep 17 00:00:00 2001
+From: PJ Reiniger <pj.reiniger@gmail.com>
+Date: Thu, 19 May 2022 01:12:41 -0400
+Subject: [PATCH 26/28] constexpr endian byte swap
+
+---
+ llvm/include/llvm/Support/Endian.h | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/llvm/include/llvm/Support/Endian.h b/llvm/include/llvm/Support/Endian.h
+index 5e7c1e961..2e883ff05 100644
+--- a/llvm/include/llvm/Support/Endian.h
++++ b/llvm/include/llvm/Support/Endian.h
+@@ -55,7 +55,9 @@ inline value_type byte_swap(value_type value, endianness endian) {
+ /// Swap the bytes of value to match the given endianness.
+ template<typename value_type, endianness endian>
+ inline value_type byte_swap(value_type value) {
+-  return byte_swap(value, endian);
++  if constexpr ((endian != native) && (endian != system_endianness()))
++    sys::swapByteOrder(value);
++  return value;
+ }
+ 
+ /// Read a value of a particular endianness from memory.

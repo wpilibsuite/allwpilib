@@ -26,6 +26,3 @@ index fe0cfec0b..9e8a0e7a9 100755
  #endif
  
  #if defined __NVCC__
--- 
-2.36.1
-

@@ -40,6 +40,6 @@ bool RepeatCommand::RunsWhenDisabled() const {
   return m_command->RunsWhenDisabled();
 }
 
-RepeatCommand RepeatCommand::Repeat() && {
+RepeatCommand RepeatCommand::Repeatedly() && {
   return std::move(*this);
 }

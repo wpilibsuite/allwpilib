@@ -7,6 +7,7 @@
 #include "CommandTestBase.h"
 #include "frc2/command/CommandScheduler.h"
 #include "frc2/command/ConditionalCommand.h"
+#include "frc2/command/FunctionalCommand.h"
 #include "frc2/command/InstantCommand.h"
 #include "frc2/command/ParallelCommandGroup.h"
 #include "frc2/command/ParallelDeadlineGroup.h"
@@ -49,26 +50,35 @@ TEST_F(CommandRequirementsTest, RequirementUninterruptible) {
 
   TestSubsystem requirement;
 
-  MockCommand command1({&requirement});
-  MockCommand command2({&requirement});
+  int initCounter = 0;
+  int exeCounter = 0;
+  int endCounter = 0;
 
-  EXPECT_CALL(command1, Initialize());
-  EXPECT_CALL(command1, Execute()).Times(2);
-  EXPECT_CALL(command1, End(true)).Times(0);
-  EXPECT_CALL(command1, End(false)).Times(0);
+  std::unique_ptr<Command> command1 =
+      FunctionalCommand([&initCounter] { initCounter++; },
+                        [&exeCounter] { exeCounter++; },
+                        [&endCounter](bool interruptible) { endCounter++; },
+                        [] { return false; }, {&requirement})
+          .WithInterruptBehavior(
+              Command::InterruptionBehavior::kCancelIncoming);
+  MockCommand command2({&requirement});
 
   EXPECT_CALL(command2, Initialize()).Times(0);
   EXPECT_CALL(command2, Execute()).Times(0);
   EXPECT_CALL(command2, End(true)).Times(0);
   EXPECT_CALL(command2, End(false)).Times(0);
 
-  scheduler.Schedule(false, &command1);
+  scheduler.Schedule(command1.get());
+  EXPECT_EQ(1, initCounter);
   scheduler.Run();
-  EXPECT_TRUE(scheduler.IsScheduled(&command1));
+  EXPECT_EQ(1, exeCounter);
+  EXPECT_TRUE(scheduler.IsScheduled(command1.get()));
   scheduler.Schedule(&command2);
-  EXPECT_TRUE(scheduler.IsScheduled(&command1));
+  EXPECT_TRUE(scheduler.IsScheduled(command1.get()));
   EXPECT_FALSE(scheduler.IsScheduled(&command2));
   scheduler.Run();
+  EXPECT_EQ(2, exeCounter);
+  EXPECT_EQ(0, endCounter);
 }
 
 TEST_F(CommandRequirementsTest, DefaultCommandRequirementError) {

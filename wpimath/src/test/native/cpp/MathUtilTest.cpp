@@ -108,12 +108,12 @@ TEST(MathUtilTest, AngleModulus) {
   EXPECT_UNITS_NEAR(frc::AngleModulus(units::radian_t{2.0 * wpi::numbers::pi}),
                     0_rad, 1e-10);
 
-  EXPECT_UNITS_EQ(frc::AngleModulus(units::radian_t(5 * wpi::numbers::pi)),
-                  units::radian_t(wpi::numbers::pi));
-  EXPECT_UNITS_EQ(frc::AngleModulus(units::radian_t(-5 * wpi::numbers::pi)),
-                  units::radian_t(wpi::numbers::pi));
-  EXPECT_UNITS_EQ(frc::AngleModulus(units::radian_t(wpi::numbers::pi / 2)),
-                  units::radian_t(wpi::numbers::pi / 2));
-  EXPECT_UNITS_EQ(frc::AngleModulus(units::radian_t(-wpi::numbers::pi / 2)),
-                  units::radian_t(-wpi::numbers::pi / 2));
+  EXPECT_UNITS_EQ(frc::AngleModulus(units::radian_t{5 * wpi::numbers::pi}),
+                  units::radian_t{wpi::numbers::pi});
+  EXPECT_UNITS_EQ(frc::AngleModulus(units::radian_t{-5 * wpi::numbers::pi}),
+                  units::radian_t{wpi::numbers::pi});
+  EXPECT_UNITS_EQ(frc::AngleModulus(units::radian_t{wpi::numbers::pi / 2}),
+                  units::radian_t{wpi::numbers::pi / 2});
+  EXPECT_UNITS_EQ(frc::AngleModulus(units::radian_t{-wpi::numbers::pi / 2}),
+                  units::radian_t{-wpi::numbers::pi / 2});
 }

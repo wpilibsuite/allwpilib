@@ -9,10 +9,10 @@
 #include "ExampleGlobalMeasurementSensor.h"
 
 frc::MecanumDriveWheelSpeeds Drivetrain::GetCurrentState() const {
-  return {units::meters_per_second_t(m_frontLeftEncoder.GetRate()),
-          units::meters_per_second_t(m_frontRightEncoder.GetRate()),
-          units::meters_per_second_t(m_backLeftEncoder.GetRate()),
-          units::meters_per_second_t(m_backRightEncoder.GetRate())};
+  return {units::meters_per_second_t{m_frontLeftEncoder.GetRate()},
+          units::meters_per_second_t{m_frontRightEncoder.GetRate()},
+          units::meters_per_second_t{m_backLeftEncoder.GetRate()},
+          units::meters_per_second_t{m_backRightEncoder.GetRate()}};
 }
 
 void Drivetrain::SetSpeeds(const frc::MecanumDriveWheelSpeeds& wheelSpeeds) {

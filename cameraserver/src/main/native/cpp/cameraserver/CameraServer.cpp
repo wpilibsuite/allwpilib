@@ -609,7 +609,7 @@ cs::CvSink CameraServer::GetVideo(const cs::VideoSource& camera) {
       if (kind != cs::VideoSink::kCv) {
         auto csShared = GetCameraServerShared();
         csShared->SetCameraServerError("expected OpenCV sink, but got {}",
-                                       kind);
+                                       static_cast<int>(kind));
         return cs::CvSink{};
       }
       return *static_cast<cs::CvSink*>(&it->second);

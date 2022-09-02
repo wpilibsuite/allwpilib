@@ -5,9 +5,10 @@
 // SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 //
 //===----------------------------------------------------------------------===//
-//
-// This file defines the SmallSet class.
-//
+///
+/// \file
+/// This file defines the SmallSet class.
+///
 //===----------------------------------------------------------------------===//
 
 #ifndef WPIUTIL_WPI_SMALLSET_H

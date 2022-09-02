@@ -31,7 +31,7 @@ Rotation2d::Rotation2d(double x, double y) {
     m_sin = 0.0;
     m_cos = 1.0;
   }
-  m_value = units::radian_t(std::atan2(m_sin, m_cos));
+  m_value = units::radian_t{std::atan2(m_sin, m_cos)};
 }
 
 Rotation2d Rotation2d::operator+(const Rotation2d& other) const {
@@ -43,11 +43,11 @@ Rotation2d Rotation2d::operator-(const Rotation2d& other) const {
 }
 
 Rotation2d Rotation2d::operator-() const {
-  return Rotation2d(-m_value);
+  return Rotation2d{-m_value};
 }
 
 Rotation2d Rotation2d::operator*(double scalar) const {
-  return Rotation2d(m_value * scalar);
+  return Rotation2d{m_value * scalar};
 }
 
 bool Rotation2d::operator==(const Rotation2d& other) const {

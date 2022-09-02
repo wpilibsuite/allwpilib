@@ -55,7 +55,7 @@ public class ParallelRaceGroup extends CommandGroupBase {
   }
 
   @Override
-  public void initialize() {
+  public final void initialize() {
     m_finished = false;
     for (Command command : m_commands) {
       command.initialize();
@@ -63,7 +63,7 @@ public class ParallelRaceGroup extends CommandGroupBase {
   }
 
   @Override
-  public void execute() {
+  public final void execute() {
     for (Command command : m_commands) {
       command.execute();
       if (command.isFinished()) {
@@ -73,14 +73,14 @@ public class ParallelRaceGroup extends CommandGroupBase {
   }
 
   @Override
-  public void end(boolean interrupted) {
+  public final void end(boolean interrupted) {
     for (Command command : m_commands) {
       command.end(!command.isFinished());
     }
   }
 
   @Override
-  public boolean isFinished() {
+  public final boolean isFinished() {
     return m_finished;
   }
 

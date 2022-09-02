@@ -67,6 +67,27 @@ std::unique_ptr<Command> Command::IgnoringDisable(bool doesRunWhenDisabled) && {
       std::move(*this).TransferOwnership(), doesRunWhenDisabled);
 }
 
+std::unique_ptr<Command> Command::WithInterruptBehavior(
+    InterruptionBehavior interruptBehavior) && {
+  class InterruptBehaviorCommand
+      : public CommandHelper<WrapperCommand, InterruptBehaviorCommand> {
+   public:
+    InterruptBehaviorCommand(std::unique_ptr<Command>&& command,
+                             InterruptionBehavior interruptBehavior)
+        : CommandHelper(std::move(command)),
+          m_interruptBehavior(interruptBehavior) {}
+    InterruptionBehavior GetInterruptionBehavior() const override {
+      return m_interruptBehavior;
+    }
+
+   private:
+    InterruptionBehavior m_interruptBehavior;
+  };
+
+  return std::make_unique<InterruptBehaviorCommand>(
+      std::move(*this).TransferOwnership(), interruptBehavior);
+}
+
 ParallelRaceGroup Command::WithInterrupt(std::function<bool()> condition) && {
   std::vector<std::unique_ptr<Command>> temp;
   temp.emplace_back(std::make_unique<WaitUntilCommand>(std::move(condition)));
@@ -116,7 +137,7 @@ EndlessCommand Command::Endlessly() && {
   return EndlessCommand(std::move(*this).TransferOwnership());
 }
 
-RepeatCommand Command::Repeat() && {
+RepeatCommand Command::Repeatedly() && {
   return RepeatCommand(std::move(*this).TransferOwnership());
 }
 
@@ -130,8 +151,8 @@ ConditionalCommand Command::Unless(std::function<bool()> condition) && {
                             std::move(condition));
 }
 
-void Command::Schedule(bool interruptible) {
-  CommandScheduler::GetInstance().Schedule(interruptible, this);
+void Command::Schedule() {
+  CommandScheduler::GetInstance().Schedule(this);
 }
 
 void Command::Cancel() {

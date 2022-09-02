@@ -41,7 +41,7 @@ class Robot : public frc::TimedRobot {
     // update the dashboard mechanism's state
     m_elevator->SetLength(kElevatorMinimumLength +
                           m_elevatorEncoder.GetDistance());
-    m_wrist->SetAngle(units::degree_t(m_wristPotentiometer.Get()));
+    m_wrist->SetAngle(units::degree_t{m_wristPotentiometer.Get()});
   }
 
   void TeleopPeriodic() override {

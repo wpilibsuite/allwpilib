@@ -13,10 +13,10 @@ static constexpr double kEpsilon = 1E-9;
 using namespace frc;
 
 TEST(DifferentialDriveOdometryTest, EncoderDistances) {
-  DifferentialDriveOdometry odometry{Rotation2d(45_deg)};
+  DifferentialDriveOdometry odometry{45_deg};
 
-  const auto& pose = odometry.Update(Rotation2d(135_deg), 0_m,
-                                     units::meter_t(5 * wpi::numbers::pi));
+  const auto& pose =
+      odometry.Update(135_deg, 0_m, units::meter_t{5 * wpi::numbers::pi});
 
   EXPECT_NEAR(pose.X().value(), 5.0, kEpsilon);
   EXPECT_NEAR(pose.Y().value(), 5.0, kEpsilon);

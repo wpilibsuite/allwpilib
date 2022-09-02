@@ -66,8 +66,8 @@ void frc::MecanumDrivePoseEstimator::ResetPosition(
 }
 
 Pose2d frc::MecanumDrivePoseEstimator::GetEstimatedPosition() const {
-  return Pose2d(m_observer.Xhat(0) * 1_m, m_observer.Xhat(1) * 1_m,
-                Rotation2d(units::radian_t{m_observer.Xhat(2)}));
+  return Pose2d{m_observer.Xhat(0) * 1_m, m_observer.Xhat(1) * 1_m,
+                units::radian_t{m_observer.Xhat(2)}};
 }
 
 void frc::MecanumDrivePoseEstimator::AddVisionMeasurement(
@@ -96,8 +96,8 @@ Pose2d frc::MecanumDrivePoseEstimator::UpdateWithTime(
 
   auto chassisSpeeds = m_kinematics.ToChassisSpeeds(wheelSpeeds);
   auto fieldRelativeVelocities =
-      Translation2d(chassisSpeeds.vx * 1_s, chassisSpeeds.vy * 1_s)
-          .RotateBy(angle);
+      Translation2d{chassisSpeeds.vx * 1_s, chassisSpeeds.vy * 1_s}.RotateBy(
+          angle);
 
   Vectord<3> u{fieldRelativeVelocities.X().value(),
                fieldRelativeVelocities.Y().value(), omega.value()};

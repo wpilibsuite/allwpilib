@@ -106,7 +106,8 @@ std::shared_ptr<Message> Message::Read(WireDecoder& decoder,
       } else {
         type = get_entry_type(msg->m_id);
       }
-      WPI_DEBUG4(decoder.logger(), "update message data type: {}", type);
+      WPI_DEBUG4(decoder.logger(), "update message data type: {}",
+                 static_cast<int>(type));
       msg->m_value = decoder.ReadValue(type);
       if (!msg->m_value) {
         return nullptr;

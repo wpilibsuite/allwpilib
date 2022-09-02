@@ -19,7 +19,7 @@ TEST(LTVUnicycleControllerTest, ReachesReference) {
   constexpr auto kDt = 0.02_s;
 
   frc::LTVUnicycleController controller{{0.0625, 0.125, 2.5}, {4.0, 4.0}, kDt};
-  frc::Pose2d robotPose{2.7_m, 23_m, frc::Rotation2d{0_deg}};
+  frc::Pose2d robotPose{2.7_m, 23_m, 0_deg};
 
   auto waypoints = std::vector{frc::Pose2d{2.75_m, 22.521_m, 0_rad},
                                frc::Pose2d{24.73_m, 19.68_m, 5.846_rad}};

@@ -38,7 +38,7 @@ public class LTVDifferentialDriveController {
   private Matrix<N5, N1> m_tolerance = new Matrix<>(Nat.N5(), Nat.N1());
 
   /** States of the drivetrain system. */
-  enum State {
+  private enum State {
     kX(0),
     kY(1),
     kHeading(2),
@@ -73,6 +73,8 @@ public class LTVDifferentialDriveController {
       double dt) {
     m_trackwidth = trackwidth;
 
+    // Control law derivation is in section 8.7 of
+    // https://file.tavsys.net/control/controls-engineering-in-frc.pdf
     var A =
         new MatBuilder<>(Nat.N5(), Nat.N5())
             .fill(

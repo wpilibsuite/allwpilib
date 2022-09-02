@@ -172,8 +172,7 @@ static void ReportJoystickUnpluggedErrorV(fmt::string_view format,
 template <typename S, typename... Args>
 static inline void ReportJoystickUnpluggedError(const S& format,
                                                 Args&&... args) {
-  ReportJoystickUnpluggedErrorV(
-      format, fmt::make_args_checked<Args...>(format, args...));
+  ReportJoystickUnpluggedErrorV(format, fmt::make_format_args(args...));
 }
 
 /**
@@ -187,8 +186,7 @@ static void ReportJoystickUnpluggedWarningV(fmt::string_view format,
 template <typename S, typename... Args>
 static inline void ReportJoystickUnpluggedWarning(const S& format,
                                                   Args&&... args) {
-  ReportJoystickUnpluggedWarningV(
-      format, fmt::make_args_checked<Args...>(format, args...));
+  ReportJoystickUnpluggedWarningV(format, fmt::make_format_args(args...));
 }
 
 Instance::Instance() {

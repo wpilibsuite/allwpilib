@@ -1,0 +1,228 @@
+From 2c53d8ac36f378fda347f36ef2bc7fbc2038cb93 Mon Sep 17 00:00:00 2001
+From: PJ Reiniger <pj.reiniger@gmail.com>
+Date: Sun, 8 May 2022 13:34:07 -0400
+Subject: [PATCH 09/28] Add compiler warning pragmas
+
+---
+ llvm/include/llvm/ADT/FunctionExtras.h | 11 +++++++++++
+ llvm/include/llvm/ADT/Hashing.h        |  9 +++++++++
+ llvm/include/llvm/ADT/SmallVector.h    |  8 ++++++++
+ llvm/include/llvm/Support/MathExtras.h |  9 +++++++++
+ llvm/include/llvm/Support/MemAlloc.h   | 13 +++++++++++++
+ llvm/lib/Support/raw_ostream.cpp       |  4 ++++
+ llvm/unittests/ADT/DenseMapTest.cpp    |  4 ++++
+ llvm/unittests/ADT/MapVectorTest.cpp   |  7 +++++++
+ llvm/unittests/ADT/SmallVectorTest.cpp |  4 ++++
+ llvm/unittests/Support/AlignOfTest.cpp |  7 +++----
+ 10 files changed, 72 insertions(+), 4 deletions(-)
+
+diff --git a/llvm/include/llvm/ADT/FunctionExtras.h b/llvm/include/llvm/ADT/FunctionExtras.h
+index 8a9d78f41..3efa73587 100644
+--- a/llvm/include/llvm/ADT/FunctionExtras.h
++++ b/llvm/include/llvm/ADT/FunctionExtras.h
+@@ -55,6 +55,13 @@ namespace llvm {
+ ///   It can hold functions with a non-const operator(), like mutable lambdas.
+ template <typename FunctionT> class unique_function;
+ 
++// GCC warns on OutOfLineStorage
++#if defined(__GNUC__) && !defined(__clang__)
++#pragma GCC diagnostic push
++#pragma GCC diagnostic ignored "-Warray-bounds"
++#pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
++#endif
++
+ namespace detail {
+ 
+ template <typename T>
+@@ -411,6 +418,10 @@ public:
+   }
+ };
+ 
++#if defined(__GNUC__) && !defined(__clang__)
++#pragma GCC diagnostic pop
++#endif
++
+ } // end namespace llvm
+ 
+ #endif // LLVM_ADT_FUNCTIONEXTRAS_H
+diff --git a/llvm/include/llvm/ADT/Hashing.h b/llvm/include/llvm/ADT/Hashing.h
+index 74a87a3d8..47ff1b2bc 100644
+--- a/llvm/include/llvm/ADT/Hashing.h
++++ b/llvm/include/llvm/ADT/Hashing.h
+@@ -55,6 +55,11 @@
+ #include <tuple>
+ #include <utility>
+ 
++#ifdef _WIN32
++#pragma warning(push)
++#pragma warning(disable : 26495)
++#endif
++
+ namespace llvm {
+ template <typename T, typename Enable> struct DenseMapInfo;
+ 
+@@ -687,4 +692,8 @@ template <> struct DenseMapInfo<hash_code, void> {
+ 
+ } // namespace llvm
+ 
++#ifdef _WIN32
++#pragma warning(pop)
++#endif
++
+ #endif
+diff --git a/llvm/include/llvm/ADT/SmallVector.h b/llvm/include/llvm/ADT/SmallVector.h
+index 8686f7bb5..1e311ea56 100644
+--- a/llvm/include/llvm/ADT/SmallVector.h
++++ b/llvm/include/llvm/ADT/SmallVector.h
+@@ -14,6 +14,14 @@
+ #ifndef LLVM_ADT_SMALLVECTOR_H
+ #define LLVM_ADT_SMALLVECTOR_H
+ 
++// This file uses std::memcpy() to copy std::pair<unsigned int, unsigned int>.
++// That type is POD, but the standard doesn't guarantee that. GCC doesn't treat
++// the type as POD so it throws a warning. We want to consider this a warning
++// instead of an error.
++#if __GNUC__ >= 8
++#pragma GCC diagnostic warning "-Wclass-memaccess"
++#endif
++
+ #include "llvm/Support/Compiler.h"
+ #include "llvm/Support/type_traits.h"
+ #include <algorithm>
+diff --git a/llvm/include/llvm/Support/MathExtras.h b/llvm/include/llvm/Support/MathExtras.h
+index da843ef79..fac12dd0e 100644
+--- a/llvm/include/llvm/Support/MathExtras.h
++++ b/llvm/include/llvm/Support/MathExtras.h
+@@ -435,6 +435,11 @@ inline uint64_t maxUIntN(uint64_t N) {
+   return UINT64_MAX >> (64 - N);
+ }
+ 
++#ifdef _WIN32
++#pragma warning(push)
++#pragma warning(disable : 4146)
++#endif
++
+ /// Gets the minimum value for a N-bit signed integer.
+ inline int64_t minIntN(int64_t N) {
+   assert(N > 0 && N <= 64 && "integer width out of range");
+@@ -442,6 +447,10 @@ inline int64_t minIntN(int64_t N) {
+   return UINT64_C(1) + ~(UINT64_C(1) << (N - 1));
+ }
+ 
++#ifdef _WIN32
++#pragma warning(pop)
++#endif
++
+ /// Gets the maximum value for a N-bit signed integer.
+ inline int64_t maxIntN(int64_t N) {
+   assert(N > 0 && N <= 64 && "integer width out of range");
+diff --git a/llvm/include/llvm/Support/MemAlloc.h b/llvm/include/llvm/Support/MemAlloc.h
+index d6012bd5a..01007deb8 100644
+--- a/llvm/include/llvm/Support/MemAlloc.h
++++ b/llvm/include/llvm/Support/MemAlloc.h
+@@ -22,6 +22,14 @@
+ 
+ namespace llvm {
+ 
++#ifdef _WIN32
++#pragma warning(push)
++// Warning on NONNULL, report is not known to abort
++#pragma warning(disable : 6387)
++#pragma warning(disable : 28196)
++#pragma warning(disable : 28183)
++#endif
++
+ LLVM_ATTRIBUTE_RETURNS_NONNULL inline void *safe_malloc(size_t Sz) {
+   void *Result = std::malloc(Sz);
+   if (Result == nullptr) {
+@@ -84,4 +92,9 @@ allocate_buffer(size_t Size, size_t Alignment);
+ void deallocate_buffer(void *Ptr, size_t Size, size_t Alignment);
+ 
+ } // namespace llvm
++
++#ifdef _WIN32
++#pragma warning(pop)
++#endif
++
+ #endif
+diff --git a/llvm/lib/Support/raw_ostream.cpp b/llvm/lib/Support/raw_ostream.cpp
+index e4c318eb8..ee01a9522 100644
+--- a/llvm/lib/Support/raw_ostream.cpp
++++ b/llvm/lib/Support/raw_ostream.cpp
+@@ -10,6 +10,10 @@
+ //
+ //===----------------------------------------------------------------------===//
+ 
++#ifdef _WIN32
++#define _CRT_NONSTDC_NO_WARNINGS
++#endif
++
+ #include "llvm/Support/raw_ostream.h"
+ #include "llvm/ADT/STLArrayExtras.h"
+ #include "llvm/ADT/StringExtras.h"
+diff --git a/llvm/unittests/ADT/DenseMapTest.cpp b/llvm/unittests/ADT/DenseMapTest.cpp
+index e505b1907..9fe83a45d 100644
+--- a/llvm/unittests/ADT/DenseMapTest.cpp
++++ b/llvm/unittests/ADT/DenseMapTest.cpp
+@@ -6,6 +6,10 @@
+ //
+ //===----------------------------------------------------------------------===//
+ 
++#if defined(__GNUC__) && !defined(__clang__)
++#pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
++#endif
++
+ #include "llvm/ADT/DenseMap.h"
+ #include "gtest/gtest.h"
+ #include <map>
+diff --git a/llvm/unittests/ADT/MapVectorTest.cpp b/llvm/unittests/ADT/MapVectorTest.cpp
+index 552f9956b..20ebcd753 100644
+--- a/llvm/unittests/ADT/MapVectorTest.cpp
++++ b/llvm/unittests/ADT/MapVectorTest.cpp
+@@ -6,6 +6,13 @@
+ //
+ //===----------------------------------------------------------------------===//
+ 
++#if defined(__GNUC__)
++#pragma GCC diagnostic ignored "-Wpedantic"
++#if !defined(__clang__)
++#pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
++#endif
++#endif
++
+ #include "llvm/ADT/MapVector.h"
+ #include "llvm/ADT/iterator_range.h"
+ #include "gtest/gtest.h"
+diff --git a/llvm/unittests/ADT/SmallVectorTest.cpp b/llvm/unittests/ADT/SmallVectorTest.cpp
+index fe827546a..0e68bad6c 100644
+--- a/llvm/unittests/ADT/SmallVectorTest.cpp
++++ b/llvm/unittests/ADT/SmallVectorTest.cpp
+@@ -17,6 +17,10 @@
+ #include <list>
+ #include <stdarg.h>
+ 
++#if defined(__GNUC__)
++#pragma GCC diagnostic ignored "-Wpedantic"
++#endif
++
+ using namespace llvm;
+ 
+ namespace {
+diff --git a/llvm/unittests/Support/AlignOfTest.cpp b/llvm/unittests/Support/AlignOfTest.cpp
+index f84895c18..6a50205b1 100644
+--- a/llvm/unittests/Support/AlignOfTest.cpp
++++ b/llvm/unittests/Support/AlignOfTest.cpp
+@@ -31,10 +31,9 @@ namespace {
+ #pragma clang diagnostic ignored "-Wunknown-pragmas"
+ #pragma clang diagnostic ignored "-Winaccessible-base"
+ #elif ((__GNUC__ * 100) + __GNUC_MINOR__) >= 402
+-// Pragma based warning suppression was introduced in GGC 4.2.  Additionally
+-// this warning is "enabled by default".  The warning still appears if -Wall is
+-// suppressed.  Apparently GCC suppresses it when -w is specifed, which is odd.
+-#pragma GCC diagnostic warning "-w"
++#pragma GCC diagnostic warning "-Wunknown-pragmas"
++#pragma GCC diagnostic warning "-Winaccessible-base"
++#pragma GCC diagnostic warning "-Wunused-function"
+ #endif
+ 
+ // Define some fixed alignment types to use in these tests.

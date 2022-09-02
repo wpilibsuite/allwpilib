@@ -109,7 +109,7 @@ class Robot : public frc::TimedRobot {
     // Send the new calculated voltage to the motors.
     // voltage = duty cycle * battery voltage, so
     // duty cycle = voltage / battery voltage
-    m_motor.SetVoltage(units::volt_t(m_loop.U(0)));
+    m_motor.SetVoltage(units::volt_t{m_loop.U(0)});
   }
 };
 

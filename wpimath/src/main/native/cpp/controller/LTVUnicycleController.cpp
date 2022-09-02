@@ -10,13 +10,15 @@
 
 using namespace frc;
 
+namespace {
+
 /**
  * States of the drivetrain system.
  */
 class State {
  public:
   /// X position in global coordinate frame.
-  static constexpr int kX = 0;
+  [[maybe_unused]] static constexpr int kX = 0;
 
   /// Y position in global coordinate frame.
   static constexpr int kY = 1;
@@ -25,17 +27,7 @@ class State {
   static constexpr int kHeading = 2;
 };
 
-/**
- * Inputs of the drivetrain system.
- */
-class Input {
- public:
-  /// Linear velocity.
-  static constexpr int kLinearVelocity = 3;
-
-  /// Angular velocity.
-  static constexpr int kAngularVelocity = 4;
-};
+}  // namespace
 
 LTVUnicycleController::LTVUnicycleController(
     units::second_t dt, units::meters_per_second_t maxVelocity)
@@ -45,6 +37,38 @@ LTVUnicycleController::LTVUnicycleController(
 LTVUnicycleController::LTVUnicycleController(
     const wpi::array<double, 3>& Qelems, const wpi::array<double, 2>& Relems,
     units::second_t dt, units::meters_per_second_t maxVelocity) {
+  // The change in global pose for a unicycle is defined by the following three
+  // equations.
+  //
+  // ẋ = v cosθ
+  // ẏ = v sinθ
+  // θ̇ = ω
+  //
+  // Here's the model as a vector function where x = [x  y  θ]ᵀ and u = [v  ω]ᵀ.
+  //
+  //           [v cosθ]
+  // f(x, u) = [v sinθ]
+  //           [  ω   ]
+  //
+  // To create an LQR, we need to linearize this.
+  //
+  //               [0  0  −v sinθ]                  [cosθ  0]
+  // ∂f(x, u)/∂x = [0  0   v cosθ]    ∂f(x, u)/∂u = [sinθ  0]
+  //               [0  0     0   ]                  [ 0    1]
+  //
+  // We're going to make a cross-track error controller, so we'll apply a
+  // clockwise rotation matrix to the global tracking error to transform it into
+  // the robot's coordinate frame. Since the cross-track error is always
+  // measured from the robot's coordinate frame, the model used to compute the
+  // LQR should be linearized around θ = 0 at all times.
+  //
+  //     [0  0  −v sin0]        [cos0  0]
+  // A = [0  0   v cos0]    B = [sin0  0]
+  //     [0  0     0   ]        [ 0    1]
+  //
+  //     [0  0  0]              [1  0]
+  // A = [0  0  v]          B = [0  0]
+  //     [0  0  0]              [0  1]
   Matrixd<3, 3> A = Matrixd<3, 3>::Zero();
   Matrixd<3, 2> B{{1.0, 0.0}, {0.0, 0.0}, {0.0, 1.0}};
   Matrixd<3, 3> Q = frc::MakeCostMatrix(Qelems);

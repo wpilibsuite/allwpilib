@@ -8,13 +8,14 @@
 #include <units/velocity.h>
 
 ReplaceMeProfiledPIDSubsystem::ReplaceMeProfiledPIDSubsystem()
-    : ProfiledPIDSubsystem(
-          // The ProfiledPIDController used by the subsystem
-          frc::ProfiledPIDController<units::meters>(
-              // The PID gains
-              0, 0, 0,
-              // The constraints for the motion profiles
-              {0_mps, 0_mps_sq})) {}
+    // The ProfiledPIDController used by the subsystem
+    : ProfiledPIDSubsystem{frc::ProfiledPIDController<units::meters>{
+          // The PID gains
+          0,
+          0,
+          0,
+          // The constraints for the motion profiles
+          {0_mps, 0_mps_sq}}} {}
 
 void ReplaceMeProfiledPIDSubsystem::UseOutput(
     double output, frc::TrapezoidProfile<units::meters>::State setpoint) {

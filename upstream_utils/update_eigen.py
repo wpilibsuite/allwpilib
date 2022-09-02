@@ -5,10 +5,11 @@ import re
 import shutil
 
 from upstream_utils import (
-    setup_upstream_repo,
+    get_repo_root,
+    clone_repo,
     comment_out_invalid_includes,
     walk_cwd_and_copy_if,
-    am_patches,
+    git_am,
 )
 
 
@@ -56,10 +57,16 @@ def eigen_inclusions(dp, f):
         "Core",
         "Eigenvalues",
         "Householder",
+        "IterativeLinearSolvers",
         "Jacobi",
         "LU",
+        "OrderingMethods",
         "QR",
         "SVD",
+        "SparseCholesky",
+        "SparseCore",
+        "SparseLU",
+        "SparseQR",
         "StlSupport",
         "misc",
         "plugins",
@@ -96,12 +103,14 @@ def unsupported_inclusions(dp, f):
 
 
 def main():
-    root, repo = setup_upstream_repo("https://gitlab.com/libeigen/eigen.git", "3.4.0")
-    wpimath = os.path.join(root, "wpimath")
+    upstream_root = clone_repo("https://gitlab.com/libeigen/eigen.git", "3.4.0")
+    wpilib_root = get_repo_root()
+    wpimath = os.path.join(wpilib_root, "wpimath")
 
-    # Apply patches to original git repo
-    prefix = os.path.join(root, "upstream_utils/eigen_patches")
-    am_patches(repo, [os.path.join(prefix, "0001-Disable-warnings.patch")])
+    # Apply patches to upstream Git repo
+    os.chdir(upstream_root)
+    for f in ["0001-Disable-warnings.patch"]:
+        git_am(os.path.join(wpilib_root, "upstream_utils/eigen_patches", f))
 
     # Delete old install
     for d in [

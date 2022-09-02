@@ -4,6 +4,8 @@
 
 #include "wpinet/MulticastServiceAnnouncer.h"
 
+#include <arpa/inet.h>
+
 #include <wpi/SmallString.h>
 
 #include "dns_sd.h"
@@ -21,6 +23,14 @@ struct MulticastServiceAnnouncer::Impl {
 
   ~Impl() noexcept { TXTRecordDeallocate(&txtRecord); }
 };
+
+MulticastServiceAnnouncer::MulticastServiceAnnouncer(
+    std::string_view serviceName, std::string_view serviceType, int port) {
+  pImpl = std::make_unique<Impl>();
+  pImpl->serviceName = serviceName;
+  pImpl->serviceType = serviceType;
+  pImpl->port = port;
+}
 
 MulticastServiceAnnouncer::MulticastServiceAnnouncer(
     std::string_view serviceName, std::string_view serviceType, int port,

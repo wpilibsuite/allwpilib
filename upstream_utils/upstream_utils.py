@@ -6,16 +6,18 @@ import tempfile
 
 
 def clone_repo(url, treeish, shallow=True):
-    """Clones a git repo at the given URL into a temp folder and checks out the
-    given tree-ish (either branch or tag).
-
-    The current working directory will be set to the repository folder.
+    """Clones a Git repo at the given URL into a temp folder, checks out the
+    given tree-ish (either branch or tag), then returns the repo root.
 
     Keyword argument:
-    url -- The URL of the git repo
+    url -- The URL of the Git repo
     treeish -- The tree-ish to check out (branch or tag)
     shallow -- Whether to do a shallow clone
+
+    Returns:
+    root -- root directory of the cloned Git repository
     """
+    cwd = os.getcwd()
     os.chdir(tempfile.gettempdir())
 
     repo = os.path.basename(url)
@@ -49,6 +51,9 @@ def clone_repo(url, treeish, shallow=True):
     else:
         subprocess.run(["git", "checkout", treeish])
 
+    os.chdir(cwd)
+    return dest
+
 
 def get_repo_root():
     """Returns the Git repository root as an absolute path.
@@ -61,27 +66,6 @@ def get_repo_root():
             return current_dir
         current_dir = os.path.dirname(current_dir)
     return ""
-
-
-def setup_upstream_repo(url, treeish, shallow=True):
-    """Clones the given upstream repository, then returns the root of the
-    destination Git repository as well as the cloned upstream Git repository.
-
-    The current working directory will be set to the cloned upstream repository
-    folder.
-
-    Keyword arguments:
-    url -- The URL of the git repo
-    treeish -- The tree-ish to check out (branch or tag)
-    shallow -- Whether to do a shallow clone
-
-    Returns:
-    root -- root directory of destination Git repository
-    repo -- root directory of cloned upstream Git repository
-    """
-    root = get_repo_root()
-    clone_repo(url, treeish, shallow=shallow)
-    return root, os.getcwd()
 
 
 def walk_if(top, pred):
@@ -196,32 +180,18 @@ def comment_out_invalid_includes(filename, include_roots):
             f.write(new_contents)
 
 
-def apply_patches(root, patches):
-    """Apply list of patches to the destination Git repository using "git
-    apply".
+def git_am(patch, use_threeway=False, ignore_whitespace=False):
+    """Apply patch to a Git repository in the current directory using "git am".
 
     Keyword arguments:
-    root -- the root directory of the destination Git repository
-    patches -- list of patch files relative to the root
+    patch -- patch file relative to the root
+    use_threeway -- use a three-way merge when applying the patch
+    ignore_whitespace -- ignore whitespace in the patch file
     """
-    os.chdir(root)
-    for patch in patches:
-        subprocess.check_output(["git", "apply", patch])
-
-
-def am_patches(root, patches, use_threeway=False, ignore_whitespce=False):
-    """Apply list of patches to the destination Git repository using "git am".
-
-    Keyword arguments:
-    root -- the root directory of the destination Git repository
-    patches -- list of patch files relative to the root
-    """
-    os.chdir(root)
     args = ["git", "am"]
     if use_threeway:
         args.append("-3")
-    if ignore_whitespce:
+    if ignore_whitespace:
         args.append("--ignore-whitespace")
 
-    for patch in patches:
-        subprocess.check_output(args + [patch])
+    subprocess.check_output(args + [patch])

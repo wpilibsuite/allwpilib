@@ -64,7 +64,7 @@ public class RepeatCommand extends CommandBase {
   }
 
   @Override
-  public RepeatCommand repeat() {
+  public RepeatCommand repeatedly() {
     return this;
   }
 }
