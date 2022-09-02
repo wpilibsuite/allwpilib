@@ -8,7 +8,7 @@ namespace wpi {
 namespace detail {
 
 PromiseFactoryBase::~PromiseFactoryBase() {
-  m_active = false;
+   m_active = false;
   m_resultCv.notify_all();  // wake up any waiters
 }
 
