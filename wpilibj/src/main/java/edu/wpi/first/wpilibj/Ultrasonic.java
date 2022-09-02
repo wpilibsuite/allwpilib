@@ -28,8 +28,8 @@ import java.util.List;
  * flight).
  */
 public class Ultrasonic implements Sendable, AutoCloseable {
-  // Time (usec) for the ping trigger pulse.
-  private static final int kPingTime = 10;
+  // Time (sec) for the ping trigger pulse.
+  private static final double kPingTime = 10 * 1e-6;
   private static final double kSpeedOfSoundInchesPerSec = 1130.0 * 12.0;
   // ultrasonic sensor list
   private static final List<Ultrasonic> m_sensors = new ArrayList<>();
