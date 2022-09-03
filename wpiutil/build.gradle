@@ -70,6 +70,16 @@ ext {
                     srcDirs 'src/main/native/thirdparty/tcb_span/include'
                 }
             }
+            memoryCpp(CppSourceSet) {
+                source {
+                    srcDirs 'src/main/native/thirdparty/memory/src', 'src/main/native/thirdparty/memory/include/wpi/memory'
+                    include '**/*.cpp'
+                }
+                exportedHeaders {
+                    srcDirs 'src/main/native/thirdparty/memory/include'
+                    include '**/*.hpp'
+                }
+            }
             resourcesCpp(CppSourceSet) {
                 source {
                     srcDirs "$buildDir/generated/main/cpp", "$rootDir/shared/singlelib"
@@ -190,6 +200,9 @@ cppHeadersZip {
     from('src/main/native/thirdparty/tcb_span/include') {
         into '/'
     }
+    from('src/main/native/thirdparty/memory/include') {
+        into '/'
+    }
 }
 
 cppSourcesZip {
@@ -199,6 +212,9 @@ cppSourcesZip {
     from('src/main/native/thirdparty/json/cpp') {
         into '/'
     }
+    from('src/main/native/thirdparty/memory/src') {
+        into '/'
+    }
 }
 
 model {
@@ -206,7 +222,7 @@ model {
         all {
             it.sources.each {
                 it.exportedHeaders {
-                    srcDirs 'src/main/native/include', 'src/main/native/thirdparty/fmtlib/include', 'src/main/native/thirdparty/llvm/include', 'src/main/native/thirdparty/sigslot/include', 'src/main/native/thirdparty/json/include', 'src/main/native/thirdparty/tcb_span/include', 'src/main/native/thirdparty/ghc/include'
+                    srcDirs 'src/main/native/include', 'src/main/native/thirdparty/fmtlib/include', 'src/main/native/thirdparty/llvm/include', 'src/main/native/thirdparty/sigslot/include', 'src/main/native/thirdparty/json/include', 'src/main/native/thirdparty/tcb_span/include', 'src/main/native/thirdparty/ghc/include', 'src/main/native/thirdparty/memory/include'
                 }
             }
         }
