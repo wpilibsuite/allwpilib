@@ -6,7 +6,7 @@
 
 #include <optional>
 
-#include <wpi/json_serializer.h>
+#include <wpi/json.h>
 #include <wpi/mpack.h>
 #include <wpi/raw_ostream.h>
 
@@ -22,95 +22,58 @@ using namespace mpack;
 void nt::net::WireEncodePublish(wpi::raw_ostream& os, int64_t pubuid,
                                 std::string_view name, std::string_view typeStr,
                                 const wpi::json& properties) {
-  wpi::json::serializer s{os, ' ', 0};
-  os << "{\"method\":\"" << PublishMsg::kMethodStr << "\",\"params\":{";
-  os << "\"name\":\"";
-  s.dump_escaped(name, false);
-  os << "\",\"properties\":";
-  s.dump(properties, false, false, 0, 0);
-  os << ",\"pubuid\":";
-  s.dump_integer(pubuid);
-  os << ",\"type\":\"";
-  s.dump_escaped(typeStr, false);
-  os << "\"}}";
+  wpi::json json = {{"method", PublishMsg::kMethodStr},
+                    {"params",
+                     {{"name", name},
+                      {"properties", properties},
+                      {"pubuid", pubuid},
+                      {"type", typeStr}}}};
+  os << json.dump();
 }
 
 void nt::net::WireEncodeUnpublish(wpi::raw_ostream& os, int64_t pubuid) {
-  wpi::json::serializer s{os, ' ', 0};
-  os << "{\"method\":\"" << UnpublishMsg::kMethodStr << "\",\"params\":{";
-  os << "\"pubuid\":";
-  s.dump_integer(pubuid);
-  os << "}}";
+  wpi::json json = {{"method", UnpublishMsg::kMethodStr},
+                    {"params", {{"pubuid", pubuid}}}};
+  os << json.dump();
 }
 
 void nt::net::WireEncodeSetProperties(wpi::raw_ostream& os,
                                       std::string_view name,
                                       const wpi::json& update) {
-  wpi::json::serializer s{os, ' ', 0};
-  os << "{\"method\":\"" << SetPropertiesMsg::kMethodStr << "\",\"params\":{";
-  os << "\"name\":\"";
-  s.dump_escaped(name, false);
-  os << "\",\"update\":";
-  s.dump(update, false, false, 0, 0);
-  os << "}}";
-}
-
-template <typename T>
-static void EncodePrefixes(wpi::raw_ostream& os, std::span<const T> topicNames,
-                           wpi::json::serializer& s) {
-  os << '[';
-  bool first = true;
-  for (auto&& name : topicNames) {
-    if (first) {
-      first = false;
-    } else {
-      os << ',';
-    }
-    os << '"';
-    s.dump_escaped(name, false);
-    os << '"';
-  }
-  os << ']';
+  wpi::json json = {{"method", SetPropertiesMsg::kMethodStr},
+                    {"params", {{"name", name}, {"update", update}}}};
+  os << json.dump();
 }
 
 template <typename T>
 static void WireEncodeSubscribeImpl(wpi::raw_ostream& os, int64_t subuid,
                                     std::span<const T> topicNames,
                                     const PubSubOptionsImpl& options) {
-  wpi::json::serializer s{os, ' ', 0};
-  os << "{\"method\":\"" << SubscribeMsg::kMethodStr << "\",\"params\":{";
-  os << "\"options\":{";
-  bool first = true;
+  wpi::json json;
+  json["method"] = SubscribeMsg::kMethodStr;
+  bool hasOptions = false;
   if (options.sendAll) {
-    os << "\"all\":true";
-    first = false;
+    json["params"]["options"]["all"] = true;
+    hasOptions = true;
   }
   if (options.topicsOnly) {
-    if (!first) {
-      os << ',';
-    }
-    os << "\"topicsonly\":true";
-    first = false;
+    json["params"]["options"]["topicsonly"] = true;
+    hasOptions = true;
   }
   if (options.prefixMatch) {
-    if (!first) {
-      os << ',';
-    }
-    os << "\"prefix\":true";
-    first = false;
+    json["params"]["options"]["prefix"] = true;
+    hasOptions = true;
   }
   if (options.periodicMs != PubSubOptionsImpl::kDefaultPeriodicMs) {
-    if (!first) {
-      os << ',';
-    }
-    os << "\"periodic\":";
-    s.dump_float(options.periodicMs / 1000.0);
+    json["params"]["options"]["periodic"] = options.periodicMs / 1000.0;
+    hasOptions = true;
   }
-  os << "},\"topics\":";
-  EncodePrefixes(os, topicNames, s);
-  os << ",\"subuid\":";
-  s.dump_integer(subuid);
-  os << "}}";
+  if (!hasOptions) {
+    json["params"]["options"] = wpi::json::object();
+  }
+  json["params"]["topics"] = topicNames;
+  json["params"]["subuid"] = subuid;
+  os << json.dump();
 }
 
 void nt::net::WireEncodeSubscribe(wpi::raw_ostream& os, int64_t subuid,
@@ -126,11 +89,9 @@ void nt::net::WireEncodeSubscribe(wpi::raw_ostream& os, int64_t subuid,
 }
 
 void nt::net::WireEncodeUnsubscribe(wpi::raw_ostream& os, int64_t subHandle) {
-  wpi::json::serializer s{os, ' ', 0};
-  os << "{\"method\":\"" << UnsubscribeMsg::kMethodStr << "\",\"params\":{";
-  os << "\"subuid\":";
-  s.dump_integer(subHandle);
-  os << "}}";
+  wpi::json json = {{"method", UnsubscribeMsg::kMethodStr},
+                    {"params", {{"subuid", subHandle}}}};
+  os << json.dump();
 }
 
 bool nt::net::WireEncodeText(wpi::raw_ostream& os, const ClientMessage& msg) {
@@ -155,48 +116,36 @@ void nt::net::WireEncodeAnnounce(wpi::raw_ostream& os, std::string_view name,
                                  int64_t id, std::string_view typeStr,
                                  const wpi::json& properties,
                                  std::optional<int64_t> pubHandle) {
-  wpi::json::serializer s{os, ' ', 0};
-  os << "{\"method\":\"" << AnnounceMsg::kMethodStr << "\",\"params\":{";
-  os << "\"id\":";
-  s.dump_integer(id);
-  os << ",\"name\":\"";
-  s.dump_escaped(name, false);
-  os << "\",\"properties\":";
-  s.dump(properties, false, false, 0, 0);
+  wpi::json json;
+  json["method"] = AnnounceMsg::kMethodStr;
+  json["params"]["id"] = id;
+  json["params"]["name"] = name;
+  json["params"]["properties"] = properties;
   if (pubHandle) {
-    os << ",\"pubuid\":";
-    s.dump_integer(*pubHandle);
+    json["params"]["pubuid"] = *pubHandle;
   }
-  os << ",\"type\":\"";
-  s.dump_escaped(typeStr, false);
-  os << "\"}}";
+  json["params"]["type"] = typeStr;
+  os << json.dump();
 }
 
 void nt::net::WireEncodeUnannounce(wpi::raw_ostream& os, std::string_view name,
                                    int64_t id) {
-  wpi::json::serializer s{os, ' ', 0};
-  os << "{\"method\":\"" << UnannounceMsg::kMethodStr << "\",\"params\":{";
-  os << "\"id\":";
-  s.dump_integer(id);
-  os << ",\"name\":\"";
-  s.dump_escaped(name, false);
-  os << "\"}}";
+  wpi::json json = {{"method", UnannounceMsg::kMethodStr},
+                    {"params", {{"id", id}, {"name", name}}}};
+  os << json.dump();
 }
 
 void nt::net::WireEncodePropertiesUpdate(wpi::raw_ostream& os,
                                          std::string_view name,
                                          const wpi::json& update, bool ack) {
-  wpi::json::serializer s{os, ' ', 0};
-  os << "{\"method\":\"" << PropertiesUpdateMsg::kMethodStr
-     << "\",\"params\":{";
-  os << "\"name\":\"";
-  s.dump_escaped(name, false);
-  os << "\",\"update\":";
-  s.dump(update, false, false, 0, 0);
+  wpi::json json;
+  json["method"] = PropertiesUpdateMsg::kMethodStr;
+  json["params"]["name"] = name;
+  json["params"]["update"] = update;
   if (ack) {
-    os << ",\"ack\":true";
+    json["params"]["ack"] = true;
   }
-  os << "}}";
+  os << json.dump();
 }
 
 bool nt::net::WireEncodeText(wpi::raw_ostream& os, const ServerMessage& msg) {

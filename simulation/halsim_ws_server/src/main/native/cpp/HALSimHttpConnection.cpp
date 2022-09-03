@@ -92,7 +92,7 @@ void HALSimHttpConnection::OnSimValueChanged(const wpi::json& msg) {
                            std::lock_guard lock(m_buffers_mutex);
                            return m_buffers.Allocate();
                          }};
-  os << msg;
+  os << msg.dump();
 
   // call the websocket send function on the uv loop
   m_server->GetExec().Send([self = shared_from_this(), sendBufs] {

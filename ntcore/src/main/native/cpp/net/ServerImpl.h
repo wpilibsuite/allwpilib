@@ -417,8 +417,6 @@ class ServerImpl final {
   // client or topic)
   TopicData* m_metaClients;
 
-  void DumpPersistent(wpi::raw_ostream& os);
-
   // helper functions
   TopicData* CreateTopic(ClientData* client, std::string_view name,
                          std::string_view typeStr, const wpi::json& properties,

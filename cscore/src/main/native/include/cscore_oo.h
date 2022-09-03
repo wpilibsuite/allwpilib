@@ -13,6 +13,8 @@
 #include <utility>
 #include <vector>
 
+#include <wpi/json_fwd.h>
+
 #include "cscore_cpp.h"
 
 namespace cs {

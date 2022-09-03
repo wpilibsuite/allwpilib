@@ -145,7 +145,7 @@ bool SinkImpl::SetConfigJson(const wpi::json& config, CS_Status* status) {
 std::string SinkImpl::GetConfigJson(CS_Status* status) {
   std::string rv;
   wpi::raw_string_ostream os(rv);
-  GetConfigJsonObject(status).dump(os, 4);
+  os << GetConfigJsonObject(status).dump(4);
   os.flush();
   return rv;
 }

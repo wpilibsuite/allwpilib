@@ -134,7 +134,7 @@ void WebServerClientTest::SendMessage(const wpi::json& msg) {
                            std::lock_guard lock(m_buffers_mutex);
                            return m_buffers->Allocate();
                          }};
-  os << msg;
+  os << msg.dump();
 
   // Call the websocket send function on the uv loop
   m_exec->Call([this, sendBufs]() mutable {

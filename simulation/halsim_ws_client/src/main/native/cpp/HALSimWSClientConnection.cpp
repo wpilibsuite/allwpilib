@@ -91,7 +91,7 @@ void HALSimWSClientConnection::OnSimValueChanged(const wpi::json& msg) {
                            return m_buffers.Allocate();
                          }};
 
-  os << msg;
+  os << msg.dump();
 
   // Call the websocket send function on the uv loop
   m_client->GetExec().Send([self = shared_from_this(), sendBufs] {

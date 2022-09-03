@@ -11,13 +11,10 @@
 
 #include <units/length.h>
 #include <wpi/SymbolExports.h>
+#include <wpi/json_fwd.h>
 
 #include "frc/apriltag/AprilTag.h"
 #include "frc/geometry/Pose3d.h"
-
-namespace wpi {
-class json;
-}  // namespace wpi
 
 namespace frc {
 /**

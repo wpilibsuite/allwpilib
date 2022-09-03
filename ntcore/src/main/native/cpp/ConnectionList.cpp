@@ -5,8 +5,7 @@
 #include "ConnectionList.h"
 
 #include <wpi/SmallVector.h>
-#include <wpi/json_serializer.h>
-#include <wpi/raw_ostream.h>
+#include <wpi/json.h>
 
 #include "IListenerStorage.h"
 #include "ntcore_c.h"
@@ -15,21 +14,13 @@
 using namespace nt;
 
 static std::string ConnInfoToJson(bool connected, const ConnectionInfo& info) {
-  std::string str;
-  wpi::raw_string_ostream os{str};
-  wpi::json::serializer s{os, ' ', 0};
-  os << "{\"connected\":" << (connected ? "true" : "false");
-  os << ",\"remote_id\":\"";
-  s.dump_escaped(info.remote_id, false);
-  os << "\",\"remote_ip\":\"";
-  s.dump_escaped(info.remote_ip, false);
-  os << "\",\"remote_port\":";
-  s.dump_integer(static_cast<uint64_t>(info.remote_port));
-  os << ",\"protocol_version\":";
-  s.dump_integer(static_cast<uint64_t>(info.protocol_version));
-  os << "}";
-  os.flush();
-  return str;
+  wpi::json json = {
+      {"connected", connected ? "true" : "false"},
+      {"remote_id", info.remote_id},
+      {"remote_ip", info.remote_ip},
+      {"remote_port", static_cast<uint64_t>(info.remote_port)},
+      {"protocol_version", static_cast<uint64_t>(info.protocol_version)}};
+  return json.dump();
 }
 
 ConnectionList::ConnectionList(int inst, IListenerStorage& listenerStorage)

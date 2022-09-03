@@ -17,7 +17,7 @@
 #include <wpi/MessagePack.h>
 #include <wpi/SmallVector.h>
 #include <wpi/StringExtras.h>
-#include <wpi/json_serializer.h>
+#include <wpi/json.h>
 #include <wpi/raw_ostream.h>
 #include <wpi/timestamp.h>
 
@@ -1350,32 +1350,6 @@ static void DumpValue(wpi::raw_ostream& os, const Value& value,
   }
 }
 
-void ServerImpl::DumpPersistent(wpi::raw_ostream& os) {
-  wpi::json::serializer s{os, ' ', 16};
-  os << "[\n";
-  bool first = true;
-  for (const auto& topic : m_topics) {
-    if (!topic->persistent || !topic->lastValue) {
-      continue;
-    }
-    if (first) {
-      first = false;
-    } else {
-      os << ",\n";
-    }
-    os << "  {\n    \"name\": \"";
-    s.dump_escaped(topic->name, false);
-    os << "\",\n    \"type\": \"";
-    s.dump_escaped(topic->typeStr, false);
-    os << "\",\n    \"value\": ";
-    DumpValue(os, topic->lastValue, s);
-    os << ",\n    \"properties\": ";
-    s.dump(topic->properties, true, false, 2, 4);
-    os << "\n  }";
-  }
-  os << "\n]\n";
-}
-
 static std::string* ObjGetString(wpi::json::object_t& obj, std::string_view key,
                                  std::string* error) {
   auto it = obj.find(key);
@@ -1936,9 +1910,30 @@ void ServerImpl::ConnectionsChanged(const std::vector<ConnectionInfo>& conns) {
 }
 
 std::string ServerImpl::DumpPersistent() {
-  std::string rv;
-  wpi::raw_string_ostream os{rv};
-  DumpPersistent(os);
-  os.flush();
-  return rv;
+  std::string str;
+  wpi::raw_string_ostream os{str};
+  wpi::json::serializer s{wpi::detail::output_adapter<char>{str}, ' '};
+  os << "[\n";
+  bool first = true;
+  for (const auto& topic : m_topics) {
+    if (!topic->persistent || !topic->lastValue) {
+      continue;
+    }
+    if (first) {
+      first = false;
+    } else {
+      os << ",\n";
+    }
+    os << "  {\n    \"name\": \"";
+    s.dump_escaped(topic->name, false);
+    os << "\",\n    \"type\": \"";
+    s.dump_escaped(topic->typeStr, false);
+    os << "\",\n    \"value\": ";
+    DumpValue(os, topic->lastValue, s);
+    os << ",\n    \"properties\": ";
+    s.dump(topic->properties, true, false, 2, 4);
+    os << "\n  }";
+  }
+  os << "\n]\n";
+  return str;
 }

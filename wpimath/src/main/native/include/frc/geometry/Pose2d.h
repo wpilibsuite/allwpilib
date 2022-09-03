@@ -8,14 +8,11 @@
 #include <span>
 
 #include <wpi/SymbolExports.h>
+#include <wpi/json_fwd.h>
 
 #include "frc/geometry/Transform2d.h"
 #include "frc/geometry/Translation2d.h"
 #include "frc/geometry/Twist2d.h"
-
-namespace wpi {
-class json;
-}  // namespace wpi
 
 namespace frc {
 

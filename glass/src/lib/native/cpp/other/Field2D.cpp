@@ -448,7 +448,7 @@ bool FieldInfo::LoadJson(std::span<const char> is, std::string_view filename) {
   // parse file
   wpi::json j;
   try {
-    j = wpi::json::parse({is.data(), is.size()});
+    j = wpi::json::parse(is);
   } catch (const wpi::json::parse_error& e) {
     fmt::print(stderr, "GUI: JSON: could not parse: {}\n", e.what());
     return false;

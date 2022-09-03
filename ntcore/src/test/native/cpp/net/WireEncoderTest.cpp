@@ -70,7 +70,7 @@ TEST_F(WireEncoderTextTest, Subscribe) {
                            PubSubOptions{});
   ASSERT_EQ(os.str(),
             "{\"method\":\"subscribe\",\"params\":{"
-            "\"options\":{},\"topics\":[\"a\",\"b\"],\"subuid\":5}}");
+            "\"options\":{},\"subuid\":5,\"topics\":[\"a\",\"b\"]}}");
 }
 
 TEST_F(WireEncoderTextTest, SubscribeSendAll) {
@@ -78,10 +78,10 @@ TEST_F(WireEncoderTextTest, SubscribeSendAll) {
   options.sendAll = true;
   net::WireEncodeSubscribe(os, 5, std::span<const std::string_view>{{"a", "b"}},
                            options);
-  ASSERT_EQ(os.str(),
-            "{\"method\":\"subscribe\",\"params\":{"
-            "\"options\":{\"all\":true},\"topics\":[\"a\",\"b\"],"
-            "\"subuid\":5}}");
+  ASSERT_EQ(
+      os.str(),
+      "{\"method\":\"subscribe\",\"params\":{"
+      "\"options\":{\"all\":true},\"subuid\":5,\"topics\":[\"a\",\"b\"]}}");
 }
 
 TEST_F(WireEncoderTextTest, SubscribePeriodic) {
@@ -89,10 +89,10 @@ TEST_F(WireEncoderTextTest, SubscribePeriodic) {
   options.periodicMs = 500u;
   net::WireEncodeSubscribe(os, 5, std::span<const std::string_view>{{"a", "b"}},
                            options);
-  ASSERT_EQ(os.str(),
-            "{\"method\":\"subscribe\",\"params\":{"
-            "\"options\":{\"periodic\":0.5},\"topics\":[\"a\",\"b\"],"
-            "\"subuid\":5}}");
+  ASSERT_EQ(
+      os.str(),
+      "{\"method\":\"subscribe\",\"params\":{"
+      "\"options\":{\"periodic\":0.5},\"subuid\":5,\"topics\":[\"a\",\"b\"]}}");
 }
 
 TEST_F(WireEncoderTextTest, SubscribeAllOptions) {
@@ -104,7 +104,7 @@ TEST_F(WireEncoderTextTest, SubscribeAllOptions) {
   ASSERT_EQ(os.str(),
             "{\"method\":\"subscribe\",\"params\":{"
             "\"options\":{\"all\":true,\"periodic\":0.5},"
-            "\"topics\":[\"a\",\"b\"],\"subuid\":5}}");
+            "\"subuid\":5,\"topics\":[\"a\",\"b\"]}}");
 }
 
 TEST_F(WireEncoderTextTest, Unsubscribe) {
@@ -172,7 +172,7 @@ TEST_F(WireEncoderTextTest, MessageSubscribe) {
   ASSERT_TRUE(net::WireEncodeText(os, msg));
   ASSERT_EQ(os.str(),
             "{\"method\":\"subscribe\",\"params\":{"
-            "\"options\":{},\"topics\":[\"a\",\"b\"],\"subuid\":402653189}}");
+            "\"options\":{},\"subuid\":402653189,\"topics\":[\"a\",\"b\"]}}");
 }
 
 TEST_F(WireEncoderTextTest, MessageUnsubscribe) {
