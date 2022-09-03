@@ -40,7 +40,7 @@ ext {
             }
             llvmCpp(CppSourceSet) {
                 source {
-                    srcDirs 'src/main/native/thirdparty/llvm'
+                    srcDirs 'src/main/native/thirdparty/llvm/cpp'
                     include '**/*.cpp'
                 }
                 exportedHeaders {
@@ -206,13 +206,22 @@ cppHeadersZip {
 }
 
 cppSourcesZip {
-    from('src/main/native/thirdparty/llvm/cpp') {
+    from('src/main/native/thirdparty/fmtlib/src') {
         into '/'
     }
     from('src/main/native/thirdparty/json/cpp') {
         into '/'
     }
+    from('src/main/native/thirdparty/llvm/cpp') {
+        into '/'
+    }
     from('src/main/native/thirdparty/memory/src') {
+        into '/'
+    }
+    from('src/main/native/thirdparty/mpack/src') {
+        into '/'
+    }
+    from('src/main/native/thirdparty/sigslot/src') {
         into '/'
     }
 }
