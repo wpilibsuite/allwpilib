@@ -4,11 +4,11 @@ import os
 import shutil
 
 from upstream_utils import (
-    setup_upstream_repo,
+    get_repo_root,
+    clone_repo,
     comment_out_invalid_includes,
     walk_if,
     copy_to,
-    am_patches,
 )
 
 
@@ -59,12 +59,12 @@ def run_global_replacements(memory_files):
 
 
 def main():
-    root, repo = setup_upstream_repo(
+    upstream_root = clone_repo(
         "https://github.com/foonathan/memory",
         "5e523a99fdb7651979f87892691f9a43642d9422",
-        shallow=False,
     )
-    wpiutil = os.path.join(root, "wpiutil")
+    wpilib_root = get_repo_root()
+    wpiutil = os.path.join(wpilib_root, "wpiutil")
 
     # Delete old install
     for d in [
@@ -74,6 +74,7 @@ def main():
         shutil.rmtree(os.path.join(wpiutil, d), ignore_errors=True)
 
     # Copy sources
+    os.chdir(upstream_root)
     src_files = walk_if("src", lambda dp, f: f.endswith(".cpp") or f.endswith(".hpp"))
     src_files = copy_to(
         src_files, os.path.join(wpiutil, "src/main/native/thirdparty/memory")
@@ -82,7 +83,7 @@ def main():
     run_source_replacements(src_files)
 
     # Copy headers
-    os.chdir(os.path.join("include", "foonathan"))
+    os.chdir(os.path.join(upstream_root, "include", "foonathan"))
     include_files = walk_if(".", lambda dp, f: f.endswith(".hpp"))
     include_files = copy_to(
         include_files,
@@ -94,7 +95,7 @@ def main():
 
     # Copy config_impl.hpp
     shutil.copyfile(
-        os.path.join(root, "upstream_utils/memory_files/config_impl.hpp"),
+        os.path.join(wpilib_root, "upstream_utils/memory_files/config_impl.hpp"),
         os.path.join(
             wpiutil,
             "src/main/native/thirdparty/memory/include/wpi/memory/config_impl.hpp",
