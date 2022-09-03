@@ -8,10 +8,6 @@
 
 #pragma once
 
-#ifndef WPI_MEMORY_IMPL_IN_CONFIG_HPP
-#error "do not include this file directly, use config.hpp"
-#endif
-
 #include <cstddef>
 
 //=== options ===//
