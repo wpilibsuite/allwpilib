@@ -62,6 +62,7 @@ def main():
     upstream_root = clone_repo(
         "https://github.com/foonathan/memory",
         "5e523a99fdb7651979f87892691f9a43642d9422",
+        shallow=False,
     )
     wpilib_root = get_repo_root()
     wpiutil = os.path.join(wpilib_root, "wpiutil")
