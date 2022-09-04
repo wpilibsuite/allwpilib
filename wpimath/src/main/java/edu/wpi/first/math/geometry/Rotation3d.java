@@ -64,7 +64,7 @@ public class Rotation3d implements Interpolatable<Rotation3d> {
    * @param angleRadians The rotation around the axis in radians.
    */
   public Rotation3d(Vector<N3> axis, double angleRadians) {
-    double norm = axis.normF();
+    double norm = axis.norm();
     if (norm == 0.0) {
       return;
     }
