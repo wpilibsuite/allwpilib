@@ -4,12 +4,15 @@
 
 package edu.wpi.first.math.geometry;
 
+import edu.wpi.first.math.MatBuilder;
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.Nat;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.Vector;
 import edu.wpi.first.math.interpolation.Interpolatable;
 import edu.wpi.first.math.numbers.N3;
 import java.util.Objects;
+import org.ejml.dense.row.factory.DecompositionFactory_DDRM;
 
 /** A rotation in a 3D coordinate. */
 public class Rotation3d implements Interpolatable<Rotation3d> {
@@ -72,6 +75,57 @@ public class Rotation3d implements Interpolatable<Rotation3d> {
     // https://en.wikipedia.org/wiki/Conversion_between_quaternions_and_Euler_angles#Definition
     var v = axis.times(1.0 / norm).times(Math.sin(angleRadians / 2.0));
     m_q = new Quaternion(Math.cos(angleRadians / 2.0), v.get(0, 0), v.get(1, 0), v.get(2, 0));
+  }
+
+  /**
+   * Constructs a Rotation3d that rotates the initial vector onto the final vector.
+   *
+   * <p>This is useful for turning a 3D vector (final) into an orientation relative to a coordinate
+   * system vector (initial).
+   *
+   * @param initial The initial vector.
+   * @param last The final vector.
+   */
+  public Rotation3d(Vector<N3> initial, Vector<N3> last) {
+    double dot = initial.dot(last);
+    double normProduct = initial.norm() * last.norm();
+    double dotNorm = dot / normProduct;
+
+    if (dotNorm > 1.0 - 1E-9) {
+      // If the dot product is 1, the two vectors point in the same direction so
+      // there's no rotation. The default initialization of m_q will work.
+      return;
+    } else if (dotNorm < -1.0 + 1E-9) {
+      // If the dot product is -1, the two vectors point in opposite directions
+      // so a 180 degree rotation is required. Any orthogonal vector can be used
+      // for it. Q in the QR decomposition is an orthonormal basis, so it
+      // contains orthogonal unit vectors.
+      @SuppressWarnings("LocalVariableName")
+      var X =
+          new MatBuilder<>(Nat.N3(), Nat.N1())
+              .fill(initial.get(0, 0), initial.get(1, 0), initial.get(2, 0));
+      final var qr = DecompositionFactory_DDRM.qr(3, 1);
+      qr.decompose(X.getStorage().getMatrix());
+      final var Q = qr.getQ(null, false);
+
+      // w = cos(θ/2) = cos(90°) = 0
+      //
+      // For x, y, and z, we use the second column of Q because the first is
+      // parallel instead of orthogonal. The third column would also work.
+      m_q = new Quaternion(0.0, Q.get(0, 1), Q.get(1, 1), Q.get(2, 1));
+    } else {
+      // initial x last
+      var axis =
+          VecBuilder.fill(
+              initial.get(1, 0) * last.get(2, 0) - last.get(1, 0) * initial.get(2, 0),
+              last.get(0, 0) * initial.get(2, 0) - initial.get(0, 0) * last.get(2, 0),
+              initial.get(0, 0) * last.get(1, 0) - last.get(0, 0) * initial.get(1, 0));
+
+      // https://stackoverflow.com/a/11741520
+      m_q =
+          new Quaternion(normProduct + dot, axis.get(0, 0), axis.get(1, 0), axis.get(2, 0))
+              .normalize();
+    }
   }
 
   /**
