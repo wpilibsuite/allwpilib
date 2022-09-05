@@ -55,10 +55,4 @@ public class PerpetualCommand extends CommandBase {
   public boolean runsWhenDisabled() {
     return m_command.runsWhenDisabled();
   }
-
-  @SuppressWarnings("removal") // Command.perpetually()
-  @Override
-  public PerpetualCommand perpetually() {
-    return this;
-  }
 }

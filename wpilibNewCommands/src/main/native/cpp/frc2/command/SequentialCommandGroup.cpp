@@ -4,8 +4,6 @@
 
 #include "frc2/command/SequentialCommandGroup.h"
 
-#include "frc2/command/InstantCommand.h"
-
 using namespace frc2;
 
 SequentialCommandGroup::SequentialCommandGroup(
@@ -73,34 +71,4 @@ void SequentialCommandGroup::AddCommands(
     m_runWhenDisabled &= command->RunsWhenDisabled();
     m_commands.emplace_back(std::move(command));
   }
-}
-
-SequentialCommandGroup SequentialCommandGroup::BeforeStarting(
-    std::function<void()> toRun, wpi::span<Subsystem* const> requirements) && {
-  // store all the commands
-  std::vector<std::unique_ptr<Command>> tmp;
-  tmp.emplace_back(
-      std::make_unique<InstantCommand>(std::move(toRun), requirements));
-  for (auto&& command : m_commands) {
-    command->SetGrouped(false);
-    tmp.emplace_back(std::move(command));
-  }
-
-  // reset current state
-  m_commands.clear();
-  m_requirements.clear();
-  m_runWhenDisabled = true;
-
-  // add the commands back
-  AddCommands(std::move(tmp));
-  return std::move(*this);
-}
-
-SequentialCommandGroup SequentialCommandGroup::AndThen(
-    std::function<void()> toRun, wpi::span<Subsystem* const> requirements) && {
-  std::vector<std::unique_ptr<Command>> tmp;
-  tmp.emplace_back(
-      std::make_unique<InstantCommand>(std::move(toRun), requirements));
-  AddCommands(std::move(tmp));
-  return std::move(*this);
 }
