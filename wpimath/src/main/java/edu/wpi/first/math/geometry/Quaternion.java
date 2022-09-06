@@ -45,20 +45,17 @@ public class Quaternion {
     final var r2 = other.m_r;
     final var v2 = other.m_v;
 
-    final var v1x = v1.get(0, 0);
-    final var v1y = v1.get(1, 0);
-    final var v1z = v1.get(2, 0);
-
-    final var v2x = v2.get(0, 0);
-    final var v2y = v2.get(1, 0);
-    final var v2z = v2.get(2, 0);
-
+    // v₁ x v₂
     var cross =
-        VecBuilder.fill(v1y * v2z - v2y * v1z, v2x * v1z - v1x * v2z, v1x * v2y - v2x * v1y);
-    double dot = v1x * v2x + v1y * v2y + v1z * v2z;
+        VecBuilder.fill(
+            v1.get(1, 0) * v2.get(2, 0) - v2.get(1, 0) * v1.get(2, 0),
+            v2.get(0, 0) * v1.get(2, 0) - v1.get(0, 0) * v2.get(2, 0),
+            v1.get(0, 0) * v2.get(1, 0) - v2.get(0, 0) * v1.get(1, 0));
 
+    // v = r₁v₂ + r₂v₁ + v₁ x v₂
     final var v = v2.times(r1).plus(v1.times(r2)).plus(cross);
-    return new Quaternion(r1 * r2 - dot, v.get(0, 0), v.get(1, 0), v.get(2, 0));
+
+    return new Quaternion(r1 * r2 - v1.dot(v2), v.get(0, 0), v.get(1, 0), v.get(2, 0));
   }
 
   @Override
@@ -78,20 +75,7 @@ public class Quaternion {
     if (obj instanceof Quaternion) {
       var other = (Quaternion) obj;
 
-      final var r1 = m_r;
-      final var v1 = m_v;
-      final var r2 = other.m_r;
-      final var v2 = other.m_v;
-
-      final var v1x = v1.get(0, 0);
-      final var v1y = v1.get(1, 0);
-      final var v1z = v1.get(2, 0);
-
-      final var v2x = v2.get(0, 0);
-      final var v2y = v2.get(1, 0);
-      final var v2z = v2.get(2, 0);
-
-      return Math.abs(r1 * r2 + v1x * v2x + v1y * v2y + v1z * v2z) > 1.0 - 1E-9;
+      return Math.abs(m_r * other.m_r + m_v.dot(other.m_v)) > 1.0 - 1E-9;
     }
     return false;
   }
@@ -172,7 +156,7 @@ public class Quaternion {
     // Sound State Representation through Encapsulation of Manifolds"
     //
     // https://arxiv.org/pdf/1107.1119.pdf
-    double norm = m_v.normF();
+    double norm = m_v.norm();
 
     if (norm < 1e-9) {
       return m_v.times(2.0 / getW() - 2.0 / 3.0 * norm * norm / (getW() * getW() * getW()));

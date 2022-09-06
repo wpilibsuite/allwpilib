@@ -179,6 +179,11 @@ int main(int argc, char** argv) {
   gui::AddIcon(glass::GetResource_glass_256_png());
   gui::AddIcon(glass::GetResource_glass_512_png());
 
+  gui::AddEarlyExecute(
+      [] { ImGui::DockSpaceOverViewport(ImGui::GetMainViewport()); });
+
+  gui::AddInit([] { ImGui::GetIO().ConfigDockingWithShift = true; });
+
   gPlotProvider = std::make_unique<glass::PlotProvider>(
       glass::GetStorageRoot().GetChild("Plots"));
   gNtProvider = std::make_unique<glass::NetworkTablesProvider>(
@@ -291,7 +296,8 @@ int main(int argc, char** argv) {
     }
   });
 
-  gui::Initialize("Glass - DISCONNECTED", 1024, 768);
+  gui::Initialize("Glass - DISCONNECTED", 1024, 768,
+                  ImGuiConfigFlags_DockingEnable);
   gEnterKey = &glass::GetStorageRoot().GetInt("enterKey", GLFW_KEY_ENTER);
   if (auto win = gui::GetSystemWindow()) {
     gPrevKeyCallback = glfwSetKeyCallback(win, RemapEnterKeyCallback);
