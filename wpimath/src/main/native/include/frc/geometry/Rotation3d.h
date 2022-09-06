@@ -52,6 +52,18 @@ class WPILIB_DLLEXPORT Rotation3d {
   Rotation3d(const Vectord<3>& axis, units::radian_t angle);
 
   /**
+   * Constructs a Rotation3d that rotates the initial vector onto the final
+   * vector.
+   *
+   * This is useful for turning a 3D vector (final) into an orientation relative
+   * to a coordinate system vector (initial).
+   *
+   * @param initial The initial vector.
+   * @param final The final vector.
+   */
+  Rotation3d(const Vectord<3>& initial, const Vectord<3>& final);
+
+  /**
    * Adds two rotations together.
    *
    * @param other The rotation to add.

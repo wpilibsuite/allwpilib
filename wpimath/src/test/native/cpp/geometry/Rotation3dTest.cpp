@@ -12,7 +12,7 @@
 
 using namespace frc;
 
-TEST(Rotation3dTest, Init) {
+TEST(Rotation3dTest, InitAxisAngleAndRollPitchYaw) {
   const Eigen::Vector3d xAxis{1.0, 0.0, 0.0};
   const Rotation3d rot1{xAxis, units::radian_t{wpi::numbers::pi / 3}};
   const Rotation3d rot2{units::radian_t{wpi::numbers::pi / 3}, 0_rad, 0_rad};
@@ -27,6 +27,56 @@ TEST(Rotation3dTest, Init) {
   const Rotation3d rot5{zAxis, units::radian_t{wpi::numbers::pi / 3}};
   const Rotation3d rot6{0_rad, 0_rad, units::radian_t{wpi::numbers::pi / 3}};
   EXPECT_EQ(rot5, rot6);
+}
+
+TEST(Rotation3dTest, InitTwoVector) {
+  const Eigen::Vector3d xAxis{1.0, 0.0, 0.0};
+  const Eigen::Vector3d yAxis{0.0, 1.0, 0.0};
+  const Eigen::Vector3d zAxis{0.0, 0.0, 1.0};
+
+  // 90 degree CW rotation around y-axis
+  const Rotation3d rot1{xAxis, zAxis};
+  const Rotation3d expected1{yAxis, units::radian_t{-wpi::numbers::pi / 2.0}};
+  EXPECT_EQ(expected1, rot1);
+
+  // 45 degree CCW rotation around z-axis
+  const Rotation3d rot2{xAxis, Eigen::Vector3d{1.0, 1.0, 0.0}};
+  const Rotation3d expected2{zAxis, units::radian_t{wpi::numbers::pi / 4.0}};
+  EXPECT_EQ(expected2, rot2);
+
+  // 0 degree rotation of x-axes
+  const Rotation3d rot3{xAxis, xAxis};
+  EXPECT_EQ(Rotation3d{}, rot3);
+
+  // 0 degree rotation of y-axes
+  const Rotation3d rot4{yAxis, yAxis};
+  EXPECT_EQ(Rotation3d{}, rot4);
+
+  // 0 degree rotation of z-axes
+  const Rotation3d rot5{zAxis, zAxis};
+  EXPECT_EQ(Rotation3d{}, rot5);
+
+  // 180 degree rotation tests. For 180 degree rotations, any quaternion with an
+  // orthogonal rotation axis is acceptable. The rotation axis and initial
+  // vector are orthogonal if their dot product is zero.
+
+  // 180 degree rotation of x-axes
+  const Rotation3d rot6{xAxis, -xAxis};
+  const auto q6 = rot6.GetQuaternion();
+  EXPECT_EQ(0.0, q6.W());
+  EXPECT_EQ(0.0, q6.X() * xAxis(0) + q6.Y() * xAxis(1) + q6.Z() * xAxis(2));
+
+  // 180 degree rotation of y-axes
+  const Rotation3d rot7{yAxis, -yAxis};
+  const auto q7 = rot7.GetQuaternion();
+  EXPECT_EQ(0.0, q7.W());
+  EXPECT_EQ(0.0, q7.X() * yAxis(0) + q7.Y() * yAxis(1) + q7.Z() * yAxis(2));
+
+  // 180 degree rotation of z-axes
+  const Rotation3d rot8{zAxis, -zAxis};
+  const auto q8 = rot8.GetQuaternion();
+  EXPECT_EQ(0.0, q8.W());
+  EXPECT_EQ(0.0, q8.X() * zAxis(0) + q8.Y() * zAxis(1) + q8.Z() * zAxis(2));
 }
 
 TEST(Rotation3dTest, RadiansToDegrees) {

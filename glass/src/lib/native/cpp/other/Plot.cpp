@@ -149,7 +149,6 @@ class Plot {
   bool& m_legendHorizontal;
   int& m_legendLocation;
   bool& m_crosshairs;
-  bool& m_antialiased;
   bool& m_mousePosition;
   bool& m_yAxis2;
   bool& m_yAxis3;
@@ -327,7 +326,7 @@ PlotSeries::Action PlotSeries::EmitPlot(PlotView& view, double now, size_t i,
     int offset;
   };
   GetterData getterData = {now, GetZeroTime() * 1.0e-6, m_data, size, offset};
-  auto getter = [](void* data, int idx) {
+  auto getter = [](int idx, void* data) {
     auto d = static_cast<GetterData*>(data);
     if (idx == d->size) {
       return ImPlotPoint{
@@ -487,7 +486,6 @@ Plot::Plot(Storage& storage)
       m_legendLocation{
           storage.GetInt("legendLocation", ImPlotLocation_NorthWest)},
       m_crosshairs{storage.GetBool("crosshairs", false)},
-      m_antialiased{storage.GetBool("antialiased", false)},
       m_mousePosition{storage.GetBool("mousePosition", true)},
       m_yAxis2{storage.GetBool("yaxis2", false)},
       m_yAxis3{storage.GetBool("yaxis3", false)},
@@ -573,7 +571,6 @@ void Plot::EmitPlot(PlotView& view, double now, bool paused, size_t i) {
                 static_cast<int>(i));
   ImPlotFlags plotFlags = (m_legend ? 0 : ImPlotFlags_NoLegend) |
                           (m_crosshairs ? ImPlotFlags_Crosshairs : 0) |
-                          (m_antialiased ? ImPlotFlags_AntiAliased : 0) |
                           (m_mousePosition ? 0 : ImPlotFlags_NoMouseText);
 
   if (ImPlot::BeginPlot(label, ImVec2(-1, m_height), plotFlags)) {
@@ -608,7 +605,6 @@ void Plot::EmitPlot(PlotView& view, double now, bool paused, size_t i) {
           (m_axis[i].lockMin ? ImPlotAxisFlags_LockMin : 0) |
           (m_axis[i].lockMax ? ImPlotAxisFlags_LockMax : 0) |
           (m_axis[i].autoFit ? ImPlotAxisFlags_AutoFit : 0) |
-          (m_axis[i].logScale ? ImPlotAxisFlags_AutoFit : 0) |
           (m_axis[i].invert ? ImPlotAxisFlags_Invert : 0) |
           (m_axis[i].opposite ? ImPlotAxisFlags_Opposite : 0) |
           (m_axis[i].gridLines ? 0 : ImPlotAxisFlags_NoGridLines) |
@@ -620,6 +616,9 @@ void Plot::EmitPlot(PlotView& view, double now, bool paused, size_t i) {
       ImPlot::SetupAxisLimits(
           ImAxis_Y1 + i, m_axis[i].min, m_axis[i].max,
           m_axis[i].apply ? ImGuiCond_Always : ImGuiCond_Once);
+      ImPlot::SetupAxisScale(ImAxis_Y1 + i, m_axis[i].logScale
+                                                ? ImPlotScale_Log10
+                                                : ImPlotScale_Linear);
       m_axis[i].apply = false;
     }
 
@@ -656,7 +655,6 @@ void Plot::EmitPlot(PlotView& view, double now, bool paused, size_t i) {
     // copy plot settings back to storage
     m_legend = (plot->Flags & ImPlotFlags_NoLegend) == 0;
     m_crosshairs = (plot->Flags & ImPlotFlags_Crosshairs) != 0;
-    m_antialiased = (plot->Flags & ImPlotFlags_AntiAliased) != 0;
     m_legendOutside =
         (plot->Items.Legend.Flags & ImPlotLegendFlags_Outside) != 0;
     m_legendHorizontal =
@@ -671,12 +669,12 @@ void Plot::EmitPlot(PlotView& view, double now, bool paused, size_t i) {
       m_axis[i].lockMin = (flags & ImPlotAxisFlags_LockMin) != 0;
       m_axis[i].lockMax = (flags & ImPlotAxisFlags_LockMax) != 0;
       m_axis[i].autoFit = (flags & ImPlotAxisFlags_AutoFit) != 0;
-      m_axis[i].logScale = (flags & ImPlotAxisFlags_LogScale) != 0;
       m_axis[i].invert = (flags & ImPlotAxisFlags_Invert) != 0;
       m_axis[i].opposite = (flags & ImPlotAxisFlags_Opposite) != 0;
       m_axis[i].gridLines = (flags & ImPlotAxisFlags_NoGridLines) == 0;
       m_axis[i].tickMarks = (flags & ImPlotAxisFlags_NoTickMarks) == 0;
       m_axis[i].tickLabels = (flags & ImPlotAxisFlags_NoTickLabels) == 0;
+      m_axis[i].logScale = plot->Axes[ImAxis_Y1 + i].Scale == ImPlotScale_Log10;
     }
   }
 }
