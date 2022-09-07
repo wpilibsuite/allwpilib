@@ -183,6 +183,7 @@ wpi::span<WPI_Handle> wpi::WaitForObjects(wpi::span<const WPI_Handle> handles,
                                           double timeout, bool* timedOut) {
   auto& manager = GetManager();
   if (gShutdown) {
+    *timedOut = false;
     return {};
   }
   std::unique_lock lock{manager.mutex};
