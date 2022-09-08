@@ -48,8 +48,6 @@ class ProxyScheduleCommand
 
   ProxyScheduleCommand(ProxyScheduleCommand&& other) = default;
 
-  ProxyScheduleCommand(const ProxyScheduleCommand& other) = default;
-
   void Initialize() override;
 
   void End(bool interrupted) override;

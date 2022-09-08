@@ -51,7 +51,7 @@ TEST_F(ProxyScheduleCommandTest, OwningCommandSchedule) {
 
   bool scheduled = false;
 
-  ProxyScheduleCommand command(std::make_unique<InstantCommand>([&scheduled] { scheduled = true; }, {}));
+  ProxyScheduleCommand command(std::make_unique<InstantCommand>([&scheduled] { scheduled = true; }));
 
   scheduler.Schedule(&command);
   scheduler.Run();
