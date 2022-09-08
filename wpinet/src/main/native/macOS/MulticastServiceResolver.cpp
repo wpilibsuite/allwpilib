@@ -2,6 +2,8 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
+#if defined(__APPLE__)
+
 #include "wpinet/MulticastServiceResolver.h"
 
 #include <netinet/in.h>
@@ -212,3 +214,5 @@ void MulticastServiceResolver::Stop() {
   pImpl->ResolveStates.clear();
   pImpl->serviceRef = nullptr;
 }
+
+#endif  // defined(__APPLE__)
