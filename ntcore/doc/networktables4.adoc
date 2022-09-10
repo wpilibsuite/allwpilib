@@ -192,10 +192,10 @@ The MessagePack contents shall be an array of maps.  Each map in the array shall
 |Subscription UID
 |A client-generated unique identifier for this subscription.
 
-|`prefixes`
+|`topics`
 |Array of String
-|Array of topic prefixes
-|One or more topic prefixes to start receiving messages for.
+|Array of topic names or prefixes
+|One or more topic names or prefixes (if the `prefix` option is true) that messages are sent for.
 
 |`options`
 |Map
@@ -408,6 +408,11 @@ Each subscription may have options set.  The following options have a defined me
 |Boolean
 |No Value Changes Flag
 |If true, the server should not send any value changes over the wire regardless of other options.  This is useful for only getting topic announcements.  If false, value changes are sent in accordance with other options.  If not specified, defaults to false.
+
+|`prefix` (optional)
+|Boolean
+|Prefix Flag
+|If true, any topic starting with the name in the subscription `topics` list is subscribed to, not just exact matches.  If not specified, defaults to false.
 |===
 
 [[text-frames]]
@@ -583,10 +588,10 @@ The `subscribe` JSON message shall contain the following parameters:
 |Description
 |Notes
 
-|`prefixes`
+|`topics`
 |Array of String
-|Array of topic prefixes
-|One or more topic prefixes to start receiving messages for.
+|Array of topic names or prefixes
+|One or more topic names or prefixes (if the `prefix` option is true) to start receiving messages for.
 
 |`subuid`
 |Integer
