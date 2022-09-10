@@ -51,7 +51,8 @@ TEST_F(ProxyScheduleCommandTest, OwningCommandSchedule) {
 
   bool scheduled = false;
 
-  ProxyScheduleCommand command(std::make_unique<InstantCommand>([&scheduled] { scheduled = true; }));
+  ProxyScheduleCommand command(
+      std::make_unique<InstantCommand>([&scheduled] { scheduled = true; }));
 
   scheduler.Schedule(&command);
   scheduler.Run();
@@ -64,7 +65,8 @@ TEST_F(ProxyScheduleCommandTest, OwningCommandEnd) {
 
   bool finished = false;
 
-  ProxyScheduleCommand command(std::make_unique<WaitUntilCommand>([&finished] { return finished; }));
+  ProxyScheduleCommand command(
+      std::make_unique<WaitUntilCommand>([&finished] { return finished; }));
 
   scheduler.Schedule(&command);
   scheduler.Run();

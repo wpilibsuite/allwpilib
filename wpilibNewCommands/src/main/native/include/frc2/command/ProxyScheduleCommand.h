@@ -39,8 +39,8 @@ class ProxyScheduleCommand
    * Creates a new ProxyScheduleCommand that schedules the given commands when
    * initialized, and ends when they are all no longer scheduled.
    *
-   * <p>Note that this constructor passes ownership of the given command to the returned
-   * ProxyScheduleCommand.
+   * <p>Note that this constructor passes ownership of the given command to the
+   * returned ProxyScheduleCommand.
    *
    * @param toSchedule the commands to schedule
    */
