@@ -151,7 +151,9 @@ class Command {
    *
    * @param condition the interrupt condition
    * @return the command with the interrupt condition added
+   * @deprecated Replace with Until()
    */
+  WPI_DEPRECATED("Replace with Until()")
   ParallelRaceGroup WithInterrupt(std::function<bool()> condition) &&;
 
   /**
