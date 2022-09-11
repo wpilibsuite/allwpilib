@@ -452,7 +452,7 @@ Clients and servers shall ignore JSON messages that:
 |<<msg-setproperties,`setproperties`>>
 |Set Properties
 |Client to Server
-|<<msg-announce,`announce`>>
+|<<msg-properties,`properties`>>
 
 4+|Value/Subscription Messages (Client to Server)
 
@@ -475,6 +475,11 @@ Clients and servers shall ignore JSON messages that:
 
 |<<msg-unannounce,`unannounce`>>
 |Topic Removed
+|Server to Client
+|---
+
+|<<msg-properties,`properties`>>
+|Properties Update
 |Server to Client
 |---
 |===
@@ -548,7 +553,7 @@ The `unpublish` JSON message shall contain the following parameters:
 [[msg-setproperties]]
 ==== Set Properties Message (`setproperties`)
 
-Sent from a client to the server to change properties (see <<properties>>) for a given topic.  The server will respond with an updated <<msg-announce>> (if the topic is published).  This message shall be ignored by the server if the topic is not published.
+Sent from a client to the server to change properties (see <<properties>>) for a given topic.  The server will send a corresponding <<msg-properties>> to all subscribers to the topic (if the topic is published).  This message shall be ignored by the server if the topic is not published.
 
 The `setproperties` JSON message shall contain the following parameters:
 
@@ -695,6 +700,37 @@ The `unannounce` JSON message shall contain the following parameters:
 |Topic ID
 |The identifier that the server was using for value updates
 |===
+
+[[msg-properties]]
+==== Properties Update Message (`properties`)
+
+The server shall send this message when a previously announced (via a <<msg-announce>>) topic has its properties changed (via <<msg-setproperties>>).
+
+The `properties` JSON message shall contain the following parameters:
+
+[cols="1,1,2,6",options="header"]
+|===
+|Key
+|Value type
+|Description
+|Notes
+
+|`name`
+|String
+|Topic name
+|
+
+|`ack`
+|Boolean
+|Acknowledgement
+|True if this message is in response to a <<msg-setproperties,`setproperties`>> message from the same client.  Otherwise absent.
+
+|`update`
+|Map
+|Properties to update (from <<msg-setproperties,`setproperties`>>)
+|===
+
+The client shall handle the `update` value as follows.  If a property is not included in the update map, its value is not changed.  If a property is provided in the update map with a value of null, the property is deleted.
 
 [[binary-frames]]
 == Binary Data Frames
