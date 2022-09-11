@@ -17,7 +17,9 @@ import java.util.function.BooleanSupplier;
  * <p>This class represents a subclass of Trigger that is specifically aimed at buttons on an
  * operator interface as a common use case of the more generalized Trigger objects. This is a simple
  * wrapper around Trigger with the method names renamed to fit the Button object use.
+ * @deprecated Replace with {@link Trigger}.
  */
+@Deprecated(since = "2023")
 public class Button extends Trigger {
   /**
    * Default constructor; creates a button that is never pressed.
@@ -41,7 +43,9 @@ public class Button extends Trigger {
    *
    * @param command the command to start
    * @return this button, so calls can be chained
+   * @deprecated Replace with {@link Trigger#whenActive(Command)}
    */
+  @Deprecated
   public Button whenPressed(final Command command) {
     whenActive(command);
     return this;
@@ -53,7 +57,9 @@ public class Button extends Trigger {
    * @param toRun the runnable to run
    * @param requirements the required subsystems
    * @return this button, so calls can be chained
+   * @deprecated Replace with {@link Trigger#whenActive(Runnable, Subsystem...)}
    */
+  @Deprecated
   public Button whenPressed(final Runnable toRun, Subsystem... requirements) {
     whenActive(toRun, requirements);
     return this;
@@ -67,7 +73,9 @@ public class Button extends Trigger {
    *
    * @param command the command to start
    * @return this button, so calls can be chained
+   * @deprecated Replace with {@link Trigger#whileActiveContinuous(Command)}
    */
+  @Deprecated
   public Button whileHeld(final Command command) {
     whileActiveContinuous(command);
     return this;
@@ -79,7 +87,9 @@ public class Button extends Trigger {
    * @param toRun the runnable to run
    * @param requirements the required subsystems
    * @return this button, so calls can be chained
+   * @deprecated Replace with {@link Trigger#whileActiveContinuous(Runnable, Subsystem...)}
    */
+  @Deprecated
   public Button whileHeld(final Runnable toRun, Subsystem... requirements) {
     whileActiveContinuous(toRun, requirements);
     return this;
@@ -91,7 +101,9 @@ public class Button extends Trigger {
    *
    * @param command the command to start
    * @return this button, so calls can be chained
+   * @deprecated Replace with {@link Trigger#whileActiveOnce(Command)}
    */
+  @Deprecated
   public Button whenHeld(final Command command) {
     whileActiveOnce(command);
     return this;
@@ -102,7 +114,9 @@ public class Button extends Trigger {
    *
    * @param command the command to start
    * @return this button, so calls can be chained
+   * @deprecated Replace with {@link Trigger#whenInactive(Command)}
    */
+  @Deprecated
   public Button whenReleased(final Command command) {
     whenInactive(command);
     return this;
@@ -114,7 +128,9 @@ public class Button extends Trigger {
    * @param toRun the runnable to run
    * @param requirements the required subsystems
    * @return this button, so calls can be chained
+   * @deprecated Replace with {@link Trigger#whenInactive(Runnable, Subsystem...)}
    */
+  @Deprecated
   public Button whenReleased(final Runnable toRun, Subsystem... requirements) {
     whenInactive(toRun, requirements);
     return this;
@@ -126,7 +142,9 @@ public class Button extends Trigger {
    *
    * @param command the command to start
    * @return this button, so calls can be chained
+   * @deprecated Replace with {@link Trigger#toggleWhenActive(Command)}
    */
+  @Deprecated
   public Button toggleWhenPressed(final Command command) {
     toggleWhenActive(command);
     return this;
@@ -137,7 +155,9 @@ public class Button extends Trigger {
    *
    * @param command the command to start
    * @return this button, so calls can be chained
+   * @deprecated Replace with {@link Trigger#cancelWhenActive(Command)}
    */
+  @Deprecated
   public Button cancelWhenPressed(final Command command) {
     cancelWhenActive(command);
     return this;

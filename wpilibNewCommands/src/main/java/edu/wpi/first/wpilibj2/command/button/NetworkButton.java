@@ -15,6 +15,7 @@ import edu.wpi.first.networktables.NetworkTableInstance;
  *
  * <p>This class is provided by the NewCommands VendorDep
  */
+@SuppressWarnings("deprecation")
 public class NetworkButton extends Button {
   /**
    * Creates a NetworkButton that commands can be bound to.

@@ -12,9 +12,9 @@
 #include "gtest/gtest.h"
 
 using namespace frc2;
-class ButtonTest : public CommandTestBase {};
+class TriggerTest : public CommandTestBase {};
 
-TEST_F(ButtonTest, WhenPressed) {
+TEST_F(TriggerTest, WhenActive) {
   auto& scheduler = CommandScheduler::GetInstance();
   bool finished = false;
   bool pressed = false;
@@ -32,7 +32,7 @@ TEST_F(ButtonTest, WhenPressed) {
   EXPECT_FALSE(scheduler.IsScheduled(&command));
 }
 
-TEST_F(ButtonTest, WhenReleased) {
+TEST_F(TriggerTest, WhenInactive) {
   auto& scheduler = CommandScheduler::GetInstance();
   bool finished = false;
   bool pressed = false;
@@ -50,7 +50,7 @@ TEST_F(ButtonTest, WhenReleased) {
   EXPECT_FALSE(scheduler.IsScheduled(&command));
 }
 
-TEST_F(ButtonTest, WhileHeld) {
+TEST_F(TriggerTest, WhileActiveContinous) {
   auto& scheduler = CommandScheduler::GetInstance();
   bool finished = false;
   bool pressed = false;
@@ -73,7 +73,7 @@ TEST_F(ButtonTest, WhileHeld) {
   EXPECT_FALSE(scheduler.IsScheduled(&command));
 }
 
-TEST_F(ButtonTest, WhenHeld) {
+TEST_F(TriggerTest, WhenActiveOnce) {
   auto& scheduler = CommandScheduler::GetInstance();
   bool finished = false;
   bool pressed = false;
@@ -101,7 +101,7 @@ TEST_F(ButtonTest, WhenHeld) {
   EXPECT_FALSE(scheduler.IsScheduled(&command));
 }
 
-TEST_F(ButtonTest, ToggleWhenPressed) {
+TEST_F(TriggerTest, ToggleWhenActive) {
   auto& scheduler = CommandScheduler::GetInstance();
   bool finished = false;
   bool pressed = false;
@@ -121,7 +121,7 @@ TEST_F(ButtonTest, ToggleWhenPressed) {
   EXPECT_FALSE(scheduler.IsScheduled(&command));
 }
 
-TEST_F(ButtonTest, And) {
+TEST_F(TriggerTest, And) {
   auto& scheduler = CommandScheduler::GetInstance();
   bool finished = false;
   bool pressed1 = false;
@@ -139,7 +139,7 @@ TEST_F(ButtonTest, And) {
   EXPECT_TRUE(scheduler.IsScheduled(&command));
 }
 
-TEST_F(ButtonTest, Or) {
+TEST_F(TriggerTest, Or) {
   auto& scheduler = CommandScheduler::GetInstance();
   bool finished = false;
   bool pressed1 = false;
@@ -164,7 +164,7 @@ TEST_F(ButtonTest, Or) {
   EXPECT_TRUE(scheduler.IsScheduled(&command2));
 }
 
-TEST_F(ButtonTest, Negate) {
+TEST_F(TriggerTest, Negate) {
   auto& scheduler = CommandScheduler::GetInstance();
   bool finished = false;
   bool pressed = true;
@@ -178,7 +178,7 @@ TEST_F(ButtonTest, Negate) {
   EXPECT_TRUE(scheduler.IsScheduled(&command));
 }
 
-TEST_F(ButtonTest, RValueButton) {
+TEST_F(TriggerTest, RValueTrigger) {
   auto& scheduler = CommandScheduler::GetInstance();
   int counter = 0;
   bool pressed = false;
@@ -193,7 +193,7 @@ TEST_F(ButtonTest, RValueButton) {
   EXPECT_EQ(counter, 1);
 }
 
-TEST_F(ButtonTest, Debounce) {
+TEST_F(TriggerTest, Debounce) {
   auto& scheduler = CommandScheduler::GetInstance();
   bool pressed = false;
   RunCommand command([] {});

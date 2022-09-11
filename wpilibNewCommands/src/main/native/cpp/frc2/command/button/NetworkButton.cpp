@@ -6,10 +6,12 @@
 
 using namespace frc2;
 
+WPI_IGNORE_DEPRECATED
 NetworkButton::NetworkButton(nt::NetworkTableEntry entry)
     : Button([entry] {
         return entry.GetInstance().IsConnected() && entry.GetBoolean(false);
       }) {}
+WPI_UNIGNORE_DEPRECATED
 
 NetworkButton::NetworkButton(std::shared_ptr<nt::NetworkTable> table,
                              std::string_view field)
