@@ -33,7 +33,7 @@ void RobotContainer::ConfigureButtonBindings() {
   // Move the arm to neutral position when the 'B' button is pressed.
   frc2::JoystickButton(&m_driverController, frc::XboxController::Button::kB)
       .WhenActive([this] { m_arm.SetGoal(ArmConstants::kArmOffset); },
-                   {&m_arm});
+                  {&m_arm});
 
   // While holding the shoulder button, drive at half speed
   frc2::JoystickButton(&m_driverController,

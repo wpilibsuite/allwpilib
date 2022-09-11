@@ -35,7 +35,7 @@ class NetworkButtonTest extends CommandTestBase {
 
     var button = new NetworkButton("TestTable", "Test");
     entry.setBoolean(false);
-    button.whenPressed(command);
+    button.whenActive(command);
     scheduler.run();
     verify(command, never()).schedule();
     entry.setBoolean(true);
