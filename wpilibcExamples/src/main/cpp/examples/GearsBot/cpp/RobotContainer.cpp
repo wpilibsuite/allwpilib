@@ -32,20 +32,20 @@ RobotContainer::RobotContainer()
 
 void RobotContainer::ConfigureButtonBindings() {
   // Configure your button bindings here
-  frc2::JoystickButton(&m_joy, 5).WhenPressed(
+  frc2::JoystickButton(&m_joy, 5).WhenActive(
       SetElevatorSetpoint(0.25, m_elevator));
-  frc2::JoystickButton(&m_joy, 6).WhenPressed(CloseClaw(m_claw));
-  frc2::JoystickButton(&m_joy, 7).WhenPressed(
+  frc2::JoystickButton(&m_joy, 6).WhenActive(CloseClaw(m_claw));
+  frc2::JoystickButton(&m_joy, 7).WhenActive(
       SetElevatorSetpoint(0.0, m_elevator));
-  frc2::JoystickButton(&m_joy, 8).WhenPressed(OpenClaw(m_claw));
-  frc2::JoystickButton(&m_joy, 9).WhenPressed(
+  frc2::JoystickButton(&m_joy, 8).WhenActive(OpenClaw(m_claw));
+  frc2::JoystickButton(&m_joy, 9).WhenActive(
       Autonomous(m_claw, m_wrist, m_elevator, m_drivetrain));
   frc2::JoystickButton(&m_joy, 10)
-      .WhenPressed(Pickup(m_claw, m_wrist, m_elevator));
+      .WhenActive(Pickup(m_claw, m_wrist, m_elevator));
   frc2::JoystickButton(&m_joy, 11)
-      .WhenPressed(Place(m_claw, m_wrist, m_elevator));
+      .WhenActive(Place(m_claw, m_wrist, m_elevator));
   frc2::JoystickButton(&m_joy, 12)
-      .WhenPressed(PrepareToPickup(m_claw, m_wrist, m_elevator));
+      .WhenActive(PrepareToPickup(m_claw, m_wrist, m_elevator));
 }
 
 frc2::Command* RobotContainer::GetAutonomousCommand() {

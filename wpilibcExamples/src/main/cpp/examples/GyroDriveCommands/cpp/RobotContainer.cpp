@@ -32,7 +32,7 @@ void RobotContainer::ConfigureButtonBindings() {
 
   // Stabilize robot to drive straight with gyro when L1 is held
   frc2::JoystickButton(&m_driverController, frc::PS4Controller::Button::kL1)
-      .WhenHeld(frc2::PIDCommand{
+      .WhileActiveOnce(frc2::PIDCommand{
           frc2::PIDController{dc::kStabilizationP, dc::kStabilizationI,
                               dc::kStabilizationD},
           // Close the loop on the turn rate
@@ -48,17 +48,17 @@ void RobotContainer::ConfigureButtonBindings() {
 
   // Turn to 90 degrees when the 'Cross' button is pressed
   frc2::JoystickButton(&m_driverController, frc::PS4Controller::Button::kCross)
-      .WhenPressed(TurnToAngle{90_deg, &m_drive}.WithTimeout(5_s));
+      .WhenActive(TurnToAngle{90_deg, &m_drive}.WithTimeout(5_s));
 
   // Turn to -90 degrees with a profile when the 'Square' button is pressed,
   // with a 5 second timeout
   frc2::JoystickButton(&m_driverController, frc::PS4Controller::Button::kSquare)
-      .WhenPressed(TurnToAngle{90_deg, &m_drive}.WithTimeout(5_s));
+      .WhenActive(TurnToAngle{90_deg, &m_drive}.WithTimeout(5_s));
 
   // While holding R1, drive at half speed
   frc2::JoystickButton(&m_driverController, frc::PS4Controller::Button::kR1)
-      .WhenPressed(frc2::InstantCommand{[this] { m_drive.SetMaxOutput(0.5); }})
-      .WhenReleased(frc2::InstantCommand{[this] { m_drive.SetMaxOutput(1); }});
+      .WhenActive(frc2::InstantCommand{[this] { m_drive.SetMaxOutput(0.5); }})
+      .WhenInactive(frc2::InstantCommand{[this] { m_drive.SetMaxOutput(1); }});
 }
 
 frc2::Command* RobotContainer::GetAutonomousCommand() {

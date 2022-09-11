@@ -88,15 +88,15 @@ public class RobotContainer {
     final JoystickButton r1 = new JoystickButton(m_joystick, 12);
 
     // Connect the buttons to commands
-    dpadUp.whenPressed(new SetElevatorSetpoint(0.25, m_elevator));
-    dpadDown.whenPressed(new SetElevatorSetpoint(0.0, m_elevator));
-    dpadRight.whenPressed(new CloseClaw(m_claw));
-    dpadLeft.whenPressed(new OpenClaw(m_claw));
+    dpadUp.whenActive(new SetElevatorSetpoint(0.25, m_elevator));
+    dpadDown.whenActive(new SetElevatorSetpoint(0.0, m_elevator));
+    dpadRight.whenActive(new CloseClaw(m_claw));
+    dpadLeft.whenActive(new OpenClaw(m_claw));
 
-    r1.whenPressed(new PrepareToPickup(m_claw, m_wrist, m_elevator));
-    r2.whenPressed(new Pickup(m_claw, m_wrist, m_elevator));
-    l1.whenPressed(new Place(m_claw, m_wrist, m_elevator));
-    l2.whenPressed(new Autonomous(m_drivetrain, m_claw, m_wrist, m_elevator));
+    r1.whenActive(new PrepareToPickup(m_claw, m_wrist, m_elevator));
+    r2.whenActive(new Pickup(m_claw, m_wrist, m_elevator));
+    l1.whenActive(new Place(m_claw, m_wrist, m_elevator));
+    l2.whenActive(new Autonomous(m_drivetrain, m_claw, m_wrist, m_elevator));
   }
 
   /**

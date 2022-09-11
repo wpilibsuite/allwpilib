@@ -30,18 +30,18 @@ void RobotContainer::ConfigureButtonBindings() {
   // While holding the shoulder button, drive at half speed
   frc2::JoystickButton(&m_driverController,
                        frc::XboxController::Button::kRightBumper)
-      .WhenPressed(&m_driveHalfSpeed)
-      .WhenReleased(&m_driveFullSpeed);
+      .WhenActive(&m_driveHalfSpeed)
+      .WhenInactive(&m_driveFullSpeed);
 
   // Drive forward by 3 meters when the 'A' button is pressed, with a timeout of
   // 10 seconds
   frc2::JoystickButton(&m_driverController, frc::XboxController::Button::kA)
-      .WhenPressed(DriveDistanceProfiled(3_m, &m_drive).WithTimeout(10_s));
+      .WhenActive(DriveDistanceProfiled(3_m, &m_drive).WithTimeout(10_s));
 
   // Do the same thing as above when the 'B' button is pressed, but defined
   // inline
   frc2::JoystickButton(&m_driverController, frc::XboxController::Button::kB)
-      .WhenPressed(
+      .WhenActive(
           frc2::TrapezoidProfileCommand<units::meters>(
               frc::TrapezoidProfile<units::meters>(
                   // Limit the max acceleration and velocity

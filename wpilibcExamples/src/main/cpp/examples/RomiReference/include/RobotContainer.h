@@ -7,7 +7,7 @@
 #include <frc/Joystick.h>
 #include <frc/smartdashboard/SendableChooser.h>
 #include <frc2/command/Command.h>
-#include <frc2/command/button/Button.h>
+#include <frc2/command/button/Trigger.h>
 
 #include "Constants.h"
 #include "commands/AutonomousDistance.h"
@@ -50,7 +50,7 @@ class RobotContainer {
                         OnBoardIO::ChannelMode::INPUT};
 
   // Example button
-  frc2::Button m_onboardButtonA{
+  frc2::Trigger m_onboardButtonA{
       [this] { return m_onboardIO.GetButtonAPressed(); }};
 
   // Autonomous commands.

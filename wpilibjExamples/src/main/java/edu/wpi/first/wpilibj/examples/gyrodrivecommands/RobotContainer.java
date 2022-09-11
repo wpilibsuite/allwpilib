@@ -58,12 +58,12 @@ public class RobotContainer {
   private void configureButtonBindings() {
     // Drive at half speed when the right bumper is held
     new JoystickButton(m_driverController, Button.kR1.value)
-        .whenPressed(() -> m_robotDrive.setMaxOutput(0.5))
-        .whenReleased(() -> m_robotDrive.setMaxOutput(1));
+        .whenActive(() -> m_robotDrive.setMaxOutput(0.5))
+        .whenInactive(() -> m_robotDrive.setMaxOutput(1));
 
     // Stabilize robot to drive straight with gyro when left bumper is held
     new JoystickButton(m_driverController, Button.kL1.value)
-        .whenHeld(
+        .whileActiveOnce(
             new PIDCommand(
                 new PIDController(
                     DriveConstants.kStabilizationP,
@@ -80,11 +80,11 @@ public class RobotContainer {
 
     // Turn to 90 degrees when the 'X' button is pressed, with a 5 second timeout
     new JoystickButton(m_driverController, Button.kCross.value)
-        .whenPressed(new TurnToAngle(90, m_robotDrive).withTimeout(5));
+        .whenActive(new TurnToAngle(90, m_robotDrive).withTimeout(5));
 
     // Turn to -90 degrees with a profile when the Circle button is pressed, with a 5 second timeout
     new JoystickButton(m_driverController, Button.kCircle.value)
-        .whenPressed(new TurnToAngleProfiled(-90, m_robotDrive).withTimeout(5));
+        .whenActive(new TurnToAngleProfiled(-90, m_robotDrive).withTimeout(5));
   }
 
   /**

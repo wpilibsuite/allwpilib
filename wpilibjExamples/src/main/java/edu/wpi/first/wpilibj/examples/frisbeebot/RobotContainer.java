@@ -80,15 +80,15 @@ public class RobotContainer {
   private void configureButtonBindings() {
     // Spin up the shooter when the 'A' button is pressed
     new JoystickButton(m_driverController, Button.kA.value)
-        .whenPressed(new InstantCommand(m_shooter::enable, m_shooter));
+        .whenActive(new InstantCommand(m_shooter::enable, m_shooter));
 
     // Turn off the shooter when the 'B' button is pressed
     new JoystickButton(m_driverController, Button.kB.value)
-        .whenPressed(new InstantCommand(m_shooter::disable, m_shooter));
+        .whenActive(new InstantCommand(m_shooter::disable, m_shooter));
 
     // Run the feeder when the 'X' button is held, but only if the shooter is at speed
     new JoystickButton(m_driverController, Button.kX.value)
-        .whenPressed(
+        .whenActive(
             new ConditionalCommand(
                 // Run the feeder
                 new InstantCommand(m_shooter::runFeeder, m_shooter),
@@ -97,12 +97,12 @@ public class RobotContainer {
                 // Determine which of the above to do based on whether the shooter has reached the
                 // desired speed
                 m_shooter::atSetpoint))
-        .whenReleased(new InstantCommand(m_shooter::stopFeeder, m_shooter));
+        .whenInactive(new InstantCommand(m_shooter::stopFeeder, m_shooter));
 
     // Drive at half speed when the bumper is held
     new JoystickButton(m_driverController, Button.kRightBumper.value)
-        .whenPressed(() -> m_robotDrive.setMaxOutput(0.5))
-        .whenReleased(() -> m_robotDrive.setMaxOutput(1));
+        .whenActive(() -> m_robotDrive.setMaxOutput(0.5))
+        .whenInactive(() -> m_robotDrive.setMaxOutput(1));
   }
 
   /**

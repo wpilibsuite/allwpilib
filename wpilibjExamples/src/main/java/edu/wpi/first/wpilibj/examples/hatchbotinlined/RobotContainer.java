@@ -89,14 +89,14 @@ public class RobotContainer {
   private void configureButtonBindings() {
     // Grab the hatch when the Circle button is pressed.
     new JoystickButton(m_driverController, Button.kCircle.value)
-        .whenPressed(new InstantCommand(m_hatchSubsystem::grabHatch, m_hatchSubsystem));
+        .whenActive(new InstantCommand(m_hatchSubsystem::grabHatch, m_hatchSubsystem));
     // Release the hatch when the Square button is pressed.
     new JoystickButton(m_driverController, Button.kSquare.value)
-        .whenPressed(new InstantCommand(m_hatchSubsystem::releaseHatch, m_hatchSubsystem));
+        .whenActive(new InstantCommand(m_hatchSubsystem::releaseHatch, m_hatchSubsystem));
     // While holding R1, drive at half speed
     new JoystickButton(m_driverController, Button.kR1.value)
-        .whenPressed(() -> m_robotDrive.setMaxOutput(0.5))
-        .whenReleased(() -> m_robotDrive.setMaxOutput(1));
+        .whenActive(() -> m_robotDrive.setMaxOutput(0.5))
+        .whenInactive(() -> m_robotDrive.setMaxOutput(1));
   }
 
   /**

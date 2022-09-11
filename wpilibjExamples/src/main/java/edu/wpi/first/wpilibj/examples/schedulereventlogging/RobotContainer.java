@@ -70,11 +70,11 @@ public class RobotContainer {
    */
   private void configureButtonBindings() {
     // Run instant command 1 when the 'A' button is pressed
-    new JoystickButton(m_driverController, Button.kA.value).whenPressed(m_instantCommand1);
+    new JoystickButton(m_driverController, Button.kA.value).whenActive(m_instantCommand1);
     // Run instant command 2 when the 'X' button is pressed
-    new JoystickButton(m_driverController, Button.kX.value).whenPressed(m_instantCommand2);
+    new JoystickButton(m_driverController, Button.kX.value).whenActive(m_instantCommand2);
     // Run instant command 3 when the 'Y' button is held; release early to interrupt
-    new JoystickButton(m_driverController, Button.kY.value).whenHeld(m_waitCommand);
+    new JoystickButton(m_driverController, Button.kY.value).whileActiveOnce(m_waitCommand);
   }
 
   /**
