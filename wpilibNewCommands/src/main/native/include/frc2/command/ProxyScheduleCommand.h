@@ -36,13 +36,13 @@ class ProxyScheduleCommand
   explicit ProxyScheduleCommand(Command* toSchedule);
 
   /**
-   * Creates a new ProxyScheduleCommand that schedules the given commands when
-   * initialized, and ends when they are all no longer scheduled.
+   * Creates a new ProxyScheduleCommand that schedules the given command when
+   * initialized, and ends when it is no longer scheduled.
    *
    * <p>Note that this constructor passes ownership of the given command to the
    * returned ProxyScheduleCommand.
    *
-   * @param toSchedule the commands to schedule
+   * @param toSchedule the command to schedule
    */
   explicit ProxyScheduleCommand(std::unique_ptr<Command>&& toSchedule);
 
