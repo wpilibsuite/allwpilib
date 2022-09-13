@@ -4,12 +4,14 @@
 
 package edu.wpi.first.wpilibj2.command;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import edu.wpi.first.hal.HAL;
 import edu.wpi.first.wpilibj.simulation.SimHooks;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.parallel.ResourceLock;
 
@@ -232,6 +234,77 @@ class CommandDecoratorTest extends CommandTestBase {
       scheduler.schedule(command);
       scheduler.run();
       assertTrue(hasRunCondition.get());
+    }
+  }
+
+  @Test
+  void finallyDoTest() {
+    try (CommandScheduler scheduler = new CommandScheduler()) {
+      AtomicInteger first = new AtomicInteger(0);
+      AtomicInteger second = new AtomicInteger(0);
+
+      Command command =
+          new FunctionalCommand(
+                  () -> {},
+                  () -> {},
+                  interrupted -> {
+                    if (!interrupted) {
+                      first.incrementAndGet();
+                    }
+                  },
+                  () -> true)
+              .finallyDo(
+                  interrupted -> {
+                    if (!interrupted) {
+                      // to differentiate between "didn't run" and "ran before command's `end()`
+                      second.addAndGet(1 + first.get());
+                    }
+                  });
+
+      scheduler.schedule(command);
+      assertEquals(0, first.get());
+      assertEquals(0, second.get());
+      scheduler.run();
+      assertEquals(1, first.get());
+      // if `second == 0`, neither of the lambdas ran.
+      // if `second == 1`, the second lambda ran before the first one
+      assertEquals(2, second.get());
+    }
+  }
+
+  // handleInterruptTest() implicitly tests the interrupt=true branch of finallyDo()
+  @Test
+  void handleInterruptTest() {
+    try (CommandScheduler scheduler = new CommandScheduler()) {
+      AtomicInteger first = new AtomicInteger(0);
+      AtomicInteger second = new AtomicInteger(0);
+
+      Command command =
+          new FunctionalCommand(
+                  () -> {},
+                  () -> {},
+                  interrupted -> {
+                    if (interrupted) {
+                      first.incrementAndGet();
+                    }
+                  },
+                  () -> false)
+              .handleInterrupt(
+                  () -> {
+                    // to differentiate between "didn't run" and "ran before command's `end()`
+                    second.addAndGet(1 + first.get());
+                  });
+
+      scheduler.schedule(command);
+      scheduler.run();
+      assertEquals(0, first.get());
+      assertEquals(0, second.get());
+
+      scheduler.cancel(command);
+      assertEquals(1, first.get());
+      // if `second == 0`, neither of the lambdas ran.
+      // if `second == 1`, the second lambda ran before the first one
+      assertEquals(2, second.get());
     }
   }
 }

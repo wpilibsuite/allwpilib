@@ -208,6 +208,25 @@ class CommandPtr final {
   [[nodiscard]] CommandPtr RaceWith(CommandPtr&& parallel) &&;
 
   /**
+   * Decorates this command with a lambda to call on interrupt or end, following
+   * the command's inherent Command::End(bool) method.
+   *
+   * @param end a lambda accepting a boolean parameter specifying whether the
+   * command was interrupted.
+   * @return the decorated command
+   */
+  [[nodiscard]] CommandPtr FinallyDo(std::function<void(bool)> end) &&;
+
+  /**
+   * Decorates this command with a lambda to call on interrupt, following the
+   * command's inherent Command::End(bool) method.
+   *
+   * @param handler a lambda to run when the command is interrupted
+   * @return the decorated command
+   */
+  [[nodiscard]] CommandPtr HandleInterrupt(std::function<void()> handler) &&;
+
+  /**
    * Get a raw pointer to the held command.
    */
   Command* get() const;
