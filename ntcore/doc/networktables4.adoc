@@ -389,20 +389,15 @@ Each subscription may have options set.  The following options have a defined me
 |Description
 |Notes
 
-|`immediate` (optional)
-|Boolean
-|Immediate Flag
-|If true, value updates seen by the server should be immediately sent to this client, rather than waiting for a periodic "sweep" of changed values. Note this will increase network bandwidth utilization--use with caution!  If not specified, defaults to false.
-
 |`periodic` (optional)
 |Number
 |Periodic sweep time (in seconds)
-|How frequently the server should send changes (if not immediate).  The server may send more frequently than this (e.g. use a combined minimum period for all values) or apply a restricted range to this value. The default if unspecified (and the `immediate` flag is false) is 100 ms (same as NT 3.0).
+|How frequently the server should send changes.  The server may send more frequently than this (e.g. use a combined minimum period for all values) or apply a restricted range to this value. The default if unspecified is 100 ms (same as NT 3.0).
 
 |`all` (optional)
 |Boolean
 |All Changes Flag
-|If true, the server should send all value changes over the wire regardless of the `immediate` and `periodic` settings.  If false, only the most recent value is sent (same as NT 3.0 behavior).  If not specified, defaults to false.
+|If true, the server should send all value changes over the wire.  If false, only the most recent value is sent (same as NT 3.0 behavior).  If not specified, defaults to false.
 
 |`topicsonly` (optional)
 |Boolean
@@ -777,7 +772,7 @@ While the server (robot) APIs can have minimal to no changes, the current Networ
 [[drawback-tcp]]
 === TCP Only
 
-Everything is sent via the WebSockets pipe, which can result in latency spikes due to TCP retransmissions, even for "immediate" subscriptions and timestamp updates.  Should there be a send-via-UDP option?  Web technologies generally can’t use UDP but this feature could be useful for other use cases.  However, adding this would add significant complexity and might be better left to MQTT or other full-stack alternatives.
+Everything is sent via the WebSockets pipe, which can result in latency spikes due to TCP retransmissions, even for timestamp updates.  Should there be a send-via-UDP option?  Web technologies generally can’t use UDP but this feature could be useful for other use cases.  However, adding this would add significant complexity and might be better left to MQTT or other full-stack alternatives.
 
 [[drawback-client-server]]
 === No peer-to-peer client connections
