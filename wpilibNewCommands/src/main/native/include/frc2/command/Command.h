@@ -24,15 +24,8 @@ std::string GetTypeName(const T& type) {
   return wpi::Demangle(typeid(type).name());
 }
 
-class EndlessCommand;
-class ParallelCommandGroup;
-class ParallelRaceGroup;
-class ParallelDeadlineGroup;
-class SequentialCommandGroup;
 class PerpetualCommand;
 class ProxyScheduleCommand;
-class RepeatCommand;
-class ConditionalCommand;
 
 /**
  * A state machine representing a complete action to be performed by the robot.
@@ -121,6 +114,8 @@ class Command {
     kCancelIncoming
   };
 
+  friend class CommandPtr;
+
   /**
    * Decorates this command with a timeout.  If the specified timeout is
    * exceeded before the command finishes normally, the command will be
@@ -130,7 +125,7 @@ class Command {
    * @param duration the timeout duration
    * @return the command with the timeout added
    */
-  ParallelRaceGroup WithTimeout(units::second_t duration) &&;
+  [[nodiscard]] CommandPtr WithTimeout(units::second_t duration) &&;
 
   /**
    * Decorates this command with an interrupt condition.  If the specified
@@ -141,7 +136,7 @@ class Command {
    * @param condition the interrupt condition
    * @return the command with the interrupt condition added
    */
-  ParallelRaceGroup Until(std::function<bool()> condition) &&;
+  [[nodiscard]] CommandPtr Until(std::function<bool()> condition) &&;
 
   /**
    * Decorates this command with an interrupt condition.  If the specified
@@ -154,7 +149,7 @@ class Command {
    * @deprecated Replace with Until()
    */
   WPI_DEPRECATED("Replace with Until()")
-  ParallelRaceGroup WithInterrupt(std::function<bool()> condition) &&;
+  [[nodiscard]] CommandPtr WithInterrupt(std::function<bool()> condition) &&;
 
   /**
    * Decorates this command with a runnable to run before this command starts.
@@ -163,7 +158,7 @@ class Command {
    * @param requirements the required subsystems
    * @return the decorated command
    */
-  SequentialCommandGroup BeforeStarting(
+  [[nodiscard]] CommandPtr BeforeStarting(
       std::function<void()> toRun,
       std::initializer_list<Subsystem*> requirements) &&;
 
@@ -174,7 +169,7 @@ class Command {
    * @param requirements the required subsystems
    * @return the decorated command
    */
-  SequentialCommandGroup BeforeStarting(
+  [[nodiscard]] CommandPtr BeforeStarting(
       std::function<void()> toRun,
       wpi::span<Subsystem* const> requirements = {}) &&;
 
@@ -185,7 +180,7 @@ class Command {
    * @param requirements the required subsystems
    * @return the decorated command
    */
-  SequentialCommandGroup AndThen(
+  [[nodiscard]] CommandPtr AndThen(
       std::function<void()> toRun,
       std::initializer_list<Subsystem*> requirements) &&;
 
@@ -196,7 +191,7 @@ class Command {
    * @param requirements the required subsystems
    * @return the decorated command
    */
-  SequentialCommandGroup AndThen(
+  [[nodiscard]] CommandPtr AndThen(
       std::function<void()> toRun,
       wpi::span<Subsystem* const> requirements = {}) &&;
 
@@ -216,7 +211,7 @@ class Command {
    *
    * @return the decorated command
    */
-  EndlessCommand Endlessly() &&;
+  [[nodiscard]] CommandPtr Endlessly() &&;
 
   /**
    * Decorates this command to run repeatedly, restarting it when it ends, until
@@ -224,17 +219,19 @@ class Command {
    *
    * @return the decorated command
    */
-  RepeatCommand Repeatedly() &&;
+  [[nodiscard]] CommandPtr Repeatedly() &&;
 
   /**
    * Decorates this command to run "by proxy" by wrapping it in a
    * ProxyScheduleCommand. This is useful for "forking off" from command groups
    * when the user does not wish to extend the command's requirements to the
    * entire command group.
+   * 
+   * <p>This overload transfers command ownership to the returned CommandPtr.
    *
    * @return the decorated command
    */
-  ProxyScheduleCommand AsProxy();
+  [[nodiscard]] CommandPtr AsProxy() &&;
 
   /**
    * Decorates this command to only run if this condition is not met. If the
@@ -245,7 +242,7 @@ class Command {
    * @param condition the condition that will prevent the command from running
    * @return the decorated command
    */
-  ConditionalCommand Unless(std::function<bool()> condition) &&;
+  [[nodiscard]] CommandPtr Unless(std::function<bool()> condition) &&;
 
   /**
    * Decorates this command to run or stop when disabled.
@@ -253,7 +250,7 @@ class Command {
    * @param doesRunWhenDisabled true to run when disabled.
    * @return the decorated command
    */
-  std::unique_ptr<Command> IgnoringDisable(bool doesRunWhenDisabled) &&;
+  [[nodiscard]] CommandPtr IgnoringDisable(bool doesRunWhenDisabled) &&;
 
   /**
    * Decorates this command to run or stop when disabled.
@@ -261,8 +258,8 @@ class Command {
    * @param interruptBehavior true to run when disabled.
    * @return the decorated command
    */
-  std::unique_ptr<Command> WithInterruptBehavior(
-      InterruptionBehavior interruptBehavior) &&;
+  [[nodiscard]] CommandPtr WithInterruptBehavior(
+      Command::InterruptionBehavior interruptBehavior) &&;
 
   /**
    * Schedules this command.

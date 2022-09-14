@@ -5,6 +5,7 @@
 #include <memory>
 
 #include "CommandTestBase.h"
+#include "frc2/command/CommandPtr.h"
 #include "frc2/command/InstantCommand.h"
 #include "frc2/command/ProxyScheduleCommand.h"
 #include "frc2/command/WaitUntilCommand.h"
@@ -51,10 +52,9 @@ TEST_F(ProxyScheduleCommandTest, OwningCommandSchedule) {
 
   bool scheduled = false;
 
-  ProxyScheduleCommand command(
-      std::make_unique<InstantCommand>([&scheduled] { scheduled = true; }));
+  CommandPtr command = InstantCommand([&scheduled] { scheduled = true; }).AsProxy();
 
-  scheduler.Schedule(&command);
+  scheduler.Schedule(command);
   scheduler.Run();
 
   EXPECT_TRUE(scheduled);
@@ -65,15 +65,14 @@ TEST_F(ProxyScheduleCommandTest, OwningCommandEnd) {
 
   bool finished = false;
 
-  ProxyScheduleCommand command(
-      std::make_unique<WaitUntilCommand>([&finished] { return finished; }));
+  CommandPtr command = WaitUntilCommand([&finished] { return finished; }).AsProxy();
 
-  scheduler.Schedule(&command);
+  scheduler.Schedule(command);
   scheduler.Run();
 
-  EXPECT_TRUE(scheduler.IsScheduled(&command));
+  EXPECT_TRUE(scheduler.IsScheduled(command));
   finished = true;
   scheduler.Run();
   scheduler.Run();
-  EXPECT_FALSE(scheduler.IsScheduled(&command));
+  EXPECT_FALSE(scheduler.IsScheduled(command));
 }
