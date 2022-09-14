@@ -9,8 +9,11 @@
 #include <wpi/numbers>
 
 #include "Eigen/Core"
+#include "Eigen/LU"
 #include "Eigen/QR"
+#include "frc/fmt/Eigen.h"
 #include "units/math.h"
+#include "wpimath/MathShared.h"
 
 using namespace frc;
 
@@ -43,6 +46,66 @@ Rotation3d::Rotation3d(const Vectord<3>& axis, units::radian_t angle) {
   // https://en.wikipedia.org/wiki/Conversion_between_quaternions_and_Euler_angles#Definition
   Vectord<3> v = axis / norm * units::math::sin(angle / 2.0);
   m_q = Quaternion{units::math::cos(angle / 2.0), v(0), v(1), v(2)};
+}
+
+Rotation3d::Rotation3d(const Matrixd<3, 3>& rotationMatrix) {
+  const auto& R = rotationMatrix;
+
+  // Require that the rotation matrix is special orthogonal. This is true if the
+  // matrix is orthogonal (RRᵀ = I) and normalized (determinant is 1).
+  if (R * R.transpose() != Matrixd<3, 3>::Identity()) {
+    std::string msg =
+        fmt::format("Rotation matrix isn't orthogonal\n\nR =\n{}\n", R);
+
+    wpi::math::MathSharedStore::ReportError(msg);
+    throw std::domain_error(msg);
+  }
+  if (R.determinant() != 1.0) {
+    std::string msg = fmt::format(
+        "Rotation matrix is orthogonal but not special orthogonal\n\nR =\n{}\n",
+        R);
+
+    wpi::math::MathSharedStore::ReportError(msg);
+    throw std::domain_error(msg);
+  }
+
+  // Turn rotation matrix into a quaternion
+  // https://www.euclideanspace.com/maths/geometry/rotations/conversions/matrixToQuaternion/
+  double trace = R(0, 0) + R(1, 1) + R(2, 2);
+  double w;
+  double x;
+  double y;
+  double z;
+
+  if (trace > 0.0) {
+    double s = 0.5 / std::sqrt(trace + 1.0);
+    w = 0.25 / s;
+    x = (R(2, 1) - R(1, 2)) * s;
+    y = (R(0, 2) - R(2, 0)) * s;
+    z = (R(1, 0) - R(0, 1)) * s;
+  } else {
+    if (R(0, 0) > R(1, 1) && R(0, 0) > R(2, 2)) {
+      double s = 2.0 * std::sqrt(1.0 + R(0, 0) - R(1, 1) - R(2, 2));
+      w = (R(2, 1) - R(1, 2)) / s;
+      x = 0.25 * s;
+      y = (R(0, 1) + R(1, 0)) / s;
+      z = (R(0, 2) + R(2, 0)) / s;
+    } else if (R(1, 1) > R(2, 2)) {
+      double s = 2.0 * std::sqrt(1.0 + R(1, 1) - R(0, 0) - R(2, 2));
+      w = (R(0, 2) - R(2, 0)) / s;
+      x = (R(0, 1) + R(1, 0)) / s;
+      y = 0.25 * s;
+      z = (R(1, 2) + R(2, 1)) / s;
+    } else {
+      double s = 2.0 * std::sqrt(1.0 + R(2, 2) - R(0, 0) - R(1, 1));
+      w = (R(1, 0) - R(0, 1)) / s;
+      x = (R(0, 2) + R(2, 0)) / s;
+      y = (R(1, 2) + R(2, 1)) / s;
+      z = 0.25 * s;
+    }
+  }
+
+  m_q = Quaternion{w, x, y, z};
 }
 
 Rotation3d::Rotation3d(const Vectord<3>& initial, const Vectord<3>& final) {

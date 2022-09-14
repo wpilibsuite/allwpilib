@@ -5,7 +5,9 @@
 package edu.wpi.first.math.geometry;
 
 import edu.wpi.first.math.MatBuilder;
+import edu.wpi.first.math.MathSharedStore;
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.Nat;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.Vector;
@@ -14,7 +16,7 @@ import edu.wpi.first.math.numbers.N3;
 import java.util.Objects;
 import org.ejml.dense.row.factory.DecompositionFactory_DDRM;
 
-/** A rotation in a 3D coordinate. */
+/** A rotation in a 3D coordinate frame represented by a quaternion. */
 public class Rotation3d implements Interpolatable<Rotation3d> {
   private Quaternion m_q = new Quaternion();
 
@@ -75,6 +77,74 @@ public class Rotation3d implements Interpolatable<Rotation3d> {
     // https://en.wikipedia.org/wiki/Conversion_between_quaternions_and_Euler_angles#Definition
     var v = axis.times(1.0 / norm).times(Math.sin(angleRadians / 2.0));
     m_q = new Quaternion(Math.cos(angleRadians / 2.0), v.get(0, 0), v.get(1, 0), v.get(2, 0));
+  }
+
+  /**
+   * Constructs a Rotation3d from a rotation matrix.
+   *
+   * @param rotationMatrix The rotation matrix.
+   * @throws IllegalArgumentException if the rotation matrix isn't special orthogonal.
+   */
+  public Rotation3d(Matrix<N3, N3> rotationMatrix) {
+    final var R = rotationMatrix;
+
+    // Require that the rotation matrix is special orthogonal. This is true if
+    // the matrix is orthogonal (RRᵀ = I) and normalized (determinant is 1).
+    if (!R.times(R.transpose()).equals(Matrix.eye(Nat.N3()))) {
+      var builder = new StringBuilder("Rotation matrix isn't orthogonal\n\nR =\n");
+      builder.append(R.getStorage().toString()).append('\n');
+
+      var msg = builder.toString();
+      MathSharedStore.reportError(msg, Thread.currentThread().getStackTrace());
+      throw new IllegalArgumentException(msg);
+    }
+    if (R.det() != 1.0) {
+      var builder =
+          new StringBuilder("Rotation matrix is orthogonal but not special orthogonal\n\nR =\n");
+      builder.append(R.getStorage().toString()).append('\n');
+
+      var msg = builder.toString();
+      MathSharedStore.reportError(msg, Thread.currentThread().getStackTrace());
+      throw new IllegalArgumentException(msg);
+    }
+
+    // Turn rotation matrix into a quaternion
+    // https://www.euclideanspace.com/maths/geometry/rotations/conversions/matrixToQuaternion/
+    double trace = R.get(0, 0) + R.get(1, 1) + R.get(2, 2);
+    double w;
+    double x;
+    double y;
+    double z;
+
+    if (trace > 0.0) {
+      double s = 0.5 / Math.sqrt(trace + 1.0);
+      w = 0.25 / s;
+      x = (R.get(2, 1) - R.get(1, 2)) * s;
+      y = (R.get(0, 2) - R.get(2, 0)) * s;
+      z = (R.get(1, 0) - R.get(0, 1)) * s;
+    } else {
+      if (R.get(0, 0) > R.get(1, 1) && R.get(0, 0) > R.get(2, 2)) {
+        double s = 2.0 * Math.sqrt(1.0 + R.get(0, 0) - R.get(1, 1) - R.get(2, 2));
+        w = (R.get(2, 1) - R.get(1, 2)) / s;
+        x = 0.25 * s;
+        y = (R.get(0, 1) + R.get(1, 0)) / s;
+        z = (R.get(0, 2) + R.get(2, 0)) / s;
+      } else if (R.get(1, 1) > R.get(2, 2)) {
+        double s = 2.0 * Math.sqrt(1.0 + R.get(1, 1) - R.get(0, 0) - R.get(2, 2));
+        w = (R.get(0, 2) - R.get(2, 0)) / s;
+        x = (R.get(0, 1) + R.get(1, 0)) / s;
+        y = 0.25 * s;
+        z = (R.get(1, 2) + R.get(2, 1)) / s;
+      } else {
+        double s = 2.0 * Math.sqrt(1.0 + R.get(2, 2) - R.get(0, 0) - R.get(1, 1));
+        w = (R.get(1, 0) - R.get(0, 1)) / s;
+        x = (R.get(0, 2) + R.get(2, 0)) / s;
+        y = (R.get(1, 2) + R.get(2, 1)) / s;
+        z = 0.25 * s;
+      }
+    }
+
+    m_q = new Quaternion(w, x, y, z);
   }
 
   /**
