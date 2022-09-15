@@ -50,11 +50,27 @@ jobs:
         working-directory: build
         run: ctest --output-on-failure
 
+  vcpkg-windows:
+    env:
+      VCPKG_DEFAULT_TRIPLET: x64-windows
+    name: "vcpkg - Windows"
+    runs-on: windows-2019
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Run vcpkg
+        uses: lukka/run-vcpkg@v10.2
+        with:
+          vcpkgDirectory: ${{ runner.workspace }}/vcpkg
+          vcpkgGitCommitId: f6af75acc923c833a5620943e3fc7d5e4930f0df # HEAD on 2022-04-10
+          runVcpkgInstall: true
+
   build-windows:
     env:
       VCPKG_DEFAULT_TRIPLET: x64-windows
     name: "Build - Windows"
     runs-on: windows-2019
+    needs: vcpkg-windows
     steps:
       - uses: actions/checkout@v3
 
