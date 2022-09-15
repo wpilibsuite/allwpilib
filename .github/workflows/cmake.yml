@@ -65,6 +65,12 @@ jobs:
           vcpkgGitCommitId: f6af75acc923c833a5620943e3fc7d5e4930f0df # HEAD on 2022-04-10
           runVcpkgInstall: true
 
+      - name: Install jinja
+        run: python -m pip install jinja2
+
+      - name: configure
+        run: mkdir build && cd build && cmake -DWITH_JAVA=OFF -DCMAKE_TOOLCHAIN_FILE=${{ runner.workspace }}/vcpkg/scripts/buildsystems/vcpkg.cmake ..
+
   build-windows:
     env:
       VCPKG_DEFAULT_TRIPLET: x64-windows
