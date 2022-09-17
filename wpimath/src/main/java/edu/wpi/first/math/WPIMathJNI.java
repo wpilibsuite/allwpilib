@@ -139,20 +139,20 @@ public final class WPIMathJNI {
       double[] mat, int rows, double[] vec, double sigma, boolean lowerTriangular);
 
   /**
-   * Deserializes an Apriltag layout JSON into a double[] of elements.
+   * Deserializes an AprilTag layout JSON into a double[] of elements.
    *
    * @param json The JSON containing the serialized trajectory.
-   * @return A double array with the trajectory states.
+   * @return A double array with the Apriltag layout.
    */
-  public static native double[] deserializeApriltagLayout(String json);
+  public static native double[] deserializeAprilTagLayout(String json);
 
   /**
-   * Serializes the Apriltag layout into a JSON string.
+   * Serializes the AprilTag layout into a JSON string.
    *
    * @param elements The elements of the layout.
    * @return A JSON containing the serialized layout.
    */
-  public static native String serializeApriltagLayout(double[] elements);
+  public static native String serializeAprilTagLayout(double[] elements);
 
   public static class Helper {
     private static AtomicBoolean extractOnStaticLoad = new AtomicBoolean(true);

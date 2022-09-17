@@ -23,32 +23,32 @@ class json;
 }  // namespace wpi
 
 namespace frc {
-class WPILIB_DLLEXPORT ApriltagFieldLayout {
+class WPILIB_DLLEXPORT AprilTagFieldLayout {
  public:
-    struct WPILIB_DLLEXPORT Apriltag {
+    struct WPILIB_DLLEXPORT AprilTag {
         int id;
 
         Pose3d pose;
     };
 
-    ApriltagFieldLayout() = default;
+    AprilTagFieldLayout() = default;
     
-    explicit ApriltagFieldLayout(const std::vector<Apriltag>& apriltags);
+    explicit AprilTagFieldLayout(const std::vector<AprilTag>& apriltags);
     
-    const std::vector<Apriltag>& GetTags() const { return m_apriltags; };
+    const std::vector<AprilTag>& GetTags() const { return m_apriltags; };
     
     Pose3d GetTagPose(int id) const;
     
     void SetShouldMirror(bool mirror);
     
  private:
-    std::vector<Apriltag> m_apriltags;
+    std::vector<AprilTag> m_apriltags;
     bool m_mirror;
 };
 
 WPILIB_DLLEXPORT
-void to_json(wpi::json& json, const ApriltagFieldLayout::Apriltag& apriltag);
+void to_json(wpi::json& json, const AprilTagFieldLayout::AprilTag& apriltag);
 
 WPILIB_DLLEXPORT
-void from_json(const wpi::json& json, ApriltagFieldLayout::Apriltag& apriltag);
+void from_json(const wpi::json& json, AprilTagFieldLayout::AprilTag& apriltag);
 }

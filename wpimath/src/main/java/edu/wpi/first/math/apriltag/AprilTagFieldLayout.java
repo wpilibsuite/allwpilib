@@ -7,11 +7,11 @@ import edu.wpi.first.math.geometry.Translation3d;
 import java.util.HashMap;
 import java.util.Map;
 
-public class ApriltagFieldLayout {
+public class AprilTagFieldLayout {
     private final Map<Integer, Pose3d> m_tags = new HashMap<>();
     private boolean m_mirror = false;
 
-    public ApriltagFieldLayout(Map<Integer, Pose3d> tags) {
+    public AprilTagFieldLayout(Map<Integer, Pose3d> tags) {
         // To ensure the underlying semantics don't change with what kind of map is passed in
         m_tags.putAll(tags);
     }

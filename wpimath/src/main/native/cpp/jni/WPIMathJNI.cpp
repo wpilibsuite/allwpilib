@@ -14,8 +14,8 @@
 #include "Eigen/QR"
 #include "drake/math/discrete_algebraic_riccati_equation.h"
 #include "edu_wpi_first_math_WPIMathJNI.h"
-#include "frc/apriltag/ApriltagFieldLayout.h"
-#include "frc/apriltag/ApriltagUtil.h"
+#include "frc/apriltag/AprilTagFieldLayout.h"
+#include "frc/apriltag/AprilTagUtil.h"
 #include "frc/geometry/Pose3d.h"
 #include "frc/geometry/Rotation3d.h"
 #include "frc/trajectory/TrajectoryUtil.h"
@@ -99,8 +99,8 @@ frc::Trajectory CreateTrajectoryFromElements(wpi::span<const double> elements) {
   return frc::Trajectory(states);
 }
 
-std::vector<double> GetElementsFromApriltagLayout(
-    const frc::ApriltagFieldLayout& apriltagFieldLayout) {
+std::vector<double> GetElementsFromAprilTagLayout(
+    const frc::AprilTagFieldLayout& apriltagFieldLayout) {
   std::vector<double> elements;
   elements.reserve(apriltagFieldLayout.GetTags().size() * 8);
 
@@ -118,16 +118,16 @@ std::vector<double> GetElementsFromApriltagLayout(
   return elements;
 }
 
-frc::ApriltagFieldLayout CreateApriltagLayoutFromElements(wpi::span<const double> elements) {
+frc::AprilTagFieldLayout CreateAprilTagLayoutFromElements(wpi::span<const double> elements) {
   // Make sure that the elements have the correct length.
   assert(elements.size() % 8 == 0);
 
   // Create a vector of states from the elements.
-  std::vector<frc::ApriltagFieldLayout::Apriltag> apriltags;
+  std::vector<frc::AprilTagFieldLayout::AprilTag> apriltags;
   apriltags.reserve(elements.size() / 8);
 
   for (size_t i = 0; i < elements.size(); i += 8) {
-    apriltags.emplace_back(frc::ApriltagFieldLayout::Apriltag{
+    apriltags.emplace_back(frc::AprilTagFieldLayout::AprilTag{
       static_cast<int>(elements[0]),
       frc::Pose3d{units::meter_t{elements[i + 1]},
                   units::meter_t{elements[i + 2]},
@@ -139,7 +139,7 @@ frc::ApriltagFieldLayout CreateApriltagLayoutFromElements(wpi::span<const double
                                   elements[i + 7]}}}});
   }
 
-  return frc::ApriltagFieldLayout(apriltags);
+  return frc::AprilTagFieldLayout(apriltags);
 }
 
 
@@ -361,22 +361,22 @@ Java_edu_wpi_first_math_WPIMathJNI_serializeTrajectory
 
 /*
  * Class:     edu_wpi_first_math_WPIMathJNI
- * Method:    deserializeApriltagLayout
+ * Method:    deserializeAprilTagLayout
  * Signature: (Ljava/lang/String;)[D
  */
 JNIEXPORT jdoubleArray JNICALL
-Java_edu_wpi_first_math_WPIMathJNI_deserializeApriltagLayout
+Java_edu_wpi_first_math_WPIMathJNI_deserializeAprilTagLayout
   (JNIEnv* env, jclass, jstring json)
 {
   try {
-    auto apriltagFieldLayout = frc::ApriltagUtil::DeserializeApriltagLayout(
+    auto apriltagFieldLayout = frc::AprilTagUtil::DeserializeAprilTagLayout(
         JStringRef{env, json}.c_str());
-    std::vector<double> elements = GetElementsFromApriltagLayout(apriltagFieldLayout);
+    std::vector<double> elements = GetElementsFromAprilTagLayout(apriltagFieldLayout);
     return MakeJDoubleArray(env, elements);
   } catch (std::exception& e) {
     jclass cls = env->FindClass(
-        "edu/wpi/first/math/apriltag/ApriltagUtil$"
-        "ApriltagLayoutSerializationException");
+        "edu/wpi/first/math/apriltag/AprilTagUtil$"
+        "AprilTagLayoutSerializationException");
     if (cls) {
       env->ThrowNew(cls, e.what());
     }
@@ -386,22 +386,22 @@ Java_edu_wpi_first_math_WPIMathJNI_deserializeApriltagLayout
 
 /*
  * Class:     edu_wpi_first_math_WPIMathJNI
- * Method:    serializeApriltagLayout
+ * Method:    serializeAprilTagLayout
  * Signature: ([D)Ljava/lang/String;
  */
 JNIEXPORT jstring JNICALL
-Java_edu_wpi_first_math_WPIMathJNI_serializeApriltagLayout
+Java_edu_wpi_first_math_WPIMathJNI_serializeAprilTagLayout
   (JNIEnv* env, jclass, jdoubleArray elements)
 {
   try {
     auto apriltagFieldLayout =
-        CreateApriltagLayoutFromElements(JDoubleArrayRef{env, elements});
+        CreateAprilTagLayoutFromElements(JDoubleArrayRef{env, elements});
     return MakeJString(env,
-                       frc::ApriltagUtil::SerializeApriltagLayout(apriltagFieldLayout));
+                       frc::AprilTagUtil::SerializeAprilTagLayout(apriltagFieldLayout));
   } catch (std::exception& e) {
     jclass cls = env->FindClass(
-        "edu/wpi/first/math/apriltag/ApriltagUtil$"
-        "ApriltagLayoutSerializationException");
+        "edu/wpi/first/math/apriltag/AprilTagUtil$"
+        "AprilTagLayoutSerializationException");
     if (cls) {
       env->ThrowNew(cls, e.what());
     }

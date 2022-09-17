@@ -2,7 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "frc/apriltag/ApriltagFieldLayout.h"
+#include "frc/apriltag/AprilTagFieldLayout.h"
 
 #include <wpi/json.h>
 #include "frc/geometry/Pose3d.h"
@@ -11,7 +11,7 @@
 
 using namespace frc;
 
-frc::Pose3d ApriltagFieldLayout::GetTagPose(int id) const {
+frc::Pose3d AprilTagFieldLayout::GetTagPose(int id) const {
     Pose3d returnPose;
     for(auto& tag : m_apriltags) {
         if(tag.id == id) {
@@ -24,18 +24,18 @@ frc::Pose3d ApriltagFieldLayout::GetTagPose(int id) const {
     return returnPose;
 }
 
-void ApriltagFieldLayout::SetShouldMirror(bool mirror) {
+void AprilTagFieldLayout::SetShouldMirror(bool mirror) {
     m_mirror = mirror;
 }
 
-void frc::to_json(wpi::json& json, const ApriltagFieldLayout::Apriltag& apriltag) {
+void frc::to_json(wpi::json& json, const AprilTagFieldLayout::AprilTag& apriltag) {
     json = wpi::json{
         {"id", apriltag.id},
         {"pose", apriltag.pose}
     };
 }
 
-void frc::from_json(const wpi::json& json, ApriltagFieldLayout::Apriltag& apriltag) {
+void frc::from_json(const wpi::json& json, AprilTagFieldLayout::AprilTag& apriltag) {
     apriltag.id = json.at("id").get<int>();
     apriltag.pose = json.at("pose").get<Pose3d>();
 }
