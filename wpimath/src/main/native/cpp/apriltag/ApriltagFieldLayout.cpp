@@ -12,8 +12,8 @@
 using namespace frc;
 
 frc::Pose3d ApriltagFieldLayout::GetTagPose(int id) const {
-    auto returnPose = Pose3d{};
-    for(Apriltag tag : m_apriltags) {
+    Pose3d returnPose;
+    for(auto& tag : m_apriltags) {
         if(tag.id == id) {
             returnPose = tag.pose;
         }

@@ -28,7 +28,7 @@ class WPILIB_DLLEXPORT ApriltagFieldLayout {
     struct WPILIB_DLLEXPORT Apriltag {
         int id;
 
-        Pose3d pose = Pose3d();
+        Pose3d pose;
     };
 
     ApriltagFieldLayout() = default;
