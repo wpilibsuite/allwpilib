@@ -14,10 +14,24 @@ DifferentialDriveAccelerationLimiter::DifferentialDriveAccelerationLimiter(
     LinearSystem<2, 2, 2> system, units::meter_t trackwidth,
     units::meters_per_second_squared_t maxLinearAccel,
     units::radians_per_second_squared_t maxAngularAccel)
+    : DifferentialDriveAccelerationLimiter(system, trackwidth, -maxLinearAccel,
+                                           maxLinearAccel, maxAngularAccel) {}
+
+DifferentialDriveAccelerationLimiter::DifferentialDriveAccelerationLimiter(
+    LinearSystem<2, 2, 2> system, units::meter_t trackwidth,
+    units::meters_per_second_squared_t minLinearAccel,
+    units::meters_per_second_squared_t maxLinearAccel,
+    units::radians_per_second_squared_t maxAngularAccel)
     : m_system{std::move(system)},
       m_trackwidth{trackwidth},
+      m_minLinearAccel{minLinearAccel},
       m_maxLinearAccel{maxLinearAccel},
-      m_maxAngularAccel{maxAngularAccel} {}
+      m_maxAngularAccel{maxAngularAccel} {
+  if (minLinearAccel > maxLinearAccel) {
+    throw std::invalid_argument(
+        "maxLinearAccel must be greater than minLinearAccel");
+  }
+}
 
 DifferentialDriveWheelVoltages DifferentialDriveAccelerationLimiter::Calculate(
     units::meters_per_second_t leftVelocity,
@@ -48,8 +62,8 @@ DifferentialDriveWheelVoltages DifferentialDriveAccelerationLimiter::Calculate(
   // Constrain the linear and angular accelerations
   if (accels(0) > m_maxLinearAccel.value()) {
     accels(0) = m_maxLinearAccel.value();
-  } else if (accels(0) < -m_maxLinearAccel.value()) {
-    accels(0) = -m_maxLinearAccel.value();
+  } else if (accels(0) < m_minLinearAccel.value()) {
+    accels(0) = m_minLinearAccel.value();
   }
   if (accels(1) > m_maxAngularAccel.value()) {
     accels(1) = m_maxAngularAccel.value();
