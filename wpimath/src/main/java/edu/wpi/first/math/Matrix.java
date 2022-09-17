@@ -707,8 +707,8 @@ public class Matrix<R extends Num, C extends Num> {
   /**
    * Performs an inplace Cholesky rank update (or downdate).
    *
-   * <p>If this matrix contains L where A = LL<sup>\u22a4</sup> before the update, it will contain L
-   * where LL<sup>\u22a4</sup> = A + &sigma;vv<sup>\u22a4</sup> after the update.
+   * <p>If this matrix contains L where A = LLᵀ before the update, it will contain L
+   * where LLᵀ = A + σvvᵀ after the update.
    *
    * @param v Vector to use for the update.
    * @param sigma Sigma to use for the update.
