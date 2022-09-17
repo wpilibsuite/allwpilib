@@ -125,6 +125,22 @@ public final class WPIMathJNI {
    */
   public static native String serializeTrajectory(double[] elements);
 
+  /**
+   * Deserializes an Apriltag layout JSON into a double[] of elements.
+   *
+   * @param json The JSON containing the serialized trajectory.
+   * @return A double array with the trajectory states.
+   */
+  public static native double[] deserializeApriltagLayout(String json);
+
+  /**
+   * Serializes the Apriltag layout into a JSON string.
+   *
+   * @param elements The elements of the layout.
+   * @return A JSON containing the serialized layout.
+   */
+  public static native String serializeApriltagLayout(double[] elements);
+
   public static class Helper {
     private static AtomicBoolean extractOnStaticLoad = new AtomicBoolean(true);
 
