@@ -39,7 +39,7 @@ class WPILIB_DLLEXPORT ApriltagFieldLayout {
     
     Pose3d GetTagPose(int id) const;
     
-    void setShouldMirror(bool mirror) { m_mirror = mirror; }
+    void SetShouldMirror(bool mirror);
     
  private:
     std::vector<Apriltag> m_apriltags;

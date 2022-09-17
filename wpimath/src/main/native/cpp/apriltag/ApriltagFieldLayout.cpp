@@ -24,6 +24,10 @@ frc::Pose3d ApriltagFieldLayout::GetTagPose(int id) const {
     return returnPose;
 }
 
+void ApriltagFieldLayout::SetShouldMirror(bool mirror) {
+    m_mirror = mirror;
+}
+
 void frc::to_json(wpi::json& json, const ApriltagFieldLayout::Apriltag& apriltag) {
     json = wpi::json{
         {"id", apriltag.id},
