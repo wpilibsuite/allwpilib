@@ -6,6 +6,8 @@
 
 #include <wpi/json.h>
 #include "frc/geometry/Pose3d.h"
+#include "units/angle.h"
+#include "units/length.h"
 
 using namespace frc;
 
@@ -15,6 +17,9 @@ frc::Pose3d ApriltagFieldLayout::GetTagPose(int id) const {
         if(tag.id == id) {
             returnPose = tag.pose;
         }
+    }
+    if(m_mirror) {
+        returnPose = returnPose.RelativeTo(Pose3d{units::inch_t{54}, units::inch_t{27}, returnPose.Z(), Rotation3d{units::radian_t{0}, units::radian_t{0}, units::radian_t{180}}});
     }
     return returnPose;
 }
