@@ -182,4 +182,10 @@ class WPILIB_DLLEXPORT Translation3d {
   units::meter_t m_z = 0_m;
 };
 
+WPILIB_DLLEXPORT
+void to_json(wpi::json& json, const Translation3d& state);
+
+WPILIB_DLLEXPORT
+void from_json(const wpi::json& json, Translation3d& state);
+
 }  // namespace frc

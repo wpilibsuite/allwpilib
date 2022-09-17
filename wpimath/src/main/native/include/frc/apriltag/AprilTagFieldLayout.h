@@ -29,6 +29,23 @@ class WPILIB_DLLEXPORT AprilTagFieldLayout {
         int id;
 
         Pose3d pose;
+        
+        /**
+         * Checks equality between this State and another object.
+         *
+         * @param other The other object.
+         * @return Whether the two objects are equal.
+         */
+        bool operator==(const AprilTag& other) const;
+
+        /**
+         * Checks inequality between this State and another object.
+         *
+         * @param other The other object.
+         * @return Whether the two objects are not equal.
+         */
+        bool operator!=(const AprilTag& other) const;
+
     };
 
     AprilTagFieldLayout() = default;

@@ -11,6 +11,16 @@
 
 using namespace frc;
 
+bool AprilTagFieldLayout::AprilTag::operator==(const AprilTag &other) const {
+    return id == other.id && pose == other.pose;
+}
+
+bool AprilTagFieldLayout::AprilTag::operator!=(const AprilTag &other) const {
+    return !operator==(other);
+}
+
+AprilTagFieldLayout::AprilTagFieldLayout(const std::vector<AprilTag>& apriltags): m_apriltags(apriltags) {}
+
 frc::Pose3d AprilTagFieldLayout::GetTagPose(int id) const {
     Pose3d returnPose;
     for(auto& tag : m_apriltags) {

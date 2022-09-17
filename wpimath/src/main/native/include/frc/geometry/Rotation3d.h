@@ -162,4 +162,10 @@ class WPILIB_DLLEXPORT Rotation3d {
   Quaternion m_q;
 };
 
+WPILIB_DLLEXPORT
+void to_json(wpi::json& json, const Rotation3d& rotation);
+
+WPILIB_DLLEXPORT
+void from_json(const wpi::json& json, Rotation3d& rotation);
+
 }  // namespace frc

@@ -177,4 +177,10 @@ class WPILIB_DLLEXPORT Pose3d {
   Rotation3d m_rotation;
 };
 
+WPILIB_DLLEXPORT
+void to_json(wpi::json& json, const Pose3d& pose);
+
+WPILIB_DLLEXPORT
+void from_json(const wpi::json& json, Pose3d& pose);
+
 }  // namespace frc
