@@ -1172,6 +1172,20 @@ public final class DriverStation {
   }
 
   /**
+   * Refresh the passed in control word to contain the current control word cache.
+   *
+   * @param word Word to refresh.
+   */
+  public static void refreshControlWordFromCache(ControlWord word) {
+    m_cacheDataMutex.lock();
+    try {
+      word.update(m_controlWord);
+    } finally {
+      m_cacheDataMutex.unlock();
+    }
+  }
+
+  /**
    * Copy data from the DS task for the user. If no new data exists, it will just be returned,
    * otherwise the data will be copied from the DS polling loop.
    */
