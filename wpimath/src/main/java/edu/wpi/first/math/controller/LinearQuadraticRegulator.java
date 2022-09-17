@@ -44,6 +44,7 @@ public class LinearQuadraticRegulator<States extends Num, Inputs extends Num, Ou
    * @param qelms The maximum desired error tolerance for each state.
    * @param relms The maximum desired control effort for each input.
    * @param dtSeconds Discretization timestep.
+   * @throws IllegalArgumentException If the system is uncontrollable.
    */
   public LinearQuadraticRegulator(
       LinearSystem<States, Inputs, Outputs> plant,
@@ -66,6 +67,7 @@ public class LinearQuadraticRegulator<States extends Num, Inputs extends Num, Ou
    * @param qelms The maximum desired error tolerance for each state.
    * @param relms The maximum desired control effort for each input.
    * @param dtSeconds Discretization timestep.
+   * @throws IllegalArgumentException If the system is uncontrollable.
    */
   @SuppressWarnings({"ParameterName", "LocalVariableName"})
   public LinearQuadraticRegulator(
@@ -90,6 +92,7 @@ public class LinearQuadraticRegulator<States extends Num, Inputs extends Num, Ou
    * @param Q The state cost matrix.
    * @param R The input cost matrix.
    * @param dtSeconds Discretization timestep.
+   * @throws IllegalArgumentException If the system is uncontrollable.
    */
   @SuppressWarnings({"LocalVariableName", "ParameterName"})
   public LinearQuadraticRegulator(
@@ -141,6 +144,7 @@ public class LinearQuadraticRegulator<States extends Num, Inputs extends Num, Ou
    * @param R The input cost matrix.
    * @param N The state-input cross-term cost matrix.
    * @param dtSeconds Discretization timestep.
+   * @throws IllegalArgumentException If the system is uncontrollable.
    */
   @SuppressWarnings({"ParameterName", "LocalVariableName"})
   public LinearQuadraticRegulator(
