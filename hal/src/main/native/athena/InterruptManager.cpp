@@ -68,7 +68,7 @@ int32_t InterruptManager::Initialize(tSystemInterface* baseSystem) {
       HAL_NiFpga_UnreserveIrqContext == nullptr ||
       HAL_NiFpga_WaitOnIrqs == nullptr ||
       HAL_NiFpga_AcknowledgeIrqs == nullptr) {
-      return NO_AVAILABLE_RESOURCES;
+    return NO_AVAILABLE_RESOURCES;
   }
 
   return HAL_SUCCESS;
