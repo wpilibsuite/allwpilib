@@ -19,7 +19,7 @@ frc::Pose3d ApriltagFieldLayout::GetTagPose(int id) const {
         }
     }
     if(m_mirror) {
-        returnPose = returnPose.RelativeTo(Pose3d{units::inch_t{54}, units::inch_t{27}, returnPose.Z(), Rotation3d{units::radian_t{0}, units::radian_t{0}, units::radian_t{180}}});
+        returnPose = returnPose.RelativeTo(Pose3d{54_ft, 27_ft, 0_ft, Rotation3d{0_deg, 0_deg, 180_deg}});
     }
     return returnPose;
 }
