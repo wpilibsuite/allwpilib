@@ -43,7 +43,7 @@ public class EducationalRobot extends RobotBase {
     DriverStationJNI.observeUserProgramStarting();
 
     while (!Thread.currentThread().isInterrupted() && !m_exit) {
-      DriverStation.updateData();
+      DriverStation.refreshData();
       if (isDisabled()) {
         disabled();
         DriverStationJNI.observeUserProgramDisabled();

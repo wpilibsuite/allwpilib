@@ -106,5 +106,5 @@ test {
         showStandardStreams = true
     }
     //jvmArgs '-Xdebug',
-     //       '-Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=10999'
+    //       '-Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=10999'
 }

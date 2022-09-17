@@ -279,7 +279,7 @@ void HAL_ObserveUserProgramTest(void) {
   // TODO
 }
 
-void HAL_UpdateDSData(void) {
+void HAL_RefreshDSData(void) {
   std::scoped_lock lock{cacheMutex};
   if (currentCache->updated) {
     std::swap(currentCache, currentRead);

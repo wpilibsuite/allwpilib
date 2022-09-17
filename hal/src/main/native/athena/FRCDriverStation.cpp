@@ -424,7 +424,7 @@ static void newDataOccur(uint32_t refNum) {
   driverStation->newDataEvents.Wakeup();
 }
 
-void HAL_UpdateDSData(void) {
+void HAL_RefreshDSData(void) {
   std::scoped_lock lock{cacheMutex};
   if (currentCache->updated) {
     std::swap(currentCache, currentRead);

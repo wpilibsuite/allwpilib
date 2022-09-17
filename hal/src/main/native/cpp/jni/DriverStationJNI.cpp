@@ -402,14 +402,14 @@ Java_edu_wpi_first_hal_DriverStationJNI_sendConsoleLine
 
 /*
  * Class:     edu_wpi_first_hal_DriverStationJNI
- * Method:    updateDSData
+ * Method:    refreshDSData
  * Signature: ()V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_hal_DriverStationJNI_updateDSData
+Java_edu_wpi_first_hal_DriverStationJNI_refreshDSData
   (JNIEnv*, jclass)
 {
-  HAL_UpdateDSData();
+  HAL_RefreshDSData();
 }
 
 /*

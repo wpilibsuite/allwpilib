@@ -592,8 +592,8 @@ double DriverStation::GetBatteryVoltage() {
  * If no new data exists, it will just be returned, otherwise
  * the data will be copied from the DS polling loop.
  */
-void GetData() {
-  HAL_UpdateDSData();
+void DriverStation::RefreshData() {
+  HAL_RefreshDSData();
   auto& inst = ::GetInstance();
   {
     // Compute the pressed and released buttons
@@ -679,10 +679,6 @@ void ReportJoystickUnpluggedWarningV(fmt::string_view format,
       inst.nextMessageTime = currentTime + kJoystickUnpluggedMessageInterval;
     }
   }
-}
-
-void DriverStation::RefreshData() {
-  GetData();
 }
 
 void SendMatchData() {

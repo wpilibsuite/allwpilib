@@ -201,7 +201,7 @@ HAL_Bool HAL_GetOutputsEnabled(void);
  */
 int32_t HAL_GetMatchInfo(HAL_MatchInfo* info);
 
-void HAL_UpdateDSData(void);
+void HAL_RefreshDSData(void);
 
 void HAL_ProvideNewDataEventHandle(WPI_EventHandle handle);
 void HAL_RemoveNewDataEventHandle(WPI_EventHandle handle);

@@ -50,7 +50,6 @@ public final class DriverStation {
     }
   }
 
-
   private static class HALJoystickPOVs {
     public short[] m_povs;
     public int m_count;
@@ -409,7 +408,8 @@ public final class DriverStation {
 
   // Joystick Cached Data
   private static HALJoystickAxes[] m_joystickAxesCache = new HALJoystickAxes[kJoystickPorts];
-  private static HALJoystickAxesRaw[] m_joystickAxesRawCache = new HALJoystickAxesRaw[kJoystickPorts];
+  private static HALJoystickAxesRaw[] m_joystickAxesRawCache =
+      new HALJoystickAxesRaw[kJoystickPorts];
   private static HALJoystickPOVs[] m_joystickPOVsCache = new HALJoystickPOVs[kJoystickPorts];
   private static HALJoystickButtons[] m_joystickButtonsCache =
       new HALJoystickButtons[kJoystickPorts];
@@ -1175,8 +1175,8 @@ public final class DriverStation {
    * Copy data from the DS task for the user. If no new data exists, it will just be returned,
    * otherwise the data will be copied from the DS polling loop.
    */
-  public static void getData() {
-    DriverStationJNI.updateDSData();
+  public static void refreshData() {
+    DriverStationJNI.refreshDSData();
 
     // Get the status of all of the joysticks
     for (byte stick = 0; stick < kJoystickPorts; stick++) {
@@ -1245,10 +1245,6 @@ public final class DriverStation {
     if (dataLogSender != null) {
       dataLogSender.send(WPIUtilJNI.now());
     }
-  }
-
-  public static void refreshData() {
-    getData();
   }
 
   public static void provideRefreshedDataEventHandle(int handle) {
