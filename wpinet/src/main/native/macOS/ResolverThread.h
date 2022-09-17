@@ -2,6 +2,8 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
+#if defined(__APPLE__)
+
 #pragma once
 
 #include <netinet/in.h>
@@ -44,3 +46,5 @@ class ResolverThread {
   std::atomic_bool running;
 };
 }  // namespace wpi
+
+#endif  // defined(__APPLE__)

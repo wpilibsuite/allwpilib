@@ -26,7 +26,3 @@ void EndlessCommand::Execute() {
 void EndlessCommand::End(bool interrupted) {
   m_command->End(interrupted);
 }
-
-EndlessCommand EndlessCommand::Endlessly() && {
-  return std::move(*this);
-}

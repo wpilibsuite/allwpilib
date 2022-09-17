@@ -8,7 +8,12 @@
 
 #include <wpi/numbers>
 
+#include "Eigen/Core"
+#include "Eigen/LU"
+#include "Eigen/QR"
+#include "frc/fmt/Eigen.h"
 #include "units/math.h"
+#include "wpimath/MathShared.h"
 
 using namespace frc;
 
@@ -41,6 +46,100 @@ Rotation3d::Rotation3d(const Vectord<3>& axis, units::radian_t angle) {
   // https://en.wikipedia.org/wiki/Conversion_between_quaternions_and_Euler_angles#Definition
   Vectord<3> v = axis / norm * units::math::sin(angle / 2.0);
   m_q = Quaternion{units::math::cos(angle / 2.0), v(0), v(1), v(2)};
+}
+
+Rotation3d::Rotation3d(const Matrixd<3, 3>& rotationMatrix) {
+  const auto& R = rotationMatrix;
+
+  // Require that the rotation matrix is special orthogonal. This is true if the
+  // matrix is orthogonal (RRᵀ = I) and normalized (determinant is 1).
+  if (R * R.transpose() != Matrixd<3, 3>::Identity()) {
+    std::string msg =
+        fmt::format("Rotation matrix isn't orthogonal\n\nR =\n{}\n", R);
+
+    wpi::math::MathSharedStore::ReportError(msg);
+    throw std::domain_error(msg);
+  }
+  if (R.determinant() != 1.0) {
+    std::string msg = fmt::format(
+        "Rotation matrix is orthogonal but not special orthogonal\n\nR =\n{}\n",
+        R);
+
+    wpi::math::MathSharedStore::ReportError(msg);
+    throw std::domain_error(msg);
+  }
+
+  // Turn rotation matrix into a quaternion
+  // https://www.euclideanspace.com/maths/geometry/rotations/conversions/matrixToQuaternion/
+  double trace = R(0, 0) + R(1, 1) + R(2, 2);
+  double w;
+  double x;
+  double y;
+  double z;
+
+  if (trace > 0.0) {
+    double s = 0.5 / std::sqrt(trace + 1.0);
+    w = 0.25 / s;
+    x = (R(2, 1) - R(1, 2)) * s;
+    y = (R(0, 2) - R(2, 0)) * s;
+    z = (R(1, 0) - R(0, 1)) * s;
+  } else {
+    if (R(0, 0) > R(1, 1) && R(0, 0) > R(2, 2)) {
+      double s = 2.0 * std::sqrt(1.0 + R(0, 0) - R(1, 1) - R(2, 2));
+      w = (R(2, 1) - R(1, 2)) / s;
+      x = 0.25 * s;
+      y = (R(0, 1) + R(1, 0)) / s;
+      z = (R(0, 2) + R(2, 0)) / s;
+    } else if (R(1, 1) > R(2, 2)) {
+      double s = 2.0 * std::sqrt(1.0 + R(1, 1) - R(0, 0) - R(2, 2));
+      w = (R(0, 2) - R(2, 0)) / s;
+      x = (R(0, 1) + R(1, 0)) / s;
+      y = 0.25 * s;
+      z = (R(1, 2) + R(2, 1)) / s;
+    } else {
+      double s = 2.0 * std::sqrt(1.0 + R(2, 2) - R(0, 0) - R(1, 1));
+      w = (R(1, 0) - R(0, 1)) / s;
+      x = (R(0, 2) + R(2, 0)) / s;
+      y = (R(1, 2) + R(2, 1)) / s;
+      z = 0.25 * s;
+    }
+  }
+
+  m_q = Quaternion{w, x, y, z};
+}
+
+Rotation3d::Rotation3d(const Vectord<3>& initial, const Vectord<3>& final) {
+  double dot = initial.dot(final);
+  double normProduct = initial.norm() * final.norm();
+  double dotNorm = dot / normProduct;
+
+  if (dotNorm > 1.0 - 1E-9) {
+    // If the dot product is 1, the two vectors point in the same direction so
+    // there's no rotation. The default initialization of m_q will work.
+    return;
+  } else if (dotNorm < -1.0 + 1E-9) {
+    // If the dot product is -1, the two vectors point in opposite directions so
+    // a 180 degree rotation is required. Any orthogonal vector can be used for
+    // it. Q in the QR decomposition is an orthonormal basis, so it contains
+    // orthogonal unit vectors.
+    Eigen::Matrix<double, 3, 1> X = initial;
+    Eigen::HouseholderQR<decltype(X)> qr{X};
+    Eigen::Matrix<double, 3, 3> Q = qr.householderQ();
+
+    // w = std::cos(θ/2) = std::cos(90°) = 0
+    //
+    // For x, y, and z, we use the second column of Q because the first is
+    // parallel instead of orthogonal. The third column would also work.
+    m_q = Quaternion{0.0, Q(0, 1), Q(1, 1), Q(2, 1)};
+  } else {
+    // initial x final
+    Eigen::Vector3d axis{initial(1) * final(2) - final(1) * initial(2),
+                         final(0) * initial(2) - initial(0) * final(2),
+                         initial(0) * final(1) - final(0) * initial(1)};
+
+    // https://stackoverflow.com/a/11741520
+    m_q = Quaternion{normProduct + dot, axis(0), axis(1), axis(2)}.Normalize();
+  }
 }
 
 Rotation3d Rotation3d::operator+(const Rotation3d& other) const {

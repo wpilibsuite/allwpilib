@@ -52,6 +52,7 @@ public class KalmanFilter<States extends Num, Inputs extends Num, Outputs extend
    * @param stateStdDevs Standard deviations of model states.
    * @param measurementStdDevs Standard deviations of measurements.
    * @param dtSeconds Nominal discretization timestep.
+   * @throws IllegalArgumentException If the system is unobservable.
    */
   @SuppressWarnings("LocalVariableName")
   public KalmanFilter(

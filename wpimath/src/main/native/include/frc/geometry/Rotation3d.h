@@ -14,7 +14,7 @@
 namespace frc {
 
 /**
- * A rotation in a 3D coordinate frame.
+ * A rotation in a 3D coordinate frame represented by a quaternion.
  */
 class WPILIB_DLLEXPORT Rotation3d {
  public:
@@ -50,6 +50,26 @@ class WPILIB_DLLEXPORT Rotation3d {
    * @param angle The rotation around the axis.
    */
   Rotation3d(const Vectord<3>& axis, units::radian_t angle);
+
+  /**
+   * Constructs a Rotation3d from a rotation matrix.
+   *
+   * @param rotationMatrix The rotation matrix.
+   * @throws std::domain_error if the rotation matrix isn't special orthogonal.
+   */
+  explicit Rotation3d(const Matrixd<3, 3>& rotationMatrix);
+
+  /**
+   * Constructs a Rotation3d that rotates the initial vector onto the final
+   * vector.
+   *
+   * This is useful for turning a 3D vector (final) into an orientation relative
+   * to a coordinate system vector (initial).
+   *
+   * @param initial The initial vector.
+   * @param final The final vector.
+   */
+  Rotation3d(const Vectord<3>& initial, const Vectord<3>& final);
 
   /**
    * Adds two rotations together.

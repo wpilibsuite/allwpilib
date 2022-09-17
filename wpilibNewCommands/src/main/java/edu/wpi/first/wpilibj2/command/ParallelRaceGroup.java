@@ -88,10 +88,4 @@ public class ParallelRaceGroup extends CommandGroupBase {
   public boolean runsWhenDisabled() {
     return m_runWhenDisabled;
   }
-
-  @Override
-  public ParallelRaceGroup raceWith(Command... parallel) {
-    addCommands(parallel);
-    return this;
-  }
 }

@@ -39,7 +39,3 @@ void RepeatCommand::End(bool interrupted) {
 bool RepeatCommand::RunsWhenDisabled() const {
   return m_command->RunsWhenDisabled();
 }
-
-RepeatCommand RepeatCommand::Repeatedly() && {
-  return std::move(*this);
-}

@@ -115,7 +115,8 @@ void gui::DestroyContext() {
   gContext = nullptr;
 }
 
-bool gui::Initialize(const char* title, int width, int height) {
+bool gui::Initialize(const char* title, int width, int height,
+                     ImGuiConfigFlags configFlags) {
   gContext->title = title;
   gContext->width = width;
   gContext->height = height;
@@ -138,6 +139,7 @@ bool gui::Initialize(const char* title, int width, int height) {
   ImGui::CreateContext();
   ImPlot::CreateContext();
   ImGuiIO& io = ImGui::GetIO();
+  io.ConfigFlags |= configFlags;
 
   // Hook ini handler to save settings
   ImGuiSettingsHandler iniHandler;
@@ -297,9 +299,10 @@ void gui::Main() {
     PlatformRenderFrame();
     gContext->isPlatformRendering = false;
 
+    auto& io = ImGui::GetIO();
+
     // custom saving
     if (gContext->saveSettings) {
-      auto& io = ImGui::GetIO();
       if (io.WantSaveIniSettings) {
         gContext->saveSettings(false);
         io.WantSaveIniSettings = false;  // reset flag

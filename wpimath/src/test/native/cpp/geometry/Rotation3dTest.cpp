@@ -7,12 +7,13 @@
 #include <wpi/MathExtras.h>
 #include <wpi/numbers>
 
+#include "frc/EigenCore.h"
 #include "frc/geometry/Rotation3d.h"
 #include "gtest/gtest.h"
 
 using namespace frc;
 
-TEST(Rotation3dTest, Init) {
+TEST(Rotation3dTest, InitAxisAngleAndRollPitchYaw) {
   const Eigen::Vector3d xAxis{1.0, 0.0, 0.0};
   const Rotation3d rot1{xAxis, units::radian_t{wpi::numbers::pi / 3}};
   const Rotation3d rot2{units::radian_t{wpi::numbers::pi / 3}, 0_rad, 0_rad};
@@ -27,6 +28,80 @@ TEST(Rotation3dTest, Init) {
   const Rotation3d rot5{zAxis, units::radian_t{wpi::numbers::pi / 3}};
   const Rotation3d rot6{0_rad, 0_rad, units::radian_t{wpi::numbers::pi / 3}};
   EXPECT_EQ(rot5, rot6);
+}
+
+TEST(Rotation3dTest, InitRotationMatrix) {
+  // No rotation
+  const Matrixd<3, 3> R1 = Matrixd<3, 3>::Identity();
+  const Rotation3d rot1{R1};
+  EXPECT_EQ(Rotation3d{}, rot1);
+
+  // 90 degree CCW rotation around z-axis
+  Matrixd<3, 3> R2;
+  R2.block<3, 1>(0, 0) = Vectord<3>{0.0, 1.0, 0.0};
+  R2.block<3, 1>(0, 1) = Vectord<3>{-1.0, 0.0, 0.0};
+  R2.block<3, 1>(0, 2) = Vectord<3>{0.0, 0.0, 1.0};
+  const Rotation3d rot2{R2};
+  const Rotation3d expected2{0_deg, 0_deg, 90_deg};
+  EXPECT_EQ(expected2, rot2);
+
+  // Matrix that isn't orthogonal
+  const Matrixd<3, 3> R3{{1.0, 0.0, 0.0}, {1.0, 0.0, 0.0}, {1.0, 0.0, 0.0}};
+  EXPECT_THROW(Rotation3d{R3}, std::domain_error);
+
+  // Matrix that's orthogonal but not special orthogonal
+  const Matrixd<3, 3> R4 = Matrixd<3, 3>::Identity() * 2.0;
+  EXPECT_THROW(Rotation3d{R4}, std::domain_error);
+}
+
+TEST(Rotation3dTest, InitTwoVector) {
+  const Eigen::Vector3d xAxis{1.0, 0.0, 0.0};
+  const Eigen::Vector3d yAxis{0.0, 1.0, 0.0};
+  const Eigen::Vector3d zAxis{0.0, 0.0, 1.0};
+
+  // 90 degree CW rotation around y-axis
+  const Rotation3d rot1{xAxis, zAxis};
+  const Rotation3d expected1{yAxis, units::radian_t{-wpi::numbers::pi / 2.0}};
+  EXPECT_EQ(expected1, rot1);
+
+  // 45 degree CCW rotation around z-axis
+  const Rotation3d rot2{xAxis, Eigen::Vector3d{1.0, 1.0, 0.0}};
+  const Rotation3d expected2{zAxis, units::radian_t{wpi::numbers::pi / 4.0}};
+  EXPECT_EQ(expected2, rot2);
+
+  // 0 degree rotation of x-axes
+  const Rotation3d rot3{xAxis, xAxis};
+  EXPECT_EQ(Rotation3d{}, rot3);
+
+  // 0 degree rotation of y-axes
+  const Rotation3d rot4{yAxis, yAxis};
+  EXPECT_EQ(Rotation3d{}, rot4);
+
+  // 0 degree rotation of z-axes
+  const Rotation3d rot5{zAxis, zAxis};
+  EXPECT_EQ(Rotation3d{}, rot5);
+
+  // 180 degree rotation tests. For 180 degree rotations, any quaternion with an
+  // orthogonal rotation axis is acceptable. The rotation axis and initial
+  // vector are orthogonal if their dot product is zero.
+
+  // 180 degree rotation of x-axes
+  const Rotation3d rot6{xAxis, -xAxis};
+  const auto q6 = rot6.GetQuaternion();
+  EXPECT_EQ(0.0, q6.W());
+  EXPECT_EQ(0.0, q6.X() * xAxis(0) + q6.Y() * xAxis(1) + q6.Z() * xAxis(2));
+
+  // 180 degree rotation of y-axes
+  const Rotation3d rot7{yAxis, -yAxis};
+  const auto q7 = rot7.GetQuaternion();
+  EXPECT_EQ(0.0, q7.W());
+  EXPECT_EQ(0.0, q7.X() * yAxis(0) + q7.Y() * yAxis(1) + q7.Z() * yAxis(2));
+
+  // 180 degree rotation of z-axes
+  const Rotation3d rot8{zAxis, -zAxis};
+  const auto q8 = rot8.GetQuaternion();
+  EXPECT_EQ(0.0, q8.W());
+  EXPECT_EQ(0.0, q8.X() * zAxis(0) + q8.Y() * zAxis(1) + q8.Z() * zAxis(2));
 }
 
 TEST(Rotation3dTest, RadiansToDegrees) {

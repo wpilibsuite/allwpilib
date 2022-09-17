@@ -53,6 +53,10 @@ jobs:
         run: |
           cd upstream_utils
           ./update_stack_walker.py
+      - name: Run update_memory.py
+        run: |
+          cd upstream_utils
+          ./update_memory.py
       - name: Add untracked files to index so they count as changes
         run: git add -A
       - name: Check output

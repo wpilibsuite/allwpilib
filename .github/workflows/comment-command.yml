@@ -20,6 +20,8 @@ jobs:
               content: "rocket",
             });
       - uses: actions/checkout@v3
+        with:
+          token: ${{ secrets.COMMENT_COMMAND_PAT_TOKEN }}
       - name: Fetch all history and metadata
         run: |
           git fetch --prune --unshallow
@@ -29,7 +31,7 @@ jobs:
         run: |
           gh pr checkout $NUMBER
         env:
-          GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
+          GITHUB_TOKEN: "${{ secrets.COMMENT_COMMAND_PAT_TOKEN }}"
           NUMBER: ${{ github.event.issue.number }}
       - name: Set up Python 3.8
         uses: actions/setup-python@v2

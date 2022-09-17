@@ -69,6 +69,9 @@ static bool JsonToWindow(const wpi::json& jfile, const char* filename) {
   wpi::raw_string_ostream ini{iniStr};
 
   for (auto&& jsection : jfile.items()) {
+    if (jsection.key() == "Docking") {
+      continue;
+    }
     if (!jsection.value().is_object()) {
       ImGui::LogText("%s section %s is not object", filename,
                      jsection.key().c_str());
@@ -95,6 +98,31 @@ static bool JsonToWindow(const wpi::json& jfile, const char* filename) {
       ini << '\n';
     }
   }
+
+  // emit Docking section last
+  auto docking = jfile.find("Docking");
+  if (docking != jfile.end()) {
+    for (auto&& jsubsection : docking->items()) {
+      if (!jsubsection.value().is_array()) {
+        ImGui::LogText("%s section %s subsection %s is not array", filename,
+                       "Docking", jsubsection.key().c_str());
+        return false;
+      }
+      ini << "[Docking][" << jsubsection.key() << "]\n";
+      for (auto&& jv : jsubsection.value()) {
+        try {
+          auto& value = jv.get_ref<const std::string&>();
+          ini << value << "\n";
+        } catch (wpi::json::exception&) {
+          ImGui::LogText("%s section %s subsection %s value is not string",
+                         filename, "Docking", jsubsection.key().c_str());
+          return false;
+        }
+      }
+      ini << '\n';
+    }
+  }
+
   ini.flush();
 
   ImGui::LoadIniSettingsFromMemory(iniStr.data(), iniStr.size());
@@ -204,7 +232,11 @@ static wpi::json WindowToJson() {
       }
       curSection = &jsection[subsection];
       if (curSection->is_null()) {
-        *curSection = wpi::json::object();
+        if (section == "Docking") {
+          *curSection = wpi::json::array();
+        } else {
+          *curSection = wpi::json::object();
+        }
       }
     } else {
       // value
@@ -212,7 +244,11 @@ static wpi::json WindowToJson() {
         continue;  // shouldn't happen, but just in case
       }
       auto [name, value] = wpi::split(line, '=');
-      (*curSection)[name] = value;
+      if (curSection->is_object()) {
+        (*curSection)[name] = value;
+      } else if (curSection->is_array()) {
+        curSection->emplace_back(line);
+      }
     }
   }
 
