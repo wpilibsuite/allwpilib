@@ -55,9 +55,4 @@ public class PerpetualCommand extends CommandBase {
   public boolean runsWhenDisabled() {
     return m_command.runsWhenDisabled();
   }
-
-  @Override
-  public PerpetualCommand perpetually() {
-    return this;
-  }
 }

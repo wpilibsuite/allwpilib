@@ -5,9 +5,8 @@
 #include "ReplaceMePIDSubsystem2.h"
 
 ReplaceMePIDSubsystem2::ReplaceMePIDSubsystem2()
-    : PIDSubsystem(
-          // The PIDController used by the subsystem
-          frc2::PIDController(0, 0, 0)) {}
+    // The PIDController used by the subsystem
+    : PIDSubsystem{frc2::PIDController{0, 0, 0}} {}
 
 void ReplaceMePIDSubsystem2::UseOutput(double output, double setpoint) {
   // Use the output here

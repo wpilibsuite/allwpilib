@@ -22,8 +22,9 @@ std::string Demangle(std::string_view mangledSymbol) {
   char buffer[256];
   DWORD sz = UnDecorateSymbolName(buf.c_str(), buffer, sizeof(buffer),
                                   UNDNAME_COMPLETE);
-  if (sz == 0)
+  if (sz == 0) {
     return std::string{mangledSymbol};
+  }
   return std::string(buffer, sz);
 }
 

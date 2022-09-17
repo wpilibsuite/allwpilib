@@ -56,7 +56,7 @@ inline void ADISReportError(int32_t status, const char* file, int line,
                             const char* function, const S& format,
                             Args&&... args) {
   frc::ReportErrorV(status, file, line, function, format,
-                    fmt::make_args_checked<Args...>(format, args...));
+                    fmt::make_format_args(args...));
 }
 }  // namespace
 
@@ -102,8 +102,8 @@ ADIS16448_IMU::ADIS16448_IMU(IMUAxis yaw_axis, SPI::Port port,
     DigitalOutput* m_reset_out = new DigitalOutput(18);  // Drive MXP DIO8 low
     Wait(10_ms);                                         // Wait 10ms
     delete m_reset_out;
-    new DigitalInput(18);  // Set MXP DIO8 high
-    Wait(500_ms);          // Wait 500ms for reset to complete
+    m_reset_in = new DigitalInput(18);  // Set MXP DIO8 high
+    Wait(500_ms);                       // Wait 500ms for reset to complete
 
     ConfigCalTime(cal_time);
 
@@ -143,7 +143,7 @@ ADIS16448_IMU::ADIS16448_IMU(IMUAxis yaw_axis, SPI::Port port,
 
     // TODO: Find what the proper pin is to turn this LED
     //  Drive MXP PWM5 (IMU ready LED) low (active low)
-    new DigitalOutput(19);
+    m_status_led = new DigitalOutput(19);
   }
 
   // Report usage and post data to DS
@@ -387,6 +387,14 @@ void ADIS16448_IMU::Reset() {
 }
 
 void ADIS16448_IMU::Close() {
+  if (m_reset_in != nullptr) {
+    delete m_reset_in;
+    m_reset_in = nullptr;
+  }
+  if (m_status_led != nullptr) {
+    delete m_status_led;
+    m_status_led = nullptr;
+  }
   if (m_thread_active) {
     m_thread_active = false;
     if (m_acquire_task.joinable()) {

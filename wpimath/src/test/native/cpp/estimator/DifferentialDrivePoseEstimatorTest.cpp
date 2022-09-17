@@ -18,22 +18,21 @@
 #include "units/time.h"
 
 TEST(DifferentialDrivePoseEstimatorTest, Accuracy) {
-  frc::DifferentialDrivePoseEstimator estimator{frc::Rotation2d(),
-                                                frc::Pose2d(),
+  frc::DifferentialDrivePoseEstimator estimator{frc::Rotation2d{},
+                                                frc::Pose2d{},
                                                 {0.02, 0.02, 0.01, 0.02, 0.02},
                                                 {0.01, 0.01, 0.001},
                                                 {0.1, 0.1, 0.01}};
 
   frc::Trajectory trajectory = frc::TrajectoryGenerator::GenerateTrajectory(
-      std::vector{frc::Pose2d(0_m, 0_m, frc::Rotation2d(45_deg)),
-                  frc::Pose2d(3_m, 0_m, frc::Rotation2d(-90_deg)),
-                  frc::Pose2d(0_m, 0_m, frc::Rotation2d(135_deg)),
-                  frc::Pose2d(-3_m, 0_m, frc::Rotation2d(-90_deg)),
-                  frc::Pose2d(0_m, 0_m, frc::Rotation2d(45_deg))},
+      std::vector{frc::Pose2d{0_m, 0_m, 45_deg}, frc::Pose2d{3_m, 0_m, -90_deg},
+                  frc::Pose2d{0_m, 0_m, 135_deg},
+                  frc::Pose2d{-3_m, 0_m, -90_deg},
+                  frc::Pose2d{0_m, 0_m, 45_deg}},
       frc::TrajectoryConfig(10_mps, 5.0_mps_sq));
 
   frc::DifferentialDriveKinematics kinematics{1.0_m};
-  frc::DifferentialDriveOdometry odometry{frc::Rotation2d()};
+  frc::DifferentialDriveOdometry odometry{frc::Rotation2d{}};
 
   std::default_random_engine generator;
   std::normal_distribution<double> distribution(0.0, 1.0);
@@ -58,15 +57,15 @@ TEST(DifferentialDrivePoseEstimatorTest, Accuracy) {
          groundTruthState.velocity * groundTruthState.curvature});
 
     if (lastVisionUpdateTime + kVisionUpdateRate < t) {
-      if (lastVisionPose != frc::Pose2d()) {
+      if (lastVisionPose != frc::Pose2d{}) {
         estimator.AddVisionMeasurement(lastVisionPose, lastVisionUpdateTime);
       }
       lastVisionPose =
           groundTruthState.pose +
-          frc::Transform2d(
-              frc::Translation2d(distribution(generator) * 0.1 * 1_m,
-                                 distribution(generator) * 0.1 * 1_m),
-              frc::Rotation2d(distribution(generator) * 0.01 * 1_rad));
+          frc::Transform2d{
+              frc::Translation2d{distribution(generator) * 0.1 * 1_m,
+                                 distribution(generator) * 0.1 * 1_m},
+              frc::Rotation2d{distribution(generator) * 0.01 * 1_rad}};
 
       lastVisionUpdateTime = t;
     }
@@ -77,7 +76,7 @@ TEST(DifferentialDrivePoseEstimatorTest, Accuracy) {
     auto xhat = estimator.UpdateWithTime(
         t,
         groundTruthState.pose.Rotation() +
-            frc::Rotation2d(units::radian_t(distribution(generator) * 0.001)),
+            frc::Rotation2d{units::radian_t{distribution(generator) * 0.001}},
         input, leftDistance, rightDistance);
 
     double error = groundTruthState.pose.Translation()
@@ -93,6 +92,6 @@ TEST(DifferentialDrivePoseEstimatorTest, Accuracy) {
   }
 
   EXPECT_NEAR(0.0, errorSum / (trajectory.TotalTime().value() / dt.value()),
-              0.2);
-  EXPECT_NEAR(0.0, maxError, 0.4);
+              0.05);
+  EXPECT_NEAR(0.0, maxError, 0.125);
 }

@@ -110,7 +110,7 @@ class DifferentialDrivePoseEstimatorTest {
       t += dt;
     }
 
-    assertEquals(0.0, errorSum / (traj.getTotalTimeSeconds() / dt), 0.035, "Incorrect mean error");
-    assertEquals(0.0, maxError, 0.055, "Incorrect max error");
+    assertEquals(0.0, errorSum / (traj.getTotalTimeSeconds() / dt), 0.05, "Incorrect mean error");
+    assertEquals(0.0, maxError, 0.125, "Incorrect max error");
   }
 }

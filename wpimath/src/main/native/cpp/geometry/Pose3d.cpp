@@ -43,7 +43,7 @@ Pose3d Pose3d::operator+(const Transform3d& other) const {
 
 Transform3d Pose3d::operator-(const Pose3d& other) const {
   const auto pose = this->RelativeTo(other);
-  return Transform3d(pose.Translation(), pose.Rotation());
+  return Transform3d{pose.Translation(), pose.Rotation()};
 }
 
 bool Pose3d::operator==(const Pose3d& other) const {

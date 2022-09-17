@@ -1,31 +1,17 @@
-From 4f34f83152a851ce675c876f3bd0e53322110d04 Mon Sep 17 00:00:00 2001
+From 3d09b3d7b78ffc037a32725cc4002976b908d965 Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Sat, 7 May 2022 20:50:26 -0400
-Subject: [PATCH 01/31] Fix spelling / language errors
+Subject: [PATCH 01/28] Fix spelling/language errors
 
 ---
- llvm/include/llvm/Support/Chrono.h        | 2 +-
  llvm/include/llvm/Support/ErrorHandling.h | 2 +-
- 2 files changed, 2 insertions(+), 2 deletions(-)
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/llvm/include/llvm/Support/Chrono.h b/llvm/include/llvm/Support/Chrono.h
-index f478549a7e4e..004519a883fd 100644
---- a/llvm/include/llvm/Support/Chrono.h
-+++ b/llvm/include/llvm/Support/Chrono.h
-@@ -22,7 +22,7 @@ class raw_ostream;
- namespace sys {
- 
- /// A time point on the system clock. This is provided for two reasons:
--/// - to insulate us agains subtle differences in behavoir to differences in
-+/// - to insulate us against subtle differences in behavior to differences in
- ///   system clock precision (which is implementation-defined and differs between
- ///   platforms).
- /// - to shorten the type name
 diff --git a/llvm/include/llvm/Support/ErrorHandling.h b/llvm/include/llvm/Support/ErrorHandling.h
-index 0ec0242d569d..dd85a5892e01 100644
+index f980510d3..6791df6be 100644
 --- a/llvm/include/llvm/Support/ErrorHandling.h
 +++ b/llvm/include/llvm/Support/ErrorHandling.h
-@@ -45,7 +45,7 @@ class StringRef;
+@@ -44,7 +44,7 @@ namespace llvm {
    void install_fatal_error_handler(fatal_error_handler_t handler,
                                     void *user_data = nullptr);
  
@@ -34,6 +20,3 @@ index 0ec0242d569d..dd85a5892e01 100644
    void remove_fatal_error_handler();
  
    /// ScopedFatalErrorHandler - This is a simple helper class which just
--- 
-2.20.1.windows.1
-

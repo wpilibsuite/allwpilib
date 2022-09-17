@@ -7,6 +7,7 @@
 #include <frc/trajectory/TrapezoidProfile.h>
 #include <units/acceleration.h>
 #include <units/angle.h>
+#include <units/angular_acceleration.h>
 #include <units/angular_velocity.h>
 #include <units/length.h>
 #include <units/time.h>
@@ -70,15 +71,10 @@ constexpr double kPRearRightVel = 0.5;
 }  // namespace DriveConstants
 
 namespace AutoConstants {
-using radians_per_second_squared_t =
-    units::compound_unit<units::radians,
-                         units::inverse<units::squared<units::second>>>;
-
-constexpr auto kMaxSpeed = units::meters_per_second_t(3);
-constexpr auto kMaxAcceleration = units::meters_per_second_squared_t(3);
-constexpr auto kMaxAngularSpeed = units::radians_per_second_t(3);
-constexpr auto kMaxAngularAcceleration =
-    units::unit_t<radians_per_second_squared_t>(3);
+constexpr auto kMaxSpeed = 3_mps;
+constexpr auto kMaxAcceleration = 3_mps_sq;
+constexpr auto kMaxAngularSpeed = 3_rad_per_s;
+constexpr auto kMaxAngularAcceleration = 3_rad_per_s_sq;
 
 constexpr double kPXController = 0.5;
 constexpr double kPYController = 0.5;

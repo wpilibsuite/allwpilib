@@ -20,9 +20,11 @@ import java.util.function.BooleanSupplier;
  */
 public class Button extends Trigger {
   /**
-   * Default constructor; creates a button that is never pressed (unless {@link Button#get()} is
-   * overridden).
+   * Default constructor; creates a button that is never pressed.
+   *
+   * @deprecated Replace with {@code new Button(() -> false) }.
    */
+  @Deprecated(since = "2023")
   public Button() {}
 
   /**
@@ -36,19 +38,6 @@ public class Button extends Trigger {
 
   /**
    * Starts the given command whenever the button is newly pressed.
-   *
-   * @param command the command to start
-   * @param interruptible whether the command is interruptible
-   * @return this button, so calls can be chained
-   */
-  public Button whenPressed(final Command command, boolean interruptible) {
-    whenActive(command, interruptible);
-    return this;
-  }
-
-  /**
-   * Starts the given command whenever the button is newly pressed. The command is set to be
-   * interruptible.
    *
    * @param command the command to start
    * @return this button, so calls can be chained
@@ -73,23 +62,8 @@ public class Button extends Trigger {
   /**
    * Constantly starts the given command while the button is held.
    *
-   * <p>{@link Command#schedule(boolean)} will be called repeatedly while the button is held, and
-   * will be canceled when the button is released.
-   *
-   * @param command the command to start
-   * @param interruptible whether the command is interruptible
-   * @return this button, so calls can be chained
-   */
-  public Button whileHeld(final Command command, boolean interruptible) {
-    whileActiveContinuous(command, interruptible);
-    return this;
-  }
-
-  /**
-   * Constantly starts the given command while the button is held.
-   *
-   * <p>{@link Command#schedule(boolean)} will be called repeatedly while the button is held, and
-   * will be canceled when the button is released. The command is set to be interruptible.
+   * <p>{@link Command#schedule()} will be called repeatedly while the button is held, and will be
+   * canceled when the button is released.
    *
    * @param command the command to start
    * @return this button, so calls can be chained
@@ -116,36 +90,10 @@ public class Button extends Trigger {
    * but does not start it again if it ends or is otherwise interrupted.
    *
    * @param command the command to start
-   * @param interruptible whether the command is interruptible
-   * @return this button, so calls can be chained
-   */
-  public Button whenHeld(final Command command, boolean interruptible) {
-    whileActiveOnce(command, interruptible);
-    return this;
-  }
-
-  /**
-   * Starts the given command when the button is first pressed, and cancels it when it is released,
-   * but does not start it again if it ends or is otherwise interrupted. The command is set to be
-   * interruptible.
-   *
-   * @param command the command to start
    * @return this button, so calls can be chained
    */
   public Button whenHeld(final Command command) {
-    whileActiveOnce(command, true);
-    return this;
-  }
-
-  /**
-   * Starts the command when the button is released.
-   *
-   * @param command the command to start
-   * @param interruptible whether the command is interruptible
-   * @return this button, so calls can be chained
-   */
-  public Button whenReleased(final Command command, boolean interruptible) {
-    whenInactive(command, interruptible);
+    whileActiveOnce(command);
     return this;
   }
 
@@ -169,18 +117,6 @@ public class Button extends Trigger {
    */
   public Button whenReleased(final Runnable toRun, Subsystem... requirements) {
     whenInactive(toRun, requirements);
-    return this;
-  }
-
-  /**
-   * Toggles the command whenever the button is pressed (on then off then on).
-   *
-   * @param command the command to start
-   * @param interruptible whether the command is interruptible
-   * @return this button, so calls can be chained
-   */
-  public Button toggleWhenPressed(final Command command, boolean interruptible) {
-    toggleWhenActive(command, interruptible);
     return this;
   }
 

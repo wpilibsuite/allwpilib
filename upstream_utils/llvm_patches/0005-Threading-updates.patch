@@ -1,7 +1,7 @@
-From a53483a33c8d5778e5594a49376b5bafe742d126 Mon Sep 17 00:00:00 2001
+From bc86b62f72cbb76a0911996f4b1c6ce476cd1fac Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Sat, 7 May 2022 22:17:19 -0400
-Subject: [PATCH 05/31] Threading updates
+Subject: [PATCH 05/28] Threading updates
 
 - Remove guards for threads and exception
 - Prefer scope gaurd over lock gaurd
@@ -12,10 +12,10 @@ Subject: [PATCH 05/31] Threading updates
  3 files changed, 11 insertions(+), 43 deletions(-)
 
 diff --git a/llvm/include/llvm/Support/Compiler.h b/llvm/include/llvm/Support/Compiler.h
-index f4d6612fe074..989d25bb03b9 100644
+index f5d726ec8..ede1cb172 100644
 --- a/llvm/include/llvm/Support/Compiler.h
 +++ b/llvm/include/llvm/Support/Compiler.h
-@@ -525,7 +525,6 @@ void AnnotateIgnoreWritesEnd(const char *file, int line);
+@@ -540,7 +540,6 @@ void AnnotateIgnoreWritesEnd(const char *file, int line);
  /// initialize to some constant value. In almost all circumstances this is most
  /// appropriate for use with a pointer, integer, or small aggregation of
  /// pointers and integers.
@@ -23,7 +23,7 @@ index f4d6612fe074..989d25bb03b9 100644
  #if __has_feature(cxx_thread_local) || defined(_MSC_VER)
  #define LLVM_THREAD_LOCAL thread_local
  #else
-@@ -533,11 +532,6 @@ void AnnotateIgnoreWritesEnd(const char *file, int line);
+@@ -548,11 +547,6 @@ void AnnotateIgnoreWritesEnd(const char *file, int line);
  // we only need the restricted functionality that provides.
  #define LLVM_THREAD_LOCAL __thread
  #endif
@@ -36,7 +36,7 @@ index f4d6612fe074..989d25bb03b9 100644
  /// \macro LLVM_ENABLE_EXCEPTIONS
  /// Whether LLVM is built with exception support.
 diff --git a/llvm/lib/Support/ErrorHandling.cpp b/llvm/lib/Support/ErrorHandling.cpp
-index 19d1fd77af12..2403db9c80f1 100644
+index 8ae8fb8b4..89440b5ab 100644
 --- a/llvm/lib/Support/ErrorHandling.cpp
 +++ b/llvm/lib/Support/ErrorHandling.cpp
 @@ -44,7 +44,6 @@ static void *ErrorHandlerUserData = nullptr;
@@ -151,7 +151,7 @@ index 19d1fd77af12..2403db9c80f1 100644
  void llvm::llvm_unreachable_internal(const char *msg, const char *file,
                                       unsigned line) {
 diff --git a/llvm/lib/Support/ManagedStatic.cpp b/llvm/lib/Support/ManagedStatic.cpp
-index a6ae67066ea0..fc798b7ec1b7 100644
+index a6ae67066..fc798b7ec 100644
 --- a/llvm/lib/Support/ManagedStatic.cpp
 +++ b/llvm/lib/Support/ManagedStatic.cpp
 @@ -12,23 +12,23 @@
@@ -183,6 +183,3 @@ index a6ae67066ea0..fc798b7ec1b7 100644
  
      if (!Ptr.load(std::memory_order_relaxed)) {
        void *Tmp = Creator();
--- 
-2.20.1.windows.1
-

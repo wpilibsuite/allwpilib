@@ -38,7 +38,7 @@ public class LTVDifferentialDriveController {
   private Matrix<N5, N1> m_tolerance = new Matrix<>(Nat.N5(), Nat.N1());
 
   /** States of the drivetrain system. */
-  enum State {
+  private enum State {
     kX(0),
     kY(1),
     kHeading(2),
@@ -57,8 +57,9 @@ public class LTVDifferentialDriveController {
   /**
    * Constructs a linear time-varying differential drive controller.
    *
-   * @param plant The drivetrain velocity plant.
-   * @param trackwidth The drivetrain's trackwidth in meters.
+   * @param plant The differential drive velocity plant.
+   * @param trackwidth The distance between the differential drive's left and right wheels in
+   *     meters.
    * @param qelems The maximum desired error tolerance for each state.
    * @param relems The maximum desired control effort for each input.
    * @param dt Discretization timestep in seconds.
@@ -72,6 +73,8 @@ public class LTVDifferentialDriveController {
       double dt) {
     m_trackwidth = trackwidth;
 
+    // Control law derivation is in section 8.7 of
+    // https://file.tavsys.net/control/controls-engineering-in-frc.pdf
     var A =
         new MatBuilder<>(Nat.N5(), Nat.N5())
             .fill(

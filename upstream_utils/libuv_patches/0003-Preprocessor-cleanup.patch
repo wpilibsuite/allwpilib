@@ -1,7 +1,7 @@
-From 20120ec8cb9310e243a71fe5bf9bee37eac7614b Mon Sep 17 00:00:00 2001
+From dec4f95751a103f132e9674adf184188ec69176f Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Tue, 26 Apr 2022 15:19:14 -0400
-Subject: [PATCH 3/7] Preprocessor cleanup
+Subject: [PATCH 3/9] Preprocessor cleanup
 
 ---
  include/uv.h        | 18 +-----------------
@@ -86,7 +86,7 @@ index 420be86c..256fef37 100644
  # include "uv/darwin.h"
  #elif defined(__DragonFly__)       || \
 diff --git a/include/uv/win.h b/include/uv/win.h
-index fe36a532..7b013173 100644
+index 10d5e8f1..0a33366f 100644
 --- a/include/uv/win.h
 +++ b/include/uv/win.h
 @@ -60,11 +60,7 @@ typedef struct pollfd {
@@ -103,7 +103,7 @@ index fe36a532..7b013173 100644
  #include "uv/tree.h"
  #include "uv/threadpool.h"
 diff --git a/src/unix/internal.h b/src/unix/internal.h
-index 5a867db7..7e1d408f 100644
+index f9d1666d..2b654157 100644
 --- a/src/unix/internal.h
 +++ b/src/unix/internal.h
 @@ -192,6 +192,8 @@ struct uv__stream_queued_fds_s {
@@ -128,7 +128,7 @@ index f71b3c04..71c9b169 100644
  #define UV_FS_FREE_PATHS         0x0002
  #define UV_FS_FREE_PTR           0x0008
 diff --git a/src/win/tty.c b/src/win/tty.c
-index f6131d45..54c6c290 100644
+index d7522668..9753784d 100644
 --- a/src/win/tty.c
 +++ b/src/win/tty.c
 @@ -42,6 +42,8 @@
@@ -177,6 +177,3 @@ index a68b0953..7843e9f1 100644
  
  /* Whether there are any non-IFS LSPs stacked on TCP */
  int uv_tcp_non_ifs_lsp_ipv4;
--- 
-2.36.1
-

@@ -90,11 +90,15 @@ template <int CovDim, int States>
 Vectord<CovDim> AngleMean(const Matrixd<CovDim, 2 * States + 1>& sigmas,
                           const Vectord<2 * States + 1>& Wm,
                           int angleStatesIdx) {
-  double sumSin = sigmas.row(angleStatesIdx)
-                      .unaryExpr([](auto it) { return std::sin(it); })
+  double sumSin = (sigmas.row(angleStatesIdx).unaryExpr([](auto it) {
+                    return std::sin(it);
+                  }) *
+                   Wm)
                       .sum();
-  double sumCos = sigmas.row(angleStatesIdx)
-                      .unaryExpr([](auto it) { return std::cos(it); })
+  double sumCos = (sigmas.row(angleStatesIdx).unaryExpr([](auto it) {
+                    return std::cos(it);
+                  }) *
+                   Wm)
                       .sum();
 
   Vectord<CovDim> ret = sigmas * Wm;

@@ -50,15 +50,18 @@ TEST(DiscretizationTest, DiscretizeAB) {
   EXPECT_EQ(x1Truth, x1Discrete);
 }
 
-//                                             dt
-// Test that the discrete approximation of Q ≈ ∫ e^(Aτ) Q e^(Aᵀτ) dτ
-//                                             0
+//                                               T
+// Test that the discrete approximation of Q_d ≈ ∫ e^(Aτ) Q e^(Aᵀτ) dτ
+//                                               0
 TEST(DiscretizationTest, DiscretizeSlowModelAQ) {
   frc::Matrixd<2, 2> contA{{0, 1}, {0, 0}};
   frc::Matrixd<2, 2> contQ{{1, 0}, {0, 1}};
 
   constexpr auto dt = 1_s;
 
+  //       T
+  // Q_d ≈ ∫ e^(Aτ) Q e^(Aᵀτ) dτ
+  //       0
   frc::Matrixd<2, 2> discQIntegrated = frc::RungeKuttaTimeVarying<
       std::function<frc::Matrixd<2, 2>(units::second_t,
                                        const frc::Matrixd<2, 2>&)>,
@@ -79,15 +82,18 @@ TEST(DiscretizationTest, DiscretizeSlowModelAQ) {
       << discQIntegrated;
 }
 
-//                                             dt
-// Test that the discrete approximation of Q ≈ ∫ e^(Aτ) Q e^(Aᵀτ) dτ
-//                                             0
+//                                               T
+// Test that the discrete approximation of Q_d ≈ ∫ e^(Aτ) Q e^(Aᵀτ) dτ
+//                                               0
 TEST(DiscretizationTest, DiscretizeFastModelAQ) {
   frc::Matrixd<2, 2> contA{{0, 1}, {0, -1406.29}};
   frc::Matrixd<2, 2> contQ{{0.0025, 0}, {0, 1}};
 
   constexpr auto dt = 5_ms;
 
+  //       T
+  // Q_d = ∫ e^(Aτ) Q e^(Aᵀτ) dτ
+  //       0
   frc::Matrixd<2, 2> discQIntegrated = frc::RungeKuttaTimeVarying<
       std::function<frc::Matrixd<2, 2>(units::second_t,
                                        const frc::Matrixd<2, 2>&)>,
@@ -125,6 +131,9 @@ TEST(DiscretizationTest, DiscretizeSlowModelAQTaylor) {
     EXPECT_GE(esCont.eigenvalues()[i], 0);
   }
 
+  //       T
+  // Q_d = ∫ e^(Aτ) Q e^(Aᵀτ) dτ
+  //       0
   frc::Matrixd<2, 2> discQIntegrated = frc::RungeKuttaTimeVarying<
       std::function<frc::Matrixd<2, 2>(units::second_t,
                                        const frc::Matrixd<2, 2>&)>,
@@ -168,6 +177,9 @@ TEST(DiscretizationTest, DiscretizeFastModelAQTaylor) {
     EXPECT_GE(esCont.eigenvalues()[i], 0);
   }
 
+  //       T
+  // Q_d = ∫ e^(Aτ) Q e^(Aᵀτ) dτ
+  //       0
   frc::Matrixd<2, 2> discQIntegrated = frc::RungeKuttaTimeVarying<
       std::function<frc::Matrixd<2, 2>(units::second_t,
                                        const frc::Matrixd<2, 2>&)>,

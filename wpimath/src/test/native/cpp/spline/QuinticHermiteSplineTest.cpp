@@ -65,23 +65,20 @@ class QuinticHermiteSplineTest : public ::testing::Test {
 }  // namespace frc
 
 TEST_F(QuinticHermiteSplineTest, StraightLine) {
-  Run(Pose2d(), Pose2d(3_m, 0_m, Rotation2d()));
+  Run(Pose2d{}, Pose2d{3_m, 0_m, 0_deg});
 }
 
 TEST_F(QuinticHermiteSplineTest, SimpleSCurve) {
-  Run(Pose2d(), Pose2d(1_m, 1_m, Rotation2d()));
+  Run(Pose2d{}, Pose2d{1_m, 1_m, 0_deg});
 }
 
 TEST_F(QuinticHermiteSplineTest, SquigglyCurve) {
-  Run(Pose2d(0_m, 0_m, Rotation2d(90_deg)),
-      Pose2d(-1_m, 0_m, Rotation2d(90_deg)));
+  Run(Pose2d{0_m, 0_m, 90_deg}, Pose2d{-1_m, 0_m, 90_deg});
 }
 
 TEST_F(QuinticHermiteSplineTest, ThrowsOnMalformed) {
-  EXPECT_THROW(Run(Pose2d(0_m, 0_m, Rotation2d(0_deg)),
-                   Pose2d(1_m, 0_m, Rotation2d(180_deg))),
+  EXPECT_THROW(Run(Pose2d{0_m, 0_m, 0_deg}, Pose2d{1_m, 0_m, 180_deg}),
                SplineParameterizer::MalformedSplineException);
-  EXPECT_THROW(Run(Pose2d(10_m, 10_m, Rotation2d(90_deg)),
-                   Pose2d(10_m, 11_m, Rotation2d(-90_deg))),
+  EXPECT_THROW(Run(Pose2d{10_m, 10_m, 90_deg}, Pose2d{10_m, 11_m, -90_deg}),
                SplineParameterizer::MalformedSplineException);
 }

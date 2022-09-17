@@ -97,6 +97,24 @@ class XboxController : public GenericHID {
   bool GetRightBumperReleased();
 
   /**
+   * Constructs an event instance around the left bumper's digital signal.
+   *
+   * @param loop the event loop instance to attach the event to.
+   * @return an event instance representing the left bumper's digital signal
+   * attached to the given loop.
+   */
+  BooleanEvent LeftBumper(EventLoop* loop) const;
+
+  /**
+   * Constructs an event instance around the right bumper's digital signal.
+   *
+   * @param loop the event loop instance to attach the event to.
+   * @return an event instance representing the right bumper's digital signal
+   * attached to the given loop.
+   */
+  BooleanEvent RightBumper(EventLoop* loop) const;
+
+  /**
    * Read the value of the left stick button (LSB) on the controller.
    */
   bool GetLeftStickButton() const;
@@ -127,6 +145,24 @@ class XboxController : public GenericHID {
   bool GetRightStickButtonReleased();
 
   /**
+   * Constructs an event instance around the left stick's digital signal.
+   *
+   * @param loop the event loop instance to attach the event to.
+   * @return an event instance representing the left stick's digital signal
+   * attached to the given loop.
+   */
+  BooleanEvent LeftStick(EventLoop* loop) const;
+
+  /**
+   * Constructs an event instance around the right stick's digital signal.
+   *
+   * @param loop the event loop instance to attach the event to.
+   * @return an event instance representing the right stick's digital signal
+   * attached to the given loop.
+   */
+  BooleanEvent RightStick(EventLoop* loop) const;
+
+  /**
    * Read the value of the A button on the controller.
    *
    * @return The state of the button.
@@ -146,6 +182,15 @@ class XboxController : public GenericHID {
    * @return Whether the button was released since the last check.
    */
   bool GetAButtonReleased();
+
+  /**
+   * Constructs an event instance around the A button's digital signal.
+   *
+   * @param loop the event loop instance to attach the event to.
+   * @return an event instance representing the A button's digital signal
+   * attached to the given loop.
+   */
+  BooleanEvent A(EventLoop* loop) const;
 
   /**
    * Read the value of the B button on the controller.
@@ -169,6 +214,15 @@ class XboxController : public GenericHID {
   bool GetBButtonReleased();
 
   /**
+   * Constructs an event instance around the B button's digital signal.
+   *
+   * @param loop the event loop instance to attach the event to.
+   * @return an event instance representing the B button's digital signal
+   * attached to the given loop.
+   */
+  BooleanEvent B(EventLoop* loop) const;
+
+  /**
    * Read the value of the X button on the controller.
    *
    * @return The state of the button.
@@ -188,6 +242,15 @@ class XboxController : public GenericHID {
    * @return Whether the button was released since the last check.
    */
   bool GetXButtonReleased();
+
+  /**
+   * Constructs an event instance around the X button's digital signal.
+   *
+   * @param loop the event loop instance to attach the event to.
+   * @return an event instance representing the X button's digital signal
+   * attached to the given loop.
+   */
+  BooleanEvent X(EventLoop* loop) const;
 
   /**
    * Read the value of the Y button on the controller.
@@ -211,6 +274,15 @@ class XboxController : public GenericHID {
   bool GetYButtonReleased();
 
   /**
+   * Constructs an event instance around the Y button's digital signal.
+   *
+   * @param loop the event loop instance to attach the event to.
+   * @return an event instance representing the Y button's digital signal
+   * attached to the given loop.
+   */
+  BooleanEvent Y(EventLoop* loop) const;
+
+  /**
    * Whether the Y button was released since the last check.
    *
    * @return Whether the button was released since the last check.
@@ -232,6 +304,15 @@ class XboxController : public GenericHID {
   bool GetBackButtonReleased();
 
   /**
+   * Constructs an event instance around the back button's digital signal.
+   *
+   * @param loop the event loop instance to attach the event to.
+   * @return an event instance representing the back button's digital signal
+   * attached to the given loop.
+   */
+  BooleanEvent Back(EventLoop* loop) const;
+
+  /**
    * Read the value of the start button on the controller.
    *
    * @return The state of the button.
@@ -251,6 +332,15 @@ class XboxController : public GenericHID {
    * @return Whether the button was released since the last check.
    */
   bool GetStartButtonReleased();
+
+  /**
+   * Constructs an event instance around the start button's digital signal.
+   *
+   * @param loop the event loop instance to attach the event to.
+   * @return an event instance representing the start button's digital signal
+   * attached to the given loop.
+   */
+  BooleanEvent Start(EventLoop* loop) const;
 
   struct Button {
     static constexpr int kLeftBumper = 5;

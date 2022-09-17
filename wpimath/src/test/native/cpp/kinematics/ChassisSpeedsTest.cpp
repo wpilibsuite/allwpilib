@@ -9,7 +9,7 @@ static constexpr double kEpsilon = 1E-9;
 
 TEST(ChassisSpeedsTest, FieldRelativeConstruction) {
   const auto chassisSpeeds = frc::ChassisSpeeds::FromFieldRelativeSpeeds(
-      1.0_mps, 0.0_mps, 0.5_rad_per_s, frc::Rotation2d(-90.0_deg));
+      1.0_mps, 0.0_mps, 0.5_rad_per_s, -90.0_deg);
 
   EXPECT_NEAR(0.0, chassisSpeeds.vx.value(), kEpsilon);
   EXPECT_NEAR(1.0, chassisSpeeds.vy.value(), kEpsilon);

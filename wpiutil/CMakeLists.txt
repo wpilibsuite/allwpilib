@@ -87,16 +87,20 @@ endif()
 
 GENERATE_RESOURCES(src/main/native/resources generated/main/cpp WPI wpi wpiutil_resources_src)
 
-file(GLOB_RECURSE wpiutil_native_src src/main/native/cpp/*.cpp)
+file(GLOB_RECURSE wpiutil_native_src src/main/native/cpp/*.cpp
+                                     src/main/native/thirdparty/json/cpp/*.cpp
+                                     src/main/native/thirdparty/llvm/cpp/*.cpp
+                                     src/main/native/thirdparty/mpack/src/*.cpp)
 list(REMOVE_ITEM wpiutil_native_src ${wpiutil_jni_src})
 file(GLOB_RECURSE wpiutil_unix_src src/main/native/unix/*.cpp)
 file(GLOB_RECURSE wpiutil_linux_src src/main/native/linux/*.cpp)
 file(GLOB_RECURSE wpiutil_macos_src src/main/native/macOS/*.cpp)
 file(GLOB_RECURSE wpiutil_windows_src src/main/native/windows/*.cpp)
 
-file(GLOB fmtlib_native_src src/main/native/fmtlib/src/*.cpp)
+file(GLOB fmtlib_native_src src/main/native/thirdparty/fmtlib/src/*.cpp)
+file(GLOB_RECURSE memory_native_src src/main/native/thirdparty/memory/src/*.cpp)
 
-add_library(wpiutil ${wpiutil_native_src} ${fmtlib_native_src} ${wpiutil_resources_src})
+add_library(wpiutil ${wpiutil_native_src} ${fmtlib_native_src} ${memory_native_src} ${wpiutil_resources_src})
 set_target_properties(wpiutil PROPERTIES DEBUG_POSTFIX "d")
 
 set_property(TARGET wpiutil PROPERTY FOLDER "libraries")
@@ -118,7 +122,7 @@ if (NOT USE_VCPKG_FMTLIB)
     target_sources(wpiutil PRIVATE ${fmtlib_native_src})
     install(DIRECTORY src/main/native/fmtlib/include/ DESTINATION "${include_dest}/wpiutil")
     target_include_directories(wpiutil PUBLIC
-                            $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/fmtlib/include>
+                            $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/thirdparty/fmtlib/include>
                             $<INSTALL_INTERFACE:${include_dest}/wpiutil>)
 else()
     find_package(fmt CONFIG REQUIRED)
@@ -138,6 +142,25 @@ endif()
 
 target_include_directories(wpiutil PUBLIC
                             $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/include>
+                            $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/thirdparty/memory/include>
+                            $<INSTALL_INTERFACE:${include_dest}/wpiutil>)
+target_include_directories(wpiutil PUBLIC
+                            $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/thirdparty/ghc/include>
+                            $<INSTALL_INTERFACE:${include_dest}/wpiutil>)
+target_include_directories(wpiutil PUBLIC
+                            $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/thirdparty/json/include>
+                            $<INSTALL_INTERFACE:${include_dest}/wpiutil>)
+target_include_directories(wpiutil PUBLIC
+                            $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/thirdparty/llvm/include>
+                            $<INSTALL_INTERFACE:${include_dest}/wpiutil>)
+target_include_directories(wpiutil PUBLIC
+                            $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/thirdparty/mpack/include>
+                            $<INSTALL_INTERFACE:${include_dest}/wpiutil>)
+target_include_directories(wpiutil PUBLIC
+                            $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/thirdparty/sigslot/include>
+                            $<INSTALL_INTERFACE:${include_dest}/wpiutil>)
+target_include_directories(wpiutil PUBLIC
+                            $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/thirdparty/tcb_span/include>
                             $<INSTALL_INTERFACE:${include_dest}/wpiutil>)
 
 install(TARGETS wpiutil EXPORT wpiutil DESTINATION "${main_lib_dest}")

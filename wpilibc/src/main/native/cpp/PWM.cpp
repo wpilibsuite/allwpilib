@@ -117,7 +117,7 @@ void PWM::SetPeriodMultiplier(PeriodMultiplier mult) {
       break;
     default:
       throw FRC_MakeError(err::InvalidParameter, "PeriodMultiplier value {}",
-                          mult);
+                          static_cast<int>(mult));
   }
 
   FRC_CheckErrorStatus(status, "Channel {}", m_channel);

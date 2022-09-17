@@ -35,8 +35,9 @@ class WPILIB_DLLEXPORT LTVDifferentialDriveController {
   /**
    * Constructs a linear time-varying differential drive controller.
    *
-   * @param plant      The drivetrain velocity plant.
-   * @param trackwidth The drivetrain's trackwidth.
+   * @param plant      The differential drive velocity plant.
+   * @param trackwidth The distance between the differential drive's left and
+   *                   right wheels.
    * @param Qelems     The maximum desired error tolerance for each state.
    * @param Relems     The maximum desired control effort for each input.
    * @param dt         Discretization timestep.

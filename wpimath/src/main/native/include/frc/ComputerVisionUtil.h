@@ -58,7 +58,7 @@ units::meter_t CalculateDistanceToTarget(units::meter_t cameraHeight,
  * @param cameraToRobot The position of the robot relative to the camera. If the
  *                      camera was mounted 3 inches behind the "origin" (usually
  *                      physical center) of the robot, this would be
- *                      frc::Transform2d(3_in, 0_in, 0_deg).
+ *                      frc::Transform2d{3_in, 0_in, 0_deg}.
  * @return The position of the robot in the field.
  */
 WPILIB_DLLEXPORT
@@ -78,7 +78,7 @@ frc::Pose2d EstimateFieldToRobot(
  * @param cameraToRobot  The position of the robot relative to the camera. If
  *                       the camera was mounted 3 inches behind the "origin"
  *                       (usually physical center) of the robot, this would be
- *                       frc::Transform2d(3_in, 0_in, 0_deg).
+ *                       frc::Transform2d{3_in, 0_in, 0_deg}.
  * @return The position of the robot in the field.
  */
 WPILIB_DLLEXPORT

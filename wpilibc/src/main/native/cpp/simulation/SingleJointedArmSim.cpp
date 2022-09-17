@@ -48,11 +48,11 @@ bool SingleJointedArmSim::WouldHitUpperLimit(units::radian_t armAngle) const {
 }
 
 bool SingleJointedArmSim::HasHitLowerLimit() const {
-  return WouldHitLowerLimit(units::radian_t(m_y(0)));
+  return WouldHitLowerLimit(units::radian_t{m_y(0)});
 }
 
 bool SingleJointedArmSim::HasHitUpperLimit() const {
-  return WouldHitUpperLimit(units::radian_t(m_y(0)));
+  return WouldHitUpperLimit(units::radian_t{m_y(0)});
 }
 
 units::radian_t SingleJointedArmSim::GetAngle() const {
@@ -102,9 +102,9 @@ Vectord<2> SingleJointedArmSim::UpdateX(const Vectord<2>& currentXhat,
       currentXhat, u, dt);
 
   // Check for collisions.
-  if (WouldHitLowerLimit(units::radian_t(updatedXhat(0)))) {
+  if (WouldHitLowerLimit(units::radian_t{updatedXhat(0)})) {
     return Vectord<2>{m_minAngle.value(), 0.0};
-  } else if (WouldHitUpperLimit(units::radian_t(updatedXhat(0)))) {
+  } else if (WouldHitUpperLimit(units::radian_t{updatedXhat(0)})) {
     return Vectord<2>{m_maxAngle.value(), 0.0};
   }
   return updatedXhat;

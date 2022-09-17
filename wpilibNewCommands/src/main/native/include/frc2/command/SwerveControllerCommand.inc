@@ -92,7 +92,7 @@ void SwerveControllerCommand<NumModules>::Initialize() {
 
 template <size_t NumModules>
 void SwerveControllerCommand<NumModules>::Execute() {
-  auto curTime = units::second_t(m_timer.Get());
+  auto curTime = m_timer.Get();
   auto m_desiredState = m_trajectory.Sample(curTime);
 
   auto targetChassisSpeeds =

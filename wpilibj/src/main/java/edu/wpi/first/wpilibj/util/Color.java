@@ -99,6 +99,11 @@ public class Color {
     return Objects.hash(red, green, blue);
   }
 
+  @Override
+  public String toString() {
+    return "Color{" + "red=" + red + ", green=" + green + ", blue=" + blue + '}';
+  }
+
   private static double roundAndClamp(double value) {
     final var rounded = Math.round((value + kPrecision / 2) / kPrecision) * kPrecision;
     return MathUtil.clamp(rounded, 0.0, 1.0);

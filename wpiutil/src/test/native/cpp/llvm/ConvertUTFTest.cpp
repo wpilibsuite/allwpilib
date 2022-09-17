@@ -23,7 +23,7 @@ TEST(ConvertUTFTest, ConvertUTF16LittleEndianToUTF8String) {
   bool Success = convertUTF16ToUTF8String(Ref, Result);
   EXPECT_TRUE(Success);
   std::string Expected("\xe0\xb2\xa0_\xe0\xb2\xa0");
-  EXPECT_EQ(Expected, Result.string());
+  EXPECT_EQ(Expected, std::string{Result});
 }
 
 TEST(ConvertUTFTest, ConvertUTF16BigEndianToUTF8String) {
@@ -34,7 +34,7 @@ TEST(ConvertUTFTest, ConvertUTF16BigEndianToUTF8String) {
   bool Success = convertUTF16ToUTF8String(Ref, Result);
   EXPECT_TRUE(Success);
   std::string Expected("\xe0\xb2\xa0_\xe0\xb2\xa0");
-  EXPECT_EQ(Expected, Result.string());
+  EXPECT_EQ(Expected, std::string{Result});
 }
 
 TEST(ConvertUTFTest, ConvertUTF8ToUTF16String) {
@@ -60,7 +60,7 @@ TEST(ConvertUTFTest, Empty) {
   SmallString<20> Result;
   bool Success = convertUTF16ToUTF8String(span<const char>(), Result);
   EXPECT_TRUE(Success);
-  EXPECT_TRUE(Result.string().empty());
+  EXPECT_TRUE(std::string{Result}.empty());
 }
 
 TEST(ConvertUTFTest, HasUTF16BOM) {
@@ -87,7 +87,7 @@ TEST(ConvertUTFTest, UTF16WrappersForConvertUTF16ToUTF8String) {
   bool Success = convertUTF16ToUTF8String(SrcRef, Result);
   EXPECT_TRUE(Success);
   std::string Expected("\xe0\xb2\xa0_\xe0\xb2\xa0");
-  EXPECT_EQ(Expected, Result.string());
+  EXPECT_EQ(Expected, std::string{Result});
 }
 
 TEST(ConvertUTFTest, ConvertUTF8toWide) {
@@ -111,7 +111,7 @@ TEST(ConvertUTFTest, convertWideToUTF8) {
   bool Success = convertWideToUTF8(Src, Result);
   EXPECT_TRUE(Success);
   std::string Expected("\xe0\xb2\xa0_\xe0\xb2\xa0");
-  EXPECT_EQ(Expected, Result.string());
+  EXPECT_EQ(Expected, std::string{Result});
 }
 
 struct ConvertUTFResultContainer {

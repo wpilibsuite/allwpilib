@@ -10,8 +10,8 @@
 using namespace frc;
 
 TEST(Pose2dTest, TransformBy) {
-  const Pose2d initial{1_m, 2_m, Rotation2d{45_deg}};
-  const Transform2d transform{Translation2d{5_m, 0_m}, Rotation2d{5_deg}};
+  const Pose2d initial{1_m, 2_m, 45_deg};
+  const Transform2d transform{Translation2d{5_m, 0_m}, 5_deg};
 
   const auto transformed = initial + transform;
 
@@ -21,8 +21,8 @@ TEST(Pose2dTest, TransformBy) {
 }
 
 TEST(Pose2dTest, RelativeTo) {
-  const Pose2d initial{0_m, 0_m, Rotation2d{45_deg}};
-  const Pose2d final{5_m, 5_m, Rotation2d{45.0_deg}};
+  const Pose2d initial{0_m, 0_m, 45_deg};
+  const Pose2d final{5_m, 5_m, 45.0_deg};
 
   const auto finalRelativeToInitial = final.RelativeTo(initial);
 
@@ -32,20 +32,20 @@ TEST(Pose2dTest, RelativeTo) {
 }
 
 TEST(Pose2dTest, Equality) {
-  const Pose2d a{0_m, 5_m, Rotation2d{43_deg}};
-  const Pose2d b{0_m, 5_m, Rotation2d{43_deg}};
+  const Pose2d a{0_m, 5_m, 43_deg};
+  const Pose2d b{0_m, 5_m, 43_deg};
   EXPECT_TRUE(a == b);
 }
 
 TEST(Pose2dTest, Inequality) {
-  const Pose2d a{0_m, 5_m, Rotation2d{43_deg}};
-  const Pose2d b{0_m, 5_ft, Rotation2d{43_deg}};
+  const Pose2d a{0_m, 5_m, 43_deg};
+  const Pose2d b{0_m, 5_ft, 43_deg};
   EXPECT_TRUE(a != b);
 }
 
 TEST(Pose2dTest, Minus) {
-  const Pose2d initial{0_m, 0_m, Rotation2d{45_deg}};
-  const Pose2d final{5_m, 5_m, Rotation2d{45_deg}};
+  const Pose2d initial{0_m, 0_m, 45_deg};
+  const Pose2d final{5_m, 5_m, 45_deg};
 
   const auto transform = final - initial;
 

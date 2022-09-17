@@ -23,6 +23,15 @@ ext {
                     srcDirs 'src/main/native/include', 'src/main/native/thirdparty/libuv/include', 'src/main/native/thirdparty/libuv/src'
                 }
             }
+            tcpsocketsCpp(CppSourceSet) {
+                source {
+                    srcDirs 'src/main/native/thirdparty/tcpsockets/cpp'
+                    include '*.cpp'
+                }
+                exportedHeaders {
+                    srcDirs 'src/main/native/include', 'src/main/native/thirdparty/tcpsockets/include'
+                }
+            }
             resourcesCpp(CppSourceSet) {
                 source {
                     srcDirs "$buildDir/generated/main/cpp", "$rootDir/shared/singlelib"
@@ -181,19 +190,6 @@ apply from: "${rootDir}/shared/jni/setupBuild.gradle"
 
 nativeUtils.exportsConfigs {
     wpinet {
-        x86ExcludeSymbols = [
-            '_CT??_R0?AV_System_error',
-            '_CT??_R0?AVexception',
-            '_CT??_R0?AVfailure',
-            '_CT??_R0?AVruntime_error',
-            '_CT??_R0?AVsystem_error',
-            '_CTA5?AVfailure',
-            '_TI5?AVfailure',
-            '_CT??_R0?AVout_of_range',
-            '_CTA3?AVout_of_range',
-            '_TI3?AVout_of_range',
-            '_CT??_R0?AVbad_cast'
-        ]
         x64ExcludeSymbols = [
             '_CT??_R0?AV_System_error',
             '_CT??_R0?AVexception',
@@ -214,6 +210,9 @@ cppHeadersZip {
     from('src/main/native/thirdparty/libuv/include') {
         into '/'
     }
+    from('src/main/native/third_party/tcpsockets/include') {
+        into '/'
+    }
 }
 
 model {
@@ -221,7 +220,7 @@ model {
         all {
             it.sources.each {
                 it.exportedHeaders {
-                    srcDirs 'src/main/native/include', 'src/main/native/thirdparty/libuv/include', 'src/main/native/thirdparty/libuv/src'
+                    srcDirs 'src/main/native/include', 'src/main/native/thirdparty/libuv/include', 'src/main/native/thirdparty/tcpsockets/include', 'src/main/native/thirdparty/libuv/src'
                 }
             }
         }
@@ -248,7 +247,6 @@ model {
             }
         }
         netconsoleServer(NativeExecutableSpec) {
-            targetBuildTypes 'release'
             sources {
                 cpp {
                     source {
@@ -268,7 +266,6 @@ model {
             }
         }
         netconsoleTee(NativeExecutableSpec) {
-            targetBuildTypes 'release'
             sources {
                 cpp {
                     source {

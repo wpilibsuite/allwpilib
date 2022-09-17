@@ -4,6 +4,8 @@
 
 package edu.wpi.first.wpilibj2.command.button;
 
+import java.util.concurrent.atomic.AtomicBoolean;
+
 /**
  * This class is intended to be used within a program. The programmer can manually set its value.
  * Also includes a setting for whether or not it should invert its value.
@@ -11,8 +13,9 @@ package edu.wpi.first.wpilibj2.command.button;
  * <p>This class is provided by the NewCommands VendorDep
  */
 public class InternalButton extends Button {
-  private boolean m_pressed;
-  private boolean m_inverted;
+  // need to be references, so they can be mutated after being captured in the constructor.
+  private final AtomicBoolean m_pressed;
+  private final AtomicBoolean m_inverted;
 
   /** Creates an InternalButton that is not inverted. */
   public InternalButton() {
@@ -26,19 +29,24 @@ public class InternalButton extends Button {
    *     when set to false.
    */
   public InternalButton(boolean inverted) {
-    m_pressed = m_inverted = inverted;
+    this(new AtomicBoolean(), new AtomicBoolean(inverted));
+  }
+
+  /*
+   * Mock constructor so the AtomicBoolean objects can be constructed before the super
+   * constructor invocation.
+   */
+  private InternalButton(AtomicBoolean state, AtomicBoolean inverted) {
+    super(() -> state.get() != inverted.get());
+    this.m_pressed = state;
+    this.m_inverted = inverted;
   }
 
   public void setInverted(boolean inverted) {
-    m_inverted = inverted;
+    m_inverted.set(inverted);
   }
 
   public void setPressed(boolean pressed) {
-    m_pressed = pressed;
-  }
-
-  @Override
-  public boolean get() {
-    return m_pressed ^ m_inverted;
+    m_pressed.set(pressed);
   }
 }

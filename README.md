@@ -54,7 +54,9 @@ Using Gradle makes building WPILib very straightforward. It only has a few depen
     - Run `./gradlew installRoboRioToolchain` after cloning this repository
     - If the WPILib installer was used, this toolchain is already installed
 - Raspberry Pi toolchain (optional)
-    - Run `./gradlew installRaspbianToolchain` after cloning this repository
+    - Run `./gradlew installArm32Toolchain` after cloning this repository
+
+On macOS ARM, run `softwareupdate --install-rosetta`. This is necessary to be able to use the macOS x86 roboRIO toolchain on ARM.
 
 ## Setup
 
@@ -166,7 +168,7 @@ The Simulation directory contains extra simulation tools and libraries, such as 
 
 The integration test directories for C++ and Java contain test code that runs on our test-system. When you submit code for review, it is tested by those programs. If you add new functionality you should make sure to write tests for it so we don't break it in the future.
 
-The hal directory contains more C++ code meant to run on the roboRIO. HAL is an acronym for "Hardware Abstraction Layer", and it interfaces with the NI Libraries. The NI Libraries contain the low-level code for controlling devices on your robot. The NI Libraries are found in the ni-libraries folder.
+The hal directory contains more C++ code meant to run on the roboRIO. HAL is an acronym for "Hardware Abstraction Layer", and it interfaces with the NI Libraries. The NI Libraries contain the low-level code for controlling devices on your robot. The NI Libraries are found in the [ni-libraries](https://github.com/wpilibsuite/ni-libraries) project.
 
 The upstream_utils directory contains scripts for updating copies of thirdparty code in the repository.
 

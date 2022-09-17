@@ -189,8 +189,9 @@ void NetworkConnection::ReadThreadMain() {
       }
       break;
     }
-    DEBUG3("received type={} with str={} id={} seq_num={}", msg->type(),
-           msg->str(), msg->id(), msg->seq_num_uid());
+    DEBUG3("received type={} with str={} id={} seq_num={}",
+           static_cast<int>(msg->type()), msg->str(), msg->id(),
+           msg->seq_num_uid());
     m_last_update = Now();
     m_process_incoming(std::move(msg), this);
   }
@@ -222,8 +223,9 @@ void NetworkConnection::WriteThreadMain() {
     DEBUG3("sending {} messages", msgs.size());
     for (auto& msg : msgs) {
       if (msg) {
-        DEBUG3("sending type={} with str={} id={} seq_num={}", msg->type(),
-               msg->str(), msg->id(), msg->seq_num_uid());
+        DEBUG3("sending type={} with str={} id={} seq_num={}",
+               static_cast<int>(msg->type()), msg->str(), msg->id(),
+               msg->seq_num_uid());
         msg->Write(encoder);
       }
     }

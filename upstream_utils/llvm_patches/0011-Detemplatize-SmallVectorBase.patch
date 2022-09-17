@@ -1,0 +1,140 @@
+From ef26f059859d3a0d08b06a70519928bcd5f9bb79 Mon Sep 17 00:00:00 2001
+From: PJ Reiniger <pj.reiniger@gmail.com>
+Date: Thu, 5 May 2022 23:18:34 -0400
+Subject: [PATCH 11/28] Detemplatize SmallVectorBase
+
+---
+ llvm/include/llvm/ADT/SmallVector.h | 21 +++++++-----------
+ llvm/lib/Support/SmallVector.cpp    | 34 +++++------------------------
+ 2 files changed, 13 insertions(+), 42 deletions(-)
+
+diff --git a/llvm/include/llvm/ADT/SmallVector.h b/llvm/include/llvm/ADT/SmallVector.h
+index 1e311ea56..4b6bbdeb2 100644
+--- a/llvm/include/llvm/ADT/SmallVector.h
++++ b/llvm/include/llvm/ADT/SmallVector.h
+@@ -50,14 +50,14 @@ template <typename IteratorT> class iterator_range;
+ /// Using 64 bit size is desirable for cases like SmallVector<char>, where a
+ /// 32 bit size would limit the vector to ~4GB. SmallVectors are used for
+ /// buffering bitcode output - which can exceed 4GB.
+-template <class Size_T> class SmallVectorBase {
++class SmallVectorBase {
+ protected:
+   void *BeginX;
+-  Size_T Size = 0, Capacity;
++  unsigned Size = 0, Capacity;
+ 
+   /// The maximum value of the Size_T used.
+   static constexpr size_t SizeTypeMax() {
+-    return (std::numeric_limits<Size_T>::max)();
++    return (std::numeric_limits<unsigned>::max)();
+   }
+ 
+   SmallVectorBase() = delete;
+@@ -91,15 +91,10 @@ protected:
+   }
+ };
+ 
+-template <class T>
+-using SmallVectorSizeType =
+-    typename std::conditional<sizeof(T) < 4 && sizeof(void *) >= 8, uint64_t,
+-                              uint32_t>::type;
+-
+ /// Figure out the offset of the first element.
+ template <class T, typename = void> struct SmallVectorAlignmentAndSize {
+-  alignas(SmallVectorBase<SmallVectorSizeType<T>>) char Base[sizeof(
+-      SmallVectorBase<SmallVectorSizeType<T>>)];
++  alignas(SmallVectorBase) char Base[sizeof(
++      SmallVectorBase)];
+   alignas(T) char FirstEl[sizeof(T)];
+ };
+ 
+@@ -108,8 +103,8 @@ template <class T, typename = void> struct SmallVectorAlignmentAndSize {
+ /// to avoid unnecessarily requiring T to be complete.
+ template <typename T, typename = void>
+ class SmallVectorTemplateCommon
+-    : public SmallVectorBase<SmallVectorSizeType<T>> {
+-  using Base = SmallVectorBase<SmallVectorSizeType<T>>;
++    : public SmallVectorBase {
++  using Base = SmallVectorBase;
+ 
+   /// Find the address of the first element.  For this pointer math to be valid
+   /// with small-size of 0 for T with lots of alignment, it's important that
+@@ -356,7 +351,7 @@ protected:
+   /// in \p NewCapacity. This is the first section of \a grow().
+   T *mallocForGrow(size_t MinSize, size_t &NewCapacity) {
+     return static_cast<T *>(
+-        SmallVectorBase<SmallVectorSizeType<T>>::mallocForGrow(
++        SmallVectorBase::mallocForGrow(
+             MinSize, sizeof(T), NewCapacity));
+   }
+ 
+diff --git a/llvm/lib/Support/SmallVector.cpp b/llvm/lib/Support/SmallVector.cpp
+index a2b4899e1..bdfc963d7 100644
+--- a/llvm/lib/Support/SmallVector.cpp
++++ b/llvm/lib/Support/SmallVector.cpp
+@@ -51,10 +51,6 @@ static_assert(sizeof(SmallVector<void *, 1>) ==
+                   sizeof(unsigned) * 2 + sizeof(void *) * 2,
+               "wasted space in SmallVector size 1");
+ 
+-static_assert(sizeof(SmallVector<char, 0>) ==
+-                  sizeof(void *) * 2 + sizeof(void *),
+-              "1 byte elements have word-sized type for size and capacity");
+-
+ /// Report that MinSize doesn't fit into this vector's size type. Throws
+ /// std::length_error or calls report_fatal_error.
+ [[noreturn]] static void report_size_overflow(size_t MinSize, size_t MaxSize);
+@@ -85,9 +81,8 @@ static void report_at_maximum_capacity(size_t MaxSize) {
+ }
+ 
+ // Note: Moving this function into the header may cause performance regression.
+-template <class Size_T>
+ static size_t getNewCapacity(size_t MinSize, size_t TSize, size_t OldCapacity) {
+-  constexpr size_t MaxSize = std::numeric_limits<Size_T>::max();
++  constexpr size_t MaxSize = std::numeric_limits<unsigned>::max();
+ 
+   // Ensure we can fit the new capacity.
+   // This is only going to be applicable when the capacity is 32 bit.
+@@ -108,18 +103,16 @@ static size_t getNewCapacity(size_t MinSize, size_t TSize, size_t OldCapacity) {
+ }
+ 
+ // Note: Moving this function into the header may cause performance regression.
+-template <class Size_T>
+-void *SmallVectorBase<Size_T>::mallocForGrow(size_t MinSize, size_t TSize,
++void *SmallVectorBase::mallocForGrow(size_t MinSize, size_t TSize,
+                                              size_t &NewCapacity) {
+-  NewCapacity = getNewCapacity<Size_T>(MinSize, TSize, this->capacity());
++  NewCapacity = getNewCapacity(MinSize, TSize, this->capacity());
+   return llvm::safe_malloc(NewCapacity * TSize);
+ }
+ 
+ // Note: Moving this function into the header may cause performance regression.
+-template <class Size_T>
+-void SmallVectorBase<Size_T>::grow_pod(void *FirstEl, size_t MinSize,
++void SmallVectorBase::grow_pod(void *FirstEl, size_t MinSize,
+                                        size_t TSize) {
+-  size_t NewCapacity = getNewCapacity<Size_T>(MinSize, TSize, this->capacity());
++  size_t NewCapacity = getNewCapacity(MinSize, TSize, this->capacity());
+   void *NewElts;
+   if (BeginX == FirstEl) {
+     NewElts = safe_malloc(NewCapacity * TSize);
+@@ -134,20 +127,3 @@ void SmallVectorBase<Size_T>::grow_pod(void *FirstEl, size_t MinSize,
+   this->BeginX = NewElts;
+   this->Capacity = NewCapacity;
+ }
+-
+-template class llvm::SmallVectorBase<uint32_t>;
+-
+-// Disable the uint64_t instantiation for 32-bit builds.
+-// Both uint32_t and uint64_t instantiations are needed for 64-bit builds.
+-// This instantiation will never be used in 32-bit builds, and will cause
+-// warnings when sizeof(Size_T) > sizeof(size_t).
+-#if SIZE_MAX > UINT32_MAX
+-template class llvm::SmallVectorBase<uint64_t>;
+-
+-// Assertions to ensure this #if stays in sync with SmallVectorSizeType.
+-static_assert(sizeof(SmallVectorSizeType<char>) == sizeof(uint64_t),
+-              "Expected SmallVectorBase<uint64_t> variant to be in use.");
+-#else
+-static_assert(sizeof(SmallVectorSizeType<char>) == sizeof(uint32_t),
+-              "Expected SmallVectorBase<uint32_t> variant to be in use.");
+-#endif

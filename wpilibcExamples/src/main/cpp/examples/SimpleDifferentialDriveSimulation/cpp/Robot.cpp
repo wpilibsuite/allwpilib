@@ -19,7 +19,7 @@ class Robot : public frc::TimedRobot {
     SetNetworkTablesFlushEnabled(true);
 
     m_trajectory = frc::TrajectoryGenerator::GenerateTrajectory(
-        frc::Pose2d(2_m, 2_m, 0_rad), {}, frc::Pose2d(6_m, 4_m, 0_rad),
+        frc::Pose2d{2_m, 2_m, 0_rad}, {}, frc::Pose2d{6_m, 4_m, 0_rad},
         frc::TrajectoryConfig(2_mps, 2_mps_sq));
   }
 

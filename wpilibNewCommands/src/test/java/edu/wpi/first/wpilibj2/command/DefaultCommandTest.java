@@ -14,7 +14,7 @@ class DefaultCommandTest extends CommandTestBase {
   @Test
   void defaultCommandScheduleTest() {
     try (CommandScheduler scheduler = new CommandScheduler()) {
-      TestSubsystem hasDefaultCommand = new TestSubsystem();
+      Subsystem hasDefaultCommand = new SubsystemBase() {};
 
       MockCommandHolder defaultHolder = new MockCommandHolder(true, hasDefaultCommand);
       Command defaultCommand = defaultHolder.getMock();
@@ -29,7 +29,7 @@ class DefaultCommandTest extends CommandTestBase {
   @Test
   void defaultCommandInterruptResumeTest() {
     try (CommandScheduler scheduler = new CommandScheduler()) {
-      TestSubsystem hasDefaultCommand = new TestSubsystem();
+      Subsystem hasDefaultCommand = new SubsystemBase() {};
 
       MockCommandHolder defaultHolder = new MockCommandHolder(true, hasDefaultCommand);
       Command defaultCommand = defaultHolder.getMock();
@@ -54,7 +54,7 @@ class DefaultCommandTest extends CommandTestBase {
   @Test
   void defaultCommandDisableResumeTest() {
     try (CommandScheduler scheduler = new CommandScheduler()) {
-      TestSubsystem hasDefaultCommand = new TestSubsystem();
+      Subsystem hasDefaultCommand = new SubsystemBase() {};
 
       MockCommandHolder defaultHolder = new MockCommandHolder(false, hasDefaultCommand);
       Command defaultCommand = defaultHolder.getMock();

@@ -25,6 +25,7 @@ public final class Discretization {
    */
   public static <States extends Num> Matrix<States, States> discretizeA(
       Matrix<States, States> contA, double dtSeconds) {
+    // A_d = eᴬᵀ
     return contA.times(dtSeconds).exp();
   }
 
@@ -42,20 +43,23 @@ public final class Discretization {
   public static <States extends Num, Inputs extends Num>
       Pair<Matrix<States, States>, Matrix<States, Inputs>> discretizeAB(
           Matrix<States, States> contA, Matrix<States, Inputs> contB, double dtSeconds) {
-    var scaledA = contA.times(dtSeconds);
-    var scaledB = contB.times(dtSeconds);
-
     int states = contA.getNumRows();
     int inputs = contB.getNumCols();
+
+    // M = [A  B]
+    //     [0  0]
     var M = new Matrix<>(new SimpleMatrix(states + inputs, states + inputs));
-    M.assignBlock(0, 0, scaledA);
-    M.assignBlock(0, scaledA.getNumCols(), scaledB);
-    var phi = M.exp();
+    M.assignBlock(0, 0, contA);
+    M.assignBlock(0, contA.getNumCols(), contB);
+
+    //  ϕ = eᴹᵀ = [A_d  B_d]
+    //            [ 0    I ]
+    var phi = M.times(dtSeconds).exp();
 
     var discA = new Matrix<States, States>(new SimpleMatrix(states, states));
-    var discB = new Matrix<States, Inputs>(new SimpleMatrix(states, inputs));
-
     discA.extractFrom(0, 0, phi);
+
+    var discB = new Matrix<States, Inputs>(new SimpleMatrix(states, inputs));
     discB.extractFrom(0, contB.getNumRows(), phi);
 
     return new Pair<>(discA, discB);
@@ -79,18 +83,22 @@ public final class Discretization {
     // Make continuous Q symmetric if it isn't already
     Matrix<States, States> Q = contQ.plus(contQ.transpose()).div(2.0);
 
-    // Set up the matrix M = [[-A, Q], [0, A.T]]
+    // M = [−A  Q ]
+    //     [ 0  Aᵀ]
     final var M = new Matrix<>(new SimpleMatrix(2 * states, 2 * states));
     M.assignBlock(0, 0, contA.times(-1.0));
     M.assignBlock(0, states, Q);
     M.assignBlock(states, 0, new Matrix<>(new SimpleMatrix(states, states)));
     M.assignBlock(states, states, contA.transpose());
 
+    // ϕ = eᴹᵀ = [−A_d  A_d⁻¹Q_d]
+    //           [ 0      A_dᵀ  ]
     final var phi = M.times(dtSeconds).exp();
 
-    // Phi12 = phi[0:States,        States:2*States]
-    // Phi22 = phi[States:2*States, States:2*States]
+    // ϕ₁₂ = A_d⁻¹Q_d
     final Matrix<States, States> phi12 = phi.block(states, states, 0, states);
+
+    // ϕ₂₂ = A_dᵀ
     final Matrix<States, States> phi22 = phi.block(states, states, states, states);
 
     final var discA = phi22.transpose();
@@ -109,9 +117,12 @@ public final class Discretization {
    * <p>Rather than solving a 2N x 2N matrix exponential like in DiscretizeQ() (which is expensive),
    * we take advantage of the structure of the block matrix of A and Q.
    *
-   * <p>The exponential of A*t, which is only N x N, is relatively cheap. 2) The upper-right quarter
-   * of the 2N x 2N matrix, which we can approximate using a taylor series to several terms and
-   * still be substantially cheaper than taking the big exponential.
+   * <ul>
+   *   <li>eᴬᵀ, which is only N x N, is relatively cheap.
+   *   <li>The upper-right quarter of the 2N x 2N matrix, which we can approximate using a taylor
+   *       series to several terms and still be substantially cheaper than taking the big
+   *       exponential.
+   * </ul>
    *
    * @param <States> Nat representing the number of states.
    * @param contA Continuous system matrix.
@@ -123,6 +134,41 @@ public final class Discretization {
   public static <States extends Num>
       Pair<Matrix<States, States>, Matrix<States, States>> discretizeAQTaylor(
           Matrix<States, States> contA, Matrix<States, States> contQ, double dtSeconds) {
+    //       T
+    // Q_d = ∫ e^(Aτ) Q e^(Aᵀτ) dτ
+    //       0
+    //
+    // M = [−A  Q ]
+    //     [ 0  Aᵀ]
+    // ϕ = eᴹᵀ
+    // ϕ₁₂ = A_d⁻¹Q_d
+    //
+    // Taylor series of ϕ:
+    //
+    //   ϕ = eᴹᵀ = I + MT + 1/2 M²T² + 1/6 M³T³ + …
+    //   ϕ = eᴹᵀ = I + MT + 1/2 T²M² + 1/6 T³M³ + …
+    //
+    // Taylor series of ϕ expanded for ϕ₁₂:
+    //
+    //   ϕ₁₂ = 0 + QT + 1/2 T² (−AQ + QAᵀ) + 1/6 T³ (−A lastTerm + Q Aᵀ²) + …
+    //
+    // ```
+    // lastTerm = Q
+    // lastCoeff = T
+    // ATn = Aᵀ
+    // ϕ₁₂ = lastTerm lastCoeff = QT
+    //
+    // for i in range(2, 6):
+    //   // i = 2
+    //   lastTerm = −A lastTerm + Q ATn = −AQ + QAᵀ
+    //   lastCoeff *= T/i → lastCoeff *= T/2 = 1/2 T²
+    //   ATn *= Aᵀ = Aᵀ²
+    //
+    //   // i = 3
+    //   lastTerm = −A lastTerm + Q ATn = −A (−AQ + QAᵀ) + QAᵀ² = …
+    //   …
+    // ```
+
     // Make continuous Q symmetric if it isn't already
     Matrix<States, States> Q = contQ.plus(contQ.transpose()).div(2.0);
 
@@ -130,17 +176,18 @@ public final class Discretization {
     double lastCoeff = dtSeconds;
 
     // Aᵀⁿ
-    Matrix<States, States> Atn = contA.transpose();
+    Matrix<States, States> ATn = contA.transpose();
+
     Matrix<States, States> phi12 = lastTerm.times(lastCoeff);
 
     // i = 6 i.e. 5th order should be enough precision
     for (int i = 2; i < 6; ++i) {
-      lastTerm = contA.times(-1).times(lastTerm).plus(Q.times(Atn));
+      lastTerm = contA.times(-1).times(lastTerm).plus(Q.times(ATn));
       lastCoeff *= dtSeconds / ((double) i);
 
       phi12 = phi12.plus(lastTerm.times(lastCoeff));
 
-      Atn = Atn.times(contA.transpose());
+      ATn = ATn.times(contA.transpose());
     }
 
     var discA = discretizeA(contA, dtSeconds);
@@ -162,6 +209,7 @@ public final class Discretization {
    * @return Discretized version of the provided continuous measurement noise covariance matrix.
    */
   public static <O extends Num> Matrix<O, O> discretizeR(Matrix<O, O> R, double dtSeconds) {
+    // R_d = 1/T R
     return R.div(dtSeconds);
   }
 }

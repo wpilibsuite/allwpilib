@@ -31,7 +31,7 @@ TEST(Translation2dTest, Difference) {
 
 TEST(Translation2dTest, RotateBy) {
   const Translation2d another{3_m, 0_m};
-  const auto rotated = another.RotateBy(Rotation2d(90_deg));
+  const auto rotated = another.RotateBy(90_deg);
 
   EXPECT_NEAR(0.0, rotated.X().value(), 1e-9);
   EXPECT_DOUBLE_EQ(3.0, rotated.Y().value());

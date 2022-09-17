@@ -4,4 +4,12 @@
 
 package edu.wpi.first.net;
 
-public class WPINetJNITest {}
+import java.io.IOException;
+import org.junit.jupiter.api.Test;
+
+public class WPINetJNITest {
+  @Test
+  void jniLinkTest() throws IOException {
+    WPINetJNI.forceLoad();
+  }
+}

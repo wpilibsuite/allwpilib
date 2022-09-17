@@ -54,7 +54,7 @@ public class ParallelCommandGroup extends CommandGroupBase {
   }
 
   @Override
-  public void initialize() {
+  public final void initialize() {
     for (Map.Entry<Command, Boolean> commandRunning : m_commands.entrySet()) {
       commandRunning.getKey().initialize();
       commandRunning.setValue(true);
@@ -62,7 +62,7 @@ public class ParallelCommandGroup extends CommandGroupBase {
   }
 
   @Override
-  public void execute() {
+  public final void execute() {
     for (Map.Entry<Command, Boolean> commandRunning : m_commands.entrySet()) {
       if (!commandRunning.getValue()) {
         continue;
@@ -76,7 +76,7 @@ public class ParallelCommandGroup extends CommandGroupBase {
   }
 
   @Override
-  public void end(boolean interrupted) {
+  public final void end(boolean interrupted) {
     if (interrupted) {
       for (Map.Entry<Command, Boolean> commandRunning : m_commands.entrySet()) {
         if (commandRunning.getValue()) {
@@ -87,18 +87,12 @@ public class ParallelCommandGroup extends CommandGroupBase {
   }
 
   @Override
-  public boolean isFinished() {
+  public final boolean isFinished() {
     return !m_commands.containsValue(true);
   }
 
   @Override
   public boolean runsWhenDisabled() {
     return m_runWhenDisabled;
-  }
-
-  @Override
-  public ParallelCommandGroup alongWith(Command... parallel) {
-    addCommands(parallel);
-    return this;
   }
 }

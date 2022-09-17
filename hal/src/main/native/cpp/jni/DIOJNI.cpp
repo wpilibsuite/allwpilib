@@ -146,6 +146,20 @@ Java_edu_wpi_first_hal_DIOJNI_pulse
 
 /*
  * Class:     edu_wpi_first_hal_DIOJNI
+ * Method:    pulseMultiple
+ * Signature: (JD)V
+ */
+JNIEXPORT void JNICALL
+Java_edu_wpi_first_hal_DIOJNI_pulseMultiple
+  (JNIEnv* env, jclass, jlong channelMask, jdouble value)
+{
+  int32_t status = 0;
+  HAL_PulseMultiple(static_cast<uint32_t>(channelMask), value, &status);
+  CheckStatus(env, status);
+}
+
+/*
+ * Class:     edu_wpi_first_hal_DIOJNI
  * Method:    isPulsing
  * Signature: (I)Z
  */

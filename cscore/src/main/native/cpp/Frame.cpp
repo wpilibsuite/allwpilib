@@ -523,7 +523,8 @@ Image* Frame::GetImageImpl(int width, int height,
 
   WPI_DEBUG4(Instance::GetInstance().logger,
              "converting image from {}x{} type {} to {}x{} type {}", cur->width,
-             cur->height, cur->pixelFormat, width, height, pixelFormat);
+             cur->height, static_cast<int>(cur->pixelFormat), width, height,
+             static_cast<int>(pixelFormat));
 
   // If the source image is a JPEG, we need to decode it before we can do
   // anything else with it.  Note that if the destination format is JPEG, we

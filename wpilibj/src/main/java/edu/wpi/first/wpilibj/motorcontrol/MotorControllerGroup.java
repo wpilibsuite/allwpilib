@@ -55,6 +55,13 @@ public class MotorControllerGroup implements MotorController, Sendable, AutoClos
   }
 
   @Override
+  public void setVoltage(double outputVolts) {
+    for (MotorController motorController : m_motorControllers) {
+      motorController.setVoltage(m_isInverted ? -outputVolts : outputVolts);
+    }
+  }
+
+  @Override
   public double get() {
     if (m_motorControllers.length > 0) {
       return m_motorControllers[0].get() * (m_isInverted ? -1 : 1);

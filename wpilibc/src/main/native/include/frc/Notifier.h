@@ -19,6 +19,13 @@
 
 namespace frc {
 
+/**
+ * Notifiers run a callback function on a separate thread at a specified period.
+ *
+ * If StartSingle() is used, the callback will run once. If StartPeriodic() is
+ * used, the callback will run repeatedly with the given period until stop() is
+ * called.
+ */
 class Notifier {
  public:
   /**
@@ -94,6 +101,9 @@ class Notifier {
    * A timer event is queued for periodic event notification. Each time the
    * interrupt occurs, the event will be immediately requeued for the same time
    * interval.
+   *
+   * The user-provided callback should be written in a nonblocking manner so the
+   * callback can be recalled at the next periodic event notification.
    *
    * @param period Period to call the handler starting one period
    *               after the call to this method.

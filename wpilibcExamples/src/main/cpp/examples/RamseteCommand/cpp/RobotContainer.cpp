@@ -38,21 +38,21 @@ void RobotContainer::ConfigureButtonBindings() {
   // Configure your button bindings here
 
   // While holding the shoulder button, drive at half speed
-  frc2::JoystickButton(&m_driverController, 6)
+  frc2::JoystickButton{&m_driverController, 6}
       .WhenPressed(&m_driveHalfSpeed)
       .WhenReleased(&m_driveFullSpeed);
 }
 
 frc2::Command* RobotContainer::GetAutonomousCommand() {
   // Create a voltage constraint to ensure we don't accelerate too fast
-  frc::DifferentialDriveVoltageConstraint autoVoltageConstraint(
-      frc::SimpleMotorFeedforward<units::meters>(
-          DriveConstants::ks, DriveConstants::kv, DriveConstants::ka),
-      DriveConstants::kDriveKinematics, 10_V);
+  frc::DifferentialDriveVoltageConstraint autoVoltageConstraint{
+      frc::SimpleMotorFeedforward<units::meters>{
+          DriveConstants::ks, DriveConstants::kv, DriveConstants::ka},
+      DriveConstants::kDriveKinematics, 10_V};
 
   // Set up config for trajectory
-  frc::TrajectoryConfig config(AutoConstants::kMaxSpeed,
-                               AutoConstants::kMaxAcceleration);
+  frc::TrajectoryConfig config{AutoConstants::kMaxSpeed,
+                               AutoConstants::kMaxAcceleration};
   // Add kinematics to ensure max speed is actually obeyed
   config.SetKinematics(DriveConstants::kDriveKinematics);
   // Apply the voltage constraint
@@ -61,26 +61,27 @@ frc2::Command* RobotContainer::GetAutonomousCommand() {
   // An example trajectory to follow.  All units in meters.
   auto exampleTrajectory = frc::TrajectoryGenerator::GenerateTrajectory(
       // Start at the origin facing the +X direction
-      frc::Pose2d(0_m, 0_m, frc::Rotation2d(0_deg)),
+      frc::Pose2d{0_m, 0_m, 0_deg},
       // Pass through these two interior waypoints, making an 's' curve path
-      {frc::Translation2d(1_m, 1_m), frc::Translation2d(2_m, -1_m)},
+      {frc::Translation2d{1_m, 1_m}, frc::Translation2d{2_m, -1_m}},
       // End 3 meters straight ahead of where we started, facing forward
-      frc::Pose2d(3_m, 0_m, frc::Rotation2d(0_deg)),
+      frc::Pose2d{3_m, 0_m, 0_deg},
       // Pass the config
       config);
 
-  frc2::RamseteCommand ramseteCommand(
-      exampleTrajectory, [this]() { return m_drive.GetPose(); },
-      frc::RamseteController(AutoConstants::kRamseteB,
-                             AutoConstants::kRamseteZeta),
-      frc::SimpleMotorFeedforward<units::meters>(
-          DriveConstants::ks, DriveConstants::kv, DriveConstants::ka),
+  frc2::RamseteCommand ramseteCommand{
+      exampleTrajectory,
+      [this]() { return m_drive.GetPose(); },
+      frc::RamseteController{AutoConstants::kRamseteB,
+                             AutoConstants::kRamseteZeta},
+      frc::SimpleMotorFeedforward<units::meters>{
+          DriveConstants::ks, DriveConstants::kv, DriveConstants::ka},
       DriveConstants::kDriveKinematics,
       [this] { return m_drive.GetWheelSpeeds(); },
-      frc2::PIDController(DriveConstants::kPDriveVel, 0, 0),
-      frc2::PIDController(DriveConstants::kPDriveVel, 0, 0),
+      frc2::PIDController{DriveConstants::kPDriveVel, 0, 0},
+      frc2::PIDController{DriveConstants::kPDriveVel, 0, 0},
       [this](auto left, auto right) { m_drive.TankDriveVolts(left, right); },
-      {&m_drive});
+      {&m_drive}};
 
   // Reset odometry to the starting pose of the trajectory.
   m_drive.ResetOdometry(exampleTrajectory.InitialPose());

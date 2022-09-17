@@ -1,0 +1,40 @@
+From 9ef10e5b331d00d7d5822afdb70c1f2d9981d772 Mon Sep 17 00:00:00 2001
+From: PJ Reiniger <pj.reiniger@gmail.com>
+Date: Tue, 3 May 2022 22:50:24 -0400
+Subject: [PATCH 16/28] Add lerp and sgn
+
+---
+ llvm/include/llvm/Support/MathExtras.h | 20 ++++++++++++++++++++
+ 1 file changed, 20 insertions(+)
+
+diff --git a/llvm/include/llvm/Support/MathExtras.h b/llvm/include/llvm/Support/MathExtras.h
+index e8f1f2aca..8116c58bd 100644
+--- a/llvm/include/llvm/Support/MathExtras.h
++++ b/llvm/include/llvm/Support/MathExtras.h
+@@ -930,6 +930,26 @@ std::enable_if_t<std::is_signed<T>::value, T> MulOverflow(T X, T Y, T &Result) {
+     return UX > (static_cast<U>((std::numeric_limits<T>::max)())) / UY;
+ }
+ 
++// Typesafe implementation of the signum function.
++// Returns -1 if negative, 1 if positive, 0 if 0.
++template <typename T>
++constexpr int sgn(T val) {
++  return (T(0) < val) - (val < T(0));
++}
++
++/**
++ * Linearly interpolates between two values.
++ *
++ * @param startValue The start value.
++ * @param endValue The end value.
++ * @param t The fraction for interpolation.
++ *
++ * @return The interpolated value.
++ */
++template <typename T>
++constexpr T Lerp(const T& startValue, const T& endValue, double t) {
++  return startValue + (endValue - startValue) * t;
++}
+ } // End llvm namespace
+ 
+ #endif

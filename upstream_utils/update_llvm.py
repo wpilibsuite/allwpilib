@@ -3,7 +3,13 @@
 import os
 import shutil
 
-from upstream_utils import setup_upstream_repo, comment_out_invalid_includes, walk_cwd_and_copy_if, am_patches, walk_if, copy_to
+from upstream_utils import (
+    get_repo_root,
+    clone_repo,
+    comment_out_invalid_includes,
+    walk_cwd_and_copy_if,
+    git_am,
+)
 
 
 def run_global_replacements(wpiutil_llvm_files):
@@ -17,61 +23,50 @@ def run_global_replacements(wpiutil_llvm_files):
         content = content.replace("llvm::", "wpi::")
 
         # Fix #includes
-        content = content.replace("include \"llvm/ADT", "include \"wpi")
-        content = content.replace("include \"llvm/Config", "include \"wpi")
-        content = content.replace("include \"llvm/Support", "include \"wpi")
+        content = content.replace('include "llvm/ADT', 'include "wpi')
+        content = content.replace('include "llvm/Config', 'include "wpi')
+        content = content.replace('include "llvm/Support', 'include "wpi')
 
         # Remove unused headers
-        content = content.replace("#include \"llvm-c/ErrorHandling.h\"\n", "")
-        content = content.replace("#include \"wpi/Debug.h\"\n", "")
-        content = content.replace("#include \"wpi/Error.h\"\n", "")
-        content = content.replace("#include \"wpi/Format.h\"\n", "")
-        content = content.replace("#include \"wpi/FormatVariadic.h\"\n", "")
-        content = content.replace("#include \"wpi/NativeFormatting.h\"\n", "")
-        content = content.replace("#include \"wpi/Threading.h\"\n", "")
-        content = content.replace("#include \"wpi/DataTypes.h\"\n", "")
-        content = content.replace("#include \"wpi/llvm-config.h\"\n", "")
-        content = content.replace("#include \"wpi/abi-breaking.h\"\n", "")
-        content = content.replace("#include \"wpi/config.h\"\n", "")
-        content = content.replace("#include \"wpi/Signals.h\"\n", "")
-        content = content.replace("#include \"wpi/Process.h\"\n", "")
-        content = content.replace("#include \"wpi/Path.h\"\n", "")
-        content = content.replace("#include \"wpi/Program.h\"\n", "")
+        content = content.replace('#include "llvm-c/ErrorHandling.h"\n', "")
+        content = content.replace('#include "wpi/Debug.h"\n', "")
+        content = content.replace('#include "wpi/Error.h"\n', "")
+        content = content.replace('#include "wpi/Format.h"\n', "")
+        content = content.replace('#include "wpi/FormatVariadic.h"\n', "")
+        content = content.replace('#include "wpi/NativeFormatting.h"\n', "")
+        content = content.replace('#include "wpi/Threading.h"\n', "")
+        content = content.replace('#include "wpi/DataTypes.h"\n', "")
+        content = content.replace('#include "wpi/llvm-config.h"\n', "")
+        content = content.replace('#include "wpi/abi-breaking.h"\n', "")
+        content = content.replace('#include "wpi/config.h"\n', "")
+        content = content.replace('#include "wpi/Signals.h"\n', "")
+        content = content.replace('#include "wpi/Process.h"\n', "")
+        content = content.replace('#include "wpi/Path.h"\n', "")
+        content = content.replace('#include "wpi/Program.h"\n', "")
 
         # Fix include guards
         content = content.replace("LLVM_ADT_", "WPIUTIL_WPI_")
         content = content.replace("LLVM_SUPPORT_", "WPIUTIL_WPI_")
-        content = content.replace("LLVM_DEFINED_HAS_FEATURE",
-                                  "WPI_DEFINED_HAS_FEATURE")
+        content = content.replace("LLVM_DEFINED_HAS_FEATURE", "WPI_DEFINED_HAS_FEATURE")
 
-        content = content.replace("const std::string_view &",
-                                  "std::string_view ")
-        content = content.replace("sys::fs::openFileForRead",
-                                  "fs::OpenFileForRead")
+        content = content.replace("const std::string_view &", "std::string_view ")
+        content = content.replace("sys::fs::openFileForRead", "fs::OpenFileForRead")
         content = content.replace("sys::fs::closeFile", "fs::CloseFile")
         content = content.replace("sys::fs::", "fs::")
 
         # Replace wpi/FileSystem.h with wpi/fs.h
-        content = content.replace("include \"wpi/FileSystem.h\"",
-                                  "include \"wpi/fs.h\"")
-        content = content.replace("#include \"wpi/ReverseIteration.h\"",
-                                  "#include \"wpi/PointerLikeTypeTraits.h\"")
+        content = content.replace('include "wpi/FileSystem.h"', 'include "wpi/fs.h"')
 
         # Replace llvm_unreachable() with wpi_unreachable()
         content = content.replace("llvm_unreachable", "wpi_unreachable")
-        content = content.replace("llvm_shutdown", "wpi_shutdown")
 
         content = content.replace("llvm_is_multithreaded()", "1")
 
         # Revert message in copyright header
-        content = content.replace("/// Defines the wpi::",
-                                  "/// Defines the llvm::")
-        content = content.replace("// end llvm namespace",
-                                  "// end wpi namespace")
-        content = content.replace("// end namespace llvm",
-                                  "// end namespace wpi")
-        content = content.replace("// End llvm namespace",
-                                  "// End wpi namespace")
+        content = content.replace("/// Defines the wpi::", "/// Defines the llvm::")
+        content = content.replace("// end llvm namespace", "// end wpi namespace")
+        content = content.replace("// end namespace llvm", "// end namespace wpi")
+        content = content.replace("// End llvm namespace", "// End wpi namespace")
 
         content = content.replace("fs::openFileForRead", "fs::OpenFileForRead")
 
@@ -95,8 +90,11 @@ def find_wpiutil_llvm_files(wpiutil_root, subfolder):
 
     # These files have substantial changes, not worth managing with the patching process
     ignore_list = [
-        "StringExtras.h", "StringExtras.cpp", "MemoryBuffer.cpp",
-        "MemoryBuffer.h", "SmallVectorMemoryBuffer.h"
+        "StringExtras.h",
+        "StringExtras.cpp",
+        "MemoryBuffer.cpp",
+        "MemoryBuffer.h",
+        "SmallVectorMemoryBuffer.h",
     ]
 
     wpiutil_files = []
@@ -104,10 +102,7 @@ def find_wpiutil_llvm_files(wpiutil_root, subfolder):
         for f in files:
             if f not in ignore_list:
                 full_file = os.path.join(root, f)
-                with open(full_file, 'r') as ff:
-                    contents = ff.read()
-                    if "LLVM Compiler" in contents or "LLVM Project" in contents:
-                        wpiutil_files.append(full_file)
+                wpiutil_files.append(full_file)
 
     return wpiutil_files
 
@@ -126,76 +121,80 @@ def overwrite_files(wpiutil_files, llvm_files):
 
 
 def overwrite_source(wpiutil_root, llvm_root):
-    llvm_files = flattened_llvm_files(llvm_root, [
-        "llvm/include/llvm/ADT/", "llvm/include/llvm/Config",
-        "llvm/include/llvm/Support/", "llvm/lib/Support/"
-    ])
+    llvm_files = flattened_llvm_files(
+        llvm_root,
+        [
+            "llvm/include/llvm/ADT/",
+            "llvm/include/llvm/Config",
+            "llvm/include/llvm/Support/",
+            "llvm/lib/Support/",
+        ],
+    )
     wpi_files = find_wpiutil_llvm_files(
-        wpiutil_root, "src/main/native/include/wpi") + find_wpiutil_llvm_files(
-            wpiutil_root, "src/main/native/cpp/llvm")
+        wpiutil_root, "src/main/native/thirdparty/llvm/include/wpi"
+    ) + find_wpiutil_llvm_files(
+        wpiutil_root, "src/main/native/thirdparty/llvm/cpp/llvm"
+    )
 
     overwrite_files(wpi_files, llvm_files)
     run_global_replacements(wpi_files)
 
 
 def overwrite_tests(wpiutil_root, llvm_root):
-    llvm_files = flattened_llvm_files(llvm_root, [
-        "llvm/unittests/ADT/", "llvm/unittests/Config",
-        "llvm/unittests/Support/"
-    ])
-    wpi_files = find_wpiutil_llvm_files(wpiutil_root,
-                                        "src/test/native/cpp/llvm")
+    llvm_files = flattened_llvm_files(
+        llvm_root,
+        ["llvm/unittests/ADT/", "llvm/unittests/Config", "llvm/unittests/Support/"],
+    )
+    wpi_files = find_wpiutil_llvm_files(wpiutil_root, "src/test/native/cpp/llvm")
 
     overwrite_files(wpi_files, llvm_files)
     run_global_replacements(wpi_files)
 
 
 def main():
-    root, repo = setup_upstream_repo("https://github.com/llvm/llvm-project",
-                                     "llvmorg-13.0.0")
-    wpiutil = os.path.join(root, "wpiutil")
+    upstream_root = clone_repo("https://github.com/llvm/llvm-project", "llvmorg-14.0.6")
+    wpilib_root = get_repo_root()
+    wpiutil = os.path.join(wpilib_root, "wpiutil")
 
-    patch_root = os.path.join(root, "upstream_utils/llvm_patches")
-    # yapf: disable
-    frontend_patches = [
-        os.path.join(patch_root, "0001-Fix-spelling-language-errors.patch"),
-        os.path.join(patch_root, "0002-Remove-StringRef-ArrayRef-and-Optional.patch"),
-        os.path.join(patch_root, "0003-Wrap-std-min-max-calls-in-parens-for-windows-warning.patch"),
-        os.path.join(patch_root, "0004-Change-uniqe_function-storage-size.patch"),
-        os.path.join(patch_root, "0005-Threading-updates.patch"),
-        os.path.join(patch_root, "0006-Remove-DJB-hash-dependency.patch"),
-        os.path.join(patch_root, "0007-ifdef-guard-safety.patch"),
-        os.path.join(patch_root, "0008-Explicitly-use-std.patch"),
-        os.path.join(patch_root, "0009-Remove-format_provider.patch"),
-        os.path.join(patch_root, "0010-Remove-reverse-iterator.patch"),
-        os.path.join(patch_root, "0011-Remove-allocator-from-collections.patch"),
-        os.path.join(patch_root, "0012-Remove-EpochTracker.patch"),
-        os.path.join(patch_root, "0013-Add-compiler-warning-pragrams.patch"),
-        os.path.join(patch_root, "0014-Remove-unused-functions.patch"),
-        os.path.join(patch_root, "0015-Detemplatize-small-vector-base.patch"),
-        os.path.join(patch_root, "0016-Add-vectors-to-raw_ostream.patch"),
-        os.path.join(patch_root, "0017-Extra-collections-features.patch"),
-        os.path.join(patch_root, "0018-EpochTracker-abi-macro.patch"),
-        os.path.join(patch_root, "0019-Delete-numbers-from-mathextras.patch"),
-        os.path.join(patch_root, "0020-Add-lerp-and-sgn.patch"),
-        os.path.join(patch_root, "0021-Fixup-includes.patch"),
-        os.path.join(patch_root, "0022-use-std-is_trivially_copy_constructible.patch"),
-        os.path.join(patch_root, "0023-Windows-Support.patch"),
-        os.path.join(patch_root, "0024-Prefer-fmtlib.patch"),
-        os.path.join(patch_root, "0025-prefer-wpi-s-fs.h.patch"),
-        os.path.join(patch_root, "0026-Remove-unused-functions.patch"),
-        os.path.join(patch_root, "0027-Add-convienence-feature-to-SmallString.patch"),
-        os.path.join(patch_root, "0028-OS-specific-changes.patch"),
-        os.path.join(patch_root, "0029-Use-smallvector-for-UTF-conversion.patch"),
-        os.path.join(patch_root, "0030-Prefer-to-use-static-pointers-in-raw_ostream.patch"),
-        os.path.join(patch_root, "0031-constexpr-endian-byte-swap.patch"),
+    # Apply patches to upstream Git repo
+    os.chdir(upstream_root)
+    for f in [
+        "0001-Fix-spelling-language-errors.patch",
+        "0002-Remove-StringRef-ArrayRef-and-Optional.patch",
+        "0003-Wrap-std-min-max-calls-in-parens-for-Windows-warning.patch",
+        "0004-Change-unique_function-storage-size.patch",
+        "0005-Threading-updates.patch",
+        "0006-ifdef-guard-safety.patch",
+        "0007-Explicitly-use-std.patch",
+        "0008-Remove-format_provider.patch",
+        "0009-Add-compiler-warning-pragmas.patch",
+        "0010-Remove-unused-functions.patch",
+        "0011-Detemplatize-SmallVectorBase.patch",
+        "0012-Add-vectors-to-raw_ostream.patch",
+        "0013-Extra-collections-features.patch",
+        "0014-EpochTracker-ABI-macro.patch",
+        "0015-Delete-numbers-from-MathExtras.patch",
+        "0016-Add-lerp-and-sgn.patch",
+        "0017-Fixup-includes.patch",
+        "0018-Use-std-is_trivially_copy_constructible.patch",
+        "0019-Windows-support.patch",
+        "0020-Prefer-fmtlib.patch",
+        "0021-Prefer-wpi-s-fs.h.patch",
+        "0022-Remove-unused-functions.patch",
+        "0023-OS-specific-changes.patch",
+        "0024-Use-SmallVector-for-UTF-conversion.patch",
+        "0025-Prefer-to-use-static-pointers-in-raw_ostream.patch",
+        "0026-constexpr-endian-byte-swap.patch",
+        "0027-Copy-type-traits-from-STLExtras.h-into-PointerUnion..patch",
+        "0028-Remove-StringMap-test-for-llvm-sort.patch",
+    ]:
+        git_am(
+            os.path.join(wpilib_root, "upstream_utils/llvm_patches", f),
+            use_threeway=True,
+        )
 
-    ]
-    # yapf: enable
-    am_patches(repo, frontend_patches, use_threeway=True)
-
-    overwrite_source(wpiutil, repo)
-    overwrite_tests(wpiutil, repo)
+    overwrite_source(wpiutil, upstream_root)
+    overwrite_tests(wpiutil, upstream_root)
 
 
 if __name__ == "__main__":

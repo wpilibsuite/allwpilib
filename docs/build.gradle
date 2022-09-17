@@ -37,7 +37,7 @@ cppProjectZips.add(project(':wpilibNewCommands').cppHeadersZip)
 
 doxygen {
     executables {
-        doxygen version : '1.9.2',
+        doxygen version : '1.9.4',
         baseURI : 'https://frcmaven.wpi.edu/artifactory/generic-release-mirror/doxygen'
     }
 }
@@ -114,6 +114,9 @@ doxygen {
 
         // json
         exclude 'wpi/json.h'
+
+        // memory
+        exclude 'wpi/memory/**'
 
         // mpack
         exclude 'wpi/mpack.h'

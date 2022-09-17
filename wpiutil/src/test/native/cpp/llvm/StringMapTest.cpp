@@ -110,6 +110,13 @@ TEST_F(StringMapTest, ConstEmptyMapTest) {
   EXPECT_TRUE(constTestMap.find(testKeyStr) == constTestMap.end());
 }
 
+// initializer_list ctor test; also implicitly tests initializer_list and
+// iterator overloads of insert().
+TEST_F(StringMapTest, InitializerListCtor) {
+  testMap = StringMap<uint32_t>({{"key", 1}});
+  assertSingleItemMap();
+}
+
 // A map with a single entry.
 TEST_F(StringMapTest, SingleEntryMapTest) {
   testMap[testKey] = testValue;
@@ -223,12 +230,13 @@ TEST_F(StringMapTest, IterationTest) {
 
 // Test StringMapEntry::Create() method.
 TEST_F(StringMapTest, StringMapEntryTest) {
+  MallocAllocator Allocator;
   StringMap<uint32_t>::value_type *entry =
       StringMap<uint32_t>::value_type::Create(
-          std::string_view(testKeyFirst, testKeyLength), 1u);
+          std::string_view(testKeyFirst, testKeyLength), Allocator, 1u);
   EXPECT_STREQ(testKey, entry->first().data());
   EXPECT_EQ(1u, entry->second);
-  entry->Destroy();
+  entry->Destroy(Allocator);
 }
 
 // Test insert() method.
@@ -237,7 +245,7 @@ TEST_F(StringMapTest, InsertTest) {
   testMap.insert(
       StringMap<uint32_t>::value_type::Create(
           std::string_view(testKeyFirst, testKeyLength),
-          1u));
+          testMap.getAllocator(), 1u));
   assertSingleItemMap();
 }
 
@@ -299,7 +307,7 @@ TEST_F(StringMapTest, InsertOrAssignTest) {
   EXPECT_EQ(0, try1.first->second.copy);
 }
 
-TEST_F(StringMapTest, IterMapKeys) {
+TEST_F(StringMapTest, IterMapKeysSmallVector) {
   StringMap<int> Map;
   Map["A"] = 1;
   Map["B"] = 2;
@@ -352,14 +360,15 @@ TEST_F(StringMapTest, MoveOnly) {
   StringMap<MoveOnly> t;
   t.insert(std::make_pair("Test", MoveOnly(42)));
   std::string_view Key = "Test";
-  StringMapEntry<MoveOnly>::Create(Key, MoveOnly(42))
-      ->Destroy();
+  StringMapEntry<MoveOnly>::Create(Key, t.getAllocator(), MoveOnly(42))
+      ->Destroy(t.getAllocator());
 }
 
 TEST_F(StringMapTest, CtorArg) {
   std::string_view Key = "Test";
-  StringMapEntry<MoveOnly>::Create(Key, Immovable())
-      ->Destroy();
+  MallocAllocator Allocator;
+  StringMapEntry<MoveOnly>::Create(Key, Allocator, Immovable())
+      ->Destroy(Allocator);
 }
 
 TEST_F(StringMapTest, MoveConstruct) {

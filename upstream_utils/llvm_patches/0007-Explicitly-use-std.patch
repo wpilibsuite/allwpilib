@@ -1,0 +1,78 @@
+From c26562caae6a685716a8785ad8689833c9996549 Mon Sep 17 00:00:00 2001
+From: PJ Reiniger <pj.reiniger@gmail.com>
+Date: Sat, 7 May 2022 22:37:34 -0400
+Subject: [PATCH 07/28] Explicitly use std::
+
+---
+ llvm/include/llvm/ADT/SmallSet.h       | 2 +-
+ llvm/include/llvm/Support/MathExtras.h | 2 +-
+ llvm/lib/Support/ErrorHandling.cpp     | 2 +-
+ llvm/unittests/ADT/SmallPtrSetTest.cpp | 2 +-
+ llvm/unittests/ADT/StringMapTest.cpp   | 2 +-
+ 5 files changed, 5 insertions(+), 5 deletions(-)
+
+diff --git a/llvm/include/llvm/ADT/SmallSet.h b/llvm/include/llvm/ADT/SmallSet.h
+index bfe93e997..403e108fd 100644
+--- a/llvm/include/llvm/ADT/SmallSet.h
++++ b/llvm/include/llvm/ADT/SmallSet.h
+@@ -270,7 +270,7 @@ bool operator==(const SmallSet<T, LN, C> &LHS, const SmallSet<T, RN, C> &RHS) {
+     return false;
+ 
+   // All elements in LHS must also be in RHS
+-  return all_of(LHS, [&RHS](const T &E) { return RHS.count(E); });
++  return std::all_of(LHS.begin(), LHS.end(), [&RHS](const T &E) { return RHS.count(E); });
+ }
+ 
+ /// Inequality comparison for SmallSet.
+diff --git a/llvm/include/llvm/Support/MathExtras.h b/llvm/include/llvm/Support/MathExtras.h
+index db9fbc148..da843ef79 100644
+--- a/llvm/include/llvm/Support/MathExtras.h
++++ b/llvm/include/llvm/Support/MathExtras.h
+@@ -586,7 +586,7 @@ inline double Log2(double Value) {
+ #if defined(__ANDROID_API__) && __ANDROID_API__ < 18
+   return __builtin_log(Value) / __builtin_log(2.0);
+ #else
+-  return log2(Value);
++  return std::log2(Value);
+ #endif
+ }
+ 
+diff --git a/llvm/lib/Support/ErrorHandling.cpp b/llvm/lib/Support/ErrorHandling.cpp
+index 89440b5ab..f80e28e87 100644
+--- a/llvm/lib/Support/ErrorHandling.cpp
++++ b/llvm/lib/Support/ErrorHandling.cpp
+@@ -210,7 +210,7 @@ void LLVMResetFatalErrorHandler() {
+ // I'd rather not double the line count of the following.
+ #define MAP_ERR_TO_COND(x, y)                                                  \
+   case x:                                                                      \
+-    return make_error_code(errc::y)
++    return std::make_error_code(std::errc::y)
+ 
+ std::error_code llvm::mapWindowsError(unsigned EV) {
+   switch (EV) {
+diff --git a/llvm/unittests/ADT/SmallPtrSetTest.cpp b/llvm/unittests/ADT/SmallPtrSetTest.cpp
+index 6f3c94eed..531f81ab5 100644
+--- a/llvm/unittests/ADT/SmallPtrSetTest.cpp
++++ b/llvm/unittests/ADT/SmallPtrSetTest.cpp
+@@ -298,7 +298,7 @@ TEST(SmallPtrSetTest, dereferenceAndIterate) {
+ 
+   // Sort.  We should hit the first element just once and the final element N
+   // times.
+-  llvm::sort(std::begin(Found), std::end(Found));
++  std::sort(std::begin(Found), std::end(Found));
+   for (auto F = std::begin(Found), E = std::end(Found); F != E; ++F)
+     EXPECT_EQ(F - Found + 1, *F);
+ }
+diff --git a/llvm/unittests/ADT/StringMapTest.cpp b/llvm/unittests/ADT/StringMapTest.cpp
+index 86907ab61..6d0c0942c 100644
+--- a/llvm/unittests/ADT/StringMapTest.cpp
++++ b/llvm/unittests/ADT/StringMapTest.cpp
+@@ -329,7 +329,7 @@ TEST_F(StringMapTest, IterMapKeysSmallVector) {
+   Map["D"] = 3;
+ 
+   auto Keys = to_vector<4>(Map.keys());
+-  llvm::sort(Keys);
++  std::sort(Keys.begin(), Keys.end());
+ 
+   SmallVector<std::string_view, 4> Expected = {"A", "B", "C", "D"};
+   EXPECT_EQ(Expected, Keys);

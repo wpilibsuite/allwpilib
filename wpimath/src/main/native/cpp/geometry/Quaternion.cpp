@@ -16,11 +16,14 @@ Quaternion Quaternion::operator*(const Quaternion& other) const {
   const auto& r2 = other.m_r;
   const auto& v2 = other.m_v;
 
+  // v₁ x v₂
   Eigen::Vector3d cross{v1(1) * v2(2) - v2(1) * v1(2),
                         v2(0) * v1(2) - v1(0) * v2(2),
                         v1(0) * v2(1) - v2(0) * v1(1)};
 
+  // v = r₁v₂ + r₂v₁ + v₁ x v₂
   Eigen::Vector3d v = r1 * v2 + r2 * v1 + cross;
+
   return Quaternion{r1 * r2 - v1.dot(v2), v(0), v(1), v(2)};
 }
 

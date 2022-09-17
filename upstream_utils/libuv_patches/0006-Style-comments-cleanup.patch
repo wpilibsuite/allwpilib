@@ -1,7 +1,7 @@
-From 6399ee267f6cc4cafda478b277c8888ee0b08632 Mon Sep 17 00:00:00 2001
+From ad60aa8e1c03cc5f0c88159d37f63b0c063927c7 Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Tue, 26 Apr 2022 15:28:52 -0400
-Subject: [PATCH 6/7] Style / comments cleanup
+Subject: [PATCH 6/9] Style / comments cleanup
 
 ---
  src/fs-poll.c     | 1 +
@@ -25,10 +25,10 @@ index 5a39daed..1a7ca70d 100644
    uv_fs_poll_t* parent_handle;
    int busy_polling;
 diff --git a/src/unix/core.c b/src/unix/core.c
-index be2ad1fc..fde43d40 100644
+index 223c5513..4c23f608 100644
 --- a/src/unix/core.c
 +++ b/src/unix/core.c
-@@ -524,6 +524,7 @@ int uv__accept(int sockfd) {
+@@ -544,6 +544,7 @@ int uv__accept(int sockfd) {
    return peerfd;
  }
  
@@ -65,10 +65,10 @@ index 64726bd6..392a0715 100644
    struct _uv_barrier* b;
  
 diff --git a/src/uv-common.c b/src/uv-common.c
-index c287246f..534119c0 100644
+index 49026c03..c9a32c03 100644
 --- a/src/uv-common.c
 +++ b/src/uv-common.c
-@@ -756,6 +756,7 @@ void uv__fs_readdir_cleanup(uv_fs_t* req) {
+@@ -758,6 +758,7 @@ void uv__fs_readdir_cleanup(uv_fs_t* req) {
    }
  }
  
@@ -100,6 +100,3 @@ index 7843e9f1..cda82bc3 100644
  #pragma comment(lib, "Ws2_32.lib")
  
  /* Whether there are any non-IFS LSPs stacked on TCP */
--- 
-2.36.1
-
