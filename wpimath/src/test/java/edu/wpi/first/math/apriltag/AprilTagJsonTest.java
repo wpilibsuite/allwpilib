@@ -3,6 +3,7 @@ package edu.wpi.first.math.apriltag;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import edu.wpi.first.math.WPIMathJNI;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.trajectory.TrajectoryUtil;
@@ -19,9 +20,7 @@ public class AprilTagJsonTest {
         ));
 
         var deserialized = assertDoesNotThrow(
-                () -> AprilTagUtil.deserializeAprilTagFieldLayout(
-                        AprilTagUtil.serializeAprilTagFieldLayout(layout)
-                )
+                () -> new AprilTagFieldLayout(AprilTagUtil.createAprilTagFieldLayoutFromElements(WPIMathJNI.deserializeAprilTagLayout(layout.serialize())))
         );
 
         assertEquals(layout.getTags(), deserialized.getTags());

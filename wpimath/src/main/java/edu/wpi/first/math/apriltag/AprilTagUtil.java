@@ -4,6 +4,7 @@ import edu.wpi.first.math.WPIMathJNI;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Quaternion;
 import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.util.datalog.IntegerLogEntry;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -17,7 +18,7 @@ public class AprilTagUtil {
      * @param elements A double[] containing the raw elements of the AprilTag layout.
      * @return An AprilTag layout created from the elements.
      */
-    private static AprilTagFieldLayout createAprilTagFieldLayoutFromElements(double[] elements) {
+    public static Map<Integer, Pose3d> createAprilTagFieldLayoutFromElements(double[] elements) {
         // Make sure that the elements have the correct length.
         if (elements.length % 8 != 0) {
             throw new AprilTagLayoutSerializationException(
@@ -42,21 +43,21 @@ public class AprilTagUtil {
                     )
             );
         }
-        return new AprilTagFieldLayout(apriltagLayout);
+        return apriltagLayout;
     }
 
     /**
      * Returns a double[] of elements from the given AprilTag layout.
      *
-     * @param aprilTagFieldLayout The AprilTag field layout to retrieve raw elements from.
-     * @return A double[] of elements from the given trajectory.
+     * @param aprilTagLayout The AprilTag layout to retrieve raw elements from.
+     * @return A double[] of elements from the given AprilTag layout.
      */
-    private static double[] getElementsFromAprilTagFieldLayout(AprilTagFieldLayout aprilTagFieldLayout) {
+     public static double[] getElementsFromAprilTagFieldLayout(Map<Integer, Pose3d> aprilTagLayout) {
         // Create a double[] of elements and fill it from the trajectory states.
-        double[] elements = new double[aprilTagFieldLayout.getTags().size() * 8];
+        double[] elements = new double[aprilTagLayout.size() * 8];
 
-        ArrayList<Map.Entry<Integer, Pose3d>> entries = new ArrayList<>(aprilTagFieldLayout.getTags().entrySet());
-        for (int i = 0; i < aprilTagFieldLayout.getTags().size() * 8; i += 8) {
+        ArrayList<Map.Entry<Integer, Pose3d>> entries = new ArrayList<>(aprilTagLayout.entrySet());
+        for (int i = 0; i < aprilTagLayout.size() * 8; i += 8) {
             var entry = entries.get(i / 8);
             elements[i] = entry.getKey();
             elements[i + 1] = entry.getValue().getX();
@@ -67,16 +68,7 @@ public class AprilTagUtil {
             elements[i + 6] = entry.getValue().getRotation().getQuaternion().getY();
             elements[i + 7] = entry.getValue().getRotation().getQuaternion().getZ();
         }
-        System.out.println(Arrays.toString(elements));
         return elements;
-    }
-
-    public static AprilTagFieldLayout deserializeAprilTagFieldLayout(String json) {
-        return createAprilTagFieldLayoutFromElements(WPIMathJNI.deserializeAprilTagLayout(json));
-    }
-
-    public static String serializeAprilTagFieldLayout(AprilTagFieldLayout aprilTagFieldLayout) {
-        return WPIMathJNI.serializeAprilTagLayout(getElementsFromAprilTagFieldLayout(aprilTagFieldLayout));
     }
 
     public static class AprilTagLayoutSerializationException extends RuntimeException {
