@@ -53,7 +53,7 @@ public class AprilTagFieldLayout {
   }
 
   /**
-   * Set the alliance that your team is on. This changes the {@link AprilTagFieldLayout getTag}
+   * Set the alliance that your team is on. This changes the {@link #getTag()}
    * method to return the correct pose for the alliance you are on.
    *
    * @param alliance the alliance to mirror poses for
@@ -63,7 +63,7 @@ public class AprilTagFieldLayout {
   }
 
   /**
-   * Gets the raw tags. This is not affected by {@link AprilTagFieldLayout setAlliance}.
+   * Gets the raw tags. This is not affected by {@link #setAlliance()}.
    *
    * @return map of IDs to poses.
    */

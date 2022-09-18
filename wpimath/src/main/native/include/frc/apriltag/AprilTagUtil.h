@@ -22,7 +22,7 @@ class WPILIB_DLLEXPORT AprilTagUtil {
     Pose3d pose;
 
     /**
-     * Checks equality between this State and another object.
+     * Checks equality between this AprilTag and another object.
      *
      * @param other The other object.
      * @return Whether the two objects are equal.
@@ -30,7 +30,7 @@ class WPILIB_DLLEXPORT AprilTagUtil {
     bool operator==(const AprilTag& other) const;
 
     /**
-     * Checks inequality between this State and another object.
+     * Checks inequality between this AprilTag and another object.
      *
      * @param other The other object.
      * @return Whether the two objects are not equal.
@@ -41,10 +41,10 @@ class WPILIB_DLLEXPORT AprilTagUtil {
   /**
    * Exports a AprilTag Layout JSON file.
    *
-   * @param apriltag the AprilTag layout to export
+   * @param apriltagLayout the AprilTag layout to export
    * @param path the path of the file to export to
    */
-  static void ToJson(const std::vector<AprilTag>& apriltagFieldLayout,
+  static void ToJson(const std::vector<AprilTag>& apriltagLayout,
                      std::string_view path);
   /**
    * Imports a AprilTag Layout JSON file.
@@ -58,12 +58,12 @@ class WPILIB_DLLEXPORT AprilTagUtil {
   /**
    * Deserializes a AprilTag layout JSON.
    *
-   * @param apriltag the AprilTag layout to export
+   * @param apriltagLayout the AprilTag layout to export
    *
    * @return the string containing the serialized JSON
    */
   static std::string SerializeAprilTagLayout(
-      const std::vector<AprilTag>& apriltagFieldLayout);
+      const std::vector<AprilTag>& apriltagLayout);
 
   /**
    * Serializes a AprilTag layout JSON.

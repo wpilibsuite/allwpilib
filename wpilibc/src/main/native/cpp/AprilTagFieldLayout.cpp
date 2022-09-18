@@ -38,4 +38,4 @@ void AprilTagFieldLayout::SetAlliance(DriverStation::Alliance alliance) {
 const std::vector<AprilTagUtil::AprilTag>& frc::AprilTagFieldLayout::GetTags()
     const {
   return m_apriltags;
-};
+}
