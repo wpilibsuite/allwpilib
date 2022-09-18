@@ -6,15 +6,37 @@
 
 #include <string>
 #include <string_view>
+#include <vector>
+#include "frc/geometry/Pose3d.h"
 
 #include <wpi/SymbolExports.h>
-
-#include "frc/apriltag/AprilTagFieldLayout.h"
 
 namespace frc {
 class WPILIB_DLLEXPORT AprilTagUtil {
  public:
   AprilTagUtil() = delete;
+
+  struct WPILIB_DLLEXPORT AprilTag {
+      int id;
+
+      Pose3d pose;
+      
+      /**
+       * Checks equality between this State and another object.
+       *
+       * @param other The other object.
+       * @return Whether the two objects are equal.
+       */
+      bool operator==(const AprilTag& other) const;
+
+      /**
+       * Checks inequality between this State and another object.
+       *
+       * @param other The other object.
+       * @return Whether the two objects are not equal.
+       */
+      bool operator!=(const AprilTag& other) const;
+  };
 
   /**
    * Exports a AprilTag Layout JSON file.
@@ -22,7 +44,7 @@ class WPILIB_DLLEXPORT AprilTagUtil {
    * @param apriltag the AprilTag layout to export
    * @param path the path of the file to export to
    */
-  static void ToJson(const AprilTagFieldLayout& apriltagFieldLayout,
+  static void ToJson(const std::vector<AprilTag>& apriltagFieldLayout,
                                std::string_view path);
   /**
    * Imports a AprilTag Layout JSON file.
@@ -31,7 +53,7 @@ class WPILIB_DLLEXPORT AprilTagUtil {
    *
    * @return The AprilTag layout represented by the file.
    */
-  static AprilTagFieldLayout FromJson(std::string_view path);
+  static std::vector<AprilTag> FromJson(std::string_view path);
 
   /**
    * Deserializes a AprilTag layout JSON.
@@ -40,7 +62,7 @@ class WPILIB_DLLEXPORT AprilTagUtil {
    *
    * @return the string containing the serialized JSON
    */
-  static std::string SerializeAprilTagLayout(const AprilTagFieldLayout& apriltagFieldLayout);
+  static std::string SerializeAprilTagLayout(const std::vector<AprilTag>& apriltagFieldLayout);
 
   /**
    * Serializes a AprilTag layout JSON.
@@ -49,6 +71,6 @@ class WPILIB_DLLEXPORT AprilTagUtil {
    *
    * @return the AprilTag layout represented by the JSON
    */
-  static AprilTagFieldLayout DeserializeAprilTagLayout(std::string_view jsonStr);
+  static std::vector<AprilTag> DeserializeAprilTagLayout(std::string_view jsonStr);
 };
 }  // namespace frc

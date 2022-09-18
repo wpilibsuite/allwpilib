@@ -11,15 +11,7 @@
 
 using namespace frc;
 
-bool AprilTagFieldLayout::AprilTag::operator==(const AprilTag &other) const {
-    return id == other.id && pose == other.pose;
-}
-
-bool AprilTagFieldLayout::AprilTag::operator!=(const AprilTag &other) const {
-    return !operator==(other);
-}
-
-AprilTagFieldLayout::AprilTagFieldLayout(const std::vector<AprilTag>& apriltags): m_apriltags(apriltags) {}
+AprilTagFieldLayout::AprilTagFieldLayout(const std::vector<AprilTagUtil::AprilTag>& apriltags): m_apriltags(apriltags) {}
 
 frc::Pose3d AprilTagFieldLayout::GetTagPose(int id) const {
     Pose3d returnPose;
@@ -38,14 +30,6 @@ void AprilTagFieldLayout::SetShouldMirror(bool mirror) {
     m_mirror = mirror;
 }
 
-void frc::to_json(wpi::json& json, const AprilTagFieldLayout::AprilTag& apriltag) {
-    json = wpi::json{
-        {"id", apriltag.id},
-        {"pose", apriltag.pose}
-    };
-}
-
-void frc::from_json(const wpi::json& json, AprilTagFieldLayout::AprilTag& apriltag) {
-    apriltag.id = json.at("id").get<int>();
-    apriltag.pose = json.at("pose").get<Pose3d>();
-}
+const std::vector<AprilTagUtil::AprilTag>& frc::AprilTagFieldLayout::GetTags() const {
+    return m_apriltags;
+};

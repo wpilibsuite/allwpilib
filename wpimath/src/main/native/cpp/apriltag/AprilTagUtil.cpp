@@ -5,6 +5,7 @@
 #include "frc/apriltag/AprilTagUtil.h"
 
 #include <system_error>
+#include <vector>
 #include "frc/apriltag/AprilTagFieldLayout.h"
 
 #include <fmt/format.h>
@@ -15,7 +16,15 @@
 
 using namespace frc;
 
-void AprilTagUtil::ToJson(const AprilTagFieldLayout& apriltagFieldLayout,
+bool AprilTagUtil::AprilTag::operator==(const AprilTag &other) const {
+    return id == other.id && pose == other.pose;
+}
+
+bool AprilTagUtil::AprilTag::operator!=(const AprilTag &other) const {
+    return !operator==(other);
+}
+
+void AprilTagUtil::ToJson(const std::vector<AprilTag>& apriltagFieldLayout,
                                       std::string_view path) {
   std::error_code error_code;
 
@@ -24,12 +33,12 @@ void AprilTagUtil::ToJson(const AprilTagFieldLayout& apriltagFieldLayout,
     throw std::runtime_error(fmt::format("Cannot open file: {}", path));
   }
 
-  wpi::json json = apriltagFieldLayout.GetTags();
+  wpi::json json = apriltagFieldLayout;
   output << json;
   output.flush();
 }
 
-AprilTagFieldLayout AprilTagUtil::FromJson(std::string_view path) {
+std::vector<AprilTagUtil::AprilTag> AprilTagUtil::FromJson(std::string_view path) {
   std::error_code error_code;
 
   wpi::raw_fd_istream input{path, error_code};
@@ -40,15 +49,27 @@ AprilTagFieldLayout AprilTagUtil::FromJson(std::string_view path) {
   wpi::json json;
   input >> json;
 
-  return AprilTagFieldLayout{json.get<std::vector<AprilTagFieldLayout::AprilTag>>()};
+  return json.get<std::vector<AprilTagUtil::AprilTag>>();
 }
 
-std::string AprilTagUtil::SerializeAprilTagLayout(const AprilTagFieldLayout& apriltagFieldLayout) {
-  wpi::json json = apriltagFieldLayout.GetTags();
+std::string AprilTagUtil::SerializeAprilTagLayout(const std::vector<AprilTagUtil::AprilTag>& apriltagLayout) {
+  wpi::json json = apriltagLayout;
   return json.dump();
 }
 
-AprilTagFieldLayout AprilTagUtil::DeserializeAprilTagLayout(std::string_view jsonStr) {
+std::vector<AprilTagUtil::AprilTag> AprilTagUtil::DeserializeAprilTagLayout(std::string_view jsonStr) {
   wpi::json json = wpi::json::parse(jsonStr);
-  return AprilTagFieldLayout{json.get<std::vector<AprilTagFieldLayout::AprilTag>>()};
+  return json.get<std::vector<AprilTagUtil::AprilTag>>();
+}
+
+void frc::to_json(wpi::json& json, const AprilTagUtil::AprilTag& apriltag) {
+    json = wpi::json{
+        {"id", apriltag.id},
+        {"pose", apriltag.pose}
+    };
+}
+
+void frc::from_json(const wpi::json& json, AprilTagUtil::AprilTag& apriltag) {
+    apriltag.id = json.at("id").get<int>();
+    apriltag.pose = json.at("pose").get<Pose3d>();
 }

@@ -100,11 +100,11 @@ frc::Trajectory CreateTrajectoryFromElements(wpi::span<const double> elements) {
 }
 
 std::vector<double> GetElementsFromAprilTagLayout(
-    const frc::AprilTagFieldLayout& apriltagFieldLayout) {
+    const std::vector<frc::AprilTagUtil::AprilTag>& apriltagFieldLayout) {
   std::vector<double> elements;
-  elements.reserve(apriltagFieldLayout.GetTags().size() * 8);
+  elements.reserve(apriltagFieldLayout.size() * 8);
 
-  for (auto&& apriltag : apriltagFieldLayout.GetTags()) {
+  for (auto&& apriltag : apriltagFieldLayout) {
     elements.push_back(apriltag.id);
     elements.push_back(apriltag.pose.X().value());
     elements.push_back(apriltag.pose.Y().value());
@@ -118,16 +118,16 @@ std::vector<double> GetElementsFromAprilTagLayout(
   return elements;
 }
 
-frc::AprilTagFieldLayout CreateAprilTagLayoutFromElements(wpi::span<const double> elements) {
+std::vector<frc::AprilTagUtil::AprilTag> CreateAprilTagLayoutFromElements(wpi::span<const double> elements) {
   // Make sure that the elements have the correct length.
   assert(elements.size() % 8 == 0);
 
   // Create a vector of AprilTags from the elements.
-  std::vector<frc::AprilTagFieldLayout::AprilTag> apriltags;
+  std::vector<frc::AprilTagUtil::AprilTag> apriltags;
   apriltags.reserve(elements.size() / 8);
 
   for (size_t i = 0; i < elements.size(); i += 8) {
-    apriltags.emplace_back(frc::AprilTagFieldLayout::AprilTag{
+    apriltags.emplace_back(frc::AprilTagUtil::AprilTag{
       static_cast<int>(elements[i]),
       frc::Pose3d{units::meter_t{elements[i + 1]},
                   units::meter_t{elements[i + 2]},
@@ -139,7 +139,7 @@ frc::AprilTagFieldLayout CreateAprilTagLayoutFromElements(wpi::span<const double
                                   elements[i + 7]}}}});
   }
 
-  return frc::AprilTagFieldLayout(apriltags);
+  return apriltags;
 }
 
 extern "C" {
