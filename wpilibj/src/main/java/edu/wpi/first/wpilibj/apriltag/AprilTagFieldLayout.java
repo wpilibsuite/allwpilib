@@ -4,6 +4,7 @@ import edu.wpi.first.math.WPIMathJNI;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation3d;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 
 import java.io.IOException;
@@ -40,7 +41,7 @@ public class AprilTagFieldLayout {
     public Pose3d getTag(int id) {
         Pose3d tag = m_tags.get(id);
         if(m_mirror) {
-            tag = tag.relativeTo(new Pose3d(new Translation3d(16.4592, 8.2296, 0), new Rotation3d(0, 0, 180)));
+            tag = tag.relativeTo(new Pose3d(new Translation3d(Units.feetToMeters(54.0), Units.feetToMeters(27.0), 0.0), new Rotation3d(0.0, 0.0, 180.0)));
         }
         return tag;
     }
