@@ -53,8 +53,9 @@ public class AprilTagFieldLayout {
   }
 
   /**
-   * Set the alliance that your team is on. This changes the {@link #getTag(int)} method to return the
-   * correct pose for the alliance you are on.
+   * Set the alliance that your team is on.
+   *
+   * <p>This changes the {@link #getTag(int)} method to return the correct pose for your alliance.
    *
    * @param alliance the alliance to mirror poses for
    */
