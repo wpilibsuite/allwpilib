@@ -8,7 +8,6 @@
 #include <vector>
 
 #include <fmt/format.h>
-#include <wpi/SmallString.h>
 #include <wpi/json.h>
 #include <wpi/raw_istream.h>
 #include <wpi/raw_ostream.h>

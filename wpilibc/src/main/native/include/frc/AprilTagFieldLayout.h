@@ -4,20 +4,10 @@
 
 #pragma once
 
-#include <cstdint>
-#include <string_view>
-#include <vector>
-
 #include <wpi/SymbolExports.h>
 
 #include "frc/DriverStation.h"
-#include "frc/geometry/Pose2d.h"
 #include "frc/geometry/Pose3d.h"
-#include "frc/geometry/Transform2d.h"
-#include "units/acceleration.h"
-#include "units/curvature.h"
-#include "units/time.h"
-#include "units/velocity.h"
 #include "frc/apriltag/AprilTagUtil.h"
 
 namespace wpi {

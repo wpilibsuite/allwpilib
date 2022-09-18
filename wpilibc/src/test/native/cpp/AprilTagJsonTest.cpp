@@ -6,8 +6,6 @@
 #include "frc/AprilTagFieldLayout.h"
 #include "frc/apriltag/AprilTagUtil.h"
 #include "frc/geometry/Pose3d.h"
-#include "frc/trajectory/TrajectoryConfig.h"
-#include "frc/trajectory/TrajectoryUtil.h"
 #include "gtest/gtest.h"
 
 using namespace frc;
