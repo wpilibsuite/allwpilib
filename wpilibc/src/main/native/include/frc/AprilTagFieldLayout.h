@@ -10,6 +10,7 @@
 
 #include <wpi/SymbolExports.h>
 
+#include "frc/DriverStation.h"
 #include "frc/geometry/Pose2d.h"
 #include "frc/geometry/Pose3d.h"
 #include "frc/geometry/Transform2d.h"
@@ -34,7 +35,7 @@ class WPILIB_DLLEXPORT AprilTagFieldLayout {
     
     Pose3d GetTagPose(int id) const;
     
-    void SetShouldMirror(bool mirror);
+    void SetAlliance(DriverStation::Alliance alliance);
     
  private:
     std::vector<AprilTagUtil::AprilTag> m_apriltags;
