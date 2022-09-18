@@ -7,7 +7,11 @@ package edu.wpi.first.math.geometry;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
+import edu.wpi.first.math.MatBuilder;
+import edu.wpi.first.math.Matrix;
+import edu.wpi.first.math.Nat;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.util.Units;
 import org.junit.jupiter.api.Test;
@@ -34,6 +38,32 @@ class Rotation3dTest {
     final var rot5 = new Rotation3d(zAxis, Math.PI / 3);
     final var rot6 = new Rotation3d(0.0, 0.0, Math.PI / 3);
     assertEquals(rot5, rot6);
+  }
+
+  @Test
+  void testInitRotationMatrix() {
+    // No rotation
+    final var R1 = Matrix.eye(Nat.N3());
+    final var rot1 = new Rotation3d(R1);
+    assertEquals(new Rotation3d(), rot1);
+
+    // 90 degree CCW rotation around z-axis
+    final var R2 = new Matrix<>(Nat.N3(), Nat.N3());
+    R2.assignBlock(0, 0, VecBuilder.fill(0.0, 1.0, 0.0));
+    R2.assignBlock(0, 1, VecBuilder.fill(-1.0, 0.0, 0.0));
+    R2.assignBlock(0, 2, VecBuilder.fill(0.0, 0.0, 1.0));
+    final var rot2 = new Rotation3d(R2);
+    final var expected2 = new Rotation3d(0.0, 0.0, Units.degreesToRadians(90.0));
+    assertEquals(expected2, rot2);
+
+    // Matrix that isn't orthogonal
+    final var R3 =
+        new MatBuilder<>(Nat.N3(), Nat.N3()).fill(1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0);
+    assertThrows(IllegalArgumentException.class, () -> new Rotation3d(R3));
+
+    // Matrix that's orthogonal but not special orthogonal
+    final var R4 = Matrix.eye(Nat.N3()).times(2.0);
+    assertThrows(IllegalArgumentException.class, () -> new Rotation3d(R4));
   }
 
   @Test

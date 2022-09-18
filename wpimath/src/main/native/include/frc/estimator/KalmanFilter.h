@@ -50,6 +50,7 @@ class KalmanFilter {
    * @param stateStdDevs       Standard deviations of model states.
    * @param measurementStdDevs Standard deviations of measurements.
    * @param dt                 Nominal discretization timestep.
+   * @throws std::invalid_argument If the system is unobservable.
    */
   KalmanFilter(LinearSystem<States, Inputs, Outputs>& plant,
                const StateArray& stateStdDevs,

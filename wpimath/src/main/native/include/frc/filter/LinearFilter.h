@@ -157,6 +157,7 @@ class LinearFilter {
    *
    * @param taps The number of samples to average over. Higher = smoother but
    *             slower
+   * @throws std::runtime_error if number of taps is less than 1.
    */
   static LinearFilter<T> MovingAverage(int taps) {
     if (taps <= 0) {
