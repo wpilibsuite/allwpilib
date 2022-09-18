@@ -1,13 +1,10 @@
-package edu.wpi.first.math.apriltag;
+package edu.wpi.first.wpilibj.apriltag;
 
-import edu.wpi.first.math.WPIMathJNI;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Quaternion;
 import edu.wpi.first.math.geometry.Rotation3d;
-import edu.wpi.first.util.datalog.IntegerLogEntry;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 

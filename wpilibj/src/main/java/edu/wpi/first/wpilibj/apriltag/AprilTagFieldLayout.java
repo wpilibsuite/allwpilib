@@ -1,9 +1,10 @@
-package edu.wpi.first.math.apriltag;
+package edu.wpi.first.wpilibj.apriltag;
 
 import edu.wpi.first.math.WPIMathJNI;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation3d;
+import edu.wpi.first.wpilibj.DriverStation;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -28,8 +29,8 @@ public class AprilTagFieldLayout {
         m_tags.putAll(tags);
     }
 
-    public void setShouldMirror(boolean mirror) {
-        m_mirror = mirror;
+    public void setAlliance(DriverStation.Alliance alliance) {
+        m_mirror = alliance == DriverStation.Alliance.Red;
     }
 
     public Map<Integer, Pose3d> getTags() {

@@ -1,17 +1,18 @@
-package edu.wpi.first.math.apriltag;
-
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertEquals;
+package edu.wpi.first.wpilibj;
 
 import edu.wpi.first.math.WPIMathJNI;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
-import edu.wpi.first.math.trajectory.TrajectoryUtil;
+import edu.wpi.first.wpilibj.apriltag.AprilTagFieldLayout;
+import edu.wpi.first.wpilibj.apriltag.AprilTagUtil;
 import org.junit.jupiter.api.Test;
 
 import java.util.Map;
 
-public class AprilTagJsonTest {
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+public class AprilTagFieldLayoutTest {
     @Test
     void deserializeMatches() {
         var layout = new AprilTagFieldLayout(Map.of(
