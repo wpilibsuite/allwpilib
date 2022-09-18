@@ -5,6 +5,8 @@ import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Quaternion;
 import edu.wpi.first.math.geometry.Rotation3d;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -17,14 +19,14 @@ public class AprilTagUtil {
      */
     private static AprilTagFieldLayout createAprilTagFieldLayoutFromElements(double[] elements) {
         // Make sure that the elements have the correct length.
-        if (elements.length % 7 != 0) {
+        if (elements.length % 8 != 0) {
             throw new AprilTagLayoutSerializationException(
-                    "An error occurred when converting trajectory elements into a trajectory.");
+                    "An error occurred when converting AprilTag elements into a AprilTag layout.");
         }
 
         // Create a list of states from the elements.
         Map<Integer, Pose3d> apriltagLayout = new HashMap<>();
-        for (int i = 0; i < elements.length; i += 7) {
+        for (int i = 0; i < elements.length; i += 8) {
             apriltagLayout.put(
                     (int) elements[i],
                     new Pose3d(
@@ -51,10 +53,11 @@ public class AprilTagUtil {
      */
     private static double[] getElementsFromAprilTagFieldLayout(AprilTagFieldLayout aprilTagFieldLayout) {
         // Create a double[] of elements and fill it from the trajectory states.
-        double[] elements = new double[aprilTagFieldLayout.getTags().size() * 7];
+        double[] elements = new double[aprilTagFieldLayout.getTags().size() * 8];
 
-        for (int i = 0; i < aprilTagFieldLayout.getTags().size() * 7; i += 7) {
-            var entry = aprilTagFieldLayout.getTags().entrySet().stream().toList().get(i / 7);
+        ArrayList<Map.Entry<Integer, Pose3d>> entries = new ArrayList<>(aprilTagFieldLayout.getTags().entrySet());
+        for (int i = 0; i < aprilTagFieldLayout.getTags().size() * 8; i += 8) {
+            var entry = entries.get(i / 8);
             elements[i] = entry.getKey();
             elements[i + 1] = entry.getValue().getX();
             elements[i + 2] = entry.getValue().getY();
@@ -64,6 +67,7 @@ public class AprilTagUtil {
             elements[i + 6] = entry.getValue().getRotation().getQuaternion().getY();
             elements[i + 7] = entry.getValue().getRotation().getQuaternion().getZ();
         }
+        System.out.println(Arrays.toString(elements));
         return elements;
     }
 

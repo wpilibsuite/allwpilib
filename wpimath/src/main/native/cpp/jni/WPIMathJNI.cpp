@@ -122,13 +122,13 @@ frc::AprilTagFieldLayout CreateAprilTagLayoutFromElements(wpi::span<const double
   // Make sure that the elements have the correct length.
   assert(elements.size() % 8 == 0);
 
-  // Create a vector of states from the elements.
+  // Create a vector of AprilTags from the elements.
   std::vector<frc::AprilTagFieldLayout::AprilTag> apriltags;
   apriltags.reserve(elements.size() / 8);
 
   for (size_t i = 0; i < elements.size(); i += 8) {
     apriltags.emplace_back(frc::AprilTagFieldLayout::AprilTag{
-      static_cast<int>(elements[0]),
+      static_cast<int>(elements[i]),
       frc::Pose3d{units::meter_t{elements[i + 1]},
                   units::meter_t{elements[i + 2]},
                   units::meter_t{elements[i + 3]},
@@ -141,8 +141,6 @@ frc::AprilTagFieldLayout CreateAprilTagLayoutFromElements(wpi::span<const double
 
   return frc::AprilTagFieldLayout(apriltags);
 }
-
-
 
 extern "C" {
 
