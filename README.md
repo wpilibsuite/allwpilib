@@ -16,7 +16,7 @@ Welcome to the WPILib project. This repository contains the HAL, WPILibJ, and WP
     - [Using Development Builds](#using-development-builds)
     - [Custom toolchain location](#custom-toolchain-location)
     - [Gazebo simulation](#gazebo-simulation)
-    - [Formatting/linting with wpiformat](#formattinglinting-with-wpiformat)
+    - [Formatting/Linting](#formattinglinting)
     - [CMake](#cmake)
   - [Publishing](#publishing)
   - [Structure and Organization](#structure-and-organization)
