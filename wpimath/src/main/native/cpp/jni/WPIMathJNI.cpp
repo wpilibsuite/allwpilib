@@ -14,7 +14,6 @@
 #include "Eigen/QR"
 #include "drake/math/discrete_algebraic_riccati_equation.h"
 #include "edu_wpi_first_math_WPIMathJNI.h"
-#include "frc/apriltag/AprilTagFieldLayout.h"
 #include "frc/apriltag/AprilTagUtil.h"
 #include "frc/geometry/Pose3d.h"
 #include "frc/geometry/Rotation3d.h"

@@ -6,7 +6,6 @@
 
 #include <system_error>
 #include <vector>
-#include "frc/apriltag/AprilTagFieldLayout.h"
 
 #include <fmt/format.h>
 #include <wpi/SmallString.h>

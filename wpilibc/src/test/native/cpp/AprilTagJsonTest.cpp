@@ -3,7 +3,7 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #include <iostream>
-#include "frc/apriltag/AprilTagFieldLayout.h"
+#include "frc/AprilTagFieldLayout.h"
 #include "frc/apriltag/AprilTagUtil.h"
 #include "frc/geometry/Pose3d.h"
 #include "frc/trajectory/TrajectoryConfig.h"

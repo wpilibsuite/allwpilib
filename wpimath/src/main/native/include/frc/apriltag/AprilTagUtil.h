@@ -73,4 +73,11 @@ class WPILIB_DLLEXPORT AprilTagUtil {
    */
   static std::vector<AprilTag> DeserializeAprilTagLayout(std::string_view jsonStr);
 };
+
+WPILIB_DLLEXPORT
+void to_json(wpi::json& json, const AprilTagUtil::AprilTag& apriltag);
+
+WPILIB_DLLEXPORT
+void from_json(const wpi::json& json, AprilTagUtil::AprilTag& apriltag);
+
 }  // namespace frc

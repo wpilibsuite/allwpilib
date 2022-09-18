@@ -17,7 +17,7 @@
 #include "units/curvature.h"
 #include "units/time.h"
 #include "units/velocity.h"
-#include "AprilTagUtil.h"
+#include "frc/apriltag/AprilTagUtil.h"
 
 namespace wpi {
 class json;
@@ -40,10 +40,4 @@ class WPILIB_DLLEXPORT AprilTagFieldLayout {
     std::vector<AprilTagUtil::AprilTag> m_apriltags;
     bool m_mirror;
 };
-
-WPILIB_DLLEXPORT
-void to_json(wpi::json& json, const AprilTagUtil::AprilTag& apriltag);
-
-WPILIB_DLLEXPORT
-void from_json(const wpi::json& json, AprilTagUtil::AprilTag& apriltag);
 }
