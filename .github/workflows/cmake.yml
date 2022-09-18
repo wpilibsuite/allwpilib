@@ -55,6 +55,7 @@ jobs:
       VCPKG_DEFAULT_TRIPLET: x64-windows
     name: "Build - Windows"
     runs-on: windows-2019
+    if: ${{ false }}  # disable due to vcpkg space issues
     steps:
       - uses: actions/checkout@v3
 
