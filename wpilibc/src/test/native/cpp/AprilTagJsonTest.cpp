@@ -3,6 +3,7 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #include <iostream>
+
 #include "frc/AprilTagFieldLayout.h"
 #include "frc/apriltag/AprilTagUtil.h"
 #include "frc/geometry/Pose3d.h"
@@ -12,12 +13,14 @@ using namespace frc;
 
 TEST(AprilTagJsonTest, DeserializeMatches) {
   auto layout = AprilTagFieldLayout{std::vector{
-        AprilTagUtil::AprilTag{1, Pose3d{}},
-        AprilTagUtil::AprilTag{3, Pose3d{0_m, 1_m, 0_m, Rotation3d{0_deg, 0_deg, 0_deg}}}}
-    };
+      AprilTagUtil::AprilTag{1, Pose3d{}},
+      AprilTagUtil::AprilTag{
+          3, Pose3d{0_m, 1_m, 0_m, Rotation3d{0_deg, 0_deg, 0_deg}}}}};
 
   AprilTagFieldLayout deserialized;
-  EXPECT_NO_THROW(deserialized = AprilTagFieldLayout{AprilTagUtil::DeserializeAprilTagLayout(
-                      AprilTagUtil::SerializeAprilTagLayout(layout.GetTags()))});
+  EXPECT_NO_THROW(
+      deserialized =
+          AprilTagFieldLayout{AprilTagUtil::DeserializeAprilTagLayout(
+              AprilTagUtil::SerializeAprilTagLayout(layout.GetTags()))});
   EXPECT_EQ(layout.GetTags(), deserialized.GetTags());
 }

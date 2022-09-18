@@ -5,7 +5,8 @@
 #include "frc/geometry/Pose3d.h"
 
 #include <cmath>
-#include "wpi/json.h"
+
+#include <wpi/json.h>
 
 using namespace frc;
 
@@ -148,4 +149,3 @@ void frc::from_json(const wpi::json& json, Pose3d& pose) {
   pose = Pose3d{json.at("translation").get<Translation3d>(),
                 json.at("rotation").get<Rotation3d>()};
 }
-

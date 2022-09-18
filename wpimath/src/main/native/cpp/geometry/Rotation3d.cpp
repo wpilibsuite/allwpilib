@@ -6,16 +6,16 @@
 
 #include <cmath>
 
+#include <wpi/json.h>
 #include <wpi/numbers>
 
 #include "Eigen/Core"
 #include "Eigen/LU"
 #include "Eigen/QR"
-#include "units/angle.h"
 #include "frc/fmt/Eigen.h"
+#include "units/angle.h"
 #include "units/math.h"
 #include "wpimath/MathShared.h"
-#include "wpi/json.h"
 
 using namespace frc;
 
@@ -239,15 +239,13 @@ Rotation2d Rotation3d::ToRotation2d() const {
 }
 
 void frc::to_json(wpi::json& json, const Rotation3d& rotation) {
-  json = wpi::json{
-    {"yaw", rotation.X().value()},
-    {"pitch", rotation.Y().value()},
-    {"roll", rotation.Z().value()}
-  };
+  json = wpi::json{{"yaw", rotation.X().value()},
+                   {"pitch", rotation.Y().value()},
+                   {"roll", rotation.Z().value()}};
 }
 
 void frc::from_json(const wpi::json& json, Rotation3d& rotation) {
   rotation = Rotation3d{units::degree_t{json.at("yaw").get<double>()},
-  units::degree_t{json.at("pitch").get<double>()},
-  units::degree_t{json.at("roll").get<double>()}};
+                        units::degree_t{json.at("pitch").get<double>()},
+                        units::degree_t{json.at("roll").get<double>()}};
 }

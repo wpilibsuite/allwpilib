@@ -113,7 +113,8 @@ std::vector<double> GetElementsFromAprilTagLayout(
   return elements;
 }
 
-std::vector<frc::AprilTagUtil::AprilTag> CreateAprilTagLayoutFromElements(wpi::span<const double> elements) {
+std::vector<frc::AprilTagUtil::AprilTag> CreateAprilTagLayoutFromElements(
+    wpi::span<const double> elements) {
   // Make sure that the elements have the correct length.
   assert(elements.size() % 8 == 0);
 
@@ -123,15 +124,13 @@ std::vector<frc::AprilTagUtil::AprilTag> CreateAprilTagLayoutFromElements(wpi::s
 
   for (size_t i = 0; i < elements.size(); i += 8) {
     apriltags.emplace_back(frc::AprilTagUtil::AprilTag{
-      static_cast<int>(elements[i]),
-      frc::Pose3d{units::meter_t{elements[i + 1]},
-                  units::meter_t{elements[i + 2]},
-                  units::meter_t{elements[i + 3]},
-                  frc::Rotation3d{frc::Quaternion{
-                                  elements[i + 4],
-                                  elements[i + 5],
-                                  elements[i + 6],
-                                  elements[i + 7]}}}});
+        static_cast<int>(elements[i]),
+        frc::Pose3d{units::meter_t{elements[i + 1]},
+                    units::meter_t{elements[i + 2]},
+                    units::meter_t{elements[i + 3]},
+                    frc::Rotation3d{
+                        frc::Quaternion{elements[i + 4], elements[i + 5],
+                                        elements[i + 6], elements[i + 7]}}}});
   }
 
   return apriltags;
@@ -364,7 +363,8 @@ Java_edu_wpi_first_math_WPIMathJNI_deserializeAprilTagLayout
   try {
     auto apriltagFieldLayout = frc::AprilTagUtil::DeserializeAprilTagLayout(
         JStringRef{env, json}.c_str());
-    std::vector<double> elements = GetElementsFromAprilTagLayout(apriltagFieldLayout);
+    std::vector<double> elements =
+        GetElementsFromAprilTagLayout(apriltagFieldLayout);
     return MakeJDoubleArray(env, elements);
   } catch (std::exception& e) {
     jclass cls = env->FindClass(
@@ -389,8 +389,8 @@ Java_edu_wpi_first_math_WPIMathJNI_serializeAprilTagLayout
   try {
     auto apriltagFieldLayout =
         CreateAprilTagLayoutFromElements(JDoubleArrayRef{env, elements});
-    return MakeJString(env,
-                       frc::AprilTagUtil::SerializeAprilTagLayout(apriltagFieldLayout));
+    return MakeJString(
+        env, frc::AprilTagUtil::SerializeAprilTagLayout(apriltagFieldLayout));
   } catch (std::exception& e) {
     jclass cls = env->FindClass(
         "edu/wpi/first/math/apriltag/AprilTagUtil$"

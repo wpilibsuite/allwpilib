@@ -4,9 +4,10 @@
 
 #include "frc/geometry/Translation3d.h"
 
+#include <wpi/json.h>
+
 #include "units/length.h"
 #include "units/math.h"
-#include "wpi/json.h"
 
 using namespace frc;
 
@@ -73,8 +74,9 @@ bool Translation3d::operator!=(const Translation3d& other) const {
 }
 
 void frc::to_json(wpi::json& json, const Translation3d& translation) {
-  json =
-      wpi::json{{"x", translation.X().value()}, {"y", translation.Y().value()}, {"z", translation.Z().value()}};
+  json = wpi::json{{"x", translation.X().value()},
+                   {"y", translation.Y().value()},
+                   {"z", translation.Z().value()}};
 }
 
 void frc::from_json(const wpi::json& json, Translation3d& translation) {

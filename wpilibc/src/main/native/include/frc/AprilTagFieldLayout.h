@@ -4,11 +4,13 @@
 
 #pragma once
 
+#include <vector>
+
 #include <wpi/SymbolExports.h>
 
 #include "frc/DriverStation.h"
-#include "frc/geometry/Pose3d.h"
 #include "frc/apriltag/AprilTagUtil.h"
+#include "frc/geometry/Pose3d.h"
 
 namespace wpi {
 class json;
@@ -17,18 +19,19 @@ class json;
 namespace frc {
 class WPILIB_DLLEXPORT AprilTagFieldLayout {
  public:
-    AprilTagFieldLayout() = default;
-    
-    explicit AprilTagFieldLayout(const std::vector<AprilTagUtil::AprilTag>& apriltags);
-    
-    const std::vector<AprilTagUtil::AprilTag>& GetTags() const;
-    
-    Pose3d GetTagPose(int id) const;
-    
-    void SetAlliance(DriverStation::Alliance alliance);
-    
+  AprilTagFieldLayout() = default;
+
+  explicit AprilTagFieldLayout(
+      const std::vector<AprilTagUtil::AprilTag>& apriltags);
+
+  const std::vector<AprilTagUtil::AprilTag>& GetTags() const;
+
+  Pose3d GetTagPose(int id) const;
+
+  void SetAlliance(DriverStation::Alliance alliance);
+
  private:
-    std::vector<AprilTagUtil::AprilTag> m_apriltags;
-    bool m_mirror;
+  std::vector<AprilTagUtil::AprilTag> m_apriltags;
+  bool m_mirror;
 };
-}
+}  // namespace frc
