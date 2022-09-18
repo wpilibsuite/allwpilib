@@ -47,8 +47,10 @@ class WPILIB_DLLEXPORT DifferentialDriveAccelerationLimiter {
    * @param trackwidth The distance between the differential drive's left and
    *                   right wheels.
    * @param minLinearAccel The minimum (most negative) linear acceleration.
-   * @param maxLinearAccel The maximum linear acceleration.
+   * @param maxLinearAccel The maximum (most positive) linear acceleration.
    * @param maxAngularAccel The maximum angular acceleration.
+   * @throws std::invalid_argument if minimum linear acceleration is greater
+   * than maximum linear acceleration
    */
   DifferentialDriveAccelerationLimiter(
       LinearSystem<2, 2, 2> system, units::meter_t trackwidth,

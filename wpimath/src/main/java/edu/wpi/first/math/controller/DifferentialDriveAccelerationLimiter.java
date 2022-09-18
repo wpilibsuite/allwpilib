@@ -47,8 +47,11 @@ public class DifferentialDriveAccelerationLimiter {
    *     meters.
    * @param minLinearAccel The minimum (most negative) linear acceleration in meters per second
    *     squared.
-   * @param maxLinearAccel The maximum linear acceleration in meters per second squared.
+   * @param maxLinearAccel The maximum (most positive) linear acceleration in meters per second
+   *     squared.
    * @param maxAngularAccel The maximum angular acceleration in radians per second squared.
+   * @throws IllegalArgumentException if minimum linear acceleration is greater than maximum linear
+   *     acceleration
    */
   public DifferentialDriveAccelerationLimiter(
       LinearSystem<N2, N2, N2> system,
