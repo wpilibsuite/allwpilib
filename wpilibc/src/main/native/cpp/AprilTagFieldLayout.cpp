@@ -15,7 +15,7 @@ using namespace frc;
 
 AprilTagFieldLayout::AprilTagFieldLayout(
     const std::vector<AprilTagUtil::AprilTag>& apriltags)
-    : m_apriltags(apriltags) {}
+    : m_apriltags(std::move(apriltags)) {}
 
 frc::Pose3d AprilTagFieldLayout::GetTagPose(int id) const {
   Pose3d returnPose;
