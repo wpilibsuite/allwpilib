@@ -5,12 +5,14 @@
 #include "frc/AprilTagFieldLayout.h"
 
 #include <algorithm>
+#include <string>
 
 #include <units/angle.h>
 #include <units/length.h>
 #include <wpi/json.h>
 
 #include "frc/DriverStation.h"
+#include "frc/apriltag/AprilTagUtil.h"
 #include "frc/geometry/Pose3d.h"
 
 using namespace frc;
@@ -35,9 +37,4 @@ frc::Pose3d AprilTagFieldLayout::GetTagPose(int id) const {
 
 void AprilTagFieldLayout::SetAlliance(DriverStation::Alliance alliance) {
   m_mirror = alliance == DriverStation::Alliance::kRed;
-}
-
-const std::vector<AprilTagUtil::AprilTag>& frc::AprilTagFieldLayout::GetTags()
-    const {
-  return m_apriltags;
 }

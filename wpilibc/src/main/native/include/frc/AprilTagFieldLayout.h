@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include <string>
 #include <vector>
 
 #include <wpi/SymbolExports.h>

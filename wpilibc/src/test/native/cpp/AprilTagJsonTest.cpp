@@ -4,7 +4,6 @@
 
 #include <iostream>
 
-#include "frc/AprilTagFieldLayout.h"
 #include "frc/apriltag/AprilTagUtil.h"
 #include "frc/geometry/Pose3d.h"
 #include "gtest/gtest.h"
@@ -12,15 +11,13 @@
 using namespace frc;
 
 TEST(AprilTagJsonTest, DeserializeMatches) {
-  auto layout = AprilTagFieldLayout{std::vector{
+  auto layout = std::vector{
       AprilTagUtil::AprilTag{1, Pose3d{}},
       AprilTagUtil::AprilTag{
-          3, Pose3d{0_m, 1_m, 0_m, Rotation3d{0_deg, 0_deg, 0_deg}}}}};
+          3, Pose3d{0_m, 1_m, 0_m, Rotation3d{0_deg, 0_deg, 0_deg}}}};
 
-  AprilTagFieldLayout deserialized;
-  EXPECT_NO_THROW(
-      deserialized =
-          AprilTagFieldLayout{AprilTagUtil::DeserializeAprilTagLayout(
-              AprilTagUtil::SerializeAprilTagLayout(layout.GetTags()))});
-  EXPECT_EQ(layout.GetTags(), deserialized.GetTags());
+  std::vector<AprilTagUtil::AprilTag> deserialized;
+  EXPECT_NO_THROW(deserialized = AprilTagUtil::DeserializeAprilTagLayout(
+                      AprilTagUtil::SerializeAprilTagLayout(layout)));
+  EXPECT_EQ(layout, deserialized);
 }
