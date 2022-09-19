@@ -4,6 +4,8 @@
 
 #include "frc/AprilTagFieldLayout.h"
 
+#include <algorithm>
+
 #include <units/angle.h>
 #include <units/length.h>
 #include <wpi/json.h>
@@ -19,10 +21,10 @@ AprilTagFieldLayout::AprilTagFieldLayout(
 
 frc::Pose3d AprilTagFieldLayout::GetTagPose(int id) const {
   Pose3d returnPose;
-  for (auto& tag : m_apriltags) {
-    if (tag.id == id) {
-      returnPose = tag.pose;
-    }
+  auto it = std::find_if(m_apriltags.begin(), m_apriltags.end(),
+                         [=](const auto& tag) { return tag.id == id; });
+  if (it != m_apriltags.end()) {
+    returnPose = it->pose;
   }
   if (m_mirror) {
     returnPose = returnPose.RelativeTo(
