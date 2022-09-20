@@ -64,15 +64,6 @@ public class AprilTagFieldLayout {
   }
 
   /**
-   * Gets the raw tags. This is not affected by {@link #setAlliance(DriverStation.Alliance)}.
-   *
-   * @return map of IDs to poses.
-   */
-  public Map<Integer, Pose3d> getTags() {
-    return m_tags;
-  }
-
-  /**
    * Gets an AprilTag pose by its id.
    *
    * @param id The id of the tag
@@ -89,15 +80,5 @@ public class AprilTagFieldLayout {
     }
 
     return tag;
-  }
-
-  /**
-   * Serialize this layout into a JSON string.
-   *
-   * @return the serialized JSON string.
-   */
-  public String serialize() {
-    return WPIMathJNI.serializeAprilTagLayout(
-        AprilTagUtil.getElementsFromAprilTagFieldLayout(m_tags));
   }
 }
