@@ -25,8 +25,6 @@ class WPILIB_DLLEXPORT AprilTagFieldLayout {
   explicit AprilTagFieldLayout(
       const std::vector<AprilTagUtil::AprilTag>& apriltags);
 
-  const std::vector<AprilTagUtil::AprilTag>& GetTags() const;
-
   Pose3d GetTagPose(int id) const;
 
   void SetAlliance(DriverStation::Alliance alliance);
