@@ -5,11 +5,11 @@
 #include "Robot.h"
 
 #include <frc/DriverStation.h>
+#include <frc/internal/DriverStationModeThread.h>
 #include <frc/livewindow/LiveWindow.h>
 #include <frc/shuffleboard/Shuffleboard.h>
 #include <hal/DriverStation.h>
 #include <networktables/NetworkTable.h>
-#include <frc/internal/DriverStationModeThread.h>
 
 void Robot::RobotInit() {}
 

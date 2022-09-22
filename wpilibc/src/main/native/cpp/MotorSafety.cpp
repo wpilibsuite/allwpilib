@@ -7,24 +7,23 @@
 #include <algorithm>
 #include <utility>
 
+#include <hal/DriverStation.h>
 #include <wpi/SafeThread.h>
 #include <wpi/SmallPtrSet.h>
 
 #include "frc/DriverStation.h"
 #include "frc/Errors.h"
-#include "hal/DriverStation.h"
 
 using namespace frc;
 
 namespace {
 class Thread : public wpi::SafeThread {
-  public:
+ public:
   Thread() {}
   void Main() override;
 };
 
 void Thread::Main() {
-
   wpi::Event event{true, false};
   HAL_ProvideNewDataEventHandle(event.GetHandle());
 
@@ -36,7 +35,7 @@ void Thread::Main() {
       HAL_ControlWord controlWord;
       std::memset(&controlWord, 0, sizeof(controlWord));
       HAL_GetControlWord(&controlWord);
-      if (!(controlWord.enabled && controlWord.dsAttached))  {
+      if (!(controlWord.enabled && controlWord.dsAttached)) {
         safetyCounter = 0;
       }
       if (++safetyCounter >= 4) {
@@ -52,7 +51,7 @@ void Thread::Main() {
 }
 
 static wpi::SafeThreadOwner<Thread> m_owner;
-}
+}  // namespace
 
 static wpi::SmallPtrSet<MotorSafety*, 32> instanceList;
 static wpi::mutex listMutex;
