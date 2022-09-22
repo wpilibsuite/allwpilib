@@ -18,8 +18,9 @@ DriverStationModeThread::DriverStationModeThread() {
 
 DriverStationModeThread::~DriverStationModeThread() {
   m_keepAlive = false;
-  if (m_thread.joinable())
+  if (m_thread.joinable()) {
     m_thread.join();
+  }
 }
 
 void DriverStationModeThread::InAutonomous(bool entering) {
