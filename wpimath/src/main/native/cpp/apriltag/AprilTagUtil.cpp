@@ -22,35 +22,6 @@ bool AprilTagUtil::AprilTag::operator!=(const AprilTag& other) const {
   return !operator==(other);
 }
 
-void AprilTagUtil::ToJson(const std::vector<AprilTag>& apriltagLayout,
-                          std::string_view path) {
-  std::error_code error_code;
-
-  wpi::raw_fd_ostream output{path, error_code};
-  if (error_code) {
-    throw std::runtime_error(fmt::format("Cannot open file: {}", path));
-  }
-
-  wpi::json json = apriltagLayout;
-  output << json;
-  output.flush();
-}
-
-std::vector<AprilTagUtil::AprilTag> AprilTagUtil::FromJson(
-    std::string_view path) {
-  std::error_code error_code;
-
-  wpi::raw_fd_istream input{path, error_code};
-  if (error_code) {
-    throw std::runtime_error(fmt::format("Cannot open file: {}", path));
-  }
-
-  wpi::json json;
-  input >> json;
-
-  return json.get<std::vector<AprilTagUtil::AprilTag>>();
-}
-
 std::string AprilTagUtil::SerializeAprilTagLayout(
     const std::vector<AprilTagUtil::AprilTag>& apriltagLayout) {
   wpi::json json = apriltagLayout;

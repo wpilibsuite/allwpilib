@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include <string>
+#include <string_view>
 #include <vector>
 
 #include <wpi/SymbolExports.h>
@@ -21,6 +21,8 @@ namespace frc {
 class WPILIB_DLLEXPORT AprilTagFieldLayout {
  public:
   AprilTagFieldLayout() = default;
+  
+  explicit AprilTagFieldLayout(const std::string_view path);
 
   explicit AprilTagFieldLayout(
       const std::vector<AprilTagUtil::AprilTag>& apriltags);
@@ -28,6 +30,9 @@ class WPILIB_DLLEXPORT AprilTagFieldLayout {
   Pose3d GetTagPose(int id) const;
 
   void SetAlliance(DriverStation::Alliance alliance);
+  
+  void ToJson(const std::vector<AprilTagUtil::AprilTag>& apriltagLayout,
+                          std::string_view path);
 
  private:
   std::vector<AprilTagUtil::AprilTag> m_apriltags;

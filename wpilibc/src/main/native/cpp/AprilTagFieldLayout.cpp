@@ -5,17 +5,34 @@
 #include "frc/AprilTagFieldLayout.h"
 
 #include <algorithm>
-#include <string>
+#include <string_view>
+#include <system_error>
 
 #include <units/angle.h>
 #include <units/length.h>
 #include <wpi/json.h>
+#include <wpi/raw_istream.h>
+#include <wpi/raw_ostream.h>
 
 #include "frc/DriverStation.h"
 #include "frc/apriltag/AprilTagUtil.h"
 #include "frc/geometry/Pose3d.h"
 
 using namespace frc;
+
+AprilTagFieldLayout::AprilTagFieldLayout(const std::string_view path) {
+  std::error_code error_code;
+
+  wpi::raw_fd_istream input{path, error_code};
+  if (error_code) {
+    throw std::runtime_error(fmt::format("Cannot open file: {}", path));
+  }
+
+  wpi::json json;
+  input >> json;
+
+  m_apriltags = json.get<std::vector<AprilTagUtil::AprilTag>>();
+}
 
 AprilTagFieldLayout::AprilTagFieldLayout(
     const std::vector<AprilTagUtil::AprilTag>& apriltags)
@@ -37,4 +54,17 @@ frc::Pose3d AprilTagFieldLayout::GetTagPose(int id) const {
 
 void AprilTagFieldLayout::SetAlliance(DriverStation::Alliance alliance) {
   m_mirror = alliance == DriverStation::Alliance::kRed;
+}
+
+void ToJson(const std::vector<AprilTagUtil::AprilTag>& apriltagLayout, std::string_view path) {
+  std::error_code error_code;
+
+  wpi::raw_fd_ostream output{path, error_code};
+  if (error_code) {
+    throw std::runtime_error(fmt::format("Cannot open file: {}", path));
+  }
+
+  wpi::json json = apriltagLayout;
+  output << json;
+  output.flush();
 }
