@@ -1,0 +1,29 @@
+cppHeaderFileInclude {
+  \.h$
+  \.inc$
+  \.inl$
+}
+
+cppSrcFileInclude {
+  \.cpp$
+}
+
+generatedFileExclude {
+  src/main/native/resources/
+  src/main/native/win/sapphire.ico
+  src/main/native/mac/sapphire.icns
+}
+
+repoRootNameOverride {
+  sapphire
+}
+
+includeOtherLibs {
+  ^GLFW
+  ^fmt/
+  ^glass/
+  ^imgui
+  ^portable-file-dialog
+  ^wpi/
+  ^wpigui
+}
