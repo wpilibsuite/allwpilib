@@ -12,8 +12,47 @@
 
 #include "frc/DriverStation.h"
 #include "frc/Errors.h"
+#include "hal/DriverStation.h"
 
 using namespace frc;
+
+namespace {
+class Thread : public wpi::SafeThread {
+  public:
+  Thread() {}
+  void Main() override;
+};
+
+void Thread::Main() {
+
+  wpi::Event event{true, false};
+  HAL_ProvideNewDataEventHandle(event.GetHandle());
+
+  int safetyCounter = 0;
+  while (m_active) {
+    bool timedOut = false;
+    bool signaled = wpi::WaitForObject(event.GetHandle(), 0.1, &timedOut);
+    if (signaled) {
+      HAL_ControlWord controlWord;
+      std::memset(&controlWord, 0, sizeof(controlWord));
+      HAL_GetControlWord(&controlWord);
+      if (!(controlWord.enabled && controlWord.dsAttached))  {
+        safetyCounter = 0;
+      }
+      if (++safetyCounter >= 4) {
+        MotorSafety::CheckMotors();
+        safetyCounter = 0;
+      }
+    } else {
+      safetyCounter = 0;
+    }
+  }
+
+  HAL_RemoveNewDataEventHandle(event.GetHandle());
+}
+
+static wpi::SafeThreadOwner<Thread> m_owner;
+}
 
 static wpi::SmallPtrSet<MotorSafety*, 32> instanceList;
 static wpi::mutex listMutex;
@@ -33,6 +72,7 @@ MotorSafety::MotorSafety() {
   instanceList.insert(this);
   if (!threadStarted) {
     threadStarted = true;
+    m_owner.Start();
     // TODO Threads
   }
 }

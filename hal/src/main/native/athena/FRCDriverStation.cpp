@@ -103,9 +103,6 @@ void JoystickDataCache::Update() {
   FRC_NetworkCommunication_getAllianceStation(
       reinterpret_cast<AllianceStationID_t*>(&allianceStation));
   FRC_NetworkCommunication_getMatchTime(&matchTime);
-  std::memset(&controlWord, 0, sizeof(controlWord));
-  FRC_NetworkCommunication_getControlWord(
-      reinterpret_cast<ControlWord_t*>(&controlWord));
 }
 
 static JoystickDataCache caches[3];
@@ -425,11 +422,16 @@ static void newDataOccur(uint32_t refNum) {
 }
 
 void HAL_RefreshDSData(void) {
+  HAL_ControlWord controlWord;
+  std::memset(&controlWord, 0, sizeof(controlWord));
+  FRC_NetworkCommunication_getControlWord(
+      reinterpret_cast<ControlWord_t*>(&controlWord));
   std::scoped_lock lock{cacheMutex};
   if (currentCache->updated) {
     std::swap(currentCache, currentRead);
     currentCache->updated = false;
   }
+  currentCache->controlWord = controlWord;
 }
 
 void HAL_ProvideNewDataEventHandle(WPI_EventHandle handle) {
