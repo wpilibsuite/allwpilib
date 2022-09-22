@@ -157,6 +157,8 @@ TEST_F(WebServerIntegrationTest, DriverStation) {
   using namespace std::chrono_literals;
   std::this_thread::sleep_for(1s);
 
+  HAL_RefreshDSData();
+
   // Compare results
   HAL_ControlWord cw;
   HAL_GetControlWord(&cw);
