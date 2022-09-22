@@ -19,7 +19,6 @@
 bool LogData::LoadWPILog(std::string filename) {
   std::error_code ec;
   auto buf = wpi::MemoryBuffer::GetFile(filename.c_str(), ec);
-  std::string fn{filename};
   if (ec) {
     return false;
   }
@@ -29,29 +28,32 @@ bool LogData::LoadWPILog(std::string filename) {
     return false;
   }
 
-  for (auto record : reader) {
+  for (const auto& record : reader) {
+    int entryId;
     if(record.IsStart()) {
-      wpi::log::StartRecordData data;
-      if(record.GetStartData(&data)) {
-        Entry entry;
-        entry.start = data;
-        m_entries.emplace(data.entry, entry);
-      }
-    } else if(record.IsFinish()) {
-      int data;
-      if(record.GetFinishEntry(&data)) {
-        auto entryId = m_entries.find(data);
-        if(entryId == m_entries.end()) {
-          continue;
-        }
-        entryId->second.finishTimestamp = record.GetTimestamp();
-      }
+      // If we find a new start record, create a new entry
+      wpi::log::StartRecordData start;
+      
+      if(!record.GetStartData(&start)) { continue; }
+      if(m_entries.find(start.entry) != m_entries.end()){ continue; } // This should probably be an error
+
+      EntryData entry_data;
+      entry_data.start = start;
+      
+      m_entries[start.entry] = entry_data;
+    
+    } else if(record.GetFinishEntry(&entryId)) {
+      // If we find a finish entry,
+      auto entryPair= m_entries.find(entryId);
+      if(entryPair == m_entries.end()) { continue; }
+    
+      entryPair->second.finishTimestamp = record.GetTimestamp();
     } else if(!record.IsControl()) {
-      auto entryId = m_entries.find(record.GetEntry());
-      if(entryId == m_entries.end()) {
+      auto entryPair = m_entries.find(record.GetEntry());
+      if(entryPair == m_entries.end()) {
         continue;
       }
-      Entry entry = entryId->second;
+      EntryData &entry = entryPair->second;
       
       int timestamp = record.GetTimestamp();
       if(timestamp > entry.finishTimestamp) {
@@ -63,11 +65,15 @@ bool LogData::LoadWPILog(std::string filename) {
         m_maxTimestamp = timestamp;
       }
 
-      entry.datapoints.emplace(record.GetTimestamp(), record);
+      entry.datapoints[record.GetTimestamp()] = record;
     }
   }
   
   m_hasLog = true;
 
   return true;
+}
+
+void LogData::AddEntryNode(EntryData& node, std::string path){
+  std::shared_ptr<EntryData> data_ptr = std::shared_ptr<EntryData>(&node);
 }
