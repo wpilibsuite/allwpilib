@@ -13,6 +13,7 @@ namespace sapphire {
 class TimeManager: public glass::View {
     public:
         void Display() override;
+        int test = 0;
 };
 }  // namespace sapphire
 
