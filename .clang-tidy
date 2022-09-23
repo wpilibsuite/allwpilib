@@ -53,7 +53,6 @@ Checks:
   google-readability-avoid-underscore-in-googletest-name,
   google-readability-casting,
   google-runtime-operator,
-  llvm-twine-local,
   misc-definitions-in-headers,
   misc-misplaced-const,
   misc-new-delete-overloads,
@@ -70,6 +69,3 @@ Checks:
   modernize-use-using,
   readability-braces-around-statements'
 FormatStyle: file
-CheckOptions:
-  - key: bugprone-dangling-handle
-    value: 'wpi::StringRef;wpi::Twine'

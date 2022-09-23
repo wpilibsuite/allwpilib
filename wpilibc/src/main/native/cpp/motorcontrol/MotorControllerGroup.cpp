@@ -33,6 +33,12 @@ void MotorControllerGroup::Set(double speed) {
   }
 }
 
+void MotorControllerGroup::SetVoltage(units::volt_t output) {
+  for (auto motorController : m_motorControllers) {
+    motorController.get().SetVoltage(m_isInverted ? -output : output);
+  }
+}
+
 double MotorControllerGroup::Get() const {
   if (!m_motorControllers.empty()) {
     return m_motorControllers.front().get().Get() * (m_isInverted ? -1 : 1);

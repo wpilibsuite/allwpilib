@@ -4,6 +4,8 @@
 
 #pragma once
 
+#include <memory>
+
 #include <wpi/SmallVector.h>
 #include <wpi/span.h>
 
@@ -33,9 +35,18 @@ class ProxyScheduleCommand
 
   explicit ProxyScheduleCommand(Command* toSchedule);
 
-  ProxyScheduleCommand(ProxyScheduleCommand&& other) = default;
+  /**
+   * Creates a new ProxyScheduleCommand that schedules the given command when
+   * initialized, and ends when it is no longer scheduled.
+   *
+   * <p>Note that this constructor passes ownership of the given command to the
+   * returned ProxyScheduleCommand.
+   *
+   * @param toSchedule the command to schedule
+   */
+  explicit ProxyScheduleCommand(std::unique_ptr<Command>&& toSchedule);
 
-  ProxyScheduleCommand(const ProxyScheduleCommand& other) = default;
+  ProxyScheduleCommand(ProxyScheduleCommand&& other) = default;
 
   void Initialize() override;
 
@@ -47,6 +58,7 @@ class ProxyScheduleCommand
 
  private:
   wpi::SmallVector<Command*, 4> m_toSchedule;
+  std::unique_ptr<Command> m_owning;
   bool m_finished{false};
 };
 }  // namespace frc2

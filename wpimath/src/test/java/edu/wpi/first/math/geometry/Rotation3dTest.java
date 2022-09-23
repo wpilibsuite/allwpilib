@@ -7,7 +7,11 @@ package edu.wpi.first.math.geometry;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
+import edu.wpi.first.math.MatBuilder;
+import edu.wpi.first.math.Matrix;
+import edu.wpi.first.math.Nat;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.util.Units;
 import org.junit.jupiter.api.Test;
@@ -16,15 +20,15 @@ class Rotation3dTest {
   private static final double kEpsilon = 1E-9;
 
   @Test
-  void testInit() {
+  void testInitAxisAngleAndRollPitchYaw() {
     @SuppressWarnings("LocalVariableName")
-    var xAxis = VecBuilder.fill(1.0, 0.0, 0.0);
+    final var xAxis = VecBuilder.fill(1.0, 0.0, 0.0);
     final var rot1 = new Rotation3d(xAxis, Math.PI / 3);
     final var rot2 = new Rotation3d(Math.PI / 3, 0.0, 0.0);
     assertEquals(rot1, rot2);
 
     @SuppressWarnings("LocalVariableName")
-    var yAxis = VecBuilder.fill(0.0, 1.0, 0.0);
+    final var yAxis = VecBuilder.fill(0.0, 1.0, 0.0);
     final var rot3 = new Rotation3d(yAxis, Math.PI / 3);
     final var rot4 = new Rotation3d(0.0, Math.PI / 3, 0.0);
     assertEquals(rot3, rot4);
@@ -34,6 +38,92 @@ class Rotation3dTest {
     final var rot5 = new Rotation3d(zAxis, Math.PI / 3);
     final var rot6 = new Rotation3d(0.0, 0.0, Math.PI / 3);
     assertEquals(rot5, rot6);
+  }
+
+  @Test
+  void testInitRotationMatrix() {
+    // No rotation
+    final var R1 = Matrix.eye(Nat.N3());
+    final var rot1 = new Rotation3d(R1);
+    assertEquals(new Rotation3d(), rot1);
+
+    // 90 degree CCW rotation around z-axis
+    final var R2 = new Matrix<>(Nat.N3(), Nat.N3());
+    R2.assignBlock(0, 0, VecBuilder.fill(0.0, 1.0, 0.0));
+    R2.assignBlock(0, 1, VecBuilder.fill(-1.0, 0.0, 0.0));
+    R2.assignBlock(0, 2, VecBuilder.fill(0.0, 0.0, 1.0));
+    final var rot2 = new Rotation3d(R2);
+    final var expected2 = new Rotation3d(0.0, 0.0, Units.degreesToRadians(90.0));
+    assertEquals(expected2, rot2);
+
+    // Matrix that isn't orthogonal
+    final var R3 =
+        new MatBuilder<>(Nat.N3(), Nat.N3()).fill(1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0);
+    assertThrows(IllegalArgumentException.class, () -> new Rotation3d(R3));
+
+    // Matrix that's orthogonal but not special orthogonal
+    final var R4 = Matrix.eye(Nat.N3()).times(2.0);
+    assertThrows(IllegalArgumentException.class, () -> new Rotation3d(R4));
+  }
+
+  @Test
+  void testInitTwoVector() {
+    @SuppressWarnings("LocalVariableName")
+    final var xAxis = VecBuilder.fill(1.0, 0.0, 0.0);
+    @SuppressWarnings("LocalVariableName")
+    final var yAxis = VecBuilder.fill(0.0, 1.0, 0.0);
+    @SuppressWarnings("LocalVariableName")
+    final var zAxis = VecBuilder.fill(0.0, 0.0, 1.0);
+
+    // 90 degree CW rotation around y-axis
+    final var rot1 = new Rotation3d(xAxis, zAxis);
+    final var expected1 = new Rotation3d(yAxis, -Math.PI / 2.0);
+    assertEquals(expected1, rot1);
+
+    // 45 degree CCW rotation around z-axis
+    final var rot2 = new Rotation3d(xAxis, VecBuilder.fill(1.0, 1.0, 0.0));
+    final var expected2 = new Rotation3d(zAxis, Math.PI / 4.0);
+    assertEquals(expected2, rot2);
+
+    // 0 degree rotation of x-axes
+    final var rot3 = new Rotation3d(xAxis, xAxis);
+    assertEquals(new Rotation3d(), rot3);
+
+    // 0 degree rotation of y-axes
+    final var rot4 = new Rotation3d(yAxis, yAxis);
+    assertEquals(new Rotation3d(), rot4);
+
+    // 0 degree rotation of z-axes
+    final var rot5 = new Rotation3d(zAxis, zAxis);
+    assertEquals(new Rotation3d(), rot5);
+
+    // 180 degree rotation tests. For 180 degree rotations, any quaternion with
+    // an orthogonal rotation axis is acceptable. The rotation axis and initial
+    // vector are orthogonal if their dot product is zero.
+
+    // 180 degree rotation of x-axes
+    final var rot6 = new Rotation3d(xAxis, xAxis.times(-1.0));
+    final var q6 = rot6.getQuaternion();
+    assertEquals(0.0, q6.getW());
+    assertEquals(
+        0.0,
+        q6.getX() * xAxis.get(0, 0) + q6.getY() * xAxis.get(1, 0) + q6.getZ() * xAxis.get(2, 0));
+
+    // 180 degree rotation of y-axes
+    final var rot7 = new Rotation3d(yAxis, yAxis.times(-1.0));
+    final var q7 = rot7.getQuaternion();
+    assertEquals(0.0, q7.getW());
+    assertEquals(
+        0.0,
+        q7.getX() * yAxis.get(0, 0) + q7.getY() * yAxis.get(1, 0) + q7.getZ() * yAxis.get(2, 0));
+
+    // 180 degree rotation of z-axes
+    final var rot8 = new Rotation3d(zAxis, zAxis.times(-1.0));
+    final var q8 = rot8.getQuaternion();
+    assertEquals(0.0, q8.getW());
+    assertEquals(
+        0.0,
+        q8.getX() * zAxis.get(0, 0) + q8.getY() * zAxis.get(1, 0) + q8.getZ() * zAxis.get(2, 0));
   }
 
   @Test

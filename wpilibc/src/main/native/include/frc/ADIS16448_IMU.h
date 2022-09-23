@@ -285,6 +285,10 @@ class ADIS16448_IMU : public nt::NTSendable,
     double gyro_rate_z = 0.0;
   };
 
+  /** @brief Internal Resources **/
+  DigitalInput* m_reset_in;
+  DigitalOutput* m_status_led;
+
   bool SwitchToStandardSPI();
 
   bool SwitchToAutoSPI();

@@ -13,7 +13,9 @@ import edu.wpi.first.math.interpolation.Interpolatable;
 import edu.wpi.first.math.util.Units;
 import java.util.Objects;
 
-/** A rotation in a 2D coordinate frame represented a point on the unit circle (cosine and sine). */
+/**
+ * A rotation in a 2D coordinate frame represented by a point on the unit circle (cosine and sine).
+ */
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonAutoDetect(getterVisibility = JsonAutoDetect.Visibility.NONE)
 public class Rotation2d implements Interpolatable<Rotation2d> {

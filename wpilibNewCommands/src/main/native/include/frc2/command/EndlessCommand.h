@@ -67,8 +67,6 @@ class EndlessCommand : public CommandHelper<CommandBase, EndlessCommand> {
 
   void End(bool interrupted) override;
 
-  EndlessCommand Endlessly() && override;
-
  private:
   std::unique_ptr<Command> m_command;
 };

@@ -110,7 +110,9 @@ public interface Command {
    *
    * @param condition the interrupt condition
    * @return the command with the interrupt condition added
+   * @deprecated Replace with {@link #until(BooleanSupplier)}
    */
+  @Deprecated(since = "2023")
   default ParallelRaceGroup withInterrupt(BooleanSupplier condition) {
     return until(condition);
   }

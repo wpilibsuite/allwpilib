@@ -130,7 +130,7 @@ class Command {
    * @param duration the timeout duration
    * @return the command with the timeout added
    */
-  virtual ParallelRaceGroup WithTimeout(units::second_t duration) &&;
+  ParallelRaceGroup WithTimeout(units::second_t duration) &&;
 
   /**
    * Decorates this command with an interrupt condition.  If the specified
@@ -141,7 +141,7 @@ class Command {
    * @param condition the interrupt condition
    * @return the command with the interrupt condition added
    */
-  virtual ParallelRaceGroup Until(std::function<bool()> condition) &&;
+  ParallelRaceGroup Until(std::function<bool()> condition) &&;
 
   /**
    * Decorates this command with an interrupt condition.  If the specified
@@ -151,8 +151,10 @@ class Command {
    *
    * @param condition the interrupt condition
    * @return the command with the interrupt condition added
+   * @deprecated Replace with Until()
    */
-  virtual ParallelRaceGroup WithInterrupt(std::function<bool()> condition) &&;
+  WPI_DEPRECATED("Replace with Until()")
+  ParallelRaceGroup WithInterrupt(std::function<bool()> condition) &&;
 
   /**
    * Decorates this command with a runnable to run before this command starts.
@@ -161,7 +163,7 @@ class Command {
    * @param requirements the required subsystems
    * @return the decorated command
    */
-  virtual SequentialCommandGroup BeforeStarting(
+  SequentialCommandGroup BeforeStarting(
       std::function<void()> toRun,
       std::initializer_list<Subsystem*> requirements) &&;
 
@@ -172,7 +174,7 @@ class Command {
    * @param requirements the required subsystems
    * @return the decorated command
    */
-  virtual SequentialCommandGroup BeforeStarting(
+  SequentialCommandGroup BeforeStarting(
       std::function<void()> toRun,
       wpi::span<Subsystem* const> requirements = {}) &&;
 
@@ -183,7 +185,7 @@ class Command {
    * @param requirements the required subsystems
    * @return the decorated command
    */
-  virtual SequentialCommandGroup AndThen(
+  SequentialCommandGroup AndThen(
       std::function<void()> toRun,
       std::initializer_list<Subsystem*> requirements) &&;
 
@@ -194,7 +196,7 @@ class Command {
    * @param requirements the required subsystems
    * @return the decorated command
    */
-  virtual SequentialCommandGroup AndThen(
+  SequentialCommandGroup AndThen(
       std::function<void()> toRun,
       wpi::span<Subsystem* const> requirements = {}) &&;
 
@@ -206,7 +208,7 @@ class Command {
    * @deprecated replace with EndlessCommand
    */
   WPI_DEPRECATED("Replace with Endlessly()")
-  virtual PerpetualCommand Perpetually() &&;
+  PerpetualCommand Perpetually() &&;
 
   /**
    * Decorates this command to run endlessly, ignoring its ordinary end
@@ -214,7 +216,7 @@ class Command {
    *
    * @return the decorated command
    */
-  virtual EndlessCommand Endlessly() &&;
+  EndlessCommand Endlessly() &&;
 
   /**
    * Decorates this command to run repeatedly, restarting it when it ends, until
@@ -222,7 +224,7 @@ class Command {
    *
    * @return the decorated command
    */
-  virtual RepeatCommand Repeatedly() &&;
+  RepeatCommand Repeatedly() &&;
 
   /**
    * Decorates this command to run "by proxy" by wrapping it in a
@@ -232,7 +234,7 @@ class Command {
    *
    * @return the decorated command
    */
-  virtual ProxyScheduleCommand AsProxy();
+  ProxyScheduleCommand AsProxy();
 
   /**
    * Decorates this command to only run if this condition is not met. If the
@@ -243,7 +245,7 @@ class Command {
    * @param condition the condition that will prevent the command from running
    * @return the decorated command
    */
-  virtual ConditionalCommand Unless(std::function<bool()> condition) &&;
+  ConditionalCommand Unless(std::function<bool()> condition) &&;
 
   /**
    * Decorates this command to run or stop when disabled.
@@ -251,7 +253,7 @@ class Command {
    * @param doesRunWhenDisabled true to run when disabled.
    * @return the decorated command
    */
-  virtual std::unique_ptr<Command> IgnoringDisable(bool doesRunWhenDisabled) &&;
+  std::unique_ptr<Command> IgnoringDisable(bool doesRunWhenDisabled) &&;
 
   /**
    * Decorates this command to run or stop when disabled.
@@ -259,7 +261,7 @@ class Command {
    * @param interruptBehavior true to run when disabled.
    * @return the decorated command
    */
-  virtual std::unique_ptr<Command> WithInterruptBehavior(
+  std::unique_ptr<Command> WithInterruptBehavior(
       InterruptionBehavior interruptBehavior) &&;
 
   /**

@@ -7,7 +7,6 @@ package edu.wpi.first.math.controller;
 import edu.wpi.first.math.Drake;
 import edu.wpi.first.math.MathSharedStore;
 import edu.wpi.first.math.Matrix;
-import edu.wpi.first.math.Nat;
 import edu.wpi.first.math.Num;
 import edu.wpi.first.math.StateSpaceUtil;
 import edu.wpi.first.math.Vector;
@@ -44,6 +43,7 @@ public class LinearQuadraticRegulator<States extends Num, Inputs extends Num, Ou
    * @param qelms The maximum desired error tolerance for each state.
    * @param relms The maximum desired control effort for each input.
    * @param dtSeconds Discretization timestep.
+   * @throws IllegalArgumentException If the system is uncontrollable.
    */
   public LinearQuadraticRegulator(
       LinearSystem<States, Inputs, Outputs> plant,
@@ -66,6 +66,7 @@ public class LinearQuadraticRegulator<States extends Num, Inputs extends Num, Ou
    * @param qelms The maximum desired error tolerance for each state.
    * @param relms The maximum desired control effort for each input.
    * @param dtSeconds Discretization timestep.
+   * @throws IllegalArgumentException If the system is uncontrollable.
    */
   @SuppressWarnings({"ParameterName", "LocalVariableName"})
   public LinearQuadraticRegulator(
@@ -90,6 +91,7 @@ public class LinearQuadraticRegulator<States extends Num, Inputs extends Num, Ou
    * @param Q The state cost matrix.
    * @param R The input cost matrix.
    * @param dtSeconds Discretization timestep.
+   * @throws IllegalArgumentException If the system is uncontrollable.
    */
   @SuppressWarnings({"LocalVariableName", "ParameterName"})
   public LinearQuadraticRegulator(
@@ -141,6 +143,7 @@ public class LinearQuadraticRegulator<States extends Num, Inputs extends Num, Ou
    * @param R The input cost matrix.
    * @param N The state-input cross-term cost matrix.
    * @param dtSeconds Discretization timestep.
+   * @throws IllegalArgumentException If the system is uncontrollable.
    */
   @SuppressWarnings({"ParameterName", "LocalVariableName"})
   public LinearQuadraticRegulator(
@@ -167,24 +170,6 @@ public class LinearQuadraticRegulator<States extends Num, Inputs extends Num, Ou
 
     m_r = new Matrix<>(new SimpleMatrix(B.getNumRows(), 1));
     m_u = new Matrix<>(new SimpleMatrix(B.getNumCols(), 1));
-
-    reset();
-  }
-
-  /**
-   * Constructs a controller with the given coefficients and plant.
-   *
-   * @param states The number of states.
-   * @param inputs The number of inputs.
-   * @param k The gain matrix.
-   */
-  @SuppressWarnings("ParameterName")
-  public LinearQuadraticRegulator(
-      Nat<States> states, Nat<Inputs> inputs, Matrix<Inputs, States> k) {
-    m_K = k;
-
-    m_r = new Matrix<>(states, Nat.N1());
-    m_u = new Matrix<>(inputs, Nat.N1());
 
     reset();
   }

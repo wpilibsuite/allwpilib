@@ -69,8 +69,6 @@ class RepeatCommand : public CommandHelper<CommandBase, RepeatCommand> {
 
   bool RunsWhenDisabled() const override;
 
-  RepeatCommand Repeatedly() && override;
-
  private:
   std::unique_ptr<Command> m_command;
 };
