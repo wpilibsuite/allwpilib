@@ -51,6 +51,7 @@ static_assert(std::is_standard_layout_v<JoystickDataCache>);
 
 struct FRCDriverStation {
   wpi::EventVector newDataEvents;
+  wpi::mutex cacheMutex;
 };
 }  // namespace
 
@@ -75,8 +76,6 @@ static JoystickDataCache caches[3];
 static JoystickDataCache* currentRead = &caches[0];
 static JoystickDataCache* currentCache = &caches[1];
 static JoystickDataCache* cacheToUpdate = &caches[2];
-
-static wpi::mutex cacheMutex;
 
 static ::FRCDriverStation* driverStation;
 
@@ -170,38 +169,38 @@ int32_t HAL_SendConsoleLine(const char* line) {
 
 int32_t HAL_GetControlWord(HAL_ControlWord* controlWord) {
   // TODO determine if we need to handle this on timeout
-  std::scoped_lock lock{cacheMutex};
+  std::scoped_lock lock{driverStation->cacheMutex};
   *controlWord = currentRead->controlWord;
   return 0;
 }
 
 HAL_AllianceStationID HAL_GetAllianceStation(int32_t* status) {
-  std::scoped_lock lock{cacheMutex};
+  std::scoped_lock lock{driverStation->cacheMutex};
   return currentRead->allianceStation;
 }
 
 int32_t HAL_GetJoystickAxes(int32_t joystickNum, HAL_JoystickAxes* axes) {
-  std::scoped_lock lock{cacheMutex};
+  std::scoped_lock lock{driverStation->cacheMutex};
   *axes = currentRead->axes[joystickNum];
   return 0;
 }
 
 int32_t HAL_GetJoystickPOVs(int32_t joystickNum, HAL_JoystickPOVs* povs) {
-  std::scoped_lock lock{cacheMutex};
+  std::scoped_lock lock{driverStation->cacheMutex};
   *povs = currentRead->povs[joystickNum];
   return 0;
 }
 
 int32_t HAL_GetJoystickButtons(int32_t joystickNum,
                                HAL_JoystickButtons* buttons) {
-  std::scoped_lock lock{cacheMutex};
+  std::scoped_lock lock{driverStation->cacheMutex};
   *buttons = currentRead->buttons[joystickNum];
   return 0;
 }
 
 void HAL_GetAllJoystickData(HAL_JoystickAxes* axes, HAL_JoystickPOVs* povs,
                             HAL_JoystickButtons* buttons) {
-  std::scoped_lock lock{cacheMutex};
+  std::scoped_lock lock{driverStation->cacheMutex};
   std::memcpy(axes, currentRead->axes, sizeof(currentRead->axes));
   std::memcpy(povs, currentRead->povs, sizeof(currentRead->povs));
   std::memcpy(buttons, currentRead->buttons, sizeof(currentRead->buttons));
@@ -250,7 +249,7 @@ int32_t HAL_SetJoystickOutputs(int32_t joystickNum, int64_t outputs,
 }
 
 double HAL_GetMatchTime(int32_t* status) {
-  std::scoped_lock lock{cacheMutex};
+  std::scoped_lock lock{driverStation->cacheMutex};
   return currentRead->matchTime;
 }
 
@@ -280,7 +279,7 @@ void HAL_ObserveUserProgramTest(void) {
 }
 
 void HAL_RefreshDSData(void) {
-  std::scoped_lock lock{cacheMutex};
+  std::scoped_lock lock{driverStation->cacheMutex};
   if (currentCache->updated) {
     std::swap(currentCache, currentRead);
     currentCache->updated = false;
@@ -296,7 +295,7 @@ void HAL_RemoveNewDataEventHandle(WPI_EventHandle handle) {
 }
 
 HAL_Bool HAL_GetOutputsEnabled(void) {
-  std::scoped_lock lock{cacheMutex};
+  std::scoped_lock lock{driverStation->cacheMutex};
   return currentRead->controlWord.enabled &&
          currentRead->controlWord.dsAttached;
 }
@@ -307,7 +306,7 @@ namespace hal {
 void NewDriverStationData() {
   cacheToUpdate->Update();
   {
-    std::scoped_lock lock{cacheMutex};
+    std::scoped_lock lock{driverStation->cacheMutex};
     std::swap(currentCache, cacheToUpdate);
     currentCache->updated = true;
   }
