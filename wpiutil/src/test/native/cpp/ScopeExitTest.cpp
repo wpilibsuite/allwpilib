@@ -21,12 +21,16 @@ TEST(ScopeExitTest, Release) {
   int exitCount = 0;
 
   {
-    wpi::scope_exit exit{[&] { ++exitCount; }};
-
-    EXPECT_EQ(0, exitCount);
-    exit.release();
+    wpi::scope_exit exit1{[&] { ++exitCount; }};
+    wpi::scope_exit exit2 = std::move(exit1);
+    wpi::scope_exit exit3 = std::move(exit1);
     EXPECT_EQ(0, exitCount);
   }
+  EXPECT_EQ(1, exitCount);
 
-  EXPECT_EQ(0, exitCount);
+  {
+    wpi::scope_exit exit{[&] { ++exitCount; }};
+    exit.release();
+  }
+  EXPECT_EQ(1, exitCount);
 }
