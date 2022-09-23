@@ -481,7 +481,7 @@ void DataLog::SetMetadata(int entry, std::string_view metadata,
     return;
   }
   std::scoped_lock lock{m_mutex};
-  uint8_t* buf = StartRecord(entry, timestamp, 5 + 4 + metadata.size(), 5);
+  uint8_t* buf = StartRecord(0, timestamp, 5 + 4 + metadata.size(), 5);
   *buf++ = impl::kControlSetMetadata;
   wpi::support::endian::write32le(buf, entry);
   AppendStringImpl(metadata);

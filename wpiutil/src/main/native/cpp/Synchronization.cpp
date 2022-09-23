@@ -5,6 +5,7 @@
 #include "wpi/Synchronization.h"
 
 #include <algorithm>
+#include <atomic>
 #include <cstring>
 #include <mutex>
 
@@ -16,6 +17,8 @@
 
 using namespace wpi;
 
+static std::atomic_bool gShutdown{false};
+
 namespace {
 
 struct State {
@@ -25,6 +28,8 @@ struct State {
 };
 
 struct HandleManager {
+  ~HandleManager() { gShutdown = true; }
+
   wpi::mutex mutex;
   wpi::UidVector<int, 8> eventIds;
   wpi::UidVector<int, 8> semaphoreIds;
@@ -40,6 +45,9 @@ static HandleManager& GetManager() {
 
 WPI_EventHandle wpi::CreateEvent(bool manualReset, bool initialState) {
   auto& manager = GetManager();
+  if (gShutdown) {
+    return {};
+  }
   std::scoped_lock lock{manager.mutex};
 
   auto index = manager.eventIds.emplace_back(0);
@@ -61,6 +69,9 @@ void wpi::DestroyEvent(WPI_EventHandle handle) {
   DestroySignalObject(handle);
 
   auto& manager = GetManager();
+  if (gShutdown) {
+    return;
+  }
   std::scoped_lock lock{manager.mutex};
   manager.eventIds.erase(handle & 0xffffff);
 }
@@ -83,6 +94,9 @@ void wpi::ResetEvent(WPI_EventHandle handle) {
 
 WPI_SemaphoreHandle wpi::CreateSemaphore(int initialCount, int maximumCount) {
   auto& manager = GetManager();
+  if (gShutdown) {
+    return {};
+  }
   std::scoped_lock lock{manager.mutex};
 
   auto index = manager.semaphoreIds.emplace_back(maximumCount);
@@ -104,6 +118,9 @@ void wpi::DestroySemaphore(WPI_SemaphoreHandle handle) {
   DestroySignalObject(handle);
 
   auto& manager = GetManager();
+  if (gShutdown) {
+    return;
+  }
   std::scoped_lock lock{manager.mutex};
   manager.eventIds.erase(handle & 0xffffff);
 }
@@ -119,6 +136,9 @@ bool wpi::ReleaseSemaphore(WPI_SemaphoreHandle handle, int releaseCount,
   int index = handle & 0xffffff;
 
   auto& manager = GetManager();
+  if (gShutdown) {
+    return true;
+  }
   std::scoped_lock lock{manager.mutex};
   auto it = manager.states.find(handle);
   if (it == manager.states.end()) {
@@ -162,6 +182,10 @@ wpi::span<WPI_Handle> wpi::WaitForObjects(wpi::span<const WPI_Handle> handles,
                                           wpi::span<WPI_Handle> signaled,
                                           double timeout, bool* timedOut) {
   auto& manager = GetManager();
+  if (gShutdown) {
+    *timedOut = false;
+    return {};
+  }
   std::unique_lock lock{manager.mutex};
   wpi::condition_variable cv;
   bool addedWaiters = false;
@@ -240,6 +264,9 @@ wpi::span<WPI_Handle> wpi::WaitForObjects(wpi::span<const WPI_Handle> handles,
 void wpi::CreateSignalObject(WPI_Handle handle, bool manualReset,
                              bool initialState) {
   auto& manager = GetManager();
+  if (gShutdown) {
+    return;
+  }
   std::scoped_lock lock{manager.mutex};
   auto& state = manager.states[handle];
   state.signaled = initialState ? 1 : 0;
@@ -248,6 +275,9 @@ void wpi::CreateSignalObject(WPI_Handle handle, bool manualReset,
 
 void wpi::SetSignalObject(WPI_Handle handle) {
   auto& manager = GetManager();
+  if (gShutdown) {
+    return;
+  }
   std::scoped_lock lock{manager.mutex};
   auto it = manager.states.find(handle);
   if (it == manager.states.end()) {
@@ -266,6 +296,9 @@ void wpi::SetSignalObject(WPI_Handle handle) {
 
 void wpi::ResetSignalObject(WPI_Handle handle) {
   auto& manager = GetManager();
+  if (gShutdown) {
+    return;
+  }
   std::scoped_lock lock{manager.mutex};
   auto it = manager.states.find(handle);
   if (it != manager.states.end()) {
@@ -275,6 +308,9 @@ void wpi::ResetSignalObject(WPI_Handle handle) {
 
 void wpi::DestroySignalObject(WPI_Handle handle) {
   auto& manager = GetManager();
+  if (gShutdown) {
+    return;
+  }
   std::scoped_lock lock{manager.mutex};
 
   auto it = manager.states.find(handle);
