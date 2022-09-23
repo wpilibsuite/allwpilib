@@ -21,7 +21,8 @@
 using namespace sapphire;
 
 static std::vector<EntryView> entries;
-static float maxTimestamp= 100;
+static float maxTimestamp = 100;
+static bool needsUpdate = false;
 
 wpi::log::DataLogRecord EntryData::GetRecordAt(int timestamp){
   wpi::log::DataLogRecord record;
@@ -45,7 +46,7 @@ bool DataLogModel::LoadWPILog(std::string filename) {
   if (!reader->IsValid()) {
     return false;
   }
-
+  this->m_entries.clear();
   for (const auto& record : *reader) {
     int entryId;
     if(record.IsStart()) {
@@ -109,20 +110,23 @@ void DataLogView::Display() {
             entry.Display(true, timestamp);
         }
     }
-
     ImGui::Text("Entry Information: #Entries: %d, Max Timestamp: %d", entries.size(), maxTimestamp);
+
+    if(logData.needsUpdate){
+        Refresh();
+        logData.needsUpdate = false;
+    }
 }
 
-void DataLogView::DisplayDataLog(DataLogModel& logData){
+void DataLogView::Refresh(){
     entries.clear();
 
-    if(!logData.Exists()){
+    if(!logData.model.Exists()){
         return;
     }
     
-    maxTimestamp = logData.GetMaxTimestamp() / 1000000.0;
-    for(auto& entry : logData.m_entries){
-       
+    maxTimestamp = logData.model.GetMaxTimestamp() / 1000000.0;
+    for(auto& entry : logData.model.m_entries){
        EntryView view{&entry.second};
        entries.emplace_back(view);
     }

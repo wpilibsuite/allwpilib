@@ -11,12 +11,13 @@
 #include "glass/View.h"
 
 namespace sapphire {
+    
 class Selector: public glass::View {
     public:
         void Display() override;
-        DataLogModel& GetLogData();
+        DataLogReference& GetDataLog();
     private:
-        DataLogModel selectedLogData;
+        DataLogReference selectedLogData;
 
 };
 }  // namespace sapphire

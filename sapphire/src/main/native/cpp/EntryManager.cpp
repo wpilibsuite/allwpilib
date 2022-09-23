@@ -57,7 +57,7 @@ std::string GetFormattedEntryValue(const EntryData& data, wpi::log::DataLogRecor
     
 }
 
-EntryView::EntryView(EntryData *data, float timestamp) {
+EntryView::EntryView(EntryData *data) {
     this->data = data;
 }
 

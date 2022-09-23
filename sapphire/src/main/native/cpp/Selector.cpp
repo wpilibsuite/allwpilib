@@ -50,10 +50,10 @@ void Selector::Display() {
     auto result = logFileSelector->result();
     if(!result.empty()) {
       logFile = result[0];
-      bool success = selectedLogData.LoadWPILog(result[0]);
+      bool success = selectedLogData.model.LoadWPILog(result[0]);
+      selectedLogData.needsUpdate = success;
       if(success) {
         logFileMessage = "Success";
-        DataLogView::DisplayDataLog(selectedLogData);
       } else {
         logFileMessage = "Failure";
       }
@@ -71,6 +71,6 @@ void Selector::Display() {
 
 }
 
-DataLogModel& Selector::GetLogData() {
+DataLogReference& Selector::GetDataLog() {
   return selectedLogData;
 }

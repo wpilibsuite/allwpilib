@@ -103,11 +103,14 @@ void Application(std::string_view saveDir) {
   m_windowManager = std::make_unique<glass::WindowManager>(storage);
   m_windowManager->GlobalInit();
 
-  m_entryManagerWindow = m_windowManager->AddWindow(
-    "Entry Managemer", std::make_unique<DataLogView>());
-
+  std::unique_ptr<Selector> selector = std::make_unique<Selector>();
+  auto& model = selector->GetDataLog();
   m_logSelectorWindow = m_windowManager->AddWindow(
-    "Log Selector", std::make_unique<Selector>());
+    "Log Selector", std::move(selector));
+
+  m_entryManagerWindow = m_windowManager->AddWindow(
+    "Entry Managemer", std::make_unique<DataLogView>(model));
+
 
   gui::AddWindowScaler([](float scale) { gDefaultScale = scale; });
   gui::AddLateExecute(DisplayMenuBar);

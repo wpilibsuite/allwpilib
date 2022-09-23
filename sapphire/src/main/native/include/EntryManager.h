@@ -16,11 +16,13 @@ struct EntryData;
 
 struct EntryView {
     explicit EntryView() {};
-    explicit EntryView(EntryData* data, float timestamp=0);
+    explicit EntryView(EntryData* data);
     void Display(bool update, float timestamp);
     private:
     EntryData* data;
     std::string displayString = "";
+    float maxTimestamp;
+    bool displaySeparate = false;
 };
 
 }  // namespace sapphire

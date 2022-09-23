@@ -18,6 +18,9 @@
 #include "glass/View.h"
 #include "EntryManager.h"
 namespace sapphire{
+
+
+
 struct EntryData {
   EntryData() {}
   EntryData(wpi::log::StartRecordData start) : entry{start.entry}, 
@@ -68,13 +71,20 @@ class DataLogModel : private glass::Model {
 };
 
 
+struct DataLogReference {
+    bool needsUpdate = false;
+    DataLogModel model;
+};
+
 class DataLogView: public glass::View {
-    public:
-        void Display() override;
-        std::string name;
-        static void DisplayDataLog(DataLogModel& logData);
-    private:
-        float timestamp;
+  public:
+    DataLogView(DataLogReference& logData) : logData{logData} {}
+    void Display() override;
+    std::string name;
+    DataLogReference& logData;
+    void Refresh();
+  private:
+    float timestamp;
 };
 
 
