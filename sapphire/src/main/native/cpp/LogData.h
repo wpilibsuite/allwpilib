@@ -38,17 +38,18 @@ class LogData {
 
     bool LoadWPILog(std::string filename);
     
-    int GetMaxTimestamp() const { return m_maxTimestamp; };
-    bool Exists() const { return m_hasLog; };
+    int  GetMaxTimestamp() const { return m_maxTimestamp; }
+    bool Exists() const { return m_hasLog; }
+    int  GetSize() const {return m_entries.size(); }
     void AddEntryNode(EntryData& node, std::string path);
 
     wpi::DenseMap<int, EntryData> m_entries;
-    std::unordered_map<std::string, EntryNode> m_tree;
+    std::vector<std::shared_ptr<EntryData> > m_entry_list;
+    // std::unordered_map<std::string, EntryNode> m_tree;
 
   private:
-    int m_maxTimestamp;
+    int  m_maxTimestamp;
     bool m_hasLog;
-
 };
 
 #endif  // ALLWPILIB_LOGDATA_H

@@ -15,6 +15,9 @@ class Selector: public glass::View {
     public:
         void Display() override;
         LogData GetLogData();
+    private:
+        LogData selectedLogData;
+
 };
 }  // namespace sapphire
 

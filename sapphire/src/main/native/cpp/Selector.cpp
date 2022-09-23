@@ -15,10 +15,8 @@
 #include "App.h"
 #include "LogData.h"
 #include "wpi/fmt/raw_ostream.h"
-
+#include "EntryManager.h"
 using namespace sapphire;
-
-static LogData selectedLogData;
 
 void Selector::Display() {
   static std::string logFile = "";
@@ -51,10 +49,10 @@ void Selector::Display() {
     auto result = logFileSelector->result();
     if(!result.empty()) {
       logFile = result[0];
-      LogData logData;
-      bool success = logData.LoadWPILog(result[0]);
+      bool success = selectedLogData.LoadWPILog(result[0]);
       if(success) {
         logFileMessage = "Success";
+        //EntryManager::FromLogData(selectedLogData);
       } else {
         logFileMessage = "Failure";
       }

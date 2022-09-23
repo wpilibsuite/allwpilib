@@ -19,7 +19,7 @@
 #include <wpigui.h>
 
 #include "Selector.h"
-#include "TimeManager.h"
+#include "EntryManager.h"
 
 using namespace sapphire;
 
@@ -36,7 +36,7 @@ static std::unique_ptr<glass::WindowManager> m_windowManager;
 static glass::Window* m_logSelectorWindow;
 static std::unique_ptr<Selector> m_selector;
 
-static glass::Window* m_timeBarWindow;
+static glass::Window* m_entryManagerWindow;
 
 void SetNextWindowPos(const ImVec2& pos, ImGuiCond cond, const ImVec2& pivot) {
   if ((cond & ImGuiCond_FirstUseEver) != 0) {
@@ -101,12 +101,11 @@ void Application(std::string_view saveDir) {
   m_windowManager = std::make_unique<glass::WindowManager>(storage);
   m_windowManager->GlobalInit();
 
-  m_selector = std::make_unique<Selector>();
-  m_logSelectorWindow = m_windowManager->AddWindow(
-    "Log Selector", std::move(m_selector));
+  m_entryManagerWindow = m_windowManager->AddWindow(
+    "Entry Managemer", std::make_unique<EntryManager>());
 
-  m_timeBarWindow = m_windowManager->AddWindow(
-    "Time Management", std::make_unique<TimeManager>());
+  m_logSelectorWindow = m_windowManager->AddWindow(
+    "Log Selector", std::make_unique<Selector>());
 
   gui::AddWindowScaler([](float scale) { gDefaultScale = scale; });
   gui::AddLateExecute(DisplayMenuBar);
