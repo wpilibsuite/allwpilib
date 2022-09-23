@@ -5,6 +5,7 @@
 #include <jni.h>
 
 #include <exception>
+#include <utility>
 
 #include <wpi/jni_util.h>
 
@@ -15,6 +16,7 @@
 #include "drake/math/discrete_algebraic_riccati_equation.h"
 #include "edu_wpi_first_math_WPIMathJNI.h"
 #include "frc/apriltag/AprilTagUtil.h"
+#include "frc/geometry/Pose3d.h"
 #include "frc/trajectory/TrajectoryUtil.h"
 #include "unsupported/Eigen/MatrixFunctions"
 
@@ -95,35 +97,35 @@ frc::Trajectory CreateTrajectoryFromElements(wpi::span<const double> elements) {
 }
 
 std::vector<double> GetElementsFromAprilTagLayout(
-    const std::vector<frc::AprilTagUtil::AprilTag>& apriltagFieldLayout) {
+    const std::vector<std::pair<int, frc::Pose3d>>& apriltagFieldLayout) {
   std::vector<double> elements;
   elements.reserve(apriltagFieldLayout.size() * 8);
 
   for (auto&& apriltag : apriltagFieldLayout) {
-    elements.push_back(apriltag.id);
-    elements.push_back(apriltag.pose.X().value());
-    elements.push_back(apriltag.pose.Y().value());
-    elements.push_back(apriltag.pose.Z().value());
-    elements.push_back(apriltag.pose.Rotation().GetQuaternion().W());
-    elements.push_back(apriltag.pose.Rotation().GetQuaternion().X());
-    elements.push_back(apriltag.pose.Rotation().GetQuaternion().Y());
-    elements.push_back(apriltag.pose.Rotation().GetQuaternion().Z());
+    elements.push_back(apriltag.first);
+    elements.push_back(apriltag.second.X().value());
+    elements.push_back(apriltag.second.Y().value());
+    elements.push_back(apriltag.second.Z().value());
+    elements.push_back(apriltag.second.Rotation().GetQuaternion().W());
+    elements.push_back(apriltag.second.Rotation().GetQuaternion().X());
+    elements.push_back(apriltag.second.Rotation().GetQuaternion().Y());
+    elements.push_back(apriltag.second.Rotation().GetQuaternion().Z());
   }
 
   return elements;
 }
 
-std::vector<frc::AprilTagUtil::AprilTag> CreateAprilTagLayoutFromElements(
+std::vector<std::pair<int, frc::Pose3d>> CreateAprilTagLayoutFromElements(
     wpi::span<const double> elements) {
   // Make sure that the elements have the correct length.
   assert(elements.size() % 8 == 0);
 
   // Create a vector of AprilTags from the elements.
-  std::vector<frc::AprilTagUtil::AprilTag> apriltags;
+  std::vector<std::pair<int, frc::Pose3d>> apriltags;
   apriltags.reserve(elements.size() / 8);
 
   for (size_t i = 0; i < elements.size(); i += 8) {
-    apriltags.emplace_back(frc::AprilTagUtil::AprilTag{
+    apriltags.emplace_back(std::pair<int, frc::Pose3d>{
         static_cast<int>(elements[i]),
         frc::Pose3d{units::meter_t{elements[i + 1]},
                     units::meter_t{elements[i + 2]},

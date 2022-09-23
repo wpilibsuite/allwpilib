@@ -5,6 +5,7 @@
 #include "frc/apriltag/AprilTagUtil.h"
 
 #include <system_error>
+#include <utility>
 #include <vector>
 
 #include <fmt/format.h>
@@ -12,33 +13,18 @@
 #include <wpi/raw_istream.h>
 #include <wpi/raw_ostream.h>
 
+#include "frc/geometry/Pose3d.h"
+
 using namespace frc;
 
-bool AprilTagUtil::AprilTag::operator==(const AprilTag& other) const {
-  return id == other.id && pose == other.pose;
-}
-
-bool AprilTagUtil::AprilTag::operator!=(const AprilTag& other) const {
-  return !operator==(other);
-}
-
 std::string AprilTagUtil::SerializeAprilTagLayout(
-    const std::vector<AprilTagUtil::AprilTag>& apriltagLayout) {
+    const std::vector<std::pair<int, Pose3d>>& apriltagLayout) {
   wpi::json json = apriltagLayout;
-  return json.dump();
+  return json.at("tags").dump();
 }
 
-std::vector<AprilTagUtil::AprilTag> AprilTagUtil::DeserializeAprilTagLayout(
+std::vector<std::pair<int, Pose3d>> AprilTagUtil::DeserializeAprilTagLayout(
     std::string_view jsonStr) {
   wpi::json json = wpi::json::parse(jsonStr);
-  return json.get<std::vector<AprilTagUtil::AprilTag>>();
-}
-
-void frc::to_json(wpi::json& json, const AprilTagUtil::AprilTag& apriltag) {
-  json = wpi::json{{"id", apriltag.id}, {"pose", apriltag.pose}};
-}
-
-void frc::from_json(const wpi::json& json, AprilTagUtil::AprilTag& apriltag) {
-  apriltag.id = json.at("id").get<int>();
-  apriltag.pose = json.at("pose").get<Pose3d>();
+  return json.at("tags").get<std::vector<std::pair<int, Pose3d>>>();
 }

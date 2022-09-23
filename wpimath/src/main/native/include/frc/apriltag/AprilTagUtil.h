@@ -5,6 +5,7 @@
 #pragma once
 
 #include <string>
+#include <utility>
 #include <vector>
 
 #include <wpi/SymbolExports.h>
@@ -16,45 +17,6 @@ class WPILIB_DLLEXPORT AprilTagUtil {
  public:
   AprilTagUtil() = delete;
 
-  struct WPILIB_DLLEXPORT AprilTag {
-    int id;
-
-    Pose3d pose;
-
-    /**
-     * Checks equality between this AprilTag and another object.
-     *
-     * @param other The other object.
-     * @return Whether the two objects are equal.
-     */
-    bool operator==(const AprilTag& other) const;
-
-    /**
-     * Checks inequality between this AprilTag and another object.
-     *
-     * @param other The other object.
-     * @return Whether the two objects are not equal.
-     */
-    bool operator!=(const AprilTag& other) const;
-  };
-
-  /**
-   * Exports a AprilTag Layout JSON file.
-   *
-   * @param apriltagLayout the AprilTag layout to export
-   * @param path the path of the file to export to
-   */
-  static void ToJson(const std::vector<AprilTag>& apriltagLayout,
-                     std::string_view path);
-  /**
-   * Imports a AprilTag Layout JSON file.
-   *
-   * @param path The path of the json file to import from.
-   *
-   * @return The AprilTag layout represented by the file.
-   */
-  static std::vector<AprilTag> FromJson(std::string_view path);
-
   /**
    * Deserializes a AprilTag layout JSON.
    *
@@ -63,7 +25,7 @@ class WPILIB_DLLEXPORT AprilTagUtil {
    * @return the string containing the serialized JSON
    */
   static std::string SerializeAprilTagLayout(
-      const std::vector<AprilTag>& apriltagLayout);
+      const std::vector<std::pair<int, Pose3d>>& apriltagLayout);
 
   /**
    * Serializes a AprilTag layout JSON.
@@ -72,14 +34,7 @@ class WPILIB_DLLEXPORT AprilTagUtil {
    *
    * @return the AprilTag layout represented by the JSON
    */
-  static std::vector<AprilTag> DeserializeAprilTagLayout(
+  static std::vector<std::pair<int, Pose3d>> DeserializeAprilTagLayout(
       std::string_view jsonStr);
 };
-
-WPILIB_DLLEXPORT
-void to_json(wpi::json& json, const AprilTagUtil::AprilTag& apriltag);
-
-WPILIB_DLLEXPORT
-void from_json(const wpi::json& json, AprilTagUtil::AprilTag& apriltag);
-
 }  // namespace frc

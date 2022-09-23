@@ -2,11 +2,12 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "frc/AprilTagFieldLayout.h"
+#include "frc/apriltag/AprilTagFieldLayout.h"
 
 #include <algorithm>
 #include <string_view>
 #include <system_error>
+#include <vector>
 
 #include <units/angle.h>
 #include <units/length.h>
@@ -15,7 +16,6 @@
 #include <wpi/raw_ostream.h>
 
 #include "frc/DriverStation.h"
-#include "frc/apriltag/AprilTagUtil.h"
 #include "frc/geometry/Pose3d.h"
 
 using namespace frc;
@@ -31,11 +31,10 @@ AprilTagFieldLayout::AprilTagFieldLayout(const std::string_view path) {
   wpi::json json;
   input >> json;
 
-  m_apriltags = json.get<std::vector<AprilTagUtil::AprilTag>>();
+  m_apriltags = json.get<std::vector<AprilTag>>();
 }
 
-AprilTagFieldLayout::AprilTagFieldLayout(
-    const std::vector<AprilTagUtil::AprilTag>& apriltags)
+AprilTagFieldLayout::AprilTagFieldLayout(const std::vector<AprilTag>& apriltags)
     : m_apriltags(std::move(apriltags)) {}
 
 frc::Pose3d AprilTagFieldLayout::GetTagPose(int id) const {
@@ -56,7 +55,7 @@ void AprilTagFieldLayout::SetAlliance(DriverStation::Alliance alliance) {
   m_mirror = alliance == DriverStation::Alliance::kRed;
 }
 
-void ToJson(const std::vector<AprilTagUtil::AprilTag>& apriltagLayout, std::string_view path) {
+void ToJson(const AprilTagFieldLayout& apriltagLayout, std::string_view path) {
   std::error_code error_code;
 
   wpi::raw_fd_ostream output{path, error_code};
@@ -67,4 +66,12 @@ void ToJson(const std::vector<AprilTagUtil::AprilTag>& apriltagLayout, std::stri
   wpi::json json = apriltagLayout;
   output << json;
   output.flush();
+}
+
+void frc::to_json(wpi::json& json, const AprilTagFieldLayout& layout) {
+  json = wpi::json{{"tags", layout.m_apriltags}};
+}
+
+void frc::from_json(const wpi::json& json, AprilTagFieldLayout& layout) {
+  layout.m_apriltags = json.at("tags").get<std::vector<AprilTag>>();
 }
