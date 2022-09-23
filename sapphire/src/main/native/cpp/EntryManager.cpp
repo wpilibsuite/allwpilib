@@ -8,20 +8,18 @@ using namespace sapphire;
 static std::vector<EntryView> entries;
 static float maxTimestamp= 100;
 
+
+
 std::string GetFormattedEntryValue(const EntryData& data, wpi::log::DataLogRecord record, int timestamp){
     if (data.type == "double") {
         double val;
         if (record.GetDouble(&val)) {
             return fmt::format("  {}\n", val);
-        } else {
-            return fmt::format("  invalid\n");
         }
     } else if (data.type == "int64") {
         int64_t val;
         if (record.GetInteger(&val)) {
             return fmt::format("  {}\n", val);
-        } else {
-            return fmt::format("  invalid\n");
         }
     } else if (data.type == "string" ||
             data.type == "json") {
@@ -32,43 +30,31 @@ std::string GetFormattedEntryValue(const EntryData& data, wpi::log::DataLogRecor
         bool val;
         if (record.GetBoolean(&val)) {
             return fmt::format("  {}\n", val);
-        } else {
-            return fmt::format("  invalid\n");
         }
     } else if (data.type == "boolean[]") {
         std::vector<int> val;
         if (record.GetBooleanArray(&val)) {
             return fmt::format("  {}\n", fmt::join(val, ", "));
-        } else {
-            return fmt::format("  invalid\n");
         }
     } else if (data.type == "double[]") {
         std::vector<double> val;
         if (record.GetDoubleArray(&val)) {
             return fmt::format("  {}\n", fmt::join(val, ", "));
-        } else {
-            return fmt::format("  invalid\n");
         }
     } else if (data.type == "float[]") {
         std::vector<float> val;
         if (record.GetFloatArray(&val)) {
             return fmt::format("  {}\n", fmt::join(val, ", "));
-        } else {
-            return fmt::format("  invalid\n");
         }
     } else if (data.type == "int64[]") {
         std::vector<int64_t> val;
         if (record.GetIntegerArray(&val)) {
             return fmt::format("  {}\n", fmt::join(val, ", "));
-        } else {
-            return fmt::format("  invalid\n");
         }
     } else if (data.type == "string[]") {
         std::vector<std::string_view> val;
         if (record.GetStringArray(&val)) {
             return fmt::format("  {}\n", fmt::join(val, ", "));
-        } else {
-            return "  invalid\n";
         }
     }
     return "  invalid";
