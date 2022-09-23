@@ -16,11 +16,11 @@ namespace sapphire {
 // Fills entreis with records from logData.
 
 struct EntryView {
-    explicit EntryView(EntryData data ) : data{data} {};
-    void Display();
+    explicit EntryView() {};
+    explicit EntryView(EntryData* data, float timestamp=0);
+    void Display(bool update, float timestamp);
     private:
-    int timestamp = 0;
-    EntryData data;
+    EntryData* data;
     std::string displayString = "";
 };
 
@@ -28,7 +28,9 @@ class EntryManager: public glass::View {
     public:
         void Display() override;
         std::string name;
-        static void FromLogData(const LogData& logData);
+        static void FromLogData(LogData& logData);
+    private:
+        float timestamp;
 };
 }  // namespace sapphire
 

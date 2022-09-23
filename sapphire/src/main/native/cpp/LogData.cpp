@@ -37,11 +37,8 @@ bool LogData::LoadWPILog(std::string filename) {
       if(!record.GetStartData(&start)) { continue; }
       if(m_entries.find(start.entry) != m_entries.end()){ continue; } // This should probably be an error
 
-      EntryData entry_data;
-      entry_data.start = start;
-
+      EntryData entry_data{start};
       m_entries[start.entry] = entry_data;
-      m_entry_list.emplace_back(std::shared_ptr<EntryData>(&m_entries[start.entry]));
     } else if(record.GetFinishEntry(&entryId)) {
       // If we find a finish entry,
       auto entryPair= m_entries.find(entryId);

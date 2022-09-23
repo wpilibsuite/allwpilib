@@ -16,8 +16,17 @@
 #include "wpi/DenseMap.h"
 
 struct EntryData {
-  wpi::log::StartRecordData start;
-  wpi::DenseMap<int, wpi::log::DataLogRecord> datapoints;
+  EntryData() {}
+  EntryData(wpi::log::StartRecordData start) : entry{start.entry}, 
+                                               name{start.name}, 
+                                               type{start.type}, 
+                                               metadata{start.metadata} {};   
+  int entry;
+  std::string name;
+  std::string type;
+  std::string metadata;
+
+  std::unordered_map<int, wpi::log::DataLogRecord> datapoints;
   int finishTimestamp = INT_MAX;
 };
 
@@ -44,7 +53,6 @@ class LogData {
     void AddEntryNode(EntryData& node, std::string path);
 
     wpi::DenseMap<int, EntryData> m_entries;
-    std::vector<std::shared_ptr<EntryData> > m_entry_list;
     // std::unordered_map<std::string, EntryNode> m_tree;
 
   private:

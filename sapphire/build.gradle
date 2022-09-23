@@ -114,6 +114,7 @@ if (!project.hasProperty('onlylinuxathena') && !project.hasProperty('onlylinuxra
                         it.linker.args << '-lX11'
                     }
                 }
+                binaries
             }
         }
     }
