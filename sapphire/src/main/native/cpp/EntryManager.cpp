@@ -77,46 +77,41 @@ std::string GetFormattedEntryValue(const EntryData& data, wpi::log::DataLogRecor
 
 EntryView::EntryView(EntryData *data, float timestamp) {
     this->data = data;
-    displayString = fmt::format("<name='{}', type='{}'> [{}]\n", data->name,
-                data->type, data->finishTimestamp / 1000000.0);
-    int ts = static_cast<int>(timestamp*1000000);
-    auto timePair = data->datapoints.find(timestamp);
-    if(timePair == data->datapoints.end()){ return ;}
-    auto record = timePair->second;
-
-    //From printlog example in wpiutil
-    displayString = displayString + GetFormattedEntryValue(*data, record, timestamp);
 }
 
 
 void EntryView::Display(bool update, float timestamp){
     ImGui::Text("Entry #%d", data->entry);
     ImGui::TextUnformatted(displayString.c_str());
+    
     if(update){
-        std::string displayString = fmt::format("<name='{}', type='{}'> [{}]\n", data->name,
-                 data->type, timestamp);
-        int ts = static_cast<int>(timestamp*1000000);
-        auto timePair = data->datapoints.find(timestamp);
-        if(timePair == data->datapoints.end()){ return ;}
-        auto record = timePair->second;
+        displayString = fmt::format("'{}' = ", data->name,data->type);
+        int expandedts = static_cast<int>(timestamp*1000000);
+        auto record = data->GetRecordAt(expandedts);
+        if(record.GetEntry() == -1){ return ;}
 
         //From printlog example in wpiutil
-        displayString = displayString + GetFormattedEntryValue(*data, record, timestamp);
+        displayString += GetFormattedEntryValue(*data, record, timestamp);
     }
 }
 
 
 void EntryManager::Display() {
+    
     ImGui::Text("Manage Entry Time:");
     ImGui::SameLine();
     ImGui::SliderFloat("Timestamp", &timestamp ,0, maxTimestamp);
     bool update = ImGui::Button("Update");
     if(update){
+        fmt::print("update!!");
+    }
 
+    if(ImGui::CollapsingHeader("TestHeader")){
+        for(auto& entry : entries){
+            entry.Display(true, timestamp);
+        }
     }
-    for(auto& entry : entries){
-        entry.Display(update, timestamp);
-    }
+
     ImGui::Text("Entry Information: #Entries: %d, Max Timestamp: %d", entries.size(), maxTimestamp);
 }
 

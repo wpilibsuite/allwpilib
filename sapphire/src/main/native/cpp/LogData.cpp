@@ -16,19 +16,30 @@
 #include <wpi/MemoryBuffer.h>
 #include <wpi/DataLogReader.h>
 
+wpi::log::DataLogRecord EntryData::GetRecordAt(int timestamp){
+  wpi::log::DataLogRecord record;
+  for(auto& entry : datapoints){
+    if(entry.first <= timestamp){
+      record = entry.second;
+    }
+  }
+  return record;
+}
+
+
 bool LogData::LoadWPILog(std::string filename) {
   std::error_code ec;
   auto buf = wpi::MemoryBuffer::GetFile(filename.c_str(), ec);
   if (ec) {
     return false;
   }
-
-  wpi::log::DataLogReader reader{std::move(buf)};
-  if (!reader.IsValid()) {
+  
+  reader = std::make_shared<wpi::log::DataLogReader>(std::move(buf));
+  if (!reader->IsValid()) {
     return false;
   }
 
-  for (const auto& record : reader) {
+  for (const auto& record : *reader) {
     int entryId;
     if(record.IsStart()) {
       // If we find a new start record, create a new entry
@@ -62,7 +73,7 @@ bool LogData::LoadWPILog(std::string filename) {
         m_maxTimestamp = timestamp;
       }
 
-      entry.datapoints[record.GetTimestamp()] = record;
+      entry.datapoints[record.GetTimestamp()] = std::move(record);
     }
   }
   

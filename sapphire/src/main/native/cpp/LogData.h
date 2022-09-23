@@ -21,12 +21,13 @@ struct EntryData {
                                                name{start.name}, 
                                                type{start.type}, 
                                                metadata{start.metadata} {};   
+  wpi::log::DataLogRecord GetRecordAt(int timestamp);
   int entry;
   std::string name;
   std::string type;
   std::string metadata;
 
-  std::unordered_map<int, wpi::log::DataLogRecord> datapoints;
+  std::map<int, wpi::log::DataLogRecord> datapoints;
   int finishTimestamp = INT_MAX;
 };
 
@@ -44,7 +45,7 @@ struct EntryNode {
 
 class LogData {
   public:
-
+    LogData():reader{nullptr}{};
     bool LoadWPILog(std::string filename);
     
     int  GetMaxTimestamp() const { return m_maxTimestamp; }
@@ -56,6 +57,7 @@ class LogData {
     // std::unordered_map<std::string, EntryNode> m_tree;
 
   private:
+    std::shared_ptr<wpi::log::DataLogReader> reader ;
     int  m_maxTimestamp;
     bool m_hasLog;
 };

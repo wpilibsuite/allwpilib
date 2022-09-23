@@ -92,12 +92,14 @@ static void DisplayMenuBar() {
 void Application(std::string_view saveDir) {
   gui::CreateContext();
   glass::CreateContext();
-
+  
   glass::SetStorageName("sapphire");
   glass::SetStorageDir(saveDir.empty() ? gui::GetPlatformSaveFileDir()
                                       : saveDir);
   
   auto& storage = glass::GetStorageRoot().GetChild("Sapphire");
+
+
   m_windowManager = std::make_unique<glass::WindowManager>(storage);
   m_windowManager->GlobalInit();
 
