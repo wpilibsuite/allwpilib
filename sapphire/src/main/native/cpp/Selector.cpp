@@ -13,7 +13,7 @@
 #include <vector>
 
 #include "App.h"
-#include "LogData.h"
+#include "DataLog.h"
 #include "wpi/fmt/raw_ostream.h"
 #include "fmt/format.h"
 #include "EntryManager.h"
@@ -53,7 +53,7 @@ void Selector::Display() {
       bool success = selectedLogData.LoadWPILog(result[0]);
       if(success) {
         logFileMessage = "Success";
-        EntryManager::FromLogData(selectedLogData);
+        DataLogView::DisplayDataLog(selectedLogData);
       } else {
         logFileMessage = "Failure";
       }
@@ -71,6 +71,6 @@ void Selector::Display() {
 
 }
 
-LogData Selector::GetLogData() {
+DataLogModel& Selector::GetLogData() {
   return selectedLogData;
 }

@@ -2,13 +2,9 @@
 #include "fmt/format.h"
 #include <imgui.h>
 #include <wpi/DataLogReader.h>
+#include "DataLog.h"
 
 using namespace sapphire;
-
-static std::vector<EntryView> entries;
-static float maxTimestamp= 100;
-
-
 
 std::string GetFormattedEntryValue(const EntryData& data, wpi::log::DataLogRecord record, int timestamp){
     if (data.type == "double") {
@@ -81,36 +77,3 @@ void EntryView::Display(bool update, float timestamp){
     }
 }
 
-
-void EntryManager::Display() {
-    
-    ImGui::Text("Manage Entry Time:");
-    ImGui::SameLine();
-    ImGui::SliderFloat("Timestamp", &timestamp ,0, maxTimestamp);
-    bool update = ImGui::Button("Update");
-    if(update){
-        fmt::print("update!!");
-    }
-
-    if(ImGui::CollapsingHeader("TestHeader")){
-        for(auto& entry : entries){
-            entry.Display(true, timestamp);
-        }
-    }
-
-    ImGui::Text("Entry Information: #Entries: %d, Max Timestamp: %d", entries.size(), maxTimestamp);
-}
-
-void EntryManager::FromLogData(LogData& logData){
-    entries.clear();
-
-    if(!logData.Exists()){
-        return;
-    }
-    maxTimestamp = logData.GetMaxTimestamp() / 1000000.0;
-    for(auto& entry : logData.m_entries){
-       EntryView view{&entry.second};
-       entries.emplace_back(view);
-    }
-
-}

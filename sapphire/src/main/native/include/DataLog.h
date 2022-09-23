@@ -14,7 +14,10 @@
 
 #include "wpi/DataLogReader.h"
 #include "wpi/DenseMap.h"
-
+#include "glass/Model.h"
+#include "glass/View.h"
+#include "EntryManager.h"
+namespace sapphire{
 struct EntryData {
   EntryData() {}
   EntryData(wpi::log::StartRecordData start) : entry{start.entry}, 
@@ -22,6 +25,7 @@ struct EntryData {
                                                type{start.type}, 
                                                metadata{start.metadata} {};   
   wpi::log::DataLogRecord GetRecordAt(int timestamp);
+  
   int entry;
   std::string name;
   std::string type;
@@ -43,13 +47,14 @@ struct EntryNode {
   std::unordered_map<std::string, std::shared_ptr<EntryNode> > children;
 };
 
-class LogData {
+class DataLogModel : private glass::Model {
   public:
-    LogData():reader{nullptr}{};
+    DataLogModel():reader{nullptr}{};
     bool LoadWPILog(std::string filename);
     
     int  GetMaxTimestamp() const { return m_maxTimestamp; }
-    bool Exists() const { return m_hasLog; }
+    void Update() override { }
+    bool Exists() override { return m_hasLog; }
     int  GetSize() const {return m_entries.size(); }
     void AddEntryNode(EntryData& node, std::string path);
 
@@ -62,4 +67,16 @@ class LogData {
     bool m_hasLog;
 };
 
+
+class DataLogView: public glass::View {
+    public:
+        void Display() override;
+        std::string name;
+        static void DisplayDataLog(DataLogModel& logData);
+    private:
+        float timestamp;
+};
+
+
+} // namespace sapphire
 #endif  // ALLWPILIB_LOGDATA_H

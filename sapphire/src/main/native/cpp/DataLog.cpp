@@ -2,7 +2,7 @@
 // Created by bagatelle on 6/2/22.
 //
 
-#include "LogData.h"
+#include "DataLog.h"
 
 #include <map>
 #include <string>
@@ -12,9 +12,16 @@
 #include <vector>
 #include <filesystem>
 #include "wpi/fmt/raw_ostream.h"
+#include "fmt/format.h"
 
 #include <wpi/MemoryBuffer.h>
 #include <wpi/DataLogReader.h>
+#include <imgui.h>
+
+using namespace sapphire;
+
+static std::vector<EntryView> entries;
+static float maxTimestamp= 100;
 
 wpi::log::DataLogRecord EntryData::GetRecordAt(int timestamp){
   wpi::log::DataLogRecord record;
@@ -27,7 +34,7 @@ wpi::log::DataLogRecord EntryData::GetRecordAt(int timestamp){
 }
 
 
-bool LogData::LoadWPILog(std::string filename) {
+bool DataLogModel::LoadWPILog(std::string filename) {
   std::error_code ec;
   auto buf = wpi::MemoryBuffer::GetFile(filename.c_str(), ec);
   if (ec) {
@@ -82,6 +89,42 @@ bool LogData::LoadWPILog(std::string filename) {
   return true;
 }
 
-void LogData::AddEntryNode(EntryData& node, std::string path){
+void DataLogModel::AddEntryNode(EntryData& node, std::string path){
   std::shared_ptr<EntryData> data_ptr = std::shared_ptr<EntryData>(&node);
+}
+
+
+void DataLogView::Display() {
+    
+    ImGui::Text("Manage Entry Time:");
+    ImGui::SameLine();
+    ImGui::SliderFloat("Timestamp", &timestamp ,0, maxTimestamp);
+    bool update = ImGui::Button("Update");
+    if(update){
+        fmt::print("update!!");
+    }
+
+    if(ImGui::CollapsingHeader("TestHeader")){
+        for(auto& entry : entries){
+            entry.Display(true, timestamp);
+        }
+    }
+
+    ImGui::Text("Entry Information: #Entries: %d, Max Timestamp: %d", entries.size(), maxTimestamp);
+}
+
+void DataLogView::DisplayDataLog(DataLogModel& logData){
+    entries.clear();
+
+    if(!logData.Exists()){
+        return;
+    }
+    
+    maxTimestamp = logData.GetMaxTimestamp() / 1000000.0;
+    for(auto& entry : logData.m_entries){
+       
+       EntryView view{&entry.second};
+       entries.emplace_back(view);
+    }
+
 }

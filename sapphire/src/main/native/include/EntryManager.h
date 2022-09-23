@@ -8,12 +8,11 @@
 #define ALLWPILIB_TIMEMANAGER_H
 
 #include "glass/View.h"
-#include "LogData.h"
-
 
 namespace sapphire {
 
 // Fills entreis with records from logData.
+struct EntryData;
 
 struct EntryView {
     explicit EntryView() {};
@@ -24,14 +23,6 @@ struct EntryView {
     std::string displayString = "";
 };
 
-class EntryManager: public glass::View {
-    public:
-        void Display() override;
-        std::string name;
-        static void FromLogData(LogData& logData);
-    private:
-        float timestamp;
-};
 }  // namespace sapphire
 
 #endif  // ALLWPILIB_TIMEMANAGER_H

@@ -7,16 +7,16 @@
 #ifndef ALLWPILIB_SELECTOR_H
 #define ALLWPILIB_SELECTOR_H
 
-#include "LogData.h"
+#include "DataLog.h"
 #include "glass/View.h"
 
 namespace sapphire {
 class Selector: public glass::View {
     public:
         void Display() override;
-        LogData GetLogData();
+        DataLogModel& GetLogData();
     private:
-        LogData selectedLogData;
+        DataLogModel selectedLogData;
 
 };
 }  // namespace sapphire

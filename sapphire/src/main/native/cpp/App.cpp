@@ -104,7 +104,7 @@ void Application(std::string_view saveDir) {
   m_windowManager->GlobalInit();
 
   m_entryManagerWindow = m_windowManager->AddWindow(
-    "Entry Managemer", std::make_unique<EntryManager>());
+    "Entry Managemer", std::make_unique<DataLogView>());
 
   m_logSelectorWindow = m_windowManager->AddWindow(
     "Log Selector", std::make_unique<Selector>());
