@@ -25,8 +25,7 @@ static_assert(HAL_SPIPort::HAL_SPI_kOnboardCS2 ==
               edu_wpi_first_hal_SPIJNI_ONBOARD_CS2_PORT);
 static_assert(HAL_SPIPort::HAL_SPI_kOnboardCS3 ==
               edu_wpi_first_hal_SPIJNI_ONBOARD_CS3_PORT);
-static_assert(HAL_SPIPort::HAL_SPI_kMXP ==
-              edu_wpi_first_hal_SPIJNI_MXP_PORT);
+static_assert(HAL_SPIPort::HAL_SPI_kMXP == edu_wpi_first_hal_SPIJNI_MXP_PORT);
 
 static_assert(HAL_SPIMode::HAL_SPI_kMode0 ==
               edu_wpi_first_hal_SPIJNI_SPI_MODE0);
@@ -231,7 +230,8 @@ JNIEXPORT void JNICALL
 Java_edu_wpi_first_hal_SPIJNI_spiSetMode
   (JNIEnv*, jclass, jint port, jint mode)
 {
-  HAL_SetSPIMode(static_cast<HAL_SPIPort>(port), static_cast<HAL_SPIMode>(mode));
+  HAL_SetSPIMode(static_cast<HAL_SPIPort>(port),
+                 static_cast<HAL_SPIMode>(mode));
 }
 
 /*

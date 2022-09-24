@@ -178,11 +178,13 @@ void SPI::SetClockRate(int hz) {
 }
 
 void SPI::SetMSBFirst() {
-  FRC_ReportError(1, "SetMSBFirst not supported by roboRIO {}", static_cast<int>(m_port));
+  FRC_ReportError(1, "SetMSBFirst not supported by roboRIO {}",
+                  static_cast<int>(m_port));
 }
 
 void SPI::SetLSBFirst() {
-  FRC_ReportError(1, "SetLSBFirst not supported by roboRIO {}", static_cast<int>(m_port));
+  FRC_ReportError(1, "SetLSBFirst not supported by roboRIO {}",
+                  static_cast<int>(m_port));
 }
 
 void SPI::SetSampleDataOnLeadingEdge() {
