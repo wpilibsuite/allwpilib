@@ -158,6 +158,7 @@ void SPI::Accumulator::Update() {
 SPI::SPI(Port port) : m_port(static_cast<HAL_SPIPort>(port)) {
   int32_t status = 0;
   HAL_InitializeSPI(m_port, &status);
+  HAL_SetSPIMode(m_port, m_mode);
   FRC_CheckErrorStatus(status, "Port {}", static_cast<int>(m_port));
 
   HAL_Report(HALUsageReporting::kResourceType_SPI,
@@ -177,33 +178,44 @@ void SPI::SetClockRate(int hz) {
 }
 
 void SPI::SetMSBFirst() {
-  m_msbFirst = true;
-  HAL_SetSPIOpts(m_port, m_msbFirst, m_sampleOnTrailing, m_clockIdleHigh);
+  FRC_ReportError(1, "SetMSBFirst not supported by roboRIO {}", static_cast<int>(m_port));
 }
 
 void SPI::SetLSBFirst() {
-  m_msbFirst = false;
-  HAL_SetSPIOpts(m_port, m_msbFirst, m_sampleOnTrailing, m_clockIdleHigh);
+  FRC_ReportError(1, "SetLSBFirst not supported by roboRIO {}", static_cast<int>(m_port));
 }
 
 void SPI::SetSampleDataOnLeadingEdge() {
-  m_sampleOnTrailing = false;
-  HAL_SetSPIOpts(m_port, m_msbFirst, m_sampleOnTrailing, m_clockIdleHigh);
+  int mode = m_mode;
+  mode &= 2;
+  m_mode = static_cast<HAL_SPIMode>(mode);
+  HAL_SetSPIMode(m_port, m_mode);
 }
 
 void SPI::SetSampleDataOnTrailingEdge() {
-  m_sampleOnTrailing = true;
-  HAL_SetSPIOpts(m_port, m_msbFirst, m_sampleOnTrailing, m_clockIdleHigh);
+  int mode = m_mode;
+  mode |= 2;
+  m_mode = static_cast<HAL_SPIMode>(mode);
+  HAL_SetSPIMode(m_port, m_mode);
 }
 
 void SPI::SetClockActiveLow() {
-  m_clockIdleHigh = true;
-  HAL_SetSPIOpts(m_port, m_msbFirst, m_sampleOnTrailing, m_clockIdleHigh);
+  int mode = m_mode;
+  mode |= 1;
+  m_mode = static_cast<HAL_SPIMode>(mode);
+  HAL_SetSPIMode(m_port, m_mode);
 }
 
 void SPI::SetClockActiveHigh() {
-  m_clockIdleHigh = false;
-  HAL_SetSPIOpts(m_port, m_msbFirst, m_sampleOnTrailing, m_clockIdleHigh);
+  int mode = m_mode;
+  mode &= 1;
+  m_mode = static_cast<HAL_SPIMode>(mode);
+  HAL_SetSPIMode(m_port, m_mode);
+}
+
+void SPI::SetMode(Mode mode) {
+  m_mode = static_cast<HAL_SPIMode>(mode & 0x3);
+  HAL_SetSPIMode(m_port, m_mode);
 }
 
 void SPI::SetChipSelectActiveHigh() {
