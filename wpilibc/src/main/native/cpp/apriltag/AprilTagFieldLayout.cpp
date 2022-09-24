@@ -63,7 +63,7 @@ void AprilTagFieldLayout::ToJson(std::string_view path) {
     throw std::runtime_error(fmt::format("Cannot open file: {}", path));
   }
 
-  wpi::json json = this;
+  wpi::json json = *this;
   output << json;
   output.flush();
 }
