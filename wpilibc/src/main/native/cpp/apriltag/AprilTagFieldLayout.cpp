@@ -20,7 +20,7 @@
 
 using namespace frc;
 
-AprilTagFieldLayout::AprilTagFieldLayout(const std::string_view path) {
+AprilTagFieldLayout::AprilTagFieldLayout(const std::string_view path): AprilTagFieldLayout() {
   std::error_code error_code;
 
   wpi::raw_fd_istream input{path, error_code};
@@ -31,7 +31,7 @@ AprilTagFieldLayout::AprilTagFieldLayout(const std::string_view path) {
   wpi::json json;
   input >> json;
 
-  m_apriltags = json.get<std::vector<AprilTag>>();
+  this->m_apriltags = json.get<std::vector<AprilTag>>();
 }
 
 AprilTagFieldLayout::AprilTagFieldLayout(const std::vector<AprilTag>& apriltags)
@@ -55,7 +55,7 @@ void AprilTagFieldLayout::SetAlliance(DriverStation::Alliance alliance) {
   m_mirror = alliance == DriverStation::Alliance::kRed;
 }
 
-void ToJson(const AprilTagFieldLayout& apriltagLayout, std::string_view path) {
+void AprilTagFieldLayout::ToJson(std::string_view path) {
   std::error_code error_code;
 
   wpi::raw_fd_ostream output{path, error_code};
@@ -63,9 +63,17 @@ void ToJson(const AprilTagFieldLayout& apriltagLayout, std::string_view path) {
     throw std::runtime_error(fmt::format("Cannot open file: {}", path));
   }
 
-  wpi::json json = apriltagLayout;
+  wpi::json json = this;
   output << json;
   output.flush();
+}
+
+bool AprilTagFieldLayout::operator==(const AprilTagFieldLayout& other) const {
+  return m_apriltags == other.m_apriltags && m_mirror == other.m_mirror;
+}
+
+bool AprilTagFieldLayout::operator!=(const AprilTagFieldLayout& other) const {
+  return !operator==(other);
 }
 
 void frc::to_json(wpi::json& json, const AprilTagFieldLayout& layout) {

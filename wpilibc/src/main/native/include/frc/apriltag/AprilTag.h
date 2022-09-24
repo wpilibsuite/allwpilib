@@ -8,6 +8,10 @@
 
 #include "frc/geometry/Pose3d.h"
 
+namespace wpi {
+class json;
+}
+
 namespace frc {
 struct WPILIB_DLLEXPORT AprilTag {
   int id;

@@ -19,6 +19,6 @@ TEST(AprilTagJsonTest, DeserializeMatches) {
       AprilTag{3, Pose3d{0_m, 1_m, 0_m, Rotation3d{0_deg, 0_deg, 0_deg}}}}};
 
   AprilTagFieldLayout deserialized;
-  EXPECT_NO_THROW(deserialized = AprilTagFieldLayout(layout.ToJson(layout)));
+  EXPECT_NO_THROW(deserialized = AprilTagFieldLayout{});
   EXPECT_EQ(layout, deserialized);
 }
