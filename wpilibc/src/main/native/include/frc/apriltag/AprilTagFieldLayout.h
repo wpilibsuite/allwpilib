@@ -4,7 +4,6 @@
 
 #pragma once
 
-#include <string>
 #include <string_view>
 #include <vector>
 
@@ -25,7 +24,7 @@ class WPILIB_DLLEXPORT AprilTagFieldLayout {
 
   AprilTagFieldLayout() = default;
 
-  explicit AprilTagFieldLayout(const std::string_view path);
+  explicit AprilTagFieldLayout(std::string_view path);
 
   explicit AprilTagFieldLayout(const std::vector<AprilTag>& apriltags);
 

@@ -20,7 +20,7 @@
 
 using namespace frc;
 
-AprilTagFieldLayout::AprilTagFieldLayout(const std::string_view path): AprilTagFieldLayout() {
+AprilTagFieldLayout::AprilTagFieldLayout(std::string_view path) {
   std::error_code error_code;
 
   wpi::raw_fd_istream input{path, error_code};
