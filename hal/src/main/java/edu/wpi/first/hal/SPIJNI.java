@@ -8,6 +8,18 @@ import java.nio.ByteBuffer;
 
 @SuppressWarnings("AbbreviationAsWordInName")
 public class SPIJNI extends JNIWrapper {
+  public static final int INVALID_PORT = -1;
+  public static final int ONBOARD_CS0_PORT = 0;
+  public static final int ONBOARD_CS1_PORT = 1;
+  public static final int ONBOARD_CS2_PORT = 2;
+  public static final int ONBOARD_CS3_PORT = 3;
+  public static final int MXP_PORT = 4;
+
+  public static final int SPI_MODE0 = 0;
+  public static final int SPI_MODE1 = 1;
+  public static final int SPI_MODE2 = 2;
+  public static final int SPI_MODE3 = 3;
+
   public static native void spiInitialize(int port);
 
   public static native int spiTransaction(
@@ -28,8 +40,9 @@ public class SPIJNI extends JNIWrapper {
 
   public static native void spiSetSpeed(int port, int speed);
 
-  public static native void spiSetOpts(
-      int port, int msbFirst, int sampleOnTrailing, int clkIdleHigh);
+  public static native void spiSetMode(int port, int mode);
+
+  public static native int spiGetMode(int port);
 
   public static native void spiSetChipSelectActiveHigh(int port);
 

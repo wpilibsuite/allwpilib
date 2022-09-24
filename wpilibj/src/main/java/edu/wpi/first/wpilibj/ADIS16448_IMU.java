@@ -395,9 +395,7 @@ public class ADIS16448_IMU implements AutoCloseable, NTSendable {
       System.out.println("Setting up a new SPI port.");
       m_spi = new SPI(m_spi_port);
       m_spi.setClockRate(1000000);
-      m_spi.setMSBFirst();
-      m_spi.setSampleDataOnTrailingEdge();
-      m_spi.setClockActiveLow();
+      m_spi.setMode(SPI.Mode.kMode3);
       m_spi.setChipSelectActiveLow();
       readRegister(PROD_ID); // Dummy read
 

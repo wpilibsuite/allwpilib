@@ -21,9 +21,7 @@ ADXL345_SPI::ADXL345_SPI(SPI::Port port, ADXL345_SPI::Range range)
     m_simZ = m_simDevice.CreateDouble("z", hal::SimDevice::kInput, 0.0);
   }
   m_spi.SetClockRate(500000);
-  m_spi.SetMSBFirst();
-  m_spi.SetSampleDataOnTrailingEdge();
-  m_spi.SetClockActiveLow();
+  m_spi.SetMode(frc::SPI::Mode::kMode3);
   m_spi.SetChipSelectActiveHigh();
 
   uint8_t commands[2];

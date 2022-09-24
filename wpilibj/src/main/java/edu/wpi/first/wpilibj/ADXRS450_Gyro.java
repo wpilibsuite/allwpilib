@@ -71,9 +71,7 @@ public class ADXRS450_Gyro implements Gyro, Sendable {
     }
 
     m_spi.setClockRate(3000000);
-    m_spi.setMSBFirst();
-    m_spi.setSampleDataOnLeadingEdge();
-    m_spi.setClockActiveHigh();
+    m_spi.setMode(SPI.Mode.kMode0);
     m_spi.setChipSelectActiveLow();
 
     if (m_simDevice == null) {

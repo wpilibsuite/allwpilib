@@ -90,23 +90,27 @@ void HAL_CloseSPI(HAL_SPIPort port);
  *
  * @param port  The number of the port to use. 0-3 for Onboard CS0-CS2, 4 for
  *              MXP
- * @param speed The speed in Hz (0-1MHz)
+ * @param speed The speed in Hz (500KHz-10MHz)
  */
 void HAL_SetSPISpeed(HAL_SPIPort port, int32_t speed);
 
 /**
- * Sets the SPI options.
+ * Sets the SPI Mode.
  *
- * @param port             The number of the port to use. 0-3 for Onboard
- *                         CS0-CS2, 4 for MXP
- * @param msbFirst         True to write the MSB first, False for LSB first
- * @param sampleOnTrailing True to sample on the trailing edge, False to sample
- *                         on the leading edge
- * @param clkIdleHigh      True to set the clock to active low, False to set the
- *                         clock active high
+ * @param port  The number of the port to use. 0-3 for Onboard CS0-CS2, 4 for
+ * MXP
+ * @param mode  The SPI mode to use
  */
-void HAL_SetSPIOpts(HAL_SPIPort port, HAL_Bool msbFirst,
-                    HAL_Bool sampleOnTrailing, HAL_Bool clkIdleHigh);
+void HAL_SetSPIMode(HAL_SPIPort port, HAL_SPIMode mode);
+
+/**
+ * Gets the SPI Mode.
+ *
+ * @param port  The number of the port to use. 0-3 for Onboard CS0-CS2, 4 for
+ * MXP
+ * @returns     The SPI mode currently set
+ */
+HAL_SPIMode HAL_GetSPIMode(HAL_SPIPort port);
 
 /**
  * Sets the CS Active high for a SPI port.
