@@ -111,6 +111,5 @@ public class AnalogJNI extends JNIWrapper {
 
   public static native boolean getAnalogTriggerOutput(int analogTriggerHandle, int type);
 
-  @SuppressWarnings("AbbreviationAsWordInName")
   public static native int getAnalogTriggerFPGAIndex(int analogTriggerHandle);
 }

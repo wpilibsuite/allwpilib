@@ -6,7 +6,6 @@ package edu.wpi.first.math.kinematics;
 
 import java.util.stream.DoubleStream;
 
-@SuppressWarnings("MemberName")
 public class MecanumDriveWheelSpeeds {
   /** Speed of the front left wheel. */
   public double frontLeftMetersPerSecond;

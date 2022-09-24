@@ -11,7 +11,6 @@ import edu.wpi.first.math.numbers.N4;
 import java.util.Random;
 import org.ejml.simple.SimpleMatrix;
 
-@SuppressWarnings("ParameterName")
 public final class StateSpaceUtil {
   private static Random rand = new Random();
 
@@ -31,7 +30,6 @@ public final class StateSpaceUtil {
    *     output measurement.
    * @return Process noise or measurement noise covariance matrix.
    */
-  @SuppressWarnings("MethodTypeParameterName")
   public static <States extends Num> Matrix<States, States> makeCovarianceMatrix(
       Nat<States> states, Matrix<States, N1> stdDevs) {
     var result = new Matrix<>(states, states);
@@ -71,7 +69,6 @@ public final class StateSpaceUtil {
    *     excursions of the control inputs from no actuation.
    * @return State excursion or control effort cost matrix.
    */
-  @SuppressWarnings("MethodTypeParameterName")
   public static <Elements extends Num> Matrix<Elements, Elements> makeCostMatrix(
       Matrix<Elements, N1> tolerances) {
     Matrix<Elements, Elements> result =
@@ -102,7 +99,6 @@ public final class StateSpaceUtil {
    * @param B Input matrix.
    * @return If the system is stabilizable.
    */
-  @SuppressWarnings("MethodTypeParameterName")
   public static <States extends Num, Inputs extends Num> boolean isStabilizable(
       Matrix<States, States> A, Matrix<States, Inputs> B) {
     return WPIMathJNI.isStabilizable(A.getNumRows(), B.getNumCols(), A.getData(), B.getData());
@@ -121,7 +117,6 @@ public final class StateSpaceUtil {
    * @param C Output matrix.
    * @return If the system is detectable.
    */
-  @SuppressWarnings("MethodTypeParameterName")
   public static <States extends Num, Outputs extends Num> boolean isDetectable(
       Matrix<States, States> A, Matrix<Outputs, States> C) {
     return WPIMathJNI.isStabilizable(
@@ -147,7 +142,6 @@ public final class StateSpaceUtil {
    * @param <I> The number of inputs.
    * @return The clamped input.
    */
-  @SuppressWarnings({"ParameterName", "LocalVariableName"})
   public static <I extends Num> Matrix<I, N1> clampInputMaxMagnitude(
       Matrix<I, N1> u, Matrix<I, N1> umin, Matrix<I, N1> umax) {
     var result = new Matrix<I, N1>(new SimpleMatrix(u.getNumRows(), 1));

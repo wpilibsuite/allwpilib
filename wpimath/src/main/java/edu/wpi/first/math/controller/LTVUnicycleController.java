@@ -25,7 +25,6 @@ import edu.wpi.first.math.trajectory.Trajectory;
  * <p>See section 8.9 in Controls Engineering in FRC for a derivation of the control law we used
  * shown in theorem 8.9.1.
  */
-@SuppressWarnings("MemberName")
 public class LTVUnicycleController {
   // LUT from drivetrain linear velocity to LQR gain
   private final InterpolatingMatrixTreeMap<Double, N2, N3> m_table =
@@ -41,10 +40,8 @@ public class LTVUnicycleController {
     kY(1),
     kHeading(2);
 
-    @SuppressWarnings("MemberName")
     public final int value;
 
-    @SuppressWarnings("ParameterName")
     State(int i) {
       this.value = i;
     }
@@ -94,7 +91,6 @@ public class LTVUnicycleController {
    * @param maxVelocity The maximum velocity in meters per second for the controller gain lookup
    *     table. The default is 9 m/s.
    */
-  @SuppressWarnings("LocalVariableName")
   public LTVUnicycleController(
       Vector<N3> qelems, Vector<N2> relems, double dt, double maxVelocity) {
     // The change in global pose for a unicycle is defined by the following
@@ -191,7 +187,6 @@ public class LTVUnicycleController {
 
     m_poseError = poseRef.relativeTo(currentPose);
 
-    @SuppressWarnings("LocalVariableName")
     var K = m_table.get(linearVelocityRef);
     var e =
         new MatBuilder<>(Nat.N3(), Nat.N1())

@@ -26,7 +26,7 @@ import java.nio.ByteOrder;
  * <p>This class is for the digital ADXRS450 gyro sensor that connects via SPI. Only one instance of
  * an ADXRS Gyro is supported.
  */
-@SuppressWarnings({"TypeName", "AbbreviationAsWordInName", "PMD.UnusedPrivateField"})
+@SuppressWarnings({"TypeName", "PMD.UnusedPrivateField"})
 public class ADXRS450_Gyro implements Gyro, Sendable {
   private static final double kSamplePeriod = 0.0005;
   private static final double kCalibrationSampleTime = 5.0;

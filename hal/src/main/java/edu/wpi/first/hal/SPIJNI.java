@@ -6,7 +6,6 @@ package edu.wpi.first.hal;
 
 import java.nio.ByteBuffer;
 
-@SuppressWarnings("AbbreviationAsWordInName")
 public class SPIJNI extends JNIWrapper {
   public static final int INVALID_PORT = -1;
   public static final int ONBOARD_CS0_PORT = 0;

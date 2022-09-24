@@ -8,76 +8,70 @@ import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.Num;
 import edu.wpi.first.math.numbers.N1;
 
-@SuppressWarnings("ClassTypeParameterName")
 public class LinearSystem<States extends Num, Inputs extends Num, Outputs extends Num> {
   /** Continuous system matrix. */
-  @SuppressWarnings("MemberName")
   private final Matrix<States, States> m_A;
 
   /** Continuous input matrix. */
-  @SuppressWarnings("MemberName")
   private final Matrix<States, Inputs> m_B;
 
   /** Output matrix. */
-  @SuppressWarnings("MemberName")
   private final Matrix<Outputs, States> m_C;
 
   /** Feedthrough matrix. */
-  @SuppressWarnings("MemberName")
   private final Matrix<Outputs, Inputs> m_D;
 
   /**
    * Construct a new LinearSystem from the four system matrices.
    *
-   * @param a The system matrix A.
-   * @param b The input matrix B.
-   * @param c The output matrix C.
-   * @param d The feedthrough matrix D.
+   * @param A The system matrix A.
+   * @param B The input matrix B.
+   * @param C The output matrix C.
+   * @param D The feedthrough matrix D.
    * @throws IllegalArgumentException if any matrix element isn't finite.
    */
-  @SuppressWarnings("ParameterName")
   public LinearSystem(
-      Matrix<States, States> a,
-      Matrix<States, Inputs> b,
-      Matrix<Outputs, States> c,
-      Matrix<Outputs, Inputs> d) {
-    for (int row = 0; row < a.getNumRows(); ++row) {
-      for (int col = 0; col < a.getNumCols(); ++col) {
-        if (!Double.isFinite(a.get(row, col))) {
+      Matrix<States, States> A,
+      Matrix<States, Inputs> B,
+      Matrix<Outputs, States> C,
+      Matrix<Outputs, Inputs> D) {
+    for (int row = 0; row < A.getNumRows(); ++row) {
+      for (int col = 0; col < A.getNumCols(); ++col) {
+        if (!Double.isFinite(A.get(row, col))) {
           throw new IllegalArgumentException(
               "Elements of A aren't finite. This is usually due to model implementation errors.");
         }
       }
     }
-    for (int row = 0; row < b.getNumRows(); ++row) {
-      for (int col = 0; col < b.getNumCols(); ++col) {
-        if (!Double.isFinite(b.get(row, col))) {
+    for (int row = 0; row < B.getNumRows(); ++row) {
+      for (int col = 0; col < B.getNumCols(); ++col) {
+        if (!Double.isFinite(B.get(row, col))) {
           throw new IllegalArgumentException(
               "Elements of B aren't finite. This is usually due to model implementation errors.");
         }
       }
     }
-    for (int row = 0; row < c.getNumRows(); ++row) {
-      for (int col = 0; col < c.getNumCols(); ++col) {
-        if (!Double.isFinite(c.get(row, col))) {
+    for (int row = 0; row < C.getNumRows(); ++row) {
+      for (int col = 0; col < C.getNumCols(); ++col) {
+        if (!Double.isFinite(C.get(row, col))) {
           throw new IllegalArgumentException(
               "Elements of C aren't finite. This is usually due to model implementation errors.");
         }
       }
     }
-    for (int row = 0; row < d.getNumRows(); ++row) {
-      for (int col = 0; col < d.getNumCols(); ++col) {
-        if (!Double.isFinite(d.get(row, col))) {
+    for (int row = 0; row < D.getNumRows(); ++row) {
+      for (int col = 0; col < D.getNumCols(); ++col) {
+        if (!Double.isFinite(D.get(row, col))) {
           throw new IllegalArgumentException(
               "Elements of D aren't finite. This is usually due to model implementation errors.");
         }
       }
     }
 
-    this.m_A = a;
-    this.m_B = b;
-    this.m_C = c;
-    this.m_D = d;
+    this.m_A = A;
+    this.m_B = B;
+    this.m_C = C;
+    this.m_D = D;
   }
 
   /**
@@ -170,7 +164,6 @@ public class LinearSystem<States extends Num, Inputs extends Num, Outputs extend
    * @param dtSeconds Timestep for model update.
    * @return the updated x.
    */
-  @SuppressWarnings("ParameterName")
   public Matrix<States, N1> calculateX(
       Matrix<States, N1> x, Matrix<Inputs, N1> clampedU, double dtSeconds) {
     var discABpair = Discretization.discretizeAB(m_A, m_B, dtSeconds);
@@ -187,7 +180,6 @@ public class LinearSystem<States extends Num, Inputs extends Num, Outputs extend
    * @param clampedU The control input.
    * @return the updated output matrix Y.
    */
-  @SuppressWarnings("ParameterName")
   public Matrix<Outputs, N1> calculateY(Matrix<States, N1> x, Matrix<Inputs, N1> clampedU) {
     return m_C.times(x).plus(m_D.times(clampedU));
   }

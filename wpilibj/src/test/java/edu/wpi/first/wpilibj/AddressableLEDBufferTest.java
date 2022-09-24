@@ -19,7 +19,6 @@ import org.junit.jupiter.params.provider.MethodSource;
 class AddressableLEDBufferTest {
   @ParameterizedTest
   @MethodSource("hsvToRgbProvider")
-  @SuppressWarnings("ParameterName")
   void hsvConvertTest(int h, int s, int v, int r, int g, int b) {
     var buffer = new AddressableLEDBuffer(1);
     buffer.setHSV(0, h, s, v);

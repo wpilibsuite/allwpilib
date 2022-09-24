@@ -20,7 +20,6 @@ class QuinticHermiteSplineTest {
   private static final double kMaxDy = 0.00127;
   private static final double kMaxDtheta = 0.0872;
 
-  @SuppressWarnings("ParameterName")
   private void run(Pose2d a, Pose2d b) {
     // Start the timer.
     // var start = System.nanoTime();
@@ -68,19 +67,16 @@ class QuinticHermiteSplineTest {
                 1E-9));
   }
 
-  @SuppressWarnings("PMD.JUnitTestsShouldIncludeAssert")
   @Test
   void testStraightLine() {
     run(new Pose2d(), new Pose2d(3, 0, new Rotation2d()));
   }
 
-  @SuppressWarnings("PMD.JUnitTestsShouldIncludeAssert")
   @Test
   void testSimpleSCurve() {
     run(new Pose2d(), new Pose2d(1, 1, new Rotation2d()));
   }
 
-  @SuppressWarnings("PMD.JUnitTestsShouldIncludeAssert")
   @Test
   void testSquiggly() {
     run(

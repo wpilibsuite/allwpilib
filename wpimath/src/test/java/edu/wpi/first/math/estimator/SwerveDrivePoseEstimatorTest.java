@@ -20,7 +20,6 @@ import org.junit.jupiter.api.Test;
 
 class SwerveDrivePoseEstimatorTest {
   @Test
-  @SuppressWarnings("LocalVariableName")
   void testAccuracy() {
     var kinematics =
         new SwerveDriveKinematics(

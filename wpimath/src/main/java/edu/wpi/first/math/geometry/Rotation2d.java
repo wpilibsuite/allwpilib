@@ -236,7 +236,6 @@ public class Rotation2d implements Interpolatable<Rotation2d> {
   }
 
   @Override
-  @SuppressWarnings("ParameterName")
   public Rotation2d interpolate(Rotation2d endValue, double t) {
     return plus(endValue.minus(this).times(MathUtil.clamp(t, 0, 1)));
   }

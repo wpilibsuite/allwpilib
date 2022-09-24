@@ -4,7 +4,6 @@
 
 package edu.wpi.first.hal;
 
-@SuppressWarnings("AbbreviationAsWordInName")
 public class DIOJNI extends JNIWrapper {
   public static native int initializeDIOPort(int halPortHandle, boolean input);
 

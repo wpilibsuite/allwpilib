@@ -152,7 +152,6 @@ public abstract class MotorEncoderFixture<T extends MotorController> implements 
    * deallocated.
    */
   @Override
-  @SuppressWarnings("Regexp")
   public void teardown() {
     if (!m_tornDown) {
       if (m_motor != null) {

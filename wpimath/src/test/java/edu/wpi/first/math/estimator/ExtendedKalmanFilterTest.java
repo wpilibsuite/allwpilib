@@ -26,7 +26,6 @@ import java.util.Arrays;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 
-@SuppressWarnings("ParameterName")
 class ExtendedKalmanFilterTest {
   private static Matrix<N5, N1> getDynamics(final Matrix<N5, N1> x, final Matrix<N2, N1> u) {
     final var motors = DCMotor.getCIM(2);
@@ -68,7 +67,6 @@ class ExtendedKalmanFilterTest {
     return VecBuilder.fill(x.get(0, 0), x.get(1, 0), x.get(2, 0), x.get(3, 0), x.get(4, 0));
   }
 
-  @SuppressWarnings("LocalVariableName")
   @Test
   void testInit() {
     double dtSeconds = 0.00505;
@@ -99,7 +97,6 @@ class ExtendedKalmanFilterTest {
         });
   }
 
-  @SuppressWarnings("LocalVariableName")
   @Test
   void testConvergence() {
     double dtSeconds = 0.00505;

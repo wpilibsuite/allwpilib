@@ -122,8 +122,7 @@ class FirstSubSuiteTest {
   public static final String METHODNAME = "aTestMethod";
 
   @Test
-  @SuppressWarnings("MethodName")
-  public void aTestMethod() {}
+  public void testMethod() {}
 }
 
 @SuppressWarnings("OneTopLevelClass")

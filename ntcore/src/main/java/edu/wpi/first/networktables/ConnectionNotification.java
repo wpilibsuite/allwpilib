@@ -5,17 +5,15 @@
 package edu.wpi.first.networktables;
 
 /** NetworkTables Connection notification. */
+@SuppressWarnings("MemberName")
 public final class ConnectionNotification {
   /** Listener that was triggered. */
-  @SuppressWarnings("MemberName")
   public final int listener;
 
   /** True if event is due to connection being established. */
-  @SuppressWarnings("MemberName")
   public final boolean connected;
 
   /** Connection information. */
-  @SuppressWarnings("MemberName")
   public final ConnectionInfo conn;
 
   /**

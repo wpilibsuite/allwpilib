@@ -20,7 +20,6 @@ import edu.wpi.first.math.trajectory.Trajectory;
  * are decoupled from translations, users can specify a custom heading that the drivetrain should
  * point toward. This heading reference is profiled for smoothness.
  */
-@SuppressWarnings("MemberName")
 public class HolonomicDriveController {
   private Pose2d m_poseError = new Pose2d();
   private Rotation2d m_rotationError = new Rotation2d();
@@ -40,7 +39,6 @@ public class HolonomicDriveController {
    * @param yController A PID Controller to respond to error in the field-relative y direction.
    * @param thetaController A profiled PID controller to respond to error in angle.
    */
-  @SuppressWarnings("ParameterName")
   public HolonomicDriveController(
       PIDController xController, PIDController yController, ProfiledPIDController thetaController) {
     m_xController = xController;
@@ -81,7 +79,6 @@ public class HolonomicDriveController {
    * @param angleRef The angular reference.
    * @return The next output of the holonomic drive controller.
    */
-  @SuppressWarnings("LocalVariableName")
   public ChassisSpeeds calculate(
       Pose2d currentPose, Pose2d poseRef, double linearVelocityRefMeters, Rotation2d angleRef) {
     // If this is the first run, then we need to reset the theta controller to the current pose's

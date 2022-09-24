@@ -269,27 +269,11 @@ public abstract class RobotBase implements AutoCloseable {
   /** Ends the main loop in startCompetition(). */
   public abstract void endCompetition();
 
-  @SuppressWarnings("MissingJavadocMethod")
-  public static boolean getBooleanProperty(String name, boolean defaultValue) {
-    String propVal = System.getProperty(name);
-    if (propVal == null) {
-      return defaultValue;
-    }
-    if ("false".equalsIgnoreCase(propVal)) {
-      return false;
-    } else if ("true".equalsIgnoreCase(propVal)) {
-      return true;
-    } else {
-      throw new IllegalStateException(propVal);
-    }
-  }
-
   private static final ReentrantLock m_runMutex = new ReentrantLock();
   private static RobotBase m_robotCopy;
   private static boolean m_suppressExitWarning;
 
   /** Run the robot main loop. */
-  @SuppressWarnings({"PMD.AvoidCatchingThrowable", "PMD.AvoidReassigningCatchVariables"})
   private static <T extends RobotBase> void runRobot(Supplier<T> robotSupplier) {
     System.out.println("********** Robot program starting **********");
 

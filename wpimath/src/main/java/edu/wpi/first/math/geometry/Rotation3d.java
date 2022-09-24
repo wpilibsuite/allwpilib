@@ -170,7 +170,6 @@ public class Rotation3d implements Interpolatable<Rotation3d> {
       // so a 180 degree rotation is required. Any orthogonal vector can be used
       // for it. Q in the QR decomposition is an orthonormal basis, so it
       // contains orthogonal unit vectors.
-      @SuppressWarnings("LocalVariableName")
       var X =
           new MatBuilder<>(Nat.N3(), Nat.N1())
               .fill(initial.get(0, 0), initial.get(1, 0), initial.get(2, 0));
@@ -376,7 +375,6 @@ public class Rotation3d implements Interpolatable<Rotation3d> {
   }
 
   @Override
-  @SuppressWarnings("ParameterName")
   public Rotation3d interpolate(Rotation3d endValue, double t) {
     return plus(endValue.minus(this).times(MathUtil.clamp(t, 0, 1)));
   }

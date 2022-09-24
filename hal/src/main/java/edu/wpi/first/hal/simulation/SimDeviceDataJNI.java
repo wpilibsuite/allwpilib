@@ -28,18 +28,21 @@ public class SimDeviceDataJNI extends JNIWrapper {
 
   public static native int getSimValueDeviceHandle(int handle);
 
+  @SuppressWarnings("MemberName")
   public static class SimDeviceInfo {
-    @SuppressWarnings("JavadocMethod")
+    public String name;
+    public int handle;
+
+    /**
+     * SimDeviceInfo constructor.
+     *
+     * @param name SimDevice name.
+     * @param handle SimDevice handle.
+     */
     public SimDeviceInfo(String name, int handle) {
       this.name = name;
       this.handle = handle;
     }
-
-    @SuppressWarnings("MemberName")
-    public String name;
-
-    @SuppressWarnings("MemberName")
-    public int handle;
   }
 
   public static native SimDeviceInfo[] enumerateSimDevices(String prefix);
@@ -70,8 +73,23 @@ public class SimDeviceDataJNI extends JNIWrapper {
 
   public static native int getSimValueHandle(int device, String name);
 
+  @SuppressWarnings("MemberName")
   public static class SimValueInfo {
-    @SuppressWarnings("JavadocMethod")
+    public String name;
+    public int handle;
+    public int direction;
+    public HALValue value;
+
+    /**
+     * SimValueInfo constructor.
+     *
+     * @param name SimValue name.
+     * @param handle SimValue handle.
+     * @param direction SimValue direction.
+     * @param type SimValue type.
+     * @param value1 Value 1.
+     * @param value2 Value 2.
+     */
     public SimValueInfo(
         String name, int handle, int direction, int type, long value1, double value2) {
       this.name = name;
@@ -79,18 +97,6 @@ public class SimDeviceDataJNI extends JNIWrapper {
       this.direction = direction;
       this.value = HALValue.fromNative(type, value1, value2);
     }
-
-    @SuppressWarnings("MemberName")
-    public String name;
-
-    @SuppressWarnings("MemberName")
-    public int handle;
-
-    @SuppressWarnings("MemberName")
-    public int direction;
-
-    @SuppressWarnings("MemberName")
-    public HALValue value;
   }
 
   public static native SimValueInfo[] enumerateSimValues(int device);

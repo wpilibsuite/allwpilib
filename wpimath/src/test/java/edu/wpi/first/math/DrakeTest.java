@@ -10,7 +10,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.ejml.simple.SimpleMatrix;
 import org.junit.jupiter.api.Test;
 
-@SuppressWarnings({"ParameterName", "LocalVariableName"})
 class DrakeTest {
   public static void assertMatrixEqual(SimpleMatrix A, SimpleMatrix B) {
     for (int i = 0; i < A.numRows(); i++) {

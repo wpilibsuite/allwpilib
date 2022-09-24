@@ -208,7 +208,6 @@ public class SPI implements AutoCloseable {
    * @param size The number of bytes to send.
    * @return Number of bytes written or -1 on error.
    */
-  @SuppressWarnings("ByteBufferBackingArray")
   public int write(ByteBuffer dataToSend, int size) {
     if (dataToSend.hasArray()) {
       return write(dataToSend.array(), size);
@@ -257,7 +256,6 @@ public class SPI implements AutoCloseable {
    * @param size The length of the transaction, in bytes
    * @return Number of bytes read or -1 on error.
    */
-  @SuppressWarnings("ByteBufferBackingArray")
   public int read(boolean initiate, ByteBuffer dataReceived, int size) {
     if (dataReceived.hasArray()) {
       return read(initiate, dataReceived.array(), size);
@@ -297,7 +295,6 @@ public class SPI implements AutoCloseable {
    * @param size The length of the transaction, in bytes
    * @return TODO
    */
-  @SuppressWarnings("ByteBufferBackingArray")
   public int transaction(ByteBuffer dataToSend, ByteBuffer dataReceived, int size) {
     if (dataToSend.hasArray() && dataReceived.hasArray()) {
       return transaction(dataToSend.array(), dataReceived.array(), size);

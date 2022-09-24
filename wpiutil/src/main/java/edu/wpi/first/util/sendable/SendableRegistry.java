@@ -425,29 +425,24 @@ public final class SendableRegistry {
   }
 
   /** Data passed to foreachLiveWindow() callback function. */
+  @SuppressWarnings("MemberName")
   public static class CallbackData {
     /** Sendable object. */
-    @SuppressWarnings("MemberName")
     public Sendable sendable;
 
     /** Name. */
-    @SuppressWarnings("MemberName")
     public String name;
 
     /** Subsystem. */
-    @SuppressWarnings("MemberName")
     public String subsystem;
 
     /** Parent sendable object. */
-    @SuppressWarnings("MemberName")
     public Sendable parent;
 
     /** Data stored in object with setData(). Update this to change the data. */
-    @SuppressWarnings("MemberName")
     public Object data;
 
     /** Sendable builder for the sendable. */
-    @SuppressWarnings("MemberName")
     public SendableBuilder builder;
   }
 
@@ -462,7 +457,6 @@ public final class SendableRegistry {
    * @param dataHandle data handle to get data object passed to callback
    * @param callback function to call for each object
    */
-  @SuppressWarnings({"PMD.AvoidCatchingThrowable", "PMD.AvoidReassigningCatchVariables"})
   public static synchronized void foreachLiveWindow(
       int dataHandle, Consumer<CallbackData> callback) {
     CallbackData cbdata = new CallbackData();

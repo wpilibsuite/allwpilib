@@ -5,25 +5,21 @@
 package edu.wpi.first.networktables;
 
 /** NetworkTables Entry information. */
+@SuppressWarnings("MemberName")
 public final class EntryInfo {
   /** Entry handle. */
-  @SuppressWarnings("MemberName")
   public final int entry;
 
   /** Entry name. */
-  @SuppressWarnings("MemberName")
   public final String name;
 
   /** Entry type. */
-  @SuppressWarnings("MemberName")
   public final NetworkTableType type;
 
   /** Entry flags. */
-  @SuppressWarnings("MemberName")
   public final int flags;
 
   /** Timestamp of last change to entry (type or value). */
-  @SuppressWarnings("MemberName")
   public final long last_change;
 
   /**

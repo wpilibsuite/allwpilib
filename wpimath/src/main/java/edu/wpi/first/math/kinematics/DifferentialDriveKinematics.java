@@ -15,7 +15,6 @@ import edu.wpi.first.math.MathUsageId;
  * whereas forward kinematics converts left and right component velocities into a linear and angular
  * chassis speed.
  */
-@SuppressWarnings("MemberName")
 public class DifferentialDriveKinematics {
   public final double trackWidthMeters;
 

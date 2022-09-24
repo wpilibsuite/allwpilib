@@ -17,7 +17,6 @@ import java.util.InputMismatchException;
  * A record in the data log. May represent either a control record (entry == 0) or a data record.
  * Used only for reading (e.g. with DataLogReader).
  */
-@SuppressWarnings("PMD.PreserveStackTrace")
 public class DataLogRecord {
   private static final int kControlStart = 0;
   private static final int kControlFinish = 1;
@@ -125,6 +124,7 @@ public class DataLogRecord {
    * Data contained in a start control record as created by DataLog.start() when writing the log.
    * This can be read by calling getStartData().
    */
+  @SuppressWarnings("MemberName")
   public static class StartRecordData {
     StartRecordData(int entry, String name, String type, String metadata) {
       this.entry = entry;
@@ -134,19 +134,15 @@ public class DataLogRecord {
     }
 
     /** Entry ID; this will be used for this entry in future records. */
-    @SuppressWarnings("MemberName")
     public final int entry;
 
     /** Entry name. */
-    @SuppressWarnings("MemberName")
     public final String name;
 
     /** Type of the stored data for this entry, as a string, e.g. "double". */
-    @SuppressWarnings("MemberName")
     public final String type;
 
     /** Initial metadata. */
-    @SuppressWarnings("MemberName")
     public final String metadata;
   }
 
@@ -173,6 +169,7 @@ public class DataLogRecord {
    * Data contained in a set metadata control record as created by DataLog.setMetadata(). This can
    * be read by calling getSetMetadataData().
    */
+  @SuppressWarnings("MemberName")
   public static class MetadataRecordData {
     MetadataRecordData(int entry, String metadata) {
       this.entry = entry;
@@ -180,11 +177,9 @@ public class DataLogRecord {
     }
 
     /** Entry ID. */
-    @SuppressWarnings("MemberName")
     public final int entry;
 
     /** New metadata for the entry. */
-    @SuppressWarnings("MemberName")
     public final String metadata;
   }
 

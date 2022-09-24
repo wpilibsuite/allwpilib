@@ -5,25 +5,21 @@
 package edu.wpi.first.networktables;
 
 /** NetworkTables Remote Procedure Call (Server Side). */
+@SuppressWarnings("MemberName")
 public final class RpcAnswer {
   /** Entry handle. */
-  @SuppressWarnings("MemberName")
   public final int entry;
 
   /** Call handle. */
-  @SuppressWarnings("MemberName")
   public int call;
 
   /** Entry name. */
-  @SuppressWarnings("MemberName")
   public final String name;
 
   /** Call raw parameters. */
-  @SuppressWarnings("MemberName")
   public final byte[] params;
 
   /** Connection that called the RPC. */
-  @SuppressWarnings("MemberName")
   public final ConnectionInfo conn;
 
   /**

@@ -34,16 +34,13 @@ import java.util.function.BiFunction;
  * https://file.tavsys.net/control/controls-engineering-in-frc.pdf chapter 9 "Stochastic control
  * theory".
  */
-@SuppressWarnings("ClassTypeParameterName")
 public class ExtendedKalmanFilter<States extends Num, Inputs extends Num, Outputs extends Num>
     implements KalmanTypeFilter<States, Inputs, Outputs> {
   private final Nat<States> m_states;
   private final Nat<Outputs> m_outputs;
 
-  @SuppressWarnings("MemberName")
   private final BiFunction<Matrix<States, N1>, Matrix<Inputs, N1>, Matrix<States, N1>> m_f;
 
-  @SuppressWarnings("MemberName")
   private final BiFunction<Matrix<States, N1>, Matrix<Inputs, N1>, Matrix<Outputs, N1>> m_h;
 
   private BiFunction<Matrix<Outputs, N1>, Matrix<Outputs, N1>, Matrix<Outputs, N1>> m_residualFuncY;
@@ -53,10 +50,8 @@ public class ExtendedKalmanFilter<States extends Num, Inputs extends Num, Output
   private final Matrix<States, States> m_initP;
   private final Matrix<Outputs, Outputs> m_contR;
 
-  @SuppressWarnings("MemberName")
   private Matrix<States, N1> m_xHat;
 
-  @SuppressWarnings("MemberName")
   private Matrix<States, States> m_P;
 
   private double m_dtSeconds;
@@ -73,7 +68,6 @@ public class ExtendedKalmanFilter<States extends Num, Inputs extends Num, Output
    * @param measurementStdDevs Standard deviations of measurements.
    * @param dtSeconds Nominal discretization timestep.
    */
-  @SuppressWarnings("ParameterName")
   public ExtendedKalmanFilter(
       Nat<States> states,
       Nat<Inputs> inputs,
@@ -111,7 +105,6 @@ public class ExtendedKalmanFilter<States extends Num, Inputs extends Num, Output
    * @param addFuncX A function that adds two state vectors.
    * @param dtSeconds Nominal discretization timestep.
    */
-  @SuppressWarnings("ParameterName")
   public ExtendedKalmanFilter(
       Nat<States> states,
       Nat<Inputs> inputs,
@@ -219,7 +212,6 @@ public class ExtendedKalmanFilter<States extends Num, Inputs extends Num, Output
    *
    * @param xHat The state estimate x-hat.
    */
-  @SuppressWarnings("ParameterName")
   @Override
   public void setXhat(Matrix<States, N1> xHat) {
     m_xHat = xHat;
@@ -248,7 +240,6 @@ public class ExtendedKalmanFilter<States extends Num, Inputs extends Num, Output
    * @param u New control input from controller.
    * @param dtSeconds Timestep for prediction.
    */
-  @SuppressWarnings("ParameterName")
   @Override
   public void predict(Matrix<Inputs, N1> u, double dtSeconds) {
     predict(u, m_f, dtSeconds);
@@ -261,7 +252,6 @@ public class ExtendedKalmanFilter<States extends Num, Inputs extends Num, Output
    * @param f The function used to linearlize the model.
    * @param dtSeconds Timestep for prediction.
    */
-  @SuppressWarnings("ParameterName")
   public void predict(
       Matrix<Inputs, N1> u,
       BiFunction<Matrix<States, N1>, Matrix<Inputs, N1>, Matrix<States, N1>> f,
@@ -288,7 +278,6 @@ public class ExtendedKalmanFilter<States extends Num, Inputs extends Num, Output
    * @param u Same control input used in the predict step.
    * @param y Measurement vector.
    */
-  @SuppressWarnings("ParameterName")
   @Override
   public void correct(Matrix<Inputs, N1> u, Matrix<Outputs, N1> y) {
     correct(m_outputs, u, y, m_h, m_contR, m_residualFuncY, m_addFuncX);
@@ -306,16 +295,15 @@ public class ExtendedKalmanFilter<States extends Num, Inputs extends Num, Output
    * @param u Same control input used in the predict step.
    * @param y Measurement vector.
    * @param h A vector-valued function of x and u that returns the measurement vector.
-   * @param R Discrete measurement noise covariance matrix.
+   * @param contR Continuous measurement noise covariance matrix.
    */
-  @SuppressWarnings({"ParameterName", "MethodTypeParameterName"})
   public <Rows extends Num> void correct(
       Nat<Rows> rows,
       Matrix<Inputs, N1> u,
       Matrix<Rows, N1> y,
       BiFunction<Matrix<States, N1>, Matrix<Inputs, N1>, Matrix<Rows, N1>> h,
-      Matrix<Rows, Rows> R) {
-    correct(rows, u, y, h, R, Matrix::minus, Matrix::plus);
+      Matrix<Rows, Rows> contR) {
+    correct(rows, u, y, h, contR, Matrix::minus, Matrix::plus);
   }
 
   /**
@@ -330,22 +318,21 @@ public class ExtendedKalmanFilter<States extends Num, Inputs extends Num, Output
    * @param u Same control input used in the predict step.
    * @param y Measurement vector.
    * @param h A vector-valued function of x and u that returns the measurement vector.
-   * @param R Discrete measurement noise covariance matrix.
+   * @param contR Continuous measurement noise covariance matrix.
    * @param residualFuncY A function that computes the residual of two measurement vectors (i.e. it
    *     subtracts them.)
    * @param addFuncX A function that adds two state vectors.
    */
-  @SuppressWarnings({"ParameterName", "MethodTypeParameterName"})
   public <Rows extends Num> void correct(
       Nat<Rows> rows,
       Matrix<Inputs, N1> u,
       Matrix<Rows, N1> y,
       BiFunction<Matrix<States, N1>, Matrix<Inputs, N1>, Matrix<Rows, N1>> h,
-      Matrix<Rows, Rows> R,
+      Matrix<Rows, Rows> contR,
       BiFunction<Matrix<Rows, N1>, Matrix<Rows, N1>, Matrix<Rows, N1>> residualFuncY,
       BiFunction<Matrix<States, N1>, Matrix<States, N1>, Matrix<States, N1>> addFuncX) {
     final var C = NumericalJacobian.numericalJacobianX(rows, m_states, h, m_xHat, u);
-    final var discR = Discretization.discretizeR(R, m_dtSeconds);
+    final var discR = Discretization.discretizeR(contR, m_dtSeconds);
 
     final var S = C.times(m_P).times(C.transpose()).plus(discR);
 

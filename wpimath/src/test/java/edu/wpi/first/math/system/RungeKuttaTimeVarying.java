@@ -23,7 +23,6 @@ public final class RungeKuttaTimeVarying {
    * @param y The initial value of y.
    * @param dtSeconds The time over which to integrate.
    */
-  @SuppressWarnings("MethodTypeParameterName")
   public static <Rows extends Num, Cols extends Num> Matrix<Rows, Cols> rungeKuttaTimeVarying(
       BiFunction<Double, Matrix<Rows, Cols>, Matrix<Rows, Cols>> f,
       double t,

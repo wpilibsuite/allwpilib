@@ -20,18 +20,14 @@ import org.ejml.simple.SimpleMatrix;
  * <p>For more on the underlying math, read appendix B.3 in
  * https://file.tavsys.net/control/controls-engineering-in-frc.pdf.
  */
-@SuppressWarnings("ClassTypeParameterName")
 public class ImplicitModelFollower<States extends Num, Inputs extends Num, Outputs extends Num> {
   // Computed controller output
-  @SuppressWarnings("MemberName")
   private Matrix<Inputs, N1> m_u;
 
   // State space conversion gain
-  @SuppressWarnings("MemberName")
   private Matrix<Inputs, States> m_A;
 
   // Input space conversion gain
-  @SuppressWarnings("MemberName")
   private Matrix<Inputs, Inputs> m_B;
 
   /**
@@ -53,7 +49,6 @@ public class ImplicitModelFollower<States extends Num, Inputs extends Num, Outpu
    * @param Aref Continuous system matrix whose dynamics should be followed.
    * @param Bref Continuous input matrix whose dynamics should be followed.
    */
-  @SuppressWarnings("ParameterName")
   public ImplicitModelFollower(
       Matrix<States, States> A,
       Matrix<States, Inputs> B,
