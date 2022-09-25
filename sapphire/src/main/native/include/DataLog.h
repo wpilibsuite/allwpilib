@@ -53,8 +53,6 @@ struct EntryNode {
   
 };
 
-
-
 class DataLogModel : private glass::Model {
   public:
     DataLogModel():reader{nullptr}{};
@@ -67,7 +65,7 @@ class DataLogModel : private glass::Model {
     void AddEntryNode(EntryData* data, std::string path);
     const std::vector<EntryNode>& GetTreeRoot(){return m_tree;}
 
-    wpi::DenseMap<int, EntryData> m_entries;
+    wpi::DenseMap<int, std::unique_ptr<EntryData> > m_entries;
     std::vector<EntryNode> m_tree;
 
   private:

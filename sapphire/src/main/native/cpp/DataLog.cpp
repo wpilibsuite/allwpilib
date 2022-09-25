@@ -56,21 +56,20 @@ bool DataLogModel::LoadWPILog(std::string filename) {
       if(!record.GetStartData(&start)) { continue; }
       if(m_entries.find(start.entry) != m_entries.end()){ continue; } // This should probably be an error
 
-      EntryData entry_data{start};
-      m_entries[start.entry] = entry_data;
-      AddEntryNode(&m_entries[start.entry], m_entries[start.entry].name);
+      m_entries[start.entry] = std::make_unique<EntryData>(start);
+      AddEntryNode(m_entries[start.entry].get(), m_entries[start.entry]->name);
     } else if(record.GetFinishEntry(&entryId)) {
       // If we find a finish entry,
       auto entryPair= m_entries.find(entryId);
       if(entryPair == m_entries.end()) { continue; }
     
-      entryPair->second.finishTimestamp = record.GetTimestamp();
+      entryPair->second->finishTimestamp = record.GetTimestamp();
     } else if(!record.IsControl()) {
       auto entryPair = m_entries.find(record.GetEntry());
       if(entryPair == m_entries.end()) {
         continue;
       }
-      EntryData &entry = entryPair->second;
+      EntryData &entry = *entryPair->second;
       
       int timestamp = record.GetTimestamp();
       if(timestamp > entry.finishTimestamp) {
@@ -221,7 +220,7 @@ void EmitTree(const std::vector<EntryNode>& tree, float timestamp) {
       ImGui::NextColumn();
       ImGui::Separator();
       if(open){
-        EmitTree(tree, timestamp);
+        EmitTree(node.children, timestamp);
         ImGui::TreePop();
       }
     }
@@ -263,7 +262,7 @@ void DataLogView::Refresh(){
     
     maxTimestamp = logData.model.GetMaxTimestamp() / 1000000.0;
     for(auto& entry : logData.model.m_entries){
-       EntryView view{&entry.second};
+       EntryView view{entry.second.get()};
        entries.emplace_back(view);
     }
 }
