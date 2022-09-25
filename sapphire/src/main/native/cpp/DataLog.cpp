@@ -33,7 +33,15 @@ wpi::log::DataLogRecord EntryData::GetRecordAt(int timestamp){
   }
   return record;
 }
-
+wpi::log::DataLogRecord EntryData::GetNextRecord(int timestamp){
+  wpi::log::DataLogRecord record;
+  for(auto& entry : datapoints){
+    if(entry.first > timestamp && (entry.first < record.GetTimestamp() || record.GetTimestamp() < timestamp)){
+      record = entry.second;
+    }
+  }
+  return record;
+}
 
 bool DataLogModel::LoadWPILog(std::string filename) {
   std::error_code ec;
@@ -145,12 +153,7 @@ std::string EntryNode::TreeToString(int depth){
   }
   return ret;
 }
-
-std::string sapphire::GetFormattedEntryValue(EntryData& data, float timestamp){
-    int expandedts = static_cast<int>(timestamp*1000000);
-    auto record = data.GetRecordAt(expandedts);
-    if(record.GetEntry() == -1){ return "";}
-
+std::string sapphire::GetFormattedEntryValue(EntryData& data, int timestamp, wpi::log::DataLogRecord record){
     if (data.type == "double") {
         double val;
         if (record.GetDouble(&val)) {
@@ -200,16 +203,31 @@ std::string sapphire::GetFormattedEntryValue(EntryData& data, float timestamp){
     return "  invalid";
 }
 
-void EmitEntry(EntryData *data, std::string name, float timestamp){
+void EmitEntry(EntryData *data, std::string name, float *timestamp){
   ImGui::Text("%s", name.c_str());
+  
+  int expandedts = static_cast<int>((*timestamp)*1000000);
+  auto record = data->GetRecordAt(expandedts);
+
+  if (ImGui::BeginPopupContextItem(name.c_str())) {
+    if(ImGui::MenuItem("Next Event") && record.GetEntry() != -1){
+      auto temp = data->GetNextRecord(record.GetTimestamp());
+      if(temp.GetEntry() != -1){
+        *timestamp = temp.GetTimestamp()/1000000.0;
+        record = temp;
+      }
+    }
+    ImGui::EndPopup();
+  }
+  
   ImGui::NextColumn();
-  std::string value = GetFormattedEntryValue(*data, timestamp);
+  std::string value = (record.GetEntry() == -1) ? "" : GetFormattedEntryValue(*data, expandedts, record);
   ImGui::Text(value.c_str());
   ImGui::NextColumn();
   ImGui::Separator();
 }
 
-void EmitTree(const std::vector<EntryNode>& tree, float timestamp) {
+void EmitTree(const std::vector<EntryNode>& tree, float *timestamp) {
   for(auto &&node : tree){
     if(node.entry){
       EmitEntry(node.entry, node.name, timestamp);
@@ -232,7 +250,9 @@ void DataLogView::Display() {
     
     ImGui::Text("Manage Entry Time:");
     ImGui::SameLine();
-    ImGui::SliderFloat("Timestamp", &timestamp ,0, maxTimestamp);
+    ImGui::SliderFloat("TsSlider", &timestamp ,0, maxTimestamp);
+    ImGui::SameLine();
+    ImGui::InputFloat("TsInput", &timestamp);
     bool update = ImGui::Button("Update");
     if(update){
         fmt::print("update!!");
@@ -249,7 +269,7 @@ void DataLogView::Display() {
       ImGui::NextColumn();
       ImGui::Text("Value");
       ImGui::NextColumn();
-      EmitTree(logData.model.GetTreeRoot(), timestamp);
+      EmitTree(logData.model.GetTreeRoot(), &timestamp);
     }
 
     if(logData.needsUpdate){

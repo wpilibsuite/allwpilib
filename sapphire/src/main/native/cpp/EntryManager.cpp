@@ -18,9 +18,12 @@ void EntryView::Display(bool update, float timestamp){
     
     if(update){
         displayString = fmt::format("'{}' = ", data->name,data->type);
-
-        //From printlog example in wpiutil
-        displayString += GetFormattedEntryValue(*data, timestamp);
+        int expandedts = static_cast<int>(timestamp*1000000);
+        auto record = data->GetRecordAt(expandedts);
+        if(record.GetEntry() != -1){
+            //From printlog example in wpiutil
+            displayString += GetFormattedEntryValue(*data, expandedts, record);
+        }
     }
 }
 

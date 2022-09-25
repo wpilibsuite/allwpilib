@@ -19,7 +19,7 @@
 #include "EntryManager.h"
 namespace sapphire{
 
-std::string GetFormattedEntryValue(EntryData& data, float timestamp);
+std::string GetFormattedEntryValue(EntryData& data, int timestamp, wpi::log::DataLogRecord record);
 
 struct EntryData {
   EntryData() {}
@@ -28,6 +28,7 @@ struct EntryData {
                                                type{start.type}, 
                                                metadata{start.metadata} {};   
   wpi::log::DataLogRecord GetRecordAt(int timestamp);
+  wpi::log::DataLogRecord GetNextRecord(int timestamp);
   
   int entry;
   std::string name;
@@ -88,7 +89,7 @@ class DataLogView: public glass::View {
     DataLogReference& logData;
     void Refresh();
   private:
-    float timestamp;
+    float timestamp = 0;
 };
 
 
