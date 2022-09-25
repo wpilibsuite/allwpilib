@@ -210,7 +210,7 @@ public final class TestBench {
     return pairs;
   }
 
-  @SuppressWarnings("MissingJavadocMethod")
+  /** Returns the analog I/O cross-connect fixture. */
   public static AnalogCrossConnectFixture getAnalogCrossConnectFixture() {
     return new AnalogCrossConnectFixture() {
       @Override
@@ -225,7 +225,7 @@ public final class TestBench {
     };
   }
 
-  @SuppressWarnings("MissingJavadocMethod")
+  /** Returns the relay cross-connect fixture. */
   public static RelayCrossConnectFixture getRelayCrossConnectFixture() {
     return new RelayCrossConnectFixture() {
       @Override

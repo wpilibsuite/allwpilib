@@ -7,7 +7,6 @@ package edu.wpi.first.math.spline;
 import edu.wpi.first.math.geometry.Pose2d;
 
 /** Represents a pair of a pose and a curvature. */
-@SuppressWarnings("MemberName")
 public class PoseWithCurvature {
   // Represents the pose.
   public Pose2d poseMeters;

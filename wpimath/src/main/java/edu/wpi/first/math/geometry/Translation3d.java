@@ -21,7 +21,6 @@ import java.util.Objects;
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonAutoDetect(getterVisibility = JsonAutoDetect.Visibility.NONE)
-@SuppressWarnings({"ParameterName", "MemberName"})
 public class Translation3d implements Interpolatable<Translation3d> {
   private final double m_x;
   private final double m_y;

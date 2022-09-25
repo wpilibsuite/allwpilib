@@ -12,7 +12,6 @@ import java.util.List;
  * JNI Wrapper for HAL<br>
  * .
  */
-@SuppressWarnings({"AbbreviationAsWordInName", "MethodName"})
 public final class HAL extends JNIWrapper {
   public static native void waitForDSData();
 
@@ -153,7 +152,11 @@ public final class HAL extends JNIWrapper {
 
   public static native int nativeGetControlWord();
 
-  @SuppressWarnings("MissingJavadocMethod")
+  /**
+   * Get the current DriverStation control word.
+   *
+   * @param controlWord Storage for control word.
+   */
   public static void getControlWord(ControlWord controlWord) {
     int word = nativeGetControlWord();
     controlWord.update(
@@ -167,7 +170,11 @@ public final class HAL extends JNIWrapper {
 
   private static native int nativeGetAllianceStation();
 
-  @SuppressWarnings("MissingJavadocMethod")
+  /**
+   * Get the alliance station.
+   *
+   * @return The alliance station.
+   */
   public static AllianceStationID getAllianceStation() {
     switch (nativeGetAllianceStation()) {
       case 0:
@@ -187,13 +194,10 @@ public final class HAL extends JNIWrapper {
     }
   }
 
-  @SuppressWarnings("MissingJavadocMethod")
   public static native boolean isNewControlData();
 
-  @SuppressWarnings("MissingJavadocMethod")
   public static native void releaseDSMutex();
 
-  @SuppressWarnings("MissingJavadocMethod")
   public static native boolean waitForDSDataTimeout(double timeout);
 
   public static final int kMaxJoystickAxes = 12;

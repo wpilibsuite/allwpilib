@@ -118,9 +118,7 @@ public class ADXL345_SPI implements Accelerometer, NTSendable, AutoCloseable {
    */
   private void init(Range range) {
     m_spi.setClockRate(500000);
-    m_spi.setMSBFirst();
-    m_spi.setSampleDataOnTrailingEdge();
-    m_spi.setClockActiveLow();
+    m_spi.setMode(SPI.Mode.kMode3);
     m_spi.setChipSelectActiveHigh();
 
     // Turn on the measurements

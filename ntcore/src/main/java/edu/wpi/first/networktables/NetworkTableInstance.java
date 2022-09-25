@@ -207,7 +207,6 @@ public final class NetworkTableInstance implements AutoCloseable {
   private boolean m_entryListenerWaitQueue;
   private final Condition m_entryListenerWaitQueueCond = m_entryListenerLock.newCondition();
 
-  @SuppressWarnings("PMD.AvoidCatchingThrowable")
   private void startEntryListenerThread() {
     var entryListenerThread =
         new Thread(
@@ -375,7 +374,6 @@ public final class NetworkTableInstance implements AutoCloseable {
   private final Condition m_connectionListenerWaitQueueCond =
       m_connectionListenerLock.newCondition();
 
-  @SuppressWarnings("PMD.AvoidCatchingThrowable")
   private void startConnectionListenerThread() {
     var connectionListenerThread =
         new Thread(
@@ -524,7 +522,6 @@ public final class NetworkTableInstance implements AutoCloseable {
   private boolean m_rpcCallWaitQueue;
   private final Condition m_rpcCallWaitQueueCond = m_rpcCallLock.newCondition();
 
-  @SuppressWarnings("PMD.AvoidCatchingThrowable")
   private void startRpcCallThread() {
     var rpcCallThread =
         new Thread(
@@ -1048,7 +1045,6 @@ public final class NetworkTableInstance implements AutoCloseable {
   private boolean m_loggerWaitQueue;
   private final Condition m_loggerWaitQueueCond = m_loggerLock.newCondition();
 
-  @SuppressWarnings("PMD.AvoidCatchingThrowable")
   private void startLogThread() {
     var loggerThread =
         new Thread(

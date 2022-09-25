@@ -50,7 +50,6 @@ public class EncoderJNI extends JNIWrapper {
   public static native void setEncoderIndexSource(
       int encoderHandle, int digitalSourceHandle, int analogTriggerType, int indexingType);
 
-  @SuppressWarnings("AbbreviationAsWordInName")
   public static native int getEncoderFPGAIndex(int encoderHandle);
 
   public static native int getEncoderEncodingScale(int encoderHandle);

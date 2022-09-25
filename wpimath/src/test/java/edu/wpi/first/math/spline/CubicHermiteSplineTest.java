@@ -23,7 +23,6 @@ class CubicHermiteSplineTest {
   private static final double kMaxDy = 0.00127;
   private static final double kMaxDtheta = 0.0872;
 
-  @SuppressWarnings("ParameterName")
   private void run(Pose2d a, List<Translation2d> waypoints, Pose2d b) {
     // Start the timer.
     // var start = System.nanoTime();
@@ -97,13 +96,11 @@ class CubicHermiteSplineTest {
                 1E-9));
   }
 
-  @SuppressWarnings("PMD.JUnitTestsShouldIncludeAssert")
   @Test
   void testStraightLine() {
     run(new Pose2d(), new ArrayList<>(), new Pose2d(3, 0, new Rotation2d()));
   }
 
-  @SuppressWarnings("PMD.JUnitTestsShouldIncludeAssert")
   @Test
   void testSCurve() {
     var start = new Pose2d(0, 0, Rotation2d.fromDegrees(90.0));
@@ -115,7 +112,6 @@ class CubicHermiteSplineTest {
     run(start, waypoints, end);
   }
 
-  @SuppressWarnings("PMD.JUnitTestsShouldIncludeAssert")
   @Test
   void testOneInterior() {
     var start = new Pose2d(0, 0, Rotation2d.fromDegrees(0.0));
@@ -126,7 +122,6 @@ class CubicHermiteSplineTest {
     run(start, waypoints, end);
   }
 
-  @SuppressWarnings("PMD.JUnitTestsShouldIncludeAssert")
   @Test
   void testWindyPath() {
     final var start = new Pose2d(0, 0, Rotation2d.fromDegrees(0.0));

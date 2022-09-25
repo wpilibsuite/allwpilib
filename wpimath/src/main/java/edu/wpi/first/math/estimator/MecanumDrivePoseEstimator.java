@@ -110,7 +110,6 @@ public class MecanumDrivePoseEstimator {
    *     theta]ᵀ, with units in meters and radians.
    * @param nominalDtSeconds The time in seconds between each robot loop.
    */
-  @SuppressWarnings("ParameterName")
   public MecanumDrivePoseEstimator(
       Rotation2d gyroAngle,
       Pose2d initialPoseMeters,
@@ -290,7 +289,6 @@ public class MecanumDrivePoseEstimator {
    * @param wheelSpeeds The current speeds of the mecanum drive wheels.
    * @return The estimated pose of the robot in meters.
    */
-  @SuppressWarnings("LocalVariableName")
   public Pose2d updateWithTime(
       double currentTimeSeconds, Rotation2d gyroAngle, MecanumDriveWheelSpeeds wheelSpeeds) {
     double dt = m_prevTimeSeconds >= 0 ? currentTimeSeconds - m_prevTimeSeconds : m_nominalDt;

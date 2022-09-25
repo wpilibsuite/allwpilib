@@ -112,7 +112,6 @@ public class DifferentialDrivePoseEstimator {
    *     theta]ᵀ, with units in meters and radians.
    * @param nominalDtSeconds The time in seconds between each robot loop.
    */
-  @SuppressWarnings("ParameterName")
   public DifferentialDrivePoseEstimator(
       Rotation2d gyroAngle,
       Pose2d initialPoseMeters,
@@ -172,7 +171,6 @@ public class DifferentialDrivePoseEstimator {
     m_visionContR = StateSpaceUtil.makeCovarianceMatrix(Nat.N3(), visionMeasurementStdDevs);
   }
 
-  @SuppressWarnings({"ParameterName", "MethodName"})
   private Matrix<N5, N1> f(Matrix<N5, N1> x, Matrix<N3, N1> u) {
     // Apply a rotation matrix. Note that we do *not* add x--Runge-Kutta does that for us.
     var theta = x.get(2, 0);
@@ -343,7 +341,6 @@ public class DifferentialDrivePoseEstimator {
    *     last time you called {@link DifferentialDrivePoseEstimator#resetPosition}.
    * @return The estimated pose of the robot in meters.
    */
-  @SuppressWarnings({"LocalVariableName", "ParameterName"})
   public Pose2d updateWithTime(
       double currentTimeSeconds,
       Rotation2d gyroAngle,

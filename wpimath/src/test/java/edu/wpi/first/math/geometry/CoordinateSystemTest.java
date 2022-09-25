@@ -29,7 +29,6 @@ class CoordinateSystemTest {
     assertEquals(poseFrom, CoordinateSystem.convert(poseTo, coordTo, coordFrom));
   }
 
-  @SuppressWarnings("PMD.JUnitTestsShouldIncludeAssert")
   @Test
   void testEDNtoNWU() {
     // No rotation from EDN to NWU
@@ -80,7 +79,6 @@ class CoordinateSystemTest {
         CoordinateSystem.NWU());
   }
 
-  @SuppressWarnings("PMD.JUnitTestsShouldIncludeAssert")
   @Test
   void testEDNtoNED() {
     // No rotation from EDN to NED

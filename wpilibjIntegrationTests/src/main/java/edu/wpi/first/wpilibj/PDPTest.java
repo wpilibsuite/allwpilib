@@ -45,7 +45,12 @@ public class PDPTest extends AbstractComsSetup {
     me = null;
   }
 
-  @SuppressWarnings("MissingJavadocMethod")
+  /**
+   * PDPTest constructor.
+   *
+   * @param mef Motor encoder fixture.
+   * @param expectedCurrentDraw Expected current draw in Amps.
+   */
   public PDPTest(MotorEncoderFixture<?> mef, Double expectedCurrentDraw) {
     logger.fine("Constructor with: " + mef.getType());
     if (me != null && !me.equals(mef)) {

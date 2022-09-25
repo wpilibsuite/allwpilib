@@ -21,7 +21,6 @@ public final class RoboRioSim {
    * @return the {@link CallbackStore} object associated with this callback. Save a reference to
    *     this object so GC doesn't cancel the callback.
    */
-  @SuppressWarnings("AbbreviationAsWordInName")
   public static CallbackStore registerFPGAButtonCallback(
       NotifyCallback callback, boolean initialNotify) {
     int uid = RoboRioDataJNI.registerFPGAButtonCallback(callback, initialNotify);
@@ -33,7 +32,6 @@ public final class RoboRioSim {
    *
    * @return the FPGA button state
    */
-  @SuppressWarnings("AbbreviationAsWordInName")
   public static boolean getFPGAButton() {
     return RoboRioDataJNI.getFPGAButton();
   }
@@ -43,7 +41,6 @@ public final class RoboRioSim {
    *
    * @param fpgaButton the new state
    */
-  @SuppressWarnings("AbbreviationAsWordInName")
   public static void setFPGAButton(boolean fpgaButton) {
     RoboRioDataJNI.setFPGAButton(fpgaButton);
   }
@@ -76,7 +73,6 @@ public final class RoboRioSim {
    *
    * @param vInVoltage the new voltage
    */
-  @SuppressWarnings("ParameterName")
   public static void setVInVoltage(double vInVoltage) {
     RoboRioDataJNI.setVInVoltage(vInVoltage);
   }
@@ -109,7 +105,6 @@ public final class RoboRioSim {
    *
    * @param vInCurrent the new current
    */
-  @SuppressWarnings("ParameterName")
   public static void setVInCurrent(double vInCurrent) {
     RoboRioDataJNI.setVInCurrent(vInCurrent);
   }
@@ -526,7 +521,6 @@ public final class RoboRioSim {
    *
    * @param vInVoltage the new voltage
    */
-  @SuppressWarnings("ParameterName")
   public static void setBrownoutVoltage(double vInVoltage) {
     RoboRioDataJNI.setBrownoutVoltage(vInVoltage);
   }

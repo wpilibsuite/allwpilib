@@ -108,7 +108,6 @@ public class Drivetrain {
    * @param xSpeed Linear velocity in m/s.
    * @param rot Angular velocity in rad/s.
    */
-  @SuppressWarnings("ParameterName")
   public void drive(double xSpeed, double rot) {
     var wheelSpeeds = m_kinematics.toWheelSpeeds(new ChassisSpeeds(xSpeed, 0.0, rot));
     setSpeeds(wheelSpeeds);

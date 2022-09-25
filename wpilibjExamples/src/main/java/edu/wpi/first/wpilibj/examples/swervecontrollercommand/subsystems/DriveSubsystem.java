@@ -99,7 +99,6 @@ public class DriveSubsystem extends SubsystemBase {
    * @param rot Angular rate of the robot.
    * @param fieldRelative Whether the provided x and y speeds are relative to the field.
    */
-  @SuppressWarnings("ParameterName")
   public void drive(double xSpeed, double ySpeed, double rot, boolean fieldRelative) {
     var swerveModuleStates =
         DriveConstants.kDriveKinematics.toSwerveModuleStates(

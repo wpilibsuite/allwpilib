@@ -5,6 +5,7 @@ cppHeaderFileInclude {
   \.inl$
   math$
   numbers$
+  scope$
 }
 
 cppSrcFileInclude {

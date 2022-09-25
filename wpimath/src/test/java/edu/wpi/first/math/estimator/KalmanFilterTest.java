@@ -34,7 +34,6 @@ class KalmanFilterTest {
     createElevator();
   }
 
-  @SuppressWarnings("LocalVariableName")
   private static void createElevator() {
     var motors = DCMotor.getVex775Pro(2);
 
@@ -61,7 +60,6 @@ class KalmanFilterTest {
           new Matrix<>(Nat.N3(), Nat.N3())); // D
 
   @Test
-  @SuppressWarnings("LocalVariableName")
   void testElevatorKalmanFilter() {
     var Q = VecBuilder.fill(0.05, 1.0);
     var R = VecBuilder.fill(0.0001);
@@ -136,7 +134,6 @@ class KalmanFilterTest {
   }
 
   @Test
-  @SuppressWarnings("LocalVariableName")
   void testSwerveKFMovingOverTrajectory() {
     var random = new Random();
 

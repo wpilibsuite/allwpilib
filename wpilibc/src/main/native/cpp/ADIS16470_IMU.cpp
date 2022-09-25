@@ -194,9 +194,7 @@ bool ADIS16470_IMU::SwitchToStandardSPI() {
   if (m_spi == nullptr) {
     m_spi = new SPI(m_spi_port);
     m_spi->SetClockRate(2000000);
-    m_spi->SetMSBFirst();
-    m_spi->SetSampleDataOnTrailingEdge();
-    m_spi->SetClockActiveLow();
+    m_spi->SetMode(frc::SPI::Mode::kMode3);
     m_spi->SetChipSelectActiveLow();
     ReadRegister(PROD_ID);  // Dummy read
 

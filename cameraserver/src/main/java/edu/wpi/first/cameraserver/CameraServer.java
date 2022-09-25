@@ -33,12 +33,10 @@ import java.util.concurrent.atomic.AtomicInteger;
  * Singleton class for creating and keeping camera servers. Also publishes camera information to
  * NetworkTables.
  */
-@SuppressWarnings("PMD.UnusedPrivateField")
 public final class CameraServer {
   public static final int kBasePort = 1181;
 
   private static final String kPublishName = "/CameraPublisher";
-  private static CameraServer server;
 
   private static final AtomicInteger m_defaultUsbDevice = new AtomicInteger();
   private static String m_primarySourceName;
@@ -63,6 +61,7 @@ public final class CameraServer {
   // - "PropertyInfo/{Property}" - Property supporting information
 
   // Listener for video events
+  @SuppressWarnings("PMD.UnusedPrivateField")
   private static final VideoListener m_videoListener =
       new VideoListener(
           event -> {
@@ -185,6 +184,7 @@ public final class CameraServer {
           0x4fff,
           true);
 
+  @SuppressWarnings("PMD.UnusedPrivateField")
   private static final int m_tableListener =
       NetworkTableInstance.getDefault()
           .addEntryListener(
@@ -243,10 +243,15 @@ public final class CameraServer {
                 }
               },
               EntryListenerFlags.kImmediate | EntryListenerFlags.kUpdate);
+
   private static int m_nextPort = kBasePort;
   private static String[] m_addresses = new String[0];
 
-  @SuppressWarnings("MissingJavadocMethod")
+  /**
+   * Return URI of source with the given index.
+   *
+   * @param source Source index.
+   */
   private static String makeSourceValue(int source) {
     switch (VideoSource.getKindFromInt(CameraServerJNI.getSourceKind(source))) {
       case kUsb:
@@ -267,12 +272,21 @@ public final class CameraServer {
     }
   }
 
-  @SuppressWarnings("MissingJavadocMethod")
+  /**
+   * Return URI of stream with the given address and port.
+   *
+   * @param address Stream IP address.
+   * @param port Stream remote port.
+   */
   private static String makeStreamValue(String address, int port) {
     return "mjpg:http://" + address + ":" + port + "/?action=stream";
   }
 
-  @SuppressWarnings("MissingJavadocMethod")
+  /**
+   * Return URI of sink stream with the given index.
+   *
+   * @param sink Sink index.
+   */
   private static synchronized String[] getSinkStreamValues(int sink) {
     // Ignore all but MjpegServer
     if (VideoSink.getKindFromInt(CameraServerJNI.getSinkKind(sink)) != VideoSink.Kind.kMjpeg) {
@@ -302,7 +316,11 @@ public final class CameraServer {
     return values.toArray(new String[0]);
   }
 
-  @SuppressWarnings("MissingJavadocMethod")
+  /**
+   * Return list of stream source URIs for the given source index.
+   *
+   * @param source Source index.
+   */
   private static synchronized String[] getSourceStreamValues(int source) {
     // Ignore all but HttpCamera
     if (VideoSource.getKindFromInt(CameraServerJNI.getSourceKind(source))
@@ -337,7 +355,7 @@ public final class CameraServer {
     return values;
   }
 
-  @SuppressWarnings("MissingJavadocMethod")
+  /** Update list of stream URIs. */
   private static synchronized void updateStreamValues() {
     // Over all the sinks...
     for (VideoSink i : m_sinks.values()) {
@@ -383,7 +401,7 @@ public final class CameraServer {
     }
   }
 
-  @SuppressWarnings("MissingJavadocMethod")
+  /** Provide string description of pixel format. */
   private static String pixelFormatToString(PixelFormat pixelFormat) {
     switch (pixelFormat) {
       case kMJPEG:
@@ -401,9 +419,11 @@ public final class CameraServer {
     }
   }
 
-  /// Provide string description of video mode.
-  /// The returned string is "{width}x{height} {format} {fps} fps".
-  @SuppressWarnings("MissingJavadocMethod")
+  /**
+   * Provide string description of video mode.
+   *
+   * <p>The returned string is "{width}x{height} {format} {fps} fps".
+   */
   private static String videoModeToString(VideoMode mode) {
     return mode.width
         + "x"
@@ -415,7 +435,11 @@ public final class CameraServer {
         + " fps";
   }
 
-  @SuppressWarnings("MissingJavadocMethod")
+  /**
+   * Get list of video modes for the given source handle.
+   *
+   * @param sourceHandle Source handle.
+   */
   private static String[] getSourceModeValues(int sourceHandle) {
     VideoMode[] modes = CameraServerJNI.enumerateSourceVideoModes(sourceHandle);
     String[] modeStrings = new String[modes.length];
@@ -425,7 +449,13 @@ public final class CameraServer {
     return modeStrings;
   }
 
-  @SuppressWarnings("MissingJavadocMethod")
+  /**
+   * Publish a source property value to NetworkTables.
+   *
+   * @param table NetworkTable to which to push value.
+   * @param event Video event.
+   * @param isNew Whether the property value hasn't been pushed to NetworkTables before.
+   */
   private static void putSourcePropertyValue(NetworkTable table, VideoEvent event, boolean isNew) {
     String name;
     String infoName;

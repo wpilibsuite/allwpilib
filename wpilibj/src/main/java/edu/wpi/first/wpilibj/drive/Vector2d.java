@@ -5,11 +5,9 @@
 package edu.wpi.first.wpilibj.drive;
 
 /** This is a 2D vector struct that supports basic vector operations. */
+@SuppressWarnings("MemberName")
 public class Vector2d {
-  @SuppressWarnings("MemberName")
   public double x;
-
-  @SuppressWarnings("MemberName")
   public double y;
 
   public Vector2d() {}

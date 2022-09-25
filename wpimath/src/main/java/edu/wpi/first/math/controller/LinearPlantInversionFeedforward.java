@@ -20,20 +20,16 @@ import org.ejml.simple.SimpleMatrix;
  * <p>For more on the underlying math, read
  * https://file.tavsys.net/control/controls-engineering-in-frc.pdf.
  */
-@SuppressWarnings({"ParameterName", "LocalVariableName", "MemberName", "ClassTypeParameterName"})
 public class LinearPlantInversionFeedforward<
     States extends Num, Inputs extends Num, Outputs extends Num> {
   /** The current reference state. */
-  @SuppressWarnings("MemberName")
   private Matrix<States, N1> m_r;
 
   /** The computed feedforward. */
   private Matrix<Inputs, N1> m_uff;
 
-  @SuppressWarnings("MemberName")
   private final Matrix<States, Inputs> m_B;
 
-  @SuppressWarnings("MemberName")
   private final Matrix<States, States> m_A;
 
   /**
@@ -54,7 +50,6 @@ public class LinearPlantInversionFeedforward<
    * @param B Continuous input matrix of the plant being controlled.
    * @param dtSeconds Discretization timestep.
    */
-  @SuppressWarnings({"ParameterName", "LocalVariableName"})
   public LinearPlantInversionFeedforward(
       Matrix<States, States> A, Matrix<States, Inputs> B, double dtSeconds) {
     var discABPair = Discretization.discretizeAB(A, B, dtSeconds);
@@ -143,7 +138,6 @@ public class LinearPlantInversionFeedforward<
    * @param nextR The reference state of the future timestep (k + dt).
    * @return The calculated feedforward.
    */
-  @SuppressWarnings({"ParameterName", "LocalVariableName"})
   public Matrix<Inputs, N1> calculate(Matrix<States, N1> r, Matrix<States, N1> nextR) {
     m_uff = new Matrix<>(m_B.solve(nextR.minus(m_A.times(r))));
 

@@ -169,7 +169,6 @@ public class Pose3d implements Interpolatable<Pose3d> {
    *     Rotation3d(0.0, 0.0, Units.degreesToRadians(0.5))).
    * @return The new pose of the robot.
    */
-  @SuppressWarnings("LocalVariableName")
   public Pose3d exp(Twist3d twist) {
     final var Omega = rotationVectorToMatrix(VecBuilder.fill(twist.rx, twist.ry, twist.rz));
     final var OmegaSq = Omega.times(Omega);
@@ -210,7 +209,6 @@ public class Pose3d implements Interpolatable<Pose3d> {
    * @param end The end pose for the transformation.
    * @return The twist that maps this to end.
    */
-  @SuppressWarnings("LocalVariableName")
   public Twist3d log(Pose3d end) {
     final var transform = end.relativeTo(this);
 
@@ -293,7 +291,6 @@ public class Pose3d implements Interpolatable<Pose3d> {
   }
 
   @Override
-  @SuppressWarnings("ParameterName")
   public Pose3d interpolate(Pose3d endValue, double t) {
     if (t < 0) {
       return this;
