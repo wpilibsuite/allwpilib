@@ -2,39 +2,40 @@ package edu.wpi.first.wpilibj.apriltag;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
-
+import edu.wpi.first.math.geometry.Pose3d;
 import java.util.Objects;
 
-import edu.wpi.first.math.geometry.Pose3d;
-
 public class AprilTag {
-  public int id;
-  public Pose3d pose;
+  @JsonProperty(value = "id")
+  public int m_id;
+
+  @JsonProperty(value = "pose")
+  public Pose3d m_pose;
 
   @JsonCreator
   public AprilTag(
       @JsonProperty(required = true, value = "id") int id,
       @JsonProperty(required = true, value = "pose") Pose3d pose) {
-    this.id = id;
-    this.pose = pose;
+    this.m_id = id;
+    this.m_pose = pose;
   }
 
   @Override
   public boolean equals(Object obj) {
     if (obj instanceof AprilTag) {
       var other = (AprilTag) obj;
-      return id == other.id && pose.equals(other.pose);
+      return m_id == other.m_id && m_pose.equals(other.m_pose);
     }
     return false;
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(id, pose);
+    return Objects.hash(m_id, m_pose);
   }
 
   @Override
   public String toString() {
-    return "AprilTag(id: " + id + ", pose: " + pose + ")";
+    return "AprilTag(id: " + m_id + ", pose: " + m_pose + ")";
   }
 }

@@ -8,11 +8,6 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
-
-import org.ejml.dense.row.factory.DecompositionFactory_DDRM;
-
-import java.util.Objects;
-
 import edu.wpi.first.math.MatBuilder;
 import edu.wpi.first.math.MathSharedStore;
 import edu.wpi.first.math.MathUtil;
@@ -22,6 +17,8 @@ import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.Vector;
 import edu.wpi.first.math.interpolation.Interpolatable;
 import edu.wpi.first.math.numbers.N3;
+import java.util.Objects;
+import org.ejml.dense.row.factory.DecompositionFactory_DDRM;
 
 /** A rotation in a 3D coordinate frame represented by a quaternion. */
 @JsonIgnoreProperties(ignoreUnknown = true)

@@ -4,10 +4,9 @@
 
 package edu.wpi.first.math;
 
+import edu.wpi.first.util.RuntimeLoader;
 import java.io.IOException;
 import java.util.concurrent.atomic.AtomicBoolean;
-
-import edu.wpi.first.util.RuntimeLoader;
 
 public final class WPIMathJNI {
   static boolean libraryLoaded = false;
