@@ -125,7 +125,6 @@ void EntryNode::AddEntry(EntryData *entry,std::vector<std::string> path){
     auto nextNode = find(children, path[0]);
     if(nextNode == nullptr){
       nextNode = &children.emplace_back(EntryNode{path[0]});
-      return;
     }
     nextNode->AddEntry(entry, std::vector<std::string>(path.begin()+1, path.end()));
   } else {
@@ -137,7 +136,7 @@ void EntryNode::AddEntry(EntryData *entry,std::vector<std::string> path){
 
 
 std::string EntryNode::TreeToString(int depth){
-  std::string ret = fmt::format("T:{} \n", this->name);
+  std::string ret = fmt::format("{} \n", this->name);
   for(auto &child : children){
     for(int i = 0; i < depth; i++){
       ret += fmt::format("-");
@@ -202,11 +201,12 @@ std::string sapphire::GetFormattedEntryValue(EntryData& data, float timestamp){
 }
 
 void EmitEntry(EntryData *data, std::string name, float timestamp){
-  ImGui::Text(name.c_str());
+  ImGui::Text("%s", name.c_str());
   ImGui::NextColumn();
   std::string value = GetFormattedEntryValue(*data, timestamp);
   ImGui::Text(value.c_str());
   ImGui::NextColumn();
+  ImGui::Separator();
 }
 
 void EmitTree(const std::vector<EntryNode>& tree, float timestamp) {
@@ -244,6 +244,11 @@ void DataLogView::Display() {
         }
     }
     if (ImGui::CollapsingHeader("Tree")) {
+      ImGui::Columns(2, "values");
+      ImGui::Text("Name");
+      ImGui::NextColumn();
+      ImGui::Text("Value");
+      ImGui::NextColumn();
       EmitTree(logData.model.GetTreeRoot(), timestamp);
     }
 
