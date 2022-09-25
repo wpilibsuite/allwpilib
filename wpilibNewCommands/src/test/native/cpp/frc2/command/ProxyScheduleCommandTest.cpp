@@ -52,7 +52,8 @@ TEST_F(ProxyScheduleCommandTest, OwningCommandSchedule) {
 
   bool scheduled = false;
 
-  CommandPtr command = InstantCommand([&scheduled] { scheduled = true; }).AsProxy();
+  CommandPtr command =
+      InstantCommand([&scheduled] { scheduled = true; }).AsProxy();
 
   scheduler.Schedule(command);
   scheduler.Run();
@@ -65,7 +66,8 @@ TEST_F(ProxyScheduleCommandTest, OwningCommandEnd) {
 
   bool finished = false;
 
-  CommandPtr command = WaitUntilCommand([&finished] { return finished; }).AsProxy();
+  CommandPtr command =
+      WaitUntilCommand([&finished] { return finished; }).AsProxy();
 
   scheduler.Schedule(command);
   scheduler.Run();

@@ -226,7 +226,7 @@ class Command {
    * ProxyScheduleCommand. This is useful for "forking off" from command groups
    * when the user does not wish to extend the command's requirements to the
    * entire command group.
-   * 
+   *
    * <p>This overload transfers command ownership to the returned CommandPtr.
    *
    * @return the decorated command

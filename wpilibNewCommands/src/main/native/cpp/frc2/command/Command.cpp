@@ -100,8 +100,7 @@ CommandPtr Command::Repeatedly() && {
 }
 
 CommandPtr Command::AsProxy() && {
-  return CommandPtr(std::move(*this).TransferOwnership())
-      .AsProxy();
+  return CommandPtr(std::move(*this).TransferOwnership()).AsProxy();
 }
 
 CommandPtr Command::Unless(std::function<bool()> condition) && {

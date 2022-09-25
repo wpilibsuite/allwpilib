@@ -88,9 +88,11 @@ CommandPtr CommandPtr::AndThen(std::function<void()> toRun,
   return std::move(*this);
 }
 
-CommandPtr CommandPtr::AndThen(std::function<void()> toRun,
-                               std::initializer_list<Subsystem*> requirements) && {
-  return std::move(*this).AndThen(std::move(toRun), {requirements.begin(), requirements.end()});
+CommandPtr CommandPtr::AndThen(
+    std::function<void()> toRun,
+    std::initializer_list<Subsystem*> requirements) && {
+  return std::move(*this).AndThen(std::move(toRun),
+                                  {requirements.begin(), requirements.end()});
 }
 
 CommandPtr CommandPtr::BeforeStarting(
@@ -106,8 +108,8 @@ CommandPtr CommandPtr::BeforeStarting(
 CommandPtr CommandPtr::BeforeStarting(
     std::function<void()> toRun,
     std::initializer_list<Subsystem*> requirements) && {
-  return std::move(*this).BeforeStarting(std::move(toRun),
-                        {requirements.begin(), requirements.end()});
+  return std::move(*this).BeforeStarting(
+      std::move(toRun), {requirements.begin(), requirements.end()});
 }
 
 CommandPtr CommandPtr::WithTimeout(units::second_t duration) && {
