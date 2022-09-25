@@ -19,7 +19,7 @@
 #include "EntryManager.h"
 namespace sapphire{
 
-
+std::string GetFormattedEntryValue(EntryData& data, float timestamp);
 
 struct EntryData {
   EntryData() {}
@@ -39,16 +39,21 @@ struct EntryData {
 };
 
 struct EntryNode {
-  explicit EntryNode(std::string_view name, std::shared_ptr<EntryData> entry) : name{name}, entry{entry} {}
+  explicit EntryNode(std::string_view name): name{name} {}
 
-  std::shared_ptr<EntryData> GetEntry(std::string path);
+  std::shared_ptr<EntryData> GetEntry(std::vector<std::string> path);
 
-  void AddEntry(std::shared_ptr<EntryData> entry,std::string path);
+  void AddEntry(EntryData *entry,std::vector<std::string> path);
 
   std::string name;
-  std::shared_ptr<EntryData> entry = nullptr;
-  std::unordered_map<std::string, std::shared_ptr<EntryNode> > children;
+  EntryData *entry = nullptr;
+  std::vector<EntryNode> children;
+  std::string TreeToString(int depth = 1);
+
+  
 };
+
+
 
 class DataLogModel : private glass::Model {
   public:
@@ -59,10 +64,11 @@ class DataLogModel : private glass::Model {
     void Update() override { }
     bool Exists() override { return m_hasLog; }
     int  GetSize() const {return m_entries.size(); }
-    void AddEntryNode(EntryData& node, std::string path);
+    void AddEntryNode(EntryData* data, std::string path);
+    const std::vector<EntryNode>& GetTreeRoot(){return m_tree;}
 
     wpi::DenseMap<int, EntryData> m_entries;
-    // std::unordered_map<std::string, EntryNode> m_tree;
+    std::vector<EntryNode> m_tree;
 
   private:
     std::shared_ptr<wpi::log::DataLogReader> reader ;

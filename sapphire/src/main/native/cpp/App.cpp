@@ -109,7 +109,7 @@ void Application(std::string_view saveDir) {
     "Log Selector", std::move(selector));
 
   m_entryManagerWindow = m_windowManager->AddWindow(
-    "Entry Managemer", std::make_unique<DataLogView>(model));
+    "Entry Manager", std::make_unique<DataLogView>(model));
 
 
   gui::AddWindowScaler([](float scale) { gDefaultScale = scale; });
