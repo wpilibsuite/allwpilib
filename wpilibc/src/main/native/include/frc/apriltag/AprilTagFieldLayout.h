@@ -39,7 +39,7 @@ class WPILIB_DLLEXPORT AprilTagFieldLayout {
   bool operator!=(const AprilTagFieldLayout& other) const;
 
  private:
-  bool m_mirror;
+  bool m_mirror = false;
 };
 
 WPILIB_DLLEXPORT
