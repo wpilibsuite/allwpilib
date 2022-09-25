@@ -4,6 +4,15 @@
 
 package edu.wpi.first.math.geometry;
 
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
+import org.ejml.dense.row.factory.DecompositionFactory_DDRM;
+
+import java.util.Objects;
+
 import edu.wpi.first.math.MatBuilder;
 import edu.wpi.first.math.MathSharedStore;
 import edu.wpi.first.math.MathUtil;
@@ -13,10 +22,10 @@ import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.Vector;
 import edu.wpi.first.math.interpolation.Interpolatable;
 import edu.wpi.first.math.numbers.N3;
-import java.util.Objects;
-import org.ejml.dense.row.factory.DecompositionFactory_DDRM;
 
 /** A rotation in a 3D coordinate frame represented by a quaternion. */
+@JsonIgnoreProperties(ignoreUnknown = true)
+@JsonAutoDetect(getterVisibility = JsonAutoDetect.Visibility.NONE)
 public class Rotation3d implements Interpolatable<Rotation3d> {
   private Quaternion m_q = new Quaternion();
 
@@ -42,7 +51,11 @@ public class Rotation3d implements Interpolatable<Rotation3d> {
    * @param pitch The counterclockwise rotation angle around the Y axis (pitch) in radians.
    * @param yaw The counterclockwise rotation angle around the Z axis (yaw) in radians.
    */
-  public Rotation3d(double roll, double pitch, double yaw) {
+  @JsonCreator
+  public Rotation3d(
+      @JsonProperty(required = true, value = "roll") double roll,
+      @JsonProperty(required = true, value = "pitch") double pitch,
+      @JsonProperty(required = true, value = "yaw") double yaw) {
     // https://en.wikipedia.org/wiki/Conversion_between_quaternions_and_Euler_angles#Euler_angles_to_quaternion_conversion
     double cr = Math.cos(roll * 0.5);
     double sr = Math.sin(roll * 0.5);
@@ -270,6 +283,7 @@ public class Rotation3d implements Interpolatable<Rotation3d> {
    *
    * @return The counterclockwise rotation angle around the X axis (roll) in radians.
    */
+  @JsonProperty(value = "yaw")
   public double getX() {
     final var w = m_q.getW();
     final var x = m_q.getX();
@@ -285,6 +299,7 @@ public class Rotation3d implements Interpolatable<Rotation3d> {
    *
    * @return The counterclockwise rotation angle around the Y axis (pitch) in radians.
    */
+  @JsonProperty(value = "pitch")
   public double getY() {
     final var w = m_q.getW();
     final var x = m_q.getX();
@@ -305,6 +320,7 @@ public class Rotation3d implements Interpolatable<Rotation3d> {
    *
    * @return The counterclockwise rotation angle around the Z axis (yaw) in radians.
    */
+  @JsonProperty(value = "roll")
   public double getZ() {
     final var w = m_q.getW();
     final var x = m_q.getX();

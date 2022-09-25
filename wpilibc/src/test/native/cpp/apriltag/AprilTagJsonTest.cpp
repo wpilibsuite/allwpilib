@@ -16,6 +16,7 @@ using namespace frc;
 
 TEST(AprilTagJsonTest, DeserializeMatches) {
   auto layout = AprilTagFieldLayout{std::vector{
+      AprilTag{1, Pose3d{}},
       AprilTag{3, Pose3d{0_m, 1_m, 0_m, Rotation3d{0_deg, 0_deg, 0_deg}}}}};
 
   AprilTagFieldLayout deserialized;

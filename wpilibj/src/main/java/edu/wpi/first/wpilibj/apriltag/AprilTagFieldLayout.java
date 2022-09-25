@@ -4,20 +4,29 @@
 
 package edu.wpi.first.wpilibj.apriltag;
 
-import edu.wpi.first.math.WPIMathJNI;
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import java.io.IOException;
+import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.HashMap;
-import java.util.Map;
 
+@JsonIgnoreProperties(ignoreUnknown = true)
+@JsonAutoDetect(getterVisibility = JsonAutoDetect.Visibility.NONE)
 public class AprilTagFieldLayout {
-  private final Map<Integer, Pose3d> m_tags = new HashMap<>();
+  @JsonProperty(value = "tags")
+  private final List<AprilTag> m_tags = new ArrayList<>();
   private boolean m_mirror;
 
   /**
@@ -37,9 +46,7 @@ public class AprilTagFieldLayout {
    * @throws IOException if reading from the file fails.
    */
   public AprilTagFieldLayout(Path path) throws IOException {
-    this(
-        AprilTagUtil.createAprilTagFieldLayoutFromElements(
-            WPIMathJNI.deserializeAprilTagLayout(Files.readString(path))));
+    this(new ObjectMapper().readValue(path.toFile(), AprilTagFieldLayout.class).m_tags);
   }
 
   /**
@@ -47,9 +54,11 @@ public class AprilTagFieldLayout {
    *
    * @param tags map of IDs to poses
    */
-  public AprilTagFieldLayout(Map<Integer, Pose3d> tags) {
-    // To ensure the underlying semantics don't change with what kind of map is passed in
-    m_tags.putAll(tags);
+  @JsonCreator
+  public AprilTagFieldLayout(
+      @JsonProperty(required = true, value = "tags") List<AprilTag> tags) {
+    // To ensure the underlying semantics don't change with what kind of list is passed in
+    m_tags.addAll(tags);
   }
 
   /**
@@ -70,15 +79,48 @@ public class AprilTagFieldLayout {
    * @return The pose corresponding to the id passed in.
    */
   public Pose3d getTag(int id) {
-    Pose3d tag = m_tags.get(id);
+    Pose3d pose = m_tags.stream().filter((it) -> id == it.id).findFirst().get().pose;
     if (m_mirror) {
-      tag =
-          tag.relativeTo(
-              new Pose3d(
-                  new Translation3d(Units.feetToMeters(54.0), Units.feetToMeters(27.0), 0.0),
-                  new Rotation3d(0.0, 0.0, 180.0)));
+      pose = pose.relativeTo(
+            new Pose3d(
+                new Translation3d(Units.feetToMeters(54.0), Units.feetToMeters(27.0), 0.0),
+                new Rotation3d(0.0, 0.0, 180.0)));
     }
 
-    return tag;
+    return pose;
+  }
+
+  /**
+   * Serializes a AprilTagFieldLayout to a JSON file.
+   *
+   * @param path The path to write to
+   * @throws IOException if writing to the file fails
+   */
+  public void serialize(String path) throws IOException {
+    serialize(Path.of(path));
+  }
+
+  /**
+   * Serializes a AprilTagFieldLayout to a JSON file.
+   *
+   * @param path The path to write to
+   * @throws IOException if writing to the file fails
+   */
+  public void serialize(Path path) throws IOException {
+    new ObjectMapper().writeValue(path.toFile(), m_tags);
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if(obj instanceof AprilTagFieldLayout) {
+      var other = (AprilTagFieldLayout) obj;
+      return m_tags.equals(other.m_tags) && m_mirror == other.m_mirror;
+    }
+    return false;
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(m_tags, m_mirror);
   }
 }

@@ -4,6 +4,13 @@
 
 package edu.wpi.first.math.geometry;
 
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
+import java.util.Objects;
+
 import edu.wpi.first.math.MatBuilder;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.Nat;
@@ -11,9 +18,10 @@ import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.Vector;
 import edu.wpi.first.math.interpolation.Interpolatable;
 import edu.wpi.first.math.numbers.N3;
-import java.util.Objects;
 
 /** Represents a 3D pose containing translational and rotational elements. */
+@JsonIgnoreProperties(ignoreUnknown = true)
+@JsonAutoDetect(getterVisibility = JsonAutoDetect.Visibility.NONE)
 public class Pose3d implements Interpolatable<Pose3d> {
   private final Translation3d m_translation;
   private final Rotation3d m_rotation;
@@ -30,7 +38,10 @@ public class Pose3d implements Interpolatable<Pose3d> {
    * @param translation The translational component of the pose.
    * @param rotation The rotational component of the pose.
    */
-  public Pose3d(Translation3d translation, Rotation3d rotation) {
+  @JsonCreator
+  public Pose3d(
+      @JsonProperty(required = true, value = "translation") Translation3d translation,
+      @JsonProperty(required = true, value = "rotation") Rotation3d rotation) {
     m_translation = translation;
     m_rotation = rotation;
   }
@@ -74,6 +85,7 @@ public class Pose3d implements Interpolatable<Pose3d> {
    *
    * @return The translational component of the pose.
    */
+  @JsonProperty
   public Translation3d getTranslation() {
     return m_translation;
   }
@@ -110,6 +122,7 @@ public class Pose3d implements Interpolatable<Pose3d> {
    *
    * @return The rotational component of the pose.
    */
+  @JsonProperty
   public Rotation3d getRotation() {
     return m_rotation;
   }

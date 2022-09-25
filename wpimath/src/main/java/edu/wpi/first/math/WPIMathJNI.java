@@ -4,9 +4,10 @@
 
 package edu.wpi.first.math;
 
-import edu.wpi.first.util.RuntimeLoader;
 import java.io.IOException;
 import java.util.concurrent.atomic.AtomicBoolean;
+
+import edu.wpi.first.util.RuntimeLoader;
 
 public final class WPIMathJNI {
   static boolean libraryLoaded = false;
@@ -137,22 +138,6 @@ public final class WPIMathJNI {
    */
   public static native void rankUpdate(
       double[] mat, int rows, double[] vec, double sigma, boolean lowerTriangular);
-
-  /**
-   * Deserializes an AprilTag layout JSON into a double[] of elements.
-   *
-   * @param json The JSON containing the serialized trajectory.
-   * @return A double array with the Apriltag layout.
-   */
-  public static native double[] deserializeAprilTagLayout(String json);
-
-  /**
-   * Serializes the AprilTag layout into a JSON string.
-   *
-   * @param elements The elements of the layout.
-   * @return A JSON containing the serialized layout.
-   */
-  public static native String serializeAprilTagLayout(double[] elements);
 
   public static class Helper {
     private static AtomicBoolean extractOnStaticLoad = new AtomicBoolean(true);

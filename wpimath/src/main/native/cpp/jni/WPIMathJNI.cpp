@@ -15,7 +15,6 @@
 #include "Eigen/QR"
 #include "drake/math/discrete_algebraic_riccati_equation.h"
 #include "edu_wpi_first_math_WPIMathJNI.h"
-#include "frc/apriltag/AprilTagUtil.h"
 #include "frc/geometry/Pose3d.h"
 #include "frc/trajectory/TrajectoryUtil.h"
 #include "unsupported/Eigen/MatrixFunctions"
@@ -94,48 +93,6 @@ frc::Trajectory CreateTrajectoryFromElements(wpi::span<const double> elements) {
   }
 
   return frc::Trajectory(states);
-}
-
-std::vector<double> GetElementsFromAprilTagLayout(
-    const std::vector<std::pair<int, frc::Pose3d>>& apriltagFieldLayout) {
-  std::vector<double> elements;
-  elements.reserve(apriltagFieldLayout.size() * 8);
-
-  for (auto&& apriltag : apriltagFieldLayout) {
-    elements.push_back(apriltag.first);
-    elements.push_back(apriltag.second.X().value());
-    elements.push_back(apriltag.second.Y().value());
-    elements.push_back(apriltag.second.Z().value());
-    elements.push_back(apriltag.second.Rotation().GetQuaternion().W());
-    elements.push_back(apriltag.second.Rotation().GetQuaternion().X());
-    elements.push_back(apriltag.second.Rotation().GetQuaternion().Y());
-    elements.push_back(apriltag.second.Rotation().GetQuaternion().Z());
-  }
-
-  return elements;
-}
-
-std::vector<std::pair<int, frc::Pose3d>> CreateAprilTagLayoutFromElements(
-    wpi::span<const double> elements) {
-  // Make sure that the elements have the correct length.
-  assert(elements.size() % 8 == 0);
-
-  // Create a vector of AprilTags from the elements.
-  std::vector<std::pair<int, frc::Pose3d>> apriltags;
-  apriltags.reserve(elements.size() / 8);
-
-  for (size_t i = 0; i < elements.size(); i += 8) {
-    apriltags.emplace_back(std::pair<int, frc::Pose3d>{
-        static_cast<int>(elements[i]),
-        frc::Pose3d{units::meter_t{elements[i + 1]},
-                    units::meter_t{elements[i + 2]},
-                    units::meter_t{elements[i + 3]},
-                    frc::Rotation3d{
-                        frc::Quaternion{elements[i + 4], elements[i + 5],
-                                        elements[i + 6], elements[i + 7]}}}});
-  }
-
-  return apriltags;
 }
 
 extern "C" {
@@ -346,57 +303,6 @@ Java_edu_wpi_first_math_WPIMathJNI_serializeTrajectory
     jclass cls = env->FindClass(
         "edu/wpi/first/math/trajectory/TrajectoryUtil$"
         "TrajectorySerializationException");
-    if (cls) {
-      env->ThrowNew(cls, e.what());
-    }
-    return nullptr;
-  }
-}
-
-/*
- * Class:     edu_wpi_first_math_WPIMathJNI
- * Method:    deserializeAprilTagLayout
- * Signature: (Ljava/lang/String;)[D
- */
-JNIEXPORT jdoubleArray JNICALL
-Java_edu_wpi_first_math_WPIMathJNI_deserializeAprilTagLayout
-  (JNIEnv* env, jclass, jstring json)
-{
-  try {
-    auto apriltagFieldLayout = frc::AprilTagUtil::DeserializeAprilTagLayout(
-        JStringRef{env, json}.c_str());
-    std::vector<double> elements =
-        GetElementsFromAprilTagLayout(apriltagFieldLayout);
-    return MakeJDoubleArray(env, elements);
-  } catch (std::exception& e) {
-    jclass cls = env->FindClass(
-        "edu/wpi/first/math/apriltag/AprilTagUtil$"
-        "AprilTagLayoutSerializationException");
-    if (cls) {
-      env->ThrowNew(cls, e.what());
-    }
-    return nullptr;
-  }
-}
-
-/*
- * Class:     edu_wpi_first_math_WPIMathJNI
- * Method:    serializeAprilTagLayout
- * Signature: ([D)Ljava/lang/String;
- */
-JNIEXPORT jstring JNICALL
-Java_edu_wpi_first_math_WPIMathJNI_serializeAprilTagLayout
-  (JNIEnv* env, jclass, jdoubleArray elements)
-{
-  try {
-    auto apriltagFieldLayout =
-        CreateAprilTagLayoutFromElements(JDoubleArrayRef{env, elements});
-    return MakeJString(
-        env, frc::AprilTagUtil::SerializeAprilTagLayout(apriltagFieldLayout));
-  } catch (std::exception& e) {
-    jclass cls = env->FindClass(
-        "edu/wpi/first/math/apriltag/AprilTagUtil$"
-        "AprilTagLayoutSerializationException");
     if (cls) {
       env->ThrowNew(cls, e.what());
     }
