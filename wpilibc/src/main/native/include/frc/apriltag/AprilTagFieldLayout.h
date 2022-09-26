@@ -24,52 +24,53 @@ class WPILIB_DLLEXPORT AprilTagFieldLayout {
 
   /**
    * Construct a new AprilTagFieldLayout with values imported from a JSON file.
-  */
+   */
   explicit AprilTagFieldLayout(std::string_view path);
 
   /**
-  * Construct a new AprilTagFieldLayout from a vector of AprilTag objects. 
-  */
+   * Construct a new AprilTagFieldLayout from a vector of AprilTag objects.
+   */
   explicit AprilTagFieldLayout(const std::vector<AprilTag>& apriltags);
 
   /**
    * Set the alliance that your team is on.
    *
-   * This changes the AprilTagFieldLayout::getTag(int) method to return the correct pose for your alliance.
+   * This changes the AprilTagFieldLayout::getTag(int) method to return the
+   * correct pose for your alliance.
    *
    * @param alliance the alliance to mirror poses for
    */
   void SetAlliance(DriverStation::Alliance alliance);
-  
+
   /**
-  * Gets an AprilTag pose by its id.
-  * 
-  * @param id the id of the tag
-  * @return The pose corresponding to the id that was passed in.
-  */
+   * Gets an AprilTag pose by its id.
+   *
+   * @param id the id of the tag
+   * @return The pose corresponding to the id that was passed in.
+   */
   Pose3d GetTagPose(int id) const;
 
   /**
-  * Serializes an AprilTagFieldLayout to a JSON file.
-  *
-  * @param path The path to write to
-  */
+   * Serializes an AprilTagFieldLayout to a JSON file.
+   *
+   * @param path The path to write to
+   */
   void Serialize(std::string_view path);
 
   /*
-  * Checks equality between this AprilTagFieldLayout and another object.
-  *
-  * @param other The other object.
-  * @return Whether the two objects are equal.
-  */
+   * Checks equality between this AprilTagFieldLayout and another object.
+   *
+   * @param other The other object.
+   * @return Whether the two objects are equal.
+   */
   bool operator==(const AprilTagFieldLayout& other) const;
 
   /**
-  * Checks inequality between this AprilTagFieldLayout and another object.
-  *
-  * @param other The other object.
-  * @return Whether the two objects are not equal.
-  */
+   * Checks inequality between this AprilTagFieldLayout and another object.
+   *
+   * @param other The other object.
+   * @return Whether the two objects are not equal.
+   */
   bool operator!=(const AprilTagFieldLayout& other) const;
 
  private:
