@@ -55,7 +55,7 @@ void AprilTagFieldLayout::SetAlliance(DriverStation::Alliance alliance) {
   m_mirror = alliance == DriverStation::Alliance::kRed;
 }
 
-void AprilTagFieldLayout::ToJson(std::string_view path) {
+void AprilTagFieldLayout::Serialize(std::string_view path) {
   std::error_code error_code;
 
   wpi::raw_fd_ostream output{path, error_code};

@@ -30,7 +30,7 @@ class WPILIB_DLLEXPORT AprilTagFieldLayout {
 
   void SetAlliance(DriverStation::Alliance alliance);
 
-  void ToJson(std::string_view path);
+  void Serialize(std::string_view path);
 
   bool operator==(const AprilTagFieldLayout& other) const;
 
