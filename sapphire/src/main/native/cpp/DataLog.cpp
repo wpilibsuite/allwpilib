@@ -204,7 +204,7 @@ std::string sapphire::GetFormattedEntryValue(EntryData& data, int timestamp, wpi
     return "  invalid";
 }
 
-void EmitEntry(EntryData *data, std::string name, float *timestamp){
+void EmitEntry(EntryData *data, std::string name, float *timestamp, DataLogFlags flags){
   ImGui::PushID(name.c_str());
   ImGui::Text("%s", name.c_str());
   
@@ -226,23 +226,31 @@ void EmitEntry(EntryData *data, std::string name, float *timestamp){
   std::string value = (record.GetEntry() == -1) ? "" : GetFormattedEntryValue(*data, expandedts, record);
   ImGui::Text(value.c_str());
   ImGui::NextColumn();
+  
+  if(flags.ShowTimestamps){
+    ImGui::Text("%fs (%fs ago)", record.GetTimestamp()/1000000.0, (*timestamp)-(record.GetTimestamp()/1000000.0));
+    ImGui::NextColumn();
+  }
   ImGui::Separator();
   ImGui::PopID();
 }
 
-void EmitTree(const std::vector<EntryNode>& tree, float *timestamp) {
+void EmitTree(const std::vector<EntryNode>& tree, float *timestamp, DataLogFlags flags) {
   for(auto &&node : tree){
     if(node.entry){
-      EmitEntry(node.entry, node.name, timestamp);
+      EmitEntry(node.entry, node.name, timestamp, flags);
     }
     if(!node.children.empty()){
       ImGui::PushID(node.name.c_str());
       bool open = ImGui::TreeNodeEx(node.name.c_str(), ImGuiTreeNodeFlags_SpanFullWidth);
       ImGui::NextColumn();
       ImGui::NextColumn();
+      if(flags.ShowTimestamps){
+        ImGui::NextColumn();
+      }
       ImGui::Separator();
       if(open){
-        EmitTree(node.children, timestamp);
+        EmitTree(node.children, timestamp, flags);
         ImGui::TreePop();
       }
       ImGui::PopID();
@@ -258,14 +266,17 @@ void DataLogView::DisplayDataLog(DataLogModel* log){
   ImGui::SameLine();
   ImGui::InputFloat("TsInput", &log->timestamp);
 
-  ImGui::Columns(2, "values");
+  ImGui::Columns(2 + log->flags.ShowTimestamps, "values");
   ImGui::Text("Name");
   ImGui::NextColumn();
   
   ImGui::Text("Value");
   ImGui::NextColumn();
-  
-  EmitTree(log->GetTreeRoot(), &log->timestamp);
+  if(log->flags.ShowTimestamps){
+    ImGui::Text("Last Updated");
+    ImGui::NextColumn();
+  }
+  EmitTree(log->GetTreeRoot(), &log->timestamp, log->flags);
   
   ImGui::Columns();
 }
@@ -274,7 +285,14 @@ void DataLogView::Display() {
   for(auto& log : logs){
     if(log->Exists()){
       ImGui::PushID(log->filename.c_str());
+      
       if(ImGui::CollapsingHeader(log->filename.c_str())){
+        if (ImGui::BeginPopupContextItem(log->filename.c_str())) {
+          if(ImGui::MenuItem("Show Last Update Timestamp", "", log->flags.ShowTimestamps)){
+            log->flags.ShowTimestamps = !log->flags.ShowTimestamps;
+          }
+          ImGui::EndPopup();
+        }
         DisplayDataLog(log.get());
       }
       ImGui::PopID();

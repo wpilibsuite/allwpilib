@@ -53,6 +53,11 @@ struct EntryNode {
   
 };
 
+struct DataLogFlags{
+  DataLogFlags() : ShowTimestamps{false} {};
+  bool ShowTimestamps;
+};
+
 class DataLogModel : private glass::Model {
   public:
     DataLogModel():reader{nullptr}{};
@@ -69,6 +74,7 @@ class DataLogModel : private glass::Model {
     std::vector<EntryNode> m_tree;
     std::string filename = "";
     float timestamp = 0;
+    DataLogFlags flags;
   private:
     std::shared_ptr<wpi::log::DataLogReader> reader ;
     int  m_maxTimestamp;
