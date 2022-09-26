@@ -9,18 +9,16 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.ObjectMapper;
-
-import java.io.IOException;
-import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
+import java.io.IOException;
+import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonAutoDetect(getterVisibility = JsonAutoDetect.Visibility.NONE)
@@ -56,7 +54,8 @@ public class AprilTagFieldLayout {
    * @param apriltags list of {@link AprilTag}
    */
   @JsonCreator
-  public AprilTagFieldLayout(@JsonProperty(required = true, value = "tags") List<AprilTag> apriltags) {
+  public AprilTagFieldLayout(
+      @JsonProperty(required = true, value = "tags") List<AprilTag> apriltags) {
     // To ensure the underlying semantics don't change with what kind of list is passed in
     m_apriltags.addAll(apriltags);
   }
