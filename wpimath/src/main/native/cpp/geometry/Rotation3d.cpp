@@ -239,9 +239,7 @@ Rotation2d Rotation3d::ToRotation2d() const {
 }
 
 void frc::to_json(wpi::json& json, const Rotation3d& rotation) {
-  json = wpi::json{
-    {"quaternion", rotation.GetQuaternion()}
-  };
+  json = wpi::json{{"quaternion", rotation.GetQuaternion()}};
 }
 
 void frc::from_json(const wpi::json& json, Rotation3d& rotation) {

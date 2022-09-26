@@ -5,9 +5,9 @@
 #pragma once
 
 #include <wpi/SymbolExports.h>
+#include <wpi/json.h>
 
 #include "frc/EigenCore.h"
-#include "wpi/json.h"
 
 namespace frc {
 

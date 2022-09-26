@@ -35,7 +35,7 @@ class WPILIB_DLLEXPORT AprilTagFieldLayout {
   void ToJson(std::string_view path);
 
   bool operator==(const AprilTagFieldLayout& other) const;
-  
+
   bool operator!=(const AprilTagFieldLayout& other) const;
 
  private:

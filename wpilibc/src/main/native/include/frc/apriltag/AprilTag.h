@@ -10,7 +10,7 @@
 
 namespace wpi {
 class json;
-}
+}  // namespace wpi
 
 namespace frc {
 struct WPILIB_DLLEXPORT AprilTag {

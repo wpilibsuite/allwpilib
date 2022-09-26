@@ -13,7 +13,6 @@ import edu.wpi.first.math.Vector;
 import edu.wpi.first.math.numbers.N3;
 import java.util.Objects;
 
-
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonAutoDetect(getterVisibility = JsonAutoDetect.Visibility.NONE)
 public class Quaternion {

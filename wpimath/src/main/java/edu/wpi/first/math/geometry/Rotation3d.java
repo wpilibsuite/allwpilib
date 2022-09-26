@@ -49,10 +49,7 @@ public class Rotation3d implements Interpolatable<Rotation3d> {
    * @param pitch The counterclockwise rotation angle around the Y axis (pitch) in radians.
    * @param yaw The counterclockwise rotation angle around the Z axis (yaw) in radians.
    */
-  public Rotation3d(
-      double roll,
-      double pitch,
-      double yaw) {
+  public Rotation3d(double roll, double pitch, double yaw) {
     // https://en.wikipedia.org/wiki/Conversion_between_quaternions_and_Euler_angles#Euler_angles_to_quaternion_conversion
     double cr = Math.cos(roll * 0.5);
     double sr = Math.sin(roll * 0.5);
