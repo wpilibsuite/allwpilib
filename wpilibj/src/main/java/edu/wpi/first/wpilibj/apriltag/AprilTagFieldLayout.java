@@ -83,7 +83,7 @@ public class AprilTagFieldLayout {
           pose.relativeTo(
               new Pose3d(
                   new Translation3d(Units.feetToMeters(54.0), Units.feetToMeters(27.0), 0.0),
-                  new Rotation3d(0.0, 0.0, 180.0)));
+                  new Rotation3d(0.0, 0.0, Units.degreesToRadians(180.0))));
     }
 
     return pose;
