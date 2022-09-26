@@ -34,7 +34,8 @@ public class Rotation3d implements Interpolatable<Rotation3d> {
    *
    * @param q The quaternion.
    */
-  public Rotation3d(Quaternion q) {
+  @JsonCreator
+  public Rotation3d(@JsonProperty(required = true, value = "quaternion") Quaternion q) {
     m_q = q.normalize();
   }
 
@@ -48,11 +49,10 @@ public class Rotation3d implements Interpolatable<Rotation3d> {
    * @param pitch The counterclockwise rotation angle around the Y axis (pitch) in radians.
    * @param yaw The counterclockwise rotation angle around the Z axis (yaw) in radians.
    */
-  @JsonCreator
   public Rotation3d(
-      @JsonProperty(required = true, value = "roll") double roll,
-      @JsonProperty(required = true, value = "pitch") double pitch,
-      @JsonProperty(required = true, value = "yaw") double yaw) {
+      double roll,
+      double pitch,
+      double yaw) {
     // https://en.wikipedia.org/wiki/Conversion_between_quaternions_and_Euler_angles#Euler_angles_to_quaternion_conversion
     double cr = Math.cos(roll * 0.5);
     double sr = Math.sin(roll * 0.5);
@@ -270,6 +270,7 @@ public class Rotation3d implements Interpolatable<Rotation3d> {
    *
    * @return The quaternion representation of the Rotation3d.
    */
+  @JsonProperty(value = "quaternion")
   public Quaternion getQuaternion() {
     return m_q;
   }
@@ -279,7 +280,6 @@ public class Rotation3d implements Interpolatable<Rotation3d> {
    *
    * @return The counterclockwise rotation angle around the X axis (roll) in radians.
    */
-  @JsonProperty(value = "yaw")
   public double getX() {
     final var w = m_q.getW();
     final var x = m_q.getX();
@@ -295,7 +295,6 @@ public class Rotation3d implements Interpolatable<Rotation3d> {
    *
    * @return The counterclockwise rotation angle around the Y axis (pitch) in radians.
    */
-  @JsonProperty(value = "pitch")
   public double getY() {
     final var w = m_q.getW();
     final var x = m_q.getX();
@@ -316,7 +315,6 @@ public class Rotation3d implements Interpolatable<Rotation3d> {
    *
    * @return The counterclockwise rotation angle around the Z axis (yaw) in radians.
    */
-  @JsonProperty(value = "roll")
   public double getZ() {
     final var w = m_q.getW();
     final var x = m_q.getX();
