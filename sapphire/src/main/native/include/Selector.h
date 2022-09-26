@@ -15,10 +15,9 @@ namespace sapphire {
 class Selector: public glass::View {
     public:
         void Display() override;
-        DataLogReference& GetDataLog();
+        std::vector<std::unique_ptr<DataLogModel> >& GetDataLogs();
     private:
-        DataLogReference selectedLogData;
-
+        std::vector<std::unique_ptr<DataLogModel> > logs;
 };
 }  // namespace sapphire
 

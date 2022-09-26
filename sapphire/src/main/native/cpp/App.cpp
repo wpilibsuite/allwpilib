@@ -19,7 +19,6 @@
 #include <wpigui.h>
 
 #include "Selector.h"
-#include "EntryManager.h"
 
 using namespace sapphire;
 
@@ -104,12 +103,12 @@ void Application(std::string_view saveDir) {
   m_windowManager->GlobalInit();
 
   std::unique_ptr<Selector> selector = std::make_unique<Selector>();
-  auto& model = selector->GetDataLog();
+  auto& logs = selector->GetDataLogs();
   m_logSelectorWindow = m_windowManager->AddWindow(
     "Log Selector", std::move(selector));
 
   m_entryManagerWindow = m_windowManager->AddWindow(
-    "Entry Manager", std::make_unique<DataLogView>(model));
+    "Entry Manager", std::make_unique<DataLogView>(logs));
 
 
   gui::AddWindowScaler([](float scale) { gDefaultScale = scale; });

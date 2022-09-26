@@ -20,7 +20,6 @@
 
 using namespace sapphire;
 
-static std::vector<EntryView> entries;
 static float maxTimestamp = 100;
 static bool needsUpdate = false;
 
@@ -49,11 +48,12 @@ bool DataLogModel::LoadWPILog(std::string filename) {
   if (ec) {
     return false;
   }
-  
+
   reader = std::make_shared<wpi::log::DataLogReader>(std::move(buf));
   if (!reader->IsValid()) {
     return false;
   }
+  m_tree.clear();
   this->m_entries.clear();
   for (const auto& record : *reader) {
     int entryId;
@@ -93,6 +93,7 @@ bool DataLogModel::LoadWPILog(std::string filename) {
     }
   }
   
+  this->filename = filename;
   m_hasLog = true;
 
   return true;
@@ -204,13 +205,14 @@ std::string sapphire::GetFormattedEntryValue(EntryData& data, int timestamp, wpi
 }
 
 void EmitEntry(EntryData *data, std::string name, float *timestamp){
+  ImGui::PushID(name.c_str());
   ImGui::Text("%s", name.c_str());
   
   int expandedts = static_cast<int>((*timestamp)*1000000);
   auto record = data->GetRecordAt(expandedts);
 
   if (ImGui::BeginPopupContextItem(name.c_str())) {
-    if(ImGui::MenuItem("Next Event") && record.GetEntry() != -1){
+    if(ImGui::MenuItem("Next Event")){
       auto temp = data->GetNextRecord(record.GetTimestamp());
       if(temp.GetEntry() != -1){
         *timestamp = temp.GetTimestamp()/1000000.0;
@@ -225,6 +227,7 @@ void EmitEntry(EntryData *data, std::string name, float *timestamp){
   ImGui::Text(value.c_str());
   ImGui::NextColumn();
   ImGui::Separator();
+  ImGui::PopID();
 }
 
 void EmitTree(const std::vector<EntryNode>& tree, float *timestamp) {
@@ -233,6 +236,7 @@ void EmitTree(const std::vector<EntryNode>& tree, float *timestamp) {
       EmitEntry(node.entry, node.name, timestamp);
     }
     if(!node.children.empty()){
+      ImGui::PushID(node.name.c_str());
       bool open = ImGui::TreeNodeEx(node.name.c_str(), ImGuiTreeNodeFlags_SpanFullWidth);
       ImGui::NextColumn();
       ImGui::NextColumn();
@@ -241,53 +245,42 @@ void EmitTree(const std::vector<EntryNode>& tree, float *timestamp) {
         EmitTree(node.children, timestamp);
         ImGui::TreePop();
       }
+      ImGui::PopID();
+    }
+  }
+}
+
+void DataLogView::DisplayDataLog(DataLogModel* log){
+  
+  ImGui::Text("Manage Entry Time:");
+  ImGui::SameLine();
+  ImGui::SliderFloat("TsSlider", &log->timestamp ,0, log->GetMaxTimestamp()/1000000.0);
+  ImGui::SameLine();
+  ImGui::InputFloat("TsInput", &log->timestamp);
+
+  ImGui::Columns(2, "values");
+  ImGui::Text("Name");
+  ImGui::NextColumn();
+  
+  ImGui::Text("Value");
+  ImGui::NextColumn();
+  
+  EmitTree(log->GetTreeRoot(), &log->timestamp);
+  
+  ImGui::Columns();
+}
+
+void DataLogView::Display() {
+  for(auto& log : logs){
+    if(log->Exists()){
+      ImGui::PushID(log->filename.c_str());
+      if(ImGui::CollapsingHeader(log->filename.c_str())){
+        DisplayDataLog(log.get());
+      }
+      ImGui::PopID();
     }
   }
 }
 
 
-void DataLogView::Display() {
-    
-    ImGui::Text("Manage Entry Time:");
-    ImGui::SameLine();
-    ImGui::SliderFloat("TsSlider", &timestamp ,0, maxTimestamp);
-    ImGui::SameLine();
-    ImGui::InputFloat("TsInput", &timestamp);
-    bool update = ImGui::Button("Update");
-    if(update){
-        fmt::print("update!!");
-    }
 
-    if(ImGui::CollapsingHeader("Values")){
-        for(auto& entry : entries){
-            entry.Display(true, timestamp);
-        }
-    }
-    if (ImGui::CollapsingHeader("Tree")) {
-      ImGui::Columns(2, "values");
-      ImGui::Text("Name");
-      ImGui::NextColumn();
-      ImGui::Text("Value");
-      ImGui::NextColumn();
-      EmitTree(logData.model.GetTreeRoot(), &timestamp);
-    }
-
-    if(logData.needsUpdate){
-        Refresh();
-        logData.needsUpdate = false;
-    }
-}
-
-void DataLogView::Refresh(){
-    entries.clear();
-
-    if(!logData.model.Exists()){
-        return;
-    }
-    
-    maxTimestamp = logData.model.GetMaxTimestamp() / 1000000.0;
-    for(auto& entry : logData.model.m_entries){
-       EntryView view{entry.second.get()};
-       entries.emplace_back(view);
-    }
-}

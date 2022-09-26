@@ -16,7 +16,6 @@
 #include "DataLog.h"
 #include "wpi/fmt/raw_ostream.h"
 #include "fmt/format.h"
-#include "EntryManager.h"
 using namespace sapphire;
 
 void Selector::Display() {
@@ -50,8 +49,8 @@ void Selector::Display() {
     auto result = logFileSelector->result();
     if(!result.empty()) {
       logFile = result[0];
-      bool success = selectedLogData.model.LoadWPILog(result[0]);
-      selectedLogData.needsUpdate = success;
+      auto& log = logs.emplace_back(std::move(std::make_unique<DataLogModel>()));
+      bool success = log->LoadWPILog(result[0]);
       if(success) {
         logFileMessage = "Success";
       } else {
@@ -71,6 +70,6 @@ void Selector::Display() {
 
 }
 
-DataLogReference& Selector::GetDataLog() {
-  return selectedLogData;
+std::vector<std::unique_ptr<DataLogModel> >& Selector::GetDataLogs() {
+  return logs;
 }

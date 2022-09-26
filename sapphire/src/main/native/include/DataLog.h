@@ -16,10 +16,8 @@
 #include "wpi/DenseMap.h"
 #include "glass/Model.h"
 #include "glass/View.h"
-#include "EntryManager.h"
 namespace sapphire{
 
-std::string GetFormattedEntryValue(EntryData& data, int timestamp, wpi::log::DataLogRecord record);
 
 struct EntryData {
   EntryData() {}
@@ -39,9 +37,10 @@ struct EntryData {
   int finishTimestamp = INT_MAX;
 };
 
+std::string GetFormattedEntryValue(EntryData& data, int timestamp, wpi::log::DataLogRecord record);
+
 struct EntryNode {
   explicit EntryNode(std::string_view name): name{name} {}
-
   std::shared_ptr<EntryData> GetEntry(std::vector<std::string> path);
 
   void AddEntry(EntryData *entry,std::vector<std::string> path);
@@ -68,7 +67,8 @@ class DataLogModel : private glass::Model {
 
     wpi::DenseMap<int, std::unique_ptr<EntryData> > m_entries;
     std::vector<EntryNode> m_tree;
-
+    std::string filename = "";
+    float timestamp = 0;
   private:
     std::shared_ptr<wpi::log::DataLogReader> reader ;
     int  m_maxTimestamp;
@@ -76,20 +76,13 @@ class DataLogModel : private glass::Model {
 };
 
 
-struct DataLogReference {
-    bool needsUpdate = false;
-    DataLogModel model;
-};
-
 class DataLogView: public glass::View {
   public:
-    DataLogView(DataLogReference& logData) : logData{logData} {}
+    DataLogView(std::vector<std::unique_ptr<DataLogModel> >& logs) : logs{logs} {}
+    void DisplayDataLog(DataLogModel*);
     void Display() override;
     std::string name;
-    DataLogReference& logData;
-    void Refresh();
-  private:
-    float timestamp = 0;
+    std::vector<std::unique_ptr<DataLogModel> >& logs;
 };
 
 
