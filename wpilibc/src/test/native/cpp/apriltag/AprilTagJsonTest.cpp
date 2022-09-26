@@ -3,7 +3,6 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #include <iostream>
-#include <utility>
 #include <vector>
 
 #include <wpi/json.h>

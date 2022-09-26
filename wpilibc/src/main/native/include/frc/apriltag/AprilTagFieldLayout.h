@@ -36,13 +36,13 @@ class WPILIB_DLLEXPORT AprilTagFieldLayout {
 
   bool operator!=(const AprilTagFieldLayout& other) const;
 
-  friend void to_json(wpi::json& json, const AprilTagFieldLayout& layout);
-
-  friend void from_json(const wpi::json& json, AprilTagFieldLayout& layout);
-
  private:
   std::vector<AprilTag> m_apriltags;
   bool m_mirror = false;
+
+  friend WPILIB_DLLEXPORT void to_json(wpi::json& json, const AprilTagFieldLayout& layout);
+
+  friend WPILIB_DLLEXPORT void from_json(const wpi::json& json, AprilTagFieldLayout& layout);
 };
 
 WPILIB_DLLEXPORT

@@ -5,18 +5,13 @@
 #include "frc/apriltag/AprilTagFieldLayout.h"
 
 #include <algorithm>
-#include <string_view>
 #include <system_error>
-#include <vector>
 
 #include <units/angle.h>
 #include <units/length.h>
 #include <wpi/json.h>
 #include <wpi/raw_istream.h>
 #include <wpi/raw_ostream.h>
-
-#include "frc/DriverStation.h"
-#include "frc/geometry/Pose3d.h"
 
 using namespace frc;
 
@@ -31,7 +26,7 @@ AprilTagFieldLayout::AprilTagFieldLayout(std::string_view path) {
   wpi::json json;
   input >> json;
 
-  this->m_apriltags = json.get<std::vector<AprilTag>>();
+  m_apriltags = json.get<std::vector<AprilTag>>();
 }
 
 AprilTagFieldLayout::AprilTagFieldLayout(const std::vector<AprilTag>& apriltags)

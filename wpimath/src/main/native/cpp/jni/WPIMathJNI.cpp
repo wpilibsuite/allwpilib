@@ -5,7 +5,6 @@
 #include <jni.h>
 
 #include <exception>
-#include <utility>
 
 #include <wpi/jni_util.h>
 
