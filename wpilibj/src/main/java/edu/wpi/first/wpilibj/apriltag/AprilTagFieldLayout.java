@@ -51,7 +51,7 @@ public class AprilTagFieldLayout {
   }
 
   /**
-   * Construct a new AprilTagFieldLayout from a list of {@link AprilTag} objects to poses.
+   * Construct a new AprilTagFieldLayout from a list of {@link AprilTag} objects.
    *
    * @param apriltags list of {@link AprilTag}
    */

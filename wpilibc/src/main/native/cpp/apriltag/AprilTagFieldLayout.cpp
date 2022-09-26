@@ -29,6 +29,10 @@ AprilTagFieldLayout::AprilTagFieldLayout(std::string_view path) {
   m_apriltags = json.get<std::vector<AprilTag>>();
 }
 
+void AprilTagFieldLayout::SetAlliance(DriverStation::Alliance alliance) {
+  m_mirror = alliance == DriverStation::Alliance::kRed;
+}
+
 AprilTagFieldLayout::AprilTagFieldLayout(const std::vector<AprilTag>& apriltags)
     : m_apriltags(std::move(apriltags)) {}
 
@@ -44,10 +48,6 @@ frc::Pose3d AprilTagFieldLayout::GetTagPose(int id) const {
         Pose3d{54_ft, 27_ft, 0_ft, Rotation3d{0_deg, 0_deg, 180_deg}});
   }
   return returnPose;
-}
-
-void AprilTagFieldLayout::SetAlliance(DriverStation::Alliance alliance) {
-  m_mirror = alliance == DriverStation::Alliance::kRed;
 }
 
 void AprilTagFieldLayout::Serialize(std::string_view path) {
