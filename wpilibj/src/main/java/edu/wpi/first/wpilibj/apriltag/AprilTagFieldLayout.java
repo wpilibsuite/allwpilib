@@ -9,22 +9,24 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import edu.wpi.first.math.geometry.Pose3d;
-import edu.wpi.first.math.geometry.Rotation3d;
-import edu.wpi.first.math.geometry.Translation3d;
-import edu.wpi.first.math.util.Units;
-import edu.wpi.first.wpilibj.DriverStation;
+
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Translation3d;
+import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.DriverStation;
+
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonAutoDetect(getterVisibility = JsonAutoDetect.Visibility.NONE)
 public class AprilTagFieldLayout {
   @JsonProperty(value = "tags")
-  private final List<AprilTag> m_tags = new ArrayList<>();
+  private final List<AprilTag> m_apriltags = new ArrayList<>();
 
   private boolean m_mirror;
 
@@ -45,18 +47,18 @@ public class AprilTagFieldLayout {
    * @throws IOException if reading from the file fails.
    */
   public AprilTagFieldLayout(Path path) throws IOException {
-    this(new ObjectMapper().readValue(path.toFile(), AprilTagFieldLayout.class).m_tags);
+    this(new ObjectMapper().readValue(path.toFile(), AprilTagFieldLayout.class).m_apriltags);
   }
 
   /**
-   * Construct a new AprilTagFieldLayout from a map of AprilTag IDs to poses.
+   * Construct a new AprilTagFieldLayout from a list of {@link AprilTag} objects to poses.
    *
-   * @param tags map of IDs to poses
+   * @param apriltags list of {@link AprilTag}
    */
   @JsonCreator
-  public AprilTagFieldLayout(@JsonProperty(required = true, value = "tags") List<AprilTag> tags) {
+  public AprilTagFieldLayout(@JsonProperty(required = true, value = "tags") List<AprilTag> apriltags) {
     // To ensure the underlying semantics don't change with what kind of list is passed in
-    m_tags.addAll(tags);
+    m_apriltags.addAll(apriltags);
   }
 
   /**
@@ -77,7 +79,7 @@ public class AprilTagFieldLayout {
    * @return The pose corresponding to the id passed in.
    */
   public Pose3d getTag(int id) {
-    Pose3d pose = m_tags.stream().filter(it -> id == it.m_id).findFirst().get().m_pose;
+    Pose3d pose = m_apriltags.stream().filter(it -> id == it.m_id).findFirst().get().m_pose;
     if (m_mirror) {
       pose =
           pose.relativeTo(
@@ -106,20 +108,20 @@ public class AprilTagFieldLayout {
    * @throws IOException if writing to the file fails
    */
   public void serialize(Path path) throws IOException {
-    new ObjectMapper().writeValue(path.toFile(), m_tags);
+    new ObjectMapper().writeValue(path.toFile(), m_apriltags);
   }
 
   @Override
   public boolean equals(Object obj) {
     if (obj instanceof AprilTagFieldLayout) {
       var other = (AprilTagFieldLayout) obj;
-      return m_tags.equals(other.m_tags) && m_mirror == other.m_mirror;
+      return m_apriltags.equals(other.m_apriltags) && m_mirror == other.m_mirror;
     }
     return false;
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(m_tags, m_mirror);
+    return Objects.hash(m_apriltags, m_mirror);
   }
 }
