@@ -29,12 +29,12 @@ AprilTagFieldLayout::AprilTagFieldLayout(std::string_view path) {
   m_apriltags = json.get<std::vector<AprilTag>>();
 }
 
+AprilTagFieldLayout::AprilTagFieldLayout(std::vector<AprilTag>& apriltags)
+    : m_apriltags(apriltags) {}
+
 void AprilTagFieldLayout::SetAlliance(DriverStation::Alliance alliance) {
   m_mirror = alliance == DriverStation::Alliance::kRed;
 }
-
-AprilTagFieldLayout::AprilTagFieldLayout(const std::vector<AprilTag>& apriltags)
-    : m_apriltags(std::move(apriltags)) {}
 
 frc::Pose3d AprilTagFieldLayout::GetTagPose(int id) const {
   Pose3d returnPose;

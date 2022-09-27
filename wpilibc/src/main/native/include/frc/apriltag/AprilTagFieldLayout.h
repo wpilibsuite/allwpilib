@@ -30,7 +30,7 @@ class WPILIB_DLLEXPORT AprilTagFieldLayout {
   /**
    * Construct a new AprilTagFieldLayout from a vector of AprilTag objects.
    */
-  explicit AprilTagFieldLayout(const std::vector<AprilTag>& apriltags);
+  explicit AprilTagFieldLayout(std::vector<AprilTag>& apriltags);
 
   /**
    * Set the alliance that your team is on.
