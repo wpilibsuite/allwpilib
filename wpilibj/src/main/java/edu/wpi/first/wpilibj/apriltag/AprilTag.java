@@ -10,12 +10,14 @@ import edu.wpi.first.math.geometry.Pose3d;
 import java.util.Objects;
 
 public class AprilTag {
+  @SuppressWarnings("MemberName")
   @JsonProperty(value = "ID")
   public int m_ID;
 
   @JsonProperty(value = "pose")
   public Pose3d m_pose;
 
+  @SuppressWarnings("ParameterName")
   @JsonCreator
   public AprilTag(
       @JsonProperty(required = true, value = "ID") int ID,
