@@ -28,9 +28,9 @@ import java.util.Objects;
  *
  * <p>Pose3ds are assumed to be measured from the bottom-left corner of the field, when the blue
  * alliance is at the left. Pose3ds will automatically be returned as passed in when calling {@link
- * AprilTagFieldLayout#getTag(int)}. Setting an alliance color via {@link
+ * AprilTagFieldLayout#getTagPose(int)}. Setting an alliance color via {@link
  * AprilTagFieldLayout#setAlliance(DriverStation.Alliance)} will mirror the poses returned from
- * {@link AprilTagFieldLayout#getTag(int)} to be correct relative to the other alliance.
+ * {@link AprilTagFieldLayout#getTagPose(int)} to be correct relative to the other alliance.
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonAutoDetect(getterVisibility = JsonAutoDetect.Visibility.NONE)
@@ -75,7 +75,8 @@ public class AprilTagFieldLayout {
   /**
    * Set the alliance that your team is on.
    *
-   * <p>This changes the {@link #getTag(int)} method to return the correct pose for your alliance.
+   * <p>This changes the {@link #getTagPose(int)} method to return the correct pose for your
+   * alliance.
    *
    * @param alliance The alliance to mirror poses for.
    */
@@ -89,7 +90,7 @@ public class AprilTagFieldLayout {
    * @param ID The ID of the tag.
    * @return The pose corresponding to the ID passed in.
    */
-  public Pose3d getTag(int ID) {
+  public Pose3d getTagPose(int ID) {
     Pose3d pose = m_apriltags.stream().filter(it -> ID == it.m_ID).findFirst().get().m_pose;
     if (m_mirror) {
       pose =

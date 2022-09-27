@@ -29,7 +29,7 @@ namespace frc {
  * Pose3ds are assumed to be measured from the bottom-left corner of the field,
  * when the blue alliance is at the left. Pose3ds will automatically be returned
  * as passed in when calling GetTagPose(int).  Setting an alliance color via
- * SetAllianceColor(DriverStation::Alliance) will mirror the poses returned from
+ * SetAlliance(DriverStation::Alliance) will mirror the poses returned from
  * GetTagPose(int) to be correct relative to the other alliance.
  */
 class WPILIB_DLLEXPORT AprilTagFieldLayout {
@@ -38,11 +38,15 @@ class WPILIB_DLLEXPORT AprilTagFieldLayout {
 
   /**
    * Construct a new AprilTagFieldLayout with values imported from a JSON file.
+   *
+   * @param path Path of the JSON file to import from.
    */
   explicit AprilTagFieldLayout(std::string_view path);
 
   /**
    * Construct a new AprilTagFieldLayout from a vector of AprilTag objects.
+   *
+   * @param apriltags Vector of AprilTags.
    */
   explicit AprilTagFieldLayout(std::vector<AprilTag>& apriltags);
 
