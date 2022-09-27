@@ -11,8 +11,8 @@
 #include "units/length.h"
 
 namespace wpi {
-  class json;
-} // namespace wpi
+class json;
+}  // namespace wpi
 
 namespace frc {
 

@@ -10,7 +10,7 @@
 
 namespace wpi {
 class json;
-} // namespace wpi
+}  // namespace wpi
 
 namespace frc {
 

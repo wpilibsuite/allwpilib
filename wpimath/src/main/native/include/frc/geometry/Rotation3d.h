@@ -11,8 +11,8 @@
 #include "frc/EigenCore.h"
 
 namespace wpi {
-  class json;
-} // namespace wpi
+class json;
+}  // namespace wpi
 
 namespace frc {
 
