@@ -22,6 +22,7 @@ using namespace sapphire;
 
 static float maxTimestamp = 100;
 static bool needsUpdate = false;
+static float timestamp = 0;
 
 wpi::log::DataLogRecord EntryData::GetRecordAt(int timestamp){
   wpi::log::DataLogRecord record;
@@ -204,18 +205,18 @@ std::string sapphire::GetFormattedEntryValue(EntryData& data, int timestamp, wpi
     return "  invalid";
 }
 
-void EmitEntry(EntryData *data, std::string name, float *timestamp, DataLogFlags flags){
+void EmitEntry(EntryData *data, std::string name, float *offset, DataLogFlags flags){
   ImGui::PushID(name.c_str());
   ImGui::Text("%s", name.c_str());
   
-  int expandedts = static_cast<int>((*timestamp)*1000000);
+  int expandedts = static_cast<int>((timestamp+*offset)*1000000);
   auto record = data->GetRecordAt(expandedts);
 
   if (ImGui::BeginPopupContextItem(name.c_str())) {
     if(ImGui::MenuItem("Next Event")){
       auto temp = data->GetNextRecord(record.GetTimestamp());
       if(temp.GetEntry() != -1){
-        *timestamp = temp.GetTimestamp()/1000000.0;
+        *offset = temp.GetTimestamp()/1000000.0;
         record = temp;
       }
     }
@@ -228,7 +229,7 @@ void EmitEntry(EntryData *data, std::string name, float *timestamp, DataLogFlags
   ImGui::NextColumn();
   
   if(flags.ShowTimestamps){
-    ImGui::Text("%fs (%fs ago)", record.GetTimestamp()/1000000.0, (*timestamp)-(record.GetTimestamp()/1000000.0));
+    ImGui::Text("%fs (%fs ago)", record.GetTimestamp()/1000000.0, (timestamp+*offset)-(record.GetTimestamp()/1000000.0));
     ImGui::NextColumn();
   }
   ImGui::Separator();
@@ -259,12 +260,11 @@ void EmitTree(const std::vector<EntryNode>& tree, float *timestamp, DataLogFlags
 }
 
 void DataLogView::DisplayDataLog(DataLogModel* log){
-  
-  ImGui::Text("Manage Entry Time:");
+  ImGui::Text("Manage Entry Offset:");
   ImGui::SameLine();
-  ImGui::SliderFloat("TsSlider", &log->timestamp ,0, log->GetMaxTimestamp()/1000000.0);
+  ImGui::SliderFloat("TsSlider", &log->offset ,0, log->GetMaxTimestamp()/1000000.0);
   ImGui::SameLine();
-  ImGui::InputFloat("TsInput", &log->timestamp);
+  ImGui::InputFloat("TsInput", &log->offset);
 
   ImGui::Columns(2 + log->flags.ShowTimestamps, "values");
   ImGui::Text("Name");
@@ -276,12 +276,27 @@ void DataLogView::DisplayDataLog(DataLogModel* log){
     ImGui::Text("Last Updated");
     ImGui::NextColumn();
   }
-  EmitTree(log->GetTreeRoot(), &log->timestamp, log->flags);
+  EmitTree(log->GetTreeRoot(), &log->offset, log->flags);
   
   ImGui::Columns();
 }
 
+int DataLogView::GetMaxTimestamp(){
+  int max = 0;
+  for(auto &log : logs){
+    if(log->GetMaxTimestamp() > max){
+      max = log->GetMaxTimestamp();
+    }
+  }
+  return max;
+}
+
 void DataLogView::Display() {
+  ImGui::Text("Manage Overall Time:");
+  ImGui::SameLine();
+  ImGui::SliderFloat("TsSlider", &timestamp ,0, GetMaxTimestamp()/1000000.0);
+  ImGui::SameLine();
+  ImGui::InputFloat("TsInput", &timestamp);
   for(auto& log : logs){
     if(log->Exists()){
       ImGui::PushID(log->filename.c_str());

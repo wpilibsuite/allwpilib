@@ -73,7 +73,7 @@ class DataLogModel : private glass::Model {
     wpi::DenseMap<int, std::unique_ptr<EntryData> > m_entries;
     std::vector<EntryNode> m_tree;
     std::string filename = "";
-    float timestamp = 0;
+    float offset = 0;
     DataLogFlags flags;
   private:
     std::shared_ptr<wpi::log::DataLogReader> reader ;
@@ -87,6 +87,7 @@ class DataLogView: public glass::View {
     DataLogView(std::vector<std::unique_ptr<DataLogModel> >& logs) : logs{logs} {}
     void DisplayDataLog(DataLogModel*);
     void Display() override;
+    int GetMaxTimestamp();
     std::string name;
     std::vector<std::unique_ptr<DataLogModel> >& logs;
 };
