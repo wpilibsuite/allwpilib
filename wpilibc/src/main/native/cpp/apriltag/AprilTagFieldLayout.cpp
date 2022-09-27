@@ -29,8 +29,8 @@ AprilTagFieldLayout::AprilTagFieldLayout(std::string_view path) {
   m_apriltags = json.get<std::vector<AprilTag>>();
 }
 
-AprilTagFieldLayout::AprilTagFieldLayout(std::vector<AprilTag>& apriltags)
-    : m_apriltags(apriltags) {}
+AprilTagFieldLayout::AprilTagFieldLayout(std::vector<AprilTag> apriltags)
+    : m_apriltags(std::move(apriltags)) {}
 
 void AprilTagFieldLayout::SetAlliance(DriverStation::Alliance alliance) {
   m_mirror = alliance == DriverStation::Alliance::kRed;
