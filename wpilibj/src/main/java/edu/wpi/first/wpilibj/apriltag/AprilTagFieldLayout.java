@@ -31,8 +31,8 @@ public class AprilTagFieldLayout {
   /**
    * Construct a new AprilTagFieldLayout with values imported from a JSON file.
    *
-   * @param path path of the JSON file to import from
-   * @throws IOException if reading from the file fails.
+   * @param path Path of the JSON file to import from.
+   * @throws IOException If reading from the file fails.
    */
   public AprilTagFieldLayout(String path) throws IOException {
     this(Path.of(path));
@@ -41,8 +41,8 @@ public class AprilTagFieldLayout {
   /**
    * Construct a new AprilTagFieldLayout with values imported from a JSON file.
    *
-   * @param path path of the JSON file to import from
-   * @throws IOException if reading from the file fails.
+   * @param path Path of the JSON file to import from.
+   * @throws IOException If reading from the file fails.
    */
   public AprilTagFieldLayout(Path path) throws IOException {
     this(new ObjectMapper().readValue(path.toFile(), AprilTagFieldLayout.class).m_apriltags);
@@ -51,7 +51,7 @@ public class AprilTagFieldLayout {
   /**
    * Construct a new AprilTagFieldLayout from a list of {@link AprilTag} objects.
    *
-   * @param apriltags list of {@link AprilTag}
+   * @param apriltags List of {@link AprilTag}.
    */
   @JsonCreator
   public AprilTagFieldLayout(
@@ -65,7 +65,7 @@ public class AprilTagFieldLayout {
    *
    * <p>This changes the {@link #getTag(int)} method to return the correct pose for your alliance.
    *
-   * @param alliance the alliance to mirror poses for
+   * @param alliance The alliance to mirror poses for.
    */
   public void setAlliance(DriverStation.Alliance alliance) {
     m_mirror = alliance == DriverStation.Alliance.Red;
@@ -74,7 +74,7 @@ public class AprilTagFieldLayout {
   /**
    * Gets an AprilTag pose by its id.
    *
-   * @param id The id of the tag
+   * @param id The id of the tag.
    * @return The pose corresponding to the id passed in.
    */
   public Pose3d getTag(int id) {
@@ -93,8 +93,8 @@ public class AprilTagFieldLayout {
   /**
    * Serializes a AprilTagFieldLayout to a JSON file.
    *
-   * @param path The path to write to
-   * @throws IOException if writing to the file fails
+   * @param path The path to write to.
+   * @throws IOException If writing to the file fails.
    */
   public void serialize(String path) throws IOException {
     serialize(Path.of(path));
@@ -103,8 +103,8 @@ public class AprilTagFieldLayout {
   /**
    * Serializes a AprilTagFieldLayout to a JSON file.
    *
-   * @param path The path to write to
-   * @throws IOException if writing to the file fails
+   * @param path The path to write to.
+   * @throws IOException If writing to the file fails.
    */
   public void serialize(Path path) throws IOException {
     new ObjectMapper().writeValue(path.toFile(), m_apriltags);
