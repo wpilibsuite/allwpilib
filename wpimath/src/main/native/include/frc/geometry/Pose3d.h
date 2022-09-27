@@ -11,6 +11,10 @@
 #include "Translation3d.h"
 #include "Twist3d.h"
 
+namespace wpi {
+class json;
+} // namespace wpi
+
 namespace frc {
 
 /**

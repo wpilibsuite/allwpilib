@@ -13,7 +13,6 @@
 #include "Eigen/LU"
 #include "Eigen/QR"
 #include "frc/fmt/Eigen.h"
-#include "units/angle.h"
 #include "units/math.h"
 #include "wpimath/MathShared.h"
 

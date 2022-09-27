@@ -10,6 +10,10 @@
 #include "Translation2d.h"
 #include "units/length.h"
 
+namespace wpi {
+  class json;
+} // namespace wpi
+
 namespace frc {
 
 /**
