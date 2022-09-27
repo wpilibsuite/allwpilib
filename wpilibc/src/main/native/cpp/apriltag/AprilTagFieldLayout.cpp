@@ -29,7 +29,7 @@ AprilTagFieldLayout::AprilTagFieldLayout(std::string_view path) {
   m_apriltags = json.get<std::vector<AprilTag>>();
 }
 
-AprilTagFieldLayout::AprilTagFieldLayout(std::vector<AprilTag>& apriltags)
+AprilTagFieldLayout::AprilTagFieldLayout(const std::vector<AprilTag>& apriltags)
     : m_apriltags(apriltags) {}
 
 void AprilTagFieldLayout::SetAlliance(DriverStation::Alliance alliance) {
