@@ -36,10 +36,10 @@ void AprilTagFieldLayout::SetAlliance(DriverStation::Alliance alliance) {
   m_mirror = alliance == DriverStation::Alliance::kRed;
 }
 
-frc::Pose3d AprilTagFieldLayout::GetTagPose(int id) const {
+frc::Pose3d AprilTagFieldLayout::GetTagPose(int ID) const {
   Pose3d returnPose;
   auto it = std::find_if(m_apriltags.begin(), m_apriltags.end(),
-                         [=](const auto& tag) { return tag.id == id; });
+                         [=](const auto& tag) { return tag.ID == ID; });
   if (it != m_apriltags.end()) {
     returnPose = it->pose;
   }
