@@ -38,14 +38,14 @@ class WPILIB_DLLEXPORT AprilTagFieldLayout {
    * This changes the AprilTagFieldLayout::getTag(int) method to return the
    * correct pose for your alliance.
    *
-   * @param alliance the alliance to mirror poses for
+   * @param alliance The alliance to mirror poses for.
    */
   void SetAlliance(DriverStation::Alliance alliance);
 
   /**
-   * Gets an AprilTag pose by its id.
+   * Gets an AprilTag pose by its ID.
    *
-   * @param id the id of the tag
+   * @param id The id of the tag.
    * @return The pose corresponding to the id that was passed in.
    */
   Pose3d GetTagPose(int id) const;
@@ -53,7 +53,7 @@ class WPILIB_DLLEXPORT AprilTagFieldLayout {
   /**
    * Serializes an AprilTagFieldLayout to a JSON file.
    *
-   * @param path The path to write to
+   * @param path The path to write to.
    */
   void Serialize(std::string_view path);
 
