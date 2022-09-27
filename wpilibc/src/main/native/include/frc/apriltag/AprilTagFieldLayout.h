@@ -18,6 +18,20 @@ class json;
 }  // namespace wpi
 
 namespace frc {
+/**
+ * Class for representing a layout of AprilTags on a field and reading them from
+ * a JSON format.
+ *
+ * The JSON format contains a top-level "tags" field, which is a list of all
+ * AprilTags contained within a layout. Each AprilTag serializes to a JSON
+ * object containing an ID and a Pose3d.
+ *
+ * Pose3ds are assumed to be measured from the bottom-left corner of the field,
+ * when the blue alliance is at the left. Pose3ds will automatically be returned
+ * as passed in when calling GetTagPose(int).  Setting an alliance color via
+ * SetAllianceColor(DriverStation::Alliance) will mirror the poses returned from
+ * GetTagPose(int) to be correct relative to the other alliance.
+ */
 class WPILIB_DLLEXPORT AprilTagFieldLayout {
  public:
   AprilTagFieldLayout() = default;
@@ -35,8 +49,8 @@ class WPILIB_DLLEXPORT AprilTagFieldLayout {
   /**
    * Set the alliance that your team is on.
    *
-   * This changes the AprilTagFieldLayout::getTag(int) method to return the
-   * correct pose for your alliance.
+   * This changes the GetTagPose(int) method to return the correct pose for your
+   * alliance.
    *
    * @param alliance The alliance to mirror poses for.
    */
@@ -45,15 +59,15 @@ class WPILIB_DLLEXPORT AprilTagFieldLayout {
   /**
    * Gets an AprilTag pose by its ID.
    *
-   * @param id The id of the tag.
+   * @param ID The ID of the tag.
    * @return The pose corresponding to the id that was passed in.
    */
-  Pose3d GetTagPose(int id) const;
+  Pose3d GetTagPose(int ID) const;
 
   /**
    * Serializes an AprilTagFieldLayout to a JSON file.
    *
-   * @param path The path to write to.
+   * @param path The path to write the JSON file to.
    */
   void Serialize(std::string_view path);
 

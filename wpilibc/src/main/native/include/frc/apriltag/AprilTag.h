@@ -10,7 +10,7 @@
 
 namespace frc {
 struct WPILIB_DLLEXPORT AprilTag {
-  int id;
+  int ID;
 
   Pose3d pose;
 

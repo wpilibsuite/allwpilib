@@ -9,7 +9,7 @@
 using namespace frc;
 
 bool AprilTag::operator==(const AprilTag& other) const {
-  return id == other.id && pose == other.pose;
+  return ID == other.ID && pose == other.pose;
 }
 
 bool AprilTag::operator!=(const AprilTag& other) const {
@@ -17,10 +17,10 @@ bool AprilTag::operator!=(const AprilTag& other) const {
 }
 
 void frc::to_json(wpi::json& json, const AprilTag& apriltag) {
-  json = wpi::json{{"id", apriltag.id}, {"pose", apriltag.pose}};
+  json = wpi::json{{"ID", apriltag.ID}, {"pose", apriltag.pose}};
 }
 
 void frc::from_json(const wpi::json& json, AprilTag& apriltag) {
-  apriltag.id = json.at("id").get<int>();
+  apriltag.ID = json.at("ID").get<int>();
   apriltag.pose = json.at("pose").get<Pose3d>();
 }

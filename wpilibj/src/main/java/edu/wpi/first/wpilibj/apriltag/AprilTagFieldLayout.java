@@ -20,6 +20,18 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+/**
+ * Class for representing a layout of AprilTags on a field and reading them from a JSON format.
+ *
+ * <p>The JSON format contains a top-level "tags" field, which is a list of all AprilTags contained
+ * within a layout. Each AprilTag serializes to a JSON object containing an ID and a Pose3d.
+ *
+ * <p>Pose3ds are assumed to be measured from the bottom-left corner of the field, when the blue
+ * alliance is at the left. Pose3ds will automatically be returned as passed in when calling {@link
+ * AprilTagFieldLayout#getTag(int)}. Setting an alliance color via {@link
+ * AprilTagFieldLayout#setAlliance(DriverStation.Alliance)} will mirror the poses returned from
+ * {@link AprilTagFieldLayout#getTag(int)} to be correct relative to the other alliance.
+ */
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonAutoDetect(getterVisibility = JsonAutoDetect.Visibility.NONE)
 public class AprilTagFieldLayout {
@@ -72,13 +84,13 @@ public class AprilTagFieldLayout {
   }
 
   /**
-   * Gets an AprilTag pose by its id.
+   * Gets an AprilTag pose by its ID.
    *
-   * @param id The id of the tag.
-   * @return The pose corresponding to the id passed in.
+   * @param ID The ID of the tag.
+   * @return The pose corresponding to the ID passed in.
    */
-  public Pose3d getTag(int id) {
-    Pose3d pose = m_apriltags.stream().filter(it -> id == it.m_id).findFirst().get().m_pose;
+  public Pose3d getTag(int ID) {
+    Pose3d pose = m_apriltags.stream().filter(it -> ID == it.m_ID).findFirst().get().m_pose;
     if (m_mirror) {
       pose =
           pose.relativeTo(
