@@ -54,8 +54,8 @@ struct EntryNode {
 };
 
 struct DataLogFlags{
-  DataLogFlags() : ShowTimestamps{false} {};
-  bool ShowTimestamps;
+  bool ShowLastUpdate = false;
+  bool ShowNextUpdate = false;
 };
 
 class DataLogModel : private glass::Model {

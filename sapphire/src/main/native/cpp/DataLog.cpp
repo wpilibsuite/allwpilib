@@ -23,6 +23,7 @@ using namespace sapphire;
 static float maxTimestamp = 100;
 static bool needsUpdate = false;
 static float timestamp = 0;
+static const int TIMESTAMP_FUDGE_FACTOR = 10000;
 
 wpi::log::DataLogRecord EntryData::GetRecordAt(int timestamp){
   wpi::log::DataLogRecord record;
@@ -36,7 +37,7 @@ wpi::log::DataLogRecord EntryData::GetRecordAt(int timestamp){
 wpi::log::DataLogRecord EntryData::GetNextRecord(int timestamp){
   wpi::log::DataLogRecord record;
   for(auto& entry : datapoints){
-    if(entry.first > timestamp && (entry.first < record.GetTimestamp() || record.GetTimestamp() < timestamp)){
+    if(entry.first > timestamp && (entry.first < record.GetTimestamp() || record.GetTimestamp() <= timestamp)){
       record = entry.second;
     }
   }
@@ -216,7 +217,7 @@ void EmitEntry(EntryData *data, std::string name, float *offset, DataLogFlags fl
     if(ImGui::MenuItem("Next Event")){
       auto temp = data->GetNextRecord(record.GetTimestamp());
       if(temp.GetEntry() != -1){
-        *offset = temp.GetTimestamp()/1000000.0;
+        *offset = (temp.GetTimestamp()+TIMESTAMP_FUDGE_FACTOR)/1000000.0;
         record = temp;
       }
     }
@@ -228,8 +229,18 @@ void EmitEntry(EntryData *data, std::string name, float *offset, DataLogFlags fl
   ImGui::Text(value.c_str());
   ImGui::NextColumn();
   
-  if(flags.ShowTimestamps){
+  if(flags.ShowLastUpdate){
     ImGui::Text("%fs (%fs ago)", record.GetTimestamp()/1000000.0, (timestamp+*offset)-(record.GetTimestamp()/1000000.0));
+    ImGui::NextColumn();
+  }
+  if(flags.ShowNextUpdate){
+    auto temp = data->GetNextRecord(record.GetTimestamp());
+    if(temp.GetEntry() != -1){
+      float next = temp.GetTimestamp()/1000000.0;
+      ImGui::Text("%fs (%fs later)", next, (next) - timestamp+*offset);
+    } else {
+      ImGui::Text("No Next Record");
+    }
     ImGui::NextColumn();
   }
   ImGui::Separator();
@@ -246,7 +257,10 @@ void EmitTree(const std::vector<EntryNode>& tree, float *timestamp, DataLogFlags
       bool open = ImGui::TreeNodeEx(node.name.c_str(), ImGuiTreeNodeFlags_SpanFullWidth);
       ImGui::NextColumn();
       ImGui::NextColumn();
-      if(flags.ShowTimestamps){
+      if(flags.ShowLastUpdate){
+        ImGui::NextColumn();
+      }
+      if(flags.ShowNextUpdate){
         ImGui::NextColumn();
       }
       ImGui::Separator();
@@ -266,14 +280,18 @@ void DataLogView::DisplayDataLog(DataLogModel* log){
   ImGui::SameLine();
   ImGui::InputFloat("TsInput", &log->offset);
 
-  ImGui::Columns(2 + log->flags.ShowTimestamps, "values");
+  ImGui::Columns(2 + log->flags.ShowLastUpdate + log->flags.ShowNextUpdate, "values");
   ImGui::Text("Name");
   ImGui::NextColumn();
   
   ImGui::Text("Value");
   ImGui::NextColumn();
-  if(log->flags.ShowTimestamps){
-    ImGui::Text("Last Updated");
+  if(log->flags.ShowLastUpdate){
+    ImGui::Text("Last Update");
+    ImGui::NextColumn();
+  }
+  if(log->flags.ShowNextUpdate){
+    ImGui::Text("Next Update");
     ImGui::NextColumn();
   }
   EmitTree(log->GetTreeRoot(), &log->offset, log->flags);
@@ -303,8 +321,11 @@ void DataLogView::Display() {
       
       if(ImGui::CollapsingHeader(log->filename.c_str())){
         if (ImGui::BeginPopupContextItem(log->filename.c_str())) {
-          if(ImGui::MenuItem("Show Last Update Timestamp", "", log->flags.ShowTimestamps)){
-            log->flags.ShowTimestamps = !log->flags.ShowTimestamps;
+          if(ImGui::MenuItem("Show Last Update Timestamp", "", log->flags.ShowLastUpdate)){
+            log->flags.ShowLastUpdate = !log->flags.ShowLastUpdate;
+          }
+          if(ImGui::MenuItem("Show Next Update Timestamp", "", log->flags.ShowNextUpdate)){
+            log->flags.ShowNextUpdate = !log->flags.ShowNextUpdate;
           }
           ImGui::EndPopup();
         }
