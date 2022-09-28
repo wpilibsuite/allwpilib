@@ -315,7 +315,10 @@ void DataLogView::Display() {
   ImGui::SliderFloat("TsSlider", &timestamp ,0, GetMaxTimestamp()/1000000.0);
   ImGui::SameLine();
   ImGui::InputFloat("TsInput", &timestamp);
-  for(auto& log : logs){
+  auto it = logs.begin();
+  bool closed = false;
+  while(it != logs.end()){
+    auto& log = *it;
     if(log->Exists()){
       ImGui::PushID(log->filename.c_str());
       
@@ -327,12 +330,23 @@ void DataLogView::Display() {
           if(ImGui::MenuItem("Show Next Update Timestamp", "", log->flags.ShowNextUpdate)){
             log->flags.ShowNextUpdate = !log->flags.ShowNextUpdate;
           }
+          if(ImGui::MenuItem("Close Log")){
+            it = logs.erase(it);
+            closed = true;
+          }
           ImGui::EndPopup();
         }
-        DisplayDataLog(log.get());
+        if(!closed){
+          DisplayDataLog(log.get());
+        }
       }
       ImGui::PopID();
     }
+    
+    if(!closed){
+      ++it;
+    }
+    closed = false;
   }
 }
 
