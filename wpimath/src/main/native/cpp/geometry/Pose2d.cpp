@@ -33,6 +33,14 @@ bool Pose2d::operator!=(const Pose2d& other) const {
   return !operator==(other);
 }
 
+Pose2d Pose2d::operator*(double scalar) const {
+  return Pose2d{m_translation * scalar, m_rotation * scalar};
+}
+
+Pose2d Pose2d::operator/(double scalar) const {
+  return *this * (1.0 / scalar);
+}
+
 Pose2d Pose2d::TransformBy(const Transform2d& other) const {
   return {m_translation + (other.Translation().RotateBy(m_rotation)),
           m_rotation + other.Rotation()};

@@ -50,6 +50,10 @@ Rotation2d Rotation2d::operator*(double scalar) const {
   return Rotation2d{m_value * scalar};
 }
 
+Rotation2d Rotation2d::operator/(double scalar) const {
+  return *this * (1.0 / scalar);
+}
+
 bool Rotation2d::operator==(const Rotation2d& other) const {
   return std::hypot(m_cos - other.m_cos, m_sin - other.m_sin) < 1E-9;
 }

@@ -113,6 +113,24 @@ class WPILIB_DLLEXPORT Pose2d {
   const Rotation2d& Rotation() const { return m_rotation; }
 
   /**
+   * Multiplies the current pose by a scalar.
+   *
+   * @param scalar The scalar.
+   *
+   * @return The new scaled Pose2d.
+   */
+  Pose2d operator*(double scalar) const;
+
+  /**
+   * Divides the current pose by a scalar.
+   *
+   * @param scalar The scalar.
+   *
+   * @return The new scaled Pose2d.
+   */
+  Pose2d operator/(double scalar) const;
+
+  /**
    * Transforms the pose by the given transformation and returns the new pose.
    * See + operator for the matrix multiplication performed.
    *

@@ -116,6 +116,26 @@ public class Pose2d implements Interpolatable<Pose2d> {
   }
 
   /**
+   * Multiplies the current pose by a scalar.
+   *
+   * @param scalar The scalar.
+   * @return The new scaled Pose2d.
+   */
+  public Pose2d times(double scalar) {
+    return new Pose2d(m_translation.times(scalar), m_rotation.times(scalar));
+  }
+
+  /**
+   * Divides the current pose by a scalar.
+   *
+   * @param scalar The scalar.
+   * @return The new scaled Pose2d.
+   */
+  public Pose2d div(double scalar) {
+    return times(1.0 / scalar);
+  }
+
+  /**
    * Transforms the pose by the given transformation and returns the new pose. See + operator for
    * the matrix multiplication performed.
    *
