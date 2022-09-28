@@ -9,6 +9,7 @@
 #include "Quaternion.h"
 #include "Rotation2d.h"
 #include "frc/EigenCore.h"
+#include "units/angle.h"
 
 namespace wpi {
 class json;

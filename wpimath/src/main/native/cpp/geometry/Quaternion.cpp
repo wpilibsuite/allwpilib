@@ -4,6 +4,8 @@
 
 #include "frc/geometry/Quaternion.h"
 
+#include <wpi/json.h>
+
 using namespace frc;
 
 Quaternion::Quaternion(double w, double x, double y, double z)
