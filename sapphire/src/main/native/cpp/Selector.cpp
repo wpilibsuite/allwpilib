@@ -18,6 +18,16 @@
 #include "fmt/format.h"
 using namespace sapphire;
 
+std::unique_ptr<DataLogModel>& Selector::GetNextModel(){
+  for(auto& log : logs){
+    if(log->flags.IsLogActive == false){
+      return log;
+    }
+  }
+  auto& ref = logs.emplace_back(std::move(std::make_unique<DataLogModel>()));
+  return ref;
+}
+
 void Selector::Display() {
   static std::string logFile = "";
   static std::unique_ptr<pfd::open_file> logFileSelector;
@@ -49,10 +59,16 @@ void Selector::Display() {
     auto result = logFileSelector->result();
     if(!result.empty()) {
       logFile = result[0];
-      auto& log = logs.emplace_back(std::move(std::make_unique<DataLogModel>()));
+      auto& log = GetNextModel();
       bool success = log->LoadWPILog(result[0]);
       if(success) {
         logFileMessage = "Success";
+        // Make sure there are no name conflicts
+        for(auto& otherLog : logs){
+          if(log->filename == otherLog->filename && otherLog != log){
+            log->filename += "(1)";
+          }
+        }
       } else {
         logFileMessage = "Failure";
       }

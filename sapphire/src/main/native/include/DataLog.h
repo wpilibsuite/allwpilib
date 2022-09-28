@@ -56,6 +56,7 @@ struct EntryNode {
 struct DataLogFlags{
   bool ShowLastUpdate = false;
   bool ShowNextUpdate = false;
+  bool IsLogActive = true;
 };
 
 class DataLogModel : private glass::Model {
@@ -65,7 +66,7 @@ class DataLogModel : private glass::Model {
     
     int  GetMaxTimestamp() const { return m_maxTimestamp; }
     void Update() override { }
-    bool Exists() override { return m_hasLog; }
+    bool Exists() override { return m_hasLog && flags.IsLogActive; }
     int  GetSize() const {return m_entries.size(); }
     void AddEntryNode(EntryData* data, std::string path);
     const std::vector<EntryNode>& GetTreeRoot(){return m_tree;}

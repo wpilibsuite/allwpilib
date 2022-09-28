@@ -97,7 +97,7 @@ bool DataLogModel::LoadWPILog(std::string filename) {
   
   this->filename = filename;
   m_hasLog = true;
-
+  flags.IsLogActive = true;
   return true;
 }
 
@@ -315,10 +315,7 @@ void DataLogView::Display() {
   ImGui::SliderFloat("TsSlider", &timestamp ,0, GetMaxTimestamp()/1000000.0);
   ImGui::SameLine();
   ImGui::InputFloat("TsInput", &timestamp);
-  auto it = logs.begin();
-  bool closed = false;
-  while(it != logs.end()){
-    auto& log = *it;
+  for(auto& log : logs){
     if(log->Exists()){
       ImGui::PushID(log->filename.c_str());
       
@@ -331,22 +328,14 @@ void DataLogView::Display() {
             log->flags.ShowNextUpdate = !log->flags.ShowNextUpdate;
           }
           if(ImGui::MenuItem("Close Log")){
-            it = logs.erase(it);
-            closed = true;
+            log->flags.IsLogActive = false;
           }
           ImGui::EndPopup();
         }
-        if(!closed){
-          DisplayDataLog(log.get());
-        }
+        DisplayDataLog(log.get());
       }
       ImGui::PopID();
     }
-    
-    if(!closed){
-      ++it;
-    }
-    closed = false;
   }
 }
 
