@@ -741,7 +741,7 @@ class Color {
   constexpr Color() = default;
 
   /**
-   * Constructs a Color.
+   * Constructs a Color from doubles (0-1).
    *
    * @param r Red value (0-1)
    * @param g Green value (0-1)
@@ -751,6 +751,16 @@ class Color {
       : red(roundAndClamp(r)),
         green(roundAndClamp(g)),
         blue(roundAndClamp(b)) {}
+  
+  /**
+   * Constructs a Color from ints (0-255).
+   *
+   * @param r Red value (0-255)
+   * @param g Green value (0-255)
+   * @param b Blue value (0-255)
+   */
+  constexpr Color(int r, int g, int b)
+      : Color(r / 255.0, g / 255.0, b / 255.0) {}
 
   /**
    * Creates a Color from HSV values.
@@ -761,30 +771,32 @@ class Color {
    * @return The color
    */
   static constexpr Color FromHSV(int h, int s, int v) {
-    if (s == 0) {
-      return {v / 255.0, v / 255.0, v / 255.0};
-    }
+    // loosly based on
+    // https://en.wikipedia.org/wiki/HSL_and_HSV#HSV_to_RGB
 
+    int chroma = (s * v) >> 8;
     int region = h / 30;
-    int remainder = (h - (region * 30)) * 6;
-
-    int p = (v * (255 - s)) >> 8;
-    int q = (v * (255 - ((s * remainder) >> 8))) >> 8;
-    int t = (v * (255 - ((s * (255 - remainder)) >> 8))) >> 8;
+    // remainder converted from 0-30 to roughly 0-255
+    int remainder = (h - (region * 30)) * 8;
+    // lowest value of r, g or b
+    int m = v - chroma;
+    // part in each region that changes
+    // goes from 0 to chroma
+    int X = (chroma * remainder) >> 8;
 
     switch (region) {
       case 0:
-        return Color(v / 255.0, t / 255.0, p / 255.0);
+        return Color(v, X+m, m);
       case 1:
-        return Color(q / 255.0, v / 255.0, p / 255.0);
+        return Color(v-X, v, m);
       case 2:
-        return Color(p / 255.0, v / 255.0, t / 255.0);
+        return Color(m, v, X+m);
       case 3:
-        return Color(p / 255.0, q / 255.0, v / 255.0);
+        return Color(m, v-X, v);
       case 4:
-        return Color(t / 255.0, p / 255.0, v / 255.0);
+        return Color(X+m, m, v);
       default:
-        return Color(v / 255.0, p / 255.0, q / 255.0);
+        return Color(v, m, v-X);
     }
   }
 
