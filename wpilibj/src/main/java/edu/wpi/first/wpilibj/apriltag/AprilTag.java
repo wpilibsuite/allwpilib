@@ -9,12 +9,11 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import edu.wpi.first.math.geometry.Pose3d;
 import java.util.Objects;
 
+@SuppressWarnings("MemberName")
 public class AprilTag {
-  @SuppressWarnings("MemberName")
   @JsonProperty(value = "ID")
   public int ID;
 
-  @SuppressWarnings("MemberName")
   @JsonProperty(value = "pose")
   public Pose3d pose;
 
