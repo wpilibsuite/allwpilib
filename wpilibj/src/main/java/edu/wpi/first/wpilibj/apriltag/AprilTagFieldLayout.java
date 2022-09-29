@@ -23,8 +23,11 @@ import java.util.Objects;
 /**
  * Class for representing a layout of AprilTags on a field and reading them from a JSON format.
  *
- * <p>The JSON format contains a top-level "tags" field, which is a list of all AprilTags contained
- * within a layout. Each AprilTag serializes to a JSON object containing an ID and a Pose3d.
+ * <p>The JSON format contains two top-level objects, "tags" and "field". The "tags" object is a
+ * list of all AprilTags contained within a layout. Each AprilTag serializes to a JSON object
+ * containing an ID and a Pose3d. The "field" object is a descriptor of the size of the field in
+ * feet with "width" and "height" values. This is to account for arbitrary field sizes when
+ * mirroring the poses
  *
  * <p>Pose3ds are assumed to be measured from the bottom-left corner of the field, when the blue
  * alliance is at the left. Pose3ds will automatically be returned as passed in when calling {@link
@@ -37,6 +40,9 @@ import java.util.Objects;
 public class AprilTagFieldLayout {
   @JsonProperty(value = "tags")
   private final List<AprilTag> m_apriltags = new ArrayList<>();
+
+  @JsonProperty(value = "field")
+  private FieldSize m_fieldSize;
 
   private boolean m_mirror;
 
@@ -57,7 +63,10 @@ public class AprilTagFieldLayout {
    * @throws IOException If reading from the file fails.
    */
   public AprilTagFieldLayout(Path path) throws IOException {
-    this(new ObjectMapper().readValue(path.toFile(), AprilTagFieldLayout.class).m_apriltags);
+    AprilTagFieldLayout layout =
+        new ObjectMapper().readValue(path.toFile(), AprilTagFieldLayout.class);
+    m_apriltags.addAll(layout.m_apriltags);
+    m_fieldSize = layout.m_fieldSize;
   }
 
   /**
@@ -67,9 +76,11 @@ public class AprilTagFieldLayout {
    */
   @JsonCreator
   public AprilTagFieldLayout(
-      @JsonProperty(required = true, value = "tags") List<AprilTag> apriltags) {
+      @JsonProperty(required = true, value = "tags") List<AprilTag> apriltags,
+      @JsonProperty(required = true, value = "field") FieldSize fieldSize) {
     // To ensure the underlying semantics don't change with what kind of list is passed in
     m_apriltags.addAll(apriltags);
+    m_fieldSize = fieldSize;
   }
 
   /**
@@ -97,7 +108,10 @@ public class AprilTagFieldLayout {
       pose =
           pose.relativeTo(
               new Pose3d(
-                  new Translation3d(Units.feetToMeters(54.0), Units.feetToMeters(27.0), 0.0),
+                  new Translation3d(
+                      Units.feetToMeters(m_fieldSize.m_fieldWidth),
+                      Units.feetToMeters(m_fieldSize.m_fieldHeight),
+                      0.0),
                   new Rotation3d(0.0, 0.0, Units.degreesToRadians(180.0))));
     }
 
@@ -121,7 +135,7 @@ public class AprilTagFieldLayout {
    * @throws IOException If writing to the file fails.
    */
   public void serialize(Path path) throws IOException {
-    new ObjectMapper().writeValue(path.toFile(), m_apriltags);
+    new ObjectMapper().writeValue(path.toFile(), this);
   }
 
   @Override
@@ -136,5 +150,23 @@ public class AprilTagFieldLayout {
   @Override
   public int hashCode() {
     return Objects.hash(m_apriltags, m_mirror);
+  }
+
+  @JsonIgnoreProperties(ignoreUnknown = true)
+  @JsonAutoDetect(getterVisibility = JsonAutoDetect.Visibility.NONE)
+  public static class FieldSize {
+    @JsonProperty(value = "width")
+    public double m_fieldWidth;
+
+    @JsonProperty(value = "height")
+    public double m_fieldHeight;
+
+    @JsonCreator()
+    public FieldSize(
+        @JsonProperty(required = true, value = "width") double fieldWidth,
+        @JsonProperty(required = true, value = "height") double fieldHeight) {
+      m_fieldWidth = fieldWidth;
+      m_fieldHeight = fieldHeight;
+    }
   }
 }
