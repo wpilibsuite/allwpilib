@@ -741,7 +741,7 @@ class Color {
   constexpr Color() = default;
 
   /**
-   * Constructs a Color.
+   * Constructs a Color from doubles (0-1).
    *
    * @param r Red value (0-1)
    * @param g Green value (0-1)
@@ -753,38 +753,58 @@ class Color {
         blue(roundAndClamp(b)) {}
 
   /**
+   * Constructs a Color from ints (0-255).
+   *
+   * @param r Red value (0-255)
+   * @param g Green value (0-255)
+   * @param b Blue value (0-255)
+   */
+  constexpr Color(int r, int g, int b)
+      : Color(r / 255.0, g / 255.0, b / 255.0) {}
+
+  /**
    * Creates a Color from HSV values.
    *
-   * @param h The h value [0-180]
+   * @param h The h value [0-180)
    * @param s The s value [0-255]
    * @param v The v value [0-255]
    * @return The color
    */
   static constexpr Color FromHSV(int h, int s, int v) {
-    if (s == 0) {
-      return {v / 255.0, v / 255.0, v / 255.0};
-    }
+    // Loosely based on
+    // https://en.wikipedia.org/wiki/HSL_and_HSV#HSV_to_RGB
+    // The hue range is split into 60 degree regions where in each region there
+    // is one rgb component at a low value (m), one at a high value (v) and one
+    // that changes (X) from low to high (X+m) or high to low (v-X)
 
+    // Difference between highest and lowest value of any rgb component
+    int chroma = (s * v) >> 8;
+
+    // Beacuse hue is 0-180 rather than 0-360 use 30 not 60
     int region = h / 30;
-    int remainder = (h - (region * 30)) * 6;
 
-    int p = (v * (255 - s)) >> 8;
-    int q = (v * (255 - ((s * remainder) >> 8))) >> 8;
-    int t = (v * (255 - ((s * (255 - remainder)) >> 8))) >> 8;
+    // Remainder converted from 0-30 to roughly 0-255
+    int remainder = (h - (region * 30)) * 9;
+
+    // Value of the lowest rgb component
+    int m = v - chroma;
+
+    // Goes from 0 to chroma as hue increases
+    int X = (chroma * remainder) >> 8;
 
     switch (region) {
       case 0:
-        return Color(v / 255.0, t / 255.0, p / 255.0);
+        return Color(v, X + m, m);
       case 1:
-        return Color(q / 255.0, v / 255.0, p / 255.0);
+        return Color(v - X, v, m);
       case 2:
-        return Color(p / 255.0, v / 255.0, t / 255.0);
+        return Color(m, v, X + m);
       case 3:
-        return Color(p / 255.0, q / 255.0, v / 255.0);
+        return Color(m, v - X, v);
       case 4:
-        return Color(t / 255.0, p / 255.0, v / 255.0);
+        return Color(X + m, m, v);
       default:
-        return Color(v / 255.0, p / 255.0, q / 255.0);
+        return Color(v, m, v - X);
     }
   }
 

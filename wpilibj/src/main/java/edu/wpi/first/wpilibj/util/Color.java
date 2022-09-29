@@ -21,7 +21,7 @@ public class Color {
   public final double blue;
 
   /**
-   * Constructs a Color.
+   * Constructs a Color from doubles.
    *
    * @param red Red value (0-1)
    * @param green Green value (0-1)
@@ -31,6 +31,17 @@ public class Color {
     this.red = roundAndClamp(red);
     this.green = roundAndClamp(green);
     this.blue = roundAndClamp(blue);
+  }
+
+  /**
+   * Constructs a Color from ints.
+   *
+   * @param red Red value (0-255)
+   * @param green Green value (0-255)
+   * @param blue Blue value (0-255)
+   */
+  public Color(int red, int green, int blue) {
+    this(red / 255.0, green / 255.0, blue / 255.0);
   }
 
   /**
@@ -45,36 +56,46 @@ public class Color {
   /**
    * Creates a Color from HSV values.
    *
-   * @param h The h value [0-180]
+   * @param h The h value [0-180)
    * @param s The s value [0-255]
    * @param v The v value [0-255]
    * @return The color
    */
   public static Color fromHSV(int h, int s, int v) {
-    if (s == 0) {
-      return new Color(v / 255.0, v / 255.0, v / 255.0);
-    }
+    // Loosely based on
+    // https://en.wikipedia.org/wiki/HSL_and_HSV#HSV_to_RGB
+    // The hue range is split into 60 degree regions where in each region there
+    // is one rgb component at a low value (m), one at a high value (v) and one
+    // that changes (X) from low to high (X+m) or high to low (v-X)
 
+    // Difference between highest and lowest value of any rgb component
+    final int chroma = (s * v) >> 8;
+
+    // Beacuse hue is 0-180 rather than 0-360 use 30 not 60
     final int region = h / 30;
-    final int remainder = (h - (region * 30)) * 6;
 
-    final int p = (v * (255 - s)) >> 8;
-    final int q = (v * (255 - ((s * remainder) >> 8))) >> 8;
-    final int t = (v * (255 - ((s * (255 - remainder)) >> 8))) >> 8;
+    // Remainder converted from 0-30 to roughly 0-255
+    final int remainder = (h - (region * 30)) * 9;
+
+    // Value of the lowest rgb component
+    final int m = v - chroma;
+
+    // Goes from 0 to chroma as hue increases
+    final int X = (chroma * remainder) >> 8;
 
     switch (region) {
       case 0:
-        return new Color(v / 255.0, t / 255.0, p / 255.0);
+        return new Color(v, X + m, m);
       case 1:
-        return new Color(q / 255.0, v / 255.0, p / 255.0);
+        return new Color(v - X, v, m);
       case 2:
-        return new Color(p / 255.0, v / 255.0, t / 255.0);
+        return new Color(m, v, X + m);
       case 3:
-        return new Color(p / 255.0, q / 255.0, v / 255.0);
+        return new Color(m, v - X, v);
       case 4:
-        return new Color(t / 255.0, p / 255.0, v / 255.0);
+        return new Color(X + m, m, v);
       default:
-        return new Color(v / 255.0, p / 255.0, q / 255.0);
+        return new Color(v, m, v - X);
     }
   }
 
