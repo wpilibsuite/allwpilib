@@ -12,7 +12,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation3d;
-import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import java.io.IOException;
 import java.nio.file.Path;
@@ -26,8 +25,8 @@ import java.util.Objects;
  * <p>The JSON format contains two top-level objects, "tags" and "field". The "tags" object is a
  * list of all AprilTags contained within a layout. Each AprilTag serializes to a JSON object
  * containing an ID and a Pose3d. The "field" object is a descriptor of the size of the field in
- * feet with "width" and "height" values. This is to account for arbitrary field sizes when
- * mirroring the poses
+ * meters with "width" and "height" values. This is to account for arbitrary field sizes when
+ * mirroring the poses.
  *
  * <p>Pose3ds are assumed to be measured from the bottom-left corner of the field, when the blue
  * alliance is at the left. Pose3ds will automatically be returned as passed in when calling {@link
@@ -42,7 +41,7 @@ public class AprilTagFieldLayout {
   private final List<AprilTag> m_apriltags = new ArrayList<>();
 
   @JsonProperty(value = "field")
-  private FieldSize m_fieldSize;
+  private FieldDimensions m_fieldDimensions;
 
   private boolean m_mirror;
 
@@ -66,7 +65,7 @@ public class AprilTagFieldLayout {
     AprilTagFieldLayout layout =
         new ObjectMapper().readValue(path.toFile(), AprilTagFieldLayout.class);
     m_apriltags.addAll(layout.m_apriltags);
-    m_fieldSize = layout.m_fieldSize;
+    m_fieldDimensions = layout.m_fieldDimensions;
   }
 
   /**
@@ -77,10 +76,10 @@ public class AprilTagFieldLayout {
   @JsonCreator
   public AprilTagFieldLayout(
       @JsonProperty(required = true, value = "tags") List<AprilTag> apriltags,
-      @JsonProperty(required = true, value = "field") FieldSize fieldSize) {
+      @JsonProperty(required = true, value = "field") FieldDimensions fieldDimensions) {
     // To ensure the underlying semantics don't change with what kind of list is passed in
     m_apriltags.addAll(apriltags);
-    m_fieldSize = fieldSize;
+    m_fieldDimensions = fieldDimensions;
   }
 
   /**
@@ -103,16 +102,16 @@ public class AprilTagFieldLayout {
    */
   @SuppressWarnings("ParameterName")
   public Pose3d getTagPose(int ID) {
-    Pose3d pose = m_apriltags.stream().filter(it -> ID == it.m_ID).findFirst().get().m_pose;
+    Pose3d pose = m_apriltags.stream().filter(it -> ID == it.m_ID).findFirst().get().m_poseMeters;
     if (m_mirror) {
       pose =
           pose.relativeTo(
               new Pose3d(
                   new Translation3d(
-                      Units.feetToMeters(m_fieldSize.m_fieldWidth),
-                      Units.feetToMeters(m_fieldSize.m_fieldHeight),
+                      m_fieldDimensions.m_fieldWidthMeters,
+                      m_fieldDimensions.m_fieldHeightMeters,
                       0.0),
-                  new Rotation3d(0.0, 0.0, Units.degreesToRadians(180.0))));
+                  new Rotation3d(0.0, 0.0, Math.PI)));
     }
 
     return pose;
@@ -154,19 +153,19 @@ public class AprilTagFieldLayout {
 
   @JsonIgnoreProperties(ignoreUnknown = true)
   @JsonAutoDetect(getterVisibility = JsonAutoDetect.Visibility.NONE)
-  public static class FieldSize {
+  public static class FieldDimensions {
     @JsonProperty(value = "width")
-    public double m_fieldWidth;
+    public double m_fieldWidthMeters;
 
     @JsonProperty(value = "height")
-    public double m_fieldHeight;
+    public double m_fieldHeightMeters;
 
     @JsonCreator()
-    public FieldSize(
-        @JsonProperty(required = true, value = "width") double fieldWidth,
-        @JsonProperty(required = true, value = "height") double fieldHeight) {
-      m_fieldWidth = fieldWidth;
-      m_fieldHeight = fieldHeight;
+    public FieldDimensions(
+        @JsonProperty(required = true, value = "width") double fieldWidthMeters,
+        @JsonProperty(required = true, value = "height") double fieldHeightMeters) {
+      m_fieldWidthMeters = fieldWidthMeters;
+      m_fieldHeightMeters = fieldHeightMeters;
     }
   }
 }

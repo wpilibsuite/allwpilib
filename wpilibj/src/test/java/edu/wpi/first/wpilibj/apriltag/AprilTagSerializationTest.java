@@ -10,6 +10,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.util.Units;
 import java.io.IOException;
 import java.util.List;
 import org.junit.jupiter.api.Test;
@@ -22,7 +23,8 @@ class AprilTagSerializationTest {
             List.of(
                 new AprilTag(1, new Pose3d(0, 0, 0, new Rotation3d(0, 0, 0))),
                 new AprilTag(3, new Pose3d(0, 1, 0, new Rotation3d(0, 0, 0)))),
-            new AprilTagFieldLayout.FieldSize(54.0, 27.0));
+            new AprilTagFieldLayout.FieldDimensions(
+                Units.feetToMeters(54.0), Units.feetToMeters(27.0)));
 
     var objectMapper = new ObjectMapper();
 
