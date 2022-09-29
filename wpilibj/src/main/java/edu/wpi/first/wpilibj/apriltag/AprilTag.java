@@ -12,36 +12,37 @@ import java.util.Objects;
 public class AprilTag {
   @SuppressWarnings("MemberName")
   @JsonProperty(value = "ID")
-  public int m_ID;
+  public int ID;
 
+  @SuppressWarnings("MemberName")
   @JsonProperty(value = "pose")
-  public Pose3d m_poseMeters;
+  public Pose3d pose;
 
   @SuppressWarnings("ParameterName")
   @JsonCreator
   public AprilTag(
       @JsonProperty(required = true, value = "ID") int ID,
-      @JsonProperty(required = true, value = "pose") Pose3d poseMeters) {
-    this.m_ID = ID;
-    this.m_poseMeters = poseMeters;
+      @JsonProperty(required = true, value = "pose") Pose3d pose) {
+    this.ID = ID;
+    this.pose = pose;
   }
 
   @Override
   public boolean equals(Object obj) {
     if (obj instanceof AprilTag) {
       var other = (AprilTag) obj;
-      return m_ID == other.m_ID && m_poseMeters.equals(other.m_poseMeters);
+      return ID == other.ID && pose.equals(other.pose);
     }
     return false;
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(m_ID, m_poseMeters);
+    return Objects.hash(ID, pose);
   }
 
   @Override
   public String toString() {
-    return "AprilTag(ID: " + m_ID + ", pose: " + m_poseMeters + ")";
+    return "AprilTag(ID: " + ID + ", pose: " + pose + ")";
   }
 }

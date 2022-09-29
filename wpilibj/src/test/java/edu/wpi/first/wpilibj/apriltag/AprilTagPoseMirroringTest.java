@@ -27,8 +27,8 @@ class AprilTagPoseMirroringTest {
                         new Translation3d(
                             Units.feetToMeters(4.0), Units.feetToMeters(4), Units.feetToMeters(4)),
                         new Rotation3d(0, 0, Units.degreesToRadians(180))))),
-            new AprilTagFieldLayout.FieldDimensions(
-                Units.feetToMeters(54.0), Units.feetToMeters(27.0)));
+            Units.feetToMeters(54.0),
+            Units.feetToMeters(27.0));
     layout.setAlliance(DriverStation.Alliance.Red);
 
     assertEquals(

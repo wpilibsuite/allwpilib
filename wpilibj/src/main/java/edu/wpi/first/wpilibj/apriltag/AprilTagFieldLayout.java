@@ -72,9 +72,15 @@ public class AprilTagFieldLayout {
    * Construct a new AprilTagFieldLayout from a list of {@link AprilTag} objects.
    *
    * @param apriltags List of {@link AprilTag}.
+   * @param fieldLength Length of the field in meters.
+   * @param fieldWidth Width of the field in meters.
    */
+  public AprilTagFieldLayout(List<AprilTag> apriltags, double fieldLength, double fieldWidth) {
+    this(apriltags, new FieldDimensions(fieldLength, fieldWidth));
+  }
+
   @JsonCreator
-  public AprilTagFieldLayout(
+  private AprilTagFieldLayout(
       @JsonProperty(required = true, value = "tags") List<AprilTag> apriltags,
       @JsonProperty(required = true, value = "field") FieldDimensions fieldDimensions) {
     // To ensure the underlying semantics don't change with what kind of list is passed in
@@ -102,15 +108,13 @@ public class AprilTagFieldLayout {
    */
   @SuppressWarnings("ParameterName")
   public Pose3d getTagPose(int ID) {
-    Pose3d pose = m_apriltags.stream().filter(it -> ID == it.m_ID).findFirst().get().m_poseMeters;
+    Pose3d pose = m_apriltags.stream().filter(it -> ID == it.ID).findFirst().get().pose;
     if (m_mirror) {
       pose =
           pose.relativeTo(
               new Pose3d(
                   new Translation3d(
-                      m_fieldDimensions.m_fieldWidthMeters,
-                      m_fieldDimensions.m_fieldHeightMeters,
-                      0.0),
+                      m_fieldDimensions.fieldWidth, m_fieldDimensions.fieldLength, 0.0),
                   new Rotation3d(0.0, 0.0, Math.PI)));
     }
 
@@ -153,19 +157,21 @@ public class AprilTagFieldLayout {
 
   @JsonIgnoreProperties(ignoreUnknown = true)
   @JsonAutoDetect(getterVisibility = JsonAutoDetect.Visibility.NONE)
-  public static class FieldDimensions {
+  private static class FieldDimensions {
+    @SuppressWarnings("MemberName")
     @JsonProperty(value = "width")
-    public double m_fieldWidthMeters;
+    public double fieldWidth;
 
+    @SuppressWarnings("MemberName")
     @JsonProperty(value = "height")
-    public double m_fieldHeightMeters;
+    public double fieldLength;
 
     @JsonCreator()
-    public FieldDimensions(
-        @JsonProperty(required = true, value = "width") double fieldWidthMeters,
-        @JsonProperty(required = true, value = "height") double fieldHeightMeters) {
-      m_fieldWidthMeters = fieldWidthMeters;
-      m_fieldHeightMeters = fieldHeightMeters;
+    FieldDimensions(
+        @JsonProperty(required = true, value = "width") double fieldWidth,
+        @JsonProperty(required = true, value = "height") double fieldLength) {
+      this.fieldWidth = fieldWidth;
+      this.fieldLength = fieldLength;
     }
   }
 }
