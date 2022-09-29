@@ -26,9 +26,9 @@ namespace frc {
  * The JSON format contains two top-level objects, "tags" and "field".
  * The "tags" object is a list of all AprilTags contained within a layout. Each
  * AprilTag serializes to a JSON object containing an ID and a Pose3d. The
- * "field" object is a descriptor of the size of the field in feet with "width"
- * and "height" values.  This is to account for arbitrary field sizes when
- * mirroring the poses.
+ * "field" object is a descriptor of the size of the field in meters with
+ * "width" and "height" values.  This is to account for arbitrary field sizes
+ * when mirroring the poses.
  *
  * Pose3ds are assumed to be measured from the bottom-left corner of the field,
  * when the blue alliance is at the left. Pose3ds will automatically be returned
@@ -51,10 +51,11 @@ class WPILIB_DLLEXPORT AprilTagFieldLayout {
    * Construct a new AprilTagFieldLayout from a vector of AprilTag objects.
    *
    * @param apriltags Vector of AprilTags.
+   * @param fieldLength Length of field the layout of representing.
+   * @param fieldWidth Width of field the layout is representing.
    */
-  explicit AprilTagFieldLayout(std::vector<AprilTag> apriltags,
-                               units::foot_t fieldWidth,
-                               units::foot_t fieldHeight);
+  AprilTagFieldLayout(std::vector<AprilTag> apriltags,
+                      units::meter_t fieldLength, units::meter_t fieldWidth);
 
   /**
    * Set the alliance that your team is on.
@@ -99,8 +100,8 @@ class WPILIB_DLLEXPORT AprilTagFieldLayout {
 
  private:
   std::vector<AprilTag> m_apriltags;
-  units::foot_t m_fieldWidth;
-  units::foot_t m_fieldHeight;
+  units::meter_t m_fieldLength;
+  units::meter_t m_fieldWidth;
   bool m_mirror = false;
 
   friend WPILIB_DLLEXPORT void to_json(wpi::json& json,
