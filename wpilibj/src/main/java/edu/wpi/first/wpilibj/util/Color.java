@@ -36,9 +36,9 @@ public class Color {
   /**
    * Constructs a Color from ints.
    *
-   * @param red Red value (0-1)
-   * @param green Green value (0-1)
-   * @param blue Blue value (0-1)
+   * @param red Red value (0-255)
+   * @param green Green value (0-255)
+   * @param blue Blue value (0-255)
    */
   public Color(int red, int green, int blue) {
     this(red / 255.0, green / 255.0, blue / 255.0);
@@ -56,38 +56,41 @@ public class Color {
   /**
    * Creates a Color from HSV values.
    *
-   * @param h The h value [0-180]
+   * @param h The h value [0-180)
    * @param s The s value [0-255]
    * @param v The v value [0-255]
    * @return The color
    */
   public static Color fromHSV(int h, int s, int v) {
-    // loosly based on
+    // Loosely based on
     // https://en.wikipedia.org/wiki/HSL_and_HSV#HSV_to_RGB
 
     final int chroma = (s * v) >> 8;
     final int region = h / 30;
+
     // remainder converted from 0-30 to roughly 0-255
-    final int remainder = (h - (region * 30)) * 8;
+    final int remainder = (h - (region * 30)) * 9;
+
     // lowest value of r, g or b
     final int m = v - chroma;
-    // part in each region that changes
+
+    // color component in each region that changes
     // goes from 0 to chroma
     final int X = (chroma * remainder) >> 8;
 
     switch (region) {
       case 0:
-        return new Color(v, X+m, m);
+        return new Color(v, X + m, m);
       case 1:
-        return new Color(v-X, v, m);
+        return new Color(v - X, v, m);
       case 2:
-        return new Color(m, v, X+m);
+        return new Color(m, v, X + m);
       case 3:
-        return new Color(m, v-X, v);
+        return new Color(m, v - X, v);
       case 4:
-        return new Color(X+m, m, v);
+        return new Color(X + m, m, v);
       default:
-        return new Color(v, m, v-X);
+        return new Color(v, m, v - X);
     }
   }
 
