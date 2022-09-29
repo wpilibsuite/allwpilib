@@ -115,6 +115,26 @@ public class Pose3d implements Interpolatable<Pose3d> {
   }
 
   /**
+   * Multiplies the current pose by a scalar.
+   *
+   * @param scalar The scalar.
+   * @return The new scaled Pose3d.
+   */
+  public Pose3d times(double scalar) {
+    return new Pose3d(m_translation.times(scalar), m_rotation.times(scalar));
+  }
+
+  /**
+   * Divides the current pose by a scalar.
+   *
+   * @param scalar The scalar.
+   * @return The new scaled Pose3d.
+   */
+  public Pose3d div(double scalar) {
+    return times(1.0 / scalar);
+  }
+
+  /**
    * Transforms the pose by the given transformation and returns the new pose. See + operator for
    * the matrix multiplication performed.
    *

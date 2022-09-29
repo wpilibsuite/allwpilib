@@ -137,6 +137,16 @@ public class Rotation2d implements Interpolatable<Rotation2d> {
   }
 
   /**
+   * Divides the current rotation by a scalar.
+   *
+   * @param scalar The scalar.
+   * @return The new scaled Rotation2d.
+   */
+  public Rotation2d div(double scalar) {
+    return times(1.0 / scalar);
+  }
+
+  /**
    * Adds the new rotation to the current rotation using a rotation matrix.
    *
    * <p>The matrix multiplication is as follows:
