@@ -26,11 +26,17 @@ AprilTagFieldLayout::AprilTagFieldLayout(std::string_view path) {
   wpi::json json;
   input >> json;
 
-  m_apriltags = json.get<std::vector<AprilTag>>();
+  m_apriltags = json.at("tags").get<std::vector<AprilTag>>();
+  m_fieldWidth = units::foot_t{json.at("field").at("width").get<double>()};
+  m_fieldHeight = units::foot_t{json.at("field").at("height").get<double>()};
 }
 
-AprilTagFieldLayout::AprilTagFieldLayout(std::vector<AprilTag> apriltags)
-    : m_apriltags(std::move(apriltags)) {}
+AprilTagFieldLayout::AprilTagFieldLayout(std::vector<AprilTag> apriltags,
+                                         units::foot_t fieldWidth,
+                                         units::foot_t fieldHeight)
+    : m_apriltags(std::move(apriltags)),
+      m_fieldWidth(std::move(fieldWidth)),
+      m_fieldHeight(std::move(fieldHeight)) {}
 
 void AprilTagFieldLayout::SetAlliance(DriverStation::Alliance alliance) {
   m_mirror = alliance == DriverStation::Alliance::kRed;
@@ -44,8 +50,8 @@ frc::Pose3d AprilTagFieldLayout::GetTagPose(int ID) const {
     returnPose = it->pose;
   }
   if (m_mirror) {
-    returnPose = returnPose.RelativeTo(
-        Pose3d{54_ft, 27_ft, 0_ft, Rotation3d{0_deg, 0_deg, 180_deg}});
+    returnPose = returnPose.RelativeTo(Pose3d{
+        m_fieldWidth, m_fieldHeight, 0_ft, Rotation3d{0_deg, 0_deg, 180_deg}});
   }
   return returnPose;
 }
@@ -72,9 +78,16 @@ bool AprilTagFieldLayout::operator!=(const AprilTagFieldLayout& other) const {
 }
 
 void frc::to_json(wpi::json& json, const AprilTagFieldLayout& layout) {
-  json = wpi::json{{"tags", layout.m_apriltags}};
+  json = wpi::json{{"field",
+                    {{"width", layout.m_fieldWidth.value()},
+                     {"height", layout.m_fieldHeight.value()}}},
+                   {"tags", layout.m_apriltags}};
 }
 
 void frc::from_json(const wpi::json& json, AprilTagFieldLayout& layout) {
   layout.m_apriltags = json.at("tags").get<std::vector<AprilTag>>();
+  layout.m_fieldWidth =
+      units::foot_t{json.at("field").at("width").get<double>()};
+  layout.m_fieldHeight =
+      units::foot_t{json.at("field").at("height").get<double>()};
 }

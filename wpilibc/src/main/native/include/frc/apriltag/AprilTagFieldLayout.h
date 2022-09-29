@@ -7,6 +7,7 @@
 #include <string_view>
 #include <vector>
 
+#include <units/length.h>
 #include <wpi/SymbolExports.h>
 
 #include "frc/DriverStation.h"
@@ -22,9 +23,12 @@ namespace frc {
  * Class for representing a layout of AprilTags on a field and reading them from
  * a JSON format.
  *
- * The JSON format contains a top-level "tags" field, which is a list of all
- * AprilTags contained within a layout. Each AprilTag serializes to a JSON
- * object containing an ID and a Pose3d.
+ * The JSON format contains two top-level objects, "tags" and "field".
+ * The "tags" object is a list of all AprilTags contained within a layout. Each
+ * AprilTag serializes to a JSON object containing an ID and a Pose3d. The
+ * "field" object is a descriptor of the size of the field in feet with "width"
+ * and "height" values.  This is to account for arbitrary field sizes when
+ * mirroring the poses.
  *
  * Pose3ds are assumed to be measured from the bottom-left corner of the field,
  * when the blue alliance is at the left. Pose3ds will automatically be returned
@@ -48,7 +52,9 @@ class WPILIB_DLLEXPORT AprilTagFieldLayout {
    *
    * @param apriltags Vector of AprilTags.
    */
-  explicit AprilTagFieldLayout(std::vector<AprilTag> apriltags);
+  explicit AprilTagFieldLayout(std::vector<AprilTag> apriltags,
+                               units::foot_t fieldWidth,
+                               units::foot_t fieldHeight);
 
   /**
    * Set the alliance that your team is on.
@@ -93,6 +99,8 @@ class WPILIB_DLLEXPORT AprilTagFieldLayout {
 
  private:
   std::vector<AprilTag> m_apriltags;
+  units::foot_t m_fieldWidth;
+  units::foot_t m_fieldHeight;
   bool m_mirror = false;
 
   friend WPILIB_DLLEXPORT void to_json(wpi::json& json,

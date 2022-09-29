@@ -14,10 +14,13 @@
 using namespace frc;
 
 TEST(AprilTagPoseMirroringTest, MirroringMatches) {
-  auto layout = AprilTagFieldLayout{std::vector<AprilTag>{
-      AprilTag{1, Pose3d{0_ft, 0_ft, 0_ft, Rotation3d{0_deg, 0_deg, 0_deg}}},
-      AprilTag{2,
-               Pose3d{4_ft, 4_ft, 4_ft, Rotation3d{0_deg, 0_deg, 180_deg}}}}};
+  auto layout = AprilTagFieldLayout{
+      std::vector<AprilTag>{
+          AprilTag{1,
+                   Pose3d{0_ft, 0_ft, 0_ft, Rotation3d{0_deg, 0_deg, 0_deg}}},
+          AprilTag{
+              2, Pose3d{4_ft, 4_ft, 4_ft, Rotation3d{0_deg, 0_deg, 180_deg}}}},
+      54_ft, 27_ft};
 
   layout.SetAlliance(DriverStation::Alliance::kRed);
 
