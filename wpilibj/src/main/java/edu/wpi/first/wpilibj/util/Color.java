@@ -64,18 +64,23 @@ public class Color {
   public static Color fromHSV(int h, int s, int v) {
     // Loosely based on
     // https://en.wikipedia.org/wiki/HSL_and_HSV#HSV_to_RGB
+    // The hue range is split into 60 degree regions where in each region there
+    // is one rgb component at a low value (m), one at a high value (v) and one
+    // that changes (X) from low to high (X+m) or high to low (v-X)
 
+    // Difference between highest and lowest value of any rgb component
     final int chroma = (s * v) >> 8;
+
+    // Beacuse hue is 0-180 rather than 0-360 use 30 not 60
     final int region = h / 30;
 
-    // remainder converted from 0-30 to roughly 0-255
+    // Remainder converted from 0-30 to roughly 0-255
     final int remainder = (h - (region * 30)) * 9;
 
-    // lowest value of r, g or b
+    // Value of the lowest rgb component
     final int m = v - chroma;
 
-    // color component in each region that changes
-    // goes from 0 to chroma
+    // Goes from 0 to chroma as hue increases
     final int X = (chroma * remainder) >> 8;
 
     switch (region) {
