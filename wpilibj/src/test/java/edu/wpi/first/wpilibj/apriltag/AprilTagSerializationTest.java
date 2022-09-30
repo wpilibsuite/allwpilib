@@ -11,7 +11,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.util.Units;
-import java.io.IOException;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 
@@ -27,12 +26,6 @@ class AprilTagSerializationTest {
             Units.feetToMeters(27.0));
 
     var objectMapper = new ObjectMapper();
-
-    try {
-      layout.serialize("/home/bagatelle/Coding/FRC/test.json");
-    } catch (IOException e) {
-      throw new RuntimeException(e);
-    }
 
     var deserialized =
         assertDoesNotThrow(
