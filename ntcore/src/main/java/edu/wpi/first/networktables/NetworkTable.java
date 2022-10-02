@@ -304,7 +304,7 @@ public final class NetworkTable {
   /**
    * Gets topic information for all keys in the table (not including sub-tables).
    *
-   * @param types bitmask of types; 0 is treated as a "don't care".
+   * @param types bitmask of types (NetworkTableType values); 0 is treated as a "don't care".
    * @return topic information for keys currently in the table
    */
   public List<TopicInfo> getTopicInfo(int types) {
@@ -332,7 +332,7 @@ public final class NetworkTable {
   /**
    * Gets all topics in the table (not including sub-tables).
    *
-   * @param types bitmask of types; 0 is treated as a "don't care".
+   * @param types bitmask of types (NetworkTableType values); 0 is treated as a "don't care".
    * @return topic for keys currently in the table
    */
   public List<Topic> getTopics(int types) {

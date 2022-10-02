@@ -7,6 +7,7 @@
 #include <stdint.h>
 
 {{ cpp.INCLUDES }}
+#include <string_view>
 #include <vector>
 
 #include <wpi/span.h>
@@ -268,6 +269,10 @@ class {{ TypeName }}Topic final : public Topic {
   using ValueType = {{ cpp.ValueType }};
   using ParamType = {{ cpp.ParamType }};
   using TimestampedValueType = Timestamped{{ TypeName }};
+{%- if TypeString %}
+  /** The default type string for this topic type. */
+  static constexpr std::string_view kTypeString = {{ TypeString }};
+{%- endif %}
 
   {{ TypeName }}Topic() = default;
 

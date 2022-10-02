@@ -6,27 +6,33 @@ package edu.wpi.first.networktables;
 
 /** Network table data types. */
 public enum NetworkTableType {
-  kUnassigned(0),
-  kBoolean(0x01),
-  kDouble(0x02),
-  kString(0x04),
-  kRaw(0x08),
-  kBooleanArray(0x10),
-  kDoubleArray(0x20),
-  kStringArray(0x40),
-  kInteger(0x100),
-  kFloat(0x200),
-  kIntegerArray(0x400),
-  kFloatArray(0x800);
+  kUnassigned(0, ""),
+  kBoolean(0x01, "boolean"),
+  kDouble(0x02, "double"),
+  kString(0x04, "string"),
+  kRaw(0x08, "raw"),
+  kBooleanArray(0x10, "boolean[]"),
+  kDoubleArray(0x20, "double[]"),
+  kStringArray(0x40, "string[]"),
+  kInteger(0x100, "int"),
+  kFloat(0x200, "float"),
+  kIntegerArray(0x400, "int[]"),
+  kFloatArray(0x800, "float[]");
 
-  private final int value;
+  private final int m_value;
+  private final String m_valueStr;
 
-  NetworkTableType(int value) {
-    this.value = value;
+  NetworkTableType(int value, String valueStr) {
+    m_value = value;
+    m_valueStr = valueStr;
   }
 
   public int getValue() {
-    return value;
+    return m_value;
+  }
+
+  public String getValueStr() {
+    return m_valueStr;
   }
 
   /**
@@ -71,30 +77,32 @@ public enum NetworkTableType {
    * @return The kind
    */
   public static NetworkTableType getFromString(String typeString) {
-    if ("boolean".equals(typeString)) {
-      return kBoolean;
-    } else if ("double".equals(typeString)) {
-      return kDouble;
-    } else if ("float".equals(typeString)) {
-      return kFloat;
-    } else if ("int".equals(typeString)) {
-      return kInteger;
-    } else if ("string".equals(typeString) || "json".equals(typeString)) {
-      return kString;
-    } else if ("boolean[]".equals(typeString)) {
-      return kBooleanArray;
-    } else if ("double[]".equals(typeString)) {
-      return kDoubleArray;
-    } else if ("float[]".equals(typeString)) {
-      return kFloatArray;
-    } else if ("int[]".equals(typeString)) {
-      return kIntegerArray;
-    } else if ("string[]".equals(typeString)) {
-      return kStringArray;
-    } else if ("".equals(typeString)) {
-      return kUnassigned;
-    } else {
-      return kRaw;
+    switch (typeString) {
+      case "boolean":
+        return kBoolean;
+      case "double":
+        return kDouble;
+      case "float":
+        return kFloat;
+      case "int":
+        return kInteger;
+      case "string":
+      case "json":
+        return kString;
+      case "boolean[]":
+        return kBooleanArray;
+      case "double[]":
+        return kDoubleArray;
+      case "float[]":
+        return kFloatArray;
+      case "int[]":
+        return kIntegerArray;
+      case "string[]":
+        return kStringArray;
+      case "":
+        return kUnassigned;
+      default:
+        return kRaw;
     }
   }
 

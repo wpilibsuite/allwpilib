@@ -6,6 +6,10 @@ package edu.wpi.first.networktables;
 
 /** NetworkTables {{ TypeName }} topic. */
 public final class {{ TypeName }}Topic extends Topic {
+{%- if TypeString %}
+  /** The default type string for this topic type. */
+  public static final String kTypeString = {{ TypeString }};
+{% endif %}
   /**
    * Construct from a generic topic.
    *

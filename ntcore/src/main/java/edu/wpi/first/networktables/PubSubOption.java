@@ -8,12 +8,13 @@ package edu.wpi.first.networktables;
 public class PubSubOption {
   private static final int kPeriodic = 1;
   private static final int kSendAll = 2;
-  private static final int kPollStorage = 3;
-  private static final int kKeepDuplicates = 4;
+  private static final int kTopicsOnly = 3;
+  private static final int kPollStorage = 4;
+  private static final int kKeepDuplicates = 5;
 
   PubSubOption(int type, double value) {
-    this.m_type = type;
-    this.m_value = value;
+    m_type = type;
+    m_value = value;
   }
 
   /**
@@ -37,7 +38,17 @@ public class PubSubOption {
    * @return option
    */
   public static PubSubOption sendAll(boolean enabled) {
-    return new PubSubOption(kSendAll, enabled ? 1 : 0);
+    return new PubSubOption(kSendAll, enabled ? 1.0 : 0.0);
+  }
+
+  /**
+   * If enabled, no value changes are sent over the network. This option defaults to disabled.
+   *
+   * @param enabled True to enable, false to disable
+   * @return option
+   */
+  public static PubSubOption topicsOnly(boolean enabled) {
+    return new PubSubOption(kTopicsOnly, enabled ? 1.0 : 0.0);
   }
 
   /**
