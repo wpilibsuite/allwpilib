@@ -343,12 +343,12 @@ HAL_Bool HAL_Initialize(int32_t timeout, int32_t mode) {
 #ifdef _WIN32
   TIMECAPS tc;
   if (timeGetDevCaps(&tc, sizeof(tc)) == TIMERR_NOERROR) {
-    UINT target = min(1, tc.wPeriodMin);
+    UINT target = (std::min)(static_cast<UINT>(1), tc.wPeriodMin);
     timeBeginPeriod(target);
     std::atexit([]() {
       TIMECAPS tc;
       if (timeGetDevCaps(&tc, sizeof(tc)) == TIMERR_NOERROR) {
-        UINT target = min(1, tc.wPeriodMin);
+        UINT target = (std::min)(static_cast<UINT>(1), tc.wPeriodMin);
         timeEndPeriod(target);
       }
     });

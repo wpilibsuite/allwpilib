@@ -1,0 +1,18 @@
+load("//shared/bazel/rules:cc_rules.bzl", "wpilib_cc_library")
+
+wpilib_cc_library(
+    name = "libglassnt",
+    srcs = glob(["cpp/*.cpp"]),
+    hdrs = glob(["include/**/*.h"]),
+    strip_include_prefix = "include",
+    tags = [
+        "no-bionic",
+        "no-raspbian",
+        "no-roborio",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        "//glass/src/lib/native:libglass",
+        "//ntcore/src/main/native:ntcore.shared",
+    ],
+)

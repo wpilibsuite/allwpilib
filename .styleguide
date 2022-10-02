@@ -18,6 +18,7 @@ generatedFileExclude {
   FRCNetComm\.java$
   simulation/gz_msgs/src/include/simulation/gz_msgs/msgs\.h$
   fieldImages/src/main/native/resources/
+  BUILD.bazel
 }
 
 repoRootNameOverride {

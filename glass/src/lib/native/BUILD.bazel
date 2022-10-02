@@ -1,0 +1,19 @@
+load("//shared/bazel/rules:cc_rules.bzl", "wpilib_cc_library")
+
+wpilib_cc_library(
+    name = "libglass",
+    srcs = glob(["cpp/**/*.cpp"]),
+    hdrs = glob(["include/**"]),
+    strip_include_prefix = "include",
+    tags = [
+        "no-bionic",
+        "no-raspbian",
+        "no-roborio",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        "//wpigui/src/main/native:wpigui",
+        "//wpimath/src/main/native:wpimath.shared",
+        "//wpiutil/src/main/native:wpiutil.shared",
+    ],
+)

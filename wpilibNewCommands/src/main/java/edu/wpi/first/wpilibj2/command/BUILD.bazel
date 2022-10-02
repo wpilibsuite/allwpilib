@@ -1,0 +1,22 @@
+load("//shared/bazel/rules:java_rules.bzl", "wpilib_java_library")
+
+wpilib_java_library(
+    name = "wpilibNewCommands",
+    srcs = glob(["**/*.java"]),
+    visibility = ["//visibility:public"],
+    deps = [
+        "//cscore/src/main/java/edu/wpi/first/cscore",
+        "//hal/src/main/java/edu/wpi/first/hal",
+        "//ntcore/src/main/java/edu/wpi/first/networktables",
+        "//wpilibj/src/main/java/edu/wpi/first/wpilibj",
+        "//wpimath/src/main/java/edu/wpi/first/math:wpimath",
+        "//wpinet/src/main/java/edu/wpi/first/net:wpinet",
+        "//wpiutil/src/main/java/edu/wpi/first/util:wpiutil",
+        "@maven//:com_fasterxml_jackson_core_jackson_annotations",
+        "@maven//:com_fasterxml_jackson_core_jackson_core",
+        "@maven//:com_fasterxml_jackson_core_jackson_databind",
+        "@maven//:org_ejml_ejml_core",
+        "@maven//:org_ejml_ejml_ddense",
+        "@maven//:org_ejml_ejml_simple",
+    ],
+)

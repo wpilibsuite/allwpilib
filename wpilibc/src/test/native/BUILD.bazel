@@ -1,0 +1,22 @@
+load("//shared/bazel/rules:cc_rules.bzl", "wpilib_cc_library", "wpilib_cc_test")
+
+wpilib_cc_library(
+    name = "test-headers",
+    testonly = True,
+    hdrs = glob(["include/**"]),
+    includes = ["include"],
+)
+
+wpilib_cc_test(
+    name = "wpilibc-test",
+    srcs = glob(["cpp/**"]),
+    tags = [
+        "no-asan",
+        "no-tsan",
+    ],
+    deps = [
+        ":test-headers",
+        "//wpilibc/src/main/native:wpilibc.static",
+        "@gtest",
+    ],
+)

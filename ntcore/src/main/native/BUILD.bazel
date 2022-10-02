@@ -1,0 +1,35 @@
+load("//shared/bazel/rules:cc_rules.bzl", "wpilib_cc_library", "wpilib_cc_static_and_shared_library")
+load("//shared/bazel/rules/jni:cc_jni.bzl", "wpilib_jni_cc_library")
+
+wpilib_cc_library(
+    name = "private_includes",
+    hdrs = glob(["cpp/*.h"]),
+    strip_include_prefix = "cpp",
+)
+
+wpilib_cc_static_and_shared_library(
+    name = "ntcore",
+    srcs = glob(
+        ["cpp/**"],
+        exclude = ["cpp/jni/**"],
+    ),
+    hdrs = glob(["include/**/*"]),
+    includes = ["include"],
+    standard_deps = [":private_includes"],
+    strip_include_prefix = "include",
+    visibility = ["//visibility:public"],
+    wpi_maybe_shared_deps = [
+        "//wpinet/src/main/native:wpinet",
+        "//wpiutil/src/main/native:wpiutil",
+    ],
+)
+
+wpilib_jni_cc_library(
+    name = "ntcorejni",
+    srcs = glob(["cpp/jni/**"]),
+    java_dep = "//ntcore/src/main/java/edu/wpi/first/networktables:networktables",
+    visibility = ["//visibility:public"],
+    wpi_maybe_shared_deps = [
+        ":ntcore",
+    ],
+)

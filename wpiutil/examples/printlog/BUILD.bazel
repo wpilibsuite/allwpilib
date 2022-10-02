@@ -1,0 +1,15 @@
+load("@rules_python//python:defs.bzl", "py_binary")
+load("//shared/bazel/rules:cc_rules.bzl", "wpilib_cc_binary")
+
+py_binary(
+    name = "datalog",
+    srcs = ["datalog.py"],
+)
+
+wpilib_cc_binary(
+    name = "printlog",
+    srcs = ["printlog.cpp"],
+    deps = [
+        "//wpiutil/src/main/native:wpiutil.static",
+    ],
+)

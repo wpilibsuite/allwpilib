@@ -1,0 +1,36 @@
+load("@rules_python//python:defs.bzl", "py_binary")
+load("//shared/bazel/rules:cc_rules.bzl", "wpilib_cc_library")
+
+py_binary(
+    name = "generate-java-resources",
+    srcs = ["generate-java-resources.py"],
+    data = [
+        "FRCNetComm.java.in",
+        "FRCUsageReporting.h.in",
+        "Instances.txt",
+        "ResourceType.txt",
+    ],
+)
+
+genrule(
+    name = "java-usage-gen",
+    outs = ["FRCNetComm.java"],
+    cmd = "$(locations :generate-java-resources) $@",
+    tools = [":generate-java-resources"],
+    visibility = ["//hal:__subpackages__"],
+)
+
+genrule(
+    name = "cpp-usage-gen",
+    outs = ["hal/FRCUsageReporting.h"],
+    cmd = "$(locations :generate-java-resources) $@",
+    tools = [":generate-java-resources"],
+    visibility = ["//hal:__subpackages__"],
+)
+
+wpilib_cc_library(
+    name = "gen-cpp",
+    hdrs = [":cpp-usage-gen"],
+    strip_include_prefix = ".",
+    visibility = ["//hal:__subpackages__"],
+)

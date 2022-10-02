@@ -1,0 +1,19 @@
+load("//shared/bazel/rules:cc_rules.bzl", "wpilib_cc_library", "wpilib_cc_test")
+
+wpilib_cc_library(
+    name = "test_headers",
+    srcs = glob(["include/*.h"]),
+    includes = ["include"],
+    strip_include_prefix = "include",
+)
+
+wpilib_cc_test(
+    name = "halsim_ws_server-test",
+    srcs = glob(["**/*.cpp"]),
+    tags = ["no-asan"],
+    deps = [
+        ":test_headers",
+        "//simulation/halsim_ws_server/src/main/native:halsim_ws_server.shared",
+        "@gtest",
+    ],
+)

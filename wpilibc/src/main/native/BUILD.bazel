@@ -1,0 +1,23 @@
+load("//shared/bazel/rules:cc_rules.bzl", "wpilib_cc_static_and_shared_library")
+
+wpilib_cc_static_and_shared_library(
+    name = "wpilibc",
+    srcs = [
+        "//wpilibc/src/generate:generate-version",
+    ] + glob([
+        "cppcs/**",
+        "cpp/**",
+    ]),
+    hdrs = glob(["include/**"]),
+    strip_include_prefix = "include",
+    visibility = ["//visibility:public"],
+    wpi_maybe_shared_deps = [
+        "//wpimath/src/main/native:wpimath",
+        "//hal/src/main/native:wpiHal",
+        "//wpinet/src/main/native:wpinet",
+        "//wpiutil/src/main/native:wpiutil",
+        "//cscore/src/main/native:cscore",
+        "//ntcore/src/main/native:ntcore",
+        "//cameraserver/src/main/native:cameraserver",
+    ],
+)

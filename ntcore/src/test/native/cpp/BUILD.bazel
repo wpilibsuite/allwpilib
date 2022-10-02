@@ -1,0 +1,17 @@
+load("//shared/bazel/rules:cc_rules.bzl", "wpilib_cc_test")
+
+wpilib_cc_test(
+    name = "ntcore-test",
+    srcs = glob([
+        "**/*.cpp",
+        "**/*.h",
+    ]),
+    tags = [
+        "no-asan",
+        "no-tsan",
+    ],
+    deps = [
+        "//ntcore/src/main/native:ntcore.static",
+        "@gtest",
+    ],
+)

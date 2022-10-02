@@ -1,0 +1,18 @@
+
+# Warning level
+build:windows --copt=/W3
+build:windows --copt=/WX
+
+build:windows --copt=/EHsc
+build:windows --copt=/FS
+build:windows --copt=/Zc:inline
+build:windows --copt=/wd4244
+build:windows --copt=/wd4267
+build:windows --copt=/wd4146
+build:windows --copt=/wd4996
+build:windows --copt=/Zc:throwingNew
+build:windows --copt=/D_CRT_SECURE_NO_WARNINGS
+build:windows --copt=/std:c++17
+build:windows --copt=/permissive-
+build:windows --copt=/bigobj
+build:windows --copt=/wd5105

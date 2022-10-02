@@ -1,0 +1,71 @@
+load("//shared/bazel/rules:cc_rules.bzl", "wpilib_cc_library")
+
+WIN_UV_SRCS = glob([
+    "src/win/*.cpp",
+    "src/win/*.h",
+])
+
+UNIX_UV_SRCS = [
+    "src/unix/async.cpp",
+    "src/unix/core.cpp",
+    "src/unix/dl.cpp",
+    "src/unix/fs.cpp",
+    "src/unix/getaddrinfo.cpp",
+    "src/unix/getnameinfo.cpp",
+    "src/unix/loop-watcher.cpp",
+    "src/unix/loop.cpp",
+    "src/unix/pipe.cpp",
+    "src/unix/poll.cpp",
+    "src/unix/process.cpp",
+    "src/unix/random-devurandom.cpp",
+    "src/unix/random-getentropy.cpp",
+    "src/unix/random-getrandom.cpp",
+    "src/unix/signal.cpp",
+    "src/unix/stream.cpp",
+    "src/unix/tcp.cpp",
+    "src/unix/thread.cpp",
+    "src/unix/tty.cpp",
+    "src/unix/udp.cpp",
+] + glob(["src/unix/*.h"])
+
+MAC_UV_SRCS = [
+    "src/unix/bsd-ifaddrs.cpp",
+    "src/unix/darwin.cpp",
+    "src/unix/darwin-proctitle.cpp",
+    "src/unix/fsevents.cpp",
+    "src/unix/kqueue.cpp",
+    "src/unix/proctitle.cpp",
+]
+
+LINUX_UV_SRCS = [
+    "src/unix/epoll.cpp",
+    "src/unix/linux-core.cpp",
+    "src/unix/linux-inotify.cpp",
+    "src/unix/linux-syscalls.cpp",
+    "src/unix/procfs-exepath.cpp",
+    "src/unix/proctitle.cpp",
+    "src/unix/random-sysctl-linux.cpp",
+]
+
+wpilib_cc_library(
+    name = "libuv-headers",
+    hdrs = glob([
+        "include/**/*.h",
+    ]),
+    includes = ["src"],
+    strip_include_prefix = "include",
+    visibility = ["//wpinet:__subpackages__"],
+)
+
+filegroup(
+    name = "libuv-srcs",
+    srcs = select({
+        "@bazel_tools//src/conditions:darwin": UNIX_UV_SRCS + MAC_UV_SRCS,
+        "@bazel_tools//src/conditions:linux_x86_64": UNIX_UV_SRCS + LINUX_UV_SRCS,
+        "@bazel_tools//src/conditions:windows": WIN_UV_SRCS,
+        # "//shared/bazel/toolchains/conditions:raspbian": UNIX_UV_SRCS + LINUX_UV_SRCS,
+        # "//shared/bazel/toolchains/conditions:bionic": UNIX_UV_SRCS + LINUX_UV_SRCS,
+        "@bazelrio//constraints/is_roborio:roborio": UNIX_UV_SRCS + LINUX_UV_SRCS,
+    }) + glob(["src/*"]),
+    visibility = ["//wpinet:__subpackages__"],
+)

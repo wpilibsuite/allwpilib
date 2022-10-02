@@ -1,0 +1,6 @@
+
+build:roborio --crosstool_top=@local_roborio//:compiler
+build:roborio --cpu=roborio
+build:roborio --host_crosstool_top=@bazel_tools//tools/cpp:toolchain
+build:roborio --build_tag_filters=-no-roborio
+test:roborio --test_tag_filters=-no-roborio

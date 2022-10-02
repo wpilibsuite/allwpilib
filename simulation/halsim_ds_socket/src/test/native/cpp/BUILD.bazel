@@ -1,0 +1,13 @@
+load("//shared/bazel/rules:cc_rules.bzl", "wpilib_cc_test")
+
+wpilib_cc_test(
+    name = "halsim_ds_socket-test",
+    srcs = glob([
+        "**/*.cpp",
+        "**/*.h",
+    ]),
+    deps = [
+        "//simulation/halsim_ds_socket/src/main/native:halsim_ds_socket.shared",
+        "@gtest",
+    ],
+)

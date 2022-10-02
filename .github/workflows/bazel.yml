@@ -1,0 +1,185 @@
+name: Bazel
+
+on: [pull_request, push]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.head_ref || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build-native:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { os: windows-latest, action: "test", config: "--config=windows" }
+#          - { os: windows-latest, config: "--config=roborio" }
+#          - { os: windows-latest, config: "--config=bionic" }
+#          - { os: windows-latest, config: "--config=raspbian" }
+
+          - { os: macos-latest,   action: "test", config: "--config=osx -c opt --config=no_example" }
+#          - { os: macos-latest, config: "--config=roborio" }
+#          - { os: macos-latest, config: "--config=bionic" }
+#          - { os: macos-latest, config: "--config=raspbian" }
+#
+#          - { os: ubuntu-latest, config: "--config=roborio" }
+#          - { os: ubuntu-latest, config: "--config=bionic" }
+#          - { os: ubuntu-latest, config: "--config=raspbian" }
+    name: "Build - ${{ matrix.os }} ${{ matrix.config }}"
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v2
+        with: { fetch-depth: 0 }
+      - uses: bazelbuild/setup-bazelisk@v1
+
+      - name: Build
+        run: bazel ${{ matrix.action }} -k ... --config=remote ${{ matrix.config }} --nojava_header_compilation --verbose_failures
+        shell: bash
+
+  build-linux:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - container: wpilib/ubuntu-base:20.04
+            artifact-name: Linux Release
+    runs-on: ubuntu-latest
+    name: "Build - ${{ matrix.artifact-name }}${{ matrix.architecture }}"
+    container: ${{ matrix.container }}
+    steps:
+      - uses: actions/checkout@v2
+        with: { fetch-depth: 0 }
+      - uses: bazelbuild/setup-bazelisk@v1
+
+      - name: Build and Test
+        run: bazel test ... --config=remote --config=linux -k --verbose_failures
+
+
+  build-sanitizers:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - config: "tsan"
+          - config: "asan"
+          - config: "ubsan"
+    runs-on: ubuntu-latest
+    container: wpilib/ubuntu-base:20.04
+    name: "Sanitizer ${{ matrix.config }}"
+    steps:
+      - uses: actions/checkout@v2
+        with: { fetch-depth: 0 }
+      - uses: bazelbuild/setup-bazelisk@v1
+      - name: Build and Test
+        run: bazel test  -k --config=remote --config=linux --config=${{ matrix.config }} //...
+
+  build-coverage:
+    runs-on: ubuntu-latest
+    name: "Code Coverage"
+    steps:
+      - uses: actions/checkout@v2
+        with: { fetch-depth: 0 }
+      - uses: bazelbuild/setup-bazelisk@v1
+
+      - name: Install LCOV
+        run: sudo apt-get install -y lcov
+
+      - name: Build, allow buildbudy failure
+        run: bazel coverage --config=remote --config=linux -k -- //... -//simulation/halsim_gui/src/test/native/cpp:halsim_gui-test
+
+      - name: genhtml
+        run: |
+          genhtml bazel-out/_coverage/_coverage_report.dat -o coverage_report/combined
+
+      - uses: actions/upload-artifact@v2
+        with:
+          name: "Coverage"
+          path: coverage_report
+
+  buildifier:
+    name: "buildifier"
+    runs-on: ubuntu-latest
+    steps:
+      - name: Set up Go 1.15.x
+        uses: actions/setup-go@v2
+        with:
+          go-version: 1.15.x
+        id: go
+
+      - name: Install Buildifier
+        run: |
+          cd $(mktemp -d)
+          GO111MODULE=on go get github.com/bazelbuild/buildtools/buildifier@5.1.0
+
+      - uses: actions/checkout@v2
+        with: { fetch-depth: 0 }
+
+      - name: Run buildifier
+        run: buildifier -warnings all --lint=fix -r .
+
+      - name: Check Output
+        run: git --no-pager diff --exit-code HEAD
+
+      - name: Generate diff
+        run: git diff HEAD > bazel-lint-fixes.patch
+        if: ${{ failure() }}
+
+      - uses: actions/upload-artifact@v2
+        with:
+          name: ${{ matrix.platform }}-bazel-lint-fixes
+          path: bazel-lint-fixes.patch
+        if: ${{ failure() }}
+
+  unused_deps:
+    name: "unused_deps"
+    runs-on: ubuntu-latest
+    steps:
+      - name: Set up Go 1.15.x
+        uses: actions/setup-go@v2
+        with:
+          go-version: 1.15.x
+        id: go
+
+      - uses: actions/checkout@v2
+
+      - name: Install Unused Deps
+        run: |
+          cd $(mktemp -d)
+          GO111MODULE=on go get github.com/bazelbuild/buildtools/unused_deps@5.1.0
+
+      - name: Install Buildozer
+        run: |
+          cd $(mktemp -d)
+          GO111MODULE=on go get github.com/bazelbuild/buildtools/buildozer@5.1.0
+
+      - name: Dump Platform Flag
+        run: echo "build --config=linux" > user.bazelrc
+
+      - name: Prep unused deps
+        run:  bazel query --tool_tag=unused_deps --keep_going "kind('(kt|java|android)_*', //...)" && bazel build --tool_tag=unused_deps --keep_going //... --config=remote --config=linux || true
+
+      - name: Run unused deps
+        run: unused_deps -cquery //... > buildozer-cmds.sh
+
+      - name: Show unused deps
+        run: cat buildozer-cmds.sh
+
+      - uses: actions/upload-artifact@v2
+        with:
+          name: Upload Unused Deps Script
+          path: buildozer-cmds.sh
+
+      - name: Fix unused deps
+        run: chmod +x buildozer-cmds.sh && ./buildozer-cmds.sh
+
+      - name: Generate diff
+        run: git diff > bazel-unused-deps-fixes.patch
+
+      - name: Check Output
+        run: git --no-pager diff --exit-code HEAD
+
+      - uses: actions/upload-artifact@v2
+        with:
+          name: Upload Unused Deps Patch
+          path: bazel-unused-deps-fixes.patch
+        if: ${{ failure() }}

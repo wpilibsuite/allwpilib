@@ -1,0 +1,4 @@
+sh_library(
+    name = "test-scripts",
+    srcs = glob(["*.sh"]),
+)

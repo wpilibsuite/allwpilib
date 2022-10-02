@@ -1,0 +1,18 @@
+load("@__allwpilib_pip_deps//:requirements.bzl", "requirement")
+load("@rules_python//python:defs.bzl", "py_binary")
+
+py_binary(
+    name = "generate_numbers",
+    srcs = ["generate_numbers.py"],
+    data = glob(["src/generate/*.jinja"]),
+    visibility = ["//visibility:public"],
+    deps = [requirement("jinja2")],
+)
+
+genrule(
+    name = "gen-nat",
+    outs = ["Nat.java"] + ["N{}.java".format(i) for i in range(21)],
+    cmd = "$(locations :generate_numbers) $(OUTS)",
+    tools = [":generate_numbers"],
+    visibility = ["//wpimath:__subpackages__"],
+)

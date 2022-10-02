@@ -1,0 +1,16 @@
+load("//shared/bazel/rules:cc_flags.bzl", "get_wpigui_linker_flags")
+load("//shared/bazel/rules:cc_rules.bzl", "wpilib_cc_binary")
+
+wpilib_cc_binary(
+    name = "DevMain",
+    srcs = ["main.cpp"],
+    linkopts = get_wpigui_linker_flags(console = True),
+    tags = [
+        "no-bionic",
+        "no-raspbian",
+        "no-roborio",
+    ],
+    deps = [
+        "//wpigui/src/main/native:wpigui",
+    ],
+)

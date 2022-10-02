@@ -1,0 +1,6 @@
+
+build:bionic --crosstool_top=@local_bionic//:compiler
+build:bionic --cpu=bionic
+build:bionic --host_crosstool_top=@bazel_tools//tools/cpp:toolchain
+build:bionic --build_tag_filters=-no-bionic
+build:bionic --test_tag_filters=-no-bionic

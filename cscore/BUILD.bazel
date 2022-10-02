@@ -1,0 +1,3 @@
+load("//cscore:build_examples.bzl", "build_cpp_examples")
+
+build_cpp_examples()

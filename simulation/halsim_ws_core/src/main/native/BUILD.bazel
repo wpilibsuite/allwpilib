@@ -1,0 +1,22 @@
+load("//shared/bazel/rules:cc_rules.bzl", "wpilib_cc_library")
+
+wpilib_cc_library(
+    name = "halsim_ws_core",
+    srcs = glob(["cpp/*.cpp"]),
+    hdrs = glob([
+        "include/*.h",
+        "include/*.inc",
+    ]),
+    strip_include_prefix = "include",
+    tags = [
+        "no-bionic",
+        "no-raspbian",
+        "no-roborio",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        "//hal/src/main/native:wpiHal.shared",
+        "//wpinet/src/main/native:wpinet.shared",
+        "//wpiutil/src/main/native:wpiutil.shared",
+    ],
+)

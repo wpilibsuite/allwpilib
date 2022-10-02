@@ -1,0 +1,15 @@
+load("//shared/bazel/rules:java_rules.bzl", "wpilib_java_binary")
+
+wpilib_java_binary(
+    name = "multiCameraServer",
+    srcs = ["Main.java"],
+    deps = [
+        "//cameraserver/src/main/java/edu/wpi/first:cameraserver",
+        "//cscore/src/main/java/edu/wpi/first/cscore",
+        "//hal/src/main/java/edu/wpi/first/hal",
+        "//ntcore/src/main/java/edu/wpi/first/networktables",
+        "//wpimath/src/main/java/edu/wpi/first/math:wpimath",
+        "//wpiutil/src/main/java/edu/wpi/first/util:wpiutil",
+        "@maven//:com_google_code_gson_gson",
+    ],
+)

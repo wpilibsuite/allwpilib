@@ -1,0 +1,6 @@
+
+build:raspbian --crosstool_top=@local_raspbian//:compiler
+build:raspbian --cpu=raspbian
+build:raspbian --host_crosstool_top=@bazel_tools//tools/cpp:toolchain
+build:raspbian --build_tag_filters=-no-raspbian
+build:raspbian --test_tag_filters=-no-raspbian

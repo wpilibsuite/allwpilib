@@ -1,0 +1,13 @@
+load("//shared/bazel/rules/jni:java_jni.bzl", "wpilib_java_jni_library")
+
+wpilib_java_jni_library(
+    name = "wpiutil",
+    srcs = glob(["**/*.java"]),
+    native_libs = ["//wpiutil/src/main/native:wpiutiljni"],
+    visibility = ["//visibility:public"],
+    deps = [
+        "@maven//:com_fasterxml_jackson_core_jackson_annotations",
+        "@maven//:com_fasterxml_jackson_core_jackson_core",
+        "@maven//:com_fasterxml_jackson_core_jackson_databind",
+    ],
+)

@@ -1,0 +1,55 @@
+load("//shared/bazel/rules:cc_rules.bzl", "wpilib_cc_static_and_shared_library")
+load("//shared/bazel/rules/jni:cc_jni.bzl", "wpilib_jni_cc_library")
+
+WIN_SRCS = glob([
+    "windows/**/*.cpp",
+    "windows/**/*.h",
+])
+
+LINUX_SRCS = glob([
+    "linux/**/*.cpp",
+    "linux/**/*.h",
+])
+
+MAC_SRCS = glob(["osx/**/*.cpp"])
+
+filegroup(
+    name = "native-srcs",
+    srcs = select({
+        "@bazel_tools//src/conditions:darwin": MAC_SRCS,
+        "@bazel_tools//src/conditions:linux_x86_64": LINUX_SRCS,
+        "@bazel_tools//src/conditions:windows": WIN_SRCS,
+    }),
+)
+
+wpilib_cc_static_and_shared_library(
+    name = "cscore",
+    srcs = [":native-srcs"] + glob(
+        ["cpp/**"],
+        exclude = ["cpp/jni/**"],
+    ),
+    hdrs = glob(["include/**/*"]),
+    includes = [
+        "cpp",
+        "include",
+    ],
+    standard_deps = [
+        "@bazelrio//libraries/cpp/opencv",
+    ],
+    strip_include_prefix = "include",
+    visibility = ["//visibility:public"],
+    wpi_maybe_shared_deps = [
+        "//wpiutil/src/main/native:wpiutil",
+        "//wpinet/src/main/native:wpinet",
+    ],
+)
+
+wpilib_jni_cc_library(
+    name = "cscorejni",
+    srcs = glob(["cpp/jni/**"]),
+    java_dep = "//cscore/src/main/java/edu/wpi/first/cscore:cscore",
+    visibility = ["//visibility:public"],
+    wpi_maybe_shared_deps = [
+        ":cscore",
+    ],
+)

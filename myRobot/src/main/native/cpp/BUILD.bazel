@@ -1,0 +1,9 @@
+load("//shared/bazel/rules:cc_rules.bzl", "wpilib_cc_binary")
+
+wpilib_cc_binary(
+    name = "MyRobot",
+    srcs = ["MyRobot.cpp"],
+    deps = [
+        "//wpilibc/src/main/native:wpilibc.shared",
+    ],
+)

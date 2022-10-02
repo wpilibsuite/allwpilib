@@ -1,0 +1,17 @@
+load("//shared/bazel/rules:cc_rules.bzl", "wpilib_cc_library")
+
+wpilib_cc_library(
+    name = "drake-headers",
+    hdrs = glob([
+        "include/**/*.h",
+    ]),
+    includes = ["include"],
+    strip_include_prefix = "include",
+    visibility = ["//wpimath:__subpackages__"],
+)
+
+filegroup(
+    name = "drake-srcs",
+    srcs = glob(["src/**"]),
+    visibility = ["//wpimath:__subpackages__"],
+)

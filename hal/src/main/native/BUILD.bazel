@@ -1,0 +1,64 @@
+load("//shared/bazel/rules:cc_rules.bzl", "wpilib_cc_static_and_shared_library")
+load("//shared/bazel/rules/jni:cc_jni.bzl", "wpilib_jni_cc_library")
+
+ATHENA_SRCS = glob([
+    "athena/*.cpp",
+    "athena/*.h",
+    "athena/cpp/*.cpp",
+    "athena/ctre/*.cpp",
+    "athena/ctre/*.h",
+    "athena/rev/*.cpp",
+    "athena/rev/*.h",
+    "athena/frccansae/*.h",
+    "athena/mockdata/*.cpp",
+])
+
+ATHENA_DEPS = []
+
+SIM_SRCS = glob([
+    "sim/*.cpp",
+    "sim/mockdata/*.cpp",
+    "sim/*.h",
+    "sim/mockdata/*.h",
+])
+
+SIM_DEPS = []
+
+HAL_DEPS = select({
+    "@bazelrio//constraints/is_roborio:roborio": ATHENA_DEPS,
+    "//conditions:default": SIM_DEPS,
+})
+
+filegroup(
+    name = "platform-srcs",
+    srcs = select({
+        "@bazelrio//constraints/is_roborio:roborio": ATHENA_SRCS,
+        "//conditions:default": SIM_SRCS,
+    }),
+)
+
+wpilib_cc_static_and_shared_library(
+    name = "wpiHal",
+    srcs = ["platform-srcs"] + glob(
+        ["cpp/**"],
+        exclude = ["cpp/jni/**"],
+    ),
+    hdrs = glob(["include/**/*"]),
+    includes = ["include"],
+    standard_deps = ["//hal/src/generate:gen-cpp"],
+    strip_include_prefix = "include",
+    visibility = ["//visibility:public"],
+    wpi_maybe_shared_deps = [
+        "//wpiutil/src/main/native:wpiutil",
+    ],
+)
+
+wpilib_jni_cc_library(
+    name = "wpiHaljni",
+    srcs = glob(["cpp/jni/**"]),
+    java_dep = "//hal/src/main/java/edu/wpi/first/hal:hal",
+    visibility = ["//visibility:public"],
+    wpi_maybe_shared_deps = [
+        ":wpiHal",
+    ],
+)

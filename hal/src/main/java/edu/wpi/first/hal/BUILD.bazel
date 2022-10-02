@@ -1,0 +1,11 @@
+load("//shared/bazel/rules/jni:java_jni.bzl", "wpilib_java_jni_library")
+
+wpilib_java_jni_library(
+    name = "hal",
+    srcs = ["//hal/src/generate:java-usage-gen"] + glob(["**/*.java"]),
+    native_libs = ["//hal/src/main/native:wpiHaljni"],
+    visibility = ["//visibility:public"],
+    deps = [
+        "//wpiutil/src/main/java/edu/wpi/first/util:wpiutil",
+    ],
+)

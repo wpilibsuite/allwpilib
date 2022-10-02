@@ -1,0 +1,13 @@
+load("//shared/bazel/rules:cc_rules.bzl", "wpilib_cc_test")
+
+wpilib_cc_test(
+    name = "cameraserver-test",
+    srcs = glob([
+        "**/*.cpp",
+        "**/*.h",
+    ]),
+    deps = [
+        "//cameraserver/src/main/native:cameraserver.static",
+        "@gtest",
+    ],
+)

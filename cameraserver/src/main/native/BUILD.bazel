@@ -1,0 +1,17 @@
+load("//shared/bazel/rules:cc_rules.bzl", "wpilib_cc_static_and_shared_library")
+
+wpilib_cc_static_and_shared_library(
+    name = "cameraserver",
+    srcs = glob(["cpp/**"]),
+    hdrs = glob(["include/**/*"]),
+    includes = [
+        "cpp",
+        "include",
+    ],
+    strip_include_prefix = "include",
+    visibility = ["//visibility:public"],
+    wpi_maybe_shared_deps = [
+        "//cscore/src/main/native:cscore",
+        "//ntcore/src/main/native:ntcore",
+    ],
+)

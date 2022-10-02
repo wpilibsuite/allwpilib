@@ -1,0 +1,14 @@
+load("//shared/bazel/rules:cc_rules.bzl", "wpilib_cc_binary")
+
+wpilib_cc_binary(
+    name = "DevMain",
+    srcs = ["main.cpp"],
+    tags = [
+        "no-bionic",
+        "no-raspbian",
+        "no-roborio",
+    ],
+    deps = [
+        "//simulation/halsim_gui/src/main/native:halsim_gui.shared",
+    ],
+)

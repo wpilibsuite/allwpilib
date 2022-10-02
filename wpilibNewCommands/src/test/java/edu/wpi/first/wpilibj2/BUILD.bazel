@@ -1,0 +1,16 @@
+load("//shared/bazel/rules:java_rules.bzl", "wpilib_java_junit5_test")
+
+wpilib_java_junit5_test(
+    name = "wpilibNewCommands-test",
+    srcs = glob(["**/*.java"]),
+    deps = [
+        "//hal/src/main/java/edu/wpi/first/hal",
+        "//ntcore/src/main/java/edu/wpi/first/networktables",
+        "//wpilibNewCommands/src/main/java/edu/wpi/first/wpilibj2/command:wpilibNewCommands",
+        "//wpilibNewCommands/src/test/resources",
+        "//wpilibj/src/main/java/edu/wpi/first/wpilibj",
+        "//wpimath/src/main/java/edu/wpi/first/math:wpimath",
+        "//wpiutil/src/main/java/edu/wpi/first/util:wpiutil",
+        "@maven//:org_mockito_mockito_core",
+    ],
+)

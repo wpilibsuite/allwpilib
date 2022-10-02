@@ -20,6 +20,7 @@ public final class PrintLog {
       DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
   /** Main function. */
+  @SuppressWarnings("ArraysAsListPrimitiveArray")
   public static void main(String[] args) {
     if (args.length != 1) {
       System.err.println("Usage: printlog <file>");

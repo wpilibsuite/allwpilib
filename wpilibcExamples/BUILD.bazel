@@ -1,0 +1,10 @@
+load("//wpilibcExamples:build_cpp_examples.bzl", "build_commands", "build_examples", "build_templates")
+
+halsim_deps = [
+]
+
+build_commands()
+
+build_examples(halsim_deps = halsim_deps)
+
+build_templates()

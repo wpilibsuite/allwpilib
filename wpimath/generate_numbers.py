@@ -27,7 +27,12 @@ def main():
     MAX_NUM = 20
 
     dirname, _ = os.path.split(os.path.abspath(__file__))
+    if dirname.startswith(f"\\"):
+        dirname = dirname[4:]
+
     cmake_binary_dir = sys.argv[1]
+
+    is_bazel = len(sys.argv) > 20
 
     env = Environment(
         loader=FileSystemLoader(f"{dirname}/src/generate"),
@@ -35,17 +40,33 @@ def main():
         keep_trailing_newline=True,
     )
 
-    template = env.get_template("GenericNumber.java.jinja")
-    rootPath = f"{cmake_binary_dir}/generated/main/java/edu/wpi/first/math/numbers"
+    if is_bazel:
+        generic_file = sys.argv[1]
+        num_files = sys.argv[2:]
+        assert MAX_NUM + 1 == len(num_files)
 
-    for i in range(MAX_NUM + 1):
-        contents = template.render(num=i)
-        output(rootPath, f"N{i}.java", contents)
+        template = env.get_template("GenericNumber.java.jinja")
+        for i, num_file in enumerate(num_files):
+            contents = template.render(num=i)
+            output(os.path.dirname(num_file), os.path.basename(num_file), contents)
 
-    template = env.get_template("Nat.java.jinja")
-    rootPath = f"{cmake_binary_dir}/generated/main/java/edu/wpi/first/math"
-    contents = template.render(nums=range(MAX_NUM + 1))
-    output(rootPath, "Nat.java", contents)
+        template = env.get_template("Nat.java.jinja")
+        contents = template.render(nums=range(MAX_NUM + 1))
+        output(os.path.dirname(generic_file), os.path.basename(generic_file), contents)
+
+    else:
+
+        template = env.get_template("GenericNumber.java.jinja")
+        rootPath = f"{cmake_binary_dir}/generated/main/java/edu/wpi/first/math/numbers"
+
+        for i in range(MAX_NUM + 1):
+            contents = template.render(num=i)
+            output(rootPath, f"N{i}.java", contents)
+
+        template = env.get_template("Nat.java.jinja")
+        rootPath = f"{cmake_binary_dir}/generated/main/java/edu/wpi/first/math"
+        contents = template.render(nums=range(MAX_NUM + 1))
+        output(rootPath, "Nat.java", contents)
 
 
 if __name__ == "__main__":

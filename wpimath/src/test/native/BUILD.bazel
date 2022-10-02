@@ -1,0 +1,22 @@
+load("//shared/bazel/rules:cc_rules.bzl", "wpilib_cc_library", "wpilib_cc_test")
+
+wpilib_cc_library(
+    name = "test_headers",
+    hdrs = glob([
+        "include/**",
+    ]),
+    strip_include_prefix = "include",
+)
+
+wpilib_cc_test(
+    name = "wpimath-cpp-test",
+    srcs = glob([
+        "cpp/**/*.cpp",
+        "cpp/**/*.h",
+    ]),
+    deps = [
+        ":test_headers",
+        "//wpimath/src/main/native:wpimath.static",
+        "@gtest",
+    ],
+)

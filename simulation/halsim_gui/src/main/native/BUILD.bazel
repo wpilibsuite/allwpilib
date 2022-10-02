@@ -1,0 +1,23 @@
+load("//shared/bazel/rules:cc_flags.bzl", "get_wpigui_linker_flags")
+load("//shared/bazel/rules:cc_rules.bzl", "wpilib_cc_shared_library")
+
+wpilib_cc_shared_library(
+    name = "halsim_gui",
+    srcs = glob([
+        "cpp/*",
+        "include/*.h",
+    ]),
+    features = ["windows_export_all_symbols"],
+    includes = ["include"],
+    linkopts = get_wpigui_linker_flags(console = True),
+    tags = [
+        "no-bionic",
+        "no-raspbian",
+        "no-roborio",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        "//glass/src/libnt/native:libglassnt",
+        "//hal/src/main/native:wpiHal.shared",
+    ],
+)
