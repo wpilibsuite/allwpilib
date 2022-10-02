@@ -135,7 +135,7 @@ CommandPtr CommandPtr::Unless(std::function<bool()> condition) && {
   return std::move(*this);
 }
 
-Command* CommandPtr::operator*() const {
+Command* CommandPtr::get() const {
   return m_ptr.get();
 }
 

@@ -175,7 +175,7 @@ void CommandScheduler::Schedule(std::initializer_list<Command*> commands) {
 }
 
 void CommandScheduler::Schedule(const CommandPtr& command) {
-  Schedule(*command);
+  Schedule(command.get());
 }
 
 void CommandScheduler::Run() {
@@ -332,7 +332,7 @@ void CommandScheduler::Cancel(Command* command) {
 }
 
 void CommandScheduler::Cancel(const CommandPtr& command) {
-  Cancel(*command);
+  Cancel(command.get());
 }
 
 void CommandScheduler::Cancel(wpi::span<Command* const> commands) {
@@ -380,7 +380,7 @@ bool CommandScheduler::IsScheduled(const Command* command) const {
 }
 
 bool CommandScheduler::IsScheduled(const CommandPtr& command) const {
-  return m_impl->scheduledCommands.contains(*command);
+  return m_impl->scheduledCommands.contains(command.get());
 }
 
 Command* CommandScheduler::Requiring(const Subsystem* subsystem) const {

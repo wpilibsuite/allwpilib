@@ -150,7 +150,7 @@ class CommandPtr final {
   /**
    * Get a raw pointer to the held command.
    */
-  Command* operator*() const;
+  Command* get() const;
 
   /**
    * Schedules this command.
