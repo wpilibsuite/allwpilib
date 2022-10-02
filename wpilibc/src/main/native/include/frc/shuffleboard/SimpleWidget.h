@@ -27,11 +27,13 @@ class SimpleWidget final : public ShuffleboardWidget<SimpleWidget> {
 
   /**
    * Gets the NetworkTable entry that contains the data for this widget.
+   * The widget owns the entry.
    */
   nt::GenericEntry& GetEntry();
 
   /**
    * Gets the NetworkTable entry that contains the data for this widget.
+   * The widget owns the entry.
    *
    * @param typeString NT type string
    */
