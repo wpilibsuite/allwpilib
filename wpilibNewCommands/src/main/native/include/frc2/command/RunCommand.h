@@ -9,8 +9,8 @@
 
 #include <wpi/span.h>
 
-#include "frc2/command/CommandBase.h"
 #include "frc2/command/CommandHelper.h"
+#include "frc2/command/FunctionalCommand.h"
 
 namespace frc2 {
 /**
@@ -21,7 +21,7 @@ namespace frc2 {
  *
  * This class is provided by the NewCommands VendorDep
  */
-class RunCommand : public CommandHelper<CommandBase, RunCommand> {
+class RunCommand : public CommandHelper<FunctionalCommand, RunCommand> {
  public:
   /**
    * Creates a new RunCommand.  The Runnable will be run continuously until the
@@ -46,10 +46,5 @@ class RunCommand : public CommandHelper<CommandBase, RunCommand> {
   RunCommand(RunCommand&& other) = default;
 
   RunCommand(const RunCommand& other) = default;
-
-  void Execute() override;
-
- protected:
-  std::function<void()> m_toRun;
 };
 }  // namespace frc2
