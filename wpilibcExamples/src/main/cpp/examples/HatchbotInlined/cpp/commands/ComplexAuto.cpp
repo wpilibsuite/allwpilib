@@ -15,14 +15,14 @@ ComplexAuto::ComplexAuto(DriveSubsystem* drive, HatchSubsystem* hatch) {
       // Drive forward the specified distance
       frc2::FunctionalCommand(
           // Reset encoders on command start
-          [&] { drive->ResetEncoders(); },
+          [drive] { drive->ResetEncoders(); },
           // Drive forward while the command is executing
-          [&] { drive->ArcadeDrive(kAutoDriveSpeed, 0); },
+          [drive] { drive->ArcadeDrive(kAutoDriveSpeed, 0); },
           // Stop driving at the end of the command
-          [&](bool interrupted) { drive->ArcadeDrive(0, 0); },
+          [drive](bool interrupted) { drive->ArcadeDrive(0, 0); },
           // End the command when the robot's driven distance exceeds the
           // desired value
-          [&] {
+          [drive] {
             return drive->GetAverageEncoderDistance() >=
                    kAutoDriveDistanceInches;
           },
@@ -34,14 +34,14 @@ ComplexAuto::ComplexAuto(DriveSubsystem* drive, HatchSubsystem* hatch) {
       // Drive forward the specified distance
       frc2::FunctionalCommand(
           // Reset encoders on command start
-          [&] { drive->ResetEncoders(); },
+          [drive] { drive->ResetEncoders(); },
           // Drive backward while the command is executing
-          [&] { drive->ArcadeDrive(-kAutoDriveSpeed, 0); },
+          [drive] { drive->ArcadeDrive(-kAutoDriveSpeed, 0); },
           // Stop driving at the end of the command
-          [&](bool interrupted) { drive->ArcadeDrive(0, 0); },
+          [drive](bool interrupted) { drive->ArcadeDrive(0, 0); },
           // End the command when the robot's driven distance exceeds the
           // desired value
-          [&] {
+          [drive] {
             return drive->GetAverageEncoderDistance() <=
                    kAutoBackupDistanceInches;
           },
