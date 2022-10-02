@@ -31,7 +31,7 @@ class NetworkBooleanEvent : public BooleanEvent {
    * @param loop the loop that polls this event
    * @param topic The boolean topic that contains the value
    */
-  explicit NetworkBooleanEvent(EventLoop* loop, nt::BooleanTopic topic);
+  NetworkBooleanEvent(EventLoop* loop, nt::BooleanTopic topic);
 
   /**
    * Creates a new event with the given boolean subscriber determining whether
@@ -40,7 +40,7 @@ class NetworkBooleanEvent : public BooleanEvent {
    * @param loop the loop that polls this event
    * @param sub The boolean subscriber that provides the value
    */
-  explicit NetworkBooleanEvent(EventLoop* loop, nt::BooleanSubscriber sub);
+  NetworkBooleanEvent(EventLoop* loop, nt::BooleanSubscriber sub);
 
   /**
    * Creates a new event with the given boolean topic determining whether it is
