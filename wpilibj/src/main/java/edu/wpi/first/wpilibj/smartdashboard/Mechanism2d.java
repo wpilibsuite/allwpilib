@@ -88,7 +88,7 @@ public final class Mechanism2d implements NTSendable {
    * @param color the new color
    */
   public synchronized void setBackgroundColor(Color8Bit color) {
-    this.m_color = String.format("#%02X%02X%02X", color.red, color.green, color.blue);
+    this.m_color = color.toHexString();
     if (m_table != null) {
       m_table.getEntry(kBackgroundColor).setString(m_color);
     }
