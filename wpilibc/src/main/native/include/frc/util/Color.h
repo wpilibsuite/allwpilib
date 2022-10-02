@@ -5,6 +5,7 @@
 #pragma once
 
 #include <algorithm>
+#include <string>
 
 namespace frc {
 
@@ -807,6 +808,13 @@ class Color {
         return Color(v, m, v - X);
     }
   }
+
+  /**
+   * Return this color represented as a hex string.
+   *
+   * @return a string of the format <tt>\#RRGGBB</tt>
+   */
+  std::string HexString() const;
 
   double red = 0.0;
   double green = 0.0;
