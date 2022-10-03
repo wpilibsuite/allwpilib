@@ -243,7 +243,7 @@ public final class CameraServer {
                       try {
                         publisher.close();
                       } catch (Exception e) {
-                        // ignore
+                        // ignore (nothing we can do about it)
                       }
                     }
                     break;
@@ -317,7 +317,7 @@ public final class CameraServer {
                           }
                           pp.m_choicesPublisher.set(choices);
                         } catch (VideoException ignored) {
-                          // ignore
+                          // ignore (just don't publish choices if we can't get them)
                         }
                       }
                     }
