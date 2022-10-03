@@ -9,7 +9,9 @@
 #include <initializer_list>
 #include <memory>
 #include <ostream>
+#include <type_traits>
 #include <utility>
+#include <vector>
 
 #include <wpi/span.h>
 
@@ -21,7 +23,7 @@ namespace wpi {
 template <typename T>
 class SpanMatcher : public ::testing::MatcherInterface<span<T>> {
  public:
-  explicit SpanMatcher(span<T> good_) : good(std::move(good_)) {}
+  explicit SpanMatcher(span<T> good_) : good{good_.begin(), good_.end()} {}
 
   bool MatchAndExplain(span<T> val,
                        ::testing::MatchResultListener* listener) const override;
@@ -29,7 +31,7 @@ class SpanMatcher : public ::testing::MatcherInterface<span<T>> {
   void DescribeNegationTo(::std::ostream* os) const override;
 
  private:
-  span<T> good;
+  std::vector<std::remove_cv_t<T>> good;
 };
 
 template <typename T>
@@ -56,13 +58,13 @@ bool SpanMatcher<T>::MatchAndExplain(
 
 template <typename T>
 void SpanMatcher<T>::DescribeTo(::std::ostream* os) const {
-  PrintTo(good, os);
+  PrintTo(span<T>{good}, os);
 }
 
 template <typename T>
 void SpanMatcher<T>::DescribeNegationTo(::std::ostream* os) const {
   *os << "is not equal to ";
-  PrintTo(good, os);
+  PrintTo(span<T>{good}, os);
 }
 
 }  // namespace wpi
