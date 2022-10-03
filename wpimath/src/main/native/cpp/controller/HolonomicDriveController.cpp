@@ -15,7 +15,9 @@ HolonomicDriveController::HolonomicDriveController(
     ProfiledPIDController<units::radian> thetaController)
     : m_xController(std::move(xController)),
       m_yController(std::move(yController)),
-      m_thetaController(std::move(thetaController)) {}
+      m_thetaController(std::move(thetaController)) {
+  m_thetaController.EnableContinuousInput(0_deg, 360.0_deg);
+}
 
 bool HolonomicDriveController::AtReference() const {
   const auto& eTranslate = m_poseError.Translation();
