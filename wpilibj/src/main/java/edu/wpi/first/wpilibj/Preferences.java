@@ -253,8 +253,9 @@ public final class Preferences {
    * @param key the key
    */
   public static void remove(String key) {
-    m_table.getEntry(key).clearPersistent();
-    // TODO: unpublish
+    NetworkTableEntry entry = m_table.getEntry(key);
+    entry.clearPersistent();
+    entry.unpublish();
   }
 
   /** Remove all preferences. */

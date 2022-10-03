@@ -151,8 +151,9 @@ bool Preferences::ContainsKey(std::string_view key) {
 }
 
 void Preferences::Remove(std::string_view key) {
-  ::GetInstance().table->GetEntry(key).ClearPersistent();
-  // TODO: unpublish
+  auto entry = ::GetInstance().table->GetEntry(key);
+  entry.ClearPersistent();
+  entry.Unpublish();
 }
 
 void Preferences::RemoveAll() {
