@@ -13,12 +13,14 @@ using namespace frc;
 
 class NetworkBooleanEventTest : public ::testing::Test {
  public:
-  void SetUp() override {
+  NetworkBooleanEventTest() {
     m_inst = nt::NetworkTableInstance::Create();
     m_inst.StartLocal();
   }
 
-  void TearDown() override { nt::NetworkTableInstance::Destroy(m_inst); }
+  ~NetworkBooleanEventTest() override {
+    nt::NetworkTableInstance::Destroy(m_inst);
+  }
 
   nt::NetworkTableInstance m_inst;
 };

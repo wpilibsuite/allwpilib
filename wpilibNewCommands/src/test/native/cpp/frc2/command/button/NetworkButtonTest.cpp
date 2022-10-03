@@ -15,12 +15,12 @@ using namespace frc2;
 
 class NetworkButtonTest : public CommandTestBase {
  public:
-  void SetUp() override {
+  NetworkButtonTest() {
     inst = nt::NetworkTableInstance::Create();
     inst.StartLocal();
   }
 
-  void TearDown() override { nt::NetworkTableInstance::Destroy(inst); }
+  ~NetworkButtonTest() override { nt::NetworkTableInstance::Destroy(inst); }
 
   nt::NetworkTableInstance inst;
 };
