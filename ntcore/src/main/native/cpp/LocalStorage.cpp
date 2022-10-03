@@ -1091,6 +1091,7 @@ TopicListenerData* LSImpl::AddTopicListenerImpl(
   // subscribe to make sure topic updates are received
   PubSubOptions options;
   options.topicsOnly = true;
+  options.prefixMatch = true;
   auto subscriber = AddMultiSubscriber(prefixes, options);
 
   auto listener =
@@ -1801,7 +1802,9 @@ NT_MultiSubscriber LocalStorage::SubscribeMultiple(
     wpi::span<const std::string_view> prefixes,
     wpi::span<const PubSubOption> options) {
   std::scoped_lock lock{m_mutex};
-  return m_impl->AddMultiSubscriber(prefixes, PubSubOptions{options})->handle;
+  PubSubOptions opts{options};
+  opts.prefixMatch = true;
+  return m_impl->AddMultiSubscriber(prefixes, opts)->handle;
 }
 
 void LocalStorage::UnsubscribeMultiple(NT_MultiSubscriber subHandle) {
