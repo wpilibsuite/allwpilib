@@ -67,7 +67,7 @@ static void NtInitialize() {
 
   // handle NetworkTables log messages
   auto logPoller = nt::CreateLoggerPoller(inst);
-  // nt::AddPolledLogger(logPoller, NT_LOG_INFO, 100);
+  nt::AddPolledLogger(logPoller, NT_LOG_INFO, 100);
   gui::AddEarlyExecute([logPoller] {
     for (auto&& msg : nt::ReadLoggerQueue(logPoller)) {
       const char* level = "";
