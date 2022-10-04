@@ -4,14 +4,14 @@
 
 package edu.wpi.first.networktables;
 
-/** NetworkTables entry implementation. */
-public abstract class EntryImpl implements Subscriber, Publisher {
+/** NetworkTables entry base implementation. */
+public abstract class EntryBase implements Subscriber, Publisher {
   /**
    * Constructor.
    *
    * @param handle handle
    */
-  public EntryImpl(int handle) {
+  public EntryBase(int handle) {
     m_handle = handle;
   }
 
