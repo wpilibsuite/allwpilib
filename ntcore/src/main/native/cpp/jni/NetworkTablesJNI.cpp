@@ -198,16 +198,22 @@ static jobject MakeJObject(JNIEnv* env, const nt::Value& value) {
                             static_cast<jdouble>(value.GetDouble()));
     case NT_STRING:
       return MakeJString(env, value.GetString());
-    case NT_RAW:
-      return MakeJByteArray(env, value.GetRaw());
+    case NT_RAW: {
+      auto data = value.GetRaw();
+      return MakeJByteArray(
+          env, {reinterpret_cast<const uint8_t*>(data.data()), data.size()});
+    }
     case NT_BOOLEAN_ARRAY:
       return MakeJBooleanArray(env, value.GetBooleanArray());
     case NT_DOUBLE_ARRAY:
       return MakeJDoubleArray(env, value.GetDoubleArray());
     case NT_STRING_ARRAY:
       return MakeJStringArray(env, value.GetStringArray());
-    case NT_RPC:
-      return MakeJByteArray(env, value.GetRpc());
+    case NT_RPC: {
+      auto data = value.GetRpc();
+      return MakeJByteArray(
+          env, {reinterpret_cast<const uint8_t*>(data.data()), data.size()});
+    }
     default:
       return nullptr;
   }
@@ -300,7 +306,10 @@ static jobject MakeJObject(JNIEnv* env, jobject inst,
                        "NetworkTableInstance;IILjava/lang/String;[B"
                        "Ledu/wpi/first/networktables/ConnectionInfo;)V");
   JLocal<jstring> name{env, MakeJString(env, answer.name)};
-  JLocal<jbyteArray> params{env, MakeJByteArray(env, answer.params)};
+  JLocal<jbyteArray> params{
+      env, MakeJByteArray(
+               env, {reinterpret_cast<const uint8_t*>(answer.params.data()),
+                     answer.params.size()})};
   JLocal<jobject> conn{env, MakeJObject(env, answer.conn)};
   return env->NewObject(
       rpcAnswerCls, constructor, inst, static_cast<jint>(answer.entry),
@@ -736,7 +745,9 @@ Java_edu_wpi_first_networktables_NetworkTablesJNI_getRaw
   if (!val || !val->IsRaw()) {
     return defaultValue;
   }
-  return MakeJByteArray(env, val->GetRaw());
+  auto data = val->GetRaw();
+  return MakeJByteArray(
+      env, {reinterpret_cast<const uint8_t*>(data.data()), data.size()});
 }
 
 /*
@@ -1359,7 +1370,8 @@ Java_edu_wpi_first_networktables_NetworkTablesJNI_getRpcResult__II
   if (!nt::GetRpcResult(entry, call, &result)) {
     return nullptr;
   }
-  return MakeJByteArray(env, result);
+  return MakeJByteArray(
+      env, {reinterpret_cast<const uint8_t*>(result.data()), result.size()});
 }
 
 /*
@@ -1376,7 +1388,8 @@ Java_edu_wpi_first_networktables_NetworkTablesJNI_getRpcResult__IID
   if (!nt::GetRpcResult(entry, call, &result, timeout, &timed_out)) {
     return nullptr;
   }
-  return MakeJByteArray(env, result);
+  return MakeJByteArray(
+      env, {reinterpret_cast<const uint8_t*>(result.data()), result.size()});
 }
 
 /*
@@ -1404,7 +1417,9 @@ Java_edu_wpi_first_networktables_NetworkTablesJNI_getRpc
   if (!val || !val->IsRpc()) {
     return defaultValue;
   }
-  return MakeJByteArray(env, val->GetRpc());
+  auto data = val->GetRpc();
+  return MakeJByteArray(
+      env, {reinterpret_cast<const uint8_t*>(data.data()), data.size()});
 }
 
 /*
