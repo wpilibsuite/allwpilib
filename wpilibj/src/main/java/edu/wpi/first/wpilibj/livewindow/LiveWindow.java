@@ -22,9 +22,11 @@ public final class LiveWindow {
     public void close() {
       if (m_namePub != null) {
         m_namePub.close();
+        m_namePub = null;
       }
       if (m_typePub != null) {
         m_typePub.close();
+        m_typePub = null;
       }
     }
 
