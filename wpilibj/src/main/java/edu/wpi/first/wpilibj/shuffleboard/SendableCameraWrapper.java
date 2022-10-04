@@ -49,13 +49,13 @@ public final class SendableCameraWrapper implements Sendable, AutoCloseable {
   private SendableCameraWrapper(String cameraName, String[] cameraUrls) {
     this(cameraName);
 
-    String streams = cameraName + "/streams";
-    // if (m_inst.getEntries(streams, 0).length != 0) {
-    //   throw new IllegalStateException(
-    //       "A camera is already being streamed with the name '" + cameraName + "'");
-    // }
+    StringArrayTopic streams = new StringArrayTopic(m_table.getTopic(cameraName + "/streams"));
+    if (streams.exists()) {
+      throw new IllegalStateException(
+          "A camera is already being streamed with the name '" + cameraName + "'");
+    }
 
-    m_streams = new StringArrayTopic(m_table.getTopic(streams)).publish();
+    m_streams = streams.publish();
     m_streams.set(cameraUrls);
   }
 
