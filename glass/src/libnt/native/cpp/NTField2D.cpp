@@ -112,12 +112,11 @@ NTField2DModel::NTField2DModel(nt::NetworkTableInstance inst,
                                std::string_view path)
     : m_path{fmt::format("{}/", path)},
       m_inst{inst},
-      m_tableSub{nt::MultiSubscriber{inst,
-                                     {{m_path}},
-                                     {{nt::PubSubOption::SendAll(true),
-                                       nt::PubSubOption::Periodic(0.05)}}}},
-      m_nameTopic{inst.GetStringTopic(fmt::format("{}/.name", path))},
-      m_nameSub{m_nameTopic.Subscribe("")},
+      m_tableSub{inst,
+                 {{m_path}},
+                 {{nt::PubSubOption::SendAll(true),
+                   nt::PubSubOption::Periodic(0.05)}}},
+      m_nameTopic{inst.GetTopic(fmt::format("{}/.name", path))},
       m_topicListener{inst},
       m_valueListener{inst} {
   m_topicListener.Add(m_tableSub, NT_TOPIC_NOTIFY_PUBLISH |
@@ -175,7 +174,7 @@ void NTField2DModel::Update() {
 }
 
 bool NTField2DModel::Exists() {
-  return m_inst.IsConnected() && m_nameSub.Exists();
+  return m_inst.IsConnected() && m_nameTopic.Exists();
 }
 
 bool NTField2DModel::IsReadOnly() {

@@ -48,7 +48,6 @@ class NTField2DModel : public Field2DModel {
   nt::NetworkTableInstance m_inst;
   nt::MultiSubscriber m_tableSub;
   nt::StringTopic m_nameTopic;
-  nt::StringSubscriber m_nameSub;
   nt::TopicListenerPoller m_topicListener;
   nt::ValueListenerPoller m_valueListener;
   std::string m_nameValue;
