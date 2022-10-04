@@ -18,9 +18,7 @@ task ntcoreGenerateJavaTypes() {
         def jsonSlurper = new JsonSlurper()
         def jsonTypes = jsonSlurper.parse(ntcoreTypesInputFile)
 
-        if (ntcoreJavaTypesOutputDir.exists()) {
-            ntcoreJavaTypesOutputDir.delete()
-        }
+        ntcoreJavaTypesOutputDir.deleteDir()
         ntcoreJavaTypesOutputDir.mkdirs()
 
         def config = new JinjavaConfig()
@@ -66,9 +64,7 @@ task ntcoreGenerateCppTypes() {
         def jsonSlurper = new JsonSlurper()
         def jsonTypes = jsonSlurper.parse(ntcoreTypesInputFile)
 
-        if (ntcoreCppTypesOutputDir.exists()) {
-            ntcoreCppTypesOutputDir.delete()
-        }
+        ntcoreCppTypesOutputDir.deleteDir()
         ntcoreCppTypesOutputDir.mkdirs()
 
         def config = new JinjavaConfig()
@@ -104,9 +100,7 @@ task ntcoreGenerateCppHandleSource() {
         def jsonSlurper = new JsonSlurper()
         def jsonTypes = jsonSlurper.parse(ntcoreTypesInputFile)
 
-        if (ntcoreCppHandleSourceOutputFile.exists()) {
-            ntcoreCppHandleSourceOutputFile.delete()
-        }
+        ntcoreCppHandleSourceOutputFile.delete()
 
         def config = new JinjavaConfig()
         def jinjava = new Jinjava(config)
@@ -136,9 +130,7 @@ task ntcoreGenerateCppHandleHeader() {
         def jsonSlurper = new JsonSlurper()
         def jsonTypes = jsonSlurper.parse(ntcoreTypesInputFile)
 
-        if (ntcoreCppHandleHeaderOutputFile.exists()) {
-            ntcoreCppHandleHeaderOutputFile.delete()
-        }
+        ntcoreCppHandleHeaderOutputFile.delete()
 
         def config = new JinjavaConfig()
         def jinjava = new Jinjava(config)
@@ -168,9 +160,7 @@ task ntcoreGenerateCHandleSource() {
         def jsonSlurper = new JsonSlurper()
         def jsonTypes = jsonSlurper.parse(ntcoreTypesInputFile)
 
-        if (ntcoreCHandleSourceOutputFile.exists()) {
-            ntcoreCHandleSourceOutputFile.delete()
-        }
+        ntcoreCHandleSourceOutputFile.delete()
 
         def config = new JinjavaConfig()
         def jinjava = new Jinjava(config)
@@ -200,9 +190,7 @@ task ntcoreGenerateCHandleHeader() {
         def jsonSlurper = new JsonSlurper()
         def jsonTypes = jsonSlurper.parse(ntcoreTypesInputFile)
 
-        if (ntcoreCHandleHeaderOutputFile.exists()) {
-            ntcoreCHandleHeaderOutputFile.delete()
-        }
+        ntcoreCHandleHeaderOutputFile.delete()
 
         def config = new JinjavaConfig()
         def jinjava = new Jinjava(config)
@@ -232,9 +220,7 @@ task ntcoreGenerateJniSource() {
         def jsonSlurper = new JsonSlurper()
         def jsonTypes = jsonSlurper.parse(ntcoreTypesInputFile)
 
-        if (ntcoreJniSourceOutputFile.exists()) {
-            ntcoreJniSourceOutputFile.delete()
-        }
+        ntcoreJniSourceOutputFile.delete()
 
         def config = new JinjavaConfig()
         def jinjava = new Jinjava(config)
