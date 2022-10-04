@@ -95,7 +95,8 @@ void glass::AddStandardNetworkTablesViews(NetworkTablesProvider& provider) {
   provider.Register(
       NTField2DModel::kType,
       [](NT_Inst inst, const char* path) {
-        return std::make_unique<NTField2DModel>(inst, path);
+        return std::make_unique<NTField2DModel>(nt::NetworkTableInstance{inst},
+                                                path);
       },
       [=](Window* win, Model* model, const char* path) {
         win->SetDefaultPos(200, 200);

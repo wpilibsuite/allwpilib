@@ -8,6 +8,8 @@
 #include <vector>
 
 #include <fmt/format.h>
+#include <networktables/DoubleArrayTopic.h>
+#include <networktables/MultiSubscriber.h>
 #include <ntcore_cpp.h>
 #include <wpi/Endian.h>
 #include <wpi/MathExtras.h>
@@ -18,20 +20,16 @@ using namespace glass;
 
 class NTField2DModel::ObjectModel : public FieldObjectModel {
  public:
-  ObjectModel(std::string_view name, NT_Entry entry)
-      : m_name{name}, m_entry{entry} {}
+  ObjectModel(std::string_view name, nt::DoubleArrayTopic topic)
+      : m_name{name}, m_topic{topic} {}
 
   const char* GetName() const override { return m_name.c_str(); }
-  NT_Entry GetEntry() const { return m_entry; }
+  nt::DoubleArrayTopic GetTopic() const { return m_topic; }
 
   void NTUpdate(const nt::Value& value);
 
-  void Update() override {
-    if (auto value = nt::GetEntryValue(m_entry)) {
-      NTUpdate(value);
-    }
-  }
-  bool Exists() override { return nt::GetEntryType(m_entry) != NT_UNASSIGNED; }
+  void Update() override {}
+  bool Exists() override { return m_topic.Exists(); }
   bool IsReadOnly() override { return false; }
 
   wpi::span<const frc::Pose2d> GetPoses() override { return m_poses; }
@@ -44,7 +42,8 @@ class NTField2DModel::ObjectModel : public FieldObjectModel {
   void UpdateNT();
 
   std::string m_name;
-  NT_Entry m_entry;
+  nt::DoubleArrayTopic m_topic;
+  nt::DoubleArrayPublisher m_pub;
 
   std::vector<frc::Pose2d> m_poses;
 };
@@ -62,30 +61,6 @@ void NTField2DModel::ObjectModel::NTUpdate(const nt::Value& value) {
           units::meter_t{arr[i * 3 + 0]}, units::meter_t{arr[i * 3 + 1]},
           frc::Rotation2d{units::degree_t{arr[i * 3 + 2]}}};
     }
-  } else if (value.IsRaw()) {
-    // treat it simply as an array of doubles
-    auto data = value.GetRaw();
-
-    // must be triples of doubles
-    auto size = data.size();
-    if ((size % (3 * 8)) != 0) {
-      return;
-    }
-    m_poses.resize(size / (3 * 8));
-    auto p = data.data();
-    for (size_t i = 0; i < size / (3 * 8); ++i) {
-      double x = wpi::BitsToDouble(
-          wpi::support::endian::readNext<uint64_t, wpi::support::big,
-                                         wpi::support::unaligned>(p));
-      double y = wpi::BitsToDouble(
-          wpi::support::endian::readNext<uint64_t, wpi::support::big,
-                                         wpi::support::unaligned>(p));
-      double rot = wpi::BitsToDouble(
-          wpi::support::endian::readNext<uint64_t, wpi::support::big,
-                                         wpi::support::unaligned>(p));
-      m_poses[i] = frc::Pose2d{units::meter_t{x}, units::meter_t{y},
-                               frc::Rotation2d{units::degree_t{rot}}};
-    }
   }
 }
 
@@ -97,7 +72,10 @@ void NTField2DModel::ObjectModel::UpdateNT() {
     arr.push_back(translation.Y().value());
     arr.push_back(pose.Rotation().Degrees().value());
   }
-  nt::SetEntryValue(m_entry, nt::Value::MakeDoubleArray(arr));
+  if (!m_pub) {
+    m_pub = m_topic.Publish();
+  }
+  m_pub.Set(arr);
 }
 
 void NTField2DModel::ObjectModel::SetPoses(wpi::span<const frc::Pose2d> poses) {
@@ -128,73 +106,76 @@ void NTField2DModel::ObjectModel::SetRotation(size_t i, frc::Rotation2d rot) {
 }
 
 NTField2DModel::NTField2DModel(std::string_view path)
-    : NTField2DModel{nt::GetDefaultInstance(), path} {}
+    : NTField2DModel{nt::NetworkTableInstance::GetDefault(), path} {}
 
-NTField2DModel::NTField2DModel(NT_Inst inst, std::string_view path)
-    : m_nt{inst},
-      m_path{fmt::format("{}/", path)},
-      m_name{m_nt.GetEntry(fmt::format("{}/.name", path))} {
-#if 0
-  m_nt.AddListener(m_path, NT_NOTIFY_LOCAL | NT_NOTIFY_NEW | NT_NOTIFY_DELETE |
-                               NT_NOTIFY_UPDATE | NT_NOTIFY_IMMEDIATE);
-#endif
+NTField2DModel::NTField2DModel(nt::NetworkTableInstance inst,
+                               std::string_view path)
+    : m_path{fmt::format("{}/", path)},
+      m_inst{inst},
+      m_tableSub{nt::MultiSubscriber{inst,
+                                     {{m_path}},
+                                     {{nt::PubSubOption::SendAll(true),
+                                       nt::PubSubOption::Periodic(0.05)}}}},
+      m_nameTopic{inst.GetStringTopic(fmt::format("{}/.name", path))},
+      m_nameSub{m_nameTopic.Subscribe("")},
+      m_topicListener{inst},
+      m_valueListener{inst} {
+  m_topicListener.Add(m_tableSub, NT_TOPIC_NOTIFY_PUBLISH |
+                                      NT_TOPIC_NOTIFY_UNPUBLISH |
+                                      NT_TOPIC_NOTIFY_IMMEDIATE);
+  m_valueListener.Add(m_tableSub,
+                      NT_VALUE_NOTIFY_IMMEDIATE | NT_VALUE_NOTIFY_LOCAL);
 }
 
 NTField2DModel::~NTField2DModel() = default;
 
 void NTField2DModel::Update() {
-#if 0
-  for (auto&& event : m_nt.PollListener()) {
+  // handle publish/unpublish
+  for (auto&& event : m_topicListener.ReadQueue()) {
+    auto name = wpi::drop_front(event.info.name, m_path.size());
+    if (name.empty() || name[0] == '.') {
+      continue;
+    }
+    auto [it, match] = Find(event.info.name);
+    if (event.flags & NT_TOPIC_NOTIFY_UNPUBLISH) {
+      if (match) {
+        m_objects.erase(it);
+      }
+      continue;
+    } else if (event.flags & NT_TOPIC_NOTIFY_PUBLISH) {
+      if (!match) {
+        it = m_objects.emplace(
+            it, std::make_unique<ObjectModel>(
+                    event.info.name, nt::DoubleArrayTopic{event.info.topic}));
+      }
+    } else if (!match) {
+      continue;
+    }
+  }
+
+  // update values
+  for (auto&& event : m_valueListener.ReadQueue()) {
     // .name
-    if (event.entry == m_name) {
+    if (event.topic == m_nameTopic.GetHandle()) {
       if (event.value && event.value.IsString()) {
         m_nameValue = event.value.GetString();
       }
       continue;
     }
 
-    // common case: update of existing entry; search by entry
-    if (event.flags & NT_NOTIFY_UPDATE) {
-      auto it = std::find_if(
-          m_objects.begin(), m_objects.end(),
-          [&](const auto& e) { return e->GetEntry() == event.entry; });
-      if (it != m_objects.end()) {
-        (*it)->NTUpdate(event.value);
-        continue;
-      }
-    }
-
-    // handle create/delete
-    std::string_view name = event.name;
-    if (wpi::starts_with(name, m_path)) {
-      name.remove_prefix(m_path.size());
-      if (name.empty() || name[0] == '.') {
-        continue;
-      }
-      auto [it, match] = Find(event.name);
-      if (event.flags & NT_NOTIFY_DELETE) {
-        if (match) {
-          m_objects.erase(it);
-        }
-        continue;
-      } else if (event.flags & NT_NOTIFY_NEW) {
-        if (!match) {
-          it = m_objects.emplace(
-              it, std::make_unique<ObjectModel>(event.name, event.entry));
-        }
-      } else if (!match) {
-        continue;
-      }
-      if (event.flags & (NT_NOTIFY_NEW | NT_NOTIFY_UPDATE)) {
-        (*it)->NTUpdate(event.value);
-      }
+    auto it =
+        std::find_if(m_objects.begin(), m_objects.end(), [&](const auto& e) {
+          return e->GetTopic().GetHandle() == event.topic;
+        });
+    if (it != m_objects.end()) {
+      (*it)->NTUpdate(event.value);
+      continue;
     }
   }
-#endif
 }
 
 bool NTField2DModel::Exists() {
-  return m_nt.IsConnected() && nt::GetEntryType(m_name) != NT_UNASSIGNED;
+  return m_inst.IsConnected() && m_nameSub.Exists();
 }
 
 bool NTField2DModel::IsReadOnly() {
@@ -205,8 +186,9 @@ FieldObjectModel* NTField2DModel::AddFieldObject(std::string_view name) {
   auto fullName = fmt::format("{}{}", m_path, name);
   auto [it, match] = Find(fullName);
   if (!match) {
-    it = m_objects.emplace(
-        it, std::make_unique<ObjectModel>(fullName, m_nt.GetEntry(fullName)));
+    it = m_objects.emplace(it,
+                           std::make_unique<ObjectModel>(
+                               fullName, m_inst.GetDoubleArrayTopic(fullName)));
   }
   return it->get();
 }
@@ -214,7 +196,6 @@ FieldObjectModel* NTField2DModel::AddFieldObject(std::string_view name) {
 void NTField2DModel::RemoveFieldObject(std::string_view name) {
   auto [it, match] = Find(fmt::format("{}{}", m_path, name));
   if (match) {
-    // nt::DeleteEntry((*it)->GetEntry());
     m_objects.erase(it);
   }
 }
