@@ -72,6 +72,7 @@ final class ContainerHelper {
   }
 
   SimpleWidget add(String title, Object defaultValue) {
+    Objects.requireNonNull(defaultValue, "Default value cannot be null");
     return add(title, NetworkTableType.getStringFromObject(defaultValue), defaultValue);
   }
 
