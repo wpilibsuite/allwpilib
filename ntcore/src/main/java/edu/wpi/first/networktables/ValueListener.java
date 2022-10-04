@@ -109,6 +109,15 @@ public final class ValueListener implements AutoCloseable {
     return m_handle != 0;
   }
 
+  /**
+   * Gets the native handle.
+   *
+   * @return Native handle
+   */
+  public int getHandle() {
+    return m_handle;
+  }
+
   private int m_handle;
 
   private static final ReentrantLock s_lock = new ReentrantLock();

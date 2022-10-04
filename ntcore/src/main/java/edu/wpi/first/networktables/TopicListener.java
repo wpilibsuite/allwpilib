@@ -45,8 +45,7 @@ public final class TopicListener implements AutoCloseable {
    * @param eventMask Bitmask of TopicListenerFlags values
    * @param listener Listener function
    */
-  public TopicListener(
-      Subscriber subscriber, int eventMask, Consumer<TopicNotification> listener) {
+  public TopicListener(Subscriber subscriber, int eventMask, Consumer<TopicNotification> listener) {
     s_lock.lock();
     try {
       if (s_poller == 0) {
@@ -55,7 +54,7 @@ public final class TopicListener implements AutoCloseable {
         startThread();
       }
       m_handle =
-        NetworkTablesJNI.addPolledTopicListener(s_poller, subscriber.getHandle(), eventMask);
+          NetworkTablesJNI.addPolledTopicListener(s_poller, subscriber.getHandle(), eventMask);
       s_listeners.put(m_handle, listener);
     } finally {
       s_lock.unlock();
@@ -79,7 +78,7 @@ public final class TopicListener implements AutoCloseable {
         startThread();
       }
       m_handle =
-        NetworkTablesJNI.addPolledTopicListener(s_poller, subscriber.getHandle(), eventMask);
+          NetworkTablesJNI.addPolledTopicListener(s_poller, subscriber.getHandle(), eventMask);
       s_listeners.put(m_handle, listener);
     } finally {
       s_lock.unlock();
@@ -102,8 +101,7 @@ public final class TopicListener implements AutoCloseable {
         s_poller = NetworkTablesJNI.createTopicListenerPoller(s_inst.getHandle());
         startThread();
       }
-      m_handle =
-        NetworkTablesJNI.addPolledTopicListener(s_poller, entry.getHandle(), eventMask);
+      m_handle = NetworkTablesJNI.addPolledTopicListener(s_poller, entry.getHandle(), eventMask);
       s_listeners.put(m_handle, listener);
     } finally {
       s_lock.unlock();
@@ -158,6 +156,15 @@ public final class TopicListener implements AutoCloseable {
    */
   public boolean isValid() {
     return m_handle != 0;
+  }
+
+  /**
+   * Gets the native handle.
+   *
+   * @return Native handle
+   */
+  public int getHandle() {
+    return m_handle;
   }
 
   private int m_handle;

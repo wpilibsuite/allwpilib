@@ -7,13 +7,19 @@ package edu.wpi.first.networktables;
 /** NetworkTables value notification. */
 @SuppressWarnings("MemberName")
 public final class ValueNotification {
-  /** Listener that was triggered. */
+  /**
+   * Handle of listener that was triggered. ValueListener.getHandle() or the return value of
+   * ValueListenerPoller.add() can be used to map this to a specific added listener.
+   */
   public final int listener;
 
-  /** Topic handle. */
+  /** Topic handle. Topic.getHandle() can be used to map this to the corresponding Topic object. */
   public final int topic;
 
-  /** Subscriber/entry handle. */
+  /**
+   * Subscriber/entry handle. Subscriber.getHandle() or entry.getHandle() can be used to map this to
+   * the corresponding Subscriber or Entry object.
+   */
   public final int subentry;
 
   /** The new value. */

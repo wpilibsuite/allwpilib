@@ -14,13 +14,15 @@ package edu.wpi.first.networktables;
  * is created. The constants kImmediate and kLocal are modifiers that cause notifications to be
  * generated at other times.
  */
-public interface ValueListenerFlags {
+public enum ValueListenerFlags {
+  ; // no enum values
+
   /**
    * Initial listener addition.
    *
    * <p>Set this flag to receive immediate notification of the current value.
    */
-  int kImmediate = 0x01;
+  public static final int kImmediate = 0x01;
 
   /**
    * Changed locally.
@@ -28,5 +30,5 @@ public interface ValueListenerFlags {
    * <p>Set this flag to receive notification of both local changes and changes coming from remote
    * nodes. By default, notifications are only generated for remote changes.
    */
-  int kLocal = 0x02;
+  public static final int kLocal = 0x02;
 }

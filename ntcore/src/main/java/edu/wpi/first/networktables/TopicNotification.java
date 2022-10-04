@@ -7,7 +7,10 @@ package edu.wpi.first.networktables;
 /** NetworkTables topic notification. */
 @SuppressWarnings("MemberName")
 public final class TopicNotification {
-  /** Listener that was triggered. */
+  /**
+   * Handle of listener that was triggered. TopicListener.getHandle() or the return value of
+   * TopicListenerPoller.add() can be used to map this to a specific added listener.
+   */
   public final int listener;
 
   /** Topic information. */

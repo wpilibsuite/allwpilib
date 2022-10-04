@@ -13,33 +13,35 @@ package edu.wpi.first.networktables;
  * <p>The constants kPublish, kUnpublish, and kProperties represent different events that can occur
  * to topics.
  */
-public interface TopicListenerFlags {
+public enum TopicListenerFlags {
+  ; // no enum values
+
   /**
    * Initial listener addition.
    *
    * <p>Set this flag to receive immediate notification of topics matching the flag criteria
    * (generally only useful when combined with kPublish).
    */
-  int kImmediate = 0x01;
+  public static final int kImmediate = 0x01;
 
   /**
    * Newly published topic.
    *
    * <p>Set this flag to receive a notification when a topic is initially published.
    */
-  int kPublish = 0x02;
+  public static final int kPublish = 0x02;
 
   /**
    * Topic has no more publishers.
    *
    * <p>Set this flag to receive a notification when a topic has no more publishers.
    */
-  int kUnpublish = 0x04;
+  public static final int kUnpublish = 0x04;
 
   /**
    * Topic's properties changed.
    *
    * <p>Set this flag to receive a notification when an topic's properties change.
    */
-  int kProperties = 0x08;
+  public static final int kProperties = 0x08;
 }
