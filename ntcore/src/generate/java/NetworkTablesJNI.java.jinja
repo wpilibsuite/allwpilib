@@ -205,7 +205,7 @@ public final class NetworkTablesJNI {
 
   public static native int addPolledTopicListener(int poller, String[] prefixes, int flags);
 
-  public static native int addPolledTopicListener(int poller, int topic, int flags);
+  public static native int addPolledTopicListener(int poller, int handle, int flags);
 
   public static native TopicNotification[] readTopicListenerQueue(
       NetworkTableInstance inst, int poller);

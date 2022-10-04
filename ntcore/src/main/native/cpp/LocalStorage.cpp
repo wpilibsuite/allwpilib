@@ -208,7 +208,7 @@ struct TopicListenerData {
         eventMask{eventMask & ~NT_TOPIC_NOTIFY_IMMEDIATE} {}
   TopicListenerData(NT_TopicListener handle, TopicListenerPollerData* poller,
                     MultiSubscriberData* multiSubscriber,
-                    wpi::span<const std::string_view> prefixes,
+                    wpi::span<const std::string> prefixes,
                     unsigned int eventMask)
       : handle{handle},
         poller{poller},
@@ -223,6 +223,7 @@ struct TopicListenerData {
   TopicData* topic{nullptr};
   std::vector<std::string> prefixes;
   unsigned int eventMask;
+  bool subscriberOwned{false};
 };
 
 struct ValueListenerPollerData {
@@ -394,14 +395,22 @@ struct LSImpl {
   TopicListenerData* AddTopicListenerImpl(TopicListenerPollerData* poller,
                                           TopicData* topic,
                                           unsigned int eventMask);
+  TopicListenerData* AddTopicListenerImpl(TopicListenerPollerData* poller,
+                                          SubscriberData* topic,
+                                          unsigned int eventMask);
+  TopicListenerData* AddTopicListenerImpl(TopicListenerPollerData* poller,
+                                          MultiSubscriberData* topic,
+                                          unsigned int eventMask);
   TopicListenerData* AddTopicListenerImpl(
       TopicListenerPollerData* poller,
       wpi::span<const std::string_view> prefixes, unsigned int eventMask);
   NT_TopicListener AddTopicListener(
       wpi::span<const std::string_view> prefixes, unsigned int mask,
       std::function<void(const TopicNotification&)> callback);
+  NT_TopicListener AddTopicListenerHandle(TopicListenerPollerData* poller,
+                                          NT_Handle handle, unsigned int mask);
   NT_TopicListener AddTopicListener(
-      NT_Topic topicHandle, unsigned int mask,
+      NT_Handle handle, unsigned int mask,
       std::function<void(const TopicNotification&)> callback);
   void DestroyTopicListenerPoller(NT_TopicListenerPoller pollerHandle);
   std::unique_ptr<TopicListenerData> RemoveTopicListener(
@@ -1066,17 +1075,24 @@ TopicListenerData* LSImpl::AddTopicListenerImpl(TopicListenerPollerData* poller,
   PubSubConfig config;
   config.topicsOnly = true;
   auto subscriber = AddLocalSubscriber(topic, config);
+  auto listener = AddTopicListenerImpl(poller, subscriber, eventMask);
+  listener->subscriberOwned = true;
+  return listener;
+}
 
-  auto listener =
-      m_topicListeners.Add(m_inst, poller, subscriber, topic, eventMask);
-  listener->topic->listeners.Add(listener);
+TopicListenerData* LSImpl::AddTopicListenerImpl(TopicListenerPollerData* poller,
+                                                SubscriberData* subscriber,
+                                                unsigned int eventMask) {
+  auto listener = m_topicListeners.Add(m_inst, poller, subscriber,
+                                       subscriber->topic, eventMask);
+  subscriber->topic->listeners.Add(listener);
 
   // handle immediate
   if ((eventMask & (NT_TOPIC_NOTIFY_PUBLISH | NT_TOPIC_NOTIFY_IMMEDIATE)) ==
           (NT_TOPIC_NOTIFY_PUBLISH | NT_TOPIC_NOTIFY_IMMEDIATE) &&
-      topic->Exists()) {
+      listener->topic->Exists()) {
     listener->poller->queue.emplace_back(
-        listener->handle, topic->GetTopicInfo(),
+        listener->handle, subscriber->topic->GetTopicInfo(),
         NT_TOPIC_NOTIFY_PUBLISH | NT_TOPIC_NOTIFY_IMMEDIATE);
     listener->handle.Set();
     listener->poller->handle.Set();
@@ -1085,17 +1101,11 @@ TopicListenerData* LSImpl::AddTopicListenerImpl(TopicListenerPollerData* poller,
   return listener;
 }
 
-TopicListenerData* LSImpl::AddTopicListenerImpl(
-    TopicListenerPollerData* poller, wpi::span<const std::string_view> prefixes,
-    unsigned int eventMask) {
-  // subscribe to make sure topic updates are received
-  PubSubOptions options;
-  options.topicsOnly = true;
-  options.prefixMatch = true;
-  auto subscriber = AddMultiSubscriber(prefixes, options);
-
-  auto listener =
-      m_topicListeners.Add(m_inst, poller, subscriber, prefixes, eventMask);
+TopicListenerData* LSImpl::AddTopicListenerImpl(TopicListenerPollerData* poller,
+                                                MultiSubscriberData* subscriber,
+                                                unsigned int eventMask) {
+  auto listener = m_topicListeners.Add(m_inst, poller, subscriber,
+                                       subscriber->prefixes, eventMask);
   m_topicPrefixListeners.Add(listener);
 
   // handle immediate
@@ -1121,6 +1131,19 @@ TopicListenerData* LSImpl::AddTopicListenerImpl(
   return listener;
 }
 
+TopicListenerData* LSImpl::AddTopicListenerImpl(
+    TopicListenerPollerData* poller, wpi::span<const std::string_view> prefixes,
+    unsigned int eventMask) {
+  // subscribe to make sure topic updates are received
+  PubSubOptions options;
+  options.topicsOnly = true;
+  options.prefixMatch = true;
+  auto subscriber = AddMultiSubscriber(prefixes, options);
+  auto listener = AddTopicListenerImpl(poller, subscriber, eventMask);
+  listener->subscriberOwned = true;
+  return listener;
+}
+
 NT_TopicListener LSImpl::AddTopicListener(
     wpi::span<const std::string_view> prefixes, unsigned int mask,
     std::function<void(const TopicNotification&)> callback) {
@@ -1139,19 +1162,31 @@ NT_TopicListener LSImpl::AddTopicListener(
   }
 }
 
+NT_TopicListener LSImpl::AddTopicListenerHandle(TopicListenerPollerData* poller,
+                                                NT_Handle handle,
+                                                unsigned int mask) {
+  if (auto topic = m_topics.Get(handle)) {
+    return AddTopicListenerImpl(poller, topic, mask)->handle;
+  } else if (auto sub = m_multiSubscribers.Get(handle)) {
+    return AddTopicListenerImpl(poller, sub, mask)->handle;
+  } else if (auto sub = m_subscribers.Get(handle)) {
+    return AddTopicListenerImpl(poller, sub, mask)->handle;
+  } else if (auto entry = m_entries.Get(handle)) {
+    return AddTopicListenerImpl(poller, entry->subscriber, mask)->handle;
+  } else {
+    return {};
+  }
+}
+
 NT_TopicListener LSImpl::AddTopicListener(
-    NT_Topic topicHandle, unsigned int mask,
+    NT_Handle handle, unsigned int mask,
     std::function<void(const TopicNotification&)> callback) {
   if (!m_topicListenerThread) {
     m_topicListenerThread.Start(AddTopicListenerPoller());
   }
-  TopicData* topic = m_topics.Get(topicHandle);
-  if (!topic) {
-    return {};
-  }
   if (auto thr = m_topicListenerThread.GetThread()) {
     NT_TopicListener listener =
-        AddTopicListenerImpl(thr->m_pollerData, topic, mask)->handle;
+        AddTopicListenerHandle(thr->m_pollerData, handle, mask);
     if (listener) {
       thr->m_callbacks.try_emplace(listener, std::move(callback));
     }
@@ -1180,11 +1215,13 @@ std::unique_ptr<TopicListenerData> LSImpl::RemoveTopicListener(
     NT_TopicListener listenerHandle) {
   auto listener = m_topicListeners.Remove(listenerHandle);
   if (listener) {
-    if (listener->subscriber) {
-      RemoveLocalSubscriber(listener->subscriber->handle);
-    }
-    if (listener->multiSubscriber) {
-      RemoveMultiSubscriber(listener->multiSubscriber->handle);
+    if (listener->subscriberOwned) {
+      if (listener->subscriber) {
+        RemoveLocalSubscriber(listener->subscriber->handle);
+      }
+      if (listener->multiSubscriber) {
+        RemoveMultiSubscriber(listener->multiSubscriber->handle);
+      }
     }
     if (listener->topic) {
       listener->topic->listeners.Remove(listener.get());
@@ -2313,18 +2350,15 @@ NT_TopicListener LocalStorage::AddPolledTopicListener(
 }
 
 NT_TopicListener LocalStorage::AddPolledTopicListener(
-    NT_TopicListenerPoller pollerHandle, NT_Topic topicHandle,
-    unsigned int mask) {
+    NT_TopicListenerPoller pollerHandle, NT_Handle handle, unsigned int mask) {
   std::scoped_lock lock{m_mutex};
-  auto topic = m_impl->m_topics.Get(topicHandle);
-  if (!topic) {
+
+  auto poller = m_impl->m_topicListenerPollers.Get(pollerHandle);
+  if (!poller) {
     return {};
   }
-  if (auto poller = m_impl->m_topicListenerPollers.Get(pollerHandle)) {
-    return m_impl->AddTopicListenerImpl(poller, topic, mask)->handle;
-  } else {
-    return {};
-  }
+
+  return m_impl->AddTopicListenerHandle(poller, handle, mask);
 }
 
 std::vector<TopicNotification> LocalStorage::ReadTopicListenerQueue(

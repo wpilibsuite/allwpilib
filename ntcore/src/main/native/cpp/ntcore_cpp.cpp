@@ -396,10 +396,10 @@ NT_TopicListener AddTopicListener(
 }
 
 NT_TopicListener AddTopicListener(
-    NT_Topic topic, unsigned int mask,
+    NT_Handle handle, unsigned int mask,
     std::function<void(const TopicNotification&)> callback) {
-  if (auto ii = InstanceImpl::GetTyped(topic, Handle::kTopic)) {
-    return ii->localStorage.AddTopicListener(topic, mask, std::move(callback));
+  if (auto ii = InstanceImpl::GetTyped(handle, Handle::kTopic)) {
+    return ii->localStorage.AddTopicListener(handle, mask, std::move(callback));
   } else {
     return {};
   }
@@ -430,9 +430,9 @@ NT_TopicListener AddPolledTopicListener(
 }
 
 NT_TopicListener AddPolledTopicListener(NT_TopicListenerPoller poller,
-                                        NT_Topic topic, unsigned int mask) {
+                                        NT_Handle handle, unsigned int mask) {
   if (auto ii = InstanceImpl::GetTyped(poller, Handle::kTopicListenerPoller)) {
-    return ii->localStorage.AddPolledTopicListener(poller, topic, mask);
+    return ii->localStorage.AddPolledTopicListener(poller, handle, mask);
   } else {
     return {};
   }

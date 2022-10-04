@@ -792,12 +792,12 @@ NT_TopicListener AddTopicListener(
 /**
  * Create a listener for changes on a particular topic.
  *
- * @param topic Topic handle
+ * @param handle Topic, subscriber, multi-subscriber, or entry handle
  * @param mask Bitmask of NT_TopicListenerFlags values
  * @param callback Listener function
  */
 NT_TopicListener AddTopicListener(
-    NT_Topic topic, unsigned int mask,
+    NT_Handle handle, unsigned int mask,
     std::function<void(const TopicNotification&)> callback);
 
 /**
@@ -849,12 +849,12 @@ NT_TopicListener AddPolledTopicListener(
  * The caller is responsible for calling ReadTopicListenerQueue() to poll.
  *
  * @param poller            poller handle
- * @param topic             topic
+ * @param handle            topic, subscriber, multi-subscriber, or entry handle
  * @param mask              NT_NotifyKind bitmask
  * @return Listener handle
  */
 NT_TopicListener AddPolledTopicListener(NT_TopicListenerPoller poller,
-                                        NT_Topic topic, unsigned int mask);
+                                        NT_Handle handle, unsigned int mask);
 
 /**
  * Removes a topic listener.

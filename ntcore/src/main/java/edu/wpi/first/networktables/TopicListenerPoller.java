@@ -31,6 +31,39 @@ public final class TopicListenerPoller implements AutoCloseable {
   }
 
   /**
+   * Start listening to topic changes on a subscriber.
+   *
+   * @param subscriber Subscriber
+   * @param eventMask Bitmask of TopicListenerFlags values
+   * @return Listener handle
+   */
+  public int add(Subscriber subscriber, int eventMask) {
+    return NetworkTablesJNI.addPolledTopicListener(m_handle, subscriber.getHandle(), eventMask);
+  }
+
+  /**
+   * Start listening to topic changes on a subscriber.
+   *
+   * @param subscriber Subscriber
+   * @param eventMask Bitmask of TopicListenerFlags values
+   * @return Listener handle
+   */
+  public int add(MultiSubscriber subscriber, int eventMask) {
+    return NetworkTablesJNI.addPolledTopicListener(m_handle, subscriber.getHandle(), eventMask);
+  }
+
+  /**
+   * Start listening to topic changes on an entry.
+   *
+   * @param entry Entry
+   * @param eventMask Bitmask of TopicListenerFlags values
+   * @return Listener handle
+   */
+  public int add(NetworkTableEntry entry, int eventMask) {
+    return NetworkTablesJNI.addPolledTopicListener(m_handle, entry.getHandle(), eventMask);
+  }
+
+  /**
    * Start listening to topic changes for topics with names that start with any of the given
    * prefixes.
    *

@@ -10,6 +10,8 @@
 
 #include <wpi/span.h>
 
+#include "networktables/MultiSubscriber.h"
+#include "networktables/NetworkTableEntry.h"
 #include "networktables/NetworkTableInstance.h"
 #include "networktables/Topic.h"
 #include "networktables/TopicListener.h"
@@ -26,6 +28,21 @@ inline TopicListener::TopicListener(
     Topic topic, unsigned int mask,
     std::function<void(const TopicNotification&)> listener)
     : m_handle{AddTopicListener(topic.GetHandle(), mask, listener)} {}
+
+inline TopicListener::TopicListener(
+    const Subscriber& subscriber, unsigned int mask,
+    std::function<void(const TopicNotification&)> listener)
+    : m_handle{AddTopicListener(subscriber.GetHandle(), mask, listener)} {}
+
+inline TopicListener::TopicListener(
+    const MultiSubscriber& subscriber, unsigned int mask,
+    std::function<void(const TopicNotification&)> listener)
+    : m_handle{AddTopicListener(subscriber.GetHandle(), mask, listener)} {}
+
+inline TopicListener::TopicListener(
+    const NetworkTableEntry& entry, unsigned int mask,
+    std::function<void(const TopicNotification&)> listener)
+    : m_handle{AddTopicListener(entry.GetHandle(), mask, listener)} {}
 
 inline TopicListener::TopicListener(TopicListener&& rhs)
     : m_handle(rhs.m_handle) {
@@ -71,6 +88,21 @@ inline NT_TopicListener TopicListenerPoller::Add(
 inline NT_TopicListener TopicListenerPoller::Add(Topic topic,
                                                  unsigned int mask) {
   return nt::AddPolledTopicListener(m_handle, topic.GetHandle(), mask);
+}
+
+inline NT_TopicListener TopicListenerPoller::Add(const Subscriber& subscriber,
+                                                 unsigned int mask) {
+  return nt::AddPolledTopicListener(m_handle, subscriber.GetHandle(), mask);
+}
+
+inline NT_TopicListener TopicListenerPoller::Add(
+    const MultiSubscriber& subscriber, unsigned int mask) {
+  return nt::AddPolledTopicListener(m_handle, subscriber.GetHandle(), mask);
+}
+
+inline NT_TopicListener TopicListenerPoller::Add(const NetworkTableEntry& entry,
+                                                 unsigned int mask) {
+  return nt::AddPolledTopicListener(m_handle, entry.GetHandle(), mask);
 }
 
 inline void TopicListenerPoller::Remove(NT_TopicListener listener) {

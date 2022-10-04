@@ -39,6 +39,78 @@ public final class TopicListener implements AutoCloseable {
   }
 
   /**
+   * Create a listener for topic changes on a subscriber.
+   *
+   * @param subscriber Subscriber
+   * @param eventMask Bitmask of TopicListenerFlags values
+   * @param listener Listener function
+   */
+  public TopicListener(
+      Subscriber subscriber, int eventMask, Consumer<TopicNotification> listener) {
+    s_lock.lock();
+    try {
+      if (s_poller == 0) {
+        s_inst = subscriber.getTopic().getInstance();
+        s_poller = NetworkTablesJNI.createTopicListenerPoller(s_inst.getHandle());
+        startThread();
+      }
+      m_handle =
+        NetworkTablesJNI.addPolledTopicListener(s_poller, subscriber.getHandle(), eventMask);
+      s_listeners.put(m_handle, listener);
+    } finally {
+      s_lock.unlock();
+    }
+  }
+
+  /**
+   * Create a listener for topic changes on a subscriber.
+   *
+   * @param subscriber Subscriber
+   * @param eventMask Bitmask of TopicListenerFlags values
+   * @param listener Listener function
+   */
+  public TopicListener(
+      MultiSubscriber subscriber, int eventMask, Consumer<TopicNotification> listener) {
+    s_lock.lock();
+    try {
+      if (s_poller == 0) {
+        s_inst = subscriber.getInstance();
+        s_poller = NetworkTablesJNI.createTopicListenerPoller(s_inst.getHandle());
+        startThread();
+      }
+      m_handle =
+        NetworkTablesJNI.addPolledTopicListener(s_poller, subscriber.getHandle(), eventMask);
+      s_listeners.put(m_handle, listener);
+    } finally {
+      s_lock.unlock();
+    }
+  }
+
+  /**
+   * Create a listener for topic changes on an entry.
+   *
+   * @param entry Entry
+   * @param eventMask Bitmask of TopicListenerFlags values
+   * @param listener Listener function
+   */
+  public TopicListener(
+      NetworkTableEntry entry, int eventMask, Consumer<TopicNotification> listener) {
+    s_lock.lock();
+    try {
+      if (s_poller == 0) {
+        s_inst = entry.getInstance();
+        s_poller = NetworkTablesJNI.createTopicListenerPoller(s_inst.getHandle());
+        startThread();
+      }
+      m_handle =
+        NetworkTablesJNI.addPolledTopicListener(s_poller, entry.getHandle(), eventMask);
+      s_listeners.put(m_handle, listener);
+    } finally {
+      s_lock.unlock();
+    }
+  }
+
+  /**
    * Create a listener for changes to topics with names that start with any of the given prefixes.
    *
    * @param inst Instance

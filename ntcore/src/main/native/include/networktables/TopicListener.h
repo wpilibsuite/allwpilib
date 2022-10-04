@@ -14,7 +14,10 @@
 
 namespace nt {
 
+class MultiSubscriber;
+class NetworkTableEntry;
 class NetworkTableInstance;
+class Subscriber;
 class Topic;
 
 /**
@@ -93,6 +96,36 @@ class TopicListener final {
   TopicListener(Topic topic, unsigned int mask,
                 std::function<void(const TopicNotification&)> listener);
 
+  /**
+   * Create a listener for topic changes on a subscriber.
+   *
+   * @param subscriber Subscriber
+   * @param mask Bitmask of TopicListenerFlags values
+   * @param listener Listener function
+   */
+  TopicListener(const Subscriber& subscriber, unsigned int mask,
+                std::function<void(const TopicNotification&)> listener);
+
+  /**
+   * Create a listener for topic changes on a subscriber.
+   *
+   * @param subscriber Subscriber
+   * @param mask Bitmask of TopicListenerFlags values
+   * @param listener Listener function
+   */
+  TopicListener(const MultiSubscriber& subscriber, unsigned int mask,
+                std::function<void(const TopicNotification&)> listener);
+
+  /**
+   * Create a listener for topic changes on an entry.
+   *
+   * @param entry Entry
+   * @param mask Bitmask of TopicListenerFlags values
+   * @param listener Listener function
+   */
+  TopicListener(const NetworkTableEntry& entry, unsigned int mask,
+                std::function<void(const TopicNotification&)> listener);
+
   TopicListener(const TopicListener&) = delete;
   TopicListener& operator=(const TopicListener&) = delete;
   TopicListener(TopicListener&& rhs);
@@ -162,6 +195,33 @@ class TopicListenerPoller final {
    * @return Listener handle
    */
   NT_TopicListener Add(Topic topic, unsigned int mask);
+
+  /**
+   * Start listening to topic changes on a subscriber.
+   *
+   * @param subscriber Subscriber
+   * @param mask Bitmask of TopicListenerFlags values
+   * @return Listener handle
+   */
+  NT_ValueListener Add(const Subscriber& subscriber, unsigned int mask);
+
+  /**
+   * Start listening to topic changes on a subscriber.
+   *
+   * @param subscriber Subscriber
+   * @param mask Bitmask of TopicListenerFlags values
+   * @return Listener handle
+   */
+  NT_ValueListener Add(const MultiSubscriber& subscriber, unsigned int mask);
+
+  /**
+   * Start listening to topic changes on an entry.
+   *
+   * @param entry Entry
+   * @param mask Bitmask of TopicListenerFlags values
+   * @return Listener handle
+   */
+  NT_ValueListener Add(const NetworkTableEntry& entry, unsigned int mask);
 
   /**
    * Remove a listener.

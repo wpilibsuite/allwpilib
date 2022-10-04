@@ -1076,9 +1076,9 @@ Java_edu_wpi_first_networktables_NetworkTablesJNI_addPolledTopicListener__I_3Lja
  */
 JNIEXPORT jint JNICALL
 Java_edu_wpi_first_networktables_NetworkTablesJNI_addPolledTopicListener__III
-  (JNIEnv* env, jclass, jint poller, jint topic, jint flags)
+  (JNIEnv* env, jclass, jint poller, jint handle, jint flags)
 {
-  return nt::AddPolledTopicListener(poller, topic, flags);
+  return nt::AddPolledTopicListener(poller, handle, flags);
 }
 
 /*

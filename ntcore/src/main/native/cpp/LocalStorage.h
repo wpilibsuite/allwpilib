@@ -196,7 +196,7 @@ class LocalStorage final : public net::ILocalStorage {
       wpi::span<const std::string_view> prefixes, unsigned int mask,
       std::function<void(const TopicNotification&)> callback);
   NT_TopicListener AddTopicListener(
-      NT_Topic topic, unsigned int mask,
+      NT_Handle handle, unsigned int mask,
       std::function<void(const TopicNotification&)> callback);
 
   NT_TopicListenerPoller CreateTopicListenerPoller();
@@ -206,7 +206,7 @@ class LocalStorage final : public net::ILocalStorage {
       NT_TopicListenerPoller poller, wpi::span<const std::string_view> prefixes,
       unsigned int mask);
   NT_TopicListener AddPolledTopicListener(NT_TopicListenerPoller poller,
-                                          NT_Topic topic, unsigned int mask);
+                                          NT_Handle handle, unsigned int mask);
 
   std::vector<TopicNotification> ReadTopicListenerQueue(
       NT_TopicListenerPoller poller);
