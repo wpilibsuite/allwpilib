@@ -2,8 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#ifndef NTCORE_NETWORKTABLES_NETWORKTABLETYPE_H_
-#define NTCORE_NETWORKTABLES_NETWORKTABLETYPE_H_
+#pragma once
 
 #include "ntcore_c.h"
 
@@ -29,5 +28,3 @@ enum class NetworkTableType {
 };
 
 }  // namespace nt
-
-#endif  // NTCORE_NETWORKTABLES_NETWORKTABLETYPE_H_

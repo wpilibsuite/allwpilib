@@ -2,8 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#ifndef NTCORE_NTCORE_TEST_H_
-#define NTCORE_NTCORE_TEST_H_
+#pragma once
 
 #include <stdint.h>
 
@@ -82,5 +81,3 @@ struct NT_RpcCallInfo* NT_GetRpcCallInfoForTesting(
     const char* params, size_t params_len, int* struct_size);
 // No need for free as one already exists in the main library
 }  // extern "C"
-
-#endif  // NTCORE_NTCORE_TEST_H_

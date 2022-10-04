@@ -2,8 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#ifndef NTCORE_NTCORE_C_H_
-#define NTCORE_NTCORE_C_H_
+#pragma once
 
 #include <stdint.h>
 
@@ -1856,5 +1855,3 @@ struct NT_String* NT_GetValueStringArray(const struct NT_Value* value,
 #endif
 
 #include "ntcore_c_types.h"
-
-#endif  // NTCORE_NTCORE_C_H_

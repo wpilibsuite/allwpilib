@@ -2,8 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#ifndef NTCORE_SPANMATCHER_H_
-#define NTCORE_SPANMATCHER_H_
+#pragma once
 
 #include <algorithm>
 #include <initializer_list>
@@ -72,5 +71,3 @@ void SpanMatcher<T>::DescribeNegationTo(::std::ostream* os) const {
 inline wpi::span<const uint8_t> operator"" _us(const char* str, size_t len) {
   return {reinterpret_cast<const uint8_t*>(str), len};
 }
-
-#endif  // NTCORE_SPANMATCHER_H_

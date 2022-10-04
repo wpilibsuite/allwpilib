@@ -2,8 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#ifndef NTCORE_VALUE_INTERNAL_H_
-#define NTCORE_VALUE_INTERNAL_H_
+#pragma once
 
 #include <cstring>
 #include <memory>
@@ -58,5 +57,3 @@ O* ConvertToC(const std::basic_string<I>& in, size_t* out_len) {
 }
 
 }  // namespace nt
-
-#endif  // NTCORE_VALUE_INTERNAL_H_

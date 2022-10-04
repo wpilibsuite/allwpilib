@@ -2,8 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#ifndef NTCORE_NETWORKTABLES_NETWORKTABLEINSTANCE_INC_
-#define NTCORE_NETWORKTABLES_NETWORKTABLEINSTANCE_INC_
+#pragma once
 
 #include <string_view>
 #include <utility>
@@ -198,5 +197,3 @@ inline void NetworkTableInstance::RemoveLogger(NT_Logger logger) {
 }
 
 }  // namespace nt
-
-#endif  // NTCORE_NETWORKTABLES_NETWORKTABLEINSTANCE_INC_
