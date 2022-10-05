@@ -19,6 +19,7 @@
 #include <wpi/sendable/SendableRegistry.h>
 
 #include "frc2/command/CommandGroupBase.h"
+#include "frc2/command/CommandPtr.h"
 #include "frc2/command/Subsystem.h"
 
 using namespace frc2;
@@ -171,6 +172,10 @@ void CommandScheduler::Schedule(std::initializer_list<Command*> commands) {
   for (auto command : commands) {
     Schedule(command);
   }
+}
+
+void CommandScheduler::Schedule(const CommandPtr& command) {
+  Schedule(command.get());
 }
 
 void CommandScheduler::Run() {
@@ -326,6 +331,10 @@ void CommandScheduler::Cancel(Command* command) {
   m_watchdog.AddEpoch(command->GetName() + ".End(true)");
 }
 
+void CommandScheduler::Cancel(const CommandPtr& command) {
+  Cancel(command.get());
+}
+
 void CommandScheduler::Cancel(wpi::span<Command* const> commands) {
   for (auto command : commands) {
     Cancel(command);
@@ -368,6 +377,10 @@ bool CommandScheduler::IsScheduled(
 
 bool CommandScheduler::IsScheduled(const Command* command) const {
   return m_impl->scheduledCommands.contains(command);
+}
+
+bool CommandScheduler::IsScheduled(const CommandPtr& command) const {
+  return m_impl->scheduledCommands.contains(command.get());
 }
 
 Command* CommandScheduler::Requiring(const Subsystem* subsystem) const {

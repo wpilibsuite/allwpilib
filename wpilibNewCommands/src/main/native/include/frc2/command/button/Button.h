@@ -11,6 +11,7 @@
 #include <wpi/span.h>
 
 #include "Trigger.h"
+#include "frc2/command/CommandPtr.h"
 
 namespace frc2 {
 class Command;
@@ -46,6 +47,16 @@ class Button : public Trigger {
    * @return The trigger, for chained calls.
    */
   Button WhenPressed(Command* command);
+
+  /**
+   * Binds a command to start when the button is pressed.  Transfers
+   * command ownership to the button scheduler, so the user does not have to
+   * worry about lifespan.
+   *
+   * @param command The command to bind.
+   * @return The trigger, for chained calls.
+   */
+  Button WhenPressed(CommandPtr&& command);
 
   /**
    * Binds a command to start when the button is pressed.  Transfers
@@ -94,6 +105,16 @@ class Button : public Trigger {
   /**
    * Binds a command to be started repeatedly while the button is pressed, and
    * canceled when it is released.  Transfers command ownership to the button
+   * scheduler, so the user does not have to worry about lifespan.
+   *
+   * @param command The command to bind.
+   * @return The button, for chained calls.
+   */
+  Button WhileHeld(CommandPtr&& command);
+
+  /**
+   * Binds a command to be started repeatedly while the button is pressed, and
+   * canceled when it is released.  Transfers command ownership to the button
    * scheduler, so the user does not have to worry about lifespan - rvalue refs
    * will be *moved*, lvalue refs will be *copied.*
    *
@@ -138,6 +159,16 @@ class Button : public Trigger {
   /**
    * Binds a command to be started when the button is pressed, and canceled
    * when it is released.  Transfers command ownership to the button scheduler,
+   * so the user does not have to worry about lifespan.
+   *
+   * @param command The command to bind.
+   * @return The button, for chained calls.
+   */
+  Button WhenHeld(CommandPtr&& command);
+
+  /**
+   * Binds a command to be started when the button is pressed, and canceled
+   * when it is released.  Transfers command ownership to the button scheduler,
    * so the user does not have to worry about lifespan - rvalue refs will be
    * *moved*, lvalue refs will be *copied.*
    *
@@ -160,6 +191,16 @@ class Button : public Trigger {
    * @return The button, for chained calls.
    */
   Button WhenReleased(Command* command);
+
+  /**
+   * Binds a command to start when the button is pressed.  Transfers
+   * command ownership to the button scheduler, so the user does not have to
+   * worry about lifespan.
+   *
+   * @param command The command to bind.
+   * @return The button, for chained calls.
+   */
+  Button WhenReleased(CommandPtr&& command);
 
   /**
    * Binds a command to start when the button is pressed.  Transfers
@@ -204,6 +245,16 @@ class Button : public Trigger {
    * @return The button, for chained calls.
    */
   Button ToggleWhenPressed(Command* command);
+
+  /**
+   * Binds a command to start when the button is pressed, and be canceled when
+   * it is pessed again.  Transfers command ownership to the button scheduler,
+   * so the user does not have to worry about lifespan.
+   *
+   * @param command The command to bind.
+   * @return The button, for chained calls.
+   */
+  Button ToggleWhenPressed(CommandPtr&& command);
 
   /**
    * Binds a command to start when the button is pressed, and be canceled when

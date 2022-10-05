@@ -9,6 +9,7 @@
 #include <utility>
 
 #include "frc2/command/Command.h"
+#include "frc2/command/CommandPtr.h"
 
 namespace frc2 {
 
@@ -27,6 +28,11 @@ class CommandHelper : public Base {
 
  public:
   CommandHelper() = default;
+
+  CommandPtr ToPtr() && {
+    return CommandPtr(
+        std::make_unique<CRTP>(std::move(*static_cast<CRTP*>(this))));
+  }
 
  protected:
   std::unique_ptr<Command> TransferOwnership() && override {

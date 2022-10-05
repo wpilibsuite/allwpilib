@@ -18,6 +18,11 @@ Trigger Trigger::WhenActive(Command* command) {
   return *this;
 }
 
+Trigger Trigger::WhenActive(CommandPtr&& command) {
+  this->Rising().IfHigh([command = std::move(command)] { command.Schedule(); });
+  return *this;
+}
+
 Trigger Trigger::WhenActive(std::function<void()> toRun,
                             std::initializer_list<Subsystem*> requirements) {
   return WhenActive(std::move(toRun),
@@ -32,6 +37,13 @@ Trigger Trigger::WhenActive(std::function<void()> toRun,
 Trigger Trigger::WhileActiveContinous(Command* command) {
   this->IfHigh([command] { command->Schedule(); });
   this->Falling().IfHigh([command] { command->Cancel(); });
+  return *this;
+}
+
+Trigger Trigger::WhileActiveContinous(CommandPtr&& command) {
+  auto ptr = std::make_shared<CommandPtr>(std::move(command));
+  this->IfHigh([ptr] { ptr->Schedule(); });
+  this->Falling().IfHigh([ptr] { ptr->Cancel(); });
   return *this;
 }
 
@@ -53,8 +65,21 @@ Trigger Trigger::WhileActiveOnce(Command* command) {
   return *this;
 }
 
+Trigger Trigger::WhileActiveOnce(CommandPtr&& command) {
+  auto ptr = std::make_shared<CommandPtr>(std::move(command));
+  this->Rising().IfHigh([ptr] { ptr->Schedule(); });
+  this->Falling().IfHigh([ptr] { ptr->Cancel(); });
+  return *this;
+}
+
 Trigger Trigger::WhenInactive(Command* command) {
   this->Falling().IfHigh([command] { command->Schedule(); });
+  return *this;
+}
+
+Trigger Trigger::WhenInactive(CommandPtr&& command) {
+  this->Falling().IfHigh(
+      [command = std::move(command)] { command.Schedule(); });
   return *this;
 }
 
@@ -75,6 +100,17 @@ Trigger Trigger::ToggleWhenActive(Command* command) {
       command->Cancel();
     } else {
       command->Schedule();
+    }
+  });
+  return *this;
+}
+
+Trigger Trigger::ToggleWhenActive(CommandPtr&& command) {
+  this->Rising().IfHigh([command = std::move(command)] {
+    if (command.IsScheduled()) {
+      command.Cancel();
+    } else {
+      command.Schedule();
     }
   });
   return *this;
