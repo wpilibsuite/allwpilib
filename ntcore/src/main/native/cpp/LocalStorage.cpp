@@ -1014,6 +1014,15 @@ std::unique_ptr<SubscriberData> LSImpl::RemoveLocalSubscriber(
   if (subscriber) {
     auto topic = subscriber->topic;
     topic->localSubscribers.Remove(subscriber.get());
+    for (auto listener : subscriber->valueListeners) {
+      listener->subscriber = nullptr;
+    }
+    // shouldn't be necessary, but do it anyway
+    for (auto&& listener : m_topicListeners) {
+      if (listener->subscriber == subscriber.get()) {
+        listener->subscriber = nullptr;
+      }
+    }
     if (m_network) {
       m_network->Unsubscribe(subscriber->handle);
     }
@@ -1060,6 +1069,15 @@ std::unique_ptr<MultiSubscriberData> LSImpl::RemoveMultiSubscriber(
   if (subscriber) {
     for (auto&& topic : m_topics) {
       topic->multiSubscribers.Remove(subscriber.get());
+    }
+    for (auto listener : subscriber->valueListeners) {
+      listener->multiSubscriber = nullptr;
+    }
+    // shouldn't be necessary, but do it anyway
+    for (auto&& listener : m_topicListeners) {
+      if (listener->multiSubscriber == subscriber.get()) {
+        listener->multiSubscriber = nullptr;
+      }
     }
     if (m_network) {
       m_network->Unsubscribe(subscriber->handle);
