@@ -9,15 +9,16 @@
 #include <string_view>
 #include <vector>
 
+#include <networktables/NetworkTableInstance.h>
 #include <networktables/StringTopic.h>
-#include <ntcore_c.h>
-#include <ntcore_cpp.h>
+#include <networktables/Topic.h>
+#include <networktables/TopicListener.h>
+#include <networktables/ValueListener.h>
 #include <wpi/DenseMap.h>
 #include <wpi/StringMap.h>
 
 #include "glass/Model.h"
 #include "glass/Provider.h"
-#include "glass/networktables/NetworkTablesHelper.h"
 
 namespace glass {
 
@@ -25,9 +26,10 @@ class Window;
 
 namespace detail {
 struct NTProviderFunctions {
-  using Exists = std::function<bool(NT_Inst inst, const char* path)>;
-  using CreateModel =
-      std::function<std::unique_ptr<Model>(NT_Inst inst, const char* path)>;
+  using Exists =
+      std::function<bool(nt::NetworkTableInstance inst, const char* path)>;
+  using CreateModel = std::function<std::unique_ptr<Model>(
+      nt::NetworkTableInstance inst, const char* path)>;
   using ViewExists = std::function<bool(Model*, const char* path)>;
   using CreateView =
       std::function<std::unique_ptr<View>(Window*, Model*, const char* path)>;
@@ -43,14 +45,14 @@ class NetworkTablesProvider : private Provider<detail::NTProviderFunctions> {
   using Provider::CreateViewFunc;
 
   explicit NetworkTablesProvider(Storage& storage);
-  NetworkTablesProvider(Storage& storage, NT_Inst inst);
+  NetworkTablesProvider(Storage& storage, nt::NetworkTableInstance inst);
 
   /**
    * Get the NetworkTables instance being used for this provider.
    *
    * @return NetworkTables instance
    */
-  NT_Inst GetInstance() const { return m_nt.GetInstance(); }
+  nt::NetworkTableInstance GetInstance() const { return m_inst; }
 
   /**
    * Perform global initialization.  This should be called prior to
@@ -76,8 +78,10 @@ class NetworkTablesProvider : private Provider<detail::NTProviderFunctions> {
  private:
   void Update() override;
 
-  NetworkTablesHelper m_nt;
-  NT_TopicListener m_listener{0};
+  nt::NetworkTableInstance m_inst;
+  nt::TopicListenerPoller m_topicPoller;
+  NT_TopicListener m_topicListener{0};
+  nt::ValueListenerPoller m_valuePoller;
 
   // cached mapping from table name to type string
   Storage& m_typeCache;
@@ -99,16 +103,16 @@ class NetworkTablesProvider : private Provider<detail::NTProviderFunctions> {
   wpi::DenseMap<NT_Topic, SubListener> m_topicMap;
 
   struct Entry : public ModelEntry {
-    Entry(NT_Topic typeTopic, std::string_view name, const Builder& builder)
-        : ModelEntry{name, [](NT_Inst, const char*) { return true; },
+    Entry(nt::Topic typeTopic, std::string_view name, const Builder& builder)
+        : ModelEntry{name, [](auto, const char*) { return true; },
                      builder.createModel},
           typeTopic{typeTopic} {}
-    NT_Topic typeTopic;
+    nt::Topic typeTopic;
   };
 
   void Show(ViewEntry* entry, Window* window) override;
 
-  ViewEntry* GetOrCreateView(const Builder& builder, NT_Topic typeTopic,
+  ViewEntry* GetOrCreateView(const Builder& builder, nt::Topic typeTopic,
                              std::string_view name);
 };
 

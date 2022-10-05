@@ -17,14 +17,19 @@
 using namespace glass;
 
 NetworkTablesProvider::NetworkTablesProvider(Storage& storage)
-    : NetworkTablesProvider{storage, nt::GetDefaultInstance()} {}
+    : NetworkTablesProvider{storage, nt::NetworkTableInstance::GetDefault()} {}
 
-NetworkTablesProvider::NetworkTablesProvider(Storage& storage, NT_Inst inst)
+NetworkTablesProvider::NetworkTablesProvider(Storage& storage,
+                                             nt::NetworkTableInstance inst)
     : Provider{storage.GetChild("windows")},
-      m_nt{inst},
+      m_inst{inst},
+      m_topicPoller{inst},
+      m_valuePoller{inst},
       m_typeCache{storage.GetChild("types")} {
   storage.SetCustomApply([this] {
-    m_listener = m_nt.AddTopicListener("");
+    m_topicListener = m_topicPoller.Add({{""}}, NT_TOPIC_NOTIFY_PUBLISH |
+                                                    NT_TOPIC_NOTIFY_UNPUBLISH |
+                                                    NT_TOPIC_NOTIFY_IMMEDIATE);
     for (auto&& childIt : m_storage.GetChildren()) {
       auto id = childIt.key();
       auto typePtr = m_typeCache.FindValue(id);
@@ -39,16 +44,15 @@ NetworkTablesProvider::NetworkTablesProvider(Storage& storage, NT_Inst inst)
       }
 
       auto entry = GetOrCreateView(
-          builderIt->second,
-          nt::GetEntry(m_nt.GetInstance(), fmt::format("{}/.type", id)), id);
+          builderIt->second, m_inst.GetTopic(fmt::format("{}/.type", id)), id);
       if (entry) {
         Show(entry, nullptr);
       }
     }
   });
   storage.SetCustomClear([this, &storage] {
-    nt::RemoveTopicListener(m_listener);
-    m_listener = 0;
+    m_topicPoller.Remove(m_topicListener);
+    m_topicListener = 0;
     for (auto&& modelEntry : m_modelEntries) {
       modelEntry->model.reset();
     }
@@ -99,7 +103,7 @@ void NetworkTablesProvider::Update() {
   Provider::Update();
 
   // add/remove entries from NT changes
-  for (auto&& event : m_nt.PollTopicListener()) {
+  for (auto&& event : m_topicPoller.ReadQueue()) {
     // look for .type fields
     if (!wpi::ends_with(event.info.name, "/.type") ||
         event.info.type != NT_STRING || event.info.type_str != "string") {
@@ -109,14 +113,14 @@ void NetworkTablesProvider::Update() {
     if (event.flags & NT_TOPIC_NOTIFY_UNPUBLISH) {
       auto it = m_topicMap.find(event.info.topic);
       if (it != m_topicMap.end()) {
-        nt::RemoveValueListener(it->second.listener);
+        m_valuePoller.Remove(it->second.listener);
         m_topicMap.erase(it);
       }
 
       auto it2 = std::find_if(
           m_viewEntries.begin(), m_viewEntries.end(), [&](const auto& elem) {
-            return static_cast<Entry*>(elem->modelEntry)->typeTopic ==
-                   event.info.topic;
+            return static_cast<Entry*>(elem->modelEntry)
+                       ->typeTopic.GetHandle() == event.info.topic;
           });
       if (it2 != m_viewEntries.end()) {
         m_viewEntries.erase(it2);
@@ -124,16 +128,16 @@ void NetworkTablesProvider::Update() {
     } else if (event.flags & NT_TOPIC_NOTIFY_PUBLISH) {
       // subscribe to it
       SubListener sublistener;
-      sublistener.subscriber = nt::StringSubscriber{
-          nt::Subscribe(event.info.topic, NT_STRING, "string"), ""};
+      sublistener.subscriber = nt::StringTopic{event.info.topic}.Subscribe("");
       sublistener.listener =
-          m_nt.AddValueListener(sublistener.subscriber.GetHandle());
+          m_valuePoller.Add(sublistener.subscriber,
+                            NT_VALUE_NOTIFY_LOCAL | NT_VALUE_NOTIFY_IMMEDIATE);
       m_topicMap.try_emplace(event.info.topic, std::move(sublistener));
     }
   }
 
   // handle actual .type strings
-  for (auto&& event : m_nt.PollValueListener()) {
+  for (auto&& event : m_valuePoller.ReadQueue()) {
     if (!event.value.IsString()) {
       continue;
     }
@@ -146,7 +150,7 @@ void NetworkTablesProvider::Update() {
 
     auto tableName = wpi::drop_back(nt::GetTopicName(event.topic), 6);
 
-    GetOrCreateView(builderIt->second, event.topic, tableName);
+    GetOrCreateView(builderIt->second, nt::Topic{event.topic}, tableName);
     // cache the type
     m_typeCache.SetString(tableName, event.value.GetString());
   }
@@ -168,7 +172,7 @@ void NetworkTablesProvider::Show(ViewEntry* entry, Window* window) {
   // get or create model
   if (!entry->modelEntry->model) {
     entry->modelEntry->model =
-        entry->modelEntry->createModel(m_nt.GetInstance(), entry->name.c_str());
+        entry->modelEntry->createModel(m_inst, entry->name.c_str());
   }
   if (!entry->modelEntry->model) {
     return;
@@ -199,7 +203,7 @@ void NetworkTablesProvider::Show(ViewEntry* entry, Window* window) {
 }
 
 NetworkTablesProvider::ViewEntry* NetworkTablesProvider::GetOrCreateView(
-    const Builder& builder, NT_Topic typeTopic, std::string_view name) {
+    const Builder& builder, nt::Topic typeTopic, std::string_view name) {
   // get view entry if it already exists
   auto viewIt = FindViewEntry(name);
   if (viewIt != m_viewEntries.end() && (*viewIt)->name == name) {
