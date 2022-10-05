@@ -42,12 +42,12 @@ public class FieldConfig {
 
   @SuppressWarnings("deprecation")
   public URL getImageUrl() {
-    return getClass().getResource(FieldImages.kBaseResourceDir + m_fieldImage);
+    return getClass().getResource(Fields.kBaseResourceDir + m_fieldImage);
   }
 
   @SuppressWarnings("deprecation")
   public InputStream getImageAsStream() {
-    return getClass().getResourceAsStream(FieldImages.kBaseResourceDir + m_fieldImage);
+    return getClass().getResourceAsStream(Fields.kBaseResourceDir + m_fieldImage);
   }
 
   /**

@@ -4,18 +4,19 @@
 
 package edu.wpi.fields;
 
-@SuppressWarnings("deprecation")
 public enum Fields {
-  k2018PowerUp(FieldImages.k2018PowerUpFieldConfig),
-  k2019DeepSpace(FieldImages.k2019DeepSpaceFieldConfig),
-  k2020InfiniteRecharge(FieldImages.k2020InfiniteRechargeFieldConfig),
-  k2021InfiniteRecharge(FieldImages.k2021InfiniteRechargeFieldConfig),
-  k2021Barrel(FieldImages.k2021BarrelFieldConfig),
-  k2021Bounce(FieldImages.k2021BounceFieldConfig),
-  k2021GalacticSearchA(FieldImages.k2021GalacticSearchAFieldConfig),
-  k2021GalacticSearchB(FieldImages.k2021GalacticSearchBFieldConfig),
-  k2021Slalom(FieldImages.k2021SlalomFieldConfig),
-  k2022RapidReact(FieldImages.k2022RapidReactFieldConfig);
+  k2018PowerUp("2018-powerup.json"),
+  k2019DeepSpace("2019-deepspace.json"),
+  k2020InfiniteRecharge("2020-infiniterecharge.json"),
+  k2021InfiniteRecharge("2021-infiniterecharge.json"),
+  k2021Barrel("2021-barrelracingpath.json"),
+  k2021Bounce("2021-bouncepath.json"),
+  k2021GalacticSearchA("2021-galacticsearcha.json"),
+  k2021GalacticSearchB("2021-galacticsearchb.json"),
+  k2021Slalom("2021-slalompath.json"),
+  k2022RapidReact("2022-rapidreact.json");
+
+  public static final String kBaseResourceDir = "/edu/wpi/first/fields/";
 
   /** Alias to the current game. */
   public static final Fields kDefaultField = k2022RapidReact;
@@ -23,6 +24,6 @@ public enum Fields {
   public final String m_resourceFile;
 
   Fields(String resourceFile) {
-    m_resourceFile = resourceFile;
+    m_resourceFile = kBaseResourceDir + resourceFile;
   }
 }
