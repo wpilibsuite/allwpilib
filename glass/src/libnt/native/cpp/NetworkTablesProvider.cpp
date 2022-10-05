@@ -148,7 +148,8 @@ void NetworkTablesProvider::Update() {
       continue;
     }
 
-    auto tableName = wpi::drop_back(nt::GetTopicName(event.topic), 6);
+    auto topicName = nt::GetTopicName(event.topic);
+    auto tableName = wpi::drop_back(topicName, 6);
 
     GetOrCreateView(builderIt->second, nt::Topic{event.topic}, tableName);
     // cache the type
