@@ -8,6 +8,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.trajectory.Trajectory;
+import edu.wpi.first.math.util.Units;
 
 /**
  * This holonomic drive controller can be used to follow trajectories using a holonomic drivetrain
@@ -44,6 +45,7 @@ public class HolonomicDriveController {
     m_xController = xController;
     m_yController = yController;
     m_thetaController = thetaController;
+    m_thetaController.enableContinuousInput(0, Units.degreesToRadians(360.0));
   }
 
   /**
