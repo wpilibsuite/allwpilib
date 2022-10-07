@@ -1369,8 +1369,6 @@ void ClientData3::EntryDelete(unsigned int id) {
     m_decoder.SetError("received unexpected EntryDelete message");
     return;
   }
-  // TODO
-
   if (id >= m_server.m_topics.size()) {
     DEBUG3("ignored EntryDelete from {} on non-existent topic {}", m_id, id);
     return;
