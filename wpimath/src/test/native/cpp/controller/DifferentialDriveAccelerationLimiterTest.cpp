@@ -171,4 +171,22 @@ TEST(DifferentialDriveAccelerationLimiterTest, HighLimits) {
   }
 }
 
+TEST(DifferentialDriveAccelerationLimiterTest, MinAccelGreaterThanMaxAccel) {
+  using Kv_t = decltype(1_V / 1_mps);
+  using Ka_t = decltype(1_V / 1_mps_sq);
+  auto plant = LinearSystemId::IdentifyDrivetrainSystem(Kv_t{1.0}, Ka_t{1.0},
+                                                        Kv_t{1.0}, Ka_t{1.0});
+  EXPECT_NO_THROW({
+    DifferentialDriveAccelerationLimiter accelLimiter(plant, 1_m, 1_mps_sq,
+                                                      1_rad_per_s_sq);
+  });
+
+  EXPECT_THROW(
+      {
+        DifferentialDriveAccelerationLimiter accelLimiter(
+            plant, 1_m, 1_mps_sq, -1_mps_sq, 1_rad_per_s_sq);
+      },
+      std::invalid_argument);
+}
+
 }  // namespace frc
