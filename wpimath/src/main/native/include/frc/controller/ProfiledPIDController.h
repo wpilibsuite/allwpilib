@@ -132,6 +132,20 @@ class ProfiledPIDController
   units::second_t GetPeriod() const { return m_controller.GetPeriod(); }
 
   /**
+   * Gets the position tolerance of this controller.
+   *
+   * @return The position tolerance of the controller.
+   */
+  double GetPositionTolerance() const { return m_controller.GetPositionTolerance(); };
+
+  /**
+   * Gets the velocity tolerance of this controller.
+   *
+   * @return The velocity tolerance of the controller.
+   */
+  double GetVelocityTolerance() const { return m_controller.GetVelocityTolerance(); };
+
+  /**
    * Sets the goal for the ProfiledPIDController.
    *
    * @param goal The desired unprofiled setpoint.

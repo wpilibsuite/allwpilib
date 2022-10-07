@@ -269,6 +269,24 @@ public class ProfiledPIDController implements Sendable {
   }
 
   /**
+   * Returns the position tolerance of this controller.
+   *
+   * @return the position tolerance of the controller.
+   */
+  public double getPositionTolerance() {
+    return m_controller.getPositionTolerance();
+  }
+
+  /**
+   * Returns the velocity tolerance of this controller.
+   *
+   * @return the velocity tolerance of the controller.
+   */
+  public double getVelocityTolerance() {
+    return m_controller.getVelocityTolerance();
+  }
+
+  /**
    * Returns the next output of the PID controller.
    *
    * @param measurement The current measurement of the process variable.
