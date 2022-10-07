@@ -203,6 +203,7 @@ enum NetworkTablesFlags_ {
   NetworkTablesFlags_TreeView = 1 << 0,
   NetworkTablesFlags_CombinedView = 1 << 1,
   NetworkTablesFlags_ReadOnly = 1 << 2,
+  NetworkTablesFlags_ShowSpecial = 1 << 3,
   NetworkTablesFlags_ShowProperties = 1 << 4,
   NetworkTablesFlags_ShowTimestamp = 1 << 5,
   NetworkTablesFlags_ShowServerTimestamp = 1 << 6,
@@ -232,6 +233,7 @@ class NetworkTablesFlagsSettings {
  private:
   bool* m_pTreeView = nullptr;
   bool* m_pCombinedView = nullptr;
+  bool* m_pShowSpecial = nullptr;
   bool* m_pShowProperties = nullptr;
   bool* m_pShowTimestamp = nullptr;
   bool* m_pShowServerTimestamp = nullptr;

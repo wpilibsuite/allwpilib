@@ -137,6 +137,9 @@ static void NtInitialize() {
       "NetworkTables Info");
   gNetworkTablesInfoWindow->SetView(glass::MakeFunctionView(
       [&] { glass::DisplayNetworkTablesInfo(gNetworkTablesModel.get()); }));
+  gNetworkTablesInfoWindow->SetDefaultPos(250, 130);
+  gNetworkTablesInfoWindow->SetDefaultSize(750, 145);
+  gNetworkTablesInfoWindow->SetDefaultVisibility(glass::Window::kHide);
   gNetworkTablesInfoWindow->DisableRenamePopup();
   gui::AddLateExecute([] { gNetworkTablesInfoWindow->Display(); });
 

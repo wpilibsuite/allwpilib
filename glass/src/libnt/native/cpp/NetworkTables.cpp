@@ -461,6 +461,7 @@ void NetworkTablesModel::Update() {
                              entry->info.type_str);
       if (wpi::starts_with(entry->info.name, '$') && entry->value.IsRaw() &&
           entry->info.type_str == "msgpack") {
+        fmt::print(stderr, "Updating meta-topic {}\n", entry->info.name);
         // meta topic handling
         if (entry->info.name == "$clients") {
           UpdateClients(entry->value.GetRaw());
@@ -609,6 +610,8 @@ void NetworkTablesModel::Client::UpdatePublishers(
   mpack_done_array(&r);
   if (mpack_reader_destroy(&r) == mpack_ok) {
     publishers = std::move(newPublishers);
+  } else {
+    fmt::print(stderr, "Failed to update publishers\n");
   }
 }
 
@@ -673,6 +676,8 @@ void NetworkTablesModel::Client::UpdateSubscribers(
   mpack_done_array(&r);
   if (mpack_reader_destroy(&r) == mpack_ok) {
     subscribers = std::move(newSubscribers);
+  } else {
+    fmt::print(stderr, "Failed to update subscribers\n");
   }
 }
 
@@ -1342,8 +1347,13 @@ static void EmitEntry(NetworkTablesModel* model,
 
 static void EmitTree(NetworkTablesModel* model,
                      const std::vector<NetworkTablesModel::TreeNode>& tree,
-                     NetworkTablesFlags flags, ShowCategory category) {
+                     NetworkTablesFlags flags, ShowCategory category,
+                     bool root) {
   for (auto&& node : tree) {
+    if (root && (flags & NetworkTablesFlags_ShowSpecial) == 0 &&
+        wpi::starts_with(node.name, '$')) {
+      continue;
+    }
     if (node.entry) {
       EmitEntry(model, *node.entry, node.name.c_str(), flags, category);
     }
@@ -1355,7 +1365,7 @@ static void EmitTree(NetworkTablesModel* model,
           TreeNodeEx(node.name.c_str(), ImGuiTreeNodeFlags_SpanFullWidth);
       EmitParentContextMenu(model, node.path, flags);
       if (open) {
-        EmitTree(model, node.children, flags, category);
+        EmitTree(model, node.children, flags, category, false);
         TreePop();
       }
     }
@@ -1410,13 +1420,16 @@ static void DisplayTable(NetworkTablesModel* model,
       default:
         break;
     }
-    EmitTree(model, tree, flags, category);
+    EmitTree(model, tree, flags, category, true);
     if (category != ShowAll) {
       PopID();
     }
   } else {
     for (auto entry : model->GetEntries()) {
-      EmitEntry(model, *entry, entry->info.name.c_str(), flags, category);
+      if ((flags & NetworkTablesFlags_ShowSpecial) != 0 ||
+          !wpi::starts_with(entry->info.name, '$')) {
+        EmitEntry(model, *entry, entry->info.name.c_str(), flags, category);
+      }
     }
   }
   ImGui::EndTable();
@@ -1555,6 +1568,8 @@ void NetworkTablesFlagsSettings::Update() {
         &storage.GetBool("tree", m_defaultFlags & NetworkTablesFlags_TreeView);
     m_pCombinedView = &storage.GetBool(
         "combined", m_defaultFlags & NetworkTablesFlags_CombinedView);
+    m_pShowSpecial = &storage.GetBool(
+        "special", m_defaultFlags & NetworkTablesFlags_ShowSpecial);
     m_pShowProperties = &storage.GetBool(
         "properties", m_defaultFlags & NetworkTablesFlags_ShowProperties);
     m_pShowTimestamp = &storage.GetBool(
@@ -1572,12 +1587,14 @@ void NetworkTablesFlagsSettings::Update() {
 
   m_flags &= ~(
       NetworkTablesFlags_TreeView | NetworkTablesFlags_CombinedView |
-      NetworkTablesFlags_ShowProperties | NetworkTablesFlags_ShowTimestamp |
+      NetworkTablesFlags_ShowSpecial | NetworkTablesFlags_ShowProperties |
+      NetworkTablesFlags_ShowTimestamp |
       NetworkTablesFlags_ShowServerTimestamp |
       NetworkTablesFlags_CreateNoncanonicalKeys | NetworkTablesFlags_Precision);
   m_flags |=
       (*m_pTreeView ? NetworkTablesFlags_TreeView : 0) |
       (*m_pCombinedView ? NetworkTablesFlags_CombinedView : 0) |
+      (*m_pShowSpecial ? NetworkTablesFlags_ShowSpecial : 0) |
       (*m_pShowProperties ? NetworkTablesFlags_ShowProperties : 0) |
       (*m_pShowTimestamp ? NetworkTablesFlags_ShowTimestamp : 0) |
       (*m_pShowServerTimestamp ? NetworkTablesFlags_ShowServerTimestamp : 0) |
@@ -1592,6 +1609,7 @@ void NetworkTablesFlagsSettings::DisplayMenu() {
   }
   ImGui::MenuItem("Tree View", "", m_pTreeView);
   ImGui::MenuItem("Combined View", "", m_pCombinedView);
+  ImGui::MenuItem("Show Special", "", m_pShowSpecial);
   ImGui::MenuItem("Show Properties", "", m_pShowProperties);
   ImGui::MenuItem("Show Timestamp", "", m_pShowTimestamp);
   ImGui::MenuItem("Show Server Timestamp", "", m_pShowServerTimestamp);
