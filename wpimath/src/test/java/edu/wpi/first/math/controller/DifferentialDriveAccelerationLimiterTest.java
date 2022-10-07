@@ -4,7 +4,10 @@
 
 package edu.wpi.first.math.controller;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import edu.wpi.first.math.MatBuilder;
 import edu.wpi.first.math.Nat;
@@ -229,16 +232,8 @@ class DifferentialDriveAccelerationLimiterTest {
               .plus(plant.getB().times(new MatBuilder<>(Nat.N2(), Nat.N1()).fill(12.0, 12.0)));
       final double a = (accels.get(0, 0) + accels.get(1, 0)) / 2.0;
       System.out.println(a);
-      assertTrue(a > maxA);
-    }
-    {
-      final var accels =
-          plant
-              .getA()
-              .times(xAccelLimiter)
-              .plus(plant.getB().times(new MatBuilder<>(Nat.N2(), Nat.N1()).fill(-12.0, -12.0)));
-      final double a = (accels.get(0, 0) + accels.get(1, 0)) / 2.0;
-      assertTrue(a < minA);
+      assertTrue(Math.abs(a) > maxA);
+      assertTrue(Math.abs(a) > -minA);
     }
 
     // a should always be within [minA, maxA]
