@@ -43,9 +43,7 @@ ADXL362::ADXL362(SPI::Port port, Range range)
   }
 
   m_spi.SetClockRate(3000000);
-  m_spi.SetMSBFirst();
-  m_spi.SetSampleDataOnTrailingEdge();
-  m_spi.SetClockActiveLow();
+  m_spi.SetMode(frc::SPI::Mode::kMode3);
   m_spi.SetChipSelectActiveLow();
 
   uint8_t commands[3];

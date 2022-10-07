@@ -187,7 +187,8 @@ class JArrayRefInner {
 };
 
 /**
- * Specialization of JArrayRefBase to provide std::string_view conversion.
+ * Specialization of JArrayRefBase to provide std::string_view conversion
+ * and span<const uint8_t> conversion.
  */
 template <typename C>
 class JArrayRefInner<C, jbyte> {
@@ -200,6 +201,14 @@ class JArrayRefInner<C, jbyte> {
       return {};
     }
     return {reinterpret_cast<const char*>(arr.data()), arr.size()};
+  }
+
+  span<const uint8_t> uarray() const {
+    auto arr = static_cast<const C*>(this)->array();
+    if (arr.empty()) {
+      return {};
+    }
+    return {reinterpret_cast<const uint8_t*>(arr.data()), arr.size()};
   }
 };
 
@@ -484,12 +493,12 @@ inline jintArray MakeJIntArray(JNIEnv* env, const std::vector<T>& arr) {
 }
 
 /**
- * Convert a std::string_view into a jbyteArray.
+ * Convert a span into a jbyteArray.
  *
  * @param env JRE environment.
- * @param str std::string_view to convert.
+ * @param str span to convert.
  */
-inline jbyteArray MakeJByteArray(JNIEnv* env, std::string_view str) {
+inline jbyteArray MakeJByteArray(JNIEnv* env, span<const uint8_t> str) {
   jbyteArray jarr = env->NewByteArray(str.size());
   if (!jarr) {
     return nullptr;

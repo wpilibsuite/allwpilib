@@ -35,7 +35,6 @@ public class KalmanFilterLatencyCompensator<S extends Num, I extends Num, O exte
    * @param localY The local output at the timestamp
    * @param timestampSeconds The timesnap of the state.
    */
-  @SuppressWarnings("ParameterName")
   public void addObserverState(
       KalmanTypeFilter<S, I, O> observer,
       Matrix<I, N1> u,
@@ -60,7 +59,6 @@ public class KalmanFilterLatencyCompensator<S extends Num, I extends Num, O exte
    * @param globalMeasurementCorrect The function take calls correct() on the observer.
    * @param timestampSeconds The timestamp of the measurement.
    */
-  @SuppressWarnings("ParameterName")
   public <R extends Num> void applyPastGlobalMeasurement(
       Nat<R> rows,
       KalmanTypeFilter<S, I, O> observer,
@@ -165,14 +163,12 @@ public class KalmanFilterLatencyCompensator<S extends Num, I extends Num, O exte
   }
 
   /** This class contains all the information about our observer at a given time. */
-  @SuppressWarnings("MemberName")
   public class ObserverSnapshot {
     public final Matrix<S, N1> xHat;
     public final Matrix<S, S> errorCovariances;
     public final Matrix<I, N1> inputs;
     public final Matrix<O, N1> localMeasurements;
 
-    @SuppressWarnings("ParameterName")
     private ObserverSnapshot(
         KalmanTypeFilter<S, I, O> observer, Matrix<I, N1> u, Matrix<O, N1> localY) {
       this.xHat = observer.getXhat();

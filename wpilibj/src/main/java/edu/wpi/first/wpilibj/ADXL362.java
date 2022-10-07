@@ -106,9 +106,7 @@ public class ADXL362 implements Accelerometer, NTSendable, AutoCloseable {
     }
 
     m_spi.setClockRate(3000000);
-    m_spi.setMSBFirst();
-    m_spi.setSampleDataOnTrailingEdge();
-    m_spi.setClockActiveLow();
+    m_spi.setMode(SPI.Mode.kMode3);
     m_spi.setChipSelectActiveLow();
 
     ByteBuffer transferBuffer = ByteBuffer.allocate(3);

@@ -299,7 +299,6 @@ public class DutyCycleEncoder implements Sendable, AutoCloseable {
    *
    * @return the FPGA index
    */
-  @SuppressWarnings("AbbreviationAsWordInName")
   public int getFPGAIndex() {
     return m_dutyCycle.getFPGAIndex();
   }

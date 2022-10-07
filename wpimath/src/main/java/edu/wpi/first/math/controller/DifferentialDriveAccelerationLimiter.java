@@ -78,7 +78,6 @@ public class DifferentialDriveAccelerationLimiter {
    * @param rightVoltage The unconstrained right motor voltage.
    * @return The constrained wheel voltages.
    */
-  @SuppressWarnings("LocalVariableName")
   public DifferentialDriveWheelVoltages calculate(
       double leftVelocity, double rightVelocity, double leftVoltage, double rightVoltage) {
     var u = new MatBuilder<>(Nat.N2(), Nat.N1()).fill(leftVoltage, rightVoltage);

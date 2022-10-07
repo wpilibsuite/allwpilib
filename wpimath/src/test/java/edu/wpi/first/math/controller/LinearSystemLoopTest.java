@@ -40,7 +40,6 @@ class LinearSystemLoopTest {
   private final LinearSystemLoop<N2, N1, N1> m_loop =
       new LinearSystemLoop<>(m_plant, m_controller, m_observer, 12, 0.00505);
 
-  @SuppressWarnings("LocalVariableName")
   private static void updateTwoState(
       LinearSystem<N2, N1, N1> plant, LinearSystemLoop<N2, N1, N1> loop, double noise) {
     Matrix<N1, N1> y = plant.calculateY(loop.getXHat(), loop.getU()).plus(VecBuilder.fill(noise));
@@ -50,7 +49,6 @@ class LinearSystemLoopTest {
   }
 
   @Test
-  @SuppressWarnings("LocalVariableName")
   void testStateSpaceEnabled() {
     m_loop.reset(VecBuilder.fill(0, 0));
     Matrix<N2, N1> references = VecBuilder.fill(2.0, 0.0);
@@ -79,7 +77,6 @@ class LinearSystemLoopTest {
   }
 
   @Test
-  @SuppressWarnings("LocalVariableName")
   void testFlywheelEnabled() {
     LinearSystem<N1, N1, N1> plant =
         LinearSystemId.createFlywheelSystem(DCMotor.getNEO(2), 0.00289, 1.0);

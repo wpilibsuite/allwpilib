@@ -65,7 +65,6 @@ public class Robot extends TimedRobot {
   }
 
   @Override
-  @SuppressWarnings("LocalVariableName")
   public void teleopPeriodic() {
     // Get the x speed. We are inverting this because Xbox controllers return
     // negative values when we push forward.

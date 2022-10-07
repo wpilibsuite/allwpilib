@@ -3,7 +3,6 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #include "CommandTestBase.h"
-#include "frc2/command/EndlessCommand.h"
 #include "frc2/command/InstantCommand.h"
 
 using namespace frc2;
@@ -14,10 +13,10 @@ TEST_F(EndlessCommandTest, EndlessCommandSchedule) {
 
   bool check = false;
 
-  EndlessCommand command{InstantCommand([&check] { check = true; }, {})};
+  auto command = InstantCommand([&check] { check = true; }, {}).Endlessly();
 
-  scheduler.Schedule(&command);
+  scheduler.Schedule(command);
   scheduler.Run();
-  EXPECT_TRUE(scheduler.IsScheduled(&command));
+  EXPECT_TRUE(scheduler.IsScheduled(command));
   EXPECT_TRUE(check);
 }

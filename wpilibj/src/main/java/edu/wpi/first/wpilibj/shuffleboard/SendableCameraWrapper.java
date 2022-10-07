@@ -37,7 +37,6 @@ public final class SendableCameraWrapper implements Sendable, AutoCloseable {
   }
 
   /** Clears all cached wrapper objects. This should only be used in tests. */
-  @SuppressWarnings("PMD.DefaultPackage")
   static void clearWrappers() {
     m_wrappers.clear();
   }
@@ -73,7 +72,6 @@ public final class SendableCameraWrapper implements Sendable, AutoCloseable {
    * @return a sendable wrapper object for the video source, usable in Shuffleboard via {@link
    *     ShuffleboardTab#add(Sendable)} and {@link ShuffleboardLayout#add(Sendable)}
    */
-  @SuppressWarnings("PMD.CyclomaticComplexity")
   public static SendableCameraWrapper wrap(String cameraName, String... cameraUrls) {
     if (m_wrappers.containsKey(cameraName)) {
       return m_wrappers.get(cameraName);

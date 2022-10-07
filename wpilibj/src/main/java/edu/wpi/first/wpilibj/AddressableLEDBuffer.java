@@ -28,7 +28,6 @@ public class AddressableLEDBuffer {
    * @param g the g value [0-255]
    * @param b the b value [0-255]
    */
-  @SuppressWarnings("ParameterName")
   public void setRGB(int index, int r, int g, int b) {
     m_buffer[index * 4] = (byte) b;
     m_buffer[(index * 4) + 1] = (byte) g;
@@ -44,7 +43,6 @@ public class AddressableLEDBuffer {
    * @param s the s value [0-255]
    * @param v the v value [0-255]
    */
-  @SuppressWarnings("ParameterName")
   public void setHSV(final int index, final int h, final int s, final int v) {
     if (s == 0) {
       setRGB(index, v, v, v);

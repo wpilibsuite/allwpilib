@@ -21,36 +21,34 @@ public final class SimpleMatrixUtils {
    * @param matrix The matrix to compute the exponential of.
    * @return The resultant matrix.
    */
-  @SuppressWarnings({"LocalVariableName", "LineLength"})
   public static SimpleMatrix expm(SimpleMatrix matrix) {
     BiFunction<SimpleMatrix, SimpleMatrix, SimpleMatrix> solveProvider = SimpleBase::solve;
     SimpleMatrix A = matrix;
     double A_L1 = NormOps_DDRM.inducedP1(matrix.getDDRM());
-    int n_squarings = 0;
+    int nSquarings = 0;
 
     if (A_L1 < 1.495585217958292e-002) {
-      Pair<SimpleMatrix, SimpleMatrix> pair = _pade3(A);
-      return dispatchPade(pair.getFirst(), pair.getSecond(), n_squarings, solveProvider);
+      Pair<SimpleMatrix, SimpleMatrix> pair = pade3(A);
+      return dispatchPade(pair.getFirst(), pair.getSecond(), nSquarings, solveProvider);
     } else if (A_L1 < 2.539398330063230e-001) {
-      Pair<SimpleMatrix, SimpleMatrix> pair = _pade5(A);
-      return dispatchPade(pair.getFirst(), pair.getSecond(), n_squarings, solveProvider);
+      Pair<SimpleMatrix, SimpleMatrix> pair = pade5(A);
+      return dispatchPade(pair.getFirst(), pair.getSecond(), nSquarings, solveProvider);
     } else if (A_L1 < 9.504178996162932e-001) {
-      Pair<SimpleMatrix, SimpleMatrix> pair = _pade7(A);
-      return dispatchPade(pair.getFirst(), pair.getSecond(), n_squarings, solveProvider);
+      Pair<SimpleMatrix, SimpleMatrix> pair = pade7(A);
+      return dispatchPade(pair.getFirst(), pair.getSecond(), nSquarings, solveProvider);
     } else if (A_L1 < 2.097847961257068e+000) {
-      Pair<SimpleMatrix, SimpleMatrix> pair = _pade9(A);
-      return dispatchPade(pair.getFirst(), pair.getSecond(), n_squarings, solveProvider);
+      Pair<SimpleMatrix, SimpleMatrix> pair = pade9(A);
+      return dispatchPade(pair.getFirst(), pair.getSecond(), nSquarings, solveProvider);
     } else {
       double maxNorm = 5.371920351148152;
       double log = Math.log(A_L1 / maxNorm) / Math.log(2); // logb(2, arg)
-      n_squarings = (int) Math.max(0, Math.ceil(log));
-      A = A.divide(Math.pow(2.0, n_squarings));
-      Pair<SimpleMatrix, SimpleMatrix> pair = _pade13(A);
-      return dispatchPade(pair.getFirst(), pair.getSecond(), n_squarings, solveProvider);
+      nSquarings = (int) Math.max(0, Math.ceil(log));
+      A = A.divide(Math.pow(2.0, nSquarings));
+      Pair<SimpleMatrix, SimpleMatrix> pair = pade13(A);
+      return dispatchPade(pair.getFirst(), pair.getSecond(), nSquarings, solveProvider);
     }
   }
 
-  @SuppressWarnings({"LocalVariableName", "ParameterName", "LineLength"})
   private static SimpleMatrix dispatchPade(
       SimpleMatrix U,
       SimpleMatrix V,
@@ -68,8 +66,7 @@ public final class SimpleMatrixUtils {
     return R;
   }
 
-  @SuppressWarnings({"MethodName", "LocalVariableName", "ParameterName"})
-  private static Pair<SimpleMatrix, SimpleMatrix> _pade3(SimpleMatrix A) {
+  private static Pair<SimpleMatrix, SimpleMatrix> pade3(SimpleMatrix A) {
     double[] b = new double[] {120, 60, 12, 1};
     SimpleMatrix ident = eye(A.numRows(), A.numCols());
 
@@ -79,8 +76,7 @@ public final class SimpleMatrixUtils {
     return new Pair<>(U, V);
   }
 
-  @SuppressWarnings({"MethodName", "LocalVariableName", "ParameterName"})
-  private static Pair<SimpleMatrix, SimpleMatrix> _pade5(SimpleMatrix A) {
+  private static Pair<SimpleMatrix, SimpleMatrix> pade5(SimpleMatrix A) {
     double[] b = new double[] {30240, 15120, 3360, 420, 30, 1};
     SimpleMatrix ident = eye(A.numRows(), A.numCols());
     SimpleMatrix A2 = A.mult(A);
@@ -92,8 +88,7 @@ public final class SimpleMatrixUtils {
     return new Pair<>(U, V);
   }
 
-  @SuppressWarnings({"MethodName", "LocalVariableName", "LineLength", "ParameterName"})
-  private static Pair<SimpleMatrix, SimpleMatrix> _pade7(SimpleMatrix A) {
+  private static Pair<SimpleMatrix, SimpleMatrix> pade7(SimpleMatrix A) {
     double[] b = new double[] {17297280, 8648640, 1995840, 277200, 25200, 1512, 56, 1};
     SimpleMatrix ident = eye(A.numRows(), A.numCols());
     SimpleMatrix A2 = A.mult(A);
@@ -108,8 +103,7 @@ public final class SimpleMatrixUtils {
     return new Pair<>(U, V);
   }
 
-  @SuppressWarnings({"MethodName", "LocalVariableName", "ParameterName", "LineLength"})
-  private static Pair<SimpleMatrix, SimpleMatrix> _pade9(SimpleMatrix A) {
+  private static Pair<SimpleMatrix, SimpleMatrix> pade9(SimpleMatrix A) {
     double[] b =
         new double[] {
           17643225600.0, 8821612800.0, 2075673600, 302702400, 30270240, 2162160, 110880, 3960, 90, 1
@@ -137,8 +131,7 @@ public final class SimpleMatrixUtils {
     return new Pair<>(U, V);
   }
 
-  @SuppressWarnings({"MethodName", "LocalVariableName", "LineLength", "ParameterName"})
-  private static Pair<SimpleMatrix, SimpleMatrix> _pade13(SimpleMatrix A) {
+  private static Pair<SimpleMatrix, SimpleMatrix> pade13(SimpleMatrix A) {
     double[] b =
         new double[] {
           64764752532480000.0,
@@ -245,7 +238,6 @@ public final class SimpleMatrixUtils {
    * @param A the matrix to exponentiate.
    * @return the exponential of A.
    */
-  @SuppressWarnings("ParameterName")
   public static SimpleMatrix exp(SimpleMatrix A) {
     SimpleMatrix toReturn = new SimpleMatrix(A.numRows(), A.numRows());
     WPIMathJNI.exp(A.getDDRM().getData(), A.numRows(), toReturn.getDDRM().getData());

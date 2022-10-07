@@ -22,7 +22,6 @@ import java.util.Random;
 import org.junit.jupiter.api.Test;
 
 class DifferentialDrivePoseEstimatorTest {
-  @SuppressWarnings("LocalVariableName")
   @Test
   void testAccuracy() {
     var estimator =

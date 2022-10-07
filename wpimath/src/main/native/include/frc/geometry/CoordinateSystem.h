@@ -94,6 +94,18 @@ class WPILIB_DLLEXPORT CoordinateSystem {
   static Pose3d Convert(const Pose3d& pose, const CoordinateSystem& from,
                         const CoordinateSystem& to);
 
+  /**
+   * Converts the given transform from one coordinate system to another.
+   *
+   * @param transform The transform to convert.
+   * @param from The coordinate system the transform starts in.
+   * @param to The coordinate system to which to convert.
+   * @return The given transform in the desired coordinate system.
+   */
+  static Transform3d Convert(const Transform3d& transform,
+                             const CoordinateSystem& from,
+                             const CoordinateSystem& to);
+
  private:
   // Rotation from this coordinate system to NWU coordinate system
   Rotation3d m_rotation;

@@ -134,7 +134,6 @@ public abstract class IterativeRobotBase extends RobotBase {
    * <p>Users should override this method for initialization code which will be called each time the
    * robot enters test mode.
    */
-  @SuppressWarnings("PMD.JUnit4TestShouldUseTestAnnotation")
   public void testInit() {}
 
   /* ----------- Overridable periodic code ----------------- */
@@ -196,7 +195,6 @@ public abstract class IterativeRobotBase extends RobotBase {
   private boolean m_tmpFirstRun = true;
 
   /** Periodic code for test mode should go here. */
-  @SuppressWarnings("PMD.JUnit4TestShouldUseTestAnnotation")
   public void testPeriodic() {
     if (m_tmpFirstRun) {
       System.out.println("Default testPeriodic() method... Override me!");
@@ -234,7 +232,6 @@ public abstract class IterativeRobotBase extends RobotBase {
    * <p>Users should override this method for code which will be called each time the robot exits
    * test mode.
    */
-  @SuppressWarnings("PMD.JUnit4TestShouldUseTestAnnotation")
   public void testExit() {}
 
   /**

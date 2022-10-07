@@ -20,6 +20,7 @@
 
 namespace frc2 {
 class Command;
+class CommandPtr;
 class Subsystem;
 
 /**
@@ -81,6 +82,17 @@ class CommandScheduler final : public nt::NTSendable,
    */
   WPI_DEPRECATED("Call Clear on the EventLoop instance directly!")
   void ClearButtons();
+
+  /**
+   * Schedules a command for execution. Does nothing if the command is already
+   * scheduled. If a command's requirements are not available, it will only be
+   * started if all the commands currently using those requirements are
+   * interruptible. If this is the case, they will be interrupted and the
+   * command will be scheduled.
+   *
+   * @param command the command to schedule
+   */
+  void Schedule(const CommandPtr& command);
 
   /**
    * Schedules a command for execution. Does nothing if the command is already
@@ -208,6 +220,18 @@ class CommandScheduler final : public nt::NTSendable,
    * <p>Commands will be canceled even if they are not scheduled as
    * interruptible.
    *
+   * @param command the command to cancel
+   */
+  void Cancel(const CommandPtr& command);
+
+  /**
+   * Cancels commands. The scheduler will only call Command::End()
+   * method of the canceled command with true, indicating they were
+   * canceled (as opposed to finishing normally).
+   *
+   * <p>Commands will be canceled even if they are not scheduled as
+   * interruptible.
+   *
    * @param commands the commands to cancel
    */
   void Cancel(wpi::span<Command* const> commands);
@@ -258,6 +282,16 @@ class CommandScheduler final : public nt::NTSendable,
    * @return whether the command is currently scheduled
    */
   bool IsScheduled(const Command* command) const;
+
+  /**
+   * Whether a given command is running.  Note that this only works on commands
+   * that are directly scheduled by the scheduler; it will not work on commands
+   * inside of CommandGroups, as the scheduler does not see them.
+   *
+   * @param command the command to query
+   * @return whether the command is currently scheduled
+   */
+  bool IsScheduled(const CommandPtr& command) const;
 
   /**
    * Returns the command currently requiring a given subsystem.  Null if no

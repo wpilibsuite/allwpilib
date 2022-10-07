@@ -8,7 +8,7 @@ import edu.wpi.first.hal.SimDouble;
 import edu.wpi.first.wpilibj.ADIS16470_IMU;
 
 /** Class to control a simulated ADIS16470 gyroscope. */
-@SuppressWarnings({"TypeName", "AbbreviationAsWordInName"})
+@SuppressWarnings("TypeName")
 public class ADIS16470_IMUSim {
   private final SimDouble m_simGyroAngleX;
   private final SimDouble m_simGyroAngleY;

@@ -4,7 +4,6 @@
 
 package edu.wpi.first.hal;
 
-@SuppressWarnings("AbbreviationAsWordInName")
 public class PowerDistributionJNI extends JNIWrapper {
   public static final int AUTOMATIC_TYPE = 0;
   public static final int CTRE_TYPE = 1;

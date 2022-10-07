@@ -4,7 +4,6 @@
 
 package edu.wpi.first.hal;
 
-@SuppressWarnings("AbbreviationAsWordInName")
 public class PortsJNI extends JNIWrapper {
   public static native int getNumAccumulators();
 

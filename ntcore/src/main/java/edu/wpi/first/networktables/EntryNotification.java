@@ -5,27 +5,23 @@
 package edu.wpi.first.networktables;
 
 /** NetworkTables Entry notification. */
+@SuppressWarnings("MemberName")
 public final class EntryNotification {
   /** Listener that was triggered. */
-  @SuppressWarnings("MemberName")
   public final int listener;
 
   /** Entry handle. */
-  @SuppressWarnings("MemberName")
   public final int entry;
 
   /** Entry name. */
-  @SuppressWarnings("MemberName")
   public final String name;
 
   /** The new value. */
-  @SuppressWarnings("MemberName")
   public final NetworkTableValue value;
 
   /**
    * Update flags. For example, {@link EntryListenerFlags#kNew} if the key did not previously exist.
    */
-  @SuppressWarnings("MemberName")
   public final int flags;
 
   /**

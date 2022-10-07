@@ -282,7 +282,6 @@ public class Encoder implements CounterBase, Sendable, AutoCloseable {
    *
    * @return The Encoder's FPGA index.
    */
-  @SuppressWarnings("AbbreviationAsWordInName")
   public int getFPGAIndex() {
     return EncoderJNI.getEncoderFPGAIndex(m_encoder);
   }

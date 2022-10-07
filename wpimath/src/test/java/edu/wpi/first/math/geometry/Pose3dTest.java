@@ -17,7 +17,6 @@ class Pose3dTest {
 
   @Test
   void testTransformBy() {
-    @SuppressWarnings("LocalVariableName")
     var zAxis = VecBuilder.fill(0.0, 0.0, 1.0);
 
     var initial =
@@ -38,7 +37,6 @@ class Pose3dTest {
 
   @Test
   void testRelativeTo() {
-    @SuppressWarnings("LocalVariableName")
     var zAxis = VecBuilder.fill(0.0, 0.0, 1.0);
 
     var initial = new Pose3d(0.0, 0.0, 0.0, new Rotation3d(zAxis, Units.degreesToRadians(45.0)));
@@ -54,7 +52,6 @@ class Pose3dTest {
 
   @Test
   void testEquality() {
-    @SuppressWarnings("LocalVariableName")
     var zAxis = VecBuilder.fill(0.0, 0.0, 1.0);
 
     var one = new Pose3d(0.0, 5.0, 0.0, new Rotation3d(zAxis, Units.degreesToRadians(43.0)));
@@ -64,7 +61,6 @@ class Pose3dTest {
 
   @Test
   void testInequality() {
-    @SuppressWarnings("LocalVariableName")
     var zAxis = VecBuilder.fill(0.0, 0.0, 1.0);
 
     var one = new Pose3d(0.0, 5.0, 0.0, new Rotation3d(zAxis, Units.degreesToRadians(43.0)));
@@ -74,7 +70,6 @@ class Pose3dTest {
 
   @Test
   void testMinus() {
-    @SuppressWarnings("LocalVariableName")
     var zAxis = VecBuilder.fill(0.0, 0.0, 1.0);
 
     var initial = new Pose3d(0.0, 0.0, 0.0, new Rotation3d(zAxis, Units.degreesToRadians(45.0)));

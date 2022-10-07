@@ -41,7 +41,6 @@ public class FieldObject2d {
    * @param yMeters Y location, in meters
    * @param rotation rotation
    */
-  @SuppressWarnings("ParameterName")
   public synchronized void setPose(double xMeters, double yMeters, Rotation2d rotation) {
     setPose(new Pose2d(xMeters, yMeters, rotation));
   }

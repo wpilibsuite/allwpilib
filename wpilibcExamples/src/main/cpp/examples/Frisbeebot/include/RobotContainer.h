@@ -45,7 +45,7 @@ class RobotContainer {
   ShooterSubsystem m_shooter;
 
   // A simple autonomous routine that shoots the loaded frisbees
-  frc2::SequentialCommandGroup m_autonomousCommand =
+  frc2::CommandPtr m_autonomousCommand =
       frc2::SequentialCommandGroup{
           // Start the command by spinning up the shooter...
           frc2::InstantCommand([this] { m_shooter.Enable(); }, {&m_shooter}),

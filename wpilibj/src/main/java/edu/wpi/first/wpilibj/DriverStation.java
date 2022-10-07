@@ -80,59 +80,25 @@ public final class DriverStation {
     }
   } /* DriverStationTask */
 
+  @SuppressWarnings("MemberName")
   private static class MatchDataSender {
-    @SuppressWarnings("MemberName")
     NetworkTable table;
-
-    @SuppressWarnings("MemberName")
     NetworkTableEntry typeMetadata;
-
-    @SuppressWarnings("MemberName")
     NetworkTableEntry gameSpecificMessage;
-
-    @SuppressWarnings("MemberName")
     NetworkTableEntry eventName;
-
-    @SuppressWarnings("MemberName")
     NetworkTableEntry matchNumber;
-
-    @SuppressWarnings("MemberName")
     NetworkTableEntry replayNumber;
-
-    @SuppressWarnings("MemberName")
     NetworkTableEntry matchType;
-
-    @SuppressWarnings("MemberName")
     NetworkTableEntry alliance;
-
-    @SuppressWarnings("MemberName")
     NetworkTableEntry station;
-
-    @SuppressWarnings("MemberName")
     NetworkTableEntry controlWord;
-
-    @SuppressWarnings("MemberName")
     boolean oldIsRedAlliance = true;
-
-    @SuppressWarnings("MemberName")
     int oldStationNumber = 1;
-
-    @SuppressWarnings("MemberName")
     String oldEventName = "";
-
-    @SuppressWarnings("MemberName")
     String oldGameSpecificMessage = "";
-
-    @SuppressWarnings("MemberName")
     int oldMatchNumber;
-
-    @SuppressWarnings("MemberName")
     int oldReplayNumber;
-
-    @SuppressWarnings("MemberName")
     int oldMatchType;
-
-    @SuppressWarnings("MemberName")
     int oldControlWord;
 
     MatchDataSender() {

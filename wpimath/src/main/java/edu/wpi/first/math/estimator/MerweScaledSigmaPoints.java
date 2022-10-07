@@ -75,7 +75,6 @@ public class MerweScaledSigmaPoints<S extends Num> {
    * @return Two dimensional array of sigma points. Each column contains all of the sigmas for one
    *     dimension in the problem space. Ordered by Xi_0, Xi_{1..n}, Xi_{n+1..2n}.
    */
-  @SuppressWarnings({"ParameterName", "LocalVariableName"})
   public Matrix<S, ?> squareRootSigmaPoints(Matrix<S, N1> x, Matrix<S, S> s) {
     double lambda = Math.pow(m_alpha, 2) * (m_states.getNum() + m_kappa) - m_states.getNum();
     double eta = Math.sqrt(lambda + m_states.getNum());
@@ -101,7 +100,6 @@ public class MerweScaledSigmaPoints<S extends Num> {
    *
    * @param beta Incorporates prior knowledge of the distribution of the mean.
    */
-  @SuppressWarnings("LocalVariableName")
   private void computeWeights(double beta) {
     double lambda = Math.pow(m_alpha, 2) * (m_states.getNum() + m_kappa) - m_states.getNum();
     double c = 0.5 / (m_states.getNum() + lambda);
