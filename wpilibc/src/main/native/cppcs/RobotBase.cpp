@@ -239,7 +239,7 @@ RobotBase::RobotBase() {
     std::this_thread::sleep_for(10ms);
     ++count;
     if (count > 100) {
-      fmt::print(stderr, "timed out while waiting for NT server to start");
+      fmt::print(stderr, "timed out while waiting for NT server to start\n");
     }
   }
 
