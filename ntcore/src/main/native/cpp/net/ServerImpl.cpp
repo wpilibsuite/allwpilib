@@ -1477,17 +1477,6 @@ SImpl::SImpl(wpi::Logger& logger) : m_logger{logger} {
   // local is client 0
   m_clients.emplace_back(std::make_unique<ClientDataLocal>(*this, 0, logger));
   m_localClient = static_cast<ClientDataLocal*>(m_clients.back().get());
-
-  // create server meta topics
-  m_metaClients = CreateMetaTopic("$clients");
-
-  // create local client meta topics
-  m_localClient->m_metaPub = CreateMetaTopic("$serverpub");
-  m_localClient->m_metaSub = CreateMetaTopic("$serversub");
-
-  // update meta topics
-  m_localClient->UpdateMetaClientPub();
-  m_localClient->UpdateMetaClientSub();
 }
 
 int SImpl::AddClient(std::string_view name, std::string_view connInfo,
@@ -2271,6 +2260,17 @@ void ServerImpl::HandleLocal(wpi::span<const ClientMessage> msgs) {
 
 void ServerImpl::SetLocal(LocalInterface* local) {
   m_impl->m_local = local;
+
+  // create server meta topics
+  m_impl->m_metaClients = m_impl->CreateMetaTopic("$clients");
+
+  // create local client meta topics
+  m_impl->m_localClient->m_metaPub = m_impl->CreateMetaTopic("$serverpub");
+  m_impl->m_localClient->m_metaSub = m_impl->CreateMetaTopic("$serversub");
+
+  // update meta topics
+  m_impl->m_localClient->UpdateMetaClientPub();
+  m_impl->m_localClient->UpdateMetaClientSub();
 }
 
 void ServerImpl::ProcessIncomingText(int clientId, std::string_view data) {
