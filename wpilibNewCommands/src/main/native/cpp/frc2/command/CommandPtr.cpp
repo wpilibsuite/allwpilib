@@ -80,15 +80,15 @@ CommandPtr CommandPtr::WithInterruptBehavior(
 
 CommandPtr CommandPtr::AndThen(std::function<void()> toRun,
                                wpi::span<Subsystem* const> requirements) && {
-  return std::move(*this)
-    .AndThen(CommandPtr(std::make_unique<InstantCommand>(std::move(toRun), requirements)));
+  return std::move(*this).AndThen(CommandPtr(
+      std::make_unique<InstantCommand>(std::move(toRun), requirements)));
 }
 
 CommandPtr CommandPtr::AndThen(
     std::function<void()> toRun,
     std::initializer_list<Subsystem*> requirements) && {
-  return std::move(*this)
-    .AndThen(CommandPtr(std::make_unique<InstantCommand>(std::move(toRun), requirements)));
+  return std::move(*this).AndThen(CommandPtr(
+      std::make_unique<InstantCommand>(std::move(toRun), requirements)));
 }
 
 CommandPtr CommandPtr::AndThen(CommandPtr&& next) && {
@@ -101,15 +101,15 @@ CommandPtr CommandPtr::AndThen(CommandPtr&& next) && {
 
 CommandPtr CommandPtr::BeforeStarting(
     std::function<void()> toRun, wpi::span<Subsystem* const> requirements) && {
-  return std::move(*this)
-    .BeforeStarting(CommandPtr(std::make_unique<InstantCommand>(std::move(toRun), requirements)));
+  return std::move(*this).BeforeStarting(CommandPtr(
+      std::make_unique<InstantCommand>(std::move(toRun), requirements)));
 }
 
 CommandPtr CommandPtr::BeforeStarting(
     std::function<void()> toRun,
     std::initializer_list<Subsystem*> requirements) && {
-  return std::move(*this)
-    .BeforeStarting(CommandPtr(std::make_unique<InstantCommand>(std::move(toRun), requirements)));
+  return std::move(*this).BeforeStarting(CommandPtr(
+      std::make_unique<InstantCommand>(std::move(toRun), requirements)));
 }
 
 CommandPtr CommandPtr::BeforeStarting(CommandPtr&& before) && {
@@ -146,7 +146,8 @@ CommandPtr CommandPtr::Unless(std::function<bool()> condition) && {
 CommandPtr CommandPtr::DeadlineWith(CommandPtr&& parallel) && {
   std::vector<std::unique_ptr<Command>> vec;
   vec.emplace_back(std::move(parallel).Unwrap());
-  m_ptr = std::make_unique<ParallelDeadlineGroup>(std::move(m_ptr), std::move(vec));
+  m_ptr =
+      std::make_unique<ParallelDeadlineGroup>(std::move(m_ptr), std::move(vec));
   return std::move(*this);
 }
 
@@ -190,9 +191,10 @@ bool CommandPtr::HasRequirement(Subsystem* requirement) const {
   return m_ptr->HasRequirement(requirement);
 }
 
-std::vector<std::unique_ptr<Command>> CommandPtr::UnwrapVector(std::vector<CommandPtr>&& vec) {
+std::vector<std::unique_ptr<Command>> CommandPtr::UnwrapVector(
+    std::vector<CommandPtr>&& vec) {
   std::vector<std::unique_ptr<Command>> ptrs;
-  for(auto&& ptr : vec) {
+  for (auto&& ptr : vec) {
     ptrs.emplace_back(std::move(ptr).Unwrap());
   }
   return ptrs;
