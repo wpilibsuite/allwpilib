@@ -99,7 +99,7 @@ if (!project.hasProperty('onlylinuxathena') && !project.hasProperty('onlylinuxar
                     }
                     lib project: ':glass', library: 'glassnt', linkage: 'static'
                     lib project: ':glass', library: 'glass', linkage: 'static'
-                    lib project: ':ntcore', library: 'ntcore', linkage: 'static'
+                    project(':ntcore').addNtcoreDependency(it, 'static')
                     lib project: ':wpinet', library: 'wpinet', linkage: 'static'
                     lib project: ':wpiutil', library: 'wpiutil', linkage: 'static'
                     lib project: ':wpigui', library: 'wpigui', linkage: 'static'

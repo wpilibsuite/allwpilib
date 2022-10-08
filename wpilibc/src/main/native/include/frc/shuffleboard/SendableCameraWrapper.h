@@ -22,6 +22,7 @@ using CS_Handle = int;        // NOLINT
 using CS_Source = CS_Handle;  // NOLINT
 #endif
 
+#include <networktables/StringArrayTopic.h>
 #include <wpi/sendable/Sendable.h>
 #include <wpi/sendable/SendableHelper.h>
 #include <wpi/span.h>
@@ -56,6 +57,17 @@ class SendableCameraWrapper
   SendableCameraWrapper(std::string_view cameraName, const private_init&);
 
   /**
+   * Creates a new sendable wrapper. Private constructor to avoid direct
+   * instantiation with multiple wrappers floating around for the same camera.
+   *
+   * @param cameraName the name of the camera to wrap
+   * @param cameraUrls camera URLs
+   */
+  SendableCameraWrapper(std::string_view cameraName,
+                        wpi::span<const std::string> cameraUrls,
+                        const private_init&);
+
+  /**
    * Gets a sendable wrapper object for the given video source, creating the
    * wrapper if one does not already exist for the source.
    *
@@ -73,6 +85,7 @@ class SendableCameraWrapper
 
  private:
   std::string m_uri;
+  nt::StringArrayPublisher m_streams;
 };
 
 #ifndef DYNAMIC_CAMERA_SERVER
@@ -81,6 +94,17 @@ inline SendableCameraWrapper::SendableCameraWrapper(std::string_view name,
     : m_uri(detail::kProtocol) {
   detail::AddToSendableRegistry(this, name);
   m_uri += name;
+}
+
+inline SendableCameraWrapper::SendableCameraWrapper(
+    std::string_view cameraName, wpi::span<const std::string> cameraUrls,
+    const private_init&)
+    : SendableCameraWrapper(cameraName, private_init{}) {
+  m_streams = nt::NetworkTableInstance::GetDefault()
+                  .GetStringArrayTopic(
+                      fmt::format("/CameraPublisher/{}/streams", cameraName))
+                  .Publish();
+  m_streams.Set(cameraUrls);
 }
 
 inline SendableCameraWrapper& SendableCameraWrapper::Wrap(
@@ -102,12 +126,9 @@ inline SendableCameraWrapper& SendableCameraWrapper::Wrap(
     std::string_view cameraName, wpi::span<const std::string> cameraUrls) {
   auto& wrapper = detail::GetSendableCameraWrapper(cameraName);
   if (!wrapper) {
-    wrapper =
-        std::make_shared<SendableCameraWrapper>(cameraName, private_init{});
+    wrapper = std::make_shared<SendableCameraWrapper>(cameraName, cameraUrls,
+                                                      private_init{});
   }
-  auto streams = fmt::format("/CameraPublisher/{}/streams", cameraName);
-  nt::NetworkTableInstance::GetDefault().GetEntry(streams).SetStringArray(
-      cameraUrls);
   return *wrapper;
 }
 #endif

@@ -1,0 +1,852 @@
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
+
+package edu.wpi.first.networktables;
+
+import edu.wpi.first.util.WPIUtilJNI;
+import edu.wpi.first.util.datalog.DataLog;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.locks.ReentrantLock;
+import java.util.function.Consumer;
+
+/**
+ * NetworkTables Instance.
+ *
+ * <p>Instances are completely independent from each other. Table operations on one instance will
+ * not be visible to other instances unless the instances are connected via the network. The main
+ * limitation on instances is that you cannot have two servers on the same network port. The main
+ * utility of instances is for unit testing, but they can also enable one program to connect to two
+ * different NetworkTables networks.
+ *
+ * <p>The global "default" instance (as returned by {@link #getDefault()}) is always available, and
+ * is intended for the common case when there is only a single NetworkTables instance being used in
+ * the program.
+ *
+ * <p>Additional instances can be created with the {@link #create()} function. A reference must be
+ * kept to the NetworkTableInstance returned by this function to keep it from being garbage
+ * collected.
+ */
+public final class NetworkTableInstance implements AutoCloseable {
+  /**
+   * Client/server mode flag values (as returned by {@link #getNetworkMode()}). This is a bitmask.
+   */
+  public static final int kNetModeNone = 0x00;
+
+  public static final int kNetModeServer = 0x01;
+  public static final int kNetModeClient3 = 0x02;
+  public static final int kNetModeClient4 = 0x04;
+  public static final int kNetModeStarting = 0x08;
+  public static final int kNetModeLocal = 0x10;
+
+  /** The default port that network tables operates on for NT3. */
+  public static final int kDefaultPort3 = 1735;
+
+  /** The default port that network tables operates on for NT4. */
+  public static final int kDefaultPort4 = 5810;
+
+  /**
+   * Construct from native handle.
+   *
+   * @param handle Native handle
+   */
+  private NetworkTableInstance(int handle) {
+    m_owned = false;
+    m_handle = handle;
+  }
+
+  /** Destroys the instance (if created by {@link #create()}). */
+  @Override
+  public synchronized void close() {
+    if (m_owned && m_handle != 0) {
+      NetworkTablesJNI.destroyInstance(m_handle);
+    }
+  }
+
+  /**
+   * Determines if the native handle is valid.
+   *
+   * @return True if the native handle is valid, false otherwise.
+   */
+  public boolean isValid() {
+    return m_handle != 0;
+  }
+
+  /* The default instance. */
+  private static NetworkTableInstance s_defaultInstance;
+
+  /**
+   * Get global default instance.
+   *
+   * @return Global default instance
+   */
+  public static synchronized NetworkTableInstance getDefault() {
+    if (s_defaultInstance == null) {
+      s_defaultInstance = new NetworkTableInstance(NetworkTablesJNI.getDefaultInstance());
+    }
+    return s_defaultInstance;
+  }
+
+  /**
+   * Create an instance. Note: A reference to the returned instance must be retained to ensure the
+   * instance is not garbage collected.
+   *
+   * @return Newly created instance
+   */
+  public static NetworkTableInstance create() {
+    NetworkTableInstance inst = new NetworkTableInstance(NetworkTablesJNI.createInstance());
+    inst.m_owned = true;
+    return inst;
+  }
+
+  /**
+   * Gets the native handle for the instance.
+   *
+   * @return Native handle
+   */
+  public int getHandle() {
+    return m_handle;
+  }
+
+  /**
+   * Get (generic) topic.
+   *
+   * @param name topic name
+   * @return Topic
+   */
+  public Topic getTopic(String name) {
+    Topic topic = m_topics.get(name);
+    if (topic == null) {
+      int handle = NetworkTablesJNI.getTopic(m_handle, name);
+      topic = new Topic(this, handle);
+      Topic oldTopic = m_topics.putIfAbsent(name, topic);
+      if (oldTopic != null) {
+        topic = oldTopic;
+      }
+      // also cache by handle
+      m_topicsByHandle.putIfAbsent(handle, topic);
+    }
+    return topic;
+  }
+{% for t in types %}
+  /**
+   * Get {{ t.java.ValueType }} topic.
+   *
+   * @param name topic name
+   * @return {{ t.TypeName }}Topic
+   */
+  public {{ t.TypeName }}Topic get{{ t.TypeName }}Topic(String name) {
+    Topic topic = m_topics.get(name);
+    if (topic instanceof {{ t.TypeName }}Topic) {
+      return ({{ t.TypeName }}Topic) topic;
+    }
+
+    int handle;
+    if (topic == null) {
+      handle = NetworkTablesJNI.getTopic(m_handle, name);
+    } else {
+      handle = topic.getHandle();
+    }
+
+    topic = new {{ t.TypeName }}Topic(this, handle);
+    m_topics.put(name, topic);
+
+    // also cache by handle
+    m_topicsByHandle.put(handle, topic);
+
+    return ({{ t.TypeName }}Topic) topic;
+  }
+{% endfor %}
+  private Topic[] topicHandlesToTopics(int[] handles) {
+    Topic[] topics = new Topic[handles.length];
+    for (int i = 0; i < handles.length; i++) {
+      topics[i] = getCachedTopic(handles[i]);
+    }
+    return topics;
+  }
+
+  /**
+   * Get all published topics.
+   *
+   * @return Array of topics.
+   */
+  public Topic[] getTopics() {
+    return topicHandlesToTopics(NetworkTablesJNI.getTopics(m_handle, "", 0));
+  }
+
+  /**
+   * Get published topics starting with the given prefix. The results are optionally filtered by
+   * string prefix to only return a subset of all topics.
+   *
+   * @param prefix topic name required prefix; only topics whose name starts with this string are
+   *     returned
+   * @return Array of topic information.
+   */
+  public Topic[] getTopics(String prefix) {
+    return topicHandlesToTopics(NetworkTablesJNI.getTopics(m_handle, prefix, 0));
+  }
+
+  /**
+   * Get published topics starting with the given prefix. The results are optionally filtered by
+   * string prefix and data type to only return a subset of all topics.
+   *
+   * @param prefix topic name required prefix; only topics whose name starts with this string are
+   *     returned
+   * @param types bitmask of data types; 0 is treated as a "don't care"
+   * @return Array of topic information.
+   */
+  public Topic[] getTopics(String prefix, int types) {
+    return topicHandlesToTopics(NetworkTablesJNI.getTopics(m_handle, prefix, types));
+  }
+
+  /**
+   * Get published topics starting with the given prefix. The results are optionally filtered by
+   * string prefix and data type to only return a subset of all topics.
+   *
+   * @param prefix topic name required prefix; only topics whose name starts with this string are
+   *     returned
+   * @param types array of data type strings
+   * @return Array of topic information.
+   */
+  public Topic[] getTopics(String prefix, String[] types) {
+    return topicHandlesToTopics(NetworkTablesJNI.getTopicsStr(m_handle, prefix, types));
+  }
+
+  /**
+   * Get information about all topics.
+   *
+   * @return Array of topic information.
+   */
+  public TopicInfo[] getTopicInfo() {
+    return NetworkTablesJNI.getTopicInfos(this, m_handle, "", 0);
+  }
+
+  /**
+   * Get information about topics starting with the given prefix. The results are optionally
+   * filtered by string prefix to only return a subset of all topics.
+   *
+   * @param prefix topic name required prefix; only topics whose name starts with this string are
+   *     returned
+   * @return Array of topic information.
+   */
+  public TopicInfo[] getTopicInfo(String prefix) {
+    return NetworkTablesJNI.getTopicInfos(this, m_handle, prefix, 0);
+  }
+
+  /**
+   * Get information about topics starting with the given prefix. The results are optionally
+   * filtered by string prefix and data type to only return a subset of all topics.
+   *
+   * @param prefix topic name required prefix; only topics whose name starts with this string are
+   *     returned
+   * @param types bitmask of data types; 0 is treated as a "don't care"
+   * @return Array of topic information.
+   */
+  public TopicInfo[] getTopicInfo(String prefix, int types) {
+    return NetworkTablesJNI.getTopicInfos(this, m_handle, prefix, types);
+  }
+
+  /**
+   * Get information about topics starting with the given prefix. The results are optionally
+   * filtered by string prefix and data type to only return a subset of all topics.
+   *
+   * @param prefix topic name required prefix; only topics whose name starts with this string are
+   *     returned
+   * @param types array of data type strings
+   * @return Array of topic information.
+   */
+  public TopicInfo[] getTopicInfo(String prefix, String[] types) {
+    return NetworkTablesJNI.getTopicInfosStr(this, m_handle, prefix, types);
+  }
+
+  /* Cache of created entries. */
+  private final ConcurrentMap<String, NetworkTableEntry> m_entries = new ConcurrentHashMap<>();
+
+  /**
+   * Gets the entry for a key.
+   *
+   * @param name Key
+   * @return Network table entry.
+   */
+  public NetworkTableEntry getEntry(String name) {
+    NetworkTableEntry entry = m_entries.get(name);
+    if (entry == null) {
+      entry = new NetworkTableEntry(this, NetworkTablesJNI.getEntry(m_handle, name));
+      NetworkTableEntry oldEntry = m_entries.putIfAbsent(name, entry);
+      if (oldEntry != null) {
+        entry = oldEntry;
+      }
+    }
+    return entry;
+  }
+
+  /* Cache of created topics. */
+  private final ConcurrentMap<String, Topic> m_topics = new ConcurrentHashMap<>();
+  private final ConcurrentMap<Integer, Topic> m_topicsByHandle = new ConcurrentHashMap<>();
+
+  Topic getCachedTopic(String name) {
+    Topic topic = m_topics.get(name);
+    if (topic == null) {
+      int handle = NetworkTablesJNI.getTopic(m_handle, name);
+      topic = new Topic(this, handle);
+      Topic oldTopic = m_topics.putIfAbsent(name, topic);
+      if (oldTopic != null) {
+        topic = oldTopic;
+      }
+      // also cache by handle
+      m_topicsByHandle.putIfAbsent(handle, topic);
+    }
+    return topic;
+  }
+
+  Topic getCachedTopic(int handle) {
+    Topic topic = m_topicsByHandle.get(handle);
+    if (topic == null) {
+      topic = new Topic(this, handle);
+      Topic oldTopic = m_topicsByHandle.putIfAbsent(handle, topic);
+      if (oldTopic != null) {
+        topic = oldTopic;
+      }
+    }
+    return topic;
+  }
+
+  /* Cache of created tables. */
+  private final ConcurrentMap<String, NetworkTable> m_tables = new ConcurrentHashMap<>();
+
+  /**
+   * Gets the table with the specified key.
+   *
+   * @param key the key name
+   * @return The network table
+   */
+  public NetworkTable getTable(String key) {
+    // prepend leading / if not present
+    String theKey;
+    if (key.isEmpty() || "/".equals(key)) {
+      theKey = "";
+    } else if (key.charAt(0) == NetworkTable.PATH_SEPARATOR) {
+      theKey = key;
+    } else {
+      theKey = NetworkTable.PATH_SEPARATOR + key;
+    }
+
+    // cache created tables
+    NetworkTable table = m_tables.get(theKey);
+    if (table == null) {
+      table = new NetworkTable(this, theKey);
+      NetworkTable oldTable = m_tables.putIfAbsent(theKey, table);
+      if (oldTable != null) {
+        table = oldTable;
+      }
+    }
+    return table;
+  }
+
+  /*
+   * Callback Creation Functions
+   */
+
+  private final ReentrantLock m_connectionListenerLock = new ReentrantLock();
+  private final Map<Integer, Consumer<ConnectionNotification>> m_connectionListeners =
+      new HashMap<>();
+  private int m_connectionListenerPoller;
+
+  @SuppressWarnings("PMD.AvoidCatchingThrowable")
+  private void startConnectionListenerThread() {
+    var connectionListenerThread =
+        new Thread(
+            () -> {
+              boolean wasInterrupted = false;
+              while (!Thread.interrupted()) {
+                try {
+                  WPIUtilJNI.waitForObject(m_connectionListenerPoller);
+                } catch (InterruptedException ex) {
+                  Thread.currentThread().interrupt();
+                  // don't try to destroy poller, as its handle is likely no longer valid
+                  wasInterrupted = true;
+                  break;
+                }
+                ConnectionNotification[] events =
+                  NetworkTablesJNI.readConnectionListenerQueue(this, m_connectionListenerPoller);
+                for (ConnectionNotification event : events) {
+                  Consumer<ConnectionNotification> listener;
+                  m_connectionListenerLock.lock();
+                  try {
+                    listener = m_connectionListeners.get(event.listener);
+                  } finally {
+                    m_connectionListenerLock.unlock();
+                  }
+                  if (listener != null) {
+                    try {
+                      listener.accept(event);
+                    } catch (Throwable throwable) {
+                      System.err.println(
+                          "Unhandled exception during connection listener callback: "
+                              + throwable.toString());
+                      throwable.printStackTrace();
+                    }
+                  }
+                }
+              }
+              m_connectionListenerLock.lock();
+              try {
+                if (!wasInterrupted) {
+                  NetworkTablesJNI.destroyConnectionListenerPoller(m_connectionListenerPoller);
+                }
+                m_connectionListenerPoller = 0;
+              } finally {
+                m_connectionListenerLock.unlock();
+              }
+            },
+            "NTConnectionListener");
+    connectionListenerThread.setDaemon(true);
+    connectionListenerThread.start();
+  }
+
+  /**
+   * Add a connection listener.
+   *
+   * @param listener Listener to add
+   * @param immediateNotify Notify listener of all existing connections
+   * @return Listener handle
+   */
+  public int addConnectionListener(
+      Consumer<ConnectionNotification> listener, boolean immediateNotify) {
+    m_connectionListenerLock.lock();
+    try {
+      if (m_connectionListenerPoller == 0) {
+        m_connectionListenerPoller = NetworkTablesJNI.createConnectionListenerPoller(m_handle);
+        startConnectionListenerThread();
+      }
+      int handle =
+          NetworkTablesJNI.addPolledConnectionListener(m_connectionListenerPoller, immediateNotify);
+      m_connectionListeners.put(handle, listener);
+      return handle;
+    } finally {
+      m_connectionListenerLock.unlock();
+    }
+  }
+
+  /**
+   * Remove a connection listener.
+   *
+   * @param listener Listener handle to remove
+   */
+  public void removeConnectionListener(int listener) {
+    m_connectionListenerLock.lock();
+    try {
+      m_connectionListeners.remove(listener);
+    } finally {
+      m_connectionListenerLock.unlock();
+    }
+    NetworkTablesJNI.removeConnectionListener(listener);
+  }
+
+  /*
+   * Client/Server Functions
+   */
+
+  /**
+   * Set the network identity of this node. This is the name used during the initial connection
+   * handshake, and is visible through ConnectionInfo on the remote node.
+   *
+   * @param name identity to advertise
+   */
+  public void setNetworkIdentity(String name) {
+    NetworkTablesJNI.setNetworkIdentity(m_handle, name);
+  }
+
+  /**
+   * Get the current network mode.
+   *
+   * @return Bitmask of NetworkMode.
+   */
+  public int getNetworkMode() {
+    return NetworkTablesJNI.getNetworkMode(m_handle);
+  }
+
+  /**
+   * Starts local-only operation. Prevents calls to startServer or startClient from taking effect.
+   * Has no effect if startServer or startClient has already been called.
+   */
+  public void startLocal() {
+    NetworkTablesJNI.startLocal(m_handle);
+  }
+
+  /**
+   * Stops local-only operation. startServer or startClient can be called after this call to start a
+   * server or client.
+   */
+  public void stopLocal() {
+    NetworkTablesJNI.stopLocal(m_handle);
+  }
+
+  /**
+   * Starts a server using the networktables.json as the persistent file, using the default
+   * listening address and port.
+   */
+  public void startServer() {
+    startServer("networktables.json");
+  }
+
+  /**
+   * Starts a server using the specified persistent filename, using the default listening address
+   * and port.
+   *
+   * @param persistFilename the name of the persist file to use
+   */
+  public void startServer(String persistFilename) {
+    startServer(persistFilename, "");
+  }
+
+  /**
+   * Starts a server using the specified filename and listening address, using the default port.
+   *
+   * @param persistFilename the name of the persist file to use
+   * @param listenAddress the address to listen on, or empty to listen on any address
+   */
+  public void startServer(String persistFilename, String listenAddress) {
+    startServer(persistFilename, listenAddress, kDefaultPort3, kDefaultPort4);
+  }
+
+  /**
+   * Starts a server using the specified filename, listening address, and port.
+   *
+   * @param persistFilename the name of the persist file to use
+   * @param listenAddress the address to listen on, or empty to listen on any address
+   * @param port3 port to communicate over (NT3)
+   */
+  public void startServer(String persistFilename, String listenAddress, int port3) {
+    startServer(persistFilename, listenAddress, port3, kDefaultPort4);
+  }
+
+  /**
+   * Starts a server using the specified filename, listening address, and port.
+   *
+   * @param persistFilename the name of the persist file to use
+   * @param listenAddress the address to listen on, or empty to listen on any address
+   * @param port3 port to communicate over (NT3)
+   * @param port4 port to communicate over (NT4)
+   */
+  public void startServer(String persistFilename, String listenAddress, int port3, int port4) {
+    NetworkTablesJNI.startServer(m_handle, persistFilename, listenAddress, port3, port4);
+  }
+
+  /** Stops the server if it is running. */
+  public void stopServer() {
+    NetworkTablesJNI.stopServer(m_handle);
+  }
+
+  /** Starts a NT3 client. Use SetServer or SetServerTeam to set the server name and port. */
+  public void startClient3() {
+    NetworkTablesJNI.startClient3(m_handle);
+  }
+
+  /** Starts a NT4 client. Use SetServer or SetServerTeam to set the server name and port. */
+  public void startClient4() {
+    NetworkTablesJNI.startClient4(m_handle);
+  }
+
+  /** Stops the client if it is running. */
+  public void stopClient() {
+    NetworkTablesJNI.stopClient(m_handle);
+  }
+
+  /**
+   * Sets server address and port for client (without restarting client). Changes the port to the
+   * default port.
+   *
+   * @param serverName server name
+   */
+  public void setServer(String serverName) {
+    setServer(serverName, 0);
+  }
+
+  /**
+   * Sets server address and port for client (without restarting client).
+   *
+   * @param serverName server name
+   * @param port port to communicate over (0=default)
+   */
+  public void setServer(String serverName, int port) {
+    NetworkTablesJNI.setServer(m_handle, serverName, port);
+  }
+
+  /**
+   * Sets server addresses and port for client (without restarting client). Changes the port to the
+   * default port. The client will attempt to connect to each server in round robin fashion.
+   *
+   * @param serverNames array of server names
+   */
+  public void setServer(String[] serverNames) {
+    setServer(serverNames, 0);
+  }
+
+  /**
+   * Sets server addresses and port for client (without restarting client). The client will attempt
+   * to connect to each server in round robin fashion.
+   *
+   * @param serverNames array of server names
+   * @param port port to communicate over (0=default)
+   */
+  public void setServer(String[] serverNames, int port) {
+    int[] ports = new int[serverNames.length];
+    for (int i = 0; i < serverNames.length; i++) {
+      ports[i] = port;
+    }
+    setServer(serverNames, ports);
+  }
+
+  /**
+   * Sets server addresses and ports for client (without restarting client). The client will attempt
+   * to connect to each server in round robin fashion.
+   *
+   * @param serverNames array of server names
+   * @param ports array of port numbers (0=default)
+   */
+  public void setServer(String[] serverNames, int[] ports) {
+    NetworkTablesJNI.setServer(m_handle, serverNames, ports);
+  }
+
+  /**
+   * Sets server addresses and port for client (without restarting client). Changes the port to the
+   * default port. The client will attempt to connect to each server in round robin fashion.
+   *
+   * @param team team number
+   */
+  public void setServerTeam(int team) {
+    setServerTeam(team, 0);
+  }
+
+  /**
+   * Sets server addresses and port for client (without restarting client). Connects using commonly
+   * known robot addresses for the specified team.
+   *
+   * @param team team number
+   * @param port port to communicate over (0=default)
+   */
+  public void setServerTeam(int team, int port) {
+    NetworkTablesJNI.setServerTeam(m_handle, team, port);
+  }
+
+  /**
+   * Starts requesting server address from Driver Station. This connects to the Driver Station
+   * running on localhost to obtain the server IP address, and connects with the default port.
+   */
+  public void startDSClient() {
+    startDSClient(0);
+  }
+
+  /**
+   * Starts requesting server address from Driver Station. This connects to the Driver Station
+   * running on localhost to obtain the server IP address.
+   *
+   * @param port server port to use in combination with IP from DS (0=default)
+   */
+  public void startDSClient(int port) {
+    NetworkTablesJNI.startDSClient(m_handle, port);
+  }
+
+  /** Stops requesting server address from Driver Station. */
+  public void stopDSClient() {
+    NetworkTablesJNI.stopDSClient(m_handle);
+  }
+
+  /**
+   * Flushes all updated values immediately to the local client/server. This does not flush to the
+   * network.
+   */
+  public void flushLocal() {
+    NetworkTablesJNI.flushLocal(m_handle);
+  }
+
+  /**
+   * Flushes all updated values immediately to the network. Note: This is rate-limited to protect
+   * the network from flooding. This is primarily useful for synchronizing network updates with user
+   * code.
+   */
+  public void flush() {
+    NetworkTablesJNI.flush(m_handle);
+  }
+
+  /**
+   * Gets information on the currently established network connections. If operating as a client,
+   * this will return either zero or one values.
+   *
+   * @return array of connection information
+   */
+  public ConnectionInfo[] getConnections() {
+    return NetworkTablesJNI.getConnections(m_handle);
+  }
+
+  /**
+   * Return whether or not the instance is connected to another node.
+   *
+   * @return True if connected.
+   */
+  public boolean isConnected() {
+    return NetworkTablesJNI.isConnected(m_handle);
+  }
+
+  /**
+   * Starts logging entry changes to a DataLog.
+   *
+   * @param log data log object; lifetime must extend until StopEntryDataLog is called or the
+   *     instance is destroyed
+   * @param prefix only store entries with names that start with this prefix; the prefix is not
+   *     included in the data log entry name
+   * @param logPrefix prefix to add to data log entry names
+   * @return Data logger handle
+   */
+  public int startEntryDataLog(DataLog log, String prefix, String logPrefix) {
+    return NetworkTablesJNI.startEntryDataLog(m_handle, log, prefix, logPrefix);
+  }
+
+  /**
+   * Stops logging entry changes to a DataLog.
+   *
+   * @param logger data logger handle
+   */
+  public static void stopEntryDataLog(int logger) {
+    NetworkTablesJNI.stopEntryDataLog(logger);
+  }
+
+  /**
+   * Starts logging connection changes to a DataLog.
+   *
+   * @param log data log object; lifetime must extend until StopConnectionDataLog is called or the
+   *     instance is destroyed
+   * @param name data log entry name
+   * @return Data logger handle
+   */
+  public int startConnectionDataLog(DataLog log, String name) {
+    return NetworkTablesJNI.startConnectionDataLog(m_handle, log, name);
+  }
+
+  /**
+   * Stops logging connection changes to a DataLog.
+   *
+   * @param logger data logger handle
+   */
+  public static void stopConnectionDataLog(int logger) {
+    NetworkTablesJNI.stopConnectionDataLog(logger);
+  }
+
+  private final ReentrantLock m_loggerLock = new ReentrantLock();
+  private final Map<Integer, Consumer<LogMessage>> m_loggers = new HashMap<>();
+  private int m_loggerPoller;
+
+  @SuppressWarnings("PMD.AvoidCatchingThrowable")
+  private void startLogThread() {
+    var loggerThread =
+        new Thread(
+            () -> {
+              boolean wasInterrupted = false;
+              while (!Thread.interrupted()) {
+                try {
+                  WPIUtilJNI.waitForObject(m_loggerPoller);
+                } catch (InterruptedException ex) {
+                  Thread.currentThread().interrupt();
+                  // don't try to destroy poller, as its handle is likely no longer valid
+                  wasInterrupted = true;
+                  break;
+                }
+                LogMessage[] events = NetworkTablesJNI.readLoggerQueue(this, m_loggerPoller);
+                for (LogMessage event : events) {
+                  Consumer<LogMessage> logger;
+                  m_loggerLock.lock();
+                  try {
+                    logger = m_loggers.get(event.logger);
+                  } finally {
+                    m_loggerLock.unlock();
+                  }
+                  if (logger != null) {
+                    try {
+                      logger.accept(event);
+                    } catch (Throwable throwable) {
+                      System.err.println(
+                          "Unhandled exception during logger callback: " + throwable.toString());
+                      throwable.printStackTrace();
+                    }
+                  }
+                }
+              }
+              m_loggerLock.lock();
+              try {
+                if (!wasInterrupted) {
+                  NetworkTablesJNI.destroyLoggerPoller(m_loggerPoller);
+                }
+              } finally {
+                m_loggerLock.unlock();
+              }
+            },
+            "NTLogger");
+    loggerThread.setDaemon(true);
+    loggerThread.start();
+  }
+
+  /**
+   * Add logger callback function. By default, log messages are sent to stderr; this function sends
+   * log messages with the specified levels to the provided callback function instead. The callback
+   * function will only be called for log messages with level greater than or equal to minLevel and
+   * less than or equal to maxLevel; messages outside this range will be silently ignored.
+   *
+   * @param func log callback function
+   * @param minLevel minimum log level
+   * @param maxLevel maximum log level
+   * @return Logger handle
+   */
+  public int addLogger(Consumer<LogMessage> func, int minLevel, int maxLevel) {
+    m_loggerLock.lock();
+    try {
+      if (m_loggerPoller == 0) {
+        m_loggerPoller = NetworkTablesJNI.createLoggerPoller(m_handle);
+        startLogThread();
+      }
+      int handle = NetworkTablesJNI.addPolledLogger(m_loggerPoller, minLevel, maxLevel);
+      m_loggers.put(handle, func);
+      return handle;
+    } finally {
+      m_loggerLock.unlock();
+    }
+  }
+
+  /**
+   * Remove a logger.
+   *
+   * @param logger Logger handle to remove
+   */
+  public void removeLogger(int logger) {
+    m_loggerLock.lock();
+    try {
+      m_loggers.remove(logger);
+    } finally {
+      m_loggerLock.unlock();
+    }
+    NetworkTablesJNI.removeLogger(logger);
+  }
+
+  @Override
+  public boolean equals(Object other) {
+    if (other == this) {
+      return true;
+    }
+    if (!(other instanceof NetworkTableInstance)) {
+      return false;
+    }
+
+    return m_handle == ((NetworkTableInstance) other).m_handle;
+  }
+
+  @Override
+  public int hashCode() {
+    return m_handle;
+  }
+
+  private boolean m_owned;
+  private final int m_handle;
+}

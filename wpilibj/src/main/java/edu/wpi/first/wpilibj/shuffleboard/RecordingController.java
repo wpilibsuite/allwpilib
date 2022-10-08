@@ -4,9 +4,10 @@
 
 package edu.wpi.first.wpilibj.shuffleboard;
 
+import edu.wpi.first.networktables.BooleanPublisher;
 import edu.wpi.first.networktables.NetworkTable;
-import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.networktables.StringPublisher;
 import edu.wpi.first.wpilibj.DriverStation;
 
 /** Controls Shuffleboard recordings via NetworkTables. */
@@ -16,30 +17,31 @@ final class RecordingController {
   private static final String kRecordingFileNameFormatKey = kRecordingTableName + "FileNameFormat";
   private static final String kEventMarkerTableName = kRecordingTableName + "events";
 
-  private final NetworkTableEntry m_recordingControlEntry;
-  private final NetworkTableEntry m_recordingFileNameFormatEntry;
+  private final BooleanPublisher m_recordingControlEntry;
+  private final StringPublisher m_recordingFileNameFormatEntry;
   private final NetworkTable m_eventsTable;
 
   RecordingController(NetworkTableInstance ntInstance) {
-    m_recordingControlEntry = ntInstance.getEntry(kRecordingControlKey);
-    m_recordingFileNameFormatEntry = ntInstance.getEntry(kRecordingFileNameFormatKey);
+    m_recordingControlEntry = ntInstance.getBooleanTopic(kRecordingControlKey).publish();
+    m_recordingFileNameFormatEntry =
+        ntInstance.getStringTopic(kRecordingFileNameFormatKey).publish();
     m_eventsTable = ntInstance.getTable(kEventMarkerTableName);
   }
 
   public void startRecording() {
-    m_recordingControlEntry.setBoolean(true);
+    m_recordingControlEntry.set(true);
   }
 
   public void stopRecording() {
-    m_recordingControlEntry.setBoolean(false);
+    m_recordingControlEntry.set(false);
   }
 
   public void setRecordingFileNameFormat(String format) {
-    m_recordingFileNameFormatEntry.setString(format);
+    m_recordingFileNameFormatEntry.set(format);
   }
 
   public void clearRecordingFileNameFormat() {
-    m_recordingFileNameFormatEntry.delete();
+    m_recordingFileNameFormatEntry.set("");
   }
 
   public void addEventMarker(String name, String description, EventImportance importance) {

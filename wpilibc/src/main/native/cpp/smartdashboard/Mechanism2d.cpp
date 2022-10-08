@@ -5,13 +5,14 @@
 #include "frc/smartdashboard/Mechanism2d.h"
 
 #include <cstdio>
+#include <string_view>
 
 #include <networktables/NTSendableBuilder.h>
 
 using namespace frc;
 
-static constexpr char kBackgroundColor[] = "backgroundColor";
-static constexpr char kDims[] = "dims";
+static constexpr std::string_view kBackgroundColor = "backgroundColor";
+static constexpr std::string_view kDims = "dims";
 
 Mechanism2d::Mechanism2d(double width, double height,
                          const Color8Bit& backgroundColor)
@@ -35,8 +36,8 @@ MechanismRoot2d* Mechanism2d::GetRoot(std::string_view name, double x,
 
 void Mechanism2d::SetBackgroundColor(const Color8Bit& color) {
   m_color = color.HexString();
-  if (m_table) {
-    m_table->GetEntry(kBackgroundColor).SetString(m_color);
+  if (m_colorPub) {
+    m_colorPub.Set(m_color);
   }
 }
 
@@ -45,8 +46,10 @@ void Mechanism2d::InitSendable(nt::NTSendableBuilder& builder) {
 
   std::scoped_lock lock(m_mutex);
   m_table = builder.GetTable();
-  m_table->GetEntry(kDims).SetDoubleArray({m_width, m_height});
-  m_table->GetEntry(kBackgroundColor).SetString(m_color);
+  m_dimsPub = m_table->GetDoubleArrayTopic(kDims).Publish();
+  m_dimsPub.Set({{m_width, m_height}});
+  m_colorPub = m_table->GetStringTopic(kBackgroundColor).Publish();
+  m_colorPub.Set(m_color);
   for (const auto& entry : m_roots) {
     const auto& root = entry.getValue().get();
     root->Update(m_table->GetSubTable(entry.getKey()));

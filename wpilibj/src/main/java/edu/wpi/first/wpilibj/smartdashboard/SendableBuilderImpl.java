@@ -4,57 +4,131 @@
 
 package edu.wpi.first.wpilibj.smartdashboard;
 
-import edu.wpi.first.networktables.EntryListenerFlags;
+import edu.wpi.first.networktables.BooleanArrayPublisher;
+import edu.wpi.first.networktables.BooleanArraySubscriber;
+import edu.wpi.first.networktables.BooleanArrayTopic;
+import edu.wpi.first.networktables.BooleanPublisher;
+import edu.wpi.first.networktables.BooleanSubscriber;
+import edu.wpi.first.networktables.BooleanTopic;
+import edu.wpi.first.networktables.DoubleArrayPublisher;
+import edu.wpi.first.networktables.DoubleArraySubscriber;
+import edu.wpi.first.networktables.DoubleArrayTopic;
+import edu.wpi.first.networktables.DoublePublisher;
+import edu.wpi.first.networktables.DoubleSubscriber;
+import edu.wpi.first.networktables.DoubleTopic;
+import edu.wpi.first.networktables.FloatArrayPublisher;
+import edu.wpi.first.networktables.FloatArraySubscriber;
+import edu.wpi.first.networktables.FloatArrayTopic;
+import edu.wpi.first.networktables.FloatPublisher;
+import edu.wpi.first.networktables.FloatSubscriber;
+import edu.wpi.first.networktables.FloatTopic;
+import edu.wpi.first.networktables.IntegerArrayPublisher;
+import edu.wpi.first.networktables.IntegerArraySubscriber;
+import edu.wpi.first.networktables.IntegerArrayTopic;
+import edu.wpi.first.networktables.IntegerPublisher;
+import edu.wpi.first.networktables.IntegerSubscriber;
+import edu.wpi.first.networktables.IntegerTopic;
 import edu.wpi.first.networktables.NTSendableBuilder;
 import edu.wpi.first.networktables.NetworkTable;
-import edu.wpi.first.networktables.NetworkTableEntry;
-import edu.wpi.first.networktables.NetworkTableValue;
+import edu.wpi.first.networktables.Publisher;
+import edu.wpi.first.networktables.RawPublisher;
+import edu.wpi.first.networktables.RawSubscriber;
+import edu.wpi.first.networktables.RawTopic;
+import edu.wpi.first.networktables.StringArrayPublisher;
+import edu.wpi.first.networktables.StringArraySubscriber;
+import edu.wpi.first.networktables.StringArrayTopic;
+import edu.wpi.first.networktables.StringPublisher;
+import edu.wpi.first.networktables.StringSubscriber;
+import edu.wpi.first.networktables.StringTopic;
+import edu.wpi.first.networktables.Subscriber;
+import edu.wpi.first.networktables.Topic;
+import edu.wpi.first.util.WPIUtilJNI;
 import edu.wpi.first.util.function.BooleanConsumer;
+import edu.wpi.first.util.function.FloatConsumer;
+import edu.wpi.first.util.function.FloatSupplier;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.BooleanSupplier;
 import java.util.function.Consumer;
 import java.util.function.DoubleConsumer;
 import java.util.function.DoubleSupplier;
-import java.util.function.Function;
+import java.util.function.LongConsumer;
+import java.util.function.LongSupplier;
 import java.util.function.Supplier;
 
 public class SendableBuilderImpl implements NTSendableBuilder {
-  private static class Property implements AutoCloseable {
-    Property(NetworkTable table, String key) {
-      m_entry = table.getEntry(key);
-    }
-
-    @Override
-    public void close() {
-      stopListener();
-    }
-
-    void startListener() {
-      if (m_entry.isValid() && m_listener == 0 && m_createListener != null) {
-        m_listener = m_createListener.apply(m_entry);
-      }
-    }
-
-    void stopListener() {
-      if (m_entry.isValid() && m_listener != 0) {
-        m_entry.removeListener(m_listener);
-        m_listener = 0;
-      }
-    }
-
-    final NetworkTableEntry m_entry;
-    int m_listener;
-    Consumer<NetworkTableEntry> m_update;
-    Function<NetworkTableEntry, Integer> m_createListener;
+  @FunctionalInterface
+  private interface TimedConsumer<T> {
+    void accept(T value, long time);
   }
 
-  private final List<Property> m_properties = new ArrayList<>();
+  private static class Property<P extends Publisher, S extends Subscriber>
+      implements AutoCloseable {
+    @Override
+    @SuppressWarnings("PMD.AvoidCatchingGenericException")
+    public void close() {
+      try {
+        if (m_pub != null) {
+          m_pub.close();
+        }
+        if (m_sub != null) {
+          m_sub.close();
+        }
+      } catch (Exception e) {
+        // ignore
+      }
+    }
+
+    void update(boolean controllable, long time) {
+      if (controllable && m_sub != null && m_updateLocal != null) {
+        m_updateLocal.accept(m_sub);
+      } else if (m_pub != null && m_updateNetwork != null) {
+        m_updateNetwork.accept(m_pub, time);
+      }
+    }
+
+    P m_pub;
+    S m_sub;
+    TimedConsumer<P> m_updateNetwork;
+    Consumer<S> m_updateLocal;
+  }
+
+  private final List<Property<?, ?>> m_properties = new ArrayList<>();
   private Runnable m_safeState;
   private final List<Runnable> m_updateTables = new ArrayList<>();
   private NetworkTable m_table;
-  private NetworkTableEntry m_controllableEntry;
+  private boolean m_controllable;
   private boolean m_actuator;
+
+  private BooleanPublisher m_controllablePub;
+  private StringPublisher m_typePub;
+  private BooleanPublisher m_actuatorPub;
+
+  private final List<AutoCloseable> m_closeables = new ArrayList<>();
+
+  @Override
+  @SuppressWarnings("PMD.AvoidCatchingGenericException")
+  public void close() {
+    if (m_controllablePub != null) {
+      m_controllablePub.close();
+    }
+    if (m_typePub != null) {
+      m_typePub.close();
+    }
+    if (m_actuatorPub != null) {
+      m_actuatorPub.close();
+    }
+    for (Property<?, ?> property : m_properties) {
+      property.close();
+    }
+    for (AutoCloseable closeable : m_closeables) {
+      try {
+        closeable.close();
+      } catch (Exception e) {
+        // ignore
+      }
+    }
+  }
 
   /**
    * Set the network table. Must be called prior to any Add* functions being called.
@@ -63,7 +137,8 @@ public class SendableBuilderImpl implements NTSendableBuilder {
    */
   public void setTable(NetworkTable table) {
     m_table = table;
-    m_controllableEntry = table.getEntry(".controllable");
+    m_controllablePub = table.getBooleanTopic(".controllable").publish();
+    m_controllablePub.setDefault(false);
   }
 
   /**
@@ -98,10 +173,9 @@ public class SendableBuilderImpl implements NTSendableBuilder {
   /** Update the network table values by calling the getters for all properties. */
   @Override
   public void update() {
-    for (Property property : m_properties) {
-      if (property.m_update != null) {
-        property.m_update.accept(property.m_entry);
-      }
+    long time = WPIUtilJNI.now();
+    for (Property<?, ?> property : m_properties) {
+      property.update(m_controllable, time);
     }
     for (Runnable updateTable : m_updateTables) {
       updateTable.run();
@@ -110,21 +184,17 @@ public class SendableBuilderImpl implements NTSendableBuilder {
 
   /** Hook setters for all properties. */
   public void startListeners() {
-    for (Property property : m_properties) {
-      property.startListener();
-    }
-    if (m_controllableEntry != null) {
-      m_controllableEntry.setBoolean(true);
+    m_controllable = true;
+    if (m_controllablePub != null) {
+      m_controllablePub.set(true);
     }
   }
 
   /** Unhook setters for all properties. */
   public void stopListeners() {
-    for (Property property : m_properties) {
-      property.stopListener();
-    }
-    if (m_controllableEntry != null) {
-      m_controllableEntry.setBoolean(false);
+    m_controllable = false;
+    if (m_controllablePub != null) {
+      m_controllablePub.set(false);
     }
   }
 
@@ -154,7 +224,15 @@ public class SendableBuilderImpl implements NTSendableBuilder {
   @Override
   public void clearProperties() {
     stopListeners();
+    for (Property<?, ?> property : m_properties) {
+      property.close();
+    }
     m_properties.clear();
+  }
+
+  @Override
+  public void addCloseable(AutoCloseable closeable) {
+    m_closeables.add(closeable);
   }
 
   /**
@@ -165,7 +243,10 @@ public class SendableBuilderImpl implements NTSendableBuilder {
    */
   @Override
   public void setSmartDashboardType(String type) {
-    m_table.getEntry(".type").setString(type);
+    if (m_typePub == null) {
+      m_typePub = m_table.getStringTopic(".type").publish();
+    }
+    m_typePub.set(type);
   }
 
   /**
@@ -176,7 +257,10 @@ public class SendableBuilderImpl implements NTSendableBuilder {
    */
   @Override
   public void setActuator(boolean value) {
-    m_table.getEntry(".actuator").setBoolean(value);
+    if (m_actuatorPub == null) {
+      m_actuatorPub = m_table.getBooleanTopic(".actuator").publish();
+    }
+    m_actuatorPub.set(value);
     m_actuator = value;
   }
 
@@ -194,7 +278,7 @@ public class SendableBuilderImpl implements NTSendableBuilder {
   /**
    * Set the function that should be called to update the network table for things other than
    * properties. Note this function is not passed the network table object; instead it should use
-   * the entry handles returned by getEntry().
+   * the topics returned by getTopic().
    *
    * @param func function
    */
@@ -211,8 +295,8 @@ public class SendableBuilderImpl implements NTSendableBuilder {
    * @return Network table entry
    */
   @Override
-  public NetworkTableEntry getEntry(String key) {
-    return m_table.getEntry(key);
+  public Topic getTopic(String key) {
+    return m_table.getTopic(key);
   }
 
   /**
@@ -224,23 +308,74 @@ public class SendableBuilderImpl implements NTSendableBuilder {
    */
   @Override
   public void addBooleanProperty(String key, BooleanSupplier getter, BooleanConsumer setter) {
-    Property property = new Property(m_table, key);
+    Property<BooleanPublisher, BooleanSubscriber> property = new Property<>();
+    BooleanTopic topic = m_table.getBooleanTopic(key);
     if (getter != null) {
-      property.m_update = entry -> entry.setBoolean(getter.getAsBoolean());
+      property.m_pub = topic.publish();
+      property.m_updateNetwork = (pub, time) -> pub.set(getter.getAsBoolean(), time);
     }
     if (setter != null) {
-      property.m_createListener =
-          entry ->
-              entry.addListener(
-                  event -> {
-                    if (event.value.isBoolean()) {
-                      SmartDashboard.postListenerTask(
-                          () -> setter.accept(event.value.getBoolean()));
-                    }
-                  },
-                  EntryListenerFlags.kImmediate
-                      | EntryListenerFlags.kNew
-                      | EntryListenerFlags.kUpdate);
+      property.m_sub = topic.subscribe(false);
+      property.m_updateLocal =
+          sub -> {
+            for (boolean val : sub.readQueueValues()) {
+              setter.accept(val);
+            }
+          };
+    }
+    m_properties.add(property);
+  }
+
+  /**
+   * Add an integer property.
+   *
+   * @param key property name
+   * @param getter getter function (returns current value)
+   * @param setter setter function (sets new value)
+   */
+  @Override
+  public void addIntegerProperty(String key, LongSupplier getter, LongConsumer setter) {
+    Property<IntegerPublisher, IntegerSubscriber> property = new Property<>();
+    IntegerTopic topic = m_table.getIntegerTopic(key);
+    if (getter != null) {
+      property.m_pub = topic.publish();
+      property.m_updateNetwork = (pub, time) -> pub.set(getter.getAsLong(), time);
+    }
+    if (setter != null) {
+      property.m_sub = topic.subscribe(0);
+      property.m_updateLocal =
+          sub -> {
+            for (long val : sub.readQueueValues()) {
+              setter.accept(val);
+            }
+          };
+    }
+    m_properties.add(property);
+  }
+
+  /**
+   * Add a float property.
+   *
+   * @param key property name
+   * @param getter getter function (returns current value)
+   * @param setter setter function (sets new value)
+   */
+  @Override
+  public void addFloatProperty(String key, FloatSupplier getter, FloatConsumer setter) {
+    Property<FloatPublisher, FloatSubscriber> property = new Property<>();
+    FloatTopic topic = m_table.getFloatTopic(key);
+    if (getter != null) {
+      property.m_pub = topic.publish();
+      property.m_updateNetwork = (pub, time) -> pub.set(getter.getAsFloat(), time);
+    }
+    if (setter != null) {
+      property.m_sub = topic.subscribe(0.0f);
+      property.m_updateLocal =
+          sub -> {
+            for (float val : sub.readQueueValues()) {
+              setter.accept(val);
+            }
+          };
     }
     m_properties.add(property);
   }
@@ -254,22 +389,20 @@ public class SendableBuilderImpl implements NTSendableBuilder {
    */
   @Override
   public void addDoubleProperty(String key, DoubleSupplier getter, DoubleConsumer setter) {
-    Property property = new Property(m_table, key);
+    Property<DoublePublisher, DoubleSubscriber> property = new Property<>();
+    DoubleTopic topic = m_table.getDoubleTopic(key);
     if (getter != null) {
-      property.m_update = entry -> entry.setDouble(getter.getAsDouble());
+      property.m_pub = topic.publish();
+      property.m_updateNetwork = (pub, time) -> pub.set(getter.getAsDouble(), time);
     }
     if (setter != null) {
-      property.m_createListener =
-          entry ->
-              entry.addListener(
-                  event -> {
-                    if (event.value.isDouble()) {
-                      SmartDashboard.postListenerTask(() -> setter.accept(event.value.getDouble()));
-                    }
-                  },
-                  EntryListenerFlags.kImmediate
-                      | EntryListenerFlags.kNew
-                      | EntryListenerFlags.kUpdate);
+      property.m_sub = topic.subscribe(0.0);
+      property.m_updateLocal =
+          sub -> {
+            for (double val : sub.readQueueValues()) {
+              setter.accept(val);
+            }
+          };
     }
     m_properties.add(property);
   }
@@ -283,22 +416,20 @@ public class SendableBuilderImpl implements NTSendableBuilder {
    */
   @Override
   public void addStringProperty(String key, Supplier<String> getter, Consumer<String> setter) {
-    Property property = new Property(m_table, key);
+    Property<StringPublisher, StringSubscriber> property = new Property<>();
+    StringTopic topic = m_table.getStringTopic(key);
     if (getter != null) {
-      property.m_update = entry -> entry.setString(getter.get());
+      property.m_pub = topic.publish();
+      property.m_updateNetwork = (pub, time) -> pub.set(getter.get(), time);
     }
     if (setter != null) {
-      property.m_createListener =
-          entry ->
-              entry.addListener(
-                  event -> {
-                    if (event.value.isString()) {
-                      SmartDashboard.postListenerTask(() -> setter.accept(event.value.getString()));
-                    }
-                  },
-                  EntryListenerFlags.kImmediate
-                      | EntryListenerFlags.kNew
-                      | EntryListenerFlags.kUpdate);
+      property.m_sub = topic.subscribe("");
+      property.m_updateLocal =
+          sub -> {
+            for (String val : sub.readQueueValues()) {
+              setter.accept(val);
+            }
+          };
     }
     m_properties.add(property);
   }
@@ -313,23 +444,76 @@ public class SendableBuilderImpl implements NTSendableBuilder {
   @Override
   public void addBooleanArrayProperty(
       String key, Supplier<boolean[]> getter, Consumer<boolean[]> setter) {
-    Property property = new Property(m_table, key);
+    Property<BooleanArrayPublisher, BooleanArraySubscriber> property = new Property<>();
+    BooleanArrayTopic topic = m_table.getBooleanArrayTopic(key);
     if (getter != null) {
-      property.m_update = entry -> entry.setBooleanArray(getter.get());
+      property.m_pub = topic.publish();
+      property.m_updateNetwork = (pub, time) -> pub.set(getter.get(), time);
     }
     if (setter != null) {
-      property.m_createListener =
-          entry ->
-              entry.addListener(
-                  event -> {
-                    if (event.value.isBooleanArray()) {
-                      SmartDashboard.postListenerTask(
-                          () -> setter.accept(event.value.getBooleanArray()));
-                    }
-                  },
-                  EntryListenerFlags.kImmediate
-                      | EntryListenerFlags.kNew
-                      | EntryListenerFlags.kUpdate);
+      property.m_sub = topic.subscribe(new boolean[] {});
+      property.m_updateLocal =
+          sub -> {
+            for (boolean[] val : sub.readQueueValues()) {
+              setter.accept(val);
+            }
+          };
+    }
+    m_properties.add(property);
+  }
+
+  /**
+   * Add an integer array property.
+   *
+   * @param key property name
+   * @param getter getter function (returns current value)
+   * @param setter setter function (sets new value)
+   */
+  @Override
+  public void addIntegerArrayProperty(
+      String key, Supplier<long[]> getter, Consumer<long[]> setter) {
+    Property<IntegerArrayPublisher, IntegerArraySubscriber> property = new Property<>();
+    IntegerArrayTopic topic = m_table.getIntegerArrayTopic(key);
+    if (getter != null) {
+      property.m_pub = topic.publish();
+      property.m_updateNetwork = (pub, time) -> pub.set(getter.get(), time);
+    }
+    if (setter != null) {
+      property.m_sub = topic.subscribe(new long[] {});
+      property.m_updateLocal =
+          sub -> {
+            for (long[] val : sub.readQueueValues()) {
+              setter.accept(val);
+            }
+          };
+    }
+    m_properties.add(property);
+  }
+
+  /**
+   * Add a float array property.
+   *
+   * @param key property name
+   * @param getter getter function (returns current value)
+   * @param setter setter function (sets new value)
+   */
+  @Override
+  public void addFloatArrayProperty(
+      String key, Supplier<float[]> getter, Consumer<float[]> setter) {
+    Property<FloatArrayPublisher, FloatArraySubscriber> property = new Property<>();
+    FloatArrayTopic topic = m_table.getFloatArrayTopic(key);
+    if (getter != null) {
+      property.m_pub = topic.publish();
+      property.m_updateNetwork = (pub, time) -> pub.set(getter.get(), time);
+    }
+    if (setter != null) {
+      property.m_sub = topic.subscribe(new float[] {});
+      property.m_updateLocal =
+          sub -> {
+            for (float[] val : sub.readQueueValues()) {
+              setter.accept(val);
+            }
+          };
     }
     m_properties.add(property);
   }
@@ -344,23 +528,20 @@ public class SendableBuilderImpl implements NTSendableBuilder {
   @Override
   public void addDoubleArrayProperty(
       String key, Supplier<double[]> getter, Consumer<double[]> setter) {
-    Property property = new Property(m_table, key);
+    Property<DoubleArrayPublisher, DoubleArraySubscriber> property = new Property<>();
+    DoubleArrayTopic topic = m_table.getDoubleArrayTopic(key);
     if (getter != null) {
-      property.m_update = entry -> entry.setDoubleArray(getter.get());
+      property.m_pub = topic.publish();
+      property.m_updateNetwork = (pub, time) -> pub.set(getter.get(), time);
     }
     if (setter != null) {
-      property.m_createListener =
-          entry ->
-              entry.addListener(
-                  event -> {
-                    if (event.value.isDoubleArray()) {
-                      SmartDashboard.postListenerTask(
-                          () -> setter.accept(event.value.getDoubleArray()));
-                    }
-                  },
-                  EntryListenerFlags.kImmediate
-                      | EntryListenerFlags.kNew
-                      | EntryListenerFlags.kUpdate);
+      property.m_sub = topic.subscribe(new double[] {});
+      property.m_updateLocal =
+          sub -> {
+            for (double[] val : sub.readQueueValues()) {
+              setter.accept(val);
+            }
+          };
     }
     m_properties.add(property);
   }
@@ -375,23 +556,20 @@ public class SendableBuilderImpl implements NTSendableBuilder {
   @Override
   public void addStringArrayProperty(
       String key, Supplier<String[]> getter, Consumer<String[]> setter) {
-    Property property = new Property(m_table, key);
+    Property<StringArrayPublisher, StringArraySubscriber> property = new Property<>();
+    StringArrayTopic topic = m_table.getStringArrayTopic(key);
     if (getter != null) {
-      property.m_update = entry -> entry.setStringArray(getter.get());
+      property.m_pub = topic.publish();
+      property.m_updateNetwork = (pub, time) -> pub.set(getter.get(), time);
     }
     if (setter != null) {
-      property.m_createListener =
-          entry ->
-              entry.addListener(
-                  event -> {
-                    if (event.value.isStringArray()) {
-                      SmartDashboard.postListenerTask(
-                          () -> setter.accept(event.value.getStringArray()));
-                    }
-                  },
-                  EntryListenerFlags.kImmediate
-                      | EntryListenerFlags.kNew
-                      | EntryListenerFlags.kUpdate);
+      property.m_sub = topic.subscribe(new String[] {});
+      property.m_updateLocal =
+          sub -> {
+            for (String[] val : sub.readQueueValues()) {
+              setter.accept(val);
+            }
+          };
     }
     m_properties.add(property);
   }
@@ -400,55 +578,27 @@ public class SendableBuilderImpl implements NTSendableBuilder {
    * Add a raw property.
    *
    * @param key property name
+   * @param typeString type string
    * @param getter getter function (returns current value)
    * @param setter setter function (sets new value)
    */
   @Override
-  public void addRawProperty(String key, Supplier<byte[]> getter, Consumer<byte[]> setter) {
-    Property property = new Property(m_table, key);
+  public void addRawProperty(
+      String key, String typeString, Supplier<byte[]> getter, Consumer<byte[]> setter) {
+    Property<RawPublisher, RawSubscriber> property = new Property<>();
+    RawTopic topic = m_table.getRawTopic(key);
     if (getter != null) {
-      property.m_update = entry -> entry.setRaw(getter.get());
+      property.m_pub = topic.publish(typeString);
+      property.m_updateNetwork = (pub, time) -> pub.set(getter.get(), time);
     }
     if (setter != null) {
-      property.m_createListener =
-          entry ->
-              entry.addListener(
-                  event -> {
-                    if (event.value.isRaw()) {
-                      SmartDashboard.postListenerTask(() -> setter.accept(event.value.getRaw()));
-                    }
-                  },
-                  EntryListenerFlags.kImmediate
-                      | EntryListenerFlags.kNew
-                      | EntryListenerFlags.kUpdate);
-    }
-    m_properties.add(property);
-  }
-
-  /**
-   * Add a NetworkTableValue property.
-   *
-   * @param key property name
-   * @param getter getter function (returns current value)
-   * @param setter setter function (sets new value)
-   */
-  @Override
-  public void addValueProperty(
-      String key, Supplier<NetworkTableValue> getter, Consumer<NetworkTableValue> setter) {
-    Property property = new Property(m_table, key);
-    if (getter != null) {
-      property.m_update = entry -> entry.setValue(getter.get());
-    }
-    if (setter != null) {
-      property.m_createListener =
-          entry ->
-              entry.addListener(
-                  event -> {
-                    SmartDashboard.postListenerTask(() -> setter.accept(event.value));
-                  },
-                  EntryListenerFlags.kImmediate
-                      | EntryListenerFlags.kNew
-                      | EntryListenerFlags.kUpdate);
+      property.m_sub = topic.subscribe(typeString, new byte[] {});
+      property.m_updateLocal =
+          sub -> {
+            for (byte[] val : sub.readQueueValues()) {
+              setter.accept(val);
+            }
+          };
     }
     m_properties.add(property);
   }

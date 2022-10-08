@@ -5,6 +5,7 @@
 #include "frc/ADXL345_SPI.h"
 
 #include <hal/FRCUsageReporting.h>
+#include <networktables/DoubleTopic.h>
 #include <networktables/NTSendableBuilder.h>
 #include <wpi/sendable/SendableRegistry.h>
 
@@ -118,13 +119,13 @@ ADXL345_SPI::AllAxes ADXL345_SPI::GetAccelerations() {
 
 void ADXL345_SPI::InitSendable(nt::NTSendableBuilder& builder) {
   builder.SetSmartDashboardType("3AxisAccelerometer");
-  auto x = builder.GetEntry("X").GetHandle();
-  auto y = builder.GetEntry("Y").GetHandle();
-  auto z = builder.GetEntry("Z").GetHandle();
-  builder.SetUpdateTable([=] {
-    auto data = GetAccelerations();
-    nt::NetworkTableEntry(x).SetDouble(data.XAxis);
-    nt::NetworkTableEntry(y).SetDouble(data.YAxis);
-    nt::NetworkTableEntry(z).SetDouble(data.ZAxis);
-  });
+  builder.SetUpdateTable(
+      [this, x = nt::DoubleTopic{builder.GetTopic("X")}.Publish(),
+       y = nt::DoubleTopic{builder.GetTopic("Y")}.Publish(),
+       z = nt::DoubleTopic{builder.GetTopic("Z")}.Publish()]() mutable {
+        auto data = GetAccelerations();
+        x.Set(data.XAxis);
+        y.Set(data.YAxis);
+        z.Set(data.ZAxis);
+      });
 }

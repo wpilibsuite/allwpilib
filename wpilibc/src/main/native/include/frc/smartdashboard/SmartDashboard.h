@@ -63,39 +63,6 @@ class SmartDashboard {
   static bool IsPersistent(std::string_view key);
 
   /**
-   * Sets flags on the specified key in this table. The key can
-   * not be null.
-   *
-   * @param key the key name
-   * @param flags the flags to set (bitmask)
-   */
-  static void SetFlags(std::string_view key, unsigned int flags);
-
-  /**
-   * Clears flags on the specified key in this table. The key can
-   * not be null.
-   *
-   * @param key the key name
-   * @param flags the flags to clear (bitmask)
-   */
-  static void ClearFlags(std::string_view key, unsigned int flags);
-
-  /**
-   * Returns the flags for the specified key.
-   *
-   * @param key the key name
-   * @return the flags, or 0 if the key is not defined
-   */
-  static unsigned int GetFlags(std::string_view key);
-
-  /**
-   * Deletes the specified key in this table.
-   *
-   * @param key the key name
-   */
-  static void Delete(std::string_view key);
-
-  /**
    * Returns an NT Entry mapping to the specified key
    *
    * This is useful if an entry is used often, or is read and then modified.
@@ -363,7 +330,7 @@ class SmartDashboard {
    * @param value The value that will be assigned.
    * @return False if the table key already exists with a different type
    */
-  static bool PutRaw(std::string_view key, std::string_view value);
+  static bool PutRaw(std::string_view key, wpi::span<const uint8_t> value);
 
   /**
    * Gets the current value in the table, setting it if it does not exist.
@@ -373,7 +340,7 @@ class SmartDashboard {
    * @returns False if the table key exists with a different type
    */
   static bool SetDefaultRaw(std::string_view key,
-                            std::string_view defaultValue);
+                            wpi::span<const uint8_t> defaultValue);
 
   /**
    * Returns the raw value (byte array) the key maps to.
@@ -389,8 +356,8 @@ class SmartDashboard {
    * @note This makes a copy of the raw contents. If the overhead of this is a
    *       concern, use GetValue() instead.
    */
-  static std::string GetRaw(std::string_view key,
-                            std::string_view defaultValue);
+  static std::vector<uint8_t> GetRaw(std::string_view key,
+                                     wpi::span<const uint8_t> defaultValue);
 
   /**
    * Maps the specified key to the specified complex value (such as an array) in
@@ -403,8 +370,7 @@ class SmartDashboard {
    * @param value   the value
    * @return        False if the table key already exists with a different type
    */
-  static bool PutValue(std::string_view keyName,
-                       std::shared_ptr<nt::Value> value);
+  static bool PutValue(std::string_view keyName, const nt::Value& value);
 
   /**
    * Gets the current value in the table, setting it if it does not exist.
@@ -414,7 +380,7 @@ class SmartDashboard {
    * @returns False if the table key exists with a different type
    */
   static bool SetDefaultValue(std::string_view key,
-                              std::shared_ptr<nt::Value> defaultValue);
+                              const nt::Value& defaultValue);
 
   /**
    * Retrieves the complex value (such as an array) in this table into the
@@ -422,7 +388,7 @@ class SmartDashboard {
    *
    * @param keyName the key
    */
-  static std::shared_ptr<nt::Value> GetValue(std::string_view keyName);
+  static nt::Value GetValue(std::string_view keyName);
 
   /**
    * Posts a task from a listener to the ListenerExecutor, so that it can be run

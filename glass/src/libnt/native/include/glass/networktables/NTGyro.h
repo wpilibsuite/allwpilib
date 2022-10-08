@@ -7,11 +7,12 @@
 #include <string>
 #include <string_view>
 
-#include <ntcore_cpp.h>
+#include <networktables/DoubleTopic.h>
+#include <networktables/NetworkTableInstance.h>
+#include <networktables/StringTopic.h>
 
 #include "glass/DataSource.h"
 #include "glass/hardware/Gyro.h"
-#include "glass/networktables/NetworkTablesHelper.h"
 
 namespace glass {
 class NTGyroModel : public GyroModel {
@@ -19,7 +20,7 @@ class NTGyroModel : public GyroModel {
   static constexpr const char* kType = "Gyro";
 
   explicit NTGyroModel(std::string_view path);
-  NTGyroModel(NT_Inst instance, std::string_view path);
+  NTGyroModel(nt::NetworkTableInstance inst, std::string_view path);
 
   const char* GetName() const override { return m_nameValue.c_str(); }
   const char* GetSimDevice() const override { return nullptr; }
@@ -32,9 +33,9 @@ class NTGyroModel : public GyroModel {
   bool IsReadOnly() override { return true; }
 
  private:
-  NetworkTablesHelper m_nt;
-  NT_Entry m_angle;
-  NT_Entry m_name;
+  nt::NetworkTableInstance m_inst;
+  nt::DoubleSubscriber m_angle;
+  nt::StringSubscriber m_name;
 
   DataSource m_angleData;
   std::string m_nameValue;

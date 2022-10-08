@@ -2,8 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#ifndef NTCORE_LOG_H_
-#define NTCORE_LOG_H_
+#pragma once
 
 #include <wpi/Logger.h>
 
@@ -19,5 +18,3 @@
 #define DEBUG2(format, ...) WPI_DEBUG2(m_logger, format, __VA_ARGS__)
 #define DEBUG3(format, ...) WPI_DEBUG3(m_logger, format, __VA_ARGS__)
 #define DEBUG4(format, ...) WPI_DEBUG4(m_logger, format, __VA_ARGS__)
-
-#endif  // NTCORE_LOG_H_

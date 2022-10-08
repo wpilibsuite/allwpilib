@@ -19,3 +19,15 @@ int main(int argc, char** argv) {
   int ret = RUN_ALL_TESTS();
   return ret;
 }
+
+extern "C" {
+void __ubsan_on_report(void) {
+  FAIL() << "Encountered an undefined behavior sanitizer error";
+}
+void __asan_on_error(void) {
+  FAIL() << "Encountered an address sanitizer error";
+}
+void __tsan_on_report(void) {
+  FAIL() << "Encountered a thread sanitizer error";
+}
+}  // extern "C"

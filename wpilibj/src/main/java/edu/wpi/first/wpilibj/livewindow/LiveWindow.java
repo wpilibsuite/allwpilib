@@ -4,9 +4,11 @@
 
 package edu.wpi.first.wpilibj.livewindow;
 
+import edu.wpi.first.networktables.BooleanPublisher;
 import edu.wpi.first.networktables.NetworkTable;
-import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.networktables.StringPublisher;
+import edu.wpi.first.networktables.StringTopic;
 import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.util.sendable.SendableRegistry;
 import edu.wpi.first.wpilibj.smartdashboard.SendableBuilderImpl;
@@ -15,16 +17,31 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableBuilderImpl;
  * The LiveWindow class is the public interface for putting sensors and actuators on the LiveWindow.
  */
 public final class LiveWindow {
-  private static class Component {
+  private static class Component implements AutoCloseable {
+    @Override
+    public void close() {
+      if (m_namePub != null) {
+        m_namePub.close();
+        m_namePub = null;
+      }
+      if (m_typePub != null) {
+        m_typePub.close();
+        m_typePub = null;
+      }
+    }
+
     boolean m_firstTime = true;
     boolean m_telemetryEnabled;
+    StringPublisher m_namePub;
+    StringPublisher m_typePub;
   }
 
   private static final int dataHandle = SendableRegistry.getDataHandle();
   private static final NetworkTable liveWindowTable =
       NetworkTableInstance.getDefault().getTable("LiveWindow");
   private static final NetworkTable statusTable = liveWindowTable.getSubTable(".status");
-  private static final NetworkTableEntry enabledEntry = statusTable.getEntry("LW Enabled");
+  private static final BooleanPublisher enabledPub =
+      statusTable.getBooleanTopic("LW Enabled").publish();
   private static boolean startLiveWindow;
   private static boolean liveWindowEnabled;
   private static boolean telemetryEnabled;
@@ -34,6 +51,7 @@ public final class LiveWindow {
 
   static {
     SendableRegistry.setLiveWindowBuilderFactory(() -> new SendableBuilderImpl());
+    enabledPub.set(false);
   }
 
   private static Component getOrAdd(Sendable sendable) {
@@ -95,7 +113,7 @@ public final class LiveWindow {
           disabledListener.run();
         }
       }
-      enabledEntry.setBoolean(enabled);
+      enabledPub.set(enabled);
     }
   }
 
@@ -177,10 +195,12 @@ public final class LiveWindow {
             } else {
               table = ssTable.getSubTable(cbdata.name);
             }
-            table.getEntry(".name").setString(cbdata.name);
+            component.m_namePub = new StringTopic(table.getTopic(".name")).publish();
+            component.m_namePub.set(cbdata.name);
             ((SendableBuilderImpl) cbdata.builder).setTable(table);
             cbdata.sendable.initSendable(cbdata.builder);
-            ssTable.getEntry(".type").setString("LW Subsystem");
+            component.m_typePub = new StringTopic(ssTable.getTopic(".type")).publish();
+            component.m_typePub.set("LW Subsystem");
 
             component.m_firstTime = false;
           }

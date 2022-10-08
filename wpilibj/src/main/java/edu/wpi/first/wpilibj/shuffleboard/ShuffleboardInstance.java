@@ -9,8 +9,8 @@ import static edu.wpi.first.wpilibj.util.ErrorMessages.requireNonNullParam;
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
 import edu.wpi.first.networktables.NetworkTable;
-import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.networktables.StringPublisher;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.function.Consumer;
@@ -21,7 +21,7 @@ final class ShuffleboardInstance implements ShuffleboardRoot {
   private boolean m_tabsChanged = false; // NOPMD redundant field initializer
   private final NetworkTable m_rootTable;
   private final NetworkTable m_rootMetaTable;
-  private final NetworkTableEntry m_selectedTabEntry;
+  private final StringPublisher m_selectedTabPub;
 
   /**
    * Creates a new Shuffleboard instance.
@@ -32,7 +32,7 @@ final class ShuffleboardInstance implements ShuffleboardRoot {
     requireNonNullParam(ntInstance, "ntInstance", "ShuffleboardInstance");
     m_rootTable = ntInstance.getTable(Shuffleboard.kBaseTableName);
     m_rootMetaTable = m_rootTable.getSubTable(".metadata");
-    m_selectedTabEntry = m_rootMetaTable.getEntry("Selected");
+    m_selectedTabPub = m_rootMetaTable.getStringTopic("Selected").publish();
     HAL.report(tResourceType.kResourceType_Shuffleboard, 0);
   }
 
@@ -51,7 +51,7 @@ final class ShuffleboardInstance implements ShuffleboardRoot {
     if (m_tabsChanged) {
       String[] tabTitles =
           m_tabs.values().stream().map(ShuffleboardTab::getTitle).toArray(String[]::new);
-      m_rootMetaTable.getEntry("Tabs").forceSetStringArray(tabTitles);
+      m_rootMetaTable.getEntry("Tabs").setStringArray(tabTitles);
       m_tabsChanged = false;
     }
     for (ShuffleboardTab tab : m_tabs.values()) {
@@ -72,12 +72,12 @@ final class ShuffleboardInstance implements ShuffleboardRoot {
 
   @Override
   public void selectTab(int index) {
-    m_selectedTabEntry.forceSetDouble(index);
+    selectTab(Integer.toString(index));
   }
 
   @Override
   public void selectTab(String title) {
-    m_selectedTabEntry.forceSetString(title);
+    m_selectedTabPub.set(title);
   }
 
   /**
