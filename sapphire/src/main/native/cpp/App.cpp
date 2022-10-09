@@ -19,6 +19,7 @@
 #include <wpigui.h>
 
 #include "Selector.h"
+#include "Plot.h"
 
 using namespace sapphire;
 
@@ -33,6 +34,7 @@ static float gDefaultScale = 1.0;
 static std::unique_ptr<glass::WindowManager> m_windowManager;
 
 static glass::Window* m_logSelectorWindow;
+static glass::Window* m_plotWindow;
 static std::unique_ptr<Selector> m_selector;
 
 static glass::Window* m_entryManagerWindow;
@@ -104,11 +106,21 @@ void Application(std::string_view saveDir) {
 
   std::unique_ptr<Selector> selector = std::make_unique<Selector>();
   auto& logs = selector->GetDataLogs();
+
+  auto  logViewer = std::make_unique<DataLogView>(logs);
+
+  auto& timestamp = logViewer->GetTimestamp();
+
+  std::unique_ptr<PlotView> plot = std::make_unique<PlotView>(logViewer->GetTimestamp(), "Plot 1");
+
   m_logSelectorWindow = m_windowManager->AddWindow(
     "Log Selector", std::move(selector));
 
   m_entryManagerWindow = m_windowManager->AddWindow(
-    "Entry Manager", std::make_unique<DataLogView>(logs));
+    "Entry Manager", std::move(logViewer));
+
+  m_plotWindow = m_windowManager->AddWindow(
+    "Plot", std::move(plot));
 
 
   gui::AddWindowScaler([](float scale) { gDefaultScale = scale; });

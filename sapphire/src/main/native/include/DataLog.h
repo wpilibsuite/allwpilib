@@ -28,6 +28,9 @@ struct EntryData {
   wpi::log::DataLogRecord GetRecordAt(int timestamp);
   wpi::log::DataLogRecord GetNextRecord(int timestamp);
   
+  std::string GetName() const { return name; }
+
+  std::map<int, wpi::log::DataLogRecord>::iterator GetIterator(int timestamp);
   int entry;
   std::string name;
   std::string type;
@@ -49,8 +52,6 @@ struct EntryNode {
   EntryData *entry = nullptr;
   std::vector<EntryNode> children;
   std::string TreeToString(int depth = 1);
-
-  
 };
 
 struct DataLogFlags{
@@ -89,6 +90,7 @@ class DataLogView: public glass::View {
     void DisplayDataLog(DataLogModel*);
     void Display() override;
     int GetMaxTimestamp();
+    float& GetTimestamp();
     std::string name;
     std::vector<std::unique_ptr<DataLogModel> >& logs;
 };

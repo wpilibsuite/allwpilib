@@ -25,6 +25,10 @@ static bool needsUpdate = false;
 static float timestamp = 0;
 static const int TIMESTAMP_FUDGE_FACTOR = 10000;
 
+float& DataLogView::GetTimestamp(){
+  return timestamp;
+}
+
 wpi::log::DataLogRecord EntryData::GetRecordAt(int timestamp){
   wpi::log::DataLogRecord record;
   for(auto& entry : datapoints){
@@ -42,6 +46,22 @@ wpi::log::DataLogRecord EntryData::GetNextRecord(int timestamp){
     }
   }
   return record;
+}
+
+std::map<int, wpi::log::DataLogRecord>::iterator EntryData::GetIterator(int timestamp){
+  auto it = datapoints.begin();
+  auto best_it = it;
+  wpi::log::DataLogRecord record;
+  while(it != datapoints.end()){
+    auto entry = *it;
+    if(entry.first > timestamp && (entry.first < record.GetTimestamp() || record.GetTimestamp() <= timestamp)){
+      record = entry.second;
+      it = best_it;
+    }
+    ++it;
+  }
+  return best_it;
+
 }
 
 bool DataLogModel::LoadWPILog(std::string filename) {
@@ -206,10 +226,23 @@ std::string sapphire::GetFormattedEntryValue(EntryData& data, int timestamp, wpi
     return "  invalid";
 }
 
+void EmitEntryDragDrop(EntryData *data, std::string name){
+  if(ImGui::BeginDragDropSource()){
+    ImGui::SetDragDropPayload("EntryData", &data, sizeof(data));
+    std::string new_name = name + "drag_drop";
+    ImGui::TextUnformatted(new_name.c_str());
+
+    ImGui::EndDragDropSource();
+  }
+}
+
 void EmitEntry(EntryData *data, std::string name, float *offset, DataLogFlags flags){
-  ImGui::PushID(name.c_str());
-  ImGui::Text("%s", name.c_str());
   
+  ImGui::PushID(name.c_str());
+  
+  ImGui::Selectable(name.c_str());
+  EmitEntryDragDrop(data, name);
+
   int expandedts = static_cast<int>((timestamp+*offset)*1000000);
   auto record = data->GetRecordAt(expandedts);
 
@@ -224,6 +257,7 @@ void EmitEntry(EntryData *data, std::string name, float *offset, DataLogFlags fl
     ImGui::EndPopup();
   }
   
+
   ImGui::NextColumn();
   std::string value = (record.GetEntry() == -1) ? "" : GetFormattedEntryValue(*data, expandedts, record);
   ImGui::Text(value.c_str());
@@ -250,6 +284,7 @@ void EmitEntry(EntryData *data, std::string name, float *offset, DataLogFlags fl
 void EmitTree(const std::vector<EntryNode>& tree, float *timestamp, DataLogFlags flags) {
   for(auto &&node : tree){
     if(node.entry){
+    
       EmitEntry(node.entry, node.name, timestamp, flags);
     }
     if(!node.children.empty()){
