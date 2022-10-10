@@ -2,6 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
+#include <span>
 #include <string>
 #include <string_view>
 #include <vector>
@@ -65,7 +66,7 @@ TEST_F(WireEncoderTextTest, SetProperties) {
 }
 
 TEST_F(WireEncoderTextTest, Subscribe) {
-  net::WireEncodeSubscribe(os, 5, std::vector<std::string_view>{{"a", "b"}},
+  net::WireEncodeSubscribe(os, 5, std::span<const std::string_view>{{"a", "b"}},
                            PubSubOptions{});
   ASSERT_EQ(os.str(),
             "{\"method\":\"subscribe\",\"params\":{"
@@ -75,7 +76,7 @@ TEST_F(WireEncoderTextTest, Subscribe) {
 TEST_F(WireEncoderTextTest, SubscribeSendAll) {
   PubSubOptions options;
   options.sendAll = true;
-  net::WireEncodeSubscribe(os, 5, std::vector<std::string_view>{{"a", "b"}},
+  net::WireEncodeSubscribe(os, 5, std::span<const std::string_view>{{"a", "b"}},
                            options);
   ASSERT_EQ(os.str(),
             "{\"method\":\"subscribe\",\"params\":{"
@@ -86,7 +87,7 @@ TEST_F(WireEncoderTextTest, SubscribeSendAll) {
 TEST_F(WireEncoderTextTest, SubscribePeriodic) {
   PubSubOptions options;
   options.periodic = 0.5;
-  net::WireEncodeSubscribe(os, 5, std::vector<std::string_view>{{"a", "b"}},
+  net::WireEncodeSubscribe(os, 5, std::span<const std::string_view>{{"a", "b"}},
                            options);
   ASSERT_EQ(os.str(),
             "{\"method\":\"subscribe\",\"params\":{"
@@ -98,7 +99,7 @@ TEST_F(WireEncoderTextTest, SubscribeAllOptions) {
   PubSubOptions options;
   options.sendAll = true;
   options.periodic = 0.5;
-  net::WireEncodeSubscribe(os, 5, std::vector<std::string_view>{{"a", "b"}},
+  net::WireEncodeSubscribe(os, 5, std::span<const std::string_view>{{"a", "b"}},
                            options);
   ASSERT_EQ(os.str(),
             "{\"method\":\"subscribe\",\"params\":{"
