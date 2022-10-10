@@ -25,7 +25,7 @@ if (!project.hasProperty('onlylinuxathena') && !project.hasProperty('onlylinuxar
                 lib project: ':glass', library: 'glass', linkage: 'static'
                 lib project: ':wpigui', library: 'wpigui', linkage: 'static'
                 lib project: ':wpimath', library: 'wpimath', linkage: 'shared'
-                lib project: ':ntcore', library: 'ntcore', linkage: 'shared'
+                project(':ntcore').addNtcoreDependency(it, 'shared')
                 lib project: ':wpinet', library: 'wpinet', linkage: 'shared'
                 lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
                 nativeUtils.useRequiredLibrary(it, 'imgui_static')

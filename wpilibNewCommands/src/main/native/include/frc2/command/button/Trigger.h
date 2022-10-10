@@ -70,6 +70,15 @@ class Trigger : public frc::BooleanEvent {
   Trigger WhenActive(Command* command);
 
   /**
+   * Binds a command to start when the trigger becomes active. Moves
+   * command ownership to the button scheduler.
+   *
+   * @param command The command to bind.
+   * @return The trigger, for chained calls.
+   */
+  Trigger WhenActive(CommandPtr&& command);
+
+  /**
    * Binds a command to start when the trigger becomes active. Transfers
    * command ownership to the button scheduler, so the user does not have to
    * worry about lifespan - rvalue refs will be *moved*, lvalue refs will be
@@ -115,6 +124,16 @@ class Trigger : public frc::BooleanEvent {
    * @return The trigger, for chained calls.
    */
   Trigger WhileActiveContinous(Command* command);
+
+  /**
+   * Binds a command to be started repeatedly while the trigger is active, and
+   * canceled when it becomes inactive. Moves command ownership to the button
+   * scheduler.
+   *
+   * @param command The command to bind.
+   * @return The trigger, for chained calls.
+   */
+  Trigger WhileActiveContinous(CommandPtr&& command);
 
   /**
    * Binds a command to be started repeatedly while the trigger is active, and
@@ -166,6 +185,16 @@ class Trigger : public frc::BooleanEvent {
 
   /**
    * Binds a command to be started when the trigger becomes active, and
+   * canceled when it becomes inactive. Moves command ownership to the button
+   * scheduler.
+   *
+   * @param command The command to bind.
+   * @return The trigger, for chained calls.
+   */
+  Trigger WhileActiveOnce(CommandPtr&& command);
+
+  /**
+   * Binds a command to be started when the trigger becomes active, and
    * canceled when it becomes inactive. Transfers command ownership to the
    * button scheduler, so the user does not have to worry about lifespan -
    * rvalue refs will be *moved*, lvalue refs will be *copied.*
@@ -194,6 +223,15 @@ class Trigger : public frc::BooleanEvent {
    * @return The trigger, for chained calls.
    */
   Trigger WhenInactive(Command* command);
+
+  /**
+   * Binds a command to start when the trigger becomes inactive. Moves
+   * command ownership to the button scheduler.
+   *
+   * @param command The command to bind.
+   * @return The trigger, for chained calls.
+   */
+  Trigger WhenInactive(CommandPtr&& command);
 
   /**
    * Binds a command to start when the trigger becomes inactive.  Transfers
@@ -241,6 +279,16 @@ class Trigger : public frc::BooleanEvent {
    * @return The trigger, for chained calls.
    */
   Trigger ToggleWhenActive(Command* command);
+
+  /**
+   * Binds a command to start when the trigger becomes active, and be canceled
+   * when it again becomes active. Moves command ownership to the button
+   * scheduler.
+   *
+   * @param command The command to bind.
+   * @return The trigger, for chained calls.
+   */
+  Trigger ToggleWhenActive(CommandPtr&& command);
 
   /**
    * Binds a command to start when the trigger becomes active, and be canceled

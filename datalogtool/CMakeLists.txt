@@ -20,7 +20,7 @@ endif()
 add_executable(datalogtool ${datalogtool_src} ${datalogtool_resources_src} ${datalogtool_rc} ${APP_ICON_MACOSX})
 wpilib_link_macos_gui(datalogtool)
 target_link_libraries(datalogtool libglass ${LIBSSH_LIBRARIES})
-target_include_directories(datalogtool PRIVATE ${LIBSSH_INCLUDE_DIRS})
+target_include_directories(datalogtool SYSTEM PRIVATE ${LIBSSH_INCLUDE_DIRS})
 
 if (WIN32)
     set_target_properties(datalogtool PROPERTIES WIN32_EXECUTABLE YES)

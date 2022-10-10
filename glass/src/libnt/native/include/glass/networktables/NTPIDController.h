@@ -7,10 +7,12 @@
 #include <string>
 #include <string_view>
 
-#include <ntcore_cpp.h>
+#include <networktables/BooleanTopic.h>
+#include <networktables/DoubleTopic.h>
+#include <networktables/NetworkTableInstance.h>
+#include <networktables/StringTopic.h>
 
 #include "glass/DataSource.h"
-#include "glass/networktables/NetworkTablesHelper.h"
 #include "glass/other/PIDController.h"
 
 namespace glass {
@@ -19,7 +21,7 @@ class NTPIDControllerModel : public PIDControllerModel {
   static constexpr const char* kType = "PIDController";
 
   explicit NTPIDControllerModel(std::string_view path);
-  NTPIDControllerModel(NT_Inst instance, std::string_view path);
+  NTPIDControllerModel(nt::NetworkTableInstance inst, std::string_view path);
 
   const char* GetName() const override { return m_nameValue.c_str(); }
 
@@ -38,13 +40,13 @@ class NTPIDControllerModel : public PIDControllerModel {
   bool IsReadOnly() override { return !m_controllableValue; }
 
  private:
-  NetworkTablesHelper m_nt;
-  NT_Entry m_name;
-  NT_Entry m_controllable;
-  NT_Entry m_p;
-  NT_Entry m_i;
-  NT_Entry m_d;
-  NT_Entry m_setpoint;
+  nt::NetworkTableInstance m_inst;
+  nt::StringSubscriber m_name;
+  nt::BooleanSubscriber m_controllable;
+  nt::DoubleEntry m_p;
+  nt::DoubleEntry m_i;
+  nt::DoubleEntry m_d;
+  nt::DoubleEntry m_setpoint;
 
   DataSource m_pData;
   DataSource m_iData;

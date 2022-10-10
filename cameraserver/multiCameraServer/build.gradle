@@ -55,7 +55,7 @@ model {
             }
             binaries.all { binary ->
                 lib project: ':cameraserver', library: 'cameraserver', linkage: 'static'
-                lib project: ':ntcore', library: 'ntcore', linkage: 'static'
+                project(':ntcore').addNtcoreDependency(binary, 'static')
                 lib project: ':cscore', library: 'cscore', linkage: 'static'
                 lib project: ':wpinet', library: 'wpinet', linkage: 'static'
                 lib project: ':wpiutil', library: 'wpiutil', linkage: 'static'

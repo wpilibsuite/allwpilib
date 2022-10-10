@@ -9,43 +9,36 @@
 using namespace glass;
 
 NTDigitalOutputModel::NTDigitalOutputModel(std::string_view path)
-    : NTDigitalOutputModel{nt::GetDefaultInstance(), path} {}
+    : NTDigitalOutputModel{nt::NetworkTableInstance::GetDefault(), path} {}
 
-NTDigitalOutputModel::NTDigitalOutputModel(NT_Inst inst, std::string_view path)
-    : m_nt{inst},
-      m_value{m_nt.GetEntry(fmt::format("{}/Value", path))},
-      m_name{m_nt.GetEntry(fmt::format("{}/.name", path))},
-      m_controllable{m_nt.GetEntry(fmt::format("{}/.controllable", path))},
+NTDigitalOutputModel::NTDigitalOutputModel(nt::NetworkTableInstance inst,
+                                           std::string_view path)
+    : m_inst{inst},
+      m_value{inst.GetBooleanTopic(fmt::format("{}/Value", path))
+                  .GetEntry(false, {{nt::PubSubOption::SendAll(true)}})},
+      m_name{inst.GetStringTopic(fmt::format("{}/.name", path)).Subscribe("")},
+      m_controllable{inst.GetBooleanTopic(fmt::format("{}/.controllable", path))
+                         .Subscribe(false)},
       m_valueData{fmt::format("NT_DOut:{}", path)} {
-  m_nt.AddListener(m_value);
-  m_nt.AddListener(m_name);
-  m_nt.AddListener(m_controllable);
-
   m_valueData.SetDigital(true);
 }
 
 void NTDigitalOutputModel::SetValue(bool val) {
-  nt::SetEntryValue(m_value, nt::Value::MakeBoolean(val));
+  m_value.Set(val);
 }
 
 void NTDigitalOutputModel::Update() {
-  for (auto&& event : m_nt.PollListener()) {
-    if (event.entry == m_value) {
-      if (event.value && event.value->IsBoolean()) {
-        m_valueData.SetValue(event.value->GetBoolean());
-      }
-    } else if (event.entry == m_name) {
-      if (event.value && event.value->IsString()) {
-        m_nameValue = event.value->GetString();
-      }
-    } else if (event.entry == m_controllable) {
-      if (event.value && event.value->IsBoolean()) {
-        m_controllableValue = event.value->GetBoolean();
-      }
-    }
+  for (auto&& v : m_value.ReadQueue()) {
+    m_valueData.SetValue(v.value, v.time);
+  }
+  for (auto&& v : m_name.ReadQueue()) {
+    m_nameValue = std::move(v.value);
+  }
+  for (auto&& v : m_controllable.ReadQueue()) {
+    m_controllableValue = v.value;
   }
 }
 
 bool NTDigitalOutputModel::Exists() {
-  return m_nt.IsConnected() && nt::GetEntryType(m_value) != NT_UNASSIGNED;
+  return m_inst.IsConnected() && m_value.Exists();
 }

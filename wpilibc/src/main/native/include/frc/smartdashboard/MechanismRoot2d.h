@@ -7,7 +7,7 @@
 #include <memory>
 #include <string_view>
 
-#include <networktables/NetworkTableEntry.h>
+#include <networktables/DoubleTopic.h>
 
 #include "MechanismObject2d.h"
 
@@ -48,7 +48,7 @@ class MechanismRoot2d : private MechanismObject2d {
   inline void Flush();
   double m_x;
   double m_y;
-  nt::NetworkTableEntry m_xEntry;
-  nt::NetworkTableEntry m_yEntry;
+  nt::DoublePublisher m_xPub;
+  nt::DoublePublisher m_yPub;
 };
 }  // namespace frc

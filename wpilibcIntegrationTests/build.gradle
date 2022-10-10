@@ -41,9 +41,9 @@ model {
                     }
                     lib project: ':wpilibc', library: 'wpilibc', linkage: 'shared'
                     lib project: ':wpimath', library: 'wpimath', linkage: 'shared'
-                    lib project: ':ntcore', library: 'ntcore', linkage: 'shared'
+                    project(':ntcore').addNtcoreDependency(binary, 'shared')
+                    project(':ntcore').addNtcoreJniDependency(binary)
                     lib project: ':cscore', library: 'cscore', linkage: 'shared'
-                    lib project: ':ntcore', library: 'ntcoreJNIShared', linkage: 'shared'
                     lib project: ':cscore', library: 'cscoreJNIShared', linkage: 'shared'
                     project(':hal').addHalDependency(binary, 'shared')
                     project(':hal').addHalJniDependency(binary)

@@ -9,9 +9,13 @@ import static edu.wpi.first.util.ErrorMessages.requireNonNullParam;
 import edu.wpi.first.hal.FRCNetComm.tInstances;
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
+import edu.wpi.first.networktables.IntegerArrayEntry;
+import edu.wpi.first.networktables.IntegerArrayPublisher;
+import edu.wpi.first.networktables.IntegerArrayTopic;
 import edu.wpi.first.networktables.NTSendable;
 import edu.wpi.first.networktables.NTSendableBuilder;
-import edu.wpi.first.networktables.NetworkTableEntry;
+import edu.wpi.first.networktables.StringArrayPublisher;
+import edu.wpi.first.networktables.StringArrayTopic;
 import edu.wpi.first.util.sendable.SendableRegistry;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotBase;
@@ -540,36 +544,43 @@ public final class CommandScheduler implements NTSendable, AutoCloseable {
   @Override
   public void initSendable(NTSendableBuilder builder) {
     builder.setSmartDashboardType("Scheduler");
-    final NetworkTableEntry namesEntry = builder.getEntry("Names");
-    final NetworkTableEntry idsEntry = builder.getEntry("Ids");
-    final NetworkTableEntry cancelEntry = builder.getEntry("Cancel");
+    final StringArrayPublisher namesPub = new StringArrayTopic(builder.getTopic("Names")).publish();
+    final IntegerArrayPublisher idsPub = new IntegerArrayTopic(builder.getTopic("Ids")).publish();
+    final IntegerArrayEntry cancelEntry =
+        new IntegerArrayTopic(builder.getTopic("Cancel")).getEntry(new long[] {});
+    builder.addCloseable(namesPub);
+    builder.addCloseable(idsPub);
+    builder.addCloseable(cancelEntry);
     builder.setUpdateTable(
         () -> {
-          if (namesEntry == null || idsEntry == null || cancelEntry == null) {
+          if (namesPub == null || idsPub == null || cancelEntry == null) {
             return;
           }
 
-          Map<Double, Command> ids = new LinkedHashMap<>();
+          Map<Long, Command> ids = new LinkedHashMap<>();
+          List<String> names = new ArrayList<>();
+          long[] ids2 = new long[m_scheduledCommands.size()];
 
+          int i = 0;
           for (Command command : m_scheduledCommands) {
-            ids.put((double) command.hashCode(), command);
+            long id = command.hashCode();
+            ids.put(id, command);
+            names.add(command.getName());
+            ids2[i] = id;
+            i++;
           }
 
-          double[] toCancel = cancelEntry.getDoubleArray(new double[0]);
+          long[] toCancel = cancelEntry.get();
           if (toCancel.length > 0) {
-            for (double hash : toCancel) {
+            for (long hash : toCancel) {
               cancel(ids.get(hash));
               ids.remove(hash);
             }
-            cancelEntry.setDoubleArray(new double[0]);
+            cancelEntry.set(new long[] {});
           }
 
-          List<String> names = new ArrayList<>();
-
-          ids.values().forEach(command -> names.add(command.getName()));
-
-          namesEntry.setStringArray(names.toArray(new String[0]));
-          idsEntry.setNumberArray(ids.keySet().toArray(new Double[0]));
+          namesPub.set(names.toArray(new String[] {}));
+          idsPub.set(ids2);
         });
   }
 }

@@ -42,6 +42,9 @@ model {
                 cpp {
                     source {
                         srcDirs 'src/main/native/cpp'
+                        if (project.hasProperty('generatedSources')) {
+                            srcDir generatedSources
+                        }
                         include '**/*.cpp'
                         exclude '**/jni/**/*.cpp'
                     }
@@ -110,6 +113,9 @@ model {
                 cpp {
                     source {
                         srcDirs 'src/main/native/cpp'
+                        if (project.hasProperty('generatedSources')) {
+                            srcDir generatedSources
+                        }
                         include '**/jni/**/*.cpp'
                     }
                     exportedHeaders {
@@ -151,6 +157,9 @@ model {
                 cpp {
                     source {
                         srcDirs 'src/main/native/cpp'
+                        if (project.hasProperty('generatedSources')) {
+                            srcDir generatedSources
+                        }
                         include '**/jni/**/*.cpp'
                     }
                     exportedHeaders {

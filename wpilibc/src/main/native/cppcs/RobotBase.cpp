@@ -224,11 +224,24 @@ RobotBase::RobotBase() {
 
   auto inst = nt::NetworkTableInstance::GetDefault();
   inst.SetNetworkIdentity("Robot");
+  // subscribe to "" to force persistent values to progagate to local
+  nt::SubscribeMultiple(inst.GetHandle(), {{std::string_view{}}});
 #ifdef __FRC_ROBORIO__
-  inst.StartServer("/home/lvuser/networktables.ini");
+  inst.StartServer("/home/lvuser/networktables.json");
 #else
   inst.StartServer();
 #endif
+
+  // wait for the NT server to actually start
+  int count = 0;
+  while ((inst.GetNetworkMode() & NT_NET_MODE_STARTING) != 0) {
+    using namespace std::chrono_literals;
+    std::this_thread::sleep_for(10ms);
+    ++count;
+    if (count > 100) {
+      fmt::print(stderr, "timed out while waiting for NT server to start\n");
+    }
+  }
 
   SmartDashboard::init();
 
@@ -247,10 +260,5 @@ RobotBase::RobotBase() {
   DriverStation::InDisabled(true);
 
   // First and one-time initialization
-  inst.GetTable("LiveWindow")
-      ->GetSubTable(".status")
-      ->GetEntry("LW Enabled")
-      .SetBoolean(false);
-
   LiveWindow::SetEnabled(false);
 }

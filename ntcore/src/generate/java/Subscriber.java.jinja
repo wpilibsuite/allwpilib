@@ -1,0 +1,83 @@
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
+
+package edu.wpi.first.networktables;
+
+import {{ java.SupplierFunctionPackage|default('java.util.function') }}.{{ java.FunctionTypePrefix }}Supplier;
+
+/** NetworkTables {{ TypeName }} subscriber. */
+@SuppressWarnings("PMD.MissingOverride")
+public interface {{ TypeName }}Subscriber extends Subscriber, {{ java.FunctionTypePrefix }}Supplier{{ java.FunctionTypeSuffix }} {
+  /**
+   * Get the corresponding topic.
+   *
+   * @return Topic
+   */
+  @Override
+  {{ TypeName }}Topic getTopic();
+
+  /**
+   * Get the last published value.
+   * If no value has been published, returns the stored default value.
+   *
+   * @return value
+   */
+  {{ java.ValueType }} get();
+
+  /**
+   * Get the last published value.
+   * If no value has been published, returns the passed defaultValue.
+   *
+   * @param defaultValue default value to return if no value has been published
+   * @return value
+   */
+  {{ java.ValueType }} get({{ java.ValueType }} defaultValue);
+{% if java.FunctionTypePrefix %}
+  @Override
+  default {{ java.ValueType }} getAs{{ java.FunctionTypePrefix }}() {
+    return get();
+  }
+{% endif %}
+  /**
+   * Get the last published value along with its timestamp
+   * If no value has been published, returns the stored default value and a
+   * timestamp of 0.
+   *
+   * @return timestamped value
+   */
+  Timestamped{{ TypeName }} getAtomic();
+
+  /**
+   * Get the last published value along with its timestamp
+   * If no value has been published, returns the passed defaultValue and a
+   * timestamp of 0.
+   *
+   * @param defaultValue default value to return if no value has been published
+   * @return timestamped value
+   */
+  Timestamped{{ TypeName }} getAtomic({{ java.ValueType }} defaultValue);
+
+  /**
+   * Get an array of all value changes since the last call to readQueue.
+   * Also provides a timestamp for each value.
+   *
+   * <p>The "poll storage" subscribe option can be used to set the queue
+   * depth.
+   *
+   * @return Array of timestamped values; empty array if no new changes have
+   *     been published since the previous call.
+   */
+  Timestamped{{ TypeName }}[] readQueue();
+
+  /**
+   * Get an array of all value changes since the last call to readQueue.
+   *
+   * <p>The "poll storage" subscribe option can be used to set the queue
+   * depth.
+   *
+   * @return Array of values; empty array if no new changes have been
+   *     published since the previous call.
+   */
+  {{ java.ValueType }}[] readQueueValues();
+}

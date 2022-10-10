@@ -7,9 +7,10 @@
 #include <string>
 #include <vector>
 
-#include <ntcore_cpp.h>
+#include <networktables/NetworkTableInstance.h>
+#include <networktables/StringArrayTopic.h>
+#include <networktables/StringTopic.h>
 
-#include "glass/networktables/NetworkTablesHelper.h"
 #include "glass/other/StringChooser.h"
 
 namespace glass {
@@ -20,7 +21,7 @@ class NTStringChooserModel : public StringChooserModel {
 
   // path is to the table containing ".type", excluding the trailing /
   explicit NTStringChooserModel(std::string_view path);
-  NTStringChooserModel(NT_Inst inst, std::string_view path);
+  NTStringChooserModel(nt::NetworkTableInstance inst, std::string_view path);
 
   const std::string& GetDefault() override { return m_defaultValue; }
   const std::string& GetSelected() override { return m_selectedValue; }
@@ -29,21 +30,18 @@ class NTStringChooserModel : public StringChooserModel {
     return m_optionsValue;
   }
 
-  void SetDefault(std::string_view val) override;
   void SetSelected(std::string_view val) override;
-  void SetActive(std::string_view val) override;
-  void SetOptions(wpi::span<const std::string> val) override;
 
   void Update() override;
   bool Exists() override;
   bool IsReadOnly() override { return false; }
 
  private:
-  NetworkTablesHelper m_nt;
-  NT_Entry m_default;
-  NT_Entry m_selected;
-  NT_Entry m_active;
-  NT_Entry m_options;
+  nt::NetworkTableInstance m_inst;
+  nt::StringSubscriber m_default;
+  nt::StringEntry m_selected;
+  nt::StringSubscriber m_active;
+  nt::StringArraySubscriber m_options;
 
   std::string m_defaultValue;
   std::string m_selectedValue;

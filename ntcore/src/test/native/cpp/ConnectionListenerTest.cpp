@@ -5,6 +5,9 @@
 #include <chrono>
 #include <thread>
 
+#include <wpi/Synchronization.h>
+#include <wpi/mutex.h>
+
 #include "TestPrinters.h"
 #include "gtest/gtest.h"
 #include "ntcore_cpp.h"
@@ -22,20 +25,27 @@ class ConnectionListenerTest : public ::testing::Test {
     nt::DestroyInstance(client_inst);
   }
 
-  void Connect(unsigned int port);
+  void Connect(const char* address, unsigned int port3, unsigned int port4);
 
  protected:
   NT_Inst server_inst;
   NT_Inst client_inst;
 };
 
-void ConnectionListenerTest::Connect(unsigned int port) {
-  nt::StartServer(server_inst, "connectionlistenertest.ini", "127.0.0.1", port);
-  nt::StartClient(client_inst, "127.0.0.1", port);
+void ConnectionListenerTest::Connect(const char* address, unsigned int port3,
+                                     unsigned int port4) {
+  nt::StartServer(server_inst, "connectionlistenertest.ini", address, port3,
+                  port4);
+  nt::StartClient4(client_inst);
+  nt::SetServer(client_inst, address, port4);
 
-  // wait for client to report it's started, then wait another 0.1 sec
-  while ((nt::GetNetworkMode(client_inst) & NT_NET_MODE_STARTING) != 0) {
+  // wait for client to report it's connected, then wait another 0.1 sec
+  int count = 0;
+  while (!nt::IsConnected(client_inst)) {
     std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    if (++count > 30) {
+      FAIL() << "timed out waiting for client to start";
+    }
   }
   std::this_thread::sleep_for(std::chrono::milliseconds(100));
 }
@@ -49,13 +59,13 @@ TEST_F(ConnectionListenerTest, Polled) {
   ASSERT_NE(handle, 0u);
 
   // trigger a connect event
-  Connect(10000);
+  Connect("127.0.0.1", 0, 10020);
 
   // get the event
-  ASSERT_TRUE(nt::WaitForConnectionListenerQueue(server_inst, 1.0));
   bool timed_out = false;
-  auto result = nt::PollConnectionListener(poller, 0.1, &timed_out);
-  EXPECT_FALSE(timed_out);
+  ASSERT_TRUE(wpi::WaitForObject(poller, 1.0, &timed_out));
+  ASSERT_FALSE(timed_out);
+  auto result = nt::ReadConnectionListenerQueue(poller);
   ASSERT_EQ(result.size(), 1u);
   EXPECT_EQ(handle, result[0].listener);
   EXPECT_TRUE(result[0].connected);
@@ -65,41 +75,61 @@ TEST_F(ConnectionListenerTest, Polled) {
   std::this_thread::sleep_for(std::chrono::milliseconds(100));
 
   // get the event
-  ASSERT_TRUE(nt::WaitForConnectionListenerQueue(server_inst, 1.0));
   timed_out = false;
-  result = nt::PollConnectionListener(poller, 0.1, &timed_out);
-  EXPECT_FALSE(timed_out);
+  ASSERT_TRUE(wpi::WaitForObject(poller, 1.0, &timed_out));
+  ASSERT_FALSE(timed_out);
+  result = nt::ReadConnectionListenerQueue(poller);
   ASSERT_EQ(result.size(), 1u);
   EXPECT_EQ(handle, result[0].listener);
   EXPECT_FALSE(result[0].connected);
-
-  // trigger a disconnect event
 }
 
-TEST_F(ConnectionListenerTest, Threaded) {
+class ConnectionListenerVariantTest
+    : public ConnectionListenerTest,
+      public ::testing::WithParamInterface<std::pair<const char*, int>> {};
+
+TEST_P(ConnectionListenerVariantTest, Threaded) {
+  wpi::mutex m;
   std::vector<nt::ConnectionNotification> result;
   auto handle = nt::AddConnectionListener(
       server_inst,
-      [&](const nt::ConnectionNotification& event) { result.push_back(event); },
+      [&](const nt::ConnectionNotification& event) {
+        std::scoped_lock lock{m};
+        result.push_back(event);
+      },
       false);
 
   // trigger a connect event
-  Connect(10001);
+  Connect(GetParam().first, 0, 20001 + GetParam().second);
 
-  ASSERT_TRUE(nt::WaitForConnectionListenerQueue(server_inst, 1.0));
+  bool timed_out = false;
+  ASSERT_TRUE(wpi::WaitForObject(handle, 1.0, &timed_out));
+  ASSERT_FALSE(timed_out);
 
   // get the event
-  ASSERT_EQ(result.size(), 1u);
-  EXPECT_EQ(handle, result[0].listener);
-  EXPECT_TRUE(result[0].connected);
-  result.clear();
+  {
+    std::scoped_lock lock{m};
+    ASSERT_EQ(result.size(), 1u);
+    EXPECT_EQ(handle, result[0].listener);
+    EXPECT_TRUE(result[0].connected);
+    result.clear();
+  }
 
   // trigger a disconnect event
   nt::StopClient(client_inst);
   std::this_thread::sleep_for(std::chrono::milliseconds(100));
 
   // get the event
-  ASSERT_EQ(result.size(), 1u);
-  EXPECT_EQ(handle, result[0].listener);
-  EXPECT_FALSE(result[0].connected);
+  {
+    std::scoped_lock lock{m};
+    ASSERT_EQ(result.size(), 1u);
+    EXPECT_EQ(handle, result[0].listener);
+    EXPECT_FALSE(result[0].connected);
+  }
 }
+
+INSTANTIATE_TEST_SUITE_P(ConnectionListenerVariantTests,
+                         ConnectionListenerVariantTest,
+                         testing::Values(std::pair{"127.0.0.1", 0},
+                                         std::pair{"127.0.0.1 ", 1},
+                                         std::pair{" 127.0.0.1 ", 2}));

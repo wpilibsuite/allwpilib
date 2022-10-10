@@ -9,11 +9,7 @@
 #include <frc/smartdashboard/SmartDashboard.h>
 #include <frc2/command/CommandScheduler.h>
 
-void Robot::RobotInit() {
-  // Flush NetworkTables every loop. This ensures that robot pose and other
-  // values are sent during every iteration.
-  SetNetworkTablesFlushEnabled(true);
-}
+void Robot::RobotInit() {}
 
 /**
  * This function is called every 20 ms, no matter the mode. Use
