@@ -54,9 +54,14 @@ std::map<int, wpi::log::DataLogRecord>::iterator EntryData::GetIterator(int time
   wpi::log::DataLogRecord record;
   while(it != datapoints.end()){
     auto entry = *it;
+    // if new entry is after the timestamp, and this is the best timestamp OR no timestamp has been recorded yet, update iterator
+    
     if(entry.first > timestamp && (entry.first < record.GetTimestamp() || record.GetTimestamp() <= timestamp)){
       record = entry.second;
-      it = best_it;
+      best_it = it;
+    } else if(entry.first < timestamp && record.GetTimestamp() <= timestamp && entry.first > record.GetTimestamp()){
+      record = entry.second;
+      best_it = it;
     }
     ++it;
   }

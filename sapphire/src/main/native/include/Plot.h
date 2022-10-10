@@ -35,7 +35,7 @@ public:
                                                                 id{id}, 
                                                                 m_yAxis{yAxis} {};
     void EmitPlot(PlotView& view);
-    void CreatePlot(PlotAxis axis);
+    void CreatePlot(PlotAxis& axis, int startts, int endts, float SampleRate);
     void Update(PlotView& view);
     std::string GetId() const { return id; }
     ImVec4 m_color{1.0,1.0,1.0,1.0};
@@ -43,19 +43,21 @@ public:
 private:
     static constexpr int kMaxSize = 20000;
     int m_yAxis;
-    int m_offset = 0;
-    int m_size = 0;
+    // int m_offset = 0;
+    // int m_size = 0;
     EntryData* m_entry;
-    ImPlotPoint points[kMaxSize];
+    std::vector<ImPlotPoint> points;
 };
 
 class PlotView : public glass::View{
 public:
-    PlotView(float& now, std::string name) : m_now{now}, m_name{name} {
+    PlotView(float& now, std::string name, float sampleRate = 0.02f) : m_nowRef{now}, m_now{now}, m_name{name}, m_sampleRate{sampleRate} {
         m_axis.emplace_back(PlotAxis{m_name, 0, 0, true, false, true});
     };
     void Display() override;
-    float& m_now;
+    float m_now;
+    float& m_nowRef;
+    float m_sampleRate;
     int m_height = 0;
     std::string m_name;
 

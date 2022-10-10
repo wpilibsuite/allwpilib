@@ -24,30 +24,52 @@ double GetValue(EntryData& data, wpi::log::DataLogRecord record){
     return 0;
 }
 
-void EntryPlot::CreatePlot(PlotAxis axis){
-    auto begin = m_entry->GetIterator(axis.min);
-    auto end = m_entry->GetIterator(axis.max);
+void EntryPlot::CreatePlot(PlotAxis& axis, int startts, int endts, float sampleRate){
+    
+    points.clear();
+
+    auto begin = m_entry->GetIterator(startts);
+    auto end = m_entry->GetIterator(endts);
     auto it = begin;
     double& min = axis.min;
     double& max = axis.max;
-    int i = 0;
-    int size = 0;
+    // int i = 0;
+    // int size = 0;
+    double lastTimestamp = endts;
+    double lastValue = 0;
     while(it != end){
         auto record = it->second;
         auto value = GetValue(*m_entry, record);
-        if(value < min){ min = value; }
-        if(value > max){ max = value; }
-        points[i] = ImPlotPoint{it->first * 1e-6, value};
+        if(axis.autofit){
+            if(value <= min){ 
+                min = value; 
+                min -= abs(max-min)/10;
+                max += abs(max-min)/10;
+            }
+            if(value >= max){ 
+                max = value + (value/10);
+                min -= abs(max-min)/10;
+                max += abs(max-min)/10;
+            }
+        }
+        double timestamp = it->first*1e-6;
+        double timesteps = (timestamp - lastTimestamp)/sampleRate;
+        if(timestamp - lastTimestamp > sampleRate){ // if we have not changed for a significant amount of time
+            points.emplace_back(ImPlotPoint{timestamp-sampleRate, lastValue});
+        }
+        points.emplace_back(ImPlotPoint{timestamp, value});
         ++it;
-        i = (i + 1) % kMaxSize;
-        size++;
+        lastValue = value;
+        lastTimestamp = timestamp;
+        // i = (i + 1) % kMaxSize;
+        // size++;
     }
-    if(i < size){
-        m_offset = i;
-    } else {
-        m_offset = 0;
-    }
-    m_size = std::min(size, kMaxSize);
+    // if(i < size){
+    //     m_offset = i;
+    // } else {
+    //     m_offset = 0;
+    // }
+    // m_size = std::min(size, kMaxSize);
 }
 
 void EntryPlot::EmitPlot(PlotView& view){
@@ -55,24 +77,24 @@ void EntryPlot::EmitPlot(PlotView& view){
     struct GetterData {
         double now;
         double zeroTime;
-        ImPlotPoint* data;
-        int size;
-        int offset;
+        std::vector<ImPlotPoint>& data;
     };
-    GetterData getterData = {view.m_now, 0, points, kMaxSize, m_offset};
+    GetterData getterData = {view.m_now, 0, points};
     auto getter = [](int idx, void* data) {
         auto d = static_cast<GetterData*>(data);
-        if (idx == d->size) {
-            return ImPlotPoint{
-                d->now - d->zeroTime,
-                d->data[d->offset == 0 ? d->size - 1 : d->offset - 1].y};
-        }
-        ImPlotPoint* point;
-        if (d->offset + idx < d->size) {
-            point = &d->data[d->offset + idx];
-        } else {
-            point = &d->data[d->offset + idx - d->size];
-        }
+        
+        // if (idx == d->size) {
+        //     return ImPlotPoint{
+        //         d->now - d->zeroTime,
+        //         d->data[d->offset == 0 ? d->size - 1 : d->offset - 1].y};
+        // }
+        // ImPlotPoint* point;
+        // if (d->offset + idx < d->size) {
+        //     point = &d->data[d->offset + idx];
+        // } else {
+        //     point = &d->data[d->offset + idx - d->size];
+        // }
+        ImPlotPoint* point = &d->data[idx];
         return ImPlotPoint{point->x - d->zeroTime, point->y};
     };
     
@@ -81,7 +103,7 @@ void EntryPlot::EmitPlot(PlotView& view){
     } else {
         ImPlot::SetAxis(ImAxis_Y1);
     }
-    ImPlot::PlotLineG(id.c_str(), getter, &getterData, getterData.size + 1);
+    ImPlot::PlotLineG(id.c_str(), getter, &getterData, getterData.data.size());
 }
 
 void PlotView::EmitContextMenu(){
@@ -135,10 +157,10 @@ void PlotView::EmitPlot(){
 
         // setup x axis
         ImPlot::SetupAxis(ImAxis_X1, nullptr, ImPlotAxisFlags_NoMenus);
-        double now = m_now*1.0e-6;
+        double now = m_now;
         ImPlot::SetupAxisLimits(
             ImAxis_X1, now - settings.m_viewTime, now,
-            ImGuiCond_Once);
+            ImGuiCond_Always);
 
 
         // setup y axes
@@ -181,7 +203,10 @@ void PlotView::EmitPlot(){
 }
 void EntryPlot::Update(PlotView& view){
     auto& axis = view.m_axis[m_yAxis];
-    CreatePlot(axis);
+    int end = view.m_now * 1e6;
+    int start = 0;
+    CreatePlot(axis, start, end, view.m_sampleRate);
+    axis.apply = true;
 }
 
 void PlotView::Display() {
@@ -190,6 +215,10 @@ void PlotView::Display() {
         NotifyChange();
     }
     EmitPlot();
+    if(m_nowRef != m_now){
+        m_now = m_nowRef;
+        NotifyChange();
+    }
 }
 
 
@@ -198,4 +227,5 @@ void PlotView::NotifyChange(){
     for(auto& plot : plots){
         plot->Update(*this);
     }
+    settings.m_viewTime = m_now;
 }
