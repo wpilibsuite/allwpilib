@@ -7,12 +7,22 @@
 #include <functional>
 #include <initializer_list>
 #include <memory>
-#include <string>
 #include <utility>
+#include <vector>
 
 #include "frc2/command/Command.h"
 
 namespace frc2 {
+/**
+ * A wrapper around std::unique_ptr<Command> so commands have move-only
+ * semantics. Commands should only be stored and passed around when held in a
+ * CommandPtr instance. For more info, see
+ * https://github.com/wpilibsuite/allwpilib/issues/4303.
+ *
+ * Various classes in the command-based library accept a
+ * std::unique_ptr<Command>, use CommandPtr::Unwrap to convert.
+ * CommandPtr::UnwrapVector does the same for vectors.
+ */
 class CommandPtr final {
  public:
   explicit CommandPtr(std::unique_ptr<Command>&& command)
@@ -93,6 +103,16 @@ class CommandPtr final {
       std::initializer_list<Subsystem*> requirements) &&;
 
   /**
+   * Decorates this command with a set of commands to run after it in sequence.
+   * Often more convenient/less-verbose than constructing a new {@link
+   * SequentialCommandGroup} explicitly.
+   *
+   * @param next the commands to run next
+   * @return the decorated command
+   */
+  [[nodiscard]] CommandPtr AndThen(CommandPtr&& next) &&;
+
+  /**
    * Decorates this command with a runnable to run before this command starts.
    *
    * @param toRun the Runnable to run
@@ -113,6 +133,15 @@ class CommandPtr final {
   [[nodiscard]] CommandPtr BeforeStarting(
       std::function<void()> toRun,
       wpi::span<Subsystem* const> requirements = {}) &&;
+
+  /**
+   * Decorates this command with another command to run before this command
+   * starts.
+   *
+   * @param before the command to run before this one
+   * @return the decorated command
+   */
+  [[nodiscard]] CommandPtr BeforeStarting(CommandPtr&& before) &&;
 
   /**
    * Decorates this command with a timeout.  If the specified timeout is
@@ -148,9 +177,45 @@ class CommandPtr final {
   [[nodiscard]] CommandPtr Unless(std::function<bool()> condition) &&;
 
   /**
+   * Decorates this command with a set of commands to run parallel to it, ending
+   * when the calling command ends and interrupting all the others. Often more
+   * convenient/less-verbose than constructing a new {@link
+   * ParallelDeadlineGroup} explicitly.
+   *
+   * @param parallel the commands to run in parallel
+   * @return the decorated command
+   */
+  [[nodiscard]] CommandPtr DeadlineWith(CommandPtr&& parallel) &&;
+
+  /**
+   * Decorates this command with a set of commands to run parallel to it, ending
+   * when the last command ends. Often more convenient/less-verbose than
+   * constructing a new {@link ParallelCommandGroup} explicitly.
+   *
+   * @param parallel the commands to run in parallel
+   * @return the decorated command
+   */
+  [[nodiscard]] CommandPtr AlongWith(CommandPtr&& parallel) &&;
+
+  /**
+   * Decorates this command with a set of commands to run parallel to it, ending
+   * when the first command ends. Often more convenient/less-verbose than
+   * constructing a new {@link ParallelRaceGroup} explicitly.
+   *
+   * @param parallel the commands to run in parallel
+   * @return the decorated command
+   */
+  [[nodiscard]] CommandPtr RaceWith(CommandPtr&& parallel) &&;
+
+  /**
    * Get a raw pointer to the held command.
    */
   Command* get() const;
+
+  /**
+   * Convert to the underlying unique_ptr.
+   */
+  std::unique_ptr<Command> Unwrap() &&;
 
   /**
    * Schedules this command.
@@ -181,6 +246,12 @@ class CommandPtr final {
    * @return whether the subsystem is required
    */
   bool HasRequirement(Subsystem* requirement) const;
+
+  /**
+   * Convert a vector of CommandPtr objects to their underlying unique_ptrs.
+   */
+  static std::vector<std::unique_ptr<Command>> UnwrapVector(
+      std::vector<CommandPtr>&& vec);
 
  private:
   std::unique_ptr<Command> m_ptr;

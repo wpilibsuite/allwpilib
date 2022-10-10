@@ -80,36 +80,44 @@ CommandPtr CommandPtr::WithInterruptBehavior(
 
 CommandPtr CommandPtr::AndThen(std::function<void()> toRun,
                                wpi::span<Subsystem* const> requirements) && {
-  std::vector<std::unique_ptr<Command>> temp;
-  temp.emplace_back(std::move(m_ptr));
-  temp.emplace_back(
-      std::make_unique<InstantCommand>(std::move(toRun), requirements));
-  m_ptr = std::make_unique<SequentialCommandGroup>(std::move(temp));
-  return std::move(*this);
+  return std::move(*this).AndThen(CommandPtr(
+      std::make_unique<InstantCommand>(std::move(toRun), requirements)));
 }
 
 CommandPtr CommandPtr::AndThen(
     std::function<void()> toRun,
     std::initializer_list<Subsystem*> requirements) && {
-  return std::move(*this).AndThen(std::move(toRun),
-                                  {requirements.begin(), requirements.end()});
+  return std::move(*this).AndThen(CommandPtr(
+      std::make_unique<InstantCommand>(std::move(toRun), requirements)));
 }
 
-CommandPtr CommandPtr::BeforeStarting(
-    std::function<void()> toRun, wpi::span<Subsystem* const> requirements) && {
+CommandPtr CommandPtr::AndThen(CommandPtr&& next) && {
   std::vector<std::unique_ptr<Command>> temp;
-  temp.emplace_back(
-      std::make_unique<InstantCommand>(std::move(toRun), requirements));
   temp.emplace_back(std::move(m_ptr));
+  temp.emplace_back(std::move(next).Unwrap());
   m_ptr = std::make_unique<SequentialCommandGroup>(std::move(temp));
   return std::move(*this);
 }
 
 CommandPtr CommandPtr::BeforeStarting(
+    std::function<void()> toRun, wpi::span<Subsystem* const> requirements) && {
+  return std::move(*this).BeforeStarting(CommandPtr(
+      std::make_unique<InstantCommand>(std::move(toRun), requirements)));
+}
+
+CommandPtr CommandPtr::BeforeStarting(
     std::function<void()> toRun,
     std::initializer_list<Subsystem*> requirements) && {
-  return std::move(*this).BeforeStarting(
-      std::move(toRun), {requirements.begin(), requirements.end()});
+  return std::move(*this).BeforeStarting(CommandPtr(
+      std::make_unique<InstantCommand>(std::move(toRun), requirements)));
+}
+
+CommandPtr CommandPtr::BeforeStarting(CommandPtr&& before) && {
+  std::vector<std::unique_ptr<Command>> temp;
+  temp.emplace_back(std::move(before).Unwrap());
+  temp.emplace_back(std::move(m_ptr));
+  m_ptr = std::make_unique<SequentialCommandGroup>(std::move(temp));
+  return std::move(*this);
 }
 
 CommandPtr CommandPtr::WithTimeout(units::second_t duration) && {
@@ -135,8 +143,36 @@ CommandPtr CommandPtr::Unless(std::function<bool()> condition) && {
   return std::move(*this);
 }
 
+CommandPtr CommandPtr::DeadlineWith(CommandPtr&& parallel) && {
+  std::vector<std::unique_ptr<Command>> vec;
+  vec.emplace_back(std::move(parallel).Unwrap());
+  m_ptr =
+      std::make_unique<ParallelDeadlineGroup>(std::move(m_ptr), std::move(vec));
+  return std::move(*this);
+}
+
+CommandPtr CommandPtr::AlongWith(CommandPtr&& parallel) && {
+  std::vector<std::unique_ptr<Command>> vec;
+  vec.emplace_back(std::move(m_ptr));
+  vec.emplace_back(std::move(parallel).Unwrap());
+  m_ptr = std::make_unique<ParallelCommandGroup>(std::move(vec));
+  return std::move(*this);
+}
+
+CommandPtr CommandPtr::RaceWith(CommandPtr&& parallel) && {
+  std::vector<std::unique_ptr<Command>> vec;
+  vec.emplace_back(std::move(m_ptr));
+  vec.emplace_back(std::move(parallel).Unwrap());
+  m_ptr = std::make_unique<ParallelRaceGroup>(std::move(vec));
+  return std::move(*this);
+}
+
 Command* CommandPtr::get() const {
   return m_ptr.get();
+}
+
+std::unique_ptr<Command> CommandPtr::Unwrap() && {
+  return std::move(m_ptr);
 }
 
 void CommandPtr::Schedule() const {
@@ -153,4 +189,13 @@ bool CommandPtr::IsScheduled() const {
 
 bool CommandPtr::HasRequirement(Subsystem* requirement) const {
   return m_ptr->HasRequirement(requirement);
+}
+
+std::vector<std::unique_ptr<Command>> CommandPtr::UnwrapVector(
+    std::vector<CommandPtr>&& vec) {
+  std::vector<std::unique_ptr<Command>> ptrs;
+  for (auto&& ptr : vec) {
+    ptrs.emplace_back(std::move(ptr).Unwrap());
+  }
+  return ptrs;
 }
