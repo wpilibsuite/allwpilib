@@ -68,7 +68,7 @@ public final class TrajectoryUtil {
   }
 
   /**
-   * Imports a Trajectory from a PathWeaver-style JSON file.
+   * Imports a Trajectory from a JSON file exported from PathWeaver.
    *
    * @param path The path of the json file to import from
    * @return The trajectory represented by the file.
@@ -90,7 +90,7 @@ public final class TrajectoryUtil {
   }
 
   /**
-   * Deserializes a Trajectory from PathWeaver-style JSON.
+   * Deserializes a Trajectory from JSON exported from PathWeaver.
    *
    * @param json The string containing the serialized JSON
    * @return the trajectory represented by the JSON
