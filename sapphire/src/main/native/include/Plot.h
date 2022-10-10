@@ -11,7 +11,7 @@
 #include <vector>
 
 namespace sapphire{
-class PlotView;
+class Plot;
 
 struct PlotSettings {
     bool m_settings = true;
@@ -31,12 +31,13 @@ struct PlotAxis{
 
 class EntryPlot {
 public:
-    EntryPlot(EntryData* entry, std::string id, int yAxis = 0) : m_entry{entry}, 
+    EntryPlot(EntryData* entry, std::string id, int yAxis = 0, int number = 0) : m_entry{entry}, 
                                                                 id{id}, 
                                                                 m_yAxis{yAxis},
-                                                                _color{1.0,1.0,1.0,1.0},
+                                                                number{number},
+                                                                _color{1.0,1.0,1.0,-1.0},
                                                                 m_color{_color} {};
-    void EmitPlot(PlotView& view);
+    void EmitPlot(Plot& view);
     
     enum PlotAction{
         ACTION_NOTHING,
@@ -47,11 +48,12 @@ public:
 
     EntryPlot::PlotAction EmitSettings();
     void CreatePlot(PlotAxis& axis, int startts, int endts, float SampleRate);
-    void Update(PlotView& view);
-    void CheckForChange(PlotView& view);
+    void Update(Plot& view);
+    void CheckForChange(Plot& view);
     std::string GetId() const { return id; }
     std::vector<float> _color;
     glass::ColorSetting m_color;
+    int number;
     std::string id;
 private:
     static constexpr int kMaxSize = 20000;
@@ -62,12 +64,12 @@ private:
     std::vector<ImPlotPoint> points;
 };
 
-class PlotView : public glass::View{
+class Plot{
 public:
-    PlotView(float& now, std::string name, float sampleRate = 0.02f) : m_nowRef{now}, m_now{now}, m_name{name}, m_sampleRate{sampleRate} {
+    Plot(float& now, std::string name, float sampleRate = 0.02f) : m_nowRef{now}, m_now{now}, m_name{name}, m_sampleRate{sampleRate} {
         m_axis.emplace_back(PlotAxis{m_name, 0, 0, true, false, true});
     };
-    void Display() override;
+    void Display() ;
     float m_now;
     float& m_nowRef;
     float m_sampleRate;
@@ -88,6 +90,16 @@ public:
 private:
     void NotifyChange();
 
+};
+
+class PlotView : public glass::View{
+    public:
+    PlotView(float& now, std::string name) : m_now{now}, m_name{name} {}
+    void Display() override;
+    void EmitContextMenu();
+    std::string m_name;
+    std::vector<std::unique_ptr<Plot> > plots;
+    float& m_now;
 };
 
 }

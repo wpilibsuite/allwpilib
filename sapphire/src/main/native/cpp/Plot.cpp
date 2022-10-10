@@ -5,6 +5,7 @@
 #include <imgui_stdlib.h>
 #include <implot.h>
 #include <implot_internal.h>
+#include "fmt/format.h"
 
 #include <wpi/timestamp.h>
 using namespace sapphire;
@@ -61,7 +62,7 @@ void EntryPlot::CreatePlot(PlotAxis& axis, int startts, int endts, float sampleR
     }
 }
 
-void EntryPlot::EmitPlot(PlotView& view){
+void EntryPlot::EmitPlot(Plot& view){
     
     struct GetterData {
         double now;
@@ -95,8 +96,8 @@ void EntryPlot::EmitPlot(PlotView& view){
     ImPlot::PlotLineG(id.c_str(), getter, &getterData, getterData.data.size());
 }
 
-void PlotView::EmitContextMenu(){
-    if (ImGui::BeginPopupContextItem(m_name.c_str())) {
+void Plot::EmitContextMenu(){
+    if (ImGui::BeginMenu(m_name.c_str())) {
         if(ImGui::MenuItem("Display Settings", "", settings.m_settings)){
             settings.m_settings = !settings.m_settings;
         }
@@ -104,7 +105,7 @@ void PlotView::EmitContextMenu(){
             settings.m_legend = !settings.m_legend;
         }
         EmitSettings();
-        ImGui::EndPopup();
+        ImGui::EndMenu();
     }
 }
 
@@ -121,7 +122,7 @@ EntryPlot::PlotAction EntryPlot::EmitSettings(){
     return ACTION_NOTHING;
 }
 
-void PlotView::EmitSettings(){
+void Plot::EmitSettings(){
     ImGui::PushID("Settings");
     if(!settings.m_autoheight){
         if(ImGui::InputInt("Height", &m_height)){
@@ -148,7 +149,7 @@ void PlotView::EmitSettings(){
     ImGui::PopID();
 }
 
-void PlotView::DragDropAccept(){
+void Plot::DragDropAccept(){
     if(const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("EntryData")){
         auto source = *static_cast<EntryData**>(payload->Data);
         auto it =
@@ -156,13 +157,13 @@ void PlotView::DragDropAccept(){
                 return elem->GetId() == source->GetName();
             });
         if(it == plots.end()){
-            plots.emplace_back(std::make_unique<EntryPlot>(source, source->GetName(), 0) );
+            plots.emplace_back(std::make_unique<EntryPlot>(source, source->GetName(), 0, plots.size()) );
             NotifyChange();
         }
     }
 }
 
-void PlotView::DragDropTarget(){
+void Plot::DragDropTarget(){
     if(ImPlot::BeginDragDropTargetPlot() ||
         ImPlot::BeginDragDropTargetLegend()){
         DragDropAccept();
@@ -170,7 +171,7 @@ void PlotView::DragDropTarget(){
     }
 }
 
-void PlotView::EmitPlot(){
+void Plot::EmitPlot(){
     
     if (ImPlot::BeginPlot(m_name.c_str(), ImVec2(-1, m_height))) {
     
@@ -210,6 +211,9 @@ void PlotView::EmitPlot(){
         ImPlot::SetupFinish();
 
         for(auto& plot : plots){
+            if (plot->m_color.GetColorFloat()[3] == IMPLOT_AUTO) {
+                plot->m_color.SetColor(ImPlot::GetColormapColor(plot->number));
+            }
             ImPlot::SetNextLineStyle(plot->m_color.GetColor());
             plot->EmitPlot(*this);
         }
@@ -220,7 +224,7 @@ void PlotView::EmitPlot(){
         ImPlot::EndPlot();
     }
 }
-void EntryPlot::Update(PlotView& view){
+void EntryPlot::Update(Plot& view){
     auto& axis = view.m_axis[m_yAxis];
     int end = (m_offset * 1e6) + (view.m_now * 1e6);
     int start = m_offset * 1e6;
@@ -228,19 +232,17 @@ void EntryPlot::Update(PlotView& view){
     axis.apply = true;
 }
 
-void EntryPlot::CheckForChange(PlotView& view){
+void EntryPlot::CheckForChange(Plot& view){
     if(m_offset != m_entry->GetOffset()){
         m_offset = m_entry->GetOffset();
         Update(view);
     }
 }
 
-void PlotView::Display() {
+void Plot::Display() {
     ImGui::PushID(m_name.c_str());
 
-    EmitContextMenu();
-    
-    ImGui::Text("Plot View");
+    ImGui::Text(m_name.c_str());
     EmitPlot();
     if(m_nowRef != m_now){
         m_now = m_nowRef;
@@ -254,10 +256,35 @@ void PlotView::Display() {
 }
 
 
-void PlotView::NotifyChange(){
+void Plot::NotifyChange(){
     // Update all EntryPlot's
     for(auto& plot : plots){
         plot->Update(*this);
     }
     settings.m_viewTime = m_now;
+}
+
+
+void PlotView::EmitContextMenu(){
+    if (ImGui::BeginPopupContextItem(m_name.c_str())) {
+        if(ImGui::Button("Add Plot")){
+            plots.emplace_back(std::make_unique<Plot>(m_now, fmt::format("Plot {}", plots.size()+1)));
+        }
+        for(auto& plot : plots){
+            plot->EmitContextMenu();
+        }
+        ImGui::EndPopup();
+    }        
+}
+
+void PlotView::Display(){
+    EmitContextMenu();
+    if(plots.size() == 0){
+        if(ImGui::Button("Add Plot")){
+            plots.emplace_back(std::make_unique<Plot>(m_now, fmt::format("Plot {}", plots.size()+1)));
+        }
+    }
+    for(auto& plot : plots){
+        plot->Display();
+    }
 }

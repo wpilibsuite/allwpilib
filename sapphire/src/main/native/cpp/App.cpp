@@ -111,7 +111,7 @@ void Application(std::string_view saveDir) {
 
   auto& timestamp = logViewer->GetTimestamp();
 
-  std::unique_ptr<PlotView> plot = std::make_unique<PlotView>(logViewer->GetTimestamp(), "Plot 1");
+  std::unique_ptr<PlotView> plotView = std::make_unique<PlotView>(logViewer->GetTimestamp(), "PlotView 1");
 
   m_logSelectorWindow = m_windowManager->AddWindow(
     "Log Selector", std::move(selector));
@@ -120,7 +120,7 @@ void Application(std::string_view saveDir) {
     "Entry Manager", std::move(logViewer));
 
   m_plotWindow = m_windowManager->AddWindow(
-    "Plot", std::move(plot));
+    "Plot", std::move(plotView));
 
 
   gui::AddWindowScaler([](float scale) { gDefaultScale = scale; });
