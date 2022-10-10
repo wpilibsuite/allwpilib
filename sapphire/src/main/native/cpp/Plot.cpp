@@ -25,7 +25,6 @@ double GetValue(EntryData& data, wpi::log::DataLogRecord record){
 }
 
 void EntryPlot::CreatePlot(PlotAxis& axis, int startts, int endts, float sampleRate){
-    
     points.clear();
 
     auto begin = m_entry->GetIterator(startts);
@@ -33,8 +32,6 @@ void EntryPlot::CreatePlot(PlotAxis& axis, int startts, int endts, float sampleR
     auto it = begin;
     double& min = axis.min;
     double& max = axis.max;
-    // int i = 0;
-    // int size = 0;
     double lastTimestamp = endts;
     double lastValue = 0;
     while(it != end){
@@ -55,21 +52,13 @@ void EntryPlot::CreatePlot(PlotAxis& axis, int startts, int endts, float sampleR
         double timestamp = it->first*1e-6;
         double timesteps = (timestamp - lastTimestamp)/sampleRate;
         if(timestamp - lastTimestamp > sampleRate){ // if we have not changed for a significant amount of time
-            points.emplace_back(ImPlotPoint{timestamp-sampleRate, lastValue});
+            points.emplace_back(ImPlotPoint{timestamp-sampleRate - m_offset, lastValue});
         }
-        points.emplace_back(ImPlotPoint{timestamp, value});
+        points.emplace_back(ImPlotPoint{timestamp - m_offset, value});
         ++it;
         lastValue = value;
         lastTimestamp = timestamp;
-        // i = (i + 1) % kMaxSize;
-        // size++;
     }
-    // if(i < size){
-    //     m_offset = i;
-    // } else {
-    //     m_offset = 0;
-    // }
-    // m_size = std::min(size, kMaxSize);
 }
 
 void EntryPlot::EmitPlot(PlotView& view){
@@ -114,9 +103,26 @@ void PlotView::EmitContextMenu(){
         if(ImGui::MenuItem("Display Legend", "", settings.m_legend)){
             settings.m_legend = !settings.m_legend;
         }
+        EmitSettings();
+        ImGui::EndPopup();
     }
 }
+
+EntryPlot::PlotAction EntryPlot::EmitSettings(){
+    if(ImGui::CollapsingHeader(id.c_str())){
+        ImGui::PushID(id.c_str());
+        if(ImGui::Button("Delete")){
+            ImGui::PopID();
+            return ACTION_DELETE;
+        }
+        m_color.ColorEdit3(id.c_str());
+        ImGui::PopID();
+    }
+    return ACTION_NOTHING;
+}
+
 void PlotView::EmitSettings(){
+    ImGui::PushID("Settings");
     if(!settings.m_autoheight){
         if(ImGui::InputInt("Height", &m_height)){
             if(m_height < 0){
@@ -124,6 +130,22 @@ void PlotView::EmitSettings(){
             }
         }
     }
+    std::vector<int> removed_idxs;
+    for(int i = 0; i < plots.size(); i++){
+        auto& plot = plots[i];
+        auto action = plot->EmitSettings();
+        if(action == EntryPlot::ACTION_DELETE){
+            removed_idxs.emplace_back(i);
+        }
+    }
+    for(int i = removed_idxs.size()-1; i >= 0; i--){
+        auto idx = removed_idxs[i];
+        if(idx < plots.size()){
+            plots.erase(plots.begin()+idx);
+        }
+    }
+
+    ImGui::PopID();
 }
 
 void PlotView::DragDropAccept(){
@@ -135,6 +157,7 @@ void PlotView::DragDropAccept(){
             });
         if(it == plots.end()){
             plots.emplace_back(std::make_unique<EntryPlot>(source, source->GetName(), 0) );
+            NotifyChange();
         }
     }
 }
@@ -148,10 +171,7 @@ void PlotView::DragDropTarget(){
 }
 
 void PlotView::EmitPlot(){
-    ImGui::PushID(m_name.c_str());
-    EmitContextMenu();
-    if(settings.m_settings){ EmitSettings(); }
-
+    
     if (ImPlot::BeginPlot(m_name.c_str(), ImVec2(-1, m_height))) {
     
 
@@ -190,7 +210,7 @@ void PlotView::EmitPlot(){
         ImPlot::SetupFinish();
 
         for(auto& plot : plots){
-            ImPlot::SetNextLineStyle(plot->m_color);
+            ImPlot::SetNextLineStyle(plot->m_color.GetColor());
             plot->EmitPlot(*this);
         }
 
@@ -199,26 +219,38 @@ void PlotView::EmitPlot(){
         ImPlotPlot* plot = ImPlot::GetCurrentPlot();
         ImPlot::EndPlot();
     }
-    ImGui::PopID();
 }
 void EntryPlot::Update(PlotView& view){
     auto& axis = view.m_axis[m_yAxis];
-    int end = view.m_now * 1e6;
-    int start = 0;
+    int end = (m_offset * 1e6) + (view.m_now * 1e6);
+    int start = m_offset * 1e6;
     CreatePlot(axis, start, end, view.m_sampleRate);
     axis.apply = true;
 }
 
-void PlotView::Display() {
-    ImGui::Text("Plot View");
-    if(ImGui::Button("Update")){
-        NotifyChange();
+void EntryPlot::CheckForChange(PlotView& view){
+    if(m_offset != m_entry->GetOffset()){
+        m_offset = m_entry->GetOffset();
+        Update(view);
     }
+}
+
+void PlotView::Display() {
+    ImGui::PushID(m_name.c_str());
+
+    EmitContextMenu();
+    
+    ImGui::Text("Plot View");
     EmitPlot();
     if(m_nowRef != m_now){
         m_now = m_nowRef;
         NotifyChange();
     }
+    for(auto& plot : plots){
+        plot->CheckForChange(*this);
+    }
+
+    ImGui::PopID();
 }
 
 

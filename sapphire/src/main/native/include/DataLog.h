@@ -29,13 +29,14 @@ struct EntryData {
   wpi::log::DataLogRecord GetNextRecord(int timestamp);
   
   std::string GetName() const { return name; }
-
+  void SetOffsetPtr(float *offset) {this->offset = offset;}
+  float GetOffset() const {return *offset; }
   std::map<int, wpi::log::DataLogRecord>::iterator GetIterator(int timestamp);
   int entry;
   std::string name;
   std::string type;
   std::string metadata;
-
+  float *offset = nullptr;
   std::map<int, wpi::log::DataLogRecord> datapoints;
   int finishTimestamp = INT_MAX;
 };

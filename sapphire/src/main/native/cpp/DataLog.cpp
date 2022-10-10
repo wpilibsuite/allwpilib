@@ -92,6 +92,7 @@ bool DataLogModel::LoadWPILog(std::string filename) {
       if(m_entries.find(start.entry) != m_entries.end()){ continue; } // This should probably be an error
 
       m_entries[start.entry] = std::make_unique<EntryData>(start);
+      m_entries[start.entry]->SetOffsetPtr(&offset);
       AddEntryNode(m_entries[start.entry].get(), m_entries[start.entry]->name);
     } else if(record.GetFinishEntry(&entryId)) {
       // If we find a finish entry,

@@ -14,7 +14,7 @@ namespace sapphire{
 class PlotView;
 
 struct PlotSettings {
-    bool m_settings = false;
+    bool m_settings = true;
     bool m_autoheight = true;
     bool m_legend = true;
     float m_viewTime = 0.1f; 
@@ -33,17 +33,30 @@ class EntryPlot {
 public:
     EntryPlot(EntryData* entry, std::string id, int yAxis = 0) : m_entry{entry}, 
                                                                 id{id}, 
-                                                                m_yAxis{yAxis} {};
+                                                                m_yAxis{yAxis},
+                                                                _color{1.0,1.0,1.0,1.0},
+                                                                m_color{_color} {};
     void EmitPlot(PlotView& view);
+    
+    enum PlotAction{
+        ACTION_NOTHING,
+        ACTION_UP,
+        ACTION_DOWN,
+        ACTION_DELETE
+    };
+
+    EntryPlot::PlotAction EmitSettings();
     void CreatePlot(PlotAxis& axis, int startts, int endts, float SampleRate);
     void Update(PlotView& view);
+    void CheckForChange(PlotView& view);
     std::string GetId() const { return id; }
-    ImVec4 m_color{1.0,1.0,1.0,1.0};
+    std::vector<float> _color;
+    glass::ColorSetting m_color;
     std::string id;
 private:
     static constexpr int kMaxSize = 20000;
     int m_yAxis;
-    // int m_offset = 0;
+    float m_offset = 0;
     // int m_size = 0;
     EntryData* m_entry;
     std::vector<ImPlotPoint> points;
