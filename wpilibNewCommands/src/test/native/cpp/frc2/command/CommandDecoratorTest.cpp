@@ -7,6 +7,7 @@
 #include "CommandTestBase.h"
 #include "frc2/command/ConditionalCommand.h"
 #include "frc2/command/EndlessCommand.h"
+#include "frc2/command/FunctionalCommand.h"
 #include "frc2/command/InstantCommand.h"
 #include "frc2/command/ParallelRaceGroup.h"
 #include "frc2/command/PerpetualCommand.h"
@@ -151,4 +152,63 @@ TEST_F(CommandDecoratorTest, Unless) {
   scheduler.Schedule(command);
   scheduler.Run();
   EXPECT_TRUE(hasRun);
+}
+
+TEST_F(CommandDecoratorTest, FinallyDo) {
+  CommandScheduler scheduler = GetScheduler();
+  int first = 0;
+  int second = 0;
+  CommandPtr command = FunctionalCommand([] {}, [] {},
+                                         [&first](bool interrupted) {
+                                           if (!interrupted) {
+                                             first++;
+                                           }
+                                         },
+                                         [] { return true; })
+                           .FinallyDo([&first, &second](bool interrupted) {
+                             if (!interrupted) {
+                               // to differentiate between "didn't run" and "ran
+                               // before command's `end()`
+                               second += 1 + first;
+                             }
+                           });
+
+  scheduler.Schedule(command);
+  EXPECT_EQ(0, first);
+  EXPECT_EQ(0, second);
+  scheduler.Run();
+  EXPECT_EQ(1, first);
+  // if `second == 0`, neither of the lambdas ran.
+  // if `second == 1`, the second lambda ran before the first one
+  EXPECT_EQ(2, second);
+}
+
+// handleInterruptTest() implicitly tests the interrupt=true branch of
+// finallyDo()
+TEST_F(CommandDecoratorTest, HandleInterrupt) {
+  CommandScheduler scheduler = GetScheduler();
+  int first = 0;
+  int second = 0;
+  CommandPtr command = FunctionalCommand([] {}, [] {},
+                                         [&first](bool interrupted) {
+                                           if (interrupted) {
+                                             first++;
+                                           }
+                                         },
+                                         [] { return false; })
+                           .HandleInterrupt([&first, &second] {
+                             // to differentiate between "didn't run" and "ran
+                             // before command's `end()`
+                             second += 1 + first;
+                           });
+
+  scheduler.Schedule(command);
+  scheduler.Run();
+  EXPECT_EQ(0, first);
+  EXPECT_EQ(0, second);
+
+  scheduler.Cancel(command);
+  // if `second == 0`, neither of the lambdas ran.
+  // if `second == 1`, the second lambda ran before the first one
+  EXPECT_EQ(2, second);
 }

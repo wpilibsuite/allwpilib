@@ -108,6 +108,16 @@ CommandPtr Command::Unless(std::function<bool()> condition) && {
       .Unless(std::move(condition));
 }
 
+CommandPtr Command::FinallyDo(std::function<void(bool)> end) && {
+  return CommandPtr(std::move(*this).TransferOwnership())
+      .FinallyDo(std::move(end));
+}
+
+CommandPtr Command::HandleInterrupt(std::function<void(void)> handler) && {
+  return CommandPtr(std::move(*this).TransferOwnership())
+      .HandleInterrupt(std::move(handler));
+}
+
 void Command::Schedule() {
   CommandScheduler::GetInstance().Schedule(this);
 }

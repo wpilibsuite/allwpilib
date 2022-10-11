@@ -167,6 +167,37 @@ CommandPtr CommandPtr::RaceWith(CommandPtr&& parallel) && {
   return std::move(*this);
 }
 
+namespace {
+class FinallyCommand : public WrapperCommand {
+ public:
+  FinallyCommand(std::unique_ptr<Command>&& command,
+                 std::function<void(bool)> end)
+      : WrapperCommand(std::move(command)), m_end(std::move(end)) {}
+
+  void End(bool interrupted) override {
+    WrapperCommand::End(interrupted);
+    m_end(interrupted);
+  }
+
+ private:
+  std::function<void(bool)> m_end;
+};
+}  // namespace
+
+CommandPtr CommandPtr::FinallyDo(std::function<void(bool)> end) && {
+  m_ptr = std::make_unique<FinallyCommand>(std::move(m_ptr), std::move(end));
+  return std::move(*this);
+}
+
+CommandPtr CommandPtr::HandleInterrupt(std::function<void(void)> handler) && {
+  return std::move(*this).FinallyDo(
+      [handler = std::move(handler)](bool interrupted) {
+        if (interrupted) {
+          handler();
+        }
+      });
+}
+
 Command* CommandPtr::get() const {
   return m_ptr.get();
 }
