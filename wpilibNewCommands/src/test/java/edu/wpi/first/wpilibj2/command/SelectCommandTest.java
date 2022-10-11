@@ -10,6 +10,7 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 
 import java.util.Map;
+import java.util.function.Supplier;
 import org.junit.jupiter.api.Test;
 
 class SelectCommandTest extends CommandTestBase {
@@ -24,13 +25,15 @@ class SelectCommandTest extends CommandTestBase {
       MockCommandHolder command3Holder = new MockCommandHolder(true);
       Command command3 = command3Holder.getMock();
 
+      Supplier<String> selector = () -> "one";
+
       SelectCommand selectCommand =
           new SelectCommand(
               Map.ofEntries(
                   Map.entry("one", command1),
                   Map.entry("two", command2),
                   Map.entry("three", command3)),
-              () -> "one");
+              selector);
 
       scheduler.schedule(selectCommand);
       scheduler.run();

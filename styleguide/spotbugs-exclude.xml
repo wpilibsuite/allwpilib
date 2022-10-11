@@ -62,6 +62,10 @@
   </Match>
   <Match>
     <Bug pattern="NS_DANGEROUS_NON_SHORT_CIRCUIT" />
+    <Source name="SelectCommand.java" />
+  </Match>
+  <Match>
+    <Bug pattern="NS_DANGEROUS_NON_SHORT_CIRCUIT" />
     <Source name="SequentialCommandGroup.java" />
   </Match>
   <Match>

@@ -9,6 +9,7 @@ import static edu.wpi.first.wpilibj2.command.CommandGroupBase.requireUngrouped;
 
 import java.util.Map;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 /**
  * Runs one of a selection of commands, either using a selector and a key to command mapping, or a
@@ -26,85 +27,47 @@ import java.util.function.Supplier;
  *
  * <p>This class is provided by the NewCommands VendorDep
  */
-public class SelectCommand extends CommandBase {
-  private final Map<Object, Command> m_commands;
-  private final Supplier<Object> m_selector;
-  private final Supplier<Command> m_toRun;
-  private Command m_selectedCommand;
+public class SelectCommand extends SuppliedCommand {
+  private final Map<?, Command> m_commands;
 
   /**
-   * Creates a new selectcommand.
+   * Creates a new SelectCommand.
    *
+   * @param <T> the type of keys
    * @param commands the map of commands to choose from
    * @param selector the selector to determine which command to run
    */
-  public SelectCommand(Map<Object, Command> commands, Supplier<Object> selector) {
-    requireUngrouped(commands.values());
-
-    CommandGroupBase.registerGroupedCommands(commands.values().toArray(new Command[] {}));
+  public <T> SelectCommand(Map<T, Command> commands, Supplier<T> selector) {
+    super(
+        () ->
+            commands.getOrDefault(
+                selector.get(),
+                new PrintCommand(
+                    "SelectCommand selector value does not correspond to any command!")),
+        commands.values().stream()
+            .flatMap(command -> command.getRequirements().stream())
+            .collect(Collectors.toSet()));
 
     m_commands = requireNonNullParam(commands, "commands", "SelectCommand");
-    m_selector = requireNonNullParam(selector, "selector", "SelectCommand");
+    requireNonNullParam(selector, "selector", "SelectCommand");
 
-    m_toRun = null;
-
-    for (Command command : m_commands.values()) {
-      m_requirements.addAll(command.getRequirements());
-    }
-  }
-
-  /**
-   * Creates a new selectcommand.
-   *
-   * @param toRun a supplier providing the command to run
-   */
-  public SelectCommand(Supplier<Command> toRun) {
-    m_commands = null;
-    m_selector = null;
-    m_toRun = requireNonNullParam(toRun, "toRun", "SelectCommand");
-  }
-
-  @Override
-  public void initialize() {
-    if (m_selector != null) {
-      if (!m_commands.keySet().contains(m_selector.get())) {
-        m_selectedCommand =
-            new PrintCommand(
-                "SelectCommand selector value does not correspond to" + " any command!");
-        return;
-      }
-      m_selectedCommand = m_commands.get(m_selector.get());
-    } else {
-      m_selectedCommand = m_toRun.get();
-    }
-    m_selectedCommand.initialize();
-  }
-
-  @Override
-  public void execute() {
-    m_selectedCommand.execute();
-  }
-
-  @Override
-  public void end(boolean interrupted) {
-    m_selectedCommand.end(interrupted);
-  }
-
-  @Override
-  public boolean isFinished() {
-    return m_selectedCommand.isFinished();
+    requireUngrouped(commands.values());
+    CommandGroupBase.registerGroupedCommands(commands.values().toArray(Command[]::new));
   }
 
   @Override
   public boolean runsWhenDisabled() {
-    if (m_commands != null) {
-      boolean runsWhenDisabled = true;
-      for (Command command : m_commands.values()) {
-        runsWhenDisabled &= command.runsWhenDisabled();
-      }
-      return runsWhenDisabled;
-    } else {
-      return m_toRun.get().runsWhenDisabled();
-    }
+    // command runs when disabled only if all options run when disabled
+    return m_commands.values().stream().allMatch(Command::runsWhenDisabled);
+  }
+
+  @Override
+  public InterruptionBehavior getInterruptionBehavior() {
+    // command is non-interruptible iff all commands are non-interruptible
+    return m_commands.values().stream()
+            .map(Command::getInterruptionBehavior)
+            .allMatch(InterruptionBehavior.kCancelIncoming::equals)
+        ? InterruptionBehavior.kCancelIncoming
+        : InterruptionBehavior.kCancelSelf;
   }
 }

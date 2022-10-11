@@ -82,11 +82,21 @@ class SelectCommand : public CommandHelper<CommandBase, SelectCommand<Key>> {
         return;
       }
     }
-
+    bool hasInterruptible = false;
+    bool hasNonInterruptible = false;
     for (auto&& command : commands) {
       this->AddRequirements(command.second->GetRequirements());
       m_runsWhenDisabled &= command.second->RunsWhenDisabled();
+      if (command.second->GetInterruptionBehavior() == Command::InterruptionBehavior::kCancelSelf) {
+        hasInterruptible = true;
+      } else {
+        hasNonInterruptible = true;
+      }
       m_commands.emplace(std::move(command.first), std::move(command.second));
+    }
+    // command is non-interruptible iff all commands are non-interruptible
+    if (hasNonInterruptible && !hasInterruptible) {
+      m_interruptBehavior = Command::InterruptionBehavior::kCancelIncoming;
     }
   }
 
@@ -95,14 +105,6 @@ class SelectCommand : public CommandHelper<CommandBase, SelectCommand<Key>> {
 
   // Prevent template expansion from emulating copy ctor
   SelectCommand(SelectCommand&) = delete;
-
-  /**
-   * Creates a new selectcommand.
-   *
-   * @param toRun a supplier providing the command to run
-   */
-  explicit SelectCommand(std::function<Command*()> toRun)
-      : m_toRun{std::move(toRun)} {}
 
   SelectCommand(SelectCommand&& other) = default;
 
@@ -118,31 +120,26 @@ class SelectCommand : public CommandHelper<CommandBase, SelectCommand<Key>> {
 
   bool RunsWhenDisabled() const override { return m_runsWhenDisabled; }
 
- protected:
-  std::unique_ptr<Command> TransferOwnership() && override {
-    return std::make_unique<SelectCommand>(std::move(*this));
+  Command::InterruptionBehavior GetInterruptionBehavior() const override {
+    return m_interruptBehavior;
   }
 
  private:
   std::unordered_map<Key, std::unique_ptr<Command>> m_commands;
   std::function<Key()> m_selector;
-  std::function<Command*()> m_toRun;
   Command* m_selectedCommand;
   bool m_runsWhenDisabled = true;
+  Command::InterruptionBehavior m_interruptBehavior = Command::InterruptionBehavior::kCancelSelf;
 };
 
 template <typename T>
 void SelectCommand<T>::Initialize() {
-  if (m_selector) {
-    auto find = m_commands.find(m_selector());
-    if (find == m_commands.end()) {
-      m_selectedCommand = new PrintCommand(
-          "SelectCommand selector value does not correspond to any command!");
-      return;
-    }
-    m_selectedCommand = find->second.get();
+  auto find = m_commands.find(m_selector());
+  if (find == m_commands.end()) {
+    m_selectedCommand = new PrintCommand(
+        "SelectCommand selector value does not correspond to any command!");
   } else {
-    m_selectedCommand = m_toRun();
+    m_selectedCommand = find->second.get();
   }
   m_selectedCommand->Initialize();
 }
