@@ -81,7 +81,7 @@ public:
     void EmitSettings();
     void DragDropTarget();
     void DragDropAccept();
-
+    void SetAutoHeight(int height) { if(settings.m_autoheight){ m_height = height; } }
     PlotSettings settings;
 
     std::vector<PlotAxis> m_axis;

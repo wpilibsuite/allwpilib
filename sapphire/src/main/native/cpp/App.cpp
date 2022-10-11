@@ -51,7 +51,7 @@ void SetNextWindowSize(const ImVec2& size, ImGuiCond cond) {
   if ((cond & ImGuiCond_FirstUseEver) != 0) {
     ImGui::SetNextWindowSize(size * gDefaultScale, cond);
   } else {
-    ImGui::SetNextWindowPos(size, cond);
+    ImGui::SetNextWindowSize(size, cond);
   }
 }
 

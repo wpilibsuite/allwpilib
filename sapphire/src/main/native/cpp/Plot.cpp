@@ -98,11 +98,14 @@ void EntryPlot::EmitPlot(Plot& view){
 
 void Plot::EmitContextMenu(){
     if (ImGui::BeginMenu(m_name.c_str())) {
-        if(ImGui::MenuItem("Display Settings", "", settings.m_settings)){
-            settings.m_settings = !settings.m_settings;
-        }
-        if(ImGui::MenuItem("Display Legend", "", settings.m_legend)){
-            settings.m_legend = !settings.m_legend;
+            
+        ImGui::Checkbox("Display Legend", &settings.m_legend);
+        ImGui::Checkbox("Autofit Height", &settings.m_autoheight);
+        if(!settings.m_autoheight){
+            ImGui::InputInt("Height", &m_height);
+            if(m_height < 0){
+                m_height = 0;
+            }
         }
         EmitSettings();
         ImGui::EndMenu();
@@ -125,11 +128,6 @@ EntryPlot::PlotAction EntryPlot::EmitSettings(){
 void Plot::EmitSettings(){
     ImGui::PushID("Settings");
     if(!settings.m_autoheight){
-        if(ImGui::InputInt("Height", &m_height)){
-            if(m_height < 0){
-                m_height = 0;
-            }
-        }
     }
     std::vector<int> removed_idxs;
     for(int i = 0; i < plots.size(); i++){
@@ -172,7 +170,7 @@ void Plot::DragDropTarget(){
 }
 
 void Plot::EmitPlot(){
-    
+    // Calculate Height
     if (ImPlot::BeginPlot(m_name.c_str(), ImVec2(-1, m_height))) {
     
 
@@ -242,7 +240,6 @@ void EntryPlot::CheckForChange(Plot& view){
 void Plot::Display() {
     ImGui::PushID(m_name.c_str());
 
-    ImGui::Text(m_name.c_str());
     EmitPlot();
     if(m_nowRef != m_now){
         m_now = m_nowRef;
@@ -284,7 +281,25 @@ void PlotView::Display(){
             plots.emplace_back(std::make_unique<Plot>(m_now, fmt::format("Plot {}", plots.size()+1)));
         }
     }
+    int availHeight = ImGui::GetContentRegionAvail().y;
+    int numAuto = 0;
+    for(auto& plot : plots){
+        if(plot->settings.m_autoheight){
+            numAuto += 1;
+        } else {
+            availHeight -= plot->m_height;
+        }
+        availHeight -= ImGui::GetStyle().ItemSpacing.y;
+    }
+    if(numAuto > 0){
+        int avgHeight = availHeight/numAuto;
+        for(auto& plot : plots){
+            plot->SetAutoHeight(avgHeight);
+        }
+    }
     for(auto& plot : plots){
         plot->Display();
     }
+  
+
 }
