@@ -170,7 +170,8 @@ CommandPtr CommandPtr::RaceWith(CommandPtr&& parallel) && {
 namespace {
 class FinallyCommand : public WrapperCommand {
  public:
-  FinallyCommand(std::unique_ptr<Command>&& command, std::function<void(bool)> end)
+  FinallyCommand(std::unique_ptr<Command>&& command,
+                 std::function<void(bool)> end)
       : WrapperCommand(std::move(command)), m_end(std::move(end)) {}
 
   void End(bool interrupted) override {
@@ -181,7 +182,7 @@ class FinallyCommand : public WrapperCommand {
  private:
   std::function<void(bool)> m_end;
 };
-} // namespace
+}  // namespace
 
 CommandPtr CommandPtr::FinallyDo(std::function<void(bool)> end) && {
   m_ptr = std::make_unique<FinallyCommand>(std::move(m_ptr), std::move(end));
