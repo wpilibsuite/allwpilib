@@ -49,7 +49,10 @@ struct JoystickDataCache {
 static_assert(std::is_standard_layout_v<JoystickDataCache>);
 // static_assert(std::is_trivial_v<JoystickDataCache>);
 
+static std::atomic_bool gShutdown{false};
+
 struct FRCDriverStation {
+  ~FRCDriverStation() { gShutdown = true; }
   wpi::EventVector newDataEvents;
   wpi::mutex cacheMutex;
 };
@@ -287,10 +290,16 @@ void HAL_RefreshDSData(void) {
 }
 
 void HAL_ProvideNewDataEventHandle(WPI_EventHandle handle) {
+  if (gShutdown) {
+    return;
+  }
   driverStation->newDataEvents.Add(handle);
 }
 
 void HAL_RemoveNewDataEventHandle(WPI_EventHandle handle) {
+  if (gShutdown) {
+    return;
+  }
   driverStation->newDataEvents.Remove(handle);
 }
 
