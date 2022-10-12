@@ -5,7 +5,6 @@
 package edu.wpi.first.math.controller;
 
 /** Motor voltages for a differential drive. */
-@SuppressWarnings("MemberName")
 public class DifferentialDriveWheelVoltages {
   public double left;
   public double right;

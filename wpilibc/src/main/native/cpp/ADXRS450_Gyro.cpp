@@ -38,9 +38,7 @@ ADXRS450_Gyro::ADXRS450_Gyro(SPI::Port port)
   }
 
   m_spi.SetClockRate(3000000);
-  m_spi.SetMSBFirst();
-  m_spi.SetSampleDataOnLeadingEdge();
-  m_spi.SetClockActiveHigh();
+  m_spi.SetMode(frc::SPI::Mode::kMode0);
   m_spi.SetChipSelectActiveLow();
 
   if (!m_simDevice) {

@@ -2,8 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#ifndef NTCORE_NETWORKTABLES_NETWORKTABLE_H_
-#define NTCORE_NETWORKTABLES_NETWORKTABLE_H_
+#pragma once
 
 #include <functional>
 #include <memory>
@@ -17,13 +16,23 @@
 #include <wpi/span.h>
 
 #include "networktables/NetworkTableEntry.h"
-#include "networktables/TableEntryListener.h"
-#include "networktables/TableListener.h"
 #include "ntcore_c.h"
 
 namespace nt {
 
+class BooleanArrayTopic;
+class BooleanTopic;
+class DoubleArrayTopic;
+class DoubleTopic;
+class FloatArrayTopic;
+class FloatTopic;
+class IntegerArrayTopic;
+class IntegerTopic;
 class NetworkTableInstance;
+class RawTopic;
+class StringArrayTopic;
+class StringTopic;
+class Topic;
 
 /**
  * @defgroup ntcore_cpp_api ntcore C++ object-oriented API
@@ -41,7 +50,6 @@ class NetworkTable final {
   std::string m_path;
   mutable wpi::mutex m_mutex;
   mutable wpi::StringMap<NT_Entry> m_entries;
-  std::vector<NT_EntryListener> m_listeners;
 
   struct private_init {};
   friend class NetworkTableInstance;
@@ -94,7 +102,7 @@ class NetworkTable final {
    * instead.
    */
   NetworkTable(NT_Inst inst, std::string_view path, const private_init&);
-  virtual ~NetworkTable();
+  ~NetworkTable();
 
   /**
    * Gets the instance for the table.
@@ -117,52 +125,100 @@ class NetworkTable final {
   NetworkTableEntry GetEntry(std::string_view key) const;
 
   /**
-   * Listen to keys only within this table.
+   * Get (generic) topic.
    *
-   * @param listener    listener to add
-   * @param flags       EntryListenerFlags bitmask
-   * @return Listener handle
+   * @param name topic name
+   * @return Topic
    */
-  NT_EntryListener AddEntryListener(TableEntryListener listener,
-                                    unsigned int flags) const;
+  Topic GetTopic(std::string_view name) const;
 
   /**
-   * Listen to a single key.
+   * Get boolean topic.
    *
-   * @param key         the key name
-   * @param listener    listener to add
-   * @param flags       EntryListenerFlags bitmask
-   * @return Listener handle
+   * @param name topic name
+   * @return BooleanTopic
    */
-  NT_EntryListener AddEntryListener(std::string_view key,
-                                    TableEntryListener listener,
-                                    unsigned int flags) const;
+  BooleanTopic GetBooleanTopic(std::string_view name) const;
 
   /**
-   * Remove an entry listener.
+   * Get integer topic.
    *
-   * @param listener    listener handle
+   * @param name topic name
+   * @return IntegerTopic
    */
-  void RemoveEntryListener(NT_EntryListener listener) const;
+  IntegerTopic GetIntegerTopic(std::string_view name) const;
 
   /**
-   * Listen for sub-table creation.
-   * This calls the listener once for each newly created sub-table.
-   * It immediately calls the listener for any existing sub-tables.
+   * Get float topic.
    *
-   * @param listener        listener to add
-   * @param localNotify     notify local changes as well as remote
-   * @return Listener handle
+   * @param name topic name
+   * @return FloatTopic
    */
-  NT_EntryListener AddSubTableListener(TableListener listener,
-                                       bool localNotify = false);
+  FloatTopic GetFloatTopic(std::string_view name) const;
 
   /**
-   * Remove a sub-table listener.
+   * Get double topic.
    *
-   * @param listener    listener handle
+   * @param name topic name
+   * @return DoubleTopic
    */
-  void RemoveTableListener(NT_EntryListener listener);
+  DoubleTopic GetDoubleTopic(std::string_view name) const;
+
+  /**
+   * Get String topic.
+   *
+   * @param name topic name
+   * @return StringTopic
+   */
+  StringTopic GetStringTopic(std::string_view name) const;
+
+  /**
+   * Get raw topic.
+   *
+   * @param name topic name
+   * @return BooleanArrayTopic
+   */
+  RawTopic GetRawTopic(std::string_view name) const;
+
+  /**
+   * Get boolean[] topic.
+   *
+   * @param name topic name
+   * @return BooleanArrayTopic
+   */
+  BooleanArrayTopic GetBooleanArrayTopic(std::string_view name) const;
+
+  /**
+   * Get integer[] topic.
+   *
+   * @param name topic name
+   * @return IntegerArrayTopic
+   */
+  IntegerArrayTopic GetIntegerArrayTopic(std::string_view name) const;
+
+  /**
+   * Get float[] topic.
+   *
+   * @param name topic name
+   * @return FloatArrayTopic
+   */
+  FloatArrayTopic GetFloatArrayTopic(std::string_view name) const;
+
+  /**
+   * Get double[] topic.
+   *
+   * @param name topic name
+   * @return DoubleArrayTopic
+   */
+  DoubleArrayTopic GetDoubleArrayTopic(std::string_view name) const;
+
+  /**
+   * Get String[] topic.
+   *
+   * @param name topic name
+   * @return StringArrayTopic
+   */
+  StringArrayTopic GetStringArrayTopic(std::string_view name) const;
 
   /**
    * Returns the table at the specified key. If there is no table at the
@@ -190,6 +246,23 @@ class NetworkTable final {
    * one key/subtable of its own
    */
   bool ContainsSubTable(std::string_view key) const;
+
+  /**
+   * Gets topic information for all keys in the table (not including
+   * sub-tables).
+   *
+   * @param types bitmask of types; 0 is treated as a "don't care".
+   * @return topic information for keys currently in the table
+   */
+  std::vector<TopicInfo> GetTopicInfo(int types = 0) const;
+
+  /**
+   * Gets all topics in the table (not including sub-tables).
+   *
+   * @param types bitmask of types; 0 is treated as a "don't care".
+   * @return topic for keys currently in the table
+   */
+  std::vector<Topic> GetTopics(int types = 0) const;
 
   /**
    * Gets all keys in the table (not including sub-tables).
@@ -228,39 +301,6 @@ class NetworkTable final {
    * @param key the key name
    */
   bool IsPersistent(std::string_view key) const;
-
-  /**
-   * Sets flags on the specified key in this table. The key can
-   * not be null.
-   *
-   * @param key the key name
-   * @param flags the flags to set (bitmask)
-   */
-  void SetFlags(std::string_view key, unsigned int flags);
-
-  /**
-   * Clears flags on the specified key in this table. The key can
-   * not be null.
-   *
-   * @param key the key name
-   * @param flags the flags to clear (bitmask)
-   */
-  void ClearFlags(std::string_view key, unsigned int flags);
-
-  /**
-   * Returns the flags for the specified key.
-   *
-   * @param key the key name
-   * @return the flags, or 0 if the key is not defined
-   */
-  unsigned int GetFlags(std::string_view key) const;
-
-  /**
-   * Deletes the specified key in this table.
-   *
-   * @param key the key name
-   */
-  void Delete(std::string_view key);
 
   /**
    * Put a number in the table
@@ -466,7 +506,7 @@ class NetworkTable final {
    * @param value the value that will be assigned
    * @return False if the table key already exists with a different type
    */
-  bool PutRaw(std::string_view key, std::string_view value);
+  bool PutRaw(std::string_view key, wpi::span<const uint8_t> value);
 
   /**
    * Gets the current value in the table, setting it if it does not exist.
@@ -475,7 +515,8 @@ class NetworkTable final {
    * @param defaultValue the default value to set if key doesn't exist.
    * @return False if the table key exists with a different type
    */
-  bool SetDefaultRaw(std::string_view key, std::string_view defaultValue);
+  bool SetDefaultRaw(std::string_view key,
+                     wpi::span<const uint8_t> defaultValue);
 
   /**
    * Returns the raw value (byte array) the key maps to. If the key does not
@@ -489,7 +530,8 @@ class NetworkTable final {
    * @note This makes a copy of the raw contents.  If the overhead of this is a
    *       concern, use GetValue() instead.
    */
-  std::string GetRaw(std::string_view key, std::string_view defaultValue) const;
+  std::vector<uint8_t> GetRaw(std::string_view key,
+                              wpi::span<const uint8_t> defaultValue) const;
 
   /**
    * Put a value in the table
@@ -498,7 +540,7 @@ class NetworkTable final {
    * @param value the value that will be assigned
    * @return False if the table key already exists with a different type
    */
-  bool PutValue(std::string_view key, std::shared_ptr<Value> value);
+  bool PutValue(std::string_view key, const Value& value);
 
   /**
    * Gets the current value in the table, setting it if it does not exist.
@@ -507,8 +549,7 @@ class NetworkTable final {
    * @param defaultValue the default value to set if key doesn't exist.
    * @return False if the table key exists with a different type
    */
-  bool SetDefaultValue(std::string_view key,
-                       std::shared_ptr<Value> defaultValue);
+  bool SetDefaultValue(std::string_view key, const Value& defaultValue);
 
   /**
    * Gets the value associated with a key as an object
@@ -517,7 +558,7 @@ class NetworkTable final {
    * @return the value associated with the given key, or nullptr if the key
    * does not exist
    */
-  std::shared_ptr<Value> GetValue(std::string_view key) const;
+  Value GetValue(std::string_view key) const;
 
   /**
    * Gets the full path of this table.  Does not include the trailing "/".
@@ -525,29 +566,6 @@ class NetworkTable final {
    * @return The path (e.g "", "/foo").
    */
   std::string_view GetPath() const;
-
-  /**
-   * Save table values to a file.  The file format used is identical to
-   * that used for SavePersistent.
-   *
-   * @param filename  filename
-   * @return error string, or nullptr if successful
-   */
-  const char* SaveEntries(std::string_view filename) const;
-
-  /**
-   * Load table values from a file.  The file format used is identical to
-   * that used for SavePersistent / LoadPersistent.
-   *
-   * @param filename  filename
-   * @param warn      callback function for warnings
-   * @return error string, or nullptr if successful
-   */
-  const char* LoadEntries(
-      std::string_view filename,
-      std::function<void(size_t line, const char* msg)> warn);
 };
 
 }  // namespace nt
-
-#endif  // NTCORE_NETWORKTABLES_NETWORKTABLE_H_

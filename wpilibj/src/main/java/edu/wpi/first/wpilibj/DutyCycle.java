@@ -100,7 +100,6 @@ public class DutyCycle implements Sendable, AutoCloseable {
    *
    * @return the FPGA index
    */
-  @SuppressWarnings("AbbreviationAsWordInName")
   public final int getFPGAIndex() {
     return DutyCycleJNI.getFPGAIndex(m_handle);
   }

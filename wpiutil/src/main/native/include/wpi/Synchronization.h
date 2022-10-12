@@ -43,8 +43,8 @@ constexpr int kHandleTypeEvent = 1;
 constexpr int kHandleTypeSemaphore = 2;
 constexpr int kHandleTypeCSBase = 3;
 constexpr int kHandleTypeNTBase = 16;
-constexpr int kHandleTypeHALBase = 32;
-constexpr int kHandleTypeUserBase = 64;
+constexpr int kHandleTypeHALBase = 48;
+constexpr int kHandleTypeUserBase = 80;
 /** @} */
 
 /**

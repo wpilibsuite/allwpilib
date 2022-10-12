@@ -197,9 +197,7 @@ bool ADIS16448_IMU::SwitchToStandardSPI() {
   if (m_spi == nullptr) {
     m_spi = new SPI(m_spi_port);
     m_spi->SetClockRate(1000000);
-    m_spi->SetMSBFirst();
-    m_spi->SetSampleDataOnTrailingEdge();
-    m_spi->SetClockActiveLow();
+    m_spi->SetMode(frc::SPI::Mode::kMode3);
     m_spi->SetChipSelectActiveLow();
     ReadRegister(PROD_ID);  // Dummy read
 
@@ -875,8 +873,6 @@ int ADIS16448_IMU::GetPort() const {
  **/
 void ADIS16448_IMU::InitSendable(nt::NTSendableBuilder& builder) {
   builder.SetSmartDashboardType("ADIS16448 IMU");
-  auto yaw_angle = builder.GetEntry("Yaw Angle").GetHandle();
-  builder.SetUpdateTable([=]() {
-    nt::NetworkTableEntry(yaw_angle).SetDouble(GetAngle().value());
-  });
+  builder.AddDoubleProperty(
+      "Yaw Angle", [=] { return GetAngle().value(); }, nullptr);
 }

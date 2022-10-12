@@ -4,7 +4,6 @@
 
 package edu.wpi.first.hal;
 
-@SuppressWarnings("AbbreviationAsWordInName")
 public class DMAJNI extends JNIWrapper {
   public static native int initialize();
 

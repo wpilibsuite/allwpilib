@@ -2,8 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#ifndef NTCORE_HANDLE_H_
-#define NTCORE_HANDLE_H_
+#pragma once
 
 #include <wpi/Synchronization.h>
 
@@ -27,11 +26,19 @@ class Handle {
     kInstance,
     kLogger,
     kLoggerPoller,
-    kRpcCall,
-    kRpcCallPoller,
     kDataLogger,
-    kConnectionDataLogger
+    kConnectionDataLogger,
+    kMultiSubscriber,
+    kTopic,
+    kTopicListener,
+    kTopicListenerPoller,
+    kSubscriber,
+    kPublisher,
+    kValueListener,
+    kValueListenerPoller,
+    kTypeMax
   };
+  static_assert(kTypeMax <= wpi::kHandleTypeHALBase);
   enum { kIndexMax = 0xfffff };
 
   explicit Handle(NT_Handle handle) : m_handle(handle) {}
@@ -48,7 +55,9 @@ class Handle {
                (index & 0xfffff);
   }
 
-  int GetIndex() const { return static_cast<int>(m_handle) & 0xfffff; }
+  unsigned int GetIndex() const {
+    return static_cast<unsigned int>(m_handle) & 0xfffff;
+  }
   Type GetType() const {
     return static_cast<Type>((static_cast<int>(m_handle) >> 24) & 0x7f);
   }
@@ -62,5 +71,3 @@ class Handle {
 };
 
 }  // namespace nt
-
-#endif  // NTCORE_HANDLE_H_

@@ -30,7 +30,6 @@ public final class NumericalJacobian {
    * @param x Vector argument.
    * @return The numerical Jacobian with respect to x for f(x, u, ...).
    */
-  @SuppressWarnings({"ParameterName", "MethodTypeParameterName"})
   public static <Rows extends Num, Cols extends Num, States extends Num>
       Matrix<Rows, Cols> numericalJacobian(
           Nat<Rows> rows,
@@ -44,7 +43,6 @@ public final class NumericalJacobian {
       var dxMinus = x.copy();
       dxPlus.set(i, 0, dxPlus.get(i, 0) + kEpsilon);
       dxMinus.set(i, 0, dxMinus.get(i, 0) - kEpsilon);
-      @SuppressWarnings("LocalVariableName")
       var dF = f.apply(dxPlus).minus(f.apply(dxMinus)).div(2 * kEpsilon);
 
       result.setColumn(i, Matrix.changeBoundsUnchecked(dF));
@@ -67,7 +65,6 @@ public final class NumericalJacobian {
    * @param u Input vector.
    * @return The numerical Jacobian with respect to x for f(x, u, ...).
    */
-  @SuppressWarnings({"LambdaParameterName", "MethodTypeParameterName"})
   public static <Rows extends Num, States extends Num, Inputs extends Num, Outputs extends Num>
       Matrix<Rows, States> numericalJacobianX(
           Nat<Rows> rows,
@@ -91,7 +88,6 @@ public final class NumericalJacobian {
    * @param u Input vector.
    * @return the numerical Jacobian with respect to u for f(x, u).
    */
-  @SuppressWarnings({"LambdaParameterName", "MethodTypeParameterName"})
   public static <Rows extends Num, States extends Num, Inputs extends Num>
       Matrix<Rows, Inputs> numericalJacobianU(
           Nat<Rows> rows,

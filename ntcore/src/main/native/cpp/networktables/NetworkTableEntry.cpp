@@ -5,9 +5,14 @@
 #include "networktables/NetworkTableEntry.h"
 
 #include "networktables/NetworkTableInstance.h"
+#include "networktables/Topic.h"
 
 using namespace nt;
 
 NetworkTableInstance NetworkTableEntry::GetInstance() const {
   return NetworkTableInstance{GetInstanceFromHandle(m_handle)};
+}
+
+Topic NetworkTableEntry::GetTopic() const {
+  return Topic{::nt::GetTopicFromHandle(m_handle)};
 }

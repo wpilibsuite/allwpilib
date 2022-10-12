@@ -84,11 +84,21 @@ class WPILIB_DLLEXPORT Rotation2d {
 
   /**
    * Multiplies the current rotation by a scalar.
+   *
    * @param scalar The scalar.
    *
    * @return The new scaled Rotation2d.
    */
   Rotation2d operator*(double scalar) const;
+
+  /**
+   * Divides the current rotation by a scalar.
+   *
+   * @param scalar The scalar.
+   *
+   * @return The new scaled Rotation2d.
+   */
+  Rotation2d operator/(double scalar) const;
 
   /**
    * Checks equality between this Rotation2d and another object.

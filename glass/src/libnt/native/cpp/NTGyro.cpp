@@ -10,32 +10,25 @@
 using namespace glass;
 
 NTGyroModel::NTGyroModel(std::string_view path)
-    : NTGyroModel(nt::GetDefaultInstance(), path) {}
+    : NTGyroModel(nt::NetworkTableInstance::GetDefault(), path) {}
 
-NTGyroModel::NTGyroModel(NT_Inst instance, std::string_view path)
-    : m_nt(instance),
-      m_angle(m_nt.GetEntry(fmt::format("{}/Value", path))),
-      m_name(m_nt.GetEntry(fmt::format("{}/.name", path))),
-      m_angleData(fmt::format("NT_Gyro:{}", path)),
-      m_nameValue(wpi::rsplit(path, '/').second) {
-  m_nt.AddListener(m_angle);
-  m_nt.AddListener(m_name);
-}
+NTGyroModel::NTGyroModel(nt::NetworkTableInstance inst, std::string_view path)
+    : m_inst{inst},
+      m_angle{inst.GetDoubleTopic(fmt::format("{}/Value", path))
+                  .Subscribe(0, {{nt::PubSubOption::SendAll(true)}})},
+      m_name{inst.GetStringTopic(fmt::format("{}/.name", path)).Subscribe({})},
+      m_angleData{fmt::format("NT_Gyro:{}", path)},
+      m_nameValue{wpi::rsplit(path, '/').second} {}
 
 void NTGyroModel::Update() {
-  for (auto&& event : m_nt.PollListener()) {
-    if (event.entry == m_angle) {
-      if (event.value && event.value->IsDouble()) {
-        m_angleData.SetValue(event.value->GetDouble());
-      }
-    } else if (event.entry == m_name) {
-      if (event.value && event.value->IsString()) {
-        m_nameValue = event.value->GetString();
-      }
-    }
+  for (auto&& v : m_name.ReadQueue()) {
+    m_nameValue = std::move(v.value);
+  }
+  for (auto&& v : m_angle.ReadQueue()) {
+    m_angleData.SetValue(v.value, v.time);
   }
 }
 
 bool NTGyroModel::Exists() {
-  return m_nt.IsConnected() && nt::GetEntryType(m_angle) != NT_UNASSIGNED;
+  return m_inst.IsConnected() && m_angle.Exists();
 }

@@ -16,7 +16,6 @@ import edu.wpi.first.math.geometry.Rotation2d;
  * component because it can never move sideways. Holonomic drivetrains such as swerve and mecanum
  * will often have all three components.
  */
-@SuppressWarnings("MemberName")
 public class ChassisSpeeds {
   /** Represents forward velocity w.r.t the robot frame of reference. (Fwd is +) */
   public double vxMetersPerSecond;

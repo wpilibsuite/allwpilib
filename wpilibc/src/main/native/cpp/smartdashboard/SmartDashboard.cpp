@@ -70,22 +70,6 @@ bool SmartDashboard::IsPersistent(std::string_view key) {
   return GetInstance().table->GetEntry(key).IsPersistent();
 }
 
-void SmartDashboard::SetFlags(std::string_view key, unsigned int flags) {
-  GetInstance().table->GetEntry(key).SetFlags(flags);
-}
-
-void SmartDashboard::ClearFlags(std::string_view key, unsigned int flags) {
-  GetInstance().table->GetEntry(key).ClearFlags(flags);
-}
-
-unsigned int SmartDashboard::GetFlags(std::string_view key) {
-  return GetInstance().table->GetEntry(key).GetFlags();
-}
-
-void SmartDashboard::Delete(std::string_view key) {
-  GetInstance().table->Delete(key);
-}
-
 nt::NetworkTableEntry SmartDashboard::GetEntry(std::string_view key) {
   return GetInstance().table->GetEntry(key);
 }
@@ -218,31 +202,32 @@ std::vector<std::string> SmartDashboard::GetStringArray(
   return GetInstance().table->GetEntry(key).GetStringArray(defaultValue);
 }
 
-bool SmartDashboard::PutRaw(std::string_view key, std::string_view value) {
+bool SmartDashboard::PutRaw(std::string_view key,
+                            wpi::span<const uint8_t> value) {
   return GetInstance().table->GetEntry(key).SetRaw(value);
 }
 
 bool SmartDashboard::SetDefaultRaw(std::string_view key,
-                                   std::string_view defaultValue) {
+                                   wpi::span<const uint8_t> defaultValue) {
   return GetInstance().table->GetEntry(key).SetDefaultRaw(defaultValue);
 }
 
-std::string SmartDashboard::GetRaw(std::string_view key,
-                                   std::string_view defaultValue) {
+std::vector<uint8_t> SmartDashboard::GetRaw(
+    std::string_view key, wpi::span<const uint8_t> defaultValue) {
   return GetInstance().table->GetEntry(key).GetRaw(defaultValue);
 }
 
 bool SmartDashboard::PutValue(std::string_view keyName,
-                              std::shared_ptr<nt::Value> value) {
+                              const nt::Value& value) {
   return GetInstance().table->GetEntry(keyName).SetValue(value);
 }
 
 bool SmartDashboard::SetDefaultValue(std::string_view key,
-                                     std::shared_ptr<nt::Value> defaultValue) {
+                                     const nt::Value& defaultValue) {
   return GetInstance().table->GetEntry(key).SetDefaultValue(defaultValue);
 }
 
-std::shared_ptr<nt::Value> SmartDashboard::GetValue(std::string_view keyName) {
+nt::Value SmartDashboard::GetValue(std::string_view keyName) {
   return GetInstance().table->GetEntry(keyName).GetValue();
 }
 

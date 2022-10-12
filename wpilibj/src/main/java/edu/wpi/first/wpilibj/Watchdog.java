@@ -208,7 +208,6 @@ public class Watchdog implements Closeable, Comparable<Watchdog> {
     m_suppressTimeoutMessage = suppress;
   }
 
-  @SuppressWarnings("resource")
   private static void updateAlarm() {
     if (m_watchdogs.size() == 0) {
       NotifierJNI.cancelNotifierAlarm(m_notifier);
@@ -225,7 +224,6 @@ public class Watchdog implements Closeable, Comparable<Watchdog> {
     return inst;
   }
 
-  @SuppressWarnings("PMD.AvoidDeeplyNestedIfStmts")
   private static void schedulerFunc() {
     while (!Thread.currentThread().isInterrupted()) {
       long curTime = NotifierJNI.waitForNotifierAlarm(m_notifier);

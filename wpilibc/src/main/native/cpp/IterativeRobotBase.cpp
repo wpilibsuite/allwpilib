@@ -190,7 +190,7 @@ void IterativeRobotBase::LoopFunc() {
 
   // Flush NetworkTables
   if (m_ntFlushEnabled) {
-    nt::NetworkTableInstance::GetDefault().Flush();
+    nt::NetworkTableInstance::GetDefault().FlushLocal();
   }
 
   // Warn on loop time overruns

@@ -5,25 +5,21 @@
 package edu.wpi.first.hal;
 
 /** Structure for holding the match info data request. */
+@SuppressWarnings("MemberName")
 public class MatchInfoData {
   /** Stores the event name. */
-  @SuppressWarnings("MemberName")
   public String eventName = "";
 
   /** Stores the game specific message. */
-  @SuppressWarnings("MemberName")
   public String gameSpecificMessage = "";
 
   /** Stores the match number. */
-  @SuppressWarnings("MemberName")
   public int matchNumber;
 
   /** Stores the replay number. */
-  @SuppressWarnings("MemberName")
   public int replayNumber;
 
   /** Stores the match type. */
-  @SuppressWarnings("MemberName")
   public int matchType;
 
   /**
@@ -35,7 +31,6 @@ public class MatchInfoData {
    * @param replayNumber Replay number.
    * @param matchType Match type.
    */
-  @SuppressWarnings("MissingJavadocMethod")
   public void setData(
       String eventName,
       String gameSpecificMessage,

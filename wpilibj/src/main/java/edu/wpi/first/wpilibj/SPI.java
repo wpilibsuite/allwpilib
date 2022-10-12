@@ -15,11 +15,11 @@ import java.nio.IntBuffer;
 /** Represents a SPI bus port. */
 public class SPI implements AutoCloseable {
   public enum Port {
-    kOnboardCS0(0),
-    kOnboardCS1(1),
-    kOnboardCS2(2),
-    kOnboardCS3(3),
-    kMXP(4);
+    kOnboardCS0(SPIJNI.ONBOARD_CS0_PORT),
+    kOnboardCS1(SPIJNI.ONBOARD_CS0_PORT),
+    kOnboardCS2(SPIJNI.ONBOARD_CS0_PORT),
+    kOnboardCS3(SPIJNI.ONBOARD_CS0_PORT),
+    kMXP(SPIJNI.MXP_PORT);
 
     public final int value;
 
@@ -28,10 +28,21 @@ public class SPI implements AutoCloseable {
     }
   }
 
+  public enum Mode {
+    kMode0(SPIJNI.SPI_MODE0),
+    kMode1(SPIJNI.SPI_MODE1),
+    kMode2(SPIJNI.SPI_MODE2),
+    kMode3(SPIJNI.SPI_MODE3);
+
+    public final int value;
+
+    Mode(int value) {
+      this.value = value;
+    }
+  }
+
   private int m_port;
-  private int m_msbFirst;
-  private int m_clockIdleHigh;
-  private int m_sampleOnTrailing;
+  private int m_mode;
 
   /**
    * Constructor.
@@ -39,9 +50,12 @@ public class SPI implements AutoCloseable {
    * @param port the physical SPI port
    */
   public SPI(Port port) {
-    m_port = (byte) port.value;
+    m_port = port.value;
 
     SPIJNI.spiInitialize(m_port);
+
+    m_mode = 0;
+    SPIJNI.spiSetMode(m_port, m_mode);
 
     HAL.report(tResourceType.kResourceType_SPI, port.value + 1);
   }
@@ -72,55 +86,89 @@ public class SPI implements AutoCloseable {
   /**
    * Configure the order that bits are sent and received on the wire to be most significant bit
    * first.
+   *
+   * @deprecated Does not work, will be removed.
    */
+  @Deprecated(since = "2023", forRemoval = true)
   public final void setMSBFirst() {
-    m_msbFirst = 1;
-    SPIJNI.spiSetOpts(m_port, m_msbFirst, m_sampleOnTrailing, m_clockIdleHigh);
+    DriverStation.reportWarning("setMSBFirst not supported by roboRIO", false);
   }
 
   /**
    * Configure the order that bits are sent and received on the wire to be least significant bit
    * first.
+   *
+   * @deprecated Does not work, will be removed.
    */
+  @Deprecated(since = "2023", forRemoval = true)
   public final void setLSBFirst() {
-    m_msbFirst = 0;
-    SPIJNI.spiSetOpts(m_port, m_msbFirst, m_sampleOnTrailing, m_clockIdleHigh);
+    DriverStation.reportWarning("setLSBFirst not supported by roboRIO", false);
   }
 
   /**
    * Configure the clock output line to be active low. This is sometimes called clock polarity high
    * or clock idle high.
+   *
+   * @deprecated Use setMode() instead.
    */
+  @Deprecated(since = "2023", forRemoval = true)
   public final void setClockActiveLow() {
-    m_clockIdleHigh = 1;
-    SPIJNI.spiSetOpts(m_port, m_msbFirst, m_sampleOnTrailing, m_clockIdleHigh);
+    m_mode |= 1;
+    SPIJNI.spiSetMode(m_port, m_mode);
   }
 
   /**
    * Configure the clock output line to be active high. This is sometimes called clock polarity low
    * or clock idle low.
+   *
+   * @deprecated Use setMode() instead.
    */
+  @Deprecated(since = "2023", forRemoval = true)
   public final void setClockActiveHigh() {
-    m_clockIdleHigh = 0;
-    SPIJNI.spiSetOpts(m_port, m_msbFirst, m_sampleOnTrailing, m_clockIdleHigh);
+    m_mode &= 1;
+    SPIJNI.spiSetMode(m_port, m_mode);
   }
 
   /**
    * Configure that the data is stable on the leading edge and the data changes on the trailing
    * edge.
+   *
+   * @deprecated Use setMode() instead.
    */
+  @Deprecated(since = "2023", forRemoval = true)
   public final void setSampleDataOnLeadingEdge() {
-    m_sampleOnTrailing = 0;
-    SPIJNI.spiSetOpts(m_port, m_msbFirst, m_sampleOnTrailing, m_clockIdleHigh);
+    m_mode &= 2;
+    SPIJNI.spiSetMode(m_port, m_mode);
   }
 
   /**
    * Configure that the data is stable on the trailing edge and the data changes on the leading
    * edge.
+   *
+   * @deprecated Use setMode() instead.
    */
+  @Deprecated(since = "2023", forRemoval = true)
   public final void setSampleDataOnTrailingEdge() {
-    m_sampleOnTrailing = 1;
-    SPIJNI.spiSetOpts(m_port, m_msbFirst, m_sampleOnTrailing, m_clockIdleHigh);
+    m_mode |= 2;
+    SPIJNI.spiSetMode(m_port, m_mode);
+  }
+
+  /**
+   * Sets the mode for the SPI device.
+   *
+   * <p>Mode 0 is Clock idle low, data sampled on rising edge.
+   *
+   * <p>Mode 1 is Clock idle low, data sampled on falling edge.
+   *
+   * <p>Mode 2 is Clock idle high, data sampled on falling edge.
+   *
+   * <p>Mode 3 is Clock idle high, data sampled on rising edge.
+   *
+   * @param mode The mode to set.
+   */
+  public final void setMode(Mode mode) {
+    m_mode = mode.value & 0x3;
+    SPIJNI.spiSetMode(m_port, m_mode);
   }
 
   /** Configure the chip select line to be active high. */
@@ -160,7 +208,6 @@ public class SPI implements AutoCloseable {
    * @param size The number of bytes to send.
    * @return Number of bytes written or -1 on error.
    */
-  @SuppressWarnings("ByteBufferBackingArray")
   public int write(ByteBuffer dataToSend, int size) {
     if (dataToSend.hasArray()) {
       return write(dataToSend.array(), size);
@@ -209,7 +256,6 @@ public class SPI implements AutoCloseable {
    * @param size The length of the transaction, in bytes
    * @return Number of bytes read or -1 on error.
    */
-  @SuppressWarnings("ByteBufferBackingArray")
   public int read(boolean initiate, ByteBuffer dataReceived, int size) {
     if (dataReceived.hasArray()) {
       return read(initiate, dataReceived.array(), size);
@@ -249,7 +295,6 @@ public class SPI implements AutoCloseable {
    * @param size The length of the transaction, in bytes
    * @return TODO
    */
-  @SuppressWarnings("ByteBufferBackingArray")
   public int transaction(ByteBuffer dataToSend, ByteBuffer dataReceived, int size) {
     if (dataToSend.hasArray() && dataReceived.hasArray()) {
       return transaction(dataToSend.array(), dataReceived.array(), size);

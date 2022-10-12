@@ -61,6 +61,13 @@ Rotation3d CoordinateSystem::Convert(const Rotation3d& rotation,
 Pose3d CoordinateSystem::Convert(const Pose3d& pose,
                                  const CoordinateSystem& from,
                                  const CoordinateSystem& to) {
-  return pose.RelativeTo(
-      Pose3d{Translation3d{}, to.m_rotation - from.m_rotation});
+  return Pose3d{Convert(pose.Translation(), from, to),
+                Convert(pose.Rotation(), from, to)};
+}
+
+Transform3d CoordinateSystem::Convert(const Transform3d& transform,
+                                      const CoordinateSystem& from,
+                                      const CoordinateSystem& to) {
+  return Transform3d{Convert(transform.Translation(), from, to),
+                     Convert(transform.Rotation(), from, to)};
 }

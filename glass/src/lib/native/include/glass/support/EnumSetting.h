@@ -15,7 +15,7 @@ class EnumSetting {
   EnumSetting(std::string& str, int defaultValue,
               std::initializer_list<const char*> choices);
 
-  int GetValue() const { return m_value; }
+  int GetValue() const;
   void SetValue(int value);
 
   // updates internal value, returns true on change
@@ -23,9 +23,12 @@ class EnumSetting {
              int popup_max_height_in_items = -1);
 
  private:
+  void UpdateValue() const;
+
   std::string& m_str;
   wpi::SmallVector<const char*, 8> m_choices;
-  int m_value;
+  int m_defaultValue;
+  mutable int m_value = -1;
 };
 
 }  // namespace glass

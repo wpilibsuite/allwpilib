@@ -364,19 +364,27 @@ void HAL_SetSPISpeed(HAL_SPIPort port, int32_t speed) {
   ioctl(HAL_GetSPIHandle(port), SPI_IOC_WR_MAX_SPEED_HZ, &speed);
 }
 
-void HAL_SetSPIOpts(HAL_SPIPort port, HAL_Bool msbFirst,
-                    HAL_Bool sampleOnTrailing, HAL_Bool clkIdleHigh) {
+void HAL_SetSPIMode(HAL_SPIPort port, HAL_SPIMode mode) {
   if (port < 0 || port >= kSpiMaxHandles) {
     return;
   }
 
-  uint8_t mode = 0;
-  mode |= (!msbFirst ? 8 : 0);
-  mode |= (clkIdleHigh ? 2 : 0);
-  mode |= (sampleOnTrailing ? 1 : 0);
+  uint8_t mode8 = mode & SPI_MODE_3;
 
   std::scoped_lock lock(spiApiMutexes[port]);
-  ioctl(HAL_GetSPIHandle(port), SPI_IOC_WR_MODE, &mode);
+  ioctl(HAL_GetSPIHandle(port), SPI_IOC_WR_MODE, &mode8);
+}
+
+HAL_SPIMode HAL_GetSPIMode(HAL_SPIPort port) {
+  if (port < 0 || port >= kSpiMaxHandles) {
+    return HAL_SPI_kMode0;
+  }
+
+  uint8_t mode8 = 0;
+
+  std::scoped_lock lock(spiApiMutexes[port]);
+  ioctl(HAL_GetSPIHandle(port), SPI_IOC_RD_MODE, &mode8);
+  return static_cast<HAL_SPIMode>(mode8 & SPI_MODE_3);
 }
 
 void HAL_SetSPIChipSelectActiveHigh(HAL_SPIPort port, int32_t* status) {

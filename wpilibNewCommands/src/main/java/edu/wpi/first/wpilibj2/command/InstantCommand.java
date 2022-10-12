@@ -4,8 +4,6 @@
 
 package edu.wpi.first.wpilibj2.command;
 
-import static edu.wpi.first.wpilibj.util.ErrorMessages.requireNonNullParam;
-
 /**
  * A Command that runs instantly; it will initialize, execute once, and end on the same iteration of
  * the scheduler. Users can either pass in a Runnable and a set of requirements, or else subclass
@@ -13,9 +11,7 @@ import static edu.wpi.first.wpilibj.util.ErrorMessages.requireNonNullParam;
  *
  * <p>This class is provided by the NewCommands VendorDep
  */
-public class InstantCommand extends CommandBase {
-  private final Runnable m_toRun;
-
+public class InstantCommand extends FunctionalCommand {
   /**
    * Creates a new InstantCommand that runs the given Runnable with the given requirements.
    *
@@ -23,9 +19,7 @@ public class InstantCommand extends CommandBase {
    * @param requirements the subsystems required by this command
    */
   public InstantCommand(Runnable toRun, Subsystem... requirements) {
-    m_toRun = requireNonNullParam(toRun, "toRun", "InstantCommand");
-
-    addRequirements(requirements);
+    super(toRun, () -> {}, interrupted -> {}, () -> true, requirements);
   }
 
   /**
@@ -33,16 +27,6 @@ public class InstantCommand extends CommandBase {
    * constructor to call implicitly from subclass constructors.
    */
   public InstantCommand() {
-    m_toRun = () -> {};
-  }
-
-  @Override
-  public void initialize() {
-    m_toRun.run();
-  }
-
-  @Override
-  public final boolean isFinished() {
-    return true;
+    this(() -> {});
   }
 }

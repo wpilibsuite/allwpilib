@@ -102,7 +102,6 @@ public class TimedRobot extends IterativeRobotBase {
 
   /** Provide an alternate "main loop" via startCompetition(). */
   @Override
-  @SuppressWarnings("UnsafeFinalization")
   public void startCompetition() {
     robotInit();
 

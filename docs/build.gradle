@@ -198,6 +198,7 @@ task generateJavaDocs(type: Javadoc) {
     dependsOn project(':wpilibj').generateJavaVersion
     dependsOn project(':hal').generateUsageReporting
     dependsOn project(':wpimath').generateNat
+    dependsOn project(':ntcore').ntcoreGenerateJavaTypes
     source project(':hal').sourceSets.main.java
     source project(':wpiutil').sourceSets.main.java
     source project(':cscore').sourceSets.main.java

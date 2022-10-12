@@ -25,14 +25,14 @@ TEST(ShuffleboardInstanceTest, PathFluent) {
   NTWrapper ntInst;
   frc::detail::ShuffleboardInstance shuffleboardInst{ntInst.inst};
 
-  auto entry = shuffleboardInst.GetTab("Tab Title")
-                   .GetLayout("List", "List Layout")
-                   .Add("Data", "string")
-                   .WithWidget("Text View")
-                   .GetEntry();
+  auto& entry = shuffleboardInst.GetTab("Tab Title")
+                    .GetLayout("List", "List Layout")
+                    .Add("Data", "string")
+                    .WithWidget("Text View")
+                    .GetEntry();
 
   EXPECT_EQ("string", entry.GetString("")) << "Wrong entry value";
-  EXPECT_EQ("/Shuffleboard/Tab Title/List/Data", entry.GetName())
+  EXPECT_EQ("/Shuffleboard/Tab Title/List/Data", entry.GetTopic().GetName())
       << "Entry path generated incorrectly";
 }
 
@@ -40,17 +40,17 @@ TEST(ShuffleboardInstanceTest, NestedLayoutsFluent) {
   NTWrapper ntInst;
   frc::detail::ShuffleboardInstance shuffleboardInst{ntInst.inst};
 
-  auto entry = shuffleboardInst.GetTab("Tab")
-                   .GetLayout("First", "List")
-                   .GetLayout("Second", "List")
-                   .GetLayout("Third", "List")
-                   .GetLayout("Fourth", "List")
-                   .Add("Value", "string")
-                   .GetEntry();
+  auto& entry = shuffleboardInst.GetTab("Tab")
+                    .GetLayout("First", "List")
+                    .GetLayout("Second", "List")
+                    .GetLayout("Third", "List")
+                    .GetLayout("Fourth", "List")
+                    .Add("Value", "string")
+                    .GetEntry();
 
   EXPECT_EQ("string", entry.GetString("")) << "Wrong entry value";
   EXPECT_EQ("/Shuffleboard/Tab/First/Second/Third/Fourth/Value",
-            entry.GetName())
+            entry.GetTopic().GetName())
       << "Entry path generated incorrectly";
 }
 
@@ -64,11 +64,11 @@ TEST(ShuffleboardInstanceTest, NestedLayoutsOop) {
   frc::ShuffleboardLayout& third = second.GetLayout("Third", "List");
   frc::ShuffleboardLayout& fourth = third.GetLayout("Fourth", "List");
   frc::SimpleWidget& widget = fourth.Add("Value", "string");
-  auto entry = widget.GetEntry();
+  auto& entry = widget.GetEntry();
 
   EXPECT_EQ("string", entry.GetString("")) << "Wrong entry value";
   EXPECT_EQ("/Shuffleboard/Tab/First/Second/Third/Fourth/Value",
-            entry.GetName())
+            entry.GetTopic().GetName())
       << "Entry path generated incorrectly";
 }
 
@@ -97,12 +97,12 @@ TEST(ShuffleboardInstanceTest, NestedActuatorWidgetsAreDisabled) {
   // Note: we use the unsafe `GetBoolean()` method because if the value is NOT
   // a boolean, or if it is not present, then something has clearly gone very,
   // very wrong
-  bool controllable = controllableEntry.GetValue()->GetBoolean();
+  bool controllable = controllableEntry.GetValue().GetBoolean();
   // Sanity check
   EXPECT_TRUE(controllable)
       << "The nested actuator widget should be enabled by default";
   shuffleboardInst.DisableActuatorWidgets();
-  controllable = controllableEntry.GetValue()->GetBoolean();
+  controllable = controllableEntry.GetValue().GetBoolean();
   EXPECT_FALSE(controllable)
       << "The nested actuator widget should have been disabled";
 }

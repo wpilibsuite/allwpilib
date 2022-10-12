@@ -83,7 +83,7 @@ class PlotSeries {
     return m_digital.GetValue() == kDigital ||
            (m_digital.GetValue() == kAuto && m_source && m_source->IsDigital());
   }
-  void AppendValue(double value, uint64_t time);
+  void AppendValue(double value, int64_t time);
 
   // source linkage
   DataSource* m_source = nullptr;
@@ -248,10 +248,10 @@ void PlotSeries::SetSource(DataSource* source) {
   AppendValue(source->GetValue(), 0);
 
   m_newValueConn = source->valueChanged.connect_connection(
-      [this](double value, uint64_t time) { AppendValue(value, time); });
+      [this](double value, int64_t time) { AppendValue(value, time); });
 }
 
-void PlotSeries::AppendValue(double value, uint64_t timeUs) {
+void PlotSeries::AppendValue(double value, int64_t timeUs) {
   double time = (timeUs != 0 ? timeUs : wpi::Now()) * 1.0e-6;
   if (IsDigital()) {
     if (m_size < kMaxSize) {

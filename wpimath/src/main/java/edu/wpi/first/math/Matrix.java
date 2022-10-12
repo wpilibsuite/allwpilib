@@ -331,7 +331,6 @@ public class Matrix<R extends Num, C extends Num> {
    * @param b The right-hand side of the equation to solve.
    * @return The solution to the linear system.
    */
-  @SuppressWarnings("ParameterName")
   public final <C2 extends Num> Matrix<C, C2> solve(Matrix<R, C2> b) {
     return new Matrix<>(this.m_storage.solve(Objects.requireNonNull(b).m_storage));
   }
@@ -464,7 +463,6 @@ public class Matrix<R extends Num, C extends Num> {
    * @param b Scalar.
    * @return The element by element power of "this" and b.
    */
-  @SuppressWarnings("ParameterName")
   public final Matrix<R, C> elementPower(double b) {
     return new Matrix<>(this.m_storage.elementPower(b));
   }
@@ -477,7 +475,6 @@ public class Matrix<R extends Num, C extends Num> {
    * @param b Scalar.
    * @return The element by element power of "this" and b.
    */
-  @SuppressWarnings("ParameterName")
   public final Matrix<R, C> elementPower(int b) {
     return new Matrix<>(this.m_storage.elementPower((double) b));
   }

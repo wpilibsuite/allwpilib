@@ -8,7 +8,6 @@ package edu.wpi.first.math.controller;
  * A helper class that computes feedforward outputs for a simple elevator (modeled as a motor acting
  * against the force of gravity).
  */
-@SuppressWarnings("MemberName")
 public class ElevatorFeedforward {
   public final double ks;
   public final double kg;

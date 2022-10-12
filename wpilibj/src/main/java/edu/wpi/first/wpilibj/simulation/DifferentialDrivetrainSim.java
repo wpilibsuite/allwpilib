@@ -44,13 +44,8 @@ public class DifferentialDrivetrainSim {
   private double m_currentGearing;
   private final double m_wheelRadiusMeters;
 
-  @SuppressWarnings("MemberName")
   private Matrix<N2, N1> m_u;
-
-  @SuppressWarnings("MemberName")
   private Matrix<N7, N1> m_x;
-
-  @SuppressWarnings("MemberName")
   private Matrix<N7, N1> m_y;
 
   private final double m_rb;
@@ -72,7 +67,6 @@ public class DifferentialDrivetrainSim {
    *     m/s, and position measurement standard deviations of 0.005 meters are a reasonable starting
    *     point.
    */
-  @SuppressWarnings("ParameterName")
   public DifferentialDrivetrainSim(
       DCMotor driveMotor,
       double gearing,
@@ -153,7 +147,6 @@ public class DifferentialDrivetrainSim {
    *
    * @param dtSeconds the time difference
    */
-  @SuppressWarnings("LocalVariableName")
   public void update(double dtSeconds) {
     // Update state estimate with RK4
     m_x = NumericalIntegration.rk4(this::getDynamics, m_x, m_u, dtSeconds);
@@ -316,7 +309,6 @@ public class DifferentialDrivetrainSim {
     m_x.set(State.kRightPosition.value, 0, 0);
   }
 
-  @SuppressWarnings({"DuplicatedCode", "LocalVariableName", "ParameterName"})
   protected Matrix<N7, N1> getDynamics(Matrix<N7, N1> x, Matrix<N2, N1> u) {
     // Because G can be factored out of B, we can divide by the old ratio and multiply
     // by the new ratio to get a new drivetrain model.
@@ -373,10 +365,8 @@ public class DifferentialDrivetrainSim {
     kLeftPosition(5),
     kRightPosition(6);
 
-    @SuppressWarnings("MemberName")
     public final int value;
 
-    @SuppressWarnings("ParameterName")
     State(int i) {
       this.value = i;
     }
@@ -393,10 +383,8 @@ public class DifferentialDrivetrainSim {
     k7p31(7.31),
     k5p95(5.95);
 
-    @SuppressWarnings("MemberName")
     public final double value;
 
-    @SuppressWarnings("ParameterName")
     KitbotGearing(double i) {
       this.value = i;
     }
@@ -413,10 +401,8 @@ public class DifferentialDrivetrainSim {
     kSingleNEOPerSide(DCMotor.getNEO(1)),
     kDoubleNEOPerSide(DCMotor.getNEO(2));
 
-    @SuppressWarnings("MemberName")
     public final DCMotor value;
 
-    @SuppressWarnings("ParameterName")
     KitbotMotor(DCMotor i) {
       this.value = i;
     }
@@ -428,10 +414,8 @@ public class DifferentialDrivetrainSim {
     kEightInch(Units.inchesToMeters(8)),
     kTenInch(Units.inchesToMeters(10));
 
-    @SuppressWarnings("MemberName")
     public final double value;
 
-    @SuppressWarnings("ParameterName")
     KitbotWheelSize(double i) {
       this.value = i;
     }
@@ -479,7 +463,6 @@ public class DifferentialDrivetrainSim {
    *     point.
    * @return A sim for the standard FRC kitbot.
    */
-  @SuppressWarnings("ParameterName")
   public static DifferentialDrivetrainSim createKitbotSim(
       KitbotMotor motor,
       KitbotGearing gearing,

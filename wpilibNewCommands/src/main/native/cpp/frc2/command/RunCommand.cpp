@@ -8,16 +8,10 @@ using namespace frc2;
 
 RunCommand::RunCommand(std::function<void()> toRun,
                        std::initializer_list<Subsystem*> requirements)
-    : m_toRun{std::move(toRun)} {
-  AddRequirements(requirements);
-}
+    : CommandHelper([] {}, std::move(toRun), [](bool interrupted) {},
+                    [] { return false; }, requirements) {}
 
 RunCommand::RunCommand(std::function<void()> toRun,
                        wpi::span<Subsystem* const> requirements)
-    : m_toRun{std::move(toRun)} {
-  AddRequirements(requirements);
-}
-
-void RunCommand::Execute() {
-  m_toRun();
-}
+    : CommandHelper([] {}, std::move(toRun), [](bool interrupted) {},
+                    [] { return false; }, requirements) {}

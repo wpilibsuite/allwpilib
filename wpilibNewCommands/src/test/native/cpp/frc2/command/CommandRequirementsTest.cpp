@@ -54,7 +54,7 @@ TEST_F(CommandRequirementsTest, RequirementUninterruptible) {
   int exeCounter = 0;
   int endCounter = 0;
 
-  std::unique_ptr<Command> command1 =
+  CommandPtr command1 =
       FunctionalCommand([&initCounter] { initCounter++; },
                         [&exeCounter] { exeCounter++; },
                         [&endCounter](bool interruptible) { endCounter++; },
@@ -68,13 +68,13 @@ TEST_F(CommandRequirementsTest, RequirementUninterruptible) {
   EXPECT_CALL(command2, End(true)).Times(0);
   EXPECT_CALL(command2, End(false)).Times(0);
 
-  scheduler.Schedule(command1.get());
+  scheduler.Schedule(command1);
   EXPECT_EQ(1, initCounter);
   scheduler.Run();
   EXPECT_EQ(1, exeCounter);
-  EXPECT_TRUE(scheduler.IsScheduled(command1.get()));
+  EXPECT_TRUE(scheduler.IsScheduled(command1));
   scheduler.Schedule(&command2);
-  EXPECT_TRUE(scheduler.IsScheduled(command1.get()));
+  EXPECT_TRUE(scheduler.IsScheduled(command1));
   EXPECT_FALSE(scheduler.IsScheduled(&command2));
   scheduler.Run();
   EXPECT_EQ(2, exeCounter);

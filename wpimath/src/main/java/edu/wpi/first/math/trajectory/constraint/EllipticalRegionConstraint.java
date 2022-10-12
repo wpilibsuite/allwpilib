@@ -23,7 +23,6 @@ public class EllipticalRegionConstraint implements TrajectoryConstraint {
    * @param rotation The rotation to apply to all radii around the origin.
    * @param constraint The constraint to enforce when the robot is within the region.
    */
-  @SuppressWarnings("ParameterName")
   public EllipticalRegionConstraint(
       Translation2d center,
       double xWidth,

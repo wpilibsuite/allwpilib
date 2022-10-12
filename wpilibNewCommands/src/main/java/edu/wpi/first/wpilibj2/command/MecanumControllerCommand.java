@@ -38,7 +38,6 @@ import java.util.function.Supplier;
  *
  * <p>This class is provided by the NewCommands VendorDep
  */
-@SuppressWarnings("MemberName")
 public class MecanumControllerCommand extends CommandBase {
   private final Timer m_timer = new Timer();
   private final boolean m_usePID;
@@ -87,7 +86,6 @@ public class MecanumControllerCommand extends CommandBase {
    *     voltages.
    * @param requirements The subsystems to require.
    */
-  @SuppressWarnings("ParameterName")
   public MecanumControllerCommand(
       Trajectory trajectory,
       Supplier<Pose2d> pose,
@@ -179,7 +177,6 @@ public class MecanumControllerCommand extends CommandBase {
    *     voltages.
    * @param requirements The subsystems to require.
    */
-  @SuppressWarnings("ParameterName")
   public MecanumControllerCommand(
       Trajectory trajectory,
       Supplier<Pose2d> pose,
@@ -236,7 +233,6 @@ public class MecanumControllerCommand extends CommandBase {
    * @param outputWheelSpeeds A MecanumDriveWheelSpeeds object containing the output wheel speeds.
    * @param requirements The subsystems to require.
    */
-  @SuppressWarnings("ParameterName")
   public MecanumControllerCommand(
       Trajectory trajectory,
       Supplier<Pose2d> pose,
@@ -308,7 +304,6 @@ public class MecanumControllerCommand extends CommandBase {
    * @param outputWheelSpeeds A MecanumDriveWheelSpeeds object containing the output wheel speeds.
    * @param requirements The subsystems to require.
    */
-  @SuppressWarnings("ParameterName")
   public MecanumControllerCommand(
       Trajectory trajectory,
       Supplier<Pose2d> pose,
@@ -350,7 +345,6 @@ public class MecanumControllerCommand extends CommandBase {
   }
 
   @Override
-  @SuppressWarnings("LocalVariableName")
   public void execute() {
     double curTime = m_timer.get();
     double dt = curTime - m_prevTime;

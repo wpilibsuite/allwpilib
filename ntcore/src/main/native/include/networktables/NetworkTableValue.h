@@ -2,8 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#ifndef NTCORE_NETWORKTABLES_NETWORKTABLEVALUE_H_
-#define NTCORE_NETWORKTABLES_NETWORKTABLEVALUE_H_
+#pragma once
 
 #include <stdint.h>
 
@@ -31,8 +30,10 @@ class Value final {
 
  public:
   Value();
-  Value(NT_Type type, uint64_t time, const private_init&);
-  ~Value();
+  Value(NT_Type type, int64_t time, const private_init&);
+  Value(NT_Type type, int64_t time, int64_t serverTime, const private_init&);
+
+  explicit operator bool() const { return m_val.type != NT_UNASSIGNED; }
 
   /**
    * Get the data type.
@@ -49,18 +50,39 @@ class Value final {
   const NT_Value& value() const { return m_val; }
 
   /**
-   * Get the creation time of the value.
+   * Get the creation time of the value, in local time.
    *
    * @return The time, in the units returned by nt::Now().
    */
-  uint64_t last_change() const { return m_val.last_change; }
+  int64_t last_change() const { return m_val.last_change; }
 
   /**
-   * Get the creation time of the value.
+   * Get the creation time of the value, in local time.
    *
    * @return The time, in the units returned by nt::Now().
    */
-  uint64_t time() const { return m_val.last_change; }
+  int64_t time() const { return m_val.last_change; }
+
+  /**
+   * Set the local creation time of the value.
+   *
+   * @param time The time.
+   */
+  void SetTime(int64_t time) { m_val.last_change = time; }
+
+  /**
+   * Get the creation time of the value, in server time.
+   *
+   * @return The server time.
+   */
+  int64_t server_time() const { return m_val.server_time; }
+
+  /**
+   * Set the creation time of the value, in server time.
+   *
+   * @param time The server time.
+   */
+  void SetServerTime(int64_t time) { m_val.server_time = time; }
 
   /**
    * @{
@@ -80,6 +102,20 @@ class Value final {
    * @return True if the entry value is of boolean type.
    */
   bool IsBoolean() const { return m_val.type == NT_BOOLEAN; }
+
+  /**
+   * Determine if entry value contains an integer.
+   *
+   * @return True if the entry value is of integer type.
+   */
+  bool IsInteger() const { return m_val.type == NT_INTEGER; }
+
+  /**
+   * Determine if entry value contains a float.
+   *
+   * @return True if the entry value is of float type.
+   */
+  bool IsFloat() const { return m_val.type == NT_FLOAT; }
 
   /**
    * Determine if entry value contains a double.
@@ -103,18 +139,25 @@ class Value final {
   bool IsRaw() const { return m_val.type == NT_RAW; }
 
   /**
-   * Determine if entry value contains a rpc definition.
-   *
-   * @return True if the entry value is of rpc definition type.
-   */
-  bool IsRpc() const { return m_val.type == NT_RPC; }
-
-  /**
    * Determine if entry value contains a boolean array.
    *
    * @return True if the entry value is of boolean array type.
    */
   bool IsBooleanArray() const { return m_val.type == NT_BOOLEAN_ARRAY; }
+
+  /**
+   * Determine if entry value contains an integer array.
+   *
+   * @return True if the entry value is of integer array type.
+   */
+  bool IsIntegerArray() const { return m_val.type == NT_INTEGER_ARRAY; }
+
+  /**
+   * Determine if entry value contains a float array.
+   *
+   * @return True if the entry value is of float array type.
+   */
+  bool IsFloatArray() const { return m_val.type == NT_FLOAT_ARRAY; }
 
   /**
    * Determine if entry value contains a double array.
@@ -148,6 +191,26 @@ class Value final {
   }
 
   /**
+   * Get the entry's integer value.
+   *
+   * @return The integer value.
+   */
+  int64_t GetInteger() const {
+    assert(m_val.type == NT_INTEGER);
+    return m_val.data.v_int;
+  }
+
+  /**
+   * Get the entry's float value.
+   *
+   * @return The float value.
+   */
+  float GetFloat() const {
+    assert(m_val.type == NT_FLOAT);
+    return m_val.data.v_float;
+  }
+
+  /**
    * Get the entry's double value.
    *
    * @return The double value.
@@ -164,7 +227,7 @@ class Value final {
    */
   std::string_view GetString() const {
     assert(m_val.type == NT_STRING);
-    return m_string;
+    return {m_val.data.v_string.str, m_val.data.v_string.len};
   }
 
   /**
@@ -172,19 +235,9 @@ class Value final {
    *
    * @return The raw value.
    */
-  std::string_view GetRaw() const {
+  wpi::span<const uint8_t> GetRaw() const {
     assert(m_val.type == NT_RAW);
-    return m_string;
-  }
-
-  /**
-   * Get the entry's rpc definition value.
-   *
-   * @return The rpc definition value.
-   */
-  std::string_view GetRpc() const {
-    assert(m_val.type == NT_RPC);
-    return m_string;
+    return {m_val.data.v_raw.data, m_val.data.v_raw.size};
   }
 
   /**
@@ -195,6 +248,26 @@ class Value final {
   wpi::span<const int> GetBooleanArray() const {
     assert(m_val.type == NT_BOOLEAN_ARRAY);
     return {m_val.data.arr_boolean.arr, m_val.data.arr_boolean.size};
+  }
+
+  /**
+   * Get the entry's integer array value.
+   *
+   * @return The integer array value.
+   */
+  wpi::span<const int64_t> GetIntegerArray() const {
+    assert(m_val.type == NT_INTEGER_ARRAY);
+    return {m_val.data.arr_int.arr, m_val.data.arr_int.size};
+  }
+
+  /**
+   * Get the entry's float array value.
+   *
+   * @return The float array value.
+   */
+  wpi::span<const float> GetFloatArray() const {
+    assert(m_val.type == NT_FLOAT_ARRAY);
+    return {m_val.data.arr_float.arr, m_val.data.arr_float.size};
   }
 
   /**
@@ -214,7 +287,7 @@ class Value final {
    */
   wpi::span<const std::string> GetStringArray() const {
     assert(m_val.type == NT_STRING_ARRAY);
-    return m_string_array;
+    return *static_cast<std::vector<std::string>*>(m_storage.get());
   }
 
   /** @} */
@@ -232,9 +305,37 @@ class Value final {
    *             time)
    * @return The entry value
    */
-  static std::shared_ptr<Value> MakeBoolean(bool value, uint64_t time = 0) {
-    auto val = std::make_shared<Value>(NT_BOOLEAN, time, private_init());
-    val->m_val.data.v_boolean = value;
+  static Value MakeBoolean(bool value, int64_t time = 0) {
+    Value val{NT_BOOLEAN, time, private_init{}};
+    val.m_val.data.v_boolean = value;
+    return val;
+  }
+
+  /**
+   * Creates an integer entry value.
+   *
+   * @param value the value
+   * @param time if nonzero, the creation time to use (instead of the current
+   *             time)
+   * @return The entry value
+   */
+  static Value MakeInteger(int64_t value, int64_t time = 0) {
+    Value val{NT_INTEGER, time, private_init{}};
+    val.m_val.data.v_int = value;
+    return val;
+  }
+
+  /**
+   * Creates a float entry value.
+   *
+   * @param value the value
+   * @param time if nonzero, the creation time to use (instead of the current
+   *             time)
+   * @return The entry value
+   */
+  static Value MakeFloat(float value, int64_t time = 0) {
+    Value val{NT_FLOAT, time, private_init{}};
+    val.m_val.data.v_float = value;
     return val;
   }
 
@@ -246,9 +347,9 @@ class Value final {
    *             time)
    * @return The entry value
    */
-  static std::shared_ptr<Value> MakeDouble(double value, uint64_t time = 0) {
-    auto val = std::make_shared<Value>(NT_DOUBLE, time, private_init());
-    val->m_val.data.v_double = value;
+  static Value MakeDouble(double value, int64_t time = 0) {
+    Value val{NT_DOUBLE, time, private_init{}};
+    val.m_val.data.v_double = value;
     return val;
   }
 
@@ -260,12 +361,12 @@ class Value final {
    *             time)
    * @return The entry value
    */
-  static std::shared_ptr<Value> MakeString(std::string_view value,
-                                           uint64_t time = 0) {
-    auto val = std::make_shared<Value>(NT_STRING, time, private_init());
-    val->m_string = value;
-    val->m_val.data.v_string.str = const_cast<char*>(val->m_string.c_str());
-    val->m_val.data.v_string.len = val->m_string.size();
+  static Value MakeString(std::string_view value, int64_t time = 0) {
+    Value val{NT_STRING, time, private_init{}};
+    auto data = std::make_shared<std::string>(value);
+    val.m_val.data.v_string.str = const_cast<char*>(data->c_str());
+    val.m_val.data.v_string.len = data->size();
+    val.m_storage = std::move(data);
     return val;
   }
 
@@ -279,11 +380,12 @@ class Value final {
    */
   template <typename T,
             typename std::enable_if<std::is_same<T, std::string>::value>::type>
-  static std::shared_ptr<Value> MakeString(T&& value, uint64_t time = 0) {
-    auto val = std::make_shared<Value>(NT_STRING, time, private_init());
-    val->m_string = std::forward<T>(value);
-    val->m_val.data.v_string.str = const_cast<char*>(val->m_string.c_str());
-    val->m_val.data.v_string.len = val->m_string.size();
+  static Value MakeString(T&& value, int64_t time = 0) {
+    Value val{NT_STRING, time, private_init{}};
+    auto data = std::make_shared<std::string>(std::forward(value));
+    val.m_val.data.v_string.str = const_cast<char*>(data->c_str());
+    val.m_val.data.v_string.len = data->size();
+    val.m_storage = std::move(data);
     return val;
   }
 
@@ -295,12 +397,13 @@ class Value final {
    *             time)
    * @return The entry value
    */
-  static std::shared_ptr<Value> MakeRaw(std::string_view value,
-                                        uint64_t time = 0) {
-    auto val = std::make_shared<Value>(NT_RAW, time, private_init());
-    val->m_string = value;
-    val->m_val.data.v_raw.str = const_cast<char*>(val->m_string.c_str());
-    val->m_val.data.v_raw.len = val->m_string.size();
+  static Value MakeRaw(wpi::span<const uint8_t> value, int64_t time = 0) {
+    Value val{NT_RAW, time, private_init{}};
+    auto data =
+        std::make_shared<std::vector<uint8_t>>(value.begin(), value.end());
+    val.m_val.data.v_raw.data = const_cast<uint8_t*>(data->data());
+    val.m_val.data.v_raw.size = data->size();
+    val.m_storage = std::move(data);
     return val;
   }
 
@@ -312,47 +415,14 @@ class Value final {
    *             time)
    * @return The entry value
    */
-  template <typename T,
-            typename std::enable_if<std::is_same<T, std::string>::value>::type>
-  static std::shared_ptr<Value> MakeRaw(T&& value, uint64_t time = 0) {
-    auto val = std::make_shared<Value>(NT_RAW, time, private_init());
-    val->m_string = std::forward<T>(value);
-    val->m_val.data.v_raw.str = const_cast<char*>(val->m_string.c_str());
-    val->m_val.data.v_raw.len = val->m_string.size();
-    return val;
-  }
-
-  /**
-   * Creates a rpc entry value.
-   *
-   * @param value the value
-   * @param time if nonzero, the creation time to use (instead of the current
-   *             time)
-   * @return The entry value
-   */
-  static std::shared_ptr<Value> MakeRpc(std::string_view value,
-                                        uint64_t time = 0) {
-    auto val = std::make_shared<Value>(NT_RPC, time, private_init());
-    val->m_string = value;
-    val->m_val.data.v_raw.str = const_cast<char*>(val->m_string.c_str());
-    val->m_val.data.v_raw.len = val->m_string.size();
-    return val;
-  }
-
-  /**
-   * Creates a rpc entry value.
-   *
-   * @param value the value
-   * @param time if nonzero, the creation time to use (instead of the current
-   *             time)
-   * @return The entry value
-   */
-  template <typename T>
-  static std::shared_ptr<Value> MakeRpc(T&& value, uint64_t time = 0) {
-    auto val = std::make_shared<Value>(NT_RPC, time, private_init());
-    val->m_string = std::forward<T>(value);
-    val->m_val.data.v_raw.str = const_cast<char*>(val->m_string.c_str());
-    val->m_val.data.v_raw.len = val->m_string.size();
+  template <typename T, typename std::enable_if<
+                            std::is_same<T, std::vector<uint8_t>>::value>::type>
+  static Value MakeRaw(T&& value, int64_t time = 0) {
+    Value val{NT_RAW, time, private_init{}};
+    auto data = std::make_shared<std::vector<uint8_t>>(std::forward(value));
+    val.m_val.data.v_raw.data = const_cast<uint8_t*>(data->data());
+    val.m_val.data.v_raw.size = data->size();
+    val.m_storage = std::move(data);
     return val;
   }
 
@@ -364,8 +434,7 @@ class Value final {
    *             time)
    * @return The entry value
    */
-  static std::shared_ptr<Value> MakeBooleanArray(wpi::span<const bool> value,
-                                                 uint64_t time = 0);
+  static Value MakeBooleanArray(wpi::span<const bool> value, int64_t time = 0);
 
   /**
    * Creates a boolean array entry value.
@@ -375,8 +444,8 @@ class Value final {
    *             time)
    * @return The entry value
    */
-  static std::shared_ptr<Value> MakeBooleanArray(
-      std::initializer_list<bool> value, uint64_t time = 0) {
+  static Value MakeBooleanArray(std::initializer_list<bool> value,
+                                int64_t time = 0) {
     return MakeBooleanArray(wpi::span(value.begin(), value.end()), time);
   }
 
@@ -388,8 +457,7 @@ class Value final {
    *             time)
    * @return The entry value
    */
-  static std::shared_ptr<Value> MakeBooleanArray(wpi::span<const int> value,
-                                                 uint64_t time = 0);
+  static Value MakeBooleanArray(wpi::span<const int> value, int64_t time = 0);
 
   /**
    * Creates a boolean array entry value.
@@ -399,9 +467,56 @@ class Value final {
    *             time)
    * @return The entry value
    */
-  static std::shared_ptr<Value> MakeBooleanArray(
-      std::initializer_list<int> value, uint64_t time = 0) {
+  static Value MakeBooleanArray(std::initializer_list<int> value,
+                                int64_t time = 0) {
     return MakeBooleanArray(wpi::span(value.begin(), value.end()), time);
+  }
+
+  /**
+   * Creates an integer array entry value.
+   *
+   * @param value the value
+   * @param time if nonzero, the creation time to use (instead of the current
+   *             time)
+   * @return The entry value
+   */
+  static Value MakeIntegerArray(wpi::span<const int64_t> value,
+                                int64_t time = 0);
+
+  /**
+   * Creates an integer array entry value.
+   *
+   * @param value the value
+   * @param time if nonzero, the creation time to use (instead of the current
+   *             time)
+   * @return The entry value
+   */
+  static Value MakeIntegerArray(std::initializer_list<int64_t> value,
+                                int64_t time = 0) {
+    return MakeIntegerArray(wpi::span(value.begin(), value.end()), time);
+  }
+
+  /**
+   * Creates a float array entry value.
+   *
+   * @param value the value
+   * @param time if nonzero, the creation time to use (instead of the current
+   *             time)
+   * @return The entry value
+   */
+  static Value MakeFloatArray(wpi::span<const float> value, int64_t time = 0);
+
+  /**
+   * Creates a float array entry value.
+   *
+   * @param value the value
+   * @param time if nonzero, the creation time to use (instead of the current
+   *             time)
+   * @return The entry value
+   */
+  static Value MakeFloatArray(std::initializer_list<float> value,
+                              int64_t time = 0) {
+    return MakeFloatArray(wpi::span(value.begin(), value.end()), time);
   }
 
   /**
@@ -412,8 +527,7 @@ class Value final {
    *             time)
    * @return The entry value
    */
-  static std::shared_ptr<Value> MakeDoubleArray(wpi::span<const double> value,
-                                                uint64_t time = 0);
+  static Value MakeDoubleArray(wpi::span<const double> value, int64_t time = 0);
 
   /**
    * Creates a double array entry value.
@@ -423,8 +537,8 @@ class Value final {
    *             time)
    * @return The entry value
    */
-  static std::shared_ptr<Value> MakeDoubleArray(
-      std::initializer_list<double> value, uint64_t time = 0) {
+  static Value MakeDoubleArray(std::initializer_list<double> value,
+                               int64_t time = 0) {
     return MakeDoubleArray(wpi::span(value.begin(), value.end()), time);
   }
 
@@ -436,8 +550,8 @@ class Value final {
    *             time)
    * @return The entry value
    */
-  static std::shared_ptr<Value> MakeStringArray(
-      wpi::span<const std::string> value, uint64_t time = 0);
+  static Value MakeStringArray(wpi::span<const std::string> value,
+                               int64_t time = 0);
 
   /**
    * Creates a string array entry value.
@@ -447,8 +561,8 @@ class Value final {
    *             time)
    * @return The entry value
    */
-  static std::shared_ptr<Value> MakeStringArray(
-      std::initializer_list<std::string> value, uint64_t time = 0) {
+  static Value MakeStringArray(std::initializer_list<std::string> value,
+                               int64_t time = 0) {
     return MakeStringArray(wpi::span(value.begin(), value.end()), time);
   }
 
@@ -462,19 +576,16 @@ class Value final {
    *
    * @note This function moves the values out of the vector.
    */
-  static std::shared_ptr<Value> MakeStringArray(
-      std::vector<std::string>&& value, uint64_t time = 0);
+  static Value MakeStringArray(std::vector<std::string>&& value,
+                               int64_t time = 0);
 
   /** @} */
 
-  Value(const Value&) = delete;
-  Value& operator=(const Value&) = delete;
   friend bool operator==(const Value& lhs, const Value& rhs);
 
  private:
   NT_Value m_val;
-  std::string m_string;
-  std::vector<std::string> m_string_array;
+  std::shared_ptr<void> m_storage;
 };
 
 bool operator==(const Value& lhs, const Value& rhs);
@@ -489,5 +600,3 @@ inline bool operator!=(const Value& lhs, const Value& rhs) {
 using NetworkTableValue = Value;
 
 }  // namespace nt
-
-#endif  // NTCORE_NETWORKTABLES_NETWORKTABLEVALUE_H_

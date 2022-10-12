@@ -113,7 +113,6 @@ public class Drivetrain {
    * @param xSpeed the speed for the x axis
    * @param rot the rotation
    */
-  @SuppressWarnings("ParameterName")
   public void drive(double xSpeed, double rot) {
     setSpeeds(m_kinematics.toWheelSpeeds(new ChassisSpeeds(xSpeed, 0, rot)));
   }

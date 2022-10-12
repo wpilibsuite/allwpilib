@@ -7,11 +7,12 @@
 #include <string>
 #include <string_view>
 
-#include <ntcore_cpp.h>
+#include <networktables/BooleanTopic.h>
+#include <networktables/NetworkTableInstance.h>
+#include <networktables/StringTopic.h>
 
 #include "glass/DataSource.h"
 #include "glass/hardware/DIO.h"
-#include "glass/networktables/NetworkTablesHelper.h"
 
 namespace glass {
 
@@ -21,7 +22,7 @@ class NTDigitalInputModel : public DIOModel {
 
   // path is to the table containing ".type", excluding the trailing /
   explicit NTDigitalInputModel(std::string_view path);
-  NTDigitalInputModel(NT_Inst inst, std::string_view path);
+  NTDigitalInputModel(nt::NetworkTableInstance inst, std::string_view path);
 
   const char* GetName() const override { return m_nameValue.c_str(); }
 
@@ -42,9 +43,9 @@ class NTDigitalInputModel : public DIOModel {
   bool IsReadOnly() override { return true; }
 
  private:
-  NetworkTablesHelper m_nt;
-  NT_Entry m_value;
-  NT_Entry m_name;
+  nt::NetworkTableInstance m_inst;
+  nt::BooleanSubscriber m_value;
+  nt::StringSubscriber m_name;
 
   DataSource m_valueData;
   std::string m_nameValue;

@@ -9,37 +9,30 @@
 using namespace glass;
 
 NTSubsystemModel::NTSubsystemModel(std::string_view path)
-    : NTSubsystemModel(nt::GetDefaultInstance(), path) {}
+    : NTSubsystemModel(nt::NetworkTableInstance::GetDefault(), path) {}
 
-NTSubsystemModel::NTSubsystemModel(NT_Inst instance, std::string_view path)
-    : m_nt(instance),
-      m_name(m_nt.GetEntry(fmt::format("{}/.name", path))),
-      m_defaultCommand(m_nt.GetEntry(fmt::format("{}/.default", path))),
-      m_currentCommand(m_nt.GetEntry(fmt::format("{}/.command", path))) {
-  m_nt.AddListener(m_name);
-  m_nt.AddListener(m_defaultCommand);
-  m_nt.AddListener(m_currentCommand);
+NTSubsystemModel::NTSubsystemModel(nt::NetworkTableInstance inst,
+                                   std::string_view path)
+    : m_inst{inst},
+      m_name{inst.GetStringTopic(fmt::format("{}/.name", path)).Subscribe("")},
+      m_defaultCommand{
+          inst.GetStringTopic(fmt::format("{}/.default", path)).Subscribe("")},
+      m_currentCommand{
+          inst.GetStringTopic(fmt::format("{}/.command", path)).Subscribe("")} {
 }
 
 void NTSubsystemModel::Update() {
-  for (auto&& event : m_nt.PollListener()) {
-    if (event.entry == m_name) {
-      if (event.value && event.value->IsString()) {
-        m_nameValue = event.value->GetString();
-      }
-    } else if (event.entry == m_defaultCommand) {
-      if (event.value && event.value->IsString()) {
-        m_defaultCommandValue = event.value->GetString();
-      }
-    } else if (event.entry == m_currentCommand) {
-      if (event.value && event.value->IsString()) {
-        m_currentCommandValue = event.value->GetString();
-      }
-    }
+  for (auto&& v : m_name.ReadQueue()) {
+    m_nameValue = std::move(v.value);
+  }
+  for (auto&& v : m_defaultCommand.ReadQueue()) {
+    m_defaultCommandValue = std::move(v.value);
+  }
+  for (auto&& v : m_currentCommand.ReadQueue()) {
+    m_currentCommandValue = std::move(v.value);
   }
 }
 
 bool NTSubsystemModel::Exists() {
-  return m_nt.IsConnected() &&
-         nt::GetEntryType(m_defaultCommand) != NT_UNASSIGNED;
+  return m_inst.IsConnected() && m_defaultCommand.Exists();
 }

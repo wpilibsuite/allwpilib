@@ -192,7 +192,6 @@ public class Counter implements CounterBase, Sendable, AutoCloseable {
    *
    * @return the Counter's FPGA index
    */
-  @SuppressWarnings("AbbreviationAsWordInName")
   public int getFPGAIndex() {
     return m_index;
   }

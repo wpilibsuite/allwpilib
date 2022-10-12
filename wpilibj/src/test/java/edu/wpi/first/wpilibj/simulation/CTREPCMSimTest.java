@@ -18,7 +18,6 @@ import edu.wpi.first.wpilibj.simulation.testutils.BooleanCallback;
 import edu.wpi.first.wpilibj.simulation.testutils.DoubleCallback;
 import org.junit.jupiter.api.Test;
 
-@SuppressWarnings("AbbreviationAsWordInName")
 class CTREPCMSimTest {
   @Test
   void testInitialization() {

@@ -101,7 +101,7 @@ model {
                     return
                 }
                 cppCompiler.define 'DYNAMIC_CAMERA_SERVER'
-                lib project: ':ntcore', library: 'ntcore', linkage: 'shared'
+                project(':ntcore').addNtcoreDependency(it, 'shared')
                 project(':hal').addHalDependency(it, 'shared')
                 lib project: ':wpinet', library: 'wpinet', linkage: 'shared'
                 lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
@@ -121,7 +121,7 @@ model {
                 }
             }
             binaries.all {
-                lib project: ':ntcore', library: 'ntcore', linkage: 'shared'
+                project(':ntcore').addNtcoreDependency(it, 'shared')
                 project(':hal').addHalDependency(it, 'shared')
                 lib project: ':wpinet', library: 'wpinet', linkage: 'shared'
                 lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
@@ -158,7 +158,7 @@ model {
                 }
             }
             binaries.all {
-                lib project: ':ntcore', library: 'ntcore', linkage: 'shared'
+                project(':ntcore').addNtcoreDependency(it, 'shared')
                 lib project: ':cscore', library: 'cscore', linkage: 'shared'
                 project(':hal').addHalDependency(it, 'shared')
                 lib project: ':wpinet', library: 'wpinet', linkage: 'shared'
@@ -209,7 +209,7 @@ model {
             }
         }
         withType(GoogleTestTestSuiteBinarySpec) {
-            lib project: ':ntcore', library: 'ntcore', linkage: 'shared'
+            project(':ntcore').addNtcoreDependency(it, 'shared')
             lib project: ':cscore', library: 'cscore', linkage: 'shared'
             project(':hal').addHalDependency(it, 'shared')
             lib project: ':wpinet', library: 'wpinet', linkage: 'shared'
