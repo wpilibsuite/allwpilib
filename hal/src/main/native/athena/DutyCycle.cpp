@@ -6,6 +6,7 @@
 
 #include <memory>
 
+#include "ConstantsInternal.h"
 #include "DigitalInternal.h"
 #include "DutyCycleInternal.h"
 #include "HALInitializer.h"
@@ -29,8 +30,6 @@ void InitializeDutyCycle() {
 }
 }  // namespace init
 }  // namespace hal
-
-static constexpr int32_t kScaleFactor = 4e7 - 1;
 
 extern "C" {
 HAL_DutyCycleHandle HAL_InitializeDutyCycle(HAL_Handle digitalSourceHandle,
@@ -89,13 +88,7 @@ int32_t HAL_GetDutyCycleFrequency(HAL_DutyCycleHandle dutyCycleHandle,
 }
 
 double HAL_GetDutyCycleOutput(HAL_DutyCycleHandle dutyCycleHandle,
-                              int32_t* status) {
-  return HAL_GetDutyCycleOutputRaw(dutyCycleHandle, status) /
-         static_cast<double>(kScaleFactor);
-}
-
-int32_t HAL_GetDutyCycleOutputRaw(HAL_DutyCycleHandle dutyCycleHandle,
-                                  int32_t* status) {
+                                   int32_t* status) {
   auto dutyCycle = dutyCycleHandles->Get(dutyCycleHandle);
   if (!dutyCycle) {
     *status = HAL_HANDLE_ERROR;
@@ -104,12 +97,43 @@ int32_t HAL_GetDutyCycleOutputRaw(HAL_DutyCycleHandle dutyCycleHandle,
 
   // TODO Handle Overflow
   unsigned char overflow = 0;
-  return dutyCycle->dutyCycle->readOutput(&overflow, status);
+  uint32_t output = dutyCycle->dutyCycle->readOutput(&overflow, status);
+  return output / static_cast<double>(kDutyCycleScaleFactor);
+}
+
+int32_t HAL_GetDutyCycleHighTime(HAL_DutyCycleHandle dutyCycleHandle,
+                                 int32_t* status) {
+  auto dutyCycle = dutyCycleHandles->Get(dutyCycleHandle);
+  if (!dutyCycle) {
+    *status = HAL_HANDLE_ERROR;
+    return 0;
+  }
+
+  // TODO Handle Overflow
+  unsigned char overflow = 0;
+  uint32_t freq0 = dutyCycle->dutyCycle->readFrequency(&overflow, status);
+  uint32_t output = dutyCycle->dutyCycle->readOutput(&overflow, status);
+  uint32_t freq1 = dutyCycle->dutyCycle->readFrequency(&overflow, status);
+  if (*status != 0) {
+    return 0;
+  }
+  if (freq0 != freq1) {
+    // Frequency rolled over. Reread output
+    output = dutyCycle->dutyCycle->readOutput(&overflow, status);
+    if (*status != 0) {
+      return 0;
+    }
+  }
+  if (freq1 == 0) {
+    return 0;
+  }
+  // Output will be at max 4e7, so x25 will still fit in a 32 bit signed int.
+  return (output / freq1) * 25;
 }
 
 int32_t HAL_GetDutyCycleOutputScaleFactor(HAL_DutyCycleHandle dutyCycleHandle,
                                           int32_t* status) {
-  return kScaleFactor;
+  return kDutyCycleScaleFactor;
 }
 
 int32_t HAL_GetDutyCycleFPGAIndex(HAL_DutyCycleHandle dutyCycleHandle,

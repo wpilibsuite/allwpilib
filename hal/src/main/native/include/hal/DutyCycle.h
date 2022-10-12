@@ -68,27 +68,24 @@ int32_t HAL_GetDutyCycleFrequency(HAL_DutyCycleHandle dutyCycleHandle,
  * @return output ratio between 0 and 1
  */
 double HAL_GetDutyCycleOutput(HAL_DutyCycleHandle dutyCycleHandle,
-                              int32_t* status);
+                                   int32_t* status);
 
 /**
- * Get the raw output ratio of the duty cycle signal.
- *
- * <p> 0 means always low, an output equal to
- * GetOutputScaleFactor() means always high.
+ * Get the raw high time of the duty cycle signal.
  *
  * @param[in] dutyCycleHandle the duty cycle handle
  * @param[out] status Error status variable. 0 on success.
- * @return output ratio in raw units
+ * @return high time of last pulse in nanoseconds
  */
-int32_t HAL_GetDutyCycleOutputRaw(HAL_DutyCycleHandle dutyCycleHandle,
-                                  int32_t* status);
+int32_t HAL_GetDutyCycleHighTime(HAL_DutyCycleHandle dutyCycleHandle,
+                                 int32_t* status);
 
 /**
  * Get the scale factor of the output.
  *
  * <p> An output equal to this value is always high, and then linearly scales
- * down to 0. Divide the result of getOutputRaw by this in order to get the
- * percentage between 0 and 1.
+ * down to 0. Divide a raw result by this in order to get the
+ * percentage between 0 and 1. Used by DMA.
  *
  * @param[in] dutyCycleHandle the duty cycle handle
  * @param[out] status Error status variable. 0 on success.
