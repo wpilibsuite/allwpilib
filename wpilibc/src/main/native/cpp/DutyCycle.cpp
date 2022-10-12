@@ -73,18 +73,11 @@ double DutyCycle::GetOutput() const {
   return retVal;
 }
 
-unsigned int DutyCycle::GetOutputRaw() const {
+units::second_t DutyCycle::GetHighTime() const {
   int32_t status = 0;
-  auto retVal = HAL_GetDutyCycleOutputRaw(m_handle, &status);
+  auto retVal = HAL_GetDutyCycleHighTime(m_handle, &status);
   FRC_CheckErrorStatus(status, "Channel {}", GetSourceChannel());
-  return retVal;
-}
-
-unsigned int DutyCycle::GetOutputScaleFactor() const {
-  int32_t status = 0;
-  auto retVal = HAL_GetDutyCycleOutputScaleFactor(m_handle, &status);
-  FRC_CheckErrorStatus(status, "Channel {}", GetSourceChannel());
-  return retVal;
+  return units::nanosecond_t{static_cast<double>(retVal)};
 }
 
 int DutyCycle::GetSourceChannel() const {
