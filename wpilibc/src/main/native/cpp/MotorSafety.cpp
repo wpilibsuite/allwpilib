@@ -53,32 +53,47 @@ void Thread::Main() {
 static wpi::SafeThreadOwner<Thread> m_owner;
 }  // namespace
 
-static wpi::SmallPtrSet<MotorSafety*, 32> instanceList;
-static wpi::mutex listMutex;
-static bool threadStarted = false;
+static std::atomic_bool gShutdown{false};
+
+namespace {
+struct MotorSafetyManager {
+  ~MotorSafetyManager() { gShutdown = true; }
+
+  wpi::SmallPtrSet<MotorSafety*, 32> instanceList;
+  wpi::mutex listMutex;
+  bool threadStarted = false;
+};
+}  // namespace
+
+static MotorSafetyManager& GetManager() {
+  static MotorSafetyManager manager;
+  return manager;
+}
 
 #ifndef __FRC_ROBORIO__
 namespace frc::impl {
 void ResetMotorSafety() {
-  std::scoped_lock lock(listMutex);
-  instanceList.clear();
+  auto& manager = GetManager();
+  std::scoped_lock lock(manager.listMutex);
+  manager.instanceList.clear();
 }
 }  // namespace frc::impl
 #endif
 
 MotorSafety::MotorSafety() {
-  std::scoped_lock lock(listMutex);
-  instanceList.insert(this);
-  if (!threadStarted) {
-    threadStarted = true;
+  auto& manager = GetManager();
+  std::scoped_lock lock(manager.listMutex);
+  manager.instanceList.insert(this);
+  if (!manager.threadStarted) {
+    manager.threadStarted = true;
     m_owner.Start();
-    // TODO Threads
   }
 }
 
 MotorSafety::~MotorSafety() {
-  std::scoped_lock lock(listMutex);
-  instanceList.erase(this);
+  auto& manager = GetManager();
+  std::scoped_lock lock(manager.listMutex);
+  manager.instanceList.erase(this);
 }
 
 MotorSafety::MotorSafety(MotorSafety&& rhs)
@@ -156,8 +171,9 @@ void MotorSafety::Check() {
 }
 
 void MotorSafety::CheckMotors() {
-  std::scoped_lock lock(listMutex);
-  for (auto elem : instanceList) {
+  auto& manager = GetManager();
+  std::scoped_lock lock(manager.listMutex);
+  for (auto elem : manager.instanceList) {
     elem->Check();
   }
 }
