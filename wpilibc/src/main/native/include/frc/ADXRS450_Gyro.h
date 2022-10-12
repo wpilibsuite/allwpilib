@@ -114,7 +114,6 @@ class ADXRS450_Gyro : public Gyro,
   hal::SimDouble m_simAngle;
   hal::SimDouble m_simRate;
 
-
   uint16_t ReadRegister(int reg);
 };
 

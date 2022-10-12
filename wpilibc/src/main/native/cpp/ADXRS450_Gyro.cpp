@@ -32,7 +32,8 @@ ADXRS450_Gyro::ADXRS450_Gyro() : ADXRS450_Gyro(SPI::kOnboardCS0) {}
 ADXRS450_Gyro::ADXRS450_Gyro(SPI::Port port)
     : m_spi(port), m_port(port), m_simDevice("Gyro:ADXRS450", port) {
   if (m_simDevice) {
-    m_simConnected = m_simDevice.CreateBoolean("connected", hal::SimDevice::kInput, true);
+    m_simConnected =
+        m_simDevice.CreateBoolean("connected", hal::SimDevice::kInput, true);
     m_simAngle =
         m_simDevice.CreateDouble("angle_x", hal::SimDevice::kInput, 0.0);
     m_simRate = m_simDevice.CreateDouble("rate_x", hal::SimDevice::kInput, 0.0);
