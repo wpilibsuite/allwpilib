@@ -68,7 +68,7 @@ int32_t HAL_GetDutyCycleFrequency(HAL_DutyCycleHandle dutyCycleHandle,
  * @return output ratio between 0 and 1
  */
 double HAL_GetDutyCycleOutput(HAL_DutyCycleHandle dutyCycleHandle,
-                                   int32_t* status);
+                              int32_t* status);
 
 /**
  * Get the raw high time of the duty cycle signal.

@@ -7,9 +7,9 @@
 #include <memory>
 
 #include <hal/Types.h>
+#include <units/time.h>
 #include <wpi/sendable/Sendable.h>
 #include <wpi/sendable/SendableHelper.h>
-#include <units/time.h>
 
 namespace frc {
 class DigitalSource;

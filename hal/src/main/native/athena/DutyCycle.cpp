@@ -88,7 +88,7 @@ int32_t HAL_GetDutyCycleFrequency(HAL_DutyCycleHandle dutyCycleHandle,
 }
 
 double HAL_GetDutyCycleOutput(HAL_DutyCycleHandle dutyCycleHandle,
-                                   int32_t* status) {
+                              int32_t* status) {
   auto dutyCycle = dutyCycleHandles->Get(dutyCycleHandle);
   if (!dutyCycle) {
     *status = HAL_HANDLE_ERROR;
