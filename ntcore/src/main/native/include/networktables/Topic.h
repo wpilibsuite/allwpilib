@@ -340,7 +340,7 @@ class Subscriber {
   NT_Subscriber m_subHandle{0};
 };
 
-/** NetworkTables pubscriber. */
+/** NetworkTables publisher. */
 class Publisher {
  public:
   virtual ~Publisher();
