@@ -759,6 +759,9 @@ void LSImpl::SetRetained(TopicData* topic, bool value) {
 
 void LSImpl::SetProperties(TopicData* topic, const wpi::json& update,
                            bool sendNetwork) {
+  if (!update.is_object()) {
+    return;
+  }
   DEBUG4("SetProperties({},{})", topic->name, sendNetwork);
   for (auto&& change : update.items()) {
     if (change.value().is_null()) {
@@ -1871,7 +1874,8 @@ NT_Publisher LocalStorage::Publish(NT_Topic topicHandle, NT_Type type,
                                    std::string_view typeStr,
                                    const wpi::json& properties,
                                    wpi::span<const PubSubOption> options) {
-  if (type == NT_UNASSIGNED || typeStr.empty()) {
+  if (type == NT_UNASSIGNED || typeStr.empty() ||
+      !(properties.is_null() || properties.is_object())) {
     return 0;
   }
 
