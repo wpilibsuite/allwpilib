@@ -927,8 +927,13 @@ PublisherData* LSImpl::AddLocalPublisher(TopicData* topic,
 
     if (properties.is_null()) {
       topic->properties = wpi::json::object();
-    } else {
+    } else if (properties.is_object()) {
       topic->properties = properties;
+    } else {
+      WPI_WARNING(m_logger,
+                  "ignoring non-object properties when publishing '{}'",
+                  topic->name);
+      topic->properties = wpi::json::object();
     }
 
     if (topic->properties.empty()) {
@@ -1874,16 +1879,21 @@ NT_Publisher LocalStorage::Publish(NT_Topic topicHandle, NT_Type type,
                                    std::string_view typeStr,
                                    const wpi::json& properties,
                                    wpi::span<const PubSubOption> options) {
-  if (type == NT_UNASSIGNED || typeStr.empty() ||
-      !(properties.is_null() || properties.is_object())) {
-    return 0;
-  }
-
   std::scoped_lock lock{m_mutex};
 
   // Get the topic
   auto* topic = m_impl->m_topics.Get(topicHandle);
   if (!topic) {
+    WPI_ERROR(m_impl->m_logger, "trying to publish invalid topic handle ({})",
+              topicHandle);
+    return 0;
+  }
+
+  if (type == NT_UNASSIGNED || typeStr.empty()) {
+    WPI_ERROR(
+        m_impl->m_logger,
+        "cannot publish '{}' with an unassigned type or empty type string",
+        topic->name);
     return 0;
   }
 
