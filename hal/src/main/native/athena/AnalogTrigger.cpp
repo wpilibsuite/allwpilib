@@ -5,6 +5,7 @@
 #include "hal/AnalogTrigger.h"
 
 #include "AnalogInternal.h"
+#include "ConstantsInternal.h"
 #include "DutyCycleInternal.h"
 #include "HALInitializer.h"
 #include "HALInternal.h"
@@ -147,16 +148,10 @@ void HAL_SetAnalogTriggerLimitsDutyCycle(
     return;
   }
 
-  int32_t scaleFactor =
-      HAL_GetDutyCycleOutputScaleFactor(trigger->handle, status);
-  if (*status != 0) {
-    return;
-  }
-
-  trigger->trigger->writeLowerLimit(static_cast<int32_t>(scaleFactor * lower),
-                                    status);
-  trigger->trigger->writeUpperLimit(static_cast<int32_t>(scaleFactor * upper),
-                                    status);
+  trigger->trigger->writeLowerLimit(
+      static_cast<int32_t>(kDutyCycleScaleFactor * lower), status);
+  trigger->trigger->writeUpperLimit(
+      static_cast<int32_t>(kDutyCycleScaleFactor * upper), status);
 }
 
 void HAL_SetAnalogTriggerLimitsVoltage(
