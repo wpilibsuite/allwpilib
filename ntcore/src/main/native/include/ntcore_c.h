@@ -671,6 +671,7 @@ char* NT_GetTopicProperties(NT_Topic topic, size_t* len);
  *
  * @param topic topic handle
  * @param properties JSON object string with keys to add/update/delete
+ * @param Returns false if properties are not a valid JSON object
  */
 NT_Bool NT_SetTopicProperties(NT_Topic topic, const char* properties);
 

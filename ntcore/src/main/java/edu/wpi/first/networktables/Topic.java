@@ -141,6 +141,7 @@ public class Topic {
    *
    * @param name property name
    * @param value property value (JSON string)
+   * @throw IllegalArgumentException if properties is not parseable as JSON
    */
   public void setProperty(String name, String value) {
     NetworkTablesJNI.setTopicProperty(m_handle, name, value);
@@ -171,6 +172,7 @@ public class Topic {
    * values result in deletion of the corresponding property.
    *
    * @param properties JSON object string with keys to add/update/delete
+   * @throw IllegalArgumentException if properties is not a JSON object
    */
   public void setProperties(String properties) {
     NetworkTablesJNI.setTopicProperties(m_handle, properties);
@@ -242,6 +244,7 @@ public class Topic {
    * @param properties JSON properties
    * @param options publish options
    * @return publisher
+   * @throw IllegalArgumentException if properties is not a JSON object
    */
   public GenericPublisher genericPublishEx(
       String typeString, String properties, PubSubOption... options) {

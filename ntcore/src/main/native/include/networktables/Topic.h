@@ -149,8 +149,9 @@ class Topic {
    * of the corresponding property.
    *
    * @param properties JSON object with keys to add/update/delete
+   * @return False if properties is not an object
    */
-  void SetProperties(const wpi::json& properties);
+  bool SetProperties(const wpi::json& properties);
 
   /**
    * Gets combined information about the topic.

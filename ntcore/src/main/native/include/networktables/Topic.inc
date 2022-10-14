@@ -54,8 +54,8 @@ inline void Topic::DeleteProperty(std::string_view name) {
   ::nt::DeleteTopicProperty(m_handle, name);
 }
 
-inline void Topic::SetProperties(const wpi::json& properties) {
-  ::nt::SetTopicProperties(m_handle, properties);
+inline bool Topic::SetProperties(const wpi::json& properties) {
+  return ::nt::SetTopicProperties(m_handle, properties);
 }
 
 inline TopicInfo Topic::GetInfo() const {

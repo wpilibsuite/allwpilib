@@ -84,7 +84,7 @@ class LocalStorage final : public net::ILocalStorage {
 
   wpi::json GetTopicProperties(NT_Topic topic);
 
-  void SetTopicProperties(NT_Topic topic, const wpi::json& update);
+  bool SetTopicProperties(NT_Topic topic, const wpi::json& update);
 
   TopicInfo GetTopicInfo(NT_Topic topic);
 

@@ -1820,14 +1820,17 @@ wpi::json LocalStorage::GetTopicProperties(NT_Topic topicHandle) {
   }
 }
 
-void LocalStorage::SetTopicProperties(NT_Topic topicHandle,
+bool LocalStorage::SetTopicProperties(NT_Topic topicHandle,
                                       const wpi::json& update) {
   if (!update.is_object()) {
-    return;
+    return false;
   }
   std::scoped_lock lock{m_mutex};
   if (auto topic = m_impl->m_topics.Get(topicHandle)) {
     m_impl->SetProperties(topic, update, true);
+    return true;
+  } else {
+    return {};
   }
 }
 

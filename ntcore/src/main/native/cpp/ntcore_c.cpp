@@ -298,8 +298,7 @@ NT_Bool NT_SetTopicProperties(NT_Topic topic, const char* properties) {
   } catch (wpi::json::parse_error&) {
     return false;
   }
-  nt::SetTopicProperties(topic, j);
-  return true;
+  return nt::SetTopicProperties(topic, j);
 }
 
 NT_Subscriber NT_Subscribe(NT_Topic topic, NT_Type type, const char* typeStr,
