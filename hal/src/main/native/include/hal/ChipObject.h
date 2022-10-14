@@ -34,7 +34,6 @@
 #include <FRC_FPGA_ChipObject/nRoboRIO_FPGANamespace/tSysWatchdog.h>
 #include <FRC_FPGA_ChipObject/tDMAChannelDescriptor.h>
 #include <FRC_FPGA_ChipObject/tDMAManager.h>
-#include <FRC_FPGA_ChipObject/tInterruptManager.h>
 #include <FRC_FPGA_ChipObject/tSystem.h>
 #include <FRC_FPGA_ChipObject/tSystemInterface.h>
 
