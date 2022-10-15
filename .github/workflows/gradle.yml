@@ -66,6 +66,10 @@ jobs:
             architecture: x64
             build-options: "-Pbuildalldesktop"
             task: "build"
+          - os: windows-2019
+            artifact-name: Win32
+            architecture: x86
+            task: ":ntcoreffi:build"
     name: "Build - ${{ matrix.artifact-name }}"
     runs-on: ${{ matrix.os }}
     steps:
