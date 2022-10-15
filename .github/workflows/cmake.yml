@@ -33,7 +33,7 @@ jobs:
 
       - name: Set up Python
         if: runner.os == 'Linux'
-        run: sudo apt-get update && sudo apt-get install -y python3-as-python
+        run: sudo apt-get update && sudo apt-get install -y python-is-python3
 
       - name: Set up Python 3.8
         if: runner.os == 'macOS'
