@@ -69,7 +69,6 @@ jobs:
           - os: windows-2019
             artifact-name: Win32
             architecture: x86
-            build-options: "-Dorg.gradle.jvmargs=-Xmx1g"
             task: ":ntcoreffi:build"
     name: "Build - ${{ matrix.artifact-name }}"
     runs-on: ${{ matrix.os }}
@@ -99,6 +98,13 @@ jobs:
         run: echo "EXTRA_GRADLE_ARGS=-PreleaseMode" >> $GITHUB_ENV
         shell: bash
         if: startsWith(github.ref, 'refs/tags/v')
+      - name: Set Java Heap Size
+        if: matrix.artifact-name == 'Win32'
+        uses: jacobtomlinson/gha-find-replace@v2
+        with:
+          find: "-Xmx2g"
+          replace: "-Xmx1g"
+          regex: False
       - name: Build with Gradle
         run: ./gradlew ${{ matrix.task }} --build-cache -PbuildServer -PskipJavaFormat ${{ matrix.build-options }} ${{ env.EXTRA_GRADLE_ARGS }}
         env:
