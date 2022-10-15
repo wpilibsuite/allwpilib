@@ -38,7 +38,6 @@ def generateSymbols = tasks.register('generateFfiSymbols') {
 model {
     components {
         ntcoreffi(NativeLibrarySpec) {
-            targetBuildTypes 'release'
             sources {
                 c {
                     source {
