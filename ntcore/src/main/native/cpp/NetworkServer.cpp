@@ -7,6 +7,7 @@
 #include <stdint.h>
 
 #include <atomic>
+#include <span>
 #include <system_error>
 #include <vector>
 
@@ -256,7 +257,7 @@ void ServerConnection4::ProcessWsUpgrade() {
     m_websocket->text.connect([this](std::string_view data, bool) {
       m_server.m_serverImpl.ProcessIncomingText(m_clientId, data);
     });
-    m_websocket->binary.connect([this](wpi::span<const uint8_t> data, bool) {
+    m_websocket->binary.connect([this](std::span<const uint8_t> data, bool) {
       m_server.m_serverImpl.ProcessIncomingBinary(m_clientId, data);
     });
 
@@ -327,7 +328,7 @@ NSImpl::NSImpl(std::string_view persistentFilename,
       m_localQueue{logger},
       m_loop(*m_loopRunner.GetLoop()) {
   m_localMsgs.reserve(net::NetworkLoopQueue::kInitialQueueSize);
-  m_loopRunner.ExecAsync([=](uv::Loop& loop) {
+  m_loopRunner.ExecAsync([=, this](uv::Loop& loop) {
     // connect local storage to server
     {
       net::ServerStartup startup{m_serverImpl};

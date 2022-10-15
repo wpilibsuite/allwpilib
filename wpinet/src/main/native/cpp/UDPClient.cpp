@@ -134,7 +134,7 @@ void UDPClient::shutdown() {
   }
 }
 
-int UDPClient::send(span<const uint8_t> data, std::string_view server,
+int UDPClient::send(std::span<const uint8_t> data, std::string_view server,
                     int port) {
   // server must be a resolvable IP address
   struct sockaddr_in addr;

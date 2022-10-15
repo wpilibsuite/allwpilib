@@ -166,20 +166,20 @@ bool wpi::WaitForObject(WPI_Handle handle) {
 bool wpi::WaitForObject(WPI_Handle handle, double timeout, bool* timedOut) {
   WPI_Handle signaledValue;
   auto signaled = WaitForObjects(
-      wpi::span(&handle, 1), wpi::span(&signaledValue, 1), timeout, timedOut);
+      std::span(&handle, 1), std::span(&signaledValue, 1), timeout, timedOut);
   if (signaled.empty()) {
     return false;
   }
   return (signaled[0] & 0x80000000ul) == 0;
 }
 
-wpi::span<WPI_Handle> wpi::WaitForObjects(wpi::span<const WPI_Handle> handles,
-                                          wpi::span<WPI_Handle> signaled) {
+std::span<WPI_Handle> wpi::WaitForObjects(std::span<const WPI_Handle> handles,
+                                          std::span<WPI_Handle> signaled) {
   return WaitForObjects(handles, signaled, -1, nullptr);
 }
 
-wpi::span<WPI_Handle> wpi::WaitForObjects(wpi::span<const WPI_Handle> handles,
-                                          wpi::span<WPI_Handle> signaled,
+std::span<WPI_Handle> wpi::WaitForObjects(std::span<const WPI_Handle> handles,
+                                          std::span<WPI_Handle> signaled,
                                           double timeout, bool* timedOut) {
   auto& manager = GetManager();
   if (gShutdown) {
@@ -368,8 +368,8 @@ int WPI_WaitForObjectTimeout(WPI_Handle handle, double timeout,
 
 int WPI_WaitForObjects(const WPI_Handle* handles, int handles_count,
                        WPI_Handle* signaled) {
-  return wpi::WaitForObjects(wpi::span(handles, handles_count),
-                             wpi::span(signaled, handles_count))
+  return wpi::WaitForObjects(std::span(handles, handles_count),
+                             std::span(signaled, handles_count))
       .size();
 }
 
@@ -377,8 +377,8 @@ int WPI_WaitForObjectsTimeout(const WPI_Handle* handles, int handles_count,
                               WPI_Handle* signaled, double timeout,
                               int* timed_out) {
   bool timedOutBool;
-  auto signaledResult = wpi::WaitForObjects(wpi::span(handles, handles_count),
-                                            wpi::span(signaled, handles_count),
+  auto signaledResult = wpi::WaitForObjects(std::span(handles, handles_count),
+                                            std::span(signaled, handles_count),
                                             timeout, &timedOutBool);
   *timed_out = timedOutBool ? 1 : 0;
   return signaledResult.size();

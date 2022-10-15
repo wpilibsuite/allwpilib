@@ -8,13 +8,13 @@
 #include <atomic>
 #include <cstddef>
 #include <memory>
+#include <span>
 #include <string>
 #include <string_view>
 #include <vector>
 
 #include <wpi/StringMap.h>
 #include <wpi/mutex.h>
-#include <wpi/span.h>
 
 #include "PropertyImpl.h"
 #include "cscore_cpp.h"
@@ -33,7 +33,7 @@ class PropertyContainer {
   virtual ~PropertyContainer() = default;
 
   int GetPropertyIndex(std::string_view name) const;
-  wpi::span<int> EnumerateProperties(wpi::SmallVectorImpl<int>& vec,
+  std::span<int> EnumerateProperties(wpi::SmallVectorImpl<int>& vec,
                                      CS_Status* status) const;
   CS_PropertyKind GetPropertyKind(int property) const;
   std::string_view GetPropertyName(int property,

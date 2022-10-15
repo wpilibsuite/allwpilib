@@ -54,7 +54,7 @@ inline std::vector<Topic> NetworkTableInstance::GetTopics(
 }
 
 inline std::vector<Topic> NetworkTableInstance::GetTopics(
-    std::string_view prefix, wpi::span<std::string_view> types) {
+    std::string_view prefix, std::span<std::string_view> types) {
   auto handles = ::nt::GetTopics(m_handle, prefix, types);
   return {handles.begin(), handles.end()};
 }
@@ -74,7 +74,7 @@ inline std::vector<TopicInfo> NetworkTableInstance::GetTopicInfo(
 }
 
 inline std::vector<TopicInfo> NetworkTableInstance::GetTopicInfo(
-    std::string_view prefix, wpi::span<std::string_view> types) {
+    std::string_view prefix, std::span<std::string_view> types) {
   return ::nt::GetTopicInfo(m_handle, prefix, types);
 }
 
@@ -132,7 +132,7 @@ inline void NetworkTableInstance::SetServer(const char* server_name,
 }
 
 inline void NetworkTableInstance::SetServer(
-    wpi::span<const std::pair<std::string_view, unsigned int>> servers) {
+    std::span<const std::pair<std::string_view, unsigned int>> servers) {
   ::nt::SetServer(m_handle, servers);
 }
 

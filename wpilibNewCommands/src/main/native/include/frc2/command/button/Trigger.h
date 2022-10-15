@@ -7,13 +7,13 @@
 #include <functional>
 #include <initializer_list>
 #include <memory>
+#include <span>
 #include <utility>
 
 #include <frc/event/BooleanEvent.h>
 #include <frc/event/EventLoop.h>
 #include <frc/filter/Debouncer.h>
 #include <units/time.h>
-#include <wpi/span.h>
 
 #include "frc2/command/Command.h"
 #include "frc2/command/CommandScheduler.h"
@@ -113,7 +113,7 @@ class Trigger : public frc::BooleanEvent {
    * @param requirements the required subsystems.
    */
   Trigger WhenActive(std::function<void()> toRun,
-                     wpi::span<Subsystem* const> requirements = {});
+                     std::span<Subsystem* const> requirements = {});
 
   /**
    * Binds a command to be started repeatedly while the trigger is active, and
@@ -171,7 +171,7 @@ class Trigger : public frc::BooleanEvent {
    * @param requirements the required subsystems.
    */
   Trigger WhileActiveContinous(std::function<void()> toRun,
-                               wpi::span<Subsystem* const> requirements = {});
+                               std::span<Subsystem* const> requirements = {});
 
   /**
    * Binds a command to be started when the trigger becomes active, and
@@ -268,7 +268,7 @@ class Trigger : public frc::BooleanEvent {
    * @param requirements the required subsystems.
    */
   Trigger WhenInactive(std::function<void()> toRun,
-                       wpi::span<Subsystem* const> requirements = {});
+                       std::span<Subsystem* const> requirements = {});
 
   /**
    * Binds a command to start when the trigger becomes active, and be canceled

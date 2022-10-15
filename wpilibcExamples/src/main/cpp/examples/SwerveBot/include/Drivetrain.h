@@ -4,11 +4,12 @@
 
 #pragma once
 
+#include <numbers>
+
 #include <frc/AnalogGyro.h>
 #include <frc/geometry/Translation2d.h>
 #include <frc/kinematics/SwerveDriveKinematics.h>
 #include <frc/kinematics/SwerveDriveOdometry.h>
-#include <wpi/numbers>
 
 #include "SwerveModule.h"
 
@@ -27,7 +28,7 @@ class Drivetrain {
   static constexpr units::meters_per_second_t kMaxSpeed =
       3.0_mps;  // 3 meters per second
   static constexpr units::radians_per_second_t kMaxAngularSpeed{
-      wpi::numbers::pi};  // 1/2 rotation per second
+      std::numbers::pi};  // 1/2 rotation per second
 
  private:
   frc::Translation2d m_frontLeftLocation{+0.381_m, +0.381_m};

@@ -49,7 +49,7 @@ void AnalogAccelerometer::SetZero(double zero) {
 void AnalogAccelerometer::InitSendable(wpi::SendableBuilder& builder) {
   builder.SetSmartDashboardType("Accelerometer");
   builder.AddDoubleProperty(
-      "Value", [=] { return GetAcceleration(); }, nullptr);
+      "Value", [=, this] { return GetAcceleration(); }, nullptr);
 }
 
 void AnalogAccelerometer::InitAccelerometer() {

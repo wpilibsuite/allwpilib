@@ -9,11 +9,11 @@
 
 #include <functional>
 #include <memory>
+#include <span>
 #include <string_view>
 #include <utility>
 
 #include <wpi/Signal.h>
-#include <wpi/span.h>
 
 #include "wpinet/uv/Handle.h"
 #include "wpinet/uv/Request.h"
@@ -245,15 +245,15 @@ class Udp final : public HandleImpl<Udp, uv_udp_t> {
    * @param bufs The buffers to be written to the stream.
    * @param req write request
    */
-  void Send(const sockaddr& addr, span<const Buffer> bufs,
+  void Send(const sockaddr& addr, std::span<const Buffer> bufs,
             const std::shared_ptr<UdpSendReq>& req);
 
-  void Send(const sockaddr_in& addr, span<const Buffer> bufs,
+  void Send(const sockaddr_in& addr, std::span<const Buffer> bufs,
             const std::shared_ptr<UdpSendReq>& req) {
     Send(reinterpret_cast<const sockaddr&>(addr), bufs, req);
   }
 
-  void Send(const sockaddr_in6& addr, span<const Buffer> bufs,
+  void Send(const sockaddr_in6& addr, std::span<const Buffer> bufs,
             const std::shared_ptr<UdpSendReq>& req) {
     Send(reinterpret_cast<const sockaddr&>(addr), bufs, req);
   }
@@ -265,7 +265,8 @@ class Udp final : public HandleImpl<Udp, uv_udp_t> {
    * @param bufs The buffers to be written to the stream.
    * @param req write request
    */
-  void Send(span<const Buffer> bufs, const std::shared_ptr<UdpSendReq>& req);
+  void Send(std::span<const Buffer> bufs,
+            const std::shared_ptr<UdpSendReq>& req);
 
   /**
    * Send data over the UDP socket.  If the socket has not previously been bound
@@ -284,16 +285,16 @@ class Udp final : public HandleImpl<Udp, uv_udp_t> {
    * @param bufs The buffers to be sent.
    * @param callback Callback function to call when the data has been sent.
    */
-  void Send(const sockaddr& addr, span<const Buffer> bufs,
-            std::function<void(span<Buffer>, Error)> callback);
+  void Send(const sockaddr& addr, std::span<const Buffer> bufs,
+            std::function<void(std::span<Buffer>, Error)> callback);
 
-  void Send(const sockaddr_in& addr, span<const Buffer> bufs,
-            std::function<void(span<Buffer>, Error)> callback) {
+  void Send(const sockaddr_in& addr, std::span<const Buffer> bufs,
+            std::function<void(std::span<Buffer>, Error)> callback) {
     Send(reinterpret_cast<const sockaddr&>(addr), bufs, std::move(callback));
   }
 
-  void Send(const sockaddr_in6& addr, span<const Buffer> bufs,
-            std::function<void(span<Buffer>, Error)> callback) {
+  void Send(const sockaddr_in6& addr, std::span<const Buffer> bufs,
+            std::function<void(std::span<Buffer>, Error)> callback) {
     Send(reinterpret_cast<const sockaddr&>(addr), bufs, std::move(callback));
   }
 
@@ -304,8 +305,8 @@ class Udp final : public HandleImpl<Udp, uv_udp_t> {
    * @param bufs The buffers to be written to the stream.
    * @param callback Callback function to call when the data has been sent.
    */
-  void Send(span<const Buffer> bufs,
-            std::function<void(span<Buffer>, Error)> callback);
+  void Send(std::span<const Buffer> bufs,
+            std::function<void(std::span<Buffer>, Error)> callback);
 
   /**
    * Same as Send(), but won't queue a send request if it can't be completed
@@ -316,7 +317,7 @@ class Udp final : public HandleImpl<Udp, uv_udp_t> {
    * @param bufs The buffers to be send.
    * @return Number of bytes sent.
    */
-  int TrySend(const sockaddr& addr, span<const Buffer> bufs) {
+  int TrySend(const sockaddr& addr, std::span<const Buffer> bufs) {
     int val = uv_udp_try_send(GetRaw(), bufs.data(),
                               static_cast<unsigned>(bufs.size()), &addr);
     if (val < 0) {
@@ -326,11 +327,11 @@ class Udp final : public HandleImpl<Udp, uv_udp_t> {
     return val;
   }
 
-  int TrySend(const sockaddr_in& addr, span<const Buffer> bufs) {
+  int TrySend(const sockaddr_in& addr, std::span<const Buffer> bufs) {
     return TrySend(reinterpret_cast<const sockaddr&>(addr), bufs);
   }
 
-  int TrySend(const sockaddr_in6& addr, span<const Buffer> bufs) {
+  int TrySend(const sockaddr_in6& addr, std::span<const Buffer> bufs) {
     return TrySend(reinterpret_cast<const sockaddr&>(addr), bufs);
   }
 
@@ -341,7 +342,7 @@ class Udp final : public HandleImpl<Udp, uv_udp_t> {
    * @param bufs The buffers to be written to the stream.
    * @return Number of bytes sent.
    */
-  int TrySend(span<const Buffer> bufs) {
+  int TrySend(std::span<const Buffer> bufs) {
     int val = uv_udp_try_send(GetRaw(), bufs.data(),
                               static_cast<unsigned>(bufs.size()), nullptr);
     if (val < 0) {

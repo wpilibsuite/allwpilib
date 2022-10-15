@@ -34,7 +34,7 @@ MulticastServiceAnnouncer::MulticastServiceAnnouncer(
 
 MulticastServiceAnnouncer::MulticastServiceAnnouncer(
     std::string_view serviceName, std::string_view serviceType, int port,
-    wpi::span<const std::pair<std::string, std::string>> txt) {
+    std::span<const std::pair<std::string, std::string>> txt) {
   pImpl = std::make_unique<Impl>();
   pImpl->serviceName = serviceName;
   pImpl->serviceType = serviceType;
@@ -48,7 +48,7 @@ MulticastServiceAnnouncer::MulticastServiceAnnouncer(
 
 MulticastServiceAnnouncer::MulticastServiceAnnouncer(
     std::string_view serviceName, std::string_view serviceType, int port,
-    wpi::span<const std::pair<std::string_view, std::string_view>> txt) {
+    std::span<const std::pair<std::string_view, std::string_view>> txt) {
   pImpl = std::make_unique<Impl>();
   pImpl->serviceName = serviceName;
   pImpl->serviceType = serviceType;

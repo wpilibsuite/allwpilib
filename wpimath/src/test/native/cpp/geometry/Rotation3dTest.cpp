@@ -3,9 +3,9 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #include <cmath>
+#include <numbers>
 
 #include <wpi/MathExtras.h>
-#include <wpi/numbers>
 
 #include "frc/EigenCore.h"
 #include "frc/geometry/Rotation3d.h"
@@ -15,18 +15,18 @@ using namespace frc;
 
 TEST(Rotation3dTest, InitAxisAngleAndRollPitchYaw) {
   const Eigen::Vector3d xAxis{1.0, 0.0, 0.0};
-  const Rotation3d rot1{xAxis, units::radian_t{wpi::numbers::pi / 3}};
-  const Rotation3d rot2{units::radian_t{wpi::numbers::pi / 3}, 0_rad, 0_rad};
+  const Rotation3d rot1{xAxis, units::radian_t{std::numbers::pi / 3}};
+  const Rotation3d rot2{units::radian_t{std::numbers::pi / 3}, 0_rad, 0_rad};
   EXPECT_EQ(rot1, rot2);
 
   const Eigen::Vector3d yAxis{0.0, 1.0, 0.0};
-  const Rotation3d rot3{yAxis, units::radian_t{wpi::numbers::pi / 3}};
-  const Rotation3d rot4{0_rad, units::radian_t{wpi::numbers::pi / 3}, 0_rad};
+  const Rotation3d rot3{yAxis, units::radian_t{std::numbers::pi / 3}};
+  const Rotation3d rot4{0_rad, units::radian_t{std::numbers::pi / 3}, 0_rad};
   EXPECT_EQ(rot3, rot4);
 
   const Eigen::Vector3d zAxis{0.0, 0.0, 1.0};
-  const Rotation3d rot5{zAxis, units::radian_t{wpi::numbers::pi / 3}};
-  const Rotation3d rot6{0_rad, 0_rad, units::radian_t{wpi::numbers::pi / 3}};
+  const Rotation3d rot5{zAxis, units::radian_t{std::numbers::pi / 3}};
+  const Rotation3d rot6{0_rad, 0_rad, units::radian_t{std::numbers::pi / 3}};
   EXPECT_EQ(rot5, rot6);
 }
 
@@ -61,12 +61,12 @@ TEST(Rotation3dTest, InitTwoVector) {
 
   // 90 degree CW rotation around y-axis
   const Rotation3d rot1{xAxis, zAxis};
-  const Rotation3d expected1{yAxis, units::radian_t{-wpi::numbers::pi / 2.0}};
+  const Rotation3d expected1{yAxis, units::radian_t{-std::numbers::pi / 2.0}};
   EXPECT_EQ(expected1, rot1);
 
   // 45 degree CCW rotation around z-axis
   const Rotation3d rot2{xAxis, Eigen::Vector3d{1.0, 1.0, 0.0}};
-  const Rotation3d expected2{zAxis, units::radian_t{wpi::numbers::pi / 4.0}};
+  const Rotation3d expected2{zAxis, units::radian_t{std::numbers::pi / 4.0}};
   EXPECT_EQ(expected2, rot2);
 
   // 0 degree rotation of x-axes
@@ -107,12 +107,12 @@ TEST(Rotation3dTest, InitTwoVector) {
 TEST(Rotation3dTest, RadiansToDegrees) {
   const Eigen::Vector3d zAxis{0.0, 0.0, 1.0};
 
-  const Rotation3d rot1{zAxis, units::radian_t{wpi::numbers::pi / 3}};
+  const Rotation3d rot1{zAxis, units::radian_t{std::numbers::pi / 3}};
   EXPECT_DOUBLE_EQ(0.0, rot1.X().value());
   EXPECT_DOUBLE_EQ(0.0, rot1.Y().value());
   EXPECT_DOUBLE_EQ(units::radian_t{60_deg}.value(), rot1.Z().value());
 
-  const Rotation3d rot2{zAxis, units::radian_t{wpi::numbers::pi / 4}};
+  const Rotation3d rot2{zAxis, units::radian_t{std::numbers::pi / 4}};
   EXPECT_DOUBLE_EQ(0.0, rot2.X().value());
   EXPECT_DOUBLE_EQ(0.0, rot2.Y().value());
   EXPECT_DOUBLE_EQ(units::radian_t{45_deg}.value(), rot2.Z().value());
@@ -124,12 +124,12 @@ TEST(Rotation3dTest, DegreesToRadians) {
   const auto rot1 = Rotation3d{zAxis, 45_deg};
   EXPECT_DOUBLE_EQ(0.0, rot1.X().value());
   EXPECT_DOUBLE_EQ(0.0, rot1.Y().value());
-  EXPECT_DOUBLE_EQ(wpi::numbers::pi / 4.0, rot1.Z().value());
+  EXPECT_DOUBLE_EQ(std::numbers::pi / 4.0, rot1.Z().value());
 
   const auto rot2 = Rotation3d{zAxis, 30_deg};
   EXPECT_DOUBLE_EQ(0.0, rot2.X().value());
   EXPECT_DOUBLE_EQ(0.0, rot2.Y().value());
-  EXPECT_DOUBLE_EQ(wpi::numbers::pi / 6.0, rot2.Z().value());
+  EXPECT_DOUBLE_EQ(std::numbers::pi / 6.0, rot2.Z().value());
 }
 
 TEST(Rotation3dTest, RotationLoop) {
@@ -228,15 +228,15 @@ TEST(Rotation3dTest, AxisAngle) {
 
   Rotation3d rot1{xAxis, 90_deg};
   EXPECT_EQ(xAxis, rot1.Axis());
-  EXPECT_DOUBLE_EQ(wpi::numbers::pi / 2.0, rot1.Angle().value());
+  EXPECT_DOUBLE_EQ(std::numbers::pi / 2.0, rot1.Angle().value());
 
   Rotation3d rot2{yAxis, 45_deg};
   EXPECT_EQ(yAxis, rot2.Axis());
-  EXPECT_DOUBLE_EQ(wpi::numbers::pi / 4.0, rot2.Angle().value());
+  EXPECT_DOUBLE_EQ(std::numbers::pi / 4.0, rot2.Angle().value());
 
   Rotation3d rot3{zAxis, 60_deg};
   EXPECT_EQ(zAxis, rot3.Axis());
-  EXPECT_DOUBLE_EQ(wpi::numbers::pi / 3.0, rot3.Angle().value());
+  EXPECT_DOUBLE_EQ(std::numbers::pi / 3.0, rot3.Angle().value());
 }
 
 TEST(Rotation3dTest, ToRotation2d) {

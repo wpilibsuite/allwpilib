@@ -50,7 +50,7 @@ Watchdog::Impl::Impl() {
   FRC_CheckErrorStatus(status, "{}", "starting watchdog notifier");
   HAL_SetNotifierName(m_notifier, "Watchdog", &status);
 
-  m_thread = std::thread([=] { Main(); });
+  m_thread = std::thread([=, this] { Main(); });
 }
 
 Watchdog::Impl::~Impl() {

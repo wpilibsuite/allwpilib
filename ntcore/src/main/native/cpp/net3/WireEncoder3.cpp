@@ -8,7 +8,6 @@
 #include <wpi/SmallVector.h>
 #include <wpi/leb128.h>
 #include <wpi/raw_ostream.h>
-#include <wpi/span.h>
 
 #include "Message3.h"
 
@@ -20,12 +19,12 @@ static void Write8(wpi::raw_ostream& os, uint8_t val) {
 }
 
 static void Write16(wpi::raw_ostream& os, uint16_t val) {
-  os << wpi::span<const uint8_t>{{static_cast<uint8_t>((val >> 8) & 0xff),
+  os << std::span<const uint8_t>{{static_cast<uint8_t>((val >> 8) & 0xff),
                                   static_cast<uint8_t>(val & 0xff)}};
 }
 
 static void Write32(wpi::raw_ostream& os, uint32_t val) {
-  os << wpi::span<const uint8_t>{{static_cast<uint8_t>((val >> 24) & 0xff),
+  os << std::span<const uint8_t>{{static_cast<uint8_t>((val >> 24) & 0xff),
                                   static_cast<uint8_t>((val >> 16) & 0xff),
                                   static_cast<uint8_t>((val >> 8) & 0xff),
                                   static_cast<uint8_t>(val & 0xff)}};
@@ -34,7 +33,7 @@ static void Write32(wpi::raw_ostream& os, uint32_t val) {
 static void WriteDouble(wpi::raw_ostream& os, double val) {
   // The highest performance way to do this, albeit non-portable.
   uint64_t v = wpi::DoubleToBits(val);
-  os << wpi::span<const uint8_t>{{static_cast<uint8_t>((v >> 56) & 0xff),
+  os << std::span<const uint8_t>{{static_cast<uint8_t>((v >> 56) & 0xff),
                                   static_cast<uint8_t>((v >> 48) & 0xff),
                                   static_cast<uint8_t>((v >> 40) & 0xff),
                                   static_cast<uint8_t>((v >> 32) & 0xff),
@@ -49,7 +48,7 @@ static void WriteString(wpi::raw_ostream& os, std::string_view str) {
   os << str;
 }
 
-static void WriteRaw(wpi::raw_ostream& os, wpi::span<const uint8_t> str) {
+static void WriteRaw(wpi::raw_ostream& os, std::span<const uint8_t> str) {
   wpi::WriteUleb128(os, str.size());
   os << str;
 }
@@ -261,7 +260,7 @@ void nt::net3::WireEncodeEntryDelete(wpi::raw_ostream& os, unsigned int id) {
 
 void nt::net3::WireEncodeExecuteRpc(wpi::raw_ostream& os, unsigned int id,
                                     unsigned int uid,
-                                    wpi::span<const uint8_t> params) {
+                                    std::span<const uint8_t> params) {
   Write8(os, Message3::kExecuteRpc);
   Write16(os, id);
   Write16(os, uid);
@@ -270,7 +269,7 @@ void nt::net3::WireEncodeExecuteRpc(wpi::raw_ostream& os, unsigned int id,
 
 void nt::net3::WireEncodeRpcResponse(wpi::raw_ostream& os, unsigned int id,
                                      unsigned int uid,
-                                     wpi::span<const uint8_t> result) {
+                                     std::span<const uint8_t> result) {
   Write8(os, Message3::kRpcResponse);
   Write16(os, id);
   Write16(os, uid);

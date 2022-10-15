@@ -6,6 +6,7 @@
 
 #include <functional>
 #include <memory>
+#include <span>
 #include <string>
 #include <string_view>
 #include <utility>
@@ -17,7 +18,6 @@
 #include <networktables/StringTopic.h>
 #include <wpi/FunctionExtras.h>
 #include <wpi/SmallVector.h>
-#include <wpi/span.h>
 
 namespace frc {
 
@@ -111,28 +111,28 @@ class SendableBuilderImpl : public nt::NTSendableBuilder {
 
   void AddBooleanArrayProperty(
       std::string_view key, std::function<std::vector<int>()> getter,
-      std::function<void(wpi::span<const int>)> setter) override;
+      std::function<void(std::span<const int>)> setter) override;
 
   void AddIntegerArrayProperty(
       std::string_view key, std::function<std::vector<int64_t>()> getter,
-      std::function<void(wpi::span<const int64_t>)> setter) override;
+      std::function<void(std::span<const int64_t>)> setter) override;
 
   void AddFloatArrayProperty(
       std::string_view key, std::function<std::vector<float>()> getter,
-      std::function<void(wpi::span<const float>)> setter) override;
+      std::function<void(std::span<const float>)> setter) override;
 
   void AddDoubleArrayProperty(
       std::string_view key, std::function<std::vector<double>()> getter,
-      std::function<void(wpi::span<const double>)> setter) override;
+      std::function<void(std::span<const double>)> setter) override;
 
   void AddStringArrayProperty(
       std::string_view key, std::function<std::vector<std::string>()> getter,
-      std::function<void(wpi::span<const std::string>)> setter) override;
+      std::function<void(std::span<const std::string>)> setter) override;
 
   void AddRawProperty(
       std::string_view key, std::string_view typeString,
       std::function<std::vector<uint8_t>()> getter,
-      std::function<void(wpi::span<const uint8_t>)> setter) override;
+      std::function<void(std::span<const uint8_t>)> setter) override;
 
   void AddSmallStringProperty(
       std::string_view key,
@@ -141,41 +141,41 @@ class SendableBuilderImpl : public nt::NTSendableBuilder {
 
   void AddSmallBooleanArrayProperty(
       std::string_view key,
-      std::function<wpi::span<const int>(wpi::SmallVectorImpl<int>& buf)>
+      std::function<std::span<const int>(wpi::SmallVectorImpl<int>& buf)>
           getter,
-      std::function<void(wpi::span<const int>)> setter) override;
+      std::function<void(std::span<const int>)> setter) override;
 
   void AddSmallIntegerArrayProperty(
       std::string_view key,
       std::function<
-          wpi::span<const int64_t>(wpi::SmallVectorImpl<int64_t>& buf)>
+          std::span<const int64_t>(wpi::SmallVectorImpl<int64_t>& buf)>
           getter,
-      std::function<void(wpi::span<const int64_t>)> setter) override;
+      std::function<void(std::span<const int64_t>)> setter) override;
 
   void AddSmallFloatArrayProperty(
       std::string_view key,
-      std::function<wpi::span<const float>(wpi::SmallVectorImpl<float>& buf)>
+      std::function<std::span<const float>(wpi::SmallVectorImpl<float>& buf)>
           getter,
-      std::function<void(wpi::span<const float>)> setter) override;
+      std::function<void(std::span<const float>)> setter) override;
 
   void AddSmallDoubleArrayProperty(
       std::string_view key,
-      std::function<wpi::span<const double>(wpi::SmallVectorImpl<double>& buf)>
+      std::function<std::span<const double>(wpi::SmallVectorImpl<double>& buf)>
           getter,
-      std::function<void(wpi::span<const double>)> setter) override;
+      std::function<void(std::span<const double>)> setter) override;
 
   void AddSmallStringArrayProperty(
       std::string_view key,
       std::function<
-          wpi::span<const std::string>(wpi::SmallVectorImpl<std::string>& buf)>
+          std::span<const std::string>(wpi::SmallVectorImpl<std::string>& buf)>
           getter,
-      std::function<void(wpi::span<const std::string>)> setter) override;
+      std::function<void(std::span<const std::string>)> setter) override;
 
   void AddSmallRawProperty(
       std::string_view key, std::string_view typeString,
-      std::function<wpi::span<uint8_t>(wpi::SmallVectorImpl<uint8_t>& buf)>
+      std::function<std::span<uint8_t>(wpi::SmallVectorImpl<uint8_t>& buf)>
           getter,
-      std::function<void(wpi::span<const uint8_t>)> setter) override;
+      std::function<void(std::span<const uint8_t>)> setter) override;
 
  private:
   struct Property {

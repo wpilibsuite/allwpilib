@@ -5,13 +5,13 @@
 #pragma once
 
 #include <memory>
+#include <span>
 #include <string>
 #include <string_view>
 #include <vector>
 
 #include <networktables/NetworkTableEntry.h>
 #include <networktables/NetworkTableValue.h>
-#include <wpi/span.h>
 
 namespace wpi {
 class Sendable;
@@ -216,7 +216,7 @@ class SmartDashboard {
    *       std::vector<bool> is special-cased in C++. 0 is false, any
    *       non-zero value is true.
    */
-  static bool PutBooleanArray(std::string_view key, wpi::span<const int> value);
+  static bool PutBooleanArray(std::string_view key, std::span<const int> value);
 
   /**
    * Gets the current value in the table, setting it if it does not exist.
@@ -226,7 +226,7 @@ class SmartDashboard {
    * @returns False if the table key exists with a different type
    */
   static bool SetDefaultBooleanArray(std::string_view key,
-                                     wpi::span<const int> defaultValue);
+                                     std::span<const int> defaultValue);
 
   /**
    * Returns the boolean array the key maps to.
@@ -247,7 +247,7 @@ class SmartDashboard {
    *       non-zero value is true.
    */
   static std::vector<int> GetBooleanArray(std::string_view key,
-                                          wpi::span<const int> defaultValue);
+                                          std::span<const int> defaultValue);
 
   /**
    * Put a number array in the table.
@@ -257,7 +257,7 @@ class SmartDashboard {
    * @return False if the table key already exists with a different type
    */
   static bool PutNumberArray(std::string_view key,
-                             wpi::span<const double> value);
+                             std::span<const double> value);
 
   /**
    * Gets the current value in the table, setting it if it does not exist.
@@ -267,7 +267,7 @@ class SmartDashboard {
    * @returns False if the table key exists with a different type
    */
   static bool SetDefaultNumberArray(std::string_view key,
-                                    wpi::span<const double> defaultValue);
+                                    std::span<const double> defaultValue);
 
   /**
    * Returns the number array the key maps to.
@@ -284,7 +284,7 @@ class SmartDashboard {
    *       use GetValue() instead.
    */
   static std::vector<double> GetNumberArray(
-      std::string_view key, wpi::span<const double> defaultValue);
+      std::string_view key, std::span<const double> defaultValue);
 
   /**
    * Put a string array in the table.
@@ -294,7 +294,7 @@ class SmartDashboard {
    * @return False if the table key already exists with a different type
    */
   static bool PutStringArray(std::string_view key,
-                             wpi::span<const std::string> value);
+                             std::span<const std::string> value);
 
   /**
    * Gets the current value in the table, setting it if it does not exist.
@@ -304,7 +304,7 @@ class SmartDashboard {
    * @returns False if the table key exists with a different type
    */
   static bool SetDefaultStringArray(std::string_view key,
-                                    wpi::span<const std::string> defaultValue);
+                                    std::span<const std::string> defaultValue);
 
   /**
    * Returns the string array the key maps to.
@@ -321,7 +321,7 @@ class SmartDashboard {
    *       use GetValue() instead.
    */
   static std::vector<std::string> GetStringArray(
-      std::string_view key, wpi::span<const std::string> defaultValue);
+      std::string_view key, std::span<const std::string> defaultValue);
 
   /**
    * Put a raw value (byte array) in the table.
@@ -330,7 +330,7 @@ class SmartDashboard {
    * @param value The value that will be assigned.
    * @return False if the table key already exists with a different type
    */
-  static bool PutRaw(std::string_view key, wpi::span<const uint8_t> value);
+  static bool PutRaw(std::string_view key, std::span<const uint8_t> value);
 
   /**
    * Gets the current value in the table, setting it if it does not exist.
@@ -340,7 +340,7 @@ class SmartDashboard {
    * @returns False if the table key exists with a different type
    */
   static bool SetDefaultRaw(std::string_view key,
-                            wpi::span<const uint8_t> defaultValue);
+                            std::span<const uint8_t> defaultValue);
 
   /**
    * Returns the raw value (byte array) the key maps to.
@@ -357,7 +357,7 @@ class SmartDashboard {
    *       concern, use GetValue() instead.
    */
   static std::vector<uint8_t> GetRaw(std::string_view key,
-                                     wpi::span<const uint8_t> defaultValue);
+                                     std::span<const uint8_t> defaultValue);
 
   /**
    * Maps the specified key to the specified complex value (such as an array) in

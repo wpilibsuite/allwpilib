@@ -13,7 +13,8 @@ namespace wpi {
 
 template <typename Derived>
 HttpWebSocketServerConnection<Derived>::HttpWebSocketServerConnection(
-    std::shared_ptr<uv::Stream> stream, span<const std::string_view> protocols)
+    std::shared_ptr<uv::Stream> stream,
+    std::span<const std::string_view> protocols)
     : HttpServerConnection{stream},
       m_helper{m_request},
       m_protocols{protocols.begin(), protocols.end()} {

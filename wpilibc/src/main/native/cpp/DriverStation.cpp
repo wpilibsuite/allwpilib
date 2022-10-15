@@ -9,6 +9,7 @@
 #include <array>
 #include <atomic>
 #include <chrono>
+#include <span>
 #include <string>
 #include <string_view>
 #include <thread>
@@ -846,7 +847,7 @@ void JoystickLogSender::Init(wpi::log::DataLog& log, unsigned int stick,
   HAL_GetJoystickPOVs(m_stick, &m_prevPOVs);
   AppendButtons(m_prevButtons, timestamp);
   m_logAxes.Append(
-      wpi::span<const float>{m_prevAxes.axes,
+      std::span<const float>{m_prevAxes.axes,
                              static_cast<size_t>(m_prevAxes.count)},
       timestamp);
   AppendPOVs(m_prevPOVs, timestamp);
@@ -867,7 +868,7 @@ void JoystickLogSender::Send(uint64_t timestamp) {
       std::memcmp(axes.axes, m_prevAxes.axes,
                   sizeof(axes.axes[0]) * axes.count) != 0) {
     m_logAxes.Append(
-        wpi::span<const float>{axes.axes, static_cast<size_t>(axes.count)},
+        std::span<const float>{axes.axes, static_cast<size_t>(axes.count)},
         timestamp);
   }
   m_prevAxes = axes;
@@ -888,7 +889,7 @@ void JoystickLogSender::AppendButtons(HAL_JoystickButtons buttons,
   for (unsigned int i = 0; i < buttons.count; ++i) {
     buttonsArr[i] = (buttons.buttons & (1u << i)) != 0;
   }
-  m_logButtons.Append(wpi::span<const uint8_t>{buttonsArr, buttons.count},
+  m_logButtons.Append(std::span<const uint8_t>{buttonsArr, buttons.count},
                       timestamp);
 }
 
@@ -899,7 +900,7 @@ void JoystickLogSender::AppendPOVs(const HAL_JoystickPOVs& povs,
     povsArr[i] = povs.povs[i];
   }
   m_logPOVs.Append(
-      wpi::span<const int64_t>{povsArr, static_cast<size_t>(povs.count)},
+      std::span<const int64_t>{povsArr, static_cast<size_t>(povs.count)},
       timestamp);
 }
 

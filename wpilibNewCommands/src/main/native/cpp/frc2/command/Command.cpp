@@ -68,7 +68,7 @@ CommandPtr Command::BeforeStarting(
 }
 
 CommandPtr Command::BeforeStarting(
-    std::function<void()> toRun, wpi::span<Subsystem* const> requirements) && {
+    std::function<void()> toRun, std::span<Subsystem* const> requirements) && {
   return CommandPtr(std::move(*this).TransferOwnership())
       .BeforeStarting(std::move(toRun), requirements);
 }
@@ -80,7 +80,7 @@ CommandPtr Command::AndThen(std::function<void()> toRun,
 }
 
 CommandPtr Command::AndThen(std::function<void()> toRun,
-                            wpi::span<Subsystem* const> requirements) && {
+                            std::span<Subsystem* const> requirements) && {
   return CommandPtr(std::move(*this).TransferOwnership())
       .AndThen(std::move(toRun), requirements);
 }

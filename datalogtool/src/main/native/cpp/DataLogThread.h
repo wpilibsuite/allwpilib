@@ -20,7 +20,7 @@
 class DataLogThread {
  public:
   explicit DataLogThread(wpi::log::DataLogReader reader)
-      : m_reader{std::move(reader)}, m_thread{[=] { ReadMain(); }} {}
+      : m_reader{std::move(reader)}, m_thread{[=, this] { ReadMain(); }} {}
   ~DataLogThread();
 
   bool IsDone() const { return m_done; }

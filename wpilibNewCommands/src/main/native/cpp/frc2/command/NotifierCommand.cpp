@@ -15,7 +15,7 @@ NotifierCommand::NotifierCommand(std::function<void()> toRun,
 
 NotifierCommand::NotifierCommand(std::function<void()> toRun,
                                  units::second_t period,
-                                 wpi::span<Subsystem* const> requirements)
+                                 std::span<Subsystem* const> requirements)
     : m_toRun(toRun), m_notifier{std::move(toRun)}, m_period{period} {
   AddRequirements(requirements);
 }

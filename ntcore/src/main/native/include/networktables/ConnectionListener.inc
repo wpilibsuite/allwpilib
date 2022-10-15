@@ -7,8 +7,6 @@
 #include <utility>
 #include <vector>
 
-#include <wpi/span.h>
-
 #include "networktables/ConnectionListener.h"
 #include "networktables/NetworkTableInstance.h"
 #include "ntcore_cpp.h"

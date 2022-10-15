@@ -98,7 +98,7 @@ MecanumControllerCommand::MecanumControllerCommand(
     std::function<void(units::volt_t, units::volt_t, units::volt_t,
                        units::volt_t)>
         output,
-    wpi::span<Subsystem* const> requirements)
+    std::span<Subsystem* const> requirements)
     : m_trajectory(std::move(trajectory)),
       m_pose(std::move(pose)),
       m_feedforward(feedforward),
@@ -135,7 +135,7 @@ MecanumControllerCommand::MecanumControllerCommand(
     std::function<void(units::volt_t, units::volt_t, units::volt_t,
                        units::volt_t)>
         output,
-    wpi::span<Subsystem* const> requirements)
+    std::span<Subsystem* const> requirements)
     : m_trajectory(std::move(trajectory)),
       m_pose(std::move(pose)),
       m_feedforward(feedforward),
@@ -208,7 +208,7 @@ MecanumControllerCommand::MecanumControllerCommand(
     std::function<void(units::meters_per_second_t, units::meters_per_second_t,
                        units::meters_per_second_t, units::meters_per_second_t)>
         output,
-    wpi::span<Subsystem* const> requirements)
+    std::span<Subsystem* const> requirements)
     : m_trajectory(std::move(trajectory)),
       m_pose(std::move(pose)),
       m_kinematics(kinematics),
@@ -229,7 +229,7 @@ MecanumControllerCommand::MecanumControllerCommand(
     std::function<void(units::meters_per_second_t, units::meters_per_second_t,
                        units::meters_per_second_t, units::meters_per_second_t)>
         output,
-    wpi::span<Subsystem* const> requirements)
+    std::span<Subsystem* const> requirements)
     : m_trajectory(std::move(trajectory)),
       m_pose(std::move(pose)),
       m_kinematics(kinematics),

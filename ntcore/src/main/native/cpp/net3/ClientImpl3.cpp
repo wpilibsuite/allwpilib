@@ -89,8 +89,8 @@ class CImpl : public MessageHandler3 {
         wpi::Logger& logger,
         std::function<void(uint32_t repeatMs)> setPeriodic);
 
-  void ProcessIncoming(wpi::span<const uint8_t> data);
-  void HandleLocal(wpi::span<const net::ClientMessage> msgs);
+  void ProcessIncoming(std::span<const uint8_t> data);
+  void HandleLocal(std::span<const net::ClientMessage> msgs);
   void SendPeriodic(uint64_t curTimeMs, bool initial);
   void SendValue(Writer& out, Entry* entry, const Value& value);
   bool CheckNetworkReady();
@@ -119,9 +119,9 @@ class CImpl : public MessageHandler3 {
   void FlagsUpdate(unsigned int id, unsigned int flags) final;
   void EntryDelete(unsigned int id) final;
   void ExecuteRpc(unsigned int id, unsigned int uid,
-                  wpi::span<const uint8_t> params) final {}
+                  std::span<const uint8_t> params) final {}
   void RpcResponse(unsigned int id, unsigned int uid,
-                   wpi::span<const uint8_t> result) final {}
+                   std::span<const uint8_t> result) final {}
 
   enum State {
     kStateInitial,
@@ -200,14 +200,14 @@ CImpl::CImpl(uint64_t curTimeMs, int inst, WireConnection3& wire,
       m_nextKeepAliveTimeMs{curTimeMs + kKeepAliveIntervalMs},
       m_decoder{*this} {}
 
-void CImpl::ProcessIncoming(wpi::span<const uint8_t> data) {
+void CImpl::ProcessIncoming(std::span<const uint8_t> data) {
   DEBUG4("received {} bytes", data.size());
   if (!m_decoder.Execute(&data)) {
     m_wire.Disconnect(m_decoder.GetError());
   }
 }
 
-void CImpl::HandleLocal(wpi::span<const net::ClientMessage> msgs) {
+void CImpl::HandleLocal(std::span<const net::ClientMessage> msgs) {
   for (const auto& elem : msgs) {  // NOLINT
     // common case is value
     if (auto msg = std::get_if<net::ClientValueMsg>(&elem.contents)) {
@@ -624,11 +624,11 @@ void ClientImpl3::Start(std::string_view selfId,
   m_impl->m_state = CImpl::kStateHelloSent;
 }
 
-void ClientImpl3::ProcessIncoming(wpi::span<const uint8_t> data) {
+void ClientImpl3::ProcessIncoming(std::span<const uint8_t> data) {
   m_impl->ProcessIncoming(data);
 }
 
-void ClientImpl3::HandleLocal(wpi::span<const net::ClientMessage> msgs) {
+void ClientImpl3::HandleLocal(std::span<const net::ClientMessage> msgs) {
   m_impl->HandleLocal(msgs);
 }
 
@@ -655,7 +655,7 @@ void ClientStartup3::Publish(NT_Publisher pubHandle, NT_Topic topicHandle,
 }
 
 void ClientStartup3::Subscribe(NT_Subscriber subHandle,
-                               wpi::span<const std::string> prefixes,
+                               std::span<const std::string> prefixes,
                                const PubSubOptions& options) {
   // NT3 ignores subscribes, so no action required
 }

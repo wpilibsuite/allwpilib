@@ -418,7 +418,7 @@ void nt::net::WireDecodeText(std::string_view in, ServerMessageHandler& out,
   ::WireDecodeTextImpl(in, out, logger);
 }
 
-bool nt::net::WireDecodeBinary(wpi::span<const uint8_t>* in, int64_t* outId,
+bool nt::net::WireDecodeBinary(std::span<const uint8_t>* in, int64_t* outId,
                                Value* outValue, std::string* error,
                                int64_t localTimeOffset) {
   mpack_reader_t reader;
