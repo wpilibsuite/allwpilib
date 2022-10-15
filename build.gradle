@@ -102,13 +102,15 @@ subprojects {
     apply plugin: 'eclipse'
     apply plugin: 'idea'
 
-    sourceCompatibility = 11
-    targetCompatibility = 11
-
     def subproj = it
 
     plugins.withType(NativeComponentPlugin) {
         subproj.apply plugin: MultiBuilds
+    }
+
+    plugins.withType(JavaPlugin) {
+        sourceCompatibility = 11
+        targetCompatibility = 11
     }
 
     apply from: "${rootDir}/shared/java/javastyle.gradle"
