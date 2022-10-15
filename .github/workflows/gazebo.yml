@@ -10,7 +10,7 @@ jobs:
   build:
     name: "Build"
     runs-on: ubuntu-latest
-    container: wpilib/gazebo-ubuntu:20.04
+    container: wpilib/gazebo-ubuntu:22.04
     steps:
       - uses: actions/checkout@v3
         with:
