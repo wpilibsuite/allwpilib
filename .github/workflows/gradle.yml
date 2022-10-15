@@ -69,6 +69,7 @@ jobs:
           - os: windows-2019
             artifact-name: Win32
             architecture: x86
+            build-options: "-Dorg.gradle.jvmargs=-Xmx1g"
             task: ":ntcoreffi:build"
     name: "Build - ${{ matrix.artifact-name }}"
     runs-on: ${{ matrix.os }}
