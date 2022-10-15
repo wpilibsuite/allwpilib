@@ -104,6 +104,7 @@ jobs:
         with:
           find: "-Xmx2g"
           replace: "-Xmx1g"
+          include: gradle.properties
           regex: False
       - name: Build with Gradle
         run: ./gradlew ${{ matrix.task }} --build-cache -PbuildServer -PskipJavaFormat ${{ matrix.build-options }} ${{ env.EXTRA_GRADLE_ARGS }}
