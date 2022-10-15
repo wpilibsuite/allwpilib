@@ -6,6 +6,11 @@
 
 #include <imgui.h>
 #include <imgui_stdlib.h>
+
+#if defined(__GNUC__)
+#pragma GCC diagnostic ignored "-Wformat-nonliteral"
+#endif
+
 #include <implot.h>
 #include <implot_internal.h>
 #include <vector>
@@ -31,12 +36,12 @@ struct PlotAxis{
 
 class EntryPlot {
 public:
-    EntryPlot(EntryData* entry, std::string id, int yAxis = 0, int number = 0) : m_entry{entry}, 
-                                                                id{id}, 
-                                                                m_yAxis{yAxis},
+    EntryPlot(EntryData* entry, std::string id, int yAxis = 0, int number = 0) :  id{id}, 
                                                                 number{number},
                                                                 _color{1.0,1.0,1.0,-1.0},
-                                                                m_color{_color} {};
+                                                                m_color{_color},
+                                                                m_yAxis{yAxis},
+                                                                m_entry{entry} {};
     void EmitPlot(Plot& view);
     
     enum PlotAction{
@@ -51,10 +56,10 @@ public:
     void Update(Plot& view);
     void CheckForChange(Plot& view);
     std::string GetId() const { return id; }
+    std::string id;
+    int number;
     std::vector<float> _color;
     glass::ColorSetting m_color;
-    int number;
-    std::string id;
 private:
     static constexpr int kMaxSize = 20000;
     int m_yAxis;
@@ -70,11 +75,11 @@ public:
         m_axis.emplace_back(PlotAxis{m_name, 0, 0, true, false, true});
     };
     void Display() ;
-    float m_now;
     float& m_nowRef;
+    float m_now;
+    std::string m_name;
     float m_sampleRate;
     int m_height = 0;
-    std::string m_name;
 
     void EmitPlot();
     void EmitContextMenu();
@@ -97,9 +102,9 @@ class PlotView : public glass::View{
     PlotView(float& now, std::string name) : m_now{now}, m_name{name} {}
     void Display() override;
     void EmitContextMenu();
+    float& m_now;
     std::string m_name;
     std::vector<std::unique_ptr<Plot> > plots;
-    float& m_now;
 };
 
 }

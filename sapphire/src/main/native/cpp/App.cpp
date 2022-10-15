@@ -109,8 +109,6 @@ void Application(std::string_view saveDir) {
 
   auto  logViewer = std::make_unique<DataLogView>(logs);
 
-  auto& timestamp = logViewer->GetTimestamp();
-
   std::unique_ptr<PlotView> plotView = std::make_unique<PlotView>(logViewer->GetTimestamp(), "PlotView 1");
 
   m_logSelectorWindow = m_windowManager->AddWindow(

@@ -20,8 +20,6 @@
 
 using namespace sapphire;
 
-static float maxTimestamp = 100;
-static bool needsUpdate = false;
 static float timestamp = 0;
 static const int TIMESTAMP_FUDGE_FACTOR = 10000;
 
@@ -141,7 +139,7 @@ EntryNode* find(std::vector<EntryNode>& list, std::string name){
 void DataLogModel::AddEntryNode(EntryData* data, std::string path){
   std::vector<std::string> pathVec;
   int last = 0;
-  for(int i = 0; i < path.length(); i++){
+  for(size_t i = 0; i < path.length(); i++){
     if(path[i] == '/'){
       pathVec.emplace_back(path.substr(last, i-last));
       last = i;
@@ -266,7 +264,7 @@ void EmitEntry(EntryData *data, std::string name, float *offset, DataLogFlags fl
 
   ImGui::NextColumn();
   std::string value = (record.GetEntry() == -1) ? "" : GetFormattedEntryValue(*data, expandedts, record);
-  ImGui::Text(value.c_str());
+  ImGui::TextUnformatted(value.c_str());
   ImGui::NextColumn();
   
   if(flags.ShowLastUpdate){
