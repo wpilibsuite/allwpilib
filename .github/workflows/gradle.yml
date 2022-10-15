@@ -56,20 +56,24 @@ jobs:
             architecture: x64
             task: "build"
             build-options: "-PciDebugOnly --max-workers 1"
+            outputs: "build/allOutputs"
           - os: windows-2019
             artifact-name: Win64Release
             architecture: x64
             build-options: "-PciReleaseOnly --max-workers 1"
             task: "copyAllOutputs"
+            outputs: "build/allOutputs"
           - os: macOS-11
             artifact-name: macOS
             architecture: x64
             build-options: "-Pbuildalldesktop"
             task: "build"
+            outputs: "build/allOutputs"
           - os: windows-2019
             artifact-name: Win32
             architecture: x86
             task: ":ntcoreffi:build"
+            outputs: "ntcoreffi/build/outputs"
     name: "Build - ${{ matrix.artifact-name }}"
     runs-on: ${{ matrix.os }}
     steps:
@@ -114,7 +118,7 @@ jobs:
       - uses: actions/upload-artifact@v2
         with:
           name: ${{ matrix.artifact-name }}
-          path: build/allOutputs
+          path: ${{ matrix.outputs }}
 
   build-documentation:
     name: "Build - Documentation"
