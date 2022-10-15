@@ -3,7 +3,7 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #define AddFunctionToLink(FuncName) \
-  extern void FuncName(void); \
+  extern void FuncName(void);       \
   FuncName()
 
 void DoNotCallMeImOnlyForLinking(void) {
