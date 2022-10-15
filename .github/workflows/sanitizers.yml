@@ -31,7 +31,7 @@ jobs:
       - uses: actions/checkout@v3
 
       - name: Install Dependencies
-        run: sudo apt-get update && sudo apt-get install -y python-is-python3
+        run: sudo apt-get update && sudo apt-get install -y libopencv-dev libopencv4.5-java python-is-python3
 
       - name: Install jinja
         run: python -m pip install jinja2

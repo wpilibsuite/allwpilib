@@ -27,15 +27,15 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
+      - name: Install dependencies (Linux)
+        if: runner.os == 'Linux'
+        run: sudo apt-get update && sudo apt-get install -y libopencv-dev libopencv4.5-java python-is-python3
+
       - name: Install opencv (macOS)
         run: brew install opencv
         if: runner.os == 'macOS'
 
-      - name: Set up Python
-        if: runner.os == 'Linux'
-        run: sudo apt-get update && sudo apt-get install -y python-is-python3
-
-      - name: Set up Python 3.8
+      - name: Set up Python 3.8 (macOS)
         if: runner.os == 'macOS'
         uses: actions/setup-python@v2
         with:
