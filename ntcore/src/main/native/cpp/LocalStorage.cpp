@@ -759,6 +759,9 @@ void LSImpl::SetRetained(TopicData* topic, bool value) {
 
 void LSImpl::SetProperties(TopicData* topic, const wpi::json& update,
                            bool sendNetwork) {
+  if (!update.is_object()) {
+    return;
+  }
   DEBUG4("SetProperties({},{})", topic->name, sendNetwork);
   for (auto&& change : update.items()) {
     if (change.value().is_null()) {
@@ -924,8 +927,13 @@ PublisherData* LSImpl::AddLocalPublisher(TopicData* topic,
 
     if (properties.is_null()) {
       topic->properties = wpi::json::object();
-    } else {
+    } else if (properties.is_object()) {
       topic->properties = properties;
+    } else {
+      WPI_WARNING(m_logger,
+                  "ignoring non-object properties when publishing '{}'",
+                  topic->name);
+      topic->properties = wpi::json::object();
     }
 
     if (topic->properties.empty()) {
@@ -1812,14 +1820,17 @@ wpi::json LocalStorage::GetTopicProperties(NT_Topic topicHandle) {
   }
 }
 
-void LocalStorage::SetTopicProperties(NT_Topic topicHandle,
+bool LocalStorage::SetTopicProperties(NT_Topic topicHandle,
                                       const wpi::json& update) {
   if (!update.is_object()) {
-    return;
+    return false;
   }
   std::scoped_lock lock{m_mutex};
   if (auto topic = m_impl->m_topics.Get(topicHandle)) {
     m_impl->SetProperties(topic, update, true);
+    return true;
+  } else {
+    return {};
   }
 }
 
@@ -1871,15 +1882,21 @@ NT_Publisher LocalStorage::Publish(NT_Topic topicHandle, NT_Type type,
                                    std::string_view typeStr,
                                    const wpi::json& properties,
                                    wpi::span<const PubSubOption> options) {
-  if (type == NT_UNASSIGNED || typeStr.empty()) {
-    return 0;
-  }
-
   std::scoped_lock lock{m_mutex};
 
   // Get the topic
   auto* topic = m_impl->m_topics.Get(topicHandle);
   if (!topic) {
+    WPI_ERROR(m_impl->m_logger, "trying to publish invalid topic handle ({})",
+              topicHandle);
+    return 0;
+  }
+
+  if (type == NT_UNASSIGNED || typeStr.empty()) {
+    WPI_ERROR(
+        m_impl->m_logger,
+        "cannot publish '{}' with an unassigned type or empty type string",
+        topic->name);
     return 0;
   }
 
