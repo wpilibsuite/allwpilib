@@ -60,7 +60,7 @@ static NiFpga_Status OpenHostMemoryBuffer(NiFpga_Session session,
     return retval;
   }
   *virtualAddress = outputs.virtualAddress;
-  if (size != NULL) {
+  if (size) {
     *size = outputs.size;
   }
   return retval;
