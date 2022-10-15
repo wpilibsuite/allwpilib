@@ -136,6 +136,7 @@ public final class {{ TypeName }}Topic extends Topic {
    * @param properties JSON properties
    * @param options publish options
    * @return publisher
+   * @throws IllegalArgumentException if properties is not a JSON object
    */
   public {{ TypeName }}Publisher publishEx(
       String typeString,

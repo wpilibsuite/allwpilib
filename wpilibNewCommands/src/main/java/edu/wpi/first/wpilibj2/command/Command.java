@@ -4,6 +4,9 @@
 
 package edu.wpi.first.wpilibj2.command;
 
+import static edu.wpi.first.wpilibj.util.ErrorMessages.requireNonNullParam;
+
+import edu.wpi.first.util.function.BooleanConsumer;
 import java.util.Set;
 import java.util.function.BooleanSupplier;
 
@@ -346,6 +349,42 @@ public interface Command {
         return interruptBehavior;
       }
     };
+  }
+
+  /**
+   * Decorates this command with a lambda to call on interrupt or end, following the command's
+   * inherent {@link #end(boolean)} method.
+   *
+   * @param end a lambda accepting a boolean parameter specifying whether the command was
+   *     interrupted.
+   * @return the decorated command
+   */
+  default WrapperCommand finallyDo(BooleanConsumer end) {
+    requireNonNullParam(end, "end", "Command.finallyDo()");
+    return new WrapperCommand(this) {
+      @Override
+      public void end(boolean interrupted) {
+        super.end(interrupted);
+        end.accept(interrupted);
+      }
+    };
+  }
+
+  /**
+   * Decorates this command with a lambda to call on interrupt, following the command's inherent
+   * {@link #end(boolean)} method.
+   *
+   * @param handler a lambda to run when the command is interrupted
+   * @return the decorated command
+   */
+  default WrapperCommand handleInterrupt(Runnable handler) {
+    requireNonNullParam(handler, "handler", "Command.handleInterrupt()");
+    return finallyDo(
+        interrupted -> {
+          if (interrupted) {
+            handler.run();
+          }
+        });
   }
 
   /** Schedules this command. */

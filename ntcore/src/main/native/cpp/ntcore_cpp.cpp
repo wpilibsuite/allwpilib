@@ -293,9 +293,11 @@ wpi::json GetTopicProperties(NT_Topic topic) {
   }
 }
 
-void SetTopicProperties(NT_Topic topic, const wpi::json& properties) {
+bool SetTopicProperties(NT_Topic topic, const wpi::json& properties) {
   if (auto ii = InstanceImpl::GetTyped(topic, Handle::kTopic)) {
-    ii->localStorage.SetTopicProperties(topic, properties);
+    return ii->localStorage.SetTopicProperties(topic, properties);
+  } else {
+    return {};
   }
 }
 

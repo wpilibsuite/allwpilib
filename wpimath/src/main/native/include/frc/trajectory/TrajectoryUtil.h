@@ -25,7 +25,7 @@ class WPILIB_DLLEXPORT TrajectoryUtil {
   static void ToPathweaverJson(const Trajectory& trajectory,
                                std::string_view path);
   /**
-   * Imports a Trajectory from a PathWeaver-style JSON file.
+   * Imports a Trajectory from a JSON file exported from PathWeaver.
    *
    * @param path The path of the json file to import from.
    *
@@ -34,7 +34,7 @@ class WPILIB_DLLEXPORT TrajectoryUtil {
   static Trajectory FromPathweaverJson(std::string_view path);
 
   /**
-   * Deserializes a Trajectory from PathWeaver-style JSON.
+   * Deserializes a Trajectory from JSON exported from PathWeaver.
    *
    * @param trajectory the trajectory to export
    *
