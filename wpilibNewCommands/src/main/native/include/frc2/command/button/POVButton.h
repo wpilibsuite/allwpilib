@@ -4,6 +4,7 @@
 
 #pragma once
 #include <frc/GenericHID.h>
+#include <wpi/deprecated.h>
 
 #include "Button.h"
 
@@ -25,9 +26,11 @@ class POVButton : public Button {
    * @param angle The angle of the POV corresponding to a button press.
    * @param povNumber The number of the POV on the joystick.
    */
+  WPI_IGNORE_DEPRECATED
   POVButton(frc::GenericHID* joystick, int angle, int povNumber = 0)
       : Button([joystick, angle, povNumber] {
           return joystick->GetPOV(povNumber) == angle;
         }) {}
+  WPI_UNIGNORE_DEPRECATED
 };
 }  // namespace frc2

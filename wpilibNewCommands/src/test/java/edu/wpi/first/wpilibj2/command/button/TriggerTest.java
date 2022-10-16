@@ -8,162 +8,188 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 import edu.wpi.first.wpilibj.simulation.SimHooks;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.CommandTestBase;
+
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.BooleanSupplier;
+
+import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.StartEndCommand;
+import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
+
 import org.junit.jupiter.api.Test;
 
-class ButtonTest extends CommandTestBase {
+class TriggerTest extends CommandTestBase {
   @Test
-  void whenPressedTest() {
+  void onTrueTest() {
     CommandScheduler scheduler = CommandScheduler.getInstance();
-    MockCommandHolder command1Holder = new MockCommandHolder(true);
-    Command command1 = command1Holder.getMock();
+    AtomicBoolean finished = new AtomicBoolean(false);
+    Command command1 = new WaitUntilCommand(finished::get);
 
     InternalButton button = new InternalButton();
     button.setPressed(false);
-    button.whenPressed(command1);
+    button.onTrue(command1);
     scheduler.run();
-    verify(command1, never()).schedule();
+    assertFalse(command1.isScheduled());
     button.setPressed(true);
     scheduler.run();
+    assertTrue(command1.isScheduled());
+    finished.set(true);
     scheduler.run();
-    verify(command1).schedule();
+    assertFalse(command1.isScheduled());
   }
 
   @Test
-  void whenReleasedTest() {
+  void onFalseTest() {
     CommandScheduler scheduler = CommandScheduler.getInstance();
-    MockCommandHolder command1Holder = new MockCommandHolder(true);
-    Command command1 = command1Holder.getMock();
+    AtomicBoolean finished = new AtomicBoolean(false);
+    Command command1 = new WaitUntilCommand(finished::get);
 
     InternalButton button = new InternalButton();
     button.setPressed(true);
-    button.whenReleased(command1);
+    button.onFalse(command1);
     scheduler.run();
-    verify(command1, never()).schedule();
+    assertFalse(command1.isScheduled());
     button.setPressed(false);
     scheduler.run();
+    assertTrue(command1.isScheduled());
+    finished.set(true);
     scheduler.run();
-    verify(command1).schedule();
+    assertFalse(command1.isScheduled());
   }
 
   @Test
-  void whileHeldTest() {
+  void whileTrueRepeatedlyTest() {
     CommandScheduler scheduler = CommandScheduler.getInstance();
-    MockCommandHolder command1Holder = new MockCommandHolder(true);
-    Command command1 = command1Holder.getMock();
+    AtomicInteger counter = new AtomicInteger(0);
+    // the repeatedly() here is the point!
+    Command command1 = new InstantCommand(counter::incrementAndGet).repeatedly();
 
     InternalButton button = new InternalButton();
     button.setPressed(false);
-    button.whileHeld(command1);
+    button.whileTrue(command1);
     scheduler.run();
-    verify(command1, never()).schedule();
+    assertEquals(0, counter.get());
     button.setPressed(true);
     scheduler.run();
     scheduler.run();
-    verify(command1, times(2)).schedule();
+    assertEquals(2, counter.get());
     button.setPressed(false);
     scheduler.run();
-    verify(command1).cancel();
+    assertEquals(2, counter.get());
   }
 
   @Test
-  void whenHeldTest() {
+  void whileTrueOnceTest() {
     CommandScheduler scheduler = CommandScheduler.getInstance();
-    MockCommandHolder command1Holder = new MockCommandHolder(true);
-    Command command1 = command1Holder.getMock();
+    AtomicInteger startCounter = new AtomicInteger(0);
+    AtomicInteger endCounter = new AtomicInteger(0);
+    Command command1 = new StartEndCommand(startCounter::incrementAndGet, endCounter::incrementAndGet);
 
     InternalButton button = new InternalButton();
     button.setPressed(false);
-    button.whenHeld(command1);
+    button.whileTrue(command1);
     scheduler.run();
-    verify(command1, never()).schedule();
+    assertEquals(0, startCounter.get());
+    assertEquals(0, endCounter.get());
     button.setPressed(true);
     scheduler.run();
     scheduler.run();
-    verify(command1).schedule();
+    assertEquals(1, startCounter.get());
+    assertEquals(0, endCounter.get());
     button.setPressed(false);
     scheduler.run();
-    verify(command1).cancel();
+    assertEquals(1, startCounter.get());
+    assertEquals(1, endCounter.get());
   }
 
   @Test
-  void toggleWhenPressedTest() {
+  void toggleOnTrueTest() {
     CommandScheduler scheduler = CommandScheduler.getInstance();
-    MockCommandHolder command1Holder = new MockCommandHolder(true);
-    Command command1 = command1Holder.getMock();
+    AtomicInteger startCounter = new AtomicInteger(0);
+    AtomicInteger endCounter = new AtomicInteger(0);
+    Command command1 = new StartEndCommand(startCounter::incrementAndGet, endCounter::incrementAndGet);
 
     InternalButton button = new InternalButton();
     button.setPressed(false);
-    button.toggleWhenPressed(command1);
+    button.toggleOnTrue(command1);
     scheduler.run();
-    verify(command1, never()).schedule();
+    assertEquals(0, startCounter.get());
+    assertEquals(0, endCounter.get());
     button.setPressed(true);
     scheduler.run();
-    when(command1.isScheduled()).thenReturn(true);
     scheduler.run();
-    verify(command1).schedule();
+    assertEquals(1, startCounter.get());
+    assertEquals(0, endCounter.get());
     button.setPressed(false);
     scheduler.run();
-    verify(command1, never()).cancel();
+    assertEquals(1, startCounter.get());
+    assertEquals(0, endCounter.get());
     button.setPressed(true);
     scheduler.run();
-    verify(command1).cancel();
+    assertEquals(1, startCounter.get());
+    assertEquals(1, endCounter.get());
   }
 
   @Test
-  void cancelWhenPressedTest() {
+  void cancelWhenActiveTest() {
     CommandScheduler scheduler = CommandScheduler.getInstance();
-    MockCommandHolder command1Holder = new MockCommandHolder(true);
-    Command command1 = command1Holder.getMock();
+    AtomicInteger startCounter = new AtomicInteger(0);
+    AtomicInteger endCounter = new AtomicInteger(0);
 
     InternalButton button = new InternalButton();
+    Command command1 = new StartEndCommand(startCounter::incrementAndGet, endCounter::incrementAndGet).until(button.rising());
+
     button.setPressed(false);
-    button.cancelWhenPressed(command1);
+    command1.schedule();
     scheduler.run();
-    verify(command1, never()).cancel();
+    assertEquals(1, startCounter.get());
+    assertEquals(0, endCounter.get());
     button.setPressed(true);
     scheduler.run();
+    assertEquals(1, startCounter.get());
+    assertEquals(1, endCounter.get());
     scheduler.run();
-    verify(command1).cancel();
+    assertEquals(1, startCounter.get());
+    assertEquals(1, endCounter.get());
   }
 
+  // Binding runnables directly is deprecated -- users should create the command manually
+  @SuppressWarnings("deprecation")
   @Test
   void runnableBindingTest() {
-    InternalButton buttonWhenPressed = new InternalButton();
-    InternalButton buttonWhileHeld = new InternalButton();
-    InternalButton buttonWhenReleased = new InternalButton();
+    InternalButton buttonWhenActive = new InternalButton();
+    InternalButton buttonWhileActiveContinuous = new InternalButton();
+    InternalButton buttonWhenInactive = new InternalButton();
 
-    buttonWhenPressed.setPressed(false);
-    buttonWhileHeld.setPressed(true);
-    buttonWhenReleased.setPressed(true);
+    buttonWhenActive.setPressed(false);
+    buttonWhileActiveContinuous.setPressed(true);
+    buttonWhenInactive.setPressed(true);
 
     AtomicInteger counter = new AtomicInteger(0);
 
-    buttonWhenPressed.whenPressed(counter::incrementAndGet);
-    buttonWhileHeld.whileHeld(counter::incrementAndGet);
-    buttonWhenReleased.whenReleased(counter::incrementAndGet);
+    buttonWhenActive.whenActive(counter::incrementAndGet);
+    buttonWhileActiveContinuous.whileActiveContinuous(counter::incrementAndGet);
+    buttonWhenInactive.whenInactive(counter::incrementAndGet);
 
     CommandScheduler scheduler = CommandScheduler.getInstance();
 
     scheduler.run();
-    buttonWhenPressed.setPressed(true);
-    buttonWhenReleased.setPressed(false);
+    buttonWhenActive.setPressed(true);
+    buttonWhenInactive.setPressed(false);
     scheduler.run();
 
     assertEquals(counter.get(), 4);
   }
 
   @Test
-  void buttonCompositionTest() {
+  void triggerCompositionTest() {
     InternalButton button1 = new InternalButton();
     InternalButton button2 = new InternalButton();
 
@@ -177,7 +203,7 @@ class ButtonTest extends CommandTestBase {
   }
 
   @Test
-  void buttonCompositionSupplierTest() {
+  void triggerCompositionSupplierTest() {
     InternalButton button1 = new InternalButton();
     BooleanSupplier booleanSupplier = () -> false;
 
@@ -196,7 +222,7 @@ class ButtonTest extends CommandTestBase {
     InternalButton button = new InternalButton();
     Trigger debounced = button.debounce(0.1);
 
-    debounced.whenActive(command);
+    debounced.onTrue(command);
 
     button.setPressed(true);
     scheduler.run();

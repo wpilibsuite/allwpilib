@@ -9,12 +9,9 @@ using namespace frc2;
 Button::Button(std::function<bool()> isPressed) : Trigger(isPressed) {}
 
 Button Button::WhenPressed(Command* command) {
+  WPI_IGNORE_DEPRECATED
   WhenActive(command);
-  return *this;
-}
-
-Button Button::WhenPressed(CommandPtr&& command) {
-  WhenActive(std::move(command));
+  WPI_UNIGNORE_DEPRECATED
   return *this;
 }
 
@@ -31,12 +28,9 @@ Button Button::WhenPressed(std::function<void()> toRun,
 }
 
 Button Button::WhileHeld(Command* command) {
+  WPI_IGNORE_DEPRECATED
   WhileActiveContinous(command);
-  return *this;
-}
-
-Button Button::WhileHeld(CommandPtr&& command) {
-  WhileActiveContinous(std::move(command));
+  WPI_UNIGNORE_DEPRECATED
   return *this;
 }
 
@@ -53,22 +47,16 @@ Button Button::WhileHeld(std::function<void()> toRun,
 }
 
 Button Button::WhenHeld(Command* command) {
+  WPI_IGNORE_DEPRECATED
   WhileActiveOnce(command);
-  return *this;
-}
-
-Button Button::WhenHeld(CommandPtr&& command) {
-  WhileActiveOnce(std::move(command));
+  WPI_UNIGNORE_DEPRECATED
   return *this;
 }
 
 Button Button::WhenReleased(Command* command) {
+  WPI_IGNORE_DEPRECATED
   WhenInactive(command);
-  return *this;
-}
-
-Button Button::WhenReleased(CommandPtr&& command) {
-  WhenInactive(std::move(command));
+  WPI_UNIGNORE_DEPRECATED
   return *this;
 }
 
@@ -85,16 +73,15 @@ Button Button::WhenReleased(std::function<void()> toRun,
 }
 
 Button Button::ToggleWhenPressed(Command* command) {
+  WPI_IGNORE_DEPRECATED
   ToggleWhenActive(command);
-  return *this;
-}
-
-Button Button::ToggleWhenPressed(CommandPtr&& command) {
-  ToggleWhenActive(std::move(command));
+  WPI_UNIGNORE_DEPRECATED
   return *this;
 }
 
 Button Button::CancelWhenPressed(Command* command) {
+  WPI_IGNORE_DEPRECATED
   CancelWhenActive(command);
+  WPI_UNIGNORE_DEPRECATED
   return *this;
 }
