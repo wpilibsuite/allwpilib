@@ -7,6 +7,7 @@
 #include <functional>
 #include <initializer_list>
 #include <memory>
+#include <span>
 
 #include <frc/Timer.h>
 #include <frc/controller/PIDController.h>
@@ -17,7 +18,6 @@
 #include <frc/trajectory/Trajectory.h>
 #include <units/length.h>
 #include <units/voltage.h>
-#include <wpi/span.h>
 
 #include "frc2/command/CommandBase.h"
 #include "frc2/command/CommandHelper.h"
@@ -116,7 +116,7 @@ class RamseteCommand : public CommandHelper<CommandBase, RamseteCommand> {
                  frc2::PIDController leftController,
                  frc2::PIDController rightController,
                  std::function<void(units::volt_t, units::volt_t)> output,
-                 wpi::span<Subsystem* const> requirements = {});
+                 std::span<Subsystem* const> requirements = {});
 
   /**
    * Constructs a new RamseteCommand that, when executed, will follow the
@@ -164,7 +164,7 @@ class RamseteCommand : public CommandHelper<CommandBase, RamseteCommand> {
                  std::function<void(units::meters_per_second_t,
                                     units::meters_per_second_t)>
                      output,
-                 wpi::span<Subsystem* const> requirements = {});
+                 std::span<Subsystem* const> requirements = {});
 
   void Initialize() override;
 

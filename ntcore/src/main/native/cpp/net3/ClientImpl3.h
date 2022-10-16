@@ -8,10 +8,9 @@
 
 #include <functional>
 #include <memory>
+#include <span>
 #include <string>
 #include <string_view>
-
-#include <wpi/span.h>
 
 #include "net/NetworkInterface.h"
 
@@ -39,8 +38,8 @@ class ClientImpl3 {
   ~ClientImpl3();
 
   void Start(std::string_view selfId, std::function<void()> succeeded);
-  void ProcessIncoming(wpi::span<const uint8_t> data);
-  void HandleLocal(wpi::span<const net::ClientMessage> msgs);
+  void ProcessIncoming(std::span<const uint8_t> data);
+  void HandleLocal(std::span<const net::ClientMessage> msgs);
 
   void SendPeriodic(uint64_t curTimeMs);
 
@@ -62,7 +61,7 @@ class ClientStartup3 final : public net::NetworkStartupInterface {
   void Publish(NT_Publisher pubHandle, NT_Topic topicHandle,
                std::string_view name, std::string_view typeStr,
                const wpi::json& properties, const PubSubOptions& options) final;
-  void Subscribe(NT_Subscriber subHandle, wpi::span<const std::string> prefixes,
+  void Subscribe(NT_Subscriber subHandle, std::span<const std::string> prefixes,
                  const PubSubOptions& options) final;
   void SetValue(NT_Publisher pubHandle, const Value& value) final;
 

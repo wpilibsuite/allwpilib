@@ -76,7 +76,7 @@ Frame SourceImpl::GetCurFrame() {
 Frame SourceImpl::GetNextFrame() {
   std::unique_lock lock{m_frameMutex};
   auto oldTime = m_frame.GetTime();
-  m_frameCv.wait(lock, [=] { return m_frame.GetTime() != oldTime; });
+  m_frameCv.wait(lock, [=, this] { return m_frame.GetTime() != oldTime; });
   return m_frame;
 }
 
@@ -85,7 +85,7 @@ Frame SourceImpl::GetNextFrame(double timeout) {
   auto oldTime = m_frame.GetTime();
   if (!m_frameCv.wait_for(
           lock, std::chrono::milliseconds(static_cast<int>(timeout * 1000)),
-          [=] { return m_frame.GetTime() != oldTime; })) {
+          [=, this] { return m_frame.GetTime() != oldTime; })) {
     m_frame = Frame{*this, "timed out getting frame", wpi::Now()};
   }
   return m_frame;

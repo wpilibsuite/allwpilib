@@ -4,9 +4,8 @@
 
 #pragma once
 
+#include <span>
 #include <string_view>
-
-#include <wpi/span.h>
 
 #include "networktables/NetworkTableInstance.h"
 #include "ntcore_cpp.h"
@@ -30,8 +29,8 @@ class MultiSubscriber final {
    * @param options subscriber options
    */
   MultiSubscriber(NetworkTableInstance inst,
-                  wpi::span<const std::string_view> prefixes,
-                  wpi::span<const PubSubOption> options = {});
+                  std::span<const std::string_view> prefixes,
+                  std::span<const PubSubOption> options = {});
 
   MultiSubscriber(const MultiSubscriber&) = delete;
   MultiSubscriber& operator=(const MultiSubscriber&) = delete;

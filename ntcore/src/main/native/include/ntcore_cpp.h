@@ -9,12 +9,11 @@
 #include <cassert>
 #include <functional>
 #include <memory>
+#include <span>
 #include <string>
 #include <string_view>
 #include <utility>
 #include <vector>
-
-#include <wpi/span.h>
 
 #include "networktables/NetworkTableValue.h"
 #include "ntcore_c.h"
@@ -482,7 +481,7 @@ std::vector<NT_Topic> GetTopics(NT_Inst inst, std::string_view prefix,
  * @return Array of topic handles.
  */
 std::vector<NT_Topic> GetTopics(NT_Inst inst, std::string_view prefix,
-                                wpi::span<const std::string_view> types);
+                                std::span<const std::string_view> types);
 
 /**
  * Get Topic Information about multiple topics.
@@ -515,7 +514,7 @@ std::vector<TopicInfo> GetTopicInfo(NT_Inst inst, std::string_view prefix,
  * @return Array of topic information.
  */
 std::vector<TopicInfo> GetTopicInfo(NT_Inst inst, std::string_view prefix,
-                                    wpi::span<const std::string_view> types);
+                                    std::span<const std::string_view> types);
 
 /**
  * Gets Topic Information.
@@ -665,7 +664,7 @@ bool SetTopicProperties(NT_Topic topic, const wpi::json& update);
  * @return Subscriber handle
  */
 NT_Subscriber Subscribe(NT_Topic topic, NT_Type type, std::string_view typeStr,
-                        wpi::span<const PubSubOption> options = {});
+                        std::span<const PubSubOption> options = {});
 
 /**
  * Stops subscriber.
@@ -684,7 +683,7 @@ void Unsubscribe(NT_Subscriber sub);
  * @return Publisher handle
  */
 NT_Publisher Publish(NT_Topic topic, NT_Type type, std::string_view typeStr,
-                     wpi::span<const PubSubOption> options = {});
+                     std::span<const PubSubOption> options = {});
 
 /**
  * Creates a new publisher to a topic.
@@ -698,7 +697,7 @@ NT_Publisher Publish(NT_Topic topic, NT_Type type, std::string_view typeStr,
  */
 NT_Publisher PublishEx(NT_Topic topic, NT_Type type, std::string_view typeStr,
                        const wpi::json& properties,
-                       wpi::span<const PubSubOption> options = {});
+                       std::span<const PubSubOption> options = {});
 
 /**
  * Stops publisher.
@@ -717,7 +716,7 @@ void Unpublish(NT_Handle pubentry);
  * @return Entry handle
  */
 NT_Entry GetEntry(NT_Topic topic, NT_Type type, std::string_view typeStr,
-                  wpi::span<const PubSubOption> options = {});
+                  std::span<const PubSubOption> options = {});
 
 /**
  * Stops entry subscriber/publisher.
@@ -759,8 +758,8 @@ NT_Topic GetTopicFromHandle(NT_Handle pubsubentry);
  * @return subscriber handle
  */
 NT_MultiSubscriber SubscribeMultiple(
-    NT_Inst inst, wpi::span<const std::string_view> prefixes,
-    wpi::span<const PubSubOption> options = {});
+    NT_Inst inst, std::span<const std::string_view> prefixes,
+    std::span<const PubSubOption> options = {});
 
 /**
  * Unsubscribes a multi-subscriber.
@@ -786,7 +785,7 @@ void UnsubscribeMultiple(NT_MultiSubscriber sub);
  * @param callback Listener function
  */
 NT_TopicListener AddTopicListener(
-    NT_Inst inst, wpi::span<const std::string_view> prefixes, unsigned int mask,
+    NT_Inst inst, std::span<const std::string_view> prefixes, unsigned int mask,
     std::function<void(const TopicNotification&)> callback);
 
 /**
@@ -841,7 +840,7 @@ std::vector<TopicNotification> ReadTopicListenerQueue(
  * @return Listener handle
  */
 NT_TopicListener AddPolledTopicListener(
-    NT_TopicListenerPoller poller, wpi::span<const std::string_view> prefixes,
+    NT_TopicListenerPoller poller, std::span<const std::string_view> prefixes,
     unsigned int mask);
 
 /**
@@ -1102,7 +1101,7 @@ void SetServer(NT_Inst inst, const char* server_name, unsigned int port);
  */
 void SetServer(
     NT_Inst inst,
-    wpi::span<const std::pair<std::string_view, unsigned int>> servers);
+    std::span<const std::pair<std::string_view, unsigned int>> servers);
 
 /**
  * Sets server addresses and port for client (without restarting client).

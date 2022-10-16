@@ -10,7 +10,7 @@
 
 #include <imgui.h>
 #include <imgui_internal.h>
-#include <wpi/numbers>
+#include <numbers>
 
 #include "glass/Context.h"
 #include "glass/DataSource.h"
@@ -54,7 +54,7 @@ void glass::DisplayGyro(GyroModel* m) {
 
   // Draw the spokes at every 5 degrees and a "major" spoke every 45 degrees.
   for (int i = -175; i <= 180; i += 5) {
-    double radians = i * 2 * wpi::numbers::pi / 360.0;
+    double radians = i * 2 * std::numbers::pi / 360.0;
     ImVec2 direction(std::sin(radians), -std::cos(radians));
 
     bool major = i % 45 == 0;
@@ -74,7 +74,7 @@ void glass::DisplayGyro(GyroModel* m) {
 
   draw->AddCircleFilled(center, radius * 0.075, secondaryColor, 50);
 
-  double radians = value * 2 * wpi::numbers::pi / 360.0;
+  double radians = value * 2 * std::numbers::pi / 360.0;
   draw->AddLine(
       center - ImVec2(1, 0),
       center + ImVec2(std::sin(radians), -std::cos(radians)) * radius * 0.95f,

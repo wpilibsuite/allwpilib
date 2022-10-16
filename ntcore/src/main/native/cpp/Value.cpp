@@ -5,6 +5,7 @@
 #include <stdint.h>
 
 #include <cstring>
+#include <span>
 
 #include <wpi/MemAlloc.h>
 #include <wpi/timestamp.h>
@@ -17,7 +18,7 @@ using namespace nt;
 
 namespace {
 struct StringArrayStorage {
-  explicit StringArrayStorage(wpi::span<const std::string> value)
+  explicit StringArrayStorage(std::span<const std::string> value)
       : strings{value.begin(), value.end()} {
     InitNtStrings();
   }
@@ -68,7 +69,7 @@ Value::Value(NT_Type type, int64_t time, int64_t serverTime,
   }
 }
 
-Value Value::MakeBooleanArray(wpi::span<const bool> value, int64_t time) {
+Value Value::MakeBooleanArray(std::span<const bool> value, int64_t time) {
   Value val{NT_BOOLEAN_ARRAY, time, private_init{}};
   auto data = std::make_shared<std::vector<int>>(value.begin(), value.end());
   // data->reserve(value.size());
@@ -79,7 +80,7 @@ Value Value::MakeBooleanArray(wpi::span<const bool> value, int64_t time) {
   return val;
 }
 
-Value Value::MakeBooleanArray(wpi::span<const int> value, int64_t time) {
+Value Value::MakeBooleanArray(std::span<const int> value, int64_t time) {
   Value val{NT_BOOLEAN_ARRAY, time, private_init{}};
   auto data = std::make_shared<std::vector<int>>(value.begin(), value.end());
   val.m_val.data.arr_boolean.arr = data->data();
@@ -88,7 +89,7 @@ Value Value::MakeBooleanArray(wpi::span<const int> value, int64_t time) {
   return val;
 }
 
-Value Value::MakeIntegerArray(wpi::span<const int64_t> value, int64_t time) {
+Value Value::MakeIntegerArray(std::span<const int64_t> value, int64_t time) {
   Value val{NT_INTEGER_ARRAY, time, private_init{}};
   auto data =
       std::make_shared<std::vector<int64_t>>(value.begin(), value.end());
@@ -98,7 +99,7 @@ Value Value::MakeIntegerArray(wpi::span<const int64_t> value, int64_t time) {
   return val;
 }
 
-Value Value::MakeFloatArray(wpi::span<const float> value, int64_t time) {
+Value Value::MakeFloatArray(std::span<const float> value, int64_t time) {
   Value val{NT_FLOAT_ARRAY, time, private_init{}};
   auto data = std::make_shared<std::vector<float>>(value.begin(), value.end());
   val.m_val.data.arr_float.arr = data->data();
@@ -107,7 +108,7 @@ Value Value::MakeFloatArray(wpi::span<const float> value, int64_t time) {
   return val;
 }
 
-Value Value::MakeDoubleArray(wpi::span<const double> value, int64_t time) {
+Value Value::MakeDoubleArray(std::span<const double> value, int64_t time) {
   Value val{NT_DOUBLE_ARRAY, time, private_init{}};
   auto data = std::make_shared<std::vector<double>>(value.begin(), value.end());
   val.m_val.data.arr_double.arr = data->data();
@@ -116,7 +117,7 @@ Value Value::MakeDoubleArray(wpi::span<const double> value, int64_t time) {
   return val;
 }
 
-Value Value::MakeStringArray(wpi::span<const std::string> value, int64_t time) {
+Value Value::MakeStringArray(std::span<const std::string> value, int64_t time) {
   Value val{NT_STRING_ARRAY, time, private_init{}};
   auto data = std::make_shared<StringArrayStorage>(value);
   val.m_val.data.arr_string.arr = data->ntStrings.data();
@@ -226,19 +227,19 @@ Value nt::ConvertFromC(const NT_Value& value) {
                             value.last_change);
     case NT_BOOLEAN_ARRAY:
       return Value::MakeBooleanArray(
-          wpi::span(value.data.arr_boolean.arr, value.data.arr_boolean.size),
+          std::span(value.data.arr_boolean.arr, value.data.arr_boolean.size),
           value.last_change);
     case NT_INTEGER_ARRAY:
       return Value::MakeIntegerArray(
-          wpi::span(value.data.arr_int.arr, value.data.arr_int.size),
+          std::span(value.data.arr_int.arr, value.data.arr_int.size),
           value.last_change);
     case NT_FLOAT_ARRAY:
       return Value::MakeFloatArray(
-          wpi::span(value.data.arr_float.arr, value.data.arr_float.size),
+          std::span(value.data.arr_float.arr, value.data.arr_float.size),
           value.last_change);
     case NT_DOUBLE_ARRAY:
       return Value::MakeDoubleArray(
-          wpi::span(value.data.arr_double.arr, value.data.arr_double.size),
+          std::span(value.data.arr_double.arr, value.data.arr_double.size),
           value.last_change);
     case NT_STRING_ARRAY: {
       std::vector<std::string> v;

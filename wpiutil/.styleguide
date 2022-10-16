@@ -12,6 +12,10 @@ cppSrcFileInclude {
   \.cpp$
 }
 
+modifiableFileExclude {
+  src/main/native/include/wpi/MulticastServiceAnnouncer\.h$
+}
+
 generatedFileExclude {
   src/main/native/thirdparty/
 

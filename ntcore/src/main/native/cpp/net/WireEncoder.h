@@ -5,10 +5,9 @@
 #pragma once
 
 #include <optional>
+#include <span>
 #include <string>
 #include <string_view>
-
-#include <wpi/span.h>
 
 namespace wpi {
 class json;
@@ -33,10 +32,10 @@ void WireEncodeUnpublish(wpi::raw_ostream& os, int64_t pubuid);
 void WireEncodeSetProperties(wpi::raw_ostream& os, std::string_view name,
                              const wpi::json& update);
 void WireEncodeSubscribe(wpi::raw_ostream& os, int64_t subuid,
-                         wpi::span<const std::string_view> topicNames,
+                         std::span<const std::string_view> topicNames,
                          const PubSubOptions& options);
 void WireEncodeSubscribe(wpi::raw_ostream& os, int64_t subuid,
-                         wpi::span<const std::string> topicNames,
+                         std::span<const std::string> topicNames,
                          const PubSubOptions& options);
 void WireEncodeUnsubscribe(wpi::raw_ostream& os, int64_t subuid);
 

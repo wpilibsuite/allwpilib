@@ -101,7 +101,7 @@ set_target_properties(wpimath PROPERTIES DEBUG_POSTFIX "d")
 set_property(TARGET wpimath PROPERTY FOLDER "libraries")
 target_compile_definitions(wpimath PRIVATE WPILIB_EXPORTS)
 
-target_compile_features(wpimath PUBLIC cxx_std_17)
+target_compile_features(wpimath PUBLIC cxx_std_20)
 if (MSVC)
     target_compile_options(wpimath PUBLIC /bigobj)
 endif()

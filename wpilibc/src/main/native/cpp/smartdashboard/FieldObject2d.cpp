@@ -42,7 +42,7 @@ Pose2d FieldObject2d::GetPose() const {
   return m_poses[0];
 }
 
-void FieldObject2d::SetPoses(wpi::span<const Pose2d> poses) {
+void FieldObject2d::SetPoses(std::span<const Pose2d> poses) {
   std::scoped_lock lock(m_mutex);
   m_poses.assign(poses.begin(), poses.end());
   UpdateEntry();
@@ -68,7 +68,7 @@ std::vector<Pose2d> FieldObject2d::GetPoses() const {
   return std::vector<Pose2d>(m_poses.begin(), m_poses.end());
 }
 
-wpi::span<const Pose2d> FieldObject2d::GetPoses(
+std::span<const Pose2d> FieldObject2d::GetPoses(
     wpi::SmallVectorImpl<Pose2d>& out) const {
   std::scoped_lock lock(m_mutex);
   UpdateFromEntry();

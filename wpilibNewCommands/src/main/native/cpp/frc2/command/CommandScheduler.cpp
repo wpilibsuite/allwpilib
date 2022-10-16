@@ -163,7 +163,7 @@ void CommandScheduler::Schedule(Command* command) {
   }
 }
 
-void CommandScheduler::Schedule(wpi::span<Command* const> commands) {
+void CommandScheduler::Schedule(std::span<Command* const> commands) {
   for (auto command : commands) {
     Schedule(command);
   }
@@ -276,7 +276,7 @@ void CommandScheduler::RegisterSubsystem(
 }
 
 void CommandScheduler::RegisterSubsystem(
-    wpi::span<Subsystem* const> subsystems) {
+    std::span<Subsystem* const> subsystems) {
   for (auto* subsystem : subsystems) {
     RegisterSubsystem(subsystem);
   }
@@ -290,7 +290,7 @@ void CommandScheduler::UnregisterSubsystem(
 }
 
 void CommandScheduler::UnregisterSubsystem(
-    wpi::span<Subsystem* const> subsystems) {
+    std::span<Subsystem* const> subsystems) {
   for (auto* subsystem : subsystems) {
     UnregisterSubsystem(subsystem);
   }
@@ -336,7 +336,7 @@ void CommandScheduler::Cancel(const CommandPtr& command) {
   Cancel(command.get());
 }
 
-void CommandScheduler::Cancel(wpi::span<Command* const> commands) {
+void CommandScheduler::Cancel(std::span<Command* const> commands) {
   for (auto command : commands) {
     Cancel(command);
   }
@@ -357,7 +357,7 @@ void CommandScheduler::CancelAll() {
 }
 
 bool CommandScheduler::IsScheduled(
-    wpi::span<const Command* const> commands) const {
+    std::span<const Command* const> commands) const {
   for (auto command : commands) {
     if (!IsScheduled(command)) {
       return false;

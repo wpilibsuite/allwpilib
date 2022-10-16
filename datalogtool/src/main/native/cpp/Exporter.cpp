@@ -107,7 +107,7 @@ static void RebuildEntryTree() {
 
     // get to leaf
     auto nodes = &gEntryTree;
-    for (auto part : wpi::drop_back(wpi::span{parts.begin(), parts.end()})) {
+    for (auto part : wpi::drop_back(std::span{parts.begin(), parts.end()})) {
       auto it =
           std::find_if(nodes->begin(), nodes->end(),
                        [&](const auto& node) { return node.name == part; });

@@ -75,7 +75,7 @@ void HttpCameraImpl::MonitorThreadMain() {
     std::unique_lock lock(m_mutex);
     // sleep for 1 second between checks
     m_monitorCond.wait_for(lock, std::chrono::seconds(1),
-                           [=] { return !m_active; });
+                           [=, this] { return !m_active; });
 
     if (!m_active) {
       break;
@@ -110,7 +110,8 @@ void HttpCameraImpl::StreamThreadMain() {
         m_streamConn->stream->close();
       }
       // Wait for enable
-      m_sinkEnabledCond.wait(lock, [=] { return !m_active || IsEnabled(); });
+      m_sinkEnabledCond.wait(lock,
+                             [=, this] { return !m_active || IsEnabled(); });
       if (!m_active) {
         return;
       }
@@ -329,7 +330,7 @@ void HttpCameraImpl::SettingsThreadMain() {
     wpi::HttpRequest req;
     {
       std::unique_lock lock(m_mutex);
-      m_settingsCond.wait(lock, [=] {
+      m_settingsCond.wait(lock, [=, this] {
         return !m_active || (m_prefLocation != -1 && !m_settings.empty());
       });
       if (!m_active) {
@@ -378,7 +379,7 @@ CS_HttpCameraKind HttpCameraImpl::GetKind() const {
   return m_kind;
 }
 
-bool HttpCameraImpl::SetUrls(wpi::span<const std::string> urls,
+bool HttpCameraImpl::SetUrls(std::span<const std::string> urls,
                              CS_Status* status) {
   std::vector<wpi::HttpLocation> locations;
   for (const auto& url : urls) {
@@ -572,14 +573,14 @@ CS_Source CreateHttpCamera(std::string_view name, std::string_view url,
       break;
   }
   std::string urlStr{url};
-  if (!source->SetUrls(wpi::span{&urlStr, 1}, status)) {
+  if (!source->SetUrls(std::span{&urlStr, 1}, status)) {
     return 0;
   }
   return inst.CreateSource(CS_SOURCE_HTTP, source);
 }
 
 CS_Source CreateHttpCamera(std::string_view name,
-                           wpi::span<const std::string> urls,
+                           std::span<const std::string> urls,
                            CS_HttpCameraKind kind, CS_Status* status) {
   auto& inst = Instance::GetInstance();
   if (urls.empty()) {
@@ -603,7 +604,7 @@ CS_HttpCameraKind GetHttpCameraKind(CS_Source source, CS_Status* status) {
   return static_cast<HttpCameraImpl&>(*data->source).GetKind();
 }
 
-void SetHttpCameraUrls(CS_Source source, wpi::span<const std::string> urls,
+void SetHttpCameraUrls(CS_Source source, std::span<const std::string> urls,
                        CS_Status* status) {
   if (urls.empty()) {
     *status = CS_EMPTY_VALUE;

@@ -42,9 +42,9 @@ class MockMessageHandler3 : public net3::MessageHandler3 {
   MOCK_METHOD2(FlagsUpdate, void(unsigned int id, unsigned int flags));
   MOCK_METHOD1(EntryDelete, void(unsigned int id));
   MOCK_METHOD3(ExecuteRpc, void(unsigned int id, unsigned int uid,
-                                wpi::span<const uint8_t> params));
+                                std::span<const uint8_t> params));
   MOCK_METHOD3(RpcResponse, void(unsigned int id, unsigned int uid,
-                                 wpi::span<const uint8_t> result));
+                                 std::span<const uint8_t> result));
 };
 
 class WireDecoder3Test : public ::testing::Test {
@@ -52,7 +52,7 @@ class WireDecoder3Test : public ::testing::Test {
   StrictMock<MockMessageHandler3> handler;
   net3::WireDecoder3 decoder{handler};
 
-  void DecodeComplete(wpi::span<const uint8_t> in) {
+  void DecodeComplete(std::span<const uint8_t> in) {
     decoder.Execute(&in);
     EXPECT_TRUE(in.empty());
     ASSERT_EQ(decoder.GetError(), "");

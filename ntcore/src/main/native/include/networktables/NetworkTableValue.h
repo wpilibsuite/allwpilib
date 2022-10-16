@@ -9,13 +9,12 @@
 #include <cassert>
 #include <initializer_list>
 #include <memory>
+#include <span>
 #include <string>
 #include <string_view>
 #include <type_traits>
 #include <utility>
 #include <vector>
-
-#include <wpi/span.h>
 
 #include "ntcore_c.h"
 
@@ -235,7 +234,7 @@ class Value final {
    *
    * @return The raw value.
    */
-  wpi::span<const uint8_t> GetRaw() const {
+  std::span<const uint8_t> GetRaw() const {
     assert(m_val.type == NT_RAW);
     return {m_val.data.v_raw.data, m_val.data.v_raw.size};
   }
@@ -245,7 +244,7 @@ class Value final {
    *
    * @return The boolean array value.
    */
-  wpi::span<const int> GetBooleanArray() const {
+  std::span<const int> GetBooleanArray() const {
     assert(m_val.type == NT_BOOLEAN_ARRAY);
     return {m_val.data.arr_boolean.arr, m_val.data.arr_boolean.size};
   }
@@ -255,7 +254,7 @@ class Value final {
    *
    * @return The integer array value.
    */
-  wpi::span<const int64_t> GetIntegerArray() const {
+  std::span<const int64_t> GetIntegerArray() const {
     assert(m_val.type == NT_INTEGER_ARRAY);
     return {m_val.data.arr_int.arr, m_val.data.arr_int.size};
   }
@@ -265,7 +264,7 @@ class Value final {
    *
    * @return The float array value.
    */
-  wpi::span<const float> GetFloatArray() const {
+  std::span<const float> GetFloatArray() const {
     assert(m_val.type == NT_FLOAT_ARRAY);
     return {m_val.data.arr_float.arr, m_val.data.arr_float.size};
   }
@@ -275,7 +274,7 @@ class Value final {
    *
    * @return The double array value.
    */
-  wpi::span<const double> GetDoubleArray() const {
+  std::span<const double> GetDoubleArray() const {
     assert(m_val.type == NT_DOUBLE_ARRAY);
     return {m_val.data.arr_double.arr, m_val.data.arr_double.size};
   }
@@ -285,7 +284,7 @@ class Value final {
    *
    * @return The string array value.
    */
-  wpi::span<const std::string> GetStringArray() const {
+  std::span<const std::string> GetStringArray() const {
     assert(m_val.type == NT_STRING_ARRAY);
     return *static_cast<std::vector<std::string>*>(m_storage.get());
   }
@@ -397,7 +396,7 @@ class Value final {
    *             time)
    * @return The entry value
    */
-  static Value MakeRaw(wpi::span<const uint8_t> value, int64_t time = 0) {
+  static Value MakeRaw(std::span<const uint8_t> value, int64_t time = 0) {
     Value val{NT_RAW, time, private_init{}};
     auto data =
         std::make_shared<std::vector<uint8_t>>(value.begin(), value.end());
@@ -434,7 +433,7 @@ class Value final {
    *             time)
    * @return The entry value
    */
-  static Value MakeBooleanArray(wpi::span<const bool> value, int64_t time = 0);
+  static Value MakeBooleanArray(std::span<const bool> value, int64_t time = 0);
 
   /**
    * Creates a boolean array entry value.
@@ -446,7 +445,7 @@ class Value final {
    */
   static Value MakeBooleanArray(std::initializer_list<bool> value,
                                 int64_t time = 0) {
-    return MakeBooleanArray(wpi::span(value.begin(), value.end()), time);
+    return MakeBooleanArray(std::span(value.begin(), value.end()), time);
   }
 
   /**
@@ -457,7 +456,7 @@ class Value final {
    *             time)
    * @return The entry value
    */
-  static Value MakeBooleanArray(wpi::span<const int> value, int64_t time = 0);
+  static Value MakeBooleanArray(std::span<const int> value, int64_t time = 0);
 
   /**
    * Creates a boolean array entry value.
@@ -469,7 +468,7 @@ class Value final {
    */
   static Value MakeBooleanArray(std::initializer_list<int> value,
                                 int64_t time = 0) {
-    return MakeBooleanArray(wpi::span(value.begin(), value.end()), time);
+    return MakeBooleanArray(std::span(value.begin(), value.end()), time);
   }
 
   /**
@@ -480,7 +479,7 @@ class Value final {
    *             time)
    * @return The entry value
    */
-  static Value MakeIntegerArray(wpi::span<const int64_t> value,
+  static Value MakeIntegerArray(std::span<const int64_t> value,
                                 int64_t time = 0);
 
   /**
@@ -493,7 +492,7 @@ class Value final {
    */
   static Value MakeIntegerArray(std::initializer_list<int64_t> value,
                                 int64_t time = 0) {
-    return MakeIntegerArray(wpi::span(value.begin(), value.end()), time);
+    return MakeIntegerArray(std::span(value.begin(), value.end()), time);
   }
 
   /**
@@ -504,7 +503,7 @@ class Value final {
    *             time)
    * @return The entry value
    */
-  static Value MakeFloatArray(wpi::span<const float> value, int64_t time = 0);
+  static Value MakeFloatArray(std::span<const float> value, int64_t time = 0);
 
   /**
    * Creates a float array entry value.
@@ -516,7 +515,7 @@ class Value final {
    */
   static Value MakeFloatArray(std::initializer_list<float> value,
                               int64_t time = 0) {
-    return MakeFloatArray(wpi::span(value.begin(), value.end()), time);
+    return MakeFloatArray(std::span(value.begin(), value.end()), time);
   }
 
   /**
@@ -527,7 +526,7 @@ class Value final {
    *             time)
    * @return The entry value
    */
-  static Value MakeDoubleArray(wpi::span<const double> value, int64_t time = 0);
+  static Value MakeDoubleArray(std::span<const double> value, int64_t time = 0);
 
   /**
    * Creates a double array entry value.
@@ -539,7 +538,7 @@ class Value final {
    */
   static Value MakeDoubleArray(std::initializer_list<double> value,
                                int64_t time = 0) {
-    return MakeDoubleArray(wpi::span(value.begin(), value.end()), time);
+    return MakeDoubleArray(std::span(value.begin(), value.end()), time);
   }
 
   /**
@@ -550,7 +549,7 @@ class Value final {
    *             time)
    * @return The entry value
    */
-  static Value MakeStringArray(wpi::span<const std::string> value,
+  static Value MakeStringArray(std::span<const std::string> value,
                                int64_t time = 0);
 
   /**
@@ -563,7 +562,7 @@ class Value final {
    */
   static Value MakeStringArray(std::initializer_list<std::string> value,
                                int64_t time = 0) {
-    return MakeStringArray(wpi::span(value.begin(), value.end()), time);
+    return MakeStringArray(std::span(value.begin(), value.end()), time);
   }
 
   /**

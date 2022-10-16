@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include <span>
 #include <string>
 #include <vector>
 
@@ -37,7 +38,7 @@ class NetworkLoopQueue : public NetworkInterface {
   void SetProperties(NT_Topic topicHandle, std::string_view name,
                      const wpi::json& update) final;
   void Subscribe(NT_Subscriber subHandle,
-                 wpi::span<const std::string> topicNames,
+                 std::span<const std::string> topicNames,
                  const PubSubOptions& options) final;
   void Unsubscribe(NT_Subscriber subHandle) final;
   void SetValue(NT_Publisher pubHandle, const Value& value) final;

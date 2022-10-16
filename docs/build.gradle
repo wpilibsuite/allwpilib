@@ -57,7 +57,6 @@ doxygen {
     if (project.hasProperty('docWarningsAsErrors')) {
         // C++20 shims
         exclude 'wpi/ghc/filesystem.hpp'
-        exclude 'wpi/span.h'
 
         // Drake
         exclude 'drake/common/**'

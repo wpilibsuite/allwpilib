@@ -25,7 +25,7 @@ Notifier::Notifier(std::function<void()> handler) {
   m_notifier = HAL_InitializeNotifier(&status);
   FRC_CheckErrorStatus(status, "{}", "InitializeNotifier");
 
-  m_thread = std::thread([=] {
+  m_thread = std::thread([=, this] {
     for (;;) {
       int32_t status = 0;
       HAL_NotifierHandle notifier = m_notifier.load();
@@ -67,7 +67,7 @@ Notifier::Notifier(int priority, std::function<void()> handler) {
   m_notifier = HAL_InitializeNotifier(&status);
   FRC_CheckErrorStatus(status, "{}", "InitializeNotifier");
 
-  m_thread = std::thread([=] {
+  m_thread = std::thread([=, this] {
     int32_t status = 0;
     HAL_SetCurrentThreadPriority(true, priority, &status);
     for (;;) {

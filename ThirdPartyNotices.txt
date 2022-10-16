@@ -34,8 +34,6 @@ popper.js             wpinet/src/main/native/resources/popper-*
 units                 wpimath/src/main/native/include/units/
 Eigen                 wpimath/src/main/native/thirdparty/eigen/include/
 StackWalker           wpiutil/src/main/native/windows/StackWalker.*
-TCB span              wpiutil/src/main/native/thirdparty/include/wpi/span.h
-                      wpiutil/src/test/native/cpp/span/
 GHC filesystem        wpiutil/src/main/native/thirdparty/include/wpi/ghc/
 Team 254 Library      wpilibj/src/main/java/edu/wpi/first/wpilibj/spline/SplineParameterizer.java
                       wpilibj/src/main/java/edu/wpi/first/wpilibj/trajectory/TrajectoryParameterizer.java

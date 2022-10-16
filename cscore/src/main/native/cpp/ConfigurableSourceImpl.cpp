@@ -88,7 +88,7 @@ int ConfigurableSourceImpl::CreateProperty(
 }
 
 void ConfigurableSourceImpl::SetEnumPropertyChoices(
-    int property, wpi::span<const std::string> choices, CS_Status* status) {
+    int property, std::span<const std::string> choices, CS_Status* status) {
   std::scoped_lock lock(m_mutex);
   auto prop = GetProperty(property);
   if (!prop) {

@@ -10,7 +10,7 @@
 using namespace nt;
 
 template <typename T>
-static inline wpi::span<const T> ConvertFromC(const T* arr, size_t size) {
+static inline std::span<const T> ConvertFromC(const T* arr, size_t size) {
   return {arr, size};
 }
 

@@ -31,7 +31,7 @@ add_library(wpilibNewCommands ${wpilibNewCommands_native_src})
 set_target_properties(wpilibNewCommands PROPERTIES DEBUG_POSTFIX "d")
 set_property(TARGET wpilibNewCommands PROPERTY FOLDER "libraries")
 
-target_compile_features(wpilibNewCommands PUBLIC cxx_std_17)
+target_compile_features(wpilibNewCommands PUBLIC cxx_std_20)
 wpilib_target_warnings(wpilibNewCommands)
 target_link_libraries(wpilibNewCommands wpilibc)
 

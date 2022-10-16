@@ -7,6 +7,7 @@
 #include <functional>
 #include <map>
 #include <memory>
+#include <span>
 #include <string>
 #include <string_view>
 #include <utility>
@@ -143,8 +144,8 @@ class NetworkTablesModel : public Model {
     std::vector<ClientPublisher> publishers;
     std::vector<ClientSubscriber> subscribers;
 
-    void UpdatePublishers(wpi::span<const uint8_t> data);
-    void UpdateSubscribers(wpi::span<const uint8_t> data);
+    void UpdatePublishers(std::span<const uint8_t> data);
+    void UpdateSubscribers(std::span<const uint8_t> data);
   };
 
   NetworkTablesModel();
@@ -175,7 +176,7 @@ class NetworkTablesModel : public Model {
  private:
   void RebuildTree();
   void RebuildTreeImpl(std::vector<TreeNode>* tree, int category);
-  void UpdateClients(wpi::span<const uint8_t> data);
+  void UpdateClients(std::span<const uint8_t> data);
 
   nt::NetworkTableInstance m_inst;
   NT_MultiSubscriber m_subscriber;

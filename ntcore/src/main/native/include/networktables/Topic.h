@@ -6,6 +6,7 @@
 
 #include <stdint.h>
 
+#include <span>
 #include <string>
 #include <string_view>
 #include <utility>
@@ -170,7 +171,7 @@ class Topic {
    * @return subscriber
    */
   [[nodiscard]] GenericSubscriber GenericSubscribe(
-      wpi::span<const PubSubOption> options = {});
+      std::span<const PubSubOption> options = {});
 
   /**
    * Create a new subscriber to the topic.
@@ -187,7 +188,7 @@ class Topic {
    * @return subscriber
    */
   [[nodiscard]] GenericSubscriber GenericSubscribe(
-      std::string_view typeString, wpi::span<const PubSubOption> options = {});
+      std::string_view typeString, std::span<const PubSubOption> options = {});
 
   /**
    * Create a new publisher to the topic.
@@ -206,7 +207,7 @@ class Topic {
    * @return publisher
    */
   [[nodiscard]] GenericPublisher GenericPublish(
-      std::string_view typeString, wpi::span<const PubSubOption> options = {});
+      std::string_view typeString, std::span<const PubSubOption> options = {});
 
   /**
    * Create a new publisher to the topic, with type string and initial
@@ -228,7 +229,7 @@ class Topic {
    */
   [[nodiscard]] GenericPublisher GenericPublishEx(
       std::string_view typeString, const wpi::json& properties,
-      wpi::span<const PubSubOption> options = {});
+      std::span<const PubSubOption> options = {});
 
   /**
    * Create a new generic entry for the topic.
@@ -249,7 +250,7 @@ class Topic {
    * @return entry
    */
   [[nodiscard]] GenericEntry GetGenericEntry(
-      wpi::span<const PubSubOption> options = {});
+      std::span<const PubSubOption> options = {});
 
   /**
    * Create a new generic entry for the topic.
@@ -271,7 +272,7 @@ class Topic {
    * @return entry
    */
   [[nodiscard]] GenericEntry GetGenericEntry(
-      std::string_view typeString, wpi::span<const PubSubOption> options = {});
+      std::string_view typeString, std::span<const PubSubOption> options = {});
 
   /**
    * Equality operator.  Returns true if both instances refer to the same

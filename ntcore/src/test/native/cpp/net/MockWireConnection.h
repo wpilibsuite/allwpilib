@@ -6,12 +6,12 @@
 
 #include <stdint.h>
 
+#include <span>
 #include <string>
 #include <string_view>
 #include <vector>
 
 #include <wpi/raw_ostream.h>
-#include <wpi/span.h>
 
 #include "gmock/gmock.h"
 #include "net/WireConnection.h"
@@ -28,7 +28,7 @@ class MockWireConnection : public WireConnection {
   BinaryWriter SendBinary() override { return {m_binary_os, *this}; }
 
   MOCK_METHOD(void, Text, (std::string_view contents));
-  MOCK_METHOD(void, Binary, (wpi::span<const uint8_t> contents));
+  MOCK_METHOD(void, Binary, (std::span<const uint8_t> contents));
 
   MOCK_METHOD(void, Flush, (), (override));
 

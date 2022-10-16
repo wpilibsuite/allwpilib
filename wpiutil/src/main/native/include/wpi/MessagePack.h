@@ -6,11 +6,11 @@
 
 #include <stdint.h>
 
+#include <span>
 #include <string>
 #include <string_view>
 
 #include "wpi/mpack.h"
-#include "wpi/span.h"
 
 namespace mpack {
 
@@ -19,13 +19,13 @@ inline void mpack_write_str(mpack_writer_t* writer, std::string_view str) {
 }
 
 inline void mpack_write_bytes(mpack_writer_t* writer,
-                              wpi::span<const uint8_t> data) {
+                              std::span<const uint8_t> data) {
   mpack_write_bytes(writer, reinterpret_cast<const char*>(data.data()),
                     data.size());
 }
 
 inline void mpack_reader_init_data(mpack_reader_t* reader,
-                                   wpi::span<const uint8_t> data) {
+                                   std::span<const uint8_t> data) {
   mpack_reader_init_data(reader, reinterpret_cast<const char*>(data.data()),
                          data.size());
 }

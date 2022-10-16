@@ -86,16 +86,16 @@ class Instance {
   void DestroySource(CS_Source handle);
   void DestroySink(CS_Sink handle);
 
-  wpi::span<CS_Source> EnumerateSourceHandles(
+  std::span<CS_Source> EnumerateSourceHandles(
       wpi::SmallVectorImpl<CS_Source>& vec) {
     return m_sources.GetAll(vec);
   }
 
-  wpi::span<CS_Sink> EnumerateSinkHandles(wpi::SmallVectorImpl<CS_Sink>& vec) {
+  std::span<CS_Sink> EnumerateSinkHandles(wpi::SmallVectorImpl<CS_Sink>& vec) {
     return m_sinks.GetAll(vec);
   }
 
-  wpi::span<CS_Sink> EnumerateSourceSinks(CS_Source source,
+  std::span<CS_Sink> EnumerateSourceSinks(CS_Source source,
                                           wpi::SmallVectorImpl<CS_Sink>& vec) {
     vec.clear();
     m_sinks.ForEach([&](CS_Sink sinkHandle, const SinkData& data) {

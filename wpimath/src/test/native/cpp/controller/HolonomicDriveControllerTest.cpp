@@ -2,7 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include <wpi/numbers>
+#include <numbers>
 
 #include "frc/MathUtil.h"
 #include "frc/controller/HolonomicDriveController.h"
@@ -16,7 +16,7 @@
   EXPECT_LE(units::math::abs(val1 - val2), eps)
 
 static constexpr units::meter_t kTolerance{1 / 12.0};
-static constexpr units::radian_t kAngularTolerance{2.0 * wpi::numbers::pi /
+static constexpr units::radian_t kAngularTolerance{2.0 * std::numbers::pi /
                                                    180.0};
 
 TEST(HolonomicDriveControllerTest, ReachesReference) {
@@ -25,8 +25,8 @@ TEST(HolonomicDriveControllerTest, ReachesReference) {
       frc::ProfiledPIDController<units::radian>{
           1.0, 0.0, 0.0,
           frc::TrapezoidProfile<units::radian>::Constraints{
-              units::radians_per_second_t{2.0 * wpi::numbers::pi},
-              units::radians_per_second_squared_t{wpi::numbers::pi}}}};
+              units::radians_per_second_t{2.0 * std::numbers::pi},
+              units::radians_per_second_squared_t{std::numbers::pi}}}};
 
   frc::Pose2d robotPose{2.7_m, 23_m, 0_deg};
 

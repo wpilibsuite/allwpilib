@@ -90,7 +90,7 @@ std::shared_ptr<NetworkTable> NetworkTableInstance::GetTable(
   }
 }
 
-void NetworkTableInstance::SetServer(wpi::span<const std::string_view> servers,
+void NetworkTableInstance::SetServer(std::span<const std::string_view> servers,
                                      unsigned int port) {
   std::vector<std::pair<std::string_view, unsigned int>> serversArr;
   serversArr.reserve(servers.size());

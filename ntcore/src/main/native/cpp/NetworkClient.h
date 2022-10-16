@@ -5,6 +5,7 @@
 #pragma once
 
 #include <memory>
+#include <span>
 #include <string>
 #include <string_view>
 #include <utility>
@@ -31,7 +32,7 @@ class NetworkClient final : public INetworkClient {
   ~NetworkClient() final;
 
   void SetServers(
-      wpi::span<const std::pair<std::string, unsigned int>> servers) final;
+      std::span<const std::pair<std::string, unsigned int>> servers) final;
 
   void StartDSClient(unsigned int port) final;
   void StopDSClient() final;
@@ -52,7 +53,7 @@ class NetworkClient3 final : public INetworkClient {
   ~NetworkClient3() final;
 
   void SetServers(
-      wpi::span<const std::pair<std::string, unsigned int>> servers) final;
+      std::span<const std::pair<std::string, unsigned int>> servers) final;
 
   void StartDSClient(unsigned int port) final;
   void StopDSClient() final;

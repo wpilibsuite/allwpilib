@@ -56,7 +56,7 @@ void nt::net::WireEncodeSetProperties(wpi::raw_ostream& os,
 }
 
 template <typename T>
-static void EncodePrefixes(wpi::raw_ostream& os, wpi::span<const T> topicNames,
+static void EncodePrefixes(wpi::raw_ostream& os, std::span<const T> topicNames,
                            wpi::json::serializer& s) {
   os << '[';
   bool first = true;
@@ -75,7 +75,7 @@ static void EncodePrefixes(wpi::raw_ostream& os, wpi::span<const T> topicNames,
 
 template <typename T>
 static void WireEncodeSubscribeImpl(wpi::raw_ostream& os, int64_t subuid,
-                                    wpi::span<const T> topicNames,
+                                    std::span<const T> topicNames,
                                     const PubSubOptions& options) {
   wpi::json::serializer s{os, ' ', 0};
   os << "{\"method\":\"" << SubscribeMsg::kMethodStr << "\",\"params\":{";
@@ -114,13 +114,13 @@ static void WireEncodeSubscribeImpl(wpi::raw_ostream& os, int64_t subuid,
 }
 
 void nt::net::WireEncodeSubscribe(wpi::raw_ostream& os, int64_t subuid,
-                                  wpi::span<const std::string_view> topicNames,
+                                  std::span<const std::string_view> topicNames,
                                   const PubSubOptions& options) {
   WireEncodeSubscribeImpl(os, subuid, topicNames, options);
 }
 
 void nt::net::WireEncodeSubscribe(wpi::raw_ostream& os, int64_t subuid,
-                                  wpi::span<const std::string> topicNames,
+                                  std::span<const std::string> topicNames,
                                   const PubSubOptions& options) {
   WireEncodeSubscribeImpl(os, subuid, topicNames, options);
 }

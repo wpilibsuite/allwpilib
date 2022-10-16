@@ -120,7 +120,7 @@ JNIEXPORT void JNICALL JNI_OnUnload(JavaVM* vm, void* reserved) {
 // Conversions from Java objects to C++
 //
 
-static wpi::span<const nt::PubSubOption> FromJavaPubSubOptions(
+static std::span<const nt::PubSubOption> FromJavaPubSubOptions(
     JNIEnv* env, jintArray optionTypes, jdoubleArray optionValues,
     wpi::SmallVectorImpl<nt::PubSubOption>& arr) {
   JIntArrayRef types{env, optionTypes};
@@ -281,7 +281,7 @@ static jobject MakeJObject(JNIEnv* env, jobject inst,
                         static_cast<jint>(notification.flags));
 }
 
-static jobjectArray MakeJObject(JNIEnv* env, wpi::span<const nt::Value> arr) {
+static jobjectArray MakeJObject(JNIEnv* env, std::span<const nt::Value> arr) {
   jobjectArray jarr = env->NewObjectArray(arr.size(), valueCls, nullptr);
   if (!jarr) {
     return nullptr;
@@ -295,7 +295,7 @@ static jobjectArray MakeJObject(JNIEnv* env, wpi::span<const nt::Value> arr) {
 
 static jobjectArray MakeJObject(
     JNIEnv* env, jobject inst,
-    wpi::span<const nt::ConnectionNotification> arr) {
+    std::span<const nt::ConnectionNotification> arr) {
   jobjectArray jarr =
       env->NewObjectArray(arr.size(), connectionNotificationCls, nullptr);
   if (!jarr) {
@@ -309,7 +309,7 @@ static jobjectArray MakeJObject(
 }
 
 static jobjectArray MakeJObject(JNIEnv* env, jobject inst,
-                                wpi::span<const nt::LogMessage> arr) {
+                                std::span<const nt::LogMessage> arr) {
   jobjectArray jarr = env->NewObjectArray(arr.size(), logMessageCls, nullptr);
   if (!jarr) {
     return nullptr;
@@ -322,7 +322,7 @@ static jobjectArray MakeJObject(JNIEnv* env, jobject inst,
 }
 
 static jobjectArray MakeJObject(JNIEnv* env, jobject inst,
-                                wpi::span<const nt::TopicNotification> arr) {
+                                std::span<const nt::TopicNotification> arr) {
   jobjectArray jarr =
       env->NewObjectArray(arr.size(), topicNotificationCls, nullptr);
   if (!jarr) {
@@ -336,7 +336,7 @@ static jobjectArray MakeJObject(JNIEnv* env, jobject inst,
 }
 
 static jobjectArray MakeJObject(JNIEnv* env, jobject inst,
-                                wpi::span<const nt::ValueNotification> arr) {
+                                std::span<const nt::ValueNotification> arr) {
   jobjectArray jarr =
       env->NewObjectArray(arr.size(), valueNotificationCls, nullptr);
   if (!jarr) {

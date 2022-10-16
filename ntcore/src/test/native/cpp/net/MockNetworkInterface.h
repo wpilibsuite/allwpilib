@@ -36,7 +36,7 @@ class MockNetworkStartupInterface : public NetworkStartupInterface {
                const wpi::json& properties, const PubSubOptions& options),
               (override));
   MOCK_METHOD(void, Subscribe,
-              (NT_Subscriber subHandle, wpi::span<const std::string> prefixes,
+              (NT_Subscriber subHandle, std::span<const std::string> prefixes,
                const PubSubOptions& options),
               (override));
   MOCK_METHOD(void, SetValue, (NT_Publisher pubHandle, const Value& value),
@@ -57,7 +57,7 @@ class MockNetworkInterface : public NetworkInterface {
                const wpi::json& update),
               (override));
   MOCK_METHOD(void, Subscribe,
-              (NT_Subscriber subHandle, wpi::span<const std::string> prefixes,
+              (NT_Subscriber subHandle, std::span<const std::string> prefixes,
                const PubSubOptions& options),
               (override));
   MOCK_METHOD(void, Unsubscribe, (NT_Subscriber subHandle), (override));
