@@ -2,8 +2,11 @@ load("//shared/bazel/rules:java_rules.bzl", "wpilib_java_junit5_test")
 
 wpilib_java_junit5_test(
     name = "ntcore-test",
+    size = "small",
     srcs = glob(["*.java"]),
+    tags = ["exclusive"],
     deps = [
         "//ntcore/src/main/java/edu/wpi/first/networktables",
+        "//wpiutil/src/main/java/edu/wpi/first/util:wpiutil",
     ],
 )

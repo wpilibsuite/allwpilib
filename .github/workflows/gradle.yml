@@ -119,6 +119,10 @@ jobs:
         with:
           name: ${{ matrix.artifact-name }}
           path: ${{ matrix.outputs }}
+      - uses: actions/upload-artifact@v2
+        with:
+          name: ${{ matrix.artifact-name }} BUILD OPTIONS
+          path: "**/build/tmp/**/options.txt"
 
   build-documentation:
     name: "Build - Documentation"

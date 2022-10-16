@@ -3,7 +3,11 @@ load("//shared/bazel/rules/jni:cc_jni.bzl", "wpilib_jni_cc_library")
 
 wpilib_cc_library(
     name = "private_includes",
-    hdrs = glob(["cpp/*.h"]),
+    hdrs = glob([
+        "cpp/*.h",
+        "cpp/net/*.h",
+        "cpp/net3/*.h",
+    ]),
     strip_include_prefix = "cpp",
 )
 
@@ -12,10 +16,13 @@ wpilib_cc_static_and_shared_library(
     srcs = glob(
         ["cpp/**"],
         exclude = ["cpp/jni/**"],
-    ),
+    ) + ["//ntcore:gen-cpp-srcs"],
     hdrs = glob(["include/**/*"]),
     includes = ["include"],
-    standard_deps = [":private_includes"],
+    standard_deps = [
+        ":private_includes",
+        "//ntcore:generated_includes",
+    ],
     strip_include_prefix = "include",
     visibility = ["//visibility:public"],
     wpi_maybe_shared_deps = [
@@ -26,7 +33,7 @@ wpilib_cc_static_and_shared_library(
 
 wpilib_jni_cc_library(
     name = "ntcorejni",
-    srcs = glob(["cpp/jni/**"]),
+    srcs = glob(["cpp/jni/**"]) + ["//ntcore:gen-jni-topics"],
     java_dep = "//ntcore/src/main/java/edu/wpi/first/networktables:networktables",
     visibility = ["//visibility:public"],
     wpi_maybe_shared_deps = [

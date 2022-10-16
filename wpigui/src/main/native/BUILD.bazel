@@ -35,6 +35,7 @@ wpilib_cc_library(
         "no-bionic",
         "no-raspbian",
         "no-roborio",
+        "wpi-cpp-gui",
     ],
     visibility = ["//visibility:public"],
     deps = [

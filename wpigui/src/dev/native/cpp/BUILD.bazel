@@ -9,6 +9,7 @@ wpilib_cc_binary(
         "no-bionic",
         "no-raspbian",
         "no-roborio",
+        "wpi-cpp-gui",
     ],
     deps = [
         "//wpigui/src/main/native:wpigui",

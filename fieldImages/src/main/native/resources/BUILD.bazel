@@ -1,4 +1,3 @@
-load("//shared/bazel/rules:java_rules.bzl", "wpilib_java_library")
 load("//shared/bazel/rules/gen:gen-resources.bzl", "generate_resources")
 
 generate_resources(
@@ -9,8 +8,8 @@ generate_resources(
     visibility = ["//visibility:public"],
 )
 
-wpilib_java_library(
+filegroup(
     name = "java-resources",
-    resources = glob(["edu/**"]),
+    srcs = glob(["edu/**"]),
     visibility = ["//visibility:public"],
 )

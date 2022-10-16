@@ -3,5 +3,12 @@ load("//shared/bazel/rules:java_rules.bzl", "wpilib_java_library")
 wpilib_java_library(
     name = "fieldImages-java",
     srcs = glob(["*.java"]),
-    resources = glob(["src/main/native/resources/*"]),
+    resource_strip_prefix = "fieldImages/src/main/native/resources",
+    resources = ["//fieldImages/src/main/native/resources:java-resources"],
+    visibility = ["//visibility:public"],
+    deps = [
+        "@maven//:com_fasterxml_jackson_core_jackson_annotations",
+        "@maven//:com_fasterxml_jackson_core_jackson_core",
+        "@maven//:com_fasterxml_jackson_core_jackson_databind",
+    ],
 )

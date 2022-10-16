@@ -2,6 +2,7 @@ load("//shared/bazel/rules:cc_rules.bzl", "wpilib_cc_test")
 
 wpilib_cc_test(
     name = "halsim_ds_socket-test",
+    size = "small",
     srcs = glob([
         "**/*.cpp",
         "**/*.h",

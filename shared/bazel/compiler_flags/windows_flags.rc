@@ -15,4 +15,8 @@ build:windows --copt=/D_CRT_SECURE_NO_WARNINGS
 build:windows --copt=/std:c++17
 build:windows --copt=/permissive-
 build:windows --copt=/bigobj
+build:windows --copt=/Zc:__cplusplus
+build:windows --copt=/Zc:preprocessor
 build:windows --copt=/wd5105
+
+build:windows --linkopt=/IGNORE:4099

@@ -12,10 +12,10 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - { os: windows-latest, action: "test", config: "--config=windows" }
-#          - { os: windows-latest, config: "--config=roborio" }
-#          - { os: windows-latest, config: "--config=bionic" }
-#          - { os: windows-latest, config: "--config=raspbian" }
+          - { os: windows-2019, action: "test", config: "--config=windows" }
+#          - { os: windows-2019, config: "--config=roborio" }
+#          - { os: windows-2019, config: "--config=bionic" }
+#          - { os: windows-2019, config: "--config=raspbian" }
 
           - { os: macos-latest,   action: "test", config: "--config=osx -c opt --config=no_example" }
 #          - { os: macos-latest, config: "--config=roborio" }
@@ -28,12 +28,12 @@ jobs:
     name: "Build - ${{ matrix.os }} ${{ matrix.config }}"
     runs-on: ${{ matrix.os }}
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with: { fetch-depth: 0 }
       - uses: bazelbuild/setup-bazelisk@v1
 
       - name: Build
-        run: bazel ${{ matrix.action }} -k ... --config=remote ${{ matrix.config }} --nojava_header_compilation --verbose_failures
+        run: bazel ${{ matrix.action }} -k ... --config=remote ${{ matrix.config }} --nojava_header_compilation --verbose_failures --test_verbose_timeout_warnings
         shell: bash
 
   build-linux:
@@ -41,19 +41,33 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - container: wpilib/ubuntu-base:20.04
+          - container: wpilib/ubuntu-base:22.04
             artifact-name: Linux Release
     runs-on: ubuntu-latest
     name: "Build - ${{ matrix.artifact-name }}${{ matrix.architecture }}"
     container: ${{ matrix.container }}
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with: { fetch-depth: 0 }
       - uses: bazelbuild/setup-bazelisk@v1
 
       - name: Build and Test
-        run: bazel test ... --config=remote --config=linux -k --verbose_failures
+        run: bazel test ... --config=remote --config=linux -k --verbose_failures --test_verbose_timeout_warnings
 
+
+  repin-maven:
+    strategy:
+      fail-fast: false
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: bazelbuild/setup-bazelisk@v1
+      - run:  bazel run @unpinned_maven//:pin
+      - run:  git diff HEAD
+      - uses: actions/upload-artifact@v2
+        with:
+          name: Re-pinned maven
+          path: shared/bazel/deps/maven_install.json
 
   build-sanitizers:
     strategy:
@@ -64,20 +78,20 @@ jobs:
           - config: "asan"
           - config: "ubsan"
     runs-on: ubuntu-latest
-    container: wpilib/ubuntu-base:20.04
+    container: wpilib/ubuntu-base:22.04
     name: "Sanitizer ${{ matrix.config }}"
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with: { fetch-depth: 0 }
       - uses: bazelbuild/setup-bazelisk@v1
       - name: Build and Test
-        run: bazel test  -k --config=remote --config=linux --config=${{ matrix.config }} //...
+        run: bazel test  -k --config=remote --config=linux --config=${{ matrix.config }} --test_verbose_timeout_warnings //...
 
   build-coverage:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     name: "Code Coverage"
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with: { fetch-depth: 0 }
       - uses: bazelbuild/setup-bazelisk@v1
 
@@ -111,7 +125,7 @@ jobs:
           cd $(mktemp -d)
           GO111MODULE=on go get github.com/bazelbuild/buildtools/buildifier@5.1.0
 
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with: { fetch-depth: 0 }
 
       - name: Run buildifier
@@ -140,7 +154,7 @@ jobs:
           go-version: 1.15.x
         id: go
 
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
 
       - name: Install Unused Deps
         run: |
@@ -153,10 +167,18 @@ jobs:
           GO111MODULE=on go get github.com/bazelbuild/buildtools/buildozer@5.1.0
 
       - name: Dump Platform Flag
-        run: echo "build --config=linux" > user.bazelrc
+        run: |
+          echo "# Flags for unused deps"                 > user.bazelrc
+          echo "build --config=linux"                   >> user.bazelrc
+          echo "build --config=remote"                  >> user.bazelrc
+          echo "build --build_tag_filters=-wpi-cpp-gui" >> user.bazelrc
+          echo "build --test_tag_filters=-wpi-cpp-gui"  >> user.bazelrc
+
+      - name: Debug userrc
+        run: cat user.bazelrc
 
       - name: Prep unused deps
-        run:  bazel query --tool_tag=unused_deps --keep_going "kind('(kt|java|android)_*', //...)" && bazel build --tool_tag=unused_deps --keep_going //... --config=remote --config=linux || true
+        run:  bazel query --tool_tag=unused_deps --keep_going "kind('(kt|java|android)_*', //...)" || true
 
       - name: Run unused deps
         run: unused_deps -cquery //... > buildozer-cmds.sh

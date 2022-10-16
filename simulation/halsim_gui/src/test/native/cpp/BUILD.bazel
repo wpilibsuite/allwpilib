@@ -3,12 +3,16 @@ load("//shared/bazel/rules:cc_rules.bzl", "wpilib_cc_test")
 
 wpilib_cc_test(
     name = "halsim_gui-test",
+    size = "small",
     srcs = glob([
         "**/*.cpp",
         "**/*.h",
     ]),
     linkopts = get_wpigui_linker_flags(console = True),
-    tags = ["no-asan"],
+    tags = [
+        "no-asan",
+        "wpi-cpp-gui",
+    ],
     deps = [
         "//simulation/halsim_gui/src/main/native:halsim_gui.shared",
         "@gtest",

@@ -1,0 +1,121 @@
+load("@__allwpilib_pip_deps//:requirements.bzl", "requirement")
+load("@rules_python//python:defs.bzl", "py_binary")
+load("//shared/bazel/rules:cc_rules.bzl", "wpilib_cc_library")
+
+filegroup(
+    name = "templates",
+    srcs = glob([
+        "src/generate/**/*.jinja",
+        "src/generate/*.json",
+    ]),
+)
+
+py_binary(
+    name = "generate_topics",
+    srcs = ["generate_topics.py"],
+    data = [":templates"],
+    visibility = ["//visibility:public"],
+    deps = [requirement("jinja2")],
+)
+
+TYPES = [
+    "Raw",
+    "Boolean",
+    "Integer",
+    "Float",
+    "Double",
+    "String",
+    "BooleanArray",
+    "IntegerArray",
+    "FloatArray",
+    "DoubleArray",
+    "StringArray",
+]
+
+GENERATED_JAVA_FILES = [
+    "generated/java/edu/wpi/first/networktables/Timestamped{0}.java".format(x)
+    for x in TYPES
+] + [
+    "generated/java/edu/wpi/first/networktables/{0}Topic.java".format(x)
+    for x in TYPES
+] + [
+    "generated/java/edu/wpi/first/networktables/{0}Publisher.java".format(x)
+    for x in TYPES
+] + [
+    "generated/java/edu/wpi/first/networktables/{0}Subscriber.java".format(x)
+    for x in TYPES
+] + [
+    "generated/java/edu/wpi/first/networktables/{0}EntryImpl.java".format(x)
+    for x in TYPES
+] + [
+    "generated/java/edu/wpi/first/networktables/{0}Entry.java".format(x)
+    for x in TYPES
+] + [
+    "generated/java/edu/wpi/first/networktables/GenericPublisher.java",
+    "generated/java/edu/wpi/first/networktables/NetworkTableEntry.java",
+    "generated/java/edu/wpi/first/networktables/NetworkTablesJNI.java",
+    "generated/java/edu/wpi/first/networktables/GenericSubscriber.java",
+    "generated/java/edu/wpi/first/networktables/NetworkTableValue.java",
+    "generated/java/edu/wpi/first/networktables/NetworkTableInstance.java",
+    "generated/java/edu/wpi/first/networktables/GenericEntryImpl.java",
+]
+
+GENERATED_CPP_INCLUDE_FILES = [
+    "generated/native/include/networktables/{0}Topic.inc".format(x)
+    for x in TYPES
+] + [
+    "generated/native/include/networktables/{0}Topic.h".format(x)
+    for x in TYPES
+] + [
+    "generated/native/include/ntcore_cpp_types.h",
+    "generated/native/include/ntcore_c_types.h",
+]
+
+GENERATED_CPP_SOURCE_FILES = [
+    "generated/native/cpp/ntcore_cpp_types.cpp",
+    "generated/native/cpp/ntcore_c_types.cpp",
+]
+
+GENERATED_JNI_FILES = ["generated/native/cpp/jni/types_jni.cpp"]
+
+genrule(
+    name = "gen-java-topics",
+    srcs = [":templates"],
+    outs = GENERATED_JAVA_FILES,
+    cmd = "$(locations :generate_topics) --generate_java --output_files $(OUTS)",
+    tools = [":generate_topics"],
+    visibility = ["//ntcore:__subpackages__"],
+)
+
+genrule(
+    name = "gen-jni-topics",
+    srcs = [":templates"],
+    outs = GENERATED_JNI_FILES,
+    cmd = "$(locations :generate_topics) --generate_jni --output_files $(OUTS)",
+    tools = [":generate_topics"],
+    visibility = ["//ntcore:__subpackages__"],
+)
+
+genrule(
+    name = "gen-cpp-includes",
+    srcs = [":templates"],
+    outs = GENERATED_CPP_INCLUDE_FILES,
+    cmd = "$(locations :generate_topics) --generate_cpp_includes --output_files $(OUTS)",
+    tools = [":generate_topics"],
+)
+
+genrule(
+    name = "gen-cpp-srcs",
+    srcs = [":templates"],
+    outs = GENERATED_CPP_SOURCE_FILES,
+    cmd = "$(locations :generate_topics) --generate_cpp_srcs --output_files $(OUTS)",
+    tools = [":generate_topics"],
+    visibility = ["//ntcore:__subpackages__"],
+)
+
+wpilib_cc_library(
+    name = "generated_includes",
+    hdrs = [":gen-cpp-includes"],
+    strip_include_prefix = "./generated/native/include",
+    visibility = ["//ntcore:__subpackages__"],
+)

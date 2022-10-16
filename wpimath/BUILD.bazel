@@ -1,18 +1,24 @@
 load("@__allwpilib_pip_deps//:requirements.bzl", "requirement")
 load("@rules_python//python:defs.bzl", "py_binary")
 
+filegroup(
+    name = "templates",
+    srcs = glob(["src/generate/*.jinja"]),
+)
+
 py_binary(
     name = "generate_numbers",
     srcs = ["generate_numbers.py"],
-    data = glob(["src/generate/*.jinja"]),
+    data = [":templates"],
     visibility = ["//visibility:public"],
     deps = [requirement("jinja2")],
 )
 
 genrule(
     name = "gen-nat",
-    outs = ["Nat.java"] + ["N{}.java".format(i) for i in range(21)],
-    cmd = "$(locations :generate_numbers) $(OUTS)",
+    srcs = [":templates"],
+    outs = ["generated/java/edu/wpi/first/math/Nat.java"] + ["generated/java/edu/wpi/first/math/numbers/N{}.java".format(i) for i in range(21)],
+    cmd = "$(locations :generate_numbers) --output_files $(OUTS)",
     tools = [":generate_numbers"],
     visibility = ["//wpimath:__subpackages__"],
 )

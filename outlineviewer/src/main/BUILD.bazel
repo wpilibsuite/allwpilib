@@ -28,6 +28,7 @@ wpilib_cc_binary(
         "no-bionic",
         "no-raspbian",
         "no-roborio",
+        "wpi-cpp-gui",
     ],
     deps = [
         "//glass/src/lib/native:libglass",

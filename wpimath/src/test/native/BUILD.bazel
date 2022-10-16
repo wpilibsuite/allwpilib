@@ -10,6 +10,7 @@ wpilib_cc_library(
 
 wpilib_cc_test(
     name = "wpimath-cpp-test",
+    size = "small",
     srcs = glob([
         "cpp/**/*.cpp",
         "cpp/**/*.h",

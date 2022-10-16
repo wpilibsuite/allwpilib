@@ -2,11 +2,13 @@ load("//shared/bazel/rules:cc_rules.bzl", "wpilib_cc_test")
 
 wpilib_cc_test(
     name = "ntcore-test",
+    size = "small",
     srcs = glob([
         "**/*.cpp",
         "**/*.h",
     ]),
     tags = [
+        "exclusive",
         "no-asan",
         "no-tsan",
     ],

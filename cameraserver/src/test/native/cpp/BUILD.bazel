@@ -2,6 +2,7 @@ load("//shared/bazel/rules:cc_rules.bzl", "wpilib_cc_test")
 
 wpilib_cc_test(
     name = "cameraserver-test",
+    size = "small",
     srcs = glob([
         "**/*.cpp",
         "**/*.h",

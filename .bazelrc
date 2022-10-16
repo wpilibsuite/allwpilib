@@ -4,14 +4,14 @@ build --java_language_version=11
 test --test_output=errors
 
 import shared/bazel/rc/buildbuddy.rc
-import shared/bazel/rc/sanitizers.rc
-import shared/bazel/rc/bionic_flags.rc
-import shared/bazel/rc/linux_flags.rc
-import shared/bazel/rc/osx_flags.rc
-import shared/bazel/rc/raspbian_flags.rc
-import shared/bazel/rc/roborio_flags.rc
-import shared/bazel/rc/windows_flags.rc
-import shared/bazel/rc/coverage_flags.rc
+import shared/bazel/compiler_flags/sanitizers.rc
+import shared/bazel/compiler_flags/bionic_flags.rc
+import shared/bazel/compiler_flags/linux_flags.rc
+import shared/bazel/compiler_flags/osx_flags.rc
+import shared/bazel/compiler_flags/raspbian_flags.rc
+import shared/bazel/compiler_flags/roborio_flags.rc
+import shared/bazel/compiler_flags/windows_flags.rc
+import shared/bazel/compiler_flags/coverage_flags.rc
 
 build:build_java --test_tag_filters=allwpilib-build-java --build_tag_filters=allwpilib-build-java
 build:build_cpp --test_tag_filters=+allwpilib-build-cpp --build_tag_filters=+allwpilib-build-cpp

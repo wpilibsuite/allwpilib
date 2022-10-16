@@ -11,10 +11,14 @@ http_archive(
 # Download BazelRio <3
 http_archive(
     name = "bazelrio",
-    sha256 = "fc90366a9af694154cf9454eea2a9a9d0916bb094ab3650331958314b868abae",
-    strip_prefix = "bazelrio-45a469c2b9b31bf2832f71e013f117d7c989bab7/bazelrio",
-    url = "https://github.com/pjreiniger/bazelRio/archive/45a469c2b9b31bf2832f71e013f117d7c989bab7.tar.gz",
+    sha256 = "dc88fafc8e1236831e0a9214a72d73f69d8c6aebf376dc76c23bc902d0925323",
+    strip_prefix = "bazelrio-6c8de3b2199141e5c0eb19319b81c192ee61dedf/bazelrio",
+    url = "https://github.com/pjreiniger/bazelRio/archive/6c8de3b2199141e5c0eb19319b81c192ee61dedf.tar.gz",
 )
+# local_repository(
+#     name = "bazelrio",
+#     path = "C:/Users/PJ/Documents/GitHub/bazelRio/bazelrio/bazelrio"
+# )
 
 # Download Extra java rules
 RULES_JVM_EXTERNAL_TAG = "4.2"
@@ -31,11 +35,15 @@ http_archive(
 load("@bazelrio//:deps.bzl", "setup_bazelrio_dependencies")
 
 setup_bazelrio_dependencies(
-    navx_version = "4.0.442",
-    ni_version = "2022.4.0",
-    opencv_version = "4.5.2-1",
-    phoenix_version = "5.20.2",
-    revlib_version = "2022.1.0",
+    colorsensor_version = None,
+    imgui_version = "1.88-5",
+    libssh_version = "0.95-3",
+    navx_version = None,
+    ni_version = None,
+    opencv_version = "4.6.0-2",
+    phoenix_version = None,
+    revlib_version = None,
+    sparkmax_version = None,
     toolchain_versions = "2022-1",
     wpilib_version = "2022.4.1",
 )

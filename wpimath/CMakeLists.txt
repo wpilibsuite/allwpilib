@@ -42,10 +42,10 @@ if (WITH_JAVA)
 
   set(CMAKE_JAVA_INCLUDE_PATH wpimath.jar ${EJML_JARS} ${JACKSON_JARS})
 
-  execute_process(COMMAND python3 ${CMAKE_CURRENT_SOURCE_DIR}/generate_numbers.py ${WPILIB_BINARY_DIR}/wpimath RESULT_VARIABLE generateResult)
+  execute_process(COMMAND python3 ${CMAKE_CURRENT_SOURCE_DIR}/generate_numbers.py --cmake_binary_dir=${WPILIB_BINARY_DIR}/wpimath RESULT_VARIABLE generateResult)
   if(NOT (generateResult EQUAL "0"))
     # Try python
-    execute_process(COMMAND python ${CMAKE_CURRENT_SOURCE_DIR}/generate_numbers.py ${WPILIB_BINARY_DIR}/wpimath RESULT_VARIABLE generateResult)
+    execute_process(COMMAND python ${CMAKE_CURRENT_SOURCE_DIR}/generate_numbers.py --cmake_binary_dir=${WPILIB_BINARY_DIR}/wpimath RESULT_VARIABLE generateResult)
     if(NOT (generateResult EQUAL "0"))
       message(FATAL_ERROR "python and python3 generate_numbers.py failed")
     endif()

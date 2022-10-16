@@ -9,6 +9,7 @@ wpilib_cc_library(
 
 wpilib_cc_test(
     name = "halsim_ws_server-test",
+    size = "small",
     srcs = glob(["**/*.cpp"]),
     tags = ["no-asan"],
     deps = [

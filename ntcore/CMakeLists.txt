@@ -3,10 +3,10 @@ project(ntcore)
 include(CompileWarnings)
 include(AddTest)
 
-execute_process(COMMAND python3 ${CMAKE_CURRENT_SOURCE_DIR}/generate_topics.py ${WPILIB_BINARY_DIR}/ntcore RESULT_VARIABLE generateResult)
+execute_process(COMMAND python3 ${CMAKE_CURRENT_SOURCE_DIR}/generate_topics.py --output_base=${WPILIB_BINARY_DIR}/ntcore --generate_java --generate_cpp_includes --generate_cpp_srcs --generate_jni RESULT_VARIABLE generateResult)
 if(NOT (generateResult EQUAL "0"))
   # Try python
-  execute_process(COMMAND python ${CMAKE_CURRENT_SOURCE_DIR}/generate_topics.py ${WPILIB_BINARY_DIR}/ntcore RESULT_VARIABLE generateResult)
+  execute_process(COMMAND python ${CMAKE_CURRENT_SOURCE_DIR}/generate_topics.py --output_base=${WPILIB_BINARY_DIR}/ntcore --generate_java --generate_cpp_includes --generate_cpp_srcs --generate_jni RESULT_VARIABLE generateResult)
   if(NOT (generateResult EQUAL "0"))
     message(FATAL_ERROR "python and python3 generate_topics.py failed")
   endif()

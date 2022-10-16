@@ -2,7 +2,7 @@ load("//shared/bazel/rules/jni:java_jni.bzl", "wpilib_java_jni_library")
 
 wpilib_java_jni_library(
     name = "networktables",
-    srcs = glob(["**/*.java"]),
+    srcs = glob(["**/*.java"]) + ["//ntcore:gen-java-topics"],
     native_libs = ["//ntcore/src/main/native:ntcorejni"],
     visibility = ["//visibility:public"],
     deps = [
