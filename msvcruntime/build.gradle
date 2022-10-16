@@ -27,10 +27,18 @@ if (OperatingSystem.current().isWindows()) {
     def runtimeVerNumber = null
 
     runtimeLocation.eachFile {
+        println it
         def verNumber =  VersionNumber.parse(it.name)
+        println verNumber
+        println visualCppVersion.major
+        println visualCppVersion.minor
         if (verNumber.major == visualCppVersion.major && verNumber.minor == visualCppVersion.minor) {
             runtimeVerNumber = verNumber
         }
+    }
+
+    if (runtimeVerNumber == null && project.hasProperty('buildServer')) {
+        throw new GradleException("Must find a runtime in CI")
     }
 
     if (runtimeVerNumber != null) {
