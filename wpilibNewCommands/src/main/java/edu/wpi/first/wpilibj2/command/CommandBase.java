@@ -51,19 +51,9 @@ public abstract class CommandBase implements Sendable, Command {
    *
    * @param name name
    */
+  @Override
   public void setName(String name) {
     SendableRegistry.setName(this, name);
-  }
-
-  /**
-   * Decorates this Command with a name. Is an inline function for #setName(String);
-   *
-   * @param name name
-   * @return the decorated Command
-   */
-  public CommandBase withName(String name) {
-    this.setName(name);
-    return this;
   }
 
   /**
