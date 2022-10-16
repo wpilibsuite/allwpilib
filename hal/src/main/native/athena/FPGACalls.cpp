@@ -3,9 +3,11 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #include "FPGACalls.h"
+
+#include <errno.h>
+
 #include "dlfcn.h"
 #include "hal/Errors.h"
-#include "errno.h"
 
 static void* NiFpgaLibrary = nullptr;
 
