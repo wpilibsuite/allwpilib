@@ -26,19 +26,26 @@ if (OperatingSystem.current().isWindows()) {
 
     def runtimeVerNumber = null
 
+    def highestMinorVer = null
+    def highestMinor = 0
+
     runtimeLocation.eachFile {
-        println it
         def verNumber =  VersionNumber.parse(it.name)
-        println verNumber
-        println visualCppVersion.major
-        println visualCppVersion.minor
         if (verNumber.major == visualCppVersion.major && verNumber.minor == visualCppVersion.minor) {
             runtimeVerNumber = verNumber
+        }
+        if (verNumber.major == visualCppVersion.major && verNumber.minor > highestMinor) {
+            highestMinor = verNumber.minor
+            highestMinorVer = verNumber
         }
     }
 
     if (runtimeVerNumber == null && project.hasProperty('buildServer')) {
-        throw new GradleException("Must find a runtime in CI")
+        if (highestMinorVer != null) {
+            runtimeVerNumber = highestMinorVer
+        } else {
+            throw new GradleException("Must find a runtime in CI")
+        }
     }
 
     if (runtimeVerNumber != null) {
