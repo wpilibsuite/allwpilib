@@ -292,7 +292,7 @@ class PubSubOption {
   /**
    * Polling storage for subscription. Specifies the maximum number of updates
    * NetworkTables should store between calls to the subscriber's poll()
-   * function. Defaults to 1 if logging is false, 20 if logging is true.
+   * function. Defaults to 1 if SendAll is false, 20 if SendAll is true.
    *
    * @param depth number of entries to save for polling.
    * @return option
