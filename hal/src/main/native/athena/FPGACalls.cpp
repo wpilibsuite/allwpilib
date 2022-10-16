@@ -4,7 +4,7 @@
 
 #include "FPGACalls.h"
 
-#include <errno.h>
+#include <cerrno>
 
 #include "dlfcn.h"
 #include "hal/Errors.h"
