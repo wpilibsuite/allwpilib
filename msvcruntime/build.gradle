@@ -42,6 +42,7 @@ if (OperatingSystem.current().isWindows()) {
 
     if (runtimeVerNumber == null && project.hasProperty('buildServer')) {
         if (highestMinorVer != null) {
+            println "Exact match of ${visualCppVersion.major}.${visualCppVersion.minor} not found. Using ${highestMinorVer} instead"
             runtimeVerNumber = highestMinorVer
         } else {
             throw new GradleException("Must find a runtime in CI")
