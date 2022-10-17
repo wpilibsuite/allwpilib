@@ -1914,6 +1914,7 @@ void LocalStorage::Unpublish(NT_Handle pubentryHandle) {
   } else if (auto entry = m_impl->m_entries.Get(pubentryHandle)) {
     if (entry->publisher) {
       m_impl->RemoveLocalPublisher(entry->publisher->handle);
+      entry->publisher = nullptr;
     }
   } else {
     // TODO: report warning
