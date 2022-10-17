@@ -6,12 +6,6 @@
 
 #include <wpi/Logger.h>
 
-// C++20 relaxed the number of arguments to variadics, but Apple Clang's
-// warnings haven't caught up yet: https://stackoverflow.com/a/67996331
-#ifdef __clang__
-#pragma clang diagnostic ignored "-Wgnu-zero-variadic-macro-arguments"
-#endif
-
 #define LOG(level, format, ...) \
   WPI_LOG(m_logger, level, format __VA_OPT__(, ) __VA_ARGS__)
 
