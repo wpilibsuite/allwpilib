@@ -122,7 +122,7 @@ class ValueListener final {
  */
 class ValueListenerPoller final {
  public:
-  ValueListenerPoller();
+  ValueListenerPoller() = default;
 
   /**
    * Construct a value listener poller.
@@ -198,7 +198,7 @@ class ValueListenerPoller final {
   std::vector<ValueNotification> ReadQueue();
 
  private:
-  NT_ValueListenerPoller m_handle;
+  NT_ValueListenerPoller m_handle{0};
 };
 
 }  // namespace nt
