@@ -150,6 +150,19 @@ public final class LiveWindow {
         });
   }
 
+  /** Enable ALL telemetry. */
+  public static synchronized void enableAllTelemetry() {
+    telemetryEnabled = true;
+    SendableRegistry.foreachLiveWindow(
+        dataHandle,
+        cbdata -> {
+          if (cbdata.data == null) {
+            cbdata.data = new Component();
+          }
+          ((Component) cbdata.data).m_telemetryEnabled = true;
+        });
+  }
+
   /**
    * Tell all the sensors to update (send) their values.
    *
