@@ -48,7 +48,9 @@ struct ValueListenerFlags {
 
 /**
  * Value change listener. This calls back to a callback function when a value
- * change matching the specified mask occurs.
+ * change matching the specified mask occurs. The callback function is called
+ * asynchronously on a separate thread, so it's important to use synchronization
+ * or atomics when accessing any shared state from the callback function.
  */
 class ValueListener final {
  public:

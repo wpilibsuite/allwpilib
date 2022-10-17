@@ -66,7 +66,9 @@ struct TopicListenerFlags {
 
 /**
  * Topic change listener. This calls back to a callback function when a topic
- * change matching the specified mask occurs.
+ * change matching the specified mask occurs. The callback function is called
+ * asynchronously on a separate thread, so it's important to use synchronization
+ * or atomics when accessing any shared state from the callback function.
  */
 class TopicListener final {
  public:
