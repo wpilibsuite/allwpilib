@@ -461,7 +461,6 @@ void NetworkTablesModel::Update() {
                              entry->info.type_str);
       if (wpi::starts_with(entry->info.name, '$') && entry->value.IsRaw() &&
           entry->info.type_str == "msgpack") {
-        fmt::print(stderr, "Updating meta-topic {}\n", entry->info.name);
         // meta topic handling
         if (entry->info.name == "$clients") {
           UpdateClients(entry->value.GetRaw());
