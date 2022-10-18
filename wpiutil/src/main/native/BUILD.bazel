@@ -43,7 +43,6 @@ wpilib_cc_static_and_shared_library(
         "//wpiutil/src/main/native/thirdparty/llvm:llvm-headers",
         "//wpiutil/src/main/native/thirdparty/mpack:mpack-headers",
         "//wpiutil/src/main/native/thirdparty/sigslot:sigslot-headers",
-        "//wpiutil/src/main/native/thirdparty/tcb_span:tcb_span-headers",
     ],
     strip_include_prefix = "include",
     visibility = ["//visibility:public"],

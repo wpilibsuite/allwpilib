@@ -4,18 +4,17 @@ build:osx --copt=-Wall
 build:osx --copt=-Wextra
 build:osx --copt=-Werror
 
-build:osx --copt=-std=c++17
+build:osx --copt=-std=c++20
 build:osx --copt=-pedantic
 build:osx --copt=-fPIC
 build:osx --copt=-Wno-unused-parameter
 build:osx --copt=-Wno-deprecated-declarations
-build:osx --copt=-Wno-shorten-64-to-32
+build:osx --copt=-Wno-error=deprecated-enum-enum-conversion
 build:osx --copt=-Wno-missing-field-initializers
 build:osx --copt=-Wno-unused-private-field
 build:osx --copt=-Wno-unused-const-variable
 build:osx --copt=-Wno-error=c11-extensions
 build:osx --copt=-pthread
-
 
 build:osx --linkopt=-framework
 build:osx --linkopt=CoreFoundation
@@ -27,3 +26,6 @@ build:osx --linkopt=-framework
 build:osx --linkopt=CoreMedia
 build:osx --linkopt=-framework
 build:osx --linkopt=CoreVideo
+
+# Things not in bazelrio
+build:osx --copt=-Wno-shorten-64-to-32

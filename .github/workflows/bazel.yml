@@ -12,10 +12,10 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - { os: windows-2019, action: "test", config: "--config=windows" }
-#          - { os: windows-2019, config: "--config=roborio" }
-#          - { os: windows-2019, config: "--config=bionic" }
-#          - { os: windows-2019, config: "--config=raspbian" }
+          - { os: windows-2022, action: "test", config: "--config=windows" }
+#          - { os: windows-2022, config: "--config=roborio" }
+#          - { os: windows-2022, config: "--config=bionic" }
+#          - { os: windows-2022, config: "--config=raspbian" }
 
           - { os: macos-latest,   action: "test", config: "--config=osx -c opt --config=no_example" }
 #          - { os: macos-latest, config: "--config=roborio" }

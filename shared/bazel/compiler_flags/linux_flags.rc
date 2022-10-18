@@ -4,12 +4,13 @@ build:linux --copt=-Wall
 build:linux --copt=-Wextra
 build:linux --copt=-Werror
 
-build:linux --copt=-std=c++17
+build:linux --copt=-std=c++20
 build:linux --copt=-Wformat=2
 build:linux --copt=-pedantic
 build:linux --copt=-Wno-psabi
 build:linux --copt=-Wno-unused-parameter
 build:linux --copt=-Wno-error=deprecated-declarations
+build:linux --copt=-Wno-error=deprecated-enum-enum-conversion
 build:linux --copt=-fPIC
 build:linux --copt=-rdynamic
 build:linux --copt=-pthread
