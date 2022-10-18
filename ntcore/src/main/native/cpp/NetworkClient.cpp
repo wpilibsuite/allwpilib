@@ -11,9 +11,11 @@
 #include <vector>
 
 #include <fmt/format.h>
+#include <wpi/SmallString.h>
 #include <wpi/StringExtras.h>
 #include <wpinet/DsClient.h>
 #include <wpinet/EventLoopRunner.h>
+#include <wpinet/HttpUtil.h>
 #include <wpinet/ParallelTcpConnector.h>
 #include <wpinet/WebSocket.h>
 #include <wpinet/uv/Async.h>
@@ -387,9 +389,10 @@ void NCImpl4::TcpConnected(uv::Tcp& tcp) {
   }
   wpi::WebSocket::ClientOptions options;
   options.handshakeTimeout = kWebsocketHandshakeTimeout;
-  auto ws =
-      wpi::WebSocket::CreateClient(tcp, fmt::format("/nt/{}", m_id), "",
-                                   {{"networktables.first.wpi.edu"}}, options);
+  wpi::SmallString<128> idBuf;
+  auto ws = wpi::WebSocket::CreateClient(
+      tcp, fmt::format("/nt/{}", wpi::EscapeURI(m_id, idBuf)), "",
+      {{"networktables.first.wpi.edu"}}, options);
   ws->SetMaxMessageSize(kMaxMessageSize);
   ws->open.connect([this, &tcp, ws = ws.get()](std::string_view) {
     if (m_connList.IsConnected()) {

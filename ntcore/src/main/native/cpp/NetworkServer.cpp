@@ -11,12 +11,14 @@
 #include <system_error>
 #include <vector>
 
+#include <wpi/SmallString.h>
 #include <wpi/StringExtras.h>
 #include <wpi/fs.h>
 #include <wpi/mutex.h>
 #include <wpi/raw_istream.h>
 #include <wpi/raw_ostream.h>
 #include <wpinet/EventLoopRunner.h>
+#include <wpinet/HttpUtil.h>
 #include <wpinet/HttpWebSocketServerConnection.h>
 #include <wpinet/UrlParser.h>
 #include <wpinet/uv/Async.h>
@@ -223,13 +225,17 @@ void ServerConnection4::ProcessWsUpgrade() {
   }
   DEBUG4("path: '{}'", path);
 
+  wpi::SmallString<128> nameBuf;
   std::string_view name;
+  bool err = false;
   if (wpi::starts_with(path, "/nt/")) {
-    name = wpi::drop_front(path, 4);
+    name = wpi::UnescapeURI(wpi::drop_front(path, 4), nameBuf, &err);
   }
-  if (name.empty()) {
-    INFO("invalid path '{}' (from {}), closing", path, m_connInfo);
-    m_websocket->Fail(404, fmt::format("invalid path '{}'", path));
+  if (err || name.empty()) {
+    INFO("invalid path '{}' (from {}), must match /nt/[clientId], closing",
+         path, m_connInfo);
+    m_websocket->Fail(
+        404, fmt::format("invalid path '{}', must match /nt/[clientId]", path));
     return;
   }
 
