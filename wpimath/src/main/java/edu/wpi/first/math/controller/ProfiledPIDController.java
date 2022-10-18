@@ -132,6 +132,24 @@ public class ProfiledPIDController implements Sendable {
   }
 
   /**
+   * Returns the position tolerance of this controller.
+   *
+   * @return the position tolerance of the controller.
+   */
+  public double getPositionTolerance() {
+    return m_controller.getPositionTolerance();
+  }
+
+  /**
+   * Returns the velocity tolerance of this controller.
+   *
+   * @return the velocity tolerance of the controller.
+   */
+  public double getVelocityTolerance() {
+    return m_controller.getVelocityTolerance();
+  }
+
+  /**
    * Sets the goal for the ProfiledPIDController.
    *
    * @param goal The desired goal state.
@@ -266,24 +284,6 @@ public class ProfiledPIDController implements Sendable {
    */
   public double getVelocityError() {
     return m_controller.getVelocityError();
-  }
-
-  /**
-   * Returns the position tolerance of this controller.
-   *
-   * @return the position tolerance of the controller.
-   */
-  public double getPositionTolerance() {
-    return m_controller.getPositionTolerance();
-  }
-
-  /**
-   * Returns the velocity tolerance of this controller.
-   *
-   * @return the velocity tolerance of the controller.
-   */
-  public double getVelocityTolerance() {
-    return m_controller.getVelocityTolerance();
   }
 
   /**

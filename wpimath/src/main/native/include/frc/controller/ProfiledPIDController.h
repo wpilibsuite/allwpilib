@@ -136,14 +136,18 @@ class ProfiledPIDController
    *
    * @return The position tolerance of the controller.
    */
-  double GetPositionTolerance() const { return m_controller.GetPositionTolerance(); };
+  double GetPositionTolerance() const {
+    return m_controller.GetPositionTolerance();
+  }
 
   /**
    * Gets the velocity tolerance of this controller.
    *
    * @return The velocity tolerance of the controller.
    */
-  double GetVelocityTolerance() const { return m_controller.GetVelocityTolerance(); };
+  double GetVelocityTolerance() const {
+    return m_controller.GetVelocityTolerance();
+  }
 
   /**
    * Sets the goal for the ProfiledPIDController.
