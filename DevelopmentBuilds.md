@@ -48,8 +48,8 @@ wpi.versions.wpimathVersion = '2023.+'
 
 ### Development Build Documentation
 
-* C++: https://github.wpilib.org/allwpilib/docs/development/cpp/index.html
-* Java: https://github.wpilib.org/allwpilib/docs/development/java/index.html
+* C++: https://github.wpilib.org/allwpilib/docs/development/cpp/
+* Java: https://github.wpilib.org/allwpilib/docs/development/java/
 
 ## Local Build
 
