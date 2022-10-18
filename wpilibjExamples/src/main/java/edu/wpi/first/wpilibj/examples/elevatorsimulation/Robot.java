@@ -109,6 +109,7 @@ public class Robot extends TimedRobot {
       m_motor.set(0.0);
     }
   }
+  // To view the Elevator Sim in the simulator, select Network Tables -> SmartDashboard -> Elevator Sim
 
   @Override
   public void disabledInit() {
