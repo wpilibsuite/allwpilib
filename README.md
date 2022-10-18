@@ -33,7 +33,7 @@ Below is a list of instructions that guide you through cloning, building, publis
 1. Clone the repository with `git clone https://github.com/wpilibsuite/allwpilib.git`
 2. Build the repository with `./gradlew build` or `./gradlew build --build-cache` if you have an internet connection
 3. Publish the artifacts locally by running `./gradlew publish`
-4. [Update your](OtherVersions.md) `build.gradle` [to use the artifacts](OtherVersions.md)
+4. [Update your](DevelopmentBuilds.md) `build.gradle` [to use the artifacts](DevelopmentBuilds.md)
 
 # Building WPILib
 
@@ -104,7 +104,7 @@ Run with `--build-cache` on the command-line to use the shared [build cache](htt
 
 ### Using Development Builds
 
-Please read the documentation available [here](OtherVersions.md)
+Please read the documentation available [here](DevelopmentBuilds.md)
 
 ### Custom toolchain location
 
