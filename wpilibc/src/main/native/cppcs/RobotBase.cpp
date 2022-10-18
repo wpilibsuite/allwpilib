@@ -223,7 +223,6 @@ RobotBase::RobotBase() {
   SetupMathShared();
 
   auto inst = nt::NetworkTableInstance::GetDefault();
-  inst.SetNetworkIdentity("Robot");
   // subscribe to "" to force persistent values to progagate to local
   nt::SubscribeMultiple(inst.GetHandle(), {{std::string_view{}}});
 #ifdef __FRC_ROBORIO__

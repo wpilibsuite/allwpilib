@@ -87,10 +87,6 @@ inline void NetworkTableInstance::RemoveConnectionListener(
   ::nt::RemoveConnectionListener(conn_listener);
 }
 
-inline void NetworkTableInstance::SetNetworkIdentity(std::string_view name) {
-  ::nt::SetNetworkIdentity(m_handle, name);
-}
-
 inline unsigned int NetworkTableInstance::GetNetworkMode() const {
   return ::nt::GetNetworkMode(m_handle);
 }
@@ -114,12 +110,12 @@ inline void NetworkTableInstance::StopServer() {
   ::nt::StopServer(m_handle);
 }
 
-inline void NetworkTableInstance::StartClient3() {
-  ::nt::StartClient3(m_handle);
+inline void NetworkTableInstance::StartClient3(std::string_view identity) {
+  ::nt::StartClient3(m_handle, identity);
 }
 
-inline void NetworkTableInstance::StartClient4() {
-  ::nt::StartClient4(m_handle);
+inline void NetworkTableInstance::StartClient4(std::string_view identity) {
+  ::nt::StartClient4(m_handle, identity);
 }
 
 inline void NetworkTableInstance::StopClient() {

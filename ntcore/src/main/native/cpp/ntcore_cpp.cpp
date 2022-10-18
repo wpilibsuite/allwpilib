@@ -624,12 +624,6 @@ void StopConnectionDataLog(NT_ConnectionDataLogger logger) {
  * Client/Server Functions
  */
 
-void SetNetworkIdentity(NT_Inst inst, std::string_view name) {
-  if (auto ii = InstanceImpl::GetTyped(inst, Handle::kInstance)) {
-    ii->SetIdentity(name);
-  }
-}
-
 unsigned int GetNetworkMode(NT_Inst inst) {
   if (auto ii = InstanceImpl::GetTyped(inst, Handle::kInstance)) {
     return ii->networkMode;
@@ -664,15 +658,15 @@ void StopServer(NT_Inst inst) {
   }
 }
 
-void StartClient3(NT_Inst inst) {
+void StartClient3(NT_Inst inst, std::string_view identity) {
   if (auto ii = InstanceImpl::GetTyped(inst, Handle::kInstance)) {
-    ii->StartClient3();
+    ii->StartClient3(identity);
   }
 }
 
-void StartClient4(NT_Inst inst) {
+void StartClient4(NT_Inst inst, std::string_view identity) {
   if (auto ii = InstanceImpl::GetTyped(inst, Handle::kInstance)) {
-    ii->StartClient4();
+    ii->StartClient4(identity);
   }
 }
 

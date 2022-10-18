@@ -31,7 +31,7 @@ class LoggerTest {
     List<LogMessage> msgs = new ArrayList<>();
     m_clientInst.addLogger(msgs::add, LogMessage.kInfo, 100);
 
-    m_clientInst.startClient4();
+    m_clientInst.startClient4("client");
     m_clientInst.setServer("127.0.0.1", 10000);
 
     // wait for client to report it's started, then wait another 0.1 sec

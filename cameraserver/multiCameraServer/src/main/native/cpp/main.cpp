@@ -183,7 +183,7 @@ int main(int argc, char* argv[]) {
     ntinst.StartServer();
   } else {
     fmt::print("Setting up NetworkTables client for team {}\n", team);
-    ntinst.StartClient4();
+    ntinst.StartClient4("cameraserver");
     ntinst.SetServerTeam(team);
   }
 

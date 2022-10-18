@@ -21,9 +21,7 @@ namespace nt {
 // Test only local here; it's more reliable to mock the network
 class ValueListenerTest : public ::testing::Test {
  public:
-  ValueListenerTest() : m_inst{nt::CreateInstance()} {
-    nt::SetNetworkIdentity(m_inst, "server");
-  }
+  ValueListenerTest() : m_inst{nt::CreateInstance()} {}
 
   ~ValueListenerTest() override { nt::DestroyInstance(m_inst); }
 

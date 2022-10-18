@@ -120,23 +120,23 @@ void InstanceImpl::StopServer() {
   networkMode = NT_NET_MODE_NONE;
 }
 
-void InstanceImpl::StartClient3() {
+void InstanceImpl::StartClient3(std::string_view identity) {
   std::scoped_lock lock{m_mutex};
   if (networkMode != NT_NET_MODE_NONE) {
     return;
   }
   m_networkClient = std::make_shared<NetworkClient3>(
-      m_inst, m_identity, localStorage, connectionList, logger);
+      m_inst, identity, localStorage, connectionList, logger);
   networkMode = NT_NET_MODE_CLIENT3;
 }
 
-void InstanceImpl::StartClient4() {
+void InstanceImpl::StartClient4(std::string_view identity) {
   std::scoped_lock lock{m_mutex};
   if (networkMode != NT_NET_MODE_NONE) {
     return;
   }
   m_networkClient = std::make_shared<NetworkClient>(
-      m_inst, m_identity, localStorage, connectionList, logger);
+      m_inst, identity, localStorage, connectionList, logger);
   networkMode = NT_NET_MODE_CLIENT4;
 }
 
@@ -147,11 +147,6 @@ void InstanceImpl::StopClient() {
   }
   m_networkClient.reset();
   networkMode = NT_NET_MODE_NONE;
-}
-
-void InstanceImpl::SetIdentity(std::string_view identity) {
-  std::scoped_lock lock{m_mutex};
-  m_identity = identity;
 }
 
 std::shared_ptr<NetworkServer> InstanceImpl::GetServer() {

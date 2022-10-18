@@ -197,7 +197,6 @@ NT_SetFloat
 NT_SetFloatArray
 NT_SetInteger
 NT_SetIntegerArray
-NT_SetNetworkIdentity
 NT_SetNow
 NT_SetRaw
 NT_SetServer

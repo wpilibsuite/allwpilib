@@ -45,10 +45,9 @@ class InstanceImpl {
                    std::string_view listenAddress, unsigned int port3,
                    unsigned int port4);
   void StopServer();
-  void StartClient3();
-  void StartClient4();
+  void StartClient3(std::string_view identity);
+  void StartClient4(std::string_view identity);
   void StopClient();
-  void SetIdentity(std::string_view identity);
 
   std::shared_ptr<NetworkServer> GetServer();
   std::shared_ptr<INetworkClient> GetClient();
@@ -68,7 +67,6 @@ class InstanceImpl {
   static wpi::mutex s_mutex;
 
   wpi::mutex m_mutex;
-  std::string m_identity;
   std::shared_ptr<NetworkServer> m_networkServer;
   std::shared_ptr<INetworkClient> m_networkClient;
   int m_inst;
