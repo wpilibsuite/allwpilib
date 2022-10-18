@@ -45,9 +45,9 @@ class Logger {
   void LogV(unsigned int level, const char* file, unsigned int line,
             fmt::string_view format, fmt::format_args args);
 
-  template <typename S, typename... Args>
+  template <typename... Args>
   void Log(unsigned int level, const char* file, unsigned int line,
-           const S& format, Args&&... args) {
+           fmt::string_view format, Args&&... args) {
     if (m_func && level >= m_min_level) {
       LogV(level, file, line, format, fmt::make_format_args(args...));
     }
