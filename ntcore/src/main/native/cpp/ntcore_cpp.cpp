@@ -684,44 +684,39 @@ void SetServer(
     NT_Inst inst,
     std::span<const std::pair<std::string_view, unsigned int>> servers) {
   if (auto ii = InstanceImpl::GetTyped(inst, Handle::kInstance)) {
-    if (auto client = ii->GetClient()) {
-      std::vector<std::pair<std::string, unsigned int>> serversCopy;
-      serversCopy.reserve(servers.size());
-      for (auto&& server : servers) {
-        serversCopy.emplace_back(std::string{server.first}, server.second);
-      }
-      client->SetServers(serversCopy);
+    std::vector<std::pair<std::string, unsigned int>> serversCopy;
+    serversCopy.reserve(servers.size());
+    for (auto&& server : servers) {
+      serversCopy.emplace_back(std::string{server.first}, server.second);
     }
+    ii->SetServers(serversCopy);
   }
 }
 
 void SetServerTeam(NT_Inst inst, unsigned int team, unsigned int port) {
   if (auto ii = InstanceImpl::GetTyped(inst, Handle::kInstance)) {
-    if (auto client = ii->GetClient()) {
-      std::vector<std::pair<std::string, unsigned int>> servers;
-      servers.reserve(5);
+    std::vector<std::pair<std::string, unsigned int>> servers;
+    servers.reserve(5);
 
-      // 10.te.am.2
-      servers.emplace_back(
-          fmt::format("10.{}.{}.2", static_cast<int>(team / 100),
-                      static_cast<int>(team % 100)),
-          port);
+    // 10.te.am.2
+    servers.emplace_back(fmt::format("10.{}.{}.2", static_cast<int>(team / 100),
+                                     static_cast<int>(team % 100)),
+                         port);
 
-      // 172.22.11.2
-      servers.emplace_back("172.22.11.2", port);
+    // 172.22.11.2
+    servers.emplace_back("172.22.11.2", port);
 
-      // roboRIO-<team>-FRC.local
-      servers.emplace_back(fmt::format("roboRIO-{}-FRC.local", team), port);
+    // roboRIO-<team>-FRC.local
+    servers.emplace_back(fmt::format("roboRIO-{}-FRC.local", team), port);
 
-      // roboRIO-<team>-FRC.lan
-      servers.emplace_back(fmt::format("roboRIO-{}-FRC.lan", team), port);
+    // roboRIO-<team>-FRC.lan
+    servers.emplace_back(fmt::format("roboRIO-{}-FRC.lan", team), port);
 
-      // roboRIO-<team>-FRC.frc-field.local
-      servers.emplace_back(fmt::format("roboRIO-{}-FRC.frc-field.local", team),
-                           port);
+    // roboRIO-<team>-FRC.frc-field.local
+    servers.emplace_back(fmt::format("roboRIO-{}-FRC.frc-field.local", team),
+                         port);
 
-      client->SetServers(servers);
-    }
+    ii->SetServers(servers);
   }
 }
 

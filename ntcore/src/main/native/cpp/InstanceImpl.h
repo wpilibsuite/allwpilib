@@ -48,6 +48,8 @@ class InstanceImpl {
   void StartClient3(std::string_view identity);
   void StartClient4(std::string_view identity);
   void StopClient();
+  void SetServers(
+      std::span<const std::pair<std::string, unsigned int>> servers);
 
   std::shared_ptr<NetworkServer> GetServer();
   std::shared_ptr<INetworkClient> GetClient();
@@ -69,6 +71,7 @@ class InstanceImpl {
   wpi::mutex m_mutex;
   std::shared_ptr<NetworkServer> m_networkServer;
   std::shared_ptr<INetworkClient> m_networkClient;
+  std::vector<std::pair<std::string, unsigned int>> m_servers;
   int m_inst;
 };
 
