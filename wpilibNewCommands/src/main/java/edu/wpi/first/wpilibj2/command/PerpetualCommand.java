@@ -17,7 +17,7 @@ import static edu.wpi.first.wpilibj2.command.CommandGroupBase.requireUngrouped;
  *
  * <p>This class is provided by the NewCommands VendorDep
  *
- * @deprecated Replaced by {@link EndlessCommand}.
+ * @deprecated Unsupported, per https://github.com/wpilibsuite/allwpilib/pull/4483
  */
 @Deprecated(forRemoval = true, since = "2023")
 public class PerpetualCommand extends CommandBase {

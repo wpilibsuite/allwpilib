@@ -200,18 +200,10 @@ class Command {
    * conditions.  The decorated command can still be interrupted or canceled.
    *
    * @return the decorated command
-   * @deprecated replace with EndlessCommand
+   * @deprecated Unsupported, per https://github.com/wpilibsuite/allwpilib/pull/4483
    */
-  WPI_DEPRECATED("Replace with Endlessly()")
+  WPI_DEPRECATED("Unsupported, per https://github.com/wpilibsuite/allwpilib/pull/4483")
   PerpetualCommand Perpetually() &&;
-
-  /**
-   * Decorates this command to run endlessly, ignoring its ordinary end
-   * conditions. The decorated command can still be interrupted or canceled.
-   *
-   * @return the decorated command
-   */
-  [[nodiscard]] CommandPtr Endlessly() &&;
 
   /**
    * Decorates this command to run repeatedly, restarting it when it ends, until

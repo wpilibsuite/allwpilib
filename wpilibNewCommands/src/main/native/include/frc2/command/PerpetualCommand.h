@@ -29,7 +29,7 @@ namespace frc2 {
  *
  * This class is provided by the NewCommands VendorDep
  *
- * @deprecated replace with EndlessCommand
+ * @deprecated Unsupported, per https://github.com/wpilibsuite/allwpilib/pull/4483
  */
 class PerpetualCommand : public CommandHelper<CommandBase, PerpetualCommand> {
  public:
@@ -40,7 +40,7 @@ class PerpetualCommand : public CommandHelper<CommandBase, PerpetualCommand> {
    *
    * @param command the command to run perpetually
    */
-  WPI_DEPRECATED("Replace with EndlessCommand")
+  WPI_DEPRECATED("Unsupported, per https://github.com/wpilibsuite/allwpilib/pull/4483")
   explicit PerpetualCommand(std::unique_ptr<Command>&& command);
 
   WPI_IGNORE_DEPRECATED
@@ -53,7 +53,7 @@ class PerpetualCommand : public CommandHelper<CommandBase, PerpetualCommand> {
    */
   template <class T, typename = std::enable_if_t<std::is_base_of_v<
                          Command, std::remove_reference_t<T>>>>
-  WPI_DEPRECATED("Replace with EndlessCommand")
+  WPI_DEPRECATED("Unsupported, per https://github.com/wpilibsuite/allwpilib/pull/4483")
   explicit PerpetualCommand(T&& command)
       : PerpetualCommand(std::make_unique<std::remove_reference_t<T>>(
             std::forward<T>(command))) {}
