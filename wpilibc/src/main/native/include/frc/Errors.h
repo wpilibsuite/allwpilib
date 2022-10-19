@@ -74,9 +74,10 @@ void ReportErrorV(int32_t status, const char* fileName, int lineNumber,
  * @param[in]  format error message format
  * @param[in]  args error message format args
  */
-template <typename S, typename... Args>
+template <typename... Args>
 inline void ReportError(int32_t status, const char* fileName, int lineNumber,
-                        const char* funcName, const S& format, Args&&... args) {
+                        const char* funcName, fmt::string_view format,
+                        Args&&... args) {
   ReportErrorV(status, fileName, lineNumber, funcName, format,
                fmt::make_format_args(args...));
 }
@@ -99,12 +100,10 @@ inline void ReportError(int32_t status, const char* fileName, int lineNumber,
                                       fmt::string_view format,
                                       fmt::format_args args);
 
-template <typename S, typename... Args>
-[[nodiscard]] inline RuntimeError MakeError(int32_t status,
-                                            const char* fileName,
-                                            int lineNumber,
-                                            const char* funcName,
-                                            const S& format, Args&&... args) {
+template <typename... Args>
+[[nodiscard]] inline RuntimeError MakeError(
+    int32_t status, const char* fileName, int lineNumber, const char* funcName,
+    fmt::string_view format, Args&&... args) {
   return MakeErrorV(status, fileName, lineNumber, funcName, format,
                     fmt::make_format_args(args...));
 }
