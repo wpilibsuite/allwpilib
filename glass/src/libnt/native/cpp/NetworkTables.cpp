@@ -176,7 +176,6 @@ static void UpdateMsgpackValueSource(NetworkTablesModel::ValueSource* out,
     case mpack::mpack_type_str: {
       std::string str;
       mpack_read_str(&r, &tag, &str);
-      mpack_done_str(&r);
       out->UpdateFromValue(nt::Value::MakeString(std::move(str), time), name,
                            "");
       break;
