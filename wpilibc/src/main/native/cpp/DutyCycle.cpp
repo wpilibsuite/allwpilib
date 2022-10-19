@@ -17,7 +17,7 @@ using namespace frc;
 DutyCycle::DutyCycle(DigitalSource* source)
     : m_source{source, wpi::NullDeleter<DigitalSource>()} {
   if (!m_source) {
-    throw FRC_MakeError(err::NullParameter, "{}", "source");
+    throw FRC_MakeError(err::NullParameter, "source");
   }
   InitDutyCycle();
 }
@@ -30,7 +30,7 @@ DutyCycle::DutyCycle(DigitalSource& source)
 DutyCycle::DutyCycle(std::shared_ptr<DigitalSource> source)
     : m_source{std::move(source)} {
   if (!m_source) {
-    throw FRC_MakeError(err::NullParameter, "{}", "source");
+    throw FRC_MakeError(err::NullParameter, "source");
   }
   InitDutyCycle();
 }

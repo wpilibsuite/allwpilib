@@ -34,7 +34,7 @@ void RunRobot(wpi::mutex& m, Robot** robot) {
   } catch (const frc::RuntimeError& e) {
     e.Report();
     FRC_ReportError(
-        err::Error, "{}",
+        err::Error,
         "The robot program quit unexpectedly."
         " This is usually due to a code error.\n"
         "  The above stacktrace can help determine where the error occurred.\n"

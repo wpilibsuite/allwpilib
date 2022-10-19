@@ -45,7 +45,7 @@ void NetworkLoopQueue::SetValue(NT_Publisher pubHandle, const Value& value) {
   m_size += sizeof(ClientMessage);
   if (m_size > kMaxSize) {
     if (!m_sizeErrored) {
-      WPI_ERROR(m_logger, "{}", "NT: dropping value set due to memory limits");
+      WPI_ERROR(m_logger, "NT: dropping value set due to memory limits");
       m_sizeErrored = true;
     }
     return;  // avoid potential out of memory

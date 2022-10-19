@@ -24,10 +24,10 @@ ExternalDirectionCounter::ExternalDirectionCounter(
     std::shared_ptr<DigitalSource> countSource,
     std::shared_ptr<DigitalSource> directionSource) {
   if (countSource == nullptr) {
-    throw FRC_MakeError(err::NullParameter, "{}", "countSource");
+    throw FRC_MakeError(err::NullParameter, "countSource");
   }
   if (directionSource == nullptr) {
-    throw FRC_MakeError(err::NullParameter, "{}", "directionSource");
+    throw FRC_MakeError(err::NullParameter, "directionSource");
   }
 
   m_countSource = countSource;

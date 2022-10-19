@@ -119,7 +119,7 @@ static void WireDecodeTextImpl(std::string_view in, T& out,
   }
 
   if (!j.is_array()) {
-    WPI_WARNING(logger, "{}", "expected JSON array at top level");
+    WPI_WARNING(logger, "expected JSON array at top level");
     return;
   }
 

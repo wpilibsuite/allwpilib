@@ -74,7 +74,7 @@ int UDPClient::start(int port) {
   m_lsd = socket(AF_INET, SOCK_DGRAM, 0);
 
   if (m_lsd < 0) {
-    WPI_ERROR(m_logger, "{}", "could not create socket");
+    WPI_ERROR(m_logger, "could not create socket");
     return -1;
   }
 
@@ -142,7 +142,7 @@ int UDPClient::send(std::span<const uint8_t> data, std::string_view server,
   addr.sin_family = AF_INET;
   SmallString<128> remoteAddr{server};
   if (remoteAddr.empty()) {
-    WPI_ERROR(m_logger, "{}", "server must be passed");
+    WPI_ERROR(m_logger, "server must be passed");
     return -1;
   }
 
@@ -171,7 +171,7 @@ int UDPClient::send(std::string_view data, std::string_view server, int port) {
   addr.sin_family = AF_INET;
   SmallString<128> remoteAddr{server};
   if (remoteAddr.empty()) {
-    WPI_ERROR(m_logger, "{}", "server must be passed");
+    WPI_ERROR(m_logger, "server must be passed");
     return -1;
   }
 
@@ -243,7 +243,7 @@ int UDPClient::set_timeout(double timeout) {
   int ret = setsockopt(m_lsd, SOL_SOCKET, SO_RCVTIMEO,
                        reinterpret_cast<char*>(&tv), sizeof(tv));
   if (ret < 0) {
-    WPI_ERROR(m_logger, "{}", "set timeout failed");
+    WPI_ERROR(m_logger, "set timeout failed");
   }
   return ret;
 }

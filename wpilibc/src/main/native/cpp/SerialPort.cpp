@@ -77,7 +77,7 @@ SerialPort::SerialPort(int baudRate, std::string_view portName, Port port,
 SerialPort::~SerialPort() {
   int32_t status = 0;
   HAL_CloseSerial(m_portHandle, &status);
-  FRC_ReportError(status, "{}", "CloseSerial");
+  FRC_ReportError(status, "CloseSerial");
 }
 
 void SerialPort::SetFlowControl(SerialPort::FlowControl flowControl) {
@@ -96,20 +96,20 @@ void SerialPort::EnableTermination(char terminator) {
 void SerialPort::DisableTermination() {
   int32_t status = 0;
   HAL_DisableSerialTermination(m_portHandle, &status);
-  FRC_CheckErrorStatus(status, "{}", "DisableTermination");
+  FRC_CheckErrorStatus(status, "DisableTermination");
 }
 
 int SerialPort::GetBytesReceived() {
   int32_t status = 0;
   int retVal = HAL_GetSerialBytesReceived(m_portHandle, &status);
-  FRC_CheckErrorStatus(status, "{}", "GetBytesReceived");
+  FRC_CheckErrorStatus(status, "GetBytesReceived");
   return retVal;
 }
 
 int SerialPort::Read(char* buffer, int count) {
   int32_t status = 0;
   int retVal = HAL_ReadSerial(m_portHandle, buffer, count, &status);
-  FRC_CheckErrorStatus(status, "{}", "Read");
+  FRC_CheckErrorStatus(status, "Read");
   return retVal;
 }
 
@@ -121,14 +121,14 @@ int SerialPort::Write(std::string_view buffer) {
   int32_t status = 0;
   int retVal =
       HAL_WriteSerial(m_portHandle, buffer.data(), buffer.size(), &status);
-  FRC_CheckErrorStatus(status, "{}", "Write");
+  FRC_CheckErrorStatus(status, "Write");
   return retVal;
 }
 
 void SerialPort::SetTimeout(units::second_t timeout) {
   int32_t status = 0;
   HAL_SetSerialTimeout(m_portHandle, timeout.value(), &status);
-  FRC_CheckErrorStatus(status, "{}", "SetTimeout");
+  FRC_CheckErrorStatus(status, "SetTimeout");
 }
 
 void SerialPort::SetReadBufferSize(int size) {
@@ -152,11 +152,11 @@ void SerialPort::SetWriteBufferMode(SerialPort::WriteBufferMode mode) {
 void SerialPort::Flush() {
   int32_t status = 0;
   HAL_FlushSerial(m_portHandle, &status);
-  FRC_CheckErrorStatus(status, "{}", "Flush");
+  FRC_CheckErrorStatus(status, "Flush");
 }
 
 void SerialPort::Reset() {
   int32_t status = 0;
   HAL_ClearSerial(m_portHandle, &status);
-  FRC_CheckErrorStatus(status, "{}", "Reset");
+  FRC_CheckErrorStatus(status, "Reset");
 }

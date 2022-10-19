@@ -171,7 +171,7 @@ void CImpl::ProcessIncomingBinary(std::span<const uint8_t> data) {
 }
 
 void CImpl::HandleLocal(std::vector<ClientMessage>&& msgs) {
-  DEBUG4("{}", "HandleLocal()");
+  DEBUG4("HandleLocal()");
   for (auto&& elem : msgs) {
     // common case is value
     if (auto msg = std::get_if<ClientValueMsg>(&elem.contents)) {

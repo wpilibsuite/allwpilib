@@ -635,7 +635,7 @@ double DriverStation::GetMatchTime() {
 double DriverStation::GetBatteryVoltage() {
   int32_t status = 0;
   double voltage = HAL_GetVinVoltage(&status);
-  FRC_CheckErrorStatus(status, "{}", "getVinVoltage");
+  FRC_CheckErrorStatus(status, "getVinVoltage");
 
   return voltage;
 }

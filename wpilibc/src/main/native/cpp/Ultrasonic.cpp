@@ -39,10 +39,10 @@ Ultrasonic::Ultrasonic(DigitalOutput* pingChannel, DigitalInput* echoChannel)
       m_echoChannel(echoChannel, wpi::NullDeleter<DigitalInput>()),
       m_counter(m_echoChannel) {
   if (!pingChannel) {
-    throw FRC_MakeError(err::NullParameter, "{}", "pingChannel");
+    throw FRC_MakeError(err::NullParameter, "pingChannel");
   }
   if (!echoChannel) {
-    throw FRC_MakeError(err::NullParameter, "{}", "echoChannel");
+    throw FRC_MakeError(err::NullParameter, "echoChannel");
   }
   Initialize();
 }
@@ -86,7 +86,7 @@ int Ultrasonic::GetEchoChannel() const {
 
 void Ultrasonic::Ping() {
   if (m_automaticEnabled) {
-    throw FRC_MakeError(err::IncompatibleMode, "{}",
+    throw FRC_MakeError(err::IncompatibleMode,
                         "cannot call Ping() in automatic mode");
   }
 
