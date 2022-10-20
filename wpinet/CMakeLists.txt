@@ -126,7 +126,7 @@ target_compile_features(wpinet PUBLIC cxx_std_20)
 wpilib_target_warnings(wpinet)
 target_link_libraries(wpinet PUBLIC wpiutil)
 
-if (NOT USE_VCPKG_LIBUV)
+if (NOT USE_SYSTEM_LIBUV)
     target_sources(wpinet PRIVATE ${uv_native_src})
     install(DIRECTORY src/main/native/thirdparty/libuv/include/ DESTINATION "${include_dest}/wpinet")
     target_include_directories(wpinet PRIVATE
