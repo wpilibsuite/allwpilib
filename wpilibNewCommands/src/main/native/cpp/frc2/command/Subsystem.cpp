@@ -4,7 +4,7 @@
 
 #include "frc2/command/Subsystem.h"
 
-#inlude "frc2/command/CommandPtr.h"
+#include "frc2/command/CommandPtr.h"
 
 using namespace frc2;
 Subsystem::~Subsystem() {
