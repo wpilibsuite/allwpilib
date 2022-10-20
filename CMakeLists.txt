@@ -52,6 +52,7 @@ ENDIF("${isSystemDir}" STREQUAL "-1")
 option(BUILD_SHARED_LIBS "Build with shared libs (needed for JNI)" ON)
 option(WITH_JAVA "Include java and JNI in the build" ON)
 option(WITH_CSCORE "Build cscore (needs OpenCV)" ON)
+option(WITH_NTCORE "Build ntcore" ON)
 option(WITH_WPIMATH "Build wpimath" ON)
 option(WITH_WPILIB "Build hal, wpilibc/j, and myRobot (needs OpenCV)" ON)
 option(WITH_EXAMPLES "Build examples" OFF)
@@ -114,6 +115,13 @@ if (NOT WITH_WPILIB AND WITH_SIMULATION_MODULES)
     message(FATAL_ERROR "
 FATAL: Cannot build simulation modules with wpilib disabled.
        Enable wpilib by setting WITH_WPILIB=ON
+")
+endif()
+
+if (NOT WITH_NTCORE AND WITH_WPILIB)
+    message(FATAL_ERROR "
+FATAL: Cannot build wpilib without ntcore.
+       Enable ntcore by setting WITH_NTCORE=ON
 ")
 endif()
 
@@ -247,8 +255,11 @@ if (WITH_TESTS)
 endif()
 
 add_subdirectory(wpiutil)
-add_subdirectory(wpinet)
-add_subdirectory(ntcore)
+
+if (WITH_NTCORE)
+    add_subdirectory(wpinet)
+    add_subdirectory(ntcore)
+endif()
 
 if (WITH_WPIMATH)
     add_subdirectory(wpimath)

@@ -35,6 +35,8 @@ The following build options are available:
   * This option will build C++ unit tests. These can be run via `make test`.
 * `WITH_CSCORE` (ON Default)
   * This option will cause cscore to be built. Turning this off will implicitly disable cameraserver, the hal and wpilib as well, irrespective of their specific options. If this is off, the OpenCV build requirement is removed.
+* `WITH_NTCORE` (ON Default)
+  * This option will cause ntcore to be built. Turning this off will implicitly disable wpinet and wpilib as well, irrespective of their specific options.
 * `WITH_WPIMATH` (ON Default)
   * This option will build the wpimath library. This option must be on to build wpilib.
 * `WITH_WPILIB` (ON Default)
