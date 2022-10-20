@@ -89,7 +89,7 @@ class ServerConnection4 final
   void ProcessRequest() final;
   void ProcessWsUpgrade() final;
 
-  std::unique_ptr<net::WebSocketConnection> m_wire;
+  std::shared_ptr<net::WebSocketConnection> m_wire;
 };
 
 class ServerConnection3 : public ServerConnection {
@@ -99,7 +99,7 @@ class ServerConnection3 : public ServerConnection {
                     wpi::Logger& logger);
 
  private:
-  std::unique_ptr<net3::UvStreamConnection3> m_wire;
+  std::shared_ptr<net3::UvStreamConnection3> m_wire;
 };
 
 class NSImpl {
@@ -242,7 +242,7 @@ void ServerConnection4::ProcessWsUpgrade() {
   m_websocket->SetMaxMessageSize(kMaxMessageSize);
 
   m_websocket->open.connect([this, name = std::string{name}](std::string_view) {
-    m_wire = std::make_unique<net::WebSocketConnection>(*m_websocket);
+    m_wire = std::make_shared<net::WebSocketConnection>(*m_websocket);
     // TODO: set local flag appropriately
     m_clientId = m_server.m_serverImpl.AddClient(
         name, m_connInfo, false, *m_wire,
@@ -276,7 +276,7 @@ ServerConnection3::ServerConnection3(std::shared_ptr<uv::Stream> stream,
                                      NSImpl& server, std::string_view addr,
                                      unsigned int port, wpi::Logger& logger)
     : ServerConnection{server, addr, port, logger},
-      m_wire{std::make_unique<net3::UvStreamConnection3>(*stream)} {
+      m_wire{std::make_shared<net3::UvStreamConnection3>(*stream)} {
   m_info.remote_ip = addr;
   m_info.remote_port = port;
 
