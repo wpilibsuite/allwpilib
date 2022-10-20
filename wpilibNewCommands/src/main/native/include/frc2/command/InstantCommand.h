@@ -28,8 +28,8 @@ class InstantCommand : public CommandHelper<FunctionalCommand, InstantCommand> {
    * @param toRun        the Runnable to run
    * @param requirements the subsystems required by this command
    */
-  InstantCommand(std::function<void()> toRun,
-                 std::initializer_list<Subsystem*> requirements = {});
+  explicit InstantCommand(std::function<void()> toRun,
+                          std::initializer_list<Subsystem*> requirements = {});
 
   InstantCommand(InstantCommand&& other) = default;
 

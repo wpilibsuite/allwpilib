@@ -29,8 +29,8 @@ class RunCommand : public CommandHelper<FunctionalCommand, RunCommand> {
    * @param toRun        the Runnable to run
    * @param requirements the subsystems to require
    */
-  RunCommand(std::function<void()> toRun,
-             std::initializer_list<Subsystem*> requirements = {});
+  explicit RunCommand(std::function<void()> toRun,
+                      std::initializer_list<Subsystem*> requirements = {});
 
   RunCommand(RunCommand&& other) = default;
 
