@@ -22,8 +22,8 @@ void RobotContainer::ConfigureButtonBindings() {
       [this] { return m_controller.GetRawAxis(2); }));
 
   // Example of how to use the onboard IO
-  m_onboardButtonA.WhenPressed(frc2::PrintCommand("Button A Pressed"))
-      .WhenReleased(frc2::PrintCommand("Button A Released"));
+  m_onboardButtonA.OnTrue(frc2::cmd::Print("Button A Pressed"))
+      .OnFalse(frc2::cmd::Print("Button A Released"));
 
   // Setup SmartDashboard options.
   m_chooser.SetDefaultOption("Auto Routine Distance", &m_autoDistance);
