@@ -63,24 +63,12 @@ CommandPtr Command::WithInterrupt(std::function<bool()> condition) && {
 CommandPtr Command::BeforeStarting(
     std::function<void()> toRun,
     std::initializer_list<Subsystem*> requirements) && {
-  return std::move(*this).BeforeStarting(
-      std::move(toRun), {requirements.begin(), requirements.end()});
-}
-
-CommandPtr Command::BeforeStarting(
-    std::function<void()> toRun, std::span<Subsystem* const> requirements) && {
   return CommandPtr(std::move(*this).TransferOwnership())
       .BeforeStarting(std::move(toRun), requirements);
 }
 
 CommandPtr Command::AndThen(std::function<void()> toRun,
                             std::initializer_list<Subsystem*> requirements) && {
-  return std::move(*this).AndThen(std::move(toRun),
-                                  {requirements.begin(), requirements.end()});
-}
-
-CommandPtr Command::AndThen(std::function<void()> toRun,
-                            std::span<Subsystem* const> requirements) && {
   return CommandPtr(std::move(*this).TransferOwnership())
       .AndThen(std::move(toRun), requirements);
 }

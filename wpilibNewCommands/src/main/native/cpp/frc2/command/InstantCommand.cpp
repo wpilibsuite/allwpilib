@@ -12,10 +12,4 @@ InstantCommand::InstantCommand(std::function<void()> toRun,
           std::move(toRun), [] {}, [](bool interrupted) {}, [] { return true; },
           requirements) {}
 
-InstantCommand::InstantCommand(std::function<void()> toRun,
-                               std::span<Subsystem* const> requirements)
-    : CommandHelper(
-          std::move(toRun), [] {}, [](bool interrupted) {}, [] { return true; },
-          requirements) {}
-
 InstantCommand::InstantCommand() : InstantCommand([] {}) {}

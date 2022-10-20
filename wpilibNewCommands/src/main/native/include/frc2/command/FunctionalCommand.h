@@ -37,23 +37,7 @@ class FunctionalCommand : public CommandHelper<CommandBase, FunctionalCommand> {
                     std::function<void()> onExecute,
                     std::function<void(bool)> onEnd,
                     std::function<bool()> isFinished,
-                    std::initializer_list<Subsystem*> requirements);
-
-  /**
-   * Creates a new FunctionalCommand.
-   *
-   * @param onInit       the function to run on command initialization
-   * @param onExecute    the function to run on command execution
-   * @param onEnd        the function to run on command end
-   * @param isFinished   the function that determines whether the command has
-   * finished
-   * @param requirements the subsystems required by this command
-   */
-  FunctionalCommand(std::function<void()> onInit,
-                    std::function<void()> onExecute,
-                    std::function<void(bool)> onEnd,
-                    std::function<bool()> isFinished,
-                    std::span<Subsystem* const> requirements = {});
+                    std::initializer_list<Subsystem*> requirements = {});
 
   FunctionalCommand(FunctionalCommand&& other) = default;
 

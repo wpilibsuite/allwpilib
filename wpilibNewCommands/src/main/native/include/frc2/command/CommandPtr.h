@@ -90,18 +90,7 @@ class CommandPtr final {
    */
   [[nodiscard]] CommandPtr AndThen(
       std::function<void()> toRun,
-      std::span<Subsystem* const> requirements = {}) &&;
-
-  /**
-   * Decorates this command with a runnable to run after the command finishes.
-   *
-   * @param toRun the Runnable to run
-   * @param requirements the required subsystems
-   * @return the decorated command
-   */
-  [[nodiscard]] CommandPtr AndThen(
-      std::function<void()> toRun,
-      std::initializer_list<Subsystem*> requirements) &&;
+      std::initializer_list<Subsystem*> requirements = {}) &&;
 
   /**
    * Decorates this command with a set of commands to run after it in sequence.
@@ -122,18 +111,7 @@ class CommandPtr final {
    */
   [[nodiscard]] CommandPtr BeforeStarting(
       std::function<void()> toRun,
-      std::initializer_list<Subsystem*> requirements) &&;
-
-  /**
-   * Decorates this command with a runnable to run before this command starts.
-   *
-   * @param toRun the Runnable to run
-   * @param requirements the required subsystems
-   * @return the decorated command
-   */
-  [[nodiscard]] CommandPtr BeforeStarting(
-      std::function<void()> toRun,
-      std::span<Subsystem* const> requirements = {}) &&;
+      std::initializer_list<Subsystem*> requirements = {}) &&;
 
   /**
    * Decorates this command with another command to run before this command

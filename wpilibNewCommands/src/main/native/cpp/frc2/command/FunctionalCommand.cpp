@@ -17,18 +17,6 @@ FunctionalCommand::FunctionalCommand(
   AddRequirements(requirements);
 }
 
-FunctionalCommand::FunctionalCommand(std::function<void()> onInit,
-                                     std::function<void()> onExecute,
-                                     std::function<void(bool)> onEnd,
-                                     std::function<bool()> isFinished,
-                                     std::span<Subsystem* const> requirements)
-    : m_onInit{std::move(onInit)},
-      m_onExecute{std::move(onExecute)},
-      m_onEnd{std::move(onEnd)},
-      m_isFinished{std::move(isFinished)} {
-  AddRequirements(requirements);
-}
-
 void FunctionalCommand::Initialize() {
   m_onInit();
 }

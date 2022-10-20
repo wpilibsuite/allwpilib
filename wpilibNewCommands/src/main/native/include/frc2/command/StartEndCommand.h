@@ -33,18 +33,7 @@ class StartEndCommand
    * @param requirements the subsystems required by this command
    */
   StartEndCommand(std::function<void()> onInit, std::function<void()> onEnd,
-                  std::initializer_list<Subsystem*> requirements);
-
-  /**
-   * Creates a new StartEndCommand.  Will run the given runnables when the
-   * command starts and when it ends.
-   *
-   * @param onInit       the Runnable to run on command init
-   * @param onEnd        the Runnable to run on command end
-   * @param requirements the subsystems required by this command
-   */
-  StartEndCommand(std::function<void()> onInit, std::function<void()> onEnd,
-                  std::span<Subsystem* const> requirements = {});
+                  std::initializer_list<Subsystem*> requirements = {});
 
   StartEndCommand(StartEndCommand&& other) = default;
 

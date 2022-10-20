@@ -160,18 +160,7 @@ class Command {
    */
   [[nodiscard]] CommandPtr BeforeStarting(
       std::function<void()> toRun,
-      std::initializer_list<Subsystem*> requirements) &&;
-
-  /**
-   * Decorates this command with a runnable to run before this command starts.
-   *
-   * @param toRun the Runnable to run
-   * @param requirements the required subsystems
-   * @return the decorated command
-   */
-  [[nodiscard]] CommandPtr BeforeStarting(
-      std::function<void()> toRun,
-      std::span<Subsystem* const> requirements = {}) &&;
+      std::initializer_list<Subsystem*> requirements = {}) &&;
 
   /**
    * Decorates this command with a runnable to run after the command finishes.
@@ -182,18 +171,7 @@ class Command {
    */
   [[nodiscard]] CommandPtr AndThen(
       std::function<void()> toRun,
-      std::initializer_list<Subsystem*> requirements) &&;
-
-  /**
-   * Decorates this command with a runnable to run after the command finishes.
-   *
-   * @param toRun the Runnable to run
-   * @param requirements the required subsystems
-   * @return the decorated command
-   */
-  [[nodiscard]] CommandPtr AndThen(
-      std::function<void()> toRun,
-      std::span<Subsystem* const> requirements = {}) &&;
+      std::initializer_list<Subsystem*> requirements = {}) &&;
 
   /**
    * Decorates this command to run perpetually, ignoring its ordinary end

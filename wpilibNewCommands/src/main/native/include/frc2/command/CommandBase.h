@@ -30,14 +30,7 @@ class CommandBase : public Command,
    *
    * @param requirements the Subsystem requirements to add
    */
-  void AddRequirements(std::initializer_list<Subsystem*> requirements);
-
-  /**
-   * Adds the specified Subsystem requirements to the command.
-   *
-   * @param requirements the Subsystem requirements to add
-   */
-  void AddRequirements(std::span<Subsystem* const> requirements);
+  void AddRequirements(std::initializer_list<Subsystem*> requirements = {});
 
   /**
    * Adds the specified Subsystem requirements to the command.

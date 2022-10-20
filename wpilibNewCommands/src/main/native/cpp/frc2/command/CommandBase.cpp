@@ -18,10 +18,6 @@ void CommandBase::AddRequirements(
   m_requirements.insert(requirements.begin(), requirements.end());
 }
 
-void CommandBase::AddRequirements(std::span<Subsystem* const> requirements) {
-  m_requirements.insert(requirements.begin(), requirements.end());
-}
-
 void CommandBase::AddRequirements(wpi::SmallSet<Subsystem*, 4> requirements) {
   m_requirements.insert(requirements.begin(), requirements.end());
 }

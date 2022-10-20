@@ -43,22 +43,7 @@ class TrapezoidProfileCommand
    */
   TrapezoidProfileCommand(frc::TrapezoidProfile<Distance> profile,
                           std::function<void(State)> output,
-                          std::initializer_list<Subsystem*> requirements)
-      : m_profile(profile), m_output(output) {
-    this->AddRequirements(requirements);
-  }
-
-  /**
-   * Creates a new TrapezoidProfileCommand that will execute the given
-   * TrapezoidalProfile. Output will be piped to the provided consumer function.
-   *
-   * @param profile      The motion profile to execute.
-   * @param output       The consumer for the profile output.
-   * @param requirements The list of requirements.
-   */
-  TrapezoidProfileCommand(frc::TrapezoidProfile<Distance> profile,
-                          std::function<void(State)> output,
-                          std::span<Subsystem* const> requirements = {})
+                          std::initializer_list<Subsystem*> requirements = {})
       : m_profile(profile), m_output(output) {
     this->AddRequirements(requirements);
   }

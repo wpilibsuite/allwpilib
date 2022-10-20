@@ -13,11 +13,3 @@ StartEndCommand::StartEndCommand(std::function<void()> onInit,
           std::move(onInit), [] {},
           [onEnd = std::move(onEnd)](bool interrupted) { onEnd(); },
           [] { return false; }, requirements) {}
-
-StartEndCommand::StartEndCommand(std::function<void()> onInit,
-                                 std::function<void()> onEnd,
-                                 std::span<Subsystem* const> requirements)
-    : CommandHelper(
-          std::move(onInit), [] {},
-          [onEnd = std::move(onEnd)](bool interrupted) { onEnd(); },
-          [] { return false; }, requirements) {}
