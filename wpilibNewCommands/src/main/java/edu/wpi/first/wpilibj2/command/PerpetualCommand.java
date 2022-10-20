@@ -17,7 +17,10 @@ import static edu.wpi.first.wpilibj2.command.CommandGroupBase.requireUngrouped;
  *
  * <p>This class is provided by the NewCommands VendorDep
  *
- * @deprecated Unsupported, per https://github.com/wpilibsuite/allwpilib/pull/4483
+ * @deprecated PerpetualCommand violates the assumption that execute() doesn't get called after
+ *     isFinished() returns true -- an assumption that should be valid. This was unsafe/undefined
+ *     behavior from the start, and RepeatCommand provides an easy way to achieve similar end
+ *     results with slightly different (and safe) semantics.
  */
 @Deprecated(forRemoval = true, since = "2023")
 public class PerpetualCommand extends CommandBase {
