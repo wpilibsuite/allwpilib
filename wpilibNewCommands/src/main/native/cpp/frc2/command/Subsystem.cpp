@@ -4,6 +4,8 @@
 
 #include "frc2/command/Subsystem.h"
 
+#inlude "frc2/command/CommandPtr.h"
+
 using namespace frc2;
 Subsystem::~Subsystem() {
   CommandScheduler::GetInstance().UnregisterSubsystem(this);
