@@ -12,16 +12,16 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - container: wpilib/roborio-cross-ubuntu:2022-20.04
+          - container: wpilib/roborio-cross-ubuntu:2023-22.04
             artifact-name: Athena
             build-options: "-Ponlylinuxathena"
-          - container: wpilib/raspbian-cross-ubuntu:10-20.04
+          - container: wpilib/raspbian-cross-ubuntu:bullseye-22.04
             artifact-name: Arm32
             build-options: "-Ponlylinuxarm32"
-          - container: wpilib/aarch64-cross-ubuntu:bionic-20.04
+          - container: wpilib/aarch64-cross-ubuntu:bullseye-22.04
             artifact-name: Arm64
             build-options: "-Ponlylinuxarm64"
-          - container: wpilib/ubuntu-base:20.04
+          - container: wpilib/ubuntu-base:22.04
             artifact-name: Linux
             build-options: "-Ponlylinuxx86-64"
     name: "Build - ${{ matrix.artifact-name }}"
@@ -51,21 +51,29 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - os: windows-2019
+          - os: windows-2022
             artifact-name: Win64Debug
             architecture: x64
             task: "build"
             build-options: "-PciDebugOnly --max-workers 1"
-          - os: windows-2019
+            outputs: "build/allOutputs"
+          - os: windows-2022
             artifact-name: Win64Release
             architecture: x64
             build-options: "-PciReleaseOnly --max-workers 1"
             task: "copyAllOutputs"
+            outputs: "build/allOutputs"
           - os: macOS-11
             artifact-name: macOS
             architecture: x64
             build-options: "-Pbuildalldesktop"
             task: "build"
+            outputs: "build/allOutputs"
+          - os: windows-2022
+            artifact-name: Win32
+            architecture: x86
+            task: ":ntcoreffi:build"
+            outputs: "ntcoreffi/build/outputs"
     name: "Build - ${{ matrix.artifact-name }}"
     runs-on: ${{ matrix.os }}
     steps:
@@ -94,6 +102,9 @@ jobs:
         run: echo "EXTRA_GRADLE_ARGS=-PreleaseMode" >> $GITHUB_ENV
         shell: bash
         if: startsWith(github.ref, 'refs/tags/v')
+      - name: Set Java Heap Size
+        run: sed -i 's/-Xmx2g/-Xmx1g/g' gradle.properties
+        if: matrix.artifact-name == 'Win32'
       - name: Build with Gradle
         run: ./gradlew ${{ matrix.task }} --build-cache -PbuildServer -PskipJavaFormat ${{ matrix.build-options }} ${{ env.EXTRA_GRADLE_ARGS }}
         env:
@@ -107,7 +118,7 @@ jobs:
       - uses: actions/upload-artifact@v2
         with:
           name: ${{ matrix.artifact-name }}
-          path: build/allOutputs
+          path: ${{ matrix.outputs }}
 
   build-documentation:
     name: "Build - Documentation"

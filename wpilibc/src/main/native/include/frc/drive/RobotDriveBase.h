@@ -5,9 +5,8 @@
 #pragma once
 
 #include <memory>
+#include <span>
 #include <string>
-
-#include <wpi/span.h>
 
 #include "frc/MotorSafety.h"
 
@@ -75,7 +74,7 @@ class RobotDriveBase : public MotorSafety {
    * Renormalize all wheel speeds if the magnitude of any wheel is greater than
    * 1.0.
    */
-  static void Desaturate(wpi::span<double> wheelSpeeds);
+  static void Desaturate(std::span<double> wheelSpeeds);
 
   double m_deadband = 0.02;
   double m_maxOutput = 1.0;

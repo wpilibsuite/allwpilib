@@ -381,7 +381,7 @@ Instance::Instance() {
 
   // Listener for video events
   m_videoListener = cs::VideoListener{
-      [=](const cs::VideoEvent& event) {
+      [=, this](const cs::VideoEvent& event) {
         std::scoped_lock lock(m_mutex);
         CS_Status status = 0;
         switch (event.kind) {
@@ -511,7 +511,7 @@ cs::AxisCamera CameraServer::AddAxisCamera(const std::string& host) {
   return AddAxisCamera("Axis Camera", host);
 }
 
-cs::AxisCamera CameraServer::AddAxisCamera(wpi::span<const std::string> hosts) {
+cs::AxisCamera CameraServer::AddAxisCamera(std::span<const std::string> hosts) {
   return AddAxisCamera("Axis Camera", hosts);
 }
 
@@ -543,7 +543,7 @@ cs::AxisCamera CameraServer::AddAxisCamera(std::string_view name,
 }
 
 cs::AxisCamera CameraServer::AddAxisCamera(std::string_view name,
-                                           wpi::span<const std::string> hosts) {
+                                           std::span<const std::string> hosts) {
   cs::AxisCamera camera{name, hosts};
   StartAutomaticCapture(camera);
   auto csShared = GetCameraServerShared();

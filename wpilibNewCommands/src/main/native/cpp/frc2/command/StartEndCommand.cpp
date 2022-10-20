@@ -16,7 +16,7 @@ StartEndCommand::StartEndCommand(std::function<void()> onInit,
 
 StartEndCommand::StartEndCommand(std::function<void()> onInit,
                                  std::function<void()> onEnd,
-                                 wpi::span<Subsystem* const> requirements)
+                                 std::span<Subsystem* const> requirements)
     : CommandHelper(
           std::move(onInit), [] {},
           [onEnd = std::move(onEnd)](bool interrupted) { onEnd(); },

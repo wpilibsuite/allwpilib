@@ -93,7 +93,7 @@ class PopupState {
 
   SelectedTargetInfo* GetTarget() { return &m_target; }
   FieldObjectModel* GetInsertModel() { return m_insertModel; }
-  wpi::span<const frc::Pose2d> GetInsertPoses() const { return m_insertPoses; }
+  std::span<const frc::Pose2d> GetInsertPoses() const { return m_insertPoses; }
 
   void Display(Field2DModel* model, const FieldFrameData& ffd);
 
@@ -189,7 +189,7 @@ class ObjectInfo {
 
   DisplayOptions GetDisplayOptions() const;
   void DisplaySettings();
-  void DrawLine(ImDrawList* drawList, wpi::span<const ImVec2> points) const;
+  void DrawLine(ImDrawList* drawList, std::span<const ImVec2> points) const;
 
   void LoadImage();
   const gui::Texture& GetTexture() const { return m_texture; }
@@ -617,7 +617,7 @@ void ObjectInfo::DisplaySettings() {
 }
 
 void ObjectInfo::DrawLine(ImDrawList* drawList,
-                          wpi::span<const ImVec2> points) const {
+                          std::span<const ImVec2> points) const {
   if (points.empty()) {
     return;
   }

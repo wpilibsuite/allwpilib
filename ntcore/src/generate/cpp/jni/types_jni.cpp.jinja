@@ -74,7 +74,7 @@ static std::vector<int> FromJavaBooleanArray(JNIEnv* env, jbooleanArray jarr) {
   if (!ref) {
     return {};
   }
-  wpi::span<const jboolean> elements{ref};
+  std::span<const jboolean> elements{ref};
   size_t len = elements.size();
   std::vector<int> arr;
   arr.reserve(len);
@@ -118,7 +118,7 @@ static jobject MakeJObject(JNIEnv* env, nt::Timestamped{{ t.TypeName }} value) {
 {% endfor %}
 {%- for t in types %}
 static jobjectArray MakeJObject(JNIEnv* env,
-                                wpi::span<const nt::Timestamped{{ t.TypeName }}> arr) {
+                                std::span<const nt::Timestamped{{ t.TypeName }}> arr) {
   jobjectArray jarr =
       env->NewObjectArray(arr.size(), timestamped{{ t.TypeName }}Cls, nullptr);
   if (!jarr) {
@@ -133,7 +133,7 @@ static jobjectArray MakeJObject(JNIEnv* env,
 {% endfor %}
 {%- for t in types %}
 {%- if t.jni.ToJavaArray == "MakeJObjectArray" %}
-static jobjectArray MakeJObjectArray(JNIEnv* env, wpi::span<const {{ t.cpp.ValueType }}> arr) {
+static jobjectArray MakeJObjectArray(JNIEnv* env, std::span<const {{ t.cpp.ValueType }}> arr) {
   jobjectArray jarr =
       env->NewObjectArray(arr.size(), {{ t.jni.jtype }}Cls, nullptr);
   if (!jarr) {

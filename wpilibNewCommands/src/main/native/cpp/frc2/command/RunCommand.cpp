@@ -12,6 +12,6 @@ RunCommand::RunCommand(std::function<void()> toRun,
                     [] { return false; }, requirements) {}
 
 RunCommand::RunCommand(std::function<void()> toRun,
-                       wpi::span<Subsystem* const> requirements)
+                       std::span<Subsystem* const> requirements)
     : CommandHelper([] {}, std::move(toRun), [](bool interrupted) {},
                     [] { return false; }, requirements) {}

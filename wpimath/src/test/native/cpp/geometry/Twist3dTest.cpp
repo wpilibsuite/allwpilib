@@ -3,8 +3,7 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #include <cmath>
-
-#include <wpi/numbers>
+#include <numbers>
 
 #include "frc/geometry/Pose3d.h"
 #include "gtest/gtest.h"
@@ -39,8 +38,8 @@ TEST(Twist3dTest, QuarterCircle) {
   Eigen::Vector3d zAxis{0.0, 0.0, 1.0};
 
   const Twist3d quarterCircle{
-      5_m / 2.0 * wpi::numbers::pi,           0_m, 0_m, 0_rad, 0_rad,
-      units::radian_t{wpi::numbers::pi / 2.0}};
+      5_m / 2.0 * std::numbers::pi,           0_m, 0_m, 0_rad, 0_rad,
+      units::radian_t{std::numbers::pi / 2.0}};
   const auto quarterCirclePose = Pose3d{}.Exp(quarterCircle);
 
   Pose3d expected{5_m, 5_m, 0_m, Rotation3d{zAxis, 90_deg}};
@@ -73,7 +72,7 @@ TEST(Twist3dTest, Pose3dLogX) {
 
   const auto twist = start.Log(end);
 
-  Twist3d expected{0_m,   units::meter_t{5.0 / 2.0 * wpi::numbers::pi},
+  Twist3d expected{0_m,   units::meter_t{5.0 / 2.0 * std::numbers::pi},
                    0_m,   90_deg,
                    0_deg, 0_deg};
   EXPECT_EQ(expected, twist);
@@ -89,7 +88,7 @@ TEST(Twist3dTest, Pose3dLogY) {
 
   const auto twist = start.Log(end);
 
-  Twist3d expected{0_m,   0_m,    units::meter_t{5.0 / 2.0 * wpi::numbers::pi},
+  Twist3d expected{0_m,   0_m,    units::meter_t{5.0 / 2.0 * std::numbers::pi},
                    0_deg, 90_deg, 0_deg};
   EXPECT_EQ(expected, twist);
 
@@ -104,7 +103,7 @@ TEST(Twist3dTest, Pose3dLogZ) {
 
   const auto twist = start.Log(end);
 
-  Twist3d expected{units::meter_t{5.0 / 2.0 * wpi::numbers::pi},
+  Twist3d expected{units::meter_t{5.0 / 2.0 * std::numbers::pi},
                    0_m,
                    0_m,
                    0_deg,

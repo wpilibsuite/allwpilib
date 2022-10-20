@@ -54,8 +54,8 @@ inline void Topic::DeleteProperty(std::string_view name) {
   ::nt::DeleteTopicProperty(m_handle, name);
 }
 
-inline void Topic::SetProperties(const wpi::json& properties) {
-  ::nt::SetTopicProperties(m_handle, properties);
+inline bool Topic::SetProperties(const wpi::json& properties) {
+  return ::nt::SetTopicProperties(m_handle, properties);
 }
 
 inline TopicInfo Topic::GetInfo() const {
@@ -71,6 +71,9 @@ inline Subscriber::Subscriber(Subscriber&& rhs) : m_subHandle{rhs.m_subHandle} {
 }
 
 inline Subscriber& Subscriber::operator=(Subscriber&& rhs) {
+  if (m_subHandle != 0) {
+    ::nt::Release(m_subHandle);
+  }
   m_subHandle = rhs.m_subHandle;
   rhs.m_subHandle = 0;
   return *this;
@@ -97,6 +100,9 @@ inline Publisher::Publisher(Publisher&& rhs) : m_pubHandle{rhs.m_pubHandle} {
 }
 
 inline Publisher& Publisher::operator=(Publisher&& rhs) {
+  if (m_pubHandle != 0) {
+    ::nt::Release(m_pubHandle);
+  }
   m_pubHandle = rhs.m_pubHandle;
   rhs.m_pubHandle = 0;
   return *this;

@@ -6,10 +6,10 @@
 
 #include <stdint.h>
 
+#include <span>
 #include <vector>
 
 #include <wpi/raw_ostream.h>
-#include <wpi/span.h>
 
 #include "gmock/gmock.h"
 #include "net3/WireConnection3.h"
@@ -24,7 +24,7 @@ class MockWireConnection3 : public WireConnection3 {
 
   Writer Send() override { return {m_os, *this}; }
 
-  MOCK_METHOD(void, Data, (wpi::span<const uint8_t> data));
+  MOCK_METHOD(void, Data, (std::span<const uint8_t> data));
 
   MOCK_METHOD(void, Flush, (), (override));
 

@@ -4,8 +4,9 @@
 
 #pragma once
 
+#include <numbers>
+
 #include <wpi/SymbolExports.h>
-#include <wpi/numbers>
 
 #include "units/angle.h"
 #include "units/base.h"
@@ -112,8 +113,8 @@ constexpr T InputModulus(T input, T minimumInput, T maximumInput) {
 WPILIB_DLLEXPORT
 constexpr units::radian_t AngleModulus(units::radian_t angle) {
   return InputModulus<units::radian_t>(angle,
-                                       units::radian_t{-wpi::numbers::pi},
-                                       units::radian_t{wpi::numbers::pi});
+                                       units::radian_t{-std::numbers::pi},
+                                       units::radian_t{std::numbers::pi});
 }
 
 }  // namespace frc

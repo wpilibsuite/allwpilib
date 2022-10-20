@@ -8,11 +8,10 @@
 #include <initializer_list>
 #include <memory>
 #include <ostream>
+#include <span>
 #include <type_traits>
 #include <utility>
 #include <vector>
-
-#include <wpi/span.h>
 
 #include "TestPrinters.h"
 #include "gmock/gmock.h"
@@ -20,11 +19,11 @@
 namespace wpi {
 
 template <typename T>
-class SpanMatcher : public ::testing::MatcherInterface<span<T>> {
+class SpanMatcher : public ::testing::MatcherInterface<std::span<T>> {
  public:
-  explicit SpanMatcher(span<T> good_) : good{good_.begin(), good_.end()} {}
+  explicit SpanMatcher(std::span<T> good_) : good{good_.begin(), good_.end()} {}
 
-  bool MatchAndExplain(span<T> val,
+  bool MatchAndExplain(std::span<T> val,
                        ::testing::MatchResultListener* listener) const override;
   void DescribeTo(::std::ostream* os) const override;
   void DescribeNegationTo(::std::ostream* os) const override;
@@ -34,12 +33,12 @@ class SpanMatcher : public ::testing::MatcherInterface<span<T>> {
 };
 
 template <typename T>
-inline ::testing::Matcher<span<const T>> SpanEq(span<const T> good) {
+inline ::testing::Matcher<std::span<const T>> SpanEq(std::span<const T> good) {
   return ::testing::MakeMatcher(new SpanMatcher(good));
 }
 
 template <typename T>
-inline ::testing::Matcher<span<const T>> SpanEq(
+inline ::testing::Matcher<std::span<const T>> SpanEq(
     std::initializer_list<const T> good) {
   return ::testing::MakeMatcher(
       new SpanMatcher<const T>({good.begin(), good.end()}));
@@ -47,7 +46,7 @@ inline ::testing::Matcher<span<const T>> SpanEq(
 
 template <typename T>
 bool SpanMatcher<T>::MatchAndExplain(
-    span<T> val, ::testing::MatchResultListener* listener) const {
+    std::span<T> val, ::testing::MatchResultListener* listener) const {
   if (val.size() != good.size() ||
       !std::equal(val.begin(), val.end(), good.begin())) {
     return false;
@@ -57,17 +56,17 @@ bool SpanMatcher<T>::MatchAndExplain(
 
 template <typename T>
 void SpanMatcher<T>::DescribeTo(::std::ostream* os) const {
-  PrintTo(span<T>{good}, os);
+  PrintTo(std::span<T>{good}, os);
 }
 
 template <typename T>
 void SpanMatcher<T>::DescribeNegationTo(::std::ostream* os) const {
   *os << "is not equal to ";
-  PrintTo(span<T>{good}, os);
+  PrintTo(std::span<T>{good}, os);
 }
 
 }  // namespace wpi
 
-inline wpi::span<const uint8_t> operator"" _us(const char* str, size_t len) {
+inline std::span<const uint8_t> operator"" _us(const char* str, size_t len) {
   return {reinterpret_cast<const uint8_t*>(str), len};
 }

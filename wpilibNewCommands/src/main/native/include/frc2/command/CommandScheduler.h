@@ -6,6 +6,7 @@
 
 #include <initializer_list>
 #include <memory>
+#include <span>
 #include <utility>
 
 #include <frc/Errors.h>
@@ -16,7 +17,6 @@
 #include <wpi/FunctionExtras.h>
 #include <wpi/deprecated.h>
 #include <wpi/sendable/SendableHelper.h>
-#include <wpi/span.h>
 
 namespace frc2 {
 class Command;
@@ -111,7 +111,7 @@ class CommandScheduler final : public nt::NTSendable,
    *
    * @param commands the commands to schedule
    */
-  void Schedule(wpi::span<Command* const> commands);
+  void Schedule(std::span<Command* const> commands);
 
   /**
    * Schedules multiple commands for execution. Does nothing for commands
@@ -159,10 +159,10 @@ class CommandScheduler final : public nt::NTSendable,
   void UnregisterSubsystem(Subsystem* subsystem);
 
   void RegisterSubsystem(std::initializer_list<Subsystem*> subsystems);
-  void RegisterSubsystem(wpi::span<Subsystem* const> subsystems);
+  void RegisterSubsystem(std::span<Subsystem* const> subsystems);
 
   void UnregisterSubsystem(std::initializer_list<Subsystem*> subsystems);
-  void UnregisterSubsystem(wpi::span<Subsystem* const> subsystems);
+  void UnregisterSubsystem(std::span<Subsystem* const> subsystems);
 
   /**
    * Sets the default command for a subsystem.  Registers that subsystem if it
@@ -179,11 +179,11 @@ class CommandScheduler final : public nt::NTSendable,
                          Command, std::remove_reference_t<T>>>>
   void SetDefaultCommand(Subsystem* subsystem, T&& defaultCommand) {
     if (!defaultCommand.HasRequirement(subsystem)) {
-      throw FRC_MakeError(frc::err::CommandIllegalUse, "{}",
+      throw FRC_MakeError(frc::err::CommandIllegalUse,
                           "Default commands must require their subsystem!");
     }
     if (defaultCommand.IsFinished()) {
-      throw FRC_MakeError(frc::err::CommandIllegalUse, "{}",
+      throw FRC_MakeError(frc::err::CommandIllegalUse,
                           "Default commands should not end!");
     }
     SetDefaultCommandImpl(subsystem,
@@ -234,7 +234,7 @@ class CommandScheduler final : public nt::NTSendable,
    *
    * @param commands the commands to cancel
    */
-  void Cancel(wpi::span<Command* const> commands);
+  void Cancel(std::span<Command* const> commands);
 
   /**
    * Cancels commands. The scheduler will only call Command::End()
@@ -261,7 +261,7 @@ class CommandScheduler final : public nt::NTSendable,
    * @param commands the command to query
    * @return whether the command is currently scheduled
    */
-  bool IsScheduled(wpi::span<const Command* const> commands) const;
+  bool IsScheduled(std::span<const Command* const> commands) const;
 
   /**
    * Whether the given commands are running.  Note that this only works on

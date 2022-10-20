@@ -85,6 +85,9 @@ model {
                         into '/cpp'
                     }
                     installTask.libs.each {
+                        if (it.absolutePath.endsWith('.debug')) {
+                            return
+                        }
                         task.from(it) {
                             into '/libs'
                         }

@@ -4,12 +4,11 @@
 
 #pragma once
 
+#include <span>
 #include <string>
 #include <string_view>
 #include <utility>
 #include <vector>
-
-#include <wpi/span.h>
 
 #include "ntcore_cpp.h"
 
@@ -20,7 +19,7 @@ class INetworkClient {
   virtual ~INetworkClient() = default;
 
   virtual void SetServers(
-      wpi::span<const std::pair<std::string, unsigned int>> servers) = 0;
+      std::span<const std::pair<std::string, unsigned int>> servers) = 0;
 
   virtual void StartDSClient(unsigned int port) = 0;
   virtual void StopDSClient() = 0;

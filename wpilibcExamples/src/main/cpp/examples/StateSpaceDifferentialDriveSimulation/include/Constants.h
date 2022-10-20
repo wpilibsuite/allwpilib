@@ -2,6 +2,8 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
+#include <numbers>
+
 #include <frc/kinematics/DifferentialDriveKinematics.h>
 #include <frc/system/plant/DCMotor.h>
 #include <frc/system/plant/LinearSystemId.h>
@@ -12,7 +14,6 @@
 #include <units/time.h>
 #include <units/velocity.h>
 #include <units/voltage.h>
-#include <wpi/numbers>
 
 #pragma once
 
@@ -43,7 +44,7 @@ constexpr int kEncoderCPR = 1024;
 constexpr auto kWheelDiameter = 6_in;
 constexpr double kEncoderDistancePerPulse =
     // Assumes the encoders are directly mounted on the wheel shafts
-    (kWheelDiameter.value() * wpi::numbers::pi) /
+    (kWheelDiameter.value() * std::numbers::pi) /
     static_cast<double>(kEncoderCPR);
 
 // These are example values only - DO NOT USE THESE FOR YOUR OWN ROBOT!

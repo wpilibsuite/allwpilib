@@ -4,6 +4,8 @@
 
 #pragma once
 
+#include <numbers>
+
 #include <frc/Encoder.h>
 #include <frc/controller/PIDController.h>
 #include <frc/controller/ProfiledPIDController.h>
@@ -14,7 +16,6 @@
 #include <units/time.h>
 #include <units/velocity.h>
 #include <units/voltage.h>
-#include <wpi/numbers>
 
 class SwerveModule {
  public:
@@ -29,9 +30,9 @@ class SwerveModule {
   static constexpr int kEncoderResolution = 4096;
 
   static constexpr auto kModuleMaxAngularVelocity =
-      wpi::numbers::pi * 1_rad_per_s;  // radians per second
+      std::numbers::pi * 1_rad_per_s;  // radians per second
   static constexpr auto kModuleMaxAngularAcceleration =
-      wpi::numbers::pi * 2_rad_per_s / 1_s;  // radians per second^2
+      std::numbers::pi * 2_rad_per_s / 1_s;  // radians per second^2
 
   frc::PWMSparkMax m_driveMotor;
   frc::PWMSparkMax m_turningMotor;

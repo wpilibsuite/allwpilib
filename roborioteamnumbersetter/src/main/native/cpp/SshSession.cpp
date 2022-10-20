@@ -18,7 +18,7 @@
 
 using namespace sysid;
 
-#define INFO(fmt, ...) WPI_INFO(m_logger, fmt, __VA_ARGS__)
+#define INFO(fmt, ...) WPI_INFO(m_logger, fmt __VA_OPT__(, ) __VA_ARGS__)
 
 SshSession::SshSession(std::string_view host, int port, std::string_view user,
                        std::string_view pass, wpi::Logger& logger)

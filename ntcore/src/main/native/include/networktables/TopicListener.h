@@ -5,10 +5,9 @@
 #pragma once
 
 #include <functional>
+#include <span>
 #include <string_view>
 #include <vector>
-
-#include <wpi/span.h>
 
 #include "ntcore_cpp.h"
 
@@ -83,7 +82,7 @@ class TopicListener final {
    * @param listener Listener function
    */
   TopicListener(NetworkTableInstance inst,
-                wpi::span<const std::string_view> prefixes, unsigned int mask,
+                std::span<const std::string_view> prefixes, unsigned int mask,
                 std::function<void(const TopicNotification&)> listener);
 
   /**
@@ -183,7 +182,7 @@ class TopicListenerPoller final {
    * @param mask Bitmask of TopicListenerFlags values
    * @return Listener handle
    */
-  NT_TopicListener Add(wpi::span<const std::string_view> prefixes,
+  NT_TopicListener Add(std::span<const std::string_view> prefixes,
                        unsigned int mask);
 
   /**

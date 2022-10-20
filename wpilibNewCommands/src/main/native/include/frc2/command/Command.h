@@ -7,13 +7,13 @@
 #include <functional>
 #include <initializer_list>
 #include <memory>
+#include <span>
 #include <string>
 
 #include <units/time.h>
 #include <wpi/Demangle.h>
 #include <wpi/SmallSet.h>
 #include <wpi/deprecated.h>
-#include <wpi/span.h>
 
 #include "frc2/command/Subsystem.h"
 
@@ -171,7 +171,7 @@ class Command {
    */
   [[nodiscard]] CommandPtr BeforeStarting(
       std::function<void()> toRun,
-      wpi::span<Subsystem* const> requirements = {}) &&;
+      std::span<Subsystem* const> requirements = {}) &&;
 
   /**
    * Decorates this command with a runnable to run after the command finishes.
@@ -193,7 +193,7 @@ class Command {
    */
   [[nodiscard]] CommandPtr AndThen(
       std::function<void()> toRun,
-      wpi::span<Subsystem* const> requirements = {}) &&;
+      std::span<Subsystem* const> requirements = {}) &&;
 
   /**
    * Decorates this command to run perpetually, ignoring its ordinary end

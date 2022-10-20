@@ -71,4 +71,4 @@ target_link_libraries(imgui PUBLIC gl3w glfw)
 target_include_directories(imgui PUBLIC "$<BUILD_INTERFACE:${imgui_srcdir}>" "$<BUILD_INTERFACE:${imgui_srcdir}/misc/cpp>" "$<BUILD_INTERFACE:${implot_srcdir}>" "$<BUILD_INTERFACE:${imgui_srcdir}/backends>" "$<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>" "$<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/stb-src>")
 
 set_property(TARGET imgui PROPERTY POSITION_INDEPENDENT_CODE ON)
-target_compile_features(imgui PUBLIC cxx_std_17)
+target_compile_features(imgui PUBLIC cxx_std_20)

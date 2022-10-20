@@ -108,6 +108,11 @@ subprojects {
         subproj.apply plugin: MultiBuilds
     }
 
+    plugins.withType(JavaPlugin) {
+        sourceCompatibility = 11
+        targetCompatibility = 11
+    }
+
     apply from: "${rootDir}/shared/java/javastyle.gradle"
 
     // Disables doclint in java 8.

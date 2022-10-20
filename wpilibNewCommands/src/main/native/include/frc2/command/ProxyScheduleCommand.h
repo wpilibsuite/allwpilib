@@ -5,9 +5,9 @@
 #pragma once
 
 #include <memory>
+#include <span>
 
 #include <wpi/SmallVector.h>
-#include <wpi/span.h>
 
 #include "frc2/command/CommandBase.h"
 #include "frc2/command/CommandHelper.h"
@@ -31,7 +31,7 @@ class ProxyScheduleCommand
    *
    * @param toSchedule the commands to schedule
    */
-  explicit ProxyScheduleCommand(wpi::span<Command* const> toSchedule);
+  explicit ProxyScheduleCommand(std::span<Command* const> toSchedule);
 
   explicit ProxyScheduleCommand(Command* toSchedule);
 

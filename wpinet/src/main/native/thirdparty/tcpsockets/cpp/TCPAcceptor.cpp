@@ -80,7 +80,7 @@ int TCPAcceptor::start() {
 
   m_lsd = socket(PF_INET, SOCK_STREAM, 0);
   if (m_lsd < 0) {
-    WPI_ERROR(m_logger, "{}", "could not create socket");
+    WPI_ERROR(m_logger, "could not create socket");
     return -1;
   }
   struct sockaddr_in address;

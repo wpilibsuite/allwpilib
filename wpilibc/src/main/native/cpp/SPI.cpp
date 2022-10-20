@@ -25,7 +25,7 @@ class SPI::Accumulator {
  public:
   Accumulator(HAL_SPIPort port, int xferSize, int validMask, int validValue,
               int dataShift, int dataSize, bool isSigned, bool bigEndian)
-      : m_notifier([=] {
+      : m_notifier([=, this] {
           std::scoped_lock lock(m_mutex);
           Update();
         }),
@@ -268,7 +268,7 @@ void SPI::FreeAuto() {
   FRC_CheckErrorStatus(status, "Port {}", static_cast<int>(m_port));
 }
 
-void SPI::SetAutoTransmitData(wpi::span<const uint8_t> dataToSend,
+void SPI::SetAutoTransmitData(std::span<const uint8_t> dataToSend,
                               int zeroSize) {
   int32_t status = 0;
   HAL_SetSPIAutoTransmitData(m_port, dataToSend.data(), dataToSend.size(),

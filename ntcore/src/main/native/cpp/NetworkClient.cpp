@@ -48,7 +48,7 @@ class NCImpl {
   virtual ~NCImpl() = default;
 
   // user-facing functions
-  void SetServers(wpi::span<const std::pair<std::string, unsigned int>> servers,
+  void SetServers(std::span<const std::pair<std::string, unsigned int>> servers,
                   unsigned int defaultPort);
   void StartDSClient(unsigned int port);
   void StopDSClient();
@@ -131,11 +131,11 @@ NCImpl::NCImpl(int inst, std::string_view id, net::ILocalStorage& localStorage,
       m_loop{*m_loopRunner.GetLoop()} {
   m_localMsgs.reserve(net::NetworkLoopQueue::kInitialQueueSize);
 
-  INFO("{}", "starting network client");
+  INFO("starting network client");
 }
 
 void NCImpl::SetServers(
-    wpi::span<const std::pair<std::string, unsigned int>> servers,
+    std::span<const std::pair<std::string, unsigned int>> servers,
     unsigned int defaultPort) {
   std::vector<std::pair<std::string, unsigned int>> serversCopy;
   serversCopy.reserve(servers.size());
@@ -154,7 +154,7 @@ void NCImpl::SetServers(
 }
 
 void NCImpl::StartDSClient(unsigned int port) {
-  m_loopRunner.ExecAsync([=](uv::Loop& loop) {
+  m_loopRunner.ExecAsync([=, this](uv::Loop& loop) {
     if (m_dsClient) {
       return;
     }
@@ -285,13 +285,13 @@ void NCImpl3::TcpConnected(uv::Tcp& tcp) {
           }
         });
         tcp.end.connect([this, &tcp] {
-          DEBUG3("{}", "NT3 TCP read ended");
+          DEBUG3("NT3 TCP read ended");
           if (!tcp.IsLoopClosing()) {
             Disconnect("remote end closed connection");
           }
         });
         tcp.closed.connect([this, &tcp] {
-          DEBUG3("{}", "NT3 TCP connection closed");
+          DEBUG3("NT3 TCP connection closed");
           if (!tcp.IsLoopClosing()) {
             Disconnect(m_wire->GetDisconnectReason());
           }
@@ -432,7 +432,7 @@ void NCImpl4::WsConnected(wpi::WebSocket& ws, uv::Tcp& tcp) {
   ws.text.connect([this](std::string_view data, bool) {
     m_clientImpl->ProcessIncomingText(data);
   });
-  ws.binary.connect([this](wpi::span<const uint8_t> data, bool) {
+  ws.binary.connect([this](std::span<const uint8_t> data, bool) {
     m_clientImpl->ProcessIncomingBinary(data);
   });
 }
@@ -463,7 +463,7 @@ NetworkClient::~NetworkClient() {
 }
 
 void NetworkClient::SetServers(
-    wpi::span<const std::pair<std::string, unsigned int>> servers) {
+    std::span<const std::pair<std::string, unsigned int>> servers) {
   m_impl->SetServers(servers, NT_DEFAULT_PORT4);
 }
 
@@ -505,7 +505,7 @@ NetworkClient3::~NetworkClient3() {
 }
 
 void NetworkClient3::SetServers(
-    wpi::span<const std::pair<std::string, unsigned int>> servers) {
+    std::span<const std::pair<std::string, unsigned int>> servers) {
   m_impl->SetServers(servers, NT_DEFAULT_PORT3);
 }
 

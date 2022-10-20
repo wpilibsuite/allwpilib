@@ -23,36 +23,36 @@ wpi::json Topic::GetProperties() const {
 }
 
 GenericSubscriber Topic::GenericSubscribe(
-    wpi::span<const PubSubOption> options) {
+    std::span<const PubSubOption> options) {
   return GenericSubscribe("", options);
 }
 
 GenericSubscriber Topic::GenericSubscribe(
-    std::string_view typeString, wpi::span<const PubSubOption> options) {
+    std::string_view typeString, std::span<const PubSubOption> options) {
   return GenericSubscriber{::nt::Subscribe(
       m_handle, ::nt::GetTypeFromString(typeString), typeString, options)};
 }
 
 GenericPublisher Topic::GenericPublish(std::string_view typeString,
-                                       wpi::span<const PubSubOption> options) {
+                                       std::span<const PubSubOption> options) {
   return GenericPublisher{::nt::Publish(
       m_handle, ::nt::GetTypeFromString(typeString), typeString, options)};
 }
 
 GenericPublisher Topic::GenericPublishEx(
     std::string_view typeString, const wpi::json& properties,
-    wpi::span<const PubSubOption> options) {
+    std::span<const PubSubOption> options) {
   return GenericPublisher{::nt::PublishEx(m_handle,
                                           ::nt::GetTypeFromString(typeString),
                                           typeString, properties, options)};
 }
 
-GenericEntry Topic::GetGenericEntry(wpi::span<const PubSubOption> options) {
+GenericEntry Topic::GetGenericEntry(std::span<const PubSubOption> options) {
   return GetGenericEntry("", options);
 }
 
 GenericEntry Topic::GetGenericEntry(std::string_view typeString,
-                                    wpi::span<const PubSubOption> options) {
+                                    std::span<const PubSubOption> options) {
   return GenericEntry{::nt::GetEntry(
       m_handle, ::nt::GetTypeFromString(typeString), typeString, options)};
 }

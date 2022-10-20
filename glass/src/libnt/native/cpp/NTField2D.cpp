@@ -32,8 +32,8 @@ class NTField2DModel::ObjectModel : public FieldObjectModel {
   bool Exists() override { return m_topic.Exists(); }
   bool IsReadOnly() override { return false; }
 
-  wpi::span<const frc::Pose2d> GetPoses() override { return m_poses; }
-  void SetPoses(wpi::span<const frc::Pose2d> poses) override;
+  std::span<const frc::Pose2d> GetPoses() override { return m_poses; }
+  void SetPoses(std::span<const frc::Pose2d> poses) override;
   void SetPose(size_t i, frc::Pose2d pose) override;
   void SetPosition(size_t i, frc::Translation2d pos) override;
   void SetRotation(size_t i, frc::Rotation2d rot) override;
@@ -78,7 +78,7 @@ void NTField2DModel::ObjectModel::UpdateNT() {
   m_pub.Set(arr);
 }
 
-void NTField2DModel::ObjectModel::SetPoses(wpi::span<const frc::Pose2d> poses) {
+void NTField2DModel::ObjectModel::SetPoses(std::span<const frc::Pose2d> poses) {
   m_poses.assign(poses.begin(), poses.end());
   UpdateNT();
 }

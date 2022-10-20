@@ -7,6 +7,7 @@
 #include <stdint.h>
 
 #include <atomic>
+#include <span>
 #include <system_error>
 #include <vector>
 
@@ -256,7 +257,7 @@ void ServerConnection4::ProcessWsUpgrade() {
     m_websocket->text.connect([this](std::string_view data, bool) {
       m_server.m_serverImpl.ProcessIncomingText(m_clientId, data);
     });
-    m_websocket->binary.connect([this](wpi::span<const uint8_t> data, bool) {
+    m_websocket->binary.connect([this](std::span<const uint8_t> data, bool) {
       m_server.m_serverImpl.ProcessIncomingBinary(m_clientId, data);
     });
 
@@ -327,7 +328,7 @@ NSImpl::NSImpl(std::string_view persistentFilename,
       m_localQueue{logger},
       m_loop(*m_loopRunner.GetLoop()) {
   m_localMsgs.reserve(net::NetworkLoopQueue::kInitialQueueSize);
-  m_loopRunner.ExecAsync([=](uv::Loop& loop) {
+  m_loopRunner.ExecAsync([=, this](uv::Loop& loop) {
     // connect local storage to server
     {
       net::ServerStartup startup{m_serverImpl};
@@ -359,7 +360,7 @@ void NSImpl::LoadPersistent() {
   is.readinto(m_persistentData, size);
   DEBUG4("read data: {}", m_persistentData);
   if (is.has_error()) {
-    WARNING("{}", "error reading persistent file");
+    WARNING("error reading persistent file");
     return;
   }
 }
@@ -452,7 +453,7 @@ void NSImpl::Init() {
       if (uv::AddrToName(tcp->GetPeer(), &peerAddr, &peerPort) == 0) {
         INFO("Got a NT3 connection from {} port {}", peerAddr, peerPort);
       } else {
-        INFO("{}", "Got a NT3 connection from unknown");
+        INFO("Got a NT3 connection from unknown");
       }
       auto conn = std::make_shared<ServerConnection3>(tcp, *this, peerAddr,
                                                       peerPort, m_logger);
@@ -484,7 +485,7 @@ void NSImpl::Init() {
       if (uv::AddrToName(tcp->GetPeer(), &peerAddr, &peerPort) == 0) {
         INFO("Got a NT4 connection from {} port {}", peerAddr, peerPort);
       } else {
-        INFO("{}", "Got a NT4 connection from unknown");
+        INFO("Got a NT4 connection from unknown");
       }
       auto conn = std::make_shared<ServerConnection4>(tcp, *this, peerAddr,
                                                       peerPort, m_logger);
@@ -495,7 +496,7 @@ void NSImpl::Init() {
   }
 
   if (m_initDone) {
-    DEBUG4("{}", "NetworkServer initDone()");
+    DEBUG4("NetworkServer initDone()");
     m_initDone();
     m_initDone = nullptr;
   }

@@ -18,6 +18,16 @@ namespace hal {
  * outside of the UnsafeManipulateDIO callback.
  */
 struct DIOSetProxy {
+  DIOSetProxy(tDIO::tOutputEnable setOutputDirReg,
+              tDIO::tOutputEnable unsetOutputDirReg,
+              tDIO::tDO setOutputStateReg, tDIO::tDO unsetOutputStateReg,
+              tDIO* dio)
+      : m_setOutputDirReg{setOutputDirReg},
+        m_unsetOutputDirReg{unsetOutputDirReg},
+        m_setOutputStateReg{setOutputStateReg},
+        m_unsetOutputStateReg{unsetOutputStateReg},
+        m_dio{dio} {}
+
   DIOSetProxy(const DIOSetProxy&) = delete;
   DIOSetProxy(DIOSetProxy&&) = delete;
   DIOSetProxy& operator=(const DIOSetProxy&) = delete;

@@ -7,11 +7,11 @@
 
 #include <initializer_list>
 #include <memory>
+#include <span>
 #include <string>
 #include <string_view>
 
 #include <wpi/SmallVector.h>
-#include <wpi/span.h>
 
 #include "wpinet/HttpServerConnection.h"
 #include "wpinet/WebSocket.h"
@@ -37,7 +37,7 @@ class HttpWebSocketServerConnection
    * @param protocols Acceptable subprotocols
    */
   HttpWebSocketServerConnection(std::shared_ptr<uv::Stream> stream,
-                                span<const std::string_view> protocols);
+                                std::span<const std::string_view> protocols);
 
   /**
    * Constructor.

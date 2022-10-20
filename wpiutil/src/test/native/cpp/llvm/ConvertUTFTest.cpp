@@ -18,7 +18,7 @@ using namespace wpi;
 TEST(ConvertUTFTest, ConvertUTF16LittleEndianToUTF8String) {
   // Src is the look of disapproval.
   alignas(UTF16) static const char Src[] = "\xff\xfe\xa0\x0c_\x00\xa0\x0c";
-  span<const char> Ref(Src, sizeof(Src) - 1);
+  std::span<const char> Ref(Src, sizeof(Src) - 1);
   SmallString<20> Result;
   bool Success = convertUTF16ToUTF8String(Ref, Result);
   EXPECT_TRUE(Success);
@@ -29,7 +29,7 @@ TEST(ConvertUTFTest, ConvertUTF16LittleEndianToUTF8String) {
 TEST(ConvertUTFTest, ConvertUTF16BigEndianToUTF8String) {
   // Src is the look of disapproval.
   alignas(UTF16) static const char Src[] = "\xfe\xff\x0c\xa0\x00_\x0c\xa0";
-  span<const char> Ref(Src, sizeof(Src) - 1);
+  std::span<const char> Ref(Src, sizeof(Src) - 1);
   SmallString<20> Result;
   bool Success = convertUTF16ToUTF8String(Ref, Result);
   EXPECT_TRUE(Success);
@@ -52,13 +52,13 @@ TEST(ConvertUTFTest, ConvertUTF8ToUTF16String) {
 
 TEST(ConvertUTFTest, OddLengthInput) {
   SmallString<20> Result;
-  bool Success = convertUTF16ToUTF8String(span<const char>("xxxxx", 5), Result);
+  bool Success = convertUTF16ToUTF8String(std::span<const char>("xxxxx", 5), Result);
   EXPECT_FALSE(Success);
 }
 
 TEST(ConvertUTFTest, Empty) {
   SmallString<20> Result;
-  bool Success = convertUTF16ToUTF8String(span<const char>(), Result);
+  bool Success = convertUTF16ToUTF8String(std::span<const char>(), Result);
   EXPECT_TRUE(Success);
   EXPECT_TRUE(std::string{Result}.empty());
 }
@@ -82,7 +82,7 @@ TEST(ConvertUTFTest, HasUTF16BOM) {
 TEST(ConvertUTFTest, UTF16WrappersForConvertUTF16ToUTF8String) {
   // Src is the look of disapproval.
   alignas(UTF16) static const char Src[] = "\xff\xfe\xa0\x0c_\x00\xa0\x0c";
-  span<const UTF16> SrcRef((const UTF16 *)Src, 4);
+  std::span<const UTF16> SrcRef((const UTF16 *)Src, 4);
   SmallString<20> Result;
   bool Success = convertUTF16ToUTF8String(SrcRef, Result);
   EXPECT_TRUE(Success);

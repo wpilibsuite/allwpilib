@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include <span>
 #include <string>
 #include <vector>
 
@@ -55,7 +56,7 @@ inline void NetworkLoopQueue::SetProperties(NT_Topic topicHandle,
 }
 
 inline void NetworkLoopQueue::Subscribe(NT_Subscriber subHandle,
-                                        wpi::span<const std::string> topicNames,
+                                        std::span<const std::string> topicNames,
                                         const PubSubOptions& options) {
   std::scoped_lock lock{m_mutex};
   m_queue.emplace_back(ClientMessage{SubscribeMsg{

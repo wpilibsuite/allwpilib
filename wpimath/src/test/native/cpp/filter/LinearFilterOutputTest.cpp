@@ -7,10 +7,10 @@
 #include <cmath>
 #include <functional>
 #include <memory>
+#include <numbers>
 #include <random>
 
 #include <wpi/array.h>
-#include <wpi/numbers>
 
 #include "gtest/gtest.h"
 #include "units/time.h"
@@ -33,8 +33,8 @@ enum LinearFilterOutputTestType {
 };
 
 static double GetData(double t) {
-  return 100.0 * std::sin(2.0 * wpi::numbers::pi * t) +
-         20.0 * std::cos(50.0 * wpi::numbers::pi * t);
+  return 100.0 * std::sin(2.0 * std::numbers::pi * t) +
+         20.0 * std::cos(50.0 * std::numbers::pi * t);
 }
 
 static double GetPulseData(double t) {
