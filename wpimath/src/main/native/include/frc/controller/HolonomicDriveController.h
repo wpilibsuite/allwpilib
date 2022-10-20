@@ -45,6 +45,12 @@ class WPILIB_DLLEXPORT HolonomicDriveController {
       frc2::PIDController xController, frc2::PIDController yController,
       ProfiledPIDController<units::radian> thetaController);
 
+  HolonomicDriveController(const HolonomicDriveController&) = default;
+  HolonomicDriveController& operator=(const HolonomicDriveController&) =
+      default;
+  HolonomicDriveController(HolonomicDriveController&&) = default;
+  HolonomicDriveController& operator=(HolonomicDriveController&&) = default;
+
   /**
    * Returns true if the pose error is within tolerance of the reference.
    */
