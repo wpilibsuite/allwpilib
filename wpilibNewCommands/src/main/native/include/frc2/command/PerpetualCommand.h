@@ -41,11 +41,11 @@ class PerpetualCommand : public CommandHelper<CommandBase, PerpetualCommand> {
    *
    * @param command the command to run perpetually
    */
-  WPI_DEPRECATED("PerpetualCommand violates the assumption that execute() doesn't get called after isFinished() returns true -- an assumption that should be valid.
-This was unsafe/undefined behavior from the start, and RepeatCommand provides an easy way to achieve similar end results with slightly different (and safe) semantics.")
+  WPI_DEPRECATED("PerpetualCommand violates the assumption that execute() doesn't get called after isFinished() returns true -- an assumption that should be valid."
+"This was unsafe/undefined behavior from the start, and RepeatCommand provides an easy way to achieve similar end results with slightly different (and safe) semantics.")
   explicit PerpetualCommand(std::unique_ptr<Command>&& command);
-
   WPI_IGNORE_DEPRECATED
+
   /**
    * Creates a new PerpetualCommand.  Will run another command in perpetuity,
    * ignoring that command's end conditions, unless this command itself is
@@ -55,8 +55,8 @@ This was unsafe/undefined behavior from the start, and RepeatCommand provides an
    */
   template <class T, typename = std::enable_if_t<std::is_base_of_v<
                          Command, std::remove_reference_t<T>>>>
-  WPI_DEPRECATED("PerpetualCommand violates the assumption that execute() doesn't get called after isFinished() returns true -- an assumption that should be valid.
-This was unsafe/undefined behavior from the start, and RepeatCommand provides an easy way to achieve similar end results with slightly different (and safe) semantics.")
+  WPI_DEPRECATED("PerpetualCommand violates the assumption that execute() doesn't get called after isFinished() returns true -- an assumption that should be valid."
+"This was unsafe/undefined behavior from the start, and RepeatCommand provides an easy way to achieve similar end results with slightly different (and safe) semantics.")
   explicit PerpetualCommand(T&& command)
       : PerpetualCommand(std::make_unique<std::remove_reference_t<T>>(
             std::forward<T>(command))) {}

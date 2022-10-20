@@ -203,8 +203,8 @@ class Command {
    * @deprecated PerpetualCommand violates the assumption that execute() doesn't get called after isFinished() returns true -- an assumption that should be valid.
 This was unsafe/undefined behavior from the start, and RepeatCommand provides an easy way to achieve similar end results with slightly different (and safe) semantics.
    */
-  WPI_DEPRECATED("PerpetualCommand violates the assumption that execute() doesn't get called after isFinished() returns true -- an assumption that should be valid.
-This was unsafe/undefined behavior from the start, and RepeatCommand provides an easy way to achieve similar end results with slightly different (and safe) semantics.")
+  WPI_DEPRECATED("PerpetualCommand violates the assumption that execute() doesn't get called after isFinished() returns true -- an assumption that should be valid."
+"This was unsafe/undefined behavior from the start, and RepeatCommand provides an easy way to achieve similar end results with slightly different (and safe) semantics.")
   PerpetualCommand Perpetually() &&;
 
   /**
