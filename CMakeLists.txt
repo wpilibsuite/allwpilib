@@ -118,6 +118,27 @@ FATAL: Cannot build simulation modules with wpilib disabled.
 ")
 endif()
 
+if (NOT WITH_NTCORE AND WITH_CSCORE)
+    message(FATAL_ERROR "
+FATAL: Cannot build cameraserver without ntcore.
+       Enable ntcore by setting WITH_NTCORE=ON
+")
+endif()
+
+if (NOT WITH_NTCORE AND WITH_GUI)
+    message(FATAL_ERROR "
+FATAL: Cannot build GUI modules without ntcore.
+       Enable ntcore by setting WITH_NTCORE=ON
+")
+endif()
+
+if (NOT WITH_NTCORE AND WITH_SIMULATION_MODULES)
+    message(FATAL_ERROR "
+FATAL: Cannot build simulation modules without ntcore.
+       Enable ntcore by setting WITH_NTCORE=ON
+")
+endif()
+
 if (NOT WITH_NTCORE AND WITH_WPILIB)
     message(FATAL_ERROR "
 FATAL: Cannot build wpilib without ntcore.
