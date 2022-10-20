@@ -7,7 +7,6 @@
 #include <frc/XboxController.h>
 #include <frc/smartdashboard/SendableChooser.h>
 #include <frc2/command/Command.h>
-#include <frc2/command/CommandPtr.h>
 
 #include "Constants.h"
 #include "subsystems/ArmSubsystem.h"

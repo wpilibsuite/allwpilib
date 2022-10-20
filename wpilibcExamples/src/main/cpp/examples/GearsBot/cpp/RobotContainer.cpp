@@ -34,7 +34,7 @@ void RobotContainer::ConfigureButtonBindings() {
   // Configure your button bindings here
   frc2::JoystickButton(&m_joy, 5).OnTrue(
       SetElevatorSetpoint(0.25, m_elevator).ToPtr());
-  frc2::JoystickButton(&m_joy, 6).OnTrue(CloseClaw(m_claw).ToPtr()));
+  frc2::JoystickButton(&m_joy, 6).OnTrue(CloseClaw(m_claw).ToPtr());
   frc2::JoystickButton(&m_joy, 7).OnTrue(
       SetElevatorSetpoint(0.0, m_elevator).ToPtr());
   frc2::JoystickButton(&m_joy, 8).OnTrue(OpenClaw(m_claw).ToPtr());

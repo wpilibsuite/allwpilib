@@ -5,6 +5,9 @@
 #include "RobotContainer.h"
 
 #include <frc/shuffleboard/Shuffleboard.h>
+#include <frc2/command/Commands.h>
+#include <frc2/command/InstantCommand.h>
+#include <frc2/command/RunCommand.h>
 #include <frc2/command/button/JoystickButton.h>
 #include <units/angle.h>
 
@@ -15,7 +18,7 @@ RobotContainer::RobotContainer() {
   ConfigureButtonBindings();
 
   // Set up default drive command
-  m_drive.SetDefaultCommand(frc2::cmd::Run(
+  m_drive.SetDefaultCommand(frc2::RunCommand(
       [this] {
         m_drive.ArcadeDrive(-m_driverController.GetLeftY(),
                             m_driverController.GetRightX());

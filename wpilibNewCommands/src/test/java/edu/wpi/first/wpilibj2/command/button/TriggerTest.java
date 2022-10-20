@@ -14,15 +14,12 @@ import edu.wpi.first.wpilibj.simulation.SimHooks;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.CommandTestBase;
-
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.function.BooleanSupplier;
-
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.StartEndCommand;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
-
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.BooleanSupplier;
 import org.junit.jupiter.api.Test;
 
 class TriggerTest extends CommandTestBase {
@@ -90,7 +87,8 @@ class TriggerTest extends CommandTestBase {
     CommandScheduler scheduler = CommandScheduler.getInstance();
     AtomicInteger startCounter = new AtomicInteger(0);
     AtomicInteger endCounter = new AtomicInteger(0);
-    Command command1 = new StartEndCommand(startCounter::incrementAndGet, endCounter::incrementAndGet);
+    Command command1 =
+        new StartEndCommand(startCounter::incrementAndGet, endCounter::incrementAndGet);
 
     InternalButton button = new InternalButton();
     button.setPressed(false);
@@ -114,7 +112,8 @@ class TriggerTest extends CommandTestBase {
     CommandScheduler scheduler = CommandScheduler.getInstance();
     AtomicInteger startCounter = new AtomicInteger(0);
     AtomicInteger endCounter = new AtomicInteger(0);
-    Command command1 = new StartEndCommand(startCounter::incrementAndGet, endCounter::incrementAndGet);
+    Command command1 =
+        new StartEndCommand(startCounter::incrementAndGet, endCounter::incrementAndGet);
 
     InternalButton button = new InternalButton();
     button.setPressed(false);
@@ -144,7 +143,9 @@ class TriggerTest extends CommandTestBase {
     AtomicInteger endCounter = new AtomicInteger(0);
 
     InternalButton button = new InternalButton();
-    Command command1 = new StartEndCommand(startCounter::incrementAndGet, endCounter::incrementAndGet).until(button.rising());
+    Command command1 =
+        new StartEndCommand(startCounter::incrementAndGet, endCounter::incrementAndGet)
+            .until(button.rising());
 
     button.setPressed(false);
     command1.schedule();
@@ -174,7 +175,7 @@ class TriggerTest extends CommandTestBase {
 
     AtomicInteger counter = new AtomicInteger(0);
 
-    buttonWhenActive.whenActive(counter::incrementAndGet);
+    buttonWhenActive.whenPressed(counter::incrementAndGet);
     buttonWhileActiveContinuous.whileActiveContinuous(counter::incrementAndGet);
     buttonWhenInactive.whenInactive(counter::incrementAndGet);
 

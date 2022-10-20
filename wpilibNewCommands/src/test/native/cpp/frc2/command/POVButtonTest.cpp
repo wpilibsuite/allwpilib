@@ -26,7 +26,7 @@ TEST_F(POVButtonTest, SetPOV) {
   WaitUntilCommand command([&finished] { return finished; });
 
   frc::Joystick joy(1);
-  POVButton(&joy, 90).WhenActive(&command);
+  POVButton(&joy, 90).OnTrue(&command);
   scheduler.Run();
   EXPECT_FALSE(scheduler.IsScheduled(&command));
 

@@ -5,6 +5,7 @@
 #include "RobotContainer.h"
 
 #include <frc/shuffleboard/Shuffleboard.h>
+#include <frc2/command/Commands.h>
 #include <frc2/command/button/JoystickButton.h>
 
 #include "commands/DriveDistanceProfiled.h"
@@ -30,8 +31,8 @@ void RobotContainer::ConfigureButtonBindings() {
   // While holding the shoulder button, drive at half speed
   frc2::JoystickButton(&m_driverController,
                        frc::XboxController::Button::kRightBumper)
-      .OnTrue(frc2::cmd::RunOnce([this] { m_drive.SetMaxOutput(0.5); }, {}))
-      .OnFalse(frc2::cmd::RunOnce([this] { m_drive.SetMaxOutput(1); }, {}));
+      .OnTrue(&m_driveHalfSpeed)
+      .OnFalse(&m_driveFullSpeed);
 
   // Drive forward by 3 meters when the 'A' button is pressed, with a timeout of
   // 10 seconds
@@ -54,6 +55,7 @@ void RobotContainer::ConfigureButtonBindings() {
               },
               // Require the drive
               {&m_drive})
+              .ToPtr()
               .BeforeStarting(
                   frc2::cmd::RunOnce([this]() { m_drive.ResetEncoders(); }, {}))
               .WithTimeout(10_s));

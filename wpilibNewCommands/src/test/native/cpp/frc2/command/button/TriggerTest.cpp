@@ -5,6 +5,7 @@
 #include <frc/simulation/SimHooks.h>
 
 #include "../CommandTestBase.h"
+#include "frc2/command/Commands.h"
 #include "frc2/command/CommandPtr.h"
 #include "frc2/command/CommandScheduler.h"
 #include "frc2/command/RunCommand.h"
@@ -55,7 +56,7 @@ TEST_F(TriggerTest, WhileTrueRepeatedly) {
   auto& scheduler = CommandScheduler::GetInstance();
   int counter = 0;
   bool pressed = false;
-  CommandPtr command = InstantCommand([&counter] { counter++; }).Repeatedly();
+  CommandPtr command = cmd::RunOnce([&counter] { counter++; }).Repeatedly();
 
   pressed = false;
   Trigger([&pressed] { return pressed; }).WhileTrue(std::move(command));
@@ -76,9 +77,8 @@ TEST_F(TriggerTest, WhenTrueOnce) {
   int endCounter = 0;
   bool pressed = false;
 
-  CommandPtr command = StartEndCommand([&startCounter] { startCounter++; },
-                                       [&endCounter] { endCounter++; })
-                           .ToPtr();
+  CommandPtr command = cmd::StartEnd([&startCounter] { startCounter++; },
+                                       [&endCounter] { endCounter++; });
 
   pressed = false;
   Trigger([&pressed] { return pressed; }).WhileTrue(std::move(command));
@@ -96,17 +96,16 @@ TEST_F(TriggerTest, WhenTrueOnce) {
   EXPECT_EQ(1, endCounter);
 }
 
-TEST_F(TriggerTest, ToggleWhenActive) {
+TEST_F(TriggerTest, ToggleOnTrue) {
   auto& scheduler = CommandScheduler::GetInstance();
   bool pressed = false;
   int startCounter = 0;
   int endCounter = 0;
-  CommandPtr command = StartEndCommand([&startCounter] { startCounter++; },
-                                       [&endCounter] { endCounter++; })
-                           .ToPtr();
+  CommandPtr command = cmd::StartEnd([&startCounter] { startCounter++; },
+                                       [&endCounter] { endCounter++; });
 
   Trigger([&pressed] { return pressed; }).ToggleOnTrue(std::move(command));
-  scheduler.run();
+  scheduler.Run();
   EXPECT_EQ(0, startCounter);
   EXPECT_EQ(0, endCounter);
   pressed = true;
@@ -131,9 +130,9 @@ TEST_F(TriggerTest, And) {
   bool pressed2 = false;
   WaitUntilCommand command([&finished] { return finished; });
 
-  (Trigger([&pressed1] { return pressed1; }) && Trigger([&pressed2] {
+  (Trigger([&pressed1] { return pressed1; }) && ([&pressed2] {
      return pressed2;
-   })).WhenActive(&command);
+   })).OnTrue(&command);
   pressed1 = true;
   scheduler.Run();
   EXPECT_FALSE(scheduler.IsScheduled(&command));
@@ -150,18 +149,18 @@ TEST_F(TriggerTest, Or) {
   WaitUntilCommand command1([&finished] { return finished; });
   WaitUntilCommand command2([&finished] { return finished; });
 
-  (Trigger([&pressed1] { return pressed1; }) || Trigger([&pressed2] {
+  (Trigger([&pressed1] { return pressed1; }) || ([&pressed2] {
      return pressed2;
-   })).WhenActive(&command1);
+   })).OnTrue(&command1);
   pressed1 = true;
   scheduler.Run();
   EXPECT_TRUE(scheduler.IsScheduled(&command1));
 
   pressed1 = false;
 
-  (Trigger([&pressed1] { return pressed1; }) || Trigger([&pressed2] {
+  (Trigger([&pressed1] { return pressed1; }) || ([&pressed2] {
      return pressed2;
-   })).WhenActive(&command2);
+   })).OnTrue(&command2);
   pressed2 = true;
   scheduler.Run();
   EXPECT_TRUE(scheduler.IsScheduled(&command2));
@@ -173,7 +172,7 @@ TEST_F(TriggerTest, Negate) {
   bool pressed = true;
   WaitUntilCommand command([&finished] { return finished; });
 
-  (!Trigger([&pressed] { return pressed; })).WhenActive(&command);
+  (!Trigger([&pressed] { return pressed; })).OnTrue(&command);
   scheduler.Run();
   EXPECT_FALSE(scheduler.IsScheduled(&command));
   pressed = false;

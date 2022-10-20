@@ -5,6 +5,9 @@
 #include "RobotContainer.h"
 
 #include <frc/shuffleboard/Shuffleboard.h>
+#include <frc2/command/Commands.h>
+#include <frc2/command/InstantCommand.h>
+#include <frc2/command/RunCommand.h>
 #include <frc2/command/button/JoystickButton.h>
 #include <units/angle.h>
 

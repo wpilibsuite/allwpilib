@@ -17,13 +17,17 @@ Button Button::WhenPressed(Command* command) {
 
 Button Button::WhenPressed(std::function<void()> toRun,
                            std::initializer_list<Subsystem*> requirements) {
+  WPI_IGNORE_DEPRECATED
   WhenActive(std::move(toRun), requirements);
+  WPI_UNIGNORE_DEPRECATED
   return *this;
 }
 
 Button Button::WhenPressed(std::function<void()> toRun,
                            std::span<Subsystem* const> requirements) {
+  WPI_IGNORE_DEPRECATED
   WhenActive(std::move(toRun), requirements);
+  WPI_UNIGNORE_DEPRECATED
   return *this;
 }
 
@@ -36,13 +40,17 @@ Button Button::WhileHeld(Command* command) {
 
 Button Button::WhileHeld(std::function<void()> toRun,
                          std::initializer_list<Subsystem*> requirements) {
+  WPI_IGNORE_DEPRECATED
   WhileActiveContinous(std::move(toRun), requirements);
+  WPI_UNIGNORE_DEPRECATED
   return *this;
 }
 
 Button Button::WhileHeld(std::function<void()> toRun,
                          std::span<Subsystem* const> requirements) {
+  WPI_IGNORE_DEPRECATED
   WhileActiveContinous(std::move(toRun), requirements);
+  WPI_UNIGNORE_DEPRECATED
   return *this;
 }
 
@@ -62,13 +70,17 @@ Button Button::WhenReleased(Command* command) {
 
 Button Button::WhenReleased(std::function<void()> toRun,
                             std::initializer_list<Subsystem*> requirements) {
+  WPI_IGNORE_DEPRECATED
   WhenInactive(std::move(toRun), requirements);
+  WPI_UNIGNORE_DEPRECATED
   return *this;
 }
 
 Button Button::WhenReleased(std::function<void()> toRun,
                             std::span<Subsystem* const> requirements) {
+  WPI_IGNORE_DEPRECATED
   WhenInactive(std::move(toRun), requirements);
+  WPI_UNIGNORE_DEPRECATED
   return *this;
 }
 

@@ -129,15 +129,16 @@ public class Trigger implements BooleanSupplier {
    */
   public Trigger toggleOnTrue(Command command) {
     requireNonNullParam(command, "command", "toggleOnRising");
-    m_event.rising()
-            .ifHigh(
-                    () -> {
-                      if (!command.isScheduled()) {
-                        command.schedule();
-                      } else {
-                        command.cancel();
-                      }
-                    });
+    m_event
+        .rising()
+        .ifHigh(
+            () -> {
+              if (!command.isScheduled()) {
+                command.schedule();
+              } else {
+                command.cancel();
+              }
+            });
     return this;
   }
 
@@ -149,15 +150,16 @@ public class Trigger implements BooleanSupplier {
    */
   public Trigger toggleOnFalse(Command command) {
     requireNonNullParam(command, "command", "toggleOnFalling");
-    m_event.falling()
-            .ifHigh(
-                    () -> {
-                      if (!command.isScheduled()) {
-                        command.schedule();
-                      } else {
-                        command.cancel();
-                      }
-                    });
+    m_event
+        .falling()
+        .ifHigh(
+            () -> {
+              if (!command.isScheduled()) {
+                command.schedule();
+              } else {
+                command.cancel();
+              }
+            });
     return this;
   }
 
@@ -182,7 +184,8 @@ public class Trigger implements BooleanSupplier {
    * @param toRun the runnable to run
    * @param requirements the required subsystems
    * @return this trigger, so calls can be chained
-   * @deprecated Replace with {@link #onTrue(Command)} ) } and constructing the InstantCommand manually
+   * @deprecated Replace with {@link #onTrue(Command)} ) } and constructing the InstantCommand
+   *     manually
    */
   @Deprecated
   public Trigger whenActive(final Runnable toRun, Subsystem... requirements) {
@@ -199,8 +202,8 @@ public class Trigger implements BooleanSupplier {
    * @return this trigger, so calls can be chained
    * @deprecated Use {@link #whileTrue(Command)} with {@link
    *     edu.wpi.first.wpilibj2.command.RepeatCommand RepeatCommand}, or bind {@link
-   *     Command#schedule() command::schedule} to {@link BooleanEvent#ifHigh(Runnable)}
-   *     (passing no requirements).
+   *     Command#schedule() command::schedule} to {@link BooleanEvent#ifHigh(Runnable)} (passing no
+   *     requirements).
    */
   @Deprecated
   public Trigger whileActiveContinuous(final Command command) {
@@ -283,7 +286,8 @@ public class Trigger implements BooleanSupplier {
   public Trigger toggleWhenActive(final Command command) {
     requireNonNullParam(command, "command", "toggleWhenActive");
 
-    m_event.rising()
+    m_event
+        .rising()
         .ifHigh(
             () -> {
               if (command.isScheduled()) {
@@ -322,6 +326,7 @@ public class Trigger implements BooleanSupplier {
     return m_event;
   }
 
+  @Override
   public boolean getAsBoolean() {
     return m_event.getAsBoolean();
   }

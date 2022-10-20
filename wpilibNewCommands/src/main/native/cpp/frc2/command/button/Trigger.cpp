@@ -105,6 +105,7 @@ Trigger Trigger::ToggleOnFalse(CommandPtr&& command) {
   return *this;
 }
 
+WPI_IGNORE_DEPRECATED
 Trigger Trigger::WhenActive(Command* command) {
   m_event.Rising().IfHigh([command] { command->Schedule(); });
   return *this;
@@ -176,6 +177,7 @@ Trigger Trigger::CancelWhenActive(Command* command) {
   m_event.Rising().IfHigh([command] { command->Cancel(); });
   return *this;
 }
+WPI_UNIGNORE_DEPRECATED
 
 BooleanEvent Trigger::GetEvent() const {
   return m_event;

@@ -22,8 +22,8 @@
 namespace frc2 {
 class Command;
 /**
- * This class is a command-based wrapper around {@link BooleanEvent}, providing
- * an easy way to link commands to inputs.
+ * This class is a command-based wrapper around {@link frc::BooleanEvent},
+ * providing an easy way to link commands to inputs.
  *
  * This class is provided by the NewCommands VendorDep
  *

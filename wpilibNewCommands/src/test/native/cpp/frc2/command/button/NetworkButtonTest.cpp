@@ -32,7 +32,7 @@ TEST_F(NetworkButtonTest, SetNetworkButton) {
 
   WaitUntilCommand command([&finished] { return finished; });
 
-  NetworkButton(inst, "TestTable", "Test").WhenActive(&command);
+  NetworkButton(inst, "TestTable", "Test").OnTrue(&command);
   scheduler.Run();
   EXPECT_FALSE(scheduler.IsScheduled(&command));
   pub.Set(true);

@@ -49,7 +49,7 @@ class Button : public Trigger {
    * @param command The command to bind.
    * @return The trigger, for chained calls.
    */
-  WPI_DEPRECATED("Replace with Trigger#WhenActive()")
+  WPI_DEPRECATED("Replace with Trigger#OnTrue()")
   Button WhenPressed(Command* command);
 
   /**
@@ -63,7 +63,7 @@ class Button : public Trigger {
    */
   template <class T, typename = std::enable_if_t<std::is_base_of_v<
                          Command, std::remove_reference_t<T>>>>
-  WPI_DEPRECATED("Replace with Trigger#WhenActive()")
+  WPI_DEPRECATED("Replace with Trigger#OnTrue()")
   Button WhenPressed(T&& command) {
     WhenActive(std::forward<T>(command));
     return *this;
@@ -75,7 +75,7 @@ class Button : public Trigger {
    * @param toRun the runnable to execute.
    * @param requirements the required subsystems.
    */
-  WPI_DEPRECATED("Replace with Trigger#WhenActive()")
+  WPI_DEPRECATED("Replace with Trigger#OnTrue(cmd::RunOnce())")
   Button WhenPressed(std::function<void()> toRun,
                      std::initializer_list<Subsystem*> requirements);
 
@@ -85,7 +85,7 @@ class Button : public Trigger {
    * @param toRun the runnable to execute.
    * @param requirements the required subsystems.
    */
-  WPI_DEPRECATED("Replace with Trigger#WhenActive()")
+  WPI_DEPRECATED("Replace with Trigger#OnTrue(cmd::RunOnce())")
   Button WhenPressed(std::function<void()> toRun,
                      std::span<Subsystem* const> requirements = {});
 
@@ -97,7 +97,7 @@ class Button : public Trigger {
    * @param command The command to bind.
    * @return The button, for chained calls.
    */
-  WPI_DEPRECATED("Replace with Trigger#WhileActiveContinuous()")
+  WPI_DEPRECATED("Replace with Trigger#WhileTrue(command.Repeatedly())")
   Button WhileHeld(Command* command);
 
   /**
@@ -111,7 +111,7 @@ class Button : public Trigger {
    */
   template <class T, typename = std::enable_if_t<std::is_base_of_v<
                          Command, std::remove_reference_t<T>>>>
-  WPI_DEPRECATED("Replace with Trigger#WhileActiveContinuous()")
+  WPI_DEPRECATED("Replace with Trigger#WhileTrue(command.Repeatedly())")
   Button WhileHeld(T&& command) {
     WhileActiveContinous(std::forward<T>(command));
     return *this;
@@ -123,7 +123,7 @@ class Button : public Trigger {
    * @param toRun the runnable to execute.
    * @param requirements the required subsystems.
    */
-  WPI_DEPRECATED("Replace with Trigger#WhileActiveContinuous()")
+  WPI_DEPRECATED("Replace with Trigger#WhileTrue(cmd::Run())")
   Button WhileHeld(std::function<void()> toRun,
                    std::initializer_list<Subsystem*> requirements);
 
@@ -133,7 +133,7 @@ class Button : public Trigger {
    * @param toRun the runnable to execute.
    * @param requirements the required subsystems.
    */
-  WPI_DEPRECATED("Replace with Trigger#WhileActiveContinuous()")
+  WPI_DEPRECATED("Replace with Trigger#WhileTrue(cmd::Run())")
   Button WhileHeld(std::function<void()> toRun,
                    std::span<Subsystem* const> requirements = {});
 
@@ -145,7 +145,7 @@ class Button : public Trigger {
    * @param command The command to bind.
    * @return The button, for chained calls.
    */
-  WPI_DEPRECATED("Replace with Trigger#WhileActiveOnce()")
+  WPI_DEPRECATED("Replace with Trigger#WhileTrue()")
   Button WhenHeld(Command* command);
 
   /**
@@ -159,7 +159,7 @@ class Button : public Trigger {
    */
   template <class T, typename = std::enable_if_t<std::is_base_of_v<
                          Command, std::remove_reference_t<T>>>>
-  WPI_DEPRECATED("Replace with Trigger#WhileActiveOnce()")
+  WPI_DEPRECATED("Replace with Trigger#WhileTrue()")
   Button WhenHeld(T&& command) {
     WhileActiveOnce(std::forward<T>(command));
     return *this;
@@ -173,7 +173,7 @@ class Button : public Trigger {
    * @param command The command to bind.
    * @return The button, for chained calls.
    */
-  WPI_DEPRECATED("Replace with Trigger#WhenInactive()")
+  WPI_DEPRECATED("Replace with Trigger#OnFalse()")
   Button WhenReleased(Command* command);
 
   /**
@@ -187,7 +187,7 @@ class Button : public Trigger {
    */
   template <class T, typename = std::enable_if_t<std::is_base_of_v<
                          Command, std::remove_reference_t<T>>>>
-  WPI_DEPRECATED("Replace with Trigger#WhenInactive()")
+  WPI_DEPRECATED("Replace with Trigger#OnFalse()")
   Button WhenReleased(T&& command) {
     WhenInactive(std::forward<T>(command));
     return *this;
@@ -199,7 +199,7 @@ class Button : public Trigger {
    * @param toRun the runnable to execute.
    * @param requirements the required subsystems.
    */
-  WPI_DEPRECATED("Replace with Trigger#WhenInactive()")
+  WPI_DEPRECATED("Replace with Trigger#OnFalse(cmd::RunOnce())")
   Button WhenReleased(std::function<void()> toRun,
                       std::initializer_list<Subsystem*> requirements);
 
@@ -209,7 +209,7 @@ class Button : public Trigger {
    * @param toRun the runnable to execute.
    * @param requirements the required subsystems.
    */
-  WPI_DEPRECATED("Replace with Trigger#WhenInactive()")
+  WPI_DEPRECATED("Replace with Trigger#OnFalse(cmd::RunOnce())")
   Button WhenReleased(std::function<void()> toRun,
                       std::span<Subsystem* const> requirements = {});
 
@@ -221,7 +221,7 @@ class Button : public Trigger {
    * @param command The command to bind.
    * @return The button, for chained calls.
    */
-  WPI_DEPRECATED("Replace with Trigger#ToggleWhenActive()")
+  WPI_DEPRECATED("Replace with Trigger#ToggleOnTrue()")
   Button ToggleWhenPressed(Command* command);
 
   /**
@@ -235,7 +235,7 @@ class Button : public Trigger {
    */
   template <class T, typename = std::enable_if_t<std::is_base_of_v<
                          Command, std::remove_reference_t<T>>>>
-  WPI_DEPRECATED("Replace with Trigger#ToggleWhenActive()")
+  WPI_DEPRECATED("Replace with Trigger#ToggleOnTrue()")
   Button ToggleWhenPressed(T&& command) {
     ToggleWhenActive(std::forward<T>(command));
     return *this;
@@ -249,7 +249,8 @@ class Button : public Trigger {
    * @param command The command to bind.
    * @return The button, for chained calls.
    */
-  WPI_DEPRECATED("Replace with Trigger#CancelWhenActive()")
+  WPI_DEPRECATED(
+      "Use Rising() as a command end condition with Until() instead.")
   Button CancelWhenPressed(Command* command);
 };
 }  // namespace frc2
