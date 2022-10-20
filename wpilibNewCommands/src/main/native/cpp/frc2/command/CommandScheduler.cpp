@@ -296,6 +296,19 @@ void CommandScheduler::UnregisterSubsystem(
   }
 }
 
+void CommandScheduler::SetDefaultCommand(Subsystem* subsystem, CommandPtr&& defaultCommand) {
+  if (!defaultCommand.get()->HasRequirement(subsystem)) {
+    throw FRC_MakeError(frc::err::CommandIllegalUse, "{}",
+                        "Default commands must require their subsystem!");
+  }
+  if (defaultCommand.get()->IsFinished()) {
+    throw FRC_MakeError(frc::err::CommandIllegalUse, "{}",
+                        "Default commands should not end!");
+  }
+
+  SetDefaultCommandImpl(subsystem, std::move(command).Unwrap());
+}
+
 Command* CommandScheduler::GetDefaultCommand(const Subsystem* subsystem) const {
   auto&& find = m_impl->subsystems.find(subsystem);
   if (find != m_impl->subsystems.end()) {

@@ -192,6 +192,19 @@ class CommandScheduler final : public nt::NTSendable,
   }
 
   /**
+   * Sets the default command for a subsystem.  Registers that subsystem if it
+   * is not already registered.  Default commands will run whenever there is no
+   * other command currently scheduled that requires the subsystem.  Default
+   * commands should be written to never end (i.e. their IsFinished() method
+   * should return false), as they would simply be re-scheduled if they do.
+   * Default commands must also require their subsystem.
+   *
+   * @param subsystem      the subsystem whose default command will be set
+   * @param defaultCommand the default command to associate with the subsystem
+   */
+  void SetDefaultCommand(Subsystem* subsystem, CommandPtr&& defaultCommand);
+
+  /**
    * Gets the default command associated with this subsystem.  Null if this
    * subsystem has no default command associated with it.
    *
