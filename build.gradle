@@ -124,6 +124,10 @@ subprojects {
         }
     }
 
+    tasks.withType(JavaCompile) {
+        options.compilerArgs '-XDstringConcat=inline'
+    }
+
     // Enables UTF-8 support in Javadoc
     tasks.withType(Javadoc) {
         options.addStringOption("charset", "utf-8")
