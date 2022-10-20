@@ -627,6 +627,15 @@ void ClientData4Base::ClientSubscribe(int64_t subuid,
       removed = topic->subscribers.Remove(sub.get());
     }
 
+    // is client already subscribed?
+    bool wasSubscribed = false;
+    for (auto subscriber : topic->subscribers) {
+      if (subscriber->client == this) {
+        wasSubscribed = true;
+        break;
+      }
+    }
+
     bool added = false;
     if (sub->Matches(topic->name, topic->special)) {
       topic->subscribers.Add(sub.get());
@@ -645,7 +654,7 @@ void ClientData4Base::ClientSubscribe(int64_t subuid,
       }
     }
 
-    if (added && !removed) {
+    if (!wasSubscribed && added && !removed) {
       // announce topic to client
       DEBUG4("client {}: announce {}", m_id, topic->name);
       SendAnnounce(topic.get(), std::nullopt);
