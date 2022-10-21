@@ -64,10 +64,10 @@ option(WITH_SIMULATION_MODULES "Build simulation modules" ON)
 option(WITH_EXTERNAL_HAL "Use a separately built HAL" OFF)
 set(EXTERNAL_HAL_FILE "" CACHE FILEPATH "Location to look for an external HAL CMake File")
 
-# Options for using a package manager (vcpkg) for certain dependencies.
-option(USE_VCPKG_FMTLIB "Use vcpkg fmtlib" OFF)
-option(USE_VCPKG_LIBUV "Use vcpkg libuv" OFF)
-option(USE_VCPKG_EIGEN "Use vcpkg eigen" OFF)
+# Options for using a package manager (e.g., vcpkg) for certain dependencies.
+option(USE_SYSTEM_FMTLIB "Use system fmtlib" OFF)
+option(USE_SYSTEM_LIBUV "Use system libuv" OFF)
+option(USE_SYSTEM_EIGEN "Use system eigen" OFF)
 
 # Options for installation.
 option(WITH_FLAT_INSTALL "Use a flat install directory" OFF)
@@ -165,12 +165,15 @@ else()
     set (wpilib_config_dir share/wpilib)
 endif()
 
-if (USE_VCPKG_LIBUV)
-set (LIBUV_VCPKG_REPLACE "find_package(unofficial-libuv CONFIG)")
+if (USE_SYSTEM_LIBUV)
+set (LIBUV_SYSTEM_REPLACE "
+find_package(PkgConfig REQUIRED)
+pkg_check_modules(libuv REQUIRED IMPORTED_TARGET libuv)
+")
 endif()
 
-if (USE_VCPKG_EIGEN)
-set (EIGEN_VCPKG_REPLACE "find_package(Eigen3 CONFIG)")
+if (USE_SYSTEM_EIGEN)
+set (EIGEN_SYSTEM_REPLACE "find_package(Eigen3 CONFIG)")
 endif()
 
 find_package(LIBSSH 0.7.1)
