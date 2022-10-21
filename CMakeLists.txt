@@ -52,6 +52,7 @@ ENDIF("${isSystemDir}" STREQUAL "-1")
 option(BUILD_SHARED_LIBS "Build with shared libs (needed for JNI)" ON)
 option(WITH_JAVA "Include java and JNI in the build" ON)
 option(WITH_CSCORE "Build cscore (needs OpenCV)" ON)
+option(WITH_NTCORE "Build ntcore" ON)
 option(WITH_WPIMATH "Build wpimath" ON)
 option(WITH_WPILIB "Build hal, wpilibc/j, and myRobot (needs OpenCV)" ON)
 option(WITH_EXAMPLES "Build examples" OFF)
@@ -63,10 +64,10 @@ option(WITH_SIMULATION_MODULES "Build simulation modules" ON)
 option(WITH_EXTERNAL_HAL "Use a separately built HAL" OFF)
 set(EXTERNAL_HAL_FILE "" CACHE FILEPATH "Location to look for an external HAL CMake File")
 
-# Options for using a package manager (vcpkg) for certain dependencies.
-option(USE_VCPKG_FMTLIB "Use vcpkg fmtlib" OFF)
-option(USE_VCPKG_LIBUV "Use vcpkg libuv" OFF)
-option(USE_VCPKG_EIGEN "Use vcpkg eigen" OFF)
+# Options for using a package manager (e.g., vcpkg) for certain dependencies.
+option(USE_SYSTEM_FMTLIB "Use system fmtlib" OFF)
+option(USE_SYSTEM_LIBUV "Use system libuv" OFF)
+option(USE_SYSTEM_EIGEN "Use system eigen" OFF)
 
 # Options for installation.
 option(WITH_FLAT_INSTALL "Use a flat install directory" OFF)
@@ -117,6 +118,34 @@ FATAL: Cannot build simulation modules with wpilib disabled.
 ")
 endif()
 
+if (NOT WITH_NTCORE AND WITH_CSCORE)
+    message(FATAL_ERROR "
+FATAL: Cannot build cameraserver without ntcore.
+       Enable ntcore by setting WITH_NTCORE=ON
+")
+endif()
+
+if (NOT WITH_NTCORE AND WITH_GUI)
+    message(FATAL_ERROR "
+FATAL: Cannot build GUI modules without ntcore.
+       Enable ntcore by setting WITH_NTCORE=ON
+")
+endif()
+
+if (NOT WITH_NTCORE AND WITH_SIMULATION_MODULES)
+    message(FATAL_ERROR "
+FATAL: Cannot build simulation modules without ntcore.
+       Enable ntcore by setting WITH_NTCORE=ON
+")
+endif()
+
+if (NOT WITH_NTCORE AND WITH_WPILIB)
+    message(FATAL_ERROR "
+FATAL: Cannot build wpilib without ntcore.
+       Enable ntcore by setting WITH_NTCORE=ON
+")
+endif()
+
 if (NOT WITH_WPIMATH AND WITH_WPILIB)
     message(FATAL_ERROR "
 FATAL: Cannot build wpilib without wpimath.
@@ -136,12 +165,15 @@ else()
     set (wpilib_config_dir share/wpilib)
 endif()
 
-if (USE_VCPKG_LIBUV)
-set (LIBUV_VCPKG_REPLACE "find_package(unofficial-libuv CONFIG)")
+if (USE_SYSTEM_LIBUV)
+set (LIBUV_SYSTEM_REPLACE "
+find_package(PkgConfig REQUIRED)
+pkg_check_modules(libuv REQUIRED IMPORTED_TARGET libuv)
+")
 endif()
 
-if (USE_VCPKG_EIGEN)
-set (EIGEN_VCPKG_REPLACE "find_package(Eigen3 CONFIG)")
+if (USE_SYSTEM_EIGEN)
+set (EIGEN_SYSTEM_REPLACE "find_package(Eigen3 CONFIG)")
 endif()
 
 find_package(LIBSSH 0.7.1)
@@ -247,8 +279,11 @@ if (WITH_TESTS)
 endif()
 
 add_subdirectory(wpiutil)
-add_subdirectory(wpinet)
-add_subdirectory(ntcore)
+
+if (WITH_NTCORE)
+    add_subdirectory(wpinet)
+    add_subdirectory(ntcore)
+endif()
 
 if (WITH_WPIMATH)
     add_subdirectory(wpimath)

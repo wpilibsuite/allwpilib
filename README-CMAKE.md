@@ -31,14 +31,20 @@ The following build options are available:
   * This option will enable Java and JNI builds. If this is on, `WITH_SHARED_LIBS` must be on. Otherwise CMake will error.
 * `WITH_SHARED_LIBS` (ON Default)
   * This option will cause cmake to build static libraries instead of shared libraries. If this is off, `WITH_JAVA` must be off. Otherwise CMake will error.
-* `WITH_TESTS` (ON Default)
-  * This option will build C++ unit tests. These can be run via `make test`.
 * `WITH_CSCORE` (ON Default)
   * This option will cause cscore to be built. Turning this off will implicitly disable cameraserver, the hal and wpilib as well, irrespective of their specific options. If this is off, the OpenCV build requirement is removed.
+* `WITH_NTCORE` (ON Default)
+  * This option will cause ntcore to be built. Turning this off will implicitly disable wpinet and wpilib as well, irrespective of their specific options.
 * `WITH_WPIMATH` (ON Default)
   * This option will build the wpimath library. This option must be on to build wpilib.
 * `WITH_WPILIB` (ON Default)
   * This option will build the hal and wpilibc/j during the build. The HAL is the simulator hal, unless the external hal options are used. The cmake build has no capability to build for the RoboRIO.
+* `WITH_EXAMPLES` (ON Default)
+  * This option will build C++ examples.
+* `WITH_TESTS` (ON Default)
+  * This option will build C++ unit tests. These can be run via `make test`.
+* `WITH_GUI` (ON Default)
+  * This option will build GUI items.
 * `WITH_SIMULATION_MODULES` (ON Default)
   * This option will build simulation modules, including wpigui and the HALSim plugins.
 * `WITH_EXTERNAL_HAL` (OFF Default)

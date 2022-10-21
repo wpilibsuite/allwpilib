@@ -6,7 +6,6 @@
 
 #include "CommandTestBase.h"
 #include "frc2/command/ConditionalCommand.h"
-#include "frc2/command/EndlessCommand.h"
 #include "frc2/command/FunctionalCommand.h"
 #include "frc2/command/InstantCommand.h"
 #include "frc2/command/ParallelRaceGroup.h"
@@ -118,19 +117,6 @@ TEST_F(CommandDecoratorTest, Perpetually) {
   scheduler.Run();
 
   EXPECT_TRUE(scheduler.IsScheduled(&command));
-}
-
-TEST_F(CommandDecoratorTest, Endlessly) {
-  CommandScheduler scheduler = GetScheduler();
-
-  auto command = InstantCommand([] {}, {}).Endlessly();
-
-  scheduler.Schedule(command);
-
-  scheduler.Run();
-  scheduler.Run();
-
-  EXPECT_TRUE(scheduler.IsScheduled(command));
 }
 
 TEST_F(CommandDecoratorTest, Unless) {

@@ -258,28 +258,15 @@ public interface Command {
    * decorated without issue.
    *
    * @return the decorated command
-   * @deprecated use {@link #endlessly()} instead.
+   * @deprecated PerpetualCommand violates the assumption that execute() doesn't get called after
+   *     isFinished() returns true -- an assumption that should be valid. This was unsafe/undefined
+   *     behavior from the start, and RepeatCommand provides an easy way to achieve similar end
+   *     results with slightly different (and safe) semantics.
    */
   @SuppressWarnings("removal") // PerpetualCommand
   @Deprecated(forRemoval = true, since = "2023")
   default PerpetualCommand perpetually() {
     return new PerpetualCommand(this);
-  }
-
-  /**
-   * Decorates this command to run endlessly, ignoring its ordinary end conditions. The decorated
-   * command can still be interrupted or canceled.
-   *
-   * <p>Note: This decorator works by composing this command within a CommandGroup. The command
-   * cannot be used independently after being decorated, or be re-decorated with a different
-   * decorator, unless it is manually cleared from the list of grouped commands with {@link
-   * CommandGroupBase#clearGroupedCommand(Command)}. The decorated command can, however, be further
-   * decorated without issue.
-   *
-   * @return the decorated command
-   */
-  default EndlessCommand endlessly() {
-    return new EndlessCommand(this);
   }
 
   /**
