@@ -17,9 +17,9 @@ namespace frc {
  */
 struct WPILIB_DLLEXPORT SwerveModulePosition {
   /**
-   * Distance the wheel of a module has travelled
+   * Distance the wheel of a module has traveled
    */
-  units::meter_t position = 0_m;
+  units::meter_t distance = 0_m;
 
   /**
    * Angle of the module.
