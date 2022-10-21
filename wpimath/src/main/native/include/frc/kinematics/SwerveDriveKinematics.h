@@ -13,8 +13,10 @@
 #include "frc/EigenCore.h"
 #include "frc/geometry/Rotation2d.h"
 #include "frc/geometry/Translation2d.h"
+#include "frc/geometry/Twist2d.h"
 #include "frc/kinematics/ChassisSpeeds.h"
 #include "frc/kinematics/SwerveModuleState.h"
+#include "frc/kinematics/SwerveModulePosition.h"
 #include "units/velocity.h"
 #include "wpimath/MathShared.h"
 
@@ -161,6 +163,13 @@ class SwerveDriveKinematics {
    */
   ChassisSpeeds ToChassisSpeeds(
       wpi::array<SwerveModuleState, NumModules> moduleStates) const;
+
+
+  template <typename... ModuleDeltas>
+  Twist2d ToTwist2d(ModuleDeltas&&... wheelDeltas) const;
+
+  Twist2d ToTwist2d(
+      wpi::array<SwerveModulePosition, NumModules> wheelDeltas) const;
 
   /**
    * Renormalizes the wheel speeds if any individual speed is above the

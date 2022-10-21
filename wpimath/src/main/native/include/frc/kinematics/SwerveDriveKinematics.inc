@@ -96,6 +96,38 @@ ChassisSpeeds SwerveDriveKinematics<NumModules>::ToChassisSpeeds(
 }
 
 template <size_t NumModules>
+template <typename... ModuleDeltas>
+Twist2d SwerveDriveKinematics<NumModules>::ToTwist2d(
+    ModuleDeltas&&... wheelDeltas) const {
+  static_assert(sizeof...(wheelDeltas) == NumModules,
+                "Number of modules is not consistent with number of wheel "
+                "locations provided in constructor.");
+
+  wpi::array<SwerveModulePosition, NumModules> moduleDeltas{wheelDeltas...};
+
+  return this->ToTwist2d(moduleDeltas);
+}
+
+template <size_t NumModules>
+Twist2d SwerveDriveKinematics<NumModules>::ToTwist2d(
+    wpi::array<SwerveModulePosition, NumModules> moduleDeltas) const {
+  Matrixd<NumModules * 2, 1> moduleDeltaMatrix;
+
+  for (size_t i = 0; i < NumModules; ++i) {
+    SwerveModulePosition module = moduleDeltas[i];
+    moduleDeltaMatrix(i * 2, 0) = module.position.value() * module.angle.Cos();
+    moduleDeltaMatrix(i * 2 + 1, 0) = module.position.value() * module.angle.Sin();
+  }
+
+  Eigen::Vector3d chassisDeltaVector =
+      m_forwardKinematics.solve(moduleDeltaMatrix);
+
+  return {units::meter_t{chassisDeltaVector(0)},
+          units::meter_t{chassisDeltaVector(1)},
+          units::radian_t{chassisDeltaVector(2)}};
+}
+
+template <size_t NumModules>
 void SwerveDriveKinematics<NumModules>::DesaturateWheelSpeeds(
     wpi::array<SwerveModuleState, NumModules>* moduleStates,
     units::meters_per_second_t attainableMaxSpeed) {
