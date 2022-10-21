@@ -137,7 +137,10 @@ else()
 endif()
 
 if (USE_SYSTEM_LIBUV)
-set (LIBUV_SYSTEM_REPLACE "find_package(unofficial-libuv CONFIG)")
+set (LIBUV_SYSTEM_REPLACE "
+find_package(PkgConfig REQUIRED)
+pkg_check_modules(libuv REQUIRED IMPORTED_TARGET libuv)
+")
 endif()
 
 if (USE_SYSTEM_EIGEN)
