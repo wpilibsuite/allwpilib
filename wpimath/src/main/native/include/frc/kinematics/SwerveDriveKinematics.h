@@ -164,10 +164,35 @@ class SwerveDriveKinematics {
   ChassisSpeeds ToChassisSpeeds(
       wpi::array<SwerveModuleState, NumModules> moduleStates) const;
 
-
+  /**
+   * Performs forward kinematics to return the resulting Twist2d from the
+   * given module position deltas. This method is often used for odometry -- 
+   * determining the robot's position on the field using data from the
+   * real-world position delta and angle of each module on the robot.
+   *
+   * @param wheelDeltas The latest change in position of the modules (as a 
+   * SwerveModulePosition type) as measured from respective encoders and gyros.
+   * The order of the swerve module states should be same as passed into the 
+   * constructor of this class.
+   *
+   * @return The resulting Twist2d.
+   */
   template <typename... ModuleDeltas>
   Twist2d ToTwist2d(ModuleDeltas&&... wheelDeltas) const;
 
+  /**
+   * Performs forward kinematics to return the resulting Twist2d from the
+   * given module position deltas. This method is often used for odometry -- 
+   * determining the robot's position on the field using data from the
+   * real-world position delta and angle of each module on the robot.
+   *
+   * @param wheelDeltas The latest change in position of the modules (as a 
+   * SwerveModulePosition type) as measured from respective encoders and gyros.
+   * The order of the swerve module states should be same as passed into the 
+   * constructor of this class.
+   *
+   * @return The resulting Twist2d.
+   */
   Twist2d ToTwist2d(
       wpi::array<SwerveModulePosition, NumModules> wheelDeltas) const;
 
