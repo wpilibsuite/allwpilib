@@ -77,6 +77,7 @@ struct TopicData {
   std::string name;
 
   Value lastValue;  // also stores timestamp
+  bool lastValueNetwork{false};
   NT_Type type{NT_UNASSIGNED};
   std::string typeStr;
   unsigned int flags{0};            // for NT3 APIs
@@ -646,6 +647,7 @@ void LSImpl::CheckReset(TopicData* topic) {
     return;
   }
   topic->lastValue = {};
+  topic->lastValueNetwork = false;
   topic->type = NT_UNASSIGNED;
   topic->typeStr.clear();
   topic->flags = 0;
@@ -658,10 +660,13 @@ bool LSImpl::SetValue(TopicData* topic, const Value& value,
   if (topic->type != NT_UNASSIGNED && topic->type != value.type()) {
     return false;
   }
-  if (!topic->lastValue || value.time() >= topic->lastValue.time()) {
+  bool isNetwork = (eventFlags & NT_VALUE_NOTIFY_LOCAL) == 0;
+  if (!topic->lastValue || topic->lastValueNetwork == isNetwork ||
+      value.time() >= topic->lastValue.time()) {
     // TODO: notify option even if older value
     topic->type = value.type();
     topic->lastValue = value;
+    topic->lastValueNetwork = isNetwork;
     NotifyValue(topic, eventFlags);
   }
   if (topic->datalogType == value.type()) {
@@ -999,6 +1004,7 @@ std::unique_ptr<PublisherData> LSImpl::RemoveLocalPublisher(
 
 SubscriberData* LSImpl::AddLocalSubscriber(TopicData* topic,
                                            const PubSubConfig& config) {
+  DEBUG4("AddLocalSubscriber({})", topic->name);
   auto subscriber = m_subscribers.Add(m_inst, topic, config);
   topic->localSubscribers.Add(subscriber);
   // set subscriber to active if the type matches
@@ -1011,6 +1017,7 @@ SubscriberData* LSImpl::AddLocalSubscriber(TopicData* topic,
         topic->name, config.typeStr, topic->typeStr);
   }
   if (m_network) {
+    DEBUG4("-> NetworkSubscribe({})", topic->name);
     m_network->Subscribe(subscriber->handle, {{topic->name}}, config);
   }
   return subscriber;
@@ -1578,7 +1585,8 @@ void LocalStorage::NetworkSetValue(NT_Topic topicHandle, const Value& value) {
   }
 }
 
-void LocalStorage::StartNetwork(net::NetworkStartupInterface& startup) {
+void LocalStorage::StartNetwork(net::NetworkStartupInterface& startup,
+                                net::NetworkInterface* network) {
   std::scoped_lock lock{m_mutex};
   // publish all active publishers to the network and send last values
   // only send value once per topic
@@ -1596,19 +1604,13 @@ void LocalStorage::StartNetwork(net::NetworkStartupInterface& startup) {
     }
   }
   for (auto&& subscriber : m_impl->m_subscribers) {
-    if (subscriber->active) {
-      startup.Subscribe(subscriber->handle, {{subscriber->topic->name}},
-                        subscriber->config);
-    }
+    startup.Subscribe(subscriber->handle, {{subscriber->topic->name}},
+                      subscriber->config);
   }
   for (auto&& subscriber : m_impl->m_multiSubscribers) {
     startup.Subscribe(subscriber->handle, subscriber->prefixes,
                       subscriber->options);
   }
-}
-
-void LocalStorage::SetNetwork(net::NetworkInterface* network) {
-  std::scoped_lock lock{m_mutex};
   m_impl->m_network = network;
 }
 

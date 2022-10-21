@@ -41,8 +41,8 @@ class LocalStorage final : public net::ILocalStorage {
                                bool ack) final;
   void NetworkSetValue(NT_Topic topicHandle, const Value& value) final;
 
-  void StartNetwork(net::NetworkStartupInterface& startup) final;
-  void SetNetwork(net::NetworkInterface* network) final;
+  void StartNetwork(net::NetworkStartupInterface& startup,
+                    net::NetworkInterface* network) final;
   void ClearNetwork() final;
 
   // User functions.  These are the actual implementations of the corresponding

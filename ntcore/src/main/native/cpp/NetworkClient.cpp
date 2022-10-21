@@ -304,9 +304,8 @@ void NCImpl3::TcpConnected(uv::Tcp& tcp) {
 
         {
           net3::ClientStartup3 startup{*m_clientImpl};
-          m_localStorage.StartNetwork(startup);
+          m_localStorage.StartNetwork(startup, &m_localQueue);
         }
-        m_localStorage.SetNetwork(&m_localQueue);
         m_clientImpl->SetLocal(&m_localStorage);
       });
 
@@ -428,9 +427,8 @@ void NCImpl4::WsConnected(wpi::WebSocket& ws, uv::Tcp& tcp) {
       });
   {
     net::ClientStartup startup{*m_clientImpl};
-    m_localStorage.StartNetwork(startup);
+    m_localStorage.StartNetwork(startup, &m_localQueue);
   }
-  m_localStorage.SetNetwork(&m_localQueue);
   m_clientImpl->SetLocal(&m_localStorage);
   ws.closed.connect([this, &ws](uint16_t, std::string_view reason) {
     if (!ws.GetStream().IsLoopClosing()) {

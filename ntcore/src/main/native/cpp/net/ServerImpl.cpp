@@ -325,6 +325,7 @@ struct TopicData {
   std::string name;
   unsigned int id;
   Value lastValue;
+  ClientData* lastValueClient = nullptr;
   std::string typeStr;
   wpi::json properties = wpi::json::object();
   bool persistent{false};
@@ -2095,11 +2096,13 @@ void SImpl::SetFlags(ClientData* client, TopicData* topic, unsigned int flags) {
 }
 
 void SImpl::SetValue(ClientData* client, TopicData* topic, const Value& value) {
-  // update retained value if timestamp newer
-  if (!topic->lastValue || value.time() > topic->lastValue.time()) {
+  // update retained value if from same client or timestamp newer
+  if (!topic->lastValue || topic->lastValueClient == client ||
+      value.time() >= topic->lastValue.time()) {
     DEBUG4("updating '{}' last value (time was {} is {})", topic->name,
            topic->lastValue.time(), value.time());
     topic->lastValue = value;
+    topic->lastValueClient = client;
 
     // if persistent, update flag
     if (topic->persistent) {

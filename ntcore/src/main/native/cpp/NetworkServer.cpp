@@ -340,9 +340,8 @@ NSImpl::NSImpl(std::string_view persistentFilename,
     // connect local storage to server
     {
       net::ServerStartup startup{m_serverImpl};
-      m_localStorage.StartNetwork(startup);
+      m_localStorage.StartNetwork(startup, &m_localQueue);
     }
-    m_localStorage.SetNetwork(&m_localQueue);
     m_serverImpl.SetLocal(&m_localStorage);
 
     // load persistent file first, then initialize
