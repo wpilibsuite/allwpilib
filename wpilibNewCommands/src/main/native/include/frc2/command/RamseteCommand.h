@@ -7,7 +7,6 @@
 #include <functional>
 #include <initializer_list>
 #include <memory>
-#include <span>
 
 #include <frc/Timer.h>
 #include <frc/controller/PIDController.h>

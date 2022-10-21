@@ -7,7 +7,6 @@
 #include <functional>
 #include <initializer_list>
 #include <memory>
-#include <span>
 #include <utility>
 #include <vector>
 

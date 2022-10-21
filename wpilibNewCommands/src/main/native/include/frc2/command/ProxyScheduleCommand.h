@@ -5,7 +5,6 @@
 #pragma once
 
 #include <memory>
-#include <span>
 
 #include <wpi/SmallVector.h>
 

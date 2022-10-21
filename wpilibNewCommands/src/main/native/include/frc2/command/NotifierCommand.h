@@ -6,7 +6,6 @@
 
 #include <functional>
 #include <initializer_list>
-#include <span>
 
 #include <frc/Notifier.h>
 #include <units/time.h>

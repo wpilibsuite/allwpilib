@@ -6,7 +6,6 @@
 
 #include <functional>
 #include <initializer_list>
-#include <span>
 
 #include <frc/controller/PIDController.h>
 
