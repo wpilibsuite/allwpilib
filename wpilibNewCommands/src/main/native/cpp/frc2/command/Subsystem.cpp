@@ -13,8 +13,8 @@ void Subsystem::Periodic() {}
 
 void Subsystem::SimulationPeriodic() {}
 
-void Subsystem::SetDefaultCommand(CommandPtr&& command) {
-  CommandScheduler::GetInstance().SetDefaultCommand(this, std::move(command));
+void Subsystem::SetDefaultCommand(CommandPtr&& defaultCommand) {
+  CommandScheduler::GetInstance().SetDefaultCommand(this, std::move(defaultCommand));
 }
 
 Command* Subsystem::GetDefaultCommand() const {

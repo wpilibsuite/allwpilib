@@ -306,7 +306,7 @@ void CommandScheduler::SetDefaultCommand(Subsystem* subsystem, CommandPtr&& defa
                         "Default commands should not end!");
   }
 
-  SetDefaultCommandImpl(subsystem, std::move(command).Unwrap());
+  SetDefaultCommandImpl(subsystem, std::move(defaultCommand).Unwrap());
 }
 
 Command* CommandScheduler::GetDefaultCommand(const Subsystem* subsystem) const {
