@@ -296,7 +296,8 @@ void CommandScheduler::UnregisterSubsystem(
   }
 }
 
-void CommandScheduler::SetDefaultCommand(Subsystem* subsystem, CommandPtr&& defaultCommand) {
+void CommandScheduler::SetDefaultCommand(Subsystem* subsystem,
+                                         CommandPtr&& defaultCommand) {
   if (!defaultCommand.get()->HasRequirement(subsystem)) {
     throw FRC_MakeError(frc::err::CommandIllegalUse, "{}",
                         "Default commands must require their subsystem!");
