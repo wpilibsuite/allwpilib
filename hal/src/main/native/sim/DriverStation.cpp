@@ -19,6 +19,7 @@
 #include <wpi/mutex.h>
 
 #include "HALInitializer.h"
+#include "hal/Errors.h"
 #include "hal/cpp/fpga_clock.h"
 #include "hal/simulation/MockHooks.h"
 #include "mockdata/DriverStationDataInternal.h"
@@ -42,7 +43,6 @@ struct JoystickDataCache {
   HAL_JoystickButtons buttons[kJoystickPorts];
   HAL_AllianceStationID allianceStation;
   double matchTime;
-  HAL_ControlWord controlWord;
   bool updated;
 };
 static_assert(std::is_standard_layout_v<JoystickDataCache>);
@@ -65,15 +65,13 @@ void JoystickDataCache::Update() {
   }
   allianceStation = SimDriverStationData->allianceStationId;
   matchTime = SimDriverStationData->matchTime;
-  std::memset(&controlWord, 0, sizeof(controlWord));
-  controlWord.enabled = SimDriverStationData->enabled;
-  controlWord.autonomous = SimDriverStationData->autonomous;
-  controlWord.test = SimDriverStationData->test;
-  controlWord.eStop = SimDriverStationData->eStop;
-  controlWord.fmsAttached = SimDriverStationData->fmsAttached;
-  controlWord.dsAttached = SimDriverStationData->dsAttached;
 }
 
+#define CHECK_JOYSTICK_NUMBER(stickNum)                  \
+  if ((stickNum) < 0 || (stickNum) >= HAL_kMaxJoysticks) \
+    return PARAMETER_OUT_OF_RANGE
+
+static HAL_ControlWord newestControlWord;
 static JoystickDataCache caches[3];
 static JoystickDataCache* currentRead = &caches[0];
 static JoystickDataCache* currentCache = &caches[1];
@@ -171,7 +169,7 @@ int32_t HAL_SendConsoleLine(const char* line) {
 
 int32_t HAL_GetControlWord(HAL_ControlWord* controlWord) {
   std::scoped_lock lock{driverStation->cacheMutex};
-  *controlWord = currentRead->controlWord;
+  *controlWord = newestControlWord;
   return 0;
 }
 
@@ -181,12 +179,14 @@ HAL_AllianceStationID HAL_GetAllianceStation(int32_t* status) {
 }
 
 int32_t HAL_GetJoystickAxes(int32_t joystickNum, HAL_JoystickAxes* axes) {
+  CHECK_JOYSTICK_NUMBER(joystickNum);
   std::scoped_lock lock{driverStation->cacheMutex};
   *axes = currentRead->axes[joystickNum];
   return 0;
 }
 
 int32_t HAL_GetJoystickPOVs(int32_t joystickNum, HAL_JoystickPOVs* povs) {
+  CHECK_JOYSTICK_NUMBER(joystickNum);
   std::scoped_lock lock{driverStation->cacheMutex};
   *povs = currentRead->povs[joystickNum];
   return 0;
@@ -194,6 +194,7 @@ int32_t HAL_GetJoystickPOVs(int32_t joystickNum, HAL_JoystickPOVs* povs) {
 
 int32_t HAL_GetJoystickButtons(int32_t joystickNum,
                                HAL_JoystickButtons* buttons) {
+  CHECK_JOYSTICK_NUMBER(joystickNum);
   std::scoped_lock lock{driverStation->cacheMutex};
   *buttons = currentRead->buttons[joystickNum];
   return 0;
@@ -209,6 +210,7 @@ void HAL_GetAllJoystickData(HAL_JoystickAxes* axes, HAL_JoystickPOVs* povs,
 
 int32_t HAL_GetJoystickDescriptor(int32_t joystickNum,
                                   HAL_JoystickDescriptor* desc) {
+  CHECK_JOYSTICK_NUMBER(joystickNum);
   SimDriverStationData->GetJoystickDescriptor(joystickNum, desc);
   return 0;
 }
@@ -280,11 +282,20 @@ void HAL_ObserveUserProgramTest(void) {
 }
 
 void HAL_RefreshDSData(void) {
+  HAL_ControlWord controlWord;
+  std::memset(&controlWord, 0, sizeof(controlWord));
+  controlWord.enabled = SimDriverStationData->enabled;
+  controlWord.autonomous = SimDriverStationData->autonomous;
+  controlWord.test = SimDriverStationData->test;
+  controlWord.eStop = SimDriverStationData->eStop;
+  controlWord.fmsAttached = SimDriverStationData->fmsAttached;
+  controlWord.dsAttached = SimDriverStationData->dsAttached;
   std::scoped_lock lock{driverStation->cacheMutex};
   if (currentCache->updated) {
     std::swap(currentCache, currentRead);
     currentCache->updated = false;
   }
+  newestControlWord = controlWord;
 }
 
 void HAL_ProvideNewDataEventHandle(WPI_EventHandle handle) {
@@ -303,8 +314,8 @@ void HAL_RemoveNewDataEventHandle(WPI_EventHandle handle) {
 
 HAL_Bool HAL_GetOutputsEnabled(void) {
   std::scoped_lock lock{driverStation->cacheMutex};
-  return currentRead->controlWord.enabled &&
-         currentRead->controlWord.dsAttached;
+  return newestControlWord.enabled &&
+         newestControlWord.dsAttached;
 }
 
 }  // extern "C"

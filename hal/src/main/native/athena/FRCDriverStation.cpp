@@ -20,6 +20,7 @@
 #include <wpi/mutex.h>
 
 #include "hal/DriverStation.h"
+#include "hal/Errors.h"
 
 static_assert(sizeof(int32_t) >= sizeof(int),
               "FRC_NetworkComm status variable is larger than 32 bits");
@@ -29,16 +30,14 @@ struct HAL_JoystickAxesInt {
   int16_t axes[HAL_kMaxJoystickAxes];
 };
 
-static constexpr int kJoystickPorts = 6;
-
 namespace {
 struct JoystickDataCache {
   JoystickDataCache() { std::memset(this, 0, sizeof(*this)); }
   void Update();
 
-  HAL_JoystickAxes axes[kJoystickPorts];
-  HAL_JoystickPOVs povs[kJoystickPorts];
-  HAL_JoystickButtons buttons[kJoystickPorts];
+  HAL_JoystickAxes axes[HAL_kMaxJoysticks];
+  HAL_JoystickPOVs povs[HAL_kMaxJoysticks];
+  HAL_JoystickButtons buttons[HAL_kMaxJoysticks];
   HAL_AllianceStationID allianceStation;
   float matchTime;
   bool updated;
@@ -94,7 +93,7 @@ static int32_t HAL_GetJoystickButtonsInternal(int32_t joystickNum,
 }
 
 void JoystickDataCache::Update() {
-  for (int i = 0; i < kJoystickPorts; i++) {
+  for (int i = 0; i < HAL_kMaxJoysticks; i++) {
     HAL_GetJoystickAxesInternal(i, &axes[i]);
     HAL_GetJoystickPOVsInternal(i, &povs[i]);
     HAL_GetJoystickButtonsInternal(i, &buttons[i]);
@@ -104,7 +103,11 @@ void JoystickDataCache::Update() {
   FRC_NetworkCommunication_getMatchTime(&matchTime);
 }
 
-static HAL_ControlWord newestControlWord = {0};
+#define CHECK_JOYSTICK_NUMBER(stickNum)                  \
+  if ((stickNum) < 0 || (stickNum) >= HAL_kMaxJoysticks) \
+    return PARAMETER_OUT_OF_RANGE
+
+static HAL_ControlWord newestControlWord;
 static JoystickDataCache caches[3];
 static JoystickDataCache* currentRead = &caches[0];
 static JoystickDataCache* currentCache = &caches[1];
@@ -166,6 +169,7 @@ static int32_t HAL_GetMatchInfoInternal(HAL_MatchInfo* info) {
 
 namespace hal::init {
 void InitializeFRCDriverStation() {
+  std::memset(&newestControlWord, 0, sizeof(newestControlWord));
   static FRCDriverStation ds;
   driverStation = &ds;
 }
@@ -286,12 +290,14 @@ int32_t HAL_GetControlWord(HAL_ControlWord* controlWord) {
 }
 
 int32_t HAL_GetJoystickAxes(int32_t joystickNum, HAL_JoystickAxes* axes) {
+  CHECK_JOYSTICK_NUMBER(joystickNum);
   std::scoped_lock lock{cacheMutex};
   *axes = currentRead->axes[joystickNum];
   return 0;
 }
 
 int32_t HAL_GetJoystickPOVs(int32_t joystickNum, HAL_JoystickPOVs* povs) {
+  CHECK_JOYSTICK_NUMBER(joystickNum);
   std::scoped_lock lock{cacheMutex};
   *povs = currentRead->povs[joystickNum];
   return 0;
@@ -299,6 +305,7 @@ int32_t HAL_GetJoystickPOVs(int32_t joystickNum, HAL_JoystickPOVs* povs) {
 
 int32_t HAL_GetJoystickButtons(int32_t joystickNum,
                                HAL_JoystickButtons* buttons) {
+  CHECK_JOYSTICK_NUMBER(joystickNum);
   std::scoped_lock lock{cacheMutex};
   *buttons = currentRead->buttons[joystickNum];
   return 0;
@@ -363,6 +370,7 @@ void HAL_FreeJoystickName(char* name) {
 }
 
 int32_t HAL_GetJoystickAxisType(int32_t joystickNum, int32_t axis) {
+  CHECK_JOYSTICK_NUMBER(joystickNum);
   HAL_JoystickDescriptor joystickDesc;
   if (HAL_GetJoystickDescriptor(joystickNum, &joystickDesc) < 0) {
     return -1;
@@ -373,6 +381,7 @@ int32_t HAL_GetJoystickAxisType(int32_t joystickNum, int32_t axis) {
 
 int32_t HAL_SetJoystickOutputs(int32_t joystickNum, int64_t outputs,
                                int32_t leftRumble, int32_t rightRumble) {
+  CHECK_JOYSTICK_NUMBER(joystickNum);
   return FRC_NetworkCommunication_setJoystickOutputs(joystickNum, outputs,
                                                      leftRumble, rightRumble);
 }
