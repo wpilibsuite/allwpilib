@@ -24,7 +24,6 @@
 #include "mockdata/DriverStationDataInternal.h"
 
 static wpi::mutex msgMutex;
-// static std::atomic_bool isFinalized{false};
 static std::atomic<HALSIM_SendErrorHandler> sendErrorHandler{nullptr};
 static std::atomic<HALSIM_SendConsoleLineHandler> sendConsoleLineHandler{
     nullptr};
@@ -171,7 +170,6 @@ int32_t HAL_SendConsoleLine(const char* line) {
 }
 
 int32_t HAL_GetControlWord(HAL_ControlWord* controlWord) {
-  // TODO determine if we need to handle this on timeout
   std::scoped_lock lock{driverStation->cacheMutex};
   *controlWord = currentRead->controlWord;
   return 0;

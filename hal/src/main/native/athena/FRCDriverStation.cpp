@@ -41,7 +41,6 @@ struct JoystickDataCache {
   HAL_JoystickButtons buttons[kJoystickPorts];
   HAL_AllianceStationID allianceStation;
   float matchTime;
-  HAL_ControlWord controlWord;
   bool updated;
 };
 static_assert(std::is_standard_layout_v<JoystickDataCache>);
@@ -105,6 +104,7 @@ void JoystickDataCache::Update() {
   FRC_NetworkCommunication_getMatchTime(&matchTime);
 }
 
+static HAL_ControlWord newestControlWord = {0};
 static JoystickDataCache caches[3];
 static JoystickDataCache* currentRead = &caches[0];
 static JoystickDataCache* currentCache = &caches[1];
@@ -280,9 +280,8 @@ int32_t HAL_SendConsoleLine(const char* line) {
 }
 
 int32_t HAL_GetControlWord(HAL_ControlWord* controlWord) {
-  // TODO determine if we need to handle this on timeout
   std::scoped_lock lock{cacheMutex};
-  *controlWord = currentRead->controlWord;
+  *controlWord = newestControlWord;
   return 0;
 }
 
@@ -431,7 +430,7 @@ void HAL_RefreshDSData(void) {
     std::swap(currentCache, currentRead);
     currentCache->updated = false;
   }
-  currentCache->controlWord = controlWord;
+  newestControlWord = controlWord;
 }
 
 void HAL_ProvideNewDataEventHandle(WPI_EventHandle handle) {

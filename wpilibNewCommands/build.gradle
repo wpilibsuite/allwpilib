@@ -105,6 +105,4 @@ test {
         outputs.upToDateWhen {false}
         showStandardStreams = true
     }
-    //jvmArgs '-Xdebug',
-    //       '-Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=10999'
 }
