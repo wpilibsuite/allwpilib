@@ -82,11 +82,12 @@ public class ChassisSpeeds {
   public static ChassisSpeeds fromFieldRelativeSpeeds(
     ChassisSpeeds fieldRelativeSpeeds,
     Rotation2d robotAngle) {
-  return fromFieldRelativeSpeeds(
-    fieldRelativeSpeeds.vxMetersPerSecond,
-    fieldRelativeSpeeds.vyMetersPerSecond,
-    fieldRelativeSpeeds.omegaRadiansPerSecond,
-    robotAngle
+    return fromFieldRelativeSpeeds(
+      fieldRelativeSpeeds.vxMetersPerSecond,
+      fieldRelativeSpeeds.vyMetersPerSecond,
+      fieldRelativeSpeeds.omegaRadiansPerSecond,
+      robotAngle
+    );
   }
 
   @Override
