@@ -15,8 +15,8 @@
 #include "frc/geometry/Translation2d.h"
 #include "frc/geometry/Twist2d.h"
 #include "frc/kinematics/ChassisSpeeds.h"
-#include "frc/kinematics/SwerveModuleState.h"
 #include "frc/kinematics/SwerveModulePosition.h"
+#include "frc/kinematics/SwerveModuleState.h"
 #include "units/velocity.h"
 #include "wpimath/MathShared.h"
 
@@ -166,13 +166,13 @@ class SwerveDriveKinematics {
 
   /**
    * Performs forward kinematics to return the resulting Twist2d from the
-   * given module position deltas. This method is often used for odometry -- 
+   * given module position deltas. This method is often used for odometry --
    * determining the robot's position on the field using data from the
    * real-world position delta and angle of each module on the robot.
    *
-   * @param wheelDeltas The latest change in position of the modules (as a 
+   * @param wheelDeltas The latest change in position of the modules (as a
    * SwerveModulePosition type) as measured from respective encoders and gyros.
-   * The order of the swerve module states should be same as passed into the 
+   * The order of the swerve module states should be same as passed into the
    * constructor of this class.
    *
    * @return The resulting Twist2d.
@@ -182,13 +182,13 @@ class SwerveDriveKinematics {
 
   /**
    * Performs forward kinematics to return the resulting Twist2d from the
-   * given module position deltas. This method is often used for odometry -- 
+   * given module position deltas. This method is often used for odometry --
    * determining the robot's position on the field using data from the
    * real-world position delta and angle of each module on the robot.
    *
-   * @param wheelDeltas The latest change in position of the modules (as a 
+   * @param wheelDeltas The latest change in position of the modules (as a
    * SwerveModulePosition type) as measured from respective encoders and gyros.
-   * The order of the swerve module states should be same as passed into the 
+   * The order of the swerve module states should be same as passed into the
    * constructor of this class.
    *
    * @return The resulting Twist2d.

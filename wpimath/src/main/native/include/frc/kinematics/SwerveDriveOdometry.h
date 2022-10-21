@@ -52,10 +52,10 @@ class SwerveDriveOdometry {
    * @param modulePositions The wheel positions reported by each module.
    * @param initialPose The starting position of the robot on the field.
    */
-  SwerveDriveOdometry(SwerveDriveKinematics<NumModules> kinematics,
-                      const Rotation2d& gyroAngle,
-                      const wpi::array<SwerveModulePosition, NumModules> modulePositions,
-                      const Pose2d& initialPose = Pose2d{});
+  SwerveDriveOdometry(
+      SwerveDriveKinematics<NumModules> kinematics, const Rotation2d& gyroAngle,
+      const wpi::array<SwerveModulePosition, NumModules> modulePositions,
+      const Pose2d& initialPose = Pose2d{});
 
   /**
    * Resets the robot's position on the field.
@@ -68,8 +68,7 @@ class SwerveDriveOdometry {
    * @param wheelPositions The wheel positions reported by each module.
    */
   template <typename... ModulePositions>
-  void ResetPosition(const Pose2d& pose,
-                     const Rotation2d& gyroAngle,
+  void ResetPosition(const Pose2d& pose, const Rotation2d& gyroAngle,
                      ModulePositions&&... wheelPositions);
 
   /**
@@ -82,9 +81,9 @@ class SwerveDriveOdometry {
    * @param gyroAngle The angle reported by the gyroscope.
    * @param modulePositions The wheel positions reported by each module.
    */
-  void ResetPosition(const Pose2d& pose, 
-                     const Rotation2d& gyroAngle,
-                     const wpi::array<SwerveModulePosition, NumModules> modulePositions);
+  void ResetPosition(
+      const Pose2d& pose, const Rotation2d& gyroAngle,
+      const wpi::array<SwerveModulePosition, NumModules> modulePositions);
 
   /**
    * Returns the position of the robot on the field.
@@ -101,9 +100,9 @@ class SwerveDriveOdometry {
    * angular rate that is calculated from forward kinematics.
    *
    * @param gyroAngle The angle reported by the gyroscope.
-   * @param wheelPositions The current position of all swerve modules. Please provide
-   *                     the positions in the same order in which you instantiated
-   *                     your SwerveDriveKinematics.
+   * @param wheelPositions The current position of all swerve modules. Please
+   * provide the positions in the same order in which you instantiated your
+   * SwerveDriveKinematics.
    *
    * @return The new pose of the robot.
    */
@@ -120,14 +119,15 @@ class SwerveDriveOdometry {
    * angular rate that is calculated from forward kinematics.
    *
    * @param gyroAngle The angle reported by the gyroscope.
-   * @param modulePositions The current position of all swerve modules. Please provide
-   *                     the positions in the same order in which you instantiated
-   *                     your SwerveDriveKinematics.
+   * @param modulePositions The current position of all swerve modules. Please
+   * provide the positions in the same order in which you instantiated your
+   * SwerveDriveKinematics.
    *
    * @return The new pose of the robot.
    */
-  const Pose2d& Update(const Rotation2d& gyroAngle,
-                       const wpi::array<SwerveModulePosition, NumModules> modulePositions);
+  const Pose2d& Update(
+      const Rotation2d& gyroAngle,
+      const wpi::array<SwerveModulePosition, NumModules> modulePositions);
 
  private:
   SwerveDriveKinematics<NumModules> m_kinematics;

@@ -8,8 +8,8 @@
 
 #include "frc/geometry/Rotation2d.h"
 #include "units/angle.h"
-#include "units/math.h"
 #include "units/length.h"
+#include "units/math.h"
 
 namespace frc {
 /**

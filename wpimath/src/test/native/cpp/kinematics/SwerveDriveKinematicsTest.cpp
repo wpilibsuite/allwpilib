@@ -181,7 +181,8 @@ TEST_F(SwerveDriveKinematicsTest, OffCenterCORRotationForwardKinematics) {
   EXPECT_NEAR(chassisSpeeds.omega.value(), 2 * std::numbers::pi, kEpsilon);
 }
 
-TEST_F(SwerveDriveKinematicsTest, OffCenterCORRotationForwardKinematicsWithDeltas) {
+TEST_F(SwerveDriveKinematicsTest,
+       OffCenterCORRotationForwardKinematicsWithDeltas) {
   SwerveModulePosition fl{0.0_m, 0_deg};
   SwerveModulePosition fr{150.796_m, 0_deg};
   SwerveModulePosition bl{150.796_m, -90_deg};

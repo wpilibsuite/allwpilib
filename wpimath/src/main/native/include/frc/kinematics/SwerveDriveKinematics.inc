@@ -116,7 +116,8 @@ Twist2d SwerveDriveKinematics<NumModules>::ToTwist2d(
   for (size_t i = 0; i < NumModules; ++i) {
     SwerveModulePosition module = moduleDeltas[i];
     moduleDeltaMatrix(i * 2, 0) = module.distance.value() * module.angle.Cos();
-    moduleDeltaMatrix(i * 2 + 1, 0) = module.distance.value() * module.angle.Sin();
+    moduleDeltaMatrix(i * 2 + 1, 0) =
+        module.distance.value() * module.angle.Sin();
   }
 
   Eigen::Vector3d chassisDeltaVector =
