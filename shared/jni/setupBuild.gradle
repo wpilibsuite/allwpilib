@@ -42,6 +42,9 @@ model {
                 cpp {
                     source {
                         srcDirs 'src/main/native/cpp'
+                        if (project.hasProperty('generatedSources')) {
+                            srcDir generatedSources
+                        }
                         include '**/*.cpp'
                         exclude '**/jni/**/*.cpp'
                     }
@@ -110,6 +113,9 @@ model {
                 cpp {
                     source {
                         srcDirs 'src/main/native/cpp'
+                        if (project.hasProperty('generatedSources')) {
+                            srcDir generatedSources
+                        }
                         include '**/jni/**/*.cpp'
                     }
                     exportedHeaders {
@@ -151,6 +157,9 @@ model {
                 cpp {
                     source {
                         srcDirs 'src/main/native/cpp'
+                        if (project.hasProperty('generatedSources')) {
+                            srcDir generatedSources
+                        }
                         include '**/jni/**/*.cpp'
                     }
                     exportedHeaders {
@@ -201,8 +210,8 @@ model {
                     lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
                     lib project: ':wpiutil', library: 'wpiutilJNIShared', linkage: 'shared'
                 }
-                if (nativeName == 'hal' && it.targetPlatform.name == nativeUtils.wpi.platforms.roborio) {
-                    nativeUtils.useRequiredLibrary(it, 'ni_link_libraries', 'ni_runtime_libraries')
+                if (project.hasProperty('exeSplitSetup')) {
+                    exeSplitSetup(it)
                 }
             }
         }
@@ -236,9 +245,9 @@ model {
             lib library: nativeName, linkage: 'shared'
             if (!project.hasProperty('noWpiutil')) {
                 lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
-                if (nativeName == 'hal' && it.targetPlatform.name == nativeUtils.wpi.platforms.roborio) {
-                    nativeUtils.useRequiredLibrary(it, 'ni_link_libraries', 'ni_runtime_libraries')
-                }
+            }
+            if (project.hasProperty('exeSplitSetup')) {
+                exeSplitSetup(it)
             }
         }
     }

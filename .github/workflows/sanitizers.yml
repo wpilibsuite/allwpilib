@@ -15,34 +15,23 @@ jobs:
           - name: asan
             cmake-flags: "-DCMAKE_BUILD_TYPE=Asan"
             ctest-env: ""
-            ctest-flags: "-E 'ntcore|wpilibc'"
+            ctest-flags: "-E 'wpilibc'"
           - name: tsan
             cmake-flags: "-DCMAKE_BUILD_TYPE=Tsan"
             ctest-env: "TSAN_OPTIONS=second_deadlock_stack=1"
-            ctest-flags: "-E 'ntcore|cscore|cameraserver|wpilibc|wpilibNewCommands'"
+            ctest-flags: "-E 'cscore|cameraserver|wpilibc|wpilibNewCommands'"
           - name: ubsan
             cmake-flags: "-DCMAKE_BUILD_TYPE=Ubsan"
             ctest-env: ""
             ctest-flags: ""
     name: "${{ matrix.name }}"
     runs-on: ubuntu-latest
-    container: wpilib/roborio-cross-ubuntu:2022-20.04
+    container: wpilib/roborio-cross-ubuntu:2023-22.04
     steps:
       - uses: actions/checkout@v3
 
       - name: Install Dependencies
-        run: |
-          sudo add-apt-repository ppa:ubuntu-toolchain-r/test
-          sudo apt install -y gcc-11 g++-11
-          sudo update-alternatives \
-            --install /usr/bin/gcc gcc /usr/bin/gcc-11 11 \
-            --slave /usr/bin/g++ g++ /usr/bin/g++-11
-          sudo update-alternatives --set gcc /usr/bin/gcc-11
-
-      - name: Set up Python 3.8
-        uses: actions/setup-python@v2
-        with:
-          python-version: 3.8
+        run: sudo apt-get update && sudo apt-get install -y libopencv-dev libopencv4.5-java python-is-python3
 
       - name: Install jinja
         run: python -m pip install jinja2

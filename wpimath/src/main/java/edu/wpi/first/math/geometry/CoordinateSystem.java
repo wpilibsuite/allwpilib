@@ -110,6 +110,21 @@ public class CoordinateSystem {
    * @return The given pose in the desired coordinate system.
    */
   public static Pose3d convert(Pose3d pose, CoordinateSystem from, CoordinateSystem to) {
-    return pose.relativeTo(new Pose3d(new Translation3d(), to.m_rotation.minus(from.m_rotation)));
+    return new Pose3d(
+        convert(pose.getTranslation(), from, to), convert(pose.getRotation(), from, to));
+  }
+
+  /**
+   * Converts the given transform from one coordinate system to another.
+   *
+   * @param transform The transform to convert.
+   * @param from The coordinate system the transform starts in.
+   * @param to The coordinate system to which to convert.
+   * @return The given transform in the desired coordinate system.
+   */
+  public static Transform3d convert(
+      Transform3d transform, CoordinateSystem from, CoordinateSystem to) {
+    return new Transform3d(
+        convert(transform.getTranslation(), from, to), convert(transform.getRotation(), from, to));
   }
 }

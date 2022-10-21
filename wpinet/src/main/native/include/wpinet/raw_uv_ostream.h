@@ -6,11 +6,11 @@
 #define WPINET_RAW_UV_OSTREAM_H_
 
 #include <functional>
+#include <span>
 #include <utility>
 
 #include <wpi/SmallVector.h>
 #include <wpi/raw_ostream.h>
-#include <wpi/span.h>
 
 #include "wpinet/uv/Buffer.h"
 
@@ -50,7 +50,7 @@ class raw_uv_ostream : public raw_ostream {
   /**
    * Returns an span to the buffers.
    */
-  span<uv::Buffer> bufs() { return m_bufs; }
+  std::span<uv::Buffer> bufs() { return m_bufs; }
 
   void flush() = delete;
 

@@ -813,7 +813,7 @@ void json::binary_writer::write_number(const NumberType n)
         std::reverse(vec.begin(), vec.end());
     }
 
-    o << span{vec.data(), sizeof(NumberType)};
+    o << std::span{vec.data(), sizeof(NumberType)};
 }
 
 template<typename NumberType, typename std::enable_if<
@@ -1004,7 +1004,7 @@ std::vector<uint8_t> json::to_cbor(const json& j)
     return result;
 }
 
-span<uint8_t> json::to_cbor(const json& j, std::vector<uint8_t>& buf)
+std::span<uint8_t> json::to_cbor(const json& j, std::vector<uint8_t>& buf)
 {
     buf.clear();
     raw_uvector_ostream os(buf);
@@ -1012,7 +1012,7 @@ span<uint8_t> json::to_cbor(const json& j, std::vector<uint8_t>& buf)
     return os.array();
 }
 
-span<uint8_t> json::to_cbor(const json& j, SmallVectorImpl<uint8_t>& buf)
+std::span<uint8_t> json::to_cbor(const json& j, SmallVectorImpl<uint8_t>& buf)
 {
     buf.clear();
     raw_usvector_ostream os(buf);
@@ -1033,7 +1033,7 @@ std::vector<uint8_t> json::to_msgpack(const json& j)
     return result;
 }
 
-span<uint8_t> json::to_msgpack(const json& j, std::vector<uint8_t>& buf)
+std::span<uint8_t> json::to_msgpack(const json& j, std::vector<uint8_t>& buf)
 {
     buf.clear();
     raw_uvector_ostream os(buf);
@@ -1041,7 +1041,7 @@ span<uint8_t> json::to_msgpack(const json& j, std::vector<uint8_t>& buf)
     return os.array();
 }
 
-span<uint8_t> json::to_msgpack(const json& j, SmallVectorImpl<uint8_t>& buf)
+std::span<uint8_t> json::to_msgpack(const json& j, SmallVectorImpl<uint8_t>& buf)
 {
     buf.clear();
     raw_usvector_ostream os(buf);
@@ -1064,7 +1064,7 @@ std::vector<uint8_t> json::to_ubjson(const json& j,
     return result;
 }
 
-span<uint8_t> json::to_ubjson(const json& j, std::vector<uint8_t>& buf,
+std::span<uint8_t> json::to_ubjson(const json& j, std::vector<uint8_t>& buf,
                               const bool use_size, const bool use_type)
 {
     buf.clear();
@@ -1073,7 +1073,7 @@ span<uint8_t> json::to_ubjson(const json& j, std::vector<uint8_t>& buf,
     return os.array();
 }
 
-span<uint8_t> json::to_ubjson(const json& j, SmallVectorImpl<uint8_t>& buf,
+std::span<uint8_t> json::to_ubjson(const json& j, SmallVectorImpl<uint8_t>& buf,
                               const bool use_size, const bool use_type)
 {
     buf.clear();

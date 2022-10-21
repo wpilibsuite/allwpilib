@@ -28,6 +28,7 @@
 #include "hal/Errors.h"
 #include "hal/Notifier.h"
 #include "hal/handles/HandlesInternal.h"
+#include "hal/roborio/InterruptManager.h"
 #include "visa/visa.h"
 
 using namespace hal;
@@ -419,6 +420,12 @@ HAL_Bool HAL_Initialize(int32_t timeout, int32_t mode) {
   int32_t status = 0;
   global.reset(tGlobal::create(&status));
   watchdog.reset(tSysWatchdog::create(&status));
+
+  if (status != 0) {
+    return false;
+  }
+
+  status = InterruptManager::Initialize(global->getSystemInterface());
 
   if (status != 0) {
     return false;

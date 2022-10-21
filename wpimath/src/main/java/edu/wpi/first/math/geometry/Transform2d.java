@@ -47,13 +47,23 @@ public class Transform2d {
   }
 
   /**
-   * Scales the transform by the scalar.
+   * Multiplies the transform by the scalar.
    *
    * @param scalar The scalar.
    * @return The scaled Transform2d.
    */
   public Transform2d times(double scalar) {
     return new Transform2d(m_translation.times(scalar), m_rotation.times(scalar));
+  }
+
+  /**
+   * Divides the transform by the scalar.
+   *
+   * @param scalar The scalar.
+   * @return The scaled Transform2d.
+   */
+  public Transform2d div(double scalar) {
+    return times(1.0 / scalar);
   }
 
   /**

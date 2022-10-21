@@ -4,6 +4,8 @@
 
 #pragma once
 
+#include <numbers>
+
 #include <frc/AnalogGyro.h>
 #include <frc/Encoder.h>
 #include <frc/controller/PIDController.h>
@@ -14,7 +16,6 @@
 #include <frc/kinematics/MecanumDriveOdometry.h>
 #include <frc/kinematics/MecanumDriveWheelSpeeds.h>
 #include <frc/motorcontrol/PWMSparkMax.h>
-#include <wpi/numbers>
 
 /**
  * Represents a mecanum drive style drivetrain.
@@ -39,7 +40,7 @@ class Drivetrain {
 
   static constexpr auto kMaxSpeed = 3.0_mps;  // 3 meters per second
   static constexpr units::radians_per_second_t kMaxAngularSpeed{
-      wpi::numbers::pi};  // 1/2 rotation per second
+      std::numbers::pi};  // 1/2 rotation per second
 
  private:
   frc::PWMSparkMax m_frontLeftMotor{1};

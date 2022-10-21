@@ -4,14 +4,18 @@
 
 #pragma once
 
+#include <stdint.h>
+
 #include <string>
 #include <string_view>
 #include <vector>
 
-#include <ntcore_cpp.h>
+#include <networktables/IntegerArrayTopic.h>
+#include <networktables/NetworkTableInstance.h>
+#include <networktables/StringArrayTopic.h>
+#include <networktables/StringTopic.h>
 
 #include "glass/DataSource.h"
-#include "glass/networktables/NetworkTablesHelper.h"
 #include "glass/other/CommandScheduler.h"
 
 namespace glass {
@@ -20,7 +24,7 @@ class NTCommandSchedulerModel : public CommandSchedulerModel {
   static constexpr const char* kType = "Scheduler";
 
   explicit NTCommandSchedulerModel(std::string_view path);
-  NTCommandSchedulerModel(NT_Inst instance, std::string_view path);
+  NTCommandSchedulerModel(nt::NetworkTableInstance inst, std::string_view path);
 
   const char* GetName() const override { return m_nameValue.c_str(); }
   const std::vector<std::string>& GetCurrentCommands() override {
@@ -34,14 +38,14 @@ class NTCommandSchedulerModel : public CommandSchedulerModel {
   bool IsReadOnly() override { return false; }
 
  private:
-  NetworkTablesHelper m_nt;
-  NT_Entry m_name;
-  NT_Entry m_commands;
-  NT_Entry m_ids;
-  NT_Entry m_cancel;
+  nt::NetworkTableInstance m_inst;
+  nt::StringSubscriber m_name;
+  nt::StringArraySubscriber m_commands;
+  nt::IntegerArraySubscriber m_ids;
+  nt::IntegerArrayPublisher m_cancel;
 
   std::string m_nameValue;
   std::vector<std::string> m_commandsValue;
-  std::vector<double> m_idsValue;
+  std::vector<int64_t> m_idsValue;
 };
 }  // namespace glass

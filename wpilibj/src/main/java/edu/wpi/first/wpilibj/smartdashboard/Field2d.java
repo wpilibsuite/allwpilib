@@ -29,13 +29,20 @@ import java.util.List;
  * using the getObject() function. Other objects can also have multiple poses (which will show the
  * object at multiple locations).
  */
-public class Field2d implements NTSendable {
+public class Field2d implements NTSendable, AutoCloseable {
   /** Constructor. */
   public Field2d() {
     FieldObject2d obj = new FieldObject2d("Robot");
     obj.setPose(new Pose2d());
     m_objects.add(obj);
     SendableRegistry.add(this, "Field");
+  }
+
+  @Override
+  public void close() {
+    for (FieldObject2d obj : m_objects) {
+      obj.close();
+    }
   }
 
   /**
@@ -83,7 +90,7 @@ public class Field2d implements NTSendable {
     m_objects.add(obj);
     if (m_table != null) {
       synchronized (obj) {
-        obj.m_entry = m_table.getEntry(name);
+        obj.m_entry = m_table.getDoubleArrayTopic(name).getEntry(new double[] {});
       }
     }
     return obj;
@@ -106,7 +113,7 @@ public class Field2d implements NTSendable {
       m_table = builder.getTable();
       for (FieldObject2d obj : m_objects) {
         synchronized (obj) {
-          obj.m_entry = m_table.getEntry(obj.m_name);
+          obj.m_entry = m_table.getDoubleArrayTopic(obj.m_name).getEntry(new double[] {});
           obj.updateEntry(true);
         }
       }

@@ -6,9 +6,6 @@
 
 #include <vector>
 
-#include <wpi/Endian.h>
-#include <wpi/MathExtras.h>
-
 #include "frc/trajectory/Trajectory.h"
 
 using namespace frc;
@@ -45,7 +42,7 @@ Pose2d FieldObject2d::GetPose() const {
   return m_poses[0];
 }
 
-void FieldObject2d::SetPoses(wpi::span<const Pose2d> poses) {
+void FieldObject2d::SetPoses(std::span<const Pose2d> poses) {
   std::scoped_lock lock(m_mutex);
   m_poses.assign(poses.begin(), poses.end());
   UpdateEntry();
@@ -71,7 +68,7 @@ std::vector<Pose2d> FieldObject2d::GetPoses() const {
   return std::vector<Pose2d>(m_poses.begin(), m_poses.end());
 }
 
-wpi::span<const Pose2d> FieldObject2d::GetPoses(
+std::span<const Pose2d> FieldObject2d::GetPoses(
     wpi::SmallVectorImpl<Pose2d>& out) const {
   std::scoped_lock lock(m_mutex);
   UpdateFromEntry();
@@ -83,41 +80,17 @@ void FieldObject2d::UpdateEntry(bool setDefault) {
   if (!m_entry) {
     return;
   }
-  if (m_poses.size() < (255 / 3)) {
-    wpi::SmallVector<double, 9> arr;
-    for (auto&& pose : m_poses) {
-      auto& translation = pose.Translation();
-      arr.push_back(translation.X().value());
-      arr.push_back(translation.Y().value());
-      arr.push_back(pose.Rotation().Degrees().value());
-    }
-    if (setDefault) {
-      m_entry.SetDefaultDoubleArray(arr);
-    } else {
-      m_entry.ForceSetDoubleArray(arr);
-    }
+  wpi::SmallVector<double, 9> arr;
+  for (auto&& pose : m_poses) {
+    auto& translation = pose.Translation();
+    arr.push_back(translation.X().value());
+    arr.push_back(translation.Y().value());
+    arr.push_back(pose.Rotation().Degrees().value());
+  }
+  if (setDefault) {
+    m_entry.SetDefault(arr);
   } else {
-    // send as raw array of doubles if too big for NT array
-    std::vector<char> arr;
-    arr.resize(m_poses.size() * 3 * 8);
-    char* p = arr.data();
-    for (auto&& pose : m_poses) {
-      auto& translation = pose.Translation();
-      wpi::support::endian::write64be(
-          p, wpi::DoubleToBits(translation.X().value()));
-      p += 8;
-      wpi::support::endian::write64be(
-          p, wpi::DoubleToBits(translation.Y().value()));
-      p += 8;
-      wpi::support::endian::write64be(
-          p, wpi::DoubleToBits(pose.Rotation().Degrees().value()));
-      p += 8;
-    }
-    if (setDefault) {
-      m_entry.SetDefaultRaw({arr.data(), arr.size()});
-    } else {
-      m_entry.ForceSetRaw({arr.data(), arr.size()});
-    }
+    m_entry.Set(arr);
   }
 }
 
@@ -125,46 +98,15 @@ void FieldObject2d::UpdateFromEntry() const {
   if (!m_entry) {
     return;
   }
-  auto val = m_entry.GetValue();
-  if (!val) {
+  auto arr = m_entry.Get();
+  auto size = arr.size();
+  if ((size % 3) != 0) {
     return;
   }
-
-  if (val->IsDoubleArray()) {
-    auto arr = val->GetDoubleArray();
-    auto size = arr.size();
-    if ((size % 3) != 0) {
-      return;
-    }
-    m_poses.resize(size / 3);
-    for (size_t i = 0; i < size / 3; ++i) {
-      m_poses[i] =
-          Pose2d{units::meter_t{arr[i * 3 + 0]}, units::meter_t{arr[i * 3 + 1]},
-                 units::degree_t{arr[i * 3 + 2]}};
-    }
-  } else if (val->IsRaw()) {
-    // treat it simply as an array of doubles
-    std::string_view data = val->GetRaw();
-
-    // must be triples of doubles
-    auto size = data.size();
-    if ((size % (3 * 8)) != 0) {
-      return;
-    }
-    m_poses.resize(size / (3 * 8));
-    const char* p = data.data();
-    for (size_t i = 0; i < size / (3 * 8); ++i) {
-      double x = wpi::BitsToDouble(
-          wpi::support::endian::readNext<uint64_t, wpi::support::big,
-                                         wpi::support::unaligned>(p));
-      double y = wpi::BitsToDouble(
-          wpi::support::endian::readNext<uint64_t, wpi::support::big,
-                                         wpi::support::unaligned>(p));
-      double rot = wpi::BitsToDouble(
-          wpi::support::endian::readNext<uint64_t, wpi::support::big,
-                                         wpi::support::unaligned>(p));
-      m_poses[i] =
-          Pose2d{units::meter_t{x}, units::meter_t{y}, units::degree_t{rot}};
-    }
+  m_poses.resize(size / 3);
+  for (size_t i = 0; i < size / 3; ++i) {
+    m_poses[i] =
+        Pose2d{units::meter_t{arr[i * 3 + 0]}, units::meter_t{arr[i * 3 + 1]},
+               units::degree_t{arr[i * 3 + 2]}};
   }
 }

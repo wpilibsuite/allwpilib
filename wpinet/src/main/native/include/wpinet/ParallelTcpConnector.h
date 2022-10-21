@@ -8,11 +8,10 @@
 
 #include <functional>
 #include <memory>
+#include <span>
 #include <string>
 #include <utility>
 #include <vector>
-
-#include <wpi/span.h>
 
 #include "wpinet/uv/Timer.h"
 
@@ -85,7 +84,7 @@ class ParallelTcpConnector
    * @param servers array of server/port pairs
    */
   void SetServers(
-      wpi::span<const std::pair<std::string, unsigned int>> servers);
+      std::span<const std::pair<std::string, unsigned int>> servers);
 
   /**
    * Tells the parallel connector that the current connection has terminated and

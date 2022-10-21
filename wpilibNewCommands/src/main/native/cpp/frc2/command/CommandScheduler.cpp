@@ -12,13 +12,15 @@
 #include <frc/livewindow/LiveWindow.h>
 #include <hal/FRCUsageReporting.h>
 #include <hal/HALBase.h>
+#include <networktables/IntegerArrayTopic.h>
 #include <networktables/NTSendableBuilder.h>
-#include <networktables/NetworkTableEntry.h>
+#include <networktables/StringArrayTopic.h>
 #include <wpi/DenseMap.h>
 #include <wpi/SmallVector.h>
 #include <wpi/sendable/SendableRegistry.h>
 
 #include "frc2/command/CommandGroupBase.h"
+#include "frc2/command/CommandPtr.h"
 #include "frc2/command/Subsystem.h"
 
 using namespace frc2;
@@ -117,7 +119,7 @@ void CommandScheduler::Schedule(Command* command) {
   }
 
   if (command->IsGrouped()) {
-    throw FRC_MakeError(frc::err::CommandIllegalUse, "{}",
+    throw FRC_MakeError(frc::err::CommandIllegalUse,
                         "A command that is part of a command group "
                         "cannot be independently scheduled");
     return;
@@ -161,7 +163,7 @@ void CommandScheduler::Schedule(Command* command) {
   }
 }
 
-void CommandScheduler::Schedule(wpi::span<Command* const> commands) {
+void CommandScheduler::Schedule(std::span<Command* const> commands) {
   for (auto command : commands) {
     Schedule(command);
   }
@@ -171,6 +173,10 @@ void CommandScheduler::Schedule(std::initializer_list<Command*> commands) {
   for (auto command : commands) {
     Schedule(command);
   }
+}
+
+void CommandScheduler::Schedule(const CommandPtr& command) {
+  Schedule(command.get());
 }
 
 void CommandScheduler::Run() {
@@ -270,7 +276,7 @@ void CommandScheduler::RegisterSubsystem(
 }
 
 void CommandScheduler::RegisterSubsystem(
-    wpi::span<Subsystem* const> subsystems) {
+    std::span<Subsystem* const> subsystems) {
   for (auto* subsystem : subsystems) {
     RegisterSubsystem(subsystem);
   }
@@ -284,7 +290,7 @@ void CommandScheduler::UnregisterSubsystem(
 }
 
 void CommandScheduler::UnregisterSubsystem(
-    wpi::span<Subsystem* const> subsystems) {
+    std::span<Subsystem* const> subsystems) {
   for (auto* subsystem : subsystems) {
     UnregisterSubsystem(subsystem);
   }
@@ -326,7 +332,11 @@ void CommandScheduler::Cancel(Command* command) {
   m_watchdog.AddEpoch(command->GetName() + ".End(true)");
 }
 
-void CommandScheduler::Cancel(wpi::span<Command* const> commands) {
+void CommandScheduler::Cancel(const CommandPtr& command) {
+  Cancel(command.get());
+}
+
+void CommandScheduler::Cancel(std::span<Command* const> commands) {
   for (auto command : commands) {
     Cancel(command);
   }
@@ -347,7 +357,7 @@ void CommandScheduler::CancelAll() {
 }
 
 bool CommandScheduler::IsScheduled(
-    wpi::span<const Command* const> commands) const {
+    std::span<const Command* const> commands) const {
   for (auto command : commands) {
     if (!IsScheduled(command)) {
       return false;
@@ -368,6 +378,10 @@ bool CommandScheduler::IsScheduled(
 
 bool CommandScheduler::IsScheduled(const Command* command) const {
   return m_impl->scheduledCommands.contains(command);
+}
+
+bool CommandScheduler::IsScheduled(const CommandPtr& command) const {
+  return m_impl->scheduledCommands.contains(command.get());
 }
 
 Command* CommandScheduler::Requiring(const Subsystem* subsystem) const {
@@ -405,34 +419,35 @@ void CommandScheduler::OnCommandFinish(Action action) {
 
 void CommandScheduler::InitSendable(nt::NTSendableBuilder& builder) {
   builder.SetSmartDashboardType("Scheduler");
-  auto namesEntry = builder.GetEntry("Names");
-  auto idsEntry = builder.GetEntry("Ids");
-  auto cancelEntry = builder.GetEntry("Cancel");
+  builder.SetUpdateTable(
+      [this,
+       namesPub = nt::StringArrayTopic{builder.GetTopic("Names")}.Publish(),
+       idsPub = nt::IntegerArrayTopic{builder.GetTopic("Ids")}.Publish(),
+       cancelEntry = nt::IntegerArrayTopic{builder.GetTopic("Cancel")}.GetEntry(
+           {})]() mutable {
+        auto toCancel = cancelEntry.Get();
+        if (!toCancel.empty()) {
+          for (auto cancel : cancelEntry.Get()) {
+            uintptr_t ptrTmp = static_cast<uintptr_t>(cancel);
+            Command* command = reinterpret_cast<Command*>(ptrTmp);
+            if (m_impl->scheduledCommands.find(command) !=
+                m_impl->scheduledCommands.end()) {
+              Cancel(command);
+            }
+          }
+          cancelEntry.Set({});
+        }
 
-  builder.SetUpdateTable([=] {
-    double tmp[1];
-    tmp[0] = 0;
-    auto toCancel = cancelEntry.GetDoubleArray(tmp);
-    for (auto cancel : toCancel) {
-      uintptr_t ptrTmp = static_cast<uintptr_t>(cancel);
-      Command* command = reinterpret_cast<Command*>(ptrTmp);
-      if (m_impl->scheduledCommands.find(command) !=
-          m_impl->scheduledCommands.end()) {
-        Cancel(command);
-      }
-      nt::NetworkTableEntry(cancelEntry).SetDoubleArray({});
-    }
-
-    wpi::SmallVector<std::string, 8> names;
-    wpi::SmallVector<double, 8> ids;
-    for (Command* command : m_impl->scheduledCommands) {
-      names.emplace_back(command->GetName());
-      uintptr_t ptrTmp = reinterpret_cast<uintptr_t>(command);
-      ids.emplace_back(static_cast<double>(ptrTmp));
-    }
-    nt::NetworkTableEntry(namesEntry).SetStringArray(names);
-    nt::NetworkTableEntry(idsEntry).SetDoubleArray(ids);
-  });
+        wpi::SmallVector<std::string, 8> names;
+        wpi::SmallVector<int64_t, 8> ids;
+        for (Command* command : m_impl->scheduledCommands) {
+          names.emplace_back(command->GetName());
+          uintptr_t ptrTmp = reinterpret_cast<uintptr_t>(command);
+          ids.emplace_back(static_cast<int64_t>(ptrTmp));
+        }
+        namesPub.Set(names);
+        idsPub.Set(ids);
+      });
 }
 
 void CommandScheduler::SetDefaultCommandImpl(Subsystem* subsystem,

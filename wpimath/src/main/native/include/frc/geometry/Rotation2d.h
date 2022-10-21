@@ -53,7 +53,7 @@ class WPILIB_DLLEXPORT Rotation2d {
    * pi.
    *
    * For example, <code>Rotation2d{30_deg} + Rotation2d{60_deg}</code> equals
-   * <code>Rotation2d{units::radian_t{wpi::numbers::pi/2.0}}</code>
+   * <code>Rotation2d{units::radian_t{std::numbers::pi/2.0}}</code>
    *
    * @param other The rotation to add.
    *
@@ -66,7 +66,7 @@ class WPILIB_DLLEXPORT Rotation2d {
    * rotation.
    *
    * For example, <code>Rotation2d{10_deg} - Rotation2d{100_deg}</code> equals
-   * <code>Rotation2d{units::radian_t{-wpi::numbers::pi/2.0}}</code>
+   * <code>Rotation2d{units::radian_t{-std::numbers::pi/2.0}}</code>
    *
    * @param other The rotation to subtract.
    *
@@ -84,11 +84,21 @@ class WPILIB_DLLEXPORT Rotation2d {
 
   /**
    * Multiplies the current rotation by a scalar.
+   *
    * @param scalar The scalar.
    *
    * @return The new scaled Rotation2d.
    */
   Rotation2d operator*(double scalar) const;
+
+  /**
+   * Divides the current rotation by a scalar.
+   *
+   * @param scalar The scalar.
+   *
+   * @return The new scaled Rotation2d.
+   */
+  Rotation2d operator/(double scalar) const;
 
   /**
    * Checks equality between this Rotation2d and another object.

@@ -9,6 +9,7 @@
 #include <array>
 #include <atomic>
 #include <chrono>
+#include <span>
 #include <string>
 #include <string_view>
 #include <thread>
@@ -19,9 +20,11 @@
 #include <hal/DriverStationTypes.h>
 #include <hal/HALBase.h>
 #include <hal/Power.h>
+#include <networktables/BooleanTopic.h>
+#include <networktables/IntegerTopic.h>
 #include <networktables/NetworkTable.h>
-#include <networktables/NetworkTableEntry.h>
 #include <networktables/NetworkTableInstance.h>
+#include <networktables/StringTopic.h>
 #include <wpi/DataLog.h>
 #include <wpi/condition_variable.h>
 #include <wpi/mutex.h>
@@ -36,56 +39,42 @@ using namespace frc;
 namespace {
 // A simple class which caches the previous value written to an NT entry
 // Used to prevent redundant, repeated writes of the same value
-template <class T>
+template <typename Topic>
 class MatchDataSenderEntry {
  public:
   MatchDataSenderEntry(const std::shared_ptr<nt::NetworkTable>& table,
-                       std::string_view key, const T& initialVal) {
-    static_assert(std::is_same_v<T, bool> || std::is_same_v<T, double> ||
-                      std::is_same_v<T, std::string>,
-                  "Invalid type for MatchDataSenderEntry - must be "
-                  "to bool, double or std::string");
-
-    ntEntry = table->GetEntry(key);
-    if constexpr (std::is_same_v<T, bool>) {
-      ntEntry.ForceSetBoolean(initialVal);
-    } else if constexpr (std::is_same_v<T, double>) {
-      ntEntry.ForceSetDouble(initialVal);
-    } else if constexpr (std::is_same_v<T, std::string>) {
-      ntEntry.ForceSetString(initialVal);
-    }
-    prevVal = initialVal;
+                       std::string_view key,
+                       typename Topic::ParamType initialVal)
+      : publisher{Topic{table->GetTopic(key)}.Publish()}, prevVal{initialVal} {
+    publisher.Set(initialVal);
   }
 
-  void Set(const T& val) {
+  void Set(typename Topic::ParamType val) {
     if (val != prevVal) {
-      SetValue(val);
+      publisher.Set(val);
       prevVal = val;
     }
   }
 
  private:
-  nt::NetworkTableEntry ntEntry;
-  T prevVal;
-
-  void SetValue(bool val) { ntEntry.SetBoolean(val); }
-  void SetValue(double val) { ntEntry.SetDouble(val); }
-  void SetValue(std::string_view val) { ntEntry.SetString(val); }
+  typename Topic::PublisherType publisher;
+  typename Topic::ValueType prevVal;
 };
 
 struct MatchDataSender {
   std::shared_ptr<nt::NetworkTable> table =
       nt::NetworkTableInstance::GetDefault().GetTable("FMSInfo");
-  MatchDataSenderEntry<std::string> typeMetaData{table, ".type", "FMSInfo"};
-  MatchDataSenderEntry<std::string> gameSpecificMessage{
+  MatchDataSenderEntry<nt::StringTopic> typeMetaData{table, ".type", "FMSInfo"};
+  MatchDataSenderEntry<nt::StringTopic> gameSpecificMessage{
       table, "GameSpecificMessage", ""};
-  MatchDataSenderEntry<std::string> eventName{table, "EventName", ""};
-  MatchDataSenderEntry<double> matchNumber{table, "MatchNumber", 0.0};
-  MatchDataSenderEntry<double> replayNumber{table, "ReplayNumber", 0.0};
-  MatchDataSenderEntry<double> matchType{table, "MatchType", 0.0};
-  MatchDataSenderEntry<bool> alliance{table, "IsRedAlliance", true};
-  MatchDataSenderEntry<double> station{table, "StationNumber", 1.0};
-  MatchDataSenderEntry<double> controlWord{table, "FMSControlData", 0.0};
+  MatchDataSenderEntry<nt::StringTopic> eventName{table, "EventName", ""};
+  MatchDataSenderEntry<nt::IntegerTopic> matchNumber{table, "MatchNumber", 0};
+  MatchDataSenderEntry<nt::IntegerTopic> replayNumber{table, "ReplayNumber", 0};
+  MatchDataSenderEntry<nt::IntegerTopic> matchType{table, "MatchType", 0};
+  MatchDataSenderEntry<nt::BooleanTopic> alliance{table, "IsRedAlliance", true};
+  MatchDataSenderEntry<nt::IntegerTopic> station{table, "StationNumber", 1};
+  MatchDataSenderEntry<nt::IntegerTopic> controlWord{table, "FMSControlData",
+                                                     0};
 };
 
 class JoystickLogSender {
@@ -646,7 +635,7 @@ double DriverStation::GetMatchTime() {
 double DriverStation::GetBatteryVoltage() {
   int32_t status = 0;
   double voltage = HAL_GetVinVoltage(&status);
-  FRC_CheckErrorStatus(status, "{}", "getVinVoltage");
+  FRC_CheckErrorStatus(status, "getVinVoltage");
 
   return voltage;
 }
@@ -858,7 +847,7 @@ void JoystickLogSender::Init(wpi::log::DataLog& log, unsigned int stick,
   HAL_GetJoystickPOVs(m_stick, &m_prevPOVs);
   AppendButtons(m_prevButtons, timestamp);
   m_logAxes.Append(
-      wpi::span<const float>{m_prevAxes.axes,
+      std::span<const float>{m_prevAxes.axes,
                              static_cast<size_t>(m_prevAxes.count)},
       timestamp);
   AppendPOVs(m_prevPOVs, timestamp);
@@ -879,7 +868,7 @@ void JoystickLogSender::Send(uint64_t timestamp) {
       std::memcmp(axes.axes, m_prevAxes.axes,
                   sizeof(axes.axes[0]) * axes.count) != 0) {
     m_logAxes.Append(
-        wpi::span<const float>{axes.axes, static_cast<size_t>(axes.count)},
+        std::span<const float>{axes.axes, static_cast<size_t>(axes.count)},
         timestamp);
   }
   m_prevAxes = axes;
@@ -900,7 +889,7 @@ void JoystickLogSender::AppendButtons(HAL_JoystickButtons buttons,
   for (unsigned int i = 0; i < buttons.count; ++i) {
     buttonsArr[i] = (buttons.buttons & (1u << i)) != 0;
   }
-  m_logButtons.Append(wpi::span<const uint8_t>{buttonsArr, buttons.count},
+  m_logButtons.Append(std::span<const uint8_t>{buttonsArr, buttons.count},
                       timestamp);
 }
 
@@ -911,7 +900,7 @@ void JoystickLogSender::AppendPOVs(const HAL_JoystickPOVs& povs,
     povsArr[i] = povs.povs[i];
   }
   m_logPOVs.Append(
-      wpi::span<const int64_t>{povsArr, static_cast<size_t>(povs.count)},
+      std::span<const int64_t>{povsArr, static_cast<size_t>(povs.count)},
       timestamp);
 }
 

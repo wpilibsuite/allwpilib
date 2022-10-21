@@ -5,6 +5,7 @@
 #pragma once
 
 #include <algorithm>
+#include <string>
 
 #include "Color.h"
 
@@ -42,6 +43,13 @@ class Color8Bit {
   constexpr operator Color() const {  // NOLINT
     return Color(red / 255.0, green / 255.0, blue / 255.0);
   }
+
+  /**
+   * Return this color represented as a hex string.
+   *
+   * @return a string of the format <tt>\#RRGGBB</tt>
+   */
+  std::string HexString() const;
 
   int red = 0;
   int green = 0;

@@ -15,15 +15,17 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 class NetworkButtonTest extends CommandTestBase {
+  NetworkTableInstance m_inst;
+
   @BeforeEach
   void setup() {
-    NetworkTableInstance.getDefault().startLocal();
+    m_inst = NetworkTableInstance.create();
+    m_inst.startLocal();
   }
 
   @AfterEach
   void teardown() {
-    NetworkTableInstance.getDefault().deleteAllEntries();
-    NetworkTableInstance.getDefault().stopLocal();
+    m_inst.close();
   }
 
   @Test
@@ -31,14 +33,14 @@ class NetworkButtonTest extends CommandTestBase {
     var scheduler = CommandScheduler.getInstance();
     var commandHolder = new MockCommandHolder(true);
     var command = commandHolder.getMock();
-    var entry = NetworkTableInstance.getDefault().getTable("TestTable").getEntry("Test");
+    var pub = m_inst.getTable("TestTable").getBooleanTopic("Test").publish();
 
-    var button = new NetworkButton("TestTable", "Test");
-    entry.setBoolean(false);
+    var button = new NetworkButton(m_inst, "TestTable", "Test");
+    pub.set(false);
     button.whenPressed(command);
     scheduler.run();
     verify(command, never()).schedule();
-    entry.setBoolean(true);
+    pub.set(true);
     scheduler.run();
     scheduler.run();
     verify(command).schedule();

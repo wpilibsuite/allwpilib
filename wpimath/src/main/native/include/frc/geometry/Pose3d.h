@@ -48,6 +48,13 @@ class WPILIB_DLLEXPORT Pose3d {
          Rotation3d rotation);
 
   /**
+   * Constructs a 3D pose from a 2D pose in the X-Y plane.
+   *
+   * @param pose The 2D pose.
+   */
+  explicit Pose3d(const Pose2d& pose);
+
+  /**
    * Transforms the pose by the given transformation and returns the new
    * transformed pose.
    *
@@ -115,6 +122,24 @@ class WPILIB_DLLEXPORT Pose3d {
    * @return Reference to the rotational component of the pose.
    */
   const Rotation3d& Rotation() const { return m_rotation; }
+
+  /**
+   * Multiplies the current pose by a scalar.
+   *
+   * @param scalar The scalar.
+   *
+   * @return The new scaled Pose2d.
+   */
+  Pose3d operator*(double scalar) const;
+
+  /**
+   * Divides the current pose by a scalar.
+   *
+   * @param scalar The scalar.
+   *
+   * @return The new scaled Pose2d.
+   */
+  Pose3d operator/(double scalar) const;
 
   /**
    * Transforms the pose by the given transformation and returns the new pose.

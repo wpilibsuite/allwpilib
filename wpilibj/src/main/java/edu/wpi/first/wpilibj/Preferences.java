@@ -8,10 +8,13 @@ import static edu.wpi.first.wpilibj.util.ErrorMessages.requireNonNullParam;
 
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
-import edu.wpi.first.networktables.EntryListenerFlags;
+import edu.wpi.first.networktables.MultiSubscriber;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.networktables.StringPublisher;
+import edu.wpi.first.networktables.TopicListener;
+import edu.wpi.first.networktables.TopicListenerFlags;
 import java.util.Collection;
 
 /**
@@ -31,20 +34,51 @@ public final class Preferences {
   /** The Preferences table name. */
   private static final String TABLE_NAME = "Preferences";
   /** The network table. */
-  private static final NetworkTable m_table;
+  private static NetworkTable m_table;
+
+  private static StringPublisher m_typePublisher;
+  private static MultiSubscriber m_tableSubscriber;
+  private static TopicListener m_listener;
 
   /** Creates a preference class. */
   private Preferences() {}
 
   static {
-    m_table = NetworkTableInstance.getDefault().getTable(TABLE_NAME);
-    m_table.getEntry(".type").setString("RobotPreferences");
+    setNetworkTableInstance(NetworkTableInstance.getDefault());
+    HAL.report(tResourceType.kResourceType_Preferences, 0);
+  }
+
+  /**
+   * Set the NetworkTable instance used for entries. For testing purposes; use with caution.
+   *
+   * @param inst NetworkTable instance
+   */
+  public static synchronized void setNetworkTableInstance(NetworkTableInstance inst) {
+    m_table = inst.getTable(TABLE_NAME);
+    if (m_typePublisher != null) {
+      m_typePublisher.close();
+    }
+    m_typePublisher = m_table.getStringTopic(".type").publish();
+    m_typePublisher.set("RobotPreferences");
+
+    // Subscribe to all Preferences; this ensures we get the latest values
+    // ahead of a getter call.
+    if (m_tableSubscriber != null) {
+      m_tableSubscriber.close();
+    }
+    m_tableSubscriber = new MultiSubscriber(inst, new String[] {m_table.getPath() + "/"});
+
     // Listener to set all Preferences values to persistent
     // (for backwards compatibility with old dashboards).
-    m_table.addEntryListener(
-        (table, key, entry, value, flags) -> entry.setPersistent(),
-        EntryListenerFlags.kImmediate | EntryListenerFlags.kNew);
-    HAL.report(tResourceType.kResourceType_Preferences, 0);
+    if (m_listener != null) {
+      m_listener.close();
+    }
+    m_listener =
+        new TopicListener(
+            m_table.getInstance(),
+            new String[] {m_table.getPath() + "/"},
+            TopicListenerFlags.kImmediate | TopicListenerFlags.kPublish,
+            event -> event.info.getTopic().setPersistent(true));
   }
 
   /**
@@ -219,7 +253,9 @@ public final class Preferences {
    * @param key the key
    */
   public static void remove(String key) {
-    m_table.delete(key);
+    NetworkTableEntry entry = m_table.getEntry(key);
+    entry.clearPersistent();
+    entry.unpublish();
   }
 
   /** Remove all preferences. */

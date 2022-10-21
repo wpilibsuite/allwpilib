@@ -4,15 +4,14 @@
 
 #pragma once
 
-#include <functional>
 #include <memory>
 #include <string_view>
 
+#include <wpi/FunctionExtras.h>
 #include <wpi/sendable/SendableBuilder.h>
 
 #include "networktables/NetworkTable.h"
-#include "networktables/NetworkTableEntry.h"
-#include "networktables/NetworkTableValue.h"
+#include "networktables/Topic.h"
 
 namespace nt {
 
@@ -26,27 +25,16 @@ class NTSendableBuilder : public wpi::SendableBuilder {
    *
    * @param func    function
    */
-  virtual void SetUpdateTable(std::function<void()> func) = 0;
+  virtual void SetUpdateTable(wpi::unique_function<void()> func) = 0;
 
   /**
    * Add a property without getters or setters.  This can be used to get
    * entry handles for the function called by SetUpdateTable().
    *
    * @param key   property name
-   * @return Network table entry
+   * @return Network table topic
    */
-  virtual NetworkTableEntry GetEntry(std::string_view key) = 0;
-
-  /**
-   * Add a NetworkTableValue property.
-   *
-   * @param key     property name
-   * @param getter  getter function (returns current value)
-   * @param setter  setter function (sets new value)
-   */
-  virtual void AddValueProperty(
-      std::string_view key, std::function<std::shared_ptr<Value>()> getter,
-      std::function<void(std::shared_ptr<Value>)> setter) = 0;
+  virtual Topic GetTopic(std::string_view key) = 0;
 
   /**
    * Get the network table.

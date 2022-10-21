@@ -39,6 +39,10 @@ Pose3d::Pose3d(units::meter_t x, units::meter_t y, units::meter_t z,
                Rotation3d rotation)
     : m_translation(x, y, z), m_rotation(std::move(rotation)) {}
 
+Pose3d::Pose3d(const Pose2d& pose)
+    : m_translation(pose.X(), pose.Y(), 0_m),
+      m_rotation(0_rad, 0_rad, pose.Rotation().Radians()) {}
+
 Pose3d Pose3d::operator+(const Transform3d& other) const {
   return TransformBy(other);
 }
@@ -54,6 +58,14 @@ bool Pose3d::operator==(const Pose3d& other) const {
 
 bool Pose3d::operator!=(const Pose3d& other) const {
   return !operator==(other);
+}
+
+Pose3d Pose3d::operator*(double scalar) const {
+  return Pose3d{m_translation * scalar, m_rotation * scalar};
+}
+
+Pose3d Pose3d::operator/(double scalar) const {
+  return *this * (1.0 / scalar);
 }
 
 Pose3d Pose3d::TransformBy(const Transform3d& other) const {

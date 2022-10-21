@@ -14,8 +14,16 @@ SimpleWidget::SimpleWidget(ShuffleboardContainer& parent,
                            std::string_view title)
     : ShuffleboardValue(title), ShuffleboardWidget(parent, title), m_entry() {}
 
-nt::NetworkTableEntry SimpleWidget::GetEntry() {
+nt::GenericEntry& SimpleWidget::GetEntry() {
   if (!m_entry) {
+    ForceGenerate();
+  }
+  return m_entry;
+}
+
+nt::GenericEntry& SimpleWidget::GetEntry(std::string_view typeString) {
+  if (!m_entry) {
+    m_typeString = typeString;
     ForceGenerate();
   }
   return m_entry;
@@ -25,7 +33,7 @@ void SimpleWidget::BuildInto(std::shared_ptr<nt::NetworkTable> parentTable,
                              std::shared_ptr<nt::NetworkTable> metaTable) {
   BuildMetadata(metaTable);
   if (!m_entry) {
-    m_entry = parentTable->GetEntry(GetTitle());
+    m_entry = parentTable->GetTopic(GetTitle()).GetGenericEntry(m_typeString);
   }
 }
 

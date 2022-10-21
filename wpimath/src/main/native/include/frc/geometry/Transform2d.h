@@ -74,7 +74,7 @@ class WPILIB_DLLEXPORT Transform2d {
   Transform2d Inverse() const;
 
   /**
-   * Scales the transform by the scalar.
+   * Multiplies the transform by the scalar.
    *
    * @param scalar The scalar.
    * @return The scaled Transform2d.
@@ -82,6 +82,14 @@ class WPILIB_DLLEXPORT Transform2d {
   Transform2d operator*(double scalar) const {
     return Transform2d(m_translation * scalar, m_rotation * scalar);
   }
+
+  /**
+   * Divides the transform by the scalar.
+   *
+   * @param scalar The scalar.
+   * @return The scaled Transform2d.
+   */
+  Transform2d operator/(double scalar) const { return *this * (1.0 / scalar); }
 
   /**
    * Composes two transformations.

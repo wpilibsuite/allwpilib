@@ -1,0 +1,366 @@
+[
+    {
+        "TypeName": "Boolean",
+        "TypeString": "\"boolean\"",
+        "c": {
+            "ValueType": "NT_Bool",
+            "ParamType": "NT_Bool"
+        },
+        "cpp": {
+            "ValueType": "bool",
+            "ParamType": "bool",
+            "TYPE_NAME": "BOOLEAN"
+        },
+        "java": {
+            "ValueType": "boolean",
+            "EmptyValue": "false",
+            "ConsumerFunctionPackage": "edu.wpi.first.util.function",
+            "FunctionTypePrefix": "Boolean",
+            "ToWrapObject": "Boolean.valueOf",
+            "FromStorageBegin": "(Boolean) "
+        },
+        "jni": {
+            "jtype": "jboolean",
+            "jtypestr": "Z",
+            "JavaObject": false,
+            "FromJavaBegin": "",
+            "FromJavaEnd": " != JNI_FALSE",
+            "ToJavaBegin": "static_cast<jboolean>(",
+            "ToJavaEnd": ")",
+            "ToJavaArray": "MakeJBooleanArray"
+        }
+    },
+    {
+        "TypeName": "Integer",
+        "TypeString": "\"int\"",
+        "c": {
+            "ValueType": "int64_t",
+            "ParamType": "int64_t"
+        },
+        "cpp": {
+            "ValueType": "int64_t",
+            "ParamType": "int64_t",
+            "TYPE_NAME": "INTEGER"
+        },
+        "java": {
+            "ValueType": "long",
+            "EmptyValue": "0",
+            "FunctionTypePrefix": "Long",
+            "ToWrapObject": "Long.valueOf",
+            "FromStorageBegin": "((Number) ",
+            "FromStorageEnd": ").longValue()"
+        },
+        "jni": {
+            "jtype": "jlong",
+            "jtypestr": "J",
+            "JavaObject": false,
+            "FromJavaBegin": "",
+            "FromJavaEnd": "",
+            "ToJavaBegin": "static_cast<jlong>(",
+            "ToJavaEnd": ")",
+            "ToJavaArray": "MakeJLongArray"
+        }
+    },
+    {
+        "TypeName": "Float",
+        "TypeString": "\"float\"",
+        "c": {
+            "ValueType": "float",
+            "ParamType": "float"
+        },
+        "cpp": {
+            "ValueType": "float",
+            "ParamType": "float",
+            "TYPE_NAME": "FLOAT"
+        },
+        "java": {
+            "ValueType": "float",
+            "EmptyValue": "0",
+            "ConsumerFunctionPackage": "edu.wpi.first.util.function",
+            "SupplierFunctionPackage": "edu.wpi.first.util.function",
+            "FunctionTypePrefix": "Float",
+            "ToWrapObject": "Float.valueOf",
+            "FromStorageBegin": "((Number) ",
+            "FromStorageEnd": ").floatValue()"
+        },
+        "jni": {
+            "jtype": "jfloat",
+            "jtypestr": "F",
+            "JavaObject": false,
+            "FromJavaBegin": "",
+            "FromJavaEnd": "",
+            "ToJavaBegin": "static_cast<jfloat>(",
+            "ToJavaEnd": ")",
+            "ToJavaArray": "MakeJFloatArray"
+        }
+    },
+    {
+        "TypeName": "Double",
+        "TypeString": "\"double\"",
+        "c": {
+            "ValueType": "double",
+            "ParamType": "double"
+        },
+        "cpp": {
+            "ValueType": "double",
+            "ParamType": "double",
+            "TYPE_NAME": "DOUBLE"
+        },
+        "java": {
+            "ValueType": "double",
+            "EmptyValue": "0",
+            "FunctionTypePrefix": "Double",
+            "ToWrapObject": "Double.valueOf",
+            "FromStorageBegin": "((Number) ",
+            "FromStorageEnd": ").doubleValue()"
+        },
+        "jni": {
+            "jtype": "jdouble",
+            "jtypestr": "D",
+            "JavaObject": false,
+            "FromJavaBegin": "",
+            "FromJavaEnd": "",
+            "ToJavaBegin": "static_cast<jdouble>(",
+            "ToJavaEnd": ")",
+            "ToJavaArray": "MakeJDoubleArray"
+        }
+    },
+    {
+        "TypeName": "String",
+        "TypeString": "\"string\"",
+        "c": {
+            "ValueType": "char*",
+            "ParamType": "const char*",
+            "IsArray": true
+        },
+        "cpp": {
+            "ValueType": "std::string",
+            "ParamType": "std::string_view",
+            "TYPE_NAME": "STRING",
+            "INCLUDES": "#include <string>\n#include <string_view>\n#include <utility>",
+            "SmallRetType": "std::string_view",
+            "SmallElemType": "char"
+        },
+        "java": {
+            "ValueType": "String",
+            "EmptyValue": "\"\"",
+            "FunctionTypeSuffix": "<String>",
+            "FromStorageBegin": "(String) "
+        },
+        "jni": {
+            "jtype": "jstring",
+            "jtypestr": "Ljava/lang/String;",
+            "JavaObject": true,
+            "FromJavaBegin": "JStringRef{env, ",
+            "FromJavaEnd": "}",
+            "ToJavaBegin": "MakeJString(env, ",
+            "ToJavaEnd": ")",
+            "ToJavaArray": "MakeJStringArray"
+        }
+    },
+    {
+        "TypeName": "Raw",
+        "c": {
+            "ValueType": "uint8_t*",
+            "ParamType": "const uint8_t*",
+            "IsArray": true
+        },
+        "cpp": {
+            "ValueType": "std::vector<uint8_t>",
+            "ParamType": "std::span<const uint8_t>",
+            "DefaultValueCopy": "defaultValue.begin(), defaultValue.end()",
+            "TYPE_NAME": "RAW",
+            "INCLUDES": "#include <utility>",
+            "SmallRetType": "std::span<uint8_t>",
+            "SmallElemType": "uint8_t"
+        },
+        "java": {
+            "ValueType": "byte[]",
+            "EmptyValue": "new byte[] {}",
+            "FunctionTypeSuffix": "<byte[]>",
+            "FromStorageBegin": "(byte[]) "
+        },
+        "jni": {
+            "jtype": "jbyteArray",
+            "jtypestr": "[B",
+            "JavaObject": true,
+            "FromJavaBegin": "CriticalJByteArrayRef{env, ",
+            "FromJavaEnd": "}.uarray()",
+            "ToJavaBegin": "MakeJByteArray(env, ",
+            "ToJavaEnd": ")",
+            "ToJavaArray": "MakeJObjectArray"
+        }
+    },
+    {
+        "TypeName": "BooleanArray",
+        "TypeString": "\"boolean[]\"",
+        "c": {
+            "ValueType": "NT_Bool*",
+            "ParamType": "const NT_Bool*",
+            "IsArray": true
+        },
+        "cpp": {
+            "ValueType": "std::vector<int>",
+            "ParamType": "std::span<const int>",
+            "DefaultValueCopy": "defaultValue.begin(), defaultValue.end()",
+            "TYPE_NAME": "BOOLEAN_ARRAY",
+            "INCLUDES": "#include <utility>",
+            "SmallRetType": "std::span<int>",
+            "SmallElemType": "int"
+        },
+        "java": {
+            "ValueType": "boolean[]",
+            "WrapValueType": "Boolean[]",
+            "EmptyValue": "new boolean[] {}",
+            "FunctionTypeSuffix": "<boolean[]>",
+            "FromStorageBegin": "(boolean[]) "
+        },
+        "jni": {
+            "jtype": "jbooleanArray",
+            "jtypestr": "[Z",
+            "JavaObject": true,
+            "FromJavaBegin": "FromJavaBooleanArray(env, ",
+            "FromJavaEnd": ")",
+            "ToJavaBegin": "MakeJBooleanArray(env, ",
+            "ToJavaEnd": ")",
+            "ToJavaArray": "MakeJObjectArray"
+        }
+    },
+    {
+        "TypeName": "IntegerArray",
+        "TypeString": "\"int[]\"",
+        "c": {
+            "ValueType": "int64_t*",
+            "ParamType": "const int64_t*",
+            "IsArray": true
+        },
+        "cpp": {
+            "ValueType": "std::vector<int64_t>",
+            "ParamType": "std::span<const int64_t>",
+            "DefaultValueCopy": "defaultValue.begin(), defaultValue.end()",
+            "TYPE_NAME": "INTEGER_ARRAY",
+            "INCLUDES": "#include <utility>",
+            "SmallRetType": "std::span<int64_t>",
+            "SmallElemType": "int64_t"
+        },
+        "java": {
+            "ValueType": "long[]",
+            "WrapValueType": "Long[]",
+            "EmptyValue": "new long[] {}",
+            "FunctionTypeSuffix": "<long[]>",
+            "FromStorageBegin": "(long[]) "
+        },
+        "jni": {
+            "jtype": "jlongArray",
+            "jtypestr": "[J",
+            "JavaObject": true,
+            "FromJavaBegin": "CriticalJLongArrayRef{env, ",
+            "FromJavaEnd": "}",
+            "ToJavaBegin": "MakeJLongArray(env, ",
+            "ToJavaEnd": ")",
+            "ToJavaArray": "MakeJObjectArray"
+        }
+    },
+    {
+        "TypeName": "FloatArray",
+        "TypeString": "\"float[]\"",
+        "c": {
+            "ValueType": "float*",
+            "ParamType": "const float*",
+            "IsArray": true
+        },
+        "cpp": {
+            "ValueType": "std::vector<float>",
+            "ParamType": "std::span<const float>",
+            "DefaultValueCopy": "defaultValue.begin(), defaultValue.end()",
+            "TYPE_NAME": "FLOAT_ARRAY",
+            "INCLUDES": "#include <utility>",
+            "SmallRetType": "std::span<float>",
+            "SmallElemType": "float"
+        },
+        "java": {
+            "ValueType": "float[]",
+            "WrapValueType": "Float[]",
+            "EmptyValue": "new float[] {}",
+            "FunctionTypeSuffix": "<float[]>",
+            "FromStorageBegin": "(float[]) "
+        },
+        "jni": {
+            "jtype": "jfloatArray",
+            "jtypestr": "[F",
+            "JavaObject": true,
+            "FromJavaBegin": "CriticalJFloatArrayRef{env, ",
+            "FromJavaEnd": "}",
+            "ToJavaBegin": "MakeJFloatArray(env, ",
+            "ToJavaEnd": ")",
+            "ToJavaArray": "MakeJObjectArray"
+        }
+    },
+    {
+        "TypeName": "DoubleArray",
+        "TypeString": "\"double[]\"",
+        "c": {
+            "ValueType": "double*",
+            "ParamType": "const double*",
+            "IsArray": true
+        },
+        "cpp": {
+            "ValueType": "std::vector<double>",
+            "ParamType": "std::span<const double>",
+            "DefaultValueCopy": "defaultValue.begin(), defaultValue.end()",
+            "TYPE_NAME": "DOUBLE_ARRAY",
+            "INCLUDES": "#include <utility>",
+            "SmallRetType": "std::span<double>",
+            "SmallElemType": "double"
+        },
+        "java": {
+            "ValueType": "double[]",
+            "WrapValueType": "Double[]",
+            "EmptyValue": "new double[] {}",
+            "FunctionTypeSuffix": "<double[]>",
+            "FromStorageBegin": "(double[]) "
+        },
+        "jni": {
+            "jtype": "jdoubleArray",
+            "jtypestr": "[D",
+            "JavaObject": true,
+            "FromJavaBegin": "CriticalJDoubleArrayRef{env, ",
+            "FromJavaEnd": "}",
+            "ToJavaBegin": "MakeJDoubleArray(env, ",
+            "ToJavaEnd": ")",
+            "ToJavaArray": "MakeJObjectArray"
+        }
+    },
+    {
+        "TypeName": "StringArray",
+        "TypeString": "\"string[]\"",
+        "c": {
+            "ValueType": "struct NT_String*",
+            "ParamType": "const struct NT_String*",
+            "IsArray": true
+        },
+        "cpp": {
+            "ValueType": "std::vector<std::string>",
+            "ParamType": "std::span<const std::string>",
+            "DefaultValueCopy": "defaultValue.begin(), defaultValue.end()",
+            "TYPE_NAME": "STRING_ARRAY",
+            "INCLUDES": "#include <utility>"
+        },
+        "java": {
+            "ValueType": "String[]",
+            "EmptyValue": "new String[] {}",
+            "FunctionTypeSuffix": "<String[]>",
+            "FromStorageBegin": "(String[]) "
+        },
+        "jni": {
+            "jtype": "jobjectArray",
+            "jtypestr": "[Ljava/lang/Object;",
+            "JavaObject": true,
+            "FromJavaBegin": "FromJavaStringArray(env, ",
+            "FromJavaEnd": ")",
+            "ToJavaBegin": "MakeJStringArray(env, ",
+            "ToJavaEnd": ")",
+            "ToJavaArray": "MakeJObjectArray"
+        }
+    }
+]

@@ -6,11 +6,10 @@
 
 #include <functional>
 #include <initializer_list>
+#include <span>
 
-#include <wpi/span.h>
-
-#include "frc2/command/CommandBase.h"
 #include "frc2/command/CommandHelper.h"
+#include "frc2/command/FunctionalCommand.h"
 
 namespace frc2 {
 /**
@@ -22,7 +21,8 @@ namespace frc2 {
  *
  * This class is provided by the NewCommands VendorDep
  */
-class StartEndCommand : public CommandHelper<CommandBase, StartEndCommand> {
+class StartEndCommand
+    : public CommandHelper<FunctionalCommand, StartEndCommand> {
  public:
   /**
    * Creates a new StartEndCommand.  Will run the given runnables when the
@@ -44,18 +44,10 @@ class StartEndCommand : public CommandHelper<CommandBase, StartEndCommand> {
    * @param requirements the subsystems required by this command
    */
   StartEndCommand(std::function<void()> onInit, std::function<void()> onEnd,
-                  wpi::span<Subsystem* const> requirements = {});
+                  std::span<Subsystem* const> requirements = {});
 
   StartEndCommand(StartEndCommand&& other) = default;
 
-  StartEndCommand(const StartEndCommand& other);
-
-  void Initialize() override;
-
-  void End(bool interrupted) override;
-
- protected:
-  std::function<void()> m_onInit;
-  std::function<void()> m_onEnd;
+  StartEndCommand(const StartEndCommand& other) = default;
 };
 }  // namespace frc2

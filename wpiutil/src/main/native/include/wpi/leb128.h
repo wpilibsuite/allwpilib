@@ -8,8 +8,7 @@
 #include <stdint.h>
 
 #include <optional>
-
-#include "wpi/span.h"
+#include <span>
 
 namespace wpi {
 
@@ -100,7 +99,7 @@ class Uleb128Reader {
    *           is left when function returns).
    * @return value (in std::optional)
    */
-  std::optional<uint64_t> ReadOne(span<const uint8_t>* in);
+  std::optional<uint64_t> ReadOne(std::span<const uint8_t>* in);
 
  private:
   uint64_t m_result = 0;

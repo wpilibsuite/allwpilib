@@ -57,9 +57,8 @@ void BufferCallbackStore::performCallback(const char* name, uint8_t* buffer,
     std::fflush(stdout);
   }
 
-  auto toCallbackArr = MakeJByteArray(
-      env, std::string_view{reinterpret_cast<const char*>(buffer),
-                            static_cast<size_t>(length)});
+  auto toCallbackArr =
+      MakeJByteArray(env, {buffer, static_cast<size_t>(length)});
 
   env->CallVoidMethod(m_call, sim::GetBufferCallback(), MakeJString(env, name),
                       toCallbackArr, static_cast<jint>(length));

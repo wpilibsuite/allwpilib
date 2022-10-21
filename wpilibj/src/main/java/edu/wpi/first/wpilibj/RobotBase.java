@@ -14,6 +14,7 @@ import edu.wpi.first.hal.HALUtil;
 import edu.wpi.first.math.MathShared;
 import edu.wpi.first.math.MathSharedStore;
 import edu.wpi.first.math.MathUsageId;
+import edu.wpi.first.networktables.MultiSubscriber;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
@@ -37,6 +38,8 @@ public abstract class RobotBase implements AutoCloseable {
   /** The ID of the main Java thread. */
   // This is usually 1, but it is best to make sure
   private static long m_threadId = -1;
+
+  private final MultiSubscriber m_suball;
 
   private static void setupCameraServerShared() {
     CameraServerShared shared =
@@ -142,12 +145,27 @@ public abstract class RobotBase implements AutoCloseable {
     setupCameraServerShared();
     setupMathShared();
     inst.setNetworkIdentity("Robot");
+    // subscribe to "" to force persistent values to progagate to local
+    m_suball = new MultiSubscriber(inst, new String[] {""});
     if (isReal()) {
-      inst.startServer("/home/lvuser/networktables.ini");
+      inst.startServer("/home/lvuser/networktables.json");
     } else {
       inst.startServer();
     }
-    inst.getTable("LiveWindow").getSubTable(".status").getEntry("LW Enabled").setBoolean(false);
+
+    // wait for the NT server to actually start
+    try {
+      int count = 0;
+      while ((inst.getNetworkMode() & NetworkTableInstance.kNetModeStarting) != 0) {
+        Thread.sleep(10);
+        count++;
+        if (count > 100) {
+          throw new InterruptedException();
+        }
+      }
+    } catch (InterruptedException ex) {
+      System.err.println("timed out while waiting for NT server to start");
+    }
 
     LiveWindow.setEnabled(false);
     Shuffleboard.disableActuatorWidgets();
@@ -158,7 +176,9 @@ public abstract class RobotBase implements AutoCloseable {
   }
 
   @Override
-  public void close() {}
+  public void close() {
+    m_suball.close();
+  }
 
   /**
    * Get the current runtime type.

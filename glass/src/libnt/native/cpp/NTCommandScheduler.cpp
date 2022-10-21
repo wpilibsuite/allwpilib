@@ -10,49 +10,38 @@
 using namespace glass;
 
 NTCommandSchedulerModel::NTCommandSchedulerModel(std::string_view path)
-    : NTCommandSchedulerModel(nt::GetDefaultInstance(), path) {}
+    : NTCommandSchedulerModel(nt::NetworkTableInstance::GetDefault(), path) {}
 
-NTCommandSchedulerModel::NTCommandSchedulerModel(NT_Inst instance,
+NTCommandSchedulerModel::NTCommandSchedulerModel(nt::NetworkTableInstance inst,
                                                  std::string_view path)
-    : m_nt(instance),
-      m_name(m_nt.GetEntry(fmt::format("{}/.name", path))),
-      m_commands(m_nt.GetEntry(fmt::format("{}/Names", path))),
-      m_ids(m_nt.GetEntry(fmt::format("{}/Ids", path))),
-      m_cancel(m_nt.GetEntry(fmt::format("{}/Cancel", path))),
-      m_nameValue(wpi::rsplit(path, '/').second) {
-  m_nt.AddListener(m_name);
-  m_nt.AddListener(m_commands);
-  m_nt.AddListener(m_ids);
-  m_nt.AddListener(m_cancel);
-}
+    : m_inst{inst},
+      m_name{inst.GetStringTopic(fmt::format("{}/.name", path)).Subscribe("")},
+      m_commands{inst.GetStringArrayTopic(fmt::format("{}/Names", path))
+                     .Subscribe({})},
+      m_ids{
+          inst.GetIntegerArrayTopic(fmt::format("{}/Ids", path)).Subscribe({})},
+      m_cancel{
+          inst.GetIntegerArrayTopic(fmt::format("{}/Cancel", path)).Publish()},
+      m_nameValue{wpi::rsplit(path, '/').second} {}
 
 void NTCommandSchedulerModel::CancelCommand(size_t index) {
   if (index < m_idsValue.size()) {
-    nt::SetEntryValue(
-        m_cancel, nt::NetworkTableValue::MakeDoubleArray({m_idsValue[index]}));
+    m_cancel.Set({{m_idsValue[index]}});
   }
 }
 
 void NTCommandSchedulerModel::Update() {
-  for (auto&& event : m_nt.PollListener()) {
-    if (event.entry == m_name) {
-      if (event.value && event.value->IsString()) {
-        m_nameValue = event.value->GetString();
-      }
-    } else if (event.entry == m_commands) {
-      if (event.value && event.value->IsStringArray()) {
-        auto arr = event.value->GetStringArray();
-        m_commandsValue.assign(arr.begin(), arr.end());
-      }
-    } else if (event.entry == m_ids) {
-      if (event.value && event.value->IsDoubleArray()) {
-        auto arr = event.value->GetDoubleArray();
-        m_idsValue.assign(arr.begin(), arr.end());
-      }
-    }
+  for (auto&& v : m_name.ReadQueue()) {
+    m_nameValue = std::move(v.value);
+  }
+  for (auto&& v : m_commands.ReadQueue()) {
+    m_commandsValue = std::move(v.value);
+  }
+  for (auto&& v : m_ids.ReadQueue()) {
+    m_idsValue = std::move(v.value);
   }
 }
 
 bool NTCommandSchedulerModel::Exists() {
-  return m_nt.IsConnected() && nt::GetEntryType(m_commands) != NT_UNASSIGNED;
+  return m_inst.IsConnected() && m_commands.Exists();
 }

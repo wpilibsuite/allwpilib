@@ -22,27 +22,21 @@ void ShuffleboardComponentBase::BuildMetadata(
     return;
   }
   // Component type
-  if (GetType() == "") {
-    metaTable->GetEntry("PreferredComponent").Delete();
-  } else {
-    metaTable->GetEntry("PreferredComponent").ForceSetString(GetType());
+  if (!GetType().empty()) {
+    metaTable->GetEntry("PreferredComponent").SetString(GetType());
   }
 
   // Tile size
-  if (m_width <= 0 || m_height <= 0) {
-    metaTable->GetEntry("Size").Delete();
-  } else {
+  if (m_width > 0 && m_height > 0) {
     metaTable->GetEntry("Size").SetDoubleArray(
-        {static_cast<double>(m_width), static_cast<double>(m_height)});
+        {{static_cast<double>(m_width), static_cast<double>(m_height)}});
   }
 
   // Tile position
-  if (m_column < 0 || m_row < 0) {
-    metaTable->GetEntry("Position").Delete();
-  } else {
+  if (m_column >= 0 && m_row >= 0) {
     metaTable->GetEntry("Position")
         .SetDoubleArray(
-            {static_cast<double>(m_column), static_cast<double>(m_row)});
+            {{static_cast<double>(m_column), static_cast<double>(m_row)}});
   }
 
   // Custom properties
@@ -63,7 +57,7 @@ const std::string& ShuffleboardComponentBase::GetType() const {
   return m_type;
 }
 
-const wpi::StringMap<std::shared_ptr<nt::Value>>&
-ShuffleboardComponentBase::GetProperties() const {
+const wpi::StringMap<nt::Value>& ShuffleboardComponentBase::GetProperties()
+    const {
   return m_properties;
 }

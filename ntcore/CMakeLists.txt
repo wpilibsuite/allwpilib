@@ -3,17 +3,32 @@ project(ntcore)
 include(CompileWarnings)
 include(AddTest)
 
-file(GLOB
-    ntcore_native_src src/main/native/cpp/*.cpp
-    ntcore_native_src src/main/native/cpp/networktables/*.cpp
-    ntcore_native_src src/main/native/cpp/tables/*.cpp)
+execute_process(COMMAND python3 ${CMAKE_CURRENT_SOURCE_DIR}/generate_topics.py ${WPILIB_BINARY_DIR}/ntcore RESULT_VARIABLE generateResult)
+if(NOT (generateResult EQUAL "0"))
+  # Try python
+  execute_process(COMMAND python ${CMAKE_CURRENT_SOURCE_DIR}/generate_topics.py ${WPILIB_BINARY_DIR}/ntcore RESULT_VARIABLE generateResult)
+  if(NOT (generateResult EQUAL "0"))
+    message(FATAL_ERROR "python and python3 generate_topics.py failed")
+  endif()
+endif()
+
+file(GLOB ntcore_native_src
+    src/main/native/cpp/*.cpp
+    ${WPILIB_BINARY_DIR}/ntcore/generated/main/native/cpp/*.cpp
+    src/main/native/cpp/net/*.cpp
+    src/main/native/cpp/net3/*.cpp
+    src/main/native/cpp/networktables/*.cpp
+    src/main/native/cpp/tables/*.cpp)
 add_library(ntcore ${ntcore_native_src})
 set_target_properties(ntcore PROPERTIES DEBUG_POSTFIX "d")
-target_include_directories(ntcore PUBLIC
+target_include_directories(ntcore
+                PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/cpp
+                PUBLIC
                 $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/include>
+                $<BUILD_INTERFACE:${WPILIB_BINARY_DIR}/ntcore/generated/main/native/include>
                             $<INSTALL_INTERFACE:${include_dest}/ntcore>)
 wpilib_target_warnings(ntcore)
-target_compile_features(ntcore PUBLIC cxx_std_17)
+target_compile_features(ntcore PUBLIC cxx_std_20)
 target_link_libraries(ntcore PUBLIC wpinet wpiutil)
 
 set_property(TARGET ntcore PROPERTY FOLDER "libraries")
@@ -38,10 +53,11 @@ if (WITH_JAVA)
     include(UseJava)
     set(CMAKE_JAVA_COMPILE_FLAGS "-encoding" "UTF8" "-Xlint:unchecked")
 
-    file(GLOB
-        ntcore_jni_src src/main/native/cpp/jni/NetworkTablesJNI.cpp)
+    file(GLOB ntcore_jni_src
+        src/main/native/cpp/jni/*.cpp
+        ${WPILIB_BINARY_DIR}/ntcore/generated/main/native/cpp/jni/*.cpp)
 
-    file(GLOB_RECURSE JAVA_SOURCES src/main/java/*.java)
+    file(GLOB_RECURSE JAVA_SOURCES src/main/java/*.java ${WPILIB_BINARY_DIR}/ntcore/generated/*.java)
     set(CMAKE_JNI_TARGET true)
 
     if(${CMAKE_VERSION} VERSION_LESS "3.11.0")
@@ -77,6 +93,9 @@ if (WITH_JAVA)
     install(TARGETS ntcorejni EXPORT ntcorejni DESTINATION "${main_lib_dest}")
 
 endif()
+
+add_executable(ntcoredev src/dev/native/cpp/main.cpp)
+target_link_libraries(ntcoredev ntcore)
 
 if (WITH_TESTS)
     wpilib_add_test(ntcore src/test/native/cpp)

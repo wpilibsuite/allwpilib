@@ -44,7 +44,7 @@ ADXRS450_Gyro::ADXRS450_Gyro(SPI::Port port)
   if (!m_simDevice) {
     // Validate the part ID
     if ((ReadRegister(kPIDRegister) & 0xff00) != 0x5200) {
-      FRC_ReportError(err::Error, "{}", "could not find ADXRS450 gyro");
+      FRC_ReportError(err::Error, "could not find ADXRS450 gyro");
       return;
     }
 
@@ -137,5 +137,5 @@ int ADXRS450_Gyro::GetPort() const {
 void ADXRS450_Gyro::InitSendable(wpi::SendableBuilder& builder) {
   builder.SetSmartDashboardType("Gyro");
   builder.AddDoubleProperty(
-      "Value", [=] { return GetAngle(); }, nullptr);
+      "Value", [=, this] { return GetAngle(); }, nullptr);
 }

@@ -4,13 +4,21 @@
 
 #pragma once
 
+#include <functional>
+#include <map>
 #include <memory>
+#include <span>
 #include <string>
 #include <string_view>
+#include <utility>
 #include <vector>
 
+#include <networktables/NetworkTableInstance.h>
+#include <networktables/TopicListener.h>
+#include <networktables/ValueListener.h>
 #include <ntcore_cpp.h>
 #include <wpi/DenseMap.h>
+#include <wpi/json.h>
 
 #include "glass/Model.h"
 #include "glass/View.h"
@@ -21,28 +29,81 @@ class DataSource;
 
 class NetworkTablesModel : public Model {
  public:
-  struct Entry {
-    explicit Entry(nt::EntryNotification&& event);
+  struct SubscriberOptions {
+    float periodic = 0.1f;
+    bool immediate = false;
+    bool sendAll = false;
+    bool prefixMatch = false;
+    // std::string otherStr;
+  };
 
-    void UpdateValue();
+  struct TopicPublisher {
+    std::string client;
+    uint64_t pubuid;
+  };
 
-    /** Entry handle. */
-    NT_Entry entry;
+  struct TopicSubscriber {
+    std::string client;
+    uint64_t subuid;
+    SubscriberOptions options;
+  };
 
-    /** Entry name. */
-    std::string name;
+  struct EntryValueTreeNode;
 
-    /** The value. */
-    std::shared_ptr<nt::Value> value;
+  struct ValueSource {
+    void UpdateFromValue(nt::Value&& v, std::string_view name,
+                         std::string_view typeStr);
 
-    /** Flags. */
-    unsigned int flags = 0;
+    /** The latest value. */
+    nt::Value value;
 
     /** String representation of the value (for arrays / complex values). */
     std::string valueStr;
 
     /** Data source (for numeric values). */
     std::unique_ptr<DataSource> source;
+
+    /** Children of this node, sorted by name/index */
+    std::vector<EntryValueTreeNode> valueChildren;
+
+    /** Whether or not the children represent a map */
+    bool valueChildrenMap = false;
+  };
+
+  struct EntryValueTreeNode : public ValueSource {
+    /** Short name (e.g. of just this node) */
+    std::string name;
+
+    /** Full path */
+    std::string path;
+  };
+
+  struct Entry : public ValueSource {
+    Entry() = default;
+    Entry(const Entry&) = delete;
+    Entry& operator=(const Entry&) = delete;
+    ~Entry();
+
+    void UpdateTopic(nt::TopicNotification&& event) {
+      UpdateInfo(std::move(event.info));
+    }
+    void UpdateInfo(nt::TopicInfo&& info_);
+
+    /** Topic information. */
+    nt::TopicInfo info;
+
+    /** JSON representation of the topic properties. */
+    wpi::json properties;
+
+    /** Specific common property flags. */
+    bool persistent{false};
+    bool retained{false};
+
+    /** Publisher (created when the value changes). */
+    NT_Publisher publisher{0};
+
+    std::vector<TopicPublisher> publishers;
+    std::vector<TopicSubscriber> subscribers;
   };
 
   struct TreeNode {
@@ -64,44 +125,96 @@ class NetworkTablesModel : public Model {
     std::vector<TreeNode> children;
   };
 
+  struct ClientPublisher {
+    int64_t uid = -1;
+    std::string topic;
+  };
+
+  struct ClientSubscriber {
+    int64_t uid = -1;
+    std::vector<std::string> topics;
+    std::string topicsStr;
+    SubscriberOptions options;
+  };
+
+  struct Client {
+    std::string id;
+    std::string conn;
+    std::string version;
+    std::vector<ClientPublisher> publishers;
+    std::vector<ClientSubscriber> subscribers;
+
+    void UpdatePublishers(std::span<const uint8_t> data);
+    void UpdateSubscribers(std::span<const uint8_t> data);
+  };
+
   NetworkTablesModel();
-  explicit NetworkTablesModel(NT_Inst inst);
-  ~NetworkTablesModel() override;
+  explicit NetworkTablesModel(nt::NetworkTableInstance inst);
 
   void Update() override;
   bool Exists() override;
 
-  NT_Inst GetInstance() { return m_inst; }
-  const std::vector<Entry*>& GetEntries() { return m_sortedEntries; }
-  const std::vector<TreeNode>& GetTreeRoot() { return m_root; }
+  nt::NetworkTableInstance GetInstance() { return m_inst; }
+  const std::vector<Entry*>& GetEntries() const { return m_sortedEntries; }
+  const std::vector<TreeNode>& GetTreeRoot() const { return m_root; }
+  const std::vector<TreeNode>& GetPersistentTreeRoot() const {
+    return m_persistentRoot;
+  }
+  const std::vector<TreeNode>& GetRetainedTreeRoot() const {
+    return m_retainedRoot;
+  }
+  const std::vector<TreeNode>& GetTransitoryTreeRoot() const {
+    return m_transitoryRoot;
+  }
+  const std::map<std::string, Client, std::less<>>& GetClients() const {
+    return m_clients;
+  }
+  const Client& GetServer() const { return m_server; }
+  Entry* GetEntry(std::string_view name);
+  Entry* AddEntry(NT_Topic topic);
 
  private:
-  NT_Inst m_inst;
-  NT_EntryListenerPoller m_poller;
-  wpi::DenseMap<NT_Entry, std::unique_ptr<Entry>> m_entries;
+  void RebuildTree();
+  void RebuildTreeImpl(std::vector<TreeNode>* tree, int category);
+  void UpdateClients(std::span<const uint8_t> data);
+
+  nt::NetworkTableInstance m_inst;
+  NT_MultiSubscriber m_subscriber;
+  nt::TopicListenerPoller m_topicPoller;
+  nt::ValueListenerPoller m_valuePoller;
+  wpi::DenseMap<NT_Topic, std::unique_ptr<Entry>> m_entries;
 
   // sorted by name
   std::vector<Entry*> m_sortedEntries;
 
   std::vector<TreeNode> m_root;
+  std::vector<TreeNode> m_persistentRoot;
+  std::vector<TreeNode> m_retainedRoot;
+  std::vector<TreeNode> m_transitoryRoot;
+
+  std::map<std::string, Client, std::less<>> m_clients;
+  Client m_server;
 };
 
 using NetworkTablesFlags = int;
 
-static constexpr const int kNetworkTablesFlags_PrecisionBitShift = 6;
+static constexpr const int kNetworkTablesFlags_PrecisionBitShift = 9;
 
 enum NetworkTablesFlags_ {
   NetworkTablesFlags_TreeView = 1 << 0,
-  NetworkTablesFlags_ReadOnly = 1 << 1,
-  NetworkTablesFlags_ShowConnections = 1 << 2,
-  NetworkTablesFlags_ShowFlags = 1 << 3,
-  NetworkTablesFlags_ShowTimestamp = 1 << 4,
-  NetworkTablesFlags_CreateNoncanonicalKeys = 1 << 5,
+  NetworkTablesFlags_CombinedView = 1 << 1,
+  NetworkTablesFlags_ReadOnly = 1 << 2,
+  NetworkTablesFlags_ShowSpecial = 1 << 3,
+  NetworkTablesFlags_ShowProperties = 1 << 4,
+  NetworkTablesFlags_ShowTimestamp = 1 << 5,
+  NetworkTablesFlags_ShowServerTimestamp = 1 << 6,
+  NetworkTablesFlags_CreateNoncanonicalKeys = 1 << 7,
   NetworkTablesFlags_Precision = 0xff << kNetworkTablesFlags_PrecisionBitShift,
-  NetworkTablesFlags_Default = (1 & ~NetworkTablesFlags_ReadOnly &
-                                ~NetworkTablesFlags_CreateNoncanonicalKeys) |
+  NetworkTablesFlags_Default = NetworkTablesFlags_TreeView |
                                (6 << kNetworkTablesFlags_PrecisionBitShift),
 };
+
+void DisplayNetworkTablesInfo(NetworkTablesModel* model);
 
 void DisplayNetworkTables(
     NetworkTablesModel* model,
@@ -120,9 +233,11 @@ class NetworkTablesFlagsSettings {
 
  private:
   bool* m_pTreeView = nullptr;
-  bool* m_pShowConnections = nullptr;
-  bool* m_pShowFlags = nullptr;
+  bool* m_pCombinedView = nullptr;
+  bool* m_pShowSpecial = nullptr;
+  bool* m_pShowProperties = nullptr;
   bool* m_pShowTimestamp = nullptr;
+  bool* m_pShowServerTimestamp = nullptr;
   bool* m_pCreateNoncanonicalKeys = nullptr;
   int* m_pPrecision = nullptr;
   NetworkTablesFlags m_defaultFlags;  // NOLINT

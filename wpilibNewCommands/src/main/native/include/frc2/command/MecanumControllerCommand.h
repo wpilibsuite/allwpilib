@@ -6,6 +6,7 @@
 #include <functional>
 #include <initializer_list>
 #include <memory>
+#include <span>
 
 #include <frc/Timer.h>
 #include <frc/controller/HolonomicDriveController.h>
@@ -21,7 +22,6 @@
 #include <units/length.h>
 #include <units/velocity.h>
 #include <units/voltage.h>
-#include <wpi/span.h>
 
 #include "CommandBase.h"
 #include "CommandHelper.h"
@@ -206,7 +206,7 @@ class MecanumControllerCommand
       std::function<void(units::volt_t, units::volt_t, units::volt_t,
                          units::volt_t)>
           output,
-      wpi::span<Subsystem* const> requirements = {});
+      std::span<Subsystem* const> requirements = {});
 
   /**
    * Constructs a new MecanumControllerCommand that when executed will follow
@@ -259,7 +259,7 @@ class MecanumControllerCommand
       std::function<void(units::volt_t, units::volt_t, units::volt_t,
                          units::volt_t)>
           output,
-      wpi::span<Subsystem* const> requirements = {});
+      std::span<Subsystem* const> requirements = {});
 
   /**
    * Constructs a new MecanumControllerCommand that when executed will follow
@@ -375,7 +375,7 @@ class MecanumControllerCommand
                          units::meters_per_second_t,
                          units::meters_per_second_t)>
           output,
-      wpi::span<Subsystem* const> requirements = {});
+      std::span<Subsystem* const> requirements = {});
 
   /**
    * Constructs a new MecanumControllerCommand that when executed will follow
@@ -415,7 +415,7 @@ class MecanumControllerCommand
                          units::meters_per_second_t,
                          units::meters_per_second_t)>
           output,
-      wpi::span<Subsystem* const> requirements = {});
+      std::span<Subsystem* const> requirements = {});
 
   void Initialize() override;
 

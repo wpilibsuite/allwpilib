@@ -253,6 +253,16 @@ public class Rotation3d implements Interpolatable<Rotation3d> {
   }
 
   /**
+   * Divides the current rotation by a scalar.
+   *
+   * @param scalar The scalar.
+   * @return The new scaled Rotation3d.
+   */
+  public Rotation3d div(double scalar) {
+    return times(1.0 / scalar);
+  }
+
+  /**
    * Adds the new rotation to the current rotation.
    *
    * @param other The rotation to rotate by.

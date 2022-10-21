@@ -16,25 +16,31 @@ if (OperatingSystem.current().isWindows()) {
 
     def vsLocator = gradle.services.get(VisualStudioLocator)
 
-    def vsLocation = vsLocator.locateAllComponents().first()
+    def vsLocationResult = vsLocator.locateComponent(null)
+
+    if (!vsLocationResult.available) {
+        return
+    }
+
+    def vsLocation = vsLocationResult.component
 
     def visualCppVersion = vsLocation.visualCpp.version
 
     def vsDirectory = vsLocation.visualStudioDir
 
-    def runtimeLocation = file("$vsDirectory\\VC\\Redist\\MSVC")
+    def defaultRedistFile = file("$vsDirectory\\VC\\Auxiliary\\Build\\Microsoft.VCRedistVersion.default.txt")
 
-    def runtimeVerNumber = null
-
-    runtimeLocation.eachFile {
-        def verNumber =  VersionNumber.parse(it.name)
-        if (verNumber.major == visualCppVersion.major && verNumber.minor == visualCppVersion.minor) {
-            runtimeVerNumber = verNumber
-        }
+    if (!defaultRedistFile.exists()) {
+        logger.warn("Version file for VS Compiler not found")
+        logger.warn("Expected at $defaultRedistFile")
+        return
     }
 
-    if (runtimeVerNumber != null) {
-        runtimeLocation = file("$runtimeLocation\\$runtimeVerNumber")
+    def expectedVersion = VersionNumber.parse(defaultRedistFile.text.trim())
+
+    def runtimeLocation = file("$vsDirectory\\VC\\Redist\\MSVC\\$expectedVersion")
+
+    if (runtimeLocation.exists()) {
 
         def x64Folder = null
 
@@ -68,5 +74,7 @@ if (OperatingSystem.current().isWindows()) {
                 }
             }
         }
+    } else if (project.hasProperty('buildServer')) {
+        throw new GradleException("Must find a runtime in CI. Expected at $runtimeLocation")
     }
 }

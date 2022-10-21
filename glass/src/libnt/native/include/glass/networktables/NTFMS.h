@@ -6,10 +6,12 @@
 
 #include <string_view>
 
-#include <ntcore_cpp.h>
+#include <networktables/BooleanTopic.h>
+#include <networktables/IntegerTopic.h>
+#include <networktables/NetworkTableInstance.h>
+#include <networktables/StringTopic.h>
 
 #include "glass/DataSource.h"
-#include "glass/networktables/NetworkTablesHelper.h"
 #include "glass/other/FMS.h"
 
 namespace glass {
@@ -20,7 +22,7 @@ class NTFMSModel : public FMSModel {
 
   // path is to the table containing ".type", excluding the trailing /
   explicit NTFMSModel(std::string_view path);
-  NTFMSModel(NT_Inst inst, std::string_view path);
+  NTFMSModel(nt::NetworkTableInstance inst, std::string_view path);
 
   DataSource* GetFmsAttachedData() override { return &m_fmsAttached; }
   DataSource* GetDsAttachedData() override { return &m_dsAttached; }
@@ -52,11 +54,11 @@ class NTFMSModel : public FMSModel {
   bool IsReadOnly() override { return true; }
 
  private:
-  NetworkTablesHelper m_nt;
-  NT_Entry m_gameSpecificMessage;
-  NT_Entry m_alliance;
-  NT_Entry m_station;
-  NT_Entry m_controlWord;
+  nt::NetworkTableInstance m_inst;
+  nt::StringSubscriber m_gameSpecificMessage;
+  nt::BooleanSubscriber m_alliance;
+  nt::IntegerSubscriber m_station;
+  nt::IntegerSubscriber m_controlWord;
 
   DataSource m_fmsAttached;
   DataSource m_dsAttached;

@@ -11,9 +11,11 @@
 #include <vector>
 
 #include <frc/geometry/Translation2d.h>
-#include <ntcore_cpp.h>
+#include <networktables/MultiSubscriber.h>
+#include <networktables/NetworkTableInstance.h>
+#include <networktables/TopicListener.h>
+#include <networktables/ValueListener.h>
 
-#include "glass/networktables/NetworkTablesHelper.h"
 #include "glass/other/Mechanism2D.h"
 
 namespace glass {
@@ -24,7 +26,7 @@ class NTMechanism2DModel : public Mechanism2DModel {
 
   // path is to the table containing ".type", excluding the trailing /
   explicit NTMechanism2DModel(std::string_view path);
-  NTMechanism2DModel(NT_Inst inst, std::string_view path);
+  NTMechanism2DModel(nt::NetworkTableInstance inst, std::string_view path);
   ~NTMechanism2DModel() override;
 
   const char* GetPath() const { return m_path.c_str(); }
@@ -42,12 +44,14 @@ class NTMechanism2DModel : public Mechanism2DModel {
       wpi::function_ref<void(MechanismRootModel& model)> func) override;
 
  private:
-  NetworkTablesHelper m_nt;
+  nt::NetworkTableInstance m_inst;
   std::string m_path;
-
-  NT_Entry m_name;
-  NT_Entry m_dimensions;
-  NT_Entry m_bgColor;
+  nt::MultiSubscriber m_tableSub;
+  nt::Topic m_nameTopic;
+  nt::Topic m_dimensionsTopic;
+  nt::Topic m_bgColorTopic;
+  nt::TopicListenerPoller m_topicListener;
+  nt::ValueListenerPoller m_valueListener;
 
   std::string m_nameValue;
   frc::Translation2d m_dimensionsValue;

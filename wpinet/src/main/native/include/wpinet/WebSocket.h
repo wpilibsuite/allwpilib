@@ -10,13 +10,13 @@
 #include <functional>
 #include <initializer_list>
 #include <memory>
+#include <span>
 #include <string>
 #include <string_view>
 #include <utility>
 
 #include <wpi/Signal.h>
 #include <wpi/SmallVector.h>
-#include <wpi/span.h>
 
 #include "wpinet/uv/Buffer.h"
 #include "wpinet/uv/Error.h"
@@ -42,8 +42,6 @@ class WebSocket : public std::enable_shared_from_this<WebSocket> {
   static constexpr uint8_t kOpPong = 0x0A;
   static constexpr uint8_t kOpMask = 0x0F;
   static constexpr uint8_t kFlagFin = 0x80;
-  static constexpr uint8_t kFlagMasking = 0x80;
-  static constexpr uint8_t kLenMask = 0x7f;
 
  public:
   WebSocket(uv::Stream& stream, bool server, const private_init&);
@@ -79,7 +77,27 @@ class WebSocket : public std::enable_shared_from_this<WebSocket> {
     uv::Timer::Time handshakeTimeout;  // NOLINT
 
     /** Additional headers to include in handshake. */
-    span<const std::pair<std::string_view, std::string_view>> extraHeaders;
+    std::span<const std::pair<std::string_view, std::string_view>> extraHeaders;
+  };
+
+  /**
+   * Frame.  Used by SendFrames().
+   */
+  struct Frame {
+    static constexpr uint8_t kText = kFlagFin | kOpText;
+    static constexpr uint8_t kBinary = kFlagFin | kOpBinary;
+    static constexpr uint8_t kTextFragment = kOpText;
+    static constexpr uint8_t kBinaryFragment = kOpBinary;
+    static constexpr uint8_t kFragment = kOpCont;
+    static constexpr uint8_t kFinalFragment = kFlagFin | kOpCont;
+    static constexpr uint8_t kPing = kFlagFin | kOpPing;
+    static constexpr uint8_t kPong = kFlagFin | kOpPong;
+
+    Frame(uint8_t opcode, std::span<const uv::Buffer> data)
+        : opcode{opcode}, data{data} {}
+
+    uint8_t opcode;
+    std::span<const uv::Buffer> data;
   };
 
   /**
@@ -94,7 +112,7 @@ class WebSocket : public std::enable_shared_from_this<WebSocket> {
    */
   static std::shared_ptr<WebSocket> CreateClient(
       uv::Stream& stream, std::string_view uri, std::string_view host,
-      span<const std::string_view> protocols = {},
+      std::span<const std::string_view> protocols = {},
       const ClientOptions& options = {});
 
   /**
@@ -182,8 +200,9 @@ class WebSocket : public std::enable_shared_from_this<WebSocket> {
    * @param data UTF-8 encoded data to send
    * @param callback Callback which is invoked when the write completes.
    */
-  void SendText(span<const uv::Buffer> data,
-                std::function<void(span<uv::Buffer>, uv::Error)> callback) {
+  void SendText(
+      std::span<const uv::Buffer> data,
+      std::function<void(std::span<uv::Buffer>, uv::Error)> callback) {
     Send(kFlagFin | kOpText, data, std::move(callback));
   }
 
@@ -192,8 +211,9 @@ class WebSocket : public std::enable_shared_from_this<WebSocket> {
    * @param data UTF-8 encoded data to send
    * @param callback Callback which is invoked when the write completes.
    */
-  void SendText(std::initializer_list<uv::Buffer> data,
-                std::function<void(span<uv::Buffer>, uv::Error)> callback) {
+  void SendText(
+      std::initializer_list<uv::Buffer> data,
+      std::function<void(std::span<uv::Buffer>, uv::Error)> callback) {
     SendText({data.begin(), data.end()}, std::move(callback));
   }
 
@@ -202,8 +222,9 @@ class WebSocket : public std::enable_shared_from_this<WebSocket> {
    * @param data Data to send
    * @param callback Callback which is invoked when the write completes.
    */
-  void SendBinary(span<const uv::Buffer> data,
-                  std::function<void(span<uv::Buffer>, uv::Error)> callback) {
+  void SendBinary(
+      std::span<const uv::Buffer> data,
+      std::function<void(std::span<uv::Buffer>, uv::Error)> callback) {
     Send(kFlagFin | kOpBinary, data, std::move(callback));
   }
 
@@ -212,8 +233,9 @@ class WebSocket : public std::enable_shared_from_this<WebSocket> {
    * @param data Data to send
    * @param callback Callback which is invoked when the write completes.
    */
-  void SendBinary(std::initializer_list<uv::Buffer> data,
-                  std::function<void(span<uv::Buffer>, uv::Error)> callback) {
+  void SendBinary(
+      std::initializer_list<uv::Buffer> data,
+      std::function<void(std::span<uv::Buffer>, uv::Error)> callback) {
     SendBinary({data.begin(), data.end()}, std::move(callback));
   }
 
@@ -225,8 +247,8 @@ class WebSocket : public std::enable_shared_from_this<WebSocket> {
    * @param callback Callback which is invoked when the write completes.
    */
   void SendTextFragment(
-      span<const uv::Buffer> data,
-      std::function<void(span<uv::Buffer>, uv::Error)> callback) {
+      std::span<const uv::Buffer> data,
+      std::function<void(std::span<uv::Buffer>, uv::Error)> callback) {
     Send(kOpText, data, std::move(callback));
   }
 
@@ -239,7 +261,7 @@ class WebSocket : public std::enable_shared_from_this<WebSocket> {
    */
   void SendTextFragment(
       std::initializer_list<uv::Buffer> data,
-      std::function<void(span<uv::Buffer>, uv::Error)> callback) {
+      std::function<void(std::span<uv::Buffer>, uv::Error)> callback) {
     SendTextFragment({data.begin(), data.end()}, std::move(callback));
   }
 
@@ -251,8 +273,8 @@ class WebSocket : public std::enable_shared_from_this<WebSocket> {
    * @param callback Callback which is invoked when the write completes.
    */
   void SendBinaryFragment(
-      span<const uv::Buffer> data,
-      std::function<void(span<uv::Buffer>, uv::Error)> callback) {
+      std::span<const uv::Buffer> data,
+      std::function<void(std::span<uv::Buffer>, uv::Error)> callback) {
     Send(kOpBinary, data, std::move(callback));
   }
 
@@ -265,7 +287,7 @@ class WebSocket : public std::enable_shared_from_this<WebSocket> {
    */
   void SendBinaryFragment(
       std::initializer_list<uv::Buffer> data,
-      std::function<void(span<uv::Buffer>, uv::Error)> callback) {
+      std::function<void(std::span<uv::Buffer>, uv::Error)> callback) {
     SendBinaryFragment({data.begin(), data.end()}, std::move(callback));
   }
 
@@ -276,8 +298,9 @@ class WebSocket : public std::enable_shared_from_this<WebSocket> {
    * @param fin Set to true if this is the final fragment of the message
    * @param callback Callback which is invoked when the write completes.
    */
-  void SendFragment(span<const uv::Buffer> data, bool fin,
-                    std::function<void(span<uv::Buffer>, uv::Error)> callback) {
+  void SendFragment(
+      std::span<const uv::Buffer> data, bool fin,
+      std::function<void(std::span<uv::Buffer>, uv::Error)> callback) {
     Send(kOpCont | (fin ? kFlagFin : 0), data, std::move(callback));
   }
 
@@ -288,8 +311,9 @@ class WebSocket : public std::enable_shared_from_this<WebSocket> {
    * @param fin Set to true if this is the final fragment of the message
    * @param callback Callback which is invoked when the write completes.
    */
-  void SendFragment(std::initializer_list<uv::Buffer> data, bool fin,
-                    std::function<void(span<uv::Buffer>, uv::Error)> callback) {
+  void SendFragment(
+      std::initializer_list<uv::Buffer> data, bool fin,
+      std::function<void(std::span<uv::Buffer>, uv::Error)> callback) {
     SendFragment({data.begin(), data.end()}, fin, std::move(callback));
   }
 
@@ -312,8 +336,9 @@ class WebSocket : public std::enable_shared_from_this<WebSocket> {
    * @param callback Callback which is invoked when the ping frame
    *                 write completes.
    */
-  void SendPing(span<const uv::Buffer> data,
-                std::function<void(span<uv::Buffer>, uv::Error)> callback) {
+  void SendPing(
+      std::span<const uv::Buffer> data,
+      std::function<void(std::span<uv::Buffer>, uv::Error)> callback) {
     Send(kFlagFin | kOpPing, data, std::move(callback));
   }
 
@@ -323,8 +348,9 @@ class WebSocket : public std::enable_shared_from_this<WebSocket> {
    * @param callback Callback which is invoked when the ping frame
    *                 write completes.
    */
-  void SendPing(std::initializer_list<uv::Buffer> data,
-                std::function<void(span<uv::Buffer>, uv::Error)> callback) {
+  void SendPing(
+      std::initializer_list<uv::Buffer> data,
+      std::function<void(std::span<uv::Buffer>, uv::Error)> callback) {
     SendPing({data.begin(), data.end()}, std::move(callback));
   }
 
@@ -347,8 +373,9 @@ class WebSocket : public std::enable_shared_from_this<WebSocket> {
    * @param callback Callback which is invoked when the pong frame
    *                 write completes.
    */
-  void SendPong(span<const uv::Buffer> data,
-                std::function<void(span<uv::Buffer>, uv::Error)> callback) {
+  void SendPong(
+      std::span<const uv::Buffer> data,
+      std::function<void(std::span<uv::Buffer>, uv::Error)> callback) {
     Send(kFlagFin | kOpPong, data, std::move(callback));
   }
 
@@ -358,10 +385,21 @@ class WebSocket : public std::enable_shared_from_this<WebSocket> {
    * @param callback Callback which is invoked when the pong frame
    *                 write completes.
    */
-  void SendPong(std::initializer_list<uv::Buffer> data,
-                std::function<void(span<uv::Buffer>, uv::Error)> callback) {
+  void SendPong(
+      std::initializer_list<uv::Buffer> data,
+      std::function<void(std::span<uv::Buffer>, uv::Error)> callback) {
     SendPong({data.begin(), data.end()}, std::move(callback));
   }
+
+  /**
+   * Send multiple frames.
+   *
+   * @param frames Frame type/data pairs
+   * @param callback Callback which is invoked when the write completes.
+   */
+  void SendFrames(
+      std::span<const Frame> frames,
+      std::function<void(std::span<uv::Buffer>, uv::Error)> callback);
 
   /**
    * Fail the connection.
@@ -419,17 +457,17 @@ class WebSocket : public std::enable_shared_from_this<WebSocket> {
    * The first parameter is the data, the second parameter is true if the
    * data is the last fragment of the message.
    */
-  sig::Signal<span<const uint8_t>, bool> binary;
+  sig::Signal<std::span<const uint8_t>, bool> binary;
 
   /**
    * Ping event.  Emitted when a ping message is received.
    */
-  sig::Signal<span<const uint8_t>> ping;
+  sig::Signal<std::span<const uint8_t>> ping;
 
   /**
    * Pong event.  Emitted when a pong message is received.
    */
-  sig::Signal<span<const uint8_t>> pong;
+  sig::Signal<std::span<const uint8_t>> pong;
 
  private:
   // user data
@@ -462,15 +500,17 @@ class WebSocket : public std::enable_shared_from_this<WebSocket> {
   std::unique_ptr<ClientHandshakeData> m_clientHandshake;
 
   void StartClient(std::string_view uri, std::string_view host,
-                   span<const std::string_view> protocols,
+                   std::span<const std::string_view> protocols,
                    const ClientOptions& options);
   void StartServer(std::string_view key, std::string_view version,
                    std::string_view protocol);
   void SendClose(uint16_t code, std::string_view reason);
   void SetClosed(uint16_t code, std::string_view reason, bool failed = false);
   void HandleIncoming(uv::Buffer& buf, size_t size);
-  void Send(uint8_t opcode, span<const uv::Buffer> data,
-            std::function<void(span<uv::Buffer>, uv::Error)> callback);
+  void Send(uint8_t opcode, std::span<const uv::Buffer> data,
+            std::function<void(std::span<uv::Buffer>, uv::Error)> callback) {
+    SendFrames({{Frame{opcode, data}}}, std::move(callback));
+  }
 };
 
 }  // namespace wpi

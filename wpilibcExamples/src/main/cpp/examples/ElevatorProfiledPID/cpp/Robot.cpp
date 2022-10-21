@@ -2,6 +2,8 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
+#include <numbers>
+
 #include <frc/Encoder.h>
 #include <frc/Joystick.h>
 #include <frc/TimedRobot.h>
@@ -12,14 +14,13 @@
 #include <units/length.h>
 #include <units/time.h>
 #include <units/velocity.h>
-#include <wpi/numbers>
 
 class Robot : public frc::TimedRobot {
  public:
   static constexpr units::second_t kDt = 20_ms;
 
   Robot() {
-    m_encoder.SetDistancePerPulse(1.0 / 360.0 * 2.0 * wpi::numbers::pi * 1.5);
+    m_encoder.SetDistancePerPulse(1.0 / 360.0 * 2.0 * std::numbers::pi * 1.5);
   }
 
   void TeleopPeriodic() override {

@@ -103,11 +103,21 @@ class WPILIB_DLLEXPORT Rotation3d {
 
   /**
    * Multiplies the current rotation by a scalar.
+   *
    * @param scalar The scalar.
    *
    * @return The new scaled Rotation3d.
    */
   Rotation3d operator*(double scalar) const;
+
+  /**
+   * Divides the current rotation by a scalar.
+   *
+   * @param scalar The scalar.
+   *
+   * @return The new scaled Rotation3d.
+   */
+  Rotation3d operator/(double scalar) const;
 
   /**
    * Checks equality between this Rotation3d and another object.

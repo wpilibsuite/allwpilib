@@ -49,7 +49,7 @@ jobs:
   tidy:
     name: "clang-tidy"
     runs-on: ubuntu-latest
-    container: wpilib/roborio-cross-ubuntu:2022-20.04
+    container: wpilib/roborio-cross-ubuntu:2023-22.04
     steps:
       - uses: actions/checkout@v3
       - name: Fetch all history and metadata
@@ -79,7 +79,7 @@ jobs:
   javaformat:
     name: "Java format"
     runs-on: ubuntu-latest
-    container: wpilib/ubuntu-base:20.04
+    container: wpilib/ubuntu-base:22.04
     steps:
       - uses: actions/checkout@v3
       - name: Fetch all history and metadata

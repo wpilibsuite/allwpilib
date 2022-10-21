@@ -5,6 +5,7 @@
 #include "LoggerImpl.h"
 
 #include <fmt/format.h>
+#include <wpi/DenseMap.h>
 #include <wpi/fs.h>
 
 using namespace nt;
@@ -29,34 +30,108 @@ static void DefaultLogger(unsigned int level, const char* file,
   fmt::print(stderr, "NT: {}: {} ({}:{})\n", levelmsg, msg, file, line);
 }
 
-LoggerImpl::LoggerImpl(int inst) : m_inst(inst) {}
+class LoggerImpl::Thread final : public wpi::SafeThreadEvent {
+ public:
+  explicit Thread(NT_LoggerPoller poller) : m_poller{poller} {}
 
-void LoggerImpl::Start() {
-  DoStart(m_inst);
+  void Main() final;
+
+  NT_LoggerPoller m_poller;
+  wpi::DenseMap<NT_Logger, std::function<void(const LogMessage& msg)>>
+      m_callbacks;
+};
+
+void LoggerImpl::Thread::Main() {
+  while (m_active) {
+    WPI_Handle signaledBuf[2];
+    auto signaled =
+        wpi::WaitForObjects({m_poller, m_stopEvent.GetHandle()}, signaledBuf);
+    if (signaled.empty() || !m_active) {
+      return;
+    }
+    // call all the way back out to the C++ API to ensure valid handle
+    auto events = nt::ReadLoggerQueue(m_poller);
+    if (events.empty()) {
+      continue;
+    }
+    std::unique_lock lock{m_mutex};
+    for (auto&& event : events) {
+      auto callbackIt = m_callbacks.find(event.logger);
+      if (callbackIt != m_callbacks.end()) {
+        auto callback = callbackIt->second;
+        lock.unlock();
+        callback(event);
+        lock.lock();
+      }
+    }
+  }
 }
 
-unsigned int LoggerImpl::Add(
-    std::function<void(const LogMessage& msg)> callback, unsigned int min_level,
-    unsigned int max_level) {
-  return DoAdd(callback, min_level, max_level);
+LoggerImpl::LoggerImpl(int inst) : m_inst{inst} {}
+
+LoggerImpl::~LoggerImpl() = default;
+
+NT_Logger LoggerImpl::Add(std::function<void(const LogMessage& msg)> callback,
+                          unsigned int minLevel, unsigned int maxLevel) {
+  if (!m_thread) {
+    m_thread.Start(CreatePoller());
+  }
+  if (auto thr = m_thread.GetThread()) {
+    auto listener = AddPolled(thr->m_poller, minLevel, maxLevel);
+    if (listener) {
+      thr->m_callbacks.try_emplace(listener, std::move(callback));
+    }
+    return listener;
+  } else {
+    return {};
+  }
 }
 
-unsigned int LoggerImpl::AddPolled(unsigned int poller_uid,
-                                   unsigned int min_level,
-                                   unsigned int max_level) {
-  return DoAdd(poller_uid, min_level, max_level);
+NT_LoggerPoller LoggerImpl::CreatePoller() {
+  std::scoped_lock lock{m_mutex};
+  return m_pollers.Add(m_inst)->handle;
+}
+
+void LoggerImpl::DestroyPoller(NT_LoggerPoller pollerHandle) {
+  std::scoped_lock lock{m_mutex};
+  m_pollers.Remove(pollerHandle);
+}
+
+NT_Logger LoggerImpl::AddPolled(NT_LoggerPoller pollerHandle,
+                                unsigned int minLevel, unsigned int maxLevel) {
+  std::scoped_lock lock{m_mutex};
+  if (auto poller = m_pollers.Get(pollerHandle)) {
+    return m_listeners.Add(m_inst, poller, minLevel, maxLevel)->handle;
+  } else {
+    return {};
+  }
+}
+
+std::vector<LogMessage> LoggerImpl::ReadQueue(NT_LoggerPoller pollerHandle) {
+  std::scoped_lock lock{m_mutex};
+  if (auto poller = m_pollers.Get(pollerHandle)) {
+    std::vector<LogMessage> rv;
+    rv.swap(poller->queue);
+    return rv;
+  } else {
+    return {};
+  }
+}
+
+void LoggerImpl::Remove(NT_Logger listenerHandle) {
+  std::scoped_lock lock{m_mutex};
+  m_listeners.Remove(listenerHandle);
+  if (auto thr = m_thread.GetThread()) {
+    thr->m_callbacks.erase(listenerHandle);
+  }
 }
 
 unsigned int LoggerImpl::GetMinLevel() {
-  auto thr = GetThread();
-  if (!thr) {
-    return NT_LOG_INFO;
-  }
+  // return 0;
   unsigned int level = NT_LOG_INFO;
-  for (size_t i = 0; i < thr->m_listeners.size(); ++i) {
-    const auto& listener = thr->m_listeners[i];
-    if (listener && listener.min_level < level) {
-      level = listener.min_level;
+  for (auto&& listener : m_listeners) {
+    if (listener && listener->minLevel < level) {
+      level = listener->minLevel;
     }
   }
   return level;
@@ -66,10 +141,18 @@ void LoggerImpl::Log(unsigned int level, const char* file, unsigned int line,
                      const char* msg) {
   auto filename = fs::path{file}.filename();
   {
-    auto thr = GetThread();
-    if (!thr || thr->m_listeners.empty()) {
+    std::scoped_lock lock{m_mutex};
+    if (m_listeners.empty()) {
       DefaultLogger(level, filename.string().c_str(), line, msg);
+    } else {
+      for (auto&& listener : m_listeners) {
+        if (level >= listener->minLevel && level <= listener->maxLevel) {
+          listener->poller->queue.emplace_back(listener->handle.GetHandle(),
+                                               level, file, line, msg);
+          listener->poller->handle.Set();
+          listener->handle.Set();
+        }
+      }
     }
   }
-  Send(UINT_MAX, 0, level, filename.string(), line, msg);
 }
