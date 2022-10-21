@@ -74,12 +74,9 @@ struct WPILIB_DLLEXPORT ChassisSpeeds {
    */
   static ChassisSpeeds FromFieldRelativeSpeeds(
       const ChassisSpeeds& fieldRelativeSpeeds, const Rotation2d& robotAngle) {
-    return FromFieldRelativeSpeeds(
-      fieldRelativeSpeeds.vx,
-      fieldRelativeSpeeds.vy,
-      fieldRelativeSpeeds.omega,
-      robotAngle
-    );
+    return FromFieldRelativeSpeeds(fieldRelativeSpeeds.vx,
+                                   fieldRelativeSpeeds.vy,
+                                   fieldRelativeSpeeds.omega, robotAngle);
   }
 };
 }  // namespace frc
