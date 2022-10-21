@@ -69,7 +69,7 @@ void JoystickDataCache::Update() {
 
 #define CHECK_JOYSTICK_NUMBER(stickNum)                  \
   if ((stickNum) < 0 || (stickNum) >= HAL_kMaxJoysticks) \
-    return PARAMETER_OUT_OF_RANGE
+  return PARAMETER_OUT_OF_RANGE
 
 static HAL_ControlWord newestControlWord;
 static JoystickDataCache caches[3];
@@ -314,8 +314,7 @@ void HAL_RemoveNewDataEventHandle(WPI_EventHandle handle) {
 
 HAL_Bool HAL_GetOutputsEnabled(void) {
   std::scoped_lock lock{driverStation->cacheMutex};
-  return newestControlWord.enabled &&
-         newestControlWord.dsAttached;
+  return newestControlWord.enabled && newestControlWord.dsAttached;
 }
 
 }  // extern "C"

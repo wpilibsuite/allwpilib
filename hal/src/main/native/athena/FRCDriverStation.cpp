@@ -105,7 +105,7 @@ void JoystickDataCache::Update() {
 
 #define CHECK_JOYSTICK_NUMBER(stickNum)                  \
   if ((stickNum) < 0 || (stickNum) >= HAL_kMaxJoysticks) \
-    return PARAMETER_OUT_OF_RANGE
+  return PARAMETER_OUT_OF_RANGE
 
 static HAL_ControlWord newestControlWord;
 static JoystickDataCache caches[3];
