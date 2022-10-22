@@ -38,11 +38,13 @@ namespace frc {
  * The state-space system used internally has the following states (x), inputs
  * (u), and outputs (y):
  *
- * <strong> x = [x, y, theta]ᵀ </strong> in the field coordinate system
- * containing x position, y position, and heading.
+ * <strong> x = [x, y, theta, s_0, ... s_n]ᵀ </strong> in the field coordinate system
+ * containing x position, y position, and heading, followed by the distance travelled
+ * by each wheel.
  *
- * <strong> u = [v_x, v_y, omega]ᵀ </strong> containing x velocity, y velocity,
- * and angular velocity in the field coordinate system.
+ * <strong> u = [v_x, v_y, omega, v_0, ... v_n]ᵀ </strong> containing x velocity, y velocity,
+ * and angular velocity in the field coordinate system, followed by the velocity measured at
+ * each wheel.
  *
  * <strong> y = [x, y, theta]ᵀ </strong> from vision containing x position, y
  * position, and heading; or <strong> y = [theta]ᵀ </strong> containing gyro
@@ -56,17 +58,20 @@ class SwerveDrivePoseEstimator {
    *
    * @param gyroAngle                The current gyro angle.
    * @param initialPose              The starting pose estimate.
+   * @param modulePositions          The current distance and rotation
+   *                                 measurements of the swerve modules.
    * @param kinematics               A correctly-configured kinematics object
    *                                 for your drivetrain.
    * @param stateStdDevs             Standard deviations of model states.
    *                                 Increase these numbers to trust your
    *                                 model's state estimates less. This matrix
-   *                                 is in the form [x, y, theta]ᵀ, with units
-   *                                 in meters and radians.
+   *                                 is in the form [x, y, theta, s_0, ... s_n]ᵀ, with units
+   *                                 in meters and radians, then meters.
    * @param localMeasurementStdDevs  Standard deviation of the gyro measurement.
    *                                 Increase this number to trust sensor
    *                                 readings from the gyro less. This matrix is
-   *                                 in the form [theta], with units in radians.
+   *                                 in the form [theta, s_0, ... s_n], with units in radians
+   *                                 followed by meters.
    * @param visionMeasurementStdDevs Standard deviations of the vision
    *                                 measurements. Increase these numbers to
    *                                 trust global measurements from vision
@@ -78,33 +83,47 @@ class SwerveDrivePoseEstimator {
    */
   SwerveDrivePoseEstimator(
       const Rotation2d& gyroAngle, const Pose2d& initialPose,
+      const wpi::array<SwerveModulePosition, NumModules> modulePositions,
       SwerveDriveKinematics<NumModules>& kinematics,
-      const wpi::array<double, 3>& stateStdDevs,
-      const wpi::array<double, 1>& localMeasurementStdDevs,
-      const wpi::array<double, 3>& visionMeasurementStdDevs,
+      const wpi::array<double, 3 + NumModules>& stateStdDevs,
+      const wpi::array<double, 1 + NumModules>& localMeasurementStdDevs,
+      const wpi::array<double, 3 >& visionMeasurementStdDevs,
       units::second_t nominalDt = 20_ms)
-      : m_observer([](const Vectord<3>& x, const Vectord<3>& u) { return u; },
-                   [](const Vectord<3>& x, const Vectord<3>& u) {
-                     return x.block<1, 1>(2, 0);
+      : m_observer([](const Vectord<3 + NumModules>& x, const Vectord<3 + NumModules>& u) { return u; },
+                   [](const Vectord<3 + NumModules>& x, const Vectord<3 + NumModules>& u) {
+                     return x.block<5, 1>(2, 0);
                    },
                    stateStdDevs, localMeasurementStdDevs,
-                   frc::AngleMean<3, 3>(2), frc::AngleMean<1, 3>(0),
-                   frc::AngleResidual<3>(2), frc::AngleResidual<1>(0),
-                   frc::AngleAdd<3>(2), nominalDt),
+                   frc::AngleMean<3 + NumModules, 3 + NumModules>(2), frc::AngleMean<1 + NumModules, 3 + NumModules>(0),
+                   frc::AngleResidual<3 + NumModules>(2), frc::AngleResidual<1 + NumModules>(0),
+                   frc::AngleAdd<3 + NumModules>(2), nominalDt),
         m_kinematics(kinematics),
         m_nominalDt(nominalDt) {
     SetVisionMeasurementStdDevs(visionMeasurementStdDevs);
 
     // Create correction mechanism for vision measurements.
-    m_visionCorrect = [&](const Vectord<3>& u, const Vectord<3>& y) {
+    m_visionCorrect = [&](const Vectord<3 + NumModules>& u, const Vectord<3>& y) {
+      auto h = [](const Vectord<3 + NumModules>& x, const Vectord<3 + NumModules>& u) { return x.block<3, 1>(0, 0); };
+      auto meanFuncY = frc::AngleMean<3, 3 + NumModules>(2);
+      auto residualFuncY = frc::AngleResidual<3>(2);
+      auto residualFuncX = frc::AngleResidual<3 + NumModules>(2);
+      auto addFuncX = frc::AngleAdd<3 + NumModules>(2);
       m_observer.Correct<3>(
-          u, y, [](const Vectord<3>& x, const Vectord<3>& u) { return x; },
-          m_visionContR, frc::AngleMean<3, 3>(2), frc::AngleResidual<3>(2),
-          frc::AngleResidual<3>(2), frc::AngleAdd<3>(2));
+          u, y, h,
+          m_visionContR, meanFuncY, residualFuncY,
+          residualFuncX, addFuncX);
     };
 
     // Set initial state.
-    m_observer.SetXhat(PoseTo3dVector(initialPose));
+    Vectord<3 + NumModules> xhat;
+    auto poseVec = PoseTo3dVector(initialPose);
+    xhat(0) = poseVec(0);
+    xhat(1) = poseVec(1);
+    xhat(2) = poseVec(2);
+    for (size_t i = 0; i < NumModules; i++) {
+      xhat(3 + i) = modulePositions[i].distance.value();
+    }
+    m_observer.SetXhat(xhat);
 
     // Calculate offsets.
     m_gyroOffset = initialPose.Rotation() - gyroAngle;
@@ -117,15 +136,26 @@ class SwerveDrivePoseEstimator {
    * The gyroscope angle does not need to be reset in the user's robot code.
    * The library automatically takes care of offsetting the gyro angle.
    *
-   * @param pose      The position on the field that your robot is at.
-   * @param gyroAngle The angle reported by the gyroscope.
+   * @param pose            The position on the field that your robot is at.
+   * @param gyroAngle       The angle reported by the gyroscope.
+   * @param modulePositions The current distance and rotation measurements of 
+   *                        the swerve modules.
    */
-  void ResetPosition(const Pose2d& pose, const Rotation2d& gyroAngle) {
+  void ResetPosition(const Pose2d& pose, const Rotation2d& gyroAngle,
+      wpi::array<SwerveModulePosition, NumModules> modulePositions) {
     // Reset state estimate and error covariance
     m_observer.Reset();
     m_poseBuffer.Clear();
 
-    m_observer.SetXhat(PoseTo3dVector(pose));
+    Vectord<3 + NumModules> xhat;
+    auto poseVec = PoseTo3dVector(pose);
+    xhat(0) = poseVec(0);
+    xhat(1) = poseVec(1);
+    xhat(2) = poseVec(2);
+    for (size_t i = 0; i < NumModules; i++) {
+      xhat(3 + i) = modulePositions[i].distance.value();
+    }
+    m_observer.SetXhat(xhat);
 
     m_prevTime = -1_s;
 
@@ -187,7 +217,7 @@ class SwerveDrivePoseEstimator {
   void AddVisionMeasurement(const Pose2d& visionRobotPose,
                             units::second_t timestamp) {
     if (auto sample = m_poseBuffer.Sample(timestamp)) {
-      m_visionCorrect(Vectord<3>::Zero(),
+      m_visionCorrect(Vectord<3 + NumModules>::Zero(),
                       PoseTo3dVector(GetEstimatedPosition().TransformBy(
                           visionRobotPose - sample.value())));
     }
@@ -240,47 +270,62 @@ class SwerveDrivePoseEstimator {
    * information. This should be called every loop, and the correct loop period
    * must be passed into the constructor of this class.
    *
-   * @param gyroAngle    The current gyro angle.
-   * @param moduleStates The current velocities and rotations of the swerve
-   *                     modules.
+   * @param gyroAngle       The current gyro angle.
+   * @param moduleStates    The current velocities and rotations of the swerve
+   *                        modules.
+   * @param modulePositions The current distance and rotation measurements of 
+   *                        the swerve modules.
    * @return The estimated pose of the robot in meters.
    */
-  template <typename... ModuleState>
-  Pose2d Update(const Rotation2d& gyroAngle, ModuleState&&... moduleStates) {
+  Pose2d Update(const Rotation2d& gyroAngle,
+                const wpi::array<SwerveModuleState, NumModules> moduleStates,
+                const wpi::array<SwerveModulePosition, NumModules> modulePositions) {
     return UpdateWithTime(units::microsecond_t(wpi::Now()), gyroAngle,
-                          moduleStates...);
+                          moduleStates, modulePositions);
   }
 
   /**
    * Updates the the Unscented Kalman Filter using only wheel encoder
    * information. This should be called every loop, and the correct loop period
    * must be passed into the constructor of this class.
-   *
-   * @param currentTime  Time at which this method was called, in seconds.
-   * @param gyroAngle    The current gyroscope angle.
-   * @param moduleStates The current velocities and rotations of the swerve
-   *                     modules.
+   * 
+   * @param currentTime     Time at which this method was called, in seconds.
+   * @param gyroAngle       The current gyro angle.
+   * @param moduleStates    The current velocities and rotations of the swerve
+   *                        modules.
+   * @param modulePositions The current distance travelled and rotations of 
+   *                        the swerve modules.
    * @return The estimated pose of the robot in meters.
    */
-  template <typename... ModuleState>
   Pose2d UpdateWithTime(units::second_t currentTime,
-                        const Rotation2d& gyroAngle,
-                        ModuleState&&... moduleStates) {
+                const Rotation2d& gyroAngle,
+                const wpi::array<SwerveModuleState, NumModules> moduleStates,
+                const wpi::array<SwerveModulePosition, NumModules> modulePositions) {
     auto dt = m_prevTime >= 0_s ? currentTime - m_prevTime : m_nominalDt;
     m_prevTime = currentTime;
 
     auto angle = gyroAngle + m_gyroOffset;
     auto omega = (angle - m_previousAngle).Radians() / dt;
 
-    auto chassisSpeeds = m_kinematics.ToChassisSpeeds(moduleStates...);
+    auto chassisSpeeds = m_kinematics.ToChassisSpeeds(moduleStates);
     auto fieldRelativeSpeeds =
         Translation2d{chassisSpeeds.vx * 1_s, chassisSpeeds.vy * 1_s}.RotateBy(
             angle);
 
-    Vectord<3> u{fieldRelativeSpeeds.X().value(),
-                 fieldRelativeSpeeds.Y().value(), omega.value()};
+    Vectord<3 + NumModules> u;
+    u(0) = fieldRelativeSpeeds.X().value();
+    u(1) = fieldRelativeSpeeds.Y().value();
+    u(2) = omega.value();
+    for (size_t i = 0; i < NumModules; i++) {
+      u(3+i) = moduleStates[i].speed.value();
+    }
 
-    Vectord<1> localY{angle.Radians().value()};
+    Vectord<1 + NumModules> localY;
+    localY(0) = angle.Radians().value();
+    for (size_t i = 0; i < NumModules; i++) {
+      localY(1+i) = modulePositions[i].distance.value();
+    }
+
     m_previousAngle = angle;
 
     m_poseBuffer.AddSample(currentTime, GetEstimatedPosition());
@@ -292,10 +337,10 @@ class SwerveDrivePoseEstimator {
   }
 
  private:
-  UnscentedKalmanFilter<3, 3, 1> m_observer;
+  UnscentedKalmanFilter<3 + NumModules, 3 + NumModules, 1 + NumModules> m_observer;
   SwerveDriveKinematics<NumModules>& m_kinematics;
   TimeInterpolatableBuffer<Pose2d> m_poseBuffer{1.5_s};
-  std::function<void(const Vectord<3>& u, const Vectord<3>& y)> m_visionCorrect;
+  std::function<void(const Vectord<3 + NumModules>& u, const Vectord<3>& y)> m_visionCorrect;
 
   Eigen::Matrix3d m_visionContR;
 

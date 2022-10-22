@@ -16,12 +16,18 @@ TEST(SwerveDrivePoseEstimatorTest, Accuracy) {
       frc::Translation2d{1_m, 1_m}, frc::Translation2d{1_m, -1_m},
       frc::Translation2d{-1_m, -1_m}, frc::Translation2d{-1_m, 1_m}};
 
+  frc::SwerveModulePosition fl;
+  frc::SwerveModulePosition fr;
+  frc::SwerveModulePosition bl;
+  frc::SwerveModulePosition br;
+
   frc::SwerveDrivePoseEstimator<4> estimator{
-      frc::Rotation2d{}, frc::Pose2d{}, kinematics,
-      {0.1, 0.1, 0.1},   {0.05},        {0.1, 0.1, 0.1}};
+      frc::Rotation2d{}, frc::Pose2d{}, {fl, fr, bl, br},
+      kinematics, {0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1}, {0.05, 0.1, 0.1, 0.1, 0.1}, {0.1, 0.1, 0.1}};
 
   frc::Trajectory trajectory = frc::TrajectoryGenerator::GenerateTrajectory(
-      std::vector{frc::Pose2d{0_m, 0_m, 45_deg}, frc::Pose2d{3_m, 0_m, -90_deg},
+      std::vector{frc::Pose2d{0_m, 0_m, 45_deg},
+                  frc::Pose2d{3_m, 0_m, -90_deg},
                   frc::Pose2d{0_m, 0_m, 135_deg},
                   frc::Pose2d{-3_m, 0_m, -90_deg},
                   frc::Pose2d{0_m, 0_m, 45_deg}},
@@ -63,11 +69,22 @@ TEST(SwerveDrivePoseEstimatorTest, Accuracy) {
         {groundTruthState.velocity, 0_mps,
          groundTruthState.velocity * groundTruthState.curvature});
 
+    fl.distance += moduleStates[0].speed * dt;
+    fr.distance += moduleStates[1].speed * dt;
+    bl.distance += moduleStates[2].speed * dt;
+    br.distance += moduleStates[3].speed * dt;
+
+    fl.angle = moduleStates[0].angle;
+    fr.angle = moduleStates[1].angle;
+    bl.angle = moduleStates[2].angle;
+    br.angle = moduleStates[3].angle;
+
     auto xhat = estimator.UpdateWithTime(
         t,
         groundTruthState.pose.Rotation() +
             frc::Rotation2d{distribution(generator) * 0.05_rad},
-        moduleStates[0], moduleStates[1], moduleStates[2], moduleStates[3]);
+        moduleStates,
+        {fl, fr, bl, br});
     double error = groundTruthState.pose.Translation()
                        .Distance(xhat.Translation())
                        .value();

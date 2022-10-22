@@ -77,10 +77,10 @@ TEST_F(SwerveDriveOdometryTest, Accuracy) {
   SwerveDriveOdometry<4> odometry{
     kinematics, 0_rad, {zero, zero, zero, zero}};
 
-  SwerveModulePosition fl{0_m, 0_rad};
-  SwerveModulePosition fr{0_m, 0_rad};
-  SwerveModulePosition bl{0_m, 0_rad};
-  SwerveModulePosition br{0_m, 0_rad};
+  SwerveModulePosition fl;
+  SwerveModulePosition fr;
+  SwerveModulePosition bl;
+  SwerveModulePosition br;
 
   Trajectory trajectory = TrajectoryGenerator::GenerateTrajectory(
       std::vector{Pose2d{0_m, 0_m, 45_deg},
