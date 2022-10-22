@@ -66,7 +66,9 @@ struct TopicListenerFlags {
 
 /**
  * Topic change listener. This calls back to a callback function when a topic
- * change matching the specified mask occurs.
+ * change matching the specified mask occurs. The callback function is called
+ * asynchronously on a separate thread, so it's important to use synchronization
+ * or atomics when accessing any shared state from the callback function.
  */
 class TopicListener final {
  public:
@@ -202,7 +204,7 @@ class TopicListenerPoller final {
    * @param mask Bitmask of TopicListenerFlags values
    * @return Listener handle
    */
-  NT_ValueListener Add(const Subscriber& subscriber, unsigned int mask);
+  NT_TopicListener Add(const Subscriber& subscriber, unsigned int mask);
 
   /**
    * Start listening to topic changes on a subscriber.
@@ -211,7 +213,7 @@ class TopicListenerPoller final {
    * @param mask Bitmask of TopicListenerFlags values
    * @return Listener handle
    */
-  NT_ValueListener Add(const MultiSubscriber& subscriber, unsigned int mask);
+  NT_TopicListener Add(const MultiSubscriber& subscriber, unsigned int mask);
 
   /**
    * Start listening to topic changes on an entry.
@@ -220,7 +222,7 @@ class TopicListenerPoller final {
    * @param mask Bitmask of TopicListenerFlags values
    * @return Listener handle
    */
-  NT_ValueListener Add(const NetworkTableEntry& entry, unsigned int mask);
+  NT_TopicListener Add(const NetworkTableEntry& entry, unsigned int mask);
 
   /**
    * Remove a listener.

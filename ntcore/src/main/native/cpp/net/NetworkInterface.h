@@ -59,8 +59,8 @@ class NetworkInterface : public NetworkStartupInterface {
 
 class ILocalStorage : public LocalInterface {
  public:
-  virtual void StartNetwork(NetworkStartupInterface& startup) = 0;
-  virtual void SetNetwork(NetworkInterface* network) = 0;
+  virtual void StartNetwork(NetworkStartupInterface& startup,
+                            NetworkInterface* network) = 0;
   virtual void ClearNetwork() = 0;
 };
 

@@ -144,7 +144,6 @@ public abstract class RobotBase implements AutoCloseable {
     m_threadId = Thread.currentThread().getId();
     setupCameraServerShared();
     setupMathShared();
-    inst.setNetworkIdentity("Robot");
     // subscribe to "" to force persistent values to progagate to local
     m_suball = new MultiSubscriber(inst, new String[] {""});
     if (isReal()) {

@@ -31,10 +31,7 @@ namespace nt {
 
 class LocalStorageTest : public ::testing::Test {
  public:
-  LocalStorageTest() {
-    storage.StartNetwork(startup);
-    storage.SetNetwork(&network);
-  }
+  LocalStorageTest() { storage.StartNetwork(startup, &network); }
 
   ::testing::StrictMock<net::MockNetworkStartupInterface> startup;
   ::testing::StrictMock<net::MockNetworkInterface> network;

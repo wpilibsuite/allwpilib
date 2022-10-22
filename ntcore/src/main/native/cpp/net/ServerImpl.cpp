@@ -325,6 +325,7 @@ struct TopicData {
   std::string name;
   unsigned int id;
   Value lastValue;
+  ClientData* lastValueClient = nullptr;
   std::string typeStr;
   wpi::json properties = wpi::json::object();
   bool persistent{false};
@@ -627,6 +628,15 @@ void ClientData4Base::ClientSubscribe(int64_t subuid,
       removed = topic->subscribers.Remove(sub.get());
     }
 
+    // is client already subscribed?
+    bool wasSubscribed = false;
+    for (auto subscriber : topic->subscribers) {
+      if (subscriber->client == this) {
+        wasSubscribed = true;
+        break;
+      }
+    }
+
     bool added = false;
     if (sub->Matches(topic->name, topic->special)) {
       topic->subscribers.Add(sub.get());
@@ -645,7 +655,7 @@ void ClientData4Base::ClientSubscribe(int64_t subuid,
       }
     }
 
-    if (added && !removed) {
+    if (!wasSubscribed && added && !removed) {
       // announce topic to client
       DEBUG4("client {}: announce {}", m_id, topic->name);
       SendAnnounce(topic.get(), std::nullopt);
@@ -2086,11 +2096,13 @@ void SImpl::SetFlags(ClientData* client, TopicData* topic, unsigned int flags) {
 }
 
 void SImpl::SetValue(ClientData* client, TopicData* topic, const Value& value) {
-  // update retained value if timestamp newer
-  if (!topic->lastValue || value.time() > topic->lastValue.time()) {
+  // update retained value if from same client or timestamp newer
+  if (!topic->lastValue || topic->lastValueClient == client ||
+      value.time() >= topic->lastValue.time()) {
     DEBUG4("updating '{}' last value (time was {} is {})", topic->name,
            topic->lastValue.time(), value.time());
     topic->lastValue = value;
+    topic->lastValueClient = client;
 
     // if persistent, update flag
     if (topic->persistent) {

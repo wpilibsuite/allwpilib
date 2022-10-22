@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include <memory>
 #include <vector>
 
 #include <wpi/SmallVector.h>
@@ -15,7 +16,9 @@
 
 namespace nt::net {
 
-class WebSocketConnection final : public WireConnection {
+class WebSocketConnection final
+    : public WireConnection,
+      public std::enable_shared_from_this<WebSocketConnection> {
  public:
   explicit WebSocketConnection(wpi::WebSocket& ws);
   ~WebSocketConnection() override;
