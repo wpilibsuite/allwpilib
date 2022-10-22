@@ -49,6 +49,7 @@ class TestEnvironment : public testing::Environment {
       HAL_GetControlWord(&controlWord);
       return controlWord.enabled && controlWord.dsAttached;
     };
+    HAL_RefreshDSData();
     while (!checkEnabled()) {
       if (enableCounter > 50) {
         // Robot did not enable properly after 5 seconds.
@@ -60,6 +61,7 @@ class TestEnvironment : public testing::Environment {
       std::this_thread::sleep_for(100ms);
 
       fmt::print("Waiting for enable: {}\n", enableCounter++);
+      HAL_RefreshDSData();
     }
     std::this_thread::sleep_for(500ms);
   }

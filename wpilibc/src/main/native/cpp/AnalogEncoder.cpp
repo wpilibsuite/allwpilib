@@ -83,7 +83,7 @@ units::turn_t AnalogEncoder::Get() const {
   }
 
   FRC_ReportError(
-      warn::Warning, "{}",
+      warn::Warning,
       "Failed to read Analog Encoder. Potential Speed Overrun. Returning last "
       "value");
   return m_lastPosition;

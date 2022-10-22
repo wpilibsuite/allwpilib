@@ -118,7 +118,7 @@ if (ATOMIC)
 endif()
 
 
-if (NOT USE_VCPKG_FMTLIB)
+if (NOT USE_SYSTEM_FMTLIB)
     target_sources(wpiutil PRIVATE ${fmtlib_native_src})
     install(DIRECTORY src/main/native/thirdparty/fmtlib/include/ DESTINATION "${include_dest}/wpiutil")
     target_include_directories(wpiutil PUBLIC

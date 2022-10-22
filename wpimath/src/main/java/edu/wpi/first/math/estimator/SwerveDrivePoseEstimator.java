@@ -27,7 +27,7 @@ import java.util.function.BiConsumer;
  * drop-in for {@link edu.wpi.first.math.kinematics.SwerveDriveOdometry}.
  *
  * <p>{@link SwerveDrivePoseEstimator#update} should be called every robot loop. If your loops are
- * faster or slower than the default of 0.02s, then you should change the nominal delta time using
+ * faster or slower than the default of 20 ms, then you should change the nominal delta time using
  * the secondary constructor: {@link SwerveDrivePoseEstimator#SwerveDrivePoseEstimator(Rotation2d,
  * Pose2d, SwerveDriveKinematics, Matrix, Matrix, Matrix, double)}.
  *

@@ -33,7 +33,7 @@ AnalogGyro::AnalogGyro(AnalogInput* channel)
 AnalogGyro::AnalogGyro(std::shared_ptr<AnalogInput> channel)
     : m_analog(channel) {
   if (!channel) {
-    throw FRC_MakeError(err::NullParameter, "{}", "channel");
+    throw FRC_MakeError(err::NullParameter, "channel");
   }
   InitGyro();
   Calibrate();
@@ -48,7 +48,7 @@ AnalogGyro::AnalogGyro(std::shared_ptr<AnalogInput> channel, int center,
                        double offset)
     : m_analog(channel) {
   if (!channel) {
-    throw FRC_MakeError(err::NullParameter, "{}", "channel");
+    throw FRC_MakeError(err::NullParameter, "channel");
   }
   InitGyro();
   int32_t status = 0;

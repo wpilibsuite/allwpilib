@@ -23,10 +23,12 @@ void UvStreamConnection3::Flush() {
     return;
   }
   ++m_sendsActive;
-  m_stream.Write(m_buffers, [this](auto bufs, auto) {
-    m_buf_pool.insert(m_buf_pool.end(), bufs.begin(), bufs.end());
-    if (m_sendsActive > 0) {
-      --m_sendsActive;
+  m_stream.Write(m_buffers, [selfweak = weak_from_this()](auto bufs, auto) {
+    if (auto self = selfweak.lock()) {
+      self->m_buf_pool.insert(self->m_buf_pool.end(), bufs.begin(), bufs.end());
+      if (self->m_sendsActive > 0) {
+        --self->m_sendsActive;
+      }
     }
   });
   m_buffers.clear();

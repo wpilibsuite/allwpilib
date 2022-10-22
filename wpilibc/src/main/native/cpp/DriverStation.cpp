@@ -26,6 +26,7 @@
 #include <networktables/NetworkTableInstance.h>
 #include <networktables/StringTopic.h>
 #include <wpi/DataLog.h>
+#include <wpi/EventVector.h>
 #include <wpi/condition_variable.h>
 #include <wpi/mutex.h>
 #include <wpi/timestamp.h>
@@ -117,6 +118,7 @@ struct Instance {
   Instance();
   ~Instance();
 
+  wpi::EventVector refreshEvents;
   MatchDataSender matchDataSender;
   std::atomic<DataLogSender*> dataLogSender{nullptr};
 
@@ -126,14 +128,6 @@ struct Instance {
       previousButtonStates;
   std::array<uint32_t, DriverStation::kJoystickPorts> joystickButtonsPressed;
   std::array<uint32_t, DriverStation::kJoystickPorts> joystickButtonsReleased;
-
-  // Internal Driver Station thread
-  std::thread dsThread;
-  std::atomic<bool> isRunning{false};
-
-  mutable wpi::mutex waitForDataMutex;
-  wpi::condition_variable waitForDataCond;
-  int waitForDataCounter = 0;
 
   bool silenceJoystickWarning = false;
 
@@ -154,7 +148,6 @@ static Instance& GetInstance() {
   return instance;
 }
 
-static void Run();
 static void SendMatchData();
 
 /**
@@ -185,15 +178,6 @@ static inline void ReportJoystickUnpluggedWarning(const S& format,
   ReportJoystickUnpluggedWarningV(format, fmt::make_format_args(args...));
 }
 
-static int& GetDSLastCount() {
-  // There is a rollover error condition here. At Packet# = n * (uintmax), this
-  // will return false when instead it should return true. However, this at a
-  // 20ms rate occurs once every 2.7 years of DS connected runtime, so not
-  // worth the cycles to check.
-  thread_local int lastCount{0};
-  return lastCount;
-}
-
 Instance::Instance() {
   HAL_Initialize(500, 0);
 
@@ -205,16 +189,9 @@ Instance::Instance() {
     previousButtonStates[i].count = 0;
     previousButtonStates[i].buttons = 0;
   }
-
-  dsThread = std::thread(&Run);
 }
 
 Instance::~Instance() {
-  isRunning = false;
-  // Trigger a DS mutex release in case there is no driver station running.
-  HAL_ReleaseDSMutex();
-  dsThread.join();
-
   if (dataLogSender) {
     delete dataLogSender.load();
   }
@@ -513,18 +490,6 @@ bool DriverStation::IsDSAttached() {
   return controlWord.dsAttached;
 }
 
-bool DriverStation::IsNewControlData() {
-  auto& inst = ::GetInstance();
-  std::unique_lock lock(inst.waitForDataMutex);
-  int& lastCount = GetDSLastCount();
-  int currentCount = inst.waitForDataCounter;
-  if (lastCount == currentCount) {
-    return false;
-  }
-  lastCount = currentCount;
-  return true;
-}
-
 bool DriverStation::IsFMSAttached() {
   HAL_ControlWord controlWord;
   HAL_GetControlWord(&controlWord);
@@ -597,36 +562,6 @@ int DriverStation::GetLocation() {
   }
 }
 
-void DriverStation::WaitForData() {
-  WaitForData(0_s);
-}
-
-bool DriverStation::WaitForData(units::second_t timeout) {
-  auto& inst = ::GetInstance();
-  auto timeoutTime = std::chrono::steady_clock::now() +
-                     std::chrono::steady_clock::duration{timeout};
-
-  std::unique_lock lock(inst.waitForDataMutex);
-  int& lastCount = GetDSLastCount();
-  int currentCount = inst.waitForDataCounter;
-  if (lastCount != currentCount) {
-    lastCount = currentCount;
-    return true;
-  }
-  while (inst.waitForDataCounter == currentCount) {
-    if (timeout > 0_s) {
-      auto timedOut = inst.waitForDataCond.wait_until(lock, timeoutTime);
-      if (timedOut == std::cv_status::timeout) {
-        return false;
-      }
-    } else {
-      inst.waitForDataCond.wait(lock);
-    }
-  }
-  lastCount = inst.waitForDataCounter;
-  return true;
-}
-
 double DriverStation::GetMatchTime() {
   int32_t status = 0;
   return HAL_GetMatchTime(&status);
@@ -635,33 +570,9 @@ double DriverStation::GetMatchTime() {
 double DriverStation::GetBatteryVoltage() {
   int32_t status = 0;
   double voltage = HAL_GetVinVoltage(&status);
-  FRC_CheckErrorStatus(status, "{}", "getVinVoltage");
+  FRC_CheckErrorStatus(status, "getVinVoltage");
 
   return voltage;
-}
-
-void DriverStation::InDisabled(bool entering) {
-  ::GetInstance().userInDisabled = entering;
-}
-
-void DriverStation::InAutonomous(bool entering) {
-  ::GetInstance().userInAutonomous = entering;
-}
-
-void DriverStation::InTeleop(bool entering) {
-  ::GetInstance().userInTeleop = entering;
-}
-
-void DriverStation::InTest(bool entering) {
-  ::GetInstance().userInTest = entering;
-}
-
-void DriverStation::WakeupWaitForData() {
-  auto& inst = ::GetInstance();
-  std::scoped_lock waitLock(inst.waitForDataMutex);
-  // Nofify all threads
-  inst.waitForDataCounter++;
-  inst.waitForDataCond.notify_all();
 }
 
 /**
@@ -670,7 +581,8 @@ void DriverStation::WakeupWaitForData() {
  * If no new data exists, it will just be returned, otherwise
  * the data will be copied from the DS polling loop.
  */
-void GetData() {
+void DriverStation::RefreshData() {
+  HAL_RefreshDSData();
   auto& inst = ::GetInstance();
   {
     // Compute the pressed and released buttons
@@ -692,11 +604,22 @@ void GetData() {
     }
   }
 
-  DriverStation::WakeupWaitForData();
+  inst.refreshEvents.Wakeup();
+
   SendMatchData();
   if (auto sender = inst.dataLogSender.load()) {
     sender->Send(wpi::Now());
   }
+}
+
+void DriverStation::ProvideRefreshedDataEventHandle(WPI_EventHandle handle) {
+  auto& inst = ::GetInstance();
+  inst.refreshEvents.Add(handle);
+}
+
+void DriverStation::RemoveRefreshedDataEventHandle(WPI_EventHandle handle) {
+  auto& inst = ::GetInstance();
+  inst.refreshEvents.Remove(handle);
 }
 
 void DriverStation::SilenceJoystickConnectionWarning(bool silence) {
@@ -743,37 +666,6 @@ void ReportJoystickUnpluggedWarningV(fmt::string_view format,
     if (currentTime > inst.nextMessageTime) {
       ReportErrorV(warn::Warning, "", 0, "", format, args);
       inst.nextMessageTime = currentTime + kJoystickUnpluggedMessageInterval;
-    }
-  }
-}
-
-void Run() {
-  auto& inst = GetInstance();
-  inst.isRunning = true;
-  int safetyCounter = 0;
-  while (inst.isRunning) {
-    HAL_WaitForDSData();
-    GetData();
-
-    if (DriverStation::IsDisabled()) {
-      safetyCounter = 0;
-    }
-
-    if (++safetyCounter >= 4) {
-      MotorSafety::CheckMotors();
-      safetyCounter = 0;
-    }
-    if (inst.userInDisabled) {
-      HAL_ObserveUserProgramDisabled();
-    }
-    if (inst.userInAutonomous) {
-      HAL_ObserveUserProgramAutonomous();
-    }
-    if (inst.userInTeleop) {
-      HAL_ObserveUserProgramTeleop();
-    }
-    if (inst.userInTest) {
-      HAL_ObserveUserProgramTest();
     }
   }
 }

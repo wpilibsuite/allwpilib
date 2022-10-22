@@ -1227,22 +1227,6 @@ Java_edu_wpi_first_networktables_NetworkTablesJNI_removeConnectionListener
 
 /*
  * Class:     edu_wpi_first_networktables_NetworkTablesJNI
- * Method:    setNetworkIdentity
- * Signature: (ILjava/lang/String;)V
- */
-JNIEXPORT void JNICALL
-Java_edu_wpi_first_networktables_NetworkTablesJNI_setNetworkIdentity
-  (JNIEnv* env, jclass, jint inst, jstring name)
-{
-  if (!name) {
-    nullPointerEx.Throw(env, "name cannot be null");
-    return;
-  }
-  nt::SetNetworkIdentity(inst, JStringRef{env, name}.str());
-}
-
-/*
- * Class:     edu_wpi_first_networktables_NetworkTablesJNI
  * Method:    getNetworkMode
  * Signature: (I)I
  */
@@ -1314,25 +1298,33 @@ Java_edu_wpi_first_networktables_NetworkTablesJNI_stopServer
 /*
  * Class:     edu_wpi_first_networktables_NetworkTablesJNI
  * Method:    startClient3
- * Signature: (I)V
+ * Signature: (ILjava/lang/String;)V
  */
 JNIEXPORT void JNICALL
 Java_edu_wpi_first_networktables_NetworkTablesJNI_startClient3
-  (JNIEnv*, jclass, jint inst)
+  (JNIEnv* env, jclass, jint inst, jstring identity)
 {
-  nt::StartClient3(inst);
+  if (!identity) {
+    nullPointerEx.Throw(env, "identity cannot be null");
+    return;
+  }
+  nt::StartClient3(inst, JStringRef{env, identity}.str());
 }
 
 /*
  * Class:     edu_wpi_first_networktables_NetworkTablesJNI
  * Method:    startClient4
- * Signature: (I)V
+ * Signature: (ILjava/lang/String;)V
  */
 JNIEXPORT void JNICALL
 Java_edu_wpi_first_networktables_NetworkTablesJNI_startClient4
-  (JNIEnv*, jclass, jint inst)
+  (JNIEnv* env, jclass, jint inst, jstring identity)
 {
-  nt::StartClient4(inst);
+  if (!identity) {
+    nullPointerEx.Throw(env, "identity cannot be null");
+    return;
+  }
+  nt::StartClient4(inst, JStringRef{env, identity}.str());
 }
 
 /*

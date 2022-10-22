@@ -61,9 +61,9 @@ inline void ADISReportError(int32_t status, const char* file, int line,
 }  // namespace
 
 #define REPORT_WARNING(msg) \
-  ADISReportError(warn::Warning, __FILE__, __LINE__, __FUNCTION__, "{}", msg);
+  ADISReportError(warn::Warning, __FILE__, __LINE__, __FUNCTION__, msg);
 #define REPORT_ERROR(msg) \
-  ADISReportError(err::Error, __FILE__, __LINE__, __FUNCTION__, "{}", msg)
+  ADISReportError(err::Error, __FILE__, __LINE__, __FUNCTION__, msg)
 
 ADIS16448_IMU::ADIS16448_IMU()
     : ADIS16448_IMU(kZ, SPI::Port::kMXP, CalibrationTime::_512ms) {}

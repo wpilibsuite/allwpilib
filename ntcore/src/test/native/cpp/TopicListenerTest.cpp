@@ -18,8 +18,6 @@ class TopicListenerTest : public ::testing::Test {
  public:
   TopicListenerTest()
       : m_serverInst(nt::CreateInstance()), m_clientInst(nt::CreateInstance()) {
-    nt::SetNetworkIdentity(m_serverInst, "server");
-    nt::SetNetworkIdentity(m_clientInst, "client");
 #if 0
     nt::AddLogger(server_inst,
                   [](const nt::LogMessage& msg) {
@@ -52,7 +50,7 @@ class TopicListenerTest : public ::testing::Test {
 
 void TopicListenerTest::Connect(unsigned int port) {
   nt::StartServer(m_serverInst, "topiclistenertest.json", "127.0.0.1", 0, port);
-  nt::StartClient4(m_clientInst);
+  nt::StartClient4(m_clientInst, "client");
   nt::SetServer(m_clientInst, "127.0.0.1", port);
 
   // Use connection listener to ensure we've connected

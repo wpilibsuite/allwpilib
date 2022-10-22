@@ -15,10 +15,7 @@
 class ConnectionListenerTest : public ::testing::Test {
  public:
   ConnectionListenerTest()
-      : server_inst(nt::CreateInstance()), client_inst(nt::CreateInstance()) {
-    nt::SetNetworkIdentity(server_inst, "server");
-    nt::SetNetworkIdentity(client_inst, "client");
-  }
+      : server_inst(nt::CreateInstance()), client_inst(nt::CreateInstance()) {}
 
   ~ConnectionListenerTest() override {
     nt::DestroyInstance(server_inst);
@@ -36,7 +33,7 @@ void ConnectionListenerTest::Connect(const char* address, unsigned int port3,
                                      unsigned int port4) {
   nt::StartServer(server_inst, "connectionlistenertest.ini", address, port3,
                   port4);
-  nt::StartClient4(client_inst);
+  nt::StartClient4(client_inst, "client");
   nt::SetServer(client_inst, address, port4);
 
   // wait for client to report it's connected, then wait another 0.1 sec

@@ -74,7 +74,7 @@ struct TopicInfo {
 struct ConnectionInfo {
   /**
    * The remote identifier (as set on the remote node by
-   * NetworkTableInstance::SetNetworkIdentity() or nt::SetNetworkIdentity()).
+   * NetworkTableInstance::StartClient4() or nt::StartClient4()).
    */
   std::string remote_id;
 
@@ -292,7 +292,7 @@ class PubSubOption {
   /**
    * Polling storage for subscription. Specifies the maximum number of updates
    * NetworkTables should store between calls to the subscriber's poll()
-   * function. Defaults to 1 if logging is false, 20 if logging is true.
+   * function. Defaults to 1 if SendAll is false, 20 if SendAll is true.
    *
    * @param depth number of entries to save for polling.
    * @return option
@@ -1008,16 +1008,6 @@ void RemoveConnectionListener(NT_ConnectionListener conn_listener);
  */
 
 /**
- * Set the network identity of this node.
- * This is the name used during the initial connection handshake, and is
- * visible through ConnectionInfo on the remote node.
- *
- * @param inst      instance handle
- * @param name      identity to advertise
- */
-void SetNetworkIdentity(NT_Inst inst, std::string_view name);
-
-/**
  * Get the current network mode.
  *
  * @param inst  instance handle
@@ -1064,17 +1054,19 @@ void StopServer(NT_Inst inst);
  * Starts a NT3 client.  Use SetServer or SetServerTeam to set the server name
  * and port.
  *
- * @param inst  instance handle
+ * @param inst      instance handle
+ * @param identity  network identity to advertise (cannot be empty string)
  */
-void StartClient3(NT_Inst inst);
+void StartClient3(NT_Inst inst, std::string_view identity);
 
 /**
  * Starts a NT4 client.  Use SetServer or SetServerTeam to set the server name
  * and port.
  *
- * @param inst  instance handle
+ * @param inst      instance handle
+ * @param identity  network identity to advertise (cannot be empty string)
  */
-void StartClient4(NT_Inst inst);
+void StartClient4(NT_Inst inst, std::string_view identity);
 
 /**
  * Stops the client if it is running.

@@ -5,6 +5,7 @@
 #include "Robot.h"
 
 #include <frc/DriverStation.h>
+#include <frc/internal/DriverStationModeThread.h>
 #include <frc/livewindow/LiveWindow.h>
 #include <frc/shuffleboard/Shuffleboard.h>
 #include <hal/DriverStation.h>
@@ -23,41 +24,46 @@ void Robot::Test() {}
 void Robot::StartCompetition() {
   RobotInit();
 
+  frc::internal::DriverStationModeThread modeThread;
+
+  wpi::Event event{true, false};
+  frc::DriverStation::ProvideRefreshedDataEventHandle(event.GetHandle());
+
   // Tell the DS that the robot is ready to be enabled
   HAL_ObserveUserProgramStarting();
 
   while (!m_exit) {
     if (IsDisabled()) {
-      frc::DriverStation::InDisabled(true);
+      modeThread.InDisabled(true);
       Disabled();
-      frc::DriverStation::InDisabled(false);
+      modeThread.InDisabled(false);
       while (IsDisabled()) {
-        frc::DriverStation::WaitForData();
+        wpi::WaitForObject(event.GetHandle());
       }
     } else if (IsAutonomous()) {
-      frc::DriverStation::InAutonomous(true);
+      modeThread.InAutonomous(true);
       Autonomous();
-      frc::DriverStation::InAutonomous(false);
+      modeThread.InAutonomous(false);
       while (IsAutonomousEnabled()) {
-        frc::DriverStation::WaitForData();
+        wpi::WaitForObject(event.GetHandle());
       }
     } else if (IsTest()) {
       frc::LiveWindow::SetEnabled(true);
       frc::Shuffleboard::EnableActuatorWidgets();
-      frc::DriverStation::InTest(true);
+      modeThread.InTest(true);
       Test();
-      frc::DriverStation::InTest(false);
+      modeThread.InTest(false);
       while (IsTest() && IsEnabled()) {
-        frc::DriverStation::WaitForData();
+        wpi::WaitForObject(event.GetHandle());
       }
       frc::LiveWindow::SetEnabled(false);
       frc::Shuffleboard::DisableActuatorWidgets();
     } else {
-      frc::DriverStation::InTeleop(true);
+      modeThread.InTeleop(true);
       Teleop();
-      frc::DriverStation::InTeleop(false);
+      modeThread.InTeleop(false);
       while (IsTeleopEnabled()) {
-        frc::DriverStation::WaitForData();
+        wpi::WaitForObject(event.GetHandle());
       }
     }
   }

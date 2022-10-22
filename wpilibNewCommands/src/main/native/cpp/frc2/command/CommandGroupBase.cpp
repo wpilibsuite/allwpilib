@@ -9,7 +9,7 @@ using namespace frc2;
 bool CommandGroupBase::RequireUngrouped(const Command& command) {
   if (command.IsGrouped()) {
     throw FRC_MakeError(
-        frc::err::CommandIllegalUse, "{}",
+        frc::err::CommandIllegalUse,
         "Commands cannot be added to more than one CommandGroup");
   }
   return true;
@@ -27,7 +27,7 @@ bool CommandGroupBase::RequireUngrouped(
   }
   if (!allUngrouped) {
     throw FRC_MakeError(
-        frc::err::CommandIllegalUse, "{}",
+        frc::err::CommandIllegalUse,
         "Commands cannot be added to more than one CommandGroup");
   }
   return allUngrouped;
@@ -41,7 +41,7 @@ bool CommandGroupBase::RequireUngrouped(
   }
   if (!allUngrouped) {
     throw FRC_MakeError(
-        frc::err::CommandIllegalUse, "{}",
+        frc::err::CommandIllegalUse,
         "Commands cannot be added to more than one CommandGroup");
   }
   return allUngrouped;

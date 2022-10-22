@@ -85,7 +85,7 @@ void HttpCameraImpl::MonitorThreadMain() {
     // (this will result in an error at the read point, and ultimately
     // a reconnect attempt)
     if (m_streamConn && m_frameCount == 0) {
-      SWARNING("{}", "Monitor detected stream hung, disconnecting");
+      SWARNING("Monitor detected stream hung, disconnecting");
       m_streamConn->stream->close();
     }
 
@@ -93,7 +93,7 @@ void HttpCameraImpl::MonitorThreadMain() {
     m_frameCount = 0;
   }
 
-  SDEBUG("{}", "Monitor Thread exiting");
+  SDEBUG("Monitor Thread exiting");
 }
 
 void HttpCameraImpl::StreamThreadMain() {
@@ -141,7 +141,7 @@ void HttpCameraImpl::StreamThreadMain() {
     }
   }
 
-  SDEBUG("{}", "Camera Thread exiting");
+  SDEBUG("Camera Thread exiting");
   SetConnected(false);
 }
 
@@ -152,7 +152,7 @@ wpi::HttpConnection* HttpCameraImpl::DeviceStreamConnect(
   {
     std::scoped_lock lock(m_mutex);
     if (m_locations.empty()) {
-      SERROR("{}", "locations array is empty!?");
+      SERROR("locations array is empty!?");
       std::this_thread::sleep_for(std::chrono::seconds(1));
       return nullptr;
     }
@@ -273,7 +273,7 @@ bool HttpCameraImpl::DeviceStreamFrame(wpi::raw_istream& is,
   wpi::SmallString<64> contentTypeBuf;
   wpi::SmallString<64> contentLengthBuf;
   if (!ParseHttpHeaders(is, &contentTypeBuf, &contentLengthBuf)) {
-    SWARNING("{}", "disconnected during headers");
+    SWARNING("disconnected during headers");
     PutError("disconnected during headers", wpi::Now());
     return false;
   }
@@ -295,7 +295,7 @@ bool HttpCameraImpl::DeviceStreamFrame(wpi::raw_istream& is,
     // Ugh, no Content-Length?  Read the blocks of the JPEG file.
     int width, height;
     if (!ReadJpeg(is, imageBuf, &width, &height)) {
-      SWARNING("{}", "did not receive a JPEG image");
+      SWARNING("did not receive a JPEG image");
       PutError("did not receive a JPEG image", wpi::Now());
       return false;
     }
@@ -314,7 +314,7 @@ bool HttpCameraImpl::DeviceStreamFrame(wpi::raw_istream& is,
   }
   int width, height;
   if (!GetJpegSize(image->str(), &width, &height)) {
-    SWARNING("{}", "did not receive a JPEG image");
+    SWARNING("did not receive a JPEG image");
     PutError("did not receive a JPEG image", wpi::Now());
     return false;
   }
@@ -344,7 +344,7 @@ void HttpCameraImpl::SettingsThreadMain() {
     DeviceSendSettings(req);
   }
 
-  SDEBUG("{}", "Settings Thread exiting");
+  SDEBUG("Settings Thread exiting");
 }
 
 void HttpCameraImpl::DeviceSendSettings(wpi::HttpRequest& req) {

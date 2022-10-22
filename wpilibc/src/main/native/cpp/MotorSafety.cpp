@@ -7,6 +7,8 @@
 #include <algorithm>
 #include <utility>
 
+#include <hal/DriverStation.h>
+#include <wpi/SafeThread.h>
 #include <wpi/SmallPtrSet.h>
 
 #include "frc/DriverStation.h"
@@ -14,26 +16,84 @@
 
 using namespace frc;
 
-static wpi::SmallPtrSet<MotorSafety*, 32> instanceList;
-static wpi::mutex listMutex;
+namespace {
+class Thread : public wpi::SafeThread {
+ public:
+  Thread() {}
+  void Main() override;
+};
+
+void Thread::Main() {
+  wpi::Event event{true, false};
+  HAL_ProvideNewDataEventHandle(event.GetHandle());
+
+  int safetyCounter = 0;
+  while (m_active) {
+    bool timedOut = false;
+    bool signaled = wpi::WaitForObject(event.GetHandle(), 0.1, &timedOut);
+    if (signaled) {
+      HAL_ControlWord controlWord;
+      std::memset(&controlWord, 0, sizeof(controlWord));
+      HAL_GetControlWord(&controlWord);
+      if (!(controlWord.enabled && controlWord.dsAttached)) {
+        safetyCounter = 0;
+      }
+      if (++safetyCounter >= 4) {
+        MotorSafety::CheckMotors();
+        safetyCounter = 0;
+      }
+    } else {
+      safetyCounter = 0;
+    }
+  }
+
+  HAL_RemoveNewDataEventHandle(event.GetHandle());
+}
+
+static wpi::SafeThreadOwner<Thread> m_owner;
+}  // namespace
+
+static std::atomic_bool gShutdown{false};
+
+namespace {
+struct MotorSafetyManager {
+  ~MotorSafetyManager() { gShutdown = true; }
+
+  wpi::SmallPtrSet<MotorSafety*, 32> instanceList;
+  wpi::mutex listMutex;
+  bool threadStarted = false;
+};
+}  // namespace
+
+static MotorSafetyManager& GetManager() {
+  static MotorSafetyManager manager;
+  return manager;
+}
 
 #ifndef __FRC_ROBORIO__
 namespace frc::impl {
 void ResetMotorSafety() {
-  std::scoped_lock lock(listMutex);
-  instanceList.clear();
+  auto& manager = GetManager();
+  std::scoped_lock lock(manager.listMutex);
+  manager.instanceList.clear();
 }
 }  // namespace frc::impl
 #endif
 
 MotorSafety::MotorSafety() {
-  std::scoped_lock lock(listMutex);
-  instanceList.insert(this);
+  auto& manager = GetManager();
+  std::scoped_lock lock(manager.listMutex);
+  manager.instanceList.insert(this);
+  if (!manager.threadStarted) {
+    manager.threadStarted = true;
+    m_owner.Start();
+  }
 }
 
 MotorSafety::~MotorSafety() {
-  std::scoped_lock lock(listMutex);
-  instanceList.erase(this);
+  auto& manager = GetManager();
+  std::scoped_lock lock(manager.listMutex);
+  manager.instanceList.erase(this);
 }
 
 MotorSafety::MotorSafety(MotorSafety&& rhs)
@@ -111,8 +171,9 @@ void MotorSafety::Check() {
 }
 
 void MotorSafety::CheckMotors() {
-  std::scoped_lock lock(listMutex);
-  for (auto elem : instanceList) {
+  auto& manager = GetManager();
+  std::scoped_lock lock(manager.listMutex);
+  for (auto elem : manager.instanceList) {
     elem->Check();
   }
 }

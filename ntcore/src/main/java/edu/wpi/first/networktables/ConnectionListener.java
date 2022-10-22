@@ -11,7 +11,11 @@ import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Consumer;
 
-/** Connection listener. This calls back to a callback function when a connection change occurs. */
+/**
+ * Connection listener. This calls back to a callback function when a connection change occurs. The
+ * callback function is called asynchronously on a separate thread, so it's important to use
+ * synchronization or atomics when accessing any shared state from the callback function.
+ */
 public final class ConnectionListener implements AutoCloseable {
   /**
    * Create a listener for connection changes.

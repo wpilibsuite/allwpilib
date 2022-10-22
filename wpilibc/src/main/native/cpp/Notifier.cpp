@@ -18,12 +18,12 @@ using namespace frc;
 
 Notifier::Notifier(std::function<void()> handler) {
   if (!handler) {
-    throw FRC_MakeError(err::NullParameter, "{}", "handler");
+    throw FRC_MakeError(err::NullParameter, "handler");
   }
   m_handler = handler;
   int32_t status = 0;
   m_notifier = HAL_InitializeNotifier(&status);
-  FRC_CheckErrorStatus(status, "{}", "InitializeNotifier");
+  FRC_CheckErrorStatus(status, "InitializeNotifier");
 
   m_thread = std::thread([=, this] {
     for (;;) {
@@ -60,12 +60,12 @@ Notifier::Notifier(std::function<void()> handler) {
 
 Notifier::Notifier(int priority, std::function<void()> handler) {
   if (!handler) {
-    throw FRC_MakeError(err::NullParameter, "{}", "handler");
+    throw FRC_MakeError(err::NullParameter, "handler");
   }
   m_handler = handler;
   int32_t status = 0;
   m_notifier = HAL_InitializeNotifier(&status);
-  FRC_CheckErrorStatus(status, "{}", "InitializeNotifier");
+  FRC_CheckErrorStatus(status, "InitializeNotifier");
 
   m_thread = std::thread([=, this] {
     int32_t status = 0;
@@ -106,7 +106,7 @@ Notifier::~Notifier() {
   // atomically set handle to 0, then clean
   HAL_NotifierHandle handle = m_notifier.exchange(0);
   HAL_StopNotifier(handle, &status);
-  FRC_ReportError(status, "{}", "StopNotifier");
+  FRC_ReportError(status, "StopNotifier");
 
   // Join the thread to ensure the handler has exited.
   if (m_thread.joinable()) {
@@ -172,7 +172,7 @@ void Notifier::Stop() {
   m_periodic = false;
   int32_t status = 0;
   HAL_CancelNotifierAlarm(m_notifier, &status);
-  FRC_CheckErrorStatus(status, "{}", "CancelNotifierAlarm");
+  FRC_CheckErrorStatus(status, "CancelNotifierAlarm");
 }
 
 void Notifier::UpdateAlarm(uint64_t triggerTime) {
@@ -183,7 +183,7 @@ void Notifier::UpdateAlarm(uint64_t triggerTime) {
     return;
   }
   HAL_UpdateNotifierAlarm(notifier, triggerTime, &status);
-  FRC_CheckErrorStatus(status, "{}", "UpdateNotifierAlarm");
+  FRC_CheckErrorStatus(status, "UpdateNotifierAlarm");
 }
 
 void Notifier::UpdateAlarm() {

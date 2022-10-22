@@ -29,7 +29,7 @@ import java.util.function.BiConsumer;
  * DifferentialDriveOdometry.
  *
  * <p>{@link DifferentialDrivePoseEstimator#update} should be called every robot loop (if your robot
- * loops are faster than the default then you should change the {@link
+ * loops are faster than the default of 20 ms then you should change the {@link
  * DifferentialDrivePoseEstimator#DifferentialDrivePoseEstimator(Rotation2d, Pose2d, Matrix, Matrix,
  * Matrix, double) nominal delta time}.) {@link DifferentialDrivePoseEstimator#addVisionMeasurement}
  * can be called as infrequently as you want; if you never call it then this class will behave

@@ -4,6 +4,8 @@
 
 #include "frc2/command/Subsystem.h"
 
+#include "frc2/command/CommandPtr.h"
+
 using namespace frc2;
 Subsystem::~Subsystem() {
   CommandScheduler::GetInstance().UnregisterSubsystem(this);
@@ -12,6 +14,11 @@ Subsystem::~Subsystem() {
 void Subsystem::Periodic() {}
 
 void Subsystem::SimulationPeriodic() {}
+
+void Subsystem::SetDefaultCommand(CommandPtr&& defaultCommand) {
+  CommandScheduler::GetInstance().SetDefaultCommand(this,
+                                                    std::move(defaultCommand));
+}
 
 Command* Subsystem::GetDefaultCommand() const {
   return CommandScheduler::GetInstance().GetDefaultCommand(this);

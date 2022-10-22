@@ -76,7 +76,7 @@ nt::NetworkTableEntry SmartDashboard::GetEntry(std::string_view key) {
 
 void SmartDashboard::PutData(std::string_view key, wpi::Sendable* data) {
   if (!data) {
-    throw FRC_MakeError(err::NullParameter, "{}", "value");
+    throw FRC_MakeError(err::NullParameter, "value");
   }
   auto& inst = GetInstance();
   std::scoped_lock lock(inst.tablesToDataMutex);
@@ -96,7 +96,7 @@ void SmartDashboard::PutData(std::string_view key, wpi::Sendable* data) {
 
 void SmartDashboard::PutData(wpi::Sendable* value) {
   if (!value) {
-    throw FRC_MakeError(err::NullParameter, "{}", "value");
+    throw FRC_MakeError(err::NullParameter, "value");
   }
   auto name = wpi::SendableRegistry::GetName(value);
   if (!name.empty()) {

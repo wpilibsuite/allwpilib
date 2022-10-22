@@ -144,7 +144,6 @@ public abstract class RobotBase implements AutoCloseable {
     m_threadId = Thread.currentThread().getId();
     setupCameraServerShared();
     setupMathShared();
-    inst.setNetworkIdentity("Robot");
     // subscribe to "" to force persistent values to progagate to local
     m_suball = new MultiSubscriber(inst, new String[] {""});
     if (isReal()) {
@@ -272,15 +271,6 @@ public abstract class RobotBase implements AutoCloseable {
    */
   public boolean isTeleopEnabled() {
     return DriverStation.isTeleopEnabled();
-  }
-
-  /**
-   * Indicates if new data is available from the driver station.
-   *
-   * @return Has new data arrived over the network since the last time this function was called?
-   */
-  public boolean isNewDataAvailable() {
-    return DriverStation.isNewControlData();
   }
 
   /** Provide an alternate "main loop" via startCompetition(). */
