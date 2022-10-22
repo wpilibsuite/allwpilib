@@ -40,9 +40,7 @@ public class EventVector {
     }
   }
 
-  /**
-   * Wakes up all events in the event vector.
-   */
+  /** Wakes up all events in the event vector. */
   public void wakeup() {
     m_lock.lock();
     try {
