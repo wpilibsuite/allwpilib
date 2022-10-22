@@ -23,7 +23,7 @@ jobs:
           git checkout -b pr
           git branch -f main origin/main
       - name: Set up Python 3.8
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v4
         with:
           python-version: 3.8
       - name: Install clang-format
@@ -41,7 +41,7 @@ jobs:
       - name: Generate diff
         run: git diff HEAD > wpiformat-fixes.patch
         if: ${{ failure() }}
-      - uses: actions/upload-artifact@v2
+      - uses: actions/upload-artifact@v3
         with:
           name: wpiformat fixes
           path: wpiformat-fixes.patch
@@ -59,7 +59,7 @@ jobs:
           git checkout -b pr
           git branch -f main origin/main
       - name: Set up Python 3.8
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v4
         with:
           python-version: 3.8
       - name: Install clang-tidy
@@ -102,7 +102,7 @@ jobs:
       - uses: actions/checkout@v3
         with:
           fetch-depth: 0
-      - uses: actions/setup-java@v1
+      - uses: actions/setup-java@v3
         with:
           java-version: 13
       - name: Install libclang-9

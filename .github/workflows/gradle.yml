@@ -39,7 +39,7 @@ jobs:
         env:
           ARTIFACTORY_PUBLISH_USERNAME: ${{ secrets.ARTIFACTORY_USERNAME }}
           ARTIFACTORY_PUBLISH_PASSWORD: ${{ secrets.ARTIFACTORY_PASSWORD }}
-      - uses: actions/upload-artifact@v2
+      - uses: actions/upload-artifact@v3
         with:
           name: ${{ matrix.artifact-name }}
           path: build/allOutputs
@@ -80,7 +80,7 @@ jobs:
       - uses: actions/checkout@v3
         with:
           fetch-depth: 0
-      - uses: actions/setup-java@v1
+      - uses: actions/setup-java@v3
         with:
           java-version: 11
           architecture: ${{ matrix.architecture }}
@@ -115,7 +115,7 @@ jobs:
         if: |
           matrix.artifact-name == 'macOS' && (github.repository_owner == 'wpilibsuite' &&
           (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v')))
-      - uses: actions/upload-artifact@v2
+      - uses: actions/upload-artifact@v3
         with:
           name: ${{ matrix.artifact-name }}
           path: ${{ matrix.outputs }}
@@ -127,7 +127,7 @@ jobs:
       - uses: actions/checkout@v3
         with:
           fetch-depth: 0
-      - uses: actions/setup-java@v1
+      - uses: actions/setup-java@v3
         with:
           java-version: 13
       - name: Install libclang-9
@@ -140,7 +140,7 @@ jobs:
         env:
           ARTIFACTORY_PUBLISH_USERNAME: ${{ secrets.ARTIFACTORY_USERNAME }}
           ARTIFACTORY_PUBLISH_PASSWORD: ${{ secrets.ARTIFACTORY_PASSWORD }}
-      - uses: actions/upload-artifact@v2
+      - uses: actions/upload-artifact@v3
         with:
           name: Documentation
           path: docs/build/outputs
@@ -153,7 +153,7 @@ jobs:
       - uses: actions/checkout@v3
         with:
           repository: wpilibsuite/build-tools
-      - uses: actions/download-artifact@v2
+      - uses: actions/download-artifact@v3
         with:
           path: combiner/products/build/allOutputs
       - name: Flatten Artifacts
@@ -162,7 +162,7 @@ jobs:
         run: |
           cat combiner/products/build/allOutputs/version.txt
           test -s combiner/products/build/allOutputs/version.txt
-      - uses: actions/setup-java@v1
+      - uses: actions/setup-java@v3
         with:
           java-version: 11
       - name: Combine
@@ -188,7 +188,7 @@ jobs:
           RUN_AZURE_ARTIFACTORY_RELEASE: "TRUE"
           ARTIFACTORY_PUBLISH_USERNAME: ${{ secrets.ARTIFACTORY_USERNAME }}
           ARTIFACTORY_PUBLISH_PASSWORD: ${{ secrets.ARTIFACTORY_PASSWORD }}
-      - uses: actions/upload-artifact@v2
+      - uses: actions/upload-artifact@v3
         with:
           name: Maven
           path: ~/releases

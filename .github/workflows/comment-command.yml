@@ -9,7 +9,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: React Rocket
-        uses: actions/github-script@v4
+        uses: actions/github-script@v6
         with:
           script: |
             const {owner, repo} = context.issue
@@ -34,7 +34,7 @@ jobs:
           GITHUB_TOKEN: "${{ secrets.COMMENT_COMMAND_PAT_TOKEN }}"
           NUMBER: ${{ github.event.issue.number }}
       - name: Set up Python 3.8
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v4
         with:
           python-version: 3.8
       - name: Install clang-format
