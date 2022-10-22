@@ -147,8 +147,13 @@ void Thread::Main() {
       m_log, "systemTime",
       "{\"source\":\"DataLogManager\",\"format\":\"time_t_us\"}"};
 
+  wpi::Event newDataEvent;
+  DriverStation::ProvideRefreshedDataEventHandle(newDataEvent.GetHandle());
+
   for (;;) {
-    bool newData = DriverStation::WaitForData(0.25_s);
+    bool timedOut = false;
+    bool newData =
+        wpi::WaitForObject(newDataEvent.GetHandle(), 0.25, &timedOut);
     if (!m_active) {
       break;
     }
@@ -236,6 +241,7 @@ void Thread::Main() {
       sysTimeEntry.Append(wpi::GetSystemTime(), wpi::Now());
     }
   }
+  DriverStation::RemoveRefreshedDataEventHandle(newDataEvent.GetHandle());
 }
 
 void Thread::StartNTLog() {

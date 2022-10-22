@@ -29,6 +29,7 @@ public abstract class MotorSafety {
   public MotorSafety() {
     synchronized (m_listMutex) {
       m_instanceList.add(this);
+      // TODO Threads
     }
   }
 

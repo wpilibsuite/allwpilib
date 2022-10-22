@@ -69,6 +69,7 @@ HAL_ENUM(HAL_MatchType) {
 struct HAL_JoystickAxes {
   int16_t count;
   float axes[HAL_kMaxJoystickAxes];
+  uint8_t raw[HAL_kMaxJoystickAxes];
 };
 typedef struct HAL_JoystickAxes HAL_JoystickAxes;
 

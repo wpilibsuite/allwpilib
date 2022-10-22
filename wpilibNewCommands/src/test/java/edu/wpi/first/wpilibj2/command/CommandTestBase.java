@@ -31,7 +31,6 @@ public class CommandTestBase {
 
     DriverStationSim.setEnabled(enabled);
     DriverStationSim.notifyNewData();
-    DriverStation.isNewControlData();
     while (DriverStation.isEnabled() != enabled) {
       try {
         Thread.sleep(1);

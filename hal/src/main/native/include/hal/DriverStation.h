@@ -6,6 +6,8 @@
 
 #include <stdint.h>
 
+#include <wpi/Synchronization.h>
+
 #include "hal/DriverStationTypes.h"
 #include "hal/Types.h"
 
@@ -86,6 +88,9 @@ int32_t HAL_GetJoystickPOVs(int32_t joystickNum, HAL_JoystickPOVs* povs);
  */
 int32_t HAL_GetJoystickButtons(int32_t joystickNum,
                                HAL_JoystickButtons* buttons);
+
+void HAL_GetAllJoystickData(HAL_JoystickAxes* axes, HAL_JoystickPOVs* povs,
+                            HAL_JoystickButtons* buttons);
 
 /**
  * Retrieves the Joystick Descriptor for particular slot.
@@ -184,6 +189,11 @@ int32_t HAL_SetJoystickOutputs(int32_t joystickNum, int64_t outputs,
 double HAL_GetMatchTime(int32_t* status);
 
 /**
+ * Gets if outputs are enabled by the control system.
+ */
+HAL_Bool HAL_GetOutputsEnabled(void);
+
+/**
  * Gets info about a specific match.
  *
  * @param[in] info the match info (output)
@@ -191,44 +201,10 @@ double HAL_GetMatchTime(int32_t* status);
  */
 int32_t HAL_GetMatchInfo(HAL_MatchInfo* info);
 
-/**
- * Releases the DS Mutex to allow proper shutdown of any threads that are
- * waiting on it.
- */
-void HAL_ReleaseDSMutex(void);
+void HAL_RefreshDSData(void);
 
-/**
- * Has a new control packet from the driver station arrived since the last
- * time this function was called?
- *
- * @return true if the control data has been updated since the last call
- */
-HAL_Bool HAL_IsNewControlData(void);
-
-/**
- * Waits for the newest DS packet to arrive. Note that this is a blocking call.
- * Checks if new control data has arrived since the last HAL_WaitForDSData or
- * HAL_IsNewControlData call. If new data has not arrived, waits for new data
- * to arrive. Otherwise, returns immediately.
- */
-void HAL_WaitForDSData(void);
-
-/**
- * Waits for the newest DS packet to arrive. If timeout is <= 0, this will wait
- * forever. Otherwise, it will wait until either a new packet, or the timeout
- * time has passed.
- *
- * @param[in] timeout timeout in seconds
- * @return true for new data, false for timeout
- */
-HAL_Bool HAL_WaitForDSDataTimeout(double timeout);
-
-/**
- * Initializes the driver station communication. This will properly
- * handle multiple calls. However note that this CANNOT be called from a library
- * that interfaces with LabVIEW.
- */
-void HAL_InitializeDriverStation(void);
+void HAL_ProvideNewDataEventHandle(WPI_EventHandle handle);
+void HAL_RemoveNewDataEventHandle(WPI_EventHandle handle);
 
 /**
  * Sets the program starting flag in the DS.
