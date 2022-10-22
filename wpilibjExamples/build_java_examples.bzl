@@ -135,6 +135,7 @@ def build_templates():
                 "//wpilibNewCommands/src/main/java/edu/wpi/first/wpilibj2/command:wpilibNewCommands",
                 "//wpimath/src/main/java/edu/wpi/first/math:wpimath",
                 "//hal/src/main/java/edu/wpi/first/hal",
+                "//wpiutil/src/main/java/edu/wpi/first/util:wpiutil",
             ],
             tags = ["wpi-example"],
         )
