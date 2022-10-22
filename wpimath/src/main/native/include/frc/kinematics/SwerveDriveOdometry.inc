@@ -13,13 +13,10 @@ template <typename... ModulePositions>
 SwerveDriveOdometry<NumModules>::SwerveDriveOdometry(
     SwerveDriveKinematics<NumModules> kinematics, const Rotation2d& gyroAngle,
     ModulePositions&&... wheelPositions, const Pose2d& initialPose)
-    : m_kinematics(kinematics), m_pose(initialPose) {
+    : m_kinematics(kinematics), m_pose(initialPose), m_previousModulePositions{wheelPositions...} {
   static_assert(sizeof...(wheelPositions) == NumModules,
                 "Number of modules is not consistent with number of wheel "
                 "locations provided in constructor.");
-
-  m_previousModulePositions =
-      wpi::array<SwerveModulePosition, NumModules>(wheelPositions...);
   m_previousAngle = m_pose.Rotation();
   m_gyroOffset = m_pose.Rotation() - gyroAngle;
   wpi::math::MathSharedStore::ReportUsage(
@@ -49,8 +46,7 @@ void SwerveDriveOdometry<NumModules>::ResetPosition(
                 "Number of modules is not consistent with number of wheel "
                 "locations provided in constructor.");
 
-  auto modulePositions =
-      wpi::array<SwerveModulePosition, NumModules>(wheelPositions...);
+  wpi::array<SwerveModulePosition, NumModules> modulePositions{wheelPositions...};
   this->ResetPosition(pose, gyroAngle, modulePositions);
 }
 
@@ -72,8 +68,7 @@ const Pose2d& frc::SwerveDriveOdometry<NumModules>::Update(
                 "Number of modules is not consistent with number of wheel "
                 "locations provided in constructor.");
 
-  auto modulePositions =
-      wpi::array<SwerveModulePosition, NumModules>(wheelPositions...);
+  wpi::array<SwerveModulePosition, NumModules> modulePositions{wheelPositions...};
 
   return this->Update(gyroAngle, modulePositions);
 }
