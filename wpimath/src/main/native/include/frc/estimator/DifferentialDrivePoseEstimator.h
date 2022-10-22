@@ -233,10 +233,6 @@ class WPILIB_DLLEXPORT DifferentialDrivePoseEstimator {
   Rotation2d m_gyroOffset;
   Rotation2d m_previousAngle;
 
-  template <int Dim>
-  static wpi::array<double, Dim> StdDevMatrixToArray(
-      const Vectord<Dim>& stdDevs);
-
   static Vectord<5> F(const Vectord<5>& x, const Vectord<3>& u);
   static Vectord<5> FillStateVector(const Pose2d& pose,
                                     units::meter_t leftDistance,
