@@ -5,11 +5,14 @@
 package edu.wpi.first.networktables;
 
 import edu.wpi.first.util.WPIUtilJNI;
+import edu.wpi.first.util.concurrent.Event;
 import edu.wpi.first.util.datalog.DataLog;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Consumer;
 
@@ -30,6 +33,7 @@ import java.util.function.Consumer;
  * kept to the NetworkTableInstance returned by this function to keep it from being garbage
  * collected.
  */
+@SuppressWarnings("PMD.CouplingBetweenObjects")
 public final class NetworkTableInstance implements AutoCloseable {
   /**
    * Client/server mode flag values (as returned by {@link #getNetworkMode()}). This is a bitmask.
@@ -62,6 +66,9 @@ public final class NetworkTableInstance implements AutoCloseable {
   @Override
   public synchronized void close() {
     if (m_owned && m_handle != 0) {
+      m_connectionListener.close();
+      m_topicListener.close();
+      m_valueListener.close();
       NetworkTablesJNI.destroyInstance(m_handle);
     }
   }
@@ -350,85 +357,181 @@ public final class NetworkTableInstance implements AutoCloseable {
    * Callback Creation Functions
    */
 
-  private final ReentrantLock m_connectionListenerLock = new ReentrantLock();
-  private final Map<Integer, Consumer<ConnectionNotification>> m_connectionListeners =
-      new HashMap<>();
-  private int m_connectionListenerPoller;
+  private abstract static class ListenerBase<T extends NotificationBase> implements AutoCloseable {
+    protected final ReentrantLock m_lock = new ReentrantLock();
+    protected final Map<Integer, Consumer<T>> m_listeners = new HashMap<>();
+    private Thread m_thread;
+    protected int m_poller;
+    private boolean m_waitQueue;
+    private final Event m_waitQueueEvent = new Event();
+    private final Condition m_waitQueueCond = m_lock.newCondition();
+    protected final NetworkTableInstance m_inst;
 
-  @SuppressWarnings("PMD.AvoidCatchingThrowable")
-  private void startConnectionListenerThread() {
-    var connectionListenerThread =
-        new Thread(
-            () -> {
-              boolean wasInterrupted = false;
-              while (!Thread.interrupted()) {
-                try {
-                  WPIUtilJNI.waitForObject(m_connectionListenerPoller);
-                } catch (InterruptedException ex) {
-                  Thread.currentThread().interrupt();
-                  // don't try to destroy poller, as its handle is likely no longer valid
-                  wasInterrupted = true;
-                  break;
-                }
-                ConnectionNotification[] events =
-                  NetworkTablesJNI.readConnectionListenerQueue(this, m_connectionListenerPoller);
-                for (ConnectionNotification event : events) {
-                  Consumer<ConnectionNotification> listener;
-                  m_connectionListenerLock.lock();
+    ListenerBase(NetworkTableInstance inst) {
+      m_inst = inst;
+    }
+
+    @Override
+    public void close() {
+      if (m_poller != 0) {
+        destroyPoller();
+      }
+      m_poller = 0;
+    }
+
+    protected abstract T[] readQueue();
+
+    protected abstract void destroyPoller();
+
+    protected void startThread(String name) {
+      m_thread =
+          new Thread(
+              () -> {
+                boolean wasInterrupted = false;
+                int[] handles = new int[] { m_poller, m_waitQueueEvent.getHandle() };
+                while (!Thread.interrupted()) {
                   try {
-                    listener = m_connectionListeners.get(event.listener);
-                  } finally {
-                    m_connectionListenerLock.unlock();
-                  }
-                  if (listener != null) {
+                    WPIUtilJNI.waitForObjects(handles);
+                  } catch (InterruptedException ex) {
+                    m_lock.lock();
                     try {
-                      listener.accept(event);
-                    } catch (Throwable throwable) {
-                      System.err.println(
-                          "Unhandled exception during connection listener callback: "
-                              + throwable.toString());
-                      throwable.printStackTrace();
+                      if (m_waitQueue) {
+                        m_waitQueue = false;
+                        m_waitQueueCond.signalAll();
+                      }
+                    } finally {
+                      m_lock.unlock();
+                    }
+                    Thread.currentThread().interrupt();
+                    // don't try to destroy poller, as its handle is likely no longer valid
+                    wasInterrupted = true;
+                    break;
+                  }
+                  for (T event : readQueue()) {
+                    Consumer<T> listener;
+                    m_lock.lock();
+                    try {
+                      listener = m_listeners.get(event.listener);
+                    } finally {
+                      m_lock.unlock();
+                    }
+                    if (listener != null) {
+                      try {
+                        listener.accept(event);
+                      } catch (Throwable throwable) {
+                        System.err.println(
+                            "Unhandled exception during listener callback: "
+                            + throwable.toString());
+                        throwable.printStackTrace();
+                      }
                     }
                   }
+                  m_lock.lock();
+                  try {
+                    if (m_waitQueue) {
+                      m_waitQueue = false;
+                      m_waitQueueCond.signalAll();
+                    }
+                  } finally {
+                    m_lock.unlock();
+                  }
                 }
-              }
-              m_connectionListenerLock.lock();
-              try {
-                if (!wasInterrupted) {
-                  NetworkTablesJNI.destroyConnectionListenerPoller(m_connectionListenerPoller);
+                m_lock.lock();
+                try {
+                  if (!wasInterrupted) {
+                    destroyPoller();
+                  }
+                  m_poller = 0;
+                } finally {
+                  m_lock.unlock();
                 }
-                m_connectionListenerPoller = 0;
-              } finally {
-                m_connectionListenerLock.unlock();
+              },
+              name);
+      m_thread.setDaemon(true);
+      m_thread.start();
+    }
+
+    boolean waitForQueue(double timeout) {
+      m_lock.lock();
+      try {
+        if (m_poller != 0) {
+          m_waitQueue = true;
+          m_waitQueueEvent.set();
+          while (m_waitQueue) {
+            try {
+              if (timeout < 0) {
+                m_waitQueueCond.await();
+              } else {
+                return m_waitQueueCond.await((long) (timeout * 1e9), TimeUnit.NANOSECONDS);
               }
-            },
-            "NTConnectionListener");
-    connectionListenerThread.setDaemon(true);
-    connectionListenerThread.start();
+            } catch (InterruptedException ex) {
+              Thread.currentThread().interrupt();
+              return true;
+            }
+          }
+        }
+      } finally {
+        m_lock.unlock();
+      }
+      return true;
+    }
   }
 
+  private static final class ConnectionListener extends ListenerBase<ConnectionNotification> {
+    ConnectionListener(NetworkTableInstance inst) {
+      super(inst);
+    }
+
+    int add(boolean immediateNotify, Consumer<ConnectionNotification> listener) {
+      m_lock.lock();
+      try {
+        if (m_poller == 0) {
+          m_poller = NetworkTablesJNI.createConnectionListenerPoller(m_inst.getHandle());
+          startThread("NTConnectionListener");
+        }
+        int h = NetworkTablesJNI.addPolledConnectionListener(m_poller, immediateNotify);
+        m_listeners.put(h, listener);
+        return h;
+      } finally {
+        m_lock.unlock();
+      }
+    }
+
+    void remove(int listener) {
+      m_lock.lock();
+      try {
+        m_listeners.remove(listener);
+      } finally {
+        m_lock.unlock();
+      }
+      NetworkTablesJNI.removeConnectionListener(listener);
+    }
+
+    @Override
+    protected ConnectionNotification[] readQueue() {
+      return NetworkTablesJNI.readConnectionListenerQueue(m_inst, m_poller);
+    }
+
+    @Override
+    protected void destroyPoller() {
+      NetworkTablesJNI.destroyConnectionListenerPoller(m_poller);
+    }
+  }
+
+  private ConnectionListener m_connectionListener = new ConnectionListener(this);
+
   /**
-   * Add a connection listener.
+   * Add a connection listener. The callback function is called asynchronously on a separate
+   * thread, so it's important to use synchronization or atomics when accessing any shared state
+   * from the callback function.
    *
-   * @param listener Listener to add
    * @param immediateNotify Notify listener of all existing connections
+   * @param listener Listener to add
    * @return Listener handle
    */
   public int addConnectionListener(
-      Consumer<ConnectionNotification> listener, boolean immediateNotify) {
-    m_connectionListenerLock.lock();
-    try {
-      if (m_connectionListenerPoller == 0) {
-        m_connectionListenerPoller = NetworkTablesJNI.createConnectionListenerPoller(m_handle);
-        startConnectionListenerThread();
-      }
-      int handle =
-          NetworkTablesJNI.addPolledConnectionListener(m_connectionListenerPoller, immediateNotify);
-      m_connectionListeners.put(handle, listener);
-      return handle;
-    } finally {
-      m_connectionListenerLock.unlock();
-    }
+      boolean immediateNotify, Consumer<ConnectionNotification> listener) {
+    return m_connectionListener.add(immediateNotify, listener);
   }
 
   /**
@@ -437,13 +540,309 @@ public final class NetworkTableInstance implements AutoCloseable {
    * @param listener Listener handle to remove
    */
   public void removeConnectionListener(int listener) {
-    m_connectionListenerLock.lock();
-    try {
-      m_connectionListeners.remove(listener);
-    } finally {
-      m_connectionListenerLock.unlock();
+    m_connectionListener.remove(listener);
+  }
+
+  /**
+   * Wait for the connection listener queue to be empty. This is primarily useful for deterministic
+   * testing. This blocks until either the connection listener queue is empty (e.g. there are no
+   * more events that need to be passed along to callbacks or poll queues) or the timeout expires.
+   *
+   * @param timeout timeout, in seconds. Set to 0 for non-blocking behavior, or a negative value to
+   *     block indefinitely
+   * @return False if timed out, otherwise true.
+   */
+  public boolean waitForConnectionListenerQueue(double timeout) {
+    return m_connectionListener.waitForQueue(timeout);
+  }
+
+  private static final class TopicListener extends ListenerBase<TopicNotification> {
+    TopicListener(NetworkTableInstance inst) {
+      super(inst);
     }
-    NetworkTablesJNI.removeConnectionListener(listener);
+
+    int add(int handle, int eventMask, Consumer<TopicNotification> listener) {
+      m_lock.lock();
+      try {
+        if (m_poller == 0) {
+          m_poller = NetworkTablesJNI.createTopicListenerPoller(m_inst.getHandle());
+          startThread("NTTopicListener");
+        }
+        int h = NetworkTablesJNI.addPolledTopicListener(m_poller, handle, eventMask);
+        m_listeners.put(h, listener);
+        return h;
+      } finally {
+        m_lock.unlock();
+      }
+    }
+
+    int add(String[] prefixes, int eventMask, Consumer<TopicNotification> listener) {
+      m_lock.lock();
+      try {
+        if (m_poller == 0) {
+          m_poller = NetworkTablesJNI.createTopicListenerPoller(m_inst.getHandle());
+          startThread("NTTopicListener");
+        }
+        int h = NetworkTablesJNI.addPolledTopicListener(m_poller, prefixes, eventMask);
+        m_listeners.put(h, listener);
+        return h;
+      } finally {
+        m_lock.unlock();
+      }
+    }
+
+    void remove(int listener) {
+      m_lock.lock();
+      try {
+        m_listeners.remove(listener);
+      } finally {
+        m_lock.unlock();
+      }
+      NetworkTablesJNI.removeTopicListener(listener);
+    }
+
+    @Override
+    protected TopicNotification[] readQueue() {
+      return NetworkTablesJNI.readTopicListenerQueue(m_inst, m_poller);
+    }
+
+    @Override
+    protected void destroyPoller() {
+      NetworkTablesJNI.destroyTopicListenerPoller(m_poller);
+    }
+  }
+
+  private TopicListener m_topicListener = new TopicListener(this);
+
+  /**
+   * Add a topic listener for changes on a particular topic. The callback function is called
+   * asynchronously on a separate thread, so it's important to use synchronization or atomics when
+   * accessing any shared state from the callback function.
+   *
+   * @param topic Topic
+   * @param eventMask Bitmask of TopicListenerFlags values
+   * @param listener Listener function
+   * @return Listener handle
+   */
+  public int addTopicListener(
+      Topic topic, int eventMask, Consumer<TopicNotification> listener) {
+    if (topic.getInstance().getHandle() != m_handle) {
+      throw new IllegalArgumentException("topic is not from this instance");
+    }
+    return m_topicListener.add(topic.getHandle(), eventMask, listener);
+  }
+
+  /**
+   * Add a topic listener for topic changes on a subscriber. The callback function is called
+   * asynchronously on a separate thread, so it's important to use synchronization or atomics when
+   * accessing any shared state from the callback function.
+   *
+   * @param subscriber Subscriber
+   * @param eventMask Bitmask of TopicListenerFlags values
+   * @param listener Listener function
+   * @return Listener handle
+   */
+  public int addTopicListener(
+      Subscriber subscriber, int eventMask, Consumer<TopicNotification> listener) {
+    if (subscriber.getTopic().getInstance().getHandle() != m_handle) {
+      throw new IllegalArgumentException("subscriber is not from this instance");
+    }
+    return m_topicListener.add(subscriber.getHandle(), eventMask, listener);
+  }
+
+  /**
+   * Add a topic listener for topic changes on a subscriber. The callback function is called
+   * asynchronously on a separate thread, so it's important to use synchronization or atomics when
+   * accessing any shared state from the callback function.
+   *
+   * @param subscriber Subscriber
+   * @param eventMask Bitmask of TopicListenerFlags values
+   * @param listener Listener function
+   * @return Listener handle
+   */
+  public int addTopicListener(
+      MultiSubscriber subscriber, int eventMask, Consumer<TopicNotification> listener) {
+    if (subscriber.getInstance().getHandle() != m_handle) {
+      throw new IllegalArgumentException("subscriber is not from this instance");
+    }
+    return m_topicListener.add(subscriber.getHandle(), eventMask, listener);
+  }
+
+  /**
+   * Add a topic listener for topic changes on an entry. The callback function is called
+   * asynchronously on a separate thread, so it's important to use synchronization or atomics when
+   * accessing any shared state from the callback function.
+   *
+   * @param entry Entry
+   * @param eventMask Bitmask of TopicListenerFlags values
+   * @param listener Listener function
+   * @return Listener handle
+   */
+  public int addTopicListener(
+      NetworkTableEntry entry, int eventMask, Consumer<TopicNotification> listener) {
+    if (entry.getTopic().getInstance().getHandle() != m_handle) {
+      throw new IllegalArgumentException("entry is not from this instance");
+    }
+    return m_topicListener.add(entry.getHandle(), eventMask, listener);
+  }
+
+  /**
+   * Add a topic listener for changes to topics with names that start with any of the given
+   * prefixes. The callback function is called asynchronously on a separate thread, so it's
+   * important to use synchronization or atomics when accessing any shared state from the callback
+   * function.
+   *
+   * @param prefixes Topic name string prefixes
+   * @param eventMask Bitmask of TopicListenerFlags values
+   * @param listener Listener function
+   * @return Listener handle
+   */
+  public int addTopicListener(
+      String[] prefixes,
+      int eventMask,
+      Consumer<TopicNotification> listener) {
+    return m_topicListener.add(prefixes, eventMask, listener);
+  }
+
+  /**
+   * Remove a topic listener.
+   *
+   * @param listener Listener handle to remove
+   */
+  public void removeTopicListener(int listener) {
+    m_topicListener.remove(listener);
+  }
+
+  /**
+   * Wait for the topic listener queue to be empty. This is primarily useful for deterministic
+   * testing. This blocks until either the topic listener queue is empty (e.g. there are no
+   * more events that need to be passed along to callbacks or poll queues) or the timeout expires.
+   *
+   * @param timeout timeout, in seconds. Set to 0 for non-blocking behavior, or a negative value to
+   *     block indefinitely
+   * @return False if timed out, otherwise true.
+   */
+  public boolean waitForTopicListenerQueue(double timeout) {
+    return m_topicListener.waitForQueue(timeout);
+  }
+
+  private static final class ValueListener extends ListenerBase<ValueNotification> {
+    ValueListener(NetworkTableInstance inst) {
+      super(inst);
+    }
+
+    int add(int handle, int eventMask, Consumer<ValueNotification> listener) {
+      m_lock.lock();
+      try {
+        if (m_poller == 0) {
+          m_poller = NetworkTablesJNI.createValueListenerPoller(m_inst.getHandle());
+          startThread("NTValueListener");
+        }
+        int h = NetworkTablesJNI.addPolledValueListener(m_poller, handle, eventMask);
+        m_listeners.put(h, listener);
+        return h;
+      } finally {
+        m_lock.unlock();
+      }
+    }
+
+    void remove(int listener) {
+      m_lock.lock();
+      try {
+        m_listeners.remove(listener);
+      } finally {
+        m_lock.unlock();
+      }
+      NetworkTablesJNI.removeValueListener(listener);
+    }
+
+    @Override
+    protected ValueNotification[] readQueue() {
+      return NetworkTablesJNI.readValueListenerQueue(m_inst, m_poller);
+    }
+
+    @Override
+    protected void destroyPoller() {
+      NetworkTablesJNI.destroyValueListenerPoller(m_poller);
+    }
+  }
+
+  private ValueListener m_valueListener = new ValueListener(this);
+
+  /**
+   * Add a value listener for value changes on a subscriber. The callback function is called
+   * asynchronously on a separate thread, so it's important to use synchronization or atomics when
+   * accessing any shared state from the callback function.
+   *
+   * @param subscriber Subscriber
+   * @param eventMask Bitmask of ValueListenerFlags values
+   * @param listener Listener function
+   * @return Listener handle
+   */
+  public int addValueListener(
+      Subscriber subscriber, int eventMask, Consumer<ValueNotification> listener) {
+    if (subscriber.getTopic().getInstance().getHandle() != m_handle) {
+      throw new IllegalArgumentException("subscriber is not from this instance");
+    }
+    return m_valueListener.add(subscriber.getHandle(), eventMask, listener);
+  }
+
+  /**
+   * Add a value listener for value changes on a subscriber. The callback function is called
+   * asynchronously on a separate thread, so it's important to use synchronization or atomics when
+   * accessing any shared state from the callback function.
+   *
+   * @param subscriber Subscriber
+   * @param eventMask Bitmask of ValueListenerFlags values
+   * @param listener Listener function
+   * @return Listener handle
+   */
+  public int addValueListener(
+      MultiSubscriber subscriber, int eventMask, Consumer<ValueNotification> listener) {
+    if (subscriber.getInstance().getHandle() != m_handle) {
+      throw new IllegalArgumentException("subscriber is not from this instance");
+    }
+    return m_valueListener.add(subscriber.getHandle(), eventMask, listener);
+  }
+
+  /**
+   * Add a value listener for value changes on an entry. The callback function is called
+   * asynchronously on a separate thread, so it's important to use synchronization or atomics when
+   * accessing any shared state from the callback function.
+   *
+   * @param entry Entry
+   * @param eventMask Bitmask of ValueListenerFlags values
+   * @param listener Listener function
+   * @return Listener handle
+   */
+  public int addValueListener(
+      NetworkTableEntry entry, int eventMask, Consumer<ValueNotification> listener) {
+    if (entry.getTopic().getInstance().getHandle() != m_handle) {
+      throw new IllegalArgumentException("entry is not from this instance");
+    }
+    return m_valueListener.add(entry.getHandle(), eventMask, listener);
+  }
+
+  /**
+   * Remove a value listener.
+   *
+   * @param listener Listener handle to remove
+   */
+  public void removeValueListener(int listener) {
+    m_valueListener.remove(listener);
+  }
+
+  /**
+   * Wait for the value listener queue to be empty. This is primarily useful for deterministic
+   * testing. This blocks until either the value listener queue is empty (e.g. there are no
+   * more events that need to be passed along to callbacks or poll queues) or the timeout expires.
+   *
+   * @param timeout timeout, in seconds. Set to 0 for non-blocking behavior, or a negative value to
+   *     block indefinitely
+   * @return False if timed out, otherwise true.
+   */
+  public boolean waitForValueListenerQueue(double timeout) {
+    return m_valueListener.waitForQueue(timeout);
   }
 
   /*

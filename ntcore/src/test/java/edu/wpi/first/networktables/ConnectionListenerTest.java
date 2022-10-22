@@ -114,12 +114,12 @@ class ConnectionListenerTest {
     List<ConnectionNotification> events = new ArrayList<>();
     final int handle =
         m_serverInst.addConnectionListener(
+            false,
             e -> {
               synchronized (events) {
                 events.add(e);
               }
-            },
-            false);
+            });
 
     // trigger a connect event
     m_clientInst.startClient4("client");
@@ -146,6 +146,9 @@ class ConnectionListenerTest {
       fail("interrupted while waiting for queue");
     }
 
+    // wait for thread
+    m_serverInst.waitForConnectionListenerQueue(1.0);
+
     // get the event
     synchronized (events) {
       assertEquals(1, events.size());
@@ -161,6 +164,9 @@ class ConnectionListenerTest {
     } catch (InterruptedException ex) {
       fail("interrupted while waiting for client to stop");
     }
+
+    // wait for thread
+    m_serverInst.waitForConnectionListenerQueue(1.0);
 
     // get the event
     try {
