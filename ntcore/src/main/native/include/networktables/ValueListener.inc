@@ -72,17 +72,17 @@ inline ValueListenerPoller::~ValueListenerPoller() {
   }
 }
 
-inline NT_ValueListener ValueListenerPoller::Add(const Subscriber& subscriber,
+inline NT_ValueListener ValueListenerPoller::Add(Subscriber& subscriber,
                                                  unsigned int mask) {
   return Add(subscriber.GetHandle(), mask);
 }
 
-inline NT_ValueListener ValueListenerPoller::Add(
-    const MultiSubscriber& subscriber, unsigned int mask) {
+inline NT_ValueListener ValueListenerPoller::Add(MultiSubscriber& subscriber,
+                                                 unsigned int mask) {
   return Add(subscriber.GetHandle(), mask);
 }
 
-inline NT_ValueListener ValueListenerPoller::Add(const NetworkTableEntry& entry,
+inline NT_ValueListener ValueListenerPoller::Add(NetworkTableEntry& entry,
                                                  unsigned int mask) {
   return Add(entry.GetHandle(), mask);
 }

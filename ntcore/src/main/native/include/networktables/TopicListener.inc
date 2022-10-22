@@ -89,17 +89,17 @@ inline NT_TopicListener TopicListenerPoller::Add(Topic topic,
   return nt::AddPolledTopicListener(m_handle, topic.GetHandle(), mask);
 }
 
-inline NT_TopicListener TopicListenerPoller::Add(const Subscriber& subscriber,
+inline NT_TopicListener TopicListenerPoller::Add(Subscriber& subscriber,
                                                  unsigned int mask) {
   return nt::AddPolledTopicListener(m_handle, subscriber.GetHandle(), mask);
 }
 
-inline NT_TopicListener TopicListenerPoller::Add(
-    const MultiSubscriber& subscriber, unsigned int mask) {
+inline NT_TopicListener TopicListenerPoller::Add(MultiSubscriber& subscriber,
+                                                 unsigned int mask) {
   return nt::AddPolledTopicListener(m_handle, subscriber.GetHandle(), mask);
 }
 
-inline NT_TopicListener TopicListenerPoller::Add(const NetworkTableEntry& entry,
+inline NT_TopicListener TopicListenerPoller::Add(NetworkTableEntry& entry,
                                                  unsigned int mask) {
   return nt::AddPolledTopicListener(m_handle, entry.GetHandle(), mask);
 }

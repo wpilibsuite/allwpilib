@@ -153,7 +153,7 @@ class ValueListenerPoller final {
    * @param mask Bitmask of ValueListenerFlags values
    * @return Listener handle
    */
-  NT_ValueListener Add(const Subscriber& subscriber, unsigned int mask);
+  NT_ValueListener Add(Subscriber& subscriber, unsigned int mask);
 
   /**
    * Start listening to value changes on a subscriber.
@@ -162,7 +162,7 @@ class ValueListenerPoller final {
    * @param mask Bitmask of ValueListenerFlags values
    * @return Listener handle
    */
-  NT_ValueListener Add(const MultiSubscriber& subscriber, unsigned int mask);
+  NT_ValueListener Add(MultiSubscriber& subscriber, unsigned int mask);
 
   /**
    * Start listening to value changes on an entry.
@@ -171,7 +171,7 @@ class ValueListenerPoller final {
    * @param mask Bitmask of ValueListenerFlags values
    * @return Listener handle
    */
-  NT_ValueListener Add(const NetworkTableEntry& entry, unsigned int mask);
+  NT_ValueListener Add(NetworkTableEntry& entry, unsigned int mask);
 
   /**
    * Start listening to value changes on a subscriber/entry handle.

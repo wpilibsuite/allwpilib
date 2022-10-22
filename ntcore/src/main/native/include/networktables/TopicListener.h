@@ -204,7 +204,7 @@ class TopicListenerPoller final {
    * @param mask Bitmask of TopicListenerFlags values
    * @return Listener handle
    */
-  NT_TopicListener Add(const Subscriber& subscriber, unsigned int mask);
+  NT_TopicListener Add(Subscriber& subscriber, unsigned int mask);
 
   /**
    * Start listening to topic changes on a subscriber.
@@ -213,7 +213,7 @@ class TopicListenerPoller final {
    * @param mask Bitmask of TopicListenerFlags values
    * @return Listener handle
    */
-  NT_TopicListener Add(const MultiSubscriber& subscriber, unsigned int mask);
+  NT_TopicListener Add(MultiSubscriber& subscriber, unsigned int mask);
 
   /**
    * Start listening to topic changes on an entry.
@@ -222,7 +222,7 @@ class TopicListenerPoller final {
    * @param mask Bitmask of TopicListenerFlags values
    * @return Listener handle
    */
-  NT_TopicListener Add(const NetworkTableEntry& entry, unsigned int mask);
+  NT_TopicListener Add(NetworkTableEntry& entry, unsigned int mask);
 
   /**
    * Remove a listener.
