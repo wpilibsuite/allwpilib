@@ -68,7 +68,7 @@ inline void UnitPublisher<T>::SetDefault(T value) {
 
 template <typename T>
 inline UnitTopic<T> UnitPublisher<T>::GetTopic() const {
-  return UnitTopic{::nt::GetTopicFromHandle(m_pubHandle)};
+  return UnitTopic<T>{::nt::GetTopicFromHandle(m_pubHandle)};
 }
 
 template <typename T>
@@ -77,7 +77,7 @@ inline UnitEntry<T>::UnitEntry(NT_Entry handle, T defaultValue)
 
 template <typename T>
 inline UnitTopic<T> UnitEntry<T>::GetTopic() const {
-  return UnitTopic{::nt::GetTopicFromHandle(this->m_subHandle)};
+  return UnitTopic<T>{::nt::GetTopicFromHandle(this->m_subHandle)};
 }
 
 template <typename T>
@@ -93,8 +93,8 @@ inline bool UnitTopic<T>::IsMatchingUnit() const {
 template <typename T>
 inline UnitSubscriber<T> UnitTopic<T>::Subscribe(
     T defaultValue, std::span<const PubSubOption> options) {
-  return UnitSubscriber{::nt::Subscribe(m_handle, NT_DOUBLE, "double", options),
-                        defaultValue};
+  return UnitSubscriber<T>{
+      ::nt::Subscribe(m_handle, NT_DOUBLE, "double", options), defaultValue};
 }
 
 template <typename T>
