@@ -28,7 +28,7 @@ namespace frc {
  * easy but more accurate drop-in for SwerveDriveOdometry.
  *
  * Update() should be called every robot loop. If your loops are faster or
- * slower than the default of 0.02s, then you should change the nominal delta
+ * slower than the default of 20 ms, then you should change the nominal delta
  * time by specifying it in the constructor.
  *
  * AddVisionMeasurement() can be called as infrequently as you want; if you
@@ -82,7 +82,7 @@ class SwerveDrivePoseEstimator {
       const wpi::array<double, 3>& stateStdDevs,
       const wpi::array<double, 1>& localMeasurementStdDevs,
       const wpi::array<double, 3>& visionMeasurementStdDevs,
-      units::second_t nominalDt = 0.02_s)
+      units::second_t nominalDt = 20_ms)
       : m_observer([](const Vectord<3>& x, const Vectord<3>& u) { return u; },
                    [](const Vectord<3>& x, const Vectord<3>& u) {
                      return x.block<1, 1>(2, 0);
