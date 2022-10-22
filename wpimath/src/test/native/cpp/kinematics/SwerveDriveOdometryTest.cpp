@@ -2,8 +2,14 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
+#include <limits>
+#include <random>
+
 #include "frc/kinematics/SwerveDriveKinematics.h"
 #include "frc/kinematics/SwerveDriveOdometry.h"
+#include "frc/trajectory/Trajectory.h"
+#include "frc/trajectory/TrajectoryGenerator.h"
+#include "frc/trajectory/TrajectoryConfig.h"
 #include "gtest/gtest.h"
 
 using namespace frc;
@@ -61,4 +67,71 @@ TEST_F(SwerveDriveOdometryTest, GyroAngleReset) {
   EXPECT_NEAR(0.5, pose.X().value(), kEpsilon);
   EXPECT_NEAR(0.0, pose.Y().value(), kEpsilon);
   EXPECT_NEAR(0.0, pose.Rotation().Degrees().value(), kEpsilon);
+}
+
+TEST_F(SwerveDriveOdometryTest, Accuracy) {
+  SwerveDriveKinematics<4> kinematics{
+      Translation2d{1_m, 1_m}, Translation2d{1_m, -1_m},
+      Translation2d{-1_m, -1_m}, Translation2d{-1_m, 1_m}};
+
+  SwerveDriveOdometry<4> odometry{
+    kinematics, 0_rad, {zero, zero, zero, zero}};
+
+  SwerveModulePosition fl{0_m, 0_rad};
+  SwerveModulePosition fr{0_m, 0_rad};
+  SwerveModulePosition bl{0_m, 0_rad};
+  SwerveModulePosition br{0_m, 0_rad};
+
+  Trajectory trajectory = TrajectoryGenerator::GenerateTrajectory(
+      std::vector{Pose2d{0_m, 0_m, 45_deg},
+                  Pose2d{3_m, 0_m, -90_deg},
+                  Pose2d{0_m, 0_m, 135_deg},
+                  Pose2d{-3_m, 0_m, -90_deg},
+                  Pose2d{0_m, 0_m, 45_deg}},
+      TrajectoryConfig(5.0_mps, 2.0_mps_sq));
+
+  std::default_random_engine generator;
+  std::normal_distribution<double> distribution(0.0, 1.0);
+
+  units::second_t dt = 0.02_s;
+  units::second_t t = 0_s;
+
+  double maxError = -std::numeric_limits<double>::max();
+  double errorSum = 0;
+
+  while (t < trajectory.TotalTime()) {
+    Trajectory::State groundTruthState = trajectory.Sample(t);
+
+    auto moduleStates = kinematics.ToSwerveModuleStates(
+        {groundTruthState.velocity, 0_mps,
+         groundTruthState.velocity * groundTruthState.curvature});
+    
+    fl.distance += moduleStates[0].speed * dt;
+    fr.distance += moduleStates[1].speed * dt;
+    bl.distance += moduleStates[2].speed * dt;
+    br.distance += moduleStates[3].speed * dt;
+
+    fl.angle = moduleStates[0].angle;
+    fr.angle = moduleStates[1].angle;
+    bl.angle = moduleStates[2].angle;
+    br.angle = moduleStates[3].angle;
+
+    auto xhat = odometry.Update(
+        groundTruthState.pose.Rotation() +
+            frc::Rotation2d{distribution(generator) * 0.05_rad},
+        fl, fr, bl, br);
+    double error = groundTruthState.pose.Translation()
+                       .Distance(xhat.Translation())
+                       .value();
+
+    if (error > maxError) {
+      maxError = error;
+    }
+    errorSum += error;
+
+    t += dt;
+  }
+
+  EXPECT_LT(errorSum / (trajectory.TotalTime().value() / dt.value()), 0.05);
+  EXPECT_LT(maxError, 0.125);
 }

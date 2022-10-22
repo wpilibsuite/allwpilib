@@ -9,7 +9,6 @@
 
 namespace frc {
 template <size_t NumModules>
-template <size_t NumModules>
 SwerveDriveOdometry<NumModules>::SwerveDriveOdometry(
     SwerveDriveKinematics<NumModules> kinematics, const Rotation2d& gyroAngle,
     const wpi::array<SwerveModulePosition, NumModules> modulePositions,
