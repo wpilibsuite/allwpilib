@@ -9,20 +9,6 @@
 
 namespace frc {
 template <size_t NumModules>
-template <typename... ModulePositions>
-SwerveDriveOdometry<NumModules>::SwerveDriveOdometry(
-    SwerveDriveKinematics<NumModules> kinematics, const Rotation2d& gyroAngle,
-    ModulePositions&&... wheelPositions, const Pose2d& initialPose)
-    : m_kinematics(kinematics), m_pose(initialPose), m_previousModulePositions{wheelPositions...} {
-  static_assert(sizeof...(wheelPositions) == NumModules,
-                "Number of modules is not consistent with number of wheel "
-                "locations provided in constructor.");
-  m_previousAngle = m_pose.Rotation();
-  m_gyroOffset = m_pose.Rotation() - gyroAngle;
-  wpi::math::MathSharedStore::ReportUsage(
-      wpi::math::MathUsageId::kOdometry_SwerveDrive, 1);
-}
-
 template <size_t NumModules>
 SwerveDriveOdometry<NumModules>::SwerveDriveOdometry(
     SwerveDriveKinematics<NumModules> kinematics, const Rotation2d& gyroAngle,

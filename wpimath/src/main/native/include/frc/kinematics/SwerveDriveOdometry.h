@@ -35,20 +35,6 @@ class SwerveDriveOdometry {
    *
    * @param kinematics The swerve drive kinematics for your drivetrain.
    * @param gyroAngle The angle reported by the gyroscope.
-   * @param wheelPositions The wheel positions reported by each module.
-   * @param initialPose The starting position of the robot on the field.
-   */
-  template <typename... ModulePositions>
-  SwerveDriveOdometry(SwerveDriveKinematics<NumModules> kinematics,
-                      const Rotation2d& gyroAngle,
-                      ModulePositions&&... wheelPositions,
-                      const Pose2d& initialPose = Pose2d{});
-
-  /**
-   * Constructs a SwerveDriveOdometry object.
-   *
-   * @param kinematics The swerve drive kinematics for your drivetrain.
-   * @param gyroAngle The angle reported by the gyroscope.
    * @param modulePositions The wheel positions reported by each module.
    * @param initialPose The starting position of the robot on the field.
    */
