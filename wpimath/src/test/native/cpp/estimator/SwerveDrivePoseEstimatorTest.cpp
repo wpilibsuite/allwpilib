@@ -22,14 +22,16 @@ TEST(SwerveDrivePoseEstimatorTest, AccuracyFacingTrajectory) {
   frc::SwerveModulePosition br;
 
   frc::SwerveDrivePoseEstimator<4> estimator{
-      frc::Rotation2d{}, frc::Pose2d{}, {fl, fr, bl, br}, kinematics,
+      frc::Rotation2d{},
+      frc::Pose2d{},
+      {fl, fr, bl, br},
+      kinematics,
       {0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1},
       {0.05, 0.05, 0.05, 0.05, 0.05},
       {0.1, 0.1, 0.1}};
 
   frc::Trajectory trajectory = frc::TrajectoryGenerator::GenerateTrajectory(
-      std::vector{frc::Pose2d{0_m, 0_m, 45_deg},
-                  frc::Pose2d{3_m, 0_m, -90_deg},
+      std::vector{frc::Pose2d{0_m, 0_m, 45_deg}, frc::Pose2d{3_m, 0_m, -90_deg},
                   frc::Pose2d{0_m, 0_m, 135_deg},
                   frc::Pose2d{-3_m, 0_m, -90_deg},
                   frc::Pose2d{0_m, 0_m, 45_deg}},
@@ -59,10 +61,9 @@ TEST(SwerveDrivePoseEstimatorTest, AccuracyFacingTrajectory) {
       }
       lastVisionPose =
           groundTruthState.pose +
-          frc::Transform2d{
-              frc::Translation2d{distribution(generator) * 0.1_m,
-                                 distribution(generator) * 0.1_m},
-              frc::Rotation2d{distribution(generator) * 0.1_rad}};
+          frc::Transform2d{frc::Translation2d{distribution(generator) * 0.1_m,
+                                              distribution(generator) * 0.1_m},
+                           frc::Rotation2d{distribution(generator) * 0.1_rad}};
       visionPoses.push_back(lastVisionPose);
       lastVisionUpdateTime = t;
     }
@@ -85,8 +86,7 @@ TEST(SwerveDrivePoseEstimatorTest, AccuracyFacingTrajectory) {
         t,
         groundTruthState.pose.Rotation() +
             frc::Rotation2d{distribution(generator) * 0.05_rad},
-        moduleStates,
-        {fl, fr, bl, br});
+        moduleStates, {fl, fr, bl, br});
     double error = groundTruthState.pose.Translation()
                        .Distance(xhat.Translation())
                        .value();
@@ -114,14 +114,16 @@ TEST(SwerveDrivePoseEstimatorTest, AccuracyFacingXAxis) {
   frc::SwerveModulePosition br;
 
   frc::SwerveDrivePoseEstimator<4> estimator{
-      frc::Rotation2d{}, frc::Pose2d{}, {fl, fr, bl, br}, kinematics,
+      frc::Rotation2d{},
+      frc::Pose2d{},
+      {fl, fr, bl, br},
+      kinematics,
       {0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1},
       {0.05, 0.05, 0.05, 0.05, 0.05},
       {0.1, 0.1, 0.1}};
 
   frc::Trajectory trajectory = frc::TrajectoryGenerator::GenerateTrajectory(
-      std::vector{frc::Pose2d{0_m, 0_m, 45_deg},
-                  frc::Pose2d{3_m, 0_m, -90_deg},
+      std::vector{frc::Pose2d{0_m, 0_m, 45_deg}, frc::Pose2d{3_m, 0_m, -90_deg},
                   frc::Pose2d{0_m, 0_m, 135_deg},
                   frc::Pose2d{-3_m, 0_m, -90_deg},
                   frc::Pose2d{0_m, 0_m, 45_deg}},
@@ -151,10 +153,9 @@ TEST(SwerveDrivePoseEstimatorTest, AccuracyFacingXAxis) {
       }
       lastVisionPose =
           groundTruthState.pose +
-          frc::Transform2d{
-              frc::Translation2d{distribution(generator) * 0.1_m,
-                                 distribution(generator) * 0.1_m},
-              frc::Rotation2d{distribution(generator) * 0.1_rad}};
+          frc::Transform2d{frc::Translation2d{distribution(generator) * 0.1_m,
+                                              distribution(generator) * 0.1_m},
+                           frc::Rotation2d{distribution(generator) * 0.1_rad}};
       visionPoses.push_back(lastVisionPose);
       lastVisionUpdateTime = t;
     }
@@ -164,10 +165,14 @@ TEST(SwerveDrivePoseEstimatorTest, AccuracyFacingXAxis) {
          groundTruthState.velocity * groundTruthState.pose.Rotation().Sin(),
          0_rad_per_s});
 
-    fl.distance += groundTruthState.velocity * dt + 0.5 * groundTruthState.acceleration * dt * dt;
-    fr.distance += groundTruthState.velocity * dt + 0.5 * groundTruthState.acceleration * dt * dt;
-    bl.distance += groundTruthState.velocity * dt + 0.5 * groundTruthState.acceleration * dt * dt;
-    br.distance += groundTruthState.velocity * dt + 0.5 * groundTruthState.acceleration * dt * dt;
+    fl.distance += groundTruthState.velocity * dt +
+                   0.5 * groundTruthState.acceleration * dt * dt;
+    fr.distance += groundTruthState.velocity * dt +
+                   0.5 * groundTruthState.acceleration * dt * dt;
+    bl.distance += groundTruthState.velocity * dt +
+                   0.5 * groundTruthState.acceleration * dt * dt;
+    br.distance += groundTruthState.velocity * dt +
+                   0.5 * groundTruthState.acceleration * dt * dt;
 
     fl.angle = groundTruthState.pose.Rotation();
     fr.angle = groundTruthState.pose.Rotation();
@@ -175,9 +180,7 @@ TEST(SwerveDrivePoseEstimatorTest, AccuracyFacingXAxis) {
     br.angle = groundTruthState.pose.Rotation();
 
     auto xhat = estimator.UpdateWithTime(
-        t,
-        frc::Rotation2d{distribution(generator) * 0.05_rad},
-        moduleStates,
+        t, frc::Rotation2d{distribution(generator) * 0.05_rad}, moduleStates,
         {fl, fr, bl, br});
     double error = groundTruthState.pose.Translation()
                        .Distance(xhat.Translation())

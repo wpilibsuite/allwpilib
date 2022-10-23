@@ -8,8 +8,8 @@
 #include "frc/kinematics/SwerveDriveKinematics.h"
 #include "frc/kinematics/SwerveDriveOdometry.h"
 #include "frc/trajectory/Trajectory.h"
-#include "frc/trajectory/TrajectoryGenerator.h"
 #include "frc/trajectory/TrajectoryConfig.h"
+#include "frc/trajectory/TrajectoryGenerator.h"
 #include "gtest/gtest.h"
 
 using namespace frc;
@@ -74,8 +74,7 @@ TEST_F(SwerveDriveOdometryTest, AccuracyFacingTrajectory) {
       Translation2d{1_m, 1_m}, Translation2d{1_m, -1_m},
       Translation2d{-1_m, -1_m}, Translation2d{-1_m, 1_m}};
 
-  SwerveDriveOdometry<4> odometry{
-    kinematics, 0_rad, {zero, zero, zero, zero}};
+  SwerveDriveOdometry<4> odometry{kinematics, 0_rad, {zero, zero, zero, zero}};
 
   SwerveModulePosition fl;
   SwerveModulePosition fr;
@@ -83,10 +82,8 @@ TEST_F(SwerveDriveOdometryTest, AccuracyFacingTrajectory) {
   SwerveModulePosition br;
 
   Trajectory trajectory = TrajectoryGenerator::GenerateTrajectory(
-      std::vector{Pose2d{0_m, 0_m, 45_deg},
-                  Pose2d{3_m, 0_m, -90_deg},
-                  Pose2d{0_m, 0_m, 135_deg},
-                  Pose2d{-3_m, 0_m, -90_deg},
+      std::vector{Pose2d{0_m, 0_m, 45_deg}, Pose2d{3_m, 0_m, -90_deg},
+                  Pose2d{0_m, 0_m, 135_deg}, Pose2d{-3_m, 0_m, -90_deg},
                   Pose2d{0_m, 0_m, 45_deg}},
       TrajectoryConfig(5.0_mps, 2.0_mps_sq));
 
@@ -105,7 +102,7 @@ TEST_F(SwerveDriveOdometryTest, AccuracyFacingTrajectory) {
     auto moduleStates = kinematics.ToSwerveModuleStates(
         {groundTruthState.velocity, 0_mps,
          groundTruthState.velocity * groundTruthState.curvature});
-    
+
     fl.distance += moduleStates[0].speed * dt;
     fr.distance += moduleStates[1].speed * dt;
     bl.distance += moduleStates[2].speed * dt;
@@ -116,10 +113,10 @@ TEST_F(SwerveDriveOdometryTest, AccuracyFacingTrajectory) {
     bl.angle = moduleStates[2].angle;
     br.angle = moduleStates[3].angle;
 
-    auto xhat = odometry.Update(
-        groundTruthState.pose.Rotation() +
-            frc::Rotation2d{distribution(generator) * 0.05_rad},
-        fl, fr, bl, br);
+    auto xhat =
+        odometry.Update(groundTruthState.pose.Rotation() +
+                            frc::Rotation2d{distribution(generator) * 0.05_rad},
+                        fl, fr, bl, br);
     double error = groundTruthState.pose.Translation()
                        .Distance(xhat.Translation())
                        .value();
@@ -141,8 +138,7 @@ TEST_F(SwerveDriveOdometryTest, AccuracyFacingXAxis) {
       Translation2d{1_m, 1_m}, Translation2d{1_m, -1_m},
       Translation2d{-1_m, -1_m}, Translation2d{-1_m, 1_m}};
 
-  SwerveDriveOdometry<4> odometry{
-    kinematics, 0_rad, {zero, zero, zero, zero}};
+  SwerveDriveOdometry<4> odometry{kinematics, 0_rad, {zero, zero, zero, zero}};
 
   SwerveModulePosition fl;
   SwerveModulePosition fr;
@@ -150,10 +146,8 @@ TEST_F(SwerveDriveOdometryTest, AccuracyFacingXAxis) {
   SwerveModulePosition br;
 
   Trajectory trajectory = TrajectoryGenerator::GenerateTrajectory(
-      std::vector{Pose2d{0_m, 0_m, 45_deg},
-                  Pose2d{3_m, 0_m, -90_deg},
-                  Pose2d{0_m, 0_m, 135_deg},
-                  Pose2d{-3_m, 0_m, -90_deg},
+      std::vector{Pose2d{0_m, 0_m, 45_deg}, Pose2d{3_m, 0_m, -90_deg},
+                  Pose2d{0_m, 0_m, 135_deg}, Pose2d{-3_m, 0_m, -90_deg},
                   Pose2d{0_m, 0_m, 45_deg}},
       TrajectoryConfig(5.0_mps, 2.0_mps_sq));
 
@@ -169,10 +163,14 @@ TEST_F(SwerveDriveOdometryTest, AccuracyFacingXAxis) {
   while (t < trajectory.TotalTime()) {
     Trajectory::State groundTruthState = trajectory.Sample(t);
 
-    fl.distance += groundTruthState.velocity * dt + 0.5 * groundTruthState.acceleration * dt * dt;
-    fr.distance += groundTruthState.velocity * dt + 0.5 * groundTruthState.acceleration * dt * dt;
-    bl.distance += groundTruthState.velocity * dt + 0.5 * groundTruthState.acceleration * dt * dt;
-    br.distance += groundTruthState.velocity * dt + 0.5 * groundTruthState.acceleration * dt * dt;
+    fl.distance += groundTruthState.velocity * dt +
+                   0.5 * groundTruthState.acceleration * dt * dt;
+    fr.distance += groundTruthState.velocity * dt +
+                   0.5 * groundTruthState.acceleration * dt * dt;
+    bl.distance += groundTruthState.velocity * dt +
+                   0.5 * groundTruthState.acceleration * dt * dt;
+    br.distance += groundTruthState.velocity * dt +
+                   0.5 * groundTruthState.acceleration * dt * dt;
 
     fl.angle = groundTruthState.pose.Rotation();
     fr.angle = groundTruthState.pose.Rotation();
@@ -180,8 +178,7 @@ TEST_F(SwerveDriveOdometryTest, AccuracyFacingXAxis) {
     br.angle = groundTruthState.pose.Rotation();
 
     auto xhat = odometry.Update(
-        frc::Rotation2d{distribution(generator) * 0.05_rad},
-        fl, fr, bl, br);
+        frc::Rotation2d{distribution(generator) * 0.05_rad}, fl, fr, bl, br);
     double error = groundTruthState.pose.Translation()
                        .Distance(xhat.Translation())
                        .value();

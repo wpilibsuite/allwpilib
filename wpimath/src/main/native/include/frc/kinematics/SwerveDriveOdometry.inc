@@ -31,7 +31,8 @@ void SwerveDriveOdometry<NumModules>::ResetPosition(
                 "Number of modules is not consistent with number of wheel "
                 "locations provided in constructor.");
 
-  wpi::array<SwerveModulePosition, NumModules> modulePositions{wheelPositions...};
+  wpi::array<SwerveModulePosition, NumModules> modulePositions{
+      wheelPositions...};
   this->ResetPosition(pose, gyroAngle, modulePositions);
 }
 
@@ -53,7 +54,8 @@ const Pose2d& frc::SwerveDriveOdometry<NumModules>::Update(
                 "Number of modules is not consistent with number of wheel "
                 "locations provided in constructor.");
 
-  wpi::array<SwerveModulePosition, NumModules> modulePositions{wheelPositions...};
+  wpi::array<SwerveModulePosition, NumModules> modulePositions{
+      wheelPositions...};
 
   return this->Update(gyroAngle, modulePositions);
 }
