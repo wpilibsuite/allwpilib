@@ -50,6 +50,16 @@ class Drivetrain {
   // Gains are for example purposes only - must be determined for your own
   // robot!
   frc::SwerveDrivePoseEstimator<4> m_poseEstimator{
-      frc::Rotation2d{}, frc::Pose2d{}, m_kinematics,
-      {0.1, 0.1, 0.1},   {0.05},        {0.1, 0.1, 0.1}};
+      frc::Rotation2d{},
+      frc::Pose2d{},
+      {
+          m_frontLeft.GetPosition(),
+          m_frontRight.GetPosition(),
+          m_backLeft.GetPosition(),
+          m_backRight.GetPosition()
+      },
+      m_kinematics,
+      {0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1},
+      {0.05, 0.05, 0.05, 0.05, 0.05},
+      {0.1, 0.1, 0.1}};
 };

@@ -11,6 +11,7 @@
 #include <frc/controller/ProfiledPIDController.h>
 #include <frc/controller/SimpleMotorFeedforward.h>
 #include <frc/kinematics/SwerveModuleState.h>
+#include <frc/kinematics/SwerveModulePosition.h>
 #include <frc/motorcontrol/PWMSparkMax.h>
 #include <units/angular_velocity.h>
 #include <units/time.h>
@@ -23,6 +24,7 @@ class SwerveModule {
                int driveEncoderChannelA, int driveEncoderChannelB,
                int turningEncoderChannelA, int turningEncoderChannelB);
   frc::SwerveModuleState GetState() const;
+  frc::SwerveModulePosition GetPosition() const;
   void SetDesiredState(const frc::SwerveModuleState& state);
 
  private:
