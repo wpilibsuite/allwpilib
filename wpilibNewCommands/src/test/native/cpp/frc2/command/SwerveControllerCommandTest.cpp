@@ -96,7 +96,7 @@ TEST_F(SwerveControllerCommandTest, ReachesReference) {
     command.Execute();
     m_angle = trajectory.Sample(m_timer.Get()).pose.Rotation();
 
-    for (int i = 0; i < m_modulePositions.size(); i++) {
+    for (size_t i = 0; i < m_modulePositions.size(); i++) {
       m_modulePositions[i].distance += m_moduleStates[i].speed * 5_ms;
       m_modulePositions[i].angle = m_moduleStates[i].angle;
     }
