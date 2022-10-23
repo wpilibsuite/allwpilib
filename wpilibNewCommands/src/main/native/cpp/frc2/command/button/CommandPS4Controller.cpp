@@ -6,6 +6,10 @@
 
 using namespace frc2;
 
+Trigger CommandPS4Controller::Button(int button, frc::EventLoop* loop) const {
+  return GenericHID::Button(button, loop).CastTo<Trigger>();
+}
+
 Trigger CommandPS4Controller::Square(frc::EventLoop* loop) const {
   return PS4Controller::Square(loop).CastTo<Trigger>();
 }
