@@ -54,4 +54,4 @@ jobs:
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           # Commit
           git commit -am "wpiformat"
-          git push origin HEAD
+          git push origin HEAD:refs/pull/$NUMBER/head
