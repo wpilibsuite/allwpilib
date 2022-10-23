@@ -62,7 +62,7 @@ On macOS ARM, run `softwareupdate --install-rosetta`. This is necessary to be ab
 
 Clone the WPILib repository and follow the instructions above for installing any required tooling.
 
-See the [styleguide README](https://github.com/wpilibsuite/styleguide/blob/main/README.md) for wpiformat setup instructions.
+See the [styleguide README](https://github.com/wpilibsuite/styleguide/blob/main/README.md) for wpiformat setup instructions. We use clang-format 14. 
 
 ## Building
 
@@ -137,7 +137,9 @@ make
 
 #### wpiformat
 
-wpiformat can be executed anywhere in the repository via `py -3 -m wpiformat` on Windows or `python3 -m wpiformat` on other platforms.
+wpiformat can be executed anywhere in the repository via `py -3 -m wpiformat -clang 14` on Windows or `python3 -m wpiformat -clang 14` on other platforms.
+
+Once a PR has been submitted, formatting can be run in CI by commenting `/wpiformat` on the PR. A new commit will be pushed with the formatting changes.
 
 #### Java Code Quality Tools
 
