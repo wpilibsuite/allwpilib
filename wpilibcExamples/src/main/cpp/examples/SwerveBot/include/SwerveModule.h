@@ -10,8 +10,8 @@
 #include <frc/controller/PIDController.h>
 #include <frc/controller/ProfiledPIDController.h>
 #include <frc/controller/SimpleMotorFeedforward.h>
-#include <frc/kinematics/SwerveModuleState.h>
 #include <frc/kinematics/SwerveModulePosition.h>
+#include <frc/kinematics/SwerveModuleState.h>
 #include <frc/motorcontrol/PWMSparkMax.h>
 #include <units/angular_velocity.h>
 #include <units/time.h>
