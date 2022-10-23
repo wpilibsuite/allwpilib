@@ -5,9 +5,9 @@
 #include <frc/simulation/SimHooks.h>
 
 #include "../CommandTestBase.h"
-#include "frc2/command/Commands.h"
 #include "frc2/command/CommandPtr.h"
 #include "frc2/command/CommandScheduler.h"
+#include "frc2/command/Commands.h"
 #include "frc2/command/RunCommand.h"
 #include "frc2/command/WaitUntilCommand.h"
 #include "frc2/command/button/Trigger.h"
@@ -54,9 +54,33 @@ TEST_F(TriggerTest, OnFalse) {
 
 TEST_F(TriggerTest, WhileTrueRepeatedly) {
   auto& scheduler = CommandScheduler::GetInstance();
+  int inits = 0;
   int counter = 0;
   bool pressed = false;
-  CommandPtr command = cmd::RunOnce([&counter] { counter++; }).Repeatedly();
+  CommandPtr command =
+      FunctionalCommand([&inits] { inits++; }, [] {}, [](bool interrupted) {},
+                        [&counter] { return ++counter % 2 == 0; })
+          .Repeatedly();
+
+  pressed = false;
+  Trigger([&pressed] { return pressed; }).WhileTrue(std::move(command));
+  scheduler.Run();
+  EXPECT_EQ(0, inits);
+  pressed = true;
+  scheduler.Run();
+  EXPECT_EQ(1, inits);
+  scheduler.Run();
+  EXPECT_EQ(2, inits);
+  pressed = false;
+  scheduler.Run();
+  EXPECT_EQ(2, inits);
+}
+
+TEST_F(TriggerTest, WhileTrueLambdaRun) {
+  auto& scheduler = CommandScheduler::GetInstance();
+  int counter = 0;
+  bool pressed = false;
+  CommandPtr command = cmd::Run([&counter] { counter++; });
 
   pressed = false;
   Trigger([&pressed] { return pressed; }).WhileTrue(std::move(command));
@@ -78,7 +102,7 @@ TEST_F(TriggerTest, WhenTrueOnce) {
   bool pressed = false;
 
   CommandPtr command = cmd::StartEnd([&startCounter] { startCounter++; },
-                                       [&endCounter] { endCounter++; });
+                                     [&endCounter] { endCounter++; });
 
   pressed = false;
   Trigger([&pressed] { return pressed; }).WhileTrue(std::move(command));
@@ -102,7 +126,7 @@ TEST_F(TriggerTest, ToggleOnTrue) {
   int startCounter = 0;
   int endCounter = 0;
   CommandPtr command = cmd::StartEnd([&startCounter] { startCounter++; },
-                                       [&endCounter] { endCounter++; });
+                                     [&endCounter] { endCounter++; });
 
   Trigger([&pressed] { return pressed; }).ToggleOnTrue(std::move(command));
   scheduler.Run();

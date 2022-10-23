@@ -14,7 +14,8 @@ import edu.wpi.first.wpilibj.simulation.SimHooks;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.CommandTestBase;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.FunctionalCommand;
+import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.StartEndCommand;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -64,9 +65,38 @@ class TriggerTest extends CommandTestBase {
   @Test
   void whileTrueRepeatedlyTest() {
     CommandScheduler scheduler = CommandScheduler.getInstance();
+    AtomicInteger inits = new AtomicInteger(0);
     AtomicInteger counter = new AtomicInteger(0);
     // the repeatedly() here is the point!
-    Command command1 = new InstantCommand(counter::incrementAndGet).repeatedly();
+    Command command1 =
+        new FunctionalCommand(
+                inits::incrementAndGet,
+                () -> {},
+                interrupted -> {},
+                () -> counter.incrementAndGet() % 2 == 0)
+            .repeatedly();
+
+    InternalButton button = new InternalButton();
+    button.setPressed(false);
+    button.whileTrue(command1);
+    scheduler.run();
+    assertEquals(0, inits.get());
+    button.setPressed(true);
+    scheduler.run();
+    assertEquals(1, inits.get());
+    scheduler.run();
+    assertEquals(2, inits.get());
+    button.setPressed(false);
+    scheduler.run();
+    assertEquals(2, inits.get());
+  }
+
+  @Test
+  void whileTrueLambdaRunTest() {
+    CommandScheduler scheduler = CommandScheduler.getInstance();
+    AtomicInteger counter = new AtomicInteger(0);
+    // the repeatedly() here is the point!
+    Command command1 = new RunCommand(counter::incrementAndGet);
 
     InternalButton button = new InternalButton();
     button.setPressed(false);
@@ -75,6 +105,7 @@ class TriggerTest extends CommandTestBase {
     assertEquals(0, counter.get());
     button.setPressed(true);
     scheduler.run();
+    assertEquals(1, counter.get());
     scheduler.run();
     assertEquals(2, counter.get());
     button.setPressed(false);
