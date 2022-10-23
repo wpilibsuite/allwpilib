@@ -62,7 +62,7 @@ On macOS ARM, run `softwareupdate --install-rosetta`. This is necessary to be ab
 
 Clone the WPILib repository and follow the instructions above for installing any required tooling.
 
-See the [styleguide README](https://github.com/wpilibsuite/styleguide/blob/main/README.md) for wpiformat setup instructions. We use clang-format 14. 
+See the [styleguide README](https://github.com/wpilibsuite/styleguide/blob/main/README.md) for wpiformat setup instructions. We use clang-format 14.
 
 ## Building
 
