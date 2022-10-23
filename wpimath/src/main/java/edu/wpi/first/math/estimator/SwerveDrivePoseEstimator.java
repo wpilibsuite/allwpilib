@@ -370,6 +370,7 @@ public class SwerveDrivePoseEstimator<States extends Num, Inputs extends Num, Ou
    * @param currentTimeSeconds Time at which this method was called, in seconds.
    * @param gyroAngle The current gyroscope angle.
    * @param moduleStates The current velocities and rotations of the swerve modules.
+   * @param modulePositions The current distance measurements and rotations of the swerve modules.
    * @return The estimated pose of the robot in meters.
    */
   public Pose2d updateWithTime(
