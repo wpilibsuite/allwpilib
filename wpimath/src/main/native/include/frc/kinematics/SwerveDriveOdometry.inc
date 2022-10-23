@@ -69,10 +69,8 @@ const Pose2d& frc::SwerveDriveOdometry<NumModules>::Update(
   for (size_t index = 0; index < modulePositions.size(); index++) {
     auto lastPosition = m_previousModulePositions[index];
     auto currentPosition = modulePositions[index];
-    moduleDeltas[index] = {
-      currentPosition.distance - lastPosition.distance,
-      currentPosition.angle
-    };
+    moduleDeltas[index] = {currentPosition.distance - lastPosition.distance,
+                           currentPosition.angle};
   }
 
   auto angle = gyroAngle + m_gyroOffset;
