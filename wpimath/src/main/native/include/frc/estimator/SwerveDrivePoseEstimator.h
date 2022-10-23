@@ -96,7 +96,7 @@ class SwerveDrivePoseEstimator {
       : m_observer([](const Vectord<States>& x,
                       const Vectord<Inputs>& u) { return u; },
                    [](const Vectord<States>& x, const Vectord<Inputs>& u) {
-                     return x.block<States - 2, 1>(2, 0);
+                     return x.template block<States - 2, 1>(2, 0);
                    },
                    stateStdDevs, localMeasurementStdDevs,
                    frc::AngleMean<States, States>(2),
@@ -110,15 +110,13 @@ class SwerveDrivePoseEstimator {
 
     // Create correction mechanism for vision measurements.
     m_visionCorrect = [&](const Vectord<Inputs>& u, const Vectord<3>& y) {
-      auto h = [](const Vectord<States>& x, const Vectord<Inputs>& u) {
-        return x.block<3, 1>(0, 0);
-      };
-      auto meanFuncY = frc::AngleMean<3, States>(2);
-      auto residualFuncY = frc::AngleResidual<3>(2);
-      auto residualFuncX = frc::AngleResidual<States>(2);
-      auto addFuncX = frc::AngleAdd<States>(2);
-      m_observer.Correct<3>(u, y, h, m_visionContR, meanFuncY, residualFuncY,
-                            residualFuncX, addFuncX);
+      m_observer.template Correct<3>(
+          u, y,
+          [](const Vectord<States>& x, const Vectord<Inputs>& u) {
+            return x.template block<3, 1>(0, 0);
+          },
+          m_visionContR, frc::AngleMean<3, States>(2), frc::AngleResidual<3>(2),
+          frc::AngleResidual<States>(2), frc::AngleAdd<States>(2));
     };
 
     // Set initial state.
