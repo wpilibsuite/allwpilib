@@ -95,7 +95,7 @@ class SwerveDrivePoseEstimator {
       units::second_t nominalDt = 20_ms)
       : m_observer([](const Vectord<States>& x, const Vectord<Inputs>& u) { return u; },
                    [](const Vectord<States>& x, const Vectord<Inputs>& u) {
-                     return x.block<5, 1>(2, 0);
+                     return x.block<States - 2, 1>(2, 0);
                    },
                    stateStdDevs, localMeasurementStdDevs,
                    frc::AngleMean<States, States>(2), frc::AngleMean<Outputs, States>(0),
