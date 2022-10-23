@@ -53,6 +53,10 @@ namespace frc {
 template <size_t NumModules>
 class SwerveDrivePoseEstimator {
  public:
+  static constexpr size_t States = 3 + NumModules;
+  static constexpr size_t Inputs = 3 + NumModules;
+  static constexpr size_t Outputs = 1 + NumModules;
+
   /**
    * Constructs a SwerveDrivePoseEstimator.
    *
@@ -85,29 +89,29 @@ class SwerveDrivePoseEstimator {
       const Rotation2d& gyroAngle, const Pose2d& initialPose,
       const wpi::array<SwerveModulePosition, NumModules> modulePositions,
       SwerveDriveKinematics<NumModules>& kinematics,
-      const wpi::array<double, 3 + NumModules>& stateStdDevs,
-      const wpi::array<double, 1 + NumModules>& localMeasurementStdDevs,
+      const wpi::array<double, States>& stateStdDevs,
+      const wpi::array<double, Outputs>& localMeasurementStdDevs,
       const wpi::array<double, 3 >& visionMeasurementStdDevs,
       units::second_t nominalDt = 20_ms)
-      : m_observer([](const Vectord<3 + NumModules>& x, const Vectord<3 + NumModules>& u) { return u; },
-                   [](const Vectord<3 + NumModules>& x, const Vectord<3 + NumModules>& u) {
+      : m_observer([](const Vectord<States>& x, const Vectord<Inputs>& u) { return u; },
+                   [](const Vectord<States>& x, const Vectord<Inputs>& u) {
                      return x.block<5, 1>(2, 0);
                    },
                    stateStdDevs, localMeasurementStdDevs,
-                   frc::AngleMean<3 + NumModules, 3 + NumModules>(2), frc::AngleMean<1 + NumModules, 3 + NumModules>(0),
-                   frc::AngleResidual<3 + NumModules>(2), frc::AngleResidual<1 + NumModules>(0),
-                   frc::AngleAdd<3 + NumModules>(2), nominalDt),
+                   frc::AngleMean<States, States>(2), frc::AngleMean<Outputs, States>(0),
+                   frc::AngleResidual<States>(2), frc::AngleResidual<Outputs>(0),
+                   frc::AngleAdd<States>(2), nominalDt),
         m_kinematics(kinematics),
         m_nominalDt(nominalDt) {
     SetVisionMeasurementStdDevs(visionMeasurementStdDevs);
 
     // Create correction mechanism for vision measurements.
-    m_visionCorrect = [&](const Vectord<3 + NumModules>& u, const Vectord<3>& y) {
-      auto h = [](const Vectord<3 + NumModules>& x, const Vectord<3 + NumModules>& u) { return x.block<3, 1>(0, 0); };
-      auto meanFuncY = frc::AngleMean<3, 3 + NumModules>(2);
+    m_visionCorrect = [&](const Vectord<Inputs>& u, const Vectord<3>& y) {
+      auto h = [](const Vectord<States>& x, const Vectord<Inputs>& u) { return x.block<3, 1>(0, 0); };
+      auto meanFuncY = frc::AngleMean<3, States>(2);
       auto residualFuncY = frc::AngleResidual<3>(2);
-      auto residualFuncX = frc::AngleResidual<3 + NumModules>(2);
-      auto addFuncX = frc::AngleAdd<3 + NumModules>(2);
+      auto residualFuncX = frc::AngleResidual<States>(2);
+      auto addFuncX = frc::AngleAdd<States>(2);
       m_observer.Correct<3>(
           u, y, h,
           m_visionContR, meanFuncY, residualFuncY,
@@ -115,7 +119,7 @@ class SwerveDrivePoseEstimator {
     };
 
     // Set initial state.
-    Vectord<3 + NumModules> xhat;
+    Vectord<States> xhat;
     auto poseVec = PoseTo3dVector(initialPose);
     xhat(0) = poseVec(0);
     xhat(1) = poseVec(1);
@@ -147,7 +151,7 @@ class SwerveDrivePoseEstimator {
     m_observer.Reset();
     m_poseBuffer.Clear();
 
-    Vectord<3 + NumModules> xhat;
+    Vectord<States> xhat;
     auto poseVec = PoseTo3dVector(pose);
     xhat(0) = poseVec(0);
     xhat(1) = poseVec(1);
@@ -217,7 +221,7 @@ class SwerveDrivePoseEstimator {
   void AddVisionMeasurement(const Pose2d& visionRobotPose,
                             units::second_t timestamp) {
     if (auto sample = m_poseBuffer.Sample(timestamp)) {
-      m_visionCorrect(Vectord<3 + NumModules>::Zero(),
+      m_visionCorrect(Vectord<States>::Zero(),
                       PoseTo3dVector(GetEstimatedPosition().TransformBy(
                           visionRobotPose - sample.value())));
     }
@@ -312,7 +316,7 @@ class SwerveDrivePoseEstimator {
         Translation2d{chassisSpeeds.vx * 1_s, chassisSpeeds.vy * 1_s}.RotateBy(
             angle);
 
-    Vectord<3 + NumModules> u;
+    Vectord<Inputs> u;
     u(0) = fieldRelativeSpeeds.X().value();
     u(1) = fieldRelativeSpeeds.Y().value();
     u(2) = omega.value();
@@ -320,7 +324,7 @@ class SwerveDrivePoseEstimator {
       u(3+i) = moduleStates[i].speed.value();
     }
 
-    Vectord<1 + NumModules> localY;
+    Vectord<Outputs> localY;
     localY(0) = angle.Radians().value();
     for (size_t i = 0; i < NumModules; i++) {
       localY(1+i) = modulePositions[i].distance.value();
@@ -337,10 +341,10 @@ class SwerveDrivePoseEstimator {
   }
 
  private:
-  UnscentedKalmanFilter<3 + NumModules, 3 + NumModules, 1 + NumModules> m_observer;
+  UnscentedKalmanFilter<States, Inputs, Outputs> m_observer;
   SwerveDriveKinematics<NumModules>& m_kinematics;
   TimeInterpolatableBuffer<Pose2d> m_poseBuffer{1.5_s};
-  std::function<void(const Vectord<3 + NumModules>& u, const Vectord<3>& y)> m_visionCorrect;
+  std::function<void(const Vectord<Inputs>& u, const Vectord<3>& y)> m_visionCorrect;
 
   Eigen::Matrix3d m_visionContR;
 
