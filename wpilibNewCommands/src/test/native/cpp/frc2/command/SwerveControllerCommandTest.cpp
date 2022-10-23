@@ -58,8 +58,7 @@ class SwerveControllerCommandTest : public ::testing::Test {
       frc::Translation2d{-kWheelBase / 2, kTrackWidth / 2},
       frc::Translation2d{-kWheelBase / 2, -kTrackWidth / 2}};
 
-  frc::SwerveDriveOdometry<4> m_odometry{m_kinematics, 0_rad, 
-                                         m_modulePositions,
+  frc::SwerveDriveOdometry<4> m_odometry{m_kinematics, 0_rad, m_modulePositions,
                                          frc::Pose2d{0_m, 0_m, 0_rad}};
 
   void SetUp() override { frc::sim::PauseTiming(); }
