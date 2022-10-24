@@ -29,17 +29,17 @@ inline TopicListener::TopicListener(
     : m_handle{AddTopicListener(topic.GetHandle(), mask, listener)} {}
 
 inline TopicListener::TopicListener(
-    const Subscriber& subscriber, unsigned int mask,
+    Subscriber& subscriber, unsigned int mask,
     std::function<void(const TopicNotification&)> listener)
     : m_handle{AddTopicListener(subscriber.GetHandle(), mask, listener)} {}
 
 inline TopicListener::TopicListener(
-    const MultiSubscriber& subscriber, unsigned int mask,
+    MultiSubscriber& subscriber, unsigned int mask,
     std::function<void(const TopicNotification&)> listener)
     : m_handle{AddTopicListener(subscriber.GetHandle(), mask, listener)} {}
 
 inline TopicListener::TopicListener(
-    const NetworkTableEntry& entry, unsigned int mask,
+    NetworkTableEntry& entry, unsigned int mask,
     std::function<void(const TopicNotification&)> listener)
     : m_handle{AddTopicListener(entry.GetHandle(), mask, listener)} {}
 
@@ -56,6 +56,14 @@ inline TopicListener& TopicListener::operator=(TopicListener&& rhs) {
 inline TopicListener::~TopicListener() {
   if (m_handle != 0) {
     nt::RemoveTopicListener(m_handle);
+  }
+}
+
+inline bool TopicListener::WaitForQueue(double timeout) {
+  if (m_handle != 0) {
+    return nt::WaitForTopicListenerQueue(m_handle, timeout);
+  } else {
+    return false;
   }
 }
 

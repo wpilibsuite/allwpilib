@@ -111,10 +111,10 @@ NetworkTablesModel::NetworkTablesModel()
 
 NetworkTablesModel::NetworkTablesModel(nt::NetworkTableInstance inst)
     : m_inst{inst},
-      m_subscriber{nt::SubscribeMultiple(inst.GetHandle(), {{"", "$"}})},
+      m_subscriber{inst, {{"", "$"}}},
       m_topicPoller{inst},
       m_valuePoller{inst} {
-  m_topicPoller.Add({{""}},
+  m_topicPoller.Add(m_subscriber,
                     NT_TOPIC_NOTIFY_IMMEDIATE | NT_TOPIC_NOTIFY_PROPERTIES |
                         NT_TOPIC_NOTIFY_PUBLISH | NT_TOPIC_NOTIFY_UNPUBLISH);
   m_valuePoller.Add(m_subscriber,

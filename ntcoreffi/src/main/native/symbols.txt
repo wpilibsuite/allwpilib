@@ -220,6 +220,9 @@ NT_StopServer
 NT_Subscribe
 NT_Unpublish
 NT_Unsubscribe
+NT_WaitForConnectionListenerQueue
+NT_WaitForTopicListenerQueue
+NT_WaitForValueListenerQueue
 WPI_CreateEvent
 WPI_CreateSemaphore
 WPI_CreateSignalObject

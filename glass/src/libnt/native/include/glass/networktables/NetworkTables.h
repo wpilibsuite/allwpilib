@@ -13,6 +13,7 @@
 #include <utility>
 #include <vector>
 
+#include <networktables/MultiSubscriber.h>
 #include <networktables/NetworkTableInstance.h>
 #include <networktables/TopicListener.h>
 #include <networktables/ValueListener.h>
@@ -179,7 +180,7 @@ class NetworkTablesModel : public Model {
   void UpdateClients(std::span<const uint8_t> data);
 
   nt::NetworkTableInstance m_inst;
-  NT_MultiSubscriber m_subscriber;
+  nt::MultiSubscriber m_subscriber;
   nt::TopicListenerPoller m_topicPoller;
   nt::ValueListenerPoller m_valuePoller;
   wpi::DenseMap<NT_Topic, std::unique_ptr<Entry>> m_entries;
