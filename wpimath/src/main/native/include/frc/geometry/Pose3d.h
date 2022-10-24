@@ -44,6 +44,13 @@ class WPILIB_DLLEXPORT Pose3d {
          Rotation3d rotation);
 
   /**
+   * Constructs a 3D pose from a 2D pose in the X-Y plane.
+   *
+   * @param pose The 2D pose.
+   */
+  explicit Pose3d(const Pose2d& pose);
+
+  /**
    * Transforms the pose by the given transformation and returns the new
    * transformed pose.
    *

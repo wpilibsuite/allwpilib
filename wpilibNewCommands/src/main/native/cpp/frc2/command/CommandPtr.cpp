@@ -6,12 +6,11 @@
 
 #include "frc2/command/CommandScheduler.h"
 #include "frc2/command/ConditionalCommand.h"
-#include "frc2/command/EndlessCommand.h"
 #include "frc2/command/InstantCommand.h"
 #include "frc2/command/ParallelCommandGroup.h"
 #include "frc2/command/ParallelDeadlineGroup.h"
 #include "frc2/command/ParallelRaceGroup.h"
-#include "frc2/command/PerpetualCommand.h"
+#include "frc2/command/PrintCommand.h"
 #include "frc2/command/ProxyScheduleCommand.h"
 #include "frc2/command/RepeatCommand.h"
 #include "frc2/command/SequentialCommandGroup.h"
@@ -23,11 +22,6 @@ using namespace frc2;
 
 CommandPtr CommandPtr::Repeatedly() && {
   m_ptr = std::make_unique<RepeatCommand>(std::move(m_ptr));
-  return std::move(*this);
-}
-
-CommandPtr CommandPtr::Endlessly() && {
-  m_ptr = std::make_unique<EndlessCommand>(std::move(m_ptr));
   return std::move(*this);
 }
 

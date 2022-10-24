@@ -238,7 +238,7 @@ void CImpl::SendPeriodic(uint64_t curTimeMs, bool initial) {
     if (!CheckNetworkReady()) {
       return;
     }
-    DEBUG4("{}", "Sending keep alive");
+    DEBUG4("Sending keep alive");
     WireEncodeKeepAlive(out.stream());
     // drift isn't critical here, so just go from current time
     m_nextKeepAliveTimeMs = curTimeMs + kKeepAliveIntervalMs;
@@ -274,7 +274,7 @@ void CImpl::SendPeriodic(uint64_t curTimeMs, bool initial) {
   }
 
   if (initial) {
-    DEBUG4("{}", "Sending ClientHelloDone");
+    DEBUG4("Sending ClientHelloDone");
     WireEncodeClientHelloDone(out.stream());
   }
 
@@ -403,7 +403,7 @@ void CImpl::SetValue(NT_Publisher pubHandle, const Value& value) {
 }
 
 void CImpl::KeepAlive() {
-  DEBUG4("{}", "KeepAlive()");
+  DEBUG4("KeepAlive()");
   if (m_state != kStateRunning && m_state != kStateInitialAssignments) {
     m_decoder.SetError("received unexpected KeepAlive message");
     return;
@@ -412,7 +412,7 @@ void CImpl::KeepAlive() {
 }
 
 void CImpl::ServerHelloDone() {
-  DEBUG4("{}", "ServerHelloDone()");
+  DEBUG4("ServerHelloDone()");
   if (m_state != kStateInitialAssignments) {
     m_decoder.SetError("received unexpected ServerHelloDone message");
     return;
@@ -426,7 +426,7 @@ void CImpl::ServerHelloDone() {
 }
 
 void CImpl::ClientHelloDone() {
-  DEBUG4("{}", "ClientHelloDone()");
+  DEBUG4("ClientHelloDone()");
   m_decoder.SetError("received unexpected ClientHelloDone message");
 }
 
@@ -572,7 +572,7 @@ void CImpl::EntryDelete(unsigned int id) {
 }
 
 void CImpl::ClearEntries() {
-  DEBUG4("{}", "ClearEntries()");
+  DEBUG4("ClearEntries()");
   if (m_state != kStateRunning) {
     m_decoder.SetError("received ClearEntries message before ServerHelloDone");
     return;
@@ -609,7 +609,7 @@ ClientImpl3::ClientImpl3(uint64_t curTimeMs, int inst, WireConnection3& wire,
                                     std::move(setPeriodic))} {}
 
 ClientImpl3::~ClientImpl3() {
-  WPI_DEBUG4(m_impl->m_logger, "{}", "NT3 ClientImpl destroyed");
+  WPI_DEBUG4(m_impl->m_logger, "NT3 ClientImpl destroyed");
 }
 
 void ClientImpl3::Start(std::string_view selfId,

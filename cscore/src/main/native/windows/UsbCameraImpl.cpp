@@ -486,7 +486,7 @@ bool UsbCameraImpl::DeviceConnect() {
     SINFO("Connecting to USB camera on {}", m_path);
   }
 
-  SDEBUG3("{}", "opening device");
+  SDEBUG3("opening device");
 
   const wchar_t* path = m_widePath.c_str();
   m_mediaSource = CreateVideoCaptureDevice(path);
@@ -520,13 +520,13 @@ bool UsbCameraImpl::DeviceConnect() {
   }
 
   if (!m_properties_cached) {
-    SDEBUG3("{}", "caching properties");
+    SDEBUG3("caching properties");
     DeviceCacheProperties();
     DeviceCacheVideoModes();
     DeviceCacheMode();
     m_properties_cached = true;
   } else {
-    SDEBUG3("{}", "restoring video mode");
+    SDEBUG3("restoring video mode");
     DeviceSetMode();
   }
 

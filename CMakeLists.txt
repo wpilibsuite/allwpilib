@@ -36,22 +36,23 @@ SET(CMAKE_SKIP_BUILD_RPATH  FALSE)
 # (but later on when installing)
 SET(CMAKE_BUILD_WITH_INSTALL_RPATH FALSE)
 
-SET(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/wpilib/lib")
+SET(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib")
 
 # add the automatically determined parts of the RPATH
 # which point to directories outside the build tree to the install RPATH
 SET(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 
 # the RPATH to be used when installing, but only if it's not a system directory
-LIST(FIND CMAKE_PLATFORM_IMPLICIT_LINK_DIRECTORIES "${CMAKE_INSTALL_PREFIX}/wpilib/lib" isSystemDir)
+LIST(FIND CMAKE_PLATFORM_IMPLICIT_LINK_DIRECTORIES "${CMAKE_INSTALL_PREFIX}/lib" isSystemDir)
 IF("${isSystemDir}" STREQUAL "-1")
-   SET(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/wpilib/lib")
+   SET(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib")
 ENDIF("${isSystemDir}" STREQUAL "-1")
 
 # Options for building certain parts of the repo. Everything is built by default.
 option(BUILD_SHARED_LIBS "Build with shared libs (needed for JNI)" ON)
 option(WITH_JAVA "Include java and JNI in the build" ON)
 option(WITH_CSCORE "Build cscore (needs OpenCV)" ON)
+option(WITH_NTCORE "Build ntcore" ON)
 option(WITH_WPIMATH "Build wpimath" ON)
 option(WITH_WPILIB "Build hal, wpilibc/j, and myRobot (needs OpenCV)" ON)
 option(WITH_EXAMPLES "Build examples" OFF)
@@ -63,10 +64,10 @@ option(WITH_SIMULATION_MODULES "Build simulation modules" ON)
 option(WITH_EXTERNAL_HAL "Use a separately built HAL" OFF)
 set(EXTERNAL_HAL_FILE "" CACHE FILEPATH "Location to look for an external HAL CMake File")
 
-# Options for using a package manager (vcpkg) for certain dependencies.
-option(USE_VCPKG_FMTLIB "Use vcpkg fmtlib" OFF)
-option(USE_VCPKG_LIBUV "Use vcpkg libuv" OFF)
-option(USE_VCPKG_EIGEN "Use vcpkg eigen" OFF)
+# Options for using a package manager (e.g., vcpkg) for certain dependencies.
+option(USE_SYSTEM_FMTLIB "Use system fmtlib" OFF)
+option(USE_SYSTEM_LIBUV "Use system libuv" OFF)
+option(USE_SYSTEM_EIGEN "Use system eigen" OFF)
 
 # Options for installation.
 option(WITH_FLAT_INSTALL "Use a flat install directory" OFF)
@@ -117,6 +118,34 @@ FATAL: Cannot build simulation modules with wpilib disabled.
 ")
 endif()
 
+if (NOT WITH_NTCORE AND WITH_CSCORE)
+    message(FATAL_ERROR "
+FATAL: Cannot build cameraserver without ntcore.
+       Enable ntcore by setting WITH_NTCORE=ON
+")
+endif()
+
+if (NOT WITH_NTCORE AND WITH_GUI)
+    message(FATAL_ERROR "
+FATAL: Cannot build GUI modules without ntcore.
+       Enable ntcore by setting WITH_NTCORE=ON
+")
+endif()
+
+if (NOT WITH_NTCORE AND WITH_SIMULATION_MODULES)
+    message(FATAL_ERROR "
+FATAL: Cannot build simulation modules without ntcore.
+       Enable ntcore by setting WITH_NTCORE=ON
+")
+endif()
+
+if (NOT WITH_NTCORE AND WITH_WPILIB)
+    message(FATAL_ERROR "
+FATAL: Cannot build wpilib without ntcore.
+       Enable ntcore by setting WITH_NTCORE=ON
+")
+endif()
+
 if (NOT WITH_WPIMATH AND WITH_WPILIB)
     message(FATAL_ERROR "
 FATAL: Cannot build wpilib without wpimath.
@@ -124,11 +153,11 @@ FATAL: Cannot build wpilib without wpimath.
 ")
 endif()
 
-set( wpilib_dest wpilib)
-set( include_dest wpilib/include )
-set( main_lib_dest wpilib/lib )
-set( java_lib_dest wpilib/java )
-set( jni_lib_dest wpilib/jni )
+set( wpilib_dest "")
+set( include_dest include )
+set( main_lib_dest lib )
+set( java_lib_dest java )
+set( jni_lib_dest jni )
 
 if (WITH_FLAT_INSTALL)
     set (wpilib_config_dir ${wpilib_dest})
@@ -136,12 +165,15 @@ else()
     set (wpilib_config_dir share/wpilib)
 endif()
 
-if (USE_VCPKG_LIBUV)
-set (LIBUV_VCPKG_REPLACE "find_package(unofficial-libuv CONFIG)")
+if (USE_SYSTEM_LIBUV)
+set (LIBUV_SYSTEM_REPLACE "
+find_package(PkgConfig REQUIRED)
+pkg_check_modules(libuv REQUIRED IMPORTED_TARGET libuv)
+")
 endif()
 
-if (USE_VCPKG_EIGEN)
-set (EIGEN_VCPKG_REPLACE "find_package(Eigen3 CONFIG)")
+if (USE_SYSTEM_EIGEN)
+set (EIGEN_SYSTEM_REPLACE "find_package(Eigen3 CONFIG)")
 endif()
 
 find_package(LIBSSH 0.7.1)
@@ -247,8 +279,11 @@ if (WITH_TESTS)
 endif()
 
 add_subdirectory(wpiutil)
-add_subdirectory(wpinet)
-add_subdirectory(ntcore)
+
+if (WITH_NTCORE)
+    add_subdirectory(wpinet)
+    add_subdirectory(ntcore)
+endif()
 
 if (WITH_WPIMATH)
     add_subdirectory(wpimath)

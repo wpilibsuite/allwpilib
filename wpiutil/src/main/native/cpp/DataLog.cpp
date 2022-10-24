@@ -276,7 +276,7 @@ void DataLog::WriterThreadMain(std::string_view dir) {
   }
 
   if (f == fs::kInvalidFile) {
-    WPI_ERROR(m_msglog, "{}", "Could not open log file, no log being saved");
+    WPI_ERROR(m_msglog, "Could not open log file, no log being saved");
   } else {
     WPI_INFO(m_msglog, "Logging to '{}'", (dirPath / filename).string());
   }

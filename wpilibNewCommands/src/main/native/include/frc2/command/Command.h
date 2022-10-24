@@ -200,18 +200,20 @@ class Command {
    * conditions.  The decorated command can still be interrupted or canceled.
    *
    * @return the decorated command
-   * @deprecated replace with EndlessCommand
+   * @deprecated PerpetualCommand violates the assumption that execute() doesn't
+get called after isFinished() returns true -- an assumption that should be
+valid. This was unsafe/undefined behavior from the start, and RepeatCommand
+provides an easy way to achieve similar end results with slightly different (and
+safe) semantics.
    */
-  WPI_DEPRECATED("Replace with Endlessly()")
+  WPI_DEPRECATED(
+      "PerpetualCommand violates the assumption that execute() doesn't get "
+      "called after isFinished() returns true -- an assumption that should be "
+      "valid."
+      "This was unsafe/undefined behavior from the start, and RepeatCommand "
+      "provides an easy way to achieve similar end results with slightly "
+      "different (and safe) semantics.")
   PerpetualCommand Perpetually() &&;
-
-  /**
-   * Decorates this command to run endlessly, ignoring its ordinary end
-   * conditions. The decorated command can still be interrupted or canceled.
-   *
-   * @return the decorated command
-   */
-  [[nodiscard]] CommandPtr Endlessly() &&;
 
   /**
    * Decorates this command to run repeatedly, restarting it when it ends, until

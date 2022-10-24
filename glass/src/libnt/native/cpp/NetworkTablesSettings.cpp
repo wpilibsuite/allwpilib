@@ -61,11 +61,10 @@ void NetworkTablesSettings::Thread::Main() {
     if (m_mode == 1 || m_mode == 2) {
       std::string_view serverTeam{m_serverTeam};
       std::optional<unsigned int> team;
-      nt::SetNetworkIdentity(m_inst, m_clientName);
       if (m_mode == 1) {
-        nt::StartClient4(m_inst);
+        nt::StartClient4(m_inst, m_clientName);
       } else if (m_mode == 2) {
-        nt::StartClient3(m_inst);
+        nt::StartClient3(m_inst, m_clientName);
       }
       if (!wpi::contains(serverTeam, '.') &&
           (team = wpi::parse_integer<unsigned int>(serverTeam, 10))) {

@@ -234,8 +234,6 @@ public final class NetworkTablesJNI {
 
   public static native void removeConnectionListener(int connListener);
 
-  public static native void setNetworkIdentity(int inst, String name);
-
   public static native int getNetworkMode(int inst);
 
   public static native void startLocal(int inst);
@@ -247,9 +245,9 @@ public final class NetworkTablesJNI {
 
   public static native void stopServer(int inst);
 
-  public static native void startClient3(int inst);
+  public static native void startClient3(int inst, String identity);
 
-  public static native void startClient4(int inst);
+  public static native void startClient4(int inst, String identity);
 
   public static native void stopClient(int inst);
 

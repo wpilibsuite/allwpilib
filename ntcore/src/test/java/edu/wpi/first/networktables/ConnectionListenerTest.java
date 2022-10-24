@@ -27,10 +27,7 @@ class ConnectionListenerTest {
   @BeforeEach
   void setUp() {
     m_serverInst = NetworkTableInstance.create();
-    m_serverInst.setNetworkIdentity("server");
-
     m_clientInst = NetworkTableInstance.create();
-    m_clientInst.setNetworkIdentity("client");
   }
 
   @AfterEach
@@ -42,7 +39,7 @@ class ConnectionListenerTest {
   /** Connect to the server. */
   private void connect(int port) {
     m_serverInst.startServer("connectionlistenertest.json", "127.0.0.1", 0, port);
-    m_clientInst.startClient4();
+    m_clientInst.startClient4("client");
     m_clientInst.setServer("127.0.0.1", port);
 
     // wait for client to report it's connected, then wait another 0.1 sec
@@ -125,7 +122,7 @@ class ConnectionListenerTest {
             false);
 
     // trigger a connect event
-    m_clientInst.startClient4();
+    m_clientInst.startClient4("client");
     m_clientInst.setServer(address, threadedPort);
     threadedPort++;
 

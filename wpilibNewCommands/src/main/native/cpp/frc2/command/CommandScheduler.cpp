@@ -119,7 +119,7 @@ void CommandScheduler::Schedule(Command* command) {
   }
 
   if (command->IsGrouped()) {
-    throw FRC_MakeError(frc::err::CommandIllegalUse, "{}",
+    throw FRC_MakeError(frc::err::CommandIllegalUse,
                         "A command that is part of a command group "
                         "cannot be independently scheduled");
     return;
@@ -294,6 +294,20 @@ void CommandScheduler::UnregisterSubsystem(
   for (auto* subsystem : subsystems) {
     UnregisterSubsystem(subsystem);
   }
+}
+
+void CommandScheduler::SetDefaultCommand(Subsystem* subsystem,
+                                         CommandPtr&& defaultCommand) {
+  if (!defaultCommand.get()->HasRequirement(subsystem)) {
+    throw FRC_MakeError(frc::err::CommandIllegalUse, "{}",
+                        "Default commands must require their subsystem!");
+  }
+  if (defaultCommand.get()->IsFinished()) {
+    throw FRC_MakeError(frc::err::CommandIllegalUse, "{}",
+                        "Default commands should not end!");
+  }
+
+  SetDefaultCommandImpl(subsystem, std::move(defaultCommand).Unwrap());
 }
 
 Command* CommandScheduler::GetDefaultCommand(const Subsystem* subsystem) const {

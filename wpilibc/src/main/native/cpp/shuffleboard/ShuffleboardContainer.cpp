@@ -70,7 +70,7 @@ ComplexWidget& ShuffleboardContainer::Add(std::string_view title,
 ComplexWidget& ShuffleboardContainer::Add(wpi::Sendable& sendable) {
   auto name = wpi::SendableRegistry::GetName(&sendable);
   if (name.empty()) {
-    FRC_ReportError(err::Error, "{}", "Sendable must have a name");
+    FRC_ReportError(err::Error, "Sendable must have a name");
   }
   return Add(name, sendable);
 }

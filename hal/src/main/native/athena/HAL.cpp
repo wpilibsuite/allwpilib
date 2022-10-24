@@ -41,6 +41,7 @@ static uint64_t dsStartTime;
 using namespace hal;
 
 namespace hal {
+void InitializeDriverStation();
 namespace init {
 void InitializeHAL() {
   InitializeCTREPCM();
@@ -433,7 +434,7 @@ HAL_Bool HAL_Initialize(int32_t timeout, int32_t mode) {
 
   InterruptManager::Initialize(global->getSystemInterface());
 
-  HAL_InitializeDriverStation();
+  hal::InitializeDriverStation();
 
   dsStartTime = HAL_GetFPGATime(&status);
   if (status != 0) {

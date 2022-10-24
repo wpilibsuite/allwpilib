@@ -49,6 +49,16 @@ public class Pose3d implements Interpolatable<Pose3d> {
   }
 
   /**
+   * Constructs a 3D pose from a 2D pose in the X-Y plane.
+   *
+   * @param pose The 2D pose.
+   */
+  public Pose3d(Pose2d pose) {
+    m_translation = new Translation3d(pose.getX(), pose.getY(), 0.0);
+    m_rotation = new Rotation3d(0.0, 0.0, pose.getRotation().getRadians());
+  }
+
+  /**
    * Transforms the pose by the given transformation and returns the new transformed pose.
    *
    * @param other The transform to transform the pose by.

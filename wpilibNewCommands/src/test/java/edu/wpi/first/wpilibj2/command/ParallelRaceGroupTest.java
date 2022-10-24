@@ -137,8 +137,8 @@ class ParallelRaceGroupTest extends CommandTestBase {
     Command command1 = command1Holder.getMock();
     MockCommandHolder command2Holder = new MockCommandHolder(true, system2);
     Command command2 = command2Holder.getMock();
-    MockCommandHolder endlessCommandHolder = new MockCommandHolder(true);
-    Command command3 = new EndlessCommand(endlessCommandHolder.getMock());
+    MockCommandHolder command3Holder = new MockCommandHolder(true);
+    Command command3 = command3Holder.getMock();
 
     Command group1 = new SequentialCommandGroup(command1, command2);
     assertNotNull(group1);
@@ -153,6 +153,7 @@ class ParallelRaceGroupTest extends CommandTestBase {
       command2Holder.setFinished(true);
       // at this point the sequential group should be done
       assertDoesNotThrow(() -> scheduler.run());
+      assertFalse(scheduler.isScheduled(group2));
     }
   }
 
