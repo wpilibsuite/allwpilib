@@ -32,6 +32,7 @@ class Drivetrain {
   }
 
   frc::MecanumDriveWheelSpeeds GetCurrentState() const;
+  frc::MecanumDriveWheelPositions GetCurrentDistances() const;
   void SetSpeeds(const frc::MecanumDriveWheelSpeeds& wheelSpeeds);
   void Drive(units::meters_per_second_t xSpeed,
              units::meters_per_second_t ySpeed, units::radians_per_second_t rot,
@@ -75,7 +76,12 @@ class Drivetrain {
 
   // Gains are for example purposes only - must be determined for your own
   // robot!
-  frc::MecanumDrivePoseEstimator m_poseEstimator{0_deg,        frc::Pose2d{},
-                                                 m_kinematics, {0.1, 0.1, 0.1},
-                                                 {0.05},       {0.1, 0.1, 0.1}};
+  frc::MecanumDrivePoseEstimator m_poseEstimator{
+      0_deg,
+      frc::Pose2d{},
+      GetCurrentDistances(),
+      m_kinematics,
+      {0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1},
+      {0.05, 0.05, 0.05, 0.05, 0.05},
+      {0.1, 0.1, 0.1}};
 };
