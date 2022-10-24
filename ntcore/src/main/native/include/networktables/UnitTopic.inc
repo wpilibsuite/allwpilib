@@ -4,6 +4,8 @@
 
 #pragma once
 
+#include <vector>
+
 #include <wpi/json.h>
 
 #include "networktables/UnitTopic.h"
@@ -49,7 +51,7 @@ inline std::vector<TimestampedUnit<T>> UnitSubscriber<T>::ReadQueue() {
 
 template <typename T>
 inline UnitTopic<T> UnitSubscriber<T>::GetTopic() const {
-  return UnitTopic{::nt::GetTopicFromHandle(m_subHandle)};
+  return UnitTopic<T>{::nt::GetTopicFromHandle(m_subHandle)};
 }
 
 template <typename T>
@@ -101,7 +103,7 @@ template <typename T>
 inline UnitSubscriber<T> UnitTopic<T>::SubscribeEx(
     std::string_view typeString, T defaultValue,
     std::span<const PubSubOption> options) {
-  return UnitSubscriber{
+  return UnitSubscriber<T>{
       ::nt::Subscribe(m_handle, NT_DOUBLE, typeString, options), defaultValue};
 }
 
