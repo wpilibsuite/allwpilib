@@ -124,6 +124,12 @@ doxygen {
         exclude 'units/**'
     }
 
+    aliases 'effects=\\par <i>Effects:</i>^^',
+            'notes=\\par <i>Notes:</i>^^',
+            'requires=\\par <i>Requires:</i>^^',
+            'requiredbe=\\par <i>Required Behavior:</i>^^',
+            'concept{2}=<a href=\"md_doc_concepts.html#\1\">\2</a>',
+            'defaultbe=\\par <i>Default Behavior:</i>^^'
     case_sense_names false
     extension_mapping 'inc=C++', 'no_extension=C++'
     extract_all true
