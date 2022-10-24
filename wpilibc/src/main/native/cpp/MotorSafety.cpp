@@ -49,8 +49,6 @@ void Thread::Main() {
 
   HAL_RemoveNewDataEventHandle(event.GetHandle());
 }
-
-static wpi::SafeThreadOwner<Thread> m_owner;
 }  // namespace
 
 static std::atomic_bool gShutdown{false};
@@ -59,6 +57,7 @@ namespace {
 struct MotorSafetyManager {
   ~MotorSafetyManager() { gShutdown = true; }
 
+  wpi::SafeThreadOwner<Thread> thread;
   wpi::SmallPtrSet<MotorSafety*, 32> instanceList;
   wpi::mutex listMutex;
   bool threadStarted = false;
@@ -76,6 +75,10 @@ void ResetMotorSafety() {
   auto& manager = GetManager();
   std::scoped_lock lock(manager.listMutex);
   manager.instanceList.clear();
+  manager.thread.Stop();
+  manager.thread.Join();
+  manager.thread = wpi::SafeThreadOwner<Thread>{};
+  manager.threadStarted = false;
 }
 }  // namespace frc::impl
 #endif
@@ -86,7 +89,7 @@ MotorSafety::MotorSafety() {
   manager.instanceList.insert(this);
   if (!manager.threadStarted) {
     manager.threadStarted = true;
-    m_owner.Start();
+    manager.thread.Start();
   }
 }
 

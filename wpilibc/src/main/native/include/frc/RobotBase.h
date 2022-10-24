@@ -21,6 +21,9 @@ namespace frc {
 int RunHALInitialization();
 
 namespace impl {
+#ifndef __FRC_ROBORIO__
+void ResetMotorSafety();
+#endif
 
 template <class Robot>
 void RunRobot(wpi::mutex& m, Robot** robot) {
@@ -103,6 +106,9 @@ int StartRobot() {
     impl::RunRobot<Robot>(m, &robot);
   }
 
+#ifndef __FRC_ROBORIO__
+  frc::impl::ResetMotorSafety();
+#endif
   HAL_Shutdown();
 
   return 0;
