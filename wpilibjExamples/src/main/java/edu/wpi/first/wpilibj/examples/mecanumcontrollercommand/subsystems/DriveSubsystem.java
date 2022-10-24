@@ -7,6 +7,7 @@ package edu.wpi.first.wpilibj.examples.mecanumcontrollercommand.subsystems;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.kinematics.MecanumDriveMotorVoltages;
 import edu.wpi.first.math.kinematics.MecanumDriveOdometry;
+import edu.wpi.first.math.kinematics.MecanumDriveWheelPositions;
 import edu.wpi.first.math.kinematics.MecanumDriveWheelSpeeds;
 import edu.wpi.first.wpilibj.ADXRS450_Gyro;
 import edu.wpi.first.wpilibj.Encoder;
@@ -58,7 +59,10 @@ public class DriveSubsystem extends SubsystemBase {
 
   // Odometry class for tracking robot pose
   MecanumDriveOdometry m_odometry =
-      new MecanumDriveOdometry(DriveConstants.kDriveKinematics, m_gyro.getRotation2d());
+      new MecanumDriveOdometry(
+          DriveConstants.kDriveKinematics,
+          m_gyro.getRotation2d(),
+          new MecanumDriveWheelPositions());
 
   /** Creates a new DriveSubsystem. */
   public DriveSubsystem() {
@@ -77,13 +81,7 @@ public class DriveSubsystem extends SubsystemBase {
   @Override
   public void periodic() {
     // Update the odometry in the periodic block
-    m_odometry.update(
-        m_gyro.getRotation2d(),
-        new MecanumDriveWheelSpeeds(
-            m_frontLeftEncoder.getRate(),
-            m_rearLeftEncoder.getRate(),
-            m_frontRightEncoder.getRate(),
-            m_rearRightEncoder.getRate()));
+    m_odometry.update(m_gyro.getRotation2d(), getCurrentWheelDistances());
   }
 
   /**
@@ -101,7 +99,7 @@ public class DriveSubsystem extends SubsystemBase {
    * @param pose The pose to which to set the odometry.
    */
   public void resetOdometry(Pose2d pose) {
-    m_odometry.resetPosition(pose, m_gyro.getRotation2d());
+    m_odometry.resetPosition(pose, m_gyro.getRotation2d(), getCurrentWheelDistances());
   }
 
   /**
@@ -184,6 +182,19 @@ public class DriveSubsystem extends SubsystemBase {
         m_rearLeftEncoder.getRate(),
         m_frontRightEncoder.getRate(),
         m_rearRightEncoder.getRate());
+  }
+
+  /**
+   * Gets the current wheel distance measurements.
+   *
+   * @return the current wheel distance measurements in a MecanumDriveWheelPositions object.
+   */
+  public MecanumDriveWheelPositions getCurrentWheelDistances() {
+    return new MecanumDriveWheelPositions(
+        m_frontLeftEncoder.getDistance(),
+        m_rearLeftEncoder.getDistance(),
+        m_frontRightEncoder.getDistance(),
+        m_rearRightEncoder.getDistance());
   }
 
   /**
