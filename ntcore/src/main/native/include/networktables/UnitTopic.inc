@@ -8,8 +8,8 @@
 
 #include <wpi/json.h>
 
-#include "networktables/UnitTopic.h"
 #include "networktables/NetworkTableType.h"
+#include "networktables/UnitTopic.h"
 #include "ntcore_cpp.h"
 
 namespace nt {
