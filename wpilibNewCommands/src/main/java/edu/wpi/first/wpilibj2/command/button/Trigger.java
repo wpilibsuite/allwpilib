@@ -184,8 +184,7 @@ public class Trigger implements BooleanSupplier {
    * @param toRun the runnable to run
    * @param requirements the required subsystems
    * @return this trigger, so calls can be chained
-   * @deprecated Replace with {@link #onTrue(Command)} ) } and constructing the InstantCommand
-   *     manually
+   * @deprecated Replace with {@link #onTrue(Command)}, creating the InstantCommand manually
    */
   @Deprecated
   public Trigger whenActive(final Runnable toRun, Subsystem... requirements) {

@@ -60,7 +60,7 @@ public class Button extends Trigger {
    * @param toRun the runnable to run
    * @param requirements the required subsystems
    * @return this button, so calls can be chained
-   * @deprecated Replace with {@link Trigger#onTrue(Command)}, creating the InstantCommand manually
+   * @deprecated Replace with {@link #onTrue(Command)}, creating the InstantCommand manually
    */
   @Deprecated
   public Button whenPressed(final Runnable toRun, Subsystem... requirements) {
@@ -76,7 +76,8 @@ public class Button extends Trigger {
    *
    * @param command the command to start
    * @return this button, so calls can be chained
-   * @deprecated Replace with {@link Trigger#whileTrue(Command)}
+   * @deprecated Use {@link #whileTrue(Command)} with {@link
+   *     edu.wpi.first.wpilibj2.command.RepeatCommand RepeatCommand}.
    */
   @Deprecated
   public Button whileHeld(final Command command) {
@@ -90,7 +91,7 @@ public class Button extends Trigger {
    * @param toRun the runnable to run
    * @param requirements the required subsystems
    * @return this button, so calls can be chained
-   * @deprecated Replace with {@link Trigger#whileTrue(Command)}
+   * @deprecated Use {@link #whileTrue(Command)} and construct a RunCommand manually
    */
   @Deprecated
   public Button whileHeld(final Runnable toRun, Subsystem... requirements) {
