@@ -287,7 +287,7 @@ ServerConnection3::ServerConnection3(std::shared_ptr<uv::Stream> stream,
         m_info.remote_id = name;
         m_info.protocol_version = proto;
         m_server.AddConnection(this, m_info);
-        INFO("CONNECTED NT4 client '{}' (from {})", name, m_connInfo);
+        INFO("CONNECTED NT3 client '{}' (from {})", name, m_connInfo);
       },
       [this](uint32_t repeatMs) { UpdatePeriodicTimer(repeatMs); });
 
