@@ -57,7 +57,8 @@ class ValueListener final {
   ValueListener() = default;
 
   /**
-   * Create a listener for value changes on a subscriber.
+   * Create a listener for value changes on a subscriber. This does NOT keep the
+   * subscriber active.
    *
    * @param subscriber Subscriber
    * @param mask Bitmask of ValueListenerFlags values
@@ -67,7 +68,8 @@ class ValueListener final {
                 std::function<void(const ValueNotification&)> listener);
 
   /**
-   * Create a listener for value changes on a subscriber.
+   * Create a listener for value changes on a subscriber. This does NOT keep the
+   * subscriber active.
    *
    * @param subscriber Subscriber
    * @param mask Bitmask of ValueListenerFlags values

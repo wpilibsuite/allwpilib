@@ -418,7 +418,7 @@ class NetworkTableInstance final {
    * Add a topic listener for topic changes on a subscriber. The callback
    * function is called asynchronously on a separate thread, so it's important
    * to use synchronization or atomics when accessing any shared state from the
-   * callback function.
+   * callback function. This does NOT keep the subscriber active.
    *
    * @param subscriber Subscriber
    * @param eventMask Bitmask of TopicListenerFlags values
@@ -433,7 +433,7 @@ class NetworkTableInstance final {
    * Add a topic listener for topic changes on a subscriber. The callback
    * function is called asynchronously on a separate thread, so it's important
    * to use synchronization or atomics when accessing any shared state from the
-   * callback function.
+   * callback function. This does NOT keep the subscriber active.
    *
    * @param subscriber Subscriber
    * @param eventMask Bitmask of TopicListenerFlags values
@@ -504,7 +504,7 @@ class NetworkTableInstance final {
    * Add a value listener for value changes on a subscriber. The callback
    * function is called asynchronously on a separate thread, so it's important
    * to use synchronization or atomics when accessing any shared state from the
-   * callback function.
+   * callback function. This does NOT keep the subscriber active.
    *
    * @param subscriber Subscriber
    * @param eventMask Bitmask of ValueListenerFlags values
@@ -519,7 +519,7 @@ class NetworkTableInstance final {
    * Add a value listener for value changes on a subscriber. The callback
    * function is called asynchronously on a separate thread, so it's important
    * to use synchronization or atomics when accessing any shared state from the
-   * callback function.
+   * callback function. This does NOT keep the subscriber active.
    *
    * @param subscriber Subscriber
    * @param eventMask Bitmask of ValueListenerFlags values

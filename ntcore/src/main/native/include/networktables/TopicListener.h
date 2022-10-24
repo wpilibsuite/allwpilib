@@ -212,7 +212,8 @@ class TopicListenerPoller final {
   NT_TopicListener Add(Topic topic, unsigned int mask);
 
   /**
-   * Start listening to topic changes on a subscriber.
+   * Start listening to topic changes on a subscriber. This does NOT keep the
+   * subscriber active.
    *
    * @param subscriber Subscriber
    * @param mask Bitmask of TopicListenerFlags values
@@ -221,7 +222,8 @@ class TopicListenerPoller final {
   NT_TopicListener Add(Subscriber& subscriber, unsigned int mask);
 
   /**
-   * Start listening to topic changes on a subscriber.
+   * Start listening to topic changes on a subscriber. This does NOT keep the
+   * subscriber active.
    *
    * @param subscriber Subscriber
    * @param mask Bitmask of TopicListenerFlags values

@@ -14,6 +14,7 @@ import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.StringPublisher;
 import edu.wpi.first.networktables.Topic;
+import edu.wpi.first.networktables.TopicListener;
 import edu.wpi.first.networktables.TopicListenerFlags;
 import java.util.Collection;
 
@@ -38,7 +39,7 @@ public final class Preferences {
 
   private static StringPublisher m_typePublisher;
   private static MultiSubscriber m_tableSubscriber;
-  private static int m_listener;
+  private static TopicListener m_listener;
 
   /** Creates a preference class. */
   private Preferences() {}
@@ -70,21 +71,19 @@ public final class Preferences {
 
     // Listener to set all Preferences values to persistent
     // (for backwards compatibility with old dashboards).
-    if (m_listener != 0) {
-      m_table.getInstance().removeTopicListener(m_listener);
+    if (m_listener != null) {
+      m_listener.close();
     }
     m_listener =
-        m_table
-            .getInstance()
-            .addTopicListener(
-                m_tableSubscriber,
-                TopicListenerFlags.kImmediate | TopicListenerFlags.kPublish,
-                event -> {
-                  Topic topic = event.info.getTopic();
-                  if (!topic.equals(m_typePublisher.getTopic())) {
-                    event.info.getTopic().setPersistent(true);
-                  }
-                });
+        new TopicListener(
+            m_tableSubscriber,
+            TopicListenerFlags.kImmediate | TopicListenerFlags.kPublish,
+            event -> {
+              Topic topic = event.info.getTopic();
+              if (!topic.equals(m_typePublisher.getTopic())) {
+                event.info.getTopic().setPersistent(true);
+              }
+            });
   }
 
   /**
