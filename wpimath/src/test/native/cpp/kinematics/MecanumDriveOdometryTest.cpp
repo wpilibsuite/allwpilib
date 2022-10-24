@@ -135,7 +135,7 @@ TEST_F(MecanumDriveOdometryTest, AccuracyFacingTrajectory) {
     t += dt;
   }
 
-  EXPECT_LT(errorSum / (trajectory.TotalTime().value() / dt.value()), 0.05);
+  EXPECT_LT(errorSum / (trajectory.TotalTime().value() / dt.value()), 0.06);
   EXPECT_LT(maxError, 0.125);
 }
 
@@ -197,6 +197,6 @@ TEST_F(MecanumDriveOdometryTest, AccuracyFacingXAxis) {
     t += dt;
   }
 
-  EXPECT_LT(errorSum / (trajectory.TotalTime().value() / dt.value()), 0.05);
+  EXPECT_LT(errorSum / (trajectory.TotalTime().value() / dt.value()), 0.06);
   EXPECT_LT(maxError, 0.125);
 }
