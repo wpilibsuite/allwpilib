@@ -6,9 +6,18 @@
 
 #include "gtest/gtest.h"
 
+#ifndef __FRC_ROBORIO__
+namespace frc::impl {
+void ResetMotorSafety();
+}
+#endif
+
 int main(int argc, char** argv) {
   HAL_Initialize(500, 0);
   ::testing::InitGoogleTest(&argc, argv);
   int ret = RUN_ALL_TESTS();
+#ifndef __FRC_ROBORIO__
+  frc::impl::ResetMotorSafety();
+#endif
   return ret;
 }
