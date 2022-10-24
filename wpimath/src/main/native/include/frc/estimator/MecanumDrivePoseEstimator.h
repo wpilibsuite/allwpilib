@@ -56,6 +56,7 @@ class WPILIB_DLLEXPORT MecanumDrivePoseEstimator {
    *
    * @param gyroAngle                The current gyro angle.
    * @param initialPose              The starting pose estimate.
+   * @param wheelPositions           The distance measured by each wheel.
    * @param kinematics               A correctly-configured kinematics object
    *                                 for your drivetrain.
    * @param stateStdDevs             Standard deviations of model states.
