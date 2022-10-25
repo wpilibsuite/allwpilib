@@ -65,6 +65,8 @@ class ListenerThread final : public wpi::SafeThreadEvent {
   wpi::DenseMap<NT_ConnectionListener,
                 std::function<void(const ConnectionNotification& event)>>
       m_callbacks;
+  wpi::Event m_waitQueueWakeup;
+  wpi::Event m_waitQueueWaiter;
 };
 
 class CLImpl {
@@ -97,9 +99,10 @@ class CLImpl {
 
 void ListenerThread::Main() {
   while (m_active) {
-    WPI_Handle signaledBuf[2];
-    auto signaled =
-        wpi::WaitForObjects({m_poller, m_stopEvent.GetHandle()}, signaledBuf);
+    WPI_Handle signaledBuf[3];
+    auto signaled = wpi::WaitForObjects(
+        {m_poller, m_stopEvent.GetHandle(), m_waitQueueWakeup.GetHandle()},
+        signaledBuf);
     if (signaled.empty() || !m_active) {
       return;
     }
@@ -117,6 +120,10 @@ void ListenerThread::Main() {
         callback(event);
         lock.lock();
       }
+    }
+    if (std::find(signaled.begin(), signaled.end(),
+                  m_waitQueueWakeup.GetHandle()) != signaled.end()) {
+      m_waitQueueWaiter.Set();
     }
   }
 }
@@ -279,10 +286,23 @@ bool ConnectionList::IsConnected() const {
 }
 
 NT_ConnectionListener ConnectionList::AddListener(
-    std::function<void(const ConnectionNotification& event)> callback,
-    bool immediateNotify) {
+    bool immediateNotify,
+    std::function<void(const ConnectionNotification& event)> callback) {
   std::scoped_lock lock{m_mutex};
   return m_impl->AddListener(std::move(callback), immediateNotify);
+}
+
+bool ConnectionList::WaitForListenerQueue(double timeout) {
+  std::scoped_lock lock{m_mutex};
+  WPI_EventHandle h;
+  if (auto thr = m_impl->m_listenerThread.GetThread()) {
+    h = thr->m_waitQueueWaiter.GetHandle();
+    thr->m_waitQueueWakeup.Set();
+  } else {
+    return false;
+  }
+  bool timedOut;
+  return wpi::WaitForObject(h, timeout, &timedOut);
 }
 
 NT_ConnectionListenerPoller ConnectionList::CreateListenerPoller() {

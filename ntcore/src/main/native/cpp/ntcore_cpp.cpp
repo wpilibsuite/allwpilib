@@ -407,6 +407,14 @@ NT_TopicListener AddTopicListener(
   }
 }
 
+bool WaitForTopicListenerQueue(NT_Handle handle, double timeout) {
+  if (auto ii = InstanceImpl::GetHandle(handle)) {
+    return ii->localStorage.WaitForTopicListenerQueue(timeout);
+  } else {
+    return {};
+  }
+}
+
 NT_TopicListenerPoller CreateTopicListenerPoller(NT_Inst inst) {
   if (auto ii = InstanceImpl::GetTyped(inst, Handle::kInstance)) {
     return ii->localStorage.CreateTopicListenerPoller();
@@ -466,6 +474,14 @@ NT_ValueListener AddValueListener(
   }
 }
 
+bool WaitForValueListenerQueue(NT_Handle handle, double timeout) {
+  if (auto ii = InstanceImpl::GetHandle(handle)) {
+    return ii->localStorage.WaitForValueListenerQueue(timeout);
+  } else {
+    return {};
+  }
+}
+
 NT_ValueListenerPoller CreateValueListenerPoller(NT_Inst inst) {
   if (auto ii = InstanceImpl::GetTyped(inst, Handle::kInstance)) {
     return ii->localStorage.CreateValueListenerPoller();
@@ -505,12 +521,19 @@ void RemoveValueListener(NT_ValueListener listener) {
 }
 
 NT_ConnectionListener AddConnectionListener(
-    NT_Inst inst,
-    std::function<void(const ConnectionNotification& event)> callback,
-    bool immediate_notify) {
+    NT_Inst inst, bool immediate_notify,
+    std::function<void(const ConnectionNotification& event)> callback) {
   if (auto ii = InstanceImpl::GetTyped(inst, Handle::kInstance)) {
-    return ii->connectionList.AddListener(std::move(callback),
-                                          immediate_notify);
+    return ii->connectionList.AddListener(immediate_notify,
+                                          std::move(callback));
+  } else {
+    return {};
+  }
+}
+
+bool WaitForConnectionListenerQueue(NT_Handle handle, double timeout) {
+  if (auto ii = InstanceImpl::GetHandle(handle)) {
+    return ii->connectionList.WaitForListenerQueue(timeout);
   } else {
     return {};
   }

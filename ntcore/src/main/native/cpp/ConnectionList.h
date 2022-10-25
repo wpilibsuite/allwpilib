@@ -31,8 +31,9 @@ class ConnectionList final : public IConnectionList {
   bool IsConnected() const final;
 
   NT_ConnectionListener AddListener(
-      std::function<void(const ConnectionNotification& event)> callback,
-      bool immediateNotify);
+      bool immediateNotify,
+      std::function<void(const ConnectionNotification& event)> callback);
+  bool WaitForListenerQueue(double timeout);
 
   NT_ConnectionListenerPoller CreateListenerPoller();
   void DestroyListenerPoller(NT_ConnectionListenerPoller pollerHandle);

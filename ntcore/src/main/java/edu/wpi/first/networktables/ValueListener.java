@@ -4,11 +4,6 @@
 
 package edu.wpi.first.networktables;
 
-import edu.wpi.first.util.WPIUtilJNI;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.concurrent.locks.Condition;
-import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Consumer;
 
 /**
@@ -19,30 +14,19 @@ import java.util.function.Consumer;
  */
 public final class ValueListener implements AutoCloseable {
   /**
-   * Create a listener for value changes on a subscriber.
+   * Create a listener for value changes on a subscriber. This does NOT keep the subscriber active.
    *
    * @param subscriber Subscriber
    * @param eventMask Bitmask of ValueListenerFlags values
    * @param listener Listener function
    */
   public ValueListener(Subscriber subscriber, int eventMask, Consumer<ValueNotification> listener) {
-    s_lock.lock();
-    try {
-      if (s_poller == 0) {
-        s_inst = subscriber.getTopic().getInstance();
-        s_poller = NetworkTablesJNI.createValueListenerPoller(s_inst.getHandle());
-        startThread();
-      }
-      m_handle =
-          NetworkTablesJNI.addPolledValueListener(s_poller, subscriber.getHandle(), eventMask);
-      s_listeners.put(m_handle, listener);
-    } finally {
-      s_lock.unlock();
-    }
+    m_inst = subscriber.getTopic().getInstance();
+    m_handle = m_inst.addValueListener(subscriber, eventMask, listener);
   }
 
   /**
-   * Create a listener for value changes on a subscriber.
+   * Create a listener for value changes on a subscriber. This does NOT keep the subscriber active.
    *
    * @param subscriber Subscriber
    * @param eventMask Bitmask of ValueListenerFlags values
@@ -50,19 +34,8 @@ public final class ValueListener implements AutoCloseable {
    */
   public ValueListener(
       MultiSubscriber subscriber, int eventMask, Consumer<ValueNotification> listener) {
-    s_lock.lock();
-    try {
-      if (s_poller == 0) {
-        s_inst = subscriber.getInstance();
-        s_poller = NetworkTablesJNI.createValueListenerPoller(s_inst.getHandle());
-        startThread();
-      }
-      m_handle =
-          NetworkTablesJNI.addPolledValueListener(s_poller, subscriber.getHandle(), eventMask);
-      s_listeners.put(m_handle, listener);
-    } finally {
-      s_lock.unlock();
-    }
+    m_inst = subscriber.getInstance();
+    m_handle = m_inst.addValueListener(subscriber, eventMask, listener);
   }
 
   /**
@@ -74,30 +47,14 @@ public final class ValueListener implements AutoCloseable {
    */
   public ValueListener(
       NetworkTableEntry entry, int eventMask, Consumer<ValueNotification> listener) {
-    s_lock.lock();
-    try {
-      if (s_poller == 0) {
-        s_inst = entry.getInstance();
-        s_poller = NetworkTablesJNI.createValueListenerPoller(s_inst.getHandle());
-        startThread();
-      }
-      m_handle = NetworkTablesJNI.addPolledValueListener(s_poller, entry.getHandle(), eventMask);
-      s_listeners.put(m_handle, listener);
-    } finally {
-      s_lock.unlock();
-    }
+    m_inst = entry.getInstance();
+    m_handle = m_inst.addValueListener(entry, eventMask, listener);
   }
 
   @Override
   public synchronized void close() {
     if (m_handle != 0) {
-      s_lock.lock();
-      try {
-        s_listeners.remove(m_handle);
-      } finally {
-        s_lock.unlock();
-      }
-      NetworkTablesJNI.removeValueListener(m_handle);
+      m_inst.removeValueListener(m_handle);
       m_handle = 0;
     }
   }
@@ -120,72 +77,19 @@ public final class ValueListener implements AutoCloseable {
     return m_handle;
   }
 
-  private int m_handle;
-
-  private static final ReentrantLock s_lock = new ReentrantLock();
-  private static final Map<Integer, Consumer<ValueNotification>> s_listeners = new HashMap<>();
-  private static Thread s_thread;
-  private static NetworkTableInstance s_inst;
-  private static int s_poller;
-  private static boolean s_waitQueue;
-  private static final Condition s_waitQueueCond = s_lock.newCondition();
-
-  private static void startThread() {
-    s_thread =
-        new Thread(
-            () -> {
-              boolean wasInterrupted = false;
-              while (!Thread.interrupted()) {
-                try {
-                  WPIUtilJNI.waitForObject(s_poller);
-                } catch (InterruptedException ex) {
-                  s_lock.lock();
-                  try {
-                    if (s_waitQueue) {
-                      s_waitQueue = false;
-                      s_waitQueueCond.signalAll();
-                      continue;
-                    }
-                  } finally {
-                    s_lock.unlock();
-                  }
-                  Thread.currentThread().interrupt();
-                  // don't try to destroy poller, as its handle is likely no longer valid
-                  wasInterrupted = true;
-                  break;
-                }
-                for (ValueNotification event :
-                    NetworkTablesJNI.readValueListenerQueue(s_inst, s_poller)) {
-                  Consumer<ValueNotification> listener;
-                  s_lock.lock();
-                  try {
-                    listener = s_listeners.get(event.listener);
-                  } finally {
-                    s_lock.unlock();
-                  }
-                  if (listener != null) {
-                    try {
-                      listener.accept(event);
-                    } catch (Throwable throwable) {
-                      System.err.println(
-                          "Unhandled exception during listener callback: " + throwable.toString());
-                      throwable.printStackTrace();
-                    }
-                  }
-                }
-              }
-              s_lock.lock();
-              try {
-                if (!wasInterrupted) {
-                  NetworkTablesJNI.destroyValueListenerPoller(s_poller);
-                }
-                s_poller = 0;
-              } finally {
-                s_lock.unlock();
-              }
-            },
-            "ValueListener");
-    s_thread.setDaemon(true);
-    s_thread.start();
+  /**
+   * Wait for the value listener queue to be empty. This is primarily useful for deterministic
+   * testing. This blocks until either the value listener queue is empty (e.g. there are no more
+   * events that need to be passed along to callbacks or poll queues) or the timeout expires.
+   *
+   * @param timeout timeout, in seconds. Set to 0 for non-blocking behavior, or a negative value to
+   *     block indefinitely
+   * @return False if timed out, otherwise true.
+   */
+  public boolean waitForQueue(double timeout) {
+    return m_inst.waitForValueListenerQueue(timeout);
   }
+
+  private final NetworkTableInstance m_inst;
+  private int m_handle;
 }

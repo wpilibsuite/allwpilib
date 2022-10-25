@@ -89,12 +89,10 @@ TEST_P(ConnectionListenerVariantTest, Threaded) {
   wpi::mutex m;
   std::vector<nt::ConnectionNotification> result;
   auto handle = nt::AddConnectionListener(
-      server_inst,
-      [&](const nt::ConnectionNotification& event) {
+      server_inst, false, [&](const nt::ConnectionNotification& event) {
         std::scoped_lock lock{m};
         result.push_back(event);
-      },
-      false);
+      });
 
   // trigger a connect event
   Connect(GetParam().first, 0, 20001 + GetParam().second);
@@ -115,6 +113,9 @@ TEST_P(ConnectionListenerVariantTest, Threaded) {
   // trigger a disconnect event
   nt::StopClient(client_inst);
   std::this_thread::sleep_for(std::chrono::milliseconds(100));
+
+  // wait for thread
+  nt::WaitForConnectionListenerQueue(server_inst, 1.0);
 
   // get the event
   {

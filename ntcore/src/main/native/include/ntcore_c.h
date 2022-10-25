@@ -863,6 +863,19 @@ NT_TopicListener NT_AddTopicListenerSingle(NT_Topic topic, unsigned int mask,
                                            NT_TopicListenerCallback callback);
 
 /**
+ * Wait for the topic listener queue to be empty. This is primarily useful
+ * for deterministic testing. This blocks until either the topic listener
+ * queue is empty (e.g. there are no more events that need to be passed along to
+ * callbacks or poll queues) or the timeout expires.
+ *
+ * @param handle  handle
+ * @param timeout timeout, in seconds. Set to 0 for non-blocking behavior, or a
+ *                negative value to block indefinitely
+ * @return False if timed out, otherwise true.
+ */
+NT_Bool NT_WaitForTopicListenerQueue(NT_Handle handle, double timeout);
+
+/**
  * Creates a topic listener poller.
  *
  * A poller provides a single queue of poll events.  Events linked to this
@@ -972,6 +985,19 @@ NT_ValueListener NT_AddValueListener(NT_Handle subentry, unsigned int mask,
                                      NT_ValueListenerCallback callback);
 
 /**
+ * Wait for the value listener queue to be empty. This is primarily useful
+ * for deterministic testing. This blocks until either the value listener
+ * queue is empty (e.g. there are no more events that need to be passed along to
+ * callbacks or poll queues) or the timeout expires.
+ *
+ * @param handle  handle
+ * @param timeout timeout, in seconds. Set to 0 for non-blocking behavior, or a
+ *                negative value to block indefinitely
+ * @return False if timed out, otherwise true.
+ */
+NT_Bool NT_WaitForValueListenerQueue(NT_Handle handle, double timeout);
+
+/**
  * Create a value listener poller.
  *
  * A poller provides a single queue of poll events.  Events linked to this
@@ -1050,8 +1076,21 @@ typedef void (*NT_ConnectionListenerCallback)(
  * @return Listener handle
  */
 NT_ConnectionListener NT_AddConnectionListener(
-    NT_Inst inst, void* data, NT_ConnectionListenerCallback callback,
-    NT_Bool immediate_notify);
+    NT_Inst inst, NT_Bool immediate_notify, void* data,
+    NT_ConnectionListenerCallback callback);
+
+/**
+ * Wait for the connection listener queue to be empty. This is primarily useful
+ * for deterministic testing. This blocks until either the connection listener
+ * queue is empty (e.g. there are no more events that need to be passed along to
+ * callbacks or poll queues) or the timeout expires.
+ *
+ * @param handle  handle
+ * @param timeout timeout, in seconds. Set to 0 for non-blocking behavior, or a
+ *                negative value to block indefinitely
+ * @return False if timed out, otherwise true.
+ */
+NT_Bool NT_WaitForConnectionListenerQueue(NT_Handle handle, double timeout);
 
 /**
  * Create a connection listener poller.

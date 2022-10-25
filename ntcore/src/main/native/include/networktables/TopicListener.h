@@ -98,23 +98,25 @@ class TopicListener final {
                 std::function<void(const TopicNotification&)> listener);
 
   /**
-   * Create a listener for topic changes on a subscriber.
+   * Create a listener for topic changes on a subscriber. This does NOT keep the
+   * subscriber active.
    *
    * @param subscriber Subscriber
    * @param mask Bitmask of TopicListenerFlags values
    * @param listener Listener function
    */
-  TopicListener(const Subscriber& subscriber, unsigned int mask,
+  TopicListener(Subscriber& subscriber, unsigned int mask,
                 std::function<void(const TopicNotification&)> listener);
 
   /**
-   * Create a listener for topic changes on a subscriber.
+   * Create a listener for topic changes on a subscriber. This does NOT keep the
+   * subscriber active.
    *
    * @param subscriber Subscriber
    * @param mask Bitmask of TopicListenerFlags values
    * @param listener Listener function
    */
-  TopicListener(const MultiSubscriber& subscriber, unsigned int mask,
+  TopicListener(MultiSubscriber& subscriber, unsigned int mask,
                 std::function<void(const TopicNotification&)> listener);
 
   /**
@@ -124,7 +126,7 @@ class TopicListener final {
    * @param mask Bitmask of TopicListenerFlags values
    * @param listener Listener function
    */
-  TopicListener(const NetworkTableEntry& entry, unsigned int mask,
+  TopicListener(NetworkTableEntry& entry, unsigned int mask,
                 std::function<void(const TopicNotification&)> listener);
 
   TopicListener(const TopicListener&) = delete;
@@ -141,6 +143,18 @@ class TopicListener final {
    * @return Handle
    */
   NT_TopicListener GetHandle() const { return m_handle; }
+
+  /**
+   * Wait for the topic listener queue to be empty. This is primarily useful for
+   * deterministic testing. This blocks until either the topic listener queue is
+   * empty (e.g. there are no more events that need to be passed along to
+   * callbacks or poll queues) or the timeout expires.
+   *
+   * @param timeout timeout, in seconds. Set to 0 for non-blocking behavior, or
+   *                a negative value to block indefinitely
+   * @return False if timed out, otherwise true.
+   */
+  bool WaitForQueue(double timeout);
 
  private:
   NT_TopicListener m_handle{0};
@@ -198,22 +212,24 @@ class TopicListenerPoller final {
   NT_TopicListener Add(Topic topic, unsigned int mask);
 
   /**
-   * Start listening to topic changes on a subscriber.
+   * Start listening to topic changes on a subscriber. This does NOT keep the
+   * subscriber active.
    *
    * @param subscriber Subscriber
    * @param mask Bitmask of TopicListenerFlags values
    * @return Listener handle
    */
-  NT_TopicListener Add(const Subscriber& subscriber, unsigned int mask);
+  NT_TopicListener Add(Subscriber& subscriber, unsigned int mask);
 
   /**
-   * Start listening to topic changes on a subscriber.
+   * Start listening to topic changes on a subscriber. This does NOT keep the
+   * subscriber active.
    *
    * @param subscriber Subscriber
    * @param mask Bitmask of TopicListenerFlags values
    * @return Listener handle
    */
-  NT_TopicListener Add(const MultiSubscriber& subscriber, unsigned int mask);
+  NT_TopicListener Add(MultiSubscriber& subscriber, unsigned int mask);
 
   /**
    * Start listening to topic changes on an entry.
@@ -222,7 +238,7 @@ class TopicListenerPoller final {
    * @param mask Bitmask of TopicListenerFlags values
    * @return Listener handle
    */
-  NT_TopicListener Add(const NetworkTableEntry& entry, unsigned int mask);
+  NT_TopicListener Add(NetworkTableEntry& entry, unsigned int mask);
 
   /**
    * Remove a listener.
