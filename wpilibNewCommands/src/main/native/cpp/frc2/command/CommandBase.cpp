@@ -10,10 +10,7 @@
 using namespace frc2;
 
 CommandBase::CommandBase() {
-  wpi::SendableRegistry::Add(
-    this, GetTypeName(*
-    this
-    ));
+  wpi::SendableRegistry::Add(this, GetTypeName(*this));
 }
 
 void CommandBase::AddRequirements(
