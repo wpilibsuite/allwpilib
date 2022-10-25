@@ -265,4 +265,24 @@ class SwerveDriveKinematicsTest {
         () -> assertEquals(4.0 * factor, arr[2].speedMetersPerSecond, kEpsilon),
         () -> assertEquals(7.0 * factor, arr[3].speedMetersPerSecond, kEpsilon));
   }
+
+  @Test
+  void testDesaturateSmooth() {
+    SwerveModuleState fl = new SwerveModuleState(5, new Rotation2d());
+    SwerveModuleState fr = new SwerveModuleState(6, new Rotation2d());
+    SwerveModuleState bl = new SwerveModuleState(4, new Rotation2d());
+    SwerveModuleState br = new SwerveModuleState(7, new Rotation2d());
+
+    SwerveModuleState[] arr = {fl, fr, bl, br};
+    SwerveDriveKinematics.desaturateWheelSpeeds(
+        arr, m_kinematics.toChassisSpeeds(arr), 5.5, 5.5, 3.5);
+
+    double factor = 5.5 / 7.0;
+
+    assertAll(
+        () -> assertEquals(5.0 * factor, arr[0].speedMetersPerSecond, kEpsilon),
+        () -> assertEquals(6.0 * factor, arr[1].speedMetersPerSecond, kEpsilon),
+        () -> assertEquals(4.0 * factor, arr[2].speedMetersPerSecond, kEpsilon),
+        () -> assertEquals(7.0 * factor, arr[3].speedMetersPerSecond, kEpsilon));
+  }
 }

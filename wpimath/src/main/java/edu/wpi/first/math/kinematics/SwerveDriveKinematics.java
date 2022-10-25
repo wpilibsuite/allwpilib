@@ -207,4 +207,43 @@ public class SwerveDriveKinematics {
       }
     }
   }
+
+  /**
+   * Renormalizes the wheel speeds if any individual speed is above the specified maximum, as well
+   * as getting rid of joystick saturation at edges of joystick.
+   *
+   * <p>Sometimes, after inverse kinematics, the requested speed from one or more modules may be
+   * above the max attainable speed for the driving motor on that module. To fix this issue, one can
+   * reduce all the wheel speeds to make sure that all requested module speeds are at-or-below the
+   * absolute threshold, while maintaining the ratio of speeds between modules.
+   *
+   * @param moduleStates Reference to array of module states. The array will be mutated with the
+   *     normalized speeds!
+   * @param currentChassisSpeed The current speed of the robot
+   * @param attainableMaxModuleSpeedMetersPerSecond The absolute max speed that a module can reach
+   * @param attainableMaxTranslationalSpeedMetersPerSecond The absolute max speed that your robot
+   *     can reach while translating
+   * @param attainableMaxRotationalVelocityRadiansPerSecond The absolute max speed the robot can
+   *     reach while rotating
+   */
+  public static void desaturateWheelSpeeds(
+      SwerveModuleState[] moduleStates,
+      ChassisSpeeds currentChassisSpeed,
+      double attainableMaxModuleSpeedMetersPerSecond,
+      double attainableMaxTranslationalSpeedMetersPerSecond,
+      double attainableMaxRotationalVelocityRadiansPerSecond) {
+
+    double translationalK =
+        Math.hypot(currentChassisSpeed.vxMetersPerSecond, currentChassisSpeed.vyMetersPerSecond)
+            / attainableMaxTranslationalSpeedMetersPerSecond;
+    double rotationalK =
+        Math.abs(currentChassisSpeed.omegaRadiansPerSecond)
+            / attainableMaxRotationalVelocityRadiansPerSecond;
+    double k = Math.max(translationalK, rotationalK);
+    double realMaxSpeed = Collections.max(Arrays.asList(moduleStates)).speedMetersPerSecond;
+    double scale = Math.min(k * attainableMaxModuleSpeedMetersPerSecond / realMaxSpeed, 1);
+    for (SwerveModuleState moduleState : moduleStates) {
+      moduleState.speedMetersPerSecond *= scale;
+    }
+  }
 }

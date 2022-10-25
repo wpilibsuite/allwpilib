@@ -181,6 +181,34 @@ class SwerveDriveKinematics {
       wpi::array<SwerveModuleState, NumModules>* moduleStates,
       units::meters_per_second_t attainableMaxSpeed);
 
+  /**
+   * Renormalizes the wheel speeds if any individual speed is above the
+   * specified maximum, as well as getting rid of joystick saturation at edges
+   * of joystick.
+   *
+   * Sometimes, after inverse kinematics, the requested speed
+   * from one or more modules may be above the max attainable speed for the
+   * driving motor on that module. To fix this issue, one can reduce all the
+   * wheel speeds to make sure that all requested module speeds are at-or-below
+   * the absolute threshold, while maintaining the ratio of speeds between
+   * modules.
+   *
+   * @param moduleStates Reference to array of module states. The array will be
+   * mutated with the normalized speeds!
+   * @param currentChassisSpeed Current speed of the robot
+   * @param attainableMaxModuleSpeed The absolute max speed a module can reach
+   * @param attainableMaxRobotTranslationSpeed The absolute max speed the robot
+   * can reach while translating
+   * @param attainableMaxRobotRotationSpeed The absolute max speed the robot can
+   * reach while rotating
+   */
+  static void DesaturateWheelSpeeds(
+      wpi::array<SwerveModuleState, NumModules>* moduleStates,
+      ChassisSpeeds currentChassisSpeed,
+      units::meters_per_second_t attainableMaxModuleSpeed,
+      units::meters_per_second_t attainableMaxRobotTranslationSpeed,
+      units::radians_per_second_t attainableMaxRobotRotationSpeed);
+
  private:
   mutable Matrixd<NumModules * 2, 3> m_inverseKinematics;
   Eigen::HouseholderQR<Matrixd<NumModules * 2, 3>> m_forwardKinematics;

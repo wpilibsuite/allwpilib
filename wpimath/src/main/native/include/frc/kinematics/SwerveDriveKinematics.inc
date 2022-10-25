@@ -8,6 +8,7 @@
 #include <utility>
 
 #include "frc/kinematics/SwerveDriveKinematics.h"
+#include "frc/kinematics/ChassisSpeeds.h"
 #include "units/math.h"
 
 namespace frc {
@@ -111,6 +112,38 @@ void SwerveDriveKinematics<NumModules>::DesaturateWheelSpeeds(
     for (auto& module : states) {
       module.speed = module.speed / realMaxSpeed * attainableMaxSpeed;
     }
+  }
+}
+
+template <size_t NumModules>
+void SwerveDriveKinematics<NumModules>::DesaturateWheelSpeeds(
+    wpi::array<SwerveModuleState, NumModules>* moduleStates,
+    ChassisSpeeds currentChassisSpeed,
+    units::meters_per_second_t attainableMaxModuleSpeed,
+    units::meters_per_second_t attainableMaxRobotTranslationSpeed,
+    units::radians_per_second_t attainableMaxRobotRotationSpeed) {
+  auto& states = *moduleStates;
+
+  auto translationalK =
+      units::math::hypot(currentChassisSpeed.vx, currentChassisSpeed.vy) /
+      attainableMaxRobotTranslationSpeed;
+
+  auto rotationalK = units::math::abs(currentChassisSpeed.omega) /
+                     attainableMaxRobotRotationSpeed;
+
+  auto k = units::math::max(translationalK, rotationalK);
+
+  auto realMaxSpeed = std::max_element(states.begin(), states.end(),
+                                       [](const auto& a, const auto& b) {
+                                         return units::math::abs(a.speed) <
+                                                units::math::abs(b.speed);
+                                       })
+                          ->speed;
+
+  auto scale = units::math::min(k * attainableMaxModuleSpeed / realMaxSpeed,
+                                units::scalar_t(1));
+  for (auto& module : states) {
+    module.speed = module.speed * scale;
   }
 }
 
