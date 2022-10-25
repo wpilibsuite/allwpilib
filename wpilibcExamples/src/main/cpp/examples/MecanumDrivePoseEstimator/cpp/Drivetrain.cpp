@@ -15,6 +15,13 @@ frc::MecanumDriveWheelSpeeds Drivetrain::GetCurrentState() const {
           units::meters_per_second_t{m_backRightEncoder.GetRate()}};
 }
 
+frc::MecanumDriveWheelPositions Drivetrain::GetCurrentDistances() const {
+  return {units::meter_t{m_frontLeftEncoder.GetDistance()},
+          units::meter_t{m_frontRightEncoder.GetDistance()},
+          units::meter_t{m_backLeftEncoder.GetDistance()},
+          units::meter_t{m_backRightEncoder.GetDistance()}};
+}
+
 void Drivetrain::SetSpeeds(const frc::MecanumDriveWheelSpeeds& wheelSpeeds) {
   std::function<void(units::meters_per_second_t, const frc::Encoder&,
                      frc2::PIDController&, frc::PWMSparkMax&)>
@@ -49,7 +56,8 @@ void Drivetrain::Drive(units::meters_per_second_t xSpeed,
 }
 
 void Drivetrain::UpdateOdometry() {
-  m_poseEstimator.Update(m_gyro.GetRotation2d(), GetCurrentState());
+  m_poseEstimator.Update(m_gyro.GetRotation2d(), GetCurrentState(),
+                         GetCurrentDistances());
 
   // Also apply vision measurements. We use 0.3 seconds in the past as an
   // example -- on a real robot, this must be calculated based either on latency
