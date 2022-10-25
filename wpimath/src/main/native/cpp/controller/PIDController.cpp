@@ -68,6 +68,14 @@ units::second_t PIDController::GetPeriod() const {
   return m_period;
 }
 
+double PIDController::GetPositionTolerance() const {
+  return m_positionTolerance;
+}
+
+double PIDController::GetVelocityTolerance() const {
+  return m_velocityTolerance;
+}
+
 void PIDController::SetSetpoint(double setpoint) {
   m_setpoint = setpoint;
 
