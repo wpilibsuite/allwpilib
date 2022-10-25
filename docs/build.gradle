@@ -4,6 +4,7 @@ plugins {
 }
 
 evaluationDependsOn(':wpiutil')
+evaluationDependsOn(':wpinet')
 evaluationDependsOn(':ntcore')
 evaluationDependsOn(':cscore')
 evaluationDependsOn(':hal')
@@ -28,6 +29,7 @@ def cppIncludeRoots = []
 
 cppProjectZips.add(project(':hal').cppHeadersZip)
 cppProjectZips.add(project(':wpiutil').cppHeadersZip)
+cppProjectZips.add(project(':wpinet').cppHeadersZip)
 cppProjectZips.add(project(':ntcore').cppHeadersZip)
 cppProjectZips.add(project(':cscore').cppHeadersZip)
 cppProjectZips.add(project(':cameraserver').cppHeadersZip)
@@ -109,7 +111,7 @@ doxygen {
         // libuv
         exclude 'uv.h'
         exclude 'uv/**'
-        exclude 'wpi/uv/**'
+        exclude 'wpinet/uv/**'
 
         // json
         exclude 'wpi/json.h'
@@ -206,6 +208,7 @@ task generateJavaDocs(type: Javadoc) {
     dependsOn project(':ntcore').ntcoreGenerateJavaTypes
     source project(':hal').sourceSets.main.java
     source project(':wpiutil').sourceSets.main.java
+    source project(':wpinet').sourceSets.main.java
     source project(':cscore').sourceSets.main.java
     source project(':ntcore').sourceSets.main.java
     source project(':wpimath').sourceSets.main.java
