@@ -48,10 +48,10 @@ jobs:
         if: ${{ failure() }}
       - name: Write to job summary
         run: |
-          echo "```diff" >> $GITHUB_STEP_SUMMARY
+          # echo '```diff' >> $GITHUB_STEP_SUMMARY
           cat wpiformat-fixes.patch >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "```" >> $GITHUB_STEP_SUMMARY
+          echo '' >> $GITHUB_STEP_SUMMARY
+          # echo '```' >> $GITHUB_STEP_SUMMARY
         if: ${{ failure() }}
 
   tidy:
