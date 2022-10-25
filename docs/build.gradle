@@ -208,7 +208,7 @@ task generateJavaDocs(type: Javadoc) {
     dependsOn project(':ntcore').ntcoreGenerateJavaTypes
     source project(':hal').sourceSets.main.java
     source project(':wpiutil').sourceSets.main.java
-	source project(':wpinet').sourceSets.main.java
+    source project(':wpinet').sourceSets.main.java
     source project(':cscore').sourceSets.main.java
     source project(':ntcore').sourceSets.main.java
     source project(':wpimath').sourceSets.main.java
