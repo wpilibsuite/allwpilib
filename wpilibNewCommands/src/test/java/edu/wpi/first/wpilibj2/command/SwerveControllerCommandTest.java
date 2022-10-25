@@ -15,6 +15,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
+import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.trajectory.TrajectoryConfig;
 import edu.wpi.first.math.trajectory.TrajectoryGenerator;
@@ -50,6 +51,14 @@ class SwerveControllerCommandTest {
         new SwerveModuleState(0, new Rotation2d(0))
       };
 
+  private SwerveModulePosition[] m_modulePositions =
+      new SwerveModulePosition[] {
+        new SwerveModulePosition(0, new Rotation2d(0)),
+        new SwerveModulePosition(0, new Rotation2d(0)),
+        new SwerveModulePosition(0, new Rotation2d(0)),
+        new SwerveModulePosition(0, new Rotation2d(0))
+      };
+
   private final ProfiledPIDController m_rotController =
       new ProfiledPIDController(1, 0, 0, new TrapezoidProfile.Constraints(3 * Math.PI, Math.PI));
 
@@ -68,7 +77,8 @@ class SwerveControllerCommandTest {
           new Translation2d(-kWheelBase / 2, -kTrackWidth / 2));
 
   private final SwerveDriveOdometry m_odometry =
-      new SwerveDriveOdometry(m_kinematics, new Rotation2d(0), new Pose2d(0, 0, new Rotation2d(0)));
+      new SwerveDriveOdometry(
+          m_kinematics, new Rotation2d(0), m_modulePositions, new Pose2d(0, 0, new Rotation2d(0)));
 
   @SuppressWarnings("PMD.ArrayIsStoredDirectly")
   public void setModuleStates(SwerveModuleState[] moduleStates) {
@@ -76,7 +86,7 @@ class SwerveControllerCommandTest {
   }
 
   public Pose2d getRobotPose() {
-    m_odometry.updateWithTime(m_timer.get(), m_angle, m_moduleStates);
+    m_odometry.update(m_angle, m_modulePositions);
     return m_odometry.getPoseMeters();
   }
 
@@ -111,6 +121,12 @@ class SwerveControllerCommandTest {
     while (!command.isFinished()) {
       command.execute();
       m_angle = trajectory.sample(m_timer.get()).poseMeters.getRotation();
+
+      for (int i = 0; i < m_modulePositions.length; i++) {
+        m_modulePositions[i].distanceMeters += m_moduleStates[i].speedMetersPerSecond * 0.005;
+        m_modulePositions[i].angle = m_moduleStates[i].angle;
+      }
+
       SimHooks.stepTiming(0.005);
     }
     m_timer.stop();

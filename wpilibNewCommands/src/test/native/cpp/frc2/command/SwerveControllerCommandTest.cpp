@@ -36,6 +36,10 @@ class SwerveControllerCommandTest : public ::testing::Test {
       frc::SwerveModuleState{}, frc::SwerveModuleState{},
       frc::SwerveModuleState{}, frc::SwerveModuleState{}};
 
+  wpi::array<frc::SwerveModulePosition, 4> m_modulePositions{
+      frc::SwerveModulePosition{}, frc::SwerveModulePosition{},
+      frc::SwerveModulePosition{}, frc::SwerveModulePosition{}};
+
   frc::ProfiledPIDController<units::radians> m_rotController{
       1, 0, 0,
       frc::TrapezoidProfile<units::radians>::Constraints{
@@ -54,19 +58,15 @@ class SwerveControllerCommandTest : public ::testing::Test {
       frc::Translation2d{-kWheelBase / 2, kTrackWidth / 2},
       frc::Translation2d{-kWheelBase / 2, -kTrackWidth / 2}};
 
-  frc::SwerveDriveOdometry<4> m_odometry{m_kinematics, 0_rad,
+  frc::SwerveDriveOdometry<4> m_odometry{m_kinematics, 0_rad, m_modulePositions,
                                          frc::Pose2d{0_m, 0_m, 0_rad}};
 
   void SetUp() override { frc::sim::PauseTiming(); }
 
   void TearDown() override { frc::sim::ResumeTiming(); }
 
-  wpi::array<frc::SwerveModuleState, 4> getCurrentWheelSpeeds() {
-    return m_moduleStates;
-  }
-
   frc::Pose2d getRobotPose() {
-    m_odometry.UpdateWithTime(m_timer.Get(), m_angle, getCurrentWheelSpeeds());
+    m_odometry.Update(m_angle, m_modulePositions);
     return m_odometry.GetPose();
   }
 };
@@ -95,6 +95,12 @@ TEST_F(SwerveControllerCommandTest, ReachesReference) {
   while (!command.IsFinished()) {
     command.Execute();
     m_angle = trajectory.Sample(m_timer.Get()).pose.Rotation();
+
+    for (size_t i = 0; i < m_modulePositions.size(); i++) {
+      m_modulePositions[i].distance += m_moduleStates[i].speed * 5_ms;
+      m_modulePositions[i].angle = m_moduleStates[i].angle;
+    }
+
     frc::sim::StepTiming(5_ms);
   }
   m_timer.Stop();
