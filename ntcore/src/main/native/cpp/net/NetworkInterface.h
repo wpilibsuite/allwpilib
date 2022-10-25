@@ -4,10 +4,9 @@
 
 #pragma once
 
+#include <span>
 #include <string>
 #include <string_view>
-
-#include <wpi/span.h>
 
 #include "ntcore_cpp.h"
 
@@ -45,7 +44,7 @@ class NetworkStartupInterface {
                        const wpi::json& properties,
                        const PubSubOptions& options) = 0;
   virtual void Subscribe(NT_Subscriber subHandle,
-                         wpi::span<const std::string> topicNames,
+                         std::span<const std::string> topicNames,
                          const PubSubOptions& options) = 0;
   virtual void SetValue(NT_Publisher pubHandle, const Value& value) = 0;
 };
@@ -60,8 +59,8 @@ class NetworkInterface : public NetworkStartupInterface {
 
 class ILocalStorage : public LocalInterface {
  public:
-  virtual void StartNetwork(NetworkStartupInterface& startup) = 0;
-  virtual void SetNetwork(NetworkInterface* network) = 0;
+  virtual void StartNetwork(NetworkStartupInterface& startup,
+                            NetworkInterface* network) = 0;
   virtual void ClearNetwork() = 0;
 };
 

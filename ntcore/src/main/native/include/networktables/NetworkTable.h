@@ -6,6 +6,7 @@
 
 #include <functional>
 #include <memory>
+#include <span>
 #include <string>
 #include <string_view>
 #include <utility>
@@ -13,7 +14,6 @@
 
 #include <wpi/StringMap.h>
 #include <wpi/mutex.h>
-#include <wpi/span.h>
 
 #include "networktables/NetworkTableEntry.h"
 #include "ntcore_c.h"
@@ -400,7 +400,7 @@ class NetworkTable final {
    *       std::vector<bool> is special-cased in C++.  0 is false, any
    *       non-zero value is true.
    */
-  bool PutBooleanArray(std::string_view key, wpi::span<const int> value);
+  bool PutBooleanArray(std::string_view key, std::span<const int> value);
 
   /**
    * Gets the current value in the table, setting it if it does not exist.
@@ -410,7 +410,7 @@ class NetworkTable final {
    * @return False if the table key exists with a different type
    */
   bool SetDefaultBooleanArray(std::string_view key,
-                              wpi::span<const int> defaultValue);
+                              std::span<const int> defaultValue);
 
   /**
    * Returns the boolean array the key maps to. If the key does not exist or is
@@ -429,7 +429,7 @@ class NetworkTable final {
    *       non-zero value is true.
    */
   std::vector<int> GetBooleanArray(std::string_view key,
-                                   wpi::span<const int> defaultValue) const;
+                                   std::span<const int> defaultValue) const;
 
   /**
    * Put a number array in the table
@@ -438,7 +438,7 @@ class NetworkTable final {
    * @param value the value that will be assigned
    * @return False if the table key already exists with a different type
    */
-  bool PutNumberArray(std::string_view key, wpi::span<const double> value);
+  bool PutNumberArray(std::string_view key, std::span<const double> value);
 
   /**
    * Gets the current value in the table, setting it if it does not exist.
@@ -448,7 +448,7 @@ class NetworkTable final {
    * @returns False if the table key exists with a different type
    */
   bool SetDefaultNumberArray(std::string_view key,
-                             wpi::span<const double> defaultValue);
+                             std::span<const double> defaultValue);
 
   /**
    * Returns the number array the key maps to. If the key does not exist or is
@@ -463,7 +463,7 @@ class NetworkTable final {
    *       concern, use GetValue() instead.
    */
   std::vector<double> GetNumberArray(
-      std::string_view key, wpi::span<const double> defaultValue) const;
+      std::string_view key, std::span<const double> defaultValue) const;
 
   /**
    * Put a string array in the table
@@ -472,7 +472,7 @@ class NetworkTable final {
    * @param value the value that will be assigned
    * @return False if the table key already exists with a different type
    */
-  bool PutStringArray(std::string_view key, wpi::span<const std::string> value);
+  bool PutStringArray(std::string_view key, std::span<const std::string> value);
 
   /**
    * Gets the current value in the table, setting it if it does not exist.
@@ -482,7 +482,7 @@ class NetworkTable final {
    * @returns False if the table key exists with a different type
    */
   bool SetDefaultStringArray(std::string_view key,
-                             wpi::span<const std::string> defaultValue);
+                             std::span<const std::string> defaultValue);
 
   /**
    * Returns the string array the key maps to. If the key does not exist or is
@@ -497,7 +497,7 @@ class NetworkTable final {
    *       concern, use GetValue() instead.
    */
   std::vector<std::string> GetStringArray(
-      std::string_view key, wpi::span<const std::string> defaultValue) const;
+      std::string_view key, std::span<const std::string> defaultValue) const;
 
   /**
    * Put a raw value (byte array) in the table
@@ -506,7 +506,7 @@ class NetworkTable final {
    * @param value the value that will be assigned
    * @return False if the table key already exists with a different type
    */
-  bool PutRaw(std::string_view key, wpi::span<const uint8_t> value);
+  bool PutRaw(std::string_view key, std::span<const uint8_t> value);
 
   /**
    * Gets the current value in the table, setting it if it does not exist.
@@ -516,7 +516,7 @@ class NetworkTable final {
    * @return False if the table key exists with a different type
    */
   bool SetDefaultRaw(std::string_view key,
-                     wpi::span<const uint8_t> defaultValue);
+                     std::span<const uint8_t> defaultValue);
 
   /**
    * Returns the raw value (byte array) the key maps to. If the key does not
@@ -531,7 +531,7 @@ class NetworkTable final {
    *       concern, use GetValue() instead.
    */
   std::vector<uint8_t> GetRaw(std::string_view key,
-                              wpi::span<const uint8_t> defaultValue) const;
+                              std::span<const uint8_t> defaultValue) const;
 
   /**
    * Put a value in the table

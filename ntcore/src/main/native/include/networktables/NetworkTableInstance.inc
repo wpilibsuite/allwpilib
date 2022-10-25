@@ -54,7 +54,7 @@ inline std::vector<Topic> NetworkTableInstance::GetTopics(
 }
 
 inline std::vector<Topic> NetworkTableInstance::GetTopics(
-    std::string_view prefix, wpi::span<std::string_view> types) {
+    std::string_view prefix, std::span<std::string_view> types) {
   auto handles = ::nt::GetTopics(m_handle, prefix, types);
   return {handles.begin(), handles.end()};
 }
@@ -74,7 +74,7 @@ inline std::vector<TopicInfo> NetworkTableInstance::GetTopicInfo(
 }
 
 inline std::vector<TopicInfo> NetworkTableInstance::GetTopicInfo(
-    std::string_view prefix, wpi::span<std::string_view> types) {
+    std::string_view prefix, std::span<std::string_view> types) {
   return ::nt::GetTopicInfo(m_handle, prefix, types);
 }
 
@@ -85,10 +85,6 @@ inline NetworkTableEntry NetworkTableInstance::GetEntry(std::string_view name) {
 inline void NetworkTableInstance::RemoveConnectionListener(
     NT_ConnectionListener conn_listener) {
   ::nt::RemoveConnectionListener(conn_listener);
-}
-
-inline void NetworkTableInstance::SetNetworkIdentity(std::string_view name) {
-  ::nt::SetNetworkIdentity(m_handle, name);
 }
 
 inline unsigned int NetworkTableInstance::GetNetworkMode() const {
@@ -114,12 +110,12 @@ inline void NetworkTableInstance::StopServer() {
   ::nt::StopServer(m_handle);
 }
 
-inline void NetworkTableInstance::StartClient3() {
-  ::nt::StartClient3(m_handle);
+inline void NetworkTableInstance::StartClient3(std::string_view identity) {
+  ::nt::StartClient3(m_handle, identity);
 }
 
-inline void NetworkTableInstance::StartClient4() {
-  ::nt::StartClient4(m_handle);
+inline void NetworkTableInstance::StartClient4(std::string_view identity) {
+  ::nt::StartClient4(m_handle, identity);
 }
 
 inline void NetworkTableInstance::StopClient() {
@@ -132,7 +128,7 @@ inline void NetworkTableInstance::SetServer(const char* server_name,
 }
 
 inline void NetworkTableInstance::SetServer(
-    wpi::span<const std::pair<std::string_view, unsigned int>> servers) {
+    std::span<const std::pair<std::string_view, unsigned int>> servers) {
   ::nt::SetServer(m_handle, servers);
 }
 

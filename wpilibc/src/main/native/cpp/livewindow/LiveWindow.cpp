@@ -114,6 +114,18 @@ void LiveWindow::DisableAllTelemetry() {
   });
 }
 
+void LiveWindow::EnableAllTelemetry() {
+  auto& inst = ::GetInstance();
+  std::scoped_lock lock(inst.mutex);
+  inst.telemetryEnabled = true;
+  wpi::SendableRegistry::ForeachLiveWindow(inst.dataHandle, [&](auto& cbdata) {
+    if (!cbdata.data) {
+      cbdata.data = std::make_shared<Component>();
+    }
+    std::static_pointer_cast<Component>(cbdata.data)->telemetryEnabled = true;
+  });
+}
+
 bool LiveWindow::IsEnabled() {
   auto& inst = ::GetInstance();
   std::scoped_lock lock(inst.mutex);

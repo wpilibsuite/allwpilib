@@ -62,7 +62,7 @@ public final class ComputerVisionUtil {
    * @param fieldToTarget A Pose2d representing the target position in the field coordinate system.
    * @param cameraToRobot The position of the robot relative to the camera. If the camera was
    *     mounted 3 inches behind the "origin" (usually physical center) of the robot, this would be
-   *     Transform2d(3 inches, 0 inches, 0 degrees).
+   *     Transform2d(Units.inchesToMeters(3), Units.inchesToMeters(0), Units.degreesToRadians(0)).
    * @return The position of the robot in the field.
    */
   public static Pose2d estimateFieldToRobot(
@@ -99,7 +99,7 @@ public final class ComputerVisionUtil {
    * @param fieldToTarget The position of the target in the field.
    * @param cameraToRobot The position of the robot relative to the camera. If the camera was
    *     mounted 3 inches behind the "origin" (usually physical center) of the robot, this would be
-   *     Transform2d(3 inches, 0 inches, 0 degrees).
+   *     Transform2d(Units.inchesToMeters(3), Units.inchesToMeters(0), Units.degreesToRadians(0)).
    * @return The position of the robot in the field.
    */
   public static Pose2d estimateFieldToRobot(

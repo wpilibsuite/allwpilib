@@ -25,7 +25,7 @@ namespace frc {
  * easy but more accurate drop-in for MecanumDriveOdometry.
  *
  * Update() should be called every robot loop. If your loops are faster or
- * slower than the default of 0.02s, then you should change the nominal delta
+ * slower than the default of 20 ms, then you should change the nominal delta
  * time by specifying it in the constructor.
  *
  * AddVisionMeasurement() can be called as infrequently as you want; if you
@@ -78,7 +78,7 @@ class WPILIB_DLLEXPORT MecanumDrivePoseEstimator {
       const wpi::array<double, 3>& stateStdDevs,
       const wpi::array<double, 1>& localMeasurementStdDevs,
       const wpi::array<double, 3>& visionMeasurementStdDevs,
-      units::second_t nominalDt = 0.02_s);
+      units::second_t nominalDt = 20_ms);
 
   /**
    * Sets the pose estimator's trust of global measurements. This might be used
@@ -222,16 +222,6 @@ class WPILIB_DLLEXPORT MecanumDrivePoseEstimator {
 
   Rotation2d m_gyroOffset;
   Rotation2d m_previousAngle;
-
-  template <int Dim>
-  static wpi::array<double, Dim> StdDevMatrixToArray(
-      const Vectord<Dim>& vector) {
-    wpi::array<double, Dim> array;
-    for (size_t i = 0; i < Dim; ++i) {
-      array[i] = vector(i);
-    }
-    return array;
-  }
 };
 
 }  // namespace frc

@@ -48,7 +48,9 @@ struct ValueListenerFlags {
 
 /**
  * Value change listener. This calls back to a callback function when a value
- * change matching the specified mask occurs.
+ * change matching the specified mask occurs. The callback function is called
+ * asynchronously on a separate thread, so it's important to use synchronization
+ * or atomics when accessing any shared state from the callback function.
  */
 class ValueListener final {
  public:
@@ -120,7 +122,7 @@ class ValueListener final {
  */
 class ValueListenerPoller final {
  public:
-  ValueListenerPoller();
+  ValueListenerPoller() = default;
 
   /**
    * Construct a value listener poller.
@@ -196,7 +198,7 @@ class ValueListenerPoller final {
   std::vector<ValueNotification> ReadQueue();
 
  private:
-  NT_ValueListenerPoller m_handle;
+  NT_ValueListenerPoller m_handle{0};
 };
 
 }  // namespace nt

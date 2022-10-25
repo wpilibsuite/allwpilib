@@ -20,10 +20,7 @@ class TopicListenerTest {
   @BeforeEach
   void setUp() {
     m_serverInst = NetworkTableInstance.create();
-    m_serverInst.setNetworkIdentity("server");
-
     m_clientInst = NetworkTableInstance.create();
-    m_clientInst.setNetworkIdentity("client");
   }
 
   @AfterEach
@@ -34,7 +31,7 @@ class TopicListenerTest {
 
   private void connect() {
     m_serverInst.startServer("topiclistenertest.json", "127.0.0.1", 0, 10010);
-    m_clientInst.startClient4();
+    m_clientInst.startClient4("client");
     m_clientInst.setServer("127.0.0.1", 10010);
 
     // Use connection listener to ensure we've connected

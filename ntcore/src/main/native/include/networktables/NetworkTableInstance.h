@@ -6,12 +6,11 @@
 
 #include <functional>
 #include <memory>
+#include <span>
 #include <string>
 #include <string_view>
 #include <utility>
 #include <vector>
-
-#include <wpi/span.h>
 
 #include "networktables/NetworkTable.h"
 #include "networktables/NetworkTableEntry.h"
@@ -283,7 +282,7 @@ class NetworkTableInstance final {
    * @return Array of topic handles.
    */
   std::vector<Topic> GetTopics(std::string_view prefix,
-                               wpi::span<std::string_view> types);
+                               std::span<std::string_view> types);
 
   /**
    * Get Topic Information about multiple topics.
@@ -336,7 +335,7 @@ class NetworkTableInstance final {
    * @return Array of topic information.
    */
   std::vector<TopicInfo> GetTopicInfo(std::string_view prefix,
-                                      wpi::span<std::string_view> types);
+                                      std::span<std::string_view> types);
 
   /**
    * Gets the entry for a key.
@@ -385,16 +384,6 @@ class NetworkTableInstance final {
    */
 
   /**
-   * Set the network identity of this node.
-   *
-   * This is the name used during the initial connection handshake, and is
-   * visible through ConnectionInfo on the remote node.
-   *
-   * @param name      identity to advertise
-   */
-  void SetNetworkIdentity(std::string_view name);
-
-  /**
    * Get the current network mode.
    *
    * @return Bitmask of NetworkMode.
@@ -437,14 +426,18 @@ class NetworkTableInstance final {
   /**
    * Starts a NT3 client.  Use SetServer or SetServerTeam to set the server name
    * and port.
+   *
+   * @param identity  network identity to advertise (cannot be empty string)
    */
-  void StartClient3();
+  void StartClient3(std::string_view identity);
 
   /**
    * Starts a NT4 client.  Use SetServer or SetServerTeam to set the server name
    * and port.
+   *
+   * @param identity  network identity to advertise (cannot be empty string)
    */
-  void StartClient4();
+  void StartClient4(std::string_view identity);
 
   /**
    * Stops the client if it is running.
@@ -466,7 +459,7 @@ class NetworkTableInstance final {
    * @param servers   array of server address and port pairs
    */
   void SetServer(
-      wpi::span<const std::pair<std::string_view, unsigned int>> servers);
+      std::span<const std::pair<std::string_view, unsigned int>> servers);
 
   /**
    * Sets server addresses and port for client (without restarting client).
@@ -475,7 +468,7 @@ class NetworkTableInstance final {
    * @param servers   array of server names
    * @param port      port to communicate over (0 = default)
    */
-  void SetServer(wpi::span<const std::string_view> servers,
+  void SetServer(std::span<const std::string_view> servers,
                  unsigned int port = 0);
 
   /**

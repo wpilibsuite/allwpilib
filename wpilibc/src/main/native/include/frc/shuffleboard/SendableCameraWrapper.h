@@ -6,6 +6,7 @@
 
 #include <functional>
 #include <memory>
+#include <span>
 #include <string>
 #include <string_view>
 
@@ -25,7 +26,6 @@ using CS_Source = CS_Handle;  // NOLINT
 #include <networktables/StringArrayTopic.h>
 #include <wpi/sendable/Sendable.h>
 #include <wpi/sendable/SendableHelper.h>
-#include <wpi/span.h>
 
 namespace frc {
 
@@ -64,7 +64,7 @@ class SendableCameraWrapper
    * @param cameraUrls camera URLs
    */
   SendableCameraWrapper(std::string_view cameraName,
-                        wpi::span<const std::string> cameraUrls,
+                        std::span<const std::string> cameraUrls,
                         const private_init&);
 
   /**
@@ -79,7 +79,7 @@ class SendableCameraWrapper
   static SendableCameraWrapper& Wrap(CS_Source source);
 
   static SendableCameraWrapper& Wrap(std::string_view cameraName,
-                                     wpi::span<const std::string> cameraUrls);
+                                     std::span<const std::string> cameraUrls);
 
   void InitSendable(wpi::SendableBuilder& builder) override;
 
@@ -97,7 +97,7 @@ inline SendableCameraWrapper::SendableCameraWrapper(std::string_view name,
 }
 
 inline SendableCameraWrapper::SendableCameraWrapper(
-    std::string_view cameraName, wpi::span<const std::string> cameraUrls,
+    std::string_view cameraName, std::span<const std::string> cameraUrls,
     const private_init&)
     : SendableCameraWrapper(cameraName, private_init{}) {
   m_streams = nt::NetworkTableInstance::GetDefault()
@@ -123,7 +123,7 @@ inline SendableCameraWrapper& SendableCameraWrapper::Wrap(CS_Source source) {
 }
 
 inline SendableCameraWrapper& SendableCameraWrapper::Wrap(
-    std::string_view cameraName, wpi::span<const std::string> cameraUrls) {
+    std::string_view cameraName, std::span<const std::string> cameraUrls) {
   auto& wrapper = detail::GetSendableCameraWrapper(cameraName);
   if (!wrapper) {
     wrapper = std::make_shared<SendableCameraWrapper>(cameraName, cameraUrls,

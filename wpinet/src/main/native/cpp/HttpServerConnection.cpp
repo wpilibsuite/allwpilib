@@ -85,7 +85,7 @@ void HttpServerConnection::BuildHeader(raw_ostream& os, int code,
   os << "\r\n";  // header ends with a blank line
 }
 
-void HttpServerConnection::SendData(span<const uv::Buffer> bufs,
+void HttpServerConnection::SendData(std::span<const uv::Buffer> bufs,
                                     bool closeAfter) {
   m_stream.Write(bufs, [closeAfter, stream = &m_stream](auto bufs, uv::Error) {
     for (auto&& buf : bufs) {

@@ -11,7 +11,7 @@
 
 #include <imgui.h>
 #include <imgui_internal.h>
-#include <wpi/numbers>
+#include <numbers>
 
 #include "glass/Context.h"
 #include "glass/DataSource.h"
@@ -55,11 +55,11 @@ void glass::DisplayDrive(DriveModel* m) {
     draw->AddTriangleFilled(
         arrowPos,
         arrowPos + ImRotate(ImVec2(0.0f, 7.5f),
-                            std::cos(angle + wpi::numbers::pi / 4),
-                            std::sin(angle + wpi::numbers::pi / 4)),
+                            std::cos(angle + std::numbers::pi / 4),
+                            std::sin(angle + std::numbers::pi / 4)),
         arrowPos + ImRotate(ImVec2(0.0f, 7.5f),
-                            std::cos(angle - wpi::numbers::pi / 4),
-                            std::sin(angle - wpi::numbers::pi / 4)),
+                            std::cos(angle - std::numbers::pi / 4),
+                            std::sin(angle - std::numbers::pi / 4)),
         color);
   };
 
@@ -88,30 +88,30 @@ void glass::DisplayDrive(DriveModel* m) {
   if (rotation != 0) {
     float radius = 60.0f;
     double a1 = 0.0;
-    double a2 = wpi::numbers::pi / 2 * rotation;
+    double a2 = std::numbers::pi / 2 * rotation;
 
     // PathArcTo requires a_min <= a_max, and rotation can be negative
     if (a1 > a2) {
       draw->PathArcTo(center, radius, a2, a1, 20);
       draw->PathStroke(color, false);
-      draw->PathArcTo(center, radius, a2 + wpi::numbers::pi,
-                      a1 + wpi::numbers::pi, 20);
+      draw->PathArcTo(center, radius, a2 + std::numbers::pi,
+                      a1 + std::numbers::pi, 20);
       draw->PathStroke(color, false);
     } else {
       draw->PathArcTo(center, radius, a1, a2, 20);
       draw->PathStroke(color, false);
-      draw->PathArcTo(center, radius, a1 + wpi::numbers::pi,
-                      a2 + wpi::numbers::pi, 20);
+      draw->PathArcTo(center, radius, a1 + std::numbers::pi,
+                      a2 + std::numbers::pi, 20);
       draw->PathStroke(color, false);
     }
 
-    double adder = rotation < 0 ? wpi::numbers::pi : 0;
+    double adder = rotation < 0 ? std::numbers::pi : 0;
 
     auto arrowPos =
         center + ImVec2(radius * -std::cos(a2), radius * -std::sin(a2));
     drawArrow(arrowPos, a2 + adder);
 
-    a2 += wpi::numbers::pi;
+    a2 += std::numbers::pi;
     arrowPos = center + ImVec2(radius * -std::cos(a2), radius * -std::sin(a2));
     drawArrow(arrowPos, a2 + adder);
   }

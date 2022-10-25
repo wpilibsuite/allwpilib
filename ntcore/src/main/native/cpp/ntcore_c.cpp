@@ -298,8 +298,7 @@ NT_Bool NT_SetTopicProperties(NT_Topic topic, const char* properties) {
   } catch (wpi::json::parse_error&) {
     return false;
   }
-  nt::SetTopicProperties(topic, j);
-  return true;
+  return nt::SetTopicProperties(topic, j);
 }
 
 NT_Subscriber NT_Subscribe(NT_Topic topic, NT_Type type, const char* typeStr,
@@ -543,10 +542,6 @@ void NT_RemoveConnectionListener(NT_ConnectionListener conn_listener) {
  * Client/Server Functions
  */
 
-void NT_SetNetworkIdentity(NT_Inst inst, const char* name, size_t name_len) {
-  nt::SetNetworkIdentity(inst, {name, name_len});
-}
-
 unsigned int NT_GetNetworkMode(NT_Inst inst) {
   return nt::GetNetworkMode(inst);
 }
@@ -569,12 +564,12 @@ void NT_StopServer(NT_Inst inst) {
   nt::StopServer(inst);
 }
 
-void NT_StartClient3(NT_Inst inst) {
-  nt::StartClient3(inst);
+void NT_StartClient3(NT_Inst inst, const char* identity) {
+  nt::StartClient3(inst, identity);
 }
 
-void NT_StartClient4(NT_Inst inst) {
-  nt::StartClient4(inst);
+void NT_StartClient4(NT_Inst inst, const char* identity) {
+  nt::StartClient4(inst, identity);
 }
 
 void NT_StopClient(NT_Inst inst) {

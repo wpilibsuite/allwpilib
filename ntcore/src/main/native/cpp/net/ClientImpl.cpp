@@ -52,9 +52,8 @@ class CImpl : public ServerMessageHandler {
   CImpl(uint64_t curTimeMs, int inst, WireConnection& wire, wpi::Logger& logger,
         std::function<void(uint32_t repeatMs)> setPeriodic);
 
-  void ProcessIncomingBinary(wpi::span<const uint8_t> data);
+  void ProcessIncomingBinary(std::span<const uint8_t> data);
   void HandleLocal(std::vector<ClientMessage>&& msgs);
-  void SendOutgoing(wpi::span<const ClientMessage> msgs);
   bool SendControl(uint64_t curTimeMs);
   void SendValues(uint64_t curTimeMs);
   bool CheckNetworkReady();
@@ -120,7 +119,7 @@ CImpl::CImpl(uint64_t curTimeMs, int inst, WireConnection& wire,
   m_setPeriodic(m_periodMs);
 }
 
-void CImpl::ProcessIncomingBinary(wpi::span<const uint8_t> data) {
+void CImpl::ProcessIncomingBinary(std::span<const uint8_t> data) {
   for (;;) {
     if (data.empty()) {
       break;
@@ -171,7 +170,7 @@ void CImpl::ProcessIncomingBinary(wpi::span<const uint8_t> data) {
 }
 
 void CImpl::HandleLocal(std::vector<ClientMessage>&& msgs) {
-  DEBUG4("{}", "HandleLocal()");
+  DEBUG4("HandleLocal()");
   for (auto&& elem : msgs) {
     // common case is value
     if (auto msg = std::get_if<ClientValueMsg>(&elem.contents)) {
@@ -419,7 +418,7 @@ void ClientImpl::ProcessIncomingText(std::string_view data) {
   WireDecodeText(data, *m_impl, m_impl->m_logger);
 }
 
-void ClientImpl::ProcessIncomingBinary(wpi::span<const uint8_t> data) {
+void ClientImpl::ProcessIncomingBinary(std::span<const uint8_t> data) {
   m_impl->ProcessIncomingBinary(data);
 }
 
@@ -463,7 +462,7 @@ void ClientStartup::Publish(NT_Publisher pubHandle, NT_Topic topicHandle,
 }
 
 void ClientStartup::Subscribe(NT_Subscriber subHandle,
-                              wpi::span<const std::string> prefixes,
+                              std::span<const std::string> prefixes,
                               const PubSubOptions& options) {
   WPI_DEBUG4(m_client.m_impl->m_logger, "StartupSubscribe({})", subHandle);
   WireEncodeSubscribe(m_textWriter.Add(), Handle{subHandle}.GetIndex(),

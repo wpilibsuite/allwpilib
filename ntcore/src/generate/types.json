@@ -167,11 +167,11 @@
         },
         "cpp": {
             "ValueType": "std::vector<uint8_t>",
-            "ParamType": "wpi::span<const uint8_t>",
+            "ParamType": "std::span<const uint8_t>",
             "DefaultValueCopy": "defaultValue.begin(), defaultValue.end()",
             "TYPE_NAME": "RAW",
             "INCLUDES": "#include <utility>",
-            "SmallRetType": "wpi::span<uint8_t>",
+            "SmallRetType": "std::span<uint8_t>",
             "SmallElemType": "uint8_t"
         },
         "java": {
@@ -201,11 +201,11 @@
         },
         "cpp": {
             "ValueType": "std::vector<int>",
-            "ParamType": "wpi::span<const int>",
+            "ParamType": "std::span<const int>",
             "DefaultValueCopy": "defaultValue.begin(), defaultValue.end()",
             "TYPE_NAME": "BOOLEAN_ARRAY",
             "INCLUDES": "#include <utility>",
-            "SmallRetType": "wpi::span<int>",
+            "SmallRetType": "std::span<int>",
             "SmallElemType": "int"
         },
         "java": {
@@ -236,11 +236,11 @@
         },
         "cpp": {
             "ValueType": "std::vector<int64_t>",
-            "ParamType": "wpi::span<const int64_t>",
+            "ParamType": "std::span<const int64_t>",
             "DefaultValueCopy": "defaultValue.begin(), defaultValue.end()",
             "TYPE_NAME": "INTEGER_ARRAY",
             "INCLUDES": "#include <utility>",
-            "SmallRetType": "wpi::span<int64_t>",
+            "SmallRetType": "std::span<int64_t>",
             "SmallElemType": "int64_t"
         },
         "java": {
@@ -271,11 +271,11 @@
         },
         "cpp": {
             "ValueType": "std::vector<float>",
-            "ParamType": "wpi::span<const float>",
+            "ParamType": "std::span<const float>",
             "DefaultValueCopy": "defaultValue.begin(), defaultValue.end()",
             "TYPE_NAME": "FLOAT_ARRAY",
             "INCLUDES": "#include <utility>",
-            "SmallRetType": "wpi::span<float>",
+            "SmallRetType": "std::span<float>",
             "SmallElemType": "float"
         },
         "java": {
@@ -306,11 +306,11 @@
         },
         "cpp": {
             "ValueType": "std::vector<double>",
-            "ParamType": "wpi::span<const double>",
+            "ParamType": "std::span<const double>",
             "DefaultValueCopy": "defaultValue.begin(), defaultValue.end()",
             "TYPE_NAME": "DOUBLE_ARRAY",
             "INCLUDES": "#include <utility>",
-            "SmallRetType": "wpi::span<double>",
+            "SmallRetType": "std::span<double>",
             "SmallElemType": "double"
         },
         "java": {
@@ -341,7 +341,7 @@
         },
         "cpp": {
             "ValueType": "std::vector<std::string>",
-            "ParamType": "wpi::span<const std::string>",
+            "ParamType": "std::span<const std::string>",
             "DefaultValueCopy": "defaultValue.begin(), defaultValue.end()",
             "TYPE_NAME": "STRING_ARRAY",
             "INCLUDES": "#include <utility>"

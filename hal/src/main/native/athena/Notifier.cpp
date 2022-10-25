@@ -20,6 +20,7 @@
 #include "hal/HAL.h"
 #include "hal/Threads.h"
 #include "hal/handles/UnlimitedHandleResource.h"
+#include "hal/roborio/InterruptManager.h"
 
 using namespace hal;
 
@@ -106,10 +107,15 @@ static void alarmCallback() {
 }
 
 static void notifierThreadMain() {
-  tRioStatusCode status = 0;
-  tInterruptManager manager{1 << kTimerInterruptNumber, true, &status};
+  InterruptManager& manager = InterruptManager::GetInstance();
+  NiFpga_IrqContext context = manager.GetContext();
+  uint32_t mask = 1 << kTimerInterruptNumber;
+  int32_t status = 0;
+
   while (notifierRunning) {
-    auto triggeredMask = manager.watch(10000, false, &status);
+    status = 0;
+    auto triggeredMask =
+        manager.WaitForInterrupt(context, mask, false, 10000, &status);
     if (!notifierRunning) {
       break;
     }

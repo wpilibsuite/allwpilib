@@ -5,10 +5,9 @@
 #pragma once
 
 #include <functional>
+#include <span>
 #include <string_view>
 #include <vector>
-
-#include <wpi/span.h>
 
 #include "ntcore_cpp.h"
 
@@ -67,7 +66,9 @@ struct TopicListenerFlags {
 
 /**
  * Topic change listener. This calls back to a callback function when a topic
- * change matching the specified mask occurs.
+ * change matching the specified mask occurs. The callback function is called
+ * asynchronously on a separate thread, so it's important to use synchronization
+ * or atomics when accessing any shared state from the callback function.
  */
 class TopicListener final {
  public:
@@ -83,7 +84,7 @@ class TopicListener final {
    * @param listener Listener function
    */
   TopicListener(NetworkTableInstance inst,
-                wpi::span<const std::string_view> prefixes, unsigned int mask,
+                std::span<const std::string_view> prefixes, unsigned int mask,
                 std::function<void(const TopicNotification&)> listener);
 
   /**
@@ -183,7 +184,7 @@ class TopicListenerPoller final {
    * @param mask Bitmask of TopicListenerFlags values
    * @return Listener handle
    */
-  NT_TopicListener Add(wpi::span<const std::string_view> prefixes,
+  NT_TopicListener Add(std::span<const std::string_view> prefixes,
                        unsigned int mask);
 
   /**
@@ -203,7 +204,7 @@ class TopicListenerPoller final {
    * @param mask Bitmask of TopicListenerFlags values
    * @return Listener handle
    */
-  NT_ValueListener Add(const Subscriber& subscriber, unsigned int mask);
+  NT_TopicListener Add(const Subscriber& subscriber, unsigned int mask);
 
   /**
    * Start listening to topic changes on a subscriber.
@@ -212,7 +213,7 @@ class TopicListenerPoller final {
    * @param mask Bitmask of TopicListenerFlags values
    * @return Listener handle
    */
-  NT_ValueListener Add(const MultiSubscriber& subscriber, unsigned int mask);
+  NT_TopicListener Add(const MultiSubscriber& subscriber, unsigned int mask);
 
   /**
    * Start listening to topic changes on an entry.
@@ -221,7 +222,7 @@ class TopicListenerPoller final {
    * @param mask Bitmask of TopicListenerFlags values
    * @return Listener handle
    */
-  NT_ValueListener Add(const NetworkTableEntry& entry, unsigned int mask);
+  NT_TopicListener Add(const NetworkTableEntry& entry, unsigned int mask);
 
   /**
    * Remove a listener.

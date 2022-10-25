@@ -14,31 +14,77 @@
 #include <string>
 
 #include <fmt/format.h>
+#include <wpi/EventVector.h>
 #include <wpi/condition_variable.h>
 #include <wpi/mutex.h>
 
 #include "HALInitializer.h"
+#include "hal/Errors.h"
 #include "hal/cpp/fpga_clock.h"
 #include "hal/simulation/MockHooks.h"
 #include "mockdata/DriverStationDataInternal.h"
 
 static wpi::mutex msgMutex;
-static wpi::condition_variable* newDSDataAvailableCond;
-static wpi::mutex newDSDataAvailableMutex;
-static int newDSDataAvailableCounter{0};
-static std::atomic_bool isFinalized{false};
 static std::atomic<HALSIM_SendErrorHandler> sendErrorHandler{nullptr};
 static std::atomic<HALSIM_SendConsoleLineHandler> sendConsoleLineHandler{
     nullptr};
 
+using namespace hal;
+
+static constexpr int kJoystickPorts = 6;
+
+namespace {
+struct JoystickDataCache {
+  JoystickDataCache() { std::memset(this, 0, sizeof(*this)); }
+  void Update();
+
+  HAL_JoystickAxes axes[kJoystickPorts];
+  HAL_JoystickPOVs povs[kJoystickPorts];
+  HAL_JoystickButtons buttons[kJoystickPorts];
+  HAL_AllianceStationID allianceStation;
+  double matchTime;
+  bool updated;
+};
+static_assert(std::is_standard_layout_v<JoystickDataCache>);
+// static_assert(std::is_trivial_v<JoystickDataCache>);
+
+static std::atomic_bool gShutdown{false};
+
+struct FRCDriverStation {
+  ~FRCDriverStation() { gShutdown = true; }
+  wpi::EventVector newDataEvents;
+  wpi::mutex cacheMutex;
+};
+}  // namespace
+
+void JoystickDataCache::Update() {
+  for (int i = 0; i < kJoystickPorts; i++) {
+    SimDriverStationData->GetJoystickAxes(i, &axes[i]);
+    SimDriverStationData->GetJoystickPOVs(i, &povs[i]);
+    SimDriverStationData->GetJoystickButtons(i, &buttons[i]);
+  }
+  allianceStation = SimDriverStationData->allianceStationId;
+  matchTime = SimDriverStationData->matchTime;
+}
+
+#define CHECK_JOYSTICK_NUMBER(stickNum)                  \
+  if ((stickNum) < 0 || (stickNum) >= HAL_kMaxJoysticks) \
+  return PARAMETER_OUT_OF_RANGE
+
+static HAL_ControlWord newestControlWord;
+static JoystickDataCache caches[3];
+static JoystickDataCache* currentRead = &caches[0];
+static JoystickDataCache* currentCache = &caches[1];
+static JoystickDataCache* cacheToUpdate = &caches[2];
+
+static ::FRCDriverStation* driverStation;
+
 namespace hal::init {
 void InitializeDriverStation() {
-  static wpi::condition_variable nddaC;
-  newDSDataAvailableCond = &nddaC;
+  static FRCDriverStation ds;
+  driverStation = &ds;
 }
 }  // namespace hal::init
-
-using namespace hal;
 
 extern "C" {
 
@@ -122,39 +168,67 @@ int32_t HAL_SendConsoleLine(const char* line) {
 }
 
 int32_t HAL_GetControlWord(HAL_ControlWord* controlWord) {
-  std::memset(controlWord, 0, sizeof(HAL_ControlWord));
-  controlWord->enabled = SimDriverStationData->enabled;
-  controlWord->autonomous = SimDriverStationData->autonomous;
-  controlWord->test = SimDriverStationData->test;
-  controlWord->eStop = SimDriverStationData->eStop;
-  controlWord->fmsAttached = SimDriverStationData->fmsAttached;
-  controlWord->dsAttached = SimDriverStationData->dsAttached;
+  if (gShutdown) {
+    return INCOMPATIBLE_STATE;
+  }
+  std::scoped_lock lock{driverStation->cacheMutex};
+  *controlWord = newestControlWord;
   return 0;
 }
 
 HAL_AllianceStationID HAL_GetAllianceStation(int32_t* status) {
-  *status = 0;
-  return SimDriverStationData->allianceStationId;
+  if (gShutdown) {
+    return HAL_AllianceStationID_kRed1;
+  }
+  std::scoped_lock lock{driverStation->cacheMutex};
+  return currentRead->allianceStation;
 }
 
 int32_t HAL_GetJoystickAxes(int32_t joystickNum, HAL_JoystickAxes* axes) {
-  SimDriverStationData->GetJoystickAxes(joystickNum, axes);
+  if (gShutdown) {
+    return INCOMPATIBLE_STATE;
+  }
+  CHECK_JOYSTICK_NUMBER(joystickNum);
+  std::scoped_lock lock{driverStation->cacheMutex};
+  *axes = currentRead->axes[joystickNum];
   return 0;
 }
 
 int32_t HAL_GetJoystickPOVs(int32_t joystickNum, HAL_JoystickPOVs* povs) {
-  SimDriverStationData->GetJoystickPOVs(joystickNum, povs);
+  if (gShutdown) {
+    return INCOMPATIBLE_STATE;
+  }
+  CHECK_JOYSTICK_NUMBER(joystickNum);
+  std::scoped_lock lock{driverStation->cacheMutex};
+  *povs = currentRead->povs[joystickNum];
   return 0;
 }
 
 int32_t HAL_GetJoystickButtons(int32_t joystickNum,
                                HAL_JoystickButtons* buttons) {
-  SimDriverStationData->GetJoystickButtons(joystickNum, buttons);
+  if (gShutdown) {
+    return INCOMPATIBLE_STATE;
+  }
+  CHECK_JOYSTICK_NUMBER(joystickNum);
+  std::scoped_lock lock{driverStation->cacheMutex};
+  *buttons = currentRead->buttons[joystickNum];
   return 0;
+}
+
+void HAL_GetAllJoystickData(HAL_JoystickAxes* axes, HAL_JoystickPOVs* povs,
+                            HAL_JoystickButtons* buttons) {
+  if (gShutdown) {
+    return;
+  }
+  std::scoped_lock lock{driverStation->cacheMutex};
+  std::memcpy(axes, currentRead->axes, sizeof(currentRead->axes));
+  std::memcpy(povs, currentRead->povs, sizeof(currentRead->povs));
+  std::memcpy(buttons, currentRead->buttons, sizeof(currentRead->buttons));
 }
 
 int32_t HAL_GetJoystickDescriptor(int32_t joystickNum,
                                   HAL_JoystickDescriptor* desc) {
+  CHECK_JOYSTICK_NUMBER(joystickNum);
   SimDriverStationData->GetJoystickDescriptor(joystickNum, desc);
   return 0;
 }
@@ -196,7 +270,11 @@ int32_t HAL_SetJoystickOutputs(int32_t joystickNum, int64_t outputs,
 }
 
 double HAL_GetMatchTime(int32_t* status) {
-  return SimDriverStationData->matchTime;
+  if (gShutdown) {
+    return 0;
+  }
+  std::scoped_lock lock{driverStation->cacheMutex};
+  return currentRead->matchTime;
 }
 
 int32_t HAL_GetMatchInfo(HAL_MatchInfo* info) {
@@ -224,103 +302,66 @@ void HAL_ObserveUserProgramTest(void) {
   // TODO
 }
 
-static int& GetThreadLocalLastCount() {
-  // There is a rollover error condition here. At Packet# = n * (uintmax), this
-  // will return false when instead it should return true. However, this at a
-  // 20ms rate occurs once every 2.7 years of DS connected runtime, so not
-  // worth the cycles to check.
-  thread_local int lastCount{0};
-  return lastCount;
-}
-
-HAL_Bool HAL_IsNewControlData(void) {
-  std::scoped_lock lock(newDSDataAvailableMutex);
-  int& lastCount = GetThreadLocalLastCount();
-  int currentCount = newDSDataAvailableCounter;
-  if (lastCount == currentCount) {
-    return false;
-  }
-  lastCount = currentCount;
-  return true;
-}
-
-void HAL_WaitForDSData(void) {
-  HAL_WaitForDSDataTimeout(0);
-}
-
-HAL_Bool HAL_WaitForDSDataTimeout(double timeout) {
-  std::unique_lock lock(newDSDataAvailableMutex);
-  int& lastCount = GetThreadLocalLastCount();
-  int currentCount = newDSDataAvailableCounter;
-  if (lastCount != currentCount) {
-    lastCount = currentCount;
-    return true;
-  }
-
-  if (isFinalized.load()) {
-    return false;
-  }
-  auto timeoutTime =
-      std::chrono::steady_clock::now() + std::chrono::duration<double>(timeout);
-
-  while (newDSDataAvailableCounter == currentCount) {
-    if (timeout > 0) {
-      auto timedOut = newDSDataAvailableCond->wait_until(lock, timeoutTime);
-      if (timedOut == std::cv_status::timeout) {
-        return false;
-      }
-    } else {
-      newDSDataAvailableCond->wait(lock);
-    }
-  }
-  lastCount = newDSDataAvailableCounter;
-  return true;
-}
-
-// Constant number to be used for our occur handle
-constexpr int32_t refNumber = 42;
-
-static int32_t newDataOccur(uint32_t refNum) {
-  // Since we could get other values, require our specific handle
-  // to signal our threads
-  if (refNum != refNumber) {
-    return 0;
-  }
-  SimDriverStationData->CallNewDataCallbacks();
-  std::scoped_lock lock(newDSDataAvailableMutex);
-  // Nofify all threads
-  newDSDataAvailableCounter++;
-  newDSDataAvailableCond->notify_all();
-  return 0;
-}
-
-void HAL_InitializeDriverStation(void) {
-  hal::init::CheckInit();
-  static std::atomic_bool initialized{false};
-  static wpi::mutex initializeMutex;
-  // Initial check, as if it's true initialization has finished
-  if (initialized) {
+void HAL_RefreshDSData(void) {
+  if (gShutdown) {
     return;
   }
-
-  std::scoped_lock lock(initializeMutex);
-  // Second check in case another thread was waiting
-  if (initialized) {
-    return;
+  HAL_ControlWord controlWord;
+  std::memset(&controlWord, 0, sizeof(controlWord));
+  controlWord.enabled = SimDriverStationData->enabled;
+  controlWord.autonomous = SimDriverStationData->autonomous;
+  controlWord.test = SimDriverStationData->test;
+  controlWord.eStop = SimDriverStationData->eStop;
+  controlWord.fmsAttached = SimDriverStationData->fmsAttached;
+  controlWord.dsAttached = SimDriverStationData->dsAttached;
+  std::scoped_lock lock{driverStation->cacheMutex};
+  if (currentCache->updated) {
+    std::swap(currentCache, currentRead);
+    currentCache->updated = false;
   }
-
-  SimDriverStationData->ResetData();
-
-  std::atexit([]() {
-    isFinalized.store(true);
-    HAL_ReleaseDSMutex();
-  });
-
-  initialized = true;
+  newestControlWord = controlWord;
 }
 
-void HAL_ReleaseDSMutex(void) {
-  newDataOccur(refNumber);
+void HAL_ProvideNewDataEventHandle(WPI_EventHandle handle) {
+  if (gShutdown) {
+    return;
+  }
+  driverStation->newDataEvents.Add(handle);
+}
+
+void HAL_RemoveNewDataEventHandle(WPI_EventHandle handle) {
+  if (gShutdown) {
+    return;
+  }
+  driverStation->newDataEvents.Remove(handle);
+}
+
+HAL_Bool HAL_GetOutputsEnabled(void) {
+  if (gShutdown) {
+    return false;
+  }
+  std::scoped_lock lock{driverStation->cacheMutex};
+  return newestControlWord.enabled && newestControlWord.dsAttached;
 }
 
 }  // extern "C"
+
+namespace hal {
+void NewDriverStationData() {
+  if (gShutdown) {
+    return;
+  }
+  cacheToUpdate->Update();
+  {
+    std::scoped_lock lock{driverStation->cacheMutex};
+    std::swap(currentCache, cacheToUpdate);
+    currentCache->updated = true;
+  }
+  driverStation->newDataEvents.Wakeup();
+  SimDriverStationData->CallNewDataCallbacks();
+}
+
+void InitializeDriverStation() {
+  SimDriverStationData->ResetData();
+}
+}  // namespace hal

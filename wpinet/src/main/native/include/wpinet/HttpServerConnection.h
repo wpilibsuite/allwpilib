@@ -6,9 +6,8 @@
 #define WPINET_HTTPSERVERCONNECTION_H_
 
 #include <memory>
+#include <span>
 #include <string_view>
-
-#include <wpi/span.h>
 
 #include "wpinet/HttpParser.h"
 #include "wpinet/uv/Stream.h"
@@ -79,7 +78,7 @@ class HttpServerConnection {
    *             is desired, call m_stream.Write() directly instead.
    * @param closeAfter close the connection after the write completes
    */
-  void SendData(span<const uv::Buffer> bufs, bool closeAfter = false);
+  void SendData(std::span<const uv::Buffer> bufs, bool closeAfter = false);
 
   /**
    * Send HTTP response, along with other header information like mimetype.

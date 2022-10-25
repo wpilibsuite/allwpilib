@@ -7,6 +7,7 @@
 #include <string>
 
 #include <units/time.h>
+#include <wpi/Synchronization.h>
 
 namespace wpi::log {
 class DataLog;
@@ -216,17 +217,6 @@ class DriverStation final {
   static bool IsDSAttached();
 
   /**
-   * Has a new control packet from the driver station arrived since the last
-   * time this function was called?
-   *
-   * Warning: If you call this function from more than one place at the same
-   * time, you will not get the intended behavior.
-   *
-   * @return True if the control data has been updated since the last call.
-   */
-  static bool IsNewControlData();
-
-  /**
    * Is the driver station attached to a Field Management System?
    *
    * @return True if the robot is competing on a field being controlled by a
@@ -290,41 +280,6 @@ class DriverStation final {
   static int GetLocation();
 
   /**
-   * Wait until a new packet comes from the driver station.
-   *
-   * This blocks on a semaphore, so the waiting is efficient.
-   *
-   * This is a good way to delay processing until there is new driver station
-   * data to act on.
-   *
-   * Checks if new control data has arrived since the last waitForData call
-   * on the current thread. If new data has not arrived, returns immediately.
-   */
-  static void WaitForData();
-
-  /**
-   * Wait until a new packet comes from the driver station, or wait for a
-   * timeout.
-   *
-   * Checks if new control data has arrived since the last waitForData call
-   * on the current thread. If new data has not arrived, returns immediately.
-   *
-   * If the timeout is less then or equal to 0, wait indefinitely.
-   *
-   * Timeout is in milliseconds
-   *
-   * This blocks on a semaphore, so the waiting is efficient.
-   *
-   * This is a good way to delay processing until there is new driver station
-   * data to act on.
-   *
-   * @param timeout Timeout
-   *
-   * @return true if new data, otherwise false
-   */
-  static bool WaitForData(units::second_t timeout);
-
-  /**
    * Return the approximate match time.
    *
    * The FMS does not send an official match time to the robots, but does send
@@ -348,45 +303,10 @@ class DriverStation final {
    */
   static double GetBatteryVoltage();
 
-  /**
-   * Only to be used to tell the Driver Station what code you claim to be
-   * executing for diagnostic purposes only.
-   *
-   * @param entering If true, starting disabled code; if false, leaving disabled
-   *                 code.
-   */
-  static void InDisabled(bool entering);
+  static void RefreshData();
 
-  /**
-   * Only to be used to tell the Driver Station what code you claim to be
-   * executing for diagnostic purposes only.
-   *
-   * @param entering If true, starting autonomous code; if false, leaving
-   *                 autonomous code.
-   */
-  static void InAutonomous(bool entering);
-
-  /**
-   * Only to be used to tell the Driver Station what code you claim to be
-   * executing for diagnostic purposes only.
-   *
-   * @param entering If true, starting teleop code; if false, leaving teleop
-   *                 code.
-   */
-  static void InTeleop(bool entering);
-
-  /**
-   * Only to be used to tell the Driver Station what code you claim to be
-   * executing for diagnostic purposes only.
-   *
-   * @param entering If true, starting test code; if false, leaving test code.
-   */
-  static void InTest(bool entering);
-
-  /**
-   * Forces WaitForData() to return immediately.
-   */
-  static void WakeupWaitForData();
+  static void ProvideRefreshedDataEventHandle(WPI_EventHandle handle);
+  static void RemoveRefreshedDataEventHandle(WPI_EventHandle handle);
 
   /**
    * Allows the user to specify whether they want joystick connection warnings

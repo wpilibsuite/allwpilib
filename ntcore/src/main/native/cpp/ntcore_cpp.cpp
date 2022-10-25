@@ -157,7 +157,7 @@ std::vector<NT_Topic> GetTopics(NT_Inst inst, std::string_view prefix,
 }
 
 std::vector<NT_Topic> GetTopics(NT_Inst inst, std::string_view prefix,
-                                wpi::span<const std::string_view> types) {
+                                std::span<const std::string_view> types) {
   if (auto ii = InstanceImpl::GetTyped(inst, Handle::kInstance)) {
     return ii->localStorage.GetTopics(prefix, types);
   } else {
@@ -175,7 +175,7 @@ std::vector<TopicInfo> GetTopicInfo(NT_Inst inst, std::string_view prefix,
 }
 
 std::vector<TopicInfo> GetTopicInfo(NT_Inst inst, std::string_view prefix,
-                                    wpi::span<const std::string_view> types) {
+                                    std::span<const std::string_view> types) {
   if (auto ii = InstanceImpl::GetTyped(inst, Handle::kInstance)) {
     return ii->localStorage.GetTopicInfo(prefix, types);
   } else {
@@ -293,14 +293,16 @@ wpi::json GetTopicProperties(NT_Topic topic) {
   }
 }
 
-void SetTopicProperties(NT_Topic topic, const wpi::json& properties) {
+bool SetTopicProperties(NT_Topic topic, const wpi::json& properties) {
   if (auto ii = InstanceImpl::GetTyped(topic, Handle::kTopic)) {
-    ii->localStorage.SetTopicProperties(topic, properties);
+    return ii->localStorage.SetTopicProperties(topic, properties);
+  } else {
+    return {};
   }
 }
 
 NT_Subscriber Subscribe(NT_Topic topic, NT_Type type, std::string_view typeStr,
-                        wpi::span<const PubSubOption> options) {
+                        std::span<const PubSubOption> options) {
   if (auto ii = InstanceImpl::GetTyped(topic, Handle::kTopic)) {
     return ii->localStorage.Subscribe(topic, type, typeStr, options);
   } else {
@@ -315,13 +317,13 @@ void Unsubscribe(NT_Subscriber sub) {
 }
 
 NT_Publisher Publish(NT_Topic topic, NT_Type type, std::string_view typeStr,
-                     wpi::span<const PubSubOption> options) {
+                     std::span<const PubSubOption> options) {
   return PublishEx(topic, type, typeStr, wpi::json::object(), options);
 }
 
 NT_Publisher PublishEx(NT_Topic topic, NT_Type type, std::string_view typeStr,
                        const wpi::json& properties,
-                       wpi::span<const PubSubOption> options) {
+                       std::span<const PubSubOption> options) {
   if (auto ii = InstanceImpl::GetTyped(topic, Handle::kTopic)) {
     return ii->localStorage.Publish(topic, type, typeStr, properties, options);
   } else {
@@ -336,7 +338,7 @@ void Unpublish(NT_Handle pubentry) {
 }
 
 NT_Entry GetEntry(NT_Topic topic, NT_Type type, std::string_view typeStr,
-                  wpi::span<const PubSubOption> options) {
+                  std::span<const PubSubOption> options) {
   if (auto ii = InstanceImpl::GetTyped(topic, Handle::kTopic)) {
     return ii->localStorage.GetEntry(topic, type, typeStr, options);
   } else {
@@ -365,8 +367,8 @@ NT_Topic GetTopicFromHandle(NT_Handle pubsubentry) {
 }
 
 NT_MultiSubscriber SubscribeMultiple(NT_Inst inst,
-                                     wpi::span<const std::string_view> prefixes,
-                                     wpi::span<const PubSubOption> options) {
+                                     std::span<const std::string_view> prefixes,
+                                     std::span<const PubSubOption> options) {
   if (auto ii = InstanceImpl::GetTyped(inst, Handle::kInstance)) {
     return ii->localStorage.SubscribeMultiple(prefixes, options);
   } else {
@@ -385,7 +387,7 @@ void UnsubscribeMultiple(NT_MultiSubscriber sub) {
  */
 
 NT_TopicListener AddTopicListener(
-    NT_Inst inst, wpi::span<const std::string_view> prefixes, unsigned int mask,
+    NT_Inst inst, std::span<const std::string_view> prefixes, unsigned int mask,
     std::function<void(const TopicNotification&)> callback) {
   if (auto ii = InstanceImpl::GetTyped(inst, Handle::kInstance)) {
     return ii->localStorage.AddTopicListener(prefixes, mask,
@@ -420,7 +422,7 @@ void DestroyTopicListenerPoller(NT_TopicListenerPoller poller) {
 }
 
 NT_TopicListener AddPolledTopicListener(
-    NT_TopicListenerPoller poller, wpi::span<const std::string_view> prefixes,
+    NT_TopicListenerPoller poller, std::span<const std::string_view> prefixes,
     unsigned int mask) {
   if (auto ii = InstanceImpl::GetTyped(poller, Handle::kTopicListenerPoller)) {
     return ii->localStorage.AddPolledTopicListener(poller, prefixes, mask);
@@ -622,12 +624,6 @@ void StopConnectionDataLog(NT_ConnectionDataLogger logger) {
  * Client/Server Functions
  */
 
-void SetNetworkIdentity(NT_Inst inst, std::string_view name) {
-  if (auto ii = InstanceImpl::GetTyped(inst, Handle::kInstance)) {
-    ii->SetIdentity(name);
-  }
-}
-
 unsigned int GetNetworkMode(NT_Inst inst) {
   if (auto ii = InstanceImpl::GetTyped(inst, Handle::kInstance)) {
     return ii->networkMode;
@@ -662,15 +658,15 @@ void StopServer(NT_Inst inst) {
   }
 }
 
-void StartClient3(NT_Inst inst) {
+void StartClient3(NT_Inst inst, std::string_view identity) {
   if (auto ii = InstanceImpl::GetTyped(inst, Handle::kInstance)) {
-    ii->StartClient3();
+    ii->StartClient3(identity);
   }
 }
 
-void StartClient4(NT_Inst inst) {
+void StartClient4(NT_Inst inst, std::string_view identity) {
   if (auto ii = InstanceImpl::GetTyped(inst, Handle::kInstance)) {
-    ii->StartClient4();
+    ii->StartClient4(identity);
   }
 }
 
@@ -686,46 +682,41 @@ void SetServer(NT_Inst inst, const char* server_name, unsigned int port) {
 
 void SetServer(
     NT_Inst inst,
-    wpi::span<const std::pair<std::string_view, unsigned int>> servers) {
+    std::span<const std::pair<std::string_view, unsigned int>> servers) {
   if (auto ii = InstanceImpl::GetTyped(inst, Handle::kInstance)) {
-    if (auto client = ii->GetClient()) {
-      std::vector<std::pair<std::string, unsigned int>> serversCopy;
-      serversCopy.reserve(servers.size());
-      for (auto&& server : servers) {
-        serversCopy.emplace_back(std::string{server.first}, server.second);
-      }
-      client->SetServers(serversCopy);
+    std::vector<std::pair<std::string, unsigned int>> serversCopy;
+    serversCopy.reserve(servers.size());
+    for (auto&& server : servers) {
+      serversCopy.emplace_back(std::string{server.first}, server.second);
     }
+    ii->SetServers(serversCopy);
   }
 }
 
 void SetServerTeam(NT_Inst inst, unsigned int team, unsigned int port) {
   if (auto ii = InstanceImpl::GetTyped(inst, Handle::kInstance)) {
-    if (auto client = ii->GetClient()) {
-      std::vector<std::pair<std::string, unsigned int>> servers;
-      servers.reserve(5);
+    std::vector<std::pair<std::string, unsigned int>> servers;
+    servers.reserve(5);
 
-      // 10.te.am.2
-      servers.emplace_back(
-          fmt::format("10.{}.{}.2", static_cast<int>(team / 100),
-                      static_cast<int>(team % 100)),
-          port);
+    // 10.te.am.2
+    servers.emplace_back(fmt::format("10.{}.{}.2", static_cast<int>(team / 100),
+                                     static_cast<int>(team % 100)),
+                         port);
 
-      // 172.22.11.2
-      servers.emplace_back("172.22.11.2", port);
+    // 172.22.11.2
+    servers.emplace_back("172.22.11.2", port);
 
-      // roboRIO-<team>-FRC.local
-      servers.emplace_back(fmt::format("roboRIO-{}-FRC.local", team), port);
+    // roboRIO-<team>-FRC.local
+    servers.emplace_back(fmt::format("roboRIO-{}-FRC.local", team), port);
 
-      // roboRIO-<team>-FRC.lan
-      servers.emplace_back(fmt::format("roboRIO-{}-FRC.lan", team), port);
+    // roboRIO-<team>-FRC.lan
+    servers.emplace_back(fmt::format("roboRIO-{}-FRC.lan", team), port);
 
-      // roboRIO-<team>-FRC.frc-field.local
-      servers.emplace_back(fmt::format("roboRIO-{}-FRC.frc-field.local", team),
-                           port);
+    // roboRIO-<team>-FRC.frc-field.local
+    servers.emplace_back(fmt::format("roboRIO-{}-FRC.frc-field.local", team),
+                         port);
 
-      client->SetServers(servers);
-    }
+    ii->SetServers(servers);
   }
 }
 

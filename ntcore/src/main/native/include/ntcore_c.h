@@ -198,8 +198,7 @@ struct NT_TopicInfo {
 /** NetworkTables Connection Information */
 struct NT_ConnectionInfo {
   /**
-   * The remote identifier (as set on the remote node by
-   * NetworkTableInstance::SetNetworkIdentity() or nt::SetNetworkIdentity()).
+   * The remote identifier (as set on the remote node by NT_StartClient4().
    */
   struct NT_String remote_id;
 
@@ -671,6 +670,7 @@ char* NT_GetTopicProperties(NT_Topic topic, size_t* len);
  *
  * @param topic topic handle
  * @param properties JSON object string with keys to add/update/delete
+ * @return False if properties are not a valid JSON object
  */
 NT_Bool NT_SetTopicProperties(NT_Topic topic, const char* properties);
 
@@ -1114,17 +1114,6 @@ void NT_RemoveConnectionListener(NT_ConnectionListener conn_listener);
  */
 
 /**
- * Set the network identity of this node.
- * This is the name used during the initial connection handshake, and is
- * visible through NT_ConnectionInfo on the remote node.
- *
- * @param inst      instance handle
- * @param name      identity to advertise
- * @param name_len  length of name in bytes
- */
-void NT_SetNetworkIdentity(NT_Inst inst, const char* name, size_t name_len);
-
-/**
  * Get the current network mode.
  *
  * @param inst  instance handle
@@ -1171,17 +1160,19 @@ void NT_StopServer(NT_Inst inst);
  * Starts a NT3 client.  Use NT_SetServer or NT_SetServerTeam to set the server
  * name and port.
  *
- * @param inst  instance handle
+ * @param inst      instance handle
+ * @param identity  network identity to advertise (cannot be empty string)
  */
-void NT_StartClient3(NT_Inst inst);
+void NT_StartClient3(NT_Inst inst, const char* identity);
 
 /**
  * Starts a NT4 client.  Use NT_SetServer or NT_SetServerTeam to set the server
  * name and port.
  *
- * @param inst  instance handle
+ * @param inst      instance handle
+ * @param identity  network identity to advertise (cannot be empty string)
  */
-void NT_StartClient4(NT_Inst inst);
+void NT_StartClient4(NT_Inst inst, const char* identity);
 
 /**
  * Stops the client if it is running.

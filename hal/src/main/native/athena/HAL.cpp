@@ -28,6 +28,7 @@
 #include "hal/Errors.h"
 #include "hal/Notifier.h"
 #include "hal/handles/HandlesInternal.h"
+#include "hal/roborio/InterruptManager.h"
 #include "visa/visa.h"
 
 using namespace hal;
@@ -39,6 +40,7 @@ static uint64_t dsStartTime;
 using namespace hal;
 
 namespace hal {
+void InitializeDriverStation();
 namespace init {
 void InitializeHAL() {
   InitializeCTREPCM();
@@ -424,7 +426,13 @@ HAL_Bool HAL_Initialize(int32_t timeout, int32_t mode) {
     return false;
   }
 
-  HAL_InitializeDriverStation();
+  status = InterruptManager::Initialize(global->getSystemInterface());
+
+  if (status != 0) {
+    return false;
+  }
+
+  hal::InitializeDriverStation();
 
   dsStartTime = HAL_GetFPGATime(&status);
   if (status != 0) {

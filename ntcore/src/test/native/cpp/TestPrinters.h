@@ -5,10 +5,9 @@
 #pragma once
 
 #include <ostream>
+#include <span>
 #include <string>
 #include <string_view>
-
-#include <wpi/span.h>
 
 #include "gtest/gtest.h"
 
@@ -21,7 +20,7 @@ inline void PrintTo(std::string_view str, ::std::ostream* os) {
 }
 
 template <typename T>
-void PrintTo(span<T> val, ::std::ostream* os) {
+void PrintTo(std::span<T> val, ::std::ostream* os) {
   *os << '{';
   bool first = true;
   for (auto v : val) {

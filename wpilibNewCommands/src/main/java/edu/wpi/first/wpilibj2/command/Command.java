@@ -258,28 +258,15 @@ public interface Command {
    * decorated without issue.
    *
    * @return the decorated command
-   * @deprecated use {@link #endlessly()} instead.
+   * @deprecated PerpetualCommand violates the assumption that execute() doesn't get called after
+   *     isFinished() returns true -- an assumption that should be valid. This was unsafe/undefined
+   *     behavior from the start, and RepeatCommand provides an easy way to achieve similar end
+   *     results with slightly different (and safe) semantics.
    */
   @SuppressWarnings("removal") // PerpetualCommand
   @Deprecated(forRemoval = true, since = "2023")
   default PerpetualCommand perpetually() {
     return new PerpetualCommand(this);
-  }
-
-  /**
-   * Decorates this command to run endlessly, ignoring its ordinary end conditions. The decorated
-   * command can still be interrupted or canceled.
-   *
-   * <p>Note: This decorator works by composing this command within a CommandGroup. The command
-   * cannot be used independently after being decorated, or be re-decorated with a different
-   * decorator, unless it is manually cleared from the list of grouped commands with {@link
-   * CommandGroupBase#clearGroupedCommand(Command)}. The decorated command can, however, be further
-   * decorated without issue.
-   *
-   * @return the decorated command
-   */
-  default EndlessCommand endlessly() {
-    return new EndlessCommand(this);
   }
 
   /**
@@ -443,12 +430,30 @@ public interface Command {
   }
 
   /**
-   * Gets the name of this Command.
+   * Gets the name of this Command. Defaults to the simple class name if not overridden.
    *
-   * @return Name
+   * @return The display name of the Command
    */
   default String getName() {
     return this.getClass().getSimpleName();
+  }
+
+  /**
+   * Sets the name of this Command. Nullop if not overridden.
+   *
+   * @param name The display name of the Command.
+   */
+  default void setName(String name) {}
+
+  /**
+   * Decorates this Command with a name. Is an inline function for #setName(String);
+   *
+   * @param name name
+   * @return the decorated Command
+   */
+  default Command withName(String name) {
+    this.setName(name);
+    return this;
   }
 
   /**

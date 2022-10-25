@@ -70,32 +70,32 @@ inline std::string NetworkTableEntry::GetString(
 }
 
 inline std::vector<uint8_t> NetworkTableEntry::GetRaw(
-    wpi::span<const uint8_t> defaultValue) const {
+    std::span<const uint8_t> defaultValue) const {
   return nt::GetRaw(m_handle, defaultValue);
 }
 
 inline std::vector<int> NetworkTableEntry::GetBooleanArray(
-    wpi::span<const int> defaultValue) const {
+    std::span<const int> defaultValue) const {
   return nt::GetBooleanArray(m_handle, defaultValue);
 }
 
 inline std::vector<int64_t> NetworkTableEntry::GetIntegerArray(
-    wpi::span<const int64_t> defaultValue) const {
+    std::span<const int64_t> defaultValue) const {
   return nt::GetIntegerArray(m_handle, defaultValue);
 }
 
 inline std::vector<float> NetworkTableEntry::GetFloatArray(
-    wpi::span<const float> defaultValue) const {
+    std::span<const float> defaultValue) const {
   return nt::GetFloatArray(m_handle, defaultValue);
 }
 
 inline std::vector<double> NetworkTableEntry::GetDoubleArray(
-    wpi::span<const double> defaultValue) const {
+    std::span<const double> defaultValue) const {
   return nt::GetDoubleArray(m_handle, defaultValue);
 }
 
 inline std::vector<std::string> NetworkTableEntry::GetStringArray(
-    wpi::span<const std::string> defaultValue) const {
+    std::span<const std::string> defaultValue) const {
   return nt::GetStringArray(m_handle, defaultValue);
 }
 
@@ -128,32 +128,32 @@ inline bool NetworkTableEntry::SetDefaultString(std::string_view defaultValue) {
 }
 
 inline bool NetworkTableEntry::SetDefaultRaw(
-    wpi::span<const uint8_t> defaultValue) {
+    std::span<const uint8_t> defaultValue) {
   return nt::SetDefaultRaw(m_handle, defaultValue);
 }
 
 inline bool NetworkTableEntry::SetDefaultBooleanArray(
-    wpi::span<const int> defaultValue) {
+    std::span<const int> defaultValue) {
   return nt::SetDefaultBooleanArray(m_handle, defaultValue);
 }
 
 inline bool NetworkTableEntry::SetDefaultIntegerArray(
-    wpi::span<const int64_t> defaultValue) {
+    std::span<const int64_t> defaultValue) {
   return nt::SetDefaultIntegerArray(m_handle, defaultValue);
 }
 
 inline bool NetworkTableEntry::SetDefaultFloatArray(
-    wpi::span<const float> defaultValue) {
+    std::span<const float> defaultValue) {
   return nt::SetDefaultFloatArray(m_handle, defaultValue);
 }
 
 inline bool NetworkTableEntry::SetDefaultDoubleArray(
-    wpi::span<const double> defaultValue) {
+    std::span<const double> defaultValue) {
   return nt::SetDefaultDoubleArray(m_handle, defaultValue);
 }
 
 inline bool NetworkTableEntry::SetDefaultStringArray(
-    wpi::span<const std::string> defaultValue) {
+    std::span<const std::string> defaultValue) {
   return nt::SetDefaultStringArray(m_handle, defaultValue);
 }
 
@@ -181,38 +181,38 @@ inline bool NetworkTableEntry::SetString(std::string_view value, int64_t time) {
   return nt::SetString(m_handle, value, time);
 }
 
-inline bool NetworkTableEntry::SetRaw(wpi::span<const uint8_t> value,
+inline bool NetworkTableEntry::SetRaw(std::span<const uint8_t> value,
                                       int64_t time) {
   return nt::SetRaw(m_handle, value, time);
 }
 
-inline bool NetworkTableEntry::SetBooleanArray(wpi::span<const bool> value,
+inline bool NetworkTableEntry::SetBooleanArray(std::span<const bool> value,
                                                int64_t time) {
   return SetEntryValue(m_handle, Value::MakeBooleanArray(value, time));
 }
 
-inline bool NetworkTableEntry::SetBooleanArray(wpi::span<const int> value,
+inline bool NetworkTableEntry::SetBooleanArray(std::span<const int> value,
                                                int64_t time) {
   return nt::SetBooleanArray(m_handle, value, time);
 }
 
-inline bool NetworkTableEntry::SetIntegerArray(wpi::span<const int64_t> value,
+inline bool NetworkTableEntry::SetIntegerArray(std::span<const int64_t> value,
                                                int64_t time) {
   return nt::SetIntegerArray(m_handle, value, time);
 }
 
-inline bool NetworkTableEntry::SetFloatArray(wpi::span<const float> value,
+inline bool NetworkTableEntry::SetFloatArray(std::span<const float> value,
                                              int64_t time) {
   return nt::SetFloatArray(m_handle, value, time);
 }
 
-inline bool NetworkTableEntry::SetDoubleArray(wpi::span<const double> value,
+inline bool NetworkTableEntry::SetDoubleArray(std::span<const double> value,
                                               int64_t time) {
   return nt::SetDoubleArray(m_handle, value, time);
 }
 
 inline bool NetworkTableEntry::SetStringArray(
-    wpi::span<const std::string> value, int64_t time) {
+    std::span<const std::string> value, int64_t time) {
   return nt::SetStringArray(m_handle, value, time);
 }
 

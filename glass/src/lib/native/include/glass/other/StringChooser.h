@@ -8,8 +8,6 @@
 #include <string_view>
 #include <vector>
 
-#include <wpi/span.h>
-
 #include "glass/Model.h"
 
 namespace glass {

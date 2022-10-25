@@ -8,13 +8,13 @@
 
 #include <functional>
 #include <memory>
+#include <span>
 #include <string>
 #include <string_view>
 #include <utility>
 #include <vector>
 
 #include <wpi/mutex.h>
-#include <wpi/span.h>
 
 #include "net/NetworkInterface.h"
 #include "ntcore_cpp.h"
@@ -41,8 +41,8 @@ class LocalStorage final : public net::ILocalStorage {
                                bool ack) final;
   void NetworkSetValue(NT_Topic topicHandle, const Value& value) final;
 
-  void StartNetwork(net::NetworkStartupInterface& startup) final;
-  void SetNetwork(net::NetworkInterface* network) final;
+  void StartNetwork(net::NetworkStartupInterface& startup,
+                    net::NetworkInterface* network) final;
   void ClearNetwork() final;
 
   // User functions.  These are the actual implementations of the corresponding
@@ -50,12 +50,12 @@ class LocalStorage final : public net::ILocalStorage {
 
   std::vector<NT_Topic> GetTopics(std::string_view prefix, unsigned int types);
   std::vector<NT_Topic> GetTopics(std::string_view prefix,
-                                  wpi::span<const std::string_view> types);
+                                  std::span<const std::string_view> types);
 
   std::vector<TopicInfo> GetTopicInfo(std::string_view prefix,
                                       unsigned int types);
   std::vector<TopicInfo> GetTopicInfo(std::string_view prefix,
-                                      wpi::span<const std::string_view> types);
+                                      std::span<const std::string_view> types);
 
   NT_Topic GetTopic(std::string_view name);
 
@@ -84,30 +84,30 @@ class LocalStorage final : public net::ILocalStorage {
 
   wpi::json GetTopicProperties(NT_Topic topic);
 
-  void SetTopicProperties(NT_Topic topic, const wpi::json& update);
+  bool SetTopicProperties(NT_Topic topic, const wpi::json& update);
 
   TopicInfo GetTopicInfo(NT_Topic topic);
 
   NT_Subscriber Subscribe(NT_Topic topic, NT_Type type,
                           std::string_view typeStr,
-                          wpi::span<const PubSubOption> options);
+                          std::span<const PubSubOption> options);
 
   void Unsubscribe(NT_Subscriber sub);
 
   NT_MultiSubscriber SubscribeMultiple(
-      wpi::span<const std::string_view> prefixes,
-      wpi::span<const PubSubOption> options);
+      std::span<const std::string_view> prefixes,
+      std::span<const PubSubOption> options);
 
   void UnsubscribeMultiple(NT_MultiSubscriber subHandle);
 
   NT_Publisher Publish(NT_Topic topic, NT_Type type, std::string_view typeStr,
                        const wpi::json& properties,
-                       wpi::span<const PubSubOption> options);
+                       std::span<const PubSubOption> options);
 
   void Unpublish(NT_Handle pubentry);
 
   NT_Entry GetEntry(NT_Topic topic, NT_Type type, std::string_view typeStr,
-                    wpi::span<const PubSubOption> options);
+                    std::span<const PubSubOption> options);
 
   void ReleaseEntry(NT_Entry entry);
 
@@ -126,36 +126,36 @@ class LocalStorage final : public net::ILocalStorage {
   TimestampedString GetAtomicString(NT_Handle subentry,
                                     std::string_view defaultValue);
   TimestampedRaw GetAtomicRaw(NT_Handle subentry,
-                              wpi::span<const uint8_t> defaultValue);
+                              std::span<const uint8_t> defaultValue);
   TimestampedBooleanArray GetAtomicBooleanArray(
-      NT_Handle subentry, wpi::span<const int> defaultValue);
+      NT_Handle subentry, std::span<const int> defaultValue);
   TimestampedIntegerArray GetAtomicIntegerArray(
-      NT_Handle subentry, wpi::span<const int64_t> defaultValue);
+      NT_Handle subentry, std::span<const int64_t> defaultValue);
   TimestampedFloatArray GetAtomicFloatArray(
-      NT_Handle subentry, wpi::span<const float> defaultValue);
+      NT_Handle subentry, std::span<const float> defaultValue);
   TimestampedDoubleArray GetAtomicDoubleArray(
-      NT_Handle subentry, wpi::span<const double> defaultValue);
+      NT_Handle subentry, std::span<const double> defaultValue);
   TimestampedStringArray GetAtomicStringArray(
-      NT_Handle subentry, wpi::span<const std::string> defaultValue);
+      NT_Handle subentry, std::span<const std::string> defaultValue);
 
   TimestampedStringView GetAtomicString(NT_Handle subentry,
                                         wpi::SmallVectorImpl<char>& buf,
                                         std::string_view defaultValue);
   TimestampedRawView GetAtomicRaw(NT_Handle subentry,
                                   wpi::SmallVectorImpl<uint8_t>& buf,
-                                  wpi::span<const uint8_t> defaultValue);
+                                  std::span<const uint8_t> defaultValue);
   TimestampedBooleanArrayView GetAtomicBooleanArray(
       NT_Handle subentry, wpi::SmallVectorImpl<int>& buf,
-      wpi::span<const int> defaultValue);
+      std::span<const int> defaultValue);
   TimestampedIntegerArrayView GetAtomicIntegerArray(
       NT_Handle subentry, wpi::SmallVectorImpl<int64_t>& buf,
-      wpi::span<const int64_t> defaultValue);
+      std::span<const int64_t> defaultValue);
   TimestampedFloatArrayView GetAtomicFloatArray(
       NT_Handle subentry, wpi::SmallVectorImpl<float>& buf,
-      wpi::span<const float> defaultValue);
+      std::span<const float> defaultValue);
   TimestampedDoubleArrayView GetAtomicDoubleArray(
       NT_Handle subentry, wpi::SmallVectorImpl<double>& buf,
-      wpi::span<const double> defaultValue);
+      std::span<const double> defaultValue);
 
   std::vector<Value> ReadQueueValue(NT_Handle subentry);
 
@@ -193,7 +193,7 @@ class LocalStorage final : public net::ILocalStorage {
   //
 
   NT_TopicListener AddTopicListener(
-      wpi::span<const std::string_view> prefixes, unsigned int mask,
+      std::span<const std::string_view> prefixes, unsigned int mask,
       std::function<void(const TopicNotification&)> callback);
   NT_TopicListener AddTopicListener(
       NT_Handle handle, unsigned int mask,
@@ -203,7 +203,7 @@ class LocalStorage final : public net::ILocalStorage {
   void DestroyTopicListenerPoller(NT_TopicListenerPoller poller);
 
   NT_TopicListener AddPolledTopicListener(
-      NT_TopicListenerPoller poller, wpi::span<const std::string_view> prefixes,
+      NT_TopicListenerPoller poller, std::span<const std::string_view> prefixes,
       unsigned int mask);
   NT_TopicListener AddPolledTopicListener(NT_TopicListenerPoller poller,
                                           NT_Handle handle, unsigned int mask);

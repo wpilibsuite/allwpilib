@@ -76,7 +76,7 @@ nt::NetworkTableEntry SmartDashboard::GetEntry(std::string_view key) {
 
 void SmartDashboard::PutData(std::string_view key, wpi::Sendable* data) {
   if (!data) {
-    throw FRC_MakeError(err::NullParameter, "{}", "value");
+    throw FRC_MakeError(err::NullParameter, "value");
   }
   auto& inst = GetInstance();
   std::scoped_lock lock(inst.tablesToDataMutex);
@@ -96,7 +96,7 @@ void SmartDashboard::PutData(std::string_view key, wpi::Sendable* data) {
 
 void SmartDashboard::PutData(wpi::Sendable* value) {
   if (!value) {
-    throw FRC_MakeError(err::NullParameter, "{}", "value");
+    throw FRC_MakeError(err::NullParameter, "value");
   }
   auto name = wpi::SendableRegistry::GetName(value);
   if (!name.empty()) {
@@ -157,63 +157,63 @@ std::string SmartDashboard::GetString(std::string_view keyName,
 }
 
 bool SmartDashboard::PutBooleanArray(std::string_view key,
-                                     wpi::span<const int> value) {
+                                     std::span<const int> value) {
   return GetInstance().table->GetEntry(key).SetBooleanArray(value);
 }
 
 bool SmartDashboard::SetDefaultBooleanArray(std::string_view key,
-                                            wpi::span<const int> defaultValue) {
+                                            std::span<const int> defaultValue) {
   return GetInstance().table->GetEntry(key).SetDefaultBooleanArray(
       defaultValue);
 }
 
 std::vector<int> SmartDashboard::GetBooleanArray(
-    std::string_view key, wpi::span<const int> defaultValue) {
+    std::string_view key, std::span<const int> defaultValue) {
   return GetInstance().table->GetEntry(key).GetBooleanArray(defaultValue);
 }
 
 bool SmartDashboard::PutNumberArray(std::string_view key,
-                                    wpi::span<const double> value) {
+                                    std::span<const double> value) {
   return GetInstance().table->GetEntry(key).SetDoubleArray(value);
 }
 
 bool SmartDashboard::SetDefaultNumberArray(
-    std::string_view key, wpi::span<const double> defaultValue) {
+    std::string_view key, std::span<const double> defaultValue) {
   return GetInstance().table->GetEntry(key).SetDefaultDoubleArray(defaultValue);
 }
 
 std::vector<double> SmartDashboard::GetNumberArray(
-    std::string_view key, wpi::span<const double> defaultValue) {
+    std::string_view key, std::span<const double> defaultValue) {
   return GetInstance().table->GetEntry(key).GetDoubleArray(defaultValue);
 }
 
 bool SmartDashboard::PutStringArray(std::string_view key,
-                                    wpi::span<const std::string> value) {
+                                    std::span<const std::string> value) {
   return GetInstance().table->GetEntry(key).SetStringArray(value);
 }
 
 bool SmartDashboard::SetDefaultStringArray(
-    std::string_view key, wpi::span<const std::string> defaultValue) {
+    std::string_view key, std::span<const std::string> defaultValue) {
   return GetInstance().table->GetEntry(key).SetDefaultStringArray(defaultValue);
 }
 
 std::vector<std::string> SmartDashboard::GetStringArray(
-    std::string_view key, wpi::span<const std::string> defaultValue) {
+    std::string_view key, std::span<const std::string> defaultValue) {
   return GetInstance().table->GetEntry(key).GetStringArray(defaultValue);
 }
 
 bool SmartDashboard::PutRaw(std::string_view key,
-                            wpi::span<const uint8_t> value) {
+                            std::span<const uint8_t> value) {
   return GetInstance().table->GetEntry(key).SetRaw(value);
 }
 
 bool SmartDashboard::SetDefaultRaw(std::string_view key,
-                                   wpi::span<const uint8_t> defaultValue) {
+                                   std::span<const uint8_t> defaultValue) {
   return GetInstance().table->GetEntry(key).SetDefaultRaw(defaultValue);
 }
 
 std::vector<uint8_t> SmartDashboard::GetRaw(
-    std::string_view key, wpi::span<const uint8_t> defaultValue) {
+    std::string_view key, std::span<const uint8_t> defaultValue) {
   return GetInstance().table->GetEntry(key).GetRaw(defaultValue);
 }
 

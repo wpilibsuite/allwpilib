@@ -14,7 +14,7 @@ jobs:
         include:
           - os: ubuntu-latest
             name: Linux
-            container: wpilib/roborio-cross-ubuntu:2022-20.04
+            container: wpilib/roborio-cross-ubuntu:2023-22.04
             flags: ""
           - os: macOS-11
             name: macOS
@@ -27,12 +27,17 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
+      - name: Install dependencies (Linux)
+        if: runner.os == 'Linux'
+        run: sudo apt-get update && sudo apt-get install -y libopencv-dev libopencv4.5-java python-is-python3
+
       - name: Install opencv (macOS)
         run: brew install opencv
         if: runner.os == 'macOS'
 
-      - name: Set up Python 3.8
-        uses: actions/setup-python@v2
+      - name: Set up Python 3.8 (macOS)
+        if: runner.os == 'macOS'
+        uses: actions/setup-python@v4
         with:
           python-version: 3.8
 

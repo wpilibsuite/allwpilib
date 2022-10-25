@@ -24,7 +24,7 @@ PIDController::PIDController(double Kp, double Ki, double Kd,
         period.value());
     m_period = 20_ms;
     wpi::math::MathSharedStore::ReportWarning(
-        "{}", "Controller period defaulted to 20ms.");
+        "Controller period defaulted to 20ms.");
   }
   static int instances = 0;
   instances++;

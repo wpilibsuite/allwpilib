@@ -2,6 +2,8 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
+#include <numbers>
+
 #include <frc/Encoder.h>
 #include <frc/Joystick.h>
 #include <frc/RobotController.h>
@@ -23,7 +25,6 @@
 #include <units/angle.h>
 #include <units/length.h>
 #include <units/moment_of_inertia.h>
-#include <wpi/numbers>
 
 /**
  * This is a sample program to demonstrate how to use a state-space controller
@@ -46,7 +47,7 @@ class Robot : public frc::TimedRobot {
   // distance per pulse = (distance per revolution) / (pulses per revolution)
   //  = (Pi * D) / ppr
   static constexpr double kArmEncoderDistPerPulse =
-      2.0 * wpi::numbers::pi * kElevatorDrumRadius.value() / 4096.0;
+      2.0 * std::numbers::pi * kElevatorDrumRadius.value() / 4096.0;
 
   // This gearbox represents a gearbox containing 4 Vex 775pro motors.
   frc::DCMotor m_elevatorGearbox = frc::DCMotor::Vex775Pro(4);

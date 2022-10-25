@@ -20,8 +20,9 @@ jobs:
         with:
           fetch-depth: 0
           persist-credentials: false
-      - uses: actions/setup-java@v1
+      - uses: actions/setup-java@v3
         with:
+          distribution: 'zulu'
           java-version: 13
       - name: Install libclang-9
         run: sudo apt update && sudo apt install -y libclang-cpp9 libclang1-9
@@ -42,11 +43,11 @@ jobs:
       - name: Build with Gradle
         run: ./gradlew docs:generateJavaDocs docs:doxygen -PbuildServer ${{ env.EXTRA_GRADLE_ARGS }}
       - name: Install SSH Client 🔑
-        uses: webfactory/ssh-agent@v0.4.1
+        uses: webfactory/ssh-agent@v0.7.0
         with:
           ssh-private-key: ${{ secrets.GH_DEPLOY_KEY }}
       - name: Deploy Java 🚀
-        uses: JamesIves/github-pages-deploy-action@3.7.1
+        uses: JamesIves/github-pages-deploy-action@v4.4.1
         with:
           SSH: true
           REPOSITORY_NAME: wpilibsuite/wpilibsuite.github.io
@@ -55,7 +56,7 @@ jobs:
           FOLDER: docs/build/docs/javadoc
           TARGET_FOLDER: ${{ env.TARGET_FOLDER }}/java
       - name: Deploy C++ 🚀
-        uses: JamesIves/github-pages-deploy-action@3.7.1
+        uses: JamesIves/github-pages-deploy-action@v4.4.1
         with:
           SSH: true
           REPOSITORY_NAME: wpilibsuite/wpilibsuite.github.io

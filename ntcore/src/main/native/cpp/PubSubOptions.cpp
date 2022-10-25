@@ -8,7 +8,7 @@
 
 using namespace nt;
 
-nt::PubSubOptions::PubSubOptions(wpi::span<const PubSubOption> options) {
+nt::PubSubOptions::PubSubOptions(std::span<const PubSubOption> options) {
   for (auto&& option : options) {
     switch (option.type) {
       case NT_PUBSUB_PERIODIC:

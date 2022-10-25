@@ -119,7 +119,7 @@ void CommandScheduler::Schedule(Command* command) {
   }
 
   if (command->IsGrouped()) {
-    throw FRC_MakeError(frc::err::CommandIllegalUse, "{}",
+    throw FRC_MakeError(frc::err::CommandIllegalUse,
                         "A command that is part of a command group "
                         "cannot be independently scheduled");
     return;
@@ -163,7 +163,7 @@ void CommandScheduler::Schedule(Command* command) {
   }
 }
 
-void CommandScheduler::Schedule(wpi::span<Command* const> commands) {
+void CommandScheduler::Schedule(std::span<Command* const> commands) {
   for (auto command : commands) {
     Schedule(command);
   }
@@ -276,7 +276,7 @@ void CommandScheduler::RegisterSubsystem(
 }
 
 void CommandScheduler::RegisterSubsystem(
-    wpi::span<Subsystem* const> subsystems) {
+    std::span<Subsystem* const> subsystems) {
   for (auto* subsystem : subsystems) {
     RegisterSubsystem(subsystem);
   }
@@ -290,10 +290,24 @@ void CommandScheduler::UnregisterSubsystem(
 }
 
 void CommandScheduler::UnregisterSubsystem(
-    wpi::span<Subsystem* const> subsystems) {
+    std::span<Subsystem* const> subsystems) {
   for (auto* subsystem : subsystems) {
     UnregisterSubsystem(subsystem);
   }
+}
+
+void CommandScheduler::SetDefaultCommand(Subsystem* subsystem,
+                                         CommandPtr&& defaultCommand) {
+  if (!defaultCommand.get()->HasRequirement(subsystem)) {
+    throw FRC_MakeError(frc::err::CommandIllegalUse, "{}",
+                        "Default commands must require their subsystem!");
+  }
+  if (defaultCommand.get()->IsFinished()) {
+    throw FRC_MakeError(frc::err::CommandIllegalUse, "{}",
+                        "Default commands should not end!");
+  }
+
+  SetDefaultCommandImpl(subsystem, std::move(defaultCommand).Unwrap());
 }
 
 Command* CommandScheduler::GetDefaultCommand(const Subsystem* subsystem) const {
@@ -336,7 +350,7 @@ void CommandScheduler::Cancel(const CommandPtr& command) {
   Cancel(command.get());
 }
 
-void CommandScheduler::Cancel(wpi::span<Command* const> commands) {
+void CommandScheduler::Cancel(std::span<Command* const> commands) {
   for (auto command : commands) {
     Cancel(command);
   }
@@ -357,7 +371,7 @@ void CommandScheduler::CancelAll() {
 }
 
 bool CommandScheduler::IsScheduled(
-    wpi::span<const Command* const> commands) const {
+    std::span<const Command* const> commands) const {
   for (auto command : commands) {
     if (!IsScheduled(command)) {
       return false;

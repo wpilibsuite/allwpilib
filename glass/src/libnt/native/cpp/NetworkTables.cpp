@@ -9,6 +9,7 @@
 #include <cstring>
 #include <initializer_list>
 #include <memory>
+#include <span>
 #include <string_view>
 #include <vector>
 
@@ -25,7 +26,6 @@
 #include <wpi/StringExtras.h>
 #include <wpi/mpack.h>
 #include <wpi/raw_ostream.h>
-#include <wpi/span.h>
 
 #include "glass/Context.h"
 #include "glass/DataSource.h"
@@ -58,7 +58,7 @@ static bool IsVisible(ShowCategory category, bool persistent, bool retained) {
   }
 }
 
-static std::string BooleanArrayToString(wpi::span<const int> in) {
+static std::string BooleanArrayToString(std::span<const int> in) {
   std::string rv;
   wpi::raw_string_ostream os{rv};
   os << '[';
@@ -78,17 +78,17 @@ static std::string BooleanArrayToString(wpi::span<const int> in) {
   return rv;
 }
 
-static std::string IntegerArrayToString(wpi::span<const int64_t> in) {
+static std::string IntegerArrayToString(std::span<const int64_t> in) {
   return fmt::format("[{:d}]", fmt::join(in, ","));
 }
 
 template <typename T>
-static std::string FloatArrayToString(wpi::span<const T> in) {
+static std::string FloatArrayToString(std::span<const T> in) {
   static_assert(std::is_same_v<T, float> || std::is_same_v<T, double>);
   return fmt::format("[{:.6f}]", fmt::join(in, ","));
 }
 
-static std::string StringArrayToString(wpi::span<const std::string> in) {
+static std::string StringArrayToString(std::span<const std::string> in) {
   std::string rv;
   wpi::raw_string_ostream os{rv};
   os << '[';
@@ -176,7 +176,6 @@ static void UpdateMsgpackValueSource(NetworkTablesModel::ValueSource* out,
     case mpack::mpack_type_str: {
       std::string str;
       mpack_read_str(&r, &tag, &str);
-      mpack_done_str(&r);
       out->UpdateFromValue(nt::Value::MakeString(std::move(str), time), name,
                            "");
       break;
@@ -461,7 +460,6 @@ void NetworkTablesModel::Update() {
                              entry->info.type_str);
       if (wpi::starts_with(entry->info.name, '$') && entry->value.IsRaw() &&
           entry->info.type_str == "msgpack") {
-        fmt::print(stderr, "Updating meta-topic {}\n", entry->info.name);
         // meta topic handling
         if (entry->info.name == "$clients") {
           UpdateClients(entry->value.GetRaw());
@@ -528,7 +526,7 @@ void NetworkTablesModel::RebuildTreeImpl(std::vector<TreeNode>* tree,
 
     // get to leaf
     auto nodes = tree;
-    for (auto part : wpi::drop_back(wpi::span{parts.begin(), parts.end()})) {
+    for (auto part : wpi::drop_back(std::span{parts.begin(), parts.end()})) {
       auto it =
           std::find_if(nodes->begin(), nodes->end(),
                        [&](const auto& node) { return node.name == part; });
@@ -584,7 +582,7 @@ NetworkTablesModel::Entry* NetworkTablesModel::AddEntry(NT_Topic topic) {
 }
 
 void NetworkTablesModel::Client::UpdatePublishers(
-    wpi::span<const uint8_t> data) {
+    std::span<const uint8_t> data) {
   mpack_reader_t r;
   mpack_reader_init_data(&r, data);
   uint32_t numPub = mpack_expect_array_max(&r, 1000);
@@ -639,7 +637,7 @@ static void DecodeSubscriberOptions(
 }
 
 void NetworkTablesModel::Client::UpdateSubscribers(
-    wpi::span<const uint8_t> data) {
+    std::span<const uint8_t> data) {
   mpack_reader_t r;
   mpack_reader_init_data(&r, data);
   uint32_t numSub = mpack_expect_array_max(&r, 1000);
@@ -681,7 +679,7 @@ void NetworkTablesModel::Client::UpdateSubscribers(
   }
 }
 
-void NetworkTablesModel::UpdateClients(wpi::span<const uint8_t> data) {
+void NetworkTablesModel::UpdateClients(std::span<const uint8_t> data) {
   mpack_reader_t r;
   mpack_reader_init_data(&r, data);
   uint32_t numClients = mpack_expect_array_max(&r, 100);

@@ -2,6 +2,8 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
+#include <numbers>
+
 #include <frc/geometry/Translation2d.h>
 #include <frc/kinematics/SwerveDriveKinematics.h>
 #include <frc/trajectory/TrapezoidProfile.h>
@@ -13,7 +15,6 @@
 #include <units/time.h>
 #include <units/velocity.h>
 #include <units/voltage.h>
-#include <wpi/numbers>
 
 #pragma once
 
@@ -77,12 +78,12 @@ constexpr int kEncoderCPR = 1024;
 constexpr double kWheelDiameterMeters = 0.15;
 constexpr double kDriveEncoderDistancePerPulse =
     // Assumes the encoders are directly mounted on the wheel shafts
-    (kWheelDiameterMeters * wpi::numbers::pi) /
+    (kWheelDiameterMeters * std::numbers::pi) /
     static_cast<double>(kEncoderCPR);
 
 constexpr double kTurningEncoderDistancePerPulse =
     // Assumes the encoders are directly mounted on the wheel shafts
-    (wpi::numbers::pi * 2) / static_cast<double>(kEncoderCPR);
+    (std::numbers::pi * 2) / static_cast<double>(kEncoderCPR);
 
 constexpr double kPModuleTurningController = 1;
 constexpr double kPModuleDriveController = 1;

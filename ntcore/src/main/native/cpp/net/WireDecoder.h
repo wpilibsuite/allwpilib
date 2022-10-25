@@ -7,10 +7,9 @@
 #include <stdint.h>
 
 #include <optional>
+#include <span>
 #include <string>
 #include <string_view>
-
-#include <wpi/span.h>
 
 namespace wpi {
 class Logger;
@@ -35,7 +34,7 @@ class ClientMessageHandler {
   virtual void ClientSetProperties(std::string_view name,
                                    const wpi::json& update) = 0;
   virtual void ClientSubscribe(int64_t subuid,
-                               wpi::span<const std::string> topicNames,
+                               std::span<const std::string> topicNames,
                                const PubSubOptions& options) = 0;
   virtual void ClientUnsubscribe(int64_t subuid) = 0;
 };
@@ -58,7 +57,7 @@ void WireDecodeText(std::string_view in, ServerMessageHandler& out,
                     wpi::Logger& logger);
 
 // returns true if successfully decoded a message
-bool WireDecodeBinary(wpi::span<const uint8_t>* in, int64_t* outId,
+bool WireDecodeBinary(std::span<const uint8_t>* in, int64_t* outId,
                       Value* outValue, std::string* error,
                       int64_t localTimeOffset);
 

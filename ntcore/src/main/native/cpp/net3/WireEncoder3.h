@@ -6,9 +6,8 @@
 
 #include <stdint.h>
 
+#include <span>
 #include <string_view>
-
-#include <wpi/span.h>
 
 namespace wpi {
 class raw_ostream;
@@ -41,9 +40,9 @@ void WireEncodeFlagsUpdate(wpi::raw_ostream& os, unsigned int id,
                            unsigned int flags);
 void WireEncodeEntryDelete(wpi::raw_ostream& os, unsigned int id);
 void WireEncodeExecuteRpc(wpi::raw_ostream& os, unsigned int id,
-                          unsigned int uid, wpi::span<const uint8_t> params);
+                          unsigned int uid, std::span<const uint8_t> params);
 void WireEncodeRpcResponse(wpi::raw_ostream& os, unsigned int id,
-                           unsigned int uid, wpi::span<const uint8_t> result);
+                           unsigned int uid, std::span<const uint8_t> result);
 
 bool WireEncode(wpi::raw_ostream& os, const Message3& msg);
 

@@ -89,7 +89,7 @@
 #ifndef WPIUTIL_WPI_CONVERTUTF_H
 #define WPIUTIL_WPI_CONVERTUTF_H
 
-#include "wpi/span.h"
+#include <span>
 
 #include <cstddef>
 #include <string>
@@ -259,7 +259,7 @@ inline ConversionResult convertUTF8Sequence(const UTF8 **source,
  * Returns true if a blob of text starts with a UTF-16 big or little endian byte
  * order mark.
  */
-bool hasUTF16ByteOrderMark(span<const char> SrcBytes);
+bool hasUTF16ByteOrderMark(std::span<const char> SrcBytes);
 
 /**
  * Converts a stream of raw bytes assumed to be UTF16 into a UTF8 std::string.
@@ -268,7 +268,7 @@ bool hasUTF16ByteOrderMark(span<const char> SrcBytes);
  * \param [out] Out Converted UTF-8 is stored here on success.
  * \returns true on success
  */
-bool convertUTF16ToUTF8String(span<const char> SrcBytes, SmallVectorImpl<char> &Out);
+bool convertUTF16ToUTF8String(std::span<const char> SrcBytes, SmallVectorImpl<char> &Out);
 
 /**
 * Converts a UTF16 string into a UTF8 std::string.
@@ -277,7 +277,7 @@ bool convertUTF16ToUTF8String(span<const char> SrcBytes, SmallVectorImpl<char> &
 * \param [out] Out Converted UTF-8 is stored here on success.
 * \returns true on success
 */
-bool convertUTF16ToUTF8String(span<const UTF16> Src, SmallVectorImpl<char> &Out);
+bool convertUTF16ToUTF8String(std::span<const UTF16> Src, SmallVectorImpl<char> &Out);
 
 /**
  * Converts a UTF-8 string into a UTF-16 string with native endianness.

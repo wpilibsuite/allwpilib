@@ -5,11 +5,11 @@
 #pragma once
 
 #include <numeric>
+#include <span>
 
 #include <units/current.h>
 #include <units/impedance.h>
 #include <units/voltage.h>
-#include <wpi/span.h>
 
 namespace frc::sim {
 
@@ -32,7 +32,7 @@ class BatterySim {
    */
   static units::volt_t Calculate(units::volt_t nominalVoltage,
                                  units::ohm_t resistance,
-                                 wpi::span<const units::ampere_t> currents) {
+                                 std::span<const units::ampere_t> currents) {
     return nominalVoltage -
            std::accumulate(currents.begin(), currents.end(), 0_A) * resistance;
   }
@@ -66,7 +66,7 @@ class BatterySim {
    * @param currents The currents drawn from the battery.
    * @return The battery's voltage under load.
    */
-  static units::volt_t Calculate(wpi::span<const units::ampere_t> currents) {
+  static units::volt_t Calculate(std::span<const units::ampere_t> currents) {
     return Calculate(12_V, 0.02_Ohm, currents);
   }
 

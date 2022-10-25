@@ -109,8 +109,8 @@ class DataLog::Buffer {
 
   size_t GetRemaining() const { return m_maxLen - m_len; }
 
-  wpi::span<uint8_t> GetData() { return {m_buf, m_len}; }
-  wpi::span<const uint8_t> GetData() const { return {m_buf, m_len}; }
+  std::span<uint8_t> GetData() { return {m_buf, m_len}; }
+  std::span<const uint8_t> GetData() const { return {m_buf, m_len}; }
 
  private:
   uint8_t* m_buf;
@@ -142,12 +142,12 @@ DataLog::DataLog(wpi::Logger& msglog, std::string_view dir,
       m_newFilename{filename},
       m_thread{[this, dir = std::string{dir}] { WriterThreadMain(dir); }} {}
 
-DataLog::DataLog(std::function<void(wpi::span<const uint8_t> data)> write,
+DataLog::DataLog(std::function<void(std::span<const uint8_t> data)> write,
                  double period, std::string_view extraHeader)
     : DataLog{defaultMessageLog, std::move(write), period, extraHeader} {}
 
 DataLog::DataLog(wpi::Logger& msglog,
-                 std::function<void(wpi::span<const uint8_t> data)> write,
+                 std::function<void(std::span<const uint8_t> data)> write,
                  double period, std::string_view extraHeader)
     : m_msglog{msglog},
       m_period{period},
@@ -192,7 +192,7 @@ void DataLog::Resume() {
   m_paused = false;
 }
 
-static void WriteToFile(fs::file_t f, wpi::span<const uint8_t> data,
+static void WriteToFile(fs::file_t f, std::span<const uint8_t> data,
                         std::string_view filename, wpi::Logger& msglog) {
   do {
 #ifdef _WIN32
@@ -276,7 +276,7 @@ void DataLog::WriterThreadMain(std::string_view dir) {
   }
 
   if (f == fs::kInvalidFile) {
-    WPI_ERROR(m_msglog, "{}", "Could not open log file, no log being saved");
+    WPI_ERROR(m_msglog, "Could not open log file, no log being saved");
   } else {
     WPI_INFO(m_msglog, "Logging to '{}'", (dirPath / filename).string());
   }
@@ -365,7 +365,7 @@ void DataLog::WriterThreadMain(std::string_view dir) {
 }
 
 void DataLog::WriterThreadMain(
-    std::function<void(wpi::span<const uint8_t> data)> write) {
+    std::function<void(std::span<const uint8_t> data)> write) {
   std::chrono::duration<double> periodTime{m_period};
 
   // write header (version 1.0)
@@ -509,7 +509,7 @@ uint8_t* DataLog::StartRecord(uint32_t entry, uint64_t timestamp,
   return buf;
 }
 
-void DataLog::AppendImpl(wpi::span<const uint8_t> data) {
+void DataLog::AppendImpl(std::span<const uint8_t> data) {
   while (data.size() > kBlockSize) {
     uint8_t* buf = Reserve(kBlockSize);
     std::memcpy(buf, data.data(), kBlockSize);
@@ -525,7 +525,7 @@ void DataLog::AppendStringImpl(std::string_view str) {
   AppendImpl({reinterpret_cast<const uint8_t*>(str.data()), str.size()});
 }
 
-void DataLog::AppendRaw(int entry, wpi::span<const uint8_t> data,
+void DataLog::AppendRaw(int entry, std::span<const uint8_t> data,
                         int64_t timestamp) {
   if (entry <= 0) {
     return;
@@ -539,7 +539,7 @@ void DataLog::AppendRaw(int entry, wpi::span<const uint8_t> data,
 }
 
 void DataLog::AppendRaw2(int entry,
-                         wpi::span<const wpi::span<const uint8_t>> data,
+                         std::span<const std::span<const uint8_t>> data,
                          int64_t timestamp) {
   if (entry <= 0) {
     return;
@@ -623,7 +623,7 @@ void DataLog::AppendString(int entry, std::string_view value,
             timestamp);
 }
 
-void DataLog::AppendBooleanArray(int entry, wpi::span<const bool> arr,
+void DataLog::AppendBooleanArray(int entry, std::span<const bool> arr,
                                  int64_t timestamp) {
   if (entry <= 0) {
     return;
@@ -647,7 +647,7 @@ void DataLog::AppendBooleanArray(int entry, wpi::span<const bool> arr,
   }
 }
 
-void DataLog::AppendBooleanArray(int entry, wpi::span<const int> arr,
+void DataLog::AppendBooleanArray(int entry, std::span<const int> arr,
                                  int64_t timestamp) {
   if (entry <= 0) {
     return;
@@ -671,12 +671,12 @@ void DataLog::AppendBooleanArray(int entry, wpi::span<const int> arr,
   }
 }
 
-void DataLog::AppendBooleanArray(int entry, wpi::span<const uint8_t> arr,
+void DataLog::AppendBooleanArray(int entry, std::span<const uint8_t> arr,
                                  int64_t timestamp) {
   AppendRaw(entry, arr, timestamp);
 }
 
-void DataLog::AppendIntegerArray(int entry, wpi::span<const int64_t> arr,
+void DataLog::AppendIntegerArray(int entry, std::span<const int64_t> arr,
                                  int64_t timestamp) {
   if constexpr (wpi::support::endian::system_endianness() ==
                 wpi::support::little) {
@@ -709,7 +709,7 @@ void DataLog::AppendIntegerArray(int entry, wpi::span<const int64_t> arr,
   }
 }
 
-void DataLog::AppendFloatArray(int entry, wpi::span<const float> arr,
+void DataLog::AppendFloatArray(int entry, std::span<const float> arr,
                                int64_t timestamp) {
   if constexpr (wpi::support::endian::system_endianness() ==
                 wpi::support::little) {
@@ -742,7 +742,7 @@ void DataLog::AppendFloatArray(int entry, wpi::span<const float> arr,
   }
 }
 
-void DataLog::AppendDoubleArray(int entry, wpi::span<const double> arr,
+void DataLog::AppendDoubleArray(int entry, std::span<const double> arr,
                                 int64_t timestamp) {
   if constexpr (wpi::support::endian::system_endianness() ==
                 wpi::support::little) {
@@ -775,7 +775,7 @@ void DataLog::AppendDoubleArray(int entry, wpi::span<const double> arr,
   }
 }
 
-void DataLog::AppendStringArray(int entry, wpi::span<const std::string> arr,
+void DataLog::AppendStringArray(int entry, std::span<const std::string> arr,
                                 int64_t timestamp) {
   if (entry <= 0) {
     return;
@@ -798,7 +798,7 @@ void DataLog::AppendStringArray(int entry, wpi::span<const std::string> arr,
 }
 
 void DataLog::AppendStringArray(int entry,
-                                wpi::span<const std::string_view> arr,
+                                std::span<const std::string_view> arr,
                                 int64_t timestamp) {
   if (entry <= 0) {
     return;

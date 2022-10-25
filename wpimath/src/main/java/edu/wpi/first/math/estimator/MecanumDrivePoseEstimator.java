@@ -27,7 +27,7 @@ import java.util.function.BiConsumer;
  * drop-in for {@link edu.wpi.first.math.kinematics.MecanumDriveOdometry}.
  *
  * <p>{@link MecanumDrivePoseEstimator#update} should be called every robot loop. If your loops are
- * faster or slower than the default of 0.02s, then you should change the nominal delta time using
+ * faster or slower than the default of 20 ms, then you should change the nominal delta time using
  * the secondary constructor: {@link MecanumDrivePoseEstimator#MecanumDrivePoseEstimator(Rotation2d,
  * Pose2d, MecanumDriveKinematics, Matrix, Matrix, Matrix, double)}.
  *

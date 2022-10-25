@@ -40,7 +40,7 @@ void TimedRobot::StartCompetition() {
     HAL_UpdateNotifierAlarm(
         m_notifier, static_cast<uint64_t>(callback.expirationTime * 1e6),
         &status);
-    FRC_CheckErrorStatus(status, "{}", "UpdateNotifierAlarm");
+    FRC_CheckErrorStatus(status, "UpdateNotifierAlarm");
 
     uint64_t curTime = HAL_WaitForNotifierAlarm(m_notifier, &status);
     if (curTime == 0 || status != 0) {
@@ -72,11 +72,11 @@ void TimedRobot::EndCompetition() {
 
 TimedRobot::TimedRobot(units::second_t period) : IterativeRobotBase(period) {
   m_startTime = Timer::GetFPGATimestamp();
-  AddPeriodic([=] { LoopFunc(); }, period);
+  AddPeriodic([=, this] { LoopFunc(); }, period);
 
   int32_t status = 0;
   m_notifier = HAL_InitializeNotifier(&status);
-  FRC_CheckErrorStatus(status, "{}", "InitializeNotifier");
+  FRC_CheckErrorStatus(status, "InitializeNotifier");
   HAL_SetNotifierName(m_notifier, "TimedRobot", &status);
 
   HAL_Report(HALUsageReporting::kResourceType_Framework,
@@ -87,7 +87,7 @@ TimedRobot::~TimedRobot() {
   int32_t status = 0;
 
   HAL_StopNotifier(m_notifier, &status);
-  FRC_ReportError(status, "{}", "StopNotifier");
+  FRC_ReportError(status, "StopNotifier");
 
   HAL_CleanNotifier(m_notifier, &status);
 }

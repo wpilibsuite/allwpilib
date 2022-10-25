@@ -1,20 +1,23 @@
-From bfd3aa822ff70908c44ad2880b91d9a8dbc1ce7e Mon Sep 17 00:00:00 2001
+From 3bfc3d1e3cbc9d7032446cc4aa6246d1c7750901 Mon Sep 17 00:00:00 2001
 From: Tyler Veness <calcmogul@gmail.com>
 Date: Wed, 18 May 2022 09:14:24 -0700
 Subject: [PATCH] Disable warnings
 
 ---
- Eigen/src/Core/util/DisableStupidWarnings.h | 8 ++++++++
- 1 file changed, 8 insertions(+)
+ Eigen/src/Core/util/DisableStupidWarnings.h | 11 +++++++++++
+ 1 file changed, 11 insertions(+)
 
 diff --git a/Eigen/src/Core/util/DisableStupidWarnings.h b/Eigen/src/Core/util/DisableStupidWarnings.h
-index fe0cfec0b..9e8a0e7a9 100755
+index fe0cfec..d973255 100755
 --- a/Eigen/src/Core/util/DisableStupidWarnings.h
 +++ b/Eigen/src/Core/util/DisableStupidWarnings.h
-@@ -71,6 +71,14 @@
+@@ -71,6 +71,17 @@
      // See: https://gcc.gnu.org/bugzilla/show_bug.cgi?id=89325
      #pragma GCC diagnostic ignored "-Wattributes"
    #endif
++  #if __GNUC__>=8
++    #pragma GCC diagnostic ignored "-Wclass-memaccess"
++  #endif
 +  #if __GNUC__>=11
 +    // This warning is a false positive
 +    #pragma GCC diagnostic ignored "-Wmaybe-uninitialized"

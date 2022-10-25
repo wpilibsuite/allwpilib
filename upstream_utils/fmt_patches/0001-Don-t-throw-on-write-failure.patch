@@ -1,7 +1,7 @@
-From d14a5bd3815e659b3c515e4c36debfecc6a47450 Mon Sep 17 00:00:00 2001
+From e685209746aabbbed0a9db54694b8ea1ca504163 Mon Sep 17 00:00:00 2001
 From: Tyler Veness <calcmogul@gmail.com>
 Date: Wed, 18 May 2022 10:21:49 -0700
-Subject: [PATCH] Don't throw on write failure
+Subject: [PATCH 1/2] Don't throw on write failure
 
 ---
  include/fmt/format-inl.h | 4 +---

@@ -7,13 +7,13 @@
 #include <functional>
 #include <initializer_list>
 #include <memory>
+#include <span>
 #include <string>
 
 #include <units/time.h>
 #include <wpi/Demangle.h>
 #include <wpi/SmallSet.h>
 #include <wpi/deprecated.h>
-#include <wpi/span.h>
 
 #include "frc2/command/Subsystem.h"
 
@@ -171,7 +171,7 @@ class Command {
    */
   [[nodiscard]] CommandPtr BeforeStarting(
       std::function<void()> toRun,
-      wpi::span<Subsystem* const> requirements = {}) &&;
+      std::span<Subsystem* const> requirements = {}) &&;
 
   /**
    * Decorates this command with a runnable to run after the command finishes.
@@ -193,25 +193,27 @@ class Command {
    */
   [[nodiscard]] CommandPtr AndThen(
       std::function<void()> toRun,
-      wpi::span<Subsystem* const> requirements = {}) &&;
+      std::span<Subsystem* const> requirements = {}) &&;
 
   /**
    * Decorates this command to run perpetually, ignoring its ordinary end
    * conditions.  The decorated command can still be interrupted or canceled.
    *
    * @return the decorated command
-   * @deprecated replace with EndlessCommand
+   * @deprecated PerpetualCommand violates the assumption that execute() doesn't
+get called after isFinished() returns true -- an assumption that should be
+valid. This was unsafe/undefined behavior from the start, and RepeatCommand
+provides an easy way to achieve similar end results with slightly different (and
+safe) semantics.
    */
-  WPI_DEPRECATED("Replace with Endlessly()")
+  WPI_DEPRECATED(
+      "PerpetualCommand violates the assumption that execute() doesn't get "
+      "called after isFinished() returns true -- an assumption that should be "
+      "valid."
+      "This was unsafe/undefined behavior from the start, and RepeatCommand "
+      "provides an easy way to achieve similar end results with slightly "
+      "different (and safe) semantics.")
   PerpetualCommand Perpetually() &&;
-
-  /**
-   * Decorates this command to run endlessly, ignoring its ordinary end
-   * conditions. The decorated command can still be interrupted or canceled.
-   *
-   * @return the decorated command
-   */
-  [[nodiscard]] CommandPtr Endlessly() &&;
 
   /**
    * Decorates this command to run repeatedly, restarting it when it ends, until

@@ -176,7 +176,7 @@ public final class Main {
     } else {
       System.out.println("Setting up NetworkTables client for team " + team);
       ntinst.setServerTeam(team);
-      ntinst.startClient4();
+      ntinst.startClient4("multicameraserver");
     }
 
     // start cameras

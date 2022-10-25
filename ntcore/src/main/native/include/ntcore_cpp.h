@@ -9,12 +9,11 @@
 #include <cassert>
 #include <functional>
 #include <memory>
+#include <span>
 #include <string>
 #include <string_view>
 #include <utility>
 #include <vector>
-
-#include <wpi/span.h>
 
 #include "networktables/NetworkTableValue.h"
 #include "ntcore_c.h"
@@ -75,7 +74,7 @@ struct TopicInfo {
 struct ConnectionInfo {
   /**
    * The remote identifier (as set on the remote node by
-   * NetworkTableInstance::SetNetworkIdentity() or nt::SetNetworkIdentity()).
+   * NetworkTableInstance::StartClient4() or nt::StartClient4()).
    */
   std::string remote_id;
 
@@ -293,7 +292,7 @@ class PubSubOption {
   /**
    * Polling storage for subscription. Specifies the maximum number of updates
    * NetworkTables should store between calls to the subscriber's poll()
-   * function. Defaults to 1 if logging is false, 20 if logging is true.
+   * function. Defaults to 1 if SendAll is false, 20 if SendAll is true.
    *
    * @param depth number of entries to save for polling.
    * @return option
@@ -482,7 +481,7 @@ std::vector<NT_Topic> GetTopics(NT_Inst inst, std::string_view prefix,
  * @return Array of topic handles.
  */
 std::vector<NT_Topic> GetTopics(NT_Inst inst, std::string_view prefix,
-                                wpi::span<const std::string_view> types);
+                                std::span<const std::string_view> types);
 
 /**
  * Get Topic Information about multiple topics.
@@ -515,7 +514,7 @@ std::vector<TopicInfo> GetTopicInfo(NT_Inst inst, std::string_view prefix,
  * @return Array of topic information.
  */
 std::vector<TopicInfo> GetTopicInfo(NT_Inst inst, std::string_view prefix,
-                                    wpi::span<const std::string_view> types);
+                                    std::span<const std::string_view> types);
 
 /**
  * Gets Topic Information.
@@ -651,8 +650,9 @@ wpi::json GetTopicProperties(NT_Topic topic);
  *
  * @param topic topic handle
  * @param update JSON object with keys to add/update/delete
+ * @return False if update is not a JSON object
  */
-void SetTopicProperties(NT_Topic topic, const wpi::json& update);
+bool SetTopicProperties(NT_Topic topic, const wpi::json& update);
 
 /**
  * Creates a new subscriber to value changes on a topic.
@@ -664,7 +664,7 @@ void SetTopicProperties(NT_Topic topic, const wpi::json& update);
  * @return Subscriber handle
  */
 NT_Subscriber Subscribe(NT_Topic topic, NT_Type type, std::string_view typeStr,
-                        wpi::span<const PubSubOption> options = {});
+                        std::span<const PubSubOption> options = {});
 
 /**
  * Stops subscriber.
@@ -683,7 +683,7 @@ void Unsubscribe(NT_Subscriber sub);
  * @return Publisher handle
  */
 NT_Publisher Publish(NT_Topic topic, NT_Type type, std::string_view typeStr,
-                     wpi::span<const PubSubOption> options = {});
+                     std::span<const PubSubOption> options = {});
 
 /**
  * Creates a new publisher to a topic.
@@ -697,7 +697,7 @@ NT_Publisher Publish(NT_Topic topic, NT_Type type, std::string_view typeStr,
  */
 NT_Publisher PublishEx(NT_Topic topic, NT_Type type, std::string_view typeStr,
                        const wpi::json& properties,
-                       wpi::span<const PubSubOption> options = {});
+                       std::span<const PubSubOption> options = {});
 
 /**
  * Stops publisher.
@@ -716,7 +716,7 @@ void Unpublish(NT_Handle pubentry);
  * @return Entry handle
  */
 NT_Entry GetEntry(NT_Topic topic, NT_Type type, std::string_view typeStr,
-                  wpi::span<const PubSubOption> options = {});
+                  std::span<const PubSubOption> options = {});
 
 /**
  * Stops entry subscriber/publisher.
@@ -758,8 +758,8 @@ NT_Topic GetTopicFromHandle(NT_Handle pubsubentry);
  * @return subscriber handle
  */
 NT_MultiSubscriber SubscribeMultiple(
-    NT_Inst inst, wpi::span<const std::string_view> prefixes,
-    wpi::span<const PubSubOption> options = {});
+    NT_Inst inst, std::span<const std::string_view> prefixes,
+    std::span<const PubSubOption> options = {});
 
 /**
  * Unsubscribes a multi-subscriber.
@@ -785,7 +785,7 @@ void UnsubscribeMultiple(NT_MultiSubscriber sub);
  * @param callback Listener function
  */
 NT_TopicListener AddTopicListener(
-    NT_Inst inst, wpi::span<const std::string_view> prefixes, unsigned int mask,
+    NT_Inst inst, std::span<const std::string_view> prefixes, unsigned int mask,
     std::function<void(const TopicNotification&)> callback);
 
 /**
@@ -840,7 +840,7 @@ std::vector<TopicNotification> ReadTopicListenerQueue(
  * @return Listener handle
  */
 NT_TopicListener AddPolledTopicListener(
-    NT_TopicListenerPoller poller, wpi::span<const std::string_view> prefixes,
+    NT_TopicListenerPoller poller, std::span<const std::string_view> prefixes,
     unsigned int mask);
 
 /**
@@ -1008,16 +1008,6 @@ void RemoveConnectionListener(NT_ConnectionListener conn_listener);
  */
 
 /**
- * Set the network identity of this node.
- * This is the name used during the initial connection handshake, and is
- * visible through ConnectionInfo on the remote node.
- *
- * @param inst      instance handle
- * @param name      identity to advertise
- */
-void SetNetworkIdentity(NT_Inst inst, std::string_view name);
-
-/**
  * Get the current network mode.
  *
  * @param inst  instance handle
@@ -1064,17 +1054,19 @@ void StopServer(NT_Inst inst);
  * Starts a NT3 client.  Use SetServer or SetServerTeam to set the server name
  * and port.
  *
- * @param inst  instance handle
+ * @param inst      instance handle
+ * @param identity  network identity to advertise (cannot be empty string)
  */
-void StartClient3(NT_Inst inst);
+void StartClient3(NT_Inst inst, std::string_view identity);
 
 /**
  * Starts a NT4 client.  Use SetServer or SetServerTeam to set the server name
  * and port.
  *
- * @param inst  instance handle
+ * @param inst      instance handle
+ * @param identity  network identity to advertise (cannot be empty string)
  */
-void StartClient4(NT_Inst inst);
+void StartClient4(NT_Inst inst, std::string_view identity);
 
 /**
  * Stops the client if it is running.
@@ -1101,7 +1093,7 @@ void SetServer(NT_Inst inst, const char* server_name, unsigned int port);
  */
 void SetServer(
     NT_Inst inst,
-    wpi::span<const std::pair<std::string_view, unsigned int>> servers);
+    std::span<const std::pair<std::string_view, unsigned int>> servers);
 
 /**
  * Sets server addresses and port for client (without restarting client).

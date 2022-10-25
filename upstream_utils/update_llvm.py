@@ -27,6 +27,19 @@ def run_global_replacements(wpiutil_llvm_files):
         content = content.replace('include "llvm/Config', 'include "wpi')
         content = content.replace('include "llvm/Support', 'include "wpi')
 
+        # Fix uses of span
+        content = content.replace("span", "std::span")
+        content = content.replace('include "wpi/std::span.h"', "include <span>")
+        if wpi_file.endswith("ConvertUTFWrapper.cpp"):
+            content = content.replace(
+                "const UTF16 *Src = reinterpret_cast<const UTF16 *>(SrcBytes.begin());",
+                "const UTF16 *Src = reinterpret_cast<const UTF16 *>(&*SrcBytes.begin());",
+            )
+            content = content.replace(
+                "const UTF16 *SrcEnd = reinterpret_cast<const UTF16 *>(SrcBytes.end());",
+                "const UTF16 *SrcEnd = reinterpret_cast<const UTF16 *>(&*SrcBytes.begin() + SrcBytes.size());",
+            )
+
         # Remove unused headers
         content = content.replace('#include "llvm-c/ErrorHandling.h"\n', "")
         content = content.replace('#include "wpi/Debug.h"\n', "")

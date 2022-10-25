@@ -11,9 +11,11 @@
 #include <vector>
 
 #include <fmt/format.h>
+#include <wpi/SmallString.h>
 #include <wpi/StringExtras.h>
 #include <wpinet/DsClient.h>
 #include <wpinet/EventLoopRunner.h>
+#include <wpinet/HttpUtil.h>
 #include <wpinet/ParallelTcpConnector.h>
 #include <wpinet/WebSocket.h>
 #include <wpinet/uv/Async.h>
@@ -48,7 +50,7 @@ class NCImpl {
   virtual ~NCImpl() = default;
 
   // user-facing functions
-  void SetServers(wpi::span<const std::pair<std::string, unsigned int>> servers,
+  void SetServers(std::span<const std::pair<std::string, unsigned int>> servers,
                   unsigned int defaultPort);
   void StartDSClient(unsigned int port);
   void StopDSClient();
@@ -114,7 +116,7 @@ class NCImpl4 : public NCImpl {
   void WsConnected(wpi::WebSocket& ws, uv::Tcp& tcp);
   void Disconnect(std::string_view reason) override;
 
-  std::unique_ptr<net::WebSocketConnection> m_wire;
+  std::shared_ptr<net::WebSocketConnection> m_wire;
   std::unique_ptr<net::ClientImpl> m_clientImpl;
 };
 
@@ -131,11 +133,11 @@ NCImpl::NCImpl(int inst, std::string_view id, net::ILocalStorage& localStorage,
       m_loop{*m_loopRunner.GetLoop()} {
   m_localMsgs.reserve(net::NetworkLoopQueue::kInitialQueueSize);
 
-  INFO("{}", "starting network client");
+  INFO("starting network client");
 }
 
 void NCImpl::SetServers(
-    wpi::span<const std::pair<std::string, unsigned int>> servers,
+    std::span<const std::pair<std::string, unsigned int>> servers,
     unsigned int defaultPort) {
   std::vector<std::pair<std::string, unsigned int>> serversCopy;
   serversCopy.reserve(servers.size());
@@ -154,7 +156,7 @@ void NCImpl::SetServers(
 }
 
 void NCImpl::StartDSClient(unsigned int port) {
-  m_loopRunner.ExecAsync([=](uv::Loop& loop) {
+  m_loopRunner.ExecAsync([=, this](uv::Loop& loop) {
     if (m_dsClient) {
       return;
     }
@@ -191,7 +193,8 @@ void NCImpl::Disconnect(std::string_view reason) {
   m_connHandle = 0;
 
   // start trying to connect again
-  m_parallelConnect->Disconnected();
+  uv::Timer::SingleShot(m_loop, kReconnectRate,
+                        [this] { m_parallelConnect->Disconnected(); });
 }
 
 NCImpl3::NCImpl3(int inst, std::string_view id,
@@ -214,8 +217,10 @@ NCImpl3::NCImpl3(int inst, std::string_view id,
     // set up flush async
     m_flush = uv::Async<>::Create(m_loop);
     m_flush->wakeup.connect([this] {
-      HandleLocal();
-      m_clientImpl->SendPeriodic(m_loop.Now().count());
+      if (m_clientImpl) {
+        HandleLocal();
+        m_clientImpl->SendPeriodic(m_loop.Now().count());
+      }
     });
     m_flushAtomic = m_flush.get();
 
@@ -285,13 +290,13 @@ void NCImpl3::TcpConnected(uv::Tcp& tcp) {
           }
         });
         tcp.end.connect([this, &tcp] {
-          DEBUG3("{}", "NT3 TCP read ended");
+          DEBUG3("NT3 TCP read ended");
           if (!tcp.IsLoopClosing()) {
             Disconnect("remote end closed connection");
           }
         });
         tcp.closed.connect([this, &tcp] {
-          DEBUG3("{}", "NT3 TCP connection closed");
+          DEBUG3("NT3 TCP connection closed");
           if (!tcp.IsLoopClosing()) {
             Disconnect(m_wire->GetDisconnectReason());
           }
@@ -299,9 +304,8 @@ void NCImpl3::TcpConnected(uv::Tcp& tcp) {
 
         {
           net3::ClientStartup3 startup{*m_clientImpl};
-          m_localStorage.StartNetwork(startup);
+          m_localStorage.StartNetwork(startup, &m_localQueue);
         }
-        m_localStorage.SetNetwork(&m_localQueue);
         m_clientImpl->SetLocal(&m_localStorage);
       });
 
@@ -373,7 +377,9 @@ NCImpl4::~NCImpl4() {
 
 void NCImpl4::HandleLocal() {
   m_localQueue.ReadQueue(&m_localMsgs);
-  m_clientImpl->HandleLocal(std::move(m_localMsgs));
+  if (m_clientImpl) {
+    m_clientImpl->HandleLocal(std::move(m_localMsgs));
+  }
 }
 
 void NCImpl4::TcpConnected(uv::Tcp& tcp) {
@@ -387,9 +393,10 @@ void NCImpl4::TcpConnected(uv::Tcp& tcp) {
   }
   wpi::WebSocket::ClientOptions options;
   options.handshakeTimeout = kWebsocketHandshakeTimeout;
-  auto ws =
-      wpi::WebSocket::CreateClient(tcp, fmt::format("/nt/{}", m_id), "",
-                                   {{"networktables.first.wpi.edu"}}, options);
+  wpi::SmallString<128> idBuf;
+  auto ws = wpi::WebSocket::CreateClient(
+      tcp, fmt::format("/nt/{}", wpi::EscapeURI(m_id, idBuf)), "",
+      {{"networktables.first.wpi.edu"}}, options);
   ws->SetMaxMessageSize(kMaxMessageSize);
   ws->open.connect([this, &tcp, ws = ws.get()](std::string_view) {
     if (m_connList.IsConnected()) {
@@ -410,7 +417,7 @@ void NCImpl4::WsConnected(wpi::WebSocket& ws, uv::Tcp& tcp) {
   INFO("CONNECTED NT4 to {} port {}", connInfo.remote_ip, connInfo.remote_port);
   m_connHandle = m_connList.AddConnection(connInfo);
 
-  m_wire = std::make_unique<net::WebSocketConnection>(ws);
+  m_wire = std::make_shared<net::WebSocketConnection>(ws);
   m_clientImpl = std::make_unique<net::ClientImpl>(
       m_loop.Now().count(), m_inst, *m_wire, m_logger,
       [this](uint32_t repeatMs) {
@@ -420,9 +427,8 @@ void NCImpl4::WsConnected(wpi::WebSocket& ws, uv::Tcp& tcp) {
       });
   {
     net::ClientStartup startup{*m_clientImpl};
-    m_localStorage.StartNetwork(startup);
+    m_localStorage.StartNetwork(startup, &m_localQueue);
   }
-  m_localStorage.SetNetwork(&m_localQueue);
   m_clientImpl->SetLocal(&m_localStorage);
   ws.closed.connect([this, &ws](uint16_t, std::string_view reason) {
     if (!ws.GetStream().IsLoopClosing()) {
@@ -430,10 +436,14 @@ void NCImpl4::WsConnected(wpi::WebSocket& ws, uv::Tcp& tcp) {
     }
   });
   ws.text.connect([this](std::string_view data, bool) {
-    m_clientImpl->ProcessIncomingText(data);
+    if (m_clientImpl) {
+      m_clientImpl->ProcessIncomingText(data);
+    }
   });
-  ws.binary.connect([this](wpi::span<const uint8_t> data, bool) {
-    m_clientImpl->ProcessIncomingBinary(data);
+  ws.binary.connect([this](std::span<const uint8_t> data, bool) {
+    if (m_clientImpl) {
+      m_clientImpl->ProcessIncomingBinary(data);
+    }
   });
 }
 
@@ -463,7 +473,7 @@ NetworkClient::~NetworkClient() {
 }
 
 void NetworkClient::SetServers(
-    wpi::span<const std::pair<std::string, unsigned int>> servers) {
+    std::span<const std::pair<std::string, unsigned int>> servers) {
   m_impl->SetServers(servers, NT_DEFAULT_PORT4);
 }
 
@@ -482,7 +492,9 @@ void NetworkClient::FlushLocal() {
 void NetworkClient::Flush() {
   m_impl->m_loopRunner.ExecAsync([this](uv::Loop&) {
     m_impl->HandleLocal();
-    m_impl->m_clientImpl->SendValues(m_impl->m_loop.Now().count());
+    if (m_impl->m_clientImpl) {
+      m_impl->m_clientImpl->SendValues(m_impl->m_loop.Now().count());
+    }
   });
 }
 
@@ -505,7 +517,7 @@ NetworkClient3::~NetworkClient3() {
 }
 
 void NetworkClient3::SetServers(
-    wpi::span<const std::pair<std::string, unsigned int>> servers) {
+    std::span<const std::pair<std::string, unsigned int>> servers) {
   m_impl->SetServers(servers, NT_DEFAULT_PORT3);
 }
 

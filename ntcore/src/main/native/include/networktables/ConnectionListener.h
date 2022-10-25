@@ -7,8 +7,6 @@
 #include <functional>
 #include <vector>
 
-#include <wpi/span.h>
-
 #include "ntcore_cpp.h"
 
 namespace nt {
@@ -17,7 +15,9 @@ class NetworkTableInstance;
 
 /**
  * Connection listener. This calls back to a callback function when a connection
- * change occurs.
+ * change occurs. The callback function is called asynchronously on a separate
+ * thread, so it's important to use synchronization or atomics when accessing
+ * any shared state from the callback function.
  */
 class ConnectionListener final {
  public:

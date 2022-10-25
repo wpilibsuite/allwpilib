@@ -7,10 +7,9 @@
 #include <stdint.h>
 
 {{ cpp.INCLUDES }}
+#include <span>
 #include <string_view>
 #include <vector>
-
-#include <wpi/span.h>
 
 #include "networktables/Topic.h"
 
@@ -312,7 +311,7 @@ class {{ TypeName }}Topic final : public Topic {
   [[nodiscard]]
   SubscriberType Subscribe(
       {% if not TypeString %}std::string_view typeString, {% endif %}ParamType defaultValue,
-      wpi::span<const PubSubOption> options = {});
+      std::span<const PubSubOption> options = {});
 {%- if TypeString %}
   /**
    * Create a new subscriber to the topic, with specific type string.
@@ -333,7 +332,7 @@ class {{ TypeName }}Topic final : public Topic {
   [[nodiscard]]
   SubscriberType SubscribeEx(
       std::string_view typeString, ParamType defaultValue,
-      wpi::span<const PubSubOption> options = {});
+      std::span<const PubSubOption> options = {});
 {% endif %}
   /**
    * Create a new publisher to the topic.
@@ -354,7 +353,7 @@ class {{ TypeName }}Topic final : public Topic {
    * @return publisher
    */
   [[nodiscard]]
-  PublisherType Publish({% if not TypeString %}std::string_view typeString, {% endif %}wpi::span<const PubSubOption> options = {});
+  PublisherType Publish({% if not TypeString %}std::string_view typeString, {% endif %}std::span<const PubSubOption> options = {});
 
   /**
    * Create a new publisher to the topic, with type string and initial
@@ -376,7 +375,7 @@ class {{ TypeName }}Topic final : public Topic {
    */
   [[nodiscard]]
   PublisherType PublishEx(std::string_view typeString,
-    const wpi::json& properties, wpi::span<const PubSubOption> options = {});
+    const wpi::json& properties, std::span<const PubSubOption> options = {});
 
   /**
    * Create a new entry for the topic.
@@ -403,7 +402,7 @@ class {{ TypeName }}Topic final : public Topic {
    */
   [[nodiscard]]
   EntryType GetEntry({% if not TypeString %}std::string_view typeString, {% endif %}ParamType defaultValue,
-                     wpi::span<const PubSubOption> options = {});
+                     std::span<const PubSubOption> options = {});
 {%- if TypeString %}
   /**
    * Create a new entry for the topic, with specific type string.
@@ -428,7 +427,7 @@ class {{ TypeName }}Topic final : public Topic {
    */
   [[nodiscard]]
   EntryType GetEntryEx(std::string_view typeString, ParamType defaultValue,
-                       wpi::span<const PubSubOption> options = {});
+                       std::span<const PubSubOption> options = {});
 {% endif %}
 };
 

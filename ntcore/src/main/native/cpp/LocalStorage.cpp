@@ -77,6 +77,7 @@ struct TopicData {
   std::string name;
 
   Value lastValue;  // also stores timestamp
+  bool lastValueNetwork{false};
   NT_Type type{NT_UNASSIGNED};
   std::string typeStr;
   unsigned int flags{0};            // for NT3 APIs
@@ -98,7 +99,7 @@ struct TopicData {
 struct PubSubConfig : public PubSubOptions {
   PubSubConfig() = default;
   PubSubConfig(NT_Type type, std::string_view typeStr,
-               wpi::span<const PubSubOption> options)
+               std::span<const PubSubOption> options)
       : PubSubOptions{options}, type{type}, typeStr{typeStr} {}
 
   NT_Type type{NT_UNASSIGNED};
@@ -167,7 +168,7 @@ struct MultiSubscriberData {
   static constexpr auto kType = Handle::kMultiSubscriber;
 
   MultiSubscriberData(NT_MultiSubscriber handle,
-                      wpi::span<const std::string_view> prefixes,
+                      std::span<const std::string_view> prefixes,
                       PubSubOptions options)
       : handle{handle}, options{std::move(options)} {
     this->options.prefixMatch = true;
@@ -208,7 +209,7 @@ struct TopicListenerData {
         eventMask{eventMask & ~NT_TOPIC_NOTIFY_IMMEDIATE} {}
   TopicListenerData(NT_TopicListener handle, TopicListenerPollerData* poller,
                     MultiSubscriberData* multiSubscriber,
-                    wpi::span<const std::string> prefixes,
+                    std::span<const std::string> prefixes,
                     unsigned int eventMask)
       : handle{handle},
         poller{poller},
@@ -385,7 +386,7 @@ struct LSImpl {
   std::unique_ptr<EntryData> RemoveEntry(NT_Entry entryHandle);
 
   MultiSubscriberData* AddMultiSubscriber(
-      wpi::span<const std::string_view> prefixes, const PubSubOptions& options);
+      std::span<const std::string_view> prefixes, const PubSubOptions& options);
   std::unique_ptr<MultiSubscriberData> RemoveMultiSubscriber(
       NT_MultiSubscriber subHandle);
 
@@ -403,9 +404,9 @@ struct LSImpl {
                                           unsigned int eventMask);
   TopicListenerData* AddTopicListenerImpl(
       TopicListenerPollerData* poller,
-      wpi::span<const std::string_view> prefixes, unsigned int eventMask);
+      std::span<const std::string_view> prefixes, unsigned int eventMask);
   NT_TopicListener AddTopicListener(
-      wpi::span<const std::string_view> prefixes, unsigned int mask,
+      std::span<const std::string_view> prefixes, unsigned int mask,
       std::function<void(const TopicNotification&)> callback);
   NT_TopicListener AddTopicListenerHandle(TopicListenerPollerData* poller,
                                           NT_Handle handle, unsigned int mask);
@@ -646,6 +647,7 @@ void LSImpl::CheckReset(TopicData* topic) {
     return;
   }
   topic->lastValue = {};
+  topic->lastValueNetwork = false;
   topic->type = NT_UNASSIGNED;
   topic->typeStr.clear();
   topic->flags = 0;
@@ -658,10 +660,13 @@ bool LSImpl::SetValue(TopicData* topic, const Value& value,
   if (topic->type != NT_UNASSIGNED && topic->type != value.type()) {
     return false;
   }
-  if (!topic->lastValue || value.time() >= topic->lastValue.time()) {
+  bool isNetwork = (eventFlags & NT_VALUE_NOTIFY_LOCAL) == 0;
+  if (!topic->lastValue || topic->lastValueNetwork == isNetwork ||
+      value.time() >= topic->lastValue.time()) {
     // TODO: notify option even if older value
     topic->type = value.type();
     topic->lastValue = value;
+    topic->lastValueNetwork = isNetwork;
     NotifyValue(topic, eventFlags);
   }
   if (topic->datalogType == value.type()) {
@@ -759,6 +764,9 @@ void LSImpl::SetRetained(TopicData* topic, bool value) {
 
 void LSImpl::SetProperties(TopicData* topic, const wpi::json& update,
                            bool sendNetwork) {
+  if (!update.is_object()) {
+    return;
+  }
   DEBUG4("SetProperties({},{})", topic->name, sendNetwork);
   for (auto&& change : update.items()) {
     if (change.value().is_null()) {
@@ -924,8 +932,13 @@ PublisherData* LSImpl::AddLocalPublisher(TopicData* topic,
 
     if (properties.is_null()) {
       topic->properties = wpi::json::object();
-    } else {
+    } else if (properties.is_object()) {
       topic->properties = properties;
+    } else {
+      WPI_WARNING(m_logger,
+                  "ignoring non-object properties when publishing '{}'",
+                  topic->name);
+      topic->properties = wpi::json::object();
     }
 
     if (topic->properties.empty()) {
@@ -991,6 +1004,7 @@ std::unique_ptr<PublisherData> LSImpl::RemoveLocalPublisher(
 
 SubscriberData* LSImpl::AddLocalSubscriber(TopicData* topic,
                                            const PubSubConfig& config) {
+  DEBUG4("AddLocalSubscriber({})", topic->name);
   auto subscriber = m_subscribers.Add(m_inst, topic, config);
   topic->localSubscribers.Add(subscriber);
   // set subscriber to active if the type matches
@@ -1003,6 +1017,7 @@ SubscriberData* LSImpl::AddLocalSubscriber(TopicData* topic,
         topic->name, config.typeStr, topic->typeStr);
   }
   if (m_network) {
+    DEBUG4("-> NetworkSubscribe({})", topic->name);
     m_network->Subscribe(subscriber->handle, {{topic->name}}, config);
   }
   return subscriber;
@@ -1045,7 +1060,7 @@ std::unique_ptr<EntryData> LSImpl::RemoveEntry(NT_Entry entryHandle) {
 }
 
 MultiSubscriberData* LSImpl::AddMultiSubscriber(
-    wpi::span<const std::string_view> prefixes, const PubSubOptions& options) {
+    std::span<const std::string_view> prefixes, const PubSubOptions& options) {
   auto subscriber = m_multiSubscribers.Add(m_inst, prefixes, options);
   // subscribe to any already existing topics
   for (auto&& topic : m_topics) {
@@ -1150,7 +1165,7 @@ TopicListenerData* LSImpl::AddTopicListenerImpl(TopicListenerPollerData* poller,
 }
 
 TopicListenerData* LSImpl::AddTopicListenerImpl(
-    TopicListenerPollerData* poller, wpi::span<const std::string_view> prefixes,
+    TopicListenerPollerData* poller, std::span<const std::string_view> prefixes,
     unsigned int eventMask) {
   // subscribe to make sure topic updates are received
   PubSubOptions options;
@@ -1163,7 +1178,7 @@ TopicListenerData* LSImpl::AddTopicListenerImpl(
 }
 
 NT_TopicListener LSImpl::AddTopicListener(
-    wpi::span<const std::string_view> prefixes, unsigned int mask,
+    std::span<const std::string_view> prefixes, unsigned int mask,
     std::function<void(const TopicNotification&)> callback) {
   if (!m_topicListenerThread) {
     m_topicListenerThread.Start(AddTopicListenerPoller());
@@ -1570,7 +1585,8 @@ void LocalStorage::NetworkSetValue(NT_Topic topicHandle, const Value& value) {
   }
 }
 
-void LocalStorage::StartNetwork(net::NetworkStartupInterface& startup) {
+void LocalStorage::StartNetwork(net::NetworkStartupInterface& startup,
+                                net::NetworkInterface* network) {
   std::scoped_lock lock{m_mutex};
   // publish all active publishers to the network and send last values
   // only send value once per topic
@@ -1588,19 +1604,13 @@ void LocalStorage::StartNetwork(net::NetworkStartupInterface& startup) {
     }
   }
   for (auto&& subscriber : m_impl->m_subscribers) {
-    if (subscriber->active) {
-      startup.Subscribe(subscriber->handle, {{subscriber->topic->name}},
-                        subscriber->config);
-    }
+    startup.Subscribe(subscriber->handle, {{subscriber->topic->name}},
+                      subscriber->config);
   }
   for (auto&& subscriber : m_impl->m_multiSubscribers) {
     startup.Subscribe(subscriber->handle, subscriber->prefixes,
                       subscriber->options);
   }
-}
-
-void LocalStorage::SetNetwork(net::NetworkInterface* network) {
-  std::scoped_lock lock{m_mutex};
   m_impl->m_network = network;
 }
 
@@ -1632,7 +1642,7 @@ static void ForEachTopic(T& topics, std::string_view prefix, unsigned int types,
 
 template <typename T, typename F>
 static void ForEachTopic(T& topics, std::string_view prefix,
-                         wpi::span<const std::string_view> types, F func) {
+                         std::span<const std::string_view> types, F func) {
   for (auto&& topic : topics) {
     if (!topic->Exists()) {
       continue;
@@ -1666,7 +1676,7 @@ std::vector<NT_Topic> LocalStorage::GetTopics(std::string_view prefix,
 }
 
 std::vector<NT_Topic> LocalStorage::GetTopics(
-    std::string_view prefix, wpi::span<const std::string_view> types) {
+    std::string_view prefix, std::span<const std::string_view> types) {
   std::scoped_lock lock(m_mutex);
   std::vector<NT_Topic> rv;
   ForEachTopic(m_impl->m_topics, prefix, types,
@@ -1685,7 +1695,7 @@ std::vector<TopicInfo> LocalStorage::GetTopicInfo(std::string_view prefix,
 }
 
 std::vector<TopicInfo> LocalStorage::GetTopicInfo(
-    std::string_view prefix, wpi::span<const std::string_view> types) {
+    std::string_view prefix, std::span<const std::string_view> types) {
   std::scoped_lock lock(m_mutex);
   std::vector<TopicInfo> rv;
   ForEachTopic(m_impl->m_topics, prefix, types, [&](TopicData& topic) {
@@ -1812,14 +1822,17 @@ wpi::json LocalStorage::GetTopicProperties(NT_Topic topicHandle) {
   }
 }
 
-void LocalStorage::SetTopicProperties(NT_Topic topicHandle,
+bool LocalStorage::SetTopicProperties(NT_Topic topicHandle,
                                       const wpi::json& update) {
   if (!update.is_object()) {
-    return;
+    return false;
   }
   std::scoped_lock lock{m_mutex};
   if (auto topic = m_impl->m_topics.Get(topicHandle)) {
     m_impl->SetProperties(topic, update, true);
+    return true;
+  } else {
+    return {};
   }
 }
 
@@ -1834,7 +1847,7 @@ TopicInfo LocalStorage::GetTopicInfo(NT_Topic topicHandle) {
 
 NT_Subscriber LocalStorage::Subscribe(NT_Topic topicHandle, NT_Type type,
                                       std::string_view typeStr,
-                                      wpi::span<const PubSubOption> options) {
+                                      std::span<const PubSubOption> options) {
   std::scoped_lock lock{m_mutex};
 
   // Get the topic
@@ -1854,8 +1867,8 @@ void LocalStorage::Unsubscribe(NT_Subscriber subHandle) {
 }
 
 NT_MultiSubscriber LocalStorage::SubscribeMultiple(
-    wpi::span<const std::string_view> prefixes,
-    wpi::span<const PubSubOption> options) {
+    std::span<const std::string_view> prefixes,
+    std::span<const PubSubOption> options) {
   std::scoped_lock lock{m_mutex};
   PubSubOptions opts{options};
   opts.prefixMatch = true;
@@ -1870,16 +1883,22 @@ void LocalStorage::UnsubscribeMultiple(NT_MultiSubscriber subHandle) {
 NT_Publisher LocalStorage::Publish(NT_Topic topicHandle, NT_Type type,
                                    std::string_view typeStr,
                                    const wpi::json& properties,
-                                   wpi::span<const PubSubOption> options) {
-  if (type == NT_UNASSIGNED || typeStr.empty()) {
-    return 0;
-  }
-
+                                   std::span<const PubSubOption> options) {
   std::scoped_lock lock{m_mutex};
 
   // Get the topic
   auto* topic = m_impl->m_topics.Get(topicHandle);
   if (!topic) {
+    WPI_ERROR(m_impl->m_logger, "trying to publish invalid topic handle ({})",
+              topicHandle);
+    return 0;
+  }
+
+  if (type == NT_UNASSIGNED || typeStr.empty()) {
+    WPI_ERROR(
+        m_impl->m_logger,
+        "cannot publish '{}' with an unassigned type or empty type string",
+        topic->name);
     return 0;
   }
 
@@ -1897,6 +1916,7 @@ void LocalStorage::Unpublish(NT_Handle pubentryHandle) {
   } else if (auto entry = m_impl->m_entries.Get(pubentryHandle)) {
     if (entry->publisher) {
       m_impl->RemoveLocalPublisher(entry->publisher->handle);
+      entry->publisher = nullptr;
     }
   } else {
     // TODO: report warning
@@ -1906,7 +1926,7 @@ void LocalStorage::Unpublish(NT_Handle pubentryHandle) {
 
 NT_Entry LocalStorage::GetEntry(NT_Topic topicHandle, NT_Type type,
                                 std::string_view typeStr,
-                                wpi::span<const PubSubOption> options) {
+                                std::span<const PubSubOption> options) {
   std::scoped_lock lock{m_mutex};
 
   // Get the topic
@@ -2021,7 +2041,7 @@ static T GetAtomicNumber(Value* value, U defaultValue) {
 }
 
 template <typename T, typename U>
-static T GetAtomicNumberArray(Value* value, wpi::span<const U> defaultValue) {
+static T GetAtomicNumberArray(Value* value, std::span<const U> defaultValue) {
   if (value && value->type() == NT_INTEGER_ARRAY) {
     auto arr = value->GetIntegerArray();
     return {value->time(), value->server_time(), {arr.begin(), arr.end()}};
@@ -2038,7 +2058,7 @@ static T GetAtomicNumberArray(Value* value, wpi::span<const U> defaultValue) {
 
 template <typename T, typename U>
 static T GetAtomicNumberArray(Value* value, wpi::SmallVectorImpl<U>& buf,
-                              wpi::span<const U> defaultValue) {
+                              std::span<const U> defaultValue) {
   if (value && value->type() == NT_INTEGER_ARRAY) {
     auto str = value->GetIntegerArray();
     buf.assign(str.begin(), str.end());
@@ -2066,7 +2086,7 @@ static T GetAtomicNumberArray(Value* value, wpi::SmallVectorImpl<U>& buf,
   }                                                                     \
                                                                         \
   Timestamped##Name##Array LocalStorage::GetAtomic##Name##Array(        \
-      NT_Handle subentry, wpi::span<const dtype> defaultValue) {        \
+      NT_Handle subentry, std::span<const dtype> defaultValue) {        \
     std::scoped_lock lock{m_mutex};                                     \
     return GetAtomicNumberArray<Timestamped##Name##Array>(              \
         m_impl->GetSubEntryValue(subentry), defaultValue);              \
@@ -2074,7 +2094,7 @@ static T GetAtomicNumberArray(Value* value, wpi::SmallVectorImpl<U>& buf,
                                                                         \
   Timestamped##Name##ArrayView LocalStorage::GetAtomic##Name##Array(    \
       NT_Handle subentry, wpi::SmallVectorImpl<dtype>& buf,             \
-      wpi::span<const dtype> defaultValue) {                            \
+      std::span<const dtype> defaultValue) {                            \
     std::scoped_lock lock{m_mutex};                                     \
     return GetAtomicNumberArray<Timestamped##Name##ArrayView>(          \
         m_impl->GetSubEntryValue(subentry), buf, defaultValue);         \
@@ -2086,7 +2106,7 @@ GET_ATOMIC_NUMBER(Double, double)
 
 #define GET_ATOMIC_ARRAY(Name, dtype)                                         \
   Timestamped##Name LocalStorage::GetAtomic##Name(                            \
-      NT_Handle subentry, wpi::span<const dtype> defaultValue) {              \
+      NT_Handle subentry, std::span<const dtype> defaultValue) {              \
     std::scoped_lock lock{m_mutex};                                           \
     Value* value = m_impl->GetSubEntryValue(subentry);                        \
     if (value && value->Is##Name()) {                                         \
@@ -2104,7 +2124,7 @@ GET_ATOMIC_ARRAY(StringArray, std::string)
 #define GET_ATOMIC_SMALL_ARRAY(Name, dtype)                                   \
   Timestamped##Name##View LocalStorage::GetAtomic##Name(                      \
       NT_Handle subentry, wpi::SmallVectorImpl<dtype>& buf,                   \
-      wpi::span<const dtype> defaultValue) {                                  \
+      std::span<const dtype> defaultValue) {                                  \
     std::scoped_lock lock{m_mutex};                                           \
     Value* value = m_impl->GetSubEntryValue(subentry);                        \
     if (value && value->Is##Name()) {                                         \
@@ -2332,7 +2352,7 @@ int64_t LocalStorage::GetEntryLastChange(NT_Handle subentryHandle) {
 }
 
 NT_TopicListener LocalStorage::AddTopicListener(
-    wpi::span<const std::string_view> prefixes, unsigned int mask,
+    std::span<const std::string_view> prefixes, unsigned int mask,
     std::function<void(const TopicNotification&)> callback) {
   std::scoped_lock lock{m_mutex};
   return m_impl->AddTopicListener(prefixes, mask, std::move(callback));
@@ -2358,7 +2378,7 @@ void LocalStorage::DestroyTopicListenerPoller(
 
 NT_TopicListener LocalStorage::AddPolledTopicListener(
     NT_TopicListenerPoller pollerHandle,
-    wpi::span<const std::string_view> prefixes, unsigned int mask) {
+    std::span<const std::string_view> prefixes, unsigned int mask) {
   std::scoped_lock lock{m_mutex};
   if (auto poller = m_impl->m_topicListenerPollers.Get(pollerHandle)) {
     return m_impl->AddTopicListenerImpl(poller, prefixes, mask)->handle;

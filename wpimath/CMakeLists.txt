@@ -101,24 +101,26 @@ set_target_properties(wpimath PROPERTIES DEBUG_POSTFIX "d")
 set_property(TARGET wpimath PROPERTY FOLDER "libraries")
 target_compile_definitions(wpimath PRIVATE WPILIB_EXPORTS)
 
-target_compile_features(wpimath PUBLIC cxx_std_17)
+target_compile_features(wpimath PUBLIC cxx_std_20)
 if (MSVC)
     target_compile_options(wpimath PUBLIC /bigobj)
 endif()
 wpilib_target_warnings(wpimath)
 target_link_libraries(wpimath wpiutil)
 
-if (NOT USE_VCPKG_EIGEN)
-    install(DIRECTORY src/main/native/thirdparty/drake/include/ DESTINATION "${include_dest}/wpimath")
+if (NOT USE_SYSTEM_EIGEN)
     install(DIRECTORY src/main/native/thirdparty/eigen/include/ DESTINATION "${include_dest}/wpimath")
     target_include_directories(wpimath SYSTEM PUBLIC
-                            $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/thirdparty/drake/include>
-                            $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/thirdparty/eigen/include>
-                            $<INSTALL_INTERFACE:${include_dest}/wpimath>)
+                               $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/thirdparty/eigen/include>
+                               $<INSTALL_INTERFACE:${include_dest}/wpimath>)
 else()
     find_package(Eigen3 CONFIG REQUIRED)
     target_link_libraries (wpimath Eigen3::Eigen)
 endif()
+
+install(DIRECTORY src/main/native/thirdparty/drake/include/ DESTINATION "${include_dest}/wpimath")
+target_include_directories(wpimath SYSTEM PUBLIC
+                           $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/thirdparty/drake/include>)
 
 target_include_directories(wpimath PUBLIC
                             $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/include>

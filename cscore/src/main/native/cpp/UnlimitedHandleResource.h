@@ -6,12 +6,12 @@
 #define CSCORE_UNLIMITEDHANDLERESOURCE_H_
 
 #include <memory>
+#include <span>
 #include <utility>
 #include <vector>
 
 #include <wpi/SmallVector.h>
 #include <wpi/mutex.h>
-#include <wpi/span.h>
 
 namespace cs {
 
@@ -50,7 +50,7 @@ class UnlimitedHandleResource {
   std::shared_ptr<TStruct> Free(THandle handle);
 
   template <typename T>
-  wpi::span<T> GetAll(wpi::SmallVectorImpl<T>& vec);
+  std::span<T> GetAll(wpi::SmallVectorImpl<T>& vec);
 
   std::vector<std::shared_ptr<TStruct>> FreeAll();
 
@@ -151,7 +151,7 @@ UnlimitedHandleResource<THandle, TStruct, typeValue, TMutex>::Free(
 
 template <typename THandle, typename TStruct, int typeValue, typename TMutex>
 template <typename T>
-inline wpi::span<T>
+inline std::span<T>
 UnlimitedHandleResource<THandle, TStruct, typeValue, TMutex>::GetAll(
     wpi::SmallVectorImpl<T>& vec) {
   ForEach([&](THandle handle, const TStruct& data) { vec.push_back(handle); });

@@ -9,8 +9,8 @@
 namespace nt {
 
 inline MultiSubscriber::MultiSubscriber(
-    NetworkTableInstance inst, wpi::span<const std::string_view> prefixes,
-    wpi::span<const PubSubOption> options)
+    NetworkTableInstance inst, std::span<const std::string_view> prefixes,
+    std::span<const PubSubOption> options)
     : m_handle{::nt::SubscribeMultiple(inst.GetHandle(), prefixes, options)} {}
 
 inline MultiSubscriber::MultiSubscriber(MultiSubscriber&& rhs)

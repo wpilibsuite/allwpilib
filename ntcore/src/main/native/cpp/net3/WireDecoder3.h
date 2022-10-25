@@ -7,9 +7,8 @@
 #include <stdint.h>
 
 #include <memory>
+#include <span>
 #include <string>
-
-#include <wpi/span.h>
 
 namespace nt {
 class Value;
@@ -35,9 +34,9 @@ class MessageHandler3 {
   virtual void FlagsUpdate(unsigned int id, unsigned int flags) = 0;
   virtual void EntryDelete(unsigned int id) = 0;
   virtual void ExecuteRpc(unsigned int id, unsigned int uid,
-                          wpi::span<const uint8_t> params) = 0;
+                          std::span<const uint8_t> params) = 0;
   virtual void RpcResponse(unsigned int id, unsigned int uid,
-                           wpi::span<const uint8_t> result) = 0;
+                           std::span<const uint8_t> result) = 0;
 };
 
 /* Decodes NT3 protocol into native representation. */
@@ -52,7 +51,7 @@ class WireDecoder3 {
    * @param in input data (updated during parse)
    * @return false if error occurred
    */
-  bool Execute(wpi::span<const uint8_t>* in);
+  bool Execute(std::span<const uint8_t>* in);
 
   void SetError(std::string_view message);
   std::string GetError() const;
