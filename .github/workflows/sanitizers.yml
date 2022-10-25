@@ -31,13 +31,13 @@ jobs:
       - uses: actions/checkout@v3
 
       - name: Install Dependencies
-        run: sudo apt-get update && sudo apt-get install -y libopencv-dev libopencv4.5-java python-is-python3
+        run: sudo apt-get update && sudo apt-get install -y libopencv-dev libopencv4.5-java python-is-python3 clang-14
 
       - name: Install jinja
         run: python -m pip install jinja2
 
       - name: configure
-        run: mkdir build && cd build && cmake ${{ matrix.cmake-flags }} ..
+        run: mkdir build && cd build && cmake -DCMAKE_C_COMPILER:FILEPATH=/usr/bin/clang-14 -DCMAKE_CXX_COMPILER:FILEPATH=/usr/bin/clang++-14 ${{ matrix.cmake-flags }} ..
 
       - name: build
         working-directory: build
