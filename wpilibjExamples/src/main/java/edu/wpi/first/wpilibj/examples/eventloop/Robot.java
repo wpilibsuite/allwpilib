@@ -11,6 +11,7 @@ import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.Ultrasonic;
 import edu.wpi.first.wpilibj.event.BooleanEvent;
+import edu.wpi.first.wpilibj.event.DataEvent;
 import edu.wpi.first.wpilibj.event.EventLoop;
 import edu.wpi.first.wpilibj.motorcontrol.MotorController;
 import edu.wpi.first.wpilibj.motorcontrol.PWMSparkMax;
@@ -37,9 +38,8 @@ public class Robot extends TimedRobot {
   public void robotInit() {
     m_controller.setTolerance(TOLERANCE);
 
-    BooleanEvent isBallAtKicker =
-        new BooleanEvent(m_loop, () -> m_kickerSensor.getRangeMM() < KICKER_THRESHOLD);
-    BooleanEvent intakeButton = new BooleanEvent(m_loop, () -> m_joystick.getRawButton(2));
+    BooleanEvent isBallAtKicker = new DataEvent<>(m_loop, m_kickerSensor::getRangeMM).threshold(v -> v < KICKER_THRESHOLD);
+    BooleanEvent intakeButton = m_joystick.button(2, m_loop);
 
     // if the thumb button is held
     intakeButton
