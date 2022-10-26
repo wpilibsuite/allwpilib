@@ -204,6 +204,7 @@ class Trigger {
    *
    * @param command The command to bind.
    * @return The trigger, for chained calls.
+   * @deprecated Use OnTrue(Command) instead
    */
   WPI_DEPRECATED("Use OnTrue(Command) instead")
   Trigger WhenActive(Command* command);
@@ -216,6 +217,7 @@ class Trigger {
    *
    * @param command The command to bind.
    * @return The trigger, for chained calls.
+   * @deprecated Use OnTrue(Command) instead
    */
   template <class T, typename = std::enable_if_t<std::is_base_of_v<
                          Command, std::remove_reference_t<T>>>>
@@ -233,6 +235,8 @@ class Trigger {
    *
    * @param toRun the runnable to execute.
    * @param requirements the required subsystems.
+   * @deprecated Use OnTrue(Command) instead and construct the InstantCommand
+   * manually
    */
   WPI_DEPRECATED(
       "Use OnTrue(Command) instead and construct the InstantCommand manually")
@@ -244,6 +248,8 @@ class Trigger {
    *
    * @param toRun the runnable to execute.
    * @param requirements the required subsystems.
+   * @deprecated Use OnTrue(Command) instead and construct the InstantCommand
+   * manually
    */
   WPI_DEPRECATED(
       "Use OnTrue(Command) instead and construct the InstantCommand manually")
@@ -257,6 +263,8 @@ class Trigger {
    *
    * @param command The command to bind.
    * @return The trigger, for chained calls.
+   * @deprecated Use WhileTrue(Command) with RepeatCommand, or bind
+   command::Schedule with IfHigh(std::function<void()>).
    */
   WPI_DEPRECATED(
       "Use WhileTrue(Command) with RepeatCommand, or bind command::Schedule "
@@ -271,6 +279,8 @@ class Trigger {
    *
    * @param command The command to bind.
    * @return The trigger, for chained calls.
+   * @deprecated Use WhileTrue(Command) with RepeatCommand, or bind
+   command::Schedule with IfHigh(std::function<void()>).
    */
   template <class T, typename = std::enable_if_t<std::is_base_of_v<
                          Command, std::remove_reference_t<T>>>>
@@ -291,6 +301,7 @@ class Trigger {
    *
    * @param toRun the runnable to execute.
    * @param requirements the required subsystems.
+   * @deprecated Use WhileTrue(Command) and construct a RunCommand manually
    */
   WPI_DEPRECATED("Use WhileTrue(Command) and construct a RunCommand manually")
   Trigger WhileActiveContinous(std::function<void()> toRun,
@@ -301,6 +312,7 @@ class Trigger {
    *
    * @param toRun the runnable to execute.
    * @param requirements the required subsystems.
+   * @deprecated Use WhileTrue(Command) and construct a RunCommand manually
    */
   WPI_DEPRECATED("Use WhileTrue(Command) and construct a RunCommand manually")
   Trigger WhileActiveContinous(std::function<void()> toRun,
@@ -313,6 +325,7 @@ class Trigger {
    *
    * @param command The command to bind.
    * @return The trigger, for chained calls.
+   * @deprecated Use WhileTrue(Command) instead.
    */
   WPI_DEPRECATED("Use WhileTrue(Command) instead.")
   Trigger WhileActiveOnce(Command* command);
@@ -325,6 +338,7 @@ class Trigger {
    *
    * @param command The command to bind.
    * @return The trigger, for chained calls.
+   * @deprecated Use WhileTrue(Command) instead.
    */
   template <class T, typename = std::enable_if_t<std::is_base_of_v<
                          Command, std::remove_reference_t<T>>>>
@@ -346,6 +360,7 @@ class Trigger {
    *
    * @param command The command to bind.
    * @return The trigger, for chained calls.
+   * @deprecated Use OnFalse(Command) instead.
    */
   WPI_DEPRECATED("Use OnFalse(Command) instead.")
   Trigger WhenInactive(Command* command);
@@ -358,6 +373,7 @@ class Trigger {
    *
    * @param command The command to bind.
    * @return The trigger, for chained calls.
+   * @deprecated Use OnFalse(Command) instead.
    */
   template <class T, typename = std::enable_if_t<std::is_base_of_v<
                          Command, std::remove_reference_t<T>>>>
@@ -375,6 +391,8 @@ class Trigger {
    *
    * @param toRun the runnable to execute.
    * @param requirements the required subsystems.
+   * @deprecated Use OnFalse(Command) instead and construct the InstantCommand
+   * manually
    */
   WPI_DEPRECATED(
       "Use OnFalse(Command) instead and construct the InstantCommand manually")
@@ -386,6 +404,8 @@ class Trigger {
    *
    * @param toRun the runnable to execute.
    * @param requirements the required subsystems.
+   * @deprecated Use OnFalse(Command) instead and construct the InstantCommand
+   * manually
    */
   WPI_DEPRECATED(
       "Use OnFalse(Command) instead and construct the InstantCommand manually")
@@ -399,6 +419,7 @@ class Trigger {
    *
    * @param command The command to bind.
    * @return The trigger, for chained calls.
+   * @deprecated Use ToggleOnTrue(Command) instead.
    */
   WPI_DEPRECATED("Use ToggleOnTrue(Command) instead.")
   Trigger ToggleWhenActive(Command* command);
@@ -411,6 +432,7 @@ class Trigger {
    *
    * @param command The command to bind.
    * @return The trigger, for chained calls.
+   * @deprecated Use ToggleOnTrue(Command) instead.
    */
   template <class T, typename = std::enable_if_t<std::is_base_of_v<
                          Command, std::remove_reference_t<T>>>>
@@ -436,6 +458,7 @@ class Trigger {
    *
    * @param command The command to bind.
    * @return The trigger, for chained calls.
+   * @deprecated Use Rising() as a command end condition with Until() instead.
    */
   WPI_DEPRECATED(
       "Use Rising() as a command end condition with Until() instead.")

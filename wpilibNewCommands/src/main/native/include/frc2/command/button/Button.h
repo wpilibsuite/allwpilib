@@ -30,6 +30,7 @@ class Button : public Trigger {
    * Create a new button that is pressed when the given condition is true.
    *
    * @param isPressed Whether the button is pressed.
+   * @deprecated Replace with Trigger
    */
   WPI_DEPRECATED("Replace with Trigger")
   explicit Button(std::function<bool()> isPressed);
@@ -37,6 +38,7 @@ class Button : public Trigger {
   /**
    * Create a new button that is pressed active (default constructor) - activity
    *  can be further determined by subclass code.
+   * @deprecated Replace with Trigger
    */
   WPI_DEPRECATED("Replace with Trigger")
   Button() = default;
@@ -48,6 +50,7 @@ class Button : public Trigger {
    *
    * @param command The command to bind.
    * @return The trigger, for chained calls.
+   * @deprecated Replace with Trigger::OnTrue()
    */
   WPI_DEPRECATED("Replace with Trigger#OnTrue()")
   Button WhenPressed(Command* command);
@@ -60,6 +63,7 @@ class Button : public Trigger {
    *
    * @param command The command to bind.
    * @return The trigger, for chained calls.
+   * @deprecated Replace with Trigger::OnTrue()
    */
   template <class T, typename = std::enable_if_t<std::is_base_of_v<
                          Command, std::remove_reference_t<T>>>>
@@ -74,6 +78,7 @@ class Button : public Trigger {
    *
    * @param toRun the runnable to execute.
    * @param requirements the required subsystems.
+   * @deprecated Replace with Trigger::OnTrue(cmd::RunOnce())
    */
   WPI_DEPRECATED("Replace with Trigger#OnTrue(cmd::RunOnce())")
   Button WhenPressed(std::function<void()> toRun,
@@ -84,6 +89,7 @@ class Button : public Trigger {
    *
    * @param toRun the runnable to execute.
    * @param requirements the required subsystems.
+   * @deprecated Replace with Trigger::OnTrue(cmd::RunOnce())
    */
   WPI_DEPRECATED("Replace with Trigger#OnTrue(cmd::RunOnce())")
   Button WhenPressed(std::function<void()> toRun,
@@ -96,6 +102,7 @@ class Button : public Trigger {
    *
    * @param command The command to bind.
    * @return The button, for chained calls.
+   * @deprecated Replace with Trigger::WhileTrue(command.Repeatedly())
    */
   WPI_DEPRECATED("Replace with Trigger#WhileTrue(command.Repeatedly())")
   Button WhileHeld(Command* command);
@@ -108,6 +115,7 @@ class Button : public Trigger {
    *
    * @param command The command to bind.
    * @return The button, for chained calls.
+   * @deprecated Replace with Trigger::WhileTrue(command.Repeatedly())
    */
   template <class T, typename = std::enable_if_t<std::is_base_of_v<
                          Command, std::remove_reference_t<T>>>>
@@ -122,6 +130,7 @@ class Button : public Trigger {
    *
    * @param toRun the runnable to execute.
    * @param requirements the required subsystems.
+   * @deprecated Replace with Trigger::WhileTrue(cmd::Run())
    */
   WPI_DEPRECATED("Replace with Trigger#WhileTrue(cmd::Run())")
   Button WhileHeld(std::function<void()> toRun,
@@ -132,6 +141,7 @@ class Button : public Trigger {
    *
    * @param toRun the runnable to execute.
    * @param requirements the required subsystems.
+   * @deprecated Replace with Trigger::WhileTrue(cmd::Run())
    */
   WPI_DEPRECATED("Replace with Trigger#WhileTrue(cmd::Run())")
   Button WhileHeld(std::function<void()> toRun,
@@ -144,6 +154,7 @@ class Button : public Trigger {
    *
    * @param command The command to bind.
    * @return The button, for chained calls.
+   * @deprecated Replace with Trigger::WhileTrue()
    */
   WPI_DEPRECATED("Replace with Trigger#WhileTrue()")
   Button WhenHeld(Command* command);
@@ -156,6 +167,7 @@ class Button : public Trigger {
    *
    * @param command The command to bind.
    * @return The button, for chained calls.
+   * @deprecated Replace with Trigger::WhileTrue()
    */
   template <class T, typename = std::enable_if_t<std::is_base_of_v<
                          Command, std::remove_reference_t<T>>>>
@@ -172,6 +184,7 @@ class Button : public Trigger {
    *
    * @param command The command to bind.
    * @return The button, for chained calls.
+   * @deprecated Replace with Trigger::OnFalse()
    */
   WPI_DEPRECATED("Replace with Trigger#OnFalse()")
   Button WhenReleased(Command* command);
@@ -184,6 +197,7 @@ class Button : public Trigger {
    *
    * @param command The command to bind.
    * @return The button, for chained calls.
+   * @deprecated Replace with Trigger::OnFalse()
    */
   template <class T, typename = std::enable_if_t<std::is_base_of_v<
                          Command, std::remove_reference_t<T>>>>
@@ -198,6 +212,7 @@ class Button : public Trigger {
    *
    * @param toRun the runnable to execute.
    * @param requirements the required subsystems.
+   * @deprecated Replace with Trigger::OnFalse(cmd::RunOnce())
    */
   WPI_DEPRECATED("Replace with Trigger#OnFalse(cmd::RunOnce())")
   Button WhenReleased(std::function<void()> toRun,
@@ -208,6 +223,7 @@ class Button : public Trigger {
    *
    * @param toRun the runnable to execute.
    * @param requirements the required subsystems.
+   * @deprecated Replace with Trigger::OnFalse(cmd::RunOnce())
    */
   WPI_DEPRECATED("Replace with Trigger#OnFalse(cmd::RunOnce())")
   Button WhenReleased(std::function<void()> toRun,
@@ -220,6 +236,7 @@ class Button : public Trigger {
    *
    * @param command The command to bind.
    * @return The button, for chained calls.
+   * @deprecated Replace with Trigger::ToggleOnTrue()
    */
   WPI_DEPRECATED("Replace with Trigger#ToggleOnTrue()")
   Button ToggleWhenPressed(Command* command);
@@ -232,6 +249,7 @@ class Button : public Trigger {
    *
    * @param command The command to bind.
    * @return The button, for chained calls.
+   * @deprecated Replace with Trigger::ToggleOnTrue()
    */
   template <class T, typename = std::enable_if_t<std::is_base_of_v<
                          Command, std::remove_reference_t<T>>>>
@@ -248,6 +266,7 @@ class Button : public Trigger {
    *
    * @param command The command to bind.
    * @return The button, for chained calls.
+   * @deprecated Use Rising() as a command end condition with Until() instead.
    */
   WPI_DEPRECATED(
       "Use Rising() as a command end condition with Until() instead.")
