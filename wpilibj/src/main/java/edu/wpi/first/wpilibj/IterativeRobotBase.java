@@ -76,6 +76,7 @@ public abstract class IterativeRobotBase extends RobotBase {
   protected IterativeRobotBase(double period) {
     m_period = period;
     m_watchdog = new Watchdog(period, this::printLoopOverrunMessage);
+    NetworkTableInstance.getDefault().enableListenerPolledMode();
   }
 
   /** Provide an alternate "main loop" via startCompetition(). */
@@ -348,6 +349,9 @@ public abstract class IterativeRobotBase extends RobotBase {
     if (m_ntFlushEnabled) {
       NetworkTableInstance.getDefault().flushLocal();
     }
+
+    // Run NetworkTables callbacks
+    NetworkTableInstance.getDefault().runListenerCallbacks();
 
     // Warn on loop time overruns
     if (m_watchdog.isExpired()) {
