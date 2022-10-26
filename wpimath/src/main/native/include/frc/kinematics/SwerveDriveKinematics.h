@@ -42,6 +42,9 @@ namespace frc {
  *
  * Forward kinematics is also used for odometry -- determining the position of
  * the robot on the field using encoders and a gyro.
+ * @see <a
+ * href="https://docs.wpilib.org/en/latest/docs/software/kinematics-and-odometry/swerve-drive-kinematics.html">SwerveDriveKinematics
+ * on frc-docs</a>
  */
 template <size_t NumModules>
 class SwerveDriveKinematics {

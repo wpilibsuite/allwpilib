@@ -35,6 +35,9 @@ class CommandPtr;
  * @see Command
  * @see CommandScheduler
  * @see SubsystemBase
+ * @see <a
+ * href="https://docs.wpilib.org/en/latest/docs/software/commandbased/subsystems.html">Subsystem
+ * on frc-docs</a>
  */
 class Subsystem {
  public:

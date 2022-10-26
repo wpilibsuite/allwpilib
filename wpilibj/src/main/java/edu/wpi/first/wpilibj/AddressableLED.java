@@ -13,6 +13,10 @@ import edu.wpi.first.hal.PWMJNI;
  * A class for driving addressable LEDs, such as WS2812s and NeoPixels.
  *
  * <p>Only 1 LED driver is currently supported by the roboRIO.
+ *
+ * @see <a
+ *     href="https://docs.wpilib.org/en/latest/docs/software/hardware-apis/misc/addressable-leds.html">Addressable
+ *     LEDs on frc-docs</a>
  */
 public class AddressableLED implements AutoCloseable {
   private final int m_pwmHandle;

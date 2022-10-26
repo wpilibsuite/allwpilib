@@ -15,6 +15,10 @@ import java.util.function.Consumer;
  * A command that runs a {@link TrapezoidProfile}. Useful for smoothly controlling mechanism motion.
  *
  * <p>This class is provided by the NewCommands VendorDep
+ *
+ * @see <a
+ *     href="https://docs.wpilib.org/en/latest/docs/software/commandbased/profile-subsystems-commands.html#trapezoidprofilecommand">TrapezoidProfileCommand
+ *     on frc-docs</a>
  */
 public class TrapezoidProfileCommand extends CommandBase {
   private final TrapezoidProfile m_profile;

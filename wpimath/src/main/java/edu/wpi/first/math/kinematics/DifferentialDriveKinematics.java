@@ -15,6 +15,10 @@ import edu.wpi.first.math.geometry.Twist2d;
  * <p>Inverse kinematics converts a desired chassis speed into left and right velocity components
  * whereas forward kinematics converts left and right component velocities into a linear and angular
  * chassis speed.
+ *
+ * @see <a
+ *     href="https://docs.wpilib.org/en/latest/docs/software/kinematics-and-odometry/differential-drive-kinematics.html">DifferentialDriveKinematics
+ *     on frc-docs</a>
  */
 public class DifferentialDriveKinematics {
   public final double trackWidthMeters;

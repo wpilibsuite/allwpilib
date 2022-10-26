@@ -16,6 +16,10 @@ import edu.wpi.first.util.sendable.SendableRegistry;
  *
  * <p>The Solenoid class is typically used for pneumatic solenoids, but could be used for any device
  * within the current spec of the module.
+ *
+ * @see <a
+ *     href="https://docs.wpilib.org/en/latest/docs/software/hardware-apis/pneumatics/pneumatics.html#single-solenoids-in-wpilib">Single
+ *     Solenoids on frc-docs</a>
  */
 public class Solenoid implements Sendable, AutoCloseable {
   private final int m_mask; // The channel mask

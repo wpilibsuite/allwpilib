@@ -45,6 +45,10 @@ import java.util.function.Consumer;
  * methods to be called and for their default commands to be scheduled.
  *
  * <p>This class is provided by the NewCommands VendorDep
+ *
+ * @see <a
+ *     href="https://docs.wpilib.org/en/latest/docs/software/commandbased/command-scheduler.html">CommandScheduler
+ *     on frc-docs</a>
  */
 public final class CommandScheduler implements NTSendable, AutoCloseable {
   /** The Singleton Instance. */

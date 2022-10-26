@@ -17,6 +17,10 @@ import edu.wpi.first.util.sendable.SendableRegistry;
  *
  * <p>The DoubleSolenoid class is typically used for pneumatics solenoids that have two positions
  * controlled by two separate channels.
+ *
+ * @see <a
+ *     href="https://docs.wpilib.org/en/latest/docs/software/hardware-apis/pneumatics/pneumatics.html#double-solenoids-in-wpilib">Double
+ *     Solenoids on frc-docs</a>
  */
 public class DoubleSolenoid implements Sendable, AutoCloseable {
   /** Possible values for a DoubleSolenoid. */

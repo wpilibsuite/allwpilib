@@ -16,6 +16,9 @@ namespace frc2 {
  * This class is provided by the NewCommands VendorDep
  *
  * @see PIDController
+ * @see <a
+ * href="https://docs.wpilib.org/en/latest/docs/software/commandbased/pid-subsystems-commands.html#pidsubsystems">PIDSubsystem
+ * on frc-docs</a>
  */
 class PIDSubsystem : public SubsystemBase {
  public:

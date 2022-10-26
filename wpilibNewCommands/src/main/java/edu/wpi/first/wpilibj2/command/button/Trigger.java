@@ -25,6 +25,10 @@ import java.util.function.BooleanSupplier;
  * #and(BooleanSupplier)}, {@link #or(BooleanSupplier)}, {@link #negate()} operators.
  *
  * <p>This class is provided by the NewCommands VendorDep
+ *
+ * @see <a
+ *     href="https://docs.wpilib.org/en/latest/docs/software/commandbased/binding-commands-to-triggers.html">Trigger
+ *     on frc-docs</a>
  */
 public class Trigger implements BooleanSupplier {
   private final BooleanSupplier m_condition;

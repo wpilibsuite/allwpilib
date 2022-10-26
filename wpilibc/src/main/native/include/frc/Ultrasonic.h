@@ -34,6 +34,9 @@ class DigitalOutput;
  * line becomes high as the ping is transmitted and goes low when the echo is
  * received. The time that the line is high determines the round trip distance
  * (time of flight).
+ * @see <a
+ * href="https://docs.wpilib.org/en/latest/docs/software/hardware-apis/sensors/ultrasonics-software.html">Ultrasonics
+ * on frc-docs</a>
  */
 class Ultrasonic : public wpi::Sendable,
                    public wpi::SendableHelper<Ultrasonic> {

@@ -31,6 +31,9 @@ class Subsystem;
  * methods to be called and for their default commands to be scheduled.
  *
  * This class is provided by the NewCommands VendorDep
+ * @see <a
+ * href="https://docs.wpilib.org/en/latest/docs/software/commandbased/command-scheduler.html">CommandScheduler
+ * on frc-docs</a>
  */
 class CommandScheduler final : public nt::NTSendable,
                                public wpi::SendableHelper<CommandScheduler> {

@@ -15,6 +15,10 @@ import edu.wpi.first.math.trajectory.TrapezoidProfile;
  * synchronously from the subsystem's periodic() method.
  *
  * <p>This class is provided by the NewCommands VendorDep
+ *
+ * @see <a
+ *     href="https://docs.wpilib.org/en/latest/docs/software/commandbased/profilepid-subsystems-commands.html#profiledpidsubsystem">ProfilePIDSubsystem
+ *     on frc-docs</a>
  */
 public abstract class ProfiledPIDSubsystem extends SubsystemBase {
   protected final ProfiledPIDController m_controller;

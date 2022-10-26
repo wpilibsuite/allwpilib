@@ -20,6 +20,10 @@ package edu.wpi.first.wpilibj2.command;
  * base for user implementations that handles this.
  *
  * <p>This class is provided by the NewCommands VendorDep
+ *
+ * @see <a
+ *     href="https://docs.wpilib.org/en/latest/docs/software/commandbased/subsystems.html">Subsystem
+ *     on frc-docs</a>
  */
 public interface Subsystem {
   /**

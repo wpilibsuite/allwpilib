@@ -19,6 +19,10 @@ import java.util.function.BooleanSupplier;
  * specified explicitly from the command implementation.
  *
  * <p>This class is provided by the NewCommands VendorDep
+ *
+ * @see <a
+ *     href="https://docs.wpilib.org/en/latest/docs/software/commandbased/index.html">Command-Based
+ *     Programming on frc-docs</a>
  */
 public interface Command {
   /** The initial subroutine of a command. Called once when the command is initially scheduled. */
