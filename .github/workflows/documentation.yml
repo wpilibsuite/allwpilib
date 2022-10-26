@@ -47,7 +47,7 @@ jobs:
         with:
           ssh-private-key: ${{ secrets.GH_DEPLOY_KEY }}
       - name: Deploy Java 🚀
-        uses: JamesIves/github-pages-deploy-action@v4.4.1
+        uses: JamesIves/github-pages-deploy-action@3.7.1
         with:
           SSH: true
           REPOSITORY_NAME: wpilibsuite/wpilibsuite.github.io
@@ -56,7 +56,7 @@ jobs:
           FOLDER: docs/build/docs/javadoc
           TARGET_FOLDER: ${{ env.TARGET_FOLDER }}/java
       - name: Deploy C++ 🚀
-        uses: JamesIves/github-pages-deploy-action@v4.4.1
+        uses: JamesIves/github-pages-deploy-action@3.7.1
         with:
           SSH: true
           REPOSITORY_NAME: wpilibsuite/wpilibsuite.github.io
