@@ -1,6 +1,6 @@
 import org.gradle.internal.os.OperatingSystem
 
-if (!project.hasProperty('onlylinuxathena') && !project.hasProperty('onlylinuxarm32') && !project.hasProperty('onlylinuxarm64')) {
+if (!project.hasProperty('onlylinuxathena')) {
 
     apply plugin: 'cpp'
     if (OperatingSystem.current().isMacOsX()) {
@@ -49,7 +49,7 @@ if (!project.hasProperty('onlylinuxathena') && !project.hasProperty('onlylinuxar
                 }
                 binaries.all {
                     nativeUtils.useRequiredLibrary(it, 'imgui_static')
-                    if (it.targetPlatform.name == nativeUtils.wpi.platforms.roborio || it.targetPlatform.name == nativeUtils.wpi.platforms.linuxarm32 || it.targetPlatform.name == nativeUtils.wpi.platforms.linuxarm64) {
+                    if (it.targetPlatform.name == nativeUtils.wpi.platforms.roborio) {
                         it.buildable = false
                         return
                     }
@@ -71,9 +71,18 @@ if (!project.hasProperty('onlylinuxathena') && !project.hasProperty('onlylinuxar
                                 }
                             }
                         }
+                    } else if (it.targetPlatform.name.startsWith('linuxarm')) {
+                        it.sources {
+                            wpiguiUnixGl2Cpp(CppSourceSet) {
+                                source {
+                                    srcDirs 'src/main/native/opengl2'
+                                    include '*.cpp'
+                                }
+                            }
+                        }
                     } else {
                         it.sources {
-                            wpiguiUnixCpp(CppSourceSet) {
+                            wpiguiUnixGl3Cpp(CppSourceSet) {
                                 source {
                                     srcDirs 'src/main/native/opengl3'
                                     include '*.cpp'
@@ -111,7 +120,7 @@ if (!project.hasProperty('onlylinuxathena') && !project.hasProperty('onlylinuxar
         }
         binaries {
             all {
-                if (it.targetPlatform.name == nativeUtils.wpi.platforms.roborio || it.targetPlatform.name == nativeUtils.wpi.platforms.linuxarm32 || it.targetPlatform.name == nativeUtils.wpi.platforms.linuxarm64) {
+                if (it.targetPlatform.name == nativeUtils.wpi.platforms.roborio) {
                     it.buildable = false
                     return
                 }
@@ -121,6 +130,9 @@ if (!project.hasProperty('onlylinuxathena') && !project.hasProperty('onlylinuxar
                     it.linker.args << '-framework' << 'Metal' << '-framework' << 'MetalKit' << '-framework' << 'Cocoa' << '-framework' << 'IOKit' << '-framework' << 'CoreFoundation' << '-framework' << 'CoreVideo' << '-framework' << 'QuartzCore'
                 } else {
                     it.linker.args << '-lX11'
+                    if (it.targetPlatform.name.startsWith('linuxarm')) {
+                        it.linker.args << '-lGL'
+                    }
                 }
             }
             withType(SharedLibraryBinarySpec) {
