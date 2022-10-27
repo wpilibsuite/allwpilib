@@ -11,7 +11,7 @@ jobs:
           repository: wpilibsuite/frc-docs
 
       - name: Inspect RLIs
-        uses: Starlight220/Inspector@v1.2
+        uses: Starlight220/Inspector@v1.3
         id: inspector
         with:
           root: ${{ github.workspace }}
@@ -22,5 +22,5 @@ jobs:
 
       # Error if RLIs can't be automatically updated
       - name: Set exit code
-        if: ${{ steps.inspector.outputs.needs-manual == true }}
+        if: ${{ steps.inspector.outputs.needs-manual == 'true' }}
         run: exit 1
