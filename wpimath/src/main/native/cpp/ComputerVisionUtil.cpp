@@ -4,6 +4,7 @@
 
 #include "frc/ComputerVisionUtil.h"
 
+#include "frc/geometry/Rotation3d.h"
 #include "units/math.h"
 
 namespace frc {
@@ -18,40 +19,44 @@ units::meter_t CalculateDistanceToTarget(units::meter_t cameraHeight,
           units::math::cos(targetYaw));
 }
 
-frc::Pose2d EstimateFieldToRobot(
+frc::Pose3d EstimateFieldToRobot(
     units::meter_t cameraHeight, units::meter_t targetHeight,
     units::radian_t cameraPitch, units::radian_t targetPitch,
     const frc::Rotation2d& targetYaw, const frc::Rotation2d& gyroAngle,
-    const frc::Pose2d& fieldToTarget, const frc::Transform2d& cameraToRobot) {
+    const frc::Pose3d& fieldToTarget, const frc::Transform3d& cameraToRobot) {
+  auto distanceAlongGround =
+      CalculateDistanceToTarget(cameraHeight, targetHeight, cameraPitch,
+                                targetPitch, targetYaw.Radians());
+  auto range =
+      units::math::hypot(distanceAlongGround, targetHeight - cameraHeight);
   return EstimateFieldToRobot(
       EstimateCameraToTarget(
-          frc::Translation2d{
-              CalculateDistanceToTarget(cameraHeight, targetHeight, cameraPitch,
-                                        targetPitch, targetYaw.Radians()),
-              targetYaw},
+          Translation3d{range,
+                        Rotation3d{0_rad, targetPitch, targetYaw.Radians()}},
           fieldToTarget, gyroAngle),
       fieldToTarget, cameraToRobot);
 }
 
-frc::Pose2d EstimateFieldToRobot(const frc::Transform2d& cameraToTarget,
-                                 const frc::Pose2d& fieldToTarget,
-                                 const frc::Transform2d& cameraToRobot) {
+frc::Pose3d EstimateFieldToRobot(const frc::Transform3d& cameraToTarget,
+                                 const frc::Pose3d& fieldToTarget,
+                                 const frc::Transform3d& cameraToRobot) {
   return EstimateFieldToCamera(cameraToTarget, fieldToTarget)
       .TransformBy(cameraToRobot);
 }
 
-frc::Transform2d EstimateCameraToTarget(
-    const frc::Translation2d& cameraToTargetTranslation,
-    const frc::Pose2d& fieldToTarget, const frc::Rotation2d& gyroAngle) {
+frc::Transform3d EstimateCameraToTarget(
+    const frc::Translation3d& cameraToTargetTranslation,
+    const frc::Pose3d& fieldToTarget, const frc::Rotation2d& gyroAngle) {
   // Map our camera at the origin out to our target, in the robot reference
   // frame. Gyro angle is needed because there's a circle of possible camera
   // poses for which the camera has the same yaw from camera to target.
-  return frc::Transform2d{cameraToTargetTranslation,
-                          -gyroAngle - fieldToTarget.Rotation()};
+  return Transform3d{cameraToTargetTranslation,
+                     Rotation3d{0_rad, 0_rad, -gyroAngle.Radians()} -
+                         fieldToTarget.Rotation()};
 }
 
-frc::Pose2d EstimateFieldToCamera(const frc::Transform2d& cameraToTarget,
-                                  const frc::Pose2d& fieldToTarget) {
+frc::Pose3d EstimateFieldToCamera(const frc::Transform3d& cameraToTarget,
+                                  const frc::Pose3d& fieldToTarget) {
   auto targetToCamera = cameraToTarget.Inverse();
   return fieldToTarget.TransformBy(targetToCamera);
 }
