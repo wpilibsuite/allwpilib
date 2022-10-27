@@ -25,7 +25,6 @@ if (!project.hasProperty('onlylinuxathena')) {
     def wpilibVersionFileOutput = file("$buildDir/generated/main/cpp/WPILibVersion.cpp")
 
     apply from: "${rootDir}/shared/libssh.gradle"
-    println "adding libssh"
 
     task generateCppVersion() {
         description = 'Generates the wpilib version class'
@@ -114,6 +113,9 @@ if (!project.hasProperty('onlylinuxathena')) {
                         it.linker.args << '-framework' << 'Kerberos'
                     } else {
                         it.linker.args << '-lX11'
+                        if (it.targetPlatform.name.startsWith('linuxarm')) {
+                            it.linker.args << '-lGL'
+                        }
                     }
                 }
             }

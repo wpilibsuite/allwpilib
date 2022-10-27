@@ -39,6 +39,9 @@ if (!project.hasProperty('onlylinuxathena')) {
                     it.linker.args << '-framework' << 'Metal' << '-framework' << 'MetalKit' << '-framework' << 'Cocoa' << '-framework' << 'IOKit' << '-framework' << 'CoreFoundation' << '-framework' << 'CoreVideo' << '-framework' << 'QuartzCore'
                 } else {
                     it.linker.args << '-lX11'
+                    if (it.targetPlatform.name.startsWith('linuxarm')) {
+                        it.linker.args << '-lGL'
+                    }
                 }
             }
         }

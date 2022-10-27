@@ -112,6 +112,9 @@ if (!project.hasProperty('onlylinuxathena')) {
                         it.linker.args << '-framework' << 'Kerberos'
                     } else {
                         it.linker.args << '-lX11'
+                        if (it.targetPlatform.name.startsWith('linuxarm')) {
+                            it.linker.args << '-lGL'
+                        }
                     }
                 }
             }

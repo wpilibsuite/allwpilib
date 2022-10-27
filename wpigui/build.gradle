@@ -71,9 +71,18 @@ if (!project.hasProperty('onlylinuxathena')) {
                                 }
                             }
                         }
+                    } else if (it.targetPlatform.name.startsWith('linuxarm')) {
+                        it.sources {
+                            wpiguiUnixGl2Cpp(CppSourceSet) {
+                                source {
+                                    srcDirs 'src/main/native/opengl2'
+                                    include '*.cpp'
+                                }
+                            }
+                        }
                     } else {
                         it.sources {
-                            wpiguiUnixCpp(CppSourceSet) {
+                            wpiguiUnixGl3Cpp(CppSourceSet) {
                                 source {
                                     srcDirs 'src/main/native/opengl3'
                                     include '*.cpp'
@@ -121,6 +130,9 @@ if (!project.hasProperty('onlylinuxathena')) {
                     it.linker.args << '-framework' << 'Metal' << '-framework' << 'MetalKit' << '-framework' << 'Cocoa' << '-framework' << 'IOKit' << '-framework' << 'CoreFoundation' << '-framework' << 'CoreVideo' << '-framework' << 'QuartzCore'
                 } else {
                     it.linker.args << '-lX11'
+                    if (it.targetPlatform.name.startsWith('linuxarm')) {
+                        it.linker.args << '-lGL'
+                    }
                 }
             }
             withType(SharedLibraryBinarySpec) {
