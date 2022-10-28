@@ -384,6 +384,10 @@ public final class NetworkTableInstance implements AutoCloseable {
     protected abstract void destroyPoller();
 
     protected void startThread(String name) {
+      if (m_inst.m_listenerPolledMode) {
+        return;
+      }
+      m_inst.m_listenerThreadStarted = true;
       m_thread =
           new Thread(
               () -> {
@@ -407,25 +411,7 @@ public final class NetworkTableInstance implements AutoCloseable {
                     wasInterrupted = true;
                     break;
                   }
-                  for (T event : readQueue()) {
-                    Consumer<T> listener;
-                    m_lock.lock();
-                    try {
-                      listener = m_listeners.get(event.listener);
-                    } finally {
-                      m_lock.unlock();
-                    }
-                    if (listener != null) {
-                      try {
-                        listener.accept(event);
-                      } catch (Throwable throwable) {
-                        System.err.println(
-                            "Unhandled exception during listener callback: "
-                            + throwable.toString());
-                        throwable.printStackTrace();
-                      }
-                    }
-                  }
+                  callCallbacks();
                   m_lock.lock();
                   try {
                     if (m_waitQueue) {
@@ -449,6 +435,28 @@ public final class NetworkTableInstance implements AutoCloseable {
               name);
       m_thread.setDaemon(true);
       m_thread.start();
+    }
+
+    void callCallbacks() {
+      for (T event : readQueue()) {
+        Consumer<T> listener;
+        m_lock.lock();
+        try {
+          listener = m_listeners.get(event.listener);
+        } finally {
+          m_lock.unlock();
+        }
+        if (listener != null) {
+          try {
+            listener.accept(event);
+          } catch (Throwable throwable) {
+            System.err.println(
+                "Unhandled exception during listener callback: "
+                + throwable.toString());
+            throwable.printStackTrace();
+          }
+        }
+      }
     }
 
     boolean waitForQueue(double timeout) {
@@ -847,6 +855,33 @@ public final class NetworkTableInstance implements AutoCloseable {
    */
   public boolean waitForValueListenerQueue(double timeout) {
     return m_valueListener.waitForQueue(timeout);
+  }
+
+  private boolean m_listenerThreadStarted;
+  private boolean m_listenerPolledMode;
+
+  /**
+   * Change listener callbacks to polled. In this mode, listener callbacks are not called from a
+   * separate thread; instead they are called only when runListenerCallbacks() is called. To be
+   * effective, this must be called prior to any listeners being added.
+   */
+  public void enableListenerPolledMode() {
+    if (m_listenerThreadStarted) {
+      return;
+    }
+    m_listenerPolledMode = true;
+  }
+
+  /**
+   * Run listener callbacks when in listener polled mode (see enableListenerPolledMode()).
+   */
+  public void runListenerCallbacks() {
+    if (!m_listenerPolledMode) {
+      return;
+    }
+    m_connectionListener.callCallbacks();
+    m_topicListener.callCallbacks();
+    m_valueListener.callCallbacks();
   }
 
   /*
