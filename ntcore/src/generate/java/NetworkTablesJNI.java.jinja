@@ -199,40 +199,18 @@ public final class NetworkTablesJNI {
 
   public static native TopicInfo getTopicInfo(NetworkTableInstance inst, int topic);
 
-  public static native int createTopicListenerPoller(int inst);
+  public static native int createListenerPoller(int inst);
 
-  public static native void destroyTopicListenerPoller(int poller);
+  public static native void destroyListenerPoller(int poller);
 
-  public static native int addPolledTopicListener(int poller, String[] prefixes, int flags);
+  public static native int addListener(int poller, String[] prefixes, int mask);
 
-  public static native int addPolledTopicListener(int poller, int handle, int flags);
+  public static native int addListener(int poller, int handle, int mask);
 
-  public static native TopicNotification[] readTopicListenerQueue(
+  public static native NetworkTableEvent[] readListenerQueue(
       NetworkTableInstance inst, int poller);
 
-  public static native void removeTopicListener(int topicListener);
-
-  public static native int createValueListenerPoller(int inst);
-
-  public static native void destroyValueListenerPoller(int poller);
-
-  public static native int addPolledValueListener(int poller, int subentry, int flags);
-
-  public static native ValueNotification[] readValueListenerQueue(
-      NetworkTableInstance inst, int poller);
-
-  public static native void removeValueListener(int valueListener);
-
-  public static native int createConnectionListenerPoller(int inst);
-
-  public static native void destroyConnectionListenerPoller(int poller);
-
-  public static native int addPolledConnectionListener(int poller, boolean immediateNotify);
-
-  public static native ConnectionNotification[] readConnectionListenerQueue(
-      NetworkTableInstance inst, int poller);
-
-  public static native void removeConnectionListener(int connListener);
+  public static native void removeListener(int listener);
 
   public static native int getNetworkMode(int inst);
 
@@ -287,13 +265,5 @@ public final class NetworkTablesJNI {
 
   public static native void stopConnectionDataLog(int logger);
 
-  public static native int createLoggerPoller(int inst);
-
-  public static native void destroyLoggerPoller(int poller);
-
-  public static native int addPolledLogger(int poller, int minLevel, int maxLevel);
-
-  public static native LogMessage[] readLoggerQueue(NetworkTableInstance inst, int poller);
-
-  public static native void removeLogger(int logger);
+  public static native int addLogger(int poller, int minLevel, int maxLevel);
 }

@@ -117,58 +117,55 @@ NTField2DModel::NTField2DModel(nt::NetworkTableInstance inst,
                  {{nt::PubSubOption::SendAll(true),
                    nt::PubSubOption::Periodic(0.05)}}},
       m_nameTopic{inst.GetTopic(fmt::format("{}/.name", path))},
-      m_topicListener{inst},
-      m_valueListener{inst} {
-  m_topicListener.Add(m_tableSub, NT_TOPIC_NOTIFY_PUBLISH |
-                                      NT_TOPIC_NOTIFY_UNPUBLISH |
-                                      NT_TOPIC_NOTIFY_IMMEDIATE);
-  m_valueListener.Add(m_tableSub,
-                      NT_VALUE_NOTIFY_IMMEDIATE | NT_VALUE_NOTIFY_LOCAL);
+      m_poller{inst} {
+  m_poller.AddListener(m_tableSub, nt::EventFlags::kTopic |
+                                       nt::EventFlags::kValueAll |
+                                       nt::EventFlags::kImmediate);
 }
 
 NTField2DModel::~NTField2DModel() = default;
 
 void NTField2DModel::Update() {
-  // handle publish/unpublish
-  for (auto&& event : m_topicListener.ReadQueue()) {
-    auto name = wpi::drop_front(event.info.name, m_path.size());
-    if (name.empty() || name[0] == '.') {
-      continue;
-    }
-    auto [it, match] = Find(event.info.name);
-    if (event.flags & NT_TOPIC_NOTIFY_UNPUBLISH) {
-      if (match) {
-        m_objects.erase(it);
+  for (auto&& event : m_poller.ReadQueue()) {
+    if (auto info = event.GetTopicInfo()) {
+      // handle publish/unpublish
+      auto name = wpi::drop_front(info->name, m_path.size());
+      if (name.empty() || name[0] == '.') {
+        continue;
       }
-      continue;
-    } else if (event.flags & NT_TOPIC_NOTIFY_PUBLISH) {
-      if (!match) {
-        it = m_objects.emplace(
-            it, std::make_unique<ObjectModel>(
-                    event.info.name, nt::DoubleArrayTopic{event.info.topic}));
+      auto [it, match] = Find(info->name);
+      if (event.flags & nt::EventFlags::kUnpublish) {
+        if (match) {
+          m_objects.erase(it);
+        }
+        continue;
+      } else if (event.flags & nt::EventFlags::kPublish) {
+        if (!match) {
+          it = m_objects.emplace(
+              it, std::make_unique<ObjectModel>(
+                      info->name, nt::DoubleArrayTopic{info->topic}));
+        }
+      } else if (!match) {
+        continue;
       }
-    } else if (!match) {
-      continue;
-    }
-  }
+    } else if (auto valueData = event.GetValueEventData()) {
+      // update values
+      // .name
+      if (valueData->topic == m_nameTopic.GetHandle()) {
+        if (valueData->value && valueData->value.IsString()) {
+          m_nameValue = valueData->value.GetString();
+        }
+        continue;
+      }
 
-  // update values
-  for (auto&& event : m_valueListener.ReadQueue()) {
-    // .name
-    if (event.topic == m_nameTopic.GetHandle()) {
-      if (event.value && event.value.IsString()) {
-        m_nameValue = event.value.GetString();
+      auto it =
+          std::find_if(m_objects.begin(), m_objects.end(), [&](const auto& e) {
+            return e->GetTopic().GetHandle() == valueData->topic;
+          });
+      if (it != m_objects.end()) {
+        (*it)->NTUpdate(valueData->value);
+        continue;
       }
-      continue;
-    }
-
-    auto it =
-        std::find_if(m_objects.begin(), m_objects.end(), [&](const auto& e) {
-          return e->GetTopic().GetHandle() == event.topic;
-        });
-    if (it != m_objects.end()) {
-      (*it)->NTUpdate(event.value);
-      continue;
     }
   }
 }

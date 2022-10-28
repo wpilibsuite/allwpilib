@@ -11,8 +11,8 @@
 #include <networktables/MultiSubscriber.h>
 #include <networktables/NetworkTable.h>
 #include <networktables/NetworkTableInstance.h>
+#include <networktables/NetworkTableListener.h>
 #include <networktables/StringTopic.h>
-#include <networktables/TopicListener.h>
 
 using namespace frc;
 
@@ -28,7 +28,7 @@ struct Instance {
   nt::StringPublisher typePublisher{table->GetStringTopic(".type").Publish()};
   nt::MultiSubscriber tableSubscriber{nt::NetworkTableInstance::GetDefault(),
                                       {{fmt::format("{}/", table->GetPath())}}};
-  nt::TopicListener listener;
+  nt::NetworkTableListener listener;
 };
 }  // namespace
 
@@ -166,13 +166,14 @@ void Preferences::RemoveAll() {
 
 Instance::Instance() {
   typePublisher.Set("RobotPreferences");
-  listener = nt::TopicListener{
-      tableSubscriber, NT_TOPIC_NOTIFY_IMMEDIATE | NT_TOPIC_NOTIFY_PUBLISH,
-      [typeTopic = typePublisher.GetTopic().GetHandle()](
-          const nt::TopicNotification& event) {
-        if (event.info.topic != typeTopic) {
-          nt::SetTopicPersistent(event.info.topic, true);
+  listener = nt::NetworkTableListener::CreateListener(
+      tableSubscriber, NT_EVENT_PUBLISH | NT_EVENT_IMMEDIATE,
+      [typeTopic = typePublisher.GetTopic().GetHandle()](auto& event) {
+        if (auto topicInfo = event.GetTopicInfo()) {
+          if (topicInfo->topic != typeTopic) {
+            nt::SetTopicPersistent(topicInfo->topic, true);
+          }
         }
-      }};
+      });
   HAL_Report(HALUsageReporting::kResourceType_Preferences, 0);
 }

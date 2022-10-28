@@ -110,15 +110,10 @@ NetworkTablesModel::NetworkTablesModel()
     : NetworkTablesModel{nt::NetworkTableInstance::GetDefault()} {}
 
 NetworkTablesModel::NetworkTablesModel(nt::NetworkTableInstance inst)
-    : m_inst{inst},
-      m_subscriber{inst, {{"", "$"}}},
-      m_topicPoller{inst},
-      m_valuePoller{inst} {
-  m_topicPoller.Add(m_subscriber,
-                    NT_TOPIC_NOTIFY_IMMEDIATE | NT_TOPIC_NOTIFY_PROPERTIES |
-                        NT_TOPIC_NOTIFY_PUBLISH | NT_TOPIC_NOTIFY_UNPUBLISH);
-  m_valuePoller.Add(m_subscriber,
-                    NT_VALUE_NOTIFY_IMMEDIATE | NT_VALUE_NOTIFY_LOCAL);
+    : m_inst{inst}, m_poller{inst} {
+  m_poller.AddListener({{"", "$"}}, nt::EventFlags::kTopic |
+                                        nt::EventFlags::kValueAll |
+                                        nt::EventFlags::kImmediate);
 }
 
 NetworkTablesModel::Entry::~Entry() {
@@ -426,56 +421,57 @@ void NetworkTablesModel::ValueSource::UpdateFromValue(
 
 void NetworkTablesModel::Update() {
   bool updateTree = false;
-  for (auto&& event : m_topicPoller.ReadQueue()) {
-    auto& entry = m_entries[event.info.topic];
-    if (event.flags & NT_TOPIC_NOTIFY_PUBLISH) {
-      if (!entry) {
-        entry = std::make_unique<Entry>();
-        m_sortedEntries.emplace_back(entry.get());
+  for (auto&& event : m_poller.ReadQueue()) {
+    if (auto info = event.GetTopicInfo()) {
+      auto& entry = m_entries[info->topic];
+      if (event.flags & nt::EventFlags::kPublish) {
+        if (!entry) {
+          entry = std::make_unique<Entry>();
+          m_sortedEntries.emplace_back(entry.get());
+          updateTree = true;
+        }
+      }
+      if (event.flags & nt::EventFlags::kUnpublish) {
+        auto it = std::find(m_sortedEntries.begin(), m_sortedEntries.end(),
+                            entry.get());
+        // will be removed completely below
+        if (it != m_sortedEntries.end()) {
+          *it = nullptr;
+        }
+        m_entries.erase(info->topic);
+        updateTree = true;
+        continue;
+      }
+      if (event.flags & nt::EventFlags::kProperties) {
         updateTree = true;
       }
-    }
-    if (event.flags & NT_TOPIC_NOTIFY_UNPUBLISH) {
-      auto it = std::find(m_sortedEntries.begin(), m_sortedEntries.end(),
-                          entry.get());
-      // will be removed completely below
-      if (it != m_sortedEntries.end()) {
-        *it = nullptr;
+      if (entry) {
+        entry->UpdateTopic(std::move(event));
       }
-      m_entries.erase(event.info.topic);
-      updateTree = true;
-      continue;
-    }
-    if (event.flags & NT_TOPIC_NOTIFY_PROPERTIES) {
-      updateTree = true;
-    }
-    if (entry) {
-      entry->UpdateTopic(std::move(event));
-    }
-  }
-  for (auto&& event : m_valuePoller.ReadQueue()) {
-    auto& entry = m_entries[event.topic];
-    if (entry) {
-      entry->UpdateFromValue(std::move(event.value), entry->info.name,
-                             entry->info.type_str);
-      if (wpi::starts_with(entry->info.name, '$') && entry->value.IsRaw() &&
-          entry->info.type_str == "msgpack") {
-        // meta topic handling
-        if (entry->info.name == "$clients") {
-          UpdateClients(entry->value.GetRaw());
-        } else if (entry->info.name == "$serverpub") {
-          m_server.UpdatePublishers(entry->value.GetRaw());
-        } else if (entry->info.name == "$serversub") {
-          m_server.UpdateSubscribers(entry->value.GetRaw());
-        } else if (wpi::starts_with(entry->info.name, "$clientpub$")) {
-          auto it = m_clients.find(wpi::drop_front(entry->info.name, 11));
-          if (it != m_clients.end()) {
-            it->second.UpdatePublishers(entry->value.GetRaw());
-          }
-        } else if (wpi::starts_with(entry->info.name, "$clientsub$")) {
-          auto it = m_clients.find(wpi::drop_front(entry->info.name, 11));
-          if (it != m_clients.end()) {
-            it->second.UpdateSubscribers(entry->value.GetRaw());
+    } else if (auto valueData = event.GetValueEventData()) {
+      auto& entry = m_entries[valueData->topic];
+      if (entry) {
+        entry->UpdateFromValue(std::move(valueData->value), entry->info.name,
+                               entry->info.type_str);
+        if (wpi::starts_with(entry->info.name, '$') && entry->value.IsRaw() &&
+            entry->info.type_str == "msgpack") {
+          // meta topic handling
+          if (entry->info.name == "$clients") {
+            UpdateClients(entry->value.GetRaw());
+          } else if (entry->info.name == "$serverpub") {
+            m_server.UpdatePublishers(entry->value.GetRaw());
+          } else if (entry->info.name == "$serversub") {
+            m_server.UpdateSubscribers(entry->value.GetRaw());
+          } else if (wpi::starts_with(entry->info.name, "$clientpub$")) {
+            auto it = m_clients.find(wpi::drop_front(entry->info.name, 11));
+            if (it != m_clients.end()) {
+              it->second.UpdatePublishers(entry->value.GetRaw());
+            }
+          } else if (wpi::starts_with(entry->info.name, "$clientsub$")) {
+            auto it = m_clients.find(wpi::drop_front(entry->info.name, 11));
+            if (it != m_clients.end()) {
+              it->second.UpdateSubscribers(entry->value.GetRaw());
+            }
           }
         }
       }

@@ -11,11 +11,11 @@ import edu.wpi.first.hal.HAL;
 import edu.wpi.first.networktables.MultiSubscriber;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
+import edu.wpi.first.networktables.NetworkTableEvent;
 import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.networktables.NetworkTableListener;
 import edu.wpi.first.networktables.StringPublisher;
 import edu.wpi.first.networktables.Topic;
-import edu.wpi.first.networktables.TopicListener;
-import edu.wpi.first.networktables.TopicListenerFlags;
 import java.util.Collection;
 
 /**
@@ -39,7 +39,7 @@ public final class Preferences {
 
   private static StringPublisher m_typePublisher;
   private static MultiSubscriber m_tableSubscriber;
-  private static TopicListener m_listener;
+  private static NetworkTableListener m_listener;
 
   /** Creates a preference class. */
   private Preferences() {}
@@ -75,13 +75,15 @@ public final class Preferences {
       m_listener.close();
     }
     m_listener =
-        new TopicListener(
+        NetworkTableListener.createListener(
             m_tableSubscriber,
-            TopicListenerFlags.kImmediate | TopicListenerFlags.kPublish,
+            NetworkTableEvent.kImmediate | NetworkTableEvent.kPublish,
             event -> {
-              Topic topic = event.info.getTopic();
-              if (!topic.equals(m_typePublisher.getTopic())) {
-                event.info.getTopic().setPersistent(true);
+              if (event.topicInfo != null) {
+                Topic topic = event.topicInfo.getTopic();
+                if (!topic.equals(m_typePublisher.getTopic())) {
+                  event.topicInfo.getTopic().setPersistent(true);
+                }
               }
             });
   }

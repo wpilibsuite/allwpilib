@@ -34,15 +34,14 @@ void JNI_UnloadTypes(JNIEnv* env);
 static JavaVM* jvm = nullptr;
 static JClass booleanCls;
 static JClass connectionInfoCls;
-static JClass connectionNotificationCls;
 static JClass doubleCls;
+static JClass eventCls;
 static JClass floatCls;
 static JClass logMessageCls;
 static JClass longCls;
 static JClass topicInfoCls;
-static JClass topicNotificationCls;
 static JClass valueCls;
-static JClass valueNotificationCls;
+static JClass valueEventDataCls;
 static JException illegalArgEx;
 static JException interruptedEx;
 static JException nullPointerEx;
@@ -50,16 +49,14 @@ static JException nullPointerEx;
 static const JClassInit classes[] = {
     {"java/lang/Boolean", &booleanCls},
     {"edu/wpi/first/networktables/ConnectionInfo", &connectionInfoCls},
-    {"edu/wpi/first/networktables/ConnectionNotification",
-     &connectionNotificationCls},
     {"java/lang/Double", &doubleCls},
+    {"edu/wpi/first/networktables/NetworkTableEvent", &eventCls},
     {"java/lang/Float", &floatCls},
     {"edu/wpi/first/networktables/LogMessage", &logMessageCls},
     {"java/lang/Long", &longCls},
     {"edu/wpi/first/networktables/TopicInfo", &topicInfoCls},
-    {"edu/wpi/first/networktables/TopicNotification", &topicNotificationCls},
     {"edu/wpi/first/networktables/NetworkTableValue", &valueCls},
-    {"edu/wpi/first/networktables/ValueNotification", &valueNotificationCls}};
+    {"edu/wpi/first/networktables/ValueEventData", &valueEventDataCls}};
 
 static const JExceptionInit exceptions[] = {
     {"java/lang/IllegalArgumentException", &illegalArgEx},
@@ -216,29 +213,12 @@ static jobject MakeJObject(JNIEnv* env, const nt::ConnectionInfo& info) {
                         static_cast<jint>(info.protocol_version));
 }
 
-static jobject MakeJObject(JNIEnv* env, jobject inst,
-                           const nt::ConnectionNotification& notification) {
+static jobject MakeJObject(JNIEnv* env, const nt::LogMessage& msg) {
   static jmethodID constructor = env->GetMethodID(
-      connectionNotificationCls, "<init>",
-      "(Ledu/wpi/first/networktables/NetworkTableInstance;IZLedu/wpi/first/"
-      "networktables/ConnectionInfo;)V");
-  JLocal<jobject> conn{env, MakeJObject(env, notification.conn)};
-  return env->NewObject(connectionNotificationCls, constructor, inst,
-                        static_cast<jint>(notification.listener),
-                        static_cast<jboolean>(notification.connected),
-                        conn.obj());
-}
-
-static jobject MakeJObject(JNIEnv* env, jobject inst,
-                           const nt::LogMessage& msg) {
-  static jmethodID constructor = env->GetMethodID(
-      logMessageCls, "<init>",
-      "(Ledu/wpi/first/networktables/NetworkTableInstance;IILjava/lang/"
-      "String;ILjava/lang/String;)V");
+      logMessageCls, "<init>", "(ILjava/lang/String;ILjava/lang/String;)V");
   JLocal<jstring> filename{env, MakeJString(env, msg.filename)};
   JLocal<jstring> message{env, MakeJString(env, msg.message)};
-  return env->NewObject(logMessageCls, constructor, inst,
-                        static_cast<jint>(msg.logger),
+  return env->NewObject(logMessageCls, constructor,
                         static_cast<jint>(msg.level), filename.obj(),
                         static_cast<jint>(msg.line), message.obj());
 }
@@ -257,28 +237,42 @@ static jobject MakeJObject(JNIEnv* env, jobject inst,
 }
 
 static jobject MakeJObject(JNIEnv* env, jobject inst,
-                           const nt::TopicNotification& notification) {
+                           const nt::ValueEventData& data) {
   static jmethodID constructor =
-      env->GetMethodID(topicNotificationCls, "<init>",
-                       "(ILedu/wpi/first/networktables/TopicInfo;I)V");
-  JLocal<jobject> info{env, MakeJObject(env, inst, notification.info)};
-  return env->NewObject(topicNotificationCls, constructor,
-                        static_cast<jint>(notification.listener), info.obj(),
-                        static_cast<jint>(notification.flags));
+      env->GetMethodID(valueEventDataCls, "<init>",
+                       "(Ledu/wpi/first/networktables/NetworkTableInstance;II"
+                       "Ledu/wpi/first/networktables/NetworkTableValue;)V");
+  JLocal<jobject> value{env, MakeJValue(env, data.value)};
+  return env->NewObject(valueEventDataCls, constructor, inst,
+                        static_cast<jint>(data.topic),
+                        static_cast<jint>(data.subentry), value.obj());
 }
 
-static jobject MakeJObject(JNIEnv* env, jobject inst,
-                           const nt::ValueNotification& notification) {
+static jobject MakeJObject(JNIEnv* env, jobject inst, const nt::Event& event) {
   static jmethodID constructor =
-      env->GetMethodID(valueNotificationCls, "<init>",
-                       "(Ledu/wpi/first/networktables/NetworkTableInstance;III"
-                       "Ledu/wpi/first/networktables/NetworkTableValue;I)V");
-  JLocal<jobject> value{env, MakeJValue(env, notification.value)};
-  return env->NewObject(valueNotificationCls, constructor, inst,
-                        static_cast<jint>(notification.listener),
-                        static_cast<jint>(notification.topic),
-                        static_cast<jint>(notification.subentry), value.obj(),
-                        static_cast<jint>(notification.flags));
+      env->GetMethodID(eventCls, "<init>",
+                       "(Ledu/wpi/first/networktables/NetworkTableInstance;II"
+                       "Ledu/wpi/first/networktables/ConnectionInfo;"
+                       "Ledu/wpi/first/networktables/TopicInfo;"
+                       "Ledu/wpi/first/networktables/ValueEventData;"
+                       "Ledu/wpi/first/networktables/LogMessage;)V");
+  JLocal<jobject> connInfo{env, nullptr};
+  JLocal<jobject> topicInfo{env, nullptr};
+  JLocal<jobject> valueData{env, nullptr};
+  JLocal<jobject> logMessage{env, nullptr};
+  if (auto v = event.GetConnectionInfo()) {
+    connInfo = JLocal<jobject>{env, MakeJObject(env, *v)};
+  } else if (auto v = event.GetTopicInfo()) {
+    topicInfo = JLocal<jobject>{env, MakeJObject(env, inst, *v)};
+  } else if (auto v = event.GetValueEventData()) {
+    valueData = JLocal<jobject>{env, MakeJObject(env, inst, *v)};
+  } else if (auto v = event.GetLogMessage()) {
+    logMessage = JLocal<jobject>{env, MakeJObject(env, *v)};
+  }
+  return env->NewObject(eventCls, constructor, inst,
+                        static_cast<jint>(event.listener),
+                        static_cast<jint>(event.flags), connInfo.obj(),
+                        topicInfo.obj(), valueData.obj(), logMessage.obj());
 }
 
 static jobjectArray MakeJObject(JNIEnv* env, std::span<const nt::Value> arr) {
@@ -293,52 +287,9 @@ static jobjectArray MakeJObject(JNIEnv* env, std::span<const nt::Value> arr) {
   return jarr;
 }
 
-static jobjectArray MakeJObject(
-    JNIEnv* env, jobject inst,
-    std::span<const nt::ConnectionNotification> arr) {
-  jobjectArray jarr =
-      env->NewObjectArray(arr.size(), connectionNotificationCls, nullptr);
-  if (!jarr) {
-    return nullptr;
-  }
-  for (size_t i = 0; i < arr.size(); ++i) {
-    JLocal<jobject> elem{env, MakeJObject(env, inst, arr[i])};
-    env->SetObjectArrayElement(jarr, i, elem.obj());
-  }
-  return jarr;
-}
-
 static jobjectArray MakeJObject(JNIEnv* env, jobject inst,
-                                std::span<const nt::LogMessage> arr) {
-  jobjectArray jarr = env->NewObjectArray(arr.size(), logMessageCls, nullptr);
-  if (!jarr) {
-    return nullptr;
-  }
-  for (size_t i = 0; i < arr.size(); ++i) {
-    JLocal<jobject> elem{env, MakeJObject(env, inst, arr[i])};
-    env->SetObjectArrayElement(jarr, i, elem.obj());
-  }
-  return jarr;
-}
-
-static jobjectArray MakeJObject(JNIEnv* env, jobject inst,
-                                std::span<const nt::TopicNotification> arr) {
-  jobjectArray jarr =
-      env->NewObjectArray(arr.size(), topicNotificationCls, nullptr);
-  if (!jarr) {
-    return nullptr;
-  }
-  for (size_t i = 0; i < arr.size(); ++i) {
-    JLocal<jobject> elem{env, MakeJObject(env, inst, arr[i])};
-    env->SetObjectArrayElement(jarr, i, elem.obj());
-  }
-  return jarr;
-}
-
-static jobjectArray MakeJObject(JNIEnv* env, jobject inst,
-                                std::span<const nt::ValueNotification> arr) {
-  jobjectArray jarr =
-      env->NewObjectArray(arr.size(), valueNotificationCls, nullptr);
+                                std::span<const nt::Event> arr) {
+  jobjectArray jarr = env->NewObjectArray(arr.size(), eventCls, nullptr);
   if (!jarr) {
     return nullptr;
   }
@@ -1013,35 +964,35 @@ Java_edu_wpi_first_networktables_NetworkTablesJNI_getTopicInfo
 
 /*
  * Class:     edu_wpi_first_networktables_NetworkTablesJNI
- * Method:    createTopicListenerPoller
+ * Method:    createListenerPoller
  * Signature: (I)I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_first_networktables_NetworkTablesJNI_createTopicListenerPoller
+Java_edu_wpi_first_networktables_NetworkTablesJNI_createListenerPoller
   (JNIEnv*, jclass, jint inst)
 {
-  return nt::CreateTopicListenerPoller(inst);
+  return nt::CreateListenerPoller(inst);
 }
 
 /*
  * Class:     edu_wpi_first_networktables_NetworkTablesJNI
- * Method:    destroyTopicListenerPoller
+ * Method:    destroyListenerPoller
  * Signature: (I)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_networktables_NetworkTablesJNI_destroyTopicListenerPoller
+Java_edu_wpi_first_networktables_NetworkTablesJNI_destroyListenerPoller
   (JNIEnv*, jclass, jint poller)
 {
-  nt::DestroyTopicListenerPoller(poller);
+  nt::DestroyListenerPoller(poller);
 }
 
 /*
  * Class:     edu_wpi_first_networktables_NetworkTablesJNI
- * Method:    addPolledTopicListener
+ * Method:    addListener
  * Signature: (I[Ljava/lang/Object;I)I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_first_networktables_NetworkTablesJNI_addPolledTopicListener__I_3Ljava_lang_String_2I
+Java_edu_wpi_first_networktables_NetworkTablesJNI_addListener__I_3Ljava_lang_String_2I
   (JNIEnv* env, jclass, jint poller, jobjectArray prefixes, jint flags)
 {
   if (!prefixes) {
@@ -1066,163 +1017,43 @@ Java_edu_wpi_first_networktables_NetworkTablesJNI_addPolledTopicListener__I_3Lja
     arrview.emplace_back(arr.back());
   }
 
-  return nt::AddPolledTopicListener(poller, arrview, flags);
+  return nt::AddPolledListener(poller, arrview, flags);
 }
 
 /*
  * Class:     edu_wpi_first_networktables_NetworkTablesJNI
- * Method:    addPolledTopicListener
+ * Method:    addListener
  * Signature: (III)I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_first_networktables_NetworkTablesJNI_addPolledTopicListener__III
+Java_edu_wpi_first_networktables_NetworkTablesJNI_addListener__III
   (JNIEnv* env, jclass, jint poller, jint handle, jint flags)
 {
-  return nt::AddPolledTopicListener(poller, handle, flags);
+  return nt::AddPolledListener(poller, handle, flags);
 }
 
 /*
  * Class:     edu_wpi_first_networktables_NetworkTablesJNI
- * Method:    readTopicListenerQueue
+ * Method:    readListenerQueue
  * Signature: (Ljava/lang/Object;I)[Ljava/lang/Object;
  */
 JNIEXPORT jobjectArray JNICALL
-Java_edu_wpi_first_networktables_NetworkTablesJNI_readTopicListenerQueue
+Java_edu_wpi_first_networktables_NetworkTablesJNI_readListenerQueue
   (JNIEnv* env, jclass, jobject inst, jint poller)
 {
-  return MakeJObject(env, inst, nt::ReadTopicListenerQueue(poller));
+  return MakeJObject(env, inst, nt::ReadListenerQueue(poller));
 }
 
 /*
  * Class:     edu_wpi_first_networktables_NetworkTablesJNI
- * Method:    removeTopicListener
+ * Method:    removeListener
  * Signature: (I)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_networktables_NetworkTablesJNI_removeTopicListener
+Java_edu_wpi_first_networktables_NetworkTablesJNI_removeListener
   (JNIEnv*, jclass, jint topicListener)
 {
-  nt::RemoveTopicListener(topicListener);
-}
-
-/*
- * Class:     edu_wpi_first_networktables_NetworkTablesJNI
- * Method:    createValueListenerPoller
- * Signature: (I)I
- */
-JNIEXPORT jint JNICALL
-Java_edu_wpi_first_networktables_NetworkTablesJNI_createValueListenerPoller
-  (JNIEnv*, jclass, jint inst)
-{
-  return nt::CreateValueListenerPoller(inst);
-}
-
-/*
- * Class:     edu_wpi_first_networktables_NetworkTablesJNI
- * Method:    destroyValueListenerPoller
- * Signature: (I)V
- */
-JNIEXPORT void JNICALL
-Java_edu_wpi_first_networktables_NetworkTablesJNI_destroyValueListenerPoller
-  (JNIEnv*, jclass, jint poller)
-{
-  nt::DestroyValueListenerPoller(poller);
-}
-
-/*
- * Class:     edu_wpi_first_networktables_NetworkTablesJNI
- * Method:    addPolledValueListener
- * Signature: (III)I
- */
-JNIEXPORT jint JNICALL
-Java_edu_wpi_first_networktables_NetworkTablesJNI_addPolledValueListener
-  (JNIEnv* env, jclass, jint poller, jint topic, jint flags)
-{
-  return nt::AddPolledValueListener(poller, topic, flags);
-}
-
-/*
- * Class:     edu_wpi_first_networktables_NetworkTablesJNI
- * Method:    readValueListenerQueue
- * Signature: (Ljava/lang/Object;I)[Ljava/lang/Object;
- */
-JNIEXPORT jobjectArray JNICALL
-Java_edu_wpi_first_networktables_NetworkTablesJNI_readValueListenerQueue
-  (JNIEnv* env, jclass, jobject inst, jint poller)
-{
-  return MakeJObject(env, inst, nt::ReadValueListenerQueue(poller));
-}
-
-/*
- * Class:     edu_wpi_first_networktables_NetworkTablesJNI
- * Method:    removeValueListener
- * Signature: (I)V
- */
-JNIEXPORT void JNICALL
-Java_edu_wpi_first_networktables_NetworkTablesJNI_removeValueListener
-  (JNIEnv*, jclass, jint topicListener)
-{
-  nt::RemoveValueListener(topicListener);
-}
-
-/*
- * Class:     edu_wpi_first_networktables_NetworkTablesJNI
- * Method:    createConnectionListenerPoller
- * Signature: (I)I
- */
-JNIEXPORT jint JNICALL
-Java_edu_wpi_first_networktables_NetworkTablesJNI_createConnectionListenerPoller
-  (JNIEnv*, jclass, jint inst)
-{
-  return nt::CreateConnectionListenerPoller(inst);
-}
-
-/*
- * Class:     edu_wpi_first_networktables_NetworkTablesJNI
- * Method:    destroyConnectionListenerPoller
- * Signature: (I)V
- */
-JNIEXPORT void JNICALL
-Java_edu_wpi_first_networktables_NetworkTablesJNI_destroyConnectionListenerPoller
-  (JNIEnv*, jclass, jint poller)
-{
-  nt::DestroyConnectionListenerPoller(poller);
-}
-
-/*
- * Class:     edu_wpi_first_networktables_NetworkTablesJNI
- * Method:    addPolledConnectionListener
- * Signature: (IZ)I
- */
-JNIEXPORT jint JNICALL
-Java_edu_wpi_first_networktables_NetworkTablesJNI_addPolledConnectionListener
-  (JNIEnv* env, jclass, jint poller, jboolean immediateNotify)
-{
-  return nt::AddPolledConnectionListener(poller, immediateNotify);
-}
-
-/*
- * Class:     edu_wpi_first_networktables_NetworkTablesJNI
- * Method:    readConnectionListenerQueue
- * Signature: (Ljava/lang/Object;I)[Ljava/lang/Object;
- */
-JNIEXPORT jobjectArray JNICALL
-Java_edu_wpi_first_networktables_NetworkTablesJNI_readConnectionListenerQueue
-  (JNIEnv* env, jclass, jobject inst, jint poller)
-{
-  return MakeJObject(env, inst, nt::ReadConnectionListenerQueue(poller));
-}
-
-/*
- * Class:     edu_wpi_first_networktables_NetworkTablesJNI
- * Method:    removeConnectionListener
- * Signature: (I)V
- */
-JNIEXPORT void JNICALL
-Java_edu_wpi_first_networktables_NetworkTablesJNI_removeConnectionListener
-  (JNIEnv*, jclass, jint connListenerUid)
-{
-  nt::RemoveConnectionListener(connListenerUid);
+  nt::RemoveListener(topicListener);
 }
 
 /*
@@ -1561,62 +1392,14 @@ Java_edu_wpi_first_networktables_NetworkTablesJNI_stopConnectionDataLog
 
 /*
  * Class:     edu_wpi_first_networktables_NetworkTablesJNI
- * Method:    createLoggerPoller
- * Signature: (I)I
- */
-JNIEXPORT jint JNICALL
-Java_edu_wpi_first_networktables_NetworkTablesJNI_createLoggerPoller
-  (JNIEnv*, jclass, jint inst)
-{
-  return nt::CreateLoggerPoller(inst);
-}
-
-/*
- * Class:     edu_wpi_first_networktables_NetworkTablesJNI
- * Method:    destroyLoggerPoller
- * Signature: (I)V
- */
-JNIEXPORT void JNICALL
-Java_edu_wpi_first_networktables_NetworkTablesJNI_destroyLoggerPoller
-  (JNIEnv*, jclass, jint poller)
-{
-  nt::DestroyLoggerPoller(poller);
-}
-
-/*
- * Class:     edu_wpi_first_networktables_NetworkTablesJNI
- * Method:    addPolledLogger
+ * Method:    addLogger
  * Signature: (III)I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_first_networktables_NetworkTablesJNI_addPolledLogger
+Java_edu_wpi_first_networktables_NetworkTablesJNI_addLogger
   (JNIEnv*, jclass, jint poller, jint minLevel, jint maxLevel)
 {
   return nt::AddPolledLogger(poller, minLevel, maxLevel);
-}
-
-/*
- * Class:     edu_wpi_first_networktables_NetworkTablesJNI
- * Method:    readLoggerQueue
- * Signature: (Ljava/lang/Object;I)[Ljava/lang/Object;
- */
-JNIEXPORT jobjectArray JNICALL
-Java_edu_wpi_first_networktables_NetworkTablesJNI_readLoggerQueue
-  (JNIEnv* env, jclass, jobject inst, jint poller)
-{
-  return MakeJObject(env, inst, nt::ReadLoggerQueue(poller));
-}
-
-/*
- * Class:     edu_wpi_first_networktables_NetworkTablesJNI
- * Method:    removeLogger
- * Signature: (I)V
- */
-JNIEXPORT void JNICALL
-Java_edu_wpi_first_networktables_NetworkTablesJNI_removeLogger
-  (JNIEnv*, jclass, jint logger)
-{
-  nt::RemoveLogger(logger);
 }
 
 }  // extern "C"

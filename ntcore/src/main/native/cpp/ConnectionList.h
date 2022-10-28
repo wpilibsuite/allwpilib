@@ -4,21 +4,31 @@
 
 #pragma once
 
+#include <stdint.h>
+
+#include <atomic>
 #include <functional>
 #include <memory>
+#include <optional>
 #include <string_view>
 #include <vector>
 
+#include <wpi/DataLog.h>
+#include <wpi/UidVector.h>
 #include <wpi/mutex.h>
 
+#include "Handle.h"
+#include "HandleMap.h"
 #include "IConnectionList.h"
 #include "ntcore_cpp.h"
 
 namespace nt {
 
+class IListenerStorage;
+
 class ConnectionList final : public IConnectionList {
  public:
-  explicit ConnectionList(int inst);
+  ConnectionList(int inst, IListenerStorage& listenerStorage);
   ~ConnectionList() final;
 
   // IConnectionList interface
@@ -30,28 +40,35 @@ class ConnectionList final : public IConnectionList {
   std::vector<ConnectionInfo> GetConnections() const final;
   bool IsConnected() const final;
 
-  NT_ConnectionListener AddListener(
-      bool immediateNotify,
-      std::function<void(const ConnectionNotification& event)> callback);
-  bool WaitForListenerQueue(double timeout);
-
-  NT_ConnectionListenerPoller CreateListenerPoller();
-  void DestroyListenerPoller(NT_ConnectionListenerPoller pollerHandle);
-  NT_ConnectionListener AddPolledListener(
-      NT_ConnectionListenerPoller pollerHandle, bool immediateNotify);
-  std::vector<ConnectionNotification> ReadListenerQueue(
-      NT_ConnectionListenerPoller pollerHandle);
-  void RemoveListener(NT_ConnectionListener listenerHandle);
+  void AddListener(NT_Listener listener, unsigned int eventMask);
 
   NT_ConnectionDataLogger StartDataLog(wpi::log::DataLog& log,
                                        std::string_view name);
   void StopDataLog(NT_ConnectionDataLogger logger);
 
  private:
-  class Impl;
-  std::unique_ptr<Impl> m_impl;
-
+  int m_inst;
+  IListenerStorage& m_listenerStorage;
   mutable wpi::mutex m_mutex;
+
+  // shared with user (must be atomic or mutex-protected)
+  std::atomic_bool m_connected{false};
+  wpi::UidVector<std::optional<ConnectionInfo>, 8> m_connections;
+
+  struct DataLoggerData {
+    static constexpr auto kType = Handle::kConnectionDataLogger;
+
+    DataLoggerData(NT_ConnectionDataLogger handle, wpi::log::DataLog& log,
+                   std::string_view name, int64_t time)
+        : handle{handle},
+          entry{log, name,
+                "{\"schema\":\"NTConnectionInfo\",\"source\":\"NT\"}", "json",
+                time} {}
+
+    NT_ConnectionDataLogger handle;
+    wpi::log::StringLogEntry entry;
+  };
+  HandleMap<DataLoggerData, 8> m_dataloggers;
 };
 
 }  // namespace nt

@@ -4,9 +4,9 @@
 
 package edu.wpi.first.networktables;
 
-/** NetworkTables value notification. */
+/** NetworkTables value event data. */
 @SuppressWarnings("MemberName")
-public final class ValueNotification extends NotificationBase {
+public final class ValueEventData {
   /** Topic handle. Topic.getHandle() can be used to map this to the corresponding Topic object. */
   public final int topic;
 
@@ -19,35 +19,26 @@ public final class ValueNotification extends NotificationBase {
   /** The new value. */
   public final NetworkTableValue value;
 
-  /** Update flags. */
-  public final int flags;
-
   /**
    * Constructor. This should generally only be used internally to NetworkTables.
    *
    * @param inst Instance
-   * @param listener Listener that was triggered
    * @param topic Topic handle
    * @param subentry Subscriber/entry handle
    * @param value The new value
-   * @param flags Update flags
    */
-  public ValueNotification(
-      NetworkTableInstance inst,
-      int listener,
-      int topic,
-      int subentry,
-      NetworkTableValue value,
-      int flags) {
-    super(inst, listener);
+  public ValueEventData(
+      NetworkTableInstance inst, int topic, int subentry, NetworkTableValue value) {
+    this.m_inst = inst;
     this.topic = topic;
     this.subentry = subentry;
     this.value = value;
-    this.flags = flags;
   }
 
   /* Cached topic object. */
-  Topic m_topicObject;
+  private Topic m_topicObject;
+
+  private final NetworkTableInstance m_inst;
 
   /**
    * Get the topic as an object.

@@ -5,24 +5,27 @@
 #include "LoggerImpl.h"
 
 #include <fmt/format.h>
-#include <wpi/DenseMap.h>
+#include <wpi/Logger.h>
+#include <wpi/SmallVector.h>
 #include <wpi/fs.h>
+
+#include "IListenerStorage.h"
 
 using namespace nt;
 
 static void DefaultLogger(unsigned int level, const char* file,
                           unsigned int line, const char* msg) {
-  if (level == 20) {
+  if (level == wpi::WPI_LOG_INFO) {
     fmt::print(stderr, "NT: {}\n", msg);
     return;
   }
 
   std::string_view levelmsg;
-  if (level >= 50) {
+  if (level >= wpi::WPI_LOG_CRITICAL) {
     levelmsg = "CRITICAL";
-  } else if (level >= 40) {
+  } else if (level >= wpi::WPI_LOG_ERROR) {
     levelmsg = "ERROR";
-  } else if (level >= 30) {
+  } else if (level >= wpi::WPI_LOG_WARNING) {
     levelmsg = "WARNING";
   } else {
     return;
@@ -30,108 +33,97 @@ static void DefaultLogger(unsigned int level, const char* file,
   fmt::print(stderr, "NT: {}: {} ({}:{})\n", levelmsg, msg, file, line);
 }
 
-class LoggerImpl::Thread final : public wpi::SafeThreadEvent {
- public:
-  explicit Thread(NT_LoggerPoller poller) : m_poller{poller} {}
+static constexpr unsigned int kFlagCritical = 1u << 16;
+static constexpr unsigned int kFlagError = 1u << 17;
+static constexpr unsigned int kFlagWarning = 1u << 18;
+static constexpr unsigned int kFlagInfo = 1u << 19;
+static constexpr unsigned int kFlagDebug = 1u << 20;
+static constexpr unsigned int kFlagDebug1 = 1u << 21;
+static constexpr unsigned int kFlagDebug2 = 1u << 22;
+static constexpr unsigned int kFlagDebug3 = 1u << 23;
+static constexpr unsigned int kFlagDebug4 = 1u << 24;
 
-  void Main() final;
-
-  NT_LoggerPoller m_poller;
-  wpi::DenseMap<NT_Logger, std::function<void(const LogMessage& msg)>>
-      m_callbacks;
-};
-
-void LoggerImpl::Thread::Main() {
-  while (m_active) {
-    WPI_Handle signaledBuf[2];
-    auto signaled =
-        wpi::WaitForObjects({m_poller, m_stopEvent.GetHandle()}, signaledBuf);
-    if (signaled.empty() || !m_active) {
-      return;
-    }
-    // call all the way back out to the C++ API to ensure valid handle
-    auto events = nt::ReadLoggerQueue(m_poller);
-    if (events.empty()) {
-      continue;
-    }
-    std::unique_lock lock{m_mutex};
-    for (auto&& event : events) {
-      auto callbackIt = m_callbacks.find(event.logger);
-      if (callbackIt != m_callbacks.end()) {
-        auto callback = callbackIt->second;
-        lock.unlock();
-        callback(event);
-        lock.lock();
-      }
-    }
+static unsigned int LevelToFlag(unsigned int level) {
+  if (level >= wpi::WPI_LOG_CRITICAL) {
+    return EventFlags::kLogMessage | kFlagCritical;
+  } else if (level >= wpi::WPI_LOG_ERROR) {
+    return EventFlags::kLogMessage | kFlagError;
+  } else if (level >= wpi::WPI_LOG_WARNING) {
+    return EventFlags::kLogMessage | kFlagWarning;
+  } else if (level >= wpi::WPI_LOG_INFO) {
+    return EventFlags::kLogMessage | kFlagInfo;
+  } else if (level >= wpi::WPI_LOG_DEBUG) {
+    return EventFlags::kLogMessage | kFlagDebug;
+  } else if (level >= wpi::WPI_LOG_DEBUG1) {
+    return EventFlags::kLogMessage | kFlagDebug1;
+  } else if (level >= wpi::WPI_LOG_DEBUG2) {
+    return EventFlags::kLogMessage | kFlagDebug2;
+  } else if (level >= wpi::WPI_LOG_DEBUG3) {
+    return EventFlags::kLogMessage | kFlagDebug3;
+  } else if (level >= wpi::WPI_LOG_DEBUG4) {
+    return EventFlags::kLogMessage | kFlagDebug4;
+  } else {
+    return EventFlags::kLogMessage;
   }
 }
 
-LoggerImpl::LoggerImpl(int inst) : m_inst{inst} {}
+static unsigned int LevelsToEventMask(unsigned int minLevel,
+                                      unsigned int maxLevel) {
+  unsigned int mask = EventFlags::kLogMessage;
+  if (minLevel <= wpi::WPI_LOG_CRITICAL && maxLevel >= wpi::WPI_LOG_CRITICAL) {
+    mask |= kFlagCritical;
+  }
+  if (minLevel <= wpi::WPI_LOG_ERROR && maxLevel >= wpi::WPI_LOG_ERROR) {
+    mask |= kFlagError;
+  }
+  if (minLevel <= wpi::WPI_LOG_WARNING && maxLevel >= wpi::WPI_LOG_WARNING) {
+    mask |= kFlagWarning;
+  }
+  if (minLevel <= wpi::WPI_LOG_DEBUG && maxLevel >= wpi::WPI_LOG_DEBUG) {
+    mask |= kFlagDebug;
+  }
+  if (minLevel <= wpi::WPI_LOG_DEBUG1 && maxLevel >= wpi::WPI_LOG_DEBUG1) {
+    mask |= kFlagDebug1;
+  }
+  if (minLevel <= wpi::WPI_LOG_DEBUG2 && maxLevel >= wpi::WPI_LOG_DEBUG2) {
+    mask |= kFlagDebug2;
+  }
+  if (minLevel <= wpi::WPI_LOG_DEBUG3 && maxLevel >= wpi::WPI_LOG_DEBUG3) {
+    mask |= kFlagDebug3;
+  }
+  if (minLevel <= wpi::WPI_LOG_DEBUG4 && maxLevel >= wpi::WPI_LOG_DEBUG4) {
+    mask |= kFlagDebug4;
+  }
+  return mask;
+}
+
+LoggerImpl::LoggerImpl(int inst, IListenerStorage& listenerStorage)
+    : m_inst{inst}, m_listenerStorage{listenerStorage} {}
 
 LoggerImpl::~LoggerImpl() = default;
 
-NT_Logger LoggerImpl::Add(std::function<void(const LogMessage& msg)> callback,
-                          unsigned int minLevel, unsigned int maxLevel) {
-  if (!m_thread) {
-    m_thread.Start(CreatePoller());
-  }
-  if (auto thr = m_thread.GetThread()) {
-    auto listener = AddPolled(thr->m_poller, minLevel, maxLevel);
-    if (listener) {
-      thr->m_callbacks.try_emplace(listener, std::move(callback));
-    }
-    return listener;
-  } else {
-    return {};
-  }
+void LoggerImpl::AddListener(NT_Listener listener, unsigned int minLevel,
+                             unsigned int maxLevel) {
+  ++m_listenerCount;
+  std::scoped_lock lock{m_mutex};
+  m_listenerLevels.emplace_back(listener, minLevel, maxLevel);
+  m_listenerStorage.Activate(listener, LevelsToEventMask(minLevel, maxLevel));
 }
 
-NT_LoggerPoller LoggerImpl::CreatePoller() {
+void LoggerImpl::RemoveListener(NT_Listener listener) {
+  --m_listenerCount;
   std::scoped_lock lock{m_mutex};
-  return m_pollers.Add(m_inst)->handle;
-}
-
-void LoggerImpl::DestroyPoller(NT_LoggerPoller pollerHandle) {
-  std::scoped_lock lock{m_mutex};
-  m_pollers.Remove(pollerHandle);
-}
-
-NT_Logger LoggerImpl::AddPolled(NT_LoggerPoller pollerHandle,
-                                unsigned int minLevel, unsigned int maxLevel) {
-  std::scoped_lock lock{m_mutex};
-  if (auto poller = m_pollers.Get(pollerHandle)) {
-    return m_listeners.Add(m_inst, poller, minLevel, maxLevel)->handle;
-  } else {
-    return {};
-  }
-}
-
-std::vector<LogMessage> LoggerImpl::ReadQueue(NT_LoggerPoller pollerHandle) {
-  std::scoped_lock lock{m_mutex};
-  if (auto poller = m_pollers.Get(pollerHandle)) {
-    std::vector<LogMessage> rv;
-    rv.swap(poller->queue);
-    return rv;
-  } else {
-    return {};
-  }
-}
-
-void LoggerImpl::Remove(NT_Logger listenerHandle) {
-  std::scoped_lock lock{m_mutex};
-  m_listeners.Remove(listenerHandle);
-  if (auto thr = m_thread.GetThread()) {
-    thr->m_callbacks.erase(listenerHandle);
-  }
+  std::erase_if(m_listenerLevels,
+                [&](auto& v) { return v.listener == listener; });
 }
 
 unsigned int LoggerImpl::GetMinLevel() {
   // return 0;
+  std::scoped_lock lock{m_mutex};
   unsigned int level = NT_LOG_INFO;
-  for (auto&& listener : m_listeners) {
-    if (listener && listener->minLevel < level) {
-      level = listener->minLevel;
+  for (auto&& listenerLevel : m_listenerLevels) {
+    if (listenerLevel.minLevel < level) {
+      level = listenerLevel.minLevel;
     }
   }
   return level;
@@ -140,19 +132,10 @@ unsigned int LoggerImpl::GetMinLevel() {
 void LoggerImpl::Log(unsigned int level, const char* file, unsigned int line,
                      const char* msg) {
   auto filename = fs::path{file}.filename();
-  {
-    std::scoped_lock lock{m_mutex};
-    if (m_listeners.empty()) {
-      DefaultLogger(level, filename.string().c_str(), line, msg);
-    } else {
-      for (auto&& listener : m_listeners) {
-        if (level >= listener->minLevel && level <= listener->maxLevel) {
-          listener->poller->queue.emplace_back(listener->handle.GetHandle(),
-                                               level, file, line, msg);
-          listener->poller->handle.Set();
-          listener->handle.Set();
-        }
-      }
-    }
+  if (m_listenerCount == 0) {
+    DefaultLogger(level, filename.string().c_str(), line, msg);
+  } else {
+    m_listenerStorage.Notify(LevelToFlag(level), level, filename.string(), line,
+                             msg);
   }
 }

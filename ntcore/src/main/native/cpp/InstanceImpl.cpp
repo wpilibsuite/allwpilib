@@ -13,11 +13,12 @@ wpi::mutex InstanceImpl::s_mutex;
 using namespace std::placeholders;
 
 InstanceImpl::InstanceImpl(int inst)
-    : logger_impl(inst),
-      logger(
-          std::bind(&LoggerImpl::Log, &logger_impl, _1, _2, _3, _4)),  // NOLINT
-      connectionList(inst),
-      localStorage(inst, logger),
+    : listenerStorage{inst},
+      logger_impl{inst, listenerStorage},
+      logger{
+          std::bind(&LoggerImpl::Log, &logger_impl, _1, _2, _3, _4)},  // NOLINT
+      connectionList{inst, listenerStorage},
+      localStorage{inst, listenerStorage, logger},
       m_inst{inst} {
   logger.set_min_level(logger_impl.GetMinLevel());
 }
