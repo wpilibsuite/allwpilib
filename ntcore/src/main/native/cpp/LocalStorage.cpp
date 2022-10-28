@@ -83,7 +83,7 @@ struct TopicData {
   unsigned int flags{0};            // for NT3 APIs
   std::string propertiesStr{"{}"};  // cached string for GetTopicInfo() et al
   wpi::json properties = wpi::json::object();
-  NT_Entry entry{0};                // cached entry for GetEntry()
+  NT_Entry entry{0};  // cached entry for GetEntry()
 
   bool onNetwork{false};  // true if there are any remote publishers
 
