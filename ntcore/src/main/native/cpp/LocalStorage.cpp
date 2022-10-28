@@ -83,6 +83,7 @@ struct TopicData {
   unsigned int flags{0};            // for NT3 APIs
   std::string propertiesStr{"{}"};  // cached string for GetTopicInfo() et al
   wpi::json properties = wpi::json::object();
+  NT_Entry entry{0};                // cached entry for GetEntry()
 
   bool onNetwork{false};  // true if there are any remote publishers
 
@@ -2331,11 +2332,15 @@ NT_Entry LocalStorage::GetEntry(std::string_view name) {
   // Get the topic data
   auto* topic = m_impl->GetOrCreateTopic(name);
 
-  // Create subscriber
-  auto* subscriber = m_impl->AddLocalSubscriber(topic, {});
+  if (topic->entry == 0) {
+    // Create subscriber
+    auto* subscriber = m_impl->AddLocalSubscriber(topic, {});
 
-  // Create entry
-  return m_impl->AddEntry(subscriber)->handle;
+    // Create entry
+    topic->entry = m_impl->AddEntry(subscriber)->handle;
+  }
+
+  return topic->entry;
 }
 
 std::string LocalStorage::GetEntryName(NT_Handle subentryHandle) {

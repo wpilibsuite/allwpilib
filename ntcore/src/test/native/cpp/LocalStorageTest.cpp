@@ -63,6 +63,14 @@ TEST_F(LocalStorageTest, GetEntryEmptyName) {
   EXPECT_EQ(storage.GetEntry(""), 0u);
 }
 
+TEST_F(LocalStorageTest, GetEntryCached) {
+  EXPECT_CALL(network, Subscribe(_, wpi::SpanEq({std::string{"tocache"}}),
+                                 IsPubSubOptions({})));
+
+  auto entry1 = storage.GetEntry("tocache");
+  EXPECT_EQ(entry1, storage.GetEntry("tocache"));
+}
+
 TEST_F(LocalStorageTest, GetTopicName) {
   EXPECT_EQ(storage.GetTopicName(fooTopic), "foo");
   EXPECT_EQ(storage.GetTopicName(barTopic), "bar");
