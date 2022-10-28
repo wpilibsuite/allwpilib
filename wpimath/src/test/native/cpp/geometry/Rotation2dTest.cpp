@@ -63,3 +63,17 @@ TEST(Rotation2dTest, Inequality) {
   const auto rot2 = Rotation2d{43.5_deg};
   EXPECT_NE(rot1, rot2);
 }
+
+TEST(Rotation2dTest, Constexpr) {
+  constexpr Rotation2d defaultCtor{};
+  constexpr Rotation2d radianCtor{5_rad};
+  constexpr Rotation2d degreeCtor{270_deg};
+
+  constexpr auto negated = -radianCtor;
+  constexpr auto multiplied = radianCtor * 2;
+
+  static_assert(defaultCtor.Radians() == 0_rad);
+  static_assert(degreeCtor.Degrees() == 270_deg);
+  static_assert(negated.Radians() == (-5_rad));
+  static_assert(multiplied.Radians() == 10_rad);
+}

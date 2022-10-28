@@ -30,14 +30,14 @@ class WPILIB_DLLEXPORT Rotation2d {
    *
    * @param value The value of the angle in radians.
    */
-  Rotation2d(units::radian_t value);  // NOLINT
+  constexpr Rotation2d(units::radian_t value);  // NOLINT
 
   /**
    * Constructs a Rotation2d with the given degree value.
    *
    * @param value The value of the angle in degrees.
    */
-  Rotation2d(units::degree_t value);  // NOLINT
+  constexpr Rotation2d(units::degree_t value);  // NOLINT
 
   /**
    * Constructs a Rotation2d with the given x and y (cosine and sine)
@@ -80,7 +80,7 @@ class WPILIB_DLLEXPORT Rotation2d {
    *
    * @return The inverse of the current rotation.
    */
-  Rotation2d operator-() const;
+  constexpr Rotation2d operator-() const;
 
   /**
    * Multiplies the current rotation by a scalar.
@@ -89,7 +89,7 @@ class WPILIB_DLLEXPORT Rotation2d {
    *
    * @return The new scaled Rotation2d.
    */
-  Rotation2d operator*(double scalar) const;
+  constexpr Rotation2d operator*(double scalar) const;
 
   /**
    * Divides the current rotation by a scalar.
@@ -136,40 +136,40 @@ class WPILIB_DLLEXPORT Rotation2d {
    *
    * @return The radian value of the rotation.
    */
-  units::radian_t Radians() const { return m_value; }
+  constexpr units::radian_t Radians() const { return m_value; }
 
   /**
    * Returns the degree value of the rotation.
    *
    * @return The degree value of the rotation.
    */
-  units::degree_t Degrees() const { return m_value; }
+  constexpr units::degree_t Degrees() const { return m_value; }
 
   /**
    * Returns the cosine of the rotation.
    *
    * @return The cosine of the rotation.
    */
-  double Cos() const { return m_cos; }
+  double Cos() const;
 
   /**
    * Returns the sine of the rotation.
    *
    * @return The sine of the rotation.
    */
-  double Sin() const { return m_sin; }
+  double Sin() const;
 
   /**
    * Returns the tangent of the rotation.
    *
    * @return The tangent of the rotation.
    */
-  double Tan() const { return m_sin / m_cos; }
+  double Tan() const { return Sin() / Cos(); }
 
  private:
   units::radian_t m_value = 0_rad;
-  double m_cos = 1;
-  double m_sin = 0;
+  mutable double m_cos = 1;
+  mutable double m_sin = 0;
 };
 
 WPILIB_DLLEXPORT
@@ -179,3 +179,5 @@ WPILIB_DLLEXPORT
 void from_json(const wpi::json& json, Rotation2d& rotation);
 
 }  // namespace frc
+
+#include "Rotation2d.inc"

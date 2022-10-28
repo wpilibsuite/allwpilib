@@ -12,16 +12,6 @@
 
 using namespace frc;
 
-Rotation2d::Rotation2d(units::radian_t value)
-    : m_value(value),
-      m_cos(units::math::cos(value)),
-      m_sin(units::math::sin(value)) {}
-
-Rotation2d::Rotation2d(units::degree_t value)
-    : m_value(value),
-      m_cos(units::math::cos(value)),
-      m_sin(units::math::sin(value)) {}
-
 Rotation2d::Rotation2d(double x, double y) {
   const auto magnitude = std::hypot(x, y);
   if (magnitude > 1e-6) {
@@ -55,7 +45,7 @@ Rotation2d Rotation2d::operator/(double scalar) const {
 }
 
 bool Rotation2d::operator==(const Rotation2d& other) const {
-  return std::hypot(m_cos - other.m_cos, m_sin - other.m_sin) < 1E-9;
+  return std::hypot(Cos() - other.Cos(), Sin() - other.Sin()) < 1E-9;
 }
 
 bool Rotation2d::operator!=(const Rotation2d& other) const {
@@ -65,6 +55,14 @@ bool Rotation2d::operator!=(const Rotation2d& other) const {
 Rotation2d Rotation2d::RotateBy(const Rotation2d& other) const {
   return {Cos() * other.Cos() - Sin() * other.Sin(),
           Cos() * other.Sin() + Sin() * other.Cos()};
+}
+
+double Rotation2d::Cos() const {
+  return m_cos;
+}
+
+double Rotation2d::Sin() const {
+  return m_sin;
 }
 
 void frc::to_json(wpi::json& json, const Rotation2d& rotation) {

@@ -53,3 +53,14 @@ TEST(Pose2dTest, Minus) {
   EXPECT_NEAR(0.0, transform.Y().value(), 1e-9);
   EXPECT_DOUBLE_EQ(0.0, transform.Rotation().Degrees().value());
 }
+
+TEST(Pose2dTest, Constexpr) {
+  constexpr Pose2d defaultConstructed;
+  constexpr Pose2d translationRotation{Translation2d{0_m, 0_m},
+                                       Rotation2d{0_deg}};
+  constexpr Pose2d coordRotation{0_m, 0_m, Rotation2d{45_deg}};
+
+  static_assert(defaultConstructed.X() == 0_m);
+  static_assert(defaultConstructed.Y() == 0_m);
+  static_assert(defaultConstructed.Rotation().Degrees() == 0_deg);
+}

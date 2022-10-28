@@ -64,3 +64,13 @@ TEST(Twist2dTest, Pose2dLog) {
   const auto reapplied = start.Exp(twist);
   EXPECT_EQ(end, reapplied);
 }
+
+TEST(Twist2dTest, Constexpr) {
+  constexpr Twist2d defaultCtor{};
+  constexpr Twist2d componentCtor{1_m, 2_m, 3_rad};
+  constexpr auto multiplied = componentCtor * 2;
+
+  static_assert(defaultCtor.dx == 0_m);
+  static_assert(componentCtor.dy == 2_m);
+  static_assert(multiplied.dtheta == 6_rad);
+}

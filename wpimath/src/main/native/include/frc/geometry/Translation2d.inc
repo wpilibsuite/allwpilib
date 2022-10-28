@@ -1,0 +1,34 @@
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
+
+#pragma once
+
+namespace frc {
+
+constexpr Translation2d::Translation2d(units::meter_t x, units::meter_t y)
+    : m_x(x), m_y(y) {}
+
+constexpr Translation2d Translation2d::operator+(
+    const Translation2d& other) const {
+  return {X() + other.X(), Y() + other.Y()};
+}
+
+constexpr Translation2d Translation2d::operator-(
+    const Translation2d& other) const {
+  return *this + -other;
+}
+
+constexpr Translation2d Translation2d::operator-() const {
+  return {-m_x, -m_y};
+}
+
+constexpr Translation2d Translation2d::operator*(double scalar) const {
+  return {scalar * m_x, scalar * m_y};
+}
+
+constexpr Translation2d Translation2d::operator/(double scalar) const {
+  return operator*(1.0 / scalar);
+}
+
+}  // namespace frc

@@ -10,12 +10,6 @@
 
 using namespace frc;
 
-Pose2d::Pose2d(Translation2d translation, Rotation2d rotation)
-    : m_translation(std::move(translation)), m_rotation(std::move(rotation)) {}
-
-Pose2d::Pose2d(units::meter_t x, units::meter_t y, Rotation2d rotation)
-    : m_translation(x, y), m_rotation(std::move(rotation)) {}
-
 Pose2d Pose2d::operator+(const Transform2d& other) const {
   return TransformBy(other);
 }
