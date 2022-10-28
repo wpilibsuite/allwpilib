@@ -242,7 +242,9 @@ NCImpl3::~NCImpl3() {
 
 void NCImpl3::HandleLocal() {
   m_localQueue.ReadQueue(&m_localMsgs);
-  m_clientImpl->HandleLocal(m_localMsgs);
+  if (m_clientImpl) {
+    m_clientImpl->HandleLocal(m_localMsgs);
+  }
 }
 
 void NCImpl3::TcpConnected(uv::Tcp& tcp) {
@@ -354,8 +356,10 @@ NCImpl4::NCImpl4(int inst, std::string_view id,
     // set up flush async
     m_flush = uv::Async<>::Create(m_loop);
     m_flush->wakeup.connect([this] {
-      HandleLocal();
-      m_clientImpl->SendValues(m_loop.Now().count());
+      if (m_clientImpl) {
+        HandleLocal();
+        m_clientImpl->SendValues(m_loop.Now().count());
+      }
     });
     m_flushAtomic = m_flush.get();
 
