@@ -29,7 +29,7 @@ class Robot : public frc::TimedRobot {
    */
   void TeleopPeriodic() override {
     m_robotDrive.DriveCartesian(-m_joystick.GetY(), m_joystick.GetX(),
-                                m_joystick.GetZ(), m_gyro.GetAngle());
+                                m_joystick.GetZ(), m_gyro.GetRotation2d());
   }
 
  private:
