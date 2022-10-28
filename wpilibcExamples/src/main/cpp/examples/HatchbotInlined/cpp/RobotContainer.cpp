@@ -34,14 +34,14 @@ void RobotContainer::ConfigureButtonBindings() {
 
   // Grab the hatch when the 'Circle' button is pressed.
   frc2::JoystickButton(&m_driverController, frc::PS4Controller::Button::kCircle)
-      .WhenPressed(&m_grabHatch);
+      .OnTrue(&m_grabHatch);
   // Release the hatch when the 'Square' button is pressed.
   frc2::JoystickButton(&m_driverController, frc::PS4Controller::Button::kSquare)
-      .WhenPressed(&m_releaseHatch);
+      .OnTrue(&m_releaseHatch);
   // While holding R1, drive at half speed
   frc2::JoystickButton(&m_driverController, frc::PS4Controller::Button::kR1)
-      .WhenPressed(&m_driveHalfSpeed)
-      .WhenReleased(&m_driveFullSpeed);
+      .OnTrue(&m_driveHalfSpeed)
+      .OnFalse(&m_driveFullSpeed);
 }
 
 frc2::Command* RobotContainer::GetAutonomousCommand() {

@@ -22,7 +22,9 @@ import java.util.function.BooleanSupplier;
  *
  * <p>This class is provided by the NewCommands VendorDep
  */
-public class Trigger extends BooleanEvent {
+public class Trigger implements BooleanSupplier {
+  private final BooleanEvent m_event;
+
   /**
    * Creates a new trigger with the given condition/digital signal.
    *
@@ -30,7 +32,7 @@ public class Trigger extends BooleanEvent {
    * @param signal the digital signal represented.
    */
   public Trigger(EventLoop loop, BooleanSupplier signal) {
-    super(loop, signal);
+    m_event = new BooleanEvent(loop, signal);
   }
 
   /**
@@ -62,18 +64,103 @@ public class Trigger extends BooleanEvent {
   }
 
   /**
-   * Returns whether or not the trigger is active.
+   * Starts the given command whenever the signal rises from the low state to the high state.
    *
-   * <p>This method will be called repeatedly a command is linked to the Trigger.
-   *
-   * <p>Functionally identical to {@link Trigger#getAsBoolean()}.
-   *
-   * @return whether or not the trigger condition is active.
-   * @deprecated use {@link #getAsBoolean()}
+   * @param command the command to start
+   * @return this trigger, so calls can be chained
+   * @see #rising()
    */
-  @Deprecated
-  public final boolean get() {
-    return getAsBoolean();
+  public Trigger onTrue(Command command) {
+    requireNonNullParam(command, "command", "onRising");
+    m_event.rising().ifHigh(command::schedule);
+    return this;
+  }
+
+  /**
+   * Starts the given command whenever the signal falls from the high state to the low state.
+   *
+   * @param command the command to start
+   * @return this trigger, so calls can be chained
+   * @see #falling()
+   */
+  public Trigger onFalse(Command command) {
+    requireNonNullParam(command, "command", "onFalling");
+    m_event.falling().ifHigh(command::schedule);
+    return this;
+  }
+
+  /**
+   * Starts the given command when the signal rises to the high state and cancels it when the signal
+   * falls.
+   *
+   * <p>Doesn't re-start the command in-between.
+   *
+   * @param command the command to start
+   * @return this trigger, so calls can be chained
+   */
+  public Trigger whileTrue(Command command) {
+    requireNonNullParam(command, "command", "whileHigh");
+    m_event.rising().ifHigh(command::schedule);
+    m_event.falling().ifHigh(command::cancel);
+    return this;
+  }
+
+  /**
+   * Starts the given command when the signal falls to the low state and cancels it when the signal
+   * rises.
+   *
+   * <p>Does not re-start the command in-between.
+   *
+   * @param command the command to start
+   * @return this trigger, so calls can be chained
+   */
+  public Trigger whileFalse(Command command) {
+    requireNonNullParam(command, "command", "whileLow");
+    m_event.falling().ifHigh(command::schedule);
+    m_event.rising().ifHigh(command::cancel);
+    return this;
+  }
+
+  /**
+   * Toggles a command when the signal rises from the low state to the high state.
+   *
+   * @param command the command to toggle
+   * @return this trigger, so calls can be chained
+   */
+  public Trigger toggleOnTrue(Command command) {
+    requireNonNullParam(command, "command", "toggleOnRising");
+    m_event
+        .rising()
+        .ifHigh(
+            () -> {
+              if (!command.isScheduled()) {
+                command.schedule();
+              } else {
+                command.cancel();
+              }
+            });
+    return this;
+  }
+
+  /**
+   * Toggles a command when the signal rises from the low state to the high state.
+   *
+   * @param command the command to toggle
+   * @return this trigger, so calls can be chained
+   */
+  public Trigger toggleOnFalse(Command command) {
+    requireNonNullParam(command, "command", "toggleOnFalling");
+    m_event
+        .falling()
+        .ifHigh(
+            () -> {
+              if (!command.isScheduled()) {
+                command.schedule();
+              } else {
+                command.cancel();
+              }
+            });
+    return this;
   }
 
   /**
@@ -81,11 +168,13 @@ public class Trigger extends BooleanEvent {
    *
    * @param command the command to start
    * @return this trigger, so calls can be chained
+   * @deprecated Use {@link #onTrue(Command)} instead.
    */
+  @Deprecated
   public Trigger whenActive(final Command command) {
     requireNonNullParam(command, "command", "whenActive");
 
-    this.rising().ifHigh(command::schedule);
+    m_event.rising().ifHigh(command::schedule);
     return this;
   }
 
@@ -95,7 +184,9 @@ public class Trigger extends BooleanEvent {
    * @param toRun the runnable to run
    * @param requirements the required subsystems
    * @return this trigger, so calls can be chained
+   * @deprecated Replace with {@link #onTrue(Command)}, creating the InstantCommand manually
    */
+  @Deprecated
   public Trigger whenActive(final Runnable toRun, Subsystem... requirements) {
     return whenActive(new InstantCommand(toRun, requirements));
   }
@@ -108,12 +199,17 @@ public class Trigger extends BooleanEvent {
    *
    * @param command the command to start
    * @return this trigger, so calls can be chained
+   * @deprecated Use {@link #whileTrue(Command)} with {@link
+   *     edu.wpi.first.wpilibj2.command.RepeatCommand RepeatCommand}, or bind {@link
+   *     Command#schedule() command::schedule} to {@link BooleanEvent#ifHigh(Runnable)} (passing no
+   *     requirements).
    */
+  @Deprecated
   public Trigger whileActiveContinuous(final Command command) {
     requireNonNullParam(command, "command", "whileActiveContinuous");
 
-    this.ifHigh(command::schedule);
-    this.falling().ifHigh(command::cancel);
+    m_event.ifHigh(command::schedule);
+    m_event.falling().ifHigh(command::cancel);
 
     return this;
   }
@@ -124,7 +220,9 @@ public class Trigger extends BooleanEvent {
    * @param toRun the runnable to run
    * @param requirements the required subsystems
    * @return this trigger, so calls can be chained
+   * @deprecated Use {@link #whileTrue(Command)} and construct a RunCommand manually
    */
+  @Deprecated
   public Trigger whileActiveContinuous(final Runnable toRun, Subsystem... requirements) {
     return whileActiveContinuous(new InstantCommand(toRun, requirements));
   }
@@ -135,12 +233,14 @@ public class Trigger extends BooleanEvent {
    *
    * @param command the command to start
    * @return this trigger, so calls can be chained
+   * @deprecated Use {@link #whileTrue(Command)} instead.
    */
+  @Deprecated
   public Trigger whileActiveOnce(final Command command) {
     requireNonNullParam(command, "command", "whileActiveOnce");
 
-    this.rising().ifHigh(command::schedule);
-    this.falling().ifHigh(command::cancel);
+    m_event.rising().ifHigh(command::schedule);
+    m_event.falling().ifHigh(command::cancel);
 
     return this;
   }
@@ -150,11 +250,13 @@ public class Trigger extends BooleanEvent {
    *
    * @param command the command to start
    * @return this trigger, so calls can be chained
+   * @deprecated Use {@link #onFalse(Command)} instead.
    */
+  @Deprecated
   public Trigger whenInactive(final Command command) {
     requireNonNullParam(command, "command", "whenInactive");
 
-    this.falling().ifHigh(command::schedule);
+    m_event.falling().ifHigh(command::schedule);
 
     return this;
   }
@@ -165,7 +267,9 @@ public class Trigger extends BooleanEvent {
    * @param toRun the runnable to run
    * @param requirements the required subsystems
    * @return this trigger, so calls can be chained
+   * @deprecated Construct the InstantCommand manually and replace with {@link #onFalse(Command)}
    */
+  @Deprecated
   public Trigger whenInactive(final Runnable toRun, Subsystem... requirements) {
     return whenInactive(new InstantCommand(toRun, requirements));
   }
@@ -175,11 +279,14 @@ public class Trigger extends BooleanEvent {
    *
    * @param command the command to toggle
    * @return this trigger, so calls can be chained
+   * @deprecated Use {@link #toggleOnTrue(Command)} instead.
    */
+  @Deprecated
   public Trigger toggleWhenActive(final Command command) {
     requireNonNullParam(command, "command", "toggleWhenActive");
 
-    this.rising()
+    m_event
+        .rising()
         .ifHigh(
             () -> {
               if (command.isScheduled()) {
@@ -197,49 +304,57 @@ public class Trigger extends BooleanEvent {
    *
    * @param command the command to cancel
    * @return this trigger, so calls can be chained
+   * @deprecated Instead, pass {@link #rising()} as an end condition to {@link
+   *     Command#until(BooleanSupplier)}.
    */
+  @Deprecated
   public Trigger cancelWhenActive(final Command command) {
     requireNonNullParam(command, "command", "cancelWhenActive");
 
-    this.rising().ifHigh(command::cancel);
+    m_event.rising().ifHigh(command::cancel);
 
     return this;
   }
 
-  /* ----------- Super method type redeclarations ----------------- */
+  /**
+   * Get the wrapped BooleanEvent.
+   *
+   * @return the wrapped BooleanEvent instance.
+   */
+  public BooleanEvent getEvent() {
+    return m_event;
+  }
 
   @Override
+  public boolean getAsBoolean() {
+    return m_event.getAsBoolean();
+  }
+
   public Trigger and(BooleanSupplier trigger) {
-    return cast(super.and(trigger));
+    return cast(m_event.and(trigger));
   }
 
-  @Override
   public Trigger or(BooleanSupplier trigger) {
-    return cast(super.or(trigger));
+    return cast(m_event.or(trigger));
   }
 
-  @Override
   public Trigger negate() {
-    return cast(super.negate());
+    return cast(m_event.negate());
   }
 
-  @Override
   public Trigger debounce(double seconds) {
     return debounce(seconds, Debouncer.DebounceType.kRising);
   }
 
-  @Override
   public Trigger debounce(double seconds, Debouncer.DebounceType type) {
-    return cast(super.debounce(seconds, type));
+    return cast(m_event.debounce(seconds, type));
   }
 
-  @Override
   public Trigger rising() {
-    return cast(super.rising());
+    return cast(m_event.rising());
   }
 
-  @Override
   public Trigger falling() {
-    return cast(super.falling());
+    return cast(m_event.falling());
   }
 }
