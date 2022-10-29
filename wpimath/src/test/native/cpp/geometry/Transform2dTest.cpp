@@ -52,7 +52,8 @@ TEST(Transform2dTest, Constexpr) {
   static_assert(translationRotationCtor.X() == 0_m);
   static_assert(translationRotationCtor.Y() == 0_m);
   static_assert(multiplied.Rotation().Degrees() == 50_deg);
-  static_assert(translationRotationCtor.Inverse().Rotation().Degrees() == (-10_deg));
+  static_assert(translationRotationCtor.Inverse().Rotation().Degrees() ==
+                (-10_deg));
   static_assert(translationRotationCtor.Inverse().X() == 0_m);
   static_assert(translationRotationCtor.Inverse().Y() == 0_m);
   static_assert(divided.Rotation().Degrees() == 5_deg);

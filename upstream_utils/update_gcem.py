@@ -24,21 +24,22 @@ def main():
 
     # Delete old install
     for d in [
-            "src/main/native/thirdparty/gcem/include",
+        "src/main/native/thirdparty/gcem/include",
     ]:
         shutil.rmtree(os.path.join(wpimath, d), ignore_errors=True)
 
     # Copy gcem include files into allwpilib
     include_files = walk_cwd_and_copy_if(
-        lambda dp, f: dp.endswith("include") or dp.endswith("gcem_incl") or dp.
-        endswith("quadrature"),
+        lambda dp, f: dp.endswith("include")
+        or dp.endswith("gcem_incl")
+        or dp.endswith("quadrature"),
         os.path.join(wpimath, "src/main/native/thirdparty/gcem"),
     )
 
     for f in include_files:
         comment_out_invalid_includes(
-            f,
-            [os.path.join(wpimath, "src/main/native/thirdparty/gcem/include")])
+            f, [os.path.join(wpimath, "src/main/native/thirdparty/gcem/include")]
+        )
 
 
 if __name__ == "__main__":

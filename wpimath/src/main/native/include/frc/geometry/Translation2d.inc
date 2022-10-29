@@ -12,7 +12,8 @@ namespace frc {
 constexpr Translation2d::Translation2d(units::meter_t x, units::meter_t y)
     : m_x(x), m_y(y) {}
 
-constexpr Translation2d::Translation2d(units::meter_t distance, const Rotation2d& angle)
+constexpr Translation2d::Translation2d(units::meter_t distance,
+                                       const Rotation2d& angle)
     : m_x(distance * angle.Cos()), m_y(distance * angle.Sin()) {}
 
 constexpr Rotation2d Translation2d::Angle() const {

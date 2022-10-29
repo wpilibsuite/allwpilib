@@ -10,7 +10,6 @@
 
 using namespace frc;
 
-
 Transform2d Pose2d::operator-(const Pose2d& other) const {
   const auto pose = this->RelativeTo(other);
   return Transform2d{pose.Translation(), pose.Rotation()};

@@ -89,7 +89,9 @@ class WPILIB_DLLEXPORT Transform2d {
    * @param scalar The scalar.
    * @return The scaled Transform2d.
    */
-  constexpr Transform2d operator/(double scalar) const { return *this * (1.0 / scalar); }
+  constexpr Transform2d operator/(double scalar) const {
+    return *this * (1.0 / scalar);
+  }
 
   /**
    * Composes two transformations.
