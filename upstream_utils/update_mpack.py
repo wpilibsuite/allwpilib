@@ -28,7 +28,9 @@ def main():
     os.chdir(upstream_root)
 
     for f in [
-        "0001-Update-C-extern-and-includes.patch",
+        "0001-Don-t-emit-inline-defs.patch",
+        "0002-Update-amalgamation-script.patch",
+        "0003-Use-namespace-for-C.patch",
     ]:
         git_am(
             os.path.join(wpilib_root, "upstream_utils/mpack_patches", f),
