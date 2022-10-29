@@ -46,7 +46,7 @@ class WPILIB_DLLEXPORT Translation2d {
    * @param distance The distance from the origin to the end of the translation.
    * @param angle The angle between the x-axis and the translation vector.
    */
-  Translation2d(units::meter_t distance, const Rotation2d& angle);
+  constexpr Translation2d(units::meter_t distance, const Rotation2d& angle);
 
   /**
    * Calculates the distance between two translations in 2D space.
@@ -85,7 +85,7 @@ class WPILIB_DLLEXPORT Translation2d {
    *
    * @return The angle of the translation
    */
-  Rotation2d Angle() const;
+  constexpr Rotation2d Angle() const;
 
   /**
    * Applies a rotation to the translation in 2D space.
@@ -105,7 +105,7 @@ class WPILIB_DLLEXPORT Translation2d {
    *
    * @return The new rotated translation.
    */
-  Translation2d RotateBy(const Rotation2d& other) const;
+  constexpr Translation2d RotateBy(const Rotation2d& other) const;
 
   /**
    * Returns the sum of two translations in 2D space.

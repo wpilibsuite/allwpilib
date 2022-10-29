@@ -10,24 +10,12 @@
 
 using namespace frc;
 
-Translation2d::Translation2d(units::meter_t distance, const Rotation2d& angle)
-    : m_x(distance * angle.Cos()), m_y(distance * angle.Sin()) {}
-
 units::meter_t Translation2d::Distance(const Translation2d& other) const {
   return units::math::hypot(other.m_x - m_x, other.m_y - m_y);
 }
 
 units::meter_t Translation2d::Norm() const {
   return units::math::hypot(m_x, m_y);
-}
-
-Rotation2d Translation2d::Angle() const {
-  return Rotation2d{m_x.value(), m_y.value()};
-}
-
-Translation2d Translation2d::RotateBy(const Rotation2d& other) const {
-  return {m_x * other.Cos() - m_y * other.Sin(),
-          m_x * other.Sin() + m_y * other.Cos()};
 }
 
 bool Translation2d::operator==(const Translation2d& other) const {

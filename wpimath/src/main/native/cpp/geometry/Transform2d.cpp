@@ -18,13 +18,6 @@ Transform2d::Transform2d(Pose2d initial, Pose2d final) {
   m_rotation = final.Rotation() - initial.Rotation();
 }
 
-Transform2d Transform2d::Inverse() const {
-  // We are rotating the difference between the translations
-  // using a clockwise rotation matrix. This transforms the global
-  // delta into a local delta (relative to the initial pose).
-  return Transform2d{(-Translation()).RotateBy(-Rotation()), -Rotation()};
-}
-
 Transform2d Transform2d::operator+(const Transform2d& other) const {
   return Transform2d{Pose2d{}, Pose2d{}.TransformBy(*this).TransformBy(other)};
 }

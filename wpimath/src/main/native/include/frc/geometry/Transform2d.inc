@@ -16,4 +16,11 @@ constexpr Transform2d::Transform2d(Translation2d translation,
                                    Rotation2d rotation)
     : m_translation(std::move(translation)), m_rotation(std::move(rotation)) {}
 
+constexpr Transform2d Transform2d::Inverse() const {
+  // We are rotating the difference between the translations
+  // using a clockwise rotation matrix. This transforms the global
+  // delta into a local delta (relative to the initial pose).
+  return Transform2d{(-Translation()).RotateBy(-Rotation()), -Rotation()};
+}
+
 }  // namespace frc

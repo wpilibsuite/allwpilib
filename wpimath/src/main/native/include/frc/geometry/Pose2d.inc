@@ -19,4 +19,21 @@ constexpr Pose2d::Pose2d(units::meter_t x, units::meter_t y,
                          Rotation2d rotation)
     : m_translation(x, y), m_rotation(std::move(rotation)) {}
 
+constexpr Pose2d Pose2d::operator+(const Transform2d& other) const {
+  return TransformBy(other);
+}
+
+constexpr Pose2d Pose2d::operator*(double scalar) const {
+  return Pose2d{m_translation * scalar, m_rotation * scalar};
+}
+
+constexpr Pose2d Pose2d::operator/(double scalar) const {
+  return *this * (1.0 / scalar);
+}
+
+constexpr Pose2d Pose2d::TransformBy(const Transform2d& other) const {
+  return {m_translation + (other.Translation().RotateBy(m_rotation)),
+          m_rotation + other.Rotation()};
+}
+
 }  // namespace frc

@@ -58,7 +58,7 @@ class WPILIB_DLLEXPORT Pose2d {
    *
    * @return The transformed pose.
    */
-  Pose2d operator+(const Transform2d& other) const;
+  constexpr Pose2d operator+(const Transform2d& other) const;
 
   /**
    * Returns the Transform2d that maps the one pose to another.
@@ -119,7 +119,7 @@ class WPILIB_DLLEXPORT Pose2d {
    *
    * @return The new scaled Pose2d.
    */
-  Pose2d operator*(double scalar) const;
+  constexpr Pose2d operator*(double scalar) const;
 
   /**
    * Divides the current pose by a scalar.
@@ -128,7 +128,7 @@ class WPILIB_DLLEXPORT Pose2d {
    *
    * @return The new scaled Pose2d.
    */
-  Pose2d operator/(double scalar) const;
+  constexpr Pose2d operator/(double scalar) const;
 
   /**
    * Transforms the pose by the given transformation and returns the new pose.
@@ -138,7 +138,7 @@ class WPILIB_DLLEXPORT Pose2d {
    *
    * @return The transformed pose.
    */
-  Pose2d TransformBy(const Transform2d& other) const;
+  constexpr Pose2d TransformBy(const Transform2d& other) const;
 
   /**
    * Returns the other pose relative to the current pose.
