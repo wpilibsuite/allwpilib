@@ -430,12 +430,30 @@ public interface Command {
   }
 
   /**
-   * Gets the name of this Command.
+   * Gets the name of this Command. Defaults to the simple class name if not overridden.
    *
-   * @return Name
+   * @return The display name of the Command
    */
   default String getName() {
     return this.getClass().getSimpleName();
+  }
+
+  /**
+   * Sets the name of this Command. Nullop if not overridden.
+   *
+   * @param name The display name of the Command.
+   */
+  default void setName(String name) {}
+
+  /**
+   * Decorates this Command with a name. Is an inline function for #setName(String);
+   *
+   * @param name name
+   * @return the decorated Command
+   */
+  default Command withName(String name) {
+    this.setName(name);
+    return this;
   }
 
   /**

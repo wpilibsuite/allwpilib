@@ -82,6 +82,13 @@ class DriveSubsystem : public frc2::SubsystemBase {
   frc::MecanumDriveWheelSpeeds getCurrentWheelSpeeds();
 
   /**
+   * Gets the distances travelled by each wheel.
+   *
+   * @return the distances travelled by each wheel.
+   */
+  frc::MecanumDriveWheelPositions getCurrentWheelDistances();
+
+  /**
    * Sets the drive MotorControllers to a desired voltage.
    */
   void SetMotorControllersVolts(units::volt_t frontLeftPower,

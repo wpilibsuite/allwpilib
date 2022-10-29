@@ -15,6 +15,7 @@
 #include "networktables/FloatTopic.h"
 #include "networktables/IntegerArrayTopic.h"
 #include "networktables/IntegerTopic.h"
+#include "networktables/MultiSubscriber.h"
 #include "networktables/RawTopic.h"
 #include "networktables/StringArrayTopic.h"
 #include "networktables/StringTopic.h"
@@ -100,8 +101,16 @@ void NetworkTableInstance::SetServer(std::span<const std::string_view> servers,
   SetServer(serversArr);
 }
 
-NT_ConnectionListener NetworkTableInstance::AddConnectionListener(
-    std::function<void(const ConnectionNotification& event)> callback,
-    bool immediate_notify) const {
-  return ::nt::AddConnectionListener(m_handle, callback, immediate_notify);
+NT_TopicListener NetworkTableInstance::AddTopicListener(
+    MultiSubscriber& subscriber, int eventMask,
+    std::function<void(const TopicNotification&)> listener) {
+  return ::nt::AddTopicListener(subscriber.GetHandle(), eventMask,
+                                std::move(listener));
+}
+
+NT_ValueListener NetworkTableInstance::AddValueListener(
+    MultiSubscriber& subscriber, unsigned int eventMask,
+    std::function<void(const ValueNotification&)> listener) {
+  return ::nt::AddValueListener(subscriber.GetHandle(), eventMask,
+                                std::move(listener));
 }

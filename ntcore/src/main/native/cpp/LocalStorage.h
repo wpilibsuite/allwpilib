@@ -41,8 +41,8 @@ class LocalStorage final : public net::ILocalStorage {
                                bool ack) final;
   void NetworkSetValue(NT_Topic topicHandle, const Value& value) final;
 
-  void StartNetwork(net::NetworkStartupInterface& startup) final;
-  void SetNetwork(net::NetworkInterface* network) final;
+  void StartNetwork(net::NetworkStartupInterface& startup,
+                    net::NetworkInterface* network) final;
   void ClearNetwork() final;
 
   // User functions.  These are the actual implementations of the corresponding
@@ -198,6 +198,7 @@ class LocalStorage final : public net::ILocalStorage {
   NT_TopicListener AddTopicListener(
       NT_Handle handle, unsigned int mask,
       std::function<void(const TopicNotification&)> callback);
+  bool WaitForTopicListenerQueue(double timeout);
 
   NT_TopicListenerPoller CreateTopicListenerPoller();
   void DestroyTopicListenerPoller(NT_TopicListenerPoller poller);
@@ -220,6 +221,7 @@ class LocalStorage final : public net::ILocalStorage {
   NT_ValueListener AddValueListener(
       NT_Handle subentry, unsigned int mask,
       std::function<void(const ValueNotification&)> callback);
+  bool WaitForValueListenerQueue(double timeout);
 
   NT_ValueListenerPoller CreateValueListenerPoller();
   void DestroyValueListenerPoller(NT_ValueListenerPoller poller);

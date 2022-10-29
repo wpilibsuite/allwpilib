@@ -27,10 +27,7 @@ class ConnectionListenerTest {
   @BeforeEach
   void setUp() {
     m_serverInst = NetworkTableInstance.create();
-    m_serverInst.setNetworkIdentity("server");
-
     m_clientInst = NetworkTableInstance.create();
-    m_clientInst.setNetworkIdentity("client");
   }
 
   @AfterEach
@@ -42,7 +39,7 @@ class ConnectionListenerTest {
   /** Connect to the server. */
   private void connect(int port) {
     m_serverInst.startServer("connectionlistenertest.json", "127.0.0.1", 0, port);
-    m_clientInst.startClient4();
+    m_clientInst.startClient4("client");
     m_clientInst.setServer("127.0.0.1", port);
 
     // wait for client to report it's connected, then wait another 0.1 sec
@@ -117,15 +114,15 @@ class ConnectionListenerTest {
     List<ConnectionNotification> events = new ArrayList<>();
     final int handle =
         m_serverInst.addConnectionListener(
+            false,
             e -> {
               synchronized (events) {
                 events.add(e);
               }
-            },
-            false);
+            });
 
     // trigger a connect event
-    m_clientInst.startClient4();
+    m_clientInst.startClient4("client");
     m_clientInst.setServer(address, threadedPort);
     threadedPort++;
 
@@ -149,6 +146,9 @@ class ConnectionListenerTest {
       fail("interrupted while waiting for queue");
     }
 
+    // wait for thread
+    m_serverInst.waitForConnectionListenerQueue(1.0);
+
     // get the event
     synchronized (events) {
       assertEquals(1, events.size());
@@ -164,6 +164,9 @@ class ConnectionListenerTest {
     } catch (InterruptedException ex) {
       fail("interrupted while waiting for client to stop");
     }
+
+    // wait for thread
+    m_serverInst.waitForConnectionListenerQueue(1.0);
 
     // get the event
     try {

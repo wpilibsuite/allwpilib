@@ -77,9 +77,9 @@ class MockLocalStorage : public ILocalStorage {
               (override));
   MOCK_METHOD(void, NetworkSetValue, (NT_Topic topicHandle, const Value& value),
               (override));
-  MOCK_METHOD(void, StartNetwork, (NetworkStartupInterface & startup),
+  MOCK_METHOD(void, StartNetwork,
+              (NetworkStartupInterface & startup, NetworkInterface* network),
               (override));
-  MOCK_METHOD(void, SetNetwork, (NetworkInterface * network), (override));
   MOCK_METHOD(void, ClearNetwork, (), (override));
 };
 

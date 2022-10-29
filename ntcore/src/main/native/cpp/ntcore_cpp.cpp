@@ -407,6 +407,14 @@ NT_TopicListener AddTopicListener(
   }
 }
 
+bool WaitForTopicListenerQueue(NT_Handle handle, double timeout) {
+  if (auto ii = InstanceImpl::GetHandle(handle)) {
+    return ii->localStorage.WaitForTopicListenerQueue(timeout);
+  } else {
+    return {};
+  }
+}
+
 NT_TopicListenerPoller CreateTopicListenerPoller(NT_Inst inst) {
   if (auto ii = InstanceImpl::GetTyped(inst, Handle::kInstance)) {
     return ii->localStorage.CreateTopicListenerPoller();
@@ -466,6 +474,14 @@ NT_ValueListener AddValueListener(
   }
 }
 
+bool WaitForValueListenerQueue(NT_Handle handle, double timeout) {
+  if (auto ii = InstanceImpl::GetHandle(handle)) {
+    return ii->localStorage.WaitForValueListenerQueue(timeout);
+  } else {
+    return {};
+  }
+}
+
 NT_ValueListenerPoller CreateValueListenerPoller(NT_Inst inst) {
   if (auto ii = InstanceImpl::GetTyped(inst, Handle::kInstance)) {
     return ii->localStorage.CreateValueListenerPoller();
@@ -505,12 +521,19 @@ void RemoveValueListener(NT_ValueListener listener) {
 }
 
 NT_ConnectionListener AddConnectionListener(
-    NT_Inst inst,
-    std::function<void(const ConnectionNotification& event)> callback,
-    bool immediate_notify) {
+    NT_Inst inst, bool immediate_notify,
+    std::function<void(const ConnectionNotification& event)> callback) {
   if (auto ii = InstanceImpl::GetTyped(inst, Handle::kInstance)) {
-    return ii->connectionList.AddListener(std::move(callback),
-                                          immediate_notify);
+    return ii->connectionList.AddListener(immediate_notify,
+                                          std::move(callback));
+  } else {
+    return {};
+  }
+}
+
+bool WaitForConnectionListenerQueue(NT_Handle handle, double timeout) {
+  if (auto ii = InstanceImpl::GetHandle(handle)) {
+    return ii->connectionList.WaitForListenerQueue(timeout);
   } else {
     return {};
   }
@@ -624,12 +647,6 @@ void StopConnectionDataLog(NT_ConnectionDataLogger logger) {
  * Client/Server Functions
  */
 
-void SetNetworkIdentity(NT_Inst inst, std::string_view name) {
-  if (auto ii = InstanceImpl::GetTyped(inst, Handle::kInstance)) {
-    ii->SetIdentity(name);
-  }
-}
-
 unsigned int GetNetworkMode(NT_Inst inst) {
   if (auto ii = InstanceImpl::GetTyped(inst, Handle::kInstance)) {
     return ii->networkMode;
@@ -664,15 +681,15 @@ void StopServer(NT_Inst inst) {
   }
 }
 
-void StartClient3(NT_Inst inst) {
+void StartClient3(NT_Inst inst, std::string_view identity) {
   if (auto ii = InstanceImpl::GetTyped(inst, Handle::kInstance)) {
-    ii->StartClient3();
+    ii->StartClient3(identity);
   }
 }
 
-void StartClient4(NT_Inst inst) {
+void StartClient4(NT_Inst inst, std::string_view identity) {
   if (auto ii = InstanceImpl::GetTyped(inst, Handle::kInstance)) {
-    ii->StartClient4();
+    ii->StartClient4(identity);
   }
 }
 
@@ -690,44 +707,39 @@ void SetServer(
     NT_Inst inst,
     std::span<const std::pair<std::string_view, unsigned int>> servers) {
   if (auto ii = InstanceImpl::GetTyped(inst, Handle::kInstance)) {
-    if (auto client = ii->GetClient()) {
-      std::vector<std::pair<std::string, unsigned int>> serversCopy;
-      serversCopy.reserve(servers.size());
-      for (auto&& server : servers) {
-        serversCopy.emplace_back(std::string{server.first}, server.second);
-      }
-      client->SetServers(serversCopy);
+    std::vector<std::pair<std::string, unsigned int>> serversCopy;
+    serversCopy.reserve(servers.size());
+    for (auto&& server : servers) {
+      serversCopy.emplace_back(std::string{server.first}, server.second);
     }
+    ii->SetServers(serversCopy);
   }
 }
 
 void SetServerTeam(NT_Inst inst, unsigned int team, unsigned int port) {
   if (auto ii = InstanceImpl::GetTyped(inst, Handle::kInstance)) {
-    if (auto client = ii->GetClient()) {
-      std::vector<std::pair<std::string, unsigned int>> servers;
-      servers.reserve(5);
+    std::vector<std::pair<std::string, unsigned int>> servers;
+    servers.reserve(5);
 
-      // 10.te.am.2
-      servers.emplace_back(
-          fmt::format("10.{}.{}.2", static_cast<int>(team / 100),
-                      static_cast<int>(team % 100)),
-          port);
+    // 10.te.am.2
+    servers.emplace_back(fmt::format("10.{}.{}.2", static_cast<int>(team / 100),
+                                     static_cast<int>(team % 100)),
+                         port);
 
-      // 172.22.11.2
-      servers.emplace_back("172.22.11.2", port);
+    // 172.22.11.2
+    servers.emplace_back("172.22.11.2", port);
 
-      // roboRIO-<team>-FRC.local
-      servers.emplace_back(fmt::format("roboRIO-{}-FRC.local", team), port);
+    // roboRIO-<team>-FRC.local
+    servers.emplace_back(fmt::format("roboRIO-{}-FRC.local", team), port);
 
-      // roboRIO-<team>-FRC.lan
-      servers.emplace_back(fmt::format("roboRIO-{}-FRC.lan", team), port);
+    // roboRIO-<team>-FRC.lan
+    servers.emplace_back(fmt::format("roboRIO-{}-FRC.lan", team), port);
 
-      // roboRIO-<team>-FRC.frc-field.local
-      servers.emplace_back(fmt::format("roboRIO-{}-FRC.frc-field.local", team),
-                           port);
+    // roboRIO-<team>-FRC.frc-field.local
+    servers.emplace_back(fmt::format("roboRIO-{}-FRC.frc-field.local", team),
+                         port);
 
-      client->SetServers(servers);
-    }
+    ii->SetServers(servers);
   }
 }
 

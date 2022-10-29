@@ -8,6 +8,7 @@ import edu.wpi.first.math.MathSharedStore;
 import edu.wpi.first.math.MathUsageId;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.geometry.Twist2d;
 import java.util.Arrays;
 import java.util.Collections;
 import org.ejml.simple.SimpleMatrix;
@@ -183,6 +184,35 @@ public class SwerveDriveKinematics {
         chassisSpeedsVector.get(0, 0),
         chassisSpeedsVector.get(1, 0),
         chassisSpeedsVector.get(2, 0));
+  }
+
+  /**
+   * Performs forward kinematics to return the resulting chassis state from the given module states.
+   * This method is often used for odometry -- determining the robot's position on the field using
+   * data from the real-world speed and angle of each module on the robot.
+   *
+   * @param wheelDeltas The latest change in position of the modules (as a SwerveModulePosition
+   *     type) as measured from respective encoders and gyros. The order of the swerve module states
+   *     should be same as passed into the constructor of this class.
+   * @return The resulting Twist2d.
+   */
+  public Twist2d toTwist2d(SwerveModulePosition... wheelDeltas) {
+    if (wheelDeltas.length != m_numModules) {
+      throw new IllegalArgumentException(
+          "Number of modules is not consistent with number of wheel locations provided in "
+              + "constructor");
+    }
+    var moduleDeltaMatrix = new SimpleMatrix(m_numModules * 2, 1);
+
+    for (int i = 0; i < m_numModules; i++) {
+      var module = wheelDeltas[i];
+      moduleDeltaMatrix.set(i * 2, 0, module.distanceMeters * module.angle.getCos());
+      moduleDeltaMatrix.set(i * 2 + 1, module.distanceMeters * module.angle.getSin());
+    }
+
+    var chassisDeltaVector = m_forwardKinematics.mult(moduleDeltaMatrix);
+    return new Twist2d(
+        chassisDeltaVector.get(0, 0), chassisDeltaVector.get(1, 0), chassisDeltaVector.get(2, 0));
   }
 
   /**

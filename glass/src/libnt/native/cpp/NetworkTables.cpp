@@ -111,10 +111,10 @@ NetworkTablesModel::NetworkTablesModel()
 
 NetworkTablesModel::NetworkTablesModel(nt::NetworkTableInstance inst)
     : m_inst{inst},
-      m_subscriber{nt::SubscribeMultiple(inst.GetHandle(), {{"", "$"}})},
+      m_subscriber{inst, {{"", "$"}}},
       m_topicPoller{inst},
       m_valuePoller{inst} {
-  m_topicPoller.Add({{""}},
+  m_topicPoller.Add(m_subscriber,
                     NT_TOPIC_NOTIFY_IMMEDIATE | NT_TOPIC_NOTIFY_PROPERTIES |
                         NT_TOPIC_NOTIFY_PUBLISH | NT_TOPIC_NOTIFY_UNPUBLISH);
   m_valuePoller.Add(m_subscriber,
@@ -176,7 +176,6 @@ static void UpdateMsgpackValueSource(NetworkTablesModel::ValueSource* out,
     case mpack::mpack_type_str: {
       std::string str;
       mpack_read_str(&r, &tag, &str);
-      mpack_done_str(&r);
       out->UpdateFromValue(nt::Value::MakeString(std::move(str), time), name,
                            "");
       break;
@@ -461,7 +460,6 @@ void NetworkTablesModel::Update() {
                              entry->info.type_str);
       if (wpi::starts_with(entry->info.name, '$') && entry->value.IsRaw() &&
           entry->info.type_str == "msgpack") {
-        fmt::print(stderr, "Updating meta-topic {}\n", entry->info.name);
         // meta topic handling
         if (entry->info.name == "$clients") {
           UpdateClients(entry->value.GetRaw());

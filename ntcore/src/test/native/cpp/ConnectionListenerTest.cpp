@@ -15,10 +15,7 @@
 class ConnectionListenerTest : public ::testing::Test {
  public:
   ConnectionListenerTest()
-      : server_inst(nt::CreateInstance()), client_inst(nt::CreateInstance()) {
-    nt::SetNetworkIdentity(server_inst, "server");
-    nt::SetNetworkIdentity(client_inst, "client");
-  }
+      : server_inst(nt::CreateInstance()), client_inst(nt::CreateInstance()) {}
 
   ~ConnectionListenerTest() override {
     nt::DestroyInstance(server_inst);
@@ -36,7 +33,7 @@ void ConnectionListenerTest::Connect(const char* address, unsigned int port3,
                                      unsigned int port4) {
   nt::StartServer(server_inst, "connectionlistenertest.ini", address, port3,
                   port4);
-  nt::StartClient4(client_inst);
+  nt::StartClient4(client_inst, "client");
   nt::SetServer(client_inst, address, port4);
 
   // wait for client to report it's connected, then wait another 0.1 sec
@@ -92,12 +89,10 @@ TEST_P(ConnectionListenerVariantTest, Threaded) {
   wpi::mutex m;
   std::vector<nt::ConnectionNotification> result;
   auto handle = nt::AddConnectionListener(
-      server_inst,
-      [&](const nt::ConnectionNotification& event) {
+      server_inst, false, [&](const nt::ConnectionNotification& event) {
         std::scoped_lock lock{m};
         result.push_back(event);
-      },
-      false);
+      });
 
   // trigger a connect event
   Connect(GetParam().first, 0, 20001 + GetParam().second);
@@ -118,6 +113,9 @@ TEST_P(ConnectionListenerVariantTest, Threaded) {
   // trigger a disconnect event
   nt::StopClient(client_inst);
   std::this_thread::sleep_for(std::chrono::milliseconds(100));
+
+  // wait for thread
+  nt::WaitForConnectionListenerQueue(server_inst, 1.0);
 
   // get the event
   {

@@ -198,8 +198,7 @@ struct NT_TopicInfo {
 /** NetworkTables Connection Information */
 struct NT_ConnectionInfo {
   /**
-   * The remote identifier (as set on the remote node by
-   * NetworkTableInstance::SetNetworkIdentity() or nt::SetNetworkIdentity()).
+   * The remote identifier (as set on the remote node by NT_StartClient4().
    */
   struct NT_String remote_id;
 
@@ -864,6 +863,19 @@ NT_TopicListener NT_AddTopicListenerSingle(NT_Topic topic, unsigned int mask,
                                            NT_TopicListenerCallback callback);
 
 /**
+ * Wait for the topic listener queue to be empty. This is primarily useful
+ * for deterministic testing. This blocks until either the topic listener
+ * queue is empty (e.g. there are no more events that need to be passed along to
+ * callbacks or poll queues) or the timeout expires.
+ *
+ * @param handle  handle
+ * @param timeout timeout, in seconds. Set to 0 for non-blocking behavior, or a
+ *                negative value to block indefinitely
+ * @return False if timed out, otherwise true.
+ */
+NT_Bool NT_WaitForTopicListenerQueue(NT_Handle handle, double timeout);
+
+/**
  * Creates a topic listener poller.
  *
  * A poller provides a single queue of poll events.  Events linked to this
@@ -973,6 +985,19 @@ NT_ValueListener NT_AddValueListener(NT_Handle subentry, unsigned int mask,
                                      NT_ValueListenerCallback callback);
 
 /**
+ * Wait for the value listener queue to be empty. This is primarily useful
+ * for deterministic testing. This blocks until either the value listener
+ * queue is empty (e.g. there are no more events that need to be passed along to
+ * callbacks or poll queues) or the timeout expires.
+ *
+ * @param handle  handle
+ * @param timeout timeout, in seconds. Set to 0 for non-blocking behavior, or a
+ *                negative value to block indefinitely
+ * @return False if timed out, otherwise true.
+ */
+NT_Bool NT_WaitForValueListenerQueue(NT_Handle handle, double timeout);
+
+/**
  * Create a value listener poller.
  *
  * A poller provides a single queue of poll events.  Events linked to this
@@ -1051,8 +1076,21 @@ typedef void (*NT_ConnectionListenerCallback)(
  * @return Listener handle
  */
 NT_ConnectionListener NT_AddConnectionListener(
-    NT_Inst inst, void* data, NT_ConnectionListenerCallback callback,
-    NT_Bool immediate_notify);
+    NT_Inst inst, NT_Bool immediate_notify, void* data,
+    NT_ConnectionListenerCallback callback);
+
+/**
+ * Wait for the connection listener queue to be empty. This is primarily useful
+ * for deterministic testing. This blocks until either the connection listener
+ * queue is empty (e.g. there are no more events that need to be passed along to
+ * callbacks or poll queues) or the timeout expires.
+ *
+ * @param handle  handle
+ * @param timeout timeout, in seconds. Set to 0 for non-blocking behavior, or a
+ *                negative value to block indefinitely
+ * @return False if timed out, otherwise true.
+ */
+NT_Bool NT_WaitForConnectionListenerQueue(NT_Handle handle, double timeout);
 
 /**
  * Create a connection listener poller.
@@ -1115,17 +1153,6 @@ void NT_RemoveConnectionListener(NT_ConnectionListener conn_listener);
  */
 
 /**
- * Set the network identity of this node.
- * This is the name used during the initial connection handshake, and is
- * visible through NT_ConnectionInfo on the remote node.
- *
- * @param inst      instance handle
- * @param name      identity to advertise
- * @param name_len  length of name in bytes
- */
-void NT_SetNetworkIdentity(NT_Inst inst, const char* name, size_t name_len);
-
-/**
  * Get the current network mode.
  *
  * @param inst  instance handle
@@ -1172,17 +1199,19 @@ void NT_StopServer(NT_Inst inst);
  * Starts a NT3 client.  Use NT_SetServer or NT_SetServerTeam to set the server
  * name and port.
  *
- * @param inst  instance handle
+ * @param inst      instance handle
+ * @param identity  network identity to advertise (cannot be empty string)
  */
-void NT_StartClient3(NT_Inst inst);
+void NT_StartClient3(NT_Inst inst, const char* identity);
 
 /**
  * Starts a NT4 client.  Use NT_SetServer or NT_SetServerTeam to set the server
  * name and port.
  *
- * @param inst  instance handle
+ * @param inst      instance handle
+ * @param identity  network identity to advertise (cannot be empty string)
  */
-void NT_StartClient4(NT_Inst inst);
+void NT_StartClient4(NT_Inst inst, const char* identity);
 
 /**
  * Stops the client if it is running.

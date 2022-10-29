@@ -6,13 +6,7 @@ package edu.wpi.first.networktables;
 
 /** NetworkTables Connection notification. */
 @SuppressWarnings("MemberName")
-public final class ConnectionNotification {
-  /**
-   * Handle of listener that was triggered. ConnectionListener.getHandle() or the return value of
-   * ConnectionListenerPoller.add() can be used to map this to a specific added listener.
-   */
-  public final int listener;
-
+public final class ConnectionNotification extends NotificationBase {
   /** True if event is due to connection being established. */
   public final boolean connected;
 
@@ -29,15 +23,8 @@ public final class ConnectionNotification {
    */
   public ConnectionNotification(
       NetworkTableInstance inst, int listener, boolean connected, ConnectionInfo conn) {
-    this.m_inst = inst;
-    this.listener = listener;
+    super(inst, listener);
     this.connected = connected;
     this.conn = conn;
-  }
-
-  private final NetworkTableInstance m_inst;
-
-  public NetworkTableInstance getInstance() {
-    return m_inst;
   }
 }

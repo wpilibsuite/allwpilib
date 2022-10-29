@@ -48,30 +48,34 @@ struct ValueListenerFlags {
 
 /**
  * Value change listener. This calls back to a callback function when a value
- * change matching the specified mask occurs.
+ * change matching the specified mask occurs. The callback function is called
+ * asynchronously on a separate thread, so it's important to use synchronization
+ * or atomics when accessing any shared state from the callback function.
  */
 class ValueListener final {
  public:
   ValueListener() = default;
 
   /**
-   * Create a listener for value changes on a subscriber.
+   * Create a listener for value changes on a subscriber. This does NOT keep the
+   * subscriber active.
    *
    * @param subscriber Subscriber
    * @param mask Bitmask of ValueListenerFlags values
    * @param listener Listener function
    */
-  ValueListener(const Subscriber& subscriber, unsigned int mask,
+  ValueListener(Subscriber& subscriber, unsigned int mask,
                 std::function<void(const ValueNotification&)> listener);
 
   /**
-   * Create a listener for value changes on a subscriber.
+   * Create a listener for value changes on a subscriber. This does NOT keep the
+   * subscriber active.
    *
    * @param subscriber Subscriber
    * @param mask Bitmask of ValueListenerFlags values
    * @param listener Listener function
    */
-  ValueListener(const MultiSubscriber& subscriber, unsigned int mask,
+  ValueListener(MultiSubscriber& subscriber, unsigned int mask,
                 std::function<void(const ValueNotification&)> listener);
 
   /**
@@ -81,17 +85,7 @@ class ValueListener final {
    * @param mask Bitmask of ValueListenerFlags values
    * @param listener Listener function
    */
-  ValueListener(const NetworkTableEntry& entry, unsigned int mask,
-                std::function<void(const ValueNotification&)> listener);
-
-  /**
-   * Create a listener for value changes on a subscriber/entry handle.
-   *
-   * @param subentry Subscriber/entry handle
-   * @param mask Bitmask of ValueListenerFlags values
-   * @param listener Listener function
-   */
-  ValueListener(NT_Handle subentry, unsigned int mask,
+  ValueListener(NetworkTableEntry& entry, unsigned int mask,
                 std::function<void(const ValueNotification&)> listener);
 
   ValueListener(const ValueListener&) = delete;
@@ -109,6 +103,18 @@ class ValueListener final {
    */
   NT_ValueListener GetHandle() const { return m_handle; }
 
+  /**
+   * Wait for the value listener queue to be empty. This is primarily useful for
+   * deterministic testing. This blocks until either the value listener queue is
+   * empty (e.g. there are no more events that need to be passed along to
+   * callbacks or poll queues) or the timeout expires.
+   *
+   * @param timeout timeout, in seconds. Set to 0 for non-blocking behavior, or
+   * a negative value to block indefinitely
+   * @return False if timed out, otherwise true.
+   */
+  bool WaitForQueue(double timeout);
+
  private:
   NT_ValueListener m_handle{0};
 };
@@ -120,7 +126,7 @@ class ValueListener final {
  */
 class ValueListenerPoller final {
  public:
-  ValueListenerPoller();
+  ValueListenerPoller() = default;
 
   /**
    * Construct a value listener poller.
@@ -145,22 +151,24 @@ class ValueListenerPoller final {
   NT_ValueListenerPoller GetHandle() const { return m_handle; }
 
   /**
-   * Start listening to value changes on a subscriber.
+   * Start listening to value changes on a subscriber. This does NOT keep the
+   * subscriber active.
    *
    * @param subscriber Subscriber
    * @param mask Bitmask of ValueListenerFlags values
    * @return Listener handle
    */
-  NT_ValueListener Add(const Subscriber& subscriber, unsigned int mask);
+  NT_ValueListener Add(Subscriber& subscriber, unsigned int mask);
 
   /**
-   * Start listening to value changes on a subscriber.
+   * Start listening to value changes on a subscriber. This does NOT keep the
+   * subscriber active.
    *
    * @param subscriber Subscriber
    * @param mask Bitmask of ValueListenerFlags values
    * @return Listener handle
    */
-  NT_ValueListener Add(const MultiSubscriber& subscriber, unsigned int mask);
+  NT_ValueListener Add(MultiSubscriber& subscriber, unsigned int mask);
 
   /**
    * Start listening to value changes on an entry.
@@ -169,16 +177,7 @@ class ValueListenerPoller final {
    * @param mask Bitmask of ValueListenerFlags values
    * @return Listener handle
    */
-  NT_ValueListener Add(const NetworkTableEntry& entry, unsigned int mask);
-
-  /**
-   * Start listening to value changes on a subscriber/entry handle.
-   *
-   * @param subentry Subscriber/entry handle
-   * @param mask Bitmask of ValueListenerFlags values
-   * @return Listener handle
-   */
-  NT_ValueListener Add(NT_Handle subentry, unsigned int mask);
+  NT_ValueListener Add(NetworkTableEntry& entry, unsigned int mask);
 
   /**
    * Remove a listener.
@@ -196,7 +195,7 @@ class ValueListenerPoller final {
   std::vector<ValueNotification> ReadQueue();
 
  private:
-  NT_ValueListenerPoller m_handle;
+  NT_ValueListenerPoller m_handle{0};
 };
 
 }  // namespace nt

@@ -74,6 +74,8 @@ ADIS16448_IMU::ADIS16448_IMU(IMUAxis yaw_axis, SPI::Port port,
       m_spi_port(port),
       m_simDevice("Gyro:ADIS16448", port) {
   if (m_simDevice) {
+    m_connected =
+        m_simDevice.CreateBoolean("connected", hal::SimDevice::kInput, true);
     m_simGyroAngleX =
         m_simDevice.CreateDouble("gyro_angle_x", hal::SimDevice::kInput, 0.0);
     m_simGyroAngleY =
@@ -150,6 +152,14 @@ ADIS16448_IMU::ADIS16448_IMU(IMUAxis yaw_axis, SPI::Port port,
   HAL_Report(HALUsageReporting::kResourceType_ADIS16448, 0);
 
   wpi::SendableRegistry::AddLW(this, "ADIS16448", port);
+  m_connected = true;
+}
+
+bool ADIS16448_IMU::IsConnected() const {
+  if (m_simConnected) {
+    return m_simConnected.Get();
+  }
+  return m_connected;
 }
 
 /**

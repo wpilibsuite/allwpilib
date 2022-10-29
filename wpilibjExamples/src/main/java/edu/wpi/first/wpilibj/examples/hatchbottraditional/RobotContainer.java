@@ -78,14 +78,13 @@ public class RobotContainer {
    */
   private void configureButtonBindings() {
     // Grab the hatch when the 'A' button is pressed.
-    new JoystickButton(m_driverController, Button.kA.value)
-        .whenPressed(new GrabHatch(m_hatchSubsystem));
+    new JoystickButton(m_driverController, Button.kA.value).onTrue(new GrabHatch(m_hatchSubsystem));
     // Release the hatch when the 'B' button is pressed.
     new JoystickButton(m_driverController, Button.kB.value)
-        .whenPressed(new ReleaseHatch(m_hatchSubsystem));
+        .onTrue(new ReleaseHatch(m_hatchSubsystem));
     // While holding the shoulder button, drive at half speed
     new JoystickButton(m_driverController, Button.kRightBumper.value)
-        .whenHeld(new HalveDriveSpeed(m_robotDrive));
+        .whileTrue(new HalveDriveSpeed(m_robotDrive));
   }
 
   /**

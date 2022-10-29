@@ -4,6 +4,7 @@
 
 #include "frc/DriverStation.h"  // NOLINT(build/include_order)
 
+#include <hal/DriverStation.h>
 #include <units/math.h>
 #include <units/time.h>
 
@@ -20,10 +21,15 @@
 TEST(DriverStationTest, WaitForData) {
   units::microsecond_t initialTime(frc::RobotController::GetFPGATime());
 
+  wpi::Event waitEvent{true};
+  HAL_ProvideNewDataEventHandle(waitEvent.GetHandle());
+
   // 20ms waiting intervals * 50 = 1s
   for (int i = 0; i < 50; i++) {
-    frc::DriverStation::WaitForData();
+    wpi::WaitForObject(waitEvent.GetHandle());
   }
+
+  HAL_RemoveNewDataEventHandle(waitEvent.GetHandle());
 
   units::microsecond_t finalTime(frc::RobotController::GetFPGATime());
 

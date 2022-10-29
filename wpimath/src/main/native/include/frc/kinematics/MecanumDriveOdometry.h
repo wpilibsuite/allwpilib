@@ -30,10 +30,12 @@ class WPILIB_DLLEXPORT MecanumDriveOdometry {
    *
    * @param kinematics The mecanum drive kinematics for your drivetrain.
    * @param gyroAngle The angle reported by the gyroscope.
+   * @param wheelPositions The current distances measured by each wheel.
    * @param initialPose The starting position of the robot on the field.
    */
   explicit MecanumDriveOdometry(MecanumDriveKinematics kinematics,
                                 const Rotation2d& gyroAngle,
+                                const MecanumDriveWheelPositions wheelPositions,
                                 const Pose2d& initialPose = Pose2d{});
 
   /**
@@ -44,11 +46,14 @@ class WPILIB_DLLEXPORT MecanumDriveOdometry {
    *
    * @param pose The position on the field that your robot is at.
    * @param gyroAngle The angle reported by the gyroscope.
+   * @param wheelPositions The current distances measured by each wheel.
    */
-  void ResetPosition(const Pose2d& pose, const Rotation2d& gyroAngle) {
+  void ResetPosition(const Pose2d& pose, const Rotation2d& gyroAngle,
+                     const MecanumDriveWheelPositions wheelPositions) {
     m_pose = pose;
     m_previousAngle = pose.Rotation();
     m_gyroOffset = m_pose.Rotation() - gyroAngle;
+    m_previousWheelPositions = wheelPositions;
   }
 
   /**
@@ -59,45 +64,23 @@ class WPILIB_DLLEXPORT MecanumDriveOdometry {
 
   /**
    * Updates the robot's position on the field using forward kinematics and
-   * integration of the pose over time. This method takes in the current time as
-   * a parameter to calculate period (difference between two timestamps). The
-   * period is used to calculate the change in distance from a velocity. This
-   * also takes in an angle parameter which is used instead of the
-   * angular rate that is calculated from forward kinematics.
-   *
-   * @param currentTime The current time.
-   * @param gyroAngle The angle reported by the gyroscope.
-   * @param wheelSpeeds The current wheel speeds.
-   *
-   * @return The new pose of the robot.
-   */
-  const Pose2d& UpdateWithTime(units::second_t currentTime,
-                               const Rotation2d& gyroAngle,
-                               MecanumDriveWheelSpeeds wheelSpeeds);
-
-  /**
-   * Updates the robot's position on the field using forward kinematics and
-   * integration of the pose over time. This method automatically calculates
-   * the current time to calculate period (difference between two timestamps).
-   * The period is used to calculate the change in distance from a velocity.
-   * This also takes in an angle parameter which is used instead of the
-   * angular rate that is calculated from forward kinematics.
+   * integration of the pose over time. This method takes in an angle parameter
+   * which is used instead of the angular rate that is calculated from forward
+   * kinematics, in addition to the current distance measurement at each wheel.
    *
    * @param gyroAngle The angle reported by the gyroscope.
-   * @param wheelSpeeds The current wheel speeds.
+   * @param wheelPositions The current distances measured by each wheel.
    *
    * @return The new pose of the robot.
    */
   const Pose2d& Update(const Rotation2d& gyroAngle,
-                       MecanumDriveWheelSpeeds wheelSpeeds) {
-    return UpdateWithTime(wpi::Now() * 1.0e-6_s, gyroAngle, wheelSpeeds);
-  }
+                       const MecanumDriveWheelPositions wheelPositions);
 
  private:
   MecanumDriveKinematics m_kinematics;
   Pose2d m_pose;
 
-  units::second_t m_previousTime = -1_s;
+  MecanumDriveWheelPositions m_previousWheelPositions;
   Rotation2d m_previousAngle;
   Rotation2d m_gyroOffset;
 };

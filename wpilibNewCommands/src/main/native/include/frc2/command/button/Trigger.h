@@ -14,6 +14,7 @@
 #include <frc/event/EventLoop.h>
 #include <frc/filter/Debouncer.h>
 #include <units/time.h>
+#include <wpi/deprecated.h>
 
 #include "frc2/command/Command.h"
 #include "frc2/command/CommandScheduler.h"
@@ -21,14 +22,14 @@
 namespace frc2 {
 class Command;
 /**
- * This class is a command-based wrapper around {@link BooleanEvent}, providing
- * an easy way to link commands to inputs.
+ * This class is a command-based wrapper around {@link frc::BooleanEvent},
+ * providing an easy way to link commands to inputs.
  *
  * This class is provided by the NewCommands VendorDep
  *
  * @see Button
  */
-class Trigger : public frc::BooleanEvent {
+class Trigger {
  public:
   /**
    * Creates a new trigger with the given condition determining whether it is
@@ -39,8 +40,8 @@ class Trigger : public frc::BooleanEvent {
    * @param isActive returns whether or not the trigger should be active
    */
   explicit Trigger(std::function<bool()> isActive)
-      : BooleanEvent{CommandScheduler::GetInstance().GetDefaultButtonLoop(),
-                     std::move(isActive)} {}
+      : m_event{CommandScheduler::GetInstance().GetDefaultButtonLoop(),
+                std::move(isActive)} {}
 
   /**
    * Create a new trigger that is active when the given condition is true.
@@ -49,7 +50,7 @@ class Trigger : public frc::BooleanEvent {
    * @param isActive Whether the trigger is active.
    */
   Trigger(frc::EventLoop* loop, std::function<bool()> isActive)
-      : BooleanEvent{loop, std::move(isActive)} {}
+      : m_event{loop, std::move(isActive)} {}
 
   /**
    * Create a new trigger that is never active (default constructor) - activity
@@ -60,23 +61,153 @@ class Trigger : public frc::BooleanEvent {
   Trigger(const Trigger& other);
 
   /**
+   * Starts the given command whenever the signal rises from `false` to `true`.
+   *
+   * <p>Takes a raw pointer, and so is non-owning; users are responsible for the
+   * lifespan of the command.
+   *
+   * @param command the command to start
+   * @return this trigger, so calls can be chained
+   * @see #Rising()
+   */
+  Trigger OnTrue(Command* command);
+
+  /**
+   * Starts the given command whenever the signal rises from `false` to `true`.
+   * Moves command ownership to the button scheduler.
+   *
+   * @param command The command to bind.
+   * @return The trigger, for chained calls.
+   */
+  Trigger OnTrue(CommandPtr&& command);
+
+  /**
+   * Starts the given command whenever the signal falls from `true` to `false`.
+   *
+   * <p>Takes a raw pointer, and so is non-owning; users are responsible for the
+   * lifespan of the command.
+   *
+   * @param command the command to start
+   * @return this trigger, so calls can be chained
+   * @see #Falling()
+   */
+  Trigger OnFalse(Command* command);
+
+  /**
+   * Starts the given command whenever the signal falls from `true` to `false`.
+   *
+   * @param command The command to bind.
+   * @return The trigger, for chained calls.
+   */
+  Trigger OnFalse(CommandPtr&& command);
+
+  /**
+   * Starts the given command when the signal rises to `true` and cancels it
+   * when the signal falls to `false`.
+   *
+   * <p>Doesn't re-start the command in-between.
+   *
+   * <p>Takes a raw pointer, and so is non-owning; users are responsible for the
+   * lifespan of the command.
+   *
+   * @param command the command to start
+   * @return this trigger, so calls can be chained
+   */
+  Trigger WhileTrue(Command* command);
+
+  /**
+   * Starts the given command when the signal rises to `true` and cancels it
+   * when the signal falls to `false`. Moves command ownership to the button
+   * scheduler.
+   *
+   * @param command The command to bind.
+   * @return The trigger, for chained calls.
+   */
+  Trigger WhileTrue(CommandPtr&& command);
+
+  /**
+   * Starts the given command when the signal falls to `false` and cancels
+   * it when the signal rises.
+   *
+   * <p>Doesn't re-start the command in-between.
+   *
+   * <p>Takes a raw pointer, and so is non-owning; users are responsible for the
+   * lifespan of the command.
+   *
+   * @param command the command to start
+   * @return this trigger, so calls can be chained
+   */
+  Trigger WhileFalse(Command* command);
+
+  /**
+   * Starts the given command when the signal falls to `false` and cancels
+   * it when the signal rises. Moves command ownership to the button
+   * scheduler.
+   *
+   * @param command The command to bind.
+   * @return The trigger, for chained calls.
+   */
+  Trigger WhileFalse(CommandPtr&& command);
+
+  /**
+   * Toggles a command when the signal rises from `false` to the high
+   * state.
+   *
+   * <p>Takes a raw pointer, and so is non-owning; users are responsible for the
+   * lifespan of the command.
+   *
+   * @param command the command to toggle
+   * @return this trigger, so calls can be chained
+   */
+  Trigger ToggleOnTrue(Command* command);
+
+  /**
+   * Toggles a command when the signal rises from `false` to the high
+   * state.
+   *
+   * <p>Takes a raw pointer, and so is non-owning; users are responsible for the
+   * lifespan of the command.
+   *
+   * @param command the command to toggle
+   * @return this trigger, so calls can be chained
+   */
+  Trigger ToggleOnTrue(CommandPtr&& command);
+
+  /**
+   * Toggles a command when the signal falls from `true` to the low
+   * state.
+   *
+   * <p>Takes a raw pointer, and so is non-owning; users are responsible for the
+   * lifespan of the command.
+   *
+   * @param command the command to toggle
+   * @return this trigger, so calls can be chained
+   */
+  Trigger ToggleOnFalse(Command* command);
+
+  /**
+   * Toggles a command when the signal falls from `true` to the low
+   * state.
+   *
+   * <p>Takes a raw pointer, and so is non-owning; users are responsible for the
+   * lifespan of the command.
+   *
+   * @param command the command to toggle
+   * @return this trigger, so calls can be chained
+   */
+  Trigger ToggleOnFalse(CommandPtr&& command);
+
+  /**
    * Binds a command to start when the trigger becomes active. Takes a
    * raw pointer, and so is non-owning; users are responsible for the lifespan
    * of the command.
    *
    * @param command The command to bind.
    * @return The trigger, for chained calls.
+   * @deprecated Use OnTrue(Command) instead
    */
+  WPI_DEPRECATED("Use OnTrue(Command) instead")
   Trigger WhenActive(Command* command);
-
-  /**
-   * Binds a command to start when the trigger becomes active. Moves
-   * command ownership to the button scheduler.
-   *
-   * @param command The command to bind.
-   * @return The trigger, for chained calls.
-   */
-  Trigger WhenActive(CommandPtr&& command);
 
   /**
    * Binds a command to start when the trigger becomes active. Transfers
@@ -86,11 +217,13 @@ class Trigger : public frc::BooleanEvent {
    *
    * @param command The command to bind.
    * @return The trigger, for chained calls.
+   * @deprecated Use OnTrue(Command) instead
    */
   template <class T, typename = std::enable_if_t<std::is_base_of_v<
                          Command, std::remove_reference_t<T>>>>
+  WPI_DEPRECATED("Use OnTrue(Command) instead")
   Trigger WhenActive(T&& command) {
-    this->Rising().IfHigh(
+    m_event.Rising().IfHigh(
         [command = std::make_unique<std::remove_reference_t<T>>(
              std::forward<T>(command))] { command->Schedule(); });
 
@@ -102,7 +235,11 @@ class Trigger : public frc::BooleanEvent {
    *
    * @param toRun the runnable to execute.
    * @param requirements the required subsystems.
+   * @deprecated Use OnTrue(Command) instead and construct the InstantCommand
+   * manually
    */
+  WPI_DEPRECATED(
+      "Use OnTrue(Command) instead and construct the InstantCommand manually")
   Trigger WhenActive(std::function<void()> toRun,
                      std::initializer_list<Subsystem*> requirements);
 
@@ -111,7 +248,11 @@ class Trigger : public frc::BooleanEvent {
    *
    * @param toRun the runnable to execute.
    * @param requirements the required subsystems.
+   * @deprecated Use OnTrue(Command) instead and construct the InstantCommand
+   * manually
    */
+  WPI_DEPRECATED(
+      "Use OnTrue(Command) instead and construct the InstantCommand manually")
   Trigger WhenActive(std::function<void()> toRun,
                      std::span<Subsystem* const> requirements = {});
 
@@ -122,18 +263,13 @@ class Trigger : public frc::BooleanEvent {
    *
    * @param command The command to bind.
    * @return The trigger, for chained calls.
+   * @deprecated Use WhileTrue(Command) with RepeatCommand, or bind
+   command::Schedule with IfHigh(std::function<void()>).
    */
+  WPI_DEPRECATED(
+      "Use WhileTrue(Command) with RepeatCommand, or bind command::Schedule "
+      "with IfHigh(std::function<void()>).")
   Trigger WhileActiveContinous(Command* command);
-
-  /**
-   * Binds a command to be started repeatedly while the trigger is active, and
-   * canceled when it becomes inactive. Moves command ownership to the button
-   * scheduler.
-   *
-   * @param command The command to bind.
-   * @return The trigger, for chained calls.
-   */
-  Trigger WhileActiveContinous(CommandPtr&& command);
 
   /**
    * Binds a command to be started repeatedly while the trigger is active, and
@@ -143,14 +279,19 @@ class Trigger : public frc::BooleanEvent {
    *
    * @param command The command to bind.
    * @return The trigger, for chained calls.
+   * @deprecated Use WhileTrue(Command) with RepeatCommand, or bind
+   command::Schedule with IfHigh(std::function<void()>).
    */
   template <class T, typename = std::enable_if_t<std::is_base_of_v<
                          Command, std::remove_reference_t<T>>>>
+  WPI_DEPRECATED(
+      "Use WhileTrue(Command) with RepeatCommand, or bind command::Schedule "
+      "with IfHigh(std::function<void()>).")
   Trigger WhileActiveContinous(T&& command) {
     std::shared_ptr<T> ptr =
         std::make_shared<std::remove_reference_t<T>>(std::forward<T>(command));
-    this->IfHigh([ptr] { ptr->Schedule(); });
-    this->Falling().IfHigh([ptr] { ptr->Cancel(); });
+    m_event.IfHigh([ptr] { ptr->Schedule(); });
+    m_event.Falling().IfHigh([ptr] { ptr->Cancel(); });
 
     return *this;
   }
@@ -160,7 +301,9 @@ class Trigger : public frc::BooleanEvent {
    *
    * @param toRun the runnable to execute.
    * @param requirements the required subsystems.
+   * @deprecated Use WhileTrue(Command) and construct a RunCommand manually
    */
+  WPI_DEPRECATED("Use WhileTrue(Command) and construct a RunCommand manually")
   Trigger WhileActiveContinous(std::function<void()> toRun,
                                std::initializer_list<Subsystem*> requirements);
 
@@ -169,7 +312,9 @@ class Trigger : public frc::BooleanEvent {
    *
    * @param toRun the runnable to execute.
    * @param requirements the required subsystems.
+   * @deprecated Use WhileTrue(Command) and construct a RunCommand manually
    */
+  WPI_DEPRECATED("Use WhileTrue(Command) and construct a RunCommand manually")
   Trigger WhileActiveContinous(std::function<void()> toRun,
                                std::span<Subsystem* const> requirements = {});
 
@@ -180,18 +325,10 @@ class Trigger : public frc::BooleanEvent {
    *
    * @param command The command to bind.
    * @return The trigger, for chained calls.
+   * @deprecated Use WhileTrue(Command) instead.
    */
+  WPI_DEPRECATED("Use WhileTrue(Command) instead.")
   Trigger WhileActiveOnce(Command* command);
-
-  /**
-   * Binds a command to be started when the trigger becomes active, and
-   * canceled when it becomes inactive. Moves command ownership to the button
-   * scheduler.
-   *
-   * @param command The command to bind.
-   * @return The trigger, for chained calls.
-   */
-  Trigger WhileActiveOnce(CommandPtr&& command);
 
   /**
    * Binds a command to be started when the trigger becomes active, and
@@ -201,15 +338,17 @@ class Trigger : public frc::BooleanEvent {
    *
    * @param command The command to bind.
    * @return The trigger, for chained calls.
+   * @deprecated Use WhileTrue(Command) instead.
    */
   template <class T, typename = std::enable_if_t<std::is_base_of_v<
                          Command, std::remove_reference_t<T>>>>
+  WPI_DEPRECATED("Use WhileTrue(Command) instead.")
   Trigger WhileActiveOnce(T&& command) {
     std::shared_ptr<T> ptr =
         std::make_shared<std::remove_reference_t<T>>(std::forward<T>(command));
 
-    this->Rising().IfHigh([ptr] { ptr->Schedule(); });
-    this->Falling().IfHigh([ptr] { ptr->Cancel(); });
+    m_event.Rising().IfHigh([ptr] { ptr->Schedule(); });
+    m_event.Falling().IfHigh([ptr] { ptr->Cancel(); });
 
     return *this;
   }
@@ -221,17 +360,10 @@ class Trigger : public frc::BooleanEvent {
    *
    * @param command The command to bind.
    * @return The trigger, for chained calls.
+   * @deprecated Use OnFalse(Command) instead.
    */
+  WPI_DEPRECATED("Use OnFalse(Command) instead.")
   Trigger WhenInactive(Command* command);
-
-  /**
-   * Binds a command to start when the trigger becomes inactive. Moves
-   * command ownership to the button scheduler.
-   *
-   * @param command The command to bind.
-   * @return The trigger, for chained calls.
-   */
-  Trigger WhenInactive(CommandPtr&& command);
 
   /**
    * Binds a command to start when the trigger becomes inactive.  Transfers
@@ -241,11 +373,13 @@ class Trigger : public frc::BooleanEvent {
    *
    * @param command The command to bind.
    * @return The trigger, for chained calls.
+   * @deprecated Use OnFalse(Command) instead.
    */
   template <class T, typename = std::enable_if_t<std::is_base_of_v<
                          Command, std::remove_reference_t<T>>>>
+  WPI_DEPRECATED("Use OnFalse(Command) instead.")
   Trigger WhenInactive(T&& command) {
-    this->Falling().IfHigh(
+    m_event.Falling().IfHigh(
         [command = std::make_unique<std::remove_reference_t<T>>(
              std::forward<T>(command))] { command->Schedule(); });
 
@@ -257,7 +391,11 @@ class Trigger : public frc::BooleanEvent {
    *
    * @param toRun the runnable to execute.
    * @param requirements the required subsystems.
+   * @deprecated Use OnFalse(Command) instead and construct the InstantCommand
+   * manually
    */
+  WPI_DEPRECATED(
+      "Use OnFalse(Command) instead and construct the InstantCommand manually")
   Trigger WhenInactive(std::function<void()> toRun,
                        std::initializer_list<Subsystem*> requirements);
 
@@ -266,7 +404,11 @@ class Trigger : public frc::BooleanEvent {
    *
    * @param toRun the runnable to execute.
    * @param requirements the required subsystems.
+   * @deprecated Use OnFalse(Command) instead and construct the InstantCommand
+   * manually
    */
+  WPI_DEPRECATED(
+      "Use OnFalse(Command) instead and construct the InstantCommand manually")
   Trigger WhenInactive(std::function<void()> toRun,
                        std::span<Subsystem* const> requirements = {});
 
@@ -277,18 +419,10 @@ class Trigger : public frc::BooleanEvent {
    *
    * @param command The command to bind.
    * @return The trigger, for chained calls.
+   * @deprecated Use ToggleOnTrue(Command) instead.
    */
+  WPI_DEPRECATED("Use ToggleOnTrue(Command) instead.")
   Trigger ToggleWhenActive(Command* command);
-
-  /**
-   * Binds a command to start when the trigger becomes active, and be canceled
-   * when it again becomes active. Moves command ownership to the button
-   * scheduler.
-   *
-   * @param command The command to bind.
-   * @return The trigger, for chained calls.
-   */
-  Trigger ToggleWhenActive(CommandPtr&& command);
 
   /**
    * Binds a command to start when the trigger becomes active, and be canceled
@@ -298,11 +432,13 @@ class Trigger : public frc::BooleanEvent {
    *
    * @param command The command to bind.
    * @return The trigger, for chained calls.
+   * @deprecated Use ToggleOnTrue(Command) instead.
    */
   template <class T, typename = std::enable_if_t<std::is_base_of_v<
                          Command, std::remove_reference_t<T>>>>
+  WPI_DEPRECATED("Use ToggleOnTrue(Command) instead.")
   Trigger ToggleWhenActive(T&& command) {
-    this->Rising().IfHigh(
+    m_event.Rising().IfHigh(
         [command = std::make_unique<std::remove_reference_t<T>>(
              std::forward<T>(command))] {
           if (!command->IsScheduled()) {
@@ -322,7 +458,10 @@ class Trigger : public frc::BooleanEvent {
    *
    * @param command The command to bind.
    * @return The trigger, for chained calls.
+   * @deprecated Use Rising() as a command end condition with Until() instead.
    */
+  WPI_DEPRECATED(
+      "Use Rising() as a command end condition with Until() instead.")
   Trigger CancelWhenActive(Command* command);
 
   /**
@@ -330,14 +469,14 @@ class Trigger : public frc::BooleanEvent {
    *
    * @return a new event representing when this one newly changes to true.
    */
-  Trigger Rising() { return BooleanEvent::Rising().CastTo<Trigger>(); }
+  Trigger Rising() { return m_event.Rising().CastTo<Trigger>(); }
 
   /**
    * Get a new event that triggers only when this one newly changes to false.
    *
    * @return a new event representing when this one newly changes to false.
    */
-  Trigger Falling() { return BooleanEvent::Falling().CastTo<Trigger>(); }
+  Trigger Falling() { return m_event.Falling().CastTo<Trigger>(); }
 
   /**
    * Composes two triggers with logical AND.
@@ -345,7 +484,7 @@ class Trigger : public frc::BooleanEvent {
    * @return A trigger which is active when both component triggers are active.
    */
   Trigger operator&&(std::function<bool()> rhs) {
-    return BooleanEvent::operator&&(rhs).CastTo<Trigger>();
+    return m_event.operator&&(rhs).CastTo<Trigger>();
   }
 
   /**
@@ -354,7 +493,7 @@ class Trigger : public frc::BooleanEvent {
    * @return A trigger which is active when either component trigger is active.
    */
   Trigger operator||(std::function<bool()> rhs) {
-    return BooleanEvent::operator||(rhs).CastTo<Trigger>();
+    return m_event.operator||(rhs).CastTo<Trigger>();
   }
 
   /**
@@ -363,7 +502,7 @@ class Trigger : public frc::BooleanEvent {
    * @return A trigger which is active when the component trigger is inactive,
    * and vice-versa.
    */
-  Trigger operator!() { return BooleanEvent::operator!().CastTo<Trigger>(); }
+  Trigger operator!() { return m_event.operator!().CastTo<Trigger>(); }
 
   /**
    * Creates a new debounced trigger from this trigger - it will become active
@@ -376,7 +515,15 @@ class Trigger : public frc::BooleanEvent {
   Trigger Debounce(units::second_t debounceTime,
                    frc::Debouncer::DebounceType type =
                        frc::Debouncer::DebounceType::kRising) {
-    return BooleanEvent::Debounce(debounceTime, type).CastTo<Trigger>();
+    return m_event.Debounce(debounceTime, type).CastTo<Trigger>();
   }
+
+  /**
+   * Get the wrapped BooleanEvent instance.
+   */
+  frc::BooleanEvent GetEvent() const;
+
+ private:
+  frc::BooleanEvent m_event;
 };
 }  // namespace frc2

@@ -25,7 +25,7 @@ namespace frc {
  * easy but more accurate drop-in for MecanumDriveOdometry.
  *
  * Update() should be called every robot loop. If your loops are faster or
- * slower than the default of 0.02s, then you should change the nominal delta
+ * slower than the default of 20 ms, then you should change the nominal delta
  * time by specifying it in the constructor.
  *
  * AddVisionMeasurement() can be called as infrequently as you want; if you
@@ -35,11 +35,15 @@ namespace frc {
  * The state-space system used internally has the following states (x), inputs
  * (u), and outputs (y):
  *
- * <strong> x = [x, y, theta]ᵀ </strong> in the field coordinate system
- * containing x position, y position, and heading.
+ * <strong> x = [x, y, theta, s_fl, s_fr, s_rl, s_rr]ᵀ </strong> in the field
+ * coordinate system containing x position, y position, and heading, followed
+ * by the distance driven by the front left, front right, rear left, and rear
+ * right wheels.
  *
- * <strong> u = [v_x, v_y, omega]ᵀ </strong> containing x velocity, y velocity,
- * and angular velocity in the field coordinate system.
+ * <strong> u = [v_x, v_y, omega, v_fl, v_fr, v_rl, v_rr]ᵀ </strong> containing
+ * x velocity, y velocity, and angular rate in the field coordinate system,
+ * followed by the velocity of the front left, front right, rear left, and rear
+ * right wheels.
  *
  * <strong> y = [x, y, theta]ᵀ </strong> from vision containing x position, y
  * position, and heading; or <strong> y = [theta]ᵀ </strong> containing gyro
@@ -52,17 +56,21 @@ class WPILIB_DLLEXPORT MecanumDrivePoseEstimator {
    *
    * @param gyroAngle                The current gyro angle.
    * @param initialPose              The starting pose estimate.
+   * @param wheelPositions           The distance measured by each wheel.
    * @param kinematics               A correctly-configured kinematics object
    *                                 for your drivetrain.
    * @param stateStdDevs             Standard deviations of model states.
    *                                 Increase these numbers to trust your
    *                                 model's state estimates less. This matrix
-   *                                 is in the form [x, y, theta]ᵀ, with units
-   *                                 in meters and radians.
-   * @param localMeasurementStdDevs  Standard deviation of the gyro measurement.
-   *                                 Increase this number to trust sensor
-   *                                 readings from the gyro less. This matrix is
-   *                                 in the form [theta], with units in radians.
+   *                                 is in the form [x, y, theta, s_fl, s_fr,
+   *                                 s_rl, s_rr]ᵀ, with units in meters and
+   *                                 radians, followed by meters.
+   * @param localMeasurementStdDevs  Standard deviation of the gyro
+   *                                 measurement. Increase this number to trust
+   *                                 sensor readings from the gyro less. This
+   *                                 matrix is in the form [theta, s_fl, s_fr,
+   *                                 s_rl, s_rr], with units in radians,
+   *                                 followed by meters.
    * @param visionMeasurementStdDevs Standard deviations of the vision
    *                                 measurements. Increase these numbers to
    *                                 trust global measurements from vision
@@ -74,11 +82,12 @@ class WPILIB_DLLEXPORT MecanumDrivePoseEstimator {
    */
   MecanumDrivePoseEstimator(
       const Rotation2d& gyroAngle, const Pose2d& initialPose,
+      const MecanumDriveWheelPositions& wheelPositions,
       MecanumDriveKinematics kinematics,
-      const wpi::array<double, 3>& stateStdDevs,
-      const wpi::array<double, 1>& localMeasurementStdDevs,
+      const wpi::array<double, 7>& stateStdDevs,
+      const wpi::array<double, 5>& localMeasurementStdDevs,
       const wpi::array<double, 3>& visionMeasurementStdDevs,
-      units::second_t nominalDt = 0.02_s);
+      units::second_t nominalDt = 20_ms);
 
   /**
    * Sets the pose estimator's trust of global measurements. This might be used
@@ -105,8 +114,10 @@ class WPILIB_DLLEXPORT MecanumDrivePoseEstimator {
    *
    * @param pose      The position on the field that your robot is at.
    * @param gyroAngle The angle reported by the gyroscope.
+   * @param wheelPositions The distances measured at each wheel.
    */
-  void ResetPosition(const Pose2d& pose, const Rotation2d& gyroAngle);
+  void ResetPosition(const Pose2d& pose, const Rotation2d& gyroAngle,
+                     const MecanumDriveWheelPositions& wheelPositions);
 
   /**
    * Gets the pose of the robot at the current time as estimated by the Extended
@@ -190,10 +201,12 @@ class WPILIB_DLLEXPORT MecanumDrivePoseEstimator {
    *
    * @param gyroAngle   The current gyro angle.
    * @param wheelSpeeds The current speeds of the mecanum drive wheels.
+   * @param wheelPositions The distances measured at each wheel.
    * @return The estimated pose of the robot in meters.
    */
   Pose2d Update(const Rotation2d& gyroAngle,
-                const MecanumDriveWheelSpeeds& wheelSpeeds);
+                const MecanumDriveWheelSpeeds& wheelSpeeds,
+                const MecanumDriveWheelPositions& wheelPositions);
 
   /**
    * Updates the the Unscented Kalman Filter using only wheel encoder
@@ -203,17 +216,19 @@ class WPILIB_DLLEXPORT MecanumDrivePoseEstimator {
    * @param currentTime Time at which this method was called, in seconds.
    * @param gyroAngle   The current gyroscope angle.
    * @param wheelSpeeds The current speeds of the mecanum drive wheels.
+   * @param wheelPositions The distances measured at each wheel.
    * @return The estimated pose of the robot in meters.
    */
   Pose2d UpdateWithTime(units::second_t currentTime,
                         const Rotation2d& gyroAngle,
-                        const MecanumDriveWheelSpeeds& wheelSpeeds);
+                        const MecanumDriveWheelSpeeds& wheelSpeeds,
+                        const MecanumDriveWheelPositions& wheelPositions);
 
  private:
-  UnscentedKalmanFilter<3, 3, 1> m_observer;
+  UnscentedKalmanFilter<7, 7, 5> m_observer;
   MecanumDriveKinematics m_kinematics;
   TimeInterpolatableBuffer<Pose2d> m_poseBuffer{1.5_s};
-  std::function<void(const Vectord<3>& u, const Vectord<3>& y)> m_visionCorrect;
+  std::function<void(const Vectord<7>& u, const Vectord<3>& y)> m_visionCorrect;
 
   Eigen::Matrix3d m_visionContR;
 
@@ -222,16 +237,6 @@ class WPILIB_DLLEXPORT MecanumDrivePoseEstimator {
 
   Rotation2d m_gyroOffset;
   Rotation2d m_previousAngle;
-
-  template <int Dim>
-  static wpi::array<double, Dim> StdDevMatrixToArray(
-      const Vectord<Dim>& vector) {
-    wpi::array<double, Dim> array;
-    for (size_t i = 0; i < Dim; ++i) {
-      array[i] = vector(i);
-    }
-    return array;
-  }
 };
 
 }  // namespace frc

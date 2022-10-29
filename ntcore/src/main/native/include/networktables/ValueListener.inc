@@ -17,24 +17,19 @@
 namespace nt {
 
 inline ValueListener::ValueListener(
-    const Subscriber& subscriber, unsigned int mask,
+    Subscriber& subscriber, unsigned int mask,
     std::function<void(const ValueNotification&)> listener)
     : m_handle{AddValueListener(subscriber.GetHandle(), mask, listener)} {}
 
 inline ValueListener::ValueListener(
-    const MultiSubscriber& subscriber, unsigned int mask,
+    MultiSubscriber& subscriber, unsigned int mask,
     std::function<void(const ValueNotification&)> listener)
     : m_handle{AddValueListener(subscriber.GetHandle(), mask, listener)} {}
 
 inline ValueListener::ValueListener(
-    const NetworkTableEntry& entry, unsigned int mask,
+    NetworkTableEntry& entry, unsigned int mask,
     std::function<void(const ValueNotification&)> listener)
     : m_handle{AddValueListener(entry.GetHandle(), mask, listener)} {}
-
-inline ValueListener::ValueListener(
-    NT_Handle subentry, unsigned int mask,
-    std::function<void(const ValueNotification&)> listener)
-    : m_handle{AddValueListener(subentry, mask, listener)} {}
 
 inline ValueListener::ValueListener(ValueListener&& rhs)
     : m_handle(rhs.m_handle) {
@@ -49,6 +44,14 @@ inline ValueListener& ValueListener::operator=(ValueListener&& rhs) {
 inline ValueListener::~ValueListener() {
   if (m_handle != 0) {
     nt::RemoveValueListener(m_handle);
+  }
+}
+
+inline bool ValueListener::WaitForQueue(double timeout) {
+  if (m_handle != 0) {
+    return nt::WaitForValueListenerQueue(m_handle, timeout);
+  } else {
+    return false;
   }
 }
 
@@ -72,24 +75,19 @@ inline ValueListenerPoller::~ValueListenerPoller() {
   }
 }
 
-inline NT_ValueListener ValueListenerPoller::Add(const Subscriber& subscriber,
+inline NT_ValueListener ValueListenerPoller::Add(Subscriber& subscriber,
                                                  unsigned int mask) {
-  return Add(subscriber.GetHandle(), mask);
+  return nt::AddPolledValueListener(m_handle, subscriber.GetHandle(), mask);
 }
 
-inline NT_ValueListener ValueListenerPoller::Add(
-    const MultiSubscriber& subscriber, unsigned int mask) {
-  return Add(subscriber.GetHandle(), mask);
+inline NT_ValueListener ValueListenerPoller::Add(MultiSubscriber& subscriber,
+                                                 unsigned int mask) {
+  return nt::AddPolledValueListener(m_handle, subscriber.GetHandle(), mask);
 }
 
-inline NT_ValueListener ValueListenerPoller::Add(const NetworkTableEntry& entry,
+inline NT_ValueListener ValueListenerPoller::Add(NetworkTableEntry& entry,
                                                  unsigned int mask) {
-  return Add(entry.GetHandle(), mask);
-}
-
-inline NT_ValueListener ValueListenerPoller::Add(NT_Handle subentry,
-                                                 unsigned int mask) {
-  return nt::AddPolledValueListener(m_handle, subentry, mask);
+  return nt::AddPolledValueListener(m_handle, entry.GetHandle(), mask);
 }
 
 inline void ValueListenerPoller::Remove(NT_ValueListener listener) {

@@ -5,6 +5,7 @@
 #include "RobotContainer.h"
 
 #include <frc/shuffleboard/Shuffleboard.h>
+#include <frc2/command/Commands.h>
 #include <frc2/command/button/JoystickButton.h>
 
 #include "commands/DriveDistanceProfiled.h"
@@ -16,7 +17,7 @@ RobotContainer::RobotContainer() {
   ConfigureButtonBindings();
 
   // Set up default drive command
-  m_drive.SetDefaultCommand(frc2::RunCommand(
+  m_drive.SetDefaultCommand(frc2::cmd::Run(
       [this] {
         m_drive.ArcadeDrive(-m_driverController.GetLeftY(),
                             m_driverController.GetRightX());
@@ -30,18 +31,18 @@ void RobotContainer::ConfigureButtonBindings() {
   // While holding the shoulder button, drive at half speed
   frc2::JoystickButton(&m_driverController,
                        frc::XboxController::Button::kRightBumper)
-      .WhenPressed(&m_driveHalfSpeed)
-      .WhenReleased(&m_driveFullSpeed);
+      .OnTrue(&m_driveHalfSpeed)
+      .OnFalse(&m_driveFullSpeed);
 
   // Drive forward by 3 meters when the 'A' button is pressed, with a timeout of
   // 10 seconds
   frc2::JoystickButton(&m_driverController, frc::XboxController::Button::kA)
-      .WhenPressed(DriveDistanceProfiled(3_m, &m_drive).WithTimeout(10_s));
+      .OnTrue(DriveDistanceProfiled(3_m, &m_drive).WithTimeout(10_s));
 
   // Do the same thing as above when the 'B' button is pressed, but defined
   // inline
   frc2::JoystickButton(&m_driverController, frc::XboxController::Button::kB)
-      .WhenPressed(
+      .OnTrue(
           frc2::TrapezoidProfileCommand<units::meters>(
               frc::TrapezoidProfile<units::meters>(
                   // Limit the max acceleration and velocity
@@ -54,7 +55,9 @@ void RobotContainer::ConfigureButtonBindings() {
               },
               // Require the drive
               {&m_drive})
-              .BeforeStarting([this]() { m_drive.ResetEncoders(); })
+              .ToPtr()
+              .BeforeStarting(
+                  frc2::cmd::RunOnce([this]() { m_drive.ResetEncoders(); }, {}))
               .WithTimeout(10_s));
 }
 

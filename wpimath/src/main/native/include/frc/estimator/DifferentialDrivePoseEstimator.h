@@ -25,8 +25,8 @@ namespace frc {
  * same as DifferentialDriveOdometry.
  *
  * Update() should be called every robot loop (if your robot loops are faster or
- * slower than the default, then you should change the nominal delta time via
- * the constructor).
+ * slower than the default of 20 ms, then you should change the nominal delta
+ * time via the constructor).
  *
  * AddVisionMeasurement() can be called as infrequently as you want; if you
  * never call it, then this class will behave like regular encoder odometry.
@@ -83,7 +83,7 @@ class WPILIB_DLLEXPORT DifferentialDrivePoseEstimator {
       const wpi::array<double, 5>& stateStdDevs,
       const wpi::array<double, 3>& localMeasurementStdDevs,
       const wpi::array<double, 3>& visionMeasurementStdDevs,
-      units::second_t nominalDt = 0.02_s);
+      units::second_t nominalDt = 20_ms);
 
   /**
    * Sets the pose estimator's trust of global measurements. This might be used
@@ -232,10 +232,6 @@ class WPILIB_DLLEXPORT DifferentialDrivePoseEstimator {
 
   Rotation2d m_gyroOffset;
   Rotation2d m_previousAngle;
-
-  template <int Dim>
-  static wpi::array<double, Dim> StdDevMatrixToArray(
-      const Vectord<Dim>& stdDevs);
 
   static Vectord<5> F(const Vectord<5>& x, const Vectord<3>& u);
   static Vectord<5> FillStateVector(const Pose2d& pose,

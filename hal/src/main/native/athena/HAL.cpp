@@ -21,6 +21,7 @@
 #include <wpi/mutex.h>
 #include <wpi/timestamp.h>
 
+#include "FPGACalls.h"
 #include "HALInitializer.h"
 #include "HALInternal.h"
 #include "hal/ChipObject.h"
@@ -40,6 +41,7 @@ static uint64_t dsStartTime;
 using namespace hal;
 
 namespace hal {
+void InitializeDriverStation();
 namespace init {
 void InitializeHAL() {
   InitializeCTREPCM();
@@ -393,6 +395,11 @@ HAL_Bool HAL_Initialize(int32_t timeout, int32_t mode) {
     return true;
   }
 
+  int fpgaInit = hal::init::InitializeFPGA();
+  if (fpgaInit != HAL_SUCCESS) {
+    return false;
+  }
+
   hal::init::InitializeHAL();
 
   hal::init::HAL_IsInitialized.store(true);
@@ -425,13 +432,9 @@ HAL_Bool HAL_Initialize(int32_t timeout, int32_t mode) {
     return false;
   }
 
-  status = InterruptManager::Initialize(global->getSystemInterface());
+  InterruptManager::Initialize(global->getSystemInterface());
 
-  if (status != 0) {
-    return false;
-  }
-
-  HAL_InitializeDriverStation();
+  hal::InitializeDriverStation();
 
   dsStartTime = HAL_GetFPGATime(&status);
   if (status != 0) {

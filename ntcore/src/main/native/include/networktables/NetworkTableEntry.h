@@ -112,9 +112,10 @@ class NetworkTableEntry final {
   int64_t GetLastChange() const;
 
   /**
-   * Gets the entry's value. If the entry does not exist, returns nullptr.
+   * Gets the entry's value. If the entry does not exist, returns an empty
+   * value.
    *
-   * @return the entry's value or nullptr if it does not exist.
+   * @return the entry's value or an empty value if it does not exist.
    */
   Value GetValue() const;
 

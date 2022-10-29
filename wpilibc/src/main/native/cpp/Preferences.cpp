@@ -27,7 +27,7 @@ struct Instance {
       nt::NetworkTableInstance::GetDefault().GetTable(kTableName)};
   nt::StringPublisher typePublisher{table->GetStringTopic(".type").Publish()};
   nt::MultiSubscriber tableSubscriber{nt::NetworkTableInstance::GetDefault(),
-                                      {{kTableName}}};
+                                      {{fmt::format("{}/", table->GetPath())}}};
   nt::TopicListener listener;
 };
 }  // namespace
@@ -167,11 +167,12 @@ void Preferences::RemoveAll() {
 Instance::Instance() {
   typePublisher.Set("RobotPreferences");
   listener = nt::TopicListener{
-      table->GetInstance(),
-      {{std::string_view{fmt::format("{}/", table->GetPath())}}},
-      NT_TOPIC_NOTIFY_IMMEDIATE | NT_TOPIC_NOTIFY_PUBLISH,
-      [](const nt::TopicNotification& event) {
-        nt::SetTopicPersistent(event.info.topic, true);
+      tableSubscriber, NT_TOPIC_NOTIFY_IMMEDIATE | NT_TOPIC_NOTIFY_PUBLISH,
+      [typeTopic = typePublisher.GetTopic().GetHandle()](
+          const nt::TopicNotification& event) {
+        if (event.info.topic != typeTopic) {
+          nt::SetTopicPersistent(event.info.topic, true);
+        }
       }};
   HAL_Report(HALUsageReporting::kResourceType_Preferences, 0);
 }
