@@ -235,7 +235,7 @@ void DriverStationSim::SetJoystickType(int stick, int type) {
 }
 
 void DriverStationSim::SetJoystickName(int stick, std::string_view name) {
-  HALSIM_SetJoystickName(stick, name.data());
+  HALSIM_SetJoystickName(stick, name.data(), name.size());
 }
 
 void DriverStationSim::SetJoystickAxisType(int stick, int axis, int type) {
@@ -243,11 +243,11 @@ void DriverStationSim::SetJoystickAxisType(int stick, int axis, int type) {
 }
 
 void DriverStationSim::SetGameSpecificMessage(std::string_view message) {
-  HALSIM_SetGameSpecificMessage(message.data());
+  HALSIM_SetGameSpecificMessage(message.data(), message.size());
 }
 
 void DriverStationSim::SetEventName(std::string_view name) {
-  HALSIM_SetEventName(name.data());
+  HALSIM_SetEventName(name.data(), name.size());
 }
 
 void DriverStationSim::SetMatchType(DriverStation::MatchType type) {
