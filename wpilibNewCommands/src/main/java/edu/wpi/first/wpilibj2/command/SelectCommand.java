@@ -63,7 +63,9 @@ public class SelectCommand extends CommandBase {
    * Creates a new selectcommand.
    *
    * @param toRun a supplier providing the command to run
+   * @deprecated Replace with {@link ProxyCommand}
    */
+  @Deprecated
   public SelectCommand(Supplier<Command> toRun) {
     m_commands = null;
     m_selector = null;

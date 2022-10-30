@@ -25,7 +25,6 @@ std::string GetTypeName(const T& type) {
 }
 
 class PerpetualCommand;
-class ProxyScheduleCommand;
 
 /**
  * A state machine representing a complete action to be performed by the robot.
@@ -225,7 +224,7 @@ safe) semantics.
 
   /**
    * Decorates this command to run "by proxy" by wrapping it in a
-   * ProxyScheduleCommand. This is useful for "forking off" from command groups
+   * ProxyCommand. This is useful for "forking off" from command groups
    * when the user does not wish to extend the command's requirements to the
    * entire command group.
    *
