@@ -33,6 +33,7 @@ void RoboRioData::ResetData() {
   userFaults3V3.Reset(0);
   brownoutVoltage.Reset(6.75);
   m_serialNumber = "";
+  m_comments = "";
 }
 
 int32_t RoboRioData::RegisterSerialNumberCallback(
@@ -70,6 +71,37 @@ void RoboRioData::SetSerialNumber(const char* serialNumber, size_t size) {
   std::scoped_lock lock(m_serialNumberMutex);
   m_serialNumber = std::string(serialNumber, size);
   m_serialNumberCallbacks(m_serialNumber.c_str(), m_serialNumber.size());
+}
+
+int32_t RoboRioData::RegisterCommentsCallback(
+    HAL_RoboRioStringCallback callback, void* param, HAL_Bool initialNotify) {
+  std::scoped_lock lock(m_commentsMutex);
+  int32_t uid = m_commentsCallbacks.Register(callback, param);
+  if (initialNotify) {
+    callback(GetCommentsName(), param, m_comments.c_str(),
+             m_serialNumber.size());
+  }
+  return uid;
+}
+
+void RoboRioData::CancelCommentsCallback(int32_t uid) {
+  m_commentsCallbacks.Cancel(uid);
+}
+
+size_t RoboRioData::GetComments(char* buffer, size_t size) {
+  std::scoped_lock lock(m_commentsMutex);
+  size_t copied = m_comments.copy(buffer, size);
+  // Null terminate if there is room
+  if (copied < size) {
+    buffer[copied] = '\0';
+  }
+  return copied;
+}
+
+void RoboRioData::SetComments(const char* comments, size_t size) {
+  std::scoped_lock lock(m_commentsMutex);
+  m_comments = std::string(comments, size);
+  m_commentsCallbacks(m_comments.c_str(), m_comments.size());
 }
 
 extern "C" {
@@ -111,6 +143,21 @@ size_t HALSIM_GetRoboRioSerialNumber(char* buffer, size_t size) {
 }
 void HALSIM_SetRoboRioSerialNumber(const char* serialNumber, size_t size) {
   SimRoboRioData->SetSerialNumber(serialNumber, size);
+}
+
+int32_t HALSIM_RegisterRoboRioCommentsCallback(
+    HAL_RoboRioStringCallback callback, void* param, HAL_Bool initialNotify) {
+  return SimRoboRioData->RegisterCommentsCallback(callback, param,
+                                                  initialNotify);
+}
+void HALSIM_CancelRoboRioCommentsCallback(int32_t uid) {
+  SimRoboRioData->CancelCommentsCallback(uid);
+}
+size_t HALSIM_GetRoboRioComments(char* buffer, size_t size) {
+  return SimRoboRioData->GetComments(buffer, size);
+}
+void HALSIM_SetRoboRioComments(const char* comments, size_t size) {
+  SimRoboRioData->SetComments(comments, size);
 }
 
 void HALSIM_RegisterRoboRioAllCallbacks(HAL_NotifyCallback callback,

@@ -35,6 +35,12 @@ std::string RobotController::GetSerialNumber() {
   return std::string(serialNum, len);
 }
 
+std::string RobotController::GetComments() {
+  char comments[256];
+  size_t len = HAL_GetComments(comments, sizeof(comments));
+  return std::string(comments, len);
+}
+
 uint64_t RobotController::GetFPGATime() {
   int32_t status = 0;
   uint64_t time = HAL_GetFPGATime(&status);

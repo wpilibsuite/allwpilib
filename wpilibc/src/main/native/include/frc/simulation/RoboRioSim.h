@@ -434,6 +434,20 @@ class RoboRioSim {
   static void SetSerialNumber(std::string_view serialNumber);
 
   /**
+   * Get the comments.
+   *
+   * @return The comments.
+   */
+  static std::string GetComments();
+
+  /**
+   * Set the comments.
+   *
+   * @param comments The comments.
+   */
+  static void SetComments(std::string_view comments);
+
+  /**
    * Reset all simulation data.
    */
   static void ResetData();

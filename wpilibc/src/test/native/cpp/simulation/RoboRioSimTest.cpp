@@ -224,4 +224,15 @@ TEST(RoboRioSimTest, SetSerialNumber) {
   EXPECT_EQ(kSerialNumberTruncated, RobotController::GetSerialNumber());
 }
 
+TEST(RoboRioSimTest, SetComments) {
+  const std::string kComments =
+      "Hello! These are comments that you'd put in the roboRIO web interface.";
+
+  RoboRioSim::ResetData();
+
+  RoboRioSim::SetComments(kComments);
+  EXPECT_EQ(kComments, RoboRioSim::GetComments());
+  EXPECT_EQ(kComments, RobotController::GetComments());
+}
+
 }  // namespace frc::sim

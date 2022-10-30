@@ -287,6 +287,11 @@ size_t HAL_GetSerialNumber(char* buffer, size_t size) {
   }
 }
 
+size_t HAL_GetComments(char* buffer, size_t size) {
+  // TODO: implement file parsing
+  return 0;
+}
+
 uint64_t HAL_GetFPGATime(int32_t* status) {
   hal::init::CheckInit();
   if (!global) {

@@ -52,6 +52,13 @@ class RobotController {
   static std::string GetSerialNumber();
 
   /**
+   * Returns the comments from the roboRIO web interface.
+   *
+   * @return The comments from the roboRIO web interface.
+   */
+  static std::string GetComments();
+
+  /**
    * Read the microsecond-resolution timer on the FPGA.
    *
    * @return The current time in microseconds according to the FPGA (since FPGA

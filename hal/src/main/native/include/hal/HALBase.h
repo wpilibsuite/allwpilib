@@ -82,6 +82,13 @@ int64_t HAL_GetFPGARevision(int32_t* status);
 size_t HAL_GetSerialNumber(char* buffer, size_t size);
 
 /**
+ * Returns the comments from the roboRIO web interface.
+ *
+ * @return Comments.
+ */
+size_t HAL_GetComments(char* buffer, size_t size);
+
+/**
  * Returns the runtime type of the HAL.
  *
  * @return HAL Runtime Type
