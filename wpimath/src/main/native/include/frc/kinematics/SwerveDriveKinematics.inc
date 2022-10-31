@@ -124,26 +124,30 @@ void SwerveDriveKinematics<NumModules>::DesaturateWheelSpeeds(
     units::radians_per_second_t attainableMaxRobotRotationSpeed) {
   auto& states = *moduleStates;
 
-  auto translationalK =
-      units::math::hypot(currentChassisSpeed.vx, currentChassisSpeed.vy) /
-      attainableMaxRobotTranslationSpeed;
+  if(attainableMaxRobotTranslationSpeed != 0_mps || attainableMaxRobotRotationSpeed != 0_rad_per_s) {
+    auto translationalK =
+        units::math::hypot(currentChassisSpeed.vx, currentChassisSpeed.vy) /
+        attainableMaxRobotTranslationSpeed;
 
-  auto rotationalK = units::math::abs(currentChassisSpeed.omega) /
-                     attainableMaxRobotRotationSpeed;
+    auto rotationalK = units::math::abs(currentChassisSpeed.omega) /
+                      attainableMaxRobotRotationSpeed;
 
-  auto k = units::math::max(translationalK, rotationalK);
+    auto k = units::math::max(translationalK, rotationalK);
 
-  auto realMaxSpeed = std::max_element(states.begin(), states.end(),
-                                       [](const auto& a, const auto& b) {
-                                         return units::math::abs(a.speed) <
-                                                units::math::abs(b.speed);
-                                       })
-                          ->speed;
+    auto realMaxSpeed = std::max_element(states.begin(), states.end(),
+                                        [](const auto& a, const auto& b) {
+                                          return units::math::abs(a.speed) <
+                                                  units::math::abs(b.speed);
+                                        })
+                            ->speed;
 
-  auto scale = units::math::min(k * attainableMaxModuleSpeed / realMaxSpeed,
-                                units::scalar_t(1));
-  for (auto& module : states) {
-    module.speed = module.speed * scale;
+    if(realMaxSpeed != 0_mps) {
+      auto scale = units::math::min(k * attainableMaxModuleSpeed / realMaxSpeed,
+                                    units::scalar_t(1));
+      for (auto& module : states) {
+        module.speed = module.speed * scale;
+      }
+    }
   }
 }
 

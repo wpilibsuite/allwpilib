@@ -233,17 +233,22 @@ public class SwerveDriveKinematics {
       double attainableMaxTranslationalSpeedMetersPerSecond,
       double attainableMaxRotationalVelocityRadiansPerSecond) {
 
-    double translationalK =
-        Math.hypot(currentChassisSpeed.vxMetersPerSecond, currentChassisSpeed.vyMetersPerSecond)
-            / attainableMaxTranslationalSpeedMetersPerSecond;
-    double rotationalK =
-        Math.abs(currentChassisSpeed.omegaRadiansPerSecond)
-            / attainableMaxRotationalVelocityRadiansPerSecond;
-    double k = Math.max(translationalK, rotationalK);
-    double realMaxSpeed = Collections.max(Arrays.asList(moduleStates)).speedMetersPerSecond;
-    double scale = Math.min(k * attainableMaxModuleSpeedMetersPerSecond / realMaxSpeed, 1);
-    for (SwerveModuleState moduleState : moduleStates) {
-      moduleState.speedMetersPerSecond *= scale;
+    if (attainableMaxTranslationalSpeedMetersPerSecond != 0
+        || attainableMaxRotationalVelocityRadiansPerSecond != 0) {
+      double translationalK =
+          Math.hypot(currentChassisSpeed.vxMetersPerSecond, currentChassisSpeed.vyMetersPerSecond)
+              / attainableMaxTranslationalSpeedMetersPerSecond;
+      double rotationalK =
+          Math.abs(currentChassisSpeed.omegaRadiansPerSecond)
+              / attainableMaxRotationalVelocityRadiansPerSecond;
+      double k = Math.max(translationalK, rotationalK);
+      double realMaxSpeed = Collections.max(Arrays.asList(moduleStates)).speedMetersPerSecond;
+      if (realMaxSpeed != 0) {
+        double scale = Math.min(k * attainableMaxModuleSpeedMetersPerSecond / realMaxSpeed, 1);
+        for (SwerveModuleState moduleState : moduleStates) {
+          moduleState.speedMetersPerSecond *= scale;
+        }
+      }
     }
   }
 }
