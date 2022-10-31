@@ -16,7 +16,7 @@ public final class ComputerVisionUtil {
   }
 
   /**
-   * Algorithm from https://docs.limelightvision.io/en/latest/cs_estimating_distance.html Estimates
+   * Algorithm from <a href="https://docs.limelightvision.io/en/latest/cs_estimating_distance.html">Limelight</a> Estimates
    * range to a target using the target's elevation. This method can produce more stable results
    * than SolvePNP when well tuned, if the full 6d robot pose is not required. Note that this method
    * requires the camera to have 0 roll (not be skewed clockwise or CCW relative to the floor), and
