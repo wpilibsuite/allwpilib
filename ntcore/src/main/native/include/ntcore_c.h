@@ -914,7 +914,7 @@ NT_Listener NT_AddListenerMultiple(NT_Inst inst,
  * events at NT_LOG_INFO or higher; for more customized settings, use
  * NT_AddLogger().
  *
- * @param topic Topic handle
+ * @param handle Handle
  * @param mask Bitmask of NT_EventFlags values
  * @param data Data passed to callback function
  * @param callback Listener function
@@ -972,7 +972,7 @@ NT_Listener NT_AddPolledListenerMultiple(NT_ListenerPoller poller,
  * NT_AddPolledLogger().
  *
  * @param poller            poller handle
- * @param topic             topic
+ * @param handle            handle
  * @param mask              NT_NotifyKind bitmask
  * @return Listener handle
  */
