@@ -31,7 +31,7 @@ public final class TopicListenerPoller implements AutoCloseable {
   }
 
   /**
-   * Start listening to topic changes on a subscriber.
+   * Start listening to topic changes on a subscriber. This does NOT keep the subscriber active.
    *
    * @param subscriber Subscriber
    * @param eventMask Bitmask of TopicListenerFlags values
@@ -42,7 +42,7 @@ public final class TopicListenerPoller implements AutoCloseable {
   }
 
   /**
-   * Start listening to topic changes on a subscriber.
+   * Start listening to topic changes on a subscriber. This does NOT keep the subscriber active.
    *
    * @param subscriber Subscriber
    * @param eventMask Bitmask of TopicListenerFlags values

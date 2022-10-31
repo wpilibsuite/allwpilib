@@ -31,10 +31,7 @@ namespace nt {
 
 class LocalStorageTest : public ::testing::Test {
  public:
-  LocalStorageTest() {
-    storage.StartNetwork(startup);
-    storage.SetNetwork(&network);
-  }
+  LocalStorageTest() { storage.StartNetwork(startup, &network); }
 
   ::testing::StrictMock<net::MockNetworkStartupInterface> startup;
   ::testing::StrictMock<net::MockNetworkInterface> network;
@@ -64,6 +61,14 @@ TEST_F(LocalStorageTest, GetTopicEmptyName) {
 
 TEST_F(LocalStorageTest, GetEntryEmptyName) {
   EXPECT_EQ(storage.GetEntry(""), 0u);
+}
+
+TEST_F(LocalStorageTest, GetEntryCached) {
+  EXPECT_CALL(network, Subscribe(_, wpi::SpanEq({std::string{"tocache"}}),
+                                 IsPubSubOptions({})));
+
+  auto entry1 = storage.GetEntry("tocache");
+  EXPECT_EQ(entry1, storage.GetEntry("tocache"));
 }
 
 TEST_F(LocalStorageTest, GetTopicName) {

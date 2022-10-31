@@ -197,7 +197,6 @@ NT_SetFloat
 NT_SetFloatArray
 NT_SetInteger
 NT_SetIntegerArray
-NT_SetNetworkIdentity
 NT_SetNow
 NT_SetRaw
 NT_SetServer
@@ -221,6 +220,9 @@ NT_StopServer
 NT_Subscribe
 NT_Unpublish
 NT_Unsubscribe
+NT_WaitForConnectionListenerQueue
+NT_WaitForTopicListenerQueue
+NT_WaitForValueListenerQueue
 WPI_CreateEvent
 WPI_CreateSemaphore
 WPI_CreateSignalObject

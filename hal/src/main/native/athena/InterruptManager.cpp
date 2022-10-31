@@ -6,33 +6,10 @@
 
 #include <fmt/format.h>
 
+#include "FPGACalls.h"
 #include "HALInternal.h"
 #include "dlfcn.h"
 #include "hal/Errors.h"
-
-// Low level FPGA calls
-using HAL_NiFpga_ReserveIrqContextFunc =
-    NiFpga_Status (*)(NiFpga_Session session, NiFpga_IrqContext* context);
-
-static HAL_NiFpga_ReserveIrqContextFunc HAL_NiFpga_ReserveIrqContext;
-
-using HAL_NiFpga_UnreserveIrqContextFunc =
-    NiFpga_Status (*)(NiFpga_Session session, NiFpga_IrqContext context);
-
-static HAL_NiFpga_UnreserveIrqContextFunc HAL_NiFpga_UnreserveIrqContext;
-
-using HAL_NiFpga_WaitOnIrqsFunc = NiFpga_Status (*)(
-    NiFpga_Session session, NiFpga_IrqContext context, uint32_t irqs,
-    uint32_t timeout, uint32_t* irqsAsserted, NiFpga_Bool* timedOut);
-
-static HAL_NiFpga_WaitOnIrqsFunc HAL_NiFpga_WaitOnIrqs;
-
-using HAL_NiFpga_AcknowledgeIrqsFunc = NiFpga_Status (*)(NiFpga_Session session,
-                                                         uint32_t irqs);
-
-static HAL_NiFpga_AcknowledgeIrqsFunc HAL_NiFpga_AcknowledgeIrqs;
-
-static void* NiFpgaLibrary = nullptr;
 
 using namespace hal;
 
@@ -41,37 +18,9 @@ InterruptManager& InterruptManager::GetInstance() {
   return manager;
 }
 
-int32_t InterruptManager::Initialize(tSystemInterface* baseSystem) {
+void InterruptManager::Initialize(tSystemInterface* baseSystem) {
   auto& manager = GetInstance();
   manager.fpgaSession = baseSystem->getHandle();
-
-  NiFpgaLibrary = dlopen("libNiFpga.so", RTLD_LAZY);
-  if (!NiFpgaLibrary) {
-    return errno;
-  }
-
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wpedantic"
-  HAL_NiFpga_ReserveIrqContext =
-      reinterpret_cast<HAL_NiFpga_ReserveIrqContextFunc>(
-          dlsym(NiFpgaLibrary, "NiFpgaDll_ReserveIrqContext"));
-  HAL_NiFpga_UnreserveIrqContext =
-      reinterpret_cast<HAL_NiFpga_UnreserveIrqContextFunc>(
-          dlsym(NiFpgaLibrary, "NiFpgaDll_UnreserveIrqContext"));
-  HAL_NiFpga_WaitOnIrqs = reinterpret_cast<HAL_NiFpga_WaitOnIrqsFunc>(
-      dlsym(NiFpgaLibrary, "NiFpgaDll_WaitOnIrqs"));
-  HAL_NiFpga_AcknowledgeIrqs = reinterpret_cast<HAL_NiFpga_AcknowledgeIrqsFunc>(
-      dlsym(NiFpgaLibrary, "NiFpgaDll_AcknowledgeIrqs"));
-#pragma GCC diagnostic pop
-
-  if (HAL_NiFpga_ReserveIrqContext == nullptr ||
-      HAL_NiFpga_UnreserveIrqContext == nullptr ||
-      HAL_NiFpga_WaitOnIrqs == nullptr ||
-      HAL_NiFpga_AcknowledgeIrqs == nullptr) {
-    return NO_AVAILABLE_RESOURCES;
-  }
-
-  return HAL_SUCCESS;
 }
 
 NiFpga_IrqContext InterruptManager::GetContext() noexcept {

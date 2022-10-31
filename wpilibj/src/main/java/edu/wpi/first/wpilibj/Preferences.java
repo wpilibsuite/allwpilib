@@ -13,6 +13,7 @@ import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.StringPublisher;
+import edu.wpi.first.networktables.Topic;
 import edu.wpi.first.networktables.TopicListener;
 import edu.wpi.first.networktables.TopicListenerFlags;
 import java.util.Collection;
@@ -75,10 +76,14 @@ public final class Preferences {
     }
     m_listener =
         new TopicListener(
-            m_table.getInstance(),
-            new String[] {m_table.getPath() + "/"},
+            m_tableSubscriber,
             TopicListenerFlags.kImmediate | TopicListenerFlags.kPublish,
-            event -> event.info.getTopic().setPersistent(true));
+            event -> {
+              Topic topic = event.info.getTopic();
+              if (!topic.equals(m_typePublisher.getTopic())) {
+                event.info.getTopic().setPersistent(true);
+              }
+            });
   }
 
   /**

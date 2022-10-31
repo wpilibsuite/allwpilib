@@ -11,10 +11,6 @@
 
 using namespace frc;
 
-Translation3d::Translation3d(units::meter_t x, units::meter_t y,
-                             units::meter_t z)
-    : m_x(x), m_y(y), m_z(z) {}
-
 Translation3d::Translation3d(units::meter_t distance, const Rotation3d& angle) {
   auto rectangular = Translation3d{distance, 0_m, 0_m}.RotateBy(angle);
   m_x = rectangular.X();
@@ -37,30 +33,6 @@ Translation3d Translation3d::RotateBy(const Rotation3d& other) const {
   auto qprime = other.GetQuaternion() * p * other.GetQuaternion().Inverse();
   return Translation3d{units::meter_t{qprime.X()}, units::meter_t{qprime.Y()},
                        units::meter_t{qprime.Z()}};
-}
-
-Translation2d Translation3d::ToTranslation2d() const {
-  return Translation2d{m_x, m_y};
-}
-
-Translation3d Translation3d::operator+(const Translation3d& other) const {
-  return {X() + other.X(), Y() + other.Y(), Z() + other.Z()};
-}
-
-Translation3d Translation3d::operator-(const Translation3d& other) const {
-  return *this + -other;
-}
-
-Translation3d Translation3d::operator-() const {
-  return {-m_x, -m_y, -m_z};
-}
-
-Translation3d Translation3d::operator*(double scalar) const {
-  return {scalar * m_x, scalar * m_y, scalar * m_z};
-}
-
-Translation3d Translation3d::operator/(double scalar) const {
-  return *this * (1.0 / scalar);
 }
 
 bool Translation3d::operator==(const Translation3d& other) const {

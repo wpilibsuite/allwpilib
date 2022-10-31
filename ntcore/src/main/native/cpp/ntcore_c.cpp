@@ -423,6 +423,10 @@ NT_TopicListener NT_AddTopicListenerSingle(NT_Topic topic, unsigned int mask,
   });
 }
 
+NT_Bool NT_WaitForTopicListenerQueue(NT_Handle handle, double timeout) {
+  return nt::WaitForTopicListenerQueue(handle, timeout);
+}
+
 NT_TopicListenerPoller NT_CreateTopicListenerPoller(NT_Inst inst) {
   return nt::CreateTopicListenerPoller(inst);
 }
@@ -477,6 +481,10 @@ NT_ValueListener NT_AddValueListener(NT_Handle subentry, unsigned int mask,
   });
 }
 
+NT_Bool NT_WaitForValueListenerQueue(NT_Handle handle, double timeout) {
+  return nt::WaitForValueListenerQueue(handle, timeout);
+}
+
 NT_ValueListenerPoller NT_CreateValueListenerPoller(NT_Inst inst) {
   return nt::CreateValueListenerPoller(inst);
 }
@@ -502,17 +510,19 @@ void NT_RemoveValueListener(NT_ValueListener value_listener) {
 }
 
 NT_ConnectionListener NT_AddConnectionListener(
-    NT_Inst inst, void* data, NT_ConnectionListenerCallback callback,
-    NT_Bool immediate_notify) {
-  return nt::AddConnectionListener(
-      inst,
-      [=](const ConnectionNotification& event) {
-        NT_ConnectionNotification event_c;
-        ConvertToC(event, &event_c);
-        callback(data, &event_c);
-        DisposeConnectionNotification(&event_c);
-      },
-      immediate_notify != 0);
+    NT_Inst inst, NT_Bool immediate_notify, void* data,
+    NT_ConnectionListenerCallback callback) {
+  return nt::AddConnectionListener(inst, immediate_notify != 0,
+                                   [=](const ConnectionNotification& event) {
+                                     NT_ConnectionNotification event_c;
+                                     ConvertToC(event, &event_c);
+                                     callback(data, &event_c);
+                                     DisposeConnectionNotification(&event_c);
+                                   });
+}
+
+NT_Bool NT_WaitForConnectionListenerQueue(NT_Handle handle, double timeout) {
+  return nt::WaitForConnectionListenerQueue(handle, timeout);
 }
 
 NT_ConnectionListenerPoller NT_CreateConnectionListenerPoller(NT_Inst inst) {
@@ -542,10 +552,6 @@ void NT_RemoveConnectionListener(NT_ConnectionListener conn_listener) {
  * Client/Server Functions
  */
 
-void NT_SetNetworkIdentity(NT_Inst inst, const char* name, size_t name_len) {
-  nt::SetNetworkIdentity(inst, {name, name_len});
-}
-
 unsigned int NT_GetNetworkMode(NT_Inst inst) {
   return nt::GetNetworkMode(inst);
 }
@@ -568,12 +574,12 @@ void NT_StopServer(NT_Inst inst) {
   nt::StopServer(inst);
 }
 
-void NT_StartClient3(NT_Inst inst) {
-  nt::StartClient3(inst);
+void NT_StartClient3(NT_Inst inst, const char* identity) {
+  nt::StartClient3(inst, identity);
 }
 
-void NT_StartClient4(NT_Inst inst) {
-  nt::StartClient4(inst);
+void NT_StartClient4(NT_Inst inst, const char* identity) {
+  nt::StartClient4(inst, identity);
 }
 
 void NT_StopClient(NT_Inst inst) {

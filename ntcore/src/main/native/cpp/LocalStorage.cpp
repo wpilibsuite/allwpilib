@@ -77,11 +77,13 @@ struct TopicData {
   std::string name;
 
   Value lastValue;  // also stores timestamp
+  bool lastValueNetwork{false};
   NT_Type type{NT_UNASSIGNED};
   std::string typeStr;
   unsigned int flags{0};            // for NT3 APIs
   std::string propertiesStr{"{}"};  // cached string for GetTopicInfo() et al
   wpi::json properties = wpi::json::object();
+  NT_Entry entry{0};  // cached entry for GetEntry()
 
   bool onNetwork{false};  // true if there are any remote publishers
 
@@ -297,6 +299,8 @@ struct TopicListenerThread final : public wpi::SafeThreadEvent {
   wpi::DenseMap<NT_TopicListener,
                 std::function<void(const TopicNotification& event)>>
       m_callbacks;
+  wpi::Event m_waitQueueWakeup;
+  wpi::Event m_waitQueueWaiter;
 };
 
 struct ValueListenerThread final : public wpi::SafeThreadEvent {
@@ -311,6 +315,8 @@ struct ValueListenerThread final : public wpi::SafeThreadEvent {
   wpi::DenseMap<NT_ValueListener,
                 std::function<void(const ValueNotification& event)>>
       m_callbacks;
+  wpi::Event m_waitQueueWakeup;
+  wpi::Event m_waitQueueWaiter;
 };
 
 struct LSImpl {
@@ -530,9 +536,10 @@ void SubscriberData::UpdateActive() {
 
 void TopicListenerThread::Main() {
   while (m_active) {
-    WPI_Handle signaledBuf[2];
-    auto signaled =
-        wpi::WaitForObjects({m_poller, m_stopEvent.GetHandle()}, signaledBuf);
+    WPI_Handle signaledBuf[3];
+    auto signaled = wpi::WaitForObjects(
+        {m_poller, m_stopEvent.GetHandle(), m_waitQueueWakeup.GetHandle()},
+        signaledBuf);
     if (signaled.empty() || !m_active) {
       break;
     }
@@ -551,14 +558,19 @@ void TopicListenerThread::Main() {
         lock.lock();
       }
     }
+    if (std::find(signaled.begin(), signaled.end(),
+                  m_waitQueueWakeup.GetHandle()) != signaled.end()) {
+      m_waitQueueWaiter.Set();
+    }
   }
 }
 
 void ValueListenerThread::Main() {
   while (m_active) {
-    WPI_Handle signaledBuf[2];
-    auto signaled =
-        wpi::WaitForObjects({m_poller, m_stopEvent.GetHandle()}, signaledBuf);
+    WPI_Handle signaledBuf[3];
+    auto signaled = wpi::WaitForObjects(
+        {m_poller, m_stopEvent.GetHandle(), m_waitQueueWakeup.GetHandle()},
+        signaledBuf);
     if (signaled.empty() || !m_active) {
       break;
     }
@@ -576,6 +588,10 @@ void ValueListenerThread::Main() {
         callback(event);
         lock.lock();
       }
+    }
+    if (std::find(signaled.begin(), signaled.end(),
+                  m_waitQueueWakeup.GetHandle()) != signaled.end()) {
+      m_waitQueueWaiter.Set();
     }
   }
 }
@@ -646,6 +662,7 @@ void LSImpl::CheckReset(TopicData* topic) {
     return;
   }
   topic->lastValue = {};
+  topic->lastValueNetwork = false;
   topic->type = NT_UNASSIGNED;
   topic->typeStr.clear();
   topic->flags = 0;
@@ -658,10 +675,13 @@ bool LSImpl::SetValue(TopicData* topic, const Value& value,
   if (topic->type != NT_UNASSIGNED && topic->type != value.type()) {
     return false;
   }
-  if (!topic->lastValue || value.time() >= topic->lastValue.time()) {
+  bool isNetwork = (eventFlags & NT_VALUE_NOTIFY_LOCAL) == 0;
+  if (!topic->lastValue || topic->lastValueNetwork == isNetwork ||
+      value.time() >= topic->lastValue.time()) {
     // TODO: notify option even if older value
     topic->type = value.type();
     topic->lastValue = value;
+    topic->lastValueNetwork = isNetwork;
     NotifyValue(topic, eventFlags);
   }
   if (topic->datalogType == value.type()) {
@@ -999,6 +1019,7 @@ std::unique_ptr<PublisherData> LSImpl::RemoveLocalPublisher(
 
 SubscriberData* LSImpl::AddLocalSubscriber(TopicData* topic,
                                            const PubSubConfig& config) {
+  DEBUG4("AddLocalSubscriber({})", topic->name);
   auto subscriber = m_subscribers.Add(m_inst, topic, config);
   topic->localSubscribers.Add(subscriber);
   // set subscriber to active if the type matches
@@ -1011,6 +1032,7 @@ SubscriberData* LSImpl::AddLocalSubscriber(TopicData* topic,
         topic->name, config.typeStr, topic->typeStr);
   }
   if (m_network) {
+    DEBUG4("-> NetworkSubscribe({})", topic->name);
     m_network->Subscribe(subscriber->handle, {{topic->name}}, config);
   }
   return subscriber;
@@ -1578,7 +1600,8 @@ void LocalStorage::NetworkSetValue(NT_Topic topicHandle, const Value& value) {
   }
 }
 
-void LocalStorage::StartNetwork(net::NetworkStartupInterface& startup) {
+void LocalStorage::StartNetwork(net::NetworkStartupInterface& startup,
+                                net::NetworkInterface* network) {
   std::scoped_lock lock{m_mutex};
   // publish all active publishers to the network and send last values
   // only send value once per topic
@@ -1596,19 +1619,13 @@ void LocalStorage::StartNetwork(net::NetworkStartupInterface& startup) {
     }
   }
   for (auto&& subscriber : m_impl->m_subscribers) {
-    if (subscriber->active) {
-      startup.Subscribe(subscriber->handle, {{subscriber->topic->name}},
-                        subscriber->config);
-    }
+    startup.Subscribe(subscriber->handle, {{subscriber->topic->name}},
+                      subscriber->config);
   }
   for (auto&& subscriber : m_impl->m_multiSubscribers) {
     startup.Subscribe(subscriber->handle, subscriber->prefixes,
                       subscriber->options);
   }
-}
-
-void LocalStorage::SetNetwork(net::NetworkInterface* network) {
-  std::scoped_lock lock{m_mutex};
   m_impl->m_network = network;
 }
 
@@ -1914,6 +1931,7 @@ void LocalStorage::Unpublish(NT_Handle pubentryHandle) {
   } else if (auto entry = m_impl->m_entries.Get(pubentryHandle)) {
     if (entry->publisher) {
       m_impl->RemoveLocalPublisher(entry->publisher->handle);
+      entry->publisher = nullptr;
     }
   } else {
     // TODO: report warning
@@ -2314,11 +2332,15 @@ NT_Entry LocalStorage::GetEntry(std::string_view name) {
   // Get the topic data
   auto* topic = m_impl->GetOrCreateTopic(name);
 
-  // Create subscriber
-  auto* subscriber = m_impl->AddLocalSubscriber(topic, {});
+  if (topic->entry == 0) {
+    // Create subscriber
+    auto* subscriber = m_impl->AddLocalSubscriber(topic, {});
 
-  // Create entry
-  return m_impl->AddEntry(subscriber)->handle;
+    // Create entry
+    topic->entry = m_impl->AddEntry(subscriber)->handle;
+  }
+
+  return topic->entry;
 }
 
 std::string LocalStorage::GetEntryName(NT_Handle subentryHandle) {
@@ -2360,6 +2382,19 @@ NT_TopicListener LocalStorage::AddTopicListener(
     std::function<void(const TopicNotification&)> callback) {
   std::scoped_lock lock{m_mutex};
   return m_impl->AddTopicListener(topicHandle, mask, std::move(callback));
+}
+
+bool LocalStorage::WaitForTopicListenerQueue(double timeout) {
+  std::scoped_lock lock{m_mutex};
+  WPI_EventHandle h;
+  if (auto thr = m_impl->m_topicListenerThread.GetThread()) {
+    h = thr->m_waitQueueWaiter.GetHandle();
+    thr->m_waitQueueWakeup.Set();
+  } else {
+    return false;
+  }
+  bool timedOut;
+  return wpi::WaitForObject(h, timeout, &timedOut);
 }
 
 NT_TopicListenerPoller LocalStorage::CreateTopicListenerPoller() {
@@ -2418,6 +2453,19 @@ NT_ValueListener LocalStorage::AddValueListener(
     std::function<void(const ValueNotification&)> callback) {
   std::scoped_lock lock{m_mutex};
   return m_impl->AddValueListener(subentry, mask, std::move(callback));
+}
+
+bool LocalStorage::WaitForValueListenerQueue(double timeout) {
+  std::scoped_lock lock{m_mutex};
+  WPI_EventHandle h;
+  if (auto thr = m_impl->m_valueListenerThread.GetThread()) {
+    h = thr->m_waitQueueWaiter.GetHandle();
+    thr->m_waitQueueWakeup.Set();
+  } else {
+    return false;
+  }
+  bool timedOut;
+  return wpi::WaitForObject(h, timeout, &timedOut);
 }
 
 NT_ValueListenerPoller LocalStorage::CreateValueListenerPoller() {

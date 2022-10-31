@@ -27,9 +27,11 @@ class FloatArrayTopic;
 class FloatTopic;
 class IntegerArrayTopic;
 class IntegerTopic;
+class MultiSubscriber;
 class RawTopic;
 class StringArrayTopic;
 class StringTopic;
+class Subscriber;
 class Topic;
 
 /**
@@ -359,15 +361,17 @@ class NetworkTableInstance final {
    */
 
   /**
-   * Add a connection listener.
+   * Add a connection listener. The callback function is called asynchronously
+   * on a separate thread, so it's important to use synchronization or atomics
+   * when accessing any shared state from the callback function.
    *
-   * @param callback          listener to add
    * @param immediate_notify  notify listener of all existing connections
+   * @param callback          listener to add
    * @return Listener handle
    */
   NT_ConnectionListener AddConnectionListener(
-      std::function<void(const ConnectionNotification& event)> callback,
-      bool immediate_notify) const;
+      bool immediate_notify,
+      std::function<void(const ConnectionNotification& event)> callback) const;
 
   /**
    * Remove a connection listener.
@@ -376,22 +380,196 @@ class NetworkTableInstance final {
    */
   static void RemoveConnectionListener(NT_ConnectionListener conn_listener);
 
+  /**
+   * Wait for the connection listener queue to be empty. This is primarily
+   * useful for deterministic testing. This blocks until either the connection
+   * listener queue is empty (e.g. there are no more events that need to be
+   * passed along to callbacks or poll queues) or the timeout expires.
+   *
+   * @param timeout timeout, in seconds. Set to 0 for non-blocking behavior, or
+   *                a negative value to block indefinitely
+   * @return False if timed out, otherwise true.
+   */
+  bool WaitForConnectionListenerQueue(double timeout);
+
+  /** @} */
+
+  /**
+   * @{
+   * @name Topic Listener Functions
+   */
+
+  /**
+   * Add a topic listener for changes on a particular topic. The callback
+   * function is called asynchronously on a separate thread, so it's important
+   * to use synchronization or atomics when accessing any shared state from the
+   * callback function.
+   *
+   * @param topic Topic
+   * @param eventMask Bitmask of TopicListenerFlags values
+   * @param listener Listener function
+   * @return Listener handle
+   */
+  NT_TopicListener AddTopicListener(
+      Topic topic, unsigned int eventMask,
+      std::function<void(const TopicNotification&)> listener);
+
+  /**
+   * Add a topic listener for topic changes on a subscriber. The callback
+   * function is called asynchronously on a separate thread, so it's important
+   * to use synchronization or atomics when accessing any shared state from the
+   * callback function. This does NOT keep the subscriber active.
+   *
+   * @param subscriber Subscriber
+   * @param eventMask Bitmask of TopicListenerFlags values
+   * @param listener Listener function
+   * @return Listener handle
+   */
+  NT_TopicListener AddTopicListener(
+      Subscriber& subscriber, unsigned int eventMask,
+      std::function<void(const TopicNotification&)> listener);
+
+  /**
+   * Add a topic listener for topic changes on a subscriber. The callback
+   * function is called asynchronously on a separate thread, so it's important
+   * to use synchronization or atomics when accessing any shared state from the
+   * callback function. This does NOT keep the subscriber active.
+   *
+   * @param subscriber Subscriber
+   * @param eventMask Bitmask of TopicListenerFlags values
+   * @param listener Listener function
+   * @return Listener handle
+   */
+  NT_TopicListener AddTopicListener(
+      MultiSubscriber& subscriber, int eventMask,
+      std::function<void(const TopicNotification&)> listener);
+
+  /**
+   * Add a topic listener for topic changes on an entry. The callback function
+   * is called asynchronously on a separate thread, so it's important to use
+   * synchronization or atomics when accessing any shared state from the
+   * callback function.
+   *
+   * @param entry Entry
+   * @param eventMask Bitmask of TopicListenerFlags values
+   * @param listener Listener function
+   * @return Listener handle
+   */
+  NT_TopicListener AddTopicListener(
+      NetworkTableEntry& entry, int eventMask,
+      std::function<void(const TopicNotification&)> listener);
+
+  /**
+   * Add a topic listener for changes to topics with names that start with any
+   * of the given prefixes. The callback function is called asynchronously on a
+   * separate thread, so it's important to use synchronization or atomics when
+   * accessing any shared state from the callback function.
+   *
+   * @param prefixes Topic name string prefixes
+   * @param eventMask Bitmask of TopicListenerFlags values
+   * @param listener Listener function
+   * @return Listener handle
+   */
+  NT_TopicListener AddTopicListener(
+      std::span<const std::string_view> prefixes, int eventMask,
+      std::function<void(const TopicNotification&)> listener);
+
+  /**
+   * Remove a topic listener.
+   *
+   * @param listener Listener handle to remove
+   */
+  static void RemoveTopicListener(NT_TopicListener listener);
+
+  /**
+   * Wait for the topic listener queue to be empty. This is primarily useful for
+   * deterministic testing. This blocks until either the topic listener queue is
+   * empty (e.g. there are no more events that need to be passed along to
+   * callbacks or poll queues) or the timeout expires.
+   *
+   * @param timeout timeout, in seconds. Set to 0 for non-blocking behavior, or
+   *                a negative value to block indefinitely
+   * @return False if timed out, otherwise true.
+   */
+  bool WaitForTopicListenerQueue(double timeout);
+
+  /** @} */
+
+  /**
+   * @{
+   * @name Value Listener Functions
+   */
+
+  /**
+   * Add a value listener for value changes on a subscriber. The callback
+   * function is called asynchronously on a separate thread, so it's important
+   * to use synchronization or atomics when accessing any shared state from the
+   * callback function. This does NOT keep the subscriber active.
+   *
+   * @param subscriber Subscriber
+   * @param eventMask Bitmask of ValueListenerFlags values
+   * @param listener Listener function
+   * @return Listener handle
+   */
+  NT_ValueListener AddValueListener(
+      Subscriber& subscriber, unsigned int eventMask,
+      std::function<void(const ValueNotification&)> listener);
+
+  /**
+   * Add a value listener for value changes on a subscriber. The callback
+   * function is called asynchronously on a separate thread, so it's important
+   * to use synchronization or atomics when accessing any shared state from the
+   * callback function. This does NOT keep the subscriber active.
+   *
+   * @param subscriber Subscriber
+   * @param eventMask Bitmask of ValueListenerFlags values
+   * @param listener Listener function
+   * @return Listener handle
+   */
+  NT_ValueListener AddValueListener(
+      MultiSubscriber& subscriber, unsigned int eventMask,
+      std::function<void(const ValueNotification&)> listener);
+
+  /**
+   * Add a value listener for value changes on an entry. The callback function
+   * is called asynchronously on a separate thread, so it's important to use
+   * synchronization or atomics when accessing any shared state from the
+   * callback function.
+   *
+   * @param entry Entry
+   * @param eventMask Bitmask of ValueListenerFlags values
+   * @param listener Listener function
+   * @return Listener handle
+   */
+  NT_ValueListener AddValueListener(
+      NetworkTableEntry& entry, int eventMask,
+      std::function<void(const ValueNotification&)> listener);
+
+  /**
+   * Remove a value listener.
+   *
+   * @param listener Listener handle to remove
+   */
+  static void RemoveValueListener(NT_ValueListener listener);
+
+  /**
+   * Wait for the value listener queue to be empty. This is primarily useful for
+   * deterministic testing. This blocks until either the value listener queue is
+   * empty (e.g. there are no more events that need to be passed along to
+   * callbacks or poll queues) or the timeout expires.
+   *
+   * @param timeout timeout, in seconds. Set to 0 for non-blocking behavior, or
+   * a negative value to block indefinitely
+   * @return False if timed out, otherwise true.
+   */
+  bool WaitForValueListenerQueue(double timeout);
+
   /** @} */
 
   /**
    * @{
    * @name Client/Server Functions
    */
-
-  /**
-   * Set the network identity of this node.
-   *
-   * This is the name used during the initial connection handshake, and is
-   * visible through ConnectionInfo on the remote node.
-   *
-   * @param name      identity to advertise
-   */
-  void SetNetworkIdentity(std::string_view name);
 
   /**
    * Get the current network mode.
@@ -436,14 +614,18 @@ class NetworkTableInstance final {
   /**
    * Starts a NT3 client.  Use SetServer or SetServerTeam to set the server name
    * and port.
+   *
+   * @param identity  network identity to advertise (cannot be empty string)
    */
-  void StartClient3();
+  void StartClient3(std::string_view identity);
 
   /**
    * Starts a NT4 client.  Use SetServer or SetServerTeam to set the server name
    * and port.
+   *
+   * @param identity  network identity to advertise (cannot be empty string)
    */
-  void StartClient4();
+  void StartClient4(std::string_view identity);
 
   /**
    * Stops the client if it is running.

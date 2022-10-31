@@ -17,7 +17,7 @@ inline ConnectionListener::ConnectionListener(
     NetworkTableInstance inst, bool immediateNotify,
     std::function<void(const ConnectionNotification&)> listener)
     : m_handle{
-          AddConnectionListener(inst.GetHandle(), listener, immediateNotify)} {}
+          AddConnectionListener(inst.GetHandle(), immediateNotify, listener)} {}
 
 inline ConnectionListener::ConnectionListener(ConnectionListener&& rhs)
     : m_handle(rhs.m_handle) {
@@ -33,6 +33,14 @@ inline ConnectionListener& ConnectionListener::operator=(
 inline ConnectionListener::~ConnectionListener() {
   if (m_handle != 0) {
     nt::RemoveConnectionListener(m_handle);
+  }
+}
+
+inline bool ConnectionListener::WaitForQueue(double timeout) {
+  if (m_handle != 0) {
+    return nt::WaitForConnectionListenerQueue(m_handle, timeout);
+  } else {
+    return false;
   }
 }
 

@@ -20,7 +20,7 @@ public final class ValueListenerPoller implements AutoCloseable {
   }
 
   /**
-   * Start listening to value changes on a subscriber.
+   * Start listening to value changes on a subscriber. This does NOT keep the subscriber active.
    *
    * @param subscriber Subscriber
    * @param eventMask Bitmask of ValueListenerFlags values
@@ -31,7 +31,7 @@ public final class ValueListenerPoller implements AutoCloseable {
   }
 
   /**
-   * Start listening to value changes on a subscriber.
+   * Start listening to value changes on a subscriber. This does NOT keep the subscriber active.
    *
    * @param subscriber Subscriber
    * @param eventMask Bitmask of ValueListenerFlags values

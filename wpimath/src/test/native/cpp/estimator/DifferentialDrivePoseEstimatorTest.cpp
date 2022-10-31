@@ -10,7 +10,6 @@
 #include "frc/geometry/Pose2d.h"
 #include "frc/geometry/Rotation2d.h"
 #include "frc/kinematics/DifferentialDriveKinematics.h"
-#include "frc/kinematics/DifferentialDriveOdometry.h"
 #include "frc/trajectory/TrajectoryGenerator.h"
 #include "gtest/gtest.h"
 #include "units/angle.h"
@@ -32,7 +31,6 @@ TEST(DifferentialDrivePoseEstimatorTest, Accuracy) {
       frc::TrajectoryConfig(10_mps, 5.0_mps_sq));
 
   frc::DifferentialDriveKinematics kinematics{1.0_m};
-  frc::DifferentialDriveOdometry odometry{frc::Rotation2d{}};
 
   std::default_random_engine generator;
   std::normal_distribution<double> distribution(0.0, 1.0);

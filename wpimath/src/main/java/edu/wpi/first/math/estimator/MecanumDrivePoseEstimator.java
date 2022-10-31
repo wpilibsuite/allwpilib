@@ -14,9 +14,12 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.interpolation.TimeInterpolatableBuffer;
 import edu.wpi.first.math.kinematics.MecanumDriveKinematics;
+import edu.wpi.first.math.kinematics.MecanumDriveWheelPositions;
 import edu.wpi.first.math.kinematics.MecanumDriveWheelSpeeds;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
+import edu.wpi.first.math.numbers.N5;
+import edu.wpi.first.math.numbers.N7;
 import edu.wpi.first.util.WPIUtilJNI;
 import java.util.function.BiConsumer;
 
@@ -27,9 +30,9 @@ import java.util.function.BiConsumer;
  * drop-in for {@link edu.wpi.first.math.kinematics.MecanumDriveOdometry}.
  *
  * <p>{@link MecanumDrivePoseEstimator#update} should be called every robot loop. If your loops are
- * faster or slower than the default of 0.02s, then you should change the nominal delta time using
+ * faster or slower than the default of 20 ms, then you should change the nominal delta time using
  * the secondary constructor: {@link MecanumDrivePoseEstimator#MecanumDrivePoseEstimator(Rotation2d,
- * Pose2d, MecanumDriveKinematics, Matrix, Matrix, Matrix, double)}.
+ * Pose2d, MecanumDriveWheelPositions, MecanumDriveKinematics, Matrix, Matrix, Matrix, double)}.
  *
  * <p>{@link MecanumDrivePoseEstimator#addVisionMeasurement} can be called as infrequently as you
  * want; if you never call it, then this class will behave mostly like regular encoder odometry.
@@ -37,19 +40,21 @@ import java.util.function.BiConsumer;
  * <p>The state-space system used internally has the following states (x), inputs (u), and outputs
  * (y):
  *
- * <p><strong> x = [x, y, theta]ᵀ </strong> in the field coordinate system containing x position, y
- * position, and heading.
+ * <p><strong> x = [x, y, theta, s_fl, s_fr, s_rl, s_rr]ᵀ </strong> in the field coordinate system
+ * containing x position, y position, and heading, followed by the distance driven by the front
+ * left, front right, rear left, and rear right wheels.
  *
- * <p><strong> u = [v_x, v_y, omega]ᵀ </strong> containing x velocity, y velocity, and angular rate
- * in the field coordinate system.
+ * <p><strong> u = [v_x, v_y, omega, v_fl, v_fr, v_rl, v_rr]ᵀ </strong> containing x velocity, y
+ * velocity, and angular rate in the field coordinate system, followed by the velocity of the front
+ * left, front right, rear left, and rear right wheels.
  *
  * <p><strong> y = [x, y, theta]ᵀ </strong> from vision containing x position, y position, and
  * heading; or <strong> y = [theta]ᵀ </strong> containing gyro heading.
  */
 public class MecanumDrivePoseEstimator {
-  private final UnscentedKalmanFilter<N3, N3, N1> m_observer;
+  private final UnscentedKalmanFilter<N7, N7, N5> m_observer;
   private final MecanumDriveKinematics m_kinematics;
-  private final BiConsumer<Matrix<N3, N1>, Matrix<N3, N1>> m_visionCorrect;
+  private final BiConsumer<Matrix<N7, N1>, Matrix<N3, N1>> m_visionCorrect;
   private final TimeInterpolatableBuffer<Pose2d> m_poseBuffer;
 
   private final double m_nominalDt; // Seconds
@@ -65,13 +70,14 @@ public class MecanumDrivePoseEstimator {
    *
    * @param gyroAngle The current gyro angle.
    * @param initialPoseMeters The starting pose estimate.
+   * @param wheelPositions The distances driven by each wheel.
    * @param kinematics A correctly-configured kinematics object for your drivetrain.
    * @param stateStdDevs Standard deviations of model states. Increase these numbers to trust your
-   *     model's state estimates less. This matrix is in the form [x, y, theta]ᵀ, with units in
-   *     meters and radians.
+   *     model's state estimates less. This matrix is in the form [x, y, theta, s_fl, s_fr, s_rl,
+   *     s_rr]ᵀ, with units in meters and radians, followed by meters.
    * @param localMeasurementStdDevs Standard deviation of the gyro measurement. Increase this number
-   *     to trust sensor readings from the gyro less. This matrix is in the form [theta], with units
-   *     in radians.
+   *     to trust sensor readings from the gyro less. This matrix is in the form [theta, s_fl, s_fr,
+   *     s_rl, s_rr], with units in radians, followed by meters.
    * @param visionMeasurementStdDevs Standard deviations of the vision measurements. Increase these
    *     numbers to trust global measurements from vision less. This matrix is in the form [x, y,
    *     theta]ᵀ, with units in meters and radians.
@@ -79,13 +85,15 @@ public class MecanumDrivePoseEstimator {
   public MecanumDrivePoseEstimator(
       Rotation2d gyroAngle,
       Pose2d initialPoseMeters,
+      MecanumDriveWheelPositions wheelPositions,
       MecanumDriveKinematics kinematics,
-      Matrix<N3, N1> stateStdDevs,
-      Matrix<N1, N1> localMeasurementStdDevs,
+      Matrix<N7, N1> stateStdDevs,
+      Matrix<N5, N1> localMeasurementStdDevs,
       Matrix<N3, N1> visionMeasurementStdDevs) {
     this(
         gyroAngle,
         initialPoseMeters,
+        wheelPositions,
         kinematics,
         stateStdDevs,
         localMeasurementStdDevs,
@@ -98,13 +106,14 @@ public class MecanumDrivePoseEstimator {
    *
    * @param gyroAngle The current gyro angle.
    * @param initialPoseMeters The starting pose estimate.
+   * @param wheelPositions The distances driven by each wheel.
    * @param kinematics A correctly-configured kinematics object for your drivetrain.
    * @param stateStdDevs Standard deviations of model states. Increase these numbers to trust your
-   *     model's state estimates less. This matrix is in the form [x, y, theta]ᵀ, with units in
-   *     meters and radians.
-   * @param localMeasurementStdDevs Standard deviations of the encoder and gyro measurements.
-   *     Increase these numbers to trust sensor readings from encoders and gyros less. This matrix
-   *     is in the form [theta], with units in radians.
+   *     model's state estimates less. This matrix is in the form [x, y, theta, s_fl, s_fr, s_rl,
+   *     s_rr]ᵀ, with units in meters and radians, followed by meters.
+   * @param localMeasurementStdDevs Standard deviation of the gyro measurement. Increase this number
+   *     to trust sensor readings from the gyro less. This matrix is in the form [theta, s_fl, s_fr,
+   *     s_rl, s_rr], with units in radians, followed by meters.
    * @param visionMeasurementStdDevs Standard deviations of the vision measurements. Increase these
    *     numbers to trust global measurements from vision less. This matrix is in the form [x, y,
    *     theta]ᵀ, with units in meters and radians.
@@ -113,19 +122,20 @@ public class MecanumDrivePoseEstimator {
   public MecanumDrivePoseEstimator(
       Rotation2d gyroAngle,
       Pose2d initialPoseMeters,
+      MecanumDriveWheelPositions wheelPositions,
       MecanumDriveKinematics kinematics,
-      Matrix<N3, N1> stateStdDevs,
-      Matrix<N1, N1> localMeasurementStdDevs,
+      Matrix<N7, N1> stateStdDevs,
+      Matrix<N5, N1> localMeasurementStdDevs,
       Matrix<N3, N1> visionMeasurementStdDevs,
       double nominalDtSeconds) {
     m_nominalDt = nominalDtSeconds;
 
     m_observer =
         new UnscentedKalmanFilter<>(
-            Nat.N3(),
-            Nat.N1(),
+            Nat.N7(),
+            Nat.N5(),
             (x, u) -> u,
-            (x, u) -> x.extractRowVector(2),
+            (x, u) -> x.block(Nat.N5(), Nat.N1(), 2, 0),
             stateStdDevs,
             localMeasurementStdDevs,
             AngleStatistics.angleMean(2),
@@ -146,7 +156,7 @@ public class MecanumDrivePoseEstimator {
                 Nat.N3(),
                 u,
                 y,
-                (x, u1) -> x,
+                (x, u1) -> x.block(Nat.N3(), Nat.N1(), 0, 0),
                 m_visionContR,
                 AngleStatistics.angleMean(2),
                 AngleStatistics.angleResidual(2),
@@ -155,7 +165,19 @@ public class MecanumDrivePoseEstimator {
 
     m_gyroOffset = initialPoseMeters.getRotation().minus(gyroAngle);
     m_previousAngle = initialPoseMeters.getRotation();
-    m_observer.setXhat(StateSpaceUtil.poseTo3dVector(initialPoseMeters));
+
+    var poseVec = StateSpaceUtil.poseTo3dVector(initialPoseMeters);
+    var xhat =
+        VecBuilder.fill(
+            poseVec.get(0, 0),
+            poseVec.get(1, 0),
+            poseVec.get(2, 0),
+            wheelPositions.frontLeftMeters,
+            wheelPositions.frontRightMeters,
+            wheelPositions.rearLeftMeters,
+            wheelPositions.rearRightMeters);
+
+    m_observer.setXhat(xhat);
   }
 
   /**
@@ -181,13 +203,26 @@ public class MecanumDrivePoseEstimator {
    *
    * @param poseMeters The position on the field that your robot is at.
    * @param gyroAngle The angle reported by the gyroscope.
+   * @param wheelPositions The distances driven by each wheel.
    */
-  public void resetPosition(Pose2d poseMeters, Rotation2d gyroAngle) {
+  public void resetPosition(
+      Pose2d poseMeters, Rotation2d gyroAngle, MecanumDriveWheelPositions wheelPositions) {
     // Reset state estimate and error covariance
     m_observer.reset();
     m_poseBuffer.clear();
 
-    m_observer.setXhat(StateSpaceUtil.poseTo3dVector(poseMeters));
+    var poseVec = StateSpaceUtil.poseTo3dVector(poseMeters);
+    var xhat =
+        VecBuilder.fill(
+            poseVec.get(0, 0),
+            poseVec.get(1, 0),
+            poseVec.get(2, 0),
+            wheelPositions.frontLeftMeters,
+            wheelPositions.frontRightMeters,
+            wheelPositions.rearLeftMeters,
+            wheelPositions.rearRightMeters);
+
+    m_observer.setXhat(xhat);
 
     m_prevTimeSeconds = -1;
 
@@ -227,7 +262,7 @@ public class MecanumDrivePoseEstimator {
     var sample = m_poseBuffer.getSample(timestampSeconds);
     if (sample.isPresent()) {
       m_visionCorrect.accept(
-          new MatBuilder<>(Nat.N3(), Nat.N1()).fill(0.0, 0.0, 0.0),
+          new MatBuilder<>(Nat.N7(), Nat.N1()).fill(0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0),
           StateSpaceUtil.poseTo3dVector(
               getEstimatedPosition().transformBy(visionRobotPoseMeters.minus(sample.get()))));
     }
@@ -273,10 +308,14 @@ public class MecanumDrivePoseEstimator {
    *
    * @param gyroAngle The current gyro angle.
    * @param wheelSpeeds The current speeds of the mecanum drive wheels.
+   * @param wheelPositions The distances driven by each wheel.
    * @return The estimated pose of the robot in meters.
    */
-  public Pose2d update(Rotation2d gyroAngle, MecanumDriveWheelSpeeds wheelSpeeds) {
-    return updateWithTime(WPIUtilJNI.now() * 1.0e-6, gyroAngle, wheelSpeeds);
+  public Pose2d update(
+      Rotation2d gyroAngle,
+      MecanumDriveWheelSpeeds wheelSpeeds,
+      MecanumDriveWheelPositions wheelPositions) {
+    return updateWithTime(WPIUtilJNI.now() * 1.0e-6, gyroAngle, wheelSpeeds, wheelPositions);
   }
 
   /**
@@ -287,10 +326,14 @@ public class MecanumDrivePoseEstimator {
    * @param currentTimeSeconds Time at which this method was called, in seconds.
    * @param gyroAngle The current gyroscope angle.
    * @param wheelSpeeds The current speeds of the mecanum drive wheels.
+   * @param wheelPositions The distances driven by each wheel.
    * @return The estimated pose of the robot in meters.
    */
   public Pose2d updateWithTime(
-      double currentTimeSeconds, Rotation2d gyroAngle, MecanumDriveWheelSpeeds wheelSpeeds) {
+      double currentTimeSeconds,
+      Rotation2d gyroAngle,
+      MecanumDriveWheelSpeeds wheelSpeeds,
+      MecanumDriveWheelPositions wheelPositions) {
     double dt = m_prevTimeSeconds >= 0 ? currentTimeSeconds - m_prevTimeSeconds : m_nominalDt;
     m_prevTimeSeconds = currentTimeSeconds;
 
@@ -302,10 +345,24 @@ public class MecanumDrivePoseEstimator {
         new Translation2d(chassisSpeeds.vxMetersPerSecond, chassisSpeeds.vyMetersPerSecond)
             .rotateBy(angle);
 
-    var u = VecBuilder.fill(fieldRelativeVelocities.getX(), fieldRelativeVelocities.getY(), omega);
+    var u =
+        VecBuilder.fill(
+            fieldRelativeVelocities.getX(),
+            fieldRelativeVelocities.getY(),
+            omega,
+            wheelSpeeds.frontLeftMetersPerSecond,
+            wheelSpeeds.frontRightMetersPerSecond,
+            wheelSpeeds.rearLeftMetersPerSecond,
+            wheelSpeeds.rearRightMetersPerSecond);
     m_previousAngle = angle;
 
-    var localY = VecBuilder.fill(angle.getRadians());
+    var localY =
+        VecBuilder.fill(
+            angle.getRadians(),
+            wheelPositions.frontLeftMeters,
+            wheelPositions.frontRightMeters,
+            wheelPositions.rearLeftMeters,
+            wheelPositions.rearRightMeters);
     m_poseBuffer.addSample(currentTimeSeconds, getEstimatedPosition());
     m_observer.predict(u, dt);
     m_observer.correct(u, localY);

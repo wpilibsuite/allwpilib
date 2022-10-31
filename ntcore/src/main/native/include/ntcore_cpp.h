@@ -74,7 +74,7 @@ struct TopicInfo {
 struct ConnectionInfo {
   /**
    * The remote identifier (as set on the remote node by
-   * NetworkTableInstance::SetNetworkIdentity() or nt::SetNetworkIdentity()).
+   * NetworkTableInstance::StartClient4() or nt::StartClient4()).
    */
   std::string remote_id;
 
@@ -292,7 +292,7 @@ class PubSubOption {
   /**
    * Polling storage for subscription. Specifies the maximum number of updates
    * NetworkTables should store between calls to the subscriber's poll()
-   * function. Defaults to 1 if logging is false, 20 if logging is true.
+   * function. Defaults to 1 if SendAll is false, 20 if SendAll is true.
    *
    * @param depth number of entries to save for polling.
    * @return option
@@ -800,6 +800,19 @@ NT_TopicListener AddTopicListener(
     std::function<void(const TopicNotification&)> callback);
 
 /**
+ * Wait for the topic listener queue to be empty. This is primarily useful
+ * for deterministic testing. This blocks until either the topic listener
+ * queue is empty (e.g. there are no more events that need to be passed along to
+ * callbacks or poll queues) or the timeout expires.
+ *
+ * @param handle  handle
+ * @param timeout timeout, in seconds. Set to 0 for non-blocking behavior, or a
+ *                negative value to block indefinitely
+ * @return False if timed out, otherwise true.
+ */
+bool WaitForTopicListenerQueue(NT_Handle handle, double timeout);
+
+/**
  * Creates a topic listener poller.
  *
  * A poller provides a single queue of poll events.  Events linked to this
@@ -881,6 +894,19 @@ NT_ValueListener AddValueListener(
     std::function<void(const ValueNotification&)> callback);
 
 /**
+ * Wait for the value listener queue to be empty. This is primarily useful
+ * for deterministic testing. This blocks until either the value listener
+ * queue is empty (e.g. there are no more events that need to be passed along to
+ * callbacks or poll queues) or the timeout expires.
+ *
+ * @param handle  handle
+ * @param timeout timeout, in seconds. Set to 0 for non-blocking behavior, or a
+ *                negative value to block indefinitely
+ * @return False if timed out, otherwise true.
+ */
+bool WaitForValueListenerQueue(NT_Handle handle, double timeout);
+
+/**
  * Create a value listener poller.
  *
  * A poller provides a single queue of poll events.  Events linked to this
@@ -945,9 +971,21 @@ void RemoveValueListener(NT_ValueListener listener);
  * @return Listener handle
  */
 NT_ConnectionListener AddConnectionListener(
-    NT_Inst inst,
-    std::function<void(const ConnectionNotification& event)> callback,
-    bool immediate_notify);
+    NT_Inst inst, bool immediate_notify,
+    std::function<void(const ConnectionNotification& event)> callback);
+
+/**
+ * Wait for the connection listener queue to be empty. This is primarily useful
+ * for deterministic testing. This blocks until either the connection listener
+ * queue is empty (e.g. there are no more events that need to be passed along to
+ * callbacks or poll queues) or the timeout expires.
+ *
+ * @param handle  handle
+ * @param timeout timeout, in seconds. Set to 0 for non-blocking behavior, or a
+ *                negative value to block indefinitely
+ * @return False if timed out, otherwise true.
+ */
+bool WaitForConnectionListenerQueue(NT_Handle handle, double timeout);
 
 /**
  * Create a connection listener poller.
@@ -1008,16 +1046,6 @@ void RemoveConnectionListener(NT_ConnectionListener conn_listener);
  */
 
 /**
- * Set the network identity of this node.
- * This is the name used during the initial connection handshake, and is
- * visible through ConnectionInfo on the remote node.
- *
- * @param inst      instance handle
- * @param name      identity to advertise
- */
-void SetNetworkIdentity(NT_Inst inst, std::string_view name);
-
-/**
  * Get the current network mode.
  *
  * @param inst  instance handle
@@ -1064,17 +1092,19 @@ void StopServer(NT_Inst inst);
  * Starts a NT3 client.  Use SetServer or SetServerTeam to set the server name
  * and port.
  *
- * @param inst  instance handle
+ * @param inst      instance handle
+ * @param identity  network identity to advertise (cannot be empty string)
  */
-void StartClient3(NT_Inst inst);
+void StartClient3(NT_Inst inst, std::string_view identity);
 
 /**
  * Starts a NT4 client.  Use SetServer or SetServerTeam to set the server name
  * and port.
  *
- * @param inst  instance handle
+ * @param inst      instance handle
+ * @param identity  network identity to advertise (cannot be empty string)
  */
-void StartClient4(NT_Inst inst);
+void StartClient4(NT_Inst inst, std::string_view identity);
 
 /**
  * Stops the client if it is running.

@@ -418,6 +418,7 @@ TEST_F(TimedRobotTest, ModeChange) {
   frc::sim::DriverStationSim::SetEnabled(true);
   frc::sim::DriverStationSim::SetAutonomous(true);
   frc::sim::DriverStationSim::SetTest(false);
+  frc::sim::DriverStationSim::NotifyNewData();
 
   frc::sim::StepTiming(20_ms);
 
@@ -435,6 +436,7 @@ TEST_F(TimedRobotTest, ModeChange) {
   frc::sim::DriverStationSim::SetEnabled(true);
   frc::sim::DriverStationSim::SetAutonomous(false);
   frc::sim::DriverStationSim::SetTest(false);
+  frc::sim::DriverStationSim::NotifyNewData();
 
   frc::sim::StepTiming(20_ms);
 
@@ -452,6 +454,7 @@ TEST_F(TimedRobotTest, ModeChange) {
   frc::sim::DriverStationSim::SetEnabled(true);
   frc::sim::DriverStationSim::SetAutonomous(false);
   frc::sim::DriverStationSim::SetTest(true);
+  frc::sim::DriverStationSim::NotifyNewData();
 
   frc::sim::StepTiming(20_ms);
 
@@ -469,6 +472,7 @@ TEST_F(TimedRobotTest, ModeChange) {
   frc::sim::DriverStationSim::SetEnabled(false);
   frc::sim::DriverStationSim::SetAutonomous(false);
   frc::sim::DriverStationSim::SetTest(false);
+  frc::sim::DriverStationSim::NotifyNewData();
 
   frc::sim::StepTiming(20_ms);
 

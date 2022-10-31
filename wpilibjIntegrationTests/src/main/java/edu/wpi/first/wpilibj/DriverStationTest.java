@@ -6,6 +6,8 @@ package edu.wpi.first.wpilibj;
 
 import static org.junit.Assert.assertEquals;
 
+import edu.wpi.first.hal.DriverStationJNI;
+import edu.wpi.first.util.WPIUtilJNI;
 import edu.wpi.first.wpilibj.test.AbstractComsSetup;
 import java.util.logging.Logger;
 import org.junit.Test;
@@ -24,12 +26,22 @@ public class DriverStationTest extends AbstractComsSetup {
   public void waitForDataTest() {
     long startTime = RobotController.getFPGATime();
 
+    int handle = WPIUtilJNI.createEvent(false, false);
+    DriverStationJNI.provideNewDataEventHandle(handle);
+
     // Wait for data 50 times
     for (int i = 0; i < 50; i++) {
-      DriverStation.waitForData();
+      try {
+        WPIUtilJNI.waitForObject(handle);
+      } catch (InterruptedException e) {
+        e.printStackTrace();
+      }
     }
     long endTime = RobotController.getFPGATime();
     long difference = endTime - startTime;
+
+    DriverStationJNI.removeNewDataEventHandle(handle);
+    WPIUtilJNI.destroyEvent(handle);
 
     assertEquals(
         "DriverStation waitForData did not wait long enough",

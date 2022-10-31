@@ -11,80 +11,87 @@
 #include "units/length.h"
 
 TEST(ComputerVisionUtilTest, CalculateDistanceToTarget) {
-  auto camHeight = 1_m;
+  auto cameraHeight = 1_m;
   auto targetHeight = 3_m;
-  auto camPitch = 0_deg;
+  auto cameraPitch = 0_deg;
   auto targetPitch = 30_deg;
   auto targetYaw = 0_deg;
 
-  auto dist = frc::CalculateDistanceToTarget(camHeight, targetHeight, camPitch,
-                                             targetPitch, targetYaw);
-  EXPECT_NEAR(3.464, dist.value(), 0.01);
+  auto distanceAlongGround = frc::CalculateDistanceToTarget(
+      cameraHeight, targetHeight, cameraPitch, targetPitch, targetYaw);
+  EXPECT_NEAR(3.464, distanceAlongGround.value(), 0.01);
 
-  camHeight = 1_m;
+  cameraHeight = 1_m;
   targetHeight = 2_m;
-  camPitch = 20_deg;
+  cameraPitch = 20_deg;
   targetPitch = -10_deg;
 
-  dist = frc::CalculateDistanceToTarget(camHeight, targetHeight, camPitch,
-                                        targetPitch, targetYaw);
-  EXPECT_NEAR(5.671, dist.value(), 0.01);
+  distanceAlongGround = frc::CalculateDistanceToTarget(
+      cameraHeight, targetHeight, cameraPitch, targetPitch, targetYaw);
+  EXPECT_NEAR(5.671, distanceAlongGround.value(), 0.01);
 
-  camHeight = 3_m;
+  cameraHeight = 3_m;
   targetHeight = 1_m;
-  camPitch = 0_deg;
+  cameraPitch = 0_deg;
   targetPitch = -30_deg;
 
-  dist = frc::CalculateDistanceToTarget(camHeight, targetHeight, camPitch,
-                                        targetPitch, targetYaw);
-  EXPECT_NEAR(3.464, dist.value(), 0.01);
+  distanceAlongGround = frc::CalculateDistanceToTarget(
+      cameraHeight, targetHeight, cameraPitch, targetPitch, targetYaw);
+  EXPECT_NEAR(3.464, distanceAlongGround.value(), 0.01);
 
-  camHeight = 1_m;
+  cameraHeight = 1_m;
   targetHeight = 3_m;
-  camPitch = 0_deg;
+  cameraPitch = 0_deg;
   targetPitch = 30_deg;
   targetYaw = 30_deg;
 
-  dist = frc::CalculateDistanceToTarget(camHeight, targetHeight, camPitch,
-                                        targetPitch, targetYaw);
-  EXPECT_NEAR(4, dist.value(), 0.01);
+  distanceAlongGround = frc::CalculateDistanceToTarget(
+      cameraHeight, targetHeight, cameraPitch, targetPitch, targetYaw);
+  EXPECT_NEAR(4, distanceAlongGround.value(), 0.01);
 }
 
 TEST(ComputerVisionUtilTest, EstimateFieldToRobot) {
-  auto camHeight = 1_m;
+  auto cameraHeight = 1_m;
   auto targetHeight = 3_m;
-  auto camPitch = 0_deg;
+  auto cameraPitch = 0_deg;
   auto targetPitch = 30_deg;
   frc::Rotation2d targetYaw;
   frc::Rotation2d gyroAngle;
-  frc::Pose2d fieldToTarget;
-  frc::Transform2d cameraToRobot;
+  frc::Pose3d fieldToTarget;
+  frc::Transform3d cameraToRobot;
 
+  auto distanceAlongGround =
+      frc::CalculateDistanceToTarget(cameraHeight, targetHeight, cameraPitch,
+                                     targetPitch, targetYaw.Radians());
+  auto range =
+      units::math::hypot(distanceAlongGround, targetHeight - cameraHeight);
   auto fieldToRobot = frc::EstimateFieldToRobot(
       frc::EstimateCameraToTarget(
-          frc::Translation2d{
-              frc::CalculateDistanceToTarget(camHeight, targetHeight, camPitch,
-                                             targetPitch, targetYaw.Radians()),
-              targetYaw},
+          frc::Translation3d{
+              range, frc::Rotation3d{0_rad, targetPitch, targetYaw.Radians()}},
           fieldToTarget, gyroAngle),
       fieldToTarget, cameraToRobot);
 
   EXPECT_NEAR(-3.464, fieldToRobot.X().value(), 0.1);
   EXPECT_NEAR(0, fieldToRobot.Y().value(), 0.1);
-  EXPECT_NEAR(0, fieldToRobot.Rotation().Degrees().value(), 0.1);
+  EXPECT_NEAR(2.0, fieldToRobot.Z().value(), 0.1);
+  EXPECT_NEAR(0, fieldToRobot.Rotation().Z().value(), 0.1);
 
   gyroAngle = -30_deg;
 
+  distanceAlongGround =
+      frc::CalculateDistanceToTarget(cameraHeight, targetHeight, cameraPitch,
+                                     targetPitch, targetYaw.Radians());
+  range = units::math::hypot(distanceAlongGround, targetHeight - cameraHeight);
   fieldToRobot = frc::EstimateFieldToRobot(
       frc::EstimateCameraToTarget(
-          frc::Translation2d{
-              frc::CalculateDistanceToTarget(camHeight, targetHeight, camPitch,
-                                             targetPitch, targetYaw.Radians()),
-              targetYaw},
+          frc::Translation3d{
+              range, frc::Rotation3d{0_rad, targetPitch, targetYaw.Radians()}},
           fieldToTarget, gyroAngle),
       fieldToTarget, cameraToRobot);
 
   EXPECT_NEAR(-3.0, fieldToRobot.X().value(), 0.1);
   EXPECT_NEAR(1.732, fieldToRobot.Y().value(), 0.1);
-  EXPECT_NEAR(-30.0, fieldToRobot.Rotation().Degrees().value(), 0.1);
+  EXPECT_NEAR(2.0, fieldToRobot.Z().value(), 0.1);
+  EXPECT_NEAR(-30.0, units::degree_t{fieldToRobot.Rotation().Z()}.value(), 0.1);
 }

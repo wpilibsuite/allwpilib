@@ -204,10 +204,6 @@ bool RobotBase::IsTest() const {
   return DriverStation::IsTest();
 }
 
-bool RobotBase::IsNewDataAvailable() const {
-  return DriverStation::IsNewControlData();
-}
-
 std::thread::id RobotBase::GetThreadId() {
   return m_threadId;
 }
@@ -223,7 +219,6 @@ RobotBase::RobotBase() {
   SetupMathShared();
 
   auto inst = nt::NetworkTableInstance::GetDefault();
-  inst.SetNetworkIdentity("Robot");
   // subscribe to "" to force persistent values to progagate to local
   nt::SubscribeMultiple(inst.GetHandle(), {{std::string_view{}}});
 #ifdef __FRC_ROBORIO__
@@ -240,6 +235,7 @@ RobotBase::RobotBase() {
     ++count;
     if (count > 100) {
       fmt::print(stderr, "timed out while waiting for NT server to start\n");
+      break;
     }
   }
 
@@ -256,8 +252,8 @@ RobotBase::RobotBase() {
     }
   }
 
-  // Call DriverStation::InDisabled() to kick off DS thread
-  DriverStation::InDisabled(true);
+  // Call DriverStation::RefreshData() to kick things off
+  DriverStation::RefreshData();
 
   // First and one-time initialization
   LiveWindow::SetEnabled(false);

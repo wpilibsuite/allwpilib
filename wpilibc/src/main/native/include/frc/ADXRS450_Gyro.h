@@ -49,6 +49,8 @@ class ADXRS450_Gyro : public Gyro,
   ADXRS450_Gyro(ADXRS450_Gyro&&) = default;
   ADXRS450_Gyro& operator=(ADXRS450_Gyro&&) = default;
 
+  bool IsConnected() const;
+
   /**
    * Return the actual angle in degrees that the robot is currently facing.
    *
@@ -105,8 +107,10 @@ class ADXRS450_Gyro : public Gyro,
  private:
   SPI m_spi;
   SPI::Port m_port;
+  bool m_connected{false};
 
   hal::SimDevice m_simDevice;
+  hal::SimBoolean m_simConnected;
   hal::SimDouble m_simAngle;
   hal::SimDouble m_simRate;
 

@@ -15,7 +15,9 @@ class NetworkTableInstance;
 
 /**
  * Connection listener. This calls back to a callback function when a connection
- * change occurs.
+ * change occurs. The callback function is called asynchronously on a separate
+ * thread, so it's important to use synchronization or atomics when accessing
+ * any shared state from the callback function.
  */
 class ConnectionListener final {
  public:
@@ -26,7 +28,7 @@ class ConnectionListener final {
    *
    * @param inst Instance
    * @param immediateNotify if notification should be immediately created for
-   * existing connections
+   *                        existing connections
    * @param listener Listener function
    */
   ConnectionListener(
@@ -47,6 +49,18 @@ class ConnectionListener final {
    * @return Handle
    */
   NT_ConnectionListener GetHandle() const { return m_handle; }
+
+  /**
+   * Wait for the connection listener queue to be empty. This is primarily
+   * useful for deterministic testing. This blocks until either the connection
+   * listener queue is empty (e.g. there are no more events that need to be
+   * passed along to callbacks or poll queues) or the timeout expires.
+   *
+   * @param timeout timeout, in seconds. Set to 0 for non-blocking behavior, or
+   *                a negative value to block indefinitely
+   * @return False if timed out, otherwise true.
+   */
+  bool WaitForQueue(double timeout);
 
  private:
   NT_ConnectionListener m_handle{0};

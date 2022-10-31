@@ -64,8 +64,7 @@ class BooleanEvent {
    * second.
    * @return an instance of the subclass.
    */
-  template <class T,
-            typename = std::enable_if_t<std::is_base_of_v<BooleanEvent, T>>>
+  template <class T>
   T CastTo(std::function<T(EventLoop*, std::function<bool()>)> ctor =
                [](EventLoop* loop, std::function<bool()> condition) {
                  return T(loop, condition);

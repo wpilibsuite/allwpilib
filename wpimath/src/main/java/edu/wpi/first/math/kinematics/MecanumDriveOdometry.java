@@ -8,8 +8,6 @@ import edu.wpi.first.math.MathSharedStore;
 import edu.wpi.first.math.MathUsageId;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Twist2d;
-import edu.wpi.first.util.WPIUtilJNI;
 
 /**
  * Class for mecanum drive odometry. Odometry allows you to track the robot's position on the field
@@ -21,7 +19,7 @@ import edu.wpi.first.util.WPIUtilJNI;
 public class MecanumDriveOdometry {
   private final MecanumDriveKinematics m_kinematics;
   private Pose2d m_poseMeters;
-  private double m_prevTimeSeconds = -1;
+  private MecanumDriveWheelPositions m_previousWheelPositions;
 
   private Rotation2d m_gyroOffset;
   private Rotation2d m_previousAngle;
@@ -31,14 +29,24 @@ public class MecanumDriveOdometry {
    *
    * @param kinematics The mecanum drive kinematics for your drivetrain.
    * @param gyroAngle The angle reported by the gyroscope.
+   * @param wheelPositions The distances driven by each wheel.
    * @param initialPoseMeters The starting position of the robot on the field.
    */
   public MecanumDriveOdometry(
-      MecanumDriveKinematics kinematics, Rotation2d gyroAngle, Pose2d initialPoseMeters) {
+      MecanumDriveKinematics kinematics,
+      Rotation2d gyroAngle,
+      MecanumDriveWheelPositions wheelPositions,
+      Pose2d initialPoseMeters) {
     m_kinematics = kinematics;
     m_poseMeters = initialPoseMeters;
     m_gyroOffset = m_poseMeters.getRotation().minus(gyroAngle);
     m_previousAngle = initialPoseMeters.getRotation();
+    m_previousWheelPositions =
+        new MecanumDriveWheelPositions(
+            wheelPositions.frontLeftMeters,
+            wheelPositions.frontRightMeters,
+            wheelPositions.rearLeftMeters,
+            wheelPositions.rearRightMeters);
     MathSharedStore.reportUsage(MathUsageId.kOdometry_MecanumDrive, 1);
   }
 
@@ -47,9 +55,13 @@ public class MecanumDriveOdometry {
    *
    * @param kinematics The mecanum drive kinematics for your drivetrain.
    * @param gyroAngle The angle reported by the gyroscope.
+   * @param wheelPositions The distances driven by each wheel.
    */
-  public MecanumDriveOdometry(MecanumDriveKinematics kinematics, Rotation2d gyroAngle) {
-    this(kinematics, gyroAngle, new Pose2d());
+  public MecanumDriveOdometry(
+      MecanumDriveKinematics kinematics,
+      Rotation2d gyroAngle,
+      MecanumDriveWheelPositions wheelPositions) {
+    this(kinematics, gyroAngle, wheelPositions, new Pose2d());
   }
 
   /**
@@ -60,11 +72,19 @@ public class MecanumDriveOdometry {
    *
    * @param poseMeters The position on the field that your robot is at.
    * @param gyroAngle The angle reported by the gyroscope.
+   * @param wheelPositions The distances driven by each wheel.
    */
-  public void resetPosition(Pose2d poseMeters, Rotation2d gyroAngle) {
+  public void resetPosition(
+      Pose2d poseMeters, Rotation2d gyroAngle, MecanumDriveWheelPositions wheelPositions) {
     m_poseMeters = poseMeters;
     m_previousAngle = poseMeters.getRotation();
     m_gyroOffset = m_poseMeters.getRotation().minus(gyroAngle);
+    m_previousWheelPositions =
+        new MecanumDriveWheelPositions(
+            wheelPositions.frontLeftMeters,
+            wheelPositions.frontRightMeters,
+            wheelPositions.rearLeftMeters,
+            wheelPositions.rearRightMeters);
   }
 
   /**
@@ -78,48 +98,37 @@ public class MecanumDriveOdometry {
 
   /**
    * Updates the robot's position on the field using forward kinematics and integration of the pose
-   * over time. This method takes in the current time as a parameter to calculate period (difference
-   * between two timestamps). The period is used to calculate the change in distance from a
-   * velocity. This also takes in an angle parameter which is used instead of the angular rate that
-   * is calculated from forward kinematics.
+   * over time. This method takes in an angle parameter which is used instead of the angular rate
+   * that is calculated from forward kinematics, in addition to the current distance measurement at
+   * each wheel.
    *
-   * @param currentTimeSeconds The current time in seconds.
    * @param gyroAngle The angle reported by the gyroscope.
-   * @param wheelSpeeds The current wheel speeds.
+   * @param wheelPositions The distances driven by each wheel.
    * @return The new pose of the robot.
    */
-  public Pose2d updateWithTime(
-      double currentTimeSeconds, Rotation2d gyroAngle, MecanumDriveWheelSpeeds wheelSpeeds) {
-    double period = m_prevTimeSeconds >= 0 ? currentTimeSeconds - m_prevTimeSeconds : 0.0;
-    m_prevTimeSeconds = currentTimeSeconds;
-
+  public Pose2d update(Rotation2d gyroAngle, MecanumDriveWheelPositions wheelPositions) {
     var angle = gyroAngle.plus(m_gyroOffset);
 
-    var chassisState = m_kinematics.toChassisSpeeds(wheelSpeeds);
-    var newPose =
-        m_poseMeters.exp(
-            new Twist2d(
-                chassisState.vxMetersPerSecond * period,
-                chassisState.vyMetersPerSecond * period,
-                angle.minus(m_previousAngle).getRadians()));
+    var wheelDeltas =
+        new MecanumDriveWheelPositions(
+            wheelPositions.frontLeftMeters - m_previousWheelPositions.frontLeftMeters,
+            wheelPositions.frontRightMeters - m_previousWheelPositions.frontRightMeters,
+            wheelPositions.rearLeftMeters - m_previousWheelPositions.rearLeftMeters,
+            wheelPositions.rearRightMeters - m_previousWheelPositions.rearRightMeters);
+
+    var twist = m_kinematics.toTwist2d(wheelDeltas);
+    twist.dtheta = angle.minus(m_previousAngle).getRadians();
+    var newPose = m_poseMeters.exp(twist);
 
     m_previousAngle = angle;
     m_poseMeters = new Pose2d(newPose.getTranslation(), angle);
-    return m_poseMeters;
-  }
+    m_previousWheelPositions =
+        new MecanumDriveWheelPositions(
+            wheelPositions.frontLeftMeters,
+            wheelPositions.frontRightMeters,
+            wheelPositions.rearLeftMeters,
+            wheelPositions.rearRightMeters);
 
-  /**
-   * Updates the robot's position on the field using forward kinematics and integration of the pose
-   * over time. This method automatically calculates the current time to calculate period
-   * (difference between two timestamps). The period is used to calculate the change in distance
-   * from a velocity. This also takes in an angle parameter which is used instead of the angular
-   * rate that is calculated from forward kinematics.
-   *
-   * @param gyroAngle The angle reported by the gyroscope.
-   * @param wheelSpeeds The current wheel speeds.
-   * @return The new pose of the robot.
-   */
-  public Pose2d update(Rotation2d gyroAngle, MecanumDriveWheelSpeeds wheelSpeeds) {
-    return updateWithTime(WPIUtilJNI.now() * 1.0e-6, gyroAngle, wheelSpeeds);
+    return m_poseMeters;
   }
 }
