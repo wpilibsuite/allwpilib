@@ -5,6 +5,7 @@
 #pragma once
 
 #include <atomic>
+#include <vector>
 
 #include <wpi/mutex.h>
 
