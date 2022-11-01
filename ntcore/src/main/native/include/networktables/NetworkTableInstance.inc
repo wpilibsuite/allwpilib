@@ -27,9 +27,10 @@ inline NetworkTableInstance NetworkTableInstance::Create() {
   return NetworkTableInstance{CreateInstance()};
 }
 
-inline void NetworkTableInstance::Destroy(NetworkTableInstance inst) {
+inline void NetworkTableInstance::Destroy(NetworkTableInstance& inst) {
   if (inst.m_handle != 0) {
     DestroyInstance(inst.m_handle);
+    inst.m_handle = 0;
   }
 }
 
