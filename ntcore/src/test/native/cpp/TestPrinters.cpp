@@ -20,43 +20,31 @@ void PrintTo(const json& val, ::std::ostream* os) {
 }  // namespace wpi
 
 namespace nt {
-#if 0
-void PrintTo(const EntryNotification& event, std::ostream* os) {
-  *os << "EntryNotification{listener=";
+
+void PrintTo(const Event& event, std::ostream* os) {
+  *os << "Event{listener=";
   PrintTo(Handle{event.listener}, os);
-  *os << ", entry=";
-  PrintTo(Handle{event.entry}, os);
-  *os << ", name=\"" << event.name << "\", flags=" << event.flags << ", value=";
-  PrintTo(event.value, os);
+  *os << ", flags=" << event.flags;
+  // *os << ", name=\"" << event.name << "\", flags=" << event.flags
+  // << "value=";
+  // PrintTo(event.value, os);
   *os << '}';
 }
-#endif
+
 void PrintTo(const Handle& handle, std::ostream* os) {
   *os << "Handle{";
   switch (handle.GetType()) {
-    case Handle::kConnectionListener:
-      *os << "kConnectionListener";
+    case Handle::kListener:
+      *os << "kListener";
       break;
-    case Handle::kConnectionListenerPoller:
-      *os << "kConnectionListenerPoller";
+    case Handle::kListenerPoller:
+      *os << "kListenerPoller";
       break;
     case Handle::kEntry:
       *os << "kEntry";
       break;
-    case Handle::kEntryListener:
-      *os << "kEntryListener";
-      break;
-    case Handle::kEntryListenerPoller:
-      *os << "kEntryListenerPoller";
-      break;
     case Handle::kInstance:
       *os << "kInstance";
-      break;
-    case Handle::kLogger:
-      *os << "kLogger";
-      break;
-    case Handle::kLoggerPoller:
-      *os << "kLoggerPoller";
       break;
     case Handle::kTopic:
       *os << "kTopic";

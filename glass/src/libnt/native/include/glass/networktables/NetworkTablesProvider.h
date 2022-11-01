@@ -10,10 +10,9 @@
 #include <vector>
 
 #include <networktables/NetworkTableInstance.h>
+#include <networktables/NetworkTableListener.h>
 #include <networktables/StringTopic.h>
 #include <networktables/Topic.h>
-#include <networktables/TopicListener.h>
-#include <networktables/ValueListener.h>
 #include <wpi/DenseMap.h>
 #include <wpi/StringMap.h>
 
@@ -79,9 +78,8 @@ class NetworkTablesProvider : private Provider<detail::NTProviderFunctions> {
   void Update() override;
 
   nt::NetworkTableInstance m_inst;
-  nt::TopicListenerPoller m_topicPoller;
-  NT_TopicListener m_topicListener{0};
-  nt::ValueListenerPoller m_valuePoller;
+  nt::NetworkTableListenerPoller m_poller;
+  NT_Listener m_listener{0};
 
   // cached mapping from table name to type string
   Storage& m_typeCache;
@@ -96,7 +94,7 @@ class NetworkTablesProvider : private Provider<detail::NTProviderFunctions> {
 
   struct SubListener {
     nt::StringSubscriber subscriber;
-    NT_ValueListener listener;
+    NT_Listener listener;
   };
 
   // mapping from .type topic to subscriber/listener

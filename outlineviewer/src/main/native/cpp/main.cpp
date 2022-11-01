@@ -39,47 +39,45 @@ static glass::NetworkTablesFlagsSettings gFlagsSettings;
 static glass::MainMenuBar gMainMenu;
 
 static void NtInitialize() {
-  // update window title when connection status changes
   auto inst = nt::GetDefaultInstance();
-  auto poller = nt::CreateConnectionListenerPoller(inst);
-  nt::AddPolledConnectionListener(poller, true);
+  auto poller = nt::CreateListenerPoller(inst);
+  nt::AddPolledListener(
+      poller, inst,
+      NT_EVENT_CONNECTION | NT_EVENT_IMMEDIATE | NT_EVENT_LOGMESSAGE);
   gui::AddEarlyExecute([inst, poller] {
     auto win = gui::GetSystemWindow();
     if (!win) {
       return;
     }
-    for (auto&& event : nt::ReadConnectionListenerQueue(poller)) {
-      if ((nt::GetNetworkMode(inst) & NT_NET_MODE_SERVER) != 0) {
-        // for server mode, just print number of clients connected
-        glfwSetWindowTitle(win,
-                           fmt::format("OutlineViewer - {} Clients Connected",
-                                       nt::GetConnections(inst).size())
-                               .c_str());
-      } else if (event.connected) {
-        glfwSetWindowTitle(win, fmt::format("OutlineViewer - Connected ({})",
-                                            event.conn.remote_ip)
-                                    .c_str());
-      } else {
-        glfwSetWindowTitle(win, "OutlineViewer - DISCONNECTED");
+    for (auto&& event : nt::ReadListenerQueue(poller)) {
+      if (auto connInfo = event.GetConnectionInfo()) {
+        // update window title when connection status changes
+        if ((nt::GetNetworkMode(inst) & NT_NET_MODE_SERVER) != 0) {
+          // for server mode, just print number of clients connected
+          glfwSetWindowTitle(win,
+                             fmt::format("OutlineViewer - {} Clients Connected",
+                                         nt::GetConnections(inst).size())
+                                 .c_str());
+        } else if ((event.flags & NT_EVENT_CONNECTED) != 0) {
+          glfwSetWindowTitle(win, fmt::format("OutlineViewer - Connected ({})",
+                                              connInfo->remote_ip)
+                                      .c_str());
+        } else {
+          glfwSetWindowTitle(win, "OutlineViewer - DISCONNECTED");
+        }
+      } else if (auto msg = event.GetLogMessage()) {
+        // handle NetworkTables log messages
+        const char* level = "";
+        if (msg->level >= NT_LOG_CRITICAL) {
+          level = "CRITICAL: ";
+        } else if (msg->level >= NT_LOG_ERROR) {
+          level = "ERROR: ";
+        } else if (msg->level >= NT_LOG_WARNING) {
+          level = "WARNING: ";
+        }
+        gLog.Append(fmt::format("{}{} ({}:{})\n", level, msg->message,
+                                msg->filename, msg->line));
       }
-    }
-  });
-
-  // handle NetworkTables log messages
-  auto logPoller = nt::CreateLoggerPoller(inst);
-  nt::AddPolledLogger(logPoller, NT_LOG_INFO, 100);
-  gui::AddEarlyExecute([logPoller] {
-    for (auto&& msg : nt::ReadLoggerQueue(logPoller)) {
-      const char* level = "";
-      if (msg.level >= NT_LOG_CRITICAL) {
-        level = "CRITICAL: ";
-      } else if (msg.level >= NT_LOG_ERROR) {
-        level = "ERROR: ";
-      } else if (msg.level >= NT_LOG_WARNING) {
-        level = "WARNING: ";
-      }
-      gLog.Append(fmt::format("{}{} ({}:{})\n", level, msg.message,
-                              msg.filename, msg.line));
     }
   });
 

@@ -19,9 +19,6 @@ public final class LogMessage {
   public static final int kDebug3 = 7;
   public static final int kDebug4 = 6;
 
-  /** The logger that generated the message. */
-  public final int logger;
-
   /** Log level of the message. */
   public final int level;
 
@@ -37,26 +34,15 @@ public final class LogMessage {
   /**
    * Constructor. This should generally only be used internally to NetworkTables.
    *
-   * @param inst Instance
-   * @param logger Logger
    * @param level Log level
    * @param filename Filename
    * @param line Line number
    * @param message Message
    */
-  public LogMessage(
-      NetworkTableInstance inst, int logger, int level, String filename, int line, String message) {
-    this.m_inst = inst;
-    this.logger = logger;
+  public LogMessage(int level, String filename, int line, String message) {
     this.level = level;
     this.filename = filename;
     this.line = line;
     this.message = message;
-  }
-
-  private final NetworkTableInstance m_inst;
-
-  NetworkTableInstance getInstance() {
-    return m_inst;
   }
 }

@@ -41,8 +41,7 @@ class NTMechanismGroupImpl final {
   const char* GetName() const { return m_name.c_str(); }
   void ForEachObject(wpi::function_ref<void(MechanismObjectModel& model)> func);
 
-  void NTUpdate(const nt::TopicNotification& event, std::string_view name);
-  void NTUpdate(const nt::ValueNotification& event, std::string_view name);
+  void NTUpdate(const nt::Event& event, std::string_view name);
 
  protected:
   nt::NetworkTableInstance m_inst;
@@ -74,8 +73,7 @@ class NTMechanismObjectModel final : public MechanismObjectModel {
   frc::Rotation2d GetAngle() const final { return m_angleValue; }
   units::meter_t GetLength() const final { return m_lengthValue; }
 
-  bool NTUpdate(const nt::TopicNotification& event, std::string_view name);
-  void NTUpdate(const nt::ValueNotification& event, std::string_view name);
+  bool NTUpdate(const nt::Event& event, std::string_view name);
 
  private:
   NTMechanismGroupImpl m_group;
@@ -102,7 +100,7 @@ void NTMechanismGroupImpl::ForEachObject(
   }
 }
 
-void NTMechanismGroupImpl::NTUpdate(const nt::TopicNotification& event,
+void NTMechanismGroupImpl::NTUpdate(const nt::Event& event,
                                     std::string_view name) {
   if (name.empty()) {
     return;
@@ -118,81 +116,67 @@ void NTMechanismGroupImpl::NTUpdate(const nt::TopicNotification& event,
       [](const auto& e, std::string_view name) { return e->GetName() < name; });
   bool match = it != m_objects.end() && (*it)->GetName() == name;
 
-  if (event.flags & NT_TOPIC_NOTIFY_PUBLISH) {
-    if (!match) {
-      it = m_objects.emplace(
-          it, std::make_unique<NTMechanismObjectModel>(
-                  m_inst, fmt::format("{}/{}", m_path, name), name));
-      match = true;
+  if (event.GetTopicInfo()) {
+    if (event.flags & nt::EventFlags::kPublish) {
+      if (!match) {
+        it = m_objects.emplace(
+            it, std::make_unique<NTMechanismObjectModel>(
+                    m_inst, fmt::format("{}/{}", m_path, name), name));
+        match = true;
+      }
     }
-  }
 
-  if (match) {
-    if ((*it)->NTUpdate(event, childName)) {
-      m_objects.erase(it);
+    if (match) {
+      if ((*it)->NTUpdate(event, childName)) {
+        m_objects.erase(it);
+      }
+    }
+  } else if (event.GetValueEventData()) {
+    if (match) {
+      (*it)->NTUpdate(event, childName);
     }
   }
 }
 
-void NTMechanismGroupImpl::NTUpdate(const nt::ValueNotification& event,
-                                    std::string_view name) {
-  if (name.empty()) {
-    return;
-  }
-  std::string_view childName;
-  std::tie(name, childName) = wpi::split(name, '/');
-  if (childName.empty()) {
-    return;
-  }
-
-  auto it = std::lower_bound(
-      m_objects.begin(), m_objects.end(), name,
-      [](const auto& e, std::string_view name) { return e->GetName() < name; });
-  if (it != m_objects.end() && (*it)->GetName() == name) {
-    (*it)->NTUpdate(event, childName);
-  }
-}
-
-bool NTMechanismObjectModel::NTUpdate(const nt::TopicNotification& event,
+bool NTMechanismObjectModel::NTUpdate(const nt::Event& event,
                                       std::string_view childName) {
-  if (event.info.topic == m_typeTopic.GetHandle()) {
-    if (event.flags & NT_TOPIC_NOTIFY_UNPUBLISH) {
-      return true;
+  if (auto info = event.GetTopicInfo()) {
+    if (info->topic == m_typeTopic.GetHandle()) {
+      if (event.flags & nt::EventFlags::kUnpublish) {
+        return true;
+      }
+    } else if (info->topic != m_colorTopic.GetHandle() &&
+               info->topic != m_weightTopic.GetHandle() &&
+               info->topic != m_angleTopic.GetHandle() &&
+               info->topic != m_lengthTopic.GetHandle()) {
+      m_group.NTUpdate(event, childName);
     }
-  } else if (event.info.topic != m_colorTopic.GetHandle() &&
-             event.info.topic != m_weightTopic.GetHandle() &&
-             event.info.topic != m_angleTopic.GetHandle() &&
-             event.info.topic != m_lengthTopic.GetHandle()) {
-    m_group.NTUpdate(event, childName);
+  } else if (auto valueData = event.GetValueEventData()) {
+    if (valueData->topic == m_typeTopic.GetHandle()) {
+      if (valueData->value && valueData->value.IsString()) {
+        m_typeValue = valueData->value.GetString();
+      }
+    } else if (valueData->topic == m_colorTopic.GetHandle()) {
+      if (valueData->value && valueData->value.IsString()) {
+        ConvertColor(valueData->value.GetString(), &m_colorValue);
+      }
+    } else if (valueData->topic == m_weightTopic.GetHandle()) {
+      if (valueData->value && valueData->value.IsDouble()) {
+        m_weightValue = valueData->value.GetDouble();
+      }
+    } else if (valueData->topic == m_angleTopic.GetHandle()) {
+      if (valueData->value && valueData->value.IsDouble()) {
+        m_angleValue = units::degree_t{valueData->value.GetDouble()};
+      }
+    } else if (valueData->topic == m_lengthTopic.GetHandle()) {
+      if (valueData->value && valueData->value.IsDouble()) {
+        m_lengthValue = units::meter_t{valueData->value.GetDouble()};
+      }
+    } else {
+      m_group.NTUpdate(event, childName);
+    }
   }
   return false;
-}
-
-void NTMechanismObjectModel::NTUpdate(const nt::ValueNotification& event,
-                                      std::string_view childName) {
-  if (event.topic == m_typeTopic.GetHandle()) {
-    if (event.value && event.value.IsString()) {
-      m_typeValue = event.value.GetString();
-    }
-  } else if (event.topic == m_colorTopic.GetHandle()) {
-    if (event.value && event.value.IsString()) {
-      ConvertColor(event.value.GetString(), &m_colorValue);
-    }
-  } else if (event.topic == m_weightTopic.GetHandle()) {
-    if (event.value && event.value.IsDouble()) {
-      m_weightValue = event.value.GetDouble();
-    }
-  } else if (event.topic == m_angleTopic.GetHandle()) {
-    if (event.value && event.value.IsDouble()) {
-      m_angleValue = units::degree_t{event.value.GetDouble()};
-    }
-  } else if (event.topic == m_lengthTopic.GetHandle()) {
-    if (event.value && event.value.IsDouble()) {
-      m_lengthValue = units::meter_t{event.value.GetDouble()};
-    }
-  } else {
-    m_group.NTUpdate(event, childName);
-  }
 }
 
 class NTMechanism2DModel::RootModel final : public MechanismRootModel {
@@ -209,8 +193,7 @@ class NTMechanism2DModel::RootModel final : public MechanismRootModel {
     m_group.ForEachObject(func);
   }
 
-  bool NTUpdate(const nt::TopicNotification& event, std::string_view childName);
-  void NTUpdate(const nt::ValueNotification& event, std::string_view childName);
+  bool NTUpdate(const nt::Event& event, std::string_view childName);
 
   frc::Translation2d GetPosition() const override { return m_pos; };
 
@@ -221,34 +204,33 @@ class NTMechanism2DModel::RootModel final : public MechanismRootModel {
   frc::Translation2d m_pos;
 };
 
-bool NTMechanism2DModel::RootModel::NTUpdate(const nt::TopicNotification& event,
+bool NTMechanism2DModel::RootModel::NTUpdate(const nt::Event& event,
                                              std::string_view childName) {
-  if (event.info.topic == m_xTopic.GetHandle() ||
-      event.info.topic == m_yTopic.GetHandle()) {
-    if (event.flags & NT_TOPIC_NOTIFY_UNPUBLISH) {
-      return true;
+  if (auto info = event.GetTopicInfo()) {
+    if (info->topic == m_xTopic.GetHandle() ||
+        info->topic == m_yTopic.GetHandle()) {
+      if (event.flags & nt::EventFlags::kUnpublish) {
+        return true;
+      }
+    } else {
+      m_group.NTUpdate(event, childName);
     }
-  } else {
-    m_group.NTUpdate(event, childName);
+  } else if (auto valueData = event.GetValueEventData()) {
+    if (valueData->topic == m_xTopic.GetHandle()) {
+      if (valueData->value && valueData->value.IsDouble()) {
+        m_pos = frc::Translation2d{units::meter_t{valueData->value.GetDouble()},
+                                   m_pos.Y()};
+      }
+    } else if (valueData->topic == m_yTopic.GetHandle()) {
+      if (valueData->value && valueData->value.IsDouble()) {
+        m_pos = frc::Translation2d{
+            m_pos.X(), units::meter_t{valueData->value.GetDouble()}};
+      }
+    } else {
+      m_group.NTUpdate(event, childName);
+    }
   }
   return false;
-}
-
-void NTMechanism2DModel::RootModel::NTUpdate(const nt::ValueNotification& event,
-                                             std::string_view childName) {
-  if (event.topic == m_xTopic.GetHandle()) {
-    if (event.value && event.value.IsDouble()) {
-      m_pos = frc::Translation2d{units::meter_t{event.value.GetDouble()},
-                                 m_pos.Y()};
-    }
-  } else if (event.topic == m_yTopic.GetHandle()) {
-    if (event.value && event.value.IsDouble()) {
-      m_pos = frc::Translation2d{m_pos.X(),
-                                 units::meter_t{event.value.GetDouble()}};
-    }
-  } else {
-    m_group.NTUpdate(event, childName);
-  }
 }
 
 NTMechanism2DModel::NTMechanism2DModel(std::string_view path)
@@ -265,75 +247,72 @@ NTMechanism2DModel::NTMechanism2DModel(nt::NetworkTableInstance inst,
       m_nameTopic{m_inst.GetTopic(fmt::format("{}/.name", path))},
       m_dimensionsTopic{m_inst.GetTopic(fmt::format("{}/dims", path))},
       m_bgColorTopic{m_inst.GetTopic(fmt::format("{}/backgroundColor", path))},
-      m_topicListener{m_inst},
-      m_valueListener{m_inst},
+      m_poller{m_inst},
       m_dimensionsValue{1_m, 1_m} {
-  m_topicListener.Add(m_tableSub, NT_TOPIC_NOTIFY_PUBLISH |
-                                      NT_TOPIC_NOTIFY_UNPUBLISH |
-                                      NT_TOPIC_NOTIFY_IMMEDIATE);
-  m_valueListener.Add(m_tableSub,
-                      NT_VALUE_NOTIFY_IMMEDIATE | NT_VALUE_NOTIFY_LOCAL);
+  m_poller.AddListener(m_tableSub, nt::EventFlags::kTopic |
+                                       nt::EventFlags::kValueAll |
+                                       nt::EventFlags::kImmediate);
 }
 
 NTMechanism2DModel::~NTMechanism2DModel() = default;
 
 void NTMechanism2DModel::Update() {
-  for (auto&& event : m_topicListener.ReadQueue()) {
-    auto name = wpi::drop_front(event.info.name, m_path.size());
-    if (name.empty() || name[0] == '.') {
-      continue;
-    }
-    std::string_view childName;
-    std::tie(name, childName) = wpi::split(name, '/');
-    if (childName.empty()) {
-      continue;
-    }
-
-    auto it = std::lower_bound(m_roots.begin(), m_roots.end(), name,
-                               [](const auto& e, std::string_view name) {
-                                 return e->GetName() < name;
-                               });
-    bool match = it != m_roots.end() && (*it)->GetName() == name;
-
-    if (event.flags & NT_TOPIC_NOTIFY_PUBLISH) {
-      if (!match) {
-        it = m_roots.emplace(
-            it, std::make_unique<RootModel>(
-                    m_inst, fmt::format("{}{}", m_path, name), name));
-        match = true;
+  for (auto&& event : m_poller.ReadQueue()) {
+    if (auto info = event.GetTopicInfo()) {
+      auto name = wpi::drop_front(info->name, m_path.size());
+      if (name.empty() || name[0] == '.') {
+        continue;
       }
-    }
-    if (match) {
-      if ((*it)->NTUpdate(event, childName)) {
-        m_roots.erase(it);
+      std::string_view childName;
+      std::tie(name, childName) = wpi::split(name, '/');
+      if (childName.empty()) {
+        continue;
       }
-    }
-  }
 
-  for (auto&& event : m_valueListener.ReadQueue()) {
-    // .name
-    if (event.topic == m_nameTopic.GetHandle()) {
-      if (event.value && event.value.IsString()) {
-        m_nameValue = event.value.GetString();
-      }
-      continue;
-    }
+      auto it = std::lower_bound(m_roots.begin(), m_roots.end(), name,
+                                 [](const auto& e, std::string_view name) {
+                                   return e->GetName() < name;
+                                 });
+      bool match = it != m_roots.end() && (*it)->GetName() == name;
 
-    // dims
-    if (event.topic == m_dimensionsTopic.GetHandle()) {
-      if (event.value && event.value.IsDoubleArray()) {
-        auto arr = event.value.GetDoubleArray();
-        if (arr.size() == 2) {
-          m_dimensionsValue = frc::Translation2d{units::meter_t{arr[0]},
-                                                 units::meter_t{arr[1]}};
+      if (event.flags & nt::EventFlags::kPublish) {
+        if (!match) {
+          it = m_roots.emplace(
+              it, std::make_unique<RootModel>(
+                      m_inst, fmt::format("{}{}", m_path, name), name));
+          match = true;
         }
       }
-    }
+      if (match) {
+        if ((*it)->NTUpdate(event, childName)) {
+          m_roots.erase(it);
+        }
+      }
+    } else if (auto valueData = event.GetValueEventData()) {
+      // .name
+      if (valueData->topic == m_nameTopic.GetHandle()) {
+        if (valueData->value && valueData->value.IsString()) {
+          m_nameValue = valueData->value.GetString();
+        }
+        continue;
+      }
 
-    // backgroundColor
-    if (event.topic == m_bgColorTopic.GetHandle()) {
-      if (event.value && event.value.IsString()) {
-        ConvertColor(event.value.GetString(), &m_bgColorValue);
+      // dims
+      if (valueData->topic == m_dimensionsTopic.GetHandle()) {
+        if (valueData->value && valueData->value.IsDoubleArray()) {
+          auto arr = valueData->value.GetDoubleArray();
+          if (arr.size() == 2) {
+            m_dimensionsValue = frc::Translation2d{units::meter_t{arr[0]},
+                                                   units::meter_t{arr[1]}};
+          }
+        }
+      }
+
+      // backgroundColor
+      if (valueData->topic == m_bgColorTopic.GetHandle()) {
+        if (valueData->value && valueData->value.IsString()) {
+          ConvertColor(valueData->value.GetString(), &m_bgColorValue);
+        }
       }
     }
   }

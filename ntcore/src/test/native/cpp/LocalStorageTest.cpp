@@ -3,6 +3,7 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #include "LocalStorage.h"
+#include "MockListenerStorage.h"
 #include "MockLogger.h"
 #include "PubSubOptionsMatcher.h"
 #include "SpanMatcher.h"
@@ -36,7 +37,8 @@ class LocalStorageTest : public ::testing::Test {
   ::testing::StrictMock<net::MockNetworkStartupInterface> startup;
   ::testing::StrictMock<net::MockNetworkInterface> network;
   wpi::MockLogger logger;
-  LocalStorage storage{0, logger};
+  MockListenerStorage listenerStorage;
+  LocalStorage storage{0, listenerStorage, logger};
   NT_Topic fooTopic{storage.GetTopic("foo")};
   NT_Topic barTopic{storage.GetTopic("bar")};
   NT_Topic bazTopic{storage.GetTopic("baz")};

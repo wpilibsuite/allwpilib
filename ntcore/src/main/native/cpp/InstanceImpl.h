@@ -15,6 +15,7 @@
 
 #include "ConnectionList.h"
 #include "Handle.h"
+#include "ListenerStorage.h"
 #include "LocalStorage.h"
 #include "Log.h"
 #include "LoggerImpl.h"
@@ -55,6 +56,7 @@ class InstanceImpl {
   std::shared_ptr<NetworkServer> GetServer();
   std::shared_ptr<INetworkClient> GetClient();
 
+  ListenerStorage listenerStorage;
   LoggerImpl logger_impl;
   wpi::Logger logger;
   ConnectionList connectionList;

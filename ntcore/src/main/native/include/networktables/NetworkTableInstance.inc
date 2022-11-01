@@ -10,6 +10,7 @@
 
 #include "networktables/NetworkTableInstance.h"
 #include "networktables/Topic.h"
+#include "ntcore_c.h"
 
 namespace nt {
 
@@ -82,81 +83,42 @@ inline NetworkTableEntry NetworkTableInstance::GetEntry(std::string_view name) {
   return NetworkTableEntry{::nt::GetEntry(m_handle, name)};
 }
 
-inline NT_ConnectionListener NetworkTableInstance::AddConnectionListener(
-    bool immediate_notify,
-    std::function<void(const ConnectionNotification& event)> callback) const {
-  return ::nt::AddConnectionListener(m_handle, immediate_notify,
-                                     std::move(callback));
+inline bool NetworkTableInstance::WaitForListenerQueue(double timeout) {
+  return ::nt::WaitForListenerQueue(m_handle, timeout);
 }
 
-inline bool NetworkTableInstance::WaitForConnectionListenerQueue(
-    double timeout) {
-  return ::nt::WaitForConnectionListenerQueue(m_handle, timeout);
+inline void NetworkTableInstance::RemoveListener(NT_Listener listener) {
+  ::nt::RemoveListener(listener);
 }
 
-inline void NetworkTableInstance::RemoveConnectionListener(
-    NT_ConnectionListener conn_listener) {
-  ::nt::RemoveConnectionListener(conn_listener);
+inline NT_Listener NetworkTableInstance::AddConnectionListener(
+    bool immediate_notify, ListenerCallback callback) const {
+  return ::nt::AddListener(
+      m_handle,
+      NT_EVENT_CONNECTION | (immediate_notify ? NT_EVENT_IMMEDIATE : 0),
+      std::move(callback));
 }
 
-inline NT_TopicListener NetworkTableInstance::AddTopicListener(
-    Topic topic, unsigned int eventMask,
-    std::function<void(const TopicNotification&)> listener) {
-  return ::nt::AddTopicListener(topic.GetHandle(), eventMask,
-                                std::move(listener));
+inline NT_Listener NetworkTableInstance::AddListener(
+    Topic topic, unsigned int eventMask, ListenerCallback listener) {
+  return ::nt::AddListener(topic.GetHandle(), eventMask, std::move(listener));
 }
 
-inline NT_TopicListener NetworkTableInstance::AddTopicListener(
-    Subscriber& subscriber, unsigned int eventMask,
-    std::function<void(const TopicNotification&)> listener) {
-  return ::nt::AddTopicListener(subscriber.GetHandle(), eventMask,
-                                std::move(listener));
+inline NT_Listener NetworkTableInstance::AddListener(
+    Subscriber& subscriber, unsigned int eventMask, ListenerCallback listener) {
+  return ::nt::AddListener(subscriber.GetHandle(), eventMask,
+                           std::move(listener));
 }
 
-inline NT_TopicListener NetworkTableInstance::AddTopicListener(
-    NetworkTableEntry& entry, int eventMask,
-    std::function<void(const TopicNotification&)> listener) {
-  return ::nt::AddTopicListener(entry.GetHandle(), eventMask,
-                                std::move(listener));
+inline NT_Listener NetworkTableInstance::AddListener(
+    NetworkTableEntry& entry, int eventMask, ListenerCallback listener) {
+  return ::nt::AddListener(entry.GetHandle(), eventMask, std::move(listener));
 }
 
-inline NT_TopicListener NetworkTableInstance::AddTopicListener(
+inline NT_Listener NetworkTableInstance::AddListener(
     std::span<const std::string_view> prefixes, int eventMask,
-    std::function<void(const TopicNotification&)> listener) {
-  return ::nt::AddTopicListener(m_handle, prefixes, eventMask,
-                                std::move(listener));
-}
-
-inline void NetworkTableInstance::RemoveTopicListener(
-    NT_TopicListener listener) {
-  return ::nt::RemoveTopicListener(listener);
-}
-
-inline bool NetworkTableInstance::WaitForTopicListenerQueue(double timeout) {
-  return ::nt::WaitForTopicListenerQueue(m_handle, timeout);
-}
-
-inline NT_ValueListener NetworkTableInstance::AddValueListener(
-    Subscriber& subscriber, unsigned int eventMask,
-    std::function<void(const ValueNotification&)> listener) {
-  return ::nt::AddValueListener(subscriber.GetHandle(), eventMask,
-                                std::move(listener));
-}
-
-inline NT_ValueListener NetworkTableInstance::AddValueListener(
-    NetworkTableEntry& entry, int eventMask,
-    std::function<void(const ValueNotification&)> listener) {
-  return ::nt::AddValueListener(entry.GetHandle(), eventMask,
-                                std::move(listener));
-}
-
-inline void NetworkTableInstance::RemoveValueListener(
-    NT_ValueListener listener) {
-  ::nt::RemoveValueListener(listener);
-}
-
-inline bool NetworkTableInstance::WaitForValueListenerQueue(double timeout) {
-  return ::nt::WaitForValueListenerQueue(m_handle, timeout);
+    ListenerCallback listener) {
+  return ::nt::AddListener(m_handle, prefixes, eventMask, std::move(listener));
 }
 
 inline unsigned int NetworkTableInstance::GetNetworkMode() const {
@@ -254,14 +216,10 @@ inline void NetworkTableInstance::StopConnectionDataLog(
   ::nt::StopConnectionDataLog(logger);
 }
 
-inline NT_Logger NetworkTableInstance::AddLogger(
-    std::function<void(const LogMessage& msg)> func, unsigned int min_level,
-    unsigned int max_level) {
-  return ::nt::AddLogger(m_handle, func, min_level, max_level);
-}
-
-inline void NetworkTableInstance::RemoveLogger(NT_Logger logger) {
-  ::nt::RemoveLogger(logger);
+inline NT_Listener NetworkTableInstance::AddLogger(unsigned int min_level,
+                                                   unsigned int max_level,
+                                                   ListenerCallback func) {
+  return ::nt::AddLogger(m_handle, min_level, max_level, std::move(func));
 }
 
 }  // namespace nt

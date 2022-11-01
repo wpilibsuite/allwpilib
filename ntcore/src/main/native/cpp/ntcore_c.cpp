@@ -37,33 +37,40 @@ static void ConvertToC(const ConnectionInfo& in, NT_ConnectionInfo* out) {
   out->protocol_version = in.protocol_version;
 }
 
-static void ConvertToC(const TopicNotification& in, NT_TopicNotification* out) {
-  out->listener = in.listener;
-  ConvertToC(in.info, &out->info);
-  out->flags = in.flags;
-}
-
-static void ConvertToC(const ValueNotification& in, NT_ValueNotification* out) {
-  out->listener = in.listener;
+static void ConvertToC(const ValueEventData& in, NT_ValueEventData* out) {
   out->topic = in.topic;
   out->subentry = in.subentry;
   ConvertToC(in.value, &out->value);
-  out->flags = in.flags;
-}
-
-static void ConvertToC(const ConnectionNotification& in,
-                       NT_ConnectionNotification* out) {
-  out->listener = in.listener;
-  out->connected = in.connected;
-  ConvertToC(in.conn, &out->conn);
 }
 
 static void ConvertToC(const LogMessage& in, NT_LogMessage* out) {
-  out->logger = in.logger;
   out->level = in.level;
   ConvertToC(in.filename, &out->filename);
   out->line = in.line;
   ConvertToC(in.message, &out->message);
+}
+
+static void ConvertToC(const Event& in, NT_Event* out) {
+  out->listener = in.listener;
+  out->flags = in.flags;
+  if ((in.flags & NT_EVENT_VALUE_ALL) != 0) {
+    if (auto v = in.GetValueEventData()) {
+      return ConvertToC(*v, &out->data.valueData);
+    }
+  } else if ((in.flags & NT_EVENT_TOPIC) != 0) {
+    if (auto v = in.GetTopicInfo()) {
+      return ConvertToC(*v, &out->data.topicInfo);
+    }
+  } else if ((in.flags & NT_EVENT_CONNECTION) != 0) {
+    if (auto v = in.GetConnectionInfo()) {
+      return ConvertToC(*v, &out->data.connInfo);
+    }
+  } else if ((in.flags & NT_EVENT_LOGMESSAGE) != 0) {
+    if (auto v = in.GetLogMessage()) {
+      return ConvertToC(*v, &out->data.logMessage);
+    }
+  }
+  out->flags = NT_EVENT_NONE;  // sanity to make sure we don't dispose
 }
 
 static void DisposeConnectionInfo(NT_ConnectionInfo* info) {
@@ -77,16 +84,21 @@ static void DisposeTopicInfo(NT_TopicInfo* info) {
   std::free(info->properties.str);
 }
 
-static void DisposeTopicNotification(NT_TopicNotification* info) {
-  DisposeTopicInfo(&info->info);
+static void DisposeLogMessage(NT_LogMessage* msg) {
+  std::free(msg->filename);
+  std::free(msg->message);
 }
 
-static void DisposeValueNotification(NT_ValueNotification* info) {
-  NT_DisposeValue(&info->value);
-}
-
-static void DisposeConnectionNotification(NT_ConnectionNotification* info) {
-  DisposeConnectionInfo(&info->conn);
+static void DisposeEvent(NT_Event* event) {
+  if ((event->flags & NT_EVENT_VALUE_ALL) != 0) {
+    NT_DisposeValue(&event->data.valueData.value);
+  } else if ((event->flags & NT_EVENT_TOPIC) != 0) {
+    DisposeTopicInfo(&event->data.topicInfo);
+  } else if ((event->flags & NT_EVENT_CONNECTION) != 0) {
+    DisposeConnectionInfo(&event->data.connInfo);
+  } else if ((event->flags & NT_EVENT_LOGMESSAGE) != 0) {
+    DisposeLogMessage(&event->data.logMessage);
+  }
 }
 
 extern "C" {
@@ -383,169 +395,87 @@ NT_Topic NT_GetTopicFromHandle(NT_Handle pubsubentry) {
  * Callback Creation Functions
  */
 
-NT_TopicListener NT_AddTopicListener(NT_Inst inst, const char* prefix,
-                                     size_t prefix_len, unsigned int mask,
-                                     void* data,
-                                     NT_TopicListenerCallback callback) {
+NT_ListenerPoller NT_CreateListenerPoller(NT_Inst inst) {
+  return nt::CreateListenerPoller(inst);
+}
+
+void NT_DestroyListenerPoller(NT_ListenerPoller poller) {
+  nt::DestroyListenerPoller(poller);
+}
+
+struct NT_Event* NT_ReadListenerQueue(NT_ListenerPoller poller, size_t* len) {
+  auto arr_cpp = nt::ReadListenerQueue(poller);
+  return ConvertToC<NT_Event>(arr_cpp, len);
+}
+
+void NT_RemoveListener(NT_Listener listener) {
+  nt::RemoveListener(listener);
+}
+
+NT_Bool NT_WaitForListenerQueue(NT_Handle handle, double timeout) {
+  return nt::WaitForListenerQueue(handle, timeout);
+}
+
+NT_Listener NT_AddListenerSingle(NT_Inst inst, const char* prefix,
+                                 size_t prefix_len, unsigned int mask,
+                                 void* data, NT_ListenerCallback callback) {
   std::string_view p{prefix, prefix_len};
-  return nt::AddTopicListener(inst, {{p}}, mask, [=](auto& event) {
-    NT_TopicNotification event_c;
+  return nt::AddListener(inst, {{p}}, mask, [=](auto& event) {
+    NT_Event event_c;
     ConvertToC(event, &event_c);
     callback(data, &event_c);
-    DisposeTopicNotification(&event_c);
+    DisposeEvent(&event_c);
   });
 }
 
-NT_TopicListener NT_AddTopicListenerMultiple(
-    NT_Inst inst, const NT_String* prefixes, size_t prefixes_len,
-    unsigned int mask, void* data, NT_TopicListenerCallback callback) {
+NT_Listener NT_AddListenerMultiple(NT_Inst inst, const NT_String* prefixes,
+                                   size_t prefixes_len, unsigned int mask,
+                                   void* data, NT_ListenerCallback callback) {
   wpi::SmallVector<std::string_view, 8> p;
   p.reserve(prefixes_len);
   for (size_t i = 0; i < prefixes_len; ++i) {
     p.emplace_back(prefixes[i].str, prefixes[i].len);
   }
-  return nt::AddTopicListener(inst, p, mask, [=](auto& event) {
-    NT_TopicNotification event_c;
+  return nt::AddListener(inst, p, mask, [=](auto& event) {
+    NT_Event event_c;
     ConvertToC(event, &event_c);
     callback(data, &event_c);
-    DisposeTopicNotification(&event_c);
+    DisposeEvent(&event_c);
   });
 }
 
-NT_TopicListener NT_AddTopicListenerSingle(NT_Topic topic, unsigned int mask,
-                                           void* data,
-                                           NT_TopicListenerCallback callback) {
-  return nt::AddTopicListener(topic, mask, [=](auto& event) {
-    NT_TopicNotification event_c;
+NT_Listener NT_AddListener(NT_Topic topic, unsigned int mask, void* data,
+                           NT_ListenerCallback callback) {
+  return nt::AddListener(topic, mask, [=](auto& event) {
+    NT_Event event_c;
     ConvertToC(event, &event_c);
     callback(data, &event_c);
-    DisposeTopicNotification(&event_c);
+    DisposeEvent(&event_c);
   });
 }
 
-NT_Bool NT_WaitForTopicListenerQueue(NT_Handle handle, double timeout) {
-  return nt::WaitForTopicListenerQueue(handle, timeout);
-}
-
-NT_TopicListenerPoller NT_CreateTopicListenerPoller(NT_Inst inst) {
-  return nt::CreateTopicListenerPoller(inst);
-}
-
-void NT_DestroyTopicListenerPoller(NT_TopicListenerPoller poller) {
-  nt::DestroyTopicListenerPoller(poller);
-}
-
-NT_TopicListener NT_AddPolledTopicListener(NT_TopicListenerPoller poller,
-                                           const char* prefix,
-                                           size_t prefix_len,
-                                           unsigned int mask) {
+NT_Listener NT_AddPolledListenerSingle(NT_ListenerPoller poller,
+                                       const char* prefix, size_t prefix_len,
+                                       unsigned int mask) {
   std::string_view p{prefix, prefix_len};
-  return nt::AddPolledTopicListener(poller, {{p}}, mask);
+  return nt::AddPolledListener(poller, {{p}}, mask);
 }
 
-NT_TopicListener NT_AddPolledTopicListenerMultiple(
-    NT_TopicListenerPoller poller, const NT_String* prefixes,
-    size_t prefixes_len, unsigned int mask) {
+NT_Listener NT_AddPolledListenerMultiple(NT_ListenerPoller poller,
+                                         const NT_String* prefixes,
+                                         size_t prefixes_len,
+                                         unsigned int mask) {
   wpi::SmallVector<std::string_view, 8> p;
   p.reserve(prefixes_len);
   for (size_t i = 0; i < prefixes_len; ++i) {
     p.emplace_back(prefixes[i].str, prefixes[i].len);
   }
-  return nt::AddPolledTopicListener(poller, p, mask);
+  return nt::AddPolledListener(poller, p, mask);
 }
 
-NT_TopicListener NT_AddPolledTopicListenerSingle(NT_TopicListenerPoller poller,
-                                                 NT_Topic topic,
-                                                 unsigned int mask) {
-  return nt::AddPolledTopicListener(poller, topic, mask);
-}
-
-struct NT_TopicNotification* NT_ReadTopicListenerQueue(
-    NT_TopicListenerPoller poller, size_t* len) {
-  auto arr_cpp = nt::ReadTopicListenerQueue(poller);
-  return ConvertToC<NT_TopicNotification>(arr_cpp, len);
-}
-
-void NT_RemoveTopicListener(NT_TopicListener topic_listener) {
-  nt::RemoveTopicListener(topic_listener);
-}
-
-NT_ValueListener NT_AddValueListener(NT_Handle subentry, unsigned int mask,
-                                     void* data,
-                                     NT_ValueListenerCallback callback) {
-  return nt::AddValueListener(subentry, mask, [=](auto& event) {
-    NT_ValueNotification event_c;
-    ConvertToC(event, &event_c);
-    callback(data, &event_c);
-    DisposeValueNotification(&event_c);
-  });
-}
-
-NT_Bool NT_WaitForValueListenerQueue(NT_Handle handle, double timeout) {
-  return nt::WaitForValueListenerQueue(handle, timeout);
-}
-
-NT_ValueListenerPoller NT_CreateValueListenerPoller(NT_Inst inst) {
-  return nt::CreateValueListenerPoller(inst);
-}
-
-void NT_DestroyValueListenerPoller(NT_ValueListenerPoller poller) {
-  nt::DestroyValueListenerPoller(poller);
-}
-
-NT_ValueListener NT_AddPolledValueListener(NT_ValueListenerPoller poller,
-                                           NT_Handle subentry,
-                                           unsigned int mask) {
-  return nt::AddPolledValueListener(poller, subentry, mask);
-}
-
-struct NT_ValueNotification* NT_ReadValueListenerQueue(
-    NT_ValueListenerPoller poller, size_t* len) {
-  auto arr_cpp = nt::ReadValueListenerQueue(poller);
-  return ConvertToC<NT_ValueNotification>(arr_cpp, len);
-}
-
-void NT_RemoveValueListener(NT_ValueListener value_listener) {
-  nt::RemoveValueListener(value_listener);
-}
-
-NT_ConnectionListener NT_AddConnectionListener(
-    NT_Inst inst, NT_Bool immediate_notify, void* data,
-    NT_ConnectionListenerCallback callback) {
-  return nt::AddConnectionListener(inst, immediate_notify != 0,
-                                   [=](const ConnectionNotification& event) {
-                                     NT_ConnectionNotification event_c;
-                                     ConvertToC(event, &event_c);
-                                     callback(data, &event_c);
-                                     DisposeConnectionNotification(&event_c);
-                                   });
-}
-
-NT_Bool NT_WaitForConnectionListenerQueue(NT_Handle handle, double timeout) {
-  return nt::WaitForConnectionListenerQueue(handle, timeout);
-}
-
-NT_ConnectionListenerPoller NT_CreateConnectionListenerPoller(NT_Inst inst) {
-  return nt::CreateConnectionListenerPoller(inst);
-}
-
-void NT_DestroyConnectionListenerPoller(NT_ConnectionListenerPoller poller) {
-  nt::DestroyConnectionListenerPoller(poller);
-}
-
-NT_ConnectionListener NT_AddPolledConnectionListener(
-    NT_ConnectionListenerPoller poller, NT_Bool immediate_notify) {
-  return nt::AddPolledConnectionListener(poller, immediate_notify);
-}
-
-struct NT_ConnectionNotification* NT_ReadConnectionListenerQueue(
-    NT_ConnectionListenerPoller poller, size_t* len) {
-  auto arr_cpp = nt::ReadConnectionListenerQueue(poller);
-  return ConvertToC<NT_ConnectionNotification>(arr_cpp, len);
-}
-
-void NT_RemoveConnectionListener(NT_ConnectionListener conn_listener) {
-  nt::RemoveConnectionListener(conn_listener);
+NT_Listener NT_AddPolledListener(NT_ListenerPoller poller, NT_Topic topic,
+                                 unsigned int mask) {
+  return nt::AddPolledListener(poller, topic, mask);
 }
 
 /*
@@ -641,39 +571,20 @@ void NT_SetNow(uint64_t timestamp) {
   nt::SetNow(timestamp);
 }
 
-NT_Logger NT_AddLogger(NT_Inst inst, void* data, NT_LogFunc func,
-                       unsigned int min_level, unsigned int max_level) {
-  return nt::AddLogger(
-      inst,
-      [=](const LogMessage& msg) {
-        NT_LogMessage msg_c;
-        ConvertToC(msg, &msg_c);
-        func(data, &msg_c);
-        NT_DisposeLogMessage(&msg_c);
-      },
-      min_level, max_level);
+NT_Listener NT_AddLogger(NT_Inst inst, unsigned int min_level,
+                         unsigned int max_level, void* data,
+                         NT_ListenerCallback func) {
+  return nt::AddLogger(inst, min_level, max_level, [=](auto& event) {
+    NT_Event event_c;
+    ConvertToC(event, &event_c);
+    func(data, &event_c);
+    NT_DisposeEvent(&event_c);
+  });
 }
 
-NT_LoggerPoller NT_CreateLoggerPoller(NT_Inst inst) {
-  return nt::CreateLoggerPoller(inst);
-}
-
-void NT_DestroyLoggerPoller(NT_LoggerPoller poller) {
-  nt::DestroyLoggerPoller(poller);
-}
-
-NT_Logger NT_AddPolledLogger(NT_LoggerPoller poller, unsigned int min_level,
-                             unsigned int max_level) {
+NT_Listener NT_AddPolledLogger(NT_ListenerPoller poller, unsigned int min_level,
+                               unsigned int max_level) {
   return nt::AddPolledLogger(poller, min_level, max_level);
-}
-
-struct NT_LogMessage* NT_ReadLoggerQueue(NT_LoggerPoller poller, size_t* len) {
-  auto arr_cpp = nt::ReadLoggerQueue(poller);
-  return ConvertToC<NT_LogMessage>(arr_cpp, len);
-}
-
-void NT_RemoveLogger(NT_Logger logger) {
-  nt::RemoveLogger(logger);
 }
 
 void NT_DisposeValue(NT_Value* value) {
@@ -759,50 +670,15 @@ void NT_DisposeTopicInfo(NT_TopicInfo* info) {
   DisposeTopicInfo(info);
 }
 
-void NT_DisposeTopicNotificationArray(NT_TopicNotification* arr, size_t count) {
+void NT_DisposeEventArray(NT_Event* arr, size_t count) {
   for (size_t i = 0; i < count; i++) {
-    DisposeTopicNotification(&arr[i]);
+    DisposeEvent(&arr[i]);
   }
   std::free(arr);
 }
 
-void NT_DisposeTopicNotification(NT_TopicNotification* info) {
-  DisposeTopicNotification(info);
-}
-
-void NT_DisposeValueNotificationArray(NT_ValueNotification* arr, size_t count) {
-  for (size_t i = 0; i < count; i++) {
-    DisposeValueNotification(&arr[i]);
-  }
-  std::free(arr);
-}
-
-void NT_DisposeValueNotification(NT_ValueNotification* info) {
-  DisposeValueNotification(info);
-}
-
-void NT_DisposeConnectionNotificationArray(NT_ConnectionNotification* arr,
-                                           size_t count) {
-  for (size_t i = 0; i < count; i++) {
-    DisposeConnectionNotification(&arr[i]);
-  }
-  std::free(arr);
-}
-
-void NT_DisposeConnectionNotification(NT_ConnectionNotification* info) {
-  DisposeConnectionNotification(info);
-}
-
-void NT_DisposeLogMessageArray(NT_LogMessage* arr, size_t count) {
-  for (size_t i = 0; i < count; i++) {
-    NT_DisposeLogMessage(&arr[i]);
-  }
-  std::free(arr);
-}
-
-void NT_DisposeLogMessage(NT_LogMessage* info) {
-  std::free(info->filename);
-  std::free(info->message);
+void NT_DisposeEvent(NT_Event* event) {
+  DisposeEvent(event);
 }
 
 /* Interop Utility Functions */

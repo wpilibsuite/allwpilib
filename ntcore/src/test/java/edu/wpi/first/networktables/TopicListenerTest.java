@@ -5,6 +5,7 @@
 package edu.wpi.first.networktables;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.fail;
 
 import edu.wpi.first.util.WPIUtilJNI;
@@ -35,8 +36,8 @@ class TopicListenerTest {
     m_clientInst.setServer("127.0.0.1", 10010);
 
     // Use connection listener to ensure we've connected
-    int poller = NetworkTablesJNI.createConnectionListenerPoller(m_clientInst.getHandle());
-    NetworkTablesJNI.addPolledConnectionListener(poller, false);
+    int poller = NetworkTablesJNI.createListenerPoller(m_clientInst.getHandle());
+    NetworkTablesJNI.addListener(poller, m_clientInst.getHandle(), NetworkTableEvent.kConnected);
     try {
       if (WPIUtilJNI.waitForObjectTimeout(poller, 1.0)) {
         fail("client didn't connect to server");
@@ -52,10 +53,9 @@ class TopicListenerTest {
   @Test
   void testPrefixNewRemote() {
     connect();
-    final int poller = NetworkTablesJNI.createTopicListenerPoller(m_serverInst.getHandle());
+    final int poller = NetworkTablesJNI.createListenerPoller(m_serverInst.getHandle());
     final int handle =
-        NetworkTablesJNI.addPolledTopicListener(
-            poller, new String[] {"/foo"}, TopicListenerFlags.kPublish);
+        NetworkTablesJNI.addListener(poller, new String[] {"/foo"}, NetworkTableEvent.kPublish);
 
     // Trigger an event
     m_clientInst.getEntry("/foo/bar").setDouble(1.0);
@@ -75,13 +75,14 @@ class TopicListenerTest {
       Thread.currentThread().interrupt();
       fail("interrupted while waiting for signal");
     }
-    TopicNotification[] events = NetworkTablesJNI.readTopicListenerQueue(m_serverInst, poller);
+    NetworkTableEvent[] events = NetworkTablesJNI.readListenerQueue(m_serverInst, poller);
 
     // Check the event
     assertEquals(1, events.length);
     assertEquals(handle, events[0].listener);
-    assertEquals(m_serverInst.getTopic("/foo/bar"), events[0].info.getTopic());
-    assertEquals("/foo/bar", events[0].info.name);
-    assertEquals(TopicListenerFlags.kPublish, events[0].flags);
+    assertNotNull(events[0].topicInfo);
+    assertEquals(m_serverInst.getTopic("/foo/bar"), events[0].topicInfo.getTopic());
+    assertEquals("/foo/bar", events[0].topicInfo.name);
+    assertEquals(NetworkTableEvent.kPublish, events[0].flags);
   }
 }

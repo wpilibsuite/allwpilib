@@ -101,16 +101,9 @@ void NetworkTableInstance::SetServer(std::span<const std::string_view> servers,
   SetServer(serversArr);
 }
 
-NT_TopicListener NetworkTableInstance::AddTopicListener(
-    MultiSubscriber& subscriber, int eventMask,
-    std::function<void(const TopicNotification&)> listener) {
-  return ::nt::AddTopicListener(subscriber.GetHandle(), eventMask,
-                                std::move(listener));
-}
-
-NT_ValueListener NetworkTableInstance::AddValueListener(
-    MultiSubscriber& subscriber, unsigned int eventMask,
-    std::function<void(const ValueNotification&)> listener) {
-  return ::nt::AddValueListener(subscriber.GetHandle(), eventMask,
-                                std::move(listener));
+NT_Listener NetworkTableInstance::AddListener(MultiSubscriber& subscriber,
+                                              int eventMask,
+                                              ListenerCallback listener) {
+  return ::nt::AddListener(subscriber.GetHandle(), eventMask,
+                           std::move(listener));
 }
