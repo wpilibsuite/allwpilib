@@ -26,7 +26,9 @@ class LoggerTest : public ::testing::Test {
 #endif
   }
 
-  ~LoggerTest() override { nt::DestroyInstance(m_inst); }
+  ~LoggerTest() override {
+    nt::DestroyInstance(m_inst);
+  }
 
   void Generate();
   void Check(const std::vector<nt::Event>& events, NT_Listener handle,
