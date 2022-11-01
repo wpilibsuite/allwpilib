@@ -2,6 +2,8 @@
 
 ## Notations
 
+### Blockquotes
+
 Comments in blockquotes are intended 
 to give the reader a deeper understanding of the discussed topics,
 and do not give any guarantees -- though they are likely to be true.
@@ -12,7 +14,57 @@ Per the blockquote comment, the reader is likely to be sitting on a chair.
 However, that is not guaranteed: they may be standing, lounging on a couch,
 lying in a bed, or floating three meters in the air.  
 
+### RFC 2119
+The keywords "MUST", "MUST NOT", "SHALL", "SHALL NOT",
+"SHOULD", "SHOULD NOT", "RECOMMENDED",  "MAY", and "OPTIONAL"
+in this document are
+to be interpreted as described in [RFC 2119](https://datatracker.ietf.org/doc/html/rfc2119).
+
+Note that this document does not use the RFC 2119 definition of the term "REQUIRED";
+any usage of the term "REQUIRED"
+in this document follows the definition [here](#Required Subsystems).
+
+[//]: # (### Idempotence)
+
+[//]: # (TODO)
+
 ## Command
+
+### Command Properties
+
+Commands have the following properties.
+The values of command properties MUST not change over the course of the program,
+and any operations to query the value of properties MUST be idempotent.  
+
+#### Required Subsystems
+
+Each command SHOULD declare the set of subsystems it controls;
+this set is referred to from here on as the command's _requirements_.
+A command's _requirements_ MAY be the empty set.    
+Subsystems SHALL NOT be _required_ by more than one (1) running command at a time;
+conflicts SHALL be resolved according to the [Interruption Behavior](#Interruption Behavior) of the command
+that is presently running.
+Requirement collisions MUST be checked and resolved
+before calling [`initialize`](#void-initializevoid) when scheduling a command.
+
+#### Interruption Behavior
+
+This property dictates the resolution strategy of [requirement](#required-subsystems) conflicts:
+what happens when another command sharing requirements with this one is scheduled.
+
+The following strategies are defined in this specification:
+- `CancelSelf`: this command is interrupted, [`end(true)`](#void-endbool-interrupted) is called, and scheduling of the incoming command commences.
+- `CancelIncoming`: scheduling of the incoming command is aborted, and this command continues running unaffected.
+
+[//]: # (TODO: do we want to explicitly allow alternate interruption behaviors? do we want to dictate a default?)
+[//]: # (      might be interesting to see alternate impls -- maybe coroutine-based in the future?)
+
+#### Runs When Disabled
+
+For implementations defining a "disabled mode",
+this property dictates whether a command may run during it.
+During "disabled mode", any commands not declared as "running when disabled"
+MUST be interrupted (i.e. `end(true)` is called), and any attempts to schedule them MUST abort.
 
 ### Command Lifecycle
 
@@ -20,7 +72,7 @@ A command's lifecycle is split into four stages, each represented by a method.
 
 #### void initialize(void)
 
-> This method is called once on command start.
+> Calling this method marks the command start.
 
 Any state needed for the command's functionality should be initialized here.
 Any resources needed should be opened here, not in the constructor.
@@ -44,11 +96,11 @@ Calling `execute` method before `initialize` or after `end` is undefined behavio
 This method may only be called between `initialize` and `end`.
 Calling `isFinished` method before `initialize` or after `end` is undefined behavior and inherently unsafe.
 
-Returning `true` marks the end of the command, and `end(false)` will be called.
+Returning `true` signals that the command should end, and `end(false)` will be called.
 
 #### void end(bool interrupted)
 
-> This method will be called when the command stops running.
+> This method marks the end of the command, and will be called when the command stops running.
 
 Any resources opened in `initialize` should be closed here.
 
