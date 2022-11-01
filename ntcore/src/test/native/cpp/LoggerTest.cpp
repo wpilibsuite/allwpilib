@@ -11,24 +11,9 @@
 
 class LoggerTest : public ::testing::Test {
  public:
-  LoggerTest() : m_inst(nt::CreateInstance()) {
-#if 0
-    nt::AddLogger(m_serverInst, 0, UINT_MAX, [](auto& event) {
-      if (auto msg = event.GetLogMessage()) {
-        std::fprintf(stderr, "SERVER: %s\n", msg->message.c_str());
-      }
-    });
-    nt::AddLogger(m_clientInst, 0, UINT_MAX, [](auto& event) {
-      if (auto msg = event.GetLogMessage()) {
-        std::fprintf(stderr, "CLIENT: %s\n", msg.message.c_str());
-      }
-    });
-#endif
-  }
+  LoggerTest() : m_inst(nt::CreateInstance()) {}
 
-  ~LoggerTest() override {
-    nt::DestroyInstance(m_inst);
-  }
+  ~LoggerTest() override { nt::DestroyInstance(m_inst); }
 
   void Generate();
   void Check(const std::vector<nt::Event>& events, NT_Listener handle,
