@@ -69,7 +69,7 @@ static unsigned int LevelToFlag(unsigned int level) {
 
 static unsigned int LevelsToEventMask(unsigned int minLevel,
                                       unsigned int maxLevel) {
-  unsigned int mask = EventFlags::kLogMessage;
+  unsigned int mask = 0;
   if (minLevel <= wpi::WPI_LOG_CRITICAL && maxLevel >= wpi::WPI_LOG_CRITICAL) {
     mask |= kFlagCritical;
   }
@@ -78,6 +78,9 @@ static unsigned int LevelsToEventMask(unsigned int minLevel,
   }
   if (minLevel <= wpi::WPI_LOG_WARNING && maxLevel >= wpi::WPI_LOG_WARNING) {
     mask |= kFlagWarning;
+  }
+  if (minLevel <= wpi::WPI_LOG_INFO && maxLevel >= wpi::WPI_LOG_INFO) {
+    mask |= kFlagInfo;
   }
   if (minLevel <= wpi::WPI_LOG_DEBUG && maxLevel >= wpi::WPI_LOG_DEBUG) {
     mask |= kFlagDebug;
@@ -94,6 +97,9 @@ static unsigned int LevelsToEventMask(unsigned int minLevel,
   if (minLevel <= wpi::WPI_LOG_DEBUG4 && maxLevel >= wpi::WPI_LOG_DEBUG4) {
     mask |= kFlagDebug4;
   }
+  if (mask == 0) {
+    mask = EventFlags::kLogMessage;
+  }
   return mask;
 }
 
@@ -107,7 +113,11 @@ void LoggerImpl::AddListener(NT_Listener listener, unsigned int minLevel,
   ++m_listenerCount;
   std::scoped_lock lock{m_mutex};
   m_listenerLevels.emplace_back(listener, minLevel, maxLevel);
-  m_listenerStorage.Activate(listener, LevelsToEventMask(minLevel, maxLevel));
+  m_listenerStorage.Activate(listener, LevelsToEventMask(minLevel, maxLevel),
+                             [](unsigned int mask, Event* event) {
+                               event->flags = NT_EVENT_LOGMESSAGE;
+                               return true;
+                             });
 }
 
 void LoggerImpl::RemoveListener(NT_Listener listener) {
