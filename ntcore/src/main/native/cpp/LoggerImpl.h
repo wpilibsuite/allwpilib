@@ -19,7 +19,7 @@ class IListenerStorage;
 
 class LoggerImpl {
  public:
-  LoggerImpl(int inst, IListenerStorage& listenerStorage);
+  explicit LoggerImpl(IListenerStorage& listenerStorage);
   LoggerImpl(const LoggerImpl&) = delete;
   LoggerImpl& operator=(const LoggerImpl&) = delete;
   ~LoggerImpl();
@@ -34,7 +34,6 @@ class LoggerImpl {
            const char* msg);
 
  private:
-  int m_inst;
   IListenerStorage& m_listenerStorage;
   std::atomic_int m_listenerCount{0};
   wpi::mutex m_mutex;

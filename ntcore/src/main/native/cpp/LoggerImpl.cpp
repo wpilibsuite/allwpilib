@@ -97,8 +97,8 @@ static unsigned int LevelsToEventMask(unsigned int minLevel,
   return mask;
 }
 
-LoggerImpl::LoggerImpl(int inst, IListenerStorage& listenerStorage)
-    : m_inst{inst}, m_listenerStorage{listenerStorage} {}
+LoggerImpl::LoggerImpl(IListenerStorage& listenerStorage)
+    : m_listenerStorage{listenerStorage} {}
 
 LoggerImpl::~LoggerImpl() = default;
 

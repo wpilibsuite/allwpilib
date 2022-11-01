@@ -14,7 +14,7 @@ using namespace std::placeholders;
 
 InstanceImpl::InstanceImpl(int inst)
     : listenerStorage{inst},
-      logger_impl{inst, listenerStorage},
+      logger_impl{listenerStorage},
       logger{
           std::bind(&LoggerImpl::Log, &logger_impl, _1, _2, _3, _4)},  // NOLINT
       connectionList{inst, listenerStorage},
