@@ -495,15 +495,19 @@ void LSImpl::NotifyValue(TopicData* topic, unsigned int eventFlags) {
     if (subscriber->active) {
       subscriber->pollStorage.emplace_back(topic->lastValue);
       subscriber->handle.Set();
-      m_listenerStorage.Notify(subscriber->valueListeners, eventFlags,
-                               topic->handle, 0, topic->lastValue);
+      if (!subscriber->valueListeners.empty()) {
+        m_listenerStorage.Notify(subscriber->valueListeners, eventFlags,
+                                 topic->handle, 0, topic->lastValue);
+      }
     }
   }
 
   for (auto&& subscriber : topic->multiSubscribers) {
     subscriber->handle.Set();
-    m_listenerStorage.Notify(subscriber->valueListeners, eventFlags,
-                             topic->handle, 0, topic->lastValue);
+    if (!subscriber->valueListeners.empty()) {
+      m_listenerStorage.Notify(subscriber->valueListeners, eventFlags,
+                               topic->handle, 0, topic->lastValue);
+    }
   }
 }
 
