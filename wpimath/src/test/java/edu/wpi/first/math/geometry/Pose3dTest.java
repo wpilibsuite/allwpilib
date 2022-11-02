@@ -14,6 +14,50 @@ import org.junit.jupiter.api.Test;
 
 class Pose3dTest {
   private static final double kEpsilon = 1E-9;
+  
+  @Test
+  void testTransformByRotations() {
+    var initialPose = new Pose3d(
+        new Translation3d(0.0, 0.0, 0.0),
+        new Rotation3d(
+            Units.degreesToRadians(0.0),
+            Units.degreesToRadians(0.0),
+            Units.degreesToRadians(0.0)
+        )
+    );
+
+    var transform1 = new Transform3d(
+        new Translation3d(0.0, 0.0, 0.0),
+        new Rotation3d(
+            Units.degreesToRadians(90.0),
+            Units.degreesToRadians(45.0),
+            Units.degreesToRadians(0.0)
+        )
+    );
+
+    var transform2 = new Transform3d(
+        new Translation3d(0.0, 0.0, 0.0),
+        new Rotation3d(
+            Units.degreesToRadians(-90.0),
+            Units.degreesToRadians(0.0),
+            Units.degreesToRadians(0.0)
+        )
+    );
+      
+    var transform3 = new Transform3d(
+        new Translation3d(0.0, 0.0, 0.0),
+        new Rotation3d(
+            Units.degreesToRadians(0.0),
+            Units.degreesToRadians(-45.0),
+            Units.degreesToRadians(0.0)
+        )
+    );
+      
+    assertAll(
+        () -> assertEquals(finalPose.getRotation().getX(), initialPose.getRotation().getX(), kEpsilon),
+        () -> assertEquals(finalPose.getRotation().getY(), initialPose.getRotation().getY(), kEpsilon),
+        () -> assertEquals(finalPose.getRotation().getZ(), initialPose.getRotation().getZ(), kEpsilon));
+  }
 
   @Test
   void testTransformBy() {
