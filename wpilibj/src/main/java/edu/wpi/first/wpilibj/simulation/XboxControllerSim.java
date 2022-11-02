@@ -17,6 +17,7 @@ public class XboxControllerSim extends GenericHIDSim {
     super(joystick);
     setAxisCount(6);
     setButtonCount(10);
+    setPOVCount(1);
   }
 
   /**

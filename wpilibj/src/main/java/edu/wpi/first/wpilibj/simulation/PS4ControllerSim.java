@@ -17,6 +17,7 @@ public class PS4ControllerSim extends GenericHIDSim {
     super(joystick);
     setAxisCount(6);
     setButtonCount(14);
+    setPOVCount(1);
   }
 
   /**
