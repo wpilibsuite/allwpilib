@@ -52,6 +52,12 @@ class Pose3dTest {
             Units.degreesToRadians(0.0)
         )
     );
+    
+    // This sequence of rotations should diverge from the origin and eventually return to it. When
+    // each rotation occurs, it should be performed intrinsicly, i.e. 'from the viewpoint' of and with
+    // the axes of the pose that is being transformed, just like how the translation is done 'from the
+    // viewpoint' of the pose that is being transformed.
+    var finalPose = initialPose.transformBy(transform1).transformBy(transform2).transformBy(transform3);
       
     assertAll(
         () -> assertEquals(finalPose.getRotation().getX(), initialPose.getRotation().getX(), kEpsilon),
