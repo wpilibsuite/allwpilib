@@ -6,10 +6,10 @@
 
 #include <wpi/SymbolExports.h>
 
-#include "frc/geometry/Pose2d.h"
+#include "frc/geometry/Pose3d.h"
 #include "frc/geometry/Rotation2d.h"
-#include "frc/geometry/Transform2d.h"
-#include "frc/geometry/Translation2d.h"
+#include "frc/geometry/Transform3d.h"
+#include "frc/geometry/Translation3d.h"
 #include "units/angle.h"
 #include "units/length.h"
 
@@ -53,20 +53,20 @@ units::meter_t CalculateDistanceToTarget(units::meter_t cameraHeight,
  * @param targetYaw The observed yaw of the target. Note that this *must* be
  *                  CCW-positive, and Photon returns CW-positive.
  * @param gyroAngle The current robot gyro angle, likely from odometry.
- * @param fieldToTarget A Pose2d representing the target position in the field
+ * @param fieldToTarget A Pose3d representing the target position in the field
  *                      coordinate system.
  * @param cameraToRobot The position of the robot relative to the camera. If the
  *                      camera was mounted 3 inches behind the "origin" (usually
  *                      physical center) of the robot, this would be
- *                      frc::Transform2d{3_in, 0_in, 0_deg}.
+ *                      frc::Transform3d{3_in, 0_in, 0_in, frc::Rotation3d{}}.
  * @return The position of the robot in the field.
  */
 WPILIB_DLLEXPORT
-frc::Pose2d EstimateFieldToRobot(
+frc::Pose3d EstimateFieldToRobot(
     units::meter_t cameraHeight, units::meter_t targetHeight,
     units::radian_t cameraPitch, units::radian_t targetPitch,
     const frc::Rotation2d& targetYaw, const frc::Rotation2d& gyroAngle,
-    const frc::Pose2d& fieldToTarget, const frc::Transform2d& cameraToRobot);
+    const frc::Pose3d& fieldToTarget, const frc::Transform3d& cameraToRobot);
 
 /**
  * Estimates the pose of the robot in the field coordinate system, given the
@@ -78,33 +78,33 @@ frc::Pose2d EstimateFieldToRobot(
  * @param cameraToRobot  The position of the robot relative to the camera. If
  *                       the camera was mounted 3 inches behind the "origin"
  *                       (usually physical center) of the robot, this would be
- *                       frc::Transform2d{3_in, 0_in, 0_deg}.
+ *                       frc::Transform3d{3_in, 0_in, 0_in, frc::Rotation3d{}}.
  * @return The position of the robot in the field.
  */
 WPILIB_DLLEXPORT
-frc::Pose2d EstimateFieldToRobot(const frc::Transform2d& cameraToTarget,
-                                 const frc::Pose2d& fieldToTarget,
-                                 const frc::Transform2d& cameraToRobot);
+frc::Pose3d EstimateFieldToRobot(const frc::Transform3d& cameraToTarget,
+                                 const frc::Pose3d& fieldToTarget,
+                                 const frc::Transform3d& cameraToRobot);
 
 /**
- * Estimates a Transform2d that maps the camera position to the target position,
+ * Estimates a Transform3d that maps the camera position to the target position,
  * using the robot's gyro. Note that the gyro angle provided *must* line up with
  * the field coordinate system -- that is, it should read zero degrees when
  * pointed towards the opposing alliance station, and increase as the robot
  * rotates CCW.
  *
- * @param cameraToTargetTranslation A Translation2d that encodes the x/y
+ * @param cameraToTargetTranslation A Translation3d that encodes the x/y
  *                                  position of the target relative to the
  *                                  camera.
- * @param fieldToTarget A Pose2d representing the target position in the field
+ * @param fieldToTarget A Pose3d representing the target position in the field
  *                      coordinate system.
  * @param gyroAngle The current robot gyro angle, likely from odometry.
- * @return A Transform2d that takes us from the camera to the target.
+ * @return A Transform3d that takes us from the camera to the target.
  */
 WPILIB_DLLEXPORT
-frc::Transform2d EstimateCameraToTarget(
-    const frc::Translation2d& cameraToTargetTranslation,
-    const frc::Pose2d& fieldToTarget, const frc::Rotation2d& gyroAngle);
+frc::Transform3d EstimateCameraToTarget(
+    const frc::Translation3d& cameraToTargetTranslation,
+    const frc::Pose3d& fieldToTarget, const frc::Rotation2d& gyroAngle);
 
 /**
  * Estimates the pose of the camera in the field coordinate system, given the
@@ -117,7 +117,7 @@ frc::Transform2d EstimateCameraToTarget(
  * @return The position of the camera in the field.
  */
 WPILIB_DLLEXPORT
-frc::Pose2d EstimateFieldToCamera(const frc::Transform2d& cameraToTarget,
-                                  const frc::Pose2d& fieldToTarget);
+frc::Pose3d EstimateFieldToCamera(const frc::Transform3d& cameraToTarget,
+                                  const frc::Pose3d& fieldToTarget);
 
 }  // namespace frc

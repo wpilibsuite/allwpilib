@@ -1,5 +1,6 @@
 cppHeaderFileInclude {
   \.h$
+  \.hpp$
   \.inc$
   \.inl$
 }
@@ -38,6 +39,7 @@ includeOtherLibs {
 }
 
 includeProject {
+  ^gcem/
   ^drake/
   ^Eigen/
   ^units/

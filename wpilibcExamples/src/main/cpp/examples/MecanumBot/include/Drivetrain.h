@@ -31,6 +31,7 @@ class Drivetrain {
   }
 
   frc::MecanumDriveWheelSpeeds GetCurrentState() const;
+  frc::MecanumDriveWheelPositions GetCurrentWheelDistances() const;
   void SetSpeeds(const frc::MecanumDriveWheelSpeeds& wheelSpeeds);
   void Drive(units::meters_per_second_t xSpeed,
              units::meters_per_second_t ySpeed, units::radians_per_second_t rot,
@@ -69,7 +70,8 @@ class Drivetrain {
       m_frontLeftLocation, m_frontRightLocation, m_backLeftLocation,
       m_backRightLocation};
 
-  frc::MecanumDriveOdometry m_odometry{m_kinematics, m_gyro.GetRotation2d()};
+  frc::MecanumDriveOdometry m_odometry{m_kinematics, m_gyro.GetRotation2d(),
+                                       GetCurrentWheelDistances()};
 
   // Gains are for example purposes only - must be determined for your own
   // robot!

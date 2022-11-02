@@ -235,6 +235,7 @@ RobotBase::RobotBase() {
     ++count;
     if (count > 100) {
       fmt::print(stderr, "timed out while waiting for NT server to start\n");
+      break;
     }
   }
 

@@ -1,13 +1,14 @@
-import groovy.transform.CompileStatic
-import javax.inject.Inject
-import edu.wpi.first.deployutils.deploy.artifact.MavenArtifact
-import edu.wpi.first.deployutils.deploy.context.DeployContext
-import org.gradle.api.Project
-import edu.wpi.first.deployutils.ActionWrapper
-import edu.wpi.first.deployutils.deploy.target.RemoteTarget
-import edu.wpi.first.deployutils.PredicateWrapper
+import groovy.transform.CompileStatic;
+import javax.inject.Inject;
 
-import java.util.function.Function
+import org.gradle.api.Project;
+
+import edu.wpi.first.deployutils.deploy.CommandDeployResult;
+import edu.wpi.first.deployutils.deploy.artifact.MavenArtifact;
+import edu.wpi.first.deployutils.deploy.context.DeployContext;
+import edu.wpi.first.deployutils.deploy.target.RemoteTarget;
+import edu.wpi.first.deployutils.PredicateWrapper;
+import edu.wpi.first.deployutils.ActionWrapper;
 
 @CompileStatic
 public class WPIJREArtifact extends MavenArtifact {
@@ -17,6 +18,18 @@ public class WPIJREArtifact extends MavenArtifact {
         return configName;
     }
 
+    public boolean isCheckJreVersion() {
+        return checkJreVersion;
+    }
+
+    public void setCheckJreVersion(boolean checkJreVersion) {
+        this.checkJreVersion = checkJreVersion;
+    }
+
+    private boolean checkJreVersion = true;
+
+    private final String artifactLocation = "edu.wpi.first.jdk:roborio-2023:17.0.5u7-1"
+
     @Inject
     public WPIJREArtifact(String name, RemoteTarget target) {
         super(name, target);
@@ -24,10 +37,10 @@ public class WPIJREArtifact extends MavenArtifact {
         this.configName = configName;
         Project project = target.getProject();
         getConfiguration().set(project.getConfigurations().create(configName));
-        getDependency().set(project.getDependencies().add(configName, "edu.wpi.first.jdk:roborio-2022:11.0.12u5-1"));
+        getDependency().set(project.getDependencies().add(configName, artifactLocation));
 
         setOnlyIf(new PredicateWrapper({ DeployContext ctx ->
-            return jreMissing(ctx) || project.hasProperty("force-redeploy-jre");
+            return jreMissing(ctx) || jreOutOfDate(ctx) || project.hasProperty("force-redeploy-jre");
         }));
 
         getDirectory().set("/tmp");
@@ -35,7 +48,7 @@ public class WPIJREArtifact extends MavenArtifact {
 
         getPostdeploy().add(new ActionWrapper({ DeployContext ctx ->
             ctx.getLogger().log("Installing JRE...");
-            ctx.execute("opkg remove frc2022-openjdk*; opkg install /tmp/frcjre.ipk; rm /tmp/frcjre.ipk");
+            ctx.execute("opkg remove frc*-openjdk*; opkg install /tmp/frcjre.ipk; rm /tmp/frcjre.ipk");
             ctx.getLogger().log("JRE Deployed!");
         }));
     }
@@ -44,5 +57,21 @@ public class WPIJREArtifact extends MavenArtifact {
         return ctx.execute("if [[ -f \"/usr/local/frc/JRE/bin/java\" ]]; then echo OK; else echo MISSING; fi").getResult().contains("MISSING");
     }
 
-
+    private boolean jreOutOfDate(DeployContext ctx) {
+        if (!checkJreVersion) {
+            return false;
+        }
+        String version = getDependency().get().getVersion();
+        CommandDeployResult cmdResult = ctx.execute("opkg list-installed | grep openjdk");
+        if (cmdResult.getExitCode() != 0) {
+            ctx.getLogger().log("JRE not found");
+            return false;
+        }
+        String result = cmdResult.getResult().trim();
+        ctx.getLogger().log("Searching for JRE " + version);
+        ctx.getLogger().log("Found JRE " + result);
+        boolean matches = result.contains(version);
+        ctx.getLogger().log(matches ? "JRE Is Correct Version" : "JRE is mismatched. Reinstalling");
+        return !matches;
+    }
 }

@@ -7,8 +7,6 @@
 #include <algorithm>
 
 #include <wpi/DataLog.h>
-#include <wpi/DenseMap.h>
-#include <wpi/SafeThread.h>
 #include <wpi/StringExtras.h>
 #include <wpi/StringMap.h>
 #include <wpi/Synchronization.h>
@@ -18,6 +16,7 @@
 
 #include "Handle.h"
 #include "HandleMap.h"
+#include "IListenerStorage.h"
 #include "Log.h"
 #include "PubSubOptions.h"
 #include "Types_internal.h"
@@ -33,19 +32,13 @@ template <typename T>
 class VectorSet : public std::vector<T> {
  public:
   void Add(T value) { this->push_back(value); }
-  void Remove(T value) {
-    this->erase(std::remove(this->begin(), this->end(), value), this->end());
-  }
+  void Remove(T value) { std::erase(*this, value); }
 };
 
 struct EntryData;
 struct PublisherData;
 struct SubscriberData;
 struct MultiSubscriberData;
-struct TopicListenerPollerData;
-struct TopicListenerData;
-struct ValueListenerPollerData;
-struct ValueListenerData;
 
 struct DataLoggerEntry {
   DataLoggerEntry(wpi::log::DataLog& log, int entry, NT_DataLogger logger)
@@ -83,6 +76,7 @@ struct TopicData {
   unsigned int flags{0};            // for NT3 APIs
   std::string propertiesStr{"{}"};  // cached string for GetTopicInfo() et al
   wpi::json properties = wpi::json::object();
+  NT_Entry entry{0};  // cached entry for GetEntry()
 
   bool onNetwork{false};  // true if there are any remote publishers
 
@@ -93,7 +87,7 @@ struct TopicData {
   VectorSet<SubscriberData*> localSubscribers;
   VectorSet<MultiSubscriberData*> multiSubscribers;
   VectorSet<EntryData*> entries;
-  VectorSet<TopicListenerData*> listeners;
+  VectorSet<NT_Listener> listeners;
 };
 
 struct PubSubConfig : public PubSubOptions {
@@ -146,7 +140,7 @@ struct SubscriberData {
   wpi::circular_buffer<Value> pollStorage;
 
   // value listeners
-  VectorSet<ValueListenerData*> valueListeners;
+  VectorSet<NT_Listener> valueListeners;
 };
 
 struct EntryData {
@@ -184,86 +178,28 @@ struct MultiSubscriberData {
   PubSubOptions options;
 
   // value listeners
-  VectorSet<ValueListenerData*> valueListeners;
+  VectorSet<NT_Listener> valueListeners;
 };
 
-struct TopicListenerPollerData {
-  static constexpr auto kType = Handle::kTopicListenerPoller;
-
-  explicit TopicListenerPollerData(NT_TopicListenerPoller handle)
-      : handle{handle} {}
-
-  wpi::SignalObject<NT_TopicListenerPoller> handle;
-  std::vector<TopicNotification> queue;
-};
-
-struct TopicListenerData {
-  static constexpr auto kType = Handle::kTopicListener;
-
-  TopicListenerData(NT_TopicListener handle, TopicListenerPollerData* poller,
-                    SubscriberData* subscriber, TopicData* topic,
-                    unsigned int eventMask)
+struct ListenerData {
+  ListenerData(NT_Listener handle, SubscriberData* subscriber,
+               unsigned int eventMask, bool subscriberOwned)
       : handle{handle},
-        poller{poller},
-        topic{topic},
-        eventMask{eventMask & ~NT_TOPIC_NOTIFY_IMMEDIATE} {}
-  TopicListenerData(NT_TopicListener handle, TopicListenerPollerData* poller,
-                    MultiSubscriberData* multiSubscriber,
-                    std::span<const std::string> prefixes,
-                    unsigned int eventMask)
-      : handle{handle},
-        poller{poller},
-        multiSubscriber{multiSubscriber},
-        prefixes{prefixes.begin(), prefixes.end()},
-        eventMask{eventMask & ~NT_TOPIC_NOTIFY_IMMEDIATE} {}
-
-  wpi::SignalObject<NT_TopicListener> handle;
-  TopicListenerPollerData* poller;
-  SubscriberData* subscriber{nullptr};
-  MultiSubscriberData* multiSubscriber{nullptr};
-  TopicData* topic{nullptr};
-  std::vector<std::string> prefixes;
-  unsigned int eventMask;
-  bool subscriberOwned{false};
-};
-
-struct ValueListenerPollerData {
-  static constexpr auto kType = Handle::kValueListenerPoller;
-
-  explicit ValueListenerPollerData(NT_ValueListenerPoller handle)
-      : handle{handle} {}
-
-  wpi::SignalObject<NT_ValueListenerPoller> handle;
-  std::vector<ValueNotification> queue;
-};
-
-struct ValueListenerData {
-  static constexpr auto kType = Handle::kValueListener;
-
-  ValueListenerData(NT_ValueListener handle, ValueListenerPollerData* poller,
-                    SubscriberData* subscriber, NT_Handle subentryHandle,
-                    unsigned int eventMask)
-      : handle{handle},
-        poller{poller},
+        eventMask{eventMask},
         subscriber{subscriber},
-        subentryHandle{subentryHandle},
-        eventMask{eventMask & ~NT_VALUE_NOTIFY_IMMEDIATE} {}
-
-  ValueListenerData(NT_ValueListener handle, ValueListenerPollerData* poller,
-                    MultiSubscriberData* subscriber, NT_Handle subentryHandle,
-                    unsigned int eventMask)
+        subscriberOwned{subscriberOwned} {}
+  ListenerData(NT_Listener handle, MultiSubscriberData* subscriber,
+               unsigned int eventMask, bool subscriberOwned)
       : handle{handle},
-        poller{poller},
+        eventMask{eventMask},
         multiSubscriber{subscriber},
-        subentryHandle{subentryHandle},
-        eventMask{eventMask & ~NT_VALUE_NOTIFY_IMMEDIATE} {}
+        subscriberOwned{subscriberOwned} {}
 
-  wpi::SignalObject<NT_ValueListener> handle;
-  ValueListenerPollerData* poller;
+  NT_Listener handle;
+  unsigned int eventMask;
   SubscriberData* subscriber{nullptr};
   MultiSubscriberData* multiSubscriber{nullptr};
-  NT_Handle subentryHandle;
-  unsigned int eventMask;
+  bool subscriberOwned;
 };
 
 struct DataLoggerData {
@@ -286,38 +222,12 @@ struct DataLoggerData {
   std::string logPrefix;
 };
 
-struct TopicListenerThread final : public wpi::SafeThreadEvent {
- public:
-  explicit TopicListenerThread(TopicListenerPollerData* pollerData)
-      : m_pollerData{pollerData}, m_poller{pollerData->handle} {}
-
-  void Main() final;
-
-  TopicListenerPollerData* m_pollerData;
-  NT_TopicListenerPoller m_poller;
-  wpi::DenseMap<NT_TopicListener,
-                std::function<void(const TopicNotification& event)>>
-      m_callbacks;
-};
-
-struct ValueListenerThread final : public wpi::SafeThreadEvent {
- public:
-  explicit ValueListenerThread(ValueListenerPollerData* pollerData)
-      : m_pollerData{pollerData}, m_poller{pollerData->handle} {}
-
-  void Main() final;
-
-  ValueListenerPollerData* m_pollerData;
-  NT_ValueListenerPoller m_poller;
-  wpi::DenseMap<NT_ValueListener,
-                std::function<void(const ValueNotification& event)>>
-      m_callbacks;
-};
-
 struct LSImpl {
-  LSImpl(int inst, wpi::Logger& logger) : m_inst{inst}, m_logger{logger} {}
+  LSImpl(int inst, IListenerStorage& listenerStorage, wpi::Logger& logger)
+      : m_inst{inst}, m_listenerStorage{listenerStorage}, m_logger{logger} {}
 
   int m_inst;
+  IListenerStorage& m_listenerStorage;
   wpi::Logger& m_logger;
   net::NetworkInterface* m_network{nullptr};
 
@@ -327,33 +237,24 @@ struct LSImpl {
   HandleMap<SubscriberData, 16> m_subscribers;
   HandleMap<EntryData, 16> m_entries;
   HandleMap<MultiSubscriberData, 16> m_multiSubscribers;
-  HandleMap<TopicListenerPollerData, 16> m_topicListenerPollers;
-  HandleMap<TopicListenerData, 16> m_topicListeners;
-  HandleMap<ValueListenerPollerData, 16> m_valueListenerPollers;
-  HandleMap<ValueListenerData, 16> m_valueListeners;
   HandleMap<DataLoggerData, 16> m_dataloggers;
 
   // name mappings
   wpi::StringMap<TopicData*> m_nameTopics;
 
-  // string-based listeners
-  VectorSet<TopicListenerData*> m_topicPrefixListeners;
+  // listeners
+  wpi::DenseMap<NT_Listener, std::unique_ptr<ListenerData>> m_listeners;
 
-  // callback listener threads
-  wpi::SafeThreadOwner<TopicListenerThread> m_topicListenerThread;
-  wpi::SafeThreadOwner<ValueListenerThread> m_valueListenerThread;
+  // string-based listeners
+  VectorSet<ListenerData*> m_topicPrefixListeners;
 
   // topic functions
   void NotifyTopic(TopicData* topic, unsigned int eventFlags);
-  void NotifyTopicListener(TopicListenerData* listener, TopicData* topic,
-                           unsigned int eventFlags);
 
   void CheckReset(TopicData* topic);
 
   bool SetValue(TopicData* topic, const Value& value, unsigned int eventFlags);
   void NotifyValue(TopicData* topic, unsigned int eventFlags);
-  void NotifyValueListener(ValueListenerData* listener, TopicData* topic,
-                           unsigned int eventFlags);
 
   void SetFlags(TopicData* topic, unsigned int flags);
   void SetPersistent(TopicData* topic, bool value);
@@ -390,53 +291,24 @@ struct LSImpl {
   std::unique_ptr<MultiSubscriberData> RemoveMultiSubscriber(
       NT_MultiSubscriber subHandle);
 
-  TopicListenerPollerData* AddTopicListenerPoller() {
-    return m_topicListenerPollers.Add(m_inst);
-  }
-  TopicListenerData* AddTopicListenerImpl(TopicListenerPollerData* poller,
-                                          TopicData* topic,
-                                          unsigned int eventMask);
-  TopicListenerData* AddTopicListenerImpl(TopicListenerPollerData* poller,
-                                          SubscriberData* topic,
-                                          unsigned int eventMask);
-  TopicListenerData* AddTopicListenerImpl(TopicListenerPollerData* poller,
-                                          MultiSubscriberData* topic,
-                                          unsigned int eventMask);
-  TopicListenerData* AddTopicListenerImpl(
-      TopicListenerPollerData* poller,
-      std::span<const std::string_view> prefixes, unsigned int eventMask);
-  NT_TopicListener AddTopicListener(
-      std::span<const std::string_view> prefixes, unsigned int mask,
-      std::function<void(const TopicNotification&)> callback);
-  NT_TopicListener AddTopicListenerHandle(TopicListenerPollerData* poller,
-                                          NT_Handle handle, unsigned int mask);
-  NT_TopicListener AddTopicListener(
-      NT_Handle handle, unsigned int mask,
-      std::function<void(const TopicNotification&)> callback);
-  void DestroyTopicListenerPoller(NT_TopicListenerPoller pollerHandle);
-  std::unique_ptr<TopicListenerData> RemoveTopicListener(
-      NT_TopicListener listenerHandle);
+  void AddListenerImpl(NT_Listener listenerHandle, TopicData* topic,
+                       unsigned int eventMask);
+  void AddListenerImpl(NT_Listener listenerHandle, SubscriberData* subscriber,
+                       unsigned int eventMask, NT_Handle subentryHandle,
+                       bool subscriberOwned);
+  void AddListenerImpl(NT_Listener listenerHandle,
+                       MultiSubscriberData* subscriber, unsigned int eventMask,
+                       bool subscriberOwned);
+  void AddListenerImpl(NT_Listener listenerHandle,
+                       std::span<const std::string_view> prefixes,
+                       unsigned int eventMask);
 
-  ValueListenerPollerData* AddValueListenerPoller() {
-    return m_valueListenerPollers.Add(m_inst);
-  }
-  ValueListenerData* AddValueListenerImpl(ValueListenerPollerData* poller,
-                                          SubscriberData* subscriber,
-                                          NT_Handle subentryHandle,
-                                          unsigned int eventMask);
-  ValueListenerData* AddValueListenerImpl(ValueListenerPollerData* poller,
-                                          MultiSubscriberData* subscriber,
-                                          NT_Handle subentryHandle,
-                                          unsigned int eventMask);
-  NT_ValueListener AddValueListenerHandle(ValueListenerPollerData* poller,
-                                          NT_Handle subentryHandle,
-                                          unsigned int mask);
-  NT_ValueListener AddValueListener(
-      NT_Handle subentry, unsigned int mask,
-      std::function<void(const ValueNotification&)> callback);
-  void DestroyValueListenerPoller(NT_ValueListenerPoller pollerHandle);
-  std::unique_ptr<ValueListenerData> RemoveValueListener(
-      NT_ValueListener listenerHandle);
+  void AddListener(NT_Listener listenerHandle,
+                   std::span<const std::string_view> prefixes,
+                   unsigned int mask);
+  void AddListener(NT_Listener listenerHandle, NT_Handle handle,
+                   unsigned int mask);
+  void RemoveListener(NT_Listener listenerHandle, unsigned int mask);
 
   TopicData* GetOrCreateTopic(std::string_view name);
   TopicData* GetTopic(NT_Handle handle);
@@ -529,73 +401,27 @@ void SubscriberData::UpdateActive() {
             (NT_INTEGER_ARRAY | NT_FLOAT_ARRAY | NT_DOUBLE_ARRAY)));
 }
 
-void TopicListenerThread::Main() {
-  while (m_active) {
-    WPI_Handle signaledBuf[2];
-    auto signaled =
-        wpi::WaitForObjects({m_poller, m_stopEvent.GetHandle()}, signaledBuf);
-    if (signaled.empty() || !m_active) {
-      break;
-    }
-    // call all the way back out to the C++ API to ensure valid handle
-    auto events = nt::ReadTopicListenerQueue(m_poller);
-    if (events.empty()) {
-      continue;
-    }
-    std::unique_lock lock{m_mutex};
-    for (auto&& event : events) {
-      auto callbackIt = m_callbacks.find(event.listener);
-      if (callbackIt != m_callbacks.end()) {
-        auto callback = callbackIt->second;
-        lock.unlock();
-        callback(event);
-        lock.lock();
-      }
-    }
-  }
-}
-
-void ValueListenerThread::Main() {
-  while (m_active) {
-    WPI_Handle signaledBuf[2];
-    auto signaled =
-        wpi::WaitForObjects({m_poller, m_stopEvent.GetHandle()}, signaledBuf);
-    if (signaled.empty() || !m_active) {
-      break;
-    }
-    // call all the way back out to the C++ API to ensure valid handle
-    auto events = nt::ReadValueListenerQueue(m_poller);
-    if (events.empty()) {
-      continue;
-    }
-    std::unique_lock lock{m_mutex};
-    for (auto&& event : events) {
-      auto callbackIt = m_callbacks.find(event.listener);
-      if (callbackIt != m_callbacks.end()) {
-        auto callback = callbackIt->second;
-        lock.unlock();
-        callback(event);
-        lock.lock();
-      }
-    }
-  }
-}
-
 void LSImpl::NotifyTopic(TopicData* topic, unsigned int eventFlags) {
-  for (auto&& listener : topic->listeners) {
-    NotifyTopicListener(listener, topic, eventFlags);
+  auto topicInfo = topic->GetTopicInfo();
+  if (!topic->listeners.empty()) {
+    m_listenerStorage.Notify(topic->listeners, eventFlags, topicInfo);
   }
 
+  wpi::SmallVector<NT_Listener, 32> listeners;
   for (auto listener : m_topicPrefixListeners) {
-    for (auto&& prefix : listener->prefixes) {
-      if (wpi::starts_with(topic->name, prefix)) {
-        NotifyTopicListener(listener, topic, eventFlags);
+    if (listener->multiSubscriber) {
+      for (auto&& prefix : listener->multiSubscriber->prefixes) {
+        if (wpi::starts_with(topic->name, prefix)) {
+          listeners.emplace_back(listener->handle);
+        }
       }
     }
   }
+  if (!listeners.empty()) {
+    m_listenerStorage.Notify(listeners, eventFlags, topicInfo);
+  }
 
-  if ((eventFlags & (NT_TOPIC_NOTIFY_PUBLISH | NT_TOPIC_NOTIFY_UNPUBLISH)) !=
-      0) {
+  if ((eventFlags & (NT_EVENT_PUBLISH | NT_EVENT_UNPUBLISH)) != 0) {
     if (!m_dataloggers.empty()) {
       auto now = Now();
       for (auto&& datalogger : m_dataloggers) {
@@ -604,13 +430,13 @@ void LSImpl::NotifyTopic(TopicData* topic, unsigned int eventFlags) {
                                  [&](const auto& elem) {
                                    return elem.logger == datalogger->handle;
                                  });
-          if ((eventFlags & NT_TOPIC_NOTIFY_PUBLISH) != 0 &&
+          if ((eventFlags & NT_EVENT_PUBLISH) != 0 &&
               it == topic->datalogs.end()) {
             topic->datalogs.emplace_back(datalogger->log,
                                          datalogger->Start(topic, now),
                                          datalogger->handle);
             topic->datalogType = topic->type;
-          } else if ((eventFlags & NT_TOPIC_NOTIFY_UNPUBLISH) != 0 &&
+          } else if ((eventFlags & NT_EVENT_UNPUBLISH) != 0 &&
                      it != topic->datalogs.end()) {
             it->log->Finish(it->entry, now);
             topic->datalogType = NT_UNASSIGNED;
@@ -619,7 +445,7 @@ void LSImpl::NotifyTopic(TopicData* topic, unsigned int eventFlags) {
         }
       }
     }
-  } else if ((eventFlags & NT_TOPIC_NOTIFY_PROPERTIES) != 0) {
+  } else if ((eventFlags & NT_EVENT_PROPERTIES) != 0) {
     if (!topic->datalogs.empty()) {
       auto metadata = DataLoggerEntry::MakeMetadata(topic->propertiesStr);
       for (auto&& datalog : topic->datalogs) {
@@ -627,19 +453,6 @@ void LSImpl::NotifyTopic(TopicData* topic, unsigned int eventFlags) {
       }
     }
   }
-}
-
-void LSImpl::NotifyTopicListener(TopicListenerData* listener, TopicData* topic,
-                                 unsigned int eventFlags) {
-  // filter by event mask
-  if ((eventFlags & listener->eventMask) == 0) {
-    return;
-  }
-
-  listener->poller->queue.emplace_back(listener->handle, topic->GetTopicInfo(),
-                                       eventFlags);
-  listener->handle.Set();
-  listener->poller->handle.Set();
 }
 
 void LSImpl::CheckReset(TopicData* topic) {
@@ -660,7 +473,7 @@ bool LSImpl::SetValue(TopicData* topic, const Value& value,
   if (topic->type != NT_UNASSIGNED && topic->type != value.type()) {
     return false;
   }
-  bool isNetwork = (eventFlags & NT_VALUE_NOTIFY_LOCAL) == 0;
+  bool isNetwork = (eventFlags & NT_EVENT_VALUE_REMOTE) != 0;
   if (!topic->lastValue || topic->lastValueNetwork == isNetwork ||
       value.time() >= topic->lastValue.time()) {
     // TODO: notify option even if older value
@@ -682,34 +495,16 @@ void LSImpl::NotifyValue(TopicData* topic, unsigned int eventFlags) {
     if (subscriber->active) {
       subscriber->pollStorage.emplace_back(topic->lastValue);
       subscriber->handle.Set();
-      for (auto&& listener : subscriber->valueListeners) {
-        NotifyValueListener(listener, topic, eventFlags);
-      }
+      m_listenerStorage.Notify(subscriber->valueListeners, eventFlags,
+                               topic->handle, 0, topic->lastValue);
     }
   }
 
   for (auto&& subscriber : topic->multiSubscribers) {
     subscriber->handle.Set();
-    for (auto&& listener : subscriber->valueListeners) {
-      NotifyValueListener(listener, topic, eventFlags);
-    }
+    m_listenerStorage.Notify(subscriber->valueListeners, eventFlags,
+                             topic->handle, 0, topic->lastValue);
   }
-}
-
-void LSImpl::NotifyValueListener(ValueListenerData* listener, TopicData* topic,
-                                 unsigned int eventFlags) {
-  // only notify listener for local events if it wants local events
-  bool listenLocal = (listener->eventMask & NT_VALUE_NOTIFY_LOCAL) != 0;
-  bool eventLocal = (eventFlags & NT_VALUE_NOTIFY_LOCAL) != 0;
-  if (eventLocal && !listenLocal) {
-    return;
-  }
-
-  listener->poller->queue.emplace_back(listener->handle, topic->handle,
-                                       listener->subentryHandle,
-                                       topic->lastValue, eventFlags);
-  listener->handle.Set();
-  listener->poller->handle.Set();
 }
 
 void LSImpl::SetFlags(TopicData* topic, unsigned int flags) {
@@ -730,7 +525,7 @@ void LSImpl::SetFlags(TopicData* topic, unsigned int flags) {
   }
   topic->flags = flags;
   if (!update.empty()) {
-    PropertiesUpdated(topic, update, NT_TOPIC_NOTIFY_NONE, true, false);
+    PropertiesUpdated(topic, update, NT_EVENT_NONE, true, false);
   }
 }
 
@@ -745,7 +540,7 @@ void LSImpl::SetPersistent(TopicData* topic, bool value) {
     topic->properties.erase("persistent");
     update["persistent"] = wpi::json();
   }
-  PropertiesUpdated(topic, update, NT_TOPIC_NOTIFY_NONE, true, false);
+  PropertiesUpdated(topic, update, NT_EVENT_NONE, true, false);
 }
 
 void LSImpl::SetRetained(TopicData* topic, bool value) {
@@ -759,7 +554,7 @@ void LSImpl::SetRetained(TopicData* topic, bool value) {
     topic->properties.erase("retained");
     update["retained"] = wpi::json();
   }
-  PropertiesUpdated(topic, update, NT_TOPIC_NOTIFY_NONE, true, false);
+  PropertiesUpdated(topic, update, NT_EVENT_NONE, true, false);
 }
 
 void LSImpl::SetProperties(TopicData* topic, const wpi::json& update,
@@ -775,7 +570,7 @@ void LSImpl::SetProperties(TopicData* topic, const wpi::json& update,
       topic->properties[change.key()] = change.value();
     }
   }
-  PropertiesUpdated(topic, update, NT_TOPIC_NOTIFY_NONE, sendNetwork);
+  PropertiesUpdated(topic, update, NT_EVENT_NONE, sendNetwork);
 }
 
 void LSImpl::PropertiesUpdated(TopicData* topic, const wpi::json& update,
@@ -808,7 +603,7 @@ void LSImpl::PropertiesUpdated(TopicData* topic, const wpi::json& update,
   }
 
   topic->propertiesStr = topic->properties.dump();
-  NotifyTopic(topic, eventFlags | NT_TOPIC_NOTIFY_PROPERTIES);
+  NotifyTopic(topic, eventFlags | NT_EVENT_PROPERTIES);
   // check local flag so we don't echo back received properties changes
   if (m_network && sendNetwork) {
     m_network->SetProperties(topic->handle, topic->name, update);
@@ -833,7 +628,7 @@ void LSImpl::NetworkAnnounce(TopicData* topic, std::string_view typeStr,
     return;  // ack of our publish; ignore
   }
 
-  unsigned int notify = NT_TOPIC_NOTIFY_NONE;
+  unsigned int event = NT_EVENT_NONE;
   // fresh non-local publish; the network publish always sets the type even
   // if it was locally published, but output a diagnostic for this case
   bool didExist = topic->Exists();
@@ -851,7 +646,7 @@ void LSImpl::NetworkAnnounce(TopicData* topic, std::string_view typeStr,
     RefreshPubSubActive(topic);
   }
   if (!didExist) {
-    notify |= NT_TOPIC_NOTIFY_PUBLISH;
+    event |= NT_EVENT_PUBLISH;
   }
 
   // may be properties update, but need to compare to see if it actually
@@ -872,9 +667,9 @@ void LSImpl::NetworkAnnounce(TopicData* topic, std::string_view typeStr,
   }
   if (!update.empty()) {
     topic->properties = properties;
-    PropertiesUpdated(topic, update, notify, false);
-  } else if (notify != NT_TOPIC_NOTIFY_NONE) {
-    NotifyTopic(topic, notify);
+    PropertiesUpdated(topic, update, event, false);
+  } else if (event != NT_EVENT_NONE) {
+    NotifyTopic(topic, event);
   }
 }
 
@@ -886,7 +681,7 @@ void LSImpl::RemoveNetworkPublisher(TopicData* topic) {
   if (didExist && !topic->Exists()) {
     DEBUG4("Unpublished {}", topic->name);
     CheckReset(topic);
-    NotifyTopic(topic, NT_TOPIC_NOTIFY_UNPUBLISH);
+    NotifyTopic(topic, NT_EVENT_UNPUBLISH);
   }
 
   if (!topic->localPublishers.empty()) {
@@ -942,10 +737,9 @@ PublisherData* LSImpl::AddLocalPublisher(TopicData* topic,
     }
 
     if (topic->properties.empty()) {
-      NotifyTopic(topic, NT_TOPIC_NOTIFY_PUBLISH);
+      NotifyTopic(topic, NT_EVENT_PUBLISH);
     } else {
-      PropertiesUpdated(topic, topic->properties, NT_TOPIC_NOTIFY_PUBLISH,
-                        false);
+      PropertiesUpdated(topic, topic->properties, NT_EVENT_PUBLISH, false);
     }
   } else {
     // only need to update just this publisher
@@ -975,7 +769,7 @@ std::unique_ptr<PublisherData> LSImpl::RemoveLocalPublisher(
     topic->localPublishers.Remove(publisher.get());
     if (didExist && !topic->Exists()) {
       CheckReset(topic);
-      NotifyTopic(topic, NT_TOPIC_NOTIFY_UNPUBLISH);
+      NotifyTopic(topic, NT_EVENT_UNPUBLISH);
     }
 
     if (publisher->active && m_network) {
@@ -1029,13 +823,9 @@ std::unique_ptr<SubscriberData> LSImpl::RemoveLocalSubscriber(
   if (subscriber) {
     auto topic = subscriber->topic;
     topic->localSubscribers.Remove(subscriber.get());
-    for (auto listener : subscriber->valueListeners) {
-      listener->subscriber = nullptr;
-    }
-    // shouldn't be necessary, but do it anyway
-    for (auto&& listener : m_topicListeners) {
-      if (listener->subscriber == subscriber.get()) {
-        listener->subscriber = nullptr;
+    for (auto&& listener : m_listeners) {
+      if (listener.getSecond()->subscriber == subscriber.get()) {
+        listener.getSecond()->subscriber = nullptr;
       }
     }
     if (m_network) {
@@ -1085,13 +875,9 @@ std::unique_ptr<MultiSubscriberData> LSImpl::RemoveMultiSubscriber(
     for (auto&& topic : m_topics) {
       topic->multiSubscribers.Remove(subscriber.get());
     }
-    for (auto listener : subscriber->valueListeners) {
-      listener->multiSubscriber = nullptr;
-    }
-    // shouldn't be necessary, but do it anyway
-    for (auto&& listener : m_topicListeners) {
-      if (listener->multiSubscriber == subscriber.get()) {
-        listener->multiSubscriber = nullptr;
+    for (auto&& listener : m_listeners) {
+      if (listener.getSecond()->multiSubscriber == subscriber.get()) {
+        listener.getSecond()->multiSubscriber = nullptr;
       }
     }
     if (m_network) {
@@ -1101,280 +887,184 @@ std::unique_ptr<MultiSubscriberData> LSImpl::RemoveMultiSubscriber(
   return subscriber;
 }
 
-TopicListenerData* LSImpl::AddTopicListenerImpl(TopicListenerPollerData* poller,
-                                                TopicData* topic,
-                                                unsigned int eventMask) {
+void LSImpl::AddListenerImpl(NT_Listener listenerHandle, TopicData* topic,
+                             unsigned int eventMask) {
   // subscribe to make sure topic updates are received
   PubSubConfig config;
-  config.topicsOnly = true;
-  auto subscriber = AddLocalSubscriber(topic, config);
-  auto listener = AddTopicListenerImpl(poller, subscriber, eventMask);
-  listener->subscriberOwned = true;
-  return listener;
+  config.topicsOnly = (eventMask & NT_EVENT_VALUE_ALL) == 0;
+  auto sub = AddLocalSubscriber(topic, config);
+  AddListenerImpl(listenerHandle, sub, eventMask, sub->handle, true);
 }
 
-TopicListenerData* LSImpl::AddTopicListenerImpl(TopicListenerPollerData* poller,
-                                                SubscriberData* subscriber,
-                                                unsigned int eventMask) {
-  auto listener = m_topicListeners.Add(m_inst, poller, subscriber,
-                                       subscriber->topic, eventMask);
-  subscriber->topic->listeners.Add(listener);
+void LSImpl::AddListenerImpl(NT_Listener listenerHandle,
+                             SubscriberData* subscriber, unsigned int eventMask,
+                             NT_Handle subentryHandle, bool subscriberOwned) {
+  m_listeners.try_emplace(listenerHandle, std::make_unique<ListenerData>(
+                                              listenerHandle, subscriber,
+                                              eventMask, subscriberOwned));
 
-  // handle immediate
-  if ((eventMask & (NT_TOPIC_NOTIFY_PUBLISH | NT_TOPIC_NOTIFY_IMMEDIATE)) ==
-          (NT_TOPIC_NOTIFY_PUBLISH | NT_TOPIC_NOTIFY_IMMEDIATE) &&
-      listener->topic->Exists()) {
-    listener->poller->queue.emplace_back(
-        listener->handle, subscriber->topic->GetTopicInfo(),
-        NT_TOPIC_NOTIFY_PUBLISH | NT_TOPIC_NOTIFY_IMMEDIATE);
-    listener->handle.Set();
-    listener->poller->handle.Set();
-  }
-
-  return listener;
-}
-
-TopicListenerData* LSImpl::AddTopicListenerImpl(TopicListenerPollerData* poller,
-                                                MultiSubscriberData* subscriber,
-                                                unsigned int eventMask) {
-  auto listener = m_topicListeners.Add(m_inst, poller, subscriber,
-                                       subscriber->prefixes, eventMask);
-  m_topicPrefixListeners.Add(listener);
-
-  // handle immediate
-  if ((eventMask & (NT_TOPIC_NOTIFY_PUBLISH | NT_TOPIC_NOTIFY_IMMEDIATE)) ==
-      (NT_TOPIC_NOTIFY_PUBLISH | NT_TOPIC_NOTIFY_IMMEDIATE)) {
-    bool any = false;
-    for (auto&& topic : m_topics) {
-      for (auto&& prefix : listener->multiSubscriber->prefixes) {
-        if (wpi::starts_with(topic->name, prefix) && topic->Exists()) {
-          listener->poller->queue.emplace_back(
-              listener->handle, topic->GetTopicInfo(),
-              NT_TOPIC_NOTIFY_PUBLISH | NT_TOPIC_NOTIFY_IMMEDIATE);
-          any = true;
-        }
-      }
-    }
-    if (any) {
-      listener->handle.Set();
-      listener->poller->handle.Set();
-    }
-  }
-
-  return listener;
-}
-
-TopicListenerData* LSImpl::AddTopicListenerImpl(
-    TopicListenerPollerData* poller, std::span<const std::string_view> prefixes,
-    unsigned int eventMask) {
-  // subscribe to make sure topic updates are received
-  PubSubOptions options;
-  options.topicsOnly = true;
-  options.prefixMatch = true;
-  auto subscriber = AddMultiSubscriber(prefixes, options);
-  auto listener = AddTopicListenerImpl(poller, subscriber, eventMask);
-  listener->subscriberOwned = true;
-  return listener;
-}
-
-NT_TopicListener LSImpl::AddTopicListener(
-    std::span<const std::string_view> prefixes, unsigned int mask,
-    std::function<void(const TopicNotification&)> callback) {
-  if (!m_topicListenerThread) {
-    m_topicListenerThread.Start(AddTopicListenerPoller());
-  }
-  if (auto thr = m_topicListenerThread.GetThread()) {
-    NT_TopicListener listener =
-        AddTopicListenerImpl(thr->m_pollerData, prefixes, mask)->handle;
-    if (listener) {
-      thr->m_callbacks.try_emplace(listener, std::move(callback));
-    }
-    return listener;
-  } else {
-    return {};
-  }
-}
-
-NT_TopicListener LSImpl::AddTopicListenerHandle(TopicListenerPollerData* poller,
-                                                NT_Handle handle,
-                                                unsigned int mask) {
-  if (auto topic = m_topics.Get(handle)) {
-    return AddTopicListenerImpl(poller, topic, mask)->handle;
-  } else if (auto sub = m_multiSubscribers.Get(handle)) {
-    return AddTopicListenerImpl(poller, sub, mask)->handle;
-  } else if (auto sub = m_subscribers.Get(handle)) {
-    return AddTopicListenerImpl(poller, sub, mask)->handle;
-  } else if (auto entry = m_entries.Get(handle)) {
-    return AddTopicListenerImpl(poller, entry->subscriber, mask)->handle;
-  } else {
-    return {};
-  }
-}
-
-NT_TopicListener LSImpl::AddTopicListener(
-    NT_Handle handle, unsigned int mask,
-    std::function<void(const TopicNotification&)> callback) {
-  if (!m_topicListenerThread) {
-    m_topicListenerThread.Start(AddTopicListenerPoller());
-  }
-  if (auto thr = m_topicListenerThread.GetThread()) {
-    NT_TopicListener listener =
-        AddTopicListenerHandle(thr->m_pollerData, handle, mask);
-    if (listener) {
-      thr->m_callbacks.try_emplace(listener, std::move(callback));
-    }
-    return listener;
-  } else {
-    return {};
-  }
-}
-
-void LSImpl::DestroyTopicListenerPoller(NT_TopicListenerPoller pollerHandle) {
-  if (auto poller = m_topicListenerPollers.Remove(pollerHandle)) {
-    // ensure all listeners that use this poller are removed
-    wpi::SmallVector<NT_TopicListener, 16> toRemove;
-    for (auto&& listener : m_topicListeners) {
-      if (listener->poller == poller.get()) {
-        toRemove.emplace_back(listener->handle);
-      }
-    }
-    for (auto handle : toRemove) {
-      RemoveTopicListener(handle);
-    }
-  }
-}
-
-std::unique_ptr<TopicListenerData> LSImpl::RemoveTopicListener(
-    NT_TopicListener listenerHandle) {
-  auto listener = m_topicListeners.Remove(listenerHandle);
-  if (listener) {
-    if (listener->subscriberOwned) {
-      if (listener->subscriber) {
-        RemoveLocalSubscriber(listener->subscriber->handle);
-      }
-      if (listener->multiSubscriber) {
-        RemoveMultiSubscriber(listener->multiSubscriber->handle);
-      }
-    }
-    if (listener->topic) {
-      listener->topic->listeners.Remove(listener.get());
-    } else {
-      m_topicPrefixListeners.Remove(listener.get());
-    }
-  }
-  return listener;
-}
-
-ValueListenerData* LSImpl::AddValueListenerImpl(ValueListenerPollerData* poller,
-                                                SubscriberData* subscriber,
-                                                NT_Handle subentryHandle,
-                                                unsigned int eventMask) {
-  auto listener = m_valueListeners.Add(m_inst, poller, subscriber,
-                                       subentryHandle, eventMask);
-  listener->subscriber->valueListeners.Add(listener);
   auto topic = subscriber->topic;
 
-  // handle immediate
-  if ((eventMask & NT_VALUE_NOTIFY_IMMEDIATE) != 0 && topic->lastValue) {
-    listener->poller->queue.emplace_back(listener->handle, topic->handle,
-                                         subentryHandle, topic->lastValue,
-                                         NT_VALUE_NOTIFY_IMMEDIATE);
-    listener->handle.Set();
-    listener->poller->handle.Set();
+  if ((eventMask & NT_EVENT_TOPIC) != 0) {
+    m_listenerStorage.Activate(
+        listenerHandle, eventMask & (NT_EVENT_TOPIC | NT_EVENT_IMMEDIATE));
+
+    topic->listeners.Add(listenerHandle);
+
+    // handle immediate publish
+    if ((eventMask & (NT_EVENT_PUBLISH | NT_EVENT_IMMEDIATE)) ==
+            (NT_EVENT_PUBLISH | NT_EVENT_IMMEDIATE) &&
+        topic->Exists()) {
+      m_listenerStorage.Notify({&listenerHandle, 1},
+                               NT_EVENT_PUBLISH | NT_EVENT_IMMEDIATE,
+                               topic->GetTopicInfo());
+    }
   }
 
-  return listener;
+  if ((eventMask & NT_EVENT_VALUE_ALL) != 0) {
+    m_listenerStorage.Activate(
+        listenerHandle, eventMask & (NT_EVENT_VALUE_ALL | NT_EVENT_IMMEDIATE),
+        [subentryHandle](unsigned int mask, Event* event) {
+          if (auto valueData = event->GetValueEventData()) {
+            valueData->subentry = subentryHandle;
+          }
+          return true;
+        });
+
+    subscriber->valueListeners.Add(listenerHandle);
+
+    // handle immediate value
+    if ((eventMask & NT_EVENT_VALUE_ALL) != 0 &&
+        (eventMask & NT_EVENT_IMMEDIATE) != 0 && topic->lastValue) {
+      m_listenerStorage.Notify({&listenerHandle, 1},
+                               NT_EVENT_IMMEDIATE | NT_EVENT_VALUE_ALL,
+                               topic->handle, subentryHandle, topic->lastValue);
+    }
+  }
 }
 
-ValueListenerData* LSImpl::AddValueListenerImpl(ValueListenerPollerData* poller,
-                                                MultiSubscriberData* subscriber,
-                                                NT_Handle subentryHandle,
-                                                unsigned int eventMask) {
-  auto listener = m_valueListeners.Add(m_inst, poller, subscriber,
-                                       subentryHandle, eventMask);
-  listener->multiSubscriber->valueListeners.Add(listener);
+void LSImpl::AddListenerImpl(NT_Listener listenerHandle,
+                             MultiSubscriberData* subscriber,
+                             unsigned int eventMask, bool subscriberOwned) {
+  auto listener =
+      m_listeners
+          .try_emplace(listenerHandle, std::make_unique<ListenerData>(
+                                           listenerHandle, subscriber,
+                                           eventMask, subscriberOwned))
+          .first->getSecond()
+          .get();
 
-  // handle immediate
-  if ((eventMask & NT_VALUE_NOTIFY_IMMEDIATE) != 0) {
-    bool any = false;
+  // if we're doing anything immediate, get the list of matching topics
+  wpi::SmallVector<TopicData*, 32> topics;
+  if ((eventMask & NT_EVENT_IMMEDIATE) != 0 &&
+      (eventMask & (NT_EVENT_PUBLISH | NT_EVENT_VALUE_ALL)) != 0) {
     for (auto&& topic : m_topics) {
-      for (auto&& prefix : listener->multiSubscriber->prefixes) {
-        if (wpi::starts_with(topic->name, prefix) && topic->lastValue) {
-          listener->poller->queue.emplace_back(listener->handle, topic->handle,
-                                               subentryHandle, topic->lastValue,
-                                               NT_VALUE_NOTIFY_IMMEDIATE);
-          any = true;
+      for (auto&& prefix : subscriber->prefixes) {
+        if (wpi::starts_with(topic->name, prefix) && topic->Exists()) {
+          topics.emplace_back(topic.get());
         }
       }
     }
-    if (any) {
-      listener->handle.Set();
-      listener->poller->handle.Set();
-    }
   }
 
-  return listener;
-}
+  if ((eventMask & NT_EVENT_TOPIC) != 0) {
+    m_listenerStorage.Activate(
+        listenerHandle, eventMask & (NT_EVENT_TOPIC | NT_EVENT_IMMEDIATE));
 
-NT_ValueListener LSImpl::AddValueListenerHandle(ValueListenerPollerData* poller,
-                                                NT_Handle subentryHandle,
-                                                unsigned int mask) {
-  if (auto sub = m_subscribers.Get(subentryHandle)) {
-    return AddValueListenerImpl(poller, sub, subentryHandle, mask)->handle;
-  } else if (auto entry = m_entries.Get(subentryHandle)) {
-    return AddValueListenerImpl(poller, entry->subscriber, subentryHandle, mask)
-        ->handle;
-  } else if (auto sub = m_multiSubscribers.Get(subentryHandle)) {
-    return AddValueListenerImpl(poller, sub, subentryHandle, mask)->handle;
-  } else {
-    return {};
-  }
-}
+    m_topicPrefixListeners.Add(listener);
 
-NT_ValueListener LSImpl::AddValueListener(
-    NT_Handle subentry, unsigned int mask,
-    std::function<void(const ValueNotification&)> callback) {
-  if (!m_valueListenerThread) {
-    m_valueListenerThread.Start(AddValueListenerPoller());
-  }
-  if (auto thr = m_valueListenerThread.GetThread()) {
-    auto listener = AddValueListenerHandle(thr->m_pollerData, subentry, mask);
-    if (listener) {
-      thr->m_callbacks.try_emplace(listener, std::move(callback));
-    }
-    return listener;
-  } else {
-    return {};
-  }
-}
-
-void LSImpl::DestroyValueListenerPoller(NT_ValueListenerPoller pollerHandle) {
-  if (auto poller = m_valueListenerPollers.Remove(pollerHandle)) {
-    // ensure all listeners that use this poller are removed
-    wpi::SmallVector<NT_ValueListener, 16> toRemove;
-    for (auto&& listener : m_valueListeners) {
-      if (listener->poller == poller.get()) {
-        toRemove.emplace_back(listener->handle);
+    // handle immediate publish
+    if ((eventMask & (NT_EVENT_PUBLISH | NT_EVENT_IMMEDIATE)) ==
+        (NT_EVENT_PUBLISH | NT_EVENT_IMMEDIATE)) {
+      std::vector<TopicInfo> topicInfos;
+      for (auto&& topic : topics) {
+        topicInfos.emplace_back(topic->GetTopicInfo());
+      }
+      if (!topicInfos.empty()) {
+        m_listenerStorage.Notify({&listenerHandle, 1},
+                                 NT_EVENT_PUBLISH | NT_EVENT_IMMEDIATE,
+                                 topicInfos);
       }
     }
-    for (auto handle : toRemove) {
-      RemoveValueListener(handle);
+  }
+
+  if ((eventMask & NT_EVENT_VALUE_ALL) != 0) {
+    m_listenerStorage.Activate(
+        listenerHandle, eventMask & (NT_EVENT_VALUE_ALL | NT_EVENT_IMMEDIATE),
+        [subentryHandle = subscriber->handle.GetHandle()](unsigned int mask,
+                                                          Event* event) {
+          if (auto valueData = event->GetValueEventData()) {
+            valueData->subentry = subentryHandle;
+          }
+          return true;
+        });
+
+    subscriber->valueListeners.Add(listenerHandle);
+
+    // handle immediate value
+    if ((eventMask & NT_EVENT_VALUE_ALL) != 0 &&
+        (eventMask & NT_EVENT_IMMEDIATE) != 0) {
+      for (auto&& topic : topics) {
+        if (topic->lastValue) {
+          m_listenerStorage.Notify(
+              {&listenerHandle, 1}, NT_EVENT_VALUE_ALL | NT_EVENT_IMMEDIATE,
+              topic->handle, subscriber->handle, topic->lastValue);
+        }
+      }
     }
   }
 }
 
-std::unique_ptr<ValueListenerData> LSImpl::RemoveValueListener(
-    NT_ValueListener listenerHandle) {
-  auto listener = m_valueListeners.Remove(listenerHandle);
-  if (listener) {
-    if (listener->subscriber) {
-      listener->subscriber->valueListeners.Remove(listener.get());
-    }
-    if (listener->multiSubscriber) {
-      listener->multiSubscriber->valueListeners.Remove(listener.get());
+void LSImpl::AddListener(NT_Listener listenerHandle,
+                         std::span<const std::string_view> prefixes,
+                         unsigned int eventMask) {
+  // subscribe to make sure topic updates are received
+  PubSubOptions options;
+  options.topicsOnly = (eventMask & NT_EVENT_VALUE_ALL) == 0;
+  options.prefixMatch = true;
+  auto sub = AddMultiSubscriber(prefixes, options);
+  AddListenerImpl(listenerHandle, sub, eventMask, true);
+}
+
+void LSImpl::AddListener(NT_Listener listenerHandle, NT_Handle handle,
+                         unsigned int mask) {
+  if (auto topic = m_topics.Get(handle)) {
+    AddListenerImpl(listenerHandle, topic, mask);
+  } else if (auto sub = m_multiSubscribers.Get(handle)) {
+    AddListenerImpl(listenerHandle, sub, mask, false);
+  } else if (auto sub = m_subscribers.Get(handle)) {
+    AddListenerImpl(listenerHandle, sub, mask, sub->handle, false);
+  } else if (auto entry = m_entries.Get(handle)) {
+    AddListenerImpl(listenerHandle, entry->subscriber, mask, entry->handle,
+                    false);
+  }
+}
+
+void LSImpl::RemoveListener(NT_Listener listenerHandle, unsigned int mask) {
+  auto listenerIt = m_listeners.find(listenerHandle);
+  if (listenerIt == m_listeners.end()) {
+    return;
+  }
+  auto listener = std::move(listenerIt->getSecond());
+  m_listeners.erase(listenerIt);
+  if (!listener) {
+    return;
+  }
+
+  m_topicPrefixListeners.Remove(listener.get());
+  if (listener->subscriber) {
+    listener->subscriber->valueListeners.Remove(listenerHandle);
+    listener->subscriber->topic->listeners.Remove(listenerHandle);
+    if (listener->subscriberOwned) {
+      RemoveLocalSubscriber(listener->subscriber->handle);
     }
   }
-  return listener;
+  if (listener->multiSubscriber) {
+    listener->multiSubscriber->valueListeners.Remove(listenerHandle);
+    if (listener->subscriberOwned) {
+      RemoveMultiSubscriber(listener->multiSubscriber->handle);
+    }
+  }
 }
 
 TopicData* LSImpl::GetOrCreateTopic(std::string_view name) {
@@ -1474,7 +1164,7 @@ bool LSImpl::PublishLocalValue(PublisherData* publisher, const Value& value) {
     if (m_network) {
       m_network->SetValue(publisher->handle, value);
     }
-    return SetValue(publisher->topic, value, NT_VALUE_NOTIFY_LOCAL);
+    return SetValue(publisher->topic, value, NT_EVENT_VALUE_LOCAL);
   } else {
     return false;
   }
@@ -1545,11 +1235,13 @@ void LSImpl::RemoveSubEntry(NT_Handle subentryHandle) {
 
 class LocalStorage::Impl : public LSImpl {
  public:
-  Impl(int inst, wpi::Logger& logger) : LSImpl{inst, logger} {}
+  Impl(int inst, IListenerStorage& listenerStorage, wpi::Logger& logger)
+      : LSImpl{inst, listenerStorage, logger} {}
 };
 
-LocalStorage::LocalStorage(int inst, wpi::Logger& logger)
-    : m_impl{std::make_unique<Impl>(inst, logger)} {}
+LocalStorage::LocalStorage(int inst, IListenerStorage& listenerStorage,
+                           wpi::Logger& logger)
+    : m_impl{std::make_unique<Impl>(inst, listenerStorage, logger)} {}
 
 LocalStorage::~LocalStorage() = default;
 
@@ -1581,7 +1273,7 @@ void LocalStorage::NetworkPropertiesUpdate(std::string_view name,
 void LocalStorage::NetworkSetValue(NT_Topic topicHandle, const Value& value) {
   std::scoped_lock lock{m_mutex};
   if (auto topic = m_impl->m_topics.Get(topicHandle)) {
-    m_impl->SetValue(topic, value, NT_VALUE_NOTIFY_NONE);
+    m_impl->SetValue(topic, value, NT_EVENT_VALUE_REMOTE);
   }
 }
 
@@ -1798,7 +1490,7 @@ void LocalStorage::SetTopicProperty(NT_Topic topicHandle, std::string_view name,
     }
     wpi::json update = wpi::json::object();
     update[name] = value;
-    m_impl->PropertiesUpdated(topic, update, NT_TOPIC_NOTIFY_NONE, true);
+    m_impl->PropertiesUpdated(topic, update, NT_EVENT_NONE, true);
   }
 }
 
@@ -1809,7 +1501,7 @@ void LocalStorage::DeleteTopicProperty(NT_Topic topicHandle,
     topic->properties.erase(name);
     wpi::json update = wpi::json::object();
     update[name] = wpi::json();
-    m_impl->PropertiesUpdated(topic, update, NT_TOPIC_NOTIFY_NONE, true);
+    m_impl->PropertiesUpdated(topic, update, NT_EVENT_NONE, true);
   }
 }
 
@@ -2317,11 +2009,15 @@ NT_Entry LocalStorage::GetEntry(std::string_view name) {
   // Get the topic data
   auto* topic = m_impl->GetOrCreateTopic(name);
 
-  // Create subscriber
-  auto* subscriber = m_impl->AddLocalSubscriber(topic, {});
+  if (topic->entry == 0) {
+    // Create subscriber
+    auto* subscriber = m_impl->AddLocalSubscriber(topic, {});
 
-  // Create entry
-  return m_impl->AddEntry(subscriber)->handle;
+    // Create entry
+    topic->entry = m_impl->AddEntry(subscriber)->handle;
+  }
+
+  return topic->entry;
 }
 
 std::string LocalStorage::GetEntryName(NT_Handle subentryHandle) {
@@ -2351,116 +2047,24 @@ int64_t LocalStorage::GetEntryLastChange(NT_Handle subentryHandle) {
   }
 }
 
-NT_TopicListener LocalStorage::AddTopicListener(
-    std::span<const std::string_view> prefixes, unsigned int mask,
-    std::function<void(const TopicNotification&)> callback) {
+void LocalStorage::AddListener(NT_Listener listener,
+                               std::span<const std::string_view> prefixes,
+                               unsigned int mask) {
+  mask &= (NT_EVENT_TOPIC | NT_EVENT_VALUE_ALL | NT_EVENT_IMMEDIATE);
   std::scoped_lock lock{m_mutex};
-  return m_impl->AddTopicListener(prefixes, mask, std::move(callback));
+  m_impl->AddListener(listener, prefixes, mask);
 }
 
-NT_TopicListener LocalStorage::AddTopicListener(
-    NT_Topic topicHandle, unsigned int mask,
-    std::function<void(const TopicNotification&)> callback) {
+void LocalStorage::AddListener(NT_Listener listener, NT_Handle handle,
+                               unsigned int mask) {
+  mask &= (NT_EVENT_TOPIC | NT_EVENT_VALUE_ALL | NT_EVENT_IMMEDIATE);
   std::scoped_lock lock{m_mutex};
-  return m_impl->AddTopicListener(topicHandle, mask, std::move(callback));
+  m_impl->AddListener(listener, handle, mask);
 }
 
-NT_TopicListenerPoller LocalStorage::CreateTopicListenerPoller() {
+void LocalStorage::RemoveListener(NT_Listener listener, unsigned int mask) {
   std::scoped_lock lock{m_mutex};
-  return m_impl->AddTopicListenerPoller()->handle;
-}
-
-void LocalStorage::DestroyTopicListenerPoller(
-    NT_TopicListenerPoller pollerHandle) {
-  std::scoped_lock lock{m_mutex};
-  m_impl->DestroyTopicListenerPoller(pollerHandle);
-}
-
-NT_TopicListener LocalStorage::AddPolledTopicListener(
-    NT_TopicListenerPoller pollerHandle,
-    std::span<const std::string_view> prefixes, unsigned int mask) {
-  std::scoped_lock lock{m_mutex};
-  if (auto poller = m_impl->m_topicListenerPollers.Get(pollerHandle)) {
-    return m_impl->AddTopicListenerImpl(poller, prefixes, mask)->handle;
-  } else {
-    return {};
-  }
-}
-
-NT_TopicListener LocalStorage::AddPolledTopicListener(
-    NT_TopicListenerPoller pollerHandle, NT_Handle handle, unsigned int mask) {
-  std::scoped_lock lock{m_mutex};
-
-  auto poller = m_impl->m_topicListenerPollers.Get(pollerHandle);
-  if (!poller) {
-    return {};
-  }
-
-  return m_impl->AddTopicListenerHandle(poller, handle, mask);
-}
-
-std::vector<TopicNotification> LocalStorage::ReadTopicListenerQueue(
-    NT_TopicListenerPoller pollerHandle) {
-  std::scoped_lock lock{m_mutex};
-  if (auto poller = m_impl->m_topicListenerPollers.Get(pollerHandle)) {
-    std::vector<TopicNotification> rv;
-    rv.swap(poller->queue);
-    return rv;
-  } else {
-    return {};
-  }
-}
-
-void LocalStorage::RemoveTopicListener(NT_TopicListener listenerHandle) {
-  std::scoped_lock lock{m_mutex};
-  m_impl->RemoveTopicListener(listenerHandle);
-}
-
-NT_ValueListener LocalStorage::AddValueListener(
-    NT_Handle subentry, unsigned int mask,
-    std::function<void(const ValueNotification&)> callback) {
-  std::scoped_lock lock{m_mutex};
-  return m_impl->AddValueListener(subentry, mask, std::move(callback));
-}
-
-NT_ValueListenerPoller LocalStorage::CreateValueListenerPoller() {
-  std::scoped_lock lock{m_mutex};
-  return m_impl->AddValueListenerPoller()->handle;
-}
-
-void LocalStorage::DestroyValueListenerPoller(
-    NT_ValueListenerPoller pollerHandle) {
-  std::scoped_lock lock{m_mutex};
-  m_impl->DestroyValueListenerPoller(pollerHandle);
-}
-
-NT_ValueListener LocalStorage::AddPolledValueListener(
-    NT_ValueListenerPoller pollerHandle, NT_Handle subentryHandle,
-    unsigned int mask) {
-  std::scoped_lock lock{m_mutex};
-
-  auto poller = m_impl->m_valueListenerPollers.Get(pollerHandle);
-  if (!poller) {
-    return {};
-  }
-  return m_impl->AddValueListenerHandle(poller, subentryHandle, mask);
-}
-
-std::vector<ValueNotification> LocalStorage::ReadValueListenerQueue(
-    NT_ValueListenerPoller pollerHandle) {
-  std::scoped_lock lock{m_mutex};
-  if (auto poller = m_impl->m_valueListenerPollers.Get(pollerHandle)) {
-    std::vector<ValueNotification> rv;
-    rv.swap(poller->queue);
-    return rv;
-  } else {
-    return {};
-  }
-}
-
-void LocalStorage::RemoveValueListener(NT_ValueListener listenerHandle) {
-  std::scoped_lock lock{m_mutex};
-  m_impl->RemoveValueListener(listenerHandle);
+  m_impl->RemoveListener(listener, mask);
 }
 
 NT_DataLogger LocalStorage::StartDataLog(wpi::log::DataLog& log,

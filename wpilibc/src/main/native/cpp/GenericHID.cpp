@@ -44,6 +44,51 @@ int GenericHID::GetPOV(int pov) const {
   return DriverStation::GetStickPOV(m_port, pov);
 }
 
+BooleanEvent GenericHID::POV(int angle, EventLoop* loop) const {
+  return POV(0, angle, loop);
+}
+
+BooleanEvent GenericHID::POV(int pov, int angle, EventLoop* loop) const {
+  return BooleanEvent(
+      loop, [this, pov, angle] { return this->GetPOV(pov) == angle; });
+}
+
+BooleanEvent GenericHID::POVUp(EventLoop* loop) const {
+  return POV(0, loop);
+}
+
+BooleanEvent GenericHID::POVUpRight(EventLoop* loop) const {
+  return POV(45, loop);
+}
+
+BooleanEvent GenericHID::POVRight(EventLoop* loop) const {
+  return POV(90, loop);
+}
+
+BooleanEvent GenericHID::POVDownRight(EventLoop* loop) const {
+  return POV(135, loop);
+}
+
+BooleanEvent GenericHID::POVDown(EventLoop* loop) const {
+  return POV(180, loop);
+}
+
+BooleanEvent GenericHID::POVDownLeft(EventLoop* loop) const {
+  return POV(225, loop);
+}
+
+BooleanEvent GenericHID::POVLeft(EventLoop* loop) const {
+  return POV(270, loop);
+}
+
+BooleanEvent GenericHID::POVUpLeft(EventLoop* loop) const {
+  return POV(315, loop);
+}
+
+BooleanEvent GenericHID::POVCenter(EventLoop* loop) const {
+  return POV(360, loop);
+}
+
 int GenericHID::GetAxisCount() const {
   return DriverStation::GetStickAxisCount(m_port);
 }

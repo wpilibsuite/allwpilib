@@ -37,7 +37,7 @@ class WPILIB_DLLEXPORT Translation2d {
    * @param x The x component of the translation.
    * @param y The y component of the translation.
    */
-  Translation2d(units::meter_t x, units::meter_t y);
+  constexpr Translation2d(units::meter_t x, units::meter_t y);
 
   /**
    * Constructs a Translation2d with the provided distance and angle. This is
@@ -46,7 +46,7 @@ class WPILIB_DLLEXPORT Translation2d {
    * @param distance The distance from the origin to the end of the translation.
    * @param angle The angle between the x-axis and the translation vector.
    */
-  Translation2d(units::meter_t distance, const Rotation2d& angle);
+  constexpr Translation2d(units::meter_t distance, const Rotation2d& angle);
 
   /**
    * Calculates the distance between two translations in 2D space.
@@ -64,14 +64,14 @@ class WPILIB_DLLEXPORT Translation2d {
    *
    * @return The X component of the translation.
    */
-  units::meter_t X() const { return m_x; }
+  constexpr units::meter_t X() const { return m_x; }
 
   /**
    * Returns the Y component of the translation.
    *
    * @return The Y component of the translation.
    */
-  units::meter_t Y() const { return m_y; }
+  constexpr units::meter_t Y() const { return m_y; }
 
   /**
    * Returns the norm, or distance from the origin to the translation.
@@ -85,7 +85,7 @@ class WPILIB_DLLEXPORT Translation2d {
    *
    * @return The angle of the translation
    */
-  Rotation2d Angle() const;
+  constexpr Rotation2d Angle() const;
 
   /**
    * Applies a rotation to the translation in 2D space.
@@ -105,7 +105,7 @@ class WPILIB_DLLEXPORT Translation2d {
    *
    * @return The new rotated translation.
    */
-  Translation2d RotateBy(const Rotation2d& other) const;
+  constexpr Translation2d RotateBy(const Rotation2d& other) const;
 
   /**
    * Returns the sum of two translations in 2D space.
@@ -117,7 +117,7 @@ class WPILIB_DLLEXPORT Translation2d {
    *
    * @return The sum of the translations.
    */
-  Translation2d operator+(const Translation2d& other) const;
+  constexpr Translation2d operator+(const Translation2d& other) const;
 
   /**
    * Returns the difference between two translations.
@@ -129,7 +129,7 @@ class WPILIB_DLLEXPORT Translation2d {
    *
    * @return The difference between the two translations.
    */
-  Translation2d operator-(const Translation2d& other) const;
+  constexpr Translation2d operator-(const Translation2d& other) const;
 
   /**
    * Returns the inverse of the current translation. This is equivalent to
@@ -138,7 +138,7 @@ class WPILIB_DLLEXPORT Translation2d {
    *
    * @return The inverse of the current translation.
    */
-  Translation2d operator-() const;
+  constexpr Translation2d operator-() const;
 
   /**
    * Returns the translation multiplied by a scalar.
@@ -149,7 +149,7 @@ class WPILIB_DLLEXPORT Translation2d {
    *
    * @return The scaled translation.
    */
-  Translation2d operator*(double scalar) const;
+  constexpr Translation2d operator*(double scalar) const;
 
   /**
    * Returns the translation divided by a scalar.
@@ -160,7 +160,7 @@ class WPILIB_DLLEXPORT Translation2d {
    *
    * @return The scaled translation.
    */
-  Translation2d operator/(double scalar) const;
+  constexpr Translation2d operator/(double scalar) const;
 
   /**
    * Checks equality between this Translation2d and another object.
@@ -190,3 +190,5 @@ WPILIB_DLLEXPORT
 void from_json(const wpi::json& json, Translation2d& state);
 
 }  // namespace frc
+
+#include "Translation2d.inc"

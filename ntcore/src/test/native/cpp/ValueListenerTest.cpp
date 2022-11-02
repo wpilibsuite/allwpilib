@@ -34,12 +34,12 @@ TEST_F(ValueListenerTest, MultiPollSub) {
   auto pub = nt::Publish(topic, NT_DOUBLE, "double");
   auto sub = nt::Subscribe(topic, NT_DOUBLE, "double");
 
-  auto poller1 = nt::CreateValueListenerPoller(m_inst);
-  auto poller2 = nt::CreateValueListenerPoller(m_inst);
-  auto poller3 = nt::CreateValueListenerPoller(m_inst);
-  auto h1 = nt::AddPolledValueListener(poller1, sub, NT_VALUE_NOTIFY_LOCAL);
-  auto h2 = nt::AddPolledValueListener(poller2, sub, NT_VALUE_NOTIFY_LOCAL);
-  auto h3 = nt::AddPolledValueListener(poller3, sub, NT_VALUE_NOTIFY_LOCAL);
+  auto poller1 = nt::CreateListenerPoller(m_inst);
+  auto poller2 = nt::CreateListenerPoller(m_inst);
+  auto poller3 = nt::CreateListenerPoller(m_inst);
+  auto h1 = nt::AddPolledListener(poller1, sub, nt::EventFlags::kValueLocal);
+  auto h2 = nt::AddPolledListener(poller2, sub, nt::EventFlags::kValueLocal);
+  auto h3 = nt::AddPolledListener(poller3, sub, nt::EventFlags::kValueLocal);
 
   nt::SetDouble(pub, 0);
 
@@ -50,30 +50,36 @@ TEST_F(ValueListenerTest, MultiPollSub) {
   ASSERT_FALSE(timedOut);
   ASSERT_TRUE(wpi::WaitForObject(poller3, 1.0, &timedOut));
   ASSERT_FALSE(timedOut);
-  auto results1 = nt::ReadValueListenerQueue(poller1);
-  auto results2 = nt::ReadValueListenerQueue(poller2);
-  auto results3 = nt::ReadValueListenerQueue(poller3);
+  auto results1 = nt::ReadListenerQueue(poller1);
+  auto results2 = nt::ReadListenerQueue(poller2);
+  auto results3 = nt::ReadListenerQueue(poller3);
 
   ASSERT_EQ(results1.size(), 1u);
-  EXPECT_EQ(results1[0].flags, NT_VALUE_NOTIFY_LOCAL);
+  EXPECT_EQ(results1[0].flags, nt::EventFlags::kValueLocal);
   EXPECT_EQ(results1[0].listener, h1);
-  EXPECT_EQ(results1[0].subentry, sub);
-  EXPECT_EQ(results1[0].topic, topic);
-  EXPECT_EQ(results1[0].value, nt::Value::MakeDouble(0.0));
+  auto valueData = results1[0].GetValueEventData();
+  ASSERT_TRUE(valueData);
+  EXPECT_EQ(valueData->subentry, sub);
+  EXPECT_EQ(valueData->topic, topic);
+  EXPECT_EQ(valueData->value, nt::Value::MakeDouble(0.0));
 
   ASSERT_EQ(results2.size(), 1u);
-  EXPECT_EQ(results2[0].flags, NT_VALUE_NOTIFY_LOCAL);
+  EXPECT_EQ(results2[0].flags, nt::EventFlags::kValueLocal);
   EXPECT_EQ(results2[0].listener, h2);
-  EXPECT_EQ(results2[0].subentry, sub);
-  EXPECT_EQ(results2[0].topic, topic);
-  EXPECT_EQ(results2[0].value, nt::Value::MakeDouble(0.0));
+  valueData = results2[0].GetValueEventData();
+  ASSERT_TRUE(valueData);
+  EXPECT_EQ(valueData->subentry, sub);
+  EXPECT_EQ(valueData->topic, topic);
+  EXPECT_EQ(valueData->value, nt::Value::MakeDouble(0.0));
 
   ASSERT_EQ(results3.size(), 1u);
-  EXPECT_EQ(results3[0].flags, NT_VALUE_NOTIFY_LOCAL);
+  EXPECT_EQ(results3[0].flags, nt::EventFlags::kValueLocal);
   EXPECT_EQ(results3[0].listener, h3);
-  EXPECT_EQ(results3[0].subentry, sub);
-  EXPECT_EQ(results3[0].topic, topic);
-  EXPECT_EQ(results3[0].value, nt::Value::MakeDouble(0.0));
+  valueData = results3[0].GetValueEventData();
+  ASSERT_TRUE(valueData);
+  EXPECT_EQ(valueData->subentry, sub);
+  EXPECT_EQ(valueData->topic, topic);
+  EXPECT_EQ(valueData->value, nt::Value::MakeDouble(0.0));
 }
 
 TEST_F(ValueListenerTest, PollMultiSub) {
@@ -82,29 +88,33 @@ TEST_F(ValueListenerTest, PollMultiSub) {
   auto sub1 = nt::Subscribe(topic, NT_DOUBLE, "double");
   auto sub2 = nt::Subscribe(topic, NT_DOUBLE, "double");
 
-  auto poller = nt::CreateValueListenerPoller(m_inst);
-  auto h1 = nt::AddPolledValueListener(poller, sub1, NT_VALUE_NOTIFY_LOCAL);
-  auto h2 = nt::AddPolledValueListener(poller, sub2, NT_VALUE_NOTIFY_LOCAL);
+  auto poller = nt::CreateListenerPoller(m_inst);
+  auto h1 = nt::AddPolledListener(poller, sub1, nt::EventFlags::kValueLocal);
+  auto h2 = nt::AddPolledListener(poller, sub2, nt::EventFlags::kValueLocal);
 
   nt::SetDouble(pub, 0);
 
   bool timedOut = false;
   ASSERT_TRUE(wpi::WaitForObject(poller, 1.0, &timedOut));
   ASSERT_FALSE(timedOut);
-  auto results = nt::ReadValueListenerQueue(poller);
+  auto results = nt::ReadListenerQueue(poller);
 
   ASSERT_EQ(results.size(), 2u);
-  EXPECT_EQ(results[0].flags, NT_VALUE_NOTIFY_LOCAL);
+  EXPECT_EQ(results[0].flags, nt::EventFlags::kValueLocal);
   EXPECT_EQ(results[0].listener, h1);
-  EXPECT_EQ(results[0].subentry, sub1);
-  EXPECT_EQ(results[0].topic, topic);
-  EXPECT_EQ(results[0].value, nt::Value::MakeDouble(0.0));
+  auto valueData = results[0].GetValueEventData();
+  ASSERT_TRUE(valueData);
+  EXPECT_EQ(valueData->subentry, sub1);
+  EXPECT_EQ(valueData->topic, topic);
+  EXPECT_EQ(valueData->value, nt::Value::MakeDouble(0.0));
 
-  EXPECT_EQ(results[1].flags, NT_VALUE_NOTIFY_LOCAL);
+  EXPECT_EQ(results[1].flags, nt::EventFlags::kValueLocal);
   EXPECT_EQ(results[1].listener, h2);
-  EXPECT_EQ(results[1].subentry, sub2);
-  EXPECT_EQ(results[1].topic, topic);
-  EXPECT_EQ(results[1].value, nt::Value::MakeDouble(0.0));
+  valueData = results[1].GetValueEventData();
+  ASSERT_TRUE(valueData);
+  EXPECT_EQ(valueData->subentry, sub2);
+  EXPECT_EQ(valueData->topic, topic);
+  EXPECT_EQ(valueData->value, nt::Value::MakeDouble(0.0));
 }
 
 TEST_F(ValueListenerTest, PollMultiSubTopic) {
@@ -115,9 +125,9 @@ TEST_F(ValueListenerTest, PollMultiSubTopic) {
   auto sub1 = nt::Subscribe(topic1, NT_DOUBLE, "double");
   auto sub2 = nt::Subscribe(topic2, NT_DOUBLE, "double");
 
-  auto poller = nt::CreateValueListenerPoller(m_inst);
-  auto h1 = nt::AddPolledValueListener(poller, sub1, NT_VALUE_NOTIFY_LOCAL);
-  auto h2 = nt::AddPolledValueListener(poller, sub2, NT_VALUE_NOTIFY_LOCAL);
+  auto poller = nt::CreateListenerPoller(m_inst);
+  auto h1 = nt::AddPolledListener(poller, sub1, nt::EventFlags::kValueLocal);
+  auto h2 = nt::AddPolledListener(poller, sub2, nt::EventFlags::kValueLocal);
 
   nt::SetDouble(pub1, 0);
   nt::SetDouble(pub2, 1);
@@ -125,20 +135,24 @@ TEST_F(ValueListenerTest, PollMultiSubTopic) {
   bool timedOut = false;
   ASSERT_TRUE(wpi::WaitForObject(poller, 1.0, &timedOut));
   ASSERT_FALSE(timedOut);
-  auto results = nt::ReadValueListenerQueue(poller);
+  auto results = nt::ReadListenerQueue(poller);
 
   ASSERT_EQ(results.size(), 2u);
-  EXPECT_EQ(results[0].flags, NT_VALUE_NOTIFY_LOCAL);
+  EXPECT_EQ(results[0].flags, nt::EventFlags::kValueLocal);
   EXPECT_EQ(results[0].listener, h1);
-  EXPECT_EQ(results[0].subentry, sub1);
-  EXPECT_EQ(results[0].topic, topic1);
-  EXPECT_EQ(results[0].value, nt::Value::MakeDouble(0.0));
+  auto valueData = results[0].GetValueEventData();
+  ASSERT_TRUE(valueData);
+  EXPECT_EQ(valueData->subentry, sub1);
+  EXPECT_EQ(valueData->topic, topic1);
+  EXPECT_EQ(valueData->value, nt::Value::MakeDouble(0.0));
 
-  EXPECT_EQ(results[1].flags, NT_VALUE_NOTIFY_LOCAL);
+  EXPECT_EQ(results[1].flags, nt::EventFlags::kValueLocal);
   EXPECT_EQ(results[1].listener, h2);
-  EXPECT_EQ(results[1].subentry, sub2);
-  EXPECT_EQ(results[1].topic, topic2);
-  EXPECT_EQ(results[1].value, nt::Value::MakeDouble(1.0));
+  valueData = results[1].GetValueEventData();
+  ASSERT_TRUE(valueData);
+  EXPECT_EQ(valueData->subentry, sub2);
+  EXPECT_EQ(valueData->topic, topic2);
+  EXPECT_EQ(valueData->value, nt::Value::MakeDouble(1.0));
 }
 
 TEST_F(ValueListenerTest, PollSubMultiple) {
@@ -148,8 +162,8 @@ TEST_F(ValueListenerTest, PollSubMultiple) {
   auto pub2 = nt::Publish(topic2, NT_DOUBLE, "double");
   auto sub = nt::SubscribeMultiple(m_inst, {{"foo"}});
 
-  auto poller = nt::CreateValueListenerPoller(m_inst);
-  auto h = nt::AddPolledValueListener(poller, sub, NT_VALUE_NOTIFY_LOCAL);
+  auto poller = nt::CreateListenerPoller(m_inst);
+  auto h = nt::AddPolledListener(poller, sub, nt::EventFlags::kValueLocal);
 
   nt::SetDouble(pub1, 0);
   nt::SetDouble(pub2, 1);
@@ -157,90 +171,139 @@ TEST_F(ValueListenerTest, PollSubMultiple) {
   bool timedOut = false;
   ASSERT_TRUE(wpi::WaitForObject(poller, 1.0, &timedOut));
   ASSERT_FALSE(timedOut);
-  auto results = nt::ReadValueListenerQueue(poller);
+  auto results = nt::ReadListenerQueue(poller);
 
   ASSERT_EQ(results.size(), 2u);
-  EXPECT_EQ(results[0].flags, NT_VALUE_NOTIFY_LOCAL);
+  EXPECT_EQ(results[0].flags, nt::EventFlags::kValueLocal);
   EXPECT_EQ(results[0].listener, h);
-  EXPECT_EQ(results[0].subentry, sub);
-  EXPECT_EQ(results[0].topic, topic1);
-  EXPECT_EQ(results[0].value, nt::Value::MakeDouble(0.0));
+  auto valueData = results[0].GetValueEventData();
+  ASSERT_TRUE(valueData);
+  EXPECT_EQ(valueData->subentry, sub);
+  EXPECT_EQ(valueData->topic, topic1);
+  EXPECT_EQ(valueData->value, nt::Value::MakeDouble(0.0));
 
-  EXPECT_EQ(results[1].flags, NT_VALUE_NOTIFY_LOCAL);
+  EXPECT_EQ(results[1].flags, nt::EventFlags::kValueLocal);
   EXPECT_EQ(results[1].listener, h);
-  EXPECT_EQ(results[1].subentry, sub);
-  EXPECT_EQ(results[1].topic, topic2);
-  EXPECT_EQ(results[1].value, nt::Value::MakeDouble(1.0));
+  valueData = results[1].GetValueEventData();
+  ASSERT_TRUE(valueData);
+  EXPECT_EQ(valueData->subentry, sub);
+  EXPECT_EQ(valueData->topic, topic2);
+  EXPECT_EQ(valueData->value, nt::Value::MakeDouble(1.0));
+}
+
+TEST_F(ValueListenerTest, PollSubPrefixCreated) {
+  auto poller = nt::CreateListenerPoller(m_inst);
+  auto h =
+      nt::AddPolledListener(poller, {{"foo"}}, nt::EventFlags::kValueLocal);
+
+  auto topic1 = nt::GetTopic(m_inst, "foo/1");
+  auto topic2 = nt::GetTopic(m_inst, "foo/2");
+  auto topic3 = nt::GetTopic(m_inst, "bar/3");
+  auto pub1 = nt::Publish(topic1, NT_DOUBLE, "double");
+  auto pub2 = nt::Publish(topic2, NT_DOUBLE, "double");
+  auto pub3 = nt::Publish(topic3, NT_DOUBLE, "double");
+
+  nt::SetDouble(pub1, 0);
+  nt::SetDouble(pub2, 1);
+  nt::SetDouble(pub3, 1);
+
+  bool timedOut = false;
+  ASSERT_TRUE(wpi::WaitForObject(poller, 1.0, &timedOut));
+  ASSERT_FALSE(timedOut);
+  auto results = nt::ReadListenerQueue(poller);
+
+  ASSERT_EQ(results.size(), 2u);
+  EXPECT_EQ(results[0].flags, nt::EventFlags::kValueLocal);
+  EXPECT_EQ(results[0].listener, h);
+  auto valueData = results[0].GetValueEventData();
+  ASSERT_TRUE(valueData);
+  EXPECT_EQ(valueData->topic, topic1);
+  EXPECT_EQ(valueData->value, nt::Value::MakeDouble(0.0));
+
+  EXPECT_EQ(results[1].flags, nt::EventFlags::kValueLocal);
+  EXPECT_EQ(results[1].listener, h);
+  valueData = results[1].GetValueEventData();
+  ASSERT_TRUE(valueData);
+  EXPECT_EQ(valueData->topic, topic2);
+  EXPECT_EQ(valueData->value, nt::Value::MakeDouble(1.0));
 }
 
 TEST_F(ValueListenerTest, PollEntry) {
   auto entry = nt::GetEntry(m_inst, "foo");
 
-  auto poller = nt::CreateValueListenerPoller(m_inst);
-  auto h = nt::AddPolledValueListener(poller, entry, NT_VALUE_NOTIFY_LOCAL);
+  auto poller = nt::CreateListenerPoller(m_inst);
+  auto h = nt::AddPolledListener(poller, entry, nt::EventFlags::kValueLocal);
 
   ASSERT_TRUE(nt::SetDouble(entry, 0));
 
   bool timedOut = false;
   ASSERT_TRUE(wpi::WaitForObject(poller, 1.0, &timedOut));
   ASSERT_FALSE(timedOut);
-  auto results = nt::ReadValueListenerQueue(poller);
+  auto results = nt::ReadListenerQueue(poller);
 
   ASSERT_EQ(results.size(), 1u);
-  EXPECT_EQ(results[0].flags, NT_VALUE_NOTIFY_LOCAL);
+  EXPECT_EQ(results[0].flags, nt::EventFlags::kValueLocal);
   EXPECT_EQ(results[0].listener, h);
-  EXPECT_EQ(results[0].subentry, entry);
-  EXPECT_EQ(results[0].topic, nt::GetTopic(m_inst, "foo"));
-  EXPECT_EQ(results[0].value, nt::Value::MakeDouble(0.0));
+  auto valueData = results[0].GetValueEventData();
+  ASSERT_TRUE(valueData);
+  EXPECT_EQ(valueData->subentry, entry);
+  EXPECT_EQ(valueData->topic, nt::GetTopic(m_inst, "foo"));
+  EXPECT_EQ(valueData->value, nt::Value::MakeDouble(0.0));
 }
 
 TEST_F(ValueListenerTest, PollImmediate) {
   auto entry = nt::GetEntry(m_inst, "foo");
   ASSERT_TRUE(nt::SetDouble(entry, 0));
 
-  auto poller = nt::CreateValueListenerPoller(m_inst);
-  auto h = nt::AddPolledValueListener(
-      poller, entry, NT_VALUE_NOTIFY_LOCAL | NT_VALUE_NOTIFY_IMMEDIATE);
+  auto poller = nt::CreateListenerPoller(m_inst);
+  auto h = nt::AddPolledListener(
+      poller, entry, nt::EventFlags::kValueLocal | nt::EventFlags::kImmediate);
 
   bool timedOut = false;
   ASSERT_TRUE(wpi::WaitForObject(poller, 1.0, &timedOut));
   ASSERT_FALSE(timedOut);
-  auto results = nt::ReadValueListenerQueue(poller);
+  auto results = nt::ReadListenerQueue(poller);
 
   ASSERT_EQ(results.size(), 1u);
-  EXPECT_EQ(results[0].flags, NT_VALUE_NOTIFY_IMMEDIATE);
+  EXPECT_EQ(results[0].flags &
+                (nt::EventFlags::kValueLocal | nt::EventFlags::kImmediate),
+            nt::EventFlags::kValueLocal | nt::EventFlags::kImmediate);
   EXPECT_EQ(results[0].listener, h);
-  EXPECT_EQ(results[0].subentry, entry);
-  EXPECT_EQ(results[0].topic, nt::GetTopic(m_inst, "foo"));
-  EXPECT_EQ(results[0].value, nt::Value::MakeDouble(0.0));
+  auto valueData = results[0].GetValueEventData();
+  ASSERT_TRUE(valueData);
+  EXPECT_EQ(valueData->subentry, entry);
+  EXPECT_EQ(valueData->topic, nt::GetTopic(m_inst, "foo"));
+  EXPECT_EQ(valueData->value, nt::Value::MakeDouble(0.0));
 }
 
 TEST_F(ValueListenerTest, PollImmediateNoValue) {
   auto entry = nt::GetEntry(m_inst, "foo");
 
-  auto poller = nt::CreateValueListenerPoller(m_inst);
-  auto h = nt::AddPolledValueListener(
-      poller, entry, NT_VALUE_NOTIFY_LOCAL | NT_VALUE_NOTIFY_IMMEDIATE);
+  auto poller = nt::CreateListenerPoller(m_inst);
+  auto h = nt::AddPolledListener(
+      poller, entry, nt::EventFlags::kValueLocal | nt::EventFlags::kImmediate);
 
   bool timedOut = false;
   ASSERT_FALSE(wpi::WaitForObject(poller, 0.02, &timedOut));
   ASSERT_TRUE(timedOut);
-  auto results = nt::ReadValueListenerQueue(poller);
+  auto results = nt::ReadListenerQueue(poller);
   ASSERT_TRUE(results.empty());
 
   // now set a value
   ASSERT_TRUE(nt::SetDouble(entry, 0));
 
   ASSERT_TRUE(wpi::WaitForObject(poller, 1.0, &timedOut));
-  results = nt::ReadValueListenerQueue(poller);
+  results = nt::ReadListenerQueue(poller);
   ASSERT_FALSE(timedOut);
 
   ASSERT_EQ(results.size(), 1u);
-  EXPECT_EQ(results[0].flags, NT_VALUE_NOTIFY_LOCAL);
+  EXPECT_EQ(results[0].flags, nt::EventFlags::kValueLocal);
   EXPECT_EQ(results[0].listener, h);
-  EXPECT_EQ(results[0].subentry, entry);
-  EXPECT_EQ(results[0].topic, nt::GetTopic(m_inst, "foo"));
-  EXPECT_EQ(results[0].value, nt::Value::MakeDouble(0.0));
+  auto valueData = results[0].GetValueEventData();
+  ASSERT_TRUE(valueData);
+  EXPECT_EQ(valueData->subentry, entry);
+  EXPECT_EQ(valueData->topic, nt::GetTopic(m_inst, "foo"));
+  EXPECT_EQ(valueData->value, nt::Value::MakeDouble(0.0));
 }
 
 TEST_F(ValueListenerTest, PollImmediateSubMultiple) {
@@ -252,27 +315,35 @@ TEST_F(ValueListenerTest, PollImmediateSubMultiple) {
   nt::SetDouble(pub1, 0);
   nt::SetDouble(pub2, 1);
 
-  auto poller = nt::CreateValueListenerPoller(m_inst);
-  auto h = nt::AddPolledValueListener(
-      poller, sub, NT_VALUE_NOTIFY_LOCAL | NT_VALUE_NOTIFY_IMMEDIATE);
+  auto poller = nt::CreateListenerPoller(m_inst);
+  auto h = nt::AddPolledListener(
+      poller, sub, nt::EventFlags::kValueLocal | nt::EventFlags::kImmediate);
 
   bool timedOut = false;
   ASSERT_TRUE(wpi::WaitForObject(poller, 1.0, &timedOut));
   ASSERT_FALSE(timedOut);
-  auto results = nt::ReadValueListenerQueue(poller);
+  auto results = nt::ReadListenerQueue(poller);
 
   ASSERT_EQ(results.size(), 2u);
-  EXPECT_EQ(results[0].flags, NT_VALUE_NOTIFY_IMMEDIATE);
+  EXPECT_EQ(results[0].flags &
+                (nt::EventFlags::kValueLocal | nt::EventFlags::kImmediate),
+            nt::EventFlags::kValueLocal | nt::EventFlags::kImmediate);
   EXPECT_EQ(results[0].listener, h);
-  EXPECT_EQ(results[0].subentry, sub);
-  EXPECT_EQ(results[0].topic, topic1);
-  EXPECT_EQ(results[0].value, nt::Value::MakeDouble(0.0));
+  auto valueData = results[0].GetValueEventData();
+  ASSERT_TRUE(valueData);
+  EXPECT_EQ(valueData->subentry, sub);
+  EXPECT_EQ(valueData->topic, topic1);
+  EXPECT_EQ(valueData->value, nt::Value::MakeDouble(0.0));
 
-  EXPECT_EQ(results[1].flags, NT_VALUE_NOTIFY_IMMEDIATE);
+  EXPECT_EQ(results[1].flags &
+                (nt::EventFlags::kValueLocal | nt::EventFlags::kImmediate),
+            nt::EventFlags::kValueLocal | nt::EventFlags::kImmediate);
   EXPECT_EQ(results[1].listener, h);
-  EXPECT_EQ(results[1].subentry, sub);
-  EXPECT_EQ(results[1].topic, topic2);
-  EXPECT_EQ(results[1].value, nt::Value::MakeDouble(1.0));
+  valueData = results[1].GetValueEventData();
+  ASSERT_TRUE(valueData);
+  EXPECT_EQ(valueData->subentry, sub);
+  EXPECT_EQ(valueData->topic, topic2);
+  EXPECT_EQ(valueData->value, nt::Value::MakeDouble(1.0));
 }
 
 }  // namespace nt

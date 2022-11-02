@@ -14,8 +14,7 @@
 #include <vector>
 
 #include <networktables/NetworkTableInstance.h>
-#include <networktables/TopicListener.h>
-#include <networktables/ValueListener.h>
+#include <networktables/NetworkTableListener.h>
 #include <ntcore_cpp.h>
 #include <wpi/DenseMap.h>
 #include <wpi/json.h>
@@ -84,8 +83,10 @@ class NetworkTablesModel : public Model {
     Entry& operator=(const Entry&) = delete;
     ~Entry();
 
-    void UpdateTopic(nt::TopicNotification&& event) {
-      UpdateInfo(std::move(event.info));
+    void UpdateTopic(nt::Event&& event) {
+      if (std::holds_alternative<nt::TopicInfo>(event.data)) {
+        UpdateInfo(std::get<nt::TopicInfo>(std::move(event.data)));
+      }
     }
     void UpdateInfo(nt::TopicInfo&& info_);
 
@@ -179,9 +180,7 @@ class NetworkTablesModel : public Model {
   void UpdateClients(std::span<const uint8_t> data);
 
   nt::NetworkTableInstance m_inst;
-  NT_MultiSubscriber m_subscriber;
-  nt::TopicListenerPoller m_topicPoller;
-  nt::ValueListenerPoller m_valuePoller;
+  nt::NetworkTableListenerPoller m_poller;
   wpi::DenseMap<NT_Topic, std::unique_ptr<Entry>> m_entries;
 
   // sorted by name

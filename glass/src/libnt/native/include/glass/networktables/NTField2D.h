@@ -12,9 +12,8 @@
 
 #include <networktables/MultiSubscriber.h>
 #include <networktables/NetworkTableInstance.h>
+#include <networktables/NetworkTableListener.h>
 #include <networktables/StringTopic.h>
-#include <networktables/TopicListener.h>
-#include <networktables/ValueListener.h>
 #include <ntcore_cpp.h>
 
 #include "glass/other/Field2D.h"
@@ -48,8 +47,7 @@ class NTField2DModel : public Field2DModel {
   nt::NetworkTableInstance m_inst;
   nt::MultiSubscriber m_tableSub;
   nt::StringTopic m_nameTopic;
-  nt::TopicListenerPoller m_topicListener;
-  nt::ValueListenerPoller m_valueListener;
+  nt::NetworkTableListenerPoller m_poller;
   std::string m_nameValue;
 
   class ObjectModel;

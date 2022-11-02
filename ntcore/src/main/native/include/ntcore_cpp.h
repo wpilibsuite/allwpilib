@@ -13,6 +13,7 @@
 #include <string>
 #include <string_view>
 #include <utility>
+#include <variant>
 #include <vector>
 
 #include "networktables/NetworkTableValue.h"
@@ -39,6 +40,47 @@ namespace nt {
  *
  * @{
  */
+
+/**
+ * Event notification flags.
+ *
+ * The flags are a bitmask and must be OR'ed together to indicate the
+ * combination of events desired to be received.
+ *
+ */
+struct EventFlags {
+  EventFlags() = delete;
+
+  static constexpr unsigned int kNone = NT_EVENT_NONE;
+  /**
+   * Initial listener addition.
+   * Set this flag to receive immediate notification of matches to the
+   * flag criteria.
+   */
+  static constexpr unsigned int kImmediate = NT_EVENT_IMMEDIATE;
+  /** Client connected (on server, any client connected). */
+  static constexpr unsigned int kConnected = NT_EVENT_CONNECTED;
+  /** Client disconnected (on server, any client disconnected). */
+  static constexpr unsigned int kDisconnected = NT_EVENT_DISCONNECTED;
+  /** Any connection event (connect or disconnect). */
+  static constexpr unsigned int kConnection = kConnected | kDisconnected;
+  /** New topic published. */
+  static constexpr unsigned int kPublish = NT_EVENT_PUBLISH;
+  /** Topic unpublished. */
+  static constexpr unsigned int kUnpublish = NT_EVENT_UNPUBLISH;
+  /** Topic properties changed. */
+  static constexpr unsigned int kProperties = NT_EVENT_PROPERTIES;
+  /** Any topic event (publish, unpublish, or properties changed). */
+  static constexpr unsigned int kTopic = kPublish | kUnpublish | kProperties;
+  /** Topic value updated (via network). */
+  static constexpr unsigned int kValueRemote = NT_EVENT_VALUE_REMOTE;
+  /** Topic value updated (local). */
+  static constexpr unsigned int kValueLocal = NT_EVENT_VALUE_LOCAL;
+  /** Topic value updated (network or local). */
+  static constexpr unsigned int kValueAll = kValueRemote | kValueLocal;
+  /** Log message. */
+  static constexpr unsigned int kLogMessage = NT_EVENT_LOGMESSAGE;
+};
 
 /** NetworkTables Topic Information */
 struct TopicInfo {
@@ -106,47 +148,12 @@ struct ConnectionInfo {
   }
 };
 
-/** NetworkTables Topic Notification */
-class TopicNotification {
+/** NetworkTables Value Event Data */
+class ValueEventData {
  public:
-  TopicNotification() = default;
-  TopicNotification(NT_TopicListener listener_, TopicInfo info_,
-                    unsigned int flags_)
-      : listener(listener_), info(std::move(info_)), flags(flags_) {}
-
-  /** Listener that was triggered. */
-  NT_TopicListener listener{0};
-
-  /** Topic info. */
-  TopicInfo info;
-
-  /**
-   * Notification flags.
-   */
-  unsigned int flags{0};
-
-  friend void swap(TopicNotification& first, TopicNotification& second) {
-    using std::swap;
-    swap(first.listener, second.listener);
-    swap(first.info, second.info);
-    swap(first.flags, second.flags);
-  }
-};
-
-/** NetworkTables Value Notification */
-class ValueNotification {
- public:
-  ValueNotification() = default;
-  ValueNotification(NT_ValueListener listener_, NT_Topic topic_,
-                    NT_Handle subentry_, Value value_, unsigned int flags_)
-      : listener(listener_),
-        topic(topic_),
-        subentry(subentry_),
-        value(std::move(value_)),
-        flags(flags_) {}
-
-  /** Listener that was triggered. */
-  NT_ValueListener listener{0};
+  ValueEventData() = default;
+  ValueEventData(NT_Topic topic, NT_Handle subentry, Value value)
+      : topic{topic}, subentry{subentry}, value{std::move(value)} {}
 
   /** Topic handle. */
   NT_Topic topic{0};
@@ -156,63 +163,15 @@ class ValueNotification {
 
   /** The new value. */
   Value value;
-
-  /**
-   * Update flags.  For example, NT_NOTIFY_NEW if the key did not previously
-   * exist.
-   */
-  unsigned int flags{0};
-
-  friend void swap(ValueNotification& first, ValueNotification& second) {
-    using std::swap;
-    swap(first.listener, second.listener);
-    swap(first.topic, second.topic);
-    swap(first.subentry, second.subentry);
-    swap(first.value, second.value);
-    swap(first.flags, second.flags);
-  }
-};
-
-/** NetworkTables Connection Notification */
-class ConnectionNotification {
- public:
-  ConnectionNotification() = default;
-  ConnectionNotification(NT_ConnectionListener listener_, bool connected_,
-                         ConnectionInfo conn_)
-      : listener(listener_), connected(connected_), conn(std::move(conn_)) {}
-
-  /** Listener that was triggered. */
-  NT_ConnectionListener listener{0};
-
-  /** True if event is due to connection being established. */
-  bool connected = false;
-
-  /** Connection info. */
-  ConnectionInfo conn;
-
-  friend void swap(ConnectionNotification& first,
-                   ConnectionNotification& second) {
-    using std::swap;
-    swap(first.listener, second.listener);
-    swap(first.connected, second.connected);
-    swap(first.conn, second.conn);
-  }
 };
 
 /** NetworkTables log message. */
 class LogMessage {
  public:
   LogMessage() = default;
-  LogMessage(NT_Logger logger_, unsigned int level_, std::string_view filename_,
-             unsigned int line_, std::string_view message_)
-      : logger(logger_),
-        level(level_),
-        filename(filename_),
-        line(line_),
-        message(message_) {}
-
-  /** The logger that generated the message. */
-  NT_Logger logger{0};
+  LogMessage(unsigned int level, std::string_view filename, unsigned int line,
+             std::string_view message)
+      : level{level}, filename{filename}, line{line}, message{message} {}
 
   /** Log level of the message.  See NT_LogLevel. */
   unsigned int level{0};
@@ -225,15 +184,71 @@ class LogMessage {
 
   /** The message. */
   std::string message;
+};
 
-  friend void swap(LogMessage& first, LogMessage& second) {
-    using std::swap;
-    swap(first.logger, second.logger);
-    swap(first.level, second.level);
-    swap(first.filename, second.filename);
-    swap(first.line, second.line);
-    swap(first.message, second.message);
+/** NetworkTables event */
+class Event {
+ public:
+  Event() = default;
+  Event(NT_Listener listener, unsigned int flags, ConnectionInfo info)
+      : listener{listener}, flags{flags}, data{std::move(info)} {}
+  Event(NT_Listener listener, unsigned int flags, TopicInfo info)
+      : listener{listener}, flags{flags}, data{std::move(info)} {}
+  Event(NT_Listener listener, unsigned int flags, ValueEventData data)
+      : listener{listener}, flags{flags}, data{std::move(data)} {}
+  Event(NT_Listener listener, unsigned int flags, LogMessage msg)
+      : listener{listener}, flags{flags}, data{std::move(msg)} {}
+  Event(NT_Listener listener, unsigned int flags, NT_Topic topic,
+        NT_Handle subentry, Value value)
+      : listener{listener},
+        flags{flags},
+        data{ValueEventData{topic, subentry, std::move(value)}} {}
+  Event(NT_Listener listener, unsigned int flags, unsigned int level,
+        std::string_view filename, unsigned int line, std::string_view message)
+      : listener{listener},
+        flags{flags},
+        data{LogMessage{level, filename, line, message}} {}
+
+  /** Listener that triggered this event. */
+  NT_Listener listener{0};
+
+  /**
+   * Event flags (NT_EventFlags). Also indicates the data included with the
+   * event:
+   * - NT_NOTIFY_CONNECTED or NT_NOTIFY_DISCONNECTED: GetConnectionInfo()
+   * - NT_NOTIFY_PUBLISH, NT_NOTIFY_UNPUBLISH, or NT_NOTIFY_PROPERTIES:
+   *   GetTopicInfo()
+   * - NT_NOTIFY_VALUE, NT_NOTIFY_VALUE_LOCAL: GetValueData()
+   * - NT_NOTIFY_LOGMESSAGE: GetLogMessage()
+   */
+  unsigned int flags{0};
+
+  /** Event data; content depends on flags. */
+  std::variant<ConnectionInfo, TopicInfo, ValueEventData, LogMessage> data;
+
+  const ConnectionInfo* GetConnectionInfo() const {
+    return std::get_if<nt::ConnectionInfo>(&data);
   }
+  ConnectionInfo* GetConnectionInfo() {
+    return std::get_if<nt::ConnectionInfo>(&data);
+  }
+
+  const TopicInfo* GetTopicInfo() const {
+    return std::get_if<nt::TopicInfo>(&data);
+  }
+  TopicInfo* GetTopicInfo() { return std::get_if<nt::TopicInfo>(&data); }
+
+  const ValueEventData* GetValueEventData() const {
+    return std::get_if<nt::ValueEventData>(&data);
+  }
+  ValueEventData* GetValueEventData() {
+    return std::get_if<nt::ValueEventData>(&data);
+  }
+
+  const LogMessage* GetLogMessage() const {
+    return std::get_if<nt::LogMessage>(&data);
+  }
+  LogMessage* GetLogMessage() { return std::get_if<nt::LogMessage>(&data); }
 };
 
 /** NetworkTables publish/subscribe option. */
@@ -771,234 +786,134 @@ void UnsubscribeMultiple(NT_MultiSubscriber sub);
 /** @} */
 
 /**
- * @defgroup ntcore_topiclistener_func Topic Listener Functions
+ * @defgroup ntcore_listener_func Listener Functions
  * @{
  */
+
+using ListenerCallback = std::function<void(const Event&)>;
+
+/**
+ * Creates a listener poller.
+ *
+ * A poller provides a single queue of poll events.  Events linked to this
+ * poller (using AddPolledListener()) will be stored in the queue and
+ * must be collected by calling ReadListenerQueue().
+ * The returned handle must be destroyed with DestroyListenerPoller().
+ *
+ * @param inst      instance handle
+ * @return poller handle
+ */
+NT_ListenerPoller CreateListenerPoller(NT_Inst inst);
+
+/**
+ * Destroys a listener poller.  This will abort any blocked polling
+ * call and prevent additional events from being generated for this poller.
+ *
+ * @param poller    poller handle
+ */
+void DestroyListenerPoller(NT_ListenerPoller poller);
+
+/**
+ * Read notifications.
+ *
+ * @param poller    poller handle
+ * @return Array of events.  Returns empty array if no events since last call.
+ */
+std::vector<Event> ReadListenerQueue(NT_ListenerPoller poller);
+
+/**
+ * Removes a listener.
+ *
+ * @param listener Listener handle to remove
+ */
+void RemoveListener(NT_Listener listener);
+
+/**
+ * Wait for the listener queue to be empty. This is primarily useful
+ * for deterministic testing. This blocks until either the listener
+ * queue is empty (e.g. there are no more events that need to be passed along to
+ * callbacks or poll queues) or the timeout expires.
+ *
+ * @param handle  handle
+ * @param timeout timeout, in seconds. Set to 0 for non-blocking behavior, or a
+ *                negative value to block indefinitely
+ * @return False if timed out, otherwise true.
+ */
+bool WaitForListenerQueue(NT_Handle handle, double timeout);
 
 /**
  * Create a listener for changes to topics with names that start with any of
- * the given prefixes.
+ * the given prefixes. This creates a corresponding internal subscriber with the
+ * lifetime of the listener.
  *
  * @param inst Instance handle
  * @param prefixes Topic name string prefixes
- * @param mask Bitmask of NT_TopicListenerFlags values
+ * @param mask Bitmask of NT_EventFlags values (only topic and value events will
+ *             be generated)
  * @param callback Listener function
  */
-NT_TopicListener AddTopicListener(
-    NT_Inst inst, std::span<const std::string_view> prefixes, unsigned int mask,
-    std::function<void(const TopicNotification&)> callback);
+NT_Listener AddListener(NT_Inst inst,
+                        std::span<const std::string_view> prefixes,
+                        unsigned int mask, ListenerCallback callback);
 
 /**
- * Create a listener for changes on a particular topic.
+ * Create a listener.
  *
- * @param handle Topic, subscriber, multi-subscriber, or entry handle
- * @param mask Bitmask of NT_TopicListenerFlags values
+ * Some combinations of handle and mask have no effect:
+ * - connection and log message events are only generated on instances
+ * - topic and value events are only generated on non-instances
+ *
+ * Adding value and topic events on a topic will create a corresponding internal
+ * subscriber with the lifetime of the listener.
+ *
+ * Adding a log message listener through this function will only result in
+ * events at NT_LOG_INFO or higher; for more customized settings, use
+ * AddLogger().
+ *
+ * @param handle Instance, topic, subscriber, multi-subscriber, or entry handle
+ * @param mask Bitmask of NT_EventFlags values
  * @param callback Listener function
  */
-NT_TopicListener AddTopicListener(
-    NT_Handle handle, unsigned int mask,
-    std::function<void(const TopicNotification&)> callback);
+NT_Listener AddListener(NT_Handle handle, unsigned int mask,
+                        ListenerCallback callback);
 
 /**
- * Creates a topic listener poller.
+ * Creates a polled listener. This creates a corresponding internal subscriber
+ * with the lifetime of the listener.
+ * The caller is responsible for calling ReadListenerQueue() to poll.
  *
- * A poller provides a single queue of poll events.  Events linked to this
- * poller (using AddPolledTopicListener()) will be stored in the queue and
- * must be collected by calling ReadTopicListenerQueue().
- * The returned handle must be destroyed with DestroyTopicListenerPoller().
- *
- * @param inst      instance handle
- * @return poller handle
- */
-NT_TopicListenerPoller CreateTopicListenerPoller(NT_Inst inst);
-
-/**
- * Destroys a topic listener poller.  This will abort any blocked polling
- * call and prevent additional events from being generated for this poller.
- *
- * @param poller    poller handle
- */
-void DestroyTopicListenerPoller(NT_TopicListenerPoller poller);
-
-/**
- * Read topic notifications.
- *
- * @param poller    poller handle
- * @return Array of topic notifications.  Returns empty array if no
- *         notifications since last call.
- */
-std::vector<TopicNotification> ReadTopicListenerQueue(
-    NT_TopicListenerPoller poller);
-
-/**
- * Creates a polled topic listener.
- * The caller is responsible for calling ReadTopicListenerQueue() to poll.
- *
- * @param poller            poller handle
- * @param prefixes          array of UTF-8 string prefixes
- * @param mask              NT_NotifyKind bitmask
+ * @param poller poller handle
+ * @param prefixes array of UTF-8 string prefixes
+ * @param mask Bitmask of NT_EventFlags values (only topic and value events will
+ *             be generated)
  * @return Listener handle
  */
-NT_TopicListener AddPolledTopicListener(
-    NT_TopicListenerPoller poller, std::span<const std::string_view> prefixes,
-    unsigned int mask);
+NT_Listener AddPolledListener(NT_ListenerPoller poller,
+                              std::span<const std::string_view> prefixes,
+                              unsigned int mask);
 
 /**
- * Creates a polled topic listener.
- * The caller is responsible for calling ReadTopicListenerQueue() to poll.
+ * Creates a polled listener.
+ * The caller is responsible for calling ReadListenerQueue() to poll.
  *
- * @param poller            poller handle
- * @param handle            topic, subscriber, multi-subscriber, or entry handle
- * @param mask              NT_NotifyKind bitmask
+ * Some combinations of handle and mask have no effect:
+ * - connection and log message events are only generated on instances
+ * - topic and value events are only generated on non-instances
+ *
+ * Adding value and topic events on a topic will create a corresponding internal
+ * subscriber with the lifetime of the listener.
+ *
+ * Adding a log message listener through this function will only result in
+ * events at NT_LOG_INFO or higher; for more customized settings, use
+ * AddPolledLogger().
+ *
+ * @param poller poller handle
+ * @param handle instance, topic, subscriber, multi-subscriber, or entry handle
+ * @param mask NT_EventFlags bitmask
  * @return Listener handle
  */
-NT_TopicListener AddPolledTopicListener(NT_TopicListenerPoller poller,
-                                        NT_Handle handle, unsigned int mask);
-
-/**
- * Removes a topic listener.
- *
- * @param listener Listener handle to remove
- */
-void RemoveTopicListener(NT_TopicListener listener);
-
-/** @} */
-
-/**
- * @defgroup ntcore_valuelistener_func Value Listener Functions
- * @{
- */
-
-/**
- * Create a listener for value changes on a subscriber.
- *
- * @param subentry Subscriber/entry
- * @param mask Bitmask of NT_ValueListenerFlags values
- * @param callback Listener function
- */
-NT_ValueListener AddValueListener(
-    NT_Handle subentry, unsigned int mask,
-    std::function<void(const ValueNotification&)> callback);
-
-/**
- * Create a value listener poller.
- *
- * A poller provides a single queue of poll events.  Events linked to this
- * poller (using AddPolledValueListener()) will be stored in the queue and
- * must be collected by calling ReadValueListenerQueue().
- * The returned handle must be destroyed with DestroyValueListenerPoller().
- *
- * @param inst      instance handle
- * @return poller handle
- */
-NT_ValueListenerPoller CreateValueListenerPoller(NT_Inst inst);
-
-/**
- * Destroy a value listener poller.  This will abort any blocked polling
- * call and prevent additional events from being generated for this poller.
- *
- * @param poller    poller handle
- */
-void DestroyValueListenerPoller(NT_ValueListenerPoller poller);
-
-/**
- * Reads value listener queue (all value changes since last call).
- *
- * @param poller    poller handle
- * @return Array of value notifications.
- */
-std::vector<ValueNotification> ReadValueListenerQueue(
-    NT_ValueListenerPoller poller);
-
-/**
- * Create a polled value listener.
- * The caller is responsible for calling ReadValueListenerQueue() to poll.
- *
- * @param poller            poller handle
- * @param subentry          subscriber or entry handle
- * @param mask              NT_NotifyKind bitmask
- * @return Listener handle
- */
-NT_ValueListener AddPolledValueListener(NT_ValueListenerPoller poller,
-                                        NT_Handle subentry, unsigned int mask);
-
-/**
- * Remove a value listener.
- *
- * @param listener Listener handle to remove
- */
-void RemoveValueListener(NT_ValueListener listener);
-
-/** @} */
-
-/**
- * @defgroup ntcore_connectionlistener_func Connection Listener Functions
- * @{
- */
-
-/**
- * Add a connection listener.
- *
- * @param inst              instance handle
- * @param callback          listener to add
- * @param immediate_notify  notify listener of all existing connections
- * @return Listener handle
- */
-NT_ConnectionListener AddConnectionListener(
-    NT_Inst inst,
-    std::function<void(const ConnectionNotification& event)> callback,
-    bool immediate_notify);
-
-/**
- * Create a connection listener poller.
- *
- * A poller provides a single queue of poll events.  Events linked to this
- * poller (using AddPolledConnectionListener()) will be stored in the queue and
- * must be collected by calling PollConnectionListener().
- * The returned handle must be destroyed with DestroyConnectionListenerPoller().
- *
- * @param inst      instance handle
- * @return poller handle
- */
-NT_ConnectionListenerPoller CreateConnectionListenerPoller(NT_Inst inst);
-
-/**
- * Destroy a connection listener poller.  This will abort any blocked polling
- * call and prevent additional events from being generated for this poller.
- *
- * @param poller    poller handle
- */
-void DestroyConnectionListenerPoller(NT_ConnectionListenerPoller poller);
-
-/**
- * Create a polled connection listener.
- * The caller is responsible for calling PollConnectionListener() to poll.
- *
- * @param poller            poller handle
- * @param immediate_notify  notify listener of all existing connections
- */
-NT_ConnectionListener AddPolledConnectionListener(
-    NT_ConnectionListenerPoller poller, bool immediate_notify);
-
-/**
- * Get the next connection event.  This blocks until the next connect or
- * disconnect occurs.  This is intended to be used with
- * AddPolledConnectionListener(); connection listeners created using
- * AddConnectionListener() will not be serviced through this function.
- *
- * @param poller    poller handle
- * @return Information on the connection events.  Only returns empty if an
- *         error occurred (e.g. the instance was invalid or is shutting down).
- */
-std::vector<ConnectionNotification> ReadConnectionListenerQueue(
-    NT_ConnectionListenerPoller poller);
-
-/**
- * Remove a connection listener.
- *
- * @param conn_listener Listener handle to remove
- */
-void RemoveConnectionListener(NT_ConnectionListener conn_listener);
+NT_Listener AddPolledListener(NT_ListenerPoller poller, NT_Handle handle,
+                              unsigned int mask);
 
 /** @} */
 
@@ -1275,31 +1190,13 @@ void StopConnectionDataLog(NT_ConnectionDataLogger logger);
  * messages outside this range will be silently ignored.
  *
  * @param inst        instance handle
- * @param func        log callback function
  * @param min_level   minimum log level
  * @param max_level   maximum log level
- * @return Logger handle
+ * @param func        listener callback function
+ * @return Listener handle
  */
-NT_Logger AddLogger(NT_Inst inst,
-                    std::function<void(const LogMessage& msg)> func,
-                    unsigned int min_level, unsigned int max_level);
-
-/**
- * Create a log poller.  A poller provides a single queue of poll events.
- * The returned handle must be destroyed with DestroyLoggerPoller().
- *
- * @param inst      instance handle
- * @return poller handle
- */
-NT_LoggerPoller CreateLoggerPoller(NT_Inst inst);
-
-/**
- * Destroy a log poller.  This will abort any blocked polling call and prevent
- * additional events from being generated for this poller.
- *
- * @param poller    poller handle
- */
-void DestroyLoggerPoller(NT_LoggerPoller poller);
+NT_Listener AddLogger(NT_Inst inst, unsigned int min_level,
+                      unsigned int max_level, ListenerCallback func);
 
 /**
  * Set the log level for a log poller.  Events will only be generated for
@@ -1311,24 +1208,8 @@ void DestroyLoggerPoller(NT_LoggerPoller poller);
  * @param max_level     maximum log level
  * @return Logger handle
  */
-NT_Logger AddPolledLogger(NT_LoggerPoller poller, unsigned int min_level,
-                          unsigned int max_level);
-
-/**
- * Get the next log event.  This blocks until the next log occurs.
- *
- * @param poller    poller handle
- * @return Information on the log events.  Only returns empty if an error
- *         occurred (e.g. the instance was invalid or is shutting down).
- */
-std::vector<LogMessage> ReadLoggerQueue(NT_LoggerPoller poller);
-
-/**
- * Remove a logger.
- *
- * @param logger Logger handle to remove
- */
-void RemoveLogger(NT_Logger logger);
+NT_Listener AddPolledLogger(NT_ListenerPoller poller, unsigned int min_level,
+                            unsigned int max_level);
 
 /** @} */
 /** @} */

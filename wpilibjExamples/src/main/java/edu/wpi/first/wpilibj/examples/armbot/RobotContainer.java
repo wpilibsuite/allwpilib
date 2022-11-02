@@ -55,29 +55,32 @@ public class RobotContainer {
   private void configureButtonBindings() {
     // Move the arm to 2 radians above horizontal when the 'A' button is pressed.
     new JoystickButton(m_driverController, Button.kA.value)
-        .whenPressed(
-            () -> {
-              m_robotArm.setGoal(2);
-              m_robotArm.enable();
-            },
-            m_robotArm);
+        .onTrue(
+            new InstantCommand(
+                () -> {
+                  m_robotArm.setGoal(2);
+                  m_robotArm.enable();
+                },
+                m_robotArm));
 
     // Move the arm to neutral position when the 'B' button is pressed.
     new JoystickButton(m_driverController, Button.kB.value)
-        .whenPressed(
-            () -> {
-              m_robotArm.setGoal(Constants.ArmConstants.kArmOffsetRads);
-              m_robotArm.enable();
-            },
-            m_robotArm);
+        .onTrue(
+            new InstantCommand(
+                () -> {
+                  m_robotArm.setGoal(Constants.ArmConstants.kArmOffsetRads);
+                  m_robotArm.enable();
+                },
+                m_robotArm));
 
     // Disable the arm controller when Y is pressed.
-    new JoystickButton(m_driverController, Button.kY.value).whenPressed(m_robotArm::disable);
+    new JoystickButton(m_driverController, Button.kY.value)
+        .onTrue(new InstantCommand(m_robotArm::disable));
 
     // Drive at half speed when the bumper is held
     new JoystickButton(m_driverController, Button.kRightBumper.value)
-        .whenPressed(() -> m_robotDrive.setMaxOutput(0.5))
-        .whenReleased(() -> m_robotDrive.setMaxOutput(1));
+        .onTrue(new InstantCommand(() -> m_robotDrive.setMaxOutput(0.5)))
+        .onFalse(new InstantCommand(() -> m_robotDrive.setMaxOutput(1)));
   }
 
   /**

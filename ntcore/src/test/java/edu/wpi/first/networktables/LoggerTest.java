@@ -28,8 +28,8 @@ class LoggerTest {
 
   @Test
   void addMessageTest() {
-    List<LogMessage> msgs = new ArrayList<>();
-    m_clientInst.addLogger(msgs::add, LogMessage.kInfo, 100);
+    List<NetworkTableEvent> msgs = new ArrayList<>();
+    m_clientInst.addLogger(LogMessage.kInfo, 100, msgs::add);
 
     m_clientInst.startClient4("client");
     m_clientInst.setServer("127.0.0.1", 10000);

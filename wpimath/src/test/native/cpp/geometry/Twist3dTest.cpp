@@ -115,3 +115,17 @@ TEST(Twist3dTest, Pose3dLogZ) {
   const auto reapplied = start.Exp(twist);
   EXPECT_EQ(end, reapplied);
 }
+
+TEST(Twist3dTest, Constexpr) {
+  constexpr Twist3d defaultCtor;
+  constexpr Twist3d componentCtor{1_m, 2_m, 3_m, 4_rad, 5_rad, 6_rad};
+  constexpr auto multiplied = componentCtor * 2;
+
+  static_assert(defaultCtor.dx == 0_m);
+  static_assert(componentCtor.dy == 2_m);
+  static_assert(componentCtor.dz == 3_m);
+  static_assert(multiplied.dx == 2_m);
+  static_assert(multiplied.rx == 8_rad);
+  static_assert(multiplied.ry == 10_rad);
+  static_assert(multiplied.rz == 12_rad);
+}
