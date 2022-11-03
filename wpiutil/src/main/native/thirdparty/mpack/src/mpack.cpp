@@ -237,7 +237,7 @@ void* mpack_realloc(void* old_ptr, size_t used_size, size_t new_size) {
 }
 #endif
 
-} //namespace mpack
+}  // namespace mpack
 MPACK_SILENCE_WARNINGS_END
 
 /* mpack/mpack-common.c.c */
@@ -972,7 +972,7 @@ void mpack_print_file_callback(void* context, const char* data, size_t count) {
 }
 #endif
 
-} //namespace mpack
+}  // namespace mpack
 MPACK_SILENCE_WARNINGS_END
 
 /* mpack/mpack-writer.c.c */
@@ -2731,7 +2731,7 @@ void mpack_complete_array(mpack_writer_t* writer) {
 #endif // MPACK_BUILDER
 #endif // MPACK_WRITER
 
-} //namespace mpack
+}  // namespace mpack
 MPACK_SILENCE_WARNINGS_END
 
 /* mpack/mpack-reader.c.c */
@@ -4002,7 +4002,7 @@ void mpack_print_stdfile_to_callback(FILE* file, mpack_print_callback_t callback
 
 #endif
 
-} //namespace mpack
+}  // namespace mpack
 MPACK_SILENCE_WARNINGS_END
 
 /* mpack/mpack-expect.c.c */
@@ -4869,7 +4869,7 @@ size_t mpack_expect_key_cstr(mpack_reader_t* reader, const char* keys[], bool fo
 
 #endif
 
-} //namespace mpack
+}  // namespace mpack
 MPACK_SILENCE_WARNINGS_END
 
 /* mpack/mpack-node.c.c */
@@ -7257,5 +7257,5 @@ mpack_node_t mpack_node_map_value_at(mpack_node_t node, size_t index) {
 
 #endif
 
-} //namespace mpack
+}  // namespace mpack
 MPACK_SILENCE_WARNINGS_END
