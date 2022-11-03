@@ -35,13 +35,13 @@ class AprilTagPoseMirroringTest {
         new Pose3d(
             new Translation3d(Units.feetToMeters(54.0), Units.feetToMeters(27.0), 0.0),
             new Rotation3d(0.0, 0.0, Units.degreesToRadians(180.0))),
-        layout.getTagPose(1));
+        layout.getTagPose(1).orElse(null));
 
     assertEquals(
         new Pose3d(
             new Translation3d(
                 Units.feetToMeters(50.0), Units.feetToMeters(23.0), Units.feetToMeters(4)),
             new Rotation3d(0.0, 0.0, 0)),
-        layout.getTagPose(2));
+        layout.getTagPose(2).orElse(null));
   }
 }

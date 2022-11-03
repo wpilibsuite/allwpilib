@@ -18,6 +18,7 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 /**
  * Class for representing a layout of AprilTags on a field and reading them from a JSON format.
@@ -107,8 +108,17 @@ public class AprilTagFieldLayout {
    * @return The pose corresponding to the ID passed in.
    */
   @SuppressWarnings("ParameterName")
-  public Pose3d getTagPose(int ID) {
-    Pose3d pose = m_apriltags.stream().filter(it -> ID == it.ID).findFirst().get().pose;
+  public Optional<Pose3d> getTagPose(int ID) {
+    Pose3d pose = null;
+    for (AprilTag apriltag : m_apriltags) {
+      if (apriltag.ID == ID) {
+        pose = apriltag.pose;
+        break;
+      }
+    }
+    if (pose == null) {
+      return Optional.empty();
+    }
     if (m_mirror) {
       pose =
           pose.relativeTo(
@@ -117,8 +127,7 @@ public class AprilTagFieldLayout {
                       m_fieldDimensions.fieldWidth, m_fieldDimensions.fieldLength, 0.0),
                   new Rotation3d(0.0, 0.0, Math.PI)));
     }
-
-    return pose;
+    return Optional.of(pose);
   }
 
   /**
