@@ -4,7 +4,6 @@
 
 package edu.wpi.first.wpilibj2.command.button;
 
-import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.event.EventLoop;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
@@ -33,7 +32,7 @@ public class CommandJoystick extends CommandGenericHID {
    * @return the wrapped GenericHID object
    */
   @Override
-  public GenericHID getHID() {
+  public Joystick getHID() {
     return m_hid;
   }
 
@@ -169,6 +168,24 @@ public class CommandJoystick extends CommandGenericHID {
    */
   public int getThrottleChannel() {
     return m_hid.getThrottleChannel();
+  }
+
+  /**
+   * Get the x position of the HID.
+   *
+   * @return the x position
+   */
+  public double getX() {
+    return m_hid.getX();
+  }
+
+  /**
+   * Get the y position of the HID.
+   *
+   * @return the y position
+   */
+  public double getY() {
+    return m_hid.getY();
   }
 
   /**
