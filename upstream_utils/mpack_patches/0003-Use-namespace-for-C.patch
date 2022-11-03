@@ -30,7 +30,7 @@ index 2c133a3..dc7207f 100644
  }
  #endif
  
-+} //namespace mpack
++}  // namespace mpack
  MPACK_SILENCE_WARNINGS_END
 diff --git a/src/mpack/mpack-expect.c b/src/mpack/mpack-expect.c
 index 81576d1..6232a67 100644
@@ -48,7 +48,7 @@ index 81576d1..6232a67 100644
  
  #endif
  
-+} //namespace mpack
++}  // namespace mpack
  MPACK_SILENCE_WARNINGS_END
 diff --git a/src/mpack/mpack-node.c b/src/mpack/mpack-node.c
 index 3d4b0f4..aba9897 100644
@@ -66,7 +66,7 @@ index 3d4b0f4..aba9897 100644
  
  #endif
  
-+} //namespace mpack
++}  // namespace mpack
  MPACK_SILENCE_WARNINGS_END
 diff --git a/src/mpack/mpack-platform.c b/src/mpack/mpack-platform.c
 index d4a2fa3..75d2de3 100644
@@ -84,7 +84,7 @@ index d4a2fa3..75d2de3 100644
  }
  #endif
  
-+} //namespace mpack
++}  // namespace mpack
  MPACK_SILENCE_WARNINGS_END
 diff --git a/src/mpack/mpack-platform.h b/src/mpack/mpack-platform.h
 index 79604c9..27a2f9e 100644
@@ -115,7 +115,7 @@ index c6d2223..a135879 100644
  
  #endif
  
-+} //namespace mpack
++}  // namespace mpack
  MPACK_SILENCE_WARNINGS_END
 diff --git a/src/mpack/mpack-writer.c b/src/mpack/mpack-writer.c
 index 4d052b1..9630d9e 100644
@@ -133,7 +133,7 @@ index 4d052b1..9630d9e 100644
  #endif // MPACK_BUILDER
  #endif // MPACK_WRITER
  
-+} //namespace mpack
++}  // namespace mpack
  MPACK_SILENCE_WARNINGS_END
 diff --git a/src/mpack/mpack-writer.h b/src/mpack/mpack-writer.h
 index c239ee6..abeee1a 100644
