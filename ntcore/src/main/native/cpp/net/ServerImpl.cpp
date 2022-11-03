@@ -620,8 +620,20 @@ void ClientData4Base::ClientSubscribe(int64_t subuid,
     sub->periodMs = kMinPeriodMs;
   }
 
+  // update periodic sender (if not local)
+  if (!m_local) {
+    if (m_periodMs == UINT32_MAX) {
+      m_periodMs = sub->periodMs;
+    } else {
+      m_periodMs = std::gcd(m_periodMs, sub->periodMs);
+    }
+    if (m_periodMs < kMinPeriodMs) {
+      m_periodMs = kMinPeriodMs;
+    }
+    m_setPeriodic(m_periodMs);
+  }
+
   // see if this immediately subscribes to any topics
-  bool updatedPeriodic = false;
   for (auto&& topic : m_server.m_topics) {
     bool removed = false;
     if (replace) {
@@ -647,14 +659,6 @@ void ClientData4Base::ClientSubscribe(int64_t subuid,
       m_server.UpdateMetaTopicSub(topic.get());
     }
 
-    if (added || removed) {
-      // update periodic sender (if not local)
-      if (!m_local) {
-        m_periodMs = std::gcd(m_periodMs, sub->periodMs);
-        updatedPeriodic = true;
-      }
-    }
-
     if (!wasSubscribed && added && !removed) {
       // announce topic to client
       DEBUG4("client {}: announce {}", m_id, topic->name);
@@ -666,12 +670,6 @@ void ClientData4Base::ClientSubscribe(int64_t subuid,
         SendValue(topic.get(), topic->lastValue, kSendAll);
       }
     }
-  }
-  if (updatedPeriodic) {
-    if (m_periodMs < kMinPeriodMs) {
-      m_periodMs = kMinPeriodMs;
-    }
-    m_setPeriodic(m_periodMs);
   }
 
   // update meta data
