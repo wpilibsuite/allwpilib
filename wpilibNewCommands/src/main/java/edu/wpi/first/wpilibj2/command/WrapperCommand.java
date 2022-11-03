@@ -16,7 +16,7 @@ import java.util.Set;
  * <p>Wrapped commands may only be used through the wrapper, trying to directly schedule them or add
  * them to a group will throw an exception.
  */
-public abstract class WrapperCommand implements Command {
+public abstract class WrapperCommand extends CommandBase {
   protected final Command m_command;
 
   /**
@@ -98,15 +98,5 @@ public abstract class WrapperCommand implements Command {
   @Override
   public InterruptionBehavior getInterruptionBehavior() {
     return m_command.getInterruptionBehavior();
-  }
-
-  /**
-   * Gets the name of this Command.
-   *
-   * @return Name
-   */
-  @Override
-  public String getName() {
-    return m_command.getName();
   }
 }
