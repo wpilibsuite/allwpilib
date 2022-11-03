@@ -49,7 +49,8 @@ import java.util.function.BiConsumer;
  * left, front right, rear left, and rear right wheels.
  *
  * <p><strong> y = [x, y, theta]ᵀ </strong> from vision containing x position, y position, and
- * heading; or <strong> y = [theta]ᵀ </strong> containing gyro heading.
+ * heading; or <strong> y = [theta, s_fl, s_fr, s_rl, s_rr]ᵀ </strong> containing gyro heading,
+ * followed by the distance driven by the front left, front right, rear left, and rear right wheels.
  */
 public class MecanumDrivePoseEstimator {
   private final UnscentedKalmanFilter<N7, N7, N5> m_observer;
