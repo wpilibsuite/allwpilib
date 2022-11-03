@@ -19,6 +19,7 @@ XboxControllerSim::XboxControllerSim(const XboxController& joystick)
 XboxControllerSim::XboxControllerSim(int port) : GenericHIDSim{port} {
   SetAxisCount(6);
   SetButtonCount(10);
+  SetPOVCount(1);
 }
 
 void XboxControllerSim::SetLeftX(double value) {

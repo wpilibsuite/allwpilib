@@ -19,6 +19,7 @@ PS4ControllerSim::PS4ControllerSim(const PS4Controller& joystick)
 PS4ControllerSim::PS4ControllerSim(int port) : GenericHIDSim{port} {
   SetAxisCount(6);
   SetButtonCount(14);
+  SetPOVCount(1);
 }
 
 void PS4ControllerSim::SetLeftX(double value) {
