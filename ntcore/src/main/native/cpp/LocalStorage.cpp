@@ -25,6 +25,12 @@
 
 using namespace nt;
 
+// maximum number of local publishers / subscribers to any given topic
+static constexpr size_t kMaxPublishers = 512;
+static constexpr size_t kMaxSubscribers = 512;
+static constexpr size_t kMaxMultiSubscribers = 512;
+static constexpr size_t kMaxListeners = 512;
+
 namespace {
 
 // Utility wrapper for making a set-like vector
@@ -893,6 +899,12 @@ std::unique_ptr<MultiSubscriberData> LSImpl::RemoveMultiSubscriber(
 
 void LSImpl::AddListenerImpl(NT_Listener listenerHandle, TopicData* topic,
                              unsigned int eventMask) {
+  if (topic->localSubscribers.size() >= kMaxSubscribers) {
+    ERROR(
+        "reached maximum number of subscribers to '{}', ignoring listener add",
+        topic->name);
+    return;
+  }
   // subscribe to make sure topic updates are received
   PubSubConfig config;
   config.topicsOnly = (eventMask & NT_EVENT_VALUE_ALL) == 0;
@@ -910,6 +922,12 @@ void LSImpl::AddListenerImpl(NT_Listener listenerHandle,
   auto topic = subscriber->topic;
 
   if ((eventMask & NT_EVENT_TOPIC) != 0) {
+    if (topic->listeners.size() >= kMaxListeners) {
+      ERROR("reached maximum number of listeners to '{}', not adding listener",
+            topic->name);
+      return;
+    }
+
     m_listenerStorage.Activate(
         listenerHandle, eventMask & (NT_EVENT_TOPIC | NT_EVENT_IMMEDIATE));
 
@@ -926,6 +944,11 @@ void LSImpl::AddListenerImpl(NT_Listener listenerHandle,
   }
 
   if ((eventMask & NT_EVENT_VALUE_ALL) != 0) {
+    if (subscriber->valueListeners.size() >= kMaxListeners) {
+      ERROR("reached maximum number of listeners to '{}', not adding listener",
+            topic->name);
+      return;
+    }
     m_listenerStorage.Activate(
         listenerHandle, eventMask & (NT_EVENT_VALUE_ALL | NT_EVENT_IMMEDIATE),
         [subentryHandle](unsigned int mask, Event* event) {
@@ -972,6 +995,11 @@ void LSImpl::AddListenerImpl(NT_Listener listenerHandle,
   }
 
   if ((eventMask & NT_EVENT_TOPIC) != 0) {
+    if (m_topicPrefixListeners.size() >= kMaxListeners) {
+      ERROR("reached maximum number of listeners, not adding listener");
+      return;
+    }
+
     m_listenerStorage.Activate(
         listenerHandle, eventMask & (NT_EVENT_TOPIC | NT_EVENT_IMMEDIATE));
 
@@ -993,6 +1021,11 @@ void LSImpl::AddListenerImpl(NT_Listener listenerHandle,
   }
 
   if ((eventMask & NT_EVENT_VALUE_ALL) != 0) {
+    if (subscriber->valueListeners.size() >= kMaxListeners) {
+      ERROR("reached maximum number of listeners, not adding listener");
+      return;
+    }
+
     m_listenerStorage.Activate(
         listenerHandle, eventMask & (NT_EVENT_VALUE_ALL | NT_EVENT_IMMEDIATE),
         [subentryHandle = subscriber->handle.GetHandle()](unsigned int mask,
@@ -1022,6 +1055,10 @@ void LSImpl::AddListenerImpl(NT_Listener listenerHandle,
 void LSImpl::AddListener(NT_Listener listenerHandle,
                          std::span<const std::string_view> prefixes,
                          unsigned int eventMask) {
+  if (m_multiSubscribers.size() >= kMaxMultiSubscribers) {
+    ERROR("reached maximum number of multi-subscribers, not adding listener");
+    return;
+  }
   // subscribe to make sure topic updates are received
   PubSubOptions options;
   options.topicsOnly = (eventMask & NT_EVENT_VALUE_ALL) == 0;
@@ -1552,6 +1589,13 @@ NT_Subscriber LocalStorage::Subscribe(NT_Topic topicHandle, NT_Type type,
     return 0;
   }
 
+  if (topic->localSubscribers.size() >= kMaxSubscribers) {
+    WPI_ERROR(m_impl->m_logger,
+              "reached maximum number of subscribers to '{}', not subscribing",
+              topic->name);
+    return 0;
+  }
+
   // Create subscriber
   return m_impl->AddLocalSubscriber(topic, PubSubConfig{type, typeStr, options})
       ->handle;
@@ -1566,6 +1610,13 @@ NT_MultiSubscriber LocalStorage::SubscribeMultiple(
     std::span<const std::string_view> prefixes,
     std::span<const PubSubOption> options) {
   std::scoped_lock lock{m_mutex};
+
+  if (m_impl->m_multiSubscribers.size() >= kMaxMultiSubscribers) {
+    WPI_ERROR(m_impl->m_logger,
+              "reached maximum number of multi-subscribers, not subscribing");
+    return 0;
+  }
+
   PubSubOptions opts{options};
   opts.prefixMatch = true;
   return m_impl->AddMultiSubscriber(prefixes, opts)->handle;
@@ -1595,6 +1646,13 @@ NT_Publisher LocalStorage::Publish(NT_Topic topicHandle, NT_Type type,
         m_impl->m_logger,
         "cannot publish '{}' with an unassigned type or empty type string",
         topic->name);
+    return 0;
+  }
+
+  if (topic->localPublishers.size() >= kMaxPublishers) {
+    WPI_ERROR(m_impl->m_logger,
+              "reached maximum number of publishers to '{}', not publishing",
+              topic->name);
     return 0;
   }
 
@@ -1628,6 +1686,14 @@ NT_Entry LocalStorage::GetEntry(NT_Topic topicHandle, NT_Type type,
   // Get the topic
   auto* topic = m_impl->m_topics.Get(topicHandle);
   if (!topic) {
+    return 0;
+  }
+
+  if (topic->localSubscribers.size() >= kMaxSubscribers) {
+    WPI_ERROR(
+        m_impl->m_logger,
+        "reached maximum number of subscribers to '{}', not creating entry",
+        topic->name);
     return 0;
   }
 
@@ -2014,6 +2080,14 @@ NT_Entry LocalStorage::GetEntry(std::string_view name) {
   auto* topic = m_impl->GetOrCreateTopic(name);
 
   if (topic->entry == 0) {
+    if (topic->localSubscribers.size() >= kMaxSubscribers) {
+      WPI_ERROR(
+          m_impl->m_logger,
+          "reached maximum number of subscribers to '{}', not creating entry",
+          topic->name);
+      return 0;
+    }
+
     // Create subscriber
     auto* subscriber = m_impl->AddLocalSubscriber(topic, {});
 
