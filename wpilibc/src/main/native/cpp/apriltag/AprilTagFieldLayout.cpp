@@ -13,8 +13,6 @@
 #include <wpi/raw_istream.h>
 #include <wpi/raw_ostream.h>
 
-#include "frc/geometry/Pose3d.h"
-
 using namespace frc;
 
 AprilTagFieldLayout::AprilTagFieldLayout(std::string_view path) {
