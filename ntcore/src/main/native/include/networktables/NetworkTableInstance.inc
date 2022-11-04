@@ -101,22 +101,6 @@ inline NT_Listener NetworkTableInstance::AddConnectionListener(
 }
 
 inline NT_Listener NetworkTableInstance::AddListener(
-    Topic topic, unsigned int eventMask, ListenerCallback listener) {
-  return ::nt::AddListener(topic.GetHandle(), eventMask, std::move(listener));
-}
-
-inline NT_Listener NetworkTableInstance::AddListener(
-    Subscriber& subscriber, unsigned int eventMask, ListenerCallback listener) {
-  return ::nt::AddListener(subscriber.GetHandle(), eventMask,
-                           std::move(listener));
-}
-
-inline NT_Listener NetworkTableInstance::AddListener(
-    NetworkTableEntry& entry, int eventMask, ListenerCallback listener) {
-  return ::nt::AddListener(entry.GetHandle(), eventMask, std::move(listener));
-}
-
-inline NT_Listener NetworkTableInstance::AddListener(
     std::span<const std::string_view> prefixes, int eventMask,
     ListenerCallback listener) {
   return ::nt::AddListener(m_handle, prefixes, eventMask, std::move(listener));
