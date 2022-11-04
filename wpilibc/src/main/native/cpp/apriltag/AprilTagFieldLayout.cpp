@@ -6,13 +6,14 @@
 
 #include <algorithm>
 #include <system_error>
-#include "frc/geometry/Pose3d.h"
 
 #include <units/angle.h>
 #include <units/length.h>
 #include <wpi/json.h>
 #include <wpi/raw_istream.h>
 #include <wpi/raw_ostream.h>
+
+#include "frc/geometry/Pose3d.h"
 
 using namespace frc;
 

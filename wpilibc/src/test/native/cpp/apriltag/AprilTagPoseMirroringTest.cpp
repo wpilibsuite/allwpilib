@@ -26,7 +26,7 @@ TEST(AprilTagPoseMirroringTest, MirroringMatches) {
 
   auto mirrorPose =
       Pose3d{54_ft, 27_ft, 0_ft, Rotation3d{0_deg, 0_deg, 180_deg}};
-  EXPECT_EQ(mirrorPose, layout.GetTagPose(1));
+  EXPECT_EQ(mirrorPose, *layout.GetTagPose(1));
   mirrorPose = Pose3d{50_ft, 23_ft, 4_ft, Rotation3d{0_deg, 0_deg, 0_deg}};
-  EXPECT_EQ(mirrorPose, layout.GetTagPose(2));
+  EXPECT_EQ(mirrorPose, *layout.GetTagPose(2));
 }
