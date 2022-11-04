@@ -7,6 +7,7 @@ package edu.wpi.first.networktables;
 import edu.wpi.first.util.WPIUtilJNI;
 import edu.wpi.first.util.concurrent.Event;
 import edu.wpi.first.util.datalog.DataLog;
+import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -369,14 +370,17 @@ public final class NetworkTableInstance implements AutoCloseable {
       m_inst = inst;
     }
 
-    int add(String[] prefixes, int mask, Consumer<NetworkTableEvent> listener) {
+    int add(
+        String[] prefixes,
+        EnumSet<NetworkTableEvent.Kind> eventKinds,
+        Consumer<NetworkTableEvent> listener) {
       m_lock.lock();
       try {
         if (m_poller == 0) {
           m_poller = NetworkTablesJNI.createListenerPoller(m_inst.getHandle());
           startThread();
         }
-        int h = NetworkTablesJNI.addListener(m_poller, prefixes, mask);
+        int h = NetworkTablesJNI.addListener(m_poller, prefixes, eventKinds);
         m_listeners.put(h, listener);
         return h;
       } finally {
@@ -384,14 +388,17 @@ public final class NetworkTableInstance implements AutoCloseable {
       }
     }
 
-    int add(int handle, int mask, Consumer<NetworkTableEvent> listener) {
+    int add(
+        int handle,
+        EnumSet<NetworkTableEvent.Kind> eventKinds,
+        Consumer<NetworkTableEvent> listener) {
       m_lock.lock();
       try {
         if (m_poller == 0) {
           m_poller = NetworkTablesJNI.createListenerPoller(m_inst.getHandle());
           startThread();
         }
-        int h = NetworkTablesJNI.addListener(m_poller, handle, mask);
+        int h = NetworkTablesJNI.addListener(m_poller, handle, eventKinds);
         m_listeners.put(h, listener);
         return h;
       } finally {
@@ -562,9 +569,11 @@ public final class NetworkTableInstance implements AutoCloseable {
    */
   public int addConnectionListener(
       boolean immediateNotify, Consumer<NetworkTableEvent> listener) {
-    return m_listeners.add(m_handle,
-        NetworkTableEvent.kConnection | (immediateNotify ? NetworkTableEvent.kImmediate : 0),
-        listener);
+    EnumSet<NetworkTableEvent.Kind> eventKinds = EnumSet.of(NetworkTableEvent.Kind.kConnection);
+    if (immediateNotify) {
+      eventKinds.add(NetworkTableEvent.Kind.kImmediate);
+    }
+    return m_listeners.add(m_handle, eventKinds, listener);
   }
 
   /**
@@ -576,16 +585,18 @@ public final class NetworkTableInstance implements AutoCloseable {
    * listener.
    *
    * @param topic Topic
-   * @param eventMask Bitmask of TopicListenerFlags values
+   * @param eventKinds set of event kinds to listen to
    * @param listener Listener function
    * @return Listener handle
    */
   public int addListener(
-      Topic topic, int eventMask, Consumer<NetworkTableEvent> listener) {
+      Topic topic,
+      EnumSet<NetworkTableEvent.Kind> eventKinds,
+      Consumer<NetworkTableEvent> listener) {
     if (topic.getInstance().getHandle() != m_handle) {
       throw new IllegalArgumentException("topic is not from this instance");
     }
-    return m_listeners.add(topic.getHandle(), eventMask, listener);
+    return m_listeners.add(topic.getHandle(), eventKinds, listener);
   }
 
   /**
@@ -595,16 +606,18 @@ public final class NetworkTableInstance implements AutoCloseable {
    * active.
    *
    * @param subscriber Subscriber
-   * @param eventMask Bitmask of TopicListenerFlags values
+   * @param eventKinds set of event kinds to listen to
    * @param listener Listener function
    * @return Listener handle
    */
   public int addListener(
-      Subscriber subscriber, int eventMask, Consumer<NetworkTableEvent> listener) {
+      Subscriber subscriber,
+      EnumSet<NetworkTableEvent.Kind> eventKinds,
+      Consumer<NetworkTableEvent> listener) {
     if (subscriber.getTopic().getInstance().getHandle() != m_handle) {
       throw new IllegalArgumentException("subscriber is not from this instance");
     }
-    return m_listeners.add(subscriber.getHandle(), eventMask, listener);
+    return m_listeners.add(subscriber.getHandle(), eventKinds, listener);
   }
 
   /**
@@ -614,16 +627,18 @@ public final class NetworkTableInstance implements AutoCloseable {
    * active.
    *
    * @param subscriber Subscriber
-   * @param eventMask Bitmask of TopicListenerFlags values
+   * @param eventKinds set of event kinds to listen to
    * @param listener Listener function
    * @return Listener handle
    */
   public int addListener(
-      MultiSubscriber subscriber, int eventMask, Consumer<NetworkTableEvent> listener) {
+      MultiSubscriber subscriber,
+      EnumSet<NetworkTableEvent.Kind> eventKinds,
+      Consumer<NetworkTableEvent> listener) {
     if (subscriber.getInstance().getHandle() != m_handle) {
       throw new IllegalArgumentException("subscriber is not from this instance");
     }
-    return m_listeners.add(subscriber.getHandle(), eventMask, listener);
+    return m_listeners.add(subscriber.getHandle(), eventKinds, listener);
   }
 
   /**
@@ -632,16 +647,18 @@ public final class NetworkTableInstance implements AutoCloseable {
    * accessing any shared state from the callback function.
    *
    * @param entry Entry
-   * @param eventMask Bitmask of TopicListenerFlags values
+   * @param eventKinds set of event kinds to listen to
    * @param listener Listener function
    * @return Listener handle
    */
   public int addListener(
-      NetworkTableEntry entry, int eventMask, Consumer<NetworkTableEvent> listener) {
+      NetworkTableEntry entry,
+      EnumSet<NetworkTableEvent.Kind> eventKinds,
+      Consumer<NetworkTableEvent> listener) {
     if (entry.getTopic().getInstance().getHandle() != m_handle) {
       throw new IllegalArgumentException("entry is not from this instance");
     }
-    return m_listeners.add(entry.getHandle(), eventMask, listener);
+    return m_listeners.add(entry.getHandle(), eventKinds, listener);
   }
 
   /**
@@ -654,15 +671,15 @@ public final class NetworkTableInstance implements AutoCloseable {
    * listener.
    *
    * @param prefixes Topic name string prefixes
-   * @param eventMask Bitmask of TopicListenerFlags values
+   * @param eventKinds set of event kinds to listen to
    * @param listener Listener function
    * @return Listener handle
    */
   public int addListener(
       String[] prefixes,
-      int eventMask,
+      EnumSet<NetworkTableEvent.Kind> eventKinds,
       Consumer<NetworkTableEvent> listener) {
-    return m_listeners.add(prefixes, eventMask, listener);
+    return m_listeners.add(prefixes, eventKinds, listener);
   }
 
   /*

@@ -12,6 +12,7 @@ import static org.junit.jupiter.api.Assertions.fail;
 
 import edu.wpi.first.util.WPIUtilJNI;
 import java.util.ArrayList;
+import java.util.EnumSet;
 import java.util.List;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -64,7 +65,7 @@ class ConnectionListenerTest {
     assertNotSame(poller, 0, "bad poller handle");
     int handle =
         NetworkTablesJNI.addListener(
-            poller, m_serverInst.getHandle(), NetworkTableEvent.kConnection);
+            poller, m_serverInst.getHandle(), EnumSet.of(NetworkTableEvent.Kind.kConnection));
     assertNotSame(handle, 0, "bad listener handle");
 
     // trigger a connect event
@@ -82,7 +83,7 @@ class ConnectionListenerTest {
     assertEquals(1, events.length);
     assertEquals(handle, events[0].listener);
     assertNotNull(events[0].connInfo);
-    assertEquals(events[0].flags, NetworkTableEvent.kConnected);
+    assertEquals(events[0].kind, NetworkTableEvent.Kind.kConnected);
 
     // trigger a disconnect event
     m_clientInst.stopClient();
@@ -103,7 +104,7 @@ class ConnectionListenerTest {
     assertNotNull(events);
     assertEquals(1, events.length);
     assertEquals(handle, events[0].listener);
-    assertEquals(events[0].flags, NetworkTableEvent.kDisconnected);
+    assertEquals(events[0].kind, NetworkTableEvent.Kind.kDisconnected);
   }
 
   private static int threadedPort = 10001;
@@ -155,7 +156,7 @@ class ConnectionListenerTest {
       assertEquals(1, events.size());
       assertEquals(handle, events.get(0).listener);
       assertNotNull(events.get(0).connInfo);
-      assertEquals(events.get(0).flags, NetworkTableEvent.kConnected);
+      assertEquals(events.get(0).kind, NetworkTableEvent.Kind.kConnected);
       events.clear();
     }
 
@@ -180,7 +181,7 @@ class ConnectionListenerTest {
       assertEquals(1, events.size());
       assertEquals(handle, events.get(0).listener);
       assertNotNull(events.get(0).connInfo);
-      assertEquals(events.get(0).flags, NetworkTableEvent.kDisconnected);
+      assertEquals(events.get(0).kind, NetworkTableEvent.Kind.kDisconnected);
     }
   }
 }

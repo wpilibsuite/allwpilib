@@ -7,52 +7,93 @@ package edu.wpi.first.networktables;
 /**
  * NetworkTables event.
  *
- * <p>Events have flags. The flags are a bitmask and must be OR'ed together when listening to an
- * event to indicate the combination of events desired to be received.
+ * <p>There are different kinds of events. When creating a listener, a combination of event kinds
+ * can be listened to by building an EnumSet of NetworkTableEvent.Kind.
  */
 @SuppressWarnings("MemberName")
 public final class NetworkTableEvent {
-  /** No flags. */
-  public static final int kNone = 0;
+  public enum Kind {
+    /** No flags. */
+    kNone(0x0000),
+
+    /**
+     * Initial listener addition. Set this to receive immediate notification of matches to other
+     * criteria.
+     */
+    kImmediate(0x0001),
+
+    /** Client connected (on server, any client connected). */
+    kConnected(0x0002),
+
+    /** Client disconnected (on server, any client disconnected). */
+    kDisconnected(0x0004),
+
+    /** Any connection event (connect or disconnect). */
+    kConnection(0x0004 | 0x0002),
+
+    /** New topic published. */
+    kPublish(0x0008),
+
+    /** Topic unpublished. */
+    kUnpublish(0x0010),
+
+    /** Topic properties changed. */
+    kProperties(0x0020),
+
+    /** Any topic event (publish, unpublish, or properties changed). */
+    kTopic(0x0020 | 0x0010 | 0x0008),
+
+    /** Topic value updated (via network). */
+    kValueRemote(0x0040),
+
+    /** Topic value updated (local). */
+    kValueLocal(0x0080),
+
+    /** Topic value updated (network or local). */
+    kValueAll(0x0080 | 0x0040),
+
+    /** Log message. */
+    kLogMessage(0x0100);
+
+    private final int value;
+
+    Kind(int value) {
+      this.value = value;
+    }
+
+    public int getValue() {
+      return value;
+    }
+  }
 
   /**
-   * Initial listener addition. Set this flag to receive immediate notification of matches to the
-   * flag criteria.
+   * Convert from the numerical representation of kind to an enum type. Immediate is not converted.
+   *
+   * @param kind The numerical representation of kind
+   * @return The kind
    */
-  public static final int kImmediate = 0x01;
-
-  /** Client connected (on server, any client connected). */
-  public static final int kConnected = 0x02;
-
-  /** Client disconnected (on server, any client disconnected). */
-  public static final int kDisconnected = 0x04;
-
-  /** Any connection event (connect or disconnect). */
-  public static final int kConnection = kConnected | kDisconnected;
-
-  /** New topic published. */
-  public static final int kPublish = 0x08;
-
-  /** Topic unpublished. */
-  public static final int kUnpublish = 0x10;
-
-  /** Topic properties changed. */
-  public static final int kProperties = 0x20;
-
-  /** Any topic event (publish, unpublish, or properties changed). */
-  public static final int kTopic = kPublish | kUnpublish | kProperties;
-
-  /** Topic value updated (via network). */
-  public static final int kValueRemote = 0x40;
-
-  /** Topic value updated (local). */
-  public static final int kValueLocal = 0x80;
-
-  /** Topic value updated (network or local). */
-  public static final int kValueAll = kValueRemote | kValueLocal;
-
-  /** Log message. */
-  public static final int kLogMessage = 0x100;
+  public static Kind getKindFromInt(int kind) {
+    switch (kind & ~Kind.kImmediate.value) {
+      case 0x0002:
+        return Kind.kConnected;
+      case 0x0004:
+        return Kind.kDisconnected;
+      case 0x0008:
+        return Kind.kPublish;
+      case 0x0010:
+        return Kind.kUnpublish;
+      case 0x0020:
+        return Kind.kProperties;
+      case 0x0040:
+        return Kind.kValueRemote;
+      case 0x0080:
+        return Kind.kValueLocal;
+      case 0x0100:
+        return Kind.kLogMessage;
+      default:
+        return Kind.kNone;
+    }
+  }
 
   /**
    * Handle of listener that was triggered. The value returned when adding the listener can be used
@@ -61,8 +102,8 @@ public final class NetworkTableEvent {
   public final int listener;
 
   /**
-   * Event flags. For example, kPublish if the topic was not previously published. Also indicates
-   * the data included with the event:
+   * Event kind. For example, kPublish if the topic was not previously published. Also indicates the
+   * data included with the event:
    *
    * <ul>
    *   <li>kConnected or kDisconnected: connInfo
@@ -71,7 +112,10 @@ public final class NetworkTableEvent {
    *   <li>kLogMessage: logMessage
    * </ul>
    */
-  public final int flags;
+  public final Kind kind;
+
+  /** If event was triggered due to Kind.kImmediate. */
+  public final boolean immediate;
 
   /** Connection information (for connection events). */
   public final ConnectionInfo connInfo;
@@ -106,7 +150,8 @@ public final class NetworkTableEvent {
       LogMessage logMessage) {
     this.m_inst = inst;
     this.listener = listener;
-    this.flags = flags;
+    this.kind = getKindFromInt(flags);
+    this.immediate = (flags & Kind.kImmediate.value) != 0;
     this.connInfo = connInfo;
     this.topicInfo = topicInfo;
     this.valueData = valueData;
