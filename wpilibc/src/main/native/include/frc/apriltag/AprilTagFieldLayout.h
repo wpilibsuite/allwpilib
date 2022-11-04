@@ -72,7 +72,8 @@ class WPILIB_DLLEXPORT AprilTagFieldLayout {
    * Gets an AprilTag pose by its ID.
    *
    * @param ID The ID of the tag.
-   * @return The pose corresponding to the ID that was passed in.
+   * @return The pose corresponding to the ID that was passed in or an empty
+   * optional if a tag with that ID is not found.
    */
   std::optional<Pose3d> GetTagPose(int ID) const;
 

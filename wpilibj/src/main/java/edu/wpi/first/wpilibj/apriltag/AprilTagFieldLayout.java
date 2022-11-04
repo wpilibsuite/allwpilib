@@ -105,7 +105,8 @@ public class AprilTagFieldLayout {
    * Gets an AprilTag pose by its ID.
    *
    * @param ID The ID of the tag.
-   * @return The pose corresponding to the ID passed in.
+   * @return The pose corresponding to the ID passed in or an empty optional if a tag with that ID
+   *     was not found.
    */
   @SuppressWarnings("ParameterName")
   public Optional<Pose3d> getTagPose(int ID) {
