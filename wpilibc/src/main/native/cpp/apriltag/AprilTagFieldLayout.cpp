@@ -6,6 +6,7 @@
 
 #include <algorithm>
 #include <system_error>
+#include "frc/geometry/Pose3d.h"
 
 #include <units/angle.h>
 #include <units/length.h>
@@ -42,18 +43,20 @@ void AprilTagFieldLayout::SetAlliance(DriverStation::Alliance alliance) {
   m_mirror = alliance == DriverStation::Alliance::kRed;
 }
 
-frc::Pose3d AprilTagFieldLayout::GetTagPose(int ID) const {
+std::optional<frc::Pose3d> AprilTagFieldLayout::GetTagPose(int ID) const {
   Pose3d returnPose;
   auto it = std::find_if(m_apriltags.begin(), m_apriltags.end(),
                          [=](const auto& tag) { return tag.ID == ID; });
   if (it != m_apriltags.end()) {
     returnPose = it->pose;
+  } else {
+    return std::optional<Pose3d>();
   }
   if (m_mirror) {
     returnPose = returnPose.RelativeTo(Pose3d{
         m_fieldLength, m_fieldWidth, 0_m, Rotation3d{0_deg, 0_deg, 180_deg}});
   }
-  return returnPose;
+  return std::make_optional(returnPose);
 }
 
 void AprilTagFieldLayout::Serialize(std::string_view path) {

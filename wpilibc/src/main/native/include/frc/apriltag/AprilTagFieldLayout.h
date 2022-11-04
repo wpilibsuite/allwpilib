@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include <optional>
 #include <string_view>
 #include <vector>
 
@@ -73,7 +74,7 @@ class WPILIB_DLLEXPORT AprilTagFieldLayout {
    * @param ID The ID of the tag.
    * @return The pose corresponding to the ID that was passed in.
    */
-  Pose3d GetTagPose(int ID) const;
+  std::optional<Pose3d> GetTagPose(int ID) const;
 
   /**
    * Serializes an AprilTagFieldLayout to a JSON file.
