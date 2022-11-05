@@ -36,16 +36,33 @@ import java.util.function.Consumer;
  */
 @SuppressWarnings("PMD.CouplingBetweenObjects")
 public final class NetworkTableInstance implements AutoCloseable {
-  /**
-   * Client/server mode flag values (as returned by {@link #getNetworkMode()}). This is a bitmask.
-   */
-  public static final int kNetModeNone = 0x00;
+  /** Client/server mode flag values (as returned by {@link #getNetworkMode()}). */
+  public enum NetworkMode {
+    /** Running in server mode. */
+    kServer(0x01),
 
-  public static final int kNetModeServer = 0x01;
-  public static final int kNetModeClient3 = 0x02;
-  public static final int kNetModeClient4 = 0x04;
-  public static final int kNetModeStarting = 0x08;
-  public static final int kNetModeLocal = 0x10;
+    /** Running in NT3 client mode. */
+    kClient3(0x02),
+
+    /** Running in NT4 client mode. */
+    kClient4(0x04),
+
+    /** Currently starting up (either client or server). */
+    kStarting(0x08),
+
+    /** Running in local-only mode. */
+    kLocal(0x10);
+
+    private final int value;
+
+    NetworkMode(int value) {
+      this.value = value;
+    }
+
+    public int getValue() {
+      return value;
+    }
+  }
 
   /** The default port that network tables operates on for NT3. */
   public static final int kDefaultPort3 = 1735;
@@ -689,10 +706,17 @@ public final class NetworkTableInstance implements AutoCloseable {
   /**
    * Get the current network mode.
    *
-   * @return Bitmask of NetworkMode.
+   * @return Enum set of NetworkMode.
    */
-  public int getNetworkMode() {
-    return NetworkTablesJNI.getNetworkMode(m_handle);
+  public EnumSet<NetworkMode> getNetworkMode() {
+    int flags = NetworkTablesJNI.getNetworkMode(m_handle);
+    EnumSet<NetworkMode> rv = EnumSet.noneOf(NetworkMode.class);
+    for (NetworkMode mode : NetworkMode.values()) {
+      if ((flags & mode.getValue()) != 0) {
+        rv.add(mode);
+      }
+    }
+    return rv;
   }
 
   /**
