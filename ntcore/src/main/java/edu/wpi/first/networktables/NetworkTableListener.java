@@ -4,6 +4,7 @@
 
 package edu.wpi.first.networktables;
 
+import java.util.EnumSet;
 import java.util.function.Consumer;
 
 /**
@@ -18,16 +19,16 @@ public final class NetworkTableListener implements AutoCloseable {
    *
    * @param inst Instance
    * @param prefixes Topic name string prefixes
-   * @param eventMask Bitmask of NetworkTableEvent flags values
+   * @param eventKinds set of event kinds to listen to
    * @param listener Listener function
    * @return Listener
    */
   public static NetworkTableListener createListener(
       NetworkTableInstance inst,
       String[] prefixes,
-      int eventMask,
+      EnumSet<NetworkTableEvent.Kind> eventKinds,
       Consumer<NetworkTableEvent> listener) {
-    return new NetworkTableListener(inst, inst.addListener(prefixes, eventMask, listener));
+    return new NetworkTableListener(inst, inst.addListener(prefixes, eventKinds, listener));
   }
 
   /**
@@ -35,56 +36,64 @@ public final class NetworkTableListener implements AutoCloseable {
    * subscriber with the lifetime of the listener.
    *
    * @param topic Topic
-   * @param eventMask Bitmask of NetworkTableEvent flags values
+   * @param eventKinds set of event kinds to listen to
    * @param listener Listener function
    * @return Listener
    */
   public static NetworkTableListener createListener(
-      Topic topic, int eventMask, Consumer<NetworkTableEvent> listener) {
+      Topic topic,
+      EnumSet<NetworkTableEvent.Kind> eventKinds,
+      Consumer<NetworkTableEvent> listener) {
     NetworkTableInstance inst = topic.getInstance();
-    return new NetworkTableListener(inst, inst.addListener(topic, eventMask, listener));
+    return new NetworkTableListener(inst, inst.addListener(topic, eventKinds, listener));
   }
 
   /**
    * Create a listener for topic changes on a subscriber. This does NOT keep the subscriber active.
    *
    * @param subscriber Subscriber
-   * @param eventMask Bitmask of NetworkTableEvent flags values
+   * @param eventKinds set of event kinds to listen to
    * @param listener Listener function
    * @return Listener
    */
   public static NetworkTableListener createListener(
-      Subscriber subscriber, int eventMask, Consumer<NetworkTableEvent> listener) {
+      Subscriber subscriber,
+      EnumSet<NetworkTableEvent.Kind> eventKinds,
+      Consumer<NetworkTableEvent> listener) {
     NetworkTableInstance inst = subscriber.getTopic().getInstance();
-    return new NetworkTableListener(inst, inst.addListener(subscriber, eventMask, listener));
+    return new NetworkTableListener(inst, inst.addListener(subscriber, eventKinds, listener));
   }
 
   /**
    * Create a listener for topic changes on a subscriber. This does NOT keep the subscriber active.
    *
    * @param subscriber Subscriber
-   * @param eventMask Bitmask of NetworkTableEvent flags values
+   * @param eventKinds set of event kinds to listen to
    * @param listener Listener function
    * @return Listener
    */
   public static NetworkTableListener createListener(
-      MultiSubscriber subscriber, int eventMask, Consumer<NetworkTableEvent> listener) {
+      MultiSubscriber subscriber,
+      EnumSet<NetworkTableEvent.Kind> eventKinds,
+      Consumer<NetworkTableEvent> listener) {
     NetworkTableInstance inst = subscriber.getInstance();
-    return new NetworkTableListener(inst, inst.addListener(subscriber, eventMask, listener));
+    return new NetworkTableListener(inst, inst.addListener(subscriber, eventKinds, listener));
   }
 
   /**
    * Create a listener for topic changes on an entry.
    *
    * @param entry Entry
-   * @param eventMask Bitmask of NetworkTableEvent flags values
+   * @param eventKinds set of event kinds to listen to
    * @param listener Listener function
    * @return Listener
    */
   public static NetworkTableListener createListener(
-      NetworkTableEntry entry, int eventMask, Consumer<NetworkTableEvent> listener) {
+      NetworkTableEntry entry,
+      EnumSet<NetworkTableEvent.Kind> eventKinds,
+      Consumer<NetworkTableEvent> listener) {
     NetworkTableInstance inst = entry.getInstance();
-    return new NetworkTableListener(inst, inst.addListener(entry, eventMask, listener));
+    return new NetworkTableListener(inst, inst.addListener(entry, eventKinds, listener));
   }
 
   /**

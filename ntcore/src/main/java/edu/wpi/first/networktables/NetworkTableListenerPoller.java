@@ -4,6 +4,8 @@
 
 package edu.wpi.first.networktables;
 
+import java.util.EnumSet;
+
 /**
  * Topic change listener. This queues topic change events matching the specified mask. Code using
  * the listener must periodically call readQueue() to read the events.
@@ -24,11 +26,11 @@ public final class NetworkTableListenerPoller implements AutoCloseable {
    * prefixes. This creates a corresponding internal subscriber with the lifetime of the listener.
    *
    * @param prefixes Topic name string prefixes
-   * @param eventMask Bitmask of TopicListenerFlags values
+   * @param eventKinds set of event kinds to listen to
    * @return Listener handle
    */
-  public int addListener(String[] prefixes, int eventMask) {
-    return NetworkTablesJNI.addListener(m_handle, prefixes, eventMask);
+  public int addListener(String[] prefixes, EnumSet<NetworkTableEvent.Kind> eventKinds) {
+    return NetworkTablesJNI.addListener(m_handle, prefixes, eventKinds);
   }
 
   /**
@@ -36,44 +38,44 @@ public final class NetworkTableListenerPoller implements AutoCloseable {
    * subscriber with the lifetime of the listener.
    *
    * @param topic Topic
-   * @param eventMask Bitmask of TopicListenerFlags values
+   * @param eventKinds set of event kinds to listen to
    * @return Listener handle
    */
-  public int addListener(Topic topic, int eventMask) {
-    return NetworkTablesJNI.addListener(m_handle, topic.getHandle(), eventMask);
+  public int addListener(Topic topic, EnumSet<NetworkTableEvent.Kind> eventKinds) {
+    return NetworkTablesJNI.addListener(m_handle, topic.getHandle(), eventKinds);
   }
 
   /**
    * Start listening to topic changes on a subscriber. This does NOT keep the subscriber active.
    *
    * @param subscriber Subscriber
-   * @param eventMask Bitmask of TopicListenerFlags values
+   * @param eventKinds set of event kinds to listen to
    * @return Listener handle
    */
-  public int addListener(Subscriber subscriber, int eventMask) {
-    return NetworkTablesJNI.addListener(m_handle, subscriber.getHandle(), eventMask);
+  public int addListener(Subscriber subscriber, EnumSet<NetworkTableEvent.Kind> eventKinds) {
+    return NetworkTablesJNI.addListener(m_handle, subscriber.getHandle(), eventKinds);
   }
 
   /**
    * Start listening to topic changes on a subscriber. This does NOT keep the subscriber active.
    *
    * @param subscriber Subscriber
-   * @param eventMask Bitmask of TopicListenerFlags values
+   * @param eventKinds set of event kinds to listen to
    * @return Listener handle
    */
-  public int addListener(MultiSubscriber subscriber, int eventMask) {
-    return NetworkTablesJNI.addListener(m_handle, subscriber.getHandle(), eventMask);
+  public int addListener(MultiSubscriber subscriber, EnumSet<NetworkTableEvent.Kind> eventKinds) {
+    return NetworkTablesJNI.addListener(m_handle, subscriber.getHandle(), eventKinds);
   }
 
   /**
    * Start listening to topic changes on an entry.
    *
    * @param entry Entry
-   * @param eventMask Bitmask of TopicListenerFlags values
+   * @param eventKinds set of event kinds to listen to
    * @return Listener handle
    */
-  public int addListener(NetworkTableEntry entry, int eventMask) {
-    return NetworkTablesJNI.addListener(m_handle, entry.getHandle(), eventMask);
+  public int addListener(NetworkTableEntry entry, EnumSet<NetworkTableEvent.Kind> eventKinds) {
+    return NetworkTablesJNI.addListener(m_handle, entry.getHandle(), eventKinds);
   }
 
   /**
@@ -85,10 +87,11 @@ public final class NetworkTableListenerPoller implements AutoCloseable {
    * @return Listener handle
    */
   public int addConnectionListener(boolean immediateNotify) {
-    return NetworkTablesJNI.addListener(
-        m_handle,
-        m_inst.getHandle(),
-        NetworkTableEvent.kConnection | (immediateNotify ? NetworkTableEvent.kImmediate : 0));
+    EnumSet<NetworkTableEvent.Kind> eventKinds = EnumSet.of(NetworkTableEvent.Kind.kConnection);
+    if (immediateNotify) {
+      eventKinds.add(NetworkTableEvent.Kind.kImmediate);
+    }
+    return NetworkTablesJNI.addListener(m_handle, m_inst.getHandle(), eventKinds);
   }
 
   /**
