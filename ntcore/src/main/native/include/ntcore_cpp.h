@@ -223,6 +223,14 @@ class Event {
    */
   unsigned int flags{0};
 
+  /**
+   * Test event flags.
+   *
+   * @param kind event flag(s) to test
+   * @return True if flags matches kind
+   */
+  bool Is(unsigned int kind) const { return (flags & kind) != 0; }
+
   /** Event data; content depends on flags. */
   std::variant<ConnectionInfo, TopicInfo, ValueEventData, LogMessage> data;
 
