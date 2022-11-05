@@ -55,12 +55,21 @@ static ::FRCDriverStation* driverStation;
 // Message and Data variables
 static wpi::mutex msgMutex;
 
+namespace {
+struct HAL_RawJoystickAxes {
+  int16_t count;
+  uint8_t axes[HAL_kMaxJoystickAxes];
+};
+typedef struct HAL_RawJoystickAxes HAL_RawJoystickAxes;
+};  // namespace
+
 static int32_t HAL_GetJoystickAxesInternal(int32_t joystickNum,
                                            HAL_JoystickAxes* axes) {
-  JoystickAxes_t netcommAxes;
+  HAL_RawJoystickAxes netcommAxes;
 
   int retVal = FRC_NetworkCommunication_getJoystickAxes(
-      joystickNum, &netcommAxes, HAL_kMaxJoystickAxes);
+      joystickNum, reinterpret_cast<JoystickAxes_t*>(&netcommAxes),
+      HAL_kMaxJoystickAxes);
 
   // copy integer values to double values
   axes->count = netcommAxes.count;
