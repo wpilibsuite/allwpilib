@@ -67,43 +67,14 @@ public final class NetworkTableEvent {
   }
 
   /**
-   * Convert from the numerical representation of kind to an enum type. Immediate is not converted.
-   *
-   * @param kind The numerical representation of kind
-   * @return The kind
-   */
-  public static Kind getKindFromInt(int kind) {
-    switch (kind & ~Kind.kImmediate.value) {
-      case 0x0002:
-        return Kind.kConnected;
-      case 0x0004:
-        return Kind.kDisconnected;
-      case 0x0008:
-        return Kind.kPublish;
-      case 0x0010:
-        return Kind.kUnpublish;
-      case 0x0020:
-        return Kind.kProperties;
-      case 0x0040:
-        return Kind.kValueRemote;
-      case 0x0080:
-        return Kind.kValueLocal;
-      case 0x0100:
-        return Kind.kLogMessage;
-      default:
-        return Kind.kNone;
-    }
-  }
-
-  /**
    * Handle of listener that was triggered. The value returned when adding the listener can be used
    * to map this to a specific added listener.
    */
   public final int listener;
 
   /**
-   * Event kind. For example, kPublish if the topic was not previously published. Also indicates the
-   * data included with the event:
+   * Determine if event is of a particular kind. For example, kPublish if the topic was not
+   * previously published. Also indicates the data included with the event:
    *
    * <ul>
    *   <li>kConnected or kDisconnected: connInfo
@@ -111,11 +82,15 @@ public final class NetworkTableEvent {
    *   <li>kValueRemote, kValueLocal: valueData
    *   <li>kLogMessage: logMessage
    * </ul>
+   *
+   * @param kind Kind
+   * @return True if event matches kind
    */
-  public final Kind kind;
+  public boolean is(Kind kind) {
+    return (m_flags & kind.getValue()) != 0;
+  }
 
-  /** If event was triggered due to Kind.kImmediate. */
-  public final boolean immediate;
+  private final int m_flags;
 
   /** Connection information (for connection events). */
   public final ConnectionInfo connInfo;
@@ -150,8 +125,7 @@ public final class NetworkTableEvent {
       LogMessage logMessage) {
     this.m_inst = inst;
     this.listener = listener;
-    this.kind = getKindFromInt(flags);
-    this.immediate = (flags & Kind.kImmediate.value) != 0;
+    this.m_flags = flags;
     this.connInfo = connInfo;
     this.topicInfo = topicInfo;
     this.valueData = valueData;

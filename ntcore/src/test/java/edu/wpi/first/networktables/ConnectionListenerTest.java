@@ -8,6 +8,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNotSame;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
 import edu.wpi.first.util.WPIUtilJNI;
@@ -83,7 +84,7 @@ class ConnectionListenerTest {
     assertEquals(1, events.length);
     assertEquals(handle, events[0].listener);
     assertNotNull(events[0].connInfo);
-    assertEquals(events[0].kind, NetworkTableEvent.Kind.kConnected);
+    assertTrue(events[0].is(NetworkTableEvent.Kind.kConnected));
 
     // trigger a disconnect event
     m_clientInst.stopClient();
@@ -104,7 +105,7 @@ class ConnectionListenerTest {
     assertNotNull(events);
     assertEquals(1, events.length);
     assertEquals(handle, events[0].listener);
-    assertEquals(events[0].kind, NetworkTableEvent.Kind.kDisconnected);
+    assertTrue(events[0].is(NetworkTableEvent.Kind.kDisconnected));
   }
 
   private static int threadedPort = 10001;
@@ -156,7 +157,7 @@ class ConnectionListenerTest {
       assertEquals(1, events.size());
       assertEquals(handle, events.get(0).listener);
       assertNotNull(events.get(0).connInfo);
-      assertEquals(events.get(0).kind, NetworkTableEvent.Kind.kConnected);
+      assertTrue(events.get(0).is(NetworkTableEvent.Kind.kConnected));
       events.clear();
     }
 
@@ -181,7 +182,7 @@ class ConnectionListenerTest {
       assertEquals(1, events.size());
       assertEquals(handle, events.get(0).listener);
       assertNotNull(events.get(0).connInfo);
-      assertEquals(events.get(0).kind, NetworkTableEvent.Kind.kDisconnected);
+      assertTrue(events.get(0).is(NetworkTableEvent.Kind.kDisconnected));
     }
   }
 }

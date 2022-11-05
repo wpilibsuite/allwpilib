@@ -6,6 +6,7 @@ package edu.wpi.first.networktables;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
 import edu.wpi.first.util.WPIUtilJNI;
@@ -86,6 +87,6 @@ class TopicListenerTest {
     assertNotNull(events[0].topicInfo);
     assertEquals(m_serverInst.getTopic("/foo/bar"), events[0].topicInfo.getTopic());
     assertEquals("/foo/bar", events[0].topicInfo.name);
-    assertEquals(NetworkTableEvent.Kind.kPublish, events[0].kind);
+    assertTrue(events[0].is(NetworkTableEvent.Kind.kPublish));
   }
 }
