@@ -16,6 +16,7 @@ wpilib_cc_static_and_shared_library(
     standard_deps = [
         "//wpimath/src/main/native/thirdparty/drake:drake-headers",
         "//wpimath/src/main/native/thirdparty/eigen:eigen-headers",
+        "//wpimath/src/main/native/thirdparty/gcem",
     ],
     strip_include_prefix = "include",
     visibility = ["//visibility:public"],
