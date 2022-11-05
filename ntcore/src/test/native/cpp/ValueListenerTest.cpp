@@ -346,4 +346,64 @@ TEST_F(ValueListenerTest, PollImmediateSubMultiple) {
   EXPECT_EQ(valueData->value, nt::Value::MakeDouble(1.0));
 }
 
+TEST_F(ValueListenerTest, TwoSubOneListener) {
+  auto topic = nt::GetTopic(m_inst, "foo");
+  auto pub = nt::Publish(topic, NT_DOUBLE, "double");
+  auto sub1 = nt::Subscribe(topic, NT_DOUBLE, "double");
+  auto sub2 = nt::Subscribe(topic, NT_DOUBLE, "double");
+  auto sub3 = nt::SubscribeMultiple(m_inst, {{"foo"}});
+
+  auto poller = nt::CreateListenerPoller(m_inst);
+  auto h = nt::AddPolledListener(poller, sub1, nt::EventFlags::kValueLocal);
+  (void)sub2;
+  (void)sub3;
+
+  nt::SetDouble(pub, 0);
+
+  bool timedOut = false;
+  ASSERT_TRUE(wpi::WaitForObject(poller, 1.0, &timedOut));
+  ASSERT_FALSE(timedOut);
+  auto results = nt::ReadListenerQueue(poller);
+
+  ASSERT_EQ(results.size(), 1u);
+  EXPECT_EQ(results[0].flags & nt::EventFlags::kValueLocal,
+            nt::EventFlags::kValueLocal);
+  EXPECT_EQ(results[0].listener, h);
+  auto valueData = results[0].GetValueEventData();
+  ASSERT_TRUE(valueData);
+  EXPECT_EQ(valueData->subentry, sub1);
+  EXPECT_EQ(valueData->topic, topic);
+  EXPECT_EQ(valueData->value, nt::Value::MakeDouble(0.0));
+}
+
+TEST_F(ValueListenerTest, TwoSubOneMultiListener) {
+  auto topic = nt::GetTopic(m_inst, "foo");
+  auto pub = nt::Publish(topic, NT_DOUBLE, "double");
+  auto sub1 = nt::Subscribe(topic, NT_DOUBLE, "double");
+  auto sub2 = nt::Subscribe(topic, NT_DOUBLE, "double");
+  auto sub3 = nt::SubscribeMultiple(m_inst, {{"foo"}});
+
+  auto poller = nt::CreateListenerPoller(m_inst);
+  auto h = nt::AddPolledListener(poller, sub3, nt::EventFlags::kValueLocal);
+  (void)sub1;
+  (void)sub2;
+
+  nt::SetDouble(pub, 0);
+
+  bool timedOut = false;
+  ASSERT_TRUE(wpi::WaitForObject(poller, 1.0, &timedOut));
+  ASSERT_FALSE(timedOut);
+  auto results = nt::ReadListenerQueue(poller);
+
+  ASSERT_EQ(results.size(), 1u);
+  EXPECT_EQ(results[0].flags & nt::EventFlags::kValueLocal,
+            nt::EventFlags::kValueLocal);
+  EXPECT_EQ(results[0].listener, h);
+  auto valueData = results[0].GetValueEventData();
+  ASSERT_TRUE(valueData);
+  EXPECT_EQ(valueData->subentry, sub3);
+  EXPECT_EQ(valueData->topic, topic);
+  EXPECT_EQ(valueData->value, nt::Value::MakeDouble(0.0));
+}
+
 }  // namespace nt

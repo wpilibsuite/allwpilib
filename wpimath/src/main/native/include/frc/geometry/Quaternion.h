@@ -8,6 +8,10 @@
 
 #include "frc/EigenCore.h"
 
+namespace wpi {
+class json;
+}  // namespace wpi
+
 namespace frc {
 
 class WPILIB_DLLEXPORT Quaternion {
@@ -91,5 +95,11 @@ class WPILIB_DLLEXPORT Quaternion {
   double m_r = 1.0;
   Eigen::Vector3d m_v{0.0, 0.0, 0.0};
 };
+
+WPILIB_DLLEXPORT
+void to_json(wpi::json& json, const Quaternion& quaternion);
+
+WPILIB_DLLEXPORT
+void from_json(const wpi::json& json, Quaternion& quaternion);
 
 }  // namespace frc

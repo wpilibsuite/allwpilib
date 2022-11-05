@@ -6,9 +6,11 @@ package edu.wpi.first.networktables;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
 import edu.wpi.first.util.WPIUtilJNI;
+import java.util.EnumSet;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
@@ -37,7 +39,8 @@ class TopicListenerTest {
 
     // Use connection listener to ensure we've connected
     int poller = NetworkTablesJNI.createListenerPoller(m_clientInst.getHandle());
-    NetworkTablesJNI.addListener(poller, m_clientInst.getHandle(), NetworkTableEvent.kConnected);
+    NetworkTablesJNI.addListener(
+        poller, m_clientInst.getHandle(), EnumSet.of(NetworkTableEvent.Kind.kConnected));
     try {
       if (WPIUtilJNI.waitForObjectTimeout(poller, 1.0)) {
         fail("client didn't connect to server");
@@ -55,7 +58,8 @@ class TopicListenerTest {
     connect();
     final int poller = NetworkTablesJNI.createListenerPoller(m_serverInst.getHandle());
     final int handle =
-        NetworkTablesJNI.addListener(poller, new String[] {"/foo"}, NetworkTableEvent.kPublish);
+        NetworkTablesJNI.addListener(
+            poller, new String[] {"/foo"}, EnumSet.of(NetworkTableEvent.Kind.kPublish));
 
     // Trigger an event
     m_clientInst.getEntry("/foo/bar").setDouble(1.0);
@@ -83,6 +87,6 @@ class TopicListenerTest {
     assertNotNull(events[0].topicInfo);
     assertEquals(m_serverInst.getTopic("/foo/bar"), events[0].topicInfo.getTopic());
     assertEquals("/foo/bar", events[0].topicInfo.name);
-    assertEquals(NetworkTableEvent.kPublish, events[0].flags);
+    assertTrue(events[0].is(NetworkTableEvent.Kind.kPublish));
   }
 }

@@ -7,6 +7,7 @@ package edu.wpi.first.networktables;
 import edu.wpi.first.util.RuntimeLoader;
 import edu.wpi.first.util.datalog.DataLog;
 import java.io.IOException;
+import java.util.EnumSet;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public final class NetworkTablesJNI {
@@ -202,6 +203,22 @@ public final class NetworkTablesJNI {
   public static native int createListenerPoller(int inst);
 
   public static native void destroyListenerPoller(int poller);
+
+  private static int kindsToMask(EnumSet<NetworkTableEvent.Kind> kinds) {
+    int mask = 0;
+    for (NetworkTableEvent.Kind kind : kinds) {
+      mask |= kind.getValue();
+    }
+    return mask;
+  }
+
+  public static int addListener(int poller, String[] prefixes, EnumSet<NetworkTableEvent.Kind> kinds) {
+    return addListener(poller, prefixes, kindsToMask(kinds));
+  }
+
+  public static int addListener(int poller, int handle, EnumSet<NetworkTableEvent.Kind> kinds) {
+    return addListener(poller, handle, kindsToMask(kinds));
+  }
 
   public static native int addListener(int poller, String[] prefixes, int mask);
 

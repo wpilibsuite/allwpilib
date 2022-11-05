@@ -17,6 +17,7 @@ import edu.wpi.first.networktables.NetworkTableListener;
 import edu.wpi.first.networktables.StringPublisher;
 import edu.wpi.first.networktables.Topic;
 import java.util.Collection;
+import java.util.EnumSet;
 
 /**
  * The preferences class provides a relatively simple way to save important values to the roboRIO to
@@ -77,7 +78,7 @@ public final class Preferences {
     m_listener =
         NetworkTableListener.createListener(
             m_tableSubscriber,
-            NetworkTableEvent.kImmediate | NetworkTableEvent.kPublish,
+            EnumSet.of(NetworkTableEvent.Kind.kImmediate, NetworkTableEvent.Kind.kPublish),
             event -> {
               if (event.topicInfo != null) {
                 Topic topic = event.topicInfo.getTopic();

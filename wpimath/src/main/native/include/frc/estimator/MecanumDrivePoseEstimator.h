@@ -46,8 +46,9 @@ namespace frc {
  * right wheels.
  *
  * <strong> y = [x, y, theta]ᵀ </strong> from vision containing x position, y
- * position, and heading; or <strong> y = [theta]ᵀ </strong> containing gyro
- * heading.
+ * position, and heading; or <strong> y = [theta, s_fl, s_fr, s_rl, s_rr]ᵀ
+ * </strong> containing gyro heading, followed by the distance driven by the
+ * front left, front right, rear left, and rear right wheels.
  */
 class WPILIB_DLLEXPORT MecanumDrivePoseEstimator {
  public:

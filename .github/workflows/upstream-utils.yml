@@ -49,6 +49,10 @@ jobs:
         run: |
           cd upstream_utils
           ./update_llvm.py
+      - name: Run update_mpack.py
+        run: |
+          cd upstream_utils
+          ./update_mpack.py
       - name: Run update_stack_walker.py
         run: |
           cd upstream_utils

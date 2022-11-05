@@ -38,7 +38,7 @@ namespace frc {
  * The state-space system used internally has the following states (x), inputs
  * (u), and outputs (y):
  *
- * <strong> x = [x, y, theta, s_0, ... s_n]ᵀ </strong> in the field coordinate
+ * <strong> x = [x, y, theta, s_0, ..., s_n]ᵀ </strong> in the field coordinate
  * system containing x position, y position, and heading, followed by the
  * distance travelled by each wheel.
  *
@@ -47,8 +47,8 @@ namespace frc {
  * followed by the velocity measured at each wheel.
  *
  * <strong> y = [x, y, theta]ᵀ </strong> from vision containing x position, y
- * position, and heading; or <strong> y = [theta]ᵀ </strong> containing gyro
- * heading.
+ * position, and heading; or <strong> y = [theta, s_0, ..., s_n]ᵀ </strong>
+ * containing gyro heading, followed by the distance travelled by each wheel.
  */
 template <size_t NumModules>
 class SwerveDrivePoseEstimator {
@@ -137,6 +137,8 @@ class SwerveDrivePoseEstimator {
 
   /**
    * Resets the robot's position on the field.
+   *
+   * You NEED to reset your encoders (to zero) when calling this method.
    *
    * The gyroscope angle does not need to be reset in the user's robot code.
    * The library automatically takes care of offsetting the gyro angle.

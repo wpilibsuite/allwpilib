@@ -11,6 +11,10 @@
 #include "frc/EigenCore.h"
 #include "units/angle.h"
 
+namespace wpi {
+class json;
+}  // namespace wpi
+
 namespace frc {
 
 /**
@@ -179,5 +183,11 @@ class WPILIB_DLLEXPORT Rotation3d {
  private:
   Quaternion m_q;
 };
+
+WPILIB_DLLEXPORT
+void to_json(wpi::json& json, const Rotation3d& rotation);
+
+WPILIB_DLLEXPORT
+void from_json(const wpi::json& json, Rotation3d& rotation);
 
 }  // namespace frc

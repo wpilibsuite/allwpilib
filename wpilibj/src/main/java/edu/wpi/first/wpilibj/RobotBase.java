@@ -155,7 +155,7 @@ public abstract class RobotBase implements AutoCloseable {
     // wait for the NT server to actually start
     try {
       int count = 0;
-      while ((inst.getNetworkMode() & NetworkTableInstance.kNetModeStarting) != 0) {
+      while (inst.getNetworkMode().contains(NetworkTableInstance.NetworkMode.kStarting)) {
         Thread.sleep(10);
         count++;
         if (count > 100) {

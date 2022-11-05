@@ -43,14 +43,15 @@ import java.util.function.BiConsumer;
  * <p>The state-space system used internally has the following states (x), inputs (u), and outputs
  * (y):
  *
- * <p><strong> x = [x, y, theta, s_0, ... s_n]ᵀ </strong> in the field coordinate system containing
+ * <p><strong> x = [x, y, theta, s_0, ..., s_n]ᵀ </strong> in the field coordinate system containing
  * x position, y position, and heading, followed by the distance travelled by each wheel.
  *
  * <p><strong> u = [v_x, v_y, omega, v_0, ... v_n]ᵀ </strong> containing x velocity, y velocity, and
  * angular rate in the field coordinate system, followed by the velocity measured at each wheel.
  *
  * <p><strong> y = [x, y, theta]ᵀ </strong> from vision containing x position, y position, and
- * heading; or <strong> y = [theta]ᵀ </strong> containing gyro heading.
+ * heading; or <strong> y = [theta, s_0, ..., s_n]ᵀ </strong> containing gyro heading, followed by
+ * the distance travelled by each wheel.
  */
 public class SwerveDrivePoseEstimator<States extends Num, Inputs extends Num, Outputs extends Num> {
   private final UnscentedKalmanFilter<States, Inputs, Outputs> m_observer;
@@ -242,6 +243,8 @@ public class SwerveDrivePoseEstimator<States extends Num, Inputs extends Num, Ou
 
   /**
    * Resets the robot's position on the field.
+   *
+   * <p>You NEED to reset your encoders (to zero) when calling this method.
    *
    * <p>The gyroscope angle does not need to be reset in the user's robot code. The library
    * automatically takes care of offsetting the gyro angle.

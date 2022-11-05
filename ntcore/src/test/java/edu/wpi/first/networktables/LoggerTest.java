@@ -39,7 +39,7 @@ class LoggerTest {
     // wait for client to report it's started, then wait another 0.1 sec
     try {
       int count = 0;
-      while ((m_clientInst.getNetworkMode() & NetworkTableInstance.kNetModeClient4) == 0) {
+      while (!m_clientInst.getNetworkMode().contains(NetworkTableInstance.NetworkMode.kClient4)) {
         Thread.sleep(100);
         count++;
         if (count > 30) {
