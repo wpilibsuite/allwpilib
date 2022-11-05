@@ -31,7 +31,8 @@ bool gShutdown = false;
 
 static float gDefaultScale = 1.0;
 
-static std::unique_ptr<glass::WindowManager> m_windowManager;
+static std::unique_ptr<glass::WindowManager> windowManager;
+static std::unique_ptr<PlotProvider> plotProvider;
 
 static glass::Window* m_logSelectorWindow;
 static glass::Window* m_plotWindow;
@@ -70,8 +71,8 @@ static void DisplayMenuBar() {
     ImGui::EndMenu();
   }
   
-  m_windowManager->DisplayMenu();
-
+  windowManager->DisplayMenu();
+  plotProvider->DisplayMenu();
   ImGui::EndMainMenuBar();
 
   if(about) {
@@ -100,9 +101,9 @@ void Application(std::string_view saveDir) {
   
   auto& storage = glass::GetStorageRoot().GetChild("Sapphire");
 
-
-  m_windowManager = std::make_unique<glass::WindowManager>(storage);
-  m_windowManager->GlobalInit();
+  
+  windowManager = std::make_unique<glass::WindowManager>(storage);
+  windowManager->GlobalInit();
 
   std::unique_ptr<Selector> selector = std::make_unique<Selector>();
   auto& logs = selector->GetDataLogs();
@@ -111,16 +112,14 @@ void Application(std::string_view saveDir) {
 
   auto& timestamp = logViewer->GetTimestamp();
 
-  std::unique_ptr<PlotView> plotView = std::make_unique<PlotView>(logViewer->GetTimestamp(), "PlotView 1");
+  plotProvider = std::make_unique<PlotProvider>(storage, timestamp);
+  plotProvider->GlobalInit();
 
-  m_logSelectorWindow = m_windowManager->AddWindow(
+  m_logSelectorWindow = windowManager->AddWindow(
     "Log Selector", std::move(selector));
 
-  m_entryManagerWindow = m_windowManager->AddWindow(
+  m_entryManagerWindow = windowManager->AddWindow(
     "Entry Manager", std::move(logViewer));
-
-  m_plotWindow = m_windowManager->AddWindow(
-    "Plot", std::move(plotView));
 
 
   gui::AddWindowScaler([](float scale) { gDefaultScale = scale; });

@@ -9,9 +9,13 @@
 #include <implot.h>
 #include <implot_internal.h>
 #include <vector>
+#include "glass/WindowManager.h"
+#include "glass/Storage.h"
+using glass::Storage;
 
 namespace sapphire{
 class Plot;
+class PlotProvider;
 
 struct PlotSettings {
     bool m_settings = true;
@@ -71,7 +75,7 @@ public:
     };
     void Display() ;
     float m_now;
-    float& m_nowRef;
+    float& m_nowRef;   
     float m_sampleRate;
     int m_height = 0;
     std::string m_name;
@@ -92,14 +96,25 @@ private:
 
 };
 
+
+class PlotProvider : private glass::WindowManager{
+  public:
+    explicit PlotProvider(Storage& storage, float& m_now);
+    ~PlotProvider() override;
+    using glass::WindowManager::GlobalInit;
+    void DisplayMenu() override;
+    float& m_now;
+};
+
 class PlotView : public glass::View{
     public:
-    PlotView(float& now, std::string name) : m_now{now}, m_name{name} {}
+    PlotView(PlotProvider *provider, float& now, std::string name) : provider{provider}, m_now{now}, m_name{name} {}
     void Display() override;
     void EmitContextMenu();
     std::string m_name;
     std::vector<std::unique_ptr<Plot> > plots;
     float& m_now;
+    PlotProvider *provider;
 };
 
 }

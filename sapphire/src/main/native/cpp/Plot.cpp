@@ -300,6 +300,68 @@ void PlotView::Display(){
     for(auto& plot : plots){
         plot->Display();
     }
-  
-
 }
+
+
+PlotProvider::PlotProvider(Storage& storage, float& now) : glass::WindowManager(storage), m_now{now}{
+    storage.SetCustomApply([this] {
+        for (auto&& windowkv : m_storage.GetChildren()) {
+            // get or create window
+            auto win = GetOrAddWindow(windowkv.key(), true);
+            if (!win) {
+                continue;
+            }
+
+            // get or create view
+            auto view = static_cast<PlotView*>(win->GetView());
+            if (!view) {
+                win->SetView(std::make_unique<PlotView>(this, m_now, std::string(windowkv.key())));
+                view = static_cast<PlotView*>(win->GetView());
+            }
+        }
+    });
+    storage.SetCustomClear([this] {
+        EraseWindows();
+        m_storage.EraseChildren();
+    });
+}
+
+void PlotProvider::DisplayMenu(){
+  for (size_t i = 0; i < m_windows.size(); ++i) {
+    m_windows[i]->DisplayMenuItem();
+    // provide method to destroy the plot window
+    if (ImGui::BeginPopupContextItem()) {
+      if (ImGui::Selectable("Destroy Plot Window")) {
+        RemoveWindow(i);
+        ImGui::CloseCurrentPopup();
+      }
+      ImGui::EndPopup();
+    }
+  }
+
+  if (ImGui::MenuItem("New Plot Window")) {
+    // this is an inefficient algorithm, but the number of windows is small
+    char id[32];
+    size_t numWindows = m_windows.size();
+    for (size_t i = 0; i <= numWindows; ++i) {
+      std::snprintf(id, sizeof(id), "Plot <%d>", static_cast<int>(i));
+      bool match = false;
+      for (size_t j = i; j < numWindows; ++j) {
+        if (m_windows[j]->GetId() == id) {
+          match = true;
+          break;
+        }
+      }
+      if (!match) {
+        break;
+      }
+    }
+    if (auto win = AddWindow(
+            id, std::make_unique<PlotView>(this, m_now, id))) {
+      win->SetDefaultSize(700, 400);
+    }
+  }
+}
+
+
+PlotProvider::~PlotProvider() = default;
