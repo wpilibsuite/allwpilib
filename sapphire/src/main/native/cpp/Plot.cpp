@@ -3,8 +3,8 @@
 
 #include <imgui.h>
 #include <imgui_stdlib.h>
-#include <implot.h>
-#include <implot_internal.h>
+
+
 #include "fmt/format.h"
 
 #include <wpi/timestamp.h>
@@ -51,7 +51,6 @@ void EntryPlot::CreatePlot(PlotAxis& axis, int startts, int endts, float sampleR
             }
         }
         double timestamp = it->first*1e-6;
-        double timesteps = (timestamp - lastTimestamp)/sampleRate;
         if(timestamp - lastTimestamp > sampleRate){ // if we have not changed for a significant amount of time
             points.emplace_back(ImPlotPoint{timestamp-sampleRate - m_offset, lastValue});
         }
@@ -130,15 +129,15 @@ void Plot::EmitSettings(){
     if(!settings.m_autoheight){
     }
     std::vector<int> removed_idxs;
-    for(int i = 0; i < plots.size(); i++){
+    for(size_t i = 0; i < plots.size(); i++){
         auto& plot = plots[i];
         auto action = plot->EmitSettings();
         if(action == EntryPlot::ACTION_DELETE){
             removed_idxs.emplace_back(i);
         }
     }
-    for(int i = removed_idxs.size()-1; i >= 0; i--){
-        auto idx = removed_idxs[i];
+    for(size_t i = removed_idxs.size()-1; static_cast<int>(i) >= 0; i--){
+        size_t idx = removed_idxs[i];
         if(idx < plots.size()){
             plots.erase(plots.begin()+idx);
         }
@@ -183,7 +182,7 @@ void Plot::EmitPlot(){
 
 
         // setup y axes
-        for (int i = 0; i < m_axis.size(); ++i) {
+        for (size_t i = 0; i < m_axis.size(); ++i) {
             ImPlotAxisFlags flags = 0;
                 //   (m_axis[i].lockMin ? ImPlotAxisFlags_LockMin : 0) |
                 //   (m_axis[i].lockMax ? ImPlotAxisFlags_LockMax : 0) |
@@ -218,7 +217,6 @@ void Plot::EmitPlot(){
 
         DragDropTarget();
 
-        ImPlotPlot* plot = ImPlot::GetCurrentPlot();
         ImPlot::EndPlot();
     }
 }
