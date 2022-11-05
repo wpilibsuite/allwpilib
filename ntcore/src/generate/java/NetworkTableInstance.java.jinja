@@ -68,6 +68,7 @@ public final class NetworkTableInstance implements AutoCloseable {
     if (m_owned && m_handle != 0) {
       m_listeners.close();
       NetworkTablesJNI.destroyInstance(m_handle);
+      m_handle = 0;
     }
   }
 
@@ -986,5 +987,5 @@ public final class NetworkTableInstance implements AutoCloseable {
   }
 
   private boolean m_owned;
-  private final int m_handle;
+  private int m_handle;
 }

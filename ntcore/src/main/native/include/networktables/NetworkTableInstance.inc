@@ -27,9 +27,10 @@ inline NetworkTableInstance NetworkTableInstance::Create() {
   return NetworkTableInstance{CreateInstance()};
 }
 
-inline void NetworkTableInstance::Destroy(NetworkTableInstance inst) {
+inline void NetworkTableInstance::Destroy(NetworkTableInstance& inst) {
   if (inst.m_handle != 0) {
     DestroyInstance(inst.m_handle);
+    inst.m_handle = 0;
   }
 }
 
@@ -97,22 +98,6 @@ inline NT_Listener NetworkTableInstance::AddConnectionListener(
       m_handle,
       NT_EVENT_CONNECTION | (immediate_notify ? NT_EVENT_IMMEDIATE : 0),
       std::move(callback));
-}
-
-inline NT_Listener NetworkTableInstance::AddListener(
-    Topic topic, unsigned int eventMask, ListenerCallback listener) {
-  return ::nt::AddListener(topic.GetHandle(), eventMask, std::move(listener));
-}
-
-inline NT_Listener NetworkTableInstance::AddListener(
-    Subscriber& subscriber, unsigned int eventMask, ListenerCallback listener) {
-  return ::nt::AddListener(subscriber.GetHandle(), eventMask,
-                           std::move(listener));
-}
-
-inline NT_Listener NetworkTableInstance::AddListener(
-    NetworkTableEntry& entry, int eventMask, ListenerCallback listener) {
-  return ::nt::AddListener(entry.GetHandle(), eventMask, std::move(listener));
 }
 
 inline NT_Listener NetworkTableInstance::AddListener(

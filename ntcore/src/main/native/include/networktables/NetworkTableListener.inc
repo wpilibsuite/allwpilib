@@ -72,7 +72,11 @@ inline NetworkTableListener::NetworkTableListener(NetworkTableListener&& rhs)
 
 inline NetworkTableListener& NetworkTableListener::operator=(
     NetworkTableListener&& rhs) {
-  std::swap(m_handle, rhs.m_handle);
+  if (m_handle != 0) {
+    nt::RemoveListener(m_handle);
+  }
+  m_handle = rhs.m_handle;
+  rhs.m_handle = 0;
   return *this;
 }
 
@@ -102,7 +106,11 @@ inline NetworkTableListenerPoller::NetworkTableListenerPoller(
 
 inline NetworkTableListenerPoller& NetworkTableListenerPoller::operator=(
     NetworkTableListenerPoller&& rhs) {
-  std::swap(m_handle, rhs.m_handle);
+  if (m_handle != 0) {
+    nt::DestroyListenerPoller(m_handle);
+  }
+  m_handle = rhs.m_handle;
+  rhs.m_handle = 0;
   return *this;
 }
 

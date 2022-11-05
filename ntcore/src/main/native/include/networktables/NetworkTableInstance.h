@@ -132,7 +132,7 @@ class NetworkTableInstance final {
    *
    * @param inst Instance
    */
-  static void Destroy(NetworkTableInstance inst);
+  static void Destroy(NetworkTableInstance& inst);
 
   /**
    * Gets the native handle for the entry.

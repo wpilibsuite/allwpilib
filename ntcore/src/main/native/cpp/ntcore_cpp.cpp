@@ -497,6 +497,14 @@ NT_Listener AddPolledListener(NT_ListenerPoller poller,
 NT_Listener AddPolledListener(NT_ListenerPoller poller, NT_Handle handle,
                               unsigned int mask) {
   if (auto ii = InstanceImpl::GetTyped(poller, Handle::kListenerPoller)) {
+    if (Handle{handle}.GetInst() != Handle{poller}.GetInst()) {
+      WPI_ERROR(
+          ii->logger,
+          "AddPolledListener(): trying to listen to handle {} (instance {}) "
+          "with poller {} (instance {}), ignored due to different instance",
+          handle, Handle{handle}.GetInst(), poller, Handle{poller}.GetInst());
+      return {};
+    }
     auto listener = ii->listenerStorage.AddListener(poller);
     DoAddListener(*ii, listener, handle, mask);
     return listener;
