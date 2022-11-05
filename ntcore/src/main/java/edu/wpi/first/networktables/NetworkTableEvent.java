@@ -13,9 +13,6 @@ package edu.wpi.first.networktables;
 @SuppressWarnings("MemberName")
 public final class NetworkTableEvent {
   public enum Kind {
-    /** No flags. */
-    kNone(0x0000),
-
     /**
      * Initial listener addition. Set this to receive immediate notification of matches to other
      * criteria.
