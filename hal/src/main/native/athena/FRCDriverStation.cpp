@@ -30,7 +30,7 @@ struct HAL_JoystickAxesInt {
   int16_t count;
   int16_t axes[HAL_kMaxJoystickAxes];
 };
-}
+}  // namespace
 
 namespace {
 struct JoystickDataCache {
