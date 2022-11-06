@@ -92,7 +92,6 @@ public class AprilTagFieldLayout {
     m_fieldDimensions = fieldDimensions;
   }
 
-
   @JsonProperty("tags")
   public List<AprilTag> getTags() {
     return new ArrayList<>(m_apriltags.values());
