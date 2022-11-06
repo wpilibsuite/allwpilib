@@ -43,7 +43,7 @@ class DifferentialDriveFeedforwardTest {
                     dtSeconds);
             // left drivetrain check
             assertEquals(y.get(0, 0), nLVelocity, 1e-6);
-            // right drivetrain check)
+            // right drivetrain check
             assertEquals(y.get(1, 0), nRVelocity, 1e-6);
           }
         }
