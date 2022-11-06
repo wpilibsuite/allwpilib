@@ -111,6 +111,7 @@ class NSImpl {
 
   void HandleLocal();
   void LoadPersistent();
+  void SavePersistent(std::string_view filename, std::string_view data);
   void Init();
   void AddConnection(ServerConnection* conn, const ConnectionInfo& info);
   void RemoveConnection(ServerConnection* conn);
@@ -372,11 +373,16 @@ void NSImpl::LoadPersistent() {
   }
 }
 
-static void SavePersistent(std::string_view filename, std::string_view data) {
+void NSImpl::SavePersistent(std::string_view filename, std::string_view data) {
   // write to temporary file
   auto tmp = fmt::format("{}.tmp", filename);
   std::error_code ec;
   wpi::raw_fd_ostream os{tmp, ec, fs::F_Text};
+  if (ec.value() != 0) {
+    INFO("could not open persistent file '{}' for write: {}", tmp,
+         ec.message());
+    return;
+  }
   os << data;
   os.close();
   if (os.has_error()) {
@@ -414,9 +420,8 @@ void NSImpl::Init() {
     if (m_serverImpl.PersistentChanged()) {
       uv::QueueWork(
           m_loop,
-          [fn = m_persistentFilename, data = m_serverImpl.DumpPersistent()] {
-            SavePersistent(fn, data);
-          },
+          [this, fn = m_persistentFilename,
+           data = m_serverImpl.DumpPersistent()] { SavePersistent(fn, data); },
           nullptr);
     }
   });
