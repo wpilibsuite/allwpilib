@@ -14,6 +14,8 @@ import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.wpilibj.DriverStation;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
@@ -149,6 +151,20 @@ public class AprilTagFieldLayout {
    */
   public void serialize(Path path) throws IOException {
     new ObjectMapper().writeValue(path.toFile(), this);
+  }
+
+  /**
+   * Deserializes a field layout from a resource within a jar file.
+   *
+   * @param resourcePath The absolute path of the resource
+   * @return The deserialized layout
+   * @throws IOException If the resource could not be loaded
+   */
+  public static AprilTagFieldLayout loadFromResource(String resourcePath) throws IOException {
+    try (InputStream stream = AprilTagFieldLayout.class.getResourceAsStream(resourcePath);
+        InputStreamReader reader = new InputStreamReader(stream)) {
+      return new ObjectMapper().readerFor(AprilTagFieldLayout.class).readValue(reader);
+    }
   }
 
   @Override

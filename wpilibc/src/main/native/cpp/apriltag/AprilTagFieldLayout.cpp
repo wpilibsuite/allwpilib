@@ -83,7 +83,7 @@ bool AprilTagFieldLayout::operator!=(const AprilTagFieldLayout& other) const {
 
 void frc::to_json(wpi::json& json, const AprilTagFieldLayout& layout) {
   json = wpi::json{{"field",
-                    {{"length", layout.m_fieldLength.value()},
+                    {{"height", layout.m_fieldLength.value()},
                      {"width", layout.m_fieldWidth.value()}}},
                    {"tags", layout.m_apriltags}};
 }
@@ -91,7 +91,7 @@ void frc::to_json(wpi::json& json, const AprilTagFieldLayout& layout) {
 void frc::from_json(const wpi::json& json, AprilTagFieldLayout& layout) {
   layout.m_apriltags = json.at("tags").get<std::vector<AprilTag>>();
   layout.m_fieldLength =
-      units::meter_t{json.at("field").at("length").get<double>()};
+      units::meter_t{json.at("field").at("height").get<double>()};
   layout.m_fieldWidth =
       units::meter_t{json.at("field").at("width").get<double>()};
 }

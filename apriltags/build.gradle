@@ -1,0 +1,83 @@
+apply from: "${rootDir}/shared/resources.gradle"
+
+ext {
+    nativeName = 'apriltags'
+    devMain = 'edu.wpi.first.apriltags.DevMain'
+
+    def generateTask = createGenerateResourcesTask('main', 'APRILTAGS', 'frc', project)
+
+    tasks.withType(CppCompile) {
+        dependsOn generateTask
+    }
+    extraSetup = {
+        it.sources {
+            resourcesCpp(CppSourceSet) {
+                source {
+                    srcDirs "$buildDir/generated/main/cpp", "$rootDir/shared/singlelib"
+                    include '*.cpp'
+                }
+            }
+        }
+    }
+}
+
+evaluationDependsOn(':wpimath')
+evaluationDependsOn(':wpilibj')
+
+apply from: "${rootDir}/shared/javacpp/setupBuild.gradle"
+
+dependencies {
+    implementation project(':wpimath')
+    implementation project(':wpilibj')
+}
+
+sourceSets {
+    main {
+        resources {
+            srcDirs 'src/main/native/resources'
+        }
+    }
+}
+
+
+model {
+    components {}
+    binaries {
+        all {
+            if (!it.buildable || !(it instanceof NativeBinarySpec)) {
+                return
+            }
+            it.cppCompiler.define 'WPILIB_EXPORTS'
+            lib project: ':wpilibc', library: 'wpilibc', linkage: 'shared'
+
+            project(':ntcore').addNtcoreDependency(it, 'shared')
+            project(':hal').addHalDependency(it, 'shared')
+            lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
+            lib project: ':wpinet', library: 'wpinet', linkage: 'shared'
+            lib project: ':wpimath', library: 'wpimath', linkage: 'shared'
+
+            if ((it instanceof NativeExecutableBinarySpec || it instanceof GoogleTestTestSuiteBinarySpec) && it.targetPlatform.name == nativeUtils.wpi.platforms.roborio) {
+                nativeUtils.useRequiredLibrary(it, 'ni_link_libraries', 'ni_runtime_libraries')
+            }
+        }
+    }
+    tasks {
+        def c = $.components
+        def found = false
+        def systemArch = getCurrentArch()
+        c.each {
+            if (it in NativeExecutableSpec && it.name == "${nativeName}Dev") {
+                it.binaries.each {
+                    if (!found) {
+                        def arch = it.targetPlatform.name
+                        if (arch == systemArch) {
+                            def filePath = it.tasks.install.installDirectory.get().toString() + File.separatorChar + 'lib'
+
+                            found = true
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
