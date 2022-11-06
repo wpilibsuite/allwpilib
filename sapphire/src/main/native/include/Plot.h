@@ -75,13 +75,13 @@ private:
 
 class Plot{
 public:
-    Plot(float& now, std::string name, float sampleRate = 0.02f) : m_nowRef{now}, m_now{now}, m_name{name}, m_sampleRate{sampleRate} {
+    Plot(float& now, std::string& name, float sampleRate = 0.02f) : m_nowRef{now}, m_now{now}, m_name{name}, m_sampleRate{sampleRate} {
         m_axis.emplace_back(PlotAxis{m_name, 0, 0, true, false, true});
     };
     void Display() ;
     float& m_nowRef;
     float m_now;
-    std::string m_name;
+    std::string& m_name;
     float m_sampleRate;
     int m_height = 0;
 
@@ -105,7 +105,6 @@ private:
 class PlotProvider : private glass::WindowManager{
   public:
     explicit PlotProvider(Storage& storage, float& m_now);
-    ~PlotProvider() override;
     using glass::WindowManager::GlobalInit;
     void DisplayMenu() override;
     float& m_now;
@@ -113,14 +112,15 @@ class PlotProvider : private glass::WindowManager{
 
 class PlotView : public glass::View{
     public:
-    PlotView(PlotProvider *provider, float& now, std::string name) : provider{provider}, m_now{now}, m_name{name} {}
+    PlotView(PlotProvider *provider, float& now, Storage& storage);
     void Display() override;
     void EmitContextMenu();
-    float& m_now;
-    std::string m_name;
-    std::vector<std::unique_ptr<Plot> > plots;
-    float& m_now;
     PlotProvider *provider;
+    float& m_now;
+    std::string& m_name;
+    std::vector<std::unique_ptr<Storage> >& m_plotStorage;
+    std::vector<std::unique_ptr<Plot> > plots;
+    Storage& m_storage;
 };
 
 }

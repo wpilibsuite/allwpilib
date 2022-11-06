@@ -259,11 +259,23 @@ void Plot::NotifyChange(){
     settings.m_viewTime = m_now;
 }
 
+PlotView::PlotView(PlotProvider *provider, float& now, Storage& storage) : provider{provider}, 
+                    m_now{now}, 
+                    m_name{storage.GetString("name")},
+                    m_plotStorage{storage.GetChildArray("plots")},
+                    m_storage{storage} {
+    for(auto&& v : m_plotStorage){
+        plots.emplace_back(std::make_unique<Plot>(now, v->GetString("name")));
+    }
+}
+
 
 void PlotView::EmitContextMenu(){
     if (ImGui::BeginPopupContextItem(m_name.c_str())) {
         if(ImGui::Button("Add Plot")){
-            plots.emplace_back(std::make_unique<Plot>(m_now, fmt::format("Plot {}", plots.size()+1)));
+            m_plotStorage.emplace_back(std::make_unique<Storage>());
+            auto& name = m_plotStorage.back()->GetString("name", fmt::format("Plot {}", plots.size()+1));
+            plots.emplace_back(std::make_unique<Plot>(m_now, name));
         }
         for(auto& plot : plots){
             plot->EmitContextMenu();
@@ -276,7 +288,10 @@ void PlotView::Display(){
     EmitContextMenu();
     if(plots.size() == 0){
         if(ImGui::Button("Add Plot")){
-            plots.emplace_back(std::make_unique<Plot>(m_now, fmt::format("Plot {}", plots.size()+1)));
+            m_plotStorage.emplace_back(std::make_unique<Storage>());
+            auto& name = m_plotStorage.back()->GetString("name");
+            if(name == "") {name = fmt::format("Plot {}", plots.size()+1);}
+            plots.emplace_back(std::make_unique<Plot>(m_now, name));
         }
     }
     int availHeight = ImGui::GetContentRegionAvail().y;
@@ -313,7 +328,7 @@ PlotProvider::PlotProvider(Storage& storage, float& now) : glass::WindowManager(
             // get or create view
             auto view = static_cast<PlotView*>(win->GetView());
             if (!view) {
-                win->SetView(std::make_unique<PlotView>(this, m_now, std::string(windowkv.key())));
+                win->SetView(std::make_unique<PlotView>(this, m_now, windowkv.value()));
                 view = static_cast<PlotView*>(win->GetView());
             }
         }
@@ -355,11 +370,11 @@ void PlotProvider::DisplayMenu(){
       }
     }
     if (auto win = AddWindow(
-            id, std::make_unique<PlotView>(this, m_now, id))) {
+            id, std::make_unique<PlotView>(this, m_now, m_storage.GetChild(id)))) {
+      m_storage.GetChild(id).GetString(id, id);
       win->SetDefaultSize(700, 400);
     }
   }
 }
 
 
-PlotProvider::~PlotProvider() = default;

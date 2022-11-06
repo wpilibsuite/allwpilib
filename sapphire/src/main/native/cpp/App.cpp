@@ -100,10 +100,10 @@ void Application(std::string_view saveDir) {
                                       : saveDir);
   
   auto& storage = glass::GetStorageRoot().GetChild("Sapphire");
+  auto& plotStorage = glass::GetStorageRoot().GetChild("Plots");
 
   
   windowManager = std::make_unique<glass::WindowManager>(storage);
-  windowManager->GlobalInit();
 
   std::unique_ptr<Selector> selector = std::make_unique<Selector>();
   auto& logs = selector->GetDataLogs();
@@ -112,7 +112,9 @@ void Application(std::string_view saveDir) {
 
   auto& timestamp = logViewer->GetTimestamp();
 
-  plotProvider = std::make_unique<PlotProvider>(storage, timestamp);
+  plotProvider = std::make_unique<PlotProvider>(plotStorage, timestamp);
+
+  windowManager->GlobalInit();
   plotProvider->GlobalInit();
 
   m_logSelectorWindow = windowManager->AddWindow(
@@ -127,6 +129,8 @@ void Application(std::string_view saveDir) {
   gui::Initialize("Sapphire", 925, 510);
 
   gui::Main();
+  windowManager.reset();
+  plotProvider.reset();
 
   gShutdown = true;
   glass::DestroyContext();
