@@ -21,6 +21,7 @@
 #include <wpi/mutex.h>
 #include <wpi/timestamp.h>
 
+#include "FPGACalls.h"
 #include "HALInitializer.h"
 #include "HALInternal.h"
 #include "hal/ChipObject.h"
@@ -394,6 +395,11 @@ HAL_Bool HAL_Initialize(int32_t timeout, int32_t mode) {
     return true;
   }
 
+  int fpgaInit = hal::init::InitializeFPGA();
+  if (fpgaInit != HAL_SUCCESS) {
+    return false;
+  }
+
   hal::init::InitializeHAL();
 
   hal::init::HAL_IsInitialized.store(true);
@@ -426,11 +432,7 @@ HAL_Bool HAL_Initialize(int32_t timeout, int32_t mode) {
     return false;
   }
 
-  status = InterruptManager::Initialize(global->getSystemInterface());
-
-  if (status != 0) {
-    return false;
-  }
+  InterruptManager::Initialize(global->getSystemInterface());
 
   hal::InitializeDriverStation();
 

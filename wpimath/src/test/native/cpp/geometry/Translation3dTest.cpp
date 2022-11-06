@@ -126,3 +126,24 @@ TEST(Translation3dTest, PolarConstructor) {
   EXPECT_NEAR(two.Y().value(), std::sqrt(3.0), kEpsilon);
   EXPECT_NEAR(two.Z().value(), 0.0, kEpsilon);
 }
+
+TEST(Translation3dTest, Constexpr) {
+  constexpr Translation3d defaultCtor;
+  constexpr Translation3d componentCtor{1_m, 2_m, 3_m};
+  constexpr auto added = defaultCtor + componentCtor;
+  constexpr auto subtracted = defaultCtor - componentCtor;
+  constexpr auto negated = -componentCtor;
+  constexpr auto multiplied = componentCtor * 2;
+  constexpr auto divided = componentCtor / 2;
+  constexpr Translation2d projected = componentCtor.ToTranslation2d();
+
+  static_assert(defaultCtor.X() == 0_m);
+  static_assert(componentCtor.Y() == 2_m);
+  static_assert(added.Z() == 3_m);
+  static_assert(subtracted.X() == (-1_m));
+  static_assert(negated.Y() == (-2_m));
+  static_assert(multiplied.Z() == 6_m);
+  static_assert(divided.Y() == 1_m);
+  static_assert(projected.X() == 1_m);
+  static_assert(projected.Y() == 2_m);
+}

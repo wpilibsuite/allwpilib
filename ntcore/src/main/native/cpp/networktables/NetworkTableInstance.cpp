@@ -15,6 +15,7 @@
 #include "networktables/FloatTopic.h"
 #include "networktables/IntegerArrayTopic.h"
 #include "networktables/IntegerTopic.h"
+#include "networktables/MultiSubscriber.h"
 #include "networktables/RawTopic.h"
 #include "networktables/StringArrayTopic.h"
 #include "networktables/StringTopic.h"
@@ -100,8 +101,44 @@ void NetworkTableInstance::SetServer(std::span<const std::string_view> servers,
   SetServer(serversArr);
 }
 
-NT_ConnectionListener NetworkTableInstance::AddConnectionListener(
-    std::function<void(const ConnectionNotification& event)> callback,
-    bool immediate_notify) const {
-  return ::nt::AddConnectionListener(m_handle, callback, immediate_notify);
+NT_Listener NetworkTableInstance::AddListener(Topic topic,
+                                              unsigned int eventMask,
+                                              ListenerCallback listener) {
+  if (::nt::GetInstanceFromHandle(topic.GetHandle()) != m_handle) {
+    fmt::print(stderr, "AddListener: topic is not from this instance\n");
+    return 0;
+  }
+  return ::nt::AddListener(topic.GetHandle(), eventMask, std::move(listener));
+}
+
+NT_Listener NetworkTableInstance::AddListener(Subscriber& subscriber,
+                                              unsigned int eventMask,
+                                              ListenerCallback listener) {
+  if (::nt::GetInstanceFromHandle(subscriber.GetHandle()) != m_handle) {
+    fmt::print(stderr, "AddListener: subscriber is not from this instance\n");
+    return 0;
+  }
+  return ::nt::AddListener(subscriber.GetHandle(), eventMask,
+                           std::move(listener));
+}
+
+NT_Listener NetworkTableInstance::AddListener(NetworkTableEntry& entry,
+                                              int eventMask,
+                                              ListenerCallback listener) {
+  if (::nt::GetInstanceFromHandle(entry.GetHandle()) != m_handle) {
+    fmt::print(stderr, "AddListener: entry is not from this instance\n");
+    return 0;
+  }
+  return ::nt::AddListener(entry.GetHandle(), eventMask, std::move(listener));
+}
+
+NT_Listener NetworkTableInstance::AddListener(MultiSubscriber& subscriber,
+                                              int eventMask,
+                                              ListenerCallback listener) {
+  if (::nt::GetInstanceFromHandle(subscriber.GetHandle()) != m_handle) {
+    fmt::print(stderr, "AddListener: subscriber is not from this instance\n");
+    return 0;
+  }
+  return ::nt::AddListener(subscriber.GetHandle(), eventMask,
+                           std::move(listener));
 }

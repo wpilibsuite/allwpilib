@@ -49,12 +49,12 @@ struct ClientMessage;
 struct ServerMessage;
 }  // namespace net
 
-// class EntryNotification;
+class Event;
 class Handle;
 class PubSubOptions;
 class Value;
 
-// void PrintTo(const EntryNotification& event, std::ostream* os);
+void PrintTo(const Event& event, std::ostream* os);
 void PrintTo(const Handle& handle, std::ostream* os);
 void PrintTo(const net3::Message3& msg, std::ostream* os);
 void PrintTo(const net::ClientMessage& msg, std::ostream* os);

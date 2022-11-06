@@ -159,6 +159,8 @@ class ADIS16470_IMU : public nt::NTSendable,
 
   int SetYawAxis(IMUAxis yaw_axis);
 
+  bool IsConnected() const;
+
   // IMU yaw axis
   IMUAxis m_yaw_axis;
 
@@ -382,10 +384,12 @@ class ADIS16470_IMU : public nt::NTSendable,
   SPI* m_spi = nullptr;
   DigitalInput* m_auto_interrupt = nullptr;
   double m_scaled_sample_rate = 2500.0;  // Default sample rate setting
+  bool m_connected{false};
 
   std::thread m_acquire_task;
 
   hal::SimDevice m_simDevice;
+  hal::SimBoolean m_simConnected;
   hal::SimDouble m_simGyroAngleX;
   hal::SimDouble m_simGyroAngleY;
   hal::SimDouble m_simGyroAngleZ;

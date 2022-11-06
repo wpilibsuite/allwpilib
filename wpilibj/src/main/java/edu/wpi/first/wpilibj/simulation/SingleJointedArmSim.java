@@ -177,7 +177,7 @@ public class SingleJointedArmSim extends LinearSystemSim<N2, N1, N1> {
    * @return Whether the arm would hit the lower limit.
    */
   public boolean wouldHitLowerLimit(double currentAngleRads) {
-    return currentAngleRads < this.m_minAngle;
+    return currentAngleRads <= this.m_minAngle;
   }
 
   /**
@@ -187,7 +187,7 @@ public class SingleJointedArmSim extends LinearSystemSim<N2, N1, N1> {
    * @return Whether the arm would hit the upper limit.
    */
   public boolean wouldHitUpperLimit(double currentAngleRads) {
-    return currentAngleRads > this.m_maxAngle;
+    return currentAngleRads >= this.m_maxAngle;
   }
 
   /**

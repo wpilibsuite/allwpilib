@@ -25,10 +25,12 @@
 static_assert(sizeof(int32_t) >= sizeof(int),
               "FRC_NetworkComm status variable is larger than 32 bits");
 
+namespace {
 struct HAL_JoystickAxesInt {
   int16_t count;
   int16_t axes[HAL_kMaxJoystickAxes];
 };
+}  // namespace
 
 namespace {
 struct JoystickDataCache {
@@ -57,10 +59,11 @@ static wpi::mutex msgMutex;
 
 static int32_t HAL_GetJoystickAxesInternal(int32_t joystickNum,
                                            HAL_JoystickAxes* axes) {
-  JoystickAxes_t netcommAxes;
+  HAL_JoystickAxesInt netcommAxes;
 
   int retVal = FRC_NetworkCommunication_getJoystickAxes(
-      joystickNum, &netcommAxes, HAL_kMaxJoystickAxes);
+      joystickNum, reinterpret_cast<JoystickAxes_t*>(&netcommAxes),
+      HAL_kMaxJoystickAxes);
 
   // copy integer values to double values
   axes->count = netcommAxes.count;

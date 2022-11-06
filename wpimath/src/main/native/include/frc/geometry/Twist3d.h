@@ -79,7 +79,7 @@ struct WPILIB_DLLEXPORT Twist3d {
    * @param factor The factor by which to scale.
    * @return The scaled Twist3d.
    */
-  Twist3d operator*(double factor) const {
+  constexpr Twist3d operator*(double factor) const {
     return Twist3d{dx * factor, dy * factor, dz * factor,
                    rx * factor, ry * factor, rz * factor};
   }

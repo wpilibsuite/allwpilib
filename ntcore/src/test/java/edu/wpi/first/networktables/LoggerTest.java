@@ -28,8 +28,8 @@ class LoggerTest {
 
   @Test
   void addMessageTest() {
-    List<LogMessage> msgs = new ArrayList<>();
-    m_clientInst.addLogger(msgs::add, LogMessage.kInfo, 100);
+    List<NetworkTableEvent> msgs = new ArrayList<>();
+    m_clientInst.addLogger(LogMessage.kInfo, 100, msgs::add);
 
     m_clientInst.startClient4("client");
     m_clientInst.setServer("127.0.0.1", 10000);
@@ -37,7 +37,7 @@ class LoggerTest {
     // wait for client to report it's started, then wait another 0.1 sec
     try {
       int count = 0;
-      while ((m_clientInst.getNetworkMode() & NetworkTableInstance.kNetModeClient4) == 0) {
+      while (!m_clientInst.getNetworkMode().contains(NetworkTableInstance.NetworkMode.kClient4)) {
         Thread.sleep(100);
         count++;
         if (count > 30) {

@@ -29,21 +29,15 @@ typedef int NT_Bool;
 
 typedef unsigned int NT_Handle;
 typedef NT_Handle NT_ConnectionDataLogger;
-typedef NT_Handle NT_ConnectionListener;
-typedef NT_Handle NT_ConnectionListenerPoller;
 typedef NT_Handle NT_DataLogger;
 typedef NT_Handle NT_Entry;
 typedef NT_Handle NT_Inst;
-typedef NT_Handle NT_Logger;
-typedef NT_Handle NT_LoggerPoller;
+typedef NT_Handle NT_Listener;
+typedef NT_Handle NT_ListenerPoller;
 typedef NT_Handle NT_MultiSubscriber;
 typedef NT_Handle NT_Topic;
-typedef NT_Handle NT_TopicListener;
-typedef NT_Handle NT_TopicListenerPoller;
 typedef NT_Handle NT_Subscriber;
 typedef NT_Handle NT_Publisher;
-typedef NT_Handle NT_ValueListener;
-typedef NT_Handle NT_ValueListenerPoller;
 
 /** Default network tables port number (NT3) */
 #define NT_DEFAULT_PORT3 1735
@@ -103,20 +97,33 @@ enum NT_PubSubOptionType {
   NT_PUBSUB_KEEPDUPLICATES, /* preserve duplicate values */
 };
 
-/** Topic notification flags. */
-enum NT_TopicNotifyKind {
-  NT_TOPIC_NOTIFY_NONE = 0,
-  NT_TOPIC_NOTIFY_IMMEDIATE = 0x01,  /* initial listener addition */
-  NT_TOPIC_NOTIFY_PUBLISH = 0x02,    /* initially published */
-  NT_TOPIC_NOTIFY_UNPUBLISH = 0x04,  /* no more publishers */
-  NT_TOPIC_NOTIFY_PROPERTIES = 0x08, /* properties changed */
-};
-
-/** Value notification flags. */
-enum NT_ValueNotifyKind {
-  NT_VALUE_NOTIFY_NONE = 0,
-  NT_VALUE_NOTIFY_IMMEDIATE = 0x01, /* initial listener addition */
-  NT_VALUE_NOTIFY_LOCAL = 0x02,     /* changed locally */
+/** Event notification flags. */
+enum NT_EventFlags {
+  NT_EVENT_NONE = 0,
+  /** Initial listener addition. */
+  NT_EVENT_IMMEDIATE = 0x01,
+  /** Client connected (on server, any client connected). */
+  NT_EVENT_CONNECTED = 0x02,
+  /** Client disconnected (on server, any client disconnected). */
+  NT_EVENT_DISCONNECTED = 0x04,
+  /** Any connection event (connect or disconnect). */
+  NT_EVENT_CONNECTION = NT_EVENT_CONNECTED | NT_EVENT_DISCONNECTED,
+  /** New topic published. */
+  NT_EVENT_PUBLISH = 0x08,
+  /** Topic unpublished. */
+  NT_EVENT_UNPUBLISH = 0x10,
+  /** Topic properties changed. */
+  NT_EVENT_PROPERTIES = 0x20,
+  /** Any topic event (publish, unpublish, or properties changed). */
+  NT_EVENT_TOPIC = NT_EVENT_PUBLISH | NT_EVENT_UNPUBLISH | NT_EVENT_PROPERTIES,
+  /** Topic value updated (via network). */
+  NT_EVENT_VALUE_REMOTE = 0x40,
+  /** Topic value updated (local). */
+  NT_EVENT_VALUE_LOCAL = 0x80,
+  /** Topic value updated (network or local). */
+  NT_EVENT_VALUE_ALL = NT_EVENT_VALUE_REMOTE | NT_EVENT_VALUE_LOCAL,
+  /** Log message. */
+  NT_EVENT_LOGMESSAGE = 0x100,
 };
 
 /*
@@ -178,6 +185,7 @@ struct NT_Value {
   } data;
 };
 
+/** NetworkTables Topic Information */
 struct NT_TopicInfo {
   /** Topic handle */
   NT_Topic topic;
@@ -221,23 +229,8 @@ struct NT_ConnectionInfo {
   unsigned int protocol_version;
 };
 
-/** NetworkTables Topic Notification */
-struct NT_TopicNotification {
-  /** Listener that was triggered. */
-  NT_TopicListener listener;
-
-  /** Topic info. */
-  struct NT_TopicInfo info;
-
-  /** Update flags. */
-  unsigned int flags;
-};
-
-/** NetworkTables Value Notification */
-struct NT_ValueNotification {
-  /** Listener that was triggered. */
-  NT_ValueListener listener;
-
+/** NetworkTables value event data. */
+struct NT_ValueEventData {
   /** Topic handle. */
   NT_Topic topic;
 
@@ -246,31 +239,10 @@ struct NT_ValueNotification {
 
   /** The new value. */
   struct NT_Value value;
-
-  /**
-   * Update flags.  For example, NT_NOTIFY_NEW if the key did not previously
-   * exist.
-   */
-  unsigned int flags;
-};
-
-/** NetworkTables Connection Notification */
-struct NT_ConnectionNotification {
-  /** Listener that was triggered. */
-  NT_ConnectionListener listener;
-
-  /** True if event is due to connection being established. */
-  NT_Bool connected;
-
-  /** Connection info. */
-  struct NT_ConnectionInfo conn;
 };
 
 /** NetworkTables log message. */
 struct NT_LogMessage {
-  /** The logger that generated the message. */
-  NT_Logger logger;
-
   /** Log level of the message.  See NT_LogLevel. */
   unsigned int level;
 
@@ -282,6 +254,30 @@ struct NT_LogMessage {
 
   /** The message. */
   char* message;
+};
+
+/** NetworkTables event */
+struct NT_Event {
+  /** Listener that triggered this event. */
+  NT_Handle listener;
+
+  /**
+   * Event flags (NT_EventFlags). Also indicates the data included with the
+   * event:
+   * - NT_EVENT_CONNECTED or NT_EVENT_DISCONNECTED: connInfo
+   * - NT_EVENT_PUBLISH, NT_EVENT_UNPUBLISH, or NT_EVENT_PROPERTIES: topicInfo
+   * - NT_EVENT_VALUE_REMOTE, NT_NOTIFY_VALUE_LOCAL: valueData
+   * - NT_EVENT_LOGMESSAGE: logMessage
+   */
+  unsigned int flags;
+
+  /** Event data; content depends on flags. */
+  union {
+    struct NT_ConnectionInfo connInfo;
+    struct NT_TopicInfo topicInfo;
+    struct NT_ValueEventData valueData;
+    struct NT_LogMessage logMessage;
+  } data;
 };
 
 /** NetworkTables publish/subscribe option. */
@@ -804,307 +800,184 @@ void NT_UnsubscribeMultiple(NT_MultiSubscriber sub);
 /** @} */
 
 /**
- * @defgroup ntcore_topiclistener_cfunc Topic Listener Functions
+ * @defgroup ntcore_listener_cfunc Listener Functions
  * @{
  */
 
 /**
- * Topic listener callback function.
+ * Event listener callback function.
  *
  * @param data            data pointer provided to callback creation function
  * @param event           event info
  */
-typedef void (*NT_TopicListenerCallback)(
-    void* data, const struct NT_TopicNotification* event);
+typedef void (*NT_ListenerCallback)(void* data, const struct NT_Event* event);
+
+/**
+ * Creates a listener poller.
+ *
+ * A poller provides a single queue of poll events.  Events linked to this
+ * poller (using NT_AddPolledXListener()) will be stored in the queue and
+ * must be collected by calling NT_ReadListenerQueue().
+ * The returned handle must be destroyed with NT_DestroyListenerPoller().
+ *
+ * @param inst      instance handle
+ * @return poller handle
+ */
+NT_ListenerPoller NT_CreateListenerPoller(NT_Inst inst);
+
+/**
+ * Destroys a listener poller.  This will abort any blocked polling
+ * call and prevent additional events from being generated for this poller.
+ *
+ * @param poller    poller handle
+ */
+void NT_DestroyListenerPoller(NT_ListenerPoller poller);
+
+/**
+ * Read notifications.
+ *
+ * @param poller    poller handle
+ * @param len       length of returned array (output)
+ * @return Array of events.  Returns NULL and len=0 if no events since last
+ *         call.
+ */
+struct NT_Event* NT_ReadListenerQueue(NT_ListenerPoller poller, size_t* len);
+
+/**
+ * Removes a listener.
+ *
+ * @param listener Listener handle to remove
+ */
+void NT_RemoveListener(NT_Listener listener);
+
+/**
+ * Wait for the listener queue to be empty. This is primarily useful
+ * for deterministic testing. This blocks until either the listener
+ * queue is empty (e.g. there are no more events that need to be passed along to
+ * callbacks or poll queues) or the timeout expires.
+ *
+ * @param handle  handle
+ * @param timeout timeout, in seconds. Set to 0 for non-blocking behavior, or a
+ *                negative value to block indefinitely
+ * @return False if timed out, otherwise true.
+ */
+NT_Bool NT_WaitForListenerQueue(NT_Handle handle, double timeout);
 
 /**
  * Create a listener for changes to topics with names that start with
- * the given prefix.
+ * the given prefix. This creates a corresponding internal subscriber with the
+ * lifetime of the listener.
  *
  * @param inst Instance handle
  * @param prefix Topic name string prefix
  * @param prefix_len Length of topic name string prefix
- * @param mask Bitmask of NT_TopicListenerFlags values
+ * @param mask Bitmask of NT_EventFlags values (only topic and value events will
+ *             be generated)
  * @param data Data passed to callback function
  * @param callback Listener function
+ * @return Listener handle
  */
-NT_TopicListener NT_AddTopicListener(NT_Inst inst, const char* prefix,
-                                     size_t prefix_len, unsigned int mask,
-                                     void* data,
-                                     NT_TopicListenerCallback callback);
+NT_Listener NT_AddListenerSingle(NT_Inst inst, const char* prefix,
+                                 size_t prefix_len, unsigned int mask,
+                                 void* data, NT_ListenerCallback callback);
 
 /**
  * Create a listener for changes to topics with names that start with any of
- * the given prefixes.
+ * the given prefixes. This creates a corresponding internal subscriber with the
+ * lifetime of the listener.
  *
  * @param inst Instance handle
  * @param prefixes Topic name string prefixes
  * @param prefixes_len Number of elements in prefixes array
- * @param mask Bitmask of NT_TopicListenerFlags values
+ * @param mask Bitmask of NT_EventFlags values (only topic and value events will
+ *             be generated)
  * @param data Data passed to callback function
  * @param callback Listener function
+ * @return Listener handle
  */
-NT_TopicListener NT_AddTopicListenerMultiple(NT_Inst inst,
-                                             const struct NT_String* prefixes,
-                                             size_t prefixes_len,
-                                             unsigned int mask, void* data,
-                                             NT_TopicListenerCallback callback);
+NT_Listener NT_AddListenerMultiple(NT_Inst inst,
+                                   const struct NT_String* prefixes,
+                                   size_t prefixes_len, unsigned int mask,
+                                   void* data, NT_ListenerCallback callback);
 
 /**
- * Create a listener for changes on a particular topic.
+ * Create a listener.
  *
- * @param topic Topic handle
- * @param mask Bitmask of NT_TopicListenerFlags values
+ * Some combinations of handle and mask have no effect:
+ * - connection and log message events are only generated on instances
+ * - topic and value events are only generated on non-instances
+ *
+ * Adding value and topic events on a topic will create a corresponding internal
+ * subscriber with the lifetime of the listener.
+ *
+ * Adding a log message listener through this function will only result in
+ * events at NT_LOG_INFO or higher; for more customized settings, use
+ * NT_AddLogger().
+ *
+ * @param handle Handle
+ * @param mask Bitmask of NT_EventFlags values
  * @param data Data passed to callback function
  * @param callback Listener function
+ * @return Listener handle
  */
-NT_TopicListener NT_AddTopicListenerSingle(NT_Topic topic, unsigned int mask,
-                                           void* data,
-                                           NT_TopicListenerCallback callback);
+NT_Listener NT_AddListener(NT_Handle handle, unsigned int mask, void* data,
+                           NT_ListenerCallback callback);
 
 /**
- * Creates a topic listener poller.
- *
- * A poller provides a single queue of poll events.  Events linked to this
- * poller (using NT_AddPolledTopicListener()) will be stored in the queue and
- * must be collected by calling NT_ReadTopicListenerQueue().
- * The returned handle must be destroyed with NT_DestroyTopicListenerPoller().
- *
- * @param inst      instance handle
- * @return poller handle
- */
-NT_TopicListenerPoller NT_CreateTopicListenerPoller(NT_Inst inst);
-
-/**
- * Destroys a topic listener poller.  This will abort any blocked polling
- * call and prevent additional events from being generated for this poller.
- *
- * @param poller    poller handle
- */
-void NT_DestroyTopicListenerPoller(NT_TopicListenerPoller poller);
-
-/**
- * Read topic notifications.
- *
- * @param poller    poller handle
- * @param len       length of returned array (output)
- * @return Array of topic notifications.  Returns NULL and len=0 if no
- *         notifications since last call.
- */
-struct NT_TopicNotification* NT_ReadTopicListenerQueue(
-    NT_TopicListenerPoller poller, size_t* len);
-
-/**
- * Creates a polled topic listener.
- * The caller is responsible for calling NT_ReadTopicListenerQueue() to poll.
+ * Creates a polled topic listener. This creates a corresponding internal
+ * subscriber with the lifetime of the listener.
+ * The caller is responsible for calling NT_ReadListenerQueue() to poll.
  *
  * @param poller            poller handle
  * @param prefix            UTF-8 string prefix
  * @param prefix_len        Length of UTF-8 string prefix
- * @param mask              NT_NotifyKind bitmask
+ * @param mask              NT_EventFlags bitmask (only topic and value events
+ * will be generated)
  * @return Listener handle
  */
-NT_TopicListener NT_AddPolledTopicListener(NT_TopicListenerPoller poller,
-                                           const char* prefix,
-                                           size_t prefix_len,
-                                           unsigned int mask);
+NT_Listener NT_AddPolledListenerSingle(NT_ListenerPoller poller,
+                                       const char* prefix, size_t prefix_len,
+                                       unsigned int mask);
 
 /**
- * Creates a polled topic listener.
- * The caller is responsible for calling NT_ReadTopicListenerQueue() to poll.
+ * Creates a polled topic listener. This creates a corresponding internal
+ * subscriber with the lifetime of the listener.
+ * The caller is responsible for calling NT_ReadListenerQueue() to poll.
  *
  * @param poller            poller handle
  * @param prefixes          array of UTF-8 string prefixes
  * @param prefixes_len      Length of prefixes array
+ * @param mask              NT_EventFlags bitmask (only topic and value events
+ * will be generated)
+ * @return Listener handle
+ */
+NT_Listener NT_AddPolledListenerMultiple(NT_ListenerPoller poller,
+                                         const struct NT_String* prefixes,
+                                         size_t prefixes_len,
+                                         unsigned int mask);
+
+/**
+ * Creates a polled listener.
+ * The caller is responsible for calling NT_ReadListenerQueue() to poll.
+ *
+ * Some combinations of handle and mask have no effect:
+ * - connection and log message events are only generated on instances
+ * - topic and value events are only generated on non-instances
+ *
+ * Adding value and topic events on a topic will create a corresponding internal
+ * subscriber with the lifetime of the listener.
+ *
+ * Adding a log message listener through this function will only result in
+ * events at NT_LOG_INFO or higher; for more customized settings, use
+ * NT_AddPolledLogger().
+ *
+ * @param poller            poller handle
+ * @param handle            handle
  * @param mask              NT_NotifyKind bitmask
  * @return Listener handle
  */
-NT_TopicListener NT_AddPolledTopicListenerMultiple(
-    NT_TopicListenerPoller poller, const struct NT_String* prefixes,
-    size_t prefixes_len, unsigned int mask);
-
-/**
- * Creates a polled topic listener.
- * The caller is responsible for calling NT_ReadTopicListenerQueue() to poll.
- *
- * @param poller            poller handle
- * @param topic             topic
- * @param mask              NT_NotifyKind bitmask
- * @return Listener handle
- */
-NT_TopicListener NT_AddPolledTopicListenerSingle(NT_TopicListenerPoller poller,
-                                                 NT_Topic topic,
-                                                 unsigned int mask);
-
-/**
- * Removes a topic listener.
- *
- * @param topic_listener Listener handle to remove
- */
-void NT_RemoveTopicListener(NT_TopicListener topic_listener);
-
-/** @} */
-
-/**
- * @defgroup ntcore_valuelistener_cfunc Value Listener Functions
- * @{
- */
-
-/**
- * Value listener callback function.
- *
- * @param data            data pointer provided to callback creation function
- * @param event           event info
- */
-typedef void (*NT_ValueListenerCallback)(
-    void* data, const struct NT_ValueNotification* event);
-
-/**
- * Create a listener for value changes on a subscriber.
- *
- * @param subentry Subscriber/entry
- * @param mask Bitmask of NT_ValueListenerFlags values
- * @param data Data passed to listener function
- * @param callback Listener function
- */
-NT_ValueListener NT_AddValueListener(NT_Handle subentry, unsigned int mask,
-                                     void* data,
-                                     NT_ValueListenerCallback callback);
-
-/**
- * Create a value listener poller.
- *
- * A poller provides a single queue of poll events.  Events linked to this
- * poller (using NT_AddPolledValueListener()) will be stored in the queue and
- * must be collected by calling NT_ReadValueListenerQueue().
- * The returned handle must be destroyed with NT_DestroyValueListenerPoller().
- *
- * @param inst      instance handle
- * @return poller handle
- */
-NT_ValueListenerPoller NT_CreateValueListenerPoller(NT_Inst inst);
-
-/**
- * Destroy a value listener poller.  This will abort any blocked polling
- * call and prevent additional events from being generated for this poller.
- *
- * @param poller    poller handle
- */
-void NT_DestroyValueListenerPoller(NT_ValueListenerPoller poller);
-
-/**
- * Reads value listener queue (all value changes since last call).
- *
- * @param poller    poller handle
- * @param len       length of returned array (output)
- * @return Array of value notifications.  Returns NULL and len=0 if no
- *         notifications since last call.
- */
-struct NT_ValueNotification* NT_ReadValueListenerQueue(
-    NT_ValueListenerPoller poller, size_t* len);
-
-/**
- * Create a polled value listener.
- * The caller is responsible for calling NT_ReadValueListenerQueue() to poll.
- *
- * @param poller            poller handle
- * @param subentry          subscriber or entry handle
- * @param flags             NT_NotifyKind bitmask
- * @return Listener handle
- */
-NT_ValueListener NT_AddPolledValueListener(NT_ValueListenerPoller poller,
-                                           NT_Handle subentry,
-                                           unsigned int flags);
-
-/**
- * Remove a value listener.
- *
- * @param value_listener Listener handle to remove
- */
-void NT_RemoveValueListener(NT_ValueListener value_listener);
-
-/** @} */
-
-/**
- * @defgroup ntcore_connectionlistener_cfunc Connection Listener Functions
- * @{
- */
-
-/**
- * Connection listener callback function.
- * Called when a network connection is made or lost.
- *
- * @param data            data pointer provided to callback creation function
- * @param event           event info
- */
-typedef void (*NT_ConnectionListenerCallback)(
-    void* data, const struct NT_ConnectionNotification* event);
-
-/**
- * Add a connection listener.
- *
- * @param inst              instance handle
- * @param data              data pointer to pass to callback
- * @param callback          listener to add
- * @param immediate_notify  notify listener of all existing connections
- * @return Listener handle
- */
-NT_ConnectionListener NT_AddConnectionListener(
-    NT_Inst inst, void* data, NT_ConnectionListenerCallback callback,
-    NT_Bool immediate_notify);
-
-/**
- * Create a connection listener poller.
- * A poller provides a single queue of poll events.  Events linked to this
- * poller (using NT_AddPolledConnectionListener()) will be stored in the queue
- * and must be collected by calling NT_PollConnectionListener().
- * The returned handle must be destroyed with
- * NT_DestroyConnectionListenerPoller().
- *
- * @param inst      instance handle
- * @return poller handle
- */
-NT_ConnectionListenerPoller NT_CreateConnectionListenerPoller(NT_Inst inst);
-
-/**
- * Destroy a connection listener poller.  This will abort any blocked polling
- * call and prevent additional events from being generated for this poller.
- *
- * @param poller    poller handle
- */
-void NT_DestroyConnectionListenerPoller(NT_ConnectionListenerPoller poller);
-
-/**
- * Create a polled connection listener.
- * The caller is responsible for calling NT_PollConnectionListener() to poll.
- *
- * @param poller            poller handle
- * @param immediate_notify  notify listener of all existing connections
- */
-NT_ConnectionListener NT_AddPolledConnectionListener(
-    NT_ConnectionListenerPoller poller, NT_Bool immediate_notify);
-
-/**
- * Get the next connection event.  This blocks until the next connect or
- * disconnect occurs.  This is intended to be used with
- * NT_AddPolledConnectionListener(); connection listeners created using
- * NT_AddConnectionListener() will not be serviced through this function.
- *
- * @param poller    poller handle
- * @param len       length of returned array (output)
- * @return Array of information on the connection events.  Only returns NULL
- *         if an error occurred (e.g. the instance was invalid or is shutting
- *         down).
- */
-struct NT_ConnectionNotification* NT_ReadConnectionListenerQueue(
-    NT_ConnectionListenerPoller poller, size_t* len);
-
-/**
- * Remove a connection listener.
- *
- * @param conn_listener Listener handle to remove
- */
-void NT_RemoveConnectionListener(NT_ConnectionListener conn_listener);
+NT_Listener NT_AddPolledListener(NT_ListenerPoller poller, NT_Handle handle,
+                                 unsigned int mask);
 
 /** @} */
 
@@ -1351,67 +1224,19 @@ void NT_DisposeTopicInfoArray(struct NT_TopicInfo* arr, size_t count);
 void NT_DisposeTopicInfo(struct NT_TopicInfo* info);
 
 /**
- * Disposes an topic notification array.
+ * Disposes an event array.
  *
  * @param arr   pointer to the array to dispose
  * @param count number of elements in the array
  */
-void NT_DisposeTopicNotificationArray(struct NT_TopicNotification* arr,
-                                      size_t count);
+void NT_DisposeEventArray(struct NT_Event* arr, size_t count);
 
 /**
- * Disposes a single topic notification.
+ * Disposes a single event.
  *
- * @param info  pointer to the info to dispose
+ * @param event  pointer to the event to dispose
  */
-void NT_DisposeTopicNotification(struct NT_TopicNotification* info);
-
-/**
- * Disposes an value notification array.
- *
- * @param arr   pointer to the array to dispose
- * @param count number of elements in the array
- */
-void NT_DisposeValueNotificationArray(struct NT_ValueNotification* arr,
-                                      size_t count);
-
-/**
- * Disposes a single value notification.
- *
- * @param info  pointer to the info to dispose
- */
-void NT_DisposeValueNotification(struct NT_ValueNotification* info);
-
-/**
- * Disposes a connection notification array.
- *
- * @param arr   pointer to the array to dispose
- * @param count number of elements in the array
- */
-void NT_DisposeConnectionNotificationArray(
-    struct NT_ConnectionNotification* arr, size_t count);
-
-/**
- * Disposes a single connection notification.
- *
- * @param info  pointer to the info to dispose
- */
-void NT_DisposeConnectionNotification(struct NT_ConnectionNotification* info);
-
-/**
- * Disposes a log message array.
- *
- * @param arr   pointer to the array to dispose
- * @param count number of elements in the array
- */
-void NT_DisposeLogMessageArray(struct NT_LogMessage* arr, size_t count);
-
-/**
- * Disposes a single log message.
- *
- * @param info  pointer to the info to dispose
- */
-void NT_DisposeLogMessage(struct NT_LogMessage* info);
+void NT_DisposeEvent(struct NT_Event* event);
 
 /**
  * Returns monotonic current time in 1 us increments.
@@ -1443,14 +1268,6 @@ void NT_SetNow(uint64_t timestamp);
  */
 
 /**
- * Log function.
- *
- * @param data    data pointer passed to NT_AddLogger()
- * @param msg     message information
- */
-typedef void (*NT_LogFunc)(void* data, const struct NT_LogMessage* msg);
-
-/**
  * Add logger callback function.  By default, log messages are sent to stderr;
  * this function sends log messages to the provided callback function instead.
  * The callback function will only be called for log messages with level
@@ -1458,61 +1275,28 @@ typedef void (*NT_LogFunc)(void* data, const struct NT_LogMessage* msg);
  * messages outside this range will be silently ignored.
  *
  * @param inst        instance handle
- * @param data        data pointer to pass to func
- * @param func        log callback function
  * @param min_level   minimum log level
  * @param max_level   maximum log level
- * @return Logger handle
+ * @param data        data pointer to pass to func
+ * @param func        listener callback function
+ * @return Listener handle
  */
-NT_Logger NT_AddLogger(NT_Inst inst, void* data, NT_LogFunc func,
-                       unsigned int min_level, unsigned int max_level);
+NT_Listener NT_AddLogger(NT_Inst inst, unsigned int min_level,
+                         unsigned int max_level, void* data,
+                         NT_ListenerCallback func);
 
 /**
- * Create a log poller.  A poller provides a single queue of poll events.
- * The returned handle must be destroyed with NT_DestroyLoggerPoller().
- *
- * @param inst      instance handle
- * @return poller handle
- */
-NT_LoggerPoller NT_CreateLoggerPoller(NT_Inst inst);
-
-/**
- * Destroy a log poller.  This will abort any blocked polling call and prevent
- * additional events from being generated for this poller.
- *
- * @param poller    poller handle
- */
-void NT_DestroyLoggerPoller(NT_LoggerPoller poller);
-
-/**
- * Set the log level for a log poller.  Events will only be generated for
+ * Set the log level for a listener poller.  Events will only be generated for
  * log messages with level greater than or equal to min_level and less than or
  * equal to max_level; messages outside this range will be silently ignored.
  *
  * @param poller        poller handle
  * @param min_level     minimum log level
  * @param max_level     maximum log level
- * @return Logger handle
+ * @return Listener handle
  */
-NT_Logger NT_AddPolledLogger(NT_LoggerPoller poller, unsigned int min_level,
-                             unsigned int max_level);
-
-/**
- * Get the next log event.  This blocks until the next log occurs.
- *
- * @param poller    poller handle
- * @param len       length of returned array (output)
- * @return Array of information on the log events.  Only returns NULL if an
- *         error occurred (e.g. the instance was invalid or is shutting down).
- */
-struct NT_LogMessage* NT_ReadLoggerQueue(NT_LoggerPoller poller, size_t* len);
-
-/**
- * Remove a logger.
- *
- * @param logger Logger handle to remove
- */
-void NT_RemoveLogger(NT_Logger logger);
+NT_Listener NT_AddPolledLogger(NT_ListenerPoller poller, unsigned int min_level,
+                               unsigned int max_level);
 
 /** @} */
 

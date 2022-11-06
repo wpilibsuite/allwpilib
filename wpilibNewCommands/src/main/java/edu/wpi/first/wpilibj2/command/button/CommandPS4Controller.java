@@ -4,7 +4,6 @@
 
 package edu.wpi.first.wpilibj2.command.button;
 
-import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.PS4Controller;
 import edu.wpi.first.wpilibj.event.EventLoop;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
@@ -34,7 +33,7 @@ public class CommandPS4Controller extends CommandGenericHID {
    * @return the wrapped GenericHID object
    */
   @Override
-  public GenericHID getHID() {
+  public PS4Controller getHID() {
     return m_hid;
   }
 

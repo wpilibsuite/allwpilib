@@ -57,11 +57,11 @@ public class RobotContainer {
   private void configureButtonBindings() {
     // Drive forward by 3 meters when the 'A' button is pressed, with a timeout of 10 seconds
     new JoystickButton(m_driverController, Button.kA.value)
-        .whenPressed(new DriveDistanceProfiled(3, m_robotDrive).withTimeout(10));
+        .onTrue(new DriveDistanceProfiled(3, m_robotDrive).withTimeout(10));
 
     // Do the same thing as above when the 'B' button is pressed, but defined inline
     new JoystickButton(m_driverController, Button.kB.value)
-        .whenPressed(
+        .onTrue(
             new TrapezoidProfileCommand(
                     new TrapezoidProfile(
                         // Limit the max acceleration and velocity
@@ -79,8 +79,8 @@ public class RobotContainer {
 
     // Drive at half speed when the bumper is held
     new JoystickButton(m_driverController, Button.kRightBumper.value)
-        .whenPressed(() -> m_robotDrive.setMaxOutput(0.5))
-        .whenReleased(() -> m_robotDrive.setMaxOutput(1));
+        .onTrue(new InstantCommand(() -> m_robotDrive.setMaxOutput(0.5)))
+        .onFalse(new InstantCommand(() -> m_robotDrive.setMaxOutput(1)));
   }
 
   /**

@@ -49,10 +49,10 @@ void ConnectionListenerTest::Connect(const char* address, unsigned int port3,
 
 TEST_F(ConnectionListenerTest, Polled) {
   // set up the poller
-  NT_ConnectionListenerPoller poller =
-      nt::CreateConnectionListenerPoller(server_inst);
+  NT_ListenerPoller poller = nt::CreateListenerPoller(server_inst);
   ASSERT_NE(poller, 0u);
-  NT_ConnectionListener handle = nt::AddPolledConnectionListener(poller, false);
+  NT_Listener handle =
+      nt::AddPolledListener(poller, server_inst, nt::EventFlags::kConnection);
   ASSERT_NE(handle, 0u);
 
   // trigger a connect event
@@ -62,10 +62,11 @@ TEST_F(ConnectionListenerTest, Polled) {
   bool timed_out = false;
   ASSERT_TRUE(wpi::WaitForObject(poller, 1.0, &timed_out));
   ASSERT_FALSE(timed_out);
-  auto result = nt::ReadConnectionListenerQueue(poller);
+  auto result = nt::ReadListenerQueue(poller);
   ASSERT_EQ(result.size(), 1u);
   EXPECT_EQ(handle, result[0].listener);
-  EXPECT_TRUE(result[0].connected);
+  EXPECT_TRUE(result[0].GetConnectionInfo());
+  EXPECT_EQ(result[0].flags, nt::EventFlags::kConnected);
 
   // trigger a disconnect event
   nt::StopClient(client_inst);
@@ -75,10 +76,11 @@ TEST_F(ConnectionListenerTest, Polled) {
   timed_out = false;
   ASSERT_TRUE(wpi::WaitForObject(poller, 1.0, &timed_out));
   ASSERT_FALSE(timed_out);
-  result = nt::ReadConnectionListenerQueue(poller);
+  result = nt::ReadListenerQueue(poller);
   ASSERT_EQ(result.size(), 1u);
   EXPECT_EQ(handle, result[0].listener);
-  EXPECT_FALSE(result[0].connected);
+  EXPECT_TRUE(result[0].GetConnectionInfo());
+  EXPECT_EQ(result[0].flags, nt::EventFlags::kDisconnected);
 }
 
 class ConnectionListenerVariantTest
@@ -87,14 +89,12 @@ class ConnectionListenerVariantTest
 
 TEST_P(ConnectionListenerVariantTest, Threaded) {
   wpi::mutex m;
-  std::vector<nt::ConnectionNotification> result;
-  auto handle = nt::AddConnectionListener(
-      server_inst,
-      [&](const nt::ConnectionNotification& event) {
-        std::scoped_lock lock{m};
-        result.push_back(event);
-      },
-      false);
+  std::vector<nt::Event> result;
+  auto handle = nt::AddListener(server_inst, nt::EventFlags::kConnection,
+                                [&](auto& event) {
+                                  std::scoped_lock lock{m};
+                                  result.push_back(event);
+                                });
 
   // trigger a connect event
   Connect(GetParam().first, 0, 20001 + GetParam().second);
@@ -108,7 +108,8 @@ TEST_P(ConnectionListenerVariantTest, Threaded) {
     std::scoped_lock lock{m};
     ASSERT_EQ(result.size(), 1u);
     EXPECT_EQ(handle, result[0].listener);
-    EXPECT_TRUE(result[0].connected);
+    EXPECT_TRUE(result[0].GetConnectionInfo());
+    EXPECT_EQ(result[0].flags, nt::EventFlags::kConnected);
     result.clear();
   }
 
@@ -116,12 +117,16 @@ TEST_P(ConnectionListenerVariantTest, Threaded) {
   nt::StopClient(client_inst);
   std::this_thread::sleep_for(std::chrono::milliseconds(100));
 
+  // wait for thread
+  nt::WaitForListenerQueue(server_inst, 1.0);
+
   // get the event
   {
     std::scoped_lock lock{m};
     ASSERT_EQ(result.size(), 1u);
     EXPECT_EQ(handle, result[0].listener);
-    EXPECT_FALSE(result[0].connected);
+    EXPECT_TRUE(result[0].GetConnectionInfo());
+    EXPECT_EQ(result[0].flags, nt::EventFlags::kDisconnected);
   }
 }
 

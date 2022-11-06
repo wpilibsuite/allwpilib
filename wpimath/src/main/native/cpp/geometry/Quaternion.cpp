@@ -4,6 +4,8 @@
 
 #include "frc/geometry/Quaternion.h"
 
+#include <wpi/json.h>
+
 using namespace frc;
 
 Quaternion::Quaternion(double w, double x, double y, double z)
@@ -80,4 +82,17 @@ Eigen::Vector3d Quaternion::ToRotationVector() const {
       return 2.0 * std::atan2(norm, W()) / norm * m_v;
     }
   }
+}
+
+void frc::to_json(wpi::json& json, const Quaternion& quaternion) {
+  json = wpi::json{{"W", quaternion.W()},
+                   {"X", quaternion.X()},
+                   {"Y", quaternion.Y()},
+                   {"Z", quaternion.Z()}};
+}
+
+void frc::from_json(const wpi::json& json, Quaternion& quaternion) {
+  quaternion =
+      Quaternion{json.at("W").get<double>(), json.at("X").get<double>(),
+                 json.at("Y").get<double>(), json.at("Z").get<double>()};
 }

@@ -27,9 +27,11 @@ class FloatArrayTopic;
 class FloatTopic;
 class IntegerArrayTopic;
 class IntegerTopic;
+class MultiSubscriber;
 class RawTopic;
 class StringArrayTopic;
 class StringTopic;
+class Subscriber;
 class Topic;
 
 /**
@@ -130,7 +132,7 @@ class NetworkTableInstance final {
    *
    * @param inst Instance
    */
-  static void Destroy(NetworkTableInstance inst);
+  static void Destroy(NetworkTableInstance& inst);
 
   /**
    * Gets the native handle for the entry.
@@ -355,26 +357,115 @@ class NetworkTableInstance final {
 
   /**
    * @{
-   * @name Connection Listener Functions
+   * @name Listener Functions
    */
 
   /**
-   * Add a connection listener.
+   * Remove a listener.
    *
-   * @param callback          listener to add
+   * @param listener Listener handle to remove
+   */
+  static void RemoveListener(NT_Listener listener);
+
+  /**
+   * Wait for the listener queue to be empty. This is primarily
+   * useful for deterministic testing. This blocks until either the
+   * listener queue is empty (e.g. there are no more events that need to be
+   * passed along to callbacks or poll queues) or the timeout expires.
+   *
+   * @param timeout timeout, in seconds. Set to 0 for non-blocking behavior, or
+   *                a negative value to block indefinitely
+   * @return False if timed out, otherwise true.
+   */
+  bool WaitForListenerQueue(double timeout);
+
+  /**
+   * Add a connection listener. The callback function is called asynchronously
+   * on a separate thread, so it's important to use synchronization or atomics
+   * when accessing any shared state from the callback function.
+   *
    * @param immediate_notify  notify listener of all existing connections
+   * @param callback          listener to add
    * @return Listener handle
    */
-  NT_ConnectionListener AddConnectionListener(
-      std::function<void(const ConnectionNotification& event)> callback,
-      bool immediate_notify) const;
+  NT_Listener AddConnectionListener(bool immediate_notify,
+                                    ListenerCallback callback) const;
 
   /**
-   * Remove a connection listener.
+   * Add a listener for changes on a particular topic. The callback
+   * function is called asynchronously on a separate thread, so it's important
+   * to use synchronization or atomics when accessing any shared state from the
+   * callback function.
    *
-   * @param conn_listener Listener handle to remove
+   * This creates a corresponding internal subscriber with the lifetime of the
+   * listener.
+   *
+   * @param topic Topic
+   * @param eventMask Bitmask of EventFlags values
+   * @param listener Listener function
+   * @return Listener handle
    */
-  static void RemoveConnectionListener(NT_ConnectionListener conn_listener);
+  NT_Listener AddListener(Topic topic, unsigned int eventMask,
+                          ListenerCallback listener);
+
+  /**
+   * Add a listener for changes on a subscriber. The callback
+   * function is called asynchronously on a separate thread, so it's important
+   * to use synchronization or atomics when accessing any shared state from the
+   * callback function. This does NOT keep the subscriber active.
+   *
+   * @param subscriber Subscriber
+   * @param eventMask Bitmask of EventFlags values
+   * @param listener Listener function
+   * @return Listener handle
+   */
+  NT_Listener AddListener(Subscriber& subscriber, unsigned int eventMask,
+                          ListenerCallback listener);
+
+  /**
+   * Add a listener for changes on a subscriber. The callback
+   * function is called asynchronously on a separate thread, so it's important
+   * to use synchronization or atomics when accessing any shared state from the
+   * callback function. This does NOT keep the subscriber active.
+   *
+   * @param subscriber Subscriber
+   * @param eventMask Bitmask of EventFlags values
+   * @param listener Listener function
+   * @return Listener handle
+   */
+  NT_Listener AddListener(MultiSubscriber& subscriber, int eventMask,
+                          ListenerCallback listener);
+
+  /**
+   * Add a listener for changes on an entry. The callback function
+   * is called asynchronously on a separate thread, so it's important to use
+   * synchronization or atomics when accessing any shared state from the
+   * callback function.
+   *
+   * @param entry Entry
+   * @param eventMask Bitmask of EventFlags values
+   * @param listener Listener function
+   * @return Listener handle
+   */
+  NT_Listener AddListener(NetworkTableEntry& entry, int eventMask,
+                          ListenerCallback listener);
+
+  /**
+   * Add a listener for changes to topics with names that start with any
+   * of the given prefixes. The callback function is called asynchronously on a
+   * separate thread, so it's important to use synchronization or atomics when
+   * accessing any shared state from the callback function.
+   *
+   * This creates a corresponding internal subscriber with the lifetime of the
+   * listener.
+   *
+   * @param prefixes Topic name string prefixes
+   * @param eventMask Bitmask of EventFlags values
+   * @param listener Listener function
+   * @return Listener handle
+   */
+  NT_Listener AddListener(std::span<const std::string_view> prefixes,
+                          int eventMask, ListenerCallback listener);
 
   /** @} */
 
@@ -583,20 +674,13 @@ class NetworkTableInstance final {
    * log messages with level greater than or equal to minLevel and less than or
    * equal to maxLevel; messages outside this range will be silently ignored.
    *
-   * @param func        log callback function
    * @param minLevel    minimum log level
    * @param maxLevel    maximum log level
-   * @return Logger handle
+   * @param func        callback function
+   * @return Listener handle
    */
-  NT_Logger AddLogger(std::function<void(const LogMessage& msg)> func,
-                      unsigned int minLevel, unsigned int maxLevel);
-
-  /**
-   * Remove a logger.
-   *
-   * @param logger Logger handle to remove
-   */
-  static void RemoveLogger(NT_Logger logger);
+  NT_Listener AddLogger(unsigned int minLevel, unsigned int maxLevel,
+                        ListenerCallback func);
 
   /** @} */
 

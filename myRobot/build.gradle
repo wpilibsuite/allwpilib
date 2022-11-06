@@ -58,7 +58,7 @@ def simProjects = ['halsim_gui']
 deploy {
     targets {
         roborio(RemoteTarget) {
-            directory = '/home/admin'
+            directory = '/home/lvuser'
             maxChannels = 4
             locations {
                 ssh(SshDeployLocation) {
@@ -78,7 +78,8 @@ deploy {
             artifacts {
                 all {
                     predeploy << { ctx ->
-                        ctx.execute('/usr/local/frc/bin/frcKillRobot.sh -t')
+                        ctx.execute('. /etc/profile.d/natinst-path.sh; /usr/local/frc/bin/frcKillRobot.sh -t 2> /dev/null')
+                        ctx.execute("sed -i -e 's/\"exec /\"/' /usr/local/frc/bin/frcRunRobot.sh")
                     }
                     postdeploy << { ctx ->
                         ctx.execute("sync")
@@ -92,6 +93,9 @@ deploy {
                     excludes.add('**/*.so.debug')
                     excludes.add('**/*.so.*.debug')
                     postdeploy << { ctx ->
+                        ctx.execute("echo '/home/lvuser/myRobotCpp' > /home/lvuser/robotCommand")
+                        ctx.execute("chmod +x /home/lvuser/robotCommand; chown lvuser /home/lvuser/robotCommand")
+                        ctx.execute("setcap cap_sys_nice+eip \"/home/lvuser/myRobotCpp\"")
                         ctx.execute('chmod +x myRobotCpp')
                     }
                 }
@@ -99,8 +103,18 @@ deploy {
                 myRobotCppStatic(NativeExecutableArtifact) {
                     libraryDirectory = '/usr/local/frc/third-party/lib'
                     postdeploy << { ctx ->
+                        ctx.execute("echo '/home/lvuser/myRobotCppStatic' > /home/lvuser/robotCommand")
+                        ctx.execute("chmod +x /home/lvuser/robotCommand; chown lvuser /home/lvuser/robotCommand")
+                        ctx.execute("setcap cap_sys_nice+eip \"/home/lvuser/myRobotCppStatic\"")
                         ctx.execute('chmod +x myRobotCppStatic')
                     }
+                }
+
+                myRobotCppJava(NativeExecutableArtifact) {
+                    libraryDirectory = '/usr/local/frc/third-party/lib'
+                    def excludes = getLibraryFilter().getExcludes()
+                    excludes.add('**/*.so.debug')
+                    excludes.add('**/*.so.*.debug')
                 }
 
                 jre(WPIJREArtifact) {
@@ -109,8 +123,8 @@ deploy {
                 myRobotJava(JavaArtifact) {
                     jarTask = shadowJar
                     postdeploy << { ctx ->
-                        ctx.execute("echo '/usr/local/frc/JRE/bin/java -XX:+UseConcMarkSweepGC -Djava.library.path=/usr/local/frc/third-party/lib -Djava.lang.invoke.stringConcat=BC_SB -jar /home/admin/myRobot-all.jar' > /home/admin/myRobotJavaRun")
-                        ctx.execute("chmod +x /home/admin/myRobotJavaRun; chown lvuser /home/admin/myRobotJavaRun")
+                        ctx.execute("echo '/usr/local/frc/JRE/bin/java -XX:+UseG1GC -XX:MaxGCPauseMillis=1 -XX:GCTimeRatio=1 -Djava.library.path=/usr/local/frc/third-party/lib -Djava.lang.invoke.stringConcat=BC_SB -jar /home/lvuser/myRobot-all.jar' > /home/lvuser/robotCommand")
+                        ctx.execute("chmod +x /home/lvuser/robotCommand; chown lvuser /home/lvuser/robotCommand")
                     }
                 }
             }
@@ -122,7 +136,7 @@ tasks.register('deployJava') {
     try {
         dependsOn tasks.named('deployjreroborio')
         dependsOn tasks.named('deploymyRobotJavaroborio')
-        dependsOn tasks.named('deploymyRobotCpproborio') // Deploying shared C++ is how to get the Java shared libraries.
+        dependsOn tasks.named('deploymyRobotCppJavaroborio') // Deploying shared C++ is how to get the Java shared libraries.
     } catch (ignored) {
     }
 }
@@ -161,6 +175,7 @@ model {
                 if (binary.targetPlatform.name == nativeUtils.wpi.platforms.roborio) {
                     if (binary.buildType.name == 'debug') {
                         deploy.targets.roborio.artifacts.myRobotCpp.binary = binary
+                        deploy.targets.roborio.artifacts.myRobotCppJava.binary = binary
                     }
                 }
                 lib project: ':wpilibNewCommands', library: 'wpilibNewCommands', linkage: 'shared'

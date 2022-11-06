@@ -48,10 +48,14 @@ public final class SuppliedValueWidget<T> extends ShuffleboardWidget<SuppliedVal
   @Override
   public void buildInto(NetworkTable parentTable, NetworkTable metaTable) {
     buildMetadata(metaTable);
-    m_controllablePub = new BooleanTopic(metaTable.getTopic("Controllable")).publish();
-    m_controllablePub.set(false);
+    if (m_controllablePub == null) {
+      m_controllablePub = new BooleanTopic(metaTable.getTopic("Controllable")).publish();
+      m_controllablePub.set(false);
+    }
 
-    m_entry = parentTable.getTopic(getTitle()).genericPublish(m_typeString);
+    if (m_entry == null) {
+      m_entry = parentTable.getTopic(getTitle()).genericPublish(m_typeString);
+    }
     m_setter.accept(m_entry, m_supplier.get());
   }
 

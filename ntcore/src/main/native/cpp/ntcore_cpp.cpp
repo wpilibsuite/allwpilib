@@ -9,6 +9,7 @@
 #include <cstdio>
 #include <cstdlib>
 
+#include <fmt/format.h>
 #include <wpi/json.h>
 #include <wpi/timestamp.h>
 
@@ -17,6 +18,7 @@
 #include "Log.h"
 #include "Types_internal.h"
 #include "ntcore.h"
+#include "ntcore_c.h"
 
 static std::atomic_bool gNowSet{false};
 static std::atomic<int64_t> gNowTime;
@@ -54,7 +56,7 @@ void DestroyInstance(NT_Inst inst) {
 NT_Inst GetInstanceFromHandle(NT_Handle handle) {
   Handle h{handle};
   auto type = h.GetType();
-  if (type >= Handle::kConnectionListener && type < Handle::kTypeMax) {
+  if (type >= Handle::kListener && type < Handle::kTypeMax) {
     return Handle(h.GetInst(), 0, Handle::kInstance);
   }
 
@@ -386,174 +388,128 @@ void UnsubscribeMultiple(NT_MultiSubscriber sub) {
  * Callback Creation Functions
  */
 
-NT_TopicListener AddTopicListener(
-    NT_Inst inst, std::span<const std::string_view> prefixes, unsigned int mask,
-    std::function<void(const TopicNotification&)> callback) {
+static void CleanupListeners(
+    InstanceImpl& ii,
+    std::span<const std::pair<NT_Listener, unsigned int>> listeners) {
+  bool updateMinLevel = false;
+  for (auto&& [listener, mask] : listeners) {
+    // connection doesn't need removal notification
+    if ((mask & (NT_EVENT_TOPIC | NT_EVENT_VALUE_ALL)) != 0) {
+      ii.localStorage.RemoveListener(listener, mask);
+    }
+    if ((mask & NT_EVENT_LOGMESSAGE) != 0) {
+      ii.logger_impl.RemoveListener(listener);
+      updateMinLevel = true;
+    }
+  }
+  if (updateMinLevel) {
+    ii.logger.set_min_level(ii.logger_impl.GetMinLevel());
+  }
+}
+
+static void DoAddListener(InstanceImpl& ii, NT_Listener listener,
+                          NT_Handle handle, unsigned int mask) {
+  if (Handle{handle}.IsType(Handle::kInstance)) {
+    if ((mask & NT_EVENT_CONNECTION) != 0) {
+      ii.connectionList.AddListener(listener, mask);
+    }
+    if ((mask & NT_EVENT_LOGMESSAGE) != 0) {
+      ii.logger_impl.AddListener(listener, NT_LOG_INFO, UINT_MAX);
+    }
+  } else if ((mask & (NT_EVENT_TOPIC | NT_EVENT_VALUE_ALL)) != 0) {
+    ii.localStorage.AddListener(listener, handle, mask);
+  }
+}
+
+NT_ListenerPoller CreateListenerPoller(NT_Inst inst) {
   if (auto ii = InstanceImpl::GetTyped(inst, Handle::kInstance)) {
-    return ii->localStorage.AddTopicListener(prefixes, mask,
-                                             std::move(callback));
+    return ii->listenerStorage.CreateListenerPoller();
   } else {
     return {};
   }
 }
 
-NT_TopicListener AddTopicListener(
-    NT_Handle handle, unsigned int mask,
-    std::function<void(const TopicNotification&)> callback) {
-  if (auto ii = InstanceImpl::GetTyped(handle, Handle::kTopic)) {
-    return ii->localStorage.AddTopicListener(handle, mask, std::move(callback));
+void DestroyListenerPoller(NT_ListenerPoller poller) {
+  if (auto ii = InstanceImpl::GetTyped(poller, Handle::kListenerPoller)) {
+    CleanupListeners(*ii, ii->listenerStorage.DestroyListenerPoller(poller));
+  }
+}
+
+std::vector<Event> ReadListenerQueue(NT_ListenerPoller poller) {
+  if (auto ii = InstanceImpl::GetTyped(poller, Handle::kListenerPoller)) {
+    return ii->listenerStorage.ReadListenerQueue(poller);
   } else {
     return {};
   }
 }
 
-NT_TopicListenerPoller CreateTopicListenerPoller(NT_Inst inst) {
+void RemoveListener(NT_Listener listener) {
+  if (auto ii = InstanceImpl::GetTyped(listener, Handle::kListener)) {
+    CleanupListeners(*ii, ii->listenerStorage.RemoveListener(listener));
+  }
+}
+
+bool WaitForListenerQueue(NT_Handle handle, double timeout) {
+  if (auto ii = InstanceImpl::GetHandle(handle)) {
+    return ii->listenerStorage.WaitForListenerQueue(timeout);
+  } else {
+    return {};
+  }
+}
+
+NT_Listener AddListener(NT_Inst inst,
+                        std::span<const std::string_view> prefixes,
+                        unsigned int mask, ListenerCallback callback) {
   if (auto ii = InstanceImpl::GetTyped(inst, Handle::kInstance)) {
-    return ii->localStorage.CreateTopicListenerPoller();
+    if ((mask & (NT_EVENT_TOPIC | NT_EVENT_VALUE_ALL)) != 0) {
+      auto listener = ii->listenerStorage.AddListener(std::move(callback));
+      ii->localStorage.AddListener(listener, prefixes, mask);
+      return listener;
+    }
+  }
+  return {};
+}
+
+NT_Listener AddListener(NT_Handle handle, unsigned int mask,
+                        ListenerCallback callback) {
+  if (auto ii = InstanceImpl::GetHandle(handle)) {
+    auto listener = ii->listenerStorage.AddListener(std::move(callback));
+    DoAddListener(*ii, listener, handle, mask);
+    return listener;
   } else {
     return {};
   }
 }
 
-void DestroyTopicListenerPoller(NT_TopicListenerPoller poller) {
-  if (auto ii = InstanceImpl::GetTyped(poller, Handle::kTopicListenerPoller)) {
-    ii->localStorage.DestroyTopicListenerPoller(poller);
+NT_Listener AddPolledListener(NT_ListenerPoller poller,
+                              std::span<const std::string_view> prefixes,
+                              unsigned int mask) {
+  if (auto ii = InstanceImpl::GetTyped(poller, Handle::kListenerPoller)) {
+    if ((mask & (NT_EVENT_TOPIC | NT_EVENT_VALUE_ALL)) != 0) {
+      auto listener = ii->listenerStorage.AddListener(poller);
+      ii->localStorage.AddListener(listener, prefixes, mask);
+      return listener;
+    }
   }
+  return {};
 }
 
-NT_TopicListener AddPolledTopicListener(
-    NT_TopicListenerPoller poller, std::span<const std::string_view> prefixes,
-    unsigned int mask) {
-  if (auto ii = InstanceImpl::GetTyped(poller, Handle::kTopicListenerPoller)) {
-    return ii->localStorage.AddPolledTopicListener(poller, prefixes, mask);
+NT_Listener AddPolledListener(NT_ListenerPoller poller, NT_Handle handle,
+                              unsigned int mask) {
+  if (auto ii = InstanceImpl::GetTyped(poller, Handle::kListenerPoller)) {
+    if (Handle{handle}.GetInst() != Handle{poller}.GetInst()) {
+      WPI_ERROR(
+          ii->logger,
+          "AddPolledListener(): trying to listen to handle {} (instance {}) "
+          "with poller {} (instance {}), ignored due to different instance",
+          handle, Handle{handle}.GetInst(), poller, Handle{poller}.GetInst());
+      return {};
+    }
+    auto listener = ii->listenerStorage.AddListener(poller);
+    DoAddListener(*ii, listener, handle, mask);
+    return listener;
   } else {
     return {};
-  }
-}
-
-NT_TopicListener AddPolledTopicListener(NT_TopicListenerPoller poller,
-                                        NT_Handle handle, unsigned int mask) {
-  if (auto ii = InstanceImpl::GetTyped(poller, Handle::kTopicListenerPoller)) {
-    return ii->localStorage.AddPolledTopicListener(poller, handle, mask);
-  } else {
-    return {};
-  }
-}
-
-std::vector<TopicNotification> ReadTopicListenerQueue(
-    NT_TopicListenerPoller poller) {
-  if (auto ii = InstanceImpl::GetTyped(poller, Handle::kTopicListenerPoller)) {
-    return ii->localStorage.ReadTopicListenerQueue(poller);
-  } else {
-    return {};
-  }
-}
-
-void RemoveTopicListener(NT_TopicListener listener) {
-  if (auto ii = InstanceImpl::GetTyped(listener, Handle::kTopicListener)) {
-    return ii->localStorage.RemoveTopicListener(listener);
-  }
-}
-
-NT_ValueListener AddValueListener(
-    NT_Handle subentry, unsigned int mask,
-    std::function<void(const ValueNotification&)> callback) {
-  if (auto ii = InstanceImpl::GetHandle(subentry)) {
-    return ii->localStorage.AddValueListener(subentry, mask,
-                                             std::move(callback));
-  } else {
-    return {};
-  }
-}
-
-NT_ValueListenerPoller CreateValueListenerPoller(NT_Inst inst) {
-  if (auto ii = InstanceImpl::GetTyped(inst, Handle::kInstance)) {
-    return ii->localStorage.CreateValueListenerPoller();
-  } else {
-    return {};
-  }
-}
-
-void DestroyValueListenerPoller(NT_ValueListenerPoller poller) {
-  if (auto ii = InstanceImpl::GetTyped(poller, Handle::kValueListenerPoller)) {
-    ii->localStorage.DestroyValueListenerPoller(poller);
-  }
-}
-
-NT_ValueListener AddPolledValueListener(NT_ValueListenerPoller poller,
-                                        NT_Handle subentry, unsigned int mask) {
-  if (auto ii = InstanceImpl::GetTyped(poller, Handle::kValueListenerPoller)) {
-    return ii->localStorage.AddPolledValueListener(poller, subentry, mask);
-  } else {
-    return {};
-  }
-}
-
-std::vector<ValueNotification> ReadValueListenerQueue(
-    NT_ValueListenerPoller poller) {
-  if (auto ii = InstanceImpl::GetTyped(poller, Handle::kValueListenerPoller)) {
-    return ii->localStorage.ReadValueListenerQueue(poller);
-  } else {
-    return {};
-  }
-}
-
-void RemoveValueListener(NT_ValueListener listener) {
-  if (auto ii = InstanceImpl::GetTyped(listener, Handle::kValueListener)) {
-    return ii->localStorage.RemoveValueListener(listener);
-  }
-}
-
-NT_ConnectionListener AddConnectionListener(
-    NT_Inst inst,
-    std::function<void(const ConnectionNotification& event)> callback,
-    bool immediate_notify) {
-  if (auto ii = InstanceImpl::GetTyped(inst, Handle::kInstance)) {
-    return ii->connectionList.AddListener(std::move(callback),
-                                          immediate_notify);
-  } else {
-    return {};
-  }
-}
-
-NT_ConnectionListenerPoller CreateConnectionListenerPoller(NT_Inst inst) {
-  if (auto ii = InstanceImpl::GetTyped(inst, Handle::kInstance)) {
-    return ii->connectionList.CreateListenerPoller();
-  } else {
-    return {};
-  }
-}
-
-void DestroyConnectionListenerPoller(NT_ConnectionListenerPoller poller) {
-  if (auto ii =
-          InstanceImpl::GetTyped(poller, Handle::kConnectionListenerPoller)) {
-    return ii->connectionList.DestroyListenerPoller(poller);
-  }
-}
-
-NT_ConnectionListener AddPolledConnectionListener(
-    NT_ConnectionListenerPoller poller, bool immediate_notify) {
-  if (auto ii =
-          InstanceImpl::GetTyped(poller, Handle::kConnectionListenerPoller)) {
-    return ii->connectionList.AddPolledListener(poller, immediate_notify);
-  } else {
-    return {};
-  }
-}
-
-std::vector<ConnectionNotification> ReadConnectionListenerQueue(
-    NT_ConnectionListenerPoller poller) {
-  if (auto ii =
-          InstanceImpl::GetTyped(poller, Handle::kConnectionListenerPoller)) {
-    return ii->connectionList.ReadListenerQueue(poller);
-  } else {
-    return {};
-  }
-}
-
-void RemoveConnectionListener(NT_ConnectionListener listener) {
-  if (auto ii = InstanceImpl::GetTyped(listener, Handle::kConnectionListener)) {
-    return ii->connectionList.RemoveListener(listener);
   }
 }
 
@@ -773,57 +729,31 @@ bool IsConnected(NT_Inst inst) {
   }
 }
 
-NT_Logger AddLogger(NT_Inst inst,
-                    std::function<void(const LogMessage& msg)> func,
-                    unsigned int minLevel, unsigned int maxLevel) {
+NT_Listener AddLogger(NT_Inst inst, unsigned int minLevel,
+                      unsigned int maxLevel, ListenerCallback func) {
   if (auto ii = InstanceImpl::GetTyped(inst, Handle::kInstance)) {
     if (minLevel < ii->logger.min_level()) {
       ii->logger.set_min_level(minLevel);
     }
-    return ii->logger_impl.Add(std::move(func), minLevel, maxLevel);
+    auto listener = ii->listenerStorage.AddListener(std::move(func));
+    ii->logger_impl.AddListener(listener, minLevel, maxLevel);
+    return listener;
   } else {
     return {};
   }
 }
 
-NT_LoggerPoller CreateLoggerPoller(NT_Inst inst) {
-  if (auto ii = InstanceImpl::GetTyped(inst, Handle::kInstance)) {
-    return ii->logger_impl.CreatePoller();
-  } else {
-    return {};
-  }
-}
-
-void DestroyLoggerPoller(NT_LoggerPoller poller) {
-  if (auto ii = InstanceImpl::GetTyped(poller, Handle::kLoggerPoller)) {
-    ii->logger_impl.DestroyPoller(poller);
-  }
-}
-
-NT_Logger AddPolledLogger(NT_LoggerPoller poller, unsigned int min_level,
-                          unsigned int max_level) {
-  if (auto ii = InstanceImpl::GetTyped(poller, Handle::kLoggerPoller)) {
-    if (min_level < ii->logger.min_level()) {
-      ii->logger.set_min_level(min_level);
+NT_Listener AddPolledLogger(NT_ListenerPoller poller, unsigned int minLevel,
+                            unsigned int maxLevel) {
+  if (auto ii = InstanceImpl::GetTyped(poller, Handle::kListenerPoller)) {
+    if (minLevel < ii->logger.min_level()) {
+      ii->logger.set_min_level(minLevel);
     }
-    return ii->logger_impl.AddPolled(poller, min_level, max_level);
+    auto listener = ii->listenerStorage.AddListener(poller);
+    ii->logger_impl.AddListener(listener, minLevel, maxLevel);
+    return listener;
   } else {
     return {};
-  }
-}
-
-std::vector<LogMessage> ReadLoggerQueue(NT_LoggerPoller poller) {
-  if (auto ii = InstanceImpl::GetTyped(poller, Handle::kLoggerPoller)) {
-    return ii->logger_impl.ReadQueue(poller);
-  } else {
-    return {};
-  }
-}
-
-void RemoveLogger(NT_Logger logger) {
-  if (auto ii = InstanceImpl::GetTyped(logger, Handle::kLogger)) {
-    ii->logger_impl.Remove(logger);
-    ii->logger.set_min_level(ii->logger_impl.GetMinLevel());
   }
 }
 

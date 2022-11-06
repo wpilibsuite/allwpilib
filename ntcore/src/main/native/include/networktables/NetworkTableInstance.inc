@@ -10,6 +10,7 @@
 
 #include "networktables/NetworkTableInstance.h"
 #include "networktables/Topic.h"
+#include "ntcore_c.h"
 
 namespace nt {
 
@@ -26,9 +27,10 @@ inline NetworkTableInstance NetworkTableInstance::Create() {
   return NetworkTableInstance{CreateInstance()};
 }
 
-inline void NetworkTableInstance::Destroy(NetworkTableInstance inst) {
+inline void NetworkTableInstance::Destroy(NetworkTableInstance& inst) {
   if (inst.m_handle != 0) {
     DestroyInstance(inst.m_handle);
+    inst.m_handle = 0;
   }
 }
 
@@ -82,9 +84,26 @@ inline NetworkTableEntry NetworkTableInstance::GetEntry(std::string_view name) {
   return NetworkTableEntry{::nt::GetEntry(m_handle, name)};
 }
 
-inline void NetworkTableInstance::RemoveConnectionListener(
-    NT_ConnectionListener conn_listener) {
-  ::nt::RemoveConnectionListener(conn_listener);
+inline bool NetworkTableInstance::WaitForListenerQueue(double timeout) {
+  return ::nt::WaitForListenerQueue(m_handle, timeout);
+}
+
+inline void NetworkTableInstance::RemoveListener(NT_Listener listener) {
+  ::nt::RemoveListener(listener);
+}
+
+inline NT_Listener NetworkTableInstance::AddConnectionListener(
+    bool immediate_notify, ListenerCallback callback) const {
+  return ::nt::AddListener(
+      m_handle,
+      NT_EVENT_CONNECTION | (immediate_notify ? NT_EVENT_IMMEDIATE : 0),
+      std::move(callback));
+}
+
+inline NT_Listener NetworkTableInstance::AddListener(
+    std::span<const std::string_view> prefixes, int eventMask,
+    ListenerCallback listener) {
+  return ::nt::AddListener(m_handle, prefixes, eventMask, std::move(listener));
 }
 
 inline unsigned int NetworkTableInstance::GetNetworkMode() const {
@@ -182,14 +201,10 @@ inline void NetworkTableInstance::StopConnectionDataLog(
   ::nt::StopConnectionDataLog(logger);
 }
 
-inline NT_Logger NetworkTableInstance::AddLogger(
-    std::function<void(const LogMessage& msg)> func, unsigned int min_level,
-    unsigned int max_level) {
-  return ::nt::AddLogger(m_handle, func, min_level, max_level);
-}
-
-inline void NetworkTableInstance::RemoveLogger(NT_Logger logger) {
-  ::nt::RemoveLogger(logger);
+inline NT_Listener NetworkTableInstance::AddLogger(unsigned int min_level,
+                                                   unsigned int max_level,
+                                                   ListenerCallback func) {
+  return ::nt::AddLogger(m_handle, min_level, max_level, std::move(func));
 }
 
 }  // namespace nt

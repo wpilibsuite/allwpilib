@@ -23,13 +23,10 @@ NetworkTablesProvider::NetworkTablesProvider(Storage& storage,
                                              nt::NetworkTableInstance inst)
     : Provider{storage.GetChild("windows")},
       m_inst{inst},
-      m_topicPoller{inst},
-      m_valuePoller{inst},
+      m_poller{inst},
       m_typeCache{storage.GetChild("types")} {
   storage.SetCustomApply([this] {
-    m_topicListener = m_topicPoller.Add({{""}}, NT_TOPIC_NOTIFY_PUBLISH |
-                                                    NT_TOPIC_NOTIFY_UNPUBLISH |
-                                                    NT_TOPIC_NOTIFY_IMMEDIATE);
+    m_listener = m_poller.AddListener({{""}}, nt::EventFlags::kTopic);
     for (auto&& childIt : m_storage.GetChildren()) {
       auto id = childIt.key();
       auto typePtr = m_typeCache.FindValue(id);
@@ -51,8 +48,8 @@ NetworkTablesProvider::NetworkTablesProvider(Storage& storage,
     }
   });
   storage.SetCustomClear([this, &storage] {
-    m_topicPoller.Remove(m_topicListener);
-    m_topicListener = 0;
+    m_poller.RemoveListener(m_listener);
+    m_listener = 0;
     for (auto&& modelEntry : m_modelEntries) {
       modelEntry->model.reset();
     }
@@ -102,58 +99,59 @@ void NetworkTablesProvider::DisplayMenu() {
 void NetworkTablesProvider::Update() {
   Provider::Update();
 
-  // add/remove entries from NT changes
-  for (auto&& event : m_topicPoller.ReadQueue()) {
-    // look for .type fields
-    if (!wpi::ends_with(event.info.name, "/.type") ||
-        event.info.type != NT_STRING || event.info.type_str != "string") {
-      continue;
-    }
-
-    if (event.flags & NT_TOPIC_NOTIFY_UNPUBLISH) {
-      auto it = m_topicMap.find(event.info.topic);
-      if (it != m_topicMap.end()) {
-        m_valuePoller.Remove(it->second.listener);
-        m_topicMap.erase(it);
+  for (auto&& event : m_poller.ReadQueue()) {
+    if (auto info = event.GetTopicInfo()) {
+      // add/remove entries from NT changes
+      // look for .type fields
+      if (!wpi::ends_with(info->name, "/.type") || info->type != NT_STRING ||
+          info->type_str != "string") {
+        continue;
       }
 
-      auto it2 = std::find_if(
-          m_viewEntries.begin(), m_viewEntries.end(), [&](const auto& elem) {
-            return static_cast<Entry*>(elem->modelEntry)
-                       ->typeTopic.GetHandle() == event.info.topic;
-          });
-      if (it2 != m_viewEntries.end()) {
-        m_viewEntries.erase(it2);
+      if (event.flags & nt::EventFlags::kUnpublish) {
+        auto it = m_topicMap.find(info->topic);
+        if (it != m_topicMap.end()) {
+          m_poller.RemoveListener(it->second.listener);
+          m_topicMap.erase(it);
+        }
+
+        auto it2 = std::find_if(
+            m_viewEntries.begin(), m_viewEntries.end(), [&](const auto& elem) {
+              return static_cast<Entry*>(elem->modelEntry)
+                         ->typeTopic.GetHandle() == info->topic;
+            });
+        if (it2 != m_viewEntries.end()) {
+          m_viewEntries.erase(it2);
+        }
+      } else if (event.flags & nt::EventFlags::kPublish) {
+        // subscribe to it; use a subscriber so we only get string values
+        SubListener sublistener;
+        sublistener.subscriber = nt::StringTopic{info->topic}.Subscribe("");
+        sublistener.listener = m_poller.AddListener(
+            sublistener.subscriber,
+            nt::EventFlags::kValueAll | nt::EventFlags::kImmediate);
+        m_topicMap.try_emplace(info->topic, std::move(sublistener));
       }
-    } else if (event.flags & NT_TOPIC_NOTIFY_PUBLISH) {
-      // subscribe to it
-      SubListener sublistener;
-      sublistener.subscriber = nt::StringTopic{event.info.topic}.Subscribe("");
-      sublistener.listener =
-          m_valuePoller.Add(sublistener.subscriber,
-                            NT_VALUE_NOTIFY_LOCAL | NT_VALUE_NOTIFY_IMMEDIATE);
-      m_topicMap.try_emplace(event.info.topic, std::move(sublistener));
+    } else if (auto valueData = event.GetValueEventData()) {
+      // handle actual .type strings
+      if (!valueData->value.IsString()) {
+        continue;
+      }
+
+      // only handle ones where we have a builder
+      auto builderIt = m_typeMap.find(valueData->value.GetString());
+      if (builderIt == m_typeMap.end()) {
+        continue;
+      }
+
+      auto topicName = nt::GetTopicName(valueData->topic);
+      auto tableName = wpi::drop_back(topicName, 6);
+
+      GetOrCreateView(builderIt->second, nt::Topic{valueData->topic},
+                      tableName);
+      // cache the type
+      m_typeCache.SetString(tableName, valueData->value.GetString());
     }
-  }
-
-  // handle actual .type strings
-  for (auto&& event : m_valuePoller.ReadQueue()) {
-    if (!event.value.IsString()) {
-      continue;
-    }
-
-    // only handle ones where we have a builder
-    auto builderIt = m_typeMap.find(event.value.GetString());
-    if (builderIt == m_typeMap.end()) {
-      continue;
-    }
-
-    auto topicName = nt::GetTopicName(event.topic);
-    auto tableName = wpi::drop_back(topicName, 6);
-
-    GetOrCreateView(builderIt->second, nt::Topic{event.topic}, tableName);
-    // cache the type
-    m_typeCache.SetString(tableName, event.value.GetString());
   }
 }
 
