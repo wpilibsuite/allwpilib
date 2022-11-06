@@ -33,7 +33,7 @@ constexpr Pose2d Pose2d::operator/(double scalar) const {
 
 constexpr Pose2d Pose2d::TransformBy(const Transform2d& other) const {
   return {m_translation + (other.Translation().RotateBy(m_rotation)),
-          m_rotation + other.Rotation()};
+          other.Rotation() + m_rotation};
 }
 
 }  // namespace frc
