@@ -68,7 +68,7 @@ Pose3d Pose3d::operator/(double scalar) const {
 
 Pose3d Pose3d::TransformBy(const Transform3d& other) const {
   return {m_translation + (other.Translation().RotateBy(m_rotation)),
-          m_rotation + other.Rotation()};
+          other.Rotation() + m_rotation};
 }
 
 Pose3d Pose3d::RelativeTo(const Pose3d& other) const {
