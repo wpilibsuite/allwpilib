@@ -35,8 +35,8 @@ class CommandPtr final {
       : CommandPtr(std::make_unique<std::remove_reference_t<T>>(
             std::forward<T>(command))) {}
 
-  CommandPtr(CommandPtr&&) = default;
-  CommandPtr& operator=(CommandPtr&&) = default;
+  CommandPtr(CommandPtr&&);
+  CommandPtr& operator=(CommandPtr&&);
 
   /**
    * Decorates this command to run repeatedly, restarting it when it ends, until
@@ -267,6 +267,7 @@ class CommandPtr final {
 
  private:
   std::unique_ptr<Command> m_ptr;
+  static std::unique_ptr<Command> UseAfterMoveErrorCommand();
 };
 
 }  // namespace frc2

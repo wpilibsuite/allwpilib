@@ -4,6 +4,8 @@
 
 #include "frc2/command/CommandPtr.h"
 
+#include <frc/Errors.h>
+
 #include "frc2/command/CommandScheduler.h"
 #include "frc2/command/ConditionalCommand.h"
 #include "frc2/command/InstantCommand.h"
@@ -19,6 +21,23 @@
 #include "frc2/command/WrapperCommand.h"
 
 using namespace frc2;
+
+std::unique_ptr<Command> CommandPtr::UseAfterMoveErrorCommand() {
+  return std::make_unique<InstantCommand>([] {
+    throw FRC_MakeError(frc::err::CommandIllegalUse,
+                        "Moved-from CommandPtr object used!");
+  });
+}
+
+CommandPtr::CommandPtr(CommandPtr&& rhs) : m_ptr(std::move(rhs.m_ptr)) {
+  rhs.m_ptr = UseAfterMoveErrorCommand();
+}
+
+CommandPtr& CommandPtr::operator=(CommandPtr&& rhs) {
+  this->m_ptr = std::move(rhs.m_ptr);
+  rhs.m_ptr = UseAfterMoveErrorCommand();
+  return *this;
+}
 
 CommandPtr CommandPtr::Repeatedly() && {
   m_ptr = std::make_unique<RepeatCommand>(std::move(m_ptr));
@@ -197,7 +216,9 @@ Command* CommandPtr::get() const {
 }
 
 std::unique_ptr<Command> CommandPtr::Unwrap() && {
-  return std::move(m_ptr);
+  auto ptr = std::move(m_ptr);
+  m_ptr = UseAfterMoveErrorCommand();
+  return ptr;
 }
 
 void CommandPtr::Schedule() const {
