@@ -12,5 +12,6 @@ wpilib_java_junit5_test(
         "//wpilibj/src/test/resources",
         "//wpimath/src/main/java/edu/wpi/first/math:wpimath",
         "//wpiutil/src/main/java/edu/wpi/first/util:wpiutil",
+        "@maven//:com_fasterxml_jackson_core_jackson_databind",
     ],
 )
