@@ -26,7 +26,9 @@ AprilTagFieldLayout::AprilTagFieldLayout(std::string_view path) {
   wpi::json json;
   input >> json;
 
-  m_apriltags = json.at("tags").get<std::vector<AprilTag>>();
+  for (const auto& tag : json.at("tags").get<std::vector<AprilTag>>()) {
+    m_apriltags[tag.ID] = tag;
+  }
   m_fieldWidth = units::meter_t{json.at("field").at("width").get<double>()};
   m_fieldLength = units::meter_t{json.at("field").at("height").get<double>()};
 }
@@ -34,28 +36,27 @@ AprilTagFieldLayout::AprilTagFieldLayout(std::string_view path) {
 AprilTagFieldLayout::AprilTagFieldLayout(std::vector<AprilTag> apriltags,
                                          units::meter_t fieldLength,
                                          units::meter_t fieldWidth)
-    : m_apriltags(std::move(apriltags)),
-      m_fieldLength(std::move(fieldLength)),
-      m_fieldWidth(std::move(fieldWidth)) {}
+    : m_fieldLength(std::move(fieldLength)),
+      m_fieldWidth(std::move(fieldWidth)) {
+    for (const auto& tag : apriltags) {
+      m_apriltags[tag.ID] = tag;
+    }
+}
 
 void AprilTagFieldLayout::SetAlliance(DriverStation::Alliance alliance) {
   m_mirror = alliance == DriverStation::Alliance::kRed;
 }
 
 std::optional<frc::Pose3d> AprilTagFieldLayout::GetTagPose(int ID) const {
-  Pose3d returnPose;
-  auto it = std::find_if(m_apriltags.begin(), m_apriltags.end(),
-                         [=](const auto& tag) { return tag.ID == ID; });
-  if (it != m_apriltags.end()) {
-    returnPose = it->pose;
-  } else {
-    return std::optional<Pose3d>();
-  }
+    if (m_apriltags.find(ID) == m_apriltags.end()) {
+        return std::nullopt;
+    }
+  Pose3d returnPose = m_apriltags.find(ID)->second.pose;
   if (m_mirror) {
     returnPose = returnPose.RelativeTo(Pose3d{
         m_fieldLength, m_fieldWidth, 0_m, Rotation3d{0_deg, 0_deg, 180_deg}});
   }
-  return std::make_optional(returnPose);
+  return returnPose;
 }
 
 void AprilTagFieldLayout::Serialize(std::string_view path) {
@@ -82,14 +83,25 @@ bool AprilTagFieldLayout::operator!=(const AprilTagFieldLayout& other) const {
 }
 
 void frc::to_json(wpi::json& json, const AprilTagFieldLayout& layout) {
+    std::vector<AprilTag> tagVector;
+    tagVector.reserve(layout.m_apriltags.size());
+    for (const auto& pair : layout.m_apriltags) {
+        tagVector.push_back(pair.second);
+    }
+
   json = wpi::json{{"field",
                     {{"length", layout.m_fieldLength.value()},
                      {"width", layout.m_fieldWidth.value()}}},
-                   {"tags", layout.m_apriltags}};
+                   {"tags", tagVector}};
 }
 
 void frc::from_json(const wpi::json& json, AprilTagFieldLayout& layout) {
-  layout.m_apriltags = json.at("tags").get<std::vector<AprilTag>>();
+
+    layout.m_apriltags.clear();
+    for (const auto& tag : json.at("tags").get<std::vector<AprilTag>>()) {
+      layout.m_apriltags[tag.ID] = tag;
+    }
+
   layout.m_fieldLength =
       units::meter_t{json.at("field").at("length").get<double>()};
   layout.m_fieldWidth =
