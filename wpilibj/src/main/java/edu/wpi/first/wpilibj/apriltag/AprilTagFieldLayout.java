@@ -120,7 +120,7 @@ public class AprilTagFieldLayout {
   @SuppressWarnings("ParameterName")
   public Optional<Pose3d> getTagPose(int ID) {
     AprilTag tag = m_apriltags.get(ID);
-    if (tag == null){
+    if (tag == null) {
       return Optional.empty();
     }
     Pose3d pose = tag.pose;
