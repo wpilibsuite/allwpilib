@@ -16,6 +16,9 @@ class EventLoop {
  public:
   EventLoop();
 
+  EventLoop(const EventLoop&) = delete;
+  EventLoop& operator=(const EventLoop&) = delete;
+
   /**
    * Bind a new action to run whenever the condition is true.
    *
