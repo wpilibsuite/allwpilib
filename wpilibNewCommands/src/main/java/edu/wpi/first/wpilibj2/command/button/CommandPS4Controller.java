@@ -206,6 +206,27 @@ public class CommandPS4Controller extends CommandGenericHID {
   }
 
   /**
+   * Constructs an event instance around the triangle button's digital signal.
+   *
+   * @return an event instance representing the triangle button's digital signal attached to the
+   *     {@link CommandScheduler#getDefaultButtonLoop() default scheduler button loop}.
+   */
+  public Trigger triangle() {
+    return triangle(CommandScheduler.getInstance().getDefaultButtonLoop());
+  }
+
+  /**
+   * Constructs an event instance around the triangle button's digital signal.
+   *
+   * @param loop the event loop instance to attach the event to.
+   * @return an event instance representing the triangle button's digital signal attached to the
+   *     given loop.
+   */
+  public Trigger triangle(EventLoop loop) {
+    return m_hid.triangle(loop).castTo(Trigger::new);
+  }
+
+  /**
    * Constructs an event instance around the circle button's digital signal.
    *
    * @return an event instance representing the circle button's digital signal attached to the

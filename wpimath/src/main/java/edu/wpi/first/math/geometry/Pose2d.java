@@ -145,7 +145,7 @@ public class Pose2d implements Interpolatable<Pose2d> {
   public Pose2d transformBy(Transform2d other) {
     return new Pose2d(
         m_translation.plus(other.getTranslation().rotateBy(m_rotation)),
-        m_rotation.plus(other.getRotation()));
+        other.getRotation().plus(m_rotation));
   }
 
   /**
