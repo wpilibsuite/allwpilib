@@ -16,7 +16,9 @@ import edu.wpi.first.wpilibj.DriverStation;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -38,8 +40,7 @@ import java.util.Optional;
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonAutoDetect(getterVisibility = JsonAutoDetect.Visibility.NONE)
 public class AprilTagFieldLayout {
-  @JsonProperty(value = "tags")
-  private final List<AprilTag> m_apriltags = new ArrayList<>();
+  private final Map<Integer, AprilTag> m_apriltags = new HashMap<>();
 
   @JsonProperty(value = "field")
   private FieldDimensions m_fieldDimensions;
@@ -65,7 +66,7 @@ public class AprilTagFieldLayout {
   public AprilTagFieldLayout(Path path) throws IOException {
     AprilTagFieldLayout layout =
         new ObjectMapper().readValue(path.toFile(), AprilTagFieldLayout.class);
-    m_apriltags.addAll(layout.m_apriltags);
+    m_apriltags.putAll(layout.m_apriltags);
     m_fieldDimensions = layout.m_fieldDimensions;
   }
 
@@ -85,8 +86,15 @@ public class AprilTagFieldLayout {
       @JsonProperty(required = true, value = "tags") List<AprilTag> apriltags,
       @JsonProperty(required = true, value = "field") FieldDimensions fieldDimensions) {
     // To ensure the underlying semantics don't change with what kind of list is passed in
-    m_apriltags.addAll(apriltags);
+    for (AprilTag tag : apriltags) {
+      m_apriltags.put(tag.ID, tag);
+    }
     m_fieldDimensions = fieldDimensions;
+  }
+
+  @JsonProperty("tags")
+  public List<AprilTag> getTags() {
+    return new ArrayList<>(m_apriltags.values());
   }
 
   /**
@@ -110,16 +118,11 @@ public class AprilTagFieldLayout {
    */
   @SuppressWarnings("ParameterName")
   public Optional<Pose3d> getTagPose(int ID) {
-    Pose3d pose = null;
-    for (AprilTag apriltag : m_apriltags) {
-      if (apriltag.ID == ID) {
-        pose = apriltag.pose;
-        break;
-      }
-    }
-    if (pose == null) {
+    AprilTag tag = m_apriltags.get(ID);
+    if (tag == null) {
       return Optional.empty();
     }
+    Pose3d pose = tag.pose;
     if (m_mirror) {
       pose =
           pose.relativeTo(

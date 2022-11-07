@@ -6,6 +6,7 @@
 
 #include <optional>
 #include <string_view>
+#include <unordered_map>
 #include <vector>
 
 #include <units/length.h>
@@ -101,7 +102,7 @@ class WPILIB_DLLEXPORT AprilTagFieldLayout {
   bool operator!=(const AprilTagFieldLayout& other) const;
 
  private:
-  std::vector<AprilTag> m_apriltags;
+  std::unordered_map<int, AprilTag> m_apriltags;
   units::meter_t m_fieldLength;
   units::meter_t m_fieldWidth;
   bool m_mirror = false;
