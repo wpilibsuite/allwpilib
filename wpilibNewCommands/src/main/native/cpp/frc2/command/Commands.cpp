@@ -14,7 +14,6 @@
 #include "frc2/command/PrintCommand.h"
 #include "frc2/command/ProxyScheduleCommand.h"
 #include "frc2/command/RunCommand.h"
-#include "frc2/command/SelectCommand.h"
 #include "frc2/command/SequentialCommandGroup.h"
 #include "frc2/command/WaitCommand.h"
 #include "frc2/command/WaitUntilCommand.h"
@@ -97,14 +96,6 @@ CommandPtr cmd::Either(CommandPtr&& onTrue, CommandPtr&& onFalse,
                        std::function<bool()> selector) {
   return ConditionalCommand(std::move(onTrue).Unwrap(),
                             std::move(onFalse).Unwrap(), std::move(selector))
-      .ToPtr();
-}
-
-template <typename Key>
-CommandPtr cmd::Select(std::function<Key()> selector,
-                       std::vector<std::pair<Key, CommandPtr>> commands) {
-  return SelectCommand(std::move(selector),
-                       CommandPtr::UnwrapVector(std::move(commands)))
       .ToPtr();
 }
 
