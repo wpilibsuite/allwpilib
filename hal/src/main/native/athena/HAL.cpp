@@ -288,8 +288,52 @@ size_t HAL_GetSerialNumber(char* buffer, size_t size) {
 }
 
 size_t HAL_GetComments(char* buffer, size_t size) {
-  // TODO: implement file parsing
-  return 0;
+  fs::path path = "/etc/machine-info";
+  std::error_code code;
+  std::unique_ptr<wpi::MemoryBuffer> fileBuffer =
+      wpi::MemoryBuffer::GetFile(path.string(), code);
+
+  std::string fileContents;
+  if (fileBuffer && !code) {
+    // If the buffer is valid put the file into a string
+    fileContents = std::string_view(
+        reinterpret_cast<const char*>(fileBuffer->begin()), fileBuffer->size());
+  } else {
+    // Otherwise null terminate if there's room and return
+    if (size > 0) {
+      buffer[0] = '\0';
+    }
+    return 0;
+  }
+
+  std::string_view searchString = "PRETTY_HOSTNAME=\"";
+
+  if (!wpi::contains(fileContents, searchString)) {
+    // If the file doesn't contain the data null terminate if there's room and
+    // return
+    if (size > 0) {
+      buffer[0] = '\0';
+    }
+    return 0;
+  }
+
+  size_t start = fileContents.find(searchString) + searchString.size();
+  size_t end = fileContents.find("\"", start);
+  if (end == std::string_view::npos)
+    end = fileContents.size() - 1;
+  std::string_view commentsContents = wpi::slice(fileContents, start, end);
+
+  std::string output = "";
+  while (commentsContents.size() != 0) {
+    std::pair<std::string_view, std::string_view> pair =
+        wpi::split(commentsContents, "\\n");
+
+    output = output + std::string(pair.first) + std::string("\n");
+    commentsContents = pair.second;
+  }
+
+  size_t copied = output.copy(buffer, size);
+  return copied;
 }
 
 uint64_t HAL_GetFPGATime(int32_t* status) {
