@@ -488,12 +488,30 @@ class Trigger {
   }
 
   /**
+   * Composes two triggers with logical AND.
+   *
+   * @return A trigger which is active when both component triggers are active.
+   */
+  Trigger operator&&(Trigger& rhs) {
+    return (m_event && rhs.m_event).CastTo<Trigger>();
+  }
+
+  /**
    * Composes two triggers with logical OR.
    *
    * @return A trigger which is active when either component trigger is active.
    */
   Trigger operator||(std::function<bool()> rhs) {
     return m_event.operator||(rhs).CastTo<Trigger>();
+  }
+
+  /**
+   * Composes two triggers with logical OR.
+   *
+   * @return A trigger which is active when either component trigger is active.
+   */
+  Trigger operator||(Trigger& rhs) {
+    return (m_event || rhs.m_event).CastTo<Trigger>();
   }
 
   /**
