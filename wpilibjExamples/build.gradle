@@ -108,7 +108,7 @@ model {
             }
             binaries.all { binary ->
                 lib project: ':wpilibNewCommands', library: 'wpilibNewCommands', linkage: 'shared'
-                lib project: ':wpilibc', library: 'wpilibc', linkage: 'shared'
+                lib project: ':wpilibcpp', library: 'wpilibcpp', linkage: 'shared'
                 lib project: ':wpimath', library: 'wpimath', linkage: 'shared'
                 lib project: ':wpimath', library: 'wpimathJNI', linkage: 'shared'
                 project(':ntcore').addNtcoreDependency(binary, 'shared')

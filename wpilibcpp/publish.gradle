@@ -1,8 +1,8 @@
 apply plugin: 'maven-publish'
 
-def baseArtifactId = 'wpilibc-cpp'
-def artifactGroupId = 'edu.wpi.first.wpilibc'
-def zipBaseName = '_GROUP_edu_wpi_first_wpilibc_ID_wpilibc-cpp_CLS'
+def baseArtifactId = 'wpilibcpp-cpp'
+def artifactGroupId = 'edu.wpi.first.wpilibcpp'
+def zipBaseName = '_GROUP_edu_wpi_first_wpilibcpp_ID_wpilibcpp-cpp_CLS'
 
 def outputsFolder = file("$project.buildDir/outputs")
 
@@ -53,7 +53,7 @@ addTaskToCopyAllOutputs(cppSourcesZip)
 
 model {
     publishing {
-        def wpilibCTaskList = createComponentZipTasks($.components, ['wpilibc'], zipBaseName, Zip, project, includeStandardZipFormat)
+        def wpilibCTaskList = createComponentZipTasks($.components, ['wpilibcpp'], zipBaseName, Zip, project, includeStandardZipFormat)
 
         publications {
             cpp(MavenPublication) {

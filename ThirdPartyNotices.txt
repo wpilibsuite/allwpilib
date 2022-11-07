@@ -37,9 +37,9 @@ StackWalker           wpiutil/src/main/native/windows/StackWalker.*
 GHC filesystem        wpiutil/src/main/native/thirdparty/include/wpi/ghc/
 Team 254 Library      wpilibj/src/main/java/edu/wpi/first/wpilibj/spline/SplineParameterizer.java
                       wpilibj/src/main/java/edu/wpi/first/wpilibj/trajectory/TrajectoryParameterizer.java
-                      wpilibc/src/main/native/include/spline/SplineParameterizer.h
-                      wpilibc/src/main/native/include/trajectory/TrajectoryParameterizer.h
-                      wpilibc/src/main/native/cpp/trajectory/TrajectoryParameterizer.cpp
+                      wpilibcpp/src/main/native/include/spline/SplineParameterizer.h
+                      wpilibcpp/src/main/native/include/trajectory/TrajectoryParameterizer.h
+                      wpilibcpp/src/main/native/cpp/trajectory/TrajectoryParameterizer.cpp
 Portable File Dialogs wpigui/src/main/native/include/portable-file-dialogs.h
 Drake                 wpimath/src/main/native/thirdparty/drake/
                       wpimath/src/test/native/cpp/drake/

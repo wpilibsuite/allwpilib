@@ -10,13 +10,13 @@ evaluationDependsOn(':cscore')
 evaluationDependsOn(':hal')
 evaluationDependsOn(':cameraserver')
 evaluationDependsOn(':wpimath')
-evaluationDependsOn(':wpilibc')
+evaluationDependsOn(':wpilibcpp')
 evaluationDependsOn(':wpilibj')
 evaluationDependsOn(':wpilibNewCommands')
 
 def baseArtifactIdCpp = 'documentation'
-def artifactGroupIdCpp = 'edu.wpi.first.wpilibc'
-def zipBaseNameCpp = '_GROUP_edu_wpi_first_wpilibc_ID_documentation_CLS'
+def artifactGroupIdCpp = 'edu.wpi.first.wpilibcpp'
+def zipBaseNameCpp = '_GROUP_edu_wpi_first_wpilibcpp_ID_documentation_CLS'
 
 def baseArtifactIdJava = 'documentation'
 def artifactGroupIdJava = 'edu.wpi.first.wpilibj'
@@ -34,7 +34,7 @@ cppProjectZips.add(project(':ntcore').cppHeadersZip)
 cppProjectZips.add(project(':cscore').cppHeadersZip)
 cppProjectZips.add(project(':cameraserver').cppHeadersZip)
 cppProjectZips.add(project(':wpimath').cppHeadersZip)
-cppProjectZips.add(project(':wpilibc').cppHeadersZip)
+cppProjectZips.add(project(':wpilibcpp').cppHeadersZip)
 cppProjectZips.add(project(':wpilibNewCommands').cppHeadersZip)
 
 doxygen {
@@ -144,7 +144,7 @@ doxygen {
     html_extra_stylesheet 'theme.css'
     html_timestamp true
     javadoc_autobrief true
-    project_name 'WPILibC++'
+    project_name 'WPILibCpp'
     project_logo '../wpiutil/src/main/native/resources/wpilib-128.png'
     project_number wpilibVersioning.version.get()
     quiet true

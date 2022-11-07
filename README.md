@@ -4,7 +4,7 @@
 [![C++ Documentation](https://img.shields.io/badge/documentation-c%2B%2B-blue)](https://first.wpi.edu/wpilib/allwpilib/docs/development/cpp/)
 [![Java Documentation](https://img.shields.io/badge/documentation-java-orange)](https://first.wpi.edu/wpilib/allwpilib/docs/development/java/)
 
-Welcome to the WPILib project. This repository contains the HAL, WPILibJ, and WPILibC projects. These are the core libraries for creating robot programs for the roboRIO.
+Welcome to the WPILib project. This repository contains the HAL, WPILibJ, and WPILibCpp projects. These are the core libraries for creating robot programs for the roboRIO.
 
 - [WPILib Project](#wpilib-project)
   - [WPILib Mission](#wpilib-mission)
@@ -72,13 +72,13 @@ All build steps are executed using the Gradle wrapper, `gradlew`. Each target th
 ./gradlew build
 ```
 
-To build a specific subproject, such as WPILibC, you must access the subproject and run the build task only on that project. Accessing a subproject in Gradle is quite easy. Simply use `:subproject_name:task_name` with the Gradle wrapper. For example, building just WPILibC:
+To build a specific subproject, such as WPILibCpp, you must access the subproject and run the build task only on that project. Accessing a subproject in Gradle is quite easy. Simply use `:subproject_name:task_name` with the Gradle wrapper. For example, building just WPILibCpp:
 
 ```bash
-./gradlew :wpilibc:build
+./gradlew :wpilibcpp:build
 ```
 
-The gradlew wrapper only exists in the root of the main project, so be sure to run all commands from there. All of the subprojects have build tasks that can be run. Gradle automatically determines and rebuilds dependencies, so if you make a change in the HAL and then run `./gradlew :wpilibc:build`, the HAL will be rebuilt, then WPILibC.
+The gradlew wrapper only exists in the root of the main project, so be sure to run all commands from there. All of the subprojects have build tasks that can be run. Gradle automatically determines and rebuilds dependencies, so if you make a change in the HAL and then run `./gradlew :wpilibcpp:build`, the HAL will be rebuilt, then WPILibCpp.
 
 There are a few tasks other than `build` available. To see them, run the meta-task `tasks`. This will print a list of all available tasks, with a description of each task.
 
@@ -88,11 +88,11 @@ If opening from a fresh clone, generated java dependencies will not exist. Most 
 
 `./gradlew build` builds _everything_, which includes debug and release builds for desktop and all installed cross compilers. Many developers don't need or want to build all of this. Therefore, common tasks have shortcuts to only build necessary components for common development and testing tasks.
 
-`./gradlew testDesktopCpp` and `./gradlew testDesktopJava` will build and run the tests for `wpilibc` and `wpilibj` respectively. They will only build the minimum components required to run the tests.
+`./gradlew testDesktopCpp` and `./gradlew testDesktopJava` will build and run the tests for `wpilibcpp` and `wpilibj` respectively. They will only build the minimum components required to run the tests.
 
 `testDesktopCpp` and `testDesktopJava` tasks also exist for the projects `wpiutil`, `ntcore`, `cscore`, `hal` `wpilibNewCommands` and `cameraserver`. These can be ran with `./gradlew :projectName:task`.
 
-`./gradlew buildDesktopCpp` and `./gradlew buildDesktopJava` will compile `wpilibcExamples` and `wpilibjExamples` respectively. The results can't be ran, but they can compile.
+`./gradlew buildDesktopCpp` and `./gradlew buildDesktopJava` will compile `wpilibcppExamples` and `wpilibjExamples` respectively. The results can't be ran, but they can compile.
 
 ### Build Cache
 
@@ -123,7 +123,7 @@ If you also want to force building Gazebo simulation support, add -PforceGazebo.
 ```
 
 If you prefer to use CMake directly, the you can still do so.
-The common CMake tasks are wpilibcSim, frc_gazebo_plugins, and gz_msgs
+The common CMake tasks are wpilibcppSim, frc_gazebo_plugins, and gz_msgs
 
 ```bash
 mkdir build #run this in the root of allwpilib
@@ -164,7 +164,7 @@ The maven artifacts are described in [MavenArtifacts.md](MavenArtifacts.md)
 
 ## Structure and Organization
 
-The main WPILib code you're probably looking for is in WPILibJ and WPILibC. Those directories are split into shared, sim, and athena. Athena contains the WPILib code meant to run on your roboRIO. Sim is WPILib code meant to run on your computer with Gazebo, and shared is code shared between the two. Shared code must be platform-independent, since it will be compiled with both the ARM cross-compiler and whatever desktop compiler you are using (g++, msvc, etc...).
+The main WPILib code you're probably looking for is in WPILibJ and WPILibCpp. Those directories are split into shared, sim, and athena. Athena contains the WPILib code meant to run on your roboRIO. Sim is WPILib code meant to run on your computer with Gazebo, and shared is code shared between the two. Shared code must be platform-independent, since it will be compiled with both the ARM cross-compiler and whatever desktop compiler you are using (g++, msvc, etc...).
 
 The Simulation directory contains extra simulation tools and libraries, such as gz_msgs and JavaGazebo. See sub-directories for more information.
 

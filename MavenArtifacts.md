@@ -28,7 +28,7 @@ When we publish C++ only libraries, they are published with the base artifact na
 
 Example:
 ```
-edu.wpi.first.wpilibc:wpilibc-cpp:version:classifier@zip
+edu.wpi.first.wpilibcpp:wpilibcpp-cpp:version:classifier@zip
 ```
 
 #### Java Only Libraries
@@ -117,7 +117,7 @@ All artifacts are based at `edu.wpi.first.artifactname` in the repository.
   * cscore
   * wpiutil
 
-* wpilibc
+* wpilibcpp
   * hal
   * cameraserver
   * ntcore
@@ -126,7 +126,7 @@ All artifacts are based at `edu.wpi.first.artifactname` in the repository.
   * wpiutil
 
 * wpilibNewCommands
-  * wpilibc
+  * wpilibcpp
   * hal
   * cameraserver
   * ntcore

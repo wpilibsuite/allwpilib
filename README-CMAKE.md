@@ -38,7 +38,7 @@ The following build options are available:
 * `WITH_WPIMATH` (ON Default)
   * This option will build the wpimath library. This option must be on to build wpilib.
 * `WITH_WPILIB` (ON Default)
-  * This option will build the hal and wpilibc/j during the build. The HAL is the simulator hal, unless the external hal options are used. The cmake build has no capability to build for the RoboRIO.
+  * This option will build the hal and wpilibcpp/j during the build. The HAL is the simulator hal, unless the external hal options are used. The cmake build has no capability to build for the RoboRIO.
 * `WITH_EXAMPLES` (ON Default)
   * This option will build C++ examples.
 * `WITH_TESTS` (ON Default)
@@ -102,7 +102,7 @@ add_executable(my_vision_app main.cpp) # executable name as first parameter
 target_link_libraries(my_vision_app cameraserver ntcore cscore wpiutil)
 ```
 
-If you are using them, `wpilibc` and `hal` should be added before the `cameraserver` declaration in the `target_link_libraries` function.
+If you are using them, `wpilibcpp` and `hal` should be added before the `cameraserver` declaration in the `target_link_libraries` function.
 
 Add a `main.cpp` file to contain your code, and create a build folder. Move into the build folder, and run
 

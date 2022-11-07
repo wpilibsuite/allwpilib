@@ -60,7 +60,7 @@ model {
                     return
                 }
                 lib project: ':wpilibNewCommands', library: 'wpilibNewCommands', linkage: 'shared'
-                lib project: ':wpilibc', library: 'wpilibc', linkage: 'shared'
+                lib project: ':wpilibcpp', library: 'wpilibcpp', linkage: 'shared'
                 lib project: ':wpimath', library: 'wpimath', linkage: 'shared'
                 project(':ntcore').addNtcoreDependency(binary, 'shared')
                 lib project: ':cscore', library: 'cscore', linkage: 'shared'
@@ -88,7 +88,7 @@ model {
                 targetBuildTypes 'debug'
                 binaries.all { binary ->
                     lib project: ':wpilibNewCommands', library: 'wpilibNewCommands', linkage: 'shared'
-                    lib project: ':wpilibc', library: 'wpilibc', linkage: 'shared'
+                    lib project: ':wpilibcpp', library: 'wpilibcpp', linkage: 'shared'
                     lib project: ':wpimath', library: 'wpimath', linkage: 'shared'
                     project(':ntcore').addNtcoreDependency(binary, 'shared')
                     lib project: ':cscore', library: 'cscore', linkage: 'shared'
@@ -136,7 +136,7 @@ model {
                 targetBuildTypes 'debug'
                 binaries.all { binary ->
                     lib project: ':wpilibNewCommands', library: 'wpilibNewCommands', linkage: 'shared'
-                    lib project: ':wpilibc', library: 'wpilibc', linkage: 'shared'
+                    lib project: ':wpilibcpp', library: 'wpilibcpp', linkage: 'shared'
                     lib project: ':wpimath', library: 'wpimath', linkage: 'shared'
                     project(':ntcore').addNtcoreDependency(binary, 'shared')
                     lib project: ':cscore', library: 'cscore', linkage: 'shared'
@@ -165,7 +165,7 @@ model {
     }
     testSuites {
         examplesMap.each { key, value ->
-            def testFolder = new File("${rootDir}/wpilibcExamples/src/test/cpp/examples/${key}")
+            def testFolder = new File("${rootDir}/wpilibcppExamples/src/test/cpp/examples/${key}")
             if (testFolder.exists()) {
                 "${key}Test"(GoogleTestTestSuiteSpec) {
                     for (NativeComponentSpec c : $.components) {
@@ -201,7 +201,7 @@ model {
     binaries {
         withType(GoogleTestTestSuiteBinarySpec) {
             lib project: ':wpilibNewCommands', library: 'wpilibNewCommands', linkage: 'shared'
-            lib project: ':wpilibc', library: 'wpilibc', linkage: 'shared'
+            lib project: ':wpilibcpp', library: 'wpilibcpp', linkage: 'shared'
             lib project: ':wpimath', library: 'wpimath', linkage: 'shared'
             project(':ntcore').addNtcoreDependency(it, 'shared')
             lib project: ':cscore', library: 'cscore', linkage: 'shared'

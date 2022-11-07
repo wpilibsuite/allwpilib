@@ -26,7 +26,7 @@ nativeUtils {
 nativeUtils.wpi.addWarnings()
 nativeUtils.wpi.addWarningsAsErrors()
 
-if (project.name != 'wpilibcExamples') {
+if (project.name != 'wpilibcppExamples') {
     nativeUtils.wpi.addReleaseSymbolGeneration()
 }
 

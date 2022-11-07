@@ -7,7 +7,7 @@ apply plugin: SingleNativeBuild
 apply plugin: ExtraTasks
 
 ext {
-    nativeName = 'wpilibc'
+    nativeName = 'wpilibcpp'
 }
 
 apply from: "${rootDir}/shared/config.gradle"
@@ -61,7 +61,7 @@ staticGtestConfigs["${nativeName}Test"] = []
 apply from: "${rootDir}/shared/googletest.gradle"
 
 nativeUtils.exportsConfigs {
-    wpilibc {
+    wpilibcpp {
         x64ExcludeSymbols = [
             '_CT??_R0?AV_System_error',
             '_CT??_R0?AVexception',
@@ -150,7 +150,7 @@ model {
                     source {
                         srcDirs 'src/dev/native/cpp'
                         include '**/*.cpp'
-                        lib library: 'wpilibc'
+                        lib library: 'wpilibcpp'
                     }
                     exportedHeaders {
                         srcDirs 'src/dev/native/include'

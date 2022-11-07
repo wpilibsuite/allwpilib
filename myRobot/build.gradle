@@ -179,7 +179,7 @@ model {
                     }
                 }
                 lib project: ':wpilibNewCommands', library: 'wpilibNewCommands', linkage: 'shared'
-                lib project: ':wpilibc', library: 'wpilibc', linkage: 'shared'
+                lib project: ':wpilibcpp', library: 'wpilibcpp', linkage: 'shared'
                 lib project: ':wpimath', library: 'wpimath', linkage: 'shared'
                 lib project: ':cameraserver', library: 'cameraserver', linkage: 'shared'
                 project(':ntcore').addNtcoreDependency(binary, 'shared')
@@ -227,7 +227,7 @@ model {
                     }
                 }
                 lib project: ':wpilibNewCommands', library: 'wpilibNewCommands', linkage: 'static'
-                lib project: ':wpilibc', library: 'wpilibc', linkage: 'static'
+                lib project: ':wpilibcpp', library: 'wpilibcpp', linkage: 'static'
                 lib project: ':wpimath', library: 'wpimath', linkage: 'static'
                 lib project: ':cameraserver', library: 'cameraserver', linkage: 'static'
                 project(':ntcore').addNtcoreDependency(binary, 'static')

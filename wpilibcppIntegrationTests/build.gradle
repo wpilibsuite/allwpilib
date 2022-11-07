@@ -8,11 +8,11 @@ apply plugin: ExtraTasks
 apply from: '../shared/config.gradle'
 
 ext {
-    sharedCvConfigs = [wpilibcIntegrationTests: []]
+    sharedCvConfigs = [wpilibcppIntegrationTests: []]
     staticCvConfigs = [:]
     useJava = false
     useCpp = true
-    staticGtestConfigs = [wpilibcIntegrationTests: []]
+    staticGtestConfigs = [wpilibcppIntegrationTests: []]
 }
 
 apply from: "${rootDir}/shared/opencv.gradle"
@@ -21,7 +21,7 @@ apply from: "${rootDir}/shared/googletest.gradle"
 
 model {
     components {
-        wpilibcIntegrationTests(NativeExecutableSpec) {
+        wpilibcppIntegrationTests(NativeExecutableSpec) {
             targetBuildTypes 'debug'
             baseName = 'FRCUserProgram'
             nativeUtils.useRequiredLibrary(it, 'googletest_static')
@@ -39,7 +39,7 @@ model {
                             }
                         }
                     }
-                    lib project: ':wpilibc', library: 'wpilibc', linkage: 'shared'
+                    lib project: ':wpilibcpp', library: 'wpilibcpp', linkage: 'shared'
                     lib project: ':wpimath', library: 'wpimath', linkage: 'shared'
                     project(':ntcore').addNtcoreDependency(binary, 'shared')
                     project(':ntcore').addNtcoreJniDependency(binary)
@@ -75,7 +75,7 @@ def testOutputFolder = file("${project(':').buildDir}/integrationTestFiles")
 
 model {
     tasks {
-        copyWpilibCTestLibrariesToOutput(Copy) {
+        copyWpilibCppTestLibrariesToOutput(Copy) {
             def task = it
             $.binaries.each {
                 if (it in NativeExecutableBinarySpec && it.targetPlatform.name == nativeUtils.wpi.platforms.roborio && it.buildable) {
@@ -99,7 +99,7 @@ model {
         // This is in a separate if statement because of what I would assume is a bug in grade.
         // Will file an issue on their side.
         if (!project.hasProperty('skiponlyathena')) {
-            build.dependsOn copyWpilibCTestLibrariesToOutput
+            build.dependsOn copyWpilibCppTestLibrariesToOutput
         }
     }
 }

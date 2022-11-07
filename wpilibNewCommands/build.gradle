@@ -7,7 +7,7 @@ evaluationDependsOn(':ntcore')
 evaluationDependsOn(':cscore')
 evaluationDependsOn(':hal')
 evaluationDependsOn(':wpimath')
-evaluationDependsOn(':wpilibc')
+evaluationDependsOn(':wpilibcpp')
 evaluationDependsOn(':cameraserver')
 evaluationDependsOn(':wpilibj')
 
@@ -56,7 +56,7 @@ model {
             if (!it.buildable || !(it instanceof NativeBinarySpec)) {
                 return
             }
-            lib project: ':wpilibc', library: 'wpilibc', linkage: 'shared'
+            lib project: ':wpilibcpp', library: 'wpilibcpp', linkage: 'shared'
             project(':ntcore').addNtcoreDependency(it, 'shared')
             project(':hal').addHalDependency(it, 'shared')
             lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'

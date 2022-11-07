@@ -28,7 +28,7 @@ stages:
               gradleOptions: "-Xmx3072m"
               publishJUnitResults: false
               testResultsFiles: "**/TEST-*.xml"
-              tasks: "copyWpilibJIntegrationTestJarToOutput copyWpilibCTestLibrariesToOutput"
+              tasks: "copyWpilibJIntegrationTestJarToOutput copyWpilibCppTestLibrariesToOutput"
               options: "-Ponlylinuxathena -PbuildServer -PskipJavaFormat"
 
           - task: PublishPipelineArtifact@0
