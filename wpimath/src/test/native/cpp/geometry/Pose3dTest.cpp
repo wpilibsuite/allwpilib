@@ -9,6 +9,29 @@
 
 using namespace frc;
 
+TEST(Pose3dTest, TestTransformByRotations) {
+  const double kEpsilon = 1E-9;
+
+  const Pose3d initialPose{0_m, 0_m, 0_m, Rotation3d{0_deg, 0_deg, 0_deg}};
+  const Transform3d transform1{Translation3d{0_m, 0_m, 0_m},
+                               Rotation3d{90_deg, 45_deg, 0_deg}};
+  const Transform3d transform2{Translation3d{0_m, 0_m, 0_m},
+                               Rotation3d{-90_deg, 0_deg, 0_deg}};
+  const Transform3d transform3{Translation3d{0_m, 0_m, 0_m},
+                               Rotation3d{0_deg, -45_deg, 0_deg}};
+
+  Pose3d finalPose = initialPose.TransformBy(transform1)
+                         .TransformBy(transform2)
+                         .TransformBy(transform3);
+
+  EXPECT_NEAR(finalPose.Rotation().X().value(),
+              initialPose.Rotation().X().value(), kEpsilon);
+  EXPECT_NEAR(finalPose.Rotation().Y().value(),
+              initialPose.Rotation().Y().value(), kEpsilon);
+  EXPECT_NEAR(finalPose.Rotation().Z().value(),
+              initialPose.Rotation().Z().value(), kEpsilon);
+}
+
 TEST(Pose3dTest, TransformBy) {
   Eigen::Vector3d zAxis{0.0, 0.0, 1.0};
 
