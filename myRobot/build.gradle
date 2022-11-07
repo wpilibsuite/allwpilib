@@ -50,7 +50,7 @@ dependencies {
     implementation project(':ntcore')
     implementation project(':cscore')
     implementation project(':cameraserver')
-    implementation project(':wpilibNewCommands')
+    implementation project(':commands')
 }
 
 def simProjects = ['halsim_gui']
@@ -178,7 +178,7 @@ model {
                         deploy.targets.roborio.artifacts.myRobotCppJava.binary = binary
                     }
                 }
-                lib project: ':wpilibNewCommands', library: 'wpilibNewCommands', linkage: 'shared'
+                lib project: ':commands', library: 'commands', linkage: 'shared'
                 lib project: ':wpilibc', library: 'wpilibc', linkage: 'shared'
                 lib project: ':wpimath', library: 'wpimath', linkage: 'shared'
                 lib project: ':cameraserver', library: 'cameraserver', linkage: 'shared'
@@ -226,7 +226,7 @@ model {
                         deploy.targets.roborio.artifacts.myRobotCppStatic.binary = binary
                     }
                 }
-                lib project: ':wpilibNewCommands', library: 'wpilibNewCommands', linkage: 'static'
+                lib project: ':commands', library: 'commands', linkage: 'static'
                 lib project: ':wpilibc', library: 'wpilibc', linkage: 'static'
                 lib project: ':wpimath', library: 'wpimath', linkage: 'static'
                 lib project: ':cameraserver', library: 'cameraserver', linkage: 'static'

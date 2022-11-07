@@ -125,7 +125,7 @@ All artifacts are based at `edu.wpi.first.artifactname` in the repository.
   * wpimath
   * wpiutil
 
-* wpilibNewCommands
+* commands
   * wpilibc
   * hal
   * cameraserver

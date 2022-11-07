@@ -1,5 +1,5 @@
 ext {
-    nativeName = 'wpilibNewCommands'
+    nativeName = 'commands'
     devMain = 'edu.wpi.first.wpilibj.commands.DevMain'
 }
 
@@ -32,7 +32,7 @@ dependencies {
 }
 
 nativeUtils.exportsConfigs {
-    wpilibNewCommands {
+    commands {
         x64ExcludeSymbols = [
             '_CT??_R0?AV_System_error',
             '_CT??_R0?AVexception',
