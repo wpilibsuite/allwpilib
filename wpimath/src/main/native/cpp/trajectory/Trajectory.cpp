@@ -5,6 +5,7 @@
 #include "frc/trajectory/Trajectory.h"
 
 #include <algorithm>
+#include <stdexcept>
 
 #include <wpi/MathExtras.h>
 #include <wpi/json.h>
@@ -64,6 +65,9 @@ Trajectory::State Trajectory::State::Interpolate(State endValue,
 }
 
 Trajectory::Trajectory(const std::vector<State>& states) : m_states(states) {
+  if (states.empty()) {
+    throw std::invalid_argument("Trajectory requires nonempty list of states");
+  }
   m_totalTime = states.back().t;
 }
 
