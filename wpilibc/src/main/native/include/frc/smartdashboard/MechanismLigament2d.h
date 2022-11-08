@@ -7,7 +7,8 @@
 #include <memory>
 #include <string_view>
 
-#include <networktables/NetworkTableEntry.h>
+#include <networktables/DoubleTopic.h>
+#include <networktables/StringTopic.h>
 #include <units/angle.h>
 
 #include "frc/smartdashboard/MechanismObject2d.h"
@@ -89,14 +90,14 @@ class MechanismLigament2d : public MechanismObject2d {
   void UpdateEntries(std::shared_ptr<nt::NetworkTable> table) override;
 
  private:
-  void Flush();
+  nt::StringPublisher m_typePub;
   double m_length;
-  nt::NetworkTableEntry m_lengthEntry;
+  nt::DoubleEntry m_lengthEntry;
   double m_angle;
-  nt::NetworkTableEntry m_angleEntry;
+  nt::DoubleEntry m_angleEntry;
   double m_weight;
-  nt::NetworkTableEntry m_weightEntry;
+  nt::DoubleEntry m_weightEntry;
   char m_color[10];
-  nt::NetworkTableEntry m_colorEntry;
+  nt::StringEntry m_colorEntry;
 };
 }  // namespace frc

@@ -143,5 +143,6 @@ void DigitalOutput::SetSimDevice(HAL_SimDeviceHandle device) {
 void DigitalOutput::InitSendable(wpi::SendableBuilder& builder) {
   builder.SetSmartDashboardType("Digital Output");
   builder.AddBooleanProperty(
-      "Value", [=] { return Get(); }, [=](bool value) { Set(value); });
+      "Value", [=, this] { return Get(); },
+      [=, this](bool value) { Set(value); });
 }

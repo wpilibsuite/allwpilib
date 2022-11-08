@@ -27,25 +27,25 @@ void RobotContainer::ConfigureButtonBindings() {
 
   // Spin up the shooter when the 'A' button is pressed
   frc2::JoystickButton(&m_driverController, frc::XboxController::Button::kA)
-      .WhenPressed(&m_spinUpShooter);
+      .OnTrue(&m_spinUpShooter);
 
   // Turn off the shooter when the 'B' button is pressed
   frc2::JoystickButton(&m_driverController, frc::XboxController::Button::kB)
-      .WhenPressed(&m_stopShooter);
+      .OnTrue(&m_stopShooter);
 
   // Shoot when the 'X' button is held
   frc2::JoystickButton(&m_driverController, frc::XboxController::Button::kX)
-      .WhenPressed(&m_shoot)
-      .WhenReleased(&m_stopFeeder);
+      .OnTrue(&m_shoot)
+      .OnFalse(&m_stopFeeder);
 
   // While holding the shoulder button, drive at half speed
   frc2::JoystickButton(&m_driverController,
                        frc::XboxController::Button::kRightBumper)
-      .WhenPressed(&m_driveHalfSpeed)
-      .WhenReleased(&m_driveFullSpeed);
+      .OnTrue(&m_driveHalfSpeed)
+      .OnFalse(&m_driveFullSpeed);
 }
 
 frc2::Command* RobotContainer::GetAutonomousCommand() {
   // Runs the chosen command in autonomous
-  return &m_autonomousCommand;
+  return m_autonomousCommand.get();
 }

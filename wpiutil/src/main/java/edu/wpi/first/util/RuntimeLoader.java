@@ -80,7 +80,6 @@ public final class RuntimeLoader<T> {
    *
    * @throws IOException if the library fails to load
    */
-  @SuppressWarnings("PMD.PreserveStackTrace")
   public void loadLibrary() throws IOException {
     try {
       // First, try loading path
@@ -132,7 +131,6 @@ public final class RuntimeLoader<T> {
    *
    * @throws IOException if the library failed to load
    */
-  @SuppressWarnings({"PMD.PreserveStackTrace", "PMD.EmptyWhileStmt"})
   public void loadLibraryHashed() throws IOException {
     try {
       // First, try loading path

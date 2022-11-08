@@ -7,7 +7,7 @@ package edu.wpi.first.wpilibj.hal;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import edu.wpi.first.hal.HAL;
+import edu.wpi.first.hal.DriverStationJNI;
 import edu.wpi.first.hal.MatchInfoData;
 import edu.wpi.first.hal.simulation.DriverStationDataJNI;
 import edu.wpi.first.wpilibj.DriverStation.MatchType;
@@ -20,7 +20,7 @@ class MatchInfoDataTest {
     DriverStationDataJNI.setMatchInfo("Event Name", "Game Message", 174, 191, matchType.ordinal());
 
     MatchInfoData outMatchInfo = new MatchInfoData();
-    HAL.getMatchInfo(outMatchInfo);
+    DriverStationJNI.getMatchInfo(outMatchInfo);
 
     assertAll(
         () -> assertEquals("Event Name", outMatchInfo.eventName),

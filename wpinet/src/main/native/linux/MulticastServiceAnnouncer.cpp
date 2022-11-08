@@ -31,13 +31,13 @@ struct MulticastServiceAnnouncer::Impl {
 
   template <typename T>
   Impl(std::string_view serviceName, std::string_view serviceType, int port,
-       wpi::span<const std::pair<T, T>> txt);
+       std::span<const std::pair<T, T>> txt);
 };
 
 template <typename T>
 MulticastServiceAnnouncer::Impl::Impl(std::string_view serviceName,
                                       std::string_view serviceType, int port,
-                                      wpi::span<const std::pair<T, T>> txt) {
+                                      std::span<const std::pair<T, T>> txt) {
   if (!this->table.IsValid()) {
     return;
   }
@@ -135,19 +135,19 @@ static void ClientCallback(AvahiClient* client, AvahiClientState state,
 
 MulticastServiceAnnouncer::MulticastServiceAnnouncer(
     std::string_view serviceName, std::string_view serviceType, int port) {
-  wpi::span<const std::pair<std::string_view, std::string_view>> txt;
+  std::span<const std::pair<std::string_view, std::string_view>> txt;
   pImpl = std::make_unique<Impl>(serviceName, serviceType, port, txt);
 }
 
 MulticastServiceAnnouncer::MulticastServiceAnnouncer(
     std::string_view serviceName, std::string_view serviceType, int port,
-    wpi::span<const std::pair<std::string, std::string>> txt) {
+    std::span<const std::pair<std::string, std::string>> txt) {
   pImpl = std::make_unique<Impl>(serviceName, serviceType, port, txt);
 }
 
 MulticastServiceAnnouncer::MulticastServiceAnnouncer(
     std::string_view serviceName, std::string_view serviceType, int port,
-    wpi::span<const std::pair<std::string_view, std::string_view>> txt) {
+    std::span<const std::pair<std::string_view, std::string_view>> txt) {
   pImpl = std::make_unique<Impl>(serviceName, serviceType, port, txt);
 }
 

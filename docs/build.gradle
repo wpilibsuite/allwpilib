@@ -4,6 +4,7 @@ plugins {
 }
 
 evaluationDependsOn(':wpiutil')
+evaluationDependsOn(':wpinet')
 evaluationDependsOn(':ntcore')
 evaluationDependsOn(':cscore')
 evaluationDependsOn(':hal')
@@ -28,6 +29,7 @@ def cppIncludeRoots = []
 
 cppProjectZips.add(project(':hal').cppHeadersZip)
 cppProjectZips.add(project(':wpiutil').cppHeadersZip)
+cppProjectZips.add(project(':wpinet').cppHeadersZip)
 cppProjectZips.add(project(':ntcore').cppHeadersZip)
 cppProjectZips.add(project(':cscore').cppHeadersZip)
 cppProjectZips.add(project(':cameraserver').cppHeadersZip)
@@ -57,7 +59,6 @@ doxygen {
     if (project.hasProperty('docWarningsAsErrors')) {
         // C++20 shims
         exclude 'wpi/ghc/filesystem.hpp'
-        exclude 'wpi/span.h'
 
         // Drake
         exclude 'drake/common/**'
@@ -110,7 +111,7 @@ doxygen {
         // libuv
         exclude 'uv.h'
         exclude 'uv/**'
-        exclude 'wpi/uv/**'
+        exclude 'wpinet/uv/**'
 
         // json
         exclude 'wpi/json.h'
@@ -125,6 +126,12 @@ doxygen {
         exclude 'units/**'
     }
 
+    aliases 'effects=\\par <i>Effects:</i>^^',
+            'notes=\\par <i>Notes:</i>^^',
+            'requires=\\par <i>Requires:</i>^^',
+            'requiredbe=\\par <i>Required Behavior:</i>^^',
+            'concept{2}=<a href=\"md_doc_concepts.html#\1\">\2</a>',
+            'defaultbe=\\par <i>Default Behavior:</i>^^'
     case_sense_names false
     extension_mapping 'inc=C++', 'no_extension=C++'
     extract_all true
@@ -198,8 +205,10 @@ task generateJavaDocs(type: Javadoc) {
     dependsOn project(':wpilibj').generateJavaVersion
     dependsOn project(':hal').generateUsageReporting
     dependsOn project(':wpimath').generateNat
+    dependsOn project(':ntcore').ntcoreGenerateJavaTypes
     source project(':hal').sourceSets.main.java
     source project(':wpiutil').sourceSets.main.java
+    source project(':wpinet').sourceSets.main.java
     source project(':cscore').sourceSets.main.java
     source project(':ntcore').sourceSets.main.java
     source project(':wpimath').sourceSets.main.java

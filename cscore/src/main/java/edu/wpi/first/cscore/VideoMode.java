@@ -5,6 +5,7 @@
 package edu.wpi.first.cscore;
 
 /** Video mode. */
+@SuppressWarnings("MemberName")
 public class VideoMode {
   public enum PixelFormat {
     kUnknown(0),
@@ -62,18 +63,14 @@ public class VideoMode {
   }
 
   /** Pixel format. */
-  @SuppressWarnings("MemberName")
   public PixelFormat pixelFormat;
 
   /** Width in pixels. */
-  @SuppressWarnings("MemberName")
   public int width;
 
   /** Height in pixels. */
-  @SuppressWarnings("MemberName")
   public int height;
 
   /** Frames per second. */
-  @SuppressWarnings("MemberName")
   public int fps;
 }

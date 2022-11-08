@@ -4,6 +4,9 @@
 
 package edu.wpi.first.wpilibj2.command;
 
+import static edu.wpi.first.wpilibj.util.ErrorMessages.requireNonNullParam;
+
+import edu.wpi.first.util.function.BooleanConsumer;
 import java.util.Set;
 import java.util.function.BooleanSupplier;
 
@@ -255,28 +258,15 @@ public interface Command {
    * decorated without issue.
    *
    * @return the decorated command
-   * @deprecated use {@link #endlessly()} instead.
+   * @deprecated PerpetualCommand violates the assumption that execute() doesn't get called after
+   *     isFinished() returns true -- an assumption that should be valid. This was unsafe/undefined
+   *     behavior from the start, and RepeatCommand provides an easy way to achieve similar end
+   *     results with slightly different (and safe) semantics.
    */
   @SuppressWarnings("removal") // PerpetualCommand
   @Deprecated(forRemoval = true, since = "2023")
   default PerpetualCommand perpetually() {
     return new PerpetualCommand(this);
-  }
-
-  /**
-   * Decorates this command to run endlessly, ignoring its ordinary end conditions. The decorated
-   * command can still be interrupted or canceled.
-   *
-   * <p>Note: This decorator works by composing this command within a CommandGroup. The command
-   * cannot be used independently after being decorated, or be re-decorated with a different
-   * decorator, unless it is manually cleared from the list of grouped commands with {@link
-   * CommandGroupBase#clearGroupedCommand(Command)}. The decorated command can, however, be further
-   * decorated without issue.
-   *
-   * @return the decorated command
-   */
-  default EndlessCommand endlessly() {
-    return new EndlessCommand(this);
   }
 
   /**
@@ -348,6 +338,42 @@ public interface Command {
     };
   }
 
+  /**
+   * Decorates this command with a lambda to call on interrupt or end, following the command's
+   * inherent {@link #end(boolean)} method.
+   *
+   * @param end a lambda accepting a boolean parameter specifying whether the command was
+   *     interrupted.
+   * @return the decorated command
+   */
+  default WrapperCommand finallyDo(BooleanConsumer end) {
+    requireNonNullParam(end, "end", "Command.finallyDo()");
+    return new WrapperCommand(this) {
+      @Override
+      public void end(boolean interrupted) {
+        super.end(interrupted);
+        end.accept(interrupted);
+      }
+    };
+  }
+
+  /**
+   * Decorates this command with a lambda to call on interrupt, following the command's inherent
+   * {@link #end(boolean)} method.
+   *
+   * @param handler a lambda to run when the command is interrupted
+   * @return the decorated command
+   */
+  default WrapperCommand handleInterrupt(Runnable handler) {
+    requireNonNullParam(handler, "handler", "Command.handleInterrupt()");
+    return finallyDo(
+        interrupted -> {
+          if (interrupted) {
+            handler.run();
+          }
+        });
+  }
+
   /** Schedules this command. */
   default void schedule() {
     CommandScheduler.getInstance().schedule(this);
@@ -404,12 +430,30 @@ public interface Command {
   }
 
   /**
-   * Gets the name of this Command.
+   * Gets the name of this Command. Defaults to the simple class name if not overridden.
    *
-   * @return Name
+   * @return The display name of the Command
    */
   default String getName() {
     return this.getClass().getSimpleName();
+  }
+
+  /**
+   * Sets the name of this Command. Nullop if not overridden.
+   *
+   * @param name The display name of the Command.
+   */
+  default void setName(String name) {}
+
+  /**
+   * Decorates this Command with a name. Is an inline function for #setName(String);
+   *
+   * @param name name
+   * @return the decorated Command
+   */
+  default Command withName(String name) {
+    this.setName(name);
+    return this;
   }
 
   /**

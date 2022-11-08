@@ -10,9 +10,12 @@
 #include <utility>
 #include <vector>
 
+#include <networktables/MultiSubscriber.h>
+#include <networktables/NetworkTableInstance.h>
+#include <networktables/NetworkTableListener.h>
+#include <networktables/StringTopic.h>
 #include <ntcore_cpp.h>
 
-#include "glass/networktables/NetworkTablesHelper.h"
 #include "glass/other/Field2D.h"
 
 namespace glass {
@@ -23,7 +26,7 @@ class NTField2DModel : public Field2DModel {
 
   // path is to the table containing ".type", excluding the trailing /
   explicit NTField2DModel(std::string_view path);
-  NTField2DModel(NT_Inst inst, std::string_view path);
+  NTField2DModel(nt::NetworkTableInstance inst, std::string_view path);
   ~NTField2DModel() override;
 
   const char* GetPath() const { return m_path.c_str(); }
@@ -40,9 +43,11 @@ class NTField2DModel : public Field2DModel {
           func) override;
 
  private:
-  NetworkTablesHelper m_nt;
   std::string m_path;
-  NT_Entry m_name;
+  nt::NetworkTableInstance m_inst;
+  nt::MultiSubscriber m_tableSub;
+  nt::StringTopic m_nameTopic;
+  nt::NetworkTableListenerPoller m_poller;
   std::string m_nameValue;
 
   class ObjectModel;

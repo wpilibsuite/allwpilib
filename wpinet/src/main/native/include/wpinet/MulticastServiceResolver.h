@@ -15,7 +15,6 @@
 #include <vector>
 
 #include <wpi/mutex.h>
-#include <wpi/span.h>
 namespace wpi {
 class MulticastServiceResolver {
  public:
@@ -56,9 +55,6 @@ class MulticastServiceResolver {
   std::unique_ptr<Impl> pImpl;
 };
 }  // namespace wpi
-#endif
-
-#ifdef __cplusplus
 extern "C" {
 #endif
 

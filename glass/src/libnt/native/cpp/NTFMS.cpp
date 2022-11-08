@@ -13,15 +13,19 @@
 using namespace glass;
 
 NTFMSModel::NTFMSModel(std::string_view path)
-    : NTFMSModel{nt::GetDefaultInstance(), path} {}
+    : NTFMSModel{nt::NetworkTableInstance::GetDefault(), path} {}
 
-NTFMSModel::NTFMSModel(NT_Inst inst, std::string_view path)
-    : m_nt{inst},
+NTFMSModel::NTFMSModel(nt::NetworkTableInstance inst, std::string_view path)
+    : m_inst{inst},
       m_gameSpecificMessage{
-          m_nt.GetEntry(fmt::format("{}/GameSpecificMessage", path))},
-      m_alliance{m_nt.GetEntry(fmt::format("{}/IsRedAlliance", path))},
-      m_station{m_nt.GetEntry(fmt::format("{}/StationNumber", path))},
-      m_controlWord{m_nt.GetEntry(fmt::format("{}/FMSControlData", path))},
+          inst.GetStringTopic(fmt::format("{}/GameSpecificMessage", path))
+              .Subscribe("")},
+      m_alliance{inst.GetBooleanTopic(fmt::format("{}/IsRedAlliance", path))
+                     .Subscribe(false, {{nt::PubSubOption::SendAll(true)}})},
+      m_station{inst.GetIntegerTopic(fmt::format("{}/StationNumber", path))
+                    .Subscribe(0, {{nt::PubSubOption::SendAll(true)}})},
+      m_controlWord{inst.GetIntegerTopic(fmt::format("{}/FMSControlData", path))
+                        .Subscribe(0, {{nt::PubSubOption::SendAll(true)}})},
       m_fmsAttached{fmt::format("NT_FMS:FMSAttached:{}", path)},
       m_dsAttached{fmt::format("NT_FMS:DSAttached:{}", path)},
       m_allianceStationId{fmt::format("NT_FMS:AllianceStationID:{}", path)},
@@ -29,10 +33,6 @@ NTFMSModel::NTFMSModel(NT_Inst inst, std::string_view path)
       m_enabled{fmt::format("NT_FMS:RobotEnabled:{}", path)},
       m_test{fmt::format("NT_FMS:TestMode:{}", path)},
       m_autonomous{fmt::format("NT_FMS:AutonomousMode:{}", path)} {
-  m_nt.AddListener(m_alliance);
-  m_nt.AddListener(m_station);
-  m_nt.AddListener(m_controlWord);
-
   m_fmsAttached.SetDigital(true);
   m_dsAttached.SetDigital(true);
   m_estop.SetDigital(true);
@@ -43,49 +43,35 @@ NTFMSModel::NTFMSModel(NT_Inst inst, std::string_view path)
 
 std::string_view NTFMSModel::GetGameSpecificMessage(
     wpi::SmallVectorImpl<char>& buf) {
-  buf.clear();
-  auto value = nt::GetEntryValue(m_gameSpecificMessage);
-  if (value && value->IsString()) {
-    auto str = value->GetString();
-    buf.append(str.begin(), str.end());
-  }
-  return std::string_view{buf.data(), buf.size()};
+  return m_gameSpecificMessage.Get(buf, "");
 }
 
 void NTFMSModel::Update() {
-  for (auto&& event : m_nt.PollListener()) {
-    if (event.entry == m_alliance) {
-      if (event.value && event.value->IsBoolean()) {
-        int allianceStationId = m_allianceStationId.GetValue();
-        allianceStationId %= 3;
-        // true if red
-        allianceStationId += 3 * (event.value->GetBoolean() ? 0 : 1);
-        m_allianceStationId.SetValue(allianceStationId);
-      }
-    } else if (event.entry == m_station) {
-      if (event.value && event.value->IsDouble()) {
-        int allianceStationId = m_allianceStationId.GetValue();
-        bool isRed = (allianceStationId < 3);
-        // the NT value is 1-indexed
-        m_allianceStationId.SetValue(event.value->GetDouble() - 1 +
-                                     3 * (isRed ? 0 : 1));
-      }
-    } else if (event.entry == m_controlWord) {
-      if (event.value && event.value->IsDouble()) {
-        uint32_t controlWord = event.value->GetDouble();
-        // See HAL_ControlWord definition
-        auto time = wpi::Now();
-        m_enabled.SetValue(((controlWord & 0x01) != 0) ? 1 : 0, time);
-        m_autonomous.SetValue(((controlWord & 0x02) != 0) ? 1 : 0, time);
-        m_test.SetValue(((controlWord & 0x04) != 0) ? 1 : 0, time);
-        m_estop.SetValue(((controlWord & 0x08) != 0) ? 1 : 0, time);
-        m_fmsAttached.SetValue(((controlWord & 0x10) != 0) ? 1 : 0, time);
-        m_dsAttached.SetValue(((controlWord & 0x20) != 0) ? 1 : 0, time);
-      }
-    }
+  for (auto&& v : m_alliance.ReadQueue()) {
+    int allianceStationId = m_allianceStationId.GetValue();
+    allianceStationId %= 3;
+    // true if red
+    allianceStationId += 3 * (v.value ? 0 : 1);
+    m_allianceStationId.SetValue(allianceStationId, v.time);
+  }
+  for (auto&& v : m_station.ReadQueue()) {
+    int allianceStationId = m_allianceStationId.GetValue();
+    bool isRed = (allianceStationId < 3);
+    // the NT value is 1-indexed
+    m_allianceStationId.SetValue(v.value - 1 + 3 * (isRed ? 0 : 1), v.time);
+  }
+  for (auto&& v : m_controlWord.ReadQueue()) {
+    uint32_t controlWord = v.value;
+    // See HAL_ControlWord definition
+    m_enabled.SetValue(((controlWord & 0x01) != 0) ? 1 : 0, v.time);
+    m_autonomous.SetValue(((controlWord & 0x02) != 0) ? 1 : 0, v.time);
+    m_test.SetValue(((controlWord & 0x04) != 0) ? 1 : 0, v.time);
+    m_estop.SetValue(((controlWord & 0x08) != 0) ? 1 : 0, v.time);
+    m_fmsAttached.SetValue(((controlWord & 0x10) != 0) ? 1 : 0, v.time);
+    m_dsAttached.SetValue(((controlWord & 0x20) != 0) ? 1 : 0, v.time);
   }
 }
 
 bool NTFMSModel::Exists() {
-  return m_nt.IsConnected() && nt::GetEntryType(m_controlWord) != NT_UNASSIGNED;
+  return m_inst.IsConnected() && m_controlWord.Exists();
 }

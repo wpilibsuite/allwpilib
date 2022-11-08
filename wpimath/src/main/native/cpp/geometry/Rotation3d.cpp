@@ -5,8 +5,9 @@
 #include "frc/geometry/Rotation3d.h"
 
 #include <cmath>
+#include <numbers>
 
-#include <wpi/numbers>
+#include <wpi/json.h>
 
 #include "Eigen/Core"
 #include "Eigen/LU"
@@ -165,6 +166,10 @@ Rotation3d Rotation3d::operator*(double scalar) const {
   }
 }
 
+Rotation3d Rotation3d::operator/(double scalar) const {
+  return *this * (1.0 / scalar);
+}
+
 bool Rotation3d::operator==(const Rotation3d& other) const {
   return m_q == other.m_q;
 }
@@ -201,7 +206,7 @@ units::radian_t Rotation3d::Y() const {
   // https://en.wikipedia.org/wiki/Conversion_between_quaternions_and_Euler_angles#Quaternion_to_Euler_angles_conversion
   double ratio = 2.0 * (w * y - z * x);
   if (std::abs(ratio) >= 1.0) {
-    return units::radian_t{std::copysign(wpi::numbers::pi / 2.0, ratio)};
+    return units::radian_t{std::copysign(std::numbers::pi / 2.0, ratio)};
   } else {
     return units::radian_t{std::asin(ratio)};
   }
@@ -234,4 +239,12 @@ units::radian_t Rotation3d::Angle() const {
 
 Rotation2d Rotation3d::ToRotation2d() const {
   return Rotation2d{Z()};
+}
+
+void frc::to_json(wpi::json& json, const Rotation3d& rotation) {
+  json = wpi::json{{"quaternion", rotation.GetQuaternion()}};
+}
+
+void frc::from_json(const wpi::json& json, Rotation3d& rotation) {
+  rotation = Rotation3d{json.at("quaternion").get<Quaternion>()};
 }

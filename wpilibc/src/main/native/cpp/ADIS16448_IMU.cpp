@@ -22,11 +22,11 @@
 
 #include <algorithm>
 #include <cmath>
+#include <numbers>
 #include <string>
 
 #include <hal/HAL.h>
 #include <networktables/NTSendableBuilder.h>
-#include <wpi/numbers>
 #include <wpi/sendable/SendableRegistry.h>
 
 #include "frc/Errors.h"
@@ -61,9 +61,9 @@ inline void ADISReportError(int32_t status, const char* file, int line,
 }  // namespace
 
 #define REPORT_WARNING(msg) \
-  ADISReportError(warn::Warning, __FILE__, __LINE__, __FUNCTION__, "{}", msg);
+  ADISReportError(warn::Warning, __FILE__, __LINE__, __FUNCTION__, msg);
 #define REPORT_ERROR(msg) \
-  ADISReportError(err::Error, __FILE__, __LINE__, __FUNCTION__, "{}", msg)
+  ADISReportError(err::Error, __FILE__, __LINE__, __FUNCTION__, msg)
 
 ADIS16448_IMU::ADIS16448_IMU()
     : ADIS16448_IMU(kZ, SPI::Port::kMXP, CalibrationTime::_512ms) {}
@@ -74,6 +74,8 @@ ADIS16448_IMU::ADIS16448_IMU(IMUAxis yaw_axis, SPI::Port port,
       m_spi_port(port),
       m_simDevice("Gyro:ADIS16448", port) {
   if (m_simDevice) {
+    m_connected =
+        m_simDevice.CreateBoolean("connected", hal::SimDevice::kInput, true);
     m_simGyroAngleX =
         m_simDevice.CreateDouble("gyro_angle_x", hal::SimDevice::kInput, 0.0);
     m_simGyroAngleY =
@@ -150,6 +152,14 @@ ADIS16448_IMU::ADIS16448_IMU(IMUAxis yaw_axis, SPI::Port port,
   HAL_Report(HALUsageReporting::kResourceType_ADIS16448, 0);
 
   wpi::SendableRegistry::AddLW(this, "ADIS16448", port);
+  m_connected = true;
+}
+
+bool ADIS16448_IMU::IsConnected() const {
+  if (m_simConnected) {
+    return m_simConnected.Get();
+  }
+  return m_connected;
 }
 
 /**
@@ -197,9 +207,7 @@ bool ADIS16448_IMU::SwitchToStandardSPI() {
   if (m_spi == nullptr) {
     m_spi = new SPI(m_spi_port);
     m_spi->SetClockRate(1000000);
-    m_spi->SetMSBFirst();
-    m_spi->SetSampleDataOnTrailingEdge();
-    m_spi->SetClockActiveLow();
+    m_spi->SetMode(frc::SPI::Mode::kMode3);
     m_spi->SetChipSelectActiveLow();
     ReadRegister(PROD_ID);  // Dummy read
 
@@ -632,29 +640,29 @@ void ADIS16448_IMU::Acquire() {
 
 /* Complementary filter functions */
 double ADIS16448_IMU::FormatFastConverge(double compAngle, double accAngle) {
-  if (compAngle > accAngle + wpi::numbers::pi) {
-    compAngle = compAngle - 2.0 * wpi::numbers::pi;
-  } else if (accAngle > compAngle + wpi::numbers::pi) {
-    compAngle = compAngle + 2.0 * wpi::numbers::pi;
+  if (compAngle > accAngle + std::numbers::pi) {
+    compAngle = compAngle - 2.0 * std::numbers::pi;
+  } else if (accAngle > compAngle + std::numbers::pi) {
+    compAngle = compAngle + 2.0 * std::numbers::pi;
   }
   return compAngle;
 }
 
 double ADIS16448_IMU::FormatRange0to2PI(double compAngle) {
-  while (compAngle >= 2 * wpi::numbers::pi) {
-    compAngle = compAngle - 2.0 * wpi::numbers::pi;
+  while (compAngle >= 2 * std::numbers::pi) {
+    compAngle = compAngle - 2.0 * std::numbers::pi;
   }
   while (compAngle < 0.0) {
-    compAngle = compAngle + 2.0 * wpi::numbers::pi;
+    compAngle = compAngle + 2.0 * std::numbers::pi;
   }
   return compAngle;
 }
 
 double ADIS16448_IMU::FormatAccelRange(double accelAngle, double accelZ) {
   if (accelZ < 0.0) {
-    accelAngle = wpi::numbers::pi - accelAngle;
+    accelAngle = std::numbers::pi - accelAngle;
   } else if (accelZ > 0.0 && accelAngle < 0.0) {
-    accelAngle = 2.0 * wpi::numbers::pi + accelAngle;
+    accelAngle = 2.0 * std::numbers::pi + accelAngle;
   }
   return accelAngle;
 }
@@ -665,8 +673,8 @@ double ADIS16448_IMU::CompFilterProcess(double compAngle, double accelAngle,
   compAngle =
       m_alpha * (compAngle + omega * m_dt) + (1.0 - m_alpha) * accelAngle;
   compAngle = FormatRange0to2PI(compAngle);
-  if (compAngle > wpi::numbers::pi) {
-    compAngle = compAngle - 2.0 * wpi::numbers::pi;
+  if (compAngle > std::numbers::pi) {
+    compAngle = compAngle - 2.0 * std::numbers::pi;
   }
   return compAngle;
 }
@@ -875,8 +883,6 @@ int ADIS16448_IMU::GetPort() const {
  **/
 void ADIS16448_IMU::InitSendable(nt::NTSendableBuilder& builder) {
   builder.SetSmartDashboardType("ADIS16448 IMU");
-  auto yaw_angle = builder.GetEntry("Yaw Angle").GetHandle();
-  builder.SetUpdateTable([=]() {
-    nt::NetworkTableEntry(yaw_angle).SetDouble(GetAngle().value());
-  });
+  builder.AddDoubleProperty(
+      "Yaw Angle", [=, this] { return GetAngle().value(); }, nullptr);
 }

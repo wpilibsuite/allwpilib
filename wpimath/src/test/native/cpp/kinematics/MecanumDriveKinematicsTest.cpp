@@ -2,7 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include <wpi/numbers>
+#include <numbers>
 
 #include "frc/geometry/Translation2d.h"
 #include "frc/kinematics/MecanumDriveKinematics.h"
@@ -40,6 +40,15 @@ TEST_F(MecanumDriveKinematicsTest, StraightLineForwardKinematics) {
   EXPECT_NEAR(0.0, chassisSpeeds.omega.value(), 0.1);
 }
 
+TEST_F(MecanumDriveKinematicsTest, StraightLineForwardKinematicsWithDeltas) {
+  MecanumDriveWheelPositions wheelDeltas{5_m, 5_m, 5_m, 5_m};
+  auto twist = kinematics.ToTwist2d(wheelDeltas);
+
+  EXPECT_NEAR(5.0, twist.dx.value(), 0.1);
+  EXPECT_NEAR(0.0, twist.dy.value(), 0.1);
+  EXPECT_NEAR(0.0, twist.dtheta.value(), 0.1);
+}
+
 TEST_F(MecanumDriveKinematicsTest, StrafeInverseKinematics) {
   ChassisSpeeds speeds{0_mps, 4_mps, 0_rad_per_s};
   auto moduleStates = kinematics.ToWheelSpeeds(speeds);
@@ -59,9 +68,18 @@ TEST_F(MecanumDriveKinematicsTest, StrafeForwardKinematics) {
   EXPECT_NEAR(0.0, chassisSpeeds.omega.value(), 0.1);
 }
 
+TEST_F(MecanumDriveKinematicsTest, StrafeForwardKinematicsWithDeltas) {
+  MecanumDriveWheelPositions wheelDeltas{-5_m, 5_m, 5_m, -5_m};
+  auto twist = kinematics.ToTwist2d(wheelDeltas);
+
+  EXPECT_NEAR(0.0, twist.dx.value(), 0.1);
+  EXPECT_NEAR(5.0, twist.dy.value(), 0.1);
+  EXPECT_NEAR(0.0, twist.dtheta.value(), 0.1);
+}
+
 TEST_F(MecanumDriveKinematicsTest, RotationInverseKinematics) {
   ChassisSpeeds speeds{0_mps, 0_mps,
-                       units::radians_per_second_t{2 * wpi::numbers::pi}};
+                       units::radians_per_second_t{2 * std::numbers::pi}};
   auto moduleStates = kinematics.ToWheelSpeeds(speeds);
 
   EXPECT_NEAR(-150.79644737, moduleStates.frontLeft.value(), 0.1);
@@ -77,7 +95,17 @@ TEST_F(MecanumDriveKinematicsTest, RotationForwardKinematics) {
 
   EXPECT_NEAR(0.0, chassisSpeeds.vx.value(), 0.1);
   EXPECT_NEAR(0.0, chassisSpeeds.vy.value(), 0.1);
-  EXPECT_NEAR(2 * wpi::numbers::pi, chassisSpeeds.omega.value(), 0.1);
+  EXPECT_NEAR(2 * std::numbers::pi, chassisSpeeds.omega.value(), 0.1);
+}
+
+TEST_F(MecanumDriveKinematicsTest, RotationForwardKinematicsWithDeltas) {
+  MecanumDriveWheelPositions wheelDeltas{-150.79644737_m, 150.79644737_m,
+                                         -150.79644737_m, 150.79644737_m};
+  auto twist = kinematics.ToTwist2d(wheelDeltas);
+
+  EXPECT_NEAR(0.0, twist.dx.value(), 0.1);
+  EXPECT_NEAR(0.0, twist.dy.value(), 0.1);
+  EXPECT_NEAR(2 * std::numbers::pi, twist.dtheta.value(), 0.1);
 }
 
 TEST_F(MecanumDriveKinematicsTest, MixedRotationTranslationInverseKinematics) {
@@ -101,6 +129,18 @@ TEST_F(MecanumDriveKinematicsTest, MixedRotationTranslationForwardKinematics) {
   EXPECT_NEAR(0.707, chassisSpeeds.omega.value(), 0.1);
 }
 
+TEST_F(MecanumDriveKinematicsTest,
+       MixedRotationTranslationForwardKinematicsWithDeltas) {
+  MecanumDriveWheelPositions wheelDeltas{-17.677670_m, 20.506097_m, -13.435_m,
+                                         16.26_m};
+
+  auto twist = kinematics.ToTwist2d(wheelDeltas);
+
+  EXPECT_NEAR(1.41335, twist.dx.value(), 0.1);
+  EXPECT_NEAR(2.1221, twist.dy.value(), 0.1);
+  EXPECT_NEAR(0.707, twist.dtheta.value(), 0.1);
+}
+
 TEST_F(MecanumDriveKinematicsTest, OffCenterRotationInverseKinematics) {
   ChassisSpeeds speeds{0_mps, 0_mps, 1_rad_per_s};
   auto moduleStates = kinematics.ToWheelSpeeds(speeds, m_fl);
@@ -119,6 +159,16 @@ TEST_F(MecanumDriveKinematicsTest, OffCenterRotationForwardKinematics) {
   EXPECT_NEAR(8.48525, chassisSpeeds.vx.value(), 0.1);
   EXPECT_NEAR(-8.48525, chassisSpeeds.vy.value(), 0.1);
   EXPECT_NEAR(0.707, chassisSpeeds.omega.value(), 0.1);
+}
+
+TEST_F(MecanumDriveKinematicsTest,
+       OffCenterRotationForwardKinematicsWithDeltas) {
+  MecanumDriveWheelPositions wheelDeltas{0_m, 16.971_m, -16.971_m, 33.941_m};
+  auto twist = kinematics.ToTwist2d(wheelDeltas);
+
+  EXPECT_NEAR(8.48525, twist.dx.value(), 0.1);
+  EXPECT_NEAR(-8.48525, twist.dy.value(), 0.1);
+  EXPECT_NEAR(0.707, twist.dtheta.value(), 0.1);
 }
 
 TEST_F(MecanumDriveKinematicsTest,
@@ -141,6 +191,16 @@ TEST_F(MecanumDriveKinematicsTest,
   EXPECT_NEAR(12.02, chassisSpeeds.vx.value(), 0.1);
   EXPECT_NEAR(-7.07, chassisSpeeds.vy.value(), 0.1);
   EXPECT_NEAR(0.707, chassisSpeeds.omega.value(), 0.1);
+}
+
+TEST_F(MecanumDriveKinematicsTest,
+       OffCenterTranslationRotationForwardKinematicsWithDeltas) {
+  MecanumDriveWheelPositions wheelDeltas{2.12_m, 21.92_m, -12.02_m, 36.06_m};
+  auto twist = kinematics.ToTwist2d(wheelDeltas);
+
+  EXPECT_NEAR(12.02, twist.dx.value(), 0.1);
+  EXPECT_NEAR(-7.07, twist.dy.value(), 0.1);
+  EXPECT_NEAR(0.707, twist.dtheta.value(), 0.1);
 }
 
 TEST_F(MecanumDriveKinematicsTest, Desaturate) {

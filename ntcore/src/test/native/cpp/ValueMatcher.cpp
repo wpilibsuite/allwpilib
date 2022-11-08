@@ -9,10 +9,9 @@
 namespace nt {
 
 bool ValueMatcher::MatchAndExplain(
-    std::shared_ptr<Value> val,
-    ::testing::MatchResultListener* listener) const {
+    Value val, ::testing::MatchResultListener* listener) const {
   if ((!val && goodval) || (val && !goodval) ||
-      (val && goodval && *val != *goodval)) {
+      (val && goodval && val != goodval)) {
     return false;
   }
   return true;

@@ -6,9 +6,8 @@
 
 #include <initializer_list>
 #include <memory>
+#include <span>
 #include <vector>
-
-#include <wpi/span.h>
 
 #include "frc2/command/CommandBase.h"
 
@@ -49,7 +48,7 @@ class CommandGroupBase : public CommandBase {
    * @return True if all the commands are ungrouped.
    */
   static bool RequireUngrouped(
-      wpi::span<const std::unique_ptr<Command>> commands);
+      std::span<const std::unique_ptr<Command>> commands);
 
   /**
    * Requires that the specified commands not have been already allocated to a

@@ -32,10 +32,6 @@ public class Robot extends TimedRobot {
 
   @Override
   public void robotInit() {
-    // Flush NetworkTables every loop. This ensures that robot pose and other values
-    // are sent during every iteration.
-    setNetworkTablesFlushEnabled(true);
-
     m_trajectory =
         TrajectoryGenerator.generateTrajectory(
             new Pose2d(2, 2, new Rotation2d()),
@@ -65,7 +61,6 @@ public class Robot extends TimedRobot {
   }
 
   @Override
-  @SuppressWarnings("LocalVariableName")
   public void teleopPeriodic() {
     // Get the x speed. We are inverting this because Xbox controllers return
     // negative values when we push forward.

@@ -36,7 +36,6 @@ public interface TrajectoryConstraint {
       Pose2d poseMeters, double curvatureRadPerMeter, double velocityMetersPerSecond);
 
   /** Represents a minimum and maximum acceleration. */
-  @SuppressWarnings("MemberName")
   class MinMax {
     public double minAccelerationMetersPerSecondSq = -Double.MAX_VALUE;
     public double maxAccelerationMetersPerSecondSq = +Double.MAX_VALUE;

@@ -2,7 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include <wpi/numbers>
+#include <numbers>
 
 #include "frc/geometry/Translation2d.h"
 #include "frc/kinematics/SwerveDriveKinematics.h"
@@ -49,6 +49,16 @@ TEST_F(SwerveDriveKinematicsTest, StraightLineForwardKinematics) {
   EXPECT_NEAR(chassisSpeeds.omega.value(), 0.0, kEpsilon);
 }
 
+TEST_F(SwerveDriveKinematicsTest, StraightLineForwardKinematicsWithDeltas) {
+  SwerveModulePosition delta{5.0_m, 0_deg};
+
+  auto twist = m_kinematics.ToTwist2d(delta, delta, delta, delta);
+
+  EXPECT_NEAR(twist.dx.value(), 5.0, kEpsilon);
+  EXPECT_NEAR(twist.dy.value(), 0.0, kEpsilon);
+  EXPECT_NEAR(twist.dtheta.value(), 0.0, kEpsilon);
+}
+
 TEST_F(SwerveDriveKinematicsTest, StraightStrafeInverseKinematics) {
   ChassisSpeeds speeds{0_mps, 5_mps, 0_rad_per_s};
   auto [fl, fr, bl, br] = m_kinematics.ToSwerveModuleStates(speeds);
@@ -73,9 +83,19 @@ TEST_F(SwerveDriveKinematicsTest, StraightStrafeForwardKinematics) {
   EXPECT_NEAR(chassisSpeeds.omega.value(), 0.0, kEpsilon);
 }
 
+TEST_F(SwerveDriveKinematicsTest, StraightStrafeForwardKinematicsWithDeltas) {
+  SwerveModulePosition delta{5_m, 90_deg};
+
+  auto twist = m_kinematics.ToTwist2d(delta, delta, delta, delta);
+
+  EXPECT_NEAR(twist.dx.value(), 0.0, kEpsilon);
+  EXPECT_NEAR(twist.dy.value(), 5.0, kEpsilon);
+  EXPECT_NEAR(twist.dtheta.value(), 0.0, kEpsilon);
+}
+
 TEST_F(SwerveDriveKinematicsTest, TurnInPlaceInverseKinematics) {
   ChassisSpeeds speeds{0_mps, 0_mps,
-                       units::radians_per_second_t{2 * wpi::numbers::pi}};
+                       units::radians_per_second_t{2 * std::numbers::pi}};
   auto [fl, fr, bl, br] = m_kinematics.ToSwerveModuleStates(speeds);
 
   EXPECT_NEAR(fl.speed.value(), 106.63, kEpsilon);
@@ -91,7 +111,7 @@ TEST_F(SwerveDriveKinematicsTest, TurnInPlaceInverseKinematics) {
 
 TEST_F(SwerveDriveKinematicsTest, ConserveWheelAngle) {
   ChassisSpeeds speeds{0_mps, 0_mps,
-                       units::radians_per_second_t{2 * wpi::numbers::pi}};
+                       units::radians_per_second_t{2 * std::numbers::pi}};
   m_kinematics.ToSwerveModuleStates(speeds);
   auto [fl, fr, bl, br] = m_kinematics.ToSwerveModuleStates(ChassisSpeeds{});
 
@@ -116,12 +136,25 @@ TEST_F(SwerveDriveKinematicsTest, TurnInPlaceForwardKinematics) {
 
   EXPECT_NEAR(chassisSpeeds.vx.value(), 0.0, kEpsilon);
   EXPECT_NEAR(chassisSpeeds.vy.value(), 0.0, kEpsilon);
-  EXPECT_NEAR(chassisSpeeds.omega.value(), 2 * wpi::numbers::pi, kEpsilon);
+  EXPECT_NEAR(chassisSpeeds.omega.value(), 2 * std::numbers::pi, kEpsilon);
+}
+
+TEST_F(SwerveDriveKinematicsTest, TurnInPlaceForwardKinematicsWithDeltas) {
+  SwerveModulePosition fl{106.629_m, 135_deg};
+  SwerveModulePosition fr{106.629_m, 45_deg};
+  SwerveModulePosition bl{106.629_m, -135_deg};
+  SwerveModulePosition br{106.629_m, -45_deg};
+
+  auto twist = m_kinematics.ToTwist2d(fl, fr, bl, br);
+
+  EXPECT_NEAR(twist.dx.value(), 0.0, kEpsilon);
+  EXPECT_NEAR(twist.dy.value(), 0.0, kEpsilon);
+  EXPECT_NEAR(twist.dtheta.value(), 2 * std::numbers::pi, kEpsilon);
 }
 
 TEST_F(SwerveDriveKinematicsTest, OffCenterCORRotationInverseKinematics) {
   ChassisSpeeds speeds{0_mps, 0_mps,
-                       units::radians_per_second_t{2 * wpi::numbers::pi}};
+                       units::radians_per_second_t{2 * std::numbers::pi}};
   auto [fl, fr, bl, br] = m_kinematics.ToSwerveModuleStates(speeds, m_fl);
 
   EXPECT_NEAR(fl.speed.value(), 0.0, kEpsilon);
@@ -145,7 +178,21 @@ TEST_F(SwerveDriveKinematicsTest, OffCenterCORRotationForwardKinematics) {
 
   EXPECT_NEAR(chassisSpeeds.vx.value(), 75.398, kEpsilon);
   EXPECT_NEAR(chassisSpeeds.vy.value(), -75.398, kEpsilon);
-  EXPECT_NEAR(chassisSpeeds.omega.value(), 2 * wpi::numbers::pi, kEpsilon);
+  EXPECT_NEAR(chassisSpeeds.omega.value(), 2 * std::numbers::pi, kEpsilon);
+}
+
+TEST_F(SwerveDriveKinematicsTest,
+       OffCenterCORRotationForwardKinematicsWithDeltas) {
+  SwerveModulePosition fl{0.0_m, 0_deg};
+  SwerveModulePosition fr{150.796_m, 0_deg};
+  SwerveModulePosition bl{150.796_m, -90_deg};
+  SwerveModulePosition br{213.258_m, -45_deg};
+
+  auto twist = m_kinematics.ToTwist2d(fl, fr, bl, br);
+
+  EXPECT_NEAR(twist.dx.value(), 75.398, kEpsilon);
+  EXPECT_NEAR(twist.dy.value(), -75.398, kEpsilon);
+  EXPECT_NEAR(twist.dtheta.value(), 2 * std::numbers::pi, kEpsilon);
 }
 
 TEST_F(SwerveDriveKinematicsTest,
@@ -177,6 +224,20 @@ TEST_F(SwerveDriveKinematicsTest,
   EXPECT_NEAR(chassisSpeeds.vx.value(), 0.0, kEpsilon);
   EXPECT_NEAR(chassisSpeeds.vy.value(), -33.0, kEpsilon);
   EXPECT_NEAR(chassisSpeeds.omega.value(), 1.5, kEpsilon);
+}
+
+TEST_F(SwerveDriveKinematicsTest,
+       OffCenterCORRotationAndTranslationForwardKinematicsWithDeltas) {
+  SwerveModulePosition fl{23.43_m, -140.19_deg};
+  SwerveModulePosition fr{23.43_m, -39.81_deg};
+  SwerveModulePosition bl{54.08_m, -109.44_deg};
+  SwerveModulePosition br{54.08_m, -70.56_deg};
+
+  auto twist = m_kinematics.ToTwist2d(fl, fr, bl, br);
+
+  EXPECT_NEAR(twist.dx.value(), 0.0, kEpsilon);
+  EXPECT_NEAR(twist.dy.value(), -33.0, kEpsilon);
+  EXPECT_NEAR(twist.dtheta.value(), 1.5, kEpsilon);
 }
 
 TEST_F(SwerveDriveKinematicsTest, Desaturate) {

@@ -9,69 +9,83 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
+import static org.junit.jupiter.api.parallel.ExecutionMode.SAME_THREAD;
 
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.networktables.Topic;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Set;
+import java.util.List;
 import java.util.stream.Stream;
-import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
+import org.junit.jupiter.api.parallel.Execution;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 
+@Execution(SAME_THREAD)
 class PreferencesTest {
-  private final NetworkTable m_table = NetworkTableInstance.getDefault().getTable("Preferences");
+  private NetworkTableInstance m_inst;
+  private NetworkTable m_table;
 
-  private static final String kFilename = "networktables.ini";
-
-  @BeforeAll
-  static void setupAll() {
-    NetworkTableInstance.getDefault().stopServer();
-  }
+  private static final String kFilename = "networktables.json";
 
   @BeforeEach
   void setup(@TempDir Path tempDir) {
-    m_table.getKeys().forEach(m_table::delete);
+    m_inst = NetworkTableInstance.create();
+    m_table = m_inst.getTable("Preferences");
+    Preferences.setNetworkTableInstance(m_inst);
 
     Path filepath = tempDir.resolve(kFilename);
-    try (InputStream is = getClass().getResource("PreferencesTestDefault.ini").openStream()) {
+    try (InputStream is = getClass().getResource("PreferencesTestDefault.json").openStream()) {
       Files.copy(is, filepath);
     } catch (IOException ex) {
       fail(ex);
     }
 
-    NetworkTableInstance.getDefault().startServer(filepath.toString());
+    m_inst.startServer(filepath.toString(), "", 0, 0);
+    try {
+      int count = 0;
+      while (m_inst.getNetworkMode().contains(NetworkTableInstance.NetworkMode.kStarting)) {
+        Thread.sleep(100);
+        count++;
+        if (count > 30) {
+          throw new InterruptedException();
+        }
+      }
+    } catch (InterruptedException ex) {
+      fail("interrupted while waiting for server to start");
+    }
   }
 
   @AfterEach
   void cleanup() {
-    NetworkTableInstance.getDefault().stopServer();
-  }
-
-  @AfterAll
-  static void cleanupAll() {
-    NetworkTableInstance.getDefault().startServer();
+    m_inst.close();
   }
 
   @Test
   void removeAllTest() {
     Preferences.removeAll();
 
-    Set<String> keys = m_table.getKeys();
-    keys.remove(".type");
+    List<String> keys = new ArrayList<>();
+    boolean anyPersistent = false;
+    for (Topic topic : m_table.getTopics()) {
+      if (topic.isPersistent()) {
+        anyPersistent = true;
+        keys.add(topic.getName());
+      }
+    }
 
-    assertTrue(
-        keys.isEmpty(),
+    assertFalse(
+        anyPersistent,
         "Preferences was not empty!  Preferences in table: " + Arrays.toString(keys.toArray()));
   }
 
@@ -96,19 +110,6 @@ class PreferencesTest {
         () -> assertEquals(2, Preferences.getInt("checkedValueInt", 0)),
         () -> assertEquals(3.4, Preferences.getFloat("checkedValueFloat", 0), 1e-6),
         () -> assertFalse(Preferences.getBoolean("checkedValueBoolean", true)));
-  }
-
-  @Test
-  void backupTest() {
-    Preferences.removeAll();
-
-    assertAll(
-        () -> assertEquals(0, Preferences.getLong("checkedValueLong", 0)),
-        () -> assertEquals(0, Preferences.getDouble("checkedValueDouble", 0), 1e-6),
-        () -> assertEquals("", Preferences.getString("checkedValueString", "")),
-        () -> assertEquals(0, Preferences.getInt("checkedValueInt", 0)),
-        () -> assertEquals(0, Preferences.getFloat("checkedValueFloat", 0), 1e-6),
-        () -> assertTrue(Preferences.getBoolean("checkedValueBoolean", true)));
   }
 
   @Nested

@@ -7,6 +7,7 @@
 #include <memory>
 
 #include <hal/Types.h>
+#include <units/time.h>
 #include <wpi/sendable/Sendable.h>
 #include <wpi/sendable/SendableHelper.h>
 
@@ -83,21 +84,18 @@ class DutyCycle : public wpi::Sendable, public wpi::SendableHelper<DutyCycle> {
   double GetOutput() const;
 
   /**
-   * Get the raw output ratio of the duty cycle signal.
+   * Get the raw high time of the duty cycle signal.
    *
-   * <p> 0 means always low, an output equal to
-   * GetOutputScaleFactor() means always high.
-   *
-   * @return output ratio in raw units
+   * @return high time of last pulse
    */
-  unsigned int GetOutputRaw() const;
+  units::second_t GetHighTime() const;
 
   /**
    * Get the scale factor of the output.
    *
    * <p> An output equal to this value is always high, and then linearly scales
-   * down to 0. Divide the result of getOutputRaw by this in order to get the
-   * percentage between 0 and 1.
+   * down to 0. Divide a raw result by this in order to get the
+   * percentage between 0 and 1. Used by DMA.
    *
    * @return the output scale factor
    */

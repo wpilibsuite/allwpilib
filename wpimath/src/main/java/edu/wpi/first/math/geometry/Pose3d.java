@@ -4,6 +4,10 @@
 
 package edu.wpi.first.math.geometry;
 
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import edu.wpi.first.math.MatBuilder;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.Nat;
@@ -14,6 +18,8 @@ import edu.wpi.first.math.numbers.N3;
 import java.util.Objects;
 
 /** Represents a 3D pose containing translational and rotational elements. */
+@JsonIgnoreProperties(ignoreUnknown = true)
+@JsonAutoDetect(getterVisibility = JsonAutoDetect.Visibility.NONE)
 public class Pose3d implements Interpolatable<Pose3d> {
   private final Translation3d m_translation;
   private final Rotation3d m_rotation;
@@ -30,7 +36,10 @@ public class Pose3d implements Interpolatable<Pose3d> {
    * @param translation The translational component of the pose.
    * @param rotation The rotational component of the pose.
    */
-  public Pose3d(Translation3d translation, Rotation3d rotation) {
+  @JsonCreator
+  public Pose3d(
+      @JsonProperty(required = true, value = "translation") Translation3d translation,
+      @JsonProperty(required = true, value = "rotation") Rotation3d rotation) {
     m_translation = translation;
     m_rotation = rotation;
   }
@@ -46,6 +55,16 @@ public class Pose3d implements Interpolatable<Pose3d> {
   public Pose3d(double x, double y, double z, Rotation3d rotation) {
     m_translation = new Translation3d(x, y, z);
     m_rotation = rotation;
+  }
+
+  /**
+   * Constructs a 3D pose from a 2D pose in the X-Y plane.
+   *
+   * @param pose The 2D pose.
+   */
+  public Pose3d(Pose2d pose) {
+    m_translation = new Translation3d(pose.getX(), pose.getY(), 0.0);
+    m_rotation = new Rotation3d(0.0, 0.0, pose.getRotation().getRadians());
   }
 
   /**
@@ -74,6 +93,7 @@ public class Pose3d implements Interpolatable<Pose3d> {
    *
    * @return The translational component of the pose.
    */
+  @JsonProperty
   public Translation3d getTranslation() {
     return m_translation;
   }
@@ -110,8 +130,29 @@ public class Pose3d implements Interpolatable<Pose3d> {
    *
    * @return The rotational component of the pose.
    */
+  @JsonProperty
   public Rotation3d getRotation() {
     return m_rotation;
+  }
+
+  /**
+   * Multiplies the current pose by a scalar.
+   *
+   * @param scalar The scalar.
+   * @return The new scaled Pose3d.
+   */
+  public Pose3d times(double scalar) {
+    return new Pose3d(m_translation.times(scalar), m_rotation.times(scalar));
+  }
+
+  /**
+   * Divides the current pose by a scalar.
+   *
+   * @param scalar The scalar.
+   * @return The new scaled Pose3d.
+   */
+  public Pose3d div(double scalar) {
+    return times(1.0 / scalar);
   }
 
   /**
@@ -124,7 +165,7 @@ public class Pose3d implements Interpolatable<Pose3d> {
   public Pose3d transformBy(Transform3d other) {
     return new Pose3d(
         m_translation.plus(other.getTranslation().rotateBy(m_rotation)),
-        m_rotation.plus(other.getRotation()));
+        other.getRotation().plus(m_rotation));
   }
 
   /**
@@ -158,7 +199,6 @@ public class Pose3d implements Interpolatable<Pose3d> {
    *     Rotation3d(0.0, 0.0, Units.degreesToRadians(0.5))).
    * @return The new pose of the robot.
    */
-  @SuppressWarnings("LocalVariableName")
   public Pose3d exp(Twist3d twist) {
     final var Omega = rotationVectorToMatrix(VecBuilder.fill(twist.rx, twist.ry, twist.rz));
     final var OmegaSq = Omega.times(Omega);
@@ -199,7 +239,6 @@ public class Pose3d implements Interpolatable<Pose3d> {
    * @param end The end pose for the transformation.
    * @return The twist that maps this to end.
    */
-  @SuppressWarnings("LocalVariableName")
   public Twist3d log(Pose3d end) {
     final var transform = end.relativeTo(this);
 
@@ -282,7 +321,6 @@ public class Pose3d implements Interpolatable<Pose3d> {
   }
 
   @Override
-  @SuppressWarnings("ParameterName")
   public Pose3d interpolate(Pose3d endValue, double t) {
     if (t < 0) {
       return this;

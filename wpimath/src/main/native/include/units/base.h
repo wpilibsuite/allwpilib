@@ -84,8 +84,6 @@
 	#include <fmt/format.h>
 #endif
 
-#include <wpi/SymbolExports.h>
-
 //------------------------------
 //	STRING FORMATTER
 //------------------------------

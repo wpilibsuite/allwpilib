@@ -14,6 +14,7 @@ package edu.wpi.first.wpilibj;
 // import java.lang.FdLibm.Pow;
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
+import edu.wpi.first.hal.SimBoolean;
 import edu.wpi.first.hal.SimDevice;
 import edu.wpi.first.hal.SimDouble;
 import edu.wpi.first.networktables.NTSendable;
@@ -250,8 +251,10 @@ public class ADIS16470_IMU implements AutoCloseable, NTSendable {
   private DigitalInput m_reset_in;
   private DigitalOutput m_status_led;
   private Thread m_acquire_task;
+  private boolean m_connected;
 
   private SimDevice m_simDevice;
+  private SimBoolean m_simConnected;
   private SimDouble m_simGyroAngleX;
   private SimDouble m_simGyroAngleY;
   private SimDouble m_simGyroAngleZ;
@@ -293,6 +296,7 @@ public class ADIS16470_IMU implements AutoCloseable, NTSendable {
 
     m_simDevice = SimDevice.create("Gyro:ADIS16470", port.value);
     if (m_simDevice != null) {
+      m_simConnected = m_simDevice.createBoolean("connected", SimDevice.Direction.kInput, true);
       m_simGyroAngleX = m_simDevice.createDouble("gyro_angle_x", SimDevice.Direction.kInput, 0.0);
       m_simGyroAngleY = m_simDevice.createDouble("gyro_angle_y", SimDevice.Direction.kInput, 0.0);
       m_simGyroAngleZ = m_simDevice.createDouble("gyro_angle_z", SimDevice.Direction.kInput, 0.0);
@@ -361,6 +365,14 @@ public class ADIS16470_IMU implements AutoCloseable, NTSendable {
 
     // Report usage and post data to DS
     HAL.report(tResourceType.kResourceType_ADIS16470, 0);
+    m_connected = true;
+  }
+
+  public boolean isConnected() {
+    if (m_simConnected != null) {
+      return m_simConnected.get();
+    }
+    return m_connected;
   }
 
   /**
@@ -438,9 +450,7 @@ public class ADIS16470_IMU implements AutoCloseable, NTSendable {
       System.out.println("Setting up a new SPI port.");
       m_spi = new SPI(m_spi_port);
       m_spi.setClockRate(2000000);
-      m_spi.setMSBFirst();
-      m_spi.setSampleDataOnTrailingEdge();
-      m_spi.setClockActiveLow();
+      m_spi.setMode(SPI.Mode.kMode3);
       m_spi.setChipSelectActiveLow();
       readRegister(PROD_ID); // Dummy read
 
@@ -638,7 +648,6 @@ public class ADIS16470_IMU implements AutoCloseable, NTSendable {
     m_spi.write(buf, 2);
   }
 
-  /** {@inheritDoc} */
   public void reset() {
     synchronized (this) {
       m_integ_angle = 0.0;

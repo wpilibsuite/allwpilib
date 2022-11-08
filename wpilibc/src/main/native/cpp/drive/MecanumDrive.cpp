@@ -5,15 +5,13 @@
 #include "frc/drive/MecanumDrive.h"
 
 #include <algorithm>
-#include <cmath>
 
 #include <hal/FRCUsageReporting.h>
-#include <wpi/numbers>
 #include <wpi/sendable/SendableBuilder.h>
 #include <wpi/sendable/SendableRegistry.h>
 
 #include "frc/MathUtil.h"
-#include "frc/drive/Vector2d.h"
+#include "frc/geometry/Translation2d.h"
 #include "frc/motorcontrol/MotorController.h"
 
 using namespace frc;
@@ -35,19 +33,19 @@ MecanumDrive::MecanumDrive(MotorController& frontLeftMotor,
   wpi::SendableRegistry::AddLW(this, "MecanumDrive", instances);
 }
 
-void MecanumDrive::DriveCartesian(double ySpeed, double xSpeed,
-                                  double zRotation, double gyroAngle) {
+void MecanumDrive::DriveCartesian(double xSpeed, double ySpeed,
+                                  double zRotation, Rotation2d gyroAngle) {
   if (!reported) {
     HAL_Report(HALUsageReporting::kResourceType_RobotDrive,
                HALUsageReporting::kRobotDrive2_MecanumCartesian, 4);
     reported = true;
   }
 
-  ySpeed = ApplyDeadband(ySpeed, m_deadband);
   xSpeed = ApplyDeadband(xSpeed, m_deadband);
+  ySpeed = ApplyDeadband(ySpeed, m_deadband);
 
   auto [frontLeft, frontRight, rearLeft, rearRight] =
-      DriveCartesianIK(ySpeed, xSpeed, zRotation, gyroAngle);
+      DriveCartesianIK(xSpeed, ySpeed, zRotation, gyroAngle);
 
   m_frontLeftMotor->Set(frontLeft * m_maxOutput);
   m_frontRightMotor->Set(frontRight * m_maxOutput);
@@ -57,7 +55,7 @@ void MecanumDrive::DriveCartesian(double ySpeed, double xSpeed,
   Feed();
 }
 
-void MecanumDrive::DrivePolar(double magnitude, double angle,
+void MecanumDrive::DrivePolar(double magnitude, Rotation2d angle,
                               double zRotation) {
   if (!reported) {
     HAL_Report(HALUsageReporting::kResourceType_RobotDrive,
@@ -65,9 +63,8 @@ void MecanumDrive::DrivePolar(double magnitude, double angle,
     reported = true;
   }
 
-  DriveCartesian(magnitude * std::cos(angle * (wpi::numbers::pi / 180.0)),
-                 magnitude * std::sin(angle * (wpi::numbers::pi / 180.0)),
-                 zRotation, 0.0);
+  DriveCartesian(magnitude * angle.Cos(), magnitude * angle.Sin(), zRotation,
+                 0_rad);
 }
 
 void MecanumDrive::StopMotor() {
@@ -78,22 +75,23 @@ void MecanumDrive::StopMotor() {
   Feed();
 }
 
-MecanumDrive::WheelSpeeds MecanumDrive::DriveCartesianIK(double ySpeed,
-                                                         double xSpeed,
+MecanumDrive::WheelSpeeds MecanumDrive::DriveCartesianIK(double xSpeed,
+                                                         double ySpeed,
                                                          double zRotation,
-                                                         double gyroAngle) {
-  ySpeed = std::clamp(ySpeed, -1.0, 1.0);
+                                                         Rotation2d gyroAngle) {
   xSpeed = std::clamp(xSpeed, -1.0, 1.0);
+  ySpeed = std::clamp(ySpeed, -1.0, 1.0);
 
   // Compensate for gyro angle.
-  Vector2d input{ySpeed, xSpeed};
-  input.Rotate(-gyroAngle);
+  auto input =
+      Translation2d{units::meter_t{xSpeed}, units::meter_t{ySpeed}}.RotateBy(
+          -gyroAngle);
 
   double wheelSpeeds[4];
-  wheelSpeeds[kFrontLeft] = input.x + input.y + zRotation;
-  wheelSpeeds[kFrontRight] = input.x - input.y - zRotation;
-  wheelSpeeds[kRearLeft] = input.x - input.y + zRotation;
-  wheelSpeeds[kRearRight] = input.x + input.y - zRotation;
+  wheelSpeeds[kFrontLeft] = input.X().value() + input.Y().value() + zRotation;
+  wheelSpeeds[kFrontRight] = input.X().value() - input.Y().value() - zRotation;
+  wheelSpeeds[kRearLeft] = input.X().value() - input.Y().value() + zRotation;
+  wheelSpeeds[kRearRight] = input.X().value() + input.Y().value() - zRotation;
 
   Desaturate(wheelSpeeds);
 
@@ -108,17 +106,17 @@ std::string MecanumDrive::GetDescription() const {
 void MecanumDrive::InitSendable(wpi::SendableBuilder& builder) {
   builder.SetSmartDashboardType("MecanumDrive");
   builder.SetActuator(true);
-  builder.SetSafeState([=] { StopMotor(); });
+  builder.SetSafeState([=, this] { StopMotor(); });
   builder.AddDoubleProperty(
-      "Front Left Motor Speed", [=] { return m_frontLeftMotor->Get(); },
-      [=](double value) { m_frontLeftMotor->Set(value); });
+      "Front Left Motor Speed", [=, this] { return m_frontLeftMotor->Get(); },
+      [=, this](double value) { m_frontLeftMotor->Set(value); });
   builder.AddDoubleProperty(
-      "Front Right Motor Speed", [=] { return m_frontRightMotor->Get(); },
-      [=](double value) { m_frontRightMotor->Set(value); });
+      "Front Right Motor Speed", [=, this] { return m_frontRightMotor->Get(); },
+      [=, this](double value) { m_frontRightMotor->Set(value); });
   builder.AddDoubleProperty(
-      "Rear Left Motor Speed", [=] { return m_rearLeftMotor->Get(); },
-      [=](double value) { m_rearLeftMotor->Set(value); });
+      "Rear Left Motor Speed", [=, this] { return m_rearLeftMotor->Get(); },
+      [=, this](double value) { m_rearLeftMotor->Set(value); });
   builder.AddDoubleProperty(
-      "Rear Right Motor Speed", [=] { return m_rearRightMotor->Get(); },
-      [=](double value) { m_rearRightMotor->Set(value); });
+      "Rear Right Motor Speed", [=, this] { return m_rearRightMotor->Get(); },
+      [=, this](double value) { m_rearRightMotor->Set(value); });
 }

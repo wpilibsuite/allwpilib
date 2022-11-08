@@ -127,16 +127,6 @@ Vectord<5> DifferentialDrivePoseEstimator::F(const Vectord<5>& x,
          Vectord<5>{u(0, 0), u(1, 0), u(2, 0), u(0, 0), u(1, 0)};
 }
 
-template <int Dim>
-wpi::array<double, Dim> DifferentialDrivePoseEstimator::StdDevMatrixToArray(
-    const Vectord<Dim>& stdDevs) {
-  wpi::array<double, Dim> array;
-  for (size_t i = 0; i < Dim; ++i) {
-    array[i] = stdDevs(i);
-  }
-  return array;
-}
-
 Vectord<5> DifferentialDrivePoseEstimator::FillStateVector(
     const Pose2d& pose, units::meter_t leftDistance,
     units::meter_t rightDistance) {

@@ -99,7 +99,7 @@ ext {
                         include '**/*.cpp'
                     }
                     exportedHeaders {
-                        srcDirs 'src/main/native/include', 'src/main/native/cpp', 'src/main/native/thirdparty/llvm/include', 'src/main/native/thirdparty/sigslot/include', 'src/main/native/thirdparty/tcb_span/include'
+                        srcDirs 'src/main/native/include', 'src/main/native/cpp', 'src/main/native/thirdparty/llvm/include', 'src/main/native/thirdparty/sigslot/include', 'src/main/native/thirdparty/tcb_span/include', 'src/main/native/thirdparty/mpack/include'
                         include '**/*.h'
                     }
                 }
@@ -113,7 +113,7 @@ ext {
                         include '**/*.cpp'
                     }
                     exportedHeaders {
-                        srcDirs 'src/main/native/include', 'src/main/native/cpp', 'src/main/native/thirdparty/llvm/include', 'src/main/native/thirdparty/fmtlib/include', 'src/main/native/thirdparty/sigslot/include', 'src/main/native/thirdparty/json/include', 'src/main/native/thirdparty/tcb_span/include'
+                        srcDirs 'src/main/native/include', 'src/main/native/cpp', 'src/main/native/thirdparty/llvm/include', 'src/main/native/thirdparty/fmtlib/include', 'src/main/native/thirdparty/sigslot/include', 'src/main/native/thirdparty/json/include', 'src/main/native/thirdparty/tcb_span/include', 'src/main/native/thirdparty/mpack/include'
                         include '**/*.h'
                     }
                 }
@@ -126,7 +126,7 @@ ext {
                         include '**/*.cpp'
                     }
                     exportedHeaders {
-                        srcDirs 'src/main/native/include', 'src/main/native/cpp', 'src/main/native/thirdparty/llvm/include', 'src/main/native/thirdparty/fmtlib/include', 'src/main/native/thirdparty/sigslot/include', 'src/main/native/thirdparty/json/include', 'src/main/native/thirdparty/tcb_span/include'
+                        srcDirs 'src/main/native/include', 'src/main/native/cpp', 'src/main/native/thirdparty/llvm/include', 'src/main/native/thirdparty/fmtlib/include', 'src/main/native/thirdparty/sigslot/include', 'src/main/native/thirdparty/json/include', 'src/main/native/thirdparty/tcb_span/include', 'src/main/native/thirdparty/mpack/include'
                         include '**/*.h'
                     }
                 }
@@ -139,7 +139,7 @@ ext {
                         include '**/*.cpp'
                     }
                     exportedHeaders {
-                        srcDirs 'src/main/native/include', 'src/main/native/cpp', 'src/main/native/thirdparty/llvm/include', 'src/main/native/thirdparty/fmtlib/include', 'src/main/native/thirdparty/sigslot/include', 'src/main/native/thirdparty/json/include', 'src/main/native/thirdparty/tcb_span/include'
+                        srcDirs 'src/main/native/include', 'src/main/native/cpp', 'src/main/native/thirdparty/llvm/include', 'src/main/native/thirdparty/fmtlib/include', 'src/main/native/thirdparty/sigslot/include', 'src/main/native/thirdparty/json/include', 'src/main/native/thirdparty/tcb_span/include', 'src/main/native/thirdparty/mpack/include'
                         include '**/*.h'
                     }
                 }
@@ -231,7 +231,7 @@ model {
         all {
             it.sources.each {
                 it.exportedHeaders {
-                    srcDirs 'src/main/native/include', 'src/main/native/thirdparty/fmtlib/include', 'src/main/native/thirdparty/llvm/include', 'src/main/native/thirdparty/sigslot/include', 'src/main/native/thirdparty/json/include', 'src/main/native/thirdparty/tcb_span/include', 'src/main/native/thirdparty/ghc/include', 'src/main/native/thirdparty/memory/include'
+                    srcDirs 'src/main/native/include', 'src/main/native/thirdparty/fmtlib/include', 'src/main/native/thirdparty/llvm/include', 'src/main/native/thirdparty/sigslot/include', 'src/main/native/thirdparty/json/include', 'src/main/native/thirdparty/tcb_span/include', 'src/main/native/thirdparty/ghc/include', 'src/main/native/thirdparty/memory/include', 'src/main/native/thirdparty/mpack/include'
                 }
             }
         }

@@ -32,21 +32,21 @@ ADXRS450_Gyro::ADXRS450_Gyro() : ADXRS450_Gyro(SPI::kOnboardCS0) {}
 ADXRS450_Gyro::ADXRS450_Gyro(SPI::Port port)
     : m_spi(port), m_port(port), m_simDevice("Gyro:ADXRS450", port) {
   if (m_simDevice) {
+    m_simConnected =
+        m_simDevice.CreateBoolean("connected", hal::SimDevice::kInput, true);
     m_simAngle =
         m_simDevice.CreateDouble("angle_x", hal::SimDevice::kInput, 0.0);
     m_simRate = m_simDevice.CreateDouble("rate_x", hal::SimDevice::kInput, 0.0);
   }
 
   m_spi.SetClockRate(3000000);
-  m_spi.SetMSBFirst();
-  m_spi.SetSampleDataOnLeadingEdge();
-  m_spi.SetClockActiveHigh();
+  m_spi.SetMode(frc::SPI::Mode::kMode0);
   m_spi.SetChipSelectActiveLow();
 
   if (!m_simDevice) {
     // Validate the part ID
     if ((ReadRegister(kPIDRegister) & 0xff00) != 0x5200) {
-      FRC_ReportError(err::Error, "{}", "could not find ADXRS450 gyro");
+      FRC_ReportError(err::Error, "could not find ADXRS450 gyro");
       return;
     }
 
@@ -59,6 +59,14 @@ ADXRS450_Gyro::ADXRS450_Gyro(SPI::Port port)
   HAL_Report(HALUsageReporting::kResourceType_ADXRS450, port + 1);
 
   wpi::SendableRegistry::AddLW(this, "ADXRS450_Gyro", port);
+  m_connected = true;
+}
+
+bool ADXRS450_Gyro::IsConnected() const {
+  if (m_simConnected) {
+    return m_simConnected.Get();
+  }
+  return m_connected;
 }
 
 static bool CalcParity(int v) {
@@ -139,5 +147,5 @@ int ADXRS450_Gyro::GetPort() const {
 void ADXRS450_Gyro::InitSendable(wpi::SendableBuilder& builder) {
   builder.SetSmartDashboardType("Gyro");
   builder.AddDoubleProperty(
-      "Value", [=] { return GetAngle(); }, nullptr);
+      "Value", [=, this] { return GetAngle(); }, nullptr);
 }

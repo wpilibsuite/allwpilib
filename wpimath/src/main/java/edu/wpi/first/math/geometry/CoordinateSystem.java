@@ -32,7 +32,6 @@ public class CoordinateSystem {
     // Construct a change of basis matrix from the source coordinate system to the
     // NWU coordinate system. Each column vector in the change of basis matrix is
     // one of the old basis vectors mapped to its representation in the new basis.
-    @SuppressWarnings("LocalVariableName")
     var R = new Matrix<>(Nat.N3(), Nat.N3());
     R.assignBlock(0, 0, positiveX.m_axis);
     R.assignBlock(0, 1, positiveY.m_axis);
@@ -50,7 +49,6 @@ public class CoordinateSystem {
    *
    * @return An instance of the North-West-Up (NWU) coordinate system.
    */
-  @SuppressWarnings("MethodName")
   public static CoordinateSystem NWU() {
     return m_nwu;
   }
@@ -62,7 +60,6 @@ public class CoordinateSystem {
    *
    * @return An instance of the East-Down-North (EDN) coordinate system.
    */
-  @SuppressWarnings("MethodName")
   public static CoordinateSystem EDN() {
     return m_edn;
   }
@@ -74,7 +71,6 @@ public class CoordinateSystem {
    *
    * @return An instance of the North-East-Down (NED) coordinate system.
    */
-  @SuppressWarnings("MethodName")
   public static CoordinateSystem NED() {
     return m_ned;
   }
@@ -114,6 +110,21 @@ public class CoordinateSystem {
    * @return The given pose in the desired coordinate system.
    */
   public static Pose3d convert(Pose3d pose, CoordinateSystem from, CoordinateSystem to) {
-    return pose.relativeTo(new Pose3d(new Translation3d(), to.m_rotation.minus(from.m_rotation)));
+    return new Pose3d(
+        convert(pose.getTranslation(), from, to), convert(pose.getRotation(), from, to));
+  }
+
+  /**
+   * Converts the given transform from one coordinate system to another.
+   *
+   * @param transform The transform to convert.
+   * @param from The coordinate system the transform starts in.
+   * @param to The coordinate system to which to convert.
+   * @return The given transform in the desired coordinate system.
+   */
+  public static Transform3d convert(
+      Transform3d transform, CoordinateSystem from, CoordinateSystem to) {
+    return new Transform3d(
+        convert(transform.getTranslation(), from, to), convert(transform.getRotation(), from, to));
   }
 }

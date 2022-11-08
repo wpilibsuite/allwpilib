@@ -4,10 +4,11 @@
 
 package edu.wpi.first.math;
 
-import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Transform2d;
-import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Transform3d;
+import edu.wpi.first.math.geometry.Translation3d;
 
 public final class ComputerVisionUtil {
   private ComputerVisionUtil() {
@@ -59,31 +60,34 @@ public final class ComputerVisionUtil {
    * @param targetYaw The observed yaw of the target. Note that this *must* be CCW-positive, and
    *     Photon returns CW-positive.
    * @param gyroAngle The current robot gyro angle, likely from odometry.
-   * @param fieldToTarget A Pose2d representing the target position in the field coordinate system.
+   * @param fieldToTarget A Pose3d representing the target position in the field coordinate system.
    * @param cameraToRobot The position of the robot relative to the camera. If the camera was
    *     mounted 3 inches behind the "origin" (usually physical center) of the robot, this would be
-   *     Transform2d(3 inches, 0 inches, 0 degrees).
+   *     new Transform3d(Units.inchesToMeters(3), Units.inchesToMeters(0), Units.inchesToMeters(0),
+   *     new Rotation3d(Units.degreesToRadians(0))).
    * @return The position of the robot in the field.
    */
-  public static Pose2d estimateFieldToRobot(
+  public static Pose3d estimateFieldToRobot(
       double cameraHeightMeters,
       double targetHeightMeters,
       double cameraPitchRadians,
       double targetPitchRadians,
       Rotation2d targetYaw,
       Rotation2d gyroAngle,
-      Pose2d fieldToTarget,
-      Transform2d cameraToRobot) {
+      Pose3d fieldToTarget,
+      Transform3d cameraToRobot) {
+    final var distanceAlongGround =
+        calculateDistanceToTarget(
+            cameraHeightMeters,
+            targetHeightMeters,
+            cameraPitchRadians,
+            targetPitchRadians,
+            targetYaw.getRadians());
+    final var range = Math.hypot(distanceAlongGround, targetHeightMeters - cameraHeightMeters);
     return estimateFieldToRobot(
         estimateCameraToTarget(
-            new Translation2d(
-                calculateDistanceToTarget(
-                    cameraHeightMeters,
-                    targetHeightMeters,
-                    cameraPitchRadians,
-                    targetPitchRadians,
-                    targetYaw.getRadians()),
-                targetYaw),
+            new Translation3d(
+                range, new Rotation3d(0.0, targetPitchRadians, targetYaw.getRadians())),
             fieldToTarget,
             gyroAngle),
         fieldToTarget,
@@ -99,33 +103,35 @@ public final class ComputerVisionUtil {
    * @param fieldToTarget The position of the target in the field.
    * @param cameraToRobot The position of the robot relative to the camera. If the camera was
    *     mounted 3 inches behind the "origin" (usually physical center) of the robot, this would be
-   *     Transform2d(3 inches, 0 inches, 0 degrees).
+   *     new Transform3d(Units.inchesToMeters(3), Units.inchesToMeters(0), Units.inchesToMeters(0),
+   *     new Rotation3d(Units.degreesToRadians(0))).
    * @return The position of the robot in the field.
    */
-  public static Pose2d estimateFieldToRobot(
-      Transform2d cameraToTarget, Pose2d fieldToTarget, Transform2d cameraToRobot) {
+  public static Pose3d estimateFieldToRobot(
+      Transform3d cameraToTarget, Pose3d fieldToTarget, Transform3d cameraToRobot) {
     return estimateFieldToCamera(cameraToTarget, fieldToTarget).transformBy(cameraToRobot);
   }
 
   /**
-   * Estimates a {@link Transform2d} that maps the camera position to the target position, using the
+   * Estimates a {@link Transform3d} that maps the camera position to the target position, using the
    * robot's gyro. Note that the gyro angle provided *must* line up with the field coordinate system
    * -- that is, it should read zero degrees when pointed towards the opposing alliance station, and
    * increase as the robot rotates CCW.
    *
-   * @param cameraToTargetTranslation A Translation2d that encodes the x/y position of the target
+   * @param cameraToTargetTranslation A Translation3d that encodes the x/y position of the target
    *     relative to the camera.
-   * @param fieldToTarget A Pose2d representing the target position in the field coordinate system.
+   * @param fieldToTarget A Pose3d representing the target position in the field coordinate system.
    * @param gyroAngle The current robot gyro angle, likely from odometry.
-   * @return A Transform2d that takes us from the camera to the target.
+   * @return A Transform3d that takes us from the camera to the target.
    */
-  public static Transform2d estimateCameraToTarget(
-      Translation2d cameraToTargetTranslation, Pose2d fieldToTarget, Rotation2d gyroAngle) {
+  public static Transform3d estimateCameraToTarget(
+      Translation3d cameraToTargetTranslation, Pose3d fieldToTarget, Rotation2d gyroAngle) {
     // Map our camera at the origin out to our target, in the robot reference
     // frame. Gyro angle is needed because there's a circle of possible camera
     // poses for which the camera has the same yaw from camera to target.
-    return new Transform2d(
-        cameraToTargetTranslation, gyroAngle.unaryMinus().minus(fieldToTarget.getRotation()));
+    return new Transform3d(
+        cameraToTargetTranslation,
+        new Rotation3d(0.0, 0.0, -gyroAngle.getRadians()).minus(fieldToTarget.getRotation()));
   }
 
   /**
@@ -137,7 +143,7 @@ public final class ComputerVisionUtil {
    * @param fieldToTarget The position of the target in the field.
    * @return The position of the camera in the field.
    */
-  public static Pose2d estimateFieldToCamera(Transform2d cameraToTarget, Pose2d fieldToTarget) {
+  public static Pose3d estimateFieldToCamera(Transform3d cameraToTarget, Pose3d fieldToTarget) {
     var targetToCamera = cameraToTarget.inverse();
     return fieldToTarget.transformBy(targetToCamera);
   }

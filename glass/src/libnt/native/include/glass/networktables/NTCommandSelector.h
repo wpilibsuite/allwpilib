@@ -7,10 +7,11 @@
 #include <string>
 #include <string_view>
 
-#include <ntcore_cpp.h>
+#include <networktables/BooleanTopic.h>
+#include <networktables/NetworkTableInstance.h>
+#include <networktables/StringTopic.h>
 
 #include "glass/DataSource.h"
-#include "glass/networktables/NetworkTablesHelper.h"
 #include "glass/other/CommandSelector.h"
 
 namespace glass {
@@ -19,7 +20,7 @@ class NTCommandSelectorModel : public CommandSelectorModel {
   static constexpr const char* kType = "Command";
 
   explicit NTCommandSelectorModel(std::string_view path);
-  NTCommandSelectorModel(NT_Inst instance, std::string_view path);
+  NTCommandSelectorModel(nt::NetworkTableInstance inst, std::string_view path);
 
   const char* GetName() const override { return m_nameValue.c_str(); }
   DataSource* GetRunningData() override { return &m_runningData; }
@@ -30,9 +31,9 @@ class NTCommandSelectorModel : public CommandSelectorModel {
   bool IsReadOnly() override { return false; }
 
  private:
-  NetworkTablesHelper m_nt;
-  NT_Entry m_running;
-  NT_Entry m_name;
+  nt::NetworkTableInstance m_inst;
+  nt::BooleanEntry m_running;
+  nt::StringSubscriber m_name;
 
   DataSource m_runningData;
   std::string m_nameValue;

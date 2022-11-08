@@ -6,6 +6,7 @@
 
 #include <initializer_list>
 #include <memory>
+#include <span>
 #include <utility>
 
 #include <frc/Errors.h>
@@ -16,10 +17,10 @@
 #include <wpi/FunctionExtras.h>
 #include <wpi/deprecated.h>
 #include <wpi/sendable/SendableHelper.h>
-#include <wpi/span.h>
 
 namespace frc2 {
 class Command;
+class CommandPtr;
 class Subsystem;
 
 /**
@@ -85,6 +86,17 @@ class CommandScheduler final : public nt::NTSendable,
   /**
    * Schedules a command for execution. Does nothing if the command is already
    * scheduled. If a command's requirements are not available, it will only be
+   * started if all the commands currently using those requirements are
+   * interruptible. If this is the case, they will be interrupted and the
+   * command will be scheduled.
+   *
+   * @param command the command to schedule
+   */
+  void Schedule(const CommandPtr& command);
+
+  /**
+   * Schedules a command for execution. Does nothing if the command is already
+   * scheduled. If a command's requirements are not available, it will only be
    * started if all the commands currently using those requirements have been
    * scheduled as interruptible. If this is the case, they will be interrupted
    * and the command will be scheduled.
@@ -99,7 +111,7 @@ class CommandScheduler final : public nt::NTSendable,
    *
    * @param commands the commands to schedule
    */
-  void Schedule(wpi::span<Command* const> commands);
+  void Schedule(std::span<Command* const> commands);
 
   /**
    * Schedules multiple commands for execution. Does nothing for commands
@@ -147,10 +159,10 @@ class CommandScheduler final : public nt::NTSendable,
   void UnregisterSubsystem(Subsystem* subsystem);
 
   void RegisterSubsystem(std::initializer_list<Subsystem*> subsystems);
-  void RegisterSubsystem(wpi::span<Subsystem* const> subsystems);
+  void RegisterSubsystem(std::span<Subsystem* const> subsystems);
 
   void UnregisterSubsystem(std::initializer_list<Subsystem*> subsystems);
-  void UnregisterSubsystem(wpi::span<Subsystem* const> subsystems);
+  void UnregisterSubsystem(std::span<Subsystem* const> subsystems);
 
   /**
    * Sets the default command for a subsystem.  Registers that subsystem if it
@@ -167,17 +179,30 @@ class CommandScheduler final : public nt::NTSendable,
                          Command, std::remove_reference_t<T>>>>
   void SetDefaultCommand(Subsystem* subsystem, T&& defaultCommand) {
     if (!defaultCommand.HasRequirement(subsystem)) {
-      throw FRC_MakeError(frc::err::CommandIllegalUse, "{}",
+      throw FRC_MakeError(frc::err::CommandIllegalUse,
                           "Default commands must require their subsystem!");
     }
     if (defaultCommand.IsFinished()) {
-      throw FRC_MakeError(frc::err::CommandIllegalUse, "{}",
+      throw FRC_MakeError(frc::err::CommandIllegalUse,
                           "Default commands should not end!");
     }
     SetDefaultCommandImpl(subsystem,
                           std::make_unique<std::remove_reference_t<T>>(
                               std::forward<T>(defaultCommand)));
   }
+
+  /**
+   * Sets the default command for a subsystem.  Registers that subsystem if it
+   * is not already registered.  Default commands will run whenever there is no
+   * other command currently scheduled that requires the subsystem.  Default
+   * commands should be written to never end (i.e. their IsFinished() method
+   * should return false), as they would simply be re-scheduled if they do.
+   * Default commands must also require their subsystem.
+   *
+   * @param subsystem      the subsystem whose default command will be set
+   * @param defaultCommand the default command to associate with the subsystem
+   */
+  void SetDefaultCommand(Subsystem* subsystem, CommandPtr&& defaultCommand);
 
   /**
    * Gets the default command associated with this subsystem.  Null if this
@@ -208,9 +233,21 @@ class CommandScheduler final : public nt::NTSendable,
    * <p>Commands will be canceled even if they are not scheduled as
    * interruptible.
    *
+   * @param command the command to cancel
+   */
+  void Cancel(const CommandPtr& command);
+
+  /**
+   * Cancels commands. The scheduler will only call Command::End()
+   * method of the canceled command with true, indicating they were
+   * canceled (as opposed to finishing normally).
+   *
+   * <p>Commands will be canceled even if they are not scheduled as
+   * interruptible.
+   *
    * @param commands the commands to cancel
    */
-  void Cancel(wpi::span<Command* const> commands);
+  void Cancel(std::span<Command* const> commands);
 
   /**
    * Cancels commands. The scheduler will only call Command::End()
@@ -237,7 +274,7 @@ class CommandScheduler final : public nt::NTSendable,
    * @param commands the command to query
    * @return whether the command is currently scheduled
    */
-  bool IsScheduled(wpi::span<const Command* const> commands) const;
+  bool IsScheduled(std::span<const Command* const> commands) const;
 
   /**
    * Whether the given commands are running.  Note that this only works on
@@ -258,6 +295,16 @@ class CommandScheduler final : public nt::NTSendable,
    * @return whether the command is currently scheduled
    */
   bool IsScheduled(const Command* command) const;
+
+  /**
+   * Whether a given command is running.  Note that this only works on commands
+   * that are directly scheduled by the scheduler; it will not work on commands
+   * inside of CommandGroups, as the scheduler does not see them.
+   *
+   * @param command the command to query
+   * @return whether the command is currently scheduled
+   */
+  bool IsScheduled(const CommandPtr& command) const;
 
   /**
    * Returns the command currently requiring a given subsystem.  Null if no

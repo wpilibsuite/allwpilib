@@ -2,15 +2,15 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#ifndef NTCORE_NETWORKTABLES_NETWORKTABLEINSTANCE_INC_
-#define NTCORE_NETWORKTABLES_NETWORKTABLEINSTANCE_INC_
+#pragma once
 
 #include <string_view>
 #include <utility>
 #include <vector>
 
 #include "networktables/NetworkTableInstance.h"
-#include "ntcore_cpp.h"
+#include "networktables/Topic.h"
+#include "ntcore_c.h"
 
 namespace nt {
 
@@ -27,9 +27,10 @@ inline NetworkTableInstance NetworkTableInstance::Create() {
   return NetworkTableInstance{CreateInstance()};
 }
 
-inline void NetworkTableInstance::Destroy(NetworkTableInstance inst) {
+inline void NetworkTableInstance::Destroy(NetworkTableInstance& inst) {
   if (inst.m_handle != 0) {
     DestroyInstance(inst.m_handle);
+    inst.m_handle = 0;
   }
 }
 
@@ -37,53 +38,72 @@ inline NT_Inst NetworkTableInstance::GetHandle() const {
   return m_handle;
 }
 
+inline std::vector<Topic> NetworkTableInstance::GetTopics() {
+  auto handles = ::nt::GetTopics(m_handle, "", 0);
+  return {handles.begin(), handles.end()};
+}
+
+inline std::vector<Topic> NetworkTableInstance::GetTopics(
+    std::string_view prefix) {
+  auto handles = ::nt::GetTopics(m_handle, prefix, 0);
+  return {handles.begin(), handles.end()};
+}
+
+inline std::vector<Topic> NetworkTableInstance::GetTopics(
+    std::string_view prefix, unsigned int types) {
+  auto handles = ::nt::GetTopics(m_handle, prefix, types);
+  return {handles.begin(), handles.end()};
+}
+
+inline std::vector<Topic> NetworkTableInstance::GetTopics(
+    std::string_view prefix, std::span<std::string_view> types) {
+  auto handles = ::nt::GetTopics(m_handle, prefix, types);
+  return {handles.begin(), handles.end()};
+}
+
+inline std::vector<TopicInfo> NetworkTableInstance::GetTopicInfo() {
+  return ::nt::GetTopicInfo(m_handle, "", 0);
+}
+
+inline std::vector<TopicInfo> NetworkTableInstance::GetTopicInfo(
+    std::string_view prefix) {
+  return ::nt::GetTopicInfo(m_handle, prefix, 0);
+}
+
+inline std::vector<TopicInfo> NetworkTableInstance::GetTopicInfo(
+    std::string_view prefix, unsigned int types) {
+  return ::nt::GetTopicInfo(m_handle, prefix, types);
+}
+
+inline std::vector<TopicInfo> NetworkTableInstance::GetTopicInfo(
+    std::string_view prefix, std::span<std::string_view> types) {
+  return ::nt::GetTopicInfo(m_handle, prefix, types);
+}
+
 inline NetworkTableEntry NetworkTableInstance::GetEntry(std::string_view name) {
   return NetworkTableEntry{::nt::GetEntry(m_handle, name)};
 }
 
-inline std::vector<NetworkTableEntry> NetworkTableInstance::GetEntries(
-    std::string_view prefix, unsigned int types) {
-  std::vector<NetworkTableEntry> entries;
-  for (auto entry : ::nt::GetEntries(m_handle, prefix, types)) {
-    entries.emplace_back(entry);
-  }
-  return entries;
+inline bool NetworkTableInstance::WaitForListenerQueue(double timeout) {
+  return ::nt::WaitForListenerQueue(m_handle, timeout);
 }
 
-inline std::vector<EntryInfo> NetworkTableInstance::GetEntryInfo(
-    std::string_view prefix, unsigned int types) const {
-  return ::nt::GetEntryInfo(m_handle, prefix, types);
+inline void NetworkTableInstance::RemoveListener(NT_Listener listener) {
+  ::nt::RemoveListener(listener);
 }
 
-inline void NetworkTableInstance::DeleteAllEntries() {
-  ::nt::DeleteAllEntries(m_handle);
+inline NT_Listener NetworkTableInstance::AddConnectionListener(
+    bool immediate_notify, ListenerCallback callback) const {
+  return ::nt::AddListener(
+      m_handle,
+      NT_EVENT_CONNECTION | (immediate_notify ? NT_EVENT_IMMEDIATE : 0),
+      std::move(callback));
 }
 
-inline void NetworkTableInstance::RemoveEntryListener(
-    NT_EntryListener entry_listener) {
-  ::nt::RemoveEntryListener(entry_listener);
-}
-
-inline bool NetworkTableInstance::WaitForEntryListenerQueue(double timeout) {
-  return ::nt::WaitForEntryListenerQueue(m_handle, timeout);
-}
-
-inline void NetworkTableInstance::RemoveConnectionListener(
-    NT_ConnectionListener conn_listener) {
-  ::nt::RemoveConnectionListener(conn_listener);
-}
-
-inline bool NetworkTableInstance::WaitForConnectionListenerQueue(
-    double timeout) {
-  return ::nt::WaitForConnectionListenerQueue(m_handle, timeout);
-}
-
-inline bool NetworkTableInstance::WaitForRpcCallQueue(double timeout) {
-  return ::nt::WaitForRpcCallQueue(m_handle, timeout);
-}
-
-inline void NetworkTableInstance::SetNetworkIdentity(std::string_view name) {
-  ::nt::SetNetworkIdentity(m_handle, name);
+inline NT_Listener NetworkTableInstance::AddListener(
+    std::span<const std::string_view> prefixes, int eventMask,
+    ListenerCallback listener) {
+  return ::nt::AddListener(m_handle, prefixes, eventMask, std::move(listener));
 }
 
 inline unsigned int NetworkTableInstance::GetNetworkMode() const {
@@ -100,31 +120,21 @@ inline void NetworkTableInstance::StopLocal() {
 
 inline void NetworkTableInstance::StartServer(std::string_view persist_filename,
                                               const char* listen_address,
-                                              unsigned int port) {
-  ::nt::StartServer(m_handle, persist_filename, listen_address, port);
+                                              unsigned int port3,
+                                              unsigned int port4) {
+  ::nt::StartServer(m_handle, persist_filename, listen_address, port3, port4);
 }
 
 inline void NetworkTableInstance::StopServer() {
   ::nt::StopServer(m_handle);
 }
 
-inline void NetworkTableInstance::StartClient() {
-  ::nt::StartClient(m_handle);
+inline void NetworkTableInstance::StartClient3(std::string_view identity) {
+  ::nt::StartClient3(m_handle, identity);
 }
 
-inline void NetworkTableInstance::StartClient(const char* server_name,
-                                              unsigned int port) {
-  ::nt::StartClient(m_handle, server_name, port);
-}
-
-inline void NetworkTableInstance::StartClient(
-    wpi::span<const std::pair<std::string_view, unsigned int>> servers) {
-  ::nt::StartClient(m_handle, servers);
-}
-
-inline void NetworkTableInstance::StartClientTeam(unsigned int team,
-                                                  unsigned int port) {
-  ::nt::StartClientTeam(m_handle, team, port);
+inline void NetworkTableInstance::StartClient4(std::string_view identity) {
+  ::nt::StartClient4(m_handle, identity);
 }
 
 inline void NetworkTableInstance::StopClient() {
@@ -137,7 +147,7 @@ inline void NetworkTableInstance::SetServer(const char* server_name,
 }
 
 inline void NetworkTableInstance::SetServer(
-    wpi::span<const std::pair<std::string_view, unsigned int>> servers) {
+    std::span<const std::pair<std::string_view, unsigned int>> servers) {
   ::nt::SetServer(m_handle, servers);
 }
 
@@ -154,8 +164,8 @@ inline void NetworkTableInstance::StopDSClient() {
   ::nt::StopDSClient(m_handle);
 }
 
-inline void NetworkTableInstance::SetUpdateRate(double interval) {
-  ::nt::SetUpdateRate(m_handle, interval);
+inline void NetworkTableInstance::FlushLocal() const {
+  ::nt::FlushLocal(m_handle);
 }
 
 inline void NetworkTableInstance::Flush() const {
@@ -169,28 +179,6 @@ inline std::vector<ConnectionInfo> NetworkTableInstance::GetConnections()
 
 inline bool NetworkTableInstance::IsConnected() const {
   return ::nt::IsConnected(m_handle);
-}
-
-inline const char* NetworkTableInstance::SavePersistent(
-    std::string_view filename) const {
-  return ::nt::SavePersistent(m_handle, filename);
-}
-
-inline const char* NetworkTableInstance::LoadPersistent(
-    std::string_view filename,
-    std::function<void(size_t line, const char* msg)> warn) {
-  return ::nt::LoadPersistent(m_handle, filename, warn);
-}
-
-inline const char* NetworkTableInstance::SaveEntries(
-    std::string_view filename, std::string_view prefix) const {
-  return ::nt::SaveEntries(m_handle, filename, prefix);
-}
-
-inline const char* NetworkTableInstance::LoadEntries(
-    std::string_view filename, std::string_view prefix,
-    std::function<void(size_t line, const char* msg)> warn) {
-  return ::nt::LoadEntries(m_handle, filename, prefix, warn);
 }
 
 inline NT_DataLogger NetworkTableInstance::StartEntryDataLog(
@@ -213,20 +201,10 @@ inline void NetworkTableInstance::StopConnectionDataLog(
   ::nt::StopConnectionDataLog(logger);
 }
 
-inline NT_Logger NetworkTableInstance::AddLogger(
-    std::function<void(const LogMessage& msg)> func, unsigned int min_level,
-    unsigned int max_level) {
-  return ::nt::AddLogger(m_handle, func, min_level, max_level);
-}
-
-inline void NetworkTableInstance::RemoveLogger(NT_Logger logger) {
-  ::nt::RemoveLogger(logger);
-}
-
-inline bool NetworkTableInstance::WaitForLoggerQueue(double timeout) {
-  return ::nt::WaitForLoggerQueue(m_handle, timeout);
+inline NT_Listener NetworkTableInstance::AddLogger(unsigned int min_level,
+                                                   unsigned int max_level,
+                                                   ListenerCallback func) {
+  return ::nt::AddLogger(m_handle, min_level, max_level, std::move(func));
 }
 
 }  // namespace nt
-
-#endif  // NTCORE_NETWORKTABLES_NETWORKTABLEINSTANCE_INC_

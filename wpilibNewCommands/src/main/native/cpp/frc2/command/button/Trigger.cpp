@@ -13,8 +13,101 @@ using namespace frc2;
 
 Trigger::Trigger(const Trigger& other) = default;
 
+Trigger Trigger::OnTrue(Command* command) {
+  m_event.Rising().IfHigh([command] { command->Schedule(); });
+  return *this;
+}
+
+Trigger Trigger::OnTrue(CommandPtr&& command) {
+  m_event.Rising().IfHigh(
+      [command = std::move(command)] { command.Schedule(); });
+  return *this;
+}
+
+Trigger Trigger::OnFalse(Command* command) {
+  m_event.Falling().IfHigh([command] { command->Schedule(); });
+  return *this;
+}
+
+Trigger Trigger::OnFalse(CommandPtr&& command) {
+  m_event.Falling().IfHigh(
+      [command = std::move(command)] { command.Schedule(); });
+  return *this;
+}
+
+Trigger Trigger::WhileTrue(Command* command) {
+  m_event.Rising().IfHigh([command] { command->Schedule(); });
+  m_event.Falling().IfHigh([command] { command->Cancel(); });
+  return *this;
+}
+
+Trigger Trigger::WhileTrue(CommandPtr&& command) {
+  auto ptr = std::make_shared<CommandPtr>(std::move(command));
+  m_event.Rising().IfHigh([ptr] { ptr->Schedule(); });
+  m_event.Falling().IfHigh([ptr] { ptr->Cancel(); });
+  return *this;
+}
+
+Trigger Trigger::WhileFalse(Command* command) {
+  m_event.Falling().IfHigh([command] { command->Schedule(); });
+  m_event.Rising().IfHigh([command] { command->Cancel(); });
+  return *this;
+}
+
+Trigger Trigger::WhileFalse(CommandPtr&& command) {
+  auto ptr = std::make_shared<CommandPtr>(std::move(command));
+  m_event.Falling().IfHigh([ptr] { ptr->Schedule(); });
+  m_event.Rising().IfHigh([ptr] { ptr->Cancel(); });
+  return *this;
+}
+
+Trigger Trigger::ToggleOnTrue(Command* command) {
+  m_event.Rising().IfHigh([command] {
+    if (command->IsScheduled()) {
+      command->Cancel();
+    } else {
+      command->Schedule();
+    }
+  });
+  return *this;
+}
+
+Trigger Trigger::ToggleOnTrue(CommandPtr&& command) {
+  m_event.Rising().IfHigh([command = std::move(command)] {
+    if (command.IsScheduled()) {
+      command.Cancel();
+    } else {
+      command.Schedule();
+    }
+  });
+  return *this;
+}
+
+Trigger Trigger::ToggleOnFalse(Command* command) {
+  m_event.Falling().IfHigh([command] {
+    if (command->IsScheduled()) {
+      command->Cancel();
+    } else {
+      command->Schedule();
+    }
+  });
+  return *this;
+}
+
+Trigger Trigger::ToggleOnFalse(CommandPtr&& command) {
+  m_event.Falling().IfHigh([command = std::move(command)] {
+    if (command.IsScheduled()) {
+      command.Cancel();
+    } else {
+      command.Schedule();
+    }
+  });
+  return *this;
+}
+
+WPI_IGNORE_DEPRECATED
 Trigger Trigger::WhenActive(Command* command) {
-  this->Rising().IfHigh([command] { command->Schedule(); });
+  m_event.Rising().IfHigh([command] { command->Schedule(); });
   return *this;
 }
 
@@ -25,13 +118,13 @@ Trigger Trigger::WhenActive(std::function<void()> toRun,
 }
 
 Trigger Trigger::WhenActive(std::function<void()> toRun,
-                            wpi::span<Subsystem* const> requirements) {
+                            std::span<Subsystem* const> requirements) {
   return WhenActive(InstantCommand(std::move(toRun), requirements));
 }
 
 Trigger Trigger::WhileActiveContinous(Command* command) {
-  this->IfHigh([command] { command->Schedule(); });
-  this->Falling().IfHigh([command] { command->Cancel(); });
+  m_event.IfHigh([command] { command->Schedule(); });
+  m_event.Falling().IfHigh([command] { command->Cancel(); });
   return *this;
 }
 
@@ -43,18 +136,18 @@ Trigger Trigger::WhileActiveContinous(
 }
 
 Trigger Trigger::WhileActiveContinous(
-    std::function<void()> toRun, wpi::span<Subsystem* const> requirements) {
+    std::function<void()> toRun, std::span<Subsystem* const> requirements) {
   return WhileActiveContinous(InstantCommand(std::move(toRun), requirements));
 }
 
 Trigger Trigger::WhileActiveOnce(Command* command) {
-  this->Rising().IfHigh([command] { command->Schedule(); });
-  this->Falling().IfHigh([command] { command->Cancel(); });
+  m_event.Rising().IfHigh([command] { command->Schedule(); });
+  m_event.Falling().IfHigh([command] { command->Cancel(); });
   return *this;
 }
 
 Trigger Trigger::WhenInactive(Command* command) {
-  this->Falling().IfHigh([command] { command->Schedule(); });
+  m_event.Falling().IfHigh([command] { command->Schedule(); });
   return *this;
 }
 
@@ -65,12 +158,12 @@ Trigger Trigger::WhenInactive(std::function<void()> toRun,
 }
 
 Trigger Trigger::WhenInactive(std::function<void()> toRun,
-                              wpi::span<Subsystem* const> requirements) {
+                              std::span<Subsystem* const> requirements) {
   return WhenInactive(InstantCommand(std::move(toRun), requirements));
 }
 
 Trigger Trigger::ToggleWhenActive(Command* command) {
-  this->Rising().IfHigh([command] {
+  m_event.Rising().IfHigh([command] {
     if (command->IsScheduled()) {
       command->Cancel();
     } else {
@@ -81,6 +174,11 @@ Trigger Trigger::ToggleWhenActive(Command* command) {
 }
 
 Trigger Trigger::CancelWhenActive(Command* command) {
-  this->Rising().IfHigh([command] { command->Cancel(); });
+  m_event.Rising().IfHigh([command] { command->Cancel(); });
   return *this;
+}
+WPI_UNIGNORE_DEPRECATED
+
+BooleanEvent Trigger::GetEvent() const {
+  return m_event;
 }

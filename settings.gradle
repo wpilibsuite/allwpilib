@@ -52,6 +52,7 @@ include 'wpilibNewCommands'
 include 'myRobot'
 include 'docs'
 include 'msvcruntime'
+include 'ntcoreffi'
 
 buildCache {
     def cred = {

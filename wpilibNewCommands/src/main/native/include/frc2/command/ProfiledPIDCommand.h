@@ -6,11 +6,11 @@
 
 #include <functional>
 #include <initializer_list>
+#include <span>
 #include <utility>
 
 #include <frc/controller/ProfiledPIDController.h>
 #include <units/time.h>
-#include <wpi/span.h>
 
 #include "frc2/command/CommandBase.h"
 #include "frc2/command/CommandHelper.h"
@@ -72,7 +72,7 @@ class ProfiledPIDCommand
                      std::function<Distance_t()> measurementSource,
                      std::function<State()> goalSource,
                      std::function<void(double, State)> useOutput,
-                     wpi::span<Subsystem* const> requirements = {})
+                     std::span<Subsystem* const> requirements = {})
       : m_controller{controller},
         m_measurement{std::move(measurementSource)},
         m_goal{std::move(goalSource)},
@@ -116,7 +116,7 @@ class ProfiledPIDCommand
                      std::function<Distance_t()> measurementSource,
                      std::function<Distance_t()> goalSource,
                      std::function<void(double, State)> useOutput,
-                     wpi::span<Subsystem* const> requirements = {})
+                     std::span<Subsystem* const> requirements = {})
       : ProfiledPIDCommand(
             controller, measurementSource,
             [goalSource = std::move(goalSource)]() {
@@ -155,7 +155,7 @@ class ProfiledPIDCommand
   ProfiledPIDCommand(frc::ProfiledPIDController<Distance> controller,
                      std::function<Distance_t()> measurementSource, State goal,
                      std::function<void(double, State)> useOutput,
-                     wpi::span<Subsystem* const> requirements = {})
+                     std::span<Subsystem* const> requirements = {})
       : ProfiledPIDCommand(
             controller, measurementSource, [goal] { return goal; }, useOutput,
             requirements) {}
@@ -193,7 +193,7 @@ class ProfiledPIDCommand
                      std::function<Distance_t()> measurementSource,
                      Distance_t goal,
                      std::function<void(double, State)> useOutput,
-                     wpi::span<Subsystem* const> requirements = {})
+                     std::span<Subsystem* const> requirements = {})
       : ProfiledPIDCommand(
             controller, measurementSource, [goal] { return goal; }, useOutput,
             requirements) {}

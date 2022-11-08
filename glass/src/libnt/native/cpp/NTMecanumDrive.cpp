@@ -12,69 +12,62 @@
 using namespace glass;
 
 NTMecanumDriveModel::NTMecanumDriveModel(std::string_view path)
-    : NTMecanumDriveModel(nt::GetDefaultInstance(), path) {}
+    : NTMecanumDriveModel(nt::NetworkTableInstance::GetDefault(), path) {}
 
-NTMecanumDriveModel::NTMecanumDriveModel(NT_Inst instance,
+NTMecanumDriveModel::NTMecanumDriveModel(nt::NetworkTableInstance inst,
                                          std::string_view path)
-    : m_nt(instance),
-      m_name(m_nt.GetEntry(fmt::format("{}/.name", path))),
-      m_controllable(m_nt.GetEntry(fmt::format("{}/.controllable", path))),
-      m_flPercent(
-          m_nt.GetEntry(fmt::format("{}/Front Left Motor Speed", path))),
-      m_frPercent(
-          m_nt.GetEntry(fmt::format("{}/Front Right Motor Speed", path))),
-      m_rlPercent(m_nt.GetEntry(fmt::format("{}/Rear Left Motor Speed", path))),
-      m_rrPercent(
-          m_nt.GetEntry(fmt::format("{}/Rear Right Motor Speed", path))),
-      m_nameValue(wpi::rsplit(path, '/').second),
-      m_flPercentData(fmt::format("NTMcnmDriveFL:{}", path)),
-      m_frPercentData(fmt::format("NTMcnmDriveFR:{}", path)),
-      m_rlPercentData(fmt::format("NTMcnmDriveRL:{}", path)),
-      m_rrPercentData(fmt::format("NTMcnmDriveRR:{}", path)) {
-  m_nt.AddListener(m_name);
-  m_nt.AddListener(m_controllable);
-  m_nt.AddListener(m_flPercent);
-  m_nt.AddListener(m_frPercent);
-  m_nt.AddListener(m_rlPercent);
-  m_nt.AddListener(m_rrPercent);
+    : m_inst{inst},
+      m_name{inst.GetStringTopic(fmt::format("{}/.name", path)).Subscribe("")},
+      m_controllable{inst.GetBooleanTopic(fmt::format("{}/.controllable", path))
+                         .Subscribe(0)},
+      m_flPercent{
+          inst.GetDoubleTopic(fmt::format("{}/Front Left Motor Speed", path))
+              .GetEntry(0, {{nt::PubSubOption::SendAll(true)}})},
+      m_frPercent{
+          inst.GetDoubleTopic(fmt::format("{}/Front Right Motor Speed", path))
+              .GetEntry(0, {{nt::PubSubOption::SendAll(true)}})},
+      m_rlPercent{
+          inst.GetDoubleTopic(fmt::format("{}/Rear Left Motor Speed", path))
+              .GetEntry(0, {{nt::PubSubOption::SendAll(true)}})},
+      m_rrPercent{
+          inst.GetDoubleTopic(fmt::format("{}/Rear Right Motor Speed", path))
+              .GetEntry(0, {{nt::PubSubOption::SendAll(true)}})},
+      m_nameValue{wpi::rsplit(path, '/').second},
+      m_flPercentData{fmt::format("NTMcnmDriveFL:{}", path)},
+      m_frPercentData{fmt::format("NTMcnmDriveFR:{}", path)},
+      m_rlPercentData{fmt::format("NTMcnmDriveRL:{}", path)},
+      m_rrPercentData{fmt::format("NTMcnmDriveRR:{}", path)} {
+  m_wheels.emplace_back("FL % Output", &m_flPercentData,
+                        [this](auto value) { m_flPercent.Set(value); });
 
-  m_wheels.emplace_back("FL % Output", &m_flPercentData, [this](auto value) {
-    nt::SetEntryValue(m_flPercent, nt::NetworkTableValue::MakeDouble(value));
-  });
+  m_wheels.emplace_back("FR % Output", &m_frPercentData,
+                        [this](auto value) { m_frPercent.Set(value); });
 
-  m_wheels.emplace_back("FR % Output", &m_frPercentData, [this](auto value) {
-    nt::SetEntryValue(m_frPercent, nt::NetworkTableValue::MakeDouble(value));
-  });
+  m_wheels.emplace_back("RL % Output", &m_rlPercentData,
+                        [this](auto value) { m_rlPercent.Set(value); });
 
-  m_wheels.emplace_back("RL % Output", &m_rlPercentData, [this](auto value) {
-    nt::SetEntryValue(m_rlPercent, nt::NetworkTableValue::MakeDouble(value));
-  });
-
-  m_wheels.emplace_back("RR % Output", &m_rrPercentData, [this](auto value) {
-    nt::SetEntryValue(m_rrPercent, nt::NetworkTableValue::MakeDouble(value));
-  });
+  m_wheels.emplace_back("RR % Output", &m_rrPercentData,
+                        [this](auto value) { m_rrPercent.Set(value); });
 }
 
 void NTMecanumDriveModel::Update() {
-  for (auto&& event : m_nt.PollListener()) {
-    if (event.entry == m_name && event.value && event.value->IsString()) {
-      m_nameValue = event.value->GetString();
-    } else if (event.entry == m_flPercent && event.value &&
-               event.value->IsDouble()) {
-      m_flPercentData.SetValue(event.value->GetDouble());
-    } else if (event.entry == m_frPercent && event.value &&
-               event.value->IsDouble()) {
-      m_frPercentData.SetValue(event.value->GetDouble());
-    } else if (event.entry == m_rlPercent && event.value &&
-               event.value->IsDouble()) {
-      m_rlPercentData.SetValue(event.value->GetDouble());
-    } else if (event.entry == m_rrPercent && event.value &&
-               event.value->IsDouble()) {
-      m_rrPercentData.SetValue(event.value->GetDouble());
-    } else if (event.entry == m_controllable && event.value &&
-               event.value->IsBoolean()) {
-      m_controllableValue = event.value->GetBoolean();
-    }
+  for (auto&& v : m_name.ReadQueue()) {
+    m_nameValue = std::move(v.value);
+  }
+  for (auto&& v : m_flPercent.ReadQueue()) {
+    m_flPercentData.SetValue(v.value, v.time);
+  }
+  for (auto&& v : m_frPercent.ReadQueue()) {
+    m_frPercentData.SetValue(v.value, v.time);
+  }
+  for (auto&& v : m_rlPercent.ReadQueue()) {
+    m_rlPercentData.SetValue(v.value, v.time);
+  }
+  for (auto&& v : m_rrPercent.ReadQueue()) {
+    m_rrPercentData.SetValue(v.value, v.time);
+  }
+  for (auto&& v : m_controllable.ReadQueue()) {
+    m_controllableValue = v.value;
   }
 
   double fl = m_flPercentData.GetValue();
@@ -88,5 +81,5 @@ void NTMecanumDriveModel::Update() {
 }
 
 bool NTMecanumDriveModel::Exists() {
-  return m_nt.IsConnected() && nt::GetEntryType(m_flPercent) != NT_UNASSIGNED;
+  return m_inst.IsConnected() && m_flPercent.Exists();
 }

@@ -1,0 +1,154 @@
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
+
+#pragma once
+
+#include <stdint.h>
+
+#include <span>
+#include <string>
+#include <string_view>
+#include <utility>
+#include <vector>
+
+#include "ntcore_c.h"
+
+namespace wpi {
+template <typename T>
+class SmallVectorImpl;
+}  // namespace wpi
+
+namespace nt {
+{% for t in types %}
+/**
+ * Timestamped {{ t.TypeName }}.
+ * @ingroup ntcore_cpp_handle_api
+ */
+struct Timestamped{{ t.TypeName }} {
+  Timestamped{{ t.TypeName }}() = default;
+  Timestamped{{ t.TypeName }}(int64_t time, int64_t serverTime, {{ t.cpp.ValueType }} value)
+    : time{time}, serverTime{serverTime}, value{std::move(value)} {}
+
+  /**
+   * Time in local time base.
+   */
+  int64_t time = 0;
+
+  /**
+   * Time in server time base.  May be 0 or 1 for locally set values.
+   */
+  int64_t serverTime = 0;
+
+  /**
+   * Value.
+   */
+  {{ t.cpp.ValueType }} value = {};
+};
+{% if t.cpp.SmallRetType %}
+/**
+ * Timestamped {{ t.TypeName }} view (for SmallVector-taking functions).
+ * @ingroup ntcore_cpp_handle_api
+ */
+struct Timestamped{{ t.TypeName }}View {
+  Timestamped{{ t.TypeName }}View() = default;
+  Timestamped{{ t.TypeName }}View(int64_t time, int64_t serverTime, {{ t.cpp.SmallRetType }} value)
+    : time{time}, serverTime{serverTime}, value{std::move(value)} {}
+
+  /**
+   * Time in local time base.
+   */
+  int64_t time = 0;
+
+  /**
+   * Time in server time base.  May be 0 or 1 for locally set values.
+   */
+  int64_t serverTime = 0;
+
+  /**
+   * Value.
+   */
+  {{ t.cpp.SmallRetType }} value = {};
+};
+{% endif %}
+/**
+ * @defgroup ntcore_{{ t.TypeName }}_func {{ t.TypeName }} Functions
+ * @ingroup ntcore_cpp_handle_api
+ * @{
+ */
+
+/**
+ * Publish a new value.
+ *
+ * @param pubentry publisher or entry handle
+ * @param value value to publish
+ * @param time timestamp; 0 indicates current NT time should be used
+ */
+bool Set{{ t.TypeName }}(NT_Handle pubentry, {{ t.cpp.ParamType }} value, int64_t time = 0);
+
+/**
+ * Publish a default value.
+ * On reconnect, a default value will never be used in preference to a
+ * published value.
+ *
+ * @param pubentry publisher or entry handle
+ * @param defaultValue default value
+ */
+bool SetDefault{{ t.TypeName }}(NT_Handle pubentry, {{ t.cpp.ParamType }} defaultValue);
+
+/**
+ * Get the last published value.
+ * If no value has been published, returns the passed defaultValue.
+ *
+ * @param subentry subscriber or entry handle
+ * @param defaultValue default value to return if no value has been published
+ * @return value
+ */
+{{ t.cpp.ValueType }} Get{{ t.TypeName }}(NT_Handle subentry, {{ t.cpp.ParamType }} defaultValue);
+
+/**
+ * Get the last published value along with its timestamp.
+ * If no value has been published, returns the passed defaultValue and a
+ * timestamp of 0.
+ *
+ * @param subentry subscriber or entry handle
+ * @param defaultValue default value to return if no value has been published
+ * @return timestamped value
+ */
+Timestamped{{ t.TypeName }} GetAtomic{{ t.TypeName}}(NT_Handle subentry, {{ t.cpp.ParamType }} defaultValue);
+
+/**
+ * Get an array of all value changes since the last call to ReadQueue.
+ * Also provides a timestamp for each value.
+ *
+ * @note The "poll storage" subscribe option can be used to set the queue
+ *     depth.
+ *
+ * @param subentry subscriber or entry handle
+ * @return Array of timestamped values; empty array if no new changes have
+ *     been published since the previous call.
+ */
+std::vector<Timestamped{{ t.TypeName }}> ReadQueue{{ t.TypeName }}(NT_Handle subentry);
+
+/**
+ * Get an array of all value changes since the last call to ReadQueue.
+ *
+ * @note The "poll storage" subscribe option can be used to set the queue
+ *     depth.
+ *
+ * @param subentry subscriber or entry handle
+ * @return Array of values; empty array if no new changes have
+ *     been published since the previous call.
+ */
+std::vector<{% if t.cpp.ValueType == "bool" %}int{% else %}{{ t.cpp.ValueType }}{% endif %}> ReadQueueValues{{ t.TypeName }}(NT_Handle subentry);
+{% if t.cpp.SmallRetType and t.cpp.SmallElemType %}
+{{ t.cpp.SmallRetType }} Get{{ t.TypeName }}(NT_Handle subentry, wpi::SmallVectorImpl<{{ t.cpp.SmallElemType }}>& buf, {{ t.cpp.ParamType }} defaultValue);
+
+Timestamped{{ t.TypeName }}View GetAtomic{{ t.TypeName }}(
+      NT_Handle subentry,
+      wpi::SmallVectorImpl<{{ t.cpp.SmallElemType }}>& buf,
+      {{ t.cpp.ParamType }} defaultValue);
+{% endif %}
+/** @} */
+{% endfor %}
+}  // namespace nt

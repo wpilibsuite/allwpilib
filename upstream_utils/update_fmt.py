@@ -21,6 +21,7 @@ def main():
     os.chdir(upstream_root)
     for f in [
         "0001-Don-t-throw-on-write-failure.patch",
+        "0002-Suppress-C-20-clang-tidy-warning-false-positive.patch",
     ]:
         git_am(os.path.join(wpilib_root, "upstream_utils/fmt_patches", f))
 

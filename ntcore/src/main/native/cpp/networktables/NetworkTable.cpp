@@ -12,7 +12,18 @@
 #include <wpi/StringExtras.h>
 #include <wpi/StringMap.h>
 
+#include "networktables/BooleanArrayTopic.h"
+#include "networktables/BooleanTopic.h"
+#include "networktables/DoubleArrayTopic.h"
+#include "networktables/DoubleTopic.h"
+#include "networktables/FloatArrayTopic.h"
+#include "networktables/FloatTopic.h"
+#include "networktables/IntegerArrayTopic.h"
+#include "networktables/IntegerTopic.h"
 #include "networktables/NetworkTableInstance.h"
+#include "networktables/RawTopic.h"
+#include "networktables/StringArrayTopic.h"
+#include "networktables/StringTopic.h"
 #include "ntcore.h"
 
 using namespace nt;
@@ -78,11 +89,7 @@ NetworkTable::NetworkTable(NT_Inst inst, std::string_view path,
                            const private_init&)
     : m_inst(inst), m_path(path) {}
 
-NetworkTable::~NetworkTable() {
-  for (auto i : m_listeners) {
-    RemoveEntryListener(i);
-  }
-}
+NetworkTable::~NetworkTable() {}
 
 NetworkTableInstance NetworkTable::GetInstance() const {
   return NetworkTableInstance{m_inst};
@@ -99,78 +106,58 @@ NetworkTableEntry NetworkTable::GetEntry(std::string_view key) const {
   return NetworkTableEntry{entry};
 }
 
-NT_EntryListener NetworkTable::AddEntryListener(TableEntryListener listener,
-                                                unsigned int flags) const {
-  size_t prefix_len = m_path.size() + 1;
-  return nt::AddEntryListener(
-      m_inst, fmt::format("{}/", m_path),
-      [=](const EntryNotification& event) {
-        auto relative_key = wpi::substr(event.name, prefix_len);
-        if (relative_key.find(PATH_SEPARATOR_CHAR) != std::string_view::npos) {
-          return;
-        }
-        listener(const_cast<NetworkTable*>(this), relative_key,
-                 NetworkTableEntry{event.entry}, event.value, event.flags);
-      },
-      flags);
+Topic NetworkTable::GetTopic(std::string_view name) const {
+  fmt::memory_buffer buf;
+  fmt::format_to(fmt::appender{buf}, "{}/{}", m_path, name);
+  return Topic{::nt::GetTopic(m_inst, {buf.data(), buf.size()})};
 }
 
-NT_EntryListener NetworkTable::AddEntryListener(std::string_view key,
-                                                TableEntryListener listener,
-                                                unsigned int flags) const {
-  size_t prefix_len = m_path.size() + 1;
-  auto entry = GetEntry(key);
-  return nt::AddEntryListener(
-      entry.GetHandle(),
-      [=](const EntryNotification& event) {
-        listener(const_cast<NetworkTable*>(this),
-                 wpi::substr(event.name, prefix_len), entry, event.value,
-                 event.flags);
-      },
-      flags);
+BooleanTopic NetworkTable::GetBooleanTopic(std::string_view name) const {
+  return BooleanTopic{GetTopic(name)};
 }
 
-void NetworkTable::RemoveEntryListener(NT_EntryListener listener) const {
-  nt::RemoveEntryListener(listener);
+IntegerTopic NetworkTable::GetIntegerTopic(std::string_view name) const {
+  return IntegerTopic{GetTopic(name)};
 }
 
-NT_EntryListener NetworkTable::AddSubTableListener(TableListener listener,
-                                                   bool localNotify) {
-  size_t prefix_len = m_path.size() + 1;
-
-  // The lambda needs to be copyable, but StringMap is not, so use
-  // a shared_ptr to it.
-  auto notified_tables = std::make_shared<wpi::StringMap<char>>();
-
-  unsigned int flags = NT_NOTIFY_NEW | NT_NOTIFY_IMMEDIATE;
-  if (localNotify) {
-    flags |= NT_NOTIFY_LOCAL;
-  }
-  NT_EntryListener id = nt::AddEntryListener(
-      m_inst, fmt::format("{}/", m_path),
-      [=](const EntryNotification& event) {
-        auto relative_key = wpi::substr(event.name, prefix_len);
-        auto end_sub_table = relative_key.find(PATH_SEPARATOR_CHAR);
-        if (end_sub_table == std::string_view::npos) {
-          return;
-        }
-        auto sub_table_key = wpi::substr(relative_key, 0, end_sub_table);
-        if (notified_tables->find(sub_table_key) == notified_tables->end()) {
-          return;
-        }
-        notified_tables->insert(std::make_pair(sub_table_key, '\0'));
-        listener(this, sub_table_key, this->GetSubTable(sub_table_key));
-      },
-      flags);
-  m_listeners.emplace_back(id);
-  return id;
+FloatTopic NetworkTable::GetFloatTopic(std::string_view name) const {
+  return FloatTopic{GetTopic(name)};
 }
 
-void NetworkTable::RemoveTableListener(NT_EntryListener listener) {
-  nt::RemoveEntryListener(listener);
-  auto matches_begin =
-      std::remove(m_listeners.begin(), m_listeners.end(), listener);
-  m_listeners.erase(matches_begin, m_listeners.end());
+DoubleTopic NetworkTable::GetDoubleTopic(std::string_view name) const {
+  return DoubleTopic{GetTopic(name)};
+}
+
+StringTopic NetworkTable::GetStringTopic(std::string_view name) const {
+  return StringTopic{GetTopic(name)};
+}
+
+RawTopic NetworkTable::GetRawTopic(std::string_view name) const {
+  return RawTopic{GetTopic(name)};
+}
+
+BooleanArrayTopic NetworkTable::GetBooleanArrayTopic(
+    std::string_view name) const {
+  return BooleanArrayTopic{GetTopic(name)};
+}
+
+IntegerArrayTopic NetworkTable::GetIntegerArrayTopic(
+    std::string_view name) const {
+  return IntegerArrayTopic{GetTopic(name)};
+}
+
+FloatArrayTopic NetworkTable::GetFloatArrayTopic(std::string_view name) const {
+  return FloatArrayTopic{GetTopic(name)};
+}
+
+DoubleArrayTopic NetworkTable::GetDoubleArrayTopic(
+    std::string_view name) const {
+  return DoubleArrayTopic{GetTopic(name)};
+}
+
+StringArrayTopic NetworkTable::GetStringArrayTopic(
+    std::string_view name) const {
+  return StringArrayTopic{GetTopic(name)};
 }
 
 std::shared_ptr<NetworkTable> NetworkTable::GetSubTable(
@@ -183,25 +170,52 @@ bool NetworkTable::ContainsKey(std::string_view key) const {
   if (key.empty()) {
     return false;
   }
-  return GetEntry(key).Exists();
+  return GetTopic(key).Exists();
 }
 
 bool NetworkTable::ContainsSubTable(std::string_view key) const {
-  return !GetEntryInfo(m_inst, fmt::format("{}/{}/", m_path, key), 0).empty();
+  return !::nt::GetTopics(m_inst, fmt::format("{}/{}/", m_path, key), 0)
+              .empty();
+}
+
+std::vector<TopicInfo> NetworkTable::GetTopicInfo(int types) const {
+  std::vector<TopicInfo> infos;
+  size_t prefix_len = m_path.size() + 1;
+  for (auto&& info :
+       ::nt::GetTopicInfo(m_inst, fmt::format("{}/", m_path), types)) {
+    auto relative_key = wpi::substr(info.name, prefix_len);
+    if (relative_key.find(PATH_SEPARATOR_CHAR) != std::string_view::npos) {
+      continue;
+    }
+    infos.emplace_back(std::move(info));
+  }
+  return infos;
+}
+
+std::vector<Topic> NetworkTable::GetTopics(int types) const {
+  std::vector<Topic> topics;
+  size_t prefix_len = m_path.size() + 1;
+  for (auto&& info :
+       ::nt::GetTopicInfo(m_inst, fmt::format("{}/", m_path), types)) {
+    auto relative_key = wpi::substr(info.name, prefix_len);
+    if (relative_key.find(PATH_SEPARATOR_CHAR) != std::string_view::npos) {
+      continue;
+    }
+    topics.emplace_back(info.topic);
+  }
+  return topics;
 }
 
 std::vector<std::string> NetworkTable::GetKeys(int types) const {
   std::vector<std::string> keys;
   size_t prefix_len = m_path.size() + 1;
-  auto infos = GetEntryInfo(m_inst, fmt::format("{}/", m_path), types);
-  std::scoped_lock lock(m_mutex);
-  for (auto& info : infos) {
+  for (auto&& info :
+       ::nt::GetTopicInfo(m_inst, fmt::format("{}/", m_path), types)) {
     auto relative_key = wpi::substr(info.name, prefix_len);
     if (relative_key.find(PATH_SEPARATOR_CHAR) != std::string_view::npos) {
       continue;
     }
     keys.emplace_back(relative_key);
-    m_entries[relative_key] = info.entry;
   }
   return keys;
 }
@@ -209,8 +223,9 @@ std::vector<std::string> NetworkTable::GetKeys(int types) const {
 std::vector<std::string> NetworkTable::GetSubTables() const {
   std::vector<std::string> keys;
   size_t prefix_len = m_path.size() + 1;
-  for (auto& entry : GetEntryInfo(m_inst, fmt::format("{}/", m_path), 0)) {
-    auto relative_key = wpi::substr(entry.name, prefix_len);
+  for (auto&& topic :
+       ::nt::GetTopicInfo(m_inst, fmt::format("{}/", m_path), 0)) {
+    auto relative_key = wpi::substr(topic.name, prefix_len);
     size_t end_subtable = relative_key.find(PATH_SEPARATOR_CHAR);
     if (end_subtable == std::string_view::npos) {
       continue;
@@ -230,22 +245,6 @@ void NetworkTable::ClearPersistent(std::string_view key) {
 
 bool NetworkTable::IsPersistent(std::string_view key) const {
   return GetEntry(key).IsPersistent();
-}
-
-void NetworkTable::SetFlags(std::string_view key, unsigned int flags) {
-  GetEntry(key).SetFlags(flags);
-}
-
-void NetworkTable::ClearFlags(std::string_view key, unsigned int flags) {
-  GetEntry(key).ClearFlags(flags);
-}
-
-unsigned int NetworkTable::GetFlags(std::string_view key) const {
-  return GetEntry(key).GetFlags();
-}
-
-void NetworkTable::Delete(std::string_view key) {
-  GetEntry(key).Delete();
 }
 
 bool NetworkTable::PutNumber(std::string_view key, double value) {
@@ -288,88 +287,78 @@ bool NetworkTable::GetBoolean(std::string_view key, bool defaultValue) const {
 }
 
 bool NetworkTable::PutBooleanArray(std::string_view key,
-                                   wpi::span<const int> value) {
+                                   std::span<const int> value) {
   return GetEntry(key).SetBooleanArray(value);
 }
 
 bool NetworkTable::SetDefaultBooleanArray(std::string_view key,
-                                          wpi::span<const int> defaultValue) {
+                                          std::span<const int> defaultValue) {
   return GetEntry(key).SetDefaultBooleanArray(defaultValue);
 }
 
 std::vector<int> NetworkTable::GetBooleanArray(
-    std::string_view key, wpi::span<const int> defaultValue) const {
+    std::string_view key, std::span<const int> defaultValue) const {
   return GetEntry(key).GetBooleanArray(defaultValue);
 }
 
 bool NetworkTable::PutNumberArray(std::string_view key,
-                                  wpi::span<const double> value) {
+                                  std::span<const double> value) {
   return GetEntry(key).SetDoubleArray(value);
 }
 
 bool NetworkTable::SetDefaultNumberArray(std::string_view key,
-                                         wpi::span<const double> defaultValue) {
+                                         std::span<const double> defaultValue) {
   return GetEntry(key).SetDefaultDoubleArray(defaultValue);
 }
 
 std::vector<double> NetworkTable::GetNumberArray(
-    std::string_view key, wpi::span<const double> defaultValue) const {
+    std::string_view key, std::span<const double> defaultValue) const {
   return GetEntry(key).GetDoubleArray(defaultValue);
 }
 
 bool NetworkTable::PutStringArray(std::string_view key,
-                                  wpi::span<const std::string> value) {
+                                  std::span<const std::string> value) {
   return GetEntry(key).SetStringArray(value);
 }
 
 bool NetworkTable::SetDefaultStringArray(
-    std::string_view key, wpi::span<const std::string> defaultValue) {
+    std::string_view key, std::span<const std::string> defaultValue) {
   return GetEntry(key).SetDefaultStringArray(defaultValue);
 }
 
 std::vector<std::string> NetworkTable::GetStringArray(
-    std::string_view key, wpi::span<const std::string> defaultValue) const {
+    std::string_view key, std::span<const std::string> defaultValue) const {
   return GetEntry(key).GetStringArray(defaultValue);
 }
 
-bool NetworkTable::PutRaw(std::string_view key, std::string_view value) {
+bool NetworkTable::PutRaw(std::string_view key,
+                          std::span<const uint8_t> value) {
   return GetEntry(key).SetRaw(value);
 }
 
 bool NetworkTable::SetDefaultRaw(std::string_view key,
-                                 std::string_view defaultValue) {
+                                 std::span<const uint8_t> defaultValue) {
   return GetEntry(key).SetDefaultRaw(defaultValue);
 }
 
-std::string NetworkTable::GetRaw(std::string_view key,
-                                 std::string_view defaultValue) const {
+std::vector<uint8_t> NetworkTable::GetRaw(
+    std::string_view key, std::span<const uint8_t> defaultValue) const {
   return GetEntry(key).GetRaw(defaultValue);
 }
 
-bool NetworkTable::PutValue(std::string_view key,
-                            std::shared_ptr<Value> value) {
+bool NetworkTable::PutValue(std::string_view key, const Value& value) {
   return GetEntry(key).SetValue(value);
 }
 
 bool NetworkTable::SetDefaultValue(std::string_view key,
-                                   std::shared_ptr<Value> defaultValue) {
+                                   const Value& defaultValue) {
   return GetEntry(key).SetDefaultValue(defaultValue);
 }
 
-std::shared_ptr<Value> NetworkTable::GetValue(std::string_view key) const {
+Value NetworkTable::GetValue(std::string_view key) const {
   return GetEntry(key).GetValue();
 }
 
 std::string_view NetworkTable::GetPath() const {
   return m_path;
-}
-
-const char* NetworkTable::SaveEntries(std::string_view filename) const {
-  return nt::SaveEntries(m_inst, filename, fmt::format("{}/", m_path));
-}
-
-const char* NetworkTable::LoadEntries(
-    std::string_view filename,
-    std::function<void(size_t line, const char* msg)> warn) {
-  return nt::LoadEntries(m_inst, filename, fmt::format("{}/", m_path), warn);
 }

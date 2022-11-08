@@ -32,7 +32,7 @@ class WPILIB_DLLEXPORT Pose2d {
    * @param translation The translational component of the pose.
    * @param rotation The rotational component of the pose.
    */
-  Pose2d(Translation2d translation, Rotation2d rotation);
+  constexpr Pose2d(Translation2d translation, Rotation2d rotation);
 
   /**
    * Constructs a pose with x and y translations instead of a separate
@@ -42,7 +42,7 @@ class WPILIB_DLLEXPORT Pose2d {
    * @param y The y component of the translational component of the pose.
    * @param rotation The rotational component of the pose.
    */
-  Pose2d(units::meter_t x, units::meter_t y, Rotation2d rotation);
+  constexpr Pose2d(units::meter_t x, units::meter_t y, Rotation2d rotation);
 
   /**
    * Transforms the pose by the given transformation and returns the new
@@ -58,7 +58,7 @@ class WPILIB_DLLEXPORT Pose2d {
    *
    * @return The transformed pose.
    */
-  Pose2d operator+(const Transform2d& other) const;
+  constexpr Pose2d operator+(const Transform2d& other) const;
 
   /**
    * Returns the Transform2d that maps the one pose to another.
@@ -89,28 +89,46 @@ class WPILIB_DLLEXPORT Pose2d {
    *
    * @return Reference to the translational component of the pose.
    */
-  const Translation2d& Translation() const { return m_translation; }
+  constexpr const Translation2d& Translation() const { return m_translation; }
 
   /**
    * Returns the X component of the pose's translation.
    *
    * @return The x component of the pose's translation.
    */
-  units::meter_t X() const { return m_translation.X(); }
+  constexpr units::meter_t X() const { return m_translation.X(); }
 
   /**
    * Returns the Y component of the pose's translation.
    *
    * @return The y component of the pose's translation.
    */
-  units::meter_t Y() const { return m_translation.Y(); }
+  constexpr units::meter_t Y() const { return m_translation.Y(); }
 
   /**
    * Returns the underlying rotation.
    *
    * @return Reference to the rotational component of the pose.
    */
-  const Rotation2d& Rotation() const { return m_rotation; }
+  constexpr const Rotation2d& Rotation() const { return m_rotation; }
+
+  /**
+   * Multiplies the current pose by a scalar.
+   *
+   * @param scalar The scalar.
+   *
+   * @return The new scaled Pose2d.
+   */
+  constexpr Pose2d operator*(double scalar) const;
+
+  /**
+   * Divides the current pose by a scalar.
+   *
+   * @param scalar The scalar.
+   *
+   * @return The new scaled Pose2d.
+   */
+  constexpr Pose2d operator/(double scalar) const;
 
   /**
    * Transforms the pose by the given transformation and returns the new pose.
@@ -120,7 +138,7 @@ class WPILIB_DLLEXPORT Pose2d {
    *
    * @return The transformed pose.
    */
-  Pose2d TransformBy(const Transform2d& other) const;
+  constexpr Pose2d TransformBy(const Transform2d& other) const;
 
   /**
    * Returns the other pose relative to the current pose.
@@ -181,3 +199,5 @@ WPILIB_DLLEXPORT
 void from_json(const wpi::json& json, Pose2d& pose);
 
 }  // namespace frc
+
+#include "Pose2d.inc"

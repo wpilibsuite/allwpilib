@@ -4,8 +4,9 @@
 
 #include "SwerveModule.h"
 
+#include <numbers>
+
 #include <frc/geometry/Rotation2d.h>
-#include <wpi/numbers>
 
 SwerveModule::SwerveModule(const int driveMotorChannel,
                            const int turningMotorChannel,
@@ -20,23 +21,28 @@ SwerveModule::SwerveModule(const int driveMotorChannel,
   // Set the distance per pulse for the drive encoder. We can simply use the
   // distance traveled for one rotation of the wheel divided by the encoder
   // resolution.
-  m_driveEncoder.SetDistancePerPulse(2 * wpi::numbers::pi *
+  m_driveEncoder.SetDistancePerPulse(2 * std::numbers::pi *
                                      kWheelRadius.value() / kEncoderResolution);
 
   // Set the distance (in this case, angle) per pulse for the turning encoder.
-  // This is the the angle through an entire rotation (2 * wpi::numbers::pi)
+  // This is the the angle through an entire rotation (2 * std::numbers::pi)
   // divided by the encoder resolution.
-  m_turningEncoder.SetDistancePerPulse(2 * wpi::numbers::pi /
+  m_turningEncoder.SetDistancePerPulse(2 * std::numbers::pi /
                                        kEncoderResolution);
 
   // Limit the PID Controller's input range between -pi and pi and set the input
   // to be continuous.
   m_turningPIDController.EnableContinuousInput(
-      -units::radian_t{wpi::numbers::pi}, units::radian_t{wpi::numbers::pi});
+      -units::radian_t{std::numbers::pi}, units::radian_t{std::numbers::pi});
 }
 
 frc::SwerveModuleState SwerveModule::GetState() const {
   return {units::meters_per_second_t{m_driveEncoder.GetRate()},
+          units::radian_t{m_turningEncoder.GetDistance()}};
+}
+
+frc::SwerveModulePosition SwerveModule::GetPosition() const {
+  return {units::meter_t{m_driveEncoder.GetDistance()},
           units::radian_t{m_turningEncoder.GetDistance()}};
 }
 

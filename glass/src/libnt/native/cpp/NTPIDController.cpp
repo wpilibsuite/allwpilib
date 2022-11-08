@@ -10,76 +10,65 @@
 using namespace glass;
 
 NTPIDControllerModel::NTPIDControllerModel(std::string_view path)
-    : NTPIDControllerModel(nt::GetDefaultInstance(), path) {}
+    : NTPIDControllerModel(nt::NetworkTableInstance::GetDefault(), path) {}
 
-NTPIDControllerModel::NTPIDControllerModel(NT_Inst instance,
+NTPIDControllerModel::NTPIDControllerModel(nt::NetworkTableInstance inst,
                                            std::string_view path)
-    : m_nt(instance),
-      m_name(m_nt.GetEntry(fmt::format("{}/.name", path))),
-      m_controllable(m_nt.GetEntry(fmt::format("{}/.controllable", path))),
-      m_p(m_nt.GetEntry(fmt::format("{}/p", path))),
-      m_i(m_nt.GetEntry(fmt::format("{}/i", path))),
-      m_d(m_nt.GetEntry(fmt::format("{}/d", path))),
-      m_setpoint(m_nt.GetEntry(fmt::format("{}/setpoint", path))),
-      m_pData(fmt::format("NTPIDCtrlP:{}", path)),
-      m_iData(fmt::format("NTPIDCtrlI:{}", path)),
-      m_dData(fmt::format("NTPIDCtrlD:{}", path)),
-      m_setpointData(fmt::format("NTPIDCtrlStpt:{}", path)),
-      m_nameValue(wpi::rsplit(path, '/').second) {
-  m_nt.AddListener(m_name);
-  m_nt.AddListener(m_controllable);
-  m_nt.AddListener(m_p);
-  m_nt.AddListener(m_i);
-  m_nt.AddListener(m_d);
-  m_nt.AddListener(m_setpoint);
-}
+    : m_inst{inst},
+      m_name{inst.GetStringTopic(fmt::format("{}/.name", path)).Subscribe("")},
+      m_controllable{inst.GetBooleanTopic(fmt::format("{}/.controllable", path))
+                         .Subscribe(false)},
+      m_p{inst.GetDoubleTopic(fmt::format("{}/p", path))
+              .GetEntry(0, {{nt::PubSubOption::SendAll(true)}})},
+      m_i{inst.GetDoubleTopic(fmt::format("{}/i", path))
+              .GetEntry(0, {{nt::PubSubOption::SendAll(true)}})},
+      m_d{inst.GetDoubleTopic(fmt::format("{}/d", path))
+              .GetEntry(0, {{nt::PubSubOption::SendAll(true)}})},
+      m_setpoint{inst.GetDoubleTopic(fmt::format("{}/setpoint", path))
+                     .GetEntry(0, {{nt::PubSubOption::SendAll(true)}})},
+      m_pData{fmt::format("NTPIDCtrlP:{}", path)},
+      m_iData{fmt::format("NTPIDCtrlI:{}", path)},
+      m_dData{fmt::format("NTPIDCtrlD:{}", path)},
+      m_setpointData{fmt::format("NTPIDCtrlStpt:{}", path)},
+      m_nameValue{wpi::rsplit(path, '/').second} {}
 
 void NTPIDControllerModel::SetP(double value) {
-  nt::SetEntryValue(m_p, nt::NetworkTableValue::MakeDouble(value));
+  m_p.Set(value);
 }
 
 void NTPIDControllerModel::SetI(double value) {
-  nt::SetEntryValue(m_i, nt::NetworkTableValue::MakeDouble(value));
+  m_i.Set(value);
 }
 
 void NTPIDControllerModel::SetD(double value) {
-  nt::SetEntryValue(m_d, nt::NetworkTableValue::MakeDouble(value));
+  m_d.Set(value);
 }
 
 void NTPIDControllerModel::SetSetpoint(double value) {
-  nt::SetEntryValue(m_setpoint, nt::NetworkTableValue::MakeDouble(value));
+  m_setpoint.Set(value);
 }
 
 void NTPIDControllerModel::Update() {
-  for (auto&& event : m_nt.PollListener()) {
-    if (event.entry == m_name) {
-      if (event.value && event.value->IsString()) {
-        m_nameValue = event.value->GetString();
-      }
-    } else if (event.entry == m_p) {
-      if (event.value && event.value->IsDouble()) {
-        m_pData.SetValue(event.value->GetDouble());
-      }
-    } else if (event.entry == m_i) {
-      if (event.value && event.value->IsDouble()) {
-        m_iData.SetValue(event.value->GetDouble());
-      }
-    } else if (event.entry == m_d) {
-      if (event.value && event.value->IsDouble()) {
-        m_dData.SetValue(event.value->GetDouble());
-      }
-    } else if (event.entry == m_setpoint) {
-      if (event.value && event.value->IsDouble()) {
-        m_setpointData.SetValue(event.value->GetDouble());
-      }
-    } else if (event.entry == m_controllable) {
-      if (event.value && event.value->IsBoolean()) {
-        m_controllableValue = event.value->GetBoolean();
-      }
-    }
+  for (auto&& v : m_name.ReadQueue()) {
+    m_nameValue = std::move(v.value);
+  }
+  for (auto&& v : m_p.ReadQueue()) {
+    m_pData.SetValue(v.value, v.time);
+  }
+  for (auto&& v : m_i.ReadQueue()) {
+    m_iData.SetValue(v.value, v.time);
+  }
+  for (auto&& v : m_d.ReadQueue()) {
+    m_dData.SetValue(v.value, v.time);
+  }
+  for (auto&& v : m_setpoint.ReadQueue()) {
+    m_setpointData.SetValue(v.value, v.time);
+  }
+  for (auto&& v : m_controllable.ReadQueue()) {
+    m_controllableValue = v.value;
   }
 }
 
 bool NTPIDControllerModel::Exists() {
-  return m_nt.IsConnected() && nt::GetEntryType(m_setpoint) != NT_UNASSIGNED;
+  return m_inst.IsConnected() && m_setpoint.Exists();
 }

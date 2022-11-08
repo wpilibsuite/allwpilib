@@ -9,7 +9,6 @@ import edu.wpi.first.math.Num;
 import edu.wpi.first.math.Pair;
 import org.ejml.simple.SimpleMatrix;
 
-@SuppressWarnings({"ParameterName", "MethodTypeParameterName"})
 public final class Discretization {
   private Discretization() {
     // Utility class
@@ -39,7 +38,6 @@ public final class Discretization {
    * @param dtSeconds Discretization timestep.
    * @return a Pair representing discA and diskB.
    */
-  @SuppressWarnings("LocalVariableName")
   public static <States extends Num, Inputs extends Num>
       Pair<Matrix<States, States>, Matrix<States, Inputs>> discretizeAB(
           Matrix<States, States> contA, Matrix<States, Inputs> contB, double dtSeconds) {
@@ -74,7 +72,6 @@ public final class Discretization {
    * @param dtSeconds Discretization timestep.
    * @return a pair representing the discrete system matrix and process noise covariance matrix.
    */
-  @SuppressWarnings("LocalVariableName")
   public static <States extends Num>
       Pair<Matrix<States, States>, Matrix<States, States>> discretizeAQ(
           Matrix<States, States> contA, Matrix<States, States> contQ, double dtSeconds) {
@@ -130,7 +127,6 @@ public final class Discretization {
    * @param dtSeconds Discretization timestep.
    * @return a pair representing the discrete system matrix and process noise covariance matrix.
    */
-  @SuppressWarnings("LocalVariableName")
   public static <States extends Num>
       Pair<Matrix<States, States>, Matrix<States, States>> discretizeAQTaylor(
           Matrix<States, States> contA, Matrix<States, States> contQ, double dtSeconds) {
@@ -204,12 +200,12 @@ public final class Discretization {
    * Note that dt=0.0 divides R by zero.
    *
    * @param <O> Nat representing the number of outputs.
-   * @param R Continuous measurement noise covariance matrix.
+   * @param contR Continuous measurement noise covariance matrix.
    * @param dtSeconds Discretization timestep.
    * @return Discretized version of the provided continuous measurement noise covariance matrix.
    */
-  public static <O extends Num> Matrix<O, O> discretizeR(Matrix<O, O> R, double dtSeconds) {
+  public static <O extends Num> Matrix<O, O> discretizeR(Matrix<O, O> contR, double dtSeconds) {
     // R_d = 1/T R
-    return R.div(dtSeconds);
+    return contR.div(dtSeconds);
   }
 }

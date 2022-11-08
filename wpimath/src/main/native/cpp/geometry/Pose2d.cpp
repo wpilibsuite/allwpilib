@@ -10,16 +10,6 @@
 
 using namespace frc;
 
-Pose2d::Pose2d(Translation2d translation, Rotation2d rotation)
-    : m_translation(std::move(translation)), m_rotation(std::move(rotation)) {}
-
-Pose2d::Pose2d(units::meter_t x, units::meter_t y, Rotation2d rotation)
-    : m_translation(x, y), m_rotation(std::move(rotation)) {}
-
-Pose2d Pose2d::operator+(const Transform2d& other) const {
-  return TransformBy(other);
-}
-
 Transform2d Pose2d::operator-(const Pose2d& other) const {
   const auto pose = this->RelativeTo(other);
   return Transform2d{pose.Translation(), pose.Rotation()};
@@ -31,11 +21,6 @@ bool Pose2d::operator==(const Pose2d& other) const {
 
 bool Pose2d::operator!=(const Pose2d& other) const {
   return !operator==(other);
-}
-
-Pose2d Pose2d::TransformBy(const Transform2d& other) const {
-  return {m_translation + (other.Translation().RotateBy(m_rotation)),
-          m_rotation + other.Rotation()};
 }
 
 Pose2d Pose2d::RelativeTo(const Pose2d& other) const {

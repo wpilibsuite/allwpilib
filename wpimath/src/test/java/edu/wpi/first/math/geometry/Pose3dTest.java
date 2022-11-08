@@ -16,8 +16,62 @@ class Pose3dTest {
   private static final double kEpsilon = 1E-9;
 
   @Test
+  void testTransformByRotations() {
+    var initialPose =
+        new Pose3d(
+            new Translation3d(0.0, 0.0, 0.0),
+            new Rotation3d(
+                Units.degreesToRadians(0.0),
+                Units.degreesToRadians(0.0),
+                Units.degreesToRadians(0.0)));
+
+    var transform1 =
+        new Transform3d(
+            new Translation3d(0.0, 0.0, 0.0),
+            new Rotation3d(
+                Units.degreesToRadians(90.0),
+                Units.degreesToRadians(45.0),
+                Units.degreesToRadians(0.0)));
+
+    var transform2 =
+        new Transform3d(
+            new Translation3d(0.0, 0.0, 0.0),
+            new Rotation3d(
+                Units.degreesToRadians(-90.0),
+                Units.degreesToRadians(0.0),
+                Units.degreesToRadians(0.0)));
+
+    var transform3 =
+        new Transform3d(
+            new Translation3d(0.0, 0.0, 0.0),
+            new Rotation3d(
+                Units.degreesToRadians(0.0),
+                Units.degreesToRadians(-45.0),
+                Units.degreesToRadians(0.0)));
+
+    // This sequence of rotations should diverge from the origin and eventually return to it. When
+    // each rotation occurs, it should be performed intrinsicly, i.e. 'from the viewpoint' of and
+    // with
+    // the axes of the pose that is being transformed, just like how the translation is done 'from
+    // the
+    // viewpoint' of the pose that is being transformed.
+    var finalPose =
+        initialPose.transformBy(transform1).transformBy(transform2).transformBy(transform3);
+
+    assertAll(
+        () ->
+            assertEquals(
+                finalPose.getRotation().getX(), initialPose.getRotation().getX(), kEpsilon),
+        () ->
+            assertEquals(
+                finalPose.getRotation().getY(), initialPose.getRotation().getY(), kEpsilon),
+        () ->
+            assertEquals(
+                finalPose.getRotation().getZ(), initialPose.getRotation().getZ(), kEpsilon));
+  }
+
+  @Test
   void testTransformBy() {
-    @SuppressWarnings("LocalVariableName")
     var zAxis = VecBuilder.fill(0.0, 0.0, 1.0);
 
     var initial =
@@ -38,7 +92,6 @@ class Pose3dTest {
 
   @Test
   void testRelativeTo() {
-    @SuppressWarnings("LocalVariableName")
     var zAxis = VecBuilder.fill(0.0, 0.0, 1.0);
 
     var initial = new Pose3d(0.0, 0.0, 0.0, new Rotation3d(zAxis, Units.degreesToRadians(45.0)));
@@ -54,7 +107,6 @@ class Pose3dTest {
 
   @Test
   void testEquality() {
-    @SuppressWarnings("LocalVariableName")
     var zAxis = VecBuilder.fill(0.0, 0.0, 1.0);
 
     var one = new Pose3d(0.0, 5.0, 0.0, new Rotation3d(zAxis, Units.degreesToRadians(43.0)));
@@ -64,7 +116,6 @@ class Pose3dTest {
 
   @Test
   void testInequality() {
-    @SuppressWarnings("LocalVariableName")
     var zAxis = VecBuilder.fill(0.0, 0.0, 1.0);
 
     var one = new Pose3d(0.0, 5.0, 0.0, new Rotation3d(zAxis, Units.degreesToRadians(43.0)));
@@ -74,7 +125,6 @@ class Pose3dTest {
 
   @Test
   void testMinus() {
-    @SuppressWarnings("LocalVariableName")
     var zAxis = VecBuilder.fill(0.0, 0.0, 1.0);
 
     var initial = new Pose3d(0.0, 0.0, 0.0, new Rotation3d(zAxis, Units.degreesToRadians(45.0)));

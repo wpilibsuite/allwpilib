@@ -4,6 +4,10 @@
 
 package edu.wpi.first.math.geometry;
 
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import edu.wpi.first.math.MatBuilder;
 import edu.wpi.first.math.MathSharedStore;
 import edu.wpi.first.math.MathUtil;
@@ -17,6 +21,8 @@ import java.util.Objects;
 import org.ejml.dense.row.factory.DecompositionFactory_DDRM;
 
 /** A rotation in a 3D coordinate frame represented by a quaternion. */
+@JsonIgnoreProperties(ignoreUnknown = true)
+@JsonAutoDetect(getterVisibility = JsonAutoDetect.Visibility.NONE)
 public class Rotation3d implements Interpolatable<Rotation3d> {
   private Quaternion m_q = new Quaternion();
 
@@ -28,7 +34,8 @@ public class Rotation3d implements Interpolatable<Rotation3d> {
    *
    * @param q The quaternion.
    */
-  public Rotation3d(Quaternion q) {
+  @JsonCreator
+  public Rotation3d(@JsonProperty(required = true, value = "quaternion") Quaternion q) {
     m_q = q.normalize();
   }
 
@@ -170,7 +177,6 @@ public class Rotation3d implements Interpolatable<Rotation3d> {
       // so a 180 degree rotation is required. Any orthogonal vector can be used
       // for it. Q in the QR decomposition is an orthonormal basis, so it
       // contains orthogonal unit vectors.
-      @SuppressWarnings("LocalVariableName")
       var X =
           new MatBuilder<>(Nat.N3(), Nat.N1())
               .fill(initial.get(0, 0), initial.get(1, 0), initial.get(2, 0));
@@ -247,6 +253,16 @@ public class Rotation3d implements Interpolatable<Rotation3d> {
   }
 
   /**
+   * Divides the current rotation by a scalar.
+   *
+   * @param scalar The scalar.
+   * @return The new scaled Rotation3d.
+   */
+  public Rotation3d div(double scalar) {
+    return times(1.0 / scalar);
+  }
+
+  /**
    * Adds the new rotation to the current rotation.
    *
    * @param other The rotation to rotate by.
@@ -261,6 +277,7 @@ public class Rotation3d implements Interpolatable<Rotation3d> {
    *
    * @return The quaternion representation of the Rotation3d.
    */
+  @JsonProperty(value = "quaternion")
   public Quaternion getQuaternion() {
     return m_q;
   }
@@ -376,7 +393,6 @@ public class Rotation3d implements Interpolatable<Rotation3d> {
   }
 
   @Override
-  @SuppressWarnings("ParameterName")
   public Rotation3d interpolate(Rotation3d endValue, double t) {
     return plus(endValue.minus(this).times(MathUtil.clamp(t, 0, 1)));
   }

@@ -4,17 +4,27 @@
 
 #include "frc2/command/button/NetworkButton.h"
 
+#include <wpi/deprecated.h>
+
 using namespace frc2;
 
-NetworkButton::NetworkButton(nt::NetworkTableEntry entry)
-    : Button([entry] {
-        return entry.GetInstance().IsConnected() && entry.GetBoolean(false);
+WPI_IGNORE_DEPRECATED
+NetworkButton::NetworkButton(nt::BooleanTopic topic)
+    : NetworkButton(topic.Subscribe(false)) {}
+
+NetworkButton::NetworkButton(nt::BooleanSubscriber sub)
+    : Button([sub = std::make_shared<nt::BooleanSubscriber>(std::move(sub))] {
+        return sub->GetTopic().GetInstance().IsConnected() && sub->Get();
       }) {}
+WPI_UNIGNORE_DEPRECATED
 
 NetworkButton::NetworkButton(std::shared_ptr<nt::NetworkTable> table,
                              std::string_view field)
-    : NetworkButton(table->GetEntry(field)) {}
+    : NetworkButton(table->GetBooleanTopic(field)) {}
 
 NetworkButton::NetworkButton(std::string_view table, std::string_view field)
-    : NetworkButton(nt::NetworkTableInstance::GetDefault().GetTable(table),
-                    field) {}
+    : NetworkButton(nt::NetworkTableInstance::GetDefault(), table, field) {}
+
+NetworkButton::NetworkButton(nt::NetworkTableInstance inst,
+                             std::string_view table, std::string_view field)
+    : NetworkButton(inst.GetTable(table), field) {}

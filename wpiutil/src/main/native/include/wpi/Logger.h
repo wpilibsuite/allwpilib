@@ -45,9 +45,9 @@ class Logger {
   void LogV(unsigned int level, const char* file, unsigned int line,
             fmt::string_view format, fmt::format_args args);
 
-  template <typename S, typename... Args>
+  template <typename... Args>
   void Log(unsigned int level, const char* file, unsigned int line,
-           const S& format, Args&&... args) {
+           fmt::string_view format, Args&&... args) {
     if (m_func && level >= m_min_level) {
       LogV(level, file, line, format, fmt::make_format_args(args...));
     }
@@ -60,15 +60,25 @@ class Logger {
   unsigned int m_min_level = 20;
 };
 
-#define WPI_LOG(logger_inst, level, format, ...) \
-  (logger_inst).Log(level, __FILE__, __LINE__, FMT_STRING(format), __VA_ARGS__)
+// C++20 relaxed the number of arguments to variadics, but Apple Clang's
+// warnings haven't caught up yet: https://stackoverflow.com/a/67996331
+#ifdef __clang__
+#pragma clang diagnostic ignored "-Wgnu-zero-variadic-macro-arguments"
+#endif
+
+#define WPI_LOG(logger_inst, level, format, ...)                         \
+  if ((logger_inst).HasLogger() && level >= (logger_inst).min_level()) { \
+    (logger_inst)                                                        \
+        .Log(level, __FILE__, __LINE__,                                  \
+             FMT_STRING(format) __VA_OPT__(, ) __VA_ARGS__);             \
+  }
 
 #define WPI_ERROR(inst, format, ...) \
-  WPI_LOG(inst, ::wpi::WPI_LOG_ERROR, format, __VA_ARGS__)
+  WPI_LOG(inst, ::wpi::WPI_LOG_ERROR, format __VA_OPT__(, ) __VA_ARGS__)
 #define WPI_WARNING(inst, format, ...) \
-  WPI_LOG(inst, ::wpi::WPI_LOG_WARNING, format, __VA_ARGS__)
+  WPI_LOG(inst, ::wpi::WPI_LOG_WARNING, format __VA_OPT__(, ) __VA_ARGS__)
 #define WPI_INFO(inst, format, ...) \
-  WPI_LOG(inst, ::wpi::WPI_LOG_INFO, format, __VA_ARGS__)
+  WPI_LOG(inst, ::wpi::WPI_LOG_INFO, format __VA_OPT__(, ) __VA_ARGS__)
 
 #ifdef NDEBUG
 #define WPI_DEBUG(inst, format, ...) \
@@ -88,15 +98,15 @@ class Logger {
   } while (0)
 #else
 #define WPI_DEBUG(inst, format, ...) \
-  WPI_LOG(inst, ::wpi::WPI_LOG_DEBUG, format, __VA_ARGS__)
+  WPI_LOG(inst, ::wpi::WPI_LOG_DEBUG, format __VA_OPT__(, ) __VA_ARGS__)
 #define WPI_DEBUG1(inst, format, ...) \
-  WPI_LOG(inst, ::wpi::WPI_LOG_DEBUG1, format, __VA_ARGS__)
+  WPI_LOG(inst, ::wpi::WPI_LOG_DEBUG1, format __VA_OPT__(, ) __VA_ARGS__)
 #define WPI_DEBUG2(inst, format, ...) \
-  WPI_LOG(inst, ::wpi::WPI_LOG_DEBUG2, format, __VA_ARGS__)
+  WPI_LOG(inst, ::wpi::WPI_LOG_DEBUG2, format __VA_OPT__(, ) __VA_ARGS__)
 #define WPI_DEBUG3(inst, format, ...) \
-  WPI_LOG(inst, ::wpi::WPI_LOG_DEBUG3, format, __VA_ARGS__)
+  WPI_LOG(inst, ::wpi::WPI_LOG_DEBUG3, format __VA_OPT__(, ) __VA_ARGS__)
 #define WPI_DEBUG4(inst, format, ...) \
-  WPI_LOG(inst, ::wpi::WPI_LOG_DEBUG4, format, __VA_ARGS__)
+  WPI_LOG(inst, ::wpi::WPI_LOG_DEBUG4, format __VA_OPT__(, ) __VA_ARGS__)
 #endif
 
 }  // namespace wpi

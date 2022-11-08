@@ -21,19 +21,16 @@ class Rotation3dTest {
 
   @Test
   void testInitAxisAngleAndRollPitchYaw() {
-    @SuppressWarnings("LocalVariableName")
     final var xAxis = VecBuilder.fill(1.0, 0.0, 0.0);
     final var rot1 = new Rotation3d(xAxis, Math.PI / 3);
     final var rot2 = new Rotation3d(Math.PI / 3, 0.0, 0.0);
     assertEquals(rot1, rot2);
 
-    @SuppressWarnings("LocalVariableName")
     final var yAxis = VecBuilder.fill(0.0, 1.0, 0.0);
     final var rot3 = new Rotation3d(yAxis, Math.PI / 3);
     final var rot4 = new Rotation3d(0.0, Math.PI / 3, 0.0);
     assertEquals(rot3, rot4);
 
-    @SuppressWarnings("LocalVariableName")
     final var zAxis = VecBuilder.fill(0.0, 0.0, 1.0);
     final var rot5 = new Rotation3d(zAxis, Math.PI / 3);
     final var rot6 = new Rotation3d(0.0, 0.0, Math.PI / 3);
@@ -68,11 +65,8 @@ class Rotation3dTest {
 
   @Test
   void testInitTwoVector() {
-    @SuppressWarnings("LocalVariableName")
     final var xAxis = VecBuilder.fill(1.0, 0.0, 0.0);
-    @SuppressWarnings("LocalVariableName")
     final var yAxis = VecBuilder.fill(0.0, 1.0, 0.0);
-    @SuppressWarnings("LocalVariableName")
     final var zAxis = VecBuilder.fill(0.0, 0.0, 1.0);
 
     // 90 degree CW rotation around y-axis
@@ -128,7 +122,6 @@ class Rotation3dTest {
 
   @Test
   void testRadiansToDegrees() {
-    @SuppressWarnings("LocalVariableName")
     final var zAxis = VecBuilder.fill(0.0, 0.0, 1.0);
 
     var rot1 = new Rotation3d(zAxis, Math.PI / 3);
@@ -146,7 +139,6 @@ class Rotation3dTest {
 
   @Test
   void testRadiansAndDegrees() {
-    @SuppressWarnings("LocalVariableName")
     final var zAxis = VecBuilder.fill(0.0, 0.0, 1.0);
 
     var rot1 = new Rotation3d(zAxis, Units.degreesToRadians(45.0));
@@ -162,7 +154,6 @@ class Rotation3dTest {
         () -> assertEquals(Math.PI / 6.0, rot2.getZ(), kEpsilon));
   }
 
-  @SuppressWarnings("LocalVariableName")
   @Test
   void testRotationLoop() {
     var rot = new Rotation3d();
@@ -186,7 +177,6 @@ class Rotation3dTest {
     assertEquals(new Rotation3d(), rot);
   }
 
-  @SuppressWarnings("LocalVariableName")
   @Test
   void testRotateByFromZeroX() {
     final var xAxis = VecBuilder.fill(1.0, 0.0, 0.0);
@@ -198,7 +188,6 @@ class Rotation3dTest {
     assertEquals(expected, rotated);
   }
 
-  @SuppressWarnings("LocalVariableName")
   @Test
   void testRotateByFromZeroY() {
     final var yAxis = VecBuilder.fill(0.0, 1.0, 0.0);
@@ -210,7 +199,6 @@ class Rotation3dTest {
     assertEquals(expected, rotated);
   }
 
-  @SuppressWarnings("LocalVariableName")
   @Test
   void testRotateByFromZeroZ() {
     final var zAxis = VecBuilder.fill(0.0, 0.0, 1.0);
@@ -224,7 +212,6 @@ class Rotation3dTest {
 
   @Test
   void testRotateByNonZeroX() {
-    @SuppressWarnings("LocalVariableName")
     final var xAxis = VecBuilder.fill(1.0, 0.0, 0.0);
 
     var rot = new Rotation3d(xAxis, Units.degreesToRadians(90.0));
@@ -236,7 +223,6 @@ class Rotation3dTest {
 
   @Test
   void testRotateByNonZeroY() {
-    @SuppressWarnings("LocalVariableName")
     final var yAxis = VecBuilder.fill(0.0, 1.0, 0.0);
 
     var rot = new Rotation3d(yAxis, Units.degreesToRadians(90.0));
@@ -248,7 +234,6 @@ class Rotation3dTest {
 
   @Test
   void testRotateByNonZeroZ() {
-    @SuppressWarnings("LocalVariableName")
     final var zAxis = VecBuilder.fill(0.0, 0.0, 1.0);
 
     var rot = new Rotation3d(zAxis, Units.degreesToRadians(90.0));
@@ -260,7 +245,6 @@ class Rotation3dTest {
 
   @Test
   void testMinus() {
-    @SuppressWarnings("LocalVariableName")
     final var zAxis = VecBuilder.fill(0.0, 0.0, 1.0);
 
     var rot1 = new Rotation3d(zAxis, Units.degreesToRadians(70.0));
@@ -271,7 +255,6 @@ class Rotation3dTest {
 
   @Test
   void testEquality() {
-    @SuppressWarnings("LocalVariableName")
     final var zAxis = VecBuilder.fill(0.0, 0.0, 1.0);
 
     var rot1 = new Rotation3d(zAxis, Units.degreesToRadians(43.0));
@@ -283,7 +266,6 @@ class Rotation3dTest {
     assertEquals(rot1, rot2);
   }
 
-  @SuppressWarnings("LocalVariableName")
   @Test
   void testAxisAngle() {
     final var xAxis = VecBuilder.fill(1.0, 0.0, 0.0);
@@ -317,7 +299,6 @@ class Rotation3dTest {
 
   @Test
   void testInequality() {
-    @SuppressWarnings("LocalVariableName")
     final var zAxis = VecBuilder.fill(0.0, 0.0, 1.0);
 
     var rot1 = new Rotation3d(zAxis, Units.degreesToRadians(43.0));
@@ -325,7 +306,6 @@ class Rotation3dTest {
     assertNotEquals(rot1, rot2);
   }
 
-  @SuppressWarnings("LocalVariableName")
   @Test
   void testInterpolate() {
     final var xAxis = VecBuilder.fill(1.0, 0.0, 0.0);

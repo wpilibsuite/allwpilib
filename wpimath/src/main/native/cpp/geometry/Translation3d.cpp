@@ -4,13 +4,12 @@
 
 #include "frc/geometry/Translation3d.h"
 
+#include <wpi/json.h>
+
+#include "units/length.h"
 #include "units/math.h"
 
 using namespace frc;
-
-Translation3d::Translation3d(units::meter_t x, units::meter_t y,
-                             units::meter_t z)
-    : m_x(x), m_y(y), m_z(z) {}
 
 Translation3d::Translation3d(units::meter_t distance, const Rotation3d& angle) {
   auto rectangular = Translation3d{distance, 0_m, 0_m}.RotateBy(angle);
@@ -36,30 +35,6 @@ Translation3d Translation3d::RotateBy(const Rotation3d& other) const {
                        units::meter_t{qprime.Z()}};
 }
 
-Translation2d Translation3d::ToTranslation2d() const {
-  return Translation2d{m_x, m_y};
-}
-
-Translation3d Translation3d::operator+(const Translation3d& other) const {
-  return {X() + other.X(), Y() + other.Y(), Z() + other.Z()};
-}
-
-Translation3d Translation3d::operator-(const Translation3d& other) const {
-  return *this + -other;
-}
-
-Translation3d Translation3d::operator-() const {
-  return {-m_x, -m_y, -m_z};
-}
-
-Translation3d Translation3d::operator*(double scalar) const {
-  return {scalar * m_x, scalar * m_y, scalar * m_z};
-}
-
-Translation3d Translation3d::operator/(double scalar) const {
-  return *this * (1.0 / scalar);
-}
-
 bool Translation3d::operator==(const Translation3d& other) const {
   return units::math::abs(m_x - other.m_x) < 1E-9_m &&
          units::math::abs(m_y - other.m_y) < 1E-9_m &&
@@ -68,4 +43,16 @@ bool Translation3d::operator==(const Translation3d& other) const {
 
 bool Translation3d::operator!=(const Translation3d& other) const {
   return !operator==(other);
+}
+
+void frc::to_json(wpi::json& json, const Translation3d& translation) {
+  json = wpi::json{{"x", translation.X().value()},
+                   {"y", translation.Y().value()},
+                   {"z", translation.Z().value()}};
+}
+
+void frc::from_json(const wpi::json& json, Translation3d& translation) {
+  translation = Translation3d{units::meter_t{json.at("x").get<double>()},
+                              units::meter_t{json.at("y").get<double>()},
+                              units::meter_t{json.at("z").get<double>()}};
 }

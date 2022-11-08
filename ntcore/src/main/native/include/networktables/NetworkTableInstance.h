@@ -2,17 +2,15 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#ifndef NTCORE_NETWORKTABLES_NETWORKTABLEINSTANCE_H_
-#define NTCORE_NETWORKTABLES_NETWORKTABLEINSTANCE_H_
+#pragma once
 
 #include <functional>
 #include <memory>
+#include <span>
 #include <string>
 #include <string_view>
 #include <utility>
 #include <vector>
-
-#include <wpi/span.h>
 
 #include "networktables/NetworkTable.h"
 #include "networktables/NetworkTableEntry.h"
@@ -20,6 +18,21 @@
 #include "ntcore_cpp.h"
 
 namespace nt {
+
+class BooleanArrayTopic;
+class BooleanTopic;
+class DoubleArrayTopic;
+class DoubleTopic;
+class FloatArrayTopic;
+class FloatTopic;
+class IntegerArrayTopic;
+class IntegerTopic;
+class MultiSubscriber;
+class RawTopic;
+class StringArrayTopic;
+class StringTopic;
+class Subscriber;
+class Topic;
 
 /**
  * NetworkTables Instance.
@@ -51,9 +64,8 @@ class NetworkTableInstance final {
   enum NetworkMode {
     kNetModeNone = NT_NET_MODE_NONE,
     kNetModeServer = NT_NET_MODE_SERVER,
-    kNetModeClient = NT_NET_MODE_CLIENT,
-    kNetModeStarting = NT_NET_MODE_STARTING,
-    kNetModeFailure = NT_NET_MODE_FAILURE,
+    kNetModeClient3 = NT_NET_MODE_CLIENT3,
+    kNetModeClient4 = NT_NET_MODE_CLIENT4,
     kNetModeLocal = NT_NET_MODE_LOCAL
   };
 
@@ -73,9 +85,14 @@ class NetworkTableInstance final {
   };
 
   /**
-   * The default port that network tables operates on.
+   * The default port that network tables operates on for NT3.
    */
-  enum { kDefaultPort = NT_DEFAULT_PORT };
+  static constexpr unsigned int kDefaultPort3 = NT_DEFAULT_PORT3;
+
+  /**
+   * The default port that network tables operates on for NT4.
+   */
+  static constexpr unsigned int kDefaultPort4 = NT_DEFAULT_PORT4;
 
   /**
    * Construct invalid instance.
@@ -115,7 +132,7 @@ class NetworkTableInstance final {
    *
    * @param inst Instance
    */
-  static void Destroy(NetworkTableInstance inst);
+  static void Destroy(NetworkTableInstance& inst);
 
   /**
    * Gets the native handle for the entry.
@@ -123,6 +140,204 @@ class NetworkTableInstance final {
    * @return Native handle
    */
   NT_Inst GetHandle() const;
+
+  /**
+   * Gets a "generic" (untyped) topic.
+   *
+   * @param name topic name
+   * @return Topic
+   */
+  Topic GetTopic(std::string_view name) const;
+
+  /**
+   * Gets a boolean topic.
+   *
+   * @param name topic name
+   * @return Topic
+   */
+  BooleanTopic GetBooleanTopic(std::string_view name) const;
+
+  /**
+   * Gets an integer topic.
+   *
+   * @param name topic name
+   * @return Topic
+   */
+  IntegerTopic GetIntegerTopic(std::string_view name) const;
+
+  /**
+   * Gets a float topic.
+   *
+   * @param name topic name
+   * @return Topic
+   */
+  FloatTopic GetFloatTopic(std::string_view name) const;
+
+  /**
+   * Gets a double topic.
+   *
+   * @param name topic name
+   * @return Topic
+   */
+  DoubleTopic GetDoubleTopic(std::string_view name) const;
+
+  /**
+   * Gets a string topic.
+   *
+   * @param name topic name
+   * @return Topic
+   */
+  StringTopic GetStringTopic(std::string_view name) const;
+
+  /**
+   * Gets a raw topic.
+   *
+   * @param name topic name
+   * @return Topic
+   */
+  RawTopic GetRawTopic(std::string_view name) const;
+
+  /**
+   * Gets a boolean array topic.
+   *
+   * @param name topic name
+   * @return Topic
+   */
+  BooleanArrayTopic GetBooleanArrayTopic(std::string_view name) const;
+
+  /**
+   * Gets an integer array topic.
+   *
+   * @param name topic name
+   * @return Topic
+   */
+  IntegerArrayTopic GetIntegerArrayTopic(std::string_view name) const;
+
+  /**
+   * Gets a float array topic.
+   *
+   * @param name topic name
+   * @return Topic
+   */
+  FloatArrayTopic GetFloatArrayTopic(std::string_view name) const;
+
+  /**
+   * Gets a double array topic.
+   *
+   * @param name topic name
+   * @return Topic
+   */
+  DoubleArrayTopic GetDoubleArrayTopic(std::string_view name) const;
+
+  /**
+   * Gets a string array topic.
+   *
+   * @param name topic name
+   * @return Topic
+   */
+  StringArrayTopic GetStringArrayTopic(std::string_view name) const;
+
+  /**
+   * Get Published Topics.
+   *
+   * Returns an array of topics.
+   *
+   * @return Array of topics.
+   */
+  std::vector<Topic> GetTopics();
+
+  /**
+   * Get Published Topics.
+   *
+   * Returns an array of topics.  The results are filtered by
+   * string prefix to only return a subset of all topics.
+   *
+   * @param prefix  name required prefix; only topics whose name
+   *                starts with this string are returned
+   * @return Array of topics.
+   */
+  std::vector<Topic> GetTopics(std::string_view prefix);
+
+  /**
+   * Get Published Topics.
+   *
+   * Returns an array of topics.  The results are filtered by
+   * string prefix and type to only return a subset of all topics.
+   *
+   * @param prefix  name required prefix; only topics whose name
+   *                starts with this string are returned
+   * @param types   bitmask of NT_Type values; 0 is treated specially
+   *                as a "don't care"
+   * @return Array of topics.
+   */
+  std::vector<Topic> GetTopics(std::string_view prefix, unsigned int types);
+
+  /**
+   * Get Published Topics.
+   *
+   * Returns an array of topics.  The results are filtered by
+   * string prefix and type to only return a subset of all topics.
+   *
+   * @param prefix  name required prefix; only topics whose name
+   *                starts with this string are returned
+   * @param types   array of type strings
+   * @return Array of topic handles.
+   */
+  std::vector<Topic> GetTopics(std::string_view prefix,
+                               std::span<std::string_view> types);
+
+  /**
+   * Get Topic Information about multiple topics.
+   *
+   * Returns an array of topic information (handle, name, type, and properties).
+   *
+   * @return Array of topic information.
+   */
+  std::vector<TopicInfo> GetTopicInfo();
+
+  /**
+   * Get Topic Information about multiple topics.
+   *
+   * Returns an array of topic information (handle, name, type, and properties).
+   * The results are filtered by string prefix to only
+   * return a subset of all topics.
+   *
+   * @param prefix  name required prefix; only topics whose name
+   *                starts with this string are returned
+   * @return Array of topic information.
+   */
+  std::vector<TopicInfo> GetTopicInfo(std::string_view prefix);
+
+  /**
+   * Get Topic Information about multiple topics.
+   *
+   * Returns an array of topic information (handle, name, type, and properties).
+   * The results are filtered by string prefix and type to only
+   * return a subset of all topics.
+   *
+   * @param prefix  name required prefix; only topics whose name
+   *                starts with this string are returned
+   * @param types   bitmask of NT_Type values; 0 is treated specially
+   *                as a "don't care"
+   * @return Array of topic information.
+   */
+  std::vector<TopicInfo> GetTopicInfo(std::string_view prefix,
+                                      unsigned int types);
+
+  /**
+   * Get Topic Information about multiple topics.
+   *
+   * Returns an array of topic information (handle, name, type, and properties).
+   * The results are filtered by string prefix and type to only
+   * return a subset of all topics.
+   *
+   * @param prefix  name required prefix; only topics whose name
+   *                starts with this string are returned
+   * @param types   array of type strings
+   * @return Array of topic information.
+   */
+  std::vector<TopicInfo> GetTopicInfo(std::string_view prefix,
+                                      std::span<std::string_view> types);
 
   /**
    * Gets the entry for a key.
@@ -133,34 +348,6 @@ class NetworkTableInstance final {
   NetworkTableEntry GetEntry(std::string_view name);
 
   /**
-   * Get entries starting with the given prefix.
-   *
-   * The results are optionally filtered by string prefix and entry type to
-   * only return a subset of all entries.
-   *
-   * @param prefix entry name required prefix; only entries whose name
-   * starts with this string are returned
-   * @param types bitmask of types; 0 is treated as a "don't care"
-   * @return Array of entries.
-   */
-  std::vector<NetworkTableEntry> GetEntries(std::string_view prefix,
-                                            unsigned int types);
-
-  /**
-   * Get information about entries starting with the given prefix.
-   *
-   * The results are optionally filtered by string prefix and entry type to
-   * only return a subset of all entries.
-   *
-   * @param prefix entry name required prefix; only entries whose name
-   * starts with this string are returned
-   * @param types bitmask of types; 0 is treated as a "don't care"
-   * @return Array of entry information.
-   */
-  std::vector<EntryInfo> GetEntryInfo(std::string_view prefix,
-                                      unsigned int types) const;
-
-  /**
    * Gets the table with the specified key.
    *
    * @param key the key name
@@ -169,103 +356,116 @@ class NetworkTableInstance final {
   std::shared_ptr<NetworkTable> GetTable(std::string_view key) const;
 
   /**
-   * Deletes ALL keys in ALL subtables (except persistent values).
-   * Use with caution!
-   */
-  void DeleteAllEntries();
-
-  /**
    * @{
-   * @name Entry Listener Functions
+   * @name Listener Functions
    */
 
   /**
-   * Add a listener for all entries starting with a certain prefix.
+   * Remove a listener.
    *
-   * @param prefix            UTF-8 string prefix
-   * @param callback          listener to add
-   * @param flags             EntryListenerFlags bitmask
-   * @return Listener handle
+   * @param listener Listener handle to remove
    */
-  NT_EntryListener AddEntryListener(
-      std::string_view prefix,
-      std::function<void(const EntryNotification& event)> callback,
-      unsigned int flags) const;
+  static void RemoveListener(NT_Listener listener);
 
   /**
-   * Remove an entry listener.
-   *
-   * @param entry_listener Listener handle to remove
-   */
-  static void RemoveEntryListener(NT_EntryListener entry_listener);
-
-  /**
-   * Wait for the entry listener queue to be empty.  This is primarily useful
-   * for deterministic testing.  This blocks until either the entry listener
-   * queue is empty (e.g. there are no more events that need to be passed along
-   * to callbacks or poll queues) or the timeout expires.
-   *
-   * @param timeout   timeout, in seconds.  Set to 0 for non-blocking behavior,
-   *                  or a negative value to block indefinitely
-   * @return False if timed out, otherwise true.
-   */
-  bool WaitForEntryListenerQueue(double timeout);
-
-  /** @} */
-
-  /**
-   * @{
-   * @name Connection Listener Functions
-   */
-
-  /**
-   * Add a connection listener.
-   *
-   * @param callback          listener to add
-   * @param immediate_notify  notify listener of all existing connections
-   * @return Listener handle
-   */
-  NT_ConnectionListener AddConnectionListener(
-      std::function<void(const ConnectionNotification& event)> callback,
-      bool immediate_notify) const;
-
-  /**
-   * Remove a connection listener.
-   *
-   * @param conn_listener Listener handle to remove
-   */
-  static void RemoveConnectionListener(NT_ConnectionListener conn_listener);
-
-  /**
-   * Wait for the connection listener queue to be empty.  This is primarily
-   * useful for deterministic testing.  This blocks until either the connection
+   * Wait for the listener queue to be empty. This is primarily
+   * useful for deterministic testing. This blocks until either the
    * listener queue is empty (e.g. there are no more events that need to be
    * passed along to callbacks or poll queues) or the timeout expires.
    *
-   * @param timeout   timeout, in seconds.  Set to 0 for non-blocking behavior,
-   *                  or a negative value to block indefinitely
+   * @param timeout timeout, in seconds. Set to 0 for non-blocking behavior, or
+   *                a negative value to block indefinitely
    * @return False if timed out, otherwise true.
    */
-  bool WaitForConnectionListenerQueue(double timeout);
-
-  /** @} */
+  bool WaitForListenerQueue(double timeout);
 
   /**
-   * @{
-   * @name Remote Procedure Call Functions
-   */
-
-  /**
-   * Wait for the incoming RPC call queue to be empty.  This is primarily useful
-   * for deterministic testing.  This blocks until either the RPC call
-   * queue is empty (e.g. there are no more events that need to be passed along
-   * to callbacks or poll queues) or the timeout expires.
+   * Add a connection listener. The callback function is called asynchronously
+   * on a separate thread, so it's important to use synchronization or atomics
+   * when accessing any shared state from the callback function.
    *
-   * @param timeout   timeout, in seconds.  Set to 0 for non-blocking behavior,
-   *                  or a negative value to block indefinitely
-   * @return False if timed out, otherwise true.
+   * @param immediate_notify  notify listener of all existing connections
+   * @param callback          listener to add
+   * @return Listener handle
    */
-  bool WaitForRpcCallQueue(double timeout);
+  NT_Listener AddConnectionListener(bool immediate_notify,
+                                    ListenerCallback callback) const;
+
+  /**
+   * Add a listener for changes on a particular topic. The callback
+   * function is called asynchronously on a separate thread, so it's important
+   * to use synchronization or atomics when accessing any shared state from the
+   * callback function.
+   *
+   * This creates a corresponding internal subscriber with the lifetime of the
+   * listener.
+   *
+   * @param topic Topic
+   * @param eventMask Bitmask of EventFlags values
+   * @param listener Listener function
+   * @return Listener handle
+   */
+  NT_Listener AddListener(Topic topic, unsigned int eventMask,
+                          ListenerCallback listener);
+
+  /**
+   * Add a listener for changes on a subscriber. The callback
+   * function is called asynchronously on a separate thread, so it's important
+   * to use synchronization or atomics when accessing any shared state from the
+   * callback function. This does NOT keep the subscriber active.
+   *
+   * @param subscriber Subscriber
+   * @param eventMask Bitmask of EventFlags values
+   * @param listener Listener function
+   * @return Listener handle
+   */
+  NT_Listener AddListener(Subscriber& subscriber, unsigned int eventMask,
+                          ListenerCallback listener);
+
+  /**
+   * Add a listener for changes on a subscriber. The callback
+   * function is called asynchronously on a separate thread, so it's important
+   * to use synchronization or atomics when accessing any shared state from the
+   * callback function. This does NOT keep the subscriber active.
+   *
+   * @param subscriber Subscriber
+   * @param eventMask Bitmask of EventFlags values
+   * @param listener Listener function
+   * @return Listener handle
+   */
+  NT_Listener AddListener(MultiSubscriber& subscriber, int eventMask,
+                          ListenerCallback listener);
+
+  /**
+   * Add a listener for changes on an entry. The callback function
+   * is called asynchronously on a separate thread, so it's important to use
+   * synchronization or atomics when accessing any shared state from the
+   * callback function.
+   *
+   * @param entry Entry
+   * @param eventMask Bitmask of EventFlags values
+   * @param listener Listener function
+   * @return Listener handle
+   */
+  NT_Listener AddListener(NetworkTableEntry& entry, int eventMask,
+                          ListenerCallback listener);
+
+  /**
+   * Add a listener for changes to topics with names that start with any
+   * of the given prefixes. The callback function is called asynchronously on a
+   * separate thread, so it's important to use synchronization or atomics when
+   * accessing any shared state from the callback function.
+   *
+   * This creates a corresponding internal subscriber with the lifetime of the
+   * listener.
+   *
+   * @param prefixes Topic name string prefixes
+   * @param eventMask Bitmask of EventFlags values
+   * @param listener Listener function
+   * @return Listener handle
+   */
+  NT_Listener AddListener(std::span<const std::string_view> prefixes,
+                          int eventMask, ListenerCallback listener);
 
   /** @} */
 
@@ -273,16 +473,6 @@ class NetworkTableInstance final {
    * @{
    * @name Client/Server Functions
    */
-
-  /**
-   * Set the network identity of this node.
-   *
-   * This is the name used during the initial connection handshake, and is
-   * visible through ConnectionInfo on the remote node.
-   *
-   * @param name      identity to advertise
-   */
-  void SetNetworkIdentity(std::string_view name);
 
   /**
    * Get the current network mode.
@@ -311,11 +501,13 @@ class NetworkTableInstance final {
    *                          null terminated)
    * @param listen_address    the address to listen on, or null to listen on any
    *                          address (UTF-8 string, null terminated)
-   * @param port              port to communicate over
+   * @param port3             port to communicate over (NT3)
+   * @param port4             port to communicate over (NT4)
    */
-  void StartServer(std::string_view persist_filename = "networktables.ini",
+  void StartServer(std::string_view persist_filename = "networktables.json",
                    const char* listen_address = "",
-                   unsigned int port = kDefaultPort);
+                   unsigned int port3 = kDefaultPort3,
+                   unsigned int port4 = kDefaultPort4);
 
   /**
    * Stops the server if it is running.
@@ -323,45 +515,20 @@ class NetworkTableInstance final {
   void StopServer();
 
   /**
-   * Starts a client.  Use SetServer to set the server name and port.
+   * Starts a NT3 client.  Use SetServer or SetServerTeam to set the server name
+   * and port.
+   *
+   * @param identity  network identity to advertise (cannot be empty string)
    */
-  void StartClient();
+  void StartClient3(std::string_view identity);
 
   /**
-   * Starts a client using the specified server and port
+   * Starts a NT4 client.  Use SetServer or SetServerTeam to set the server name
+   * and port.
    *
-   * @param server_name server name (UTF-8 string, null terminated)
-   * @param port        port to communicate over
+   * @param identity  network identity to advertise (cannot be empty string)
    */
-  void StartClient(const char* server_name, unsigned int port = kDefaultPort);
-
-  /**
-   * Starts a client using the specified (server, port) combinations.  The
-   * client will attempt to connect to each server in round robin fashion.
-   *
-   * @param servers   array of server name and port pairs
-   */
-  void StartClient(
-      wpi::span<const std::pair<std::string_view, unsigned int>> servers);
-
-  /**
-   * Starts a client using the specified servers and port.  The
-   * client will attempt to connect to each server in round robin fashion.
-   *
-   * @param servers   array of server names
-   * @param port      port to communicate over
-   */
-  void StartClient(wpi::span<const std::string_view> servers,
-                   unsigned int port = kDefaultPort);
-
-  /**
-   * Starts a client using commonly known robot addresses for the specified
-   * team.
-   *
-   * @param team        team number
-   * @param port        port to communicate over
-   */
-  void StartClientTeam(unsigned int team, unsigned int port = kDefaultPort);
+  void StartClient4(std::string_view identity);
 
   /**
    * Stops the client if it is running.
@@ -372,46 +539,46 @@ class NetworkTableInstance final {
    * Sets server address and port for client (without restarting client).
    *
    * @param server_name server name (UTF-8 string, null terminated)
-   * @param port        port to communicate over
+   * @param port        port to communicate over (0 = default)
    */
-  void SetServer(const char* server_name, unsigned int port = kDefaultPort);
+  void SetServer(const char* server_name, unsigned int port = 0);
 
   /**
    * Sets server addresses and ports for client (without restarting client).
    * The client will attempt to connect to each server in round robin fashion.
    *
-   * @param servers   array of server name and port pairs
+   * @param servers   array of server address and port pairs
    */
   void SetServer(
-      wpi::span<const std::pair<std::string_view, unsigned int>> servers);
+      std::span<const std::pair<std::string_view, unsigned int>> servers);
 
   /**
    * Sets server addresses and port for client (without restarting client).
    * The client will attempt to connect to each server in round robin fashion.
    *
    * @param servers   array of server names
-   * @param port      port to communicate over
+   * @param port      port to communicate over (0 = default)
    */
-  void SetServer(wpi::span<const std::string_view> servers,
-                 unsigned int port = kDefaultPort);
+  void SetServer(std::span<const std::string_view> servers,
+                 unsigned int port = 0);
 
   /**
    * Sets server addresses and port for client (without restarting client).
    * Connects using commonly known robot addresses for the specified team.
    *
    * @param team        team number
-   * @param port        port to communicate over
+   * @param port        port to communicate over (0 = default)
    */
-  void SetServerTeam(unsigned int team, unsigned int port = kDefaultPort);
+  void SetServerTeam(unsigned int team, unsigned int port = 0);
 
   /**
    * Starts requesting server address from Driver Station.
    * This connects to the Driver Station running on localhost to obtain the
    * server IP address.
    *
-   * @param port server port to use in combination with IP from DS
+   * @param port server port to use in combination with IP from DS (0 = default)
    */
-  void StartDSClient(unsigned int port = kDefaultPort);
+  void StartDSClient(unsigned int port = 0);
 
   /**
    * Stops requesting server address from Driver Station.
@@ -419,12 +586,10 @@ class NetworkTableInstance final {
   void StopDSClient();
 
   /**
-   * Set the periodic update rate.
-   * Sets how frequently updates are sent to other nodes over the network.
-   *
-   * @param interval update interval in seconds (range 0.01 to 1.0)
+   * Flushes all updated values immediately to the local client/server. This
+   * does not flush to the network.
    */
-  void SetUpdateRate(double interval);
+  void FlushLocal() const;
 
   /**
    * Flushes all updated values immediately to the network.
@@ -448,60 +613,6 @@ class NetworkTableInstance final {
    * @return True if connected.
    */
   bool IsConnected() const;
-
-  /** @} */
-
-  /**
-   * @{
-   * @name File Save/Load Functions
-   */
-
-  /**
-   * Save persistent values to a file.  The server automatically does this,
-   * but this function provides a way to save persistent values in the same
-   * format to a file on either a client or a server.
-   *
-   * @param filename  filename
-   * @return error string, or nullptr if successful
-   */
-  const char* SavePersistent(std::string_view filename) const;
-
-  /**
-   * Load persistent values from a file.  The server automatically does this
-   * at startup, but this function provides a way to restore persistent values
-   * in the same format from a file at any time on either a client or a server.
-   *
-   * @param filename  filename
-   * @param warn      callback function for warnings
-   * @return error string, or nullptr if successful
-   */
-  const char* LoadPersistent(
-      std::string_view filename,
-      std::function<void(size_t line, const char* msg)> warn);
-
-  /**
-   * Save table values to a file.  The file format used is identical to
-   * that used for SavePersistent.
-   *
-   * @param filename  filename
-   * @param prefix    save only keys starting with this prefix
-   * @return error string, or nullptr if successful
-   */
-  const char* SaveEntries(std::string_view filename,
-                          std::string_view prefix) const;
-
-  /**
-   * Load table values from a file.  The file format used is identical to
-   * that used for SavePersistent / LoadPersistent.
-   *
-   * @param filename  filename
-   * @param prefix    load only keys starting with this prefix
-   * @param warn      callback function for warnings
-   * @return error string, or nullptr if successful
-   */
-  const char* LoadEntries(
-      std::string_view filename, std::string_view prefix,
-      std::function<void(size_t line, const char* msg)> warn);
 
   /** @} */
 
@@ -563,32 +674,13 @@ class NetworkTableInstance final {
    * log messages with level greater than or equal to minLevel and less than or
    * equal to maxLevel; messages outside this range will be silently ignored.
    *
-   * @param func        log callback function
    * @param minLevel    minimum log level
    * @param maxLevel    maximum log level
-   * @return Logger handle
+   * @param func        callback function
+   * @return Listener handle
    */
-  NT_Logger AddLogger(std::function<void(const LogMessage& msg)> func,
-                      unsigned int minLevel, unsigned int maxLevel);
-
-  /**
-   * Remove a logger.
-   *
-   * @param logger Logger handle to remove
-   */
-  static void RemoveLogger(NT_Logger logger);
-
-  /**
-   * Wait for the incoming log event queue to be empty.  This is primarily
-   * useful for deterministic testing.  This blocks until either the log event
-   * queue is empty (e.g. there are no more events that need to be passed along
-   * to callbacks or poll queues) or the timeout expires.
-   *
-   * @param timeout   timeout, in seconds.  Set to 0 for non-blocking behavior,
-   *                  or a negative value to block indefinitely
-   * @return False if timed out, otherwise true.
-   */
-  bool WaitForLoggerQueue(double timeout);
+  NT_Listener AddLogger(unsigned int minLevel, unsigned int maxLevel,
+                        ListenerCallback func);
 
   /** @} */
 
@@ -613,5 +705,3 @@ class NetworkTableInstance final {
 }  // namespace nt
 
 #include "networktables/NetworkTableInstance.inc"
-
-#endif  // NTCORE_NETWORKTABLES_NETWORKTABLEINSTANCE_H_

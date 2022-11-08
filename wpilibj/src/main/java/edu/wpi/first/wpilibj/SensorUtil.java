@@ -141,7 +141,6 @@ public final class SensorUtil {
    *
    * @return The number of the default solenoid module.
    */
-  @SuppressWarnings("AbbreviationAsWordInName")
   public static int getDefaultCTREPCMModule() {
     return 0;
   }
@@ -151,7 +150,6 @@ public final class SensorUtil {
    *
    * @return The number of the default solenoid module.
    */
-  @SuppressWarnings("AbbreviationAsWordInName")
   public static int getDefaultREVPHModule() {
     return 1;
   }

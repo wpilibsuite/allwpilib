@@ -1,6 +1,6 @@
 import org.gradle.internal.os.OperatingSystem
 
-if (!project.hasProperty('onlylinuxathena') && !project.hasProperty('onlylinuxarm32') && !project.hasProperty('onlylinuxarm64')) {
+if (!project.hasProperty('onlylinuxathena')) {
 
     description = "NetworkTables Viewer"
 
@@ -93,13 +93,13 @@ if (!project.hasProperty('onlylinuxathena') && !project.hasProperty('onlylinuxar
                     }
                 }
                 binaries.all {
-                    if (it.targetPlatform.name == nativeUtils.wpi.platforms.roborio || it.targetPlatform.name == nativeUtils.wpi.platforms.linuxarm32 || it.targetPlatform.name == nativeUtils.wpi.platforms.linuxarm64) {
+                    if (it.targetPlatform.name == nativeUtils.wpi.platforms.roborio) {
                         it.buildable = false
                         return
                     }
                     lib project: ':glass', library: 'glassnt', linkage: 'static'
                     lib project: ':glass', library: 'glass', linkage: 'static'
-                    lib project: ':ntcore', library: 'ntcore', linkage: 'static'
+                    project(':ntcore').addNtcoreDependency(it, 'static')
                     lib project: ':wpinet', library: 'wpinet', linkage: 'static'
                     lib project: ':wpiutil', library: 'wpiutil', linkage: 'static'
                     lib project: ':wpigui', library: 'wpigui', linkage: 'static'
@@ -110,6 +110,9 @@ if (!project.hasProperty('onlylinuxathena') && !project.hasProperty('onlylinuxar
                         it.linker.args << '-framework' << 'Metal' << '-framework' << 'MetalKit' << '-framework' << 'Cocoa' << '-framework' << 'IOKit' << '-framework' << 'CoreFoundation' << '-framework' << 'CoreVideo' << '-framework' << 'QuartzCore'
                     } else {
                         it.linker.args << '-lX11'
+                        if (it.targetPlatform.name.startsWith('linuxarm')) {
+                            it.linker.args << '-lGL'
+                        }
                     }
                 }
             }

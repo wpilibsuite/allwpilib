@@ -1,6 +1,6 @@
 import org.gradle.internal.os.OperatingSystem
 
-if (!project.hasProperty('onlylinuxathena') && !project.hasProperty('onlylinuxarm32') && !project.hasProperty('onlylinuxarm64')) {
+if (!project.hasProperty('onlylinuxathena')) {
 
     apply plugin: 'cpp'
     apply plugin: 'c'
@@ -11,6 +11,12 @@ if (!project.hasProperty('onlylinuxathena') && !project.hasProperty('onlylinuxar
 
     if (OperatingSystem.current().isWindows()) {
         apply plugin: 'windows-resources'
+    }
+
+    dependencies {
+        implementation "com.fasterxml.jackson.core:jackson-annotations:2.12.4"
+        implementation "com.fasterxml.jackson.core:jackson-core:2.12.4"
+        implementation "com.fasterxml.jackson.core:jackson-databind:2.12.4"
     }
 
     ext {

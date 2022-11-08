@@ -178,7 +178,7 @@ public class BooleanEvent implements BooleanSupplier {
    * @param <T> the subclass type
    * @return an instance of the subclass.
    */
-  public <T extends BooleanEvent> T castTo(BiFunction<EventLoop, BooleanSupplier, T> ctor) {
+  public <T extends BooleanSupplier> T castTo(BiFunction<EventLoop, BooleanSupplier, T> ctor) {
     return ctor.apply(m_loop, m_signal);
   }
 }

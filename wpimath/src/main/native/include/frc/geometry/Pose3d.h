@@ -11,6 +11,10 @@
 #include "Translation3d.h"
 #include "Twist3d.h"
 
+namespace wpi {
+class json;
+}  // namespace wpi
+
 namespace frc {
 
 /**
@@ -42,6 +46,13 @@ class WPILIB_DLLEXPORT Pose3d {
    */
   Pose3d(units::meter_t x, units::meter_t y, units::meter_t z,
          Rotation3d rotation);
+
+  /**
+   * Constructs a 3D pose from a 2D pose in the X-Y plane.
+   *
+   * @param pose The 2D pose.
+   */
+  explicit Pose3d(const Pose2d& pose);
 
   /**
    * Transforms the pose by the given transformation and returns the new
@@ -113,6 +124,24 @@ class WPILIB_DLLEXPORT Pose3d {
   const Rotation3d& Rotation() const { return m_rotation; }
 
   /**
+   * Multiplies the current pose by a scalar.
+   *
+   * @param scalar The scalar.
+   *
+   * @return The new scaled Pose2d.
+   */
+  Pose3d operator*(double scalar) const;
+
+  /**
+   * Divides the current pose by a scalar.
+   *
+   * @param scalar The scalar.
+   *
+   * @return The new scaled Pose2d.
+   */
+  Pose3d operator/(double scalar) const;
+
+  /**
    * Transforms the pose by the given transformation and returns the new pose.
    * See + operator for the matrix multiplication performed.
    *
@@ -176,5 +205,11 @@ class WPILIB_DLLEXPORT Pose3d {
   Translation3d m_translation;
   Rotation3d m_rotation;
 };
+
+WPILIB_DLLEXPORT
+void to_json(wpi::json& json, const Pose3d& pose);
+
+WPILIB_DLLEXPORT
+void from_json(const wpi::json& json, Pose3d& pose);
 
 }  // namespace frc

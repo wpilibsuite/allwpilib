@@ -6,6 +6,8 @@
 
 #include <cmath>
 
+#include <wpi/json.h>
+
 using namespace frc;
 
 namespace {
@@ -37,6 +39,10 @@ Pose3d::Pose3d(units::meter_t x, units::meter_t y, units::meter_t z,
                Rotation3d rotation)
     : m_translation(x, y, z), m_rotation(std::move(rotation)) {}
 
+Pose3d::Pose3d(const Pose2d& pose)
+    : m_translation(pose.X(), pose.Y(), 0_m),
+      m_rotation(0_rad, 0_rad, pose.Rotation().Radians()) {}
+
 Pose3d Pose3d::operator+(const Transform3d& other) const {
   return TransformBy(other);
 }
@@ -54,9 +60,17 @@ bool Pose3d::operator!=(const Pose3d& other) const {
   return !operator==(other);
 }
 
+Pose3d Pose3d::operator*(double scalar) const {
+  return Pose3d{m_translation * scalar, m_rotation * scalar};
+}
+
+Pose3d Pose3d::operator/(double scalar) const {
+  return *this * (1.0 / scalar);
+}
+
 Pose3d Pose3d::TransformBy(const Transform3d& other) const {
   return {m_translation + (other.Translation().RotateBy(m_rotation)),
-          m_rotation + other.Rotation()};
+          other.Rotation() + m_rotation};
 }
 
 Pose3d Pose3d::RelativeTo(const Pose3d& other) const {
@@ -136,4 +150,14 @@ Twist3d Pose3d::Log(const Pose3d& end) const {
 
 Pose2d Pose3d::ToPose2d() const {
   return Pose2d{m_translation.X(), m_translation.Y(), m_rotation.Z()};
+}
+
+void frc::to_json(wpi::json& json, const Pose3d& pose) {
+  json = wpi::json{{"translation", pose.Translation()},
+                   {"rotation", pose.Rotation()}};
+}
+
+void frc::from_json(const wpi::json& json, Pose3d& pose) {
+  pose = Pose3d{json.at("translation").get<Translation3d>(),
+                json.at("rotation").get<Rotation3d>()};
 }

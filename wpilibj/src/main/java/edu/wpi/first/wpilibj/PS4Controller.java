@@ -495,6 +495,17 @@ public class PS4Controller extends GenericHID {
   }
 
   /**
+   * Constructs an event instance around the triangle button's digital signal.
+   *
+   * @param loop the event loop instance to attach the event to.
+   * @return an event instance representing the triangle button's digital signal attached to the
+   *     given loop.
+   */
+  public BooleanEvent triangle(EventLoop loop) {
+    return new BooleanEvent(loop, this::getTriangleButton);
+  }
+
+  /**
    * Read the value of the Circle button on the controller.
    *
    * @return The state of the button.

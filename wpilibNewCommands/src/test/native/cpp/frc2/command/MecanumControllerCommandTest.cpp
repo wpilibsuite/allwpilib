@@ -5,6 +5,8 @@
 #include <frc2/command/MecanumControllerCommand.h>
 #include <frc2/command/Subsystem.h>
 
+#include <numbers>
+
 #include <frc/Timer.h>
 #include <frc/controller/PIDController.h>
 #include <frc/controller/ProfiledPIDController.h>
@@ -14,7 +16,6 @@
 #include <frc/kinematics/MecanumDriveOdometry.h>
 #include <frc/simulation/SimHooks.h>
 #include <frc/trajectory/TrajectoryGenerator.h>
-#include <wpi/numbers>
 
 #include "gtest/gtest.h"
 
@@ -31,9 +32,13 @@ class MecanumControllerCommandTest : public ::testing::Test {
   frc::Rotation2d m_angle{0_rad};
 
   units::meters_per_second_t m_frontLeftSpeed = 0.0_mps;
+  units::meter_t m_frontLeftDistance = 0.0_m;
   units::meters_per_second_t m_rearLeftSpeed = 0.0_mps;
+  units::meter_t m_rearLeftDistance = 0.0_m;
   units::meters_per_second_t m_frontRightSpeed = 0.0_mps;
+  units::meter_t m_frontRightDistance = 0.0_m;
   units::meters_per_second_t m_rearRightSpeed = 0.0_mps;
+  units::meter_t m_rearRightDistance = 0.0_m;
 
   frc::ProfiledPIDController<units::radians> m_rotController{
       1, 0, 0,
@@ -54,6 +59,7 @@ class MecanumControllerCommandTest : public ::testing::Test {
       frc::Translation2d{-kWheelBase / 2, -kTrackWidth / 2}};
 
   frc::MecanumDriveOdometry m_odometry{m_kinematics, 0_rad,
+                                       getCurrentWheelDistances(),
                                        frc::Pose2d{0_m, 0_m, 0_rad}};
 
   void SetUp() override { frc::sim::PauseTiming(); }
@@ -65,8 +71,17 @@ class MecanumControllerCommandTest : public ::testing::Test {
                                         m_rearLeftSpeed, m_rearRightSpeed};
   }
 
+  frc::MecanumDriveWheelPositions getCurrentWheelDistances() {
+    return frc::MecanumDriveWheelPositions{
+        m_frontLeftDistance,
+        m_rearLeftDistance,
+        m_frontRightDistance,
+        m_rearRightDistance,
+    };
+  }
+
   frc::Pose2d getRobotPose() {
-    m_odometry.UpdateWithTime(m_timer.Get(), m_angle, getCurrentWheelSpeeds());
+    m_odometry.Update(m_angle, getCurrentWheelDistances());
     return m_odometry.GetPose();
   }
 };
@@ -104,6 +119,10 @@ TEST_F(MecanumControllerCommandTest, ReachesReference) {
   while (!command.IsFinished()) {
     command.Execute();
     m_angle = trajectory.Sample(m_timer.Get()).pose.Rotation();
+    m_frontLeftDistance += m_frontLeftSpeed * 5_ms;
+    m_rearLeftDistance += m_rearLeftSpeed * 5_ms;
+    m_frontRightDistance += m_frontRightSpeed * 5_ms;
+    m_rearRightDistance += m_rearRightSpeed * 5_ms;
     frc::sim::StepTiming(5_ms);
   }
   m_timer.Stop();

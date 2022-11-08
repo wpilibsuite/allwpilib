@@ -21,7 +21,7 @@ AnalogAccelerometer::AnalogAccelerometer(int channel)
 AnalogAccelerometer::AnalogAccelerometer(AnalogInput* channel)
     : m_analogInput(channel, wpi::NullDeleter<AnalogInput>()) {
   if (!channel) {
-    throw FRC_MakeError(err::NullParameter, "{}", "channel");
+    throw FRC_MakeError(err::NullParameter, "channel");
   }
   InitAccelerometer();
 }
@@ -29,7 +29,7 @@ AnalogAccelerometer::AnalogAccelerometer(AnalogInput* channel)
 AnalogAccelerometer::AnalogAccelerometer(std::shared_ptr<AnalogInput> channel)
     : m_analogInput(channel) {
   if (!channel) {
-    throw FRC_MakeError(err::NullParameter, "{}", "channel");
+    throw FRC_MakeError(err::NullParameter, "channel");
   }
   InitAccelerometer();
 }
@@ -49,7 +49,7 @@ void AnalogAccelerometer::SetZero(double zero) {
 void AnalogAccelerometer::InitSendable(wpi::SendableBuilder& builder) {
   builder.SetSmartDashboardType("Accelerometer");
   builder.AddDoubleProperty(
-      "Value", [=] { return GetAcceleration(); }, nullptr);
+      "Value", [=, this] { return GetAcceleration(); }, nullptr);
 }
 
 void AnalogAccelerometer::InitAccelerometer() {

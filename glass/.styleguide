@@ -24,6 +24,7 @@ includeOtherLibs {
   ^fmt/
   ^frc/
   ^imgui
+  ^networktables/
   ^ntcore
   ^wpi/
   ^wpigui

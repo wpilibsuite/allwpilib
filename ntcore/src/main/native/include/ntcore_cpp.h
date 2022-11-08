@@ -2,23 +2,29 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#ifndef NTCORE_NTCORE_CPP_H_
-#define NTCORE_NTCORE_CPP_H_
+#pragma once
 
 #include <stdint.h>
 
 #include <cassert>
 #include <functional>
 #include <memory>
+#include <span>
 #include <string>
 #include <string_view>
-#include <thread>
 #include <utility>
+#include <variant>
 #include <vector>
 
-#include <wpi/span.h>
-
 #include "networktables/NetworkTableValue.h"
+#include "ntcore_c.h"
+#include "ntcore_cpp_types.h"
+
+namespace wpi {
+template <typename T>
+class SmallVectorImpl;
+class json;
+}  // namespace wpi
 
 namespace wpi::log {
 class DataLog;
@@ -35,30 +41,74 @@ namespace nt {
  * @{
  */
 
-/** NetworkTables Entry Information */
-struct EntryInfo {
-  /** Entry handle */
-  NT_Entry entry;
+/**
+ * Event notification flags.
+ *
+ * The flags are a bitmask and must be OR'ed together to indicate the
+ * combination of events desired to be received.
+ *
+ */
+struct EventFlags {
+  EventFlags() = delete;
 
-  /** Entry name */
+  static constexpr unsigned int kNone = NT_EVENT_NONE;
+  /**
+   * Initial listener addition.
+   * Set this flag to receive immediate notification of matches to the
+   * flag criteria.
+   */
+  static constexpr unsigned int kImmediate = NT_EVENT_IMMEDIATE;
+  /** Client connected (on server, any client connected). */
+  static constexpr unsigned int kConnected = NT_EVENT_CONNECTED;
+  /** Client disconnected (on server, any client disconnected). */
+  static constexpr unsigned int kDisconnected = NT_EVENT_DISCONNECTED;
+  /** Any connection event (connect or disconnect). */
+  static constexpr unsigned int kConnection = kConnected | kDisconnected;
+  /** New topic published. */
+  static constexpr unsigned int kPublish = NT_EVENT_PUBLISH;
+  /** Topic unpublished. */
+  static constexpr unsigned int kUnpublish = NT_EVENT_UNPUBLISH;
+  /** Topic properties changed. */
+  static constexpr unsigned int kProperties = NT_EVENT_PROPERTIES;
+  /** Any topic event (publish, unpublish, or properties changed). */
+  static constexpr unsigned int kTopic = kPublish | kUnpublish | kProperties;
+  /** Topic value updated (via network). */
+  static constexpr unsigned int kValueRemote = NT_EVENT_VALUE_REMOTE;
+  /** Topic value updated (local). */
+  static constexpr unsigned int kValueLocal = NT_EVENT_VALUE_LOCAL;
+  /** Topic value updated (network or local). */
+  static constexpr unsigned int kValueAll = kValueRemote | kValueLocal;
+  /** Log message. */
+  static constexpr unsigned int kLogMessage = NT_EVENT_LOGMESSAGE;
+};
+
+/** NetworkTables Topic Information */
+struct TopicInfo {
+  /** Topic handle */
+  NT_Topic topic{0};
+
+  /** Topic name */
   std::string name;
 
-  /** Entry type */
-  NT_Type type;
+  /** Topic type */
+  NT_Type type{NT_UNASSIGNED};
 
-  /** Entry flags */
-  unsigned int flags;
+  /** Topic type string */
+  std::string type_str;
 
-  /** Timestamp of last change to entry (type or value). */
-  uint64_t last_change;
+  /** Topic properties JSON string */
+  std::string properties;
 
-  friend void swap(EntryInfo& first, EntryInfo& second) {
+  /** Get topic properties as a JSON object. */
+  wpi::json GetProperties() const;
+
+  friend void swap(TopicInfo& first, TopicInfo& second) {
     using std::swap;
-    swap(first.entry, second.entry);
+    swap(first.topic, second.topic);
     swap(first.name, second.name);
     swap(first.type, second.type);
-    swap(first.flags, second.flags);
-    swap(first.last_change, second.last_change);
+    swap(first.type_str, second.type_str);
+    swap(first.properties, second.properties);
   }
 };
 
@@ -66,7 +116,7 @@ struct EntryInfo {
 struct ConnectionInfo {
   /**
    * The remote identifier (as set on the remote node by
-   * NetworkTableInstance::SetNetworkIdentity() or nt::SetNetworkIdentity()).
+   * NetworkTableInstance::StartClient4() or nt::StartClient4()).
    */
   std::string remote_id;
 
@@ -80,7 +130,7 @@ struct ConnectionInfo {
    * The last time any update was received from the remote node (same scale as
    * returned by nt::Now()).
    */
-  uint64_t last_update{0};
+  int64_t last_update{0};
 
   /**
    * The protocol version being used for this connection.  This in protocol
@@ -98,165 +148,30 @@ struct ConnectionInfo {
   }
 };
 
-/** NetworkTables RPC Version 1 Definition Parameter */
-struct RpcParamDef {
-  RpcParamDef() = default;
-  RpcParamDef(std::string_view name_, std::shared_ptr<Value> def_value_)
-      : name(name_), def_value(std::move(def_value_)) {}
-
-  std::string name;
-  std::shared_ptr<Value> def_value;
-};
-
-/** NetworkTables RPC Version 1 Definition Result */
-struct RpcResultDef {
-  RpcResultDef() = default;
-  RpcResultDef(std::string_view name_, NT_Type type_)
-      : name(name_), type(type_) {}
-
-  std::string name;
-  NT_Type type;
-};
-
-/** NetworkTables RPC Version 1 Definition */
-struct RpcDefinition {
-  unsigned int version;
-  std::string name;
-  std::vector<RpcParamDef> params;
-  std::vector<RpcResultDef> results;
-};
-
-/** NetworkTables Remote Procedure Call (Server Side) */
-class RpcAnswer {
+/** NetworkTables Value Event Data */
+class ValueEventData {
  public:
-  RpcAnswer() = default;
-  RpcAnswer(NT_Entry entry_, NT_RpcCall call_, std::string_view name_,
-            std::string_view params_, ConnectionInfo conn_)
-      : entry(entry_),
-        call(call_),
-        name(name_),
-        params(params_),
-        conn(std::move(conn_)) {}
+  ValueEventData() = default;
+  ValueEventData(NT_Topic topic, NT_Handle subentry, Value value)
+      : topic{topic}, subentry{subentry}, value{std::move(value)} {}
 
-  /** Entry handle. */
-  NT_Entry entry{0};
+  /** Topic handle. */
+  NT_Topic topic{0};
 
-  /** Call handle. */
-  mutable NT_RpcCall call{0};
-
-  /** Entry name. */
-  std::string name;
-
-  /** Call raw parameters. */
-  std::string params;
-
-  /** Connection that called the RPC. */
-  ConnectionInfo conn;
-
-  /**
-   * Determines if the native handle is valid.
-   * @return True if the native handle is valid, false otherwise.
-   */
-  explicit operator bool() const { return call != 0; }
-
-  /**
-   * Post RPC response (return value) for a polled RPC.
-   * @param result  result raw data that will be provided to remote caller
-   * @return True if posting the response is valid, otherwise false
-   */
-  bool PostResponse(std::string_view result) const;
-
-  friend void swap(RpcAnswer& first, RpcAnswer& second) {
-    using std::swap;
-    swap(first.entry, second.entry);
-    swap(first.call, second.call);
-    swap(first.name, second.name);
-    swap(first.params, second.params);
-    swap(first.conn, second.conn);
-  }
-};
-
-/** NetworkTables Entry Notification */
-class EntryNotification {
- public:
-  EntryNotification() = default;
-  EntryNotification(NT_EntryListener listener_, NT_Entry entry_,
-                    std::string_view name_, std::shared_ptr<Value> value_,
-                    unsigned int flags_)
-      : listener(listener_),
-        entry(entry_),
-        name(name_),
-        value(std::move(value_)),
-        flags(flags_) {}
-
-  /** Listener that was triggered. */
-  NT_EntryListener listener{0};
-
-  /** Entry handle. */
-  NT_Entry entry{0};
-
-  /** Entry name. */
-  std::string name;
+  /** Subscriber/entry handle. */
+  NT_Handle subentry{0};
 
   /** The new value. */
-  std::shared_ptr<Value> value;
-
-  /**
-   * Update flags.  For example, NT_NOTIFY_NEW if the key did not previously
-   * exist.
-   */
-  unsigned int flags{0};
-
-  friend void swap(EntryNotification& first, EntryNotification& second) {
-    using std::swap;
-    swap(first.listener, second.listener);
-    swap(first.entry, second.entry);
-    swap(first.name, second.name);
-    swap(first.value, second.value);
-    swap(first.flags, second.flags);
-  }
-};
-
-/** NetworkTables Connection Notification */
-class ConnectionNotification {
- public:
-  ConnectionNotification() = default;
-  ConnectionNotification(NT_ConnectionListener listener_, bool connected_,
-                         ConnectionInfo conn_)
-      : listener(listener_), connected(connected_), conn(std::move(conn_)) {}
-
-  /** Listener that was triggered. */
-  NT_ConnectionListener listener{0};
-
-  /** True if event is due to connection being established. */
-  bool connected = false;
-
-  /** Connection info. */
-  ConnectionInfo conn;
-
-  friend void swap(ConnectionNotification& first,
-                   ConnectionNotification& second) {
-    using std::swap;
-    swap(first.listener, second.listener);
-    swap(first.connected, second.connected);
-    swap(first.conn, second.conn);
-  }
+  Value value;
 };
 
 /** NetworkTables log message. */
 class LogMessage {
  public:
   LogMessage() = default;
-  LogMessage(NT_Logger logger_, unsigned int level_, std::string_view filename_,
-             unsigned int line_, std::string_view message_)
-      : logger(logger_),
-        level(level_),
-        filename(filename_),
-        line(line_),
-        message(message_) {}
-
-  /** The logger that generated the message. */
-  NT_Logger logger{0};
+  LogMessage(unsigned int level, std::string_view filename, unsigned int line,
+             std::string_view message)
+      : level{level}, filename{filename}, line{line}, message{message} {}
 
   /** Log level of the message.  See NT_LogLevel. */
   unsigned int level{0};
@@ -269,15 +184,148 @@ class LogMessage {
 
   /** The message. */
   std::string message;
+};
 
-  friend void swap(LogMessage& first, LogMessage& second) {
-    using std::swap;
-    swap(first.logger, second.logger);
-    swap(first.level, second.level);
-    swap(first.filename, second.filename);
-    swap(first.line, second.line);
-    swap(first.message, second.message);
+/** NetworkTables event */
+class Event {
+ public:
+  Event() = default;
+  Event(NT_Listener listener, unsigned int flags, ConnectionInfo info)
+      : listener{listener}, flags{flags}, data{std::move(info)} {}
+  Event(NT_Listener listener, unsigned int flags, TopicInfo info)
+      : listener{listener}, flags{flags}, data{std::move(info)} {}
+  Event(NT_Listener listener, unsigned int flags, ValueEventData data)
+      : listener{listener}, flags{flags}, data{std::move(data)} {}
+  Event(NT_Listener listener, unsigned int flags, LogMessage msg)
+      : listener{listener}, flags{flags}, data{std::move(msg)} {}
+  Event(NT_Listener listener, unsigned int flags, NT_Topic topic,
+        NT_Handle subentry, Value value)
+      : listener{listener},
+        flags{flags},
+        data{ValueEventData{topic, subentry, std::move(value)}} {}
+  Event(NT_Listener listener, unsigned int flags, unsigned int level,
+        std::string_view filename, unsigned int line, std::string_view message)
+      : listener{listener},
+        flags{flags},
+        data{LogMessage{level, filename, line, message}} {}
+
+  /** Listener that triggered this event. */
+  NT_Listener listener{0};
+
+  /**
+   * Event flags (NT_EventFlags). Also indicates the data included with the
+   * event:
+   * - NT_NOTIFY_CONNECTED or NT_NOTIFY_DISCONNECTED: GetConnectionInfo()
+   * - NT_NOTIFY_PUBLISH, NT_NOTIFY_UNPUBLISH, or NT_NOTIFY_PROPERTIES:
+   *   GetTopicInfo()
+   * - NT_NOTIFY_VALUE, NT_NOTIFY_VALUE_LOCAL: GetValueData()
+   * - NT_NOTIFY_LOGMESSAGE: GetLogMessage()
+   */
+  unsigned int flags{0};
+
+  /**
+   * Test event flags.
+   *
+   * @param kind event flag(s) to test
+   * @return True if flags matches kind
+   */
+  bool Is(unsigned int kind) const { return (flags & kind) != 0; }
+
+  /** Event data; content depends on flags. */
+  std::variant<ConnectionInfo, TopicInfo, ValueEventData, LogMessage> data;
+
+  const ConnectionInfo* GetConnectionInfo() const {
+    return std::get_if<nt::ConnectionInfo>(&data);
   }
+  ConnectionInfo* GetConnectionInfo() {
+    return std::get_if<nt::ConnectionInfo>(&data);
+  }
+
+  const TopicInfo* GetTopicInfo() const {
+    return std::get_if<nt::TopicInfo>(&data);
+  }
+  TopicInfo* GetTopicInfo() { return std::get_if<nt::TopicInfo>(&data); }
+
+  const ValueEventData* GetValueEventData() const {
+    return std::get_if<nt::ValueEventData>(&data);
+  }
+  ValueEventData* GetValueEventData() {
+    return std::get_if<nt::ValueEventData>(&data);
+  }
+
+  const LogMessage* GetLogMessage() const {
+    return std::get_if<nt::LogMessage>(&data);
+  }
+  LogMessage* GetLogMessage() { return std::get_if<nt::LogMessage>(&data); }
+};
+
+/** NetworkTables publish/subscribe option. */
+class PubSubOption {
+ public:
+  constexpr PubSubOption(NT_PubSubOptionType type, double value)
+      : type{type}, value{value} {}
+
+  /**
+   * How frequently changes will be sent over the network. NetworkTables may
+   * send more frequently than this (e.g. use a combined minimum period for all
+   * values) or apply a restricted range to this value. The default if
+   * unspecified (and the immediate flag is false) is 100 ms. This option and
+   * the immediate option override each other.
+   *
+   * @param time time between updates, in seconds
+   * @return option
+   */
+  static constexpr PubSubOption Periodic(double time) {
+    return PubSubOption{NT_PUBSUB_PERIODIC, time};
+  }
+
+  /**
+   * If enabled, sends all value changes over the network even if only sent
+   * periodically. This option defaults to disabled.
+   *
+   * @param enabled True to enable, false to disable
+   * @return option
+   */
+  static constexpr PubSubOption SendAll(bool enabled) {
+    return PubSubOption{NT_PUBSUB_SENDALL, enabled ? 1.0 : 0.0};
+  }
+
+  /**
+   * If enabled, no value changes are sent over the network. This option
+   * defaults to disabled.
+   *
+   * @param enabled True to enable, false to disable
+   * @return option
+   */
+  static constexpr PubSubOption TopicsOnly(bool enabled) {
+    return PubSubOption{NT_PUBSUB_TOPICSONLY, enabled ? 1.0 : 0.0};
+  }
+
+  /**
+   * If enabled, preserves duplicate value changes (rather than ignoring them).
+   * This option defaults to disabled.
+   *
+   * @param enabled True to enable, false to disable
+   * @return option
+   */
+  static constexpr PubSubOption KeepDuplicates(bool enabled) {
+    return PubSubOption{NT_PUBSUB_KEEPDUPLICATES, enabled ? 1.0 : 0.0};
+  }
+
+  /**
+   * Polling storage for subscription. Specifies the maximum number of updates
+   * NetworkTables should store between calls to the subscriber's poll()
+   * function. Defaults to 1 if SendAll is false, 20 if SendAll is true.
+   *
+   * @param depth number of entries to save for polling.
+   * @return option
+   */
+  static constexpr PubSubOption PollStorage(int depth) {
+    return PubSubOption{NT_PUBSUB_POLLSTORAGE, static_cast<double>(depth)};
+  }
+
+  NT_PubSubOptionType type;
+  double value;
 };
 
 /**
@@ -333,23 +381,6 @@ NT_Inst GetInstanceFromHandle(NT_Handle handle);
 NT_Entry GetEntry(NT_Inst inst, std::string_view name);
 
 /**
- * Get Entry Handles.
- *
- * Returns an array of entry handles.  The results are optionally
- * filtered by string prefix and entry type to only return a subset of all
- * entries.
- *
- * @param inst          instance handle
- * @param prefix        entry name required prefix; only entries whose name
- *                      starts with this string are returned
- * @param types         bitmask of NT_Type values; 0 is treated specially
- *                      as a "don't care"
- * @return Array of entry handles.
- */
-std::vector<NT_Entry> GetEntries(NT_Inst inst, std::string_view prefix,
-                                 unsigned int types);
-
-/**
  * Gets the name of the specified entry.
  * Returns an empty string if the handle is invalid.
  *
@@ -370,10 +401,10 @@ NT_Type GetEntryType(NT_Entry entry);
  * Gets the last time the entry was changed.
  * Returns 0 if the handle is invalid.
  *
- * @param entry   entry handle
+ * @param subentry   subscriber or entry handle
  * @return Entry last change time
  */
-uint64_t GetEntryLastChange(NT_Entry entry);
+int64_t GetEntryLastChange(NT_Handle subentry);
 
 /**
  * Get Entry Value.
@@ -381,10 +412,10 @@ uint64_t GetEntryLastChange(NT_Entry entry);
  * Returns copy of current entry value.
  * Note that one of the type options is "unassigned".
  *
- * @param entry     entry handle
+ * @param subentry     subscriber or entry handle
  * @return entry value
  */
-std::shared_ptr<Value> GetEntryValue(NT_Entry entry);
+Value GetEntryValue(NT_Handle subentry);
 
 /**
  * Set Default Entry Value
@@ -397,7 +428,7 @@ std::shared_ptr<Value> GetEntryValue(NT_Entry entry);
  * @param value     value to be set if name does not exist
  * @return False on error (value not set), True on success
  */
-bool SetDefaultEntryValue(NT_Entry entry, std::shared_ptr<Value> value);
+bool SetDefaultEntryValue(NT_Entry entry, const Value& value);
 
 /**
  * Set Entry Value.
@@ -409,22 +440,7 @@ bool SetDefaultEntryValue(NT_Entry entry, std::shared_ptr<Value> value);
  * @param value     new entry value
  * @return False on error (type mismatch), True on success
  */
-bool SetEntryValue(NT_Entry entry, std::shared_ptr<Value> value);
-
-/**
- * Set Entry Type and Value.
- *
- * Sets new entry value.  If type of new value differs from the type of the
- * currently stored entry, the currently stored entry type is overridden
- * (generally this will generate an Entry Assignment message).
- *
- * This is NOT the preferred method to update a value; generally
- * SetEntryValue() should be used instead, with appropriate error handling.
- *
- * @param entry     entry handle
- * @param value     new entry value
- */
-void SetEntryTypeValue(NT_Entry entry, std::shared_ptr<Value> value);
+bool SetEntryValue(NT_Entry entry, const Value& value);
 
 /**
  * Set Entry Flags.
@@ -443,533 +459,469 @@ void SetEntryFlags(NT_Entry entry, unsigned int flags);
 unsigned int GetEntryFlags(NT_Entry entry);
 
 /**
- * Delete Entry.
+ * Read Entry Queue.
  *
- * Deletes an entry.  This is a new feature in version 3.0 of the protocol,
- * so this may not have an effect if any other node in the network is not
- * version 3.0 or newer.
+ * Returns new entry values since last call.
  *
- * Note: GetConnections() can be used to determine the protocol version
- * of direct remote connection(s), but this is not sufficient to determine
- * if all nodes in the network are version 3.0 or newer.
- *
- * @param entry     entry handle
+ * @param subentry     subscriber or entry handle
+ * @return entry value array
  */
-void DeleteEntry(NT_Entry entry);
+std::vector<Value> ReadQueueValue(NT_Handle subentry);
+
+/** @} */
 
 /**
- * Delete All Entries.
- *
- * Deletes ALL table entries.  This is a new feature in version 3.0 of the
- * so this may not have an effect if any other node in the network is not
- * version 3.0 or newer.
- *
- * Note: GetConnections() can be used to determine the protocol version
- * of direct remote connection(s), but this is not sufficient to determine
- * if all nodes in the network are version 3.0 or newer.
- *
- * @param inst      instance handle
+ * @defgroup ntcore_topic_func Topic Functions
+ * @{
  */
-void DeleteAllEntries(NT_Inst inst);
 
 /**
- * Get Entry Information.
+ * Get Published Topics.
  *
- * Returns an array of entry information (name, entry type,
- * and timestamp of last change to type/value).  The results are optionally
- * filtered by string prefix and entry type to only return a subset of all
- * entries.
+ * Returns an array of topic handles.  The results are optionally filtered by
+ * string prefix and type to only return a subset of all topics.
  *
  * @param inst    instance handle
- * @param prefix        entry name required prefix; only entries whose name
- *                      starts with this string are returned
- * @param types         bitmask of NT_Type values; 0 is treated specially
- *                      as a "don't care"
- * @return Array of entry information.
+ * @param prefix  name required prefix; only topics whose name
+ *                starts with this string are returned
+ * @param types   bitmask of NT_Type values; 0 is treated specially
+ *                as a "don't care"
+ * @return Array of topic handles.
  */
-std::vector<EntryInfo> GetEntryInfo(NT_Inst inst, std::string_view prefix,
+std::vector<NT_Topic> GetTopics(NT_Inst inst, std::string_view prefix,
+                                unsigned int types);
+
+/**
+ * Get Published Topics.
+ *
+ * Returns an array of topic handles.  The results are optionally filtered by
+ * string prefix and type to only return a subset of all topics.
+ *
+ * @param inst    instance handle
+ * @param prefix  name required prefix; only topics whose name
+ *                starts with this string are returned
+ * @param types   array of type strings
+ * @return Array of topic handles.
+ */
+std::vector<NT_Topic> GetTopics(NT_Inst inst, std::string_view prefix,
+                                std::span<const std::string_view> types);
+
+/**
+ * Get Topic Information about multiple topics.
+ *
+ * Returns an array of topic information (handle, name, type, and properties).
+ * The results are optionally filtered by string prefix and type to only
+ * return a subset of all topics.
+ *
+ * @param inst    instance handle
+ * @param prefix  name required prefix; only topics whose name
+ *                starts with this string are returned
+ * @param types   bitmask of NT_Type values; 0 is treated specially
+ *                as a "don't care"
+ * @return Array of topic information.
+ */
+std::vector<TopicInfo> GetTopicInfo(NT_Inst inst, std::string_view prefix,
                                     unsigned int types);
 
 /**
- * Get Entry Information.
+ * Get Topic Information about multiple topics.
  *
- * Returns information about an entry (name, entry type,
- * and timestamp of last change to type/value).
+ * Returns an array of topic information (handle, name, type, and properties).
+ * The results are optionally filtered by string prefix and type to only
+ * return a subset of all topics.
  *
- * @param entry         entry handle
- * @return Entry information.
+ * @param inst    instance handle
+ * @param prefix  name required prefix; only topics whose name
+ *                starts with this string are returned
+ * @param types   array of type strings
+ * @return Array of topic information.
  */
-EntryInfo GetEntryInfo(NT_Entry entry);
+std::vector<TopicInfo> GetTopicInfo(NT_Inst inst, std::string_view prefix,
+                                    std::span<const std::string_view> types);
+
+/**
+ * Gets Topic Information.
+ *
+ * Returns information about a topic (name, type, and properties).
+ *
+ * @param topic   handle
+ * @return Topic information.
+ */
+TopicInfo GetTopicInfo(NT_Topic topic);
+
+/**
+ * Gets Topic Handle.
+ *
+ * Returns topic handle.
+ *
+ * @param inst   instance handle
+ * @param name   topic name
+ * @return Topic handle.
+ */
+NT_Topic GetTopic(NT_Inst inst, std::string_view name);
+
+/**
+ * Gets the name of the specified topic.
+ * Returns an empty string if the handle is invalid.
+ *
+ * @param topic   topic handle
+ * @return Topic name
+ */
+std::string GetTopicName(NT_Topic topic);
+
+/**
+ * Gets the type for the specified topic, or unassigned if non existent.
+ *
+ * @param topic   topic handle
+ * @return Topic type
+ */
+NT_Type GetTopicType(NT_Topic topic);
+
+/**
+ * Gets the type string for the specified topic, or empty string if non
+ * existent.  This may have more information than the numeric type (especially
+ * for raw values).
+ *
+ * @param topic   topic handle
+ * @return Topic type string
+ */
+std::string GetTopicTypeString(NT_Topic topic);
+
+/**
+ * Sets the persistent property of a topic.  If true, the stored value is
+ * persistent through server restarts.
+ *
+ * @param topic topic handle
+ * @param value True for persistent, false for not persistent.
+ */
+void SetTopicPersistent(NT_Topic topic, bool value);
+
+/**
+ * Gets the persistent property of a topic.  If true, the server retains the
+ * topic even when there are no publishers.
+ *
+ * @param topic topic handle
+ * @return persistent property value
+ */
+bool GetTopicPersistent(NT_Topic topic);
+
+/**
+ * Sets the retained property of a topic.
+ *
+ * @param topic topic handle
+ * @param value new retained property value
+ */
+void SetTopicRetained(NT_Topic topic, bool value);
+
+/**
+ * Gets the retained property of a topic.
+ *
+ * @param topic topic handle
+ * @return retained property value
+ */
+bool GetTopicRetained(NT_Topic topic);
+
+/**
+ * Determine if topic exists (e.g. has at least one publisher).
+ *
+ * @param handle Topic, entry, or subscriber handle.
+ * @return True if topic exists.
+ */
+bool GetTopicExists(NT_Handle handle);
+
+/**
+ * Gets the current value of a property (as a JSON object).
+ *
+ * @param topic topic handle
+ * @param name property name
+ * @return JSON object; null object if the property does not exist.
+ */
+wpi::json GetTopicProperty(NT_Topic topic, std::string_view name);
+
+/**
+ * Sets a property value.
+ *
+ * @param topic topic handle
+ * @param name property name
+ * @param value property value
+ */
+void SetTopicProperty(NT_Topic topic, std::string_view name,
+                      const wpi::json& value);
+
+/**
+ * Deletes a property.  Has no effect if the property does not exist.
+ *
+ * @param topic topic handle
+ * @param name property name
+ */
+void DeleteTopicProperty(NT_Topic topic, std::string_view name);
+
+/**
+ * Gets all topic properties as a JSON object.  Each key in the object
+ * is the property name, and the corresponding value is the property value.
+ *
+ * @param topic topic handle
+ * @return JSON object
+ */
+wpi::json GetTopicProperties(NT_Topic topic);
+
+/**
+ * Updates multiple topic properties.  Each key in the passed-in object is
+ * the name of the property to add/update, and the corresponding value is the
+ * property value to set for that property.  Null values result in deletion
+ * of the corresponding property.
+ *
+ * @param topic topic handle
+ * @param update JSON object with keys to add/update/delete
+ * @return False if update is not a JSON object
+ */
+bool SetTopicProperties(NT_Topic topic, const wpi::json& update);
+
+/**
+ * Creates a new subscriber to value changes on a topic.
+ *
+ * @param topic topic handle
+ * @param type expected type
+ * @param typeStr expected type string
+ * @param options subscription options
+ * @return Subscriber handle
+ */
+NT_Subscriber Subscribe(NT_Topic topic, NT_Type type, std::string_view typeStr,
+                        std::span<const PubSubOption> options = {});
+
+/**
+ * Stops subscriber.
+ *
+ * @param sub subscriber handle
+ */
+void Unsubscribe(NT_Subscriber sub);
+
+/**
+ * Creates a new publisher to a topic.
+ *
+ * @param topic topic handle
+ * @param type type
+ * @param typeStr type string
+ * @param options publish options
+ * @return Publisher handle
+ */
+NT_Publisher Publish(NT_Topic topic, NT_Type type, std::string_view typeStr,
+                     std::span<const PubSubOption> options = {});
+
+/**
+ * Creates a new publisher to a topic.
+ *
+ * @param topic topic handle
+ * @param type type
+ * @param typeStr type string
+ * @param properties initial properties
+ * @param options publish options
+ * @return Publisher handle
+ */
+NT_Publisher PublishEx(NT_Topic topic, NT_Type type, std::string_view typeStr,
+                       const wpi::json& properties,
+                       std::span<const PubSubOption> options = {});
+
+/**
+ * Stops publisher.
+ *
+ * @param pubentry publisher/entry handle
+ */
+void Unpublish(NT_Handle pubentry);
+
+/**
+ * @brief Creates a new entry (subscriber and weak publisher) to a topic.
+ *
+ * @param topic topic handle
+ * @param type type
+ * @param typeStr type string
+ * @param options publish options
+ * @return Entry handle
+ */
+NT_Entry GetEntry(NT_Topic topic, NT_Type type, std::string_view typeStr,
+                  std::span<const PubSubOption> options = {});
+
+/**
+ * Stops entry subscriber/publisher.
+ *
+ * @param entry entry handle
+ */
+void ReleaseEntry(NT_Entry entry);
+
+/**
+ * Stops entry/subscriber/publisher.
+ *
+ * @param pubsubentry entry/subscriber/publisher handle
+ */
+void Release(NT_Handle pubsubentry);
+
+/**
+ * Gets the topic handle from an entry/subscriber/publisher handle.
+ *
+ * @param pubsubentry entry/subscriber/publisher handle
+ * @return Topic handle
+ */
+NT_Topic GetTopicFromHandle(NT_Handle pubsubentry);
 
 /** @} */
 
 /**
- * @defgroup ntcore_entrylistener_func Entry Listener Functions
+ * @defgroup ntcore_advancedsub_func Advanced Subscriber Functions
  * @{
  */
 
 /**
- * Entry listener callback function.
- * Called when a key-value pair is changed.
+ * Subscribes to multiple topics based on one or more topic name prefixes. Can
+ * be used in combination with a Value Listener or ReadQueueValue() to get value
+ * changes across all matching topics.
  *
- * @param entry_listener  entry listener handle returned by callback creation
- *                        function
- * @param name            entry name
- * @param value           the new value
- * @param flags           update flags; for example, NT_NOTIFY_NEW if the key
- *                        did not previously exist
+ * @param inst instance handle
+ * @param prefixes topic name prefixes
+ * @param options subscriber options
+ * @return subscriber handle
  */
-using EntryListenerCallback =
-    std::function<void(NT_EntryListener entry_listener, std::string_view name,
-                       std::shared_ptr<Value> value, unsigned int flags)>;
+NT_MultiSubscriber SubscribeMultiple(
+    NT_Inst inst, std::span<const std::string_view> prefixes,
+    std::span<const PubSubOption> options = {});
 
 /**
- * Add a listener for all entries starting with a certain prefix.
+ * Unsubscribes a multi-subscriber.
  *
- * @param inst              instance handle
- * @param prefix            UTF-8 string prefix
- * @param callback          listener to add
- * @param flags             NotifyKind bitmask
- * @return Listener handle
+ * @param sub multi-subscriber handle
  */
-NT_EntryListener AddEntryListener(
-    NT_Inst inst, std::string_view prefix,
-    std::function<void(const EntryNotification& event)> callback,
-    unsigned int flags);
+void UnsubscribeMultiple(NT_MultiSubscriber sub);
+
+/** @} */
 
 /**
- * Add a listener for a single entry.
- *
- * @param entry             entry handle
- * @param callback          listener to add
- * @param flags             NotifyKind bitmask
- * @return Listener handle
+ * @defgroup ntcore_listener_func Listener Functions
+ * @{
  */
-NT_EntryListener AddEntryListener(
-    NT_Entry entry,
-    std::function<void(const EntryNotification& event)> callback,
-    unsigned int flags);
+
+using ListenerCallback = std::function<void(const Event&)>;
 
 /**
- * Create a entry listener poller.
+ * Creates a listener poller.
  *
  * A poller provides a single queue of poll events.  Events linked to this
- * poller (using AddPolledEntryListener()) will be stored in the queue and
- * must be collected by calling PollEntryListener().
- * The returned handle must be destroyed with DestroyEntryListenerPoller().
+ * poller (using AddPolledListener()) will be stored in the queue and
+ * must be collected by calling ReadListenerQueue().
+ * The returned handle must be destroyed with DestroyListenerPoller().
  *
  * @param inst      instance handle
  * @return poller handle
  */
-NT_EntryListenerPoller CreateEntryListenerPoller(NT_Inst inst);
+NT_ListenerPoller CreateListenerPoller(NT_Inst inst);
 
 /**
- * Destroy a entry listener poller.  This will abort any blocked polling
+ * Destroys a listener poller.  This will abort any blocked polling
  * call and prevent additional events from being generated for this poller.
  *
  * @param poller    poller handle
  */
-void DestroyEntryListenerPoller(NT_EntryListenerPoller poller);
+void DestroyListenerPoller(NT_ListenerPoller poller);
 
 /**
- * Create a polled entry listener.
- * The caller is responsible for calling PollEntryListener() to poll.
- *
- * @param poller            poller handle
- * @param prefix            UTF-8 string prefix
- * @param flags             NotifyKind bitmask
- * @return Listener handle
- */
-NT_EntryListener AddPolledEntryListener(NT_EntryListenerPoller poller,
-                                        std::string_view prefix,
-                                        unsigned int flags);
-
-/**
- * Create a polled entry listener.
- * The caller is responsible for calling PollEntryListener() to poll.
- *
- * @param poller            poller handle
- * @param entry             entry handle
- * @param flags             NotifyKind bitmask
- * @return Listener handle
- */
-NT_EntryListener AddPolledEntryListener(NT_EntryListenerPoller poller,
-                                        NT_Entry entry, unsigned int flags);
-
-/**
- * Get the next entry listener event.  This blocks until the next event occurs.
- * This is intended to be used with AddPolledEntryListener(); entry listeners
- * created using AddEntryListener() will not be serviced through this function.
+ * Read notifications.
  *
  * @param poller    poller handle
- * @return Information on the entry listener events.  Only returns empty if an
- *         error occurred (e.g. the instance was invalid or is shutting down).
+ * @return Array of events.  Returns empty array if no events since last call.
  */
-std::vector<EntryNotification> PollEntryListener(NT_EntryListenerPoller poller);
+std::vector<Event> ReadListenerQueue(NT_ListenerPoller poller);
 
 /**
- * Get the next entry listener event.  This blocks until the next event occurs
- * or it times out.  This is intended to be used with AddPolledEntryListener();
- * entry listeners created using AddEntryListener() will not be serviced
- * through this function.
+ * Removes a listener.
  *
- * @param poller      poller handle
- * @param timeout     timeout, in seconds
- * @param timed_out   true if the timeout period elapsed (output)
- * @return Information on the entry listener events.  If empty is returned and
- *         and timed_out is also false, an error occurred (e.g. the instance
- *         was invalid or is shutting down).
+ * @param listener Listener handle to remove
  */
-std::vector<EntryNotification> PollEntryListener(NT_EntryListenerPoller poller,
-                                                 double timeout,
-                                                 bool* timed_out);
+void RemoveListener(NT_Listener listener);
 
 /**
- * Cancel a PollEntryListener call.  This wakes up a call to
- * PollEntryListener for this poller and causes it to immediately return
- * an empty array.
+ * Wait for the listener queue to be empty. This is primarily useful
+ * for deterministic testing. This blocks until either the listener
+ * queue is empty (e.g. there are no more events that need to be passed along to
+ * callbacks or poll queues) or the timeout expires.
  *
- * @param poller  poller handle
- */
-void CancelPollEntryListener(NT_EntryListenerPoller poller);
-
-/**
- * Remove an entry listener.
- *
- * @param entry_listener Listener handle to remove
- */
-void RemoveEntryListener(NT_EntryListener entry_listener);
-
-/**
- * Wait for the entry listener queue to be empty.  This is primarily useful
- * for deterministic testing.  This blocks until either the entry listener
- * queue is empty (e.g. there are no more events that need to be passed along
- * to callbacks or poll queues) or the timeout expires.
- *
- * @param inst      instance handle
- * @param timeout   timeout, in seconds.  Set to 0 for non-blocking behavior,
- *                  or a negative value to block indefinitely
+ * @param handle  handle
+ * @param timeout timeout, in seconds. Set to 0 for non-blocking behavior, or a
+ *                negative value to block indefinitely
  * @return False if timed out, otherwise true.
  */
-bool WaitForEntryListenerQueue(NT_Inst inst, double timeout);
-
-/** @} */
+bool WaitForListenerQueue(NT_Handle handle, double timeout);
 
 /**
- * @defgroup ntcore_connectionlistener_func Connection Listener Functions
- * @{
- */
-
-/**
- * Connection listener callback function.
- * Called when a network connection is made or lost.
+ * Create a listener for changes to topics with names that start with any of
+ * the given prefixes. This creates a corresponding internal subscriber with the
+ * lifetime of the listener.
  *
- * @param conn_listener   connection listener handle returned by callback
- *                        creation function
- * @param connected       true if event is due to connection being established
- * @param conn            connection info
+ * @param inst Instance handle
+ * @param prefixes Topic name string prefixes
+ * @param mask Bitmask of NT_EventFlags values (only topic and value events will
+ *             be generated)
+ * @param callback Listener function
  */
-using ConnectionListenerCallback =
-    std::function<void(NT_ConnectionListener, bool, const ConnectionInfo&)>;
+NT_Listener AddListener(NT_Inst inst,
+                        std::span<const std::string_view> prefixes,
+                        unsigned int mask, ListenerCallback callback);
 
 /**
- * Add a connection listener.
+ * Create a listener.
  *
- * @param inst              instance handle
- * @param callback          listener to add
- * @param immediate_notify  notify listener of all existing connections
+ * Some combinations of handle and mask have no effect:
+ * - connection and log message events are only generated on instances
+ * - topic and value events are only generated on non-instances
+ *
+ * Adding value and topic events on a topic will create a corresponding internal
+ * subscriber with the lifetime of the listener.
+ *
+ * Adding a log message listener through this function will only result in
+ * events at NT_LOG_INFO or higher; for more customized settings, use
+ * AddLogger().
+ *
+ * @param handle Instance, topic, subscriber, multi-subscriber, or entry handle
+ * @param mask Bitmask of NT_EventFlags values
+ * @param callback Listener function
+ */
+NT_Listener AddListener(NT_Handle handle, unsigned int mask,
+                        ListenerCallback callback);
+
+/**
+ * Creates a polled listener. This creates a corresponding internal subscriber
+ * with the lifetime of the listener.
+ * The caller is responsible for calling ReadListenerQueue() to poll.
+ *
+ * @param poller poller handle
+ * @param prefixes array of UTF-8 string prefixes
+ * @param mask Bitmask of NT_EventFlags values (only topic and value events will
+ *             be generated)
  * @return Listener handle
  */
-NT_ConnectionListener AddConnectionListener(
-    NT_Inst inst,
-    std::function<void(const ConnectionNotification& event)> callback,
-    bool immediate_notify);
+NT_Listener AddPolledListener(NT_ListenerPoller poller,
+                              std::span<const std::string_view> prefixes,
+                              unsigned int mask);
 
 /**
- * Create a connection listener poller.
+ * Creates a polled listener.
+ * The caller is responsible for calling ReadListenerQueue() to poll.
  *
- * A poller provides a single queue of poll events.  Events linked to this
- * poller (using AddPolledConnectionListener()) will be stored in the queue and
- * must be collected by calling PollConnectionListener().
- * The returned handle must be destroyed with DestroyConnectionListenerPoller().
+ * Some combinations of handle and mask have no effect:
+ * - connection and log message events are only generated on instances
+ * - topic and value events are only generated on non-instances
  *
- * @param inst      instance handle
- * @return poller handle
+ * Adding value and topic events on a topic will create a corresponding internal
+ * subscriber with the lifetime of the listener.
+ *
+ * Adding a log message listener through this function will only result in
+ * events at NT_LOG_INFO or higher; for more customized settings, use
+ * AddPolledLogger().
+ *
+ * @param poller poller handle
+ * @param handle instance, topic, subscriber, multi-subscriber, or entry handle
+ * @param mask NT_EventFlags bitmask
+ * @return Listener handle
  */
-NT_ConnectionListenerPoller CreateConnectionListenerPoller(NT_Inst inst);
-
-/**
- * Destroy a connection listener poller.  This will abort any blocked polling
- * call and prevent additional events from being generated for this poller.
- *
- * @param poller    poller handle
- */
-void DestroyConnectionListenerPoller(NT_ConnectionListenerPoller poller);
-
-/**
- * Create a polled connection listener.
- * The caller is responsible for calling PollConnectionListener() to poll.
- *
- * @param poller            poller handle
- * @param immediate_notify  notify listener of all existing connections
- */
-NT_ConnectionListener AddPolledConnectionListener(
-    NT_ConnectionListenerPoller poller, bool immediate_notify);
-
-/**
- * Get the next connection event.  This blocks until the next connect or
- * disconnect occurs.  This is intended to be used with
- * AddPolledConnectionListener(); connection listeners created using
- * AddConnectionListener() will not be serviced through this function.
- *
- * @param poller    poller handle
- * @return Information on the connection events.  Only returns empty if an
- *         error occurred (e.g. the instance was invalid or is shutting down).
- */
-std::vector<ConnectionNotification> PollConnectionListener(
-    NT_ConnectionListenerPoller poller);
-
-/**
- * Get the next connection event.  This blocks until the next connect or
- * disconnect occurs or it times out.  This is intended to be used with
- * AddPolledConnectionListener(); connection listeners created using
- * AddConnectionListener() will not be serviced through this function.
- *
- * @param poller      poller handle
- * @param timeout     timeout, in seconds
- * @param timed_out   true if the timeout period elapsed (output)
- * @return Information on the connection events.  If empty is returned and
- *         timed_out is also false, an error occurred (e.g. the instance was
- *         invalid or is shutting down).
- */
-std::vector<ConnectionNotification> PollConnectionListener(
-    NT_ConnectionListenerPoller poller, double timeout, bool* timed_out);
-
-/**
- * Cancel a PollConnectionListener call.  This wakes up a call to
- * PollConnectionListener for this poller and causes it to immediately return
- * an empty array.
- *
- * @param poller  poller handle
- */
-void CancelPollConnectionListener(NT_ConnectionListenerPoller poller);
-
-/**
- * Remove a connection listener.
- *
- * @param conn_listener Listener handle to remove
- */
-void RemoveConnectionListener(NT_ConnectionListener conn_listener);
-
-/**
- * Wait for the connection listener queue to be empty.  This is primarily useful
- * for deterministic testing.  This blocks until either the connection listener
- * queue is empty (e.g. there are no more events that need to be passed along
- * to callbacks or poll queues) or the timeout expires.
- *
- * @param inst      instance handle
- * @param timeout   timeout, in seconds.  Set to 0 for non-blocking behavior,
- *                  or a negative value to block indefinitely
- * @return False if timed out, otherwise true.
- */
-bool WaitForConnectionListenerQueue(NT_Inst inst, double timeout);
-
-/** @} */
-
-/**
- * @defgroup ntcore_rpc_func Remote Procedure Call Functions
- * @{
- */
-
-/**
- * Create a callback-based RPC entry point.  Only valid to use on the server.
- * The callback function will be called when the RPC is called.
- *
- * @param entry     entry handle of RPC entry
- * @param def       RPC definition
- * @param callback  callback function; note the callback function must call
- *                  PostRpcResponse() to provide a response to the call
- */
-void CreateRpc(NT_Entry entry, std::string_view def,
-               std::function<void(const RpcAnswer& answer)> callback);
-
-/**
- * Create a RPC call poller.  Only valid to use on the server.
- *
- * A poller provides a single queue of poll events.  Events linked to this
- * poller (using CreatePolledRpc()) will be stored in the queue and must be
- * collected by calling PollRpc().
- * The returned handle must be destroyed with DestroyRpcCallPoller().
- *
- * @param inst      instance handle
- * @return poller handle
- */
-NT_RpcCallPoller CreateRpcCallPoller(NT_Inst inst);
-
-/**
- * Destroy a RPC call poller.  This will abort any blocked polling call and
- * prevent additional events from being generated for this poller.
- *
- * @param poller    poller handle
- */
-void DestroyRpcCallPoller(NT_RpcCallPoller poller);
-
-/**
- * Create a polled RPC entry point.  Only valid to use on the server.
- * The caller is responsible for calling PollRpc() to poll for servicing
- * incoming RPC calls.
- *
- * @param entry     entry handle of RPC entry
- * @param def       RPC definition
- * @param poller    poller handle
- */
-void CreatePolledRpc(NT_Entry entry, std::string_view def,
-                     NT_RpcCallPoller poller);
-
-/**
- * Get the next incoming RPC call.  This blocks until the next incoming RPC
- * call is received.  This is intended to be used with CreatePolledRpc();
- * RPC calls created using CreateRpc() will not be serviced through this
- * function.  Upon successful return, PostRpcResponse() must be called to
- * send the return value to the caller.
- *
- * @param poller      poller handle
- * @return Information on the next RPC calls.  Only returns empty if an error
- *         occurred (e.g. the instance was invalid or is shutting down).
- */
-std::vector<RpcAnswer> PollRpc(NT_RpcCallPoller poller);
-
-/**
- * Get the next incoming RPC call.  This blocks until the next incoming RPC
- * call is received or it times out.  This is intended to be used with
- * CreatePolledRpc(); RPC calls created using CreateRpc() will not be
- * serviced through this function.  Upon successful return,
- * PostRpcResponse() must be called to send the return value to the caller.
- *
- * @param poller      poller handle
- * @param timeout     timeout, in seconds
- * @param timed_out   true if the timeout period elapsed (output)
- * @return Information on the next RPC calls.  If empty and timed_out is also
- *         false, an error occurred (e.g. the instance was invalid or is
- *         shutting down).
- */
-std::vector<RpcAnswer> PollRpc(NT_RpcCallPoller poller, double timeout,
-                               bool* timed_out);
-
-/**
- * Cancel a PollRpc call.  This wakes up a call to PollRpc for this poller
- * and causes it to immediately return an empty array.
- *
- * @param poller  poller handle
- */
-void CancelPollRpc(NT_RpcCallPoller poller);
-
-/**
- * Wait for the incoming RPC call queue to be empty.  This is primarily useful
- * for deterministic testing.  This blocks until either the RPC call
- * queue is empty (e.g. there are no more events that need to be passed along
- * to callbacks or poll queues) or the timeout expires.
- *
- * @param inst      instance handle
- * @param timeout   timeout, in seconds.  Set to 0 for non-blocking behavior,
- *                  or a negative value to block indefinitely
- * @return False if timed out, otherwise true.
- */
-bool WaitForRpcCallQueue(NT_Inst inst, double timeout);
-
-/**
- * Post RPC response (return value) for a polled RPC.
- * The rpc and call parameters should come from the RpcAnswer returned
- * by PollRpc().
- *
- * @param entry       entry handle of RPC entry (from RpcAnswer)
- * @param call        RPC call handle (from RpcAnswer)
- * @param result      result raw data that will be provided to remote caller
- * @return            true if the response was posted, otherwise false
- */
-bool PostRpcResponse(NT_Entry entry, NT_RpcCall call, std::string_view result);
-
-/**
- * Call a RPC function.  May be used on either the client or server.
- * This function is non-blocking.  Either GetRpcResult() or
- * CancelRpcResult() must be called to either get or ignore the result of
- * the call.
- *
- * @param entry       entry handle of RPC entry
- * @param params      parameter
- * @return RPC call handle (for use with GetRpcResult() or
- *         CancelRpcResult()).
- */
-NT_RpcCall CallRpc(NT_Entry entry, std::string_view params);
-
-/**
- * Get the result (return value) of a RPC call.  This function blocks until
- * the result is received.
- *
- * @param entry       entry handle of RPC entry
- * @param call        RPC call handle returned by CallRpc()
- * @param result      received result (output)
- * @return False on error, true otherwise.
- */
-bool GetRpcResult(NT_Entry entry, NT_RpcCall call, std::string* result);
-
-/**
- * Get the result (return value) of a RPC call.  This function blocks until
- * the result is received or it times out.
- *
- * @param entry       entry handle of RPC entry
- * @param call        RPC call handle returned by CallRpc()
- * @param result      received result (output)
- * @param timeout     timeout, in seconds
- * @param timed_out   true if the timeout period elapsed (output)
- * @return False on error or timeout, true otherwise.
- */
-bool GetRpcResult(NT_Entry entry, NT_RpcCall call, std::string* result,
-                  double timeout, bool* timed_out);
-
-/**
- * Ignore the result of a RPC call.  This function is non-blocking.
- *
- * @param entry       entry handle of RPC entry
- * @param call        RPC call handle returned by CallRpc()
- */
-void CancelRpcResult(NT_Entry entry, NT_RpcCall call);
-
-/**
- * Pack a RPC version 1 definition.
- *
- * @param def         RPC version 1 definition
- * @return Raw packed bytes.
- */
-std::string PackRpcDefinition(const RpcDefinition& def);
-
-/**
- * Unpack a RPC version 1 definition.  This can be used for introspection or
- * validation.
- *
- * @param packed      raw packed bytes
- * @param def         RPC version 1 definition (output)
- * @return True if successfully unpacked, false otherwise.
- */
-bool UnpackRpcDefinition(std::string_view packed, RpcDefinition* def);
-
-/**
- * Pack RPC values as required for RPC version 1 definition messages.
- *
- * @param values      array of values to pack
- * @return Raw packed bytes.
- */
-std::string PackRpcValues(wpi::span<const std::shared_ptr<Value>> values);
-
-/**
- * Unpack RPC values as required for RPC version 1 definition messages.
- *
- * @param packed      raw packed bytes
- * @param types       array of data types (as provided in the RPC definition)
- * @return Array of values.
- */
-std::vector<std::shared_ptr<Value>> UnpackRpcValues(
-    std::string_view packed, wpi::span<const NT_Type> types);
+NT_Listener AddPolledListener(NT_ListenerPoller poller, NT_Handle handle,
+                              unsigned int mask);
 
 /** @} */
 
@@ -977,16 +929,6 @@ std::vector<std::shared_ptr<Value>> UnpackRpcValues(
  * @defgroup ntcore_network_func Client/Server Functions
  * @{
  */
-
-/**
- * Set the network identity of this node.
- * This is the name used during the initial connection handshake, and is
- * visible through ConnectionInfo on the remote node.
- *
- * @param inst      instance handle
- * @param name      identity to advertise
- */
-void SetNetworkIdentity(NT_Inst inst, std::string_view name);
 
 /**
  * Get the current network mode.
@@ -1017,10 +959,12 @@ void StopLocal(NT_Inst inst);
  *                          null terminated)
  * @param listen_address    the address to listen on, or null to listen on any
  *                          address. (UTF-8 string, null terminated)
- * @param port              port to communicate over.
+ * @param port3             port to communicate over (NT3)
+ * @param port4             port to communicate over (NT4)
  */
 void StartServer(NT_Inst inst, std::string_view persist_filename,
-                 const char* listen_address, unsigned int port);
+                 const char* listen_address, unsigned int port3,
+                 unsigned int port4);
 
 /**
  * Stops the server if it is running.
@@ -1030,41 +974,22 @@ void StartServer(NT_Inst inst, std::string_view persist_filename,
 void StopServer(NT_Inst inst);
 
 /**
- * Starts a client.  Use SetServer to set the server name and port.
- *
- * @param inst  instance handle
- */
-void StartClient(NT_Inst inst);
-
-/**
- * Starts a client using the specified server and port
- *
- * @param inst        instance handle
- * @param server_name server name (UTF-8 string, null terminated)
- * @param port        port to communicate over
- */
-void StartClient(NT_Inst inst, const char* server_name, unsigned int port);
-
-/**
- * Starts a client using the specified (server, port) combinations.  The
- * client will attempt to connect to each server in round robin fashion.
+ * Starts a NT3 client.  Use SetServer or SetServerTeam to set the server name
+ * and port.
  *
  * @param inst      instance handle
- * @param servers   array of server name and port pairs
+ * @param identity  network identity to advertise (cannot be empty string)
  */
-void StartClient(
-    NT_Inst inst,
-    wpi::span<const std::pair<std::string_view, unsigned int>> servers);
+void StartClient3(NT_Inst inst, std::string_view identity);
 
 /**
- * Starts a client using commonly known robot addresses for the specified
- * team.
+ * Starts a NT4 client.  Use SetServer or SetServerTeam to set the server name
+ * and port.
  *
- * @param inst        instance handle
- * @param team        team number
- * @param port        port to communicate over
+ * @param inst      instance handle
+ * @param identity  network identity to advertise (cannot be empty string)
  */
-void StartClientTeam(NT_Inst inst, unsigned int team, unsigned int port);
+void StartClient4(NT_Inst inst, std::string_view identity);
 
 /**
  * Stops the client if it is running.
@@ -1091,7 +1016,7 @@ void SetServer(NT_Inst inst, const char* server_name, unsigned int port);
  */
 void SetServer(
     NT_Inst inst,
-    wpi::span<const std::pair<std::string_view, unsigned int>> servers);
+    std::span<const std::pair<std::string_view, unsigned int>> servers);
 
 /**
  * Sets server addresses and port for client (without restarting client).
@@ -1109,7 +1034,7 @@ void SetServerTeam(NT_Inst inst, unsigned int team, unsigned int port);
  * server IP address.
  *
  * @param inst  instance handle
- * @param port server port to use in combination with IP from DS
+ * @param port  server port to use in combination with IP from DS
  */
 void StartDSClient(NT_Inst inst, unsigned int port);
 
@@ -1121,20 +1046,23 @@ void StartDSClient(NT_Inst inst, unsigned int port);
 void StopDSClient(NT_Inst inst);
 
 /**
- * Set the periodic update rate.
- * Sets how frequently updates are sent to other nodes over the network.
+ * Flush local updates.
+ *
+ * Forces an immediate flush of all local changes to the client/server.
+ * This does not flush to the network.
+ *
+ * Normally this is done on a regularly scheduled interval.
  *
  * @param inst      instance handle
- * @param interval  update interval in seconds (range 0.01 to 1.0)
  */
-void SetUpdateRate(NT_Inst inst, double interval);
+void FlushLocal(NT_Inst inst);
 
 /**
- * Flush Entries.
+ * Flush to network.
  *
  * Forces an immediate flush of all local entry changes to network.
- * Normally this is done on a regularly scheduled interval (see
- * SetUpdateRate()).
+ * Normally this is done on a regularly scheduled interval (set
+ * by update rates on individual publishers).
  *
  * Note: flushes are rate limited to avoid excessive network traffic.  If
  * the time between calls is too short, the flush will occur after the minimum
@@ -1164,76 +1092,47 @@ bool IsConnected(NT_Inst inst);
 /** @} */
 
 /**
- * @defgroup ntcore_file_func File Save/Load Functions
- * @{
- */
-
-/**
- * Save persistent values to a file.  The server automatically does this,
- * but this function provides a way to save persistent values in the same
- * format to a file on either a client or a server.
- *
- * @param inst      instance handle
- * @param filename  filename
- * @return error string, or nullptr if successful
- */
-const char* SavePersistent(NT_Inst inst, std::string_view filename);
-
-/**
- * Load persistent values from a file.  The server automatically does this
- * at startup, but this function provides a way to restore persistent values
- * in the same format from a file at any time on either a client or a server.
- *
- * @param inst      instance handle
- * @param filename  filename
- * @param warn      callback function for warnings
- * @return error string, or nullptr if successful
- */
-const char* LoadPersistent(
-    NT_Inst inst, std::string_view filename,
-    std::function<void(size_t line, const char* msg)> warn);
-
-/**
- * Save table values to a file.  The file format used is identical to
- * that used for SavePersistent.
- *
- * @param inst      instance handle
- * @param filename  filename
- * @param prefix    save only keys starting with this prefix
- * @return error string, or nullptr if successful
- */
-const char* SaveEntries(NT_Inst inst, std::string_view filename,
-                        std::string_view prefix);
-
-/**
- * Load table values from a file.  The file format used is identical to
- * that used for SavePersistent / LoadPersistent.
- *
- * @param inst      instance handle
- * @param filename  filename
- * @param prefix    load only keys starting with this prefix
- * @param warn      callback function for warnings
- * @return error string, or nullptr if successful
- */
-const char* LoadEntries(NT_Inst inst, std::string_view filename,
-                        std::string_view prefix,
-                        std::function<void(size_t line, const char* msg)> warn);
-
-/** @} */
-
-/**
  * @defgroup ntcore_utility_func Utility Functions
  * @{
  */
 
 /**
  * Returns monotonic current time in 1 us increments.
- * This is the same time base used for entry and connection timestamps.
- * This function is a compatibility wrapper around wpi::Now().
+ * This is the same time base used for value and connection timestamps.
+ * This function by default simply wraps wpi::Now(), but if SetNow() is
+ * called, this function instead returns the value passed to SetNow();
+ * this can be used to reduce overhead.
  *
  * @return Timestamp
  */
-uint64_t Now();
+int64_t Now();
+
+/**
+ * Sets the current timestamp used for timestamping values that do not
+ * provide a timestamp (e.g. a value of 0 is passed).  For consistency,
+ * it also results in Now() returning the set value.  This should generally
+ * be used only if the overhead of calling wpi::Now() is a concern.
+ * If used, it should be called periodically with the value of wpi::Now().
+ *
+ * @param timestamp timestamp (1 us increments)
+ */
+void SetNow(int64_t timestamp);
+
+/**
+ * Turns a type string into a type enum value.
+ *
+ * @param typeString type string
+ * @return Type value
+ */
+NT_Type GetTypeFromString(std::string_view typeString);
+
+/**
+ * Turns a type enum value into a type string.
+ *
+ * @param type type enum
+ * @return Type string
+ */
+std::string_view GetStringFromType(NT_Type type);
 
 /** @} */
 
@@ -1299,31 +1198,13 @@ void StopConnectionDataLog(NT_ConnectionDataLogger logger);
  * messages outside this range will be silently ignored.
  *
  * @param inst        instance handle
- * @param func        log callback function
  * @param min_level   minimum log level
  * @param max_level   maximum log level
- * @return Logger handle
+ * @param func        listener callback function
+ * @return Listener handle
  */
-NT_Logger AddLogger(NT_Inst inst,
-                    std::function<void(const LogMessage& msg)> func,
-                    unsigned int min_level, unsigned int max_level);
-
-/**
- * Create a log poller.  A poller provides a single queue of poll events.
- * The returned handle must be destroyed with DestroyLoggerPoller().
- *
- * @param inst      instance handle
- * @return poller handle
- */
-NT_LoggerPoller CreateLoggerPoller(NT_Inst inst);
-
-/**
- * Destroy a log poller.  This will abort any blocked polling call and prevent
- * additional events from being generated for this poller.
- *
- * @param poller    poller handle
- */
-void DestroyLoggerPoller(NT_LoggerPoller poller);
+NT_Listener AddLogger(NT_Inst inst, unsigned int min_level,
+                      unsigned int max_level, ListenerCallback func);
 
 /**
  * Set the log level for a log poller.  Events will only be generated for
@@ -1335,69 +1216,10 @@ void DestroyLoggerPoller(NT_LoggerPoller poller);
  * @param max_level     maximum log level
  * @return Logger handle
  */
-NT_Logger AddPolledLogger(NT_LoggerPoller poller, unsigned int min_level,
-                          unsigned int max_level);
-
-/**
- * Get the next log event.  This blocks until the next log occurs.
- *
- * @param poller    poller handle
- * @return Information on the log events.  Only returns empty if an error
- *         occurred (e.g. the instance was invalid or is shutting down).
- */
-std::vector<LogMessage> PollLogger(NT_LoggerPoller poller);
-
-/**
- * Get the next log event.  This blocks until the next log occurs or it times
- * out.
- *
- * @param poller      poller handle
- * @param timeout     timeout, in seconds
- * @param timed_out   true if the timeout period elapsed (output)
- * @return Information on the log events.  If empty is returned and timed_out
- *         is also false, an error occurred (e.g. the instance was invalid or
- *         is shutting down).
- */
-std::vector<LogMessage> PollLogger(NT_LoggerPoller poller, double timeout,
-                                   bool* timed_out);
-
-/**
- * Cancel a PollLogger call.  This wakes up a call to PollLogger for this
- * poller and causes it to immediately return an empty array.
- *
- * @param poller  poller handle
- */
-void CancelPollLogger(NT_LoggerPoller poller);
-
-/**
- * Remove a logger.
- *
- * @param logger Logger handle to remove
- */
-void RemoveLogger(NT_Logger logger);
-
-/**
- * Wait for the incoming log event queue to be empty.  This is primarily useful
- * for deterministic testing.  This blocks until either the log event
- * queue is empty (e.g. there are no more events that need to be passed along
- * to callbacks or poll queues) or the timeout expires.
- *
- * @param inst      instance handle
- * @param timeout   timeout, in seconds.  Set to 0 for non-blocking behavior,
- *                  or a negative value to block indefinitely
- * @return False if timed out, otherwise true.
- */
-bool WaitForLoggerQueue(NT_Inst inst, double timeout);
+NT_Listener AddPolledLogger(NT_ListenerPoller poller, unsigned int min_level,
+                            unsigned int max_level);
 
 /** @} */
 /** @} */
-
-inline bool RpcAnswer::PostResponse(std::string_view result) const {
-  auto ret = PostRpcResponse(entry, call, result);
-  call = 0;
-  return ret;
-}
 
 }  // namespace nt
-
-#endif  // NTCORE_NTCORE_CPP_H_

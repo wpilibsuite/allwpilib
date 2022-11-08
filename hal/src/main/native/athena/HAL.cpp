@@ -21,6 +21,7 @@
 #include <wpi/mutex.h>
 #include <wpi/timestamp.h>
 
+#include "FPGACalls.h"
 #include "HALInitializer.h"
 #include "HALInternal.h"
 #include "hal/ChipObject.h"
@@ -28,6 +29,7 @@
 #include "hal/Errors.h"
 #include "hal/Notifier.h"
 #include "hal/handles/HandlesInternal.h"
+#include "hal/roborio/InterruptManager.h"
 #include "visa/visa.h"
 
 using namespace hal;
@@ -39,6 +41,7 @@ static uint64_t dsStartTime;
 using namespace hal;
 
 namespace hal {
+void InitializeDriverStation();
 namespace init {
 void InitializeHAL() {
   InitializeCTREPCM();
@@ -392,6 +395,11 @@ HAL_Bool HAL_Initialize(int32_t timeout, int32_t mode) {
     return true;
   }
 
+  int fpgaInit = hal::init::InitializeFPGA();
+  if (fpgaInit != HAL_SUCCESS) {
+    return false;
+  }
+
   hal::init::InitializeHAL();
 
   hal::init::HAL_IsInitialized.store(true);
@@ -424,7 +432,9 @@ HAL_Bool HAL_Initialize(int32_t timeout, int32_t mode) {
     return false;
   }
 
-  HAL_InitializeDriverStation();
+  InterruptManager::Initialize(global->getSystemInterface());
+
+  hal::InitializeDriverStation();
 
   dsStartTime = HAL_GetFPGATime(&status);
   if (status != 0) {

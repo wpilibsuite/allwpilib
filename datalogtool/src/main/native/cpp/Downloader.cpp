@@ -75,6 +75,20 @@ void Downloader::DisplayRemoteDirSelector() {
     m_cv.notify_all();
   }
 
+  ImGui::SameLine();
+  if (ImGui::Button("Deselect All")) {
+    for (auto&& download : m_downloadList) {
+      download.enabled = false;
+    }
+  }
+
+  ImGui::SameLine();
+  if (ImGui::Button("Select All")) {
+    for (auto&& download : m_downloadList) {
+      download.enabled = true;
+    }
+  }
+
   // Remote directory text box
   ImGui::SetNextItemWidth(ImGui::GetFontSize() * 20);
   if (ImGui::InputText("Remote Dir", &m_remoteDir,

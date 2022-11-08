@@ -10,38 +10,32 @@
 using namespace glass;
 
 NTCommandSelectorModel::NTCommandSelectorModel(std::string_view path)
-    : NTCommandSelectorModel(nt::GetDefaultInstance(), path) {}
+    : NTCommandSelectorModel(nt::NetworkTableInstance::GetDefault(), path) {}
 
-NTCommandSelectorModel::NTCommandSelectorModel(NT_Inst instance,
+NTCommandSelectorModel::NTCommandSelectorModel(nt::NetworkTableInstance inst,
                                                std::string_view path)
-    : m_nt(instance),
-      m_running(m_nt.GetEntry(fmt::format("{}/running", path))),
-      m_name(m_nt.GetEntry(fmt::format("{}/.name", path))),
-      m_runningData(fmt::format("NTCmd:{}", path)),
-      m_nameValue(wpi::rsplit(path, '/').second) {
+    : m_inst{inst},
+      m_running{inst.GetBooleanTopic(fmt::format("{}/running", path))
+                    .GetEntry(false)},
+      m_name{inst.GetStringTopic(fmt::format("{}/.name", path)).Subscribe("")},
+      m_runningData{fmt::format("NTCmd:{}", path)},
+      m_nameValue{wpi::rsplit(path, '/').second} {
   m_runningData.SetDigital(true);
-  m_nt.AddListener(m_running);
-  m_nt.AddListener(m_name);
 }
 
 void NTCommandSelectorModel::SetRunning(bool run) {
-  nt::SetEntryValue(m_running, nt::NetworkTableValue::MakeBoolean(run));
+  m_running.Set(run);
 }
 
 void NTCommandSelectorModel::Update() {
-  for (auto&& event : m_nt.PollListener()) {
-    if (event.entry == m_running) {
-      if (event.value && event.value->IsBoolean()) {
-        m_runningData.SetValue(event.value->GetBoolean());
-      }
-    } else if (event.entry == m_name) {
-      if (event.value && event.value->IsString()) {
-        m_nameValue = event.value->GetString();
-      }
-    }
+  for (auto&& v : m_running.ReadQueue()) {
+    m_runningData.SetValue(v.value, v.time);
+  }
+  for (auto&& v : m_name.ReadQueue()) {
+    m_nameValue = std::move(v.value);
   }
 }
 
 bool NTCommandSelectorModel::Exists() {
-  return m_nt.IsConnected() && nt::GetEntryType(m_running) != NT_UNASSIGNED;
+  return m_inst.IsConnected() && m_running.Exists();
 }

@@ -1,6 +1,291 @@
+import groovy.json.JsonSlurper;
+import com.hubspot.jinjava.Jinjava;
+import com.hubspot.jinjava.JinjavaConfig;
+
+def ntcoreTypesInputFile = file("src/generate/types.json")
+def ntcoreJavaTypesInputDir = file("src/generate/java")
+def ntcoreJavaTypesOutputDir = file("$buildDir/generated/main/java/edu/wpi/first/networktables")
+
+task ntcoreGenerateJavaTypes() {
+    description = "Generates ntcore Java type classes"
+    group = "WPILib"
+
+    inputs.file ntcoreTypesInputFile
+    inputs.dir ntcoreJavaTypesInputDir
+    outputs.dir ntcoreJavaTypesOutputDir
+
+    doLast {
+        def jsonSlurper = new JsonSlurper()
+        def jsonTypes = jsonSlurper.parse(ntcoreTypesInputFile)
+
+        ntcoreJavaTypesOutputDir.deleteDir()
+        ntcoreJavaTypesOutputDir.mkdirs()
+
+        def config = new JinjavaConfig()
+        def jinjava = new Jinjava(config)
+
+        ntcoreJavaTypesInputDir.listFiles().each { File file ->
+            def template = file.text
+            def outfn = file.name.substring(0, file.name.length() - 6)
+            if (file.name.startsWith("NetworkTable") || file.name.startsWith("Generic")) {
+                def replacements = new HashMap<String,?>()
+                replacements.put("types", jsonTypes)
+                def output = jinjava.render(template, replacements)
+                new File(ntcoreJavaTypesOutputDir, outfn).write(output)
+            } else {
+                jsonTypes.each { Map<String,?> replacements ->
+                    def output = jinjava.render(template, replacements)
+                    def typename = replacements.get("TypeName")
+                    File outfile
+                    if (outfn == "Timestamped.java") {
+                        outfile = new File(ntcoreJavaTypesOutputDir, "Timestamped${typename}.java")
+                    } else {
+                        outfile = new File(ntcoreJavaTypesOutputDir, "${typename}${outfn}")
+                    }
+                    outfile.write(output)
+                }
+            }
+        }
+    }
+}
+
+def ntcoreCppTypesInputDir = file("src/generate/include/networktables")
+def ntcoreCppTypesOutputDir = file("$buildDir/generated/main/native/include/networktables")
+
+task ntcoreGenerateCppTypes() {
+    description = "Generates ntcore C++ type classes"
+    group = "WPILib"
+
+    inputs.file ntcoreTypesInputFile
+    inputs.dir ntcoreCppTypesInputDir
+    outputs.dir ntcoreCppTypesOutputDir
+
+    doLast {
+        def jsonSlurper = new JsonSlurper()
+        def jsonTypes = jsonSlurper.parse(ntcoreTypesInputFile)
+
+        ntcoreCppTypesOutputDir.deleteDir()
+        ntcoreCppTypesOutputDir.mkdirs()
+
+        def config = new JinjavaConfig()
+        def jinjava = new Jinjava(config)
+
+        ntcoreCppTypesInputDir.listFiles().each { File file ->
+            def template = file.text
+            def outfn = file.name.substring(0, file.name.length() - 6)
+            jsonTypes.each { Map<String,?> replacements ->
+                def output = jinjava.render(template, replacements)
+                def typename = replacements.get("TypeName")
+                def outfile = new File(ntcoreCppTypesOutputDir, "${typename}${outfn}")
+                outfile.write(output)
+            }
+        }
+    }
+}
+
+def ntcoreCppHandleSourceInputFile = file("src/generate/cpp/ntcore_cpp_types.cpp.jinja")
+def ntcoreCppHandleSourceOutputFile = file("$buildDir/generated/main/native/cpp/ntcore_cpp_types.cpp")
+
+task ntcoreGenerateCppHandleSource() {
+    description = "Generates ntcore C++ handle source"
+    group = "WPILib"
+
+    inputs.files([
+        ntcoreTypesInputFile,
+        ntcoreCppHandleSourceInputFile
+    ])
+    outputs.file ntcoreCppHandleSourceOutputFile
+
+    doLast {
+        def jsonSlurper = new JsonSlurper()
+        def jsonTypes = jsonSlurper.parse(ntcoreTypesInputFile)
+
+        ntcoreCppHandleSourceOutputFile.delete()
+
+        def config = new JinjavaConfig()
+        def jinjava = new Jinjava(config)
+
+        def template = ntcoreCppHandleSourceInputFile.text
+        def replacements = new HashMap<String,?>()
+        replacements.put("types", jsonTypes)
+        def output = jinjava.render(template, replacements)
+        ntcoreCppHandleSourceOutputFile.write(output)
+    }
+}
+
+def ntcoreCppHandleHeaderInputFile = file("src/generate/include/ntcore_cpp_types.h.jinja")
+def ntcoreCppHandleHeaderOutputFile = file("$buildDir/generated/main/native/include/ntcore_cpp_types.h")
+
+task ntcoreGenerateCppHandleHeader() {
+    description = "Generates ntcore C++ handle header"
+    group = "WPILib"
+
+    inputs.files([
+        ntcoreTypesInputFile,
+        ntcoreCppHandleHeaderInputFile
+    ])
+    outputs.file ntcoreCppHandleHeaderOutputFile
+
+    doLast {
+        def jsonSlurper = new JsonSlurper()
+        def jsonTypes = jsonSlurper.parse(ntcoreTypesInputFile)
+
+        ntcoreCppHandleHeaderOutputFile.delete()
+
+        def config = new JinjavaConfig()
+        def jinjava = new Jinjava(config)
+
+        def template = ntcoreCppHandleHeaderInputFile.text
+        def replacements = new HashMap<String,?>()
+        replacements.put("types", jsonTypes)
+        def output = jinjava.render(template, replacements)
+        ntcoreCppHandleHeaderOutputFile.write(output)
+    }
+}
+
+def ntcoreCHandleSourceInputFile = file("src/generate/cpp/ntcore_c_types.cpp.jinja")
+def ntcoreCHandleSourceOutputFile = file("$buildDir/generated/main/native/cpp/ntcore_c_types.cpp")
+
+task ntcoreGenerateCHandleSource() {
+    description = "Generates ntcore C handle source"
+    group = "WPILib"
+
+    inputs.files([
+        ntcoreTypesInputFile,
+        ntcoreCHandleSourceInputFile
+    ])
+    outputs.file ntcoreCHandleSourceOutputFile
+
+    doLast {
+        def jsonSlurper = new JsonSlurper()
+        def jsonTypes = jsonSlurper.parse(ntcoreTypesInputFile)
+
+        ntcoreCHandleSourceOutputFile.delete()
+
+        def config = new JinjavaConfig()
+        def jinjava = new Jinjava(config)
+
+        def template = ntcoreCHandleSourceInputFile.text
+        def replacements = new HashMap<String,?>()
+        replacements.put("types", jsonTypes)
+        def output = jinjava.render(template, replacements)
+        ntcoreCHandleSourceOutputFile.write(output)
+    }
+}
+
+def ntcoreCHandleHeaderInputFile = file("src/generate/include/ntcore_c_types.h.jinja")
+def ntcoreCHandleHeaderOutputFile = file("$buildDir/generated/main/native/include/ntcore_c_types.h")
+
+task ntcoreGenerateCHandleHeader() {
+    description = "Generates ntcore C handle header"
+    group = "WPILib"
+
+    inputs.files([
+        ntcoreTypesInputFile,
+        ntcoreCHandleHeaderInputFile
+    ])
+    outputs.file ntcoreCHandleHeaderOutputFile
+
+    doLast {
+        def jsonSlurper = new JsonSlurper()
+        def jsonTypes = jsonSlurper.parse(ntcoreTypesInputFile)
+
+        ntcoreCHandleHeaderOutputFile.delete()
+
+        def config = new JinjavaConfig()
+        def jinjava = new Jinjava(config)
+
+        def template = ntcoreCHandleHeaderInputFile.text
+        def replacements = new HashMap<String,?>()
+        replacements.put("types", jsonTypes)
+        def output = jinjava.render(template, replacements)
+        ntcoreCHandleHeaderOutputFile.write(output)
+    }
+}
+
+def ntcoreJniSourceInputFile = file("src/generate/cpp/jni/types_jni.cpp.jinja")
+def ntcoreJniSourceOutputFile = file("$buildDir/generated/main/native/cpp/jni/types_jni.cpp")
+
+task ntcoreGenerateJniSource() {
+    description = "Generates ntcore JNI types source"
+    group = "WPILib"
+
+    inputs.files([
+        ntcoreTypesInputFile,
+        ntcoreJniSourceInputFile
+    ])
+    outputs.file ntcoreJniSourceOutputFile
+
+    doLast {
+        def jsonSlurper = new JsonSlurper()
+        def jsonTypes = jsonSlurper.parse(ntcoreTypesInputFile)
+
+        ntcoreJniSourceOutputFile.delete()
+
+        def config = new JinjavaConfig()
+        def jinjava = new Jinjava(config)
+
+        def template = ntcoreJniSourceInputFile.text
+        def replacements = new HashMap<String,?>()
+        replacements.put("types", jsonTypes)
+        def output = jinjava.render(template, replacements)
+        ntcoreJniSourceOutputFile.write(output)
+    }
+}
+
 ext {
+    addNtcoreDependency = { binary, shared->
+        binary.tasks.withType(AbstractNativeSourceCompileTask) {
+            it.dependsOn ntcoreGenerateCppTypes
+            it.dependsOn ntcoreGenerateCppHandleHeader
+            it.dependsOn ntcoreGenerateCHandleHeader
+        }
+        binary.lib project: ':ntcore', library: 'ntcore', linkage: shared
+    }
+
+    addNtcoreJniDependency = { binary->
+        binary.tasks.withType(AbstractNativeSourceCompileTask) {
+            it.dependsOn ntcoreGenerateCppTypes
+            it.dependsOn ntcoreGenerateCppHandleHeader
+            it.dependsOn ntcoreGenerateCHandleHeader
+        }
+        binary.lib project: ':ntcore', library: 'ntcoreJNIShared', linkage: 'shared'
+    }
+
     nativeName = 'ntcore'
     devMain = 'edu.wpi.first.ntcore.DevMain'
+    generatedSources = "$buildDir/generated/main/native/cpp"
+    generatedHeaders = "$buildDir/generated/main/native/include"
+    jniSplitSetup = {
+        it.tasks.withType(CppCompile) {
+            it.dependsOn ntcoreGenerateCppTypes
+            it.dependsOn ntcoreGenerateCppHandleSource
+            it.dependsOn ntcoreGenerateCppHandleHeader
+            it.dependsOn ntcoreGenerateCHandleSource
+            it.dependsOn ntcoreGenerateCHandleHeader
+            it.dependsOn ntcoreGenerateJniSource
+        }
+    }
+    splitSetup = {
+        it.tasks.withType(CppCompile) {
+            it.dependsOn ntcoreGenerateCppTypes
+            it.dependsOn ntcoreGenerateCppHandleSource
+            it.dependsOn ntcoreGenerateCppHandleHeader
+            it.dependsOn ntcoreGenerateCHandleSource
+            it.dependsOn ntcoreGenerateCHandleHeader
+            it.dependsOn ntcoreGenerateJniSource
+            it.includes 'src/main/native/cpp'
+        }
+    }
+    exeSplitSetup = {
+        it.tasks.withType(CppCompile) {
+            it.dependsOn ntcoreGenerateCppTypes
+            it.dependsOn ntcoreGenerateCppHandleSource
+            it.dependsOn ntcoreGenerateCppHandleHeader
+            it.dependsOn ntcoreGenerateCHandleSource
+            it.dependsOn ntcoreGenerateCHandleHeader
+        }
+    }
 }
 
 apply from: "${rootDir}/shared/jni/setupBuild.gradle"
@@ -15,6 +300,18 @@ model {
             lib project: ':wpinet', library: 'wpinet', linkage: 'shared'
             lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
         }
+    }
+}
+
+sourceSets.main.java.srcDir "${buildDir}/generated/main/java"
+compileJava.dependsOn ntcoreGenerateJavaTypes
+
+cppHeadersZip {
+    dependsOn ntcoreGenerateCppTypes
+    dependsOn ntcoreGenerateCppHandleHeader
+    dependsOn ntcoreGenerateCHandleHeader
+    from(generatedHeaders) {
+        into '/'
     }
 }
 
