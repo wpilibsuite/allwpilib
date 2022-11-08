@@ -12,6 +12,7 @@
 #include <vector>
 
 #include "frc2/command/CommandPtr.h"
+#include "frc2/command/SelectCommand.h"
 
 namespace frc2 {
 class Subsystem;
@@ -158,7 +159,11 @@ namespace cmd {
 template <typename Key>
 [[nodiscard]] CommandPtr Select(
     std::function<Key()> selector,
-    std::vector<std::pair<Key, CommandPtr>> commands);
+    std::vector<std::pair<Key, CommandPtr>> commands) {
+  return SelectCommand(std::move(selector),
+                       CommandPtr::UnwrapVector(std::move(commands)))
+      .ToPtr();
+}
 
 // Command Groups
 

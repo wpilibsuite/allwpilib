@@ -15,7 +15,7 @@ if (WITH_JAVA)
 endif()
 
 
-GENERATE_RESOURCES(src/main/native/resources/edu/wpi/first/apriltags generated/main/cpp APRILTAG frc apriltags_resources_src)
+GENERATE_RESOURCES(src/main/native/resources/edu/wpi/first/apriltag generated/main/cpp APRILTAG frc apriltags_resources_src)
 
 file(GLOB_RECURSE apriltags_native_src src/main/native/cpp/*.cpp)
 
