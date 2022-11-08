@@ -192,13 +192,13 @@ public class AprilTagFieldLayout {
     public double fieldWidth;
 
     @SuppressWarnings("MemberName")
-    @JsonProperty(value = "height")
+    @JsonProperty(value = "length")
     public double fieldLength;
 
     @JsonCreator()
     FieldDimensions(
         @JsonProperty(required = true, value = "width") double fieldWidth,
-        @JsonProperty(required = true, value = "height") double fieldLength) {
+        @JsonProperty(required = true, value = "length") double fieldLength) {
       this.fieldWidth = fieldWidth;
       this.fieldLength = fieldLength;
     }

@@ -90,7 +90,7 @@ void frc::to_json(wpi::json& json, const AprilTagFieldLayout& layout) {
   }
 
   json = wpi::json{{"field",
-                    {{"height", layout.m_fieldLength.value()},
+                    {{"length", layout.m_fieldLength.value()},
                      {"width", layout.m_fieldWidth.value()}}},
                    {"tags", tagVector}};
 }
@@ -102,7 +102,7 @@ void frc::from_json(const wpi::json& json, AprilTagFieldLayout& layout) {
   }
 
   layout.m_fieldLength =
-      units::meter_t{json.at("field").at("height").get<double>()};
+      units::meter_t{json.at("field").at("length").get<double>()};
   layout.m_fieldWidth =
       units::meter_t{json.at("field").at("width").get<double>()};
 }
