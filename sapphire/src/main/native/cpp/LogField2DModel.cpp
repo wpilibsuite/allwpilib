@@ -22,7 +22,7 @@ void LogField2DModel::ObjectModel::UpdatePoses(const wpi::log::DataLogRecord& va
             frc::Rotation2d{units::degree_t{arr[i * 3 + 2]}}};
     }
 }
-void LogField2DModel::ObjectModel::SetPoses(wpi::span<const frc::Pose2d> poses) {
+void LogField2DModel::ObjectModel::SetPoses(std::span<const frc::Pose2d> poses) {
   m_poses.assign(poses.begin(), poses.end());
 }
 

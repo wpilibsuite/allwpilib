@@ -4,6 +4,8 @@
 #include <utility>
 #include <vector>
 
+#include <span>
+
 #include "glass/other/Field2D.h"
 #include "DataLog.h"
 
@@ -21,7 +23,7 @@ class LogField2DModel : public glass::Field2DModel {
    public:
     ObjectModel(std::string_view name, EntryData * entry, float& now)
         : m_name{name}, m_entry{entry}, m_now{now} {}
-
+    ~ObjectModel() override = default;
     const char* GetName() const override { return m_name.c_str(); }
     EntryData * GetEntry() const { return m_entry; }
 
@@ -36,8 +38,8 @@ class LogField2DModel : public glass::Field2DModel {
     bool Exists() override { return true; }
     bool IsReadOnly() override { return false; }
 
-    wpi::span<const frc::Pose2d> GetPoses() override { return m_poses; }
-    void SetPoses(wpi::span<const frc::Pose2d> poses) override;
+    std::span<const frc::Pose2d> GetPoses() override { return m_poses; }
+    void SetPoses(std::span<const frc::Pose2d> poses) override;
     void SetPose(size_t i, frc::Pose2d pose) override;
     void SetPosition(size_t i, frc::Translation2d pos) override;
     void SetRotation(size_t i, frc::Rotation2d rot) override;
