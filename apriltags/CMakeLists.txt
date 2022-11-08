@@ -11,7 +11,7 @@ if (WITH_JAVA)
 
      file(GLOB_RECURSE JAVA_SOURCES src/main/java/*.java)
      file(GLOB_RECURSE JAVA_RESOURCES src/main/native/resources/*.json)
-     add_jar(apriltags_jar SOURCES ${JAVA_SOURCES} RESOURCES NAMESPACE "edu/wpi/first/apriltags" ${JAVA_RESOURCES} OUTPUT_NAME apriltags)
+     add_jar(apriltags_jar SOURCES ${JAVA_SOURCES} RESOURCES NAMESPACE "edu/wpi/first/apriltag" ${JAVA_RESOURCES} OUTPUT_NAME apriltag)
 endif()
 
 
