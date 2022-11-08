@@ -30,7 +30,7 @@ import java.util.Optional;
  * <p>The JSON format contains two top-level objects, "tags" and "field". The "tags" object is a
  * list of all AprilTags contained within a layout. Each AprilTag serializes to a JSON object
  * containing an ID and a Pose3d. The "field" object is a descriptor of the size of the field in
- * meters with "width" and "height" values. This is to account for arbitrary field sizes when
+ * meters with "width" and "length" values. This is to account for arbitrary field sizes when
  * mirroring the poses.
  *
  * <p>Pose3ds are assumed to be measured from the bottom-left corner of the field, when the blue
