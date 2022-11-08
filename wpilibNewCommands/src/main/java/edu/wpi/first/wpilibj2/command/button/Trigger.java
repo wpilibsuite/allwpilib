@@ -143,7 +143,7 @@ public class Trigger implements BooleanSupplier {
   }
 
   /**
-   * Toggles a command when the signal rises from the low state to the high state.
+   * Toggles a command when the signal falls from the high state to the low state.
    *
    * @param command the command to toggle
    * @return this trigger, so calls can be chained
