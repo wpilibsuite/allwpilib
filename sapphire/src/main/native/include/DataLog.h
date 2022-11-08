@@ -18,7 +18,8 @@
 #include "glass/View.h"
 namespace sapphire{
 
-
+// Contains records of a single datalog entry
+// Analogous to DataSource
 struct EntryData {
   EntryData() {}
   EntryData(wpi::log::StartRecordData start) : entry{start.entry}, 
@@ -43,10 +44,12 @@ struct EntryData {
 
 std::string GetFormattedEntryValue(EntryData& data, int timestamp, wpi::log::DataLogRecord record);
 
+// Contains information about the structure of the datalog
 struct EntryNode {
   explicit EntryNode(std::string_view name): name{name} {}
   std::shared_ptr<EntryData> GetEntry(std::vector<std::string> path);
 
+  std::shared_ptr<EntryNode> GetEntryNode(std::vector<std::string> path);
   void AddEntry(EntryData *entry,std::vector<std::string> path);
 
   std::string name;
@@ -61,6 +64,8 @@ struct DataLogFlags{
   bool IsLogActive = true;
 };
 
+// Model of the datalog. Used for the table view, as well as the object
+// Used by other classes to parse datalogs
 class DataLogModel : private glass::Model {
   public:
     DataLogModel():reader{nullptr}{};
@@ -70,6 +75,7 @@ class DataLogModel : private glass::Model {
     void Update() override { }
     bool Exists() override { return m_hasLog && flags.IsLogActive; }
     int  GetSize() const {return m_entries.size(); }
+    std::shared_ptr<EntryNode> GetEntryNode(std::string path);
     void AddEntryNode(EntryData* data, std::string path);
     const std::vector<EntryNode>& GetTreeRoot(){return m_tree;}
 

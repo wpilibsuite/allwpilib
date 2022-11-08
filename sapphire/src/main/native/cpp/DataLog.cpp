@@ -46,6 +46,7 @@ wpi::log::DataLogRecord EntryData::GetNextRecord(int timestamp){
   return record;
 }
 
+
 std::map<int, wpi::log::DataLogRecord>::iterator EntryData::GetIterator(int timestamp){
   auto it = datapoints.begin();
   auto best_it = it;
@@ -134,7 +135,38 @@ EntryNode* find(std::vector<EntryNode>& list, std::string name){
   }
   return nullptr;
 }
+std::shared_ptr<EntryNode> EntryNode::GetEntryNode(std::vector<std::string> path){
+  if(path.size() == 0){
+    return std::shared_ptr<EntryNode>(this);
+  }
+  auto nextNode = find(children, path[0]);
+  if(nextNode == nullptr){
+    return nullptr;
+  }
+  return nextNode->GetEntryNode(std::vector<std::string>(path.begin()+1, path.end()));
+}
 
+
+std::shared_ptr<EntryNode> DataLogModel::GetEntryNode(std::string path){
+  std::vector<std::string> pathVec;
+  int last = 0;
+  for(size_t i = 0; i < path.length(); i++){
+    if(path[i] == '/'){
+      pathVec.emplace_back(path.substr(last, i-last));
+      last = i;
+    }
+  }
+  pathVec.emplace_back(path.substr(last, path.length()-last));
+  
+  if(pathVec.size() > 0){
+    auto nextNode = find(m_tree, pathVec[0]);
+    if(nextNode == nullptr){
+      return nullptr;
+    }
+    return nextNode->GetEntryNode(std::vector<std::string>(pathVec.begin()+1, pathVec.end()));
+  }
+  return nullptr;
+}
 
 void DataLogModel::AddEntryNode(EntryData* data, std::string path){
   std::vector<std::string> pathVec;
