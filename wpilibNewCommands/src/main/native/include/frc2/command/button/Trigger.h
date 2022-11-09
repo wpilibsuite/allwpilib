@@ -22,46 +22,47 @@
 namespace frc2 {
 class Command;
 /**
- * This class is a command-based wrapper around {@link frc::BooleanEvent},
- * providing an easy way to link commands to inputs.
+ * This class provides an easy way to link commands to conditions.
  *
- * This class is provided by the NewCommands VendorDep
+ * <p>It is very easy to link a button to a command. For instance, you could link the trigger button
+ * of a joystick to a "score" command.
+ * 
+ * <p>Triggers can easily be composed for advanced functionality using the &&, ||, and !
+ * operators.
  *
- * @see Button
+ * <p>This class is provided by the NewCommands VendorDep
  */
 class Trigger {
  public:
   /**
-   * Creates a new trigger with the given condition determining whether it is
-   * active.
+   * Creates a new trigger based on the given condition.
    *
    * <p>Polled by the default scheduler button loop.
    *
-   * @param isActive returns whether or not the trigger should be active
+   * @param condition the condition represented by this trigger
    */
-  explicit Trigger(std::function<bool()> isActive)
+  explicit Trigger(std::function<bool()> condition)
       : m_event{CommandScheduler::GetInstance().GetDefaultButtonLoop(),
-                std::move(isActive)} {}
+                std::move(condition)} {}
 
   /**
-   * Create a new trigger that is active when the given condition is true.
+   * Creates a new trigger based on the given condition.   
    *
    * @param loop The loop instance that polls this trigger.
-   * @param isActive Whether the trigger is active.
+   * @param condition the condition represented by this trigger
    */
-  Trigger(frc::EventLoop* loop, std::function<bool()> isActive)
-      : m_event{loop, std::move(isActive)} {}
+  Trigger(frc::EventLoop* loop, std::function<bool()> condition)
+      : m_event{loop, std::move(condition)} {}
 
   /**
-   * Create a new trigger that is never active (default constructor) - activity
-   *  can be further determined by subclass code.
+   * Create a new trigger that is always `false`.
    */
   Trigger() : Trigger([] { return false; }) {}
 
   Trigger(const Trigger& other);
 
   /**
-   * Starts the given command whenever the signal rises from `false` to `true`.
+   * Starts the given command whenever the condition changes from `false` to `true`.
    *
    * <p>Takes a raw pointer, and so is non-owning; users are responsible for the
    * lifespan of the command.
@@ -73,7 +74,7 @@ class Trigger {
   Trigger OnTrue(Command* command);
 
   /**
-   * Starts the given command whenever the signal rises from `false` to `true`.
+   * Starts the given command whenever the condition changes from `false` to `true`.
    * Moves command ownership to the button scheduler.
    *
    * @param command The command to bind.
@@ -82,7 +83,7 @@ class Trigger {
   Trigger OnTrue(CommandPtr&& command);
 
   /**
-   * Starts the given command whenever the signal falls from `true` to `false`.
+   * Starts the given command whenever the condition changes from `true` to `false`.
    *
    * <p>Takes a raw pointer, and so is non-owning; users are responsible for the
    * lifespan of the command.
@@ -94,7 +95,7 @@ class Trigger {
   Trigger OnFalse(Command* command);
 
   /**
-   * Starts the given command whenever the signal falls from `true` to `false`.
+   * Starts the given command whenever the condition changes from `true` to `false`.
    *
    * @param command The command to bind.
    * @return The trigger, for chained calls.
@@ -102,10 +103,10 @@ class Trigger {
   Trigger OnFalse(CommandPtr&& command);
 
   /**
-   * Starts the given command when the signal rises to `true` and cancels it
-   * when the signal falls to `false`.
+   * Starts the given command when the condition changes to `true` and cancels it
+   * when the condition changes to `false`.
    *
-   * <p>Doesn't re-start the command in-between.
+   * <p>Doesn't re-start the command in-between. If the command should restart, see RepeatCommand.
    *
    * <p>Takes a raw pointer, and so is non-owning; users are responsible for the
    * lifespan of the command.
@@ -116,20 +117,22 @@ class Trigger {
   Trigger WhileTrue(Command* command);
 
   /**
-   * Starts the given command when the signal rises to `true` and cancels it
-   * when the signal falls to `false`. Moves command ownership to the button
+   * Starts the given command when the condition changes to `true` and cancels it
+   * when the condition changes to `false`. Moves command ownership to the button
    * scheduler.
    *
+   * <p>Doesn't re-start the command in-between. If the command should restart, see RepeatCommand.
+   * 
    * @param command The command to bind.
    * @return The trigger, for chained calls.
    */
   Trigger WhileTrue(CommandPtr&& command);
 
   /**
-   * Starts the given command when the signal falls to `false` and cancels
-   * it when the signal rises.
+   * Starts the given command when the condition changes to `false` and cancels
+   * it when the condition changes to `true`.
    *
-   * <p>Doesn't re-start the command in-between.
+   * <p>Doesn't re-start the command in-between. If the command should restart, see RepeatCommand.
    *
    * <p>Takes a raw pointer, and so is non-owning; users are responsible for the
    * lifespan of the command.
@@ -140,9 +143,11 @@ class Trigger {
   Trigger WhileFalse(Command* command);
 
   /**
-   * Starts the given command when the signal falls to `false` and cancels
-   * it when the signal rises. Moves command ownership to the button
+   * Starts the given command when the condition changes to `false` and cancels
+   * it when the condition changes to `true`. Moves command ownership to the button
    * scheduler.
+   * 
+   * <p>Doesn't re-start the command in-between. If the command should restart, see RepeatCommand.
    *
    * @param command The command to bind.
    * @return The trigger, for chained calls.
@@ -150,8 +155,7 @@ class Trigger {
   Trigger WhileFalse(CommandPtr&& command);
 
   /**
-   * Toggles a command when the signal rises from `false` to the high
-   * state.
+   * Toggles a command when the condition changes from `false` to `true`.
    *
    * <p>Takes a raw pointer, and so is non-owning; users are responsible for the
    * lifespan of the command.
@@ -162,8 +166,7 @@ class Trigger {
   Trigger ToggleOnTrue(Command* command);
 
   /**
-   * Toggles a command when the signal rises from `false` to the high
-   * state.
+   * Toggles a command when the condition changes from `false` to `true`.
    *
    * <p>Takes a raw pointer, and so is non-owning; users are responsible for the
    * lifespan of the command.
@@ -174,7 +177,7 @@ class Trigger {
   Trigger ToggleOnTrue(CommandPtr&& command);
 
   /**
-   * Toggles a command when the signal falls from `true` to the low
+   * Toggles a command when the condition changes from `true` to the low
    * state.
    *
    * <p>Takes a raw pointer, and so is non-owning; users are responsible for the
@@ -186,7 +189,7 @@ class Trigger {
   Trigger ToggleOnFalse(Command* command);
 
   /**
-   * Toggles a command when the signal falls from `true` to the low
+   * Toggles a command when the condition changes from `true` to the low
    * state.
    *
    * <p>Takes a raw pointer, and so is non-owning; users are responsible for the
