@@ -30,10 +30,10 @@ TEST(DifferentialDriveFeedforwardTest, Calculate) {
           kVAngular,
           kAAngular,
           trackwidth);
-  for (units::meters_per_second_t cLVelocity = -4_mps; cLVelocity <= 4_mps; cLVelocity += 2_mps) {
-    for (units::meters_per_second_t cRVelocity = -4_mps; cRVelocity <= 4_mps; cRVelocity += 2_mps) {
-      for (units::meters_per_second_t nLVelocity = -4_mps; nLVelocity <= 4_mps; nLVelocity += 2_mps) {
-        for (units::meters_per_second_t nRVelocity = -4_mps; nRVelocity <= 4_mps; nRVelocity += 2_mps) {
+  for (auto cLVelocity = -4_mps; cLVelocity <= 4_mps; cLVelocity += 2_mps) {
+    for (auto cRVelocity = -4_mps; cRVelocity <= 4_mps; cRVelocity += 2_mps) {
+      for (auto nLVelocity = -4_mps; nLVelocity <= 4_mps; nLVelocity += 2_mps) {
+        for (auto nRVelocity = -4_mps; nRVelocity <= 4_mps; nRVelocity += 2_mps) {
           frc::DifferentialDriveWheelVoltages u =
               differentialDriveFeedforward.Calculate(
                   cLVelocity, nLVelocity, cRVelocity, nRVelocity, dt);
