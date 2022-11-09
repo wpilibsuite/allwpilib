@@ -5,6 +5,8 @@
 #pragma once
 
 #include <wpi/MathExtras.h>
+#include <wpi/SymbolExports.h>
+
 
 #include "frc/EigenCore.h"
 #include "frc/controller/DifferentialDriveWheelVoltages.h"
@@ -18,12 +20,13 @@ namespace frc {
  * A helper class which computes the feedforward outputs for a differential
  * drive drivetrain.
  */
-class DifferentialDriveFeedforward {
+class WPILIB_DLLEXPORT DifferentialDriveFeedforward {
   frc::LinearSystem<2, 2, 2> m_plant;
 
  public:
   /**
    * Creates a new DifferentialDriveFeedforward with the specified parameters.
+   *
    * @param kVLinear The linear velocity gain in volts per (meters per second).
    * @param kALinear The linear acceleration gain in volts per (meters per
    * second squared).
@@ -34,18 +37,19 @@ class DifferentialDriveFeedforward {
    * @param trackwidth The distance between the differential drive's left and
    * right wheels, in meters.
    */
-  DifferentialDriveFeedforward(double kVLinear, double kALinear,
-                               double kVAngular, double kAAngular,
-                               double trackwidth)
+  DifferentialDriveFeedforward(units::volt_t kVLinear, units::volt_t kALinear,
+                               units::volt_t kVAngular, units::volt_t kAAngular,
+                               units::meter_t trackwidth)
       : m_plant{frc::LinearSystemId::IdentifyDrivetrainSystem(
-            units::volt_t{kVLinear} / 1_mps, units::volt_t{kALinear} / 1_mps_sq,
-            units::volt_t{kVAngular} / 1_rad_per_s,
-            units::volt_t{kAAngular} / 1_rad_per_s_sq,
-            units::meter_t{trackwidth})} {}
+            kVLinear / 1_mps, kALinear / 1_mps_sq,
+            kVAngular / 1_rad_per_s,
+            kAAngular / 1_rad_per_s_sq,
+            trackwidth)} {}
 
   /**
    * Calculates the differential drive feedforward inputs given velocity
    * setpoints.
+   *
    * @param currentLVelocity The current left velocity of the differential drive
    * in meters/second.
    * @param nextLVelocity The next left velocity of the differential drive in
@@ -56,10 +60,10 @@ class DifferentialDriveFeedforward {
    * meters/second.
    * @param dtSeconds Discretization timestep.
    */
-  DifferentialDriveWheelVoltages calculate(double currentLVelocity,
+  DifferentialDriveWheelVoltages Calculate(double currentLVelocity,
                                            double nextLVelocity,
                                            double currentRVelocity,
                                            double nextRVelocity,
-                                           double dtSeconds);
+                                           units::second_t dtSeconds);
 };
 }  // namespace frc

@@ -5,13 +5,13 @@
 #include "frc/controller/DifferentialDriveFeedforward.h"
 
 frc::DifferentialDriveWheelVoltages
-frc::DifferentialDriveFeedforward::calculate(double currentLVelocity,
+frc::DifferentialDriveFeedforward::Calculate(double currentLVelocity,
                                              double nextLVelocity,
                                              double currentRVelocity,
                                              double nextRVelocity,
-                                             double dtSeconds) {
+                                             units::second_t dtSeconds) {
   frc::LinearPlantInversionFeedforward<2, 2> feedforward{
-      frc::DifferentialDriveFeedforward::m_plant, units::second_t{dtSeconds}};
+      frc::DifferentialDriveFeedforward::m_plant, dtSeconds};
 
   frc::Vectord<2> r{currentLVelocity, currentRVelocity};
   frc::Vectord<2> nextR{nextLVelocity, nextRVelocity};
