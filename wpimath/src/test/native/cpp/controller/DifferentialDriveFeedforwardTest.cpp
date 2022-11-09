@@ -15,12 +15,12 @@
 #include "units/time.h"
 
 TEST(DifferentialDriveFeedforwardTest, Calculate) {
-    units::volt_t kVLinear = units::volt_t{1.0};
-    units::volt_t kALinear = units::volt_t{1.0};
-    units::volt_t kVAngular = units::volt_t{1.0};
-    units::volt_t kAAngular = units::volt_t{1.0};
-    units::meter_t trackwidth = units::meter_t{1.0};
-    units::second_t dtSeconds = units::second_t{0.02};
+    auto kVLinear = 1_V / 1_mps;
+    auto kALinear = 1_v / 1_mps_sq;
+    auto kVAngular = 1_V / 1_rad_per_s;
+    auto kAAngular = 1_V / 1_rad_per_s_sq;
+    auto trackwidth = 1_m;
+    auto dt = 20_ms;
 
   frc::DifferentialDriveFeedforward differentialDriveFeedforward{
       kVLinear, kALinear, kVAngular, kAAngular, trackwidth};
