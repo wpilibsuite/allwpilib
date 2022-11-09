@@ -26,9 +26,9 @@ TEST(DifferentialDriveFeedforwardTest, Calculate) {
       kVLinear, kALinear, kVAngular, kAAngular, trackwidth};
   frc::LinearSystem<2, 2, 2> plant =
       frc::LinearSystemId::IdentifyDrivetrainSystem(
-          kVLinear / 1_mps, kALinear / 1_mps_sq,
-          kVAngular / 1_rad_per_s,
-          kAAngular / 1_rad_per_s_sq,
+          kVLinear, kALinear,
+          kVAngular,
+          kAAngular,
           trackwidth);
   for (int cLVelocity = -4; cLVelocity <= 4; cLVelocity += 2) {
     for (int cRVelocity = -4; cRVelocity <= 4; cRVelocity += 2) {
