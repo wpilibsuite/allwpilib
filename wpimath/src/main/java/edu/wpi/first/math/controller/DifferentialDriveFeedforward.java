@@ -35,8 +35,8 @@ public class DifferentialDriveFeedforward {
    *
    * @param kVLinear The linear velocity gain in volts per (meters per second).
    * @param kALinear The linear acceleration gain in volts per (meters per second squared).
-   * @param kVAngular The angular velocity gain in volts per (radians per second).
-   * @param kAAngular The angular acceleration gain in volts per (radians per second squared).
+   * @param kVAngular The angular velocity gain in volts per (meters per second).
+   * @param kAAngular The angular acceleration gain in volts per (meters per second squared).
    */
   public DifferentialDriveFeedforward(
       double kVLinear, double kALinear, double kVAngular, double kAAngular) {

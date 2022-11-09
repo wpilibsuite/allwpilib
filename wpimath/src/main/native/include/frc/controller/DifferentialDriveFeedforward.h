@@ -44,6 +44,24 @@ class WPILIB_DLLEXPORT DifferentialDriveFeedforward {
                                units::meter_t trackwidth)
       : m_plant{frc::LinearSystemId::IdentifyDrivetrainSystem(
             kVLinear, kALinear, kVAngular, kAAngular, trackwidth)} {}
+  /**
+   * Creates a new DifferentialDriveFeedforward with the specified parameters.
+   *
+   * @param kVLinear The linear velocity gain in volts per (meters per second).
+   * @param kALinear The linear acceleration gain in volts per (meters per
+   * second squared).
+   * @param kVAngular The angular velocity gain in volts per (meters per
+   * second).
+   * @param kAAngular The angular acceleration gain in volts per (meters per
+   * second squared).
+   */
+
+  DifferentialDriveFeedforward(decltype(1_V / 1_mps) kVLinear,
+                               decltype(1_V / 1_mps_sq) kALinear,
+                               decltype(1_V / 1_mps) kVAngular,
+                               decltype(1_V / 1_mps_sq) kAAngular)
+      : m_plant{frc::LinearSystemId::IdentifyDrivetrainSystem(
+            kVLinear, kALinear, kVAngular, kAAngular)} {}
 
   /**
    * Calculates the differential drive feedforward inputs given velocity
