@@ -24,11 +24,11 @@ class Command;
 /**
  * This class provides an easy way to link commands to conditions.
  *
- * <p>It is very easy to link a button to a command. For instance, you could link the trigger button
- * of a joystick to a "score" command.
- * 
- * <p>Triggers can easily be composed for advanced functionality using the &&, ||, and !
- * operators.
+ * <p>It is very easy to link a button to a command. For instance, you could
+ * link the trigger button of a joystick to a "score" command.
+ *
+ * <p>Triggers can easily be composed for advanced functionality using the {@link
+ * #operator!}, {@link #operator||}, {@link #operator&&} operators.
  *
  * <p>This class is provided by the NewCommands VendorDep
  */
@@ -46,7 +46,7 @@ class Trigger {
                 std::move(condition)} {}
 
   /**
-   * Creates a new trigger based on the given condition.   
+   * Creates a new trigger based on the given condition.
    *
    * @param loop The loop instance that polls this trigger.
    * @param condition the condition represented by this trigger
@@ -62,7 +62,8 @@ class Trigger {
   Trigger(const Trigger& other);
 
   /**
-   * Starts the given command whenever the condition changes from `false` to `true`.
+   * Starts the given command whenever the condition changes from `false` to
+   * `true`.
    *
    * <p>Takes a raw pointer, and so is non-owning; users are responsible for the
    * lifespan of the command.
@@ -74,8 +75,8 @@ class Trigger {
   Trigger OnTrue(Command* command);
 
   /**
-   * Starts the given command whenever the condition changes from `false` to `true`.
-   * Moves command ownership to the button scheduler.
+   * Starts the given command whenever the condition changes from `false` to
+   * `true`. Moves command ownership to the button scheduler.
    *
    * @param command The command to bind.
    * @return The trigger, for chained calls.
@@ -83,7 +84,8 @@ class Trigger {
   Trigger OnTrue(CommandPtr&& command);
 
   /**
-   * Starts the given command whenever the condition changes from `true` to `false`.
+   * Starts the given command whenever the condition changes from `true` to
+   * `false`.
    *
    * <p>Takes a raw pointer, and so is non-owning; users are responsible for the
    * lifespan of the command.
@@ -95,7 +97,8 @@ class Trigger {
   Trigger OnFalse(Command* command);
 
   /**
-   * Starts the given command whenever the condition changes from `true` to `false`.
+   * Starts the given command whenever the condition changes from `true` to
+   * `false`.
    *
    * @param command The command to bind.
    * @return The trigger, for chained calls.
@@ -103,10 +106,11 @@ class Trigger {
   Trigger OnFalse(CommandPtr&& command);
 
   /**
-   * Starts the given command when the condition changes to `true` and cancels it
-   * when the condition changes to `false`.
+   * Starts the given command when the condition changes to `true` and cancels
+   * it when the condition changes to `false`.
    *
-   * <p>Doesn't re-start the command in-between. If the command should restart, see RepeatCommand.
+   * <p>Doesn't re-start the command in-between. If the command should restart,
+   * see RepeatCommand.
    *
    * <p>Takes a raw pointer, and so is non-owning; users are responsible for the
    * lifespan of the command.
@@ -117,12 +121,13 @@ class Trigger {
   Trigger WhileTrue(Command* command);
 
   /**
-   * Starts the given command when the condition changes to `true` and cancels it
-   * when the condition changes to `false`. Moves command ownership to the button
-   * scheduler.
+   * Starts the given command when the condition changes to `true` and cancels
+   * it when the condition changes to `false`. Moves command ownership to the
+   * button scheduler.
    *
-   * <p>Doesn't re-start the command in-between. If the command should restart, see RepeatCommand.
-   * 
+   * <p>Doesn't re-start the command in-between. If the command should restart,
+   * see RepeatCommand.
+   *
    * @param command The command to bind.
    * @return The trigger, for chained calls.
    */
@@ -132,7 +137,8 @@ class Trigger {
    * Starts the given command when the condition changes to `false` and cancels
    * it when the condition changes to `true`.
    *
-   * <p>Doesn't re-start the command in-between. If the command should restart, see RepeatCommand.
+   * <p>Doesn't re-start the command in-between. If the command should restart,
+   * see RepeatCommand.
    *
    * <p>Takes a raw pointer, and so is non-owning; users are responsible for the
    * lifespan of the command.
@@ -144,10 +150,11 @@ class Trigger {
 
   /**
    * Starts the given command when the condition changes to `false` and cancels
-   * it when the condition changes to `true`. Moves command ownership to the button
-   * scheduler.
-   * 
-   * <p>Doesn't re-start the command in-between. If the command should restart, see RepeatCommand.
+   * it when the condition changes to `true`. Moves command ownership to the
+   * button scheduler.
+   *
+   * <p>Doesn't re-start the command in-between. If the command should restart,
+   * see RepeatCommand.
    *
    * @param command The command to bind.
    * @return The trigger, for chained calls.

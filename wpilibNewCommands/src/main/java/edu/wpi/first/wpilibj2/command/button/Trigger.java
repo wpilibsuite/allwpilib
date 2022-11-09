@@ -22,7 +22,8 @@ import java.util.function.BooleanSupplier;
  * <p>It is very easy to link a button to a command. For instance, you could link the trigger button
  * of a joystick to a "score" command.
  *
- * <p>Triggers can easily be composed for advanced functionality using the &&, ||, and ! operators.
+ * <p>Triggers can easily be composed for advanced functionality using the {@link
+ * #and(BooleanSupplier)}, {@link #or(BooleanSupplier)}, {@link #negate()} operators.
  *
  * <p>This class is provided by the NewCommands VendorDep
  */
