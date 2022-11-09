@@ -11,7 +11,7 @@ frc::DifferentialDriveFeedforward::Calculate(units::meters_per_second_t currentL
                                              units::meters_per_second_t nextRVelocity,
                                              units::second_t dt) {
   frc::LinearPlantInversionFeedforward<2, 2> feedforward{
-      frc::DifferentialDriveFeedforward::m_plant, dt};
+      m_plant, dt};
 
   frc::Vectord<2> r{currentLVelocity, currentRVelocity};
   frc::Vectord<2> nextR{nextLVelocity, nextRVelocity};
