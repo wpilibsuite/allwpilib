@@ -14,8 +14,10 @@
 #include "units/voltage.h"
 
 namespace frc {
-/** A helper class which computes the feedforward outputs for a differential
- * drive drivetrain. */
+/**
+ * A helper class which computes the feedforward outputs for a differential
+ * drive drivetrain.
+ */
 class DifferentialDriveFeedforward {
   frc::LinearSystem<2, 2, 2> m_plant;
 
