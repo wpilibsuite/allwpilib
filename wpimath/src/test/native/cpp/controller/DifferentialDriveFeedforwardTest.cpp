@@ -27,21 +27,25 @@ TEST(DifferentialDriveFeedforwardTest, Calculate) {
   frc::LinearSystem<2, 2, 2> plant =
       frc::LinearSystemId::IdentifyDrivetrainSystem(
           kVLinear, kALinear, kVAngular, kAAngular, trackwidth);
-  for (auto cLVelocity = -4_mps; cLVelocity <= 4_mps; cLVelocity += 2_mps) {
-    for (auto cRVelocity = -4_mps; cRVelocity <= 4_mps; cRVelocity += 2_mps) {
-      for (auto nLVelocity = -4_mps; nLVelocity <= 4_mps; nLVelocity += 2_mps) {
-        for (auto nRVelocity = -4_mps; nRVelocity <= 4_mps;
-             nRVelocity += 2_mps) {
+  for (auto currentLeftVelocity = -4_mps; currentLeftVelocity <= 4_mps;
+       currentLeftVelocity += 2_mps) {
+    for (auto currentRightVelocity = -4_mps; currentRightVelocity <= 4_mps;
+         currentRightVelocity += 2_mps) {
+      for (auto nextLeftVelocity = -4_mps; nextLeftVelocity <= 4_mps;
+           nextLeftVelocity += 2_mps) {
+        for (auto nextRightVelocity = -4_mps; nextRightVelocity <= 4_mps;
+             nextRightVelocity += 2_mps) {
           frc::DifferentialDriveWheelVoltages u =
               differentialDriveFeedforward.Calculate(
-                  cLVelocity, nLVelocity, cRVelocity, nRVelocity, dt);
-          frc::Matrixd<2, 1> y =
-              plant.CalculateX(frc::Vectord<2>{cLVelocity, cRVelocity},
-                               frc::Vectord<2>{u.left, u.right}, dt);
+                  currentLeftVelocity, nextLeftVelocity, currentRightVelocity,
+                  nextRightVelocity, dt);
+          frc::Matrixd<2, 1> y = plant.CalculateX(
+              frc::Vectord<2>{currentLeftVelocity, currentRightVelocity},
+              frc::Vectord<2>{u.left, u.right}, dt);
           // left drivetrain check
-          EXPECT_NEAR(y[0], double{nLVelocity}, 1e-6);
+          EXPECT_NEAR(y[0], double{nextLeftVelocity}, 1e-6);
           // right drivetrain check
-          EXPECT_NEAR(y[1], double{nRVelocity}, 1e-6);
+          EXPECT_NEAR(y[1], double{nextRightVelocity}, 1e-6);
         }
       }
     }

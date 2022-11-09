@@ -46,22 +46,24 @@ public class DifferentialDriveFeedforward {
   /**
    * Calculates the differential drive feedforward inputs given velocity setpoints.
    *
-   * @param currentLVelocity The current left velocity of the differential drive in meters/second.
-   * @param nextLVelocity The next left velocity of the differential drive in meters/second.
-   * @param currentRVelocity The current right velocity of the differential drive in meters/second.
-   * @param nextRVelocity The next right velocity of the differential drive in meters/second.
+   * @param currentLeftVelocity The current left velocity of the differential drive in
+   *     meters/second.
+   * @param nextLeftVelocity The next left velocity of the differential drive in meters/second.
+   * @param currentRightVelocity The current right velocity of the differential drive in
+   *     meters/second.
+   * @param nextRightVelocity The next right velocity of the differential drive in meters/second.
    * @param dtSeconds Discretization timestep.
    * @return A DifferentialDriveWheelVoltages object containing the computed feedforward voltages.
    */
   public DifferentialDriveWheelVoltages calculate(
-      double currentLVelocity,
-      double nextLVelocity,
-      double currentRVelocity,
-      double nextRVelocity,
+      double currentLeftVelocity,
+      double nextLeftVelocity,
+      double currentRightVelocity,
+      double nextRightVelocity,
       double dtSeconds) {
     var feedforward = new LinearPlantInversionFeedforward<>(m_plant, dtSeconds);
-    var r = VecBuilder.fill(currentLVelocity, currentRVelocity);
-    var nextR = VecBuilder.fill(nextLVelocity, nextRVelocity);
+    var r = VecBuilder.fill(currentLeftVelocity, currentRightVelocity);
+    var nextR = VecBuilder.fill(nextLeftVelocity, nextRightVelocity);
     var u = feedforward.calculate(r, nextR);
     return new DifferentialDriveWheelVoltages(u.get(0, 0), u.get(1, 0));
   }

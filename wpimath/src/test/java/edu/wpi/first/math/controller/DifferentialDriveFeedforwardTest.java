@@ -29,22 +29,26 @@ class DifferentialDriveFeedforwardTest {
     LinearSystem<N2, N2, N2> plant =
         LinearSystemId.identifyDrivetrainSystem(
             kVLinear, kALinear, kVAngular, kAAngular, trackwidth);
-    for (int cLVelocity = -4; cLVelocity <= 4; cLVelocity += 2) {
-      for (int cRVelocity = -4; cRVelocity <= 4; cRVelocity += 2) {
-        for (int nLVelocity = -4; nLVelocity <= 4; nLVelocity += 2) {
-          for (int nRVelocity = -4; nRVelocity <= 4; nRVelocity += 2) {
+    for (int currentLeftVelocity = -4; currentLeftVelocity <= 4; currentLeftVelocity += 2) {
+      for (int currentRightVelocity = -4; currentRightVelocity <= 4; currentRightVelocity += 2) {
+        for (int nextLeftVelocity = -4; nextLeftVelocity <= 4; nextLeftVelocity += 2) {
+          for (int nextRightVelocity = -4; nextRightVelocity <= 4; nextRightVelocity += 2) {
             DifferentialDriveWheelVoltages u =
                 differentialDriveFeedforward.calculate(
-                    cLVelocity, nLVelocity, cRVelocity, nRVelocity, dtSeconds);
+                    currentLeftVelocity,
+                    nextLeftVelocity,
+                    currentRightVelocity,
+                    nextRightVelocity,
+                    dtSeconds);
             Matrix<N2, N1> y =
                 plant.calculateX(
-                    VecBuilder.fill(cLVelocity, cRVelocity),
+                    VecBuilder.fill(currentLeftVelocity, currentRightVelocity),
                     VecBuilder.fill(u.left, u.right),
                     dtSeconds);
             // left drivetrain check
-            assertEquals(y.get(0, 0), nLVelocity, 1e-6);
+            assertEquals(y.get(0, 0), nextLeftVelocity, 1e-6);
             // right drivetrain check
-            assertEquals(y.get(1, 0), nRVelocity, 1e-6);
+            assertEquals(y.get(1, 0), nextRightVelocity, 1e-6);
           }
         }
       }

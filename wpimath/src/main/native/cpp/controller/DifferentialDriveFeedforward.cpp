@@ -6,14 +6,14 @@
 
 frc::DifferentialDriveWheelVoltages
 frc::DifferentialDriveFeedforward::Calculate(
-    units::meters_per_second_t currentLVelocity,
-    units::meters_per_second_t nextLVelocity,
-    units::meters_per_second_t currentRVelocity,
-    units::meters_per_second_t nextRVelocity, units::second_t dt) {
+    units::meters_per_second_t currentLeftVelocity,
+    units::meters_per_second_t nextLeftVelocity,
+    units::meters_per_second_t currentRightVelocity,
+    units::meters_per_second_t nextRightVelocity, units::second_t dt) {
   frc::LinearPlantInversionFeedforward<2, 2> feedforward{m_plant, dt};
 
-  frc::Vectord<2> r{currentLVelocity, currentRVelocity};
-  frc::Vectord<2> nextR{nextLVelocity, nextRVelocity};
+  frc::Vectord<2> r{currentLeftVelocity, currentRightVelocity};
+  frc::Vectord<2> nextR{nextLeftVelocity, nextRightVelocity};
   auto u = feedforward.Calculate(r, nextR);
   return {units::volt_t{u(0)}, units::volt_t{u(1)}};
 }

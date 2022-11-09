@@ -67,20 +67,20 @@ class WPILIB_DLLEXPORT DifferentialDriveFeedforward {
    * Calculates the differential drive feedforward inputs given velocity
    * setpoints.
    *
-   * @param currentLVelocity The current left velocity of the differential drive
-   * in meters/second.
-   * @param nextLVelocity The next left velocity of the differential drive in
-   * meters/second.
-   * @param currentRVelocity The current right velocity of the differential
+   * @param currentLeftVelocity The current left velocity of the differential
    * drive in meters/second.
-   * @param nextRVelocity The next right velocity of the differential drive in
+   * @param nextLeftVelocity The next left velocity of the differential drive in
    * meters/second.
+   * @param currentRightVelocity The current right velocity of the differential
+   * drive in meters/second.
+   * @param nextRightVelocity The next right velocity of the differential drive
+   * in meters/second.
    * @param dt Discretization timestep.
    */
   DifferentialDriveWheelVoltages Calculate(
-      units::meters_per_second_t currentLVelocity,
-      units::meters_per_second_t nextLVelocity,
-      units::meters_per_second_t currentRVelocity,
-      units::meters_per_second_t nextRVelocity, units::second_t dt);
+      units::meters_per_second_t currentLeftVelocity,
+      units::meters_per_second_t nextLeftVelocity,
+      units::meters_per_second_t currentRightVelocity,
+      units::meters_per_second_t nextRightVelocity, units::second_t dt);
 };
 }  // namespace frc
