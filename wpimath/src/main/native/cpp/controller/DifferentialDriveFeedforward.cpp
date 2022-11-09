@@ -16,8 +16,5 @@ frc::DifferentialDriveFeedforward::Calculate(units::meters_per_second_t currentL
   frc::Vectord<2> r{currentLVelocity, currentRVelocity};
   frc::Vectord<2> nextR{nextLVelocity, nextRVelocity};
   auto u = feedforward.Calculate(r, nextR);
-  frc::DifferentialDriveWheelVoltages voltages;
-  voltages.left = units::volt_t{u[0]};
-  voltages.right = units::volt_t{u[1]};
-  return voltages;
+  return {units::volt_t{u(0)}, units::volt_t{u(1)}};
 }
