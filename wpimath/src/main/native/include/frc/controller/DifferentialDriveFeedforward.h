@@ -6,7 +6,6 @@
 
 #include <wpi/MathExtras.h>
 #include <wpi/SymbolExports.h>
-#include <units/velocity.h>
 
 #include "frc/EigenCore.h"
 #include "frc/controller/DifferentialDriveWheelVoltages.h"
@@ -14,6 +13,7 @@
 #include "frc/system/plant/LinearSystemId.h"
 #include "units/time.h"
 #include "units/voltage.h"
+#include "units/velocity.h"
 
 namespace frc {
 /**
