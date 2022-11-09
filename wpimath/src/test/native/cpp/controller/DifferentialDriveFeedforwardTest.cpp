@@ -16,7 +16,7 @@
 
 TEST(DifferentialDriveFeedforwardTest, Calculate) {
     auto kVLinear = 1_V / 1_mps;
-    auto kALinear = 1_v / 1_mps_sq;
+    auto kALinear = 1_V / 1_mps_sq;
     auto kVAngular = 1_V / 1_rad_per_s;
     auto kAAngular = 1_V / 1_rad_per_s_sq;
     auto trackwidth = 1_m;
@@ -30,20 +30,20 @@ TEST(DifferentialDriveFeedforwardTest, Calculate) {
           kVAngular,
           kAAngular,
           trackwidth);
-  for (int cLVelocity = -4; cLVelocity <= 4; cLVelocity += 2) {
-    for (int cRVelocity = -4; cRVelocity <= 4; cRVelocity += 2) {
-      for (int nLVelocity = -4; nLVelocity <= 4; nLVelocity += 2) {
-        for (int nRVelocity = -4; nRVelocity <= 4; nRVelocity += 2) {
+  for (units::meters_per_second_t cLVelocity = -4_mps; cLVelocity <= 4_mps; cLVelocity += 2_mps) {
+    for (units::meters_per_second_t cRVelocity = -4_mps; cRVelocity <= 4_mps; cRVelocity += 2_mps) {
+      for (units::meters_per_second_t nLVelocity = -4_mps; nLVelocity <= 4_mps; nLVelocity += 2_mps) {
+        for (units::meters_per_second_t nRVelocity = -4_mps; nRVelocity <= 4_mps; nRVelocity += 2_mps) {
           frc::DifferentialDriveWheelVoltages u =
               differentialDriveFeedforward.Calculate(
-                  cLVelocity, nLVelocity, cRVelocity, nRVelocity, dtSeconds);
+                  cLVelocity, nLVelocity, cRVelocity, nRVelocity, dt);
           frc::Matrixd<2, 1> y = plant.CalculateX(
               frc::Vectord<2>{cLVelocity, cRVelocity},
-              frc::Vectord<2>{u.left, u.right}, units::second_t{dtSeconds});
+              frc::Vectord<2>{u.left, u.right}, dt);
           // left drivetrain check
-          EXPECT_NEAR(y[0], nLVelocity, 1e-6);
+          EXPECT_NEAR(y[0], double{nLVelocity}, 1e-6);
           // right drivetrain check
-          EXPECT_NEAR(y[1], nRVelocity, 1e-6);
+          EXPECT_NEAR(y[1], double{nRVelocity}, 1e-6);
         }
       }
     }

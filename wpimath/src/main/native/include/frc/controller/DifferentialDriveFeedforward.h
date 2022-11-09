@@ -6,7 +6,7 @@
 
 #include <wpi/MathExtras.h>
 #include <wpi/SymbolExports.h>
-
+#include <units/velocity.h>
 
 #include "frc/EigenCore.h"
 #include "frc/controller/DifferentialDriveWheelVoltages.h"
@@ -37,13 +37,13 @@ class WPILIB_DLLEXPORT DifferentialDriveFeedforward {
    * @param trackwidth The distance between the differential drive's left and
    * right wheels, in meters.
    */
-  DifferentialDriveFeedforward(units::volt_t kVLinear, units::volt_t kALinear,
-                               units::volt_t kVAngular, units::volt_t kAAngular,
+  DifferentialDriveFeedforward(decltype(1_V / 1_mps) kVLinear, decltype(1_V / 1_mps_sq) kALinear,
+                               decltype(1_V / 1_rad_per_s) kVAngular, decltype(1_V / 1_rad_per_s_sq) kAAngular,
                                units::meter_t trackwidth)
       : m_plant{frc::LinearSystemId::IdentifyDrivetrainSystem(
-            kVLinear / 1_mps, kALinear / 1_mps_sq,
-            kVAngular / 1_rad_per_s,
-            kAAngular / 1_rad_per_s_sq,
+            kVLinear, kALinear,
+            kVAngular,
+            kAAngular,
             trackwidth)} {}
 
   /**
@@ -58,12 +58,12 @@ class WPILIB_DLLEXPORT DifferentialDriveFeedforward {
    * drive in meters/second.
    * @param nextRVelocity The next right velocity of the differential drive in
    * meters/second.
-   * @param dtSeconds Discretization timestep.
+   * @param dt Discretization timestep.
    */
-  DifferentialDriveWheelVoltages Calculate(double currentLVelocity,
-                                           double nextLVelocity,
-                                           double currentRVelocity,
-                                           double nextRVelocity,
-                                           units::second_t dtSeconds);
+  DifferentialDriveWheelVoltages Calculate(units::meters_per_second_t currentLVelocity,
+                                           units::meters_per_second_t nextLVelocity,
+                                           units::meters_per_second_t currentRVelocity,
+                                           units::meters_per_second_t nextRVelocity,
+                                           units::second_t dt);
 };
 }  // namespace frc
