@@ -62,8 +62,8 @@ TEST(DifferentialDriveFeedforwardTest, CalculateWithoutTrackwidth) {
   frc::DifferentialDriveFeedforward differentialDriveFeedforward{
       kVLinear, kALinear, kVAngular, kAAngular};
   frc::LinearSystem<2, 2, 2> plant =
-      frc::LinearSystemId::IdentifyDrivetrainSystem(
-          kVLinear, kALinear, kVAngular, kAAngular);
+      frc::LinearSystemId::IdentifyDrivetrainSystem(kVLinear, kALinear,
+                                                    kVAngular, kAAngular);
   for (auto currentLeftVelocity = -4_mps; currentLeftVelocity <= 4_mps;
        currentLeftVelocity += 2_mps) {
     for (auto currentRightVelocity = -4_mps; currentRightVelocity <= 4_mps;
