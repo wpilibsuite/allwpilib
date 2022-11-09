@@ -283,8 +283,8 @@ public final class LinearSystemId {
    *
    * @param kVLinear The linear velocity gain in volts per (meters per second).
    * @param kALinear The linear acceleration gain in volts per (meters per second squared).
-   * @param kVAngular The angular velocity gain in volts per (radians per second).
-   * @param kAAngular The angular acceleration gain in volts per (radians per second squared).
+   * @param kVAngular The angular velocity gain in volts per (meters per second).
+   * @param kAAngular The angular acceleration gain in volts per (meters per second squared).
    * @return A LinearSystem representing the given characterized constants.
    * @throws IllegalArgumentException if kVLinear &lt;= 0, kALinear &lt;= 0, kVAngular &lt;= 0, or
    *     kAAngular &lt;= 0.
