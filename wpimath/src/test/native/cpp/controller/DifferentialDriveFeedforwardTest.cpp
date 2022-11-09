@@ -14,7 +14,7 @@
 #include "units/length.h"
 #include "units/time.h"
 
-TEST(DifferentialDriveFeedforwardTest, Calculate) {
+TEST(DifferentialDriveFeedforwardTest, CalculateWithTrackwidth) {
   auto kVLinear = 1_V / 1_mps;
   auto kALinear = 1_V / 1_mps_sq;
   auto kVAngular = 1_V / 1_rad_per_s;
@@ -27,6 +27,43 @@ TEST(DifferentialDriveFeedforwardTest, Calculate) {
   frc::LinearSystem<2, 2, 2> plant =
       frc::LinearSystemId::IdentifyDrivetrainSystem(
           kVLinear, kALinear, kVAngular, kAAngular, trackwidth);
+  for (auto currentLeftVelocity = -4_mps; currentLeftVelocity <= 4_mps;
+       currentLeftVelocity += 2_mps) {
+    for (auto currentRightVelocity = -4_mps; currentRightVelocity <= 4_mps;
+         currentRightVelocity += 2_mps) {
+      for (auto nextLeftVelocity = -4_mps; nextLeftVelocity <= 4_mps;
+           nextLeftVelocity += 2_mps) {
+        for (auto nextRightVelocity = -4_mps; nextRightVelocity <= 4_mps;
+             nextRightVelocity += 2_mps) {
+          frc::DifferentialDriveWheelVoltages u =
+              differentialDriveFeedforward.Calculate(
+                  currentLeftVelocity, nextLeftVelocity, currentRightVelocity,
+                  nextRightVelocity, dt);
+          frc::Matrixd<2, 1> y = plant.CalculateX(
+              frc::Vectord<2>{currentLeftVelocity, currentRightVelocity},
+              frc::Vectord<2>{u.left, u.right}, dt);
+          // left drivetrain check
+          EXPECT_NEAR(y[0], double{nextLeftVelocity}, 1e-6);
+          // right drivetrain check
+          EXPECT_NEAR(y[1], double{nextRightVelocity}, 1e-6);
+        }
+      }
+    }
+  }
+}
+
+TEST(DifferentialDriveFeedforwardTest, CalculateWithoutTrackwidth) {
+  auto kVLinear = 1_V / 1_mps;
+  auto kALinear = 1_V / 1_mps_sq;
+  auto kVAngular = 1_V / 1_mps;
+  auto kAAngular = 1_V / 1_mps_sq;
+  auto dt = 20_ms;
+
+  frc::DifferentialDriveFeedforward differentialDriveFeedforward{
+      kVLinear, kALinear, kVAngular, kAAngular};
+  frc::LinearSystem<2, 2, 2> plant =
+      frc::LinearSystemId::IdentifyDrivetrainSystem(
+          kVLinear, kALinear, kVAngular, kAAngular);
   for (auto currentLeftVelocity = -4_mps; currentLeftVelocity <= 4_mps;
        currentLeftVelocity += 2_mps) {
     for (auto currentRightVelocity = -4_mps; currentRightVelocity <= 4_mps;
