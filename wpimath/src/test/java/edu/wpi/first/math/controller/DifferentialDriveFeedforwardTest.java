@@ -77,10 +77,8 @@ class DifferentialDriveFeedforwardTest {
                     VecBuilder.fill(currentLeftVelocity, currentRightVelocity),
                     VecBuilder.fill(u.left, u.right),
                     dtSeconds);
-            // left drivetrain check
-            assertEquals(y.get(0, 0), nextLeftVelocity, 1e-6);
-            // right drivetrain check
-            assertEquals(y.get(1, 0), nextRightVelocity, 1e-6);
+            assertEquals(nextX.get(0, 0), nextLeftVelocity, 1e-6);
+            assertEquals(nextX.get(1, 0), nextRightVelocity, 1e-6);
           }
         }
       }
