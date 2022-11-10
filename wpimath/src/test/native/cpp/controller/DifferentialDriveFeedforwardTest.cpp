@@ -43,9 +43,9 @@ TEST(DifferentialDriveFeedforwardTest, CalculateWithTrackwidth) {
               frc::Vectord<2>{currentLeftVelocity, currentRightVelocity},
               frc::Vectord<2>{u.left, u.right}, dt);
           // left drivetrain check
-          EXPECT_NEAR(y[0], double{nextLeftVelocity}, 1e-6);
+          EXPECT_NEAR(y(0), nextLeftVelocity.value(), 1e-6);
           // right drivetrain check
-          EXPECT_NEAR(y[1], double{nextRightVelocity}, 1e-6);
+          EXPECT_NEAR(y(1), nextRightVelocity.value(), 1e-6);
         }
       }
     }
