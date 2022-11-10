@@ -4,13 +4,14 @@
 
 #pragma once
 
-#include <wpi/MathExtras.h>
 #include <wpi/SymbolExports.h>
 
-#include "frc/EigenCore.h"
 #include "frc/controller/DifferentialDriveWheelVoltages.h"
-#include "frc/controller/LinearPlantInversionFeedforward.h"
-#include "frc/system/plant/LinearSystemId.h"
+#include "frc/system/LinearSystem.h"
+#include "units/acceleration.h"
+#include "units/angular_acceleration.h"
+#include "units/angular_velocity.h"
+#include "units/length.h"
 #include "units/time.h"
 #include "units/velocity.h"
 #include "units/voltage.h"

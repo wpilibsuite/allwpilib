@@ -4,6 +4,10 @@
 
 #include "frc/controller/DifferentialDriveFeedforward.h"
 
+#include "frc/EigenCore.h"
+#include "frc/controller/LinearPlantInversionFeedforward.h"
+#include "frc/system/plant/LinearSystemId.h"
+
 frc::DifferentialDriveFeedforward::DifferentialDriveFeedforward(
     decltype(1_V / 1_mps) kVLinear, decltype(1_V / 1_mps_sq) kALinear,
     decltype(1_V / 1_rad_per_s) kVAngular,
