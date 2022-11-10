@@ -20,6 +20,7 @@
 
 #include "Selector.h"
 #include "Plot.h"
+#include "LogModelViewLoader.h"
 
 using namespace sapphire;
 
@@ -33,6 +34,7 @@ static float gDefaultScale = 1.0;
 
 static std::unique_ptr<glass::WindowManager> windowManager;
 static std::unique_ptr<PlotProvider> plotProvider;
+static std::unique_ptr<LogModelViewLoader> viewLoader;
 
 static glass::Window* m_logSelectorWindow;
 static glass::Window* m_plotWindow;
@@ -101,6 +103,7 @@ void Application(std::string_view saveDir) {
   
   auto& storage = glass::GetStorageRoot().GetChild("Sapphire");
   auto& plotStorage = glass::GetStorageRoot().GetChild("Plots");
+  auto& viewStorage = glass::GetStorageRoot().GetChild("ViewStorage");
 
   
   windowManager = std::make_unique<glass::WindowManager>(storage);
@@ -113,9 +116,11 @@ void Application(std::string_view saveDir) {
   auto& timestamp = logViewer->GetTimestamp();
 
   plotProvider = std::make_unique<PlotProvider>(plotStorage, timestamp);
+  viewLoader = std::make_unique<LogModelViewLoader>(viewStorage, timestamp);
 
   windowManager->GlobalInit();
   plotProvider->GlobalInit();
+  viewLoader->GlobalInit();
 
   m_logSelectorWindow = windowManager->AddWindow(
     "Log Selector", std::move(selector));
@@ -131,6 +136,7 @@ void Application(std::string_view saveDir) {
   gui::Main();
   windowManager.reset();
   plotProvider.reset();
+  viewLoader.reset();
 
   gShutdown = true;
   glass::DestroyContext();

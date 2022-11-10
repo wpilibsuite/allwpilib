@@ -55,8 +55,8 @@ LogField2DModel::LogField2DModel(DataLogModel& model, std::string_view path, flo
 LogField2DModel::~LogField2DModel() = default;
 
 void LogField2DModel::Update() {
-    if(now != nowRef){ 
-        now = nowRef;
+    if(now != nowRef + m_model.offset){ 
+        now = nowRef + m_model.offset;
         for(auto& object : m_objects){
             object->Update();
         }
