@@ -40,7 +40,7 @@ class DifferentialDriveFeedforwardTest {
                     currentRightVelocity,
                     nextRightVelocity,
                     dtSeconds);
-            Matrix<N2, N1> y =
+            Matrix<N2, N1> nextX =
                 plant.calculateX(
                     VecBuilder.fill(currentLeftVelocity, currentRightVelocity),
                     VecBuilder.fill(u.left, u.right),
