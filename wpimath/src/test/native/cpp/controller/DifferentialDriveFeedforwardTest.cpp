@@ -38,13 +38,11 @@ TEST(DifferentialDriveFeedforwardTest, CalculateWithTrackwidth) {
           auto [left, right] = differentialDriveFeedforward.Calculate(
               currentLeftVelocity, nextLeftVelocity, currentRightVelocity,
               nextRightVelocity, dt);
-          frc::Matrixd<2, 1> y = plant.CalculateX(
+          frc::Matrixd<2, 1> nextX = plant.CalculateX(
               frc::Vectord<2>{currentLeftVelocity, currentRightVelocity},
               frc::Vectord<2>{left, right}, dt);
-          // left drivetrain check
-          EXPECT_NEAR(y(0), nextLeftVelocity.value(), 1e-6);
-          // right drivetrain check
-          EXPECT_NEAR(y(1), nextRightVelocity.value(), 1e-6);
+          EXPECT_NEAR(nextX(0), nextLeftVelocity.value(), 1e-6);
+          EXPECT_NEAR(nextX(1), nextRightVelocity.value(), 1e-6);
         }
       }
     }
