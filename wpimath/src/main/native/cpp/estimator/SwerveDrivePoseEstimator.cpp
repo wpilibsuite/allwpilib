@@ -8,7 +8,7 @@ namespace frc {
 
 template class EXPORT_TEMPLATE_DEFINE(WPILIB_DLLEXPORT)
     SwerveDrivePoseEstimator<2>;
-    template class EXPORT_TEMPLATE_DEFINE(WPILIB_DLLEXPORT)
+template class EXPORT_TEMPLATE_DEFINE(WPILIB_DLLEXPORT)
     SwerveDrivePoseEstimator<3>;
 template class EXPORT_TEMPLATE_DEFINE(WPILIB_DLLEXPORT)
     SwerveDrivePoseEstimator<4>;
