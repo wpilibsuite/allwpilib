@@ -33,7 +33,8 @@ UNIT_ADD(angular_acceleration, revolutions_per_minute_squared,
          compound_unit<angle::turns, inverse<squared<time::minutes>>>)
 UNIT_ADD(angular_acceleration, revolutions_per_minute_per_second,
          revolutions_per_minute_per_second, rev_per_m_per_s,
-         compound_unit<angle::turns, compound_unit<inverse<time::minutes>, inverse<time::seconds>>>)
+         compound_unit<angle::turns, compound_unit<inverse<time::minutes>,
+                                                   inverse<time::seconds>>>)
 
 UNIT_ADD_CATEGORY_TRAIT(angular_acceleration)
 
