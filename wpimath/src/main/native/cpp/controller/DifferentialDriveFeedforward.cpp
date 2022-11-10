@@ -17,3 +17,16 @@ frc::DifferentialDriveFeedforward::Calculate(
   auto u = feedforward.Calculate(r, nextR);
   return {units::volt_t{u(0)}, units::volt_t{u(1)}};
 }
+
+frc::DifferentialDriveFeedforward::DifferentialDriveFeedforward(
+    decltype(1_V / 1_mps) kVLinear, decltype(1_V / 1_mps_sq) kALinear,
+    decltype(1_V / 1_rad_per_s) kVAngular,
+    decltype(1_V / 1_rad_per_s_sq) kAAngular, units::meter_t trackwidth)
+    : m_plant{frc::LinearSystemId::IdentifyDrivetrainSystem(
+          kVLinear, kALinear, kVAngular, kAAngular, trackwidth)} {}
+
+frc::DifferentialDriveFeedforward::DifferentialDriveFeedforward(
+    decltype(1_V / 1_mps) kVLinear, decltype(1_V / 1_mps_sq) kALinear,
+    decltype(1_V / 1_mps) kVAngular, decltype(1_V / 1_mps_sq) kAAngular)
+    : m_plant{frc::LinearSystemId::IdentifyDrivetrainSystem(
+          kVLinear, kALinear, kVAngular, kAAngular)} {}

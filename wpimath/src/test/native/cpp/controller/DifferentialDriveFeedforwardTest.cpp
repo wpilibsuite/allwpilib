@@ -35,10 +35,9 @@ TEST(DifferentialDriveFeedforwardTest, CalculateWithTrackwidth) {
            nextLeftVelocity += 2_mps) {
         for (auto nextRightVelocity = -4_mps; nextRightVelocity <= 4_mps;
              nextRightVelocity += 2_mps) {
-          auto [left, right] =
-              differentialDriveFeedforward.Calculate(
-                  currentLeftVelocity, nextLeftVelocity, currentRightVelocity,
-                  nextRightVelocity, dt);
+          auto [left, right] = differentialDriveFeedforward.Calculate(
+              currentLeftVelocity, nextLeftVelocity, currentRightVelocity,
+              nextRightVelocity, dt);
           frc::Matrixd<2, 1> y = plant.CalculateX(
               frc::Vectord<2>{currentLeftVelocity, currentRightVelocity},
               frc::Vectord<2>{left, right}, dt);
@@ -72,10 +71,9 @@ TEST(DifferentialDriveFeedforwardTest, CalculateWithoutTrackwidth) {
            nextLeftVelocity += 2_mps) {
         for (auto nextRightVelocity = -4_mps; nextRightVelocity <= 4_mps;
              nextRightVelocity += 2_mps) {
-          auto [left, right] =
-              differentialDriveFeedforward.Calculate(
-                  currentLeftVelocity, nextLeftVelocity, currentRightVelocity,
-                  nextRightVelocity, dt);
+          auto [left, right] = differentialDriveFeedforward.Calculate(
+              currentLeftVelocity, nextLeftVelocity, currentRightVelocity,
+              nextRightVelocity, dt);
           frc::Matrixd<2, 1> y = plant.CalculateX(
               frc::Vectord<2>{currentLeftVelocity, currentRightVelocity},
               frc::Vectord<2>{left, right}, dt);
