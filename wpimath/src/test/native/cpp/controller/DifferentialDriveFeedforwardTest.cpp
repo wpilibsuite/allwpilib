@@ -50,11 +50,11 @@ TEST(DifferentialDriveFeedforwardTest, CalculateWithTrackwidth) {
 }
 
 TEST(DifferentialDriveFeedforwardTest, CalculateWithoutTrackwidth) {
-  auto kVLinear = 1_V / 1_mps;
-  auto kALinear = 1_V / 1_mps_sq;
-  auto kVAngular = 1_V / 1_mps;
-  auto kAAngular = 1_V / 1_mps_sq;
-  auto dt = 20_ms;
+  constexpr auto kVLinear = 1_V / 1_mps;
+  constexpr auto kALinear = 1_V / 1_mps_sq;
+  constexpr auto kVAngular = 1_V / 1_mps;
+  constexpr auto kAAngular = 1_V / 1_mps_sq;
+  constexpr auto dt = 20_ms;
 
   frc::DifferentialDriveFeedforward differentialDriveFeedforward{
       kVLinear, kALinear, kVAngular, kAAngular};
