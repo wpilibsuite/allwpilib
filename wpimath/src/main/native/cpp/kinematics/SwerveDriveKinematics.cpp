@@ -7,6 +7,12 @@
 namespace frc {
 
 template class EXPORT_TEMPLATE_DEFINE(WPILIB_DLLEXPORT)
+    SwerveDriveKinematics<2>;
+template class EXPORT_TEMPLATE_DEFINE(WPILIB_DLLEXPORT)
+    SwerveDriveKinematics<3>;
+template class EXPORT_TEMPLATE_DEFINE(WPILIB_DLLEXPORT)
     SwerveDriveKinematics<4>;
+template class EXPORT_TEMPLATE_DEFINE(WPILIB_DLLEXPORT)
+    SwerveDriveKinematics<6>;
 
 }  // namespace frc

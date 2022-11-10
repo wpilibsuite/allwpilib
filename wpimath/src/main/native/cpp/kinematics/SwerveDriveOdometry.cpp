@@ -6,6 +6,9 @@
 
 namespace frc {
 
+template class EXPORT_TEMPLATE_DEFINE(WPILIB_DLLEXPORT) SwerveDriveOdometry<2>;
+template class EXPORT_TEMPLATE_DEFINE(WPILIB_DLLEXPORT) SwerveDriveOdometry<3>;
 template class EXPORT_TEMPLATE_DEFINE(WPILIB_DLLEXPORT) SwerveDriveOdometry<4>;
+template class EXPORT_TEMPLATE_DEFINE(WPILIB_DLLEXPORT) SwerveDriveOdometry<6>;
 
 }  // namespace frc

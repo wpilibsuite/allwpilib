@@ -362,6 +362,12 @@ class SwerveDrivePoseEstimator {
 };
 
 extern template class EXPORT_TEMPLATE_DECLARE(WPILIB_DLLEXPORT)
+    SwerveDrivePoseEstimator<2>;
+extern template class EXPORT_TEMPLATE_DECLARE(WPILIB_DLLEXPORT)
+    SwerveDrivePoseEstimator<3>;
+extern template class EXPORT_TEMPLATE_DECLARE(WPILIB_DLLEXPORT)
     SwerveDrivePoseEstimator<4>;
+extern template class EXPORT_TEMPLATE_DECLARE(WPILIB_DLLEXPORT)
+    SwerveDrivePoseEstimator<6>;
 
 }  // namespace frc

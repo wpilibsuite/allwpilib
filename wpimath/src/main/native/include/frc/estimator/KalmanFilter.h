@@ -138,6 +138,8 @@ extern template class EXPORT_TEMPLATE_DECLARE(WPILIB_DLLEXPORT)
     KalmanFilter<1, 1, 1>;
 extern template class EXPORT_TEMPLATE_DECLARE(WPILIB_DLLEXPORT)
     KalmanFilter<2, 1, 1>;
+extern template class EXPORT_TEMPLATE_DECLARE(WPILIB_DLLEXPORT)
+    KalmanFilter<2, 2, 2>;
 
 }  // namespace frc
 

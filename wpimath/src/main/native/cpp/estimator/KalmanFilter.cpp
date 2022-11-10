@@ -8,5 +8,6 @@ namespace frc {
 
 template class EXPORT_TEMPLATE_DEFINE(WPILIB_DLLEXPORT) KalmanFilter<1, 1, 1>;
 template class EXPORT_TEMPLATE_DEFINE(WPILIB_DLLEXPORT) KalmanFilter<2, 1, 1>;
+template class EXPORT_TEMPLATE_DEFINE(WPILIB_DLLEXPORT) KalmanFilter<2, 2, 2>;
 
 }  // namespace frc

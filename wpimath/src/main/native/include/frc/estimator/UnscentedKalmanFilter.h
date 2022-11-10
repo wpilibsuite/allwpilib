@@ -283,7 +283,15 @@ class UnscentedKalmanFilter {
 extern template class EXPORT_TEMPLATE_DECLARE(WPILIB_DLLEXPORT)
     UnscentedKalmanFilter<3, 3, 1>;
 extern template class EXPORT_TEMPLATE_DECLARE(WPILIB_DLLEXPORT)
+    UnscentedKalmanFilter<5, 5, 3>;
+extern template class EXPORT_TEMPLATE_DECLARE(WPILIB_DLLEXPORT)
+    UnscentedKalmanFilter<6, 6, 4>;
+extern template class EXPORT_TEMPLATE_DECLARE(WPILIB_DLLEXPORT)
+    UnscentedKalmanFilter<7, 7, 5>;
+
+extern template class EXPORT_TEMPLATE_DECLARE(WPILIB_DLLEXPORT)
     UnscentedKalmanFilter<5, 3, 3>;
+
 
 }  // namespace frc
 

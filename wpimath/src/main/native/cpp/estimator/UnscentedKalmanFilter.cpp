@@ -9,6 +9,13 @@ namespace frc {
 template class EXPORT_TEMPLATE_DEFINE(WPILIB_DLLEXPORT)
     UnscentedKalmanFilter<3, 3, 1>;
 template class EXPORT_TEMPLATE_DEFINE(WPILIB_DLLEXPORT)
+    UnscentedKalmanFilter<5, 5, 3>;
+template class EXPORT_TEMPLATE_DEFINE(WPILIB_DLLEXPORT)
+    UnscentedKalmanFilter<6, 6, 4>;
+template class EXPORT_TEMPLATE_DEFINE(WPILIB_DLLEXPORT)
+    UnscentedKalmanFilter<7, 7, 5>;
+
+template class EXPORT_TEMPLATE_DEFINE(WPILIB_DLLEXPORT)
     UnscentedKalmanFilter<5, 3, 3>;
 
 }  // namespace frc
