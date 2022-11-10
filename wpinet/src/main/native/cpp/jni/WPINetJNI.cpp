@@ -50,7 +50,7 @@ JNIEXPORT void JNICALL JNI_OnUnload(JavaVM* vm, void* reserved) {
 }
 
 /*
- * Class:     edu_wpi_first_util_WPIUtilJNI
+ * Class:     edu_wpi_first_net_WPINetJNI
  * Method:    addPortForwarder
  * Signature: (ILjava/lang/String;I)V
  */
@@ -64,7 +64,7 @@ Java_edu_wpi_first_net_WPINetJNI_addPortForwarder
 }
 
 /*
- * Class:     edu_wpi_first_util_WPIUtilJNI
+ * Class:     edu_wpi_first_net_WPINetJNI
  * Method:    removePortForwarder
  * Signature: (I)V
  */
@@ -76,7 +76,7 @@ Java_edu_wpi_first_net_WPINetJNI_removePortForwarder
 }
 
 /*
- * Class:     edu_wpi_first_util_WPIUtilJNI
+ * Class:     edu_wpi_first_net_WPINetJNI
  * Method:    createMulticastServiceAnnouncer
  * Signature: (Ljava/lang/String;Ljava/lang/String;I[Ljava/lang/Object;[Ljava/lang/Object;)I
  */
@@ -119,7 +119,7 @@ Java_edu_wpi_first_net_WPINetJNI_createMulticastServiceAnnouncer
 }
 
 /*
- * Class:     edu_wpi_first_util_WPIUtilJNI
+ * Class:     edu_wpi_first_net_WPINetJNI
  * Method:    freeMulticastServiceAnnouncer
  * Signature: (I)V
  */
@@ -134,7 +134,7 @@ Java_edu_wpi_first_net_WPINetJNI_freeMulticastServiceAnnouncer
 }
 
 /*
- * Class:     edu_wpi_first_util_WPIUtilJNI
+ * Class:     edu_wpi_first_net_WPINetJNI
  * Method:    startMulticastServiceAnnouncer
  * Signature: (I)V
  */
@@ -149,7 +149,7 @@ Java_edu_wpi_first_net_WPINetJNI_startMulticastServiceAnnouncer
 }
 
 /*
- * Class:     edu_wpi_first_util_WPIUtilJNI
+ * Class:     edu_wpi_first_net_WPINetJNI
  * Method:    stopMulticastServiceAnnouncer
  * Signature: (I)V
  */
@@ -164,7 +164,7 @@ Java_edu_wpi_first_net_WPINetJNI_stopMulticastServiceAnnouncer
 }
 
 /*
- * Class:     edu_wpi_first_util_WPIUtilJNI
+ * Class:     edu_wpi_first_net_WPINetJNI
  * Method:    getMulticastServiceAnnouncerHasImplementation
  * Signature: (I)Z
  */
@@ -179,7 +179,7 @@ Java_edu_wpi_first_net_WPINetJNI_getMulticastServiceAnnouncerHasImplementation
 }
 
 /*
- * Class:     edu_wpi_first_util_WPIUtilJNI
+ * Class:     edu_wpi_first_net_WPINetJNI
  * Method:    createMulticastServiceResolver
  * Signature: (Ljava/lang/String;)I
  */
@@ -202,7 +202,7 @@ Java_edu_wpi_first_net_WPINetJNI_createMulticastServiceResolver
 }
 
 /*
- * Class:     edu_wpi_first_util_WPIUtilJNI
+ * Class:     edu_wpi_first_net_WPINetJNI
  * Method:    freeMulticastServiceResolver
  * Signature: (I)V
  */
@@ -217,7 +217,7 @@ Java_edu_wpi_first_net_WPINetJNI_freeMulticastServiceResolver
 }
 
 /*
- * Class:     edu_wpi_first_util_WPIUtilJNI
+ * Class:     edu_wpi_first_net_WPINetJNI
  * Method:    startMulticastServiceResolver
  * Signature: (I)V
  */
@@ -232,7 +232,7 @@ Java_edu_wpi_first_net_WPINetJNI_startMulticastServiceResolver
 }
 
 /*
- * Class:     edu_wpi_first_util_WPIUtilJNI
+ * Class:     edu_wpi_first_net_WPINetJNI
  * Method:    stopMulticastServiceResolver
  * Signature: (I)V
  */
@@ -247,7 +247,7 @@ Java_edu_wpi_first_net_WPINetJNI_stopMulticastServiceResolver
 }
 
 /*
- * Class:     edu_wpi_first_util_WPIUtilJNI
+ * Class:     edu_wpi_first_net_WPINetJNI
  * Method:    getMulticastServiceResolverHasImplementation
  * Signature: (I)Z
  */
@@ -262,7 +262,7 @@ Java_edu_wpi_first_net_WPINetJNI_getMulticastServiceResolverHasImplementation
 }
 
 /*
- * Class:     edu_wpi_first_util_WPIUtilJNI
+ * Class:     edu_wpi_first_net_WPINetJNI
  * Method:    getMulticastServiceResolverEventHandle
  * Signature: (I)I
  */
@@ -277,7 +277,7 @@ Java_edu_wpi_first_net_WPINetJNI_getMulticastServiceResolverEventHandle
 }
 
 /*
- * Class:     edu_wpi_first_util_WPIUtilJNI
+ * Class:     edu_wpi_first_net_WPINetJNI
  * Method:    getMulticastServiceResolverData
  * Signature: (I)[Ljava/lang/Object;
  */
