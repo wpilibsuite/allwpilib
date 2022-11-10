@@ -55,7 +55,7 @@ JNIEXPORT void JNICALL JNI_OnUnload(JavaVM* vm, void* reserved) {
  * Signature: (ILjava/lang/String;I)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_util_WPIUtilJNI_addPortForwarder
+Java_edu_wpi_first_net_WPINetJNI_addPortForwarder
   (JNIEnv* env, jclass, jint port, jstring remoteHost, jint remotePort)
 {
   wpi::PortForwarder::GetInstance().Add(static_cast<unsigned int>(port),
@@ -69,7 +69,7 @@ Java_edu_wpi_first_util_WPIUtilJNI_addPortForwarder
  * Signature: (I)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_util_WPIUtilJNI_removePortForwarder
+Java_edu_wpi_first_net_WPINetJNI_removePortForwarder
   (JNIEnv* env, jclass, jint port)
 {
   wpi::PortForwarder::GetInstance().Remove(port);
@@ -81,7 +81,7 @@ Java_edu_wpi_first_util_WPIUtilJNI_removePortForwarder
  * Signature: (Ljava/lang/String;Ljava/lang/String;I[Ljava/lang/Object;[Ljava/lang/Object;)I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_first_util_WPIUtilJNI_createMulticastServiceAnnouncer
+Java_edu_wpi_first_net_WPINetJNI_createMulticastServiceAnnouncer
   (JNIEnv* env, jclass, jstring serviceName, jstring serviceType, jint port,
    jobjectArray keys, jobjectArray values)
 {
@@ -124,7 +124,7 @@ Java_edu_wpi_first_util_WPIUtilJNI_createMulticastServiceAnnouncer
  * Signature: (I)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_util_WPIUtilJNI_freeMulticastServiceAnnouncer
+Java_edu_wpi_first_net_WPINetJNI_freeMulticastServiceAnnouncer
   (JNIEnv* env, jclass, jint handle)
 {
   auto& manager = wpi::GetMulticastManager();
@@ -139,7 +139,7 @@ Java_edu_wpi_first_util_WPIUtilJNI_freeMulticastServiceAnnouncer
  * Signature: (I)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_util_WPIUtilJNI_startMulticastServiceAnnouncer
+Java_edu_wpi_first_net_WPINetJNI_startMulticastServiceAnnouncer
   (JNIEnv* env, jclass, jint handle)
 {
   auto& manager = wpi::GetMulticastManager();
@@ -154,7 +154,7 @@ Java_edu_wpi_first_util_WPIUtilJNI_startMulticastServiceAnnouncer
  * Signature: (I)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_util_WPIUtilJNI_stopMulticastServiceAnnouncer
+Java_edu_wpi_first_net_WPINetJNI_stopMulticastServiceAnnouncer
   (JNIEnv* env, jclass, jint handle)
 {
   auto& manager = wpi::GetMulticastManager();
@@ -169,7 +169,7 @@ Java_edu_wpi_first_util_WPIUtilJNI_stopMulticastServiceAnnouncer
  * Signature: (I)Z
  */
 JNIEXPORT jboolean JNICALL
-Java_edu_wpi_first_util_WPIUtilJNI_getMulticastServiceAnnouncerHasImplementation
+Java_edu_wpi_first_net_WPINetJNI_getMulticastServiceAnnouncerHasImplementation
   (JNIEnv* env, jclass, jint handle)
 {
   auto& manager = wpi::GetMulticastManager();
@@ -184,7 +184,7 @@ Java_edu_wpi_first_util_WPIUtilJNI_getMulticastServiceAnnouncerHasImplementation
  * Signature: (Ljava/lang/String;)I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_first_util_WPIUtilJNI_createMulticastServiceResolver
+Java_edu_wpi_first_net_WPINetJNI_createMulticastServiceResolver
   (JNIEnv* env, jclass, jstring serviceType)
 {
   auto& manager = wpi::GetMulticastManager();
@@ -207,7 +207,7 @@ Java_edu_wpi_first_util_WPIUtilJNI_createMulticastServiceResolver
  * Signature: (I)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_util_WPIUtilJNI_freeMulticastServiceResolver
+Java_edu_wpi_first_net_WPINetJNI_freeMulticastServiceResolver
   (JNIEnv* env, jclass, jint handle)
 {
   auto& manager = wpi::GetMulticastManager();
@@ -222,7 +222,7 @@ Java_edu_wpi_first_util_WPIUtilJNI_freeMulticastServiceResolver
  * Signature: (I)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_util_WPIUtilJNI_startMulticastServiceResolver
+Java_edu_wpi_first_net_WPINetJNI_startMulticastServiceResolver
   (JNIEnv* env, jclass, jint handle)
 {
   auto& manager = wpi::GetMulticastManager();
@@ -237,7 +237,7 @@ Java_edu_wpi_first_util_WPIUtilJNI_startMulticastServiceResolver
  * Signature: (I)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_util_WPIUtilJNI_stopMulticastServiceResolver
+Java_edu_wpi_first_net_WPINetJNI_stopMulticastServiceResolver
   (JNIEnv* env, jclass, jint handle)
 {
   auto& manager = wpi::GetMulticastManager();
@@ -252,7 +252,7 @@ Java_edu_wpi_first_util_WPIUtilJNI_stopMulticastServiceResolver
  * Signature: (I)Z
  */
 JNIEXPORT jboolean JNICALL
-Java_edu_wpi_first_util_WPIUtilJNI_getMulticastServiceResolverHasImplementation
+Java_edu_wpi_first_net_WPINetJNI_getMulticastServiceResolverHasImplementation
   (JNIEnv* env, jclass, jint handle)
 {
   auto& manager = wpi::GetMulticastManager();
@@ -267,7 +267,7 @@ Java_edu_wpi_first_util_WPIUtilJNI_getMulticastServiceResolverHasImplementation
  * Signature: (I)I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_first_util_WPIUtilJNI_getMulticastServiceResolverEventHandle
+Java_edu_wpi_first_net_WPINetJNI_getMulticastServiceResolverEventHandle
   (JNIEnv* env, jclass, jint handle)
 {
   auto& manager = wpi::GetMulticastManager();
@@ -282,7 +282,7 @@ Java_edu_wpi_first_util_WPIUtilJNI_getMulticastServiceResolverEventHandle
  * Signature: (I)[Ljava/lang/Object;
  */
 JNIEXPORT jobjectArray JNICALL
-Java_edu_wpi_first_util_WPIUtilJNI_getMulticastServiceResolverData
+Java_edu_wpi_first_net_WPINetJNI_getMulticastServiceResolverData
   (JNIEnv* env, jclass, jint handle)
 {
   static jmethodID constructor =
