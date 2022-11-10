@@ -27,8 +27,8 @@ class Command;
  * <p>It is very easy to link a button to a command. For instance, you could
  * link the trigger button of a joystick to a "score" command.
  *
- * <p>Triggers can easily be composed for advanced functionality using the {@link
- * #operator!}, {@link #operator||}, {@link #operator&&} operators.
+ * <p>Triggers can easily be composed for advanced functionality using the
+ * {@link #operator!}, {@link #operator||}, {@link #operator&&} operators.
  *
  * <p>This class is provided by the NewCommands VendorDep
  */
