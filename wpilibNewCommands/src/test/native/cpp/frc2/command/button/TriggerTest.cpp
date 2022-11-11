@@ -120,34 +120,7 @@ TEST_F(TriggerTest, WhenTrueOnce) {
   EXPECT_EQ(1, endCounter);
 }
 
-TEST_F(TriggerTest, ToggleOnTrueOwned) {
-  auto& scheduler = CommandScheduler::GetInstance();
-  bool pressed = false;
-  int startCounter = 0;
-  int endCounter = 0;
-  CommandPtr command = cmd::StartEnd([&startCounter] { startCounter++; },
-                                     [&endCounter] { endCounter++; });
-
-  Trigger([&pressed] { return pressed; }).ToggleOnTrue(command.get());
-  scheduler.Run();
-  EXPECT_EQ(0, startCounter);
-  EXPECT_EQ(0, endCounter);
-  pressed = true;
-  scheduler.Run();
-  scheduler.Run();
-  EXPECT_EQ(1, startCounter);
-  EXPECT_EQ(0, endCounter);
-  pressed = false;
-  scheduler.Run();
-  EXPECT_EQ(1, startCounter);
-  EXPECT_EQ(0, endCounter);
-  pressed = true;
-  scheduler.Run();
-  EXPECT_EQ(1, startCounter);
-  EXPECT_EQ(1, endCounter);
-}
-
-TEST_F(TriggerTest, ToggleOnTrueMoved) {
+TEST_F(TriggerTest, ToggleOnTrue) {
   auto& scheduler = CommandScheduler::GetInstance();
   bool pressed = false;
   int startCounter = 0;
