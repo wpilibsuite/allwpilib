@@ -120,7 +120,16 @@ bool DataLogModel::LoadWPILog(std::string filename) {
     }
   }
   
-  this->filename = filename;
+  
+  for(int i = 0; i < filename.length(); i++){
+    this->rawFilename += filename[i];
+    if(filename[i] == '/' || filename[i] == '\\'){
+      this->rawFilename = "";
+    }
+  }
+  
+  this->filename = this->rawFilename;
+  this->path = filename;
   m_hasLog = true;
   flags.IsLogActive = true;
   return true;

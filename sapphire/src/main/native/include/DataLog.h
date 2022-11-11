@@ -81,6 +81,8 @@ class DataLogModel : private glass::Model {
 
     wpi::DenseMap<int, std::unique_ptr<EntryData> > m_entries;
     std::vector<EntryNode> m_tree;
+    std::string path = "";
+    std::string rawFilename = "";
     std::string filename = "";
     float offset = 0;
     DataLogFlags flags;

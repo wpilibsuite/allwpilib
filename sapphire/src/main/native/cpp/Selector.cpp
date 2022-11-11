@@ -63,11 +63,16 @@ void Selector::Display() {
       bool success = log->LoadWPILog(result[0]);
       if(success) {
         logFileMessage = "Success";
+        auto filename = log->rawFilename;
         // Make sure there are no name conflicts
+        int number = 0;
         for(auto& otherLog : logs){
-          if(log->filename == otherLog->filename && otherLog != log){
-            log->filename += "(1)";
+          if(filename == otherLog->rawFilename && otherLog != log){
+              number++;
           }
+        }
+        if(number){
+          log->filename = fmt::format("{}({})", filename, number);
         }
         if(loader){
           loader->AddDataLog(*log);
