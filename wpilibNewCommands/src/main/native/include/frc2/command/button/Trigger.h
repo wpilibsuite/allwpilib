@@ -109,7 +109,7 @@ class Trigger {
    * Starts the given command when the condition changes to `true` and cancels
    * it when the condition changes to `false`.
    *
-   * <p>Doesn't re-start the command in-between. If the command should restart,
+   * <p>Doesn't re-start the command if it ends while the condition is still `true`. If the command should restart,
    * see RepeatCommand.
    *
    * <p>Takes a raw pointer, and so is non-owning; users are responsible for the
@@ -125,7 +125,7 @@ class Trigger {
    * it when the condition changes to `false`. Moves command ownership to the
    * button scheduler.
    *
-   * <p>Doesn't re-start the command in-between. If the command should restart,
+   * <p>Doesn't re-start the command if it ends while the condition is still `true`. If the command should restart,
    * see RepeatCommand.
    *
    * @param command The command to bind.
@@ -137,8 +137,8 @@ class Trigger {
    * Starts the given command when the condition changes to `false` and cancels
    * it when the condition changes to `true`.
    *
-   * <p>Doesn't re-start the command in-between. If the command should restart,
-   * see RepeatCommand.
+   * <p>Doesn't re-start the command if it ends while the condition is still `true`. If the command
+   * should restart, see RepeatCommand.
    *
    * <p>Takes a raw pointer, and so is non-owning; users are responsible for the
    * lifespan of the command.
@@ -153,8 +153,8 @@ class Trigger {
    * it when the condition changes to `true`. Moves command ownership to the
    * button scheduler.
    *
-   * <p>Doesn't re-start the command in-between. If the command should restart,
-   * see RepeatCommand.
+   * <p>Doesn't re-start the command if it ends while the condition is still `false`. If the command
+   * should restart, see RepeatCommand.
    *
    * @param command The command to bind.
    * @return The trigger, for chained calls.

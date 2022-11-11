@@ -98,8 +98,8 @@ public class Trigger implements BooleanSupplier {
    * Starts the given command when the condition changes to `true` and cancels it when the condition
    * changes to `false`.
    *
-   * <p>Doesn't re-start the command in-between. If the command should restart, see {@link
-   * edu.wpi.first.wpilibj2.command.RepeatCommand}.
+   * <p>Doesn't re-start the command if it ends while the condition is still `true`. If the command
+   * should restart, see {@link edu.wpi.first.wpilibj2.command.RepeatCommand}.
    *
    * @param command the command to start
    * @return this trigger, so calls can be chained
@@ -115,8 +115,8 @@ public class Trigger implements BooleanSupplier {
    * Starts the given command when the condition changes to `false` and cancels it when the
    * condition changes to `true`.
    *
-   * <p>Doesn't re-start the command in-between. If the command should restart, see {@link
-   * edu.wpi.first.wpilibj2.command.RepeatCommand}.
+   * <p>Doesn't re-start the command if it ends while the condition is still `false`. If the command
+   * should restart, see {@link edu.wpi.first.wpilibj2.command.RepeatCommand}.
    *
    * @param command the command to start
    * @return this trigger, so calls can be chained
