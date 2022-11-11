@@ -163,7 +163,7 @@ class DataLogRecord:
             arr.append(val)
         return arr
 
-    def _readInnerString(self, pos: int) -> str:
+    def _readInnerString(self, pos: int) -> tuple:
         size = int.from_bytes(
             self.data[pos : pos + 4], byteorder="little", signed=False
         )
@@ -324,7 +324,7 @@ if __name__ == "__main__":
                         print(f"  {record.getDouble()}")
                     elif entry.type == "int64":
                         print(f"  {record.getInteger()}")
-                    elif entry.type in ["string", "json"]:
+                    elif entry.type in ("string", "json"):
                         print(f"  '{record.getString()}'")
                     elif entry.type == "boolean":
                         print(f"  {record.getBoolean()}")
