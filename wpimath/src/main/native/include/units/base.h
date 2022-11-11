@@ -2870,6 +2870,7 @@ namespace units
 	}
 #if defined(UNIT_LIB_ENABLE_IOSTREAM)
 	namespace dimensionless
+	{
 		inline std::ostream& operator<<(std::ostream& os, const dB_t& obj) { os << obj() << " dB"; return os; }
 	}
 #endif
