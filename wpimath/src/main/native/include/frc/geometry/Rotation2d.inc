@@ -13,10 +13,9 @@
 namespace frc {
 
 constexpr Rotation2d::Rotation2d(units::radian_t value)
-    : m_value(value),
-      m_cos(std::is_constant_evaluated() ? gcem::cos(value.to<double>())
-                                         : std::cos(value.to<double>())),
-      m_sin(std::is_constant_evaluated() ? gcem::sin(value.to<double>())
+    : Rotation2d(std::is_constant_evaluated() ? gcem::cos(value.to<double>())
+                                         : std::cos(value.to<double>()),
+                                         std::is_constant_evaluated() ? gcem::sin(value.to<double>())
                                          : std::sin(value.to<double>())) {}
 
 constexpr Rotation2d::Rotation2d(units::degree_t value)
@@ -31,17 +30,14 @@ constexpr Rotation2d::Rotation2d(double x, double y) {
     m_sin = 0.0;
     m_cos = 1.0;
   }
-  m_value =
-      units::radian_t{std::is_constant_evaluated() ? gcem::atan2(m_sin, m_cos)
-                                                   : std::atan2(m_sin, m_cos)};
 }
 
 constexpr Rotation2d Rotation2d::operator-() const {
-  return Rotation2d{-m_value};
+  return Rotation2d{m_cos, -m_sin};
 }
 
 constexpr Rotation2d Rotation2d::operator*(double scalar) const {
-  return Rotation2d(m_value * scalar);
+  return Rotation2d(Radians() * scalar);
 }
 
 constexpr Rotation2d Rotation2d::operator+(const Rotation2d& other) const {
@@ -69,6 +65,15 @@ constexpr bool Rotation2d::operator!=(const Rotation2d& other) const {
 constexpr Rotation2d Rotation2d::RotateBy(const Rotation2d& other) const {
   return {Cos() * other.Cos() - Sin() * other.Sin(),
           Cos() * other.Sin() + Sin() * other.Cos()};
+}
+
+constexpr units::radian_t Rotation2d::Radians() const {
+  return units::radian_t{std::is_constant_evaluated() ? gcem::atan2(m_sin, m_cos)
+                                                   : std::atan2(m_sin, m_cos)};
+}
+
+constexpr units::degree_t Rotation2d::Degrees() const {
+  return Radians();
 }
 
 }  // namespace frc

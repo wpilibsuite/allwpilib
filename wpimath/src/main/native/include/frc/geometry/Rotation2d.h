@@ -136,14 +136,14 @@ class WPILIB_DLLEXPORT Rotation2d {
    *
    * @return The radian value of the rotation.
    */
-  constexpr units::radian_t Radians() const { return m_value; }
+  constexpr units::radian_t Radians() const;
 
   /**
    * Returns the degree value of the rotation.
    *
    * @return The degree value of the rotation.
    */
-  constexpr units::degree_t Degrees() const { return m_value; }
+  constexpr units::degree_t Degrees() const;
 
   /**
    * Returns the cosine of the rotation.
@@ -167,7 +167,6 @@ class WPILIB_DLLEXPORT Rotation2d {
   constexpr double Tan() const { return Sin() / Cos(); }
 
  private:
-  units::radian_t m_value = 0_rad;
   double m_cos = 1;
   double m_sin = 0;
 };
