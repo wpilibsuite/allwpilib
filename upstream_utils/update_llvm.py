@@ -126,9 +126,10 @@ def overwrite_files(wpiutil_files, llvm_files):
 
     for wpi_file in wpiutil_files:
         wpi_base_name = os.path.basename(wpi_file)
-        if wpi_base_name in llvm_files or wpi_base_name in unmatched_files_whitelist:
+        if wpi_base_name in llvm_files:
             shutil.copyfile(llvm_files[wpi_base_name], wpi_file)
-        else:
+
+        elif wpi_base_name not in unmatched_files_whitelist:
             print(f"No file match for {wpi_file}, check if LLVM deleted it")
 
 
