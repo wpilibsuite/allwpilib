@@ -161,7 +161,7 @@ public class Rotation2d implements Interpolatable<Rotation2d> {
   }
 
   /**
-   * Returns the radian value of the Rotation2d in the -pi to pi range.
+   * Returns the radian value of the Rotation2d within (-pi, pi].
    *
    * @return The radian value of the Rotation2d.
    */
@@ -171,7 +171,7 @@ public class Rotation2d implements Interpolatable<Rotation2d> {
   }
 
   /**
-   * Returns the degree value of the Rotation2d in the -180 to 180 range.
+   * Returns the degree value of the Rotation2d within (-180, 180].
    *
    * @return The degree value of the Rotation2d.
    */
