@@ -35,8 +35,8 @@ class CommandPtr final {
       : CommandPtr(std::make_unique<std::remove_reference_t<T>>(
             std::forward<T>(command))) {}
 
-  CommandPtr(CommandPtr&&);
-  CommandPtr& operator=(CommandPtr&&);
+  CommandPtr(CommandPtr&&) = default;
+  CommandPtr& operator=(CommandPtr&&) = default;
 
   /**
    * Decorates this command to run repeatedly, restarting it when it ends, until
@@ -260,6 +260,11 @@ class CommandPtr final {
   bool HasRequirement(Subsystem* requirement) const;
 
   /**
+   * Check if this CommandPtr object is valid and wasn't moved-from.
+   */
+  explicit operator bool() const;
+
+  /**
    * Convert a vector of CommandPtr objects to their underlying unique_ptrs.
    */
   static std::vector<std::unique_ptr<Command>> UnwrapVector(
@@ -267,7 +272,7 @@ class CommandPtr final {
 
  private:
   std::unique_ptr<Command> m_ptr;
-  static std::unique_ptr<Command> UseAfterMoveErrorCommand();
+  void AssertValid() const;
 };
 
 }  // namespace frc2

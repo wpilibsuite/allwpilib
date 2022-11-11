@@ -27,6 +27,8 @@ TEST_F(CommandPtrTest, MovedFrom) {
   EXPECT_NO_FATAL_FAILURE(scheduler.Cancel(movedTo));
 
   EXPECT_THROW(scheduler.Schedule(movedFrom), frc::RuntimeError);
+  EXPECT_THROW(movedFrom.IsScheduled(), frc::RuntimeError);
+  EXPECT_THROW(std::move(movedFrom).Repeatedly(), frc::RuntimeError);
 
   EXPECT_EQ(1, counter);
 }

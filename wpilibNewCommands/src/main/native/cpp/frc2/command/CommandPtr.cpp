@@ -22,29 +22,21 @@
 
 using namespace frc2;
 
-std::unique_ptr<Command> CommandPtr::UseAfterMoveErrorCommand() {
-  return std::make_unique<InstantCommand>([] {
+void CommandPtr::AssertValid() const {
+  if (!this->m_ptr) {
     throw FRC_MakeError(frc::err::CommandIllegalUse,
                         "Moved-from CommandPtr object used!");
-  });
-}
-
-CommandPtr::CommandPtr(CommandPtr&& rhs) : m_ptr(std::move(rhs.m_ptr)) {
-  rhs.m_ptr = UseAfterMoveErrorCommand();
-}
-
-CommandPtr& CommandPtr::operator=(CommandPtr&& rhs) {
-  this->m_ptr = std::move(rhs.m_ptr);
-  rhs.m_ptr = UseAfterMoveErrorCommand();
-  return *this;
+  }
 }
 
 CommandPtr CommandPtr::Repeatedly() && {
+  this->AssertValid();
   m_ptr = std::make_unique<RepeatCommand>(std::move(m_ptr));
   return std::move(*this);
 }
 
 CommandPtr CommandPtr::AsProxy() && {
+  this->AssertValid();
   m_ptr = std::make_unique<ProxyScheduleCommand>(std::move(m_ptr));
   return std::move(*this);
 }
@@ -63,6 +55,7 @@ class RunsWhenDisabledCommand : public WrapperCommand {
 };
 
 CommandPtr CommandPtr::IgnoringDisable(bool doesRunWhenDisabled) && {
+  this->AssertValid();
   m_ptr = std::make_unique<RunsWhenDisabledCommand>(std::move(m_ptr),
                                                     doesRunWhenDisabled);
   return std::move(*this);
@@ -86,6 +79,7 @@ class InterruptBehaviorCommand : public WrapperCommand {
 
 CommandPtr CommandPtr::WithInterruptBehavior(
     InterruptionBehavior interruptBehavior) && {
+  this->AssertValid();
   m_ptr = std::make_unique<InterruptBehaviorCommand>(std::move(m_ptr),
                                                      interruptBehavior);
   return std::move(*this);
@@ -93,6 +87,7 @@ CommandPtr CommandPtr::WithInterruptBehavior(
 
 CommandPtr CommandPtr::AndThen(std::function<void()> toRun,
                                std::span<Subsystem* const> requirements) && {
+  this->AssertValid();
   return std::move(*this).AndThen(CommandPtr(
       std::make_unique<InstantCommand>(std::move(toRun), requirements)));
 }
@@ -100,11 +95,13 @@ CommandPtr CommandPtr::AndThen(std::function<void()> toRun,
 CommandPtr CommandPtr::AndThen(
     std::function<void()> toRun,
     std::initializer_list<Subsystem*> requirements) && {
+  this->AssertValid();
   return std::move(*this).AndThen(CommandPtr(
       std::make_unique<InstantCommand>(std::move(toRun), requirements)));
 }
 
 CommandPtr CommandPtr::AndThen(CommandPtr&& next) && {
+  this->AssertValid();
   std::vector<std::unique_ptr<Command>> temp;
   temp.emplace_back(std::move(m_ptr));
   temp.emplace_back(std::move(next).Unwrap());
@@ -114,6 +111,7 @@ CommandPtr CommandPtr::AndThen(CommandPtr&& next) && {
 
 CommandPtr CommandPtr::BeforeStarting(
     std::function<void()> toRun, std::span<Subsystem* const> requirements) && {
+  this->AssertValid();
   return std::move(*this).BeforeStarting(CommandPtr(
       std::make_unique<InstantCommand>(std::move(toRun), requirements)));
 }
@@ -121,11 +119,13 @@ CommandPtr CommandPtr::BeforeStarting(
 CommandPtr CommandPtr::BeforeStarting(
     std::function<void()> toRun,
     std::initializer_list<Subsystem*> requirements) && {
+  this->AssertValid();
   return std::move(*this).BeforeStarting(CommandPtr(
       std::make_unique<InstantCommand>(std::move(toRun), requirements)));
 }
 
 CommandPtr CommandPtr::BeforeStarting(CommandPtr&& before) && {
+  this->AssertValid();
   std::vector<std::unique_ptr<Command>> temp;
   temp.emplace_back(std::move(before).Unwrap());
   temp.emplace_back(std::move(m_ptr));
@@ -134,6 +134,7 @@ CommandPtr CommandPtr::BeforeStarting(CommandPtr&& before) && {
 }
 
 CommandPtr CommandPtr::WithTimeout(units::second_t duration) && {
+  this->AssertValid();
   std::vector<std::unique_ptr<Command>> temp;
   temp.emplace_back(std::make_unique<WaitCommand>(duration));
   temp.emplace_back(std::move(m_ptr));
@@ -142,6 +143,7 @@ CommandPtr CommandPtr::WithTimeout(units::second_t duration) && {
 }
 
 CommandPtr CommandPtr::Until(std::function<bool()> condition) && {
+  this->AssertValid();
   std::vector<std::unique_ptr<Command>> temp;
   temp.emplace_back(std::make_unique<WaitUntilCommand>(std::move(condition)));
   temp.emplace_back(std::move(m_ptr));
@@ -150,6 +152,7 @@ CommandPtr CommandPtr::Until(std::function<bool()> condition) && {
 }
 
 CommandPtr CommandPtr::Unless(std::function<bool()> condition) && {
+  this->AssertValid();
   m_ptr = std::make_unique<ConditionalCommand>(
       std::make_unique<InstantCommand>(), std::move(m_ptr),
       std::move(condition));
@@ -157,6 +160,7 @@ CommandPtr CommandPtr::Unless(std::function<bool()> condition) && {
 }
 
 CommandPtr CommandPtr::DeadlineWith(CommandPtr&& parallel) && {
+  this->AssertValid();
   std::vector<std::unique_ptr<Command>> vec;
   vec.emplace_back(std::move(parallel).Unwrap());
   m_ptr =
@@ -165,6 +169,7 @@ CommandPtr CommandPtr::DeadlineWith(CommandPtr&& parallel) && {
 }
 
 CommandPtr CommandPtr::AlongWith(CommandPtr&& parallel) && {
+  this->AssertValid();
   std::vector<std::unique_ptr<Command>> vec;
   vec.emplace_back(std::move(m_ptr));
   vec.emplace_back(std::move(parallel).Unwrap());
@@ -173,6 +178,7 @@ CommandPtr CommandPtr::AlongWith(CommandPtr&& parallel) && {
 }
 
 CommandPtr CommandPtr::RaceWith(CommandPtr&& parallel) && {
+  this->AssertValid();
   std::vector<std::unique_ptr<Command>> vec;
   vec.emplace_back(std::move(m_ptr));
   vec.emplace_back(std::move(parallel).Unwrap());
@@ -198,11 +204,13 @@ class FinallyCommand : public WrapperCommand {
 }  // namespace
 
 CommandPtr CommandPtr::FinallyDo(std::function<void(bool)> end) && {
+  this->AssertValid();
   m_ptr = std::make_unique<FinallyCommand>(std::move(m_ptr), std::move(end));
   return std::move(*this);
 }
 
 CommandPtr CommandPtr::HandleInterrupt(std::function<void(void)> handler) && {
+  this->AssertValid();
   return std::move(*this).FinallyDo(
       [handler = std::move(handler)](bool interrupted) {
         if (interrupted) {
@@ -216,24 +224,26 @@ Command* CommandPtr::get() const {
 }
 
 std::unique_ptr<Command> CommandPtr::Unwrap() && {
-  auto ptr = std::move(m_ptr);
-  m_ptr = UseAfterMoveErrorCommand();
-  return ptr;
+  return std::move(m_ptr);
 }
 
 void CommandPtr::Schedule() const {
+  this->AssertValid();
   CommandScheduler::GetInstance().Schedule(*this);
 }
 
 void CommandPtr::Cancel() const {
+  this->AssertValid();
   CommandScheduler::GetInstance().Cancel(*this);
 }
 
 bool CommandPtr::IsScheduled() const {
+  this->AssertValid();
   return CommandScheduler::GetInstance().IsScheduled(*this);
 }
 
 bool CommandPtr::HasRequirement(Subsystem* requirement) const {
+  this->AssertValid();
   return m_ptr->HasRequirement(requirement);
 }
 
