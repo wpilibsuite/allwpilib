@@ -132,14 +132,14 @@ class WPILIB_DLLEXPORT Rotation2d {
   constexpr Rotation2d RotateBy(const Rotation2d& other) const;
 
   /**
-   * Returns the radian value of the rotation.
+   * Returns the radian value of the rotation in the -pi to pi range.
    *
    * @return The radian value of the rotation.
    */
   constexpr units::radian_t Radians() const;
 
   /**
-   * Returns the degree value of the rotation.
+   * Returns the degree value of the rotation in the -180 to 180 range.
    *
    * @return The degree value of the rotation.
    */
