@@ -135,9 +135,9 @@ EntryNode* find(std::vector<EntryNode>& list, std::string name){
   }
   return nullptr;
 }
-std::shared_ptr<EntryNode> EntryNode::GetEntryNode(std::vector<std::string> path){
+EntryNode* EntryNode::GetEntryNode(std::vector<std::string> path){
   if(path.size() == 0){
-    return std::shared_ptr<EntryNode>(this);
+    return this;
   }
   auto nextNode = find(children, path[0]);
   if(nextNode == nullptr){
@@ -147,7 +147,7 @@ std::shared_ptr<EntryNode> EntryNode::GetEntryNode(std::vector<std::string> path
 }
 
 
-std::shared_ptr<EntryNode> DataLogModel::GetEntryNode(std::string path){
+EntryNode* DataLogModel::GetEntryNode(std::string path){
   std::vector<std::string> pathVec;
   int last = 0;
   for(size_t i = 0; i < path.length(); i++){

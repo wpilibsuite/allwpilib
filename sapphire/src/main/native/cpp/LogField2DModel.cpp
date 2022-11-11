@@ -50,7 +50,13 @@ LogField2DModel::LogField2DModel(DataLogModel& model, std::string_view path, flo
                                                     m_path{path},
                                                     node{model.GetEntryNode(std::string(path))},
                                                     nowRef{nowRef},
-                                                    now{nowRef} {}
+                                                    now{nowRef} {
+  for(auto& obj : node->children){
+    if(obj.entry && obj.entry->type == "double[]"){
+      AddFieldObject(obj.name);
+    }
+  }
+}
 
 LogField2DModel::~LogField2DModel() = default;
 

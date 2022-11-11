@@ -117,6 +117,8 @@ void Application(std::string_view saveDir) {
 
   plotProvider = std::make_unique<PlotProvider>(plotStorage, timestamp);
   viewLoader = std::make_unique<LogModelViewLoader>(viewStorage, timestamp);
+  RegisterLogModels(*viewLoader);
+  selector->AddLoader(viewLoader.get());
 
   windowManager->GlobalInit();
   plotProvider->GlobalInit();

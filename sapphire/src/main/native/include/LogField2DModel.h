@@ -30,7 +30,7 @@ class LogField2DModel : public glass::Field2DModel {
     void UpdatePoses(const wpi::log::DataLogRecord& value);
 
     void Update() override {
-        auto value = m_entry->GetRecordAt(m_now);
+        auto value = m_entry->GetRecordAt(m_now*1e6);
         if (value.GetEntry() != -1) {
             UpdatePoses(value);
         }
@@ -72,7 +72,7 @@ class LogField2DModel : public glass::Field2DModel {
  private:
   DataLogModel& m_model;
   std::string m_path;
-  std::shared_ptr<EntryNode> node;
+  EntryNode* node;
   std::string m_nameValue;
   float& nowRef;
   float now;

@@ -47,9 +47,9 @@ std::string GetFormattedEntryValue(EntryData& data, int timestamp, wpi::log::Dat
 // Contains information about the structure of the datalog
 struct EntryNode {
   explicit EntryNode(std::string_view name): name{name} {}
-  std::shared_ptr<EntryData> GetEntry(std::vector<std::string> path);
+  EntryData* GetEntry(std::vector<std::string> path);
 
-  std::shared_ptr<EntryNode> GetEntryNode(std::vector<std::string> path);
+  EntryNode* GetEntryNode(std::vector<std::string> path);
   void AddEntry(EntryData *entry,std::vector<std::string> path);
 
   std::string name;
@@ -75,7 +75,7 @@ class DataLogModel : private glass::Model {
     void Update() override { }
     bool Exists() override { return m_hasLog && flags.IsLogActive; }
     int  GetSize() const {return m_entries.size(); }
-    std::shared_ptr<EntryNode> GetEntryNode(std::string path);
+    EntryNode* GetEntryNode(std::string path);
     void AddEntryNode(EntryData* data, std::string path);
     const std::vector<EntryNode>& GetTreeRoot(){return m_tree;}
 

@@ -9,6 +9,7 @@
 
 #include "DataLog.h"
 #include "glass/View.h"
+#include "LogModelViewLoader.h"
 
 namespace sapphire {
     
@@ -16,7 +17,11 @@ class Selector: public glass::View {
     public:
         void Display() override;
         std::vector<std::unique_ptr<DataLogModel> >& GetDataLogs();
+        void AddLoader(LogModelViewLoader* loader) {
+            this->loader = loader;
+        }
     private:
+        LogModelViewLoader* loader = nullptr;
         std::unique_ptr<DataLogModel>& GetNextModel();
         std::vector<std::unique_ptr<DataLogModel> > logs;
 };

@@ -30,15 +30,22 @@ LogModelViewLoader::DataLogProvider::DataLogProvider(LogModelViewLoader* loader,
         if(builderIt == m_typeMap.end()){
             continue;
         }
-        std::string_view id = wpi::drop_back(entry->GetName()); 
+        std::string path = entry->GetName();
+        
+        int c;
+        for(c = path.length()-1; path[c] != '/'; c--){
+            path = path.substr(0,c);
+        }
+        path = path.substr(0,c);
+         
         m_models.emplace_back(
                 std::make_unique<ModelEntry>(
-                    id, 
+                    path, 
                     builderIt->second.createModel));
         
         auto& view = m_views.emplace_back(
                 std::make_unique<ViewEntry>(
-                    id,  m_models.back().get(),
+                    path,  m_models.back().get(),
                     builderIt->second.createView));
 
         Show(view.get(), nullptr);
@@ -72,7 +79,7 @@ void LogModelViewLoader::DataLogProvider::Show(ViewEntry* entry, glass::Window* 
 
     // the window might exist and we're just not associated to it yet
     if (!window) {
-        window = loader->GetOrAddWindow(std::string{name} + entry->name, true, glass::Window::kHide);
+        window = loader->GetOrAddWindow(std::string{name} + entry->name, true, glass::Window::kShow);
     }
     if (!window) {
         return;

@@ -69,6 +69,9 @@ void Selector::Display() {
             log->filename += "(1)";
           }
         }
+        if(loader){
+          loader->AddDataLog(*log);
+        }
       } else {
         logFileMessage = "Failure";
       }
