@@ -14,7 +14,7 @@ class Rotation2dTest {
   private static final double kEpsilon = 1E-9;
 
   @Test
-  void testPositiveRadianInScope() {
+  void testInScope() {
     var rot1 = Rotation2d.fromRadians(Math.PI * 5 / 2);
     var rot2 = Rotation2d.fromRadians(Math.PI * 7 / 2);
 
