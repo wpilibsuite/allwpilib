@@ -75,6 +75,7 @@ static void DisplayMenuBar() {
   
   windowManager->DisplayMenu();
   plotProvider->DisplayMenu();
+  viewLoader->DisplayMenu();
   ImGui::EndMainMenuBar();
 
   if(about) {

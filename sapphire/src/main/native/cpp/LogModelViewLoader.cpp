@@ -8,7 +8,7 @@ using namespace sapphire;
 
 LogModelViewLoader::DataLogProvider::DataLogProvider(LogModelViewLoader* loader,
                                     std::string_view name,
-                                    std::shared_ptr<DataLogModel> log, 
+                                    DataLogModel* log, 
                                     wpi::StringMap<Builder>& typeMap) 
                                     : loader{loader},
                                     name{name},
@@ -58,7 +58,7 @@ void LogModelViewLoader::Register(std::string_view typeName, CreateModelFunc cre
 }
 
 void LogModelViewLoader::AddDataLog(DataLogModel& log){
-    m_logMap.try_emplace(log.filename, std::make_shared<LogModelViewLoader::DataLogProvider>(this, log.filename, std::shared_ptr<DataLogModel>(&log), m_typeMap));
+    m_logMap.try_emplace(log.filename, std::make_shared<LogModelViewLoader::DataLogProvider>(this, log.filename, &log, m_typeMap));
 }
 
 void LogModelViewLoader::DataLogProvider::Show(ViewEntry* entry, glass::Window* window){
@@ -113,6 +113,19 @@ void LogModelViewLoader::Update(){
     }
 }
 
+void LogModelViewLoader::DisplayMenu() {
+    if(ImGui::BeginMenu("Views")){
+        for(auto& log : m_logMap){
+            if(ImGui::BeginMenu(log.first().data())){
+                for(auto& entry : log.second->m_views){
+                    entry->window->DisplayMenuItem();
+                }
+                ImGui::EndMenu();
+            }
+        }
+        ImGui::EndMenu();
+    }
+}
 void sapphire::RegisterLogModels(LogModelViewLoader& provider){
     provider.Register(
             LogField2DModel::kType,
@@ -127,3 +140,4 @@ void sapphire::RegisterLogModels(LogModelViewLoader& provider){
                         static_cast<LogField2DModel*>(model));
             });
 }
+

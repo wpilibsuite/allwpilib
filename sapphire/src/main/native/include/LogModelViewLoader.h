@@ -42,6 +42,8 @@ class LogModelViewLoader : public glass::WindowManager {
 
   void AddDataLog(DataLogModel& model);
 
+  void DisplayMenu() override;
+
   float& nowRef;
 
  private:
@@ -80,9 +82,9 @@ class LogModelViewLoader : public glass::WindowManager {
 
   class DataLogProvider{
    public:
-    DataLogProvider(LogModelViewLoader* loader, std::string_view name, std::shared_ptr<DataLogModel> log, wpi::StringMap<Builder>& typeMap);
+    DataLogProvider(LogModelViewLoader* loader, std::string_view name, DataLogModel* log, wpi::StringMap<Builder>& typeMap);
     std::string_view name;
-    std::shared_ptr<DataLogModel> log;
+    DataLogModel* log;
     wpi::StringMap<Builder>& m_typeMap;
     std::vector<std::unique_ptr<ModelEntry> > m_models;
     std::vector<std::unique_ptr<ViewEntry> > m_views;
