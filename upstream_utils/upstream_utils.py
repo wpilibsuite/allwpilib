@@ -104,9 +104,9 @@ def copy_to(files, root):
 
         # Rename .cc file to .cpp
         if dest_file.endswith(".cc"):
-            dest_file = os.path.splitext(dest_file)[0] + ".cpp"
+            dest_file = f"{os.path.splitext(dest_file)[0]}.cpp"
         if dest_file.endswith(".c"):
-            dest_file = os.path.splitext(dest_file)[0] + ".cpp"
+            dest_file = f"{os.path.splitext(dest_file)[0]}.cpp"
 
         # Make leading directory
         dest_dir = os.path.dirname(dest_file)
