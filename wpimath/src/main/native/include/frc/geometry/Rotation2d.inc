@@ -14,9 +14,9 @@ namespace frc {
 
 constexpr Rotation2d::Rotation2d(units::radian_t value)
     : Rotation2d(std::is_constant_evaluated() ? gcem::cos(value.to<double>())
-                                         : std::cos(value.to<double>()),
-                                         std::is_constant_evaluated() ? gcem::sin(value.to<double>())
-                                         : std::sin(value.to<double>())) {}
+                                              : std::cos(value.to<double>()),
+                 std::is_constant_evaluated() ? gcem::sin(value.to<double>())
+                                              : std::sin(value.to<double>())) {}
 
 constexpr Rotation2d::Rotation2d(units::degree_t value)
     : Rotation2d(units::radian_t{value}) {}
@@ -68,8 +68,9 @@ constexpr Rotation2d Rotation2d::RotateBy(const Rotation2d& other) const {
 }
 
 constexpr units::radian_t Rotation2d::Radians() const {
-  return units::radian_t{std::is_constant_evaluated() ? gcem::atan2(m_sin, m_cos)
-                                                   : std::atan2(m_sin, m_cos)};
+  return units::radian_t{std::is_constant_evaluated()
+                             ? gcem::atan2(m_sin, m_cos)
+                             : std::atan2(m_sin, m_cos)};
 }
 
 constexpr units::degree_t Rotation2d::Degrees() const {
