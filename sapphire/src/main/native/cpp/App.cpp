@@ -21,6 +21,7 @@
 #include "Selector.h"
 #include "Plot.h"
 #include "LogModelViewLoader.h"
+#include "TimeManager.h"
 
 using namespace sapphire;
 
@@ -37,6 +38,7 @@ static std::unique_ptr<PlotProvider> plotProvider;
 static std::unique_ptr<LogModelViewLoader> viewLoader;
 
 static glass::Window* m_logSelectorWindow;
+static glass::Window* m_timeManagerWindow;
 static glass::Window* m_plotWindow;
 static std::unique_ptr<Selector> m_selector;
 
@@ -114,10 +116,13 @@ void Application(std::string_view saveDir) {
 
   auto  logViewer = std::make_unique<DataLogView>(logs);
 
+  auto  timeManager = std::make_unique<TimeManager>(*logViewer);
+
   auto& timestamp = logViewer->GetTimestamp();
 
   plotProvider = std::make_unique<PlotProvider>(plotStorage, timestamp);
   viewLoader = std::make_unique<LogModelViewLoader>(viewStorage, timestamp);
+  
   RegisterLogModels(*viewLoader);
   selector->AddLoader(viewLoader.get());
 
@@ -131,6 +136,8 @@ void Application(std::string_view saveDir) {
   m_entryManagerWindow = windowManager->AddWindow(
     "Entry Manager", std::move(logViewer));
 
+  m_timeManagerWindow = windowManager->AddWindow(
+    "Time Manager", std::move(timeManager));
 
   gui::AddWindowScaler([](float scale) { gDefaultScale = scale; });
   gui::AddLateExecute(DisplayMenuBar);
