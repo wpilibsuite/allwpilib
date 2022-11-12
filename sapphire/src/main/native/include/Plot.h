@@ -78,6 +78,11 @@ public:
     Plot(float& now, std::string& name, float sampleRate = 0.02f) : m_nowRef{now}, m_now{now}, m_name{name}, m_sampleRate{sampleRate} {
         m_axis.emplace_back(PlotAxis{m_name, 0, 0, true, false, true});
     };
+
+    enum PlotAction{
+        PlotNothing, PlotDelete, PlotMoveUp, PlotMoveDown
+    };
+
     void Display() ;
     float& m_nowRef;
     float m_now;
@@ -86,7 +91,7 @@ public:
     int m_height = 0;
 
     void EmitPlot();
-    void EmitContextMenu();
+    PlotAction EmitContextMenu();
     void EmitSettings();
     void DragDropTarget();
     void DragDropAccept();
@@ -121,6 +126,9 @@ class PlotView : public glass::View{
     std::vector<std::unique_ptr<Storage> >& m_plotStorage;
     std::vector<std::unique_ptr<Plot> > plots;
     Storage& m_storage;
+    private:
+    void AddPlot();
+
 };
 
 }

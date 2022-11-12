@@ -95,7 +95,8 @@ void EntryPlot::EmitPlot(Plot& view){
     ImPlot::PlotLineG(id.c_str(), getter, &getterData, getterData.data.size());
 }
 
-void Plot::EmitContextMenu(){
+Plot::PlotAction Plot::EmitContextMenu(){
+    Plot::PlotAction action = PlotNothing;
     if (ImGui::BeginMenu(m_name.c_str())) {
             
         ImGui::Checkbox("Display Legend", &settings.m_legend);
@@ -106,9 +107,13 @@ void Plot::EmitContextMenu(){
                 m_height = 0;
             }
         }
+        if(ImGui::Button("Delete")){
+            action = PlotDelete;
+        }
         EmitSettings();
         ImGui::EndMenu();
     }
+    return action;
 }
 
 EntryPlot::PlotAction EntryPlot::EmitSettings(){
@@ -269,16 +274,32 @@ PlotView::PlotView(PlotProvider *provider, float& now, Storage& storage) : provi
     }
 }
 
+void PlotView::AddPlot(){
+    m_plotStorage.emplace_back(std::make_unique<Storage>());
+    auto& name = m_plotStorage.back()->GetString("name");
+    if(name == ""){
+        name = fmt::format("Plot {}", plots.size()+1);
+    }
+    plots.emplace_back(std::make_unique<Plot>(m_now, name));
+}
 
 void PlotView::EmitContextMenu(){
     if (ImGui::BeginPopupContextItem(m_name.c_str())) {
         if(ImGui::Button("Add Plot")){
-            m_plotStorage.emplace_back(std::make_unique<Storage>());
-            auto& name = m_plotStorage.back()->GetString("name", fmt::format("Plot {}", plots.size()+1));
-            plots.emplace_back(std::make_unique<Plot>(m_now, name));
+            AddPlot();
         }
+        std::vector<Plot::PlotAction> actions;
         for(auto& plot : plots){
-            plot->EmitContextMenu();
+            actions.push_back(plot->EmitContextMenu());
+        }
+        for(int i = std::min(actions.size()-1, plots.size()-1); i >= 0; i--){
+            if(actions[i] == Plot::PlotDelete){
+                m_plotStorage.erase(m_plotStorage.begin()+i);
+                plots.erase(plots.begin()+i);
+                for(int j = i; j < plots.size(); j++){
+                    plots[j]->m_name = fmt::format("Plot {}", j+1);
+                }
+            }
         }
         ImGui::EndPopup();
     }        
@@ -288,10 +309,7 @@ void PlotView::Display(){
     EmitContextMenu();
     if(plots.size() == 0){
         if(ImGui::Button("Add Plot")){
-            m_plotStorage.emplace_back(std::make_unique<Storage>());
-            auto& name = m_plotStorage.back()->GetString("name");
-            if(name == "") {name = fmt::format("Plot {}", plots.size()+1);}
-            plots.emplace_back(std::make_unique<Plot>(m_now, name));
+            AddPlot();
         }
     }
     int availHeight = ImGui::GetContentRegionAvail().y;
