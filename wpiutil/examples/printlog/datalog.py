@@ -163,7 +163,7 @@ class DataLogRecord:
             arr.append(val)
         return arr
 
-    def _readInnerString(self, pos: int) -> tuple:
+    def _readInnerString(self, pos: int) -> tuple[str, int]:
         size = int.from_bytes(
             self.data[pos : pos + 4], byteorder="little", signed=False
         )
