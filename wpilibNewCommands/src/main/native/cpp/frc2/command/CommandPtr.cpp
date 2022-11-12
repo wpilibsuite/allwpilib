@@ -23,7 +23,7 @@
 using namespace frc2;
 
 void CommandPtr::AssertValid() const {
-  if (!this->m_ptr) {
+  if (!m_ptr) {
     throw FRC_MakeError(frc::err::CommandIllegalUse,
                         "Moved-from CommandPtr object used!");
   }
@@ -220,10 +220,12 @@ CommandPtr CommandPtr::HandleInterrupt(std::function<void(void)> handler) && {
 }
 
 Command* CommandPtr::get() const {
+  AssertValid();
   return m_ptr.get();
 }
 
 std::unique_ptr<Command> CommandPtr::Unwrap() && {
+  AssertValid();
   return std::move(m_ptr);
 }
 
