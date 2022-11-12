@@ -16,6 +16,7 @@
 
 #include <wpi/MemoryBuffer.h>
 #include <wpi/DataLogReader.h>
+#include <wpi/StringExtras.h>
 #include <imgui.h>
 
 using namespace sapphire;
@@ -120,14 +121,14 @@ bool DataLogModel::LoadWPILog(std::string filename) {
     }
   }
   
-  
-  for(int i = 0; i < filename.length(); i++){
-    this->rawFilename += filename[i];
-    if(filename[i] == '/' || filename[i] == '\\'){
-      this->rawFilename = "";
-    }
+  this->rawFilename = std::string(wpi::rsplit(filename, '/').second);
+  if(this->rawFilename == ""){
+    this->rawFilename = std::string(wpi::rsplit(filename, '\\').second);
   }
-  
+  if(this->rawFilename == "") {
+    this->rawFilename = filename;
+  }
+
   this->filename = this->rawFilename;
   this->path = filename;
   m_hasLog = true;

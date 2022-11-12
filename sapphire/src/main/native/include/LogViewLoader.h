@@ -26,14 +26,14 @@ namespace detail{
 }
 
 // Loads all Model Views from a log file
-class LogModelViewLoader : public glass::WindowManager {
+class LogViewLoader : public glass::WindowManager {
   using Provider = glass::Provider<detail::Functions>;
  public:
  using CreateModelFunc = detail::Functions::CreateModel;
  using CreateViewFunc = detail::Functions::CreateView;
  using glass::WindowManager::GlobalInit;
 
-  LogModelViewLoader(glass::Storage& storage, float& nowRef) :glass::WindowManager{storage}, nowRef{nowRef} {
+  LogViewLoader(glass::Storage& storage, float& nowRef) :glass::WindowManager{storage}, nowRef{nowRef} {
     wpi::gui::AddEarlyExecute([this] {Update(); });
   }; 
 
@@ -82,13 +82,13 @@ class LogModelViewLoader : public glass::WindowManager {
 
   class DataLogProvider{
    public:
-    DataLogProvider(LogModelViewLoader* loader, std::string_view name, DataLogModel* log, wpi::StringMap<Builder>& typeMap);
+    DataLogProvider(LogViewLoader* loader, std::string_view name, DataLogModel* log, wpi::StringMap<Builder>& typeMap);
     std::string_view name;
     DataLogModel* log;
     wpi::StringMap<Builder>& m_typeMap;
     std::vector<std::unique_ptr<ModelEntry> > m_models;
     std::vector<std::unique_ptr<ViewEntry> > m_views;
-    LogModelViewLoader* loader;
+    LogViewLoader* loader;
     void Show(ViewEntry* entry, glass::Window* window);
     void Update();
   };
@@ -97,6 +97,6 @@ class LogModelViewLoader : public glass::WindowManager {
   wpi::StringMap<Builder> m_typeMap;
 };
 
-void RegisterLogModels(LogModelViewLoader& provider);
+void RegisterLogModels(LogViewLoader& provider);
 
 }
