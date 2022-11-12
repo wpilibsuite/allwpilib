@@ -48,12 +48,12 @@ void LogField2DModel::ObjectModel::SetRotation(size_t i, frc::Rotation2d rot) {
 
 LogField2DModel::LogField2DModel(DataLogModel& model, std::string_view path, float& nowRef) :  m_model{model},
                                                     m_path{path},
-                                                    node{model.GetEntryNode(std::string(path))},
-                                                    nowRef{nowRef},
-                                                    now{nowRef} {
-  for(auto& obj : node->children){
-    if(obj.entry && obj.entry->type == "double[]"){
-      AddFieldObject(obj.name);
+                                                    m_node{model.GetEntryNode(std::string(path))},
+                                                    m_nowRef{nowRef},
+                                                    m_now{nowRef} {
+  for(auto& obj : m_node->m_children){
+    if(obj.m_entry && obj.m_entry->m_type == "double[]"){
+      AddFieldObject(obj.m_name);
     }
   }
 }
@@ -61,8 +61,8 @@ LogField2DModel::LogField2DModel(DataLogModel& model, std::string_view path, flo
 LogField2DModel::~LogField2DModel() = default;
 
 void LogField2DModel::Update() {
-    if(now != nowRef + m_model.offset){ 
-        now = nowRef + m_model.offset;
+    if(m_now != m_nowRef + m_model.m_offset){ 
+        m_now = m_nowRef + m_model.m_offset;
         for(auto& object : m_objects){
             object->Update();
         }
@@ -78,7 +78,7 @@ glass::FieldObjectModel* LogField2DModel::AddFieldObject(std::string_view name) 
     auto dataNode = m_model.GetEntryNode(fullName);
     if(dataNode == nullptr){ return nullptr;}
     it = m_objects.emplace(
-        it, std::make_unique<ObjectModel>(fullName, dataNode->entry, nowRef));
+        it, std::make_unique<ObjectModel>(fullName, dataNode->m_entry, m_nowRef));
   }
   return it->get();
 

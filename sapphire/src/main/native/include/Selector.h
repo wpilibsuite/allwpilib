@@ -18,12 +18,12 @@ class Selector: public glass::View {
         void Display() override;
         std::vector<std::unique_ptr<DataLogModel> >& GetDataLogs();
         void AddLoader(LogViewLoader* loader) {
-            this->loader = loader;
+            m_loader = loader;
         }
     private:
-        LogViewLoader* loader = nullptr;
+        LogViewLoader* m_loader = nullptr;
         std::unique_ptr<DataLogModel>& GetNextModel();
-        std::vector<std::unique_ptr<DataLogModel> > logs;
+        std::vector<std::unique_ptr<DataLogModel> > m_logs;
 };
 }  // namespace sapphire
 

@@ -33,7 +33,7 @@ class LogViewLoader : public glass::WindowManager {
  using CreateViewFunc = detail::Functions::CreateView;
  using glass::WindowManager::GlobalInit;
 
-  LogViewLoader(glass::Storage& storage, float& nowRef) :glass::WindowManager{storage}, nowRef{nowRef} {
+  LogViewLoader(glass::Storage& storage, float& nowRef) :glass::WindowManager{storage}, m_nowRef{nowRef} {
     wpi::gui::AddEarlyExecute([this] {Update(); });
   }; 
 
@@ -44,7 +44,7 @@ class LogViewLoader : public glass::WindowManager {
 
   void DisplayMenu() override;
 
-  float& nowRef;
+  float& m_nowRef;
 
  private:
   void Update();
@@ -83,12 +83,12 @@ class LogViewLoader : public glass::WindowManager {
   class DataLogProvider{
    public:
     DataLogProvider(LogViewLoader* loader, std::string_view name, DataLogModel* log, wpi::StringMap<Builder>& typeMap);
-    std::string_view name;
-    DataLogModel* log;
+    std::string_view m_name;
+    DataLogModel* m_log;
     wpi::StringMap<Builder>& m_typeMap;
     std::vector<std::unique_ptr<ModelEntry> > m_models;
     std::vector<std::unique_ptr<ViewEntry> > m_views;
-    LogViewLoader* loader;
+    LogViewLoader* m_loader;
     void Show(ViewEntry* entry, glass::Window* window);
     void Update();
   };

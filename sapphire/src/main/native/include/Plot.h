@@ -40,8 +40,8 @@ struct PlotAxis{
 
 class EntryPlot {
 public:
-    EntryPlot(EntryData* entry, std::string id, int yAxis = 0, int number = 0) :  id{id}, 
-                                                                number{number},
+    EntryPlot(EntryData* entry, std::string id, int yAxis = 0, int number = 0) :  m_id{id}, 
+                                                                m_number{number},
                                                                 _color{1.0,1.0,1.0,-1.0},
                                                                 m_color{_color},
                                                                 m_yAxis{yAxis},
@@ -59,9 +59,9 @@ public:
     void CreatePlot(PlotAxis& axis, int startts, int endts, float SampleRate);
     void Update(Plot& view);
     void CheckForChange(Plot& view);
-    std::string GetId() const { return id; }
-    std::string id;
-    int number;
+    std::string GetId() const { return m_id; }
+    std::string m_id;
+    int m_number;
     std::vector<float> _color;
     glass::ColorSetting m_color;
 private:
@@ -70,7 +70,7 @@ private:
     float m_offset = 0;
     // int m_size = 0;
     EntryData* m_entry;
-    std::vector<ImPlotPoint> points;
+    std::vector<ImPlotPoint> m_points;
 };
 
 class Plot{
@@ -95,11 +95,11 @@ public:
     void EmitSettings();
     void DragDropTarget();
     void DragDropAccept();
-    void SetAutoHeight(int height) { if(settings.m_autoheight){ m_height = height; } }
-    PlotSettings settings;
+    void SetAutoHeight(int height) { if(m_settings.m_autoheight){ m_height = height; } }
+    PlotSettings m_settings;
 
     std::vector<PlotAxis> m_axis;
-    std::vector<std::unique_ptr<EntryPlot> > plots;
+    std::vector<std::unique_ptr<EntryPlot> > m_entryPlots;
 
 private:
     void NotifyChange();
@@ -109,7 +109,7 @@ private:
 
 class PlotProvider : private glass::WindowManager{
   public:
-    explicit PlotProvider(Storage& storage, float& m_now);
+    explicit PlotProvider(Storage& storage, float& now);
     using glass::WindowManager::GlobalInit;
     void DisplayMenu() override;
     float& m_now;
@@ -120,11 +120,11 @@ class PlotView : public glass::View{
     PlotView(PlotProvider *provider, float& now, Storage& storage);
     void Display() override;
     void EmitContextMenu();
-    PlotProvider *provider;
+    PlotProvider* m_provider;
     float& m_now;
     std::string& m_name;
     std::vector<std::unique_ptr<Storage> >& m_plotStorage;
-    std::vector<std::unique_ptr<Plot> > plots;
+    std::vector<std::unique_ptr<Plot> > m_plots;
     Storage& m_storage;
     private:
     void AddPlot();

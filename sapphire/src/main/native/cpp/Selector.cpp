@@ -19,12 +19,12 @@
 using namespace sapphire;
 
 std::unique_ptr<DataLogModel>& Selector::GetNextModel(){
-  for(auto& log : logs){
-    if(log->flags.IsLogActive == false){
+  for(auto& log : m_logs){
+    if(log->m_flags.IsLogActive == false){
       return log;
     }
   }
-  auto& ref = logs.emplace_back(std::move(std::make_unique<DataLogModel>()));
+  auto& ref = m_logs.emplace_back(std::move(std::make_unique<DataLogModel>()));
   return ref;
 }
 
@@ -63,19 +63,19 @@ void Selector::Display() {
       bool success = log->LoadWPILog(result[0]);
       if(success) {
         logFileMessage = "Success";
-        auto filename = log->rawFilename;
+        auto filename = log->m_rawFilename;
         // Make sure there are no name conflicts
         int number = 0;
-        for(auto& otherLog : logs){
-          if(filename == otherLog->rawFilename && otherLog != log){
+        for(auto& otherLog : m_logs){
+          if(filename == otherLog->m_rawFilename && otherLog != log){
               number++;
           }
         }
         if(number){
-          log->filename = fmt::format("{}({})", filename, number);
+          log->m_filename = fmt::format("{}({})", filename, number);
         }
-        if(loader){
-          loader->AddDataLog(*log);
+        if(m_loader){
+          m_loader->AddDataLog(*log);
         }
       } else {
         logFileMessage = "Failure";
@@ -95,5 +95,5 @@ void Selector::Display() {
 }
 
 std::vector<std::unique_ptr<DataLogModel> >& Selector::GetDataLogs() {
-  return logs;
+  return m_logs;
 }

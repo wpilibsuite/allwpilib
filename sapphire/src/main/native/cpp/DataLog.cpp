@@ -30,7 +30,7 @@ float& DataLogView::GetTimestamp(){
 
 wpi::log::DataLogRecord EntryData::GetRecordAt(int timestamp){
   wpi::log::DataLogRecord record;
-  for(auto& entry : datapoints){
+  for(auto& entry : m_datapoints){
     if(entry.first <= timestamp){
       record = entry.second;
     }
@@ -39,7 +39,7 @@ wpi::log::DataLogRecord EntryData::GetRecordAt(int timestamp){
 }
 wpi::log::DataLogRecord EntryData::GetNextRecord(int timestamp){
   wpi::log::DataLogRecord record;
-  for(auto& entry : datapoints){
+  for(auto& entry : m_datapoints){
     if(entry.first > timestamp && (entry.first < record.GetTimestamp() || record.GetTimestamp() <= timestamp)){
       record = entry.second;
     }
@@ -49,10 +49,10 @@ wpi::log::DataLogRecord EntryData::GetNextRecord(int timestamp){
 
 
 std::map<int, wpi::log::DataLogRecord>::iterator EntryData::GetIterator(int timestamp){
-  auto it = datapoints.begin();
+  auto it = m_datapoints.begin();
   auto best_it = it;
   wpi::log::DataLogRecord record;
-  while(it != datapoints.end()){
+  while(it != m_datapoints.end()){
     auto entry = *it;
     // if new entry is after the timestamp, and this is the best timestamp OR no timestamp has been recorded yet, update iterator
     
@@ -76,13 +76,13 @@ bool DataLogModel::LoadWPILog(std::string filename) {
     return false;
   }
 
-  reader = std::make_shared<wpi::log::DataLogReader>(std::move(buf));
-  if (!reader->IsValid()) {
+  m_reader = std::make_shared<wpi::log::DataLogReader>(std::move(buf));
+  if (!m_reader->IsValid()) {
     return false;
   }
   m_tree.clear();
   this->m_entries.clear();
-  for (const auto& record : *reader) {
+  for (const auto& record : *m_reader) {
     int entryId;
     if(record.IsStart()) {
       // If we find a new start record, create a new entry
@@ -92,8 +92,8 @@ bool DataLogModel::LoadWPILog(std::string filename) {
       if(m_entries.find(start.entry) != m_entries.end()){ continue; } // This should probably be an error
 
       m_entries[start.entry] = std::make_unique<EntryData>(start);
-      m_entries[start.entry]->SetOffsetPtr(&offset);
-      AddEntryNode(m_entries[start.entry].get(), m_entries[start.entry]->name);
+      m_entries[start.entry]->SetOffsetPtr(&m_offset);
+      AddEntryNode(m_entries[start.entry].get(), m_entries[start.entry]->m_name);
     } else if(record.GetFinishEntry(&entryId)) {
       // If we find a finish entry,
       auto entryPair= m_entries.find(entryId);
@@ -117,29 +117,29 @@ bool DataLogModel::LoadWPILog(std::string filename) {
         m_maxTimestamp = timestamp;
       }
 
-      entry.datapoints[record.GetTimestamp()] = std::move(record);
+      entry.m_datapoints[record.GetTimestamp()] = std::move(record);
     }
   }
   
-  this->rawFilename = std::string(wpi::rsplit(filename, '/').second);
-  if(this->rawFilename == ""){
-    this->rawFilename = std::string(wpi::rsplit(filename, '\\').second);
+  this->m_rawFilename = std::string(wpi::rsplit(filename, '/').second);
+  if(this->m_rawFilename == ""){
+    this->m_rawFilename = std::string(wpi::rsplit(filename, '\\').second);
   }
-  if(this->rawFilename == "") {
-    this->rawFilename = filename;
+  if(this->m_rawFilename == "") {
+    this->m_rawFilename = filename;
   }
 
-  this->filename = this->rawFilename;
-  this->path = filename;
+  this->m_filename = this->m_rawFilename;
+  this->m_path = filename;
   m_hasLog = true;
-  flags.IsLogActive = true;
+  m_flags.IsLogActive = true;
   return true;
 }
 
 
 EntryNode* find(std::vector<EntryNode>& list, std::string name){
   for(auto& child : list){
-    if(child.name == name){
+    if(child.m_name == name){
       return &child;
     }
   }
@@ -149,7 +149,7 @@ EntryNode* EntryNode::GetEntryNode(std::vector<std::string> path){
   if(path.size() == 0){
     return this;
   }
-  auto nextNode = find(children, path[0]);
+  auto nextNode = find(m_children, path[0]);
   if(nextNode == nullptr){
     return nullptr;
   }
@@ -199,22 +199,22 @@ void DataLogModel::AddEntryNode(EntryData* data, std::string path){
 
 void EntryNode::AddEntry(EntryData *entry,std::vector<std::string> path){
   if(path.size() > 0){
-    auto nextNode = find(children, path[0]);
+    auto nextNode = find(m_children, path[0]);
     if(nextNode == nullptr){
-      nextNode = &children.emplace_back(EntryNode{path[0]});
+      nextNode = &m_children.emplace_back(EntryNode{path[0]});
     }
     nextNode->AddEntry(entry, std::vector<std::string>(path.begin()+1, path.end()));
   } else {
     // We are the final destination for the data
-    this->entry = entry;
+    this->m_entry = entry;
   }
 
 }
 
 
 std::string EntryNode::TreeToString(int depth){
-  std::string ret = fmt::format("{} \n", this->name);
-  for(auto &child : children){
+  std::string ret = fmt::format("{} \n", this->m_name);
+  for(auto &child : m_children){
     for(int i = 0; i < depth; i++){
       ret += fmt::format("-");
     }
@@ -223,47 +223,47 @@ std::string EntryNode::TreeToString(int depth){
   return ret;
 }
 std::string sapphire::GetFormattedEntryValue(EntryData& data, int timestamp, wpi::log::DataLogRecord record){
-    if (data.type == "double") {
+    if (data.m_type == "double") {
         double val;
         if (record.GetDouble(&val)) {
             return fmt::format("  {}\n", val);
         }
-    } else if (data.type == "int64") {
+    } else if (data.m_type == "int64") {
         int64_t val;
         if (record.GetInteger(&val)) {
             return fmt::format("  {}\n", val);
         }
-    } else if (data.type == "string" ||
-            data.type == "json") {
+    } else if (data.m_type == "string" ||
+            data.m_type == "json") {
         std::string_view val;
         record.GetString(&val);
         return fmt::format("  '{}'\n", val);
-    } else if (data.type == "boolean") {
+    } else if (data.m_type == "boolean") {
         bool val;
         if (record.GetBoolean(&val)) {
             return fmt::format("  {}\n", val);
         }
-    } else if (data.type == "boolean[]") {
+    } else if (data.m_type == "boolean[]") {
         std::vector<int> val;
         if (record.GetBooleanArray(&val)) {
             return fmt::format("  {}\n", fmt::join(val, ", "));
         }
-    } else if (data.type == "double[]") {
+    } else if (data.m_type == "double[]") {
         std::vector<double> val;
         if (record.GetDoubleArray(&val)) {
             return fmt::format("  {}\n", fmt::join(val, ", "));
         }
-    } else if (data.type == "float[]") {
+    } else if (data.m_type == "float[]") {
         std::vector<float> val;
         if (record.GetFloatArray(&val)) {
             return fmt::format("  {}\n", fmt::join(val, ", "));
         }
-    } else if (data.type == "int64[]") {
+    } else if (data.m_type == "int64[]") {
         std::vector<int64_t> val;
         if (record.GetIntegerArray(&val)) {
             return fmt::format("  {}\n", fmt::join(val, ", "));
         }
-    } else if (data.type == "string[]") {
+    } else if (data.m_type == "string[]") {
         std::vector<std::string_view> val;
         if (record.GetStringArray(&val)) {
             return fmt::format("  {}\n", fmt::join(val, ", "));
@@ -329,13 +329,13 @@ void EmitEntry(EntryData *data, std::string name, float *offset, DataLogFlags fl
 
 void EmitTree(const std::vector<EntryNode>& tree, float *timestamp, DataLogFlags flags) {
   for(auto &&node : tree){
-    if(node.entry){
+    if(node.m_entry){
     
-      EmitEntry(node.entry, node.name, timestamp, flags);
+      EmitEntry(node.m_entry, node.m_name, timestamp, flags);
     }
-    if(!node.children.empty()){
-      ImGui::PushID(node.name.c_str());
-      bool open = ImGui::TreeNodeEx(node.name.c_str(), ImGuiTreeNodeFlags_SpanFullWidth);
+    if(!node.m_children.empty()){
+      ImGui::PushID(node.m_name.c_str());
+      bool open = ImGui::TreeNodeEx(node.m_name.c_str(), ImGuiTreeNodeFlags_SpanFullWidth);
       ImGui::NextColumn();
       ImGui::NextColumn();
       if(flags.ShowLastUpdate){
@@ -346,7 +346,7 @@ void EmitTree(const std::vector<EntryNode>& tree, float *timestamp, DataLogFlags
       }
       ImGui::Separator();
       if(open){
-        EmitTree(node.children, timestamp, flags);
+        EmitTree(node.m_children, timestamp, flags);
         ImGui::TreePop();
       }
       ImGui::PopID();
@@ -357,32 +357,32 @@ void EmitTree(const std::vector<EntryNode>& tree, float *timestamp, DataLogFlags
 void DataLogView::DisplayDataLog(DataLogModel* log){
   ImGui::Text("Manage Entry Offset:");
   ImGui::SameLine();
-  ImGui::SliderFloat("TsSlider", &log->offset ,0, log->GetMaxTimestamp()/1000000.0);
+  ImGui::SliderFloat("TsSlider", &log->m_offset ,0, log->GetMaxTimestamp()/1000000.0);
   ImGui::SameLine();
-  ImGui::InputFloat("TsInput", &log->offset);
+  ImGui::InputFloat("TsInput", &log->m_offset);
 
-  ImGui::Columns(2 + log->flags.ShowLastUpdate + log->flags.ShowNextUpdate, "values");
+  ImGui::Columns(2 + log->m_flags.ShowLastUpdate + log->m_flags.ShowNextUpdate, "values");
   ImGui::Text("Name");
   ImGui::NextColumn();
   
   ImGui::Text("Value");
   ImGui::NextColumn();
-  if(log->flags.ShowLastUpdate){
+  if(log->m_flags.ShowLastUpdate){
     ImGui::Text("Last Update");
     ImGui::NextColumn();
   }
-  if(log->flags.ShowNextUpdate){
+  if(log->m_flags.ShowNextUpdate){
     ImGui::Text("Next Update");
     ImGui::NextColumn();
   }
-  EmitTree(log->GetTreeRoot(), &log->offset, log->flags);
+  EmitTree(log->GetTreeRoot(), &log->m_offset, log->m_flags);
   
   ImGui::Columns();
 }
 
 int DataLogView::GetMaxTimestamp(){
   int max = 0;
-  for(auto &log : logs){
+  for(auto &log : m_logs){
     if(log->GetMaxTimestamp() > max){
       max = log->GetMaxTimestamp();
     }
@@ -396,20 +396,20 @@ void DataLogView::Display() {
   ImGui::SliderFloat("TsSlider", &timestamp ,0, GetMaxTimestamp()/1000000.0);
   ImGui::SameLine();
   ImGui::InputFloat("TsInput", &timestamp);
-  for(auto& log : logs){
+  for(auto& log : m_logs){
     if(log->Exists()){
-      ImGui::PushID(log->filename.c_str());
+      ImGui::PushID(log->m_filename.c_str());
       
-      if(ImGui::CollapsingHeader(log->filename.c_str())){
-        if (ImGui::BeginPopupContextItem(log->filename.c_str())) {
-          if(ImGui::MenuItem("Show Last Update Timestamp", "", log->flags.ShowLastUpdate)){
-            log->flags.ShowLastUpdate = !log->flags.ShowLastUpdate;
+      if(ImGui::CollapsingHeader(log->m_filename.c_str())){
+        if (ImGui::BeginPopupContextItem(log->m_filename.c_str())) {
+          if(ImGui::MenuItem("Show Last Update Timestamp", "", log->m_flags.ShowLastUpdate)){
+            log->m_flags.ShowLastUpdate = !log->m_flags.ShowLastUpdate;
           }
-          if(ImGui::MenuItem("Show Next Update Timestamp", "", log->flags.ShowNextUpdate)){
-            log->flags.ShowNextUpdate = !log->flags.ShowNextUpdate;
+          if(ImGui::MenuItem("Show Next Update Timestamp", "", log->m_flags.ShowNextUpdate)){
+            log->m_flags.ShowNextUpdate = !log->m_flags.ShowNextUpdate;
           }
           if(ImGui::MenuItem("Close Log")){
-            log->flags.IsLogActive = false;
+            log->m_flags.IsLogActive = false;
           }
           ImGui::EndPopup();
         }

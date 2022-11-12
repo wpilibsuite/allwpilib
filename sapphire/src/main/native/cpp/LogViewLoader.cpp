@@ -11,13 +11,13 @@ LogViewLoader::DataLogProvider::DataLogProvider(LogViewLoader* loader,
                                     std::string_view name,
                                     DataLogModel* log, 
                                     wpi::StringMap<Builder>& typeMap) 
-                                    : loader{loader},
-                                    name{name},
-                                    log{log}, 
+                                    : m_loader{loader},
+                                    m_name{name},
+                                    m_log{log}, 
                                     m_typeMap{typeMap} {
     // Parse all entries to find models
     for(auto& [i, entry] : log->m_entries){
-        if(!wpi::ends_with(entry->GetName(), "/.type") || !(entry->type == "string") ){
+        if(!wpi::ends_with(entry->GetName(), "/.type") || !(entry->m_type == "string") ){
             continue;
         }
         wpi::log::DataLogRecord record;
@@ -54,7 +54,7 @@ void LogViewLoader::Register(std::string_view typeName, CreateModelFunc createMo
 }
 
 void LogViewLoader::AddDataLog(DataLogModel& log){
-    m_logMap.try_emplace(log.filename, std::make_shared<LogViewLoader::DataLogProvider>(this, log.filename, &log, m_typeMap));
+    m_logMap.try_emplace(log.m_filename, std::make_shared<LogViewLoader::DataLogProvider>(this, log.m_filename, &log, m_typeMap));
 }
 
 void LogViewLoader::DataLogProvider::Show(ViewEntry* entry, glass::Window* window){
@@ -67,7 +67,7 @@ void LogViewLoader::DataLogProvider::Show(ViewEntry* entry, glass::Window* windo
     // get or create model
     if (!entry->modelEntry->model) {
         entry->modelEntry->model =
-            entry->modelEntry->createModel(*log, entry->name.c_str());
+            entry->modelEntry->createModel(*m_log, entry->name.c_str());
     }
     if (!entry->modelEntry->model) {
         return;
@@ -75,7 +75,7 @@ void LogViewLoader::DataLogProvider::Show(ViewEntry* entry, glass::Window* windo
 
     // the window might exist and we're just not associated to it yet
     if (!window) {
-        window = loader->GetOrAddWindow(std::string{name} + ":" + entry->name, true, glass::Window::kHide);
+        window = m_loader->GetOrAddWindow(std::string{m_name} + ":" + entry->name, true, glass::Window::kHide);
     }
     if (!window) {
         return;
@@ -126,7 +126,7 @@ void sapphire::RegisterLogModels(LogViewLoader& provider){
     provider.Register(
             LogField2DModel::kType,
             [&provider](DataLogModel& log, const char* path){
-                return std::make_unique<LogField2DModel>(log, path, provider.nowRef);
+                return std::make_unique<LogField2DModel>(log, path, provider.m_nowRef);
             },
             [](glass::Window* win, glass::Model* model, const char*) {
                 win->SetDefaultSize(400, 200);

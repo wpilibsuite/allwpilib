@@ -72,10 +72,10 @@ class LogField2DModel : public glass::Field2DModel {
  private:
   DataLogModel& m_model;
   std::string m_path;
-  EntryNode* node;
+  EntryNode* m_node;
   std::string m_nameValue;
-  float& nowRef;
-  float now;
+  float& m_nowRef;
+  float m_now;
   class ObjectModel;
   using Objects = std::vector<std::unique_ptr<ObjectModel>>;
   Objects m_objects;
