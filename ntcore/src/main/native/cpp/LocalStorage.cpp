@@ -1234,7 +1234,7 @@ bool LSImpl::SetDefaultEntryValue(NT_Handle pubsubentryHandle,
   }
   if (auto topic = GetTopic(pubsubentryHandle)) {
     if (topic->type == NT_UNASSIGNED || topic->type == value.type()) {
-      // set without notifying
+      // force value timestamps to 0
       topic->type = value.type();
       topic->lastValue = value;
       topic->lastValue.SetTime(0);
@@ -1249,9 +1249,7 @@ bool LSImpl::SetDefaultEntryValue(NT_Handle pubsubentryHandle,
           return true;
         }
       }
-      if (publisher->active && m_network) {
-        m_network->SetValue(publisher->handle, value);
-      }
+      PublishLocalValue(publisher, topic->lastValue);
       return true;
     }
   }
