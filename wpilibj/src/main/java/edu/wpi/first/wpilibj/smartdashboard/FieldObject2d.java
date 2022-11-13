@@ -25,7 +25,9 @@ public class FieldObject2d implements AutoCloseable {
 
   @Override
   public void close() {
-    m_entry.close();
+    if (m_entry != null) {
+      m_entry.close();
+    }
   }
 
   /**
