@@ -37,6 +37,11 @@ jobs:
         uses: actions/setup-python@v2
         with:
           python-version: 3.8
+      - name: Setup Java
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'zulu'
+          java-version: 11
       - name: Install clang-format
         run: |
           wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key | sudo apt-key add -
@@ -47,6 +52,8 @@ jobs:
         run: pip3 install wpiformat
       - name: Run wpiformat
         run: wpiformat -clang 14
+      - name: Run spotlessApply
+        run: ./gradlew spotlessApply
       - name: Commit
         run: |
           # Set credentials
