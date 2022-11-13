@@ -17,7 +17,7 @@ jobs:
           root: ${{ github.workspace }}
           baseUrl: 'https://raw.githubusercontent.com/wpilibsuite/allwpilib/'
           versionScheme: 'v\d{4}\.\d\.\d(?:-(?:alpha|beta)-\d)?|[0-9a-f]{40}'
-          latestVersion: ${{ github.sha }}
+          latestVersion: ${{ github.event.pull_request.head.sha }}
           ignoredFiles: '["source/docs/software/pathplanning/trajectory-tutorial/"]'
 
       # Error if RLIs can't be automatically updated
@@ -52,7 +52,7 @@ jobs:
           body: |
             ### Found RLIs needing manual updates!
             <details>
-            <summary>See the full report</summary>
+            <summary>See the "needs manual updates" section of the report:</summary>
 
             ${{ env.REPORT }}
 
