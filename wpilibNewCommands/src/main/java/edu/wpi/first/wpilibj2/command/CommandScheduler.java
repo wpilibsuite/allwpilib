@@ -386,7 +386,7 @@ public final class CommandScheduler implements NTSendable, AutoCloseable {
    * registered. Default commands will run whenever there is no other command currently scheduled
    * that requires the subsystem. Default commands should be written to never end (i.e. their {@link
    * Command#isFinished()} method should return false), as they would simply be re-scheduled if they
-   * do. Default commands must also require their subsystem.
+   * do. Default commands must also require their subsystem. Pass null as the command to unset the default command.
    *
    * @param subsystem the subsystem whose default command will be set
    * @param defaultCommand the default command to associate with the subsystem
@@ -397,7 +397,8 @@ public final class CommandScheduler implements NTSendable, AutoCloseable {
       return;
     }
     if (defaultCommand == null) {
-      DriverStation.reportWarning("Tried to set a null default command", true);
+      // Unset subsystem's default command.
+      m_subsystems.put(subsystem, null);
       return;
     }
 
