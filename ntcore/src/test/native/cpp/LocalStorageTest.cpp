@@ -15,19 +15,23 @@
 #include "ntcore_c.h"
 
 using ::testing::_;
+using ::testing::AllOf;
+using ::testing::ElementsAre;
+using ::testing::Field;
+using ::testing::IsEmpty;
+using ::testing::Property;
 using ::testing::Return;
 
 namespace nt {
 
 ::testing::Matcher<const PubSubOptions&> IsPubSubOptions(
     const PubSubOptions& good) {
-  return ::testing::AllOf(
-      ::testing::Field("periodic", &PubSubOptions::periodic, good.periodic),
-      ::testing::Field("pollStorageSize", &PubSubOptions::pollStorageSize,
-                       good.pollStorageSize),
-      ::testing::Field("logging", &PubSubOptions::sendAll, good.sendAll),
-      ::testing::Field("keepDuplicates", &PubSubOptions::keepDuplicates,
-                       good.keepDuplicates));
+  return AllOf(Field("periodic", &PubSubOptions::periodic, good.periodic),
+               Field("pollStorageSize", &PubSubOptions::pollStorageSize,
+                     good.pollStorageSize),
+               Field("logging", &PubSubOptions::sendAll, good.sendAll),
+               Field("keepDuplicates", &PubSubOptions::keepDuplicates,
+                     good.keepDuplicates));
 }
 
 class LocalStorageTest : public ::testing::Test {
@@ -247,6 +251,9 @@ TEST_F(LocalStorageTest, PubUnpubPub) {
   EXPECT_CALL(network, Publish(_, fooTopic, std::string_view{"foo"},
                                std::string_view{"boolean"}, wpi::json::object(),
                                IsPubSubOptions({})));
+  EXPECT_CALL(logger, Call(NT_LOG_INFO, _, _,
+                           "local subscribe to 'foo' disabled due to type "
+                           "mismatch (wanted 'int', published as 'boolean')"));
   auto pub = storage.Publish(fooTopic, NT_BOOLEAN, "boolean", {}, {});
 
   auto val = Value::MakeBoolean(true, 5);
@@ -329,7 +336,7 @@ TEST_F(LocalStorageTest, LocalSubConflict) {
                                  IsPubSubOptions({})));
   EXPECT_CALL(logger, Call(NT_LOG_INFO, _, _,
                            "local subscribe to 'foo' disabled due to type "
-                           "mismatch (wanted 'int', currently 'boolean')"));
+                           "mismatch (wanted 'int', published as 'boolean')"));
   storage.Subscribe(fooTopic, NT_INTEGER, "int", {});
 }
 
@@ -466,11 +473,218 @@ TEST_F(LocalStorageTest, SetValueEmptyUntypedEntry) {
 }
 
 TEST_F(LocalStorageTest, PublishUntyped) {
+  EXPECT_CALL(
+      logger,
+      Call(
+          NT_LOG_ERROR, _, _,
+          "cannot publish 'foo' with an unassigned type or empty type string"));
+
   EXPECT_EQ(storage.Publish(fooTopic, NT_UNASSIGNED, "", {}, {}), 0u);
 }
 
 TEST_F(LocalStorageTest, SetValueInvalidHandle) {
   EXPECT_FALSE(storage.SetEntryValue(0u, {}));
+}
+
+class LocalStorageNumberVariantsTest : public LocalStorageTest {
+ public:
+  void CreateSubscriber(NT_Handle* handle, std::string_view name, NT_Type type,
+                        std::string_view typeStr);
+  void CreateSubscribers();
+  void CreateSubscribersArray();
+
+  NT_Subscriber sub1, sub2, sub3, sub4;
+  NT_Entry entry;
+
+  struct SubEntry {
+    SubEntry(NT_Handle subentry, NT_Type type, std::string_view name)
+        : subentry{subentry}, type{type}, name{name} {}
+    NT_Handle subentry;
+    NT_Type type;
+    std::string name;
+  };
+  std::vector<SubEntry> subentries;
+};
+
+void LocalStorageNumberVariantsTest::CreateSubscriber(
+    NT_Handle* handle, std::string_view name, NT_Type type,
+    std::string_view typeStr) {
+  *handle = storage.Subscribe(fooTopic, type, typeStr, {});
+  subentries.emplace_back(*handle, type, name);
+}
+
+void LocalStorageNumberVariantsTest::CreateSubscribers() {
+  EXPECT_CALL(logger,
+              Call(NT_LOG_INFO, _, _,
+                   "local subscribe to 'foo' disabled due to type "
+                   "mismatch (wanted 'boolean', published as 'double')"));
+  CreateSubscriber(&sub1, "subDouble", NT_DOUBLE, "double");
+  CreateSubscriber(&sub2, "subInteger", NT_INTEGER, "int");
+  CreateSubscriber(&sub3, "subFloat", NT_FLOAT, "float");
+  CreateSubscriber(&sub4, "subBoolean", NT_BOOLEAN, "boolean");
+  entry = storage.GetEntry("foo");
+  subentries.emplace_back(entry, NT_UNASSIGNED, "entry");
+}
+
+void LocalStorageNumberVariantsTest::CreateSubscribersArray() {
+  EXPECT_CALL(logger,
+              Call(NT_LOG_INFO, _, _,
+                   "local subscribe to 'foo' disabled due to type "
+                   "mismatch (wanted 'boolean[]', published as 'double[]')"));
+  CreateSubscriber(&sub1, "subDouble", NT_DOUBLE_ARRAY, "double[]");
+  CreateSubscriber(&sub2, "subInteger", NT_INTEGER_ARRAY, "int[]");
+  CreateSubscriber(&sub3, "subFloat", NT_FLOAT_ARRAY, "float[]");
+  CreateSubscriber(&sub4, "subBoolean", NT_BOOLEAN_ARRAY, "boolean[]");
+  entry = storage.GetEntry("foo");
+  subentries.emplace_back(entry, NT_UNASSIGNED, "entry");
+}
+
+TEST_F(LocalStorageNumberVariantsTest, GetEntryPubAfter) {
+  EXPECT_CALL(network, Subscribe(_, _, _)).Times(5);
+  EXPECT_CALL(network, Publish(_, _, _, _, _, _)).Times(1);
+  EXPECT_CALL(network, SetValue(_, _)).Times(1);
+  CreateSubscribers();
+  auto pub = storage.Publish(fooTopic, NT_DOUBLE, "double", {}, {});
+  storage.SetEntryValue(pub, Value::MakeDouble(1.0, 50));
+  // all subscribers get the actual type and time
+  for (auto&& subentry : subentries) {
+    SCOPED_TRACE(subentry.name);
+    EXPECT_EQ(storage.GetEntryType(subentry.subentry), NT_DOUBLE);
+    EXPECT_EQ(storage.GetEntryLastChange(subentry.subentry), 50);
+  }
+  // for subscribers, they get a converted value or nothing on mismatch
+  EXPECT_EQ(storage.GetEntryValue(sub1), Value::MakeDouble(1.0, 50));
+  EXPECT_EQ(storage.GetEntryValue(sub2), Value::MakeInteger(1, 50));
+  EXPECT_EQ(storage.GetEntryValue(sub3), Value::MakeFloat(1.0, 50));
+  EXPECT_EQ(storage.GetEntryValue(sub4), Value{});
+  // entrys just get whatever the value is
+  EXPECT_EQ(storage.GetEntryValue(entry), Value::MakeDouble(1.0, 50));
+}
+
+TEST_F(LocalStorageNumberVariantsTest, GetEntryPubBefore) {
+  EXPECT_CALL(network, Subscribe(_, _, _)).Times(5);
+  EXPECT_CALL(network, Publish(_, _, _, _, _, _)).Times(1);
+  EXPECT_CALL(network, SetValue(_, _)).Times(1);
+  auto pub = storage.Publish(fooTopic, NT_DOUBLE, "double", {}, {});
+  CreateSubscribers();
+  storage.SetEntryValue(pub, Value::MakeDouble(1.0, 50));
+  // all subscribers get the actual type and time
+  for (auto&& subentry : subentries) {
+    SCOPED_TRACE(subentry.name);
+    EXPECT_EQ(storage.GetEntryType(subentry.subentry), NT_DOUBLE);
+    EXPECT_EQ(storage.GetEntryLastChange(subentry.subentry), 50);
+  }
+  // for subscribers, they get a converted value or nothing on mismatch
+  EXPECT_EQ(storage.GetEntryValue(sub1), Value::MakeDouble(1.0, 50));
+  EXPECT_EQ(storage.GetEntryValue(sub2), Value::MakeInteger(1, 50));
+  EXPECT_EQ(storage.GetEntryValue(sub3), Value::MakeFloat(1.0, 50));
+  EXPECT_EQ(storage.GetEntryValue(sub4), Value{});
+  // entrys just get whatever the value is
+  EXPECT_EQ(storage.GetEntryValue(entry), Value::MakeDouble(1.0, 50));
+}
+
+template <typename T>
+::testing::Matcher<const T&> TSEq(auto value, int64_t time) {
+  return AllOf(Field("value", &T::value, value), Field("time", &T::time, time));
+}
+
+TEST_F(LocalStorageNumberVariantsTest, GetAtomic) {
+  EXPECT_CALL(network, Subscribe(_, _, _)).Times(5);
+  EXPECT_CALL(network, Publish(_, _, _, _, _, _)).Times(1);
+  EXPECT_CALL(network, SetValue(_, _)).Times(1);
+  auto pub = storage.Publish(fooTopic, NT_DOUBLE, "double", {}, {});
+  CreateSubscribers();
+  storage.SetEntryValue(pub, Value::MakeDouble(1.0, 50));
+
+  for (auto&& subentry : subentries) {
+    SCOPED_TRACE(subentry.name);
+    EXPECT_THAT(storage.GetAtomicDouble(subentry.subentry, 0),
+                TSEq<TimestampedDouble>(1.0, 50));
+    EXPECT_THAT(storage.GetAtomicInteger(subentry.subentry, 0),
+                TSEq<TimestampedInteger>(1, 50));
+    EXPECT_THAT(storage.GetAtomicFloat(subentry.subentry, 0),
+                TSEq<TimestampedFloat>(1.0, 50));
+    EXPECT_THAT(storage.GetAtomicBoolean(subentry.subentry, false),
+                TSEq<TimestampedBoolean>(false, 0));
+  }
+}
+
+template <typename T, typename U>
+::testing::Matcher<const T&> TSSpanEq(std::span<U> value, int64_t time) {
+  return AllOf(
+      Field("value", &T::value, wpi::SpanEq(std::span<const U>(value))),
+      Field("time", &T::time, time));
+}
+
+TEST_F(LocalStorageNumberVariantsTest, GetAtomicArray) {
+  EXPECT_CALL(network, Subscribe(_, _, _)).Times(5);
+  EXPECT_CALL(network, Publish(_, _, _, _, _, _)).Times(1);
+  EXPECT_CALL(network, SetValue(_, _)).Times(1);
+  auto pub = storage.Publish(fooTopic, NT_DOUBLE_ARRAY, "double[]", {}, {});
+  CreateSubscribersArray();
+  storage.SetEntryValue(pub, Value::MakeDoubleArray({1.0}, 50));
+
+  for (auto&& subentry : subentries) {
+    SCOPED_TRACE(subentry.name);
+    double doubleVal = 1.0;
+    EXPECT_THAT(storage.GetAtomicDoubleArray(subentry.subentry, {}),
+                TSSpanEq<TimestampedDoubleArray>(std::span{&doubleVal, 1}, 50));
+    int64_t intVal = 1;
+    EXPECT_THAT(storage.GetAtomicIntegerArray(subentry.subentry, {}),
+                TSSpanEq<TimestampedIntegerArray>(std::span{&intVal, 1}, 50));
+    float floatVal = 1.0;
+    EXPECT_THAT(storage.GetAtomicFloatArray(subentry.subentry, {}),
+                TSSpanEq<TimestampedFloatArray>(std::span{&floatVal, 1}, 50));
+    EXPECT_THAT(storage.GetAtomicBooleanArray(subentry.subentry, {}),
+                TSSpanEq<TimestampedBooleanArray>(std::span<int>{}, 0));
+  }
+}
+
+TEST_F(LocalStorageNumberVariantsTest, ReadQueue) {
+  EXPECT_CALL(network, Subscribe(_, _, _)).Times(5);
+  EXPECT_CALL(network, Publish(_, _, _, _, _, _)).Times(1);
+  EXPECT_CALL(network, SetValue(_, _)).Times(4);
+  auto pub = storage.Publish(fooTopic, NT_DOUBLE, "double", {}, {});
+  CreateSubscribers();
+
+  storage.SetEntryValue(pub, Value::MakeDouble(1.0, 50));
+  for (auto&& subentry : subentries) {
+    SCOPED_TRACE(subentry.name);
+    if (subentry.type == NT_BOOLEAN) {
+      EXPECT_THAT(storage.ReadQueueDouble(subentry.subentry), IsEmpty());
+    } else {
+      EXPECT_THAT(storage.ReadQueueDouble(subentry.subentry),
+                  ElementsAre(TSEq<TimestampedDouble>(1.0, 50)));
+    }
+  }
+
+  storage.SetEntryValue(pub, Value::MakeDouble(1.0, 50));
+  for (auto&& subentry : subentries) {
+    SCOPED_TRACE(subentry.name);
+    if (subentry.type == NT_BOOLEAN) {
+      EXPECT_THAT(storage.ReadQueueInteger(subentry.subentry), IsEmpty());
+    } else {
+      EXPECT_THAT(storage.ReadQueueInteger(subentry.subentry),
+                  ElementsAre(TSEq<TimestampedInteger>(1, 50)));
+    }
+  }
+
+  storage.SetEntryValue(pub, Value::MakeDouble(1.0, 50));
+  for (auto&& subentry : subentries) {
+    SCOPED_TRACE(subentry.name);
+    if (subentry.type == NT_BOOLEAN) {
+      EXPECT_THAT(storage.ReadQueueFloat(subentry.subentry), IsEmpty());
+    } else {
+      EXPECT_THAT(storage.ReadQueueFloat(subentry.subentry),
+                  ElementsAre(TSEq<TimestampedFloat>(1.0, 50)));
+    }
+  }
+
+  storage.SetEntryValue(pub, Value::MakeDouble(1.0, 50));
+  for (auto&& subentry : subentries) {
+    SCOPED_TRACE(subentry.name);
+    EXPECT_THAT(storage.ReadQueueBoolean(subentry.subentry), IsEmpty());
+  }
 }
 
 }  // namespace nt
