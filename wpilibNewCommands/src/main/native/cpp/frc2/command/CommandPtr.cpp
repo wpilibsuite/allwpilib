@@ -250,7 +250,7 @@ bool CommandPtr::HasRequirement(Subsystem* requirement) const {
 }
 
 CommandPtr::operator bool() const {
-  return !m_ptr;
+  return m_ptr.operator bool();
 }
 
 std::vector<std::unique_ptr<Command>> CommandPtr::UnwrapVector(
