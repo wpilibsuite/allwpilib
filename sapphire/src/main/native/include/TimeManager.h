@@ -17,6 +17,7 @@ class TimeManager : public glass::View{
     float& m_timestamp;
     bool m_limitOffset = true;
     bool m_isPlaying = false;
+    bool m_manualLimits = false;
     struct TimeOption{
         TimeOption(std::string name, double speed) : m_name{name}, m_speed{speed} {};
         std::string m_name;
@@ -34,6 +35,8 @@ class TimeManager : public glass::View{
     };
     TimeOption* m_selected = &m_options[3];
     double m_lastTime = 0;
+    float m_timestart = 0;
+    float m_timestop = 0;
 };
 
 }

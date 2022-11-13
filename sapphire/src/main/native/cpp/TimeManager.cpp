@@ -5,9 +5,11 @@ using namespace sapphire;
 
 void TimeManager::Display() {
   ImGui::PushID("TimeManager");
-  ImGui::Checkbox("Limit Offset?", &m_limitOffset);
+  ImGui::Checkbox("Use Offset Limits?", &m_limitOffset);
+  ImGui::SameLine();
+  ImGui::Checkbox("Manually Set Timestamp Limits?", &m_manualLimits);
   ImGui::Text("Manage Overall Time:");
-  ImGui::SliderFloat("timestamp", &m_timestamp ,0, m_logView.GetMaxTimestamp()/1000000.0);
+  ImGui::SliderFloat("timestamp", &m_timestamp, m_timestart, m_timestop);
   ImGui::SameLine();
   ImGui::Checkbox("Play", &m_isPlaying);
   if(m_isPlaying){
@@ -22,6 +24,28 @@ void TimeManager::Display() {
       }
       ImGui::EndMenu();
     }
+    if(m_timestamp >= m_timestop){
+      m_timestamp = m_timestart;
+    }
+  }
+  if(m_manualLimits){
+    ImGui::Separator();
+    auto maxTimestamp = m_logView.GetMaxTimestamp()/1000000.0;
+    ImGui::SliderFloat("Start time", &m_timestart, 0, maxTimestamp);
+    ImGui::SliderFloat("Stop time", &m_timestop, 0, maxTimestamp);
+    if(ImGui::Button("Set Start Time to Now")){
+      m_timestart = m_timestamp;
+    }
+    ImGui::SameLine();
+    if(ImGui::Button("Set Stop Time to Now")){
+      m_timestop = m_timestamp;
+    }
+    m_timestart = std::min(m_timestart, m_timestop);
+    m_timestop = std::max(m_timestart, m_timestop);
+    ImGui::Separator();
+  } else{
+    m_timestart = 0;
+    m_timestop = m_logView.GetMaxTimestamp()/1000000.0;
   }
   for(auto& log : m_logView.m_logs){
     ImGui::Text("%s's offset", log->m_filename.c_str());
