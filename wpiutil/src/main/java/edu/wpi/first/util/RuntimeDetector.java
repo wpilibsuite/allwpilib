@@ -31,13 +31,7 @@ public final class RuntimeDetector {
     } else if (isMac()) {
       filePrefix = "lib";
       fileExtension = ".dylib";
-      if (intel32) {
-        filePath = "/osx/x86/";
-      } else if (arm64) {
-        filePath = "/osx/arm64/";
-      } else {
-        filePath = "/osx/x86-64/";
-      }
+      filePath = "/osx/universal/";
     } else if (isLinux()) {
       filePrefix = "lib";
       fileExtension = ".so";

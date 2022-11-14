@@ -289,16 +289,13 @@ void NTMechanism2DModel::Update() {
         }
       }
     } else if (auto valueData = event.GetValueEventData()) {
-      // .name
       if (valueData->topic == m_nameTopic.GetHandle()) {
+        // .name
         if (valueData->value && valueData->value.IsString()) {
           m_nameValue = valueData->value.GetString();
         }
-        continue;
-      }
-
-      // dims
-      if (valueData->topic == m_dimensionsTopic.GetHandle()) {
+      } else if (valueData->topic == m_dimensionsTopic.GetHandle()) {
+        // dims
         if (valueData->value && valueData->value.IsDoubleArray()) {
           auto arr = valueData->value.GetDoubleArray();
           if (arr.size() == 2) {
@@ -306,12 +303,31 @@ void NTMechanism2DModel::Update() {
                                                    units::meter_t{arr[1]}};
           }
         }
-      }
-
-      // backgroundColor
-      if (valueData->topic == m_bgColorTopic.GetHandle()) {
+      } else if (valueData->topic == m_bgColorTopic.GetHandle()) {
+        // backgroundColor
         if (valueData->value && valueData->value.IsString()) {
           ConvertColor(valueData->value.GetString(), &m_bgColorValue);
+        }
+      } else {
+        auto fullName = nt::Topic{valueData->topic}.GetName();
+        auto name = wpi::drop_front(fullName, m_path.size());
+        if (name.empty() || name[0] == '.') {
+          continue;
+        }
+        std::string_view childName;
+        std::tie(name, childName) = wpi::split(name, '/');
+        if (childName.empty()) {
+          continue;
+        }
+
+        auto it = std::lower_bound(m_roots.begin(), m_roots.end(), name,
+                                   [](const auto& e, std::string_view name) {
+                                     return e->GetName() < name;
+                                   });
+        if (it != m_roots.end() && (*it)->GetName() == name) {
+          if ((*it)->NTUpdate(event, childName)) {
+            m_roots.erase(it);
+          }
         }
       }
     }
