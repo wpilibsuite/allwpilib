@@ -65,7 +65,7 @@ class WPILIB_DLLEXPORT AprilTagFieldLayout {
 
   /**
    * Sets the origin based on a pre-known enumeration of positions. The position
-   * is calculated from values in the configuration file
+   * is calculated from values in the configuration file.
    *
    * This changes the GetTagPose(int) method to return the correct pose for your
    * alliance.

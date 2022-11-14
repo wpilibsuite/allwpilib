@@ -108,7 +108,7 @@ public class AprilTagFieldLayout {
 
   /**
    * Sets the origin based on a pre-known enumeration of positions. The position is calculated from
-   * values in the configuration file
+   * values in the configuration file.
    *
    * <p>This changes the {@link #getTagPose(int)} method to return the correct pose for your
    * alliance.
