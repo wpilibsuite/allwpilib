@@ -12,7 +12,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.util.Units;
-import edu.wpi.first.wpilibj.apriltag.AprilTagFieldLayout;
 import java.io.IOException;
 import java.util.Optional;
 import org.junit.jupiter.api.Assertions;

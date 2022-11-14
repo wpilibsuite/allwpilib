@@ -22,13 +22,11 @@ ext {
 }
 
 evaluationDependsOn(':wpimath')
-evaluationDependsOn(':wpilibj')
 
 apply from: "${rootDir}/shared/javacpp/setupBuild.gradle"
 
 dependencies {
     implementation project(':wpimath')
-    implementation project(':wpilibj')
 }
 
 sourceSets {
@@ -48,12 +46,8 @@ model {
                 return
             }
             it.cppCompiler.define 'WPILIB_EXPORTS'
-            lib project: ':wpilibc', library: 'wpilibc', linkage: 'shared'
 
-            project(':ntcore').addNtcoreDependency(it, 'shared')
-            project(':hal').addHalDependency(it, 'shared')
             lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
-            lib project: ':wpinet', library: 'wpinet', linkage: 'shared'
             lib project: ':wpimath', library: 'wpimath', linkage: 'shared'
 
             if ((it instanceof NativeExecutableBinarySpec || it instanceof GoogleTestTestSuiteBinarySpec) && it.targetPlatform.name == nativeUtils.wpi.platforms.roborio) {
