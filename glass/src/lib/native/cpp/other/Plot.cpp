@@ -53,11 +53,12 @@ struct PlotSeriesRef {
 };
 
 class PlotSeries {
-  explicit PlotSeries(Storage& storage, int yAxis = 0);
+  explicit PlotSeries(Storage& storage);
 
  public:
   PlotSeries(Storage& storage, std::string_view id);
-  PlotSeries(Storage& storage, DataSource* source, int yAxis = 0);
+  PlotSeries(Storage& storage, DataSource* source);
+  PlotSeries(Storage& storage, DataSource* source, int yAxis);
 
   const std::string& GetId() const { return m_id; }
 
@@ -195,7 +196,7 @@ class PlotView : public View {
 
 }  // namespace
 
-PlotSeries::PlotSeries(Storage& storage, int yAxis)
+PlotSeries::PlotSeries(Storage& storage)
     : m_id{storage.GetString("id")},
       m_name{storage.GetString("name")},
       m_yAxis{storage.GetInt("yAxis", 0)},
@@ -208,12 +209,10 @@ PlotSeries::PlotSeries(Storage& storage, int yAxis)
       m_digital{
           storage.GetString("digital"), kAuto, {"Auto", "Digital", "Analog"}},
       m_digitalBitHeight{storage.GetInt("digitalBitHeight", 8)},
-      m_digitalBitGap{storage.GetInt("digitalBitGap", 4)} {
-  m_yAxis = yAxis;
-}
+      m_digitalBitGap{storage.GetInt("digitalBitGap", 4)} {}
 
 PlotSeries::PlotSeries(Storage& storage, std::string_view id)
-    : PlotSeries{storage, 0} {
+    : PlotSeries{storage} {
   m_id = id;
   if (DataSource* source = DataSource::Find(id)) {
     SetSource(source);
@@ -222,10 +221,15 @@ PlotSeries::PlotSeries(Storage& storage, std::string_view id)
   CheckSource();
 }
 
-PlotSeries::PlotSeries(Storage& storage, DataSource* source, int yAxis)
-    : PlotSeries{storage, yAxis} {
+PlotSeries::PlotSeries(Storage& storage, DataSource* source)
+    : PlotSeries{storage} {
   SetSource(source);
   m_id = source->GetId();
+}
+
+PlotSeries::PlotSeries(Storage& storage, DataSource* source, int yAxis)
+    : PlotSeries{storage, source} {
+  m_yAxis = yAxis;
 }
 
 void PlotSeries::CheckSource() {
