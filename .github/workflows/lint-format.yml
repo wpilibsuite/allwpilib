@@ -13,7 +13,7 @@ concurrency:
 jobs:
   wpiformat:
     name: "wpiformat"
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v3
       - name: Fetch all history and metadata
@@ -56,7 +56,7 @@ jobs:
 
   tidy:
     name: "clang-tidy"
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     container: wpilib/roborio-cross-ubuntu:2023-22.04
     steps:
       - uses: actions/checkout@v3
@@ -86,7 +86,7 @@ jobs:
         run: wpiformat -clang 14 -no-format -tidy-changed -compile-commands=build/compile_commands/linuxx86-64 -vv
   javaformat:
     name: "Java format"
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     container: wpilib/ubuntu-base:22.04
     steps:
       - uses: actions/checkout@v3
@@ -105,7 +105,7 @@ jobs:
         if: ${{ failure() }}
   documentation:
     name: "Documentation"
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v3
         with:
@@ -114,7 +114,7 @@ jobs:
         with:
           distribution: 'zulu'
           java-version: 13
-      - name: Install libclang-9
-        run: sudo apt update && sudo apt install -y libclang-cpp9 libclang1-9
+      - name: Install doxygen
+        run: sudo apt update && sudo apt install -y doxygen
       - name: Build with Gradle
         run: ./gradlew docs:zipDocs -PbuildServer -PdocWarningsAsErrors ${{ env.EXTRA_GRADLE_ARGS }}
