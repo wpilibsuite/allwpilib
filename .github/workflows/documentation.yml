@@ -24,8 +24,6 @@ jobs:
         with:
           distribution: 'zulu'
           java-version: 13
-      - name: Install doxygen
-        run: sudo apt update && sudo apt install -y doxygen
       - name: Set environment variables (Development)
         run: |
           echo "TARGET_FOLDER=$BASE_PATH/development" >> $GITHUB_ENV
