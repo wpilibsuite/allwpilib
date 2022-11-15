@@ -153,17 +153,17 @@ class DataLogRecord:
         return arr
 
     def getStringArray(self) -> List[str]:
-        size = int.from_bytes(self.data[0:4], byteorder="little", signed=False)
+        size = int.from_bytes(self.data[:4], byteorder="little", signed=False)
         if size > ((len(self.data) - 4) / 4):
             raise TypeError("not a string array")
         arr = []
         pos = 4
-        for i in range(size):
+        for _ in range(size):
             val, pos = self._readInnerString(pos)
             arr.append(val)
         return arr
 
-    def _readInnerString(self, pos: int) -> str:
+    def _readInnerString(self, pos: int) -> tuple[str, int]:
         size = int.from_bytes(
             self.data[pos : pos + 4], byteorder="little", signed=False
         )
@@ -225,7 +225,7 @@ class DataLogReader:
         """Returns true if the data log is valid (e.g. has a valid header)."""
         return (
             len(self.buf) >= 12
-            and self.buf[0:6] == b"WPILOG"
+            and self.buf[:6] == b"WPILOG"
             and self.getVersion() >= 0x0100
         )
 
@@ -307,7 +307,7 @@ if __name__ == "__main__":
                 print("Unrecognized control record")
             else:
                 print(f"Data({record.entry}, size={len(record.data)}) ", end="")
-                entry = entries.get(record.entry, None)
+                entry = entries.get(record.entry)
                 if entry is None:
                     print("<ID not found>")
                     continue
@@ -324,7 +324,7 @@ if __name__ == "__main__":
                         print(f"  {record.getDouble()}")
                     elif entry.type == "int64":
                         print(f"  {record.getInteger()}")
-                    elif entry.type == "string" or entry.type == "json":
+                    elif entry.type in ("string", "json"):
                         print(f"  '{record.getString()}'")
                     elif entry.type == "boolean":
                         print(f"  {record.getBoolean()}")
