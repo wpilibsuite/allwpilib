@@ -11,7 +11,7 @@ jobs:
           repository: wpilibsuite/frc-docs
 
       - name: Inspect RLIs
-        uses: Starlight220/Inspector@v1.4
+        uses: Starlight220/Inspector@v1.5
         id: inspector
         with:
           root: ${{ github.workspace }}
