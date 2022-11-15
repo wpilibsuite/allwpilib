@@ -65,7 +65,7 @@ public class SwerveDriveOdometry {
   public SwerveDriveOdometry(
       SwerveDriveKinematics kinematics,
       Rotation2d gyroAngle,
-      SwerveModulePosition... modulePositions) {
+      SwerveModulePosition[] modulePositions) {
     this(kinematics, gyroAngle, modulePositions, new Pose2d());
   }
 
@@ -80,7 +80,7 @@ public class SwerveDriveOdometry {
    * @param modulePositions The wheel positions reported by each module.
    */
   public void resetPosition(
-      Pose2d pose, Rotation2d gyroAngle, SwerveModulePosition... modulePositions) {
+      Pose2d pose, Rotation2d gyroAngle, SwerveModulePosition[] modulePositions) {
     if (modulePositions.length != m_numModules) {
       throw new IllegalArgumentException(
           "Number of modules is not consistent with number of wheel locations provided in "
@@ -118,7 +118,7 @@ public class SwerveDriveOdometry {
    *     in the same order in which you instantiated your SwerveDriveKinematics.
    * @return The new pose of the robot.
    */
-  public Pose2d update(Rotation2d gyroAngle, SwerveModulePosition... modulePositions) {
+  public Pose2d update(Rotation2d gyroAngle, SwerveModulePosition[] modulePositions) {
     if (modulePositions.length != m_numModules) {
       throw new IllegalArgumentException(
           "Number of modules is not consistent with number of wheel locations provided in "

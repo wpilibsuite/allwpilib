@@ -254,7 +254,7 @@ public class SwerveDrivePoseEstimator<States extends Num, Inputs extends Num, Ou
    * @param modulePositions The current distance measurements and rotations of the swerve modules.
    */
   public void resetPosition(
-      Pose2d poseMeters, Rotation2d gyroAngle, SwerveModulePosition... modulePositions) {
+      Pose2d poseMeters, Rotation2d gyroAngle, SwerveModulePosition[] modulePositions) {
     // Reset state estimate and error covariance
     m_observer.reset();
     m_poseBuffer.clear();
