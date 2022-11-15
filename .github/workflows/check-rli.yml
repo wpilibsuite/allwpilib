@@ -60,4 +60,3 @@ jobs:
 
           comment-id: ${{ steps.fc.outputs.comment-id }}
           edit-mode: replace
-
