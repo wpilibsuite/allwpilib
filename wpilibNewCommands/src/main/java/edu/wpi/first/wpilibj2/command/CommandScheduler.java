@@ -25,6 +25,7 @@ import edu.wpi.first.wpilibj.Watchdog;
 import edu.wpi.first.wpilibj.event.EventLoop;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
@@ -384,13 +385,15 @@ public final class CommandScheduler implements NTSendable, AutoCloseable {
   /**
    * Sets the default command for a subsystem. Registers that subsystem if it is not already
    * registered. Default commands will run whenever there is no other command currently scheduled
-   * that requires the subsystem. Default commands should be written to never end (i.e. their {@link
-   * Command#isFinished()} method should return false), as they would simply be re-scheduled if they
-   * do. Default commands must also require their subsystem.
+   * that requires the subsystem. Default commands must also require their subsystem.
    *
    * @param subsystem the subsystem whose default command will be set
    * @param defaultCommand the default command to associate with the subsystem
+   * @deprecated replace with an explicit Trigger binding:<code>
+   *   subsystem.requiredTrigger().onFalse(defaultCommand)
+   * </code>
    */
+  @Deprecated
   public void setDefaultCommand(Subsystem subsystem, Command defaultCommand) {
     if (subsystem == null) {
       DriverStation.reportWarning("Tried to set a default command for a null subsystem", true);
@@ -422,7 +425,10 @@ public final class CommandScheduler implements NTSendable, AutoCloseable {
    *
    * @param subsystem the subsystem to inquire about
    * @return the default command associated with the subsystem
+   * @deprecated this will return only default commands set through {@link
+   *     #setDefaultCommand(Subsystem, Command)}.
    */
+  @Deprecated
   public Command getDefaultCommand(Subsystem subsystem) {
     return m_subsystems.get(subsystem);
   }
@@ -489,6 +495,41 @@ public final class CommandScheduler implements NTSendable, AutoCloseable {
    */
   public Command requiring(Subsystem subsystem) {
     return m_requirements.get(subsystem);
+  }
+
+  /**
+   * Returns `true` if the subsystem is currently required by a command.
+   *
+   * @param subsystem the subsystem to check
+   * @return true if required
+   */
+  public boolean isRequired(Subsystem subsystem) {
+    return requiring(subsystem) != null;
+  }
+
+  /**
+   * Returns a Trigger that is `true` when the subsystem is required. Useful for binding a "default
+   * command" that will start when no commands require the subsystem. Bound to the {@link
+   * CommandScheduler#getDefaultButtonLoop() default button loop}.
+   *
+   * @param subsystem the subsystem
+   * @return a Trigger
+   */
+  public Trigger requiredTrigger(Subsystem subsystem) {
+    return requiredTrigger(subsystem, m_defaultButtonLoop);
+  }
+
+  /**
+   * Returns a Trigger that is `true` when the subsystem is required. Useful for binding a "default
+   * command" that will start when no commands require the subsystem.
+   *
+   * @param subsystem the subsystem
+   * @param loop the EventLoop to bind the Trigger to. Defaults to the {@link
+   *     CommandScheduler#getDefaultButtonLoop() default button loop}.
+   * @return a Trigger
+   */
+  public Trigger requiredTrigger(Subsystem subsystem, EventLoop loop) {
+    return new Trigger(loop, () -> isRequired(subsystem));
   }
 
   /** Disables the command scheduler. */

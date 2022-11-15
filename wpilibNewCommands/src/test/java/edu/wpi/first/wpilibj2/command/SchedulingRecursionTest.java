@@ -80,7 +80,7 @@ class SchedulingRecursionTest extends CommandTestBase {
             }
           };
       Command other = new RunCommand(() -> hasOtherRun.set(true), requirement);
-      scheduler.setDefaultCommand(requirement, other);
+      scheduler.requiredTrigger(requirement).onFalse(other);
 
       assertDoesNotThrow(
           () -> {
@@ -149,17 +149,13 @@ class SchedulingRecursionTest extends CommandTestBase {
       Subsystem requirement = new SubsystemBase() {};
       InstantCommand other = new InstantCommand(() -> {}, requirement);
       Command selfCancels =
-          new CommandBase() {
-            {
-              addRequirements(requirement);
-            }
-
-            @Override
-            public void end(boolean interrupted) {
-              counter.incrementAndGet();
-              scheduler.schedule(other);
-            }
-          };
+          new StartEndCommand(
+              () -> {},
+              () -> {
+                counter.incrementAndGet();
+                scheduler.schedule(other);
+              },
+              requirement);
 
       scheduler.schedule(selfCancels);
 
@@ -179,19 +175,14 @@ class SchedulingRecursionTest extends CommandTestBase {
       Command other =
           new InstantCommand(() -> {}, requirement).withInterruptBehavior(interruptionBehavior);
       Command defaultCommand =
-          new CommandBase() {
-            {
-              addRequirements(requirement);
-            }
+          new InstantCommand(
+              () -> {
+                counter.incrementAndGet();
+                scheduler.schedule(other);
+              },
+              requirement);
 
-            @Override
-            public void initialize() {
-              counter.incrementAndGet();
-              scheduler.schedule(other);
-            }
-          };
-
-      scheduler.setDefaultCommand(requirement, defaultCommand);
+      scheduler.requiredTrigger(requirement).onFalse(defaultCommand);
 
       scheduler.run();
       scheduler.run();

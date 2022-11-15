@@ -8,6 +8,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.verify;
 
+import edu.wpi.first.wpilibj.event.BooleanEvent;
 import org.junit.jupiter.api.Test;
 
 class DefaultCommandTest extends CommandTestBase {
@@ -19,7 +20,7 @@ class DefaultCommandTest extends CommandTestBase {
       MockCommandHolder defaultHolder = new MockCommandHolder(true, hasDefaultCommand);
       Command defaultCommand = defaultHolder.getMock();
 
-      scheduler.setDefaultCommand(hasDefaultCommand, defaultCommand);
+      new BooleanEvent(scheduler.getDefaultButtonLoop(), () -> scheduler.requiring(hasDefaultCommand) == null).ifHigh(()->scheduler.schedule(defaultCommand));
       scheduler.run();
 
       assertTrue(scheduler.isScheduled(defaultCommand));
@@ -36,14 +37,16 @@ class DefaultCommandTest extends CommandTestBase {
       MockCommandHolder interrupterHolder = new MockCommandHolder(true, hasDefaultCommand);
       Command interrupter = interrupterHolder.getMock();
 
-      scheduler.setDefaultCommand(hasDefaultCommand, defaultCommand);
+      scheduler.requiredTrigger(hasDefaultCommand).onFalse(defaultCommand);
       scheduler.run();
       scheduler.schedule(interrupter);
 
       assertFalse(scheduler.isScheduled(defaultCommand));
       assertTrue(scheduler.isScheduled(interrupter));
+      assertTrue(scheduler.isRequired(hasDefaultCommand));
 
       scheduler.cancel(interrupter);
+      assertFalse(scheduler.isRequired(hasDefaultCommand));
       scheduler.run();
 
       assertTrue(scheduler.isScheduled(defaultCommand));
@@ -59,7 +62,7 @@ class DefaultCommandTest extends CommandTestBase {
       MockCommandHolder defaultHolder = new MockCommandHolder(false, hasDefaultCommand);
       Command defaultCommand = defaultHolder.getMock();
 
-      scheduler.setDefaultCommand(hasDefaultCommand, defaultCommand);
+      scheduler.requiredTrigger(hasDefaultCommand).onFalse(defaultCommand);
       scheduler.run();
 
       assertTrue(scheduler.isScheduled(defaultCommand));

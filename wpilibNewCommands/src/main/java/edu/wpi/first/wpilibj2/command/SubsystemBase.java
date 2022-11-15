@@ -69,6 +69,7 @@ public abstract class SubsystemBase implements Subsystem, Sendable {
     SendableRegistry.addLW(child, getSubsystem(), name);
   }
 
+  @SuppressWarnings("deprecation")
   @Override
   public void initSendable(SendableBuilder builder) {
     builder.setSmartDashboardType("Subsystem");

@@ -22,10 +22,13 @@ class CommandRequirementsTest extends CommandTestBase {
       MockCommandHolder interrupterHolder = new MockCommandHolder(true, requirement);
       Command interrupter = interrupterHolder.getMock();
 
+      assertFalse(scheduler.isRequired(requirement));
       scheduler.schedule(interrupted);
+      assertTrue(scheduler.isRequired(requirement));
       scheduler.run();
       scheduler.schedule(interrupter);
       scheduler.run();
+      assertTrue(scheduler.isRequired(requirement));
 
       verify(interrupted).initialize();
       verify(interrupted).execute();
@@ -58,6 +61,7 @@ class CommandRequirementsTest extends CommandTestBase {
     }
   }
 
+  @SuppressWarnings("deprecation")
   @Test
   void defaultCommandRequirementErrorTest() {
     try (CommandScheduler scheduler = new CommandScheduler()) {

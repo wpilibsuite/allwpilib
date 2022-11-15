@@ -4,6 +4,9 @@
 
 package edu.wpi.first.wpilibj2.command;
 
+import edu.wpi.first.wpilibj.event.EventLoop;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
+
 /**
  * A robot subsystem. Subsystems are the basic unit of robot organization in the Command-based
  * framework; they encapsulate low-level hardware objects (motor controllers, sensors, etc) and
@@ -39,13 +42,16 @@ public interface Subsystem {
 
   /**
    * Sets the default {@link Command} of the subsystem. The default command will be automatically
-   * scheduled when no other commands are scheduled that require the subsystem. Default commands
-   * should generally not end on their own, i.e. their {@link Command#isFinished()} method should
-   * always return false. Will automatically register this subsystem with the {@link
-   * CommandScheduler}.
+   * scheduled when no other commands are scheduled that require the subsystem. Will automatically
+   * register this subsystem with the {@link CommandScheduler}.
    *
    * @param defaultCommand the default command to associate with this subsystem
+   * @deprecated replace with an explicit Trigger binding:<code>
+   *   subsystem.requiredTrigger().onFalse(defaultCommand)
+   * </code>
+   * @see #requiredTrigger(EventLoop)
    */
+  @Deprecated
   default void setDefaultCommand(Command defaultCommand) {
     CommandScheduler.getInstance().setDefaultCommand(this, defaultCommand);
   }
@@ -55,7 +61,10 @@ public interface Subsystem {
    * associated with the subsystem.
    *
    * @return the default command associated with this subsystem
+   * @deprecated this will return only default commands set through {@link
+   *     #setDefaultCommand(Command)}.
    */
+  @Deprecated
   default Command getDefaultCommand() {
     return CommandScheduler.getInstance().getDefaultCommand(this);
   }
@@ -68,6 +77,38 @@ public interface Subsystem {
    */
   default Command getCurrentCommand() {
     return CommandScheduler.getInstance().requiring(this);
+  }
+
+  /**
+   * Returns `true` if the subsystem is currently required by a command.
+   *
+   * @return true if required
+   */
+  default boolean isRequired() {
+    return CommandScheduler.getInstance().isRequired(this);
+  }
+
+  /**
+   * Returns a Trigger that is `true` when this subsystem is required. Useful for binding a "default
+   * command" that will start when no commands require this subsystem. Bound to the {@link
+   * CommandScheduler#getDefaultButtonLoop() default button loop}.
+   *
+   * @return a Trigger
+   */
+  default Trigger requiredTrigger() {
+    return requiredTrigger(CommandScheduler.getInstance().getDefaultButtonLoop());
+  }
+
+  /**
+   * Returns a Trigger that is `true` when this subsystem is required. Useful for binding a "default
+   * command" that will start when no commands require this subsystem.
+   *
+   * @param loop the EventLoop to bind the Trigger to. Defaults to the {@link
+   *     CommandScheduler#getDefaultButtonLoop() default button loop}.
+   * @return a Trigger
+   */
+  default Trigger requiredTrigger(EventLoop loop) {
+    return new Trigger(loop, this::isRequired);
   }
 
   /**
