@@ -136,8 +136,10 @@ subprojects {
     }
 
     // Sign outputs with Developer ID
-    if (project.hasProperty("developerID")) {
-        tasks.withType(AbstractLinkTask) { task ->
+    tasks.withType(AbstractLinkTask) { task ->
+        task.inputs.property "HasDeveloperId", project.hasProperty("developerID")
+
+        if (project.hasProperty("developerID")) {
             // Don't sign any executables because codesign complains
             // about relative rpath.
             if (!(task instanceof LinkExecutable)) {
