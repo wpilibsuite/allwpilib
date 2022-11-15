@@ -2,7 +2,7 @@ apply from: "${rootDir}/shared/resources.gradle"
 
 ext {
     nativeName = 'apriltags'
-    devMain = 'edu.wpi.first.apriltags.DevMain'
+    devMain = 'edu.wpi.first.apriltag.DevMain'
 
     def generateTask = createGenerateResourcesTask('main', 'APRILTAGS', 'frc', project)
 

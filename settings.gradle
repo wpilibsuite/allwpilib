@@ -52,7 +52,7 @@ include 'myRobot'
 include 'docs'
 include 'msvcruntime'
 include 'ntcoreffi'
-include 'apriltags'
+include 'apriltag'
 
 buildCache {
     def cred = {

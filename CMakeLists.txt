@@ -315,7 +315,7 @@ endif()
 
 if (WITH_WPILIB)
     set(WPILIBC_DEP_REPLACE ${WPILIBC_DEP_REPLACE_IMPL})
-    add_subdirectory(apriltags)
+    add_subdirectory(apriltag)
     add_subdirectory(wpilibj)
     add_subdirectory(wpilibc)
     add_subdirectory(wpilibNewCommands)
