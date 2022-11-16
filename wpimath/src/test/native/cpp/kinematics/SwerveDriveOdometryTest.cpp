@@ -36,7 +36,8 @@ TEST_F(SwerveDriveOdometryTest, TwoIterations) {
 
   m_odometry.Update(0_deg, {zero, zero, zero, zero});
 
-  auto pose = m_odometry.Update(0_deg, {position, position, position, position});
+  auto pose =
+      m_odometry.Update(0_deg, {position, position, position, position});
 
   EXPECT_NEAR(0.5, pose.X().value(), kEpsilon);
   EXPECT_NEAR(0.0, pose.Y().value(), kEpsilon);
@@ -62,7 +63,8 @@ TEST_F(SwerveDriveOdometryTest, GyroAngleReset) {
 
   SwerveModulePosition position{0.5_m, 0_deg};
 
-  auto pose = m_odometry.Update(90_deg, {position, position, position, position});
+  auto pose =
+      m_odometry.Update(90_deg, {position, position, position, position});
 
   EXPECT_NEAR(0.5, pose.X().value(), kEpsilon);
   EXPECT_NEAR(0.0, pose.Y().value(), kEpsilon);
