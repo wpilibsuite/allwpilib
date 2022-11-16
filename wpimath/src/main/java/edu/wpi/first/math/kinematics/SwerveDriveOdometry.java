@@ -73,8 +73,8 @@ public class SwerveDriveOdometry {
    * Resets the robot's position on the field.
    *
    * <p>The gyroscope angle does not need to be reset here on the user's robot code. The library
-   * automatically takes care of offsetting the gyro angle. 
-   * 
+   * automatically takes care of offsetting the gyro angle.
+   *
    * <p>Similarly, module positions do not need to be reset in user code.
    *
    * @param pose The position on the field that your robot is at.
