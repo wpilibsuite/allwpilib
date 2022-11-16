@@ -174,8 +174,8 @@ model {
 
                             new groovy.json.JsonSlurper().parseText(exampleFile.text).each { entry ->
                                 project.tasks.create("run${entry.foldername}", JavaExec) { run ->
-                                    mainClass = "edu.wpi.first.wpilibj.examples." + entry.foldername + ".Main"
-                                    classpath = sourceSets.main.runtimeClasspath
+                                    run.mainClass = "edu.wpi.first.wpilibj.examples." + entry.foldername + ".Main"
+                                    run.classpath = sourceSets.main.runtimeClasspath
                                     run.dependsOn it.tasks.install
                                     run.systemProperty 'java.library.path', filePath
                                     run.environment 'LD_LIBRARY_PATH', filePath

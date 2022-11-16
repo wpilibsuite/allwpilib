@@ -7,7 +7,6 @@
     ],
     "foldername": "gettingstarted",
     "gradlebase": "java",
-    "mainclass": "Main",
     "commandversion": 2
   },
   {
@@ -21,7 +20,6 @@
     ],
     "foldername": "tankdrive",
     "gradlebase": "java",
-    "mainclass": "Main",
     "commandversion": 2
   },
   {
@@ -32,7 +30,6 @@
     ],
     "foldername": "arcadedrive",
     "gradlebase": "java",
-    "mainclass": "Main",
     "commandversion": 2
   },
   {
@@ -46,7 +43,6 @@
     ],
     "foldername": "mecanumdrive",
     "gradlebase": "java",
-    "mainclass": "Main",
     "commandversion": 2
   },
   {
@@ -59,7 +55,6 @@
     ],
     "foldername": "canpdp",
     "gradlebase": "java",
-    "mainclass": "Main",
     "commandversion": 2
   },
   {
@@ -73,7 +68,6 @@
     ],
     "foldername": "solenoid",
     "gradlebase": "java",
-    "mainclass": "Main",
     "commandversion": 2
   },
   {
@@ -86,7 +80,6 @@
     ],
     "foldername": "encoder",
     "gradlebase": "java",
-    "mainclass": "Main",
     "commandversion": 2
   },
   {
@@ -97,7 +90,6 @@
     ],
     "foldername": "eventloop",
     "gradlebase": "java",
-    "mainclass": "Main",
     "commandversion": 2
   },
   {
@@ -110,7 +102,6 @@
     ],
     "foldername": "relay",
     "gradlebase": "java",
-    "mainclass": "Main",
     "commandversion": 2
   },
   {
@@ -123,7 +114,6 @@
     ],
     "foldername": "ultrasonic",
     "gradlebase": "java",
-    "mainclass": "Main",
     "commandversion": 2
   },
   {
@@ -136,7 +126,6 @@
     ],
     "foldername": "ultrasonicpid",
     "gradlebase": "java",
-    "mainclass": "Main",
     "commandversion": 2
   },
   {
@@ -150,7 +139,6 @@
     ],
     "foldername": "potentiometerpid",
     "gradlebase": "java",
-    "mainclass": "Main",
     "commandversion": 2
   },
   {
@@ -164,7 +152,6 @@
     ],
     "foldername": "elevatortrapezoidprofile",
     "gradlebase": "java",
-    "mainclass": "Main",
     "commandversion": 2
   },
   {
@@ -178,7 +165,6 @@
     ],
     "foldername": "elevatorprofiledpid",
     "gradlebase": "java",
-    "mainclass": "Main",
     "commandversion": 2
   },
   {
@@ -192,7 +178,6 @@
     ],
     "foldername": "gyro",
     "gradlebase": "java",
-    "mainclass": "Main",
     "commandversion": 2
   },
   {
@@ -206,7 +191,6 @@
     ],
     "foldername": "gyromecanum",
     "gradlebase": "java",
-    "mainclass": "Main",
     "commandversion": 2
   },
   {
@@ -217,7 +201,6 @@
     ],
     "foldername": "hidrumble",
     "gradlebase": "java",
-    "mainclass": "Main",
     "commandversion": 2
   },
   {"name": "Mechanism2d",
@@ -225,7 +208,6 @@
     "tags": ["Mechanism2d"],
     "foldername": "mechanism2d",
     "gradlebase": "java",
-    "mainclass": "Main",
     "commandversion": 2
   },
   {
@@ -238,7 +220,6 @@
     ],
     "foldername": "motorcontrol",
     "gradlebase": "java",
-    "mainclass": "Main",
     "commandversion": 2
   },
   {
@@ -254,7 +235,6 @@
     ],
     "foldername": "motorcontrolencoder",
     "gradlebase": "java",
-    "mainclass": "Main",
     "commandversion": 2
   },
   {
@@ -265,7 +245,6 @@
     ],
     "foldername": "gearsbot",
     "gradlebase": "java",
-    "mainclass": "Main",
     "commandversion": 2
   },
   {
@@ -277,7 +256,6 @@
     ],
     "foldername": "quickvision",
     "gradlebase": "java",
-    "mainclass": "Main",
     "commandversion": 2
   },
   {
@@ -289,7 +267,6 @@
     ],
     "foldername": "intermediatevision",
     "gradlebase": "java",
-    "mainclass": "Main",
     "commandversion": 2
   },
   {
@@ -300,7 +277,6 @@
     ],
     "foldername": "axiscamera",
     "gradlebase": "java",
-    "mainclass": "Main",
     "commandversion": 2
   },
   {
@@ -312,7 +288,6 @@
     ],
     "foldername": "shuffleboard",
     "gradlebase": "java",
-    "mainclass": "Main",
     "commandversion": 2
   },
   {
@@ -324,7 +299,6 @@
     ],
     "foldername": "hatchbottraditional",
     "gradlebase": "java",
-    "mainclass": "Main",
     "commandversion": 2
   },
   {
@@ -337,7 +311,6 @@
     ],
     "foldername": "hatchbotinlined",
     "gradlebase": "java",
-    "mainclass": "Main",
     "commandversion": 2
   },
   {
@@ -348,7 +321,6 @@
     ],
     "foldername": "selectcommand",
     "gradlebase": "java",
-    "mainclass": "Main",
     "commandversion": 2
   },
   {
@@ -360,7 +332,6 @@
     ],
     "foldername": "schedulereventlogging",
     "gradlebase": "java",
-    "mainclass": "Main",
     "commandversion": 2
   },
   {
@@ -372,7 +343,6 @@
     ],
     "foldername": "frisbeebot",
     "gradlebase": "java",
-    "mainclass": "Main",
     "commandversion": 2
   },
   {
@@ -385,7 +355,6 @@
     ],
     "foldername": "gyrodrivecommands",
     "gradlebase": "java",
-    "mainclass": "Main",
     "commandversion": 2
   },
   {
@@ -396,7 +365,6 @@
     ],
     "foldername": "swervebot",
     "gradlebase": "java",
-    "mainclass": "Main",
     "commandversion": 2
   },
   {
@@ -407,7 +375,6 @@
     ],
     "foldername": "mecanumbot",
     "gradlebase": "java",
-    "mainclass": "Main",
     "commandversion": 2
   },
   {
@@ -418,7 +385,6 @@
     ],
     "foldername": "differentialdrivebot",
     "gradlebase": "java",
-    "mainclass": "Main",
     "commandversion": 2
   },
   {
@@ -433,7 +399,6 @@
     ],
     "foldername": "ramsetecommand",
     "gradlebase": "java",
-    "mainclass": "Main",
     "commandversion": 2
   },
   {
@@ -444,7 +409,6 @@
     ],
     "foldername": "arcadedrivexboxcontroller",
     "gradlebase": "java",
-    "mainclass": "Main",
     "commandversion": 2
   },
   {
@@ -455,7 +419,6 @@
     ],
     "foldername": "tankdrivexboxcontroller",
     "gradlebase": "java",
-    "mainclass": "Main",
     "commandversion": 2
   },
   {
@@ -466,7 +429,6 @@
     ],
     "foldername": "dutycycleencoder",
     "gradlebase": "java",
-    "mainclass": "Main",
     "commandversion": 2
   },
   {
@@ -477,7 +439,6 @@
     ],
     "foldername": "dutycycleinput",
     "gradlebase": "java",
-    "mainclass": "Main",
     "commandversion": 2
   },
   {
@@ -488,7 +449,6 @@
     ],
     "foldername": "addressableled",
     "gradlebase": "java",
-    "mainclass": "Main",
     "commandversion": 2
   },
   {
@@ -499,7 +459,6 @@
     ],
     "foldername": "dma",
     "gradlebase": "java",
-    "mainclass": "Main",
     "commandversion": 2
   },
   {
@@ -512,7 +471,6 @@
     ],
     "foldername": "armbot",
     "gradlebase": "java",
-    "mainclass": "Main",
     "commandversion": 2
   },
   {
@@ -525,7 +483,6 @@
     ],
     "foldername": "armbotoffboard",
     "gradlebase": "java",
-    "mainclass": "Main",
     "commandversion": 2
   },
   {
@@ -538,7 +495,6 @@
     ],
     "foldername": "drivedistanceoffboard",
     "gradlebase": "java",
-    "mainclass": "Main",
     "commandversion": 2
   },
   {
@@ -553,7 +509,6 @@
     ],
     "foldername": "mecanumcontrollercommand",
     "gradlebase": "java",
-    "mainclass": "Main",
     "commandversion": 2
   },
   {
@@ -568,7 +523,6 @@
     ],
     "foldername": "swervecontrollercommand",
     "gradlebase": "java",
-    "mainclass": "Main",
     "commandversion": 2
   },
   {
@@ -579,7 +533,6 @@
     ],
     "foldername": "ramsetecontroller",
     "gradlebase": "java",
-    "mainclass": "Main",
     "commandversion": 2
   },
   {
@@ -597,7 +550,6 @@
     ],
     "foldername": "statespaceflywheel",
     "gradlebase": "java",
-    "mainclass": "Main",
     "commandversion": 2
   },
   {
@@ -616,7 +568,6 @@
     ],
     "foldername": "statespaceflywheelsysid",
     "gradlebase": "java",
-    "mainclass": "Main",
     "commandversion": 2
   },
   {
@@ -632,7 +583,6 @@
     ],
     "foldername": "statespaceelevator",
     "gradlebase": "java",
-    "mainclass": "Main",
     "commandversion": 2
   },
   {
@@ -648,7 +598,6 @@
     ],
     "foldername": "statespacearm",
     "gradlebase": "java",
-    "mainclass": "Main",
     "commandversion": 2
   },
   {
@@ -665,7 +614,6 @@
     ],
     "foldername": "simpledifferentialdrivesimulation",
     "gradlebase": "java",
-    "mainclass": "Main",
     "commandversion": 2
   },
   {
@@ -682,7 +630,6 @@
     ],
     "foldername": "statespacedifferentialdrivesimulation",
     "gradlebase": "java",
-    "mainclass": "Main",
     "commandversion": 2
   },
   {
@@ -699,7 +646,6 @@
     ],
     "foldername": "elevatorsimulation",
     "gradlebase": "java",
-    "mainclass": "Main",
     "commandversion": 2
   },
   {
@@ -717,7 +663,6 @@
     ],
     "foldername": "armsimulation",
     "gradlebase": "java",
-    "mainclass": "Main",
     "commandversion": 2
   },
   {
@@ -734,7 +679,6 @@
     ],
     "foldername": "differentialdriveposeestimator",
     "gradlebase": "java",
-    "mainclass": "Main",
     "commandversion": 2
   },
   {
@@ -751,7 +695,6 @@
     ],
     "foldername": "mecanumdriveposeestimator",
     "gradlebase": "java",
-    "mainclass": "Main",
     "commandversion": 2
   },
   {
@@ -768,7 +711,6 @@
     ],
     "foldername": "swervedriveposeestimator",
     "gradlebase": "java",
-    "mainclass": "Main",
     "commandversion": 2
   },
   {
@@ -780,7 +722,6 @@
     ],
     "foldername": "romireference",
     "gradlebase": "javaromi",
-    "mainclass": "Main",
     "commandversion": 2
   },
   {
@@ -791,8 +732,7 @@
     ],
     "foldername": "digitalcommunication",
     "gradlebase": "java",
-    "commandversion": 2,
-    "mainclass": "Main"
+    "commandversion": 2
   },
   {
     "name": "I2C Communication Sample",
@@ -802,7 +742,6 @@
     ],
     "foldername": "i2ccommunication",
     "gradlebase": "java",
-    "commandversion": 2,
-    "mainclass": "Main"
+    "commandversion": 2
   }
 ]

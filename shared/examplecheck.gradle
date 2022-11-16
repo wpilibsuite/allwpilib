@@ -53,9 +53,6 @@ task checkExamples(type: Task) {
             assert it.foldername != null
             assert it.gradlebase != null
             assert it.commandversion != null
-            if (it.gradlebase == 'java') {
-                assert it.mainclass != null
-            }
         }
     }
 }
