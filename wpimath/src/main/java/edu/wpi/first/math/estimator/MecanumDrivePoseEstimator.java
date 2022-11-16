@@ -204,6 +204,19 @@ public class MecanumDrivePoseEstimator {
    *
    * @param poseMeters The position on the field that your robot is at.
    * @param gyroAngle The angle reported by the gyroscope.
+   */
+  public void resetPosition(Pose2d poseMeters, Rotation2d gyroAngle) {
+    resetPosition(poseMeters, gyroAngle, new MecanumDriveWheelPositions());
+  }
+
+  /**
+   * Resets the robot's position on the field.
+   *
+   * <p>The gyroscope angle does not need to be reset in the user's robot code. The library
+   * automatically takes care of offsetting the gyro angle.
+   *
+   * @param poseMeters The position on the field that your robot is at.
+   * @param gyroAngle The angle reported by the gyroscope.
    * @param wheelPositions The distances driven by each wheel.
    */
   public void resetPosition(
