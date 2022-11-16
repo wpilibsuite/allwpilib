@@ -69,6 +69,8 @@ public class DifferentialDrivePoseEstimator {
   /**
    * Constructs a DifferentialDrivePoseEstimator.
    *
+   * <p>You NEED to reset your encoders (to zero) when calling this method.
+   *
    * @param gyroAngle The current gyro angle.
    * @param initialPoseMeters The starting pose estimate.
    * @param stateStdDevs Standard deviations of model states. Increase these numbers to trust your
@@ -90,6 +92,8 @@ public class DifferentialDrivePoseEstimator {
     this(
         gyroAngle,
         initialPoseMeters,
+        0,
+        0,
         stateStdDevs,
         localMeasurementStdDevs,
         visionMeasurementStdDevs,
@@ -104,6 +108,8 @@ public class DifferentialDrivePoseEstimator {
    * @param stateStdDevs Standard deviations of model states. Increase these numbers to trust your
    *     model's state estimates less. This matrix is in the form [x, y, theta, dist_l, dist_r]ᵀ,
    *     with units in meters and radians.
+   * @param leftDistanceMeters The distance traveled by the left encoder.
+   * @param rightDistanceMeters The distance traveled by the right encoder.
    * @param localMeasurementStdDevs Standard deviations of the encoder and gyro measurements.
    *     Increase these numbers to trust sensor readings from encoders and gyros less. This matrix
    *     is in the form [dist_l, dist_r, theta]ᵀ, with units in meters and radians.
@@ -115,6 +121,8 @@ public class DifferentialDrivePoseEstimator {
   public DifferentialDrivePoseEstimator(
       Rotation2d gyroAngle,
       Pose2d initialPoseMeters,
+      double leftDistanceMeters,
+      double rightDistanceMeters,
       Matrix<N5, N1> stateStdDevs,
       Matrix<N3, N1> localMeasurementStdDevs,
       Matrix<N3, N1> visionMeasurementStdDevs,
@@ -155,7 +163,7 @@ public class DifferentialDrivePoseEstimator {
 
     m_gyroOffset = initialPoseMeters.getRotation().minus(gyroAngle);
     m_previousAngle = initialPoseMeters.getRotation();
-    m_observer.setXhat(fillStateVector(initialPoseMeters, 0.0, 0.0));
+    m_observer.setXhat(fillStateVector(initialPoseMeters, leftDistanceMeters, rightDistanceMeters));
   }
 
   /**
@@ -218,11 +226,30 @@ public class DifferentialDrivePoseEstimator {
    * @param gyroAngle The angle reported by the gyroscope.
    */
   public void resetPosition(Pose2d poseMeters, Rotation2d gyroAngle) {
+    resetPosition(poseMeters, gyroAngle, 0, 0);
+  }
+
+  /**
+   * Resets the robot's position on the field.
+   *
+   * <p>The gyroscope angle does not need to be reset here on the user's robot code. The library
+   * automatically takes care of offsetting the gyro angle.
+   *
+   * @param poseMeters The position on the field that your robot is at.
+   * @param gyroAngle The angle reported by the gyroscope.
+   * @param leftDistanceMeters The distance traveled by the left encoder.
+   * @param rightDistanceMeters The distance traveled by the right encoder.
+   */
+  public void resetPosition(
+      Pose2d poseMeters,
+      Rotation2d gyroAngle,
+      double leftPositionMeters,
+      double rightPositionMeters) {
     // Reset state estimate and error covariance
     m_observer.reset();
     m_poseBuffer.clear();
 
-    m_observer.setXhat(fillStateVector(poseMeters, 0.0, 0.0));
+    m_observer.setXhat(fillStateVector(poseMeters, leftPositionMeters, rightPositionMeters));
 
     m_prevTimeSeconds = -1;
 
