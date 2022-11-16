@@ -48,6 +48,7 @@ class NetworkTable final {
  private:
   NT_Inst m_inst;
   std::string m_path;
+  NT_MultiSubscriber m_topicSub;
   mutable wpi::mutex m_mutex;
   mutable wpi::StringMap<NT_Entry> m_entries;
 
