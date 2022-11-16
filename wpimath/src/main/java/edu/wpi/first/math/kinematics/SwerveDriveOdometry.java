@@ -72,6 +72,26 @@ public class SwerveDriveOdometry {
   /**
    * Resets the robot's position on the field.
    *
+   * <p>You NEED to reset your encoders (to zero) when calling this method.
+   *
+   * <p>The gyroscope angle does not need to be reset here on the user's robot code. The library
+   * automatically takes care of offsetting the gyro angle.
+   *
+   * @param pose The position on the field that your robot is at.
+   * @param gyroAngle The angle reported by the gyroscope.
+   */
+  public void resetPosition(Pose2d pose, Rotation2d gyroAngle) {
+    var modulePositions = new SwerveModulePosition[m_numModules];
+    for (int i = 0; i < m_numModules; i++) {
+      modulePositions[i] = new SwerveModulePosition();
+    }
+
+    resetPosition(pose, gyroAngle, modulePositions);
+  }
+
+  /**
+   * Resets the robot's position on the field.
+   *
    * <p>The gyroscope angle does not need to be reset here on the user's robot code. The library
    * automatically takes care of offsetting the gyro angle.
    *

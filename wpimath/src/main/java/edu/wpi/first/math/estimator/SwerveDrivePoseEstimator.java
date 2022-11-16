@@ -63,6 +63,8 @@ public class SwerveDrivePoseEstimator<States extends Num, Inputs extends Num, Ou
   private final Nat<Inputs> m_inputs;
   private final Nat<Outputs> m_outputs;
 
+  private final int m_numModules;
+
   private final double m_nominalDt; // Seconds
   private double m_prevTimeSeconds = -1.0;
 
@@ -178,6 +180,7 @@ public class SwerveDrivePoseEstimator<States extends Num, Inputs extends Num, Ou
     }
 
     m_nominalDt = nominalDtSeconds;
+    m_numModules = modulePositions.length;
 
     m_observer =
         new UnscentedKalmanFilter<>(
@@ -245,6 +248,23 @@ public class SwerveDrivePoseEstimator<States extends Num, Inputs extends Num, Ou
    * Resets the robot's position on the field.
    *
    * <p>You NEED to reset your encoders (to zero) when calling this method.
+   *
+   * <p>The gyroscope angle does not need to be reset in the user's robot code. The library
+   * automatically takes care of offsetting the gyro angle.
+   *
+   * @param poseMeters The position on the field that your robot is at.
+   * @param gyroAngle The angle reported by the gyroscope.
+   */
+  public void resetPosition(Pose2d poseMeters, Rotation2d gyroAngle) {
+    var modulePositions = new SwerveModulePosition[m_numModules];
+    for (int i = 0; i < m_numModules; i++) {
+      modulePositions[i] = new SwerveModulePosition();
+    }
+    resetPosition(poseMeters, gyroAngle, modulePositions);
+  }
+
+  /**
+   * Resets the robot's position on the field.
    *
    * <p>The gyroscope angle does not need to be reset in the user's robot code. The library
    * automatically takes care of offsetting the gyro angle.
