@@ -1,3 +1,7 @@
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
+
 package edu.wpi.first.wpilibj.examples.unittest.subsystems;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -23,7 +27,11 @@ public class IntakeTest {
     assert HAL.initialize(500, 0); // initialize the HAL, crash if failed
     intake = new Intake(); // create our intake
     simMotor = new PWMSim(IntakeConstants.kMotorPort); // create our simulation PWM motor controller
-    simPiston = new DoubleSolenoidSim(PneumaticsModuleType.CTREPCM, IntakeConstants.kPistonFwdChannel, IntakeConstants.kPistonRevChannel); // create our simulation solenoid
+    simPiston =
+        new DoubleSolenoidSim(
+            PneumaticsModuleType.CTREPCM,
+            IntakeConstants.kPistonFwdChannel,
+            IntakeConstants.kPistonRevChannel); // create our simulation solenoid
   }
 
   @AfterEach // this method will run after each test

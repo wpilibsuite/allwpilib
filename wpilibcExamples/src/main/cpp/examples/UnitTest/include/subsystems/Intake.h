@@ -18,5 +18,7 @@ class Intake {
 
  private:
   frc::PWMSparkMax m_motor{IntakeConstants::kMotorPort};
-  frc::DoubleSolenoid m_piston{frc::PneumaticsModuleType::CTREPCM, IntakeConstants::kPistonFwdChannel, IntakeConstants::kPistonRevChannel};
+  frc::DoubleSolenoid m_piston{frc::PneumaticsModuleType::CTREPCM,
+                               IntakeConstants::kPistonFwdChannel,
+                               IntakeConstants::kPistonRevChannel};
 };
