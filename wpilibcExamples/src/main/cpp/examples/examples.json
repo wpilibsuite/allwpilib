@@ -610,7 +610,6 @@
     ],
     "foldername": "StateSpaceFlywheel",
     "gradlebase": "cpp",
-    "mainclass": "Main",
     "commandversion": 2
   },
   {
@@ -629,7 +628,6 @@
     ],
     "foldername": "StateSpaceFlywheelSysId",
     "gradlebase": "cpp",
-    "mainclass": "Main",
     "commandversion": 2
   },
   {
@@ -645,7 +643,6 @@
     ],
     "foldername": "StateSpaceElevator",
     "gradlebase": "cpp",
-    "mainclass": "Main",
     "commandversion": 2
   },
   {
@@ -661,7 +658,6 @@
     ],
     "foldername": "StateSpaceArm",
     "gradlebase": "cpp",
-    "mainclass": "Main",
     "commandversion": 2
   },
   {
@@ -678,7 +674,6 @@
     ],
     "foldername": "ElevatorSimulation",
     "gradlebase": "cpp",
-    "mainclass": "Main",
     "commandversion": 2
   },
   {
@@ -694,7 +689,6 @@
     ],
     "foldername": "DifferentialDrivePoseEstimator",
     "gradlebase": "cpp",
-    "mainclass": "Main",
     "commandversion": 2
   },
   {
@@ -710,7 +704,6 @@
     ],
     "foldername": "MecanumDrivePoseEstimator",
     "gradlebase": "cpp",
-    "mainclass": "Main",
     "commandversion": 2
   },
   {
@@ -728,7 +721,16 @@
     ],
     "foldername": "ArmSimulation",
     "gradlebase": "cpp",
-    "mainclass": "Main",
+    "commandversion": 2
+  },
+  {
+    "name": "UnitTesting",
+    "description": "Demonstrates basic unit testing for a robot project.",
+    "tags": [
+      "Testing"
+    ],
+    "foldername": "UnitTest",
+    "gradlebase": "cpp",
     "commandversion": 2
   },
   {
@@ -746,7 +748,6 @@
     ],
     "foldername": "SimpleDifferentialDriveSimulation",
     "gradlebase": "cpp",
-    "mainclass": "Main",
     "commandversion": 2
   },
   {
@@ -764,7 +765,6 @@
     ],
     "foldername": "StateSpaceDifferentialDriveSimulation",
     "gradlebase": "cpp",
-    "mainclass": "Main",
     "commandversion": 2
   },
   {
@@ -781,7 +781,6 @@
     ],
     "foldername": "SwerveDrivePoseEstimator",
     "gradlebase": "cpp",
-    "mainclass": "Main",
     "commandversion": 2
   }
 ]
