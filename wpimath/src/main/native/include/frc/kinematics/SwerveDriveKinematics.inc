@@ -7,8 +7,8 @@
 #include <algorithm>
 #include <utility>
 
-#include "frc/kinematics/SwerveDriveKinematics.h"
 #include "frc/kinematics/ChassisSpeeds.h"
+#include "frc/kinematics/SwerveDriveKinematics.h"
 #include "units/math.h"
 
 namespace frc {
@@ -158,22 +158,23 @@ void SwerveDriveKinematics<NumModules>::DesaturateWheelSpeeds(
   auto& states = *moduleStates;
 
   auto realMaxSpeed = std::max_element(states.begin(), states.end(),
-                                    [](const auto& a, const auto& b) {
-                                      return units::math::abs(a.speed) <
-                                              units::math::abs(b.speed);
-                                    })
-                        ->speed;
+                                       [](const auto& a, const auto& b) {
+                                         return units::math::abs(a.speed) <
+                                                units::math::abs(b.speed);
+                                       })
+                          ->speed;
 
-  if(attainableMaxRobotTranslationSpeed == 0_mps || attainableMaxRobotRotationSpeed == 0_rad_per_s || realMaxSpeed == 0_mps) {
+  if (attainableMaxRobotTranslationSpeed == 0_mps ||
+      attainableMaxRobotRotationSpeed == 0_rad_per_s || realMaxSpeed == 0_mps) {
     return;
   }
-  
+
   auto translationalK =
       units::math::hypot(currentChassisSpeed.vx, currentChassisSpeed.vy) /
       attainableMaxRobotTranslationSpeed;
 
   auto rotationalK = units::math::abs(currentChassisSpeed.omega) /
-                    attainableMaxRobotRotationSpeed;
+                     attainableMaxRobotRotationSpeed;
 
   auto k = units::math::max(translationalK, rotationalK);
 

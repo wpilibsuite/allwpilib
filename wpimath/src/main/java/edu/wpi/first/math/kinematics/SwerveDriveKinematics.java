@@ -262,7 +262,6 @@ public class SwerveDriveKinematics {
       double attainableMaxModuleSpeedMetersPerSecond,
       double attainableMaxTranslationalSpeedMetersPerSecond,
       double attainableMaxRotationalVelocityRadiansPerSecond) {
-
     double realMaxSpeed = Collections.max(Arrays.asList(moduleStates)).speedMetersPerSecond;
 
     if (attainableMaxTranslationalSpeedMetersPerSecond == 0
