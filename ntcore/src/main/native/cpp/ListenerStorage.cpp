@@ -320,6 +320,19 @@ bool ListenerStorage::WaitForListenerQueue(double timeout) {
   return wpi::WaitForObject(h, timeout, &timedOut);
 }
 
+void ListenerStorage::Reset() {
+  std::scoped_lock lock{m_mutex};
+  m_pollers.clear();
+  m_listeners.clear();
+  m_connListeners.clear();
+  m_topicListeners.clear();
+  m_valueListeners.clear();
+  m_logListeners.clear();
+  if (m_thread) {
+    m_thread.Stop();
+  }
+}
+
 std::vector<std::pair<NT_Listener, unsigned int>>
 ListenerStorage::DoRemoveListeners(std::span<const NT_Listener> handles) {
   std::vector<std::pair<NT_Listener, unsigned int>> rv;
