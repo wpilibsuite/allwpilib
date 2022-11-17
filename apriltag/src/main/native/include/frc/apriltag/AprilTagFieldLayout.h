@@ -12,7 +12,6 @@
 #include <units/length.h>
 #include <wpi/SymbolExports.h>
 
-#include "frc/DriverStation.h"
 #include "frc/apriltag/AprilTag.h"
 #include "frc/geometry/Pose3d.h"
 
@@ -40,6 +39,11 @@ namespace frc {
  */
 class WPILIB_DLLEXPORT AprilTagFieldLayout {
  public:
+  enum class OriginPosition {
+    kBlueAllianceWallRightSide,
+    kRedAllianceWallRightSide,
+  };
+
   AprilTagFieldLayout() = default;
 
   /**
@@ -60,14 +64,25 @@ class WPILIB_DLLEXPORT AprilTagFieldLayout {
                       units::meter_t fieldLength, units::meter_t fieldWidth);
 
   /**
-   * Set the alliance that your team is on.
+   * Sets the origin based on a pre-known enumeration of positions. The position
+   * is calculated from values in the configuration file.
    *
    * This changes the GetTagPose(int) method to return the correct pose for your
    * alliance.
    *
    * @param alliance The alliance to mirror poses for.
    */
-  void SetAlliance(DriverStation::Alliance alliance);
+  void SetOrigin(OriginPosition position);
+
+  /**
+   * Sets the origin for tag pose transformation.
+   *
+   * This changes the GetTagPose(int) method to return the correct pose for your
+   * alliance.
+   *
+   * @param alliance The alliance to mirror poses for.
+   */
+  void SetOrigin(const Pose3d& origin);
 
   /**
    * Gets an AprilTag pose by its ID.
@@ -105,7 +120,7 @@ class WPILIB_DLLEXPORT AprilTagFieldLayout {
   std::unordered_map<int, AprilTag> m_apriltags;
   units::meter_t m_fieldLength;
   units::meter_t m_fieldWidth;
-  bool m_mirror = false;
+  Pose3d m_origin;
 
   friend WPILIB_DLLEXPORT void to_json(wpi::json& json,
                                        const AprilTagFieldLayout& layout);
