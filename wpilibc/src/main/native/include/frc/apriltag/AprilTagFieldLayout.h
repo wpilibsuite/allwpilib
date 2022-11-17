@@ -6,6 +6,7 @@
 
 #include <optional>
 #include <string_view>
+#include <unordered_map>
 #include <vector>
 
 #include <units/length.h>
@@ -28,7 +29,7 @@ namespace frc {
  * The "tags" object is a list of all AprilTags contained within a layout. Each
  * AprilTag serializes to a JSON object containing an ID and a Pose3d. The
  * "field" object is a descriptor of the size of the field in meters with
- * "width" and "height" values.  This is to account for arbitrary field sizes
+ * "width" and "length" values.  This is to account for arbitrary field sizes
  * when mirroring the poses.
  *
  * Pose3ds are assumed to be measured from the bottom-left corner of the field,
@@ -101,7 +102,7 @@ class WPILIB_DLLEXPORT AprilTagFieldLayout {
   bool operator!=(const AprilTagFieldLayout& other) const;
 
  private:
-  std::vector<AprilTag> m_apriltags;
+  std::unordered_map<int, AprilTag> m_apriltags;
   units::meter_t m_fieldLength;
   units::meter_t m_fieldWidth;
   bool m_mirror = false;

@@ -260,6 +260,11 @@ class CommandPtr final {
   bool HasRequirement(Subsystem* requirement) const;
 
   /**
+   * Check if this CommandPtr object is valid and wasn't moved-from.
+   */
+  explicit operator bool() const;
+
+  /**
    * Convert a vector of CommandPtr objects to their underlying unique_ptrs.
    */
   static std::vector<std::unique_ptr<Command>> UnwrapVector(
@@ -267,6 +272,7 @@ class CommandPtr final {
 
  private:
   std::unique_ptr<Command> m_ptr;
+  void AssertValid() const;
 };
 
 }  // namespace frc2

@@ -21,7 +21,7 @@ ShuffleboardComponent<Derived>::ShuffleboardComponent(
 
 template <typename Derived>
 Derived& ShuffleboardComponent<Derived>::WithProperties(
-    const wpi::StringMap<std::shared_ptr<nt::Value>>& properties) {
+    const wpi::StringMap<nt::Value>& properties) {
   m_properties = properties;
   m_metadataDirty = true;
   return *static_cast<Derived*>(this);

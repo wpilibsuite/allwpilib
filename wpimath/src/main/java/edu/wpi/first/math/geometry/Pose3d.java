@@ -165,7 +165,7 @@ public class Pose3d implements Interpolatable<Pose3d> {
   public Pose3d transformBy(Transform3d other) {
     return new Pose3d(
         m_translation.plus(other.getTranslation().rotateBy(m_rotation)),
-        m_rotation.plus(other.getRotation()));
+        other.getRotation().plus(m_rotation));
   }
 
   /**

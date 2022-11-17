@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2020 FIRST. All Rights Reserved.                             */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 // Copyright (c) 2016 Nic Holthaus
 //
@@ -78,7 +75,8 @@
 	#include <iostream>
 	#include <locale>
 	#include <string>
-#else
+#endif
+#if !defined(UNIT_LIB_DISABLE_FMT)
 	#include <locale>
 	#include <string>
 	#include <fmt/format.h>
@@ -178,7 +176,7 @@ namespace units
  * @param		abbrev - abbreviated unit name, e.g. 'm'
  * @note		When UNIT_LIB_ENABLE_IOSTREAM isn't defined, the macro does not generate any code
  */
-#if !defined(UNIT_LIB_ENABLE_IOSTREAM)
+#if !defined(UNIT_LIB_DISABLE_FMT)
 	#define UNIT_ADD_IO(namespaceName, nameSingular, abbrev)\
 	}\
 	template <>\
@@ -203,7 +201,8 @@ namespace units
 			return units::detail::to_string(obj()) + std::string(" "#abbrev);\
 		}\
 	}
-#else
+#endif
+#if defined(UNIT_LIB_ENABLE_IOSTREAM)
 	#define UNIT_ADD_IO(namespaceName, nameSingular, abbrev)\
 	namespace namespaceName\
 	{\
@@ -2867,13 +2866,16 @@ namespace units
 	namespace dimensionless
 	{
 		typedef unit_t<scalar, UNIT_LIB_DEFAULT_TYPE, decibel_scale> dB_t;
-#if defined(UNIT_LIB_ENABLE_IOSTREAM)
-		inline std::ostream& operator<<(std::ostream& os, const dB_t& obj) { os << obj() << " dB"; return os; }
 		typedef dB_t dBi_t;
 	}
-#else
+#if defined(UNIT_LIB_ENABLE_IOSTREAM)
+	namespace dimensionless
+	{
+		inline std::ostream& operator<<(std::ostream& os, const dB_t& obj) { os << obj() << " dB"; return os; }
+	}
+#endif
 }
-}
+#if !defined(UNIT_LIB_DISABLE_FMT)
 template <>
 struct fmt::formatter<units::dimensionless::dB_t> : fmt::formatter<double>
 {
@@ -2886,13 +2888,9 @@ struct fmt::formatter<units::dimensionless::dB_t> : fmt::formatter<double>
 		return fmt::format_to(out, " dB");
 	}
 };
-
-namespace units {
-namespace dimensionless {
-		typedef dB_t dBi_t;
-	}
 #endif
 
+namespace units {
 	//------------------------------
 	//	DECIBEL ARITHMETIC
 	//------------------------------
@@ -3442,4 +3440,6 @@ namespace units::literals {}
 using namespace units::literals;
 #endif  // UNIT_HAS_LITERAL_SUPPORT
 
+#if !defined(UNIT_LIB_DISABLE_FMT)
 #include "frc/fmt/Units.h"
+#endif

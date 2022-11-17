@@ -17,8 +17,13 @@ import java.util.function.BiFunction;
 import java.util.function.BooleanSupplier;
 
 /**
- * This class is a wrapper around {@link BooleanEvent}, providing an easy way to link commands to
- * digital inputs.
+ * This class provides an easy way to link commands to conditions.
+ *
+ * <p>It is very easy to link a button to a command. For instance, you could link the trigger button
+ * of a joystick to a "score" command.
+ *
+ * <p>Triggers can easily be composed for advanced functionality using the {@link
+ * #and(BooleanSupplier)}, {@link #or(BooleanSupplier)}, {@link #negate()} operators.
  *
  * <p>This class is provided by the NewCommands VendorDep
  */
@@ -26,13 +31,13 @@ public class Trigger implements BooleanSupplier {
   private final BooleanEvent m_event;
 
   /**
-   * Creates a new trigger with the given condition/digital signal.
+   * Creates a new trigger based on the given condition.
    *
-   * @param loop the loop that polls this trigger
-   * @param signal the digital signal represented.
+   * @param loop The loop instance that polls this trigger.
+   * @param condition the condition represented by this trigger
    */
-  public Trigger(EventLoop loop, BooleanSupplier signal) {
-    m_event = new BooleanEvent(loop, signal);
+  public Trigger(EventLoop loop, BooleanSupplier condition) {
+    m_event = new BooleanEvent(loop, condition);
   }
 
   /**
@@ -47,24 +52,24 @@ public class Trigger implements BooleanSupplier {
   }
 
   /**
-   * Creates a new trigger with the given condition/digital signal.
+   * Creates a new trigger based on the given condition.
    *
-   * <p>Polled by the {@link CommandScheduler#getDefaultButtonLoop() default scheduler button loop}.
+   * <p>Polled by the default scheduler button loop.
    *
-   * @param signal the digital signal represented.
+   * @param condition the condition represented by this trigger
    */
-  public Trigger(BooleanSupplier signal) {
-    this(CommandScheduler.getInstance().getDefaultButtonLoop(), signal);
+  public Trigger(BooleanSupplier condition) {
+    this(CommandScheduler.getInstance().getDefaultButtonLoop(), condition);
   }
 
-  /** Creates a new trigger that is always inactive. */
+  /** Creates a new trigger that is always `false`. */
   @Deprecated
   public Trigger() {
     this(() -> false);
   }
 
   /**
-   * Starts the given command whenever the signal rises from the low state to the high state.
+   * Starts the given command whenever the condition changes from `false` to `true`.
    *
    * @param command the command to start
    * @return this trigger, so calls can be chained
@@ -77,7 +82,7 @@ public class Trigger implements BooleanSupplier {
   }
 
   /**
-   * Starts the given command whenever the signal falls from the high state to the low state.
+   * Starts the given command whenever the condition changes from `true` to `false`.
    *
    * @param command the command to start
    * @return this trigger, so calls can be chained
@@ -90,10 +95,11 @@ public class Trigger implements BooleanSupplier {
   }
 
   /**
-   * Starts the given command when the signal rises to the high state and cancels it when the signal
-   * falls.
+   * Starts the given command when the condition changes to `true` and cancels it when the condition
+   * changes to `false`.
    *
-   * <p>Doesn't re-start the command in-between.
+   * <p>Doesn't re-start the command if it ends while the condition is still `true`. If the command
+   * should restart, see {@link edu.wpi.first.wpilibj2.command.RepeatCommand}.
    *
    * @param command the command to start
    * @return this trigger, so calls can be chained
@@ -106,10 +112,11 @@ public class Trigger implements BooleanSupplier {
   }
 
   /**
-   * Starts the given command when the signal falls to the low state and cancels it when the signal
-   * rises.
+   * Starts the given command when the condition changes to `false` and cancels it when the
+   * condition changes to `true`.
    *
-   * <p>Does not re-start the command in-between.
+   * <p>Doesn't re-start the command if it ends while the condition is still `false`. If the command
+   * should restart, see {@link edu.wpi.first.wpilibj2.command.RepeatCommand}.
    *
    * @param command the command to start
    * @return this trigger, so calls can be chained
@@ -122,7 +129,7 @@ public class Trigger implements BooleanSupplier {
   }
 
   /**
-   * Toggles a command when the signal rises from the low state to the high state.
+   * Toggles a command when the condition changes from `false` to `true`.
    *
    * @param command the command to toggle
    * @return this trigger, so calls can be chained
@@ -143,7 +150,7 @@ public class Trigger implements BooleanSupplier {
   }
 
   /**
-   * Toggles a command when the signal rises from the low state to the high state.
+   * Toggles a command when the condition changes from `true` to the low state.
    *
    * @param command the command to toggle
    * @return this trigger, so calls can be chained
