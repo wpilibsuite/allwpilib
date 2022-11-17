@@ -26,7 +26,8 @@ public class IntakeTest {
   public void setup() {
     assert HAL.initialize(500, 0); // initialize the HAL, crash if failed
     m_intake = new Intake(); // create our intake
-    m_simMotor = new PWMSim(IntakeConstants.kMotorPort); // create our simulation PWM motor controller
+    m_simMotor =
+        new PWMSim(IntakeConstants.kMotorPort); // create our simulation PWM motor controller
     m_simPiston =
         new DoubleSolenoidSim(
             PneumaticsModuleType.CTREPCM,
@@ -43,7 +44,8 @@ public class IntakeTest {
   public void doesntWorkWhenClosed() {
     m_intake.retract(); // close the intake
     m_intake.activate(0.5); // try to activate the motor
-    assertEquals(0.0, m_simMotor.getSpeed(), DELTA); // make sure that the value set to the motor is 0
+    assertEquals(
+        0.0, m_simMotor.getSpeed(), DELTA); // make sure that the value set to the motor is 0
   }
 
   @Test
