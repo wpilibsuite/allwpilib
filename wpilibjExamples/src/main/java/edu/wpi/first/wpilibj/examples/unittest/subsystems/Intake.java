@@ -10,8 +10,8 @@ import edu.wpi.first.wpilibj.examples.unittest.Constants.IntakeConstants;
 import edu.wpi.first.wpilibj.motorcontrol.PWMSparkMax;
 
 public class Intake implements AutoCloseable {
-  private PWMSparkMax m_motor;
-  private DoubleSolenoid m_piston;
+  private final PWMSparkMax m_motor;
+  private final DoubleSolenoid m_piston;
 
   public Intake() {
     m_motor = new PWMSparkMax(IntakeConstants.kMotorPort);

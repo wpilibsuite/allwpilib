@@ -16,14 +16,14 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-public class IntakeTest {
-  public static final double DELTA = 1e-2; // acceptable deviation range
+class IntakeTest {
+  static final double DELTA = 1e-2; // acceptable deviation range
   Intake m_intake;
   PWMSim m_simMotor;
   DoubleSolenoidSim m_simPiston;
 
   @BeforeEach // this method will run before each test
-  public void setup() {
+  void setup() {
     assert HAL.initialize(500, 0); // initialize the HAL, crash if failed
     m_intake = new Intake(); // create our intake
     m_simMotor =
@@ -35,13 +35,14 @@ public class IntakeTest {
             IntakeConstants.kPistonRevChannel); // create our simulation solenoid
   }
 
+  @SuppressWarnings("PMD.SignatureDeclareThrowsException")
   @AfterEach // this method will run after each test
-  public void shutdown() throws Exception {
+  void shutdown() throws Exception {
     m_intake.close(); // destroy our intake object
   }
 
   @Test // marks this method as a test
-  public void doesntWorkWhenClosed() {
+  void doesntWorkWhenClosed() {
     m_intake.retract(); // close the intake
     m_intake.activate(0.5); // try to activate the motor
     assertEquals(
@@ -49,20 +50,20 @@ public class IntakeTest {
   }
 
   @Test
-  public void worksWhenOpen() {
+  void worksWhenOpen() {
     m_intake.deploy();
     m_intake.activate(0.5);
     assertEquals(0.5, m_simMotor.getSpeed(), DELTA);
   }
 
   @Test
-  public void retractTest() {
+  void retractTest() {
     m_intake.retract();
     assertEquals(DoubleSolenoid.Value.kReverse, m_simPiston.get());
   }
 
   @Test
-  public void deployTest() {
+  void deployTest() {
     m_intake.deploy();
     assertEquals(DoubleSolenoid.Value.kForward, m_simPiston.get());
   }
