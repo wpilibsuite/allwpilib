@@ -90,7 +90,7 @@ public class SwerveModule {
    */
   public SwerveModuleState getState() {
     return new SwerveModuleState(
-        m_driveEncoder.getRate(), new Rotation2d(m_turningEncoder.getRate()));
+        m_driveEncoder.getRate(), new Rotation2d(m_turningEncoder.getDistance()));
   }
 
   /**
