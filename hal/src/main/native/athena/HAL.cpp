@@ -82,6 +82,7 @@ void InitializeHAL() {
 }  // namespace init
 
 void ReleaseFPGAInterrupt(int32_t interruptNumber) {
+  hal::init::CheckInit();
   if (!global) {
     return;
   }
@@ -252,6 +253,7 @@ HAL_RuntimeType HAL_GetRuntimeType(void) {
 }
 
 int32_t HAL_GetFPGAVersion(int32_t* status) {
+  hal::init::CheckInit();
   if (!global) {
     *status = NiFpga_Status_ResourceNotInitialized;
     return 0;
@@ -260,6 +262,7 @@ int32_t HAL_GetFPGAVersion(int32_t* status) {
 }
 
 int64_t HAL_GetFPGARevision(int32_t* status) {
+  hal::init::CheckInit();
   if (!global) {
     *status = NiFpga_Status_ResourceNotInitialized;
     return 0;
@@ -268,6 +271,7 @@ int64_t HAL_GetFPGARevision(int32_t* status) {
 }
 
 uint64_t HAL_GetFPGATime(int32_t* status) {
+  hal::init::CheckInit();
   if (!global) {
     *status = NiFpga_Status_ResourceNotInitialized;
     return 0;
@@ -314,6 +318,7 @@ uint64_t HAL_ExpandFPGATime(uint32_t unexpandedLower, int32_t* status) {
 }
 
 HAL_Bool HAL_GetFPGAButton(int32_t* status) {
+  hal::init::CheckInit();
   if (!global) {
     *status = NiFpga_Status_ResourceNotInitialized;
     return false;
@@ -322,6 +327,7 @@ HAL_Bool HAL_GetFPGAButton(int32_t* status) {
 }
 
 HAL_Bool HAL_GetSystemActive(int32_t* status) {
+  hal::init::CheckInit();
   if (!watchdog) {
     *status = NiFpga_Status_ResourceNotInitialized;
     return false;
@@ -330,6 +336,7 @@ HAL_Bool HAL_GetSystemActive(int32_t* status) {
 }
 
 HAL_Bool HAL_GetBrownedOut(int32_t* status) {
+  hal::init::CheckInit();
   if (!watchdog) {
     *status = NiFpga_Status_ResourceNotInitialized;
     return false;
