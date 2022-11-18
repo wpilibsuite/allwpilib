@@ -10,7 +10,7 @@ using namespace frc;
 
 MecanumDriveOdometry::MecanumDriveOdometry(
     MecanumDriveKinematics kinematics, const Rotation2d& gyroAngle,
-    MecanumDriveWheelPositions wheelPositions, const Pose2d& initialPose)
+    const MecanumDriveWheelPositions& wheelPositions, const Pose2d& initialPose)
     : m_kinematics(kinematics),
       m_pose(initialPose),
       m_previousWheelPositions(wheelPositions) {

@@ -83,7 +83,7 @@ class WPILIB_DLLEXPORT MecanumDrivePoseEstimator {
    */
   MecanumDrivePoseEstimator(
       const Rotation2d& gyroAngle, const Pose2d& initialPose,
-      MecanumDriveWheelPositions wheelPositions,
+      const MecanumDriveWheelPositions& wheelPositions,
       MecanumDriveKinematics kinematics,
       const wpi::array<double, 7>& stateStdDevs,
       const wpi::array<double, 5>& localMeasurementStdDevs,
@@ -119,7 +119,7 @@ class WPILIB_DLLEXPORT MecanumDrivePoseEstimator {
    * @param wheelPositions The distances measured at each wheel.
    */
   void ResetPosition(const Pose2d& pose, const Rotation2d& gyroAngle,
-                     MecanumDriveWheelPositions wheelPositions = MecanumDriveWheelPositions{});
+                     const MecanumDriveWheelPositions& wheelPositions = MecanumDriveWheelPositions{});
 
   /**
    * Gets the pose of the robot at the current time as estimated by the Extended

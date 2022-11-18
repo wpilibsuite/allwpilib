@@ -87,7 +87,7 @@ class SwerveDrivePoseEstimator {
    */
   SwerveDrivePoseEstimator(
       const Rotation2d& gyroAngle, const Pose2d& initialPose,
-      wpi::array<SwerveModulePosition, NumModules> modulePositions,
+      const wpi::array<SwerveModulePosition, NumModules>& modulePositions,
       SwerveDriveKinematics<NumModules>& kinematics,
       const wpi::array<double, States>& stateStdDevs,
       const wpi::array<double, Outputs>& localMeasurementStdDevs,
@@ -151,7 +151,7 @@ class SwerveDrivePoseEstimator {
    */
   void ResetPosition(
       const Pose2d& pose, const Rotation2d& gyroAngle,
-      wpi::array<SwerveModulePosition, NumModules> modulePositions = wpi::array<SwerveModulePosition, NumModules>{}) {
+      const wpi::array<SwerveModulePosition, NumModules>& modulePositions = wpi::array<SwerveModulePosition, NumModules>{}) {
     // Reset state estimate and error covariance
     m_observer.Reset();
     m_poseBuffer.Clear();
@@ -288,8 +288,8 @@ class SwerveDrivePoseEstimator {
    */
   Pose2d Update(
       const Rotation2d& gyroAngle,
-      const wpi::array<SwerveModuleState, NumModules> moduleStates,
-      const wpi::array<SwerveModulePosition, NumModules> modulePositions) {
+      const wpi::array<SwerveModuleState, NumModules>& moduleStates,
+      const wpi::array<SwerveModulePosition, NumModules>& modulePositions) {
     return UpdateWithTime(units::microsecond_t(wpi::Now()), gyroAngle,
                           moduleStates, modulePositions);
   }
@@ -309,8 +309,8 @@ class SwerveDrivePoseEstimator {
    */
   Pose2d UpdateWithTime(
       units::second_t currentTime, const Rotation2d& gyroAngle,
-      const wpi::array<SwerveModuleState, NumModules> moduleStates,
-      const wpi::array<SwerveModulePosition, NumModules> modulePositions) {
+      const wpi::array<SwerveModuleState, NumModules>& moduleStates,
+      const wpi::array<SwerveModulePosition, NumModules>& modulePositions) {
     auto dt = m_prevTime >= 0_s ? currentTime - m_prevTime : m_nominalDt;
     m_prevTime = currentTime;
 
