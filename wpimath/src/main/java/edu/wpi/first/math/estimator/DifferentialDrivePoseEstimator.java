@@ -73,6 +73,8 @@ public class DifferentialDrivePoseEstimator {
    *
    * @param gyroAngle The current gyro angle.
    * @param initialPoseMeters The starting pose estimate.
+   * @param leftDistanceMeters The distance traveled by the left encoder.
+   * @param rightDistanceMeters The distance traveled by the right encoder.
    * @param stateStdDevs Standard deviations of model states. Increase these numbers to trust your
    *     model's state estimates less. This matrix is in the form [x, y, theta, dist_l, dist_r]ᵀ,
    *     with units in meters and radians.
@@ -86,14 +88,16 @@ public class DifferentialDrivePoseEstimator {
   public DifferentialDrivePoseEstimator(
       Rotation2d gyroAngle,
       Pose2d initialPoseMeters,
+      double leftDistanceMeters,
+      double rightDistanceMeters,
       Matrix<N5, N1> stateStdDevs,
       Matrix<N3, N1> localMeasurementStdDevs,
       Matrix<N3, N1> visionMeasurementStdDevs) {
     this(
         gyroAngle,
         initialPoseMeters,
-        0,
-        0,
+        leftDistanceMeters,
+        rightDistanceMeters,
         stateStdDevs,
         localMeasurementStdDevs,
         visionMeasurementStdDevs,
