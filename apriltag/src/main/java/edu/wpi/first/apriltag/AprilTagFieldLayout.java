@@ -31,13 +31,13 @@ import java.util.Optional;
  * list of all AprilTags contained within a layout. Each AprilTag serializes to a JSON object
  * containing an ID and a Pose3d. The "field" object is a descriptor of the size of the field in
  * meters with "width" and "length" values. This is to account for arbitrary field sizes when
- * mirroring the poses.
+ * transforming the poses.
  *
- * <p>Pose3ds are assumed to be measured from the blue alliance right side of the field, when the
- * blue alliance is at the left. Pose3ds will automatically be returned as passed in when calling
- * {@link AprilTagFieldLayout#getTagPose(int)}. You can call {@link #setOrigin(OriginPosition)} to
- * mirror the poses returned from {@link AprilTagFieldLayout#getTagPose(int)} to be correct relative
- * to a custom frame.
+ * <p>Pose3ds are assumed to be measured from the bottom-left corner of the field, when the blue
+ * alliance is at the left. By default, Pose3ds will be returned as declared when calling {@link
+ * AprilTagFieldLayout#getTagPose(int)}. {@link #setOrigin(OriginPosition)} can be used to transform
+ * the poses returned from {@link AprilTagFieldLayout#getTagPose(int)} to be correct relative to a
+ * different coordinate frame.
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonAutoDetect(getterVisibility = JsonAutoDetect.Visibility.NONE)
@@ -82,8 +82,8 @@ public class AprilTagFieldLayout {
    * Construct a new AprilTagFieldLayout from a list of {@link AprilTag} objects.
    *
    * @param apriltags List of {@link AprilTag}.
-   * @param fieldLength Length of the field in meters.
-   * @param fieldWidth Width of the field in meters.
+   * @param fieldLength Length of the field the layout is representing in meters.
+   * @param fieldWidth Width of the field the layout is representing in meters.
    */
   public AprilTagFieldLayout(List<AprilTag> apriltags, double fieldLength, double fieldWidth) {
     this(apriltags, new FieldDimensions(fieldLength, fieldWidth));
@@ -101,23 +101,28 @@ public class AprilTagFieldLayout {
     setOrigin(OriginPosition.kBlueAllianceWallRightSide);
   }
 
+  /**
+   * Returns a List of the {@link AprilTag AprilTags} used in this layout.
+   *
+   * @return The {@link AprilTag AprilTags} used in this layout.
+   */
   @JsonProperty("tags")
   public List<AprilTag> getTags() {
     return new ArrayList<>(m_apriltags.values());
   }
 
   /**
-   * Sets the origin based on a pre-known enumeration of positions. The position is calculated from
-   * values in the configuration file.
+   * Sets the origin based on a predefined enumeration of coordinate frame origins. The origins are
+   * calculated from the field dimensions.
    *
-   * <p>This changes the {@link #getTagPose(int)} method to return the correct pose for your
-   * alliance.
+   * <p>This transforms the Pose3ds returned by {@link #getTagPose(int)} to return the correct pose
+   * relative to a predefined coordinate frame.
    *
-   * @param position The predefined position
+   * @param origin The predefined origin
    */
   @JsonIgnore
-  public void setOrigin(OriginPosition position) {
-    switch (position) {
+  public void setOrigin(OriginPosition origin) {
+    switch (origin) {
       case kBlueAllianceWallRightSide:
         setOrigin(new Pose3d());
         break;
@@ -135,8 +140,8 @@ public class AprilTagFieldLayout {
   /**
    * Sets the origin for tag pose transformation.
    *
-   * <p>This changes the {@link #getTagPose(int)} method to return the correct pose for your
-   * alliance.
+   * <p>This transforms the Pose3ds returned by {@link #getTagPose(int)} to return the correct pose
+   * relative to the provided origin.
    *
    * @param origin The new origin for tag transformations
    */

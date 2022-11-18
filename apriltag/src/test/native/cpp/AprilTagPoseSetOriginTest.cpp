@@ -13,7 +13,7 @@
 
 using namespace frc;
 
-TEST(AprilTagPoseMirroringTest, MirroringMatches) {
+TEST(AprilTagPoseSetOriginTest, TransformationMatches) {
   auto layout = AprilTagFieldLayout{
       std::vector<AprilTag>{
           AprilTag{1,

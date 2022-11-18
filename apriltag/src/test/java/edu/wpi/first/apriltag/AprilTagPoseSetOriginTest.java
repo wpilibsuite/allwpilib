@@ -13,9 +13,9 @@ import edu.wpi.first.math.util.Units;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 
-class AprilTagPoseMirroringTest {
+class AprilTagPoseSetOriginTest {
   @Test
-  void poseMirroring() {
+  void transformationMatches() {
     var layout =
         new AprilTagFieldLayout(
             List.of(
