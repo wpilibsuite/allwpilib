@@ -80,7 +80,7 @@ public class DifferentialDriveOdometry {
    * Constructs a DifferentialDriveOdometry object with the default pose at the origin.
    *
    * <p>You NEED to reset your encoders (to zero) when calling this method.
-   * 
+   *
    * @param gyroAngle The angle reported by the gyroscope.
    */
   public DifferentialDriveOdometry(Rotation2d gyroAngle) {
