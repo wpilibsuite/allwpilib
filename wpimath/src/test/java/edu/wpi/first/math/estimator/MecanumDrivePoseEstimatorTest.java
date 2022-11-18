@@ -32,8 +32,8 @@ class MecanumDrivePoseEstimatorTest {
     var estimator =
         new MecanumDrivePoseEstimator(
             new Rotation2d(),
-            new Pose2d(),
             wheelPositions,
+            new Pose2d(),
             kinematics,
             VecBuilder.fill(0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1),
             VecBuilder.fill(0.05, 0.05, 0.05, 0.05, 0.05),
@@ -136,8 +136,8 @@ class MecanumDrivePoseEstimatorTest {
     var estimator =
         new MecanumDrivePoseEstimator(
             new Rotation2d(),
-            new Pose2d(),
             wheelPositions,
+            new Pose2d(),
             kinematics,
             VecBuilder.fill(0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1),
             VecBuilder.fill(0.05, 0.05, 0.05, 0.05, 0.05),

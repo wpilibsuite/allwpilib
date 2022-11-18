@@ -65,44 +65,17 @@ public class MecanumDriveOdometry {
   }
 
   /**
-   * Constructs a MecanumDriveOdometry object with the default pose at the origin.
-   *
-   * <p>You NEED to reset your encoders (to zero) when calling this method.
-   *
-   * @param kinematics The mecanum drive kinematics for your drivetrain.
-   * @param gyroAngle The angle reported by the gyroscope.
-   */
-  public MecanumDriveOdometry(MecanumDriveKinematics kinematics, Rotation2d gyroAngle) {
-    this(kinematics, gyroAngle, new MecanumDriveWheelPositions());
-  }
-
-  /**
-   * Resets the robot's position on the field.
-   *
-   * <p>You NEED to reset your encoders (to zero) when calling this method.
-   *
-   * <p>The gyroscope angle does not need to be reset here on the user's robot code. The library
-   * automatically takes care of offsetting the gyro angle.
-   *
-   * @param poseMeters The position on the field that your robot is at.
-   * @param gyroAngle The angle reported by the gyroscope.
-   */
-  public void resetPosition(Pose2d poseMeters, Rotation2d gyroAngle) {
-    resetPosition(poseMeters, gyroAngle, new MecanumDriveWheelPositions());
-  }
-
-  /**
    * Resets the robot's position on the field.
    *
    * <p>The gyroscope angle does not need to be reset here on the user's robot code. The library
    * automatically takes care of offsetting the gyro angle.
    *
-   * @param poseMeters The position on the field that your robot is at.
    * @param gyroAngle The angle reported by the gyroscope.
    * @param wheelPositions The distances driven by each wheel.
+   * @param poseMeters The position on the field that your robot is at.
    */
   public void resetPosition(
-      Pose2d poseMeters, Rotation2d gyroAngle, MecanumDriveWheelPositions wheelPositions) {
+      Rotation2d gyroAngle, MecanumDriveWheelPositions wheelPositions, Pose2d poseMeters) {
     m_poseMeters = poseMeters;
     m_previousAngle = poseMeters.getRotation();
     m_gyroOffset = m_poseMeters.getRotation().minus(gyroAngle);

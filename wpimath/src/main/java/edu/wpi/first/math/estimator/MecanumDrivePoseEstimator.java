@@ -70,8 +70,8 @@ public class MecanumDrivePoseEstimator {
    * Constructs a MecanumDrivePoseEstimator.
    *
    * @param gyroAngle The current gyro angle.
-   * @param initialPoseMeters The starting pose estimate.
    * @param wheelPositions The distances driven by each wheel.
+   * @param initialPoseMeters The starting pose estimate.
    * @param kinematics A correctly-configured kinematics object for your drivetrain.
    * @param stateStdDevs Standard deviations of model states. Increase these numbers to trust your
    *     model's state estimates less. This matrix is in the form [x, y, theta, s_fl, s_fr, s_rl,
@@ -85,16 +85,16 @@ public class MecanumDrivePoseEstimator {
    */
   public MecanumDrivePoseEstimator(
       Rotation2d gyroAngle,
-      Pose2d initialPoseMeters,
       MecanumDriveWheelPositions wheelPositions,
+      Pose2d initialPoseMeters,
       MecanumDriveKinematics kinematics,
       Matrix<N7, N1> stateStdDevs,
       Matrix<N5, N1> localMeasurementStdDevs,
       Matrix<N3, N1> visionMeasurementStdDevs) {
     this(
         gyroAngle,
-        initialPoseMeters,
         wheelPositions,
+        initialPoseMeters,
         kinematics,
         stateStdDevs,
         localMeasurementStdDevs,
@@ -106,8 +106,8 @@ public class MecanumDrivePoseEstimator {
    * Constructs a MecanumDrivePoseEstimator.
    *
    * @param gyroAngle The current gyro angle.
-   * @param initialPoseMeters The starting pose estimate.
    * @param wheelPositions The distances driven by each wheel.
+   * @param initialPoseMeters The starting pose estimate.
    * @param kinematics A correctly-configured kinematics object for your drivetrain.
    * @param stateStdDevs Standard deviations of model states. Increase these numbers to trust your
    *     model's state estimates less. This matrix is in the form [x, y, theta, s_fl, s_fr, s_rl,
@@ -122,8 +122,8 @@ public class MecanumDrivePoseEstimator {
    */
   public MecanumDrivePoseEstimator(
       Rotation2d gyroAngle,
-      Pose2d initialPoseMeters,
       MecanumDriveWheelPositions wheelPositions,
+      Pose2d initialPoseMeters,
       MecanumDriveKinematics kinematics,
       Matrix<N7, N1> stateStdDevs,
       Matrix<N5, N1> localMeasurementStdDevs,
@@ -200,25 +200,12 @@ public class MecanumDrivePoseEstimator {
    * <p>The gyroscope angle does not need to be reset in the user's robot code. The library
    * automatically takes care of offsetting the gyro angle.
    *
-   * @param poseMeters The position on the field that your robot is at.
-   * @param gyroAngle The angle reported by the gyroscope.
-   */
-  public void resetPosition(Pose2d poseMeters, Rotation2d gyroAngle) {
-    resetPosition(poseMeters, gyroAngle, new MecanumDriveWheelPositions());
-  }
-
-  /**
-   * Resets the robot's position on the field.
-   *
-   * <p>The gyroscope angle does not need to be reset in the user's robot code. The library
-   * automatically takes care of offsetting the gyro angle.
-   *
-   * @param poseMeters The position on the field that your robot is at.
    * @param gyroAngle The angle reported by the gyroscope.
    * @param wheelPositions The distances driven by each wheel.
+   * @param poseMeters The position on the field that your robot is at.
    */
   public void resetPosition(
-      Pose2d poseMeters, Rotation2d gyroAngle, MecanumDriveWheelPositions wheelPositions) {
+      Rotation2d gyroAngle, MecanumDriveWheelPositions wheelPositions, Pose2d poseMeters) {
     // Reset state estimate and error covariance
     m_observer.reset();
     m_poseBuffer.clear();
