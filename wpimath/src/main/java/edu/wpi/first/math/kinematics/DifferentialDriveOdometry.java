@@ -32,8 +32,6 @@ public class DifferentialDriveOdometry {
   /**
    * Constructs a DifferentialDriveOdometry object.
    *
-   * <p>You NEED to reset your encoders (to zero) when calling this method.
-   *
    * @param gyroAngle The angle reported by the gyroscope.
    * @param leftDistanceMeters The distance traveled by the left encoder.
    * @param rightDistanceMeters The distance traveled by the right encoder.
@@ -81,6 +79,8 @@ public class DifferentialDriveOdometry {
   /**
    * Constructs a DifferentialDriveOdometry object with the default pose at the origin.
    *
+   * <p>You NEED to reset your encoders (to zero) when calling this method.
+   * 
    * @param gyroAngle The angle reported by the gyroscope.
    */
   public DifferentialDriveOdometry(Rotation2d gyroAngle) {

@@ -71,7 +71,6 @@ public class MecanumDriveOdometry {
    *
    * @param kinematics The mecanum drive kinematics for your drivetrain.
    * @param gyroAngle The angle reported by the gyroscope.
-   * @param wheelPositions The distances driven by each wheel.
    */
   public MecanumDriveOdometry(MecanumDriveKinematics kinematics, Rotation2d gyroAngle) {
     this(kinematics, gyroAngle, new MecanumDriveWheelPositions());

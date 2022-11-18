@@ -237,8 +237,8 @@ public class DifferentialDrivePoseEstimator {
    *
    * @param poseMeters The position on the field that your robot is at.
    * @param gyroAngle The angle reported by the gyroscope.
-   * @param leftDistanceMeters The distance traveled by the left encoder.
-   * @param rightDistanceMeters The distance traveled by the right encoder.
+   * @param leftPositionMeters The distance traveled by the left encoder.
+   * @param rightPositionMeters The distance traveled by the right encoder.
    */
   public void resetPosition(
       Pose2d poseMeters,

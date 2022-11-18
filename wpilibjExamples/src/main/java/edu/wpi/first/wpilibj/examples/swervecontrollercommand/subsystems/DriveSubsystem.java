@@ -62,10 +62,10 @@ public class DriveSubsystem extends SubsystemBase {
           DriveConstants.kDriveKinematics,
           m_gyro.getRotation2d(),
           new SwerveModulePosition[] {
-            new SwerveModulePosition(),
-            new SwerveModulePosition(),
-            new SwerveModulePosition(),
-            new SwerveModulePosition()
+            m_frontLeft.getPosition(),
+            m_frontRight.getPosition(),
+            m_rearLeft.getPosition(),
+            m_rearRight.getPosition()
           });
 
   /** Creates a new DriveSubsystem. */
