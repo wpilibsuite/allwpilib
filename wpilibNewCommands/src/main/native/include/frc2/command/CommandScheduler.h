@@ -182,10 +182,6 @@ class CommandScheduler final : public nt::NTSendable,
       throw FRC_MakeError(frc::err::CommandIllegalUse,
                           "Default commands must require their subsystem!");
     }
-    if (defaultCommand.IsFinished()) {
-      throw FRC_MakeError(frc::err::CommandIllegalUse,
-                          "Default commands should not end!");
-    }
     SetDefaultCommandImpl(subsystem,
                           std::make_unique<std::remove_reference_t<T>>(
                               std::forward<T>(defaultCommand)));
