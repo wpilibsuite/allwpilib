@@ -54,10 +54,8 @@ class WPILIB_DLLEXPORT DifferentialDriveOdometry {
    * @param leftDistance The distance traveled by the left encoder.
    * @param rightDistance The distance traveled by the right encoder.
    */
-  void ResetPosition(const Rotation2d& gyroAngle,
-                     units::meter_t leftDistance,
-                     units::meter_t rightDistance,
-                     const Pose2d& pose) {
+  void ResetPosition(const Rotation2d& gyroAngle, units::meter_t leftDistance,
+                     units::meter_t rightDistance, const Pose2d& pose) {
     m_pose = pose;
     m_previousAngle = pose.Rotation();
     m_gyroOffset = m_pose.Rotation() - gyroAngle;

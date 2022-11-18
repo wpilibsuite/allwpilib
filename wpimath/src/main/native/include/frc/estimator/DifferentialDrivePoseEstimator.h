@@ -81,10 +81,8 @@ class WPILIB_DLLEXPORT DifferentialDrivePoseEstimator {
    * @param nominalDt                The period of the loop calling Update().
    */
   DifferentialDrivePoseEstimator(
-      const Rotation2d& gyroAngle, 
-      units::meter_t leftDistance,
-      units::meter_t rightDistance,
-      const Pose2d& initialPose,
+      const Rotation2d& gyroAngle, units::meter_t leftDistance,
+      units::meter_t rightDistance, const Pose2d& initialPose,
       const wpi::array<double, 5>& stateStdDevs,
       const wpi::array<double, 3>& localMeasurementStdDevs,
       const wpi::array<double, 3>& visionMeasurementStdDevs,
@@ -118,10 +116,8 @@ class WPILIB_DLLEXPORT DifferentialDrivePoseEstimator {
    * @param rightDistance The distance traveled by the right encoder.
    * @param pose The estimated pose of the robot on the field.
    */
-  void ResetPosition(const Rotation2d& gyroAngle,
-                     units::meter_t leftDistance,
-                     units::meter_t rightDistance,
-                     const Pose2d& pose);
+  void ResetPosition(const Rotation2d& gyroAngle, units::meter_t leftDistance,
+                     units::meter_t rightDistance, const Pose2d& pose);
 
   /**
    * Returns the pose of the robot at the current time as estimated by the

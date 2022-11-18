@@ -12,10 +12,8 @@
 using namespace frc;
 
 DifferentialDrivePoseEstimator::DifferentialDrivePoseEstimator(
-    const Rotation2d& gyroAngle,
-    units::meter_t leftDistance,
-    units::meter_t rightDistance,
-    const Pose2d& initialPose,
+    const Rotation2d& gyroAngle, units::meter_t leftDistance,
+    units::meter_t rightDistance, const Pose2d& initialPose,
     const wpi::array<double, 5>& stateStdDevs,
     const wpi::array<double, 3>& localMeasurementStdDevs,
     const wpi::array<double, 3>& visionMeasurmentStdDevs,
@@ -53,11 +51,10 @@ void DifferentialDrivePoseEstimator::SetVisionMeasurementStdDevs(
   m_visionContR = frc::MakeCovMatrix(visionMeasurmentStdDevs);
 }
 
-void DifferentialDrivePoseEstimator::ResetPosition(
-    const Rotation2d& gyroAngle,
-    units::meter_t leftDistance,
-    units::meter_t rightDistance,
-    const Pose2d& pose) {
+void DifferentialDrivePoseEstimator::ResetPosition(const Rotation2d& gyroAngle,
+                                                   units::meter_t leftDistance,
+                                                   units::meter_t rightDistance,
+                                                   const Pose2d& pose) {
   // Reset state estimate and error covariance
   m_observer.Reset();
   m_poseBuffer.Clear();
