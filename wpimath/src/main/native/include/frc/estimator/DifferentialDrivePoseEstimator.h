@@ -57,6 +57,8 @@ class WPILIB_DLLEXPORT DifferentialDrivePoseEstimator {
    *
    * @param gyroAngle                The gyro angle of the robot.
    * @param initialPose              The estimated initial pose.
+   * @param leftDistance The distance traveled by the left encoder.
+   * @param rightDistance The distance traveled by the right encoder.
    * @param stateStdDevs             Standard deviations of model states.
    *                                 Increase these numbers to trust your
    *                                 model's state estimates less. This matrix
@@ -80,6 +82,8 @@ class WPILIB_DLLEXPORT DifferentialDrivePoseEstimator {
    */
   DifferentialDrivePoseEstimator(
       const Rotation2d& gyroAngle, const Pose2d& initialPose,
+      const units::meter_t leftDistance,
+      const units::meter_t rightDistance,
       const wpi::array<double, 5>& stateStdDevs,
       const wpi::array<double, 3>& localMeasurementStdDevs,
       const wpi::array<double, 3>& visionMeasurementStdDevs,
@@ -103,14 +107,19 @@ class WPILIB_DLLEXPORT DifferentialDrivePoseEstimator {
   /**
    * Resets the robot's position on the field.
    *
-   * You NEED to reset your encoders to zero when calling this method. The
+   * IF leftDistance and rightDistance are unspecified, 
+   * You NEED to reset your encoders (to zero). The
    * gyroscope angle does not need to be reset here on the user's robot code.
    * The library automatically takes care of offsetting the gyro angle.
    *
    * @param pose The estimated pose of the robot on the field.
    * @param gyroAngle The current gyro angle.
+   * @param leftDistance The distance traveled by the left encoder.
+   * @param rightDistance The distance traveled by the right encoder.
    */
-  void ResetPosition(const Pose2d& pose, const Rotation2d& gyroAngle);
+  void ResetPosition(const Pose2d& pose, const Rotation2d& gyroAngle,
+        const units::meter_t leftDistance = 0_m,
+      const units::meter_t rightDistance = 0_m);
 
   /**
    * Returns the pose of the robot at the current time as estimated by the
