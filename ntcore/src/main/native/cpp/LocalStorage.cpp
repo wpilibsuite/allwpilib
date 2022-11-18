@@ -2190,5 +2190,6 @@ void LocalStorage::StopDataLog(NT_DataLogger logger) {
 
 void LocalStorage::Reset() {
   std::scoped_lock lock{m_mutex};
-  m_impl = std::make_unique<Impl>(m_impl->m_inst, m_impl->m_listenerStorage, m_impl->m_logger);
+  m_impl = std::make_unique<Impl>(m_impl->m_inst, m_impl->m_listenerStorage,
+                                  m_impl->m_logger);
 }

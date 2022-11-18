@@ -183,6 +183,6 @@ void InstanceImpl::Reset() {
   networkMode = NT_NET_MODE_NONE;
 
   listenerStorage.Reset();
-  //connectionList should have been cleared by destroying networkClient/server
+  // connectionList should have been cleared by destroying networkClient/server
   localStorage.Reset();
 }
