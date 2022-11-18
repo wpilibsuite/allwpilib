@@ -89,3 +89,15 @@ TEST_F(NetworkTableTest, EmptyOrNoSlash) {
   ASSERT_TRUE(inst.GetEntry("/testkey").Exists());
   nt::NetworkTableInstance::Destroy(inst);
 }
+
+TEST_F(NetworkTableTest, ResetInstance) {
+  auto inst = nt::NetworkTableInstance::Create();
+  auto nt = inst.GetTable("containskey");
+  ASSERT_FALSE(nt->ContainsKey("testkey"));
+  nt->PutNumber("testkey", 5);
+  ASSERT_TRUE(nt->ContainsKey("testkey"));
+  ASSERT_TRUE(inst.GetEntry("/containskey/testkey").Exists());
+  nt::ResetInstance(inst.GetHandle());
+  ASSERT_FALSE(nt->ContainsKey("testkey"));
+  nt::NetworkTableInstance::Destroy(inst);
+}

@@ -349,6 +349,13 @@ NT_Inst GetDefaultInstance();
 NT_Inst CreateInstance();
 
 /**
+ * Reset the internals of an instance. Every handle previously associated
+ * with this instance will no longer be valid, except for the instance
+ * handle.
+ */
+void ResetInstance(NT_Inst inst);
+
+/**
  * Destroy an instance.
  * The default instance cannot be destroyed.
  *
