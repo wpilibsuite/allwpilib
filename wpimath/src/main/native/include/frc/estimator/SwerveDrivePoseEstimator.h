@@ -87,7 +87,7 @@ class SwerveDrivePoseEstimator {
    */
   SwerveDrivePoseEstimator(
       const Rotation2d& gyroAngle, const Pose2d& initialPose,
-      const wpi::array<SwerveModulePosition, NumModules> modulePositions,
+      wpi::array<SwerveModulePosition, NumModules> modulePositions,
       SwerveDriveKinematics<NumModules>& kinematics,
       const wpi::array<double, States>& stateStdDevs,
       const wpi::array<double, Outputs>& localMeasurementStdDevs,

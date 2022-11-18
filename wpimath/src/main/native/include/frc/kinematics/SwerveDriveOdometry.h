@@ -43,7 +43,7 @@ class SwerveDriveOdometry {
    */
   SwerveDriveOdometry(
       SwerveDriveKinematics<NumModules> kinematics, const Rotation2d& gyroAngle,
-      const wpi::array<SwerveModulePosition, NumModules> modulePositions = wpi::array<SwerveModulePosition, NumModules>{},
+      wpi::array<SwerveModulePosition, NumModules> modulePositions = wpi::array<SwerveModulePosition, NumModules>{},
       const Pose2d& initialPose = Pose2d{});
 
   /**
@@ -61,7 +61,7 @@ class SwerveDriveOdometry {
    */
   void ResetPosition(
       const Pose2d& pose, const Rotation2d& gyroAngle,
-      const wpi::array<SwerveModulePosition, NumModules> modulePositions = wpi::array<SwerveModulePosition, NumModules>{});
+      wpi::array<SwerveModulePosition, NumModules> modulePositions = wpi::array<SwerveModulePosition, NumModules>{});
 
   /**
    * Returns the position of the robot on the field.
@@ -86,7 +86,7 @@ class SwerveDriveOdometry {
    */
   const Pose2d& Update(
       const Rotation2d& gyroAngle,
-      const wpi::array<SwerveModulePosition, NumModules> modulePositions);
+      const wpi::array<SwerveModulePosition, NumModules>& modulePositions);
 
  private:
   SwerveDriveKinematics<NumModules> m_kinematics;

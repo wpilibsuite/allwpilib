@@ -38,7 +38,7 @@ class WPILIB_DLLEXPORT MecanumDriveOdometry {
    */
   explicit MecanumDriveOdometry(MecanumDriveKinematics kinematics,
                                 const Rotation2d& gyroAngle,
-                                const MecanumDriveWheelPositions wheelPositions = MecanumDriveWheelPositions{},
+                                MecanumDriveWheelPositions wheelPositions = MecanumDriveWheelPositions{},
                                 const Pose2d& initialPose = Pose2d{});
 
   /**
@@ -52,7 +52,7 @@ class WPILIB_DLLEXPORT MecanumDriveOdometry {
    * @param wheelPositions The current distances measured by each wheel.
    */
   void ResetPosition(const Pose2d& pose, const Rotation2d& gyroAngle,
-                     const MecanumDriveWheelPositions wheelPositions = MecanumDriveWheelPositions{}) {
+                     MecanumDriveWheelPositions wheelPositions = MecanumDriveWheelPositions{}) {
     m_pose = pose;
     m_previousAngle = pose.Rotation();
     m_gyroOffset = m_pose.Rotation() - gyroAngle;
@@ -77,7 +77,7 @@ class WPILIB_DLLEXPORT MecanumDriveOdometry {
    * @return The new pose of the robot.
    */
   const Pose2d& Update(const Rotation2d& gyroAngle,
-                       const MecanumDriveWheelPositions wheelPositions);
+                       const MecanumDriveWheelPositions& wheelPositions);
 
  private:
   MecanumDriveKinematics m_kinematics;

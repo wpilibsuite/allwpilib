@@ -10,8 +10,8 @@ using namespace frc;
 
 DifferentialDriveOdometry::DifferentialDriveOdometry(
     const Rotation2d& gyroAngle,
-    const units::meter_t leftDistance,
-    const units::meter_t rightDistance,
+    units::meter_t leftDistance,
+    units::meter_t rightDistance,
     const Pose2d& initialPose)
     : m_pose(initialPose),
     m_prevLeftDistance(leftDistance),

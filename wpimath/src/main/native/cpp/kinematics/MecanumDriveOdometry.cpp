@@ -10,7 +10,7 @@ using namespace frc;
 
 MecanumDriveOdometry::MecanumDriveOdometry(
     MecanumDriveKinematics kinematics, const Rotation2d& gyroAngle,
-    const MecanumDriveWheelPositions wheelPositions, const Pose2d& initialPose)
+    MecanumDriveWheelPositions wheelPositions, const Pose2d& initialPose)
     : m_kinematics(kinematics),
       m_pose(initialPose),
       m_previousWheelPositions(wheelPositions) {
@@ -22,7 +22,7 @@ MecanumDriveOdometry::MecanumDriveOdometry(
 
 const Pose2d& MecanumDriveOdometry::Update(
     const Rotation2d& gyroAngle,
-    const MecanumDriveWheelPositions wheelPositions) {
+    const MecanumDriveWheelPositions& wheelPositions) {
   auto angle = gyroAngle + m_gyroOffset;
 
   MecanumDriveWheelPositions wheelDeltas{
