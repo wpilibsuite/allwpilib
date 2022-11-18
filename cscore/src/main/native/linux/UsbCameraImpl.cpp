@@ -140,6 +140,12 @@ int UsbCameraImpl::RawToPercentage(const UsbCameraProperty& rawProp,
     }
     return 100;
   }
+  // Arducam OV9281 exposure setting quirk
+  if (m_ov9281_exposure && rawProp.name == "raw_exposure_absolute" &&
+      rawProp.minimum == 1 && rawProp.maximum == 5000) {
+    // real range is 1-75
+    return 100.0 * (rawValue - 1) / (75 - 1);
+  }
   return 100.0 * (rawValue - rawProp.minimum) /
          (rawProp.maximum - rawProp.minimum);
 }
@@ -158,6 +164,12 @@ int UsbCameraImpl::PercentageToRaw(const UsbCameraProperty& rawProp,
       ndx = nelems - 1;
     }
     return quirkLifeCamHd3000[ndx];
+  }
+  // Arducam OV9281 exposure setting quirk
+  if (m_ov9281_exposure && rawProp.name == "raw_exposure_absolute" &&
+      rawProp.minimum == 1 && rawProp.maximum == 5000) {
+    // real range is 1-75
+    return 1 + (75 - 1) * (percentValue / 100.0);
   }
   return rawProp.minimum +
          (rawProp.maximum - rawProp.minimum) * (percentValue / 100.0);
@@ -1384,6 +1396,7 @@ void UsbCameraImpl::SetQuirks() {
   std::string_view desc = GetDescription(descbuf);
   m_lifecam_exposure = wpi::ends_with(desc, "LifeCam HD-3000") ||
                        wpi::ends_with(desc, "LifeCam Cinema (TM)");
+  m_ov9281_exposure = wpi::contains(desc, "OV9281");
   m_picamera = wpi::ends_with(desc, "mmal service");
 
   int deviceNum = GetDeviceNum(m_path.c_str());
