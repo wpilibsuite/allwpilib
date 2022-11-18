@@ -129,7 +129,7 @@ public class AprilTagFieldLayout {
       case kRedAllianceWallRightSide:
         setOrigin(
             new Pose3d(
-                new Translation3d(m_fieldDimensions.fieldWidth, m_fieldDimensions.fieldLength, 0),
+                new Translation3d(m_fieldDimensions.fieldLength, m_fieldDimensions.fieldWidth, 0),
                 new Rotation3d(0, 0, Math.PI)));
         break;
       default:
@@ -218,19 +218,19 @@ public class AprilTagFieldLayout {
   @JsonAutoDetect(getterVisibility = JsonAutoDetect.Visibility.NONE)
   private static class FieldDimensions {
     @SuppressWarnings("MemberName")
-    @JsonProperty(value = "width")
-    public double fieldWidth;
-
-    @SuppressWarnings("MemberName")
     @JsonProperty(value = "length")
     public double fieldLength;
 
+    @SuppressWarnings("MemberName")
+    @JsonProperty(value = "width")
+    public double fieldWidth;
+
     @JsonCreator()
     FieldDimensions(
-        @JsonProperty(required = true, value = "width") double fieldWidth,
-        @JsonProperty(required = true, value = "length") double fieldLength) {
-      this.fieldWidth = fieldWidth;
+        @JsonProperty(required = true, value = "length") double fieldLength,
+        @JsonProperty(required = true, value = "width") double fieldWidth) {
       this.fieldLength = fieldLength;
+      this.fieldWidth = fieldWidth;
     }
   }
 }
