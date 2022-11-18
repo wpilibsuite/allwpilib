@@ -38,8 +38,7 @@ class WPILIB_DLLEXPORT MecanumDriveOdometry {
    */
   explicit MecanumDriveOdometry(
       MecanumDriveKinematics kinematics, const Rotation2d& gyroAngle,
-      const MecanumDriveWheelPositions& wheelPositions =
-          MecanumDriveWheelPositions{},
+      const MecanumDriveWheelPositions& wheelPositions,
       const Pose2d& initialPose = Pose2d{});
 
   /**
@@ -48,13 +47,13 @@ class WPILIB_DLLEXPORT MecanumDriveOdometry {
    * The gyroscope angle does not need to be reset here on the user's robot
    * code. The library automatically takes care of offsetting the gyro angle.
    *
-   * @param pose The position on the field that your robot is at.
    * @param gyroAngle The angle reported by the gyroscope.
    * @param wheelPositions The current distances measured by each wheel.
+   * @param pose The position on the field that your robot is at.
    */
-  void ResetPosition(const Pose2d& pose, const Rotation2d& gyroAngle,
-                     const MecanumDriveWheelPositions& wheelPositions =
-                         MecanumDriveWheelPositions{}) {
+  void ResetPosition(const Rotation2d& gyroAngle,
+                     const MecanumDriveWheelPositions& wheelPositions,
+                     const Pose2d& pose) {
     m_pose = pose;
     m_previousAngle = pose.Rotation();
     m_gyroOffset = m_pose.Rotation() - gyroAngle;

@@ -36,8 +36,8 @@ class WPILIB_DLLEXPORT DifferentialDriveOdometry {
    * @param initialPose The starting position of the robot on the field.
    */
   explicit DifferentialDriveOdometry(const Rotation2d& gyroAngle,
-                                     units::meter_t leftDistance = 0_m,
-                                     units::meter_t rightDistance = 0_m,
+                                     units::meter_t leftDistance,
+                                     units::meter_t rightDistance,
                                      const Pose2d& initialPose = Pose2d{});
 
   /**
@@ -54,9 +54,10 @@ class WPILIB_DLLEXPORT DifferentialDriveOdometry {
    * @param leftDistance The distance traveled by the left encoder.
    * @param rightDistance The distance traveled by the right encoder.
    */
-  void ResetPosition(const Pose2d& pose, const Rotation2d& gyroAngle,
-                     units::meter_t leftDistance = 0_m,
-                     units::meter_t rightDistance = 0_m) {
+  void ResetPosition(const Rotation2d& gyroAngle,
+                     units::meter_t leftDistance,
+                     units::meter_t rightDistance,
+                     const Pose2d& pose) {
     m_pose = pose;
     m_previousAngle = pose.Rotation();
     m_gyroOffset = m_pose.Rotation() - gyroAngle;

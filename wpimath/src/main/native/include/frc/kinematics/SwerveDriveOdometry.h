@@ -43,8 +43,7 @@ class SwerveDriveOdometry {
    */
   SwerveDriveOdometry(
       SwerveDriveKinematics<NumModules> kinematics, const Rotation2d& gyroAngle,
-      const wpi::array<SwerveModulePosition, NumModules>& modulePositions =
-          wpi::array<SwerveModulePosition, NumModules>{},
+      const wpi::array<SwerveModulePosition, NumModules>& modulePositions,
       const Pose2d& initialPose = Pose2d{});
 
   /**
@@ -56,14 +55,14 @@ class SwerveDriveOdometry {
    * The gyroscope angle does not need to be reset here on the user's robot
    * code. The library automatically takes care of offsetting the gyro angle.
    *
-   * @param pose The position on the field that your robot is at.
    * @param gyroAngle The angle reported by the gyroscope.
    * @param modulePositions The wheel positions reported by each module.
+   * @param pose The position on the field that your robot is at.
    */
   void ResetPosition(
-      const Pose2d& pose, const Rotation2d& gyroAngle,
-      const wpi::array<SwerveModulePosition, NumModules>& modulePositions =
-          wpi::array<SwerveModulePosition, NumModules>{});
+      const Rotation2d& gyroAngle,
+      const wpi::array<SwerveModulePosition, NumModules>& modulePositions,
+      const Pose2d& pose);
 
   /**
    * Returns the position of the robot on the field.

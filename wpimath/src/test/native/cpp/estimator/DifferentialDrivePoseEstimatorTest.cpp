@@ -18,9 +18,9 @@
 
 TEST(DifferentialDrivePoseEstimatorTest, Accuracy) {
   frc::DifferentialDrivePoseEstimator estimator{frc::Rotation2d{},
+                                                0_m,
+                                                0_m,
                                                 frc::Pose2d{},
-                                                0_m,
-                                                0_m,
                                                 {0.02, 0.02, 0.01, 0.02, 0.02},
                                                 {0.01, 0.01, 0.001},
                                                 {0.1, 0.1, 0.01}};

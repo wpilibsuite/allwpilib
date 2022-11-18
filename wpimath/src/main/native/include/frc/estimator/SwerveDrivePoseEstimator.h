@@ -61,9 +61,9 @@ class SwerveDrivePoseEstimator {
    * Constructs a SwerveDrivePoseEstimator.
    *
    * @param gyroAngle                The current gyro angle.
-   * @param initialPose              The starting pose estimate.
    * @param modulePositions          The current distance and rotation
    *                                 measurements of the swerve modules.
+   * @param initialPose              The starting pose estimate.
    * @param kinematics               A correctly-configured kinematics object
    *                                 for your drivetrain.
    * @param stateStdDevs             Standard deviations of model states.
@@ -86,8 +86,9 @@ class SwerveDrivePoseEstimator {
    *                                 loop.
    */
   SwerveDrivePoseEstimator(
-      const Rotation2d& gyroAngle, const Pose2d& initialPose,
+      const Rotation2d& gyroAngle,
       const wpi::array<SwerveModulePosition, NumModules>& modulePositions,
+      const Pose2d& initialPose,
       SwerveDriveKinematics<NumModules>& kinematics,
       const wpi::array<double, States>& stateStdDevs,
       const wpi::array<double, Outputs>& localMeasurementStdDevs,
@@ -144,15 +145,15 @@ class SwerveDrivePoseEstimator {
    * The gyroscope angle does not need to be reset in the user's robot code.
    * The library automatically takes care of offsetting the gyro angle.
    *
-   * @param pose            The position on the field that your robot is at.
    * @param gyroAngle       The angle reported by the gyroscope.
    * @param modulePositions The current distance and rotation measurements of
    *                        the swerve modules.
+   * @param pose            The position on the field that your robot is at.
    */
   void ResetPosition(
-      const Pose2d& pose, const Rotation2d& gyroAngle,
-      const wpi::array<SwerveModulePosition, NumModules>& modulePositions =
-          wpi::array<SwerveModulePosition, NumModules>{}) {
+      const Rotation2d& gyroAngle,
+      const wpi::array<SwerveModulePosition, NumModules>& modulePositions,
+      const Pose2d& pose) {
     // Reset state estimate and error covariance
     m_observer.Reset();
     m_poseBuffer.Clear();
