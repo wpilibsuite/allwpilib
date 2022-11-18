@@ -21,7 +21,7 @@ public final class Commands {
    *
    * @return the command
    */
-  public static Command none() {
+  public static CommandBase none() {
     return new InstantCommand();
   }
 
@@ -35,7 +35,7 @@ public final class Commands {
    * @return the command
    * @see InstantCommand
    */
-  public static Command runOnce(Runnable action, Subsystem... requirements) {
+  public static CommandBase runOnce(Runnable action, Subsystem... requirements) {
     return new InstantCommand(action, requirements);
   }
 
@@ -47,7 +47,7 @@ public final class Commands {
    * @return the command
    * @see RunCommand
    */
-  public static Command run(Runnable action, Subsystem... requirements) {
+  public static CommandBase run(Runnable action, Subsystem... requirements) {
     return new RunCommand(action, requirements);
   }
 
@@ -61,7 +61,7 @@ public final class Commands {
    * @return the command
    * @see StartEndCommand
    */
-  public static Command startEnd(Runnable start, Runnable end, Subsystem... requirements) {
+  public static CommandBase startEnd(Runnable start, Runnable end, Subsystem... requirements) {
     return new StartEndCommand(start, end, requirements);
   }
 
@@ -74,7 +74,7 @@ public final class Commands {
    * @param requirements subsystems the action requires
    * @return the command
    */
-  public static Command runEnd(Runnable run, Runnable end, Subsystem... requirements) {
+  public static CommandBase runEnd(Runnable run, Runnable end, Subsystem... requirements) {
     requireNonNullParam(end, "end", "Command.runEnd");
     return new FunctionalCommand(
         () -> {}, run, interrupted -> end.run(), () -> false, requirements);
@@ -87,7 +87,7 @@ public final class Commands {
    * @return the command
    * @see PrintCommand
    */
-  public static Command print(String message) {
+  public static CommandBase print(String message) {
     return new PrintCommand(message);
   }
 
@@ -100,7 +100,7 @@ public final class Commands {
    * @return the command
    * @see WaitCommand
    */
-  public static Command wait(double seconds) {
+  public static CommandBase wait(double seconds) {
     return new WaitCommand(seconds);
   }
 
@@ -111,7 +111,7 @@ public final class Commands {
    * @return the command
    * @see WaitUntilCommand
    */
-  public static Command waitUntil(BooleanSupplier condition) {
+  public static CommandBase waitUntil(BooleanSupplier condition) {
     return new WaitUntilCommand(condition);
   }
 
@@ -126,7 +126,7 @@ public final class Commands {
    * @return the command
    * @see ConditionalCommand
    */
-  public static Command either(Command onTrue, Command onFalse, BooleanSupplier selector) {
+  public static CommandBase either(Command onTrue, Command onFalse, BooleanSupplier selector) {
     return new ConditionalCommand(onTrue, onFalse, selector);
   }
 
@@ -138,7 +138,7 @@ public final class Commands {
    * @return the command
    * @see SelectCommand
    */
-  public static Command select(Map<Object, Command> commands, Supplier<Object> selector) {
+  public static CommandBase select(Map<Object, Command> commands, Supplier<Object> selector) {
     return new SelectCommand(commands, selector);
   }
 
@@ -149,7 +149,7 @@ public final class Commands {
    * @return the command group
    * @see SequentialCommandGroup
    */
-  public static Command sequence(Command... commands) {
+  public static CommandBase sequence(Command... commands) {
     return new SequentialCommandGroup(commands);
   }
 
@@ -164,7 +164,7 @@ public final class Commands {
    * @see SequentialCommandGroup
    * @see Command#repeatedly()
    */
-  public static Command repeatingSequence(Command... commands) {
+  public static CommandBase repeatingSequence(Command... commands) {
     return sequence(commands).repeatedly();
   }
 
@@ -175,7 +175,7 @@ public final class Commands {
    * @return the command
    * @see ParallelCommandGroup
    */
-  public static Command parallel(Command... commands) {
+  public static CommandBase parallel(Command... commands) {
     return new ParallelCommandGroup(commands);
   }
 
@@ -187,7 +187,7 @@ public final class Commands {
    * @return the command group
    * @see ParallelRaceGroup
    */
-  public static Command race(Command... commands) {
+  public static CommandBase race(Command... commands) {
     return new ParallelRaceGroup(commands);
   }
 
@@ -200,7 +200,7 @@ public final class Commands {
    * @return the command group
    * @see ParallelDeadlineGroup
    */
-  public static Command deadline(Command deadline, Command... commands) {
+  public static CommandBase deadline(Command deadline, Command... commands) {
     return new ParallelDeadlineGroup(deadline, commands);
   }
 

@@ -56,6 +56,12 @@ public abstract class CommandBase implements Sendable, Command {
     SendableRegistry.setName(this, name);
   }
 
+  @Override
+  public CommandBase withName(String name) {
+    this.setName(name);
+    return this;
+  }
+
   /**
    * Gets the subsystem name of this Command.
    *

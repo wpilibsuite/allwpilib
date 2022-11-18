@@ -85,8 +85,7 @@ model {
                 cpp {
                     source {
                         srcDirs = [
-                            'src/main/native/cpp',
-                            "$buildDir/generated/cpp"
+                            'src/main/native/cpp'
                         ]
                         include '**/*.cpp'
                     }
@@ -100,6 +99,22 @@ model {
                     it.buildable = false
                     return
                 }
+
+                it.sources {
+                    versionSources(CppSourceSet) {
+                        source {
+                            srcDirs = [
+                                "${rootDir}/shared/singlelib",
+                                "$buildDir/generated/cpp"
+                            ]
+                            include '**/*.cpp'
+                        }
+                        exportedHeaders {
+                            srcDirs 'src/main/native/include'
+                        }
+                    }
+                }
+
                 cppCompiler.define 'DYNAMIC_CAMERA_SERVER'
                 project(':ntcore').addNtcoreDependency(it, 'shared')
                 project(':hal').addHalDependency(it, 'shared')

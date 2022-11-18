@@ -64,12 +64,10 @@ class CommandRequirementsTest extends CommandTestBase {
       Subsystem system = new SubsystemBase() {};
 
       Command missingRequirement = new WaitUntilCommand(() -> false);
-      Command ends = new InstantCommand(() -> {}, system);
 
       assertThrows(
           IllegalArgumentException.class,
           () -> scheduler.setDefaultCommand(system, missingRequirement));
-      assertThrows(IllegalArgumentException.class, () -> scheduler.setDefaultCommand(system, ends));
     }
   }
 }

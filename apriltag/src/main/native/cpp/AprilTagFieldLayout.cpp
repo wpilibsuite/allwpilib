@@ -42,8 +42,22 @@ AprilTagFieldLayout::AprilTagFieldLayout(std::vector<AprilTag> apriltags,
   }
 }
 
-void AprilTagFieldLayout::SetAlliance(DriverStation::Alliance alliance) {
-  m_mirror = alliance == DriverStation::Alliance::kRed;
+void AprilTagFieldLayout::SetOrigin(OriginPosition origin) {
+  switch (origin) {
+    case OriginPosition::kBlueAllianceWallRightSide:
+      SetOrigin(Pose3d{});
+      break;
+    case OriginPosition::kRedAllianceWallRightSide:
+      SetOrigin(Pose3d{Translation3d{m_fieldLength, m_fieldWidth, 0_m},
+                       Rotation3d{0_deg, 0_deg, 180_deg}});
+      break;
+    default:
+      throw std::invalid_argument("Invalid origin");
+  }
+}
+
+void AprilTagFieldLayout::SetOrigin(const Pose3d& origin) {
+  m_origin = origin;
 }
 
 std::optional<frc::Pose3d> AprilTagFieldLayout::GetTagPose(int ID) const {
@@ -51,12 +65,7 @@ std::optional<frc::Pose3d> AprilTagFieldLayout::GetTagPose(int ID) const {
   if (it == m_apriltags.end()) {
     return std::nullopt;
   }
-  Pose3d returnPose = it->second.pose;
-  if (m_mirror) {
-    returnPose = returnPose.RelativeTo(Pose3d{
-        m_fieldLength, m_fieldWidth, 0_m, Rotation3d{0_deg, 0_deg, 180_deg}});
-  }
-  return returnPose;
+  return it->second.pose.RelativeTo(m_origin);
 }
 
 void AprilTagFieldLayout::Serialize(std::string_view path) {
@@ -73,7 +82,7 @@ void AprilTagFieldLayout::Serialize(std::string_view path) {
 }
 
 bool AprilTagFieldLayout::operator==(const AprilTagFieldLayout& other) const {
-  return m_apriltags == other.m_apriltags && m_mirror == other.m_mirror &&
+  return m_apriltags == other.m_apriltags && m_origin == other.m_origin &&
          m_fieldLength == other.m_fieldLength &&
          m_fieldWidth == other.m_fieldWidth;
 }

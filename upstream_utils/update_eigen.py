@@ -73,12 +73,8 @@ def eigen_inclusions(dp, f):
     ]
     modules_rgx = r"|".join("/" + m for m in modules)
 
-    # "Std" matches StdDeque, StdList, and StdVector headers
-    if re.search(modules_rgx, abspath) or "Std" in f:
-        return True
-    else:
-        # Exclude all other modules
-        return False
+    # "Std" matches StdDeque, StdList, and StdVector headers. Other modules are excluded.
+    return bool(re.search(modules_rgx, abspath) or "Std" in f)
 
 
 def unsupported_inclusions(dp, f):

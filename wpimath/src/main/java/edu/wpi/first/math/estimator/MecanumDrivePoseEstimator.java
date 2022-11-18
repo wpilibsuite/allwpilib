@@ -197,8 +197,6 @@ public class MecanumDrivePoseEstimator {
   /**
    * Resets the robot's position on the field.
    *
-   * <p>You NEED to reset your encoders (to zero) when calling this method.
-   *
    * <p>The gyroscope angle does not need to be reset in the user's robot code. The library
    * automatically takes care of offsetting the gyro angle.
    *

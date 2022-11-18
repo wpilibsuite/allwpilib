@@ -126,6 +126,9 @@ doxygen {
         exclude 'units/**'
     }
 
+    //TODO: building memory docs causes search to break
+    exclude 'wpi/memory/**'
+
     aliases 'effects=\\par <i>Effects:</i>^^',
             'notes=\\par <i>Notes:</i>^^',
             'requires=\\par <i>Requires:</i>^^',

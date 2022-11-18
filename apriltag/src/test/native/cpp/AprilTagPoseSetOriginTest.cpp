@@ -13,7 +13,7 @@
 
 using namespace frc;
 
-TEST(AprilTagPoseMirroringTest, MirroringMatches) {
+TEST(AprilTagPoseSetOriginTest, TransformationMatches) {
   auto layout = AprilTagFieldLayout{
       std::vector<AprilTag>{
           AprilTag{1,
@@ -22,7 +22,8 @@ TEST(AprilTagPoseMirroringTest, MirroringMatches) {
               2, Pose3d{4_ft, 4_ft, 4_ft, Rotation3d{0_deg, 0_deg, 180_deg}}}},
       54_ft, 27_ft};
 
-  layout.SetAlliance(DriverStation::Alliance::kRed);
+  layout.SetOrigin(
+      AprilTagFieldLayout::OriginPosition::kRedAllianceWallRightSide);
 
   auto mirrorPose =
       Pose3d{54_ft, 27_ft, 0_ft, Rotation3d{0_deg, 0_deg, 180_deg}};
