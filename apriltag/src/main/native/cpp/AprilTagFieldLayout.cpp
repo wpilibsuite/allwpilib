@@ -42,8 +42,8 @@ AprilTagFieldLayout::AprilTagFieldLayout(std::vector<AprilTag> apriltags,
   }
 }
 
-void AprilTagFieldLayout::SetOrigin(OriginPosition position) {
-  switch (position) {
+void AprilTagFieldLayout::SetOrigin(OriginPosition origin) {
+  switch (origin) {
     case OriginPosition::kBlueAllianceWallRightSide:
       SetOrigin(Pose3d{});
       break;

@@ -29,13 +29,14 @@ namespace frc {
  * AprilTag serializes to a JSON object containing an ID and a Pose3d. The
  * "field" object is a descriptor of the size of the field in meters with
  * "width" and "length" values.  This is to account for arbitrary field sizes
- * when mirroring the poses.
+ * when transforming the poses.
  *
  * Pose3ds are assumed to be measured from the bottom-left corner of the field,
- * when the blue alliance is at the left. Pose3ds will automatically be returned
- * as passed in when calling GetTagPose(int).  Setting an alliance color via
- * SetAlliance(DriverStation::Alliance) will mirror the poses returned from
- * GetTagPose(int) to be correct relative to the other alliance.
+ * when the blue alliance is at the left. By default, Pose3ds will be returned
+ * as declared when calling GetTagPose(int).
+ * SetOrigin(AprilTagFieldLayout::OriginPosition) can be used to transform the
+ * poses returned by GetTagPose(int) to be correct relative to a different
+ * coordinate frame.
  */
 class WPILIB_DLLEXPORT AprilTagFieldLayout {
  public:
@@ -57,30 +58,30 @@ class WPILIB_DLLEXPORT AprilTagFieldLayout {
    * Construct a new AprilTagFieldLayout from a vector of AprilTag objects.
    *
    * @param apriltags Vector of AprilTags.
-   * @param fieldLength Length of field the layout of representing.
+   * @param fieldLength Length of field the layout is representing.
    * @param fieldWidth Width of field the layout is representing.
    */
   AprilTagFieldLayout(std::vector<AprilTag> apriltags,
                       units::meter_t fieldLength, units::meter_t fieldWidth);
 
   /**
-   * Sets the origin based on a pre-known enumeration of positions. The position
-   * is calculated from values in the configuration file.
+   * Sets the origin based on a predefined enumeration of coordinate frame
+   * origins. The origins are calculated from the field dimensions.
    *
-   * This changes the GetTagPose(int) method to return the correct pose for your
-   * alliance.
+   * This transforms the Pose3ds returned by GetTagPose(int) to return the
+   * correct pose relative to a predefined coordinate frame.
    *
-   * @param alliance The alliance to mirror poses for.
+   * @param origin The predefined origin
    */
-  void SetOrigin(OriginPosition position);
+  void SetOrigin(OriginPosition origin);
 
   /**
    * Sets the origin for tag pose transformation.
    *
-   * This changes the GetTagPose(int) method to return the correct pose for your
-   * alliance.
+   * This tranforms the Pose3ds returned by GetTagPose(int) to return the
+   * correct pose relative to the provided origin.
    *
-   * @param alliance The alliance to mirror poses for.
+   * @param origin The new origin for tag transformations
    */
   void SetOrigin(const Pose3d& origin);
 
