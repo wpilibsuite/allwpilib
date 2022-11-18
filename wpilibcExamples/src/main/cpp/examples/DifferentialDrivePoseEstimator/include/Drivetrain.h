@@ -81,6 +81,8 @@ class Drivetrain {
   frc::DifferentialDrivePoseEstimator m_poseEstimator{
       frc::Rotation2d{},
       frc::Pose2d{},
+      units::meter_t(m_leftEncoder.GetDistance()),
+      units::meter_t(m_rightEncoder.GetDistance()),
       {0.01, 0.01, 0.01, 0.01, 0.01},
       {0.1, 0.1, 0.1},
       {0.1, 0.1, 0.1}};

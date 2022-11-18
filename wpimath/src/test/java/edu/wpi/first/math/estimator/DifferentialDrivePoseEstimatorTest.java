@@ -28,6 +28,8 @@ class DifferentialDrivePoseEstimatorTest {
         new DifferentialDrivePoseEstimator(
             new Rotation2d(),
             new Pose2d(),
+            0,
+            0,
             new MatBuilder<>(Nat.N5(), Nat.N1()).fill(0.02, 0.02, 0.01, 0.02, 0.02),
             new MatBuilder<>(Nat.N3(), Nat.N1()).fill(0.01, 0.01, 0.001),
             new MatBuilder<>(Nat.N3(), Nat.N1()).fill(0.1, 0.1, 0.01));
