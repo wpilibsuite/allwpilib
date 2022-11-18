@@ -69,8 +69,6 @@ public class DifferentialDrivePoseEstimator {
   /**
    * Constructs a DifferentialDrivePoseEstimator.
    *
-   * <p>You NEED to reset your encoders (to zero) when calling this method.
-   *
    * @param gyroAngle The current gyro angle.
    * @param initialPoseMeters The starting pose estimate.
    * @param leftDistanceMeters The distance traveled by the left encoder.
