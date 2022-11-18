@@ -19,6 +19,7 @@
 #include <wpi/condition_variable.h>
 #include <wpi/mutex.h>
 
+#include "HALInitializer.h"
 #include "hal/DriverStation.h"
 #include "hal/Errors.h"
 
@@ -446,6 +447,7 @@ void HAL_RefreshDSData(void) {
 }
 
 void HAL_ProvideNewDataEventHandle(WPI_EventHandle handle) {
+  hal::init::CheckInit();
   driverStation->newDataEvents.Add(handle);
 }
 
