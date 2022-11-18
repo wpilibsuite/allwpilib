@@ -108,7 +108,7 @@ class WPILIB_DLLEXPORT MecanumDrivePoseEstimator {
   /**
    * Resets the robot's position on the field.
    *
-   * IF wheelPositions are unspecified, 
+   * IF wheelPositions are unspecified,
    * You NEED to reset your encoders (to zero).
    *
    * The gyroscope angle does not need to be reset in the user's robot code.
@@ -119,7 +119,8 @@ class WPILIB_DLLEXPORT MecanumDrivePoseEstimator {
    * @param wheelPositions The distances measured at each wheel.
    */
   void ResetPosition(const Pose2d& pose, const Rotation2d& gyroAngle,
-                     const MecanumDriveWheelPositions& wheelPositions = MecanumDriveWheelPositions{});
+                     const MecanumDriveWheelPositions& wheelPositions =
+                         MecanumDriveWheelPositions{});
 
   /**
    * Gets the pose of the robot at the current time as estimated by the Extended

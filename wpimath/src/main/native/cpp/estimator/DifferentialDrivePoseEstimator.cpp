@@ -13,8 +13,7 @@ using namespace frc;
 
 DifferentialDrivePoseEstimator::DifferentialDrivePoseEstimator(
     const Rotation2d& gyroAngle, const Pose2d& initialPose,
-    units::meter_t leftDistance,
-    units::meter_t rightDistance,
+    units::meter_t leftDistance, units::meter_t rightDistance,
     const wpi::array<double, 5>& stateStdDevs,
     const wpi::array<double, 3>& localMeasurementStdDevs,
     const wpi::array<double, 3>& visionMeasurmentStdDevs,
@@ -54,8 +53,7 @@ void DifferentialDrivePoseEstimator::SetVisionMeasurementStdDevs(
 
 void DifferentialDrivePoseEstimator::ResetPosition(
     const Pose2d& pose, const Rotation2d& gyroAngle,
-        units::meter_t leftDistance,
-    units::meter_t rightDistance) {
+    units::meter_t leftDistance, units::meter_t rightDistance) {
   // Reset state estimate and error covariance
   m_observer.Reset();
   m_poseBuffer.Clear();

@@ -82,8 +82,7 @@ class WPILIB_DLLEXPORT DifferentialDrivePoseEstimator {
    */
   DifferentialDrivePoseEstimator(
       const Rotation2d& gyroAngle, const Pose2d& initialPose,
-      units::meter_t leftDistance,
-      units::meter_t rightDistance,
+      units::meter_t leftDistance, units::meter_t rightDistance,
       const wpi::array<double, 5>& stateStdDevs,
       const wpi::array<double, 3>& localMeasurementStdDevs,
       const wpi::array<double, 3>& visionMeasurementStdDevs,
@@ -107,7 +106,7 @@ class WPILIB_DLLEXPORT DifferentialDrivePoseEstimator {
   /**
    * Resets the robot's position on the field.
    *
-   * IF leftDistance and rightDistance are unspecified, 
+   * IF leftDistance and rightDistance are unspecified,
    * You NEED to reset your encoders (to zero). The
    * gyroscope angle does not need to be reset here on the user's robot code.
    * The library automatically takes care of offsetting the gyro angle.
@@ -118,8 +117,8 @@ class WPILIB_DLLEXPORT DifferentialDrivePoseEstimator {
    * @param rightDistance The distance traveled by the right encoder.
    */
   void ResetPosition(const Pose2d& pose, const Rotation2d& gyroAngle,
-        units::meter_t leftDistance = 0_m,
-        units::meter_t rightDistance = 0_m);
+                     units::meter_t leftDistance = 0_m,
+                     units::meter_t rightDistance = 0_m);
 
   /**
    * Returns the pose of the robot at the current time as estimated by the

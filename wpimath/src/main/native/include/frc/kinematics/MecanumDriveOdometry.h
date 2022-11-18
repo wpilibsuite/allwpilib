@@ -28,18 +28,19 @@ class WPILIB_DLLEXPORT MecanumDriveOdometry {
   /**
    * Constructs a MecanumDriveOdometry object.
    *
-   * IF wheelPositions is unspecified, 
+   * IF wheelPositions is unspecified,
    * You NEED to reset your encoders (to zero).
-   * 
+   *
    * @param kinematics The mecanum drive kinematics for your drivetrain.
    * @param gyroAngle The angle reported by the gyroscope.
    * @param wheelPositions The current distances measured by each wheel.
    * @param initialPose The starting position of the robot on the field.
    */
-  explicit MecanumDriveOdometry(MecanumDriveKinematics kinematics,
-                                const Rotation2d& gyroAngle,
-                                const MecanumDriveWheelPositions& wheelPositions = MecanumDriveWheelPositions{},
-                                const Pose2d& initialPose = Pose2d{});
+  explicit MecanumDriveOdometry(
+      MecanumDriveKinematics kinematics, const Rotation2d& gyroAngle,
+      const MecanumDriveWheelPositions& wheelPositions =
+          MecanumDriveWheelPositions{},
+      const Pose2d& initialPose = Pose2d{});
 
   /**
    * Resets the robot's position on the field.
@@ -52,7 +53,8 @@ class WPILIB_DLLEXPORT MecanumDriveOdometry {
    * @param wheelPositions The current distances measured by each wheel.
    */
   void ResetPosition(const Pose2d& pose, const Rotation2d& gyroAngle,
-                     const MecanumDriveWheelPositions& wheelPositions = MecanumDriveWheelPositions{}) {
+                     const MecanumDriveWheelPositions& wheelPositions =
+                         MecanumDriveWheelPositions{}) {
     m_pose = pose;
     m_previousAngle = pose.Rotation();
     m_gyroOffset = m_pose.Rotation() - gyroAngle;

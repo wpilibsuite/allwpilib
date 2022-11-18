@@ -138,7 +138,7 @@ class SwerveDrivePoseEstimator {
   /**
    * Resets the robot's position on the field.
    *
-   * IF leftDistance and rightDistance are unspecified, 
+   * IF leftDistance and rightDistance are unspecified,
    * You NEED to reset your encoders (to zero).
    *
    * The gyroscope angle does not need to be reset in the user's robot code.
@@ -151,7 +151,8 @@ class SwerveDrivePoseEstimator {
    */
   void ResetPosition(
       const Pose2d& pose, const Rotation2d& gyroAngle,
-      const wpi::array<SwerveModulePosition, NumModules>& modulePositions = wpi::array<SwerveModulePosition, NumModules>{}) {
+      const wpi::array<SwerveModulePosition, NumModules>& modulePositions =
+          wpi::array<SwerveModulePosition, NumModules>{}) {
     // Reset state estimate and error covariance
     m_observer.Reset();
     m_poseBuffer.Clear();

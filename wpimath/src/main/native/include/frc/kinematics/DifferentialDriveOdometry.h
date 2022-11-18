@@ -27,9 +27,9 @@ class WPILIB_DLLEXPORT DifferentialDriveOdometry {
   /**
    * Constructs a DifferentialDriveOdometry object.
    *
-   * IF leftDistance and rightDistance are unspecified, 
+   * IF leftDistance and rightDistance are unspecified,
    * You NEED to reset your encoders (to zero).
-   * 
+   *
    * @param gyroAngle The angle reported by the gyroscope.
    * @param leftDistance The distance traveled by the left encoder.
    * @param rightDistance The distance traveled by the right encoder.
@@ -42,8 +42,8 @@ class WPILIB_DLLEXPORT DifferentialDriveOdometry {
 
   /**
    * Resets the robot's position on the field.
-   * 
-   * IF leftDistance and rightDistance are unspecified, 
+   *
+   * IF leftDistance and rightDistance are unspecified,
    * You NEED to reset your encoders (to zero).
    *
    * The gyroscope angle does not need to be reset here on the user's robot
@@ -54,10 +54,9 @@ class WPILIB_DLLEXPORT DifferentialDriveOdometry {
    * @param leftDistance The distance traveled by the left encoder.
    * @param rightDistance The distance traveled by the right encoder.
    */
-  void ResetPosition(const Pose2d& pose, 
-      const Rotation2d& gyroAngle, 
-      units::meter_t leftDistance = 0_m,
-      units::meter_t rightDistance = 0_m) {
+  void ResetPosition(const Pose2d& pose, const Rotation2d& gyroAngle,
+                     units::meter_t leftDistance = 0_m,
+                     units::meter_t rightDistance = 0_m) {
     m_pose = pose;
     m_previousAngle = pose.Rotation();
     m_gyroOffset = m_pose.Rotation() - gyroAngle;
