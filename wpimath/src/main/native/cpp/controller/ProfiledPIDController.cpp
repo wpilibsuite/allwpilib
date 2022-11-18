@@ -9,4 +9,5 @@ void frc::detail::ReportProfiledPIDController() {
   ++instances;
   wpi::math::MathSharedStore::ReportUsage(
       wpi::math::MathUsageId::kController_ProfiledPIDController, instances);
+  wpi::SendableRegistry::Add(this, "ProfiledPIDController", instances);
 }

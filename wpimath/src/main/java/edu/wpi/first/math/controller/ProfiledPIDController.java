@@ -52,8 +52,8 @@ public class ProfiledPIDController implements Sendable {
     m_controller = new PIDController(Kp, Ki, Kd, period);
     m_constraints = constraints;
     instances++;
-    
-    SendableRegistry.addLW(this, "ProfiledPIDController", instances);
+
+    SendableRegistry.add(this, "ProfiledPIDController", instances);
     MathSharedStore.reportUsage(MathUsageId.kController_ProfiledPIDController, instances);
   }
 
