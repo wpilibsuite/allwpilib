@@ -169,7 +169,7 @@ public class Pose3d implements Interpolatable<Pose3d> {
   }
 
   /**
-   * Returns the other pose relative to the current pose.
+   * Returns the current pose relative to the given pose.
    *
    * <p>This function can often be used for trajectory tracking or pose stabilization algorithms to
    * get the error between the reference and the current pose.
