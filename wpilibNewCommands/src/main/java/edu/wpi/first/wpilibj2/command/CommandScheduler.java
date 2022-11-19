@@ -367,6 +367,10 @@ public final class CommandScheduler implements NTSendable, AutoCloseable {
         DriverStation.reportWarning("Tried to register a null subsystem", true);
         continue;
       }
+      if (m_subsystems.containsKey(subsystem)) {
+        DriverStation.reportWarning("Tried to register an already-registered subsystem", true);
+        continue;
+      }
       m_subsystems.put(subsystem, null);
     }
   }
