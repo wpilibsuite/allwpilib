@@ -57,8 +57,8 @@ public class Drivetrain {
   private final MecanumDrivePoseEstimator m_poseEstimator =
       new MecanumDrivePoseEstimator(
           m_gyro.getRotation2d(),
-          new Pose2d(),
           getCurrentDistances(),
+          new Pose2d(),
           m_kinematics,
           VecBuilder.fill(0.05, 0.05, Units.degreesToRadians(5), 0.05, 0.05, 0.05, 0.05),
           VecBuilder.fill(Units.degreesToRadians(0.01), 0.01, 0.01, 0.01, 0.01),
