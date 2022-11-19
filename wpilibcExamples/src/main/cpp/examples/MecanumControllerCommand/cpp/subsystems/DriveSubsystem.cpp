@@ -126,6 +126,6 @@ frc::Pose2d DriveSubsystem::GetPose() {
 }
 
 void DriveSubsystem::ResetOdometry(frc::Pose2d pose) {
-  m_odometry.ResetPosition(pose, m_gyro.GetRotation2d(),
-                           getCurrentWheelDistances());
+  m_odometry.ResetPosition(m_gyro.GetRotation2d(), getCurrentWheelDistances(),
+                           pose);
 }

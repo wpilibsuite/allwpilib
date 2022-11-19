@@ -103,7 +103,8 @@ frc::Pose2d DriveSubsystem::GetPose() {
 
 void DriveSubsystem::ResetOdometry(frc::Pose2d pose) {
   m_odometry.ResetPosition(
-      pose, units::degree_t{GetHeading()},
+      GetHeading(),
       {m_frontLeft.GetPosition(), m_frontRight.GetPosition(),
-       m_rearLeft.GetPosition(), m_rearRight.GetPosition()});
+       m_rearLeft.GetPosition(), m_rearRight.GetPosition()},
+      pose);
 }
