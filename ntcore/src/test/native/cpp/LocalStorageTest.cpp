@@ -13,6 +13,7 @@
 #include "gtest/gtest.h"
 #include "net/MockNetworkInterface.h"
 #include "ntcore_c.h"
+#include "ntcore_cpp.h"
 
 using ::testing::_;
 using ::testing::AllOf;
@@ -162,7 +163,7 @@ TEST_F(LocalStorageTest, SubscribeNoTypeLocalPubPost) {
   EXPECT_EQ(vals[0].value, true);
   EXPECT_EQ(vals[0].time, 5);
 
-  val = Value::MakeBoolean(true, 6);
+  val = Value::MakeBoolean(false, 6);
   EXPECT_CALL(network, SetValue(pub, val));
   storage.SetEntryValue(pub, val);
 
@@ -225,7 +226,7 @@ TEST_F(LocalStorageTest, EntryNoTypeLocalSet) {
   EXPECT_EQ(vals[0].time, 5);
 
   // normal set with same type
-  val = Value::MakeBoolean(true, 6);
+  val = Value::MakeBoolean(false, 6);
   EXPECT_CALL(network, SetValue(_, val));
   EXPECT_TRUE(storage.SetEntryValue(entry, val));
 
@@ -486,6 +487,107 @@ TEST_F(LocalStorageTest, SetValueInvalidHandle) {
   EXPECT_FALSE(storage.SetEntryValue(0u, {}));
 }
 
+class LocalStorageDuplicatesTest : public LocalStorageTest {
+ public:
+  void SetupPubSub(bool keepPub, bool keepSub);
+  void SetValues();
+
+  NT_Publisher pub;
+  NT_Subscriber sub;
+  Value val1 = Value::MakeDouble(1.0, 10);
+  Value val2 = Value::MakeDouble(1.0, 20);  // duplicate value
+  Value val3 = Value::MakeDouble(2.0, 30);
+};
+
+void LocalStorageDuplicatesTest::SetupPubSub(bool keepPub, bool keepSub) {
+  PubSubOptions pubOptions;
+  pubOptions.keepDuplicates = keepPub;
+  EXPECT_CALL(network, Publish(_, fooTopic, std::string_view{"foo"},
+                               std::string_view{"double"}, wpi::json::object(),
+                               IsPubSubOptions(pubOptions)));
+  pub = storage.Publish(fooTopic, NT_DOUBLE, "double", {},
+                        {{PubSubOption::KeepDuplicates(keepPub)}});
+
+  PubSubOptions subOptions;
+  subOptions.pollStorageSize = 10;
+  subOptions.keepDuplicates = keepSub;
+  EXPECT_CALL(network, Subscribe(_, wpi::SpanEq({std::string{"foo"}}),
+                                 IsPubSubOptions(subOptions)));
+  sub = storage.Subscribe(
+      fooTopic, NT_DOUBLE, "double",
+      {{PubSubOption::KeepDuplicates(keepSub), PubSubOption::PollStorage(10)}});
+}
+
+void LocalStorageDuplicatesTest::SetValues() {
+  storage.SetEntryValue(pub, val1);
+  storage.SetEntryValue(pub, val2);
+  // verify the timestamp was updated
+  EXPECT_EQ(storage.GetEntryLastChange(sub), val2.time());
+  storage.SetEntryValue(pub, val3);
+}
+
+TEST_F(LocalStorageDuplicatesTest, Defaults) {
+  SetupPubSub(false, false);
+
+  EXPECT_CALL(network, SetValue(pub, val1));
+  EXPECT_CALL(network, SetValue(pub, val3));
+  SetValues();
+
+  // verify 2nd update was dropped locally
+  auto values = storage.ReadQueueDouble(sub);
+  ASSERT_EQ(values.size(), 2u);
+  ASSERT_EQ(values[0].value, val1.GetDouble());
+  ASSERT_EQ(values[0].time, val1.time());
+  ASSERT_EQ(values[1].value, val3.GetDouble());
+  ASSERT_EQ(values[1].time, val3.time());
+}
+
+TEST_F(LocalStorageDuplicatesTest, KeepPub) {
+  SetupPubSub(true, false);
+
+  EXPECT_CALL(network, SetValue(pub, val1)).Times(2);
+  // EXPECT_CALL(network, SetValue(pub, val2));
+  EXPECT_CALL(network, SetValue(pub, val3));
+  SetValues();
+
+  // verify all 3 updates were received locally
+  auto values = storage.ReadQueueDouble(sub);
+  ASSERT_EQ(values.size(), 3u);
+}
+
+TEST_F(LocalStorageDuplicatesTest, KeepSub) {
+  SetupPubSub(false, true);
+
+  // second update should NOT go to the network
+  EXPECT_CALL(network, SetValue(pub, val1));
+  EXPECT_CALL(network, SetValue(pub, val3));
+  SetValues();
+
+  // verify all 3 updates were received locally
+  auto values = storage.ReadQueueDouble(sub);
+  ASSERT_EQ(values.size(), 3u);
+}
+
+TEST_F(LocalStorageDuplicatesTest, FromNetwork) {
+  SetupPubSub(false, false);
+
+  // incoming from the network are treated like a normal local publish
+  auto topic = storage.NetworkAnnounce("foo", "double", {{}}, 0);
+  storage.NetworkSetValue(topic, val1);
+  storage.NetworkSetValue(topic, val2);
+  // verify the timestamp was updated
+  EXPECT_EQ(storage.GetEntryLastChange(sub), val2.time());
+  storage.NetworkSetValue(topic, val3);
+
+  // verify 2nd update was dropped locally
+  auto values = storage.ReadQueueDouble(sub);
+  ASSERT_EQ(values.size(), 2u);
+  ASSERT_EQ(values[0].value, val1.GetDouble());
+  ASSERT_EQ(values[0].time, val1.time());
+  ASSERT_EQ(values[1].value, val3.GetDouble());
+  ASSERT_EQ(values[1].time, val3.time());
+}
+
 class LocalStorageNumberVariantsTest : public LocalStorageTest {
  public:
   void CreateSubscriber(NT_Handle* handle, std::string_view name, NT_Type type,
@@ -658,29 +760,29 @@ TEST_F(LocalStorageNumberVariantsTest, ReadQueue) {
     }
   }
 
-  storage.SetEntryValue(pub, Value::MakeDouble(1.0, 50));
+  storage.SetEntryValue(pub, Value::MakeDouble(2.0, 50));
   for (auto&& subentry : subentries) {
     SCOPED_TRACE(subentry.name);
     if (subentry.type == NT_BOOLEAN) {
       EXPECT_THAT(storage.ReadQueueInteger(subentry.subentry), IsEmpty());
     } else {
       EXPECT_THAT(storage.ReadQueueInteger(subentry.subentry),
-                  ElementsAre(TSEq<TimestampedInteger>(1, 50)));
+                  ElementsAre(TSEq<TimestampedInteger>(2, 50)));
     }
   }
 
-  storage.SetEntryValue(pub, Value::MakeDouble(1.0, 50));
+  storage.SetEntryValue(pub, Value::MakeDouble(3.0, 50));
   for (auto&& subentry : subentries) {
     SCOPED_TRACE(subentry.name);
     if (subentry.type == NT_BOOLEAN) {
       EXPECT_THAT(storage.ReadQueueFloat(subentry.subentry), IsEmpty());
     } else {
       EXPECT_THAT(storage.ReadQueueFloat(subentry.subentry),
-                  ElementsAre(TSEq<TimestampedFloat>(1.0, 50)));
+                  ElementsAre(TSEq<TimestampedFloat>(3.0, 50)));
     }
   }
 
-  storage.SetEntryValue(pub, Value::MakeDouble(1.0, 50));
+  storage.SetEntryValue(pub, Value::MakeDouble(4.0, 50));
   for (auto&& subentry : subentries) {
     SCOPED_TRACE(subentry.name);
     EXPECT_THAT(storage.ReadQueueBoolean(subentry.subentry), IsEmpty());
