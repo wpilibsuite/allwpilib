@@ -32,7 +32,7 @@ class SwerveDriveOdometryTest : public ::testing::Test {
 TEST_F(SwerveDriveOdometryTest, TwoIterations) {
   SwerveModulePosition position{0.5_m, 0_deg};
 
-  m_odometry.ResetPosition(Pose2d{}, 0_rad, {zero, zero, zero, zero});
+  m_odometry.ResetPosition(0_rad, {zero, zero, zero, zero}, Pose2d{});
 
   m_odometry.Update(0_deg, {zero, zero, zero, zero});
 
@@ -50,7 +50,7 @@ TEST_F(SwerveDriveOdometryTest, 90DegreeTurn) {
   SwerveModulePosition bl{18.85_m, -90_deg};
   SwerveModulePosition br{42.15_m, -26.565_deg};
 
-  m_odometry.ResetPosition(Pose2d{}, 0_rad, {zero, zero, zero, zero});
+  m_odometry.ResetPosition(0_rad, {zero, zero, zero, zero}, Pose2d{});
   auto pose = m_odometry.Update(90_deg, {fl, fr, bl, br});
 
   EXPECT_NEAR(12.0, pose.X().value(), kEpsilon);
@@ -59,7 +59,7 @@ TEST_F(SwerveDriveOdometryTest, 90DegreeTurn) {
 }
 
 TEST_F(SwerveDriveOdometryTest, GyroAngleReset) {
-  m_odometry.ResetPosition(Pose2d{}, 90_deg, {zero, zero, zero, zero});
+  m_odometry.ResetPosition(90_deg, {zero, zero, zero, zero}, Pose2d{});
 
   SwerveModulePosition position{0.5_m, 0_deg};
 

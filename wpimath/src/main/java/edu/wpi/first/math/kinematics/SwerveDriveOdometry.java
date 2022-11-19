@@ -77,12 +77,12 @@ public class SwerveDriveOdometry {
    *
    * <p>Similarly, module positions do not need to be reset in user code.
    *
-   * @param pose The position on the field that your robot is at.
    * @param gyroAngle The angle reported by the gyroscope.
-   * @param modulePositions The wheel positions reported by each module.
+   * @param modulePositions The wheel positions reported by each module.,
+   * @param pose The position on the field that your robot is at.
    */
   public void resetPosition(
-      Pose2d pose, Rotation2d gyroAngle, SwerveModulePosition[] modulePositions) {
+      Rotation2d gyroAngle, SwerveModulePosition[] modulePositions, Pose2d pose) {
     if (modulePositions.length != m_numModules) {
       throw new IllegalArgumentException(
           "Number of modules is not consistent with number of wheel locations provided in "

@@ -12,8 +12,8 @@
 using namespace frc;
 
 frc::MecanumDrivePoseEstimator::MecanumDrivePoseEstimator(
-    const Rotation2d& gyroAngle, const Pose2d& initialPose,
-    const MecanumDriveWheelPositions& wheelPositions,
+    const Rotation2d& gyroAngle,
+    const MecanumDriveWheelPositions& wheelPositions, const Pose2d& initialPose,
     MecanumDriveKinematics kinematics,
     const wpi::array<double, 7>& stateStdDevs,
     const wpi::array<double, 5>& localMeasurementStdDevs,
@@ -67,8 +67,8 @@ void frc::MecanumDrivePoseEstimator::SetVisionMeasurementStdDevs(
 }
 
 void frc::MecanumDrivePoseEstimator::ResetPosition(
-    const Pose2d& pose, const Rotation2d& gyroAngle,
-    const MecanumDriveWheelPositions& wheelPositions) {
+    const Rotation2d& gyroAngle,
+    const MecanumDriveWheelPositions& wheelPositions, const Pose2d& pose) {
   // Reset state estimate and error covariance
   m_observer.Reset();
   m_poseBuffer.Clear();

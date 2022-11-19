@@ -61,9 +61,9 @@ class SwerveDrivePoseEstimator {
    * Constructs a SwerveDrivePoseEstimator.
    *
    * @param gyroAngle                The current gyro angle.
-   * @param initialPose              The starting pose estimate.
    * @param modulePositions          The current distance and rotation
    *                                 measurements of the swerve modules.
+   * @param initialPose              The starting pose estimate.
    * @param kinematics               A correctly-configured kinematics object
    *                                 for your drivetrain.
    * @param stateStdDevs             Standard deviations of model states.
@@ -86,9 +86,9 @@ class SwerveDrivePoseEstimator {
    *                                 loop.
    */
   SwerveDrivePoseEstimator(
-      const Rotation2d& gyroAngle, const Pose2d& initialPose,
-      const wpi::array<SwerveModulePosition, NumModules> modulePositions,
-      SwerveDriveKinematics<NumModules>& kinematics,
+      const Rotation2d& gyroAngle,
+      const wpi::array<SwerveModulePosition, NumModules>& modulePositions,
+      const Pose2d& initialPose, SwerveDriveKinematics<NumModules>& kinematics,
       const wpi::array<double, States>& stateStdDevs,
       const wpi::array<double, Outputs>& localMeasurementStdDevs,
       const wpi::array<double, 3>& visionMeasurementStdDevs,
@@ -138,17 +138,21 @@ class SwerveDrivePoseEstimator {
   /**
    * Resets the robot's position on the field.
    *
+   * IF leftDistance and rightDistance are unspecified,
+   * You NEED to reset your encoders (to zero).
+   *
    * The gyroscope angle does not need to be reset in the user's robot code.
    * The library automatically takes care of offsetting the gyro angle.
    *
-   * @param pose            The position on the field that your robot is at.
    * @param gyroAngle       The angle reported by the gyroscope.
    * @param modulePositions The current distance and rotation measurements of
    *                        the swerve modules.
+   * @param pose            The position on the field that your robot is at.
    */
   void ResetPosition(
-      const Pose2d& pose, const Rotation2d& gyroAngle,
-      wpi::array<SwerveModulePosition, NumModules> modulePositions) {
+      const Rotation2d& gyroAngle,
+      const wpi::array<SwerveModulePosition, NumModules>& modulePositions,
+      const Pose2d& pose) {
     // Reset state estimate and error covariance
     m_observer.Reset();
     m_poseBuffer.Clear();
@@ -285,8 +289,8 @@ class SwerveDrivePoseEstimator {
    */
   Pose2d Update(
       const Rotation2d& gyroAngle,
-      const wpi::array<SwerveModuleState, NumModules> moduleStates,
-      const wpi::array<SwerveModulePosition, NumModules> modulePositions) {
+      const wpi::array<SwerveModuleState, NumModules>& moduleStates,
+      const wpi::array<SwerveModulePosition, NumModules>& modulePositions) {
     return UpdateWithTime(units::microsecond_t(wpi::Now()), gyroAngle,
                           moduleStates, modulePositions);
   }
@@ -306,8 +310,8 @@ class SwerveDrivePoseEstimator {
    */
   Pose2d UpdateWithTime(
       units::second_t currentTime, const Rotation2d& gyroAngle,
-      const wpi::array<SwerveModuleState, NumModules> moduleStates,
-      const wpi::array<SwerveModulePosition, NumModules> modulePositions) {
+      const wpi::array<SwerveModuleState, NumModules>& moduleStates,
+      const wpi::array<SwerveModulePosition, NumModules>& modulePositions) {
     auto dt = m_prevTime >= 0_s ? currentTime - m_prevTime : m_nominalDt;
     m_prevTime = currentTime;
 

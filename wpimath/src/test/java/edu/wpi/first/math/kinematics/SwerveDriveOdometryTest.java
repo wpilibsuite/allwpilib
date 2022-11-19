@@ -87,9 +87,9 @@ class SwerveDriveOdometryTest {
     var gyro = Rotation2d.fromDegrees(90.0);
     var fieldAngle = Rotation2d.fromDegrees(0.0);
     m_odometry.resetPosition(
-        new Pose2d(new Translation2d(), fieldAngle),
         gyro,
-        new SwerveModulePosition[] {zero, zero, zero, zero});
+        new SwerveModulePosition[] {zero, zero, zero, zero},
+        new Pose2d(new Translation2d(), fieldAngle));
     var delta = new SwerveModulePosition();
     m_odometry.update(gyro, new SwerveModulePosition[] {delta, delta, delta, delta});
     delta = new SwerveModulePosition(1.0, Rotation2d.fromDegrees(0));

@@ -19,8 +19,8 @@ TEST(MecanumDrivePoseEstimatorTest, AccuracyFacingTrajectory) {
   frc::MecanumDriveWheelPositions wheelPositions;
 
   frc::MecanumDrivePoseEstimator estimator{frc::Rotation2d{},
-                                           frc::Pose2d{},
                                            wheelPositions,
+                                           frc::Pose2d{},
                                            kinematics,
                                            {0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1},
                                            {0.05, 0.05, 0.05, 0.05, 0.05},
@@ -103,8 +103,8 @@ TEST(MecanumDrivePoseEstimatorTest, AccuracyFacingXAxis) {
   frc::MecanumDriveWheelPositions wheelPositions;
 
   frc::MecanumDrivePoseEstimator estimator{frc::Rotation2d{},
-                                           frc::Pose2d{},
                                            wheelPositions,
+                                           frc::Pose2d{},
                                            kinematics,
                                            {0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1},
                                            {0.05, 0.05, 0.05, 0.05, 0.05},

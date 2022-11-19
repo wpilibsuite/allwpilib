@@ -34,7 +34,7 @@ import java.util.function.BiConsumer;
  * <p>{@link SwerveDrivePoseEstimator#update} should be called every robot loop. If your loops are
  * faster or slower than the default of 20 ms, then you should change the nominal delta time using
  * the secondary constructor: {@link SwerveDrivePoseEstimator#SwerveDrivePoseEstimator(Nat, Nat,
- * Nat, Rotation2d, Pose2d, SwerveModulePosition[], SwerveDriveKinematics, Matrix, Matrix, Matrix,
+ * Nat, Rotation2d, SwerveModulePosition[], Pose2d, SwerveDriveKinematics, Matrix, Matrix, Matrix,
  * double)}.
  *
  * <p>{@link SwerveDrivePoseEstimator#addVisionMeasurement} can be called as infrequently as you
@@ -96,8 +96,8 @@ public class SwerveDrivePoseEstimator<States extends Num, Inputs extends Num, Ou
       Nat<Inputs> inputs,
       Nat<Outputs> outputs,
       Rotation2d gyroAngle,
-      Pose2d initialPoseMeters,
       SwerveModulePosition[] modulePositions,
+      Pose2d initialPoseMeters,
       SwerveDriveKinematics kinematics,
       Matrix<States, N1> stateStdDevs,
       Matrix<Outputs, N1> localMeasurementStdDevs,
@@ -107,8 +107,8 @@ public class SwerveDrivePoseEstimator<States extends Num, Inputs extends Num, Ou
         inputs,
         outputs,
         gyroAngle,
-        initialPoseMeters,
         modulePositions,
+        initialPoseMeters,
         kinematics,
         stateStdDevs,
         localMeasurementStdDevs,
@@ -123,8 +123,8 @@ public class SwerveDrivePoseEstimator<States extends Num, Inputs extends Num, Ou
    * @param inputs The size of the input vector.
    * @param outputs The size of the outputs vector.
    * @param gyroAngle The current gyro angle.
-   * @param initialPoseMeters The starting pose estimate.
    * @param modulePositions The current distance measurements and rotations of the swerve modules.
+   * @param initialPoseMeters The starting pose estimate.
    * @param kinematics A correctly-configured kinematics object for your drivetrain.
    * @param stateStdDevs Standard deviations of model states. Increase these numbers to trust your
    *     model's state estimates less. This matrix is in the form [x, y, theta, s_0, ... s_n]ᵀ, with
@@ -142,8 +142,8 @@ public class SwerveDrivePoseEstimator<States extends Num, Inputs extends Num, Ou
       Nat<Inputs> inputs,
       Nat<Outputs> outputs,
       Rotation2d gyroAngle,
-      Pose2d initialPoseMeters,
       SwerveModulePosition[] modulePositions,
+      Pose2d initialPoseMeters,
       SwerveDriveKinematics kinematics,
       Matrix<States, N1> stateStdDevs,
       Matrix<Outputs, N1> localMeasurementStdDevs,
@@ -247,12 +247,12 @@ public class SwerveDrivePoseEstimator<States extends Num, Inputs extends Num, Ou
    * <p>The gyroscope angle does not need to be reset in the user's robot code. The library
    * automatically takes care of offsetting the gyro angle.
    *
-   * @param poseMeters The position on the field that your robot is at.
    * @param gyroAngle The angle reported by the gyroscope.
    * @param modulePositions The current distance measurements and rotations of the swerve modules.
+   * @param poseMeters The position on the field that your robot is at.
    */
   public void resetPosition(
-      Pose2d poseMeters, Rotation2d gyroAngle, SwerveModulePosition[] modulePositions) {
+      Rotation2d gyroAngle, SwerveModulePosition[] modulePositions, Pose2d poseMeters) {
     // Reset state estimate and error covariance
     m_observer.reset();
     m_poseBuffer.clear();
