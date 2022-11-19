@@ -45,6 +45,12 @@ NT_Inst CreateInstance() {
   return Handle{InstanceImpl::Alloc(), 0, Handle::kInstance};
 }
 
+void ResetInstance(NT_Inst inst) {
+  if (auto ii = InstanceImpl::GetTyped(inst, Handle::kInstance)) {
+    ii->Reset();
+  }
+}
+
 void DestroyInstance(NT_Inst inst) {
   int i = Handle{inst}.GetTypedInst(Handle::kInstance);
   if (i < 0) {

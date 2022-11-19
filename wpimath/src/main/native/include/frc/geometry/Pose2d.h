@@ -141,7 +141,7 @@ class WPILIB_DLLEXPORT Pose2d {
   constexpr Pose2d TransformBy(const Transform2d& other) const;
 
   /**
-   * Returns the other pose relative to the current pose.
+   * Returns the current pose relative to the given pose.
    *
    * This function can often be used for trajectory tracking or pose
    * stabilization algorithms to get the error between the reference and the

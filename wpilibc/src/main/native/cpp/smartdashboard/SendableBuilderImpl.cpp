@@ -26,7 +26,8 @@ void SendableBuilderImpl::PropertyImpl<Topic>::Update(bool controllable,
                                                       int64_t time) {
   if (controllable && sub && updateLocal) {
     updateLocal(sub);
-  } else if (pub && updateNetwork) {
+  }
+  if (pub && updateNetwork) {
     updateNetwork(pub, time);
   }
 }

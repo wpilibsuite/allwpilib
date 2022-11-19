@@ -326,6 +326,7 @@ void HAL_ProvideNewDataEventHandle(WPI_EventHandle handle) {
   if (gShutdown) {
     return;
   }
+  hal::init::CheckInit();
   driverStation->newDataEvents.Add(handle);
 }
 

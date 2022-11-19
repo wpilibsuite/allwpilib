@@ -36,17 +36,16 @@ void ListenerStorage::Thread::Main() {
     }
     // call all the way back out to the C++ API to ensure valid handle
     auto events = nt::ReadListenerQueue(m_poller);
-    if (events.empty()) {
-      continue;
-    }
-    std::unique_lock lock{m_mutex};
-    for (auto&& event : events) {
-      auto callbackIt = m_callbacks.find(event.listener);
-      if (callbackIt != m_callbacks.end()) {
-        auto callback = callbackIt->second;
-        lock.unlock();
-        callback(event);
-        lock.lock();
+    if (!events.empty()) {
+      std::unique_lock lock{m_mutex};
+      for (auto&& event : events) {
+        auto callbackIt = m_callbacks.find(event.listener);
+        if (callbackIt != m_callbacks.end()) {
+          auto callback = callbackIt->second;
+          lock.unlock();
+          callback(event);
+          lock.lock();
+        }
       }
     }
     if (std::find(signaled.begin(), signaled.end(),
@@ -308,16 +307,32 @@ ListenerStorage::RemoveListener(NT_Listener listenerHandle) {
 }
 
 bool ListenerStorage::WaitForListenerQueue(double timeout) {
-  std::scoped_lock lock{m_mutex};
   WPI_EventHandle h;
-  if (auto thr = m_thread.GetThread()) {
-    h = thr->m_waitQueueWaiter.GetHandle();
-    thr->m_waitQueueWakeup.Set();
-  } else {
-    return false;
+  {
+    std::scoped_lock lock{m_mutex};
+    if (auto thr = m_thread.GetThread()) {
+      h = thr->m_waitQueueWaiter.GetHandle();
+      thr->m_waitQueueWakeup.Set();
+    } else {
+      return false;
+    }
   }
   bool timedOut;
-  return wpi::WaitForObject(h, timeout, &timedOut);
+  wpi::WaitForObject(h, timeout, &timedOut);
+  return !timedOut;
+}
+
+void ListenerStorage::Reset() {
+  std::scoped_lock lock{m_mutex};
+  m_pollers.clear();
+  m_listeners.clear();
+  m_connListeners.clear();
+  m_topicListeners.clear();
+  m_valueListeners.clear();
+  m_logListeners.clear();
+  if (m_thread) {
+    m_thread.Stop();
+  }
 }
 
 std::vector<std::pair<NT_Listener, unsigned int>>

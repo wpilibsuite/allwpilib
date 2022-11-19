@@ -82,7 +82,8 @@ public class SendableBuilderImpl implements NTSendableBuilder {
     void update(boolean controllable, long time) {
       if (controllable && m_sub != null && m_updateLocal != null) {
         m_updateLocal.accept(m_sub);
-      } else if (m_pub != null && m_updateNetwork != null) {
+      }
+      if (m_pub != null && m_updateNetwork != null) {
         m_updateNetwork.accept(m_pub, time);
       }
     }

@@ -472,6 +472,18 @@ class Value final {
   }
 
   /**
+   * Creates a boolean array entry value.
+   *
+   * @param value the value
+   * @param time if nonzero, the creation time to use (instead of the current
+   *             time)
+   * @return The entry value
+   *
+   * @note This function moves the values out of the vector.
+   */
+  static Value MakeBooleanArray(std::vector<int>&& value, int64_t time = 0);
+
+  /**
    * Creates an integer array entry value.
    *
    * @param value the value
@@ -494,6 +506,18 @@ class Value final {
                                 int64_t time = 0) {
     return MakeIntegerArray(std::span(value.begin(), value.end()), time);
   }
+
+  /**
+   * Creates an integer array entry value.
+   *
+   * @param value the value
+   * @param time if nonzero, the creation time to use (instead of the current
+   *             time)
+   * @return The entry value
+   *
+   * @note This function moves the values out of the vector.
+   */
+  static Value MakeIntegerArray(std::vector<int64_t>&& value, int64_t time = 0);
 
   /**
    * Creates a float array entry value.
@@ -519,6 +543,18 @@ class Value final {
   }
 
   /**
+   * Creates a float array entry value.
+   *
+   * @param value the value
+   * @param time if nonzero, the creation time to use (instead of the current
+   *             time)
+   * @return The entry value
+   *
+   * @note This function moves the values out of the vector.
+   */
+  static Value MakeFloatArray(std::vector<float>&& value, int64_t time = 0);
+
+  /**
    * Creates a double array entry value.
    *
    * @param value the value
@@ -540,6 +576,18 @@ class Value final {
                                int64_t time = 0) {
     return MakeDoubleArray(std::span(value.begin(), value.end()), time);
   }
+
+  /**
+   * Creates a double array entry value.
+   *
+   * @param value the value
+   * @param time if nonzero, the creation time to use (instead of the current
+   *             time)
+   * @return The entry value
+   *
+   * @note This function moves the values out of the vector.
+   */
+  static Value MakeDoubleArray(std::vector<double>&& value, int64_t time = 0);
 
   /**
    * Creates a string array entry value.

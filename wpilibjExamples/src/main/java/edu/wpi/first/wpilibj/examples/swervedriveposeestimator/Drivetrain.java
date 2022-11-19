@@ -48,13 +48,13 @@ public class Drivetrain {
           Nat.N7(),
           Nat.N5(),
           m_gyro.getRotation2d(),
-          new Pose2d(),
           new SwerveModulePosition[] {
             m_frontLeft.getPosition(),
             m_frontRight.getPosition(),
             m_backLeft.getPosition(),
             m_backRight.getPosition()
           },
+          new Pose2d(),
           m_kinematics,
           VecBuilder.fill(0.05, 0.05, Units.degreesToRadians(5), 0.05, 0.05, 0.05, 0.05),
           VecBuilder.fill(Units.degreesToRadians(0.01), 0.01, 0.01, 0.01, 0.01),

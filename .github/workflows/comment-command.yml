@@ -6,7 +6,7 @@ on:
 jobs:
   wpiformat:
     if: github.event.issue.pull_request && startsWith(github.event.comment.body, '/wpiformat')
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
       - name: React Rocket
         uses: actions/github-script@v4
@@ -37,16 +37,23 @@ jobs:
         uses: actions/setup-python@v2
         with:
           python-version: 3.8
+      - name: Setup Java
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'zulu'
+          java-version: 11
       - name: Install clang-format
         run: |
           wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key | sudo apt-key add -
-          sudo sh -c "echo 'deb http://apt.llvm.org/focal/ llvm-toolchain-focal-14 main' >> /etc/apt/sources.list.d/proposed-repositories.list"
+          sudo sh -c "echo 'deb http://apt.llvm.org/jammy/ llvm-toolchain-jammy-14 main' >> /etc/apt/sources.list.d/proposed-repositories.list"
           sudo apt-get update -q
           sudo apt-get install -y clang-format-14
       - name: Install wpiformat
         run: pip3 install wpiformat
       - name: Run wpiformat
         run: wpiformat -clang 14
+      - name: Run spotlessApply
+        run: ./gradlew spotlessApply
       - name: Commit
         run: |
           # Set credentials

@@ -12,6 +12,7 @@
 
 #include <wpi/MemAlloc.h>
 
+#include "networktables/NetworkTableValue.h"
 #include "ntcore_c.h"
 
 namespace nt {
@@ -55,5 +56,36 @@ O* ConvertToC(const std::basic_string<I>& in, size_t* out_len) {
   *out_len = in.size();
   return out;
 }
+
+template <typename T>
+T GetNumericAs(const Value& value) {
+  if (value.IsInteger()) {
+    return static_cast<T>(value.GetInteger());
+  } else if (value.IsFloat()) {
+    return static_cast<T>(value.GetFloat());
+  } else if (value.IsDouble()) {
+    return static_cast<T>(value.GetDouble());
+  } else {
+    return {};
+  }
+}
+
+template <typename T>
+std::vector<T> GetNumericArrayAs(const Value& value) {
+  if (value.IsIntegerArray()) {
+    auto arr = value.GetIntegerArray();
+    return {arr.begin(), arr.end()};
+  } else if (value.IsFloatArray()) {
+    auto arr = value.GetFloatArray();
+    return {arr.begin(), arr.end()};
+  } else if (value.IsDoubleArray()) {
+    auto arr = value.GetDoubleArray();
+    return {arr.begin(), arr.end()};
+  } else {
+    return {};
+  }
+}
+
+Value ConvertNumericValue(const Value& value, NT_Type type);
 
 }  // namespace nt

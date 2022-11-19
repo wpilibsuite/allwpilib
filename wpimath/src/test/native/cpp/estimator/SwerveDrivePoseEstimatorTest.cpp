@@ -23,8 +23,8 @@ TEST(SwerveDrivePoseEstimatorTest, AccuracyFacingTrajectory) {
 
   frc::SwerveDrivePoseEstimator<4> estimator{
       frc::Rotation2d{},
-      frc::Pose2d{},
       {fl, fr, bl, br},
+      frc::Pose2d{},
       kinematics,
       {0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1},
       {0.05, 0.05, 0.05, 0.05, 0.05},
@@ -115,8 +115,8 @@ TEST(SwerveDrivePoseEstimatorTest, AccuracyFacingXAxis) {
 
   frc::SwerveDrivePoseEstimator<4> estimator{
       frc::Rotation2d{},
-      frc::Pose2d{},
       {fl, fr, bl, br},
+      frc::Pose2d{},
       kinematics,
       {0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1},
       {0.05, 0.05, 0.05, 0.05, 0.05},

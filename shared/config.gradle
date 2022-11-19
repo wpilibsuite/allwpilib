@@ -15,9 +15,9 @@ nativeUtils {
         configureDependencies {
             wpiVersion = "-1"
             niLibVersion = "2023.1.0"
-            opencvVersion = "4.6.0-2"
-            googleTestVersion = "1.11.0-3"
-            imguiVersion = "1.88-8"
+            opencvVersion = "4.6.0-3"
+            googleTestVersion = "1.11.0-4"
+            imguiVersion = "1.88-9"
             wpimathVersion = "-1"
         }
     }
@@ -34,14 +34,6 @@ nativeUtils.setSinglePrintPerPlatform()
 nativeUtils.enableSourceLink()
 
 nativeUtils.platformConfigs.each {
-    if (it.name.contains('windows')) {
-        it.cppCompiler.args.remove("/std:c++17")
-        it.cppCompiler.args.add("/std:c++20")
-        return
-    } else if (it.name == 'linuxx86-64' || it.name == 'osxx86-64' || it.name == 'osxarm64') {
-        it.cppCompiler.args.remove("-std=c++17")
-        it.cppCompiler.args.add("-std=c++20")
-    }
     if (it.name.contains('osx')) {
         it.linker.args << '-Wl,-rpath,\'@loader_path\''
         it.linker.args << "-headerpad_max_install_names"

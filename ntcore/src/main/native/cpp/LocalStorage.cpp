@@ -20,6 +20,7 @@
 #include "Log.h"
 #include "PubSubOptions.h"
 #include "Types_internal.h"
+#include "Value_internal.h"
 #include "networktables/NetworkTableValue.h"
 #include "ntcore_c.h"
 
@@ -259,8 +260,9 @@ struct LSImpl {
 
   void CheckReset(TopicData* topic);
 
-  bool SetValue(TopicData* topic, const Value& value, unsigned int eventFlags);
-  void NotifyValue(TopicData* topic, unsigned int eventFlags);
+  bool SetValue(TopicData* topic, const Value& value, unsigned int eventFlags,
+                bool isDuplicate);
+  void NotifyValue(TopicData* topic, unsigned int eventFlags, bool isDuplicate);
 
   void SetFlags(TopicData* topic, unsigned int flags);
   void SetPersistent(TopicData* topic, bool value);
@@ -271,7 +273,7 @@ struct LSImpl {
                          unsigned int eventFlags, bool sendNetwork,
                          bool updateFlags = true);
 
-  void RefreshPubSubActive(TopicData* topic);
+  void RefreshPubSubActive(TopicData* topic, bool warnOnSubMismatch);
 
   void NetworkAnnounce(TopicData* topic, std::string_view typeStr,
                        const wpi::json& properties, NT_Publisher pubHandle);
@@ -322,7 +324,8 @@ struct LSImpl {
   PublisherData* PublishEntry(EntryData* entry, NT_Type type);
   Value* GetSubEntryValue(NT_Handle subentryHandle);
 
-  bool PublishLocalValue(PublisherData* publisher, const Value& value);
+  bool PublishLocalValue(PublisherData* publisher, const Value& value,
+                         bool force = false);
 
   bool SetEntryValue(NT_Handle pubentryHandle, const Value& value);
   bool SetDefaultEntryValue(NT_Handle pubsubentryHandle, const Value& value);
@@ -394,17 +397,9 @@ void PublisherData::UpdateActive() {
 void SubscriberData::UpdateActive() {
   // for subscribers, unassigned is a wildcard
   // also allow numerically compatible subscribers
-  active =
-      config.type == NT_UNASSIGNED ||
-      (config.type == topic->type && config.typeStr == topic->typeStr) ||
-      ((config.type & (NT_INTEGER | NT_FLOAT | NT_DOUBLE)) != 0 &&
-       (config.type & (NT_INTEGER | NT_FLOAT | NT_DOUBLE)) ==
-           (topic->type & (NT_INTEGER | NT_FLOAT | NT_DOUBLE))) ||
-      ((config.type & (NT_INTEGER_ARRAY | NT_FLOAT_ARRAY | NT_DOUBLE_ARRAY)) !=
-           0 &&
-       (config.type & (NT_INTEGER_ARRAY | NT_FLOAT_ARRAY | NT_DOUBLE_ARRAY)) ==
-           (topic->type &
-            (NT_INTEGER_ARRAY | NT_FLOAT_ARRAY | NT_DOUBLE_ARRAY)));
+  active = config.type == NT_UNASSIGNED ||
+           (config.type == topic->type && config.typeStr == topic->typeStr) ||
+           IsNumericCompatible(config.type, topic->type);
 }
 
 void LSImpl::NotifyTopic(TopicData* topic, unsigned int eventFlags) {
@@ -475,7 +470,7 @@ void LSImpl::CheckReset(TopicData* topic) {
 }
 
 bool LSImpl::SetValue(TopicData* topic, const Value& value,
-                      unsigned int eventFlags) {
+                      unsigned int eventFlags, bool isDuplicate) {
   if (topic->type != NT_UNASSIGNED && topic->type != value.type()) {
     return false;
   }
@@ -486,9 +481,9 @@ bool LSImpl::SetValue(TopicData* topic, const Value& value,
     topic->type = value.type();
     topic->lastValue = value;
     topic->lastValueNetwork = isNetwork;
-    NotifyValue(topic, eventFlags);
+    NotifyValue(topic, eventFlags, isDuplicate);
   }
-  if (topic->datalogType == value.type()) {
+  if (!isDuplicate && topic->datalogType == value.type()) {
     for (auto&& datalog : topic->datalogs) {
       datalog.Append(value);
     }
@@ -496,9 +491,11 @@ bool LSImpl::SetValue(TopicData* topic, const Value& value,
   return true;
 }
 
-void LSImpl::NotifyValue(TopicData* topic, unsigned int eventFlags) {
+void LSImpl::NotifyValue(TopicData* topic, unsigned int eventFlags,
+                         bool isDuplicate) {
   for (auto&& subscriber : topic->localSubscribers) {
-    if (subscriber->active) {
+    if (subscriber->active &&
+        (subscriber->config.keepDuplicates || !isDuplicate)) {
       subscriber->pollStorage.emplace_back(topic->lastValue);
       subscriber->handle.Set();
       if (!subscriber->valueListeners.empty()) {
@@ -509,10 +506,12 @@ void LSImpl::NotifyValue(TopicData* topic, unsigned int eventFlags) {
   }
 
   for (auto&& subscriber : topic->multiSubscribers) {
-    subscriber->handle.Set();
-    if (!subscriber->valueListeners.empty()) {
-      m_listenerStorage.Notify(subscriber->valueListeners, eventFlags,
-                               topic->handle, 0, topic->lastValue);
+    if (subscriber->options.keepDuplicates || !isDuplicate) {
+      subscriber->handle.Set();
+      if (!subscriber->valueListeners.empty()) {
+        m_listenerStorage.Notify(subscriber->valueListeners, eventFlags,
+                                 topic->handle, 0, topic->lastValue);
+      }
     }
   }
 }
@@ -620,12 +619,19 @@ void LSImpl::PropertiesUpdated(TopicData* topic, const wpi::json& update,
   }
 }
 
-void LSImpl::RefreshPubSubActive(TopicData* topic) {
+void LSImpl::RefreshPubSubActive(TopicData* topic, bool warnOnSubMismatch) {
   for (auto&& publisher : topic->localPublishers) {
     publisher->UpdateActive();
   }
   for (auto&& subscriber : topic->localSubscribers) {
     subscriber->UpdateActive();
+    if (warnOnSubMismatch && topic->Exists() && !subscriber->active) {
+      // warn on type mismatch
+      INFO(
+          "local subscribe to '{}' disabled due to type mismatch (wanted '{}', "
+          "published as '{}')",
+          topic->name, subscriber->config.typeStr, topic->typeStr);
+    }
   }
 }
 
@@ -653,7 +659,7 @@ void LSImpl::NetworkAnnounce(TopicData* topic, std::string_view typeStr,
     }
     topic->type = type;
     topic->typeStr = typeStr;
-    RefreshPubSubActive(topic);
+    RefreshPubSubActive(topic, true);
   }
   if (!didExist) {
     event |= NT_EVENT_PUBLISH;
@@ -702,7 +708,7 @@ void LSImpl::RemoveNetworkPublisher(TopicData* topic) {
         nextPub->config.typeStr != topic->typeStr) {
       topic->type = nextPub->config.type;
       topic->typeStr = nextPub->config.typeStr;
-      RefreshPubSubActive(topic);
+      RefreshPubSubActive(topic, false);
       // this may result in a duplicate publish warning on the server side,
       // but send one anyway in this case just to be sure
       if (nextPub->active && m_network) {
@@ -730,19 +736,20 @@ PublisherData* LSImpl::AddLocalPublisher(TopicData* topic,
   topic->localPublishers.Add(publisher);
 
   if (!didExist) {
+    DEBUG4("AddLocalPublisher: setting {} type {} typestr {}", topic->name,
+           static_cast<int>(config.type), config.typeStr);
     // set the type to the published type
     topic->type = config.type;
     topic->typeStr = config.typeStr;
-    RefreshPubSubActive(topic);
+    RefreshPubSubActive(topic, true);
 
     if (properties.is_null()) {
       topic->properties = wpi::json::object();
     } else if (properties.is_object()) {
       topic->properties = properties;
     } else {
-      WPI_WARNING(m_logger,
-                  "ignoring non-object properties when publishing '{}'",
-                  topic->name);
+      WARNING("ignoring non-object properties when publishing '{}'",
+              topic->name);
       topic->properties = wpi::json::object();
     }
 
@@ -794,7 +801,7 @@ std::unique_ptr<PublisherData> LSImpl::RemoveLocalPublisher(
           nextPub->config.typeStr != topic->typeStr) {
         topic->type = nextPub->config.type;
         topic->typeStr = nextPub->config.typeStr;
-        RefreshPubSubActive(topic);
+        RefreshPubSubActive(topic, false);
         if (nextPub->active && m_network) {
           m_network->Publish(nextPub->handle, topic->handle, topic->name,
                              topic->typeStr, topic->properties,
@@ -817,7 +824,7 @@ SubscriberData* LSImpl::AddLocalSubscriber(TopicData* topic,
     // warn on type mismatch
     INFO(
         "local subscribe to '{}' disabled due to type mismatch (wanted '{}', "
-        "currently '{}')",
+        "published as '{}')",
         topic->name, config.typeStr, topic->typeStr);
   }
   if (m_network) {
@@ -1176,8 +1183,12 @@ PublisherData* LSImpl::PublishEntry(EntryData* entry, NT_Type type) {
     entry->subscriber->config.typeStr = typeStr;
   } else if (entry->subscriber->config.type != type ||
              entry->subscriber->config.typeStr != typeStr) {
-    // don't allow dynamically changing the type of an entry
-    return nullptr;
+    if (!IsNumericCompatible(type, entry->subscriber->config.type)) {
+      // don't allow dynamically changing the type of an entry
+      ERROR("cannot publish entry {} as type {}, previously subscribed as {}",
+            entry->topic->name, typeStr, entry->subscriber->config.typeStr);
+      return nullptr;
+    }
   }
   // create publisher
   entry->publisher = AddLocalPublisher(entry->topic, wpi::json::object(),
@@ -1193,19 +1204,30 @@ Value* LSImpl::GetSubEntryValue(NT_Handle subentryHandle) {
   }
 }
 
-bool LSImpl::PublishLocalValue(PublisherData* publisher, const Value& value) {
+bool LSImpl::PublishLocalValue(PublisherData* publisher, const Value& value,
+                               bool force) {
   if (!value) {
     return false;
   }
   if (publisher->topic->type != NT_UNASSIGNED &&
       publisher->topic->type != value.type()) {
+    if (IsNumericCompatible(publisher->topic->type, value.type())) {
+      return PublishLocalValue(
+          publisher, ConvertNumericValue(value, publisher->topic->type));
+    }
     return false;
   }
   if (publisher->active) {
-    if (m_network) {
+    bool isDuplicate;
+    if (force || publisher->config.keepDuplicates) {
+      isDuplicate = false;
+    } else {
+      isDuplicate = (publisher->topic->lastValue == value);
+    }
+    if (!isDuplicate && m_network) {
       m_network->SetValue(publisher->handle, value);
     }
-    return SetValue(publisher->topic, value, NT_EVENT_VALUE_LOCAL);
+    return SetValue(publisher->topic, value, NT_EVENT_VALUE_LOCAL, isDuplicate);
   } else {
     return false;
   }
@@ -1229,28 +1251,38 @@ bool LSImpl::SetEntryValue(NT_Handle pubentryHandle, const Value& value) {
 
 bool LSImpl::SetDefaultEntryValue(NT_Handle pubsubentryHandle,
                                   const Value& value) {
+  DEBUG4("SetDefaultEntryValue({}, {})", pubsubentryHandle,
+         static_cast<int>(value.type()));
   if (!value) {
     return false;
   }
   if (auto topic = GetTopic(pubsubentryHandle)) {
-    if (topic->type == NT_UNASSIGNED || topic->type == value.type()) {
-      // set without notifying
-      topic->type = value.type();
-      topic->lastValue = value;
-      topic->lastValue.SetTime(0);
-      topic->lastValue.SetServerTime(0);
-
+    if (!topic->lastValue &&
+        (topic->type == NT_UNASSIGNED || topic->type == value.type() ||
+         IsNumericCompatible(topic->type, value.type()))) {
+      // publish if we haven't yet
       auto publisher = m_publishers.Get(pubsubentryHandle);
       if (!publisher) {
         if (auto entry = m_entries.Get(pubsubentryHandle)) {
           publisher = PublishEntry(entry, value.type());
         }
-        if (!publisher) {
-          return true;
-        }
       }
-      if (publisher->active && m_network) {
-        m_network->SetValue(publisher->handle, value);
+
+      // force value timestamps to 0
+      if (topic->type == NT_UNASSIGNED) {
+        topic->type = value.type();
+      }
+      if (topic->type == value.type()) {
+        topic->lastValue = value;
+      } else if (IsNumericCompatible(topic->type, value.type())) {
+        topic->lastValue = ConvertNumericValue(value, topic->type);
+      } else {
+        return true;
+      }
+      topic->lastValue.SetTime(0);
+      topic->lastValue.SetServerTime(0);
+      if (publisher) {
+        PublishLocalValue(publisher, topic->lastValue, true);
       }
       return true;
     }
@@ -1314,7 +1346,8 @@ void LocalStorage::NetworkPropertiesUpdate(std::string_view name,
 void LocalStorage::NetworkSetValue(NT_Topic topicHandle, const Value& value) {
   std::scoped_lock lock{m_mutex};
   if (auto topic = m_impl->m_topics.Get(topicHandle)) {
-    m_impl->SetValue(topic, value, NT_EVENT_VALUE_REMOTE);
+    m_impl->SetValue(topic, value, NT_EVENT_VALUE_REMOTE,
+                     value == topic->lastValue);
   }
 }
 
@@ -2047,10 +2080,17 @@ READ_QUEUE_NUMBER(Double)
 Value LocalStorage::GetEntryValue(NT_Handle subentryHandle) {
   std::scoped_lock lock{m_mutex};
   if (auto subscriber = m_impl->GetSubEntry(subentryHandle)) {
-    return subscriber->topic->lastValue;
-  } else {
-    return {};
+    if (subscriber->config.type == NT_UNASSIGNED ||
+        !subscriber->topic->lastValue ||
+        subscriber->config.type == subscriber->topic->lastValue.type()) {
+      return subscriber->topic->lastValue;
+    } else if (IsNumericCompatible(subscriber->config.type,
+                                   subscriber->topic->lastValue.type())) {
+      return ConvertNumericValue(subscriber->topic->lastValue,
+                                 subscriber->config.type);
+    }
   }
+  return {};
 }
 
 void LocalStorage::SetEntryFlags(NT_Entry entryHandle, unsigned int flags) {
@@ -2188,4 +2228,10 @@ void LocalStorage::StopDataLog(NT_DataLogger logger) {
       }
     }
   }
+}
+
+void LocalStorage::Reset() {
+  std::scoped_lock lock{m_mutex};
+  m_impl = std::make_unique<Impl>(m_impl->m_inst, m_impl->m_listenerStorage,
+                                  m_impl->m_logger);
 }

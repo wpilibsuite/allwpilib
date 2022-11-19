@@ -8,7 +8,7 @@ This article contains instructions on building projects using a development buil
 
 Development builds are the per-commit build hosted every time a commit is pushed to the [allwpilib](https://github.com/wpilibsuite/allwpilib/) repository. These builds are then hosted on [artifactory](https://frcmaven.wpi.edu/artifactory/webapp/#/home).
 
-In order to build a project using a development build, find the build.gradle file and open it. Then, add the following code below the plugin section and replace YEAR with the year of the development version. It is also necessary to use a 2023 GradleRIO version, ie `2023.0.0-alpha-1`
+To build a project using a development build, find the build.gradle file and open it. Then, add the following code below the plugin section and replace YEAR with the year of the development version. It is also necessary to use a 2023 GradleRIO version, ie `2023.0.0-alpha-1`
 
 ```groovy
 wpi.maven.useLocal = false
@@ -45,6 +45,11 @@ wpi.maven.useDevelopment = true
 wpi.versions.wpilibVersion = '2023.+'
 wpi.versions.wpimathVersion = '2023.+'
 ```
+
+### Development Build Documentation
+
+* C++: https://github.wpilib.org/allwpilib/docs/development/cpp/
+* Java: https://github.wpilib.org/allwpilib/docs/development/java/
 
 ## Local Build
 

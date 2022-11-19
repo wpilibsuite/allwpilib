@@ -56,8 +56,8 @@ class WPILIB_DLLEXPORT MecanumDrivePoseEstimator {
    * Constructs a MecanumDrivePoseEstimator.
    *
    * @param gyroAngle                The current gyro angle.
-   * @param initialPose              The starting pose estimate.
    * @param wheelPositions           The distance measured by each wheel.
+   * @param initialPose              The starting pose estimate.
    * @param kinematics               A correctly-configured kinematics object
    *                                 for your drivetrain.
    * @param stateStdDevs             Standard deviations of model states.
@@ -82,9 +82,9 @@ class WPILIB_DLLEXPORT MecanumDrivePoseEstimator {
    *                                 loop.
    */
   MecanumDrivePoseEstimator(
-      const Rotation2d& gyroAngle, const Pose2d& initialPose,
+      const Rotation2d& gyroAngle,
       const MecanumDriveWheelPositions& wheelPositions,
-      MecanumDriveKinematics kinematics,
+      const Pose2d& initialPose, MecanumDriveKinematics kinematics,
       const wpi::array<double, 7>& stateStdDevs,
       const wpi::array<double, 5>& localMeasurementStdDevs,
       const wpi::array<double, 3>& visionMeasurementStdDevs,
@@ -108,17 +108,19 @@ class WPILIB_DLLEXPORT MecanumDrivePoseEstimator {
   /**
    * Resets the robot's position on the field.
    *
-   * <p>You NEED to reset your encoders (to zero) when calling this method.
+   * IF wheelPositions are unspecified,
+   * You NEED to reset your encoders (to zero).
    *
-   * <p>The gyroscope angle does not need to be reset in the user's robot code.
+   * The gyroscope angle does not need to be reset in the user's robot code.
    * The library automatically takes care of offsetting the gyro angle.
    *
-   * @param pose      The position on the field that your robot is at.
    * @param gyroAngle The angle reported by the gyroscope.
    * @param wheelPositions The distances measured at each wheel.
+   * @param pose      The position on the field that your robot is at.
    */
-  void ResetPosition(const Pose2d& pose, const Rotation2d& gyroAngle,
-                     const MecanumDriveWheelPositions& wheelPositions);
+  void ResetPosition(const Rotation2d& gyroAngle,
+                     const MecanumDriveWheelPositions& wheelPositions,
+                     const Pose2d& pose);
 
   /**
    * Gets the pose of the robot at the current time as estimated by the Extended

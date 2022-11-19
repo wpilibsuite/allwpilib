@@ -12,7 +12,8 @@
 using namespace frc;
 
 DifferentialDrivePoseEstimator::DifferentialDrivePoseEstimator(
-    const Rotation2d& gyroAngle, const Pose2d& initialPose,
+    const Rotation2d& gyroAngle, units::meter_t leftDistance,
+    units::meter_t rightDistance, const Pose2d& initialPose,
     const wpi::array<double, 5>& stateStdDevs,
     const wpi::array<double, 3>& localMeasurementStdDevs,
     const wpi::array<double, 3>& visionMeasurmentStdDevs,
@@ -41,7 +42,7 @@ DifferentialDrivePoseEstimator::DifferentialDrivePoseEstimator(
 
   m_gyroOffset = initialPose.Rotation() - gyroAngle;
   m_previousAngle = initialPose.Rotation();
-  m_observer.SetXhat(FillStateVector(initialPose, 0_m, 0_m));
+  m_observer.SetXhat(FillStateVector(initialPose, leftDistance, rightDistance));
 }
 
 void DifferentialDrivePoseEstimator::SetVisionMeasurementStdDevs(
@@ -50,13 +51,15 @@ void DifferentialDrivePoseEstimator::SetVisionMeasurementStdDevs(
   m_visionContR = frc::MakeCovMatrix(visionMeasurmentStdDevs);
 }
 
-void DifferentialDrivePoseEstimator::ResetPosition(
-    const Pose2d& pose, const Rotation2d& gyroAngle) {
+void DifferentialDrivePoseEstimator::ResetPosition(const Rotation2d& gyroAngle,
+                                                   units::meter_t leftDistance,
+                                                   units::meter_t rightDistance,
+                                                   const Pose2d& pose) {
   // Reset state estimate and error covariance
   m_observer.Reset();
   m_poseBuffer.Clear();
 
-  m_observer.SetXhat(FillStateVector(pose, 0_m, 0_m));
+  m_observer.SetXhat(FillStateVector(pose, leftDistance, rightDistance));
 
   m_prevTime = -1_s;
 

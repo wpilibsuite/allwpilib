@@ -145,11 +145,11 @@ public class Pose2d implements Interpolatable<Pose2d> {
   public Pose2d transformBy(Transform2d other) {
     return new Pose2d(
         m_translation.plus(other.getTranslation().rotateBy(m_rotation)),
-        m_rotation.plus(other.getRotation()));
+        other.getRotation().plus(m_rotation));
   }
 
   /**
-   * Returns the other pose relative to the current pose.
+   * Returns the current pose relative to the given pose.
    *
    * <p>This function can often be used for trajectory tracking or pose stabilization algorithms to
    * get the error between the reference and the current pose.

@@ -209,6 +209,8 @@ class LocalStorage final : public net::ILocalStorage {
                              std::string_view logPrefix);
   void StopDataLog(NT_DataLogger logger);
 
+  void Reset();
+
  private:
   class Impl;
   std::unique_ptr<Impl> m_impl;

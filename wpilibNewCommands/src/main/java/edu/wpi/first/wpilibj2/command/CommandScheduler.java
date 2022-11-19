@@ -405,10 +405,6 @@ public final class CommandScheduler implements NTSendable, AutoCloseable {
       throw new IllegalArgumentException("Default commands must require their subsystem!");
     }
 
-    if (defaultCommand.isFinished()) {
-      throw new IllegalArgumentException("Default commands should not end!");
-    }
-
     if (defaultCommand.getInterruptionBehavior() == InterruptionBehavior.kCancelIncoming) {
       DriverStation.reportWarning(
           "Registering a non-interruptible default command!\n"

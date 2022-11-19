@@ -65,7 +65,7 @@ public class SwerveDriveOdometry {
   public SwerveDriveOdometry(
       SwerveDriveKinematics kinematics,
       Rotation2d gyroAngle,
-      SwerveModulePosition... modulePositions) {
+      SwerveModulePosition[] modulePositions) {
     this(kinematics, gyroAngle, modulePositions, new Pose2d());
   }
 
@@ -75,12 +75,14 @@ public class SwerveDriveOdometry {
    * <p>The gyroscope angle does not need to be reset here on the user's robot code. The library
    * automatically takes care of offsetting the gyro angle.
    *
-   * @param pose The position on the field that your robot is at.
+   * <p>Similarly, module positions do not need to be reset in user code.
+   *
    * @param gyroAngle The angle reported by the gyroscope.
-   * @param modulePositions The wheel positions reported by each module.
+   * @param modulePositions The wheel positions reported by each module.,
+   * @param pose The position on the field that your robot is at.
    */
   public void resetPosition(
-      Pose2d pose, Rotation2d gyroAngle, SwerveModulePosition... modulePositions) {
+      Rotation2d gyroAngle, SwerveModulePosition[] modulePositions, Pose2d pose) {
     if (modulePositions.length != m_numModules) {
       throw new IllegalArgumentException(
           "Number of modules is not consistent with number of wheel locations provided in "
@@ -118,7 +120,7 @@ public class SwerveDriveOdometry {
    *     in the same order in which you instantiated your SwerveDriveKinematics.
    * @return The new pose of the robot.
    */
-  public Pose2d update(Rotation2d gyroAngle, SwerveModulePosition... modulePositions) {
+  public Pose2d update(Rotation2d gyroAngle, SwerveModulePosition[] modulePositions) {
     if (modulePositions.length != m_numModules) {
       throw new IllegalArgumentException(
           "Number of modules is not consistent with number of wheel locations provided in "
