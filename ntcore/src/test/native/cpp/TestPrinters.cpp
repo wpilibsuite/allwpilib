@@ -121,37 +121,37 @@ void PrintTo(const Value& value, std::ostream* os) {
     case NT_UNASSIGNED:
       break;
     case NT_BOOLEAN:
-      *os << (value.GetBoolean() ? "true" : "false");
+      *os << "boolean, " << (value.GetBoolean() ? "true" : "false");
       break;
     case NT_DOUBLE:
-      *os << value.GetDouble();
+      *os << "double, " << value.GetDouble();
       break;
     case NT_FLOAT:
-      *os << value.GetFloat();
+      *os << "float, " << value.GetFloat();
       break;
     case NT_INTEGER:
-      *os << value.GetInteger();
+      *os << "int, " << value.GetInteger();
       break;
     case NT_STRING:
-      *os << '"' << value.GetString() << '"';
+      *os << "string, \"" << value.GetString() << '"';
       break;
     case NT_RAW:
-      *os << ::testing::PrintToString(value.GetRaw());
+      *os << "raw, " << ::testing::PrintToString(value.GetRaw());
       break;
     case NT_BOOLEAN_ARRAY:
-      *os << ::testing::PrintToString(value.GetBooleanArray());
+      *os << "boolean[], " << ::testing::PrintToString(value.GetBooleanArray());
       break;
     case NT_DOUBLE_ARRAY:
-      *os << ::testing::PrintToString(value.GetDoubleArray());
+      *os << "double[], " << ::testing::PrintToString(value.GetDoubleArray());
       break;
     case NT_FLOAT_ARRAY:
-      *os << ::testing::PrintToString(value.GetFloatArray());
+      *os << "float[], " << ::testing::PrintToString(value.GetFloatArray());
       break;
     case NT_INTEGER_ARRAY:
-      *os << ::testing::PrintToString(value.GetIntegerArray());
+      *os << "int[], " << ::testing::PrintToString(value.GetIntegerArray());
       break;
     case NT_STRING_ARRAY:
-      *os << ::testing::PrintToString(value.GetStringArray());
+      *os << "string[], " << ::testing::PrintToString(value.GetStringArray());
       break;
     default:
       *os << "UNKNOWN TYPE " << value.type();
