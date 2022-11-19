@@ -178,6 +178,14 @@ class SwerveDriveOdometryTest {
       t += dt;
     }
 
+    assertEquals(0.0, odometry.getPoseMeters().getX(), 1e-1, "Incorrect Final X");
+    assertEquals(0.0, odometry.getPoseMeters().getY(), 1e-1, "Incorrect Final Y");
+    assertEquals(
+        Math.PI / 4,
+        odometry.getPoseMeters().getRotation().getRadians(),
+        10 * Math.PI / 180,
+        "Incorrect Final Theta");
+
     assertEquals(
         0.0, errorSum / (trajectory.getTotalTimeSeconds() / dt), 0.05, "Incorrect mean error");
     assertEquals(0.0, maxError, 0.125, "Incorrect max error");
@@ -252,6 +260,14 @@ class SwerveDriveOdometryTest {
 
       t += dt;
     }
+
+    assertEquals(0.0, odometry.getPoseMeters().getX(), 1e-1, "Incorrect Final X");
+    assertEquals(0.0, odometry.getPoseMeters().getY(), 1e-1, "Incorrect Final Y");
+    assertEquals(
+        0.0,
+        odometry.getPoseMeters().getRotation().getRadians(),
+        10 * Math.PI / 180,
+        "Incorrect Final Theta");
 
     assertEquals(
         0.0, errorSum / (trajectory.getTotalTimeSeconds() / dt), 0.06, "Incorrect mean error");
