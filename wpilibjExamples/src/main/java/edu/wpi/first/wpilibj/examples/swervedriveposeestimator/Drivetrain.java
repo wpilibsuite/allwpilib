@@ -40,6 +40,7 @@ public class Drivetrain {
   below are robot specific, and should be tuned. */
   private final SwerveDrivePoseEstimator m_poseEstimator =
       new SwerveDrivePoseEstimator(
+          m_kinematics,
           m_gyro.getRotation2d(),
           new SwerveModulePosition[] {
             m_frontLeft.getPosition(),
@@ -48,7 +49,6 @@ public class Drivetrain {
             m_backRight.getPosition()
           },
           new Pose2d(),
-          m_kinematics,
           VecBuilder.fill(0.05, 0.05, Units.degreesToRadians(5)),
           VecBuilder.fill(0.5, 0.5, Units.degreesToRadians(30)));
 
