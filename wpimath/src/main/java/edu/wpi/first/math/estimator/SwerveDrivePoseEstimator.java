@@ -16,7 +16,6 @@ import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
-import edu.wpi.first.math.system.LinearSystem;
 import edu.wpi.first.util.WPIUtilJNI;
 
 /**
@@ -24,10 +23,7 @@ import edu.wpi.first.util.WPIUtilJNI;
  * vision measurements with swerve drive encoder distance measurements. It is intended to be a
  * drop-in replacement for {@link edu.wpi.first.math.kinematics.SwerveDriveOdometry}.
  *
- * <p>{@link SwerveDrivePoseEstimator#update} should be called every robot loop. If your loops are
- * faster or slower than the default of 20 ms, then you should change the nominal delta time using
- * the secondary constructor: {@link SwerveDrivePoseEstimator#SwerveDrivePoseEstimator(Rotation2d,
- * SwerveModulePosition[], Pose2d, SwerveDriveKinematics, Matrix, Matrix, double)}.
+ * <p>{@link SwerveDrivePoseEstimator#update} should be called every robot loop.
  *
  * <p>{@link SwerveDrivePoseEstimator#addVisionMeasurement} can be called as infrequently as you
  * want; if you never call it, then this class will behave as regular encoder odometry.
@@ -42,26 +38,22 @@ import edu.wpi.first.util.WPIUtilJNI;
  */
 public class SwerveDrivePoseEstimator {
   private final SwerveDriveOdometry m_odometry;
-  private final TimeInterpolatableBuffer<Pose2d> m_poseBuffer;
-
+  private Rotation2d m_previousGyroAngle;
+  private final Matrix<N3, N1> m_q;
   private SwerveModulePosition[] m_prevModulePositions;
   private final int m_numModules;
-
-  private final double m_nominalDt; // Seconds
-
-  private Rotation2d m_previousGyroAngle;
-
-  private final Matrix<N3, N1> m_stateStdDevs;
-
   private Matrix<N3, N3> m_visionK;
 
+  private final TimeInterpolatableBuffer<Pose2d> m_poseBuffer =
+      TimeInterpolatableBuffer.createBuffer(1.5);
+
   /**
    * Constructs a SwerveDrivePoseEstimator.
    *
+   * @param kinematics A correctly-configured kinematics object for your drivetrain.
    * @param gyroAngle The current gyro angle.
    * @param modulePositions The current distance measurements and rotations of the swerve modules.
    * @param initialPoseMeters The starting pose estimate.
-   * @param kinematics A correctly-configured kinematics object for your drivetrain.
    * @param stateStdDevs Standard deviations of model states. Increase these numbers to trust your
    *     model's state estimates less. This matrix is in the form [x, y, theta]ᵀ, with units in
    *     meters and radians.
@@ -70,62 +62,27 @@ public class SwerveDrivePoseEstimator {
    *     theta]ᵀ, with units in meters and radians.
    */
   public SwerveDrivePoseEstimator(
+      SwerveDriveKinematics kinematics,
       Rotation2d gyroAngle,
       SwerveModulePosition[] modulePositions,
       Pose2d initialPoseMeters,
-      SwerveDriveKinematics kinematics,
       Matrix<N3, N1> stateStdDevs,
       Matrix<N3, N1> visionMeasurementStdDevs) {
-    this(
-        gyroAngle,
-        modulePositions,
-        initialPoseMeters,
-        kinematics,
-        stateStdDevs,
-        visionMeasurementStdDevs,
-        0.02);
-  }
-
-  /**
-   * Constructs a SwerveDrivePoseEstimator.
-   *
-   * @param gyroAngle The current gyro angle.
-   * @param modulePositions The current distance measurements and rotations of the swerve modules.
-   * @param initialPoseMeters The starting pose estimate.
-   * @param kinematics A correctly-configured kinematics object for your drivetrain.
-   * @param stateStdDevs Standard deviations of model states. Increase these numbers to trust your
-   *     model's state estimates less. This matrix is in the form [x, y, theta]ᵀ, with units in
-   *     meters and radians.
-   * @param visionMeasurementStdDevs Standard deviations of the vision measurements. Increase these
-   *     numbers to trust global measurements from vision less. This matrix is in the form [x, y,
-   *     theta]ᵀ, with units in meters and radians.
-   * @param nominalDtSeconds The time in seconds between each robot loop.
-   */
-  public SwerveDrivePoseEstimator(
-      Rotation2d gyroAngle,
-      SwerveModulePosition[] modulePositions,
-      Pose2d initialPoseMeters,
-      SwerveDriveKinematics kinematics,
-      Matrix<N3, N1> stateStdDevs,
-      Matrix<N3, N1> visionMeasurementStdDevs,
-      double nominalDtSeconds) {
-    m_nominalDt = nominalDtSeconds;
-    m_numModules = modulePositions.length;
-
+    m_odometry = new SwerveDriveOdometry(kinematics, gyroAngle, modulePositions, initialPoseMeters);
     m_previousGyroAngle = gyroAngle;
+
+    m_q = new Matrix<>(Nat.N3(), Nat.N1());
+    for (int i = 0; i < 3; ++i) {
+      m_q.set(i, 0, stateStdDevs.get(i, 0));
+    }
+
+    m_numModules = modulePositions.length;
     m_prevModulePositions = new SwerveModulePosition[m_numModules];
-    for (int i = 0; i < m_numModules; i++) {
+    for (int i = 0; i < m_numModules; ++i) {
       m_prevModulePositions[i] = new SwerveModulePosition(modulePositions[i].distanceMeters, null);
     }
 
-    m_poseBuffer = TimeInterpolatableBuffer.createBuffer(1.5);
-
-    m_stateStdDevs = stateStdDevs;
-
-    // Initialize vision K
     setVisionMeasurementStdDevs(visionMeasurementStdDevs);
-
-    m_odometry = new SwerveDriveOdometry(kinematics, gyroAngle, modulePositions, initialPoseMeters);
   }
 
   /**
@@ -138,20 +95,21 @@ public class SwerveDrivePoseEstimator {
    *     theta]ᵀ, with units in meters and radians.
    */
   public void setVisionMeasurementStdDevs(Matrix<N3, N1> visionMeasurementStdDevs) {
-    var visionObserver =
-        new KalmanFilter<>(
-            Nat.N3(),
-            Nat.N3(),
-            new LinearSystem<>(
-                Matrix.eye(Nat.N3()),
-                new Matrix<>(Nat.N3(), Nat.N3()),
-                Matrix.eye(Nat.N3()),
-                new Matrix<>(Nat.N3(), Nat.N3())),
-            m_stateStdDevs,
-            visionMeasurementStdDevs,
-            m_nominalDt);
+    var r = new double[3];
+    for (int i = 0; i < 3; ++i) {
+      r[i] = visionMeasurementStdDevs.get(i, 0) * visionMeasurementStdDevs.get(i, 0);
+    }
 
-    m_visionK = visionObserver.getK();
+    // Solve for closed form Kalman gain for continuous Kalman filter with A = 0
+    // and C = I. See wpimath/algorithms.md.
+    for (int row = 0; row < 3; ++row) {
+      if (m_q.get(row, 0) == 0.0) {
+        m_visionK.set(row, row, 0.0);
+      } else {
+        m_visionK.set(
+            row, row, m_q.get(row, 0) / (m_q.get(row, 0) + Math.sqrt(m_q.get(row, 0) * r[row])));
+      }
+    }
   }
 
   /**
@@ -177,7 +135,7 @@ public class SwerveDrivePoseEstimator {
   }
 
   /**
-   * Gets the pose of the robot at the current time as estimated by the Unscented Kalman Filter.
+   * Gets the estimated robot pose.
    *
    * @return The estimated robot pose in meters.
    */
@@ -186,8 +144,8 @@ public class SwerveDrivePoseEstimator {
   }
 
   /**
-   * Add a vision measurement to the Unscented Kalman Filter. This will correct the odometry pose
-   * estimate while still accounting for measurement noise.
+   * Adds a vision measurement to the Kalman Filter. This will correct the odometry pose estimate
+   * while still accounting for measurement noise.
    *
    * <p>This method can be called as infrequently as you want, as long as you are calling {@link
    * SwerveDrivePoseEstimator#update} every loop.
@@ -219,19 +177,19 @@ public class SwerveDrivePoseEstimator {
     var k_times_twist = m_visionK.times(VecBuilder.fill(twist.dx, twist.dy, twist.dtheta));
 
     // Step 4: Convert back to Twist2d
-    var scaled_twist =
+    var scaledTwist =
         new Twist2d(k_times_twist.get(0, 0), k_times_twist.get(1, 0), k_times_twist.get(2, 0));
 
     // Step 5: Apply scaled twist to the latest pose
-    var est_pose = getEstimatedPosition().exp(scaled_twist);
+    var estimatedPose = getEstimatedPosition().exp(scaledTwist);
 
     // Step 6: Apply new pose to odometry
-    m_odometry.resetPosition(m_previousGyroAngle, m_prevModulePositions, est_pose);
+    m_odometry.resetPosition(m_previousGyroAngle, m_prevModulePositions, estimatedPose);
   }
 
   /**
-   * Add a vision measurement to the Unscented Kalman Filter. This will correct the odometry pose
-   * estimate while still accounting for measurement noise.
+   * Adds a vision measurement to the Kalman Filter. This will correct the odometry pose estimate
+   * while still accounting for measurement noise.
    *
    * <p>This method can be called as infrequently as you want, as long as you are calling {@link
    * SwerveDrivePoseEstimator#update} every loop.
@@ -263,9 +221,8 @@ public class SwerveDrivePoseEstimator {
   }
 
   /**
-   * Updates the the Unscented Kalman Filter using only wheel encoder information. This should be
-   * called every loop, and the correct loop period must be passed into the constructor of this
-   * class.
+   * Updates the Kalman Filter using only wheel encoder information. This should be called every
+   * loop, and the correct loop period must be passed into the constructor of this class.
    *
    * @param gyroAngle The current gyro angle.
    * @param modulePositions The current distance measurements and rotations of the swerve modules.
@@ -276,9 +233,8 @@ public class SwerveDrivePoseEstimator {
   }
 
   /**
-   * Updates the the Unscented Kalman Filter using only wheel encoder information. This should be
-   * called every loop, and the correct loop period must be passed into the constructor of this
-   * class.
+   * Updates the Kalman Filter using only wheel encoder information. This should be called every
+   * loop, and the correct loop period must be passed into the constructor of this class.
    *
    * @param currentTimeSeconds Time at which this method was called, in seconds.
    * @param gyroAngle The current gyroscope angle.

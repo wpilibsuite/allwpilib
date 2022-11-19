@@ -23,8 +23,8 @@ TEST(SwerveDrivePoseEstimatorTest, AccuracyFacingTrajectory) {
   frc::SwerveModulePosition br;
 
   frc::SwerveDrivePoseEstimator<4> estimator{
-      frc::Rotation2d{}, {fl, fr, bl, br},   frc::Pose2d{},
-      kinematics,        {0.05, 0.05, 0.01}, {0.1, 0.1, 0.1}};
+      kinematics,    frc::Rotation2d{},  {fl, fr, bl, br},
+      frc::Pose2d{}, {0.05, 0.05, 0.01}, {0.1, 0.1, 0.1}};
 
   frc::Trajectory trajectory = frc::TrajectoryGenerator::GenerateTrajectory(
       std::vector{frc::Pose2d{0_m, 0_m, 45_deg}, frc::Pose2d{3_m, 0_m, -90_deg},
@@ -116,8 +116,8 @@ TEST(SwerveDrivePoseEstimatorTest, AccuracyFacingXAxis) {
   frc::SwerveModulePosition br;
 
   frc::SwerveDrivePoseEstimator<4> estimator{
-      frc::Rotation2d{}, {fl, fr, bl, br},   frc::Pose2d{},
-      kinematics,        {0.05, 0.05, 0.01}, {0.1, 0.1, 0.1}};
+      kinematics,    frc::Rotation2d{},  {fl, fr, bl, br},
+      frc::Pose2d{}, {0.05, 0.05, 0.01}, {0.1, 0.1, 0.1}};
 
   frc::Trajectory trajectory = frc::TrajectoryGenerator::GenerateTrajectory(
       std::vector{frc::Pose2d{0_m, 0_m, 45_deg}, frc::Pose2d{3_m, 0_m, -90_deg},
@@ -205,12 +205,9 @@ TEST(SwerveDrivePoseEstimatorTest, BadInitialPose) {
   frc::SwerveModulePosition br;
 
   frc::SwerveDrivePoseEstimator<4> estimator{
-      frc::Rotation2d{},
-      {fl, fr, bl, br},
-      frc::Pose2d{-1_m, -1_m, frc::Rotation2d{-0.4_rad}},
-      kinematics,
-      {0.05, 0.05, 0.01},
-      {0.1, 0.1, 0.1}};
+      kinematics,         frc::Rotation2d{},
+      {fl, fr, bl, br},   frc::Pose2d{-1_m, -1_m, frc::Rotation2d{-0.4_rad}},
+      {0.05, 0.05, 0.01}, {0.1, 0.1, 0.1}};
 
   frc::Trajectory trajectory = frc::TrajectoryGenerator::GenerateTrajectory(
       std::vector{frc::Pose2d{0_m, 0_m, 45_deg}, frc::Pose2d{3_m, 0_m, -90_deg},
