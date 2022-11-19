@@ -28,8 +28,6 @@ void Drivetrain::Drive(units::meters_per_second_t xSpeed,
 
 void Drivetrain::UpdateOdometry() {
   m_poseEstimator.Update(m_gyro.GetRotation2d(),
-                         {m_frontLeft.GetState(), m_frontRight.GetState(),
-                          m_backLeft.GetState(), m_backRight.GetState()},
                          {m_frontLeft.GetPosition(), m_frontRight.GetPosition(),
                           m_backLeft.GetPosition(), m_backRight.GetPosition()});
 

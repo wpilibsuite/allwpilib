@@ -55,7 +55,6 @@ class Drivetrain {
        m_backLeft.GetPosition(), m_backRight.GetPosition()},
       frc::Pose2d{},
       m_kinematics,
-      {0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1},
-      {0.05, 0.05, 0.05, 0.05, 0.05},
+      {0.1, 0.1, 0.1},
       {0.1, 0.1, 0.1}};
 };
