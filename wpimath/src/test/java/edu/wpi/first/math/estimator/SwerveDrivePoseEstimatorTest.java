@@ -6,7 +6,6 @@ package edu.wpi.first.math.estimator;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import edu.wpi.first.math.Nat;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -14,8 +13,6 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
-import edu.wpi.first.math.numbers.N5;
-import edu.wpi.first.math.numbers.N7;
 import edu.wpi.first.math.trajectory.TrajectoryConfig;
 import edu.wpi.first.math.trajectory.TrajectoryGenerator;
 import java.util.List;
@@ -38,17 +35,14 @@ class SwerveDrivePoseEstimatorTest {
     var br = new SwerveModulePosition();
 
     var estimator =
-        new SwerveDrivePoseEstimator<N7, N7, N5>(
-            Nat.N7(),
-            Nat.N7(),
-            Nat.N5(),
+        new SwerveDrivePoseEstimator(
             new Rotation2d(),
             new SwerveModulePosition[] {fl, fr, bl, br},
             new Pose2d(),
             kinematics,
-            VecBuilder.fill(0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1),
-            VecBuilder.fill(0.005, 0.005, 0.005, 0.005, 0.005),
-            VecBuilder.fill(0.1, 0.1, 0.1));
+            VecBuilder.fill(0.05, 0.05, 0.01),
+            VecBuilder.fill(0.1, 0.1, 0.1),
+            0.02);
 
     var trajectory =
         TrajectoryGenerator.generateTrajectory(
@@ -58,9 +52,9 @@ class SwerveDrivePoseEstimatorTest {
                 new Pose2d(0, 0, Rotation2d.fromDegrees(135)),
                 new Pose2d(-3, 0, Rotation2d.fromDegrees(-90)),
                 new Pose2d(0, 0, Rotation2d.fromDegrees(45))),
-            new TrajectoryConfig(0.5, 2));
+            new TrajectoryConfig(2, 2));
 
-    var rand = new Random(4915);
+    var rand = new Random(3538);
 
     final double dt = 0.02;
     double t = 0.0;
@@ -120,7 +114,6 @@ class SwerveDrivePoseEstimatorTest {
                   .poseMeters
                   .getRotation()
                   .plus(new Rotation2d(rand.nextGaussian() * 0.05)),
-              moduleStates,
               new SwerveModulePosition[] {fl, fr, bl, br});
 
       double error =
@@ -132,6 +125,14 @@ class SwerveDrivePoseEstimatorTest {
 
       t += dt;
     }
+
+    assertEquals(0.0, estimator.getEstimatedPosition().getX(), 5e-2, "Incorrect Final X");
+    assertEquals(0.0, estimator.getEstimatedPosition().getY(), 5e-2, "Incorrect Final Y");
+    assertEquals(
+        Math.PI / 4,
+        estimator.getEstimatedPosition().getRotation().getRadians(),
+        0.15,
+        "Incorrect Final Theta");
 
     assertEquals(
         0.0, errorSum / (trajectory.getTotalTimeSeconds() / dt), 0.05, "Incorrect mean error");
@@ -153,17 +154,14 @@ class SwerveDrivePoseEstimatorTest {
     var br = new SwerveModulePosition();
 
     var estimator =
-        new SwerveDrivePoseEstimator<N7, N7, N5>(
-            Nat.N7(),
-            Nat.N7(),
-            Nat.N5(),
+        new SwerveDrivePoseEstimator(
             new Rotation2d(),
             new SwerveModulePosition[] {fl, fr, bl, br},
             new Pose2d(),
             kinematics,
-            VecBuilder.fill(0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1),
-            VecBuilder.fill(0.005, 0.005, 0.005, 0.005, 0.005),
-            VecBuilder.fill(0.1, 0.1, 0.1));
+            VecBuilder.fill(0.05, 0.05, 0.01),
+            VecBuilder.fill(0.1, 0.1, 0.1),
+            0.02);
 
     var trajectory =
         TrajectoryGenerator.generateTrajectory(
@@ -173,9 +171,9 @@ class SwerveDrivePoseEstimatorTest {
                 new Pose2d(0, 0, Rotation2d.fromDegrees(135)),
                 new Pose2d(-3, 0, Rotation2d.fromDegrees(-90)),
                 new Pose2d(0, 0, Rotation2d.fromDegrees(45))),
-            new TrajectoryConfig(0.5, 2));
+            new TrajectoryConfig(2, 2));
 
-    var rand = new Random(4915);
+    var rand = new Random(3538);
 
     final double dt = 0.02;
     double t = 0.0;
@@ -200,8 +198,7 @@ class SwerveDrivePoseEstimatorTest {
                     groundTruthState.poseMeters.getTranslation().getX() + rand.nextGaussian() * 0.1,
                     groundTruthState.poseMeters.getTranslation().getY()
                         + rand.nextGaussian() * 0.1),
-                new Rotation2d(rand.nextGaussian() * 0.1)
-                    .plus(groundTruthState.poseMeters.getRotation()));
+                new Rotation2d(rand.nextGaussian() * 0.1));
 
         lastVisionUpdateTime = t;
       }
@@ -241,7 +238,6 @@ class SwerveDrivePoseEstimatorTest {
           estimator.updateWithTime(
               t,
               new Rotation2d(rand.nextGaussian() * 0.05),
-              moduleStates,
               new SwerveModulePosition[] {fl, fr, bl, br});
 
       double error =
@@ -254,8 +250,121 @@ class SwerveDrivePoseEstimatorTest {
       t += dt;
     }
 
+    assertEquals(0.0, estimator.getEstimatedPosition().getX(), 5e-2, "Incorrect Final X");
+    assertEquals(0.0, estimator.getEstimatedPosition().getY(), 5e-2, "Incorrect Final Y");
+    assertEquals(
+        0.0,
+        estimator.getEstimatedPosition().getRotation().getRadians(),
+        0.15,
+        "Incorrect Final Theta");
+
     assertEquals(
         0.0, errorSum / (trajectory.getTotalTimeSeconds() / dt), 0.05, "Incorrect mean error");
     assertEquals(0.0, maxError, 0.125, "Incorrect max error");
+  }
+
+  @Test
+  void testBadInitialPose() {
+    var kinematics =
+        new SwerveDriveKinematics(
+            new Translation2d(1, 1),
+            new Translation2d(1, -1),
+            new Translation2d(-1, -1),
+            new Translation2d(-1, 1));
+
+    var fl = new SwerveModulePosition();
+    var fr = new SwerveModulePosition();
+    var bl = new SwerveModulePosition();
+    var br = new SwerveModulePosition();
+
+    var estimator =
+        new SwerveDrivePoseEstimator(
+            new Rotation2d(),
+            new SwerveModulePosition[] {fl, fr, bl, br},
+            new Pose2d(-1, -1, Rotation2d.fromRadians(-0.4)),
+            kinematics,
+            VecBuilder.fill(0.05, 0.05, 0.01),
+            VecBuilder.fill(0.1, 0.1, 0.1),
+            0.02);
+
+    var trajectory =
+        TrajectoryGenerator.generateTrajectory(
+            List.of(
+                new Pose2d(0, 0, Rotation2d.fromDegrees(45)),
+                new Pose2d(3, 0, Rotation2d.fromDegrees(-90)),
+                new Pose2d(0, 0, Rotation2d.fromDegrees(135)),
+                new Pose2d(-3, 0, Rotation2d.fromDegrees(-90)),
+                new Pose2d(0, 0, Rotation2d.fromDegrees(45))),
+            new TrajectoryConfig(2, 2));
+
+    var rand = new Random(3538);
+
+    final double dt = 0.02;
+    double t = 0.0;
+
+    final double visionUpdateRate = 0.1;
+    Pose2d lastVisionPose = null;
+    double lastVisionUpdateTime = Double.NEGATIVE_INFINITY;
+
+    while (t <= trajectory.getTotalTimeSeconds()) {
+      var groundTruthState = trajectory.sample(t);
+
+      if (lastVisionUpdateTime + visionUpdateRate < t) {
+        if (lastVisionPose != null) {
+          estimator.addVisionMeasurement(lastVisionPose, lastVisionUpdateTime);
+        }
+
+        lastVisionPose =
+            new Pose2d(
+                new Translation2d(
+                    groundTruthState.poseMeters.getTranslation().getX() + rand.nextGaussian() * 0.1,
+                    groundTruthState.poseMeters.getTranslation().getY()
+                        + rand.nextGaussian() * 0.1),
+                new Rotation2d(rand.nextGaussian() * 0.1)
+                    .plus(groundTruthState.poseMeters.getRotation()));
+
+        lastVisionUpdateTime = t;
+      }
+
+      var moduleStates =
+          kinematics.toSwerveModuleStates(
+              new ChassisSpeeds(
+                  groundTruthState.velocityMetersPerSecond,
+                  0.0,
+                  groundTruthState.velocityMetersPerSecond
+                      * groundTruthState.curvatureRadPerMeter));
+      for (var moduleState : moduleStates) {
+        moduleState.angle = moduleState.angle.plus(new Rotation2d(rand.nextGaussian() * 0.005));
+        moduleState.speedMetersPerSecond += rand.nextGaussian() * 0.1;
+      }
+
+      fl.distanceMeters += moduleStates[0].speedMetersPerSecond * dt;
+      fr.distanceMeters += moduleStates[1].speedMetersPerSecond * dt;
+      bl.distanceMeters += moduleStates[2].speedMetersPerSecond * dt;
+      br.distanceMeters += moduleStates[3].speedMetersPerSecond * dt;
+
+      fl.angle = moduleStates[0].angle;
+      fr.angle = moduleStates[1].angle;
+      bl.angle = moduleStates[2].angle;
+      br.angle = moduleStates[3].angle;
+
+      estimator.updateWithTime(
+          t,
+          groundTruthState
+              .poseMeters
+              .getRotation()
+              .plus(new Rotation2d(rand.nextGaussian() * 0.01)),
+          new SwerveModulePosition[] {fl, fr, bl, br});
+
+      t += dt;
+    }
+
+    assertEquals(0.0, estimator.getEstimatedPosition().getX(), 5e-2, "Incorrect Final X");
+    assertEquals(0.0, estimator.getEstimatedPosition().getY(), 5e-2, "Incorrect Final Y");
+    assertEquals(
+        Math.PI / 4,
+        estimator.getEstimatedPosition().getRotation().getRadians(),
+        0.15,
+        "Incorrect Final Theta");
   }
 }
