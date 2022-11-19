@@ -109,7 +109,6 @@ public class SwerveDrivePoseEstimator {
       Matrix<N3, N1> stateStdDevs,
       Matrix<N3, N1> visionMeasurementStdDevs,
       double nominalDtSeconds) {
-
     m_nominalDt = nominalDtSeconds;
     m_numModules = modulePositions.length;
 
@@ -205,7 +204,6 @@ public class SwerveDrivePoseEstimator {
    *     Timer.getFPGATimestamp as your time source or sync the epochs.
    */
   public void addVisionMeasurement(Pose2d visionRobotPoseMeters, double timestampSeconds) {
-
     // Step 1: Get the pose odometry measured at the moment the vision measurement was made
     var sample = m_poseBuffer.getSample(timestampSeconds);
 

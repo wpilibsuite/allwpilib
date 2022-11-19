@@ -6,6 +6,7 @@
 
 #include <limits>
 
+#include <fmt/format.h>
 #include <wpi/SymbolExports.h>
 #include <wpi/array.h>
 #include <wpi/timestamp.h>
@@ -14,14 +15,13 @@
 #include "frc/StateSpaceUtil.h"
 #include "frc/estimator/AngleStatistics.h"
 #include "frc/estimator/KalmanFilter.h"
-#include "frc/system/LinearSystem.h"
 #include "frc/geometry/Pose2d.h"
 #include "frc/geometry/Rotation2d.h"
 #include "frc/interpolation/TimeInterpolatableBuffer.h"
 #include "frc/kinematics/SwerveDriveKinematics.h"
 #include "frc/kinematics/SwerveDriveOdometry.h"
+#include "frc/system/LinearSystem.h"
 #include "units/time.h"
-#include "fmt/format.h"
 
 namespace frc {
 /**
@@ -38,7 +38,8 @@ namespace frc {
  * never call it, then this class will behave mostly like regular encoder
  * odometry.
  *
- * The state-space system used internally has the following states (x) and outputs (y):
+ * The state-space system used internally has the following states (x) and
+ * outputs (y):
  *
  * <strong> x = [x, y, theta]ᵀ </strong> in the field coordinate
  * system containing x position, y position, and heading.
@@ -75,8 +76,7 @@ class SwerveDrivePoseEstimator {
   SwerveDrivePoseEstimator(
       const Rotation2d& gyroAngle,
       const wpi::array<SwerveModulePosition, NumModules>& modulePositions,
-      const Pose2d& initialPose, 
-      SwerveDriveKinematics<NumModules>& kinematics,
+      const Pose2d& initialPose, SwerveDriveKinematics<NumModules>& kinematics,
       const wpi::array<double, 3>& stateStdDevs,
       const wpi::array<double, 3>& visionMeasurementStdDevs,
       units::second_t nominalDt = 20_ms)
@@ -84,9 +84,9 @@ class SwerveDrivePoseEstimator {
         m_nominalDt(nominalDt),
         m_previousGyroAngle(gyroAngle),
         m_stateStdDevs(stateStdDevs) {
-
     for (size_t i = 0; i < NumModules; i++) {
-      m_prevModulePositions[i] = {modulePositions[i].distance, modulePositions[i].angle};
+      m_prevModulePositions[i] = {modulePositions[i].distance,
+                                  modulePositions[i].angle};
     }
 
     SetVisionMeasurementStdDevs(visionMeasurementStdDevs);
@@ -107,7 +107,6 @@ class SwerveDrivePoseEstimator {
       const Rotation2d& gyroAngle,
       const wpi::array<SwerveModulePosition, NumModules>& modulePositions,
       const Pose2d& pose) {
-
     // Reset state estimate and error covariance
     m_odometry.ResetPosition(gyroAngle, modulePositions, pose);
     m_poseBuffer.Clear();
@@ -124,9 +123,7 @@ class SwerveDrivePoseEstimator {
    *
    * @return The estimated robot pose in meters.
    */
-  Pose2d GetEstimatedPosition() const {
-    return m_odometry.GetPose();
-  }
+  Pose2d GetEstimatedPosition() const { return m_odometry.GetPose(); }
 
   /**
    * Sets the pose estimator's trust of global measurements. This might be used
@@ -143,17 +140,10 @@ class SwerveDrivePoseEstimator {
   void SetVisionMeasurementStdDevs(
       const wpi::array<double, 3>& visionMeasurementStdDevs) {
     auto system = LinearSystem<3, 3, 3>{
-      frc::Matrixd<3, 3>::Identity(),
-      frc::Matrixd<3, 3>::Zero(),
-      frc::Matrixd<3, 3>::Identity(),
-      frc::Matrixd<3, 3>::Zero()
-    };
+        frc::Matrixd<3, 3>::Identity(), frc::Matrixd<3, 3>::Zero(),
+        frc::Matrixd<3, 3>::Identity(), frc::Matrixd<3, 3>::Zero()};
     auto visionObserver = KalmanFilter<3, 3, 3>{
-       system,
-       m_stateStdDevs,
-       visionMeasurementStdDevs,
-       m_nominalDt
-    };
+        system, m_stateStdDevs, visionMeasurementStdDevs, m_nominalDt};
     // Create R (covariances) for vision measurements.
     m_visionK = visionObserver.K();
   }
@@ -192,18 +182,24 @@ class SwerveDrivePoseEstimator {
     // Step 2: Measure the twist between the odometry pose and the vision pose
     auto twist = sample.value().Log(visionRobotPose);
 
-    // Step 3: We should not trust the twist entirely, so instead we scale this twist by a Kalman
-    // gain matrix representing how much we trust vision measurements compared to our current pose.
-    auto k_times_twist = m_visionK * frc::Vectord<3>{twist.dx.value(), twist.dy.value(), twist.dtheta.value()};
+    // Step 3: We should not trust the twist entirely, so instead we scale this
+    // twist by a Kalman gain matrix representing how much we trust vision
+    // measurements compared to our current pose.
+    auto k_times_twist =
+        m_visionK * frc::Vectord<3>{twist.dx.value(), twist.dy.value(),
+                                    twist.dtheta.value()};
 
     // Step 4: Convert back to Twist2d
-    auto scaled_twist = Twist2d{units::meter_t{k_times_twist(0)}, units::meter_t{k_times_twist(1)}, units::radian_t{k_times_twist(2)}};
+    auto scaled_twist = Twist2d{units::meter_t{k_times_twist(0)},
+                                units::meter_t{k_times_twist(1)},
+                                units::radian_t{k_times_twist(2)}};
 
     // Step 5: Apply scaled twist to the latest pose
     auto est_pose = GetEstimatedPosition().Exp(scaled_twist);
 
     // Step 6: Apply new pose to odometry
-    m_odometry.ResetPosition(m_previousGyroAngle, m_prevModulePositions, est_pose);
+    m_odometry.ResetPosition(m_previousGyroAngle, m_prevModulePositions,
+                             est_pose);
   }
 
   /**
@@ -299,7 +295,8 @@ class SwerveDrivePoseEstimator {
   units::second_t m_nominalDt;
 
   Rotation2d m_previousGyroAngle;
-  wpi::array<SwerveModulePosition, NumModules> m_prevModulePositions{wpi::empty_array};
+  wpi::array<SwerveModulePosition, NumModules> m_prevModulePositions{
+      wpi::empty_array};
   const wpi::array<double, 3>& m_stateStdDevs;
 };
 

@@ -3,6 +3,7 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #include <limits>
+#include <numbers>
 #include <random>
 
 #include "frc/estimator/SwerveDrivePoseEstimator.h"
@@ -10,7 +11,6 @@
 #include "frc/kinematics/SwerveDriveKinematics.h"
 #include "frc/trajectory/TrajectoryGenerator.h"
 #include "gtest/gtest.h"
-#include <numbers>
 
 TEST(SwerveDrivePoseEstimatorTest, AccuracyFacingTrajectory) {
   frc::SwerveDriveKinematics<4> kinematics{
@@ -23,12 +23,8 @@ TEST(SwerveDrivePoseEstimatorTest, AccuracyFacingTrajectory) {
   frc::SwerveModulePosition br;
 
   frc::SwerveDrivePoseEstimator<4> estimator{
-      frc::Rotation2d{},
-      {fl, fr, bl, br},
-      frc::Pose2d{},
-      kinematics,
-      {0.05, 0.05, 0.01},
-      {0.1, 0.1, 0.1}};
+      frc::Rotation2d{}, {fl, fr, bl, br},   frc::Pose2d{},
+      kinematics,        {0.05, 0.05, 0.01}, {0.1, 0.1, 0.1}};
 
   frc::Trajectory trajectory = frc::TrajectoryGenerator::GenerateTrajectory(
       std::vector{frc::Pose2d{0_m, 0_m, 45_deg}, frc::Pose2d{3_m, 0_m, -90_deg},
@@ -99,9 +95,11 @@ TEST(SwerveDrivePoseEstimatorTest, AccuracyFacingTrajectory) {
     t += dt;
   }
 
-  EXPECT_NEAR(0.0, estimator.GetEstimatedPosition().X().value(), 0.05);  
+  EXPECT_NEAR(0.0, estimator.GetEstimatedPosition().X().value(), 0.05);
   EXPECT_NEAR(0.0, estimator.GetEstimatedPosition().Y().value(), 0.05);
-  EXPECT_NEAR(std::numbers::pi / 4, estimator.GetEstimatedPosition().Rotation().Radians().value(), 0.15);
+  EXPECT_NEAR(std::numbers::pi / 4,
+              estimator.GetEstimatedPosition().Rotation().Radians().value(),
+              0.15);
 
   EXPECT_LT(errorSum / (trajectory.TotalTime().value() / dt.value()), 0.05);
   EXPECT_LT(maxError, 0.125);
@@ -118,12 +116,8 @@ TEST(SwerveDrivePoseEstimatorTest, AccuracyFacingXAxis) {
   frc::SwerveModulePosition br;
 
   frc::SwerveDrivePoseEstimator<4> estimator{
-      frc::Rotation2d{},
-      {fl, fr, bl, br},
-      frc::Pose2d{},
-      kinematics,
-      {0.05, 0.05, 0.01},
-      {0.1, 0.1, 0.1}};
+      frc::Rotation2d{}, {fl, fr, bl, br},   frc::Pose2d{},
+      kinematics,        {0.05, 0.05, 0.01}, {0.1, 0.1, 0.1}};
 
   frc::Trajectory trajectory = frc::TrajectoryGenerator::GenerateTrajectory(
       std::vector{frc::Pose2d{0_m, 0_m, 45_deg}, frc::Pose2d{3_m, 0_m, -90_deg},
@@ -154,11 +148,10 @@ TEST(SwerveDrivePoseEstimatorTest, AccuracyFacingXAxis) {
       if (lastVisionPose != frc::Pose2d{}) {
         estimator.AddVisionMeasurement(lastVisionPose, lastVisionUpdateTime);
       }
-      lastVisionPose = {
-            groundTruthState.pose.Translation()
-            + frc::Translation2d{distribution(generator) * 0.1_m,
-                               distribution(generator) * 0.1_m},
-            frc::Rotation2d{distribution(generator) * 0.1_rad}};
+      lastVisionPose = {groundTruthState.pose.Translation() +
+                            frc::Translation2d{distribution(generator) * 0.1_m,
+                                               distribution(generator) * 0.1_m},
+                        frc::Rotation2d{distribution(generator) * 0.1_rad}};
       visionPoses.push_back(lastVisionPose);
       lastVisionUpdateTime = t;
     }
@@ -197,9 +190,10 @@ TEST(SwerveDrivePoseEstimatorTest, AccuracyFacingXAxis) {
     t += dt;
   }
 
-  EXPECT_NEAR(0.0, estimator.GetEstimatedPosition().X().value(), 0.05);  
+  EXPECT_NEAR(0.0, estimator.GetEstimatedPosition().X().value(), 0.05);
   EXPECT_NEAR(0.0, estimator.GetEstimatedPosition().Y().value(), 0.05);
-  EXPECT_NEAR(0.0, estimator.GetEstimatedPosition().Rotation().Radians().value(), 0.15);
+  EXPECT_NEAR(
+      0.0, estimator.GetEstimatedPosition().Rotation().Radians().value(), 0.15);
 
   EXPECT_LT(errorSum / (trajectory.TotalTime().value() / dt.value()), 0.05);
   EXPECT_LT(maxError, 0.125);
@@ -281,7 +275,9 @@ TEST(SwerveDrivePoseEstimatorTest, BadInitialPose) {
     t += dt;
   }
 
-  EXPECT_NEAR(0.0, estimator.GetEstimatedPosition().X().value(), 0.05);  
+  EXPECT_NEAR(0.0, estimator.GetEstimatedPosition().X().value(), 0.05);
   EXPECT_NEAR(0.0, estimator.GetEstimatedPosition().Y().value(), 0.05);
-  EXPECT_NEAR(std::numbers::pi / 4, estimator.GetEstimatedPosition().Rotation().Radians().value(), 0.15);
+  EXPECT_NEAR(std::numbers::pi / 4,
+              estimator.GetEstimatedPosition().Rotation().Radians().value(),
+              0.15);
 }

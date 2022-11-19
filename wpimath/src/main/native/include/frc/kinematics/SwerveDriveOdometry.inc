@@ -13,14 +13,13 @@ SwerveDriveOdometry<NumModules>::SwerveDriveOdometry(
     SwerveDriveKinematics<NumModules> kinematics, const Rotation2d& gyroAngle,
     const wpi::array<SwerveModulePosition, NumModules>& modulePositions,
     const Pose2d& initialPose)
-    : m_kinematics(kinematics),
-      m_pose(initialPose) {
+    : m_kinematics(kinematics), m_pose(initialPose) {
   m_previousAngle = m_pose.Rotation();
   m_gyroOffset = m_pose.Rotation() - gyroAngle;
 
   for (size_t i = 0; i < NumModules; i++) {
     m_previousModulePositions[i] = {modulePositions[i].distance,
-                           modulePositions[i].angle};
+                                    modulePositions[i].angle};
   }
 
   wpi::math::MathSharedStore::ReportUsage(
