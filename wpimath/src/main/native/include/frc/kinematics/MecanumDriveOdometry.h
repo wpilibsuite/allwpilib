@@ -28,9 +28,6 @@ class WPILIB_DLLEXPORT MecanumDriveOdometry {
   /**
    * Constructs a MecanumDriveOdometry object.
    *
-   * IF wheelPositions is unspecified,
-   * You NEED to reset your encoders (to zero).
-   *
    * @param kinematics The mecanum drive kinematics for your drivetrain.
    * @param gyroAngle The angle reported by the gyroscope.
    * @param wheelPositions The current distances measured by each wheel.

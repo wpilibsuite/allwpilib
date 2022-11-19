@@ -33,9 +33,6 @@ class SwerveDriveOdometry {
   /**
    * Constructs a SwerveDriveOdometry object.
    *
-   * IF modulePositions is unspecified,
-   * You NEED to reset your encoders (to zero).
-   *
    * @param kinematics The swerve drive kinematics for your drivetrain.
    * @param gyroAngle The angle reported by the gyroscope.
    * @param modulePositions The wheel positions reported by each module.
@@ -48,9 +45,6 @@ class SwerveDriveOdometry {
 
   /**
    * Resets the robot's position on the field.
-   *
-   * IF modulePositions is unspecified,
-   * You NEED to reset your encoders (to zero).
    *
    * The gyroscope angle does not need to be reset here on the user's robot
    * code. The library automatically takes care of offsetting the gyro angle.
