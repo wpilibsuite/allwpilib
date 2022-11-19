@@ -14,10 +14,15 @@ SwerveDriveOdometry<NumModules>::SwerveDriveOdometry(
     const wpi::array<SwerveModulePosition, NumModules>& modulePositions,
     const Pose2d& initialPose)
     : m_kinematics(kinematics),
-      m_pose(initialPose),
-      m_previousModulePositions(modulePositions) {
+      m_pose(initialPose) {
   m_previousAngle = m_pose.Rotation();
   m_gyroOffset = m_pose.Rotation() - gyroAngle;
+
+  for (size_t i = 0; i < NumModules; i++) {
+    m_previousModulePositions[i] = {modulePositions[i].distance,
+                           modulePositions[i].angle};
+  }
+
   wpi::math::MathSharedStore::ReportUsage(
       wpi::math::MathUsageId::kOdometry_SwerveDrive, 1);
 }
@@ -30,7 +35,10 @@ void SwerveDriveOdometry<NumModules>::ResetPosition(
   m_pose = pose;
   m_previousAngle = pose.Rotation();
   m_gyroOffset = m_pose.Rotation() - gyroAngle;
-  m_previousModulePositions = modulePositions;
+
+  for (size_t i = 0; i < NumModules; i++) {
+    m_previousModulePositions[i].distance = modulePositions[i].distance;
+  }
 }
 
 template <size_t NumModules>
@@ -39,11 +47,13 @@ const Pose2d& frc::SwerveDriveOdometry<NumModules>::Update(
     const wpi::array<SwerveModulePosition, NumModules>& modulePositions) {
   auto moduleDeltas =
       wpi::array<SwerveModulePosition, NumModules>(wpi::empty_array);
-  for (size_t index = 0; index < modulePositions.size(); index++) {
+  for (size_t index = 0; index < NumModules; index++) {
     auto lastPosition = m_previousModulePositions[index];
     auto currentPosition = modulePositions[index];
     moduleDeltas[index] = {currentPosition.distance - lastPosition.distance,
                            currentPosition.angle};
+
+    m_previousModulePositions[index].distance = modulePositions[index].distance;
   }
 
   auto angle = gyroAngle + m_gyroOffset;
@@ -55,7 +65,6 @@ const Pose2d& frc::SwerveDriveOdometry<NumModules>::Update(
 
   m_previousAngle = angle;
   m_pose = {newPose.Translation(), angle};
-  m_previousModulePositions = modulePositions;
 
   return m_pose;
 }

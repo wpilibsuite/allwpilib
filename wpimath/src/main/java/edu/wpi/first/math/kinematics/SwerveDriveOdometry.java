@@ -134,6 +134,7 @@ public class SwerveDriveOdometry {
 
       moduleDeltas[index] =
           new SwerveModulePosition(current.distanceMeters - previous.distanceMeters, current.angle);
+      previous.distanceMeters = current.distanceMeters;
     }
 
     var angle = gyroAngle.plus(m_gyroOffset);
@@ -145,11 +146,7 @@ public class SwerveDriveOdometry {
 
     m_previousAngle = angle;
     m_poseMeters = new Pose2d(newPose.getTranslation(), angle);
-    for (int index = 0; index < m_numModules; index++) {
-      m_previousModulePositions[index] =
-          new SwerveModulePosition(
-              modulePositions[index].distanceMeters, modulePositions[index].angle);
-    }
+
     return m_poseMeters;
   }
 }
