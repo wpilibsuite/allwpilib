@@ -156,11 +156,6 @@ TEST(SwerveDrivePoseEstimatorTest, AccuracyFacingXAxis) {
       lastVisionUpdateTime = t;
     }
 
-    auto moduleStates = kinematics.ToSwerveModuleStates(
-        {groundTruthState.velocity * groundTruthState.pose.Rotation().Cos(),
-         groundTruthState.velocity * groundTruthState.pose.Rotation().Sin(),
-         0_rad_per_s});
-
     fl.distance += groundTruthState.velocity * dt +
                    0.5 * groundTruthState.acceleration * dt * dt;
     fr.distance += groundTruthState.velocity * dt +
