@@ -34,7 +34,7 @@ import java.util.function.BiConsumer;
  * <p>{@link SwerveDrivePoseEstimator#update} should be called every robot loop. If your loops are
  * faster or slower than the default of 20 ms, then you should change the nominal delta time using
  * the secondary constructor: {@link SwerveDrivePoseEstimator#SwerveDrivePoseEstimator(Nat, Nat,
- * Nat, Rotation2d, Pose2d, SwerveModulePosition[], SwerveDriveKinematics, Matrix, Matrix, Matrix,
+ * Nat, Rotation2d, SwerveModulePosition[], Pose2d, SwerveDriveKinematics, Matrix, Matrix, Matrix,
  * double)}.
  *
  * <p>{@link SwerveDrivePoseEstimator#addVisionMeasurement} can be called as infrequently as you

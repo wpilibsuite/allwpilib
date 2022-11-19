@@ -32,7 +32,7 @@ import java.util.function.BiConsumer;
  * <p>{@link MecanumDrivePoseEstimator#update} should be called every robot loop. If your loops are
  * faster or slower than the default of 20 ms, then you should change the nominal delta time using
  * the secondary constructor: {@link MecanumDrivePoseEstimator#MecanumDrivePoseEstimator(Rotation2d,
- * Pose2d, MecanumDriveWheelPositions, MecanumDriveKinematics, Matrix, Matrix, Matrix, double)}.
+ * MecanumDriveWheelPositions, Pose2d, MecanumDriveKinematics, Matrix, Matrix, Matrix, double)}.
  *
  * <p>{@link MecanumDrivePoseEstimator#addVisionMeasurement} can be called as infrequently as you
  * want; if you never call it, then this class will behave mostly like regular encoder odometry.
