@@ -24,10 +24,6 @@ Note that this document does not use the RFC 2119 definition of the term "REQUIR
 any usage of the term "REQUIRED"
 in this document follows the definition [here](#Required Subsystems).
 
-[//]: # (### Idempotence)
-
-[//]: # (TODO)
-
 ## Command
 
 ### Command Properties
@@ -112,3 +108,42 @@ were not closely preceded by `isFinished()` returning `true` are undefined behav
 
 No more lifecycle methods will be called on the command instance after `end` for this current usage.
 `initialize` will be called at the start of any following reuse.
+
+### Command Compositions
+
+Commands may be composed to achieve advanced functionality.
+As a rule, a composition takes ownership of the commands composing it,
+and they MUST NOT be scheduled individually.
+
+This specification defines some core compositions,
+implementations may define additional composition types.
+
+#### Sequential
+
+> A sequential command composition executes a series of commands in sequence,
+starting each one after the previous one ends.
+
+Interrupting a sequential composition forwards the interruption event to the currently-running command.
+
+#### Parallel
+
+> A parallel composition runs multiple commands in parallel
+(note: the term "parallel" here is loosely defined -- no multithreading or other parallel-execution techniques are guaranteed to be used.
+Implementations should specify whether they are multithreaded or require thread safety).
+
+Interruptions are forwarded to all currently-running commands.
+
+There are three types of parallel compositions, differing by what command in the composition ends the composition:
+- First (this is also called a "race" group): composition ends when any command ends, all other commands are cancelled.
+- Specific/Deadline: composition ends when a specific command ends, all commands running at that time are cancelled.
+- Last: composition ends when all commands end.
+
+#### Repeat
+
+> A repeat composition restarts its wrapped command when it ends, until interrupted.
+
+#### Select
+
+> A selection composition selects at schedule-time one command of a given set.
+ 
+Implementations may provide optimized versions of selection compositions.
