@@ -721,6 +721,17 @@
     "commandversion": 2
   },
   {
+    "name": "UnitTesting",
+    "description": "Demonstrates basic unit testing for a robot project.",
+    "tags": [
+      "Testing"
+    ],
+    "foldername": "unittest",
+    "gradlebase": "java",
+    "mainclass": "Main",
+    "commandversion": 2
+  },
+  {
     "name": "DifferentialDrivePoseEstimator",
     "description": "Demonstrates the use of the DifferentialDrivePoseEstimator as a replacement for differential drive odometry.",
     "tags": [
