@@ -158,7 +158,7 @@ public final class CommandScheduler implements NTSendable, AutoCloseable {
    */
   @Deprecated(since = "2023")
   public void addButton(Runnable button) {
-    m_activeButtonLoop.bind(() -> true, requireNonNullParam(button, "button", "addButton"));
+    m_activeButtonLoop.bind(requireNonNullParam(button, "button", "addButton"));
   }
 
   /**

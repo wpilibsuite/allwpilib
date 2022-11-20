@@ -17,8 +17,12 @@ bool BooleanEvent::GetAsBoolean() const {
   return m_condition();
 }
 
-void BooleanEvent::IfHigh(wpi::unique_function<void()> action) {
-  m_loop->Bind(m_condition, std::move(action));
+void BooleanEvent::IfHigh(std::function<void()> action) {
+  m_loop->Bind([condition = m_condition, action = std::move(action)] {
+    if (condition()) {
+      action();
+    }
+  });
 }
 
 BooleanEvent BooleanEvent::operator!() {

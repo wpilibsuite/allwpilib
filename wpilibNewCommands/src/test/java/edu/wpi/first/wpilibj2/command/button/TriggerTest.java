@@ -176,7 +176,7 @@ class TriggerTest extends CommandTestBase {
     InternalButton button = new InternalButton();
     Command command1 =
         new StartEndCommand(startCounter::incrementAndGet, endCounter::incrementAndGet)
-            .until(button.rising());
+            .until(button);
 
     button.setPressed(false);
     command1.schedule();

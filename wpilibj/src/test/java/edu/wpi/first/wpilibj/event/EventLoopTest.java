@@ -16,8 +16,8 @@ class EventLoopTest {
     var counterTrue = new AtomicInteger(0);
     var counterFalse = new AtomicInteger(0);
     var loop = new EventLoop();
-    loop.bind(() -> true, counterTrue::incrementAndGet);
-    loop.bind(() -> false, counterFalse::incrementAndGet);
+    new BooleanEvent(loop, () -> true).ifHigh(counterTrue::incrementAndGet);
+    new BooleanEvent(loop, () -> false).ifHigh(counterFalse::incrementAndGet);
 
     assertEquals(0, counterTrue.get());
     assertEquals(0, counterFalse.get());
@@ -40,7 +40,7 @@ class EventLoopTest {
     var loop = new EventLoop();
 
     // first ensure binding works
-    loop.bind(condition::get, counter::incrementAndGet);
+    new BooleanEvent(loop, condition::get).ifHigh(counter::incrementAndGet);
 
     condition.set(false);
     loop.poll();
