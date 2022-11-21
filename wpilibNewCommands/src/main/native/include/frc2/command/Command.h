@@ -345,6 +345,12 @@ safe) semantics.
 
   virtual std::string GetName() const;
 
+  /**
+   * Transfers ownership of this command to a unique pointer.  Used for
+   * decorator methods.
+   */
+  virtual CommandPtr ToPtr() && = 0;
+
  protected:
   /**
    * Transfers ownership of this command to a unique pointer.  Used for
