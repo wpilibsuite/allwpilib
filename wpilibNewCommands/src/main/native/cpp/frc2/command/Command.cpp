@@ -39,24 +39,20 @@ CommandPtr Command::WithTimeout(units::second_t duration) && {
 }
 
 CommandPtr Command::Until(std::function<bool()> condition) && {
-  return std::move(*this).ToPtr()
-      .Until(std::move(condition));
+  return std::move(*this).ToPtr().Until(std::move(condition));
 }
 
 CommandPtr Command::IgnoringDisable(bool doesRunWhenDisabled) && {
-  return std::move(*this).ToPtr()
-      .IgnoringDisable(doesRunWhenDisabled);
+  return std::move(*this).ToPtr().IgnoringDisable(doesRunWhenDisabled);
 }
 
 CommandPtr Command::WithInterruptBehavior(
     InterruptionBehavior interruptBehavior) && {
-  return std::move(*this).ToPtr()
-      .WithInterruptBehavior(interruptBehavior);
+  return std::move(*this).ToPtr().WithInterruptBehavior(interruptBehavior);
 }
 
 CommandPtr Command::WithInterrupt(std::function<bool()> condition) && {
-  return std::move(*this).ToPtr()
-      .Until(std::move(condition));
+  return std::move(*this).ToPtr().Until(std::move(condition));
 }
 
 CommandPtr Command::BeforeStarting(
@@ -68,8 +64,8 @@ CommandPtr Command::BeforeStarting(
 
 CommandPtr Command::BeforeStarting(
     std::function<void()> toRun, std::span<Subsystem* const> requirements) && {
-  return std::move(*this).ToPtr()
-      .BeforeStarting(std::move(toRun), requirements);
+  return std::move(*this).ToPtr().BeforeStarting(std::move(toRun),
+                                                 requirements);
 }
 
 CommandPtr Command::AndThen(std::function<void()> toRun,
@@ -80,8 +76,7 @@ CommandPtr Command::AndThen(std::function<void()> toRun,
 
 CommandPtr Command::AndThen(std::function<void()> toRun,
                             std::span<Subsystem* const> requirements) && {
-  return std::move(*this).ToPtr()
-      .AndThen(std::move(toRun), requirements);
+  return std::move(*this).ToPtr().AndThen(std::move(toRun), requirements);
 }
 
 PerpetualCommand Command::Perpetually() && {
@@ -99,18 +94,15 @@ CommandPtr Command::AsProxy() && {
 }
 
 CommandPtr Command::Unless(std::function<bool()> condition) && {
-  return std::move(*this).ToPtr()
-      .Unless(std::move(condition));
+  return std::move(*this).ToPtr().Unless(std::move(condition));
 }
 
 CommandPtr Command::FinallyDo(std::function<void(bool)> end) && {
-  return std::move(*this).ToPtr()
-      .FinallyDo(std::move(end));
+  return std::move(*this).ToPtr().FinallyDo(std::move(end));
 }
 
 CommandPtr Command::HandleInterrupt(std::function<void(void)> handler) && {
-  return std::move(*this).ToPtr()
-      .HandleInterrupt(std::move(handler));
+  return std::move(*this).ToPtr().HandleInterrupt(std::move(handler));
 }
 
 void Command::Schedule() {
