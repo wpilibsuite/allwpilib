@@ -504,8 +504,7 @@ class Trigger {
    * @return The trigger, for chained calls.
    * @deprecated Pass this as a command end condition with Until() instead.
    */
-  WPI_DEPRECATED(
-      "Pass this as a command end condition with Until() instead.")
+  WPI_DEPRECATED("Pass this as a command end condition with Until() instead.")
   Trigger CancelWhenActive(Command* command);
 
   /**

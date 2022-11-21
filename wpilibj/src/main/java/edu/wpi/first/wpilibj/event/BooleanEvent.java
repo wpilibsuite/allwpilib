@@ -7,7 +7,6 @@ package edu.wpi.first.wpilibj.event;
 import static edu.wpi.first.util.ErrorMessages.requireNonNullParam;
 
 import edu.wpi.first.math.filter.Debouncer;
-
 import java.util.function.BiFunction;
 import java.util.function.BooleanSupplier;
 
@@ -55,11 +54,12 @@ public class BooleanEvent implements BooleanSupplier {
    * @param action the action to run if this event is active.
    */
   public final void ifHigh(Runnable action) {
-    m_loop.bind(() -> {
-      if (m_signal.getAsBoolean()) {
-        action.run();
-      }
-    });
+    m_loop.bind(
+        () -> {
+          if (m_signal.getAsBoolean()) {
+            action.run();
+          }
+        });
   }
 
   /**

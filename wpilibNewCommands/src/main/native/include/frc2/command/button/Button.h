@@ -268,8 +268,7 @@ class Button : public Trigger {
    * @return The button, for chained calls.
    * @deprecated Pass this as a command end condition with Until() instead.
    */
-  WPI_DEPRECATED(
-      "Pass this as a command end condition with Until() instead.")
+  WPI_DEPRECATED("Pass this as a command end condition with Until() instead.")
   Button CancelWhenPressed(Command* command);
 };
 }  // namespace frc2
