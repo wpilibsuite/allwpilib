@@ -219,12 +219,12 @@ CommandPtr CommandPtr::HandleInterrupt(std::function<void(void)> handler) && {
       });
 }
 
-Command* CommandPtr::get() const {
+CommandBase* CommandPtr::get() const {
   AssertValid();
   return m_ptr.get();
 }
 
-std::unique_ptr<Command> CommandPtr::Unwrap() && {
+std::unique_ptr<CommandBase> CommandPtr::Unwrap() && {
   AssertValid();
   return std::move(m_ptr);
 }
@@ -253,9 +253,9 @@ CommandPtr::operator bool() const {
   return m_ptr.operator bool();
 }
 
-std::vector<std::unique_ptr<Command>> CommandPtr::UnwrapVector(
+std::vector<std::unique_ptr<CommandBase>> CommandPtr::UnwrapVector(
     std::vector<CommandPtr>&& vec) {
-  std::vector<std::unique_ptr<Command>> ptrs;
+  std::vector<std::unique_ptr<CommandBase>> ptrs;
   for (auto&& ptr : vec) {
     ptrs.emplace_back(std::move(ptr).Unwrap());
   }
