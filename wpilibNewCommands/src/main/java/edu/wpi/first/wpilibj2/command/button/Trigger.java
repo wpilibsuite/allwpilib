@@ -471,22 +471,55 @@ public class Trigger implements BooleanSupplier {
     return m_condition.getAsBoolean();
   }
 
+  /**
+   * Composes two triggers with logical OR.
+   *
+   * @param trigger the condition to compose with
+   * @return A trigger which is active when either component trigger is active.
+   */
   public Trigger and(BooleanSupplier trigger) {
     return new Trigger(() -> m_condition.getAsBoolean() && trigger.getAsBoolean());
   }
 
+  /**
+   * Composes two triggers with logical OR.
+   *
+   * @param trigger the condition to compose with
+   * @return A trigger which is active when either component trigger is active.
+   */
   public Trigger or(BooleanSupplier trigger) {
     return new Trigger(() -> m_condition.getAsBoolean() || trigger.getAsBoolean());
   }
 
+  /**
+   * Creates a new trigger that is active when this trigger is inactive, i.e. that acts as the
+   * negation of this trigger.
+   *
+   * @return the negated trigger
+   */
   public Trigger negate() {
     return new Trigger(() -> !m_condition.getAsBoolean());
   }
 
+  /**
+   * Creates a new debounced trigger from this trigger - it will become active when this trigger has
+   * been active for longer than the specified period.
+   *
+   * @param seconds The debounce period.
+   * @return The debounced trigger (rising edges debounced only)
+   */
   public Trigger debounce(double seconds) {
     return debounce(seconds, Debouncer.DebounceType.kRising);
   }
 
+  /**
+   * Creates a new debounced trigger from this trigger - it will become active when this trigger has
+   * been active for longer than the specified period.
+   *
+   * @param seconds The debounce period.
+   * @param type The debounce type.
+   * @return The debounced trigger.
+   */
   public Trigger debounce(double seconds, Debouncer.DebounceType type) {
     return new Trigger(
         new BooleanSupplier() {
