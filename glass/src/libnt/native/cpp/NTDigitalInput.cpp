@@ -33,5 +33,5 @@ void NTDigitalInputModel::Update() {
 }
 
 bool NTDigitalInputModel::Exists() {
-  return m_inst.IsConnected() && m_value.Exists();
+  return m_value.Exists();
 }

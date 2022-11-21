@@ -73,5 +73,5 @@ void NTFMSModel::Update() {
 }
 
 bool NTFMSModel::Exists() {
-  return m_inst.IsConnected() && m_controlWord.Exists();
+  return m_controlWord.Exists();
 }
