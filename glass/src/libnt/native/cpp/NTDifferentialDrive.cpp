@@ -56,5 +56,5 @@ void NTDifferentialDriveModel::Update() {
 }
 
 bool NTDifferentialDriveModel::Exists() {
-  return m_inst.IsConnected() && m_lPercent.Exists();
+  return m_lPercent.Exists();
 }

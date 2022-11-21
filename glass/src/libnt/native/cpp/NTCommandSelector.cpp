@@ -37,5 +37,5 @@ void NTCommandSelectorModel::Update() {
 }
 
 bool NTCommandSelectorModel::Exists() {
-  return m_inst.IsConnected() && m_running.Exists();
+  return m_running.Exists();
 }

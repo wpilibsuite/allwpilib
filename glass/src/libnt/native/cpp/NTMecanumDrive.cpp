@@ -81,5 +81,5 @@ void NTMecanumDriveModel::Update() {
 }
 
 bool NTMecanumDriveModel::Exists() {
-  return m_inst.IsConnected() && m_flPercent.Exists();
+  return m_flPercent.Exists();
 }
