@@ -403,7 +403,7 @@ TEST_P(TimedRobotTest, TestMode) {
   EXPECT_EQ(1u, robot.m_disabledPeriodicCount);
   EXPECT_EQ(0u, robot.m_autonomousPeriodicCount);
   EXPECT_EQ(0u, robot.m_teleopPeriodicCount);
-  EXPECT_EQ(0u, robot.m_testPeriodicCount);
+  EXPECT_EQ(2u, robot.m_testPeriodicCount);
 
   EXPECT_EQ(0u, robot.m_disabledExitCount);
   EXPECT_EQ(0u, robot.m_autonomousExitCount);
