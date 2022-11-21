@@ -10,7 +10,6 @@ import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-
 import java.util.ConcurrentModificationException;
 
 /**
@@ -262,6 +261,8 @@ public abstract class IterativeRobotBase extends RobotBase {
 
   /**
    * Whether LiveWindow operation is enabled during test mode.
+   *
+   * @return whether LiveWindow should be enabled in test mode.
    */
   public boolean getTestLW() {
     return m_isTestLW;

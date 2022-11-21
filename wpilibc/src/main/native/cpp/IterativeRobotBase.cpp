@@ -96,7 +96,8 @@ void IterativeRobotBase::SetNetworkTablesFlushEnabled(bool enabled) {
 
 void IterativeRobotBase::SetTestLW(bool testLW) {
   if (IsTest()) {
-    throw FRC_MakeError(err::IncompatibleMode, "Can't configure test mode while in test mode!");
+    throw FRC_MakeError(err::IncompatibleMode,
+                        "Can't configure test mode while in test mode!");
   }
   m_isTestLW = testLW;
 }
