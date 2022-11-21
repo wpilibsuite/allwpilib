@@ -9,6 +9,7 @@
 #include <atomic>
 #include <thread>
 
+#include "frc/livewindow/LiveWindow.h"
 #include "frc/simulation/DriverStationSim.h"
 #include "frc/simulation/SimHooks.h"
 #include "gtest/gtest.h"
