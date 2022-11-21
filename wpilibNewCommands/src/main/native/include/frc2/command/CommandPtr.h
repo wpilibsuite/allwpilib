@@ -267,7 +267,7 @@ class CommandPtr final {
   /**
    * Convert a vector of CommandPtr objects to their underlying unique_ptrs.
    */
-  static std::vector<std::unique_ptr<CommandBase>> UnwrapVector(
+  static std::vector<std::unique_ptr<Command>> UnwrapVector(
       std::vector<CommandPtr>&& vec);
 
  private:

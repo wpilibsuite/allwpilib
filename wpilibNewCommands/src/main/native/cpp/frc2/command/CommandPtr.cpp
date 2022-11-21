@@ -253,9 +253,9 @@ CommandPtr::operator bool() const {
   return m_ptr.operator bool();
 }
 
-std::vector<std::unique_ptr<CommandBase>> CommandPtr::UnwrapVector(
+std::vector<std::unique_ptr<Command>> CommandPtr::UnwrapVector(
     std::vector<CommandPtr>&& vec) {
-  std::vector<std::unique_ptr<CommandBase>> ptrs;
+  std::vector<std::unique_ptr<Command>> ptrs;
   for (auto&& ptr : vec) {
     ptrs.emplace_back(std::move(ptr).Unwrap());
   }
