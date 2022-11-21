@@ -502,10 +502,10 @@ class Trigger {
    *
    * @param command The command to bind.
    * @return The trigger, for chained calls.
-   * @deprecated Use Rising() as a command end condition with Until() instead.
+   * @deprecated Pass this as a command end condition with Until() instead.
    */
   WPI_DEPRECATED(
-      "Use Rising() as a command end condition with Until() instead.")
+      "Pass this as a command end condition with Until() instead.")
   Trigger CancelWhenActive(Command* command);
 
   /**
