@@ -19,10 +19,7 @@ TEST(Transform2dTest, Inverse) {
   auto transformed = initial + transform;
   auto untransformed = transformed + transform.Inverse();
 
-  EXPECT_NEAR(initial.X().value(), untransformed.X().value(), 1e-9);
-  EXPECT_DOUBLE_EQ(initial.Y().value(), untransformed.Y().value());
-  EXPECT_DOUBLE_EQ(initial.Rotation().Degrees().value(),
-                   untransformed.Rotation().Degrees().value());
+  EXPECT_EQ(initial, untransformed);
 }
 
 TEST(Transform2dTest, Composition) {
@@ -33,12 +30,7 @@ TEST(Transform2dTest, Composition) {
   auto transformedSeparate = initial + transform1 + transform2;
   auto transformedCombined = initial + (transform1 + transform2);
 
-  EXPECT_DOUBLE_EQ(transformedSeparate.X().value(),
-                   transformedCombined.X().value());
-  EXPECT_DOUBLE_EQ(transformedSeparate.Y().value(),
-                   transformedCombined.Y().value());
-  EXPECT_DOUBLE_EQ(transformedSeparate.Rotation().Degrees().value(),
-                   transformedCombined.Rotation().Degrees().value());
+  EXPECT_EQ(transformedSeparate, transformedCombined);
 }
 
 TEST(Transform2dTest, Constexpr) {
