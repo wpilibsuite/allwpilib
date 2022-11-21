@@ -4,15 +4,20 @@
 
 package edu.wpi.first.wpilibj;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-
+import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import edu.wpi.first.wpilibj.simulation.DriverStationSim;
 import edu.wpi.first.wpilibj.simulation.SimHooks;
+
+import java.util.ConcurrentModificationException;
 import java.util.concurrent.atomic.AtomicInteger;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.parallel.ResourceLock;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 class TimedRobotTest {
   static class MockRobot extends TimedRobot {
@@ -119,6 +124,7 @@ class TimedRobotTest {
   @BeforeEach
   void setup() {
     SimHooks.pauseTiming();
+    DriverStationSim.resetData();
   }
 
   @AfterEach
@@ -391,10 +397,12 @@ class TimedRobotTest {
     robot.close();
   }
 
-  @Test
+  @ValueSource(booleans = {true, false})
+  @ParameterizedTest
   @ResourceLock("timing")
-  void testModeTest() {
+  void testModeTest(boolean isLW) {
     MockRobot robot = new MockRobot();
+    robot.setTestLW(isLW);
 
     Thread robotThread =
         new Thread(
@@ -415,6 +423,7 @@ class TimedRobotTest {
     assertEquals(0, robot.m_autonomousInitCount.get());
     assertEquals(0, robot.m_teleopInitCount.get());
     assertEquals(0, robot.m_testInitCount.get());
+    assertFalse(LiveWindow.isEnabled());
 
     assertEquals(0, robot.m_robotPeriodicCount.get());
     assertEquals(0, robot.m_simulationPeriodicCount.get());
@@ -457,6 +466,9 @@ class TimedRobotTest {
     assertEquals(0, robot.m_autonomousInitCount.get());
     assertEquals(0, robot.m_teleopInitCount.get());
     assertEquals(1, robot.m_testInitCount.get());
+    assertEquals(isLW, LiveWindow.isEnabled());
+
+    assertThrows(ConcurrentModificationException.class, () -> robot.setTestLW(isLW));
 
     assertEquals(2, robot.m_robotPeriodicCount.get());
     assertEquals(2, robot.m_simulationPeriodicCount.get());
@@ -469,6 +481,33 @@ class TimedRobotTest {
     assertEquals(0, robot.m_autonomousExitCount.get());
     assertEquals(0, robot.m_teleopExitCount.get());
     assertEquals(0, robot.m_testExitCount.get());
+
+    DriverStationSim.setEnabled(false);
+    DriverStationSim.setAutonomous(false);
+    DriverStationSim.setTest(false);
+    DriverStationSim.notifyNewData();
+
+    SimHooks.stepTiming(0.02);
+
+    assertEquals(1, robot.m_robotInitCount.get());
+    assertEquals(1, robot.m_simulationInitCount.get());
+    assertEquals(1, robot.m_disabledInitCount.get());
+    assertEquals(0, robot.m_autonomousInitCount.get());
+    assertEquals(0, robot.m_teleopInitCount.get());
+    assertEquals(1, robot.m_testInitCount.get());
+    assertFalse(LiveWindow.isEnabled());
+
+    assertEquals(3, robot.m_robotPeriodicCount.get());
+    assertEquals(3, robot.m_simulationPeriodicCount.get());
+    assertEquals(1, robot.m_disabledPeriodicCount.get());
+    assertEquals(0, robot.m_autonomousPeriodicCount.get());
+    assertEquals(0, robot.m_teleopPeriodicCount.get());
+    assertEquals(2, robot.m_testPeriodicCount.get());
+
+    assertEquals(0, robot.m_disabledExitCount.get());
+    assertEquals(0, robot.m_autonomousExitCount.get());
+    assertEquals(0, robot.m_teleopExitCount.get());
+    assertEquals(1, robot.m_testExitCount.get());
 
     robot.endCompetition();
     try {
