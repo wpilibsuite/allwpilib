@@ -34,8 +34,8 @@ void HolonomicDriveController::SetTolerance(const Pose2d& tolerance) {
 }
 
 ChassisSpeeds HolonomicDriveController::Calculate(
-    const Pose2d& currentPose, const Pose2d& poseRef,
-    units::meters_per_second_t linearVelocityRef, const Rotation2d& angleRef) {
+    const Pose2d& currentPose, const Pose2d& trajectoryPose,
+    units::meters_per_second_t desiredLinearVelocity, const Rotation2d& desiredHeading) {
   // If this is the first run, then we need to reset the theta controller to the
   // current pose's heading.
   if (m_firstRun) {
@@ -44,13 +44,13 @@ ChassisSpeeds HolonomicDriveController::Calculate(
   }
 
   // Calculate feedforward velocities (field-relative)
-  auto xFF = linearVelocityRef * poseRef.Rotation().Cos();
-  auto yFF = linearVelocityRef * poseRef.Rotation().Sin();
+  auto xFF = desiredLinearVelocity * trajectoryPose.Rotation().Cos();
+  auto yFF = desiredLinearVelocity * trajectoryPose.Rotation().Sin();
   auto thetaFF = units::radians_per_second_t{m_thetaController.Calculate(
-      currentPose.Rotation().Radians(), angleRef.Radians())};
+      currentPose.Rotation().Radians(), desiredHeading.Radians())};
 
-  m_poseError = poseRef.RelativeTo(currentPose);
-  m_rotationError = angleRef - currentPose.Rotation();
+  m_poseError = trajectoryPose.RelativeTo(currentPose);
+  m_rotationError = desiredHeading - currentPose.Rotation();
 
   if (!m_enabled) {
     return ChassisSpeeds::FromFieldRelativeSpeeds(xFF, yFF, thetaFF,
@@ -59,9 +59,9 @@ ChassisSpeeds HolonomicDriveController::Calculate(
 
   // Calculate feedback velocities (based on position error).
   auto xFeedback = units::meters_per_second_t{
-      m_xController.Calculate(currentPose.X().value(), poseRef.X().value())};
+      m_xController.Calculate(currentPose.X().value(), trajectoryPose.X().value())};
   auto yFeedback = units::meters_per_second_t{
-      m_yController.Calculate(currentPose.Y().value(), poseRef.Y().value())};
+      m_yController.Calculate(currentPose.Y().value(), trajectoryPose.Y().value())};
 
   // Return next output.
   return ChassisSpeeds::FromFieldRelativeSpeeds(
@@ -70,9 +70,9 @@ ChassisSpeeds HolonomicDriveController::Calculate(
 
 ChassisSpeeds HolonomicDriveController::Calculate(
     const Pose2d& currentPose, const Trajectory::State& desiredState,
-    const Rotation2d& angleRef) {
+    const Rotation2d& desiredHeading) {
   return Calculate(currentPose, desiredState.pose, desiredState.velocity,
-                   angleRef);
+                   desiredHeading);
 }
 
 void HolonomicDriveController::SetEnabled(bool enabled) {

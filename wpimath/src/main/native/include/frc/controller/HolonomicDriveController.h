@@ -61,32 +61,27 @@ class WPILIB_DLLEXPORT HolonomicDriveController {
   /**
    * Returns the next output of the holonomic drive controller.
    *
-   * The reference pose, linear velocity, and angular velocity should come from
-   * a drivetrain trajectory.
-   *
-   * @param currentPose        The current pose.
-   * @param poseRef            The desired pose.
-   * @param linearVelocityRef  The desired linear velocity.
-   * @param angleRef           The desired ending angle.
+   * @param currentPose The current pose, as measured by odometry or pose estimator.
+   * @param trajectoryPose The desired trajectory pose, as sampled for the current timestep.
+   * @param desiredLinearVelocity The desired linear velocity.
+   * @param desiredHeading The desired heading.
+   * @return The next output of the holonomic drive controller.
    */
-  ChassisSpeeds Calculate(const Pose2d& currentPose, const Pose2d& poseRef,
-                          units::meters_per_second_t linearVelocityRef,
-                          const Rotation2d& angleRef);
+  ChassisSpeeds Calculate(const Pose2d& currentPose, const Pose2d& trajectoryPose,
+                          units::meters_per_second_t desiredLinearVelocity,
+                          const Rotation2d& desiredHeading);
 
   /**
    * Returns the next output of the holonomic drive controller.
    *
-   * The reference pose, linear velocity, and angular velocity should come from
-   * a drivetrain trajectory.
-   *
-   * @param currentPose  The current pose.
-   * @param desiredState The desired pose, linear velocity, and angular velocity
-   *                     from a trajectory.
-   * @param angleRef     The desired ending angle.
+   * @param currentPose The current pose, as measured by odometry or pose estimator.
+   * @param desiredState The desired trajectory pose, as sampled for the current timestep.
+   * @param desiredHeading The desired heading.
+   * @return The next output of the holonomic drive controller.
    */
   ChassisSpeeds Calculate(const Pose2d& currentPose,
                           const Trajectory::State& desiredState,
-                          const Rotation2d& angleRef);
+                          const Rotation2d& desiredHeading);
 
   /**
    * Enables and disables the controller for troubleshooting purposes. When
