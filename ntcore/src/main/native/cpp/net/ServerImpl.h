@@ -11,6 +11,7 @@
 #include <span>
 #include <string>
 #include <string_view>
+#include <utility>
 #include <vector>
 
 #include "NetworkInterface.h"
@@ -53,8 +54,10 @@ class ServerImpl final {
 
   // Returns -1 if cannot add client (e.g. due to duplicate name).
   // Caller must ensure WireConnection lifetime lasts until RemoveClient() call.
-  int AddClient(std::string_view name, std::string_view connInfo, bool local,
-                WireConnection& wire, SetPeriodicFunc setPeriodic);
+  std::pair<std::string, int> AddClient(std::string_view name,
+                                        std::string_view connInfo, bool local,
+                                        WireConnection& wire,
+                                        SetPeriodicFunc setPeriodic);
   int AddClient3(std::string_view connInfo, bool local,
                  net3::WireConnection3& wire, Connected3Func connected,
                  SetPeriodicFunc setPeriodic);
