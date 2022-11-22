@@ -1497,6 +1497,11 @@ SImpl::SImpl(wpi::Logger& logger) : m_logger{logger} {
 std::pair<std::string, int> SImpl::AddClient(
     std::string_view name, std::string_view connInfo, bool local,
     WireConnection& wire, ServerImpl::SetPeriodicFunc setPeriodic) {
+  // strip anything after @ in the name
+  name = wpi::split(name, '@').first;
+  if (name.empty()) {
+    name = "NT4";
+  }
   size_t index = m_clients.size();
   // find an empty slot and check for duplicates
   // just do a linear search as number of clients is typically small (<10)
