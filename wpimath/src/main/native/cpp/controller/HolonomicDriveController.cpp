@@ -35,7 +35,8 @@ void HolonomicDriveController::SetTolerance(const Pose2d& tolerance) {
 
 ChassisSpeeds HolonomicDriveController::Calculate(
     const Pose2d& currentPose, const Pose2d& trajectoryPose,
-    units::meters_per_second_t desiredLinearVelocity, const Rotation2d& desiredHeading) {
+    units::meters_per_second_t desiredLinearVelocity,
+    const Rotation2d& desiredHeading) {
   // If this is the first run, then we need to reset the theta controller to the
   // current pose's heading.
   if (m_firstRun) {
@@ -58,10 +59,10 @@ ChassisSpeeds HolonomicDriveController::Calculate(
   }
 
   // Calculate feedback velocities (based on position error).
-  auto xFeedback = units::meters_per_second_t{
-      m_xController.Calculate(currentPose.X().value(), trajectoryPose.X().value())};
-  auto yFeedback = units::meters_per_second_t{
-      m_yController.Calculate(currentPose.Y().value(), trajectoryPose.Y().value())};
+  auto xFeedback = units::meters_per_second_t{m_xController.Calculate(
+      currentPose.X().value(), trajectoryPose.X().value())};
+  auto yFeedback = units::meters_per_second_t{m_yController.Calculate(
+      currentPose.Y().value(), trajectoryPose.Y().value())};
 
   // Return next output.
   return ChassisSpeeds::FromFieldRelativeSpeeds(

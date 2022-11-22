@@ -82,7 +82,10 @@ public class HolonomicDriveController {
    * @return The next output of the holonomic drive controller.
    */
   public ChassisSpeeds calculate(
-      Pose2d currentPose, Pose2d trajectoryPose, double desiredLinearVelocityMetersPerSecond, Rotation2d desiredHeading) {
+      Pose2d currentPose,
+      Pose2d trajectoryPose,
+      double desiredLinearVelocityMetersPerSecond,
+      Rotation2d desiredHeading) {
     // If this is the first run, then we need to reset the theta controller to the current pose's
     // heading.
     if (m_firstRun) {
@@ -94,7 +97,8 @@ public class HolonomicDriveController {
     double xFF = desiredLinearVelocityMetersPerSecond * trajectoryPose.getRotation().getCos();
     double yFF = desiredLinearVelocityMetersPerSecond * trajectoryPose.getRotation().getSin();
     double thetaFF =
-        m_thetaController.calculate(currentPose.getRotation().getRadians(), desiredHeading.getRadians());
+        m_thetaController.calculate(
+            currentPose.getRotation().getRadians(), desiredHeading.getRadians());
 
     m_poseError = trajectoryPose.relativeTo(currentPose);
     m_rotationError = desiredHeading.minus(currentPose.getRotation());
