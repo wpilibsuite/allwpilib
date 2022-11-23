@@ -73,7 +73,7 @@ public class SwerveDrivePoseEstimator {
 
     m_q = new Matrix<>(Nat.N3(), Nat.N1());
     for (int i = 0; i < 3; ++i) {
-      m_q.set(i, 0, stateStdDevs.get(i, 0));
+      m_q.set(i, 0, stateStdDevs.get(i, 0) * stateStdDevs.get(i, 0));
     }
 
     m_numModules = modulePositions.length;
