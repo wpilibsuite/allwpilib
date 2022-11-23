@@ -168,9 +168,28 @@ template <typename Key>
 // Command Groups
 
 /**
+ * Create a vector of commands.
+ */
+template <typename... Args>
+std::vector<CommandPtr> vec(Args&&... args) {
+  std::vector<CommandPtr> data;
+  data.reserve(sizeof...(Args));
+  (data.emplace_back(std::forward<Args>(args)), ...);
+  return data;
+}
+
+/**
  * Runs a group of commands in series, one after the other.
  */
 [[nodiscard]] CommandPtr Sequence(std::vector<CommandPtr>&& commands);
+
+/**
+ * Runs a group of commands in series, one after the other.
+ */
+template <typename... Args>
+[[nodiscard]] CommandPtr Sequence(Args&&... commands) {
+  return Sequence(vec(std::forward<Args>(commands)...));
+}
 
 /**
  * Runs a group of commands in series, one after the other. Once the last
@@ -179,10 +198,28 @@ template <typename Key>
 [[nodiscard]] CommandPtr RepeatingSequence(std::vector<CommandPtr>&& commands);
 
 /**
+ * Runs a group of commands in series, one after the other. Once the last
+ * command ends, the group is restarted.
+ */
+template <typename... Args>
+[[nodiscard]] CommandPtr RepeatingSequence(Args&&... commands) {
+  return RepeatingSequence(vec(std::forward<Args>(commands)...));
+}
+
+/**
  * Runs a group of commands at the same time. Ends once all commands in the
  * group finish.
  */
 [[nodiscard]] CommandPtr Parallel(std::vector<CommandPtr>&& commands);
+
+/**
+ * Runs a group of commands at the same time. Ends once all commands in the
+ * group finish.
+ */
+template <typename... Args>
+[[nodiscard]] CommandPtr Parallel(Args&&... commands) {
+  return Parallel(vec(std::forward<Args>(commands)...));
+}
 
 /**
  * Runs a group of commands at the same time. Ends once any command in the group
@@ -191,11 +228,30 @@ template <typename Key>
 [[nodiscard]] CommandPtr Race(std::vector<CommandPtr>&& commands);
 
 /**
+ * Runs a group of commands at the same time. Ends once any command in the group
+ * finishes, and cancels the others.
+ */
+template <typename... Args>
+[[nodiscard]] CommandPtr Race(Args&&... commands) {
+  return Race(vec(std::forward<Args>(commands)...));
+}
+
+/**
  * Runs a group of commands at the same time. Ends once a specific command
  * finishes, and cancels the others.
  */
 [[nodiscard]] CommandPtr Deadline(CommandPtr&& deadline,
                                   std::vector<CommandPtr>&& others);
+
+/**
+ * Runs a group of commands at the same time. Ends once a specific command
+ * finishes, and cancels the others.
+ */
+template <typename... Args>
+[[nodiscard]] CommandPtr Deadline(CommandPtr&& deadline, Args&&... commands) {
+  return Deadline(std::move(deadline), vec(std::forward<Args>(commands)...));
+}
+
 }  // namespace cmd
 
 }  // namespace frc2
