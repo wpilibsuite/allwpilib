@@ -5,6 +5,7 @@
 #pragma once
 
 #include <frc/controller/ArmFeedforward.h>
+#include <frc2/command/Commands.h>
 #include <frc2/command/TrapezoidProfileSubsystem.h>
 #include <units/angle.h>
 
@@ -20,6 +21,8 @@ class ArmSubsystem : public frc2::TrapezoidProfileSubsystem<units::radians> {
   ArmSubsystem();
 
   void UseState(State setpoint) override;
+
+  frc2::CommandPtr SetArmGoalCommand(units::radian_t goal);
 
  private:
   ExampleSmartMotorController m_motor;

@@ -34,10 +34,8 @@ RobotContainer::RobotContainer() {
 void RobotContainer::ConfigureButtonBindings() {
   // Configure your button bindings here
 
-  // NOTE: Using `new` here will leak these commands if they are ever no longer
-  // needed. This is usually a non-issue as button-bindings tend to be permanent
-  // - however, if you wish to avoid this, the commands should be
-  // stack-allocated and declared as members of RobotContainer.
+  // NOTE: since we're binding a CommandPtr, command ownership here is moved to
+  // the scheduler thus, no memory leaks!
 
   // Grab the hatch when the 'A' button is pressed.
   frc2::JoystickButton(&m_driverController, frc::XboxController::Button::kA)

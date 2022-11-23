@@ -4,16 +4,10 @@
 
 #pragma once
 
-#include <frc/XboxController.h>
-#include <frc/smartdashboard/SendableChooser.h>
 #include <frc2/command/Command.h>
-#include <frc2/command/ConditionalCommand.h>
-#include <frc2/command/InstantCommand.h>
-#include <frc2/command/ParallelRaceGroup.h>
-#include <frc2/command/RunCommand.h>
-#include <frc2/command/SequentialCommandGroup.h>
-#include <frc2/command/WaitCommand.h>
-#include <frc2/command/WaitUntilCommand.h>
+#include <frc2/command/CommandPtr.h>
+#include <frc2/command/Commands.h>
+#include <frc2/command/button/CommandXboxController.h>
 
 #include "Constants.h"
 #include "subsystems/DriveSubsystem.h"
@@ -32,65 +26,47 @@ class RobotContainer {
  public:
   RobotContainer();
 
+  // The chooser for the autonomous routines
   frc2::Command* GetAutonomousCommand();
 
  private:
   // The driver's controller
-  frc::XboxController m_driverController{OIConstants::kDriverControllerPort};
-
-  // The robot's subsystems and commands are defined here...
+  frc2::CommandXboxController m_driverController{
+      OIConstants::kDriverControllerPort};
 
   // The robot's subsystems
   DriveSubsystem m_drive;
   ShooterSubsystem m_shooter;
 
-  // A simple autonomous routine that shoots the loaded frisbees
+  // RobotContainer-owned commands
+  // (These variables will still be valid after binding, because we don't move
+  // ownership)
+
+  frc2::CommandPtr m_spinUpShooter =
+      frc2::cmd::RunOnce([this] { m_shooter.Enable(); }, {&m_shooter});
+
+  frc2::CommandPtr m_stopShooter =
+      frc2::cmd::RunOnce([this] { m_shooter.Disable(); }, {&m_shooter});
+
+  // An autonomous routine that shoots the loaded frisbees
   frc2::CommandPtr m_autonomousCommand =
-      frc2::SequentialCommandGroup{
+      frc2::cmd::Sequence(
           // Start the command by spinning up the shooter...
-          frc2::InstantCommand([this] { m_shooter.Enable(); }, {&m_shooter}),
+          frc2::cmd::RunOnce([this] { m_shooter.Enable(); }, {&m_shooter}),
           // Wait until the shooter is at speed before feeding the frisbees
-          frc2::WaitUntilCommand([this] { return m_shooter.AtSetpoint(); }),
+          frc2::cmd::WaitUntil([this] { return m_shooter.AtSetpoint(); }),
           // Start running the feeder
-          frc2::InstantCommand([this] { m_shooter.RunFeeder(); }, {&m_shooter}),
+          frc2::cmd::RunOnce([this] { m_shooter.RunFeeder(); }, {&m_shooter}),
           // Shoot for the specified time
-          frc2::WaitCommand(ac::kAutoShootTimeSeconds)}
+          frc2::cmd::Wait(ac::kAutoShootTimeSeconds))
           // Add a timeout (will end the command if, for instance, the shooter
           // never gets up to speed)
           .WithTimeout(ac::kAutoTimeoutSeconds)
           // When the command ends, turn off the shooter and the feeder
-          .AndThen([this] {
+          .AndThen(frc2::cmd::RunOnce([this] {
             m_shooter.Disable();
             m_shooter.StopFeeder();
-          });
-
-  // Assorted commands to be bound to buttons
-
-  frc2::InstantCommand m_spinUpShooter{[this] { m_shooter.Enable(); },
-                                       {&m_shooter}};
-
-  frc2::InstantCommand m_stopShooter{[this] { m_shooter.Disable(); },
-                                     {&m_shooter}};
-
-  // Shoots if the shooter wheel has reached the target speed
-  frc2::ConditionalCommand m_shoot{
-      // Run the feeder
-      frc2::InstantCommand{[this] { m_shooter.RunFeeder(); }, {&m_shooter}},
-      // Do nothing
-      frc2::InstantCommand(),
-      // Determine which of the above to do based on whether the shooter has
-      // reached the desired speed
-      [this] { return m_shooter.AtSetpoint(); }};
-
-  frc2::InstantCommand m_stopFeeder{[this] { m_shooter.StopFeeder(); },
-                                    {&m_shooter}};
-
-  frc2::InstantCommand m_driveHalfSpeed{[this] { m_drive.SetMaxOutput(0.5); },
-                                        {}};
-  frc2::InstantCommand m_driveFullSpeed{[this] { m_drive.SetMaxOutput(1); },
-                                        {}};
-
-  // The chooser for the autonomous routines
+          }));
 
   void ConfigureButtonBindings();
 };
