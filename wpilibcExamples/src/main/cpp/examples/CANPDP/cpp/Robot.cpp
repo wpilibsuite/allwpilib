@@ -42,6 +42,9 @@ class Robot : public frc::TimedRobot {
     // Energy is the power summed over time with units Joules.
     double totalEnergy = m_pdp.GetTotalEnergy();
     frc::SmartDashboard::PutNumber("Total Energy", totalEnergy);
+
+    // Put the PDP itself to the dashboard
+    frc::SmartDashboard::PutData("PDP", &m_pdp);
   }
 
  private:
