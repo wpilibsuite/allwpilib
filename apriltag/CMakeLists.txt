@@ -1,4 +1,4 @@
-project(fieldImages)
+project(apriltag)
 
 include(CompileWarnings)
 include(GenResources)
