@@ -423,7 +423,7 @@ public final class CommandScheduler implements NTSendable, AutoCloseable {
 
     m_subsystems.put(subsystem, defaultCommand);
   }
-  
+
   /**
    * Removes the default command for a subsystem. The current default command will run until another
    * command is scheduled that requires the subsystem, at which point the current default command
@@ -436,7 +436,7 @@ public final class CommandScheduler implements NTSendable, AutoCloseable {
       DriverStation.reportWarning("Tried to remove a default command for a null subsystem", true);
       return;
     }
-    
+
     m_subsystems.put(subsystem, null);
   }
 
