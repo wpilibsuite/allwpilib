@@ -107,7 +107,7 @@ class SwerveDrivePoseEstimatorTest {
     for (int offset_direction_degs = 0; offset_direction_degs < 360; offset_direction_degs += 45) {
       for (int offset_heading_degs = 0; offset_heading_degs < 360; offset_heading_degs+= 45) {
         var pose_offset = Rotation2d.fromDegrees(offset_direction_degs);
-        var heading_offset = Rotation2d.fromRadians(offset_heading_degs);
+        var heading_offset = Rotation2d.fromDegrees(offset_heading_degs);
 
         var initial_pose =
             trajectory
@@ -192,7 +192,7 @@ class SwerveDrivePoseEstimatorTest {
 
       for (int i = 0; i < moduleStates.length; i++) {
         positions[i].distanceMeters +=
-            (moduleStates[i].speedMetersPerSecond + rand.nextGaussian() * 0.1) * dt;
+            moduleStates[i].speedMetersPerSecond * (1 - rand.nextGaussian() * 0.05) * dt;
         positions[i].angle =
             moduleStates[i].angle.plus(new Rotation2d(rand.nextGaussian() * 0.005));
       }
