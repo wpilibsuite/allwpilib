@@ -43,7 +43,7 @@ class SwerveDrivePoseEstimatorTest {
             new Rotation2d(),
             new SwerveModulePosition[] {fl, fr, bl, br},
             new Pose2d(),
-            VecBuilder.fill(0.05, 0.05, 0.01),
+            VecBuilder.fill(0.1, 0.1, 0.1),
             VecBuilder.fill(0.45, 0.45, 0.1));
 
     var trajectory =
@@ -66,7 +66,7 @@ class SwerveDrivePoseEstimatorTest {
                 0,
                 state.velocityMetersPerSecond * state.curvatureRadPerMeter),
         state -> state.poseMeters,
-        new Pose2d(0, 0, Rotation2d.fromDegrees(45)),
+        trajectory.getInitialPose(),
         new Pose2d(0, 0, Rotation2d.fromDegrees(45)),
         0.02,
         true);
@@ -92,7 +92,7 @@ class SwerveDrivePoseEstimatorTest {
             new Rotation2d(),
             new SwerveModulePosition[] {fl, fr, bl, br},
             new Pose2d(-1, -1, Rotation2d.fromRadians(-1)),
-            VecBuilder.fill(0.05, 0.05, 0.01),
+            VecBuilder.fill(0.1, 0.1, 0.1),
             VecBuilder.fill(0.45, 0.45, 0.1));
     var trajectory =
         TrajectoryGenerator.generateTrajectory(
@@ -105,7 +105,7 @@ class SwerveDrivePoseEstimatorTest {
             new TrajectoryConfig(2, 2));
 
     for (int offset_direction_degs = 0; offset_direction_degs < 360; offset_direction_degs += 45) {
-      for (int offset_heading_degs = 0; offset_heading_degs < 360; offset_heading_degs+= 45) {
+      for (int offset_heading_degs = 0; offset_heading_degs < 360; offset_heading_degs += 45) {
         var pose_offset = Rotation2d.fromDegrees(offset_direction_degs);
         var heading_offset = Rotation2d.fromDegrees(offset_heading_degs);
 
@@ -240,7 +240,7 @@ class SwerveDrivePoseEstimatorTest {
     if (checkError) {
       assertEquals(
           0.0, errorSum / (trajectory.getTotalTimeSeconds() / dt), 0.07, "Incorrect mean error");
-      assertEquals(0.0, maxError, 0.125, "Incorrect max error");
+      assertEquals(0.0, maxError, 0.13, "Incorrect max error");
     }
   }
 }
