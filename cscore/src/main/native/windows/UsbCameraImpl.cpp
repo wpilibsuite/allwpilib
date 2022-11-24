@@ -467,8 +467,7 @@ LRESULT UsbCameraImpl::PumpMain(HWND hwnd, UINT uiMsg, WPARAM wParam,
 
 static cs::VideoMode::PixelFormat GetFromGUID(const GUID& guid) {
   // Compare GUID to one of the supported ones
-  if (IsEqualGUID(guid, MFVideoFormat_NV12)) {
-    // GrayScale
+  if (IsEqualGUID(guid, MFVideoFormat_L8)) {
     return cs::VideoMode::PixelFormat::kGray;
   } else if (IsEqualGUID(guid, MFVideoFormat_YUY2)) {
     return cs::VideoMode::PixelFormat::kYUYV;
