@@ -40,6 +40,10 @@ class WPILIB_DLLEXPORT Rotation3d {
    * Extrinsic rotations occur in that order around the axes in the fixed global
    * frame rather than the body frame.
    *
+   * Angles are measured counterclockwise with the rotation axis pointing "out
+   * of the page". If you point your right thumb along the positive axis
+   * direction, your fingers curl in the direction of positive rotation.
+   *
    * @param roll The counterclockwise rotation angle around the X axis (roll).
    * @param pitch The counterclockwise rotation angle around the Y axis (pitch).
    * @param yaw The counterclockwise rotation angle around the Z axis (yaw).
