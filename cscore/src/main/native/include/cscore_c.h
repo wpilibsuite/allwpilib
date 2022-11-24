@@ -94,6 +94,7 @@ enum CS_PixelFormat {
   CS_PIXFMT_RGB565,
   CS_PIXFMT_BGR,
   CS_PIXFMT_GRAY,
+  CS_PIXFMT_Y16,
   CS_PIXFMT_UYVY
 };
 
