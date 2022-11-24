@@ -16,6 +16,12 @@ public class Robot extends TimedRobot {
   private final PowerDistribution m_pdp = new PowerDistribution();
 
   @Override
+  public void robotInit() {
+    // Put the PDP itself to the dashboard
+    SmartDashboard.putData("PDP", m_pdp);
+  }
+
+  @Override
   public void robotPeriodic() {
     // Get the current going through channel 7, in Amperes.
     // The PDP returns the current in increments of 0.125A.
@@ -45,8 +51,5 @@ public class Robot extends TimedRobot {
     // Energy is the power summed over time with units Joules.
     double totalEnergy = m_pdp.getTotalEnergy();
     SmartDashboard.putNumber("Total Energy", totalEnergy);
-
-    // Put the PDP itself to the dashboard
-    SmartDashboard.putData("PDP", m_pdp);
   }
 }

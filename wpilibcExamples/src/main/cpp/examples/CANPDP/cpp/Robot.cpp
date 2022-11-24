@@ -13,7 +13,12 @@
  */
 class Robot : public frc::TimedRobot {
  public:
-  void TeleopPeriodic() override {
+  void RobotInit() override {
+    // Put the PDP itself to the dashboard
+    frc::SmartDashboard::PutData("PDP", &m_pdp);
+  }
+
+  void RobotPeriodic() override {
     // Get the current going through channel 7, in Amperes.
     // The PDP returns the current in increments of 0.125A.
     // At low currents the current readings tend to be less accurate.
@@ -42,9 +47,6 @@ class Robot : public frc::TimedRobot {
     // Energy is the power summed over time with units Joules.
     double totalEnergy = m_pdp.GetTotalEnergy();
     frc::SmartDashboard::PutNumber("Total Energy", totalEnergy);
-
-    // Put the PDP itself to the dashboard
-    frc::SmartDashboard::PutData("PDP", &m_pdp);
   }
 
  private:
