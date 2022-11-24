@@ -217,7 +217,7 @@ Image* Frame::ConvertImpl(Image* image, VideoMode::PixelFormat pixelFormat,
   // Color convert
   switch (pixelFormat) {
     case VideoMode::kRGB565:
-      // If source is YUYV or Gray, need to convert to BGR first
+      // If source is YUYV, UYVY, or Gray, need to convert to BGR first
       if (cur->pixelFormat == VideoMode::kYUYV) {
         // Check to see if BGR version already exists...
         if (Image* newImage =
@@ -225,6 +225,14 @@ Image* Frame::ConvertImpl(Image* image, VideoMode::PixelFormat pixelFormat,
           cur = newImage;
         } else {
           cur = ConvertYUYVToBGR(cur);
+        }
+      } else if (cur->pixelFormat == VideoMode::kUYVY) {
+        // Check to see if BGR version already exists...
+        if (Image* newImage =
+                GetExistingImage(cur->width, cur->height, VideoMode::kBGR)) {
+          cur = newImage;
+        } else {
+          cur = ConvertUYVYToBGR(cur);
         }
       } else if (cur->pixelFormat == VideoMode::kGray) {
         // Check to see if BGR version already exists...
@@ -237,7 +245,7 @@ Image* Frame::ConvertImpl(Image* image, VideoMode::PixelFormat pixelFormat,
       }
       return ConvertBGRToRGB565(cur);
     case VideoMode::kGray:
-      // If source is YUYV or RGB565, need to convert to BGR first
+      // If source is YUYV, UYVY, or RGB565, need to convert to BGR first
       if (cur->pixelFormat == VideoMode::kYUYV) {
         // Check to see if BGR version already exists...
         if (Image* newImage =
@@ -245,6 +253,14 @@ Image* Frame::ConvertImpl(Image* image, VideoMode::PixelFormat pixelFormat,
           cur = newImage;
         } else {
           cur = ConvertYUYVToBGR(cur);
+        }
+      } else if (cur->pixelFormat == VideoMode::kUYVY) {
+        // Check to see if BGR version already exists...
+        if (Image* newImage =
+                GetExistingImage(cur->width, cur->height, VideoMode::kBGR)) {
+          cur = newImage;
+        } else {
+          cur = ConvertUYVYToBGR(cur);
         }
       } else if (cur->pixelFormat == VideoMode::kRGB565) {
         // Check to see if BGR version already exists...
@@ -260,6 +276,8 @@ Image* Frame::ConvertImpl(Image* image, VideoMode::PixelFormat pixelFormat,
     case VideoMode::kMJPEG:
       if (cur->pixelFormat == VideoMode::kYUYV) {
         cur = ConvertYUYVToBGR(cur);
+      } else if (cur->pixelFormat == VideoMode::kUYVY) {
+        cur = ConvertUYVYToBGR(cur);
       } else if (cur->pixelFormat == VideoMode::kRGB565) {
         cur = ConvertRGB565ToBGR(cur);
       } else if (cur->pixelFormat == VideoMode::kGray) {
@@ -271,6 +289,7 @@ Image* Frame::ConvertImpl(Image* image, VideoMode::PixelFormat pixelFormat,
       }
       break;
     case VideoMode::kYUYV:
+    case VideoMode::kUYVY:
     default:
       return nullptr;  // Unsupported
   }
@@ -341,6 +360,28 @@ Image* Frame::ConvertYUYVToBGR(Image* image) {
 
   // Convert
   cv::cvtColor(image->AsMat(), newImage->AsMat(), cv::COLOR_YUV2BGR_YUYV);
+
+  // Save the result
+  Image* rv = newImage.release();
+  if (m_impl) {
+    std::scoped_lock lock(m_impl->mutex);
+    m_impl->images.push_back(rv);
+  }
+  return rv;
+}
+
+Image* Frame::ConvertUYVYToBGR(Image* image) {
+  if (!image || image->pixelFormat != VideoMode::kUYVY) {
+    return nullptr;
+  }
+
+  // Allocate a BGR image
+  auto newImage =
+      m_impl->source.AllocImage(VideoMode::kBGR, image->width, image->height,
+                                image->width * image->height * 3);
+
+  // Convert
+  cv::cvtColor(image->AsMat(), newImage->AsMat(), cv::COLOR_YUV2BGR_UYVY);
 
   // Save the result
   Image* rv = newImage.release();
