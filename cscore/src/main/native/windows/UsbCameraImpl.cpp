@@ -356,6 +356,12 @@ void UsbCameraImpl::ProcessFrame(IMFSample* videoSample,
                         tmpMat.total());
       tmpMat.copyTo(dest->AsMat());
       break;
+    case cs::VideoMode::PixelFormat::kY16:
+      tmpMat = cv::Mat(mode.height, mode.width, CV_8UC2, ptr, pitch);
+      dest =
+          AllocImage(VideoMode::kY16, tmpMat.cols, tmpMat.rows, tmpMat.total());
+      tmpMat.copyTo(dest->AsMat());
+      break;
     case cs::VideoMode::PixelFormat::kBGR:
       tmpMat = cv::Mat(mode.height, mode.width, CV_8UC3, ptr, pitch);
       dest = AllocImage(VideoMode::kBGR, tmpMat.cols, tmpMat.rows,
@@ -469,6 +475,8 @@ static cs::VideoMode::PixelFormat GetFromGUID(const GUID& guid) {
   // Compare GUID to one of the supported ones
   if (IsEqualGUID(guid, MFVideoFormat_L8)) {
     return cs::VideoMode::PixelFormat::kGray;
+  } else if (IsEqualGUID(guid, MFVideoFormat_L16)) {
+    return cs::VideoMode::PixelFormat::kY16;
   } else if (IsEqualGUID(guid, MFVideoFormat_YUY2)) {
     return cs::VideoMode::PixelFormat::kYUYV;
   } else if (IsEqualGUID(guid, MFVideoFormat_RGB24)) {

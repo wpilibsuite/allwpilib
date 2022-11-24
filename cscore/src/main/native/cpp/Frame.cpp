@@ -217,7 +217,7 @@ Image* Frame::ConvertImpl(Image* image, VideoMode::PixelFormat pixelFormat,
   // Color convert
   switch (pixelFormat) {
     case VideoMode::kRGB565:
-      // If source is YUYV, UYVY, or Gray, need to convert to BGR first
+      // If source is YUYV, UYVY, Gray, or Y16, need to convert to BGR first
       if (cur->pixelFormat == VideoMode::kYUYV) {
         // Check to see if BGR version already exists...
         if (Image* newImage =
@@ -242,9 +242,29 @@ Image* Frame::ConvertImpl(Image* image, VideoMode::PixelFormat pixelFormat,
         } else {
           cur = ConvertGrayToBGR(cur);
         }
+      } else if (cur->pixelFormat == VideoMode::kY16) {
+        // Check to see if BGR version already exists...
+        if (Image* newImage =
+                GetExistingImage(cur->width, cur->height, VideoMode::kBGR)) {
+          cur = newImage;
+        } else if (Image* newImage = GetExistingImage(cur->width, cur->height,
+                                                      VideoMode::kGray)) {
+          cur = ConvertGrayToBGR(cur);
+        } else {
+          cur = ConvertGrayToBGR(ConvertY16ToGray(cur));
+        }
       }
       return ConvertBGRToRGB565(cur);
     case VideoMode::kGray:
+    case VideoMode::kY16:
+      // If source is also grayscale, convert directly
+      if (pixelFormat == VideoMode::kGray &&
+          cur->pixelFormat == VideoMode::kY16) {
+        return ConvertY16ToGray(cur);
+      } else if (pixelFormat == VideoMode::kY16 &&
+                 cur->pixelFormat == VideoMode::kGray) {
+        return ConvertGrayToY16(cur);
+      }
       // If source is YUYV, UYVY, or RGB565, need to convert to BGR first
       if (cur->pixelFormat == VideoMode::kYUYV) {
         // Check to see if BGR version already exists...
@@ -271,7 +291,11 @@ Image* Frame::ConvertImpl(Image* image, VideoMode::PixelFormat pixelFormat,
           cur = ConvertRGB565ToBGR(cur);
         }
       }
-      return ConvertBGRToGray(cur);
+      cur = ConvertBGRToGray(cur);
+      if (pixelFormat == VideoMode::kY16) {
+        cur = ConvertGrayToY16(cur);
+      }
+      return cur;
     case VideoMode::kBGR:
     case VideoMode::kMJPEG:
       if (cur->pixelFormat == VideoMode::kYUYV) {
@@ -281,6 +305,19 @@ Image* Frame::ConvertImpl(Image* image, VideoMode::PixelFormat pixelFormat,
       } else if (cur->pixelFormat == VideoMode::kRGB565) {
         cur = ConvertRGB565ToBGR(cur);
       } else if (cur->pixelFormat == VideoMode::kGray) {
+        if (pixelFormat == VideoMode::kBGR) {
+          return ConvertGrayToBGR(cur);
+        } else {
+          return ConvertGrayToMJPEG(cur, defaultJpegQuality);
+        }
+      } else if (cur->pixelFormat == VideoMode::kY16) {
+        // Check to see if Gray version already exists...
+        if (Image* newImage =
+                GetExistingImage(cur->width, cur->height, VideoMode::kGray)) {
+          cur = newImage;
+        } else {
+          cur = ConvertY16ToGray(cur);
+        }
         if (pixelFormat == VideoMode::kBGR) {
           return ConvertGrayToBGR(cur);
         } else {
@@ -547,6 +584,50 @@ Image* Frame::ConvertGrayToMJPEG(Image* image, int quality) {
   // Save the result
   Image* rv = newImage.release();
   m_impl->images.push_back(rv);
+  return rv;
+}
+
+Image* Frame::ConvertGrayToY16(Image* image) {
+  if (!image || image->pixelFormat != VideoMode::kGray) {
+    return nullptr;
+  }
+
+  // Allocate a Y16 image
+  auto newImage =
+      m_impl->source.AllocImage(VideoMode::kY16, image->width, image->height,
+                                image->width * image->height * 2);
+
+  // Convert with linear scaling
+  image->AsMat().convertTo(newImage->AsMat(), CV_16U, 256);
+
+  // Save the result
+  Image* rv = newImage.release();
+  if (m_impl) {
+    std::scoped_lock lock(m_impl->mutex);
+    m_impl->images.push_back(rv);
+  }
+  return rv;
+}
+
+Image* Frame::ConvertY16ToGray(Image* image) {
+  if (!image || image->pixelFormat != VideoMode::kY16) {
+    return nullptr;
+  }
+
+  // Allocate a Grayscale image
+  auto newImage =
+      m_impl->source.AllocImage(VideoMode::kGray, image->width, image->height,
+                                image->width * image->height);
+
+  // Scale min to 0 and max to 255
+  cv::normalize(image->AsMat(), newImage->AsMat(), 255, 0, cv::NORM_MINMAX);
+
+  // Save the result
+  Image* rv = newImage.release();
+  if (m_impl) {
+    std::scoped_lock lock(m_impl->mutex);
+    m_impl->images.push_back(rv);
+  }
   return rv;
 }
 
