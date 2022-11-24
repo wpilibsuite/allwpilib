@@ -460,6 +460,9 @@ void MjpegServerImpl::ConnThread::SendHTML(wpi::raw_ostream& os,
       case VideoMode::kGray:
         os << "gray";
         break;
+      case VideoMode::kUYVY:
+        os << "UYVY";
+        break;
       default:
         os << "unknown";
         break;
@@ -568,6 +571,9 @@ void MjpegServerImpl::ConnThread::SendJSON(wpi::raw_ostream& os,
         break;
       case VideoMode::kGray:
         os << "gray";
+        break;
+      case VideoMode::kUYVY:
+        os << "UYVY";
         break;
       default:
         os << "unknown";
@@ -740,8 +746,9 @@ void MjpegServerImpl::ConnThread::SendStream(wpi::raw_socket_ostream& os) {
         // for adding it if required.
         addDHT = JpegNeedsDHT(data, &size, &locSOF);
         break;
-      case VideoMode::kYUYV:
+      case VideoMode::kUYVY:
       case VideoMode::kRGB565:
+      case VideoMode::kYUYV:
       default:
         // Bad frame; sleep for 10 ms so we don't consume all processor time.
         std::this_thread::sleep_for(std::chrono::milliseconds(10));

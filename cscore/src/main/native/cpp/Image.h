@@ -74,6 +74,7 @@ class Image {
     switch (pixelFormat) {
       case VideoMode::kYUYV:
       case VideoMode::kRGB565:
+      case VideoMode::kUYVY:
         type = CV_8UC2;
         break;
       case VideoMode::kBGR:
