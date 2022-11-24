@@ -249,7 +249,7 @@ Image* Frame::ConvertImpl(Image* image, VideoMode::PixelFormat pixelFormat,
           cur = newImage;
         } else if (Image* newImage = GetExistingImage(cur->width, cur->height,
                                                       VideoMode::kGray)) {
-          cur = ConvertGrayToBGR(cur);
+          cur = ConvertGrayToBGR(newImage);
         } else {
           cur = ConvertGrayToBGR(ConvertY16ToGray(cur));
         }
