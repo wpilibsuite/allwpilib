@@ -52,6 +52,8 @@ The following strategies are defined in this specification:
 - `CancelSelf`: this command is interrupted, [`end(true)`](#void-endbool-interrupted) is called, and scheduling of the incoming command commences.
 - `CancelIncoming`: scheduling of the incoming command is aborted, and this command continues running unaffected.
 
+Compositions are `CancelSelf` unless all their components are `CancelIncoming`.
+
 [//]: # (TODO: do we want to explicitly allow alternate interruption behaviors? do we want to dictate a default?)
 [//]: # (      might be interesting to see alternate impls -- maybe coroutine-based in the future?)
 
@@ -61,6 +63,8 @@ For implementations defining a "disabled mode",
 this property dictates whether a command may run during it.
 During "disabled mode", any commands not declared as "running when disabled"
 MUST be interrupted (i.e. `end(true)` is called), and any attempts to schedule them MUST abort.
+
+Compositions may run when disabled only if all their components may run when disabled.
 
 ### Command Lifecycle
 
