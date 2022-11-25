@@ -3,6 +3,7 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #include "CommandTestBase.h"
+#include "CompositionTestBase.h"
 #include "frc2/command/ConditionalCommand.h"
 #include "frc2/command/InstantCommand.h"
 #include "frc2/command/SelectCommand.h"
@@ -57,3 +58,24 @@ TEST_F(SelectCommandTest, SelectCommandRequirement) {
   EXPECT_TRUE(scheduler.IsScheduled(&command3));
   EXPECT_FALSE(scheduler.IsScheduled(&select));
 }
+
+class TestableSelectCommand : public SelectCommand<int> {
+  static std::vector<std::pair<int, std::unique_ptr<Command>>> ZipVector(
+      std::vector<std::unique_ptr<Command>>&& commands) {
+    std::vector<std::pair<int, std::unique_ptr<Command>>> vec;
+    int index = 0;
+    for (auto&& command : commands) {
+      vec.emplace_back(std::make_pair(index, std::move(command)));
+      index++;
+    }
+    return vec;
+  }
+
+ public:
+  explicit TestableSelectCommand(
+      std::vector<std::unique_ptr<Command>>&& commands)
+      : SelectCommand([] { return 0; }, ZipVector(std::move(commands))) {}
+};
+
+INSTANTIATE_MULTI_COMMAND_COMPOSITION_TEST_SUITE(SelectCommandTest,
+                                                 TestableSelectCommand);
