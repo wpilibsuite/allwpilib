@@ -18,7 +18,7 @@
 
 namespace frc {
 /**
- * This class wraps an Unscented Kalman Filter to fuse latency-compensated
+ * This class wraps Differential Drive Odometry to fuse latency-compensated
  * vision measurements with differential drive encoder measurements. It will
  * correct for noisy vision measurements and encoder drift. It is intended to be
  * an easy drop-in for DifferentialDriveOdometry. In fact, if you never call
@@ -32,24 +32,13 @@ namespace frc {
  * AddVisionMeasurement() can be called as infrequently as you want; if you
  * never call it, then this class will behave like regular encoder odometry.
  *
- * The state-space system used internally has the following states (x), inputs
- * (u), and outputs (y):
+ * The state-space system used internally has the following states (x) and outputs (y):
  *
- * <strong> x = [x, y, theta, dist_l, dist_r]ᵀ </strong> in the field coordinate
- * system containing x position, y position, heading, left encoder distance,
- * and right encoder distance.
- *
- * <strong> u = [v_x, v_y, omega]ᵀ </strong> containing x velocity, y velocity,
- * and angular velocity in the field coordinate system.
- *
- * NB: Using velocities make things considerably easier, because it means that
- * teams don't have to worry about getting an accurate model. Basically, we
- * suspect that it's easier for teams to get good encoder data than it is for
- * them to perform system identification well enough to get a good model.
+ * <strong> x = [x, y, theta]ᵀ </strong> in the field coordinate
+ * system containing x position, y position, and heading.
  *
  * <strong> y = [x, y, theta]ᵀ </strong> from vision containing x position, y
- * position, and heading; or <strong>y = [dist_l, dist_r, theta] </strong>
- * containing left encoder position, right encoder position, and gyro heading.
+ * position, and heading.
  */
 class WPILIB_DLLEXPORT DifferentialDrivePoseEstimator {
  public:
@@ -107,15 +96,14 @@ class WPILIB_DLLEXPORT DifferentialDrivePoseEstimator {
                      units::meter_t rightDistance, const Pose2d& pose);
 
   /**
-   * Returns the pose of the robot at the current time as estimated by the
-   * Unscented Kalman Filter.
+   * Gets the estimated robot pose.
    *
    * @return The estimated robot pose.
    */
   Pose2d GetEstimatedPosition() const;
 
   /**
-   * Adds a vision measurement to the Unscented Kalman Filter. This will correct
+   * Adds a vision measurement to the Kalman Filter. This will correct
    * the odometry pose estimate while still accounting for measurement noise.
    *
    * This method can be called as infrequently as you want, as long as you are
@@ -140,7 +128,7 @@ class WPILIB_DLLEXPORT DifferentialDrivePoseEstimator {
                             units::second_t timestamp);
 
   /**
-   * Adds a vision measurement to the Unscented Kalman Filter. This will correct
+   * Adds a vision measurement to the Kalman Filter. This will correct
    * the odometry pose estimate while still accounting for measurement noise.
    *
    * This method can be called as infrequently as you want, as long as you are

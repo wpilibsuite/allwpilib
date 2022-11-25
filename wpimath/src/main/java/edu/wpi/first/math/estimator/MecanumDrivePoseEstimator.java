@@ -225,7 +225,7 @@ public class MecanumDrivePoseEstimator {
 
   /**
    * Updates the Kalman Filter using only wheel encoder information. This should be called every
-   * loop, and the correct loop period must be passed into the constructor of this class.
+   * loop.
    *
    * @param gyroAngle The current gyro angle.
    * @param wheelPositions The distances driven by each wheel.
@@ -237,7 +237,7 @@ public class MecanumDrivePoseEstimator {
 
   /**
    * Updates the Kalman Filter using only wheel encoder information. This should be called every
-   * loop, and the correct loop period must be passed into the constructor of this class.
+   * loop.
    *
    * @param currentTimeSeconds Time at which this method was called, in seconds.
    * @param gyroAngle The current gyroscope angle.

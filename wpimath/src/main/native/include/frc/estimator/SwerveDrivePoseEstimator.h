@@ -23,14 +23,13 @@ namespace frc {
 
 /**
  * This class wraps Swerve Drive Odometry to fuse latency-compensated
- * vision measurements with swerve drive encoder velocity measurements. It will
- * correct for noisy measurements and encoder drift. It is intended to be a
+ * vision measurements with swerve drive encoder distance measurements. It is intended to be a
  * drop-in for SwerveDriveOdometry.
  *
  * Update() should be called every robot loop.
  *
  * AddVisionMeasurement() can be called as infrequently as you want; if you
- * never call it, then this class will behave mostly like regular encoder
+ * never call it, then this class will behave as regular encoder
  * odometry.
  *
  * The state-space system used internally has the following states (x) and
@@ -246,8 +245,7 @@ class SwerveDrivePoseEstimator {
 
   /**
    * Updates the Kalman Filter using only wheel encoder information. This should
-   * be called every loop, and the correct loop period must be passed into the
-   * constructor of this class.
+   * be called every loop.
    *
    * @param gyroAngle       The current gyro angle.
    * @param modulePositions The current distance and rotation measurements of
@@ -263,8 +261,7 @@ class SwerveDrivePoseEstimator {
 
   /**
    * Updates the Kalman Filter using only wheel encoder information. This should
-   * be called every loop, and the correct loop period must be passed into the
-   * constructor of this class.
+   * be called every loop.
    *
    * @param currentTime     Time at which this method was called, in seconds.
    * @param gyroAngle       The current gyro angle.

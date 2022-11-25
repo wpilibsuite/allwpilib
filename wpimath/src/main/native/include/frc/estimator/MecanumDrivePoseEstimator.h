@@ -20,10 +20,10 @@
 
 namespace frc {
 /**
- * This class wraps an Unscented Kalman Filter to fuse latency-compensated
+ * This class wraps Mecanum Drive Odometry to fuse latency-compensated
  * vision measurements with mecanum drive encoder velocity measurements. It will
  * correct for noisy measurements and encoder drift. It is intended to be an
- * easy but more accurate drop-in for MecanumDriveOdometry.
+ * easy drop-in for MecanumDriveOdometry.
  *
  * Update() should be called every robot loop. If your loops are faster or
  * slower than the default of 20 ms, then you should change the nominal delta
@@ -33,23 +33,13 @@ namespace frc {
  * never call it, then this class will behave mostly like regular encoder
  * odometry.
  *
- * The state-space system used internally has the following states (x), inputs
- * (u), and outputs (y):
+ * The state-space system used internally has the following states (x) and outputs (y):
  *
- * <strong> x = [x, y, theta, s_fl, s_fr, s_rl, s_rr]ᵀ </strong> in the field
- * coordinate system containing x position, y position, and heading, followed
- * by the distance driven by the front left, front right, rear left, and rear
- * right wheels.
- *
- * <strong> u = [v_x, v_y, omega, v_fl, v_fr, v_rl, v_rr]ᵀ </strong> containing
- * x velocity, y velocity, and angular rate in the field coordinate system,
- * followed by the velocity of the front left, front right, rear left, and rear
- * right wheels.
+ * <strong> x = [x, y, theta]ᵀ </strong> in the field
+ * coordinate system containing x position, y position, and heading.
  *
  * <strong> y = [x, y, theta]ᵀ </strong> from vision containing x position, y
- * position, and heading; or <strong> y = [theta, s_fl, s_fr, s_rl, s_rr]ᵀ
- * </strong> containing gyro heading, followed by the distance driven by the
- * front left, front right, rear left, and rear right wheels.
+ * position, and heading.
  */
 class WPILIB_DLLEXPORT MecanumDrivePoseEstimator {
  public:
@@ -100,9 +90,6 @@ class WPILIB_DLLEXPORT MecanumDrivePoseEstimator {
   /**
    * Resets the robot's position on the field.
    *
-   * IF wheelPositions are unspecified,
-   * You NEED to reset your encoders (to zero).
-   *
    * The gyroscope angle does not need to be reset in the user's robot code.
    * The library automatically takes care of offsetting the gyro angle.
    *
@@ -115,15 +102,14 @@ class WPILIB_DLLEXPORT MecanumDrivePoseEstimator {
                      const Pose2d& pose);
 
   /**
-   * Gets the pose of the robot at the current time as estimated by the Extended
-   * Kalman Filter.
+   * Gets the estimated robot pose.
    *
    * @return The estimated robot pose in meters.
    */
   Pose2d GetEstimatedPosition() const;
 
   /**
-   * Add a vision measurement to the Unscented Kalman Filter. This will correct
+   * Add a vision measurement to the Kalman Filter. This will correct
    * the odometry pose estimate while still accounting for measurement noise.
    *
    * This method can be called as infrequently as you want, as long as you are
@@ -148,7 +134,7 @@ class WPILIB_DLLEXPORT MecanumDrivePoseEstimator {
                             units::second_t timestamp);
 
   /**
-   * Adds a vision measurement to the Unscented Kalman Filter. This will correct
+   * Adds a vision measurement to the Kalman Filter. This will correct
    * the odometry pose estimate while still accounting for measurement noise.
    *
    * This method can be called as infrequently as you want, as long as you are
@@ -190,9 +176,8 @@ class WPILIB_DLLEXPORT MecanumDrivePoseEstimator {
   }
 
   /**
-   * Updates the the Unscented Kalman Filter using only wheel encoder
-   * information. This should be called every loop, and the correct loop period
-   * must be passed into the constructor of this class.
+   * Updates the the Kalman Filter using only wheel encoder
+   * information. This should be called every loop.
    *
    * @param gyroAngle   The current gyro angle.
    * @param wheelPositions The distances measured at each wheel.
@@ -202,9 +187,8 @@ class WPILIB_DLLEXPORT MecanumDrivePoseEstimator {
                 const MecanumDriveWheelPositions& wheelPositions);
 
   /**
-   * Updates the the Unscented Kalman Filter using only wheel encoder
-   * information. This should be called every loop, and the correct loop period
-   * must be passed into the constructor of this class.
+   * Updates the the Kalman Filter using only wheel encoder
+   * information. This should be called every loop.
    *
    * @param currentTime Time at which this method was called, in seconds.
    * @param gyroAngle   The current gyroscope angle.

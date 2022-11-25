@@ -17,7 +17,7 @@ import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.util.WPIUtilJNI;
 
 /**
- * This class wraps an {@link DifferentialDriveOdometry Differential Drive Odometry} to fuse
+ * This class wraps {@link DifferentialDriveOdometry Differential Drive Odometry} to fuse
  * latency-compensated vision measurements with differential drive encoder measurements. It is
  * intended to be a drop-in replacement for {@link DifferentialDriveOdometry}; in fact, if you never
  * call {@link DifferentialDrivePoseEstimator#addVisionMeasurement} and only call {@link
@@ -231,10 +231,8 @@ public class DifferentialDrivePoseEstimator {
    * called every loop.
    *
    * @param gyroAngle The current gyro angle.
-   * @param distanceLeftMeters The total distance travelled by the left wheel in meters since the
-   *     last time you called {@link DifferentialDrivePoseEstimator#resetPosition}.
-   * @param distanceRightMeters The total distance travelled by the right wheel in meters since the
-   *     last time you called {@link DifferentialDrivePoseEstimator#resetPosition}.
+   * @param distanceLeftMeters The total distance travelled by the left wheel in meters.
+   * @param distanceRightMeters The total distance travelled by the right wheel in meters.
    * @return The estimated pose of the robot in meters.
    */
   public Pose2d update(
@@ -244,15 +242,13 @@ public class DifferentialDrivePoseEstimator {
   }
 
   /**
-   * Updates the the Unscented Kalman Filter using only wheel encoder information. Note that this
+   * Updates the the Kalman Filter using only wheel encoder information. Note that this
    * should be called every loop.
    *
    * @param currentTimeSeconds Time at which this method was called, in seconds.
    * @param gyroAngle The current gyro angle.
-   * @param distanceLeftMeters The total distance travelled by the left wheel in meters since the
-   *     last time you called {@link DifferentialDrivePoseEstimator#resetPosition}.
-   * @param distanceRightMeters The total distance travelled by the right wheel in meters since the
-   *     last time you called {@link DifferentialDrivePoseEstimator#resetPosition}.
+   * @param distanceLeftMeters The total distance travelled by the left wheel in meters.
+   * @param distanceRightMeters The total distance travelled by the right wheel in meters.
    * @return The estimated pose of the robot in meters.
    */
   public Pose2d updateWithTime(
