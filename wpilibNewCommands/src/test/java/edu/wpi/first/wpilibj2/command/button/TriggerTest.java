@@ -85,6 +85,8 @@ class TriggerTest extends CommandTestBase {
     scheduler.run();
     assertEquals(1, inits.get());
     scheduler.run();
+    assertEquals(1, inits.get());
+    scheduler.run();
     assertEquals(2, inits.get());
     button.setPressed(false);
     scheduler.run();
