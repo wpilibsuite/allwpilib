@@ -186,8 +186,8 @@ TEST(SwerveDrivePoseEstimatorTest, BadInitialPose) {
                                       state.velocity * state.curvature};
           },
           [&](frc::Trajectory::State& state) { return state.pose; },
-          {0_m, 0_m, frc::Rotation2d{45_deg}},
-          {0_m, 0_m, frc::Rotation2d{45_deg}}, 0.02_s, false, false);
+          {0_m, 0_m, frc::Rotation2d{45_deg}}, initial_pose, 0.02_s, false,
+          false);
     }
   }
 }
