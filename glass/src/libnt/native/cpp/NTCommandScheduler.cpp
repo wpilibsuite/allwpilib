@@ -43,5 +43,5 @@ void NTCommandSchedulerModel::Update() {
 }
 
 bool NTCommandSchedulerModel::Exists() {
-  return m_inst.IsConnected() && m_commands.Exists();
+  return m_commands.Exists();
 }

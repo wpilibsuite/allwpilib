@@ -100,7 +100,7 @@ public final class Commands {
    * @return the command
    * @see WaitCommand
    */
-  public static CommandBase wait(double seconds) {
+  public static CommandBase waitSeconds(double seconds) {
     return new WaitCommand(seconds);
   }
 

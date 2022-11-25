@@ -70,5 +70,5 @@ void NTPIDControllerModel::Update() {
 }
 
 bool NTPIDControllerModel::Exists() {
-  return m_inst.IsConnected() && m_setpoint.Exists();
+  return m_setpoint.Exists();
 }

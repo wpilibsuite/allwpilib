@@ -195,12 +195,15 @@ class Frame {
   Image* ConvertMJPEGToBGR(Image* image);
   Image* ConvertMJPEGToGray(Image* image);
   Image* ConvertYUYVToBGR(Image* image);
+  Image* ConvertUYVYToBGR(Image* image);
   Image* ConvertBGRToRGB565(Image* image);
   Image* ConvertRGB565ToBGR(Image* image);
   Image* ConvertBGRToGray(Image* image);
   Image* ConvertGrayToBGR(Image* image);
   Image* ConvertBGRToMJPEG(Image* image, int quality);
   Image* ConvertGrayToMJPEG(Image* image, int quality);
+  Image* ConvertGrayToY16(Image* image);
+  Image* ConvertY16ToGray(Image* image);
 
   Image* GetImage(int width, int height, VideoMode::PixelFormat pixelFormat) {
     if (pixelFormat == VideoMode::kMJPEG) {

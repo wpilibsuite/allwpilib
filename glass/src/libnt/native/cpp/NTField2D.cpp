@@ -171,7 +171,7 @@ void NTField2DModel::Update() {
 }
 
 bool NTField2DModel::Exists() {
-  return m_inst.IsConnected() && m_nameTopic.Exists();
+  return m_nameTopic.Exists();
 }
 
 bool NTField2DModel::IsReadOnly() {

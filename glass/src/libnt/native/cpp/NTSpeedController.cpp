@@ -40,5 +40,5 @@ void NTSpeedControllerModel::Update() {
 }
 
 bool NTSpeedControllerModel::Exists() {
-  return m_inst.IsConnected() && m_value.Exists();
+  return m_value.Exists();
 }

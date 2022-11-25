@@ -1,10 +1,10 @@
 apply from: "${rootDir}/shared/resources.gradle"
 
 ext {
-    nativeName = 'apriltags'
+    nativeName = 'apriltag'
     devMain = 'edu.wpi.first.apriltag.DevMain'
 
-    def generateTask = createGenerateResourcesTask('main', 'APRILTAGS', 'frc', project)
+    def generateTask = createGenerateResourcesTask('main', 'APRILTAG', 'frc', project)
 
     tasks.withType(CppCompile) {
         dependsOn generateTask

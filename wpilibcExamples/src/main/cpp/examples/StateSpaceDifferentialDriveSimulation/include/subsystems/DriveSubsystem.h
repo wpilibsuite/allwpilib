@@ -144,11 +144,13 @@ class DriveSubsystem : public frc2::SubsystemBase {
 
   // The left-side drive encoder
   frc::Encoder m_leftEncoder{DriveConstants::kLeftEncoderPorts[0],
-                             DriveConstants::kLeftEncoderPorts[1]};
+                             DriveConstants::kLeftEncoderPorts[1],
+                             DriveConstants::kLeftEncoderReversed};
 
   // The right-side drive encoder
   frc::Encoder m_rightEncoder{DriveConstants::kRightEncoderPorts[0],
-                              DriveConstants::kRightEncoderPorts[1]};
+                              DriveConstants::kRightEncoderPorts[1],
+                              DriveConstants::kRightEncoderReversed};
 
   // The gyro sensor
   frc::ADXRS450_Gyro m_gyro;

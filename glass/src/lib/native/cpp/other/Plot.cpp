@@ -991,7 +991,7 @@ void PlotProvider::DisplayMenu() {
     for (size_t i = 0; i <= numWindows; ++i) {
       std::snprintf(id, sizeof(id), "Plot <%d>", static_cast<int>(i));
       bool match = false;
-      for (size_t j = i; j < numWindows; ++j) {
+      for (size_t j = 0; j < numWindows; ++j) {
         if (m_windows[j]->GetId() == id) {
           match = true;
           break;

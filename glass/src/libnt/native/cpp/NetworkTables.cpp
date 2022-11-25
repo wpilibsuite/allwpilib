@@ -552,7 +552,7 @@ void NetworkTablesModel::RebuildTreeImpl(std::vector<TreeNode>* tree,
 }
 
 bool NetworkTablesModel::Exists() {
-  return m_inst.IsConnected();
+  return true;
 }
 
 NetworkTablesModel::Entry* NetworkTablesModel::GetEntry(std::string_view name) {

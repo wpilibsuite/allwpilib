@@ -335,7 +335,7 @@ void NTMechanism2DModel::Update() {
 }
 
 bool NTMechanism2DModel::Exists() {
-  return m_inst.IsConnected() && m_nameTopic.Exists();
+  return m_nameTopic.Exists();
 }
 
 bool NTMechanism2DModel::IsReadOnly() {

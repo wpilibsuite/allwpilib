@@ -30,5 +30,5 @@ void NTGyroModel::Update() {
 }
 
 bool NTGyroModel::Exists() {
-  return m_inst.IsConnected() && m_angle.Exists();
+  return m_angle.Exists();
 }

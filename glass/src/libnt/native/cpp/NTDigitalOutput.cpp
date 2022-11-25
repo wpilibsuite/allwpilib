@@ -40,5 +40,5 @@ void NTDigitalOutputModel::Update() {
 }
 
 bool NTDigitalOutputModel::Exists() {
-  return m_inst.IsConnected() && m_value.Exists();
+  return m_value.Exists();
 }

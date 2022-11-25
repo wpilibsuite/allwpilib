@@ -245,17 +245,12 @@ void ServerConnection4::ProcessWsUpgrade() {
   m_websocket->open.connect([this, name = std::string{name}](std::string_view) {
     m_wire = std::make_shared<net::WebSocketConnection>(*m_websocket);
     // TODO: set local flag appropriately
-    m_clientId = m_server.m_serverImpl.AddClient(
+    std::string dedupName;
+    std::tie(dedupName, m_clientId) = m_server.m_serverImpl.AddClient(
         name, m_connInfo, false, *m_wire,
         [this](uint32_t repeatMs) { UpdatePeriodicTimer(repeatMs); });
-    if (m_clientId < 0) {
-      INFO("duplicate connection name '{}' (from {}), closing", name,
-           m_connInfo);
-      m_websocket->Fail(409, fmt::format("duplicate name '{}'", name));
-      return;
-    }
-    INFO("CONNECTED NT4 client '{}' (from {})", name, m_connInfo);
-    m_info.remote_id = name;
+    INFO("CONNECTED NT4 client '{}' (from {})", dedupName, m_connInfo);
+    m_info.remote_id = dedupName;
     m_server.AddConnection(this, m_info);
     m_websocket->closed.connect([this](uint16_t, std::string_view reason) {
       INFO("DISCONNECTED NT4 client '{}' (from {}): {}", m_info.remote_id,

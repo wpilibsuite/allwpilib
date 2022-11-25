@@ -219,12 +219,12 @@ CommandPtr CommandPtr::HandleInterrupt(std::function<void(void)> handler) && {
       });
 }
 
-Command* CommandPtr::get() const {
+CommandBase* CommandPtr::get() const {
   AssertValid();
   return m_ptr.get();
 }
 
-std::unique_ptr<Command> CommandPtr::Unwrap() && {
+std::unique_ptr<CommandBase> CommandPtr::Unwrap() && {
   AssertValid();
   return std::move(m_ptr);
 }

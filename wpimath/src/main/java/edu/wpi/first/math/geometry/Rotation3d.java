@@ -45,6 +45,10 @@ public class Rotation3d implements Interpolatable<Rotation3d> {
    * <p>Extrinsic rotations occur in that order around the axes in the fixed global frame rather
    * than the body frame.
    *
+   * <p>Angles are measured counterclockwise with the rotation axis pointing "out of the page". If
+   * you point your right thumb along the positive axis direction, your fingers curl in the
+   * direction of positive rotation.
+   *
    * @param roll The counterclockwise rotation angle around the X axis (roll) in radians.
    * @param pitch The counterclockwise rotation angle around the Y axis (pitch) in radians.
    * @param yaw The counterclockwise rotation angle around the Z axis (yaw) in radians.
