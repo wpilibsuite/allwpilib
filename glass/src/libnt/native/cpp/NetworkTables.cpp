@@ -828,54 +828,6 @@ static bool StringToFloatArray(std::string_view in, std::vector<T>* out) {
   return true;
 }
 
-static int fromxdigit(char ch) {
-  if (ch >= 'a' && ch <= 'f') {
-    return (ch - 'a' + 10);
-  } else if (ch >= 'A' && ch <= 'F') {
-    return (ch - 'A' + 10);
-  } else {
-    return ch - '0';
-  }
-}
-
-static std::string_view UnescapeString(std::string_view source,
-                                       wpi::SmallVectorImpl<char>& buf) {
-  assert(source.size() >= 2 && source.front() == '"' && source.back() == '"');
-  buf.clear();
-  buf.reserve(source.size() - 2);
-  for (auto s = source.begin() + 1, end = source.end() - 1; s != end; ++s) {
-    if (*s != '\\') {
-      buf.push_back(*s);
-      continue;
-    }
-    switch (*++s) {
-      case 't':
-        buf.push_back('\t');
-        break;
-      case 'n':
-        buf.push_back('\n');
-        break;
-      case 'x': {
-        if (!isxdigit(*(s + 1))) {
-          buf.push_back('x');  // treat it like a unknown escape
-          break;
-        }
-        int ch = fromxdigit(*++s);
-        if (std::isxdigit(*(s + 1))) {
-          ch <<= 4;
-          ch |= fromxdigit(*++s);
-        }
-        buf.push_back(static_cast<char>(ch));
-        break;
-      }
-      default:
-        buf.push_back(*s);
-        break;
-    }
-  }
-  return {buf.data(), buf.size()};
-}
-
 static bool StringToStringArray(std::string_view in,
                                 std::vector<std::string>* out) {
   in = wpi::trim(in);
@@ -904,7 +856,9 @@ static bool StringToStringArray(std::string_view in,
                  "GUI: NetworkTables: Could not understand value '{}'\n", val);
       return false;
     }
-    out->emplace_back(UnescapeString(val, buf));
+    val.remove_prefix(1);
+    val.remove_suffix(1);
+    out->emplace_back(wpi::UnescapeCString(val, buf).first);
   }
 
   return true;
