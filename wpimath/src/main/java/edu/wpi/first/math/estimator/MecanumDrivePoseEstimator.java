@@ -42,7 +42,7 @@ public class MecanumDrivePoseEstimator {
   private final MecanumDriveOdometry m_odometry;
   private Rotation2d m_previousGyroAngle;
   private final Matrix<N3, N1> m_q = new Matrix<>(Nat.N3(), Nat.N1());
-  private MecanumDriveWheelPositions m_prevWheelPositions;
+  private final MecanumDriveWheelPositions m_prevWheelPositions;
   private Matrix<N3, N3> m_visionK = new Matrix<>(Nat.N3(), Nat.N3());
 
   private final TimeInterpolatableBuffer<Pose2d> m_poseBuffer =
