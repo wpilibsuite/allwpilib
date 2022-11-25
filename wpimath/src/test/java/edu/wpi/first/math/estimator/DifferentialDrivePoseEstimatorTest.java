@@ -125,7 +125,6 @@ class DifferentialDrivePoseEstimatorTest {
       final Pose2d endingPose,
       final double dt,
       final boolean checkError) {
-
     double leftDistanceMeters = 0;
     double rightDistanceMeters = 0;
 

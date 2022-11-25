@@ -136,7 +136,6 @@ class MecanumDrivePoseEstimatorTest {
       final Pose2d endingPose,
       final double dt,
       final boolean checkError) {
-
     var wheelPositions = new MecanumDriveWheelPositions();
 
     estimator.resetPosition(new Rotation2d(), wheelPositions, startingPose);

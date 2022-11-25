@@ -145,7 +145,6 @@ class SwerveDrivePoseEstimatorTest {
       final Pose2d endingPose,
       final double dt,
       final boolean checkError) {
-
     SwerveModulePosition[] positions = {
       new SwerveModulePosition(),
       new SwerveModulePosition(),
