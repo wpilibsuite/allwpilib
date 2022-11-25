@@ -6,8 +6,6 @@ package edu.wpi.first.wpilibj2.command;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import edu.wpi.first.hal.HAL;
-import edu.wpi.first.wpilibj.simulation.DriverStationSim;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import org.junit.jupiter.api.Test;
@@ -71,7 +69,8 @@ class RepeatCommandTest extends CommandTestBase {
   @EnumSource(Command.InterruptionBehavior.class)
   @ParameterizedTest
   void interruptible(Command.InterruptionBehavior interruptionBehavior) {
-    var command = new WaitUntilCommand(() -> false).withInterruptBehavior(interruptionBehavior).repeatedly();
+    var command =
+        new WaitUntilCommand(() -> false).withInterruptBehavior(interruptionBehavior).repeatedly();
     assertEquals(interruptionBehavior, command.getInterruptionBehavior());
   }
 

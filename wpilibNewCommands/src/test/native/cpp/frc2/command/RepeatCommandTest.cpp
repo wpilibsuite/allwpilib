@@ -61,20 +61,30 @@ TEST_F(RepeatCommandTest, CallsMethodsCorrectly) {
   EXPECT_EQ(1, endCounter);
 }
 
-class RepeatCommandInterruptibilityTest : public CommandTestBaseWithParam<Command::InterruptionBehavior> {};
+class RepeatCommandInterruptibilityTest
+    : public CommandTestBaseWithParam<Command::InterruptionBehavior> {};
 
 TEST_P(RepeatCommandInterruptibilityTest, Interruptibility) {
-  CommandPtr command = cmd::WaitUntil([] { return false;}).WithInterruptBehavior(GetParam()).Repeatedly();
+  CommandPtr command = cmd::WaitUntil([] { return false; })
+                           .WithInterruptBehavior(GetParam())
+                           .Repeatedly();
   EXPECT_EQ(GetParam(), command.get()->GetInterruptionBehavior());
 }
 
-INSTANTIATE_TEST_SUITE_P(RepeatCommandTest, RepeatCommandInterruptibilityTest, testing::Values(Command::InterruptionBehavior::kCancelIncoming, Command::InterruptionBehavior::kCancelSelf));
+INSTANTIATE_TEST_SUITE_P(
+    RepeatCommandTests, RepeatCommandInterruptibilityTest,
+    testing::Values(Command::InterruptionBehavior::kCancelIncoming,
+                    Command::InterruptionBehavior::kCancelSelf));
 
-class RepeatCommandRunsWhenDisabledTest : public CommandTestBaseWithParam<bool> {};
+class RepeatCommandRunsWhenDisabledTest
+    : public CommandTestBaseWithParam<bool> {};
 
 TEST_P(RepeatCommandRunsWhenDisabledTest, RunsWhenDisabled) {
-  CommandPtr command = cmd::WaitUntil([] { return false;}).IgnoringDisable(GetParam()).Repeatedly();
+  CommandPtr command = cmd::WaitUntil([] { return false; })
+                           .IgnoringDisable(GetParam())
+                           .Repeatedly();
   EXPECT_EQ(GetParam(), command.get()->RunsWhenDisabled());
 }
 
-INSTANTIATE_TEST_SUITE_P(RepeatCommandTest, RepeatCommandRunsWhenDisabledTest, testing::Bool());
+INSTANTIATE_TEST_SUITE_P(RepeatCommandTests, RepeatCommandRunsWhenDisabledTest,
+                         testing::Bool());
