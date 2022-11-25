@@ -13,6 +13,7 @@
 #include "frc/geometry/Rotation2d.h"
 #include "frc/interpolation/TimeInterpolatableBuffer.h"
 #include "frc/kinematics/DifferentialDriveWheelSpeeds.h"
+#include "frc/kinematics/DifferentialDriveOdometry.h"
 #include "units/time.h"
 
 namespace frc {
@@ -65,28 +66,19 @@ class WPILIB_DLLEXPORT DifferentialDrivePoseEstimator {
    *                                 is in the form
    *                                 [x, y, theta, dist_l, dist_r]ᵀ,
    *                                 with units in meters and radians.
-   * @param localMeasurementStdDevs  Standard deviations of the encoder and gyro
-   *                                 measurements. Increase these numbers to
-   *                                 trust sensor readings from
-   *                                 encoders and gyros less.
-   *                                 This matrix is in the form
-   *                                 [dist_l, dist_r, theta]ᵀ, with units in
-   *                                 meters and radians.
    * @param visionMeasurementStdDevs Standard deviations of the vision
    *                                 measurements. Increase these numbers to
    *                                 trust global measurements from
    *                                 vision less. This matrix is in the form
    *                                 [x, y, theta]ᵀ, with units in meters and
    *                                 radians.
-   * @param nominalDt                The period of the loop calling Update().
    */
   DifferentialDrivePoseEstimator(
       const Rotation2d& gyroAngle, units::meter_t leftDistance,
       units::meter_t rightDistance, const Pose2d& initialPose,
-      const wpi::array<double, 5>& stateStdDevs,
-      const wpi::array<double, 3>& localMeasurementStdDevs,
+      const wpi::array<double, 3>& stateStdDevs,
       const wpi::array<double, 3>& visionMeasurementStdDevs,
-      units::second_t nominalDt = 20_ms);
+      bool debug = false);
 
   /**
    * Sets the pose estimator's trust of global measurements. This might be used
@@ -105,11 +97,6 @@ class WPILIB_DLLEXPORT DifferentialDrivePoseEstimator {
 
   /**
    * Resets the robot's position on the field.
-   *
-   * IF leftDistance and rightDistance are unspecified,
-   * You NEED to reset your encoders (to zero). The
-   * gyroscope angle does not need to be reset here on the user's robot code.
-   * The library automatically takes care of offsetting the gyro angle.
    *
    * @param gyroAngle The current gyro angle.
    * @param leftDistance The distance traveled by the left encoder.
@@ -199,14 +186,12 @@ class WPILIB_DLLEXPORT DifferentialDrivePoseEstimator {
    * Note that this should be called every loop iteration.
    *
    * @param gyroAngle     The current gyro angle.
-   * @param wheelSpeeds   The velocities of the wheels in meters per second.
    * @param leftDistance  The distance traveled by the left encoder.
    * @param rightDistance The distance traveled by the right encoder.
    *
    * @return The estimated pose of the robot.
    */
   Pose2d Update(const Rotation2d& gyroAngle,
-                const DifferentialDriveWheelSpeeds& wheelSpeeds,
                 units::meter_t leftDistance, units::meter_t rightDistance);
 
   /**
@@ -215,7 +200,6 @@ class WPILIB_DLLEXPORT DifferentialDrivePoseEstimator {
    *
    * @param currentTime   The time at which this method was called.
    * @param gyroAngle     The current gyro angle.
-   * @param wheelSpeeds   The velocities of the wheels in meters per second.
    * @param leftDistance  The distance traveled by the left encoder.
    * @param rightDistance The distance traveled by the right encoder.
    *
@@ -223,27 +207,18 @@ class WPILIB_DLLEXPORT DifferentialDrivePoseEstimator {
    */
   Pose2d UpdateWithTime(units::second_t currentTime,
                         const Rotation2d& gyroAngle,
-                        const DifferentialDriveWheelSpeeds& wheelSpeeds,
                         units::meter_t leftDistance,
                         units::meter_t rightDistance);
 
  private:
-  UnscentedKalmanFilter<5, 3, 3> m_observer;
+  DifferentialDriveOdometry m_odometry;
+  Rotation2d m_prevGyroAngle;
+  wpi::array<double, 3> m_q{wpi::empty_array};
+  units::meter_t m_prevLeftDistance;
+  units::meter_t m_prevRightDistance;
+  Eigen::Matrix3d m_visionK = Eigen::Matrix3d::Zero();
+
   TimeInterpolatableBuffer<Pose2d> m_poseBuffer{1.5_s};
-  std::function<void(const Vectord<3>& u, const Vectord<3>& y)> m_visionCorrect;
-
-  Matrixd<3, 3> m_visionContR;
-
-  units::second_t m_nominalDt;
-  units::second_t m_prevTime = -1_s;
-
-  Rotation2d m_gyroOffset;
-  Rotation2d m_previousAngle;
-
-  static Vectord<5> F(const Vectord<5>& x, const Vectord<3>& u);
-  static Vectord<5> FillStateVector(const Pose2d& pose,
-                                    units::meter_t leftDistance,
-                                    units::meter_t rightDistance);
 };
 
 }  // namespace frc
