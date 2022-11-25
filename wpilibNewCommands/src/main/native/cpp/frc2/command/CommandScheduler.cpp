@@ -258,8 +258,7 @@ void CommandScheduler::Run() {
 }
 
 void CommandScheduler::RegisterSubsystem(Subsystem* subsystem) {
-  auto s = m_impl->subsystems.find(subsystem);
-  if (s != m_impl->subsystems.end()) {
+  if (m_impl->subsystems.find(subsystem) != m_impl->subsystems.end()) {
     std::puts("Tried to register an already-registered subsystem");
     return;
   }
