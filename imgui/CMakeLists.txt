@@ -39,7 +39,7 @@ FetchContent_MakeAvailable(
 )
 
 # Build font
-add_executable(imgui_font_bin2c ${CMAKE_CURRENT_BINARY_DIR}/imgui-src/misc/fonts/binary_to_compressed_c.cpp)
+add_executable(imgui_font_bin2c ${imgui_SOURCE_DIR}/misc/fonts/binary_to_compressed_c.cpp)
 add_custom_command(OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/ProggyDotted.inc
   COMMAND imgui_font_bin2c
   ARGS "${proggyfonts_SOURCE_DIR}/ProggyDotted/ProggyDotted Regular.ttf" ProggyDotted > ${CMAKE_CURRENT_BINARY_DIR}/ProggyDotted.inc
