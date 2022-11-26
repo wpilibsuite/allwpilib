@@ -242,8 +242,8 @@ public class DifferentialDrivePoseEstimator {
   }
 
   /**
-   * Updates the the Kalman Filter using only wheel encoder information. Note that this
-   * should be called every loop.
+   * Updates the the Kalman Filter using only wheel encoder information. Note that this should be
+   * called every loop.
    *
    * @param currentTimeSeconds Time at which this method was called, in seconds.
    * @param gyroAngle The current gyro angle.
