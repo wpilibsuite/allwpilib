@@ -9,7 +9,9 @@
 #include <cstring>
 
 #include <GLFW/glfw3.h>
+#include <IconsFontAwesome6.h>
 #include <imgui.h>
+#include <imgui_FontAwesomeSolid.h>
 #include <imgui_ProggyDotted.h>
 #include <imgui_impl_glfw.h>
 #include <imgui_internal.h>
@@ -104,7 +106,13 @@ static void IniWriteAll(ImGuiContext* ctx, ImGuiSettingsHandler* handler,
 void gui::CreateContext() {
   gContext = new Context;
   AddFont("ProggyDotted", [](ImGuiIO& io, float size, const ImFontConfig* cfg) {
-    return ImGui::AddFontProggyDotted(io, size, cfg);
+    auto font = ImGui::AddFontProggyDotted(io, size, cfg);
+    static const ImWchar icons_ranges[] = {ICON_MIN_FA, ICON_MAX_16_FA, 0};
+    ImFontConfig icons_cfg;
+    icons_cfg.MergeMode = true;
+    icons_cfg.PixelSnapH = true;
+    ImGui::AddFontFontAwesomeSolid(io, size, &icons_cfg, icons_ranges);
+    return font;
   });
   PlatformCreateContext();
 }
