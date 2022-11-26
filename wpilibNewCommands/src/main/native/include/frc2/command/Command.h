@@ -283,6 +283,14 @@ safe) semantics.
   [[nodiscard]] CommandPtr HandleInterrupt(std::function<void()> handler) &&;
 
   /**
+   * Decorates this Command with a name. Is an inline function for #setName(String);
+   *
+   * @param name name
+   * @return the decorated Command
+   */
+  [[nodiscard]] CommandPtr WithName(std::string name) &&;
+
+  /**
    * Schedules this command.
    */
   void Schedule();
@@ -343,7 +351,19 @@ safe) semantics.
     return InterruptionBehavior::kCancelSelf;
   }
 
+  /**
+   * Gets the name of this Command. Defaults to the simple class name if not overridden.
+   *
+   * @return The display name of the Command
+   */
   virtual std::string GetName() const;
+
+  /**
+   * Sets the name of this Command. Nullop if not overridden.
+   *
+   * @param name The display name of the Command.
+   */
+  virtual void SetName(std::string name);
 
   /**
    * Transfers ownership of this command to a unique pointer.  Used for

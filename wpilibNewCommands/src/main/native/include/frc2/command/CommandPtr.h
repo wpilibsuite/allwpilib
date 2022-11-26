@@ -220,6 +220,14 @@ class CommandPtr final {
   [[nodiscard]] CommandPtr HandleInterrupt(std::function<void()> handler) &&;
 
   /**
+   * Decorates this Command with a name. Is an inline function for #setName(String);
+   *
+   * @param name name
+   * @return the decorated Command
+   */
+  [[nodiscard]] CommandPtr WithName(std::string name) &&;
+
+  /**
    * Get a raw pointer to the held command.
    */
   CommandBase* get() const;
