@@ -131,7 +131,7 @@ void testFollowTrajectory(
 TEST(DifferentialDrivePoseEstimatorTest, Accuracy) {
   frc::DifferentialDrivePoseEstimator estimator{
       frc::Rotation2d{}, 0_m, 0_m, frc::Pose2d{}, {0.02, 0.02, 0.01},
-      {0.45, 0.45, 0.1}};
+      {0.1, 0.1, 0.1}};
 
   frc::Trajectory trajectory = frc::TrajectoryGenerator::GenerateTrajectory(
       std::vector{frc::Pose2d{0_m, 0_m, 45_deg}, frc::Pose2d{3_m, 0_m, -90_deg},
@@ -156,7 +156,7 @@ TEST(DifferentialDrivePoseEstimatorTest, Accuracy) {
 TEST(DifferentialDrivePoseEstimatorTest, BadInitialPose) {
   frc::DifferentialDrivePoseEstimator estimator{
       frc::Rotation2d{}, 0_m, 0_m, frc::Pose2d{}, {0.02, 0.02, 0.01},
-      {0.45, 0.45, 0.1}};
+      {0.1, 0.1, 0.1}};
 
   frc::Trajectory trajectory = frc::TrajectoryGenerator::GenerateTrajectory(
       std::vector{frc::Pose2d{0_m, 0_m, 45_deg}, frc::Pose2d{3_m, 0_m, -90_deg},
@@ -187,8 +187,8 @@ TEST(DifferentialDrivePoseEstimatorTest, BadInitialPose) {
                                       state.velocity * state.curvature};
           },
           [&](frc::Trajectory::State& state) { return state.pose; },
-          {0_m, 0_m, frc::Rotation2d{45_deg}},
-          {0_m, 0_m, frc::Rotation2d{45_deg}}, 0.02_s, false, false);
+          initial_pose, {0_m, 0_m, frc::Rotation2d{45_deg}}, 0.02_s,
+          false, false);
     }
   }
 }
