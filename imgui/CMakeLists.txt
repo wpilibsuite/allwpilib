@@ -47,19 +47,8 @@ add_custom_command(OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/ProggyDotted.inc
   MAIN_DEPENDENCY "${proggyfonts_SOURCE_DIR}/ProggyDotted/ProggyDotted Regular.ttf"
   VERBATIM
 )
-file(GENERATE OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/imgui_ProggyDotted.cpp
-    CONTENT "#include \"imgui_ProggyDotted.h\"\n#include \"ProggyDotted.inc\"\nImFont* ImGui::AddFontProggyDotted(ImGuiIO& io, float size_pixels, const ImFontConfig* font_cfg, const ImWchar* glyph_ranges) {\n  return io.Fonts->AddFontFromMemoryCompressedTTF(ProggyDotted_compressed_data, ProggyDotted_compressed_size, size_pixels, font_cfg, glyph_ranges);\n}\n"
-)
-file(GENERATE OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/imgui_ProggyDotted.h
-    CONTENT "#pragma once\n#include \"imgui.h\"\nnamespace ImGui {\nImFont* AddFontProggyDotted(ImGuiIO& io, float size_pixels, const ImFontConfig* font_cfg = nullptr, const ImWchar* glyph_ranges = nullptr);\n}\n"
-)
-set_source_files_properties(${CMAKE_CURRENT_BINARY_DIR}/imgui_ProggyDotted.cpp
+set_source_files_properties(src/imgui_ProggyDotted.cpp
     PROPERTIES OBJECT_DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/ProggyDotted.inc)
-
-# stb_image
-file(GENERATE OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/stb_image.cpp
-    CONTENT "#define STBI_WINDOWS_UTF8\n#define STB_IMAGE_IMPLEMENTATION\n#include \"stb_image.h\"\n"
-)
 
 # Add glfw directly to our build.
 FetchContent_GetProperties(glfw3)
@@ -78,11 +67,13 @@ FetchContent_GetProperties(gl3w)
 if(NOT gl3w_POPULATED)
     FetchContent_Populate(gl3w)
 endif()
-find_package(Python COMPONENTS Interpreter Development REQUIRED)
-execute_process(
-    COMMAND "${PYTHON_EXECUTABLE}" ${gl3w_SOURCE_DIR}/gl3w_gen.py
-    WORKING_DIRECTORY ${gl3w_BINARY_DIR}
-)
+if(NOT EXISTS "${gl3w_BINARY_DIR}/src/gl3w.c")
+    find_package(Python COMPONENTS Interpreter Development REQUIRED)
+    execute_process(
+        COMMAND "${PYTHON_EXECUTABLE}" ${gl3w_SOURCE_DIR}/gl3w_gen.py
+        WORKING_DIRECTORY ${gl3w_BINARY_DIR}
+    )
+endif()
 
 # Add imgui directly to our build.
 file(GLOB imgui_sources ${imgui_SOURCE_DIR}/*.cpp ${imgui_SOURCE_DIR}/misc/cpp/*.cpp)
@@ -93,8 +84,8 @@ add_library(imgui STATIC
     ${imgui_SOURCE_DIR}/backends/imgui_impl_glfw.cpp
     ${imgui_SOURCE_DIR}/backends/imgui_impl_opengl3.cpp
     ${gl3w_BINARY_DIR}/src/gl3w.c
-    ${CMAKE_CURRENT_BINARY_DIR}/imgui_ProggyDotted.cpp
-    ${CMAKE_CURRENT_BINARY_DIR}/stb_image.cpp
+    src/imgui_ProggyDotted.cpp
+    src/stb_image.cpp
 )
 target_compile_definitions(imgui PUBLIC IMGUI_IMPL_OPENGL_LOADER_GL3W)
 if (MSVC)
@@ -109,14 +100,17 @@ else()
     endif()
 endif()
 target_link_libraries(imgui PUBLIC glfw)
-target_include_directories(imgui PUBLIC
+target_include_directories(imgui
+    PUBLIC
     "$<BUILD_INTERFACE:${imgui_SOURCE_DIR}>"
     "$<BUILD_INTERFACE:${imgui_SOURCE_DIR}/misc/cpp>"
     "$<BUILD_INTERFACE:${implot_SOURCE_DIR}>"
     "$<BUILD_INTERFACE:${imgui_SOURCE_DIR}/backends>"
     "$<BUILD_INTERFACE:${gl3w_BINARY_DIR}/include>"
-    "$<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>"
+    "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>"
     "$<BUILD_INTERFACE:${stb_SOURCE_DIR}>"
+    PRIVATE
+    "$<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>"
 )
 
 set_property(TARGET imgui PROPERTY POSITION_INDEPENDENT_CODE ON)
