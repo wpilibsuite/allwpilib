@@ -167,16 +167,20 @@ template <typename Key>
 
 // Command Groups
 
+namespace impl {
+
 /**
  * Create a vector of commands.
  */
 template <typename... Args>
-std::vector<CommandPtr> vec(Args&&... args) {
+std::vector<CommandPtr> MakeVector(Args&&... args) {
   std::vector<CommandPtr> data;
   data.reserve(sizeof...(Args));
   (data.emplace_back(std::forward<Args>(args)), ...);
   return data;
 }
+
+}  // namespace impl
 
 /**
  * Runs a group of commands in series, one after the other.
@@ -188,7 +192,7 @@ std::vector<CommandPtr> vec(Args&&... args) {
  */
 template <typename... Args>
 [[nodiscard]] CommandPtr Sequence(Args&&... commands) {
-  return Sequence(vec(std::forward<Args>(commands)...));
+  return Sequence(impl::MakeVector(std::forward<Args>(commands)...));
 }
 
 /**
@@ -203,7 +207,7 @@ template <typename... Args>
  */
 template <typename... Args>
 [[nodiscard]] CommandPtr RepeatingSequence(Args&&... commands) {
-  return RepeatingSequence(vec(std::forward<Args>(commands)...));
+  return RepeatingSequence(impl::MakeVector(std::forward<Args>(commands)...));
 }
 
 /**
@@ -218,7 +222,7 @@ template <typename... Args>
  */
 template <typename... Args>
 [[nodiscard]] CommandPtr Parallel(Args&&... commands) {
-  return Parallel(vec(std::forward<Args>(commands)...));
+  return Parallel(impl::MakeVector(std::forward<Args>(commands)...));
 }
 
 /**
@@ -233,7 +237,7 @@ template <typename... Args>
  */
 template <typename... Args>
 [[nodiscard]] CommandPtr Race(Args&&... commands) {
-  return Race(vec(std::forward<Args>(commands)...));
+  return Race(impl::MakeVector(std::forward<Args>(commands)...));
 }
 
 /**
@@ -249,7 +253,7 @@ template <typename... Args>
  */
 template <typename... Args>
 [[nodiscard]] CommandPtr Deadline(CommandPtr&& deadline, Args&&... commands) {
-  return Deadline(std::move(deadline), vec(std::forward<Args>(commands)...));
+  return Deadline(std::move(deadline), impl::MakeVector(std::forward<Args>(commands)...));
 }
 
 }  // namespace cmd
