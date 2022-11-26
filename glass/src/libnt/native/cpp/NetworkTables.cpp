@@ -616,9 +616,9 @@ static void DecodeSubscriberOptions(
   for (uint32_t j = 0; j < numMapElem; ++j) {
     std::string key;
     mpack_expect_str(&r, &key);
-    if (key == "immediate") {
-      options->immediate = mpack_expect_bool(&r);
-    } else if (key == "sendAll") {
+    if (key == "topicsonly") {
+      options->topicsOnly = mpack_expect_bool(&r);
+    } else if (key == "all") {
       options->sendAll = mpack_expect_bool(&r);
     } else if (key == "periodic") {
       options->periodic = mpack_expect_float(&r);
@@ -1454,7 +1454,7 @@ static void DisplayClient(const NetworkTablesModel::Client& client) {
     ImGui::TableSetupColumn("Topics", ImGuiTableColumnFlags_WidthStretch, 6.0f);
     ImGui::TableSetupColumn("Periodic", ImGuiTableColumnFlags_WidthStretch,
                             1.0f);
-    ImGui::TableSetupColumn("Immediate", ImGuiTableColumnFlags_WidthStretch,
+    ImGui::TableSetupColumn("Topics Only", ImGuiTableColumnFlags_WidthStretch,
                             1.0f);
     ImGui::TableSetupColumn("Send All", ImGuiTableColumnFlags_WidthStretch,
                             1.0f);
@@ -1470,7 +1470,7 @@ static void DisplayClient(const NetworkTablesModel::Client& client) {
       ImGui::TableNextColumn();
       ImGui::Text("%0.3f", sub.options.periodic);
       ImGui::TableNextColumn();
-      ImGui::Text(sub.options.immediate ? "Yes" : "No");
+      ImGui::Text(sub.options.topicsOnly ? "Yes" : "No");
       ImGui::TableNextColumn();
       ImGui::Text(sub.options.sendAll ? "Yes" : "No");
       ImGui::TableNextColumn();
