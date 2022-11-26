@@ -4,8 +4,13 @@
 
 #pragma once
 
+#include <string>
 #include <type_traits>
 #include <utility>
+
+#include <wpi/sendable/Sendable.h>
+#include <wpi/sendable/SendableBuilder.h>
+#include <wpi/sendable/SendableHelper.h>
 
 #include "frc2/command/CommandScheduler.h"
 
@@ -36,9 +41,11 @@ class CommandPtr;
  * @see CommandScheduler
  * @see SubsystemBase
  */
-class Subsystem {
+class Subsystem : public wpi::Sendable, public wpi::SendableHelper<Subsystem> {
  public:
-  ~Subsystem();
+  Subsystem();
+
+  ~Subsystem() override;
   /**
    * This method is called periodically by the CommandScheduler.  Useful for
    * updating subsystem-specific state that you don't want to offload to a
@@ -104,5 +111,44 @@ class Subsystem {
    * Periodic() method to be called when the scheduler runs.
    */
   void Register();
+
+  /**
+   * Gets the name of this Subsystem.
+   *
+   * @return Name
+   */
+  std::string GetName() const;
+
+  /**
+   * Sets the name of this Subsystem.
+   *
+   * @param name name
+   */
+  void SetName(std::string_view name);
+
+  /**
+   * Gets the subsystem name of this Subsystem.
+   *
+   * @return Subsystem name
+   */
+  std::string GetSubsystem() const;
+
+  /**
+   * Sets the subsystem name of this Subsystem.
+   *
+   * @param name subsystem name
+   */
+  void SetSubsystem(std::string_view name);
+
+  /**
+   * Associate a Sendable with this Subsystem.
+   * Also update the child's name.
+   *
+   * @param name name to give child
+   * @param child sendable
+   */
+  void AddChild(std::string name, wpi::Sendable* child);
+
+  void InitSendable(wpi::SendableBuilder& builder) override;
 };
 }  // namespace frc2

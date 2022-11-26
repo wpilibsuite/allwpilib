@@ -19,50 +19,5 @@ namespace frc2 {
  *
  * This class is provided by the NewCommands VendorDep
  */
-class SubsystemBase : public Subsystem,
-                      public wpi::Sendable,
-                      public wpi::SendableHelper<SubsystemBase> {
- public:
-  void InitSendable(wpi::SendableBuilder& builder) override;
-
-  /**
-   * Gets the name of this Subsystem.
-   *
-   * @return Name
-   */
-  std::string GetName() const;
-
-  /**
-   * Sets the name of this Subsystem.
-   *
-   * @param name name
-   */
-  void SetName(std::string_view name);
-
-  /**
-   * Gets the subsystem name of this Subsystem.
-   *
-   * @return Subsystem name
-   */
-  std::string GetSubsystem() const;
-
-  /**
-   * Sets the subsystem name of this Subsystem.
-   *
-   * @param name subsystem name
-   */
-  void SetSubsystem(std::string_view name);
-
-  /**
-   * Associate a Sendable with this Subsystem.
-   * Also update the child's name.
-   *
-   * @param name name to give child
-   * @param child sendable
-   */
-  void AddChild(std::string name, wpi::Sendable* child);
-
- protected:
-  SubsystemBase();
-};
+class SubsystemBase : public Subsystem {};
 }  // namespace frc2

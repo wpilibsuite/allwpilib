@@ -4,9 +4,9 @@
 
 #pragma once
 
-#include <frc2/command/SubsystemBase.h>
+#include <frc2/command/Subsystem.h>
 
-class ExampleSubsystem : public frc2::SubsystemBase {
+class ExampleSubsystem : public frc2::Subsystem {
  public:
   ExampleSubsystem();
 

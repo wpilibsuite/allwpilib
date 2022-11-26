@@ -46,7 +46,7 @@ class SchedulerTest extends CommandTestBase {
   @Test
   void unregisterSubsystemTest() {
     try (CommandScheduler scheduler = new CommandScheduler()) {
-      Subsystem system = new SubsystemBase() {};
+      Subsystem system = new Subsystem() {};
 
       scheduler.registerSubsystem(system);
       assertDoesNotThrow(() -> scheduler.unregisterSubsystem(system));

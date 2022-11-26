@@ -13,7 +13,7 @@
 #include "frc2/command/CommandHelper.h"
 #include "frc2/command/CommandScheduler.h"
 #include "frc2/command/SetUtilities.h"
-#include "frc2/command/SubsystemBase.h"
+#include "frc2/command/Subsystem.h"
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
 #include "make_vector.h"
@@ -24,7 +24,7 @@ class CommandTestBase : public ::testing::Test {
  public:
   CommandTestBase();
 
-  class TestSubsystem : public SubsystemBase {};
+  class TestSubsystem : public Subsystem {};
 
  protected:
   /**
@@ -104,7 +104,7 @@ class CommandTestBaseWithParam : public ::testing::TestWithParam<T> {
     scheduler.GetActiveButtonLoop()->Clear();
   }
 
-  class TestSubsystem : public SubsystemBase {};
+  class TestSubsystem : public Subsystem {};
 
  protected:
   class MockCommand : public Command {

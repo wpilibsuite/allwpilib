@@ -15,6 +15,7 @@
 #include <wpi/SmallSet.h>
 #include <wpi/deprecated.h>
 #include <wpi/sendable/Sendable.h>
+#include <wpi/sendable/SendableBuilder.h>
 #include <wpi/sendable/SendableHelper.h>
 
 #include "frc2/command/Subsystem.h"
