@@ -31,7 +31,7 @@ import java.util.function.Supplier;
  *
  * <p>This class is provided by the NewCommands VendorDep
  */
-public class SwerveControllerCommand extends CommandBase {
+public class SwerveControllerCommand extends Command {
   private final Timer m_timer = new Timer();
   private final Trajectory m_trajectory;
   private final Supplier<Pose2d> m_pose;

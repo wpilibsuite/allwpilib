@@ -23,7 +23,7 @@ import static edu.wpi.first.wpilibj2.command.CommandGroupBase.requireUngrouped;
  *     results with slightly different (and safe) semantics.
  */
 @Deprecated(forRemoval = true, since = "2023")
-public class PerpetualCommand extends CommandBase {
+public class PerpetualCommand extends Command {
   protected final Command m_command;
 
   /**

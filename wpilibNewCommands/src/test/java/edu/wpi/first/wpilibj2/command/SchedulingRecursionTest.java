@@ -27,7 +27,7 @@ class SchedulingRecursionTest extends CommandTestBase {
       AtomicBoolean hasOtherRun = new AtomicBoolean();
       Subsystem requirement = new SubsystemBase() {};
       Command selfCancels =
-          new CommandBase() {
+          new Command() {
             {
               addRequirements(requirement);
             }
@@ -64,7 +64,7 @@ class SchedulingRecursionTest extends CommandTestBase {
       AtomicBoolean hasOtherRun = new AtomicBoolean();
       Subsystem requirement = new SubsystemBase() {};
       Command selfCancels =
-          new CommandBase() {
+          new Command() {
             {
               addRequirements(requirement);
             }
@@ -100,7 +100,7 @@ class SchedulingRecursionTest extends CommandTestBase {
     try (CommandScheduler scheduler = new CommandScheduler()) {
       AtomicInteger counter = new AtomicInteger();
       Command selfCancels =
-          new CommandBase() {
+          new Command() {
             @Override
             public void end(boolean interrupted) {
               counter.incrementAndGet();
@@ -122,7 +122,7 @@ class SchedulingRecursionTest extends CommandTestBase {
       Subsystem requirement = new SubsystemBase() {};
       InstantCommand other = new InstantCommand(() -> {}, requirement);
       Command selfCancels =
-          new CommandBase() {
+          new Command() {
             {
               addRequirements(requirement);
             }
@@ -149,7 +149,7 @@ class SchedulingRecursionTest extends CommandTestBase {
       Subsystem requirement = new SubsystemBase() {};
       InstantCommand other = new InstantCommand(() -> {}, requirement);
       Command selfCancels =
-          new CommandBase() {
+          new Command() {
             {
               addRequirements(requirement);
             }
@@ -179,7 +179,7 @@ class SchedulingRecursionTest extends CommandTestBase {
       Command other =
           new InstantCommand(() -> {}, requirement).withInterruptBehavior(interruptionBehavior);
       Command defaultCommand =
-          new CommandBase() {
+          new Command() {
             {
               addRequirements(requirement);
             }

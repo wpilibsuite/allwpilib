@@ -16,7 +16,7 @@ import java.util.WeakHashMap;
  *
  * <p>This class is provided by the NewCommands VendorDep
  */
-public abstract class CommandGroupBase extends CommandBase {
+public abstract class CommandGroupBase extends Command {
   private static final Set<Command> m_groupedCommands =
       Collections.newSetFromMap(new WeakHashMap<>());
 

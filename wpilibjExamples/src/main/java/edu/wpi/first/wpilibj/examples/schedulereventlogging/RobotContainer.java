@@ -12,7 +12,6 @@ import edu.wpi.first.wpilibj.examples.schedulereventlogging.Constants.OIConstant
 import edu.wpi.first.wpilibj.shuffleboard.EventImportance;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
@@ -30,9 +29,9 @@ public class RobotContainer {
       new XboxController(OIConstants.kDriverControllerPort);
 
   // A few commands that do nothing, but will demonstrate the scheduler functionality
-  private final CommandBase m_instantCommand1 = new InstantCommand();
-  private final CommandBase m_instantCommand2 = new InstantCommand();
-  private final CommandBase m_waitCommand = new WaitCommand(5);
+  private final Command m_instantCommand1 = new InstantCommand();
+  private final Command m_instantCommand2 = new InstantCommand();
+  private final Command m_waitCommand = new WaitCommand(5);
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {

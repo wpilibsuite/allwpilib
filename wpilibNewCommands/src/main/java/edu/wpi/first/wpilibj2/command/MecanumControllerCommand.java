@@ -38,7 +38,7 @@ import java.util.function.Supplier;
  *
  * <p>This class is provided by the NewCommands VendorDep
  */
-public class MecanumControllerCommand extends CommandBase {
+public class MecanumControllerCommand extends Command {
   private final Timer m_timer = new Timer();
   private final boolean m_usePID;
   private final Trajectory m_trajectory;

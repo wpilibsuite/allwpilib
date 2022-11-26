@@ -17,7 +17,7 @@ import static edu.wpi.first.wpilibj2.command.CommandGroupBase.requireUngrouped;
  *
  * <p>This class is provided by the NewCommands VendorDep
  */
-public class RepeatCommand extends CommandBase {
+public class RepeatCommand extends Command {
   protected final Command m_command;
   private boolean m_ended;
 

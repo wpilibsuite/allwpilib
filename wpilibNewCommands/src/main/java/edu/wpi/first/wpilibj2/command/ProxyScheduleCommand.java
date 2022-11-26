@@ -13,7 +13,7 @@ import java.util.Set;
  *
  * <p>This class is provided by the NewCommands VendorDep
  */
-public class ProxyScheduleCommand extends CommandBase {
+public class ProxyScheduleCommand extends Command {
   private final Set<Command> m_toSchedule;
   private boolean m_finished;
 

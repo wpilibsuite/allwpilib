@@ -16,7 +16,7 @@ import java.util.Set;
  * <p>Wrapped commands may only be used through the wrapper, trying to directly schedule them or add
  * them to a group will throw an exception.
  */
-public abstract class WrapperCommand extends CommandBase {
+public abstract class WrapperCommand extends Command {
   protected final Command m_command;
 
   /**
