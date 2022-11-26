@@ -77,18 +77,18 @@ endif()
 FetchContent_GetProperties(gl3w)
 if(NOT gl3w_POPULATED)
     FetchContent_Populate(gl3w)
-    find_package(Python COMPONENTS Interpreter Development REQUIRED)
-    add_custom_command(
-        OUTPUT
-            "${gl3w_BINARY_DIR}/src/gl3w.c"
-            "${gl3w_BINARY_DIR}/include/GL/gl3w.h"
-            "${gl3w_BINARY_DIR}/include/GL/glcorearb.h"
-            "${gl3w_BINARY_DIR}/include/KHR/khrplatform.h"
-        COMMAND "${PYTHON_EXECUTABLE}" ${gl3w_SOURCE_DIR}/gl3w_gen.py
-        DEPENDS ${gl3w_SOURCE_DIR}/gl3w_gen.py
-        WORKING_DIRECTORY ${gl3w_BINARY_DIR}
-    )
 endif()
+find_package(Python COMPONENTS Interpreter Development REQUIRED)
+add_custom_command(
+    OUTPUT
+        "${gl3w_BINARY_DIR}/src/gl3w.c"
+        "${gl3w_BINARY_DIR}/include/GL/gl3w.h"
+        "${gl3w_BINARY_DIR}/include/GL/glcorearb.h"
+        "${gl3w_BINARY_DIR}/include/KHR/khrplatform.h"
+    COMMAND "${PYTHON_EXECUTABLE}" ${gl3w_SOURCE_DIR}/gl3w_gen.py
+    DEPENDS ${gl3w_SOURCE_DIR}/gl3w_gen.py
+    WORKING_DIRECTORY ${gl3w_BINARY_DIR}
+)
 
 # Add imgui directly to our build.
 file(GLOB imgui_sources ${imgui_SOURCE_DIR}/*.cpp ${imgui_SOURCE_DIR}/misc/cpp/*.cpp)
