@@ -79,14 +79,8 @@ if(NOT gl3w_POPULATED)
     FetchContent_Populate(gl3w)
 endif()
 find_package(Python COMPONENTS Interpreter Development REQUIRED)
-add_custom_command(
-    OUTPUT
-        "${gl3w_BINARY_DIR}/src/gl3w.c"
-        "${gl3w_BINARY_DIR}/include/GL/gl3w.h"
-        "${gl3w_BINARY_DIR}/include/GL/glcorearb.h"
-        "${gl3w_BINARY_DIR}/include/KHR/khrplatform.h"
+execute_process(
     COMMAND "${PYTHON_EXECUTABLE}" ${gl3w_SOURCE_DIR}/gl3w_gen.py
-    DEPENDS ${gl3w_SOURCE_DIR}/gl3w_gen.py
     WORKING_DIRECTORY ${gl3w_BINARY_DIR}
 )
 
