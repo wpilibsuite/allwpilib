@@ -1,9 +1,11 @@
 pluginManagement {
     repositories {
+        mavenCentral()
         mavenLocal()
         maven {
             url = 'https://frcmaven.wpi.edu/artifactory/ex-gradle'
         }
+        gradlePluginPortal()
     }
 }
 
