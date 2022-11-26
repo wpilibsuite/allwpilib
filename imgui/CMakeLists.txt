@@ -70,7 +70,7 @@ endif()
 if(NOT EXISTS "${gl3w_BINARY_DIR}/src/gl3w.c")
     find_package(Python COMPONENTS Interpreter Development REQUIRED)
     execute_process(
-        COMMAND "${PYTHON_EXECUTABLE}" ${gl3w_SOURCE_DIR}/gl3w_gen.py
+        COMMAND "${Python_EXECUTABLE}" ${gl3w_SOURCE_DIR}/gl3w_gen.py "--root=${gl3w_BINARY_DIR}"
         WORKING_DIRECTORY ${gl3w_BINARY_DIR}
     )
 endif()
