@@ -433,5 +433,6 @@ std::pair<std::string_view, std::string_view> wpi::UnescapeCString(
         break;
     }
   }
-  return {{buf.data(), buf.size()}, {s, static_cast<size_t>(end - s)}};
+  // mac clang doesn't like {s, end} here
+  return {{buf.data(), buf.size()}, {&(*s), static_cast<size_t>(end - s)}};
 }
