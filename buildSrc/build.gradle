@@ -1,7 +1,10 @@
 repositories {
     maven {
-        mavenCentral()
         mavenLocal()
+        maven {
+            url = 'https://frcmaven.wpi.edu/artifactory/ex-gradle'
+        }
+        mavenCentral()
         url "https://plugins.gradle.org/m2/"
     }
 }
