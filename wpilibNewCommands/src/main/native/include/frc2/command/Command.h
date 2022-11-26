@@ -283,7 +283,8 @@ safe) semantics.
   [[nodiscard]] CommandPtr HandleInterrupt(std::function<void()> handler) &&;
 
   /**
-   * Decorates this Command with a name. Is an inline function for #setName(String);
+   * Decorates this Command with a name. Is an inline function for
+   * #SetName(std::string);
    *
    * @param name name
    * @return the decorated Command
@@ -352,7 +353,8 @@ safe) semantics.
   }
 
   /**
-   * Gets the name of this Command. Defaults to the simple class name if not overridden.
+   * Gets the name of this Command. Defaults to the simple class name if not
+   * overridden.
    *
    * @return The display name of the Command
    */

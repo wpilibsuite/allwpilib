@@ -8,6 +8,7 @@
 #include <initializer_list>
 #include <memory>
 #include <span>
+#include <string>
 #include <utility>
 #include <vector>
 
@@ -220,7 +221,8 @@ class CommandPtr final {
   [[nodiscard]] CommandPtr HandleInterrupt(std::function<void()> handler) &&;
 
   /**
-   * Decorates this Command with a name. Is an inline function for #setName(String);
+   * Decorates this Command with a name. Is an inline function for
+   * Command::SetName(std::string);
    *
    * @param name name
    * @return the decorated Command

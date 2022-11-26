@@ -104,5 +104,41 @@ class Subsystem {
    * Periodic() method to be called when the scheduler runs.
    */
   void Register();
+
+  /**
+   * Constructs a command that runs an action once and finishes. Requires this
+   * subsystem.
+   *
+   * @param action the action to run
+   */
+  [[nodiscard]] CommandPtr RunOnce(std::function<void()> action);
+
+  /**
+   * Constructs a command that runs an action every iteration until interrupted.
+   * Requires this subsystem.
+   *
+   * @param action the action to run
+   */
+  [[nodiscard]] CommandPtr Run(std::function<void()> action);
+
+  /**
+   * Constructs a command that runs an action once and another action when the
+   * command is interrupted. Requires this subsystem.
+   *
+   * @param start the action to run on start
+   * @param end the action to run on interrupt
+   */
+  [[nodiscard]] CommandPtr StartEnd(std::function<void()> start,
+                                    std::function<void()> end);
+
+  /**
+   * Constructs a command that runs an action every iteration until interrupted,
+   * and then runs a second action. Requires this subsystem.
+   *
+   * @param run the action to run every iteration
+   * @param end the action to run on interrupt
+   */
+  [[nodiscard]] CommandPtr RunEnd(std::function<void()> run,
+                                  std::function<void()> end);
 };
 }  // namespace frc2
