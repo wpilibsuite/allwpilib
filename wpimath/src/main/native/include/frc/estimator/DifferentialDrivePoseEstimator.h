@@ -12,8 +12,8 @@
 #include "frc/geometry/Pose2d.h"
 #include "frc/geometry/Rotation2d.h"
 #include "frc/interpolation/TimeInterpolatableBuffer.h"
-#include "frc/kinematics/DifferentialDriveWheelSpeeds.h"
 #include "frc/kinematics/DifferentialDriveOdometry.h"
+#include "frc/kinematics/DifferentialDriveWheelSpeeds.h"
 #include "units/time.h"
 
 namespace frc {
@@ -32,7 +32,8 @@ namespace frc {
  * AddVisionMeasurement() can be called as infrequently as you want; if you
  * never call it, then this class will behave like regular encoder odometry.
  *
- * The state-space system used internally has the following states (x) and outputs (y):
+ * The state-space system used internally has the following states (x) and
+ * outputs (y):
  *
  * <strong> x = [x, y, theta]ᵀ </strong> in the field coordinate
  * system containing x position, y position, and heading.
@@ -178,8 +179,8 @@ class WPILIB_DLLEXPORT DifferentialDrivePoseEstimator {
    *
    * @return The estimated pose of the robot.
    */
-  Pose2d Update(const Rotation2d& gyroAngle,
-                units::meter_t leftDistance, units::meter_t rightDistance);
+  Pose2d Update(const Rotation2d& gyroAngle, units::meter_t leftDistance,
+                units::meter_t rightDistance);
 
   /**
    * Updates the Unscented Kalman Filter using only wheel encoder information.

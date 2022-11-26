@@ -12,21 +12,18 @@
 using namespace frc;
 
 frc::MecanumDrivePoseEstimator::MecanumDrivePoseEstimator(
-    const MecanumDriveKinematics &kinematics,
-    const Rotation2d& gyroAngle,
-    const MecanumDriveWheelPositions& wheelPositions,
-    const Pose2d& initialPose,
+    const MecanumDriveKinematics& kinematics, const Rotation2d& gyroAngle,
+    const MecanumDriveWheelPositions& wheelPositions, const Pose2d& initialPose,
     const wpi::array<double, 3>& stateStdDevs,
     const wpi::array<double, 3>& visionMeasurementStdDevs)
     : m_odometry{kinematics, gyroAngle, wheelPositions, initialPose},
       m_prevGyroAngle(gyroAngle),
       m_prevWheelPositions{
-        wheelPositions.frontLeft,
-        wheelPositions.frontRight,
-        wheelPositions.rearLeft,
-        wheelPositions.rearRight,
+          wheelPositions.frontLeft,
+          wheelPositions.frontRight,
+          wheelPositions.rearLeft,
+          wheelPositions.rearRight,
       } {
-  
   for (size_t i = 0; i < 3; ++i) {
     m_q[i] = stateStdDevs[i] * stateStdDevs[i];
   }
@@ -87,8 +84,8 @@ void frc::MecanumDrivePoseEstimator::AddVisionMeasurement(
   // twist by a Kalman gain matrix representing how much we trust vision
   // measurements compared to our current pose.
   frc::Vectord<3> k_times_twist =
-      m_visionK * frc::Vectord<3>{twist.dx.value(), twist.dy.value(),
-                                  twist.dtheta.value()};
+      m_visionK *
+      frc::Vectord<3>{twist.dx.value(), twist.dy.value(), twist.dtheta.value()};
 
   // Step 4: Convert back to Twist2d
   Twist2d scaledTwist{units::meter_t{k_times_twist(0)},
@@ -100,7 +97,7 @@ void frc::MecanumDrivePoseEstimator::AddVisionMeasurement(
 
   // Step 6: Apply new pose to odometry
   m_odometry.ResetPosition(m_prevGyroAngle, m_prevWheelPositions,
-                            estimatedPose);
+                           estimatedPose);
 }
 
 Pose2d frc::MecanumDrivePoseEstimator::Update(
@@ -113,14 +110,14 @@ Pose2d frc::MecanumDrivePoseEstimator::Update(
 Pose2d frc::MecanumDrivePoseEstimator::UpdateWithTime(
     units::second_t currentTime, const Rotation2d& gyroAngle,
     const MecanumDriveWheelPositions& wheelPositions) {
-    m_poseBuffer.AddSample(currentTime, GetEstimatedPosition());
-    m_odometry.Update(gyroAngle, wheelPositions);
+  m_poseBuffer.AddSample(currentTime, GetEstimatedPosition());
+  m_odometry.Update(gyroAngle, wheelPositions);
 
-    m_prevGyroAngle = gyroAngle;
-    m_prevWheelPositions.frontLeft = wheelPositions.frontLeft;
-    m_prevWheelPositions.frontRight = wheelPositions.frontRight;
-    m_prevWheelPositions.rearLeft = wheelPositions.rearLeft;
-    m_prevWheelPositions.rearRight = wheelPositions.rearRight;
+  m_prevGyroAngle = gyroAngle;
+  m_prevWheelPositions.frontLeft = wheelPositions.frontLeft;
+  m_prevWheelPositions.frontRight = wheelPositions.frontRight;
+  m_prevWheelPositions.rearLeft = wheelPositions.rearLeft;
+  m_prevWheelPositions.rearRight = wheelPositions.rearRight;
 
-    return GetEstimatedPosition();
+  return GetEstimatedPosition();
 }

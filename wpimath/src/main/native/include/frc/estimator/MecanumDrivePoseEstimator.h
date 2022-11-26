@@ -33,7 +33,8 @@ namespace frc {
  * never call it, then this class will behave mostly like regular encoder
  * odometry.
  *
- * The state-space system used internally has the following states (x) and outputs (y):
+ * The state-space system used internally has the following states (x) and
+ * outputs (y):
  *
  * <strong> x = [x, y, theta]ᵀ </strong> in the field
  * coordinate system containing x position, y position, and heading.
@@ -65,11 +66,9 @@ class WPILIB_DLLEXPORT MecanumDrivePoseEstimator {
    *                                 radians.
    */
   MecanumDrivePoseEstimator(
-      const MecanumDriveKinematics &kinematics,
-      const Rotation2d& gyroAngle,
+      const MecanumDriveKinematics& kinematics, const Rotation2d& gyroAngle,
       const MecanumDriveWheelPositions& wheelPositions,
-      const Pose2d& initialPose, 
-      const wpi::array<double, 3>& stateStdDevs,
+      const Pose2d& initialPose, const wpi::array<double, 3>& stateStdDevs,
       const wpi::array<double, 3>& visionMeasurementStdDevs);
 
   /**
@@ -205,7 +204,7 @@ class WPILIB_DLLEXPORT MecanumDrivePoseEstimator {
   MecanumDriveWheelPositions m_prevWheelPositions;
   wpi::array<double, 3> m_q{wpi::empty_array};
   Eigen::Matrix3d m_visionK = Eigen::Matrix3d::Zero();
-  
+
   TimeInterpolatableBuffer<Pose2d> m_poseBuffer{1.5_s};
 };
 

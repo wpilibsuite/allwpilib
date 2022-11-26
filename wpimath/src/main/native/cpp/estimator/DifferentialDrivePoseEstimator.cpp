@@ -17,10 +17,9 @@ DifferentialDrivePoseEstimator::DifferentialDrivePoseEstimator(
     const wpi::array<double, 3>& stateStdDevs,
     const wpi::array<double, 3>& visionMeasurementStdDevs)
     : m_odometry{gyroAngle, leftDistance, rightDistance, initialPose},
-    m_prevGyroAngle{gyroAngle},
-    m_prevLeftDistance{leftDistance},
-    m_prevRightDistance{rightDistance} {
-
+      m_prevGyroAngle{gyroAngle},
+      m_prevLeftDistance{leftDistance},
+      m_prevRightDistance{rightDistance} {
   for (size_t i = 0; i < 3; ++i) {
     m_q[i] = stateStdDevs[i] * stateStdDevs[i];
   }
@@ -80,8 +79,8 @@ void DifferentialDrivePoseEstimator::AddVisionMeasurement(
   // twist by a Kalman gain matrix representing how much we trust vision
   // measurements compared to our current pose.
   frc::Vectord<3> k_times_twist =
-      m_visionK * frc::Vectord<3>{twist.dx.value(), twist.dy.value(),
-                                  twist.dtheta.value()};
+      m_visionK *
+      frc::Vectord<3>{twist.dx.value(), twist.dy.value(), twist.dtheta.value()};
 
   // Step 4: Convert back to Twist2d
   Twist2d scaledTwist{units::meter_t{k_times_twist(0)},
@@ -92,13 +91,13 @@ void DifferentialDrivePoseEstimator::AddVisionMeasurement(
   auto estimatedPose = GetEstimatedPosition().Exp(scaledTwist);
 
   // Step 6: Apply new pose to odometry
-  m_odometry.ResetPosition(m_prevGyroAngle, m_prevLeftDistance, m_prevRightDistance,
-                            estimatedPose);
+  m_odometry.ResetPosition(m_prevGyroAngle, m_prevLeftDistance,
+                           m_prevRightDistance, estimatedPose);
 }
 
-Pose2d DifferentialDrivePoseEstimator::Update(
-    const Rotation2d& gyroAngle,
-    units::meter_t leftDistance, units::meter_t rightDistance) {
+Pose2d DifferentialDrivePoseEstimator::Update(const Rotation2d& gyroAngle,
+                                              units::meter_t leftDistance,
+                                              units::meter_t rightDistance) {
   return UpdateWithTime(units::microsecond_t(wpi::Now()), gyroAngle,
                         leftDistance, rightDistance);
 }
@@ -106,13 +105,13 @@ Pose2d DifferentialDrivePoseEstimator::Update(
 Pose2d DifferentialDrivePoseEstimator::UpdateWithTime(
     units::second_t currentTime, const Rotation2d& gyroAngle,
     units::meter_t leftDistance, units::meter_t rightDistance) {
-    m_poseBuffer.AddSample(currentTime, GetEstimatedPosition());
+  m_poseBuffer.AddSample(currentTime, GetEstimatedPosition());
 
-    m_odometry.Update(gyroAngle, leftDistance, rightDistance);
+  m_odometry.Update(gyroAngle, leftDistance, rightDistance);
 
-    m_prevGyroAngle = gyroAngle;
-    m_prevLeftDistance = leftDistance;
-    m_prevRightDistance = rightDistance;
+  m_prevGyroAngle = gyroAngle;
+  m_prevLeftDistance = leftDistance;
+  m_prevRightDistance = rightDistance;
 
-    return GetEstimatedPosition();
+  return GetEstimatedPosition();
 }

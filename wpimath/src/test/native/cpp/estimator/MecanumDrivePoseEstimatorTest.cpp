@@ -12,17 +12,15 @@
 #include "gtest/gtest.h"
 
 void testFollowTrajectory(
-  const frc::MecanumDriveKinematics &kinematics,
-  frc::MecanumDrivePoseEstimator &estimator,
-  const frc::Trajectory &trajectory,
-  std::function<frc::ChassisSpeeds(frc::Trajectory::State &)> chassisSpeedsGenerator,
-  std::function<frc::Pose2d(frc::Trajectory::State &)> visionMeasurementGenerator,
-  const frc::Pose2d &startingPose,
-  const frc::Pose2d &endingPose,
-  const units::second_t dt,
-  const bool checkError,
-  const bool debug
-) {
+    const frc::MecanumDriveKinematics& kinematics,
+    frc::MecanumDrivePoseEstimator& estimator,
+    const frc::Trajectory& trajectory,
+    std::function<frc::ChassisSpeeds(frc::Trajectory::State&)>
+        chassisSpeedsGenerator,
+    std::function<frc::Pose2d(frc::Trajectory::State&)>
+        visionMeasurementGenerator,
+    const frc::Pose2d& startingPose, const frc::Pose2d& endingPose,
+    const units::second_t dt, const bool checkError, const bool debug) {
   frc::MecanumDriveWheelPositions wheelPositions{};
 
   estimator.ResetPosition(frc::Rotation2d{}, wheelPositions, startingPose);
@@ -52,7 +50,8 @@ void testFollowTrajectory(
       if (lastVisionPose != frc::Pose2d{}) {
         estimator.AddVisionMeasurement(lastVisionPose, lastVisionUpdateTime);
       }
-      lastVisionPose = visionMeasurementGenerator(groundTruthState) +
+      lastVisionPose =
+          visionMeasurementGenerator(groundTruthState) +
           frc::Transform2d{frc::Translation2d{distribution(generator) * 0.1_m,
                                               distribution(generator) * 0.1_m},
                            frc::Rotation2d{distribution(generator) * 0.05_rad}};
@@ -72,19 +71,16 @@ void testFollowTrajectory(
     auto xhat = estimator.UpdateWithTime(
         t,
         groundTruthState.pose.Rotation() +
-            frc::Rotation2d{distribution(generator) * 0.05_rad}
-            - trajectory.InitialPose().Rotation(),
+            frc::Rotation2d{distribution(generator) * 0.05_rad} -
+            trajectory.InitialPose().Rotation(),
         wheelPositions);
 
     if (debug) {
-      fmt::print("{}, {}, {}, {}, {}, {}, {}\n",
-        t.value(),
-        xhat.X().value(),
-        xhat.Y().value(),
-        xhat.Rotation().Radians().value(),
-        groundTruthState.pose.X().value(),
-        groundTruthState.pose.Y().value(),
-        groundTruthState.pose.Rotation().Radians().value());
+      fmt::print("{}, {}, {}, {}, {}, {}, {}\n", t.value(), xhat.X().value(),
+                 xhat.Y().value(), xhat.Rotation().Radians().value(),
+                 groundTruthState.pose.X().value(),
+                 groundTruthState.pose.Y().value(),
+                 groundTruthState.pose.Rotation().Radians().value());
     }
 
     double error = groundTruthState.pose.Translation()
@@ -99,10 +95,13 @@ void testFollowTrajectory(
     t += dt;
   }
 
-  EXPECT_NEAR(endingPose.X().value(), estimator.GetEstimatedPosition().X().value(), 0.05);
-  EXPECT_NEAR(endingPose.Y().value(), estimator.GetEstimatedPosition().Y().value(), 0.05);
-  EXPECT_NEAR(
-      endingPose.Rotation().Radians().value(), estimator.GetEstimatedPosition().Rotation().Radians().value(), 0.15);
+  EXPECT_NEAR(endingPose.X().value(),
+              estimator.GetEstimatedPosition().X().value(), 0.05);
+  EXPECT_NEAR(endingPose.Y().value(),
+              estimator.GetEstimatedPosition().Y().value(), 0.05);
+  EXPECT_NEAR(endingPose.Rotation().Radians().value(),
+              estimator.GetEstimatedPosition().Rotation().Radians().value(),
+              0.15);
 
   if (checkError) {
     EXPECT_LT(errorSum / (trajectory.TotalTime() / dt), 0.05);
@@ -117,12 +116,9 @@ TEST(MecanumDrivePoseEstimatorTest, AccuracyFacingTrajectory) {
 
   frc::MecanumDriveWheelPositions wheelPositions;
 
-  frc::MecanumDrivePoseEstimator estimator{kinematics,
-                                           frc::Rotation2d{},
-                                           wheelPositions,
-                                           frc::Pose2d{},
-                                           {0.1, 0.1, 0.1},
-                                           {0.45, 0.45, 0.1}};
+  frc::MecanumDrivePoseEstimator estimator{kinematics,      frc::Rotation2d{},
+                                           wheelPositions,  frc::Pose2d{},
+                                           {0.1, 0.1, 0.1}, {0.45, 0.45, 0.1}};
 
   frc::Trajectory trajectory = frc::TrajectoryGenerator::GenerateTrajectory(
       std::vector{frc::Pose2d{0_m, 0_m, 45_deg}, frc::Pose2d{3_m, 0_m, -90_deg},
@@ -132,32 +128,26 @@ TEST(MecanumDrivePoseEstimatorTest, AccuracyFacingTrajectory) {
       frc::TrajectoryConfig(2.0_mps, 2.0_mps_sq));
 
   testFollowTrajectory(
-    kinematics,
-    estimator,
-    trajectory,
-    [&] (frc::Trajectory::State &state) { return frc::ChassisSpeeds{state.velocity, 0_mps, state.velocity * state.curvature}; },
-    [&] (frc::Trajectory::State &state) { return state.pose; },
-    trajectory.InitialPose(),
-    {0_m, 0_m, frc::Rotation2d{45_deg}},
-    0.02_s,
-    true,
-    false
-  );
+      kinematics, estimator, trajectory,
+      [&](frc::Trajectory::State& state) {
+        return frc::ChassisSpeeds{state.velocity, 0_mps,
+                                  state.velocity * state.curvature};
+      },
+      [&](frc::Trajectory::State& state) { return state.pose; },
+      trajectory.InitialPose(), {0_m, 0_m, frc::Rotation2d{45_deg}}, 0.02_s,
+      true, false);
 }
 
 TEST(MecanumDrivePoseEstimatorTest, BadInitialPose) {
-    frc::MecanumDriveKinematics kinematics{
+  frc::MecanumDriveKinematics kinematics{
       frc::Translation2d{1_m, 1_m}, frc::Translation2d{1_m, -1_m},
       frc::Translation2d{-1_m, -1_m}, frc::Translation2d{-1_m, 1_m}};
 
   frc::MecanumDriveWheelPositions wheelPositions;
 
-  frc::MecanumDrivePoseEstimator estimator{kinematics,
-                                           frc::Rotation2d{},
-                                           wheelPositions,
-                                           frc::Pose2d{},
-                                           {0.1, 0.1, 0.1},
-                                           {0.45, 0.45, 0.1}};
+  frc::MecanumDrivePoseEstimator estimator{kinematics,      frc::Rotation2d{},
+                                           wheelPositions,  frc::Pose2d{},
+                                           {0.1, 0.1, 0.1}, {0.45, 0.45, 0.1}};
 
   frc::Trajectory trajectory = frc::TrajectoryGenerator::GenerateTrajectory(
       std::vector{frc::Pose2d{0_m, 0_m, 45_deg}, frc::Pose2d{3_m, 0_m, -90_deg},
@@ -166,25 +156,28 @@ TEST(MecanumDrivePoseEstimatorTest, BadInitialPose) {
                   frc::Pose2d{0_m, 0_m, 45_deg}},
       frc::TrajectoryConfig(2.0_mps, 2.0_mps_sq));
 
-  for (units::degree_t offset_direction_degs = 0_deg; offset_direction_degs < 360_deg; offset_direction_degs += 45_deg) {
-    for (units::degree_t offset_heading_degs = 0_deg; offset_heading_degs < 360_deg; offset_heading_degs += 45_deg) {
+  for (units::degree_t offset_direction_degs = 0_deg;
+       offset_direction_degs < 360_deg; offset_direction_degs += 45_deg) {
+    for (units::degree_t offset_heading_degs = 0_deg;
+         offset_heading_degs < 360_deg; offset_heading_degs += 45_deg) {
       auto pose_offset = frc::Rotation2d{offset_direction_degs};
       auto heading_offset = frc::Rotation2d{offset_heading_degs};
 
-      auto initial_pose = trajectory.InitialPose() + frc::Transform2d{ frc::Translation2d{pose_offset.Cos() * 1_m, pose_offset.Sin() * 1_m}, heading_offset};
+      auto initial_pose =
+          trajectory.InitialPose() +
+          frc::Transform2d{frc::Translation2d{pose_offset.Cos() * 1_m,
+                                              pose_offset.Sin() * 1_m},
+                           heading_offset};
 
       testFollowTrajectory(
-        kinematics,
-        estimator,
-        trajectory,
-        [&] (frc::Trajectory::State &state) { return frc::ChassisSpeeds{state.velocity, 0_mps, state.velocity * state.curvature}; },
-        [&] (frc::Trajectory::State &state) { return state.pose; },
-        {0_m, 0_m, frc::Rotation2d{45_deg}},
-        {0_m, 0_m, frc::Rotation2d{45_deg}},
-        0.02_s,
-        false,
-        false
-      );
+          kinematics, estimator, trajectory,
+          [&](frc::Trajectory::State& state) {
+            return frc::ChassisSpeeds{state.velocity, 0_mps,
+                                      state.velocity * state.curvature};
+          },
+          [&](frc::Trajectory::State& state) { return state.pose; },
+          {0_m, 0_m, frc::Rotation2d{45_deg}},
+          {0_m, 0_m, frc::Rotation2d{45_deg}}, 0.02_s, false, false);
     }
   }
 }
