@@ -433,5 +433,5 @@ std::pair<std::string_view, std::string_view> wpi::UnescapeCString(
         break;
     }
   }
-  return {{buf.data(), buf.size()}, {s, end}};
+  return {{buf.data(), buf.size()}, std::string_view(s, end)};
 }
