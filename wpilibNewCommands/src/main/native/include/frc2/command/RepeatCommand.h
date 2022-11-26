@@ -12,7 +12,7 @@
 #include <memory>
 #include <utility>
 
-#include "frc2/command/CommandBase.h"
+#include "frc2/command/Command.h"
 #include "frc2/command/CommandGroupBase.h"
 #include "frc2/command/CommandHelper.h"
 
@@ -29,7 +29,7 @@ namespace frc2 {
  *
  * <p>This class is provided by the NewCommands VendorDep
  */
-class RepeatCommand : public CommandHelper<CommandBase, RepeatCommand> {
+class RepeatCommand : public CommandHelper<Command, RepeatCommand> {
  public:
   /**
    * Creates a new RepeatCommand. Will run another command repeatedly,

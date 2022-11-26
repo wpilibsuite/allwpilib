@@ -49,7 +49,7 @@ class ProxyScheduleCommand;
  */
 class Command : public wpi::Sendable, public wpi::SendableHelper<Command> {
  public:
-  ~Command() override; 
+  ~Command() override;
 
   Command(const Command&) = default;
   Command& operator=(const Command& rhs);

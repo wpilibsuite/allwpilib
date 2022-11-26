@@ -21,7 +21,7 @@
 #include <units/time.h>
 #include <units/voltage.h>
 
-#include "CommandBase.h"
+#include "Command.h"
 #include "CommandHelper.h"
 
 #pragma once
@@ -51,7 +51,7 @@ namespace frc2 {
  */
 template <size_t NumModules>
 class SwerveControllerCommand
-    : public CommandHelper<CommandBase, SwerveControllerCommand<NumModules>> {
+    : public CommandHelper<Command, SwerveControllerCommand<NumModules>> {
   using voltsecondspermeter =
       units::compound_unit<units::voltage::volt, units::second,
                            units::inverse<units::meter>>;

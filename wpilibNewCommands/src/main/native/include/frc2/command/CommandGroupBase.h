@@ -9,7 +9,7 @@
 #include <span>
 #include <vector>
 
-#include "frc2/command/CommandBase.h"
+#include "frc2/command/Command.h"
 
 namespace frc2 {
 

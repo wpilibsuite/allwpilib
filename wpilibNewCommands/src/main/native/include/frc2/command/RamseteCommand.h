@@ -19,7 +19,7 @@
 #include <units/length.h>
 #include <units/voltage.h>
 
-#include "frc2/command/CommandBase.h"
+#include "frc2/command/Command.h"
 #include "frc2/command/CommandHelper.h"
 
 namespace frc2 {
@@ -42,7 +42,7 @@ namespace frc2 {
  * @see RamseteController
  * @see Trajectory
  */
-class RamseteCommand : public CommandHelper<CommandBase, RamseteCommand> {
+class RamseteCommand : public CommandHelper<Command, RamseteCommand> {
  public:
   /**
    * Constructs a new RamseteCommand that, when executed, will follow the

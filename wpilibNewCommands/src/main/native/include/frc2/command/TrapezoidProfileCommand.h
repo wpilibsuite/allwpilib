@@ -11,7 +11,7 @@
 #include <frc/Timer.h>
 #include <frc/trajectory/TrapezoidProfile.h>
 
-#include "frc2/command/CommandBase.h"
+#include "frc2/command/Command.h"
 #include "frc2/command/CommandHelper.h"
 
 namespace frc2 {
@@ -25,7 +25,7 @@ namespace frc2 {
  */
 template <class Distance>
 class TrapezoidProfileCommand
-    : public CommandHelper<CommandBase, TrapezoidProfileCommand<Distance>> {
+    : public CommandHelper<Command, TrapezoidProfileCommand<Distance>> {
   using Distance_t = units::unit_t<Distance>;
   using Velocity =
       units::compound_unit<Distance, units::inverse<units::seconds>>;

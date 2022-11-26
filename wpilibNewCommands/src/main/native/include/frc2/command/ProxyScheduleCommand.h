@@ -9,7 +9,7 @@
 
 #include <wpi/SmallVector.h>
 
-#include "frc2/command/CommandBase.h"
+#include "frc2/command/Command.h"
 #include "frc2/command/CommandHelper.h"
 #include "frc2/command/SetUtilities.h"
 
@@ -23,7 +23,7 @@ namespace frc2 {
  * This class is provided by the NewCommands VendorDep
  */
 class ProxyScheduleCommand
-    : public CommandHelper<CommandBase, ProxyScheduleCommand> {
+    : public CommandHelper<Command, ProxyScheduleCommand> {
  public:
   /**
    * Creates a new ProxyScheduleCommand that schedules the given commands when

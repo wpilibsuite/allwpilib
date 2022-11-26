@@ -12,7 +12,7 @@
 #include <memory>
 #include <utility>
 
-#include "frc2/command/CommandBase.h"
+#include "frc2/command/Command.h"
 #include "frc2/command/CommandGroupBase.h"
 #include "frc2/command/CommandHelper.h"
 
@@ -24,7 +24,7 @@ namespace frc2 {
  * <p>Wrapped commands may only be used through the wrapper, trying to directly
  * schedule them or add them to a group will throw an exception.
  */
-class WrapperCommand : public CommandHelper<CommandBase, WrapperCommand> {
+class WrapperCommand : public CommandHelper<Command, WrapperCommand> {
  public:
   /**
    * Wrap a command.
