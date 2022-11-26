@@ -357,6 +357,18 @@
     "commandversion": 2
   },
   {
+    "name": "Rapid React Command Bot",
+    "description": "A fully-functional command-based fender bot for the 2022 game using the new command framework.",
+    "tags": [
+      "Complete robot",
+      "Command-based",
+      "Lambdas"
+    ],
+    "foldername": "RapidReactCommandBot",
+    "gradlebase": "cpp",
+    "commandversion": 2
+  },
+  {
     "name": "Select Command Example",
     "description": "An example showing how to use the SelectCommand class from the new command framework.",
     "tags": [
