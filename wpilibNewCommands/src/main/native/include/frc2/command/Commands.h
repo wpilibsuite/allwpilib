@@ -253,7 +253,8 @@ template <typename... Args>
  */
 template <typename... Args>
 [[nodiscard]] CommandPtr Deadline(CommandPtr&& deadline, Args&&... commands) {
-  return Deadline(std::move(deadline), impl::MakeVector(std::forward<Args>(commands)...));
+  return Deadline(std::move(deadline),
+                  impl::MakeVector(std::forward<Args>(commands)...));
 }
 
 }  // namespace cmd
