@@ -14,6 +14,8 @@
 #include <wpi/Demangle.h>
 #include <wpi/SmallSet.h>
 #include <wpi/deprecated.h>
+#include <wpi/sendable/Sendable.h>
+#include <wpi/sendable/SendableHelper.h>
 
 #include "frc2/command/Subsystem.h"
 
@@ -45,10 +47,9 @@ class ProxyScheduleCommand;
  * @see CommandScheduler
  * @see CommandHelper
  */
-class Command {
+class Command : public wpi::Sendable, public wpi::SendableHelper<Command> {
  public:
-  Command() = default;
-  virtual ~Command();
+  ~Command() override; 
 
   Command(const Command&) = default;
   Command& operator=(const Command& rhs);
@@ -84,7 +85,7 @@ class Command {
   virtual bool IsFinished() { return false; }
 
   /**
-   * Specifies the set of subsystems used by this command. Two commands cannot
+   * Get the set of subsystems used by this command. Two commands cannot
    * use the same subsystem at the same time. If another command is scheduled
    * that shares a requirement, GetInterruptionBehavior() will be checked and
    * followed. If no subsystems are required, return an empty set.
@@ -96,7 +97,63 @@ class Command {
    * @return the set of subsystems that are required
    * @see InterruptionBehavior
    */
-  virtual wpi::SmallSet<Subsystem*, 4> GetRequirements() const = 0;
+  virtual wpi::SmallSet<Subsystem*, 4> GetRequirements() const;
+
+  /**
+   * Adds the specified Subsystem requirements to the command.
+   *
+   * @param requirements the Subsystem requirements to add
+   */
+  void AddRequirements(std::initializer_list<Subsystem*> requirements);
+
+  /**
+   * Adds the specified Subsystem requirements to the command.
+   *
+   * @param requirements the Subsystem requirements to add
+   */
+  void AddRequirements(std::span<Subsystem* const> requirements);
+
+  /**
+   * Adds the specified Subsystem requirements to the command.
+   *
+   * @param requirements the Subsystem requirements to add
+   */
+  void AddRequirements(wpi::SmallSet<Subsystem*, 4> requirements);
+
+  /**
+   * Adds the specified Subsystem requirement to the command.
+   *
+   * @param requirement the Subsystem requirement to add
+   */
+  void AddRequirements(Subsystem* requirement);
+
+  /**
+   * Gets the name of this Command.
+   *
+   * @return Name
+   */
+  std::string GetName() const;
+
+  /**
+   * Sets the name of this Command.
+   *
+   * @param name name
+   */
+  void SetName(std::string_view name);
+
+  /**
+   * Gets the subsystem name of this Command.
+   *
+   * @return Subsystem name
+   */
+  std::string GetSubsystem() const;
+
+  /**
+   * Sets the subsystem name of this Command.
+   *
+   * @param subsystem subsystem name
+   */
+  void SetSubsystem(std::string_view subsystem);
 
   /**
    * An enum describing the command's behavior when another command with a
@@ -343,15 +400,19 @@ safe) semantics.
     return InterruptionBehavior::kCancelSelf;
   }
 
-  virtual std::string GetName() const;
-
   /**
    * Transfers ownership of this command to a unique pointer.  Used for
    * decorator methods.
    */
   virtual CommandPtr ToPtr() && = 0;
 
+  void InitSendable(wpi::SendableBuilder& builder) override;
+
  protected:
+  Command();
+
+  wpi::SmallSet<Subsystem*, 4> m_requirements;
+
   /**
    * Transfers ownership of this command to a unique pointer.  Used for
    * decorator methods.

@@ -10,6 +10,9 @@ import edu.wpi.first.util.sendable.Sendable;
  * A {@link Sendable} base class for {@link Command}s.
  *
  * <p>This class is provided by the NewCommands VendorDep
+ *
+ * @deprecated Use {@link Command} instead.
+ * @see Command
  */
 @Deprecated(since = "2023", forRemoval = true)
-public abstract class CommandBase extends Command {}
+public class CommandBase extends Command {}

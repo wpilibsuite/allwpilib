@@ -12,7 +12,7 @@
 #include <memory>
 #include <utility>
 
-#include "frc2/command/CommandBase.h"
+#include "frc2/command/Command.h"
 #include "frc2/command/CommandGroupBase.h"
 #include "frc2/command/CommandHelper.h"
 
@@ -35,7 +35,7 @@ valid. This was unsafe/undefined behavior from the start, and RepeatCommand
 provides an easy way to achieve similar end results with slightly different (and
 safe) semantics.
  */
-class PerpetualCommand : public CommandHelper<CommandBase, PerpetualCommand> {
+class PerpetualCommand : public CommandHelper<Command, PerpetualCommand> {
  public:
   /**
    * Creates a new PerpetualCommand.  Will run another command in perpetuity,

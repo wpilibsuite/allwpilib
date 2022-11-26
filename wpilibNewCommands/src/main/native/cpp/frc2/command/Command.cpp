@@ -4,6 +4,9 @@
 
 #include "frc2/command/Command.h"
 
+#include <wpi/sendable/SendableBuilder.h>
+#include <wpi/sendable/SendableRegistry.h>
+
 #include "frc2/command/CommandHelper.h"
 #include "frc2/command/CommandScheduler.h"
 #include "frc2/command/ConditionalCommand.h"
@@ -21,6 +24,10 @@
 
 using namespace frc2;
 
+Command::Command() {
+  wpi::SendableRegistry::Add(this, GetTypeName(*this));
+}
+
 Command::~Command() {
   CommandScheduler::GetInstance().Cancel(this);
 }
@@ -33,6 +40,42 @@ Command& Command::operator=(const Command& rhs) {
 void Command::Initialize() {}
 void Command::Execute() {}
 void Command::End(bool interrupted) {}
+
+void Command::AddRequirements(std::initializer_list<Subsystem*> requirements) {
+  m_requirements.insert(requirements.begin(), requirements.end());
+}
+
+void Command::AddRequirements(std::span<Subsystem* const> requirements) {
+  m_requirements.insert(requirements.begin(), requirements.end());
+}
+
+void Command::AddRequirements(wpi::SmallSet<Subsystem*, 4> requirements) {
+  m_requirements.insert(requirements.begin(), requirements.end());
+}
+
+void Command::AddRequirements(Subsystem* requirement) {
+  m_requirements.insert(requirement);
+}
+
+wpi::SmallSet<Subsystem*, 4> Command::GetRequirements() const {
+  return m_requirements;
+}
+
+std::string Command::GetName() const {
+  return wpi::SendableRegistry::GetName(this);
+}
+
+void Command::SetName(std::string_view name) {
+  wpi::SendableRegistry::SetName(this, name);
+}
+
+std::string Command::GetSubsystem() const {
+  return wpi::SendableRegistry::GetSubsystem(this);
+}
+
+void Command::SetSubsystem(std::string_view subsystem) {
+  wpi::SendableRegistry::SetSubsystem(this, subsystem);
+}
 
 CommandPtr Command::WithTimeout(units::second_t duration) && {
   return std::move(*this).ToPtr().WithTimeout(duration);
@@ -125,16 +168,28 @@ bool Command::HasRequirement(Subsystem* requirement) const {
   return hasRequirement;
 }
 
-std::string Command::GetName() const {
-  return GetTypeName(*this);
-}
-
 bool Command::IsGrouped() const {
   return m_isGrouped;
 }
 
 void Command::SetGrouped(bool grouped) {
   m_isGrouped = grouped;
+}
+
+void Command::InitSendable(wpi::SendableBuilder& builder) {
+  builder.SetSmartDashboardType("Command");
+  builder.AddStringProperty(
+      ".name", [this] { return GetName(); }, nullptr);
+  builder.AddBooleanProperty(
+      "running", [this] { return IsScheduled(); },
+      [this](bool value) {
+        bool isScheduled = IsScheduled();
+        if (value && !isScheduled) {
+          Schedule();
+        } else if (!value && isScheduled) {
+          Cancel();
+        }
+      });
 }
 
 namespace frc2 {

@@ -20,7 +20,7 @@ namespace frc2 {
  *
  * This class is provided by the NewCommands VendorDep
  */
-class CommandGroupBase : public CommandBase {
+class CommandGroupBase : public Command {
  public:
   /**
    * Requires that the specified command not have been already allocated to a
