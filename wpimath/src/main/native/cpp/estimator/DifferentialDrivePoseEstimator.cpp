@@ -15,8 +15,7 @@ DifferentialDrivePoseEstimator::DifferentialDrivePoseEstimator(
     const Rotation2d& gyroAngle, units::meter_t leftDistance,
     units::meter_t rightDistance, const Pose2d& initialPose,
     const wpi::array<double, 3>& stateStdDevs,
-    const wpi::array<double, 3>& visionMeasurementStdDevs,
-    bool debug)
+    const wpi::array<double, 3>& visionMeasurementStdDevs)
     : m_odometry{gyroAngle, leftDistance, rightDistance, initialPose},
     m_prevGyroAngle{gyroAngle},
     m_prevLeftDistance{leftDistance},
@@ -89,8 +88,6 @@ void DifferentialDrivePoseEstimator::AddVisionMeasurement(
                       units::meter_t{k_times_twist(1)},
                       units::radian_t{k_times_twist(2)}};
 
-  auto currPose = GetEstimatedPosition();
-
   // Step 5: Apply scaled twist to the latest pose
   auto estimatedPose = GetEstimatedPosition().Exp(scaledTwist);
 
@@ -111,13 +108,11 @@ Pose2d DifferentialDrivePoseEstimator::UpdateWithTime(
     units::meter_t leftDistance, units::meter_t rightDistance) {
     m_poseBuffer.AddSample(currentTime, GetEstimatedPosition());
 
-    auto currPose = GetEstimatedPosition();
     m_odometry.Update(gyroAngle, leftDistance, rightDistance);
-    auto newPose = GetEstimatedPosition();
 
-  m_prevGyroAngle = gyroAngle;
-  m_prevLeftDistance = leftDistance;
-  m_prevRightDistance = rightDistance;
+    m_prevGyroAngle = gyroAngle;
+    m_prevLeftDistance = leftDistance;
+    m_prevRightDistance = rightDistance;
 
     return GetEstimatedPosition();
 }

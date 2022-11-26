@@ -66,8 +66,7 @@ class WPILIB_DLLEXPORT DifferentialDrivePoseEstimator {
       const Rotation2d& gyroAngle, units::meter_t leftDistance,
       units::meter_t rightDistance, const Pose2d& initialPose,
       const wpi::array<double, 3>& stateStdDevs,
-      const wpi::array<double, 3>& visionMeasurementStdDevs,
-      bool debug = false);
+      const wpi::array<double, 3>& visionMeasurementStdDevs);
 
   /**
    * Sets the pose estimator's trust of global measurements. This might be used
