@@ -77,11 +77,10 @@ class Drivetrain {
   // Gains are for example purposes only - must be determined for your own
   // robot!
   frc::MecanumDrivePoseEstimator m_poseEstimator{
+      m_kinematics,
       m_gyro.GetRotation2d(),
       GetCurrentDistances(),
       frc::Pose2d{},
-      m_kinematics,
-      {0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1},
-      {0.05, 0.05, 0.05, 0.05, 0.05},
+      {0.1, 0.1, 0.1},
       {0.1, 0.1, 0.1}};
 };

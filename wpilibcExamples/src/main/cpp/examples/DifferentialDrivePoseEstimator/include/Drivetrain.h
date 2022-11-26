@@ -83,8 +83,7 @@ class Drivetrain {
       units::meter_t{m_leftEncoder.GetDistance()},
       units::meter_t{m_rightEncoder.GetDistance()},
       frc::Pose2d{},
-      {0.01, 0.01, 0.01, 0.01, 0.01},
-      {0.1, 0.1, 0.1},
+      {0.01, 0.01, 0.01},
       {0.1, 0.1, 0.1}};
 
   // Gains are for example purposes only - must be determined for your own
