@@ -70,6 +70,8 @@ TEST_F(TriggerTest, WhileTrueRepeatedly) {
   scheduler.Run();
   EXPECT_EQ(1, inits);
   scheduler.Run();
+  EXPECT_EQ(1, inits);
+  scheduler.Run();
   EXPECT_EQ(2, inits);
   pressed = false;
   scheduler.Run();

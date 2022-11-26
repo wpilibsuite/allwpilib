@@ -69,8 +69,11 @@ class RepeatCommand : public CommandHelper<CommandBase, RepeatCommand> {
 
   bool RunsWhenDisabled() const override;
 
+  Command::InterruptionBehavior GetInterruptionBehavior() const override;
+
  private:
   std::unique_ptr<Command> m_command;
+  bool m_ended;
 };
 }  // namespace frc2
 
