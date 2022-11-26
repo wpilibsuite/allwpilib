@@ -16,7 +16,8 @@ import static org.mockito.Mockito.verify;
 
 import org.junit.jupiter.api.Test;
 
-class ParallelRaceGroupTest extends CommandTestBase {
+class ParallelRaceGroupTest extends CommandTestBase
+    implements MultiCompositionTestBase<ParallelRaceGroup> {
   @Test
   void parallelRaceScheduleTest() {
     try (CommandScheduler scheduler = new CommandScheduler()) {
@@ -201,5 +202,10 @@ class ParallelRaceGroupTest extends CommandTestBase {
 
       assertFalse(scheduler.isScheduled(group));
     }
+  }
+
+  @Override
+  public ParallelRaceGroup compose(Command... members) {
+    return new ParallelRaceGroup(members);
   }
 }
