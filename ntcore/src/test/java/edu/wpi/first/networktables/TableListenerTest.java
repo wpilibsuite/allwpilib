@@ -36,11 +36,13 @@ class TableListenerTest {
   void testAddListener() {
     NetworkTable table = m_inst.getTable("/foo");
     AtomicInteger count = new AtomicInteger();
-    table.addListener(EnumSet.of(NetworkTableEvent.Kind.kTopic), (atable, key, event) -> {
-      count.incrementAndGet();
-      assertEquals(atable, table);
-      assertEquals(key, "foovalue");
-    });
+    table.addListener(
+        EnumSet.of(NetworkTableEvent.Kind.kTopic),
+        (atable, key, event) -> {
+          count.incrementAndGet();
+          assertEquals(atable, table);
+          assertEquals(key, "foovalue");
+        });
     publishTopics();
     assertTrue(m_inst.waitForListenerQueue(1.0));
     assertEquals(count.get(), 1);
@@ -50,11 +52,12 @@ class TableListenerTest {
   void testAddSubTableListener() {
     NetworkTable table = m_inst.getTable("/foo");
     AtomicInteger count = new AtomicInteger();
-    table.addSubTableListener((atable, key, event) -> {
-      count.incrementAndGet();
-      assertEquals(atable, table);
-      assertEquals(key, "bar");
-    });
+    table.addSubTableListener(
+        (atable, key, event) -> {
+          count.incrementAndGet();
+          assertEquals(atable, table);
+          assertEquals(key, "bar");
+        });
     publishTopics();
     assertTrue(m_inst.waitForListenerQueue(1.0));
     assertEquals(count.get(), 1);
