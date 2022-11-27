@@ -76,47 +76,47 @@ TYPED_TEST_SUITE_P(MultiCompositionRunsWhenDisabledTest);
 
 TYPED_TEST_P(MultiCompositionRunsWhenDisabledTest, OneTrue) {
   auto param = true;
-  TypeParam command = TypeParam(CommandPtr::UnwrapVector(
-      cmd::impl::MakeVector(cmd::WaitUntil([] { return false; }).IgnoringDisable(param))));
+  TypeParam command = TypeParam(CommandPtr::UnwrapVector(cmd::impl::MakeVector(
+      cmd::WaitUntil([] { return false; }).IgnoringDisable(param))));
   EXPECT_EQ(param, command.RunsWhenDisabled());
 }
 
 TYPED_TEST_P(MultiCompositionRunsWhenDisabledTest, OneFalse) {
   auto param = false;
-  TypeParam command = TypeParam(CommandPtr::UnwrapVector(
-      cmd::impl::MakeVector(cmd::WaitUntil([] { return false; }).IgnoringDisable(param))));
+  TypeParam command = TypeParam(CommandPtr::UnwrapVector(cmd::impl::MakeVector(
+      cmd::WaitUntil([] { return false; }).IgnoringDisable(param))));
   EXPECT_EQ(param, command.RunsWhenDisabled());
 }
 
 TYPED_TEST_P(MultiCompositionRunsWhenDisabledTest, AllTrue) {
-  TypeParam command = TypeParam(CommandPtr::UnwrapVector(
-      cmd::impl::MakeVector(cmd::WaitUntil([] { return false; }).IgnoringDisable(true),
-               cmd::WaitUntil([] { return false; }).IgnoringDisable(true),
-               cmd::WaitUntil([] { return false; }).IgnoringDisable(true))));
+  TypeParam command = TypeParam(CommandPtr::UnwrapVector(cmd::impl::MakeVector(
+      cmd::WaitUntil([] { return false; }).IgnoringDisable(true),
+      cmd::WaitUntil([] { return false; }).IgnoringDisable(true),
+      cmd::WaitUntil([] { return false; }).IgnoringDisable(true))));
   EXPECT_EQ(true, command.RunsWhenDisabled());
 }
 
 TYPED_TEST_P(MultiCompositionRunsWhenDisabledTest, AllFalse) {
-  TypeParam command = TypeParam(CommandPtr::UnwrapVector(
-      cmd::impl::MakeVector(cmd::WaitUntil([] { return false; }).IgnoringDisable(false),
-               cmd::WaitUntil([] { return false; }).IgnoringDisable(false),
-               cmd::WaitUntil([] { return false; }).IgnoringDisable(false))));
+  TypeParam command = TypeParam(CommandPtr::UnwrapVector(cmd::impl::MakeVector(
+      cmd::WaitUntil([] { return false; }).IgnoringDisable(false),
+      cmd::WaitUntil([] { return false; }).IgnoringDisable(false),
+      cmd::WaitUntil([] { return false; }).IgnoringDisable(false))));
   EXPECT_EQ(false, command.RunsWhenDisabled());
 }
 
 TYPED_TEST_P(MultiCompositionRunsWhenDisabledTest, TwoTrueOneFalse) {
-  TypeParam command = TypeParam(CommandPtr::UnwrapVector(
-      cmd::impl::MakeVector(cmd::WaitUntil([] { return false; }).IgnoringDisable(true),
-               cmd::WaitUntil([] { return false; }).IgnoringDisable(true),
-               cmd::WaitUntil([] { return false; }).IgnoringDisable(false))));
+  TypeParam command = TypeParam(CommandPtr::UnwrapVector(cmd::impl::MakeVector(
+      cmd::WaitUntil([] { return false; }).IgnoringDisable(true),
+      cmd::WaitUntil([] { return false; }).IgnoringDisable(true),
+      cmd::WaitUntil([] { return false; }).IgnoringDisable(false))));
   EXPECT_EQ(false, command.RunsWhenDisabled());
 }
 
 TYPED_TEST_P(MultiCompositionRunsWhenDisabledTest, TwoFalseOneTrue) {
-  TypeParam command = TypeParam(CommandPtr::UnwrapVector(
-      cmd::impl::MakeVector(cmd::WaitUntil([] { return false; }).IgnoringDisable(false),
-               cmd::WaitUntil([] { return false; }).IgnoringDisable(false),
-               cmd::WaitUntil([] { return false; }).IgnoringDisable(true))));
+  TypeParam command = TypeParam(CommandPtr::UnwrapVector(cmd::impl::MakeVector(
+      cmd::WaitUntil([] { return false; }).IgnoringDisable(false),
+      cmd::WaitUntil([] { return false; }).IgnoringDisable(false),
+      cmd::WaitUntil([] { return false; }).IgnoringDisable(true))));
   EXPECT_EQ(false, command.RunsWhenDisabled());
 }
 
