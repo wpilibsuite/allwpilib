@@ -2147,9 +2147,6 @@ void SImpl::SetValue(ClientData* client, TopicData* topic, const Value& value) {
 
   for (auto&& subscriber : topic->subscribers) {
     int id = subscriber->client->GetId();
-    DEBUG4("subscriber client {} uid {} options topicsOnly={} sendAll={}", id,
-           subscriber->subuid, subscriber->options.topicsOnly,
-           subscriber->options.sendAll);
     if (subscriber->options.topicsOnly) {
       continue;
     } else if (subscriber->options.sendAll) {
@@ -2158,8 +2155,6 @@ void SImpl::SetValue(ClientData* client, TopicData* topic, const Value& value) {
       toSend[id] = ClientData::kSendNormal;
     }
   }
-  DEBUG4("sending {} value to client modes {}", topic->name,
-         fmt::join(toSend, ","));
 
   for (size_t i = 0, iend = toSend.size(); i < iend; ++i) {
     auto aClient = m_clients[i].get();
