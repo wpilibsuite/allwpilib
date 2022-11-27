@@ -21,9 +21,9 @@ FetchContent_Declare(
     GIT_TAG         e80e42e8b4136ddb84ccfe04fa28d0c745828952
 )
 FetchContent_Declare(
-    proggyfonts
-    URL         https://github.com/bluescan/proggyfonts/archive/refs/tags/v1.1.5.zip
-    URL_HASH    SHA256=260c5311b655ef1e73bf38947a82d37f14ed51522d3bcaf1b466c2d6225b11bb
+    fonts
+    URL         https://github.com/wpilibsuite/thirdparty-fonts/releases/download/v0.1/fonts.zip
+    URL_HASH    SHA256=0d1cc6cfc86953a676993e23adcfb259ae621f3e1cc675761a5c4457472345da
 )
 FetchContent_Declare(
     stb
@@ -34,21 +34,9 @@ FetchContent_Declare(
 FetchContent_MakeAvailable(
     imgui
     implot
-    proggyfonts
+    fonts
     stb
 )
-
-# Build font
-add_executable(imgui_font_bin2c ${imgui_SOURCE_DIR}/misc/fonts/binary_to_compressed_c.cpp)
-add_custom_command(OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/ProggyDotted.inc
-  COMMAND imgui_font_bin2c
-  ARGS "${proggyfonts_SOURCE_DIR}/ProggyDotted/ProggyDotted Regular.ttf" ProggyDotted > ${CMAKE_CURRENT_BINARY_DIR}/ProggyDotted.inc
-  WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
-  MAIN_DEPENDENCY "${proggyfonts_SOURCE_DIR}/ProggyDotted/ProggyDotted Regular.ttf"
-  VERBATIM
-)
-set_source_files_properties(src/imgui_ProggyDotted.cpp
-    PROPERTIES OBJECT_DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/ProggyDotted.inc)
 
 # Add glfw directly to our build.
 FetchContent_GetProperties(glfw3)
@@ -78,13 +66,14 @@ endif()
 # Add imgui directly to our build.
 file(GLOB imgui_sources ${imgui_SOURCE_DIR}/*.cpp ${imgui_SOURCE_DIR}/misc/cpp/*.cpp)
 file(GLOB implot_sources ${implot_SOURCE_DIR}/*.cpp)
+file(GLOB fonts_sources ${fonts_SOURCE_DIR}/src/*.cpp)
 add_library(imgui STATIC
     ${imgui_sources}
     ${implot_sources}
     ${imgui_SOURCE_DIR}/backends/imgui_impl_glfw.cpp
     ${imgui_SOURCE_DIR}/backends/imgui_impl_opengl3.cpp
     ${gl3w_BINARY_DIR}/src/gl3w.c
-    src/imgui_ProggyDotted.cpp
+    ${fonts_sources}
     src/stb_image.cpp
 )
 target_compile_definitions(imgui PUBLIC IMGUI_IMPL_OPENGL_LOADER_GL3W)
@@ -107,7 +96,7 @@ target_include_directories(imgui
     "$<BUILD_INTERFACE:${implot_SOURCE_DIR}>"
     "$<BUILD_INTERFACE:${imgui_SOURCE_DIR}/backends>"
     "$<BUILD_INTERFACE:${gl3w_BINARY_DIR}/include>"
-    "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>"
+    "$<BUILD_INTERFACE:${fonts_SOURCE_DIR}/include>"
     "$<BUILD_INTERFACE:${stb_SOURCE_DIR}>"
     PRIVATE
     "$<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>"
