@@ -84,6 +84,12 @@ void gui::PlatformRenderFrame() {
     id <MTLRenderCommandEncoder> renderEncoder = [commandBuffer renderCommandEncoderWithDescriptor:renderPassDescriptor];
     [renderEncoder pushDebugGroup:@"WPI GUI"];
 
+    if (gContext->reloadFonts) {
+      ImGui_ImplMetal_DestroyFontsTexture();
+      ImGui_ImplMetal_CreateFontsTexture(gPlatformContext->layer.device);
+      gContext->reloadFonts = false;
+    }
+
     // Start the Dear ImGui frame
     ImGui_ImplMetal_NewFrame(renderPassDescriptor);
 
