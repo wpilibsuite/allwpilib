@@ -363,7 +363,8 @@ std::pair<std::string_view, std::string_view> wpi::UnescapeCString(
     std::string_view str, wpi::SmallVectorImpl<char>& buf) {
   buf.clear();
   buf.reserve(str.size() - 2);
-  auto s = str.begin(), end = str.end();
+  const char* s = str.data();
+  const char* end = str.data() + str.size();
   for (; s != end && *s != '"'; ++s) {
     if (*s != '\\' || (s + 1) >= end) {
       buf.push_back(*s);
@@ -433,6 +434,9 @@ std::pair<std::string_view, std::string_view> wpi::UnescapeCString(
         break;
     }
   }
-  // mac clang doesn't like {s, end} here
-  return {{buf.data(), buf.size()}, {&(*s), static_cast<size_t>(end - s)}};
+  if (s == end) {
+    return {{buf.data(), buf.size()}, {}};
+  } else {
+    return {{buf.data(), buf.size()}, {s, static_cast<size_t>(end - s)}};
+  }
 }
