@@ -110,8 +110,9 @@ class ClientData {
   void UpdateMetaClientPub();
   void UpdateMetaClientSub();
 
-  // returns nullptr if there is no subscriber for that topic name
-  SubscriberData* GetSubscriber(std::string_view name, bool special);
+  std::span<SubscriberData*> GetSubscribers(
+      std::string_view name, bool special,
+      wpi::SmallVectorImpl<SubscriberData*>& buf);
 
   std::string_view GetOriginalName() const { return m_originalName; }
   std::string_view GetName() const { return m_name; }
@@ -531,14 +532,17 @@ void ClientData::UpdateMetaClientSub() {
   }
 }
 
-SubscriberData* ClientData::GetSubscriber(std::string_view name, bool special) {
+std::span<SubscriberData*> ClientData::GetSubscribers(
+    std::string_view name, bool special,
+    wpi::SmallVectorImpl<SubscriberData*>& buf) {
+  buf.resize(0);
   for (auto&& subPair : m_subscribers) {
     SubscriberData* subscriber = subPair.getSecond().get();
     if (subscriber->Matches(name, special)) {
-      return subscriber;
+      buf.emplace_back(subscriber);
     }
   }
-  return nullptr;
+  return {buf.data(), buf.size()};
 }
 
 void ClientData4Base::ClientPublish(int64_t pubuid, std::string_view name,
@@ -2018,14 +2022,15 @@ TopicData* SImpl::CreateTopic(ClientData* client, std::string_view name,
       }
 
       // look for subscriber matching prefixes
-      bool hasSubscriber = false;
-      if (auto subscriber = aClient->GetSubscriber(name, topic->special)) {
+      wpi::SmallVector<SubscriberData*, 16> subscribersBuf;
+      auto subscribers =
+          aClient->GetSubscribers(name, topic->special, subscribersBuf);
+      for (auto subscriber : subscribers) {
         topic->subscribers.Add(subscriber);
-        hasSubscriber = true;
       }
 
       // don't announce to this client if no subscribers
-      if (!hasSubscriber) {
+      if (subscribers.empty()) {
         continue;
       }
 
