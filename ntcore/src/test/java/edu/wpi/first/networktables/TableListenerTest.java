@@ -26,7 +26,7 @@ class TableListenerTest {
     m_inst.close();
   }
 
-  void publishTopics() {
+  private void publishTopics() {
     m_inst.getDoubleTopic("/foo/foovalue").publish();
     m_inst.getDoubleTopic("/foo/bar/barvalue").publish();
     m_inst.getDoubleTopic("/baz/bazvalue").publish();
