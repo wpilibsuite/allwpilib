@@ -284,12 +284,12 @@ safe) semantics.
 
   /**
    * Decorates this Command with a name. Is an inline function for
-   * #SetName(std::string);
+   * #SetName(std::string_view);
    *
    * @param name name
    * @return the decorated Command
    */
-  [[nodiscard]] CommandPtr WithName(std::string name) &&;
+  [[nodiscard]] CommandPtr WithName(std::string_view name) &&;
 
   /**
    * Schedules this command.
@@ -365,7 +365,7 @@ safe) semantics.
    *
    * @param name The display name of the Command.
    */
-  virtual void SetName(std::string name);
+  virtual void SetName(std::string_view name);
 
   /**
    * Transfers ownership of this command to a unique pointer.  Used for

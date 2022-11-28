@@ -219,7 +219,7 @@ CommandPtr CommandPtr::HandleInterrupt(std::function<void(void)> handler) && {
       });
 }
 
-CommandPtr CommandPtr::WithName(std::string name) && {
+CommandPtr CommandPtr::WithName(std::string_view name) && {
   AssertValid();
   m_ptr->SetName(name);
   return std::move(*this);

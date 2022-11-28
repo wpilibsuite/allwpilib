@@ -65,7 +65,7 @@ class CommandBase : public Command,
    *
    * @param name name
    */
-  void SetName(std::string name) override;
+  void SetName(std::string_view name) override;
 
   /**
    * Gets the name of this Command.

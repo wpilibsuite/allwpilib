@@ -34,7 +34,7 @@ wpi::SmallSet<Subsystem*, 4> CommandBase::GetRequirements() const {
   return m_requirements;
 }
 
-void CommandBase::SetName(std::string name) {
+void CommandBase::SetName(std::string_view name) {
   wpi::SendableRegistry::SetName(this, name);
 }
 

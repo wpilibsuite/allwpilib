@@ -222,12 +222,12 @@ class CommandPtr final {
 
   /**
    * Decorates this Command with a name. Is an inline function for
-   * Command::SetName(std::string);
+   * Command::SetName(std::string_view);
    *
    * @param name name
    * @return the decorated Command
    */
-  [[nodiscard]] CommandPtr WithName(std::string name) &&;
+  [[nodiscard]] CommandPtr WithName(std::string_view name) &&;
 
   /**
    * Get a raw pointer to the held command.
