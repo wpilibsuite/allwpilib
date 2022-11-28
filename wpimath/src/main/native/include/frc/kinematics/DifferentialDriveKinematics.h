@@ -65,6 +65,14 @@ class WPILIB_DLLEXPORT DifferentialDriveKinematics {
             chassisSpeeds.vx + trackWidth / 2 * chassisSpeeds.omega / 1_rad};
   }
 
+  /**
+   * Returns a twist from left and right distance deltas using
+   * forward kinematics.
+   *
+   * @param leftDistance The distance measured by the left encoder.
+   * @param rightDistance The distance measured by the right encoder.
+   * @return The resulting Twist2d.
+   */
   constexpr Twist2d ToTwist2d(const units::meter_t leftDistance,
                               const units::meter_t rightDistance) const {
     return {(leftDistance + rightDistance) / 2, 0_m,

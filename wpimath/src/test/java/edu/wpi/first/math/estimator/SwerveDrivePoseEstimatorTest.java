@@ -168,7 +168,7 @@ class SwerveDrivePoseEstimatorTest {
     System.out.print(
         "time, est_x, est_y, est_theta, true_x, true_y, true_theta, "
             + "distance_1, distance_2, distance_3, distance_4, "
-	    + "angle_1, angle_2, angle_3, angle_4\n");
+            + "angle_1, angle_2, angle_3, angle_4\n");
 
     final TreeMap<Double, Pose2d> visionUpdateQueue = new TreeMap<>();
 

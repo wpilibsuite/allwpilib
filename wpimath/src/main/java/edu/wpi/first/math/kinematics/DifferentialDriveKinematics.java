@@ -59,8 +59,19 @@ public class DifferentialDriveKinematics {
             + trackWidthMeters / 2 * chassisSpeeds.omegaRadiansPerSecond);
   }
 
-  public Twist2d toTwist2d(double leftMeters, double rightMeters) {
+  /**
+   * Performs forward kinematics to return the resulting Twist2d from the given left and right side
+   * distance deltas. This method is often used for odometry -- determining the robot's position on
+   * the field using changes in the distance driven by each wheel on the robot.
+   *
+   * @param leftDistanceMeters The distance measured by the left side encoder.
+   * @param rightDistanceMeters The distance measured by the right side encoder.
+   * @return The resulting Twist2d.
+   */
+  public Twist2d toTwist2d(double leftDistanceMeters, double rightDistanceMeters) {
     return new Twist2d(
-        (leftMeters + rightMeters) / 2, 0, (rightMeters - leftMeters) / trackWidthMeters);
+        (leftDistanceMeters + rightDistanceMeters) / 2,
+        0,
+        (rightDistanceMeters - leftDistanceMeters) / trackWidthMeters);
   }
 }
