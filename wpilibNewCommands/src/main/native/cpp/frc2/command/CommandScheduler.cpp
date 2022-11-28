@@ -258,6 +258,11 @@ void CommandScheduler::Run() {
 }
 
 void CommandScheduler::RegisterSubsystem(Subsystem* subsystem) {
+  if (m_impl->subsystems.find(subsystem) != m_impl->subsystems.end()) {
+    std::puts("Tried to register an already-registered subsystem");
+    return;
+  }
+
   m_impl->subsystems[subsystem] = nullptr;
 }
 
@@ -304,6 +309,10 @@ void CommandScheduler::SetDefaultCommand(Subsystem* subsystem,
   }
 
   SetDefaultCommandImpl(subsystem, std::move(defaultCommand).Unwrap());
+}
+
+void CommandScheduler::RemoveDefaultCommand(Subsystem* subsystem) {
+  m_impl->subsystems[subsystem] = nullptr;
 }
 
 Command* CommandScheduler::GetDefaultCommand(const Subsystem* subsystem) const {
