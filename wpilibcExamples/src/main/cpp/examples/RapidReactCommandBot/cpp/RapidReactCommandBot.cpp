@@ -25,8 +25,8 @@ void RapidReactCommandBot::ConfigureBindings() {
 
   // Control the drive with split-stick arcade controls
   m_drive.SetDefaultCommand(m_drive.ArcadeDriveCommand(
-      [this] { return m_driverController.GetLeftY(); },
-      [this] { return m_driverController.GetRightX(); }));
+      [this] { return -m_driverController.GetLeftY(); },
+      [this] { return -m_driverController.GetRightX(); }));
 
   // Deploy the intake with the X button
   m_driverController.X().OnTrue(m_intake.IntakeCommand());

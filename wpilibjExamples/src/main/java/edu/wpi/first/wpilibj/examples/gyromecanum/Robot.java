@@ -51,6 +51,6 @@ public class Robot extends TimedRobot {
   @Override
   public void teleopPeriodic() {
     m_robotDrive.driveCartesian(
-        -m_joystick.getY(), m_joystick.getX(), m_joystick.getZ(), m_gyro.getRotation2d());
+        -m_joystick.getY(), -m_joystick.getX(), -m_joystick.getZ(), m_gyro.getRotation2d());
   }
 }

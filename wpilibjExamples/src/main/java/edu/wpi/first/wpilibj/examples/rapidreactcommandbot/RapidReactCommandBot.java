@@ -52,7 +52,8 @@ public class RapidReactCommandBot {
 
     // Control the drive with split-stick arcade controls
     m_drive.setDefaultCommand(
-        m_drive.arcadeDriveCommand(m_driverController::getLeftY, m_driverController::getRightX));
+        m_drive.arcadeDriveCommand(
+            () -> -m_driverController.getLeftY(), () -> -m_driverController.getRightX()));
 
     // Deploy the intake with the X button
     m_driverController.x().onTrue(m_intake.intakeCommand());
