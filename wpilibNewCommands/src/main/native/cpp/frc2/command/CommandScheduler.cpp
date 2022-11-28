@@ -302,10 +302,6 @@ void CommandScheduler::SetDefaultCommand(Subsystem* subsystem,
     throw FRC_MakeError(frc::err::CommandIllegalUse, "{}",
                         "Default commands must require their subsystem!");
   }
-  if (defaultCommand.get()->IsFinished()) {
-    throw FRC_MakeError(frc::err::CommandIllegalUse, "{}",
-                        "Default commands should not end!");
-  }
 
   SetDefaultCommandImpl(subsystem, std::move(defaultCommand).Unwrap());
 }
