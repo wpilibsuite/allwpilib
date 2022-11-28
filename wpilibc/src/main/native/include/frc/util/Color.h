@@ -763,6 +763,9 @@ class Color {
   constexpr Color(int r, int g, int b)
       : Color(r / 255.0, g / 255.0, b / 255.0) {}
 
+  constexpr bool operator==(const Color&) const = default;
+  constexpr bool operator!=(const Color&) const = default;
+
   /**
    * Creates a Color from HSV values.
    *
@@ -829,14 +832,6 @@ class Color {
     return std::clamp(rounded, 0.0, 1.0);
   }
 };
-
-inline bool operator==(const Color& c1, const Color& c2) {
-  return c1.red == c2.red && c1.green == c2.green && c1.blue == c2.blue;
-}
-
-inline bool operator!=(const Color& c1, const Color& c2) {
-  return !(c1 == c2);
-}
 
 /*
  * FIRST Colors

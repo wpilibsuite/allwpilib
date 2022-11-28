@@ -81,16 +81,6 @@ void AprilTagFieldLayout::Serialize(std::string_view path) {
   output.flush();
 }
 
-bool AprilTagFieldLayout::operator==(const AprilTagFieldLayout& other) const {
-  return m_apriltags == other.m_apriltags && m_origin == other.m_origin &&
-         m_fieldLength == other.m_fieldLength &&
-         m_fieldWidth == other.m_fieldWidth;
-}
-
-bool AprilTagFieldLayout::operator!=(const AprilTagFieldLayout& other) const {
-  return !operator==(other);
-}
-
 void frc::to_json(wpi::json& json, const AprilTagFieldLayout& layout) {
   std::vector<AprilTag> tagVector;
   tagVector.reserve(layout.m_apriltags.size());

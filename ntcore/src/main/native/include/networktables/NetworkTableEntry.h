@@ -520,14 +520,10 @@ class NetworkTableEntry final {
    * Equality operator.  Returns true if both instances refer to the same
    * native handle.
    */
-  bool operator==(const NetworkTableEntry& oth) const {
-    return m_handle == oth.m_handle;
-  }
+  bool operator==(const NetworkTableEntry&) const = default;
 
   /** Inequality operator. */
-  bool operator!=(const NetworkTableEntry& oth) const {
-    return !(*this == oth);
-  }
+  bool operator!=(const NetworkTableEntry&) const = default;
 
  protected:
   /* Native handle */

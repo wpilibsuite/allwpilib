@@ -170,14 +170,6 @@ Rotation3d Rotation3d::operator/(double scalar) const {
   return *this * (1.0 / scalar);
 }
 
-bool Rotation3d::operator==(const Rotation3d& other) const {
-  return m_q == other.m_q;
-}
-
-bool Rotation3d::operator!=(const Rotation3d& other) const {
-  return !operator==(other);
-}
-
 Rotation3d Rotation3d::RotateBy(const Rotation3d& other) const {
   return Rotation3d{other.m_q * m_q};
 }
