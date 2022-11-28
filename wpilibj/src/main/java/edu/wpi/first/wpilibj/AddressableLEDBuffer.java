@@ -92,6 +92,7 @@ public class AddressableLEDBuffer {
       default:
         setRGB(index, v, m, v - X);
         break;
+    }
   }
 
   /**
