@@ -159,7 +159,9 @@ void MotorSafety::Check() {
   }
 
   if (stopTime < Timer::GetFPGATimestamp()) {
-    FRC_ReportError(err::Timeout, "{}... Output not updated often enough",
+    FRC_ReportError(err::Timeout,
+                    "{}... Output not updated often enough. See "
+                    "https://docs.wpilib.org/motorsafety for more information.",
                     GetDescription());
 
     try {
