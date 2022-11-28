@@ -23,11 +23,6 @@ struct WPILIB_DLLEXPORT AprilTag {
    * Checks equality between this AprilTag and another object.
    */
   bool operator==(const AprilTag&) const = default;
-
-  /**
-   * Checks inequality between this AprilTag and another object.
-   */
-  bool operator!=(const AprilTag&) const = default;
 };
 
 WPILIB_DLLEXPORT

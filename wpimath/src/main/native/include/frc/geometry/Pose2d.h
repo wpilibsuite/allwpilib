@@ -74,11 +74,6 @@ class WPILIB_DLLEXPORT Pose2d {
   bool operator==(const Pose2d&) const = default;
 
   /**
-   * Checks inequality between this Pose2d and another object.
-   */
-  bool operator!=(const Pose2d&) const = default;
-
-  /**
    * Returns the underlying translation.
    *
    * @return Reference to the translational component of the pose.

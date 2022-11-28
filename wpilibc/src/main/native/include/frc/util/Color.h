@@ -764,7 +764,6 @@ class Color {
       : Color(r / 255.0, g / 255.0, b / 255.0) {}
 
   constexpr bool operator==(const Color&) const = default;
-  constexpr bool operator!=(const Color&) const = default;
 
   /**
    * Creates a Color from HSV values.

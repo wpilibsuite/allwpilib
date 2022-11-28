@@ -52,11 +52,6 @@ class WPILIB_DLLEXPORT Trajectory {
     bool operator==(const State&) const = default;
 
     /**
-     * Checks inequality between this State and another object.
-     */
-    bool operator!=(const State&) const = default;
-
-    /**
      * Interpolates between two States.
      *
      * @param endValue The end value for the interpolation.
@@ -136,11 +131,6 @@ class WPILIB_DLLEXPORT Trajectory {
    * Checks equality between this Trajectory and another object.
    */
   bool operator==(const Trajectory&) const = default;
-
-  /**
-   * Checks inequality between this Trajectory and another object.
-   */
-  bool operator!=(const Trajectory&) const = default;
 
  private:
   std::vector<State> m_states;

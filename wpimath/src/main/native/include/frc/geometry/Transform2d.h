@@ -106,11 +106,6 @@ class WPILIB_DLLEXPORT Transform2d {
    */
   bool operator==(const Transform2d&) const = default;
 
-  /**
-   * Checks inequality between this Transform2d and another object.
-   */
-  bool operator!=(const Transform2d&) const = default;
-
  private:
   Translation2d m_translation;
   Rotation2d m_rotation;

@@ -45,7 +45,6 @@ class Color8Bit {
   }
 
   constexpr bool operator==(const Color8Bit&) const = default;
-  constexpr bool operator!=(const Color8Bit&) const = default;
 
   /**
    * Return this color represented as a hex string.

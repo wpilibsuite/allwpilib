@@ -140,8 +140,6 @@ class VideoSource {
     return m_handle == other.m_handle;
   }
 
-  bool operator!=(const VideoSource& other) const { return !(*this == other); }
-
   /**
    * Get the kind of the source.
    */
@@ -735,8 +733,6 @@ class VideoSink {
   bool operator==(const VideoSink& other) const {
     return m_handle == other.m_handle;
   }
-
-  bool operator!=(const VideoSink& other) const { return !(*this == other); }
 
   /**
    * Get the kind of the sink.

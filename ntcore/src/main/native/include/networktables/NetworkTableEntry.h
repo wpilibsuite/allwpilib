@@ -522,9 +522,6 @@ class NetworkTableEntry final {
    */
   bool operator==(const NetworkTableEntry&) const = default;
 
-  /** Inequality operator. */
-  bool operator!=(const NetworkTableEntry&) const = default;
-
  protected:
   /* Native handle */
   NT_Entry m_handle{0};

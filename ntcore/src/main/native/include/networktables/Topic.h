@@ -280,9 +280,6 @@ class Topic {
    */
   bool operator==(const Topic&) const = default;
 
-  /** Inequality operator. */
-  bool operator!=(const Topic&) const = default;
-
  protected:
   NT_Topic m_handle{0};
 };

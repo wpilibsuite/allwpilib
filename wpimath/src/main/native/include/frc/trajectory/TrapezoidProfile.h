@@ -69,7 +69,6 @@ class TrapezoidProfile {
     Distance_t position{0};
     Velocity_t velocity{0};
     bool operator==(const State&) const = default;
-    bool operator!=(const State&) const = default;
   };
 
   /**

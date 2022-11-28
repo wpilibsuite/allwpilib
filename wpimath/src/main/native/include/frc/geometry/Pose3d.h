@@ -78,11 +78,6 @@ class WPILIB_DLLEXPORT Pose3d {
   bool operator==(const Pose3d&) const = default;
 
   /**
-   * Checks inequality between this Pose3d and another object.
-   */
-  bool operator!=(const Pose3d&) const = default;
-
-  /**
    * Returns the underlying translation.
    *
    * @return Reference to the translational component of the pose.

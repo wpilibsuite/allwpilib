@@ -636,9 +636,6 @@ class Value final {
 };
 
 bool operator==(const Value& lhs, const Value& rhs);
-inline bool operator!=(const Value& lhs, const Value& rhs) {
-  return !(lhs == rhs);
-}
 
 /**
  * NetworkTable Value alias for similarity with Java.

@@ -47,14 +47,6 @@ class WPILIB_DLLEXPORT Quaternion {
   bool operator==(const Quaternion& other) const;
 
   /**
-   * Checks inequality between this Quaternion and another object.
-   *
-   * @param other The other object.
-   * @return Whether the two objects are not equal.
-   */
-  bool operator!=(const Quaternion& other) const;
-
-  /**
    * Returns the inverse of the quaternion.
    */
   Quaternion Inverse() const;

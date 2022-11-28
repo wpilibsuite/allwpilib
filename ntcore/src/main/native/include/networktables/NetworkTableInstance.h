@@ -690,9 +690,6 @@ class NetworkTableInstance final {
    */
   bool operator==(const NetworkTableInstance&) const = default;
 
-  /** Inequality operator. */
-  bool operator!=(const NetworkTableInstance&) const = default;
-
  private:
   /* Native handle */
   NT_Inst m_handle{0};

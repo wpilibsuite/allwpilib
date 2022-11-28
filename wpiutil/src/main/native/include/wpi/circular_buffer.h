@@ -44,7 +44,6 @@ class circular_buffer {
       return retval;
     }
     bool operator==(const iterator&) const = default;
-    bool operator!=(const iterator&) const = default;
     reference operator*() { return (*m_buffer)[m_index]; }
 
    private:
@@ -73,7 +72,6 @@ class circular_buffer {
       return retval;
     }
     bool operator==(const const_iterator&) const = default;
-    bool operator!=(const const_iterator&) const = default;
     const_reference operator*() const { return (*m_buffer)[m_index]; }
 
    private:

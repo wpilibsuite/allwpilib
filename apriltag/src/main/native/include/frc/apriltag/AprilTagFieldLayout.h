@@ -106,11 +106,6 @@ class WPILIB_DLLEXPORT AprilTagFieldLayout {
    */
   bool operator==(const AprilTagFieldLayout&) const = default;
 
-  /**
-   * Checks inequality between this AprilTagFieldLayout and another object.
-   */
-  bool operator!=(const AprilTagFieldLayout&) const = default;
-
  private:
   std::unordered_map<int, AprilTag> m_apriltags;
   units::meter_t m_fieldLength;

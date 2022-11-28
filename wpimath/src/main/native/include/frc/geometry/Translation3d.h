@@ -172,14 +172,6 @@ class WPILIB_DLLEXPORT Translation3d {
    */
   bool operator==(const Translation3d& other) const;
 
-  /**
-   * Checks inequality between this Translation3d and another object.
-   *
-   * @param other The other object.
-   * @return Whether the two objects are not equal.
-   */
-  bool operator!=(const Translation3d& other) const;
-
  private:
   units::meter_t m_x = 0_m;
   units::meter_t m_y = 0_m;

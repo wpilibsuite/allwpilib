@@ -111,11 +111,6 @@ class WPILIB_DLLEXPORT Transform3d {
    */
   bool operator==(const Transform3d&) const = default;
 
-  /**
-   * Checks inequality between this Transform3d and another object.
-   */
-  bool operator!=(const Transform3d&) const = default;
-
  private:
   Translation3d m_translation;
   Rotation3d m_rotation;

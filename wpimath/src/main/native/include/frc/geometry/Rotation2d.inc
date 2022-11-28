@@ -58,10 +58,6 @@ constexpr bool Rotation2d::operator==(const Rotation2d& other) const {
               : std::hypot(Cos() - other.Cos(), Sin() - other.Sin())) < 1E-9;
 }
 
-constexpr bool Rotation2d::operator!=(const Rotation2d& other) const {
-  return !operator==(other);
-}
-
 constexpr Rotation2d Rotation2d::RotateBy(const Rotation2d& other) const {
   return {Cos() * other.Cos() - Sin() * other.Sin(),
           Cos() * other.Sin() + Sin() * other.Cos()};
