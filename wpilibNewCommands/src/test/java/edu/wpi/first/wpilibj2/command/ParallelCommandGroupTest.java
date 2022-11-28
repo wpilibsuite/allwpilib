@@ -14,7 +14,8 @@ import static org.mockito.Mockito.verify;
 
 import org.junit.jupiter.api.Test;
 
-class ParallelCommandGroupTest extends CommandTestBase {
+class ParallelCommandGroupTest extends CommandTestBase
+    implements MultiCompositionTestBase<ParallelCommandGroup> {
   @Test
   void parallelGroupScheduleTest() {
     try (CommandScheduler scheduler = new CommandScheduler()) {
@@ -125,5 +126,10 @@ class ParallelCommandGroupTest extends CommandTestBase {
 
     assertThrows(
         IllegalArgumentException.class, () -> new ParallelCommandGroup(command1, command2));
+  }
+
+  @Override
+  public ParallelCommandGroup compose(Command... members) {
+    return new ParallelCommandGroup(members);
   }
 }

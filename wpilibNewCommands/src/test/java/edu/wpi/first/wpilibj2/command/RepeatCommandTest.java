@@ -9,11 +9,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.EnumSource;
-import org.junit.jupiter.params.provider.ValueSource;
 
-class RepeatCommandTest extends CommandTestBase {
+class RepeatCommandTest extends CommandTestBase
+    implements SingleCompositionTestBase<RepeatCommand> {
   @Test
   void callsMethodsCorrectly() {
     var initCounter = new AtomicInteger(0);
@@ -66,18 +64,8 @@ class RepeatCommandTest extends CommandTestBase {
     assertEquals(1, endCounter.get());
   }
 
-  @EnumSource(Command.InterruptionBehavior.class)
-  @ParameterizedTest
-  void interruptible(Command.InterruptionBehavior interruptionBehavior) {
-    var command =
-        new WaitUntilCommand(() -> false).withInterruptBehavior(interruptionBehavior).repeatedly();
-    assertEquals(interruptionBehavior, command.getInterruptionBehavior());
-  }
-
-  @ValueSource(booleans = {true, false})
-  @ParameterizedTest
-  void runWhenDisabled(boolean runsWhenDisabled) {
-    var command = new WaitUntilCommand(() -> false).ignoringDisable(runsWhenDisabled).repeatedly();
-    assertEquals(runsWhenDisabled, command.runsWhenDisabled());
+  @Override
+  public RepeatCommand composeSingle(Command member) {
+    return member.repeatedly();
   }
 }

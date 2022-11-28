@@ -9,10 +9,11 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 
+import java.util.HashMap;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
 
-class SelectCommandTest extends CommandTestBase {
+class SelectCommandTest extends CommandTestBase implements MultiCompositionTestBase<SelectCommand> {
   @Test
   void selectCommandTest() {
     try (CommandScheduler scheduler = new CommandScheduler()) {
@@ -104,5 +105,14 @@ class SelectCommandTest extends CommandTestBase {
       verify(command2, never()).end(true);
       verify(command3, never()).end(true);
     }
+  }
+
+  @Override
+  public SelectCommand compose(Command... members) {
+    var map = new HashMap<Object, Command>();
+    for (int i = 0; i < members.length; i++) {
+      map.put(i, members[i]);
+    }
+    return new SelectCommand(map, () -> 0);
   }
 }

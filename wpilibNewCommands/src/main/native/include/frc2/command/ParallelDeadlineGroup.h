@@ -92,6 +92,8 @@ class ParallelDeadlineGroup
 
   bool RunsWhenDisabled() const override;
 
+  Command::InterruptionBehavior GetInterruptionBehavior() const override;
+
  private:
   void AddCommands(std::vector<std::unique_ptr<Command>>&& commands) final;
 
@@ -100,6 +102,8 @@ class ParallelDeadlineGroup
   std::vector<std::pair<std::unique_ptr<Command>, bool>> m_commands;
   Command* m_deadline;
   bool m_runWhenDisabled{true};
+  Command::InterruptionBehavior m_interruptBehavior{
+      Command::InterruptionBehavior::kCancelIncoming};
   bool m_finished{true};
 };
 }  // namespace frc2

@@ -56,6 +56,11 @@ bool ParallelCommandGroup::RunsWhenDisabled() const {
   return m_runWhenDisabled;
 }
 
+Command::InterruptionBehavior ParallelCommandGroup::GetInterruptionBehavior()
+    const {
+  return m_interruptBehavior;
+}
+
 void ParallelCommandGroup::AddCommands(
     std::vector<std::unique_ptr<Command>>&& commands) {
   for (auto&& command : commands) {
@@ -75,6 +80,10 @@ void ParallelCommandGroup::AddCommands(
       command->SetGrouped(true);
       AddRequirements(command->GetRequirements());
       m_runWhenDisabled &= command->RunsWhenDisabled();
+      if (command->GetInterruptionBehavior() ==
+          Command::InterruptionBehavior::kCancelSelf) {
+        m_interruptBehavior = Command::InterruptionBehavior::kCancelSelf;
+      }
       m_commands.emplace_back(std::move(command), false);
     } else {
       throw FRC_MakeError(frc::err::CommandIllegalUse,

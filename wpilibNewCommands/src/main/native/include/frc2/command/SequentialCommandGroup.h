@@ -87,12 +87,16 @@ class SequentialCommandGroup
 
   bool RunsWhenDisabled() const override;
 
+  Command::InterruptionBehavior GetInterruptionBehavior() const override;
+
  private:
   void AddCommands(std::vector<std::unique_ptr<Command>>&& commands) final;
 
   wpi::SmallVector<std::unique_ptr<Command>, 4> m_commands;
   size_t m_currentCommandIndex{invalid_index};
   bool m_runWhenDisabled{true};
+  Command::InterruptionBehavior m_interruptBehavior{
+      Command::InterruptionBehavior::kCancelIncoming};
 };
 }  // namespace frc2
 
