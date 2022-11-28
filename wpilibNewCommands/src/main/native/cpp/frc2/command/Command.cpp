@@ -105,6 +105,11 @@ CommandPtr Command::HandleInterrupt(std::function<void(void)> handler) && {
   return std::move(*this).ToPtr().HandleInterrupt(std::move(handler));
 }
 
+CommandPtr Command::WithName(std::string_view name) && {
+  SetName(name);
+  return std::move(*this).ToPtr();
+}
+
 void Command::Schedule() {
   CommandScheduler::GetInstance().Schedule(this);
 }
@@ -128,6 +133,8 @@ bool Command::HasRequirement(Subsystem* requirement) const {
 std::string Command::GetName() const {
   return GetTypeName(*this);
 }
+
+void Command::SetName(std::string_view name) {}
 
 bool Command::IsGrouped() const {
   return m_isGrouped;

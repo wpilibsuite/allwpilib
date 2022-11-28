@@ -5,6 +5,7 @@
 #include "frc2/command/Subsystem.h"
 
 #include "frc2/command/CommandPtr.h"
+#include "frc2/command/Commands.h"
 
 using namespace frc2;
 Subsystem::~Subsystem() {
@@ -30,4 +31,22 @@ Command* Subsystem::GetCurrentCommand() const {
 
 void Subsystem::Register() {
   return CommandScheduler::GetInstance().RegisterSubsystem(this);
+}
+
+CommandPtr Subsystem::RunOnce(std::function<void()> action) {
+  return cmd::RunOnce(std::move(action), {this});
+}
+
+CommandPtr Subsystem::Run(std::function<void()> action) {
+  return cmd::Run(std::move(action), {this});
+}
+
+CommandPtr Subsystem::StartEnd(std::function<void()> start,
+                               std::function<void()> end) {
+  return cmd::StartEnd(std::move(start), std::move(end), {this});
+}
+
+CommandPtr Subsystem::RunEnd(std::function<void()> run,
+                             std::function<void()> end) {
+  return cmd::RunEnd(std::move(run), std::move(end), {this});
 }
