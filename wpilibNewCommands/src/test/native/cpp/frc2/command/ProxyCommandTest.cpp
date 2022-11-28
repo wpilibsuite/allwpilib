@@ -7,20 +7,20 @@
 #include "CommandTestBase.h"
 #include "frc2/command/CommandPtr.h"
 #include "frc2/command/InstantCommand.h"
-#include "frc2/command/ProxyScheduleCommand.h"
+#include "frc2/command/ProxyCommand.h"
 #include "frc2/command/WaitUntilCommand.h"
 
 using namespace frc2;
-class ProxyScheduleCommandTest : public CommandTestBase {};
+class ProxyCommandTest : public CommandTestBase {};
 
-TEST_F(ProxyScheduleCommandTest, NonOwningCommandSchedule) {
+TEST_F(ProxyCommandTest, NonOwningCommandSchedule) {
   CommandScheduler& scheduler = CommandScheduler::GetInstance();
 
   bool scheduled = false;
 
   InstantCommand toSchedule([&scheduled] { scheduled = true; }, {});
 
-  ProxyScheduleCommand command(&toSchedule);
+  ProxyCommand command(&toSchedule);
 
   scheduler.Schedule(&command);
   scheduler.Run();
@@ -28,14 +28,14 @@ TEST_F(ProxyScheduleCommandTest, NonOwningCommandSchedule) {
   EXPECT_TRUE(scheduled);
 }
 
-TEST_F(ProxyScheduleCommandTest, NonOwningCommandEnd) {
+TEST_F(ProxyCommandTest, NonOwningCommandEnd) {
   CommandScheduler& scheduler = CommandScheduler::GetInstance();
 
   bool finished = false;
 
   WaitUntilCommand toSchedule([&finished] { return finished; });
 
-  ProxyScheduleCommand command(&toSchedule);
+  ProxyCommand command(&toSchedule);
 
   scheduler.Schedule(&command);
   scheduler.Run();
@@ -47,7 +47,7 @@ TEST_F(ProxyScheduleCommandTest, NonOwningCommandEnd) {
   EXPECT_FALSE(scheduler.IsScheduled(&command));
 }
 
-TEST_F(ProxyScheduleCommandTest, OwningCommandSchedule) {
+TEST_F(ProxyCommandTest, OwningCommandSchedule) {
   CommandScheduler& scheduler = CommandScheduler::GetInstance();
 
   bool scheduled = false;
@@ -61,7 +61,7 @@ TEST_F(ProxyScheduleCommandTest, OwningCommandSchedule) {
   EXPECT_TRUE(scheduled);
 }
 
-TEST_F(ProxyScheduleCommandTest, OwningCommandEnd) {
+TEST_F(ProxyCommandTest, OwningCommandEnd) {
   CommandScheduler& scheduler = CommandScheduler::GetInstance();
 
   bool finished = false;

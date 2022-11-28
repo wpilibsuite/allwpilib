@@ -108,7 +108,10 @@ class SelectCommand : public CommandHelper<CommandBase, SelectCommand<Key>> {
    * Creates a new selectcommand.
    *
    * @param toRun a supplier providing the command to run
+   * @deprecated Replace with {@link ProxyCommand},
+   * composing multiple of them in a {@link ParallelRaceGroup} if needed.
    */
+  WPI_DEPRECATED("Replace with ProxyCommand")
   explicit SelectCommand(std::function<Command*()> toRun)
       : m_toRun{std::move(toRun)} {}
 

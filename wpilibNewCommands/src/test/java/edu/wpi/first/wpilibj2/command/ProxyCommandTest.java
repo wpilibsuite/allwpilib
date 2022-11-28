@@ -11,14 +11,14 @@ import static org.mockito.Mockito.verify;
 import java.util.concurrent.atomic.AtomicBoolean;
 import org.junit.jupiter.api.Test;
 
-class ProxyScheduleCommandTest extends CommandTestBase {
+class ProxyCommandTest extends CommandTestBase {
   @Test
-  void proxyScheduleCommandScheduleTest() {
+  void proxyCommandScheduleTest() {
     try (CommandScheduler scheduler = new CommandScheduler()) {
       MockCommandHolder command1Holder = new MockCommandHolder(true);
       Command command1 = command1Holder.getMock();
 
-      ProxyScheduleCommand scheduleCommand = new ProxyScheduleCommand(command1);
+      ProxyCommand scheduleCommand = new ProxyCommand(command1);
 
       scheduler.schedule(scheduleCommand);
 
@@ -27,13 +27,13 @@ class ProxyScheduleCommandTest extends CommandTestBase {
   }
 
   @Test
-  void proxyScheduleCommandEndTest() {
+  void proxyCommandEndTest() {
     try (CommandScheduler scheduler = CommandScheduler.getInstance()) {
       AtomicBoolean cond = new AtomicBoolean();
 
       WaitUntilCommand command = new WaitUntilCommand(cond::get);
 
-      ProxyScheduleCommand scheduleCommand = new ProxyScheduleCommand(command);
+      ProxyCommand scheduleCommand = new ProxyCommand(command);
 
       scheduler.schedule(scheduleCommand);
 
