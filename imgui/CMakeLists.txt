@@ -22,8 +22,8 @@ FetchContent_Declare(
 )
 FetchContent_Declare(
     fonts
-    URL         https://github.com/wpilibsuite/thirdparty-fonts/releases/download/v0.1/fonts.zip
-    URL_HASH    SHA256=0d1cc6cfc86953a676993e23adcfb259ae621f3e1cc675761a5c4457472345da
+    URL         https://github.com/wpilibsuite/thirdparty-fonts/releases/download/v0.2/fonts.zip
+    URL_HASH    SHA256=cedf365657fab0770e11f72d49e4f0f889f564d2e635a4d214029d0ab6bcd324
 )
 FetchContent_Declare(
     stb
