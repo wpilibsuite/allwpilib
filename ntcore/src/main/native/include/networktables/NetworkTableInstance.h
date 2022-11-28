@@ -447,7 +447,7 @@ class NetworkTableInstance final {
    * @param listener Listener function
    * @return Listener handle
    */
-  NT_Listener AddListener(NetworkTableEntry& entry, int eventMask,
+  NT_Listener AddListener(const NetworkTableEntry& entry, int eventMask,
                           ListenerCallback listener);
 
   /**

@@ -5,12 +5,14 @@
 package edu.wpi.first.networktables;
 
 import java.util.ArrayList;
+import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+import java.util.function.Consumer;
 
 /** A network table that knows its subtable path. */
 public final class NetworkTable {
@@ -20,6 +22,7 @@ public final class NetworkTable {
   private final String m_path;
   private final String m_pathWithSep;
   private final NetworkTableInstance m_inst;
+  private final MultiSubscriber m_topicSub;
 
   /**
    * Gets the "base name" of a key. For example, "/foo/bar" becomes "bar". If the key has a trailing
@@ -112,6 +115,8 @@ public final class NetworkTable {
     m_path = path;
     m_pathWithSep = path + PATH_SEPARATOR;
     m_inst = inst;
+    m_topicSub =
+        new MultiSubscriber(inst, new String[] {m_pathWithSep}, PubSubOption.topicsOnly(true));
   }
 
   /**
@@ -445,6 +450,123 @@ public final class NetworkTable {
     return m_path;
   }
 
+  /** A listener that listens to events on topics in a {@link NetworkTable}. */
+  @FunctionalInterface
+  public interface TableEventListener {
+    /**
+     * Called when an event occurs on a topic in a {@link NetworkTable}.
+     *
+     * @param table the table the topic exists in
+     * @param key the key associated with the topic that changed
+     * @param event the event
+     */
+    void accept(NetworkTable table, String key, NetworkTableEvent event);
+  }
+
+  /**
+   * Listen to topics only within this table.
+   *
+   * @param eventKinds set of event kinds to listen to
+   * @param listener listener to add
+   * @return Listener handle
+   */
+  public int addListener(EnumSet<NetworkTableEvent.Kind> eventKinds, TableEventListener listener) {
+    final int prefixLen = m_path.length() + 1;
+    return m_inst.addListener(
+        new String[] {m_pathWithSep},
+        eventKinds,
+        event -> {
+          String topicName = null;
+          if (event.topicInfo != null) {
+            topicName = event.topicInfo.name;
+          } else if (event.valueData != null) {
+            topicName = event.valueData.getTopic().getName();
+          }
+          if (topicName == null) {
+            return;
+          }
+          String relativeKey = topicName.substring(prefixLen);
+          if (relativeKey.indexOf(PATH_SEPARATOR) != -1) {
+            // part of a sub table
+            return;
+          }
+          listener.accept(this, relativeKey, event);
+        });
+  }
+
+  /**
+   * Listen to a single key.
+   *
+   * @param key the key name
+   * @param eventKinds set of event kinds to listen to
+   * @param listener listener to add
+   * @return Listener handle
+   */
+  public int addListener(
+      String key, EnumSet<NetworkTableEvent.Kind> eventKinds, TableEventListener listener) {
+    NetworkTableEntry entry = getEntry(key);
+    return m_inst.addListener(entry, eventKinds, event -> listener.accept(this, key, event));
+  }
+
+  /** A listener that listens to new tables in a {@link NetworkTable}. */
+  @FunctionalInterface
+  public interface SubTableListener {
+    /**
+     * Called when a new table is created within a {@link NetworkTable}.
+     *
+     * @param parent the parent of the table
+     * @param name the name of the new table
+     * @param table the new table
+     */
+    void tableCreated(NetworkTable parent, String name, NetworkTable table);
+  }
+
+  /**
+   * Listen for sub-table creation. This calls the listener once for each newly created sub-table.
+   * It immediately calls the listener for any existing sub-tables.
+   *
+   * @param listener listener to add
+   * @return Listener handle
+   */
+  public int addSubTableListener(SubTableListener listener) {
+    final int prefixLen = m_path.length() + 1;
+    final NetworkTable parent = this;
+
+    return m_inst.addListener(
+        m_topicSub,
+        EnumSet.of(NetworkTableEvent.Kind.kPublish, NetworkTableEvent.Kind.kImmediate),
+        new Consumer<NetworkTableEvent>() {
+          final Set<String> m_notifiedTables = new HashSet<>();
+
+          @Override
+          public void accept(NetworkTableEvent event) {
+            if (event.topicInfo == null) {
+              return; // should not happen
+            }
+            String relativeKey = event.topicInfo.name.substring(prefixLen);
+            int endSubTable = relativeKey.indexOf(PATH_SEPARATOR);
+            if (endSubTable == -1) {
+              return;
+            }
+            String subTableKey = relativeKey.substring(0, endSubTable);
+            if (m_notifiedTables.contains(subTableKey)) {
+              return;
+            }
+            m_notifiedTables.add(subTableKey);
+            listener.tableCreated(parent, subTableKey, parent.getSubTable(subTableKey));
+          }
+        });
+  }
+
+  /**
+   * Remove a listener.
+   *
+   * @param listener listener handle
+   */
+  public void removeListener(int listener) {
+    m_inst.removeListener(listener);
+  }
+
   @Override
   public boolean equals(Object other) {
     if (other == this) {
@@ -460,5 +582,9 @@ public final class NetworkTable {
   @Override
   public int hashCode() {
     return Objects.hash(m_inst, m_path);
+  }
+
+  void close() {
+    m_topicSub.close();
   }
 }

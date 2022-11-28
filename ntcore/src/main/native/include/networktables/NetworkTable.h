@@ -48,6 +48,7 @@ class NetworkTable final {
  private:
   NT_Inst m_inst;
   std::string m_path;
+  NT_MultiSubscriber m_topicSub;
   mutable wpi::mutex m_mutex;
   mutable wpi::StringMap<NT_Entry> m_entries;
 
@@ -566,6 +567,64 @@ class NetworkTable final {
    * @return The path (e.g "", "/foo").
    */
   std::string_view GetPath() const;
+
+  /**
+   * Called when an event occurs on a topic in a {@link NetworkTable}.
+   *
+   * @param table the table the topic exists in
+   * @param key the key associated with the topic that changed
+   * @param event the event
+   */
+  using TableEventListener = std::function<void(
+      NetworkTable* table, std::string_view key, const Event& event)>;
+
+  /**
+   * Listen to topics only within this table.
+   *
+   * @param eventMask Bitmask of EventFlags values
+   * @param listener listener to add
+   * @return Listener handle
+   */
+  NT_Listener AddListener(int eventMask, TableEventListener listener);
+
+  /**
+   * Listen to a single key.
+   *
+   * @param key the key name
+   * @param eventMask Bitmask of EventFlags values
+   * @param listener listener to add
+   * @return Listener handle
+   */
+  NT_Listener AddListener(std::string_view key, int eventMask,
+                          TableEventListener listener);
+
+  /**
+   * Called when a new table is created within a NetworkTable.
+   *
+   * @param parent the parent of the table
+   * @param name the name of the new table
+   * @param table the new table
+   */
+  using SubTableListener =
+      std::function<void(NetworkTable* parent, std::string_view name,
+                         std::shared_ptr<NetworkTable> table)>;
+
+  /**
+   * Listen for sub-table creation. This calls the listener once for each newly
+   * created sub-table. It immediately calls the listener for any existing
+   * sub-tables.
+   *
+   * @param listener listener to add
+   * @return Listener handle
+   */
+  NT_Listener AddSubTableListener(SubTableListener listener);
+
+  /**
+   * Remove a listener.
+   *
+   * @param listener listener handle
+   */
+  void RemoveListener(NT_Listener listener);
 };
 
 }  // namespace nt

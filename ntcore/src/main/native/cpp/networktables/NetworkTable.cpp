@@ -25,6 +25,7 @@
 #include "networktables/StringArrayTopic.h"
 #include "networktables/StringTopic.h"
 #include "ntcore.h"
+#include "ntcore_cpp.h"
 
 using namespace nt;
 
@@ -87,9 +88,14 @@ std::vector<std::string> NetworkTable::GetHierarchy(std::string_view key) {
 
 NetworkTable::NetworkTable(NT_Inst inst, std::string_view path,
                            const private_init&)
-    : m_inst(inst), m_path(path) {}
+    : m_inst(inst),
+      m_path(path),
+      m_topicSub{::nt::SubscribeMultiple(inst, {{fmt::format("{}/", path)}},
+                                         {{PubSubOption::TopicsOnly(true)}})} {}
 
-NetworkTable::~NetworkTable() {}
+NetworkTable::~NetworkTable() {
+  ::nt::UnsubscribeMultiple(m_topicSub);
+}
 
 NetworkTableInstance NetworkTable::GetInstance() const {
   return NetworkTableInstance{m_inst};
@@ -361,4 +367,65 @@ Value NetworkTable::GetValue(std::string_view key) const {
 
 std::string_view NetworkTable::GetPath() const {
   return m_path;
+}
+
+NT_Listener NetworkTable::AddListener(int eventMask,
+                                      TableEventListener listener) {
+  return NetworkTableInstance{m_inst}.AddListener(
+      {{fmt::format("{}/", m_path)}}, eventMask,
+      [this, cb = std::move(listener)](const Event& event) {
+        std::string topicNameStr;
+        std::string_view topicName;
+        if (auto topicInfo = event.GetTopicInfo()) {
+          topicName = topicInfo->name;
+        } else if (auto valueData = event.GetValueEventData()) {
+          topicNameStr = Topic{valueData->topic}.GetName();
+          topicName = topicNameStr;
+        } else {
+          return;
+        }
+        auto relative_key = wpi::substr(topicName, m_path.size() + 1);
+        if (relative_key.find(PATH_SEPARATOR_CHAR) != std::string_view::npos) {
+          return;
+        }
+        cb(this, relative_key, event);
+      });
+}
+
+NT_Listener NetworkTable::AddListener(std::string_view key, int eventMask,
+                                      TableEventListener listener) {
+  return NetworkTableInstance{m_inst}.AddListener(
+      GetEntry(key), eventMask,
+      [this, cb = std::move(listener),
+       key = std::string{key}](const Event& event) { cb(this, key, event); });
+}
+
+NT_Listener NetworkTable::AddSubTableListener(SubTableListener listener) {
+  // The lambda needs to be copyable, but StringMap is not, so use
+  // a shared_ptr to it.
+  auto notified_tables = std::make_shared<wpi::StringMap<char>>();
+
+  return ::nt::AddListener(
+      m_topicSub, NT_EVENT_PUBLISH | NT_EVENT_IMMEDIATE,
+      [this, cb = std::move(listener), notified_tables](const Event& event) {
+        auto topicInfo = event.GetTopicInfo();
+        if (!topicInfo) {
+          return;
+        }
+        auto relative_key = wpi::substr(topicInfo->name, m_path.size() + 1);
+        auto end_sub_table = relative_key.find(PATH_SEPARATOR_CHAR);
+        if (end_sub_table == std::string_view::npos) {
+          return;
+        }
+        auto sub_table_key = relative_key.substr(0, end_sub_table);
+        if (notified_tables->find(sub_table_key) != notified_tables->end()) {
+          return;
+        }
+        notified_tables->insert(std::make_pair(sub_table_key, '\0'));
+        cb(this, sub_table_key, this->GetSubTable(sub_table_key));
+      });
+}
+
+void NetworkTable::RemoveListener(NT_Listener listener) {
+  NetworkTableInstance{m_inst}.RemoveListener(listener);
 }
