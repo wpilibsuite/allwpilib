@@ -784,10 +784,10 @@ class Color {
     int chroma = (s * v) >> 8;
 
     // Beacuse hue is 0-180 rather than 0-360 use 30 not 60
-    int region = h / 30;
+    int region = (h / 30) % 6;
 
-    // Remainder converted from 0-30 to roughly 0-255
-    int remainder = (h - (region * 30)) * 9;
+    // Remainder converted from 0-30 to 0-255
+    int remainder = static_cast<int>((h % 30) * (255 / 30.0));
 
     // Value of the lowest rgb component
     int m = v - chroma;
