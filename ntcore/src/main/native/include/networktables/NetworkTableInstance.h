@@ -688,14 +688,7 @@ class NetworkTableInstance final {
    * Equality operator.  Returns true if both instances refer to the same
    * native handle.
    */
-  bool operator==(const NetworkTableInstance& other) const {
-    return m_handle == other.m_handle;
-  }
-
-  /** Inequality operator. */
-  bool operator!=(const NetworkTableInstance& other) const {
-    return !(*this == other);
-  }
+  bool operator==(const NetworkTableInstance&) const = default;
 
  private:
   /* Native handle */

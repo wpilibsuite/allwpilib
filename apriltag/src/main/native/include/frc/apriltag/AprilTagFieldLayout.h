@@ -103,19 +103,8 @@ class WPILIB_DLLEXPORT AprilTagFieldLayout {
 
   /*
    * Checks equality between this AprilTagFieldLayout and another object.
-   *
-   * @param other The other object.
-   * @return Whether the two objects are equal.
    */
-  bool operator==(const AprilTagFieldLayout& other) const;
-
-  /**
-   * Checks inequality between this AprilTagFieldLayout and another object.
-   *
-   * @param other The other object.
-   * @return Whether the two objects are not equal.
-   */
-  bool operator!=(const AprilTagFieldLayout& other) const;
+  bool operator==(const AprilTagFieldLayout&) const = default;
 
  private:
   std::unordered_map<int, AprilTag> m_apriltags;

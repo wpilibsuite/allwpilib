@@ -125,19 +125,8 @@ class WPILIB_DLLEXPORT Rotation3d {
 
   /**
    * Checks equality between this Rotation3d and another object.
-   *
-   * @param other The other object.
-   * @return Whether the two objects are equal.
    */
-  bool operator==(const Rotation3d& other) const;
-
-  /**
-   * Checks inequality between this Rotation3d and another object.
-   *
-   * @param other The other object.
-   * @return Whether the two objects are not equal.
-   */
-  bool operator!=(const Rotation3d& other) const;
+  bool operator==(const Rotation3d&) const = default;
 
   /**
    * Adds the new rotation to the current rotation.

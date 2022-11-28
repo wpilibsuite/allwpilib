@@ -31,11 +31,3 @@ Transform3d Transform3d::Inverse() const {
 Transform3d Transform3d::operator+(const Transform3d& other) const {
   return Transform3d{Pose3d{}, Pose3d{}.TransformBy(*this).TransformBy(other)};
 }
-
-bool Transform3d::operator==(const Transform3d& other) const {
-  return m_translation == other.m_translation && m_rotation == other.m_rotation;
-}
-
-bool Transform3d::operator!=(const Transform3d& other) const {
-  return !operator==(other);
-}

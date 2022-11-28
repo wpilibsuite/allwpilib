@@ -109,14 +109,6 @@ class WPILIB_DLLEXPORT Rotation2d {
   constexpr bool operator==(const Rotation2d& other) const;
 
   /**
-   * Checks inequality between this Rotation2d and another object.
-   *
-   * @param other The other object.
-   * @return Whether the two objects are not equal.
-   */
-  constexpr bool operator!=(const Rotation2d& other) const;
-
-  /**
    * Adds the new rotation to the current rotation using a rotation matrix.
    *
    * <pre>

@@ -278,10 +278,7 @@ class Topic {
    * Equality operator.  Returns true if both instances refer to the same
    * native handle.
    */
-  bool operator==(const Topic& oth) const { return m_handle == oth.m_handle; }
-
-  /** Inequality operator. */
-  bool operator!=(const Topic& oth) const { return !(*this == oth); }
+  bool operator==(const Topic&) const = default;
 
  protected:
   NT_Topic m_handle{0};
