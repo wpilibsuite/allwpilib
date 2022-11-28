@@ -201,13 +201,13 @@ class WPILIB_DLLEXPORT MecanumDrivePoseEstimator {
  private:
   struct InterpolationRecord {
     // The pose observed given the current sensor inputs and the previous pose.
-    const Pose2d pose;
+    Pose2d pose;
 
     // The current gyroscope angle.
-    const Rotation2d gyroAngle;
+    Rotation2d gyroAngle;
 
     // The distances measured at each wheel.
-    const MecanumDriveWheelPositions wheelPositions;
+    MecanumDriveWheelPositions wheelPositions;
 
     /**
      * Checks equality between this InterpolationRecord and another object.

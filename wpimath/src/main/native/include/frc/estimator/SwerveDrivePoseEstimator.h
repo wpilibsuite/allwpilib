@@ -293,13 +293,13 @@ class SwerveDrivePoseEstimator {
  private:
   struct InterpolationRecord {
     // The pose observed given the current sensor inputs and the previous pose.
-    const Pose2d pose;
+    Pose2d pose;
 
     // The current gyroscope angle.
-    const Rotation2d gyroAngle;
+    Rotation2d gyroAngle;
 
     // The distances traveled and rotations meaured at each module.
-    const wpi::array<SwerveModulePosition, NumModules> modulePostions;
+    wpi::array<SwerveModulePosition, NumModules> modulePostions;
 
     /**
      * Checks equality between this InterpolationRecord and another object.
