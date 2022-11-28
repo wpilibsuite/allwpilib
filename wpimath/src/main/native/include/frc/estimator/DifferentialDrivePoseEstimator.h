@@ -47,6 +47,8 @@ class WPILIB_DLLEXPORT DifferentialDrivePoseEstimator {
   /**
    * Constructs a DifferentialDrivePoseEstimator.
    *
+   * @param kinematics               A correctly-configured kinematics object
+   *                                 for your drivetrain.
    * @param gyroAngle                The gyro angle of the robot.
    * @param leftDistance The distance traveled by the left encoder.
    * @param rightDistance The distance traveled by the right encoder.
@@ -65,10 +67,9 @@ class WPILIB_DLLEXPORT DifferentialDrivePoseEstimator {
    *                                 radians.
    */
   DifferentialDrivePoseEstimator(
-      DifferentialDriveKinematics &kinematics,
-      const Rotation2d& gyroAngle, units::meter_t leftDistance,
-      units::meter_t rightDistance, const Pose2d& initialPose,
-      const wpi::array<double, 3>& stateStdDevs,
+      DifferentialDriveKinematics& kinematics, const Rotation2d& gyroAngle,
+      units::meter_t leftDistance, units::meter_t rightDistance,
+      const Pose2d& initialPose, const wpi::array<double, 3>& stateStdDevs,
       const wpi::array<double, 3>& visionMeasurementStdDevs);
 
   /**
@@ -201,10 +202,17 @@ class WPILIB_DLLEXPORT DifferentialDrivePoseEstimator {
                         units::meter_t rightDistance);
 
  private:
-   struct InterpolationRecord {
+  struct InterpolationRecord {
+    // The pose observed given the current sensor inputs and the previous pose.
     Pose2d pose;
+
+    // The current gyro angle.
     Rotation2d gyroAngle;
+
+    // The distance traveled by the left encoder.
     units::meter_t leftDistance;
+
+    // The distance traveled by the right encoder.
     units::meter_t rightDistance;
 
     /**
@@ -231,15 +239,21 @@ class WPILIB_DLLEXPORT DifferentialDrivePoseEstimator {
      *
      * @return The interpolated state.
      */
-    InterpolationRecord Interpolate(DifferentialDriveKinematics &kinematics, InterpolationRecord endValue, double i) const;
+    InterpolationRecord Interpolate(DifferentialDriveKinematics& kinematics,
+                                    InterpolationRecord endValue,
+                                    double i) const;
   };
 
-  DifferentialDriveKinematics &m_kinematics;
+  DifferentialDriveKinematics& m_kinematics;
   DifferentialDriveOdometry m_odometry;
   wpi::array<double, 3> m_q{wpi::empty_array};
   Eigen::Matrix3d m_visionK = Eigen::Matrix3d::Zero();
 
-  TimeInterpolatableBuffer<InterpolationRecord> m_poseBuffer{1.5_s, [this](const InterpolationRecord &start, const InterpolationRecord &end, double t) { return start.Interpolate(this->m_kinematics, end, t);}};
+  TimeInterpolatableBuffer<InterpolationRecord> m_poseBuffer{
+      1.5_s, [this](const InterpolationRecord& start,
+                    const InterpolationRecord& end, double t) {
+        return start.Interpolate(this->m_kinematics, end, t);
+      }};
 };
 
 }  // namespace frc

@@ -120,7 +120,12 @@ class TimeInterpolatableBuffer {
     return m_interpolatingFunc(lower_bound->second, upper_bound->second, t);
   }
 
-  std::vector<std::pair<units::second_t, T>> &GetInternalStructure() {
+
+  /** 
+   * Grant access to the internal sample buffer. Used in Pose Estimation to
+   * replay odometry inputs stored within this buffer. 
+   */
+  std::vector<std::pair<units::second_t, T>>& GetInternalBuffer() {
     return m_pastSnapshots;
   }
 

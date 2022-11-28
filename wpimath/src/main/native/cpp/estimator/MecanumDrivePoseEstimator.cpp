@@ -11,36 +11,37 @@
 
 using namespace frc;
 
-
-frc::MecanumDrivePoseEstimator::InterpolationRecord 
-frc::MecanumDrivePoseEstimator::InterpolationRecord::Interpolate(MecanumDriveKinematics &kinematics, InterpolationRecord endValue,
-                                                 double i) const {
+frc::MecanumDrivePoseEstimator::InterpolationRecord
+frc::MecanumDrivePoseEstimator::InterpolationRecord::Interpolate(
+    MecanumDriveKinematics& kinematics, InterpolationRecord endValue,
+    double i) const {
   if (i < 0) {
     return *this;
   } else if (i > 1) {
     return endValue;
   } else {
     MecanumDriveWheelPositions wheels_lerp{
-      wpi::Lerp(this->wheelPositions.frontLeft, endValue.wheelPositions.frontLeft, i),
-      wpi::Lerp(this->wheelPositions.frontRight, endValue.wheelPositions.frontRight, i),
-      wpi::Lerp(this->wheelPositions.rearLeft, endValue.wheelPositions.rearLeft, i),
-      wpi::Lerp(this->wheelPositions.rearRight, endValue.wheelPositions.rearRight, i)
-    };
+        wpi::Lerp(this->wheelPositions.frontLeft,
+                  endValue.wheelPositions.frontLeft, i),
+        wpi::Lerp(this->wheelPositions.frontRight,
+                  endValue.wheelPositions.frontRight, i),
+        wpi::Lerp(this->wheelPositions.rearLeft,
+                  endValue.wheelPositions.rearLeft, i),
+        wpi::Lerp(this->wheelPositions.rearRight,
+                  endValue.wheelPositions.rearRight, i)};
 
     MecanumDriveWheelPositions wheels_delta{
-      wheels_lerp.frontLeft - this->wheelPositions.frontLeft,
-      wheels_lerp.frontRight - this->wheelPositions.frontRight,
-      wheels_lerp.rearLeft - this->wheelPositions.rearLeft,
-      wheels_lerp.rearRight - this->wheelPositions.rearRight
-    };
+        wheels_lerp.frontLeft - this->wheelPositions.frontLeft,
+        wheels_lerp.frontRight - this->wheelPositions.frontRight,
+        wheels_lerp.rearLeft - this->wheelPositions.rearLeft,
+        wheels_lerp.rearRight - this->wheelPositions.rearRight};
 
     auto gyro = wpi::Lerp(this->gyroAngle, endValue.gyroAngle, i);
 
     auto twist = kinematics.ToTwist2d(wheels_delta);
     twist.dtheta = (gyro - gyroAngle).Radians();
 
-
-    return {pose.Exp(twist), gyro, wheels_lerp}; 
+    return {pose.Exp(twist), gyro, wheels_lerp};
   }
 }
 
@@ -49,7 +50,7 @@ frc::MecanumDrivePoseEstimator::MecanumDrivePoseEstimator(
     const MecanumDriveWheelPositions& wheelPositions, const Pose2d& initialPose,
     const wpi::array<double, 3>& stateStdDevs,
     const wpi::array<double, 3>& visionMeasurementStdDevs)
-    : m_kinematics{kinematics}, 
+    : m_kinematics{kinematics},
       m_odometry{kinematics, gyroAngle, wheelPositions, initialPose} {
   for (size_t i = 0; i < 3; ++i) {
     m_q[i] = stateStdDevs[i] * stateStdDevs[i];
@@ -113,22 +114,22 @@ void frc::MecanumDrivePoseEstimator::AddVisionMeasurement(
                       units::meter_t{k_times_twist(1)},
                       units::radian_t{k_times_twist(2)}};
 
-  // Step 6: Apply new pose to odometry
-  m_odometry.ResetPosition(sample.value().gyroAngle, sample.value().wheelPositions,
+  // Step 5: Reset Odometry to state at sample with vision adjustment.
+  m_odometry.ResetPosition(sample.value().gyroAngle,
+                           sample.value().wheelPositions,
                            sample.value().pose.Exp(scaledTwist));
 
-  auto internal_buf = m_poseBuffer.GetInternalStructure();
+  // Step 6: Replay odometry inputs between sample time and latest recorded
+  // sample to update the pose buffer and correct odometry.
+  auto internal_buf = m_poseBuffer.GetInternalBuffer();
 
-  auto upper_bound = std::lower_bound(
-    internal_buf.begin(), internal_buf.end(), timestamp,
-    [](const auto& pair, auto t) { return t > pair.first; });
+  auto upper_bound =
+      std::lower_bound(internal_buf.begin(), internal_buf.end(), timestamp,
+                       [](const auto& pair, auto t) { return t > pair.first; });
 
-  for(auto entry = upper_bound; entry != internal_buf.end(); entry++) {
-    UpdateWithTime(
-      entry->first,
-      entry->second.gyroAngle,
-      entry->second.wheelPositions
-    );
+  for (auto entry = upper_bound; entry != internal_buf.end(); entry++) {
+    UpdateWithTime(entry->first, entry->second.gyroAngle,
+                   entry->second.wheelPositions);
   }
 }
 
@@ -145,13 +146,11 @@ Pose2d frc::MecanumDrivePoseEstimator::UpdateWithTime(
   m_odometry.Update(gyroAngle, wheelPositions);
 
   MecanumDriveWheelPositions internalWheelPositions{
-    wheelPositions.frontLeft,
-    wheelPositions.frontRight,
-    wheelPositions.rearLeft,
-    wheelPositions.rearRight
-  };
+      wheelPositions.frontLeft, wheelPositions.frontRight,
+      wheelPositions.rearLeft, wheelPositions.rearRight};
 
-  m_poseBuffer.AddSample(currentTime, {GetEstimatedPosition(), gyroAngle, internalWheelPositions});
+  m_poseBuffer.AddSample(
+      currentTime, {GetEstimatedPosition(), gyroAngle, internalWheelPositions});
 
   return GetEstimatedPosition();
 }

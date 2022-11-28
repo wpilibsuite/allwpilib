@@ -200,8 +200,13 @@ class WPILIB_DLLEXPORT MecanumDrivePoseEstimator {
 
  private:
   struct InterpolationRecord {
+    // The pose observed given the current sensor inputs and the previous pose.
     Pose2d pose;
+
+    // The current gyroscope angle.
     Rotation2d gyroAngle;
+
+    // The distances measured at each wheel.
     MecanumDriveWheelPositions wheelPositions;
 
     /**
@@ -228,17 +233,21 @@ class WPILIB_DLLEXPORT MecanumDrivePoseEstimator {
      *
      * @return The interpolated state.
      */
-    InterpolationRecord Interpolate(MecanumDriveKinematics &kinematics, InterpolationRecord endValue, double i) const;
+    InterpolationRecord Interpolate(MecanumDriveKinematics& kinematics,
+                                    InterpolationRecord endValue,
+                                    double i) const;
   };
 
-  MecanumDriveKinematics &m_kinematics;
+  MecanumDriveKinematics& m_kinematics;
   MecanumDriveOdometry m_odometry;
   wpi::array<double, 3> m_q{wpi::empty_array};
   Eigen::Matrix3d m_visionK = Eigen::Matrix3d::Zero();
 
-  TimeInterpolatableBuffer<InterpolationRecord> m_poseBuffer{1.5_s, [this](const InterpolationRecord &start, const InterpolationRecord &end, double t) {
-    return start.Interpolate(this->m_kinematics, end, t);
-  }};
+  TimeInterpolatableBuffer<InterpolationRecord> m_poseBuffer{
+      1.5_s, [this](const InterpolationRecord& start,
+                    const InterpolationRecord& end, double t) {
+        return start.Interpolate(this->m_kinematics, end, t);
+      }};
 };
 
 }  // namespace frc

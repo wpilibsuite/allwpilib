@@ -34,7 +34,8 @@ void testFollowTrajectory(
   units::second_t t = 0_s;
 
   std::vector<std::pair<units::second_t, frc::Pose2d>> visionPoses;
-  std::vector<std::tuple<units::second_t, units::second_t, frc::Pose2d>> visionLog;
+  std::vector<std::tuple<units::second_t, units::second_t, frc::Pose2d>>
+      visionLog;
 
   double maxError = -std::numeric_limits<double>::max();
   double errorSum = 0;
@@ -46,9 +47,10 @@ void testFollowTrajectory(
   while (t < trajectory.TotalTime()) {
     frc::Trajectory::State groundTruthState = trajectory.Sample(t);
 
-    // We are due for a new vision measurement if it's been `visionUpdateRate` seconds since the
-    // last vision measurement
-    if (visionPoses.empty() || visionPoses.back().first + kVisionUpdateRate < t) {
+    // We are due for a new vision measurement if it's been `visionUpdateRate`
+    // seconds since the last vision measurement
+    if (visionPoses.empty() ||
+        visionPoses.back().first + kVisionUpdateRate < t) {
       auto visionPose =
           visionMeasurementGenerator(groundTruthState) +
           frc::Transform2d{frc::Translation2d{distribution(generator) * 0.1_m,
@@ -57,9 +59,10 @@ void testFollowTrajectory(
       visionPoses.push_back({t, visionPose});
     }
 
-    // We should apply the oldest vision measurement if it has been `visionUpdateDelay` seconds
-    // since it was measured
-    if (!visionPoses.empty() && visionPoses.front().first + kVisionUpdateDelay < t) {
+    // We should apply the oldest vision measurement if it has been
+    // `visionUpdateDelay` seconds since it was measured
+    if (!visionPoses.empty() &&
+        visionPoses.front().first + kVisionUpdateDelay < t) {
       auto visionEntry = visionPoses.front();
       estimator.AddVisionMeasurement(visionEntry.second, visionEntry.first);
       visionPoses.erase(visionPoses.begin());
@@ -109,9 +112,11 @@ void testFollowTrajectory(
     units::second_t measure_time;
     frc::Pose2d vision_pose;
     for (auto record : visionLog) {
-      
       std::tie(apply_time, measure_time, vision_pose) = record;
-      fmt::print("{}, {}, {}, {}, {}\n", apply_time.value(), measure_time.value(), vision_pose.X().value(), vision_pose.Y().value(), vision_pose.Rotation().Radians().value());
+      fmt::print("{}, {}, {}, {}, {}\n", apply_time.value(),
+                 measure_time.value(), vision_pose.X().value(),
+                 vision_pose.Y().value(),
+                 vision_pose.Rotation().Radians().value());
     }
   }
 

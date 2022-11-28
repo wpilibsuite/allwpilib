@@ -79,6 +79,7 @@ class Drivetrain {
   // Gains are for example purposes only - must be determined for your own
   // robot!
   frc::DifferentialDrivePoseEstimator m_poseEstimator{
+      m_kinematics,
       m_gyro.GetRotation2d(),
       units::meter_t{m_leftEncoder.GetDistance()},
       units::meter_t{m_rightEncoder.GetDistance()},

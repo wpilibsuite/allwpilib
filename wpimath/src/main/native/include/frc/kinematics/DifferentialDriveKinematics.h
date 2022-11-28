@@ -65,8 +65,10 @@ class WPILIB_DLLEXPORT DifferentialDriveKinematics {
             chassisSpeeds.vx + trackWidth / 2 * chassisSpeeds.omega / 1_rad};
   }
 
-  constexpr Twist2d ToTwist2d(const units::meter_t leftDistance, const units::meter_t rightDistance) const {
-    return {(leftDistance + rightDistance) / 2, 0_m, (rightDistance - leftDistance) / trackWidth * 1_rad};
+  constexpr Twist2d ToTwist2d(const units::meter_t leftDistance,
+                              const units::meter_t rightDistance) const {
+    return {(leftDistance + rightDistance) / 2, 0_m,
+            (rightDistance - leftDistance) / trackWidth * 1_rad};
   }
 
   units::meter_t trackWidth;

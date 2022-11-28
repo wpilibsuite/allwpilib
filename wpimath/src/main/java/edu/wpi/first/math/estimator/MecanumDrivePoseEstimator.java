@@ -206,30 +206,32 @@ public class MecanumDrivePoseEstimator {
    *     Timer.getFPGATimestamp as your time source or sync the epochs.
    */
   public void addVisionMeasurement(Pose2d visionRobotPoseMeters, double timestampSeconds) {
-    // Step 1: Get the pose odometry measured at the moment the vision measurement was made
+    // Step 1: Get the pose odometry measured at the moment the vision measurement was made.
     var sample = m_poseBuffer.getSample(timestampSeconds);
 
     if (sample.isEmpty()) {
       return;
     }
 
-    // Step 2: Measure the twist between the odometry pose and the vision pose
+    // Step 2: Measure the twist between the odometry pose and the vision pose.
     var twist = sample.get().pose.log(visionRobotPoseMeters);
 
     // Step 3: We should not trust the twist entirely, so instead we scale this twist by a Kalman
     // gain matrix representing how much we trust vision measurements compared to our current pose.
     var k_times_twist = m_visionK.times(VecBuilder.fill(twist.dx, twist.dy, twist.dtheta));
 
-    // Step 4: Convert back to Twist2d
+    // Step 4: Convert back to Twist2d.
     var scaledTwist =
         new Twist2d(k_times_twist.get(0, 0), k_times_twist.get(1, 0), k_times_twist.get(2, 0));
 
+    // Step 5: Reset Odometry to state at sample with vision adjustment.
     m_odometry.resetPosition(
         sample.get().gyroAngle, sample.get().wheelPositions, sample.get().pose.exp(scaledTwist));
 
+    // Step 6: Replay odometry inputs between sample time and latest recorded sample to update the
+    // pose buffer and correct odometry.
     for (Map.Entry<Double, InterpolationRecord> entry :
-        m_poseBuffer.getInternalMap().tailMap(timestampSeconds).entrySet()) {
-
+        m_poseBuffer.getInternalBuffer().tailMap(timestampSeconds).entrySet()) {
       updateWithTime(entry.getKey(), entry.getValue().gyroAngle, entry.getValue().wheelPositions);
     }
   }

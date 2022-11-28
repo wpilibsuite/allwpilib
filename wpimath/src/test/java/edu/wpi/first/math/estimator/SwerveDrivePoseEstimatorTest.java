@@ -178,7 +178,6 @@ class SwerveDrivePoseEstimatorTest {
       // We are due for a new vision measurement if it's been `visionUpdateRate` seconds since the
       // last vision measurement
       if (visionUpdateQueue.isEmpty() || visionUpdateQueue.lastKey() + visionUpdateRate < t) {
-
         Pose2d newVisionPose =
             visionMeasurementGenerator
                 .apply(groundTruthState)

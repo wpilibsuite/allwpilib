@@ -33,7 +33,6 @@ struct WPILIB_DLLEXPORT MecanumDriveWheelPositions {
    */
   units::meter_t rearRight = 0_m;
 
-  
   /**
    * Checks equality between this MecanumDriveWheelPositions and another object.
    *
@@ -43,7 +42,8 @@ struct WPILIB_DLLEXPORT MecanumDriveWheelPositions {
   bool operator==(const MecanumDriveWheelPositions& other) const = default;
 
   /**
-   * Checks inequality between this MecanumDriveWheelPositions and another object.
+   * Checks inequality between this MecanumDriveWheelPositions and another
+   * object.
    *
    * @param other The other object.
    * @return Whether the two objects are not equal.

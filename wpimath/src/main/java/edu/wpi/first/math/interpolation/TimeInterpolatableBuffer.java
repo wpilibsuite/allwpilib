@@ -134,8 +134,13 @@ public final class TimeInterpolatableBuffer<T> {
     }
   }
 
-  // Unsafe! DO NOT USE THIS UNLESS YOU KNOW WHAT YOU ARE DOING
-  public NavigableMap<Double, T> getInternalMap() {
+  /** 
+   * Grant access to the internal sample buffer. Used in Pose Estimation to
+   * replay odometry inputs stored within this buffer.
+   * 
+   * @return The internal sample buffer.
+   */
+  public NavigableMap<Double, T> getInternalBuffer() {
     return m_pastSnapshots;
   }
 
