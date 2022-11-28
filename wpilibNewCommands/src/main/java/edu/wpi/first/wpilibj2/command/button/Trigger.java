@@ -13,7 +13,6 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.Subsystem;
-import java.util.function.BiFunction;
 import java.util.function.BooleanSupplier;
 
 /**
@@ -28,7 +27,8 @@ import java.util.function.BooleanSupplier;
  * <p>This class is provided by the NewCommands VendorDep
  */
 public class Trigger implements BooleanSupplier {
-  private final BooleanEvent m_event;
+  private final BooleanSupplier m_condition;
+  private final EventLoop m_loop;
 
   /**
    * Creates a new trigger based on the given condition.
@@ -37,18 +37,8 @@ public class Trigger implements BooleanSupplier {
    * @param condition the condition represented by this trigger
    */
   public Trigger(EventLoop loop, BooleanSupplier condition) {
-    m_event = new BooleanEvent(loop, condition);
-  }
-
-  /**
-   * Copies the BooleanEvent into a Trigger object.
-   *
-   * @param toCast the BooleanEvent
-   * @return a Trigger wrapping the given BooleanEvent
-   * @see BooleanEvent#castTo(BiFunction)
-   */
-  public static Trigger cast(BooleanEvent toCast) {
-    return toCast.castTo(Trigger::new);
+    m_loop = requireNonNullParam(loop, "loop", "Trigger");
+    m_condition = requireNonNullParam(condition, "condition", "Trigger");
   }
 
   /**
@@ -73,11 +63,24 @@ public class Trigger implements BooleanSupplier {
    *
    * @param command the command to start
    * @return this trigger, so calls can be chained
-   * @see #rising()
    */
   public Trigger onTrue(Command command) {
     requireNonNullParam(command, "command", "onRising");
-    m_event.rising().ifHigh(command::schedule);
+    m_loop.bind(
+        new Runnable() {
+          private boolean m_pressedLast = m_condition.getAsBoolean();
+
+          @Override
+          public void run() {
+            boolean pressed = m_condition.getAsBoolean();
+
+            if (!m_pressedLast && pressed) {
+              command.schedule();
+            }
+
+            m_pressedLast = pressed;
+          }
+        });
     return this;
   }
 
@@ -86,11 +89,24 @@ public class Trigger implements BooleanSupplier {
    *
    * @param command the command to start
    * @return this trigger, so calls can be chained
-   * @see #falling()
    */
   public Trigger onFalse(Command command) {
     requireNonNullParam(command, "command", "onFalling");
-    m_event.falling().ifHigh(command::schedule);
+    m_loop.bind(
+        new Runnable() {
+          private boolean m_pressedLast = m_condition.getAsBoolean();
+
+          @Override
+          public void run() {
+            boolean pressed = m_condition.getAsBoolean();
+
+            if (m_pressedLast && !pressed) {
+              command.schedule();
+            }
+
+            m_pressedLast = pressed;
+          }
+        });
     return this;
   }
 
@@ -106,8 +122,23 @@ public class Trigger implements BooleanSupplier {
    */
   public Trigger whileTrue(Command command) {
     requireNonNullParam(command, "command", "whileHigh");
-    m_event.rising().ifHigh(command::schedule);
-    m_event.falling().ifHigh(command::cancel);
+    m_loop.bind(
+        new Runnable() {
+          private boolean m_pressedLast = m_condition.getAsBoolean();
+
+          @Override
+          public void run() {
+            boolean pressed = m_condition.getAsBoolean();
+
+            if (!m_pressedLast && pressed) {
+              command.schedule();
+            } else if (m_pressedLast && !pressed) {
+              command.cancel();
+            }
+
+            m_pressedLast = pressed;
+          }
+        });
     return this;
   }
 
@@ -123,8 +154,23 @@ public class Trigger implements BooleanSupplier {
    */
   public Trigger whileFalse(Command command) {
     requireNonNullParam(command, "command", "whileLow");
-    m_event.falling().ifHigh(command::schedule);
-    m_event.rising().ifHigh(command::cancel);
+    m_loop.bind(
+        new Runnable() {
+          private boolean m_pressedLast = m_condition.getAsBoolean();
+
+          @Override
+          public void run() {
+            boolean pressed = m_condition.getAsBoolean();
+
+            if (m_pressedLast && !pressed) {
+              command.schedule();
+            } else if (!m_pressedLast && pressed) {
+              command.cancel();
+            }
+
+            m_pressedLast = pressed;
+          }
+        });
     return this;
   }
 
@@ -136,16 +182,25 @@ public class Trigger implements BooleanSupplier {
    */
   public Trigger toggleOnTrue(Command command) {
     requireNonNullParam(command, "command", "toggleOnRising");
-    m_event
-        .rising()
-        .ifHigh(
-            () -> {
-              if (!command.isScheduled()) {
-                command.schedule();
-              } else {
+    m_loop.bind(
+        new Runnable() {
+          private boolean m_pressedLast = m_condition.getAsBoolean();
+
+          @Override
+          public void run() {
+            boolean pressed = m_condition.getAsBoolean();
+
+            if (!m_pressedLast && pressed) {
+              if (command.isScheduled()) {
                 command.cancel();
+              } else {
+                command.schedule();
               }
-            });
+            }
+
+            m_pressedLast = pressed;
+          }
+        });
     return this;
   }
 
@@ -157,16 +212,25 @@ public class Trigger implements BooleanSupplier {
    */
   public Trigger toggleOnFalse(Command command) {
     requireNonNullParam(command, "command", "toggleOnFalling");
-    m_event
-        .falling()
-        .ifHigh(
-            () -> {
-              if (!command.isScheduled()) {
-                command.schedule();
-              } else {
+    m_loop.bind(
+        new Runnable() {
+          private boolean m_pressedLast = m_condition.getAsBoolean();
+
+          @Override
+          public void run() {
+            boolean pressed = m_condition.getAsBoolean();
+
+            if (m_pressedLast && !pressed) {
+              if (command.isScheduled()) {
                 command.cancel();
+              } else {
+                command.schedule();
               }
-            });
+            }
+
+            m_pressedLast = pressed;
+          }
+        });
     return this;
   }
 
@@ -181,7 +245,21 @@ public class Trigger implements BooleanSupplier {
   public Trigger whenActive(final Command command) {
     requireNonNullParam(command, "command", "whenActive");
 
-    m_event.rising().ifHigh(command::schedule);
+    m_loop.bind(
+        new Runnable() {
+          private boolean m_pressedLast = m_condition.getAsBoolean();
+
+          @Override
+          public void run() {
+            boolean pressed = m_condition.getAsBoolean();
+
+            if (!m_pressedLast && pressed) {
+              command.schedule();
+            }
+
+            m_pressedLast = pressed;
+          }
+        });
     return this;
   }
 
@@ -215,8 +293,23 @@ public class Trigger implements BooleanSupplier {
   public Trigger whileActiveContinuous(final Command command) {
     requireNonNullParam(command, "command", "whileActiveContinuous");
 
-    m_event.ifHigh(command::schedule);
-    m_event.falling().ifHigh(command::cancel);
+    m_loop.bind(
+        new Runnable() {
+          private boolean m_pressedLast = m_condition.getAsBoolean();
+
+          @Override
+          public void run() {
+            boolean pressed = m_condition.getAsBoolean();
+
+            if (pressed) {
+              command.schedule();
+            } else if (m_pressedLast) {
+              command.cancel();
+            }
+
+            m_pressedLast = pressed;
+          }
+        });
 
     return this;
   }
@@ -246,9 +339,23 @@ public class Trigger implements BooleanSupplier {
   public Trigger whileActiveOnce(final Command command) {
     requireNonNullParam(command, "command", "whileActiveOnce");
 
-    m_event.rising().ifHigh(command::schedule);
-    m_event.falling().ifHigh(command::cancel);
+    m_loop.bind(
+        new Runnable() {
+          private boolean m_pressedLast = m_condition.getAsBoolean();
 
+          @Override
+          public void run() {
+            boolean pressed = m_condition.getAsBoolean();
+
+            if (!m_pressedLast && pressed) {
+              command.schedule();
+            } else if (m_pressedLast && !pressed) {
+              command.cancel();
+            }
+
+            m_pressedLast = pressed;
+          }
+        });
     return this;
   }
 
@@ -263,7 +370,21 @@ public class Trigger implements BooleanSupplier {
   public Trigger whenInactive(final Command command) {
     requireNonNullParam(command, "command", "whenInactive");
 
-    m_event.falling().ifHigh(command::schedule);
+    m_loop.bind(
+        new Runnable() {
+          private boolean m_pressedLast = m_condition.getAsBoolean();
+
+          @Override
+          public void run() {
+            boolean pressed = m_condition.getAsBoolean();
+
+            if (m_pressedLast && !pressed) {
+              command.schedule();
+            }
+
+            m_pressedLast = pressed;
+          }
+        });
 
     return this;
   }
@@ -292,16 +413,25 @@ public class Trigger implements BooleanSupplier {
   public Trigger toggleWhenActive(final Command command) {
     requireNonNullParam(command, "command", "toggleWhenActive");
 
-    m_event
-        .rising()
-        .ifHigh(
-            () -> {
+    m_loop.bind(
+        new Runnable() {
+          private boolean m_pressedLast = m_condition.getAsBoolean();
+
+          @Override
+          public void run() {
+            boolean pressed = m_condition.getAsBoolean();
+
+            if (!m_pressedLast && pressed) {
               if (command.isScheduled()) {
                 command.cancel();
               } else {
                 command.schedule();
               }
-            });
+            }
+
+            m_pressedLast = pressed;
+          }
+        });
 
     return this;
   }
@@ -311,57 +441,94 @@ public class Trigger implements BooleanSupplier {
    *
    * @param command the command to cancel
    * @return this trigger, so calls can be chained
-   * @deprecated Instead, pass {@link #rising()} as an end condition to {@link
-   *     Command#until(BooleanSupplier)}.
+   * @deprecated Instead, pass this as an end condition to {@link Command#until(BooleanSupplier)}.
    */
   @Deprecated
   public Trigger cancelWhenActive(final Command command) {
     requireNonNullParam(command, "command", "cancelWhenActive");
 
-    m_event.rising().ifHigh(command::cancel);
+    m_loop.bind(
+        new Runnable() {
+          private boolean m_pressedLast = m_condition.getAsBoolean();
+
+          @Override
+          public void run() {
+            boolean pressed = m_condition.getAsBoolean();
+
+            if (!m_pressedLast && pressed) {
+              command.cancel();
+            }
+
+            m_pressedLast = pressed;
+          }
+        });
 
     return this;
   }
 
-  /**
-   * Get the wrapped BooleanEvent.
-   *
-   * @return the wrapped BooleanEvent instance.
-   */
-  public BooleanEvent getEvent() {
-    return m_event;
-  }
-
   @Override
   public boolean getAsBoolean() {
-    return m_event.getAsBoolean();
+    return m_condition.getAsBoolean();
   }
 
+  /**
+   * Composes two triggers with logical OR.
+   *
+   * @param trigger the condition to compose with
+   * @return A trigger which is active when either component trigger is active.
+   */
   public Trigger and(BooleanSupplier trigger) {
-    return cast(m_event.and(trigger));
+    return new Trigger(() -> m_condition.getAsBoolean() && trigger.getAsBoolean());
   }
 
+  /**
+   * Composes two triggers with logical OR.
+   *
+   * @param trigger the condition to compose with
+   * @return A trigger which is active when either component trigger is active.
+   */
   public Trigger or(BooleanSupplier trigger) {
-    return cast(m_event.or(trigger));
+    return new Trigger(() -> m_condition.getAsBoolean() || trigger.getAsBoolean());
   }
 
+  /**
+   * Creates a new trigger that is active when this trigger is inactive, i.e. that acts as the
+   * negation of this trigger.
+   *
+   * @return the negated trigger
+   */
   public Trigger negate() {
-    return cast(m_event.negate());
+    return new Trigger(() -> !m_condition.getAsBoolean());
   }
 
+  /**
+   * Creates a new debounced trigger from this trigger - it will become active when this trigger has
+   * been active for longer than the specified period.
+   *
+   * @param seconds The debounce period.
+   * @return The debounced trigger (rising edges debounced only)
+   */
   public Trigger debounce(double seconds) {
     return debounce(seconds, Debouncer.DebounceType.kRising);
   }
 
+  /**
+   * Creates a new debounced trigger from this trigger - it will become active when this trigger has
+   * been active for longer than the specified period.
+   *
+   * @param seconds The debounce period.
+   * @param type The debounce type.
+   * @return The debounced trigger.
+   */
   public Trigger debounce(double seconds, Debouncer.DebounceType type) {
-    return cast(m_event.debounce(seconds, type));
-  }
+    return new Trigger(
+        new BooleanSupplier() {
+          final Debouncer m_debouncer = new Debouncer(seconds, type);
 
-  public Trigger rising() {
-    return cast(m_event.rising());
-  }
-
-  public Trigger falling() {
-    return cast(m_event.falling());
+          @Override
+          public boolean getAsBoolean() {
+            return m_debouncer.calculate(m_condition.getAsBoolean());
+          }
+        });
   }
 }
