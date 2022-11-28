@@ -28,7 +28,7 @@ class Robot : public frc::TimedRobot {
 
   void TeleopPeriodic() override {
     // Drive with tank style
-    m_robotDrive.TankDrive(m_leftStick.GetY(), m_rightStick.GetY());
+    m_robotDrive.TankDrive(-m_leftStick.GetY(), -m_rightStick.GetY());
   }
 };
 

@@ -28,8 +28,8 @@ class Robot : public frc::TimedRobot {
    * Mecanum drive is used with the gyro angle as an input.
    */
   void TeleopPeriodic() override {
-    m_robotDrive.DriveCartesian(-m_joystick.GetY(), m_joystick.GetX(),
-                                m_joystick.GetZ(), m_gyro.GetRotation2d());
+    m_robotDrive.DriveCartesian(-m_joystick.GetY(), -m_joystick.GetX(),
+                                -m_joystick.GetZ(), m_gyro.GetRotation2d());
   }
 
  private:

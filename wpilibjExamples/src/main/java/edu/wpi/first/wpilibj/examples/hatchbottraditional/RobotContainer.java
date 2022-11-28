@@ -60,7 +60,9 @@ public class RobotContainer {
         // A split-stick arcade command, with forward/backward controlled by the left
         // hand, and turning controlled by the right.
         new DefaultDrive(
-            m_robotDrive, m_driverController::getLeftY, m_driverController::getRightX));
+            m_robotDrive,
+            () -> -m_driverController.getLeftY(),
+            () -> -m_driverController.getRightX()));
 
     // Add commands to the autonomous command chooser
     m_chooser.setDefaultOption("Simple Auto", m_simpleAuto);

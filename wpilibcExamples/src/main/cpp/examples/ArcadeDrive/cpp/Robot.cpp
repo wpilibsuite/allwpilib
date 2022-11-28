@@ -27,7 +27,7 @@ class Robot : public frc::TimedRobot {
 
   void TeleopPeriodic() override {
     // Drive with arcade style
-    m_robotDrive.ArcadeDrive(-m_stick.GetY(), m_stick.GetX());
+    m_robotDrive.ArcadeDrive(-m_stick.GetY(), -m_stick.GetX());
   }
 };
 
