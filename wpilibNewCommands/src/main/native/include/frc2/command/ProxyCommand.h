@@ -49,7 +49,7 @@ class ProxyCommand : public CommandHelper<CommandBase, ProxyCommand> {
    *
    * @param command the command to schedule
    */
-  explicit ProxyCommand(std::unique_ptr<Command>&& command);
+  explicit ProxyCommand(std::unique_ptr<Command> command);
 
   ProxyCommand(ProxyCommand&& other) = default;
 

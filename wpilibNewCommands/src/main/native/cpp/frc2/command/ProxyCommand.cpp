@@ -12,7 +12,7 @@ ProxyCommand::ProxyCommand(wpi::unique_function<Command*()> supplier)
 ProxyCommand::ProxyCommand(Command* command)
     : m_supplier([command] { return command; }) {}
 
-ProxyCommand::ProxyCommand(std::unique_ptr<Command>&& command)
+ProxyCommand::ProxyCommand(std::unique_ptr<Command> command)
     : m_supplier([command = std::move(command)] { return command.get(); }) {}
 
 void ProxyCommand::Initialize() {
