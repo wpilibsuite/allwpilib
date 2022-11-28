@@ -44,7 +44,54 @@ public class AddressableLEDBuffer {
    * @param v the v value [0-255]
    */
   public void setHSV(final int index, final int h, final int s, final int v) {
-    setLED(index, Color.fromHSV(h, s, v));
+    if (s == 0) {
+      setRGB(index, v, v, v);
+      return;
+    }
+
+    // The below algorithm is copied from Color.fromHSV and moved here for
+    // performance reasons.
+
+    // Loosely based on
+    // https://en.wikipedia.org/wiki/HSL_and_HSV#HSV_to_RGB
+    // The hue range is split into 60 degree regions where in each region there
+    // is one rgb component at a low value (m), one at a high value (v) and one
+    // that changes (X) from low to high (X+m) or high to low (v-X)
+
+    // Difference between highest and lowest value of any rgb component
+    final int chroma = (s * v) >> 8;
+
+    // Beacuse hue is 0-180 rather than 0-360 use 30 not 60
+    final int region = (h / 30) % 6;
+
+    // Remainder converted from 0-30 to 0-255
+    final int remainder = (int) Math.round((h % 30) * (255 / 30.0));
+
+    // Value of the lowest rgb component
+    final int m = v - chroma;
+
+    // Goes from 0 to chroma as hue increases
+    final int X = (chroma * remainder) >> 8;
+
+    switch (region) {
+      case 0:
+        setRGB(index, v, X + m, m);
+        break;
+      case 1:
+        setRGB(index, v - X, v, m);
+        break;
+      case 2:
+        setRGB(index, m, v, X + m);
+        break;
+      case 3:
+        setRGB(index, m, v - X, v);
+        break;
+      case 4:
+        setRGB(index, X + m, m, v);
+        break;
+      default:
+        setRGB(index, v, m, v - X);
+        break;
   }
 
   /**
