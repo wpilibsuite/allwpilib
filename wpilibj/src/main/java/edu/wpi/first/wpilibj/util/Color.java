@@ -90,7 +90,7 @@ public class Color {
     // Beacuse hue is 0-180 rather than 0-360 use 30 not 60
     final int region = (h / 30) % 6;
 
-    // Remainder converted from 0-30 to roughly 0-255
+    // Remainder converted from 0-30 to 0-255
     final int remainder = (int) Math.round((h % 30) * (255 / 30.0));
 
     // Value of the lowest rgb component
