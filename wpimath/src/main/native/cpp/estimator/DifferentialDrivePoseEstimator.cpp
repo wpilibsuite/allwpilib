@@ -20,10 +20,16 @@ DifferentialDrivePoseEstimator::InterpolationRecord::Interpolate(
   } else if (i > 1) {
     return endValue;
   } else {
+    // Find the interpolated left distance.
     auto left = wpi::Lerp(this->leftDistance, endValue.leftDistance, i);
+    // Find the interpolated right distance.
     auto right = wpi::Lerp(this->rightDistance, endValue.rightDistance, i);
+
+    // Find the new gyro angle.
     auto gyro = wpi::Lerp(this->gyroAngle, endValue.gyroAngle, i);
 
+    // Create a twist to represent this changed based on the interpolated
+    // sensor inputs.
     auto twist =
         kinematics.ToTwist2d(left - leftDistance, right - rightDistance);
     twist.dtheta = (gyro - gyroAngle).Radians();

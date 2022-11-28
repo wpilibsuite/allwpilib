@@ -20,6 +20,7 @@ import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.util.WPIUtilJNI;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * This class wraps {@link MecanumDriveOdometry Mecanum Drive Odometry} to fuse latency-compensated
@@ -49,58 +50,6 @@ public class MecanumDrivePoseEstimator {
 
   private final TimeInterpolatableBuffer<InterpolationRecord> m_poseBuffer =
       TimeInterpolatableBuffer.createBuffer(1.5);
-
-  private class InterpolationRecord implements Interpolatable<InterpolationRecord> {
-    private Pose2d pose;
-    private Rotation2d gyroAngle;
-    private MecanumDriveWheelPositions wheelPositions;
-
-    private InterpolationRecord(
-        Pose2d pose, Rotation2d gyro, MecanumDriveWheelPositions wheelPositions) {
-      this.pose = pose;
-      this.gyroAngle = gyro;
-      this.wheelPositions = wheelPositions;
-    }
-
-    @Override
-    public InterpolationRecord interpolate(InterpolationRecord endValue, double t) {
-      if (t < 0) {
-        return this;
-      } else if (t >= 1) {
-        return endValue;
-      } else {
-        var wheels_lerp =
-            new MecanumDriveWheelPositions(
-                MathUtil.interpolate(
-                    this.wheelPositions.frontLeftMeters,
-                    endValue.wheelPositions.frontLeftMeters,
-                    t),
-                MathUtil.interpolate(
-                    this.wheelPositions.frontRightMeters,
-                    endValue.wheelPositions.frontRightMeters,
-                    t),
-                MathUtil.interpolate(
-                    this.wheelPositions.rearLeftMeters, endValue.wheelPositions.rearLeftMeters, t),
-                MathUtil.interpolate(
-                    this.wheelPositions.rearRightMeters,
-                    endValue.wheelPositions.rearRightMeters,
-                    t));
-        var wheels_delta =
-            new MecanumDriveWheelPositions(
-                wheels_lerp.frontLeftMeters - this.wheelPositions.frontLeftMeters,
-                wheels_lerp.frontRightMeters - this.wheelPositions.frontRightMeters,
-                wheels_lerp.rearLeftMeters - this.wheelPositions.rearLeftMeters,
-                wheels_lerp.rearRightMeters - this.wheelPositions.rearRightMeters);
-
-        var gyro_lerp = gyroAngle.interpolate(endValue.gyroAngle, t);
-
-        Twist2d twist = m_kinematics.toTwist2d(wheels_delta);
-        twist.dtheta = gyro_lerp.minus(gyroAngle).getRadians();
-
-        return new InterpolationRecord(pose.exp(twist), gyro_lerp, wheels_lerp);
-      }
-    }
-  }
 
   /**
    * Constructs a MecanumDrivePoseEstimator.
@@ -214,7 +163,7 @@ public class MecanumDrivePoseEstimator {
     }
 
     // Step 2: Measure the twist between the odometry pose and the vision pose.
-    var twist = sample.get().pose.log(visionRobotPoseMeters);
+    var twist = sample.get().poseMeters.log(visionRobotPoseMeters);
 
     // Step 3: We should not trust the twist entirely, so instead we scale this twist by a Kalman
     // gain matrix representing how much we trust vision measurements compared to our current pose.
@@ -226,7 +175,9 @@ public class MecanumDrivePoseEstimator {
 
     // Step 5: Reset Odometry to state at sample with vision adjustment.
     m_odometry.resetPosition(
-        sample.get().gyroAngle, sample.get().wheelPositions, sample.get().pose.exp(scaledTwist));
+        sample.get().gyroAngle,
+        sample.get().wheelPositions,
+        sample.get().poseMeters.exp(scaledTwist));
 
     // Step 6: Replay odometry inputs between sample time and latest recorded sample to update the
     // pose buffer and correct odometry.
@@ -306,5 +257,105 @@ public class MecanumDrivePoseEstimator {
                 wheelPositions.rearRightMeters)));
 
     return getEstimatedPosition();
+  }
+
+  /**
+   * Represents an odometry record. The record contains the inputs provided as well as the pose that
+   * was observed based on these inputs, as well as the previous record and its inputs.
+   */
+  private class InterpolationRecord implements Interpolatable<InterpolationRecord> {
+    // The pose observed given the current sensor inputs and the previous pose.
+    private final Pose2d poseMeters;
+
+    // The current gyro angle.
+    private final Rotation2d gyroAngle;
+
+    // The distances traveled by each wheel encoder.
+    private final MecanumDriveWheelPositions wheelPositions;
+
+    /**
+     * Constructs an Interpolation Record with the specified parameters.
+     *
+     * @param pose The pose observed given the current sensor inputs and the previous pose.
+     * @param gyro The current gyro angle.
+     * @param wheelPositions The distances traveled by each wheel encoder.
+     */
+    private InterpolationRecord(
+        Pose2d poseMeters, Rotation2d gyro, MecanumDriveWheelPositions wheelPositions) {
+      this.poseMeters = poseMeters;
+      this.gyroAngle = gyro;
+      this.wheelPositions = wheelPositions;
+    }
+
+    /**
+     * Return the interpolated record. This object is assumed to be the starting position, or lower
+     * bound.
+     *
+     * @param endValue The upper bound, or end.
+     * @param t How far between the lower and upper bound we are. This should be bounded in [0, 1].
+     * @return The interpolated value.
+     */
+    @Override
+    public InterpolationRecord interpolate(InterpolationRecord endValue, double t) {
+      if (t < 0) {
+        return this;
+      } else if (t >= 1) {
+        return endValue;
+      } else {
+        // Find the new wheel distances.
+        var wheels_lerp =
+            new MecanumDriveWheelPositions(
+                MathUtil.interpolate(
+                    this.wheelPositions.frontLeftMeters,
+                    endValue.wheelPositions.frontLeftMeters,
+                    t),
+                MathUtil.interpolate(
+                    this.wheelPositions.frontRightMeters,
+                    endValue.wheelPositions.frontRightMeters,
+                    t),
+                MathUtil.interpolate(
+                    this.wheelPositions.rearLeftMeters, endValue.wheelPositions.rearLeftMeters, t),
+                MathUtil.interpolate(
+                    this.wheelPositions.rearRightMeters,
+                    endValue.wheelPositions.rearRightMeters,
+                    t));
+
+        // Find the distance travelled between this measurement and the interpolated measurement.
+        var wheels_delta =
+            new MecanumDriveWheelPositions(
+                wheels_lerp.frontLeftMeters - this.wheelPositions.frontLeftMeters,
+                wheels_lerp.frontRightMeters - this.wheelPositions.frontRightMeters,
+                wheels_lerp.rearLeftMeters - this.wheelPositions.rearLeftMeters,
+                wheels_lerp.rearRightMeters - this.wheelPositions.rearRightMeters);
+
+        // Find the new gyro angle.
+        var gyro_lerp = gyroAngle.interpolate(endValue.gyroAngle, t);
+
+        // Create a twist to represent this change based on the interpolated sensor inputs.
+        Twist2d twist = m_kinematics.toTwist2d(wheels_delta);
+        twist.dtheta = gyro_lerp.minus(gyroAngle).getRadians();
+
+        return new InterpolationRecord(poseMeters.exp(twist), gyro_lerp, wheels_lerp);
+      }
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+      if (this == obj) {
+        return true;
+      }
+      if (!(obj instanceof InterpolationRecord)) {
+        return false;
+      }
+      InterpolationRecord record = (InterpolationRecord) obj;
+      return Objects.equals(gyroAngle, record.gyroAngle)
+          && Objects.equals(wheelPositions, record.wheelPositions)
+          && Objects.equals(poseMeters, record.poseMeters);
+    }
+
+    @Override
+    public int hashCode() {
+      return Objects.hash(gyroAngle, wheelPositions, poseMeters);
+    }
   }
 }

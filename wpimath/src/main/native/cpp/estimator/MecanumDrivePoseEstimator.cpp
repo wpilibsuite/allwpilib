@@ -20,6 +20,7 @@ frc::MecanumDrivePoseEstimator::InterpolationRecord::Interpolate(
   } else if (i > 1) {
     return endValue;
   } else {
+    // Find the new wheel distance measurements.
     MecanumDriveWheelPositions wheels_lerp{
         wpi::Lerp(this->wheelPositions.frontLeft,
                   endValue.wheelPositions.frontLeft, i),
@@ -30,14 +31,19 @@ frc::MecanumDrivePoseEstimator::InterpolationRecord::Interpolate(
         wpi::Lerp(this->wheelPositions.rearRight,
                   endValue.wheelPositions.rearRight, i)};
 
+    // Find the distance between this measurement and the
+    // interpolated measurement.
     MecanumDriveWheelPositions wheels_delta{
         wheels_lerp.frontLeft - this->wheelPositions.frontLeft,
         wheels_lerp.frontRight - this->wheelPositions.frontRight,
         wheels_lerp.rearLeft - this->wheelPositions.rearLeft,
         wheels_lerp.rearRight - this->wheelPositions.rearRight};
 
+    // Find the new gyro angle.
     auto gyro = wpi::Lerp(this->gyroAngle, endValue.gyroAngle, i);
 
+    // Create a twist to represent this changed based on the interpolated
+    // sensor inputs.
     auto twist = kinematics.ToTwist2d(wheels_delta);
     twist.dtheta = (gyro - gyroAngle).Radians();
 

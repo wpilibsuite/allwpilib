@@ -19,6 +19,7 @@ import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.util.WPIUtilJNI;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * This class wraps {@link DifferentialDriveOdometry Differential Drive Odometry} to fuse
@@ -50,42 +51,10 @@ public class DifferentialDrivePoseEstimator {
   private final TimeInterpolatableBuffer<InterpolationRecord> m_poseBuffer =
       TimeInterpolatableBuffer.createBuffer(1.5);
 
-  private class InterpolationRecord implements Interpolatable<InterpolationRecord> {
-    private Pose2d pose;
-    private Rotation2d gyroAngle;
-    private double leftMeters;
-    private double rightMeters;
-
-    private InterpolationRecord(
-        Pose2d pose, Rotation2d gyro, double leftMeters, double rightMeters) {
-      this.pose = pose;
-      this.gyroAngle = gyro;
-      this.leftMeters = leftMeters;
-      this.rightMeters = rightMeters;
-    }
-
-    @Override
-    public InterpolationRecord interpolate(InterpolationRecord endValue, double t) {
-      if (t < 0) {
-        return this;
-      } else if (t >= 1) {
-        return endValue;
-      } else {
-        var left_lerp = MathUtil.interpolate(this.leftMeters, endValue.leftMeters, t);
-        var right_lerp = MathUtil.interpolate(this.rightMeters, endValue.rightMeters, t);
-        var gyro_lerp = gyroAngle.interpolate(endValue.gyroAngle, t);
-
-        Twist2d twist = m_kinematics.toTwist2d(left_lerp - leftMeters, right_lerp - rightMeters);
-        twist.dtheta = gyro_lerp.minus(gyroAngle).getRadians();
-
-        return new InterpolationRecord(pose.exp(twist), gyro_lerp, left_lerp, right_lerp);
-      }
-    }
-  }
-
   /**
    * Constructs a DifferentialDrivePoseEstimator.
    *
+   * @param kinematics A correctly-configured kinematics object for your drivetrain.
    * @param gyroAngle The current gyro angle.
    * @param leftDistanceMeters The distance traveled by the left encoder.
    * @param rightDistanceMeters The distance traveled by the right encoder.
@@ -203,7 +172,7 @@ public class DifferentialDrivePoseEstimator {
     }
 
     // Step 2: Measure the twist between the odometry pose and the vision pose.
-    var twist = sample.get().pose.log(visionRobotPoseMeters);
+    var twist = sample.get().poseMeters.log(visionRobotPoseMeters);
 
     // Step 3: We should not trust the twist entirely, so instead we scale this twist by a Kalman
     // gain matrix representing how much we trust vision measurements compared to our current pose.
@@ -218,7 +187,7 @@ public class DifferentialDrivePoseEstimator {
         sample.get().gyroAngle,
         sample.get().leftMeters,
         sample.get().rightMeters,
-        sample.get().pose.exp(scaledTwist));
+        sample.get().poseMeters.exp(scaledTwist));
 
     // Step 6: Replay odometry inputs between sample time and latest recorded sample to update the
     // pose buffer and correct odometry.
@@ -303,5 +272,91 @@ public class DifferentialDrivePoseEstimator {
             getEstimatedPosition(), gyroAngle, distanceLeftMeters, distanceRightMeters));
 
     return getEstimatedPosition();
+  }
+
+  /**
+   * Represents an odometry record. The record contains the inputs provided as well as the pose that
+   * was observed based on these inputs, as well as the previous record and its inputs.
+   */
+  private class InterpolationRecord implements Interpolatable<InterpolationRecord> {
+    // The pose observed given the current sensor inputs and the previous pose.
+    private final Pose2d poseMeters;
+
+    // The current gyro angle.
+    private final Rotation2d gyroAngle;
+
+    // The distance traveled by the left encoder.
+    private final double leftMeters;
+
+    // The distance traveled by the right encoder.
+    private final double rightMeters;
+
+    /**
+     * Constructs an Interpolation Record with the specified parameters.
+     *
+     * @param pose The pose observed given the current sensor inputs and the previous pose.
+     * @param gyro The current gyro angle.
+     * @param leftMeters The distance traveled by the left encoder.
+     * @param rightMeters The distanced traveled by the right encoder.
+     */
+    private InterpolationRecord(
+        Pose2d poseMeters, Rotation2d gyro, double leftMeters, double rightMeters) {
+      this.poseMeters = poseMeters;
+      this.gyroAngle = gyro;
+      this.leftMeters = leftMeters;
+      this.rightMeters = rightMeters;
+    }
+
+    /**
+     * Return the interpolated record. This object is assumed to be the starting position, or lower
+     * bound.
+     *
+     * @param endValue The upper bound, or end.
+     * @param t How far between the lower and upper bound we are. This should be bounded in [0, 1].
+     * @return The interpolated value.
+     */
+    @Override
+    public InterpolationRecord interpolate(InterpolationRecord endValue, double t) {
+      if (t < 0) {
+        return this;
+      } else if (t >= 1) {
+        return endValue;
+      } else {
+        // Find the new left distance.
+        var left_lerp = MathUtil.interpolate(this.leftMeters, endValue.leftMeters, t);
+
+        // Find the new right distance.
+        var right_lerp = MathUtil.interpolate(this.rightMeters, endValue.rightMeters, t);
+
+        // Find the new gyro angle.
+        var gyro_lerp = gyroAngle.interpolate(endValue.gyroAngle, t);
+
+        // Create a twist to represent this change based on the interpolated sensor inputs.
+        Twist2d twist = m_kinematics.toTwist2d(left_lerp - leftMeters, right_lerp - rightMeters);
+        twist.dtheta = gyro_lerp.minus(gyroAngle).getRadians();
+
+        return new InterpolationRecord(poseMeters.exp(twist), gyro_lerp, left_lerp, right_lerp);
+      }
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+      if (this == obj) {
+        return true;
+      }
+      if (!(obj instanceof InterpolationRecord)) {
+        return false;
+      }
+      InterpolationRecord record = (InterpolationRecord) obj;
+      return Objects.equals(gyroAngle, record.gyroAngle)
+          && Double.compare(leftMeters, record.leftMeters) == 0
+          && Double.compare(rightMeters, record.rightMeters) == 0
+          && Objects.equals(poseMeters, record.poseMeters);
+    }
+
+    @Override
+    public int hashCode() {
+      return Objects.hash(gyroAngle, leftMeters, rightMeters, poseMeters);
+    }
   }
 }

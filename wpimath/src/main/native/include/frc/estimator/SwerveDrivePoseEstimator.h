@@ -293,13 +293,13 @@ class SwerveDrivePoseEstimator {
  private:
   struct InterpolationRecord {
     // The pose observed given the current sensor inputs and the previous pose.
-    Pose2d pose;
+    const Pose2d pose;
 
     // The current gyroscope angle.
-    Rotation2d gyroAngle;
+    const Rotation2d gyroAngle;
 
     // The distances traveled and rotations meaured at each module.
-    wpi::array<SwerveModulePosition, NumModules> modulePostions;
+    const wpi::array<SwerveModulePosition, NumModules> modulePostions;
 
     /**
      * Checks equality between this InterpolationRecord and another object.
@@ -333,29 +333,36 @@ class SwerveDrivePoseEstimator {
       } else if (i > 1) {
         return endValue;
       } else {
-        wpi::array<SwerveModulePosition, NumModules> wheels_lerp{
+        // Find the new module distances.
+        wpi::array<SwerveModulePosition, NumModules> modulePositions{
             wpi::empty_array};
-        wpi::array<SwerveModulePosition, NumModules> wheels_delta{
+        // Find the distance between this measurement and the
+        // interpolated measurement.
+        wpi::array<SwerveModulePosition, NumModules> modulesDelta{
             wpi::empty_array};
 
         for (size_t i = 0; i < NumModules; i++) {
-          wheels_lerp[i].distance =
-              wpi::Lerp(modulePostions[i].distance,
+          modulePositions[i].distance =
+              wpi::Lerp(this->modulePostions[i].distance,
                         endValue.modulePostions[i].distance, i);
-          wheels_lerp[i].angle = wpi::Lerp(modulePostions[i].angle,
-                                           endValue.modulePostions[i].angle, i);
+          modulePositions[i].angle =
+              wpi::Lerp(this->modulePostions[i].angle,
+                        endValue.modulePostions[i].angle, i);
 
-          wheels_delta[i].distance =
-              wheels_lerp[i].distance - modulePostions[i].distance;
-          wheels_delta[i].angle = wheels_lerp[i].angle;
+          modulesDelta[i].distance =
+              modulePositions[i].distance - this->modulePostions[i].distance;
+          modulesDelta[i].angle = modulePositions[i].angle;
         }
 
+        // Find the new gyro angle.
         auto gyro = wpi::Lerp(this->gyroAngle, endValue.gyroAngle, i);
 
-        auto twist = kinematics.ToTwist2d(wheels_delta);
+        // Create a twist to represent this changed based on the interpolated
+        // sensor inputs.
+        auto twist = kinematics.ToTwist2d(modulesDelta);
         twist.dtheta = (gyro - gyroAngle).Radians();
 
-        return {pose.Exp(twist), gyro, wheels_lerp};
+        return {pose.Exp(twist), gyro, modulePositions};
       }
     }
   };

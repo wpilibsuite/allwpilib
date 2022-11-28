@@ -204,16 +204,16 @@ class WPILIB_DLLEXPORT DifferentialDrivePoseEstimator {
  private:
   struct InterpolationRecord {
     // The pose observed given the current sensor inputs and the previous pose.
-    Pose2d pose;
+    const Pose2d pose;
 
     // The current gyro angle.
-    Rotation2d gyroAngle;
+    const Rotation2d gyroAngle;
 
     // The distance traveled by the left encoder.
-    units::meter_t leftDistance;
+    const units::meter_t leftDistance;
 
     // The distance traveled by the right encoder.
-    units::meter_t rightDistance;
+    const units::meter_t rightDistance;
 
     /**
      * Checks equality between this InterpolationRecord and another object.

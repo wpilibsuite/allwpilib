@@ -20,6 +20,7 @@ import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.util.WPIUtilJNI;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * This class wraps {@link SwerveDriveOdometry Swerve Drive Odometry} to fuse latency-compensated
@@ -48,51 +49,6 @@ public class SwerveDrivePoseEstimator {
 
   private final TimeInterpolatableBuffer<InterpolationRecord> m_poseBuffer =
       TimeInterpolatableBuffer.createBuffer(1.5);
-
-  private class InterpolationRecord implements Interpolatable<InterpolationRecord> {
-    private Pose2d pose;
-    private Rotation2d gyroAngle;
-    private SwerveModulePosition[] wheelPositions;
-
-    private InterpolationRecord(
-        Pose2d pose, Rotation2d gyro, SwerveModulePosition[] wheelPositions) {
-      this.pose = pose;
-      this.gyroAngle = gyro;
-      this.wheelPositions = wheelPositions;
-    }
-
-    @Override
-    public InterpolationRecord interpolate(InterpolationRecord endValue, double t) {
-      if (t < 0) {
-        return this;
-      } else if (t >= 1) {
-        return endValue;
-      } else {
-        var wheelPositions = new SwerveModulePosition[m_numModules];
-        var wheelDeltas = new SwerveModulePosition[m_numModules];
-
-        for (int i = 0; i < m_numModules; i++) {
-          double ds =
-              MathUtil.interpolate(
-                  this.wheelPositions[i].distanceMeters,
-                  endValue.wheelPositions[i].distanceMeters,
-                  t);
-          Rotation2d theta =
-              this.wheelPositions[i].angle.interpolate(endValue.wheelPositions[i].angle, t);
-          wheelPositions[i] = new SwerveModulePosition(ds, theta);
-          wheelDeltas[i] =
-              new SwerveModulePosition(ds - this.wheelPositions[i].distanceMeters, theta);
-        }
-
-        var gyro_lerp = gyroAngle.interpolate(endValue.gyroAngle, t);
-
-        Twist2d twist = m_kinematics.toTwist2d(wheelDeltas);
-        twist.dtheta = gyro_lerp.minus(gyroAngle).getRadians();
-
-        return new InterpolationRecord(pose.exp(twist), gyro_lerp, wheelPositions);
-      }
-    }
-  }
 
   /**
    * Constructs a SwerveDrivePoseEstimator.
@@ -207,7 +163,7 @@ public class SwerveDrivePoseEstimator {
     }
 
     // Step 2: Measure the twist between the odometry pose and the vision pose.
-    var twist = sample.get().pose.log(visionRobotPoseMeters);
+    var twist = sample.get().poseMeters.log(visionRobotPoseMeters);
 
     // Step 3: We should not trust the twist entirely, so instead we scale this twist by a Kalman
     // gain matrix representing how much we trust vision measurements compared to our current pose.
@@ -219,13 +175,15 @@ public class SwerveDrivePoseEstimator {
 
     // Step 5: Reset Odometry to state at sample with vision adjustment.
     m_odometry.resetPosition(
-        sample.get().gyroAngle, sample.get().wheelPositions, sample.get().pose.exp(scaledTwist));
+        sample.get().gyroAngle,
+        sample.get().modulePositions,
+        sample.get().poseMeters.exp(scaledTwist));
 
     // Step 6: Replay odometry inputs between sample time and latest recorded sample to update the
     // pose buffer and correct odometry.
     for (Map.Entry<Double, InterpolationRecord> entry :
         m_poseBuffer.getInternalBuffer().tailMap(timestampSeconds).entrySet()) {
-      updateWithTime(entry.getKey(), entry.getValue().gyroAngle, entry.getValue().wheelPositions);
+      updateWithTime(entry.getKey(), entry.getValue().gyroAngle, entry.getValue().modulePositions);
     }
   }
 
@@ -305,5 +263,98 @@ public class SwerveDrivePoseEstimator {
         new InterpolationRecord(getEstimatedPosition(), gyroAngle, internalModulePositions));
 
     return getEstimatedPosition();
+  }
+
+  /**
+   * Represents an odometry record. The record contains the inputs provided as well as the pose that
+   * was observed based on these inputs, as well as the previous record and its inputs.
+   */
+  private class InterpolationRecord implements Interpolatable<InterpolationRecord> {
+    // The pose observed given the current sensor inputs and the previous pose.
+    private final Pose2d poseMeters;
+
+    // The current gyro angle.
+    private final Rotation2d gyroAngle;
+
+    // The distances and rotations measured at each module.
+    private final SwerveModulePosition[] modulePositions;
+
+    /**
+     * Constructs an Interpolation Record with the specified parameters.
+     *
+     * @param pose The pose observed given the current sensor inputs and the previous pose.
+     * @param gyro The current gyro angle.
+     * @param wheelPositions The distances and rotations measured at each wheel.
+     */
+    private InterpolationRecord(
+        Pose2d poseMeters, Rotation2d gyro, SwerveModulePosition[] modulePositions) {
+      this.poseMeters = poseMeters;
+      this.gyroAngle = gyro;
+      this.modulePositions = modulePositions;
+    }
+
+    /**
+     * Return the interpolated record. This object is assumed to be the starting position, or lower
+     * bound.
+     *
+     * @param endValue The upper bound, or end.
+     * @param t How far between the lower and upper bound we are. This should be bounded in [0, 1].
+     * @return The interpolated value.
+     */
+    @Override
+    public InterpolationRecord interpolate(InterpolationRecord endValue, double t) {
+      if (t < 0) {
+        return this;
+      } else if (t >= 1) {
+        return endValue;
+      } else {
+        // Find the new wheel distances.
+        var modulePositions = new SwerveModulePosition[m_numModules];
+
+        // Find the distance travelled between this measurement and the interpolated measurement.
+        var moduleDeltas = new SwerveModulePosition[m_numModules];
+
+        for (int i = 0; i < m_numModules; i++) {
+          double ds =
+              MathUtil.interpolate(
+                  this.modulePositions[i].distanceMeters,
+                  endValue.modulePositions[i].distanceMeters,
+                  t);
+          Rotation2d theta =
+              this.modulePositions[i].angle.interpolate(endValue.modulePositions[i].angle, t);
+          modulePositions[i] = new SwerveModulePosition(ds, theta);
+          moduleDeltas[i] =
+              new SwerveModulePosition(ds - this.modulePositions[i].distanceMeters, theta);
+        }
+
+        // Find the new gyro angle.
+        var gyro_lerp = gyroAngle.interpolate(endValue.gyroAngle, t);
+
+        // Create a twist to represent this change based on the interpolated sensor inputs.
+        Twist2d twist = m_kinematics.toTwist2d(moduleDeltas);
+        twist.dtheta = gyro_lerp.minus(gyroAngle).getRadians();
+
+        return new InterpolationRecord(poseMeters.exp(twist), gyro_lerp, modulePositions);
+      }
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+      if (this == obj) {
+        return true;
+      }
+      if (!(obj instanceof InterpolationRecord)) {
+        return false;
+      }
+      InterpolationRecord record = (InterpolationRecord) obj;
+      return Objects.equals(gyroAngle, record.gyroAngle)
+          && Objects.equals(modulePositions, record.modulePositions)
+          && Objects.equals(poseMeters, record.poseMeters);
+    }
+
+    @Override
+    public int hashCode() {
+      return Objects.hash(gyroAngle, modulePositions, poseMeters);
+    }
   }
 }
