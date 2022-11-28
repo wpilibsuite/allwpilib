@@ -19,6 +19,7 @@ import edu.wpi.first.math.trajectory.TrajectoryConfig;
 import edu.wpi.first.math.trajectory.TrajectoryGenerator;
 import java.util.List;
 import java.util.Random;
+import java.util.TreeMap;
 import java.util.function.Function;
 import org.junit.jupiter.api.Test;
 
@@ -44,7 +45,7 @@ class SwerveDrivePoseEstimatorTest {
             new SwerveModulePosition[] {fl, fr, bl, br},
             new Pose2d(),
             VecBuilder.fill(0.1, 0.1, 0.1),
-            VecBuilder.fill(0.45, 0.45, 0.1));
+            VecBuilder.fill(0.5, 0.5, 0.5));
 
     var trajectory =
         TrajectoryGenerator.generateTrajectory(
@@ -69,6 +70,8 @@ class SwerveDrivePoseEstimatorTest {
         trajectory.getInitialPose(),
         new Pose2d(0, 0, Rotation2d.fromDegrees(45)),
         0.02,
+        0.1,
+        0.25,
         true);
   }
 
@@ -93,7 +96,7 @@ class SwerveDrivePoseEstimatorTest {
             new SwerveModulePosition[] {fl, fr, bl, br},
             new Pose2d(-1, -1, Rotation2d.fromRadians(-1)),
             VecBuilder.fill(0.1, 0.1, 0.1),
-            VecBuilder.fill(0.45, 0.45, 0.1));
+            VecBuilder.fill(0.9, 0.9, 0.9));
     var trajectory =
         TrajectoryGenerator.generateTrajectory(
             List.of(
@@ -130,6 +133,8 @@ class SwerveDrivePoseEstimatorTest {
             initial_pose,
             new Pose2d(0, 0, Rotation2d.fromDegrees(45)),
             0.02,
+            0.1,
+            1.0,
             false);
       }
     }
@@ -144,6 +149,8 @@ class SwerveDrivePoseEstimatorTest {
       final Pose2d startingPose,
       final Pose2d endingPose,
       final double dt,
+      final double visionUpdateRate,
+      final double visionUpdateDelay,
       final boolean checkError) {
     SwerveModulePosition[] positions = {
       new SwerveModulePosition(),
@@ -158,23 +165,21 @@ class SwerveDrivePoseEstimatorTest {
 
     double t = 0.0;
 
-    System.out.print("time, est_x, est_y, est_theta, true_x, true_y, true_theta\n");
+    System.out.print(
+        "time, est_x, est_y, est_theta, true_x, true_y, true_theta, distance_1, distance_2, distance_3, distance_4, angle_1, angle_2, angle_3, angle_4\n");
 
-    final double visionUpdateRate = 0.1;
-    Pose2d lastVisionPose = null;
-    double lastVisionUpdateTime = Double.NEGATIVE_INFINITY;
+    final TreeMap<Double, Pose2d> visionUpdateQueue = new TreeMap<>();
 
     double maxError = Double.NEGATIVE_INFINITY;
     double errorSum = 0;
     while (t <= trajectory.getTotalTimeSeconds()) {
       var groundTruthState = trajectory.sample(t);
 
-      if (lastVisionUpdateTime + visionUpdateRate < t) {
-        if (lastVisionPose != null) {
-          estimator.addVisionMeasurement(lastVisionPose, lastVisionUpdateTime);
-        }
+      // We are due for a new vision measurement if it's been `visionUpdateRate` seconds since the
+      // last vision measurement
+      if (visionUpdateQueue.isEmpty() || visionUpdateQueue.lastKey() + visionUpdateRate < t) {
 
-        lastVisionPose =
+        Pose2d newVisionPose =
             visionMeasurementGenerator
                 .apply(groundTruthState)
                 .plus(
@@ -182,7 +187,14 @@ class SwerveDrivePoseEstimatorTest {
                         new Translation2d(rand.nextGaussian() * 0.1, rand.nextGaussian() * 0.1),
                         new Rotation2d(rand.nextGaussian() * 0.05)));
 
-        lastVisionUpdateTime = t;
+        visionUpdateQueue.put(t, newVisionPose);
+      }
+
+      // We should apply the oldest vision measurement if it has been `visionUpdateDelay` seconds
+      // since it was measured
+      if (visionUpdateQueue.size() > 0 && visionUpdateQueue.firstKey() + visionUpdateDelay < t) {
+        var visionEntry = visionUpdateQueue.pollFirstEntry();
+        estimator.addVisionMeasurement(visionEntry.getValue(), visionEntry.getKey());
       }
 
       var chassisSpeeds = chassisSpeedsGenerator.apply(groundTruthState);
@@ -207,14 +219,22 @@ class SwerveDrivePoseEstimatorTest {
               positions);
 
       System.out.printf(
-          "%f, %f, %f, %f, %f, %f, %f\n",
+          "%f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f\n",
           t,
           xHat.getX(),
           xHat.getY(),
           xHat.getRotation().getRadians(),
           groundTruthState.poseMeters.getX(),
           groundTruthState.poseMeters.getY(),
-          groundTruthState.poseMeters.getRotation().getRadians());
+          groundTruthState.poseMeters.getRotation().getRadians(),
+          positions[0].distanceMeters,
+          positions[1].distanceMeters,
+          positions[2].distanceMeters,
+          positions[3].distanceMeters,
+          positions[0].angle.getRadians(),
+          positions[1].angle.getRadians(),
+          positions[2].angle.getRadians(),
+          positions[3].angle.getRadians());
 
       double error =
           groundTruthState.poseMeters.getTranslation().getDistance(xHat.getTranslation());

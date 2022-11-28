@@ -5,6 +5,7 @@
 #include <limits>
 #include <random>
 #include <utility>
+#include <tuple>
 
 #include "frc/StateSpaceUtil.h"
 #include "frc/estimator/DifferentialDrivePoseEstimator.h"
@@ -26,7 +27,9 @@ void testFollowTrajectory(
     std::function<frc::Pose2d(frc::Trajectory::State&)>
         visionMeasurementGenerator,
     const frc::Pose2d& startingPose, const frc::Pose2d& endingPose,
-    const units::second_t dt, const bool checkError, const bool debug) {
+    const units::second_t dt, const units::second_t kVisionUpdateRate,
+    const units::second_t kVisionUpdateDelay, const bool checkError,
+    const bool debug) {
   units::meter_t leftDistance = 0_m;
   units::meter_t rightDistance = 0_m;
 
@@ -38,11 +41,8 @@ void testFollowTrajectory(
 
   units::second_t t = 0_s;
 
-  units::second_t kVisionUpdateRate = 0.1_s;
-  frc::Pose2d lastVisionPose;
-  units::second_t lastVisionUpdateTime{-std::numeric_limits<double>::max()};
-
   std::vector<std::pair<units::second_t, frc::Pose2d>> visionPoses;
+  std::vector<std::tuple<units::second_t, units::second_t, frc::Pose2d>> visionLog;
 
   double maxError = -std::numeric_limits<double>::max();
   double errorSum = 0;
@@ -56,17 +56,24 @@ void testFollowTrajectory(
   while (t < trajectory.TotalTime()) {
     frc::Trajectory::State groundTruthState = trajectory.Sample(t);
 
-    if (lastVisionUpdateTime + kVisionUpdateRate < t) {
-      if (lastVisionPose != frc::Pose2d{}) {
-        estimator.AddVisionMeasurement(lastVisionPose, lastVisionUpdateTime);
-      }
-      lastVisionPose =
+    // We are due for a new vision measurement if it's been `visionUpdateRate` seconds since the
+    // last vision measurement
+    if (visionPoses.empty() || visionPoses.back().first + kVisionUpdateRate < t) {
+      auto visionPose =
           visionMeasurementGenerator(groundTruthState) +
           frc::Transform2d{frc::Translation2d{distribution(generator) * 0.1_m,
                                               distribution(generator) * 0.1_m},
                            frc::Rotation2d{distribution(generator) * 0.05_rad}};
-      visionPoses.push_back({t, lastVisionPose});
-      lastVisionUpdateTime = t;
+      visionPoses.push_back({t, visionPose});
+    }
+
+    // We should apply the oldest vision measurement if it has been `visionUpdateDelay` seconds
+    // since it was measured
+    if (!visionPoses.empty() && visionPoses.front().first + kVisionUpdateDelay < t) {
+      auto visionEntry = visionPoses.front();
+      estimator.AddVisionMeasurement(visionEntry.second, visionEntry.first);
+      visionPoses.erase(visionPoses.begin());
+      visionLog.push_back({t, visionEntry.first, visionEntry.second});
     }
 
     auto chassisSpeeds = chassisSpeedsGenerator(groundTruthState);
@@ -104,13 +111,16 @@ void testFollowTrajectory(
     t += dt;
   }
 
-  if (debug && false) {
-    fmt::print("time, vision_x, vision_y, vision_theta\n");
+  if (debug) {
+    fmt::print("apply_time, measured_time, vision_x, vision_y, vision_theta\n");
 
-    for (auto pose : visionPoses) {
-      fmt::print("{}, {}, {}, {}\n", pose.first.value(),
-                 pose.second.X().value(), pose.second.Y().value(),
-                 pose.second.Rotation().Radians().value());
+    units::second_t apply_time;
+    units::second_t measure_time;
+    frc::Pose2d vision_pose;
+    for (auto record : visionLog) {
+      
+      std::tie(apply_time, measure_time, vision_pose) = record;
+      fmt::print("{}, {}, {}, {}, {}\n", apply_time.value(), measure_time.value(), vision_pose.X().value(), vision_pose.Y().value(), vision_pose.Rotation().Radians().value());
     }
   }
 
@@ -129,8 +139,10 @@ void testFollowTrajectory(
 }
 
 TEST(DifferentialDrivePoseEstimatorTest, Accuracy) {
+  frc::DifferentialDriveKinematics kinematics{1.0_m};
+
   frc::DifferentialDrivePoseEstimator estimator{
-      frc::Rotation2d{}, 0_m, 0_m, frc::Pose2d{}, {0.02, 0.02, 0.01},
+      kinematics, frc::Rotation2d{}, 0_m, 0_m, frc::Pose2d{}, {0.02, 0.02, 0.01},
       {0.1, 0.1, 0.1}};
 
   frc::Trajectory trajectory = frc::TrajectoryGenerator::GenerateTrajectory(
@@ -140,7 +152,6 @@ TEST(DifferentialDrivePoseEstimatorTest, Accuracy) {
                   frc::Pose2d{0_m, 0_m, 45_deg}},
       frc::TrajectoryConfig(2_mps, 2_mps_sq));
 
-  frc::DifferentialDriveKinematics kinematics{1.0_m};
 
   testFollowTrajectory(
       kinematics, estimator, trajectory,
@@ -150,12 +161,14 @@ TEST(DifferentialDrivePoseEstimatorTest, Accuracy) {
       },
       [&](frc::Trajectory::State& state) { return state.pose; },
       trajectory.InitialPose(), {0_m, 0_m, frc::Rotation2d{45_deg}}, 0.02_s,
-      true, false);
+      0.1_s, 0.25_s, true, false);
 }
 
 TEST(DifferentialDrivePoseEstimatorTest, BadInitialPose) {
+  frc::DifferentialDriveKinematics kinematics{1.0_m};
+
   frc::DifferentialDrivePoseEstimator estimator{
-      frc::Rotation2d{}, 0_m, 0_m, frc::Pose2d{}, {0.02, 0.02, 0.01},
+      kinematics, frc::Rotation2d{}, 0_m, 0_m, frc::Pose2d{}, {0.02, 0.02, 0.01},
       {0.1, 0.1, 0.1}};
 
   frc::Trajectory trajectory = frc::TrajectoryGenerator::GenerateTrajectory(
@@ -164,8 +177,6 @@ TEST(DifferentialDrivePoseEstimatorTest, BadInitialPose) {
                   frc::Pose2d{-3_m, 0_m, -90_deg},
                   frc::Pose2d{0_m, 0_m, 45_deg}},
       frc::TrajectoryConfig(2_mps, 2_mps_sq));
-
-  frc::DifferentialDriveKinematics kinematics{1.0_m};
 
   for (units::degree_t offset_direction_degs = 0_deg;
        offset_direction_degs < 360_deg; offset_direction_degs += 45_deg) {
@@ -187,8 +198,8 @@ TEST(DifferentialDrivePoseEstimatorTest, BadInitialPose) {
                                       state.velocity * state.curvature};
           },
           [&](frc::Trajectory::State& state) { return state.pose; },
-          initial_pose, {0_m, 0_m, frc::Rotation2d{45_deg}}, 0.02_s, false,
-          false);
+          initial_pose, {0_m, 0_m, frc::Rotation2d{45_deg}}, 0.02_s, 0.1_s,
+          0.25_s, false, false);
     }
   }
 }

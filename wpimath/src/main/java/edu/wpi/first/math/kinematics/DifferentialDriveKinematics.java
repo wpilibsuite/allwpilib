@@ -6,6 +6,7 @@ package edu.wpi.first.math.kinematics;
 
 import edu.wpi.first.math.MathSharedStore;
 import edu.wpi.first.math.MathUsageId;
+import edu.wpi.first.math.geometry.Twist2d;
 
 /**
  * Helper class that converts a chassis velocity (dx and dtheta components) to left and right wheel
@@ -56,5 +57,10 @@ public class DifferentialDriveKinematics {
             - trackWidthMeters / 2 * chassisSpeeds.omegaRadiansPerSecond,
         chassisSpeeds.vxMetersPerSecond
             + trackWidthMeters / 2 * chassisSpeeds.omegaRadiansPerSecond);
+  }
+
+  public Twist2d toTwist2d(double leftMeters, double rightMeters) {
+    return new Twist2d(
+        (leftMeters + rightMeters) / 2, 0, (rightMeters - leftMeters) / trackWidthMeters);
   }
 }

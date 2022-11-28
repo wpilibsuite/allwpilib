@@ -4,6 +4,7 @@
 
 #include <limits>
 #include <random>
+#include <tuple>
 
 #include "frc/estimator/MecanumDrivePoseEstimator.h"
 #include "frc/geometry/Pose2d.h"
@@ -20,7 +21,9 @@ void testFollowTrajectory(
     std::function<frc::Pose2d(frc::Trajectory::State&)>
         visionMeasurementGenerator,
     const frc::Pose2d& startingPose, const frc::Pose2d& endingPose,
-    const units::second_t dt, const bool checkError, const bool debug) {
+    const units::second_t dt, const units::second_t kVisionUpdateRate,
+    const units::second_t kVisionUpdateDelay, const bool checkError,
+    const bool debug) {
   frc::MecanumDriveWheelPositions wheelPositions{};
 
   estimator.ResetPosition(frc::Rotation2d{}, wheelPositions, startingPose);
@@ -30,11 +33,8 @@ void testFollowTrajectory(
 
   units::second_t t = 0_s;
 
-  units::second_t kVisionUpdateRate = 0.1_s;
-  frc::Pose2d lastVisionPose;
-  units::second_t lastVisionUpdateTime{-std::numeric_limits<double>::max()};
-
-  std::vector<frc::Pose2d> visionPoses;
+  std::vector<std::pair<units::second_t, frc::Pose2d>> visionPoses;
+  std::vector<std::tuple<units::second_t, units::second_t, frc::Pose2d>> visionLog;
 
   double maxError = -std::numeric_limits<double>::max();
   double errorSum = 0;
@@ -46,17 +46,24 @@ void testFollowTrajectory(
   while (t < trajectory.TotalTime()) {
     frc::Trajectory::State groundTruthState = trajectory.Sample(t);
 
-    if (lastVisionUpdateTime + kVisionUpdateRate < t) {
-      if (lastVisionPose != frc::Pose2d{}) {
-        estimator.AddVisionMeasurement(lastVisionPose, lastVisionUpdateTime);
-      }
-      lastVisionPose =
+    // We are due for a new vision measurement if it's been `visionUpdateRate` seconds since the
+    // last vision measurement
+    if (visionPoses.empty() || visionPoses.back().first + kVisionUpdateRate < t) {
+      auto visionPose =
           visionMeasurementGenerator(groundTruthState) +
           frc::Transform2d{frc::Translation2d{distribution(generator) * 0.1_m,
                                               distribution(generator) * 0.1_m},
                            frc::Rotation2d{distribution(generator) * 0.05_rad}};
-      visionPoses.push_back(lastVisionPose);
-      lastVisionUpdateTime = t;
+      visionPoses.push_back({t, visionPose});
+    }
+
+    // We should apply the oldest vision measurement if it has been `visionUpdateDelay` seconds
+    // since it was measured
+    if (!visionPoses.empty() && visionPoses.front().first + kVisionUpdateDelay < t) {
+      auto visionEntry = visionPoses.front();
+      estimator.AddVisionMeasurement(visionEntry.second, visionEntry.first);
+      visionPoses.erase(visionPoses.begin());
+      visionLog.push_back({t, visionEntry.first, visionEntry.second});
     }
 
     auto chassisSpeeds = chassisSpeedsGenerator(groundTruthState);
@@ -93,6 +100,19 @@ void testFollowTrajectory(
     errorSum += error;
 
     t += dt;
+  }
+
+  if (debug) {
+    fmt::print("apply_time, measured_time, vision_x, vision_y, vision_theta\n");
+
+    units::second_t apply_time;
+    units::second_t measure_time;
+    frc::Pose2d vision_pose;
+    for (auto record : visionLog) {
+      
+      std::tie(apply_time, measure_time, vision_pose) = record;
+      fmt::print("{}, {}, {}, {}, {}\n", apply_time.value(), measure_time.value(), vision_pose.X().value(), vision_pose.Y().value(), vision_pose.Rotation().Radians().value());
+    }
   }
 
   EXPECT_NEAR(endingPose.X().value(),
@@ -135,7 +155,7 @@ TEST(MecanumDrivePoseEstimatorTest, AccuracyFacingTrajectory) {
       },
       [&](frc::Trajectory::State& state) { return state.pose; },
       trajectory.InitialPose(), {0_m, 0_m, frc::Rotation2d{45_deg}}, 0.02_s,
-      true, false);
+      0.1_s, 0.25_s, true, false);
 }
 
 TEST(MecanumDrivePoseEstimatorTest, BadInitialPose) {
@@ -176,8 +196,8 @@ TEST(MecanumDrivePoseEstimatorTest, BadInitialPose) {
                                       state.velocity * state.curvature};
           },
           [&](frc::Trajectory::State& state) { return state.pose; },
-          initial_pose, {0_m, 0_m, frc::Rotation2d{45_deg}}, 0.02_s, false,
-          false);
+          initial_pose, {0_m, 0_m, frc::Rotation2d{45_deg}}, 0.02_s, 0.1_s,
+          0.25_s, false, false);
     }
   }
 }

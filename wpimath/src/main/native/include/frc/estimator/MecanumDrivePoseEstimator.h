@@ -66,7 +66,7 @@ class WPILIB_DLLEXPORT MecanumDrivePoseEstimator {
    *                                 radians.
    */
   MecanumDrivePoseEstimator(
-      const MecanumDriveKinematics& kinematics, const Rotation2d& gyroAngle,
+      MecanumDriveKinematics& kinematics, const Rotation2d& gyroAngle,
       const MecanumDriveWheelPositions& wheelPositions,
       const Pose2d& initialPose, const wpi::array<double, 3>& stateStdDevs,
       const wpi::array<double, 3>& visionMeasurementStdDevs);
@@ -199,13 +199,46 @@ class WPILIB_DLLEXPORT MecanumDrivePoseEstimator {
                         const MecanumDriveWheelPositions& wheelPositions);
 
  private:
+  struct InterpolationRecord {
+    Pose2d pose;
+    Rotation2d gyroAngle;
+    MecanumDriveWheelPositions wheelPositions;
+
+    /**
+     * Checks equality between this InterpolationRecord and another object.
+     *
+     * @param other The other object.
+     * @return Whether the two objects are equal.
+     */
+    bool operator==(const InterpolationRecord& other) const = default;
+
+    /**
+     * Checks inequality between this InterpolationRecord and another object.
+     *
+     * @param other The other object.
+     * @return Whether the two objects are not equal.
+     */
+    bool operator!=(const InterpolationRecord& other) const = default;
+
+    /**
+     * Interpolates between two InterpolationRecords.
+     *
+     * @param endValue The end value for the interpolation.
+     * @param i The interpolant (fraction).
+     *
+     * @return The interpolated state.
+     */
+    InterpolationRecord Interpolate(MecanumDriveKinematics &kinematics, InterpolationRecord endValue, double i) const;
+  };
+
+  MecanumDriveKinematics &m_kinematics;
   MecanumDriveOdometry m_odometry;
-  Rotation2d m_prevGyroAngle;
-  MecanumDriveWheelPositions m_prevWheelPositions;
   wpi::array<double, 3> m_q{wpi::empty_array};
   Eigen::Matrix3d m_visionK = Eigen::Matrix3d::Zero();
 
-  TimeInterpolatableBuffer<Pose2d> m_poseBuffer{1.5_s};
+  TimeInterpolatableBuffer<InterpolationRecord> m_poseBuffer{1.5_s, [this](const InterpolationRecord &start, const InterpolationRecord &end, double t) {
+    return start.Interpolate(this->m_kinematics, end, t);
+  }};
 };
 
 }  // namespace frc

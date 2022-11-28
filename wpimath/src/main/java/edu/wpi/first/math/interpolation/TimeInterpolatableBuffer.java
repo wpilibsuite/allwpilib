@@ -134,6 +134,11 @@ public final class TimeInterpolatableBuffer<T> {
     }
   }
 
+  // Unsafe! DO NOT USE THIS UNLESS YOU KNOW WHAT YOU ARE DOING
+  public NavigableMap<Double, T> getInternalMap() {
+    return m_pastSnapshots;
+  }
+
   public interface InterpolateFunction<T> {
     /**
      * Return the interpolated value. This object is assumed to be the starting position, or lower

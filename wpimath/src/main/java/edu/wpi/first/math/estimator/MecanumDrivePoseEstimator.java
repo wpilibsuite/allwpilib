@@ -4,12 +4,14 @@
 
 package edu.wpi.first.math.estimator;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.Nat;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Twist2d;
+import edu.wpi.first.math.interpolation.Interpolatable;
 import edu.wpi.first.math.interpolation.TimeInterpolatableBuffer;
 import edu.wpi.first.math.kinematics.MecanumDriveKinematics;
 import edu.wpi.first.math.kinematics.MecanumDriveOdometry;
@@ -17,6 +19,7 @@ import edu.wpi.first.math.kinematics.MecanumDriveWheelPositions;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.util.WPIUtilJNI;
+import java.util.Map;
 
 /**
  * This class wraps {@link MecanumDriveOdometry Mecanum Drive Odometry} to fuse latency-compensated
@@ -39,14 +42,65 @@ import edu.wpi.first.util.WPIUtilJNI;
  * heading.
  */
 public class MecanumDrivePoseEstimator {
+  private final MecanumDriveKinematics m_kinematics;
   private final MecanumDriveOdometry m_odometry;
-  private Rotation2d m_previousGyroAngle;
   private final Matrix<N3, N1> m_q = new Matrix<>(Nat.N3(), Nat.N1());
-  private final MecanumDriveWheelPositions m_prevWheelPositions;
   private Matrix<N3, N3> m_visionK = new Matrix<>(Nat.N3(), Nat.N3());
 
-  private final TimeInterpolatableBuffer<Pose2d> m_poseBuffer =
+  private final TimeInterpolatableBuffer<InterpolationRecord> m_poseBuffer =
       TimeInterpolatableBuffer.createBuffer(1.5);
+
+  private class InterpolationRecord implements Interpolatable<InterpolationRecord> {
+    private Pose2d pose;
+    private Rotation2d gyroAngle;
+    private MecanumDriveWheelPositions wheelPositions;
+
+    private InterpolationRecord(
+        Pose2d pose, Rotation2d gyro, MecanumDriveWheelPositions wheelPositions) {
+      this.pose = pose;
+      this.gyroAngle = gyro;
+      this.wheelPositions = wheelPositions;
+    }
+
+    @Override
+    public InterpolationRecord interpolate(InterpolationRecord endValue, double t) {
+      if (t < 0) {
+        return this;
+      } else if (t >= 1) {
+        return endValue;
+      } else {
+        var wheels_lerp =
+            new MecanumDriveWheelPositions(
+                MathUtil.interpolate(
+                    this.wheelPositions.frontLeftMeters,
+                    endValue.wheelPositions.frontLeftMeters,
+                    t),
+                MathUtil.interpolate(
+                    this.wheelPositions.frontRightMeters,
+                    endValue.wheelPositions.frontRightMeters,
+                    t),
+                MathUtil.interpolate(
+                    this.wheelPositions.rearLeftMeters, endValue.wheelPositions.rearLeftMeters, t),
+                MathUtil.interpolate(
+                    this.wheelPositions.rearRightMeters,
+                    endValue.wheelPositions.rearRightMeters,
+                    t));
+        var wheels_delta =
+            new MecanumDriveWheelPositions(
+                wheels_lerp.frontLeftMeters - this.wheelPositions.frontLeftMeters,
+                wheels_lerp.frontRightMeters - this.wheelPositions.frontRightMeters,
+                wheels_lerp.rearLeftMeters - this.wheelPositions.rearLeftMeters,
+                wheels_lerp.rearRightMeters - this.wheelPositions.rearRightMeters);
+
+        var gyro_lerp = gyroAngle.interpolate(endValue.gyroAngle, t);
+
+        Twist2d twist = m_kinematics.toTwist2d(wheels_delta);
+        twist.dtheta = gyro_lerp.minus(gyroAngle).getRadians();
+
+        return new InterpolationRecord(pose.exp(twist), gyro_lerp, wheels_lerp);
+      }
+    }
+  }
 
   /**
    * Constructs a MecanumDrivePoseEstimator.
@@ -69,19 +123,12 @@ public class MecanumDrivePoseEstimator {
       Pose2d initialPoseMeters,
       Matrix<N3, N1> stateStdDevs,
       Matrix<N3, N1> visionMeasurementStdDevs) {
+    m_kinematics = kinematics;
     m_odometry = new MecanumDriveOdometry(kinematics, gyroAngle, wheelPositions, initialPoseMeters);
-    m_previousGyroAngle = gyroAngle;
 
     for (int i = 0; i < 3; ++i) {
       m_q.set(i, 0, stateStdDevs.get(i, 0) * stateStdDevs.get(i, 0));
     }
-
-    m_prevWheelPositions =
-        new MecanumDriveWheelPositions(
-            wheelPositions.frontLeftMeters,
-            wheelPositions.frontRightMeters,
-            wheelPositions.rearLeftMeters,
-            wheelPositions.rearRightMeters);
 
     // Initialize vision R
     setVisionMeasurementStdDevs(visionMeasurementStdDevs);
@@ -129,12 +176,6 @@ public class MecanumDrivePoseEstimator {
     // Reset state estimate and error covariance
     m_odometry.resetPosition(gyroAngle, wheelPositions, poseMeters);
     m_poseBuffer.clear();
-
-    m_previousGyroAngle = gyroAngle;
-    m_prevWheelPositions.frontLeftMeters = wheelPositions.frontLeftMeters;
-    m_prevWheelPositions.frontRightMeters = wheelPositions.frontRightMeters;
-    m_prevWheelPositions.rearLeftMeters = wheelPositions.rearLeftMeters;
-    m_prevWheelPositions.rearRightMeters = wheelPositions.rearRightMeters;
   }
 
   /**
@@ -173,7 +214,7 @@ public class MecanumDrivePoseEstimator {
     }
 
     // Step 2: Measure the twist between the odometry pose and the vision pose
-    var twist = sample.get().log(visionRobotPoseMeters);
+    var twist = sample.get().pose.log(visionRobotPoseMeters);
 
     // Step 3: We should not trust the twist entirely, so instead we scale this twist by a Kalman
     // gain matrix representing how much we trust vision measurements compared to our current pose.
@@ -183,11 +224,14 @@ public class MecanumDrivePoseEstimator {
     var scaledTwist =
         new Twist2d(k_times_twist.get(0, 0), k_times_twist.get(1, 0), k_times_twist.get(2, 0));
 
-    // Step 5: Apply scaled twist to the latest pose
-    var estimatedPose = getEstimatedPosition().exp(scaledTwist);
+    m_odometry.resetPosition(
+        sample.get().gyroAngle, sample.get().wheelPositions, sample.get().pose.exp(scaledTwist));
 
-    // Step 6: Apply new pose to odometry
-    m_odometry.resetPosition(m_previousGyroAngle, m_prevWheelPositions, estimatedPose);
+    for (Map.Entry<Double, InterpolationRecord> entry :
+        m_poseBuffer.getInternalMap().tailMap(timestampSeconds).entrySet()) {
+
+      updateWithTime(entry.getKey(), entry.getValue().gyroAngle, entry.getValue().wheelPositions);
+    }
   }
 
   /**
@@ -246,14 +290,18 @@ public class MecanumDrivePoseEstimator {
    */
   public Pose2d updateWithTime(
       double currentTimeSeconds, Rotation2d gyroAngle, MecanumDriveWheelPositions wheelPositions) {
-    m_poseBuffer.addSample(currentTimeSeconds, getEstimatedPosition());
     m_odometry.update(gyroAngle, wheelPositions);
 
-    m_previousGyroAngle = gyroAngle;
-    m_prevWheelPositions.frontLeftMeters = wheelPositions.frontLeftMeters;
-    m_prevWheelPositions.frontRightMeters = wheelPositions.frontRightMeters;
-    m_prevWheelPositions.rearLeftMeters = wheelPositions.rearLeftMeters;
-    m_prevWheelPositions.rearRightMeters = wheelPositions.rearRightMeters;
+    m_poseBuffer.addSample(
+        currentTimeSeconds,
+        new InterpolationRecord(
+            getEstimatedPosition(),
+            gyroAngle,
+            new MecanumDriveWheelPositions(
+                wheelPositions.frontLeftMeters,
+                wheelPositions.frontRightMeters,
+                wheelPositions.rearLeftMeters,
+                wheelPositions.rearRightMeters)));
 
     return getEstimatedPosition();
   }

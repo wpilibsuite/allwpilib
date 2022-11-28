@@ -4,12 +4,14 @@
 
 package edu.wpi.first.math.estimator;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.Nat;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Twist2d;
+import edu.wpi.first.math.interpolation.Interpolatable;
 import edu.wpi.first.math.interpolation.TimeInterpolatableBuffer;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
@@ -17,6 +19,7 @@ import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.util.WPIUtilJNI;
+import java.util.Map;
 
 /**
  * This class wraps {@link SwerveDriveOdometry Swerve Drive Odometry} to fuse latency-compensated
@@ -37,15 +40,59 @@ import edu.wpi.first.util.WPIUtilJNI;
  * heading.
  */
 public class SwerveDrivePoseEstimator {
+  private final SwerveDriveKinematics m_kinematics;
   private final SwerveDriveOdometry m_odometry;
-  private Rotation2d m_previousGyroAngle;
   private final Matrix<N3, N1> m_q = new Matrix<>(Nat.N3(), Nat.N1());
-  private SwerveModulePosition[] m_prevModulePositions;
   private final int m_numModules;
   private Matrix<N3, N3> m_visionK = new Matrix<>(Nat.N3(), Nat.N3());
 
-  private final TimeInterpolatableBuffer<Pose2d> m_poseBuffer =
+  private final TimeInterpolatableBuffer<InterpolationRecord> m_poseBuffer =
       TimeInterpolatableBuffer.createBuffer(1.5);
+
+  private class InterpolationRecord implements Interpolatable<InterpolationRecord> {
+    private Pose2d pose;
+    private Rotation2d gyroAngle;
+    private SwerveModulePosition[] wheelPositions;
+
+    private InterpolationRecord(
+        Pose2d pose, Rotation2d gyro, SwerveModulePosition[] wheelPositions) {
+      this.pose = pose;
+      this.gyroAngle = gyro;
+      this.wheelPositions = wheelPositions;
+    }
+
+    @Override
+    public InterpolationRecord interpolate(InterpolationRecord endValue, double t) {
+      if (t < 0) {
+        return this;
+      } else if (t >= 1) {
+        return endValue;
+      } else {
+        var wheelPositions = new SwerveModulePosition[m_numModules];
+        var wheelDeltas = new SwerveModulePosition[m_numModules];
+
+        for (int i = 0; i < m_numModules; i++) {
+          double ds =
+              MathUtil.interpolate(
+                  this.wheelPositions[i].distanceMeters,
+                  endValue.wheelPositions[i].distanceMeters,
+                  t);
+          Rotation2d theta =
+              this.wheelPositions[i].angle.interpolate(endValue.wheelPositions[i].angle, t);
+          wheelPositions[i] = new SwerveModulePosition(ds, theta);
+          wheelDeltas[i] =
+              new SwerveModulePosition(ds - this.wheelPositions[i].distanceMeters, theta);
+        }
+
+        var gyro_lerp = gyroAngle.interpolate(endValue.gyroAngle, t);
+
+        Twist2d twist = m_kinematics.toTwist2d(wheelDeltas);
+        twist.dtheta = gyro_lerp.minus(gyroAngle).getRadians();
+
+        return new InterpolationRecord(pose.exp(twist), gyro_lerp, wheelPositions);
+      }
+    }
+  }
 
   /**
    * Constructs a SwerveDrivePoseEstimator.
@@ -68,18 +115,14 @@ public class SwerveDrivePoseEstimator {
       Pose2d initialPoseMeters,
       Matrix<N3, N1> stateStdDevs,
       Matrix<N3, N1> visionMeasurementStdDevs) {
+    m_kinematics = kinematics;
     m_odometry = new SwerveDriveOdometry(kinematics, gyroAngle, modulePositions, initialPoseMeters);
-    m_previousGyroAngle = gyroAngle;
 
     for (int i = 0; i < 3; ++i) {
       m_q.set(i, 0, stateStdDevs.get(i, 0) * stateStdDevs.get(i, 0));
     }
 
     m_numModules = modulePositions.length;
-    m_prevModulePositions = new SwerveModulePosition[m_numModules];
-    for (int i = 0; i < m_numModules; ++i) {
-      m_prevModulePositions[i] = new SwerveModulePosition(modulePositions[i].distanceMeters, null);
-    }
 
     setVisionMeasurementStdDevs(visionMeasurementStdDevs);
   }
@@ -126,11 +169,6 @@ public class SwerveDrivePoseEstimator {
     // Reset state estimate and error covariance
     m_odometry.resetPosition(gyroAngle, modulePositions, poseMeters);
     m_poseBuffer.clear();
-
-    m_previousGyroAngle = gyroAngle;
-    for (int i = 0; i < m_numModules; i++) {
-      m_prevModulePositions[i] = new SwerveModulePosition(modulePositions[i].distanceMeters, null);
-    }
   }
 
   /**
@@ -169,7 +207,7 @@ public class SwerveDrivePoseEstimator {
     }
 
     // Step 2: Measure the twist between the odometry pose and the vision pose
-    var twist = sample.get().log(visionRobotPoseMeters);
+    var twist = sample.get().pose.log(visionRobotPoseMeters);
 
     // Step 3: We should not trust the twist entirely, so instead we scale this twist by a Kalman
     // gain matrix representing how much we trust vision measurements compared to our current pose.
@@ -179,11 +217,15 @@ public class SwerveDrivePoseEstimator {
     var scaledTwist =
         new Twist2d(k_times_twist.get(0, 0), k_times_twist.get(1, 0), k_times_twist.get(2, 0));
 
-    // Step 5: Apply scaled twist to the latest pose
-    var estimatedPose = getEstimatedPosition().exp(scaledTwist);
-
     // Step 6: Apply new pose to odometry
-    m_odometry.resetPosition(m_previousGyroAngle, m_prevModulePositions, estimatedPose);
+    m_odometry.resetPosition(
+        sample.get().gyroAngle, sample.get().wheelPositions, sample.get().pose.exp(scaledTwist));
+
+    for (Map.Entry<Double, InterpolationRecord> entry :
+        m_poseBuffer.getInternalMap().tailMap(timestampSeconds).entrySet()) {
+
+      updateWithTime(entry.getKey(), entry.getValue().gyroAngle, entry.getValue().wheelPositions);
+    }
   }
 
   /**
@@ -248,13 +290,18 @@ public class SwerveDrivePoseEstimator {
               + "constructor");
     }
 
-    m_poseBuffer.addSample(currentTimeSeconds, getEstimatedPosition());
-    m_odometry.update(gyroAngle, modulePositions);
+    var internalModulePositions = new SwerveModulePosition[m_numModules];
 
-    m_previousGyroAngle = gyroAngle;
     for (int i = 0; i < m_numModules; i++) {
-      m_prevModulePositions[i] = new SwerveModulePosition(modulePositions[i].distanceMeters, null);
+      internalModulePositions[i] =
+          new SwerveModulePosition(modulePositions[i].distanceMeters, modulePositions[i].angle);
     }
+
+    m_odometry.update(gyroAngle, internalModulePositions);
+
+    m_poseBuffer.addSample(
+        currentTimeSeconds,
+        new InterpolationRecord(getEstimatedPosition(), gyroAngle, internalModulePositions));
 
     return getEstimatedPosition();
   }

@@ -71,14 +71,10 @@ class SwerveDrivePoseEstimator {
       const wpi::array<SwerveModulePosition, NumModules>& modulePositions,
       const Pose2d& initialPose, const wpi::array<double, 3>& stateStdDevs,
       const wpi::array<double, 3>& visionMeasurementStdDevs)
-      : m_odometry{kinematics, gyroAngle, modulePositions, initialPose},
-        m_previousGyroAngle{gyroAngle} {
+      : m_kinematics{kinematics},
+        m_odometry{kinematics, gyroAngle, modulePositions, initialPose} {
     for (size_t i = 0; i < 3; ++i) {
       m_q[i] = stateStdDevs[i] * stateStdDevs[i];
-    }
-    for (size_t i = 0; i < NumModules; ++i) {
-      m_prevModulePositions[i] = {modulePositions[i].distance,
-                                  modulePositions[i].angle};
     }
 
     SetVisionMeasurementStdDevs(visionMeasurementStdDevs);
@@ -102,11 +98,6 @@ class SwerveDrivePoseEstimator {
     // Reset state estimate and error covariance
     m_odometry.ResetPosition(gyroAngle, modulePositions, pose);
     m_poseBuffer.Clear();
-
-    m_previousGyroAngle = gyroAngle;
-    for (size_t i = 0; i < NumModules; i++) {
-      m_prevModulePositions[i].distance = modulePositions[i].distance;
-    }
   }
 
   /**
@@ -179,7 +170,7 @@ class SwerveDrivePoseEstimator {
     }
 
     // Step 2: Measure the twist between the odometry pose and the vision pose
-    auto twist = sample.value().Log(visionRobotPose);
+    auto twist = sample.value().pose.Log(visionRobotPose);
 
     // Step 3: We should not trust the twist entirely, so instead we scale this
     // twist by a Kalman gain matrix representing how much we trust vision
@@ -193,12 +184,23 @@ class SwerveDrivePoseEstimator {
                         units::meter_t{k_times_twist(1)},
                         units::radian_t{k_times_twist(2)}};
 
-    // Step 5: Apply scaled twist to the latest pose
-    auto estimatedPose = GetEstimatedPosition().Exp(scaledTwist);
-
     // Step 6: Apply new pose to odometry
-    m_odometry.ResetPosition(m_previousGyroAngle, m_prevModulePositions,
-                             estimatedPose);
+    m_odometry.ResetPosition(sample.value().gyroAngle, sample.value().modulePostions,
+                            sample.value().pose.Exp(scaledTwist));
+
+    auto internal_buf = m_poseBuffer.GetInternalStructure();
+
+    auto upper_bound = std::lower_bound(
+      internal_buf.begin(), internal_buf.end(), timestamp,
+      [](const auto& pair, auto t) { return t > pair.first; });
+
+    for(auto entry = upper_bound; entry != internal_buf.end(); entry++) {
+      UpdateWithTime(
+        entry->first,
+        entry->second.gyroAngle,
+        entry->second.modulePostions
+      );
+    }
   }
 
   /**
@@ -272,26 +274,86 @@ class SwerveDrivePoseEstimator {
   Pose2d UpdateWithTime(
       units::second_t currentTime, const Rotation2d& gyroAngle,
       const wpi::array<SwerveModulePosition, NumModules>& modulePositions) {
-    m_poseBuffer.AddSample(currentTime, GetEstimatedPosition());
     m_odometry.Update(gyroAngle, modulePositions);
 
-    m_previousGyroAngle = gyroAngle;
+    wpi::array<SwerveModulePosition, NumModules> internalModulePositions{wpi::empty_array};
+
     for (size_t i = 0; i < NumModules; i++) {
-      m_prevModulePositions[i].distance = modulePositions[i].distance;
+      internalModulePositions[i].distance = modulePositions[i].distance;
+      internalModulePositions[i].angle = modulePositions[i].angle;
     }
+
+    m_poseBuffer.AddSample(currentTime, {GetEstimatedPosition(), gyroAngle, internalModulePositions});
 
     return GetEstimatedPosition();
   }
 
  private:
+  struct InterpolationRecord {
+    Pose2d pose;
+    Rotation2d gyroAngle;
+    wpi::array<SwerveModulePosition, NumModules> modulePostions;
+
+    /**
+     * Checks equality between this InterpolationRecord and another object.
+     *
+     * @param other The other object.
+     * @return Whether the two objects are equal.
+     */
+    bool operator==(const InterpolationRecord& other) const = default;
+
+    /**
+     * Checks inequality between this InterpolationRecord and another object.
+     *
+     * @param other The other object.
+     * @return Whether the two objects are not equal.
+     */
+    bool operator!=(const InterpolationRecord& other) const = default;
+
+    /**
+     * Interpolates between two InterpolationRecords.
+     *
+     * @param endValue The end value for the interpolation.
+     * @param i The interpolant (fraction).
+     *
+     * @return The interpolated state.
+     */
+    InterpolationRecord Interpolate(SwerveDriveKinematics<NumModules> &kinematics, InterpolationRecord endValue, double i) const {
+      if (i < 0) {
+        return *this;
+      } else if (i > 1) {
+        return endValue;
+      } else {
+        wpi::array<SwerveModulePosition, NumModules> wheels_lerp{wpi::empty_array};
+        wpi::array<SwerveModulePosition, NumModules> wheels_delta{wpi::empty_array};
+
+
+        for (size_t i = 0; i < NumModules; i++) {
+          wheels_lerp[i].distance = wpi::Lerp(modulePostions[i].distance, endValue.modulePostions[i].distance, i);
+          wheels_lerp[i].angle = wpi::Lerp(modulePostions[i].angle, endValue.modulePostions[i].angle, i);
+
+          wheels_delta[i].distance = wpi::Lerp(modulePostions[i].distance, endValue.modulePostions[i].distance, i) - modulePostions[i].distance;
+          wheels_delta[i].angle = wpi::Lerp(modulePostions[i].angle, endValue.modulePostions[i].angle, i);
+        }
+
+        auto gyro = wpi::Lerp(this->gyroAngle, endValue.gyroAngle, i);
+
+        auto twist = kinematics.ToTwist2d(wheels_delta);
+        twist.dtheta = (gyro - gyroAngle).Radians();
+
+        return {pose.Exp(twist), gyro, wheels_lerp}; 
+      }
+    };
+  };
+
+  SwerveDriveKinematics<NumModules> &m_kinematics;
   SwerveDriveOdometry<NumModules> m_odometry;
-  Rotation2d m_previousGyroAngle;
   wpi::array<double, 3> m_q{wpi::empty_array};
-  wpi::array<SwerveModulePosition, NumModules> m_prevModulePositions{
-      wpi::empty_array};
   Eigen::Matrix3d m_visionK = Eigen::Matrix3d::Zero();
 
-  TimeInterpolatableBuffer<Pose2d> m_poseBuffer{1.5_s};
+  TimeInterpolatableBuffer<InterpolationRecord> m_poseBuffer{1.5_s, [this](const InterpolationRecord &start, const InterpolationRecord &end, double t) {
+    return start.Interpolate(this->m_kinematics, end, t);
+  }};
 };
 
 extern template class EXPORT_TEMPLATE_DECLARE(WPILIB_DLLEXPORT)
