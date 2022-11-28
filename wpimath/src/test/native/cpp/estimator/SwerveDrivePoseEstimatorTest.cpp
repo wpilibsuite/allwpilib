@@ -132,8 +132,8 @@ void testFollowTrajectory(
               0.15);
 
   if (checkError) {
-    EXPECT_LT(errorSum / (trajectory.TotalTime() / dt), 0.05);
-    EXPECT_LT(maxError, 0.125);
+    EXPECT_LT(errorSum / (trajectory.TotalTime() / dt), 0.058);
+    EXPECT_LT(maxError, 0.13);
   }
 }
 
@@ -149,7 +149,7 @@ TEST(SwerveDrivePoseEstimatorTest, AccuracyFacingTrajectory) {
 
   frc::SwerveDrivePoseEstimator<4> estimator{
       kinematics,    frc::Rotation2d{}, {fl, fr, bl, br},
-      frc::Pose2d{}, {0.1, 0.1, 0.1},   {0.9, 0.9, 0.9}};
+      frc::Pose2d{}, {0.1, 0.1, 0.1},   {0.45, 0.45, 0.45}};
 
   frc::Trajectory trajectory = frc::TrajectoryGenerator::GenerateTrajectory(
       std::vector{frc::Pose2d{0_m, 0_m, 45_deg}, frc::Pose2d{3_m, 0_m, -90_deg},

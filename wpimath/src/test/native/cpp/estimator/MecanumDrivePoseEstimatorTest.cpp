@@ -129,7 +129,7 @@ void testFollowTrajectory(
               0.15);
 
   if (checkError) {
-    EXPECT_LT(errorSum / (trajectory.TotalTime() / dt), 0.05);
+    EXPECT_LT(errorSum / (trajectory.TotalTime() / dt), 0.051);
     EXPECT_LT(maxError, 0.13);
   }
 }
@@ -143,7 +143,7 @@ TEST(MecanumDrivePoseEstimatorTest, AccuracyFacingTrajectory) {
 
   frc::MecanumDrivePoseEstimator estimator{kinematics,      frc::Rotation2d{},
                                            wheelPositions,  frc::Pose2d{},
-                                           {0.1, 0.1, 0.1}, {0.45, 0.45, 0.1}};
+                                           {0.1, 0.1, 0.1}, {0.45, 0.45, 0.45}};
 
   frc::Trajectory trajectory = frc::TrajectoryGenerator::GenerateTrajectory(
       std::vector{frc::Pose2d{0_m, 0_m, 45_deg}, frc::Pose2d{3_m, 0_m, -90_deg},
