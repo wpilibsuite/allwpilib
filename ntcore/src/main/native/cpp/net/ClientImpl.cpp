@@ -43,7 +43,6 @@ struct PublisherData {
   // 10 ms
   uint32_t periodMs;
   uint64_t nextSendMs{0};
-  Value lastValue;               // only used for duplicate value checking
   std::vector<Value> outValues;  // outgoing values
 };
 
@@ -355,12 +354,6 @@ void CImpl::SetValue(NT_Publisher pubHandle, const Value& value) {
     return;
   }
   auto& publisher = *m_publishers[index];
-  if (!publisher.options.keepDuplicates) {
-    if (value == publisher.lastValue) {
-      return;
-    }
-    publisher.lastValue = value;
-  }
   if (publisher.outValues.empty() || publisher.options.sendAll) {
     publisher.outValues.emplace_back(value);
   } else {
@@ -476,7 +469,6 @@ void ClientStartup::SetValue(NT_Publisher pubHandle, const Value& value) {
   assert(index < m_client.m_impl->m_publishers.size() &&
          m_client.m_impl->m_publishers[index]);
   auto& publisher = *m_client.m_impl->m_publishers[index];
-  publisher.lastValue = value;
   // only send time 0 values until we have a RTT
   if (value.server_time() == 0) {
     WireEncodeBinary(m_binaryWriter.Add(), index, 0, value);
