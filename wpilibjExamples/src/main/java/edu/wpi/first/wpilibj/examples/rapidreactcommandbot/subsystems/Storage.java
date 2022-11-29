@@ -8,7 +8,7 @@ import static edu.wpi.first.wpilibj.examples.rapidreactcommandbot.Constants.Stor
 
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.motorcontrol.PWMSparkMax;
-import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Storage extends SubsystemBase {
@@ -27,7 +27,7 @@ public class Storage extends SubsystemBase {
   }
 
   /** Returns a command that runs the storage motor indefinitely. */
-  public Command runCommand() {
+  public CommandBase runCommand() {
     return run(() -> m_motor.set(1)).withName("run");
   }
 }

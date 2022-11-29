@@ -9,7 +9,7 @@ import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.examples.rapidreactcommandbot.Constants.DriveConstants;
 import edu.wpi.first.wpilibj.motorcontrol.MotorControllerGroup;
 import edu.wpi.first.wpilibj.motorcontrol.PWMSparkMax;
-import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import java.util.function.DoubleSupplier;
 
@@ -61,7 +61,7 @@ public class Drive extends SubsystemBase {
    * @param fwd the commanded forward movement
    * @param rot the commanded rotation
    */
-  public Command arcadeDriveCommand(DoubleSupplier fwd, DoubleSupplier rot) {
+  public CommandBase arcadeDriveCommand(DoubleSupplier fwd, DoubleSupplier rot) {
     // A split-stick arcade command, with forward/backward controlled by the left
     // hand, and turning controlled by the right.
     return run(() -> m_drive.arcadeDrive(fwd.getAsDouble(), rot.getAsDouble()))
@@ -74,7 +74,7 @@ public class Drive extends SubsystemBase {
    * @param distanceMeters The distance to drive forward in meters
    * @param speed The fraction of max speed at which to drive
    */
-  public Command driveDistanceCommand(double distanceMeters, double speed) {
+  public CommandBase driveDistanceCommand(double distanceMeters, double speed) {
     return runOnce(
             () -> {
               // Reset encoders at the start of the command
