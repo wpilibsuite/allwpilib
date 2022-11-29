@@ -114,6 +114,7 @@ NetworkTablesModel::NetworkTablesModel(nt::NetworkTableInstance inst)
   m_poller.AddListener({{"", "$"}}, nt::EventFlags::kTopic |
                                         nt::EventFlags::kValueAll |
                                         nt::EventFlags::kImmediate);
+  m_poller.AddConnectionListener(false);  // we only track disconnects
 }
 
 NetworkTablesModel::Entry::~Entry() {
@@ -432,6 +433,27 @@ void NetworkTablesModel::Update() {
         }
       }
       if (event.flags & nt::EventFlags::kUnpublish) {
+        // meta topic handling
+        if (wpi::starts_with(info->name, '$') && info->type_str == "msgpack") {
+          // meta topic handling
+          if (info->name == "$clients") {
+            m_clients.clear();
+          } else if (info->name == "$serverpub") {
+            m_server.publishers.clear();
+          } else if (info->name == "$serversub") {
+            m_server.subscribers.clear();
+          } else if (wpi::starts_with(info->name, "$clientpub$")) {
+            auto it = m_clients.find(wpi::drop_front(info->name, 11));
+            if (it != m_clients.end()) {
+              it->second.publishers.clear();
+            }
+          } else if (wpi::starts_with(info->name, "$clientsub$")) {
+            auto it = m_clients.find(wpi::drop_front(info->name, 11));
+            if (it != m_clients.end()) {
+              it->second.subscribers.clear();
+            }
+          }
+        }
         auto it = std::find(m_sortedEntries.begin(), m_sortedEntries.end(),
                             entry.get());
         // will be removed completely below
@@ -475,6 +497,12 @@ void NetworkTablesModel::Update() {
           }
         }
       }
+    } else if (event.Is(nt::EventFlags::kDisconnected) &&
+               m_inst.GetNetworkMode() != NT_NET_MODE_SERVER) {
+      // clear meta topic generated info on disconnect
+      m_clients.clear();
+      m_server.publishers.clear();
+      m_server.subscribers.clear();
     }
   }
 
