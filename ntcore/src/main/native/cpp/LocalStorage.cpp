@@ -77,7 +77,7 @@ struct TopicData {
   std::string name;
 
   Value lastValue;  // also stores timestamp
-  bool lastValueNetwork{false};
+  Value lastValueNetwork;
   NT_Type type{NT_UNASSIGNED};
   std::string typeStr;
   unsigned int flags{0};            // for NT3 APIs
@@ -461,7 +461,7 @@ void LSImpl::CheckReset(TopicData* topic) {
     return;
   }
   topic->lastValue = {};
-  topic->lastValueNetwork = false;
+  topic->lastValueNetwork = {};
   topic->type = NT_UNASSIGNED;
   topic->typeStr.clear();
   topic->flags = 0;
@@ -471,16 +471,15 @@ void LSImpl::CheckReset(TopicData* topic) {
 
 bool LSImpl::SetValue(TopicData* topic, const Value& value,
                       unsigned int eventFlags, bool isDuplicate) {
+  DEBUG4("SetValue({}, {}, {}, {})", topic->name, value.time(), eventFlags,
+         isDuplicate);
   if (topic->type != NT_UNASSIGNED && topic->type != value.type()) {
     return false;
   }
-  bool isNetwork = (eventFlags & NT_EVENT_VALUE_REMOTE) != 0;
-  if (!topic->lastValue || topic->lastValueNetwork == isNetwork ||
-      value.time() >= topic->lastValue.time()) {
+  if (!topic->lastValue || value.time() >= topic->lastValue.time()) {
     // TODO: notify option even if older value
     topic->type = value.type();
     topic->lastValue = value;
-    topic->lastValueNetwork = isNetwork;
     NotifyValue(topic, eventFlags, isDuplicate);
   }
   if (!isDuplicate && topic->datalogType == value.type()) {
@@ -1218,13 +1217,16 @@ bool LSImpl::PublishLocalValue(PublisherData* publisher, const Value& value,
     return false;
   }
   if (publisher->active) {
-    bool isDuplicate;
+    bool isDuplicate, isNetworkDuplicate;
     if (force || publisher->config.keepDuplicates) {
       isDuplicate = false;
+      isNetworkDuplicate = false;
     } else {
       isDuplicate = (publisher->topic->lastValue == value);
+      isNetworkDuplicate = (publisher->topic->lastValueNetwork == value);
     }
-    if (!isDuplicate && m_network) {
+    if (!isNetworkDuplicate && m_network) {
+      publisher->topic->lastValueNetwork = value;
       m_network->SetValue(publisher->handle, value);
     }
     return SetValue(publisher->topic, value, NT_EVENT_VALUE_LOCAL, isDuplicate);
@@ -1346,8 +1348,10 @@ void LocalStorage::NetworkPropertiesUpdate(std::string_view name,
 void LocalStorage::NetworkSetValue(NT_Topic topicHandle, const Value& value) {
   std::scoped_lock lock{m_mutex};
   if (auto topic = m_impl->m_topics.Get(topicHandle)) {
-    m_impl->SetValue(topic, value, NT_EVENT_VALUE_REMOTE,
-                     value == topic->lastValue);
+    if (m_impl->SetValue(topic, value, NT_EVENT_VALUE_REMOTE,
+                         value == topic->lastValue)) {
+      topic->lastValueNetwork = value;
+    }
   }
 }
 

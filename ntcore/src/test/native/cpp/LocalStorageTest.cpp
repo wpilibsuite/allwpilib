@@ -789,4 +789,22 @@ TEST_F(LocalStorageNumberVariantsTest, ReadQueue) {
   }
 }
 
+TEST_F(LocalStorageTest, NetworkDuplicateDetect) {
+  EXPECT_CALL(network, Publish(_, _, _, _, _, _));
+  auto pub = storage.Publish(fooTopic, NT_DOUBLE, "double", {}, {});
+  auto remoteTopic =
+      storage.NetworkAnnounce("foo", "double", wpi::json::object(), 0);
+
+  // local set
+  EXPECT_CALL(network, SetValue(_, _));
+  storage.SetEntryValue(pub, Value::MakeDouble(1.0, 50));
+  // 2nd local set with same value - no SetValue call to network
+  storage.SetEntryValue(pub, Value::MakeDouble(1.0, 60));
+  // network set with different value
+  storage.NetworkSetValue(remoteTopic, Value::MakeDouble(2.0, 70));
+  // 3rd local set with same value generates a SetValue call to network
+  EXPECT_CALL(network, SetValue(_, _));
+  storage.SetEntryValue(pub, Value::MakeDouble(1.0, 80));
+}
+
 }  // namespace nt
