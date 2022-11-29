@@ -15,7 +15,6 @@ Welcome to the WPILib project. This repository contains the HAL, WPILibJ, and WP
     - [Faster builds](#faster-builds)
     - [Using Development Builds](#using-development-builds)
     - [Custom toolchain location](#custom-toolchain-location)
-    - [Gazebo simulation](#gazebo-simulation)
     - [Formatting/Linting](#formattinglinting)
     - [CMake](#cmake)
   - [Publishing](#publishing)
@@ -114,25 +113,6 @@ If you have installed the FRC Toolchain to a directory other than the default, o
 ./gradlew build -PtoolChainPath=some/path/to/frc/toolchain/bin
 ```
 
-### Gazebo simulation
-
-If you also want to force building Gazebo simulation support, add -PforceGazebo. This requires gazebo_transport. We have tested on 14.04 and 15.05, but any correct install of Gazebo should work, even on Windows if you build Gazebo from source. Correct means CMake needs to be able to find gazebo-config.cmake. See [The Gazebo website](https://gazebosim.org/) for installation instructions.
-
-```bash
-./gradlew build -PforceGazebo
-```
-
-If you prefer to use CMake directly, the you can still do so.
-The common CMake tasks are wpilibcSim, frc_gazebo_plugins, and gz_msgs
-
-```bash
-mkdir build #run this in the root of allwpilib
-cd build
-cmake ..
-make
-```
-
-
 ### Formatting/linting
 
 #### wpiformat
@@ -164,9 +144,7 @@ The maven artifacts are described in [MavenArtifacts.md](MavenArtifacts.md)
 
 ## Structure and Organization
 
-The main WPILib code you're probably looking for is in WPILibJ and WPILibC. Those directories are split into shared, sim, and athena. Athena contains the WPILib code meant to run on your roboRIO. Sim is WPILib code meant to run on your computer with Gazebo, and shared is code shared between the two. Shared code must be platform-independent, since it will be compiled with both the ARM cross-compiler and whatever desktop compiler you are using (g++, msvc, etc...).
-
-The Simulation directory contains extra simulation tools and libraries, such as gz_msgs and JavaGazebo. See sub-directories for more information.
+The main WPILib code you're probably looking for is in WPILibJ and WPILibC. Those directories are split into shared, sim, and athena. Athena contains the WPILib code meant to run on your roboRIO. Sim is WPILib code meant to run on your computer, and shared is code shared between the two. Shared code must be platform-independent, since it will be compiled with both the ARM cross-compiler and whatever desktop compiler you are using (g++, msvc, etc...).
 
 The integration test directories for C++ and Java contain test code that runs on our test-system. When you submit code for review, it is tested by those programs. If you add new functionality you should make sure to write tests for it so we don't break it in the future.
 
