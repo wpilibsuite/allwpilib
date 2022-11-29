@@ -4,61 +4,23 @@
 
 #pragma once
 
-#include <initializer_list>
 #include <memory>
-#include <span>
 #include <vector>
+
+#include <wpi/deprecated.h>
 
 #include "frc2/command/CommandBase.h"
 
 namespace frc2 {
 
 /**
- * A base for CommandGroups.  Statically tracks commands that have been
- * allocated to groups to ensure those commands are not also used independently,
- * which can result in inconsistent command state and unpredictable execution.
+ * A base for CommandGroups.
  *
  * This class is provided by the NewCommands VendorDep
+ * @deprecated This class is an empty abstraction. Inherit directly from CommandBase.
  */
 class CommandGroupBase : public CommandBase {
  public:
-  /**
-   * Requires that the specified command not have been already allocated to a
-   * CommandGroup. Reports an error if the command is already grouped.
-   *
-   * @param command The command to check
-   * @return True if all the command is ungrouped.
-   */
-  static bool RequireUngrouped(const Command& command);
-
-  /**
-   * Requires that the specified command not have been already allocated to a
-   * CommandGroup. Reports an error if the command is already grouped.
-   *
-   * @param command The command to check
-   * @return True if all the command is ungrouped.
-   */
-  static bool RequireUngrouped(const Command* command);
-
-  /**
-   * Requires that the specified commands not have been already allocated to a
-   * CommandGroup. Reports an error if any of the commands are already grouped.
-   *
-   * @param commands The commands to check
-   * @return True if all the commands are ungrouped.
-   */
-  static bool RequireUngrouped(
-      std::span<const std::unique_ptr<Command>> commands);
-
-  /**
-   * Requires that the specified commands not have been already allocated to a
-   * CommandGroup. Reports an error if any of the commands are already grouped.
-   *
-   * @param commands The commands to check
-   * @return True if all the commands are ungrouped.
-   */
-  static bool RequireUngrouped(std::initializer_list<const Command*> commands);
-
   /**
    * Adds the given commands to the command group.
    *

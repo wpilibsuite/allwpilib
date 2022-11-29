@@ -302,9 +302,8 @@ safe) semantics.
   void Cancel();
 
   /**
-   * Whether or not the command is currently scheduled.  Note that this does not
-   * detect whether the command is being run by a CommandGroup, only whether it
-   * is directly being run by the scheduler.
+   * Whether or not the command is currently scheduled. Note that this does not detect whether the
+   * command is in a composition, only whether it is directly being run by the scheduler.
    *
    * @return Whether the command is scheduled.
    */
@@ -324,14 +323,14 @@ safe) semantics.
    * Whether the command is currently grouped in a command group.  Used as extra
    * insurance to prevent accidental independent use of grouped commands.
    */
-  bool IsGrouped() const;
+  bool IsComposed() const;
 
   /**
    * Sets whether the command is currently grouped in a command group.  Can be
    * used to "reclaim" a command if a group is no longer going to use it.  NOT
    * ADVISED!
    */
-  void SetGrouped(bool grouped);
+  void SetComposed(bool isComposed);
 
   /**
    * Whether the given command should run when the robot is disabled.  Override
@@ -379,7 +378,7 @@ safe) semantics.
    */
   virtual std::unique_ptr<Command> TransferOwnership() && = 0;
 
-  bool m_isGrouped = false;
+  bool m_isComposed = false;
 };
 
 /**

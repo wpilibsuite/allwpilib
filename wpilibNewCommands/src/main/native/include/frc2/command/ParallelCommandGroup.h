@@ -18,11 +18,11 @@
 
 namespace frc2 {
 /**
- * A CommandGroup that runs a set of commands in parallel, ending when the last
- * command ends.
+ * A command composition that runs a set of commands in parallel, ending when the last command ends.
  *
- * <p>As a rule, CommandGroups require the union of the requirements of their
- * component commands.
+ * <p>The rules for command compositions apply: command instances that are passed to it are owned 
+ * by the composition and cannot be added to any other composition or scheduled individually, and
+ * the composition requires all subsystems its components require.
  *
  * This class is provided by the NewCommands VendorDep
  */
@@ -30,23 +30,21 @@ class ParallelCommandGroup
     : public CommandHelper<CommandGroupBase, ParallelCommandGroup> {
  public:
   /**
-   * Creates a new ParallelCommandGroup.  The given commands will be executed
-   * simultaneously. The command group will finish when the last command
-   * finishes.  If the CommandGroup is interrupted, only the commands that are
-   * still running will be interrupted.
+   * Creates a new ParallelCommandGroup. The given commands will be executed simultaneously. The
+   * command group will finish when the last command finishes. If the composition is interrupted,
+   * only the commands that are still running will be interrupted.
    *
-   * @param commands the commands to include in this group.
+   * @param commands the commands to include in this composition.
    */
   explicit ParallelCommandGroup(
       std::vector<std::unique_ptr<Command>>&& commands);
 
   /**
-   * Creates a new ParallelCommandGroup.  The given commands will be executed
-   * simultaneously. The command group will finish when the last command
-   * finishes.  If the CommandGroup is interrupted, only the commands that are
-   * still running will be interrupted.
+   * Creates a new ParallelCommandGroup. The given commands will be executed simultaneously. The
+   * command group will finish when the last command finishes. If the composition is interrupted,
+   * only the commands that are still running will be interrupted.
    *
-   * @param commands the commands to include in this group.
+   * @param commands the commands to include in this composition.
    */
   template <class... Types,
             typename = std::enable_if_t<std::conjunction_v<

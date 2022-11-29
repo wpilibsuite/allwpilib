@@ -26,6 +26,7 @@ import edu.wpi.first.wpilibj.event.EventLoop;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -33,6 +34,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.WeakHashMap;
 import java.util.function.Consumer;
 
 /**
@@ -59,6 +61,8 @@ public final class CommandScheduler implements NTSendable, AutoCloseable {
     }
     return instance;
   }
+
+  private final Set<Command> m_composedCommands = Collections.newSetFromMap(new WeakHashMap<>());
 
   // A set of the currently-running commands.
   private final Set<Command> m_scheduledCommands = new LinkedHashSet<>();
@@ -208,10 +212,7 @@ public final class CommandScheduler implements NTSendable, AutoCloseable {
       return;
     }
 
-    if (CommandGroupBase.getGroupedCommands().contains(command)) {
-      throw new IllegalArgumentException(
-          "A command that is part of a command group cannot be independently scheduled");
-    }
+    requireNotComposed(command);
 
     // Do nothing if the scheduler is disabled, the robot is disabled and the command doesn't
     // run when disabled, or the command is already scheduled.
@@ -405,6 +406,8 @@ public final class CommandScheduler implements NTSendable, AutoCloseable {
       return;
     }
 
+    requireNotComposed(defaultCommand);
+
     if (!defaultCommand.getRequirements().contains(subsystem)) {
       throw new IllegalArgumentException("Default commands must require their subsystem!");
     }
@@ -489,8 +492,8 @@ public final class CommandScheduler implements NTSendable, AutoCloseable {
 
   /**
    * Whether the given commands are running. Note that this only works on commands that are directly
-   * scheduled by the scheduler; it will not work on commands inside of CommandGroups, as the
-   * scheduler does not see them.
+   * scheduled by the scheduler; it will not work on commands inside compositions, as the scheduler
+   * does not see them.
    *
    * @param commands the command to query
    * @return whether the command is currently scheduled
@@ -555,6 +558,83 @@ public final class CommandScheduler implements NTSendable, AutoCloseable {
    */
   public void onCommandFinish(Consumer<Command> action) {
     m_finishActions.add(requireNonNullParam(action, "action", "onCommandFinish"));
+  }
+
+  /**
+   * Register commands as composed. An exception will be thrown if these commands are scheduled
+   * directly or added to a composition.
+   *
+   * @param commands the commands to register
+   * @throws IllegalArgumentException if the given commands have already been composed.
+   */
+  public void registerComposedCommands(Command... commands) {
+    var commandSet = Set.of(commands);
+    requireNotComposed(commandSet);
+    m_composedCommands.addAll(commandSet);
+  }
+
+  /**
+   * Clears the list of composed commands, allowing all commands to be freely used again.
+   *
+   * <p>WARNING: Using this haphazardly can result in unexpected/undesirable behavior. Do not use
+   * this unless you fully understand what you are doing.
+   */
+  public void clearComposedCommands() {
+    m_composedCommands.clear();
+  }
+
+  /**
+   * Removes a single command from the list of composed commands, allowing it to be freely used
+   * again.
+   *
+   * <p>WARNING: Using this haphazardly can result in unexpected/undesirable behavior. Do not use
+   * this unless you fully understand what you are doing.
+   *
+   * @param command the command to remove from the list of grouped commands
+   */
+  public void removeComposedCommand(Command command) {
+    m_composedCommands.remove(command);
+  }
+
+  /**
+   * Requires that the specified command hasn't been already added to a composition.
+   *
+   * @param command The command to check
+   * @throws IllegalArgumentException if the given commands have already been composed.
+   */
+  public void requireNotComposed(Command command) {
+    if (m_composedCommands.contains(command)) {
+      throw new IllegalArgumentException(
+          "Commands that have been composed may not be added to another composition or scheduled individually!");
+    }
+  }
+
+  /**
+   * Requires that the specified commands not have been already added to a composition.
+   *
+   * @param commands The commands to check
+   * @throws IllegalArgumentException if the given commands have already been composed.
+   */
+  public void requireNotComposed(Collection<Command> commands) {
+    if (!Collections.disjoint(commands, getComposedCommands())) {
+      throw new IllegalArgumentException(
+          "Commands that have been composed may not be added to another composition or scheduled individually!");
+    }
+  }
+
+  /**
+   * Check if the given command has been composed.
+   *
+   * @param command The command to check
+   * @return true if composed
+   * @throws IllegalArgumentException if the given commands have already been composed.
+   */
+  public boolean isComposed(Command command) {
+    return getComposedCommands().contains(command);
+  }
+
+  Set<Command> getComposedCommands() {
+    return m_composedCommands;
   }
 
   @Override

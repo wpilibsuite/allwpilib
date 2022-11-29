@@ -4,7 +4,7 @@
 
 package edu.wpi.first.wpilibj.examples.rapidreactcommandbot;
 
-import static edu.wpi.first.wpilibj2.command.CommandGroupBase.parallel;
+import static edu.wpi.first.wpilibj2.command.Commands.parallel;
 
 import edu.wpi.first.wpilibj.examples.rapidreactcommandbot.Constants.AutoConstants;
 import edu.wpi.first.wpilibj.examples.rapidreactcommandbot.Constants.OIConstants;

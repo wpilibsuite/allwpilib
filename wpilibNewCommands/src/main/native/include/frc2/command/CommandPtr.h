@@ -251,9 +251,8 @@ class CommandPtr final {
   void Cancel() const;
 
   /**
-   * Whether or not the command is currently scheduled. Note that this does not
-   * detect whether the command is being run by a CommandGroup, only whether it
-   * is directly being run by the scheduler.
+   * Whether or not the command is currently scheduled. Note that this does not detect whether the
+   * command is in a composition, only whether it is directly being run by the scheduler.
    *
    * @return Whether the command is scheduled.
    */

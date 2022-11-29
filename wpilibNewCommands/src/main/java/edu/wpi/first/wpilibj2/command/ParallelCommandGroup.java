@@ -9,24 +9,27 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * A CommandGroup that runs a set of commands in parallel, ending when the last command ends.
+ * A command composition that runs a set of commands in parallel, ending when the last command ends.
  *
- * <p>As a rule, CommandGroups require the union of the requirements of their component commands.
+ * <p>The rules for command compositions apply: command instances that are passed to it cannot be
+ * added to any other composition or scheduled individually, and the composition requires all
+ * subsystems its components require.
  *
  * <p>This class is provided by the NewCommands VendorDep
  */
+@SuppressWarnings("removal")
 public class ParallelCommandGroup extends CommandGroupBase {
-  // maps commands in this group to whether they are still running
+  // maps commands in this composition to whether they are still running
   private final Map<Command, Boolean> m_commands = new HashMap<>();
   private boolean m_runWhenDisabled = true;
   private InterruptionBehavior m_interruptBehavior = InterruptionBehavior.kCancelIncoming;
 
   /**
    * Creates a new ParallelCommandGroup. The given commands will be executed simultaneously. The
-   * command group will finish when the last command finishes. If the CommandGroup is interrupted,
-   * only the commands that are still running will be interrupted.
+   * command composition will finish when the last command finishes. If the composition is
+   * interrupted, only the commands that are still running will be interrupted.
    *
-   * @param commands the commands to include in this group.
+   * @param commands the commands to include in this composition.
    */
   public ParallelCommandGroup(Command... commands) {
     addCommands(commands);
@@ -34,19 +37,17 @@ public class ParallelCommandGroup extends CommandGroupBase {
 
   @Override
   public final void addCommands(Command... commands) {
-    requireUngrouped(commands);
-
     if (m_commands.containsValue(true)) {
       throw new IllegalStateException(
-          "Commands cannot be added to a CommandGroup while the group is running");
+          "Commands cannot be added to a composition while it's running");
     }
 
-    registerGroupedCommands(commands);
+    CommandScheduler.getInstance().registerComposedCommands(commands);
 
     for (Command command : commands) {
       if (!Collections.disjoint(command.getRequirements(), m_requirements)) {
         throw new IllegalArgumentException(
-            "Multiple commands in a parallel group cannot" + "require the same subsystems");
+            "Multiple commands in a parallel composition cannot require the same subsystems");
       }
       m_commands.put(command, false);
       m_requirements.addAll(command.getRequirements());

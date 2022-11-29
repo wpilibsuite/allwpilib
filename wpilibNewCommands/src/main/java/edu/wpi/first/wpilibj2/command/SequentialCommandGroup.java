@@ -8,12 +8,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * A CommandGroups that runs a list of commands in sequence.
+ * A command composition that runs a list of commands in sequence.
  *
- * <p>As a rule, CommandGroups require the union of the requirements of their component commands.
+ * <p>The rules for command compositions apply: command instances that are passed to it cannot be
+ * added to any other composition or scheduled individually, and the composition requires all
+ * subsystems its components require.
  *
  * <p>This class is provided by the NewCommands VendorDep
  */
+@SuppressWarnings("removal")
 public class SequentialCommandGroup extends CommandGroupBase {
   private final List<Command> m_commands = new ArrayList<>();
   private int m_currentCommandIndex = -1;
@@ -22,9 +25,9 @@ public class SequentialCommandGroup extends CommandGroupBase {
 
   /**
    * Creates a new SequentialCommandGroup. The given commands will be run sequentially, with the
-   * CommandGroup finishing when the last command finishes.
+   * composition finishing when the last command finishes.
    *
-   * @param commands the commands to include in this group.
+   * @param commands the commands to include in this composition.
    */
   public SequentialCommandGroup(Command... commands) {
     addCommands(commands);
@@ -32,14 +35,12 @@ public class SequentialCommandGroup extends CommandGroupBase {
 
   @Override
   public final void addCommands(Command... commands) {
-    requireUngrouped(commands);
-
     if (m_currentCommandIndex != -1) {
       throw new IllegalStateException(
-          "Commands cannot be added to a CommandGroup while the group is running");
+          "Commands cannot be added to a composition while it's running");
     }
 
-    registerGroupedCommands(commands);
+    CommandScheduler.getInstance().registerComposedCommands(commands);
 
     for (Command command : commands) {
       m_commands.add(command);
