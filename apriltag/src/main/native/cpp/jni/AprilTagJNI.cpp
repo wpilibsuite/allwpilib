@@ -83,8 +83,8 @@ Java_edu_wpi_first_apriltag_jni_AprilTagJNI_aprilTagCreate(
 
   apriltag_detector_t* td = apriltag_detector_create();
   apriltag_detector_add_family(td, tf);
-  td->quad_decimate = (float)decimate;
-  td->quad_sigma = (float)blur;
+  td->quad_decimate = static_cast<float>(decimate);
+  td->quad_sigma = static_cast<float>(blur);
   td->nthreads = threads;
   td->debug = debug;
   td->refine_edges = refine_edges;
@@ -108,7 +108,7 @@ static JClass detectionClass;
 
 JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM* vm, void* reserved) {
   JNIEnv* env;
-  if (vm->GetEnv((void**)(&env), JNI_VERSION_1_6) != JNI_OK) {
+  if (vm->GetEnv(reinterpret_cast<void**>(&env), JNI_VERSION_1_6) != JNI_OK) {
     return JNI_ERR;
   }
 
@@ -211,8 +211,9 @@ Java_edu_wpi_first_apriltag_jni_AprilTagJNI_aprilTagDetectInternal(
   }
 
   // Make an image_u8_t header for the Mat data
-  image_u8_t im = {(int32_t)cols, (int32_t)rows, (int32_t)cols,
-                   (uint8_t*)pData};
+  image_u8_t im = {static_cast<int32_t>(cols), static_cast<int32_t>(rows),
+                   static_cast<int32_t>(cols),
+                   reinterpret_cast<uint8_t*>(pData)};
 
   // Get our detector
   auto state =
@@ -274,8 +275,6 @@ JNIEXPORT void JNICALL
 Java_edu_wpi_first_apriltag_jni_AprilTagJNI_aprilTagDestroy(JNIEnv* env,
                                                             jclass clazz,
                                                             jlong detectIdx) {
-  printf("Destroying detector at idx %li\n", (long)detectIdx);
-
   auto state =
       std::find_if(detectors.begin(), detectors.end(),
                    [&](DetectorState& s) { return s.id == detectIdx; });
