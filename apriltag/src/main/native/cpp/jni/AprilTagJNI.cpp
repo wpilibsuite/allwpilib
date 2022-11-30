@@ -1,10 +1,16 @@
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
+
+#include <wpi/jni_util.h>
+
 #include "edu_wpi_first_apriltag_jni_AprilTagJNI.h"
-#include "wpi/jni_util.h"
 
 #ifdef _WIN32
 #pragma warning(push)
 #pragma warning(disable : 4200)
 #endif
+
 #if defined(__GNUC__)
 #pragma GCC diagnostic ignored "-Wpedantic"
 #endif
@@ -25,7 +31,7 @@
 
 #include <vector>
 #include <algorithm>
-#include <math.h>
+#include <cmath>
 
 using namespace wpi::java;
 
@@ -40,10 +46,16 @@ static std::vector<DetectorState> detectors;
 
 extern "C" {
 
+/*
+ * Class:     edu_wpi_first_apriltag_jni_AprilTagJNI
+ * Method:    aprilTagCreate
+ * Signature: (Ljava/lang/String;DDIZZ)J
+ */
 JNIEXPORT jlong JNICALL
-Java_edu_wpi_first_apriltag_jni_AprilTagJNI_aprilTagCreate(
-    JNIEnv* env, jclass cls, jstring jstr, jdouble decimate, jdouble blur,
-    jint threads, jboolean debug, jboolean refine_edges) {
+Java_edu_wpi_first_apriltag_jni_AprilTagJNI_aprilTagCreate
+  (JNIEnv* env, jclass cls, jstring jstr, jdouble decimate, jdouble blur,
+   jint threads, jboolean debug, jboolean refine_edges)
+{
   // Initialize tag detector with options
   apriltag_family_t* tf = nullptr;
   // const char *famname = fam;
@@ -76,7 +88,7 @@ Java_edu_wpi_first_apriltag_jni_AprilTagJNI_aprilTagCreate(
     tf = tagCustom48h12_create();
     tf_destroy_func = tagCustom48h12_destroy;
   } else {
-    printf("Unrecognized tag family name. Use e.g. \"tag36h11\".\n");
+    std::printf("Unrecognized tag family name. Use e.g. \"tag36h11\".\n");
     env->ReleaseStringUTFChars(jstr, famname);
     return 0;
   }
@@ -91,7 +103,7 @@ Java_edu_wpi_first_apriltag_jni_AprilTagJNI_aprilTagCreate(
 
   env->ReleaseStringUTFChars(jstr, famname);
 
-  // printf("Looking for max\n");
+  // std::printf("Looking for max\n");
   auto max = std::max_element(detectors.begin(), detectors.end(),
                               [](DetectorState& a, DetectorState& b) {
                                 return a.id < b.id;
@@ -100,7 +112,7 @@ Java_edu_wpi_first_apriltag_jni_AprilTagJNI_aprilTagCreate(
   if (max != detectors.end())
     index = max->id + 1;
   detectors.push_back({index, td, tf, tf_destroy_func});
-  printf("Created detector at idx %i\n", index);
+  std::printf("Created detector at idx %i\n", index);
   return (jlong)index;
 }
 
@@ -115,7 +127,7 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM* vm, void* reserved) {
   detectionClass = JClass(env, "edu/wpi/first/apriltag/jni/DetectionResult");
 
   if (!detectionClass) {
-    printf("Couldn't find class!");
+    std::printf("Couldn't find class!");
     return JNI_ERR;
   }
 
@@ -200,11 +212,17 @@ static jobject MakeJObject(JNIEnv* env, const apriltag_detection_t* detect,
   return ret;
 }
 
+/*
+ * Class:     edu_wpi_first_apriltag_jni_AprilTagJNI
+ * Method:    aprilTagDetectInternal
+ * Signature: (JJIIZDDDDDI)[Ljava/lang/Object;
+ */
 JNIEXPORT jobjectArray JNICALL
-Java_edu_wpi_first_apriltag_jni_AprilTagJNI_aprilTagDetectInternal(
-    JNIEnv* env, jclass cls, jlong detectIdx, jlong pData, jint rows, jint cols,
-    jboolean doPoseEstimation, jdouble tagWidthMeters, jdouble fx, jdouble fy,
-    jdouble cx, jdouble cy, jint nIters) {
+Java_edu_wpi_first_apriltag_jni_AprilTagJNI_aprilTagDetectInternal
+  (JNIEnv* env, jclass cls, jlong detectIdx, jlong pData, jint rows, jint cols,
+   jboolean doPoseEstimation, jdouble tagWidthMeters, jdouble fx, jdouble fy,
+   jdouble cx, jdouble cy, jint nIters)
+{
   // No image, can't do anything
   if (!pData) {
     return nullptr;
@@ -231,18 +249,18 @@ Java_edu_wpi_first_apriltag_jni_AprilTagJNI_aprilTagDetectInternal(
   // Object array to return to Java
   jobjectArray jarr = env->NewObjectArray(size, detectionClass, nullptr);
   if (!jarr) {
-    printf("Couldn't make array\n");
+    std::printf("Couldn't make array\n");
     return nullptr;
   }
 
   // Global pose
   apriltag_pose_t pose1;
-  memset(&pose1, 0, sizeof(pose1));
+  std::memset(&pose1, 0, sizeof(pose1));
 
   apriltag_pose_t pose2;
-  memset(&pose2, 0, sizeof(pose2));
+  std::memset(&pose2, 0, sizeof(pose2));
 
-  // printf("Created array %llu! Got %i targets!\n", &jarr, size);
+  // std::printf("Created array %llu! Got %i targets!\n", &jarr, size);
   //  Add our detected targets to the array
   for (int i = 0; i < size; ++i) {
     apriltag_detection_t* det = nullptr;
@@ -271,10 +289,15 @@ Java_edu_wpi_first_apriltag_jni_AprilTagJNI_aprilTagDetectInternal(
   return jarr;
 }
 
+/*
+ * Class:     edu_wpi_first_apriltag_jni_AprilTagJNI
+ * Method:    aprilTagDestroy
+ * Signature: (J)V
+ */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_apriltag_jni_AprilTagJNI_aprilTagDestroy(JNIEnv* env,
-                                                            jclass clazz,
-                                                            jlong detectIdx) {
+Java_edu_wpi_first_apriltag_jni_AprilTagJNI_aprilTagDestroy
+  (JNIEnv* env, jclass clazz, jlong detectIdx)
+{
   auto state =
       std::find_if(detectors.begin(), detectors.end(),
                    [&](DetectorState& s) { return s.id == detectIdx; });
@@ -294,4 +317,4 @@ Java_edu_wpi_first_apriltag_jni_AprilTagJNI_aprilTagDestroy(JNIEnv* env,
 
   detectors.erase(detectors.begin() + detectIdx);
 }
-}
+}  // extern "C"
