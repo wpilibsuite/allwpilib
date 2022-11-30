@@ -24,7 +24,6 @@ class CommandGroupErrorTest extends CommandTestBase {
 
   @Test
   void commandInGroupExternallyScheduledTest() {
-    try (CommandScheduler scheduler = new CommandScheduler()) {
       MockCommandHolder command1Holder = new MockCommandHolder(true);
       Command command1 = command1Holder.getMock();
       MockCommandHolder command2Holder = new MockCommandHolder(true);
@@ -32,8 +31,7 @@ class CommandGroupErrorTest extends CommandTestBase {
 
       new ParallelCommandGroup(command1, command2);
 
-      assertThrows(IllegalArgumentException.class, () -> scheduler.schedule(command1));
-    }
+      assertThrows(IllegalArgumentException.class, () -> CommandScheduler.getInstance().schedule(command1));
   }
 
   @Test
