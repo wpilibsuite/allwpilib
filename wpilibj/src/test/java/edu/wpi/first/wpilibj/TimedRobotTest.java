@@ -403,7 +403,7 @@ class TimedRobotTest {
   @ResourceLock("timing")
   void testModeTest(boolean isLW) {
     MockRobot robot = new MockRobot();
-    robot.setTestLW(isLW);
+    robot.enableLiveWindowInTest(isLW);
 
     Thread robotThread =
         new Thread(
@@ -469,7 +469,7 @@ class TimedRobotTest {
     assertEquals(1, robot.m_testInitCount.get());
     assertEquals(isLW, LiveWindow.isEnabled());
 
-    assertThrows(ConcurrentModificationException.class, () -> robot.setTestLW(isLW));
+    assertThrows(ConcurrentModificationException.class, () -> robot.enableLiveWindowInTest(isLW));
 
     assertEquals(2, robot.m_robotPeriodicCount.get());
     assertEquals(2, robot.m_simulationPeriodicCount.get());

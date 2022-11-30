@@ -68,7 +68,7 @@ public abstract class IterativeRobotBase extends RobotBase {
   private final double m_period;
   private final Watchdog m_watchdog;
   private boolean m_ntFlushEnabled = true;
-  private boolean m_isTestLW = true;
+  private boolean m_lwEnabledInTest = true;
 
   /**
    * Constructor for IterativeRobotBase.
@@ -252,11 +252,11 @@ public abstract class IterativeRobotBase extends RobotBase {
    * @param testLW True to enable, false to disable. Defaults to true.
    * @throws ConcurrentModificationException if this is called during test mode.
    */
-  public void setTestLW(boolean testLW) {
+  public void enableLiveWindowInTest(boolean testLW) {
     if (isTest()) {
       throw new ConcurrentModificationException("Can't configure test mode while in test mode!");
     }
-    m_isTestLW = testLW;
+    m_lwEnabledInTest = testLW;
   }
 
   /**
@@ -264,8 +264,8 @@ public abstract class IterativeRobotBase extends RobotBase {
    *
    * @return whether LiveWindow should be enabled in test mode.
    */
-  public boolean getTestLW() {
-    return m_isTestLW;
+  public boolean isLiveWindowEnabledInTest() {
+    return m_lwEnabledInTest;
   }
 
   /**
@@ -305,7 +305,7 @@ public abstract class IterativeRobotBase extends RobotBase {
       } else if (m_lastMode == Mode.kTeleop) {
         teleopExit();
       } else if (m_lastMode == Mode.kTest) {
-        if (m_isTestLW) {
+        if (m_lwEnabledInTest) {
           LiveWindow.setEnabled(false);
           Shuffleboard.disableActuatorWidgets();
         }
@@ -323,7 +323,7 @@ public abstract class IterativeRobotBase extends RobotBase {
         teleopInit();
         m_watchdog.addEpoch("teleopInit()");
       } else if (mode == Mode.kTest) {
-        if (m_isTestLW) {
+        if (m_lwEnabledInTest) {
           LiveWindow.setEnabled(true);
           Shuffleboard.enableActuatorWidgets();
         }

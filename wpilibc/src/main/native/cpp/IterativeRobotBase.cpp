@@ -94,16 +94,16 @@ void IterativeRobotBase::SetNetworkTablesFlushEnabled(bool enabled) {
   m_ntFlushEnabled = enabled;
 }
 
-void IterativeRobotBase::SetTestLW(bool testLW) {
+void IterativeRobotBase::EnableLiveWindowInTest(bool testLW) {
   if (IsTest()) {
     throw FRC_MakeError(err::IncompatibleMode,
                         "Can't configure test mode while in test mode!");
   }
-  m_isTestLW = testLW;
+  m_lwEnabledInTest = testLW;
 }
 
-bool IterativeRobotBase::GetTestLW() {
-  return m_isTestLW;
+bool IterativeRobotBase::IsLiveWindowEnabledInTest() {
+  return m_lwEnabledInTest;
 }
 
 units::second_t IterativeRobotBase::GetPeriod() const {
@@ -137,7 +137,7 @@ void IterativeRobotBase::LoopFunc() {
     } else if (m_lastMode == Mode::kTeleop) {
       TeleopExit();
     } else if (m_lastMode == Mode::kTest) {
-      if (m_isTestLW) {
+      if (m_lwEnabledInTest) {
         LiveWindow::SetEnabled(false);
         Shuffleboard::DisableActuatorWidgets();
       }
@@ -155,7 +155,7 @@ void IterativeRobotBase::LoopFunc() {
       TeleopInit();
       m_watchdog.AddEpoch("TeleopInit()");
     } else if (mode == Mode::kTest) {
-      if (m_isTestLW) {
+      if (m_lwEnabledInTest) {
         LiveWindow::SetEnabled(true);
         Shuffleboard::EnableActuatorWidgets();
       }

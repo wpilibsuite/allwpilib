@@ -207,12 +207,12 @@ class IterativeRobotBase : public RobotBase {
    * @param testLW True to enable, false to disable. Defaults to true.
    * @throws if called in test mode.
    */
-  void SetTestLW(bool testLW);
+  void EnableLiveWindowInTest(bool testLW);
 
   /**
    * Whether LiveWindow operation is enabled during test mode.
    */
-  bool GetTestLW();
+  bool IsLiveWindowEnabledInTest();
 
   /**
    * Gets time period between calls to Periodic() functions.
@@ -241,7 +241,7 @@ class IterativeRobotBase : public RobotBase {
   units::second_t m_period;
   Watchdog m_watchdog;
   bool m_ntFlushEnabled = true;
-  bool m_isTestLW = true;
+  bool m_lwEnabledInTest = true;
 
   void PrintLoopOverrunMessage();
 };

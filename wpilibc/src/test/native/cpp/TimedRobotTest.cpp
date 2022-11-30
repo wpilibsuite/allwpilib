@@ -309,7 +309,7 @@ TEST_P(TimedRobotTest, TestMode) {
   bool isTestLW = GetParam();
 
   MockRobot robot;
-  robot.SetTestLW(isTestLW);
+  robot.EnableLiveWindowInTest(isTestLW);
 
   std::thread robotThread{[&] { robot.StartCompetition(); }};
 
@@ -349,7 +349,7 @@ TEST_P(TimedRobotTest, TestMode) {
   EXPECT_EQ(1u, robot.m_testInitCount);
   EXPECT_EQ(isTestLW, frc::LiveWindow::IsEnabled());
 
-  EXPECT_THROW(robot.SetTestLW(isTestLW), std::runtime_error);
+  EXPECT_THROW(robot.EnableLiveWindowInTest(isTestLW), std::runtime_error);
 
   EXPECT_EQ(1u, robot.m_robotPeriodicCount);
   EXPECT_EQ(1u, robot.m_simulationPeriodicCount);
