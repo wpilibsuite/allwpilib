@@ -29,6 +29,25 @@ nt::PubSubOptions::PubSubOptions(std::span<const PubSubOption> options) {
       case NT_PUBSUB_POLLSTORAGE:
         pollStorageSize = static_cast<size_t>(option.value);
         break;
+      case NT_PUBSUB_LOCALREMOTE:
+        switch (static_cast<int>(option.value)) {
+          case 0:
+          case 3:
+            fromLocal = true;
+            fromRemote = true;
+            break;
+          case 1:
+            fromLocal = true;
+            fromRemote = false;
+            break;
+          case 2:
+            fromLocal = false;
+            fromRemote = true;
+            break;
+          default:
+            break;
+        }
+        break;
       default:
         break;
     }

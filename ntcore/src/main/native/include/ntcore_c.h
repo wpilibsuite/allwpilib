@@ -95,6 +95,7 @@ enum NT_PubSubOptionType {
   NT_PUBSUB_TOPICSONLY,     /* only send topic changes, no value changes */
   NT_PUBSUB_POLLSTORAGE,    /* polling storage for subscription */
   NT_PUBSUB_KEEPDUPLICATES, /* preserve duplicate values */
+  NT_PUBSUB_LOCALREMOTE,    /* local, remote, or any value changes */
 };
 
 /** Event notification flags. */
@@ -287,7 +288,8 @@ struct NT_PubSubOption {
 
   /**
    * Option value.  1 (true) or 0 (false) for immediate and logging options,
-   * time between updates, in seconds, for periodic option.
+   * time between updates, in seconds, for periodic option.  For local/remote
+   * option, 1=local only, 2=remote only, 0 or 3=both local and remote.
    */
   double value;
 };

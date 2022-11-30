@@ -807,4 +807,36 @@ TEST_F(LocalStorageTest, NetworkDuplicateDetect) {
   storage.SetEntryValue(pub, Value::MakeDouble(1.0, 80));
 }
 
+TEST_F(LocalStorageTest, ReadQueueLocalRemote) {
+  EXPECT_CALL(network, Subscribe(_, _, _)).Times(3);
+  EXPECT_CALL(network, Publish(_, _, _, _, _, _)).Times(1);
+
+  auto subBoth = storage.Subscribe(fooTopic, NT_DOUBLE, "double",
+                                   {{PubSubOption::AllUpdates()}});
+  auto subLocal = storage.Subscribe(fooTopic, NT_DOUBLE, "double",
+                                    {{PubSubOption::LocalOnly()}});
+  auto subRemote = storage.Subscribe(fooTopic, NT_DOUBLE, "double",
+                                     {{PubSubOption::RemoteOnly()}});
+  auto pub = storage.Publish(fooTopic, NT_DOUBLE, "double", {}, {});
+  auto remoteTopic =
+      storage.NetworkAnnounce("foo", "double", wpi::json::object(), 0);
+
+  // local set
+  EXPECT_CALL(network, SetValue(_, _));
+  storage.SetEntryValue(pub, Value::MakeDouble(1.0, 50));
+  EXPECT_THAT(storage.ReadQueueDouble(subBoth),
+              ElementsAre(TSEq<TimestampedDouble>(1.0, 50)));
+  EXPECT_THAT(storage.ReadQueueDouble(subLocal),
+              ElementsAre(TSEq<TimestampedDouble>(1.0, 50)));
+  EXPECT_THAT(storage.ReadQueueDouble(subRemote), IsEmpty());
+
+  // network set
+  storage.NetworkSetValue(remoteTopic, Value::MakeDouble(2.0, 60));
+  EXPECT_THAT(storage.ReadQueueDouble(subBoth),
+              ElementsAre(TSEq<TimestampedDouble>(2.0, 60)));
+  EXPECT_THAT(storage.ReadQueueDouble(subRemote),
+              ElementsAre(TSEq<TimestampedDouble>(2.0, 60)));
+  EXPECT_THAT(storage.ReadQueueDouble(subLocal), IsEmpty());
+}
+
 }  // namespace nt

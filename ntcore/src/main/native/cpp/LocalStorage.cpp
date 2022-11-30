@@ -492,9 +492,12 @@ bool LSImpl::SetValue(TopicData* topic, const Value& value,
 
 void LSImpl::NotifyValue(TopicData* topic, unsigned int eventFlags,
                          bool isDuplicate) {
+  bool isNetwork = (eventFlags & NT_EVENT_VALUE_REMOTE) != 0;
   for (auto&& subscriber : topic->localSubscribers) {
     if (subscriber->active &&
-        (subscriber->config.keepDuplicates || !isDuplicate)) {
+        (subscriber->config.keepDuplicates || !isDuplicate) &&
+        ((isNetwork && subscriber->config.fromRemote) ||
+         (!isNetwork && subscriber->config.fromLocal))) {
       subscriber->pollStorage.emplace_back(topic->lastValue);
       subscriber->handle.Set();
       if (!subscriber->valueListeners.empty()) {

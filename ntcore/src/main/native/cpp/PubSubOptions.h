@@ -22,6 +22,8 @@ class PubSubOptions {
   bool topicsOnly = false;
   bool prefixMatch = false;
   bool keepDuplicates = false;
+  bool fromRemote = true;
+  bool fromLocal = true;
 };
 
 }  // namespace nt
