@@ -18,12 +18,13 @@
 
 namespace frc2 {
 /**
- * A composition that runs a set of commands in parallel, ending when any one of the commands ends
- * and interrupting all the others.
+ * A composition that runs a set of commands in parallel, ending when any one of
+ * the commands ends and interrupting all the others.
  *
- * <p>The rules for command compositions apply: command instances that are passed to it are owned 
- * by the composition and cannot be added to any other composition or scheduled individually, and
- * the composition requires all subsystems its components require.
+ * <p>The rules for command compositions apply: command instances that are
+ * passed to it are owned by the composition and cannot be added to any other
+ * composition or scheduled individually, and the composition requires all
+ * subsystems its components require.
  *
  * This class is provided by the NewCommands VendorDep
  */
@@ -31,9 +32,9 @@ class ParallelRaceGroup
     : public CommandHelper<CommandGroupBase, ParallelRaceGroup> {
  public:
   /**
-   * Creates a new ParallelCommandRace. The given commands will be executed simultaneously, and will
-   * "race to the finish" - the first command to finish ends the entire command, with all other
-   * commands being interrupted.
+   * Creates a new ParallelCommandRace. The given commands will be executed
+   * simultaneously, and will "race to the finish" - the first command to finish
+   * ends the entire command, with all other commands being interrupted.
    *
    * @param commands the commands to include in this composition.
    */

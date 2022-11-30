@@ -10,7 +10,8 @@ ConditionalCommand::ConditionalCommand(std::unique_ptr<Command>&& onTrue,
                                        std::unique_ptr<Command>&& onFalse,
                                        std::function<bool()> condition)
     : m_condition{std::move(condition)} {
-  CommandScheduler::GetInstance().RequireUngrouped({onTrue.get(), onFalse.get()});
+  CommandScheduler::GetInstance().RequireUngrouped(
+      {onTrue.get(), onFalse.get()});
 
   m_onTrue = std::move(onTrue);
   m_onFalse = std::move(onFalse);

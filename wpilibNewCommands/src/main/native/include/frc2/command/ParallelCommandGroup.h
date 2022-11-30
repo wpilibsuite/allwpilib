@@ -18,11 +18,13 @@
 
 namespace frc2 {
 /**
- * A command composition that runs a set of commands in parallel, ending when the last command ends.
+ * A command composition that runs a set of commands in parallel, ending when
+ * the last command ends.
  *
- * <p>The rules for command compositions apply: command instances that are passed to it are owned 
- * by the composition and cannot be added to any other composition or scheduled individually, and
- * the composition requires all subsystems its components require.
+ * <p>The rules for command compositions apply: command instances that are
+ * passed to it are owned by the composition and cannot be added to any other
+ * composition or scheduled individually, and the composition requires all
+ * subsystems its components require.
  *
  * This class is provided by the NewCommands VendorDep
  */
@@ -30,9 +32,10 @@ class ParallelCommandGroup
     : public CommandHelper<CommandGroupBase, ParallelCommandGroup> {
  public:
   /**
-   * Creates a new ParallelCommandGroup. The given commands will be executed simultaneously. The
-   * command group will finish when the last command finishes. If the composition is interrupted,
-   * only the commands that are still running will be interrupted.
+   * Creates a new ParallelCommandGroup. The given commands will be executed
+   * simultaneously. The command group will finish when the last command
+   * finishes. If the composition is interrupted, only the commands that are
+   * still running will be interrupted.
    *
    * @param commands the commands to include in this composition.
    */
@@ -40,9 +43,10 @@ class ParallelCommandGroup
       std::vector<std::unique_ptr<Command>>&& commands);
 
   /**
-   * Creates a new ParallelCommandGroup. The given commands will be executed simultaneously. The
-   * command group will finish when the last command finishes. If the composition is interrupted,
-   * only the commands that are still running will be interrupted.
+   * Creates a new ParallelCommandGroup. The given commands will be executed
+   * simultaneously. The command group will finish when the last command
+   * finishes. If the composition is interrupted, only the commands that are
+   * still running will be interrupted.
    *
    * @param commands the commands to include in this composition.
    */

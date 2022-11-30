@@ -17,7 +17,8 @@ namespace frc2 {
  * A base for CommandGroups.
  *
  * This class is provided by the NewCommands VendorDep
- * @deprecated This class is an empty abstraction. Inherit directly from CommandBase.
+ * @deprecated This class is an empty abstraction. Inherit directly from
+ * CommandBase.
  */
 class CommandGroupBase : public CommandBase {
  public:

@@ -18,13 +18,14 @@
 
 namespace frc2 {
 /**
- * A command composition that runs a set of commands in parallel, ending only when a specific
- * command (the "deadline") ends, interrupting all other commands that are still running at that
- * point.
+ * A command composition that runs a set of commands in parallel, ending only
+ * when a specific command (the "deadline") ends, interrupting all other
+ * commands that are still running at that point.
  *
- * <p>The rules for command compositions apply: command instances that are passed to it are owned 
- * by the composition and cannot be added to any other composition or scheduled individually, and
- * the composition requires all subsystems its components require.
+ * <p>The rules for command compositions apply: command instances that are
+ * passed to it are owned by the composition and cannot be added to any other
+ * composition or scheduled individually, and the composition requires all
+ * subsystems its components require.
  *
  * This class is provided by the NewCommands VendorDep
  */
@@ -32,10 +33,11 @@ class ParallelDeadlineGroup
     : public CommandHelper<CommandGroupBase, ParallelDeadlineGroup> {
  public:
   /**
-   * Creates a new ParallelDeadlineGroup. The given commands (including the deadline) will be
-   * executed simultaneously. The composition will finish when the deadline finishes, interrupting
-   * all other still-running commands. If the composition is interrupted, only the commands still
-   * running will be interrupted.
+   * Creates a new ParallelDeadlineGroup. The given commands (including the
+   * deadline) will be executed simultaneously. The composition will finish when
+   * the deadline finishes, interrupting all other still-running commands. If
+   * the composition is interrupted, only the commands still running will be
+   * interrupted.
    *
    * @param deadline the command that determines when the composition ends
    * @param commands the commands to be executed
@@ -43,10 +45,11 @@ class ParallelDeadlineGroup
   ParallelDeadlineGroup(std::unique_ptr<Command>&& deadline,
                         std::vector<std::unique_ptr<Command>>&& commands);
   /**
-   * Creates a new ParallelDeadlineGroup. The given commands (including the deadline) will be
-   * executed simultaneously. The composition will finish when the deadline finishes, interrupting
-   * all other still-running commands. If the composition is interrupted, only the commands still
-   * running will be interrupted.
+   * Creates a new ParallelDeadlineGroup. The given commands (including the
+   * deadline) will be executed simultaneously. The composition will finish when
+   * the deadline finishes, interrupting all other still-running commands. If
+   * the composition is interrupted, only the commands still running will be
+   * interrupted.
    *
    * @param deadline the command that determines when the composition ends
    * @param commands the commands to be executed

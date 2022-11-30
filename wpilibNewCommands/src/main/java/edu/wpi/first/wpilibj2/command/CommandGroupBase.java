@@ -13,7 +13,6 @@ package edu.wpi.first.wpilibj2.command;
  */
 @Deprecated(forRemoval = true)
 public abstract class CommandGroupBase extends CommandBase {
-
   /**
    * Adds the given commands to the command group.
    *

@@ -26,9 +26,10 @@ const size_t invalid_index = std::numeric_limits<size_t>::max();
 /**
  * A command composition that runs a list of commands in sequence.
  *
- * <p>The rules for command compositions apply: command instances that are passed to it are owned 
- * by the composition and cannot be added to any other composition or scheduled individually, and
- * the composition requires all subsystems its components require.
+ * <p>The rules for command compositions apply: command instances that are
+ * passed to it are owned by the composition and cannot be added to any other
+ * composition or scheduled individually, and the composition requires all
+ * subsystems its components require.
  *
  * This class is provided by the NewCommands VendorDep
  */
@@ -36,8 +37,9 @@ class SequentialCommandGroup
     : public CommandHelper<CommandGroupBase, SequentialCommandGroup> {
  public:
   /**
-   * Creates a new SequentialCommandGroup. The given commands will be run sequentially, with the
-   * composition finishing when the last command finishes.
+   * Creates a new SequentialCommandGroup. The given commands will be run
+   * sequentially, with the composition finishing when the last command
+   * finishes.
    *
    * @param commands the commands to include in this composition.
    */
@@ -45,8 +47,9 @@ class SequentialCommandGroup
       std::vector<std::unique_ptr<Command>>&& commands);
 
   /**
-   * Creates a new SequentialCommandGroup. The given commands will be run sequentially, with the
-   * composition finishing when the last command finishes.
+   * Creates a new SequentialCommandGroup. The given commands will be run
+   * sequentially, with the composition finishing when the last command
+   * finishes.
    *
    * @param commands the commands to include in this composition.
    */

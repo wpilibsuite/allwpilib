@@ -17,13 +17,14 @@
 
 namespace frc2 {
 /**
- * A command that runs another command repeatedly, restarting it when it ends, until this command is
- * interrupted. Command instances that are passed to it cannot be added to any other groups, or
- * scheduled individually.
+ * A command that runs another command repeatedly, restarting it when it ends,
+ * until this command is interrupted. Command instances that are passed to it
+ * cannot be added to any other groups, or scheduled individually.
  *
- * <p>The rules for command compositions apply: command instances that are passed to it are owned 
- * by the composition and cannot be added to any other composition or scheduled individually, and
- * the composition requires all subsystems its components require.
+ * <p>The rules for command compositions apply: command instances that are
+ * passed to it are owned by the composition and cannot be added to any other
+ * composition or scheduled individually, and the composition requires all
+ * subsystems its components require.
  *
  * <p>This class is provided by the NewCommands VendorDep
  */

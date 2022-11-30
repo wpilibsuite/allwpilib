@@ -13,12 +13,13 @@
 
 namespace frc2 {
 /**
- * A command composition that runs one of two commands, depending on the value of the given
- * condition when this command is initialized.
+ * A command composition that runs one of two commands, depending on the value
+ * of the given condition when this command is initialized.
  *
- * <p>The rules for command compositions apply: command instances that are passed to it are owned 
- * by the composition and cannot be added to any other composition or scheduled individually, and
- * the composition requires all subsystems its components require.
+ * <p>The rules for command compositions apply: command instances that are
+ * passed to it are owned by the composition and cannot be added to any other
+ * composition or scheduled individually, and the composition requires all
+ * subsystems its components require.
  *
  * This class is provided by the NewCommands VendorDep
  *

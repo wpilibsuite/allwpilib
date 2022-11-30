@@ -20,12 +20,14 @@
 
 namespace frc2 {
 /**
- * A command composition that runs one of a selection of commands, either using a selector and a key
- * to command mapping, or a supplier that returns the command directly at runtime.
+ * A command composition that runs one of a selection of commands, either using
+ * a selector and a key to command mapping, or a supplier that returns the
+ * command directly at runtime.
  *
- * <p>The rules for command compositions apply: command instances that are passed to it are owned 
- * by the composition and cannot be added to any other composition or scheduled individually, and
- * the composition requires all subsystems its components require.
+ * <p>The rules for command compositions apply: command instances that are
+ * passed to it are owned by the composition and cannot be added to any other
+ * composition or scheduled individually, and the composition requires all
+ * subsystems its components require.
  *
  * This class is provided by the NewCommands VendorDep
  */

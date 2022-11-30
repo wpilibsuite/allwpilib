@@ -361,7 +361,8 @@ class CommandScheduler final : public nt::NTSendable,
   void OnCommandFinish(Action action);
 
   /**
-   * Requires that the specified command hasn't been already added to a composition.
+   * Requires that the specified command hasn't been already added to a
+   * composition.
    *
    * @param command The command to check
    * @throws if the given commands have already been composed.
@@ -369,19 +370,21 @@ class CommandScheduler final : public nt::NTSendable,
   void RequireUngrouped(const Command* command);
 
   /**
-   * Requires that the specified commands not have been already added to a composition.
+   * Requires that the specified commands not have been already added to a
+   * composition.
    *
    * @param commands The commands to check
    * @throws if the given commands have already been composed.
    */
-  void RequireUngrouped(
-      std::span<const std::unique_ptr<Command>> commands);
+  void RequireUngrouped(std::span<const std::unique_ptr<Command>> commands);
 
   /**
-   * Requires that the specified commands not have been already added to a composition.
+   * Requires that the specified commands not have been already added to a
+   * composition.
    *
    * @param commands The commands to check
-   * @throws IllegalArgumentException if the given commands have already been composed.
+   * @throws IllegalArgumentException if the given commands have already been
+   * composed.
    */
   void RequireUngrouped(std::initializer_list<const Command*> commands);
 
