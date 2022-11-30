@@ -179,14 +179,14 @@ void InitializeFRCDriverStation() {
 }
 }  // namespace hal::init
 
-
 namespace hal {
 static void DefaultPrintErrorImpl(const char* line, size_t size) {
   std::fwrite(line, size, 1, stderr);
 }
 }  // namespace hal
 
-static std::atomic<void (*)(const char* line, size_t size)> gPrintErrorImpl{hal::DefaultPrintErrorImpl};
+static std::atomic<void (*)(const char* line, size_t size)> gPrintErrorImpl{
+    hal::DefaultPrintErrorImpl};
 
 extern "C" {
 
