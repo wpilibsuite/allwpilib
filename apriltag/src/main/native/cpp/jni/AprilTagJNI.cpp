@@ -45,7 +45,7 @@ Java_edu_wpi_first_apriltag_jni_AprilTagJNI_aprilTagCreate(
     JNIEnv* env, jclass cls, jstring jstr, jdouble decimate, jdouble blur,
     jint threads, jboolean debug, jboolean refine_edges) {
   // Initialize tag detector with options
-  apriltag_family_t* tf = NULL;
+  apriltag_family_t* tf = nullptr;
   // const char *famname = fam;
   const char* famname = env->GetStringUTFChars(jstr, 0);
 
@@ -245,7 +245,7 @@ Java_edu_wpi_first_apriltag_jni_AprilTagJNI_aprilTagDetectInternal(
   // printf("Created array %llu! Got %i targets!\n", &jarr, size);
   //  Add our detected targets to the array
   for (int i = 0; i < size; ++i) {
-    apriltag_detection_t* det = {0};
+    apriltag_detection_t* det = nullptr;
     zarray_get(detections, i, &det);
 
     if (det != nullptr) {
@@ -279,16 +279,17 @@ Java_edu_wpi_first_apriltag_jni_AprilTagJNI_aprilTagDestroy(JNIEnv* env,
       std::find_if(detectors.begin(), detectors.end(),
                    [&](DetectorState& s) { return s.id == detectIdx; });
 
-  if (state == detectors.end())
+  if (state == detectors.end()) {
     return;
+  }
 
   if (state->td) {
     apriltag_detector_destroy(state->td);
-    state->td = NULL;
+    state->td = nullptr;
   }
   if (state->tf) {
     state->tf_destroy(state->tf);
-    state->tf = NULL;
+    state->tf = nullptr;
   }
 
   detectors.erase(detectors.begin() + detectIdx);
