@@ -6,7 +6,7 @@ nativeUtils {
             headerClassifier = "headers"
             sourceClassifier = "sources"
             ext = "zip"
-            version = '1.11.0-2'
+            version = '3.2.0-1'
             targetPlatforms.addAll(nativeUtils.wpi.platforms.allPlatforms)
         }
     }
