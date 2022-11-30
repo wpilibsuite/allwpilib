@@ -165,15 +165,17 @@ else ()
     endif()
 endif()
 
-target_include_directories(wpinet PUBLIC
-                            $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/include>
-                            $<INSTALL_INTERFACE:${include_dest}/wpinet>)
+install(DIRECTORY src/main/native/thirdparty/tcpsockets/include/ DESTINATION "${include_dest}/wpinet")
 target_include_directories(wpinet PUBLIC
                             $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/thirdparty/tcpsockets/include>
                             $<INSTALL_INTERFACE:${include_dest}/wpinet>)
 
-install(TARGETS wpinet EXPORT wpinet DESTINATION "${main_lib_dest}")
 install(DIRECTORY src/main/native/include/ DESTINATION "${include_dest}/wpinet")
+target_include_directories(wpinet PUBLIC
+                            $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/include>
+                            $<INSTALL_INTERFACE:${include_dest}/wpinet>)
+
+install(TARGETS wpinet EXPORT wpinet DESTINATION "${main_lib_dest}")
 
 if (WITH_JAVA AND MSVC)
     install(TARGETS wpinet RUNTIME DESTINATION "${jni_lib_dest}" COMPONENT Runtime)
