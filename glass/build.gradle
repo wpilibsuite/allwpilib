@@ -24,6 +24,8 @@ if (!project.hasProperty('onlylinuxathena')) {
     def wpilibVersionFileInput = file("src/app/generate/WPILibVersion.cpp.in")
     def wpilibVersionFileOutput = file("$buildDir/generated/app/cpp/WPILibVersion.cpp")
 
+    apply from: "${rootDir}/shared/imgui.gradle"
+
     task generateCppVersion() {
         description = 'Generates the wpilib version class'
         group = 'WPILib'
@@ -111,7 +113,7 @@ if (!project.hasProperty('onlylinuxathena')) {
                     lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
                     lib project: ':wpimath', library: 'wpimath', linkage: 'shared'
                     lib project: ':wpigui', library: 'wpigui', linkage: 'static'
-                    nativeUtils.useRequiredLibrary(it, 'imgui_static')
+                    nativeUtils.useRequiredLibrary(it, 'imgui')
                 }
                 appendDebugPathToBinaries(binaries)
             }
@@ -142,7 +144,7 @@ if (!project.hasProperty('onlylinuxathena')) {
                     lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
                     lib project: ':wpimath', library: 'wpimath', linkage: 'shared'
                     lib project: ':wpigui', library: 'wpigui', linkage: 'static'
-                    nativeUtils.useRequiredLibrary(it, 'imgui_static')
+                    nativeUtils.useRequiredLibrary(it, 'imgui')
                 }
                 appendDebugPathToBinaries(binaries)
             }
@@ -182,7 +184,7 @@ if (!project.hasProperty('onlylinuxathena')) {
                     lib project: ':wpimath', library: 'wpimath', linkage: 'static'
                     lib project: ':wpigui', library: 'wpigui', linkage: 'static'
                     nativeUtils.useRequiredLibrary(it, 'opencv_static')
-                    nativeUtils.useRequiredLibrary(it, 'imgui_static')
+                    nativeUtils.useRequiredLibrary(it, 'imgui')
                     if (it.targetPlatform.operatingSystem.isWindows()) {
                         it.linker.args << 'Gdi32.lib' << 'Shell32.lib' << 'd3d11.lib' << 'd3dcompiler.lib'
                         it.linker.args << '/DELAYLOAD:MF.dll' << '/DELAYLOAD:MFReadWrite.dll' << '/DELAYLOAD:MFPlat.dll' << '/delay:nobind'

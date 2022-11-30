@@ -18,6 +18,9 @@ if (!project.hasProperty('onlylinuxathena')) {
 
     apply from: "${rootDir}/shared/plugins/setupBuild.gradle"
 
+
+    apply from: "${rootDir}/shared/imgui.gradle"
+
     model {
         binaries {
             all {
@@ -28,7 +31,7 @@ if (!project.hasProperty('onlylinuxathena')) {
                 project(':ntcore').addNtcoreDependency(it, 'shared')
                 lib project: ':wpinet', library: 'wpinet', linkage: 'shared'
                 lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
-                nativeUtils.useRequiredLibrary(it, 'imgui_static')
+                nativeUtils.useRequiredLibrary(it, 'imgui')
                 if (it.targetPlatform.name == nativeUtils.wpi.platforms.roborio) {
                     it.buildable = false
                     return

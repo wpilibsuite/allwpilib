@@ -14,6 +14,7 @@ if (!project.hasProperty('onlylinuxathena')) {
     }
 
     apply from: "${rootDir}/shared/config.gradle"
+    apply from: "${rootDir}/shared/imgui.gradle"
 
     nativeUtils.exportsConfigs {
         wpigui {
@@ -48,7 +49,7 @@ if (!project.hasProperty('onlylinuxathena')) {
                     }
                 }
                 binaries.all {
-                    nativeUtils.useRequiredLibrary(it, 'imgui_static')
+                    nativeUtils.useRequiredLibrary(it, 'imgui')
                     if (it.targetPlatform.name == nativeUtils.wpi.platforms.roborio) {
                         it.buildable = false
                         return
@@ -114,7 +115,7 @@ if (!project.hasProperty('onlylinuxathena')) {
                 }
                 binaries.all {
                     lib library: 'wpigui'
-                    nativeUtils.useRequiredLibrary(it, 'imgui_static')
+                    nativeUtils.useRequiredLibrary(it, 'imgui')
                 }
             }
         }
