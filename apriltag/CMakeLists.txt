@@ -84,7 +84,7 @@ wpilib_target_warnings(apriltag)
 if (MSVC)
   target_compile_options(apriltag PRIVATE /wd4005 /wd4018 /wd4098 /wd4200 /wd4244 /wd4996)
 else()
-  target_compile_options(apriltag PRIVATE -Wno-newline-eof -Wno-sign-compare -Wno-pedantic)
+  target_compile_options(apriltag PRIVATE -Wno-newline-eof -Wno-unused-variable -Wno-sign-compare -Wno-pedantic)
 endif()
 
 target_link_libraries(apriltag wpimath)
