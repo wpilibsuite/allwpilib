@@ -7,13 +7,14 @@ if (WITH_JAVA)
      find_package(Java REQUIRED)
      include(UseJava)
 
+     file(GLOB EJML_JARS "${WPILIB_BINARY_DIR}/wpimath/thirdparty/ejml/*.jar")
      file(GLOB JACKSON_JARS "${WPILIB_BINARY_DIR}/wpiutil/thirdparty/jackson/*.jar")
 
-     set(CMAKE_JAVA_INCLUDE_PATH apriltag.jar ${JACKSON_JARS})
+     set(CMAKE_JAVA_INCLUDE_PATH apriltag.jar ${EJML_JARS} ${JACKSON_JARS})
 
      file(GLOB_RECURSE JAVA_SOURCES src/main/java/*.java)
      file(GLOB_RECURSE JAVA_RESOURCES src/main/native/resources/*.json)
-     add_jar(apriltag_jar SOURCES ${JAVA_SOURCES} RESOURCES NAMESPACE "edu/wpi/first/apriltag" ${JAVA_RESOURCES} INCLUDE_JARS wpimath_jar OUTPUT_NAME apriltag)
+     add_jar(apriltag_jar SOURCES ${JAVA_SOURCES} RESOURCES NAMESPACE "edu/wpi/first/apriltag" ${JAVA_RESOURCES} INCLUDE_JARS wpimath_jar ${EJML_JARS} OUTPUT_NAME apriltag)
 endif()
 
 
