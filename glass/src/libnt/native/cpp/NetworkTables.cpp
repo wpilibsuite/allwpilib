@@ -114,7 +114,6 @@ NetworkTablesModel::NetworkTablesModel(nt::NetworkTableInstance inst)
   m_poller.AddListener({{"", "$"}}, nt::EventFlags::kTopic |
                                         nt::EventFlags::kValueAll |
                                         nt::EventFlags::kImmediate);
-  m_poller.AddConnectionListener(false);  // we only track disconnects
 }
 
 NetworkTablesModel::Entry::~Entry() {
@@ -434,7 +433,7 @@ void NetworkTablesModel::Update() {
       }
       if (event.flags & nt::EventFlags::kUnpublish) {
         // meta topic handling
-        if (wpi::starts_with(info->name, '$') && info->type_str == "msgpack") {
+        if (wpi::starts_with(info->name, '$')) {
           // meta topic handling
           if (info->name == "$clients") {
             m_clients.clear();
@@ -497,12 +496,6 @@ void NetworkTablesModel::Update() {
           }
         }
       }
-    } else if (event.Is(nt::EventFlags::kDisconnected) &&
-               m_inst.GetNetworkMode() != NT_NET_MODE_SERVER) {
-      // clear meta topic generated info on disconnect
-      m_clients.clear();
-      m_server.publishers.clear();
-      m_server.subscribers.clear();
     }
   }
 
