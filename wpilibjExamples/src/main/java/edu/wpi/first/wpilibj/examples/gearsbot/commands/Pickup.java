@@ -24,6 +24,7 @@ public class Pickup extends SequentialCommandGroup {
   public Pickup(Claw claw, Wrist wrist, Elevator elevator) {
     addCommands(
         new CloseClaw(claw),
-        Commands.parallel(new SetWristSetpoint(-45, wrist), new SetElevatorSetpoint(0.25, elevator)));
+        Commands.parallel(
+            new SetWristSetpoint(-45, wrist), new SetElevatorSetpoint(0.25, elevator)));
   }
 }
