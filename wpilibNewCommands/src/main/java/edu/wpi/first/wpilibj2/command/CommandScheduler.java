@@ -605,7 +605,8 @@ public final class CommandScheduler implements NTSendable, AutoCloseable {
   public void requireNotComposed(Command command) {
     if (m_composedCommands.contains(command)) {
       throw new IllegalArgumentException(
-          "Commands that have been composed may not be added to another composition or scheduled individually!");
+          "Commands that have been composed may not be added to another composition or scheduled"
+              + "individually!");
     }
   }
 
@@ -618,7 +619,8 @@ public final class CommandScheduler implements NTSendable, AutoCloseable {
   public void requireNotComposed(Collection<Command> commands) {
     if (!Collections.disjoint(commands, getComposedCommands())) {
       throw new IllegalArgumentException(
-          "Commands that have been composed may not be added to another composition or scheduled individually!");
+          "Commands that have been composed may not be added to another composition or scheduled"
+              + "individually!");
     }
   }
 
