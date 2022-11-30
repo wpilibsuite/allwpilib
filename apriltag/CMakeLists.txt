@@ -9,12 +9,13 @@ if (WITH_JAVA)
 
      file(GLOB EJML_JARS "${WPILIB_BINARY_DIR}/wpimath/thirdparty/ejml/*.jar")
      file(GLOB JACKSON_JARS "${WPILIB_BINARY_DIR}/wpiutil/thirdparty/jackson/*.jar")
+     find_file(OPENCV_JAR_FILE NAMES opencv-${OpenCV_VERSION_MAJOR}${OpenCV_VERSION_MINOR}${OpenCV_VERSION_PATCH}.jar PATHS ${OPENCV_JAVA_INSTALL_DIR} ${OpenCV_INSTALL_PATH}/bin ${OpenCV_INSTALL_PATH}/share/java NO_DEFAULT_PATH)
 
      set(CMAKE_JAVA_INCLUDE_PATH apriltag.jar ${EJML_JARS} ${JACKSON_JARS})
 
      file(GLOB_RECURSE JAVA_SOURCES src/main/java/*.java)
      file(GLOB_RECURSE JAVA_RESOURCES src/main/native/resources/*.json)
-     add_jar(apriltag_jar SOURCES ${JAVA_SOURCES} RESOURCES NAMESPACE "edu/wpi/first/apriltag" ${JAVA_RESOURCES} INCLUDE_JARS wpimath_jar ${EJML_JARS} OUTPUT_NAME apriltag)
+     add_jar(apriltag_jar SOURCES ${JAVA_SOURCES} RESOURCES NAMESPACE "edu/wpi/first/apriltag" ${JAVA_RESOURCES} INCLUDE_JARS wpimath_jar ${EJML_JARS} wpiutil_jar ${OPENCV_JAR_FILE} OUTPUT_NAME apriltag)
 endif()
 
 

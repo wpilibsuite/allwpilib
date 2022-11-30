@@ -59,7 +59,7 @@ Java_edu_wpi_first_apriltag_jni_AprilTagJNI_aprilTagCreate
   // Initialize tag detector with options
   apriltag_family_t* tf = nullptr;
   // const char *famname = fam;
-  const char* famname = env->GetStringUTFChars(jstr, 0);
+  const char* famname = env->GetStringUTFChars(jstr, NULL);
 
   void (*tf_destroy_func)(apriltag_family_t*);
 
