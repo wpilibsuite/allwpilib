@@ -176,7 +176,7 @@ class MecanumDrivePoseEstimatorTest {
 
       // We should apply the oldest vision measurement if it has been `visionUpdateDelay` seconds
       // since it was measured
-      if (visionUpdateQueue.size() > 0 && visionUpdateQueue.firstKey() + visionUpdateDelay < t) {
+      if (!visionUpdateQueue.isEmpty() && visionUpdateQueue.firstKey() + visionUpdateDelay < t) {
         var visionEntry = visionUpdateQueue.pollFirstEntry();
         estimator.addVisionMeasurement(visionEntry.getValue(), visionEntry.getKey());
       }
