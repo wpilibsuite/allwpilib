@@ -25,7 +25,6 @@ std::string GetTypeName(const T& type) {
 }
 
 class PerpetualCommand;
-class ProxyScheduleCommand;
 
 /**
  * A state machine representing a complete action to be performed by the robot.
@@ -225,7 +224,7 @@ safe) semantics.
 
   /**
    * Decorates this command to run "by proxy" by wrapping it in a
-   * ProxyScheduleCommand. This is useful for "forking off" from command groups
+   * ProxyCommand. This is useful for "forking off" from command groups
    * when the user does not wish to extend the command's requirements to the
    * entire command group.
    *
@@ -281,6 +280,15 @@ safe) semantics.
    * @return the decorated command
    */
   [[nodiscard]] CommandPtr HandleInterrupt(std::function<void()> handler) &&;
+
+  /**
+   * Decorates this Command with a name. Is an inline function for
+   * #SetName(std::string_view);
+   *
+   * @param name name
+   * @return the decorated Command
+   */
+  [[nodiscard]] CommandPtr WithName(std::string_view name) &&;
 
   /**
    * Schedules this command.
@@ -343,7 +351,20 @@ safe) semantics.
     return InterruptionBehavior::kCancelSelf;
   }
 
+  /**
+   * Gets the name of this Command. Defaults to the simple class name if not
+   * overridden.
+   *
+   * @return The display name of the Command
+   */
   virtual std::string GetName() const;
+
+  /**
+   * Sets the name of this Command. Nullop if not overridden.
+   *
+   * @param name The display name of the Command.
+   */
+  virtual void SetName(std::string_view name);
 
   /**
    * Transfers ownership of this command to a unique pointer.  Used for

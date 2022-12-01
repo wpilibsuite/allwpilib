@@ -51,6 +51,11 @@ bool gui::PlatformInitRenderer() {
 }
 
 void gui::PlatformRenderFrame() {
+  if (gContext->reloadFonts) {
+    ImGui_ImplOpenGL2_DestroyFontsTexture();
+    ImGui_ImplOpenGL2_CreateFontsTexture();
+    gContext->reloadFonts = false;
+  }
   ImGui_ImplOpenGL2_NewFrame();
 
   CommonRenderFrame();

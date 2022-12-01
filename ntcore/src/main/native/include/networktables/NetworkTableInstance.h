@@ -447,7 +447,7 @@ class NetworkTableInstance final {
    * @param listener Listener function
    * @return Listener handle
    */
-  NT_Listener AddListener(NetworkTableEntry& entry, int eventMask,
+  NT_Listener AddListener(const NetworkTableEntry& entry, int eventMask,
                           ListenerCallback listener);
 
   /**
@@ -688,14 +688,7 @@ class NetworkTableInstance final {
    * Equality operator.  Returns true if both instances refer to the same
    * native handle.
    */
-  bool operator==(const NetworkTableInstance& other) const {
-    return m_handle == other.m_handle;
-  }
-
-  /** Inequality operator. */
-  bool operator!=(const NetworkTableInstance& other) const {
-    return !(*this == other);
-  }
+  bool operator==(const NetworkTableInstance&) const = default;
 
  private:
   /* Native handle */

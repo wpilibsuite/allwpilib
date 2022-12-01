@@ -33,10 +33,6 @@ bool Quaternion::operator==(const Quaternion& other) const {
   return std::abs(m_r * other.m_r + m_v.dot(other.m_v)) > 1.0 - 1E-9;
 }
 
-bool Quaternion::operator!=(const Quaternion& other) const {
-  return !operator==(other);
-}
-
 Quaternion Quaternion::Inverse() const {
   return Quaternion{m_r, -m_v(0), -m_v(1), -m_v(2)};
 }

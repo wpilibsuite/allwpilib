@@ -8,6 +8,7 @@
 #include <initializer_list>
 #include <memory>
 #include <span>
+#include <string>
 #include <utility>
 #include <vector>
 
@@ -48,7 +49,7 @@ class CommandPtr final {
 
   /**
    * Decorates this command to run "by proxy" by wrapping it in a
-   * ProxyScheduleCommand. This is useful for "forking off" from command groups
+   * ProxyCommand. This is useful for "forking off" from command groups
    * when the user does not wish to extend the command's requirements to the
    * entire command group.
    *
@@ -218,6 +219,15 @@ class CommandPtr final {
    * @return the decorated command
    */
   [[nodiscard]] CommandPtr HandleInterrupt(std::function<void()> handler) &&;
+
+  /**
+   * Decorates this Command with a name. Is an inline function for
+   * Command::SetName(std::string_view);
+   *
+   * @param name name
+   * @return the decorated Command
+   */
+  [[nodiscard]] CommandPtr WithName(std::string_view name) &&;
 
   /**
    * Get a raw pointer to the held command.

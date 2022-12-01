@@ -13,7 +13,7 @@
 #include "frc2/command/ParallelDeadlineGroup.h"
 #include "frc2/command/ParallelRaceGroup.h"
 #include "frc2/command/PrintCommand.h"
-#include "frc2/command/ProxyScheduleCommand.h"
+#include "frc2/command/ProxyCommand.h"
 #include "frc2/command/RepeatCommand.h"
 #include "frc2/command/SequentialCommandGroup.h"
 #include "frc2/command/WaitCommand.h"
@@ -37,7 +37,7 @@ CommandPtr CommandPtr::Repeatedly() && {
 
 CommandPtr CommandPtr::AsProxy() && {
   AssertValid();
-  m_ptr = std::make_unique<ProxyScheduleCommand>(std::move(m_ptr));
+  m_ptr = std::make_unique<ProxyCommand>(std::move(m_ptr));
   return std::move(*this);
 }
 
@@ -217,6 +217,12 @@ CommandPtr CommandPtr::HandleInterrupt(std::function<void(void)> handler) && {
           handler();
         }
       });
+}
+
+CommandPtr CommandPtr::WithName(std::string_view name) && {
+  AssertValid();
+  m_ptr->SetName(name);
+  return std::move(*this);
 }
 
 CommandBase* CommandPtr::get() const {

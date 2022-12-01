@@ -158,7 +158,7 @@ public final class CommandScheduler implements NTSendable, AutoCloseable {
    */
   @Deprecated(since = "2023")
   public void addButton(Runnable button) {
-    m_activeButtonLoop.bind(() -> true, requireNonNullParam(button, "button", "addButton"));
+    m_activeButtonLoop.bind(requireNonNullParam(button, "button", "addButton"));
   }
 
   /**
@@ -367,6 +367,10 @@ public final class CommandScheduler implements NTSendable, AutoCloseable {
         DriverStation.reportWarning("Tried to register a null subsystem", true);
         continue;
       }
+      if (m_subsystems.containsKey(subsystem)) {
+        DriverStation.reportWarning("Tried to register an already-registered subsystem", true);
+        continue;
+      }
       m_subsystems.put(subsystem, null);
     }
   }
@@ -414,6 +418,22 @@ public final class CommandScheduler implements NTSendable, AutoCloseable {
     }
 
     m_subsystems.put(subsystem, defaultCommand);
+  }
+
+  /**
+   * Removes the default command for a subsystem. The current default command will run until another
+   * command is scheduled that requires the subsystem, at which point the current default command
+   * will not be re-scheduled.
+   *
+   * @param subsystem the subsystem whose default command will be removed
+   */
+  public void removeDefaultCommand(Subsystem subsystem) {
+    if (subsystem == null) {
+      DriverStation.reportWarning("Tried to remove a default command for a null subsystem", true);
+      return;
+    }
+
+    m_subsystems.put(subsystem, null);
   }
 
   /**

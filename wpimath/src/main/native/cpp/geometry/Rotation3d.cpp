@@ -54,14 +54,14 @@ Rotation3d::Rotation3d(const Matrixd<3, 3>& rotationMatrix) {
 
   // Require that the rotation matrix is special orthogonal. This is true if the
   // matrix is orthogonal (RRᵀ = I) and normalized (determinant is 1).
-  if (R * R.transpose() != Matrixd<3, 3>::Identity()) {
+  if ((R * R.transpose() - Matrixd<3, 3>::Identity()).norm() > 1e-9) {
     std::string msg =
         fmt::format("Rotation matrix isn't orthogonal\n\nR =\n{}\n", R);
 
     wpi::math::MathSharedStore::ReportError(msg);
     throw std::domain_error(msg);
   }
-  if (R.determinant() != 1.0) {
+  if (std::abs(R.determinant() - 1.0) > 1e-9) {
     std::string msg = fmt::format(
         "Rotation matrix is orthogonal but not special orthogonal\n\nR =\n{}\n",
         R);
@@ -168,14 +168,6 @@ Rotation3d Rotation3d::operator*(double scalar) const {
 
 Rotation3d Rotation3d::operator/(double scalar) const {
   return *this * (1.0 / scalar);
-}
-
-bool Rotation3d::operator==(const Rotation3d& other) const {
-  return m_q == other.m_q;
-}
-
-bool Rotation3d::operator!=(const Rotation3d& other) const {
-  return !operator==(other);
 }
 
 Rotation3d Rotation3d::RotateBy(const Rotation3d& other) const {

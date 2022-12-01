@@ -35,16 +35,16 @@ class AddressableLEDBufferTest {
         arguments(0, 255, 255, 255, 0, 0), // Red
         arguments(60, 255, 255, 0, 255, 0), // Lime
         arguments(120, 255, 255, 0, 0, 255), // Blue
-        arguments(30, 255, 255, 254, 255, 0), // Yellow (ish)
-        arguments(90, 255, 255, 0, 254, 255), // Cyan (ish)
-        arguments(150, 255, 255, 255, 0, 254), // Magenta (ish)
+        arguments(30, 255, 255, 255, 255, 0), // Yellow
+        arguments(90, 255, 255, 0, 255, 255), // Cyan
+        arguments(150, 255, 255, 255, 0, 255), // Magenta
         arguments(0, 0, 191, 191, 191, 191), // Silver
         arguments(0, 0, 128, 128, 128, 128), // Gray
         arguments(0, 255, 128, 128, 0, 0), // Maroon
-        arguments(30, 255, 128, 127, 128, 0), // Olive (ish)
+        arguments(30, 255, 128, 128, 128, 0), // Olive
         arguments(60, 255, 128, 0, 128, 0), // Green
-        arguments(150, 255, 128, 128, 0, 127), // Purple (ish)
-        arguments(90, 255, 128, 0, 127, 128), // Teal (ish)
+        arguments(150, 255, 128, 128, 0, 128), // Purple
+        arguments(90, 255, 128, 0, 128, 128), // Teal
         arguments(120, 255, 128, 0, 0, 128) // Navy
         );
   }

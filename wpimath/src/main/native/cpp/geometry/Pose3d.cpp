@@ -52,14 +52,6 @@ Transform3d Pose3d::operator-(const Pose3d& other) const {
   return Transform3d{pose.Translation(), pose.Rotation()};
 }
 
-bool Pose3d::operator==(const Pose3d& other) const {
-  return m_translation == other.m_translation && m_rotation == other.m_rotation;
-}
-
-bool Pose3d::operator!=(const Pose3d& other) const {
-  return !operator==(other);
-}
-
 Pose3d Pose3d::operator*(double scalar) const {
   return Pose3d{m_translation * scalar, m_rotation * scalar};
 }

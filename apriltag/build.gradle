@@ -3,13 +3,14 @@ apply from: "${rootDir}/shared/resources.gradle"
 ext {
     nativeName = 'apriltag'
     devMain = 'edu.wpi.first.apriltag.DevMain'
+    useJava = true
 
     def generateTask = createGenerateResourcesTask('main', 'APRILTAG', 'frc', project)
 
     tasks.withType(CppCompile) {
         dependsOn generateTask
     }
-    extraSetup = {
+    splitSetup = {
         it.sources {
             resourcesCpp(CppSourceSet) {
                 source {
@@ -23,7 +24,9 @@ ext {
 
 evaluationDependsOn(':wpimath')
 
-apply from: "${rootDir}/shared/javacpp/setupBuild.gradle"
+apply from: "${rootDir}/shared/jni/setupBuild.gradle"
+apply from: "${rootDir}/shared/apriltaglib.gradle"
+apply from: "${rootDir}/shared/opencv.gradle"
 
 dependencies {
     implementation project(':wpimath')
@@ -47,12 +50,15 @@ model {
             }
             it.cppCompiler.define 'WPILIB_EXPORTS'
 
-            lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
-            lib project: ':wpimath', library: 'wpimath', linkage: 'shared'
-
-            if ((it instanceof NativeExecutableBinarySpec || it instanceof GoogleTestTestSuiteBinarySpec) && it.targetPlatform.name == nativeUtils.wpi.platforms.roborio) {
-                nativeUtils.useRequiredLibrary(it, 'ni_link_libraries', 'ni_runtime_libraries')
+            if (it.component.name == "${nativeName}JNI") {
+                lib project: ':wpimath', library: 'wpimath', linkage: 'static'
+                lib project: ':wpiutil', library: 'wpiutil', linkage: 'static'
+            } else {
+                lib project: ':wpimath', library: 'wpimath', linkage: 'shared'
+                lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
             }
+
+            nativeUtils.useRequiredLibrary(it, 'apriltaglib')
         }
     }
     tasks {

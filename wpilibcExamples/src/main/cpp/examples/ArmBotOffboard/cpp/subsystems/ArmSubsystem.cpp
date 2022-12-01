@@ -25,3 +25,7 @@ void ArmSubsystem::UseState(State setpoint) {
   m_motor.SetSetpoint(ExampleSmartMotorController::PIDMode::kPosition,
                       setpoint.position.value(), feedforward / 12_V);
 }
+
+frc2::CommandPtr ArmSubsystem::SetArmGoalCommand(units::radian_t goal) {
+  return frc2::cmd::RunOnce([this, goal] { this->SetGoal(goal); }, {this});
+}

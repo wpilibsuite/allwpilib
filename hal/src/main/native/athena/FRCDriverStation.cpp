@@ -179,6 +179,15 @@ void InitializeFRCDriverStation() {
 }
 }  // namespace hal::init
 
+namespace hal {
+static void DefaultPrintErrorImpl(const char* line, size_t size) {
+  std::fwrite(line, size, 1, stderr);
+}
+}  // namespace hal
+
+static std::atomic<void (*)(const char* line, size_t size)> gPrintErrorImpl{
+    hal::DefaultPrintErrorImpl};
+
 extern "C" {
 
 int32_t HAL_SendError(HAL_Bool isError, int32_t errorCode, HAL_Bool isLVCode,
@@ -256,7 +265,8 @@ int32_t HAL_SendError(HAL_Bool isError, int32_t errorCode, HAL_Bool isLVCode,
       if (callStack && callStack[0] != '\0') {
         fmt::format_to(fmt::appender{buf}, "{}\n", callStack);
       }
-      std::fwrite(buf.data(), buf.size(), 1, stderr);
+      auto printError = gPrintErrorImpl.load();
+      printError(buf.data(), buf.size());
     }
     if (i == KEEP_MSGS) {
       // replace the oldest one
@@ -273,6 +283,10 @@ int32_t HAL_SendError(HAL_Bool isError, int32_t errorCode, HAL_Bool isLVCode,
     prevMsgTime[i] = curTime;
   }
   return retval;
+}
+
+void HAL_SetPrintErrorImpl(void (*func)(const char* line, size_t size)) {
+  gPrintErrorImpl.store(func ? func : hal::DefaultPrintErrorImpl);
 }
 
 int32_t HAL_SendConsoleLine(const char* line) {

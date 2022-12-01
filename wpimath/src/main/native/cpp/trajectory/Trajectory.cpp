@@ -13,16 +13,6 @@
 
 using namespace frc;
 
-bool Trajectory::State::operator==(const Trajectory::State& other) const {
-  return t == other.t && velocity == other.velocity &&
-         acceleration == other.acceleration && pose == other.pose &&
-         curvature == other.curvature;
-}
-
-bool Trajectory::State::operator!=(const Trajectory::State& other) const {
-  return !operator==(other);
-}
-
 Trajectory::State Trajectory::State::Interpolate(State endValue,
                                                  double i) const {
   // Find the new [t] value.
@@ -162,12 +152,4 @@ void frc::from_json(const wpi::json& json, Trajectory::State& state) {
   state.acceleration =
       units::meters_per_second_squared_t{json.at("acceleration").get<double>()};
   state.curvature = units::curvature_t{json.at("curvature").get<double>()};
-}
-
-bool Trajectory::operator==(const Trajectory& other) const {
-  return m_states == other.States();
-}
-
-bool Trajectory::operator!=(const Trajectory& other) const {
-  return !operator==(other);
 }

@@ -201,6 +201,15 @@ class CommandScheduler final : public nt::NTSendable,
   void SetDefaultCommand(Subsystem* subsystem, CommandPtr&& defaultCommand);
 
   /**
+   * Removes the default command for a subsystem. The current default command
+   * will run until another command is scheduled that requires the subsystem, at
+   * which point the current default command will not be re-scheduled.
+   *
+   * @param subsystem the subsystem whose default command will be removed
+   */
+  void RemoveDefaultCommand(Subsystem* subsystem);
+
+  /**
    * Gets the default command associated with this subsystem.  Null if this
    * subsystem has no default command associated with it.
    *

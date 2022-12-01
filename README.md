@@ -1,6 +1,6 @@
 # WPILib Project
 
-![CI](https://github.com/wpilibsuite/allwpilib/workflows/CI/badge.svg)
+[![Gradle](https://github.com/wpilibsuite/allwpilib/actions/workflows/gradle.yml/badge.svg?branch=main)](https://github.com/wpilibsuite/allwpilib/actions/workflows/gradle.yml)
 [![C++ Documentation](https://img.shields.io/badge/documentation-c%2B%2B-blue)](https://github.wpilib.org/allwpilib/docs/development/cpp/)
 [![Java Documentation](https://img.shields.io/badge/documentation-java-orange)](https://github.wpilib.org/allwpilib/docs/development/java/)
 

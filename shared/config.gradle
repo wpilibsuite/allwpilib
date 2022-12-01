@@ -13,12 +13,9 @@ nativeUtils.withCrossLinuxArm64()
 nativeUtils {
     wpi {
         configureDependencies {
-            wpiVersion = "-1"
             niLibVersion = "2023.1.0"
             opencvVersion = "4.6.0-3"
             googleTestVersion = "1.11.0-4"
-            imguiVersion = "1.88-9"
-            wpimathVersion = "-1"
         }
     }
 }
@@ -37,7 +34,7 @@ nativeUtils.platformConfigs.each {
     if (it.name.contains('osx')) {
         it.linker.args << '-Wl,-rpath,\'@loader_path\''
         it.linker.args << "-headerpad_max_install_names"
-    } else {
+    } else if (it.name.contains('linux')) {
         it.linker.args << '-Wl,-rpath,\'$ORIGIN\''
     }
 }

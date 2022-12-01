@@ -30,7 +30,7 @@ class NetworkTablesModel : public Model {
  public:
   struct SubscriberOptions {
     float periodic = 0.1f;
-    bool immediate = false;
+    bool topicsOnly = false;
     bool sendAll = false;
     bool prefixMatch = false;
     // std::string otherStr;

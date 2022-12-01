@@ -31,6 +31,8 @@ public class SelectCommand extends CommandBase {
   private final Supplier<Object> m_selector;
   private final Supplier<Command> m_toRun;
   private Command m_selectedCommand;
+  private boolean m_runsWhenDisabled = true;
+  private InterruptionBehavior m_interruptBehavior = InterruptionBehavior.kCancelIncoming;
 
   /**
    * Creates a new selectcommand.
@@ -50,6 +52,10 @@ public class SelectCommand extends CommandBase {
 
     for (Command command : m_commands.values()) {
       m_requirements.addAll(command.getRequirements());
+      m_runsWhenDisabled &= command.runsWhenDisabled();
+      if (command.getInterruptionBehavior() == InterruptionBehavior.kCancelSelf) {
+        m_interruptBehavior = InterruptionBehavior.kCancelSelf;
+      }
     }
   }
 
@@ -57,11 +63,17 @@ public class SelectCommand extends CommandBase {
    * Creates a new selectcommand.
    *
    * @param toRun a supplier providing the command to run
+   * @deprecated Replace with {@link ProxyCommand}
    */
+  @Deprecated
   public SelectCommand(Supplier<Command> toRun) {
     m_commands = null;
     m_selector = null;
     m_toRun = requireNonNullParam(toRun, "toRun", "SelectCommand");
+
+    // we have no way of checking the underlying command, so default.
+    m_runsWhenDisabled = false;
+    m_interruptBehavior = InterruptionBehavior.kCancelSelf;
   }
 
   @Override
@@ -97,14 +109,11 @@ public class SelectCommand extends CommandBase {
 
   @Override
   public boolean runsWhenDisabled() {
-    if (m_commands != null) {
-      boolean runsWhenDisabled = true;
-      for (Command command : m_commands.values()) {
-        runsWhenDisabled &= command.runsWhenDisabled();
-      }
-      return runsWhenDisabled;
-    } else {
-      return m_toRun.get().runsWhenDisabled();
-    }
+    return m_runsWhenDisabled;
+  }
+
+  @Override
+  public InterruptionBehavior getInterruptionBehavior() {
+    return m_interruptBehavior;
   }
 }

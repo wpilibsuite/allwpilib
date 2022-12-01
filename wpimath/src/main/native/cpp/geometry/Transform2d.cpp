@@ -21,11 +21,3 @@ Transform2d::Transform2d(Pose2d initial, Pose2d final) {
 Transform2d Transform2d::operator+(const Transform2d& other) const {
   return Transform2d{Pose2d{}, Pose2d{}.TransformBy(*this).TransformBy(other)};
 }
-
-bool Transform2d::operator==(const Transform2d& other) const {
-  return m_translation == other.m_translation && m_rotation == other.m_rotation;
-}
-
-bool Transform2d::operator!=(const Transform2d& other) const {
-  return !operator==(other);
-}

@@ -4,21 +4,16 @@
 
 package edu.wpi.first.wpilibj.examples.hatchbotinlined;
 
-import static edu.wpi.first.wpilibj.PS4Controller.Button;
-
 import edu.wpi.first.wpilibj.PS4Controller;
-import edu.wpi.first.wpilibj.examples.hatchbotinlined.Constants.AutoConstants;
 import edu.wpi.first.wpilibj.examples.hatchbotinlined.Constants.OIConstants;
-import edu.wpi.first.wpilibj.examples.hatchbotinlined.commands.ComplexAutoCommand;
+import edu.wpi.first.wpilibj.examples.hatchbotinlined.commands.Autos;
 import edu.wpi.first.wpilibj.examples.hatchbotinlined.subsystems.DriveSubsystem;
 import edu.wpi.first.wpilibj.examples.hatchbotinlined.subsystems.HatchSubsystem;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.FunctionalCommand;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.RunCommand;
-import edu.wpi.first.wpilibj2.command.button.JoystickButton;
+import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.button.CommandPS4Controller;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -31,30 +26,20 @@ public class RobotContainer {
   private final DriveSubsystem m_robotDrive = new DriveSubsystem();
   private final HatchSubsystem m_hatchSubsystem = new HatchSubsystem();
 
+  // Retained command handles
+
   // The autonomous routines
-
   // A simple auto routine that drives forward a specified distance, and then stops.
-  private final Command m_simpleAuto =
-      new FunctionalCommand(
-          // Reset encoders on command start
-          m_robotDrive::resetEncoders,
-          // Drive forward while the command is executing
-          () -> m_robotDrive.arcadeDrive(AutoConstants.kAutoDriveSpeed, 0),
-          // Stop driving at the end of the command
-          interrupt -> m_robotDrive.arcadeDrive(0, 0),
-          // End the command when the robot's driven distance exceeds the desired value
-          () -> m_robotDrive.getAverageEncoderDistance() >= AutoConstants.kAutoDriveDistanceInches,
-          // Require the drive subsystem
-          m_robotDrive);
-
+  private final Command m_simpleAuto = Autos.simpleAuto(m_robotDrive);
   // A complex auto routine that drives forward, drops a hatch, and then drives backward.
-  private final Command m_complexAuto = new ComplexAutoCommand(m_robotDrive, m_hatchSubsystem);
+  private final Command m_complexAuto = Autos.complexAuto(m_robotDrive, m_hatchSubsystem);
 
   // A chooser for autonomous commands
   SendableChooser<Command> m_chooser = new SendableChooser<>();
 
   // The driver's controller
-  PS4Controller m_driverController = new PS4Controller(OIConstants.kDriverControllerPort);
+  CommandPS4Controller m_driverController =
+      new CommandPS4Controller(OIConstants.kDriverControllerPort);
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
@@ -66,10 +51,10 @@ public class RobotContainer {
     m_robotDrive.setDefaultCommand(
         // A split-stick arcade command, with forward/backward controlled by the left
         // hand, and turning controlled by the right.
-        new RunCommand(
+        Commands.run(
             () ->
                 m_robotDrive.arcadeDrive(
-                    -m_driverController.getLeftY(), m_driverController.getRightX()),
+                    -m_driverController.getLeftY(), -m_driverController.getRightX()),
             m_robotDrive));
 
     // Add commands to the autonomous command chooser
@@ -88,15 +73,18 @@ public class RobotContainer {
    */
   private void configureButtonBindings() {
     // Grab the hatch when the Circle button is pressed.
-    new JoystickButton(m_driverController, Button.kCircle.value)
-        .onTrue(new InstantCommand(m_hatchSubsystem::grabHatch, m_hatchSubsystem));
+    m_driverController
+        .circle()
+        .onTrue(Commands.runOnce(m_hatchSubsystem::grabHatch, m_hatchSubsystem));
     // Release the hatch when the Square button is pressed.
-    new JoystickButton(m_driverController, Button.kSquare.value)
-        .onTrue(new InstantCommand(m_hatchSubsystem::releaseHatch, m_hatchSubsystem));
+    m_driverController
+        .square()
+        .onTrue(Commands.runOnce(m_hatchSubsystem::releaseHatch, m_hatchSubsystem));
     // While holding R1, drive at half speed
-    new JoystickButton(m_driverController, Button.kR1.value)
-        .onTrue(new InstantCommand(() -> m_robotDrive.setMaxOutput(0.5)))
-        .onFalse(new InstantCommand(() -> m_robotDrive.setMaxOutput(1)));
+    m_driverController
+        .R1()
+        .onTrue(Commands.runOnce(() -> m_robotDrive.setMaxOutput(0.5)))
+        .onFalse(Commands.runOnce(() -> m_robotDrive.setMaxOutput(1)));
   }
 
   /**

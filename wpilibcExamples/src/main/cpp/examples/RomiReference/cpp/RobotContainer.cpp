@@ -19,7 +19,7 @@ void RobotContainer::ConfigureButtonBindings() {
   // Also set default commands here
   m_drive.SetDefaultCommand(TeleopArcadeDrive(
       &m_drive, [this] { return -m_controller.GetRawAxis(1); },
-      [this] { return m_controller.GetRawAxis(2); }));
+      [this] { return -m_controller.GetRawAxis(2); }));
 
   // Example of how to use the onboard IO
   m_onboardButtonA.OnTrue(frc2::cmd::Print("Button A Pressed"))

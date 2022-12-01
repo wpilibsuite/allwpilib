@@ -19,6 +19,7 @@ import static edu.wpi.first.wpilibj2.command.CommandGroupBase.requireUngrouped;
  */
 public class RepeatCommand extends CommandBase {
   protected final Command m_command;
+  private boolean m_ended;
 
   /**
    * Creates a new RepeatCommand. Will run another command repeatedly, restarting it whenever it
@@ -35,16 +36,21 @@ public class RepeatCommand extends CommandBase {
 
   @Override
   public void initialize() {
+    m_ended = false;
     m_command.initialize();
   }
 
   @Override
   public void execute() {
+    if (m_ended) {
+      m_ended = false;
+      m_command.initialize();
+    }
     m_command.execute();
     if (m_command.isFinished()) {
       // restart command
       m_command.end(false);
-      m_command.initialize();
+      m_ended = true;
     }
   }
 
@@ -61,5 +67,10 @@ public class RepeatCommand extends CommandBase {
   @Override
   public boolean runsWhenDisabled() {
     return m_command.runsWhenDisabled();
+  }
+
+  @Override
+  public InterruptionBehavior getInterruptionBehavior() {
+    return m_command.getInterruptionBehavior();
   }
 }

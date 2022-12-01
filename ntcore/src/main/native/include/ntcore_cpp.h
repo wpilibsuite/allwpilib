@@ -314,7 +314,7 @@ class PubSubOption {
 
   /**
    * Polling storage for subscription. Specifies the maximum number of updates
-   * NetworkTables should store between calls to the subscriber's poll()
+   * NetworkTables should store between calls to the subscriber's ReadQueue()
    * function. Defaults to 1 if SendAll is false, 20 if SendAll is true.
    *
    * @param depth number of entries to save for polling.
@@ -322,6 +322,39 @@ class PubSubOption {
    */
   static constexpr PubSubOption PollStorage(int depth) {
     return PubSubOption{NT_PUBSUB_POLLSTORAGE, static_cast<double>(depth)};
+  }
+
+  /**
+   * If only local value updates should be queued for ReadQueue(). See also
+   * RemoteOnly() and AllUpdates(). Default is AllUpdates. Only has an effect on
+   * subscriptions.
+   *
+   * @return option
+   */
+  static constexpr PubSubOption LocalOnly() {
+    return PubSubOption{NT_PUBSUB_LOCALREMOTE, 1.0};
+  }
+
+  /**
+   * If only remote value updates should be queued for ReadQueue(). See also
+   * LocalOnly() and AllUpdates(). Default is AllUpdates. Only has an effect on
+   * subscriptions.
+   *
+   * @return option
+   */
+  static constexpr PubSubOption RemoteOnly() {
+    return PubSubOption{NT_PUBSUB_LOCALREMOTE, 2.0};
+  }
+
+  /**
+   * If both local and remote value updates should be queued for ReadQueue().
+   * See also LocalOnly() and RemoteOnly(). Default is AllUpdates. Only has an
+   * effect on subscriptions.
+   *
+   * @return option
+   */
+  static constexpr PubSubOption AllUpdates() {
+    return PubSubOption{NT_PUBSUB_LOCALREMOTE, 0.0};
   }
 
   NT_PubSubOptionType type;

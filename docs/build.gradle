@@ -3,16 +3,17 @@ plugins {
     id "org.ysb33r.doxygen" version "0.7.0"
 }
 
-evaluationDependsOn(':wpiutil')
-evaluationDependsOn(':wpinet')
-evaluationDependsOn(':ntcore')
+evaluationDependsOn(':apriltag')
+evaluationDependsOn(':cameraserver')
 evaluationDependsOn(':cscore')
 evaluationDependsOn(':hal')
-evaluationDependsOn(':cameraserver')
-evaluationDependsOn(':wpimath')
+evaluationDependsOn(':ntcore')
+evaluationDependsOn(':wpilibNewCommands')
 evaluationDependsOn(':wpilibc')
 evaluationDependsOn(':wpilibj')
-evaluationDependsOn(':wpilibNewCommands')
+evaluationDependsOn(':wpimath')
+evaluationDependsOn(':wpinet')
+evaluationDependsOn(':wpiutil')
 
 def baseArtifactIdCpp = 'documentation'
 def artifactGroupIdCpp = 'edu.wpi.first.wpilibc'
@@ -27,15 +28,16 @@ def outputsFolder = file("$project.buildDir/outputs")
 def cppProjectZips = []
 def cppIncludeRoots = []
 
-cppProjectZips.add(project(':hal').cppHeadersZip)
-cppProjectZips.add(project(':wpiutil').cppHeadersZip)
-cppProjectZips.add(project(':wpinet').cppHeadersZip)
-cppProjectZips.add(project(':ntcore').cppHeadersZip)
-cppProjectZips.add(project(':cscore').cppHeadersZip)
+cppProjectZips.add(project(':apriltag').cppHeadersZip)
 cppProjectZips.add(project(':cameraserver').cppHeadersZip)
-cppProjectZips.add(project(':wpimath').cppHeadersZip)
-cppProjectZips.add(project(':wpilibc').cppHeadersZip)
+cppProjectZips.add(project(':cscore').cppHeadersZip)
+cppProjectZips.add(project(':hal').cppHeadersZip)
+cppProjectZips.add(project(':ntcore').cppHeadersZip)
 cppProjectZips.add(project(':wpilibNewCommands').cppHeadersZip)
+cppProjectZips.add(project(':wpilibc').cppHeadersZip)
+cppProjectZips.add(project(':wpimath').cppHeadersZip)
+cppProjectZips.add(project(':wpinet').cppHeadersZip)
+cppProjectZips.add(project(':wpiutil').cppHeadersZip)
 
 doxygen {
     executables {
@@ -205,19 +207,20 @@ task generateJavaDocs(type: Javadoc) {
     options.addBooleanOption("Xdoclint:html,missing,reference,syntax", true)
     options.addBooleanOption('html5', true)
     options.linkSource(true)
-    dependsOn project(':wpilibj').generateJavaVersion
     dependsOn project(':hal').generateUsageReporting
-    dependsOn project(':wpimath').generateNat
     dependsOn project(':ntcore').ntcoreGenerateJavaTypes
-    source project(':hal').sourceSets.main.java
-    source project(':wpiutil').sourceSets.main.java
-    source project(':wpinet').sourceSets.main.java
-    source project(':cscore').sourceSets.main.java
-    source project(':ntcore').sourceSets.main.java
-    source project(':wpimath').sourceSets.main.java
-    source project(':wpilibj').sourceSets.main.java
+    dependsOn project(':wpilibj').generateJavaVersion
+    dependsOn project(':wpimath').generateNat
+    source project(':apriltag').sourceSets.main.java
     source project(':cameraserver').sourceSets.main.java
+    source project(':cscore').sourceSets.main.java
+    source project(':hal').sourceSets.main.java
+    source project(':ntcore').sourceSets.main.java
     source project(':wpilibNewCommands').sourceSets.main.java
+    source project(':wpilibj').sourceSets.main.java
+    source project(':wpimath').sourceSets.main.java
+    source project(':wpinet').sourceSets.main.java
+    source project(':wpiutil').sourceSets.main.java
     source configurations.javaSource.collect { zipTree(it) }
     include '**/*.java'
     failOnError = true

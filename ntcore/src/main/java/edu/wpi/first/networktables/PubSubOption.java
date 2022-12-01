@@ -11,6 +11,7 @@ public class PubSubOption {
   private static final int kTopicsOnly = 3;
   private static final int kPollStorage = 4;
   private static final int kKeepDuplicates = 5;
+  private static final int kLocalRemote = 6;
 
   PubSubOption(int type, double value) {
     m_type = type;
@@ -64,14 +65,44 @@ public class PubSubOption {
 
   /**
    * Polling storage for subscription. Specifies the maximum number of updates NetworkTables should
-   * store between calls to the subscriber's poll() function. Defaults to 1 if sendAll is false, 20
-   * if sendAll is true.
+   * store between calls to the subscriber's readQueue() function. Defaults to 1 if sendAll is
+   * false, 20 if sendAll is true.
    *
    * @param depth number of entries to save for polling.
    * @return option
    */
   public static PubSubOption pollStorage(int depth) {
     return new PubSubOption(kPollStorage, depth);
+  }
+
+  /**
+   * If only local value updates should be queued for readQueue(). See also remoteOnly() and
+   * allUpdates(). Default is allUpdates. Only has an effect on subscriptions.
+   *
+   * @return option
+   */
+  public static PubSubOption localOnly() {
+    return new PubSubOption(kLocalRemote, 1.0);
+  }
+
+  /**
+   * If only remote value updates should be queued for readQueue(). See also localOnly() and
+   * allUpdates(). Default is allUpdates. Only has an effect on subscriptions.
+   *
+   * @return option
+   */
+  public static PubSubOption remoteOnly() {
+    return new PubSubOption(kLocalRemote, 2.0);
+  }
+
+  /**
+   * If both local and remote value updates should be queued for readQueue(). See also localOnly()
+   * and remoteOnly(). Default is allUpdates. Only has an effect on subscriptions.
+   *
+   * @return option
+   */
+  public static PubSubOption allUpdates() {
+    return new PubSubOption(kLocalRemote, 0.0);
   }
 
   final int m_type;

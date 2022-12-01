@@ -358,3 +358,85 @@ std::optional<long double> wpi::parse_float<long double>(
   }
   return val;
 }
+
+std::pair<std::string_view, std::string_view> wpi::UnescapeCString(
+    std::string_view str, wpi::SmallVectorImpl<char>& buf) {
+  buf.clear();
+  buf.reserve(str.size() - 2);
+  const char* s = str.data();
+  const char* end = str.data() + str.size();
+  for (; s != end && *s != '"'; ++s) {
+    if (*s != '\\' || (s + 1) >= end) {
+      buf.push_back(*s);
+      continue;
+    }
+    switch (*++s) {
+      case 'a':
+        buf.push_back('\a');
+        break;
+      case 'b':
+        buf.push_back('\b');
+        break;
+      case 'f':
+        buf.push_back('\f');
+        break;
+      case 'n':
+        buf.push_back('\n');
+        break;
+      case 'r':
+        buf.push_back('\r');
+        break;
+      case 't':
+        buf.push_back('\t');
+        break;
+      case 'v':
+        buf.push_back('\v');
+        break;
+      case 'x': {
+        // hex escape
+        if ((s + 1) >= end || !isxdigit(*(s + 1))) {
+          buf.push_back('x');  // treat it like a unknown escape
+          break;
+        }
+        unsigned int ch = wpi::hexDigitValue(*++s);
+        if ((s + 1) < end && std::isxdigit(*(s + 1))) {
+          ch <<= 4;
+          ch |= wpi::hexDigitValue(*++s);
+        }
+        buf.push_back(static_cast<char>(ch));
+        break;
+      }
+      case '0':
+      case '1':
+      case '2':
+      case '3':
+      case '4':
+      case '5':
+      case '6':
+      case '7':
+      case '8':
+      case '9': {
+        // octal escape
+        unsigned int ch = *s - '0';
+        if ((s + 1) < end && wpi::isDigit(*(s + 1))) {
+          ch <<= 3;
+          ch |= *++s - '0';
+        }
+        if ((s + 1) < end && wpi::isDigit(*(s + 1))) {
+          ch <<= 3;
+          ch |= *++s - '0';
+        }
+        buf.push_back(static_cast<char>(ch));
+        break;
+      }
+      default:
+        buf.push_back(*s);
+        break;
+    }
+  }
+  if (s == end) {
+    return {{buf.data(), buf.size()}, {}};
+  } else {
+    return {{buf.data(), buf.size()}, {s, static_cast<size_t>(end - s)}};
+  }
+}

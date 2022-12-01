@@ -4,14 +4,10 @@
 
 #pragma once
 
-#include <frc/XboxController.h>
-#include <frc/smartdashboard/SendableChooser.h>
 #include <frc2/command/Command.h>
-#include <frc2/command/InstantCommand.h>
-#include <frc2/command/ParallelRaceGroup.h>
-#include <frc2/command/RunCommand.h>
-#include <frc2/command/SequentialCommandGroup.h>
-#include <frc2/command/StartEndCommand.h>
+#include <frc2/command/CommandPtr.h>
+#include <frc2/command/Commands.h>
+#include <frc2/command/button/CommandXboxController.h>
 
 #include "Constants.h"
 #include "subsystems/DriveSubsystem.h"
@@ -31,17 +27,19 @@ class RobotContainer {
 
  private:
   // The driver's controller
-  frc::XboxController m_driverController{OIConstants::kDriverControllerPort};
+  frc2::CommandXboxController m_driverController{
+      OIConstants::kDriverControllerPort};
 
   // The robot's subsystems and commands are defined here...
 
   // The robot's subsystems
   DriveSubsystem m_drive;
 
-  frc2::InstantCommand m_driveHalfSpeed{[this] { m_drive.SetMaxOutput(0.5); },
-                                        {}};
-  frc2::InstantCommand m_driveFullSpeed{[this] { m_drive.SetMaxOutput(1); },
-                                        {}};
+  // RobotContainer-owned commands
+  frc2::CommandPtr m_driveHalfSpeed =
+      frc2::cmd::RunOnce([this] { m_drive.SetMaxOutput(0.5); }, {});
+  frc2::CommandPtr m_driveFullSpeed =
+      frc2::cmd::RunOnce([this] { m_drive.SetMaxOutput(1); }, {});
 
   void ConfigureButtonBindings();
 };
