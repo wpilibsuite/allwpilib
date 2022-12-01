@@ -348,7 +348,7 @@ public class SwerveDrivePoseEstimator {
       }
       InterpolationRecord record = (InterpolationRecord) obj;
       return Objects.equals(gyroAngle, record.gyroAngle)
-          && Objects.equals(modulePositions, record.modulePositions)
+          && modulePositions == record.modulePositions
           && Objects.equals(poseMeters, record.poseMeters);
     }
 
