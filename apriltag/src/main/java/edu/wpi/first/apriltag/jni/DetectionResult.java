@@ -157,6 +157,8 @@ public class DetectionResult {
   /**
    * Get the ratio of pose reprojection errors, called ambiguity. Numbers above 0.2 are likely to be
    * ambiguous.
+   *
+   * @return The ratio of pose reprojection errors.
    */
   public double getPoseAmbiguity() {
     var min = Math.min(m_error1, m_error2);
