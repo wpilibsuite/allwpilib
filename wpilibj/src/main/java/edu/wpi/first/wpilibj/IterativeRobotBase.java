@@ -10,6 +10,7 @@ import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import java.util.ConcurrentModificationException;
 
 /**
  * IterativeRobotBase implements a specific type of robot program framework, extending the RobotBase
@@ -67,6 +68,7 @@ public abstract class IterativeRobotBase extends RobotBase {
   private final double m_period;
   private final Watchdog m_watchdog;
   private boolean m_ntFlushEnabled = true;
+  private boolean m_lwEnabledInTest = true;
 
   /**
    * Constructor for IterativeRobotBase.
@@ -245,6 +247,28 @@ public abstract class IterativeRobotBase extends RobotBase {
   }
 
   /**
+   * Sets whether LiveWindow operation is enabled during test mode. Calling
+   *
+   * @param testLW True to enable, false to disable. Defaults to true.
+   * @throws ConcurrentModificationException if this is called during test mode.
+   */
+  public void enableLiveWindowInTest(boolean testLW) {
+    if (isTest()) {
+      throw new ConcurrentModificationException("Can't configure test mode while in test mode!");
+    }
+    m_lwEnabledInTest = testLW;
+  }
+
+  /**
+   * Whether LiveWindow operation is enabled during test mode.
+   *
+   * @return whether LiveWindow should be enabled in test mode.
+   */
+  public boolean isLiveWindowEnabledInTest() {
+    return m_lwEnabledInTest;
+  }
+
+  /**
    * Gets time period between calls to Periodic() functions.
    *
    * @return The time period between calls to Periodic() functions.
@@ -281,8 +305,10 @@ public abstract class IterativeRobotBase extends RobotBase {
       } else if (m_lastMode == Mode.kTeleop) {
         teleopExit();
       } else if (m_lastMode == Mode.kTest) {
-        LiveWindow.setEnabled(false);
-        Shuffleboard.disableActuatorWidgets();
+        if (m_lwEnabledInTest) {
+          LiveWindow.setEnabled(false);
+          Shuffleboard.disableActuatorWidgets();
+        }
         testExit();
       }
 
@@ -297,8 +323,10 @@ public abstract class IterativeRobotBase extends RobotBase {
         teleopInit();
         m_watchdog.addEpoch("teleopInit()");
       } else if (mode == Mode.kTest) {
-        LiveWindow.setEnabled(true);
-        Shuffleboard.enableActuatorWidgets();
+        if (m_lwEnabledInTest) {
+          LiveWindow.setEnabled(true);
+          Shuffleboard.enableActuatorWidgets();
+        }
         testInit();
         m_watchdog.addEpoch("testInit()");
       }
