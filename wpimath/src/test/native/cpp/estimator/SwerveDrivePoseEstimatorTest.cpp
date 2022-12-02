@@ -124,9 +124,9 @@ void testFollowTrajectory(
   }
 
   EXPECT_NEAR(endingPose.X().value(),
-              estimator.GetEstimatedPosition().X().value(), 0.05);
+              estimator.GetEstimatedPosition().X().value(), 0.08);
   EXPECT_NEAR(endingPose.Y().value(),
-              estimator.GetEstimatedPosition().Y().value(), 0.05);
+              estimator.GetEstimatedPosition().Y().value(), 0.08);
   EXPECT_NEAR(endingPose.Rotation().Radians().value(),
               estimator.GetEstimatedPosition().Rotation().Radians().value(),
               0.15);
