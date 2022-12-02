@@ -260,7 +260,7 @@ class SwerveDrivePoseEstimatorTest {
     if (checkError) {
       assertEquals(
           0.0, errorSum / (trajectory.getTotalTimeSeconds() / dt), 0.07, "Incorrect mean error");
-      assertEquals(0.0, maxError, 0.13, "Incorrect max error");
+      assertEquals(0.0, maxError, 0.2, "Incorrect max error");
     }
   }
 }

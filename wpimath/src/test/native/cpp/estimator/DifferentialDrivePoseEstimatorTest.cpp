@@ -139,7 +139,7 @@ void testFollowTrajectory(
 
   if (checkError) {
     EXPECT_LT(errorSum / (trajectory.TotalTime() / dt), 0.05);
-    EXPECT_LT(maxError, 0.125);
+    EXPECT_LT(maxError, 0.2);
   }
 }
 
