@@ -76,6 +76,49 @@ class WPILIB_DLLEXPORT DCMotor {
   }
 
   /**
+   * Returns torque produced by the motor with a given current.
+   *
+   * @param current     The current drawn by the motor.
+   */
+  constexpr units::newton_meter_t Torque(units::ampere_t current) const {
+    return 1.0 * current * Kt;
+  }
+
+  /**
+   * Returns the voltage provided to the motor for a given torque and
+   * angular velocity.
+   *
+   * @param torque      The torque produced by the motor.
+   * @param speed       The current angular velocity of the motor.
+   */
+  constexpr units::volt_t Voltage(units::newton_meter_t torque,
+                                  units::radians_per_second_t speed) const {
+    return 1.0 / Kv * speed + 1.0 / Kt * R * torque;
+  }
+
+  /**
+   * Returns the speed produced by the motor at a given torque and input
+   * voltage.
+   *
+   * @param torque        The torque produced by the motor.
+   * @param inputVoltage  The input voltage provided to the motor.
+   */
+  constexpr units::radians_per_second_t Speed(
+      units::newton_meter_t torque, units::volt_t inputVoltage) const {
+    return 1.0 * inputVoltage * Kv - 1.0 / Kt * torque * R * Kv;
+  }
+
+  /**
+   * Returns a copy of this motor with the given gearbox reduction applied.
+   *
+   * @param gearboxReduction  The gearbox reduction.
+   */
+  constexpr DCMotor WithReduction(double gearboxReduction) {
+    return DCMotor(nominalVoltage, stallTorque * gearboxReduction, stallCurrent,
+                   freeCurrent, freeSpeed / gearboxReduction);
+  }
+
+  /**
    * Returns instance of CIM.
    */
   static constexpr DCMotor CIM(int numMotors = 1) {
