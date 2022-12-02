@@ -81,7 +81,7 @@ class WPILIB_DLLEXPORT DCMotor {
    * @param current     The current drawn by the motor.
    */
   constexpr units::newton_meter_t Torque(units::ampere_t current) const {
-    return 1.0 * current * Kt;
+    return current * Kt;
   }
 
   /**
@@ -105,7 +105,7 @@ class WPILIB_DLLEXPORT DCMotor {
    */
   constexpr units::radians_per_second_t Speed(
       units::newton_meter_t torque, units::volt_t inputVoltage) const {
-    return 1.0 * inputVoltage * Kv - 1.0 / Kt * torque * R * Kv;
+    return inputVoltage * Kv - 1.0 / Kt * torque * R * Kv;
   }
 
   /**

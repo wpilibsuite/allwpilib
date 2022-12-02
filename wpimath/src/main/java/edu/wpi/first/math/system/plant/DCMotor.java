@@ -64,7 +64,7 @@ public class DCMotor {
    * @return The torque produced.
    */
   public double getTorque(double currentAmpere) {
-    return 1.0 * currentAmpere * KtNMPerAmp;
+    return currentAmpere * KtNMPerAmp;
   }
 
   /**
@@ -86,7 +86,7 @@ public class DCMotor {
    * @return The speed of the motor.
    */
   public double getSpeed(double torqueNm, double voltageInputVolts) {
-    return 1.0 * voltageInputVolts - 1.0 / KtNMPerAmp * torqueNm * rOhms * KvRadPerSecPerVolt;
+    return voltageInputVolts - 1.0 / KtNMPerAmp * torqueNm * rOhms * KvRadPerSecPerVolt;
   }
 
   /**
