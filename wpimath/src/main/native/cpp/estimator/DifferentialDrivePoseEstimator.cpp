@@ -11,44 +11,64 @@
 
 using namespace frc;
 
+DifferentialDrivePoseEstimator::InterpolationRecord
+DifferentialDrivePoseEstimator::InterpolationRecord::Interpolate(
+    DifferentialDriveKinematics& kinematics, InterpolationRecord endValue,
+    double i) const {
+  if (i < 0) {
+    return *this;
+  } else if (i > 1) {
+    return endValue;
+  } else {
+    // Find the interpolated left distance.
+    auto left = wpi::Lerp(this->leftDistance, endValue.leftDistance, i);
+    // Find the interpolated right distance.
+    auto right = wpi::Lerp(this->rightDistance, endValue.rightDistance, i);
+
+    // Find the new gyro angle.
+    auto gyro = wpi::Lerp(this->gyroAngle, endValue.gyroAngle, i);
+
+    // Create a twist to represent this changed based on the interpolated
+    // sensor inputs.
+    auto twist =
+        kinematics.ToTwist2d(left - leftDistance, right - rightDistance);
+    twist.dtheta = (gyro - gyroAngle).Radians();
+
+    return {pose.Exp(twist), gyro, left, right};
+  }
+}
+
 DifferentialDrivePoseEstimator::DifferentialDrivePoseEstimator(
-    const Rotation2d& gyroAngle, units::meter_t leftDistance,
-    units::meter_t rightDistance, const Pose2d& initialPose,
-    const wpi::array<double, 5>& stateStdDevs,
-    const wpi::array<double, 3>& localMeasurementStdDevs,
-    const wpi::array<double, 3>& visionMeasurmentStdDevs,
-    units::second_t nominalDt)
-    : m_observer(
-          &DifferentialDrivePoseEstimator::F,
-          [](const Vectord<5>& x, const Vectord<3>& u) {
-            return Vectord<3>{x(3, 0), x(4, 0), x(2, 0)};
-          },
-          stateStdDevs, localMeasurementStdDevs, frc::AngleMean<5, 5>(2),
-          frc::AngleMean<3, 5>(2), frc::AngleResidual<5>(2),
-          frc::AngleResidual<3>(2), frc::AngleAdd<5>(2), nominalDt),
-      m_nominalDt(nominalDt) {
-  SetVisionMeasurementStdDevs(visionMeasurmentStdDevs);
+    DifferentialDriveKinematics& kinematics, const Rotation2d& gyroAngle,
+    units::meter_t leftDistance, units::meter_t rightDistance,
+    const Pose2d& initialPose, const wpi::array<double, 3>& stateStdDevs,
+    const wpi::array<double, 3>& visionMeasurementStdDevs)
+    : m_kinematics{kinematics},
+      m_odometry{gyroAngle, leftDistance, rightDistance, initialPose} {
+  for (size_t i = 0; i < 3; ++i) {
+    m_q[i] = stateStdDevs[i] * stateStdDevs[i];
+  }
 
-  // Create correction mechanism for vision measurements.
-  m_visionCorrect = [&](const Vectord<3>& u, const Vectord<3>& y) {
-    m_observer.Correct<3>(
-        u, y,
-        [](const Vectord<5>& x, const Vectord<3>&) {
-          return x.block<3, 1>(0, 0);
-        },
-        m_visionContR, frc::AngleMean<3, 5>(2), frc::AngleResidual<3>(2),
-        frc::AngleResidual<5>(2), frc::AngleAdd<5>(2));
-  };
-
-  m_gyroOffset = initialPose.Rotation() - gyroAngle;
-  m_previousAngle = initialPose.Rotation();
-  m_observer.SetXhat(FillStateVector(initialPose, leftDistance, rightDistance));
+  SetVisionMeasurementStdDevs(visionMeasurementStdDevs);
 }
 
 void DifferentialDrivePoseEstimator::SetVisionMeasurementStdDevs(
-    const wpi::array<double, 3>& visionMeasurmentStdDevs) {
-  // Create R (covariances) for vision measurements.
-  m_visionContR = frc::MakeCovMatrix(visionMeasurmentStdDevs);
+    const wpi::array<double, 3>& visionMeasurementStdDevs) {
+  wpi::array<double, 3> r{wpi::empty_array};
+  for (size_t i = 0; i < 3; ++i) {
+    r[i] = visionMeasurementStdDevs[i] * visionMeasurementStdDevs[i];
+  }
+
+  // Solve for closed form Kalman gain for continuous Kalman filter with A = 0
+  // and C = I. See wpimath/algorithms.md.
+  for (size_t row = 0; row < 3; ++row) {
+    if (m_q[row] == 0.0) {
+      m_visionK(row, row) = 0.0;
+    } else {
+      m_visionK(row, row) =
+          m_q[row] / (m_q[row] + std::sqrt(m_q[row] * r[row]));
+    }
+  }
 }
 
 void DifferentialDrivePoseEstimator::ResetPosition(const Rotation2d& gyroAngle,
@@ -56,85 +76,81 @@ void DifferentialDrivePoseEstimator::ResetPosition(const Rotation2d& gyroAngle,
                                                    units::meter_t rightDistance,
                                                    const Pose2d& pose) {
   // Reset state estimate and error covariance
-  m_observer.Reset();
+  m_odometry.ResetPosition(gyroAngle, leftDistance, rightDistance, pose);
   m_poseBuffer.Clear();
-
-  m_observer.SetXhat(FillStateVector(pose, leftDistance, rightDistance));
-
-  m_prevTime = -1_s;
-
-  m_gyroOffset = GetEstimatedPosition().Rotation() - gyroAngle;
-  m_previousAngle = pose.Rotation();
 }
 
 Pose2d DifferentialDrivePoseEstimator::GetEstimatedPosition() const {
-  return Pose2d{units::meter_t{m_observer.Xhat(0)},
-                units::meter_t{m_observer.Xhat(1)},
-                units::radian_t{m_observer.Xhat(2)}};
+  return m_odometry.GetPose();
 }
 
 void DifferentialDrivePoseEstimator::AddVisionMeasurement(
     const Pose2d& visionRobotPose, units::second_t timestamp) {
-  if (auto sample = m_poseBuffer.Sample(timestamp)) {
-    m_visionCorrect(Vectord<3>::Zero(),
-                    PoseTo3dVector(GetEstimatedPosition().TransformBy(
-                        visionRobotPose - sample.value())));
+  // Step 1: Get the estimated pose from when the vision measurement was made.
+  auto sample = m_poseBuffer.Sample(timestamp);
+
+  if (!sample.has_value()) {
+    return;
+  }
+
+  // Step 2: Measure the twist between the odometry pose and the vision pose.
+  auto twist = sample.value().pose.Log(visionRobotPose);
+
+  // Step 3: We should not trust the twist entirely, so instead we scale this
+  // twist by a Kalman gain matrix representing how much we trust vision
+  // measurements compared to our current pose.
+  frc::Vectord<3> k_times_twist =
+      m_visionK *
+      frc::Vectord<3>{twist.dx.value(), twist.dy.value(), twist.dtheta.value()};
+
+  // Step 4: Convert back to Twist2d.
+  Twist2d scaledTwist{units::meter_t{k_times_twist(0)},
+                      units::meter_t{k_times_twist(1)},
+                      units::radian_t{k_times_twist(2)}};
+
+  // Step 5: Reset Odometry to state at sample with vision adjustment.
+  m_odometry.ResetPosition(
+      sample.value().gyroAngle, sample.value().leftDistance,
+      sample.value().rightDistance, sample.value().pose.Exp(scaledTwist));
+
+  // Step 6: Replay odometry inputs between sample time and latest recorded
+  // sample to update the pose buffer and correct odometry.
+  auto internal_buf = m_poseBuffer.GetInternalBuffer();
+
+  auto first_newer_record =
+      std::lower_bound(internal_buf.begin(), internal_buf.end(), timestamp,
+                       [](const auto& pair, auto t) { return t > pair.first; });
+
+  for (auto entry = first_newer_record + 1; entry != internal_buf.end();
+       entry++) {
+    UpdateWithTime(entry->first, entry->second.gyroAngle,
+                   entry->second.leftDistance, entry->second.rightDistance);
   }
 }
 
-Pose2d DifferentialDrivePoseEstimator::Update(
-    const Rotation2d& gyroAngle,
-    const DifferentialDriveWheelSpeeds& wheelSpeeds,
-    units::meter_t leftDistance, units::meter_t rightDistance) {
+Pose2d DifferentialDrivePoseEstimator::Update(const Rotation2d& gyroAngle,
+                                              units::meter_t leftDistance,
+                                              units::meter_t rightDistance) {
   return UpdateWithTime(units::microsecond_t(wpi::Now()), gyroAngle,
-                        wheelSpeeds, leftDistance, rightDistance);
+                        leftDistance, rightDistance);
 }
 
 Pose2d DifferentialDrivePoseEstimator::UpdateWithTime(
     units::second_t currentTime, const Rotation2d& gyroAngle,
-    const DifferentialDriveWheelSpeeds& wheelSpeeds,
     units::meter_t leftDistance, units::meter_t rightDistance) {
-  auto dt = m_prevTime >= 0_s ? currentTime - m_prevTime : m_nominalDt;
-  m_prevTime = currentTime;
+  m_odometry.Update(gyroAngle, leftDistance, rightDistance);
 
-  auto angle = gyroAngle + m_gyroOffset;
-  auto omega = (gyroAngle - m_previousAngle).Radians() / dt;
+  // fmt::print("odo, {}, {}, {}, {}, {}, {}\n",
+  //   gyroAngle.Radians(),
+  //   leftDistance,
+  //   rightDistance,
+  //   GetEstimatedPosition().X(),
+  //   GetEstimatedPosition().Y(),
+  //   GetEstimatedPosition().Rotation().Radians()
+  // );
 
-  auto u = Vectord<3>{(wheelSpeeds.left + wheelSpeeds.right).value() / 2.0, 0.0,
-                      omega.value()};
-
-  m_previousAngle = angle;
-
-  auto localY = Vectord<3>{leftDistance.value(), rightDistance.value(),
-                           angle.Radians().value()};
-
-  m_poseBuffer.AddSample(currentTime, GetEstimatedPosition());
-  m_observer.Predict(u, dt);
-  m_observer.Correct(u, localY);
+  m_poseBuffer.AddSample(currentTime, {GetEstimatedPosition(), gyroAngle,
+                                       leftDistance, rightDistance});
 
   return GetEstimatedPosition();
-}
-
-Vectord<5> DifferentialDrivePoseEstimator::F(const Vectord<5>& x,
-                                             const Vectord<3>& u) {
-  // Apply a rotation matrix. Note that we do not add x because Runge-Kutta does
-  // that for us.
-  auto& theta = x(2);
-  Matrixd<5, 5> toFieldRotation{
-      {std::cos(theta), -std::sin(theta), 0.0, 0.0, 0.0},
-      {std::sin(theta), std::cos(theta), 0.0, 0.0, 0.0},
-      {0.0, 0.0, 1.0, 0.0, 0.0},
-      {0.0, 0.0, 0.0, 1.0, 0.0},
-      {0.0, 0.0, 0.0, 0.0, 1.0}};
-  return toFieldRotation *
-         Vectord<5>{u(0, 0), u(1, 0), u(2, 0), u(0, 0), u(1, 0)};
-}
-
-Vectord<5> DifferentialDrivePoseEstimator::FillStateVector(
-    const Pose2d& pose, units::meter_t leftDistance,
-    units::meter_t rightDistance) {
-  return Vectord<5>{pose.Translation().X().value(),
-                    pose.Translation().Y().value(),
-                    pose.Rotation().Radians().value(), leftDistance.value(),
-                    rightDistance.value()};
 }

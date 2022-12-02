@@ -54,12 +54,12 @@ public class Drivetrain {
   numbers used  below are robot specific, and should be tuned. */
   private final DifferentialDrivePoseEstimator m_poseEstimator =
       new DifferentialDrivePoseEstimator(
+          m_kinematics,
           m_gyro.getRotation2d(),
           m_leftEncoder.getDistance(),
           m_rightEncoder.getDistance(),
           new Pose2d(),
-          VecBuilder.fill(0.05, 0.05, Units.degreesToRadians(5), 0.01, 0.01),
-          VecBuilder.fill(0.02, 0.02, Units.degreesToRadians(1)),
+          VecBuilder.fill(0.05, 0.05, Units.degreesToRadians(5)),
           VecBuilder.fill(0.5, 0.5, Units.degreesToRadians(30)));
 
   // Gains are for example purposes only - must be determined for your own robot!
@@ -118,10 +118,7 @@ public class Drivetrain {
   /** Updates the field-relative position. */
   public void updateOdometry() {
     m_poseEstimator.update(
-        m_gyro.getRotation2d(),
-        new DifferentialDriveWheelSpeeds(m_leftEncoder.getRate(), m_rightEncoder.getRate()),
-        m_leftEncoder.getDistance(),
-        m_rightEncoder.getDistance());
+        m_gyro.getRotation2d(), m_leftEncoder.getDistance(), m_rightEncoder.getDistance());
 
     // Also apply vision measurements. We use 0.3 seconds in the past as an example -- on
     // a real robot, this must be calculated based either on latency or timestamps.

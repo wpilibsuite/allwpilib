@@ -18,6 +18,10 @@
     <Bug pattern="DMI_RANDOM_USED_ONLY_ONCE" />
   </Match>
   <Match>
+    <Bug pattern="EC_BAD_ARRAY_COMPARE" />
+    <Class name="edu.wpi.first.math.estimator.SwerveDrivePoseEstimator$InterpolationRecord" />
+  </Match>
+  <Match>
     <Bug pattern="EI_EXPOSE_REP" />
   </Match>
   <Match>

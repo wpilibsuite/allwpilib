@@ -56,12 +56,11 @@ public class Drivetrain {
   below are robot specific, and should be tuned. */
   private final MecanumDrivePoseEstimator m_poseEstimator =
       new MecanumDrivePoseEstimator(
+          m_kinematics,
           m_gyro.getRotation2d(),
           getCurrentDistances(),
           new Pose2d(),
-          m_kinematics,
-          VecBuilder.fill(0.05, 0.05, Units.degreesToRadians(5), 0.05, 0.05, 0.05, 0.05),
-          VecBuilder.fill(Units.degreesToRadians(0.01), 0.01, 0.01, 0.01, 0.01),
+          VecBuilder.fill(0.05, 0.05, Units.degreesToRadians(5)),
           VecBuilder.fill(0.5, 0.5, Units.degreesToRadians(30)));
 
   // Gains are for example purposes only - must be determined for your own robot!
@@ -153,7 +152,7 @@ public class Drivetrain {
 
   /** Updates the field relative position of the robot. */
   public void updateOdometry() {
-    m_poseEstimator.update(m_gyro.getRotation2d(), getCurrentState(), getCurrentDistances());
+    m_poseEstimator.update(m_gyro.getRotation2d(), getCurrentDistances());
 
     // Also apply vision measurements. We use 0.3 seconds in the past as an example -- on
     // a real robot, this must be calculated based either on latency or timestamps.
