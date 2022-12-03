@@ -53,6 +53,15 @@ frc::MecanumDrivePoseEstimator::InterpolationRecord::Interpolate(
 
 frc::MecanumDrivePoseEstimator::MecanumDrivePoseEstimator(
     MecanumDriveKinematics& kinematics, const Rotation2d& gyroAngle,
+    const MecanumDriveWheelPositions& wheelPositions, const Pose2d& initialPose)
+    : MecanumDrivePoseEstimator{
+      kinematics, gyroAngle,
+      wheelPositions, initialPose, 
+      {0.1, 0.1, 0.1}, {0.45, 0.45, 0.45}}
+  {}
+
+frc::MecanumDrivePoseEstimator::MecanumDrivePoseEstimator(
+    MecanumDriveKinematics& kinematics, const Rotation2d& gyroAngle,
     const MecanumDriveWheelPositions& wheelPositions, const Pose2d& initialPose,
     const wpi::array<double, 3>& stateStdDevs,
     const wpi::array<double, 3>& visionMeasurementStdDevs)

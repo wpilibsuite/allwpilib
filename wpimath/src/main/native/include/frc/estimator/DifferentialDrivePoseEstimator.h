@@ -45,6 +45,27 @@ namespace frc {
 class WPILIB_DLLEXPORT DifferentialDrivePoseEstimator {
  public:
   /**
+   * Constructs a DifferentialDrivePoseEstimator with default standard deviations 
+   * for the model and vision measurements.
+   * 
+   * The default standard deviations of the model states are 
+   * 0.02 meters for x, 0.02 meters for y, and 0.01 radians for heading.
+   * The default standard deviations of the vision measurements are 
+   * 0.1 meters for x, 0.1 meters for y, and 0.1 radians for heading.
+   *
+   * @param kinematics               A correctly-configured kinematics object
+   *                                 for your drivetrain.
+   * @param gyroAngle                The gyro angle of the robot.
+   * @param leftDistance The distance traveled by the left encoder.
+   * @param rightDistance The distance traveled by the right encoder.
+   * @param initialPose              The estimated initial pose.
+   */
+  DifferentialDrivePoseEstimator(
+      DifferentialDriveKinematics& kinematics, const Rotation2d& gyroAngle,
+      units::meter_t leftDistance, units::meter_t rightDistance,
+      const Pose2d& initialPose);
+    
+  /**
    * Constructs a DifferentialDrivePoseEstimator.
    *
    * @param kinematics               A correctly-configured kinematics object

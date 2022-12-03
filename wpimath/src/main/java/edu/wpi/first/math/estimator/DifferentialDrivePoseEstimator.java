@@ -52,6 +52,32 @@ public class DifferentialDrivePoseEstimator {
       TimeInterpolatableBuffer.createBuffer(1.5);
 
   /**
+   * Constructs a DifferentialDrivePoseEstimator with default standard deviations 
+   * for the model and vision measurements.
+   * 
+   * The default standard deviations of the model states are 
+   * 0.02 meters for x, 0.02 meters for y, and 0.01 radians for heading.
+   * The default standard deviations of the vision measurements are 
+   * 0.1 meters for x, 0.1 meters for y, and 0.1 radians for heading.
+   *
+   * @param kinematics A correctly-configured kinematics object for your drivetrain.
+   * @param gyroAngle The current gyro angle.
+   * @param leftDistanceMeters The distance traveled by the left encoder.
+   * @param rightDistanceMeters The distance traveled by the right encoder.
+   * @param initialPoseMeters The starting pose estimate.
+   */
+  public DifferentialDrivePoseEstimator(
+      DifferentialDriveKinematics kinematics,
+      Rotation2d gyroAngle,
+      double leftDistanceMeters,
+      double rightDistanceMeters,
+      Pose2d initialPoseMeters) {
+    this(kinematics, gyroAngle, leftDistanceMeters, rightDistanceMeters, initialPoseMeters, 
+      VecBuilder.fill(0.02, 0.02, 0.01),
+      VecBuilder.fill(0.1, 0.1, 0.1));
+  }
+
+  /**
    * Constructs a DifferentialDrivePoseEstimator.
    *
    * @param kinematics A correctly-configured kinematics object for your drivetrain.

@@ -45,6 +45,40 @@ template <size_t NumModules>
 class SwerveDrivePoseEstimator {
  public:
   /**
+   * Constructs a SwerveDrivePoseEstimator with default standard deviations
+   * for the model and vision measurements.
+   * 
+   * The default standard deviations of the model states are 
+   * 0.1 meters for x, 0.1 meters for y, and 0.1 radians for heading.
+   * The default standard deviations of the vision measurements are 
+   * 0.9 meters for x, 0.9 meters for y, and 0.9 radians for heading.
+   *
+   * @param kinematics               A correctly-configured kinematics object
+   *                                 for your drivetrain.
+   * @param gyroAngle                The current gyro angle.
+   * @param modulePositions          The current distance and rotation
+   *                                 measurements of the swerve modules.
+   * @param initialPose              The starting pose estimate.
+   * @param stateStdDevs             Standard deviations of model states.
+   *                                 Increase these numbers to trust your
+   *                                 model's state estimates less. This matrix
+   *                                 is in the form [x, y, theta]ᵀ, with units
+   *                                 in meters and radians.
+   * @param visionMeasurementStdDevs Standard deviations of the vision
+   *                                 measurements. Increase these numbers to
+   *                                 trust global measurements from vision
+   *                                 less. This matrix is in the form
+   *                                 [x, y, theta]ᵀ, with units in meters and
+   *                                 radians.
+   */
+  SwerveDrivePoseEstimator(
+      SwerveDriveKinematics<NumModules>& kinematics,
+      const Rotation2d& gyroAngle,
+      const wpi::array<SwerveModulePosition, NumModules>& modulePositions,
+      const Pose2d& initialPose)
+      : SwerveDrivePoseEstimator{kinematics, gyroAngle, modulePositions, initialPose, {0.1, 0.1, 0.1}, {0.9, 0.9, 0.9}} {}
+
+  /**
    * Constructs a SwerveDrivePoseEstimator.
    *
    * @param kinematics               A correctly-configured kinematics object
