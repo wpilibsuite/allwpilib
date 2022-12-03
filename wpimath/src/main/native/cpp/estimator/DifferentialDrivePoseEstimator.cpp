@@ -43,11 +43,8 @@ DifferentialDrivePoseEstimator::DifferentialDrivePoseEstimator(
     units::meter_t leftDistance, units::meter_t rightDistance,
     const Pose2d& initialPose)
     : DifferentialDrivePoseEstimator{
-      kinematics, gyroAngle, 
-      leftDistance, rightDistance, 
-      initialPose, {0.02, 0.02, 0.01}, 
-      {0.1, 0.1, 0.1}}
-    {}
+          kinematics,  gyroAngle,          leftDistance,   rightDistance,
+          initialPose, {0.02, 0.02, 0.01}, {0.1, 0.1, 0.1}} {}
 
 DifferentialDrivePoseEstimator::DifferentialDrivePoseEstimator(
     DifferentialDriveKinematics& kinematics, const Rotation2d& gyroAngle,

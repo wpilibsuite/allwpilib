@@ -47,10 +47,10 @@ class SwerveDrivePoseEstimator {
   /**
    * Constructs a SwerveDrivePoseEstimator with default standard deviations
    * for the model and vision measurements.
-   * 
-   * The default standard deviations of the model states are 
+   *
+   * The default standard deviations of the model states are
    * 0.1 meters for x, 0.1 meters for y, and 0.1 radians for heading.
-   * The default standard deviations of the vision measurements are 
+   * The default standard deviations of the vision measurements are
    * 0.9 meters for x, 0.9 meters for y, and 0.9 radians for heading.
    *
    * @param kinematics               A correctly-configured kinematics object
@@ -65,7 +65,9 @@ class SwerveDrivePoseEstimator {
       const Rotation2d& gyroAngle,
       const wpi::array<SwerveModulePosition, NumModules>& modulePositions,
       const Pose2d& initialPose)
-      : SwerveDrivePoseEstimator{kinematics, gyroAngle, modulePositions, initialPose, {0.1, 0.1, 0.1}, {0.9, 0.9, 0.9}} {}
+      : SwerveDrivePoseEstimator{kinematics,      gyroAngle,
+                                 modulePositions, initialPose,
+                                 {0.1, 0.1, 0.1}, {0.9, 0.9, 0.9}} {}
 
   /**
    * Constructs a SwerveDrivePoseEstimator.

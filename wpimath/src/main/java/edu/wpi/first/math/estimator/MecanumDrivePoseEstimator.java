@@ -52,12 +52,11 @@ public class MecanumDrivePoseEstimator {
       TimeInterpolatableBuffer.createBuffer(1.5);
 
   /**
-   * Constructs a MecanumDrivePoseEstimator with default standard deviations
-   * for the model and vision measurements.
-   * 
-   * The default standard deviations of the model states are 
-   * 0.1 meters for x, 0.1 meters for y, and 0.1 radians for heading.
-   * The default standard deviations of the vision measurements are 
+   * Constructs a MecanumDrivePoseEstimator with default standard deviations for the model and
+   * vision measurements.
+   *
+   * <p>The default standard deviations of the model states are 0.1 meters for x, 0.1 meters for y,
+   * and 0.1 radians for heading. The default standard deviations of the vision measurements are
    * 0.45 meters for x, 0.45 meters for y, and 0.45 radians for heading.
    *
    * @param kinematics A correctly-configured kinematics object for your drivetrain.
@@ -70,9 +69,13 @@ public class MecanumDrivePoseEstimator {
       Rotation2d gyroAngle,
       MecanumDriveWheelPositions wheelPositions,
       Pose2d initialPoseMeters) {
-    this(kinematics, gyroAngle, wheelPositions, initialPoseMeters, 
-      VecBuilder.fill(0.1, 0.1, 0.1),
-      VecBuilder.fill(0.45, 0.45, 0.45));
+    this(
+        kinematics,
+        gyroAngle,
+        wheelPositions,
+        initialPoseMeters,
+        VecBuilder.fill(0.1, 0.1, 0.1),
+        VecBuilder.fill(0.45, 0.45, 0.45));
   }
   /**
    * Constructs a MecanumDrivePoseEstimator.

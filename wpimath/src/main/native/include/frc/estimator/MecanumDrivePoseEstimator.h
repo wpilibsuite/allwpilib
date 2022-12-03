@@ -47,10 +47,10 @@ class WPILIB_DLLEXPORT MecanumDrivePoseEstimator {
   /**
    * Constructs a MecanumDrivePoseEstimator with default standard deviations
    * for the model and vision measurements.
-   * 
-   * The default standard deviations of the model states are 
+   *
+   * The default standard deviations of the model states are
    * 0.1 meters for x, 0.1 meters for y, and 0.1 radians for heading.
-   * The default standard deviations of the vision measurements are 
+   * The default standard deviations of the vision measurements are
    * 0.45 meters for x, 0.45 meters for y, and 0.45 radians for heading.
    *
    * @param kinematics               A correctly-configured kinematics object
@@ -59,10 +59,10 @@ class WPILIB_DLLEXPORT MecanumDrivePoseEstimator {
    * @param wheelPositions           The distance measured by each wheel.
    * @param initialPose              The starting pose estimate.
    */
-  MecanumDrivePoseEstimator(
-      MecanumDriveKinematics& kinematics, const Rotation2d& gyroAngle,
-      const MecanumDriveWheelPositions& wheelPositions,
-      const Pose2d& initialPose);
+  MecanumDrivePoseEstimator(MecanumDriveKinematics& kinematics,
+                            const Rotation2d& gyroAngle,
+                            const MecanumDriveWheelPositions& wheelPositions,
+                            const Pose2d& initialPose);
 
   /**
    * Constructs a MecanumDrivePoseEstimator.

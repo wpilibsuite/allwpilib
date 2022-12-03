@@ -51,13 +51,12 @@ public class SwerveDrivePoseEstimator {
       TimeInterpolatableBuffer.createBuffer(1.5);
 
   /**
-   * Constructs a SwerveDrivePoseEstimator with default standard deviations
-   * for the model and vision measurements.
-   * 
-   * The default standard deviations of the model states are 
-   * 0.1 meters for x, 0.1 meters for y, and 0.1 radians for heading.
-   * The default standard deviations of the vision measurements are 
-   * 0.9 meters for x, 0.9 meters for y, and 0.9 radians for heading.
+   * Constructs a SwerveDrivePoseEstimator with default standard deviations for the model and vision
+   * measurements.
+   *
+   * <p>The default standard deviations of the model states are 0.1 meters for x, 0.1 meters for y,
+   * and 0.1 radians for heading. The default standard deviations of the vision measurements are 0.9
+   * meters for x, 0.9 meters for y, and 0.9 radians for heading.
    *
    * @param kinematics A correctly-configured kinematics object for your drivetrain.
    * @param gyroAngle The current gyro angle.
@@ -69,9 +68,13 @@ public class SwerveDrivePoseEstimator {
       Rotation2d gyroAngle,
       SwerveModulePosition[] modulePositions,
       Pose2d initialPoseMeters) {
-    this(kinematics, gyroAngle, modulePositions, initialPoseMeters, 
-      VecBuilder.fill(0.1, 0.1, 0.1),
-      VecBuilder.fill(0.9, 0.9, 0.9));
+    this(
+        kinematics,
+        gyroAngle,
+        modulePositions,
+        initialPoseMeters,
+        VecBuilder.fill(0.1, 0.1, 0.1),
+        VecBuilder.fill(0.9, 0.9, 0.9));
   }
   /**
    * Constructs a SwerveDrivePoseEstimator.
