@@ -79,7 +79,7 @@ class WPILIB_DLLEXPORT DifferentialDrivePoseEstimator {
    *                                 Increase these numbers to trust your
    *                                 model's state estimates less. This matrix
    *                                 is in the form
-   *                                 [x, y, theta, dist_l, dist_r]ᵀ,
+   *                                 [x, y, theta]ᵀ,
    *                                 with units in meters and radians.
    * @param visionMeasurementStdDevs Standard deviations of the vision
    *                                 measurements. Increase these numbers to

@@ -36,8 +36,7 @@ import java.util.Objects;
  * <p>The state-space system used internally has the following states (x) and outputs (y):
  *
  * <p><strong> x = [x, y, theta]ᵀ </strong> in the field coordinate system containing x position, y
- * position, and heading, followed by the distance driven by the front left, front right, rear left,
- * and rear right wheels.
+ * position, and heading.
  *
  * <p><strong> y = [x, y, theta]ᵀ </strong> from vision containing x position, y position, and
  * heading.
