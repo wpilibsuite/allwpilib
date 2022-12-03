@@ -115,11 +115,11 @@ If you have installed the FRC Toolchain to a directory other than the default, o
 
 ### Formatting/linting
 
+Once a PR has been submitted, formatting can be run in CI by commenting `/format` on the PR. A new commit will be pushed with the formatting changes.
+
 #### wpiformat
 
 wpiformat can be executed anywhere in the repository via `py -3 -m wpiformat -clang 14` on Windows or `python3 -m wpiformat -clang 14` on other platforms.
-
-Once a PR has been submitted, formatting can be run in CI by commenting `/wpiformat` on the PR. A new commit will be pushed with the formatting changes.
 
 #### Java Code Quality Tools
 

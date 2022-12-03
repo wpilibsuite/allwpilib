@@ -4,8 +4,8 @@ on:
     types: [ created ]
 
 jobs:
-  wpiformat:
-    if: github.event.issue.pull_request && startsWith(github.event.comment.body, '/wpiformat')
+  format:
+    if: github.event.issue.pull_request && startsWith(github.event.comment.body, '/format')
     runs-on: ubuntu-22.04
     steps:
       - name: React Rocket
@@ -60,5 +60,5 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           # Commit
-          git commit -am "wpiformat"
+          git commit -am "Formatting fixes"
           git push
