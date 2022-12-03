@@ -59,17 +59,6 @@ class SwerveDrivePoseEstimator {
    * @param modulePositions          The current distance and rotation
    *                                 measurements of the swerve modules.
    * @param initialPose              The starting pose estimate.
-   * @param stateStdDevs             Standard deviations of model states.
-   *                                 Increase these numbers to trust your
-   *                                 model's state estimates less. This matrix
-   *                                 is in the form [x, y, theta]ᵀ, with units
-   *                                 in meters and radians.
-   * @param visionMeasurementStdDevs Standard deviations of the vision
-   *                                 measurements. Increase these numbers to
-   *                                 trust global measurements from vision
-   *                                 less. This matrix is in the form
-   *                                 [x, y, theta]ᵀ, with units in meters and
-   *                                 radians.
    */
   SwerveDrivePoseEstimator(
       SwerveDriveKinematics<NumModules>& kinematics,
