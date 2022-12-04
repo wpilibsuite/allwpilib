@@ -233,7 +233,8 @@ class GenericHID {
 
   /**
    * Constructs an event instance that is true when the axis value is less than
-   * {@code threshold}
+   * threshold
+   *
    * @param axis The axis to read, starting at 0.
    * @param threshold The value below which this trigger should return true.
    * @param loop the event loop instance to attach the event to.
@@ -244,7 +245,8 @@ class GenericHID {
 
   /**
    * Constructs an event instance that is true when the axis value is greater
-   * than {@code threshold}
+   * than threshold
+   *
    * @param axis The axis to read, starting at 0.
    * @param threshold The value above which this trigger should return true.
    * @param loop the event loop instance to attach the event to.
