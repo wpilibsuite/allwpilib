@@ -61,13 +61,3 @@ Trigger CommandPS4Controller::PS(frc::EventLoop* loop) const {
 Trigger CommandPS4Controller::Touchpad(frc::EventLoop* loop) const {
   return PS4Controller::Touchpad(loop).CastTo<Trigger>();
 }
-
-Trigger CommandPS4Controller::L2Axis(double threshold,
-                                     frc::EventLoop* loop) const {
-  return PS4Controller::L2Axis(threshold, loop).CastTo<Trigger>();
-}
-
-Trigger CommandPS4Controller::R2Axis(double threshold,
-                                     frc::EventLoop* loop) const {
-  return PS4Controller::R2Axis(threshold, loop).CastTo<Trigger>();
-}

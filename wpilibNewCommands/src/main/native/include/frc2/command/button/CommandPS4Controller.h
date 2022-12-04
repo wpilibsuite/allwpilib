@@ -174,37 +174,5 @@ class CommandPS4Controller : public frc::PS4Controller {
    */
   Trigger Touchpad(frc::EventLoop* loop = CommandScheduler::GetInstance()
                                               .GetDefaultButtonLoop()) const;
-
-  /**
-   * Constructs a Trigger instance around the axis value of the L2 trigger. The
-   * returned Trigger will be true when the axis value is greater than {@code
-   * threshold}.
-   * @param threshold the minimum axis value for the returned Trigger to be
-   * true. This value should be in the range [0, 1] where 0 is the unpressed
-   * state of the axis.
-   * @param loop the event loop instance to attach the Trigger to. Defaults to
-   * the CommandScheduler's default loop.
-   * @return a Trigger instance that is true when the L2 axis exceeds the
-   * provided threshold, attached to the given loop
-   */
-  Trigger L2Axis(double threshold,
-                 frc::EventLoop* loop = CommandScheduler::GetInstance()
-                                            .GetDefaultButtonLoop()) const;
-
-  /**
-   * Constructs a Trigger instance around the axis value of the R2 trigger. The
-   * returned Trigger will be true when the axis value is greater than {@code
-   * threshold}.
-   * @param threshold the minimum axis value for the returned Trigger to be
-   * true. This value should be in the range [0, 1] where 0 is the unpressed
-   * state of the axis.
-   * @param loop the event loop instance to attach the Trigger to. Defaults to
-   * the CommandScheduler's default loop.
-   * @return a Trigger instance that is true when the R2 axis exceeds the
-   * provided threshold, attached to the given loop
-   */
-  Trigger R2Axis(double threshold,
-                 frc::EventLoop* loop = CommandScheduler::GetInstance()
-                                            .GetDefaultButtonLoop()) const;
 };
 }  // namespace frc2

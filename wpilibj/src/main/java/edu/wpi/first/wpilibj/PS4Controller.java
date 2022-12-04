@@ -696,34 +696,4 @@ public class PS4Controller extends GenericHID {
   public BooleanEvent touchpad(EventLoop loop) {
     return new BooleanEvent(loop, this::getTouchpad);
   }
-
-  /**
-   * Constructs an event instance around the axis value of the L2 trigger. The returned trigger will
-   * be true when the axis value is greater than {@code threshold}.
-   *
-   * @param threshold the minimum axis value for the returned {@link BooleanEvent} to be true. This
-   *     value should be in the range [0, 1] where 0 is the unpressed state of the axis.
-   * @param loop the event loop instance to attach the event to.
-   * @return an event instance that is true when the L2 axis exceeds the provided threshold,
-   *     attached to the given event loop
-   */
-  @SuppressWarnings("MethodName")
-  public BooleanEvent L2Axis(double threshold, EventLoop loop) {
-    return new BooleanEvent(loop, () -> getL2Axis() > threshold);
-  }
-
-  /**
-   * Constructs an event instance around the axis value of the L2 trigger. The returned trigger will
-   * be true when the axis value is greater than {@code threshold}.
-   *
-   * @param threshold the minimum axis value for the returned {@link BooleanEvent} to be true. This
-   *     value should be in the range [0, 1] where 0 is the unpressed state of the axis.
-   * @param loop the event loop instance to attach the event to.
-   * @return an event instance that is true when the L2 axis exceeds the provided threshold,
-   *     attached to the given event loop
-   */
-  @SuppressWarnings("MethodName")
-  public BooleanEvent R2Axis(double threshold, EventLoop loop) {
-    return new BooleanEvent(loop, () -> getR2Axis() > threshold);
-  }
 }
