@@ -707,6 +707,7 @@ public class PS4Controller extends GenericHID {
    * @return an event instance that is true when the L2 axis exceeds the provided threshold,
    *     attached to the given event loop
    */
+  @SuppressWarnings("MethodName")
   public BooleanEvent L2Axis(double threshold, EventLoop loop) {
     return new BooleanEvent(loop, () -> getL2Axis() > threshold);
   }
@@ -721,6 +722,7 @@ public class PS4Controller extends GenericHID {
    * @return an event instance that is true when the L2 axis exceeds the provided threshold,
    *     attached to the given event loop
    */
+  @SuppressWarnings("MethodName")
   public BooleanEvent R2Axis(double threshold, EventLoop loop) {
     return new BooleanEvent(loop, () -> getR2Axis() > threshold);
   }
