@@ -6,8 +6,8 @@ include(FetchContent)
 
 FetchContent_Declare(
     apriltaglib
-    GIT_REPOSITORY  https://github.com/photonvision/apriltag.git
-    GIT_TAG         404435205b62c3981569dc837e0051d829181ab3
+    GIT_REPOSITORY  https://github.com/wpilibsuite/apriltag.git
+    GIT_TAG         05d8da25f640079ad68363ad135f63637db9e183
 )
 
 # Don't use apriltag's CMakeLists.txt due to conflicting naming and JNI
@@ -82,12 +82,9 @@ target_compile_features(apriltag PUBLIC cxx_std_20)
 wpilib_target_warnings(apriltag)
 # disable warnings that apriltaglib can't handle
 if (MSVC)
-  target_compile_options(apriltag PRIVATE /wd4005 /wd4018 /wd4098 /wd4200 /wd4244 /wd4996)
+  target_compile_options(apriltag PRIVATE /wd4018)
 else()
-  target_compile_options(apriltag PRIVATE -Wno-newline-eof -Wno-unused-variable -Wno-sign-compare -Wno-pedantic -Wno-shift-negative-value)
-  if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
-    target_compile_options(apriltag PRIVATE -Wno-maybe-uninitialized)
-  endif()
+  target_compile_options(apriltag PRIVATE -Wno-sign-compare -Wno-gnu-zero-variadic-macro-arguments)
 endif()
 
 target_link_libraries(apriltag wpimath)
