@@ -197,3 +197,17 @@ bool XboxController::GetStartButtonReleased() {
 BooleanEvent XboxController::Start(EventLoop* loop) const {
   return BooleanEvent(loop, [this]() { return this->GetStartButton(); });
 }
+
+BooleanEvent XboxController::LeftTrigger(double threshold,
+                                         EventLoop* loop) const {
+  return BooleanEvent(loop, [this, threshold]() {
+    return this->GetLeftTriggerAxis() > threshold;
+  });
+}
+
+BooleanEvent XboxController::RightTrigger(double threshold,
+                                          EventLoop* loop) const {
+  return BooleanEvent(loop, [this, threshold]() {
+    return this->GetRightTriggerAxis() > threshold;
+  });
+}

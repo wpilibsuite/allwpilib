@@ -261,3 +261,13 @@ bool PS4Controller::GetTouchpadReleased() {
 BooleanEvent PS4Controller::Touchpad(EventLoop* loop) const {
   return BooleanEvent(loop, [this]() { return this->GetTouchpad(); });
 }
+
+BooleanEvent PS4Controller::L2Axis(double threshold, EventLoop* loop) const {
+  return BooleanEvent(
+      loop, [this, threshold]() { return this->GetL2Axis() > threshold; });
+}
+
+BooleanEvent PS4Controller::R2Axis(double threshold, EventLoop* loop) const {
+  return BooleanEvent(
+      loop, [this, threshold]() { return this->GetR2Axis() > threshold; });
+}

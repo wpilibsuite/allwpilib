@@ -179,5 +179,41 @@ class CommandGenericHID : public frc::GenericHID {
    */
   Trigger POVCenter(frc::EventLoop* loop = CommandScheduler::GetInstance()
                                                .GetDefaultButtonLoop()) const;
+
+  /**
+   * Constructs a Trigger instance that is true when the axis value is less than
+   * {@code threshold}, attached to {@link
+   * CommandScheduler::GetDefaultButtonLoop() the default command scheduler
+   * button loop}.
+   * @param axis The axis to read, starting at 0.
+   * @param threshold The value below which this trigger should return true.
+   * @param loop  the event loop instance to attach the event to. Defaults to
+   * {@link CommandScheduler::GetDefaultButtonLoop() the default command
+   * scheduler button loop}.
+   * @return a Trigger instance that is true when the axis value is less than
+   * the provided threshold.
+   */
+  Trigger AxisLessThan(
+      int axis, double threshold,
+      frc::EventLoop* loop =
+          CommandScheduler::GetInstance().GetDefaultButtonLoop()) const;
+
+  /**
+   * Constructs a Trigger instance that is true when the axis value is greater
+   * than {@code threshold}, attached to {@link
+   * CommandScheduler::GetDefaultButtonLoop() the default command scheduler
+   * button loop}.
+   * @param axis The axis to read, starting at 0.
+   * @param threshold The value below which this trigger should return true.
+   * @param loop  the event loop instance to attach the event to. Defaults to
+   * {@link CommandScheduler::GetDefaultButtonLoop() the default command
+   * scheduler button loop}.
+   * @return a Trigger instance that is true when the axis value is greater than
+   * the provided threshold.
+   */
+  Trigger AxisGreaterThan(
+      int axis, double threshold,
+      frc::EventLoop* loop =
+          CommandScheduler::GetInstance().GetDefaultButtonLoop()) const;
 };
 }  // namespace frc2

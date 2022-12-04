@@ -332,6 +332,62 @@ public class CommandPS4Controller extends CommandGenericHID {
   }
 
   /**
+   * Constructs a Trigger instance around the axis value of the L2 trigger. The returned trigger
+   * will be true when the axis value is greater than {@code threshold}.
+   *
+   * @param threshold the minimum axis value for the returned {@link Trigger} to be true. This value
+   *     should be in the range [0, 1] where 0 is the unpressed state of the axis.
+   * @param loop the event loop instance to attach the event to.
+   * @return a Trigger instance that is true when the L2 axis exceeds the provided threshold,
+   *     attached to the given event loop
+   */
+  public Trigger L2Axis(double threshold, EventLoop loop) {
+    return m_hid.R2Axis(threshold, loop).castTo(Trigger::new);
+  }
+
+  /**
+   * Constructs a Trigger instance around the axis value of the L2 trigger. The returned trigger
+   * will be true when the axis value is greater than {@code threshold}.
+   *
+   * @param threshold the minimum axis value for the returned {@link Trigger} to be true. This value
+   *     should be in the range [0, 1] where 0 is the unpressed state of the axis.
+   * @return a Trigger instance that is true when the left trigger's axis exceeds the provided
+   *     threshold, attached to the {@link CommandScheduler#getDefaultButtonLoop() default scheduler
+   *     button loop}.
+   */
+  public Trigger L2Axis(double threshold) {
+    return L2Axis(threshold, CommandScheduler.getInstance().getDefaultButtonLoop());
+  }
+
+  /**
+   * Constructs a Trigger instance around the axis value of the R2 trigger. The returned trigger
+   * will be true when the axis value is greater than {@code threshold}.
+   *
+   * @param threshold the minimum axis value for the returned {@link Trigger} to be true. This value
+   *     should be in the range [0, 1] where 0 is the unpressed state of the axis.
+   * @param loop the event loop instance to attach the Trigger to.
+   * @return a Trigger instance that is true when the R2 axis exceeds the provided threshold,
+   *     attached to the given event loop
+   */
+  public Trigger R2Axis(double threshold, EventLoop loop) {
+    return m_hid.R2Axis(threshold, loop).castTo(Trigger::new);
+  }
+
+  /**
+   * Constructs a Trigger instance around the axis value of the R2 trigger. The returned trigger
+   * will be true when the axis value is greater than {@code threshold}.
+   *
+   * @param threshold the minimum axis value for the returned {@link Trigger} to be true. This value
+   *     should be in the range [0, 1] where 0 is the unpressed state of the axis.
+   * @return a Trigger instance that is true when the R2 axis exceeds the provided threshold,
+   *     attached to the {@link CommandScheduler#getDefaultButtonLoop() default scheduler button
+   *     loop}.
+   */
+  public Trigger R2Axis(double threshold) {
+    return R2Axis(threshold, CommandScheduler.getInstance().getDefaultButtonLoop());
+  }
+
+  /**
    * Get the X axis value of left side of the controller.
    *
    * @return the axis value.

@@ -232,6 +232,29 @@ class GenericHID {
   BooleanEvent POVCenter(EventLoop* loop) const;
 
   /**
+   * Constructs an event instance that is true when the axis value is less than
+   * {@code threshold}
+   * @param axis The axis to read, starting at 0.
+   * @param threshold The value below which this trigger should return true.
+   * @param loop the event loop instance to attach the event to.
+   * @return an event instance that is true when the axis value is less than the
+   * provided threshold.
+   */
+  BooleanEvent AxisLessThan(int axis, double threshold, EventLoop* loop) const;
+
+  /**
+   * Constructs an event instance that is true when the axis value is greater
+   * than {@code threshold}
+   * @param axis The axis to read, starting at 0.
+   * @param threshold The value above which this trigger should return true.
+   * @param loop the event loop instance to attach the event to.
+   * @return an event instance that is true when the axis value is greater than
+   * the provided threshold.
+   */
+  BooleanEvent AxisGreaterThan(int axis, double threshold,
+                               EventLoop* loop) const;
+
+  /**
    * Get the number of axes for the HID.
    *
    * @return the number of axis for the current HID

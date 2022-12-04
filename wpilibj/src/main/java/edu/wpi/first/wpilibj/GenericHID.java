@@ -296,6 +296,33 @@ public class GenericHID {
   }
 
   /**
+   * Constructs an event instance that is true when the axis value is less than {@code threshold},
+   * attached to the given loop.
+   *
+   * @param axis The axis to read, starting at 0
+   * @param threshold The value below which this event should return true.
+   * @param loop the event loop instance to attach the event to.
+   * @return an event instance that is true when the axis value is less than the provided threshold.
+   */
+  public BooleanEvent axisLessThan(int axis, double threshold, EventLoop loop) {
+    return new BooleanEvent(loop, () -> getRawAxis(axis) < threshold);
+  }
+
+  /**
+   * Constructs an event instance that is true when the axis value is greater than {@code
+   * threshold}, attached to the given loop.
+   *
+   * @param axis The axis to read, starting at 0
+   * @param threshold The value above which this event should return true.
+   * @param loop the event loop instance to attach the event to.
+   * @return an event instance that is true when the axis value is greater than the provided
+   *     threshold.
+   */
+  public BooleanEvent axisGreaterThan(int axis, double threshold, EventLoop loop) {
+    return new BooleanEvent(loop, () -> getRawAxis(axis) > threshold);
+  }
+
+  /**
    * Get the number of axes for the HID.
    *
    * @return the number of axis for the current HID
