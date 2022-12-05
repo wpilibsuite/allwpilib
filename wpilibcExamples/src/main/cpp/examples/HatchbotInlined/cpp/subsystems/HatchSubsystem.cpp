@@ -12,10 +12,12 @@ HatchSubsystem::HatchSubsystem()
 
 frc2::CommandPtr HatchSubsystem::GrabHatchCommand() {
   // implicitly require `this`
-  return this->RunOnce([this] { m_hatchSolenoid.Set(frc::DoubleSolenoid::kForward); });
+  return this->RunOnce(
+      [this] { m_hatchSolenoid.Set(frc::DoubleSolenoid::kForward); });
 }
 
 frc2::CommandPtr HatchSubsystem::ReleaseHatchCommand() {
   // implicitly require `this`
-  return this->RunOnce([this] { m_hatchSolenoid.Set(frc::DoubleSolenoid::kReverse); });
+  return this->RunOnce(
+      [this] { m_hatchSolenoid.Set(frc::DoubleSolenoid::kReverse); });
 }
