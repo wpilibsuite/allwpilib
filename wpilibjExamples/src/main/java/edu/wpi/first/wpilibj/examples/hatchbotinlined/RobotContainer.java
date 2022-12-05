@@ -75,11 +75,11 @@ public class RobotContainer {
     // Grab the hatch when the Circle button is pressed.
     m_driverController
         .circle()
-        .onTrue(Commands.runOnce(m_hatchSubsystem::grabHatch, m_hatchSubsystem));
+        .onTrue(m_hatchSubsystem.grabHatchCommand());
     // Release the hatch when the Square button is pressed.
     m_driverController
         .square()
-        .onTrue(Commands.runOnce(m_hatchSubsystem::releaseHatch, m_hatchSubsystem));
+        .onTrue(m_hatchSubsystem.releaseHatchCommand());
     // While holding R1, drive at half speed
     m_driverController
         .R1()

@@ -33,11 +33,9 @@ void RobotContainer::ConfigureButtonBindings() {
   // Configure your button bindings here
 
   // Grab the hatch when the 'Circle' button is pressed.
-  m_driverController.Circle().OnTrue(
-      frc2::cmd::RunOnce([this] { m_hatch.GrabHatch(); }, {&m_hatch}));
+  m_driverController.Circle().OnTrue(m_hatch.GrabHatchCommand());
   // Release the hatch when the 'Square' button is pressed.
-  m_driverController.Square().OnTrue(
-      frc2::cmd::RunOnce([this] { m_hatch.ReleaseHatch(); }, {&m_hatch}));
+  m_driverController.Square().OnTrue(m_hatch.ReleaseHatchCommand());
   // While holding R1, drive at half speed
   m_driverController.R1()
       .OnTrue(frc2::cmd::RunOnce([this] { m_drive.SetMaxOutput(0.5); }, {}))
