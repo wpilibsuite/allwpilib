@@ -31,7 +31,7 @@ void PWMMotorController::Disable() {
 }
 
 void PWMMotorController::StopMotor() {
-  Disable();
+  Set(0);
 }
 
 std::string PWMMotorController::GetDescription() const {
