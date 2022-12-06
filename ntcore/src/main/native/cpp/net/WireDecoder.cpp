@@ -238,10 +238,12 @@ static void WireDecodeTextImpl(std::string_view in, T& out,
             // periodic
             auto periodicIt = joptions->find("periodic");
             if (periodicIt != joptions->end()) {
-              if (!GetNumber(periodicIt->second, &options.periodic)) {
+              double val;
+              if (!GetNumber(periodicIt->second, &val)) {
                 error = "periodic value must be a number";
                 goto err;
               }
+              options.periodicMs = val * 1000;
             }
 
             // send all changes

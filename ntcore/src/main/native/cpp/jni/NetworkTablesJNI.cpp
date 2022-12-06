@@ -118,10 +118,10 @@ JNIEXPORT void JNICALL JNI_OnUnload(JavaVM* vm, void* reserved) {
 //
 
 static std::span<const nt::PubSubOption> FromJavaPubSubOptions(
-    JNIEnv* env, jintArray optionTypes, jdoubleArray optionValues,
+    JNIEnv* env, jintArray optionTypes, jintArray optionValues,
     wpi::SmallVectorImpl<nt::PubSubOption>& arr) {
   JIntArrayRef types{env, optionTypes};
-  JDoubleArrayRef values{env, optionValues};
+  JIntArrayRef values{env, optionValues};
   if (types.size() != values.size()) {
     return {};
   }
@@ -720,12 +720,12 @@ Java_edu_wpi_first_networktables_NetworkTablesJNI_setTopicProperties
 /*
  * Class:     edu_wpi_first_networktables_NetworkTablesJNI
  * Method:    subscribe
- * Signature: (IILjava/lang/String;[I[D)I
+ * Signature: (IILjava/lang/String;[I[I)I
  */
 JNIEXPORT jint JNICALL
 Java_edu_wpi_first_networktables_NetworkTablesJNI_subscribe
   (JNIEnv* env, jclass, jint topic, jint type, jstring typeStr,
-   jintArray optionTypes, jdoubleArray optionValues)
+   jintArray optionTypes, jintArray optionValues)
 {
   wpi::SmallVector<nt::PubSubOption, 4> options;
   return nt::Subscribe(
@@ -748,12 +748,12 @@ Java_edu_wpi_first_networktables_NetworkTablesJNI_unsubscribe
 /*
  * Class:     edu_wpi_first_networktables_NetworkTablesJNI
  * Method:    publish
- * Signature: (IILjava/lang/String;[I[D)I
+ * Signature: (IILjava/lang/String;[I[I)I
  */
 JNIEXPORT jint JNICALL
 Java_edu_wpi_first_networktables_NetworkTablesJNI_publish
   (JNIEnv* env, jclass, jint topic, jint type, jstring typeStr,
-   jintArray optionTypes, jdoubleArray optionValues)
+   jintArray optionTypes, jintArray optionValues)
 {
   wpi::SmallVector<nt::PubSubOption, 4> options;
   return nt::Publish(
@@ -764,12 +764,12 @@ Java_edu_wpi_first_networktables_NetworkTablesJNI_publish
 /*
  * Class:     edu_wpi_first_networktables_NetworkTablesJNI
  * Method:    publishEx
- * Signature: (IILjava/lang/String;Ljava/lang/String;[I[D)I
+ * Signature: (IILjava/lang/String;Ljava/lang/String;[I[I)I
  */
 JNIEXPORT jint JNICALL
 Java_edu_wpi_first_networktables_NetworkTablesJNI_publishEx
   (JNIEnv* env, jclass, jint topic, jint type, jstring typeStr,
-   jstring properties, jintArray optionTypes, jdoubleArray optionValues)
+   jstring properties, jintArray optionTypes, jintArray optionValues)
 {
   wpi::json j;
   try {
@@ -804,12 +804,12 @@ Java_edu_wpi_first_networktables_NetworkTablesJNI_unpublish
 /*
  * Class:     edu_wpi_first_networktables_NetworkTablesJNI
  * Method:    getEntry
- * Signature: (IILjava/lang/String;[I[D)I
+ * Signature: (IILjava/lang/String;[I[I)I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_first_networktables_NetworkTablesJNI_getEntry__IILjava_lang_String_2_3I_3D
+Java_edu_wpi_first_networktables_NetworkTablesJNI_getEntry__IILjava_lang_String_2_3I_3I
   (JNIEnv* env, jclass, jint topic, jint type, jstring typeStr,
-   jintArray optionTypes, jdoubleArray optionValues)
+   jintArray optionTypes, jintArray optionValues)
 {
   wpi::SmallVector<nt::PubSubOption, 4> options;
   return nt::GetEntry(
@@ -856,12 +856,12 @@ Java_edu_wpi_first_networktables_NetworkTablesJNI_getTopicFromHandle
 /*
  * Class:     edu_wpi_first_networktables_NetworkTablesJNI
  * Method:    subscribeMultiple
- * Signature: (I[Ljava/lang/Object;[I[D)I
+ * Signature: (I[Ljava/lang/Object;[I[I)I
  */
 JNIEXPORT jint JNICALL
 Java_edu_wpi_first_networktables_NetworkTablesJNI_subscribeMultiple
   (JNIEnv* env, jclass, jint inst, jobjectArray prefixes, jintArray optionTypes,
-   jdoubleArray optionValues)
+   jintArray optionValues)
 {
   if (!prefixes) {
     nullPointerEx.Throw(env, "prefixes cannot be null");

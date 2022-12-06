@@ -13,7 +13,7 @@ public class PubSubOption {
   private static final int kKeepDuplicates = 5;
   private static final int kLocalRemote = 6;
 
-  PubSubOption(int type, double value) {
+  PubSubOption(int type, int value) {
     m_type = type;
     m_value = value;
   }
@@ -28,7 +28,7 @@ public class PubSubOption {
    * @return option
    */
   public static PubSubOption periodic(double period) {
-    return new PubSubOption(kPeriodic, period);
+    return new PubSubOption(kPeriodic, (int) (period * 1000));
   }
 
   /**
@@ -39,7 +39,7 @@ public class PubSubOption {
    * @return option
    */
   public static PubSubOption sendAll(boolean enabled) {
-    return new PubSubOption(kSendAll, enabled ? 1.0 : 0.0);
+    return new PubSubOption(kSendAll, enabled ? 1 : 0);
   }
 
   /**
@@ -49,7 +49,7 @@ public class PubSubOption {
    * @return option
    */
   public static PubSubOption topicsOnly(boolean enabled) {
-    return new PubSubOption(kTopicsOnly, enabled ? 1.0 : 0.0);
+    return new PubSubOption(kTopicsOnly, enabled ? 1 : 0);
   }
 
   /**
@@ -60,7 +60,7 @@ public class PubSubOption {
    * @return option
    */
   public static PubSubOption keepDuplicates(boolean enabled) {
-    return new PubSubOption(kKeepDuplicates, enabled ? 1.0 : 0.0);
+    return new PubSubOption(kKeepDuplicates, enabled ? 1 : 0);
   }
 
   /**
@@ -82,7 +82,7 @@ public class PubSubOption {
    * @return option
    */
   public static PubSubOption localOnly() {
-    return new PubSubOption(kLocalRemote, 1.0);
+    return new PubSubOption(kLocalRemote, 1);
   }
 
   /**
@@ -92,7 +92,7 @@ public class PubSubOption {
    * @return option
    */
   public static PubSubOption remoteOnly() {
-    return new PubSubOption(kLocalRemote, 2.0);
+    return new PubSubOption(kLocalRemote, 2);
   }
 
   /**
@@ -102,9 +102,9 @@ public class PubSubOption {
    * @return option
    */
   public static PubSubOption allUpdates() {
-    return new PubSubOption(kLocalRemote, 0.0);
+    return new PubSubOption(kLocalRemote, 0);
   }
 
   final int m_type;
-  final double m_value;
+  final int m_value;
 }

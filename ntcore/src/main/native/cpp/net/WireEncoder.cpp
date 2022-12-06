@@ -99,12 +99,12 @@ static void WireEncodeSubscribeImpl(wpi::raw_ostream& os, int64_t subuid,
     os << "\"prefix\":true";
     first = false;
   }
-  if (options.periodic != 0.1) {
+  if (options.periodicMs != PubSubOptions::kDefaultPeriodicMs) {
     if (!first) {
       os << ',';
     }
     os << "\"periodic\":";
-    s.dump_float(options.periodic);
+    s.dump_float(options.periodicMs / 1000.0);
   }
   os << "},\"topics\":";
   EncodePrefixes(os, topicNames, s);

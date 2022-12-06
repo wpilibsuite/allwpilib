@@ -262,7 +262,7 @@ class Event {
 /** NetworkTables publish/subscribe option. */
 class PubSubOption {
  public:
-  constexpr PubSubOption(NT_PubSubOptionType type, double value)
+  constexpr PubSubOption(NT_PubSubOptionType type, unsigned int value)
       : type{type}, value{value} {}
 
   /**
@@ -276,7 +276,8 @@ class PubSubOption {
    * @return option
    */
   static constexpr PubSubOption Periodic(double time) {
-    return PubSubOption{NT_PUBSUB_PERIODIC, time};
+    return PubSubOption{NT_PUBSUB_PERIODIC,
+                        static_cast<unsigned int>(time * 1000)};
   }
 
   /**
@@ -287,7 +288,7 @@ class PubSubOption {
    * @return option
    */
   static constexpr PubSubOption SendAll(bool enabled) {
-    return PubSubOption{NT_PUBSUB_SENDALL, enabled ? 1.0 : 0.0};
+    return PubSubOption{NT_PUBSUB_SENDALL, enabled ? 1u : 0u};
   }
 
   /**
@@ -298,7 +299,7 @@ class PubSubOption {
    * @return option
    */
   static constexpr PubSubOption TopicsOnly(bool enabled) {
-    return PubSubOption{NT_PUBSUB_TOPICSONLY, enabled ? 1.0 : 0.0};
+    return PubSubOption{NT_PUBSUB_TOPICSONLY, enabled ? 1u : 0u};
   }
 
   /**
@@ -309,7 +310,7 @@ class PubSubOption {
    * @return option
    */
   static constexpr PubSubOption KeepDuplicates(bool enabled) {
-    return PubSubOption{NT_PUBSUB_KEEPDUPLICATES, enabled ? 1.0 : 0.0};
+    return PubSubOption{NT_PUBSUB_KEEPDUPLICATES, enabled ? 1u : 0u};
   }
 
   /**
@@ -320,8 +321,8 @@ class PubSubOption {
    * @param depth number of entries to save for polling.
    * @return option
    */
-  static constexpr PubSubOption PollStorage(int depth) {
-    return PubSubOption{NT_PUBSUB_POLLSTORAGE, static_cast<double>(depth)};
+  static constexpr PubSubOption PollStorage(unsigned int depth) {
+    return PubSubOption{NT_PUBSUB_POLLSTORAGE, depth};
   }
 
   /**
@@ -332,7 +333,7 @@ class PubSubOption {
    * @return option
    */
   static constexpr PubSubOption LocalOnly() {
-    return PubSubOption{NT_PUBSUB_LOCALREMOTE, 1.0};
+    return PubSubOption{NT_PUBSUB_LOCALREMOTE, 1u};
   }
 
   /**
@@ -343,7 +344,7 @@ class PubSubOption {
    * @return option
    */
   static constexpr PubSubOption RemoteOnly() {
-    return PubSubOption{NT_PUBSUB_LOCALREMOTE, 2.0};
+    return PubSubOption{NT_PUBSUB_LOCALREMOTE, 2u};
   }
 
   /**
@@ -354,11 +355,11 @@ class PubSubOption {
    * @return option
    */
   static constexpr PubSubOption AllUpdates() {
-    return PubSubOption{NT_PUBSUB_LOCALREMOTE, 0.0};
+    return PubSubOption{NT_PUBSUB_LOCALREMOTE, 0u};
   }
 
   NT_PubSubOptionType type;
-  double value;
+  unsigned int value;
 };
 
 /**

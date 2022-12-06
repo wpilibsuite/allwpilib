@@ -16,7 +16,9 @@ class PubSubOptions {
   PubSubOptions() = default;
   explicit PubSubOptions(std::span<const PubSubOption> options);
 
-  double periodic = 0.1;
+  static constexpr unsigned int kDefaultPeriodicMs = 100;
+
+  unsigned int periodicMs = kDefaultPeriodicMs;
   size_t pollStorageSize = 1;
   bool sendAll = false;
   bool topicsOnly = false;
