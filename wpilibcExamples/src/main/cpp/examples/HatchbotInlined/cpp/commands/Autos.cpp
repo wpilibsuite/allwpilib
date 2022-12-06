@@ -51,7 +51,7 @@ frc2::CommandPtr autos::ComplexAuto(DriveSubsystem* drive,
           {drive})
           .ToPtr(),
       // Release the hatch
-      frc2::cmd::RunOnce([hatch] { hatch->ReleaseHatch(); }, {hatch}),
+      hatch->ReleaseHatchCommand(),
       // Drive backward the specified distance
       // Drive forward the specified distance
       frc2::FunctionalCommand(

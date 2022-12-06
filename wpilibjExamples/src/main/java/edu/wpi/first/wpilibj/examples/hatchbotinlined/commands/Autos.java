@@ -47,7 +47,7 @@ public final class Autos {
             driveSubsystem),
 
         // Release the hatch
-        Commands.runOnce(hatchSubsystem::releaseHatch, hatchSubsystem),
+        hatchSubsystem.releaseHatchCommand(),
 
         // Drive backward the specified distance
         new FunctionalCommand(
