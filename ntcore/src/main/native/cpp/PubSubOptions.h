@@ -26,6 +26,8 @@ class PubSubOptions {
   bool keepDuplicates = false;
   bool fromRemote = true;
   bool fromLocal = true;
+  unsigned int excludePub = 0;
+  bool excludeSelf = false;
 };
 
 }  // namespace nt

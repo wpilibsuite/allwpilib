@@ -12,6 +12,8 @@ public class PubSubOption {
   private static final int kPollStorage = 4;
   private static final int kKeepDuplicates = 5;
   private static final int kLocalRemote = 6;
+  private static final int kExcludePub = 7;
+  private static final int kExcludeSelf = 8;
 
   PubSubOption(int type, int value) {
     m_type = type;
@@ -103,6 +105,39 @@ public class PubSubOption {
    */
   public static PubSubOption allUpdates() {
     return new PubSubOption(kLocalRemote, 0);
+  }
+
+  /**
+   * Don't queue value updates for the given publisher. Only has an effect on subscriptions. Only
+   * one exclusion may be set.
+   *
+   * @param publisher publisher handle to exclude
+   * @return option
+   */
+  public static PubSubOption excludePublisher(int publisher) {
+    return new PubSubOption(kExcludePub, publisher);
+  }
+
+  /**
+   * Don't queue value updates for the given publisher. Only has an effect on subscriptions. Only
+   * one exclusion may be set.
+   *
+   * @param publisher publisher to exclude
+   * @return option
+   */
+  public static PubSubOption excludePublisher(Publisher publisher) {
+    return new PubSubOption(kExcludePub, publisher != null ? publisher.getHandle() : 0);
+  }
+
+  /**
+   * Don't queue value updates for the internal publisher for an entry. Only has an effect on
+   * entries.
+   *
+   * @param enabled True to enable, false to disable
+   * @return option
+   */
+  public static PubSubOption excludeSelf(boolean enabled) {
+    return new PubSubOption(kExcludeSelf, enabled ? 1 : 0);
   }
 
   final int m_type;

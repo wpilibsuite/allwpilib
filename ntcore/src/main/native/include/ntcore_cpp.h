@@ -358,6 +358,28 @@ class PubSubOption {
     return PubSubOption{NT_PUBSUB_LOCALREMOTE, 0u};
   }
 
+  /**
+   * Don't queue value updates for the given publisher. Only has an effect on
+   * subscriptions. Only one exclusion may be set.
+   *
+   * @param publisher publisher handle
+   * @return option
+   */
+  static constexpr PubSubOption ExcludePublisher(NT_Publisher publisher) {
+    return PubSubOption{NT_PUBSUB_EXCLUDEPUB, publisher};
+  }
+
+  /**
+   * Don't queue value updates for the internal publisher for an entry. Only has
+   * an effect on entries.
+   *
+   * @param enabled True to enable, false to disable
+   * @return option
+   */
+  static constexpr PubSubOption ExcludeSelf(bool enabled) {
+    return PubSubOption{NT_PUBSUB_EXCLUDESELF, enabled ? 1u : 0u};
+  }
+
   NT_PubSubOptionType type;
   unsigned int value;
 };
