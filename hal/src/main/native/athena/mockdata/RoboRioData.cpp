@@ -48,7 +48,7 @@ int32_t HALSIM_RegisterRoboRioCommentsCallback(
 }
 void HALSIM_CancelRoboRioCommentsCallback(int32_t uid) {}
 size_t HALSIM_GetRoboRioComments(char* buffer, size_t size) {
-  if(size > 0) {
+  if (size > 0) {
     buffer[0] = '\0';
   }
   return 0;

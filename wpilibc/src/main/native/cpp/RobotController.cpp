@@ -36,7 +36,7 @@ std::string RobotController::GetSerialNumber() {
 }
 
 std::string RobotController::GetComments() {
-  char comments[256];
+  char comments[65];
   size_t len = HAL_GetComments(comments, sizeof(comments));
   return std::string(comments, len);
 }

@@ -295,7 +295,7 @@ void RoboRioSim::SetSerialNumber(std::string_view serialNumber) {
 }
 
 std::string RoboRioSim::GetComments() {
-  char comments[128];
+  char comments[65];
   size_t len = HALSIM_GetRoboRioComments(comments, sizeof(comments));
   return std::string(comments, len);
 }
