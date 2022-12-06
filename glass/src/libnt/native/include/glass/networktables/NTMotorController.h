@@ -13,15 +13,15 @@
 #include <networktables/StringTopic.h>
 
 #include "glass/DataSource.h"
-#include "glass/hardware/SpeedController.h"
+#include "glass/hardware/MotorController.h"
 
 namespace glass {
-class NTSpeedControllerModel : public SpeedControllerModel {
+class NTMotorControllerModel : public MotorControllerModel {
  public:
   static constexpr const char* kType = "Motor Controller";
 
-  explicit NTSpeedControllerModel(std::string_view path);
-  NTSpeedControllerModel(nt::NetworkTableInstance inst, std::string_view path);
+  explicit NTMotorControllerModel(std::string_view path);
+  NTMotorControllerModel(nt::NetworkTableInstance inst, std::string_view path);
 
   const char* GetName() const override { return m_nameValue.c_str(); }
   const char* GetSimDevice() const override { return nullptr; }

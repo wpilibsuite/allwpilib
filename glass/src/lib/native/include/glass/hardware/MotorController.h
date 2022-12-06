@@ -8,12 +8,12 @@
 
 namespace glass {
 class DataSource;
-class SpeedControllerModel : public Model {
+class MotorControllerModel : public Model {
  public:
   virtual const char* GetName() const = 0;
   virtual const char* GetSimDevice() const = 0;
   virtual DataSource* GetPercentData() = 0;
   virtual void SetPercent(double value) = 0;
 };
-void DisplaySpeedController(SpeedControllerModel* m);
+void DisplayMotorController(MotorControllerModel* m);
 }  // namespace glass

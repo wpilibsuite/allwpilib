@@ -13,7 +13,7 @@
 #include "glass/networktables/NTMecanumDrive.h"
 #include "glass/networktables/NTMechanism2D.h"
 #include "glass/networktables/NTPIDController.h"
-#include "glass/networktables/NTSpeedController.h"
+#include "glass/networktables/NTMotorController.h"
 #include "glass/networktables/NTStringChooser.h"
 #include "glass/networktables/NTSubsystem.h"
 #include "glass/networktables/NetworkTablesProvider.h"
@@ -142,14 +142,14 @@ void glass::AddStandardNetworkTablesViews(NetworkTablesProvider& provider) {
         });
       });
   provider.Register(
-      NTSpeedControllerModel::kType,
+      NTMotorControllerModel::kType,
       [](nt::NetworkTableInstance inst, const char* path) {
-        return std::make_unique<NTSpeedControllerModel>(inst, path);
+        return std::make_unique<NTMotorControllerModel>(inst, path);
       },
       [](Window* win, Model* model, const char* path) {
         win->SetFlags(ImGuiWindowFlags_AlwaysAutoResize);
         return MakeFunctionView([=] {
-          DisplaySpeedController(static_cast<NTSpeedControllerModel*>(model));
+          DisplayMotorController(static_cast<NTMotorControllerModel*>(model));
         });
       });
   provider.Register(

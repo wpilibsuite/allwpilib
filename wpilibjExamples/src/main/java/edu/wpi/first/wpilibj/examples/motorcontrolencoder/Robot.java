@@ -15,7 +15,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
  * This sample program shows how to control a motor using a joystick. In the operator control part
  * of the program, the joystick is read and the value is written to the motor.
  *
- * <p>Joystick analog values range from -1 to 1 and speed controller inputs also range from -1 to 1
+ * <p>Joystick analog values range from -1 to 1 and motor controller inputs also range from -1 to 1
  * making it easy to work together.
  *
  * <p>In addition, the encoder value of an encoder connected to ports 0 and 1 is consistently sent
