@@ -334,12 +334,6 @@ safe) semantics.
   void SetComposed(bool isComposed);
 
   /**
-   * Whether the command is currently composed in a command group.  Used as extra
-   * insurance to prevent accidental independent use of grouped commands.
-   */
-  bool IsComposed() const;
-
-  /**
    * Whether the command is currently grouped in a command group.  Used as extra
    * insurance to prevent accidental independent use of grouped commands.
    *
