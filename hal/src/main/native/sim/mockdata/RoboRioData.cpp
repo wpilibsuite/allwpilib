@@ -32,6 +32,43 @@ void RoboRioData::ResetData() {
   userFaults5V.Reset(0);
   userFaults3V3.Reset(0);
   brownoutVoltage.Reset(6.75);
+  m_serialNumber = "";
+}
+
+int32_t RoboRioData::RegisterSerialNumberCallback(
+    HAL_RoboRioStringCallback callback, void* param, HAL_Bool initialNotify) {
+  std::scoped_lock lock(m_serialNumberMutex);
+  int32_t uid = m_serialNumberCallbacks.Register(callback, param);
+  if (initialNotify) {
+    callback(GetSerialNumberName(), param, m_serialNumber.c_str(),
+             m_serialNumber.size());
+  }
+  return uid;
+}
+
+void RoboRioData::CancelSerialNumberCallback(int32_t uid) {
+  m_serialNumberCallbacks.Cancel(uid);
+}
+
+size_t RoboRioData::GetSerialNumber(char* buffer, size_t size) {
+  std::scoped_lock lock(m_serialNumberMutex);
+  size_t copied = m_serialNumber.copy(buffer, size);
+  // Null terminate if there is room
+  if (copied < size) {
+    buffer[copied] = '\0';
+  }
+  return copied;
+}
+
+void RoboRioData::SetSerialNumber(const char* serialNumber, size_t size) {
+  // Limit serial number to 8 characters internally- serialnum environment
+  // variable is always 8 characters
+  if (size > 8) {
+    size = 8;
+  }
+  std::scoped_lock lock(m_serialNumberMutex);
+  m_serialNumber = std::string(serialNumber, size);
+  m_serialNumberCallbacks(m_serialNumber.c_str(), m_serialNumber.size());
 }
 
 extern "C" {
@@ -59,6 +96,24 @@ DEFINE_CAPI(int32_t, UserFaults6V, userFaults6V)
 DEFINE_CAPI(int32_t, UserFaults5V, userFaults5V)
 DEFINE_CAPI(int32_t, UserFaults3V3, userFaults3V3)
 DEFINE_CAPI(double, BrownoutVoltage, brownoutVoltage)
+
+int32_t HALSIM_RegisterRoboRioSerialNumberCallback(
+    HAL_RoboRioStringCallback callback, void* param, HAL_Bool initialNotify) {
+  return SimRoboRioData->RegisterSerialNumberCallback(callback, param,
+                                                      initialNotify);
+}
+void HALSIM_CancelRoboRioSerialNumberCallback(int32_t uid) {
+  return SimRoboRioData->CancelSerialNumberCallback(uid);
+}
+size_t HALSIM_GetRoboRioSerialNumber(char* buffer, size_t size) {
+  return SimRoboRioData->GetSerialNumber(buffer, size);
+}
+void HALSIM_SetRoboRioSerialNumber(const char* serialNumber, size_t size) {
+  SimRoboRioData->SetSerialNumber(serialNumber, size);
+}
+
+void HALSIM_RegisterRoboRioAllCallbacks(HAL_NotifyCallback callback,
+                                        void* param, HAL_Bool initialNotify);
 
 #define REGISTER(NAME) \
   SimRoboRioData->NAME.RegisterCallback(callback, param, initialNotify)

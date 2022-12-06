@@ -6,6 +6,14 @@
 
 #include <stdint.h>
 
+#ifdef __cplusplus
+#include <cstddef>
+#else
+
+#include <stddef.h>  // NOLINT(build/include_order)
+
+#endif
+
 #include "hal/Types.h"
 
 /**
@@ -65,6 +73,13 @@ int32_t HAL_GetFPGAVersion(int32_t* status);
  * @return FPGA Revision number.
  */
 int64_t HAL_GetFPGARevision(int32_t* status);
+
+/**
+ * Returns the serial number.
+ *
+ * @return Serial number.
+ */
+size_t HAL_GetSerialNumber(char* buffer, size_t size);
 
 /**
  * Returns the runtime type of the HAL.
