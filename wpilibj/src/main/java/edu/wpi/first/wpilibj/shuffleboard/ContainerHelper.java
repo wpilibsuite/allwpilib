@@ -57,6 +57,7 @@ final class ContainerHelper {
   }
 
   ComplexWidget add(String title, Sendable sendable) {
+    Objects.requireNonNull(sendable, "sendable cannot be null");
     checkTitle(title);
     ComplexWidget widget = new ComplexWidget(m_container, title, sendable);
     m_components.add(widget);
@@ -64,6 +65,7 @@ final class ContainerHelper {
   }
 
   ComplexWidget add(Sendable sendable) {
+    Objects.requireNonNull(sendable, "sendable cannot be null");
     String name = SendableRegistry.getName(sendable);
     if (name.isEmpty()) {
       throw new IllegalArgumentException("Sendable must have a name");
@@ -170,6 +172,7 @@ final class ContainerHelper {
   }
 
   private static void checkNtType(Object data) {
+    Objects.requireNonNull(data, "data cannot be null");
     if (!NetworkTableEntry.isValidDataType(data)) {
       throw new IllegalArgumentException(
           "Cannot add data of type " + data.getClass().getName() + " to Shuffleboard");
