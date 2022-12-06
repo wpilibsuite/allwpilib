@@ -163,7 +163,7 @@ doxygen {
     warn_if_undocumented false
     warn_no_paramdoc true
 
-    //enable doxygen preprocessor expansion of WPI_DEPRECATED to fix SpeedController docs
+    //enable doxygen preprocessor expansion of WPI_DEPRECATED to fix MotorController docs
     enable_preprocessing true
     macro_expansion true
     expand_only_predef true

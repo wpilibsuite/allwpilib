@@ -2,7 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "glass/hardware/SpeedController.h"
+#include "glass/hardware/MotorController.h"
 
 #include <imgui.h>
 #include <imgui_internal.h>
@@ -12,13 +12,13 @@
 
 using namespace glass;
 
-void glass::DisplaySpeedController(SpeedControllerModel* m) {
+void glass::DisplayMotorController(MotorControllerModel* m) {
   // Get duty cycle data from the model and do not display anything if the data
   // is null.
   auto dc = m->GetPercentData();
   if (!dc || !m->Exists()) {
     ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(96, 96, 96, 255));
-    ImGui::Text("Unknown SpeedController");
+    ImGui::Text("Unknown MotorController");
     ImGui::PopStyleColor();
     return;
   }
