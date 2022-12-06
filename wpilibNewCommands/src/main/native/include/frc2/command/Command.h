@@ -327,11 +327,36 @@ safe) semantics.
   bool IsComposed() const;
 
   /**
-   * Sets whether the command is currently grouped in a command group.  Can be
-   * used to "reclaim" a command if a group is no longer going to use it.  NOT
+   * Sets whether the command is currently composed in a command composition.  Can be
+   * used to "reclaim" a command if a composition is no longer going to use it.  NOT
    * ADVISED!
    */
   void SetComposed(bool isComposed);
+
+  /**
+   * Whether the command is currently composed in a command group.  Used as extra
+   * insurance to prevent accidental independent use of grouped commands.
+   */
+  bool IsComposed() const;
+
+  /**
+   * Whether the command is currently grouped in a command group.  Used as extra
+   * insurance to prevent accidental independent use of grouped commands.
+   *
+   * @deprecated Moved to IsComposed()
+   */
+  WPI_DEPRECATED("Moved to IsComposed()")
+  bool IsGrouped() const;
+
+  /**
+   * Sets whether the command is currently grouped in a command group.  Can be
+   * used to "reclaim" a command if a group is no longer going to use it.  NOT
+   * ADVISED!
+   *
+   * @deprecated Moved to SetComposed()
+   */
+  WPI_DEPRECATED("Moved to SetComposed()")
+  void SetGrouped(bool grouped);
 
   /**
    * Whether the given command should run when the robot is disabled.  Override
