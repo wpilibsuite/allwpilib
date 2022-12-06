@@ -367,7 +367,7 @@ struct SubscriberData {
         topicNames{topicNames.begin(), topicNames.end()},
         subuid{subuid},
         options{options},
-        periodMs(std::lround(options.periodic * 100) * 10) {
+        periodMs(std::lround(options.periodicMs / 10.0) * 10) {
     if (periodMs < kMinPeriodMs) {
       periodMs = kMinPeriodMs;
     }
@@ -377,7 +377,7 @@ struct SubscriberData {
               const PubSubOptions& options_) {
     topicNames = {topicNames_.begin(), topicNames_.end()};
     options = options_;
-    periodMs = std::lround(options_.periodic * 100) * 10;
+    periodMs = std::lround(options_.periodicMs / 10.0) * 10;
     if (periodMs < kMinPeriodMs) {
       periodMs = kMinPeriodMs;
     }
@@ -465,7 +465,8 @@ struct Writer : public mpack_writer_t {
 
 static void WriteOptions(mpack_writer_t& w, const PubSubOptions& options) {
   int size = (options.sendAll ? 1 : 0) + (options.topicsOnly ? 1 : 0) +
-             (options.periodic != 0.1 ? 1 : 0) + (options.prefixMatch ? 1 : 0);
+             (options.periodicMs != PubSubOptions::kDefaultPeriodicMs ? 1 : 0) +
+             (options.prefixMatch ? 1 : 0);
   mpack_start_map(&w, size);
   if (options.sendAll) {
     mpack_write_str(&w, "all");
@@ -475,9 +476,9 @@ static void WriteOptions(mpack_writer_t& w, const PubSubOptions& options) {
     mpack_write_str(&w, "topicsonly");
     mpack_write_bool(&w, true);
   }
-  if (options.periodic != 0.1) {
+  if (options.periodicMs != PubSubOptions::kDefaultPeriodicMs) {
     mpack_write_str(&w, "periodic");
-    mpack_write_float(&w, options.periodic);
+    mpack_write_float(&w, options.periodicMs / 1000.0);
   }
   if (options.prefixMatch) {
     mpack_write_str(&w, "prefix");

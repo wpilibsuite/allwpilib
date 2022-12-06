@@ -27,7 +27,7 @@ namespace nt {
 
 ::testing::Matcher<const PubSubOptions&> IsPubSubOptions(
     const PubSubOptions& good) {
-  return AllOf(Field("periodic", &PubSubOptions::periodic, good.periodic),
+  return AllOf(Field("periodic", &PubSubOptions::periodicMs, good.periodicMs),
                Field("pollStorageSize", &PubSubOptions::pollStorageSize,
                      good.pollStorageSize),
                Field("logging", &PubSubOptions::sendAll, good.sendAll),

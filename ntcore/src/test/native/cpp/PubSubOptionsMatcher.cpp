@@ -11,7 +11,7 @@ namespace nt {
 bool PubSubOptionsMatcher::MatchAndExplain(
     const PubSubOptions& val, ::testing::MatchResultListener* listener) const {
   bool match = true;
-  if (val.periodic != good.periodic) {
+  if (val.periodicMs != good.periodicMs) {
     *listener << "periodic mismatch ";
     match = false;
   }

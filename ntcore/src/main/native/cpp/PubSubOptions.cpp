@@ -12,7 +12,7 @@ nt::PubSubOptions::PubSubOptions(std::span<const PubSubOption> options) {
   for (auto&& option : options) {
     switch (option.type) {
       case NT_PUBSUB_PERIODIC:
-        periodic = option.value;
+        periodicMs = option.value;
         break;
       case NT_PUBSUB_SENDALL:
         sendAll = option.value != 0;

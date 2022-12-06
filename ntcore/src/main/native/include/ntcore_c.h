@@ -288,10 +288,11 @@ struct NT_PubSubOption {
 
   /**
    * Option value.  1 (true) or 0 (false) for immediate and logging options,
-   * time between updates, in seconds, for periodic option.  For local/remote
-   * option, 1=local only, 2=remote only, 0 or 3=both local and remote.
+   * time between updates, in milliseconds, for periodic option.  For
+   * local/remote option, 1=local only, 2=remote only, 0 or 3=both local and
+   * remote.
    */
-  double value;
+  unsigned int value;
 };
 
 /**

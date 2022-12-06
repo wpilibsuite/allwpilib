@@ -293,7 +293,7 @@ void CImpl::Publish(NT_Publisher pubHandle, NT_Topic topicHandle,
   }
   publisher->handle = pubHandle;
   publisher->options = options;
-  publisher->periodMs = std::lround(options.periodic * 100) * 10;
+  publisher->periodMs = std::lround(options.periodicMs / 10.0) * 10;
   if (publisher->periodMs < kMinPeriodMs) {
     publisher->periodMs = kMinPeriodMs;
   }
