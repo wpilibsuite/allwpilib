@@ -327,9 +327,9 @@ safe) semantics.
   bool IsComposed() const;
 
   /**
-   * Sets whether the command is currently composed in a command composition.  Can be
-   * used to "reclaim" a command if a composition is no longer going to use it.  NOT
-   * ADVISED!
+   * Sets whether the command is currently composed in a command composition.
+   * Can be used to "reclaim" a command if a composition is no longer going to
+   * use it.  NOT ADVISED!
    */
   void SetComposed(bool isComposed);
 
