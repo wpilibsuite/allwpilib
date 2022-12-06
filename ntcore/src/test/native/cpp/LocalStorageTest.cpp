@@ -867,4 +867,50 @@ TEST_F(LocalStorageTest, ReadQueueLocalRemote) {
   EXPECT_THAT(storage.ReadQueueDouble(subLocal), IsEmpty());
 }
 
+TEST_F(LocalStorageTest, SubExcludePub) {
+  EXPECT_CALL(network, Subscribe(_, _, _)).Times(2);
+  EXPECT_CALL(network, Publish(_, _, _, _, _, _)).Times(1);
+
+  auto pub = storage.Publish(fooTopic, NT_DOUBLE, "double", {}, {});
+  auto subActive = storage.Subscribe(fooTopic, NT_DOUBLE, "double", {});
+  auto subExclude = storage.Subscribe(fooTopic, NT_DOUBLE, "double",
+                                      {{PubSubOption::ExcludePublisher(pub)}});
+  auto remoteTopic =
+      storage.NetworkAnnounce("foo", "double", wpi::json::object(), 0);
+
+  // local set
+  EXPECT_CALL(network, SetValue(_, _));
+  storage.SetEntryValue(pub, Value::MakeDouble(1.0, 50));
+  EXPECT_THAT(storage.ReadQueueDouble(subActive),
+              ElementsAre(TSEq<TimestampedDouble>(1.0, 50)));
+  EXPECT_THAT(storage.ReadQueueDouble(subExclude), IsEmpty());
+
+  // network set
+  storage.NetworkSetValue(remoteTopic, Value::MakeDouble(2.0, 60));
+  EXPECT_THAT(storage.ReadQueueDouble(subActive),
+              ElementsAre(TSEq<TimestampedDouble>(2.0, 60)));
+  EXPECT_THAT(storage.ReadQueueDouble(subExclude),
+              ElementsAre(TSEq<TimestampedDouble>(2.0, 60)));
+}
+
+TEST_F(LocalStorageTest, EntryExcludeSelf) {
+  EXPECT_CALL(network, Subscribe(_, _, _));
+
+  auto entry = storage.GetEntry(fooTopic, NT_DOUBLE, "double",
+                                {{PubSubOption::ExcludeSelf(true)}});
+  auto remoteTopic =
+      storage.NetworkAnnounce("foo", "double", wpi::json::object(), 0);
+
+  // local set
+  EXPECT_CALL(network, Publish(_, _, _, _, _, _));
+  EXPECT_CALL(network, SetValue(_, _));
+  storage.SetEntryValue(entry, Value::MakeDouble(1.0, 50));
+  EXPECT_THAT(storage.ReadQueueDouble(entry), IsEmpty());
+
+  // network set
+  storage.NetworkSetValue(remoteTopic, Value::MakeDouble(2.0, 60));
+  EXPECT_THAT(storage.ReadQueueDouble(entry),
+              ElementsAre(TSEq<TimestampedDouble>(2.0, 60)));
+}
+
 }  // namespace nt

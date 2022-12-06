@@ -4,6 +4,7 @@
 
 #include "PubSubOptions.h"
 
+#include "ntcore_c.h"
 #include "ntcore_cpp.h"
 
 using namespace nt;
@@ -47,6 +48,12 @@ nt::PubSubOptions::PubSubOptions(std::span<const PubSubOption> options) {
           default:
             break;
         }
+        break;
+      case NT_PUBSUB_EXCLUDEPUB:
+        excludePub = option.value;
+        break;
+      case NT_PUBSUB_EXCLUDESELF:
+        excludeSelf = option.value != 0;
         break;
       default:
         break;
