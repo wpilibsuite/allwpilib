@@ -63,11 +63,7 @@ Command::InterruptionBehavior ParallelCommandGroup::GetInterruptionBehavior()
 
 void ParallelCommandGroup::AddCommands(
     std::vector<std::unique_ptr<Command>>&& commands) {
-  for (auto&& command : commands) {
-    if (!RequireUngrouped(*command)) {
-      return;
-    }
-  }
+  CommandScheduler::GetInstance().RequireUngrouped(commands);
 
   if (isRunning) {
     throw FRC_MakeError(frc::err::CommandIllegalUse,
@@ -77,7 +73,7 @@ void ParallelCommandGroup::AddCommands(
 
   for (auto&& command : commands) {
     if (RequirementsDisjoint(this, command.get())) {
-      command->SetGrouped(true);
+      command->SetComposed(true);
       AddRequirements(command->GetRequirements());
       m_runWhenDisabled &= command->RunsWhenDisabled();
       if (command->GetInterruptionBehavior() ==

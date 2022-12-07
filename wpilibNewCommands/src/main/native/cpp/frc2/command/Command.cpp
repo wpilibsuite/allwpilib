@@ -25,7 +25,7 @@ Command::~Command() {
 }
 
 Command& Command::operator=(const Command& rhs) {
-  m_isGrouped = false;
+  m_isComposed = false;
   return *this;
 }
 
@@ -135,12 +135,20 @@ std::string Command::GetName() const {
 
 void Command::SetName(std::string_view name) {}
 
+bool Command::IsComposed() const {
+  return m_isComposed;
+}
+
+void Command::SetComposed(bool isComposed) {
+  m_isComposed = isComposed;
+}
+
 bool Command::IsGrouped() const {
-  return m_isGrouped;
+  return IsComposed();
 }
 
 void Command::SetGrouped(bool grouped) {
-  m_isGrouped = grouped;
+  SetComposed(grouped);
 }
 
 namespace frc2 {

@@ -60,9 +60,7 @@ Command::InterruptionBehavior SequentialCommandGroup::GetInterruptionBehavior()
 
 void SequentialCommandGroup::AddCommands(
     std::vector<std::unique_ptr<Command>>&& commands) {
-  if (!RequireUngrouped(commands)) {
-    return;
-  }
+  CommandScheduler::GetInstance().RequireUngrouped(commands);
 
   if (m_currentCommandIndex != invalid_index) {
     throw FRC_MakeError(frc::err::CommandIllegalUse,
@@ -71,7 +69,7 @@ void SequentialCommandGroup::AddCommands(
   }
 
   for (auto&& command : commands) {
-    command->SetGrouped(true);
+    command->SetComposed(true);
     AddRequirements(command->GetRequirements());
     m_runWhenDisabled &= command->RunsWhenDisabled();
     if (command->GetInterruptionBehavior() ==

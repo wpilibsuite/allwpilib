@@ -24,10 +24,12 @@ namespace frc2 {
 const size_t invalid_index = std::numeric_limits<size_t>::max();
 
 /**
- * A CommandGroups that runs a list of commands in sequence.
+ * A command composition that runs a list of commands in sequence.
  *
- * <p>As a rule, CommandGroups require the union of the requirements of their
- * component commands.
+ * <p>The rules for command compositions apply: command instances that are
+ * passed to it are owned by the composition and cannot be added to any other
+ * composition or scheduled individually, and the composition requires all
+ * subsystems its components require.
  *
  * This class is provided by the NewCommands VendorDep
  */
@@ -35,21 +37,21 @@ class SequentialCommandGroup
     : public CommandHelper<CommandGroupBase, SequentialCommandGroup> {
  public:
   /**
-   * Creates a new SequentialCommandGroup.  The given commands will be run
-   * sequentially, with the CommandGroup finishing when the last command
+   * Creates a new SequentialCommandGroup. The given commands will be run
+   * sequentially, with the composition finishing when the last command
    * finishes.
    *
-   * @param commands the commands to include in this group.
+   * @param commands the commands to include in this composition.
    */
   explicit SequentialCommandGroup(
       std::vector<std::unique_ptr<Command>>&& commands);
 
   /**
-   * Creates a new SequentialCommandGroup.  The given commands will be run
-   * sequentially, with the CommandGroup finishing when the last command
+   * Creates a new SequentialCommandGroup. The given commands will be run
+   * sequentially, with the composition finishing when the last command
    * finishes.
    *
-   * @param commands the commands to include in this group.
+   * @param commands the commands to include in this composition.
    */
   template <class... Types,
             typename = std::enable_if_t<std::conjunction_v<

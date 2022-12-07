@@ -9,7 +9,6 @@
 
 #include <frc/simulation/DriverStationSim.h>
 
-#include "frc2/command/CommandGroupBase.h"
 #include "frc2/command/CommandHelper.h"
 #include "frc2/command/CommandScheduler.h"
 #include "frc2/command/SetUtilities.h"
