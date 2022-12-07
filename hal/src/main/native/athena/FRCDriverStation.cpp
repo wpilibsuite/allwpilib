@@ -18,6 +18,7 @@
 #include <wpi/SmallVector.h>
 #include <wpi/condition_variable.h>
 #include <wpi/mutex.h>
+#include <wpi/timestamp.h>
 
 #include "HALInitializer.h"
 #include "hal/DriverStation.h"
@@ -169,6 +170,39 @@ static int32_t HAL_GetMatchInfoInternal(HAL_MatchInfo* info) {
   *(std::end(info->eventName) - 1) = '\0';
 
   return status;
+}
+
+namespace {
+struct TcpCache {
+  TcpCache() { std::memset(this, 0, sizeof(*this)); }
+  void Update(uint32_t mask);
+  void CloneTo(TcpCache* other) {
+    std::memcpy(other, this, sizeof(*this));
+  }
+
+  HAL_MatchInfo matchInfo;
+  HAL_JoystickDescriptor descriptors[HAL_kMaxJoysticks];
+};
+static_assert(std::is_standard_layout_v<TcpCache>);
+}
+
+static std::atomic_uint32_t tcpMask{0xFFFFFFFF};
+static TcpCache tcpCache;
+static TcpCache tcpCurrent;
+static wpi::mutex tcpCacheMutex;
+
+constexpr uint32_t combinedMatchInfoMask = kTcpRecvMask_MatchInfoOld | kTcpRecvMask_MatchInfo | kTcpRecvMask_GameSpecific;
+
+void TcpCache::Update(uint32_t mask) {
+
+  if ((mask & combinedMatchInfoMask) != 0) {
+    HAL_GetMatchInfoInternal(&matchInfo);
+  }
+  for (int i = 0; i < HAL_kMaxJoysticks; i++) {
+    if ((mask & (1 << i)) != 0) {
+      HAL_GetJoystickDescriptorInternal(i, &descriptors[i]);
+    }
+  }
 }
 
 namespace hal::init {
@@ -339,11 +373,16 @@ void HAL_GetAllJoystickData(HAL_JoystickAxes* axes, HAL_JoystickPOVs* povs,
 
 int32_t HAL_GetJoystickDescriptor(int32_t joystickNum,
                                   HAL_JoystickDescriptor* desc) {
-  return HAL_GetJoystickDescriptorInternal(joystickNum, desc);
+  CHECK_JOYSTICK_NUMBER(joystickNum);
+  std::scoped_lock lock{tcpCacheMutex};
+  *desc = tcpCurrent.descriptors[joystickNum];
+  return 0;
 }
 
 int32_t HAL_GetMatchInfo(HAL_MatchInfo* info) {
-  return HAL_GetMatchInfoInternal(info);
+  std::scoped_lock lock{tcpCacheMutex};
+  *info = tcpCurrent.matchInfo;
+  return 0;
 }
 
 HAL_AllianceStationID HAL_GetAllianceStation(int32_t* status) {
@@ -388,7 +427,6 @@ void HAL_FreeJoystickName(char* name) {
 }
 
 int32_t HAL_GetJoystickAxisType(int32_t joystickNum, int32_t axis) {
-  CHECK_JOYSTICK_NUMBER(joystickNum);
   HAL_JoystickDescriptor joystickDesc;
   if (HAL_GetJoystickDescriptor(joystickNum, &joystickDesc) < 0) {
     return -1;
@@ -431,13 +469,14 @@ void HAL_ObserveUserProgramTest(void) {
 
 // Constant number to be used for our occur handle
 constexpr int32_t refNumber = 42;
+constexpr int32_t tcpRefNumber = 94;
 
-static void newDataOccur(uint32_t refNum) {
-  // Since we could get other values, require our specific handle
-  // to signal our threads
-  if (refNum != refNumber) {
-    return;
-  }
+static void tcpOccur() {
+  uint32_t mask = FRC_NetworkCommunication_getNewTcpRecvMask();
+  tcpMask.fetch_or(mask);
+}
+
+static void udpOccur() {
   cacheToUpdate->Update();
   {
     std::scoped_lock lock{cacheMutex};
@@ -445,6 +484,22 @@ static void newDataOccur(uint32_t refNum) {
     currentCache->updated = true;
   }
   driverStation->newDataEvents.Wakeup();
+}
+
+static void newDataOccur(uint32_t refNum) {
+  switch (refNum) {
+    case refNumber:
+      udpOccur();
+      break;
+
+    case tcpRefNumber:
+      tcpOccur();
+      break;
+
+    default:
+      printf("Unknown occur %u\n", refNum);
+      break;
+  }
 }
 
 void HAL_RefreshDSData(void) {
@@ -458,6 +513,13 @@ void HAL_RefreshDSData(void) {
     currentCache->updated = false;
   }
   newestControlWord = controlWord;
+
+  uint32_t mask = tcpMask.exchange(0);
+  if (mask != 0) {
+    tcpCache.Update(mask);
+    std::scoped_lock tcpLock(tcpCacheMutex);
+    tcpCache.CloneTo(&tcpCurrent);
+  }
 }
 
 void HAL_ProvideNewDataEventHandle(WPI_EventHandle handle) {
@@ -481,5 +543,6 @@ void InitializeDriverStation() {
   NetCommRPCProxy_SetOccurFuncPointer(newDataOccur);
   // Set up our occur reference number
   setNewDataOccurRef(refNumber);
+  FRC_NetworkCommunication_setNewTcpDataOccurRef(tcpRefNumber);
 }
 }  // namespace hal
