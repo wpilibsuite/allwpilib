@@ -4,8 +4,6 @@
 
 package edu.wpi.first.wpilibj.drive;
 
-import static java.util.Objects.requireNonNull;
-
 import edu.wpi.first.hal.FRCNetComm.tInstances;
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
@@ -14,6 +12,7 @@ import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.util.sendable.SendableRegistry;
 import edu.wpi.first.wpilibj.motorcontrol.MotorController;
+import edu.wpi.first.wpilibj.util.ErrorMessages;
 
 /**
  * A class for driving differential drive/skid-steer drive platforms such as the Kit of Parts drive
@@ -129,8 +128,8 @@ public class DifferentialDrive extends RobotDriveBase implements Sendable, AutoC
    * @param rightMotor Right motor.
    */
   public DifferentialDrive(MotorController leftMotor, MotorController rightMotor) {
-    requireNonNull(leftMotor, "Left motor cannot be null");
-    requireNonNull(rightMotor, "Right motor cannot be null");
+    ErrorMessages.requireNonNullParam(leftMotor, "leftMotor", "DifferentialDrive");
+    ErrorMessages.requireNonNullParam(rightMotor, "rightMotor", "DifferentialDrive");
 
     m_leftMotor = leftMotor;
     m_rightMotor = rightMotor;

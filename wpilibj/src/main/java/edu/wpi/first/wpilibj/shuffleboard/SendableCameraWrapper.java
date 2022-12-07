@@ -12,6 +12,7 @@ import edu.wpi.first.networktables.StringArrayTopic;
 import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.util.sendable.SendableRegistry;
+import edu.wpi.first.wpilibj.util.ErrorMessages;
 import java.util.Map;
 import java.util.Objects;
 import java.util.WeakHashMap;
@@ -112,8 +113,8 @@ public final class SendableCameraWrapper implements Sendable, AutoCloseable {
       return m_wrappers.get(cameraName);
     }
 
-    Objects.requireNonNull(cameraName, "cameraName");
-    Objects.requireNonNull(cameraUrls, "cameraUrls");
+    ErrorMessages.requireNonNullParam(cameraName, "cameraName", "wrap");
+    ErrorMessages.requireNonNullParam(cameraUrls, "cameraUrls", "wrap");
     if (cameraName.isEmpty()) {
       throw new IllegalArgumentException("Camera name not specified");
     }
