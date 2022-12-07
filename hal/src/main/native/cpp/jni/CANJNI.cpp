@@ -138,44 +138,40 @@ Java_edu_wpi_first_hal_can_CANJNI_readCANStreamSession
   uint32_t handle = static_cast<uint32_t>(sessionHandle);
   uint32_t messagesRead = 0;
 
-  // TODO: Remove heap allocation, maybe this needs to live in a HAL handle
-  // which includes a pre-allocated buffer.
-  struct HAL_CANStreamMessage* messageBuffer =
-      new struct HAL_CANStreamMessage[messagesToRead];
+  wpi::SmallVector<HAL_CANStreamMessage, 16> messageBuffer;
+  messageBuffer.resize_for_overwrite(messagesToRead);
+
   int32_t status = 0;
 
-  HAL_CAN_ReadStreamSession(handle, messageBuffer,
+  HAL_CAN_ReadStreamSession(handle, messageBuffer.begin(),
                             static_cast<uint32_t>(messagesToRead),
                             &messagesRead, &status);
 
   if (status == HAL_ERR_CANSessionMux_MessageNotFound || messagesRead == 0) {
-    messagesRead = 0;
-    goto canStreamReadCleanup;
+    return 0;
   }
 
   if (!CheckStatus(env, status)) {
-    messagesRead = 0;
-    goto canStreamReadCleanup;
+    return 0;
   }
 
   for (int i = 0; i < static_cast<int>(messagesRead); i++) {
     struct HAL_CANStreamMessage* msg = &messageBuffer[i];
-    jobject element = env->GetObjectArrayElement(messages, i);
-    jbyteArray toSetArray = SetCANStreamObject(env, element, msg->dataSize,
-                                               msg->messageID, msg->timeStamp);
+    JLocal<jobject> elem{
+        env, static_cast<jstring>(env->GetObjectArrayElement(messages, i))};
+    if (!elem) {
+      // TODO decide if should throw
+      continue;
+    }
+    JLocal<jbyteArray> toSetArray{env, SetCANStreamObject(env, elem, msg->dataSize, msg->messageID, msg->timeStamp)};
     auto javaLen = env->GetArrayLength(toSetArray);
     if (javaLen < msg->dataSize) {
       msg->dataSize = javaLen;
     }
     env->SetByteArrayRegion(toSetArray, 0, msg->dataSize,
                             reinterpret_cast<jbyte*>(msg->data));
-
-    // Do I need this for array elements?
-    env->DeleteLocalRef(element);
   }
 
-canStreamReadCleanup:
-  delete messageBuffer;
   return static_cast<jint>(messagesRead);
 }
 
