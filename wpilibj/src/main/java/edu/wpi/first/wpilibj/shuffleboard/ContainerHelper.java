@@ -10,6 +10,7 @@ import edu.wpi.first.networktables.NetworkTableType;
 import edu.wpi.first.util.function.FloatSupplier;
 import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.util.sendable.SendableRegistry;
+import edu.wpi.first.wpilibj.util.ErrorMessages;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -57,6 +58,7 @@ final class ContainerHelper {
   }
 
   ComplexWidget add(String title, Sendable sendable) {
+    ErrorMessages.requireNonNullParam(sendable, "sendable", "add");
     checkTitle(title);
     ComplexWidget widget = new ComplexWidget(m_container, title, sendable);
     m_components.add(widget);
@@ -64,6 +66,7 @@ final class ContainerHelper {
   }
 
   ComplexWidget add(Sendable sendable) {
+    ErrorMessages.requireNonNullParam(sendable, "sendable", "add");
     String name = SendableRegistry.getName(sendable);
     if (name.isEmpty()) {
       throw new IllegalArgumentException("Sendable must have a name");
