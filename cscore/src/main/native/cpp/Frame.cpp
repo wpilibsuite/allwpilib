@@ -401,7 +401,7 @@ Image* Frame::ConvertYUYVToGray(Image* image) {
     return nullptr;
   }
 
-  // Allocate a BGR image
+  // Allocate a grayscale image
   auto newImage =
       m_impl->source.AllocImage(VideoMode::kGray, image->width, image->height,
                                 image->width * image->height);
@@ -445,7 +445,7 @@ Image* Frame::ConvertUYVYToGray(Image* image) {
     return nullptr;
   }
 
-  // Allocate a BGR image
+  // Allocate a grayscale image
   auto newImage =
       m_impl->source.AllocImage(VideoMode::kGray, image->width, image->height,
                                 image->width * image->height);
