@@ -163,7 +163,9 @@ Java_edu_wpi_first_hal_can_CANJNI_readCANStreamSession
       // TODO decide if should throw
       continue;
     }
-    JLocal<jbyteArray> toSetArray{env, SetCANStreamObject(env, elem, msg->dataSize, msg->messageID, msg->timeStamp)};
+    JLocal<jbyteArray> toSetArray{
+        env, SetCANStreamObject(env, elem, msg->dataSize, msg->messageID,
+                                msg->timeStamp)};
     auto javaLen = env->GetArrayLength(toSetArray);
     if (javaLen < msg->dataSize) {
       msg->dataSize = javaLen;
