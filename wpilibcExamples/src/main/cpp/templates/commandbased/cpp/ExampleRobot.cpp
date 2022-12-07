@@ -2,20 +2,22 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "RobotContainer.h"
+#include "ExampleRobot.h"
 
-RobotContainer::RobotContainer() : m_autonomousCommand(&m_subsystem) {
+#include "commands/Autos.h"
+
+ExampleRobot::ExampleRobot() {
   // Initialize all of your commands and subsystems here
 
   // Configure the button bindings
-  ConfigureButtonBindings();
+  ConfigureBindings();
 }
 
-void RobotContainer::ConfigureButtonBindings() {
+void ExampleRobot::ConfigureBindings() {
   // Configure your button bindings here
 }
 
-frc2::Command* RobotContainer::GetAutonomousCommand() {
+frc2::CommandPtr ExampleRobot::GetAutonomousCommand() {
   // An example command will be run in autonomous
-  return &m_autonomousCommand;
+  return autos::ExampleAuto(&m_subsystem);
 }
