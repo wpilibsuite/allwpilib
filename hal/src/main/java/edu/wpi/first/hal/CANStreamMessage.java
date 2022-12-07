@@ -20,13 +20,13 @@ public class CANStreamMessage {
   /**
    * API used from JNI to set the data.
    *
-   * @param messageID CAN message ID of the message.
    * @param length Length of packet in bytes.
+   * @param messageID CAN message ID of the message.
    * @param timestamp CAN frame timestamp in microseconds.
    * @return Buffer containing CAN frame.
    */
   @SuppressWarnings("PMD.MethodReturnsInternalArray")
-  public byte[] setStreamData(int messageID, int length, long timestamp) {
+  public byte[] setStreamData(int length, int messageID, long timestamp) {
     this.messageID = messageID;
     this.length = length;
     this.timestamp = timestamp;
