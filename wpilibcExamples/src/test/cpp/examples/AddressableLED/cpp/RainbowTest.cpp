@@ -2,25 +2,27 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
+#include <fmt/format.h>
 #include <gtest/gtest.h>
 
 #include <array>
 
-#include <hal/AddressableLEDTypes.h>
-#include <fmt/format.h>
 #include <frc/AddressableLED.h>
 #include <frc/simulation/AddressableLEDSim.h>
 #include <frc/util/Color.h>
 #include <frc/util/Color8Bit.h>
+#include <hal/AddressableLEDTypes.h>
 
 #include "Robot.h"
 
-void AssertIndexColor(std::array<frc::AddressableLED::LEDData, 60> data, int index, int hue, int saturation, int value);
+void AssertIndexColor(std::array<frc::AddressableLED::LEDData, 60> data,
+                      int index, int hue, int saturation, int value);
 
 TEST(RainbowTest, RainbowPattern) {
   Robot robot;
   robot.RobotInit();
-  frc::sim::AddressableLEDSim ledSim = frc::sim::AddressableLEDSim::CreateForChannel(9);
+  frc::sim::AddressableLEDSim ledSim =
+      frc::sim::AddressableLEDSim::CreateForChannel(9);
   EXPECT_TRUE(ledSim.GetRunning());
   EXPECT_EQ(60, ledSim.GetLength());
 
@@ -40,7 +42,8 @@ TEST(RainbowTest, RainbowPattern) {
   }
 }
 
-void AssertIndexColor(std::array<frc::AddressableLED::LEDData, 60> data, int index, int hue, int saturation, int value) {
+void AssertIndexColor(std::array<frc::AddressableLED::LEDData, 60> data,
+                      int index, int hue, int saturation, int value) {
   frc::Color8Bit color{frc::Color::FromHSV(hue, saturation, value)};
 
   EXPECT_EQ(0, data[index].padding);

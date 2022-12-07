@@ -34,7 +34,6 @@ void Robot::Rainbow() {
   firstPixelHue %= 180;
 }
 
-
 #ifndef RUNNING_FRC_TESTS
 int main() {
   return frc::StartRobot<Robot>();
