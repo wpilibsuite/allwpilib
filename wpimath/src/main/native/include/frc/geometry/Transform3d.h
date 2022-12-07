@@ -81,7 +81,7 @@ class WPILIB_DLLEXPORT Transform3d {
   Transform3d Inverse() const;
 
   /**
-   * Scales the transform by the scalar.
+   * Multiplies the transform by the scalar.
    *
    * @param scalar The scalar.
    * @return The scaled Transform3d.
@@ -89,6 +89,14 @@ class WPILIB_DLLEXPORT Transform3d {
   Transform3d operator*(double scalar) const {
     return Transform3d(m_translation * scalar, m_rotation * scalar);
   }
+
+  /**
+   * Divides the transform by the scalar.
+   *
+   * @param scalar The scalar.
+   * @return The scaled Transform3d.
+   */
+  Transform3d operator/(double scalar) const { return *this * (1.0 / scalar); }
 
   /**
    * Composes two transformations.
@@ -100,19 +108,8 @@ class WPILIB_DLLEXPORT Transform3d {
 
   /**
    * Checks equality between this Transform3d and another object.
-   *
-   * @param other The other object.
-   * @return Whether the two objects are equal.
    */
-  bool operator==(const Transform3d& other) const;
-
-  /**
-   * Checks inequality between this Transform3d and another object.
-   *
-   * @param other The other object.
-   * @return Whether the two objects are not equal.
-   */
-  bool operator!=(const Transform3d& other) const;
+  bool operator==(const Transform3d&) const = default;
 
  private:
   Translation3d m_translation;

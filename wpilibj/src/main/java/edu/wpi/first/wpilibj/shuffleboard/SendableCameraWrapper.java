@@ -5,7 +5,10 @@
 package edu.wpi.first.wpilibj.shuffleboard;
 
 import edu.wpi.first.cscore.VideoSource;
+import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.networktables.StringArrayPublisher;
+import edu.wpi.first.networktables.StringArrayTopic;
 import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.util.sendable.SendableRegistry;
@@ -19,7 +22,14 @@ public final class SendableCameraWrapper implements Sendable, AutoCloseable {
 
   private static Map<String, SendableCameraWrapper> m_wrappers = new WeakHashMap<>();
 
+  private static NetworkTable m_table;
+
+  static {
+    setNetworkTableInstance(NetworkTableInstance.getDefault());
+  }
+
   private final String m_uri;
+  private StringArrayPublisher m_streams;
 
   /**
    * Creates a new sendable wrapper. Private constructor to avoid direct instantiation with multiple
@@ -36,8 +46,20 @@ public final class SendableCameraWrapper implements Sendable, AutoCloseable {
     m_uri = kProtocol + cameraName;
   }
 
+  private SendableCameraWrapper(String cameraName, String[] cameraUrls) {
+    this(cameraName);
+
+    StringArrayTopic streams = new StringArrayTopic(m_table.getTopic(cameraName + "/streams"));
+    if (streams.exists()) {
+      throw new IllegalStateException(
+          "A camera is already being streamed with the name '" + cameraName + "'");
+    }
+
+    m_streams = streams.publish();
+    m_streams.set(cameraUrls);
+  }
+
   /** Clears all cached wrapper objects. This should only be used in tests. */
-  @SuppressWarnings("PMD.DefaultPackage")
   static void clearWrappers() {
     m_wrappers.clear();
   }
@@ -45,6 +67,18 @@ public final class SendableCameraWrapper implements Sendable, AutoCloseable {
   @Override
   public void close() {
     SendableRegistry.remove(this);
+    if (m_streams != null) {
+      m_streams.close();
+    }
+  }
+
+  /*
+   * Sets NetworkTable instance used for camera publisher entries.
+   *
+   * @param inst NetworkTable instance
+   */
+  public static synchronized void setNetworkTableInstance(NetworkTableInstance inst) {
+    m_table = inst.getTable("CameraPublisher");
   }
 
   /**
@@ -73,7 +107,6 @@ public final class SendableCameraWrapper implements Sendable, AutoCloseable {
    * @return a sendable wrapper object for the video source, usable in Shuffleboard via {@link
    *     ShuffleboardTab#add(Sendable)} and {@link ShuffleboardLayout#add(Sendable)}
    */
-  @SuppressWarnings("PMD.CyclomaticComplexity")
   public static SendableCameraWrapper wrap(String cameraName, String... cameraUrls) {
     if (m_wrappers.containsKey(cameraName)) {
       return m_wrappers.get(cameraName);
@@ -91,15 +124,7 @@ public final class SendableCameraWrapper implements Sendable, AutoCloseable {
       Objects.requireNonNull(cameraUrls[i], "Camera URL at index " + i + " was null");
     }
 
-    String streams = "/CameraPublisher/" + cameraName + "/streams";
-    if (NetworkTableInstance.getDefault().getEntries(streams, 0).length != 0) {
-      throw new IllegalStateException(
-          "A camera is already being streamed with the name '" + cameraName + "'");
-    }
-
-    NetworkTableInstance.getDefault().getEntry(streams).setStringArray(cameraUrls);
-
-    SendableCameraWrapper wrapper = new SendableCameraWrapper(cameraName);
+    SendableCameraWrapper wrapper = new SendableCameraWrapper(cameraName, cameraUrls);
     m_wrappers.put(cameraName, wrapper);
     return wrapper;
   }

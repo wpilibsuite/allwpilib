@@ -1,8 +1,8 @@
 # WPILib Project
 
-![CI](https://github.com/wpilibsuite/allwpilib/workflows/CI/badge.svg)
-[![C++ Documentation](https://img.shields.io/badge/documentation-c%2B%2B-blue)](https://first.wpi.edu/wpilib/allwpilib/docs/development/cpp/)
-[![Java Documentation](https://img.shields.io/badge/documentation-java-orange)](https://first.wpi.edu/wpilib/allwpilib/docs/development/java/)
+[![Gradle](https://github.com/wpilibsuite/allwpilib/actions/workflows/gradle.yml/badge.svg?branch=main)](https://github.com/wpilibsuite/allwpilib/actions/workflows/gradle.yml)
+[![C++ Documentation](https://img.shields.io/badge/documentation-c%2B%2B-blue)](https://github.wpilib.org/allwpilib/docs/development/cpp/)
+[![Java Documentation](https://img.shields.io/badge/documentation-java-orange)](https://github.wpilib.org/allwpilib/docs/development/java/)
 
 Welcome to the WPILib project. This repository contains the HAL, WPILibJ, and WPILibC projects. These are the core libraries for creating robot programs for the roboRIO.
 
@@ -15,8 +15,7 @@ Welcome to the WPILib project. This repository contains the HAL, WPILibJ, and WP
     - [Faster builds](#faster-builds)
     - [Using Development Builds](#using-development-builds)
     - [Custom toolchain location](#custom-toolchain-location)
-    - [Gazebo simulation](#gazebo-simulation)
-    - [Formatting/linting with wpiformat](#formattinglinting-with-wpiformat)
+    - [Formatting/Linting](#formattinglinting)
     - [CMake](#cmake)
   - [Publishing](#publishing)
   - [Structure and Organization](#structure-and-organization)
@@ -33,7 +32,7 @@ Below is a list of instructions that guide you through cloning, building, publis
 1. Clone the repository with `git clone https://github.com/wpilibsuite/allwpilib.git`
 2. Build the repository with `./gradlew build` or `./gradlew build --build-cache` if you have an internet connection
 3. Publish the artifacts locally by running `./gradlew publish`
-4. [Update your](OtherVersions.md) `build.gradle` [to use the artifacts](OtherVersions.md)
+4. [Update your](DevelopmentBuilds.md) `build.gradle` [to use the artifacts](DevelopmentBuilds.md)
 
 # Building WPILib
 
@@ -47,8 +46,8 @@ Using Gradle makes building WPILib very straightforward. It only has a few depen
     - On Windows, install the JDK 11 .msi from the link above
     - On macOS, install the JDK 11 .pkg from the link above
 - C++ compiler
-    - On Linux, install GCC 8 or greater
-    - On Windows, install [Visual Studio Community 2022 or 2019](https://visualstudio.microsoft.com/vs/community/) and select the C++ programming language during installation (Gradle can't use the build tools for Visual Studio)
+    - On Linux, install GCC 11 or greater
+    - On Windows, install [Visual Studio Community 2022](https://visualstudio.microsoft.com/vs/community/) and select the C++ programming language during installation (Gradle can't use the build tools for Visual Studio)
     - On macOS, install the Xcode command-line build tools via `xcode-select --install`
 - ARM compiler toolchain
     - Run `./gradlew installRoboRioToolchain` after cloning this repository
@@ -56,11 +55,13 @@ Using Gradle makes building WPILib very straightforward. It only has a few depen
 - Raspberry Pi toolchain (optional)
     - Run `./gradlew installArm32Toolchain` after cloning this repository
 
+On macOS ARM, run `softwareupdate --install-rosetta`. This is necessary to be able to use the macOS x86 roboRIO toolchain on ARM.
+
 ## Setup
 
 Clone the WPILib repository and follow the instructions above for installing any required tooling.
 
-See the [styleguide README](https://github.com/wpilibsuite/styleguide/blob/main/README.md) for wpiformat setup instructions.
+See the [styleguide README](https://github.com/wpilibsuite/styleguide/blob/main/README.md) for wpiformat setup instructions. We use clang-format 14.
 
 ## Building
 
@@ -102,7 +103,7 @@ Run with `--build-cache` on the command-line to use the shared [build cache](htt
 
 ### Using Development Builds
 
-Please read the documentation available [here](OtherVersions.md)
+Please read the documentation available [here](DevelopmentBuilds.md)
 
 ### Custom toolchain location
 
@@ -112,30 +113,13 @@ If you have installed the FRC Toolchain to a directory other than the default, o
 ./gradlew build -PtoolChainPath=some/path/to/frc/toolchain/bin
 ```
 
-### Gazebo simulation
-
-If you also want to force building Gazebo simulation support, add -PforceGazebo. This requires gazebo_transport. We have tested on 14.04 and 15.05, but any correct install of Gazebo should work, even on Windows if you build Gazebo from source. Correct means CMake needs to be able to find gazebo-config.cmake. See [The Gazebo website](https://gazebosim.org/) for installation instructions.
-
-```bash
-./gradlew build -PforceGazebo
-```
-
-If you prefer to use CMake directly, the you can still do so.
-The common CMake tasks are wpilibcSim, frc_gazebo_plugins, and gz_msgs
-
-```bash
-mkdir build #run this in the root of allwpilib
-cd build
-cmake ..
-make
-```
-
-
 ### Formatting/linting
+
+Once a PR has been submitted, formatting can be run in CI by commenting `/format` on the PR. A new commit will be pushed with the formatting changes.
 
 #### wpiformat
 
-wpiformat can be executed anywhere in the repository via `py -3 -m wpiformat` on Windows or `python3 -m wpiformat` on other platforms.
+wpiformat can be executed anywhere in the repository via `py -3 -m wpiformat -clang 14` on Windows or `python3 -m wpiformat -clang 14` on other platforms.
 
 #### Java Code Quality Tools
 
@@ -160,9 +144,7 @@ The maven artifacts are described in [MavenArtifacts.md](MavenArtifacts.md)
 
 ## Structure and Organization
 
-The main WPILib code you're probably looking for is in WPILibJ and WPILibC. Those directories are split into shared, sim, and athena. Athena contains the WPILib code meant to run on your roboRIO. Sim is WPILib code meant to run on your computer with Gazebo, and shared is code shared between the two. Shared code must be platform-independent, since it will be compiled with both the ARM cross-compiler and whatever desktop compiler you are using (g++, msvc, etc...).
-
-The Simulation directory contains extra simulation tools and libraries, such as gz_msgs and JavaGazebo. See sub-directories for more information.
+The main WPILib code you're probably looking for is in WPILibJ and WPILibC. Those directories are split into shared, sim, and athena. Athena contains the WPILib code meant to run on your roboRIO. Sim is WPILib code meant to run on your computer, and shared is code shared between the two. Shared code must be platform-independent, since it will be compiled with both the ARM cross-compiler and whatever desktop compiler you are using (g++, msvc, etc...).
 
 The integration test directories for C++ and Java contain test code that runs on our test-system. When you submit code for review, it is tested by those programs. If you add new functionality you should make sure to write tests for it so we don't break it in the future.
 

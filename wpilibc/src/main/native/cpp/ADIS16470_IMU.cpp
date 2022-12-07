@@ -19,11 +19,11 @@
 #include <frc/Timer.h>
 
 #include <cmath>
+#include <numbers>
 #include <string>
 
 #include <hal/HAL.h>
 #include <networktables/NTSendableBuilder.h>
-#include <wpi/numbers>
 #include <wpi/sendable/SendableRegistry.h>
 
 #include "frc/Errors.h"
@@ -50,14 +50,14 @@ inline void ADISReportError(int32_t status, const char* file, int line,
                             const char* function, const S& format,
                             Args&&... args) {
   frc::ReportErrorV(status, file, line, function, format,
-                    fmt::make_args_checked<Args...>(format, args...));
+                    fmt::make_format_args(args...));
 }
 }  // namespace
 
 #define REPORT_WARNING(msg) \
-  ADISReportError(warn::Warning, __FILE__, __LINE__, __FUNCTION__, "{}", msg);
+  ADISReportError(warn::Warning, __FILE__, __LINE__, __FUNCTION__, msg);
 #define REPORT_ERROR(msg) \
-  ADISReportError(err::Error, __FILE__, __LINE__, __FUNCTION__, "{}", msg)
+  ADISReportError(err::Error, __FILE__, __LINE__, __FUNCTION__, msg)
 
 /**
  * Constructor.
@@ -72,6 +72,8 @@ ADIS16470_IMU::ADIS16470_IMU(IMUAxis yaw_axis, SPI::Port port,
       m_calibration_time(static_cast<uint16_t>(cal_time)),
       m_simDevice("Gyro:ADIS16470", port) {
   if (m_simDevice) {
+    m_connected =
+        m_simDevice.CreateBoolean("connected", hal::SimDevice::kInput, true);
     m_simGyroAngleX =
         m_simDevice.CreateDouble("gyro_angle_x", hal::SimDevice::kInput, 0.0);
     m_simGyroAngleY =
@@ -101,8 +103,8 @@ ADIS16470_IMU::ADIS16470_IMU(IMUAxis yaw_axis, SPI::Port port,
         new DigitalOutput(27);  // Drive SPI CS2 (IMU RST) low
     Wait(10_ms);                // Wait 10ms
     delete m_reset_out;
-    new DigitalInput(27);  // Set SPI CS2 (IMU RST) high
-    Wait(500_ms);          // Wait 500ms for reset to complete
+    m_reset_in = new DigitalInput(27);  // Set SPI CS2 (IMU RST) high
+    Wait(500_ms);                       // Wait 500ms for reset to complete
 
     // Configure standard SPI
     if (!SwitchToStandardSPI()) {
@@ -140,13 +142,21 @@ ADIS16470_IMU::ADIS16470_IMU(IMUAxis yaw_axis, SPI::Port port,
     REPORT_WARNING("ADIS16470 IMU Successfully Initialized!");
 
     // Drive SPI CS3 (IMU ready LED) low (active low)
-    new DigitalOutput(28);
+    m_status_led = new DigitalOutput(28);
   }
 
   // Report usage and post data to DS
   HAL_Report(HALUsageReporting::kResourceType_ADIS16470, 0);
 
   wpi::SendableRegistry::AddLW(this, "ADIS16470", port);
+  m_connected = true;
+}
+
+bool ADIS16470_IMU::IsConnected() const {
+  if (m_simConnected) {
+    return m_simConnected.Get();
+  }
+  return m_connected;
 }
 
 /**
@@ -194,9 +204,7 @@ bool ADIS16470_IMU::SwitchToStandardSPI() {
   if (m_spi == nullptr) {
     m_spi = new SPI(m_spi_port);
     m_spi->SetClockRate(2000000);
-    m_spi->SetMSBFirst();
-    m_spi->SetSampleDataOnTrailingEdge();
-    m_spi->SetClockActiveLow();
+    m_spi->SetMode(frc::SPI::Mode::kMode3);
     m_spi->SetChipSelectActiveLow();
     ReadRegister(PROD_ID);  // Dummy read
 
@@ -441,6 +449,14 @@ void ADIS16470_IMU::Reset() {
 }
 
 void ADIS16470_IMU::Close() {
+  if (m_reset_in != nullptr) {
+    delete m_reset_in;
+    m_reset_in = nullptr;
+  }
+  if (m_status_led != nullptr) {
+    delete m_status_led;
+    m_status_led = nullptr;
+  }
   if (m_thread_active) {
     m_thread_active = false;
     if (m_acquire_task.joinable()) {
@@ -641,29 +657,29 @@ void ADIS16470_IMU::Acquire() {
 
 /* Complementary filter functions */
 double ADIS16470_IMU::FormatFastConverge(double compAngle, double accAngle) {
-  if (compAngle > accAngle + wpi::numbers::pi) {
-    compAngle = compAngle - 2.0 * wpi::numbers::pi;
-  } else if (accAngle > compAngle + wpi::numbers::pi) {
-    compAngle = compAngle + 2.0 * wpi::numbers::pi;
+  if (compAngle > accAngle + std::numbers::pi) {
+    compAngle = compAngle - 2.0 * std::numbers::pi;
+  } else if (accAngle > compAngle + std::numbers::pi) {
+    compAngle = compAngle + 2.0 * std::numbers::pi;
   }
   return compAngle;
 }
 
 double ADIS16470_IMU::FormatRange0to2PI(double compAngle) {
-  while (compAngle >= 2 * wpi::numbers::pi) {
-    compAngle = compAngle - 2.0 * wpi::numbers::pi;
+  while (compAngle >= 2 * std::numbers::pi) {
+    compAngle = compAngle - 2.0 * std::numbers::pi;
   }
   while (compAngle < 0.0) {
-    compAngle = compAngle + 2.0 * wpi::numbers::pi;
+    compAngle = compAngle + 2.0 * std::numbers::pi;
   }
   return compAngle;
 }
 
 double ADIS16470_IMU::FormatAccelRange(double accelAngle, double accelZ) {
   if (accelZ < 0.0) {
-    accelAngle = wpi::numbers::pi - accelAngle;
+    accelAngle = std::numbers::pi - accelAngle;
   } else if (accelZ > 0.0 && accelAngle < 0.0) {
-    accelAngle = 2.0 * wpi::numbers::pi + accelAngle;
+    accelAngle = 2.0 * std::numbers::pi + accelAngle;
   }
   return accelAngle;
 }
@@ -674,8 +690,8 @@ double ADIS16470_IMU::CompFilterProcess(double compAngle, double accelAngle,
   compAngle =
       m_alpha * (compAngle + omega * m_dt) + (1.0 - m_alpha) * accelAngle;
   compAngle = FormatRange0to2PI(compAngle);
-  if (compAngle > wpi::numbers::pi) {
-    compAngle = compAngle - 2.0 * wpi::numbers::pi;
+  if (compAngle > std::numbers::pi) {
+    compAngle = compAngle - 2.0 * std::numbers::pi;
   }
   return compAngle;
 }
@@ -802,8 +818,6 @@ int ADIS16470_IMU::GetPort() const {
  **/
 void ADIS16470_IMU::InitSendable(nt::NTSendableBuilder& builder) {
   builder.SetSmartDashboardType("ADIS16470 IMU");
-  auto yaw_angle = builder.GetEntry("Yaw Angle").GetHandle();
-  builder.SetUpdateTable([=]() {
-    nt::NetworkTableEntry(yaw_angle).SetDouble(GetAngle().value());
-  });
+  builder.AddDoubleProperty(
+      "Yaw Angle", [=, this] { return GetAngle().value(); }, nullptr);
 }

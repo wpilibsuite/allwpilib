@@ -17,7 +17,6 @@ public class Timer {
    *
    * @return Robot running time in seconds.
    */
-  @SuppressWarnings("AbbreviationAsWordInName")
   public static double getFPGATimestamp() {
     return RobotController.getFPGATime() / 1000000.0;
   }
@@ -55,7 +54,7 @@ public class Timer {
   private double m_accumulatedTime;
   private boolean m_running;
 
-  @SuppressWarnings("MissingJavadocMethod")
+  /** Timer constructor. */
   public Timer() {
     reset();
   }

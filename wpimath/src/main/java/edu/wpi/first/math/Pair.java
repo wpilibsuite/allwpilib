@@ -21,7 +21,6 @@ public class Pair<A, B> {
     return m_second;
   }
 
-  @SuppressWarnings("ParameterName")
   public static <A, B> Pair<A, B> of(A a, B b) {
     return new Pair<>(a, b);
   }

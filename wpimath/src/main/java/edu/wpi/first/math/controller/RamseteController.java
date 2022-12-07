@@ -33,10 +33,8 @@ import edu.wpi.first.math.trajectory.Trajectory;
  * derivation and analysis.
  */
 public class RamseteController {
-  @SuppressWarnings("MemberName")
   private final double m_b;
 
-  @SuppressWarnings("MemberName")
   private final double m_zeta;
 
   private Pose2d m_poseError = new Pose2d();
@@ -51,7 +49,6 @@ public class RamseteController {
    * @param zeta Tuning parameter (0 rad⁻¹ &lt; zeta &lt; 1 rad⁻¹) for which larger values provide
    *     more damping in response.
    */
-  @SuppressWarnings("ParameterName")
   public RamseteController(double b, double zeta) {
     m_b = b;
     m_zeta = zeta;
@@ -101,7 +98,6 @@ public class RamseteController {
    * @param angularVelocityRefRadiansPerSecond The desired angular velocity in radians per second.
    * @return The next controller output.
    */
-  @SuppressWarnings("LocalVariableName")
   public ChassisSpeeds calculate(
       Pose2d currentPose,
       Pose2d poseRef,
@@ -141,7 +137,6 @@ public class RamseteController {
    * @param desiredState The desired pose, linear velocity, and angular velocity from a trajectory.
    * @return The next controller output.
    */
-  @SuppressWarnings("LocalVariableName")
   public ChassisSpeeds calculate(Pose2d currentPose, Trajectory.State desiredState) {
     return calculate(
         currentPose,
@@ -164,7 +159,6 @@ public class RamseteController {
    *
    * @param x Value of which to take sinc(x).
    */
-  @SuppressWarnings("ParameterName")
   private static double sinc(double x) {
     if (Math.abs(x) < 1e-9) {
       return 1.0 - 1.0 / 6.0 * x * x;

@@ -164,8 +164,8 @@ class Ultrasonic : public wpi::Sendable,
    */
   static void UltrasonicChecker();
 
-  // Time (sec) for the ping trigger pulse.
-  static constexpr double kPingTime = 10 * 1e-6;
+  // Time (usec) for the ping trigger pulse.
+  static constexpr auto kPingTime = 10_us;
 
   // Max time (ms) between readings.
   static constexpr auto kMaxUltrasonicTime = 0.1_s;

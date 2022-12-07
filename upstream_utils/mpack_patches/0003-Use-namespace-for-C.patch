@@ -1,0 +1,158 @@
+From 37854ea8a4a4b387940719c40bd32792f1e6e027 Mon Sep 17 00:00:00 2001
+From: PJ Reiniger <pj.reiniger@gmail.com>
+Date: Sat, 29 Oct 2022 12:22:50 -0400
+Subject: [PATCH 3/3] Use namespace for C++
+
+---
+ src/mpack/mpack-common.c   | 2 ++
+ src/mpack/mpack-expect.c   | 2 ++
+ src/mpack/mpack-node.c     | 2 ++
+ src/mpack/mpack-platform.c | 2 ++
+ src/mpack/mpack-platform.h | 2 +-
+ src/mpack/mpack-reader.c   | 2 ++
+ src/mpack/mpack-writer.c   | 2 ++
+ src/mpack/mpack-writer.h   | 3 ++-
+ 8 files changed, 15 insertions(+), 2 deletions(-)
+
+diff --git a/src/mpack/mpack-common.c b/src/mpack/mpack-common.c
+index 2c133a3..dc7207f 100644
+--- a/src/mpack/mpack-common.c
++++ b/src/mpack/mpack-common.c
+@@ -24,6 +24,7 @@
+ #include "mpack-common.h"
+ 
+ MPACK_SILENCE_WARNINGS_BEGIN
++namespace mpack {
+ 
+ const char* mpack_error_to_string(mpack_error_t error) {
+     #if MPACK_STRINGS
+@@ -748,4 +749,5 @@ void mpack_print_file_callback(void* context, const char* data, size_t count) {
+ }
+ #endif
+ 
++}  // namespace mpack
+ MPACK_SILENCE_WARNINGS_END
+diff --git a/src/mpack/mpack-expect.c b/src/mpack/mpack-expect.c
+index 81576d1..6232a67 100644
+--- a/src/mpack/mpack-expect.c
++++ b/src/mpack/mpack-expect.c
+@@ -24,6 +24,7 @@
+ #include "mpack-expect.h"
+ 
+ MPACK_SILENCE_WARNINGS_BEGIN
++namespace mpack {
+ 
+ #if MPACK_EXPECT
+ 
+@@ -880,4 +881,5 @@ size_t mpack_expect_key_cstr(mpack_reader_t* reader, const char* keys[], bool fo
+ 
+ #endif
+ 
++}  // namespace mpack
+ MPACK_SILENCE_WARNINGS_END
+diff --git a/src/mpack/mpack-node.c b/src/mpack/mpack-node.c
+index 3d4b0f4..aba9897 100644
+--- a/src/mpack/mpack-node.c
++++ b/src/mpack/mpack-node.c
+@@ -24,6 +24,7 @@
+ #include "mpack-node.h"
+ 
+ MPACK_SILENCE_WARNINGS_BEGIN
++namespace mpack {
+ 
+ #if MPACK_NODE
+ 
+@@ -2401,4 +2402,5 @@ mpack_node_t mpack_node_map_value_at(mpack_node_t node, size_t index) {
+ 
+ #endif
+ 
++}  // namespace mpack
+ MPACK_SILENCE_WARNINGS_END
+diff --git a/src/mpack/mpack-platform.c b/src/mpack/mpack-platform.c
+index d4a2fa3..75d2de3 100644
+--- a/src/mpack/mpack-platform.c
++++ b/src/mpack/mpack-platform.c
+@@ -30,6 +30,7 @@
+ #include "mpack.h"
+ 
+ MPACK_SILENCE_WARNINGS_BEGIN
++namespace mpack {
+ 
+ #if MPACK_DEBUG
+ 
+@@ -218,4 +219,5 @@ void* mpack_realloc(void* old_ptr, size_t used_size, size_t new_size) {
+ }
+ #endif
+ 
++}  // namespace mpack
+ MPACK_SILENCE_WARNINGS_END
+diff --git a/src/mpack/mpack-platform.h b/src/mpack/mpack-platform.h
+index 79604c9..27a2f9e 100644
+--- a/src/mpack/mpack-platform.h
++++ b/src/mpack/mpack-platform.h
+@@ -1043,7 +1043,7 @@ void mpack_assert_fail(const char* message);
+  */
+ 
+ #ifdef __cplusplus
+-    #define MPACK_EXTERN_C_BEGIN extern "C" {
++    #define MPACK_EXTERN_C_BEGIN namespace mpack {
+     #define MPACK_EXTERN_C_END   }
+ #else
+     #define MPACK_EXTERN_C_BEGIN /*nothing*/
+diff --git a/src/mpack/mpack-reader.c b/src/mpack/mpack-reader.c
+index c6d2223..a135879 100644
+--- a/src/mpack/mpack-reader.c
++++ b/src/mpack/mpack-reader.c
+@@ -24,6 +24,7 @@
+ #include "mpack-reader.h"
+ 
+ MPACK_SILENCE_WARNINGS_BEGIN
++namespace mpack {
+ 
+ #if MPACK_READER
+ 
+@@ -1284,4 +1285,5 @@ void mpack_print_stdfile_to_callback(FILE* file, mpack_print_callback_t callback
+ 
+ #endif
+ 
++}  // namespace mpack
+ MPACK_SILENCE_WARNINGS_END
+diff --git a/src/mpack/mpack-writer.c b/src/mpack/mpack-writer.c
+index 4d052b1..9630d9e 100644
+--- a/src/mpack/mpack-writer.c
++++ b/src/mpack/mpack-writer.c
+@@ -24,6 +24,7 @@
+ #include "mpack-writer.h"
+ 
+ MPACK_SILENCE_WARNINGS_BEGIN
++namespace mpack {
+ 
+ #if MPACK_WRITER
+ 
+@@ -1772,4 +1773,5 @@ void mpack_complete_array(mpack_writer_t* writer) {
+ #endif // MPACK_BUILDER
+ #endif // MPACK_WRITER
+ 
++}  // namespace mpack
+ MPACK_SILENCE_WARNINGS_END
+diff --git a/src/mpack/mpack-writer.h b/src/mpack/mpack-writer.h
+index c239ee6..abeee1a 100644
+--- a/src/mpack/mpack-writer.h
++++ b/src/mpack/mpack-writer.h
+@@ -1168,6 +1168,7 @@ MPACK_EXTERN_C_END
+ 
+ #if defined(__cplusplus) || defined(MPACK_DOXYGEN)
+ 
++namespace mpack {
+ /**
+  * @name C++ write overloads
+  * @{
+@@ -1304,7 +1305,7 @@ MPACK_INLINE void mpack_write_kv(mpack_writer_t* writer, const char *key, const
+ /**
+  * @}
+  */
+-
++}  // namespace mpack
+ #endif /* __cplusplus */
+ 
+ /**

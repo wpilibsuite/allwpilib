@@ -37,6 +37,8 @@ model {
                             into("MacOS") { with copySpec { from binary.executable.file } }
                             into("Resources") { with copySpec { from icon } }
 
+                            inputs.property "HasDeveloperId", project.hasProperty("developerID")
+
                             doLast {
                                 if (project.hasProperty("developerID")) {
                                     // Get path to binary.

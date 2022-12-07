@@ -12,7 +12,7 @@ import edu.wpi.first.wpilibj.interfaces.Accelerometer.Range;
  * <p>For example, setting a number to be displayed with a slider:
  *
  * <pre>{@code
- * NetworkTableEntry example = Shuffleboard.getTab("My Tab")
+ * GenericEntry example = Shuffleboard.getTab("My Tab")
  *   .add("My Number", 0)
  *   .withWidget(BuiltInWidgets.kNumberSlider)
  *   .withProperties(Map.of("min", 0, "max", 1))

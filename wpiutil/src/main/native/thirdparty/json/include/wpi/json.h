@@ -43,7 +43,6 @@ SOFTWARE.
 #include <algorithm> // all_of, copy, find, for_each, generate_n, min, reverse, remove, fill, none_of, transform
 #include <array> // array
 #include <cassert> // assert
-#include <ciso646> // and, not, or
 #include <cstddef> // nullptr_t, ptrdiff_t, size_t
 #include <cstdint> // uint8_t, uint16_t, uint32_t, uint64_t
 #include <exception> // exception
@@ -52,6 +51,7 @@ SOFTWARE.
 #include <iterator>
 #include <limits> // numeric_limits
 #include <memory> // allocator, shared_ptr, make_shared, addressof
+#include <span>
 #include <stdexcept> // runtime_error
 #include <string> // string, char_traits, stoi, to_string
 #include <string_view>
@@ -61,7 +61,6 @@ SOFTWARE.
 #include <vector> // vector
 
 #include "wpi/StringMap.h"
-#include "wpi/span.h"
 
 namespace wpi
 {
@@ -1126,7 +1125,7 @@ struct external_constructor<value_t::array>
     }
 
     template<typename BasicJsonType, typename T>
-    static void construct(BasicJsonType& j, span<T> arr)
+    static void construct(BasicJsonType& j, std::span<T> arr)
     {
         using std::begin;
         using std::end;
@@ -7015,7 +7014,7 @@ class json
                             const parser_callback_t cb = nullptr,
                             const bool allow_exceptions = true);
 
-    static json parse(span<const uint8_t> arr,
+    static json parse(std::span<const uint8_t> arr,
                             const parser_callback_t cb = nullptr,
                             const bool allow_exceptions = true);
 
@@ -7028,7 +7027,7 @@ class json
 
     static bool accept(std::string_view s);
 
-    static bool accept(span<const uint8_t> arr);
+    static bool accept(std::span<const uint8_t> arr);
 
     static bool accept(raw_istream& i);
 
@@ -7206,8 +7205,8 @@ class json
     @since version 2.0.9
     */
     static std::vector<uint8_t> to_cbor(const json& j);
-    static span<uint8_t> to_cbor(const json& j, std::vector<uint8_t>& buf);
-    static span<uint8_t> to_cbor(const json& j, SmallVectorImpl<uint8_t>& buf);
+    static std::span<uint8_t> to_cbor(const json& j, std::vector<uint8_t>& buf);
+    static std::span<uint8_t> to_cbor(const json& j, SmallVectorImpl<uint8_t>& buf);
     static void to_cbor(raw_ostream& os, const json& j);
 
     /*!
@@ -7291,8 +7290,8 @@ class json
     @since version 2.0.9
     */
     static std::vector<uint8_t> to_msgpack(const json& j);
-    static span<uint8_t> to_msgpack(const json& j, std::vector<uint8_t>& buf);
-    static span<uint8_t> to_msgpack(const json& j, SmallVectorImpl<uint8_t>& buf);
+    static std::span<uint8_t> to_msgpack(const json& j, std::vector<uint8_t>& buf);
+    static std::span<uint8_t> to_msgpack(const json& j, SmallVectorImpl<uint8_t>& buf);
     static void to_msgpack(raw_ostream& os, const json& j);
 
     /*!
@@ -7378,9 +7377,9 @@ class json
     static std::vector<uint8_t> to_ubjson(const json& j,
                                           const bool use_size = false,
                                           const bool use_type = false);
-    static span<uint8_t> to_ubjson(const json& j, std::vector<uint8_t>& buf,
+    static std::span<uint8_t> to_ubjson(const json& j, std::vector<uint8_t>& buf,
                                    const bool use_size = false, const bool use_type = false);
-    static span<uint8_t> to_ubjson(const json& j, SmallVectorImpl<uint8_t>& buf,
+    static std::span<uint8_t> to_ubjson(const json& j, SmallVectorImpl<uint8_t>& buf,
                                    const bool use_size = false, const bool use_type = false);
     static void to_ubjson(raw_ostream& os, const json& j,
                           const bool use_size = false, const bool use_type = false);
@@ -7484,7 +7483,7 @@ class json
     /*!
     @copydoc from_cbor(raw_istream&, const bool)
     */
-    static json from_cbor(span<const uint8_t> arr, const bool strict = true);
+    static json from_cbor(std::span<const uint8_t> arr, const bool strict = true);
 
     /*!
     @brief create a JSON value from an input in MessagePack format
@@ -7565,7 +7564,7 @@ class json
     /*!
     @copydoc from_msgpack(raw_istream&, const bool)
     */
-    static json from_msgpack(span<const uint8_t> arr, const bool strict = true);
+    static json from_msgpack(std::span<const uint8_t> arr, const bool strict = true);
 
     /*!
     @brief create a JSON value from an input in UBJSON format
@@ -7623,7 +7622,7 @@ class json
     static json from_ubjson(raw_istream& is,
                                   const bool strict = true);
 
-    static json from_ubjson(span<const uint8_t> arr, const bool strict = true);
+    static json from_ubjson(std::span<const uint8_t> arr, const bool strict = true);
 
     /// @}
 

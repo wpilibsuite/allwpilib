@@ -4,7 +4,6 @@
 
 package edu.wpi.first.hal;
 
-@SuppressWarnings("AbbreviationAsWordInName")
 public final class HALValue {
   public static final int kUnassigned = 0;
   public static final int kBoolean = 0x01;

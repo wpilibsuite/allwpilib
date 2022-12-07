@@ -22,7 +22,6 @@ package edu.wpi.first.util.datalog;
  * For this reason (as well as the fact that timestamps can be set to arbitrary values), records in
  * the log are not guaranteed to be sorted by timestamp.
  */
-@SuppressWarnings({"PMD.TooManyMethods", "PMD.ExcessivePublicCount"})
 public final class DataLog implements AutoCloseable {
   /**
    * Construct a new Data Log. The log will be initially created with a temporary filename.

@@ -351,6 +351,26 @@ int64_t HAL_WaitForInterrupt(HAL_InterruptHandle interruptHandle,
   }
 }
 
+int64_t HAL_WaitForMultipleInterrupts(HAL_InterruptHandle interruptHandle,
+                                      int64_t mask, double timeout,
+                                      HAL_Bool ignorePrevious,
+                                      int32_t* status) {
+  // TODO make this properly work, will require a decent rewrite
+  auto interrupt = interruptHandles->Get(interruptHandle);
+  if (interrupt == nullptr) {
+    *status = HAL_HANDLE_ERROR;
+    return WaitResult::Timeout;
+  }
+
+  if (interrupt->isAnalog) {
+    return WaitForInterruptAnalog(interruptHandle, interrupt.get(), timeout,
+                                  ignorePrevious);
+  } else {
+    return WaitForInterruptDigital(interruptHandle, interrupt.get(), timeout,
+                                   ignorePrevious);
+  }
+}
+
 int64_t HAL_ReadInterruptRisingTimestamp(HAL_InterruptHandle interruptHandle,
                                          int32_t* status) {
   auto interrupt = interruptHandles->Get(interruptHandle);

@@ -1,0 +1,83 @@
+apply from: "${rootDir}/shared/resources.gradle"
+
+ext {
+    nativeName = 'apriltag'
+    devMain = 'edu.wpi.first.apriltag.DevMain'
+    useJava = true
+
+    def generateTask = createGenerateResourcesTask('main', 'APRILTAG', 'frc', project)
+
+    tasks.withType(CppCompile) {
+        dependsOn generateTask
+    }
+    splitSetup = {
+        it.sources {
+            resourcesCpp(CppSourceSet) {
+                source {
+                    srcDirs "$buildDir/generated/main/cpp", "$rootDir/shared/singlelib"
+                    include '*.cpp'
+                }
+            }
+        }
+    }
+}
+
+evaluationDependsOn(':wpimath')
+
+apply from: "${rootDir}/shared/jni/setupBuild.gradle"
+apply from: "${rootDir}/shared/apriltaglib.gradle"
+apply from: "${rootDir}/shared/opencv.gradle"
+
+dependencies {
+    implementation project(':wpimath')
+}
+
+sourceSets {
+    main {
+        resources {
+            srcDirs 'src/main/native/resources'
+        }
+    }
+}
+
+
+model {
+    components {}
+    binaries {
+        all {
+            if (!it.buildable || !(it instanceof NativeBinarySpec)) {
+                return
+            }
+            it.cppCompiler.define 'WPILIB_EXPORTS'
+
+            if (it.component.name == "${nativeName}JNI") {
+                lib project: ':wpimath', library: 'wpimath', linkage: 'static'
+                lib project: ':wpiutil', library: 'wpiutil', linkage: 'static'
+            } else {
+                lib project: ':wpimath', library: 'wpimath', linkage: 'shared'
+                lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
+            }
+
+            nativeUtils.useRequiredLibrary(it, 'apriltaglib')
+        }
+    }
+    tasks {
+        def c = $.components
+        def found = false
+        def systemArch = getCurrentArch()
+        c.each {
+            if (it in NativeExecutableSpec && it.name == "${nativeName}Dev") {
+                it.binaries.each {
+                    if (!found) {
+                        def arch = it.targetPlatform.name
+                        if (arch == systemArch) {
+                            def filePath = it.tasks.install.installDirectory.get().toString() + File.separatorChar + 'lib'
+
+                            found = true
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

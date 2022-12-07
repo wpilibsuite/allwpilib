@@ -8,6 +8,8 @@ import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj.examples.armbotoffboard.Constants.ArmConstants;
 import edu.wpi.first.wpilibj.examples.armbotoffboard.ExampleSmartMotorController;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.TrapezoidProfileSubsystem;
 
 /** A robot arm subsystem that moves with a motion profile. */
@@ -35,5 +37,9 @@ public class ArmSubsystem extends TrapezoidProfileSubsystem {
     // Add the feedforward to the PID output to get the motor output
     m_motor.setSetpoint(
         ExampleSmartMotorController.PIDMode.kPosition, setpoint.position, feedforward / 12.0);
+  }
+
+  public Command setArmGoalCommand(double kArmOffsetRads) {
+    return Commands.runOnce(() -> setGoal(kArmOffsetRads), this);
   }
 }

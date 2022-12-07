@@ -36,9 +36,9 @@ class Image {
   Image& operator=(const Image&) = delete;
 
   // Getters
-  operator std::string_view() const {
+  operator std::string_view() const {  // NOLINT
     return str();
-  }  // NOLINT
+  }
   std::string_view str() const {
     return {data(), size()};
   }
@@ -74,6 +74,8 @@ class Image {
     switch (pixelFormat) {
       case VideoMode::kYUYV:
       case VideoMode::kRGB565:
+      case VideoMode::kY16:
+      case VideoMode::kUYVY:
         type = CV_8UC2;
         break;
       case VideoMode::kBGR:

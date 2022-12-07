@@ -33,7 +33,6 @@ public class ProfiledPIDController implements Sendable {
    * @param Kd The derivative coefficient.
    * @param constraints Velocity and acceleration constraints for goal.
    */
-  @SuppressWarnings("ParameterName")
   public ProfiledPIDController(
       double Kp, double Ki, double Kd, TrapezoidProfile.Constraints constraints) {
     this(Kp, Ki, Kd, constraints, 0.02);
@@ -48,7 +47,6 @@ public class ProfiledPIDController implements Sendable {
    * @param constraints Velocity and acceleration constraints for goal.
    * @param period The period between controller updates in seconds. The default is 0.02 seconds.
    */
-  @SuppressWarnings("ParameterName")
   public ProfiledPIDController(
       double Kp, double Ki, double Kd, TrapezoidProfile.Constraints constraints, double period) {
     m_controller = new PIDController(Kp, Ki, Kd, period);
@@ -66,7 +64,6 @@ public class ProfiledPIDController implements Sendable {
    * @param Ki Integral coefficient
    * @param Kd Differential coefficient
    */
-  @SuppressWarnings("ParameterName")
   public void setPID(double Kp, double Ki, double Kd) {
     m_controller.setPID(Kp, Ki, Kd);
   }
@@ -76,7 +73,6 @@ public class ProfiledPIDController implements Sendable {
    *
    * @param Kp proportional coefficient
    */
-  @SuppressWarnings("ParameterName")
   public void setP(double Kp) {
     m_controller.setP(Kp);
   }
@@ -86,7 +82,6 @@ public class ProfiledPIDController implements Sendable {
    *
    * @param Ki integral coefficient
    */
-  @SuppressWarnings("ParameterName")
   public void setI(double Ki) {
     m_controller.setI(Ki);
   }
@@ -96,7 +91,6 @@ public class ProfiledPIDController implements Sendable {
    *
    * @param Kd differential coefficient
    */
-  @SuppressWarnings("ParameterName")
   public void setD(double Kd) {
     m_controller.setD(Kd);
   }
@@ -135,6 +129,24 @@ public class ProfiledPIDController implements Sendable {
    */
   public double getPeriod() {
     return m_controller.getPeriod();
+  }
+
+  /**
+   * Returns the position tolerance of this controller.
+   *
+   * @return the position tolerance of the controller.
+   */
+  public double getPositionTolerance() {
+    return m_controller.getPositionTolerance();
+  }
+
+  /**
+   * Returns the velocity tolerance of this controller.
+   *
+   * @return the velocity tolerance of the controller.
+   */
+  public double getVelocityTolerance() {
+    return m_controller.getVelocityTolerance();
   }
 
   /**

@@ -18,6 +18,7 @@ import edu.wpi.first.math.system.LinearSystem;
 public class DifferentialDriveAccelerationLimiter {
   private final LinearSystem<N2, N2, N2> m_system;
   private final double m_trackwidth;
+  private final double m_minLinearAccel;
   private final double m_maxLinearAccel;
   private final double m_maxAngularAccel;
 
@@ -35,14 +36,41 @@ public class DifferentialDriveAccelerationLimiter {
       double trackwidth,
       double maxLinearAccel,
       double maxAngularAccel) {
+    this(system, trackwidth, -maxLinearAccel, maxLinearAccel, maxAngularAccel);
+  }
+
+  /**
+   * Constructs a DifferentialDriveAccelerationLimiter.
+   *
+   * @param system The differential drive dynamics.
+   * @param trackwidth The distance between the differential drive's left and right wheels in
+   *     meters.
+   * @param minLinearAccel The minimum (most negative) linear acceleration in meters per second
+   *     squared.
+   * @param maxLinearAccel The maximum (most positive) linear acceleration in meters per second
+   *     squared.
+   * @param maxAngularAccel The maximum angular acceleration in radians per second squared.
+   * @throws IllegalArgumentException if minimum linear acceleration is greater than maximum linear
+   *     acceleration
+   */
+  public DifferentialDriveAccelerationLimiter(
+      LinearSystem<N2, N2, N2> system,
+      double trackwidth,
+      double minLinearAccel,
+      double maxLinearAccel,
+      double maxAngularAccel) {
+    if (minLinearAccel > maxLinearAccel) {
+      throw new IllegalArgumentException("maxLinearAccel must be greater than minLinearAccel");
+    }
     m_system = system;
     m_trackwidth = trackwidth;
+    m_minLinearAccel = minLinearAccel;
     m_maxLinearAccel = maxLinearAccel;
     m_maxAngularAccel = maxAngularAccel;
   }
 
   /**
-   * Returns the next voltage pair subject to acceleraiton constraints.
+   * Returns the next voltage pair subject to acceleration constraints.
    *
    * @param leftVelocity The left wheel velocity in meters per second.
    * @param rightVelocity The right wheel velocity in meters per second.
@@ -50,7 +78,6 @@ public class DifferentialDriveAccelerationLimiter {
    * @param rightVoltage The unconstrained right motor voltage.
    * @return The constrained wheel voltages.
    */
-  @SuppressWarnings("LocalVariableName")
   public DifferentialDriveWheelVoltages calculate(
       double leftVelocity, double rightVelocity, double leftVoltage, double rightVoltage) {
     var u = new MatBuilder<>(Nat.N2(), Nat.N1()).fill(leftVoltage, rightVoltage);
@@ -79,8 +106,8 @@ public class DifferentialDriveAccelerationLimiter {
     // Constrain the linear and angular accelerations
     if (accels.get(0, 0) > m_maxLinearAccel) {
       accels.set(0, 0, m_maxLinearAccel);
-    } else if (accels.get(0, 0) < -m_maxLinearAccel) {
-      accels.set(0, 0, -m_maxLinearAccel);
+    } else if (accels.get(0, 0) < m_minLinearAccel) {
+      accels.set(0, 0, m_minLinearAccel);
     }
     if (accels.get(1, 0) > m_maxAngularAccel) {
       accels.set(1, 0, m_maxAngularAccel);

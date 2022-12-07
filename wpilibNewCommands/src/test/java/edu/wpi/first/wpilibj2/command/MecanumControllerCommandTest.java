@@ -15,6 +15,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.MecanumDriveKinematics;
 import edu.wpi.first.math.kinematics.MecanumDriveOdometry;
+import edu.wpi.first.math.kinematics.MecanumDriveWheelPositions;
 import edu.wpi.first.math.kinematics.MecanumDriveWheelSpeeds;
 import edu.wpi.first.math.trajectory.TrajectoryConfig;
 import edu.wpi.first.math.trajectory.TrajectoryGenerator;
@@ -43,9 +44,13 @@ class MecanumControllerCommandTest {
   private Rotation2d m_angle = new Rotation2d(0);
 
   private double m_frontLeftSpeed;
+  private double m_frontLeftDistance;
   private double m_rearLeftSpeed;
+  private double m_rearLeftDistance;
   private double m_frontRightSpeed;
+  private double m_frontRightDistance;
   private double m_rearRightSpeed;
+  private double m_rearRightDistance;
 
   private final ProfiledPIDController m_rotController =
       new ProfiledPIDController(1, 0, 0, new TrapezoidProfile.Constraints(3 * Math.PI, Math.PI));
@@ -66,7 +71,10 @@ class MecanumControllerCommandTest {
 
   private final MecanumDriveOdometry m_odometry =
       new MecanumDriveOdometry(
-          m_kinematics, new Rotation2d(0), new Pose2d(0, 0, new Rotation2d(0)));
+          m_kinematics,
+          new Rotation2d(0),
+          new MecanumDriveWheelPositions(),
+          new Pose2d(0, 0, new Rotation2d(0)));
 
   public void setWheelSpeeds(MecanumDriveWheelSpeeds wheelSpeeds) {
     this.m_frontLeftSpeed = wheelSpeeds.frontLeftMetersPerSecond;
@@ -75,13 +83,13 @@ class MecanumControllerCommandTest {
     this.m_rearRightSpeed = wheelSpeeds.rearRightMetersPerSecond;
   }
 
-  public MecanumDriveWheelSpeeds getCurrentWheelSpeeds() {
-    return new MecanumDriveWheelSpeeds(
-        m_frontLeftSpeed, m_frontRightSpeed, m_rearLeftSpeed, m_rearRightSpeed);
+  public MecanumDriveWheelPositions getCurrentWheelDistances() {
+    return new MecanumDriveWheelPositions(
+        m_frontLeftDistance, m_frontRightDistance, m_rearLeftDistance, m_rearRightDistance);
   }
 
   public Pose2d getRobotPose() {
-    m_odometry.updateWithTime(m_timer.get(), m_angle, getCurrentWheelSpeeds());
+    m_odometry.update(m_angle, getCurrentWheelDistances());
     return m_odometry.getPoseMeters();
   }
 
@@ -117,6 +125,10 @@ class MecanumControllerCommandTest {
     while (!command.isFinished()) {
       command.execute();
       m_angle = trajectory.sample(m_timer.get()).poseMeters.getRotation();
+      m_frontLeftDistance += m_frontLeftSpeed * 0.005;
+      m_rearLeftDistance += m_rearLeftSpeed * 0.005;
+      m_frontRightDistance += m_frontRightSpeed * 0.005;
+      m_rearRightDistance += m_rearRightSpeed * 0.005;
       SimHooks.stepTiming(0.005);
     }
     m_timer.stop();

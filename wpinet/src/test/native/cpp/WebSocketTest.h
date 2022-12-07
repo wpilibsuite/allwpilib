@@ -6,9 +6,8 @@
 
 #include <cstdio>
 #include <memory>
+#include <span>
 #include <vector>
-
-#include <wpi/span.h>
 
 #include "gtest/gtest.h"
 #include "wpinet/uv/Loop.h"
@@ -61,8 +60,8 @@ class WebSocketTest : public ::testing::Test {
                                           bool masking, uint64_t len);
   static std::vector<uint8_t> BuildMessage(uint8_t opcode, bool fin,
                                            bool masking,
-                                           span<const uint8_t> data);
-  static void AdjustMasking(span<uint8_t> message);
+                                           std::span<const uint8_t> data);
+  static void AdjustMasking(std::span<uint8_t> message);
   static const uint8_t testMask[4];
 
   std::shared_ptr<uv::Loop> loop;

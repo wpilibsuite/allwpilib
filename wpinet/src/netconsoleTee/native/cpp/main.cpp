@@ -49,7 +49,7 @@ static bool NewlineBuffer(std::string& rem, uv::Buffer& buf, size_t len,
                               static_cast<uint8_t>(ts & 0xff),
                               static_cast<uint8_t>((tcpSeq >> 8) & 0xff),
                               static_cast<uint8_t>(tcpSeq & 0xff)};
-    out << wpi::span<const uint8_t>(header);
+    out << std::span<const uint8_t>(header);
   }
   out << rem << toCopy;
 

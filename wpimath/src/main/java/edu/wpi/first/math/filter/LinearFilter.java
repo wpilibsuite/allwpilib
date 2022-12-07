@@ -154,7 +154,6 @@ public class LinearFilter {
    * @throws IllegalArgumentException if derivative &lt; 1, samples &lt;= 0, or derivative &gt;=
    *     samples.
    */
-  @SuppressWarnings("LocalVariableName")
   public static LinearFilter finiteDifference(int derivative, int[] stencil, double period) {
     // See
     // https://en.wikipedia.org/wiki/Finite_difference_coefficient#Arbitrary_stencil_points

@@ -5,13 +5,17 @@
 package edu.wpi.first.util.sendable;
 
 import edu.wpi.first.util.function.BooleanConsumer;
+import edu.wpi.first.util.function.FloatConsumer;
+import edu.wpi.first.util.function.FloatSupplier;
 import java.util.function.BooleanSupplier;
 import java.util.function.Consumer;
 import java.util.function.DoubleConsumer;
 import java.util.function.DoubleSupplier;
+import java.util.function.LongConsumer;
+import java.util.function.LongSupplier;
 import java.util.function.Supplier;
 
-public interface SendableBuilder {
+public interface SendableBuilder extends AutoCloseable {
   /** The backend kinds used for the sendable builder. */
   enum BackendKind {
     kUnknown,
@@ -52,6 +56,24 @@ public interface SendableBuilder {
   void addBooleanProperty(String key, BooleanSupplier getter, BooleanConsumer setter);
 
   /**
+   * Add an integer property.
+   *
+   * @param key property name
+   * @param getter getter function (returns current value)
+   * @param setter setter function (sets new value)
+   */
+  void addIntegerProperty(String key, LongSupplier getter, LongConsumer setter);
+
+  /**
+   * Add a float property.
+   *
+   * @param key property name
+   * @param getter getter function (returns current value)
+   * @param setter setter function (sets new value)
+   */
+  void addFloatProperty(String key, FloatSupplier getter, FloatConsumer setter);
+
+  /**
    * Add a double property.
    *
    * @param key property name
@@ -79,6 +101,24 @@ public interface SendableBuilder {
   void addBooleanArrayProperty(String key, Supplier<boolean[]> getter, Consumer<boolean[]> setter);
 
   /**
+   * Add an integer array property.
+   *
+   * @param key property name
+   * @param getter getter function (returns current value)
+   * @param setter setter function (sets new value)
+   */
+  void addIntegerArrayProperty(String key, Supplier<long[]> getter, Consumer<long[]> setter);
+
+  /**
+   * Add a float array property.
+   *
+   * @param key property name
+   * @param getter getter function (returns current value)
+   * @param setter setter function (sets new value)
+   */
+  void addFloatArrayProperty(String key, Supplier<float[]> getter, Consumer<float[]> setter);
+
+  /**
    * Add a double array property.
    *
    * @param key property name
@@ -100,10 +140,12 @@ public interface SendableBuilder {
    * Add a raw property.
    *
    * @param key property name
+   * @param typeString type string
    * @param getter getter function (returns current value)
    * @param setter setter function (sets new value)
    */
-  void addRawProperty(String key, Supplier<byte[]> getter, Consumer<byte[]> setter);
+  void addRawProperty(
+      String key, String typeString, Supplier<byte[]> getter, Consumer<byte[]> setter);
 
   /**
    * Gets the kind of backend being used.
@@ -124,4 +166,11 @@ public interface SendableBuilder {
 
   /** Clear properties. */
   void clearProperties();
+
+  /**
+   * Adds a closeable. The closeable.close() will be called when close() is called.
+   *
+   * @param closeable closeable object
+   */
+  void addCloseable(AutoCloseable closeable);
 }

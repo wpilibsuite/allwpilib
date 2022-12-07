@@ -19,7 +19,6 @@ public class QuinticHermiteSpline extends Spline {
    * @param yInitialControlVector The control vector for the initial point in the y dimension.
    * @param yFinalControlVector The control vector for the final point in the y dimension.
    */
-  @SuppressWarnings("ParameterName")
   public QuinticHermiteSpline(
       double[] xInitialControlVector,
       double[] xFinalControlVector,

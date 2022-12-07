@@ -9,7 +9,6 @@ import edu.wpi.first.math.Nat;
 import edu.wpi.first.math.system.plant.LinearSystemId;
 
 /** A helper class that computes feedforward outputs for a simple permanent-magnet DC motor. */
-@SuppressWarnings("MemberName")
 public class SimpleMotorFeedforward {
   public final double ks;
   public final double kv;

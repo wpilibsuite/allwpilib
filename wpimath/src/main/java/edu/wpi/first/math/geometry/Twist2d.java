@@ -12,7 +12,6 @@ import java.util.Objects;
  *
  * <p>A Twist can be used to represent a difference between two poses.
  */
-@SuppressWarnings("MemberName")
 public class Twist2d {
   /** Linear "dx" component. */
   public double dx;

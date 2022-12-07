@@ -10,6 +10,7 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.MecanumDriveKinematics;
 import edu.wpi.first.math.kinematics.MecanumDriveOdometry;
+import edu.wpi.first.math.kinematics.MecanumDriveWheelPositions;
 import edu.wpi.first.math.kinematics.MecanumDriveWheelSpeeds;
 import edu.wpi.first.wpilibj.AnalogGyro;
 import edu.wpi.first.wpilibj.Encoder;
@@ -48,7 +49,7 @@ public class Drivetrain {
           m_frontLeftLocation, m_frontRightLocation, m_backLeftLocation, m_backRightLocation);
 
   private final MecanumDriveOdometry m_odometry =
-      new MecanumDriveOdometry(m_kinematics, m_gyro.getRotation2d());
+      new MecanumDriveOdometry(m_kinematics, m_gyro.getRotation2d(), getCurrentDistances());
 
   // Gains are for example purposes only - must be determined for your own robot!
   private final SimpleMotorFeedforward m_feedforward = new SimpleMotorFeedforward(1, 3);
@@ -74,6 +75,19 @@ public class Drivetrain {
         m_frontRightEncoder.getRate(),
         m_backLeftEncoder.getRate(),
         m_backRightEncoder.getRate());
+  }
+
+  /**
+   * Returns the current distances measured by the drivetrain.
+   *
+   * @return The current distances measured by the drivetrain.
+   */
+  public MecanumDriveWheelPositions getCurrentDistances() {
+    return new MecanumDriveWheelPositions(
+        m_frontLeftEncoder.getDistance(),
+        m_frontRightEncoder.getDistance(),
+        m_backLeftEncoder.getDistance(),
+        m_backRightEncoder.getDistance());
   }
 
   /**
@@ -114,7 +128,6 @@ public class Drivetrain {
    * @param rot Angular rate of the robot.
    * @param fieldRelative Whether the provided x and y speeds are relative to the field.
    */
-  @SuppressWarnings("ParameterName")
   public void drive(double xSpeed, double ySpeed, double rot, boolean fieldRelative) {
     var mecanumDriveWheelSpeeds =
         m_kinematics.toWheelSpeeds(
@@ -127,6 +140,6 @@ public class Drivetrain {
 
   /** Updates the field relative position of the robot. */
   public void updateOdometry() {
-    m_odometry.update(m_gyro.getRotation2d(), getCurrentState());
+    m_odometry.update(m_gyro.getRotation2d(), getCurrentDistances());
   }
 }

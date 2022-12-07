@@ -114,7 +114,6 @@ public class DataLogReader implements Iterable<DataLogRecord> {
     return val;
   }
 
-  @SuppressWarnings("PMD.PreserveStackTrace")
   DataLogRecord getRecord(int pos) {
     try {
       int lenbyte = m_buf.get(pos) & 0xff;

@@ -46,7 +46,6 @@ public final class SplineParameterizer {
    */
   private static final int kMaxIterations = 5000;
 
-  @SuppressWarnings("MemberName")
   private static class StackContents {
     final double t1;
     final double t0;

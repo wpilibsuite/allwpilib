@@ -132,6 +132,7 @@ TEST(DriverStationTest, AllianceStationId) {
   // B1
   allianceStation = HAL_AllianceStationID_kBlue1;
   DriverStationSim::SetAllianceStationId(allianceStation);
+  frc::sim::DriverStationSim::NotifyNewData();
   EXPECT_EQ(allianceStation, DriverStationSim::GetAllianceStationId());
   EXPECT_EQ(DriverStation::kBlue, DriverStation::GetAlliance());
   EXPECT_EQ(1, DriverStation::GetLocation());
@@ -141,6 +142,7 @@ TEST(DriverStationTest, AllianceStationId) {
   // B2
   allianceStation = HAL_AllianceStationID_kBlue2;
   DriverStationSim::SetAllianceStationId(allianceStation);
+  frc::sim::DriverStationSim::NotifyNewData();
   EXPECT_EQ(allianceStation, DriverStationSim::GetAllianceStationId());
   EXPECT_EQ(DriverStation::kBlue, DriverStation::GetAlliance());
   EXPECT_EQ(2, DriverStation::GetLocation());
@@ -150,6 +152,7 @@ TEST(DriverStationTest, AllianceStationId) {
   // B3
   allianceStation = HAL_AllianceStationID_kBlue3;
   DriverStationSim::SetAllianceStationId(allianceStation);
+  frc::sim::DriverStationSim::NotifyNewData();
   EXPECT_EQ(allianceStation, DriverStationSim::GetAllianceStationId());
   EXPECT_EQ(DriverStation::kBlue, DriverStation::GetAlliance());
   EXPECT_EQ(3, DriverStation::GetLocation());
@@ -159,6 +162,7 @@ TEST(DriverStationTest, AllianceStationId) {
   // R1
   allianceStation = HAL_AllianceStationID_kRed1;
   DriverStationSim::SetAllianceStationId(allianceStation);
+  frc::sim::DriverStationSim::NotifyNewData();
   EXPECT_EQ(allianceStation, DriverStationSim::GetAllianceStationId());
   EXPECT_EQ(DriverStation::kRed, DriverStation::GetAlliance());
   EXPECT_EQ(1, DriverStation::GetLocation());
@@ -168,6 +172,7 @@ TEST(DriverStationTest, AllianceStationId) {
   // R2
   allianceStation = HAL_AllianceStationID_kRed2;
   DriverStationSim::SetAllianceStationId(allianceStation);
+  frc::sim::DriverStationSim::NotifyNewData();
   EXPECT_EQ(allianceStation, DriverStationSim::GetAllianceStationId());
   EXPECT_EQ(DriverStation::kRed, DriverStation::GetAlliance());
   EXPECT_EQ(2, DriverStation::GetLocation());
@@ -177,6 +182,7 @@ TEST(DriverStationTest, AllianceStationId) {
   // R3
   allianceStation = HAL_AllianceStationID_kRed3;
   DriverStationSim::SetAllianceStationId(allianceStation);
+  frc::sim::DriverStationSim::NotifyNewData();
   EXPECT_EQ(allianceStation, DriverStationSim::GetAllianceStationId());
   EXPECT_EQ(DriverStation::kRed, DriverStation::GetAlliance());
   EXPECT_EQ(3, DriverStation::GetLocation());
@@ -211,6 +217,7 @@ TEST(DriverStationTest, MatchTime) {
                                                         false);
   constexpr double kTestTime = 19.174;
   DriverStationSim::SetMatchTime(kTestTime);
+  frc::sim::DriverStationSim::NotifyNewData();
   EXPECT_EQ(kTestTime, DriverStationSim::GetMatchTime());
   EXPECT_EQ(kTestTime, DriverStation::GetMatchTime());
   EXPECT_TRUE(callback.WasTriggered());

@@ -78,7 +78,7 @@ public abstract class PWMMotorController extends MotorSafety
 
   @Override
   public void stopMotor() {
-    disable();
+    set(0);
   }
 
   @Override

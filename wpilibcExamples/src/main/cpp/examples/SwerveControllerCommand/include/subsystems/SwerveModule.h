@@ -4,28 +4,28 @@
 
 #pragma once
 
+#include <numbers>
+
 #include <frc/Encoder.h>
 #include <frc/controller/PIDController.h>
 #include <frc/controller/ProfiledPIDController.h>
 #include <frc/geometry/Rotation2d.h>
+#include <frc/kinematics/SwerveModulePosition.h>
 #include <frc/kinematics/SwerveModuleState.h>
 #include <frc/motorcontrol/Spark.h>
 #include <frc/trajectory/TrapezoidProfile.h>
-#include <wpi/numbers>
 
 #include "Constants.h"
 
 class SwerveModule {
-  using radians_per_second_squared_t =
-      units::compound_unit<units::radians,
-                           units::inverse<units::squared<units::second>>>;
-
  public:
   SwerveModule(int driveMotorChannel, int turningMotorChannel,
                const int driveEncoderPorts[2], const int turningEncoderPorts[2],
                bool driveEncoderReversed, bool turningEncoderReversed);
 
   frc::SwerveModuleState GetState();
+
+  frc::SwerveModulePosition GetPosition();
 
   void SetDesiredState(const frc::SwerveModuleState& state);
 
@@ -36,12 +36,10 @@ class SwerveModule {
   // ProfiledPIDController's constraints only take in meters per second and
   // meters per second squared.
 
-  static constexpr units::radians_per_second_t kModuleMaxAngularVelocity =
-      units::radians_per_second_t(wpi::numbers::pi);  // radians per second
-  static constexpr units::unit_t<radians_per_second_squared_t>
-      kModuleMaxAngularAcceleration =
-          units::unit_t<radians_per_second_squared_t>(
-              wpi::numbers::pi * 2.0);  // radians per second squared
+  static constexpr auto kModuleMaxAngularVelocity =
+      units::radians_per_second_t{std::numbers::pi};
+  static constexpr auto kModuleMaxAngularAcceleration =
+      units::radians_per_second_squared_t{std::numbers::pi * 2.0};
 
   frc::Spark m_driveMotor;
   frc::Spark m_turningMotor;

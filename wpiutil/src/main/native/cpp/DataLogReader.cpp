@@ -10,7 +10,7 @@
 
 using namespace wpi::log;
 
-static bool ReadString(wpi::span<const uint8_t>* buf, std::string_view* str) {
+static bool ReadString(std::span<const uint8_t>* buf, std::string_view* str) {
   if (buf->size() < 4) {
     *str = {};
     return false;
@@ -241,7 +241,7 @@ DataLogReader::iterator DataLogReader::begin() const {
   return DataLogIterator{this, 12 + size};
 }
 
-static uint64_t ReadVarInt(wpi::span<const uint8_t> buf) {
+static uint64_t ReadVarInt(std::span<const uint8_t> buf) {
   uint64_t val = 0;
   int shift = 0;
   for (auto v : buf) {

@@ -47,20 +47,12 @@ struct WPILIB_DLLEXPORT Twist2d {
   }
 
   /**
-   * Checks inequality between this Twist2d and another object.
-   *
-   * @param other The other object.
-   * @return Whether the two objects are not equal.
-   */
-  bool operator!=(const Twist2d& other) const { return !operator==(other); }
-
-  /**
    * Scale this by a given factor.
    *
    * @param factor The factor by which to scale.
    * @return The scaled Twist2d.
    */
-  Twist2d operator*(double factor) const {
+  constexpr Twist2d operator*(double factor) const {
     return Twist2d{dx * factor, dy * factor, dtheta * factor};
   }
 };

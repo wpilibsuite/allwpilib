@@ -8,11 +8,11 @@
 
 #include <iterator>
 #include <memory>
+#include <span>
 #include <utility>
 #include <vector>
 
 #include "wpi/MemoryBuffer.h"
-#include "wpi/span.h"
 
 namespace wpi::log {
 
@@ -54,7 +54,7 @@ struct MetadataRecordData {
 class DataLogRecord {
  public:
   DataLogRecord() = default;
-  DataLogRecord(int entry, int64_t timestamp, wpi::span<const uint8_t> data)
+  DataLogRecord(int entry, int64_t timestamp, std::span<const uint8_t> data)
       : m_timestamp{timestamp}, m_data{data}, m_entry{entry} {}
 
   /**
@@ -82,7 +82,7 @@ class DataLogRecord {
    * Gets the raw data. Use the GetX functions to decode based on the data type
    * in the entry's start record.
    */
-  wpi::span<const uint8_t> GetRaw() const { return m_data; }
+  std::span<const uint8_t> GetRaw() const { return m_data; }
 
   /**
    * Returns true if the record is a control record.
@@ -241,7 +241,7 @@ class DataLogRecord {
 
  private:
   int64_t m_timestamp{0};
-  wpi::span<const uint8_t> m_data;
+  std::span<const uint8_t> m_data;
   int m_entry{-1};
 };
 

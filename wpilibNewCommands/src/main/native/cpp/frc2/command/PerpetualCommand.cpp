@@ -7,11 +7,9 @@
 using namespace frc2;
 
 PerpetualCommand::PerpetualCommand(std::unique_ptr<Command>&& command) {
-  if (!CommandGroupBase::RequireUngrouped(*command)) {
-    return;
-  }
+  CommandScheduler::GetInstance().RequireUngrouped(command.get());
   m_command = std::move(command);
-  m_command->SetGrouped(true);
+  m_command->SetComposed(true);
   AddRequirements(m_command->GetRequirements());
 }
 
@@ -25,8 +23,4 @@ void PerpetualCommand::Execute() {
 
 void PerpetualCommand::End(bool interrupted) {
   m_command->End(interrupted);
-}
-
-PerpetualCommand PerpetualCommand::Perpetually() && {
-  return std::move(*this);
 }

@@ -29,8 +29,8 @@ RamseteController::RamseteController(units::unit_t<b_unit> b,
     : m_b{b}, m_zeta{zeta} {}
 
 RamseteController::RamseteController()
-    : RamseteController(units::unit_t<b_unit>{2.0},
-                        units::unit_t<zeta_unit>{0.7}) {}
+    : RamseteController{units::unit_t<b_unit>{2.0},
+                        units::unit_t<zeta_unit>{0.7}} {}
 
 bool RamseteController::AtReference() const {
   const auto& eTranslate = m_poseError.Translation();

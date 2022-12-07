@@ -22,7 +22,7 @@ DsClient::DsClient(wpi::uv::Loop& loop, wpi::Logger& logger,
       m_tcp{uv::Tcp::Create(loop)},
       m_timer{uv::Timer::Create(loop)} {
   m_tcp->end.connect([this] {
-    WPI_DEBUG4(m_logger, "{}", "DS connection closed");
+    WPI_DEBUG4(m_logger, "DS connection closed");
     clearIp();
     // try to connect again
     m_tcp->Reuse([this] { m_timer->Start(kReconnectTime); });
@@ -56,7 +56,7 @@ void DsClient::Connect() {
     m_tcp->Reuse([this] { m_timer->Start(kReconnectTime); });
   };
 
-  WPI_DEBUG4(m_logger, "{}", "Starting DS connection attempt");
+  WPI_DEBUG4(m_logger, "Starting DS connection attempt");
   m_tcp->Connect("127.0.0.1", 1742, connreq);
 }
 

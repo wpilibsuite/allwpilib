@@ -28,7 +28,6 @@ import org.ejml.simple.SimpleMatrix;
  * <p>For more on the underlying math, read
  * https://file.tavsys.net/control/controls-engineering-in-frc.pdf.
  */
-@SuppressWarnings("ClassTypeParameterName")
 public class LinearSystemLoop<States extends Num, Inputs extends Num, Outputs extends Num> {
   private final LinearQuadraticRegulator<States, Inputs, Outputs> m_controller;
   private final LinearPlantInversionFeedforward<States, Inputs, Outputs> m_feedforward;
@@ -315,7 +314,6 @@ public class LinearSystemLoop<States extends Num, Inputs extends Num, Outputs ex
    *
    * @param y Measurement vector.
    */
-  @SuppressWarnings("ParameterName")
   public void correct(Matrix<Outputs, N1> y) {
     getObserver().correct(getU(), y);
   }
@@ -327,7 +325,6 @@ public class LinearSystemLoop<States extends Num, Inputs extends Num, Outputs ex
    *
    * @param dtSeconds Timestep for model update.
    */
-  @SuppressWarnings("LocalVariableName")
   public void predict(double dtSeconds) {
     var u =
         clampInput(

@@ -80,12 +80,15 @@ public class DigitalOutput extends DigitalSource implements Sendable {
   }
 
   /**
-   * Generate a single pulse. There can only be a single pulse going at any time.
+   * Output a single pulse on the digital output line.
    *
-   * @param pulseLength The length of the pulse.
+   * <p>Send a single pulse on the digital output line where the pulse duration is specified in
+   * seconds. Maximum of 65535 microseconds.
+   *
+   * @param pulseLengthSeconds The pulse length in seconds
    */
-  public void pulse(final double pulseLength) {
-    DIOJNI.pulse(m_handle, pulseLength);
+  public void pulse(final double pulseLengthSeconds) {
+    DIOJNI.pulse(m_handle, pulseLengthSeconds);
   }
 
   /**

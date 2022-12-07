@@ -8,6 +8,7 @@
 #include <functional>
 #include <initializer_list>
 #include <memory>
+#include <span>
 #include <string>
 #include <string_view>
 #include <utility>
@@ -15,7 +16,6 @@
 #include <wpi/Signal.h>
 #include <wpi/SmallString.h>
 #include <wpi/SmallVector.h>
-#include <wpi/span.h>
 
 #include "wpinet/HttpParser.h"
 #include "wpinet/WebSocket.h"
@@ -54,7 +54,7 @@ class WebSocketServerHelper {
    *         is empty.
    */
   std::pair<bool, std::string_view> MatchProtocol(
-      span<const std::string_view> protocols);
+      std::span<const std::string_view> protocols);
 
   /**
    * Try to find a match to the list of sub-protocols provided by the client.
@@ -123,7 +123,8 @@ class WebSocketServer : public std::enable_shared_from_this<WebSocketServer> {
   /**
    * Private constructor.
    */
-  WebSocketServer(uv::Stream& stream, span<const std::string_view> protocols,
+  WebSocketServer(uv::Stream& stream,
+                  std::span<const std::string_view> protocols,
                   ServerOptions options, const private_init&);
 
   /**
@@ -136,7 +137,7 @@ class WebSocketServer : public std::enable_shared_from_this<WebSocketServer> {
    * @param options Handshake options
    */
   static std::shared_ptr<WebSocketServer> Create(
-      uv::Stream& stream, span<const std::string_view> protocols = {},
+      uv::Stream& stream, std::span<const std::string_view> protocols = {},
       const ServerOptions& options = {});
 
   /**

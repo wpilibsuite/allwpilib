@@ -25,7 +25,7 @@ class SPI::Accumulator {
  public:
   Accumulator(HAL_SPIPort port, int xferSize, int validMask, int validValue,
               int dataShift, int dataSize, bool isSigned, bool bigEndian)
-      : m_notifier([=] {
+      : m_notifier([=, this] {
           std::scoped_lock lock(m_mutex);
           Update();
         }),
@@ -77,7 +77,7 @@ void SPI::Accumulator::Update() {
     // get amount of data available
     int32_t numToRead =
         HAL_ReadSPIAutoReceivedData(m_port, m_buf, 0, 0, &status);
-    FRC_CheckErrorStatus(status, "Port {}", m_port);
+    FRC_CheckErrorStatus(status, "Port {}", static_cast<int>(m_port));
 
     // only get whole responses; +1 is for timestamp
     numToRead -= numToRead % m_xferSize;
@@ -91,7 +91,7 @@ void SPI::Accumulator::Update() {
 
     // read buffered data
     HAL_ReadSPIAutoReceivedData(m_port, m_buf, numToRead, 0, &status);
-    FRC_CheckErrorStatus(status, "Port {}", m_port);
+    FRC_CheckErrorStatus(status, "Port {}", static_cast<int>(m_port));
 
     // loop over all responses
     for (int32_t off = 0; off < numToRead; off += m_xferSize) {
@@ -158,7 +158,8 @@ void SPI::Accumulator::Update() {
 SPI::SPI(Port port) : m_port(static_cast<HAL_SPIPort>(port)) {
   int32_t status = 0;
   HAL_InitializeSPI(m_port, &status);
-  FRC_CheckErrorStatus(status, "Port {}", m_port);
+  HAL_SetSPIMode(m_port, m_mode);
+  FRC_CheckErrorStatus(status, "Port {}", static_cast<int>(m_port));
 
   HAL_Report(HALUsageReporting::kResourceType_SPI,
              static_cast<uint8_t>(port) + 1);
@@ -177,45 +178,58 @@ void SPI::SetClockRate(int hz) {
 }
 
 void SPI::SetMSBFirst() {
-  m_msbFirst = true;
-  HAL_SetSPIOpts(m_port, m_msbFirst, m_sampleOnTrailing, m_clockIdleHigh);
+  FRC_ReportError(1, "SetMSBFirst not supported by roboRIO {}",
+                  static_cast<int>(m_port));
 }
 
 void SPI::SetLSBFirst() {
-  m_msbFirst = false;
-  HAL_SetSPIOpts(m_port, m_msbFirst, m_sampleOnTrailing, m_clockIdleHigh);
+  FRC_ReportError(1, "SetLSBFirst not supported by roboRIO {}",
+                  static_cast<int>(m_port));
 }
 
 void SPI::SetSampleDataOnLeadingEdge() {
-  m_sampleOnTrailing = false;
-  HAL_SetSPIOpts(m_port, m_msbFirst, m_sampleOnTrailing, m_clockIdleHigh);
+  int mode = m_mode;
+  mode &= 2;
+  m_mode = static_cast<HAL_SPIMode>(mode);
+  HAL_SetSPIMode(m_port, m_mode);
 }
 
 void SPI::SetSampleDataOnTrailingEdge() {
-  m_sampleOnTrailing = true;
-  HAL_SetSPIOpts(m_port, m_msbFirst, m_sampleOnTrailing, m_clockIdleHigh);
+  int mode = m_mode;
+  mode |= 2;
+  m_mode = static_cast<HAL_SPIMode>(mode);
+  HAL_SetSPIMode(m_port, m_mode);
 }
 
 void SPI::SetClockActiveLow() {
-  m_clockIdleHigh = true;
-  HAL_SetSPIOpts(m_port, m_msbFirst, m_sampleOnTrailing, m_clockIdleHigh);
+  int mode = m_mode;
+  mode |= 1;
+  m_mode = static_cast<HAL_SPIMode>(mode);
+  HAL_SetSPIMode(m_port, m_mode);
 }
 
 void SPI::SetClockActiveHigh() {
-  m_clockIdleHigh = false;
-  HAL_SetSPIOpts(m_port, m_msbFirst, m_sampleOnTrailing, m_clockIdleHigh);
+  int mode = m_mode;
+  mode &= 1;
+  m_mode = static_cast<HAL_SPIMode>(mode);
+  HAL_SetSPIMode(m_port, m_mode);
+}
+
+void SPI::SetMode(Mode mode) {
+  m_mode = static_cast<HAL_SPIMode>(mode & 0x3);
+  HAL_SetSPIMode(m_port, m_mode);
 }
 
 void SPI::SetChipSelectActiveHigh() {
   int32_t status = 0;
   HAL_SetSPIChipSelectActiveHigh(m_port, &status);
-  FRC_CheckErrorStatus(status, "Port {}", m_port);
+  FRC_CheckErrorStatus(status, "Port {}", static_cast<int>(m_port));
 }
 
 void SPI::SetChipSelectActiveLow() {
   int32_t status = 0;
   HAL_SetSPIChipSelectActiveLow(m_port, &status);
-  FRC_CheckErrorStatus(status, "Port {}", m_port);
+  FRC_CheckErrorStatus(status, "Port {}", static_cast<int>(m_port));
 }
 
 int SPI::Write(uint8_t* data, int size) {
@@ -245,27 +259,27 @@ int SPI::Transaction(uint8_t* dataToSend, uint8_t* dataReceived, int size) {
 void SPI::InitAuto(int bufferSize) {
   int32_t status = 0;
   HAL_InitSPIAuto(m_port, bufferSize, &status);
-  FRC_CheckErrorStatus(status, "Port {}", m_port);
+  FRC_CheckErrorStatus(status, "Port {}", static_cast<int>(m_port));
 }
 
 void SPI::FreeAuto() {
   int32_t status = 0;
   HAL_FreeSPIAuto(m_port, &status);
-  FRC_CheckErrorStatus(status, "Port {}", m_port);
+  FRC_CheckErrorStatus(status, "Port {}", static_cast<int>(m_port));
 }
 
-void SPI::SetAutoTransmitData(wpi::span<const uint8_t> dataToSend,
+void SPI::SetAutoTransmitData(std::span<const uint8_t> dataToSend,
                               int zeroSize) {
   int32_t status = 0;
   HAL_SetSPIAutoTransmitData(m_port, dataToSend.data(), dataToSend.size(),
                              zeroSize, &status);
-  FRC_CheckErrorStatus(status, "Port {}", m_port);
+  FRC_CheckErrorStatus(status, "Port {}", static_cast<int>(m_port));
 }
 
 void SPI::StartAutoRate(units::second_t period) {
   int32_t status = 0;
   HAL_StartSPIAutoRate(m_port, period.value(), &status);
-  FRC_CheckErrorStatus(status, "Port {}", m_port);
+  FRC_CheckErrorStatus(status, "Port {}", static_cast<int>(m_port));
 }
 
 void SPI::StartAutoTrigger(DigitalSource& source, bool rising, bool falling) {
@@ -274,19 +288,19 @@ void SPI::StartAutoTrigger(DigitalSource& source, bool rising, bool falling) {
                           static_cast<HAL_AnalogTriggerType>(
                               source.GetAnalogTriggerTypeForRouting()),
                           rising, falling, &status);
-  FRC_CheckErrorStatus(status, "Port {}", m_port);
+  FRC_CheckErrorStatus(status, "Port {}", static_cast<int>(m_port));
 }
 
 void SPI::StopAuto() {
   int32_t status = 0;
   HAL_StopSPIAuto(m_port, &status);
-  FRC_CheckErrorStatus(status, "Port {}", m_port);
+  FRC_CheckErrorStatus(status, "Port {}", static_cast<int>(m_port));
 }
 
 void SPI::ForceAutoRead() {
   int32_t status = 0;
   HAL_ForceSPIAutoRead(m_port, &status);
-  FRC_CheckErrorStatus(status, "Port {}", m_port);
+  FRC_CheckErrorStatus(status, "Port {}", static_cast<int>(m_port));
 }
 
 int SPI::ReadAutoReceivedData(uint32_t* buffer, int numToRead,
@@ -294,14 +308,14 @@ int SPI::ReadAutoReceivedData(uint32_t* buffer, int numToRead,
   int32_t status = 0;
   int32_t val = HAL_ReadSPIAutoReceivedData(m_port, buffer, numToRead,
                                             timeout.value(), &status);
-  FRC_CheckErrorStatus(status, "Port {}", m_port);
+  FRC_CheckErrorStatus(status, "Port {}", static_cast<int>(m_port));
   return val;
 }
 
 int SPI::GetAutoDroppedCount() {
   int32_t status = 0;
   int32_t val = HAL_GetSPIAutoDroppedCount(m_port, &status);
-  FRC_CheckErrorStatus(status, "Port {}", m_port);
+  FRC_CheckErrorStatus(status, "Port {}", static_cast<int>(m_port));
   return val;
 }
 
@@ -310,7 +324,7 @@ void SPI::ConfigureAutoStall(HAL_SPIPort port, int csToSclkTicks,
   int32_t status = 0;
   HAL_ConfigureSPIAutoStall(m_port, csToSclkTicks, stallTicks, pow2BytesPerRead,
                             &status);
-  FRC_CheckErrorStatus(status, "Port {}", m_port);
+  FRC_CheckErrorStatus(status, "Port {}", static_cast<int>(m_port));
 }
 
 void SPI::InitAccumulator(units::second_t period, int cmd, int xferSize,

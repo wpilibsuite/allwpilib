@@ -8,6 +8,7 @@
 #include <initializer_list>
 #include <memory>
 #include <optional>
+#include <span>
 #include <string>
 #include <string_view>
 #include <utility>
@@ -17,7 +18,6 @@
 #include <wpi/SmallVector.h>
 #include <wpi/StringMap.h>
 #include <wpi/raw_istream.h>
-#include <wpi/span.h>
 
 #include "wpinet/NetworkStream.h"
 #include "wpinet/raw_socket_istream.h"
@@ -146,7 +146,7 @@ class HttpPath {
   bool equals(std::initializer_list<std::string_view> match) const {
     return equals(0, {match.begin(), match.end()});
   }
-  bool equals(span<const std::string_view> match) const {
+  bool equals(std::span<const std::string_view> match) const {
     return equals(0, match);
   }
   bool equals(std::string_view match) const { return equals(0, {match}); }
@@ -163,7 +163,7 @@ class HttpPath {
               std::initializer_list<std::string_view> match) const {
     return equals(start, {match.begin(), match.end()});
   }
-  bool equals(size_t start, span<const std::string_view> match) const {
+  bool equals(size_t start, std::span<const std::string_view> match) const {
     if (m_pathEnds.size() != (start + match.size())) {
       return false;
     }
@@ -183,7 +183,7 @@ class HttpPath {
   bool startswith(std::initializer_list<std::string_view> match) const {
     return startswith(0, {match.begin(), match.end()});
   }
-  bool startswith(span<const std::string_view> match) const {
+  bool startswith(std::span<const std::string_view> match) const {
     return startswith(0, match);
   }
   bool startswith(std::string_view match) const {
@@ -203,7 +203,7 @@ class HttpPath {
     return startswith(start, {match.begin(), match.end()});
   }
 
-  bool startswith(size_t start, span<const std::string_view> match) const;
+  bool startswith(size_t start, std::span<const std::string_view> match) const;
 
   bool startswith(size_t start, std::string_view match) const {
     return startswith(start, {match});
@@ -241,7 +241,7 @@ class HttpPathRef {
   bool equals(std::initializer_list<std::string_view> match) const {
     return equals(0, {match.begin(), match.end()});
   }
-  bool equals(span<const std::string_view> match) const {
+  bool equals(std::span<const std::string_view> match) const {
     return equals(0, match);
   }
   bool equals(std::string_view match) const { return equals(0, {match}); }
@@ -250,7 +250,7 @@ class HttpPathRef {
               std::initializer_list<std::string_view> match) const {
     return equals(start, {match.begin(), match.end()});
   }
-  bool equals(size_t start, span<const std::string_view> match) const {
+  bool equals(size_t start, std::span<const std::string_view> match) const {
     return m_path ? m_path->equals(m_start + start, match) : false;
   }
   bool equals(size_t start, std::string_view match) const {
@@ -260,7 +260,7 @@ class HttpPathRef {
   bool startswith(std::initializer_list<std::string_view> match) const {
     return startswith(0, {match.begin(), match.end()});
   }
-  bool startswith(span<const std::string_view> match) const {
+  bool startswith(std::span<const std::string_view> match) const {
     return startswith(0, match);
   }
   bool startswith(std::string_view match) const {
@@ -271,7 +271,7 @@ class HttpPathRef {
                   std::initializer_list<std::string_view> match) const {
     return startswith(start, {match.begin(), match.end()});
   }
-  bool startswith(size_t start, span<const std::string_view> match) const {
+  bool startswith(size_t start, std::span<const std::string_view> match) const {
     return m_path ? m_path->startswith(m_start + start, match) : false;
   }
   bool startswith(size_t start, std::string_view match) const {

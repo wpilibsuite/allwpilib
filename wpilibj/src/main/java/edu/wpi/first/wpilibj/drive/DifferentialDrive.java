@@ -73,12 +73,10 @@ import edu.wpi.first.wpilibj.motorcontrol.MotorController;
  * <p>Each drive function provides different inverse kinematic relations for a differential drive
  * robot.
  *
- * <p>This library uses the NED axes convention (North-East-Down as external reference in the world
- * frame): http://www.nuclearprojects.com/ins/images/axis_big.png.
- *
- * <p>The positive X axis points ahead, the positive Y axis points right, and the positive Z axis
- * points down. Rotations follow the right-hand rule, so clockwise rotation around the Z axis is
- * positive.
+ * <p>This library uses the NWU axes convention (North-West-Up as external reference in the world
+ * frame). The positive X axis points ahead, the positive Y axis points to the left, and the
+ * positive Z axis points up. Rotations follow the right-hand rule, so counterclockwise rotation
+ * around the Z axis is positive.
  *
  * <p>Inputs smaller then {@value edu.wpi.first.wpilibj.drive.RobotDriveBase#kDefaultDeadband} will
  * be set to 0, and larger values will be scaled so that the full range is still used. This deadband
@@ -152,10 +150,9 @@ public class DifferentialDrive extends RobotDriveBase implements Sendable, AutoC
    * decrease sensitivity at low speeds.
    *
    * @param xSpeed The robot's speed along the X axis [-1.0..1.0]. Forward is positive.
-   * @param zRotation The robot's rotation rate around the Z axis [-1.0..1.0]. Clockwise is
+   * @param zRotation The robot's rotation rate around the Z axis [-1.0..1.0]. Counterclockwise is
    *     positive.
    */
-  @SuppressWarnings("ParameterName")
   public void arcadeDrive(double xSpeed, double zRotation) {
     arcadeDrive(xSpeed, zRotation, true);
   }
@@ -164,11 +161,10 @@ public class DifferentialDrive extends RobotDriveBase implements Sendable, AutoC
    * Arcade drive method for differential drive platform.
    *
    * @param xSpeed The robot's speed along the X axis [-1.0..1.0]. Forward is positive.
-   * @param zRotation The robot's rotation rate around the Z axis [-1.0..1.0]. Clockwise is
+   * @param zRotation The robot's rotation rate around the Z axis [-1.0..1.0]. Counterclockwise is
    *     positive.
    * @param squareInputs If set, decreases the input sensitivity at low speeds.
    */
-  @SuppressWarnings("ParameterName")
   public void arcadeDrive(double xSpeed, double zRotation, boolean squareInputs) {
     if (!m_reported) {
       HAL.report(
@@ -194,11 +190,10 @@ public class DifferentialDrive extends RobotDriveBase implements Sendable, AutoC
    * heading change. This makes the robot more controllable at high speeds.
    *
    * @param xSpeed The robot's speed along the X axis [-1.0..1.0]. Forward is positive.
-   * @param zRotation The normalized curvature [-1.0..1.0]. Clockwise is positive.
+   * @param zRotation The normalized curvature [-1.0..1.0]. Counterclockwise is positive.
    * @param allowTurnInPlace If set, overrides constant-curvature turning for turn-in-place
    *     maneuvers. zRotation will control turning rate instead of curvature.
    */
-  @SuppressWarnings("ParameterName")
   public void curvatureDrive(double xSpeed, double zRotation, boolean allowTurnInPlace) {
     if (!m_reported) {
       HAL.report(
@@ -259,12 +254,11 @@ public class DifferentialDrive extends RobotDriveBase implements Sendable, AutoC
    * Arcade drive inverse kinematics for differential drive platform.
    *
    * @param xSpeed The robot's speed along the X axis [-1.0..1.0]. Forward is positive.
-   * @param zRotation The robot's rotation rate around the Z axis [-1.0..1.0]. Clockwise is
+   * @param zRotation The robot's rotation rate around the Z axis [-1.0..1.0]. Counterclockwise is
    *     positive.
    * @param squareInputs If set, decreases the input sensitivity at low speeds.
    * @return Wheel speeds [-1.0..1.0].
    */
-  @SuppressWarnings("ParameterName")
   public static WheelSpeeds arcadeDriveIK(double xSpeed, double zRotation, boolean squareInputs) {
     xSpeed = MathUtil.clamp(xSpeed, -1.0, 1.0);
     zRotation = MathUtil.clamp(zRotation, -1.0, 1.0);
@@ -276,37 +270,19 @@ public class DifferentialDrive extends RobotDriveBase implements Sendable, AutoC
       zRotation = Math.copySign(zRotation * zRotation, zRotation);
     }
 
-    double leftSpeed;
-    double rightSpeed;
+    double leftSpeed = xSpeed - zRotation;
+    double rightSpeed = xSpeed + zRotation;
 
-    double maxInput = Math.copySign(Math.max(Math.abs(xSpeed), Math.abs(zRotation)), xSpeed);
-
-    if (Double.compare(xSpeed, 0.0) >= 0) {
-      // First quadrant, else second quadrant
-      if (Double.compare(zRotation, 0.0) >= 0) {
-        leftSpeed = maxInput;
-        rightSpeed = xSpeed - zRotation;
-      } else {
-        leftSpeed = xSpeed + zRotation;
-        rightSpeed = maxInput;
-      }
-    } else {
-      // Third quadrant, else fourth quadrant
-      if (Double.compare(zRotation, 0.0) >= 0) {
-        leftSpeed = xSpeed + zRotation;
-        rightSpeed = maxInput;
-      } else {
-        leftSpeed = maxInput;
-        rightSpeed = xSpeed - zRotation;
-      }
+    // Find the maximum possible value of (throttle + turn) along the vector
+    // that the joystick is pointing, then desaturate the wheel speeds
+    double greaterInput = Math.max(Math.abs(xSpeed), Math.abs(zRotation));
+    double lesserInput = Math.min(Math.abs(xSpeed), Math.abs(zRotation));
+    if (greaterInput == 0.0) {
+      return new WheelSpeeds(0.0, 0.0);
     }
-
-    // Normalize the wheel speeds
-    double maxMagnitude = Math.max(Math.abs(leftSpeed), Math.abs(rightSpeed));
-    if (maxMagnitude > 1.0) {
-      leftSpeed /= maxMagnitude;
-      rightSpeed /= maxMagnitude;
-    }
+    double saturatedInput = (greaterInput + lesserInput) / greaterInput;
+    leftSpeed /= saturatedInput;
+    rightSpeed /= saturatedInput;
 
     return new WheelSpeeds(leftSpeed, rightSpeed);
   }
@@ -318,12 +294,11 @@ public class DifferentialDrive extends RobotDriveBase implements Sendable, AutoC
    * heading change. This makes the robot more controllable at high speeds.
    *
    * @param xSpeed The robot's speed along the X axis [-1.0..1.0]. Forward is positive.
-   * @param zRotation The normalized curvature [-1.0..1.0]. Clockwise is positive.
+   * @param zRotation The normalized curvature [-1.0..1.0]. Counterclockwise is positive.
    * @param allowTurnInPlace If set, overrides constant-curvature turning for turn-in-place
    *     maneuvers. zRotation will control rotation rate around the Z axis instead of curvature.
    * @return Wheel speeds [-1.0..1.0].
    */
-  @SuppressWarnings("ParameterName")
   public static WheelSpeeds curvatureDriveIK(
       double xSpeed, double zRotation, boolean allowTurnInPlace) {
     xSpeed = MathUtil.clamp(xSpeed, -1.0, 1.0);
@@ -333,14 +308,14 @@ public class DifferentialDrive extends RobotDriveBase implements Sendable, AutoC
     double rightSpeed;
 
     if (allowTurnInPlace) {
-      leftSpeed = xSpeed + zRotation;
-      rightSpeed = xSpeed - zRotation;
+      leftSpeed = xSpeed - zRotation;
+      rightSpeed = xSpeed + zRotation;
     } else {
-      leftSpeed = xSpeed + Math.abs(xSpeed) * zRotation;
-      rightSpeed = xSpeed - Math.abs(xSpeed) * zRotation;
+      leftSpeed = xSpeed - Math.abs(xSpeed) * zRotation;
+      rightSpeed = xSpeed + Math.abs(xSpeed) * zRotation;
     }
 
-    // Normalize wheel speeds
+    // Desaturate wheel speeds
     double maxMagnitude = Math.max(Math.abs(leftSpeed), Math.abs(rightSpeed));
     if (maxMagnitude > 1.0) {
       leftSpeed /= maxMagnitude;

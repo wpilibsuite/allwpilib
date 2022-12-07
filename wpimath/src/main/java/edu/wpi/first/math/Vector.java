@@ -61,4 +61,35 @@ public class Vector<R extends Num> extends Matrix<R, N1> {
   public Vector<R> div(double value) {
     return new Vector<>(this.m_storage.divide(value));
   }
+
+  /**
+   * Returns the dot product of this vector with another.
+   *
+   * @param other The other vector.
+   * @return The dot product.
+   */
+  public double dot(Vector<R> other) {
+    double dot = 0.0;
+
+    for (int i = 0; i < getNumRows(); ++i) {
+      dot += get(i, 0) * other.get(i, 0);
+    }
+
+    return dot;
+  }
+
+  /**
+   * Returns the norm of this vector.
+   *
+   * @return The norm.
+   */
+  public double norm() {
+    double squaredNorm = 0.0;
+
+    for (int i = 0; i < getNumRows(); ++i) {
+      squaredNorm += get(i, 0) * get(i, 0);
+    }
+
+    return Math.sqrt(squaredNorm);
+  }
 }

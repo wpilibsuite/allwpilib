@@ -21,6 +21,7 @@
 #include <wpi/mutex.h>
 #include <wpi/timestamp.h>
 
+#include "FPGACalls.h"
 #include "HALInitializer.h"
 #include "HALInternal.h"
 #include "hal/ChipObject.h"
@@ -28,6 +29,7 @@
 #include "hal/Errors.h"
 #include "hal/Notifier.h"
 #include "hal/handles/HandlesInternal.h"
+#include "hal/roborio/InterruptManager.h"
 #include "visa/visa.h"
 
 using namespace hal;
@@ -39,6 +41,7 @@ static uint64_t dsStartTime;
 using namespace hal;
 
 namespace hal {
+void InitializeDriverStation();
 namespace init {
 void InitializeHAL() {
   InitializeCTREPCM();
@@ -79,6 +82,7 @@ void InitializeHAL() {
 }  // namespace init
 
 void ReleaseFPGAInterrupt(int32_t interruptNumber) {
+  hal::init::CheckInit();
   if (!global) {
     return;
   }
@@ -249,6 +253,7 @@ HAL_RuntimeType HAL_GetRuntimeType(void) {
 }
 
 int32_t HAL_GetFPGAVersion(int32_t* status) {
+  hal::init::CheckInit();
   if (!global) {
     *status = NiFpga_Status_ResourceNotInitialized;
     return 0;
@@ -257,6 +262,7 @@ int32_t HAL_GetFPGAVersion(int32_t* status) {
 }
 
 int64_t HAL_GetFPGARevision(int32_t* status) {
+  hal::init::CheckInit();
   if (!global) {
     *status = NiFpga_Status_ResourceNotInitialized;
     return 0;
@@ -265,6 +271,7 @@ int64_t HAL_GetFPGARevision(int32_t* status) {
 }
 
 uint64_t HAL_GetFPGATime(int32_t* status) {
+  hal::init::CheckInit();
   if (!global) {
     *status = NiFpga_Status_ResourceNotInitialized;
     return 0;
@@ -311,6 +318,7 @@ uint64_t HAL_ExpandFPGATime(uint32_t unexpandedLower, int32_t* status) {
 }
 
 HAL_Bool HAL_GetFPGAButton(int32_t* status) {
+  hal::init::CheckInit();
   if (!global) {
     *status = NiFpga_Status_ResourceNotInitialized;
     return false;
@@ -319,6 +327,7 @@ HAL_Bool HAL_GetFPGAButton(int32_t* status) {
 }
 
 HAL_Bool HAL_GetSystemActive(int32_t* status) {
+  hal::init::CheckInit();
   if (!watchdog) {
     *status = NiFpga_Status_ResourceNotInitialized;
     return false;
@@ -327,6 +336,7 @@ HAL_Bool HAL_GetSystemActive(int32_t* status) {
 }
 
 HAL_Bool HAL_GetBrownedOut(int32_t* status) {
+  hal::init::CheckInit();
   if (!watchdog) {
     *status = NiFpga_Status_ResourceNotInitialized;
     return false;
@@ -392,6 +402,11 @@ HAL_Bool HAL_Initialize(int32_t timeout, int32_t mode) {
     return true;
   }
 
+  int fpgaInit = hal::init::InitializeFPGA();
+  if (fpgaInit != HAL_SUCCESS) {
+    return false;
+  }
+
   hal::init::InitializeHAL();
 
   hal::init::HAL_IsInitialized.store(true);
@@ -424,7 +439,9 @@ HAL_Bool HAL_Initialize(int32_t timeout, int32_t mode) {
     return false;
   }
 
-  HAL_InitializeDriverStation();
+  InterruptManager::Initialize(global->getSystemInterface());
+
+  hal::InitializeDriverStation();
 
   dsStartTime = HAL_GetFPGATime(&status);
   if (status != 0) {

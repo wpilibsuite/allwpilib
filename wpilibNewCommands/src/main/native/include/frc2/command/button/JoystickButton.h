@@ -4,6 +4,7 @@
 
 #pragma once
 #include <frc/GenericHID.h>
+#include <wpi/deprecated.h>
 
 #include "Button.h"
 
@@ -24,9 +25,11 @@ class JoystickButton : public Button {
    * @param joystick The joystick on which the button is located.
    * @param buttonNumber The number of the button on the joystic.
    */
+  WPI_IGNORE_DEPRECATED
   explicit JoystickButton(frc::GenericHID* joystick, int buttonNumber)
       : Button([joystick, buttonNumber] {
           return joystick->GetRawButton(buttonNumber);
         }) {}
+  WPI_UNIGNORE_DEPRECATED
 };
 }  // namespace frc2

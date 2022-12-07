@@ -22,7 +22,6 @@ public class Tracer {
   private long m_lastEpochsPrintTime; // microseconds
   private long m_startTime; // microseconds
 
-  @SuppressWarnings("PMD.UseConcurrentHashMap")
   private final Map<String, Long> m_epochs = new HashMap<>(); // microseconds
 
   /** Tracer constructor. */

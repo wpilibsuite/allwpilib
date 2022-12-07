@@ -16,7 +16,6 @@ import edu.wpi.first.math.geometry.Rotation2d;
  * component because it can never move sideways. Holonomic drivetrains such as swerve and mecanum
  * will often have all three components.
  */
-@SuppressWarnings("MemberName")
 public class ChassisSpeeds {
   /** Represents forward velocity w.r.t the robot frame of reference. (Fwd is +) */
   public double vxMetersPerSecond;
@@ -67,6 +66,27 @@ public class ChassisSpeeds {
         vxMetersPerSecond * robotAngle.getCos() + vyMetersPerSecond * robotAngle.getSin(),
         -vxMetersPerSecond * robotAngle.getSin() + vyMetersPerSecond * robotAngle.getCos(),
         omegaRadiansPerSecond);
+  }
+
+  /**
+   * Converts a user provided field-relative ChassisSpeeds object into a robot-relative
+   * ChassisSpeeds object.
+   *
+   * @param fieldRelativeSpeeds The ChassisSpeeds object representing the speeds in the field frame
+   *     of reference. Positive x is away from your alliance wall. Positive y is to your left when
+   *     standing behind the alliance wall.
+   * @param robotAngle The angle of the robot as measured by a gyroscope. The robot's angle is
+   *     considered to be zero when it is facing directly away from your alliance station wall.
+   *     Remember that this should be CCW positive.
+   * @return ChassisSpeeds object representing the speeds in the robot's frame of reference.
+   */
+  public static ChassisSpeeds fromFieldRelativeSpeeds(
+      ChassisSpeeds fieldRelativeSpeeds, Rotation2d robotAngle) {
+    return fromFieldRelativeSpeeds(
+        fieldRelativeSpeeds.vxMetersPerSecond,
+        fieldRelativeSpeeds.vyMetersPerSecond,
+        fieldRelativeSpeeds.omegaRadiansPerSecond,
+        robotAngle);
   }
 
   @Override

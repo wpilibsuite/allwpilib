@@ -4,111 +4,105 @@
 
 #pragma once
 
-#include <limits>
+#include <cmath>
 
+#include <fmt/format.h>
 #include <wpi/SymbolExports.h>
 #include <wpi/array.h>
 #include <wpi/timestamp.h>
 
 #include "frc/EigenCore.h"
-#include "frc/StateSpaceUtil.h"
-#include "frc/estimator/AngleStatistics.h"
-#include "frc/estimator/UnscentedKalmanFilter.h"
 #include "frc/geometry/Pose2d.h"
 #include "frc/geometry/Rotation2d.h"
 #include "frc/interpolation/TimeInterpolatableBuffer.h"
 #include "frc/kinematics/SwerveDriveKinematics.h"
+#include "frc/kinematics/SwerveDriveOdometry.h"
 #include "units/time.h"
 
 namespace frc {
+
 /**
- * This class wraps an Unscented Kalman Filter to fuse latency-compensated
- * vision measurements with swerve drive encoder velocity measurements. It will
- * correct for noisy measurements and encoder drift. It is intended to be an
- * easy but more accurate drop-in for SwerveDriveOdometry.
+ * This class wraps Swerve Drive Odometry to fuse latency-compensated
+ * vision measurements with swerve drive encoder distance measurements. It is
+ * intended to be a drop-in for SwerveDriveOdometry.
  *
- * Update() should be called every robot loop. If your loops are faster or
- * slower than the default of 0.02s, then you should change the nominal delta
- * time by specifying it in the constructor.
+ * Update() should be called every robot loop.
  *
  * AddVisionMeasurement() can be called as infrequently as you want; if you
- * never call it, then this class will behave mostly like regular encoder
+ * never call it, then this class will behave as regular encoder
  * odometry.
  *
- * The state-space system used internally has the following states (x), inputs
- * (u), and outputs (y):
+ * The state-space system used internally has the following states (x) and
+ * outputs (y):
  *
- * <strong> x = [x, y, theta]ᵀ </strong> in the field coordinate system
- * containing x position, y position, and heading.
- *
- * <strong> u = [v_x, v_y, omega]ᵀ </strong> containing x velocity, y velocity,
- * and angular velocity in the field coordinate system.
+ * <strong> x = [x, y, theta]ᵀ </strong> in the field coordinate
+ * system containing x position, y position, and heading.
  *
  * <strong> y = [x, y, theta]ᵀ </strong> from vision containing x position, y
- * position, and heading; or <strong> y = [theta]ᵀ </strong> containing gyro
- * heading.
+ * position, and heading.
  */
 template <size_t NumModules>
 class SwerveDrivePoseEstimator {
  public:
   /**
-   * Constructs a SwerveDrivePoseEstimator.
+   * Constructs a SwerveDrivePoseEstimator with default standard deviations
+   * for the model and vision measurements.
    *
-   * @param gyroAngle                The current gyro angle.
-   * @param initialPose              The starting pose estimate.
+   * The default standard deviations of the model states are
+   * 0.1 meters for x, 0.1 meters for y, and 0.1 radians for heading.
+   * The default standard deviations of the vision measurements are
+   * 0.9 meters for x, 0.9 meters for y, and 0.9 radians for heading.
+   *
    * @param kinematics               A correctly-configured kinematics object
    *                                 for your drivetrain.
+   * @param gyroAngle                The current gyro angle.
+   * @param modulePositions          The current distance and rotation
+   *                                 measurements of the swerve modules.
+   * @param initialPose              The starting pose estimate.
+   */
+  SwerveDrivePoseEstimator(
+      SwerveDriveKinematics<NumModules>& kinematics,
+      const Rotation2d& gyroAngle,
+      const wpi::array<SwerveModulePosition, NumModules>& modulePositions,
+      const Pose2d& initialPose)
+      : SwerveDrivePoseEstimator{kinematics,      gyroAngle,
+                                 modulePositions, initialPose,
+                                 {0.1, 0.1, 0.1}, {0.9, 0.9, 0.9}} {}
+
+  /**
+   * Constructs a SwerveDrivePoseEstimator.
+   *
+   * @param kinematics               A correctly-configured kinematics object
+   *                                 for your drivetrain.
+   * @param gyroAngle                The current gyro angle.
+   * @param modulePositions          The current distance and rotation
+   *                                 measurements of the swerve modules.
+   * @param initialPose              The starting pose estimate.
    * @param stateStdDevs             Standard deviations of model states.
    *                                 Increase these numbers to trust your
    *                                 model's state estimates less. This matrix
    *                                 is in the form [x, y, theta]ᵀ, with units
    *                                 in meters and radians.
-   * @param localMeasurementStdDevs  Standard deviation of the gyro measurement.
-   *                                 Increase this number to trust sensor
-   *                                 readings from the gyro less. This matrix is
-   *                                 in the form [theta], with units in radians.
    * @param visionMeasurementStdDevs Standard deviations of the vision
    *                                 measurements. Increase these numbers to
    *                                 trust global measurements from vision
    *                                 less. This matrix is in the form
    *                                 [x, y, theta]ᵀ, with units in meters and
    *                                 radians.
-   * @param nominalDt                The time in seconds between each robot
-   *                                 loop.
    */
   SwerveDrivePoseEstimator(
-      const Rotation2d& gyroAngle, const Pose2d& initialPose,
       SwerveDriveKinematics<NumModules>& kinematics,
-      const wpi::array<double, 3>& stateStdDevs,
-      const wpi::array<double, 1>& localMeasurementStdDevs,
-      const wpi::array<double, 3>& visionMeasurementStdDevs,
-      units::second_t nominalDt = 0.02_s)
-      : m_observer([](const Vectord<3>& x, const Vectord<3>& u) { return u; },
-                   [](const Vectord<3>& x, const Vectord<3>& u) {
-                     return x.block<1, 1>(2, 0);
-                   },
-                   stateStdDevs, localMeasurementStdDevs,
-                   frc::AngleMean<3, 3>(2), frc::AngleMean<1, 3>(0),
-                   frc::AngleResidual<3>(2), frc::AngleResidual<1>(0),
-                   frc::AngleAdd<3>(2), nominalDt),
-        m_kinematics(kinematics),
-        m_nominalDt(nominalDt) {
+      const Rotation2d& gyroAngle,
+      const wpi::array<SwerveModulePosition, NumModules>& modulePositions,
+      const Pose2d& initialPose, const wpi::array<double, 3>& stateStdDevs,
+      const wpi::array<double, 3>& visionMeasurementStdDevs)
+      : m_kinematics{kinematics},
+        m_odometry{kinematics, gyroAngle, modulePositions, initialPose} {
+    for (size_t i = 0; i < 3; ++i) {
+      m_q[i] = stateStdDevs[i] * stateStdDevs[i];
+    }
+
     SetVisionMeasurementStdDevs(visionMeasurementStdDevs);
-
-    // Create correction mechanism for vision measurements.
-    m_visionCorrect = [&](const Vectord<3>& u, const Vectord<3>& y) {
-      m_observer.Correct<3>(
-          u, y, [](const Vectord<3>& x, const Vectord<3>& u) { return x; },
-          m_visionContR, frc::AngleMean<3, 3>(2), frc::AngleResidual<3>(2),
-          frc::AngleResidual<3>(2), frc::AngleAdd<3>(2));
-    };
-
-    // Set initial state.
-    m_observer.SetXhat(PoseTo3dVector(initialPose));
-
-    // Calculate offsets.
-    m_gyroOffset = initialPose.Rotation() - gyroAngle;
-    m_previousAngle = initialPose.Rotation();
   }
 
   /**
@@ -117,32 +111,26 @@ class SwerveDrivePoseEstimator {
    * The gyroscope angle does not need to be reset in the user's robot code.
    * The library automatically takes care of offsetting the gyro angle.
    *
-   * @param pose      The position on the field that your robot is at.
-   * @param gyroAngle The angle reported by the gyroscope.
+   * @param gyroAngle       The angle reported by the gyroscope.
+   * @param modulePositions The current distance and rotation measurements of
+   *                        the swerve modules.
+   * @param pose            The position on the field that your robot is at.
    */
-  void ResetPosition(const Pose2d& pose, const Rotation2d& gyroAngle) {
+  void ResetPosition(
+      const Rotation2d& gyroAngle,
+      const wpi::array<SwerveModulePosition, NumModules>& modulePositions,
+      const Pose2d& pose) {
     // Reset state estimate and error covariance
-    m_observer.Reset();
+    m_odometry.ResetPosition(gyroAngle, modulePositions, pose);
     m_poseBuffer.Clear();
-
-    m_observer.SetXhat(PoseTo3dVector(pose));
-
-    m_prevTime = -1_s;
-
-    m_gyroOffset = pose.Rotation() - gyroAngle;
-    m_previousAngle = pose.Rotation();
   }
 
   /**
-   * Gets the pose of the robot at the current time as estimated by the Extended
-   * Kalman Filter.
+   * Gets the estimated robot pose.
    *
    * @return The estimated robot pose in meters.
    */
-  Pose2d GetEstimatedPosition() const {
-    return Pose2d(m_observer.Xhat(0) * 1_m, m_observer.Xhat(1) * 1_m,
-                  Rotation2d(units::radian_t{m_observer.Xhat(2)}));
-  }
+  Pose2d GetEstimatedPosition() const { return m_odometry.GetPose(); }
 
   /**
    * Sets the pose estimator's trust of global measurements. This might be used
@@ -158,13 +146,26 @@ class SwerveDrivePoseEstimator {
    */
   void SetVisionMeasurementStdDevs(
       const wpi::array<double, 3>& visionMeasurementStdDevs) {
-    // Create R (covariances) for vision measurements.
-    m_visionContR = frc::MakeCovMatrix(visionMeasurementStdDevs);
+    wpi::array<double, 3> r{wpi::empty_array};
+    for (size_t i = 0; i < 3; ++i) {
+      r[i] = visionMeasurementStdDevs[i] * visionMeasurementStdDevs[i];
+    }
+
+    // Solve for closed form Kalman gain for continuous Kalman filter with A = 0
+    // and C = I. See wpimath/algorithms.md.
+    for (size_t row = 0; row < 3; ++row) {
+      if (m_q[row] == 0.0) {
+        m_visionK(row, row) = 0.0;
+      } else {
+        m_visionK(row, row) =
+            m_q[row] / (m_q[row] + std::sqrt(m_q[row] * r[row]));
+      }
+    }
   }
 
   /**
-   * Add a vision measurement to the Unscented Kalman Filter. This will correct
-   * the odometry pose estimate while still accounting for measurement noise.
+   * Adds a vision measurement to the Kalman Filter. This will correct the
+   * odometry pose estimate while still accounting for measurement noise.
    *
    * This method can be called as infrequently as you want, as long as you are
    * calling Update() every loop.
@@ -186,16 +187,50 @@ class SwerveDrivePoseEstimator {
    */
   void AddVisionMeasurement(const Pose2d& visionRobotPose,
                             units::second_t timestamp) {
-    if (auto sample = m_poseBuffer.Sample(timestamp)) {
-      m_visionCorrect(Vectord<3>::Zero(),
-                      PoseTo3dVector(GetEstimatedPosition().TransformBy(
-                          visionRobotPose - sample.value())));
+    // Step 1: Get the estimated pose from when the vision measurement was made.
+    auto sample = m_poseBuffer.Sample(timestamp);
+
+    if (!sample.has_value()) {
+      return;
+    }
+
+    // Step 2: Measure the twist between the odometry pose and the vision pose
+    auto twist = sample.value().pose.Log(visionRobotPose);
+
+    // Step 3: We should not trust the twist entirely, so instead we scale this
+    // twist by a Kalman gain matrix representing how much we trust vision
+    // measurements compared to our current pose.
+    frc::Vectord<3> k_times_twist =
+        m_visionK * frc::Vectord<3>{twist.dx.value(), twist.dy.value(),
+                                    twist.dtheta.value()};
+
+    // Step 4: Convert back to Twist2d
+    Twist2d scaledTwist{units::meter_t{k_times_twist(0)},
+                        units::meter_t{k_times_twist(1)},
+                        units::radian_t{k_times_twist(2)}};
+
+    // Step 5: Reset Odometry to state at sample with vision adjustment.
+    m_odometry.ResetPosition(sample.value().gyroAngle,
+                             sample.value().modulePostions,
+                             sample.value().pose.Exp(scaledTwist));
+
+    // Step 6: Replay odometry inputs between sample time and latest recorded
+    // sample to update the pose buffer and correct odometry.
+    auto internal_buf = m_poseBuffer.GetInternalBuffer();
+
+    auto upper_bound = std::lower_bound(
+        internal_buf.begin(), internal_buf.end(), timestamp,
+        [](const auto& pair, auto t) { return t > pair.first; });
+
+    for (auto entry = upper_bound; entry != internal_buf.end(); entry++) {
+      UpdateWithTime(entry->first, entry->second.gyroAngle,
+                     entry->second.modulePostions);
     }
   }
 
   /**
-   * Adds a vision measurement to the Unscented Kalman Filter. This will correct
-   * the odometry pose estimate while still accounting for measurement noise.
+   * Adds a vision measurement to the Kalman Filter. This will correct the
+   * odometry pose estimate while still accounting for measurement noise.
    *
    * This method can be called as infrequently as you want, as long as you are
    * calling Update() every loop.
@@ -236,84 +271,137 @@ class SwerveDrivePoseEstimator {
   }
 
   /**
-   * Updates the the Unscented Kalman Filter using only wheel encoder
-   * information. This should be called every loop, and the correct loop period
-   * must be passed into the constructor of this class.
+   * Updates the Kalman Filter using only wheel encoder information. This should
+   * be called every loop.
    *
-   * @param gyroAngle    The current gyro angle.
-   * @param moduleStates The current velocities and rotations of the swerve
-   *                     modules.
-   * @return The estimated pose of the robot in meters.
+   * @param gyroAngle       The current gyro angle.
+   * @param modulePositions The current distance and rotation measurements of
+   *                        the swerve modules.
+   * @return The estimated robot pose in meters.
    */
-  template <typename... ModuleState>
-  Pose2d Update(const Rotation2d& gyroAngle, ModuleState&&... moduleStates) {
+  Pose2d Update(
+      const Rotation2d& gyroAngle,
+      const wpi::array<SwerveModulePosition, NumModules>& modulePositions) {
     return UpdateWithTime(units::microsecond_t(wpi::Now()), gyroAngle,
-                          moduleStates...);
+                          modulePositions);
   }
 
   /**
-   * Updates the the Unscented Kalman Filter using only wheel encoder
-   * information. This should be called every loop, and the correct loop period
-   * must be passed into the constructor of this class.
+   * Updates the Kalman Filter using only wheel encoder information. This should
+   * be called every loop.
    *
-   * @param currentTime  Time at which this method was called, in seconds.
-   * @param gyroAngle    The current gyroscope angle.
-   * @param moduleStates The current velocities and rotations of the swerve
-   *                     modules.
-   * @return The estimated pose of the robot in meters.
+   * @param currentTime     Time at which this method was called, in seconds.
+   * @param gyroAngle       The current gyro angle.
+   * @param modulePositions The current distance traveled and rotations of
+   *                        the swerve modules.
+   * @return The estimated robot pose in meters.
    */
-  template <typename... ModuleState>
-  Pose2d UpdateWithTime(units::second_t currentTime,
-                        const Rotation2d& gyroAngle,
-                        ModuleState&&... moduleStates) {
-    auto dt = m_prevTime >= 0_s ? currentTime - m_prevTime : m_nominalDt;
-    m_prevTime = currentTime;
+  Pose2d UpdateWithTime(
+      units::second_t currentTime, const Rotation2d& gyroAngle,
+      const wpi::array<SwerveModulePosition, NumModules>& modulePositions) {
+    m_odometry.Update(gyroAngle, modulePositions);
 
-    auto angle = gyroAngle + m_gyroOffset;
-    auto omega = (angle - m_previousAngle).Radians() / dt;
+    wpi::array<SwerveModulePosition, NumModules> internalModulePositions{
+        wpi::empty_array};
 
-    auto chassisSpeeds = m_kinematics.ToChassisSpeeds(moduleStates...);
-    auto fieldRelativeSpeeds =
-        Translation2d(chassisSpeeds.vx * 1_s, chassisSpeeds.vy * 1_s)
-            .RotateBy(angle);
+    for (size_t i = 0; i < NumModules; i++) {
+      internalModulePositions[i].distance = modulePositions[i].distance;
+      internalModulePositions[i].angle = modulePositions[i].angle;
+    }
 
-    Vectord<3> u{fieldRelativeSpeeds.X().value(),
-                 fieldRelativeSpeeds.Y().value(), omega.value()};
-
-    Vectord<1> localY{angle.Radians().value()};
-    m_previousAngle = angle;
-
-    m_poseBuffer.AddSample(currentTime, GetEstimatedPosition());
-
-    m_observer.Predict(u, dt);
-    m_observer.Correct(u, localY);
+    m_poseBuffer.AddSample(currentTime, {GetEstimatedPosition(), gyroAngle,
+                                         internalModulePositions});
 
     return GetEstimatedPosition();
   }
 
  private:
-  UnscentedKalmanFilter<3, 3, 1> m_observer;
-  SwerveDriveKinematics<NumModules>& m_kinematics;
-  TimeInterpolatableBuffer<Pose2d> m_poseBuffer{1.5_s};
-  std::function<void(const Vectord<3>& u, const Vectord<3>& y)> m_visionCorrect;
+  struct InterpolationRecord {
+    // The pose observed given the current sensor inputs and the previous pose.
+    Pose2d pose;
 
-  Eigen::Matrix3d m_visionContR;
+    // The current gyroscope angle.
+    Rotation2d gyroAngle;
 
-  units::second_t m_nominalDt;
-  units::second_t m_prevTime = -1_s;
+    // The distances traveled and rotations meaured at each module.
+    wpi::array<SwerveModulePosition, NumModules> modulePostions;
 
-  Rotation2d m_gyroOffset;
-  Rotation2d m_previousAngle;
+    /**
+     * Checks equality between this InterpolationRecord and another object.
+     *
+     * @param other The other object.
+     * @return Whether the two objects are equal.
+     */
+    bool operator==(const InterpolationRecord& other) const = default;
 
-  template <int Dim>
-  static wpi::array<double, Dim> StdDevMatrixToArray(
-      const Vectord<Dim>& vector) {
-    wpi::array<double, Dim> array;
-    for (size_t i = 0; i < Dim; ++i) {
-      array[i] = vector(i);
+    /**
+     * Checks inequality between this InterpolationRecord and another object.
+     *
+     * @param other The other object.
+     * @return Whether the two objects are not equal.
+     */
+    bool operator!=(const InterpolationRecord& other) const = default;
+
+    /**
+     * Interpolates between two InterpolationRecords.
+     *
+     * @param endValue The end value for the interpolation.
+     * @param i The interpolant (fraction).
+     *
+     * @return The interpolated state.
+     */
+    InterpolationRecord Interpolate(
+        SwerveDriveKinematics<NumModules>& kinematics,
+        InterpolationRecord endValue, double i) const {
+      if (i < 0) {
+        return *this;
+      } else if (i > 1) {
+        return endValue;
+      } else {
+        // Find the new module distances.
+        wpi::array<SwerveModulePosition, NumModules> modulePositions{
+            wpi::empty_array};
+        // Find the distance between this measurement and the
+        // interpolated measurement.
+        wpi::array<SwerveModulePosition, NumModules> modulesDelta{
+            wpi::empty_array};
+
+        for (size_t i = 0; i < NumModules; i++) {
+          modulePositions[i].distance =
+              wpi::Lerp(this->modulePostions[i].distance,
+                        endValue.modulePostions[i].distance, i);
+          modulePositions[i].angle =
+              wpi::Lerp(this->modulePostions[i].angle,
+                        endValue.modulePostions[i].angle, i);
+
+          modulesDelta[i].distance =
+              modulePositions[i].distance - this->modulePostions[i].distance;
+          modulesDelta[i].angle = modulePositions[i].angle;
+        }
+
+        // Find the new gyro angle.
+        auto gyro = wpi::Lerp(this->gyroAngle, endValue.gyroAngle, i);
+
+        // Create a twist to represent this changed based on the interpolated
+        // sensor inputs.
+        auto twist = kinematics.ToTwist2d(modulesDelta);
+        twist.dtheta = (gyro - gyroAngle).Radians();
+
+        return {pose.Exp(twist), gyro, modulePositions};
+      }
     }
-    return array;
-  }
+  };
+
+  SwerveDriveKinematics<NumModules>& m_kinematics;
+  SwerveDriveOdometry<NumModules> m_odometry;
+  wpi::array<double, 3> m_q{wpi::empty_array};
+  Eigen::Matrix3d m_visionK = Eigen::Matrix3d::Zero();
+
+  TimeInterpolatableBuffer<InterpolationRecord> m_poseBuffer{
+      1.5_s, [this](const InterpolationRecord& start,
+                    const InterpolationRecord& end, double t) {
+        return start.Interpolate(this->m_kinematics, end, t);
+      }};
 };
 
 extern template class EXPORT_TEMPLATE_DECLARE(WPILIB_DLLEXPORT)

@@ -10,7 +10,6 @@ import edu.wpi.first.wpilibj.PneumaticsControlModule;
 import edu.wpi.first.wpilibj.SensorUtil;
 
 /** Class to control a simulated Pneumatic Control Module (PCM). */
-@SuppressWarnings("AbbreviationAsWordInName")
 public class CTREPCMSim extends PneumaticsBaseSim {
   /** Constructs for the default PCM. */
   public CTREPCMSim() {

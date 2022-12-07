@@ -1,13 +1,19 @@
 cppHeaderFileInclude {
   \.h$
+  \.hpp$
   \.inc$
   \.inl$
   math$
   numbers$
+  scope$
 }
 
 cppSrcFileInclude {
   \.cpp$
+}
+
+modifiableFileExclude {
+  src/main/native/include/wpi/MulticastServiceAnnouncer\.h$
 }
 
 generatedFileExclude {

@@ -38,7 +38,7 @@ public abstract class MotorEncoderFixture<T extends MotorController> implements 
   public abstract int getPDPChannel();
 
   /**
-   * Where the implementer of this class should pass the speed controller Constructor should only be
+   * Where the implementer of this class should pass the motor controller Constructor should only be
    * called from outside this class if the Motor controller is not also an implementation of PWM
    * interface.
    *
@@ -75,7 +75,7 @@ public abstract class MotorEncoderFixture<T extends MotorController> implements 
         m_encoder = new Encoder(m_alphaSource, m_betaSource);
         m_counters[0] = new Counter(m_alphaSource);
         m_counters[1] = new Counter(m_betaSource);
-        logger.fine("Creating the speed controller!");
+        logger.fine("Creating the motor controller!");
         m_motor = giveMotorController();
       }
     }
@@ -152,7 +152,6 @@ public abstract class MotorEncoderFixture<T extends MotorController> implements 
    * deallocated.
    */
   @Override
-  @SuppressWarnings("Regexp")
   public void teardown() {
     if (!m_tornDown) {
       if (m_motor != null) {

@@ -4,8 +4,6 @@
 
 package edu.wpi.first.wpilibj2.command;
 
-import static edu.wpi.first.wpilibj.util.ErrorMessages.requireNonNullParam;
-
 import java.util.function.BooleanSupplier;
 
 /**
@@ -15,9 +13,7 @@ import java.util.function.BooleanSupplier;
  *
  * <p>This class is provided by the NewCommands VendorDep
  */
-public class RunCommand extends CommandBase {
-  protected final Runnable m_toRun;
-
+public class RunCommand extends FunctionalCommand {
   /**
    * Creates a new RunCommand. The Runnable will be run continuously until the command ends. Does
    * not run when disabled.
@@ -26,12 +22,6 @@ public class RunCommand extends CommandBase {
    * @param requirements the subsystems to require
    */
   public RunCommand(Runnable toRun, Subsystem... requirements) {
-    m_toRun = requireNonNullParam(toRun, "toRun", "RunCommand");
-    addRequirements(requirements);
-  }
-
-  @Override
-  public void execute() {
-    m_toRun.run();
+    super(() -> {}, toRun, interrupted -> {}, () -> false, requirements);
   }
 }

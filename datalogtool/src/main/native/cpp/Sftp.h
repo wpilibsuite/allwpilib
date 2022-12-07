@@ -7,12 +7,11 @@
 #include <libssh/libssh.h>
 #include <libssh/sftp.h>
 
+#include <span>
 #include <stdexcept>
 #include <string>
 #include <string_view>
 #include <vector>
-
-#include <wpi/span.h>
 
 namespace sftp {
 
@@ -53,7 +52,7 @@ class File {
   size_t Read(void* buf, uint32_t count);
   AsyncId AsyncReadBegin(uint32_t len) const;
   size_t AsyncRead(void* data, uint32_t len, AsyncId id);
-  size_t Write(wpi::span<const uint8_t> data);
+  size_t Write(std::span<const uint8_t> data);
 
   void Seek(uint64_t offset);
   uint64_t Tell() const;

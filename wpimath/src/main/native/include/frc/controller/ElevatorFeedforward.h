@@ -6,6 +6,7 @@
 
 #include <wpi/MathExtras.h>
 
+#include "units/length.h"
 #include "units/time.h"
 #include "units/voltage.h"
 
@@ -14,9 +15,9 @@ namespace frc {
  * A helper class that computes feedforward outputs for a simple elevator
  * (modeled as a motor acting against the force of gravity).
  */
-template <class Distance>
 class ElevatorFeedforward {
  public:
+  using Distance = units::meters;
   using Velocity =
       units::compound_unit<Distance, units::inverse<units::seconds>>;
   using Acceleration =

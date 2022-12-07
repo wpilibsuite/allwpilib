@@ -30,7 +30,6 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 
 class UnscentedKalmanFilterTest {
-  @SuppressWarnings({"LocalVariableName", "ParameterName"})
   private static Matrix<N5, N1> getDynamics(Matrix<N5, N1> x, Matrix<N2, N1> u) {
     var motors = DCMotor.getCIM(2);
 
@@ -63,18 +62,17 @@ class UnscentedKalmanFilterTest {
         k2 * (C1 * vl + C2 * Vl) + k1 * (C1 * vr + C2 * Vr));
   }
 
-  @SuppressWarnings({"PMD.UnusedFormalParameter", "ParameterName"})
+  @SuppressWarnings("PMD.UnusedFormalParameter")
   private static Matrix<N3, N1> getLocalMeasurementModel(Matrix<N5, N1> x, Matrix<N2, N1> u) {
     return VecBuilder.fill(x.get(2, 0), x.get(3, 0), x.get(4, 0));
   }
 
-  @SuppressWarnings({"PMD.UnusedFormalParameter", "ParameterName"})
+  @SuppressWarnings("PMD.UnusedFormalParameter")
   private static Matrix<N5, N1> getGlobalMeasurementModel(Matrix<N5, N1> x, Matrix<N2, N1> u) {
     return x.copy();
   }
 
   @Test
-  @SuppressWarnings("LocalVariableName")
   void testInit() {
     var dtSeconds = 0.005;
     assertDoesNotThrow(
@@ -117,7 +115,6 @@ class UnscentedKalmanFilterTest {
         });
   }
 
-  @SuppressWarnings("LocalVariableName")
   @Test
   void testConvergence() {
     double dtSeconds = 0.005;
@@ -224,7 +221,6 @@ class UnscentedKalmanFilterTest {
   }
 
   @Test
-  @SuppressWarnings({"LocalVariableName", "ParameterName"})
   void testLinearUKF() {
     var dt = 0.020;
     var plant = LinearSystemId.identifyVelocitySystem(0.02, 0.006);
@@ -254,7 +250,6 @@ class UnscentedKalmanFilterTest {
     assertEquals(ref.get(0, 0), observer.getXhat(0), 5);
   }
 
-  @SuppressWarnings("LocalVariableName")
   @Test
   void testRoundTripP() {
     var dtSeconds = 0.005;

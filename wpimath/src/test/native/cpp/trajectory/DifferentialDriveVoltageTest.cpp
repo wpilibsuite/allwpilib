@@ -72,12 +72,12 @@ TEST(DifferentialDriveVoltageConstraintTest, HighCurvature) {
       DifferentialDriveVoltageConstraint(feedforward, kinematics, maxVoltage));
 
   EXPECT_NO_FATAL_FAILURE(TrajectoryGenerator::GenerateTrajectory(
-      Pose2d{1_m, 0_m, Rotation2d{90_deg}}, std::vector<Translation2d>{},
-      Pose2d{0_m, 1_m, Rotation2d{180_deg}}, config));
+      Pose2d{1_m, 0_m, 90_deg}, std::vector<Translation2d>{},
+      Pose2d{0_m, 1_m, 180_deg}, config));
 
   config.SetReversed(true);
 
   EXPECT_NO_FATAL_FAILURE(TrajectoryGenerator::GenerateTrajectory(
-      Pose2d{0_m, 1_m, Rotation2d{180_deg}}, std::vector<Translation2d>{},
-      Pose2d{1_m, 0_m, Rotation2d{90_deg}}, config));
+      Pose2d{0_m, 1_m, 180_deg}, std::vector<Translation2d>{},
+      Pose2d{1_m, 0_m, 90_deg}, config));
 }

@@ -36,7 +36,6 @@ public class CoordinateAxis {
    *
    * @return A coordinate axis corresponding to +X in the NWU coordinate system.
    */
-  @SuppressWarnings("MethodName")
   public static CoordinateAxis N() {
     return m_n;
   }
@@ -46,7 +45,6 @@ public class CoordinateAxis {
    *
    * @return A coordinate axis corresponding to -X in the NWU coordinate system.
    */
-  @SuppressWarnings("MethodName")
   public static CoordinateAxis S() {
     return m_s;
   }
@@ -56,7 +54,6 @@ public class CoordinateAxis {
    *
    * @return A coordinate axis corresponding to -Y in the NWU coordinate system.
    */
-  @SuppressWarnings("MethodName")
   public static CoordinateAxis E() {
     return m_e;
   }
@@ -66,7 +63,6 @@ public class CoordinateAxis {
    *
    * @return A coordinate axis corresponding to +Y in the NWU coordinate system.
    */
-  @SuppressWarnings("MethodName")
   public static CoordinateAxis W() {
     return m_w;
   }
@@ -76,7 +72,6 @@ public class CoordinateAxis {
    *
    * @return A coordinate axis corresponding to +Z in the NWU coordinate system.
    */
-  @SuppressWarnings("MethodName")
   public static CoordinateAxis U() {
     return m_u;
   }
@@ -86,7 +81,6 @@ public class CoordinateAxis {
    *
    * @return A coordinate axis corresponding to -Z in the NWU coordinate system.
    */
-  @SuppressWarnings("MethodName")
   public static CoordinateAxis D() {
     return m_d;
   }

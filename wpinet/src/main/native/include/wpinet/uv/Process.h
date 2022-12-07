@@ -9,12 +9,12 @@
 
 #include <initializer_list>
 #include <memory>
+#include <span>
 #include <string>
 #include <string_view>
 
 #include <wpi/Signal.h>
 #include <wpi/SmallVector.h>
-#include <wpi/span.h>
 
 #include "wpinet/uv/Handle.h"
 
@@ -233,7 +233,7 @@ class Process final : public HandleImpl<Process, uv_process_t> {
    * @param options Process options
    */
   static std::shared_ptr<Process> SpawnArray(Loop& loop, std::string_view file,
-                                             span<const Option> options);
+                                             std::span<const Option> options);
 
   static std::shared_ptr<Process> SpawnArray(
       Loop& loop, std::string_view file,
@@ -262,7 +262,7 @@ class Process final : public HandleImpl<Process, uv_process_t> {
    */
   static std::shared_ptr<Process> SpawnArray(const std::shared_ptr<Loop>& loop,
                                              std::string_view file,
-                                             span<const Option> options) {
+                                             std::span<const Option> options) {
     return SpawnArray(*loop, file, options);
   }
 

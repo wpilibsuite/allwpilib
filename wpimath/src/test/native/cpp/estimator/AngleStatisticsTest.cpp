@@ -4,7 +4,7 @@
 
 #include <gtest/gtest.h>
 
-#include <wpi/numbers>
+#include <numbers>
 
 #include "frc/EigenCore.h"
 #include "frc/estimator/AngleStatistics.h"
@@ -12,7 +12,7 @@
 TEST(AngleStatisticsTest, Mean) {
   frc::Matrixd<3, 3> sigmas{
       {1, 1.2, 0},
-      {359 * wpi::numbers::pi / 180, 3 * wpi::numbers::pi / 180, 0},
+      {359 * std::numbers::pi / 180, 3 * std::numbers::pi / 180, 0},
       {1, 2, 0}};
   // Weights need to produce the mean of the sigmas
   Eigen::Vector3d weights;
@@ -23,16 +23,16 @@ TEST(AngleStatisticsTest, Mean) {
 }
 
 TEST(AngleStatisticsTest, Residual) {
-  Eigen::Vector3d a{1, 1 * wpi::numbers::pi / 180, 2};
-  Eigen::Vector3d b{1, 359 * wpi::numbers::pi / 180, 1};
+  Eigen::Vector3d a{1, 1 * std::numbers::pi / 180, 2};
+  Eigen::Vector3d b{1, 359 * std::numbers::pi / 180, 1};
 
   EXPECT_TRUE(frc::AngleResidual<3>(a, b, 1).isApprox(
-      Eigen::Vector3d{0, 2 * wpi::numbers::pi / 180, 1}));
+      Eigen::Vector3d{0, 2 * std::numbers::pi / 180, 1}));
 }
 
 TEST(AngleStatisticsTest, Add) {
-  Eigen::Vector3d a{1, 1 * wpi::numbers::pi / 180, 2};
-  Eigen::Vector3d b{1, 359 * wpi::numbers::pi / 180, 1};
+  Eigen::Vector3d a{1, 1 * std::numbers::pi / 180, 2};
+  Eigen::Vector3d b{1, 359 * std::numbers::pi / 180, 1};
 
   EXPECT_TRUE(frc::AngleAdd<3>(a, b, 1).isApprox(Eigen::Vector3d{2, 0, 3}));
 }

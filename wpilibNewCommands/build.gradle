@@ -57,14 +57,14 @@ model {
                 return
             }
             lib project: ':wpilibc', library: 'wpilibc', linkage: 'shared'
-            lib project: ':ntcore', library: 'ntcore', linkage: 'shared'
+            project(':ntcore').addNtcoreDependency(it, 'shared')
             project(':hal').addHalDependency(it, 'shared')
             lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
             lib project: ':wpinet', library: 'wpinet', linkage: 'shared'
             lib project: ':wpimath', library: 'wpimath', linkage: 'shared'
 
             if (it.component.name == "${nativeName}Dev") {
-                lib project: ':ntcore', library: 'ntcoreJNIShared', linkage: 'shared'
+                project(':ntcore').addNtcoreJniDependency(it)
                 lib project: ':wpinet', library: 'wpinetJNIShared', linkage: 'shared'
                 lib project: ':wpiutil', library: 'wpiutilJNIShared', linkage: 'shared'
                 project(':hal').addHalJniDependency(it)

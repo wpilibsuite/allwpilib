@@ -195,11 +195,24 @@ class IterativeRobotBase : public RobotBase {
 
   /**
    * Enables or disables flushing NetworkTables every loop iteration.
-   * By default, this is disabled.
+   * By default, this is enabled.
    *
    * @param enabled True to enable, false to disable
    */
   void SetNetworkTablesFlushEnabled(bool enabled);
+
+  /**
+   * Sets whether LiveWindow operation is enabled during test mode.
+   *
+   * @param testLW True to enable, false to disable. Defaults to true.
+   * @throws if called in test mode.
+   */
+  void EnableLiveWindowInTest(bool testLW);
+
+  /**
+   * Whether LiveWindow operation is enabled during test mode.
+   */
+  bool IsLiveWindowEnabledInTest();
 
   /**
    * Gets time period between calls to Periodic() functions.
@@ -227,7 +240,8 @@ class IterativeRobotBase : public RobotBase {
   Mode m_lastMode = Mode::kNone;
   units::second_t m_period;
   Watchdog m_watchdog;
-  bool m_ntFlushEnabled = false;
+  bool m_ntFlushEnabled = true;
+  bool m_lwEnabledInTest = true;
 
   void PrintLoopOverrunMessage();
 };

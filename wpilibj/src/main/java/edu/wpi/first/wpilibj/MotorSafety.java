@@ -29,6 +29,7 @@ public abstract class MotorSafety {
   public MotorSafety() {
     synchronized (m_listMutex) {
       m_instanceList.add(this);
+      // TODO Threads
     }
   }
 
@@ -95,7 +96,10 @@ public abstract class MotorSafety {
     }
 
     if (stopTime < Timer.getFPGATimestamp()) {
-      DriverStation.reportError(getDescription() + "... Output not updated often enough.", false);
+      DriverStation.reportError(
+          getDescription()
+              + "... Output not updated often enough. See https://docs.wpilib.org/motorsafety for more information.",
+          false);
 
       stopMotor();
     }

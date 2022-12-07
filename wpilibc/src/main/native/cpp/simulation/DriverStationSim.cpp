@@ -7,6 +7,7 @@
 #include <memory>
 #include <utility>
 
+#include <hal/DriverStation.h>
 #include <hal/simulation/DriverStationData.h>
 #include <hal/simulation/MockHooks.h>
 
@@ -154,8 +155,12 @@ void DriverStationSim::SetMatchTime(double matchTime) {
 }
 
 void DriverStationSim::NotifyNewData() {
+  wpi::Event waitEvent{true};
+  HAL_ProvideNewDataEventHandle(waitEvent.GetHandle());
   HALSIM_NotifyDriverStationNewData();
-  DriverStation::WaitForData();
+  wpi::WaitForObject(waitEvent.GetHandle());
+  HAL_RemoveNewDataEventHandle(waitEvent.GetHandle());
+  frc::DriverStation::RefreshData();
 }
 
 void DriverStationSim::SetSendError(bool shouldSend) {

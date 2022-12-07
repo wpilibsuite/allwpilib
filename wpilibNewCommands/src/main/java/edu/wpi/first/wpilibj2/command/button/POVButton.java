@@ -13,6 +13,7 @@ import edu.wpi.first.wpilibj.GenericHID;
  *
  * <p>This class is provided by the NewCommands VendorDep
  */
+@SuppressWarnings("deprecation")
 public class POVButton extends Button {
   /**
    * Creates a POV button for triggering commands.

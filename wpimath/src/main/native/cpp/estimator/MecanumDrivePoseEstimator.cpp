@@ -11,104 +11,159 @@
 
 using namespace frc;
 
+frc::MecanumDrivePoseEstimator::InterpolationRecord
+frc::MecanumDrivePoseEstimator::InterpolationRecord::Interpolate(
+    MecanumDriveKinematics& kinematics, InterpolationRecord endValue,
+    double i) const {
+  if (i < 0) {
+    return *this;
+  } else if (i > 1) {
+    return endValue;
+  } else {
+    // Find the new wheel distance measurements.
+    MecanumDriveWheelPositions wheels_lerp{
+        wpi::Lerp(this->wheelPositions.frontLeft,
+                  endValue.wheelPositions.frontLeft, i),
+        wpi::Lerp(this->wheelPositions.frontRight,
+                  endValue.wheelPositions.frontRight, i),
+        wpi::Lerp(this->wheelPositions.rearLeft,
+                  endValue.wheelPositions.rearLeft, i),
+        wpi::Lerp(this->wheelPositions.rearRight,
+                  endValue.wheelPositions.rearRight, i)};
+
+    // Find the distance between this measurement and the
+    // interpolated measurement.
+    MecanumDriveWheelPositions wheels_delta{
+        wheels_lerp.frontLeft - this->wheelPositions.frontLeft,
+        wheels_lerp.frontRight - this->wheelPositions.frontRight,
+        wheels_lerp.rearLeft - this->wheelPositions.rearLeft,
+        wheels_lerp.rearRight - this->wheelPositions.rearRight};
+
+    // Find the new gyro angle.
+    auto gyro = wpi::Lerp(this->gyroAngle, endValue.gyroAngle, i);
+
+    // Create a twist to represent this changed based on the interpolated
+    // sensor inputs.
+    auto twist = kinematics.ToTwist2d(wheels_delta);
+    twist.dtheta = (gyro - gyroAngle).Radians();
+
+    return {pose.Exp(twist), gyro, wheels_lerp};
+  }
+}
+
 frc::MecanumDrivePoseEstimator::MecanumDrivePoseEstimator(
-    const Rotation2d& gyroAngle, const Pose2d& initialPose,
-    MecanumDriveKinematics kinematics,
+    MecanumDriveKinematics& kinematics, const Rotation2d& gyroAngle,
+    const MecanumDriveWheelPositions& wheelPositions, const Pose2d& initialPose)
+    : MecanumDrivePoseEstimator{kinematics,      gyroAngle,
+                                wheelPositions,  initialPose,
+                                {0.1, 0.1, 0.1}, {0.45, 0.45, 0.45}} {}
+
+frc::MecanumDrivePoseEstimator::MecanumDrivePoseEstimator(
+    MecanumDriveKinematics& kinematics, const Rotation2d& gyroAngle,
+    const MecanumDriveWheelPositions& wheelPositions, const Pose2d& initialPose,
     const wpi::array<double, 3>& stateStdDevs,
-    const wpi::array<double, 1>& localMeasurementStdDevs,
-    const wpi::array<double, 3>& visionMeasurementStdDevs,
-    units::second_t nominalDt)
-    : m_observer([](const Vectord<3>& x, const Vectord<3>& u) { return u; },
-                 [](const Vectord<3>& x, const Vectord<3>& u) {
-                   return x.block<1, 1>(2, 0);
-                 },
-                 stateStdDevs, localMeasurementStdDevs, frc::AngleMean<3, 3>(2),
-                 frc::AngleMean<1, 3>(0), frc::AngleResidual<3>(2),
-                 frc::AngleResidual<1>(0), frc::AngleAdd<3>(2), nominalDt),
-      m_kinematics(kinematics),
-      m_nominalDt(nominalDt) {
+    const wpi::array<double, 3>& visionMeasurementStdDevs)
+    : m_kinematics{kinematics},
+      m_odometry{kinematics, gyroAngle, wheelPositions, initialPose} {
+  for (size_t i = 0; i < 3; ++i) {
+    m_q[i] = stateStdDevs[i] * stateStdDevs[i];
+  }
+
   SetVisionMeasurementStdDevs(visionMeasurementStdDevs);
-
-  // Create vision correction mechanism.
-  m_visionCorrect = [&](const Vectord<3>& u, const Vectord<3>& y) {
-    m_observer.Correct<3>(
-        u, y, [](const Vectord<3>& x, const Vectord<3>&) { return x; },
-        m_visionContR, frc::AngleMean<3, 3>(2), frc::AngleResidual<3>(2),
-        frc::AngleResidual<3>(2), frc::AngleAdd<3>(2));
-  };
-
-  // Set initial state.
-  m_observer.SetXhat(PoseTo3dVector(initialPose));
-
-  // Calculate offsets.
-  m_gyroOffset = initialPose.Rotation() - gyroAngle;
-  m_previousAngle = initialPose.Rotation();
 }
 
 void frc::MecanumDrivePoseEstimator::SetVisionMeasurementStdDevs(
-    const wpi::array<double, 3>& visionMeasurmentStdDevs) {
-  // Create R (covariances) for vision measurements.
-  m_visionContR = frc::MakeCovMatrix(visionMeasurmentStdDevs);
+    const wpi::array<double, 3>& visionMeasurementStdDevs) {
+  wpi::array<double, 3> r{wpi::empty_array};
+  for (size_t i = 0; i < 3; ++i) {
+    r[i] = visionMeasurementStdDevs[i] * visionMeasurementStdDevs[i];
+  }
+
+  // Solve for closed form Kalman gain for continuous Kalman filter with A = 0
+  // and C = I. See wpimath/algorithms.md.
+  for (size_t row = 0; row < 3; ++row) {
+    if (m_q[row] == 0.0) {
+      m_visionK(row, row) = 0.0;
+    } else {
+      m_visionK(row, row) =
+          m_q[row] / (m_q[row] + std::sqrt(m_q[row] * r[row]));
+    }
+  }
 }
 
 void frc::MecanumDrivePoseEstimator::ResetPosition(
-    const Pose2d& pose, const Rotation2d& gyroAngle) {
+    const Rotation2d& gyroAngle,
+    const MecanumDriveWheelPositions& wheelPositions, const Pose2d& pose) {
   // Reset state estimate and error covariance
-  m_observer.Reset();
+  m_odometry.ResetPosition(gyroAngle, wheelPositions, pose);
   m_poseBuffer.Clear();
-
-  m_observer.SetXhat(PoseTo3dVector(pose));
-
-  m_prevTime = -1_s;
-
-  m_gyroOffset = pose.Rotation() - gyroAngle;
-  m_previousAngle = pose.Rotation();
 }
 
 Pose2d frc::MecanumDrivePoseEstimator::GetEstimatedPosition() const {
-  return Pose2d(m_observer.Xhat(0) * 1_m, m_observer.Xhat(1) * 1_m,
-                Rotation2d(units::radian_t{m_observer.Xhat(2)}));
+  return m_odometry.GetPose();
 }
 
 void frc::MecanumDrivePoseEstimator::AddVisionMeasurement(
     const Pose2d& visionRobotPose, units::second_t timestamp) {
-  if (auto sample = m_poseBuffer.Sample(timestamp)) {
-    m_visionCorrect(Vectord<3>::Zero(),
-                    PoseTo3dVector(GetEstimatedPosition().TransformBy(
-                        visionRobotPose - sample.value())));
+  // Step 1: Get the estimated pose from when the vision measurement was made.
+  auto sample = m_poseBuffer.Sample(timestamp);
+
+  if (!sample.has_value()) {
+    return;
+  }
+
+  // Step 2: Measure the twist between the odometry pose and the vision pose
+  auto twist = sample.value().pose.Log(visionRobotPose);
+
+  // Step 3: We should not trust the twist entirely, so instead we scale this
+  // twist by a Kalman gain matrix representing how much we trust vision
+  // measurements compared to our current pose.
+  frc::Vectord<3> k_times_twist =
+      m_visionK *
+      frc::Vectord<3>{twist.dx.value(), twist.dy.value(), twist.dtheta.value()};
+
+  // Step 4: Convert back to Twist2d
+  Twist2d scaledTwist{units::meter_t{k_times_twist(0)},
+                      units::meter_t{k_times_twist(1)},
+                      units::radian_t{k_times_twist(2)}};
+
+  // Step 5: Reset Odometry to state at sample with vision adjustment.
+  m_odometry.ResetPosition(sample.value().gyroAngle,
+                           sample.value().wheelPositions,
+                           sample.value().pose.Exp(scaledTwist));
+
+  // Step 6: Replay odometry inputs between sample time and latest recorded
+  // sample to update the pose buffer and correct odometry.
+  auto internal_buf = m_poseBuffer.GetInternalBuffer();
+
+  auto upper_bound =
+      std::lower_bound(internal_buf.begin(), internal_buf.end(), timestamp,
+                       [](const auto& pair, auto t) { return t > pair.first; });
+
+  for (auto entry = upper_bound; entry != internal_buf.end(); entry++) {
+    UpdateWithTime(entry->first, entry->second.gyroAngle,
+                   entry->second.wheelPositions);
   }
 }
 
 Pose2d frc::MecanumDrivePoseEstimator::Update(
-    const Rotation2d& gyroAngle, const MecanumDriveWheelSpeeds& wheelSpeeds) {
+    const Rotation2d& gyroAngle,
+    const MecanumDriveWheelPositions& wheelPositions) {
   return UpdateWithTime(units::microsecond_t(wpi::Now()), gyroAngle,
-                        wheelSpeeds);
+                        wheelPositions);
 }
 
 Pose2d frc::MecanumDrivePoseEstimator::UpdateWithTime(
     units::second_t currentTime, const Rotation2d& gyroAngle,
-    const MecanumDriveWheelSpeeds& wheelSpeeds) {
-  auto dt = m_prevTime >= 0_s ? currentTime - m_prevTime : m_nominalDt;
-  m_prevTime = currentTime;
+    const MecanumDriveWheelPositions& wheelPositions) {
+  m_odometry.Update(gyroAngle, wheelPositions);
 
-  auto angle = gyroAngle + m_gyroOffset;
-  auto omega = (angle - m_previousAngle).Radians() / dt;
+  MecanumDriveWheelPositions internalWheelPositions{
+      wheelPositions.frontLeft, wheelPositions.frontRight,
+      wheelPositions.rearLeft, wheelPositions.rearRight};
 
-  auto chassisSpeeds = m_kinematics.ToChassisSpeeds(wheelSpeeds);
-  auto fieldRelativeVelocities =
-      Translation2d(chassisSpeeds.vx * 1_s, chassisSpeeds.vy * 1_s)
-          .RotateBy(angle);
-
-  Vectord<3> u{fieldRelativeVelocities.X().value(),
-               fieldRelativeVelocities.Y().value(), omega.value()};
-
-  Vectord<1> localY{angle.Radians().value()};
-  m_previousAngle = angle;
-
-  m_poseBuffer.AddSample(currentTime, GetEstimatedPosition());
-
-  m_observer.Predict(u, dt);
-  m_observer.Correct(u, localY);
+  m_poseBuffer.AddSample(
+      currentTime, {GetEstimatedPosition(), gyroAngle, internalWheelPositions});
 
   return GetEstimatedPosition();
 }

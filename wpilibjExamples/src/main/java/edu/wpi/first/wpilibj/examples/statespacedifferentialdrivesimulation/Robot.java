@@ -26,10 +26,6 @@ public class Robot extends TimedRobot {
     // Instantiate our RobotContainer.  This will perform all our button bindings, and put our
     // autonomous chooser on the dashboard.
     m_robotContainer = new RobotContainer();
-
-    // Flush NetworkTables every loop. This ensures that robot pose and other values
-    // are sent during every loop iteration.
-    setNetworkTablesFlushEnabled(true);
   }
 
   @Override

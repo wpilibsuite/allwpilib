@@ -21,7 +21,6 @@ public final class RobotController {
    *
    * @return FPGA Version number.
    */
-  @SuppressWarnings("AbbreviationAsWordInName")
   public static int getFPGAVersion() {
     return HALUtil.getFPGAVersion();
   }
@@ -33,7 +32,6 @@ public final class RobotController {
    *
    * @return FPGA Revision number.
    */
-  @SuppressWarnings("AbbreviationAsWordInName")
   public static long getFPGARevision() {
     return (long) HALUtil.getFPGARevision();
   }

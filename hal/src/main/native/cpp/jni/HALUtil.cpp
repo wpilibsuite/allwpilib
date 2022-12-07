@@ -52,6 +52,7 @@ static JClass canStatusCls;
 static JClass matchInfoDataCls;
 static JClass accumulatorResultCls;
 static JClass canDataCls;
+static JClass canStreamMessageCls;
 static JClass halValueCls;
 static JClass baseStoreCls;
 static JClass revPHVersionCls;
@@ -64,6 +65,7 @@ static const JClassInit classes[] = {
     {"edu/wpi/first/hal/MatchInfoData", &matchInfoDataCls},
     {"edu/wpi/first/hal/AccumulatorResult", &accumulatorResultCls},
     {"edu/wpi/first/hal/CANData", &canDataCls},
+    {"edu/wpi/first/hal/CANStreamMessage", &canStreamMessageCls},
     {"edu/wpi/first/hal/HALValue", &halValueCls},
     {"edu/wpi/first/hal/DMAJNISample$BaseStore", &baseStoreCls},
     {"edu/wpi/first/hal/REVPHVersion", &revPHVersionCls}};
@@ -300,6 +302,18 @@ jbyteArray SetCANDataObject(JNIEnv* env, jobject canData, int32_t length,
 
   jbyteArray retVal = static_cast<jbyteArray>(env->CallObjectMethod(
       canData, func, static_cast<jint>(length), static_cast<jlong>(timestamp)));
+  return retVal;
+}
+
+jbyteArray SetCANStreamObject(JNIEnv* env, jobject canStreamData,
+                              int32_t length, uint32_t messageID,
+                              uint64_t timestamp) {
+  static jmethodID func =
+      env->GetMethodID(canStreamMessageCls, "setStreamData", "(IIJ)[B");
+
+  jbyteArray retVal = static_cast<jbyteArray>(env->CallObjectMethod(
+      canStreamData, func, static_cast<jint>(length),
+      static_cast<jint>(messageID), static_cast<jlong>(timestamp)));
   return retVal;
 }
 

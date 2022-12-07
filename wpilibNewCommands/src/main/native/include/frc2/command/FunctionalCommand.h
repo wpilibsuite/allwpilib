@@ -6,8 +6,7 @@
 
 #include <functional>
 #include <initializer_list>
-
-#include <wpi/span.h>
+#include <span>
 
 #include "frc2/command/CommandBase.h"
 #include "frc2/command/CommandHelper.h"
@@ -54,7 +53,7 @@ class FunctionalCommand : public CommandHelper<CommandBase, FunctionalCommand> {
                     std::function<void()> onExecute,
                     std::function<void(bool)> onEnd,
                     std::function<bool()> isFinished,
-                    wpi::span<Subsystem* const> requirements = {});
+                    std::span<Subsystem* const> requirements = {});
 
   FunctionalCommand(FunctionalCommand&& other) = default;
 

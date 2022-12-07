@@ -54,6 +54,8 @@ public class WPIUtilJNI {
     libraryLoaded = true;
   }
 
+  public static native void writeStderr(String str);
+
   public static native void enableMockTime();
 
   public static native void disableMockTime();

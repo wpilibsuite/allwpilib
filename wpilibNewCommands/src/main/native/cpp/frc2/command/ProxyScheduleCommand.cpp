@@ -7,7 +7,7 @@
 using namespace frc2;
 
 ProxyScheduleCommand::ProxyScheduleCommand(
-    wpi::span<Command* const> toSchedule) {
+    std::span<Command* const> toSchedule) {
   SetInsert(m_toSchedule, toSchedule);
 }
 

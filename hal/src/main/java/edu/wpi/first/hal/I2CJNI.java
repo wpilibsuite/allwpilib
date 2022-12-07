@@ -6,7 +6,6 @@ package edu.wpi.first.hal;
 
 import java.nio.ByteBuffer;
 
-@SuppressWarnings("AbbreviationAsWordInName")
 public class I2CJNI extends JNIWrapper {
   public static native void i2CInitialize(int port);
 

@@ -29,16 +29,13 @@ import java.util.function.Function;
  * <p>For more on the underlying math, read
  * https://file.tavsys.net/control/controls-engineering-in-frc.pdf.
  */
-@SuppressWarnings({"ParameterName", "LocalVariableName", "MemberName", "ClassTypeParameterName"})
 public class ControlAffinePlantInversionFeedforward<States extends Num, Inputs extends Num> {
   /** The current reference state. */
-  @SuppressWarnings("MemberName")
   private Matrix<States, N1> m_r;
 
   /** The computed feedforward. */
   private Matrix<Inputs, N1> m_uff;
 
-  @SuppressWarnings("MemberName")
   private final Matrix<States, Inputs> m_B;
 
   private final Nat<Inputs> m_inputs;
@@ -181,7 +178,6 @@ public class ControlAffinePlantInversionFeedforward<States extends Num, Inputs e
    * @param nextR The reference state of the future timestep (k + dt).
    * @return The calculated feedforward.
    */
-  @SuppressWarnings({"ParameterName", "LocalVariableName"})
   public Matrix<Inputs, N1> calculate(Matrix<States, N1> r, Matrix<States, N1> nextR) {
     var rDot = (nextR.minus(r)).div(m_dt);
 

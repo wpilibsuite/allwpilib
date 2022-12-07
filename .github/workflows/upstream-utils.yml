@@ -13,7 +13,7 @@ concurrency:
 jobs:
   update:
     name: "Update"
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v3
       - name: Fetch all history and metadata
@@ -22,7 +22,7 @@ jobs:
           git checkout -b pr
           git branch -f main origin/main
       - name: Set up Python 3.9
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v4
         with:
           python-version: 3.9
       - name: Configure committer identity
@@ -49,10 +49,18 @@ jobs:
         run: |
           cd upstream_utils
           ./update_llvm.py
+      - name: Run update_mpack.py
+        run: |
+          cd upstream_utils
+          ./update_mpack.py
       - name: Run update_stack_walker.py
         run: |
           cd upstream_utils
           ./update_stack_walker.py
+      - name: Run update_memory.py
+        run: |
+          cd upstream_utils
+          ./update_memory.py
       - name: Add untracked files to index so they count as changes
         run: git add -A
       - name: Check output

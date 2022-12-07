@@ -38,3 +38,15 @@ TEST_F(SlewRateLimiterTest, SlewRateNoLimit) {
 
   EXPECT_EQ(limiter.Calculate(0.5_m), 0.5_m);
 }
+
+TEST_F(SlewRateLimiterTest, SlewRatePositveNegativeLimit) {
+  frc::SlewRateLimiter<units::meters> limiter(1_mps, -0.5_mps);
+
+  now += 1_s;
+
+  EXPECT_EQ(limiter.Calculate(2_m), 1_m);
+
+  now += 1_s;
+
+  EXPECT_EQ(limiter.Calculate(0_m), 0.5_m);
+}

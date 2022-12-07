@@ -5,12 +5,12 @@
 #ifndef WPINET_UDPCLIENT_H_
 #define WPINET_UDPCLIENT_H_
 
+#include <span>
 #include <string>
 #include <string_view>
 
 #include <wpi/SmallVector.h>
 #include <wpi/mutex.h>
-#include <wpi/span.h>
 
 namespace wpi {
 
@@ -36,7 +36,7 @@ class UDPClient {
   int start(int port);
   void shutdown();
   // The passed in address MUST be a resolved IP address.
-  int send(span<const uint8_t> data, std::string_view server, int port);
+  int send(std::span<const uint8_t> data, std::string_view server, int port);
   int send(std::string_view data, std::string_view server, int port);
   int receive(uint8_t* data_received, int receive_len);
   int receive(uint8_t* data_received, int receive_len,

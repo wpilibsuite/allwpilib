@@ -8,10 +8,12 @@
 #include <string_view>
 #include <vector>
 
-#include <ntcore_cpp.h>
+#include <networktables/BooleanTopic.h>
+#include <networktables/DoubleTopic.h>
+#include <networktables/NetworkTableInstance.h>
+#include <networktables/StringTopic.h>
 
 #include "glass/DataSource.h"
-#include "glass/networktables/NetworkTablesHelper.h"
 #include "glass/other/Drive.h"
 
 namespace glass {
@@ -20,7 +22,7 @@ class NTMecanumDriveModel : public DriveModel {
   static constexpr const char* kType = "MecanumDrive";
 
   explicit NTMecanumDriveModel(std::string_view path);
-  NTMecanumDriveModel(NT_Inst instance, std::string_view path);
+  NTMecanumDriveModel(nt::NetworkTableInstance inst, std::string_view path);
 
   const char* GetName() const override { return m_nameValue.c_str(); }
   const std::vector<DriveModel::WheelInfo>& GetWheels() const override {
@@ -35,13 +37,13 @@ class NTMecanumDriveModel : public DriveModel {
   bool IsReadOnly() override { return !m_controllableValue; }
 
  private:
-  NetworkTablesHelper m_nt;
-  NT_Entry m_name;
-  NT_Entry m_controllable;
-  NT_Entry m_flPercent;
-  NT_Entry m_frPercent;
-  NT_Entry m_rlPercent;
-  NT_Entry m_rrPercent;
+  nt::NetworkTableInstance m_inst;
+  nt::StringSubscriber m_name;
+  nt::BooleanSubscriber m_controllable;
+  nt::DoubleEntry m_flPercent;
+  nt::DoubleEntry m_frPercent;
+  nt::DoubleEntry m_rlPercent;
+  nt::DoubleEntry m_rrPercent;
 
   std::string m_nameValue;
   bool m_controllableValue = false;

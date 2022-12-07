@@ -2,6 +2,8 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
+#include <numbers>
+
 #include <frc/Encoder.h>
 #include <frc/TimedRobot.h>
 #include <frc/XboxController.h>
@@ -17,7 +19,6 @@
 #include <units/length.h>
 #include <units/mass.h>
 #include <units/velocity.h>
-#include <wpi/numbers>
 
 /**
  * This is a sample program to demonstrate how to use a state-space controller
@@ -90,7 +91,7 @@ class Robot : public frc::TimedRobot {
  public:
   void RobotInit() override {
     // Circumference = pi * d, so distance per click = pi * d / counts
-    m_encoder.SetDistancePerPulse(2.0 * wpi::numbers::pi * kDrumRadius.value() /
+    m_encoder.SetDistancePerPulse(2.0 * std::numbers::pi * kDrumRadius.value() /
                                   4096.0);
   }
 
@@ -98,8 +99,8 @@ class Robot : public frc::TimedRobot {
     // Reset our loop to make sure it's in a known state.
     m_loop.Reset(frc::Vectord<2>{m_encoder.GetDistance(), m_encoder.GetRate()});
 
-    m_lastProfiledReference = {units::meter_t(m_encoder.GetDistance()),
-                               units::meters_per_second_t(m_encoder.GetRate())};
+    m_lastProfiledReference = {units::meter_t{m_encoder.GetDistance()},
+                               units::meters_per_second_t{m_encoder.GetRate()}};
   }
 
   void TeleopPeriodic() override {
@@ -131,7 +132,7 @@ class Robot : public frc::TimedRobot {
     // Send the new calculated voltage to the motors.
     // voltage = duty cycle * battery voltage, so
     // duty cycle = voltage / battery voltage
-    m_motor.SetVoltage(units::volt_t(m_loop.U(0)));
+    m_motor.SetVoltage(units::volt_t{m_loop.U(0)});
   }
 };
 

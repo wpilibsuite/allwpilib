@@ -9,25 +9,17 @@
 #include <utility>
 
 #include "frc2/command/CommandBase.h"
-#include "frc2/command/CommandGroupBase.h"
 #include "frc2/command/CommandHelper.h"
 
 namespace frc2 {
 /**
- * Runs one of two commands, depending on the value of the given condition when
- * this command is initialized.  Does not actually schedule the selected command
- * - rather, the command is run through this command; this ensures that the
- * command will behave as expected if used as part of a CommandGroup.  Requires
- * the requirements of both commands, again to ensure proper functioning when
- * used in a CommandGroup.  If this is undesired, consider using
- * ScheduleCommand.
+ * A command composition that runs one of two commands, depending on the value
+ * of the given condition when this command is initialized.
  *
- * <p>As this command contains multiple component commands within it, it is
- * technically a command group; the command instances that are passed to it
- * cannot be added to any other groups, or scheduled individually.
- *
- * <p>As a rule, CommandGroups require the union of the requirements of their
- * component commands.
+ * <p>The rules for command compositions apply: command instances that are
+ * passed to it are owned by the composition and cannot be added to any other
+ * composition or scheduled individually, and the composition requires all
+ * subsystems its components require.
  *
  * This class is provided by the NewCommands VendorDep
  *

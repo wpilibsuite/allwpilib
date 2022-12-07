@@ -19,23 +19,22 @@ struct NT_String* NT_GetStringForTesting(const char* string, int* struct_size) {
   return str;
 }
 
-struct NT_EntryInfo* NT_GetEntryInfoForTesting(const char* name,
+struct NT_TopicInfo* NT_GetTopicInfoForTesting(const char* name,
                                                enum NT_Type type,
-                                               unsigned int flags,
-                                               uint64_t last_change,
+                                               const char* type_str,
                                                int* struct_size) {
-  struct NT_EntryInfo* entry_info =
-      static_cast<NT_EntryInfo*>(wpi::safe_calloc(1, sizeof(NT_EntryInfo)));
-  nt::ConvertToC(name, &entry_info->name);
-  entry_info->type = type;
-  entry_info->flags = flags;
-  entry_info->last_change = last_change;
-  *struct_size = sizeof(NT_EntryInfo);
-  return entry_info;
+  struct NT_TopicInfo* topic_info =
+      static_cast<NT_TopicInfo*>(wpi::safe_calloc(1, sizeof(NT_TopicInfo)));
+  nt::ConvertToC(name, &topic_info->name);
+  topic_info->type = type;
+  nt::ConvertToC(type_str, &topic_info->type_str);
+  *struct_size = sizeof(NT_TopicInfo);
+  return topic_info;
 }
 
-void NT_FreeEntryInfoForTesting(struct NT_EntryInfo* info) {
+void NT_FreeTopicInfoForTesting(struct NT_TopicInfo* info) {
   std::free(info->name.str);
+  std::free(info->type_str.str);
   std::free(info);
 }
 
@@ -158,88 +157,4 @@ struct NT_Value* NT_GetValueStringArrayForTesting(uint64_t last_change,
 }
 // No need for free as one already exists in the main library
 
-static void CopyNtValue(const struct NT_Value* copy_from,
-                        struct NT_Value* copy_to) {
-  auto cpp_value = nt::ConvertFromC(*copy_from);
-  nt::ConvertToC(*cpp_value, copy_to);
-}
-
-static void CopyNtString(const struct NT_String* copy_from,
-                         struct NT_String* copy_to) {
-  nt::ConvertToC({copy_from->str, copy_from->len}, copy_to);
-}
-
-struct NT_RpcParamDef* NT_GetRpcParamDefForTesting(const char* name,
-                                                   const struct NT_Value* val,
-                                                   int* struct_size) {
-  struct NT_RpcParamDef* def =
-      static_cast<NT_RpcParamDef*>(wpi::safe_calloc(1, sizeof(NT_RpcParamDef)));
-  nt::ConvertToC(name, &def->name);
-  CopyNtValue(val, &def->def_value);
-  *struct_size = sizeof(NT_RpcParamDef);
-  return def;
-}
-
-void NT_FreeRpcParamDefForTesting(struct NT_RpcParamDef* def) {
-  NT_DisposeValue(&def->def_value);
-  NT_DisposeString(&def->name);
-  std::free(def);
-}
-
-struct NT_RpcResultDef* NT_GetRpcResultsDefForTesting(const char* name,
-                                                      enum NT_Type type,
-                                                      int* struct_size) {
-  struct NT_RpcResultDef* def = static_cast<NT_RpcResultDef*>(
-      wpi::safe_calloc(1, sizeof(NT_RpcResultDef)));
-  nt::ConvertToC(name, &def->name);
-  def->type = type;
-  *struct_size = sizeof(NT_RpcResultDef);
-  return def;
-}
-
-void NT_FreeRpcResultsDefForTesting(struct NT_RpcResultDef* def) {
-  NT_DisposeString(&def->name);
-  std::free(def);
-}
-
-struct NT_RpcDefinition* NT_GetRpcDefinitionForTesting(
-    unsigned int version, const char* name, size_t num_params,
-    const struct NT_RpcParamDef* params, size_t num_results,
-    const struct NT_RpcResultDef* results, int* struct_size) {
-  struct NT_RpcDefinition* def = static_cast<NT_RpcDefinition*>(
-      wpi::safe_calloc(1, sizeof(NT_RpcDefinition)));
-  def->version = version;
-  nt::ConvertToC(name, &def->name);
-  def->num_params = num_params;
-  def->params = static_cast<NT_RpcParamDef*>(
-      wpi::safe_malloc(num_params * sizeof(NT_RpcParamDef)));
-  for (size_t i = 0; i < num_params; ++i) {
-    CopyNtString(&params[i].name, &def->params[i].name);
-    CopyNtValue(&params[i].def_value, &def->params[i].def_value);
-  }
-  def->num_results = num_results;
-  def->results = static_cast<NT_RpcResultDef*>(
-      wpi::safe_malloc(num_results * sizeof(NT_RpcResultDef)));
-  for (size_t i = 0; i < num_results; ++i) {
-    CopyNtString(&results[i].name, &def->results[i].name);
-    def->results[i].type = results[i].type;
-  }
-  *struct_size = sizeof(NT_RpcDefinition);
-  return def;
-}
-// No need for free as one already exists in the main library
-
-struct NT_RpcAnswer* NT_GetRpcAnswerForTesting(
-    unsigned int rpc_id, unsigned int call_uid, const char* name,
-    const char* params, size_t params_len, int* struct_size) {
-  struct NT_RpcAnswer* info =
-      static_cast<NT_RpcAnswer*>(wpi::safe_calloc(1, sizeof(NT_RpcAnswer)));
-  info->entry = rpc_id;
-  info->call = call_uid;
-  nt::ConvertToC(name, &info->name);
-  nt::ConvertToC({params, params_len}, &info->params);
-  *struct_size = sizeof(NT_RpcAnswer);
-  return info;
-}
-// No need for free as one already exists in the main library
 }  // extern "C"

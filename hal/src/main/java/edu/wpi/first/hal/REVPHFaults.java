@@ -4,72 +4,50 @@
 
 package edu.wpi.first.hal;
 
-@SuppressWarnings("AbbreviationAsWordInName")
+@SuppressWarnings("MemberName")
 public class REVPHFaults {
-  @SuppressWarnings("MemberName")
   public final boolean Channel0Fault;
 
-  @SuppressWarnings("MemberName")
   public final boolean Channel1Fault;
 
-  @SuppressWarnings("MemberName")
   public final boolean Channel2Fault;
 
-  @SuppressWarnings("MemberName")
   public final boolean Channel3Fault;
 
-  @SuppressWarnings("MemberName")
   public final boolean Channel4Fault;
 
-  @SuppressWarnings("MemberName")
   public final boolean Channel5Fault;
 
-  @SuppressWarnings("MemberName")
   public final boolean Channel6Fault;
 
-  @SuppressWarnings("MemberName")
   public final boolean Channel7Fault;
 
-  @SuppressWarnings("MemberName")
   public final boolean Channel8Fault;
 
-  @SuppressWarnings("MemberName")
   public final boolean Channel9Fault;
 
-  @SuppressWarnings("MemberName")
   public final boolean Channel10Fault;
 
-  @SuppressWarnings("MemberName")
   public final boolean Channel11Fault;
 
-  @SuppressWarnings("MemberName")
   public final boolean Channel12Fault;
 
-  @SuppressWarnings("MemberName")
   public final boolean Channel13Fault;
 
-  @SuppressWarnings("MemberName")
   public final boolean Channel14Fault;
 
-  @SuppressWarnings("MemberName")
   public final boolean Channel15Fault;
 
-  @SuppressWarnings("MemberName")
   public final boolean CompressorOverCurrent;
 
-  @SuppressWarnings("MemberName")
   public final boolean CompressorOpen;
 
-  @SuppressWarnings("MemberName")
   public final boolean SolenoidOverCurrent;
 
-  @SuppressWarnings("MemberName")
   public final boolean Brownout;
 
-  @SuppressWarnings("MemberName")
   public final boolean CanWarning;
 
-  @SuppressWarnings("MemberName")
   public final boolean HardwareFault;
 
   /**

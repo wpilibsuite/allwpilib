@@ -104,8 +104,8 @@ namespace {
 template <typename MB>
 class MemoryBufferMem : public MB {
  public:
-  explicit MemoryBufferMem(span<const uint8_t> inputData) {
-    MemoryBuffer::Init(inputData.begin(), inputData.end());
+  explicit MemoryBufferMem(std::span<const uint8_t> inputData) {
+    MemoryBuffer::Init(&*inputData.begin(), &*inputData.end());
   }
 
   /// Disable sized deallocation for MemoryBufferMem, because it has
@@ -129,7 +129,7 @@ static std::unique_ptr<MB> GetFileAux(std::string_view filename,
                                       uint64_t mapSize, uint64_t offset);
 
 std::unique_ptr<MemoryBuffer> MemoryBuffer::GetMemBuffer(
-    span<const uint8_t> inputData, std::string_view bufferName) {
+    std::span<const uint8_t> inputData, std::string_view bufferName) {
   auto* ret = new (NamedBufferAlloc(bufferName))
       MemoryBufferMem<MemoryBuffer>(inputData);
   return std::unique_ptr<MemoryBuffer>(ret);
@@ -141,7 +141,7 @@ std::unique_ptr<MemoryBuffer> MemoryBuffer::GetMemBuffer(MemoryBufferRef ref) {
 }
 
 static std::unique_ptr<WritableMemoryBuffer> GetMemBufferCopyImpl(
-    span<const uint8_t> inputData, std::string_view bufferName,
+    std::span<const uint8_t> inputData, std::string_view bufferName,
     std::error_code& ec) {
   auto buf =
       WritableMemoryBuffer::GetNewUninitMemBuffer(inputData.size(), bufferName);
@@ -154,7 +154,7 @@ static std::unique_ptr<WritableMemoryBuffer> GetMemBufferCopyImpl(
 }
 
 std::unique_ptr<MemoryBuffer> MemoryBuffer::GetMemBufferCopy(
-    span<const uint8_t> inputData, std::string_view bufferName) {
+    std::span<const uint8_t> inputData, std::string_view bufferName) {
   std::error_code ec;
   return GetMemBufferCopyImpl(inputData, bufferName, ec);
 }

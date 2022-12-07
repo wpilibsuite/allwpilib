@@ -6,10 +6,9 @@
 
 #include <stdint.h>
 
+#include <span>
 #include <string>
 #include <string_view>
-
-#include <wpi/span.h>
 
 #include "cscore.h"
 #include "cscore_cv.h"
@@ -110,7 +109,7 @@ class CameraServer {
    *
    * @param hosts Array of Camera host IPs/DNS names
    */
-  static cs::AxisCamera AddAxisCamera(wpi::span<const std::string> hosts);
+  static cs::AxisCamera AddAxisCamera(std::span<const std::string> hosts);
 
   /**
    * Adds an Axis IP camera.
@@ -155,7 +154,7 @@ class CameraServer {
    * @param hosts Array of Camera host IPs/DNS names
    */
   static cs::AxisCamera AddAxisCamera(std::string_view name,
-                                      wpi::span<const std::string> hosts);
+                                      std::span<const std::string> hosts);
 
   /**
    * Adds an Axis IP camera.

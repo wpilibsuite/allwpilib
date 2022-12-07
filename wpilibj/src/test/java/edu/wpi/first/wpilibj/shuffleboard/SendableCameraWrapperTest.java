@@ -8,20 +8,22 @@ import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import edu.wpi.first.networktables.NetworkTableInstance;
-import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 class SendableCameraWrapperTest {
+  NetworkTableInstance m_inst;
+
   @BeforeEach
   void setup() {
-    NetworkTableInstance.getDefault().deleteAllEntries();
+    m_inst = NetworkTableInstance.create();
     SendableCameraWrapper.clearWrappers();
   }
 
-  @AfterAll
-  static void tearDown() {
-    NetworkTableInstance.getDefault().deleteAllEntries();
+  @AfterEach
+  void tearDown() {
+    m_inst.close();
   }
 
   @Test

@@ -23,7 +23,7 @@ DifferentialDriveVoltageConstraint::DifferentialDriveVoltageConstraint(
 units::meters_per_second_t DifferentialDriveVoltageConstraint::MaxVelocity(
     const Pose2d& pose, units::curvature_t curvature,
     units::meters_per_second_t velocity) const {
-  return units::meters_per_second_t(std::numeric_limits<double>::max());
+  return units::meters_per_second_t{std::numeric_limits<double>::max()};
 }
 
 TrajectoryConstraint::MinMax

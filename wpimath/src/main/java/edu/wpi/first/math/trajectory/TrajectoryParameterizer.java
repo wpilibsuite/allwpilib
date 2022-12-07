@@ -294,7 +294,6 @@ public final class TrajectoryParameterizer {
     }
   }
 
-  @SuppressWarnings("MemberName")
   private static class ConstrainedState {
     PoseWithCurvature pose;
     double distanceMeters;

@@ -38,7 +38,6 @@ import org.ejml.simple.SimpleMatrix;
  * <p>This class implements a square-root-form unscented Kalman filter (SR-UKF). For more
  * information about the SR-UKF, see https://www.researchgate.net/publication/3908304.
  */
-@SuppressWarnings({"MemberName", "ClassTypeParameterName"})
 public class UnscentedKalmanFilter<States extends Num, Inputs extends Num, Outputs extends Num>
     implements KalmanTypeFilter<States, Inputs, Outputs> {
   private final Nat<States> m_states;
@@ -73,7 +72,6 @@ public class UnscentedKalmanFilter<States extends Num, Inputs extends Num, Outpu
    * @param measurementStdDevs Standard deviations of measurements.
    * @param nominalDtSeconds Nominal discretization timestep.
    */
-  @SuppressWarnings("LambdaParameterName")
   public UnscentedKalmanFilter(
       Nat<States> states,
       Nat<Outputs> outputs,
@@ -119,7 +117,6 @@ public class UnscentedKalmanFilter<States extends Num, Inputs extends Num, Outpu
    * @param addFuncX A function that adds two state vectors.
    * @param nominalDtSeconds Nominal discretization timestep.
    */
-  @SuppressWarnings("ParameterName")
   public UnscentedKalmanFilter(
       Nat<States> states,
       Nat<Outputs> outputs,
@@ -155,7 +152,6 @@ public class UnscentedKalmanFilter<States extends Num, Inputs extends Num, Outpu
     reset();
   }
 
-  @SuppressWarnings({"ParameterName", "LocalVariableName"})
   static <S extends Num, C extends Num>
       Pair<Matrix<C, N1>, Matrix<C, C>> squareRootUnscentedTransform(
           Nat<S> s,
@@ -300,7 +296,6 @@ public class UnscentedKalmanFilter<States extends Num, Inputs extends Num, Outpu
    *
    * @param xHat The state estimate x-hat.
    */
-  @SuppressWarnings("ParameterName")
   @Override
   public void setXhat(Matrix<States, N1> xHat) {
     m_xHat = xHat;
@@ -331,7 +326,6 @@ public class UnscentedKalmanFilter<States extends Num, Inputs extends Num, Outpu
    * @param u New control input from controller.
    * @param dtSeconds Timestep for prediction.
    */
-  @SuppressWarnings({"LocalVariableName", "ParameterName"})
   @Override
   public void predict(Matrix<Inputs, N1> u, double dtSeconds) {
     // Discretize Q before projecting mean and covariance forward
@@ -370,7 +364,6 @@ public class UnscentedKalmanFilter<States extends Num, Inputs extends Num, Outpu
    * @param u Same control input used in the predict step.
    * @param y Measurement vector.
    */
-  @SuppressWarnings("ParameterName")
   @Override
   public void correct(Matrix<Inputs, N1> u, Matrix<Outputs, N1> y) {
     correct(
@@ -391,7 +384,6 @@ public class UnscentedKalmanFilter<States extends Num, Inputs extends Num, Outpu
    * @param h A vector-valued function of x and u that returns the measurement vector.
    * @param R Measurement noise covariance matrix (continuous-time).
    */
-  @SuppressWarnings({"ParameterName", "LambdaParameterName", "LocalVariableName"})
   public <R extends Num> void correct(
       Nat<R> rows,
       Matrix<Inputs, N1> u,
@@ -428,7 +420,6 @@ public class UnscentedKalmanFilter<States extends Num, Inputs extends Num, Outpu
    *     subtracts them.)
    * @param addFuncX A function that adds two state vectors.
    */
-  @SuppressWarnings({"ParameterName", "LocalVariableName"})
   public <R extends Num> void correct(
       Nat<R> rows,
       Matrix<Inputs, N1> u,

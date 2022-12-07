@@ -76,9 +76,9 @@ int DigitalOutput::GetChannel() const {
   return m_channel;
 }
 
-void DigitalOutput::Pulse(double length) {
+void DigitalOutput::Pulse(units::second_t pulseLength) {
   int32_t status = 0;
-  HAL_Pulse(m_handle, length, &status);
+  HAL_Pulse(m_handle, pulseLength.to<double>(), &status);
   FRC_CheckErrorStatus(status, "Channel {}", m_channel);
 }
 
@@ -143,5 +143,6 @@ void DigitalOutput::SetSimDevice(HAL_SimDeviceHandle device) {
 void DigitalOutput::InitSendable(wpi::SendableBuilder& builder) {
   builder.SetSmartDashboardType("Digital Output");
   builder.AddBooleanProperty(
-      "Value", [=] { return Get(); }, [=](bool value) { Set(value); });
+      "Value", [=, this] { return Get(); },
+      [=, this](bool value) { Set(value); });
 }

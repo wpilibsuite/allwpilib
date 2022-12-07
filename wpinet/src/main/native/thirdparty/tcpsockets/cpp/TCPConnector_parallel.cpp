@@ -24,7 +24,7 @@ using namespace wpi;
 #endif
 
 std::unique_ptr<NetworkStream> TCPConnector::connect_parallel(
-    span<const std::pair<const char*, int>> servers, Logger& logger,
+    std::span<const std::pair<const char*, int>> servers, Logger& logger,
     int timeout) {
   if (servers.empty()) {
     return nullptr;
