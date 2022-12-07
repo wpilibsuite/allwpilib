@@ -18,7 +18,6 @@
 #include <wpi/SmallVector.h>
 #include <wpi/condition_variable.h>
 #include <wpi/mutex.h>
-#include <wpi/timestamp.h>
 
 #include "HALInitializer.h"
 #include "hal/DriverStation.h"
@@ -176,25 +175,24 @@ namespace {
 struct TcpCache {
   TcpCache() { std::memset(this, 0, sizeof(*this)); }
   void Update(uint32_t mask);
-  void CloneTo(TcpCache* other) {
-    std::memcpy(other, this, sizeof(*this));
-  }
+  void CloneTo(TcpCache* other) { std::memcpy(other, this, sizeof(*this)); }
 
   HAL_MatchInfo matchInfo;
   HAL_JoystickDescriptor descriptors[HAL_kMaxJoysticks];
 };
 static_assert(std::is_standard_layout_v<TcpCache>);
-}
+}  // namespace
 
 static std::atomic_uint32_t tcpMask{0xFFFFFFFF};
 static TcpCache tcpCache;
 static TcpCache tcpCurrent;
 static wpi::mutex tcpCacheMutex;
 
-constexpr uint32_t combinedMatchInfoMask = kTcpRecvMask_MatchInfoOld | kTcpRecvMask_MatchInfo | kTcpRecvMask_GameSpecific;
+constexpr uint32_t combinedMatchInfoMask = kTcpRecvMask_MatchInfoOld |
+                                           kTcpRecvMask_MatchInfo |
+                                           kTcpRecvMask_GameSpecific;
 
 void TcpCache::Update(uint32_t mask) {
-
   if ((mask & combinedMatchInfoMask) != 0) {
     HAL_GetMatchInfoInternal(&matchInfo);
   }
