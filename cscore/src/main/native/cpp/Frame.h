@@ -195,7 +195,9 @@ class Frame {
   Image* ConvertMJPEGToBGR(Image* image);
   Image* ConvertMJPEGToGray(Image* image);
   Image* ConvertYUYVToBGR(Image* image);
+  Image* ConvertYUYVToGray(Image* image);
   Image* ConvertUYVYToBGR(Image* image);
+  Image* ConvertUYVYToGray(Image* image);
   Image* ConvertBGRToRGB565(Image* image);
   Image* ConvertRGB565ToBGR(Image* image);
   Image* ConvertBGRToGray(Image* image);

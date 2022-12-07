@@ -265,23 +265,12 @@ Image* Frame::ConvertImpl(Image* image, VideoMode::PixelFormat pixelFormat,
                  cur->pixelFormat == VideoMode::kGray) {
         return ConvertGrayToY16(cur);
       }
-      // If source is YUYV, UYVY, or RGB565, need to convert to BGR first
+      // If source is YUYV, UYVY, convert directly to Gray
+      // If RGB565, need to convert to BGR first
       if (cur->pixelFormat == VideoMode::kYUYV) {
-        // Check to see if BGR version already exists...
-        if (Image* newImage =
-                GetExistingImage(cur->width, cur->height, VideoMode::kBGR)) {
-          cur = newImage;
-        } else {
-          cur = ConvertYUYVToBGR(cur);
-        }
+        cur = ConvertYUYVToGray(cur);
       } else if (cur->pixelFormat == VideoMode::kUYVY) {
-        // Check to see if BGR version already exists...
-        if (Image* newImage =
-                GetExistingImage(cur->width, cur->height, VideoMode::kBGR)) {
-          cur = newImage;
-        } else {
-          cur = ConvertUYVYToBGR(cur);
-        }
+        cur = ConvertUYVYToGray(cur);
       } else if (cur->pixelFormat == VideoMode::kRGB565) {
         // Check to see if BGR version already exists...
         if (Image* newImage =
@@ -290,8 +279,8 @@ Image* Frame::ConvertImpl(Image* image, VideoMode::PixelFormat pixelFormat,
         } else {
           cur = ConvertRGB565ToBGR(cur);
         }
+        cur = ConvertBGRToGray(cur);
       }
-      cur = ConvertBGRToGray(cur);
       if (pixelFormat == VideoMode::kY16) {
         cur = ConvertGrayToY16(cur);
       }
@@ -407,6 +396,28 @@ Image* Frame::ConvertYUYVToBGR(Image* image) {
   return rv;
 }
 
+Image* Frame::ConvertYUYVToGray(Image* image) {
+  if (!image || image->pixelFormat != VideoMode::kYUYV) {
+    return nullptr;
+  }
+
+  // Allocate a BGR image
+  auto newImage =
+      m_impl->source.AllocImage(VideoMode::kGray, image->width, image->height,
+                                image->width * image->height);
+
+  // Convert
+  cv::cvtColor(image->AsMat(), newImage->AsMat(), cv::COLOR_YUV2GRAY_YUYV);
+
+  // Save the result
+  Image* rv = newImage.release();
+  if (m_impl) {
+    std::scoped_lock lock(m_impl->mutex);
+    m_impl->images.push_back(rv);
+  }
+  return rv;
+}
+
 Image* Frame::ConvertUYVYToBGR(Image* image) {
   if (!image || image->pixelFormat != VideoMode::kUYVY) {
     return nullptr;
@@ -419,6 +430,28 @@ Image* Frame::ConvertUYVYToBGR(Image* image) {
 
   // Convert
   cv::cvtColor(image->AsMat(), newImage->AsMat(), cv::COLOR_YUV2BGR_UYVY);
+
+  // Save the result
+  Image* rv = newImage.release();
+  if (m_impl) {
+    std::scoped_lock lock(m_impl->mutex);
+    m_impl->images.push_back(rv);
+  }
+  return rv;
+}
+
+Image* Frame::ConvertUYVYToGray(Image* image) {
+  if (!image || image->pixelFormat != VideoMode::kUYVY) {
+    return nullptr;
+  }
+
+  // Allocate a BGR image
+  auto newImage =
+      m_impl->source.AllocImage(VideoMode::kGray, image->width, image->height,
+                                image->width * image->height);
+
+  // Convert
+  cv::cvtColor(image->AsMat(), newImage->AsMat(), cv::COLOR_YUV2GRAY_UYVY);
 
   // Save the result
   Image* rv = newImage.release();
