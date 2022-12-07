@@ -8,7 +8,6 @@ package edu.wpi.first.hal.util;
  * Exception indicating that the resource is already allocated This is meant to be thrown by the
  * resource class.
  */
-@SuppressWarnings("serial")
 public class CheckedAllocationException extends Exception {
   /**
    * Create a new CheckedAllocationException.

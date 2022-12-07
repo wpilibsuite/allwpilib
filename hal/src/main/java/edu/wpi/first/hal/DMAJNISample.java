@@ -7,7 +7,6 @@ package edu.wpi.first.hal;
 import java.util.HashMap;
 import java.util.Map;
 
-@SuppressWarnings("AbbreviationAsWordInName")
 public class DMAJNISample {
   private static final int kEnable_Accumulator0 = 8;
   private static final int kEnable_Accumulator1 = 9;

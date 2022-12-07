@@ -4,7 +4,10 @@
 
 package edu.wpi.first.wpilibj.shuffleboard;
 
+import edu.wpi.first.networktables.GenericPublisher;
 import edu.wpi.first.networktables.NetworkTableEntry;
+import edu.wpi.first.networktables.NetworkTableType;
+import edu.wpi.first.util.function.FloatSupplier;
 import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.util.sendable.SendableRegistry;
 import java.util.ArrayList;
@@ -18,6 +21,7 @@ import java.util.Set;
 import java.util.function.BiConsumer;
 import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
+import java.util.function.LongSupplier;
 import java.util.function.Supplier;
 
 /** A helper class for Shuffleboard containers to handle common child operations. */
@@ -68,6 +72,11 @@ final class ContainerHelper {
   }
 
   SimpleWidget add(String title, Object defaultValue) {
+    Objects.requireNonNull(defaultValue, "Default value cannot be null");
+    return add(title, NetworkTableType.getStringFromObject(defaultValue), defaultValue);
+  }
+
+  SimpleWidget add(String title, String typeString, Object defaultValue) {
     Objects.requireNonNull(title, "Title cannot be null");
     Objects.requireNonNull(defaultValue, "Default value cannot be null");
     checkTitle(title);
@@ -75,43 +84,72 @@ final class ContainerHelper {
 
     SimpleWidget widget = new SimpleWidget(m_container, title);
     m_components.add(widget);
-    widget.getEntry().setDefaultValue(defaultValue);
+    widget.getEntry(typeString).setDefaultValue(defaultValue);
     return widget;
   }
 
   SuppliedValueWidget<String> addString(String title, Supplier<String> valueSupplier) {
     precheck(title, valueSupplier);
-    return addSupplied(title, valueSupplier, NetworkTableEntry::setString);
+    return addSupplied(title, "string", valueSupplier, GenericPublisher::setString);
   }
 
   SuppliedValueWidget<Double> addNumber(String title, DoubleSupplier valueSupplier) {
+    return addDouble(title, valueSupplier);
+  }
+
+  SuppliedValueWidget<Double> addDouble(String title, DoubleSupplier valueSupplier) {
     precheck(title, valueSupplier);
-    return addSupplied(title, valueSupplier::getAsDouble, NetworkTableEntry::setDouble);
+    return addSupplied(title, "double", valueSupplier::getAsDouble, GenericPublisher::setDouble);
+  }
+
+  SuppliedValueWidget<Float> addFloat(String title, FloatSupplier valueSupplier) {
+    precheck(title, valueSupplier);
+    return addSupplied(title, "float", valueSupplier::getAsFloat, GenericPublisher::setFloat);
+  }
+
+  SuppliedValueWidget<Long> addInteger(String title, LongSupplier valueSupplier) {
+    precheck(title, valueSupplier);
+    return addSupplied(title, "int", valueSupplier::getAsLong, GenericPublisher::setInteger);
   }
 
   SuppliedValueWidget<Boolean> addBoolean(String title, BooleanSupplier valueSupplier) {
     precheck(title, valueSupplier);
-    return addSupplied(title, valueSupplier::getAsBoolean, NetworkTableEntry::setBoolean);
+    return addSupplied(title, "boolean", valueSupplier::getAsBoolean, GenericPublisher::setBoolean);
   }
 
   SuppliedValueWidget<String[]> addStringArray(String title, Supplier<String[]> valueSupplier) {
     precheck(title, valueSupplier);
-    return addSupplied(title, valueSupplier, NetworkTableEntry::setStringArray);
+    return addSupplied(title, "string[]", valueSupplier, GenericPublisher::setStringArray);
   }
 
   SuppliedValueWidget<double[]> addDoubleArray(String title, Supplier<double[]> valueSupplier) {
     precheck(title, valueSupplier);
-    return addSupplied(title, valueSupplier, NetworkTableEntry::setDoubleArray);
+    return addSupplied(title, "double[]", valueSupplier, GenericPublisher::setDoubleArray);
+  }
+
+  SuppliedValueWidget<float[]> addFloatArray(String title, Supplier<float[]> valueSupplier) {
+    precheck(title, valueSupplier);
+    return addSupplied(title, "float[]", valueSupplier, GenericPublisher::setFloatArray);
+  }
+
+  SuppliedValueWidget<long[]> addIntegerArray(String title, Supplier<long[]> valueSupplier) {
+    precheck(title, valueSupplier);
+    return addSupplied(title, "int[]", valueSupplier, GenericPublisher::setIntegerArray);
   }
 
   SuppliedValueWidget<boolean[]> addBooleanArray(String title, Supplier<boolean[]> valueSupplier) {
     precheck(title, valueSupplier);
-    return addSupplied(title, valueSupplier, NetworkTableEntry::setBooleanArray);
+    return addSupplied(title, "boolean[]", valueSupplier, GenericPublisher::setBooleanArray);
   }
 
   SuppliedValueWidget<byte[]> addRaw(String title, Supplier<byte[]> valueSupplier) {
+    return addRaw(title, "raw", valueSupplier);
+  }
+
+  SuppliedValueWidget<byte[]> addRaw(
+      String title, String typeString, Supplier<byte[]> valueSupplier) {
     precheck(title, valueSupplier);
-    return addSupplied(title, valueSupplier, NetworkTableEntry::setRaw);
+    return addSupplied(title, typeString, valueSupplier, GenericPublisher::setRaw);
   }
 
   private void precheck(String title, Object valueSupplier) {
@@ -121,8 +159,12 @@ final class ContainerHelper {
   }
 
   private <T> SuppliedValueWidget<T> addSupplied(
-      String title, Supplier<T> supplier, BiConsumer<NetworkTableEntry, T> setter) {
-    SuppliedValueWidget<T> widget = new SuppliedValueWidget<>(m_container, title, supplier, setter);
+      String title,
+      String typeString,
+      Supplier<T> supplier,
+      BiConsumer<GenericPublisher, T> setter) {
+    SuppliedValueWidget<T> widget =
+        new SuppliedValueWidget<>(m_container, title, typeString, supplier, setter);
     m_components.add(widget);
     return widget;
   }

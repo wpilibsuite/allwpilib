@@ -12,6 +12,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.MecanumDriveKinematics;
+import edu.wpi.first.math.kinematics.MecanumDriveWheelPositions;
 import edu.wpi.first.math.kinematics.MecanumDriveWheelSpeeds;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.AnalogGyro;
@@ -55,11 +56,11 @@ public class Drivetrain {
   below are robot specific, and should be tuned. */
   private final MecanumDrivePoseEstimator m_poseEstimator =
       new MecanumDrivePoseEstimator(
-          m_gyro.getRotation2d(),
-          new Pose2d(),
           m_kinematics,
+          m_gyro.getRotation2d(),
+          getCurrentDistances(),
+          new Pose2d(),
           VecBuilder.fill(0.05, 0.05, Units.degreesToRadians(5)),
-          VecBuilder.fill(Units.degreesToRadians(0.01)),
           VecBuilder.fill(0.5, 0.5, Units.degreesToRadians(30)));
 
   // Gains are for example purposes only - must be determined for your own robot!
@@ -86,6 +87,19 @@ public class Drivetrain {
         m_frontRightEncoder.getRate(),
         m_backLeftEncoder.getRate(),
         m_backRightEncoder.getRate());
+  }
+
+  /**
+   * Returns the current distances measured by the drivetrain.
+   *
+   * @return The current distances measured by the drivetrain.
+   */
+  public MecanumDriveWheelPositions getCurrentDistances() {
+    return new MecanumDriveWheelPositions(
+        m_frontLeftEncoder.getDistance(),
+        m_frontRightEncoder.getDistance(),
+        m_backLeftEncoder.getDistance(),
+        m_backRightEncoder.getDistance());
   }
 
   /**
@@ -126,7 +140,6 @@ public class Drivetrain {
    * @param rot Angular rate of the robot.
    * @param fieldRelative Whether the provided x and y speeds are relative to the field.
    */
-  @SuppressWarnings("ParameterName")
   public void drive(double xSpeed, double ySpeed, double rot, boolean fieldRelative) {
     var mecanumDriveWheelSpeeds =
         m_kinematics.toWheelSpeeds(
@@ -139,7 +152,7 @@ public class Drivetrain {
 
   /** Updates the field relative position of the robot. */
   public void updateOdometry() {
-    m_poseEstimator.update(m_gyro.getRotation2d(), getCurrentState());
+    m_poseEstimator.update(m_gyro.getRotation2d(), getCurrentDistances());
 
     // Also apply vision measurements. We use 0.3 seconds in the past as an example -- on
     // a real robot, this must be calculated based either on latency or timestamps.

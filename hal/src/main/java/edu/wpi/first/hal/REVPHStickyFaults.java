@@ -4,27 +4,20 @@
 
 package edu.wpi.first.hal;
 
-@SuppressWarnings("AbbreviationAsWordInName")
+@SuppressWarnings("MemberName")
 public class REVPHStickyFaults {
-  @SuppressWarnings("MemberName")
   public final boolean CompressorOverCurrent;
 
-  @SuppressWarnings("MemberName")
   public final boolean CompressorOpen;
 
-  @SuppressWarnings("MemberName")
   public final boolean SolenoidOverCurrent;
 
-  @SuppressWarnings("MemberName")
   public final boolean Brownout;
 
-  @SuppressWarnings("MemberName")
   public final boolean CanWarning;
 
-  @SuppressWarnings("MemberName")
   public final boolean CanBusOff;
 
-  @SuppressWarnings("MemberName")
   public final boolean HasReset;
 
   /**

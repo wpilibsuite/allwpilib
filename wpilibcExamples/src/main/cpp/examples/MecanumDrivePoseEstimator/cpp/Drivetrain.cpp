@@ -9,10 +9,17 @@
 #include "ExampleGlobalMeasurementSensor.h"
 
 frc::MecanumDriveWheelSpeeds Drivetrain::GetCurrentState() const {
-  return {units::meters_per_second_t(m_frontLeftEncoder.GetRate()),
-          units::meters_per_second_t(m_frontRightEncoder.GetRate()),
-          units::meters_per_second_t(m_backLeftEncoder.GetRate()),
-          units::meters_per_second_t(m_backRightEncoder.GetRate())};
+  return {units::meters_per_second_t{m_frontLeftEncoder.GetRate()},
+          units::meters_per_second_t{m_frontRightEncoder.GetRate()},
+          units::meters_per_second_t{m_backLeftEncoder.GetRate()},
+          units::meters_per_second_t{m_backRightEncoder.GetRate()}};
+}
+
+frc::MecanumDriveWheelPositions Drivetrain::GetCurrentDistances() const {
+  return {units::meter_t{m_frontLeftEncoder.GetDistance()},
+          units::meter_t{m_frontRightEncoder.GetDistance()},
+          units::meter_t{m_backLeftEncoder.GetDistance()},
+          units::meter_t{m_backRightEncoder.GetDistance()}};
 }
 
 void Drivetrain::SetSpeeds(const frc::MecanumDriveWheelSpeeds& wheelSpeeds) {
@@ -49,7 +56,7 @@ void Drivetrain::Drive(units::meters_per_second_t xSpeed,
 }
 
 void Drivetrain::UpdateOdometry() {
-  m_poseEstimator.Update(m_gyro.GetRotation2d(), GetCurrentState());
+  m_poseEstimator.Update(m_gyro.GetRotation2d(), GetCurrentDistances());
 
   // Also apply vision measurements. We use 0.3 seconds in the past as an
   // example -- on a real robot, this must be calculated based either on latency

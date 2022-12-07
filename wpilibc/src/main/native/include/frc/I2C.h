@@ -15,6 +15,10 @@ namespace frc {
  *
  * This class is intended to be used by sensor (and other I2C device) drivers.
  * It probably should not be used directly.
+ *
+ * The Onboard I2C port is subject to system lockups. See <a
+ * href="https://docs.wpilib.org/en/stable/docs/yearly-overview/known-issues.html#onboard-i2c-causing-system-lockups">
+ * WPILib Known Issues</a> page for details.
  */
 class I2C {
  public:

@@ -24,7 +24,6 @@ public class MatBuilder<R extends Num, C extends Num> {
    * @param data The data to fill the matrix with.
    * @return The constructed matrix.
    */
-  @SuppressWarnings("LineLength")
   public final Matrix<R, C> fill(double... data) {
     if (Objects.requireNonNull(data).length != this.m_rows.getNum() * this.m_cols.getNum()) {
       throw new IllegalArgumentException(

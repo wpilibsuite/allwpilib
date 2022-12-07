@@ -11,7 +11,7 @@
 #include <frc/shuffleboard/Shuffleboard.h>
 #include <frc/shuffleboard/ShuffleboardLayout.h>
 #include <frc/shuffleboard/ShuffleboardTab.h>
-#include <networktables/NetworkTableEntry.h>
+#include <networktables/GenericEntry.h>
 #include <networktables/NetworkTableInstance.h>
 
 /**
@@ -57,7 +57,7 @@ class Robot : public frc::TimedRobot {
 
   void AutonomousInit() override {
     // Update the Max Output for the drivetrain.
-    m_robotDrive.SetMaxOutput(m_maxSpeed.GetDouble(1.0));
+    m_robotDrive.SetMaxOutput(m_maxSpeed->GetDouble(1.0));
   }
 
  private:
@@ -73,7 +73,7 @@ class Robot : public frc::TimedRobot {
   frc::Encoder m_rightEncoder{2, 3};
   frc::AnalogPotentiometer m_ElevatorPot{0};
 
-  nt::NetworkTableEntry m_maxSpeed;
+  nt::GenericEntry* m_maxSpeed;
 };
 
 #ifndef RUNNING_FRC_TESTS

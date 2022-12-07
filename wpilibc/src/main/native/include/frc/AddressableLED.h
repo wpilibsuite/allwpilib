@@ -5,11 +5,11 @@
 #pragma once
 
 #include <initializer_list>
+#include <span>
 
 #include <hal/AddressableLEDTypes.h>
 #include <hal/Types.h>
 #include <units/time.h>
-#include <wpi/span.h>
 
 #include "util/Color.h"
 #include "util/Color8Bit.h"
@@ -107,7 +107,7 @@ class AddressableLED {
    *
    * @param ledData the buffer to write
    */
-  void SetData(wpi::span<const LEDData> ledData);
+  void SetData(std::span<const LEDData> ledData);
 
   /**
    * Sets the led output data.

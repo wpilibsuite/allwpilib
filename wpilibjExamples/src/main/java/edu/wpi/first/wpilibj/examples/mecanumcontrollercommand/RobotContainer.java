@@ -19,6 +19,7 @@ import edu.wpi.first.wpilibj.examples.mecanumcontrollercommand.Constants.DriveCo
 import edu.wpi.first.wpilibj.examples.mecanumcontrollercommand.Constants.OIConstants;
 import edu.wpi.first.wpilibj.examples.mecanumcontrollercommand.subsystems.DriveSubsystem;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.MecanumControllerCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
@@ -50,9 +51,9 @@ public class RobotContainer {
         new RunCommand(
             () ->
                 m_robotDrive.drive(
-                    m_driverController.getLeftY(),
-                    m_driverController.getRightX(),
-                    m_driverController.getLeftX(),
+                    -m_driverController.getLeftY(),
+                    -m_driverController.getRightX(),
+                    -m_driverController.getLeftX(),
                     false),
             m_robotDrive));
   }
@@ -66,8 +67,8 @@ public class RobotContainer {
   private void configureButtonBindings() {
     // Drive at half speed when the right bumper is held
     new JoystickButton(m_driverController, Button.kRightBumper.value)
-        .whenPressed(() -> m_robotDrive.setMaxOutput(0.5))
-        .whenReleased(() -> m_robotDrive.setMaxOutput(1));
+        .onTrue(new InstantCommand(() -> m_robotDrive.setMaxOutput(0.5)))
+        .onFalse(new InstantCommand(() -> m_robotDrive.setMaxOutput(1)));
   }
 
   /**

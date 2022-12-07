@@ -21,6 +21,9 @@ class DigitalSource;
  */
 class SynchronousInterrupt {
  public:
+  /**
+   * Event trigger combinations for a synchronous interrupt.
+   */
   enum WaitResult {
     kTimeout = 0x0,
     kRisingEdge = 0x1,

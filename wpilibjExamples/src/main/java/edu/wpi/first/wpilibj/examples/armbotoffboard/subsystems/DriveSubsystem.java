@@ -9,7 +9,10 @@ import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.examples.armbotoffboard.Constants.DriveConstants;
 import edu.wpi.first.wpilibj.motorcontrol.MotorControllerGroup;
 import edu.wpi.first.wpilibj.motorcontrol.PWMSparkMax;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import java.util.function.DoubleSupplier;
 
 public class DriveSubsystem extends SubsystemBase {
   // The motors on the left side of the drive.
@@ -54,13 +57,14 @@ public class DriveSubsystem extends SubsystemBase {
   }
 
   /**
-   * Drives the robot using arcade controls.
+   * A split-stick arcade command, with forward/backward controlled by the left hand, and turning
+   * controlled by the right.
    *
-   * @param fwd the commanded forward movement
-   * @param rot the commanded rotation
+   * @param fwd supplier for the commanded forward movement
+   * @param rot supplier for the commanded rotation
    */
-  public void arcadeDrive(double fwd, double rot) {
-    m_drive.arcadeDrive(fwd, rot);
+  public Command arcadeDriveCommand(DoubleSupplier fwd, DoubleSupplier rot) {
+    return Commands.run(() -> m_drive.arcadeDrive(fwd.getAsDouble(), rot.getAsDouble()), this);
   }
 
   /** Resets the drive encoders to currently read a position of 0. */
@@ -101,7 +105,7 @@ public class DriveSubsystem extends SubsystemBase {
    *
    * @param maxOutput the maximum output to which the drive will be constrained
    */
-  public void setMaxOutput(double maxOutput) {
-    m_drive.setMaxOutput(maxOutput);
+  public Command limitOutputCommand(double maxOutput) {
+    return Commands.runOnce(() -> m_drive.setMaxOutput(maxOutput));
   }
 }

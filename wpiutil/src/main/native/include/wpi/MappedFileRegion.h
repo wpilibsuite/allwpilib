@@ -59,13 +59,19 @@ class MappedFileRegion {
     return *this;
   }
 
-  explicit operator bool() const { return m_mapping != nullptr; }
+  explicit operator bool() const {
+    return m_mapping != nullptr;
+  }
 
   void Flush();
   void Unmap();
 
-  uint64_t size() const { return m_size; }
-  uint8_t* data() const { return static_cast<uint8_t*>(m_mapping); }
+  uint64_t size() const {
+    return m_size;
+  }
+  uint8_t* data() const {
+    return static_cast<uint8_t*>(m_mapping);
+  }
   const uint8_t* const_data() const {
     return static_cast<const uint8_t*>(m_mapping);
   }

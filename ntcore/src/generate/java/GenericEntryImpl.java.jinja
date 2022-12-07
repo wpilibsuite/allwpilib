@@ -1,0 +1,317 @@
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
+
+package edu.wpi.first.networktables;
+
+/** NetworkTables generic implementation. */
+final class GenericEntryImpl extends EntryBase implements GenericEntry {
+  /**
+   * Constructor.
+   *
+   * @param topic Topic
+   * @param handle Native handle
+   */
+  GenericEntryImpl(Topic topic, int handle) {
+    super(handle);
+    m_topic = topic;
+  }
+
+  @Override
+  public Topic getTopic() {
+    return m_topic;
+  }
+
+  @Override
+  public NetworkTableValue get() {
+    return NetworkTablesJNI.getValue(m_handle);
+  }
+{% for t in types %}
+  /**
+   * Gets the entry's value as a {{ t.java.ValueType }}. If the entry does not exist or is of different type, it
+   * will return the default value.
+   *
+   * @param defaultValue the value to be returned if no value is found
+   * @return the entry's value or the given default value
+   */
+  @Override
+  public {{ t.java.ValueType }} get{{ t.TypeName }}({{ t.java.ValueType }} defaultValue) {
+    return NetworkTablesJNI.get{{ t.TypeName }}(m_handle, defaultValue);
+  }
+{% if t.java.WrapValueType %}
+  /**
+   * Gets the entry's value as a boolean array. If the entry does not exist or is of different type,
+   * it will return the default value.
+   *
+   * @param defaultValue the value to be returned if no value is found
+   * @return the entry's value or the given default value
+   */
+  @Override
+  public {{ t.java.WrapValueType }} get{{ t.TypeName }}({{ t.java.WrapValueType }} defaultValue) {
+    return NetworkTableValue.fromNative{{ t.TypeName }}(
+        get{{ t.TypeName }}(NetworkTableValue.toNative{{ t.TypeName }}(defaultValue)));
+  }
+{% endif -%}
+{% endfor %}
+  @Override
+  public NetworkTableValue[] readQueue() {
+    return NetworkTablesJNI.readQueueValue(m_handle);
+  }
+
+  @Override
+  public boolean set(NetworkTableValue value) {
+    long time = value.getTime();
+    Object otherValue = value.getValue();
+    switch (value.getType()) {
+      case kBoolean:
+        return NetworkTablesJNI.setBoolean(m_handle, time, (Boolean) otherValue);
+      case kInteger:
+        return NetworkTablesJNI.setInteger(
+            m_handle, time, ((Number) otherValue).longValue());
+      case kFloat:
+        return NetworkTablesJNI.setFloat(
+            m_handle, time, ((Number) otherValue).floatValue());
+      case kDouble:
+        return NetworkTablesJNI.setDouble(
+            m_handle, time, ((Number) otherValue).doubleValue());
+      case kString:
+        return NetworkTablesJNI.setString(m_handle, time, (String) otherValue);
+      case kRaw:
+        return NetworkTablesJNI.setRaw(m_handle, time, (byte[]) otherValue);
+      case kBooleanArray:
+        return NetworkTablesJNI.setBooleanArray(m_handle, time, (boolean[]) otherValue);
+      case kIntegerArray:
+        return NetworkTablesJNI.setIntegerArray(m_handle, time, (long[]) otherValue);
+      case kFloatArray:
+        return NetworkTablesJNI.setFloatArray(m_handle, time, (float[]) otherValue);
+      case kDoubleArray:
+        return NetworkTablesJNI.setDoubleArray(m_handle, time, (double[]) otherValue);
+      case kStringArray:
+        return NetworkTablesJNI.setStringArray(m_handle, time, (String[]) otherValue);
+      default:
+        return true;
+    }
+  }
+
+  /**
+   * Sets the entry's value.
+   *
+   * @param value the value that will be assigned
+   * @return False if the table key already exists with a different type
+   * @throws IllegalArgumentException if the value is not a known type
+   */
+  @Override
+  public boolean setValue(Object value, long time) {
+    if (value instanceof NetworkTableValue) {
+      return set((NetworkTableValue) value);
+    } else if (value instanceof Boolean) {
+      return setBoolean((Boolean) value, time);
+    } else if (value instanceof Long) {
+      return setInteger((Long) value, time);
+    } else if (value instanceof Float) {
+      return setFloat((Float) value, time);
+    } else if (value instanceof Number) {
+      return setNumber((Number) value, time);
+    } else if (value instanceof String) {
+      return setString((String) value, time);
+    } else if (value instanceof byte[]) {
+      return setRaw((byte[]) value, time);
+    } else if (value instanceof boolean[]) {
+      return setBooleanArray((boolean[]) value, time);
+    } else if (value instanceof long[]) {
+      return setIntegerArray((long[]) value, time);
+    } else if (value instanceof float[]) {
+      return setFloatArray((float[]) value, time);
+    } else if (value instanceof double[]) {
+      return setDoubleArray((double[]) value, time);
+    } else if (value instanceof Boolean[]) {
+      return setBooleanArray((Boolean[]) value, time);
+    } else if (value instanceof Long[]) {
+      return setIntegerArray((Long[]) value, time);
+    } else if (value instanceof Float[]) {
+      return setFloatArray((Float[]) value, time);
+    } else if (value instanceof Number[]) {
+      return setNumberArray((Number[]) value, time);
+    } else if (value instanceof String[]) {
+      return setStringArray((String[]) value, time);
+    } else {
+      throw new IllegalArgumentException(
+          "Value of type " + value.getClass().getName() + " cannot be put into a table");
+    }
+  }
+{% for t in types %}
+  /**
+   * Sets the entry's value.
+   *
+   * @param value the value to set
+   * @return False if the entry exists with a different type
+   */
+  @Override
+  public boolean set{{ t.TypeName }}({{ t.java.ValueType }} value, long time) {
+    return NetworkTablesJNI.set{{ t.TypeName }}(m_handle, time, value);
+  }
+{% if t.java.WrapValueType %}
+  /**
+   * Sets the entry's value.
+   *
+   * @param value the value to set
+   * @return False if the entry exists with a different type
+   */
+  @Override
+  public boolean set{{ t.TypeName }}({{ t.java.WrapValueType }} value, long time) {
+    return set{{ t.TypeName }}(NetworkTableValue.toNative{{ t.TypeName }}(value), time);
+  }
+{% endif -%}
+{% endfor %}
+  /**
+   * Sets the entry's value.
+   *
+   * @param value the value to set
+   * @return False if the entry exists with a different type
+   */
+  public boolean setNumber(Number value, long time) {
+    return setDouble(value.doubleValue(), time);
+  }
+
+  /**
+   * Sets the entry's value.
+   *
+   * @param value the value to set
+   * @return False if the entry exists with a different type
+   */
+  public boolean setNumberArray(Number[] value, long time) {
+    return setDoubleArray(NetworkTableValue.toNativeDoubleArray(value), time);
+  }
+
+  @Override
+  public boolean setDefault(NetworkTableValue defaultValue) {
+    long time = defaultValue.getTime();
+    Object otherValue = defaultValue.getValue();
+    switch (defaultValue.getType()) {
+      case kBoolean:
+        return NetworkTablesJNI.setDefaultBoolean(m_handle, time, (Boolean) otherValue);
+      case kInteger:
+        return NetworkTablesJNI.setDefaultInteger(
+            m_handle, time, ((Number) otherValue).longValue());
+      case kFloat:
+        return NetworkTablesJNI.setDefaultFloat(
+            m_handle, time, ((Number) otherValue).floatValue());
+      case kDouble:
+        return NetworkTablesJNI.setDefaultDouble(
+            m_handle, time, ((Number) otherValue).doubleValue());
+      case kString:
+        return NetworkTablesJNI.setDefaultString(m_handle, time, (String) otherValue);
+      case kRaw:
+        return NetworkTablesJNI.setDefaultRaw(m_handle, time, (byte[]) otherValue);
+      case kBooleanArray:
+        return NetworkTablesJNI.setDefaultBooleanArray(m_handle, time, (boolean[]) otherValue);
+      case kIntegerArray:
+        return NetworkTablesJNI.setDefaultIntegerArray(m_handle, time, (long[]) otherValue);
+      case kFloatArray:
+        return NetworkTablesJNI.setDefaultFloatArray(m_handle, time, (float[]) otherValue);
+      case kDoubleArray:
+        return NetworkTablesJNI.setDefaultDoubleArray(m_handle, time, (double[]) otherValue);
+      case kStringArray:
+        return NetworkTablesJNI.setDefaultStringArray(m_handle, time, (String[]) otherValue);
+      default:
+        return true;
+    }
+  }
+
+  /**
+   * Sets the entry's value if it does not exist.
+   *
+   * @param defaultValue the default value to set
+   * @return False if the entry exists with a different type
+   * @throws IllegalArgumentException if the value is not a known type
+   */
+  @Override
+  public boolean setDefaultValue(Object defaultValue) {
+    if (defaultValue instanceof NetworkTableValue) {
+      return setDefault((NetworkTableValue) defaultValue);
+    } else if (defaultValue instanceof Boolean) {
+      return setDefaultBoolean((Boolean) defaultValue);
+    } else if (defaultValue instanceof Integer) {
+      return setDefaultInteger((Integer) defaultValue);
+    } else if (defaultValue instanceof Float) {
+      return setDefaultFloat((Float) defaultValue);
+    } else if (defaultValue instanceof Number) {
+      return setDefaultNumber((Number) defaultValue);
+    } else if (defaultValue instanceof String) {
+      return setDefaultString((String) defaultValue);
+    } else if (defaultValue instanceof byte[]) {
+      return setDefaultRaw((byte[]) defaultValue);
+    } else if (defaultValue instanceof boolean[]) {
+      return setDefaultBooleanArray((boolean[]) defaultValue);
+    } else if (defaultValue instanceof long[]) {
+      return setDefaultIntegerArray((long[]) defaultValue);
+    } else if (defaultValue instanceof float[]) {
+      return setDefaultFloatArray((float[]) defaultValue);
+    } else if (defaultValue instanceof double[]) {
+      return setDefaultDoubleArray((double[]) defaultValue);
+    } else if (defaultValue instanceof Boolean[]) {
+      return setDefaultBooleanArray((Boolean[]) defaultValue);
+    } else if (defaultValue instanceof Long[]) {
+      return setDefaultIntegerArray((Long[]) defaultValue);
+    } else if (defaultValue instanceof Float[]) {
+      return setDefaultFloatArray((Float[]) defaultValue);
+    } else if (defaultValue instanceof Number[]) {
+      return setDefaultNumberArray((Number[]) defaultValue);
+    } else if (defaultValue instanceof String[]) {
+      return setDefaultStringArray((String[]) defaultValue);
+    } else {
+      throw new IllegalArgumentException(
+          "Value of type " + defaultValue.getClass().getName() + " cannot be put into a table");
+    }
+  }
+{% for t in types %}
+  /**
+   * Sets the entry's value if it does not exist.
+   *
+   * @param defaultValue the default value to set
+   * @return False if the entry exists with a different type
+   */
+  @Override
+  public boolean setDefault{{ t.TypeName }}({{ t.java.ValueType }} defaultValue) {
+    return NetworkTablesJNI.setDefault{{ t.TypeName }}(m_handle, 0, defaultValue);
+  }
+{% if t.java.WrapValueType %}
+  /**
+   * Sets the entry's value if it does not exist.
+   *
+   * @param defaultValue the default value to set
+   * @return False if the entry exists with a different type
+   */
+  @Override
+  public boolean setDefault{{ t.TypeName }}({{ t.java.WrapValueType }} defaultValue) {
+    return setDefault{{ t.TypeName }}(NetworkTableValue.toNative{{ t.TypeName }}(defaultValue));
+  }
+{% endif -%}
+{% endfor %}
+  /**
+   * Sets the entry's value if it does not exist.
+   *
+   * @param defaultValue the default value to set
+   * @return False if the entry exists with a different type
+   */
+  public boolean setDefaultNumber(Number defaultValue) {
+    return setDefaultDouble(defaultValue.doubleValue());
+  }
+
+  /**
+   * Sets the entry's value if it does not exist.
+   *
+   * @param defaultValue the default value to set
+   * @return False if the entry exists with a different type
+   */
+  public boolean setDefaultNumberArray(Number[] defaultValue) {
+    return setDefaultDoubleArray(NetworkTableValue.toNativeDoubleArray(defaultValue));
+  }
+
+  @Override
+  public void unpublish() {
+    NetworkTablesJNI.unpublish(m_handle);
+  }
+
+  private final Topic m_topic;
+}

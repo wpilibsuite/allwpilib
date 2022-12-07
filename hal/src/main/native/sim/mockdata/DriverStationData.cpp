@@ -216,8 +216,12 @@ void DriverStationData::CallNewDataCallbacks() {
   m_newDataCallbacks(&empty);
 }
 
+namespace hal {
+void NewDriverStationData();
+}  // namespace hal
+
 void DriverStationData::NotifyNewData() {
-  HAL_ReleaseDSMutex();
+  hal::NewDriverStationData();
 }
 
 void DriverStationData::SetJoystickButton(int32_t stick, int32_t button,

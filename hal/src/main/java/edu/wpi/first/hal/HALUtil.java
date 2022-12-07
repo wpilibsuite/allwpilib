@@ -4,7 +4,6 @@
 
 package edu.wpi.first.hal;
 
-@SuppressWarnings("AbbreviationAsWordInName")
 public final class HALUtil extends JNIWrapper {
   public static final int NULL_PARAMETER = -1005;
   public static final int SAMPLE_RATE_TOO_HIGH = 1001;

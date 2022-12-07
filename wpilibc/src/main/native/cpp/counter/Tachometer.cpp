@@ -19,7 +19,7 @@ Tachometer::Tachometer(DigitalSource& source)
     : Tachometer({&source, wpi::NullDeleter<DigitalSource>()}) {}
 Tachometer::Tachometer(std::shared_ptr<DigitalSource> source) {
   if (source == nullptr) {
-    throw FRC_MakeError(err::NullParameter, "{}", "source");
+    throw FRC_MakeError(err::NullParameter, "source");
   }
 
   m_source = source;

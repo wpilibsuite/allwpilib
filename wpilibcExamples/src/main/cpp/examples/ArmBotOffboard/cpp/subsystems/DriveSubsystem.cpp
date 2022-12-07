@@ -26,10 +26,6 @@ void DriveSubsystem::Periodic() {
   // Implementation of subsystem periodic method goes here.
 }
 
-void DriveSubsystem::ArcadeDrive(double fwd, double rot) {
-  m_drive.ArcadeDrive(fwd, rot);
-}
-
 void DriveSubsystem::ResetEncoders() {
   m_leftEncoder.Reset();
   m_rightEncoder.Reset();
@@ -47,6 +43,16 @@ frc::Encoder& DriveSubsystem::GetRightEncoder() {
   return m_rightEncoder;
 }
 
-void DriveSubsystem::SetMaxOutput(double maxOutput) {
-  m_drive.SetMaxOutput(maxOutput);
+frc2::CommandPtr DriveSubsystem::SetMaxOutputCommand(double maxOutput) {
+  return frc2::cmd::RunOnce(
+      [this, maxOutput] { m_drive.SetMaxOutput(maxOutput); });
+}
+
+frc2::CommandPtr DriveSubsystem::ArcadeDriveCommand(
+    std::function<double()> fwd, std::function<double()> rot) {
+  return frc2::cmd::Run(
+      [this, fwd = std::move(fwd), rot = std::move(rot)] {
+        m_drive.ArcadeDrive(fwd(), rot());
+      },
+      {this});
 }

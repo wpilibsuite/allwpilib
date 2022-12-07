@@ -4,6 +4,9 @@
 
 package edu.wpi.first.wpilibj2.command;
 
+import static edu.wpi.first.wpilibj.util.ErrorMessages.requireNonNullParam;
+
+import edu.wpi.first.util.function.BooleanConsumer;
 import java.util.Set;
 import java.util.function.BooleanSupplier;
 
@@ -47,14 +50,15 @@ public interface Command {
 
   /**
    * Specifies the set of subsystems used by this command. Two commands cannot use the same
-   * subsystem at the same time. If the command is scheduled as interruptible and another command is
-   * scheduled that shares a requirement, the command will be interrupted. Else, the command will
-   * not be scheduled. If no subsystems are required, return an empty set.
+   * subsystem at the same time. If another command is scheduled that shares a requirement, {@link
+   * #getInterruptionBehavior()} will be checked and followed. If no subsystems are required, return
+   * an empty set.
    *
    * <p>Note: it is recommended that user implementations contain the requirements as a field, and
    * return that field here, rather than allocating a new set every time this is called.
    *
    * @return the set of subsystems that are required
+   * @see InterruptionBehavior
    */
   Set<Subsystem> getRequirements();
 
@@ -109,7 +113,9 @@ public interface Command {
    *
    * @param condition the interrupt condition
    * @return the command with the interrupt condition added
+   * @deprecated Replace with {@link #until(BooleanSupplier)}
    */
+  @Deprecated(since = "2023")
   default ParallelRaceGroup withInterrupt(BooleanSupplier condition) {
     return until(condition);
   }
@@ -252,7 +258,13 @@ public interface Command {
    * decorated without issue.
    *
    * @return the decorated command
+   * @deprecated PerpetualCommand violates the assumption that execute() doesn't get called after
+   *     isFinished() returns true -- an assumption that should be valid. This was unsafe/undefined
+   *     behavior from the start, and RepeatCommand provides an easy way to achieve similar end
+   *     results with slightly different (and safe) semantics.
    */
+  @SuppressWarnings("removal") // PerpetualCommand
+  @Deprecated(forRemoval = true, since = "2023")
   default PerpetualCommand perpetually() {
     return new PerpetualCommand(this);
   }
@@ -269,39 +281,109 @@ public interface Command {
    *
    * @return the decorated command
    */
-  default RepeatCommand repeat() {
+  default RepeatCommand repeatedly() {
     return new RepeatCommand(this);
   }
 
   /**
-   * Decorates this command to run "by proxy" by wrapping it in a {@link ProxyScheduleCommand}. This
-   * is useful for "forking off" from command groups when the user does not wish to extend the
+   * Decorates this command to run "by proxy" by wrapping it in a {@link ProxyCommand}. This is
+   * useful for "forking off" from command groups when the user does not wish to extend the
    * command's requirements to the entire command group.
    *
    * @return the decorated command
    */
-  default ProxyScheduleCommand asProxy() {
-    return new ProxyScheduleCommand(this);
+  default ProxyCommand asProxy() {
+    return new ProxyCommand(this);
   }
 
   /**
-   * Schedules this command.
+   * Decorates this command to only run if this condition is not met. If the command is already
+   * running and the condition changes to true, the command will not stop running. The requirements
+   * of this command will be kept for the new conditonal command.
    *
-   * @param interruptible whether this command can be interrupted by another command that shares one
-   *     of its requirements
+   * @param condition the condition that will prevent the command from running
+   * @return the decorated command
    */
-  default void schedule(boolean interruptible) {
-    CommandScheduler.getInstance().schedule(interruptible, this);
-  }
-
-  /** Schedules this command, defaulting to interruptible. */
-  default void schedule() {
-    schedule(true);
+  default ConditionalCommand unless(BooleanSupplier condition) {
+    return new ConditionalCommand(new InstantCommand(), this, condition);
   }
 
   /**
-   * Cancels this command. Will call the command's interrupted() method. Commands will be canceled
-   * even if they are not marked as interruptible.
+   * Decorates this command to run or stop when disabled.
+   *
+   * @param doesRunWhenDisabled true to run when disabled.
+   * @return the decorated command
+   */
+  default WrapperCommand ignoringDisable(boolean doesRunWhenDisabled) {
+    return new WrapperCommand(this) {
+      @Override
+      public boolean runsWhenDisabled() {
+        return doesRunWhenDisabled;
+      }
+    };
+  }
+
+  /**
+   * Decorates this command to have a different {@link InterruptionBehavior interruption behavior}.
+   *
+   * @param interruptBehavior the desired interrupt behavior
+   * @return the decorated command
+   */
+  default WrapperCommand withInterruptBehavior(InterruptionBehavior interruptBehavior) {
+    return new WrapperCommand(this) {
+      @Override
+      public InterruptionBehavior getInterruptionBehavior() {
+        return interruptBehavior;
+      }
+    };
+  }
+
+  /**
+   * Decorates this command with a lambda to call on interrupt or end, following the command's
+   * inherent {@link #end(boolean)} method.
+   *
+   * @param end a lambda accepting a boolean parameter specifying whether the command was
+   *     interrupted.
+   * @return the decorated command
+   */
+  default WrapperCommand finallyDo(BooleanConsumer end) {
+    requireNonNullParam(end, "end", "Command.finallyDo()");
+    return new WrapperCommand(this) {
+      @Override
+      public void end(boolean interrupted) {
+        super.end(interrupted);
+        end.accept(interrupted);
+      }
+    };
+  }
+
+  /**
+   * Decorates this command with a lambda to call on interrupt, following the command's inherent
+   * {@link #end(boolean)} method.
+   *
+   * @param handler a lambda to run when the command is interrupted
+   * @return the decorated command
+   */
+  default WrapperCommand handleInterrupt(Runnable handler) {
+    requireNonNullParam(handler, "handler", "Command.handleInterrupt()");
+    return finallyDo(
+        interrupted -> {
+          if (interrupted) {
+            handler.run();
+          }
+        });
+  }
+
+  /** Schedules this command. */
+  default void schedule() {
+    CommandScheduler.getInstance().schedule(this);
+  }
+
+  /**
+   * Cancels this command. Will call {@link #end(boolean) end(true)}. Commands will be canceled
+   * regardless of {@link InterruptionBehavior interruption behavior}.
+   *
+   * @see CommandScheduler#cancel(Command...)
    */
   default void cancel() {
     CommandScheduler.getInstance().cancel(this);
@@ -328,6 +410,16 @@ public interface Command {
   }
 
   /**
+   * How the command behaves when another command with a shared requirement is scheduled.
+   *
+   * @return a variant of {@link InterruptionBehavior}, defaulting to {@link
+   *     InterruptionBehavior#kCancelSelf kCancelSelf}.
+   */
+  default InterruptionBehavior getInterruptionBehavior() {
+    return InterruptionBehavior.kCancelSelf;
+  }
+
+  /**
    * Whether the given command should run when the robot is disabled. Override to return true if the
    * command should run when disabled.
    *
@@ -338,11 +430,45 @@ public interface Command {
   }
 
   /**
-   * Gets the name of this Command.
+   * Gets the name of this Command. Defaults to the simple class name if not overridden.
    *
-   * @return Name
+   * @return The display name of the Command
    */
   default String getName() {
     return this.getClass().getSimpleName();
+  }
+
+  /**
+   * Sets the name of this Command. Nullop if not overridden.
+   *
+   * @param name The display name of the Command.
+   */
+  default void setName(String name) {}
+
+  /**
+   * Decorates this Command with a name. Is an inline function for #setName(String);
+   *
+   * @param name name
+   * @return the decorated Command
+   */
+  default Command withName(String name) {
+    this.setName(name);
+    return this;
+  }
+
+  /**
+   * An enum describing the command's behavior when another command with a shared requirement is
+   * scheduled.
+   */
+  enum InterruptionBehavior {
+    /**
+     * This command ends, {@link #end(boolean) end(true)} is called, and the incoming command is
+     * scheduled normally.
+     *
+     * <p>This is the default behavior.
+     */
+    kCancelSelf,
+    /** This command continues, and the incoming command is not scheduled. */
+    kCancelIncoming
   }
 }

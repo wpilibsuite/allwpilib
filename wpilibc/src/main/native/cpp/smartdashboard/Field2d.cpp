@@ -4,6 +4,7 @@
 
 #include "frc/smartdashboard/Field2d.h"
 
+#include <networktables/DoubleArrayTopic.h>
 #include <networktables/NTSendableBuilder.h>
 #include <wpi/sendable/SendableRegistry.h>
 
@@ -57,7 +58,7 @@ FieldObject2d* Field2d::GetObject(std::string_view name) {
       std::make_unique<FieldObject2d>(name, FieldObject2d::private_init{}));
   auto obj = m_objects.back().get();
   if (m_table) {
-    obj->m_entry = m_table->GetEntry(obj->m_name);
+    obj->m_entry = m_table->GetDoubleArrayTopic(obj->m_name).GetEntry({});
   }
   return obj;
 }
@@ -74,7 +75,7 @@ void Field2d::InitSendable(nt::NTSendableBuilder& builder) {
   m_table = builder.GetTable();
   for (auto&& obj : m_objects) {
     std::scoped_lock lock2(obj->m_mutex);
-    obj->m_entry = m_table->GetEntry(obj->m_name);
+    obj->m_entry = m_table->GetDoubleArrayTopic(obj->m_name).GetEntry({});
     obj->UpdateEntry(true);
   }
 }

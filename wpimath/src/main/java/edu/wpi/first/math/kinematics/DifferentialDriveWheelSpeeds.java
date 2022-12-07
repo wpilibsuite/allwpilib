@@ -5,7 +5,6 @@
 package edu.wpi.first.math.kinematics;
 
 /** Represents the wheel speeds for a differential drive drivetrain. */
-@SuppressWarnings("MemberName")
 public class DifferentialDriveWheelSpeeds {
   /** Speed of the left side of the robot. */
   public double leftMetersPerSecond;

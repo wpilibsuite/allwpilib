@@ -25,12 +25,12 @@
           "skipInvalidPlatforms": true,
           "binaryPlatforms": [
               "linuxathena",
-              "linuxraspbian",
-              "linuxaarch64bionic",
+              "linuxarm32",
+              "linuxarm64",
               "windowsx86-64",
               "windowsx86",
               "linuxx86-64",
-              "osxx86-64"
+              "osxuniversal"
           ]
       }
   ]

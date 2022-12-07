@@ -74,21 +74,25 @@ class ParallelCommandGroup
     AddCommands(std::move(foo));
   }
 
-  void Initialize() override;
+  void Initialize() final;
 
-  void Execute() override;
+  void Execute() final;
 
-  void End(bool interrupted) override;
+  void End(bool interrupted) final;
 
-  bool IsFinished() override;
+  bool IsFinished() final;
 
   bool RunsWhenDisabled() const override;
+
+  Command::InterruptionBehavior GetInterruptionBehavior() const override;
 
  private:
   void AddCommands(std::vector<std::unique_ptr<Command>>&& commands) final;
 
   std::vector<std::pair<std::unique_ptr<Command>, bool>> m_commands;
   bool m_runWhenDisabled{true};
+  Command::InterruptionBehavior m_interruptBehavior{
+      Command::InterruptionBehavior::kCancelIncoming};
   bool isRunning = false;
 };
 }  // namespace frc2

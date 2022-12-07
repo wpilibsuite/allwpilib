@@ -46,7 +46,6 @@ public final class SplineParameterizer {
    */
   private static final int kMaxIterations = 5000;
 
-  @SuppressWarnings("MemberName")
   private static class StackContents {
     final double t1;
     final double t0;
@@ -57,7 +56,6 @@ public final class SplineParameterizer {
     }
   }
 
-  @SuppressWarnings("serial")
   public static class MalformedSplineException extends RuntimeException {
     /**
      * Create a new exception with the given message.

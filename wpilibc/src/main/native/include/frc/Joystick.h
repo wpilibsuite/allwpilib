@@ -173,6 +173,15 @@ class Joystick : public GenericHID {
   bool GetTriggerReleased();
 
   /**
+   * Constructs an event instance around the trigger button's digital signal.
+   *
+   * @param loop the event loop instance to attach the event to.
+   * @return an event instance representing the trigger button's digital signal
+   * attached to the given loop.
+   */
+  BooleanEvent Trigger(EventLoop* loop) const;
+
+  /**
    * Read the state of the top button on the joystick.
    *
    * Look up which button has been assigned to the top and read its state.
@@ -194,6 +203,15 @@ class Joystick : public GenericHID {
    * @return Whether the button was released since the last check.
    */
   bool GetTopReleased();
+
+  /**
+   * Constructs an event instance around the top button's digital signal.
+   *
+   * @param loop the event loop instance to attach the event to.
+   * @return an event instance representing the top button's digital signal
+   * attached to the given loop.
+   */
+  BooleanEvent Top(EventLoop* loop) const;
 
   /**
    * Get the magnitude of the direction vector formed by the joystick's

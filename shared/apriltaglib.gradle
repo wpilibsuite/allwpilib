@@ -1,0 +1,13 @@
+nativeUtils {
+    nativeDependencyContainer {
+        apriltaglib(getNativeDependencyTypeClass('WPIStaticMavenDependency')) {
+            groupId = "edu.wpi.first.thirdparty.frc2023"
+            artifactId = "apriltaglib"
+            headerClassifier = "headers"
+            sourceClassifier = "sources"
+            ext = "zip"
+            version = '3.2.0-2'
+            targetPlatforms.addAll(nativeUtils.wpi.platforms.allPlatforms)
+        }
+    }
+}

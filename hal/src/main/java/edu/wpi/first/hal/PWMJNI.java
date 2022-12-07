@@ -4,7 +4,6 @@
 
 package edu.wpi.first.hal;
 
-@SuppressWarnings("AbbreviationAsWordInName")
 public class PWMJNI extends DIOJNI {
   public static native int initializePWMPort(int halPortHandle);
 

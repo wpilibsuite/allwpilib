@@ -8,17 +8,14 @@
 
 #include "frc/PneumaticsBase.h"
 #include "frc/simulation/CallbackStore.h"
+#include "frc/simulation/PneumaticsBaseSim.h"
 
-namespace frc {
-
-class Compressor;
-
-namespace sim {
+namespace frc::sim {
 
 /**
  * Class to control a simulated Pneumatic Control Module (PCM).
  */
-class CTREPCMSim {
+class CTREPCMSim : public PneumaticsBaseSim {
  public:
   /**
    * Constructs with the default PCM module number (CAN ID).
@@ -34,81 +31,28 @@ class CTREPCMSim {
 
   explicit CTREPCMSim(const PneumaticsBase& pneumatics);
 
-  /**
-   * Register a callback to be run when a solenoid is initialized on a channel.
-   *
-   * @param callback the callback
-   * @param initialNotify should the callback be run with the initial state
-   * @return the CallbackStore object associated with this callback
-   */
+  ~CTREPCMSim() override = default;
+
   [[nodiscard]] std::unique_ptr<CallbackStore> RegisterInitializedCallback(
-      NotifyCallback callback, bool initialNotify);
+      NotifyCallback callback, bool initialNotify) override;
 
-  /**
-   * Check if a solenoid has been initialized on a specific channel.
-   *
-   * @return true if initialized
-   */
-  bool GetInitialized() const;
+  bool GetInitialized() const override;
 
-  /**
-   * Define whether a solenoid has been initialized on a specific channel.
-   *
-   * @param solenoidInitialized is there a solenoid initialized on that channel
-   */
-  void SetInitialized(bool solenoidInitialized);
+  void SetInitialized(bool initialized) override;
 
-  /**
-   * Register a callback to be run when the solenoid output on a channel
-   * changes.
-   *
-   * @param channel the channel to monitor
-   * @param callback the callback
-   * @param initialNotify should the callback be run with the initial value
-   * @return the CallbackStore object associated with this callback
-   */
   [[nodiscard]] std::unique_ptr<CallbackStore> RegisterSolenoidOutputCallback(
-      int channel, NotifyCallback callback, bool initialNotify);
+      int channel, NotifyCallback callback, bool initialNotify) override;
 
-  /**
-   * Check the solenoid output on a specific channel.
-   *
-   * @param channel the channel to check
-   * @return the solenoid output
-   */
-  bool GetSolenoidOutput(int channel) const;
+  bool GetSolenoidOutput(int channel) const override;
 
-  /**
-   * Change the solenoid output on a specific channel.
-   *
-   * @param channel the channel to check
-   * @param solenoidOutput the new solenoid output
-   */
-  void SetSolenoidOutput(int channel, bool solenoidOutput);
+  void SetSolenoidOutput(int channel, bool solenoidOutput) override;
 
-  /**
-   * Register a callback to be run when the compressor activates.
-   *
-   * @param callback the callback
-   * @param initialNotify whether to run the callback with the initial state
-   * @return the CallbackStore object associated with this callback
-   */
   [[nodiscard]] std::unique_ptr<CallbackStore> RegisterCompressorOnCallback(
-      NotifyCallback callback, bool initialNotify);
+      NotifyCallback callback, bool initialNotify) override;
 
-  /**
-   * Check if the compressor is on.
-   *
-   * @return true if the compressor is active
-   */
-  bool GetCompressorOn() const;
+  bool GetCompressorOn() const override;
 
-  /**
-   * Set whether the compressor is active.
-   *
-   * @param compressorOn the new value
-   */
-  void SetCompressorOn(bool compressorOn);
+  void SetCompressorOn(bool compressorOn) override;
 
   /**
    * Register a callback to be run whenever the closed loop state changes.
@@ -145,21 +89,21 @@ class CTREPCMSim {
    * @return the CallbackStore object associated with this callback
    */
   [[nodiscard]] std::unique_ptr<CallbackStore> RegisterPressureSwitchCallback(
-      NotifyCallback callback, bool initialNotify);
+      NotifyCallback callback, bool initialNotify) override;
 
   /**
    * Check the value of the pressure switch.
    *
    * @return the pressure switch value
    */
-  bool GetPressureSwitch() const;
+  bool GetPressureSwitch() const override;
 
   /**
    * Set the value of the pressure switch.
    *
    * @param pressureSwitch the new value
    */
-  void SetPressureSwitch(bool pressureSwitch);
+  void SetPressureSwitch(bool pressureSwitch) override;
 
   /**
    * Register a callback to be run whenever the compressor current changes.
@@ -170,43 +114,26 @@ class CTREPCMSim {
    */
   [[nodiscard]] std::unique_ptr<CallbackStore>
   RegisterCompressorCurrentCallback(NotifyCallback callback,
-                                    bool initialNotify);
+                                    bool initialNotify) override;
 
   /**
    * Read the compressor current.
    *
    * @return the current of the compressor connected to this module
    */
-  double GetCompressorCurrent() const;
+  double GetCompressorCurrent() const override;
 
   /**
    * Set the compressor current.
    *
    * @param compressorCurrent the new compressor current
    */
-  void SetCompressorCurrent(double compressorCurrent);
+  void SetCompressorCurrent(double compressorCurrent) override;
 
-  /**
-   * Get the current value of all solenoid outputs.
-   *
-   * @return the solenoid outputs (1 bit per output)
-   */
-  uint8_t GetAllSolenoidOutputs() const;
+  uint8_t GetAllSolenoidOutputs() const override;
 
-  /**
-   * Change all of the solenoid outputs.
-   *
-   * @param outputs the new solenoid outputs (1 bit per output)
-   */
-  void SetAllSolenoidOutputs(uint8_t outputs);
+  void SetAllSolenoidOutputs(uint8_t outputs) override;
 
-  /**
-   * Reset all simulation data for this object.
-   */
-  void ResetData();
-
- private:
-  int m_index;
+  void ResetData() override;
 };
-}  // namespace sim
-}  // namespace frc
+}  // namespace frc::sim

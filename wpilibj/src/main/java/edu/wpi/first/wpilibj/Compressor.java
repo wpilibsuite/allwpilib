@@ -63,34 +63,6 @@ public class Compressor implements Sendable, AutoCloseable {
   }
 
   /**
-   * Start the compressor running in closed loop control mode.
-   *
-   * <p>Use the method in cases where you would like to manually stop and start the compressor for
-   * applications such as conserving battery or making sure that the compressor motor doesn't start
-   * during critical operations.
-   *
-   * @deprecated Use enableDigital() instead.
-   */
-  @Deprecated(since = "2022", forRemoval = true)
-  public void start() {
-    enableDigital();
-  }
-
-  /**
-   * Stop the compressor from running in closed loop control mode.
-   *
-   * <p>Use the method in cases where you would like to manually stop and start the compressor for
-   * applications such as conserving battery or making sure that the compressor motor doesn't start
-   * during critical operations.
-   *
-   * @deprecated Use disable() instead.
-   */
-  @Deprecated(since = "2022", forRemoval = true)
-  public void stop() {
-    disable();
-  }
-
-  /**
    * Get the status of the compressor. To (re)enable the compressor use enableDigital() or
    * enableAnalog(...).
    *

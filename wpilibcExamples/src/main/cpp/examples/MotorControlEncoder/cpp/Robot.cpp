@@ -2,19 +2,20 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
+#include <numbers>
+
 #include <frc/Encoder.h>
 #include <frc/Joystick.h>
 #include <frc/TimedRobot.h>
 #include <frc/motorcontrol/PWMSparkMax.h>
 #include <frc/smartdashboard/SmartDashboard.h>
-#include <wpi/numbers>
 
 /**
  * This sample program shows how to control a motor using a joystick. In the
  * operator control part of the program, the joystick is read and the value is
  * written to the motor.
  *
- * Joystick analog values range from -1 to 1 and speed controller inputs as
+ * Joystick analog values range from -1 to 1 and motor controller inputs as
  * range from -1 to 1 making it easy to work together.
  *
  * In addition, the encoder value of an encoder connected to ports 0 and 1 is
@@ -35,7 +36,7 @@ class Robot : public frc::TimedRobot {
   void RobotInit() override {
     // Use SetDistancePerPulse to set the multiplier for GetDistance
     // This is set up assuming a 6 inch wheel with a 360 CPR encoder.
-    m_encoder.SetDistancePerPulse((wpi::numbers::pi * 6) / 360.0);
+    m_encoder.SetDistancePerPulse((std::numbers::pi * 6) / 360.0);
   }
 
  private:

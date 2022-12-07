@@ -62,21 +62,25 @@ class ParallelRaceGroup
     AddCommands(std::move(foo));
   }
 
-  void Initialize() override;
+  void Initialize() final;
 
-  void Execute() override;
+  void Execute() final;
 
-  void End(bool interrupted) override;
+  void End(bool interrupted) final;
 
-  bool IsFinished() override;
+  bool IsFinished() final;
 
   bool RunsWhenDisabled() const override;
+
+  Command::InterruptionBehavior GetInterruptionBehavior() const override;
 
  private:
   void AddCommands(std::vector<std::unique_ptr<Command>>&& commands) final;
 
   std::vector<std::unique_ptr<Command>> m_commands;
   bool m_runWhenDisabled{true};
+  Command::InterruptionBehavior m_interruptBehavior{
+      Command::InterruptionBehavior::kCancelIncoming};
   bool m_finished{false};
   bool isRunning = false;
 };

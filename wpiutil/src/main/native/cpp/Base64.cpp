@@ -138,8 +138,8 @@ size_t Base64Decode(std::string_view encoded, std::vector<uint8_t>* plain) {
   return Base64Decode(os, encoded);
 }
 
-span<uint8_t> Base64Decode(std::string_view encoded, size_t* num_read,
-                           SmallVectorImpl<uint8_t>& buf) {
+std::span<uint8_t> Base64Decode(std::string_view encoded, size_t* num_read,
+                                SmallVectorImpl<uint8_t>& buf) {
   buf.clear();
   raw_usvector_ostream os(buf);
   *num_read = Base64Decode(os, encoded);
@@ -193,19 +193,19 @@ std::string_view Base64Encode(std::string_view plain,
   return os.str();
 }
 
-void Base64Encode(raw_ostream& os, span<const uint8_t> plain) {
+void Base64Encode(raw_ostream& os, std::span<const uint8_t> plain) {
   Base64Encode(os, std::string_view{reinterpret_cast<const char*>(plain.data()),
                                     plain.size()});
 }
 
-void Base64Encode(span<const uint8_t> plain, std::string* encoded) {
+void Base64Encode(std::span<const uint8_t> plain, std::string* encoded) {
   encoded->resize(0);
   raw_string_ostream os(*encoded);
   Base64Encode(os, plain);
   os.flush();
 }
 
-std::string_view Base64Encode(span<const uint8_t> plain,
+std::string_view Base64Encode(std::span<const uint8_t> plain,
                               SmallVectorImpl<char>& buf) {
   buf.clear();
   raw_svector_ostream os(buf);

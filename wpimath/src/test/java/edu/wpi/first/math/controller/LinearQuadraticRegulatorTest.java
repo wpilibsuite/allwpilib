@@ -17,7 +17,6 @@ import org.junit.jupiter.api.Test;
 
 class LinearQuadraticRegulatorTest {
   @Test
-  @SuppressWarnings("LocalVariableName")
   void testLQROnElevator() {
     var motors = DCMotor.getVex775Pro(2);
 
@@ -38,7 +37,6 @@ class LinearQuadraticRegulatorTest {
   }
 
   @Test
-  @SuppressWarnings("LocalVariableName")
   void testFourMotorElevator() {
     var dt = 0.020;
 
@@ -55,7 +53,6 @@ class LinearQuadraticRegulatorTest {
   }
 
   @Test
-  @SuppressWarnings("LocalVariableName")
   void testLQROnArm() {
     var motors = DCMotor.getVex775Pro(2);
 
@@ -89,7 +86,6 @@ class LinearQuadraticRegulatorTest {
    * @param Aref Desired state matrix.
    * @param dtSeconds Discretization timestep in seconds.
    */
-  @SuppressWarnings({"LocalVariableName", "MethodTypeParameterName", "ParameterName"})
   <States extends Num, Inputs extends Num> Matrix<Inputs, States> getImplicitModelFollowingK(
       Matrix<States, States> A,
       Matrix<States, Inputs> B,
@@ -114,7 +110,6 @@ class LinearQuadraticRegulatorTest {
   }
 
   @Test
-  @SuppressWarnings("LocalVariableName")
   void testMatrixOverloadsWithSingleIntegrator() {
     var A = Matrix.mat(Nat.N2(), Nat.N2()).fill(0, 0, 0, 0);
     var B = Matrix.mat(Nat.N2(), Nat.N2()).fill(1, 0, 0, 1);
@@ -138,7 +133,6 @@ class LinearQuadraticRegulatorTest {
   }
 
   @Test
-  @SuppressWarnings("LocalVariableName")
   void testMatrixOverloadsWithDoubleIntegrator() {
     double Kv = 3.02;
     double Ka = 0.642;

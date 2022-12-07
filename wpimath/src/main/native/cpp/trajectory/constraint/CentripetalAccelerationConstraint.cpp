@@ -15,12 +15,12 @@ CentripetalAccelerationConstraint::CentripetalAccelerationConstraint(
 units::meters_per_second_t CentripetalAccelerationConstraint::MaxVelocity(
     const Pose2d& pose, units::curvature_t curvature,
     units::meters_per_second_t velocity) const {
-  // ac = v^2 / r
-  // k (curvature) = 1 / r
+  // ac = v²/r
+  // k (curvature) = 1/r
 
-  // therefore, ac = v^2 * k
-  // ac / k = v^2
-  // v = std::sqrt(ac / k)
+  // therefore, ac = v²k
+  // ac/k = v²
+  // v = √(ac/k)
 
   // We have to multiply by 1_rad here to get the units to cancel out nicely.
   // The units library defines a unit for radians although it is technically

@@ -2,6 +2,8 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
+#include <limits>
+
 #include "frc/MathUtil.h"
 #include "gtest/gtest.h"
 #include "units/angle.h"
@@ -10,7 +12,7 @@
 
 #define EXPECT_UNITS_NEAR(a, b, c) EXPECT_NEAR((a).value(), (b).value(), c)
 
-TEST(MathUtilTest, ApplyDeadband) {
+TEST(MathUtilTest, ApplyDeadbandUnityScale) {
   // < 0
   EXPECT_DOUBLE_EQ(-1.0, frc::ApplyDeadband(-1.0, 0.02));
   EXPECT_DOUBLE_EQ((-0.03 + 0.02) / (1.0 - 0.02),
@@ -27,6 +29,33 @@ TEST(MathUtilTest, ApplyDeadband) {
   EXPECT_DOUBLE_EQ((0.03 - 0.02) / (1.0 - 0.02),
                    frc::ApplyDeadband(0.03, 0.02));
   EXPECT_DOUBLE_EQ(1.0, frc::ApplyDeadband(1.0, 0.02));
+}
+
+TEST(MathUtilTest, ApplyDeadbandArbitraryScale) {
+  // < 0
+  EXPECT_DOUBLE_EQ(-2.5, frc::ApplyDeadband(-2.5, 0.02, 2.5));
+  EXPECT_DOUBLE_EQ(0.0, frc::ApplyDeadband(-0.02, 0.02, 2.5));
+  EXPECT_DOUBLE_EQ(0.0, frc::ApplyDeadband(-0.01, 0.02, 2.5));
+
+  // == 0
+  EXPECT_DOUBLE_EQ(0.0, frc::ApplyDeadband(0.0, 0.02, 2.5));
+
+  // > 0
+  EXPECT_DOUBLE_EQ(0.0, frc::ApplyDeadband(0.01, 0.02, 2.5));
+  EXPECT_DOUBLE_EQ(0.0, frc::ApplyDeadband(0.02, 0.02, 2.5));
+  EXPECT_DOUBLE_EQ(2.5, frc::ApplyDeadband(2.5, 0.02, 2.5));
+}
+
+TEST(MathUtilTest, ApplyDeadbandUnits) {
+  // < 0
+  EXPECT_DOUBLE_EQ(
+      -20, frc::ApplyDeadband<units::radian_t>(-20_rad, 1_rad, 20_rad).value());
+}
+
+TEST(MathUtilTest, ApplyDeadbandLargeMaxMagnitude) {
+  EXPECT_DOUBLE_EQ(
+      80.0,
+      frc::ApplyDeadband(100.0, 20.0, std::numeric_limits<double>::infinity()));
 }
 
 TEST(MathUtilTest, InputModulus) {
@@ -71,20 +100,20 @@ TEST(MathUtilTest, InputModulus) {
 
 TEST(MathUtilTest, AngleModulus) {
   EXPECT_UNITS_NEAR(
-      frc::AngleModulus(units::radian_t{-2000 * wpi::numbers::pi / 180}),
-      units::radian_t{160 * wpi::numbers::pi / 180}, 1e-10);
+      frc::AngleModulus(units::radian_t{-2000 * std::numbers::pi / 180}),
+      units::radian_t{160 * std::numbers::pi / 180}, 1e-10);
   EXPECT_UNITS_NEAR(
-      frc::AngleModulus(units::radian_t{358 * wpi::numbers::pi / 180}),
-      units::radian_t{-2 * wpi::numbers::pi / 180}, 1e-10);
-  EXPECT_UNITS_NEAR(frc::AngleModulus(units::radian_t{2.0 * wpi::numbers::pi}),
+      frc::AngleModulus(units::radian_t{358 * std::numbers::pi / 180}),
+      units::radian_t{-2 * std::numbers::pi / 180}, 1e-10);
+  EXPECT_UNITS_NEAR(frc::AngleModulus(units::radian_t{2.0 * std::numbers::pi}),
                     0_rad, 1e-10);
 
-  EXPECT_UNITS_EQ(frc::AngleModulus(units::radian_t(5 * wpi::numbers::pi)),
-                  units::radian_t(wpi::numbers::pi));
-  EXPECT_UNITS_EQ(frc::AngleModulus(units::radian_t(-5 * wpi::numbers::pi)),
-                  units::radian_t(wpi::numbers::pi));
-  EXPECT_UNITS_EQ(frc::AngleModulus(units::radian_t(wpi::numbers::pi / 2)),
-                  units::radian_t(wpi::numbers::pi / 2));
-  EXPECT_UNITS_EQ(frc::AngleModulus(units::radian_t(-wpi::numbers::pi / 2)),
-                  units::radian_t(-wpi::numbers::pi / 2));
+  EXPECT_UNITS_EQ(frc::AngleModulus(units::radian_t{5 * std::numbers::pi}),
+                  units::radian_t{std::numbers::pi});
+  EXPECT_UNITS_EQ(frc::AngleModulus(units::radian_t{-5 * std::numbers::pi}),
+                  units::radian_t{std::numbers::pi});
+  EXPECT_UNITS_EQ(frc::AngleModulus(units::radian_t{std::numbers::pi / 2}),
+                  units::radian_t{std::numbers::pi / 2});
+  EXPECT_UNITS_EQ(frc::AngleModulus(units::radian_t{-std::numbers::pi / 2}),
+                  units::radian_t{-std::numbers::pi / 2});
 }

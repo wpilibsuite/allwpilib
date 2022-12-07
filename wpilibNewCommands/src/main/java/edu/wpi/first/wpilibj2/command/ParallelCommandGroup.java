@@ -19,6 +19,7 @@ public class ParallelCommandGroup extends CommandGroupBase {
   // maps commands in this group to whether they are still running
   private final Map<Command, Boolean> m_commands = new HashMap<>();
   private boolean m_runWhenDisabled = true;
+  private InterruptionBehavior m_interruptBehavior = InterruptionBehavior.kCancelIncoming;
 
   /**
    * Creates a new ParallelCommandGroup. The given commands will be executed simultaneously. The
@@ -50,11 +51,14 @@ public class ParallelCommandGroup extends CommandGroupBase {
       m_commands.put(command, false);
       m_requirements.addAll(command.getRequirements());
       m_runWhenDisabled &= command.runsWhenDisabled();
+      if (command.getInterruptionBehavior() == InterruptionBehavior.kCancelSelf) {
+        m_interruptBehavior = InterruptionBehavior.kCancelSelf;
+      }
     }
   }
 
   @Override
-  public void initialize() {
+  public final void initialize() {
     for (Map.Entry<Command, Boolean> commandRunning : m_commands.entrySet()) {
       commandRunning.getKey().initialize();
       commandRunning.setValue(true);
@@ -62,7 +66,7 @@ public class ParallelCommandGroup extends CommandGroupBase {
   }
 
   @Override
-  public void execute() {
+  public final void execute() {
     for (Map.Entry<Command, Boolean> commandRunning : m_commands.entrySet()) {
       if (!commandRunning.getValue()) {
         continue;
@@ -76,7 +80,7 @@ public class ParallelCommandGroup extends CommandGroupBase {
   }
 
   @Override
-  public void end(boolean interrupted) {
+  public final void end(boolean interrupted) {
     if (interrupted) {
       for (Map.Entry<Command, Boolean> commandRunning : m_commands.entrySet()) {
         if (commandRunning.getValue()) {
@@ -87,7 +91,7 @@ public class ParallelCommandGroup extends CommandGroupBase {
   }
 
   @Override
-  public boolean isFinished() {
+  public final boolean isFinished() {
     return !m_commands.containsValue(true);
   }
 
@@ -97,8 +101,7 @@ public class ParallelCommandGroup extends CommandGroupBase {
   }
 
   @Override
-  public ParallelCommandGroup alongWith(Command... parallel) {
-    addCommands(parallel);
-    return this;
+  public InterruptionBehavior getInterruptionBehavior() {
+    return m_interruptBehavior;
   }
 }

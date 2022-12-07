@@ -89,7 +89,8 @@ if (WITH_JAVA)
 
 endif()
 
-file(GLOB_RECURSE wpimath_native_src src/main/native/cpp/*.cpp)
+file(GLOB_RECURSE wpimath_native_src src/main/native/cpp/*.cpp
+                                     src/main/native/thirdparty/drake/src/*.cpp)
 list(REMOVE_ITEM wpimath_native_src ${wpimath_jni_src})
 
 set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS FALSE)
@@ -100,29 +101,37 @@ set_target_properties(wpimath PROPERTIES DEBUG_POSTFIX "d")
 set_property(TARGET wpimath PROPERTY FOLDER "libraries")
 target_compile_definitions(wpimath PRIVATE WPILIB_EXPORTS)
 
-target_compile_features(wpimath PUBLIC cxx_std_17)
+target_compile_features(wpimath PUBLIC cxx_std_20)
 if (MSVC)
     target_compile_options(wpimath PUBLIC /bigobj)
 endif()
 wpilib_target_warnings(wpimath)
 target_link_libraries(wpimath wpiutil)
 
-if (NOT USE_VCPKG_EIGEN)
-    install(DIRECTORY src/main/native/eigeninclude/ DESTINATION "${include_dest}/wpimath")
+if (NOT USE_SYSTEM_EIGEN)
+    install(DIRECTORY src/main/native/thirdparty/eigen/include/ DESTINATION "${include_dest}/wpimath")
     target_include_directories(wpimath SYSTEM PUBLIC
-                            $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/eigeninclude>
-                            $<INSTALL_INTERFACE:${include_dest}/wpimath>)
+                               $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/thirdparty/eigen/include>
+                               $<INSTALL_INTERFACE:${include_dest}/wpimath>)
 else()
     find_package(Eigen3 CONFIG REQUIRED)
     target_link_libraries (wpimath Eigen3::Eigen)
 endif()
 
+install(DIRECTORY src/main/native/thirdparty/drake/include/ DESTINATION "${include_dest}/wpimath")
+target_include_directories(wpimath SYSTEM PUBLIC
+                           $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/thirdparty/drake/include>)
+
+install(DIRECTORY src/main/native/thirdparty/gcem/include/ DESTINATION "${include_dest}/wpimath")
+target_include_directories(wpimath SYSTEM PUBLIC
+                          $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/thirdparty/gcem/include>)
+
+install(DIRECTORY src/main/native/include/ DESTINATION "${include_dest}/wpimath")
 target_include_directories(wpimath PUBLIC
                             $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/include>
                             $<INSTALL_INTERFACE:${include_dest}/wpimath>)
 
 install(TARGETS wpimath EXPORT wpimath DESTINATION "${main_lib_dest}")
-install(DIRECTORY src/main/native/include/ DESTINATION "${include_dest}/wpimath")
 
 if (WITH_JAVA AND MSVC)
     install(TARGETS wpimath RUNTIME DESTINATION "${jni_lib_dest}" COMPONENT Runtime)

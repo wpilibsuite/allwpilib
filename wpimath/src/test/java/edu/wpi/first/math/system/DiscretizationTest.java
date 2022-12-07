@@ -58,9 +58,9 @@ class DiscretizationTest {
     assertEquals(x1Truth, x1Discrete);
   }
 
-  //                                             dt
-  // Test that the discrete approximation of Q ≈ ∫ e^(Aτ) Q e^(Aᵀτ) dτ
-  //                                             0
+  //                                               T
+  // Test that the discrete approximation of Q_d ≈ ∫ e^(Aτ) Q e^(Aᵀτ) dτ
+  //                                               0
   @Test
   void testDiscretizeSlowModelAQ() {
     final var contA = new MatBuilder<>(Nat.N2(), Nat.N2()).fill(0, 1, 0, 0);
@@ -68,6 +68,9 @@ class DiscretizationTest {
 
     final double dt = 1.0;
 
+    //       T
+    // Q_d = ∫ e^(Aτ) Q e^(Aᵀτ) dτ
+    //       0
     final var discQIntegrated =
         RungeKuttaTimeVarying.rungeKuttaTimeVarying(
             (Double t, Matrix<N2, N2> x) ->
@@ -87,9 +90,9 @@ class DiscretizationTest {
             + discQIntegrated);
   }
 
-  //                                             dt
-  // Test that the discrete approximation of Q ≈ ∫ e^(Aτ) Q e^(Aᵀτ) dτ
-  //                                             0
+  //                                               T
+  // Test that the discrete approximation of Q_d ≈ ∫ e^(Aτ) Q e^(Aᵀτ) dτ
+  //                                               0
   @Test
   void testDiscretizeFastModelAQ() {
     final var contA = new MatBuilder<>(Nat.N2(), Nat.N2()).fill(0, 1, 0, -1406.29);
@@ -97,6 +100,9 @@ class DiscretizationTest {
 
     final var dt = 0.005;
 
+    //       T
+    // Q_d = ∫ e^(Aτ) Q e^(Aᵀτ) dτ
+    //       0
     final var discQIntegrated =
         RungeKuttaTimeVarying.rungeKuttaTimeVarying(
             (Double t, Matrix<N2, N2> x) ->
@@ -130,6 +136,9 @@ class DiscretizationTest {
       assertTrue(esCont.getEigenvalue(i).real >= 0);
     }
 
+    //       T
+    // Q_d = ∫ e^(Aτ) Q e^(Aᵀτ) dτ
+    //       0
     final var discQIntegrated =
         RungeKuttaTimeVarying.rungeKuttaTimeVarying(
             (Double t, Matrix<N2, N2> x) ->
@@ -173,6 +182,9 @@ class DiscretizationTest {
       assertTrue(esCont.getEigenvalue(i).real >= 0);
     }
 
+    //       T
+    // Q_d = ∫ e^(Aτ) Q e^(Aᵀτ) dτ
+    //       0
     final var discQIntegrated =
         RungeKuttaTimeVarying.rungeKuttaTimeVarying(
             (Double t, Matrix<N2, N2> x) ->

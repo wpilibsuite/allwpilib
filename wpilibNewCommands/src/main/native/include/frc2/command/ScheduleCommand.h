@@ -4,8 +4,9 @@
 
 #pragma once
 
+#include <span>
+
 #include <wpi/SmallVector.h>
-#include <wpi/span.h>
 
 #include "frc2/command/CommandBase.h"
 #include "frc2/command/CommandHelper.h"
@@ -28,7 +29,7 @@ class ScheduleCommand : public CommandHelper<CommandBase, ScheduleCommand> {
    *
    * @param toSchedule the commands to schedule
    */
-  explicit ScheduleCommand(wpi::span<Command* const> toSchedule);
+  explicit ScheduleCommand(std::span<Command* const> toSchedule);
 
   explicit ScheduleCommand(Command* toSchedule);
 

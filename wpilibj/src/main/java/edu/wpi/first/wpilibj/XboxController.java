@@ -6,6 +6,8 @@ package edu.wpi.first.wpilibj;
 
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
+import edu.wpi.first.wpilibj.event.BooleanEvent;
+import edu.wpi.first.wpilibj.event.EventLoop;
 
 /**
  * Handle input from Xbox 360 or Xbox One controllers connected to the Driver Station.
@@ -28,7 +30,6 @@ public class XboxController extends GenericHID {
     kBack(7),
     kStart(8);
 
-    @SuppressWarnings("MemberName")
     public final int value;
 
     Button(int value) {
@@ -62,7 +63,6 @@ public class XboxController extends GenericHID {
     kLeftTrigger(2),
     kRightTrigger(3);
 
-    @SuppressWarnings("MemberName")
     public final int value;
 
     Axis(int value) {
@@ -209,6 +209,28 @@ public class XboxController extends GenericHID {
   }
 
   /**
+   * Constructs an event instance around the right bumper's digital signal.
+   *
+   * @param loop the event loop instance to attach the event to.
+   * @return an event instance representing the right bumper's digital signal attached to the given
+   *     loop.
+   */
+  public BooleanEvent leftBumper(EventLoop loop) {
+    return new BooleanEvent(loop, this::getLeftBumper);
+  }
+
+  /**
+   * Constructs an event instance around the left bumper's digital signal.
+   *
+   * @param loop the event loop instance to attach the event to.
+   * @return an event instance representing the left bumper's digital signal attached to the given
+   *     loop.
+   */
+  public BooleanEvent rightBumper(EventLoop loop) {
+    return new BooleanEvent(loop, this::getRightBumper);
+  }
+
+  /**
    * Read the value of the left stick button (LSB) on the controller.
    *
    * @return The state of the button.
@@ -263,6 +285,28 @@ public class XboxController extends GenericHID {
   }
 
   /**
+   * Constructs an event instance around the left stick button's digital signal.
+   *
+   * @param loop the event loop instance to attach the event to.
+   * @return an event instance representing the left stick button's digital signal attached to the
+   *     given loop.
+   */
+  public BooleanEvent leftStick(EventLoop loop) {
+    return new BooleanEvent(loop, this::getLeftStickButton);
+  }
+
+  /**
+   * Constructs an event instance around the right stick button's digital signal.
+   *
+   * @param loop the event loop instance to attach the event to.
+   * @return an event instance representing the right stick button's digital signal attached to the
+   *     given loop.
+   */
+  public BooleanEvent rightStick(EventLoop loop) {
+    return new BooleanEvent(loop, this::getRightStickButton);
+  }
+
+  /**
    * Read the value of the A button on the controller.
    *
    * @return The state of the button.
@@ -287,6 +331,18 @@ public class XboxController extends GenericHID {
    */
   public boolean getAButtonReleased() {
     return getRawButtonReleased(Button.kA.value);
+  }
+
+  /**
+   * Constructs an event instance around the A button's digital signal.
+   *
+   * @param loop the event loop instance to attach the event to.
+   * @return an event instance representing the A button's digital signal attached to the given
+   *     loop.
+   */
+  @SuppressWarnings("MethodName")
+  public BooleanEvent a(EventLoop loop) {
+    return new BooleanEvent(loop, this::getAButton);
   }
 
   /**
@@ -317,6 +373,18 @@ public class XboxController extends GenericHID {
   }
 
   /**
+   * Constructs an event instance around the B button's digital signal.
+   *
+   * @param loop the event loop instance to attach the event to.
+   * @return an event instance representing the B button's digital signal attached to the given
+   *     loop.
+   */
+  @SuppressWarnings("MethodName")
+  public BooleanEvent b(EventLoop loop) {
+    return new BooleanEvent(loop, this::getBButton);
+  }
+
+  /**
    * Read the value of the X button on the controller.
    *
    * @return The state of the button.
@@ -341,6 +409,18 @@ public class XboxController extends GenericHID {
    */
   public boolean getXButtonReleased() {
     return getRawButtonReleased(Button.kX.value);
+  }
+
+  /**
+   * Constructs an event instance around the X button's digital signal.
+   *
+   * @param loop the event loop instance to attach the event to.
+   * @return an event instance representing the X button's digital signal attached to the given
+   *     loop.
+   */
+  @SuppressWarnings("MethodName")
+  public BooleanEvent x(EventLoop loop) {
+    return new BooleanEvent(loop, this::getXButton);
   }
 
   /**
@@ -371,6 +451,18 @@ public class XboxController extends GenericHID {
   }
 
   /**
+   * Constructs an event instance around the Y button's digital signal.
+   *
+   * @param loop the event loop instance to attach the event to.
+   * @return an event instance representing the Y button's digital signal attached to the given
+   *     loop.
+   */
+  @SuppressWarnings("MethodName")
+  public BooleanEvent y(EventLoop loop) {
+    return new BooleanEvent(loop, this::getYButton);
+  }
+
+  /**
    * Read the value of the back button on the controller.
    *
    * @return The state of the button.
@@ -398,6 +490,17 @@ public class XboxController extends GenericHID {
   }
 
   /**
+   * Constructs an event instance around the back button's digital signal.
+   *
+   * @param loop the event loop instance to attach the event to.
+   * @return an event instance representing the back button's digital signal attached to the given
+   *     loop.
+   */
+  public BooleanEvent back(EventLoop loop) {
+    return new BooleanEvent(loop, this::getBackButton);
+  }
+
+  /**
    * Read the value of the start button on the controller.
    *
    * @return The state of the button.
@@ -422,5 +525,16 @@ public class XboxController extends GenericHID {
    */
   public boolean getStartButtonReleased() {
     return getRawButtonReleased(Button.kStart.value);
+  }
+
+  /**
+   * Constructs an event instance around the start button's digital signal.
+   *
+   * @param loop the event loop instance to attach the event to.
+   * @return an event instance representing the start button's digital signal attached to the given
+   *     loop.
+   */
+  public BooleanEvent start(EventLoop loop) {
+    return new BooleanEvent(loop, this::getStartButton);
   }
 }

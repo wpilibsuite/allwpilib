@@ -6,6 +6,7 @@ package edu.wpi.first.wpilibj;
 
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.util.WPIUtilJNI;
+import edu.wpi.first.util.concurrent.Event;
 import edu.wpi.first.util.datalog.DataLog;
 import edu.wpi.first.util.datalog.IntegerLogEntry;
 import edu.wpi.first.util.datalog.StringLogEntry;
@@ -188,7 +189,6 @@ public final class DataLogManager {
     }
   }
 
-  @SuppressWarnings("PMD.EmptyCatchBlock")
   private static String makeLogDir(String dir) {
     if (!dir.isEmpty()) {
       return dir;
@@ -280,12 +280,19 @@ public final class DataLogManager {
         new IntegerLogEntry(
             m_log, "systemTime", "{\"source\":\"DataLogManager\",\"format\":\"time_t_us\"}");
 
+    Event newDataEvent = new Event();
+    DriverStation.provideRefreshedDataEventHandle(newDataEvent.getHandle());
     while (!Thread.interrupted()) {
-      boolean newData = DriverStation.waitForData(0.25);
+      boolean timedOut;
+      try {
+        timedOut = WPIUtilJNI.waitForObjectTimeout(newDataEvent.getHandle(), 0.25);
+      } catch (InterruptedException e) {
+        break;
+      }
       if (Thread.interrupted()) {
         break;
       }
-      if (!newData) {
+      if (timedOut) {
         timeoutCount++;
         // pause logging after being disconnected for 10 seconds
         if (timeoutCount > 40 && !paused) {
@@ -372,5 +379,6 @@ public final class DataLogManager {
         sysTimeEntry.append(WPIUtilJNI.getSystemTime(), WPIUtilJNI.now());
       }
     }
+    newDataEvent.close();
   }
 }

@@ -334,7 +334,7 @@ class future final {
     }
   }
 
-  template <typename F, typename R = typename std::result_of<F && (T &&)>::type>
+  template <typename F, typename R = typename std::invoke_result_t<F&&, T&&>>
   future<R> then(F&& func) {
     return then(PromiseFactory<R>::GetInstance(), std::forward<F>(func));
   }
@@ -457,7 +457,7 @@ class future<void> final {
     }
   }
 
-  template <typename F, typename R = typename std::result_of<F && ()>::type>
+  template <typename F, typename R = typename std::invoke_result_t<F&&>>
   future<R> then(F&& func) {
     return then(PromiseFactory<R>::GetInstance(), std::forward<F>(func));
   }

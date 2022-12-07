@@ -254,7 +254,7 @@ Storage::Value& Storage::GetValue(std::string_view key) {
   }                                                                            \
                                                                                \
   std::vector<ArrCType>& Storage::Get##CapsName##Array(                        \
-      std::string_view key, wpi::span<const ArrCType> defaultVal) {            \
+      std::string_view key, std::span<const ArrCType> defaultVal) {            \
     auto& valuePtr = m_values[key];                                            \
     bool setValue = false;                                                     \
     if (!valuePtr) {                                                           \

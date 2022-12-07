@@ -233,9 +233,11 @@ void HAL_SetCTREPCMClosedLoopControl(HAL_CTREPCMHandle handle, HAL_Bool enabled,
     return;
   }
 
+  int32_t can_status = 0;
+
   std::scoped_lock lock{pcm->lock};
   pcm->control.bits.closedLoopEnable = enabled ? 1 : 0;
-  SendControl(pcm.get(), status);
+  SendControl(pcm.get(), &can_status);
 }
 
 HAL_Bool HAL_GetCTREPCMClosedLoopControl(HAL_CTREPCMHandle handle,
@@ -394,9 +396,8 @@ void HAL_SetCTREPCMOneShotDuration(HAL_CTREPCMHandle handle, int32_t index,
   }
 
   std::scoped_lock lock{pcm->lock};
-  pcm->oneShot.sol10MsPerUnit[index] =
-      (std::min)(static_cast<uint32_t>(durMs) / 10,
-                 static_cast<uint32_t>(0xFF));
+  pcm->oneShot.sol10MsPerUnit[index] = (std::min)(
+      static_cast<uint32_t>(durMs) / 10, static_cast<uint32_t>(0xFF));
   HAL_WriteCANPacketRepeating(pcm->canHandle, pcm->oneShot.sol10MsPerUnit, 8,
                               Control3, SendPeriod, status);
 }

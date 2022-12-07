@@ -7,8 +7,9 @@
 #include <atomic>
 #include <string>
 
+#include <networktables/IntegerTopic.h>
 #include <networktables/NTSendable.h>
-#include <networktables/NetworkTableEntry.h>
+#include <networktables/StringTopic.h>
 #include <wpi/SmallVector.h>
 #include <wpi/mutex.h>
 #include <wpi/sendable/SendableHelper.h>
@@ -40,7 +41,8 @@ class SendableChooserBase : public nt::NTSendable,
   std::string m_defaultChoice;
   std::string m_selected;
   bool m_haveSelected = false;
-  wpi::SmallVector<nt::NetworkTableEntry, 2> m_activeEntries;
+  wpi::SmallVector<nt::IntegerPublisher, 2> m_instancePubs;
+  wpi::SmallVector<nt::StringPublisher, 2> m_activePubs;
   wpi::mutex m_mutex;
   int m_instance;
   static std::atomic_int s_instances;

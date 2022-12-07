@@ -17,7 +17,7 @@ using namespace frc;
 DutyCycle::DutyCycle(DigitalSource* source)
     : m_source{source, wpi::NullDeleter<DigitalSource>()} {
   if (!m_source) {
-    throw FRC_MakeError(err::NullParameter, "{}", "source");
+    throw FRC_MakeError(err::NullParameter, "source");
   }
   InitDutyCycle();
 }
@@ -30,7 +30,7 @@ DutyCycle::DutyCycle(DigitalSource& source)
 DutyCycle::DutyCycle(std::shared_ptr<DigitalSource> source)
     : m_source{std::move(source)} {
   if (!m_source) {
-    throw FRC_MakeError(err::NullParameter, "{}", "source");
+    throw FRC_MakeError(err::NullParameter, "source");
   }
   InitDutyCycle();
 }
@@ -73,11 +73,11 @@ double DutyCycle::GetOutput() const {
   return retVal;
 }
 
-unsigned int DutyCycle::GetOutputRaw() const {
+units::second_t DutyCycle::GetHighTime() const {
   int32_t status = 0;
-  auto retVal = HAL_GetDutyCycleOutputRaw(m_handle, &status);
+  auto retVal = HAL_GetDutyCycleHighTime(m_handle, &status);
   FRC_CheckErrorStatus(status, "Channel {}", GetSourceChannel());
-  return retVal;
+  return units::nanosecond_t{static_cast<double>(retVal)};
 }
 
 unsigned int DutyCycle::GetOutputScaleFactor() const {

@@ -5,8 +5,10 @@
 package edu.wpi.first.wpilibj.smartdashboard;
 
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.networktables.DoubleEntry;
 import edu.wpi.first.networktables.NetworkTable;
-import edu.wpi.first.networktables.NetworkTableEntry;
+import edu.wpi.first.networktables.StringEntry;
+import edu.wpi.first.networktables.StringPublisher;
 import edu.wpi.first.wpilibj.util.Color8Bit;
 
 /**
@@ -16,14 +18,15 @@ import edu.wpi.first.wpilibj.util.Color8Bit;
  * @see Mechanism2d
  */
 public class MechanismLigament2d extends MechanismObject2d {
+  private StringPublisher m_typePub;
   private double m_angle;
-  private NetworkTableEntry m_angleEntry;
+  private DoubleEntry m_angleEntry;
   private String m_color;
-  private NetworkTableEntry m_colorEntry;
+  private StringEntry m_colorEntry;
   private double m_length;
-  private NetworkTableEntry m_lengthEntry;
+  private DoubleEntry m_lengthEntry;
   private double m_weight;
-  private NetworkTableEntry m_weightEntry;
+  private DoubleEntry m_weightEntry;
 
   /**
    * Create a new ligament.
@@ -54,6 +57,26 @@ public class MechanismLigament2d extends MechanismObject2d {
     this(name, length, angle, 10, new Color8Bit(235, 137, 52));
   }
 
+  @Override
+  public void close() {
+    super.close();
+    if (m_typePub != null) {
+      m_typePub.close();
+    }
+    if (m_angleEntry != null) {
+      m_angleEntry.close();
+    }
+    if (m_colorEntry != null) {
+      m_colorEntry.close();
+    }
+    if (m_lengthEntry != null) {
+      m_lengthEntry.close();
+    }
+    if (m_weightEntry != null) {
+      m_weightEntry.close();
+    }
+  }
+
   /**
    * Set the ligament's angle relative to its parent.
    *
@@ -61,7 +84,9 @@ public class MechanismLigament2d extends MechanismObject2d {
    */
   public synchronized void setAngle(double degrees) {
     m_angle = degrees;
-    flush();
+    if (m_angleEntry != null) {
+      m_angleEntry.set(degrees);
+    }
   }
 
   /**
@@ -80,7 +105,7 @@ public class MechanismLigament2d extends MechanismObject2d {
    */
   public synchronized double getAngle() {
     if (m_angleEntry != null) {
-      m_angle = m_angleEntry.getDouble(0.0);
+      m_angle = m_angleEntry.get();
     }
     return m_angle;
   }
@@ -92,7 +117,9 @@ public class MechanismLigament2d extends MechanismObject2d {
    */
   public synchronized void setLength(double length) {
     m_length = length;
-    flush();
+    if (m_lengthEntry != null) {
+      m_lengthEntry.set(length);
+    }
   }
 
   /**
@@ -102,7 +129,7 @@ public class MechanismLigament2d extends MechanismObject2d {
    */
   public synchronized double getLength() {
     if (m_lengthEntry != null) {
-      m_length = m_lengthEntry.getDouble(0.0);
+      m_length = m_lengthEntry.get();
     }
     return m_length;
   }
@@ -114,7 +141,9 @@ public class MechanismLigament2d extends MechanismObject2d {
    */
   public synchronized void setColor(Color8Bit color) {
     m_color = String.format("#%02X%02X%02X", color.red, color.green, color.blue);
-    flush();
+    if (m_colorEntry != null) {
+      m_colorEntry.set(m_color);
+    }
   }
 
   /**
@@ -124,7 +153,7 @@ public class MechanismLigament2d extends MechanismObject2d {
    */
   public synchronized Color8Bit getColor() {
     if (m_colorEntry != null) {
-      m_color = m_colorEntry.getString("");
+      m_color = m_colorEntry.get();
     }
     int r = 0;
     int g = 0;
@@ -150,7 +179,9 @@ public class MechanismLigament2d extends MechanismObject2d {
    */
   public synchronized void setLineWeight(double weight) {
     m_weight = weight;
-    flush();
+    if (m_weightEntry != null) {
+      m_weightEntry.set(weight);
+    }
   }
 
   /**
@@ -160,34 +191,41 @@ public class MechanismLigament2d extends MechanismObject2d {
    */
   public synchronized double getLineWeight() {
     if (m_weightEntry != null) {
-      m_weight = m_weightEntry.getDouble(0.0);
+      m_weight = m_weightEntry.get();
     }
     return m_weight;
   }
 
   @Override
   protected void updateEntries(NetworkTable table) {
-    table.getEntry(".type").setString("line");
-    m_angleEntry = table.getEntry("angle");
-    m_lengthEntry = table.getEntry("length");
-    m_colorEntry = table.getEntry("color");
-    m_weightEntry = table.getEntry("weight");
-    flush();
-  }
+    if (m_typePub != null) {
+      m_typePub.close();
+    }
+    m_typePub = table.getStringTopic(".type").publish();
+    m_typePub.set("line");
 
-  /** Flush latest data to NT. */
-  private void flush() {
     if (m_angleEntry != null) {
-      m_angleEntry.setDouble(m_angle);
+      m_angleEntry.close();
     }
+    m_angleEntry = table.getDoubleTopic("angle").getEntry(0.0);
+    m_angleEntry.set(m_angle);
+
     if (m_lengthEntry != null) {
-      m_lengthEntry.setDouble(m_length);
+      m_lengthEntry.close();
     }
+    m_lengthEntry = table.getDoubleTopic("length").getEntry(0.0);
+    m_lengthEntry.set(m_length);
+
     if (m_colorEntry != null) {
-      m_colorEntry.setString(m_color);
+      m_colorEntry.close();
     }
+    m_colorEntry = table.getStringTopic("color").getEntry("");
+    m_colorEntry.set(m_color);
+
     if (m_weightEntry != null) {
-      m_weightEntry.setDouble(m_weight);
+      m_weightEntry.close();
     }
+    m_weightEntry = table.getDoubleTopic("weight").getEntry(0.0);
+    m_weightEntry.set(m_weight);
   }
 }

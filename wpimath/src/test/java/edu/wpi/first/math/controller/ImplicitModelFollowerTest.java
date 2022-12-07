@@ -15,7 +15,6 @@ import org.junit.jupiter.api.Test;
 
 class ImplicitModelFollowerTest {
   @Test
-  @SuppressWarnings("LocalVariableName")
   void testSameModel() {
     final double dt = 0.005;
 
@@ -58,7 +57,6 @@ class ImplicitModelFollowerTest {
   }
 
   @Test
-  @SuppressWarnings("LocalVariableName")
   void testSlowerRefModel() {
     final double dt = 0.005;
 

@@ -45,6 +45,17 @@ class MecanumDriveKinematicsTest {
   }
 
   @Test
+  void testStraightLineForwardKinematicsKinematicsWithDeltas() {
+    var wheelDeltas = new MecanumDriveWheelPositions(3.536, 3.536, 3.536, 3.536);
+    var twist = m_kinematics.toTwist2d(wheelDeltas);
+
+    assertAll(
+        () -> assertEquals(3.536, twist.dx, 0.1),
+        () -> assertEquals(0, twist.dy, 0.1),
+        () -> assertEquals(0, twist.dtheta, 0.1));
+  }
+
+  @Test
   void testStrafeInverseKinematics() {
     ChassisSpeeds speeds = new ChassisSpeeds(0, 4, 0);
     var moduleStates = m_kinematics.toWheelSpeeds(speeds);
@@ -65,6 +76,17 @@ class MecanumDriveKinematicsTest {
         () -> assertEquals(0, moduleStates.vxMetersPerSecond, 0.1),
         () -> assertEquals(2.8284, moduleStates.vyMetersPerSecond, 0.1),
         () -> assertEquals(0, moduleStates.omegaRadiansPerSecond, 0.1));
+  }
+
+  @Test
+  void testStrafeForwardKinematicsKinematicsWithDeltas() {
+    var wheelDeltas = new MecanumDriveWheelPositions(-2.828427, 2.828427, 2.828427, -2.828427);
+    var twist = m_kinematics.toTwist2d(wheelDeltas);
+
+    assertAll(
+        () -> assertEquals(0, twist.dx, 0.1),
+        () -> assertEquals(2.8284, twist.dy, 0.1),
+        () -> assertEquals(0, twist.dtheta, 0.1));
   }
 
   @Test
@@ -91,6 +113,17 @@ class MecanumDriveKinematicsTest {
   }
 
   @Test
+  void testRotationForwardKinematicsKinematicsWithDeltas() {
+    var wheelDeltas = new MecanumDriveWheelPositions(-150.79645, 150.79645, -150.79645, 150.79645);
+    var twist = m_kinematics.toTwist2d(wheelDeltas);
+
+    assertAll(
+        () -> assertEquals(0, twist.dx, 0.1),
+        () -> assertEquals(0, twist.dy, 0.1),
+        () -> assertEquals(2 * Math.PI, twist.dtheta, 0.1));
+  }
+
+  @Test
   void testMixedTranslationRotationInverseKinematics() {
     ChassisSpeeds speeds = new ChassisSpeeds(2, 3, 1);
     var moduleStates = m_kinematics.toWheelSpeeds(speeds);
@@ -111,6 +144,17 @@ class MecanumDriveKinematicsTest {
         () -> assertEquals(1.413, moduleStates.vxMetersPerSecond, 0.1),
         () -> assertEquals(2.122, moduleStates.vyMetersPerSecond, 0.1),
         () -> assertEquals(0.707, moduleStates.omegaRadiansPerSecond, 0.1));
+  }
+
+  @Test
+  void testMixedTranslationRotationForwardKinematicsKinematicsWithDeltas() {
+    var wheelDeltas = new MecanumDriveWheelPositions(-17.677670, 20.51, -13.44, 16.26);
+    var twist = m_kinematics.toTwist2d(wheelDeltas);
+
+    assertAll(
+        () -> assertEquals(1.413, twist.dx, 0.1),
+        () -> assertEquals(2.122, twist.dy, 0.1),
+        () -> assertEquals(0.707, twist.dtheta, 0.1));
   }
 
   @Test
@@ -137,6 +181,17 @@ class MecanumDriveKinematicsTest {
   }
 
   @Test
+  void testOffCenterRotationForwardKinematicsKinematicsWithDeltas() {
+    var wheelDeltas = new MecanumDriveWheelPositions(0, 16.971, -16.971, 33.941);
+    var twist = m_kinematics.toTwist2d(wheelDeltas);
+
+    assertAll(
+        () -> assertEquals(8.48525, twist.dx, 0.1),
+        () -> assertEquals(-8.48525, twist.dy, 0.1),
+        () -> assertEquals(0.707, twist.dtheta, 0.1));
+  }
+
+  @Test
   void testOffCenterTranslationRotationInverseKinematics() {
     ChassisSpeeds speeds = new ChassisSpeeds(5, 2, 1);
     var moduleStates = m_kinematics.toWheelSpeeds(speeds, m_fl);
@@ -157,6 +212,17 @@ class MecanumDriveKinematicsTest {
         () -> assertEquals(12.02, moduleStates.vxMetersPerSecond, 0.1),
         () -> assertEquals(-7.07, moduleStates.vyMetersPerSecond, 0.1),
         () -> assertEquals(0.707, moduleStates.omegaRadiansPerSecond, 0.1));
+  }
+
+  @Test
+  void testOffCenterRotationTranslationForwardKinematicsKinematicsWithDeltas() {
+    var wheelDeltas = new MecanumDriveWheelPositions(2.12, 21.92, -12.02, 36.06);
+    var twist = m_kinematics.toTwist2d(wheelDeltas);
+
+    assertAll(
+        () -> assertEquals(12.02, twist.dx, 0.1),
+        () -> assertEquals(-7.07, twist.dy, 0.1),
+        () -> assertEquals(0.707, twist.dtheta, 0.1));
   }
 
   @Test

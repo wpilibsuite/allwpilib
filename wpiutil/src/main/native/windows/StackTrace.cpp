@@ -8,6 +8,8 @@
 #include "wpi/ConvertUTF.h"
 #include "wpi/SmallString.h"
 
+#if defined(_MSC_VER)
+
 namespace {
 class StackTraceWalker : public StackWalker {
  public:
@@ -40,3 +42,5 @@ std::string GetStackTraceDefault(int offset) {
 }
 
 }  // namespace wpi
+
+#endif  // defined(_MSC_VER)

@@ -7,6 +7,7 @@
 #include <wpi/SymbolExports.h>
 
 #include "Eigen/Core"
+#include "frc/controller/DifferentialDriveWheelVoltages.h"
 #include "frc/system/LinearSystem.h"
 #include "units/acceleration.h"
 #include "units/angular_acceleration.h"
@@ -26,23 +27,34 @@ namespace frc {
 class WPILIB_DLLEXPORT DifferentialDriveAccelerationLimiter {
  public:
   /**
-   * Motor voltages for a differential drive.
-   */
-  struct WheelVoltages {
-    units::volt_t left = 0_V;
-    units::volt_t right = 0_V;
-  };
-
-  /**
    * Constructs a DifferentialDriveAccelerationLimiter.
    *
    * @param system The differential drive dynamics.
-   * @param trackwidth The trackwidth.
+   * @param trackwidth The distance between the differential drive's left and
+   *                   right wheels.
    * @param maxLinearAccel The maximum linear acceleration.
    * @param maxAngularAccel The maximum angular acceleration.
    */
   DifferentialDriveAccelerationLimiter(
       LinearSystem<2, 2, 2> system, units::meter_t trackwidth,
+      units::meters_per_second_squared_t maxLinearAccel,
+      units::radians_per_second_squared_t maxAngularAccel);
+
+  /**
+   * Constructs a DifferentialDriveAccelerationLimiter.
+   *
+   * @param system The differential drive dynamics.
+   * @param trackwidth The distance between the differential drive's left and
+   *                   right wheels.
+   * @param minLinearAccel The minimum (most negative) linear acceleration.
+   * @param maxLinearAccel The maximum (most positive) linear acceleration.
+   * @param maxAngularAccel The maximum angular acceleration.
+   * @throws std::invalid_argument if minimum linear acceleration is greater
+   * than maximum linear acceleration
+   */
+  DifferentialDriveAccelerationLimiter(
+      LinearSystem<2, 2, 2> system, units::meter_t trackwidth,
+      units::meters_per_second_squared_t minLinearAccel,
       units::meters_per_second_squared_t maxLinearAccel,
       units::radians_per_second_squared_t maxAngularAccel);
 
@@ -55,14 +67,15 @@ class WPILIB_DLLEXPORT DifferentialDriveAccelerationLimiter {
    * @param rightVoltage The unconstrained right motor voltage.
    * @return The constrained wheel voltages.
    */
-  WheelVoltages Calculate(units::meters_per_second_t leftVelocity,
-                          units::meters_per_second_t rightVelocity,
-                          units::volt_t leftVoltage,
-                          units::volt_t rightVoltage);
+  DifferentialDriveWheelVoltages Calculate(
+      units::meters_per_second_t leftVelocity,
+      units::meters_per_second_t rightVelocity, units::volt_t leftVoltage,
+      units::volt_t rightVoltage);
 
  private:
   LinearSystem<2, 2, 2> m_system;
   units::meter_t m_trackwidth;
+  units::meters_per_second_squared_t m_minLinearAccel;
   units::meters_per_second_squared_t m_maxLinearAccel;
   units::radians_per_second_squared_t m_maxAngularAccel;
 };

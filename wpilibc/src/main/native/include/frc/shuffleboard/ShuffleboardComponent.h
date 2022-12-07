@@ -37,8 +37,7 @@ class ShuffleboardComponent : public ShuffleboardComponentBase {
    * @param properties the properties for this component
    * @return this component
    */
-  Derived& WithProperties(
-      const wpi::StringMap<std::shared_ptr<nt::Value>>& properties);
+  Derived& WithProperties(const wpi::StringMap<nt::Value>& properties);
 
   /**
    * Sets the position of this component in the tab. This has no effect if this

@@ -25,4 +25,5 @@ includeOtherLibs {
   ^ntcore
   ^wpi/
   ^wpigui
+  ^wpinet/
 }

@@ -24,17 +24,13 @@ static decltype(1 / 1_rad) Sinc(units::radian_t x) {
   }
 }
 
-RamseteController::RamseteController(double b, double zeta)
-    : RamseteController(units::unit_t<b_unit>{b},
-                        units::unit_t<zeta_unit>{zeta}) {}
-
 RamseteController::RamseteController(units::unit_t<b_unit> b,
                                      units::unit_t<zeta_unit> zeta)
     : m_b{b}, m_zeta{zeta} {}
 
 RamseteController::RamseteController()
-    : RamseteController(units::unit_t<b_unit>{2.0},
-                        units::unit_t<zeta_unit>{0.7}) {}
+    : RamseteController{units::unit_t<b_unit>{2.0},
+                        units::unit_t<zeta_unit>{0.7}} {}
 
 bool RamseteController::AtReference() const {
   const auto& eTranslate = m_poseError.Translation();
@@ -67,10 +63,13 @@ ChassisSpeeds RamseteController::Calculate(
   const auto& vRef = linearVelocityRef;
   const auto& omegaRef = angularVelocityRef;
 
+  // k = 2ζ√(ω_ref² + b v_ref²)
   auto k = 2.0 * m_zeta *
            units::math::sqrt(units::math::pow<2>(omegaRef) +
                              m_b * units::math::pow<2>(vRef));
 
+  // v_cmd = v_ref cos(e_θ) + k e_x
+  // ω_cmd = ω_ref + k e_θ + b v_ref sinc(e_θ) e_y
   return ChassisSpeeds{vRef * m_poseError.Rotation().Cos() + k * eX, 0_mps,
                        omegaRef + k * eTheta + m_b * vRef * Sinc(eTheta) * eY};
 }

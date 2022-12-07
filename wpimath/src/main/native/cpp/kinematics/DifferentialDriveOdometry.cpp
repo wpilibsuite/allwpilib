@@ -9,8 +9,11 @@
 using namespace frc;
 
 DifferentialDriveOdometry::DifferentialDriveOdometry(
-    const Rotation2d& gyroAngle, const Pose2d& initialPose)
-    : m_pose(initialPose) {
+    const Rotation2d& gyroAngle, units::meter_t leftDistance,
+    units::meter_t rightDistance, const Pose2d& initialPose)
+    : m_pose(initialPose),
+      m_prevLeftDistance(leftDistance),
+      m_prevRightDistance(rightDistance) {
   m_previousAngle = m_pose.Rotation();
   m_gyroOffset = m_pose.Rotation() - gyroAngle;
   wpi::math::MathSharedStore::ReportUsage(

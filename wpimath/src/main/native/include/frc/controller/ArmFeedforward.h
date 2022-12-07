@@ -37,7 +37,7 @@ class WPILIB_DLLEXPORT ArmFeedforward {
    * @param kS   The static gain, in volts.
    * @param kG The gravity gain, in volts.
    * @param kV   The velocity gain, in volt seconds per radian.
-   * @param kA   The acceleration gain, in volt seconds^2 per radian.
+   * @param kA   The acceleration gain, in volt seconds² per radian.
    */
   constexpr ArmFeedforward(
       units::volt_t kS, units::volt_t kG, units::unit_t<kv_unit> kV,
@@ -47,9 +47,13 @@ class WPILIB_DLLEXPORT ArmFeedforward {
   /**
    * Calculates the feedforward from the gains and setpoints.
    *
-   * @param angle        The angle setpoint, in radians.
+   * @param angle        The angle setpoint, in radians. This angle should be
+   *                     measured from the horizontal (i.e. if the provided
+   *                     angle is 0, the arm should be parallel to the floor).
+   *                     If your encoder does not follow this convention, an
+   *                     offset should be added.
    * @param velocity     The velocity setpoint, in radians per second.
-   * @param acceleration The acceleration setpoint, in radians per second^2.
+   * @param acceleration The acceleration setpoint, in radians per second².
    * @return The computed feedforward, in volts.
    */
   units::volt_t Calculate(units::unit_t<Angle> angle,
@@ -70,8 +74,12 @@ class WPILIB_DLLEXPORT ArmFeedforward {
    * achievable - enter the acceleration constraint, and this will give you
    * a simultaneously-achievable velocity constraint.
    *
-   * @param maxVoltage The maximum voltage that can be supplied to the arm.
-   * @param angle The angle of the arm
+   * @param maxVoltage   The maximum voltage that can be supplied to the arm.
+   * @param angle        The angle of the arm. This angle should be measured
+   *                     from the horizontal (i.e. if the provided angle is 0,
+   *                     the arm should be parallel to the floor). If your
+   *                     encoder does not follow this convention, an offset
+   *                     should be added.
    * @param acceleration The acceleration of the arm.
    * @return The maximum possible velocity at the given acceleration and angle.
    */
@@ -91,8 +99,12 @@ class WPILIB_DLLEXPORT ArmFeedforward {
    * achievable - enter the acceleration constraint, and this will give you
    * a simultaneously-achievable velocity constraint.
    *
-   * @param maxVoltage The maximum voltage that can be supplied to the arm.
-   * @param angle The angle of the arm
+   * @param maxVoltage   The maximum voltage that can be supplied to the arm.
+   * @param angle        The angle of the arm. This angle should be measured
+   *                     from the horizontal (i.e. if the provided angle is 0,
+   *                     the arm should be parallel to the floor). If your
+   *                     encoder does not follow this convention, an offset
+   *                     should be added.
    * @param acceleration The acceleration of the arm.
    * @return The minimum possible velocity at the given acceleration and angle.
    */
@@ -113,8 +125,12 @@ class WPILIB_DLLEXPORT ArmFeedforward {
    * a simultaneously-achievable acceleration constraint.
    *
    * @param maxVoltage The maximum voltage that can be supplied to the arm.
-   * @param angle The angle of the arm
-   * @param velocity The velocity of the arm.
+   * @param angle      The angle of the arm. This angle should be measured
+   *                   from the horizontal (i.e. if the provided angle is 0,
+   *                   the arm should be parallel to the floor). If your
+   *                   encoder does not follow this convention, an offset
+   *                   should be added.
+   * @param velocity   The velocity of the arm.
    * @return The maximum possible acceleration at the given velocity and angle.
    */
   units::unit_t<Acceleration> MaxAchievableAcceleration(
@@ -133,8 +149,12 @@ class WPILIB_DLLEXPORT ArmFeedforward {
    * a simultaneously-achievable acceleration constraint.
    *
    * @param maxVoltage The maximum voltage that can be supplied to the arm.
-   * @param angle The angle of the arm
-   * @param velocity The velocity of the arm.
+   * @param angle      The angle of the arm. This angle should be measured
+   *                   from the horizontal (i.e. if the provided angle is 0,
+   *                   the arm should be parallel to the floor). If your
+   *                   encoder does not follow this convention, an offset
+   *                   should be added.
+   * @param velocity   The velocity of the arm.
    * @return The minimum possible acceleration at the given velocity and angle.
    */
   units::unit_t<Acceleration> MinAchievableAcceleration(

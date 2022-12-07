@@ -36,4 +36,5 @@ includeOtherLibs {
   ^support/
   ^tcpsockets/
   ^wpi/
+  ^wpinet/
 }

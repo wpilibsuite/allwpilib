@@ -34,5 +34,6 @@ public final class MockHardwareExtension implements BeforeAllCallback {
     DriverStationSim.setAutonomous(false);
     DriverStationSim.setEnabled(true);
     DriverStationSim.setTest(true);
+    DriverStationSim.notifyNewData();
   }
 }

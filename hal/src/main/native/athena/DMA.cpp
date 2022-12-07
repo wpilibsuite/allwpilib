@@ -130,8 +130,9 @@ void HAL_FreeDMA(HAL_DMAHandle handle) {
   auto dma = dmaHandles->Get(handle);
   dmaHandles->Free(handle);
 
-  if (!dma)
+  if (!dma) {
     return;
+  }
 
   int32_t status = 0;
   if (dma->manager) {

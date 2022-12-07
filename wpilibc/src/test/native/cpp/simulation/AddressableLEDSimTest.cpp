@@ -4,6 +4,8 @@
 
 #include "frc/simulation/AddressableLEDSim.h"  // NOLINT(build/include_order)
 
+#include <array>
+
 #include <hal/HAL.h>
 
 #include "callback_helpers/TestCallbackHelpers.h"

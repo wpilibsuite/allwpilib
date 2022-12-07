@@ -10,7 +10,7 @@ CommandTestBase::CommandTestBase() {
   auto& scheduler = CommandScheduler::GetInstance();
   scheduler.CancelAll();
   scheduler.Enable();
-  scheduler.ClearButtons();
+  scheduler.GetActiveButtonLoop()->Clear();
 }
 
 CommandScheduler CommandTestBase::GetScheduler() {
@@ -19,12 +19,14 @@ CommandScheduler CommandTestBase::GetScheduler() {
 
 void CommandTestBase::SetUp() {
   frc::sim::DriverStationSim::SetEnabled(true);
+  frc::sim::DriverStationSim::NotifyNewData();
 }
 
 void CommandTestBase::TearDown() {
-  CommandScheduler::GetInstance().ClearButtons();
+  CommandScheduler::GetInstance().GetActiveButtonLoop()->Clear();
 }
 
 void CommandTestBase::SetDSEnabled(bool enabled) {
   frc::sim::DriverStationSim::SetEnabled(enabled);
+  frc::sim::DriverStationSim::NotifyNewData();
 }

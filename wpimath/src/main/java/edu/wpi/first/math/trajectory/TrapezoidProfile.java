@@ -51,10 +51,8 @@ public class TrapezoidProfile {
   private double m_endDeccel;
 
   public static class Constraints {
-    @SuppressWarnings("MemberName")
     public final double maxVelocity;
 
-    @SuppressWarnings("MemberName")
     public final double maxAcceleration;
 
     /**
@@ -71,10 +69,8 @@ public class TrapezoidProfile {
   }
 
   public static class State {
-    @SuppressWarnings("MemberName")
     public double position;
 
-    @SuppressWarnings("MemberName")
     public double velocity;
 
     public State() {}

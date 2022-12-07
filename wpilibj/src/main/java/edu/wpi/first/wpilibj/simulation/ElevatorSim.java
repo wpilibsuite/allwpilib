@@ -244,14 +244,13 @@ public class ElevatorSim extends LinearSystemSim<N2, N1, N1> {
    * @param u The system inputs (voltage).
    * @param dtSeconds The time difference between controller updates.
    */
-  @SuppressWarnings({"ParameterName", "LambdaParameterName"})
   @Override
   protected Matrix<N2, N1> updateX(Matrix<N2, N1> currentXhat, Matrix<N1, N1> u, double dtSeconds) {
     // Calculate updated x-hat from Runge-Kutta.
     var updatedXhat =
         NumericalIntegration.rkdp(
-            (x, u_) -> {
-              Matrix<N2, N1> xdot = m_plant.getA().times(x).plus(m_plant.getB().times(u_));
+            (x, _u) -> {
+              Matrix<N2, N1> xdot = m_plant.getA().times(x).plus(m_plant.getB().times(_u));
               if (m_simulateGravity) {
                 xdot = xdot.plus(VecBuilder.fill(0, -9.8));
               }

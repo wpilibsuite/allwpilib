@@ -59,7 +59,6 @@ public class DCMotorSim extends LinearSystemSim<N2, N1, N2> {
    * @param jKgMetersSquared The moment of inertia of the DC motor. If this is unknown, use the
    *     {@link #DCMotorSim(LinearSystem, DCMotor, double, Matrix)} constructor.
    */
-  @SuppressWarnings("ParameterName")
   public DCMotorSim(DCMotor gearbox, double gearing, double jKgMetersSquared) {
     super(LinearSystemId.createDCMotorSystem(gearbox, jKgMetersSquared, gearing));
     m_gearbox = gearbox;
@@ -75,7 +74,6 @@ public class DCMotorSim extends LinearSystemSim<N2, N1, N2> {
    *     {@link #DCMotorSim(LinearSystem, DCMotor, double, Matrix)} constructor.
    * @param measurementStdDevs The standard deviations of the measurements.
    */
-  @SuppressWarnings("ParameterName")
   public DCMotorSim(
       DCMotor gearbox, double gearing, double jKgMetersSquared, Matrix<N2, N1> measurementStdDevs) {
     super(

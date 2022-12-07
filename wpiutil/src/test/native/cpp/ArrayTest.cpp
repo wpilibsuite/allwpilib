@@ -15,16 +15,20 @@ class MoveOnlyType {
 }  // namespace
 
 TEST(ArrayTest, CopyableTypeCompiles) {
-  wpi::array<int, 3> arr1{1, 2, 3};
+  constexpr wpi::array<int, 3> arr1{1, 2, 3};
+  static_cast<void>(arr1);
 
   // Test deduction guide
-  wpi::array ar2{1, 2, 3};
+  constexpr wpi::array arr2{1, 2, 3};
+  static_cast<void>(arr2);
 }
 
 TEST(ArrayTest, MoveOnlyTypeCompiles) {
-  wpi::array<MoveOnlyType, 3> arr1{MoveOnlyType{}, MoveOnlyType{},
-                                   MoveOnlyType{}};
+  constexpr wpi::array<MoveOnlyType, 3> arr1{MoveOnlyType{}, MoveOnlyType{},
+                                             MoveOnlyType{}};
+  static_cast<void>(arr1);
 
   // Test deduction guide
-  wpi::array arr2{MoveOnlyType{}, MoveOnlyType{}, MoveOnlyType{}};
+  constexpr wpi::array arr2{MoveOnlyType{}, MoveOnlyType{}, MoveOnlyType{}};
+  static_cast<void>(arr2);
 }

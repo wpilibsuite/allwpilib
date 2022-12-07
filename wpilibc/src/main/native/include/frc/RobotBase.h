@@ -11,7 +11,6 @@
 #include <hal/HALBase.h>
 #include <hal/Main.h>
 #include <wpi/condition_variable.h>
-#include <wpi/deprecated.h>
 #include <wpi/mutex.h>
 
 #include "frc/Errors.h"
@@ -22,6 +21,9 @@ namespace frc {
 int RunHALInitialization();
 
 namespace impl {
+#ifndef __FRC_ROBORIO__
+void ResetMotorSafety();
+#endif
 
 template <class Robot>
 void RunRobot(wpi::mutex& m, Robot** robot) {
@@ -35,7 +37,7 @@ void RunRobot(wpi::mutex& m, Robot** robot) {
   } catch (const frc::RuntimeError& e) {
     e.Report();
     FRC_ReportError(
-        err::Error, "{}",
+        err::Error,
         "The robot program quit unexpectedly."
         " This is usually due to a code error.\n"
         "  The above stacktrace can help determine where the error occurred.\n"
@@ -104,6 +106,9 @@ int StartRobot() {
     impl::RunRobot<Robot>(m, &robot);
   }
 
+#ifndef __FRC_ROBORIO__
+  frc::impl::ResetMotorSafety();
+#endif
   HAL_Shutdown();
 
   return 0;
@@ -156,28 +161,8 @@ class RobotBase {
    *
    * @return True if the robot is currently operating in Tele-Op mode as
    *         determined by the field controls.
-   * @deprecated Use IsTeleop() instead.
-   */
-  WPI_DEPRECATED("Use IsTeleop() instead")
-  bool IsOperatorControl() const;
-
-  /**
-   * Determine if the robot is currently in Operator Control mode.
-   *
-   * @return True if the robot is currently operating in Tele-Op mode as
-   *         determined by the field controls.
    */
   bool IsTeleop() const;
-
-  /**
-   * Determine if the robot is current in Operator Control mode and enabled.
-   *
-   * @return True if the robot is currently operating in Tele-Op mode while
-   *         enabled as determined by the field-controls.
-   * @deprecated Use IsTeleopEnabled() instead.
-   */
-  WPI_DEPRECATED("Use IsTeleopEnabled() instead")
-  bool IsOperatorControlEnabled() const;
 
   /**
    * Determine if the robot is current in Operator Control mode and enabled.
@@ -194,14 +179,6 @@ class RobotBase {
    *         field controls.
    */
   bool IsTest() const;
-
-  /**
-   * Indicates if new data is available from the driver station.
-   *
-   * @return Has new data arrived over the network since the last time this
-   *         function was called?
-   */
-  bool IsNewDataAvailable() const;
 
   /**
    * Gets the ID of the main robot thread.
@@ -237,7 +214,9 @@ class RobotBase {
    *
    * @return If the robot is running in simulation.
    */
-  static constexpr bool IsSimulation() { return !IsReal(); }
+  static constexpr bool IsSimulation() {
+    return !IsReal();
+  }
 
   /**
    * Constructor for a generic robot program.

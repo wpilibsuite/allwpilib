@@ -39,21 +39,19 @@ model {
                             }
                         }
                     }
-                    binary.tasks.withType(CppCompile) {
-                        cppCompiler.args "-Wno-missing-field-initializers"
-                        cppCompiler.args "-Wno-unused-variable"
-                        cppCompiler.args "-Wno-error=deprecated-declarations"
-                    }
-                    lib project: ':wpilibOldCommands', library: 'wpilibOldCommands', linkage: 'shared'
                     lib project: ':wpilibc', library: 'wpilibc', linkage: 'shared'
                     lib project: ':wpimath', library: 'wpimath', linkage: 'shared'
-                    lib project: ':ntcore', library: 'ntcore', linkage: 'shared'
+                    project(':ntcore').addNtcoreDependency(binary, 'shared')
+                    project(':ntcore').addNtcoreJniDependency(binary)
                     lib project: ':cscore', library: 'cscore', linkage: 'shared'
-                    lib project: ':ntcore', library: 'ntcoreJNIShared', linkage: 'shared'
                     lib project: ':cscore', library: 'cscoreJNIShared', linkage: 'shared'
                     project(':hal').addHalDependency(binary, 'shared')
                     project(':hal').addHalJniDependency(binary)
                     lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
+                    lib project: ':wpimath', library: 'wpimathJNIShared', linkage: 'shared'
+                    lib project: ':wpinet', library: 'wpinetJNIShared', linkage: 'shared'
+                    lib project: ':wpiutil', library: 'wpiutilJNIShared', linkage: 'shared'
+                    lib project: ':wpinet', library: 'wpinet', linkage: 'shared'
                     lib project: ':cameraserver', library: 'cameraserver', linkage: 'shared'
                     if (binary.targetPlatform.name == nativeUtils.wpi.platforms.roborio) {
                         nativeUtils.useRequiredLibrary(binary, 'ni_link_libraries', 'ni_runtime_libraries')
@@ -87,6 +85,9 @@ model {
                         into '/cpp'
                     }
                     installTask.libs.each {
+                        if (it.absolutePath.endsWith('.debug')) {
+                            return
+                        }
                         task.from(it) {
                             into '/libs'
                         }

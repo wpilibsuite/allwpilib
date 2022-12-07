@@ -7,7 +7,6 @@
 #include "wpi/SpanExtras.h"
 #include "wpi/raw_istream.h"
 #include "wpi/raw_ostream.h"
-#include "wpi/span.h"
 
 namespace wpi {
 
@@ -98,7 +97,7 @@ bool ReadUleb128(raw_istream& is, uint64_t* ret) {
   return true;
 }
 
-std::optional<uint64_t> Uleb128Reader::ReadOne(span<const uint8_t>* in) {
+std::optional<uint64_t> Uleb128Reader::ReadOne(std::span<const uint8_t>* in) {
   while (!in->empty()) {
     uint8_t byte = in->front();
     *in = wpi::drop_front(*in);

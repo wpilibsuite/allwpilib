@@ -3,16 +3,17 @@ plugins {
     id "org.ysb33r.doxygen" version "0.7.0"
 }
 
-evaluationDependsOn(':wpiutil')
-evaluationDependsOn(':ntcore')
+evaluationDependsOn(':apriltag')
+evaluationDependsOn(':cameraserver')
 evaluationDependsOn(':cscore')
 evaluationDependsOn(':hal')
-evaluationDependsOn(':cameraserver')
-evaluationDependsOn(':wpimath')
+evaluationDependsOn(':ntcore')
+evaluationDependsOn(':wpilibNewCommands')
 evaluationDependsOn(':wpilibc')
 evaluationDependsOn(':wpilibj')
-evaluationDependsOn(':wpilibOldCommands')
-evaluationDependsOn(':wpilibNewCommands')
+evaluationDependsOn(':wpimath')
+evaluationDependsOn(':wpinet')
+evaluationDependsOn(':wpiutil')
 
 def baseArtifactIdCpp = 'documentation'
 def artifactGroupIdCpp = 'edu.wpi.first.wpilibc'
@@ -27,19 +28,20 @@ def outputsFolder = file("$project.buildDir/outputs")
 def cppProjectZips = []
 def cppIncludeRoots = []
 
-cppProjectZips.add(project(':hal').cppHeadersZip)
-cppProjectZips.add(project(':wpiutil').cppHeadersZip)
-cppProjectZips.add(project(':ntcore').cppHeadersZip)
-cppProjectZips.add(project(':cscore').cppHeadersZip)
+cppProjectZips.add(project(':apriltag').cppHeadersZip)
 cppProjectZips.add(project(':cameraserver').cppHeadersZip)
-cppProjectZips.add(project(':wpimath').cppHeadersZip)
-cppProjectZips.add(project(':wpilibc').cppHeadersZip)
-cppProjectZips.add(project(':wpilibOldCommands').cppHeadersZip)
+cppProjectZips.add(project(':cscore').cppHeadersZip)
+cppProjectZips.add(project(':hal').cppHeadersZip)
+cppProjectZips.add(project(':ntcore').cppHeadersZip)
 cppProjectZips.add(project(':wpilibNewCommands').cppHeadersZip)
+cppProjectZips.add(project(':wpilibc').cppHeadersZip)
+cppProjectZips.add(project(':wpimath').cppHeadersZip)
+cppProjectZips.add(project(':wpinet').cppHeadersZip)
+cppProjectZips.add(project(':wpiutil').cppHeadersZip)
 
 doxygen {
     executables {
-        doxygen version : '1.9.2',
+        doxygen version : '1.9.4',
         baseURI : 'https://frcmaven.wpi.edu/artifactory/generic-release-mirror/doxygen'
     }
 }
@@ -59,7 +61,6 @@ doxygen {
     if (project.hasProperty('docWarningsAsErrors')) {
         // C++20 shims
         exclude 'wpi/ghc/filesystem.hpp'
-        exclude 'wpi/span.h'
 
         // Drake
         exclude 'drake/common/**'
@@ -112,10 +113,13 @@ doxygen {
         // libuv
         exclude 'uv.h'
         exclude 'uv/**'
-        exclude 'wpi/uv/**'
+        exclude 'wpinet/uv/**'
 
         // json
         exclude 'wpi/json.h'
+
+        // memory
+        exclude 'wpi/memory/**'
 
         // mpack
         exclude 'wpi/mpack.h'
@@ -124,6 +128,15 @@ doxygen {
         exclude 'units/**'
     }
 
+    //TODO: building memory docs causes search to break
+    exclude 'wpi/memory/**'
+
+    aliases 'effects=\\par <i>Effects:</i>^^',
+            'notes=\\par <i>Notes:</i>^^',
+            'requires=\\par <i>Requires:</i>^^',
+            'requiredbe=\\par <i>Required Behavior:</i>^^',
+            'concept{2}=<a href=\"md_doc_concepts.html#\1\">\2</a>',
+            'defaultbe=\\par <i>Default Behavior:</i>^^'
     case_sense_names false
     extension_mapping 'inc=C++', 'no_extension=C++'
     extract_all true
@@ -150,7 +163,7 @@ doxygen {
     warn_if_undocumented false
     warn_no_paramdoc true
 
-    //enable doxygen preprocessor expansion of WPI_DEPRECATED to fix SpeedController docs
+    //enable doxygen preprocessor expansion of WPI_DEPRECATED to fix MotorController docs
     enable_preprocessing true
     macro_expansion true
     expand_only_predef true
@@ -194,18 +207,20 @@ task generateJavaDocs(type: Javadoc) {
     options.addBooleanOption("Xdoclint:html,missing,reference,syntax", true)
     options.addBooleanOption('html5', true)
     options.linkSource(true)
-    dependsOn project(':wpilibj').generateJavaVersion
     dependsOn project(':hal').generateUsageReporting
+    dependsOn project(':ntcore').ntcoreGenerateJavaTypes
+    dependsOn project(':wpilibj').generateJavaVersion
     dependsOn project(':wpimath').generateNat
-    source project(':hal').sourceSets.main.java
-    source project(':wpiutil').sourceSets.main.java
-    source project(':cscore').sourceSets.main.java
-    source project(':ntcore').sourceSets.main.java
-    source project(':wpimath').sourceSets.main.java
-    source project(':wpilibj').sourceSets.main.java
+    source project(':apriltag').sourceSets.main.java
     source project(':cameraserver').sourceSets.main.java
-    source project(':wpilibOldCommands').sourceSets.main.java
+    source project(':cscore').sourceSets.main.java
+    source project(':hal').sourceSets.main.java
+    source project(':ntcore').sourceSets.main.java
     source project(':wpilibNewCommands').sourceSets.main.java
+    source project(':wpilibj').sourceSets.main.java
+    source project(':wpimath').sourceSets.main.java
+    source project(':wpinet').sourceSets.main.java
+    source project(':wpiutil').sourceSets.main.java
     source configurations.javaSource.collect { zipTree(it) }
     include '**/*.java'
     failOnError = true

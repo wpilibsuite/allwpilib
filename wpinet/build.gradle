@@ -1,0 +1,284 @@
+apply from: "${rootDir}/shared/resources.gradle"
+
+ext {
+    baseId = 'wpinet'
+    groupId = 'edu.wpi.first.net'
+
+    nativeName = 'wpinet'
+    devMain = 'edu.wpi.first.net.DevMain'
+    def generateTask = createGenerateResourcesTask('main', 'WPI', 'wpi', project)
+
+    splitSetup = {
+        it.tasks.withType(CppCompile) {
+            dependsOn generateTask
+        }
+        it.sources {
+            libuvCpp(CppSourceSet) {
+                source {
+                    srcDirs 'src/main/native/thirdparty/libuv/src'
+                    include '*.cpp'
+                }
+                exportedHeaders {
+                    srcDirs 'src/main/native/include', 'src/main/native/thirdparty/libuv/include', 'src/main/native/thirdparty/libuv/src'
+                }
+            }
+            tcpsocketsCpp(CppSourceSet) {
+                source {
+                    srcDirs 'src/main/native/thirdparty/tcpsockets/cpp'
+                    include '*.cpp'
+                }
+                exportedHeaders {
+                    srcDirs 'src/main/native/include', 'src/main/native/thirdparty/tcpsockets/include'
+                }
+            }
+            resourcesCpp(CppSourceSet) {
+                source {
+                    srcDirs "$buildDir/generated/main/cpp", "$rootDir/shared/singlelib"
+                    include '*.cpp'
+                }
+                exportedHeaders {
+                    srcDirs 'src/main/native/include'
+                }
+            }
+        }
+        if (!it.targetPlatform.operatingSystem.isWindows()) {
+            it.cppCompiler.define '_GNU_SOURCE'
+            it.sources {
+                libuvUnixCpp(CppSourceSet) {
+                    source {
+                        srcDirs 'src/main/native/thirdparty/libuv/src/unix'
+                        includes = [
+                            'async.cpp',
+                            'core.cpp',
+                            'dl.cpp',
+                            'fs.cpp',
+                            'getaddrinfo.cpp',
+                            'getnameinfo.cpp',
+                            'loop-watcher.cpp',
+                            'loop.cpp',
+                            'pipe.cpp',
+                            'poll.cpp',
+                            'process.cpp',
+                            'random-devurandom.cpp',
+                            'random-getentropy.cpp',
+                            'random-getrandom.cpp',
+                            'signal.cpp',
+                            'stream.cpp',
+                            'tcp.cpp',
+                            'thread.cpp',
+                            'timer.cpp',
+                            'tty.cpp',
+                            'udp.cpp',
+                        ]
+                    }
+                    exportedHeaders {
+                        srcDirs 'src/main/native/include', 'src/main/native/thirdparty/libuv/include', 'src/main/native/thirdparty/libuv/src'
+                    }
+                }
+                wpinetUnixCpp(CppSourceSet) {
+                    source {
+                        srcDirs 'src/main/native/unix'
+                        include '**/*.cpp'
+                    }
+                    exportedHeaders {
+                        srcDirs 'src/main/native/include', 'src/main/native/cpp'
+                        include '**/*.h'
+                    }
+                }
+            }
+        }
+        if (it.targetPlatform.operatingSystem.isWindows()) {
+            if (it in SharedLibraryBinarySpec) {
+                it.cppCompiler.define 'BUILDING_UV_SHARED'
+            }
+            it.sources {
+                libuvWindowsCpp(CppSourceSet) {
+                    source {
+                        srcDirs 'src/main/native/thirdparty/libuv/src/win'
+                        include '*.cpp'
+                    }
+                    exportedHeaders {
+                        srcDirs 'src/main/native/include', 'src/main/native/thirdparty/libuv/include', 'src/main/native/thirdparty/libuv/src'
+                    }
+                }
+                wpinetWindowsCpp(CppSourceSet) {
+                    source {
+                        srcDirs 'src/main/native/windows'
+                        include '**/*.cpp'
+                    }
+                    exportedHeaders {
+                        srcDirs 'src/main/native/include', 'src/main/native/cpp'
+                        include '**/*.h'
+                    }
+                }
+            }
+        } else if (it.targetPlatform.operatingSystem.isMacOsX()) {
+            it.sources {
+                libuvMacCpp(CppSourceSet) {
+                    source {
+                        srcDirs 'src/main/native/thirdparty/libuv/src/unix'
+                        includes = [
+                            'bsd-ifaddrs.cpp',
+                            'darwin.cpp',
+                            'darwin-proctitle.cpp',
+                            'fsevents.cpp',
+                            'kqueue.cpp',
+                            'proctitle.cpp'
+                        ]
+                    }
+                    exportedHeaders {
+                        srcDirs 'src/main/native/include', 'src/main/native/thirdparty/libuv/include', 'src/main/native/thirdparty/libuv/src'
+                    }
+                }
+                wpinetmacOSCpp(CppSourceSet) {
+                    source {
+                        srcDirs 'src/main/native/macOS'
+                        include '**/*.cpp'
+                    }
+                    exportedHeaders {
+                        srcDirs 'src/main/native/include', 'src/main/native/cpp'
+                        include '**/*.h'
+                    }
+                }
+            }
+        } else {
+            it.sources {
+                libuvLinuxCpp(CppSourceSet) {
+                    source {
+                        srcDirs 'src/main/native/thirdparty/libuv/src/unix'
+                        includes = [
+                            'epoll.cpp',
+                            'linux-core.cpp',
+                            'linux-inotify.cpp',
+                            'linux-syscalls.cpp',
+                            'procfs-exepath.cpp',
+                            'proctitle.cpp',
+                            'random-sysctl-linux.cpp',
+                        ]
+                    }
+                    exportedHeaders {
+                        srcDirs 'src/main/native/include', 'src/main/native/thirdparty/libuv/include', 'src/main/native/thirdparty/libuv/src'
+                    }
+                }
+                wpinetLinuxCpp(CppSourceSet) {
+                    source {
+                        srcDirs 'src/main/native/linux'
+                        include '**/*.cpp'
+                    }
+                    exportedHeaders {
+                        srcDirs 'src/main/native/include', 'src/main/native/cpp', 'src/main/native/fmtlib/include'
+                        include '**/*.h'
+                    }
+                }
+            }
+        }
+    }
+}
+
+def examplesMap = [:];
+file("$projectDir/examples").list(new FilenameFilter() {
+            @Override
+            public boolean accept(File current, String name) {
+                return new File(current, name).isDirectory();
+            }
+        }).each {
+            examplesMap.put(it, [])
+        }
+
+apply from: "${rootDir}/shared/jni/setupBuild.gradle"
+
+nativeUtils.exportsConfigs {
+    wpinet {
+        x64ExcludeSymbols = [
+            '_CT??_R0?AV_System_error',
+            '_CT??_R0?AVexception',
+            '_CT??_R0?AVfailure',
+            '_CT??_R0?AVruntime_error',
+            '_CT??_R0?AVsystem_error',
+            '_CTA5?AVfailure',
+            '_TI5?AVfailure',
+            '_CT??_R0?AVout_of_range',
+            '_CTA3?AVout_of_range',
+            '_TI3?AVout_of_range',
+            '_CT??_R0?AVbad_cast'
+        ]
+    }
+}
+
+cppHeadersZip {
+    from('src/main/native/thirdparty/libuv/include') {
+        into '/'
+    }
+    from('src/main/native/third_party/tcpsockets/include') {
+        into '/'
+    }
+}
+
+model {
+    components {
+        all {
+            it.sources.each {
+                it.exportedHeaders {
+                    srcDirs 'src/main/native/include', 'src/main/native/thirdparty/libuv/include', 'src/main/native/thirdparty/tcpsockets/include', 'src/main/native/thirdparty/libuv/src'
+                }
+            }
+        }
+    }
+}
+
+model {
+    components {
+        examplesMap.each { key, value ->
+            "${key}"(NativeExecutableSpec) {
+                targetBuildTypes 'debug'
+                binaries.all {
+                    lib library: 'wpinet', linkage: 'shared'
+                    lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
+                }
+                sources {
+                    cpp {
+                        source {
+                            srcDirs 'examples/' + "${key}"
+                            include '**/*.cpp'
+                        }
+                    }
+                }
+            }
+        }
+        netconsoleServer(NativeExecutableSpec) {
+            sources {
+                cpp {
+                    source {
+                        srcDirs = [
+                            'src/netconsoleServer/native/cpp'
+                        ]
+                        includes = ['**/*.cpp']
+                    }
+                }
+            }
+            binaries.all { binary ->
+                lib project: ':wpinet', library: 'wpinet', linkage: 'static'
+                lib project: ':wpiutil', library: 'wpiutil', linkage: 'static'
+                if (binary.targetPlatform.operatingSystem.isLinux()) {
+                    linker.args "-lutil"
+                }
+            }
+        }
+        netconsoleTee(NativeExecutableSpec) {
+            sources {
+                cpp {
+                    source {
+                        srcDirs = [
+                            'src/netconsoleTee/native/cpp'
+                        ]
+                        includes = ['**/*.cpp']
+                    }
+                }
+            }
+            binaries.all { binary ->
+                lib project: ':wpinet', library: 'wpinet', linkage: 'static'
+                lib project: ':wpiutil', library: 'wpiutil', linkage: 'static'
+            }
+        }
+    }
+}

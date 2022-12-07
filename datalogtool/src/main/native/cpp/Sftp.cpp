@@ -90,7 +90,7 @@ size_t File::AsyncRead(void* data, uint32_t len, AsyncId id) {
   return rv;
 }
 
-size_t File::Write(wpi::span<const uint8_t> data) {
+size_t File::Write(std::span<const uint8_t> data) {
   auto rv = sftp_write(m_handle, data.data(), data.size());
   if (rv < 0) {
     throw Exception{m_handle->sftp};

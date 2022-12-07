@@ -5,9 +5,8 @@
 #include "frc/filter/LinearFilter.h"  // NOLINT(build/include_order)
 
 #include <cmath>
+#include <numbers>
 #include <random>
-
-#include <wpi/numbers>
 
 #include "gtest/gtest.h"
 #include "units/time.h"
@@ -21,7 +20,7 @@ static constexpr int32_t kMovAvgTaps = 6;
 enum LinearFilterNoiseTestType { kTestSinglePoleIIR, kTestMovAvg };
 
 static double GetData(double t) {
-  return 100.0 * std::sin(2.0 * wpi::numbers::pi * t);
+  return 100.0 * std::sin(2.0 * std::numbers::pi * t);
 }
 
 class LinearFilterNoiseTest

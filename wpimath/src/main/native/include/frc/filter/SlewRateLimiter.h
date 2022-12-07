@@ -6,6 +6,7 @@
 
 #include <algorithm>
 
+#include <wpi/deprecated.h>
 #include <wpi/timestamp.h>
 
 #include "units/time.h"
@@ -28,15 +29,45 @@ class SlewRateLimiter {
   using Rate_t = units::unit_t<Rate>;
 
   /**
-   * Creates a new SlewRateLimiter with the given rate limit and initial value.
+   * Creates a new SlewRateLimiter with the given positive and negative rate
+   * limits and initial value.
+   *
+   * @param positiveRateLimit The rate-of-change limit in the positive
+   *                          direction, in units per second. This is expected
+   *                          to be positive.
+   * @param negativeRateLimit The rate-of-change limit in the negative
+   *                          direction, in units per second. This is expected
+   *                          to be negative.
+   * @param initialValue The initial value of the input.
+   */
+  SlewRateLimiter(Rate_t positiveRateLimit, Rate_t negativeRateLimit,
+                  Unit_t initialValue = Unit_t{0})
+      : m_positiveRateLimit{positiveRateLimit},
+        m_negativeRateLimit{negativeRateLimit},
+        m_prevVal{initialValue},
+        m_prevTime{units::microsecond_t(wpi::Now())} {}
+
+  /**
+   * Creates a new SlewRateLimiter with the given positive rate limit and
+   * negative rate limit of -rateLimit.
+   *
+   * @param rateLimit The rate-of-change limit.
+   */
+  explicit SlewRateLimiter(Rate_t rateLimit)
+      : SlewRateLimiter(rateLimit, -rateLimit) {}
+
+  /**
+   * Creates a new SlewRateLimiter with the given positive rate limit and
+   * negative rate limit of -rateLimit and initial value.
    *
    * @param rateLimit The rate-of-change limit.
    * @param initialValue The initial value of the input.
    */
-  explicit SlewRateLimiter(Rate_t rateLimit, Unit_t initialValue = Unit_t{0})
-      : m_rateLimit{rateLimit},
-        m_prevVal{initialValue},
-        m_prevTime{units::microsecond_t(wpi::Now())} {}
+  WPI_DEPRECATED(
+      "Use SlewRateLimiter(Rate_t positiveRateLimit, Rate_t negativeRateLimit, "
+      "Unit_t initalValue) instead")
+  SlewRateLimiter(Rate_t rateLimit, Unit_t initialValue)
+      : SlewRateLimiter(rateLimit, -rateLimit, initialValue) {}
 
   /**
    * Filters the input to limit its slew rate.
@@ -48,8 +79,9 @@ class SlewRateLimiter {
   Unit_t Calculate(Unit_t input) {
     units::second_t currentTime = units::microsecond_t(wpi::Now());
     units::second_t elapsedTime = currentTime - m_prevTime;
-    m_prevVal += std::clamp(input - m_prevVal, -m_rateLimit * elapsedTime,
-                            m_rateLimit * elapsedTime);
+    m_prevVal +=
+        std::clamp(input - m_prevVal, m_negativeRateLimit * elapsedTime,
+                   m_positiveRateLimit * elapsedTime);
     m_prevTime = currentTime;
     return m_prevVal;
   }
@@ -66,7 +98,8 @@ class SlewRateLimiter {
   }
 
  private:
-  Rate_t m_rateLimit;
+  Rate_t m_positiveRateLimit;
+  Rate_t m_negativeRateLimit;
   Unit_t m_prevVal;
   units::second_t m_prevTime;
 };

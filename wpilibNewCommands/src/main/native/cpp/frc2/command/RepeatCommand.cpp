@@ -16,15 +16,20 @@ RepeatCommand::RepeatCommand(std::unique_ptr<Command>&& command) {
 }
 
 void RepeatCommand::Initialize() {
+  m_ended = false;
   m_command->Initialize();
 }
 
 void RepeatCommand::Execute() {
+  if (m_ended) {
+    m_ended = false;
+    m_command->Initialize();
+  }
   m_command->Execute();
   if (m_command->IsFinished()) {
     // restart command
     m_command->End(false);
-    m_command->Initialize();
+    m_ended = true;
   }
 }
 
@@ -40,6 +45,6 @@ bool RepeatCommand::RunsWhenDisabled() const {
   return m_command->RunsWhenDisabled();
 }
 
-RepeatCommand RepeatCommand::Repeat() && {
-  return std::move(*this);
+Command::InterruptionBehavior RepeatCommand::GetInterruptionBehavior() const {
+  return m_command->GetInterruptionBehavior();
 }

@@ -24,7 +24,7 @@ PIDController::PIDController(double Kp, double Ki, double Kd,
         period.value());
     m_period = 20_ms;
     wpi::math::MathSharedStore::ReportWarning(
-        "{}", "Controller period defaulted to 20ms.");
+        "Controller period defaulted to 20ms.");
   }
   static int instances = 0;
   instances++;
@@ -65,7 +65,15 @@ double PIDController::GetD() const {
 }
 
 units::second_t PIDController::GetPeriod() const {
-  return units::second_t(m_period);
+  return m_period;
+}
+
+double PIDController::GetPositionTolerance() const {
+  return m_positionTolerance;
+}
+
+double PIDController::GetVelocityTolerance() const {
+  return m_velocityTolerance;
 }
 
 void PIDController::SetSetpoint(double setpoint) {
@@ -155,8 +163,10 @@ double PIDController::Calculate(double measurement, double setpoint) {
 }
 
 void PIDController::Reset() {
+  m_positionError = 0;
   m_prevError = 0;
   m_totalError = 0;
+  m_velocityError = 0;
 }
 
 void PIDController::InitSendable(wpi::SendableBuilder& builder) {

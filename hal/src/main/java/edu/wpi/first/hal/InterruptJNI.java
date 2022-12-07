@@ -11,8 +11,11 @@ public class InterruptJNI extends JNIWrapper {
 
   public static native void cleanInterrupts(int interruptHandle);
 
-  public static native int waitForInterrupt(
+  public static native long waitForInterrupt(
       int interruptHandle, double timeout, boolean ignorePrevious);
+
+  public static native long waitForMultipleInterrupts(
+      int interruptHandle, long mask, double timeout, boolean ignorePrevious);
 
   public static native long readInterruptRisingTimestamp(int interruptHandle);
 

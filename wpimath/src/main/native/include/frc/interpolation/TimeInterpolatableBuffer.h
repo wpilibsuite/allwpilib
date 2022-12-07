@@ -4,9 +4,11 @@
 
 #pragma once
 
+#include <algorithm>
 #include <array>
 #include <functional>
 #include <map>
+#include <optional>
 #include <utility>
 #include <vector>
 
@@ -81,12 +83,16 @@ class TimeInterpolatableBuffer {
   void Clear() { m_pastSnapshots.clear(); }
 
   /**
-   * Sample the buffer at the given time. If there are no elements in the
-   * buffer, calling this function results in undefined behavior.
+   * Sample the buffer at the given time. If the buffer is empty, an empty
+   * optional is returned.
    *
    * @param time The time at which to sample the buffer.
    */
-  T Sample(units::second_t time) {
+  std::optional<T> Sample(units::second_t time) {
+    if (m_pastSnapshots.empty()) {
+      return {};
+    }
+
     // We will perform a binary search to find the index of the element in the
     // vector that has a timestamp that is equal to or greater than the vision
     // measurement timestamp.
@@ -112,6 +118,14 @@ class TimeInterpolatableBuffer {
                 (upper_bound->first - lower_bound->first));
 
     return m_interpolatingFunc(lower_bound->second, upper_bound->second, t);
+  }
+
+  /**
+   * Grant access to the internal sample buffer. Used in Pose Estimation to
+   * replay odometry inputs stored within this buffer.
+   */
+  std::vector<std::pair<units::second_t, T>>& GetInternalBuffer() {
+    return m_pastSnapshots;
   }
 
  private:

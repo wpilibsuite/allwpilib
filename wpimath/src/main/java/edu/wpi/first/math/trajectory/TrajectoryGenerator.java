@@ -193,7 +193,6 @@ public final class TrajectoryGenerator {
    * @param config The configuration for the trajectory.
    * @return The generated trajectory.
    */
-  @SuppressWarnings("LocalVariableName")
   public static Trajectory generateTrajectory(List<Pose2d> waypoints, TrajectoryConfig config) {
     final var flip = new Transform2d(new Translation2d(), Rotation2d.fromDegrees(180.0));
 
@@ -263,7 +262,6 @@ public final class TrajectoryGenerator {
   }
 
   // Work around type erasure signatures
-  @SuppressWarnings("serial")
   public static class ControlVectorList extends ArrayList<Spline.ControlVector> {
     public ControlVectorList(int initialCapacity) {
       super(initialCapacity);

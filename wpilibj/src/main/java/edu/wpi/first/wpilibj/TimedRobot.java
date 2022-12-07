@@ -4,6 +4,7 @@
 
 package edu.wpi.first.wpilibj;
 
+import edu.wpi.first.hal.DriverStationJNI;
 import edu.wpi.first.hal.FRCNetComm.tInstances;
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
@@ -101,7 +102,6 @@ public class TimedRobot extends IterativeRobotBase {
 
   /** Provide an alternate "main loop" via startCompetition(). */
   @Override
-  @SuppressWarnings("UnsafeFinalization")
   public void startCompetition() {
     robotInit();
 
@@ -111,7 +111,7 @@ public class TimedRobot extends IterativeRobotBase {
 
     // Tell the DS that the robot is ready to be enabled
     System.out.println("********** Robot program startup complete **********");
-    HAL.observeUserProgramStarting();
+    DriverStationJNI.observeUserProgramStarting();
 
     // Loop forever, calling the appropriate mode-dependent function
     while (true) {

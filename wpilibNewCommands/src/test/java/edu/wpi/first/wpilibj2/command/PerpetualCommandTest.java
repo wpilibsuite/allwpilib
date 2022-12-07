@@ -9,6 +9,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.Test;
 
 class PerpetualCommandTest extends CommandTestBase {
+  @SuppressWarnings("removal") // PerpetualCommand
   @Test
   void perpetualCommandScheduleTest() {
     try (CommandScheduler scheduler = new CommandScheduler()) {

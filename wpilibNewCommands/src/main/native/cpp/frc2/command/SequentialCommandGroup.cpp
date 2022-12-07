@@ -4,8 +4,6 @@
 
 #include "frc2/command/SequentialCommandGroup.h"
 
-#include "frc2/command/InstantCommand.h"
-
 using namespace frc2;
 
 SequentialCommandGroup::SequentialCommandGroup(
@@ -55,6 +53,11 @@ bool SequentialCommandGroup::RunsWhenDisabled() const {
   return m_runWhenDisabled;
 }
 
+Command::InterruptionBehavior SequentialCommandGroup::GetInterruptionBehavior()
+    const {
+  return m_interruptBehavior;
+}
+
 void SequentialCommandGroup::AddCommands(
     std::vector<std::unique_ptr<Command>>&& commands) {
   if (!RequireUngrouped(commands)) {
@@ -62,7 +65,7 @@ void SequentialCommandGroup::AddCommands(
   }
 
   if (m_currentCommandIndex != invalid_index) {
-    throw FRC_MakeError(frc::err::CommandIllegalUse, "{}",
+    throw FRC_MakeError(frc::err::CommandIllegalUse,
                         "Commands cannot be added to a CommandGroup "
                         "while the group is running");
   }
@@ -71,36 +74,10 @@ void SequentialCommandGroup::AddCommands(
     command->SetGrouped(true);
     AddRequirements(command->GetRequirements());
     m_runWhenDisabled &= command->RunsWhenDisabled();
+    if (command->GetInterruptionBehavior() ==
+        Command::InterruptionBehavior::kCancelSelf) {
+      m_interruptBehavior = Command::InterruptionBehavior::kCancelSelf;
+    }
     m_commands.emplace_back(std::move(command));
   }
-}
-
-SequentialCommandGroup SequentialCommandGroup::BeforeStarting(
-    std::function<void()> toRun, wpi::span<Subsystem* const> requirements) && {
-  // store all the commands
-  std::vector<std::unique_ptr<Command>> tmp;
-  tmp.emplace_back(
-      std::make_unique<InstantCommand>(std::move(toRun), requirements));
-  for (auto&& command : m_commands) {
-    command->SetGrouped(false);
-    tmp.emplace_back(std::move(command));
-  }
-
-  // reset current state
-  m_commands.clear();
-  m_requirements.clear();
-  m_runWhenDisabled = true;
-
-  // add the commands back
-  AddCommands(std::move(tmp));
-  return std::move(*this);
-}
-
-SequentialCommandGroup SequentialCommandGroup::AndThen(
-    std::function<void()> toRun, wpi::span<Subsystem* const> requirements) && {
-  std::vector<std::unique_ptr<Command>> tmp;
-  tmp.emplace_back(
-      std::make_unique<InstantCommand>(std::move(toRun), requirements));
-  AddCommands(std::move(tmp));
-  return std::move(*this);
 }

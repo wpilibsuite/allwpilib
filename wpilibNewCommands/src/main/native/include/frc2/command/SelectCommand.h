@@ -69,6 +69,10 @@ class SelectCommand : public CommandHelper<CommandBase, SelectCommand<Key>> {
     for (auto&& command : foo) {
       this->AddRequirements(command.second->GetRequirements());
       m_runsWhenDisabled &= command.second->RunsWhenDisabled();
+      if (command.second->GetInterruptionBehavior() ==
+          Command::InterruptionBehavior::kCancelSelf) {
+        m_interruptBehavior = Command::InterruptionBehavior::kCancelSelf;
+      }
       m_commands.emplace(std::move(command.first), std::move(command.second));
     }
   }
@@ -86,6 +90,10 @@ class SelectCommand : public CommandHelper<CommandBase, SelectCommand<Key>> {
     for (auto&& command : commands) {
       this->AddRequirements(command.second->GetRequirements());
       m_runsWhenDisabled &= command.second->RunsWhenDisabled();
+      if (command.second->GetInterruptionBehavior() ==
+          Command::InterruptionBehavior::kCancelSelf) {
+        m_interruptBehavior = Command::InterruptionBehavior::kCancelSelf;
+      }
       m_commands.emplace(std::move(command.first), std::move(command.second));
     }
   }
@@ -100,7 +108,10 @@ class SelectCommand : public CommandHelper<CommandBase, SelectCommand<Key>> {
    * Creates a new selectcommand.
    *
    * @param toRun a supplier providing the command to run
+   * @deprecated Replace with {@link ProxyCommand},
+   * composing multiple of them in a {@link ParallelRaceGroup} if needed.
    */
+  WPI_DEPRECATED("Replace with ProxyCommand")
   explicit SelectCommand(std::function<Command*()> toRun)
       : m_toRun{std::move(toRun)} {}
 
@@ -118,6 +129,10 @@ class SelectCommand : public CommandHelper<CommandBase, SelectCommand<Key>> {
 
   bool RunsWhenDisabled() const override { return m_runsWhenDisabled; }
 
+  Command::InterruptionBehavior GetInterruptionBehavior() const override {
+    return m_interruptBehavior;
+  }
+
  protected:
   std::unique_ptr<Command> TransferOwnership() && override {
     return std::make_unique<SelectCommand>(std::move(*this));
@@ -129,6 +144,8 @@ class SelectCommand : public CommandHelper<CommandBase, SelectCommand<Key>> {
   std::function<Command*()> m_toRun;
   Command* m_selectedCommand;
   bool m_runsWhenDisabled = true;
+  Command::InterruptionBehavior m_interruptBehavior{
+      Command::InterruptionBehavior::kCancelIncoming};
 };
 
 template <typename T>

@@ -1,0 +1,762 @@
+From df2dc9fdb3d57e01423104a71a6a1d1d6382644a Mon Sep 17 00:00:00 2001
+From: PJ Reiniger <pj.reiniger@gmail.com>
+Date: Sun, 8 May 2022 13:43:50 -0400
+Subject: [PATCH 10/28] Remove unused functions
+
+---
+ llvm/include/llvm/ADT/SmallString.h      |  80 ------
+ llvm/include/llvm/Support/Errno.h        |   9 -
+ llvm/include/llvm/Support/VersionTuple.h |  40 ---
+ llvm/include/llvm/Support/raw_ostream.h  | 115 +-------
+ llvm/lib/Support/raw_ostream.cpp         | 328 -----------------------
+ 5 files changed, 8 insertions(+), 564 deletions(-)
+
+diff --git a/llvm/include/llvm/ADT/SmallString.h b/llvm/include/llvm/ADT/SmallString.h
+index 50cbdade4..bfa965fd6 100644
+--- a/llvm/include/llvm/ADT/SmallString.h
++++ b/llvm/include/llvm/ADT/SmallString.h
+@@ -88,48 +88,12 @@ public:
+   /// @name String Comparison
+   /// @{
+ 
+-  /// Check for string equality.  This is more efficient than compare() when
+-  /// the relative ordering of inequal strings isn't needed.
+-  bool equals(std::string_view RHS) const {
+-    return str().equals(RHS);
+-  }
+-
+-  /// Check for string equality, ignoring case.
+-  bool equals_insensitive(std::string_view RHS) const {
+-    return str().equals_insensitive(RHS);
+-  }
+-
+   /// Compare two strings; the result is -1, 0, or 1 if this string is
+   /// lexicographically less than, equal to, or greater than the \p RHS.
+   int compare(std::string_view RHS) const {
+     return str().compare(RHS);
+   }
+ 
+-  /// compare_insensitive - Compare two strings, ignoring case.
+-  int compare_insensitive(std::string_view RHS) const {
+-    return str().compare_insensitive(RHS);
+-  }
+-
+-  /// compare_numeric - Compare two strings, treating sequences of digits as
+-  /// numbers.
+-  int compare_numeric(std::string_view RHS) const {
+-    return str().compare_numeric(RHS);
+-  }
+-
+-  /// @}
+-  /// @name String Predicates
+-  /// @{
+-
+-  /// startswith - Check if this string starts with the given \p Prefix.
+-  bool startswith(std::string_view Prefix) const {
+-    return str().startswith(Prefix);
+-  }
+-
+-  /// endswith - Check if this string ends with the given \p Suffix.
+-  bool endswith(std::string_view Suffix) const {
+-    return str().endswith(Suffix);
+-  }
+-
+   /// @}
+   /// @name String Searching
+   /// @{
+@@ -210,50 +174,6 @@ public:
+   }
+ 
+   /// @}
+-  /// @name Helpful Algorithms
+-  /// @{
+-
+-  /// Return the number of occurrences of \p C in the string.
+-  size_t count(char C) const {
+-    return str().count(C);
+-  }
+-
+-  /// Return the number of non-overlapped occurrences of \p Str in the
+-  /// string.
+-  size_t count(std::string_view Str) const {
+-    return str().count(Str);
+-  }
+-
+-  /// @}
+-  /// @name Substring Operations
+-  /// @{
+-
+-  /// Return a reference to the substring from [Start, Start + N).
+-  ///
+-  /// \param Start The index of the starting character in the substring; if
+-  /// the index is npos or greater than the length of the string then the
+-  /// empty substring will be returned.
+-  ///
+-  /// \param N The number of characters to included in the substring. If \p N
+-  /// exceeds the number of characters remaining in the string, the string
+-  /// suffix (starting with \p Start) will be returned.
+-  std::string_view substr(size_t Start, size_t N = std::string_view::npos) const {
+-    return str().substr(Start, N);
+-  }
+-
+-  /// Return a reference to the substring from [Start, End).
+-  ///
+-  /// \param Start The index of the starting character in the substring; if
+-  /// the index is npos or greater than the length of the string then the
+-  /// empty substring will be returned.
+-  ///
+-  /// \param End The index following the last character to include in the
+-  /// substring. If this is npos, or less than \p Start, or exceeds the
+-  /// number of characters remaining in the string, the string suffix
+-  /// (starting with \p Start) will be returned.
+-  std::string_view slice(size_t Start, size_t End) const {
+-    return str().slice(Start, End);
+-  }
+ 
+   // Extra methods.
+ 
+diff --git a/llvm/include/llvm/Support/Errno.h b/llvm/include/llvm/Support/Errno.h
+index 07df6765d..d9bf68bb3 100644
+--- a/llvm/include/llvm/Support/Errno.h
++++ b/llvm/include/llvm/Support/Errno.h
+@@ -20,15 +20,6 @@
+ namespace llvm {
+ namespace sys {
+ 
+-/// Returns a string representation of the errno value, using whatever
+-/// thread-safe variant of strerror() is available.  Be sure to call this
+-/// immediately after the function that set errno, or errno may have been
+-/// overwritten by an intervening call.
+-std::string StrError();
+-
+-/// Like the no-argument version above, but uses \p errnum instead of errno.
+-std::string StrError(int errnum);
+-
+ template <typename FailT, typename Fun, typename... Args>
+ inline decltype(auto) RetryAfterSignal(const FailT &Fail, const Fun &F,
+                                        const Args &... As) {
+diff --git a/llvm/include/llvm/Support/VersionTuple.h b/llvm/include/llvm/Support/VersionTuple.h
+index 3d6573bf5..a28e12adc 100644
+--- a/llvm/include/llvm/Support/VersionTuple.h
++++ b/llvm/include/llvm/Support/VersionTuple.h
+@@ -16,7 +16,6 @@
+ 
+ #include "llvm/ADT/DenseMapInfo.h"
+ #include "llvm/ADT/Hashing.h"
+-#include "llvm/Support/HashBuilder.h"
+ #include <optional>
+ #include <string>
+ #include <tuple>
+@@ -159,45 +158,6 @@ public:
+   friend bool operator>=(const VersionTuple &X, const VersionTuple &Y) {
+     return !(X < Y);
+   }
+-
+-  friend llvm::hash_code hash_value(const VersionTuple &VT) {
+-    return llvm::hash_combine(VT.Major, VT.Minor, VT.Subminor, VT.Build);
+-  }
+-
+-  template <typename HasherT, llvm::support::endianness Endianness>
+-  friend void addHash(HashBuilderImpl<HasherT, Endianness> &HBuilder,
+-                      const VersionTuple &VT) {
+-    HBuilder.add(VT.Major, VT.Minor, VT.Subminor, VT.Build);
+-  }
+-
+-  /// Retrieve a string representation of the version number.
+-  std::string getAsString() const;
+-};
+-
+-/// Print a version number.
+-raw_ostream &operator<<(raw_ostream &Out, const VersionTuple &V);
+-
+-// Provide DenseMapInfo for version tuples.
+-template <> struct DenseMapInfo<VersionTuple> {
+-  static inline VersionTuple getEmptyKey() { return VersionTuple(0x7FFFFFFF); }
+-  static inline VersionTuple getTombstoneKey() {
+-    return VersionTuple(0x7FFFFFFE);
+-  }
+-  static unsigned getHashValue(const VersionTuple &Value) {
+-    unsigned Result = Value.getMajor();
+-    if (auto Minor = Value.getMinor())
+-      Result = detail::combineHashValue(Result, *Minor);
+-    if (auto Subminor = Value.getSubminor())
+-      Result = detail::combineHashValue(Result, *Subminor);
+-    if (auto Build = Value.getBuild())
+-      Result = detail::combineHashValue(Result, *Build);
+-
+-    return Result;
+-  }
+-
+-  static bool isEqual(const VersionTuple &LHS, const VersionTuple &RHS) {
+-    return LHS == RHS;
+-  }
+ };
+ 
+ } // end namespace llvm
+diff --git a/llvm/include/llvm/Support/raw_ostream.h b/llvm/include/llvm/Support/raw_ostream.h
+index a25ca5b7b..d4521c8e2 100644
+--- a/llvm/include/llvm/Support/raw_ostream.h
++++ b/llvm/include/llvm/Support/raw_ostream.h
+@@ -248,32 +248,6 @@ public:
+     return write(Str.data(), Str.size());
+   }
+ 
+-  raw_ostream &operator<<(unsigned long N);
+-  raw_ostream &operator<<(long N);
+-  raw_ostream &operator<<(unsigned long long N);
+-  raw_ostream &operator<<(long long N);
+-  raw_ostream &operator<<(const void *P);
+-
+-  raw_ostream &operator<<(unsigned int N) {
+-    return this->operator<<(static_cast<unsigned long>(N));
+-  }
+-
+-  raw_ostream &operator<<(int N) {
+-    return this->operator<<(static_cast<long>(N));
+-  }
+-
+-  raw_ostream &operator<<(double N);
+-
+-  /// Output \p N in hexadecimal, without any prefix or padding.
+-  raw_ostream &write_hex(unsigned long long N);
+-
+-  // Change the foreground color of text.
+-  raw_ostream &operator<<(Colors C);
+-
+-  /// Output a formatted UUID with dash separators.
+-  using uuid_t = uint8_t[16];
+-  raw_ostream &write_uuid(const uuid_t UUID);
+-
+   /// Output \p Str, turning '\\', '\t', '\n', '"', and anything that doesn't
+   /// satisfy llvm::isPrint into an escape sequence.
+   raw_ostream &write_escaped(std::string_view Str, bool UseHexEscapes = false);
+@@ -281,21 +255,6 @@ public:
+   raw_ostream &write(unsigned char C);
+   raw_ostream &write(const char *Ptr, size_t Size);
+ 
+-  // Formatted output, see the format() function in Support/Format.h.
+-  raw_ostream &operator<<(const format_object_base &Fmt);
+-
+-  // Formatted output, see the leftJustify() function in Support/Format.h.
+-  raw_ostream &operator<<(const FormattedString &);
+-
+-  // Formatted output, see the formatHex() function in Support/Format.h.
+-  raw_ostream &operator<<(const FormattedNumber &);
+-
+-  // Formatted output, see the formatv() function in Support/FormatVariadic.h.
+-  raw_ostream &operator<<(const formatv_object_base &);
+-
+-  // Formatted output, see the format_bytes() function in Support/Format.h.
+-  raw_ostream &operator<<(const FormattedBytes &);
+-
+   /// indent - Insert 'NumSpaces' spaces.
+   raw_ostream &indent(unsigned NumSpaces);
+ 
+@@ -310,14 +269,19 @@ public:
+   /// @param BG if true change the background, default: change foreground
+   /// @returns itself so it can be used within << invocations
+   virtual raw_ostream &changeColor(enum Colors Color, bool Bold = false,
+-                                   bool BG = false);
++                                   bool BG = false)  {
++    (void)Color;
++    (void)Bold;
++    (void)BG;
++    return *this;
++  }
+ 
+   /// Resets the colors to terminal defaults. Call this when you are done
+   /// outputting colored text, or before program exit.
+-  virtual raw_ostream &resetColor();
++  virtual raw_ostream &resetColor() { return *this; }
+ 
+   /// Reverses the foreground and background colors.
+-  virtual raw_ostream &reverseColor();
++  virtual raw_ostream &reverseColor() { return *this; }
+ 
+   /// This function determines if this stream is connected to a "tty" or
+   /// "console" window. That is, the output would be displayed to the user
+@@ -392,10 +356,6 @@ private:
+   /// unused bytes in the buffer.
+   void copy_to_buffer(const char *Ptr, size_t Size);
+ 
+-  /// Compute whether colors should be used and do the necessary work such as
+-  /// flushing. The result is affected by calls to enable_color().
+-  bool prepare_colors();
+-
+   /// Flush the tied-to stream (if present) and then write the required data.
+   void flush_tied_then_write(const char *Ptr, size_t Size);
+ 
+@@ -447,7 +407,6 @@ class raw_fd_ostream : public raw_pwrite_stream {
+   bool ShouldClose;
+   bool SupportsSeeking = false;
+   bool IsRegularFile = false;
+-  mutable std::optional<bool> HasColors;
+ 
+ #ifdef _WIN32
+   /// True if this fd refers to a Windows console device. Mintty and other
+@@ -523,10 +482,6 @@ public:
+   /// to the offset specified from the beginning of the file.
+   uint64_t seek(uint64_t off);
+ 
+-  bool is_displayed() const override;
+-
+-  bool has_colors() const override;
+-
+   std::error_code error() const { return EC; }
+ 
+   /// Return the value of the flag in this raw_fd_ostream indicating whether an
+@@ -545,38 +500,6 @@ public:
+   ///      - from The Zen of Python, by Tim Peters
+   ///
+   void clear_error() { EC = std::error_code(); }
+-
+-  /// Locks the underlying file.
+-  ///
+-  /// @returns RAII object that releases the lock upon leaving the scope, if the
+-  ///          locking was successful. Otherwise returns corresponding
+-  ///          error code.
+-  ///
+-  /// The function blocks the current thread until the lock become available or
+-  /// error occurs.
+-  ///
+-  /// Possible use of this function may be as follows:
+-  ///
+-  ///   @code{.cpp}
+-  ///   if (auto L = stream.lock()) {
+-  ///     // ... do action that require file to be locked.
+-  ///   } else {
+-  ///     handleAllErrors(std::move(L.takeError()), [&](ErrorInfoBase &EIB) {
+-  ///       // ... handle lock error.
+-  ///     });
+-  ///   }
+-  ///   @endcode
+-  LLVM_NODISCARD Expected<sys::fs::FileLocker> lock();
+-
+-  /// Tries to lock the underlying file within the specified period.
+-  ///
+-  /// @returns RAII object that releases the lock upon leaving the scope, if the
+-  ///          locking was successful. Otherwise returns corresponding
+-  ///          error code.
+-  ///
+-  /// It is used as @ref lock.
+-  LLVM_NODISCARD
+-  Expected<sys::fs::FileLocker> tryLockFor(Duration const& Timeout);
+ };
+ 
+ /// This returns a reference to a raw_fd_ostream for standard output. Use it
+@@ -606,17 +529,6 @@ public:
+   /// immediately destroyed.
+   raw_fd_stream(std::string_view Filename, std::error_code &EC);
+ 
+-  /// This reads the \p Size bytes into a buffer pointed by \p Ptr.
+-  ///
+-  /// \param Ptr The start of the buffer to hold data to be read.
+-  ///
+-  /// \param Size The number of bytes to be read.
+-  ///
+-  /// On success, the number of bytes read is returned, and the file position is
+-  /// advanced by this number. On error, -1 is returned, use error() to get the
+-  /// error code.
+-  ssize_t read(char *Ptr, size_t Size);
+-
+   /// Check if \p OS is a pointer of type raw_fd_stream*.
+   static bool classof(const raw_ostream *OS);
+ };
+@@ -734,17 +646,6 @@ public:
+   ~buffer_unique_ostream() override { *OS << str(); }
+ };
+ 
+-class Error;
+-
+-/// This helper creates an output stream and then passes it to \p Write.
+-/// The stream created is based on the specified \p OutputFileName:
+-/// llvm::outs for "-", raw_null_ostream for "/dev/null", and raw_fd_ostream
+-/// for other names. For raw_fd_ostream instances, the stream writes to
+-/// a temporary file. The final output file is atomically replaced with the
+-/// temporary file after the \p Write function is finished.
+-Error writeToOutput(std::string_view OutputFileName,
+-                    std::function<Error(raw_ostream &)> Write);
+-
+ } // end namespace llvm
+ 
+ #endif // LLVM_SUPPORT_RAW_OSTREAM_H
+diff --git a/llvm/lib/Support/raw_ostream.cpp b/llvm/lib/Support/raw_ostream.cpp
+index ee01a9522..875eda7ba 100644
+--- a/llvm/lib/Support/raw_ostream.cpp
++++ b/llvm/lib/Support/raw_ostream.cpp
+@@ -19,7 +19,6 @@
+ #include "llvm/ADT/StringExtras.h"
+ #include "llvm/Config/config.h"
+ #include "llvm/Support/Compiler.h"
+-#include "llvm/Support/Duration.h"
+ #include "llvm/Support/ErrorHandling.h"
+ #include "llvm/Support/FileSystem.h"
+ #include "llvm/Support/Format.h"
+@@ -120,49 +119,6 @@ void raw_ostream::SetBufferAndMode(char *BufferStart, size_t Size,
+   assert(OutBufStart <= OutBufEnd && "Invalid size!");
+ }
+ 
+-raw_ostream &raw_ostream::operator<<(unsigned long N) {
+-  write_integer(*this, static_cast<uint64_t>(N), 0, IntegerStyle::Integer);
+-  return *this;
+-}
+-
+-raw_ostream &raw_ostream::operator<<(long N) {
+-  write_integer(*this, static_cast<int64_t>(N), 0, IntegerStyle::Integer);
+-  return *this;
+-}
+-
+-raw_ostream &raw_ostream::operator<<(unsigned long long N) {
+-  write_integer(*this, static_cast<uint64_t>(N), 0, IntegerStyle::Integer);
+-  return *this;
+-}
+-
+-raw_ostream &raw_ostream::operator<<(long long N) {
+-  write_integer(*this, static_cast<int64_t>(N), 0, IntegerStyle::Integer);
+-  return *this;
+-}
+-
+-raw_ostream &raw_ostream::write_hex(unsigned long long N) {
+-  llvm::write_hex(*this, N, HexPrintStyle::Lower);
+-  return *this;
+-}
+-
+-raw_ostream &raw_ostream::operator<<(Colors C) {
+-  if (C == Colors::RESET)
+-    resetColor();
+-  else
+-    changeColor(C);
+-  return *this;
+-}
+-
+-raw_ostream &raw_ostream::write_uuid(const uuid_t UUID) {
+-  for (int Idx = 0; Idx < 16; ++Idx) {
+-    *this << format("%02" PRIX32, UUID[Idx]);
+-    if (Idx == 3 || Idx == 5 || Idx == 7 || Idx == 9)
+-      *this << "-";
+-  }
+-  return *this;
+-}
+-
+-
+ raw_ostream &raw_ostream::write_escaped(std::string_view Str,
+                                         bool UseHexEscapes) {
+   for (unsigned char c : Str) {
+@@ -308,172 +264,6 @@ void raw_ostream::flush_tied_then_write(const char *Ptr, size_t Size) {
+   write_impl(Ptr, Size);
+ }
+ 
+-// Formatted output.
+-raw_ostream &raw_ostream::operator<<(const format_object_base &Fmt) {
+-  // If we have more than a few bytes left in our output buffer, try
+-  // formatting directly onto its end.
+-  size_t NextBufferSize = 127;
+-  size_t BufferBytesLeft = OutBufEnd - OutBufCur;
+-  if (BufferBytesLeft > 3) {
+-    size_t BytesUsed = Fmt.print(OutBufCur, BufferBytesLeft);
+-
+-    // Common case is that we have plenty of space.
+-    if (BytesUsed <= BufferBytesLeft) {
+-      OutBufCur += BytesUsed;
+-      return *this;
+-    }
+-
+-    // Otherwise, we overflowed and the return value tells us the size to try
+-    // again with.
+-    NextBufferSize = BytesUsed;
+-  }
+-
+-  // If we got here, we didn't have enough space in the output buffer for the
+-  // string.  Try printing into a SmallVector that is resized to have enough
+-  // space.  Iterate until we win.
+-  SmallVector<char, 128> V;
+-
+-  while (true) {
+-    V.resize(NextBufferSize);
+-
+-    // Try formatting into the SmallVector.
+-    size_t BytesUsed = Fmt.print(V.data(), NextBufferSize);
+-
+-    // If BytesUsed fit into the vector, we win.
+-    if (BytesUsed <= NextBufferSize)
+-      return write(V.data(), BytesUsed);
+-
+-    // Otherwise, try again with a new size.
+-    assert(BytesUsed > NextBufferSize && "Didn't grow buffer!?");
+-    NextBufferSize = BytesUsed;
+-  }
+-}
+-
+-raw_ostream &raw_ostream::operator<<(const formatv_object_base &Obj) {
+-  Obj.format(*this);
+-  return *this;
+-}
+-
+-raw_ostream &raw_ostream::operator<<(const FormattedString &FS) {
+-  unsigned LeftIndent = 0;
+-  unsigned RightIndent = 0;
+-  const ssize_t Difference = FS.Width - FS.Str.size();
+-  if (Difference > 0) {
+-    switch (FS.Justify) {
+-    case FormattedString::JustifyNone:
+-      break;
+-    case FormattedString::JustifyLeft:
+-      RightIndent = Difference;
+-      break;
+-    case FormattedString::JustifyRight:
+-      LeftIndent = Difference;
+-      break;
+-    case FormattedString::JustifyCenter:
+-      LeftIndent = Difference / 2;
+-      RightIndent = Difference - LeftIndent;
+-      break;
+-    }
+-  }
+-  indent(LeftIndent);
+-  (*this) << FS.Str;
+-  indent(RightIndent);
+-  return *this;
+-}
+-
+-raw_ostream &raw_ostream::operator<<(const FormattedNumber &FN) {
+-  if (FN.Hex) {
+-    HexPrintStyle Style;
+-    if (FN.Upper && FN.HexPrefix)
+-      Style = HexPrintStyle::PrefixUpper;
+-    else if (FN.Upper && !FN.HexPrefix)
+-      Style = HexPrintStyle::Upper;
+-    else if (!FN.Upper && FN.HexPrefix)
+-      Style = HexPrintStyle::PrefixLower;
+-    else
+-      Style = HexPrintStyle::Lower;
+-    llvm::write_hex(*this, FN.HexValue, Style, FN.Width);
+-  } else {
+-    llvm::SmallString<16> Buffer;
+-    llvm::raw_svector_ostream Stream(Buffer);
+-    llvm::write_integer(Stream, FN.DecValue, 0, IntegerStyle::Integer);
+-    if (Buffer.size() < FN.Width)
+-      indent(FN.Width - Buffer.size());
+-    (*this) << Buffer;
+-  }
+-  return *this;
+-}
+-
+-raw_ostream &raw_ostream::operator<<(const FormattedBytes &FB) {
+-  if (FB.Bytes.empty())
+-    return *this;
+-
+-  size_t LineIndex = 0;
+-  auto Bytes = FB.Bytes;
+-  const size_t Size = Bytes.size();
+-  HexPrintStyle HPS = FB.Upper ? HexPrintStyle::Upper : HexPrintStyle::Lower;
+-  uint64_t OffsetWidth = 0;
+-  if (FB.FirstByteOffset.hasValue()) {
+-    // Figure out how many nibbles are needed to print the largest offset
+-    // represented by this data set, so that we can align the offset field
+-    // to the right width.
+-    size_t Lines = Size / FB.NumPerLine;
+-    uint64_t MaxOffset = *FB.FirstByteOffset + Lines * FB.NumPerLine;
+-    unsigned Power = 0;
+-    if (MaxOffset > 0)
+-      Power = llvm::Log2_64_Ceil(MaxOffset);
+-    OffsetWidth = std::max<uint64_t>(4, llvm::alignTo(Power, 4) / 4);
+-  }
+-
+-  // The width of a block of data including all spaces for group separators.
+-  unsigned NumByteGroups =
+-      alignTo(FB.NumPerLine, FB.ByteGroupSize) / FB.ByteGroupSize;
+-  unsigned BlockCharWidth = FB.NumPerLine * 2 + NumByteGroups - 1;
+-
+-  while (!Bytes.empty()) {
+-    indent(FB.IndentLevel);
+-
+-    if (FB.FirstByteOffset.hasValue()) {
+-      uint64_t Offset = FB.FirstByteOffset.getValue();
+-      llvm::write_hex(*this, Offset + LineIndex, HPS, OffsetWidth);
+-      *this << ": ";
+-    }
+-
+-    auto Line = Bytes.take_front(FB.NumPerLine);
+-
+-    size_t CharsPrinted = 0;
+-    // Print the hex bytes for this line in groups
+-    for (size_t I = 0; I < Line.size(); ++I, CharsPrinted += 2) {
+-      if (I && (I % FB.ByteGroupSize) == 0) {
+-        ++CharsPrinted;
+-        *this << " ";
+-      }
+-      llvm::write_hex(*this, Line[I], HPS, 2);
+-    }
+-
+-    if (FB.ASCII) {
+-      // Print any spaces needed for any bytes that we didn't print on this
+-      // line so that the ASCII bytes are correctly aligned.
+-      assert(BlockCharWidth >= CharsPrinted);
+-      indent(BlockCharWidth - CharsPrinted + 2);
+-      *this << "|";
+-
+-      // Print the ASCII char values for each byte on this line
+-      for (uint8_t Byte : Line) {
+-        if (isPrint(Byte))
+-          *this << static_cast<char>(Byte);
+-        else
+-          *this << '.';
+-      }
+-      *this << '|';
+-    }
+-
+-    Bytes = Bytes.drop_front(Line.size());
+-    LineIndex += Line.size();
+-    if (LineIndex < Size)
+-      *this << '\n';
+-  }
+-  return *this;
+-}
+ 
+ template <char C>
+ static raw_ostream &write_padding(raw_ostream &OS, unsigned NumChars) {
+@@ -506,63 +296,8 @@ raw_ostream &raw_ostream::write_zeros(unsigned NumZeros) {
+   return write_padding<'\0'>(*this, NumZeros);
+ }
+ 
+-bool raw_ostream::prepare_colors() {
+-  // Colors were explicitly disabled.
+-  if (!ColorEnabled)
+-    return false;
+-
+-  // Colors require changing the terminal but this stream is not going to a
+-  // terminal.
+-  if (sys::Process::ColorNeedsFlush() && !is_displayed())
+-    return false;
+-
+-  if (sys::Process::ColorNeedsFlush())
+-    flush();
+-
+-  return true;
+-}
+-
+-raw_ostream &raw_ostream::changeColor(enum Colors colors, bool bold, bool bg) {
+-  if (!prepare_colors())
+-    return *this;
+-
+-  const char *colorcode =
+-      (colors == SAVEDCOLOR)
+-          ? sys::Process::OutputBold(bg)
+-          : sys::Process::OutputColor(static_cast<char>(colors), bold, bg);
+-  if (colorcode)
+-    write(colorcode, strlen(colorcode));
+-  return *this;
+-}
+-
+-raw_ostream &raw_ostream::resetColor() {
+-  if (!prepare_colors())
+-    return *this;
+-
+-  if (const char *colorcode = sys::Process::ResetColor())
+-    write(colorcode, strlen(colorcode));
+-  return *this;
+-}
+-
+-raw_ostream &raw_ostream::reverseColor() {
+-  if (!prepare_colors())
+-    return *this;
+-
+-  if (const char *colorcode = sys::Process::OutputReverse())
+-    write(colorcode, strlen(colorcode));
+-  return *this;
+-}
+-
+ void raw_ostream::anchor() {}
+ 
+-//===----------------------------------------------------------------------===//
+-//  Formatted Output
+-//===----------------------------------------------------------------------===//
+-
+-// Out of line virtual method.
+-void format_object_base::home() {
+-}
+-
+ //===----------------------------------------------------------------------===//
+ //  raw_fd_ostream
+ //===----------------------------------------------------------------------===//
+@@ -854,31 +589,6 @@ size_t raw_fd_ostream::preferred_buffer_size() const {
+ #endif
+ }
+ 
+-bool raw_fd_ostream::is_displayed() const {
+-  return sys::Process::FileDescriptorIsDisplayed(FD);
+-}
+-
+-bool raw_fd_ostream::has_colors() const {
+-  if (!HasColors)
+-    HasColors = sys::Process::FileDescriptorHasColors(FD);
+-  return *HasColors;
+-}
+-
+-Expected<sys::fs::FileLocker> raw_fd_ostream::lock() {
+-  std::error_code EC = sys::fs::lockFile(FD);
+-  if (!EC)
+-    return sys::fs::FileLocker(FD);
+-  return errorCodeToError(EC);
+-}
+-
+-Expected<sys::fs::FileLocker>
+-raw_fd_ostream::tryLockFor(Duration const& Timeout) {
+-  std::error_code EC = sys::fs::tryLockFile(FD, Timeout.getDuration());
+-  if (!EC)
+-    return sys::fs::FileLocker(FD);
+-  return errorCodeToError(EC);
+-}
+-
+ void raw_fd_ostream::anchor() {}
+ 
+ //===----------------------------------------------------------------------===//
+@@ -921,16 +631,6 @@ raw_fd_stream::raw_fd_stream(std::string_view Filename, std::error_code &EC)
+     EC = std::make_error_code(std::errc::invalid_argument);
+ }
+ 
+-ssize_t raw_fd_stream::read(char *Ptr, size_t Size) {
+-  assert(get_fd() >= 0 && "File already closed.");
+-  ssize_t Ret = ::read(get_fd(), (void *)Ptr, Size);
+-  if (Ret >= 0)
+-    inc_pos(Ret);
+-  else
+-    error_detected(std::error_code(errno, std::generic_category()));
+-  return Ret;
+-}
+-
+ bool raw_fd_stream::classof(const raw_ostream *OS) {
+   return OS->get_kind() == OStreamKind::OK_FDStream;
+ }
+@@ -986,31 +686,3 @@ void raw_pwrite_stream::anchor() {}
+ void buffer_ostream::anchor() {}
+ 
+ void buffer_unique_ostream::anchor() {}
+-
+-Error llvm::writeToOutput(std::string_view OutputFileName,
+-                          std::function<Error(raw_ostream &)> Write) {
+-  if (OutputFileName == "-")
+-    return Write(outs());
+-
+-  if (OutputFileName == "/dev/null") {
+-    raw_null_ostream Out;
+-    return Write(Out);
+-  }
+-
+-  unsigned Mode = sys::fs::all_read | sys::fs::all_write | sys::fs::all_exe;
+-  Expected<sys::fs::TempFile> Temp =
+-      sys::fs::TempFile::create(OutputFileName + ".temp-stream-%%%%%%", Mode);
+-  if (!Temp)
+-    return createFileError(OutputFileName, Temp.takeError());
+-
+-  raw_fd_ostream Out(Temp->FD, false);
+-
+-  if (Error E = Write(Out)) {
+-    if (Error DiscardError = Temp->discard())
+-      return joinErrors(std::move(E), std::move(DiscardError));
+-    return E;
+-  }
+-  Out.flush();
+-
+-  return Temp->keep(OutputFileName);
+-}

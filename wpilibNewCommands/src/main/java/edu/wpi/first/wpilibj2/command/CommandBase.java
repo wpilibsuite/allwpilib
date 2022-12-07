@@ -4,6 +4,8 @@
 
 package edu.wpi.first.wpilibj2.command;
 
+import static edu.wpi.first.util.ErrorMessages.requireNonNullParam;
+
 import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.util.sendable.SendableRegistry;
@@ -29,7 +31,9 @@ public abstract class CommandBase implements Sendable, Command {
    * @param requirements the requirements to add
    */
   public final void addRequirements(Subsystem... requirements) {
-    m_requirements.addAll(Set.of(requirements));
+    for (Subsystem requirement : requirements) {
+      m_requirements.add(requireNonNullParam(requirement, "requirement", "addRequirements"));
+    }
   }
 
   @Override
@@ -47,16 +51,12 @@ public abstract class CommandBase implements Sendable, Command {
    *
    * @param name name
    */
+  @Override
   public void setName(String name) {
     SendableRegistry.setName(this, name);
   }
 
-  /**
-   * Decorates this Command with a name. Is an inline function for #setName(String);
-   *
-   * @param name name
-   * @return the decorated Command
-   */
+  @Override
   public CommandBase withName(String name) {
     this.setName(name);
     return this;

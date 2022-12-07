@@ -4,7 +4,9 @@
 
 package edu.wpi.first.wpilibj;
 
-import edu.wpi.first.hal.HAL;
+import edu.wpi.first.hal.DriverStationJNI;
+import edu.wpi.first.wpilibj.event.BooleanEvent;
+import edu.wpi.first.wpilibj.event.EventLoop;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -120,6 +122,17 @@ public class GenericHID {
   }
 
   /**
+   * Constructs an event instance around this button's digital signal.
+   *
+   * @param button the button index
+   * @param loop the event loop instance to attach the event to.
+   * @return an event instance representing the button's digital signal attached to the given loop.
+   */
+  public BooleanEvent button(int button, EventLoop loop) {
+    return new BooleanEvent(loop, () -> getRawButton(button));
+  }
+
+  /**
    * Get the value of the axis.
    *
    * @param axis The axis to read, starting at 0.
@@ -152,6 +165,134 @@ public class GenericHID {
    */
   public int getPOV() {
     return getPOV(0);
+  }
+
+  /**
+   * Constructs a BooleanEvent instance based around this angle of a POV on the HID.
+   *
+   * <p>The POV angles start at 0 in the up direction, and increase clockwise (eg right is 90,
+   * upper-left is 315).
+   *
+   * @param angle POV angle in degrees, or -1 for the center / not pressed.
+   * @param loop the event loop instance to attach the event to.
+   * @return a BooleanEvent instance based around this angle of a POV on the HID.
+   */
+  public BooleanEvent pov(int angle, EventLoop loop) {
+    return pov(0, angle, loop);
+  }
+
+  /**
+   * Constructs a BooleanEvent instance based around this angle of a POV on the HID.
+   *
+   * <p>The POV angles start at 0 in the up direction, and increase clockwise (eg right is 90,
+   * upper-left is 315).
+   *
+   * @param pov index of the POV to read (starting at 0). Defaults to 0.
+   * @param angle POV angle in degrees, or -1 for the center / not pressed.
+   * @param loop the event loop instance to attach the event to.
+   * @return a BooleanEvent instance based around this angle of a POV on the HID.
+   */
+  public BooleanEvent pov(int pov, int angle, EventLoop loop) {
+    return new BooleanEvent(loop, () -> getPOV(pov) == angle);
+  }
+
+  /**
+   * Constructs a BooleanEvent instance based around the 0-degree angle (up) of the default (index
+   * 0) POV on the HID.
+   *
+   * @param loop the event loop instance to attach the event to.
+   * @return a BooleanEvent instance based around the 0-degree angle of a POV on the HID.
+   */
+  public BooleanEvent povUp(EventLoop loop) {
+    return pov(0, loop);
+  }
+
+  /**
+   * Constructs a BooleanEvent instance based around the 45-degree angle (right up) of the default
+   * (index 0) POV on the HID.
+   *
+   * @param loop the event loop instance to attach the event to.
+   * @return a BooleanEvent instance based around the 45-degree angle of a POV on the HID.
+   */
+  public BooleanEvent povUpRight(EventLoop loop) {
+    return pov(45, loop);
+  }
+
+  /**
+   * Constructs a BooleanEvent instance based around the 90-degree angle (right) of the default
+   * (index 0) POV on the HID.
+   *
+   * @param loop the event loop instance to attach the event to.
+   * @return a BooleanEvent instance based around the 90-degree angle of a POV on the HID.
+   */
+  public BooleanEvent povRight(EventLoop loop) {
+    return pov(90, loop);
+  }
+
+  /**
+   * Constructs a BooleanEvent instance based around the 135-degree angle (right down) of the
+   * default (index 0) POV on the HID.
+   *
+   * @param loop the event loop instance to attach the event to.
+   * @return a BooleanEvent instance based around the 135-degree angle of a POV on the HID.
+   */
+  public BooleanEvent povDownRight(EventLoop loop) {
+    return pov(135, loop);
+  }
+
+  /**
+   * Constructs a BooleanEvent instance based around the 180-degree angle (down) of the default
+   * (index 0) POV on the HID.
+   *
+   * @param loop the event loop instance to attach the event to.
+   * @return a BooleanEvent instance based around the 180-degree angle of a POV on the HID.
+   */
+  public BooleanEvent povDown(EventLoop loop) {
+    return pov(180, loop);
+  }
+
+  /**
+   * Constructs a BooleanEvent instance based around the 225-degree angle (down left) of the default
+   * (index 0) POV on the HID.
+   *
+   * @param loop the event loop instance to attach the event to.
+   * @return a BooleanEvent instance based around the 225-degree angle of a POV on the HID.
+   */
+  public BooleanEvent povDownLeft(EventLoop loop) {
+    return pov(225, loop);
+  }
+
+  /**
+   * Constructs a BooleanEvent instance based around the 270-degree angle (left) of the default
+   * (index 0) POV on the HID.
+   *
+   * @param loop the event loop instance to attach the event to.
+   * @return a BooleanEvent instance based around the 270-degree angle of a POV on the HID.
+   */
+  public BooleanEvent povLeft(EventLoop loop) {
+    return pov(270, loop);
+  }
+
+  /**
+   * Constructs a BooleanEvent instance based around the 315-degree angle (left up) of the default
+   * (index 0) POV on the HID.
+   *
+   * @param loop the event loop instance to attach the event to.
+   * @return a BooleanEvent instance based around the 315-degree angle of a POV on the HID.
+   */
+  public BooleanEvent povUpLeft(EventLoop loop) {
+    return pov(315, loop);
+  }
+
+  /**
+   * Constructs a BooleanEvent instance based around the center (not pressed) of the default (index
+   * 0) POV on the HID.
+   *
+   * @param loop the event loop instance to attach the event to.
+   * @return a BooleanEvent instance based around the center of a POV on the HID.
+   */
+  public BooleanEvent povCenter(EventLoop loop) {
+    return pov(-1, loop);
   }
 
   /**
@@ -235,7 +376,7 @@ public class GenericHID {
    */
   public void setOutput(int outputNumber, boolean value) {
     m_outputs = (m_outputs & ~(1 << (outputNumber - 1))) | ((value ? 1 : 0) << (outputNumber - 1));
-    HAL.setJoystickOutputs((byte) m_port, m_outputs, m_leftRumble, m_rightRumble);
+    DriverStationJNI.setJoystickOutputs((byte) m_port, m_outputs, m_leftRumble, m_rightRumble);
   }
 
   /**
@@ -245,7 +386,7 @@ public class GenericHID {
    */
   public void setOutputs(int value) {
     m_outputs = value;
-    HAL.setJoystickOutputs((byte) m_port, m_outputs, m_leftRumble, m_rightRumble);
+    DriverStationJNI.setJoystickOutputs((byte) m_port, m_outputs, m_leftRumble, m_rightRumble);
   }
 
   /**
@@ -266,6 +407,6 @@ public class GenericHID {
     } else {
       m_rightRumble = (short) (value * 65535);
     }
-    HAL.setJoystickOutputs((byte) m_port, m_outputs, m_leftRumble, m_rightRumble);
+    DriverStationJNI.setJoystickOutputs((byte) m_port, m_outputs, m_leftRumble, m_rightRumble);
   }
 }

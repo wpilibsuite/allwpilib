@@ -6,8 +6,8 @@
 
 #include <frc/system/LinearSystem.h>
 
-#include "Eigen/Core"
 #include "Eigen/QR"
+#include "frc/EigenCore.h"
 #include "units/time.h"
 
 namespace frc {
@@ -27,6 +27,9 @@ namespace frc {
 template <int States, int Inputs>
 class ImplicitModelFollower {
  public:
+  using StateVector = Vectord<States>;
+  using InputVector = Vectord<Inputs>;
+
   /**
    * Constructs a controller with the given coefficients and plant.
    *
@@ -47,10 +50,10 @@ class ImplicitModelFollower {
    * @param Aref Continuous system matrix whose dynamics should be followed.
    * @param Bref Continuous input matrix whose dynamics should be followed.
    */
-  ImplicitModelFollower(const Eigen::Matrix<double, States, States>& A,
-                        const Eigen::Matrix<double, States, Inputs>& B,
-                        const Eigen::Matrix<double, States, States>& Aref,
-                        const Eigen::Matrix<double, States, Inputs>& Bref) {
+  ImplicitModelFollower(const Matrixd<States, States>& A,
+                        const Matrixd<States, Inputs>& B,
+                        const Matrixd<States, States>& Aref,
+                        const Matrixd<States, Inputs>& Bref) {
     // Find u_imf that makes real model match reference model.
     //
     // dx/dt = Ax + Bu_imf
@@ -79,7 +82,7 @@ class ImplicitModelFollower {
    *
    * @return The control input.
    */
-  const Eigen::Vector<double, Inputs>& U() const { return m_u; }
+  const InputVector& U() const { return m_u; }
 
   /**
    * Returns an element of the control input vector u.
@@ -101,22 +104,20 @@ class ImplicitModelFollower {
    * @param x The current state x.
    * @param u The current input for the original model.
    */
-  Eigen::Vector<double, Inputs> Calculate(
-      const Eigen::Vector<double, States>& x,
-      const Eigen::Vector<double, Inputs>& u) {
+  InputVector Calculate(const StateVector& x, const InputVector& u) {
     m_u = m_A * x + m_B * u;
     return m_u;
   }
 
  private:
   // Computed controller output
-  Eigen::Vector<double, Inputs> m_u;
+  InputVector m_u;
 
   // State space conversion gain
-  Eigen::Matrix<double, Inputs, States> m_A;
+  Matrixd<Inputs, States> m_A;
 
   // Input space conversion gain
-  Eigen::Matrix<double, Inputs, Inputs> m_B;
+  Matrixd<Inputs, Inputs> m_B;
 };
 
 }  // namespace frc

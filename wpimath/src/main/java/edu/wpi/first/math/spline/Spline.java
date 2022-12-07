@@ -35,7 +35,6 @@ public abstract class Spline {
    * @param t The point t
    * @return The pose and curvature at that point.
    */
-  @SuppressWarnings("ParameterName")
   public PoseWithCurvature getPoint(double t) {
     SimpleMatrix polynomialBases = new SimpleMatrix(m_degree + 1, 1);
     final var coefficients = getCoefficients();
@@ -85,7 +84,6 @@ public abstract class Spline {
    * <p>Each element in each array represents the value of the derivative at the index. For example,
    * the value of x[2] is the second derivative in the x dimension.
    */
-  @SuppressWarnings("MemberName")
   public static class ControlVector {
     public double[] x;
     public double[] y;
@@ -96,7 +94,6 @@ public abstract class Spline {
      * @param x The x dimension of the control vector.
      * @param y The y dimension of the control vector.
      */
-    @SuppressWarnings("ParameterName")
     public ControlVector(double[] x, double[] y) {
       this.x = Arrays.copyOf(x, x.length);
       this.y = Arrays.copyOf(y, y.length);

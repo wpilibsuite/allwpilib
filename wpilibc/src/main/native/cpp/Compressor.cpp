@@ -34,14 +34,6 @@ Compressor::~Compressor() {
   }
 }
 
-void Compressor::Start() {
-  EnableDigital();
-}
-
-void Compressor::Stop() {
-  Disable();
-}
-
 bool Compressor::Enabled() const {
   return IsEnabled();
 }
@@ -91,7 +83,7 @@ CompressorConfigType Compressor::GetConfigType() const {
 void Compressor::InitSendable(wpi::SendableBuilder& builder) {
   builder.SetSmartDashboardType("Compressor");
   builder.AddBooleanProperty(
-      "Enabled", [=] { return IsEnabled(); }, nullptr);
+      "Enabled", [this] { return IsEnabled(); }, nullptr);
   builder.AddBooleanProperty(
-      "Pressure switch", [=]() { return GetPressureSwitchValue(); }, nullptr);
+      "Pressure switch", [this] { return GetPressureSwitchValue(); }, nullptr);
 }

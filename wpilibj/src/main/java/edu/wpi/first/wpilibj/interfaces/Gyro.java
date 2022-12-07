@@ -52,10 +52,6 @@ public interface Gyro extends AutoCloseable {
   /**
    * Return the heading of the robot as a {@link edu.wpi.first.math.geometry.Rotation2d}.
    *
-   * <p>The angle is continuous, that is it will continue from 360 to 361 degrees. This allows
-   * algorithms that wouldn't want to see a discontinuity in the gyro output as it sweeps past from
-   * 360 to 0 on the second time around.
-   *
    * <p>The angle is expected to increase as the gyro turns counterclockwise when looked at from the
    * top. It needs to follow the NWU axis convention.
    *

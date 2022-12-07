@@ -4,8 +4,11 @@
 
 package edu.wpi.first.wpilibj2.command.button;
 
+import static edu.wpi.first.wpilibj.util.ErrorMessages.requireNonNullParam;
+
+import edu.wpi.first.networktables.BooleanSubscriber;
+import edu.wpi.first.networktables.BooleanTopic;
 import edu.wpi.first.networktables.NetworkTable;
-import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
 
 /**
@@ -13,16 +16,25 @@ import edu.wpi.first.networktables.NetworkTableInstance;
  *
  * <p>This class is provided by the NewCommands VendorDep
  */
+@SuppressWarnings("deprecation")
 public class NetworkButton extends Button {
-  private final NetworkTableEntry m_entry;
+  /**
+   * Creates a NetworkButton that commands can be bound to.
+   *
+   * @param topic The boolean topic that contains the value.
+   */
+  public NetworkButton(BooleanTopic topic) {
+    this(topic.subscribe(false));
+  }
 
   /**
    * Creates a NetworkButton that commands can be bound to.
    *
-   * @param entry The entry that is the value.
+   * @param sub The boolean subscriber that provides the value.
    */
-  public NetworkButton(NetworkTableEntry entry) {
-    m_entry = entry;
+  public NetworkButton(BooleanSubscriber sub) {
+    super(() -> sub.getTopic().getInstance().isConnected() && sub.get());
+    requireNonNullParam(sub, "sub", "NetworkButton");
   }
 
   /**
@@ -32,7 +44,7 @@ public class NetworkButton extends Button {
    * @param field The field that is the value.
    */
   public NetworkButton(NetworkTable table, String field) {
-    this(table.getEntry(field));
+    this(table.getBooleanTopic(field));
   }
 
   /**
@@ -42,11 +54,17 @@ public class NetworkButton extends Button {
    * @param field The field that is the value.
    */
   public NetworkButton(String table, String field) {
-    this(NetworkTableInstance.getDefault().getTable(table), field);
+    this(NetworkTableInstance.getDefault(), table, field);
   }
 
-  @Override
-  public boolean get() {
-    return m_entry.getInstance().isConnected() && m_entry.getBoolean(false);
+  /**
+   * Creates a NetworkButton that commands can be bound to.
+   *
+   * @param inst The NetworkTable instance to use
+   * @param table The table where the networktable value is located.
+   * @param field The field that is the value.
+   */
+  public NetworkButton(NetworkTableInstance inst, String table, String field) {
+    this(inst.getTable(table), field);
   }
 }

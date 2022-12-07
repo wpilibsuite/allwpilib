@@ -175,6 +175,24 @@ public class PIDController implements Sendable, AutoCloseable {
   }
 
   /**
+   * Returns the position tolerance of this controller.
+   *
+   * @return the position tolerance of the controller.
+   */
+  public double getPositionTolerance() {
+    return m_positionTolerance;
+  }
+
+  /**
+   * Returns the velocity tolerance of this controller.
+   *
+   * @return the velocity tolerance of the controller.
+   */
+  public double getVelocityTolerance() {
+    return m_velocityTolerance;
+  }
+
+  /**
    * Sets the setpoint for the PIDController.
    *
    * @param setpoint The desired setpoint.
@@ -338,8 +356,10 @@ public class PIDController implements Sendable, AutoCloseable {
 
   /** Resets the previous error and the integral term. */
   public void reset() {
+    m_positionError = 0;
     m_prevError = 0;
     m_totalError = 0;
+    m_velocityError = 0;
   }
 
   @Override

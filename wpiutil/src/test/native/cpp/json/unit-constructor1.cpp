@@ -35,6 +35,7 @@ SOFTWARE.
 #include "gtest/gtest.h"
 
 #include <array>
+#include <cmath>
 #include <deque>
 #include <forward_list>
 #include <list>

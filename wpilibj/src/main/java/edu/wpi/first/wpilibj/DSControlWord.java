@@ -16,12 +16,12 @@ public class DSControlWord {
    * <p>Upon construction, the current Driver Station control word is read and stored internally.
    */
   public DSControlWord() {
-    update();
+    refresh();
   }
 
   /** Update internal Driver Station control word. */
-  public void update() {
-    DriverStation.updateControlWordFromCache(m_controlWord);
+  public void refresh() {
+    DriverStation.refreshControlWordFromCache(m_controlWord);
   }
 
   /**

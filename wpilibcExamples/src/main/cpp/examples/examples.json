@@ -85,6 +85,16 @@
     "commandversion": 2
   },
   {
+    "name": "EventLoop",
+    "description": "Demonstrate managing a ball system using EventLoop and BooleanEvent.",
+    "tags": [
+      "EventLoop"
+    ],
+    "foldername": "EventLoop",
+    "gradlebase": "cpp",
+    "commandversion": 2
+  },
+  {
     "name": "Arcade Drive",
     "description": "An example program which demonstrates the use of Arcade Drive with the DifferentialDrive class",
     "tags": [
@@ -347,6 +357,18 @@
     "commandversion": 2
   },
   {
+    "name": "Rapid React Command Bot",
+    "description": "A fully-functional command-based fender bot for the 2022 game using the new command framework.",
+    "tags": [
+      "Complete robot",
+      "Command-based",
+      "Lambdas"
+    ],
+    "foldername": "RapidReactCommandBot",
+    "gradlebase": "cpp",
+    "commandversion": 2
+  },
+  {
     "name": "Select Command Example",
     "description": "An example showing how to use the SelectCommand class from the new command framework.",
     "tags": [
@@ -600,7 +622,6 @@
     ],
     "foldername": "StateSpaceFlywheel",
     "gradlebase": "cpp",
-    "mainclass": "Main",
     "commandversion": 2
   },
   {
@@ -619,7 +640,6 @@
     ],
     "foldername": "StateSpaceFlywheelSysId",
     "gradlebase": "cpp",
-    "mainclass": "Main",
     "commandversion": 2
   },
   {
@@ -635,7 +655,6 @@
     ],
     "foldername": "StateSpaceElevator",
     "gradlebase": "cpp",
-    "mainclass": "Main",
     "commandversion": 2
   },
   {
@@ -651,7 +670,6 @@
     ],
     "foldername": "StateSpaceArm",
     "gradlebase": "cpp",
-    "mainclass": "Main",
     "commandversion": 2
   },
   {
@@ -668,7 +686,6 @@
     ],
     "foldername": "ElevatorSimulation",
     "gradlebase": "cpp",
-    "mainclass": "Main",
     "commandversion": 2
   },
   {
@@ -684,7 +701,6 @@
     ],
     "foldername": "DifferentialDrivePoseEstimator",
     "gradlebase": "cpp",
-    "mainclass": "Main",
     "commandversion": 2
   },
   {
@@ -700,7 +716,6 @@
     ],
     "foldername": "MecanumDrivePoseEstimator",
     "gradlebase": "cpp",
-    "mainclass": "Main",
     "commandversion": 2
   },
   {
@@ -718,7 +733,16 @@
     ],
     "foldername": "ArmSimulation",
     "gradlebase": "cpp",
-    "mainclass": "Main",
+    "commandversion": 2
+  },
+  {
+    "name": "UnitTesting",
+    "description": "Demonstrates basic unit testing for a robot project.",
+    "tags": [
+      "Testing"
+    ],
+    "foldername": "UnitTest",
+    "gradlebase": "cpp",
     "commandversion": 2
   },
   {
@@ -736,7 +760,6 @@
     ],
     "foldername": "SimpleDifferentialDriveSimulation",
     "gradlebase": "cpp",
-    "mainclass": "Main",
     "commandversion": 2
   },
   {
@@ -754,7 +777,6 @@
     ],
     "foldername": "StateSpaceDifferentialDriveSimulation",
     "gradlebase": "cpp",
-    "mainclass": "Main",
     "commandversion": 2
   },
   {
@@ -771,7 +793,6 @@
     ],
     "foldername": "SwerveDrivePoseEstimator",
     "gradlebase": "cpp",
-    "mainclass": "Main",
     "commandversion": 2
   }
 ]

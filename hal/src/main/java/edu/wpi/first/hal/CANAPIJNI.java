@@ -4,7 +4,6 @@
 
 package edu.wpi.first.hal;
 
-@SuppressWarnings("AbbreviationAsWordInName")
 public class CANAPIJNI extends JNIWrapper {
   public static native int initializeCAN(int manufacturer, int deviceId, int deviceType);
 

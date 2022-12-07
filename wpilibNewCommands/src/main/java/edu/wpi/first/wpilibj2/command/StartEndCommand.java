@@ -6,6 +6,8 @@ package edu.wpi.first.wpilibj2.command;
 
 import static edu.wpi.first.wpilibj.util.ErrorMessages.requireNonNullParam;
 
+import java.util.function.Consumer;
+
 /**
  * A command that runs a given runnable when it is initialized, and another runnable when it ends.
  * Useful for running and then stopping a motor, or extending and then retracting a solenoid. Has no
@@ -14,10 +16,7 @@ import static edu.wpi.first.wpilibj.util.ErrorMessages.requireNonNullParam;
  *
  * <p>This class is provided by the NewCommands VendorDep
  */
-public class StartEndCommand extends CommandBase {
-  protected final Runnable m_onInit;
-  protected final Runnable m_onEnd;
-
+public class StartEndCommand extends FunctionalCommand {
   /**
    * Creates a new StartEndCommand. Will run the given runnables when the command starts and when it
    * ends.
@@ -27,19 +26,16 @@ public class StartEndCommand extends CommandBase {
    * @param requirements the subsystems required by this command
    */
   public StartEndCommand(Runnable onInit, Runnable onEnd, Subsystem... requirements) {
-    m_onInit = requireNonNullParam(onInit, "onInit", "StartEndCommand");
-    m_onEnd = requireNonNullParam(onEnd, "onEnd", "StartEndCommand");
-
-    addRequirements(requirements);
+    super(
+        onInit,
+        () -> {},
+        // we need to do some magic here to null-check `onEnd` before it's captured
+        droppingParameter(requireNonNullParam(onEnd, "onEnd", "StartEndCommand")),
+        () -> false,
+        requirements);
   }
 
-  @Override
-  public void initialize() {
-    m_onInit.run();
-  }
-
-  @Override
-  public void end(boolean interrupted) {
-    m_onEnd.run();
+  private static Consumer<Boolean> droppingParameter(Runnable run) {
+    return bool -> run.run();
   }
 }

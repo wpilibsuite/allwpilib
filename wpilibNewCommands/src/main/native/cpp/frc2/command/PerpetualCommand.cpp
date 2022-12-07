@@ -26,7 +26,3 @@ void PerpetualCommand::Execute() {
 void PerpetualCommand::End(bool interrupted) {
   m_command->End(interrupted);
 }
-
-PerpetualCommand PerpetualCommand::Perpetually() && {
-  return std::move(*this);
-}

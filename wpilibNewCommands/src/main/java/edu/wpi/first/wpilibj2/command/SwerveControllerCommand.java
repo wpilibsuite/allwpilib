@@ -31,7 +31,6 @@ import java.util.function.Supplier;
  *
  * <p>This class is provided by the NewCommands VendorDep
  */
-@SuppressWarnings("MemberName")
 public class SwerveControllerCommand extends CommandBase {
   private final Timer m_timer = new Timer();
   private final Trajectory m_trajectory;
@@ -61,7 +60,6 @@ public class SwerveControllerCommand extends CommandBase {
    * @param outputModuleStates The raw output module states from the position controllers.
    * @param requirements The subsystems to require.
    */
-  @SuppressWarnings("ParameterName")
   public SwerveControllerCommand(
       Trajectory trajectory,
       Supplier<Pose2d> pose,
@@ -114,7 +112,6 @@ public class SwerveControllerCommand extends CommandBase {
    * @param outputModuleStates The raw output module states from the position controllers.
    * @param requirements The subsystems to require.
    */
-  @SuppressWarnings("ParameterName")
   public SwerveControllerCommand(
       Trajectory trajectory,
       Supplier<Pose2d> pose,
@@ -144,7 +141,6 @@ public class SwerveControllerCommand extends CommandBase {
   }
 
   @Override
-  @SuppressWarnings("LocalVariableName")
   public void execute() {
     double curTime = m_timer.get();
     var desiredState = m_trajectory.sample(curTime);

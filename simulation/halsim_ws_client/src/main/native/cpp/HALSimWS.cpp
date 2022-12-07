@@ -8,7 +8,7 @@
 
 #include <fmt/format.h>
 #include <wpi/SmallString.h>
-#include <wpi/uv/util.h>
+#include <wpinet/uv/util.h>
 
 #include "HALSimWSClientConnection.h"
 

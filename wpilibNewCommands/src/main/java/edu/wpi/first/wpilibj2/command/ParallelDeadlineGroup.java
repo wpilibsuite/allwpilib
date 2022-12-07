@@ -22,6 +22,7 @@ public class ParallelDeadlineGroup extends CommandGroupBase {
   private boolean m_runWhenDisabled = true;
   private boolean m_finished = true;
   private Command m_deadline;
+  private InterruptionBehavior m_interruptBehavior = InterruptionBehavior.kCancelIncoming;
 
   /**
    * Creates a new ParallelDeadlineGroup. The given commands (including the deadline) will be
@@ -72,11 +73,14 @@ public class ParallelDeadlineGroup extends CommandGroupBase {
       m_commands.put(command, false);
       m_requirements.addAll(command.getRequirements());
       m_runWhenDisabled &= command.runsWhenDisabled();
+      if (command.getInterruptionBehavior() == InterruptionBehavior.kCancelSelf) {
+        m_interruptBehavior = InterruptionBehavior.kCancelSelf;
+      }
     }
   }
 
   @Override
-  public void initialize() {
+  public final void initialize() {
     for (Map.Entry<Command, Boolean> commandRunning : m_commands.entrySet()) {
       commandRunning.getKey().initialize();
       commandRunning.setValue(true);
@@ -85,7 +89,7 @@ public class ParallelDeadlineGroup extends CommandGroupBase {
   }
 
   @Override
-  public void execute() {
+  public final void execute() {
     for (Map.Entry<Command, Boolean> commandRunning : m_commands.entrySet()) {
       if (!commandRunning.getValue()) {
         continue;
@@ -102,7 +106,7 @@ public class ParallelDeadlineGroup extends CommandGroupBase {
   }
 
   @Override
-  public void end(boolean interrupted) {
+  public final void end(boolean interrupted) {
     for (Map.Entry<Command, Boolean> commandRunning : m_commands.entrySet()) {
       if (commandRunning.getValue()) {
         commandRunning.getKey().end(true);
@@ -111,7 +115,7 @@ public class ParallelDeadlineGroup extends CommandGroupBase {
   }
 
   @Override
-  public boolean isFinished() {
+  public final boolean isFinished() {
     return m_finished;
   }
 
@@ -121,8 +125,7 @@ public class ParallelDeadlineGroup extends CommandGroupBase {
   }
 
   @Override
-  public ParallelDeadlineGroup deadlineWith(Command... parallel) {
-    addCommands(parallel);
-    return this;
+  public InterruptionBehavior getInterruptionBehavior() {
+    return m_interruptBehavior;
   }
 }

@@ -195,7 +195,7 @@ void PowerDistribution::InitSendable(wpi::SendableBuilder& builder) {
   for (int i = 0; i < numChannels; ++i) {
     builder.AddDoubleProperty(
         fmt::format("Chan{}", i),
-        [=] {
+        [=, this] {
           int32_t lStatus = 0;
           return HAL_GetPowerDistributionChannelCurrent(m_handle, i, &lStatus);
         },
@@ -203,25 +203,25 @@ void PowerDistribution::InitSendable(wpi::SendableBuilder& builder) {
   }
   builder.AddDoubleProperty(
       "Voltage",
-      [=] {
+      [=, this] {
         int32_t lStatus = 0;
         return HAL_GetPowerDistributionVoltage(m_handle, &lStatus);
       },
       nullptr);
   builder.AddDoubleProperty(
       "TotalCurrent",
-      [=] {
+      [=, this] {
         int32_t lStatus = 0;
         return HAL_GetPowerDistributionTotalCurrent(m_handle, &lStatus);
       },
       nullptr);
   builder.AddBooleanProperty(
       "SwitchableChannel",
-      [=] {
+      [=, this] {
         int32_t lStatus = 0;
         return HAL_GetPowerDistributionSwitchableChannel(m_handle, &lStatus);
       },
-      [=](bool value) {
+      [=, this](bool value) {
         int32_t lStatus = 0;
         HAL_SetPowerDistributionSwitchableChannel(m_handle, value, &lStatus);
       });

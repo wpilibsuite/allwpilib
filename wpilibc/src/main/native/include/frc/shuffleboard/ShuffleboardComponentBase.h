@@ -35,7 +35,7 @@ class ShuffleboardComponentBase : public virtual ShuffleboardValue {
   const std::string& GetType() const;
 
  protected:
-  wpi::StringMap<std::shared_ptr<nt::Value>> m_properties;
+  wpi::StringMap<nt::Value> m_properties;
   bool m_metadataDirty = true;
   int m_column = -1;
   int m_row = -1;
@@ -49,7 +49,7 @@ class ShuffleboardComponentBase : public virtual ShuffleboardValue {
   /**
    * Gets the custom properties for this component. May be null.
    */
-  const wpi::StringMap<std::shared_ptr<nt::Value>>& GetProperties() const;
+  const wpi::StringMap<nt::Value>& GetProperties() const;
 };
 
 }  // namespace frc

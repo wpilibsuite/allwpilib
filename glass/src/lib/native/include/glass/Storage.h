@@ -8,6 +8,7 @@
 
 #include <functional>
 #include <memory>
+#include <span>
 #include <string>
 #include <string_view>
 #include <utility>
@@ -15,7 +16,6 @@
 
 #include <wpi/StringMap.h>
 #include <wpi/iterator_range.h>
-#include <wpi/span.h>
 
 namespace wpi {
 class json;
@@ -137,17 +137,17 @@ class Storage {
                          std::string_view defaultVal = {});
 
   std::vector<int>& GetIntArray(std::string_view key,
-                                wpi::span<const int> defaultVal = {});
+                                std::span<const int> defaultVal = {});
   std::vector<int64_t>& GetInt64Array(std::string_view key,
-                                      wpi::span<const int64_t> defaultVal = {});
+                                      std::span<const int64_t> defaultVal = {});
   std::vector<int>& GetBoolArray(std::string_view key,
-                                 wpi::span<const int> defaultVal = {});
+                                 std::span<const int> defaultVal = {});
   std::vector<float>& GetFloatArray(std::string_view key,
-                                    wpi::span<const float> defaultVal = {});
+                                    std::span<const float> defaultVal = {});
   std::vector<double>& GetDoubleArray(std::string_view key,
-                                      wpi::span<const double> defaultVal = {});
+                                      std::span<const double> defaultVal = {});
   std::vector<std::string>& GetStringArray(
-      std::string_view key, wpi::span<const std::string> defaultVal = {});
+      std::string_view key, std::span<const std::string> defaultVal = {});
   std::vector<std::unique_ptr<Storage>>& GetChildArray(std::string_view key);
 
   Value* FindValue(std::string_view key);

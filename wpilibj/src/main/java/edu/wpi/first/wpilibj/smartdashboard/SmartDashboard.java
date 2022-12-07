@@ -11,7 +11,6 @@ import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.util.sendable.SendableRegistry;
-import java.nio.ByteBuffer;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -25,8 +24,7 @@ import java.util.Set;
  */
 public final class SmartDashboard {
   /** The {@link NetworkTable} used by {@link SmartDashboard}. */
-  private static final NetworkTable table =
-      NetworkTableInstance.getDefault().getTable("SmartDashboard");
+  private static NetworkTable table;
 
   /**
    * A table linking tables in the SmartDashboard to the {@link Sendable} objects they came from.
@@ -38,11 +36,22 @@ public final class SmartDashboard {
   private static final ListenerExecutor listenerExecutor = new ListenerExecutor();
 
   static {
+    setNetworkTableInstance(NetworkTableInstance.getDefault());
     HAL.report(tResourceType.kResourceType_SmartDashboard, 0);
   }
 
   private SmartDashboard() {
     throw new UnsupportedOperationException("This is a utility class!");
+  }
+
+  /**
+   * Set the NetworkTable instance used for entries. For testing purposes; use with caution.
+   *
+   * @param inst NetworkTable instance
+   */
+  public static synchronized void setNetworkTableInstance(NetworkTableInstance inst) {
+    SmartDashboard.table = inst.getTable("SmartDashboard");
+    tablesToData.clear();
   }
 
   /**
@@ -163,45 +172,6 @@ public final class SmartDashboard {
    */
   public static boolean isPersistent(String key) {
     return getEntry(key).isPersistent();
-  }
-
-  /**
-   * Sets flags on the specified key in this table. The key can not be null.
-   *
-   * @param key the key name
-   * @param flags the flags to set (bitmask)
-   */
-  public static void setFlags(String key, int flags) {
-    getEntry(key).setFlags(flags);
-  }
-
-  /**
-   * Clears flags on the specified key in this table. The key can not be null.
-   *
-   * @param key the key name
-   * @param flags the flags to clear (bitmask)
-   */
-  public static void clearFlags(String key, int flags) {
-    getEntry(key).clearFlags(flags);
-  }
-
-  /**
-   * Returns the flags for the specified key.
-   *
-   * @param key the key name
-   * @return the flags, or 0 if the key is not defined
-   */
-  public static int getFlags(String key) {
-    return getEntry(key).getFlags();
-  }
-
-  /**
-   * Deletes the specified key in this table. The key can not be null.
-   *
-   * @param key the key name
-   */
-  public static void delete(String key) {
-    table.delete(key);
   }
 
   /**
@@ -493,18 +463,6 @@ public final class SmartDashboard {
    */
   public static boolean putRaw(String key, byte[] value) {
     return getEntry(key).setRaw(value);
-  }
-
-  /**
-   * Put a raw value (bytes from a byte buffer) in the table.
-   *
-   * @param key the key to be assigned to
-   * @param value the value that will be assigned
-   * @param len the length of the value
-   * @return False if the table key already exists with a different type
-   */
-  public static boolean putRaw(String key, ByteBuffer value, int len) {
-    return getEntry(key).setRaw(value, len);
   }
 
   /**

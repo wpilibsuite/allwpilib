@@ -62,9 +62,7 @@ Java_edu_wpi_first_hal_can_CANJNI_FRCNetCommCANSessionMuxReceiveMessage
   if (!CheckCANStatus(env, status, *messageIDPtr)) {
     return nullptr;
   }
-  return MakeJByteArray(env,
-                        std::string_view{reinterpret_cast<const char*>(buffer),
-                                         static_cast<size_t>(dataSize)});
+  return MakeJByteArray(env, {buffer, static_cast<size_t>(dataSize)});
 }
 
 /*

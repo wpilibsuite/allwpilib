@@ -5,6 +5,7 @@
 #pragma once
 
 #include <hal/Types.h>
+#include <units/time.h>
 #include <wpi/sendable/Sendable.h>
 #include <wpi/sendable/SendableHelper.h>
 
@@ -79,11 +80,11 @@ class DigitalOutput : public DigitalSource,
    * Output a single pulse on the digital output line.
    *
    * Send a single pulse on the digital output line where the pulse duration is
-   * specified in seconds. Maximum pulse length is 0.0016 seconds.
+   * specified in seconds. Maximum of 65535 microseconds.
    *
-   * @param length The pulse length in seconds
+   * @param pulseLength The pulse length in seconds
    */
-  void Pulse(double length);
+  void Pulse(units::second_t pulseLength);
 
   /**
    * Determine if the pulse is still going.

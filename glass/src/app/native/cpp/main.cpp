@@ -42,6 +42,7 @@ static std::unique_ptr<glass::NetworkTablesModel> gNetworkTablesModel;
 static std::unique_ptr<glass::NetworkTablesSettings> gNetworkTablesSettings;
 static glass::LogData gNetworkTablesLog;
 static std::unique_ptr<glass::Window> gNetworkTablesWindow;
+static std::unique_ptr<glass::Window> gNetworkTablesInfoWindow;
 static std::unique_ptr<glass::Window> gNetworkTablesSettingsWindow;
 static std::unique_ptr<glass::Window> gNetworkTablesLogWindow;
 
@@ -49,45 +50,58 @@ static glass::MainMenuBar gMainMenu;
 static bool gAbout = false;
 static bool gSetEnterKey = false;
 static bool gKeyEdit = false;
+static int* gEnterKey;
+static void (*gPrevKeyCallback)(GLFWwindow*, int, int, int, int);
+
+static void RemapEnterKeyCallback(GLFWwindow* window, int key, int scancode,
+                                  int action, int mods) {
+  if (action == GLFW_PRESS || action == GLFW_RELEASE) {
+    if (gKeyEdit) {
+      *gEnterKey = key;
+      gKeyEdit = false;
+    } else if (*gEnterKey == key) {
+      key = GLFW_KEY_ENTER;
+    }
+  }
+
+  if (gPrevKeyCallback) {
+    gPrevKeyCallback(window, key, scancode, action, mods);
+  }
+}
 
 static void NtInitialize() {
-  // update window title when connection status changes
   auto inst = nt::GetDefaultInstance();
-  auto poller = nt::CreateConnectionListenerPoller(inst);
-  nt::AddPolledConnectionListener(poller, true);
+  auto poller = nt::CreateListenerPoller(inst);
+  nt::AddPolledListener(
+      poller, inst,
+      NT_EVENT_CONNECTION | NT_EVENT_IMMEDIATE | NT_EVENT_LOGMESSAGE);
   gui::AddEarlyExecute([poller] {
     auto win = gui::GetSystemWindow();
     if (!win) {
       return;
     }
-    bool timedOut;
-    for (auto&& event : nt::PollConnectionListener(poller, 0, &timedOut)) {
-      if (event.connected) {
-        glfwSetWindowTitle(
-            win, fmt::format("Glass - Connected ({})", event.conn.remote_ip)
-                     .c_str());
-      } else {
-        glfwSetWindowTitle(win, "Glass - DISCONNECTED");
+    for (auto&& event : nt::ReadListenerQueue(poller)) {
+      if (auto connInfo = event.GetConnectionInfo()) {
+        // update window title when connection status changes
+        if ((event.flags & NT_EVENT_CONNECTED) != 0) {
+          glfwSetWindowTitle(
+              win, fmt::format("Glass - Connected ({})", connInfo->remote_ip)
+                       .c_str());
+        } else {
+          glfwSetWindowTitle(win, "Glass - DISCONNECTED");
+        }
+      } else if (auto msg = event.GetLogMessage()) {
+        const char* level = "";
+        if (msg->level >= NT_LOG_CRITICAL) {
+          level = "CRITICAL: ";
+        } else if (msg->level >= NT_LOG_ERROR) {
+          level = "ERROR: ";
+        } else if (msg->level >= NT_LOG_WARNING) {
+          level = "WARNING: ";
+        }
+        gNetworkTablesLog.Append(fmt::format(
+            "{}{} ({}:{})\n", level, msg->message, msg->filename, msg->line));
       }
-    }
-  });
-
-  // handle NetworkTables log messages
-  auto logPoller = nt::CreateLoggerPoller(inst);
-  nt::AddPolledLogger(logPoller, NT_LOG_INFO, 100);
-  gui::AddEarlyExecute([logPoller] {
-    bool timedOut;
-    for (auto&& msg : nt::PollLogger(logPoller, 0, &timedOut)) {
-      const char* level = "";
-      if (msg.level >= NT_LOG_CRITICAL) {
-        level = "CRITICAL: ";
-      } else if (msg.level >= NT_LOG_ERROR) {
-        level = "ERROR: ";
-      } else if (msg.level >= NT_LOG_WARNING) {
-        level = "WARNING: ";
-      }
-      gNetworkTablesLog.Append(fmt::format("{}{} ({}:{})\n", level, msg.message,
-                                           msg.filename, msg.line));
     }
   });
 
@@ -114,9 +128,21 @@ static void NtInitialize() {
   gNetworkTablesWindow->DisableRenamePopup();
   gui::AddLateExecute([] { gNetworkTablesWindow->Display(); });
 
+  // NetworkTables info window
+  gNetworkTablesInfoWindow = std::make_unique<glass::Window>(
+      glass::GetStorageRoot().GetChild("NetworkTables Info"),
+      "NetworkTables Info");
+  gNetworkTablesInfoWindow->SetView(glass::MakeFunctionView(
+      [&] { glass::DisplayNetworkTablesInfo(gNetworkTablesModel.get()); }));
+  gNetworkTablesInfoWindow->SetDefaultPos(250, 130);
+  gNetworkTablesInfoWindow->SetDefaultSize(750, 145);
+  gNetworkTablesInfoWindow->SetDefaultVisibility(glass::Window::kHide);
+  gNetworkTablesInfoWindow->DisableRenamePopup();
+  gui::AddLateExecute([] { gNetworkTablesInfoWindow->Display(); });
+
   // NetworkTables settings window
   gNetworkTablesSettings = std::make_unique<glass::NetworkTablesSettings>(
-      glass::GetStorageRoot().GetChild("NetworkTables Settings"));
+      "glass", glass::GetStorageRoot().GetChild("NetworkTables Settings"));
   gui::AddEarlyExecute([] { gNetworkTablesSettings->Update(); });
 
   gNetworkTablesSettingsWindow = std::make_unique<glass::Window>(
@@ -161,6 +187,11 @@ int main(int argc, char** argv) {
   gui::AddIcon(glass::GetResource_glass_256_png());
   gui::AddIcon(glass::GetResource_glass_512_png());
 
+  gui::AddEarlyExecute(
+      [] { ImGui::DockSpaceOverViewport(ImGui::GetMainViewport()); });
+
+  gui::AddInit([] { ImGui::GetIO().ConfigDockingWithShift = true; });
+
   gPlotProvider = std::make_unique<glass::PlotProvider>(
       glass::GetStorageRoot().GetChild("Plots"));
   gNtProvider = std::make_unique<glass::NetworkTablesProvider>(
@@ -194,6 +225,9 @@ int main(int argc, char** argv) {
       }
       if (gNetworkTablesWindow) {
         gNetworkTablesWindow->DisplayMenuItem("NetworkTables View");
+      }
+      if (gNetworkTablesInfoWindow) {
+        gNetworkTablesInfoWindow->DisplayMenuItem("NetworkTables Info");
       }
       if (gNetworkTablesLogWindow) {
         gNetworkTablesLogWindow->DisplayMenuItem("NetworkTables Log");
@@ -237,11 +271,6 @@ int main(int argc, char** argv) {
       ImGui::EndPopup();
     }
 
-    int& enterKey = glass::GetStorageRoot().GetInt("enterKey", GLFW_KEY_ENTER);
-
-    ImGuiIO& io = ImGui::GetIO();
-    io.KeyMap[ImGuiKey_Enter] = enterKey;
-
     if (gSetEnterKey) {
       ImGui::OpenPopup("Set Enter Key");
       gSetEnterKey = false;
@@ -251,24 +280,13 @@ int main(int argc, char** argv) {
       ImGui::Text("This is useful to edit values without the DS disabling");
       ImGui::Separator();
 
-      if (gKeyEdit) {
-        for (int i = 0; i < IM_ARRAYSIZE(io.KeysDown); ++i) {
-          if (io.KeysDown[i]) {
-            // remove all other uses
-            enterKey = i;
-            gKeyEdit = false;
-            break;
-          }
-        }
-      }
-
       ImGui::Text("Key:");
       ImGui::SameLine();
       char editLabel[40];
       char nameBuf[32];
-      const char* name = glfwGetKeyName(enterKey, 0);
+      const char* name = glfwGetKeyName(*gEnterKey, 0);
       if (!name) {
-        std::snprintf(nameBuf, sizeof(nameBuf), "%d", enterKey);
+        std::snprintf(nameBuf, sizeof(nameBuf), "%d", *gEnterKey);
         name = nameBuf;
       }
       std::snprintf(editLabel, sizeof(editLabel), "%s###edit",
@@ -278,7 +296,7 @@ int main(int argc, char** argv) {
       }
       ImGui::SameLine();
       if (ImGui::SmallButton("Reset")) {
-        enterKey = GLFW_KEY_ENTER;
+        *gEnterKey = GLFW_KEY_ENTER;
       }
 
       if (ImGui::Button("Close")) {
@@ -289,7 +307,12 @@ int main(int argc, char** argv) {
     }
   });
 
-  gui::Initialize("Glass - DISCONNECTED", 1024, 768);
+  gui::Initialize("Glass - DISCONNECTED", 1024, 768,
+                  ImGuiConfigFlags_DockingEnable);
+  gEnterKey = &glass::GetStorageRoot().GetInt("enterKey", GLFW_KEY_ENTER);
+  if (auto win = gui::GetSystemWindow()) {
+    gPrevKeyCallback = glfwSetKeyCallback(win, RemapEnterKeyCallback);
+  }
   gui::Main();
 
   gNetworkTablesSettingsWindow.reset();

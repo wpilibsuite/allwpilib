@@ -18,20 +18,25 @@ import java.util.function.BooleanSupplier;
  * operator interface as a common use case of the more generalized Trigger objects. This is a simple
  * wrapper around Trigger with the method names renamed to fit the Button object use.
  *
- * <p>This class is provided by the OldCommands VendorDep
+ * @deprecated Replace with {@link Trigger}.
  */
+@Deprecated
 public class Button extends Trigger {
   /**
-   * Default constructor; creates a button that is never pressed (unless {@link Button#get()} is
-   * overridden).
+   * Default constructor; creates a button that is never pressed.
+   *
+   * @deprecated Replace with {@code new Button(() -> false) }.
    */
+  @Deprecated(since = "2023")
   public Button() {}
 
   /**
    * Creates a new button with the given condition determining whether it is pressed.
    *
    * @param isPressed returns whether or not the trigger should be active
+   * @deprecated Replace with Trigger.
    */
+  @Deprecated
   public Button(BooleanSupplier isPressed) {
     super(isPressed);
   }
@@ -40,21 +45,10 @@ public class Button extends Trigger {
    * Starts the given command whenever the button is newly pressed.
    *
    * @param command the command to start
-   * @param interruptible whether the command is interruptible
    * @return this button, so calls can be chained
+   * @deprecated Replace with {@link Trigger#onTrue(Command)}
    */
-  public Button whenPressed(final Command command, boolean interruptible) {
-    whenActive(command, interruptible);
-    return this;
-  }
-
-  /**
-   * Starts the given command whenever the button is newly pressed. The command is set to be
-   * interruptible.
-   *
-   * @param command the command to start
-   * @return this button, so calls can be chained
-   */
+  @Deprecated
   public Button whenPressed(final Command command) {
     whenActive(command);
     return this;
@@ -66,7 +60,9 @@ public class Button extends Trigger {
    * @param toRun the runnable to run
    * @param requirements the required subsystems
    * @return this button, so calls can be chained
+   * @deprecated Replace with {@link #onTrue(Command)}, creating the InstantCommand manually
    */
+  @Deprecated
   public Button whenPressed(final Runnable toRun, Subsystem... requirements) {
     whenActive(toRun, requirements);
     return this;
@@ -75,27 +71,15 @@ public class Button extends Trigger {
   /**
    * Constantly starts the given command while the button is held.
    *
-   * <p>{@link Command#schedule(boolean)} will be called repeatedly while the button is held, and
-   * will be canceled when the button is released.
-   *
-   * @param command the command to start
-   * @param interruptible whether the command is interruptible
-   * @return this button, so calls can be chained
-   */
-  public Button whileHeld(final Command command, boolean interruptible) {
-    whileActiveContinuous(command, interruptible);
-    return this;
-  }
-
-  /**
-   * Constantly starts the given command while the button is held.
-   *
-   * <p>{@link Command#schedule(boolean)} will be called repeatedly while the button is held, and
-   * will be canceled when the button is released. The command is set to be interruptible.
+   * <p>{@link Command#schedule()} will be called repeatedly while the button is held, and will be
+   * canceled when the button is released.
    *
    * @param command the command to start
    * @return this button, so calls can be chained
+   * @deprecated Use {@link #whileTrue(Command)} with {@link
+   *     edu.wpi.first.wpilibj2.command.RepeatCommand RepeatCommand}.
    */
+  @Deprecated
   public Button whileHeld(final Command command) {
     whileActiveContinuous(command);
     return this;
@@ -107,7 +91,9 @@ public class Button extends Trigger {
    * @param toRun the runnable to run
    * @param requirements the required subsystems
    * @return this button, so calls can be chained
+   * @deprecated Use {@link #whileTrue(Command)} and construct a RunCommand manually
    */
+  @Deprecated
   public Button whileHeld(final Runnable toRun, Subsystem... requirements) {
     whileActiveContinuous(toRun, requirements);
     return this;
@@ -118,36 +104,12 @@ public class Button extends Trigger {
    * but does not start it again if it ends or is otherwise interrupted.
    *
    * @param command the command to start
-   * @param interruptible whether the command is interruptible
    * @return this button, so calls can be chained
+   * @deprecated Replace with {@link Trigger#whileTrue(Command)}
    */
-  public Button whenHeld(final Command command, boolean interruptible) {
-    whileActiveOnce(command, interruptible);
-    return this;
-  }
-
-  /**
-   * Starts the given command when the button is first pressed, and cancels it when it is released,
-   * but does not start it again if it ends or is otherwise interrupted. The command is set to be
-   * interruptible.
-   *
-   * @param command the command to start
-   * @return this button, so calls can be chained
-   */
+  @Deprecated
   public Button whenHeld(final Command command) {
-    whileActiveOnce(command, true);
-    return this;
-  }
-
-  /**
-   * Starts the command when the button is released.
-   *
-   * @param command the command to start
-   * @param interruptible whether the command is interruptible
-   * @return this button, so calls can be chained
-   */
-  public Button whenReleased(final Command command, boolean interruptible) {
-    whenInactive(command, interruptible);
+    whileActiveOnce(command);
     return this;
   }
 
@@ -156,7 +118,9 @@ public class Button extends Trigger {
    *
    * @param command the command to start
    * @return this button, so calls can be chained
+   * @deprecated Replace with {@link Trigger#onFalse(Command)}
    */
+  @Deprecated
   public Button whenReleased(final Command command) {
     whenInactive(command);
     return this;
@@ -168,21 +132,11 @@ public class Button extends Trigger {
    * @param toRun the runnable to run
    * @param requirements the required subsystems
    * @return this button, so calls can be chained
+   * @deprecated Replace with {@link Trigger#onFalse(Command)}, creating the InstantCommand manually
    */
+  @Deprecated
   public Button whenReleased(final Runnable toRun, Subsystem... requirements) {
     whenInactive(toRun, requirements);
-    return this;
-  }
-
-  /**
-   * Toggles the command whenever the button is pressed (on then off then on).
-   *
-   * @param command the command to start
-   * @param interruptible whether the command is interruptible
-   * @return this button, so calls can be chained
-   */
-  public Button toggleWhenPressed(final Command command, boolean interruptible) {
-    toggleWhenActive(command, interruptible);
     return this;
   }
 
@@ -192,7 +146,9 @@ public class Button extends Trigger {
    *
    * @param command the command to start
    * @return this button, so calls can be chained
+   * @deprecated Replace with {@link Trigger#toggleOnTrue(Command)}
    */
+  @Deprecated
   public Button toggleWhenPressed(final Command command) {
     toggleWhenActive(command);
     return this;
@@ -203,7 +159,9 @@ public class Button extends Trigger {
    *
    * @param command the command to start
    * @return this button, so calls can be chained
+   * @deprecated Instead, pass this as an end condition to {@link Command#until(BooleanSupplier)}.
    */
+  @Deprecated
   public Button cancelWhenPressed(final Command command) {
     cancelWhenActive(command);
     return this;

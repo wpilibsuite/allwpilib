@@ -9,6 +9,7 @@
 #include <functional>
 #include <initializer_list>
 #include <memory>
+#include <span>
 #include <string>
 #include <string_view>
 #include <thread>
@@ -18,7 +19,6 @@
 #include "wpi/StringMap.h"
 #include "wpi/condition_variable.h"
 #include "wpi/mutex.h"
-#include "wpi/span.h"
 
 namespace wpi {
 class Logger;
@@ -106,7 +106,7 @@ class DataLog final {
    *               this is a time/storage tradeoff
    * @param extraHeader extra header data
    */
-  explicit DataLog(std::function<void(wpi::span<const uint8_t> data)> write,
+  explicit DataLog(std::function<void(std::span<const uint8_t> data)> write,
                    double period = 0.25, std::string_view extraHeader = "");
 
   /**
@@ -122,7 +122,7 @@ class DataLog final {
    * @param extraHeader extra header data
    */
   explicit DataLog(wpi::Logger& msglog,
-                   std::function<void(wpi::span<const uint8_t> data)> write,
+                   std::function<void(std::span<const uint8_t> data)> write,
                    double period = 0.25, std::string_view extraHeader = "");
 
   ~DataLog();
@@ -196,7 +196,7 @@ class DataLog final {
    * @param data Data to record
    * @param timestamp Time stamp (may be 0 to indicate now)
    */
-  void AppendRaw(int entry, wpi::span<const uint8_t> data, int64_t timestamp);
+  void AppendRaw(int entry, std::span<const uint8_t> data, int64_t timestamp);
 
   /**
    * Appends a record to the log.
@@ -205,7 +205,7 @@ class DataLog final {
    * @param data Data to record
    * @param timestamp Time stamp (may be 0 to indicate now)
    */
-  void AppendRaw2(int entry, wpi::span<const wpi::span<const uint8_t>> data,
+  void AppendRaw2(int entry, std::span<const std::span<const uint8_t>> data,
                   int64_t timestamp);
 
   void AppendBoolean(int entry, bool value, int64_t timestamp);
@@ -213,33 +213,33 @@ class DataLog final {
   void AppendFloat(int entry, float value, int64_t timestamp);
   void AppendDouble(int entry, double value, int64_t timestamp);
   void AppendString(int entry, std::string_view value, int64_t timestamp);
-  void AppendBooleanArray(int entry, wpi::span<const bool> arr,
+  void AppendBooleanArray(int entry, std::span<const bool> arr,
                           int64_t timestamp);
-  void AppendBooleanArray(int entry, wpi::span<const int> arr,
+  void AppendBooleanArray(int entry, std::span<const int> arr,
                           int64_t timestamp);
-  void AppendBooleanArray(int entry, wpi::span<const uint8_t> arr,
+  void AppendBooleanArray(int entry, std::span<const uint8_t> arr,
                           int64_t timestamp);
-  void AppendIntegerArray(int entry, wpi::span<const int64_t> arr,
+  void AppendIntegerArray(int entry, std::span<const int64_t> arr,
                           int64_t timestamp);
-  void AppendFloatArray(int entry, wpi::span<const float> arr,
+  void AppendFloatArray(int entry, std::span<const float> arr,
                         int64_t timestamp);
-  void AppendDoubleArray(int entry, wpi::span<const double> arr,
+  void AppendDoubleArray(int entry, std::span<const double> arr,
                          int64_t timestamp);
-  void AppendStringArray(int entry, wpi::span<const std::string> arr,
+  void AppendStringArray(int entry, std::span<const std::string> arr,
                          int64_t timestamp);
-  void AppendStringArray(int entry, wpi::span<const std::string_view> arr,
+  void AppendStringArray(int entry, std::span<const std::string_view> arr,
                          int64_t timestamp);
 
  private:
   void WriterThreadMain(std::string_view dir);
   void WriterThreadMain(
-      std::function<void(wpi::span<const uint8_t> data)> write);
+      std::function<void(std::span<const uint8_t> data)> write);
 
   // must be called with m_mutex held
   uint8_t* StartRecord(uint32_t entry, uint64_t timestamp, uint32_t payloadSize,
                        size_t reserveSize);
   uint8_t* Reserve(size_t size);
-  void AppendImpl(wpi::span<const uint8_t> data);
+  void AppendImpl(std::span<const uint8_t> data);
   void AppendStringImpl(std::string_view str);
 
   wpi::Logger& m_msglog;
@@ -338,7 +338,7 @@ class RawLogEntry : public DataLogEntry {
    * @param data Data to record
    * @param timestamp Time stamp (may be 0 to indicate now)
    */
-  void Append(wpi::span<const uint8_t> data, int64_t timestamp = 0) {
+  void Append(std::span<const uint8_t> data, int64_t timestamp = 0) {
     m_log->AppendRaw(m_entry, data, timestamp);
   }
 };
@@ -493,7 +493,7 @@ class BooleanArrayLogEntry : public DataLogEntry {
    * @param arr Values to record
    * @param timestamp Time stamp (may be 0 to indicate now)
    */
-  void Append(wpi::span<const bool> arr, int64_t timestamp = 0) {
+  void Append(std::span<const bool> arr, int64_t timestamp = 0) {
     m_log->AppendBooleanArray(m_entry, arr, timestamp);
   }
 
@@ -504,7 +504,7 @@ class BooleanArrayLogEntry : public DataLogEntry {
    * @param timestamp Time stamp (may be 0 to indicate now)
    */
   void Append(std::initializer_list<bool> arr, int64_t timestamp = 0) {
-    Append(wpi::span{arr.begin(), arr.end()}, timestamp);
+    Append(std::span{arr.begin(), arr.end()}, timestamp);
   }
 
   /**
@@ -513,7 +513,7 @@ class BooleanArrayLogEntry : public DataLogEntry {
    * @param arr Values to record
    * @param timestamp Time stamp (may be 0 to indicate now)
    */
-  void Append(wpi::span<const int> arr, int64_t timestamp = 0) {
+  void Append(std::span<const int> arr, int64_t timestamp = 0) {
     m_log->AppendBooleanArray(m_entry, arr, timestamp);
   }
 
@@ -524,7 +524,7 @@ class BooleanArrayLogEntry : public DataLogEntry {
    * @param timestamp Time stamp (may be 0 to indicate now)
    */
   void Append(std::initializer_list<int> arr, int64_t timestamp = 0) {
-    Append(wpi::span{arr.begin(), arr.end()}, timestamp);
+    Append(std::span{arr.begin(), arr.end()}, timestamp);
   }
 
   /**
@@ -533,7 +533,7 @@ class BooleanArrayLogEntry : public DataLogEntry {
    * @param arr Values to record
    * @param timestamp Time stamp (may be 0 to indicate now)
    */
-  void Append(wpi::span<const uint8_t> arr, int64_t timestamp = 0) {
+  void Append(std::span<const uint8_t> arr, int64_t timestamp = 0) {
     m_log->AppendBooleanArray(m_entry, arr, timestamp);
   }
 };
@@ -559,7 +559,7 @@ class IntegerArrayLogEntry : public DataLogEntry {
    * @param arr Values to record
    * @param timestamp Time stamp (may be 0 to indicate now)
    */
-  void Append(wpi::span<const int64_t> arr, int64_t timestamp = 0) {
+  void Append(std::span<const int64_t> arr, int64_t timestamp = 0) {
     m_log->AppendIntegerArray(m_entry, arr, timestamp);
   }
 
@@ -594,7 +594,7 @@ class FloatArrayLogEntry : public DataLogEntry {
    * @param arr Values to record
    * @param timestamp Time stamp (may be 0 to indicate now)
    */
-  void Append(wpi::span<const float> arr, int64_t timestamp = 0) {
+  void Append(std::span<const float> arr, int64_t timestamp = 0) {
     m_log->AppendFloatArray(m_entry, arr, timestamp);
   }
 
@@ -630,7 +630,7 @@ class DoubleArrayLogEntry : public DataLogEntry {
    * @param arr Values to record
    * @param timestamp Time stamp (may be 0 to indicate now)
    */
-  void Append(wpi::span<const double> arr, int64_t timestamp = 0) {
+  void Append(std::span<const double> arr, int64_t timestamp = 0) {
     m_log->AppendDoubleArray(m_entry, arr, timestamp);
   }
 
@@ -666,7 +666,7 @@ class StringArrayLogEntry : public DataLogEntry {
    * @param arr Values to record
    * @param timestamp Time stamp (may be 0 to indicate now)
    */
-  void Append(wpi::span<const std::string> arr, int64_t timestamp = 0) {
+  void Append(std::span<const std::string> arr, int64_t timestamp = 0) {
     m_log->AppendStringArray(m_entry, arr, timestamp);
   }
 
@@ -676,7 +676,7 @@ class StringArrayLogEntry : public DataLogEntry {
    * @param arr Values to record
    * @param timestamp Time stamp (may be 0 to indicate now)
    */
-  void Append(wpi::span<const std::string_view> arr, int64_t timestamp = 0) {
+  void Append(std::span<const std::string_view> arr, int64_t timestamp = 0) {
     m_log->AppendStringArray(m_entry, arr, timestamp);
   }
 
@@ -688,7 +688,7 @@ class StringArrayLogEntry : public DataLogEntry {
    */
   void Append(std::initializer_list<std::string_view> arr,
               int64_t timestamp = 0) {
-    Append(wpi::span<const std::string_view>{arr.begin(), arr.end()},
+    Append(std::span<const std::string_view>{arr.begin(), arr.end()},
            timestamp);
   }
 };

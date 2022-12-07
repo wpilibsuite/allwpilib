@@ -6,22 +6,23 @@ package edu.wpi.first.wpilibj2.command;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import java.util.concurrent.atomic.AtomicInteger;
 import org.junit.jupiter.api.Test;
 
 class RunCommandTest extends CommandTestBase {
   @Test
   void runCommandScheduleTest() {
     try (CommandScheduler scheduler = new CommandScheduler()) {
-      Counter counter = new Counter();
+      AtomicInteger counter = new AtomicInteger(0);
 
-      RunCommand command = new RunCommand(counter::increment);
+      RunCommand command = new RunCommand(counter::incrementAndGet);
 
       scheduler.schedule(command);
       scheduler.run();
       scheduler.run();
       scheduler.run();
 
-      assertEquals(3, counter.m_counter);
+      assertEquals(3, counter.get());
     }
   }
 }
