@@ -4,6 +4,7 @@
 
 package edu.wpi.first.hal.can;
 
+import edu.wpi.first.hal.CANStreamMessage;
 import edu.wpi.first.hal.JNIWrapper;
 import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
@@ -24,4 +25,11 @@ public class CANJNI extends JNIWrapper {
       IntBuffer messageID, int messageIDMask, ByteBuffer timeStamp);
 
   public static native void getCANStatus(CANStatus status);
+
+  public static native int openCANStreamSession(int messageID, int messageIDMask, int maxMessages);
+
+  public static native void closeCANStreamSession(int sessionHandle);
+
+  public static native int readCANStreamSession(
+      int sessionHandle, CANStreamMessage[] messages, int messagesToRead);
 }
