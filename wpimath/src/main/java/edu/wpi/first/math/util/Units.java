@@ -218,5 +218,4 @@ public final class Units {
   public static double rpmToFalconVelocity(double rpm) {
     return rpm * kCountsPerRevolutionFalcon500 / (kSecondsPerMinute * 10);
   }
-
 }
