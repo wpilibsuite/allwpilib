@@ -124,18 +124,18 @@ class WPILIB_DLLEXPORT Rotation2d {
   constexpr Rotation2d RotateBy(const Rotation2d& other) const;
 
   /**
-   * Returns the radian value of the rotation within (-pi, pi].
+   * Returns the radian value of the rotation.
    *
    * @return The radian value of the rotation.
    */
-  constexpr units::radian_t Radians() const;
+  constexpr units::radian_t Radians() const { return m_value; }
 
   /**
-   * Returns the degree value of the rotation within (-180, 180].
+   * Returns the degree value of the rotation.
    *
    * @return The degree value of the rotation.
    */
-  constexpr units::degree_t Degrees() const;
+  constexpr units::degree_t Degrees() const { return m_value; }
 
   /**
    * Returns the cosine of the rotation.
@@ -159,6 +159,7 @@ class WPILIB_DLLEXPORT Rotation2d {
   constexpr double Tan() const { return Sin() / Cos(); }
 
  private:
+  units::radian_t m_value = 0_rad;
   double m_cos = 1;
   double m_sin = 0;
 };
