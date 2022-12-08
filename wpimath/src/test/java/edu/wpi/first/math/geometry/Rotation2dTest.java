@@ -106,6 +106,4 @@ class Rotation2dTest {
     interpolated = rot1.interpolate(rot2, 0.5);
     assertEquals(-175.0, interpolated.getDegrees());
   }
-
-  
 }
