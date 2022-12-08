@@ -97,7 +97,8 @@ final class ContainerHelper {
   }
 
   SuppliedValueWidget<Double> addNumber(String title, DoubleSupplier valueSupplier) {
-    precheck(title, valueSupplier, "addNumber");
+    requireNonNullParam(title, "title", "addNumber");
+    requireNonNullParam(valueSupplier, "valueSupplier", "addNumber");
     return addDouble(title, valueSupplier);
   }
 
