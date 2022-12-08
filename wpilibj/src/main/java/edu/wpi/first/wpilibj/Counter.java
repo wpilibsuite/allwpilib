@@ -4,6 +4,8 @@
 
 package edu.wpi.first.wpilibj;
 
+import static edu.wpi.first.util.ErrorMessages.requireNonNullParam;
+
 import edu.wpi.first.hal.CounterJNI;
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
@@ -11,7 +13,6 @@ import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.util.sendable.SendableRegistry;
 import edu.wpi.first.wpilibj.AnalogTriggerOutput.AnalogTriggerType;
-import edu.wpi.first.wpilibj.util.ErrorMessages;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
@@ -97,7 +98,7 @@ public class Counter implements CounterBase, Sendable, AutoCloseable {
   public Counter(DigitalSource source) {
     this();
 
-    ErrorMessages.requireNonNullParam(source, "source", "Counter");
+    requireNonNullParam(source, "source", "Counter");
     setUpSource(source);
   }
 
@@ -131,9 +132,9 @@ public class Counter implements CounterBase, Sendable, AutoCloseable {
       boolean inverted) {
     this(Mode.kExternalDirection);
 
-    ErrorMessages.requireNonNullParam(encodingType, "encodingType", "Counter");
-    ErrorMessages.requireNonNullParam(upSource, "upSource", "Counter");
-    ErrorMessages.requireNonNullParam(downSource, "downSource", "Counter");
+    requireNonNullParam(encodingType, "encodingType", "Counter");
+    requireNonNullParam(upSource, "upSource", "Counter");
+    requireNonNullParam(downSource, "downSource", "Counter");
 
     if (encodingType != EncodingType.k1X && encodingType != EncodingType.k2X) {
       throw new IllegalArgumentException("Counters only support 1X and 2X quadrature decoding!");
@@ -164,7 +165,7 @@ public class Counter implements CounterBase, Sendable, AutoCloseable {
   public Counter(AnalogTrigger trigger) {
     this();
 
-    ErrorMessages.requireNonNullParam(trigger, "trigger", "Counter");
+    requireNonNullParam(trigger, "trigger", "Counter");
 
     setUpSource(trigger.createOutput(AnalogTriggerType.kState));
   }
@@ -227,8 +228,8 @@ public class Counter implements CounterBase, Sendable, AutoCloseable {
    * @param triggerType The analog trigger output that will trigger the counter.
    */
   public void setUpSource(AnalogTrigger analogTrigger, AnalogTriggerType triggerType) {
-    ErrorMessages.requireNonNullParam(analogTrigger, "analogTrigger", "setUpSource");
-    ErrorMessages.requireNonNullParam(triggerType, "triggerType", "setUpSource");
+    requireNonNullParam(analogTrigger, "analogTrigger", "setUpSource");
+    requireNonNullParam(triggerType, "triggerType", "setUpSource");
 
     setUpSource(analogTrigger.createOutput(triggerType));
     m_allocatedUpSource = true;
@@ -277,7 +278,7 @@ public class Counter implements CounterBase, Sendable, AutoCloseable {
    * @param source the digital source to count
    */
   public void setDownSource(DigitalSource source) {
-    ErrorMessages.requireNonNullParam(source, "source", "setDownSource");
+    requireNonNullParam(source, "source", "setDownSource");
 
     if (m_downSource != null && m_allocatedDownSource) {
       m_downSource.close();
@@ -295,8 +296,8 @@ public class Counter implements CounterBase, Sendable, AutoCloseable {
    * @param triggerType The analog trigger output that will trigger the counter.
    */
   public void setDownSource(AnalogTrigger analogTrigger, AnalogTriggerType triggerType) {
-    ErrorMessages.requireNonNullParam(analogTrigger, "analogTrigger", "setDownSource");
-    ErrorMessages.requireNonNullParam(triggerType, "analogTrigger", "setDownSource");
+    requireNonNullParam(analogTrigger, "analogTrigger", "setDownSource");
+    requireNonNullParam(triggerType, "analogTrigger", "setDownSource");
 
     setDownSource(analogTrigger.createOutput(triggerType));
     m_allocatedDownSource = true;

@@ -4,8 +4,9 @@
 
 package edu.wpi.first.wpilibj;
 
+import static edu.wpi.first.util.ErrorMessages.requireNonNullParam;
+
 import edu.wpi.first.hal.NotifierJNI;
-import edu.wpi.first.wpilibj.util.ErrorMessages;
 
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.ReentrantLock;
@@ -81,7 +82,7 @@ public class Notifier implements AutoCloseable {
    *     or StartPeriodic.
    */
   public Notifier(Runnable run) {
-    ErrorMessages.requireNonNullParam(run, "run", "Notifier");
+    requireNonNullParam(run, "run", "Notifier");
 
     m_handler = run;
     m_notifier.set(NotifierJNI.initializeNotifier());

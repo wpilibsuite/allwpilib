@@ -4,6 +4,8 @@
 
 package edu.wpi.first.wpilibj.drive;
 
+import static edu.wpi.first.util.ErrorMessages.requireNonNullParam;
+
 import edu.wpi.first.hal.FRCNetComm.tInstances;
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
@@ -14,7 +16,6 @@ import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.util.sendable.SendableRegistry;
 import edu.wpi.first.wpilibj.motorcontrol.MotorController;
-import edu.wpi.first.wpilibj.util.ErrorMessages;
 
 /**
  * A class for driving Mecanum drive platforms.
@@ -108,10 +109,10 @@ public class MecanumDrive extends RobotDriveBase implements Sendable, AutoClosea
       MotorController rearLeftMotor,
       MotorController frontRightMotor,
       MotorController rearRightMotor) {
-    ErrorMessages.requireNonNullParam(frontLeftMotor, "frontLeftMotor", "MecanumDrive");
-    ErrorMessages.requireNonNullParam(rearLeftMotor, "rearLeftMotor", "MecanumDrive");
-    ErrorMessages.requireNonNullParam(frontRightMotor, "frontRightMotor", "MecanumDrive");
-    ErrorMessages.requireNonNullParam(rearRightMotor, "rearRightMotor", "MecanumDrive");
+    requireNonNullParam(frontLeftMotor, "frontLeftMotor", "MecanumDrive");
+    requireNonNullParam(rearLeftMotor, "rearLeftMotor", "MecanumDrive");
+    requireNonNullParam(frontRightMotor, "frontRightMotor", "MecanumDrive");
+    requireNonNullParam(rearRightMotor, "rearRightMotor", "MecanumDrive");
 
     m_frontLeftMotor = frontLeftMotor;
     m_rearLeftMotor = rearLeftMotor;
