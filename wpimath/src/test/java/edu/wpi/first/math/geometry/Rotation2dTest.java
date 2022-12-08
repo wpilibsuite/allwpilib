@@ -60,6 +60,21 @@ class Rotation2dTest {
   }
 
   @Test
+  void testUnaryMinus() {
+    var rot = Rotation2d.fromDegrees(20.0);
+
+    assertEquals(-20.0, rot.unaryMinus().getDegrees(), kEpsilon);
+  }
+
+  @Test
+  void testMultiply() {
+    var rot = Rotation2d.fromDegrees(10.0);
+
+    assertEquals(30.0, rot.times(3.0).getDegrees(), kEpsilon);
+    assertEquals(410.0, rot.times(41.0).getDegrees(), kEpsilon);
+  }
+
+  @Test
   void testEquality() {
     var rot1 = Rotation2d.fromDegrees(43.0);
     var rot2 = Rotation2d.fromDegrees(43.0);
@@ -91,4 +106,6 @@ class Rotation2dTest {
     interpolated = rot1.interpolate(rot2, 0.5);
     assertEquals(-175.0, interpolated.getDegrees());
   }
+
+  
 }
