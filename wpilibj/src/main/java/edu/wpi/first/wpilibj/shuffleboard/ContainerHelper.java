@@ -4,20 +4,20 @@
 
 package edu.wpi.first.wpilibj.shuffleboard;
 
+import static edu.wpi.first.util.ErrorMessages.requireNonNullParam;
+
 import edu.wpi.first.networktables.GenericPublisher;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableType;
 import edu.wpi.first.util.function.FloatSupplier;
 import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.util.sendable.SendableRegistry;
-import edu.wpi.first.wpilibj.util.ErrorMessages;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
-import java.util.Objects;
 import java.util.Set;
 import java.util.function.BiConsumer;
 import java.util.function.BooleanSupplier;
@@ -58,7 +58,7 @@ final class ContainerHelper {
   }
 
   ComplexWidget add(String title, Sendable sendable) {
-    ErrorMessages.requireNonNullParam(sendable, "sendable", "add");
+    requireNonNullParam(sendable, "sendable", "add");
     checkTitle(title);
     ComplexWidget widget = new ComplexWidget(m_container, title, sendable);
     m_components.add(widget);
@@ -66,7 +66,7 @@ final class ContainerHelper {
   }
 
   ComplexWidget add(Sendable sendable) {
-    ErrorMessages.requireNonNullParam(sendable, "sendable", "add");
+    requireNonNullParam(sendable, "sendable", "add");
     String name = SendableRegistry.getName(sendable);
     if (name.isEmpty()) {
       throw new IllegalArgumentException("Sendable must have a name");
@@ -75,13 +75,13 @@ final class ContainerHelper {
   }
 
   SimpleWidget add(String title, Object defaultValue) {
-    Objects.requireNonNull(defaultValue, "Default value cannot be null");
+    requireNonNullParam(defaultValue, "defaultValue", "add");
     return add(title, NetworkTableType.getStringFromObject(defaultValue), defaultValue);
   }
 
   SimpleWidget add(String title, String typeString, Object defaultValue) {
-    Objects.requireNonNull(title, "Title cannot be null");
-    Objects.requireNonNull(defaultValue, "Default value cannot be null");
+    requireNonNullParam(title, "title", "add");
+    requireNonNullParam(defaultValue, "defaultValue", "add");
     checkTitle(title);
     checkNtType(defaultValue);
 
@@ -92,56 +92,58 @@ final class ContainerHelper {
   }
 
   SuppliedValueWidget<String> addString(String title, Supplier<String> valueSupplier) {
-    precheck(title, valueSupplier);
+    precheck(title, valueSupplier, "addString");
     return addSupplied(title, "string", valueSupplier, GenericPublisher::setString);
   }
 
   SuppliedValueWidget<Double> addNumber(String title, DoubleSupplier valueSupplier) {
+    requireNonNullParam(title, "title", "addNumber");
+    requireNonNullParam(valueSupplier, "valueSupplier", "addNumber");
     return addDouble(title, valueSupplier);
   }
 
   SuppliedValueWidget<Double> addDouble(String title, DoubleSupplier valueSupplier) {
-    precheck(title, valueSupplier);
+    precheck(title, valueSupplier, "addDouble");
     return addSupplied(title, "double", valueSupplier::getAsDouble, GenericPublisher::setDouble);
   }
 
   SuppliedValueWidget<Float> addFloat(String title, FloatSupplier valueSupplier) {
-    precheck(title, valueSupplier);
+    precheck(title, valueSupplier, "addFloat");
     return addSupplied(title, "float", valueSupplier::getAsFloat, GenericPublisher::setFloat);
   }
 
   SuppliedValueWidget<Long> addInteger(String title, LongSupplier valueSupplier) {
-    precheck(title, valueSupplier);
+    precheck(title, valueSupplier, "addInteger");
     return addSupplied(title, "int", valueSupplier::getAsLong, GenericPublisher::setInteger);
   }
 
   SuppliedValueWidget<Boolean> addBoolean(String title, BooleanSupplier valueSupplier) {
-    precheck(title, valueSupplier);
+    precheck(title, valueSupplier, "addBoolean");
     return addSupplied(title, "boolean", valueSupplier::getAsBoolean, GenericPublisher::setBoolean);
   }
 
   SuppliedValueWidget<String[]> addStringArray(String title, Supplier<String[]> valueSupplier) {
-    precheck(title, valueSupplier);
+    precheck(title, valueSupplier, "addStringArray");
     return addSupplied(title, "string[]", valueSupplier, GenericPublisher::setStringArray);
   }
 
   SuppliedValueWidget<double[]> addDoubleArray(String title, Supplier<double[]> valueSupplier) {
-    precheck(title, valueSupplier);
+    precheck(title, valueSupplier, "addDoubleArray");
     return addSupplied(title, "double[]", valueSupplier, GenericPublisher::setDoubleArray);
   }
 
   SuppliedValueWidget<float[]> addFloatArray(String title, Supplier<float[]> valueSupplier) {
-    precheck(title, valueSupplier);
+    precheck(title, valueSupplier, "addFloatArray");
     return addSupplied(title, "float[]", valueSupplier, GenericPublisher::setFloatArray);
   }
 
   SuppliedValueWidget<long[]> addIntegerArray(String title, Supplier<long[]> valueSupplier) {
-    precheck(title, valueSupplier);
+    precheck(title, valueSupplier, "addIntegerArray");
     return addSupplied(title, "int[]", valueSupplier, GenericPublisher::setIntegerArray);
   }
 
   SuppliedValueWidget<boolean[]> addBooleanArray(String title, Supplier<boolean[]> valueSupplier) {
-    precheck(title, valueSupplier);
+    precheck(title, valueSupplier, "addBooleanArray");
     return addSupplied(title, "boolean[]", valueSupplier, GenericPublisher::setBooleanArray);
   }
 
@@ -151,13 +153,13 @@ final class ContainerHelper {
 
   SuppliedValueWidget<byte[]> addRaw(
       String title, String typeString, Supplier<byte[]> valueSupplier) {
-    precheck(title, valueSupplier);
+    precheck(title, valueSupplier, "addRaw");
     return addSupplied(title, typeString, valueSupplier, GenericPublisher::setRaw);
   }
 
-  private void precheck(String title, Object valueSupplier) {
-    Objects.requireNonNull(title, "Title cannot be null");
-    Objects.requireNonNull(valueSupplier, "Value supplier cannot be null");
+  private void precheck(String title, Object valueSupplier, String methodName) {
+    requireNonNullParam(title, "title", methodName);
+    requireNonNullParam(valueSupplier, "valueSupplier", methodName);
     checkTitle(title);
   }
 
