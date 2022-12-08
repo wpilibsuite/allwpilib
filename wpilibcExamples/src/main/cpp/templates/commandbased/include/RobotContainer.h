@@ -15,9 +15,9 @@
  * scheduler calls).  Instead, the structure of the robot (including subsystems,
  * commands, and button mappings) should be declared here.
  */
-class ExampleRobot {
+class RobotContainer {
  public:
-  ExampleRobot();
+  RobotContainer();
 
   frc2::CommandPtr GetAutonomousCommand();
 
