@@ -7,7 +7,6 @@ package edu.wpi.first.wpilibj;
 import static edu.wpi.first.util.ErrorMessages.requireNonNullParam;
 
 import edu.wpi.first.hal.NotifierJNI;
-
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.ReentrantLock;
 
