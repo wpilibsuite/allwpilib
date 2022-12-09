@@ -276,12 +276,9 @@ int64_t HAL_GetFPGARevision(int32_t* status) {
 size_t HAL_GetSerialNumber(char* buffer, size_t size) {
   const char* serialNum = std::getenv("serialnum");
   if (serialNum) {
-    size_t length = std::strlen(serialNum);
     std::strncpy(buffer, serialNum, size);
-    if (length < size) {
-      return length;
-    }
-    return size;
+    buffer[size - 1] = '\0';
+    return std::strlen(buffer);
   } else {
     if (size > 0) {
       buffer[0] = '\0';
