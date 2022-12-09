@@ -208,7 +208,7 @@ TEST(RoboRioSimTest, Set3V3) {
 }
 
 TEST(RoboRioSimTest, SetSerialNumber) {
-  const std::string kSerialNum = "Hello!";
+  const std::string kSerialNum = "Hello";
 
   RoboRioSim::ResetData();
 

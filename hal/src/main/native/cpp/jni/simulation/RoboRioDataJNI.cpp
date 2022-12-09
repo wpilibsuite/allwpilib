@@ -839,7 +839,7 @@ Java_edu_wpi_first_hal_simulation_RoboRioDataJNI_getSerialNumber
 {
   char serialNum[9];
   size_t len = HALSIM_GetRoboRioSerialNumber(serialNum, sizeof(serialNum));
-  return MakeJString(env, std::string(serialNum, len));
+  return MakeJString(env, std::string_view(serialNum, len));
 }
 
 /*

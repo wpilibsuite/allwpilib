@@ -53,10 +53,11 @@ void RoboRioData::CancelSerialNumberCallback(int32_t uid) {
 size_t RoboRioData::GetSerialNumber(char* buffer, size_t size) {
   std::scoped_lock lock(m_serialNumberMutex);
   size_t copied = m_serialNumber.copy(buffer, size);
-  // Null terminate if there is room
-  if (copied < size) {
-    buffer[copied] = '\0';
+  // Null terminate
+  if (copied == size) {
+    copied -= 1;
   }
+  buffer[copied] = '\0';
   return copied;
 }
 
