@@ -337,7 +337,7 @@ class DriverStationSim {
    * @param stick The joystick number
    * @param name The value of name
    */
-  static void SetJoystickName(int stick, const char* name);
+  static void SetJoystickName(int stick, std::string_view name);
 
   /**
    * Sets the types of Axes for a joystick.
@@ -353,14 +353,14 @@ class DriverStationSim {
    *
    * @param message the game specific message
    */
-  static void SetGameSpecificMessage(const char* message);
+  static void SetGameSpecificMessage(std::string_view message);
 
   /**
    * Sets the event name.
    *
    * @param name the event name
    */
-  static void SetEventName(const char* name);
+  static void SetEventName(std::string_view name);
 
   /**
    * Sets the match type.
