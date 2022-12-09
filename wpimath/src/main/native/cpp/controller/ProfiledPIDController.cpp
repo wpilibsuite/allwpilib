@@ -4,10 +4,7 @@
 
 #include "frc/controller/ProfiledPIDController.h"
 
-void frc::detail::ReportProfiledPIDController() {
+int frc::detail::IncrementAndGetProfiledPIDControllerInstances() {
   static int instances = 0;
-  ++instances;
-  wpi::math::MathSharedStore::ReportUsage(
-      wpi::math::MathUsageId::kController_ProfiledPIDController, instances);
-  wpi::SendableRegistry::Add(this, "ProfiledPIDController", instances);
+  return ++instances;
 }
