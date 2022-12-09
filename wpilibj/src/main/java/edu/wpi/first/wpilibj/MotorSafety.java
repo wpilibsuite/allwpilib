@@ -4,10 +4,9 @@
 
 package edu.wpi.first.wpilibj;
 
-import edu.wpi.first.util.WPIUtilJNI;
-import edu.wpi.first.hal.DriverStationJNI;
 import edu.wpi.first.hal.ControlWord;
-
+import edu.wpi.first.hal.DriverStationJNI;
+import edu.wpi.first.util.WPIUtilJNI;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
@@ -37,16 +36,16 @@ public abstract class MotorSafety {
 
     int safetyCounter = 0;
     while (true) {
-      boolean timed_out;
+      boolean timedOut;
       try {
-        timed_out = WPIUtilJNI.waitForObjectTimeout(event, 0.1);
+        timedOut = WPIUtilJNI.waitForObjectTimeout(event, 0.1);
       } catch (InterruptedException e) {
         DriverStationJNI.removeNewDataEventHandle(event);
         WPIUtilJNI.destroyEvent(event);
         Thread.currentThread().interrupt();
         return;
       }
-      if (!timed_out) {
+      if (!timedOut) {
         DriverStationJNI.getControlWord(controlWord);
         if (!(controlWord.getEnabled() && controlWord.getDSAttached())) {
           safetyCounter = 0;
