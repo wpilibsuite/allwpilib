@@ -24,7 +24,7 @@ class Thread : public wpi::SafeThread {
 };
 
 void Thread::Main() {
-  wpi::Event event{true, false};
+  wpi::Event event{false, false};
   HAL_ProvideNewDataEventHandle(event.GetHandle());
 
   int safetyCounter = 0;

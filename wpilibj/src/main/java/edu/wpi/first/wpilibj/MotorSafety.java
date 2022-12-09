@@ -37,16 +37,16 @@ public abstract class MotorSafety {
 
     int safetyCounter = 0;
     while (true) {
-      boolean signaled;
+      boolean timed_out;
       try {
-        signaled = WPIUtilJNI.waitForObjectTimeout(event, 0.1);
+        timed_out = WPIUtilJNI.waitForObjectTimeout(event, 0.1);
       } catch (InterruptedException e) {
         DriverStationJNI.removeNewDataEventHandle(event);
         WPIUtilJNI.destroyEvent(event);
         Thread.currentThread().interrupt();
         return;
       }
-      if (signaled) {
+      if (!timed_out) {
         DriverStationJNI.getControlWord(controlWord);
         if (!(controlWord.getEnabled() && controlWord.getDSAttached())) {
           safetyCounter = 0;
