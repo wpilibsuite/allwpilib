@@ -12,6 +12,7 @@ using namespace frc;
 
 void PWMMotorController::Set(double speed) {
   m_pwm.SetSpeed(m_isInverted ? -speed : speed);
+  Feed();
 }
 
 double PWMMotorController::Get() const {
@@ -31,7 +32,8 @@ void PWMMotorController::Disable() {
 }
 
 void PWMMotorController::StopMotor() {
-  Set(0);
+  // Don't use Set(0) as that will feed the watch kitty
+  m_pwm.SetSpeed(0);
 }
 
 std::string PWMMotorController::GetDescription() const {
