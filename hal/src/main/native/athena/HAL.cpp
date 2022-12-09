@@ -18,6 +18,9 @@
 #include <FRC_NetworkCommunication/LoadOut.h>
 #include <FRC_NetworkCommunication/UsageReporting.h>
 #include <fmt/format.h>
+#include <wpi/MemoryBuffer.h>
+#include <wpi/StringExtras.h>
+#include <wpi/fs.h>
 #include <wpi/mutex.h>
 #include <wpi/timestamp.h>
 
@@ -268,6 +271,20 @@ int64_t HAL_GetFPGARevision(int32_t* status) {
     return 0;
   }
   return global->readRevision(status);
+}
+
+size_t HAL_GetSerialNumber(char* buffer, size_t size) {
+  const char* serialNum = std::getenv("serialnum");
+  if (serialNum) {
+    std::strncpy(buffer, serialNum, size);
+    buffer[size - 1] = '\0';
+    return std::strlen(buffer);
+  } else {
+    if (size > 0) {
+      buffer[0] = '\0';
+    }
+    return 0;
+  }
 }
 
 uint64_t HAL_GetFPGATime(int32_t* status) {

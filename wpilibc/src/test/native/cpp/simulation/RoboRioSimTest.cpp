@@ -207,4 +207,21 @@ TEST(RoboRioSimTest, Set3V3) {
   EXPECT_EQ(kTestFaults, RobotController::GetFaultCount3V3());
 }
 
+TEST(RoboRioSimTest, SetSerialNumber) {
+  const std::string kSerialNum = "Hello";
+
+  RoboRioSim::ResetData();
+
+  RoboRioSim::SetSerialNumber(kSerialNum);
+  EXPECT_EQ(kSerialNum, RoboRioSim::GetSerialNumber());
+  EXPECT_EQ(kSerialNum, RobotController::GetSerialNumber());
+
+  const std::string kSerialNumberOverflow = "SerialNumber";
+  const std::string kSerialNumberTruncated = kSerialNumberOverflow.substr(0, 8);
+
+  RoboRioSim::SetSerialNumber(kSerialNumberOverflow);
+  EXPECT_EQ(kSerialNumberTruncated, RoboRioSim::GetSerialNumber());
+  EXPECT_EQ(kSerialNumberTruncated, RobotController::GetSerialNumber());
+}
+
 }  // namespace frc::sim

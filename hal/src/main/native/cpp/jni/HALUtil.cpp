@@ -458,6 +458,20 @@ Java_edu_wpi_first_hal_HALUtil_getFPGARevision
 
 /*
  * Class:     edu_wpi_first_hal_HALUtil
+ * Method:    getSerialNumber
+ * Signature: ()Ljava/lang/String;
+ */
+JNIEXPORT jstring JNICALL
+Java_edu_wpi_first_hal_HALUtil_getSerialNumber
+  (JNIEnv* env, jclass)
+{
+  char serialNum[9];
+  size_t len = HAL_GetSerialNumber(serialNum, sizeof(serialNum));
+  return MakeJString(env, std::string_view(serialNum, len));
+}
+
+/*
+ * Class:     edu_wpi_first_hal_HALUtil
  * Method:    getFPGATime
  * Signature: ()J
  */

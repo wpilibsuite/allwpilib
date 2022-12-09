@@ -5,6 +5,7 @@
 #pragma once
 
 #include <memory>
+#include <string>
 
 #include <units/current.h>
 #include <units/voltage.h>
@@ -417,6 +418,20 @@ class RoboRioSim {
    * @param brownoutVoltage the new voltage
    */
   static void SetBrownoutVoltage(units::volt_t brownoutVoltage);
+
+  /**
+   * Get the serial number.
+   *
+   * @return The serial number.
+   */
+  static std::string GetSerialNumber();
+
+  /**
+   * Set the serial number.
+   *
+   * @param serialNumber The serial number.
+   */
+  static void SetSerialNumber(std::string_view serialNumber);
 
   /**
    * Reset all simulation data.
