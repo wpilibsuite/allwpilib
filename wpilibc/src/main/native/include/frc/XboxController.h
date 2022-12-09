@@ -356,6 +356,15 @@ class XboxController : public GenericHID {
   BooleanEvent LeftTrigger(double threshold, EventLoop* loop) const;
 
   /**
+   * Constructs an event instance around the axis value of the left trigger.
+   * The returned trigger will be true when the axis value is greater than 0.5.
+   * @param loop the event loop instance to attach the event to.
+   * @return an event instance that is true when the right trigger's axis
+   * exceeds 0.5, attached to the given event loop
+   */
+  BooleanEvent LeftTrigger(EventLoop* loop) const;
+
+  /**
    * Constructs an event instance around the axis value of the right trigger.
    * The returned trigger will be true when the axis value is greater than
    * {@code threshold}.
@@ -367,6 +376,15 @@ class XboxController : public GenericHID {
    * exceeds the provided threshold, attached to the given event loop
    */
   BooleanEvent RightTrigger(double threshold, EventLoop* loop) const;
+
+  /**
+   * Constructs an event instance around the axis value of the right trigger.
+   * The returned trigger will be true when the axis value is greater than 0.5.
+   * @param loop the event loop instance to attach the event to.
+   * @return an event instance that is true when the right trigger's axis
+   * exceeds 0.5, attached to the given event loop
+   */
+  BooleanEvent RightTrigger(EventLoop* loop) const;
 
   struct Button {
     static constexpr int kLeftBumper = 5;

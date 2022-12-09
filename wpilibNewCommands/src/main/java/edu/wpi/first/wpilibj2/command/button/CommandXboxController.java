@@ -286,6 +286,17 @@ public class CommandXboxController extends CommandGenericHID {
   }
 
   /**
+   * Constructs a Trigger instance around the axis value of the left trigger. The returned trigger
+   * will be true when the axis value is greater than 0.5.
+   *
+   * @return a Trigger instance that is true when the left trigger's axis exceeds 0.5, attached to
+   *     the {@link CommandScheduler#getDefaultButtonLoop() default scheduler button loop}.
+   */
+  public Trigger leftTrigger() {
+    return leftTrigger(0.5);
+  }
+
+  /**
    * Constructs a Trigger instance around the axis value of the right trigger. The returned trigger
    * will be true when the axis value is greater than {@code threshold}.
    *
@@ -311,6 +322,17 @@ public class CommandXboxController extends CommandGenericHID {
    */
   public Trigger rightTrigger(double threshold) {
     return rightTrigger(threshold, CommandScheduler.getInstance().getDefaultButtonLoop());
+  }
+
+  /**
+   * Constructs a Trigger instance around the axis value of the right trigger. The returned trigger
+   * will be true when the axis value is greater than 0.5.
+   *
+   * @return a Trigger instance that is true when the right trigger's axis exceeds 0.5, attached to
+   *     the {@link CommandScheduler#getDefaultButtonLoop() default scheduler button loop}.
+   */
+  public Trigger rightTrigger() {
+    return rightTrigger(0.5);
   }
 
   /**

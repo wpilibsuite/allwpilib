@@ -205,9 +205,17 @@ BooleanEvent XboxController::LeftTrigger(double threshold,
   });
 }
 
+BooleanEvent XboxController::LeftTrigger(EventLoop* loop) const {
+  return this->LeftTrigger(0.5, loop);
+}
+
 BooleanEvent XboxController::RightTrigger(double threshold,
                                           EventLoop* loop) const {
   return BooleanEvent(loop, [this, threshold]() {
     return this->GetRightTriggerAxis() > threshold;
   });
+}
+
+BooleanEvent XboxController::RightTrigger(EventLoop* loop) const {
+  return this->RightTrigger(0.5, loop);
 }
