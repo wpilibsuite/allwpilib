@@ -472,7 +472,7 @@ public class Trigger implements BooleanSupplier {
   }
 
   /**
-   * Composes two triggers with logical OR.
+   * Composes two triggers with logical AND.
    *
    * @param trigger the condition to compose with
    * @return A trigger which is active when either component trigger is active.
