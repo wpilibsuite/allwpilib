@@ -57,20 +57,11 @@ public final class NetworkTablesJNI {
     libraryLoaded = true;
   }
 
-  private static int[] pubSubOptionTypes(PubSubOption... options) {
-    int[] rv = new int[options.length];
-    for (int i = 0; i < options.length; i++) {
-      rv[i] = options[i].m_type;
+  private static PubSubOptions buildOptions(PubSubOption... options) {
+    if (options.length == 0) {
+      return null;  // optimize common case (JNI checks for null)
     }
-    return rv;
-  }
-
-  private static int[] pubSubOptionValues(PubSubOption... options) {
-    int[] rv = new int[options.length];
-    for (int i = 0; i < options.length; i++) {
-      rv[i] = options[i].m_value;
-    }
-    return rv;
+    return new PubSubOptions(options);
   }
 
   public static native int getDefaultInstance();
@@ -81,13 +72,19 @@ public final class NetworkTablesJNI {
 
   public static native int getInstanceFromHandle(int handle);
 
+  private static native int getEntryImpl(
+      int topic, int type, String typeStr, PubSubOptions options);
+
   public static native int getEntry(int inst, String key);
 
-  private static native int getEntry(
-      int topic, int type, String typeStr, int[] optionTypes, int[] optionValues);
+  public static int getEntry(
+      int topic, int type, String typeStr, PubSubOptions options) {
+    return getEntryImpl(topic, type, typeStr, options);
+  }
 
-  public static int getEntry(int topic, int type, String typeStr, PubSubOption... options) {
-    return getEntry(topic, type, typeStr, pubSubOptionTypes(options), pubSubOptionValues(options));
+  public static int getEntry(
+      int topic, int type, String typeStr, PubSubOption... options) {
+    return getEntryImpl(topic, type, typeStr, buildOptions(options));
   }
 
   public static native String getEntryName(int entry);
@@ -136,27 +133,30 @@ public final class NetworkTablesJNI {
 
   public static native void setTopicProperties(int topic, String properties);
 
-  private static native int subscribe(
-      int topic, int type, String typeStr, int[] optionTypes, int[] optionValues);
+  public static native int subscribe(
+      int topic, int type, String typeStr, PubSubOptions options);
 
-  public static int subscribe(int topic, int type, String typeStr, PubSubOption... options) {
-    return subscribe(topic, type, typeStr, pubSubOptionTypes(options), pubSubOptionValues(options));
+  public static int subscribe(
+      int topic, int type, String typeStr, PubSubOption... options) {
+    return subscribe(topic, type, typeStr, buildOptions(options));
   }
 
   public static native void unsubscribe(int sub);
 
-  private static native int publish(
-      int topic, int type, String typeStr, int[] optionTypes, int[] optionValues);
+  public static native int publish(
+      int topic, int type, String typeStr, PubSubOptions options);
 
-  public static int publish(int topic, int type, String typeStr, PubSubOption... options) {
-    return publish(topic, type, typeStr, pubSubOptionTypes(options), pubSubOptionValues(options));
+  public static int publish(
+      int topic, int type, String typeStr, PubSubOption... options) {
+    return publish(topic, type, typeStr, buildOptions(options));
   }
 
-  private static native int publishEx(
-      int topic, int type, String typeStr, String properties, int[] optionTypes, int[] optionValues);
+  public static native int publishEx(
+      int topic, int type, String typeStr, String properties, PubSubOptions options);
 
-  public static int publishEx(int topic, int type, String typeStr, String properties, PubSubOption... options) {
-    return publishEx(topic, type, typeStr, properties, pubSubOptionTypes(options), pubSubOptionValues(options));
+  public static int publishEx(
+      int topic, int type, String typeStr, String properties, PubSubOption... options) {
+    return publishEx(topic, type, typeStr, properties, buildOptions(options));
   }
 
   public static native void unpublish(int pubentry);
@@ -167,12 +167,10 @@ public final class NetworkTablesJNI {
 
   public static native int getTopicFromHandle(int pubsubentry);
 
-  private static native int subscribeMultiple(
-      int inst, String[] prefixes, int[] optionTypes, int[] optionValues);
+  public static native int subscribeMultiple(int inst, String[] prefixes, PubSubOptions options);
 
   public static int subscribeMultiple(int inst, String[] prefixes, PubSubOption... options) {
-    return subscribeMultiple(
-        inst, prefixes, pubSubOptionTypes(options), pubSubOptionValues(options));
+    return subscribeMultiple(inst, prefixes, buildOptions(options));
   }
 
   public static native void unsubscribeMultiple(int sub);

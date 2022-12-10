@@ -15,7 +15,7 @@ class json;
 }  // namespace wpi
 
 namespace nt {
-class PubSubOptions;
+class PubSubOptionsImpl;
 class Value;
 }  // namespace nt
 
@@ -42,10 +42,10 @@ class NetworkStartupInterface {
   virtual void Publish(NT_Publisher pubHandle, NT_Topic topicHandle,
                        std::string_view name, std::string_view typeStr,
                        const wpi::json& properties,
-                       const PubSubOptions& options) = 0;
+                       const PubSubOptionsImpl& options) = 0;
   virtual void Subscribe(NT_Subscriber subHandle,
                          std::span<const std::string> topicNames,
-                         const PubSubOptions& options) = 0;
+                         const PubSubOptionsImpl& options) = 0;
   virtual void SetValue(NT_Publisher pubHandle, const Value& value) = 0;
 };
 

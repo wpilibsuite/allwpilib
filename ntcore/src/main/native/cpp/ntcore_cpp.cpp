@@ -310,7 +310,7 @@ bool SetTopicProperties(NT_Topic topic, const wpi::json& properties) {
 }
 
 NT_Subscriber Subscribe(NT_Topic topic, NT_Type type, std::string_view typeStr,
-                        std::span<const PubSubOption> options) {
+                        const PubSubOptions& options) {
   if (auto ii = InstanceImpl::GetTyped(topic, Handle::kTopic)) {
     return ii->localStorage.Subscribe(topic, type, typeStr, options);
   } else {
@@ -325,13 +325,13 @@ void Unsubscribe(NT_Subscriber sub) {
 }
 
 NT_Publisher Publish(NT_Topic topic, NT_Type type, std::string_view typeStr,
-                     std::span<const PubSubOption> options) {
+                     const PubSubOptions& options) {
   return PublishEx(topic, type, typeStr, wpi::json::object(), options);
 }
 
 NT_Publisher PublishEx(NT_Topic topic, NT_Type type, std::string_view typeStr,
                        const wpi::json& properties,
-                       std::span<const PubSubOption> options) {
+                       const PubSubOptions& options) {
   if (auto ii = InstanceImpl::GetTyped(topic, Handle::kTopic)) {
     return ii->localStorage.Publish(topic, type, typeStr, properties, options);
   } else {
@@ -346,7 +346,7 @@ void Unpublish(NT_Handle pubentry) {
 }
 
 NT_Entry GetEntry(NT_Topic topic, NT_Type type, std::string_view typeStr,
-                  std::span<const PubSubOption> options) {
+                  const PubSubOptions& options) {
   if (auto ii = InstanceImpl::GetTyped(topic, Handle::kTopic)) {
     return ii->localStorage.GetEntry(topic, type, typeStr, options);
   } else {
@@ -376,7 +376,7 @@ NT_Topic GetTopicFromHandle(NT_Handle pubsubentry) {
 
 NT_MultiSubscriber SubscribeMultiple(NT_Inst inst,
                                      std::span<const std::string_view> prefixes,
-                                     std::span<const PubSubOption> options) {
+                                     const PubSubOptions& options) {
   if (auto ii = InstanceImpl::GetTyped(inst, Handle::kInstance)) {
     return ii->localStorage.SubscribeMultiple(prefixes, options);
   } else {

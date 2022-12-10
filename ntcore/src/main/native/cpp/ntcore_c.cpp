@@ -2,6 +2,8 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
+#include "ntcore_c.h"
+
 #include <stdint.h>
 
 #include <cassert>
@@ -99,6 +101,22 @@ static void DisposeEvent(NT_Event* event) {
   } else if ((event->flags & NT_EVENT_LOGMESSAGE) != 0) {
     DisposeLogMessage(&event->data.logMessage);
   }
+}
+
+static PubSubOptions ConvertToCpp(const NT_PubSubOptions* in) {
+  PubSubOptions out;
+  out.structSize = in->structSize;
+  out.pollStorage = in->pollStorage;
+  out.periodic = in->periodic;
+  out.excludePublisher = in->excludePublisher;
+  out.sendAll = in->sendAll;
+  out.topicsOnly = in->topicsOnly;
+  out.prefixMatch = in->prefixMatch;
+  out.keepDuplicates = in->keepDuplicates;
+  out.disableRemote = in->disableRemote;
+  out.disableLocal = in->disableLocal;
+  out.excludeSelf = in->excludeSelf;
+  return out;
 }
 
 extern "C" {
@@ -314,14 +332,8 @@ NT_Bool NT_SetTopicProperties(NT_Topic topic, const char* properties) {
 }
 
 NT_Subscriber NT_Subscribe(NT_Topic topic, NT_Type type, const char* typeStr,
-                           const struct NT_PubSubOption* options,
-                           size_t options_len) {
-  wpi::SmallVector<nt::PubSubOption> o;
-  o.reserve(options_len);
-  for (size_t i = 0; i < options_len; ++i) {
-    o.emplace_back(options[i].type, options[i].value);
-  }
-  return nt::Subscribe(topic, type, typeStr, o);
+                           const struct NT_PubSubOptions* options) {
+  return nt::Subscribe(topic, type, typeStr, ConvertToCpp(options));
 }
 
 void NT_Unsubscribe(NT_Subscriber sub) {
@@ -329,20 +341,13 @@ void NT_Unsubscribe(NT_Subscriber sub) {
 }
 
 NT_Publisher NT_Publish(NT_Topic topic, NT_Type type, const char* typeStr,
-                        const struct NT_PubSubOption* options,
-                        size_t options_len) {
-  wpi::SmallVector<nt::PubSubOption> o;
-  o.reserve(options_len);
-  for (size_t i = 0; i < options_len; ++i) {
-    o.emplace_back(options[i].type, options[i].value);
-  }
-  return nt::Publish(topic, type, typeStr, o);
+                        const struct NT_PubSubOptions* options) {
+  return nt::Publish(topic, type, typeStr, ConvertToCpp(options));
 }
 
 NT_Publisher NT_PublishEx(NT_Topic topic, NT_Type type, const char* typeStr,
                           const char* properties,
-                          const struct NT_PubSubOption* options,
-                          size_t options_len) {
+                          const struct NT_PubSubOptions* options) {
   wpi::json j;
   if (properties[0] == '\0') {
     // gracefully handle empty string
@@ -355,13 +360,7 @@ NT_Publisher NT_PublishEx(NT_Topic topic, NT_Type type, const char* typeStr,
     }
   }
 
-  wpi::SmallVector<nt::PubSubOption> o;
-  o.reserve(options_len);
-  for (size_t i = 0; i < options_len; ++i) {
-    o.emplace_back(options[i].type, options[i].value);
-  }
-
-  return nt::PublishEx(topic, type, typeStr, j, o);
+  return nt::PublishEx(topic, type, typeStr, j, ConvertToCpp(options));
 }
 
 void NT_Unpublish(NT_Handle pubentry) {
@@ -369,14 +368,8 @@ void NT_Unpublish(NT_Handle pubentry) {
 }
 
 NT_Entry NT_GetEntryEx(NT_Topic topic, NT_Type type, const char* typeStr,
-                       const struct NT_PubSubOption* options,
-                       size_t options_len) {
-  wpi::SmallVector<nt::PubSubOption> o;
-  o.reserve(options_len);
-  for (size_t i = 0; i < options_len; ++i) {
-    o.emplace_back(options[i].type, options[i].value);
-  }
-  return nt::GetEntry(topic, type, typeStr, o);
+                       const struct NT_PubSubOptions* options) {
+  return nt::GetEntry(topic, type, typeStr, ConvertToCpp(options));
 }
 
 void NT_ReleaseEntry(NT_Entry entry) {

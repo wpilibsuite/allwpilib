@@ -130,8 +130,8 @@ void SendableBuilderImpl::AddPropertyImpl(Topic topic, Getter getter,
     };
   }
   if (setter) {
-    prop->sub = topic.Subscribe(
-        {}, {{nt::PubSubOption::ExcludePublisher(prop->pub.GetHandle())}});
+    prop->sub =
+        topic.Subscribe({}, {.excludePublisher = prop->pub.GetHandle()});
     prop->updateLocal = [=](auto& sub) {
       for (auto&& val : sub.ReadQueue()) {
         setter(val.value);
@@ -224,9 +224,8 @@ void SendableBuilderImpl::AddRawProperty(
     };
   }
   if (setter) {
-    prop->sub = topic.Subscribe(
-        typeString, {},
-        {{nt::PubSubOption::ExcludePublisher(prop->pub.GetHandle())}});
+    prop->sub = topic.Subscribe(typeString, {},
+                                {.excludePublisher = prop->pub.GetHandle()});
     prop->updateLocal = [=](auto& sub) {
       for (auto&& val : sub.ReadQueue()) {
         setter(val.value);
@@ -249,8 +248,8 @@ void SendableBuilderImpl::AddSmallPropertyImpl(Topic topic, Getter getter,
     };
   }
   if (setter) {
-    prop->sub = topic.Subscribe(
-        {}, {{nt::PubSubOption::ExcludePublisher(prop->pub.GetHandle())}});
+    prop->sub =
+        topic.Subscribe({}, {.excludePublisher = prop->pub.GetHandle()});
     prop->updateLocal = [=](auto& sub) {
       for (auto&& val : sub.ReadQueue()) {
         setter(val.value);
@@ -328,9 +327,8 @@ void SendableBuilderImpl::AddSmallRawProperty(
     };
   }
   if (setter) {
-    prop->sub = topic.Subscribe(
-        typeString, {},
-        {{nt::PubSubOption::ExcludePublisher(prop->pub.GetHandle())}});
+    prop->sub = topic.Subscribe(typeString, {},
+                                {.excludePublisher = prop->pub.GetHandle()});
     prop->updateLocal = [=](auto& sub) {
       for (auto&& val : sub.ReadQueue()) {
         setter(val.value);

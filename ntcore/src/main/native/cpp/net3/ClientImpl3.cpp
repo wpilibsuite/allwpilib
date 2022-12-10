@@ -44,7 +44,7 @@ struct PublisherData {
 
   Entry* entry;
   NT_Publisher handle;
-  PubSubOptions options;
+  PubSubOptionsImpl options;
   // in options as double, but copy here as integer; rounded to the nearest
   // 10 ms
   uint32_t periodMs;
@@ -98,7 +98,7 @@ class CImpl : public MessageHandler3 {
   // Outgoing handlers
   void Publish(NT_Publisher pubHandle, NT_Topic topicHandle,
                std::string_view name, std::string_view typeStr,
-               const wpi::json& properties, const PubSubOptions& options);
+               const wpi::json& properties, const PubSubOptionsImpl& options);
   void Unpublish(NT_Publisher pubHandle, NT_Topic topicHandle);
   void SetProperties(NT_Topic topicHandle, std::string_view name,
                      const wpi::json& update);
@@ -315,7 +315,8 @@ bool CImpl::CheckNetworkReady() {
 
 void CImpl::Publish(NT_Publisher pubHandle, NT_Topic topicHandle,
                     std::string_view name, std::string_view typeStr,
-                    const wpi::json& properties, const PubSubOptions& options) {
+                    const wpi::json& properties,
+                    const PubSubOptionsImpl& options) {
   DEBUG4("Publish('{}', '{}')", name, typeStr);
   unsigned int index = Handle{pubHandle}.GetIndex();
   if (index >= m_publishers.size()) {
@@ -647,7 +648,7 @@ ClientStartup3::~ClientStartup3() = default;
 void ClientStartup3::Publish(NT_Publisher pubHandle, NT_Topic topicHandle,
                              std::string_view name, std::string_view typeStr,
                              const wpi::json& properties,
-                             const PubSubOptions& options) {
+                             const PubSubOptionsImpl& options) {
   WPI_DEBUG4(m_client.m_impl->m_logger, "StartupPublish({}, {}, {}, {})",
              pubHandle, topicHandle, name, typeStr);
   m_client.m_impl->Publish(pubHandle, topicHandle, name, typeStr, properties,
@@ -656,7 +657,7 @@ void ClientStartup3::Publish(NT_Publisher pubHandle, NT_Topic topicHandle,
 
 void ClientStartup3::Subscribe(NT_Subscriber subHandle,
                                std::span<const std::string> prefixes,
-                               const PubSubOptions& options) {
+                               const PubSubOptionsImpl& options) {
   // NT3 ignores subscribes, so no action required
 }
 

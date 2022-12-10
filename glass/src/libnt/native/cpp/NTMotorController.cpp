@@ -15,8 +15,7 @@ NTMotorControllerModel::NTMotorControllerModel(std::string_view path)
 NTMotorControllerModel::NTMotorControllerModel(nt::NetworkTableInstance inst,
                                                std::string_view path)
     : m_inst{inst},
-      m_value{inst.GetDoubleTopic(fmt::format("{}/Value", path))
-                  .GetEntry(0, {{nt::PubSubOption::SendAll(true)}})},
+      m_value{inst.GetDoubleTopic(fmt::format("{}/Value", path)).GetEntry(0)},
       m_name{inst.GetStringTopic(fmt::format("{}/.name", path)).Subscribe("")},
       m_controllable{inst.GetBooleanTopic(fmt::format("{}/.controllable", path))
                          .Subscribe(false)},

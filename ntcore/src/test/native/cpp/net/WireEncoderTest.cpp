@@ -74,7 +74,7 @@ TEST_F(WireEncoderTextTest, Subscribe) {
 }
 
 TEST_F(WireEncoderTextTest, SubscribeSendAll) {
-  PubSubOptions options;
+  PubSubOptionsImpl options;
   options.sendAll = true;
   net::WireEncodeSubscribe(os, 5, std::span<const std::string_view>{{"a", "b"}},
                            options);
@@ -85,7 +85,7 @@ TEST_F(WireEncoderTextTest, SubscribeSendAll) {
 }
 
 TEST_F(WireEncoderTextTest, SubscribePeriodic) {
-  PubSubOptions options;
+  PubSubOptionsImpl options;
   options.periodicMs = 500u;
   net::WireEncodeSubscribe(os, 5, std::span<const std::string_view>{{"a", "b"}},
                            options);
@@ -96,7 +96,7 @@ TEST_F(WireEncoderTextTest, SubscribePeriodic) {
 }
 
 TEST_F(WireEncoderTextTest, SubscribeAllOptions) {
-  PubSubOptions options;
+  PubSubOptionsImpl options;
   options.sendAll = true;
   options.periodicMs = 500u;
   net::WireEncodeSubscribe(os, 5, std::span<const std::string_view>{{"a", "b"}},
