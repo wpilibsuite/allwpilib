@@ -475,7 +475,7 @@ public class Trigger implements BooleanSupplier {
    * Composes two triggers with logical AND.
    *
    * @param trigger the condition to compose with
-   * @return A trigger which is active when either component trigger is active.
+   * @return A trigger which is active when both component triggers are active.
    */
   public Trigger and(BooleanSupplier trigger) {
     return new Trigger(() -> m_condition.getAsBoolean() && trigger.getAsBoolean());
