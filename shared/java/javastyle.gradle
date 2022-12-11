@@ -71,8 +71,8 @@ if (!project.hasProperty('skipJavaFormat')) {
     }
 }
 
-task javaFormat {
+tasks.register('javaFormat') {
     dependsOn(tasks.withType(Checkstyle))
     dependsOn(tasks.withType(Pmd))
+    dependsOn(tasks.named('spotlessApply'))
 }
-javaFormat.dependsOn 'spotlessApply'
