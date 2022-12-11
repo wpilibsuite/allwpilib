@@ -12,6 +12,7 @@
 #include <cstdio>
 #include <cstdlib>
 #include <fstream>
+#include <iostream>
 #include <thread>
 
 #include <FRC_NetworkCommunication/FRCComm.h>
@@ -19,6 +20,7 @@
 #include <FRC_NetworkCommunication/UsageReporting.h>
 #include <fmt/format.h>
 #include <wpi/MemoryBuffer.h>
+#include <wpi/SmallString.h>
 #include <wpi/StringExtras.h>
 #include <wpi/fs.h>
 #include <wpi/mutex.h>
@@ -41,7 +43,7 @@ static std::unique_ptr<tGlobal> global;
 static std::unique_ptr<tSysWatchdog> watchdog;
 static uint64_t dsStartTime;
 
-static char roboRioCommentsString[256];
+static char roboRioCommentsString[65];
 static size_t roboRioCommentsStringSize;
 static bool roboRioCommentsStringInitialized;
 
@@ -293,48 +295,46 @@ size_t HAL_GetSerialNumber(char* buffer, size_t size) {
 
 void InitializeRoboRioComments(void) {
   if (!roboRioCommentsStringInitialized) {
-    fs::path path = "/etc/machine-info";
-    std::error_code code;
+    std::error_code ec;
     std::unique_ptr<wpi::MemoryBuffer> fileBuffer =
-        wpi::MemoryBuffer::GetFile(path.string(), code);
+        wpi::MemoryBuffer::GetFile("/etc/machine-info", ec);
 
-    std::string fileContents;
-    if (fileBuffer && !code) {
-      // If the buffer is valid put the file into a string
+    std::string_view fileContents;
+    if (fileBuffer && !ec) {
       fileContents =
           std::string_view(reinterpret_cast<const char*>(fileBuffer->begin()),
                            fileBuffer->size());
     } else {
-      // Null terminate and return
-      roboRioCommentsString[0] = '\0';
+      return;
+      roboRioCommentsStringSize = 0;
+      roboRioCommentsStringInitialized = true;
       return;
     }
-
     std::string_view searchString = "PRETTY_HOSTNAME=\"";
 
     size_t start = fileContents.find(searchString);
     if (start == std::string_view::npos) {
-      roboRioCommentsString[0] = '\0';
+      roboRioCommentsStringSize = 0;
+      roboRioCommentsStringInitialized = true;
       return;
     }
     start += searchString.size();
-
     size_t end = fileContents.find("\"", start);
-    if (end == std::string_view::npos)
-      end = fileContents.size() - 1;
-    std::string_view commentsContents = wpi::slice(fileContents, start, end);
-
-    std::string output = "";
-    while (commentsContents.size() != 0) {
-      std::pair<std::string_view, std::string_view> pair =
-          wpi::split(commentsContents, "\\n");
-
-      output = output + std::string(pair.first) + std::string("\n");
-      commentsContents = pair.second;
+    if (end == std::string_view::npos) {
+      end = fileContents.size();
     }
+    std::string_view escapedComments = wpi::slice(fileContents, start, end);
+    wpi::SmallString<64> buf;
+    auto [unescapedComments, rem] = wpi::UnescapeCString(escapedComments, buf);
+    unescapedComments.copy(roboRioCommentsString,
+                           sizeof(roboRioCommentsString));
 
-    roboRioCommentsStringSize =
-        output.copy(roboRioCommentsString, sizeof(roboRioCommentsString));
+    if (unescapedComments.size() > sizeof(roboRioCommentsString)) {
+      roboRioCommentsStringSize = sizeof(roboRioCommentsString);
+    } else {
+      roboRioCommentsStringSize = unescapedComments.size();
+    }
+    roboRioCommentsStringInitialized = true;
   }
 }
 
@@ -342,11 +342,17 @@ size_t HAL_GetComments(char* buffer, size_t size) {
   if (!roboRioCommentsStringInitialized) {
     InitializeRoboRioComments();
   }
+  size_t toCopy = size;
   if (size > roboRioCommentsStringSize) {
-    size = roboRioCommentsStringSize;
+    toCopy = roboRioCommentsStringSize;
   }
-  std::strncpy(buffer, roboRioCommentsString, size);
-  return size;
+  std::memcpy(buffer, roboRioCommentsString, toCopy);
+  if (toCopy < size) {
+    buffer[toCopy] = '\0';
+  } else {
+    buffer[toCopy - 1] = '\0';
+  }
+  return toCopy;
 }
 
 uint64_t HAL_GetFPGATime(int32_t* status) {
