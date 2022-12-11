@@ -8,30 +8,35 @@ def javaBaseName = "_GROUP_edu_wpi_first_${project.baseId}_ID_${project.baseId}-
 
 def outputsFolder = file("$project.buildDir/outputs")
 
-task sourcesJar(type: Jar, dependsOn: classes) {
+tasks.register('sourcesJar', Jar) {
+    dependsOn 'classes'
     classifier = 'sources'
     from sourceSets.main.allSource
 }
 
-task javadocJar(type: Jar, dependsOn: javadoc) {
+tasks.register('javadocJar', Jar) {
+    dependsOn 'javadoc'
     classifier = 'javadoc'
     from javadoc.destinationDir
 }
 
-task outputJar(type: Jar, dependsOn: classes) {
+tasks.register('outputJar', Jar) {
+    dependsOn 'classes'
     archiveBaseName = javaBaseName
     destinationDirectory = outputsFolder
     from sourceSets.main.output
 }
 
-task outputSourcesJar(type: Jar, dependsOn: classes) {
+tasks.register('outputSourcesJar', Jar) {
+    dependsOn 'classes'
     archiveBaseName = javaBaseName
     destinationDirectory = outputsFolder
     classifier = 'sources'
     from sourceSets.main.allSource
 }
 
-task outputJavadocJar(type: Jar, dependsOn: javadoc) {
+tasks.register('outputJavadocJar', Jar) {
+    dependsOn 'javadoc'
     archiveBaseName = javaBaseName
     destinationDirectory = outputsFolder
     classifier = 'javadoc'
@@ -119,7 +124,7 @@ dependencies {
     devImplementation sourceSets.main.output
 }
 
-task run(type: JavaExec) {
+tasks.register('run', JavaExec) {
     classpath = sourceSets.dev.runtimeClasspath
 
     mainClass = project.devMain
