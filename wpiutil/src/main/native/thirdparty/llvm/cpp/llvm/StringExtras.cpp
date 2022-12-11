@@ -362,7 +362,7 @@ std::optional<long double> wpi::parse_float<long double>(
 std::pair<std::string_view, std::string_view> wpi::UnescapeCString(
     std::string_view str, wpi::SmallVectorImpl<char>& buf) {
   buf.clear();
-  buf.reserve(str.size() - 2);
+  buf.reserve(str.size());
   const char* s = str.data();
   const char* end = str.data() + str.size();
   for (; s != end && *s != '"'; ++s) {
