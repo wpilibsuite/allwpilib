@@ -15,15 +15,15 @@ evaluationDependsOn(':wpimath')
 evaluationDependsOn(':wpinet')
 evaluationDependsOn(':wpiutil')
 
-def baseArtifactIdCpp = 'documentation'
-def artifactGroupIdCpp = 'edu.wpi.first.wpilibc'
-def zipBaseNameCpp = '_GROUP_edu_wpi_first_wpilibc_ID_documentation_CLS'
+String baseArtifactIdCpp = 'documentation'
+String artifactGroupIdCpp = 'edu.wpi.first.wpilibc'
+String zipBaseNameCpp = '_GROUP_edu_wpi_first_wpilibc_ID_documentation_CLS'
 
-def baseArtifactIdJava = 'documentation'
-def artifactGroupIdJava = 'edu.wpi.first.wpilibj'
-def zipBaseNameJava = '_GROUP_edu_wpi_first_wpilibj_ID_documentation_CLS'
+String baseArtifactIdJava = 'documentation'
+String artifactGroupIdJava = 'edu.wpi.first.wpilibj'
+String zipBaseNameJava = '_GROUP_edu_wpi_first_wpilibj_ID_documentation_CLS'
 
-def outputsFolder = file("$project.buildDir/outputs")
+File outputsFolder = file("$project.buildDir/outputs")
 
 def cppProjectZips = []
 def cppIncludeRoots = []
@@ -174,12 +174,12 @@ doxygen {
     }
 }
 
-tasks.register("zipCppDocs", Zip) {
-    archiveBaseName = zipBaseNameCpp
-    destinationDirectory = outputsFolder
-    dependsOn doxygen
-    from ("$buildDir/docs/doxygen/html")
-    into '/'
+TaskProvider<Zip> zipCppDocs = tasks.register("zipCppDocs", Zip) { Zip zip ->
+    zip.archiveBaseName = zipBaseNameCpp
+    zip.destinationDirectory = outputsFolder
+    zip.dependsOn doxygen
+    zip.from ("$buildDir/docs/doxygen/html")
+    zip.into '/'
 }
 
 // Java
@@ -200,33 +200,33 @@ ext {
 
 apply from: "${rootDir}/shared/opencv.gradle"
 
-task generateJavaDocs(type: Javadoc) {
-    classpath += project(":wpimath").sourceSets.main.compileClasspath
-    options.links("https://docs.oracle.com/en/java/javase/11/docs/api/")
-    options.addStringOption("tag", "pre:a:Pre-Condition")
-    options.addBooleanOption("Xdoclint:html,missing,reference,syntax", true)
-    options.addBooleanOption('html5', true)
-    options.linkSource(true)
-    dependsOn project(':hal').generateUsageReporting
-    dependsOn project(':ntcore').ntcoreGenerateJavaTypes
-    dependsOn project(':wpilibj').generateJavaVersion
-    dependsOn project(':wpimath').generateNat
-    source project(':apriltag').sourceSets.main.java
-    source project(':cameraserver').sourceSets.main.java
-    source project(':cscore').sourceSets.main.java
-    source project(':hal').sourceSets.main.java
-    source project(':ntcore').sourceSets.main.java
-    source project(':wpilibNewCommands').sourceSets.main.java
-    source project(':wpilibj').sourceSets.main.java
-    source project(':wpimath').sourceSets.main.java
-    source project(':wpinet').sourceSets.main.java
-    source project(':wpiutil').sourceSets.main.java
-    source configurations.javaSource.collect { zipTree(it) }
-    include '**/*.java'
-    failOnError = true
+TaskProvider<Javadoc> generateJavaDocs = tasks.register('generateJavaDocs') { Javadoc t ->
+    t.classpath += project(":wpimath").sourceSets.main.compileClasspath
+    t.options.links("https://docs.oracle.com/en/java/javase/11/docs/api/")
+    t.options.addStringOption("tag", "pre:a:Pre-Condition")
+    t.options.addBooleanOption("Xdoclint:html,missing,reference,syntax", true)
+    t.options.addBooleanOption('html5', true)
+    t.options.linkSource(true)
+    t.dependsOn project(':hal').tasks.named('generateUsageReporting')
+    t.dependsOn project(':ntcore').tasks.named('ntcoreGenerateJavaTypes')
+    t.dependsOn project(':wpilibj').tasks.named('generateJavaVersion')
+    t.dependsOn project(':wpimath').tasks.named('generateNat')
+    t.source project(':apriltag').sourceSets.main.java
+    t.source project(':cameraserver').sourceSets.main.java
+    t.source project(':cscore').sourceSets.main.java
+    t.source project(':hal').sourceSets.main.java
+    t.source project(':ntcore').sourceSets.main.java
+    t.source project(':wpilibNewCommands').sourceSets.main.java
+    t.source project(':wpilibj').sourceSets.main.java
+    t.source project(':wpimath').sourceSets.main.java
+    t.source project(':wpinet').sourceSets.main.java
+    t.source project(':wpiutil').sourceSets.main.java
+    t.source configurations.javaSource.collect { zipTree(it) }
+    t.include '**/*.java'
+    t.failOnError = true
 
-    title = "WPILib API ${wpilibVersioning.version.get()}"
-    ext.entryPoint = "$destinationDir/index.html"
+    t.title = "WPILib API ${wpilibVersioning.version.get()}"
+    ext.entryPoint = "${t.destinationDir}/index.html"
 
     if (JavaVersion.current().isJava8Compatible() && project.hasProperty('docWarningsAsErrors')) {
         // Treat javadoc warnings as errors.
@@ -238,33 +238,33 @@ task generateJavaDocs(type: Javadoc) {
         // See JDK-8200363 (https://bugs.openjdk.java.net/browse/JDK-8200363)
         // for information about the nonstandard -Xwerror option. JDK 15+ has
         // -Werror.
-        options.addStringOption('Xwerror', '-quiet')
+        t.options.addStringOption('Xwerror', '-quiet')
     }
 
     if (JavaVersion.current().isJava11Compatible()) {
         if (!JavaVersion.current().isJava12Compatible()) {
-            options.addBooleanOption('-no-module-directories', true)
+            t.options.addBooleanOption('-no-module-directories', true)
         }
-        doLast {
+        t.doLast {
             // This is a work-around for https://bugs.openjdk.java.net/browse/JDK-8211194. Can be removed once that issue is fixed on JDK's side
             // Since JDK 11, package-list is missing from javadoc output files and superseded by element-list file, but a lot of external tools still need it
             // Here we generate this file manually
-            new File(destinationDir, 'package-list').text = new File(destinationDir, 'element-list').text
+            new File(t.destinationDir, 'package-list').text = new File(t.destinationDir, 'element-list').text
         }
     }
 }
 
-tasks.register("zipJavaDocs", Zip) {
-    archiveBaseName = zipBaseNameJava
-    destinationDirectory = outputsFolder
-    dependsOn generateJavaDocs
-    from ("$buildDir/docs/javadoc")
-    into '/'
+TaskProvider<Zip> zipJavaDocs = tasks.register("zipJavaDocs", Zip) { Zip zip ->
+    zip.archiveBaseName = zipBaseNameJava
+    zip.destinationDirectory = outputsFolder
+    zip.dependsOn generateJavaDocs
+    zip.from ("$buildDir/docs/javadoc")
+    zip.into '/'
 }
 
-tasks.register("zipDocs") {
-    dependsOn zipCppDocs
-    dependsOn zipJavaDocs
+tasks.register("zipDocs") { Task t ->
+    t.dependsOn zipCppDocs
+    t.dependsOn zipJavaDocs
 }
 
 apply plugin: 'maven-publish'
