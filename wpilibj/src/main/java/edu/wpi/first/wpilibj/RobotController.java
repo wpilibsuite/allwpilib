@@ -46,6 +46,15 @@ public final class RobotController {
   }
 
   /**
+   * Return the comments from the roboRIO web interface.
+   *
+   * @return the comments from the roboRIO web interface.
+   */
+  public static String getComments() {
+    return HALUtil.getComments();
+  }
+
+  /**
    * Read the microsecond timer from the FPGA.
    *
    * @return The current time in microseconds according to the FPGA.

@@ -45,14 +45,14 @@ class RobotController {
   static int64_t GetFPGARevision();
 
   /**
-   * Returns the serial number of the roboRIO.
+   * Return the serial number of the roboRIO.
    *
    * @return The serial number of the roboRIO.
    */
   static std::string GetSerialNumber();
 
   /**
-   * Returns the comments from the roboRIO web interface.
+   * Return the comments from the roboRIO web interface.
    *
    * @return The comments from the roboRIO web interface.
    */

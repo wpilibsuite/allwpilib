@@ -472,6 +472,20 @@ Java_edu_wpi_first_hal_HALUtil_getSerialNumber
 
 /*
  * Class:     edu_wpi_first_hal_HALUtil
+ * Method:    getComments
+ * Signature: ()Ljava/lang/String;
+ */
+JNIEXPORT jstring JNICALL
+Java_edu_wpi_first_hal_HALUtil_getComments
+  (JNIEnv* env, jclass)
+{
+  char comments[65];
+  size_t len = HAL_GetComments(comments, sizeof(comments));
+  return MakeJString(env, std::string_view(comments, len));
+}
+
+/*
+ * Class:     edu_wpi_first_hal_HALUtil
  * Method:    getFPGATime
  * Signature: ()J
  */
