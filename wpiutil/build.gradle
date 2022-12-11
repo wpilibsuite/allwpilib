@@ -265,10 +265,10 @@ sourceSets {
     printlog
 }
 
-task runPrintLog(type: JavaExec) {
-    classpath = sourceSets.printlog.runtimeClasspath
+tasks.register('runPrintLog', JavaExec) { JavaExec it ->
+    it.classpath = sourceSets.printlog.runtimeClasspath
 
-    mainClass = 'printlog.PrintLog'
+    it.mainClass = 'printlog.PrintLog'
 }
 
 dependencies {
