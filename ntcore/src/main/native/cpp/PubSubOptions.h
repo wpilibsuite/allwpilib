@@ -8,7 +8,7 @@
 
 namespace nt {
 
-// options built from array of PubSubOption
+// internal helper class for PubSubOptions
 class PubSubOptionsImpl : public PubSubOptions {
  public:
   constexpr PubSubOptionsImpl() : PubSubOptionsImpl{kDefaultPubSubOptions} {}
