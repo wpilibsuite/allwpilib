@@ -226,13 +226,22 @@ TEST(RoboRioSimTest, SetSerialNumber) {
 
 TEST(RoboRioSimTest, SetComments) {
   const std::string kComments =
-      "Hello! These are comments that you'd put in the roboRIO web interface.";
+      "Hello! These are comments in the roboRIO web interface!";
 
   RoboRioSim::ResetData();
 
   RoboRioSim::SetComments(kComments);
   EXPECT_EQ(kComments, RoboRioSim::GetComments());
   EXPECT_EQ(kComments, RobotController::GetComments());
+
+  const std::string kCommentsOverflow =
+      "Hello! These are comments in the roboRIO web interface! This comment "
+      "exceeds 64 characters!";
+  const std::string kCommentsTruncated = kCommentsOverflow.substr(0, 64);
+
+  RoboRioSim::SetComments(kCommentsOverflow);
+  EXPECT_EQ(kCommentsTruncated, RoboRioSim::GetComments());
+  EXPECT_EQ(kCommentsTruncated, RobotController::GetComments());
 }
 
 }  // namespace frc::sim
