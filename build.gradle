@@ -57,45 +57,48 @@ if (project.hasProperty("publishVersion")) {
 
 wpilibVersioning.version.finalizeValue()
 
-def outputsFolder = file("$buildDir/allOutputs")
+File outputsFolder = file("$buildDir/allOutputs")
 
-def versionFile = file("$outputsFolder/version.txt")
+File versionFile = file("$outputsFolder/version.txt")
 
-task outputVersions() {
-    description = 'Prints the versions of wpilib to a file for use by the downstream packaging project'
-    group = 'Build'
-    outputs.files(versionFile)
+TaskProvider<Task> outputVersions = tasks.register('outputVersions') { Task t ->
+    t.description = 'Prints the versions of wpilib to a file for use by the downstream packaging project'
+    t.group = 'Build'
+    t.outputs.files(versionFile)
 
-    doFirst {
+    t.doFirst {
         buildDir.mkdir()
         outputsFolder.mkdir()
     }
 
-    doLast {
+    t.doLast {
         versionFile.write wpilibVersioning.version.get()
     }
 }
 
 task libraryBuild() {}
 
-build.dependsOn outputVersions
-
-task copyAllOutputs(type: Copy) {
-    destinationDir outputsFolder
+TaskProvider<Copy> copyAllOutputs = tasks.register('copyAllOutputs', Copy) { Copy t ->
+    t.destinationDir outputsFolder
+    t.dependsOn outputVersions
 }
 
-build.dependsOn copyAllOutputs
-copyAllOutputs.dependsOn outputVersions
+tasks.named('build') { Task build ->
+    build.dependsOn outputVersions
+    build.dependsOn copyAllOutputs
+}
 
 def copyReleaseOnly = project.hasProperty('ciReleaseOnly')
 
-ext.addTaskToCopyAllOutputs = { task ->
-    if (copyReleaseOnly && task.name.contains('debug')) {
+ext.addTaskToCopyAllOutputs = { Zip zip ->
+    if (copyReleaseOnly && zip.name.contains('debug')) {
         return
     }
-    copyAllOutputs.dependsOn task
-    copyAllOutputs.inputs.file task.archivePath
-    copyAllOutputs.from task.archivePath
+    copyAllOutputs.configure { Copy c ->
+        c.dependsOn zip
+        c.inputs.file zip.archiveFile.get()
+        c.from zip.archiveFile.get()
+    }
 }
 
 subprojects {

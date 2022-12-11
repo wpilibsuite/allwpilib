@@ -6,41 +6,47 @@ def baseArtifactId = project.baseId
 def artifactGroupId = project.groupId
 def javaBaseName = "_GROUP_edu_wpi_first_${project.baseId}_ID_${project.baseId}-java_CLS"
 
-def outputsFolder = file("$project.buildDir/outputs")
+File outputsFolder = file("$project.buildDir/outputs")
 
-tasks.register('sourcesJar', Jar) {
+TaskProvider<Jar> sourcesJar = tasks.register('sourcesJar', Jar) {
     dependsOn 'classes'
     classifier = 'sources'
     from sourceSets.main.allSource
 }
 
-tasks.register('javadocJar', Jar) {
+TaskProvider<org.gradle.jvm.tasks.Jar> javadocJar = tasks.register('javadocJar', Jar) {
     dependsOn 'javadoc'
     classifier = 'javadoc'
     from javadoc.destinationDir
 }
 
-tasks.register('outputJar', Jar) {
-    dependsOn 'classes'
-    archiveBaseName = javaBaseName
-    destinationDirectory = outputsFolder
-    from sourceSets.main.output
+TaskProvider<Jar> outputJar = tasks.register('outputJar', Jar) { Jar j ->
+    j.dependsOn 'classes'
+    j.archiveBaseName = javaBaseName
+    j.destinationDirectory = outputsFolder
+    j.from sourceSets.main.output
+
+    addTaskToCopyAllOutputs(j)
 }
 
-tasks.register('outputSourcesJar', Jar) {
-    dependsOn 'classes'
-    archiveBaseName = javaBaseName
-    destinationDirectory = outputsFolder
-    classifier = 'sources'
-    from sourceSets.main.allSource
+TaskProvider<Jar> outputSourcesJar = tasks.register('outputSourcesJar', Jar) { Jar j ->
+    j.dependsOn 'classes'
+    j.archiveBaseName = javaBaseName
+    j.destinationDirectory = outputsFolder
+    j.classifier = 'sources'
+    j.from sourceSets.main.allSource
+
+    addTaskToCopyAllOutputs(j)
 }
 
-tasks.register('outputJavadocJar', Jar) {
-    dependsOn 'javadoc'
-    archiveBaseName = javaBaseName
-    destinationDirectory = outputsFolder
-    classifier = 'javadoc'
-    from javadoc.destinationDir
+TaskProvider<Jar> outputJavadocJar = tasks.register('outputJavadocJar', Jar) { Jar j ->
+    j.dependsOn 'javadoc'
+    j.archiveBaseName = javaBaseName
+    j.destinationDirectory = outputsFolder
+    j.classifier = 'javadoc'
+    j.from javadoc.destinationDir
+
+    addTaskToCopyAllOutputs(j)
 }
 
 artifacts {
@@ -51,15 +57,13 @@ artifacts {
     archives outputJavadocJar
 }
 
-addTaskToCopyAllOutputs(outputSourcesJar)
-addTaskToCopyAllOutputs(outputJavadocJar)
-addTaskToCopyAllOutputs(outputJar)
+tasks.named('build') { Task build ->
+    build.dependsOn outputSourcesJar
+    build.dependsOn outputJavadocJar
+    build.dependsOn outputJar
 
-build.dependsOn outputSourcesJar
-build.dependsOn outputJavadocJar
-build.dependsOn outputJar
-
-project(':').libraryBuild.dependsOn build
+    project(':').libraryBuild.dependsOn build
+}
 
 publishing {
     publications {
@@ -76,18 +80,18 @@ publishing {
     }
 }
 
-test {
-    useJUnitPlatform()
-    systemProperty 'junit.jupiter.extensions.autodetection.enabled', 'true'
-    testLogging {
+tasks.named('test', Test) { Test t ->
+    t.useJUnitPlatform()
+    t.systemProperty 'junit.jupiter.extensions.autodetection.enabled', 'true'
+    t.testLogging {
         events "failed"
         exceptionFormat "full"
     }
-    finalizedBy jacocoTestReport
-}
+    t.finalizedBy tasks.named('jacocoTestReport', JacocoReport)
 
-if (project.hasProperty('onlylinuxathena') || project.hasProperty('onlylinuxarm32') || project.hasProperty('onlylinuxarm64')) {
-    test.enabled = false
+    if (project.hasProperty('onlylinuxathena') || project.hasProperty('onlylinuxarm32') || project.hasProperty('onlylinuxarm64')) {
+        t.enabled = false
+    }
 }
 
 repositories {
@@ -101,8 +105,8 @@ sourceSets {
     dev
 }
 
-tasks.withType(JavaCompile).configureEach {
-    options.compilerArgs = [
+tasks.withType(JavaCompile).configureEach { JavaCompile javac ->
+    javac.options.compilerArgs = [
         '--release',
         '11',
         '-encoding',
@@ -124,20 +128,22 @@ dependencies {
     devImplementation sourceSets.main.output
 }
 
-tasks.register('run', JavaExec) {
-    classpath = sourceSets.dev.runtimeClasspath
+tasks.register('run', JavaExec) { JavaExec run ->
+    run.classpath = sourceSets.dev.runtimeClasspath
 
-    mainClass = project.devMain
+    run.mainClass = project.devMain
 }
 
-build.dependsOn devClasses
+tasks.named('build') { Task build ->
+    build.dependsOn devClasses
+}
 
 jacoco {
     toolVersion = "0.8.8"
 }
 
-jacocoTestReport {
-    reports {
+tasks.named('jacocoTestReport', JacocoReport) { JacocoReport task ->
+    task.reports {
         xml.required = true
         html.required = true
     }
