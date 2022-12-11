@@ -63,20 +63,20 @@ dependencies {
     api "com.fasterxml.jackson.core:jackson-databind:2.12.4"
 }
 
-def wpilibNumberFileInput = file("src/generate/GenericNumber.java.jinja")
-def natFileInput = file("src/generate/Nat.java.jinja")
-def wpilibNumberFileOutputDir = file("$buildDir/generated/java/edu/wpi/first/math/numbers")
-def wpilibNatFileOutput = file("$buildDir/generated/java/edu/wpi/first/math/Nat.java")
-def maxNum = 20
+File wpilibNumberFileInput = file("src/generate/GenericNumber.java.jinja")
+File natFileInput = file("src/generate/Nat.java.jinja")
+File wpilibNumberFileOutputDir = file("$buildDir/generated/java/edu/wpi/first/math/numbers")
+File wpilibNatFileOutput = file("$buildDir/generated/java/edu/wpi/first/math/Nat.java")
+int maxNum = 20
 
-task generateNumbers() {
-    description = "Generates generic number classes from template"
-    group = "WPILib"
+TaskProvider<Task> generateNumbers = tasks.register('generateNumbers') { Task t ->
+    t.description = "Generates generic number classes from template"
+    t.group = "WPILib"
 
-    inputs.file wpilibNumberFileInput
-    outputs.dir wpilibNumberFileOutputDir
+    t.inputs.file wpilibNumberFileInput
+    t.outputs.dir wpilibNumberFileOutputDir
 
-    doLast {
+    t.doLast {
         if(wpilibNumberFileOutputDir.exists()) {
             wpilibNumberFileOutputDir.delete()
         }
@@ -97,14 +97,14 @@ task generateNumbers() {
     }
 }
 
-task generateNat() {
-    description = "Generates Nat.java"
-    group = "WPILib"
-    inputs.file natFileInput
-    outputs.file wpilibNatFileOutput
-    dependsOn generateNumbers
+TaskProvider<Task> generateNat = tasks.register('generateNat') { Task t ->
+    t.description = "Generates Nat.java"
+    t.group = "WPILib"
+    t.inputs.file natFileInput
+    t.outputs.file wpilibNatFileOutput
+    t.dependsOn generateNumbers
 
-    doLast {
+    t.doLast {
         if(wpilibNatFileOutput.exists()) {
             wpilibNatFileOutput.delete()
         }
@@ -123,5 +123,8 @@ task generateNat() {
 }
 
 sourceSets.main.java.srcDir "${buildDir}/generated/java"
-compileJava.dependsOn generateNumbers
-compileJava.dependsOn generateNat
+
+tasks.named('compileJava', JavaCompile) { JavaCompile compileJava ->
+    compileJava.dependsOn generateNumbers
+    compileJava.dependsOn generateNat
+}
