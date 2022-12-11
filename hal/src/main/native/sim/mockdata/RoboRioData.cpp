@@ -99,7 +99,7 @@ size_t RoboRioData::GetComments(char* buffer, size_t size) {
 }
 
 void RoboRioData::SetComments(const char* comments, size_t size) {
-  if(size > 64) {
+  if (size > 64) {
     size = 64;
   }
   std::scoped_lock lock(m_commentsMutex);

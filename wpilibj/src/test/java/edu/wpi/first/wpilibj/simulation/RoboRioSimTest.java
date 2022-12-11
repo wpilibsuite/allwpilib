@@ -238,7 +238,8 @@ class RoboRioSimTest {
     assertEquals(kComments, RobotController.getComments());
 
     final String kCommentsOverflow =
-        "Hello! These are comments in the roboRIO web interface! This comment exceeds 64 characters!";
+        "Hello! These are comments in the roboRIO web interface!"
+            + " This comment exceeds 64 characters!";
     final String kCommentsTruncated = kCommentsOverflow.substring(0, 64);
     RoboRioSim.setComments(kCommentsOverflow);
     assertEquals(kCommentsTruncated, RoboRioSim.getComments());
