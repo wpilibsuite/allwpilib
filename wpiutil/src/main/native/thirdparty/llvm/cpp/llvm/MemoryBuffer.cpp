@@ -105,7 +105,7 @@ template <typename MB>
 class MemoryBufferMem : public MB {
  public:
   explicit MemoryBufferMem(std::span<const uint8_t> inputData) {
-    MemoryBuffer::Init(&*inputData.begin(), &*inputData.end());
+    MemoryBuffer::Init(inputData.data(), inputData.data() + inputData.size());
   }
 
   /// Disable sized deallocation for MemoryBufferMem, because it has
