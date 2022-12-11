@@ -1,25 +1,25 @@
 import groovy.io.FileType
 
-ext.createGenerateResourcesTask = { name, prefix, namespace, project ->
-    def generatedOutputDir = file("$buildDir/generated/$name/cpp")
+ext.createGenerateResourcesTask = { String name, String prefix, String namespace, Project project ->
+    File generatedOutputDir = file("$buildDir/generated/$name/cpp")
 
-    def inputDir = file("$projectDir/src/$name/native/resources")
+    File inputDir = file("$projectDir/src/$name/native/resources")
 
     if (!prefix.isEmpty()) prefix += '_'
 
-    def task = project.tasks.create("generateResources-$name") {
-        outputs.dir generatedOutputDir
-        inputs.dir inputDir
+    def task = project.tasks.register("generateResources-$name") { Task t ->
+        t.outputs.dir generatedOutputDir
+        t.inputs.dir inputDir
 
-        doLast {
+        t.doLast {
             generatedOutputDir.mkdirs()
             inputDir.eachFileRecurse (FileType.FILES) { inputFile ->
                 if (inputFile.name.startsWith('.')) return
                     def fileBytes = inputFile.bytes
-                def outputFile = file("$generatedOutputDir/${inputFile.name}.cpp")
-                def funcName = "GetResource_" + inputFile.name.replaceAll('[^a-zA-Z0-9]', '_')
-                outputFile.withWriter { out ->
-                    def inputBytes = inputFile.bytes
+                File outputFile = file("$generatedOutputDir/${inputFile.name}.cpp")
+                String funcName = "GetResource_" + inputFile.name.replaceAll('[^a-zA-Z0-9]', '_')
+                outputFile.withWriter { BufferedWriter out ->
+                    byte[] inputBytes = inputFile.bytes
                     out.print '''#include <stddef.h>
 #include <string_view>
 extern "C" {
