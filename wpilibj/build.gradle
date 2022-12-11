@@ -14,7 +14,7 @@ apply from: "${rootDir}/shared/java/javacommon.gradle"
 File wpilibVersionFileInput = file("src/generate/WPILibVersion.java.in")
 File wpilibVersionFileOutput = file("$buildDir/generated/java/edu/wpi/first/wpilibj/util/WPILibVersion.java")
 
-tasks.register('generateJavaVersion') { Task t ->
+TaskProvider<Task> generateJavaVersion = tasks.register('generateJavaVersion') { Task t ->
     t.description = 'Generates the wpilib version class'
     t.group = 'WPILib'
 
@@ -45,14 +45,16 @@ tasks.register('generateJavaVersion') { Task t ->
 gradle.taskGraph.addTaskExecutionGraphListener { graph ->
     def willPublish = graph.hasTask(publish)
     if (willPublish) {
-        generateJavaVersion.outputs.upToDateWhen { false }
+        generateJavaVersion.configure { Task t ->
+            t.outputs.upToDateWhen { false }
+        }
     }
 }
 
 sourceSets.main.java.srcDir "${buildDir}/generated/java/"
 
-compileJava {
-    dependsOn generateJavaVersion
+tasks.named('compileJava', JavaCompile) { JavaCompile javaCompile ->
+    javaCompile.dependsOn generateJavaVersion
 }
 
 repositories {

@@ -21,21 +21,21 @@ if (!project.hasProperty('onlylinuxathena')) {
     apply from: "${rootDir}/shared/resources.gradle"
     apply from: "${rootDir}/shared/config.gradle"
 
-    def wpilibVersionFileInput = file("src/main/generate/WPILibVersion.cpp.in")
-    def wpilibVersionFileOutput = file("$buildDir/generated/main/cpp/WPILibVersion.cpp")
+    File wpilibVersionFileInput = file("src/main/generate/WPILibVersion.cpp.in")
+    File wpilibVersionFileOutput = file("$buildDir/generated/main/cpp/WPILibVersion.cpp")
 
     apply from: "${rootDir}/shared/libssh.gradle"
     apply from: "${rootDir}/shared/imgui.gradle"
 
-    task generateCppVersion() {
-        description = 'Generates the wpilib version class'
-        group = 'WPILib'
+    TaskProvider<Task> generateCppVersion = tasks.register('generateCppVersion') { Task t ->
+        t.description = 'Generates the wpilib version class'
+        t.group = 'WPILib'
 
-        outputs.file wpilibVersionFileOutput
-        inputs.file wpilibVersionFileInput
+        t.outputs.file wpilibVersionFileOutput
+        t.inputs.file wpilibVersionFileInput
 
         if (wpilibVersioning.releaseMode) {
-            outputs.upToDateWhen { false }
+            t.outputs.upToDateWhen { false }
         }
 
         // We follow a simple set of checks to determine whether we should generate a new version file:
@@ -43,7 +43,7 @@ if (!project.hasProperty('onlylinuxathena')) {
         // 2. If there is no generated version number, we generate a new version file
         // 3. If there is a generated build number, and the release type is development, then we will
         //    only generate if the publish task is run.
-        doLast {
+        t.doLast {
             def version = wpilibVersioning.version.get()
             println "Writing version ${version} to $wpilibVersionFileOutput"
 

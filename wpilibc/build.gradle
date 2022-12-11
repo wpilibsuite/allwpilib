@@ -15,7 +15,7 @@ apply from: "${rootDir}/shared/config.gradle"
 File wpilibVersionFileInput = file("src/generate/WPILibVersion.cpp.in")
 File wpilibVersionFileOutput = file("$buildDir/generated/cpp/WPILibVersion.cpp")
 
-tasks.register('generateCppVersion') { Task t ->
+TaskProvider<Task> generateCppVersion = tasks.register('generateCppVersion') { Task t ->
     t.description = 'Generates the wpilib version class'
     t.group = 'WPILib'
 
@@ -46,7 +46,9 @@ tasks.register('generateCppVersion') { Task t ->
 gradle.taskGraph.addTaskExecutionGraphListener { graph ->
     def willPublish = graph.hasTask(publish)
     if (willPublish) {
-        generateCppVersion.outputs.upToDateWhen { false }
+        generateCppVersion.configure { Task t ->
+            t.outputs.upToDateWhen { false }
+        }
     }
 }
 

@@ -23,7 +23,7 @@ task cppSourcesZip(type: Zip) {
     }
 }
 
-cppSourcesZip.dependsOn generateCppVersion
+cppSourcesZip.dependsOn tasks.named('generateCppVersion')
 
 task cppHeadersZip(type: Zip) {
     destinationDirectory = outputsFolder
