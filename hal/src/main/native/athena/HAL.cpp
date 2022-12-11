@@ -43,7 +43,7 @@ static std::unique_ptr<tGlobal> global;
 static std::unique_ptr<tSysWatchdog> watchdog;
 static uint64_t dsStartTime;
 
-static char roboRioCommentsString[65];
+static char roboRioCommentsString[64];
 static size_t roboRioCommentsStringSize;
 static bool roboRioCommentsStringInitialized;
 
