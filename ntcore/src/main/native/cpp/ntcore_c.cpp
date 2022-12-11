@@ -105,7 +105,6 @@ static void DisposeEvent(NT_Event* event) {
 
 static PubSubOptions ConvertToCpp(const NT_PubSubOptions* in) {
   PubSubOptions out;
-  out.structSize = in->structSize;
   out.pollStorage = in->pollStorage;
   out.periodic = in->periodic;
   out.excludePublisher = in->excludePublisher;
