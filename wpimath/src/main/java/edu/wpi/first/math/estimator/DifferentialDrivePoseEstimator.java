@@ -33,14 +33,6 @@ import java.util.Objects;
  *
  * <p>{@link DifferentialDrivePoseEstimator#addVisionMeasurement} can be called as infrequently as
  * you want; if you never call it then this class will behave exactly like regular encoder odometry.
- *
- * <p>The state-space system used internally has the following states (x), and outputs (y):
- *
- * <p><strong> x = [x, y, theta]ᵀ </strong> in the field coordinate system containing x position, y
- * position, and heading.
- *
- * <p><strong> y = [x, y, theta]ᵀ </strong> from vision containing x position, y position, and
- * heading.
  */
 public class DifferentialDrivePoseEstimator {
   private final DifferentialDriveKinematics m_kinematics;
@@ -85,16 +77,16 @@ public class DifferentialDrivePoseEstimator {
    * Constructs a DifferentialDrivePoseEstimator.
    *
    * @param kinematics A correctly-configured kinematics object for your drivetrain.
-   * @param gyroAngle The current gyro angle.
+   * @param gyroAngle The gyro angle of the robot.
    * @param leftDistanceMeters The distance traveled by the left encoder.
    * @param rightDistanceMeters The distance traveled by the right encoder.
-   * @param initialPoseMeters The starting pose estimate.
-   * @param stateStdDevs Standard deviations of model states. Increase these numbers to trust your
-   *     model's state estimates less. This matrix is in the form [x, y, theta]ᵀ, with units in
-   *     meters and radians.
-   * @param visionMeasurementStdDevs Standard deviations of the vision measurements. Increase these
-   *     numbers to trust global measurements from vision less. This matrix is in the form [x, y,
-   *     theta]ᵀ, with units in meters and radians.
+   * @param initialPoseMeters The estimated initial pose.
+   * @param stateStdDevs Standard deviations of the pose estimate (x position in meters, y position
+   *     in meters, and heading in radians). Increase these numbers to trust your state estimate
+   *     less.
+   * @param visionMeasurementStdDevs Standard deviations of the vision pose measurement (x position
+   *     in meters, y position in meters, and heading in radians). Increase these numbers to trust
+   *     the vision pose measurement less.
    */
   public DifferentialDrivePoseEstimator(
       DifferentialDriveKinematics kinematics,
@@ -188,10 +180,11 @@ public class DifferentialDrivePoseEstimator {
    * @param visionRobotPoseMeters The pose of the robot as measured by the vision camera.
    * @param timestampSeconds The timestamp of the vision measurement in seconds. Note that if you
    *     don't use your own time source by calling {@link
-   *     DifferentialDrivePoseEstimator#updateWithTime} then you must use a timestamp with an epoch
-   *     since FPGA startup (i.e. the epoch of this timestamp is the same epoch as
-   *     Timer.getFPGATimestamp.) This means that you should use Timer.getFPGATimestamp as your time
-   *     source or sync the epochs.
+   *     DifferentialDrivePoseEstimator#updateWithTime(double,Rotation2d,double,double)} then you
+   *     must use a timestamp with an epoch since FPGA startup (i.e., the epoch of this timestamp is
+   *     the same epoch as {@link edu.wpi.first.wpilibj.Timer#getFPGATimestamp()}.) This means that
+   *     you should use {@link edu.wpi.first.wpilibj.Timer#getFPGATimestamp()} as your time source
+   *     or sync the epochs.
    */
   public void addVisionMeasurement(Pose2d visionRobotPoseMeters, double timestampSeconds) {
     // Step 1: Get the pose odometry measured at the moment the vision measurement was made.
@@ -249,13 +242,14 @@ public class DifferentialDrivePoseEstimator {
    * @param visionRobotPoseMeters The pose of the robot as measured by the vision camera.
    * @param timestampSeconds The timestamp of the vision measurement in seconds. Note that if you
    *     don't use your own time source by calling {@link
-   *     DifferentialDrivePoseEstimator#updateWithTime} then you must use a timestamp with an epoch
-   *     since FPGA startup (i.e. the epoch of this timestamp is the same epoch as
-   *     Timer.getFPGATimestamp.) This means that you should use Timer.getFPGATimestamp as your time
-   *     source in this case.
-   * @param visionMeasurementStdDevs Standard deviations of the vision measurements. Increase these
-   *     numbers to trust global measurements from vision less. This matrix is in the form [x, y,
-   *     theta]ᵀ, with units in meters and radians.
+   *     DifferentialDrivePoseEstimator#updateWithTime(double,Rotation2d,double,double)}, then you
+   *     must use a timestamp with an epoch since FPGA startup (i.e., the epoch of this timestamp is
+   *     the same epoch as {@link edu.wpi.first.wpilibj.Timer#getFPGATimestamp()}. This means that
+   *     you should use {@link edu.wpi.first.wpilibj.Timer#getFPGATimestamp()} as your time source
+   *     in this case.
+   * @param visionMeasurementStdDevs Standard deviations of the vision pose measurement (x position
+   *     in meters, y position in meters, and heading in radians). Increase these numbers to trust
+   *     the vision pose measurement less.
    */
   public void addVisionMeasurement(
       Pose2d visionRobotPoseMeters,
@@ -266,8 +260,8 @@ public class DifferentialDrivePoseEstimator {
   }
 
   /**
-   * Updates the the Kalman Filter using only wheel encoder information. Note that this should be
-   * called every loop.
+   * Updates the pose estimator with wheel encoder and gyro information. This should be called every
+   * loop.
    *
    * @param gyroAngle The current gyro angle.
    * @param distanceLeftMeters The total distance travelled by the left wheel in meters.
@@ -281,8 +275,8 @@ public class DifferentialDrivePoseEstimator {
   }
 
   /**
-   * Updates the the Kalman Filter using only wheel encoder information. Note that this should be
-   * called every loop.
+   * Updates the pose estimator with wheel encoder and gyro information. This should be called every
+   * loop.
    *
    * @param currentTimeSeconds Time at which this method was called, in seconds.
    * @param gyroAngle The current gyro angle.
