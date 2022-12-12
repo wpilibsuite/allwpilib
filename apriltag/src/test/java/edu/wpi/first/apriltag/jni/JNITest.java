@@ -10,7 +10,7 @@ public class JNITest {
   @Test
   void jniLinkTest() {
     // Test to verify that the JNI test link works correctly.
-    var detector=AprilTagJNI.aprilTagCreate("tag16h5", 2.0, 0.0, 1, false, false);
+    var detector = AprilTagJNI.aprilTagCreate("tag16h5", 2.0, 0.0, 1, false, false);
     AprilTagJNI.aprilTagDestroy(detector);
   }
 }
