@@ -1294,4 +1294,119 @@ NT_Listener AddPolledLogger(NT_ListenerPoller poller, unsigned int min_level,
 /** @} */
 /** @} */
 
+/**
+ * NetworkTables meta-topic decoding functions.
+ */
+namespace meta {
+
+/**
+ * @defgroup ntcore_cpp_meta_api ntcore C++ meta-topic API
+ *
+ * Meta-topic decoders for C++.
+ *
+ * @{
+ */
+
+/**
+ * Subscriber options. Different from PubSubOptions in this reflects only
+ * options that are sent over the network.
+ */
+struct SubscriberOptions {
+  double periodic = 0.1;
+  bool topicsOnly = false;
+  bool sendAll = false;
+  bool prefixMatch = false;
+  // std::string otherStr;
+};
+
+/**
+ * Topic publisher (as published via `$pub$<topic>`).
+ */
+struct TopicPublisher {
+  std::string client;
+  uint64_t pubuid = 0;
+};
+
+/**
+ * Topic subscriber (as published via `$sub$<topic>`).
+ */
+struct TopicSubscriber {
+  std::string client;
+  uint64_t subuid = 0;
+  SubscriberOptions options;
+};
+
+/**
+ * Client publisher (as published via `$clientpub$<client>` or `$serverpub`).
+ */
+struct ClientPublisher {
+  int64_t uid = -1;
+  std::string topic;
+};
+
+/**
+ * Client subscriber (as published via `$clientsub$<client>` or `$serversub`).
+ */
+struct ClientSubscriber {
+  int64_t uid = -1;
+  std::vector<std::string> topics;
+  SubscriberOptions options;
+};
+
+/**
+ * Client (as published via `$clients`).
+ */
+struct Client {
+  std::string id;
+  std::string conn;
+  uint16_t version = 0;
+};
+
+/**
+ * Decodes `$pub$<topic>` meta-topic data.
+ *
+ * @param data data contents
+ * @return Vector of TopicPublishers, or empty optional on decoding error.
+ */
+std::optional<std::vector<TopicPublisher>> DecodeTopicPublishers(
+    std::span<const uint8_t> data);
+
+/**
+ * Decodes `$sub$<topic>` meta-topic data.
+ *
+ * @param data data contents
+ * @return Vector of TopicSubscribers, or empty optional on decoding error.
+ */
+std::optional<std::vector<TopicSubscriber>> DecodeTopicSubscribers(
+    std::span<const uint8_t> data);
+
+/**
+ * Decodes `$clientpub$<topic>` meta-topic data.
+ *
+ * @param data data contents
+ * @return Vector of ClientPublishers, or empty optional on decoding error.
+ */
+std::optional<std::vector<ClientPublisher>> DecodeClientPublishers(
+    std::span<const uint8_t> data);
+
+/**
+ * Decodes `$clientsub$<topic>` meta-topic data.
+ *
+ * @param data data contents
+ * @return Vector of ClientSubscribers, or empty optional on decoding error.
+ */
+std::optional<std::vector<ClientSubscriber>> DecodeClientSubscribers(
+    std::span<const uint8_t> data);
+
+/**
+ * Decodes `$clients` meta-topic data.
+ *
+ * @param data data contents
+ * @return Vector of Clients, or empty optional on decoding error.
+ */
+std::optional<std::vector<Client>> DecodeClients(std::span<const uint8_t> data);
+
+/** @} */
+
+}  // namespace meta
 }  // namespace nt
