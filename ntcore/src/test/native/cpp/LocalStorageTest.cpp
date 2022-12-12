@@ -42,9 +42,8 @@ namespace nt {
 
 class LocalStorageTest : public ::testing::Test {
  public:
-  LocalStorageTest() { storage.StartNetwork(startup, &network); }
+  LocalStorageTest() { storage.StartNetwork(&network); }
 
-  ::testing::StrictMock<net::MockNetworkStartupInterface> startup;
   ::testing::StrictMock<net::MockNetworkInterface> network;
   wpi::MockLogger logger;
   MockListenerStorage listenerStorage;

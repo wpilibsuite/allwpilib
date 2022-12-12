@@ -427,7 +427,7 @@ void SubscriberData::UpdateActive() {
 }
 
 void LSImpl::NotifyTopic(TopicData* topic, unsigned int eventFlags) {
-  DEBUG4("NotifyTopic({}, {})\n", topic->name, eventFlags);
+  DEBUG4("NotifyTopic({}, {})", topic->name, eventFlags);
   auto topicInfo = topic->GetTopicInfo();
   if (!topic->listeners.empty()) {
     m_listenerStorage.Notify(topic->listeners, eventFlags, topicInfo);
@@ -1380,36 +1380,37 @@ void LocalStorage::NetworkSetValue(NT_Topic topicHandle, const Value& value) {
   }
 }
 
-void LocalStorage::StartNetwork(net::NetworkStartupInterface& startup,
-                                net::NetworkInterface* network) {
+void LocalStorage::StartNetwork(net::NetworkInterface* network) {
+  WPI_DEBUG4(m_impl->m_logger, "StartNetwork()");
   std::scoped_lock lock{m_mutex};
+  m_impl->m_network = network;
   // publish all active publishers to the network and send last values
   // only send value once per topic
   for (auto&& topic : m_impl->m_topics) {
     PublisherData* anyPublisher = nullptr;
     for (auto&& publisher : topic->localPublishers) {
       if (publisher->active) {
-        startup.Publish(publisher->handle, topic->handle, topic->name,
-                        topic->typeStr, topic->properties, publisher->config);
+        network->Publish(publisher->handle, topic->handle, topic->name,
+                         topic->typeStr, topic->properties, publisher->config);
         anyPublisher = publisher;
       }
     }
     if (anyPublisher && topic->lastValue) {
-      startup.SetValue(anyPublisher->handle, topic->lastValue);
+      network->SetValue(anyPublisher->handle, topic->lastValue);
     }
   }
   for (auto&& subscriber : m_impl->m_subscribers) {
-    startup.Subscribe(subscriber->handle, {{subscriber->topic->name}},
-                      subscriber->config);
+    network->Subscribe(subscriber->handle, {{subscriber->topic->name}},
+                       subscriber->config);
   }
   for (auto&& subscriber : m_impl->m_multiSubscribers) {
-    startup.Subscribe(subscriber->handle, subscriber->prefixes,
-                      subscriber->options);
+    network->Subscribe(subscriber->handle, subscriber->prefixes,
+                       subscriber->options);
   }
-  m_impl->m_network = network;
 }
 
 void LocalStorage::ClearNetwork() {
+  WPI_DEBUG4(m_impl->m_logger, "ClearNetwork()");
   std::scoped_lock lock{m_mutex};
   m_impl->m_network = nullptr;
   // treat as an unannounce all from the network side

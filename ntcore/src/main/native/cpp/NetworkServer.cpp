@@ -334,11 +334,9 @@ NSImpl::NSImpl(std::string_view persistentFilename,
   m_localMsgs.reserve(net::NetworkLoopQueue::kInitialQueueSize);
   m_loopRunner.ExecAsync([=, this](uv::Loop& loop) {
     // connect local storage to server
-    {
-      net::ServerStartup startup{m_serverImpl};
-      m_localStorage.StartNetwork(startup, &m_localQueue);
-    }
     m_serverImpl.SetLocal(&m_localStorage);
+    m_localStorage.StartNetwork(&m_localQueue);
+    HandleLocal();
 
     // load persistent file first, then initialize
     uv::QueueWork(
