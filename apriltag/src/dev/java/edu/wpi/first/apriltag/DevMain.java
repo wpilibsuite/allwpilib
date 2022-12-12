@@ -10,7 +10,7 @@ public final class DevMain {
   /** Main entry point. */
   public static void main(String[] args) {
     System.out.println("Hello World!");
-    var detector=AprilTagJNI.aprilTagCreate("tag16h5", 2.0, 0.0, 1, false, false);
+    var detector = AprilTagJNI.aprilTagCreate("tag16h5", 2.0, 0.0, 1, false, false);
     AprilTagJNI.aprilTagDestroy(detector);
   }
 
