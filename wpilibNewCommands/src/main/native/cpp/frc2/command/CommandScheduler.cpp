@@ -120,8 +120,8 @@ void CommandScheduler::Schedule(Command* command) {
   RequireUngrouped(command);
 
   if (m_impl->disabled ||
-      (frc::RobotState::IsDisabled() && !command->RunsWhenDisabled()) ||
-      m_impl->scheduledCommands.contains(command)) {
+      m_impl->scheduledCommands.contains(command) ||
+      (frc::RobotState::IsDisabled() && !command->RunsWhenDisabled())) {
     return;
   }
 
