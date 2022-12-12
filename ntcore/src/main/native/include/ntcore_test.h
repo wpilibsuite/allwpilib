@@ -14,7 +14,7 @@
 extern "C" {
 #endif
 
-struct NT_String* NT_GetStringForTesting(const char* string, int* struct_size);
+struct NT_String* NT_GetStringForTesting(const char* str, int* struct_size);
 // No need for free as one already exists in main library
 
 struct NT_EntryInfo* NT_GetEntryInfoForTesting(const char* name,
