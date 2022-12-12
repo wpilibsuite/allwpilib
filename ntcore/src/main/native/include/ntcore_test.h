@@ -6,13 +6,14 @@
 
 #include <stdint.h>
 
-#include <string>
-
 #include "ntcore.h"
 
 // Functions in this header are to be used only for testing
 
+#ifdef __cplusplus
 extern "C" {
+#endif
+
 struct NT_String* NT_GetStringForTesting(const char* string, int* struct_size);
 // No need for free as one already exists in main library
 
@@ -58,26 +59,6 @@ struct NT_Value* NT_GetValueStringArrayForTesting(uint64_t last_change,
                                                   int* struct_size);
 // No need for free as one already exists in the main library
 
-struct NT_RpcParamDef* NT_GetRpcParamDefForTesting(const char* name,
-                                                   const struct NT_Value* val,
-                                                   int* struct_size);
-
-void NT_FreeRpcParamDefForTesting(struct NT_RpcParamDef* def);
-
-struct NT_RpcResultDef* NT_GetRpcResultsDefForTesting(const char* name,
-                                                      enum NT_Type type,
-                                                      int* struct_size);
-
-void NT_FreeRpcResultsDefForTesting(struct NT_RpcResultDef* def);
-
-struct NT_RpcDefinition* NT_GetRpcDefinitionForTesting(
-    unsigned int version, const char* name, size_t num_params,
-    const struct NT_RpcParamDef* params, size_t num_results,
-    const struct NT_RpcResultDef* results, int* struct_size);
-// No need for free as one already exists in the main library
-
-struct NT_RpcCallInfo* NT_GetRpcCallInfoForTesting(
-    unsigned int rpc_id, unsigned int call_uid, const char* name,
-    const char* params, size_t params_len, int* struct_size);
-// No need for free as one already exists in the main library
+#ifdef __cplusplus
 }  // extern "C"
+#endif
