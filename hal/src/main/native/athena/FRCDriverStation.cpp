@@ -469,12 +469,12 @@ void HAL_ObserveUserProgramTest(void) {
 constexpr int32_t refNumber = 42;
 constexpr int32_t tcpRefNumber = 94;
 
-static void tcpOccur() {
+static void tcpOccur(void) {
   uint32_t mask = FRC_NetworkCommunication_getNewTcpRecvMask();
   tcpMask.fetch_or(mask);
 }
 
-static void udpOccur() {
+static void udpOccur(void) {
   cacheToUpdate->Update();
   {
     std::scoped_lock lock{cacheMutex};
@@ -495,7 +495,7 @@ static void newDataOccur(uint32_t refNum) {
       break;
 
     default:
-      printf("Unknown occur %u\n", refNum);
+      std::printf("Unknown occur %u\n", refNum);
       break;
   }
 }
