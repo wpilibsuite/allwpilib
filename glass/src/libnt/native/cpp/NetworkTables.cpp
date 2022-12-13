@@ -478,6 +478,10 @@ void NetworkTablesModel::Update() {
             entry->info.type_str == "msgpack") {
           // meta topic handling
           if (entry->info.name == "$clients") {
+            // need to remove deleted entries as UpdateClients() uses GetEntry()
+            if (updateTree) {
+              std::erase(m_sortedEntries, nullptr);
+            }
             UpdateClients(entry->value.GetRaw());
           } else if (entry->info.name == "$serverpub") {
             m_server.UpdatePublishers(entry->value.GetRaw());
@@ -505,9 +509,7 @@ void NetworkTablesModel::Update() {
   }
 
   // remove deleted entries
-  m_sortedEntries.erase(
-      std::remove(m_sortedEntries.begin(), m_sortedEntries.end(), nullptr),
-      m_sortedEntries.end());
+  std::erase(m_sortedEntries, nullptr);
 
   RebuildTree();
 }
