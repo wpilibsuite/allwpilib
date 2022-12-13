@@ -21,7 +21,7 @@ class Logger;
 }  // namespace wpi
 
 namespace nt {
-class PubSubOptions;
+class PubSubOptionsImpl;
 class Value;
 }  // namespace nt
 
@@ -64,9 +64,10 @@ class ClientStartup final : public NetworkStartupInterface {
   // NetworkStartupInterface interface
   void Publish(NT_Publisher pubHandle, NT_Topic topicHandle,
                std::string_view name, std::string_view typeStr,
-               const wpi::json& properties, const PubSubOptions& options) final;
+               const wpi::json& properties,
+               const PubSubOptionsImpl& options) final;
   void Subscribe(NT_Subscriber subHandle, std::span<const std::string> prefixes,
-                 const PubSubOptions& options) final;
+                 const PubSubOptionsImpl& options) final;
   void SetValue(NT_Publisher pubHandle, const Value& value) final;
 
  private:

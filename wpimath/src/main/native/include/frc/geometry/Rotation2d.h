@@ -17,6 +17,11 @@ namespace frc {
 /**
  * A rotation in a 2D coordinate frame represented by a point on the unit circle
  * (cosine and sine).
+ *
+ * The angle is continuous, that is if a Rotation2d is constructed with 361
+ * degrees, it will return 361 degrees. This allows algorithms that wouldn't
+ * want to see a discontinuity in the rotations as it sweeps past from 360 to 0
+ * on the second time around.
  */
 class WPILIB_DLLEXPORT Rotation2d {
  public:
@@ -124,18 +129,20 @@ class WPILIB_DLLEXPORT Rotation2d {
   constexpr Rotation2d RotateBy(const Rotation2d& other) const;
 
   /**
-   * Returns the radian value of the rotation within (-pi, pi].
+   * Returns the radian value of the rotation.
    *
    * @return The radian value of the rotation.
+   * @see AngleModulus to constrain the angle within (-pi, pi]
    */
-  constexpr units::radian_t Radians() const;
+  constexpr units::radian_t Radians() const { return m_value; }
 
   /**
-   * Returns the degree value of the rotation within (-180, 180].
+   * Returns the degree value of the rotation.
    *
    * @return The degree value of the rotation.
+   * @see InputModulus to constrain the angle within (-180, 180]
    */
-  constexpr units::degree_t Degrees() const;
+  constexpr units::degree_t Degrees() const { return m_value; }
 
   /**
    * Returns the cosine of the rotation.
@@ -159,6 +166,7 @@ class WPILIB_DLLEXPORT Rotation2d {
   constexpr double Tan() const { return Sin() / Cos(); }
 
  private:
+  units::radian_t m_value = 0_rad;
   double m_cos = 1;
   double m_sin = 0;
 };

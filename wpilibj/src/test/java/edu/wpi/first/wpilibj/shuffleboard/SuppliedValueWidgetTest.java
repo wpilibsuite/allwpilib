@@ -12,6 +12,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import java.util.concurrent.atomic.AtomicInteger;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -23,6 +24,11 @@ class SuppliedValueWidgetTest {
   void setup() {
     m_ntInstance = NetworkTableInstance.create();
     m_instance = new ShuffleboardInstance(m_ntInstance);
+  }
+
+  @AfterEach
+  void tearDown() {
+    m_ntInstance.close();
   }
 
   @Test

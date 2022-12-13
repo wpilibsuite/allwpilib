@@ -30,7 +30,7 @@ class MultiSubscriber final {
    */
   MultiSubscriber(NetworkTableInstance inst,
                   std::span<const std::string_view> prefixes,
-                  std::span<const PubSubOption> options = {});
+                  const PubSubOptions& options = kDefaultPubSubOptions);
 
   MultiSubscriber(const MultiSubscriber&) = delete;
   MultiSubscriber& operator=(const MultiSubscriber&) = delete;

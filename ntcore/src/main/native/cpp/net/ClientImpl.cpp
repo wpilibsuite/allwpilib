@@ -38,7 +38,7 @@ namespace {
 
 struct PublisherData {
   NT_Publisher handle;
-  PubSubOptions options;
+  PubSubOptionsImpl options;
   // in options as double, but copy here as integer; rounded to the nearest
   // 10 ms
   uint32_t periodMs;
@@ -67,7 +67,7 @@ class CImpl : public ServerMessageHandler {
 
   void Publish(NT_Publisher pubHandle, NT_Topic topicHandle,
                std::string_view name, std::string_view typeStr,
-               const wpi::json& properties, const PubSubOptions& options);
+               const wpi::json& properties, const PubSubOptionsImpl& options);
   bool Unpublish(NT_Publisher pubHandle, NT_Topic topicHandle);
   void SetValue(NT_Publisher pubHandle, const Value& value);
 
@@ -282,7 +282,8 @@ bool CImpl::CheckNetworkReady() {
 
 void CImpl::Publish(NT_Publisher pubHandle, NT_Topic topicHandle,
                     std::string_view name, std::string_view typeStr,
-                    const wpi::json& properties, const PubSubOptions& options) {
+                    const wpi::json& properties,
+                    const PubSubOptionsImpl& options) {
   unsigned int index = Handle{pubHandle}.GetIndex();
   if (index >= m_publishers.size()) {
     m_publishers.resize(index + 1);
@@ -293,7 +294,7 @@ void CImpl::Publish(NT_Publisher pubHandle, NT_Topic topicHandle,
   }
   publisher->handle = pubHandle;
   publisher->options = options;
-  publisher->periodMs = std::lround(options.periodic * 100) * 10;
+  publisher->periodMs = std::lround(options.periodicMs / 10.0) * 10;
   if (publisher->periodMs < kMinPeriodMs) {
     publisher->periodMs = kMinPeriodMs;
   }
@@ -445,7 +446,7 @@ ClientStartup::~ClientStartup() {
 void ClientStartup::Publish(NT_Publisher pubHandle, NT_Topic topicHandle,
                             std::string_view name, std::string_view typeStr,
                             const wpi::json& properties,
-                            const PubSubOptions& options) {
+                            const PubSubOptionsImpl& options) {
   WPI_DEBUG4(m_client.m_impl->m_logger, "StartupPublish({}, {}, {}, {})",
              pubHandle, topicHandle, name, typeStr);
   m_client.m_impl->Publish(pubHandle, topicHandle, name, typeStr, properties,
@@ -456,7 +457,7 @@ void ClientStartup::Publish(NT_Publisher pubHandle, NT_Topic topicHandle,
 
 void ClientStartup::Subscribe(NT_Subscriber subHandle,
                               std::span<const std::string> prefixes,
-                              const PubSubOptions& options) {
+                              const PubSubOptionsImpl& options) {
   WPI_DEBUG4(m_client.m_impl->m_logger, "StartupSubscribe({})", subHandle);
   WireEncodeSubscribe(m_textWriter.Add(), Handle{subHandle}.GetIndex(),
                       prefixes, options);

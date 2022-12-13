@@ -4,25 +4,18 @@
 
 package edu.wpi.first.wpilibj2.command;
 
-import static edu.wpi.first.wpilibj.util.ErrorMessages.requireNonNullParam;
-import static edu.wpi.first.wpilibj2.command.CommandGroupBase.requireUngrouped;
+import static edu.wpi.first.util.ErrorMessages.requireNonNullParam;
 
 import java.util.Map;
 import java.util.function.Supplier;
 
 /**
- * Runs one of a selection of commands, either using a selector and a key to command mapping, or a
- * supplier that returns the command directly at runtime. Does not actually schedule the selected
- * command - rather, the command is run through this command; this ensures that the command will
- * behave as expected if used as part of a CommandGroup. Requires the requirements of all included
- * commands, again to ensure proper functioning when used in a CommandGroup. If this is undesired,
- * consider using {@link ScheduleCommand}.
+ * A command composition that runs one of a selection of commands, either using a selector and a key
+ * to command mapping, or a supplier that returns the command directly at runtime.
  *
- * <p>As this command contains multiple component commands within it, it is technically a command
- * group; the command instances that are passed to it cannot be added to any other groups, or
- * scheduled individually.
- *
- * <p>As a rule, CommandGroups require the union of the requirements of their component commands.
+ * <p>The rules for command compositions apply: command instances that are passed to it cannot be
+ * added to any other composition or scheduled individually, and the composition requires all
+ * subsystems its components require.
  *
  * <p>This class is provided by the NewCommands VendorDep
  */
@@ -41,12 +34,11 @@ public class SelectCommand extends CommandBase {
    * @param selector the selector to determine which command to run
    */
   public SelectCommand(Map<Object, Command> commands, Supplier<Object> selector) {
-    requireUngrouped(commands.values());
-
-    CommandGroupBase.registerGroupedCommands(commands.values().toArray(new Command[] {}));
-
     m_commands = requireNonNullParam(commands, "commands", "SelectCommand");
     m_selector = requireNonNullParam(selector, "selector", "SelectCommand");
+
+    CommandScheduler.getInstance()
+        .registerComposedCommands(commands.values().toArray(new Command[] {}));
 
     m_toRun = null;
 

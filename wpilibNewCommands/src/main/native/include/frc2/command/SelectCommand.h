@@ -16,25 +16,18 @@
 #include <vector>
 
 #include "frc2/command/CommandBase.h"
-#include "frc2/command/CommandGroupBase.h"
 #include "frc2/command/PrintCommand.h"
 
 namespace frc2 {
 /**
- * Runs one of a selection of commands, either using a selector and a key to
- * command mapping, or a supplier that returns the command directly at runtime.
- * Does not actually schedule the selected command - rather, the command is run
- * through this command; this ensures that the command will behave as expected
- * if used as part of a CommandGroup.  Requires the requirements of all included
- * commands, again to ensure proper functioning when used in a CommandGroup.  If
- * this is undesired, consider using ScheduleCommand.
+ * A command composition that runs one of a selection of commands, either using
+ * a selector and a key to command mapping, or a supplier that returns the
+ * command directly at runtime.
  *
- * <p>As this command contains multiple component commands within it, it is
- * technically a command group; the command instances that are passed to it
- * cannot be added to any other groups, or scheduled individually.
- *
- * <p>As a rule, CommandGroups require the union of the requirements of their
- * component commands.
+ * <p>The rules for command compositions apply: command instances that are
+ * passed to it are owned by the composition and cannot be added to any other
+ * composition or scheduled individually, and the composition requires all
+ * subsystems its components require.
  *
  * This class is provided by the NewCommands VendorDep
  */
@@ -61,9 +54,7 @@ class SelectCommand : public CommandHelper<CommandBase, SelectCommand<Key>> {
      ...);
 
     for (auto&& command : foo) {
-      if (!CommandGroupBase::RequireUngrouped(*command.second)) {
-        return;
-      }
+      CommandScheduler::GetInstance().RequireUngrouped(command.second.get());
     }
 
     for (auto&& command : foo) {
@@ -82,9 +73,7 @@ class SelectCommand : public CommandHelper<CommandBase, SelectCommand<Key>> {
       std::vector<std::pair<Key, std::unique_ptr<Command>>>&& commands)
       : m_selector{std::move(selector)} {
     for (auto&& command : commands) {
-      if (!CommandGroupBase::RequireUngrouped(*command.second)) {
-        return;
-      }
+      CommandScheduler::GetInstance().RequireUngrouped(command.second.get());
     }
 
     for (auto&& command : commands) {

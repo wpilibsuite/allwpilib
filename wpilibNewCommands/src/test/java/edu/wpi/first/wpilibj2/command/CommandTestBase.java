@@ -22,7 +22,7 @@ public class CommandTestBase {
     CommandScheduler.getInstance().cancelAll();
     CommandScheduler.getInstance().enable();
     CommandScheduler.getInstance().getActiveButtonLoop().clear();
-    CommandGroupBase.clearGroupedCommands();
+    CommandScheduler.getInstance().clearComposedCommands();
 
     setDSEnabled(true);
   }

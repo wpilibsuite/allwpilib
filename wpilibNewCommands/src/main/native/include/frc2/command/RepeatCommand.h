@@ -13,19 +13,18 @@
 #include <utility>
 
 #include "frc2/command/CommandBase.h"
-#include "frc2/command/CommandGroupBase.h"
 #include "frc2/command/CommandHelper.h"
 
 namespace frc2 {
 /**
  * A command that runs another command repeatedly, restarting it when it ends,
- * until this command is interrupted. While this class does not extend {@link
- * CommandGroupBase}, it is still considered a CommandGroup, as it allows one to
- * compose another command within it; the command instances that are passed to
- * it cannot be added to any other groups, or scheduled individually.
+ * until this command is interrupted. Command instances that are passed to it
+ * cannot be added to any other groups, or scheduled individually.
  *
- * <p>As a rule, CommandGroups require the union of the requirements of their
- * component commands.
+ * <p>The rules for command compositions apply: command instances that are
+ * passed to it are owned by the composition and cannot be added to any other
+ * composition or scheduled individually, and the composition requires all
+ * subsystems its components require.
  *
  * <p>This class is provided by the NewCommands VendorDep
  */

@@ -14,15 +14,6 @@ class Rotation2dTest {
   private static final double kEpsilon = 1E-9;
 
   @Test
-  void testInScope() {
-    var rot1 = Rotation2d.fromRadians(Math.PI * 5 / 2);
-    var rot2 = Rotation2d.fromRadians(Math.PI * 7 / 2);
-
-    assertEquals(Math.PI / 2, rot1.getRadians(), kEpsilon);
-    assertEquals(-Math.PI / 2, rot2.getRadians(), kEpsilon);
-  }
-
-  @Test
   void testRadiansToDegrees() {
     var rot1 = Rotation2d.fromRadians(Math.PI / 3);
     var rot2 = Rotation2d.fromRadians(Math.PI / 4);
@@ -80,7 +71,7 @@ class Rotation2dTest {
     var rot = Rotation2d.fromDegrees(10.0);
 
     assertEquals(30.0, rot.times(3.0).getDegrees(), kEpsilon);
-    assertEquals(50.0, rot.times(41.0).getDegrees(), kEpsilon);
+    assertEquals(410.0, rot.times(41.0).getDegrees(), kEpsilon);
   }
 
   @Test

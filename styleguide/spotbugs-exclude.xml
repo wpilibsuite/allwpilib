@@ -127,6 +127,9 @@
     <Bug pattern="VA_FORMAT_STRING_USES_NEWLINE" />
   </Match>
   <Match>
+    <Bug pattern="SC_START_IN_CTOR" />
+  </Match>
+  <Match>
     <Bug pattern="RV_RETURN_VALUE_OF_PUTIFABSENT_IGNORED" />
     <Class name="edu.wpi.first.networktables.NetworkTableInstance" />
   </Match>

@@ -159,7 +159,7 @@ class ClientData4Base : public ClientData, protected ClientMessageHandler {
   void ClientSetProperties(std::string_view name,
                            const wpi::json& update) final;
   void ClientSubscribe(int64_t subuid, std::span<const std::string> topicNames,
-                       const PubSubOptions& options) final;
+                       const PubSubOptionsImpl& options) final;
   void ClientUnsubscribe(int64_t subuid) final;
 
   void ClientSetValue(int64_t pubuid, const Value& value);
@@ -362,22 +362,22 @@ struct PublisherData {
 
 struct SubscriberData {
   SubscriberData(ClientData* client, std::span<const std::string> topicNames,
-                 int64_t subuid, const PubSubOptions& options)
+                 int64_t subuid, const PubSubOptionsImpl& options)
       : client{client},
         topicNames{topicNames.begin(), topicNames.end()},
         subuid{subuid},
         options{options},
-        periodMs(std::lround(options.periodic * 100) * 10) {
+        periodMs(std::lround(options.periodicMs / 10.0) * 10) {
     if (periodMs < kMinPeriodMs) {
       periodMs = kMinPeriodMs;
     }
   }
 
   void Update(std::span<const std::string> topicNames_,
-              const PubSubOptions& options_) {
+              const PubSubOptionsImpl& options_) {
     topicNames = {topicNames_.begin(), topicNames_.end()};
     options = options_;
-    periodMs = std::lround(options_.periodic * 100) * 10;
+    periodMs = std::lround(options_.periodicMs / 10.0) * 10;
     if (periodMs < kMinPeriodMs) {
       periodMs = kMinPeriodMs;
     }
@@ -388,7 +388,7 @@ struct SubscriberData {
   ClientData* client;
   std::vector<std::string> topicNames;
   int64_t subuid;
-  PubSubOptions options;
+  PubSubOptionsImpl options;
   // in options as double, but copy here as integer; rounded to the nearest
   // 10 ms
   uint32_t periodMs;
@@ -463,9 +463,11 @@ struct Writer : public mpack_writer_t {
 };
 }  // namespace
 
-static void WriteOptions(mpack_writer_t& w, const PubSubOptions& options) {
-  int size = (options.sendAll ? 1 : 0) + (options.topicsOnly ? 1 : 0) +
-             (options.periodic != 0.1 ? 1 : 0) + (options.prefixMatch ? 1 : 0);
+static void WriteOptions(mpack_writer_t& w, const PubSubOptionsImpl& options) {
+  int size =
+      (options.sendAll ? 1 : 0) + (options.topicsOnly ? 1 : 0) +
+      (options.periodicMs != PubSubOptionsImpl::kDefaultPeriodicMs ? 1 : 0) +
+      (options.prefixMatch ? 1 : 0);
   mpack_start_map(&w, size);
   if (options.sendAll) {
     mpack_write_str(&w, "all");
@@ -475,9 +477,9 @@ static void WriteOptions(mpack_writer_t& w, const PubSubOptions& options) {
     mpack_write_str(&w, "topicsonly");
     mpack_write_bool(&w, true);
   }
-  if (options.periodic != 0.1) {
+  if (options.periodicMs != PubSubOptionsImpl::kDefaultPeriodicMs) {
     mpack_write_str(&w, "periodic");
-    mpack_write_float(&w, options.periodic);
+    mpack_write_float(&w, options.periodicMs / 1000.0);
   }
   if (options.prefixMatch) {
     mpack_write_str(&w, "prefix");
@@ -615,7 +617,7 @@ void ClientData4Base::ClientSetProperties(std::string_view name,
 
 void ClientData4Base::ClientSubscribe(int64_t subuid,
                                       std::span<const std::string> topicNames,
-                                      const PubSubOptions& options) {
+                                      const PubSubOptionsImpl& options) {
   DEBUG4("ClientSubscribe({}, ({}), {})", m_id, fmt::join(topicNames, ","),
          subuid);
   auto& sub = m_subscribers[subuid];
@@ -2364,14 +2366,14 @@ std::string ServerImpl::LoadPersistent(std::string_view in) {
 void ServerStartup::Publish(NT_Publisher pubHandle, NT_Topic topicHandle,
                             std::string_view name, std::string_view typeStr,
                             const wpi::json& properties,
-                            const PubSubOptions& options) {
+                            const PubSubOptionsImpl& options) {
   m_server.m_impl->m_localClient->ClientPublish(pubHandle, name, typeStr,
                                                 properties);
 }
 
 void ServerStartup::Subscribe(NT_Subscriber subHandle,
                               std::span<const std::string> topicNames,
-                              const PubSubOptions& options) {
+                              const PubSubOptionsImpl& options) {
   m_server.m_impl->m_localClient->ClientSubscribe(subHandle, topicNames,
                                                   options);
 }

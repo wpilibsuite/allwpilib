@@ -4,7 +4,7 @@
 
 package edu.wpi.first.wpilibj2.command.button;
 
-import static edu.wpi.first.wpilibj.util.ErrorMessages.requireNonNullParam;
+import static edu.wpi.first.util.ErrorMessages.requireNonNullParam;
 
 import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.wpilibj.event.BooleanEvent;
@@ -472,10 +472,10 @@ public class Trigger implements BooleanSupplier {
   }
 
   /**
-   * Composes two triggers with logical OR.
+   * Composes two triggers with logical AND.
    *
    * @param trigger the condition to compose with
-   * @return A trigger which is active when either component trigger is active.
+   * @return A trigger which is active when both component triggers are active.
    */
   public Trigger and(BooleanSupplier trigger) {
     return new Trigger(() -> m_condition.getAsBoolean() && trigger.getAsBoolean());

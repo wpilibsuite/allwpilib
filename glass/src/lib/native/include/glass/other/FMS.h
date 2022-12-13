@@ -38,7 +38,7 @@ class FMSModel : public Model {
   virtual void SetEnabled(bool val) = 0;
   virtual void SetTest(bool val) = 0;
   virtual void SetAutonomous(bool val) = 0;
-  virtual void SetGameSpecificMessage(const char* val) = 0;
+  virtual void SetGameSpecificMessage(std::string_view val) = 0;
 };
 
 /**

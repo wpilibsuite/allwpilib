@@ -6,50 +6,69 @@ package edu.wpi.first.networktables;
 
 /** NetworkTables publish/subscribe option. */
 public class PubSubOption {
-  private static final int kPeriodic = 1;
-  private static final int kSendAll = 2;
-  private static final int kTopicsOnly = 3;
-  private static final int kPollStorage = 4;
-  private static final int kKeepDuplicates = 5;
-  private static final int kLocalRemote = 6;
+  enum Kind {
+    periodic,
+    sendAll,
+    topicsOnly,
+    pollStorage,
+    keepDuplicates,
+    disableRemote,
+    disableLocal,
+    excludePublisher,
+    excludeSelf;
+  }
 
-  PubSubOption(int type, double value) {
-    m_type = type;
-    m_value = value;
+  PubSubOption(Kind kind, boolean value) {
+    m_kind = kind;
+    m_bValue = value;
+    m_iValue = 0;
+    m_dValue = 0;
+  }
+
+  PubSubOption(Kind kind, int value) {
+    m_kind = kind;
+    m_bValue = false;
+    m_iValue = value;
+    m_dValue = 0;
+  }
+
+  PubSubOption(Kind kind, double value) {
+    m_kind = kind;
+    m_bValue = false;
+    m_iValue = 0;
+    m_dValue = value;
   }
 
   /**
    * How frequently changes will be sent over the network. NetworkTables may send more frequently
    * than this (e.g. use a combined minimum period for all values) or apply a restricted range to
-   * this value. The default if unspecified (and the immediate flag is false) is 100 ms. This option
-   * and the immediate option override each other.
+   * this value. The default if unspecified is 100 ms.
    *
    * @param period time between updates, in seconds
    * @return option
    */
   public static PubSubOption periodic(double period) {
-    return new PubSubOption(kPeriodic, period);
+    return new PubSubOption(Kind.periodic, period);
   }
 
   /**
-   * If enabled, sends all value changes over the network even if only sent periodically. This
-   * option defaults to disabled.
+   * If enabled, sends all value changes over the network. This option defaults to disabled.
    *
    * @param enabled True to enable, false to disable
    * @return option
    */
   public static PubSubOption sendAll(boolean enabled) {
-    return new PubSubOption(kSendAll, enabled ? 1.0 : 0.0);
+    return new PubSubOption(Kind.sendAll, enabled);
   }
 
   /**
-   * If enabled, no value changes are sent over the network. This option defaults to disabled.
+   * If enabled on a subscription, does not request value changes. This option defaults to disabled.
    *
    * @param enabled True to enable, false to disable
    * @return option
    */
   public static PubSubOption topicsOnly(boolean enabled) {
-    return new PubSubOption(kTopicsOnly, enabled ? 1.0 : 0.0);
+    return new PubSubOption(Kind.topicsOnly, enabled);
   }
 
   /**
@@ -60,7 +79,7 @@ public class PubSubOption {
    * @return option
    */
   public static PubSubOption keepDuplicates(boolean enabled) {
-    return new PubSubOption(kKeepDuplicates, enabled ? 1.0 : 0.0);
+    return new PubSubOption(Kind.keepDuplicates, enabled);
   }
 
   /**
@@ -72,39 +91,66 @@ public class PubSubOption {
    * @return option
    */
   public static PubSubOption pollStorage(int depth) {
-    return new PubSubOption(kPollStorage, depth);
+    return new PubSubOption(Kind.pollStorage, depth);
   }
 
   /**
-   * If only local value updates should be queued for readQueue(). See also remoteOnly() and
-   * allUpdates(). Default is allUpdates. Only has an effect on subscriptions.
+   * For subscriptions, specify whether remote value updates should not be queued for readQueue().
+   * See also disableLocal(). Defaults to false (remote value updates are queued).
    *
+   * @param disabled True to disable, false to enable
    * @return option
    */
-  public static PubSubOption localOnly() {
-    return new PubSubOption(kLocalRemote, 1.0);
+  public static PubSubOption disableRemote(boolean disabled) {
+    return new PubSubOption(Kind.disableRemote, disabled);
   }
 
   /**
-   * If only remote value updates should be queued for readQueue(). See also localOnly() and
-   * allUpdates(). Default is allUpdates. Only has an effect on subscriptions.
+   * For subscriptions, specify whether local value updates should not be queued for readQueue().
+   * See alse disableRemote(). Defaults to false (local value updates are queued).
    *
+   * @param disabled True to disable, false to enable
    * @return option
    */
-  public static PubSubOption remoteOnly() {
-    return new PubSubOption(kLocalRemote, 2.0);
+  public static PubSubOption disableLocal(boolean disabled) {
+    return new PubSubOption(Kind.disableLocal, disabled);
   }
 
   /**
-   * If both local and remote value updates should be queued for readQueue(). See also localOnly()
-   * and remoteOnly(). Default is allUpdates. Only has an effect on subscriptions.
+   * Don't queue value updates for the given publisher. Only has an effect on subscriptions. Only
+   * one exclusion may be set.
    *
+   * @param publisher publisher handle to exclude
    * @return option
    */
-  public static PubSubOption allUpdates() {
-    return new PubSubOption(kLocalRemote, 0.0);
+  public static PubSubOption excludePublisher(int publisher) {
+    return new PubSubOption(Kind.excludePublisher, publisher);
   }
 
-  final int m_type;
-  final double m_value;
+  /**
+   * Don't queue value updates for the given publisher. Only has an effect on subscriptions. Only
+   * one exclusion may be set.
+   *
+   * @param publisher publisher to exclude
+   * @return option
+   */
+  public static PubSubOption excludePublisher(Publisher publisher) {
+    return excludePublisher(publisher != null ? publisher.getHandle() : 0);
+  }
+
+  /**
+   * Don't queue value updates for the internal publisher for an entry. Only has an effect on
+   * entries.
+   *
+   * @param enabled True to enable, false to disable
+   * @return option
+   */
+  public static PubSubOption excludeSelf(boolean enabled) {
+    return new PubSubOption(Kind.excludeSelf, enabled);
+  }
+
+  final Kind m_kind;
+  final boolean m_bValue;
+  final int m_iValue;
+  final double m_dValue;
 }

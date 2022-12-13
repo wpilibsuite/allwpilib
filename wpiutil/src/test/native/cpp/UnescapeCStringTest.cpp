@@ -52,4 +52,23 @@ TEST(UnescapeCStringTest, Octal) {
   EXPECT_TRUE(rem.empty());
 }
 
+TEST(UnescapeCStringTest, EmptyString) {
+  SmallString<64> buf;
+  auto [out, rem] = UnescapeCString("", buf);
+  EXPECT_EQ(out, "");
+}
+
+TEST(UnescapeCStringTest, ShortString) {
+  SmallString<64> buf;
+  auto [out, rem] = UnescapeCString("a", buf);
+  EXPECT_EQ(out, "a");
+}
+
+TEST(UnescapeCStringTest, NoEscapesString) {
+  SmallString<64> buf;
+  std::string_view input = "abcdefghijklmnopqrstuvwxyz1234567890";
+  auto [out, rem] = UnescapeCString(input, buf);
+  EXPECT_EQ(out, input);
+}
+
 }  // namespace

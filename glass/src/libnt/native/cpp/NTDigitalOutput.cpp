@@ -14,8 +14,8 @@ NTDigitalOutputModel::NTDigitalOutputModel(std::string_view path)
 NTDigitalOutputModel::NTDigitalOutputModel(nt::NetworkTableInstance inst,
                                            std::string_view path)
     : m_inst{inst},
-      m_value{inst.GetBooleanTopic(fmt::format("{}/Value", path))
-                  .GetEntry(false, {{nt::PubSubOption::SendAll(true)}})},
+      m_value{
+          inst.GetBooleanTopic(fmt::format("{}/Value", path)).GetEntry(false)},
       m_name{inst.GetStringTopic(fmt::format("{}/.name", path)).Subscribe("")},
       m_controllable{inst.GetBooleanTopic(fmt::format("{}/.controllable", path))
                          .Subscribe(false)},

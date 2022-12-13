@@ -31,15 +31,6 @@ namespace frc {
  * AddVisionMeasurement() can be called as infrequently as you want; if you
  * never call it, then this class will behave as regular encoder
  * odometry.
- *
- * The state-space system used internally has the following states (x) and
- * outputs (y):
- *
- * <strong> x = [x, y, theta]ᵀ </strong> in the field coordinate
- * system containing x position, y position, and heading.
- *
- * <strong> y = [x, y, theta]ᵀ </strong> from vision containing x position, y
- * position, and heading.
  */
 template <size_t NumModules>
 class SwerveDrivePoseEstimator {
@@ -53,12 +44,12 @@ class SwerveDrivePoseEstimator {
    * The default standard deviations of the vision measurements are
    * 0.9 meters for x, 0.9 meters for y, and 0.9 radians for heading.
    *
-   * @param kinematics               A correctly-configured kinematics object
-   *                                 for your drivetrain.
-   * @param gyroAngle                The current gyro angle.
-   * @param modulePositions          The current distance and rotation
-   *                                 measurements of the swerve modules.
-   * @param initialPose              The starting pose estimate.
+   * @param kinematics A correctly-configured kinematics object for your
+   *     drivetrain.
+   * @param gyroAngle The current gyro angle.
+   * @param modulePositions The current distance and rotation measurements of
+   *     the swerve modules.
+   * @param initialPose The starting pose estimate.
    */
   SwerveDrivePoseEstimator(
       SwerveDriveKinematics<NumModules>& kinematics,
@@ -72,23 +63,19 @@ class SwerveDrivePoseEstimator {
   /**
    * Constructs a SwerveDrivePoseEstimator.
    *
-   * @param kinematics               A correctly-configured kinematics object
-   *                                 for your drivetrain.
-   * @param gyroAngle                The current gyro angle.
-   * @param modulePositions          The current distance and rotation
-   *                                 measurements of the swerve modules.
-   * @param initialPose              The starting pose estimate.
-   * @param stateStdDevs             Standard deviations of model states.
-   *                                 Increase these numbers to trust your
-   *                                 model's state estimates less. This matrix
-   *                                 is in the form [x, y, theta]ᵀ, with units
-   *                                 in meters and radians.
-   * @param visionMeasurementStdDevs Standard deviations of the vision
-   *                                 measurements. Increase these numbers to
-   *                                 trust global measurements from vision
-   *                                 less. This matrix is in the form
-   *                                 [x, y, theta]ᵀ, with units in meters and
-   *                                 radians.
+   * @param kinematics A correctly-configured kinematics object for your
+   *     drivetrain.
+   * @param gyroAngle The current gyro angle.
+   * @param modulePositions The current distance and rotation measurements of
+   *     the swerve modules.
+   * @param initialPose The starting pose estimate.
+   * @param stateStdDevs Standard deviations of the pose estimate (x position in
+   *     meters, y position in meters, and heading in radians). Increase these
+   *     numbers to trust your state estimate less.
+   * @param visionMeasurementStdDevs Standard deviations of the vision pose
+   *     measurement (x position in meters, y position in meters, and heading in
+   *     radians). Increase these numbers to trust the vision pose measurement
+   *     less.
    */
   SwerveDrivePoseEstimator(
       SwerveDriveKinematics<NumModules>& kinematics,
@@ -133,16 +120,14 @@ class SwerveDrivePoseEstimator {
   Pose2d GetEstimatedPosition() const { return m_odometry.GetPose(); }
 
   /**
-   * Sets the pose estimator's trust of global measurements. This might be used
+   * Sets the pose estimator's trust in vision measurements. This might be used
    * to change trust in vision measurements after the autonomous period, or to
    * change trust as distance to a vision target increases.
    *
-   * @param visionMeasurementStdDevs Standard deviations of the vision
-   *                                 measurements. Increase these numbers to
-   *                                 trust global measurements from vision
-   *                                 less. This matrix is in the form
-   *                                 [x, y, theta]ᵀ, with units in meters and
-   *                                 radians.
+   * @param visionMeasurementStdDevs Standard deviations of the vision pose
+   *     measurement (x position in meters, y position in meters, and heading in
+   *     radians). Increase these numbers to trust the vision pose measurement
+   *     less.
    */
   void SetVisionMeasurementStdDevs(
       const wpi::array<double, 3>& visionMeasurementStdDevs) {
@@ -175,15 +160,13 @@ class SwerveDrivePoseEstimator {
    * one meter or so of the current pose estimate.
    *
    * @param visionRobotPose The pose of the robot as measured by the vision
-   *                        camera.
-   * @param timestamp       The timestamp of the vision measurement in seconds.
-   *                        Note that if you don't use your own time source by
-   *                        calling UpdateWithTime() then you must use a
-   *                        timestamp with an epoch since FPGA startup
-   *                        (i.e. the epoch of this timestamp is the same
-   *                        epoch as Timer#GetFPGATimestamp.) This means
-   *                        that you should use Timer#GetFPGATimestamp as your
-   *                        time source or sync the epochs.
+   *    camera.
+   * @param timestamp The timestamp of the vision measurement in seconds. Note
+   *     that if you don't use your own time source by calling UpdateWithTime()
+   *     then you must use a timestamp with an epoch since FPGA startup (i.e.,
+   *     the epoch of this timestamp is the same epoch as
+   *     frc::Timer::GetFPGATimestamp().) This means that you should use
+   *     frc::Timer::GetFPGATimestamp() as your time source or sync the epochs.
    */
   void AddVisionMeasurement(const Pose2d& visionRobotPose,
                             units::second_t timestamp) {
@@ -243,25 +226,18 @@ class SwerveDrivePoseEstimator {
    * method will continue to apply to future measurements until a subsequent
    * call to SetVisionMeasurementStdDevs() or this method.
    *
-   * @param visionRobotPose          The pose of the robot as measured by the
-   *                                 vision camera.
-   * @param timestamp                The timestamp of the vision measurement in
-   *                                 seconds. Note that if you don't use your
-   *                                 own time source by calling
-   *                                 UpdateWithTime(), then you must use a
-   *                                 timestamp with an epoch since FPGA startup
-   *                                 (i.e. the epoch of this timestamp is the
-   *                                 same epoch as
-   *                                 frc::Timer::GetFPGATimestamp(). This means
-   *                                 that you should use
-   *                                 frc::Timer::GetFPGATimestamp() as your
-   *                                 time source in this case.
-   * @param visionMeasurementStdDevs Standard deviations of the vision
-   *                                 measurements. Increase these numbers to
-   *                                 trust global measurements from vision
-   *                                 less. This matrix is in the form
-   *                                 [x, y, theta]ᵀ, with units in meters and
-   *                                 radians.
+   * @param visionRobotPose The pose of the robot as measured by the vision
+   *     camera.
+   * @param timestamp The timestamp of the vision measurement in seconds. Note
+   *     that if you don't use your own time source by calling UpdateWithTime(),
+   *     then you must use a timestamp with an epoch since FPGA startup (i.e.,
+   *     the epoch of this timestamp is the same epoch as
+   *     frc::Timer::GetFPGATimestamp(). This means that you should use
+   *     frc::Timer::GetFPGATimestamp() as your time source in this case.
+   * @param visionMeasurementStdDevs Standard deviations of the vision pose
+   *     measurement (x position in meters, y position in meters, and heading in
+   *     radians). Increase these numbers to trust the vision pose measurement
+   *     less.
    */
   void AddVisionMeasurement(
       const Pose2d& visionRobotPose, units::second_t timestamp,
@@ -271,8 +247,8 @@ class SwerveDrivePoseEstimator {
   }
 
   /**
-   * Updates the Kalman Filter using only wheel encoder information. This should
-   * be called every loop.
+   * Updates the pose estimator with wheel encoder and gyro information. This
+   * should be called every loop.
    *
    * @param gyroAngle       The current gyro angle.
    * @param modulePositions The current distance and rotation measurements of
@@ -287,8 +263,8 @@ class SwerveDrivePoseEstimator {
   }
 
   /**
-   * Updates the Kalman Filter using only wheel encoder information. This should
-   * be called every loop.
+   * Updates the pose estimator with wheel encoder and gyro information. This
+   * should be called every loop.
    *
    * @param currentTime     Time at which this method was called, in seconds.
    * @param gyroAngle       The current gyro angle.

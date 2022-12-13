@@ -259,107 +259,85 @@ class Event {
   LogMessage* GetLogMessage() { return std::get_if<nt::LogMessage>(&data); }
 };
 
-/** NetworkTables publish/subscribe option. */
-class PubSubOption {
- public:
-  constexpr PubSubOption(NT_PubSubOptionType type, double value)
-      : type{type}, value{value} {}
+/** NetworkTables publish/subscribe options. */
+struct PubSubOptions {
+  /**
+   * Default value of periodic.
+   */
+  static constexpr double kDefaultPeriodic = 0.1;
 
   /**
-   * How frequently changes will be sent over the network. NetworkTables may
-   * send more frequently than this (e.g. use a combined minimum period for all
-   * values) or apply a restricted range to this value. The default if
-   * unspecified (and the immediate flag is false) is 100 ms. This option and
-   * the immediate option override each other.
-   *
-   * @param time time between updates, in seconds
-   * @return option
+   * Structure size. Must be set to sizeof(PubSubOptions).
    */
-  static constexpr PubSubOption Periodic(double time) {
-    return PubSubOption{NT_PUBSUB_PERIODIC, time};
-  }
+  unsigned int structSize = sizeof(PubSubOptions);
 
   /**
-   * If enabled, sends all value changes over the network even if only sent
-   * periodically. This option defaults to disabled.
-   *
-   * @param enabled True to enable, false to disable
-   * @return option
+   * Polling storage size for a subscription. Specifies the maximum number of
+   * updates NetworkTables should store between calls to the subscriber's
+   * ReadQueue() function. If zero, defaults to 1 if sendAll is false, 20 if
+   * sendAll is true.
    */
-  static constexpr PubSubOption SendAll(bool enabled) {
-    return PubSubOption{NT_PUBSUB_SENDALL, enabled ? 1.0 : 0.0};
-  }
+  unsigned int pollStorage = 0;
 
   /**
-   * If enabled, no value changes are sent over the network. This option
-   * defaults to disabled.
-   *
-   * @param enabled True to enable, false to disable
-   * @return option
+   * How frequently changes will be sent over the network, in seconds.
+   * NetworkTables may send more frequently than this (e.g. use a combined
+   * minimum period for all values) or apply a restricted range to this value.
+   * The default is 100 ms.
    */
-  static constexpr PubSubOption TopicsOnly(bool enabled) {
-    return PubSubOption{NT_PUBSUB_TOPICSONLY, enabled ? 1.0 : 0.0};
-  }
+  double periodic = kDefaultPeriodic;
 
   /**
-   * If enabled, preserves duplicate value changes (rather than ignoring them).
-   * This option defaults to disabled.
-   *
-   * @param enabled True to enable, false to disable
-   * @return option
+   * For subscriptions, if non-zero, value updates for ReadQueue() are not
+   * queued for this publisher.
    */
-  static constexpr PubSubOption KeepDuplicates(bool enabled) {
-    return PubSubOption{NT_PUBSUB_KEEPDUPLICATES, enabled ? 1.0 : 0.0};
-  }
+  NT_Publisher excludePublisher = 0;
 
   /**
-   * Polling storage for subscription. Specifies the maximum number of updates
-   * NetworkTables should store between calls to the subscriber's ReadQueue()
-   * function. Defaults to 1 if SendAll is false, 20 if SendAll is true.
-   *
-   * @param depth number of entries to save for polling.
-   * @return option
+   * Send all value changes over the network.
    */
-  static constexpr PubSubOption PollStorage(int depth) {
-    return PubSubOption{NT_PUBSUB_POLLSTORAGE, static_cast<double>(depth)};
-  }
+  bool sendAll = false;
 
   /**
-   * If only local value updates should be queued for ReadQueue(). See also
-   * RemoteOnly() and AllUpdates(). Default is AllUpdates. Only has an effect on
-   * subscriptions.
-   *
-   * @return option
+   * For subscriptions, don't ask for value changes (only topic announcements).
    */
-  static constexpr PubSubOption LocalOnly() {
-    return PubSubOption{NT_PUBSUB_LOCALREMOTE, 1.0};
-  }
+  bool topicsOnly = false;
 
   /**
-   * If only remote value updates should be queued for ReadQueue(). See also
-   * LocalOnly() and AllUpdates(). Default is AllUpdates. Only has an effect on
-   * subscriptions.
-   *
-   * @return option
+   * Preserve duplicate value changes (rather than ignoring them).
    */
-  static constexpr PubSubOption RemoteOnly() {
-    return PubSubOption{NT_PUBSUB_LOCALREMOTE, 2.0};
-  }
+  bool keepDuplicates = false;
 
   /**
-   * If both local and remote value updates should be queued for ReadQueue().
-   * See also LocalOnly() and RemoteOnly(). Default is AllUpdates. Only has an
-   * effect on subscriptions.
-   *
-   * @return option
+   * Perform prefix match on subscriber topic names. Is ignored/overridden by
+   * Subscribe() functions; only present in struct for the purposes of getting
+   * information about subscriptions.
    */
-  static constexpr PubSubOption AllUpdates() {
-    return PubSubOption{NT_PUBSUB_LOCALREMOTE, 0.0};
-  }
+  bool prefixMatch = false;
 
-  NT_PubSubOptionType type;
-  double value;
+  /**
+   * For subscriptions, if remote value updates should not be queued for
+   * ReadQueue(). See also disableLocal.
+   */
+  bool disableRemote = false;
+
+  /**
+   * For subscriptions, if local value updates should not be queued for
+   * ReadQueue(). See also disableRemote.
+   */
+  bool disableLocal = false;
+
+  /**
+   * For entries, don't queue (for ReadQueue) value updates for the entry's
+   * internal publisher.
+   */
+  bool excludeSelf = false;
 };
+
+/**
+ * Default publish/subscribe options.
+ */
+constexpr PubSubOptions kDefaultPubSubOptions;
 
 /**
  * @defgroup ntcore_instance_func Instance Functions
@@ -727,7 +705,7 @@ bool SetTopicProperties(NT_Topic topic, const wpi::json& update);
  * @return Subscriber handle
  */
 NT_Subscriber Subscribe(NT_Topic topic, NT_Type type, std::string_view typeStr,
-                        std::span<const PubSubOption> options = {});
+                        const PubSubOptions& options = kDefaultPubSubOptions);
 
 /**
  * Stops subscriber.
@@ -746,7 +724,7 @@ void Unsubscribe(NT_Subscriber sub);
  * @return Publisher handle
  */
 NT_Publisher Publish(NT_Topic topic, NT_Type type, std::string_view typeStr,
-                     std::span<const PubSubOption> options = {});
+                     const PubSubOptions& options = kDefaultPubSubOptions);
 
 /**
  * Creates a new publisher to a topic.
@@ -760,7 +738,7 @@ NT_Publisher Publish(NT_Topic topic, NT_Type type, std::string_view typeStr,
  */
 NT_Publisher PublishEx(NT_Topic topic, NT_Type type, std::string_view typeStr,
                        const wpi::json& properties,
-                       std::span<const PubSubOption> options = {});
+                       const PubSubOptions& options = kDefaultPubSubOptions);
 
 /**
  * Stops publisher.
@@ -779,7 +757,7 @@ void Unpublish(NT_Handle pubentry);
  * @return Entry handle
  */
 NT_Entry GetEntry(NT_Topic topic, NT_Type type, std::string_view typeStr,
-                  std::span<const PubSubOption> options = {});
+                  const PubSubOptions& options = kDefaultPubSubOptions);
 
 /**
  * Stops entry subscriber/publisher.
@@ -822,7 +800,7 @@ NT_Topic GetTopicFromHandle(NT_Handle pubsubentry);
  */
 NT_MultiSubscriber SubscribeMultiple(
     NT_Inst inst, std::span<const std::string_view> prefixes,
-    std::span<const PubSubOption> options = {});
+    const PubSubOptions& options = kDefaultPubSubOptions);
 
 /**
  * Unsubscribes a multi-subscriber.

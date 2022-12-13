@@ -104,6 +104,6 @@ public abstract class CommandBase implements Sendable, Command {
           }
         });
     builder.addBooleanProperty(
-        ".isParented", () -> CommandGroupBase.getGroupedCommands().contains(this), null);
+        ".isParented", () -> CommandScheduler.getInstance().isComposed(this), null);
   }
 }
