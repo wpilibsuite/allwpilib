@@ -9,7 +9,9 @@
 #include <cstring>
 
 #include <GLFW/glfw3.h>
+#include <IconsFontAwesome6.h>
 #include <imgui.h>
+#include <imgui_FontAwesomeSolid.h>
 #include <imgui_ProggyDotted.h>
 #include <imgui_impl_glfw.h>
 #include <imgui_internal.h>
@@ -104,7 +106,13 @@ static void IniWriteAll(ImGuiContext* ctx, ImGuiSettingsHandler* handler,
 void gui::CreateContext() {
   gContext = new Context;
   AddFont("ProggyDotted", [](ImGuiIO& io, float size, const ImFontConfig* cfg) {
-    return ImGui::AddFontProggyDotted(io, size, cfg);
+    auto font = ImGui::AddFontProggyDotted(io, size, cfg);
+    static const ImWchar icons_ranges[] = {ICON_MIN_FA, ICON_MAX_16_FA, 0};
+    ImFontConfig icons_cfg;
+    icons_cfg.MergeMode = true;
+    icons_cfg.PixelSnapH = true;
+    ImGui::AddFontFontAwesomeSolid(io, size, &icons_cfg, icons_ranges);
+    return font;
   });
   PlatformCreateContext();
 }
@@ -113,6 +121,47 @@ void gui::DestroyContext() {
   PlatformDestroyContext();
   delete gContext;
   gContext = nullptr;
+}
+
+static void UpdateFontScale() {
+  // Scale based on OS window content scaling
+  float windowScale = 1.0;
+#ifndef __APPLE__
+  glfwGetWindowContentScale(gContext->window, &windowScale, nullptr);
+#endif
+  // map to closest font size: 0 = 0.5x, 1 = 0.75x, 2 = 1.0x, 3 = 1.25x,
+  // 4 = 1.5x, 5 = 1.75x, 6 = 2x
+  int fontScale =
+      gContext->userScale + static_cast<int>((windowScale - 1.0) * 4);
+  if (fontScale < 0) {
+    fontScale = 0;
+  }
+  if (gContext->fontScale != fontScale) {
+    gContext->reloadFonts = true;
+    gContext->fontScale = fontScale;
+  }
+}
+
+// the range is based on 13px being the "nominal" 100% size and going from
+// ~0.5x (7px) to ~2.0x (25px)
+static void ReloadFonts() {
+  auto& io = ImGui::GetIO();
+  io.Fonts->Clear();
+  gContext->fonts.clear();
+  float size = 7.0f + gContext->fontScale * 3.0f;
+  bool first = true;
+  for (auto&& makeFont : gContext->makeFonts) {
+    if (makeFont.second) {
+      ImFontConfig cfg;
+      std::snprintf(cfg.Name, sizeof(cfg.Name), "%s", makeFont.first);
+      ImFont* font = makeFont.second(io, size, &cfg);
+      if (first) {
+        ImGui::GetIO().FontDefault = font;
+        first = false;
+      }
+      gContext->fonts.emplace_back(font);
+    }
+  }
 }
 
 bool gui::Initialize(const char* title, int width, int height,
@@ -268,20 +317,9 @@ bool gui::Initialize(const char* title, int width, int height,
   SetStyle(static_cast<Style>(gContext->style));
 
   // Load Fonts
-  // this range is based on 13px being the "nominal" 100% size and going from
-  // ~0.5x (7px) to ~2.0x (25px)
-  for (auto&& makeFont : gContext->makeFonts) {
-    if (makeFont.second) {
-      auto& font = gContext->fonts.emplace_back();
-      for (int i = 0; i < Font::kScaledLevels; ++i) {
-        float size = 7.0f + i * 3.0f;
-        ImFontConfig cfg;
-        std::snprintf(cfg.Name, sizeof(cfg.Name), "%s-%d", makeFont.first,
-                      static_cast<int>(size));
-        font.scaled[i] = makeFont.second(io, size, &cfg);
-      }
-    }
-  }
+  UpdateFontScale();
+  ReloadFonts();
+  gContext->reloadFonts = false;  // init renderer will do this
 
   if (!PlatformInitRenderer()) {
     return false;
@@ -296,6 +334,11 @@ void gui::Main() {
     // Poll and handle events (inputs, window resize, etc.)
     glfwPollEvents();
     gContext->isPlatformRendering = true;
+    UpdateFontScale();
+    if (gContext->reloadFonts) {
+      ReloadFonts();
+      // PlatformRenderFrame() will clear reloadFonts flag
+    }
     PlatformRenderFrame();
     gContext->isPlatformRendering = false;
 
@@ -335,18 +378,6 @@ void gui::CommonRenderFrame() {
 
   // Start the Dear ImGui frame
   ImGui::NewFrame();
-
-  // Scale based on OS window content scaling
-  float windowScale = 1.0;
-#ifndef __APPLE__
-  glfwGetWindowContentScale(gContext->window, &windowScale, nullptr);
-#endif
-  // map to closest font size: 0 = 0.5x, 1 = 0.75x, 2 = 1.0x, 3 = 1.25x,
-  // 4 = 1.5x, 5 = 1.75x, 6 = 2x
-  gContext->fontScale = std::clamp(
-      gContext->userScale + static_cast<int>((windowScale - 1.0) * 4), 0,
-      Font::kScaledLevels - 1);
-  ImGui::GetIO().FontDefault = gContext->fonts[0].scaled[gContext->fontScale];
 
   for (size_t i = 0; i < gContext->earlyExecutors.size(); ++i) {
     auto& execute = gContext->earlyExecutors[i];
@@ -431,10 +462,6 @@ int gui::AddFont(
   return gContext->makeFonts.size() - 1;
 }
 
-ImFont* gui::GetFont(int font) {
-  return gContext->fonts[font].scaled[gContext->fontScale];
-}
-
 void gui::SetStyle(Style style) {
   gContext->style = static_cast<int>(style);
   switch (style) {
@@ -501,14 +528,11 @@ void gui::EmitViewMenu() {
     }
 
     if (ImGui::BeginMenu("Zoom")) {
-      for (int i = 0; i < Font::kScaledLevels && (25 * (i + 2)) <= 200; ++i) {
+      for (int i = 0; i < kFontScaledLevels && (25 * (i + 2)) <= 200; ++i) {
         char label[20];
         std::snprintf(label, sizeof(label), "%d%%", 25 * (i + 2));
         bool selected = gContext->userScale == i;
-        bool enabled = (gContext->fontScale - gContext->userScale + i) >= 0 &&
-                       (gContext->fontScale - gContext->userScale + i) <
-                           Font::kScaledLevels;
-        if (ImGui::MenuItem(label, nullptr, &selected, enabled)) {
+        if (ImGui::MenuItem(label, nullptr, &selected)) {
           gContext->userScale = i;
         }
       }

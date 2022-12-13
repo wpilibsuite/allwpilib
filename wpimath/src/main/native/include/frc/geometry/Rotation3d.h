@@ -11,6 +11,10 @@
 #include "frc/EigenCore.h"
 #include "units/angle.h"
 
+namespace wpi {
+class json;
+}  // namespace wpi
+
 namespace frc {
 
 /**
@@ -35,6 +39,10 @@ class WPILIB_DLLEXPORT Rotation3d {
    *
    * Extrinsic rotations occur in that order around the axes in the fixed global
    * frame rather than the body frame.
+   *
+   * Angles are measured counterclockwise with the rotation axis pointing "out
+   * of the page". If you point your right thumb along the positive axis
+   * direction, your fingers curl in the direction of positive rotation.
    *
    * @param roll The counterclockwise rotation angle around the X axis (roll).
    * @param pitch The counterclockwise rotation angle around the Y axis (pitch).
@@ -117,19 +125,8 @@ class WPILIB_DLLEXPORT Rotation3d {
 
   /**
    * Checks equality between this Rotation3d and another object.
-   *
-   * @param other The other object.
-   * @return Whether the two objects are equal.
    */
-  bool operator==(const Rotation3d& other) const;
-
-  /**
-   * Checks inequality between this Rotation3d and another object.
-   *
-   * @param other The other object.
-   * @return Whether the two objects are not equal.
-   */
-  bool operator!=(const Rotation3d& other) const;
+  bool operator==(const Rotation3d&) const = default;
 
   /**
    * Adds the new rotation to the current rotation.
@@ -179,5 +176,11 @@ class WPILIB_DLLEXPORT Rotation3d {
  private:
   Quaternion m_q;
 };
+
+WPILIB_DLLEXPORT
+void to_json(wpi::json& json, const Rotation3d& rotation);
+
+WPILIB_DLLEXPORT
+void from_json(const wpi::json& json, Rotation3d& rotation);
 
 }  // namespace frc

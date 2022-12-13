@@ -30,6 +30,7 @@ import edu.wpi.first.networktables.IntegerSubscriber;
 import edu.wpi.first.networktables.IntegerTopic;
 import edu.wpi.first.networktables.NTSendableBuilder;
 import edu.wpi.first.networktables.NetworkTable;
+import edu.wpi.first.networktables.PubSubOption;
 import edu.wpi.first.networktables.Publisher;
 import edu.wpi.first.networktables.RawPublisher;
 import edu.wpi.first.networktables.RawSubscriber;
@@ -82,7 +83,8 @@ public class SendableBuilderImpl implements NTSendableBuilder {
     void update(boolean controllable, long time) {
       if (controllable && m_sub != null && m_updateLocal != null) {
         m_updateLocal.accept(m_sub);
-      } else if (m_pub != null && m_updateNetwork != null) {
+      }
+      if (m_pub != null && m_updateNetwork != null) {
         m_updateNetwork.accept(m_pub, time);
       }
     }
@@ -315,7 +317,7 @@ public class SendableBuilderImpl implements NTSendableBuilder {
       property.m_updateNetwork = (pub, time) -> pub.set(getter.getAsBoolean(), time);
     }
     if (setter != null) {
-      property.m_sub = topic.subscribe(false);
+      property.m_sub = topic.subscribe(false, PubSubOption.excludePublisher(property.m_pub));
       property.m_updateLocal =
           sub -> {
             for (boolean val : sub.readQueueValues()) {
@@ -342,7 +344,7 @@ public class SendableBuilderImpl implements NTSendableBuilder {
       property.m_updateNetwork = (pub, time) -> pub.set(getter.getAsLong(), time);
     }
     if (setter != null) {
-      property.m_sub = topic.subscribe(0);
+      property.m_sub = topic.subscribe(0, PubSubOption.excludePublisher(property.m_pub));
       property.m_updateLocal =
           sub -> {
             for (long val : sub.readQueueValues()) {
@@ -369,7 +371,7 @@ public class SendableBuilderImpl implements NTSendableBuilder {
       property.m_updateNetwork = (pub, time) -> pub.set(getter.getAsFloat(), time);
     }
     if (setter != null) {
-      property.m_sub = topic.subscribe(0.0f);
+      property.m_sub = topic.subscribe(0.0f, PubSubOption.excludePublisher(property.m_pub));
       property.m_updateLocal =
           sub -> {
             for (float val : sub.readQueueValues()) {
@@ -396,7 +398,7 @@ public class SendableBuilderImpl implements NTSendableBuilder {
       property.m_updateNetwork = (pub, time) -> pub.set(getter.getAsDouble(), time);
     }
     if (setter != null) {
-      property.m_sub = topic.subscribe(0.0);
+      property.m_sub = topic.subscribe(0.0, PubSubOption.excludePublisher(property.m_pub));
       property.m_updateLocal =
           sub -> {
             for (double val : sub.readQueueValues()) {
@@ -423,7 +425,7 @@ public class SendableBuilderImpl implements NTSendableBuilder {
       property.m_updateNetwork = (pub, time) -> pub.set(getter.get(), time);
     }
     if (setter != null) {
-      property.m_sub = topic.subscribe("");
+      property.m_sub = topic.subscribe("", PubSubOption.excludePublisher(property.m_pub));
       property.m_updateLocal =
           sub -> {
             for (String val : sub.readQueueValues()) {
@@ -451,7 +453,8 @@ public class SendableBuilderImpl implements NTSendableBuilder {
       property.m_updateNetwork = (pub, time) -> pub.set(getter.get(), time);
     }
     if (setter != null) {
-      property.m_sub = topic.subscribe(new boolean[] {});
+      property.m_sub =
+          topic.subscribe(new boolean[] {}, PubSubOption.excludePublisher(property.m_pub));
       property.m_updateLocal =
           sub -> {
             for (boolean[] val : sub.readQueueValues()) {
@@ -479,7 +482,8 @@ public class SendableBuilderImpl implements NTSendableBuilder {
       property.m_updateNetwork = (pub, time) -> pub.set(getter.get(), time);
     }
     if (setter != null) {
-      property.m_sub = topic.subscribe(new long[] {});
+      property.m_sub =
+          topic.subscribe(new long[] {}, PubSubOption.excludePublisher(property.m_pub));
       property.m_updateLocal =
           sub -> {
             for (long[] val : sub.readQueueValues()) {
@@ -507,7 +511,8 @@ public class SendableBuilderImpl implements NTSendableBuilder {
       property.m_updateNetwork = (pub, time) -> pub.set(getter.get(), time);
     }
     if (setter != null) {
-      property.m_sub = topic.subscribe(new float[] {});
+      property.m_sub =
+          topic.subscribe(new float[] {}, PubSubOption.excludePublisher(property.m_pub));
       property.m_updateLocal =
           sub -> {
             for (float[] val : sub.readQueueValues()) {
@@ -535,7 +540,8 @@ public class SendableBuilderImpl implements NTSendableBuilder {
       property.m_updateNetwork = (pub, time) -> pub.set(getter.get(), time);
     }
     if (setter != null) {
-      property.m_sub = topic.subscribe(new double[] {});
+      property.m_sub =
+          topic.subscribe(new double[] {}, PubSubOption.excludePublisher(property.m_pub));
       property.m_updateLocal =
           sub -> {
             for (double[] val : sub.readQueueValues()) {
@@ -563,7 +569,8 @@ public class SendableBuilderImpl implements NTSendableBuilder {
       property.m_updateNetwork = (pub, time) -> pub.set(getter.get(), time);
     }
     if (setter != null) {
-      property.m_sub = topic.subscribe(new String[] {});
+      property.m_sub =
+          topic.subscribe(new String[] {}, PubSubOption.excludePublisher(property.m_pub));
       property.m_updateLocal =
           sub -> {
             for (String[] val : sub.readQueueValues()) {
@@ -592,7 +599,8 @@ public class SendableBuilderImpl implements NTSendableBuilder {
       property.m_updateNetwork = (pub, time) -> pub.set(getter.get(), time);
     }
     if (setter != null) {
-      property.m_sub = topic.subscribe(typeString, new byte[] {});
+      property.m_sub =
+          topic.subscribe(typeString, new byte[] {}, PubSubOption.excludePublisher(property.m_pub));
       property.m_updateLocal =
           sub -> {
             for (byte[] val : sub.readQueueValues()) {

@@ -763,6 +763,8 @@ class Color {
   constexpr Color(int r, int g, int b)
       : Color(r / 255.0, g / 255.0, b / 255.0) {}
 
+  constexpr bool operator==(const Color&) const = default;
+
   /**
    * Creates a Color from HSV values.
    *
@@ -782,10 +784,10 @@ class Color {
     int chroma = (s * v) >> 8;
 
     // Beacuse hue is 0-180 rather than 0-360 use 30 not 60
-    int region = h / 30;
+    int region = (h / 30) % 6;
 
-    // Remainder converted from 0-30 to roughly 0-255
-    int remainder = (h - (region * 30)) * 9;
+    // Remainder converted from 0-30 to 0-255
+    int remainder = static_cast<int>((h % 30) * (255 / 30.0));
 
     // Value of the lowest rgb component
     int m = v - chroma;
@@ -829,14 +831,6 @@ class Color {
     return std::clamp(rounded, 0.0, 1.0);
   }
 };
-
-inline bool operator==(const Color& c1, const Color& c2) {
-  return c1.red == c2.red && c1.green == c2.green && c1.blue == c2.blue;
-}
-
-inline bool operator!=(const Color& c1, const Color& c2) {
-  return !(c1 == c2);
-}
 
 /*
  * FIRST Colors

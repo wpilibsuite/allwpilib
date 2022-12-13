@@ -4,6 +4,8 @@
 
 package edu.wpi.first.wpilibj.shuffleboard;
 
+import static edu.wpi.first.util.ErrorMessages.requireNonNullParam;
+
 import edu.wpi.first.cscore.VideoSource;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
@@ -112,8 +114,8 @@ public final class SendableCameraWrapper implements Sendable, AutoCloseable {
       return m_wrappers.get(cameraName);
     }
 
-    Objects.requireNonNull(cameraName, "cameraName");
-    Objects.requireNonNull(cameraUrls, "cameraUrls");
+    requireNonNullParam(cameraName, "cameraName", "wrap");
+    requireNonNullParam(cameraUrls, "cameraUrls", "wrap");
     if (cameraName.isEmpty()) {
       throw new IllegalArgumentException("Camera name not specified");
     }

@@ -13,6 +13,7 @@ import static org.junit.jupiter.api.Assertions.fail;
 
 import edu.wpi.first.util.WPIUtilJNI;
 import java.util.ArrayList;
+import java.util.EnumSet;
 import java.util.List;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -27,10 +28,7 @@ class ConnectionListenerTest {
   @BeforeEach
   void setUp() {
     m_serverInst = NetworkTableInstance.create();
-    m_serverInst.setNetworkIdentity("server");
-
     m_clientInst = NetworkTableInstance.create();
-    m_clientInst.setNetworkIdentity("client");
   }
 
   @AfterEach
@@ -42,7 +40,7 @@ class ConnectionListenerTest {
   /** Connect to the server. */
   private void connect(int port) {
     m_serverInst.startServer("connectionlistenertest.json", "127.0.0.1", 0, port);
-    m_clientInst.startClient4();
+    m_clientInst.startClient4("client");
     m_clientInst.setServer("127.0.0.1", port);
 
     // wait for client to report it's connected, then wait another 0.1 sec
@@ -64,9 +62,11 @@ class ConnectionListenerTest {
   @Test
   void testJNI() {
     // set up the poller
-    int poller = NetworkTablesJNI.createConnectionListenerPoller(m_serverInst.getHandle());
+    int poller = NetworkTablesJNI.createListenerPoller(m_serverInst.getHandle());
     assertNotSame(poller, 0, "bad poller handle");
-    int handle = NetworkTablesJNI.addPolledConnectionListener(poller, false);
+    int handle =
+        NetworkTablesJNI.addListener(
+            poller, m_serverInst.getHandle(), EnumSet.of(NetworkTableEvent.Kind.kConnection));
     assertNotSame(handle, 0, "bad listener handle");
 
     // trigger a connect event
@@ -78,13 +78,13 @@ class ConnectionListenerTest {
     } catch (InterruptedException ex) {
       fail("interrupted while waiting for queue");
     }
-    ConnectionNotification[] events =
-        NetworkTablesJNI.readConnectionListenerQueue(m_serverInst, poller);
+    NetworkTableEvent[] events = NetworkTablesJNI.readListenerQueue(m_serverInst, poller);
 
     assertNotNull(events);
     assertEquals(1, events.length);
     assertEquals(handle, events[0].listener);
-    assertTrue(events[0].connected);
+    assertNotNull(events[0].connInfo);
+    assertTrue(events[0].is(NetworkTableEvent.Kind.kConnected));
 
     // trigger a disconnect event
     m_clientInst.stopClient();
@@ -100,12 +100,12 @@ class ConnectionListenerTest {
     } catch (InterruptedException ex) {
       fail("interrupted while waiting for queue");
     }
-    events = NetworkTablesJNI.readConnectionListenerQueue(m_serverInst, poller);
+    events = NetworkTablesJNI.readListenerQueue(m_serverInst, poller);
 
     assertNotNull(events);
     assertEquals(1, events.length);
     assertEquals(handle, events[0].listener);
-    assertFalse(events[0].connected);
+    assertTrue(events[0].is(NetworkTableEvent.Kind.kDisconnected));
   }
 
   private static int threadedPort = 10001;
@@ -114,18 +114,18 @@ class ConnectionListenerTest {
   @ValueSource(strings = {"127.0.0.1", "127.0.0.1 ", " 127.0.0.1 "})
   void testThreaded(String address) {
     m_serverInst.startServer("connectionlistenertest.json", address, 0, threadedPort);
-    List<ConnectionNotification> events = new ArrayList<>();
+    List<NetworkTableEvent> events = new ArrayList<>();
     final int handle =
         m_serverInst.addConnectionListener(
+            false,
             e -> {
               synchronized (events) {
                 events.add(e);
               }
-            },
-            false);
+            });
 
     // trigger a connect event
-    m_clientInst.startClient4();
+    m_clientInst.startClient4("client");
     m_clientInst.setServer(address, threadedPort);
     threadedPort++;
 
@@ -149,11 +149,15 @@ class ConnectionListenerTest {
       fail("interrupted while waiting for queue");
     }
 
+    // wait for thread
+    m_serverInst.waitForListenerQueue(1.0);
+
     // get the event
     synchronized (events) {
       assertEquals(1, events.size());
       assertEquals(handle, events.get(0).listener);
-      assertTrue(events.get(0).connected);
+      assertNotNull(events.get(0).connInfo);
+      assertTrue(events.get(0).is(NetworkTableEvent.Kind.kConnected));
       events.clear();
     }
 
@@ -165,6 +169,9 @@ class ConnectionListenerTest {
       fail("interrupted while waiting for client to stop");
     }
 
+    // wait for thread
+    m_serverInst.waitForListenerQueue(1.0);
+
     // get the event
     try {
       assertFalse(WPIUtilJNI.waitForObjectTimeout(handle, 1.0));
@@ -174,7 +181,8 @@ class ConnectionListenerTest {
     synchronized (events) {
       assertEquals(1, events.size());
       assertEquals(handle, events.get(0).listener);
-      assertFalse(events.get(0).connected);
+      assertNotNull(events.get(0).connInfo);
+      assertTrue(events.get(0).is(NetworkTableEvent.Kind.kDisconnected));
     }
   }
 }

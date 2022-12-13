@@ -7,6 +7,7 @@ package edu.wpi.first.networktables;
 import edu.wpi.first.util.RuntimeLoader;
 import edu.wpi.first.util.datalog.DataLog;
 import java.io.IOException;
+import java.util.EnumSet;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public final class NetworkTablesJNI {
@@ -56,20 +57,11 @@ public final class NetworkTablesJNI {
     libraryLoaded = true;
   }
 
-  private static int[] pubSubOptionTypes(PubSubOption... options) {
-    int[] rv = new int[options.length];
-    for (int i = 0; i < options.length; i++) {
-      rv[i] = options[i].m_type;
+  private static PubSubOptions buildOptions(PubSubOption... options) {
+    if (options.length == 0) {
+      return null;  // optimize common case (JNI checks for null)
     }
-    return rv;
-  }
-
-  private static double[] pubSubOptionValues(PubSubOption... options) {
-    double[] rv = new double[options.length];
-    for (int i = 0; i < options.length; i++) {
-      rv[i] = options[i].m_value;
-    }
-    return rv;
+    return new PubSubOptions(options);
   }
 
   public static native int getDefaultInstance();
@@ -80,13 +72,19 @@ public final class NetworkTablesJNI {
 
   public static native int getInstanceFromHandle(int handle);
 
+  private static native int getEntryImpl(
+      int topic, int type, String typeStr, PubSubOptions options);
+
   public static native int getEntry(int inst, String key);
 
-  private static native int getEntry(
-      int topic, int type, String typeStr, int[] optionTypes, double[] optionValues);
+  public static int getEntry(
+      int topic, int type, String typeStr, PubSubOptions options) {
+    return getEntryImpl(topic, type, typeStr, options);
+  }
 
-  public static int getEntry(int topic, int type, String typeStr, PubSubOption... options) {
-    return getEntry(topic, type, typeStr, pubSubOptionTypes(options), pubSubOptionValues(options));
+  public static int getEntry(
+      int topic, int type, String typeStr, PubSubOption... options) {
+    return getEntryImpl(topic, type, typeStr, buildOptions(options));
   }
 
   public static native String getEntryName(int entry);
@@ -135,27 +133,30 @@ public final class NetworkTablesJNI {
 
   public static native void setTopicProperties(int topic, String properties);
 
-  private static native int subscribe(
-      int topic, int type, String typeStr, int[] optionTypes, double[] optionValues);
+  public static native int subscribe(
+      int topic, int type, String typeStr, PubSubOptions options);
 
-  public static int subscribe(int topic, int type, String typeStr, PubSubOption... options) {
-    return subscribe(topic, type, typeStr, pubSubOptionTypes(options), pubSubOptionValues(options));
+  public static int subscribe(
+      int topic, int type, String typeStr, PubSubOption... options) {
+    return subscribe(topic, type, typeStr, buildOptions(options));
   }
 
   public static native void unsubscribe(int sub);
 
-  private static native int publish(
-      int topic, int type, String typeStr, int[] optionTypes, double[] optionValues);
+  public static native int publish(
+      int topic, int type, String typeStr, PubSubOptions options);
 
-  public static int publish(int topic, int type, String typeStr, PubSubOption... options) {
-    return publish(topic, type, typeStr, pubSubOptionTypes(options), pubSubOptionValues(options));
+  public static int publish(
+      int topic, int type, String typeStr, PubSubOption... options) {
+    return publish(topic, type, typeStr, buildOptions(options));
   }
 
-  private static native int publishEx(
-      int topic, int type, String typeStr, String properties, int[] optionTypes, double[] optionValues);
+  public static native int publishEx(
+      int topic, int type, String typeStr, String properties, PubSubOptions options);
 
-  public static int publishEx(int topic, int type, String typeStr, String properties, PubSubOption... options) {
-    return publishEx(topic, type, typeStr, properties, pubSubOptionTypes(options), pubSubOptionValues(options));
+  public static int publishEx(
+      int topic, int type, String typeStr, String properties, PubSubOption... options) {
+    return publishEx(topic, type, typeStr, properties, buildOptions(options));
   }
 
   public static native void unpublish(int pubentry);
@@ -166,12 +167,10 @@ public final class NetworkTablesJNI {
 
   public static native int getTopicFromHandle(int pubsubentry);
 
-  private static native int subscribeMultiple(
-      int inst, String[] prefixes, int[] optionTypes, double[] optionValues);
+  public static native int subscribeMultiple(int inst, String[] prefixes, PubSubOptions options);
 
   public static int subscribeMultiple(int inst, String[] prefixes, PubSubOption... options) {
-    return subscribeMultiple(
-        inst, prefixes, pubSubOptionTypes(options), pubSubOptionValues(options));
+    return subscribeMultiple(inst, prefixes, buildOptions(options));
   }
 
   public static native void unsubscribeMultiple(int sub);
@@ -199,42 +198,34 @@ public final class NetworkTablesJNI {
 
   public static native TopicInfo getTopicInfo(NetworkTableInstance inst, int topic);
 
-  public static native int createTopicListenerPoller(int inst);
+  public static native int createListenerPoller(int inst);
 
-  public static native void destroyTopicListenerPoller(int poller);
+  public static native void destroyListenerPoller(int poller);
 
-  public static native int addPolledTopicListener(int poller, String[] prefixes, int flags);
+  private static int kindsToMask(EnumSet<NetworkTableEvent.Kind> kinds) {
+    int mask = 0;
+    for (NetworkTableEvent.Kind kind : kinds) {
+      mask |= kind.getValue();
+    }
+    return mask;
+  }
 
-  public static native int addPolledTopicListener(int poller, int handle, int flags);
+  public static int addListener(int poller, String[] prefixes, EnumSet<NetworkTableEvent.Kind> kinds) {
+    return addListener(poller, prefixes, kindsToMask(kinds));
+  }
 
-  public static native TopicNotification[] readTopicListenerQueue(
+  public static int addListener(int poller, int handle, EnumSet<NetworkTableEvent.Kind> kinds) {
+    return addListener(poller, handle, kindsToMask(kinds));
+  }
+
+  public static native int addListener(int poller, String[] prefixes, int mask);
+
+  public static native int addListener(int poller, int handle, int mask);
+
+  public static native NetworkTableEvent[] readListenerQueue(
       NetworkTableInstance inst, int poller);
 
-  public static native void removeTopicListener(int topicListener);
-
-  public static native int createValueListenerPoller(int inst);
-
-  public static native void destroyValueListenerPoller(int poller);
-
-  public static native int addPolledValueListener(int poller, int subentry, int flags);
-
-  public static native ValueNotification[] readValueListenerQueue(
-      NetworkTableInstance inst, int poller);
-
-  public static native void removeValueListener(int valueListener);
-
-  public static native int createConnectionListenerPoller(int inst);
-
-  public static native void destroyConnectionListenerPoller(int poller);
-
-  public static native int addPolledConnectionListener(int poller, boolean immediateNotify);
-
-  public static native ConnectionNotification[] readConnectionListenerQueue(
-      NetworkTableInstance inst, int poller);
-
-  public static native void removeConnectionListener(int connListener);
-
-  public static native void setNetworkIdentity(int inst, String name);
+  public static native void removeListener(int listener);
 
   public static native int getNetworkMode(int inst);
 
@@ -247,9 +238,9 @@ public final class NetworkTablesJNI {
 
   public static native void stopServer(int inst);
 
-  public static native void startClient3(int inst);
+  public static native void startClient3(int inst, String identity);
 
-  public static native void startClient4(int inst);
+  public static native void startClient4(int inst, String identity);
 
   public static native void stopClient(int inst);
 
@@ -289,13 +280,5 @@ public final class NetworkTablesJNI {
 
   public static native void stopConnectionDataLog(int logger);
 
-  public static native int createLoggerPoller(int inst);
-
-  public static native void destroyLoggerPoller(int poller);
-
-  public static native int addPolledLogger(int poller, int minLevel, int maxLevel);
-
-  public static native LogMessage[] readLoggerQueue(NetworkTableInstance inst, int poller);
-
-  public static native void removeLogger(int logger);
+  public static native int addLogger(int poller, int minLevel, int maxLevel);
 }

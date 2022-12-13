@@ -13,11 +13,12 @@ wpi::mutex InstanceImpl::s_mutex;
 using namespace std::placeholders;
 
 InstanceImpl::InstanceImpl(int inst)
-    : logger_impl(inst),
-      logger(
-          std::bind(&LoggerImpl::Log, &logger_impl, _1, _2, _3, _4)),  // NOLINT
-      connectionList(inst),
-      localStorage(inst, logger),
+    : listenerStorage{inst},
+      logger_impl{listenerStorage},
+      logger{
+          std::bind(&LoggerImpl::Log, &logger_impl, _1, _2, _3, _4)},  // NOLINT
+      connectionList{inst, listenerStorage},
+      localStorage{inst, listenerStorage, logger},
       m_inst{inst} {
   logger.set_min_level(logger_impl.GetMinLevel());
 }
@@ -120,23 +121,29 @@ void InstanceImpl::StopServer() {
   networkMode = NT_NET_MODE_NONE;
 }
 
-void InstanceImpl::StartClient3() {
+void InstanceImpl::StartClient3(std::string_view identity) {
   std::scoped_lock lock{m_mutex};
   if (networkMode != NT_NET_MODE_NONE) {
     return;
   }
   m_networkClient = std::make_shared<NetworkClient3>(
-      m_inst, m_identity, localStorage, connectionList, logger);
+      m_inst, identity, localStorage, connectionList, logger);
+  if (!m_servers.empty()) {
+    m_networkClient->SetServers(m_servers);
+  }
   networkMode = NT_NET_MODE_CLIENT3;
 }
 
-void InstanceImpl::StartClient4() {
+void InstanceImpl::StartClient4(std::string_view identity) {
   std::scoped_lock lock{m_mutex};
   if (networkMode != NT_NET_MODE_NONE) {
     return;
   }
   m_networkClient = std::make_shared<NetworkClient>(
-      m_inst, m_identity, localStorage, connectionList, logger);
+      m_inst, identity, localStorage, connectionList, logger);
+  if (!m_servers.empty()) {
+    m_networkClient->SetServers(m_servers);
+  }
   networkMode = NT_NET_MODE_CLIENT4;
 }
 
@@ -149,9 +156,13 @@ void InstanceImpl::StopClient() {
   networkMode = NT_NET_MODE_NONE;
 }
 
-void InstanceImpl::SetIdentity(std::string_view identity) {
+void InstanceImpl::SetServers(
+    std::span<const std::pair<std::string, unsigned int>> servers) {
   std::scoped_lock lock{m_mutex};
-  m_identity = identity;
+  m_servers = {servers.begin(), servers.end()};
+  if (m_networkClient) {
+    m_networkClient->SetServers(servers);
+  }
 }
 
 std::shared_ptr<NetworkServer> InstanceImpl::GetServer() {
@@ -162,4 +173,16 @@ std::shared_ptr<NetworkServer> InstanceImpl::GetServer() {
 std::shared_ptr<INetworkClient> InstanceImpl::GetClient() {
   std::scoped_lock lock{m_mutex};
   return m_networkClient;
+}
+
+void InstanceImpl::Reset() {
+  std::scoped_lock lock{m_mutex};
+  m_networkServer.reset();
+  m_networkClient.reset();
+  m_servers.clear();
+  networkMode = NT_NET_MODE_NONE;
+
+  listenerStorage.Reset();
+  // connectionList should have been cleared by destroying networkClient/server
+  localStorage.Reset();
 }

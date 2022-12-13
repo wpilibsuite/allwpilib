@@ -38,12 +38,11 @@ namespace {
 
 struct PublisherData {
   NT_Publisher handle;
-  PubSubOptions options;
+  PubSubOptionsImpl options;
   // in options as double, but copy here as integer; rounded to the nearest
   // 10 ms
   uint32_t periodMs;
   uint64_t nextSendMs{0};
-  Value lastValue;               // only used for duplicate value checking
   std::vector<Value> outValues;  // outgoing values
 };
 
@@ -54,7 +53,6 @@ class CImpl : public ServerMessageHandler {
 
   void ProcessIncomingBinary(std::span<const uint8_t> data);
   void HandleLocal(std::vector<ClientMessage>&& msgs);
-  void SendOutgoing(std::span<const ClientMessage> msgs);
   bool SendControl(uint64_t curTimeMs);
   void SendValues(uint64_t curTimeMs);
   bool CheckNetworkReady();
@@ -69,7 +67,7 @@ class CImpl : public ServerMessageHandler {
 
   void Publish(NT_Publisher pubHandle, NT_Topic topicHandle,
                std::string_view name, std::string_view typeStr,
-               const wpi::json& properties, const PubSubOptions& options);
+               const wpi::json& properties, const PubSubOptionsImpl& options);
   bool Unpublish(NT_Publisher pubHandle, NT_Topic topicHandle);
   void SetValue(NT_Publisher pubHandle, const Value& value);
 
@@ -171,7 +169,7 @@ void CImpl::ProcessIncomingBinary(std::span<const uint8_t> data) {
 }
 
 void CImpl::HandleLocal(std::vector<ClientMessage>&& msgs) {
-  DEBUG4("{}", "HandleLocal()");
+  DEBUG4("HandleLocal()");
   for (auto&& elem : msgs) {
     // common case is value
     if (auto msg = std::get_if<ClientValueMsg>(&elem.contents)) {
@@ -284,7 +282,8 @@ bool CImpl::CheckNetworkReady() {
 
 void CImpl::Publish(NT_Publisher pubHandle, NT_Topic topicHandle,
                     std::string_view name, std::string_view typeStr,
-                    const wpi::json& properties, const PubSubOptions& options) {
+                    const wpi::json& properties,
+                    const PubSubOptionsImpl& options) {
   unsigned int index = Handle{pubHandle}.GetIndex();
   if (index >= m_publishers.size()) {
     m_publishers.resize(index + 1);
@@ -295,7 +294,7 @@ void CImpl::Publish(NT_Publisher pubHandle, NT_Topic topicHandle,
   }
   publisher->handle = pubHandle;
   publisher->options = options;
-  publisher->periodMs = std::lround(options.periodic * 100) * 10;
+  publisher->periodMs = std::lround(options.periodicMs / 10.0) * 10;
   if (publisher->periodMs < kMinPeriodMs) {
     publisher->periodMs = kMinPeriodMs;
   }
@@ -356,12 +355,6 @@ void CImpl::SetValue(NT_Publisher pubHandle, const Value& value) {
     return;
   }
   auto& publisher = *m_publishers[index];
-  if (!publisher.options.keepDuplicates) {
-    if (value == publisher.lastValue) {
-      return;
-    }
-    publisher.lastValue = value;
-  }
   if (publisher.outValues.empty() || publisher.options.sendAll) {
     publisher.outValues.emplace_back(value);
   } else {
@@ -453,7 +446,7 @@ ClientStartup::~ClientStartup() {
 void ClientStartup::Publish(NT_Publisher pubHandle, NT_Topic topicHandle,
                             std::string_view name, std::string_view typeStr,
                             const wpi::json& properties,
-                            const PubSubOptions& options) {
+                            const PubSubOptionsImpl& options) {
   WPI_DEBUG4(m_client.m_impl->m_logger, "StartupPublish({}, {}, {}, {})",
              pubHandle, topicHandle, name, typeStr);
   m_client.m_impl->Publish(pubHandle, topicHandle, name, typeStr, properties,
@@ -464,7 +457,7 @@ void ClientStartup::Publish(NT_Publisher pubHandle, NT_Topic topicHandle,
 
 void ClientStartup::Subscribe(NT_Subscriber subHandle,
                               std::span<const std::string> prefixes,
-                              const PubSubOptions& options) {
+                              const PubSubOptionsImpl& options) {
   WPI_DEBUG4(m_client.m_impl->m_logger, "StartupSubscribe({})", subHandle);
   WireEncodeSubscribe(m_textWriter.Add(), Handle{subHandle}.GetIndex(),
                       prefixes, options);
@@ -477,7 +470,6 @@ void ClientStartup::SetValue(NT_Publisher pubHandle, const Value& value) {
   assert(index < m_client.m_impl->m_publishers.size() &&
          m_client.m_impl->m_publishers[index]);
   auto& publisher = *m_client.m_impl->m_publishers[index];
-  publisher.lastValue = value;
   // only send time 0 values until we have a RTT
   if (value.server_time() == 0) {
     WireEncodeBinary(m_binaryWriter.Add(), index, 0, value);

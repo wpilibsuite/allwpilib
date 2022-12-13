@@ -7,10 +7,12 @@
 #include <memory>
 #include <string>
 
+#include <units/angle.h>
 #include <wpi/sendable/Sendable.h>
 #include <wpi/sendable/SendableHelper.h>
 
 #include "frc/drive/RobotDriveBase.h"
+#include "frc/geometry/Rotation2d.h"
 
 namespace frc {
 
@@ -35,9 +37,11 @@ class MotorController;
  * Each Drive() function provides different inverse kinematic relations for a
  * Mecanum drive robot.
  *
- * The positive Y axis points ahead, the positive X axis points to the right,
- * and the positive Z axis points down. Rotations follow the right-hand rule, so
- * clockwise rotation around the Z axis is positive.
+ * This library uses the NWU axes convention (North-West-Up as external
+ * reference in the world frame). The positive X axis points ahead, the positive
+ * Y axis points to the left, and the positive Z axis points up. Rotations
+ * follow the right-hand rule, so counterclockwise rotation around the Z axis is
+ * positive.
  *
  * Note: the axis conventions used in this class differ from DifferentialDrive.
  * This may change in a future year's WPILib release.
@@ -82,54 +86,54 @@ class MecanumDrive : public RobotDriveBase,
   /**
    * Drive method for Mecanum platform.
    *
-   * Angles are measured clockwise from the positive X axis. The robot's speed
-   * is independent from its angle or rotation rate.
+   * Angles are measured counterclockwise from the positive X axis. The robot's
+   * speed is independent from its angle or rotation rate.
    *
-   * @param ySpeed    The robot's speed along the Y axis [-1.0..1.0]. Forward is
+   * @param xSpeed    The robot's speed along the X axis [-1.0..1.0]. Forward is
    *                  positive.
-   * @param xSpeed    The robot's speed along the X axis [-1.0..1.0]. Right is
+   * @param ySpeed    The robot's speed along the Y axis [-1.0..1.0]. Left is
    *                  positive.
    * @param zRotation The robot's rotation rate around the Z axis [-1.0..1.0].
-   *                  Clockwise is positive.
-   * @param gyroAngle The current angle reading from the gyro in degrees around
-   *                  the Z axis. Use this to implement field-oriented controls.
+   *                  Counterclockwise is positive.
+   * @param gyroAngle The gyro heading around the Z axis. Use this to implement
+   *                  field-oriented controls.
    */
-  void DriveCartesian(double ySpeed, double xSpeed, double zRotation,
-                      double gyroAngle = 0.0);
+  void DriveCartesian(double xSpeed, double ySpeed, double zRotation,
+                      Rotation2d gyroAngle = 0_rad);
 
   /**
    * Drive method for Mecanum platform.
    *
-   * Angles are measured clockwise from the positive X axis. The robot's speed
-   * is independent from its angle or rotation rate.
+   * Angles are measured counterclockwise from the positive X axis. The robot's
+   * speed is independent from its angle or rotation rate.
    *
    * @param magnitude The robot's speed at a given angle [-1.0..1.0]. Forward is
    *                  positive.
-   * @param angle     The angle around the Z axis at which the robot drives in
-   *                  degrees [-180..180].
+   * @param angle     The angle around the Z axis at which the robot drives.
    * @param zRotation The robot's rotation rate around the Z axis [-1.0..1.0].
-   *                  Clockwise is positive.
+   *                  Counterclockwise is positive.
    */
-  void DrivePolar(double magnitude, double angle, double zRotation);
+  void DrivePolar(double magnitude, Rotation2d angle, double zRotation);
 
   /**
    * Cartesian inverse kinematics for Mecanum platform.
    *
-   * Angles are measured clockwise from the positive X axis. The robot's speed
-   * is independent from its angle or rotation rate.
+   * Angles are measured counterclockwise from the positive X axis. The robot's
+   * speed is independent from its angle or rotation rate.
    *
-   * @param ySpeed    The robot's speed along the Y axis [-1.0..1.0]. Forward is
+   * @param xSpeed    The robot's speed along the X axis [-1.0..1.0]. Forward is
    *                  positive.
-   * @param xSpeed    The robot's speed along the X axis [-1.0..1.0]. Right is
+   * @param ySpeed    The robot's speed along the Y axis [-1.0..1.0]. Left is
    *                  positive.
    * @param zRotation The robot's rotation rate around the Z axis [-1.0..1.0].
-   *                  Clockwise is positive.
-   * @param gyroAngle The current angle reading from the gyro in degrees around
-   *                  the Z axis. Use this to implement field-oriented controls.
+   *                  Counterclockwise is positive.
+   * @param gyroAngle The gyro heading around the Z axis. Use this to implement
+   *                  field-oriented controls.
    * @return Wheel speeds [-1.0..1.0].
    */
-  static WheelSpeeds DriveCartesianIK(double ySpeed, double xSpeed,
-                                      double zRotation, double gyroAngle = 0.0);
+  static WheelSpeeds DriveCartesianIK(double xSpeed, double ySpeed,
+                                      double zRotation,
+                                      Rotation2d gyroAngle = 0_rad);
 
   void StopMotor() override;
   std::string GetDescription() const override;

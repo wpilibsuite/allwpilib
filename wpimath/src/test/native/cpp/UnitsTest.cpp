@@ -1420,6 +1420,7 @@ TEST_F(UnitContainer, cout) {
 }
 #endif
 
+#if !defined(UNIT_LIB_DISABLE_FMT)
 TEST_F(UnitContainer, fmtlib) {
   testing::internal::CaptureStdout();
   fmt::print("{}", degree_t(349.87));
@@ -1500,6 +1501,7 @@ TEST_F(UnitContainer, fmtlib) {
   EXPECT_STREQ("5.670367e-08 kg s^-3 K^-4", output.c_str());
 #endif
 }
+#endif
 
 TEST_F(UnitContainer, to_string) {
   foot_t a(3.5);

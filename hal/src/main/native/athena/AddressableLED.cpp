@@ -6,11 +6,11 @@
 
 #include <cstring>
 
-#include <FRC_FPGA_ChipObject/fpgainterfacecapi/NiFpga_HMB.h>
 #include <fmt/format.h>
 
 #include "ConstantsInternal.h"
 #include "DigitalInternal.h"
+#include "FPGACalls.h"
 #include "HALInitializer.h"
 #include "HALInternal.h"
 #include "PortsInternal.h"
@@ -20,51 +20,6 @@
 #include "hal/handles/LimitedHandleResource.h"
 
 using namespace hal;
-
-extern "C" {
-NiFpga_Status NiFpga_ClientFunctionCall(NiFpga_Session session, uint32_t group,
-                                        uint32_t functionId,
-                                        const void* inBuffer,
-                                        size_t inBufferSize, void* outBuffer,
-                                        size_t outBufferSize);
-}  // extern "C"
-
-// Shim for broken ChipObject function
-static const uint32_t clientFeature_hostMemoryBuffer = 0;
-static const uint32_t hostMemoryBufferFunction_open = 2;
-
-// Input arguments for HMB open
-struct AtomicHMBOpenInputs {
-  const char* memoryName;
-};
-
-// Output arguments for HMB open
-struct AtomicHMBOpenOutputs {
-  size_t size;
-  void* virtualAddress;
-};
-
-static NiFpga_Status OpenHostMemoryBuffer(NiFpga_Session session,
-                                          const char* memoryName,
-                                          void** virtualAddress, size_t* size) {
-  struct AtomicHMBOpenOutputs outputs;
-
-  struct AtomicHMBOpenInputs inputs;
-  inputs.memoryName = memoryName;
-
-  NiFpga_Status retval = NiFpga_ClientFunctionCall(
-      session, clientFeature_hostMemoryBuffer, hostMemoryBufferFunction_open,
-      &inputs, sizeof(struct AtomicHMBOpenInputs), &outputs,
-      sizeof(struct AtomicHMBOpenOutputs));
-  if (NiFpga_IsError(retval)) {
-    return retval;
-  }
-  *virtualAddress = outputs.virtualAddress;
-  if (size) {
-    *size = outputs.size;
-  }
-  return retval;
-}
 
 namespace {
 struct AddressableLED {
@@ -88,6 +43,8 @@ void InitializeAddressableLED() {
   addressableLEDHandles = &alH;
 }
 }  // namespace hal::init
+
+static constexpr const char* HmbName = "HMB_0_LED";
 
 extern "C" {
 
@@ -146,8 +103,8 @@ HAL_AddressableLEDHandle HAL_InitializeAddressableLED(
 
   uint32_t session = led->led->getSystemInterface()->getHandle();
 
-  *status = OpenHostMemoryBuffer(session, "HMB_0_LED", &led->ledBuffer,
-                                 &led->ledBufferSize);
+  *status = hal::HAL_NiFpga_OpenHmb(session, HmbName, &led->ledBufferSize,
+                                    &led->ledBuffer);
 
   if (*status != 0) {
     addressableLEDHandles->Free(handle);
@@ -158,6 +115,12 @@ HAL_AddressableLEDHandle HAL_InitializeAddressableLED(
 }
 
 void HAL_FreeAddressableLED(HAL_AddressableLEDHandle handle) {
+  auto led = addressableLEDHandles->Get(handle);
+  if (!led) {
+    return;
+  }
+  uint32_t session = led->led->getSystemInterface()->getHandle();
+  hal::HAL_NiFpga_CloseHmb(session, HmbName);
   addressableLEDHandles->Free(handle);
 }
 

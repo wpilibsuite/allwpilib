@@ -40,11 +40,11 @@ SingleJointedArmSim::SingleJointedArmSim(
           simulateGravity, measurementStdDevs) {}
 
 bool SingleJointedArmSim::WouldHitLowerLimit(units::radian_t armAngle) const {
-  return armAngle < m_minAngle;
+  return armAngle <= m_minAngle;
 }
 
 bool SingleJointedArmSim::WouldHitUpperLimit(units::radian_t armAngle) const {
-  return armAngle > m_maxAngle;
+  return armAngle >= m_maxAngle;
 }
 
 bool SingleJointedArmSim::HasHitLowerLimit() const {

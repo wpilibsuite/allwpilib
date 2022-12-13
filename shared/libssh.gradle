@@ -1,0 +1,13 @@
+nativeUtils {
+    nativeDependencyContainer {
+        libssh(getNativeDependencyTypeClass('WPIStaticMavenDependency')) {
+            groupId = "edu.wpi.first.thirdparty.frc2023"
+            artifactId = "libssh"
+            headerClassifier = "headers"
+            sourceClassifier = "sources"
+            ext = "zip"
+            version = '0.95-6'
+            targetPlatforms.addAll(nativeUtils.wpi.platforms.allPlatforms)
+        }
+    }
+}

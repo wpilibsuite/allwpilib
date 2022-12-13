@@ -11,6 +11,10 @@
 #include "Translation3d.h"
 #include "Twist3d.h"
 
+namespace wpi {
+class json;
+}  // namespace wpi
+
 namespace frc {
 
 /**
@@ -44,6 +48,13 @@ class WPILIB_DLLEXPORT Pose3d {
          Rotation3d rotation);
 
   /**
+   * Constructs a 3D pose from a 2D pose in the X-Y plane.
+   *
+   * @param pose The 2D pose.
+   */
+  explicit Pose3d(const Pose2d& pose);
+
+  /**
    * Transforms the pose by the given transformation and returns the new
    * transformed pose.
    *
@@ -63,19 +74,8 @@ class WPILIB_DLLEXPORT Pose3d {
 
   /**
    * Checks equality between this Pose3d and another object.
-   *
-   * @param other The other object.
-   * @return Whether the two objects are equal.
    */
-  bool operator==(const Pose3d& other) const;
-
-  /**
-   * Checks inequality between this Pose3d and another object.
-   *
-   * @param other The other object.
-   * @return Whether the two objects are not equal.
-   */
-  bool operator!=(const Pose3d& other) const;
+  bool operator==(const Pose3d&) const = default;
 
   /**
    * Returns the underlying translation.
@@ -141,7 +141,7 @@ class WPILIB_DLLEXPORT Pose3d {
   Pose3d TransformBy(const Transform3d& other) const;
 
   /**
-   * Returns the other pose relative to the current pose.
+   * Returns the current pose relative to the given pose.
    *
    * This function can often be used for trajectory tracking or pose
    * stabilization algorithms to get the error between the reference and the
@@ -194,5 +194,11 @@ class WPILIB_DLLEXPORT Pose3d {
   Translation3d m_translation;
   Rotation3d m_rotation;
 };
+
+WPILIB_DLLEXPORT
+void to_json(wpi::json& json, const Pose3d& pose);
+
+WPILIB_DLLEXPORT
+void from_json(const wpi::json& json, Pose3d& pose);
 
 }  // namespace frc

@@ -134,6 +134,16 @@ public final class TimeInterpolatableBuffer<T> {
     }
   }
 
+  /**
+   * Grant access to the internal sample buffer. Used in Pose Estimation to replay odometry inputs
+   * stored within this buffer.
+   *
+   * @return The internal sample buffer.
+   */
+  public NavigableMap<Double, T> getInternalBuffer() {
+    return m_pastSnapshots;
+  }
+
   public interface InterpolateFunction<T> {
     /**
      * Return the interpolated value. This object is assumed to be the starting position, or lower

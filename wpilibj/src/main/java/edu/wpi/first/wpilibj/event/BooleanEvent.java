@@ -54,7 +54,12 @@ public class BooleanEvent implements BooleanSupplier {
    * @param action the action to run if this event is active.
    */
   public final void ifHigh(Runnable action) {
-    m_loop.bind(m_signal, action);
+    m_loop.bind(
+        () -> {
+          if (m_signal.getAsBoolean()) {
+            action.run();
+          }
+        });
   }
 
   /**
@@ -178,7 +183,7 @@ public class BooleanEvent implements BooleanSupplier {
    * @param <T> the subclass type
    * @return an instance of the subclass.
    */
-  public <T extends BooleanEvent> T castTo(BiFunction<EventLoop, BooleanSupplier, T> ctor) {
+  public <T extends BooleanSupplier> T castTo(BiFunction<EventLoop, BooleanSupplier, T> ctor) {
     return ctor.apply(m_loop, m_signal);
   }
 }

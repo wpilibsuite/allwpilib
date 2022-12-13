@@ -46,14 +46,14 @@ void RobotContainer::ConfigureButtonBindings() {
 
   // Run instant command 1 when the 'A' button is pressed
   frc2::JoystickButton(&m_driverController, frc::XboxController::Button::kA)
-      .WhenPressed(&m_instantCommand1);
+      .OnTrue(&m_instantCommand1);
   // Run instant command 2 when the 'X' button is pressed
   frc2::JoystickButton(&m_driverController, frc::XboxController::Button::kX)
-      .WhenPressed(&m_instantCommand2);
+      .OnTrue(&m_instantCommand2);
   // Run instant command 3 when the 'Y' button is held; release early to
   // interrupt
   frc2::JoystickButton(&m_driverController, frc::XboxController::Button::kY)
-      .WhenHeld(&m_waitCommand);
+      .OnTrue(&m_waitCommand);
 }
 
 frc2::Command* RobotContainer::GetAutonomousCommand() {

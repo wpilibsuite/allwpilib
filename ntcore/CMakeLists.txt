@@ -35,6 +35,7 @@ set_property(TARGET ntcore PROPERTY FOLDER "libraries")
 
 install(TARGETS ntcore EXPORT ntcore DESTINATION "${main_lib_dest}")
 install(DIRECTORY src/main/native/include/ DESTINATION "${include_dest}/ntcore")
+install(DIRECTORY ${WPILIB_BINARY_DIR}/ntcore/generated/main/native/include/ DESTINATION "${include_dest}/ntcore")
 
 if (WITH_FLAT_INSTALL)
     set (ntcore_config_dir ${wpilib_dest})

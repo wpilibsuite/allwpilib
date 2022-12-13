@@ -12,7 +12,7 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - os: ubuntu-latest
+          - os: ubuntu-22.04
             name: Linux
             container: wpilib/roborio-cross-ubuntu:2023-22.04
             flags: ""
@@ -37,7 +37,7 @@ jobs:
 
       - name: Set up Python 3.8 (macOS)
         if: runner.os == 'macOS'
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v4
         with:
           python-version: 3.8
 

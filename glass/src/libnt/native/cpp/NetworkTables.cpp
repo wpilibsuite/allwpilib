@@ -110,15 +110,10 @@ NetworkTablesModel::NetworkTablesModel()
     : NetworkTablesModel{nt::NetworkTableInstance::GetDefault()} {}
 
 NetworkTablesModel::NetworkTablesModel(nt::NetworkTableInstance inst)
-    : m_inst{inst},
-      m_subscriber{nt::SubscribeMultiple(inst.GetHandle(), {{"", "$"}})},
-      m_topicPoller{inst},
-      m_valuePoller{inst} {
-  m_topicPoller.Add({{""}},
-                    NT_TOPIC_NOTIFY_IMMEDIATE | NT_TOPIC_NOTIFY_PROPERTIES |
-                        NT_TOPIC_NOTIFY_PUBLISH | NT_TOPIC_NOTIFY_UNPUBLISH);
-  m_valuePoller.Add(m_subscriber,
-                    NT_VALUE_NOTIFY_IMMEDIATE | NT_VALUE_NOTIFY_LOCAL);
+    : m_inst{inst}, m_poller{inst} {
+  m_poller.AddListener({{"", "$"}}, nt::EventFlags::kTopic |
+                                        nt::EventFlags::kValueAll |
+                                        nt::EventFlags::kImmediate);
 }
 
 NetworkTablesModel::Entry::~Entry() {
@@ -176,7 +171,6 @@ static void UpdateMsgpackValueSource(NetworkTablesModel::ValueSource* out,
     case mpack::mpack_type_str: {
       std::string str;
       mpack_read_str(&r, &tag, &str);
-      mpack_done_str(&r);
       out->UpdateFromValue(nt::Value::MakeString(std::move(str), time), name,
                            "");
       break;
@@ -427,57 +421,78 @@ void NetworkTablesModel::ValueSource::UpdateFromValue(
 
 void NetworkTablesModel::Update() {
   bool updateTree = false;
-  for (auto&& event : m_topicPoller.ReadQueue()) {
-    auto& entry = m_entries[event.info.topic];
-    if (event.flags & NT_TOPIC_NOTIFY_PUBLISH) {
-      if (!entry) {
-        entry = std::make_unique<Entry>();
-        m_sortedEntries.emplace_back(entry.get());
+  for (auto&& event : m_poller.ReadQueue()) {
+    if (auto info = event.GetTopicInfo()) {
+      auto& entry = m_entries[info->topic];
+      if (event.flags & nt::EventFlags::kPublish) {
+        if (!entry) {
+          entry = std::make_unique<Entry>();
+          m_sortedEntries.emplace_back(entry.get());
+          updateTree = true;
+        }
+      }
+      if (event.flags & nt::EventFlags::kUnpublish) {
+        // meta topic handling
+        if (wpi::starts_with(info->name, '$')) {
+          // meta topic handling
+          if (info->name == "$clients") {
+            m_clients.clear();
+          } else if (info->name == "$serverpub") {
+            m_server.publishers.clear();
+          } else if (info->name == "$serversub") {
+            m_server.subscribers.clear();
+          } else if (wpi::starts_with(info->name, "$clientpub$")) {
+            auto it = m_clients.find(wpi::drop_front(info->name, 11));
+            if (it != m_clients.end()) {
+              it->second.publishers.clear();
+            }
+          } else if (wpi::starts_with(info->name, "$clientsub$")) {
+            auto it = m_clients.find(wpi::drop_front(info->name, 11));
+            if (it != m_clients.end()) {
+              it->second.subscribers.clear();
+            }
+          }
+        }
+        auto it = std::find(m_sortedEntries.begin(), m_sortedEntries.end(),
+                            entry.get());
+        // will be removed completely below
+        if (it != m_sortedEntries.end()) {
+          *it = nullptr;
+        }
+        m_entries.erase(info->topic);
+        updateTree = true;
+        continue;
+      }
+      if (event.flags & nt::EventFlags::kProperties) {
         updateTree = true;
       }
-    }
-    if (event.flags & NT_TOPIC_NOTIFY_UNPUBLISH) {
-      auto it = std::find(m_sortedEntries.begin(), m_sortedEntries.end(),
-                          entry.get());
-      // will be removed completely below
-      if (it != m_sortedEntries.end()) {
-        *it = nullptr;
+      if (entry) {
+        entry->UpdateTopic(std::move(event));
       }
-      m_entries.erase(event.info.topic);
-      updateTree = true;
-      continue;
-    }
-    if (event.flags & NT_TOPIC_NOTIFY_PROPERTIES) {
-      updateTree = true;
-    }
-    if (entry) {
-      entry->UpdateTopic(std::move(event));
-    }
-  }
-  for (auto&& event : m_valuePoller.ReadQueue()) {
-    auto& entry = m_entries[event.topic];
-    if (entry) {
-      entry->UpdateFromValue(std::move(event.value), entry->info.name,
-                             entry->info.type_str);
-      if (wpi::starts_with(entry->info.name, '$') && entry->value.IsRaw() &&
-          entry->info.type_str == "msgpack") {
-        fmt::print(stderr, "Updating meta-topic {}\n", entry->info.name);
-        // meta topic handling
-        if (entry->info.name == "$clients") {
-          UpdateClients(entry->value.GetRaw());
-        } else if (entry->info.name == "$serverpub") {
-          m_server.UpdatePublishers(entry->value.GetRaw());
-        } else if (entry->info.name == "$serversub") {
-          m_server.UpdateSubscribers(entry->value.GetRaw());
-        } else if (wpi::starts_with(entry->info.name, "$clientpub$")) {
-          auto it = m_clients.find(wpi::drop_front(entry->info.name, 11));
-          if (it != m_clients.end()) {
-            it->second.UpdatePublishers(entry->value.GetRaw());
-          }
-        } else if (wpi::starts_with(entry->info.name, "$clientsub$")) {
-          auto it = m_clients.find(wpi::drop_front(entry->info.name, 11));
-          if (it != m_clients.end()) {
-            it->second.UpdateSubscribers(entry->value.GetRaw());
+    } else if (auto valueData = event.GetValueEventData()) {
+      auto& entry = m_entries[valueData->topic];
+      if (entry) {
+        entry->UpdateFromValue(std::move(valueData->value), entry->info.name,
+                               entry->info.type_str);
+        if (wpi::starts_with(entry->info.name, '$') && entry->value.IsRaw() &&
+            entry->info.type_str == "msgpack") {
+          // meta topic handling
+          if (entry->info.name == "$clients") {
+            UpdateClients(entry->value.GetRaw());
+          } else if (entry->info.name == "$serverpub") {
+            m_server.UpdatePublishers(entry->value.GetRaw());
+          } else if (entry->info.name == "$serversub") {
+            m_server.UpdateSubscribers(entry->value.GetRaw());
+          } else if (wpi::starts_with(entry->info.name, "$clientpub$")) {
+            auto it = m_clients.find(wpi::drop_front(entry->info.name, 11));
+            if (it != m_clients.end()) {
+              it->second.UpdatePublishers(entry->value.GetRaw());
+            }
+          } else if (wpi::starts_with(entry->info.name, "$clientsub$")) {
+            auto it = m_clients.find(wpi::drop_front(entry->info.name, 11));
+            if (it != m_clients.end()) {
+              it->second.UpdateSubscribers(entry->value.GetRaw());
+            }
           }
         }
       }
@@ -558,7 +573,7 @@ void NetworkTablesModel::RebuildTreeImpl(std::vector<TreeNode>* tree,
 }
 
 bool NetworkTablesModel::Exists() {
-  return m_inst.IsConnected();
+  return true;
 }
 
 NetworkTablesModel::Entry* NetworkTablesModel::GetEntry(std::string_view name) {
@@ -622,9 +637,9 @@ static void DecodeSubscriberOptions(
   for (uint32_t j = 0; j < numMapElem; ++j) {
     std::string key;
     mpack_expect_str(&r, &key);
-    if (key == "immediate") {
-      options->immediate = mpack_expect_bool(&r);
-    } else if (key == "sendAll") {
+    if (key == "topicsonly") {
+      options->topicsOnly = mpack_expect_bool(&r);
+    } else if (key == "all") {
       options->sendAll = mpack_expect_bool(&r);
     } else if (key == "periodic") {
       options->periodic = mpack_expect_float(&r);
@@ -834,54 +849,6 @@ static bool StringToFloatArray(std::string_view in, std::vector<T>* out) {
   return true;
 }
 
-static int fromxdigit(char ch) {
-  if (ch >= 'a' && ch <= 'f') {
-    return (ch - 'a' + 10);
-  } else if (ch >= 'A' && ch <= 'F') {
-    return (ch - 'A' + 10);
-  } else {
-    return ch - '0';
-  }
-}
-
-static std::string_view UnescapeString(std::string_view source,
-                                       wpi::SmallVectorImpl<char>& buf) {
-  assert(source.size() >= 2 && source.front() == '"' && source.back() == '"');
-  buf.clear();
-  buf.reserve(source.size() - 2);
-  for (auto s = source.begin() + 1, end = source.end() - 1; s != end; ++s) {
-    if (*s != '\\') {
-      buf.push_back(*s);
-      continue;
-    }
-    switch (*++s) {
-      case 't':
-        buf.push_back('\t');
-        break;
-      case 'n':
-        buf.push_back('\n');
-        break;
-      case 'x': {
-        if (!isxdigit(*(s + 1))) {
-          buf.push_back('x');  // treat it like a unknown escape
-          break;
-        }
-        int ch = fromxdigit(*++s);
-        if (std::isxdigit(*(s + 1))) {
-          ch <<= 4;
-          ch |= fromxdigit(*++s);
-        }
-        buf.push_back(static_cast<char>(ch));
-        break;
-      }
-      default:
-        buf.push_back(*s);
-        break;
-    }
-  }
-  return {buf.data(), buf.size()};
-}
-
 static bool StringToStringArray(std::string_view in,
                                 std::vector<std::string>* out) {
   in = wpi::trim(in);
@@ -910,7 +877,9 @@ static bool StringToStringArray(std::string_view in,
                  "GUI: NetworkTables: Could not understand value '{}'\n", val);
       return false;
     }
-    out->emplace_back(UnescapeString(val, buf));
+    val.remove_prefix(1);
+    val.remove_suffix(1);
+    out->emplace_back(wpi::UnescapeCString(val, buf).first);
   }
 
   return true;
@@ -1460,7 +1429,7 @@ static void DisplayClient(const NetworkTablesModel::Client& client) {
     ImGui::TableSetupColumn("Topics", ImGuiTableColumnFlags_WidthStretch, 6.0f);
     ImGui::TableSetupColumn("Periodic", ImGuiTableColumnFlags_WidthStretch,
                             1.0f);
-    ImGui::TableSetupColumn("Immediate", ImGuiTableColumnFlags_WidthStretch,
+    ImGui::TableSetupColumn("Topics Only", ImGuiTableColumnFlags_WidthStretch,
                             1.0f);
     ImGui::TableSetupColumn("Send All", ImGuiTableColumnFlags_WidthStretch,
                             1.0f);
@@ -1476,7 +1445,7 @@ static void DisplayClient(const NetworkTablesModel::Client& client) {
       ImGui::TableNextColumn();
       ImGui::Text("%0.3f", sub.options.periodic);
       ImGui::TableNextColumn();
-      ImGui::Text(sub.options.immediate ? "Yes" : "No");
+      ImGui::Text(sub.options.topicsOnly ? "Yes" : "No");
       ImGui::TableNextColumn();
       ImGui::Text(sub.options.sendAll ? "Yes" : "No");
       ImGui::TableNextColumn();

@@ -7,6 +7,7 @@
 #include <algorithm>
 #include <utility>
 
+#include "frc/kinematics/ChassisSpeeds.h"
 #include "frc/kinematics/SwerveDriveKinematics.h"
 #include "units/math.h"
 
@@ -96,6 +97,39 @@ ChassisSpeeds SwerveDriveKinematics<NumModules>::ToChassisSpeeds(
 }
 
 template <size_t NumModules>
+template <typename... ModuleDeltas>
+Twist2d SwerveDriveKinematics<NumModules>::ToTwist2d(
+    ModuleDeltas&&... wheelDeltas) const {
+  static_assert(sizeof...(wheelDeltas) == NumModules,
+                "Number of modules is not consistent with number of wheel "
+                "locations provided in constructor.");
+
+  wpi::array<SwerveModulePosition, NumModules> moduleDeltas{wheelDeltas...};
+
+  return this->ToTwist2d(moduleDeltas);
+}
+
+template <size_t NumModules>
+Twist2d SwerveDriveKinematics<NumModules>::ToTwist2d(
+    wpi::array<SwerveModulePosition, NumModules> moduleDeltas) const {
+  Matrixd<NumModules * 2, 1> moduleDeltaMatrix;
+
+  for (size_t i = 0; i < NumModules; ++i) {
+    SwerveModulePosition module = moduleDeltas[i];
+    moduleDeltaMatrix(i * 2, 0) = module.distance.value() * module.angle.Cos();
+    moduleDeltaMatrix(i * 2 + 1, 0) =
+        module.distance.value() * module.angle.Sin();
+  }
+
+  Eigen::Vector3d chassisDeltaVector =
+      m_forwardKinematics.solve(moduleDeltaMatrix);
+
+  return {units::meter_t{chassisDeltaVector(0)},
+          units::meter_t{chassisDeltaVector(1)},
+          units::radian_t{chassisDeltaVector(2)}};
+}
+
+template <size_t NumModules>
 void SwerveDriveKinematics<NumModules>::DesaturateWheelSpeeds(
     wpi::array<SwerveModuleState, NumModules>* moduleStates,
     units::meters_per_second_t attainableMaxSpeed) {
@@ -111,6 +145,43 @@ void SwerveDriveKinematics<NumModules>::DesaturateWheelSpeeds(
     for (auto& module : states) {
       module.speed = module.speed / realMaxSpeed * attainableMaxSpeed;
     }
+  }
+}
+
+template <size_t NumModules>
+void SwerveDriveKinematics<NumModules>::DesaturateWheelSpeeds(
+    wpi::array<SwerveModuleState, NumModules>* moduleStates,
+    ChassisSpeeds currentChassisSpeed,
+    units::meters_per_second_t attainableMaxModuleSpeed,
+    units::meters_per_second_t attainableMaxRobotTranslationSpeed,
+    units::radians_per_second_t attainableMaxRobotRotationSpeed) {
+  auto& states = *moduleStates;
+
+  auto realMaxSpeed = std::max_element(states.begin(), states.end(),
+                                       [](const auto& a, const auto& b) {
+                                         return units::math::abs(a.speed) <
+                                                units::math::abs(b.speed);
+                                       })
+                          ->speed;
+
+  if (attainableMaxRobotTranslationSpeed == 0_mps ||
+      attainableMaxRobotRotationSpeed == 0_rad_per_s || realMaxSpeed == 0_mps) {
+    return;
+  }
+
+  auto translationalK =
+      units::math::hypot(currentChassisSpeed.vx, currentChassisSpeed.vy) /
+      attainableMaxRobotTranslationSpeed;
+
+  auto rotationalK = units::math::abs(currentChassisSpeed.omega) /
+                     attainableMaxRobotRotationSpeed;
+
+  auto k = units::math::max(translationalK, rotationalK);
+
+  auto scale = units::math::min(k * attainableMaxModuleSpeed / realMaxSpeed,
+                                units::scalar_t(1));
+  for (auto& module : states) {
+    module.speed = module.speed * scale;
   }
 }
 

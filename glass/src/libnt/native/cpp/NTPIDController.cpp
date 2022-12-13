@@ -18,14 +18,11 @@ NTPIDControllerModel::NTPIDControllerModel(nt::NetworkTableInstance inst,
       m_name{inst.GetStringTopic(fmt::format("{}/.name", path)).Subscribe("")},
       m_controllable{inst.GetBooleanTopic(fmt::format("{}/.controllable", path))
                          .Subscribe(false)},
-      m_p{inst.GetDoubleTopic(fmt::format("{}/p", path))
-              .GetEntry(0, {{nt::PubSubOption::SendAll(true)}})},
-      m_i{inst.GetDoubleTopic(fmt::format("{}/i", path))
-              .GetEntry(0, {{nt::PubSubOption::SendAll(true)}})},
-      m_d{inst.GetDoubleTopic(fmt::format("{}/d", path))
-              .GetEntry(0, {{nt::PubSubOption::SendAll(true)}})},
-      m_setpoint{inst.GetDoubleTopic(fmt::format("{}/setpoint", path))
-                     .GetEntry(0, {{nt::PubSubOption::SendAll(true)}})},
+      m_p{inst.GetDoubleTopic(fmt::format("{}/p", path)).GetEntry(0)},
+      m_i{inst.GetDoubleTopic(fmt::format("{}/i", path)).GetEntry(0)},
+      m_d{inst.GetDoubleTopic(fmt::format("{}/d", path)).GetEntry(0)},
+      m_setpoint{
+          inst.GetDoubleTopic(fmt::format("{}/setpoint", path)).GetEntry(0)},
       m_pData{fmt::format("NTPIDCtrlP:{}", path)},
       m_iData{fmt::format("NTPIDCtrlI:{}", path)},
       m_dData{fmt::format("NTPIDCtrlD:{}", path)},
@@ -70,5 +67,5 @@ void NTPIDControllerModel::Update() {
 }
 
 bool NTPIDControllerModel::Exists() {
-  return m_inst.IsConnected() && m_setpoint.Exists();
+  return m_setpoint.Exists();
 }

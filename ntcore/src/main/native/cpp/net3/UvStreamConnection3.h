@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include <memory>
 #include <string>
 #include <string_view>
 #include <vector>
@@ -20,7 +21,9 @@ class Stream;
 
 namespace nt::net3 {
 
-class UvStreamConnection3 final : public WireConnection3 {
+class UvStreamConnection3 final
+    : public WireConnection3,
+      public std::enable_shared_from_this<UvStreamConnection3> {
   static constexpr size_t kAllocSize = 4096;
 
  public:

@@ -11,6 +11,13 @@ frc::MecanumDriveWheelSpeeds Drivetrain::GetCurrentState() const {
           units::meters_per_second_t{m_backRightEncoder.GetRate()}};
 }
 
+frc::MecanumDriveWheelPositions Drivetrain::GetCurrentWheelDistances() const {
+  return {units::meter_t{m_frontLeftEncoder.GetDistance()},
+          units::meter_t{m_frontRightEncoder.GetDistance()},
+          units::meter_t{m_backLeftEncoder.GetDistance()},
+          units::meter_t{m_backRightEncoder.GetDistance()}};
+}
+
 void Drivetrain::SetSpeeds(const frc::MecanumDriveWheelSpeeds& wheelSpeeds) {
   const auto frontLeftFeedforward =
       m_feedforward.Calculate(wheelSpeeds.frontLeft);
@@ -52,5 +59,5 @@ void Drivetrain::Drive(units::meters_per_second_t xSpeed,
 }
 
 void Drivetrain::UpdateOdometry() {
-  m_odometry.Update(m_gyro.GetRotation2d(), GetCurrentState());
+  m_odometry.Update(m_gyro.GetRotation2d(), GetCurrentWheelDistances());
 }

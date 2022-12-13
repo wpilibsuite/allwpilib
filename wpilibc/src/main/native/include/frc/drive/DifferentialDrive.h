@@ -73,13 +73,11 @@ class MotorController;
  * Each drive function provides different inverse kinematic relations for a
  * differential drive robot.
  *
- * This library uses the NED axes convention (North-East-Down as external
- * reference in the world frame):
- * http://www.nuclearprojects.com/ins/images/axis_big.png.
- *
- * The positive X axis points ahead, the positive Y axis points to the right,
- * and the positive Z axis points down. Rotations follow the right-hand rule, so
- * clockwise rotation around the Z axis is positive.
+ * This library uses the NWU axes convention (North-West-Up as external
+ * reference in the world frame). The positive X axis points ahead, the positive
+ * Y axis points to the left, and the positive Z axis points up. Rotations
+ * follow the right-hand rule, so counterclockwise rotation around the Z axis is
+ * positive.
  *
  * Inputs smaller then 0.02 will be set to 0, and larger values will be scaled
  * so that the full range is still used. This deadband value can be changed
@@ -125,7 +123,7 @@ class DifferentialDrive : public RobotDriveBase,
    * @param xSpeed        The speed at which the robot should drive along the X
    *                      axis [-1.0..1.0]. Forward is positive.
    * @param zRotation     The rotation rate of the robot around the Z axis
-   *                      [-1.0..1.0]. Clockwise is positive.
+   *                      [-1.0..1.0]. Counterclockwise is positive.
    * @param squareInputs If set, decreases the input sensitivity at low speeds.
    */
   void ArcadeDrive(double xSpeed, double zRotation, bool squareInputs = true);
@@ -139,8 +137,8 @@ class DifferentialDrive : public RobotDriveBase,
    *
    * @param xSpeed           The robot's speed along the X axis [-1.0..1.0].
    *                         Forward is positive.
-   * @param zRotation        The normalized curvature [-1.0..1.0]. Clockwise is
-   *                         positive.
+   * @param zRotation        The normalized curvature [-1.0..1.0].
+   *                         Counterclockwise is positive.
    * @param allowTurnInPlace If set, overrides constant-curvature turning for
    *                         turn-in-place maneuvers. zRotation will control
    *                         turning rate instead of curvature.

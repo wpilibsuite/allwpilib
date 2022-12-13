@@ -78,10 +78,12 @@ class SImpl;
 
 class ClientData {
  public:
-  ClientData(std::string_view name, std::string_view connInfo, bool local,
+  ClientData(std::string_view originalName, std::string_view name,
+             std::string_view connInfo, bool local,
              ServerImpl::SetPeriodicFunc setPeriodic, SImpl& server, int id,
              wpi::Logger& logger)
-      : m_name{name},
+      : m_originalName{originalName},
+        m_name{name},
         m_connInfo{connInfo},
         m_local{local},
         m_setPeriodic{std::move(setPeriodic)},
@@ -108,13 +110,16 @@ class ClientData {
   void UpdateMetaClientPub();
   void UpdateMetaClientSub();
 
-  // returns nullptr if there is no subscriber for that topic name
-  SubscriberData* GetSubscriber(std::string_view name, bool special);
+  std::span<SubscriberData*> GetSubscribers(
+      std::string_view name, bool special,
+      wpi::SmallVectorImpl<SubscriberData*>& buf);
 
+  std::string_view GetOriginalName() const { return m_originalName; }
   std::string_view GetName() const { return m_name; }
   int GetId() const { return m_id; }
 
  protected:
+  std::string m_originalName;
   std::string m_name;
   std::string m_connInfo;
   bool m_local;  // local to machine
@@ -138,10 +143,12 @@ class ClientData {
 
 class ClientData4Base : public ClientData, protected ClientMessageHandler {
  public:
-  ClientData4Base(std::string_view name, std::string_view connInfo, bool local,
+  ClientData4Base(std::string_view originalName, std::string_view name,
+                  std::string_view connInfo, bool local,
                   ServerImpl::SetPeriodicFunc setPeriodic, SImpl& server,
                   int id, wpi::Logger& logger)
-      : ClientData{name, connInfo, local, setPeriodic, server, id, logger} {}
+      : ClientData{originalName, name,   connInfo, local,
+                   setPeriodic,  server, id,       logger} {}
 
  protected:
   // ClientMessageHandler interface
@@ -152,7 +159,7 @@ class ClientData4Base : public ClientData, protected ClientMessageHandler {
   void ClientSetProperties(std::string_view name,
                            const wpi::json& update) final;
   void ClientSubscribe(int64_t subuid, std::span<const std::string> topicNames,
-                       const PubSubOptions& options) final;
+                       const PubSubOptionsImpl& options) final;
   void ClientUnsubscribe(int64_t subuid) final;
 
   void ClientSetValue(int64_t pubuid, const Value& value);
@@ -165,7 +172,8 @@ class ClientDataLocal final : public ClientData4Base {
 
  public:
   ClientDataLocal(SImpl& server, int id, wpi::Logger& logger)
-      : ClientData4Base{"", "", true, [](uint32_t) {}, server, id, logger} {}
+      : ClientData4Base{"", "", "", true, [](uint32_t) {}, server, id, logger} {
+  }
 
   void ProcessIncomingText(std::string_view data) final {}
   void ProcessIncomingBinary(std::span<const uint8_t> data) final {}
@@ -183,10 +191,12 @@ class ClientDataLocal final : public ClientData4Base {
 
 class ClientData4 final : public ClientData4Base {
  public:
-  ClientData4(std::string_view name, std::string_view connInfo, bool local,
-              WireConnection& wire, ServerImpl::SetPeriodicFunc setPeriodic,
-              SImpl& server, int id, wpi::Logger& logger)
-      : ClientData4Base{name, connInfo, local, setPeriodic, server, id, logger},
+  ClientData4(std::string_view originalName, std::string_view name,
+              std::string_view connInfo, bool local, WireConnection& wire,
+              ServerImpl::SetPeriodicFunc setPeriodic, SImpl& server, int id,
+              wpi::Logger& logger)
+      : ClientData4Base{originalName, name,   connInfo, local,
+                        setPeriodic,  server, id,       logger},
         m_wire{wire} {}
 
   void ProcessIncomingText(std::string_view data) final;
@@ -239,7 +249,7 @@ class ClientData3 final : public ClientData, private net3::MessageHandler3 {
               net3::WireConnection3& wire, ServerImpl::Connected3Func connected,
               ServerImpl::SetPeriodicFunc setPeriodic, SImpl& server, int id,
               wpi::Logger& logger)
-      : ClientData{"", connInfo, local, setPeriodic, server, id, logger},
+      : ClientData{"", "", connInfo, local, setPeriodic, server, id, logger},
         m_connected{std::move(connected)},
         m_wire{wire},
         m_decoder{*this} {}
@@ -325,6 +335,7 @@ struct TopicData {
   std::string name;
   unsigned int id;
   Value lastValue;
+  ClientData* lastValueClient = nullptr;
   std::string typeStr;
   wpi::json properties = wpi::json::object();
   bool persistent{false};
@@ -351,22 +362,22 @@ struct PublisherData {
 
 struct SubscriberData {
   SubscriberData(ClientData* client, std::span<const std::string> topicNames,
-                 int64_t subuid, const PubSubOptions& options)
+                 int64_t subuid, const PubSubOptionsImpl& options)
       : client{client},
         topicNames{topicNames.begin(), topicNames.end()},
         subuid{subuid},
         options{options},
-        periodMs(std::lround(options.periodic * 100) * 10) {
+        periodMs(std::lround(options.periodicMs / 10.0) * 10) {
     if (periodMs < kMinPeriodMs) {
       periodMs = kMinPeriodMs;
     }
   }
 
   void Update(std::span<const std::string> topicNames_,
-              const PubSubOptions& options_) {
+              const PubSubOptionsImpl& options_) {
     topicNames = {topicNames_.begin(), topicNames_.end()};
     options = options_;
-    periodMs = std::lround(options_.periodic * 100) * 10;
+    periodMs = std::lround(options_.periodicMs / 10.0) * 10;
     if (periodMs < kMinPeriodMs) {
       periodMs = kMinPeriodMs;
     }
@@ -377,7 +388,7 @@ struct SubscriberData {
   ClientData* client;
   std::vector<std::string> topicNames;
   int64_t subuid;
-  PubSubOptions options;
+  PubSubOptionsImpl options;
   // in options as double, but copy here as integer; rounded to the nearest
   // 10 ms
   uint32_t periodMs;
@@ -402,8 +413,9 @@ class SImpl {
   TopicData* m_metaClients;
 
   // ServerImpl interface
-  int AddClient(std::string_view name, std::string_view connInfo, bool local,
-                WireConnection& wire, ServerImpl::SetPeriodicFunc setPeriodic);
+  std::pair<std::string, int> AddClient(
+      std::string_view name, std::string_view connInfo, bool local,
+      WireConnection& wire, ServerImpl::SetPeriodicFunc setPeriodic);
   int AddClient3(std::string_view connInfo, bool local,
                  net3::WireConnection3& wire,
                  ServerImpl::Connected3Func connected,
@@ -451,9 +463,11 @@ struct Writer : public mpack_writer_t {
 };
 }  // namespace
 
-static void WriteOptions(mpack_writer_t& w, const PubSubOptions& options) {
-  int size = (options.sendAll ? 1 : 0) + (options.topicsOnly ? 1 : 0) +
-             (options.periodic != 0.1 ? 1 : 0) + (options.prefixMatch ? 1 : 0);
+static void WriteOptions(mpack_writer_t& w, const PubSubOptionsImpl& options) {
+  int size =
+      (options.sendAll ? 1 : 0) + (options.topicsOnly ? 1 : 0) +
+      (options.periodicMs != PubSubOptionsImpl::kDefaultPeriodicMs ? 1 : 0) +
+      (options.prefixMatch ? 1 : 0);
   mpack_start_map(&w, size);
   if (options.sendAll) {
     mpack_write_str(&w, "all");
@@ -463,9 +477,9 @@ static void WriteOptions(mpack_writer_t& w, const PubSubOptions& options) {
     mpack_write_str(&w, "topicsonly");
     mpack_write_bool(&w, true);
   }
-  if (options.periodic != 0.1) {
+  if (options.periodicMs != PubSubOptionsImpl::kDefaultPeriodicMs) {
     mpack_write_str(&w, "periodic");
-    mpack_write_float(&w, options.periodic);
+    mpack_write_float(&w, options.periodicMs / 1000.0);
   }
   if (options.prefixMatch) {
     mpack_write_str(&w, "prefix");
@@ -520,14 +534,17 @@ void ClientData::UpdateMetaClientSub() {
   }
 }
 
-SubscriberData* ClientData::GetSubscriber(std::string_view name, bool special) {
+std::span<SubscriberData*> ClientData::GetSubscribers(
+    std::string_view name, bool special,
+    wpi::SmallVectorImpl<SubscriberData*>& buf) {
+  buf.resize(0);
   for (auto&& subPair : m_subscribers) {
     SubscriberData* subscriber = subPair.getSecond().get();
     if (subscriber->Matches(name, special)) {
-      return subscriber;
+      buf.emplace_back(subscriber);
     }
   }
-  return nullptr;
+  return {buf.data(), buf.size()};
 }
 
 void ClientData4Base::ClientPublish(int64_t pubuid, std::string_view name,
@@ -600,7 +617,7 @@ void ClientData4Base::ClientSetProperties(std::string_view name,
 
 void ClientData4Base::ClientSubscribe(int64_t subuid,
                                       std::span<const std::string> topicNames,
-                                      const PubSubOptions& options) {
+                                      const PubSubOptionsImpl& options) {
   DEBUG4("ClientSubscribe({}, ({}), {})", m_id, fmt::join(topicNames, ","),
          subuid);
   auto& sub = m_subscribers[subuid];
@@ -619,12 +636,33 @@ void ClientData4Base::ClientSubscribe(int64_t subuid,
     sub->periodMs = kMinPeriodMs;
   }
 
+  // update periodic sender (if not local)
+  if (!m_local) {
+    if (m_periodMs == UINT32_MAX) {
+      m_periodMs = sub->periodMs;
+    } else {
+      m_periodMs = std::gcd(m_periodMs, sub->periodMs);
+    }
+    if (m_periodMs < kMinPeriodMs) {
+      m_periodMs = kMinPeriodMs;
+    }
+    m_setPeriodic(m_periodMs);
+  }
+
   // see if this immediately subscribes to any topics
-  bool updatedPeriodic = false;
   for (auto&& topic : m_server.m_topics) {
     bool removed = false;
     if (replace) {
       removed = topic->subscribers.Remove(sub.get());
+    }
+
+    // is client already subscribed?
+    bool wasSubscribed = false;
+    for (auto subscriber : topic->subscribers) {
+      if (subscriber->client == this) {
+        wasSubscribed = true;
+        break;
+      }
     }
 
     bool added = false;
@@ -637,15 +675,7 @@ void ClientData4Base::ClientSubscribe(int64_t subuid,
       m_server.UpdateMetaTopicSub(topic.get());
     }
 
-    if (added || removed) {
-      // update periodic sender (if not local)
-      if (!m_local) {
-        m_periodMs = std::gcd(m_periodMs, sub->periodMs);
-        updatedPeriodic = true;
-      }
-    }
-
-    if (added && !removed) {
+    if (!wasSubscribed && added && !removed) {
       // announce topic to client
       DEBUG4("client {}: announce {}", m_id, topic->name);
       SendAnnounce(topic.get(), std::nullopt);
@@ -656,12 +686,6 @@ void ClientData4Base::ClientSubscribe(int64_t subuid,
         SendValue(topic.get(), topic->lastValue, kSendAll);
       }
     }
-  }
-  if (updatedPeriodic) {
-    if (m_periodMs < kMinPeriodMs) {
-      m_periodMs = kMinPeriodMs;
-    }
-    m_setPeriodic(m_periodMs);
   }
 
   // update meta data
@@ -758,7 +782,7 @@ void ClientDataLocal::SendPropertiesUpdate(TopicData* topic,
 }
 
 void ClientDataLocal::HandleLocal(std::span<const ClientMessage> msgs) {
-  DEBUG4("{}", "HandleLocal()");
+  DEBUG4("HandleLocal()");
   // just map as a normal client into client=0 calls
   for (const auto& elem : msgs) {  // NOLINT
     // common case is value, so check that first
@@ -1181,11 +1205,8 @@ void ClientData3::ClientHello(std::string_view self_id,
         fmt::format("unsupported protocol version {:04x}", proto_rev));
     return;
   }
-  m_name = self_id;
-  // create a unique name if none provided
-  if (m_name.empty()) {
-    m_name = fmt::format("NT3@{}", m_connInfo);
-  }
+  // create a unique name (just ignore provided client id)
+  m_name = fmt::format("NT3@{}", m_connInfo);
   m_connected(m_name, 0x0300);
   m_connected = nullptr;  // no longer required
 
@@ -1479,16 +1500,22 @@ SImpl::SImpl(wpi::Logger& logger) : m_logger{logger} {
   m_localClient = static_cast<ClientDataLocal*>(m_clients.back().get());
 }
 
-int SImpl::AddClient(std::string_view name, std::string_view connInfo,
-                     bool local, WireConnection& wire,
-                     ServerImpl::SetPeriodicFunc setPeriodic) {
+std::pair<std::string, int> SImpl::AddClient(
+    std::string_view name, std::string_view connInfo, bool local,
+    WireConnection& wire, ServerImpl::SetPeriodicFunc setPeriodic) {
+  // strip anything after @ in the name
+  name = wpi::split(name, '@').first;
+  if (name.empty()) {
+    name = "NT4";
+  }
   size_t index = m_clients.size();
-  // find an empty slot and ensure there's no duplicates
+  // find an empty slot and check for duplicates
   // just do a linear search as number of clients is typically small (<10)
+  int duplicateName = 0;
   for (size_t i = 0, end = index; i < end; ++i) {
     auto& clientData = m_clients[i];
-    if (clientData && clientData->GetName() == name) {
-      return -1;  // don't allow duplicate client names
+    if (clientData && clientData->GetOriginalName() == name) {
+      ++duplicateName;
     } else if (!clientData && index == end) {
       index = i;
     }
@@ -1497,14 +1524,24 @@ int SImpl::AddClient(std::string_view name, std::string_view connInfo,
     m_clients.emplace_back();
   }
 
+  // if duplicate name, de-duplicate
+  std::string dedupName;
+  if (duplicateName > 0) {
+    dedupName = fmt::format("{}@{}", name, duplicateName);
+  } else {
+    dedupName = name;
+  }
+
   auto& clientData = m_clients[index];
-  clientData = std::make_unique<ClientData4>(name, connInfo, local, wire,
-                                             std::move(setPeriodic), *this,
-                                             index, m_logger);
+  clientData = std::make_unique<ClientData4>(name, dedupName, connInfo, local,
+                                             wire, std::move(setPeriodic),
+                                             *this, index, m_logger);
 
   // create client meta topics
-  clientData->m_metaPub = CreateMetaTopic(fmt::format("$clientpub${}", name));
-  clientData->m_metaSub = CreateMetaTopic(fmt::format("$clientsub${}", name));
+  clientData->m_metaPub =
+      CreateMetaTopic(fmt::format("$clientpub${}", dedupName));
+  clientData->m_metaSub =
+      CreateMetaTopic(fmt::format("$clientsub${}", dedupName));
 
   // update meta topics
   clientData->UpdateMetaClientPub();
@@ -1513,7 +1550,7 @@ int SImpl::AddClient(std::string_view name, std::string_view connInfo,
   wire.Flush();
 
   DEBUG3("AddClient('{}', '{}') -> {}", name, connInfo, index);
-  return index;
+  return {std::move(dedupName), index};
 }
 
 int SImpl::AddClient3(std::string_view connInfo, bool local,
@@ -1524,8 +1561,9 @@ int SImpl::AddClient3(std::string_view connInfo, bool local,
   // find an empty slot; we can't check for duplicates until we get a hello.
   // just do a linear search as number of clients is typically small (<10)
   for (size_t i = 0, end = index; i < end; ++i) {
-    if (!m_clients[i] && index == end) {
+    if (!m_clients[i]) {
       index = i;
+      break;
     }
   }
   if (index == m_clients.size()) {
@@ -1986,14 +2024,15 @@ TopicData* SImpl::CreateTopic(ClientData* client, std::string_view name,
       }
 
       // look for subscriber matching prefixes
-      bool hasSubscriber = false;
-      if (auto subscriber = aClient->GetSubscriber(name, topic->special)) {
+      wpi::SmallVector<SubscriberData*, 16> subscribersBuf;
+      auto subscribers =
+          aClient->GetSubscribers(name, topic->special, subscribersBuf);
+      for (auto subscriber : subscribers) {
         topic->subscribers.Add(subscriber);
-        hasSubscriber = true;
       }
 
       // don't announce to this client if no subscribers
-      if (!hasSubscriber) {
+      if (subscribers.empty()) {
         continue;
       }
 
@@ -2086,11 +2125,13 @@ void SImpl::SetFlags(ClientData* client, TopicData* topic, unsigned int flags) {
 }
 
 void SImpl::SetValue(ClientData* client, TopicData* topic, const Value& value) {
-  // update retained value if timestamp newer
-  if (!topic->lastValue || value.time() > topic->lastValue.time()) {
+  // update retained value if from same client or timestamp newer
+  if (!topic->lastValue || topic->lastValueClient == client ||
+      value.time() >= topic->lastValue.time()) {
     DEBUG4("updating '{}' last value (time was {} is {})", topic->name,
            topic->lastValue.time(), value.time());
     topic->lastValue = value;
+    topic->lastValueClient = client;
 
     // if persistent, update flag
     if (topic->persistent) {
@@ -2145,7 +2186,7 @@ void SImpl::UpdateMetaClients(const std::vector<ConnectionInfo>& conns) {
   if (mpack_writer_destroy(&w) == mpack_ok) {
     SetValue(nullptr, m_metaClients, Value::MakeRaw(std::move(w.bytes)));
   } else {
-    DEBUG4("{}", "failed to encode $clients");
+    DEBUG4("failed to encode $clients");
   }
 }
 
@@ -2282,9 +2323,11 @@ void ServerImpl::ProcessIncomingBinary(int clientId,
   m_impl->m_clients[clientId]->ProcessIncomingBinary(data);
 }
 
-int ServerImpl::AddClient(std::string_view name, std::string_view connInfo,
-                          bool local, WireConnection& wire,
-                          SetPeriodicFunc setPeriodic) {
+std::pair<std::string, int> ServerImpl::AddClient(std::string_view name,
+                                                  std::string_view connInfo,
+                                                  bool local,
+                                                  WireConnection& wire,
+                                                  SetPeriodicFunc setPeriodic) {
   return m_impl->AddClient(name, connInfo, local, wire, std::move(setPeriodic));
 }
 
@@ -2323,14 +2366,14 @@ std::string ServerImpl::LoadPersistent(std::string_view in) {
 void ServerStartup::Publish(NT_Publisher pubHandle, NT_Topic topicHandle,
                             std::string_view name, std::string_view typeStr,
                             const wpi::json& properties,
-                            const PubSubOptions& options) {
+                            const PubSubOptionsImpl& options) {
   m_server.m_impl->m_localClient->ClientPublish(pubHandle, name, typeStr,
                                                 properties);
 }
 
 void ServerStartup::Subscribe(NT_Subscriber subHandle,
                               std::span<const std::string> topicNames,
-                              const PubSubOptions& options) {
+                              const PubSubOptionsImpl& options) {
   m_server.m_impl->m_localClient->ClientSubscribe(subHandle, topicNames,
                                                   options);
 }

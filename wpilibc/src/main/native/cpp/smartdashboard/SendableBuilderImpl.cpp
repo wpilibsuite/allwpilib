@@ -26,7 +26,8 @@ void SendableBuilderImpl::PropertyImpl<Topic>::Update(bool controllable,
                                                       int64_t time) {
   if (controllable && sub && updateLocal) {
     updateLocal(sub);
-  } else if (pub && updateNetwork) {
+  }
+  if (pub && updateNetwork) {
     updateNetwork(pub, time);
   }
 }
@@ -129,7 +130,8 @@ void SendableBuilderImpl::AddPropertyImpl(Topic topic, Getter getter,
     };
   }
   if (setter) {
-    prop->sub = topic.Subscribe({});
+    prop->sub =
+        topic.Subscribe({}, {.excludePublisher = prop->pub.GetHandle()});
     prop->updateLocal = [=](auto& sub) {
       for (auto&& val : sub.ReadQueue()) {
         setter(val.value);
@@ -222,7 +224,8 @@ void SendableBuilderImpl::AddRawProperty(
     };
   }
   if (setter) {
-    prop->sub = topic.Subscribe(typeString, {});
+    prop->sub = topic.Subscribe(typeString, {},
+                                {.excludePublisher = prop->pub.GetHandle()});
     prop->updateLocal = [=](auto& sub) {
       for (auto&& val : sub.ReadQueue()) {
         setter(val.value);
@@ -245,7 +248,8 @@ void SendableBuilderImpl::AddSmallPropertyImpl(Topic topic, Getter getter,
     };
   }
   if (setter) {
-    prop->sub = topic.Subscribe({});
+    prop->sub =
+        topic.Subscribe({}, {.excludePublisher = prop->pub.GetHandle()});
     prop->updateLocal = [=](auto& sub) {
       for (auto&& val : sub.ReadQueue()) {
         setter(val.value);
@@ -323,7 +327,8 @@ void SendableBuilderImpl::AddSmallRawProperty(
     };
   }
   if (setter) {
-    prop->sub = topic.Subscribe(typeString, {});
+    prop->sub = topic.Subscribe(typeString, {},
+                                {.excludePublisher = prop->pub.GetHandle()});
     prop->updateLocal = [=](auto& sub) {
       for (auto&& val : sub.ReadQueue()) {
         setter(val.value);

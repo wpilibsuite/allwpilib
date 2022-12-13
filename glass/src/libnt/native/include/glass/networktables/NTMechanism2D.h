@@ -13,8 +13,7 @@
 #include <frc/geometry/Translation2d.h>
 #include <networktables/MultiSubscriber.h>
 #include <networktables/NetworkTableInstance.h>
-#include <networktables/TopicListener.h>
-#include <networktables/ValueListener.h>
+#include <networktables/NetworkTableListener.h>
 
 #include "glass/other/Mechanism2D.h"
 
@@ -50,8 +49,7 @@ class NTMechanism2DModel : public Mechanism2DModel {
   nt::Topic m_nameTopic;
   nt::Topic m_dimensionsTopic;
   nt::Topic m_bgColorTopic;
-  nt::TopicListenerPoller m_topicListener;
-  nt::ValueListenerPoller m_valueListener;
+  nt::NetworkTableListenerPoller m_poller;
 
   std::string m_nameValue;
   frc::Translation2d m_dimensionsValue;

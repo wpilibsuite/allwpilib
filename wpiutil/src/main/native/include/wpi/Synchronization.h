@@ -4,9 +4,9 @@
 
 #pragma once
 
+#ifdef __cplusplus
 #include <climits>  // NOLINT
 
-#ifdef __cplusplus
 #include <initializer_list>
 #include <span>
 #endif

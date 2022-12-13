@@ -11,12 +11,14 @@
 #include <system_error>
 #include <vector>
 
+#include <wpi/SmallString.h>
 #include <wpi/StringExtras.h>
 #include <wpi/fs.h>
 #include <wpi/mutex.h>
 #include <wpi/raw_istream.h>
 #include <wpi/raw_ostream.h>
 #include <wpinet/EventLoopRunner.h>
+#include <wpinet/HttpUtil.h>
 #include <wpinet/HttpWebSocketServerConnection.h>
 #include <wpinet/UrlParser.h>
 #include <wpinet/uv/Async.h>
@@ -87,7 +89,7 @@ class ServerConnection4 final
   void ProcessRequest() final;
   void ProcessWsUpgrade() final;
 
-  std::unique_ptr<net::WebSocketConnection> m_wire;
+  std::shared_ptr<net::WebSocketConnection> m_wire;
 };
 
 class ServerConnection3 : public ServerConnection {
@@ -97,7 +99,7 @@ class ServerConnection3 : public ServerConnection {
                     wpi::Logger& logger);
 
  private:
-  std::unique_ptr<net3::UvStreamConnection3> m_wire;
+  std::shared_ptr<net3::UvStreamConnection3> m_wire;
 };
 
 class NSImpl {
@@ -109,6 +111,7 @@ class NSImpl {
 
   void HandleLocal();
   void LoadPersistent();
+  void SavePersistent(std::string_view filename, std::string_view data);
   void Init();
   void AddConnection(ServerConnection* conn, const ConnectionInfo& info);
   void RemoveConnection(ServerConnection* conn);
@@ -223,35 +226,35 @@ void ServerConnection4::ProcessWsUpgrade() {
   }
   DEBUG4("path: '{}'", path);
 
+  wpi::SmallString<128> nameBuf;
   std::string_view name;
+  bool err = false;
   if (wpi::starts_with(path, "/nt/")) {
-    name = wpi::drop_front(path, 4);
+    name = wpi::UnescapeURI(wpi::drop_front(path, 4), nameBuf, &err);
   }
-  if (name.empty()) {
-    INFO("invalid path '{}' (from {}), closing", path, m_connInfo);
-    m_websocket->Fail(404, fmt::format("invalid path '{}'", path));
+  if (err || name.empty()) {
+    INFO("invalid path '{}' (from {}), must match /nt/[clientId], closing",
+         path, m_connInfo);
+    m_websocket->Fail(
+        404, fmt::format("invalid path '{}', must match /nt/[clientId]", path));
     return;
   }
 
   m_websocket->SetMaxMessageSize(kMaxMessageSize);
 
   m_websocket->open.connect([this, name = std::string{name}](std::string_view) {
-    m_wire = std::make_unique<net::WebSocketConnection>(*m_websocket);
+    m_wire = std::make_shared<net::WebSocketConnection>(*m_websocket);
     // TODO: set local flag appropriately
-    m_clientId = m_server.m_serverImpl.AddClient(
+    std::string dedupName;
+    std::tie(dedupName, m_clientId) = m_server.m_serverImpl.AddClient(
         name, m_connInfo, false, *m_wire,
         [this](uint32_t repeatMs) { UpdatePeriodicTimer(repeatMs); });
-    if (m_clientId < 0) {
-      INFO("duplicate connection name '{}' (from {}), closing", name,
-           m_connInfo);
-      m_websocket->Fail(409, fmt::format("duplicate name '{}'", name));
-      return;
-    }
-    m_info.remote_id = name;
+    INFO("CONNECTED NT4 client '{}' (from {})", dedupName, m_connInfo);
+    m_info.remote_id = dedupName;
     m_server.AddConnection(this, m_info);
     m_websocket->closed.connect([this](uint16_t, std::string_view reason) {
-      INFO("NT4 connection '{}' closed (from {})", m_info.remote_id,
-           m_connInfo);
+      INFO("DISCONNECTED NT4 client '{}' (from {}): {}", m_info.remote_id,
+           m_connInfo, reason);
       ConnectionClosed();
     });
     m_websocket->text.connect([this](std::string_view data, bool) {
@@ -269,7 +272,7 @@ ServerConnection3::ServerConnection3(std::shared_ptr<uv::Stream> stream,
                                      NSImpl& server, std::string_view addr,
                                      unsigned int port, wpi::Logger& logger)
     : ServerConnection{server, addr, port, logger},
-      m_wire{std::make_unique<net3::UvStreamConnection3>(*stream)} {
+      m_wire{std::make_shared<net3::UvStreamConnection3>(*stream)} {
   m_info.remote_ip = addr;
   m_info.remote_port = port;
 
@@ -280,6 +283,7 @@ ServerConnection3::ServerConnection3(std::shared_ptr<uv::Stream> stream,
         m_info.remote_id = name;
         m_info.protocol_version = proto;
         m_server.AddConnection(this, m_info);
+        INFO("CONNECTED NT3 client '{}' (from {})", name, m_connInfo);
       },
       [this](uint32_t repeatMs) { UpdatePeriodicTimer(repeatMs); });
 
@@ -298,7 +302,7 @@ ServerConnection3::ServerConnection3(std::shared_ptr<uv::Stream> stream,
     m_wire->GetStream().Shutdown([this] { m_wire->GetStream().Close(); });
   });
   stream->closed.connect([this] {
-    INFO("NT3 connection '{}' closed (from {}): {}", m_info.remote_id,
+    INFO("DISCONNECTED NT3 client '{}' (from {}): {}", m_info.remote_id,
          m_connInfo, m_wire->GetDisconnectReason());
     ConnectionClosed();
   });
@@ -332,9 +336,8 @@ NSImpl::NSImpl(std::string_view persistentFilename,
     // connect local storage to server
     {
       net::ServerStartup startup{m_serverImpl};
-      m_localStorage.StartNetwork(startup);
+      m_localStorage.StartNetwork(startup, &m_localQueue);
     }
-    m_localStorage.SetNetwork(&m_localQueue);
     m_serverImpl.SetLocal(&m_localStorage);
 
     // load persistent file first, then initialize
@@ -360,16 +363,21 @@ void NSImpl::LoadPersistent() {
   is.readinto(m_persistentData, size);
   DEBUG4("read data: {}", m_persistentData);
   if (is.has_error()) {
-    WARNING("{}", "error reading persistent file");
+    WARNING("error reading persistent file");
     return;
   }
 }
 
-static void SavePersistent(std::string_view filename, std::string_view data) {
+void NSImpl::SavePersistent(std::string_view filename, std::string_view data) {
   // write to temporary file
   auto tmp = fmt::format("{}.tmp", filename);
   std::error_code ec;
   wpi::raw_fd_ostream os{tmp, ec, fs::F_Text};
+  if (ec.value() != 0) {
+    INFO("could not open persistent file '{}' for write: {}", tmp,
+         ec.message());
+    return;
+  }
   os << data;
   os.close();
   if (os.has_error()) {
@@ -407,9 +415,8 @@ void NSImpl::Init() {
     if (m_serverImpl.PersistentChanged()) {
       uv::QueueWork(
           m_loop,
-          [fn = m_persistentFilename, data = m_serverImpl.DumpPersistent()] {
-            SavePersistent(fn, data);
-          },
+          [this, fn = m_persistentFilename,
+           data = m_serverImpl.DumpPersistent()] { SavePersistent(fn, data); },
           nullptr);
     }
   });
@@ -453,7 +460,7 @@ void NSImpl::Init() {
       if (uv::AddrToName(tcp->GetPeer(), &peerAddr, &peerPort) == 0) {
         INFO("Got a NT3 connection from {} port {}", peerAddr, peerPort);
       } else {
-        INFO("{}", "Got a NT3 connection from unknown");
+        INFO("Got a NT3 connection from unknown");
       }
       auto conn = std::make_shared<ServerConnection3>(tcp, *this, peerAddr,
                                                       peerPort, m_logger);
@@ -485,7 +492,7 @@ void NSImpl::Init() {
       if (uv::AddrToName(tcp->GetPeer(), &peerAddr, &peerPort) == 0) {
         INFO("Got a NT4 connection from {} port {}", peerAddr, peerPort);
       } else {
-        INFO("{}", "Got a NT4 connection from unknown");
+        INFO("Got a NT4 connection from unknown");
       }
       auto conn = std::make_shared<ServerConnection4>(tcp, *this, peerAddr,
                                                       peerPort, m_logger);
@@ -496,7 +503,7 @@ void NSImpl::Init() {
   }
 
   if (m_initDone) {
-    DEBUG4("{}", "NetworkServer initDone()");
+    DEBUG4("NetworkServer initDone()");
     m_initDone();
     m_initDone = nullptr;
   }

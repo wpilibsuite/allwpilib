@@ -6,6 +6,10 @@
 
 using namespace frc2;
 
+Trigger CommandXboxController::Button(int button, frc::EventLoop* loop) const {
+  return GenericHID::Button(button, loop).CastTo<Trigger>();
+}
+
 Trigger CommandXboxController::LeftBumper(frc::EventLoop* loop) const {
   return XboxController::LeftBumper(loop).CastTo<Trigger>();
 }

@@ -44,7 +44,7 @@ struct PublisherData {
 
   Entry* entry;
   NT_Publisher handle;
-  PubSubOptions options;
+  PubSubOptionsImpl options;
   // in options as double, but copy here as integer; rounded to the nearest
   // 10 ms
   uint32_t periodMs;
@@ -98,7 +98,7 @@ class CImpl : public MessageHandler3 {
   // Outgoing handlers
   void Publish(NT_Publisher pubHandle, NT_Topic topicHandle,
                std::string_view name, std::string_view typeStr,
-               const wpi::json& properties, const PubSubOptions& options);
+               const wpi::json& properties, const PubSubOptionsImpl& options);
   void Unpublish(NT_Publisher pubHandle, NT_Topic topicHandle);
   void SetProperties(NT_Topic topicHandle, std::string_view name,
                      const wpi::json& update);
@@ -238,7 +238,7 @@ void CImpl::SendPeriodic(uint64_t curTimeMs, bool initial) {
     if (!CheckNetworkReady()) {
       return;
     }
-    DEBUG4("{}", "Sending keep alive");
+    DEBUG4("Sending keep alive");
     WireEncodeKeepAlive(out.stream());
     // drift isn't critical here, so just go from current time
     m_nextKeepAliveTimeMs = curTimeMs + kKeepAliveIntervalMs;
@@ -274,7 +274,7 @@ void CImpl::SendPeriodic(uint64_t curTimeMs, bool initial) {
   }
 
   if (initial) {
-    DEBUG4("{}", "Sending ClientHelloDone");
+    DEBUG4("Sending ClientHelloDone");
     WireEncodeClientHelloDone(out.stream());
   }
 
@@ -315,7 +315,8 @@ bool CImpl::CheckNetworkReady() {
 
 void CImpl::Publish(NT_Publisher pubHandle, NT_Topic topicHandle,
                     std::string_view name, std::string_view typeStr,
-                    const wpi::json& properties, const PubSubOptions& options) {
+                    const wpi::json& properties,
+                    const PubSubOptionsImpl& options) {
   DEBUG4("Publish('{}', '{}')", name, typeStr);
   unsigned int index = Handle{pubHandle}.GetIndex();
   if (index >= m_publishers.size()) {
@@ -330,7 +331,7 @@ void CImpl::Publish(NT_Publisher pubHandle, NT_Topic topicHandle,
   }
   publisher->handle = pubHandle;
   publisher->options = options;
-  publisher->periodMs = std::lround(options.periodic * 100) * 10;
+  publisher->periodMs = std::lround(options.periodicMs / 10.0) * 10;
   if (publisher->periodMs < 10) {
     publisher->periodMs = 10;
   }
@@ -403,7 +404,7 @@ void CImpl::SetValue(NT_Publisher pubHandle, const Value& value) {
 }
 
 void CImpl::KeepAlive() {
-  DEBUG4("{}", "KeepAlive()");
+  DEBUG4("KeepAlive()");
   if (m_state != kStateRunning && m_state != kStateInitialAssignments) {
     m_decoder.SetError("received unexpected KeepAlive message");
     return;
@@ -412,7 +413,7 @@ void CImpl::KeepAlive() {
 }
 
 void CImpl::ServerHelloDone() {
-  DEBUG4("{}", "ServerHelloDone()");
+  DEBUG4("ServerHelloDone()");
   if (m_state != kStateInitialAssignments) {
     m_decoder.SetError("received unexpected ServerHelloDone message");
     return;
@@ -426,7 +427,7 @@ void CImpl::ServerHelloDone() {
 }
 
 void CImpl::ClientHelloDone() {
-  DEBUG4("{}", "ClientHelloDone()");
+  DEBUG4("ClientHelloDone()");
   m_decoder.SetError("received unexpected ClientHelloDone message");
 }
 
@@ -572,7 +573,7 @@ void CImpl::EntryDelete(unsigned int id) {
 }
 
 void CImpl::ClearEntries() {
-  DEBUG4("{}", "ClearEntries()");
+  DEBUG4("ClearEntries()");
   if (m_state != kStateRunning) {
     m_decoder.SetError("received ClearEntries message before ServerHelloDone");
     return;
@@ -609,7 +610,7 @@ ClientImpl3::ClientImpl3(uint64_t curTimeMs, int inst, WireConnection3& wire,
                                     std::move(setPeriodic))} {}
 
 ClientImpl3::~ClientImpl3() {
-  WPI_DEBUG4(m_impl->m_logger, "{}", "NT3 ClientImpl destroyed");
+  WPI_DEBUG4(m_impl->m_logger, "NT3 ClientImpl destroyed");
 }
 
 void ClientImpl3::Start(std::string_view selfId,
@@ -647,7 +648,7 @@ ClientStartup3::~ClientStartup3() = default;
 void ClientStartup3::Publish(NT_Publisher pubHandle, NT_Topic topicHandle,
                              std::string_view name, std::string_view typeStr,
                              const wpi::json& properties,
-                             const PubSubOptions& options) {
+                             const PubSubOptionsImpl& options) {
   WPI_DEBUG4(m_client.m_impl->m_logger, "StartupPublish({}, {}, {}, {})",
              pubHandle, topicHandle, name, typeStr);
   m_client.m_impl->Publish(pubHandle, topicHandle, name, typeStr, properties,
@@ -656,7 +657,7 @@ void ClientStartup3::Publish(NT_Publisher pubHandle, NT_Topic topicHandle,
 
 void ClientStartup3::Subscribe(NT_Subscriber subHandle,
                                std::span<const std::string> prefixes,
-                               const PubSubOptions& options) {
+                               const PubSubOptionsImpl& options) {
   // NT3 ignores subscribes, so no action required
 }
 

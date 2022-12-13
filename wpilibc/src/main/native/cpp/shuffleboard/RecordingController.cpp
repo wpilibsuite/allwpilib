@@ -39,8 +39,7 @@ void RecordingController::AddEventMarker(
     std::string_view name, std::string_view description,
     ShuffleboardEventImportance importance) {
   if (name.empty()) {
-    FRC_ReportError(err::Error, "{}",
-                    "Shuffleboard event name was not specified");
+    FRC_ReportError(err::Error, "Shuffleboard event name was not specified");
     return;
   }
   m_eventsTable->GetSubTable(name)->GetEntry("Info").SetStringArray(

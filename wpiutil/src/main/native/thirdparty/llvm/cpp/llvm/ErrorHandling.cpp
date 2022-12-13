@@ -163,7 +163,7 @@ void wpi::wpi_unreachable_internal(const char *msg, const char *file,
   std::fputs("UNREACHABLE executed", stderr);
   if (file)
     fmt::print(stderr, " at {}:{}", file, line);
-  fmt::print(stderr, "{}", "!\n");
+  fmt::print(stderr, "!\n");
   abort();
 #ifdef LLVM_BUILTIN_UNREACHABLE
   // Windows systems and possibly others don't declare abort() to be noreturn,

@@ -70,7 +70,7 @@ ComplexWidget& ShuffleboardContainer::Add(std::string_view title,
 ComplexWidget& ShuffleboardContainer::Add(wpi::Sendable& sendable) {
   auto name = wpi::SendableRegistry::GetName(&sendable);
   if (name.empty()) {
-    FRC_ReportError(err::Error, "{}", "Sendable must have a name");
+    FRC_ReportError(err::Error, "Sendable must have a name");
   }
   return Add(name, sendable);
 }
@@ -83,7 +83,7 @@ SimpleWidget& ShuffleboardContainer::Add(std::string_view title,
   auto ptr = widget.get();
   m_components.emplace_back(std::move(widget));
   ptr->GetEntry(nt::GetStringFromType(defaultValue.type()))
-      .SetDefault(defaultValue);
+      ->SetDefault(defaultValue);
   return *ptr;
 }
 
@@ -322,7 +322,7 @@ SimpleWidget& ShuffleboardContainer::AddPersistent(
     std::string_view title, const nt::Value& defaultValue) {
   auto& widget = Add(title, defaultValue);
   widget.GetEntry(nt::GetStringFromType(defaultValue.type()))
-      .GetTopic()
+      ->GetTopic()
       .SetPersistent(true);
   return widget;
 }

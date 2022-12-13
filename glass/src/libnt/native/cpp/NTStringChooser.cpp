@@ -60,5 +60,5 @@ void NTStringChooserModel::Update() {
 }
 
 bool NTStringChooserModel::Exists() {
-  return m_inst.IsConnected() && m_options.Exists();
+  return m_options.Exists();
 }

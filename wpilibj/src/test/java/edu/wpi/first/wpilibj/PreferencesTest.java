@@ -54,7 +54,7 @@ class PreferencesTest {
     m_inst.startServer(filepath.toString(), "", 0, 0);
     try {
       int count = 0;
-      while ((m_inst.getNetworkMode() & NetworkTableInstance.kNetModeStarting) != 0) {
+      while (m_inst.getNetworkMode().contains(NetworkTableInstance.NetworkMode.kStarting)) {
         Thread.sleep(100);
         count++;
         if (count > 30) {

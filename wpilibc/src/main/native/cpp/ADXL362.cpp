@@ -55,7 +55,7 @@ ADXL362::ADXL362(SPI::Port port, Range range)
     commands[2] = 0;
     m_spi.Transaction(commands, commands, 3);
     if (commands[2] != 0xF2) {
-      FRC_ReportError(err::Error, "{}", "could not find ADXL362");
+      FRC_ReportError(err::Error, "could not find ADXL362");
       m_gsPerLSB = 0.0;
       return;
     }

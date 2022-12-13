@@ -4,6 +4,8 @@
 
 #pragma once
 
+#include <cstddef>
+
 #include "hal/DriverStationTypes.h"
 #include "hal/Types.h"
 #include "hal/simulation/NotifyListener.h"
@@ -145,11 +147,11 @@ void HALSIM_GetJoystickCounts(int32_t stick, int32_t* axisCount,
 
 void HALSIM_SetJoystickIsXbox(int32_t stick, HAL_Bool isXbox);
 void HALSIM_SetJoystickType(int32_t stick, int32_t type);
-void HALSIM_SetJoystickName(int32_t stick, const char* name);
+void HALSIM_SetJoystickName(int32_t stick, const char* name, size_t size);
 void HALSIM_SetJoystickAxisType(int32_t stick, int32_t axis, int32_t type);
 
-void HALSIM_SetGameSpecificMessage(const char* message);
-void HALSIM_SetEventName(const char* name);
+void HALSIM_SetGameSpecificMessage(const char* message, size_t size);
+void HALSIM_SetEventName(const char* name, size_t size);
 void HALSIM_SetMatchType(HAL_MatchType type);
 void HALSIM_SetMatchNumber(int32_t matchNumber);
 void HALSIM_SetReplayNumber(int32_t replayNumber);

@@ -202,22 +202,6 @@ class CommandDecoratorTest extends CommandTestBase {
   }
 
   @Test
-  void endlesslyTest() {
-    try (CommandScheduler scheduler = new CommandScheduler()) {
-      Command command = new InstantCommand();
-
-      Command perpetual = command.endlessly();
-
-      scheduler.schedule(perpetual);
-      scheduler.run();
-      scheduler.run();
-      scheduler.run();
-
-      assertTrue(scheduler.isScheduled(perpetual));
-    }
-  }
-
-  @Test
   void unlessTest() {
     try (CommandScheduler scheduler = new CommandScheduler()) {
       AtomicBoolean unlessCondition = new AtomicBoolean(true);

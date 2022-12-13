@@ -51,12 +51,10 @@ void bench() {
   // set up instances
   auto client = nt::CreateInstance();
   auto server = nt::CreateInstance();
-  nt::SetNetworkIdentity(server, "server");
-  nt::SetNetworkIdentity(client, "client");
 
   // connect client and server
   nt::StartServer(server, "bench.json", "127.0.0.1", 0, 10000);
-  nt::StartClient4(client);
+  nt::StartClient4(client, "client");
   nt::SetServer(client, "127.0.0.1", 10000);
 
   using namespace std::chrono_literals;
@@ -65,8 +63,7 @@ void bench() {
   // add "typical" set of subscribers on client and server
   nt::SubscribeMultiple(client, {{std::string_view{}}});
   nt::Subscribe(nt::GetTopic(client, "highrate"), NT_DOUBLE, "double",
-                {{nt::PubSubOption::KeepDuplicates(true),
-                  nt::PubSubOption::SendAll(true)}});
+                {.sendAll = true, .keepDuplicates = true});
   nt::SubscribeMultiple(server, {{std::string_view{}}});
   auto pub = nt::Publish(nt::GetTopic(server, "highrate"), NT_DOUBLE, "double");
   nt::SetDouble(pub, 0);

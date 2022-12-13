@@ -18,24 +18,16 @@ namespace nt {
 class Handle {
  public:
   enum Type {
-    kConnectionListener = wpi::kHandleTypeNTBase,
-    kConnectionListenerPoller,
+    kListener = wpi::kHandleTypeNTBase,
+    kListenerPoller,
     kEntry,
-    kEntryListener,
-    kEntryListenerPoller,
     kInstance,
-    kLogger,
-    kLoggerPoller,
     kDataLogger,
     kConnectionDataLogger,
     kMultiSubscriber,
     kTopic,
-    kTopicListener,
-    kTopicListenerPoller,
     kSubscriber,
     kPublisher,
-    kValueListener,
-    kValueListenerPoller,
     kTypeMax
   };
   static_assert(kTypeMax <= wpi::kHandleTypeHALBase);

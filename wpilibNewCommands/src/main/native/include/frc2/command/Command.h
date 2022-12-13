@@ -25,7 +25,6 @@ std::string GetTypeName(const T& type) {
 }
 
 class PerpetualCommand;
-class ProxyScheduleCommand;
 
 /**
  * A state machine representing a complete action to be performed by the robot.
@@ -200,18 +199,20 @@ class Command {
    * conditions.  The decorated command can still be interrupted or canceled.
    *
    * @return the decorated command
-   * @deprecated replace with EndlessCommand
+   * @deprecated PerpetualCommand violates the assumption that execute() doesn't
+get called after isFinished() returns true -- an assumption that should be
+valid. This was unsafe/undefined behavior from the start, and RepeatCommand
+provides an easy way to achieve similar end results with slightly different (and
+safe) semantics.
    */
-  WPI_DEPRECATED("Replace with Endlessly()")
+  WPI_DEPRECATED(
+      "PerpetualCommand violates the assumption that execute() doesn't get "
+      "called after isFinished() returns true -- an assumption that should be "
+      "valid."
+      "This was unsafe/undefined behavior from the start, and RepeatCommand "
+      "provides an easy way to achieve similar end results with slightly "
+      "different (and safe) semantics.")
   PerpetualCommand Perpetually() &&;
-
-  /**
-   * Decorates this command to run endlessly, ignoring its ordinary end
-   * conditions. The decorated command can still be interrupted or canceled.
-   *
-   * @return the decorated command
-   */
-  [[nodiscard]] CommandPtr Endlessly() &&;
 
   /**
    * Decorates this command to run repeatedly, restarting it when it ends, until
@@ -223,7 +224,7 @@ class Command {
 
   /**
    * Decorates this command to run "by proxy" by wrapping it in a
-   * ProxyScheduleCommand. This is useful for "forking off" from command groups
+   * ProxyCommand. This is useful for "forking off" from command groups
    * when the user does not wish to extend the command's requirements to the
    * entire command group.
    *
@@ -281,6 +282,15 @@ class Command {
   [[nodiscard]] CommandPtr HandleInterrupt(std::function<void()> handler) &&;
 
   /**
+   * Decorates this Command with a name. Is an inline function for
+   * #SetName(std::string_view);
+   *
+   * @param name name
+   * @return the decorated Command
+   */
+  [[nodiscard]] CommandPtr WithName(std::string_view name) &&;
+
+  /**
    * Schedules this command.
    */
   void Schedule();
@@ -292,9 +302,9 @@ class Command {
   void Cancel();
 
   /**
-   * Whether or not the command is currently scheduled.  Note that this does not
-   * detect whether the command is being run by a CommandGroup, only whether it
-   * is directly being run by the scheduler.
+   * Whether or not the command is currently scheduled. Note that this does not
+   * detect whether the command is in a composition, only whether it is directly
+   * being run by the scheduler.
    *
    * @return Whether the command is scheduled.
    */
@@ -314,13 +324,32 @@ class Command {
    * Whether the command is currently grouped in a command group.  Used as extra
    * insurance to prevent accidental independent use of grouped commands.
    */
+  bool IsComposed() const;
+
+  /**
+   * Sets whether the command is currently composed in a command composition.
+   * Can be used to "reclaim" a command if a composition is no longer going to
+   * use it.  NOT ADVISED!
+   */
+  void SetComposed(bool isComposed);
+
+  /**
+   * Whether the command is currently grouped in a command group.  Used as extra
+   * insurance to prevent accidental independent use of grouped commands.
+   *
+   * @deprecated Moved to IsComposed()
+   */
+  WPI_DEPRECATED("Moved to IsComposed()")
   bool IsGrouped() const;
 
   /**
    * Sets whether the command is currently grouped in a command group.  Can be
    * used to "reclaim" a command if a group is no longer going to use it.  NOT
    * ADVISED!
+   *
+   * @deprecated Moved to SetComposed()
    */
+  WPI_DEPRECATED("Moved to SetComposed()")
   void SetGrouped(bool grouped);
 
   /**
@@ -341,7 +370,26 @@ class Command {
     return InterruptionBehavior::kCancelSelf;
   }
 
+  /**
+   * Gets the name of this Command. Defaults to the simple class name if not
+   * overridden.
+   *
+   * @return The display name of the Command
+   */
   virtual std::string GetName() const;
+
+  /**
+   * Sets the name of this Command. Nullop if not overridden.
+   *
+   * @param name The display name of the Command.
+   */
+  virtual void SetName(std::string_view name);
+
+  /**
+   * Transfers ownership of this command to a unique pointer.  Used for
+   * decorator methods.
+   */
+  virtual CommandPtr ToPtr() && = 0;
 
  protected:
   /**
@@ -350,7 +398,7 @@ class Command {
    */
   virtual std::unique_ptr<Command> TransferOwnership() && = 0;
 
-  bool m_isGrouped = false;
+  bool m_isComposed = false;
 };
 
 /**

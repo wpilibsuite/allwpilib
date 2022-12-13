@@ -104,6 +104,10 @@ model {
                 baseName = nativeName + 'jni'
             }
 
+            if (project.hasProperty('skipJniSymbols')) {
+                checkSkipSymbols = skipJniSymbols
+            }
+
             enableCheckTask !project.hasProperty('skipJniCheck')
             javaCompileTasks << compileJava
             jniCrossCompileOptions << JniCrossCompileOptions(nativeUtils.wpi.platforms.roborio)
@@ -146,6 +150,10 @@ model {
                 baseName = setBaseName + 'jni'
             } else {
                 baseName = nativeName + 'jni'
+            }
+
+            if (project.hasProperty('skipJniSymbols')) {
+                checkSkipSymbols = skipJniSymbols
             }
 
             enableCheckTask !project.hasProperty('skipJniCheck')

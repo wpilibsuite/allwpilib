@@ -34,7 +34,7 @@ RobotContainer::RobotContainer() {
   m_drive.SetDefaultCommand(frc2::RunCommand(
       [this] {
         m_drive.ArcadeDrive(-m_driverController.GetLeftY(),
-                            m_driverController.GetRightX());
+                            -m_driverController.GetLeftX());
       },
       {&m_drive}));
 }
@@ -53,8 +53,8 @@ void RobotContainer::ConfigureButtonBindings() {
   // While holding the shoulder button, drive at half speed
   frc2::JoystickButton(&m_driverController,
                        frc::XboxController::Button::kRightBumper)
-      .WhenPressed(&m_driveHalfSpeed)
-      .WhenReleased(&m_driveFullSpeed);
+      .OnTrue(&m_driveHalfSpeed)
+      .OnFalse(&m_driveFullSpeed);
 }
 
 frc2::Command* RobotContainer::GetAutonomousCommand() {

@@ -13,14 +13,201 @@ using namespace frc2;
 
 Trigger::Trigger(const Trigger& other) = default;
 
-Trigger Trigger::WhenActive(Command* command) {
-  this->Rising().IfHigh([command] { command->Schedule(); });
+Trigger Trigger::OnTrue(Command* command) {
+  m_loop->Bind(
+      [condition = m_condition, previous = m_condition(), command]() mutable {
+        bool current = condition();
+
+        if (!previous && current) {
+          command->Schedule();
+        }
+
+        previous = current;
+      });
   return *this;
 }
 
-Trigger Trigger::WhenActive(CommandPtr&& command) {
-  this->Rising().IfHigh([command = std::move(command)] { command.Schedule(); });
+Trigger Trigger::OnTrue(CommandPtr&& command) {
+  m_loop->Bind([condition = m_condition, previous = m_condition(),
+                command = std::move(command)]() mutable {
+    bool current = condition();
+
+    if (!previous && current) {
+      command.Schedule();
+    }
+
+    previous = current;
+  });
   return *this;
+}
+
+Trigger Trigger::OnFalse(Command* command) {
+  m_loop->Bind(
+      [condition = m_condition, previous = m_condition(), command]() mutable {
+        bool current = condition();
+
+        if (previous && !current) {
+          command->Schedule();
+        }
+
+        previous = current;
+      });
+  return *this;
+}
+
+Trigger Trigger::OnFalse(CommandPtr&& command) {
+  m_loop->Bind([condition = m_condition, previous = m_condition(),
+                command = std::move(command)]() mutable {
+    bool current = condition();
+
+    if (previous && !current) {
+      command.Schedule();
+    }
+
+    previous = current;
+  });
+  return *this;
+}
+
+Trigger Trigger::WhileTrue(Command* command) {
+  m_loop->Bind(
+      [condition = m_condition, previous = m_condition(), command]() mutable {
+        bool current = condition();
+
+        if (!previous && current) {
+          command->Schedule();
+        } else if (previous && !current) {
+          command->Cancel();
+        }
+
+        previous = current;
+      });
+  return *this;
+}
+
+Trigger Trigger::WhileTrue(CommandPtr&& command) {
+  m_loop->Bind([condition = m_condition, previous = m_condition(),
+                command = std::move(command)]() mutable {
+    bool current = condition();
+
+    if (!previous && current) {
+      command.Schedule();
+    } else if (previous && !current) {
+      command.Cancel();
+    }
+
+    previous = current;
+  });
+  return *this;
+}
+
+Trigger Trigger::WhileFalse(Command* command) {
+  m_loop->Bind(
+      [condition = m_condition, previous = m_condition(), command]() mutable {
+        bool current = condition();
+
+        if (previous && !current) {
+          command->Schedule();
+        } else if (!previous && current) {
+          command->Cancel();
+        }
+
+        previous = current;
+      });
+  return *this;
+}
+
+Trigger Trigger::WhileFalse(CommandPtr&& command) {
+  m_loop->Bind([condition = m_condition, previous = m_condition(),
+                command = std::move(command)]() mutable {
+    bool current = condition();
+
+    if (!previous && current) {
+      command.Schedule();
+    } else if (previous && !current) {
+      command.Cancel();
+    }
+
+    previous = current;
+  });
+  return *this;
+}
+
+Trigger Trigger::ToggleOnTrue(Command* command) {
+  m_loop->Bind([condition = m_condition, previous = m_condition(),
+                command = command]() mutable {
+    bool current = condition();
+
+    if (!previous && current) {
+      if (command->IsScheduled()) {
+        command->Cancel();
+      } else {
+        command->Schedule();
+      }
+    }
+
+    previous = current;
+  });
+  return *this;
+}
+
+Trigger Trigger::ToggleOnTrue(CommandPtr&& command) {
+  m_loop->Bind([condition = m_condition, previous = m_condition(),
+                command = std::move(command)]() mutable {
+    bool current = condition();
+
+    if (!previous && current) {
+      if (command.IsScheduled()) {
+        command.Cancel();
+      } else {
+        command.Schedule();
+      }
+    }
+
+    previous = current;
+  });
+  return *this;
+}
+
+Trigger Trigger::ToggleOnFalse(Command* command) {
+  m_loop->Bind([condition = m_condition, previous = m_condition(),
+                command = command]() mutable {
+    bool current = condition();
+
+    if (previous && !current) {
+      if (command->IsScheduled()) {
+        command->Cancel();
+      } else {
+        command->Schedule();
+      }
+    }
+
+    previous = current;
+  });
+  return *this;
+}
+
+Trigger Trigger::ToggleOnFalse(CommandPtr&& command) {
+  m_loop->Bind([condition = m_condition, previous = m_condition(),
+                command = std::move(command)]() mutable {
+    bool current = condition();
+
+    if (previous && !current) {
+      if (command.IsScheduled()) {
+        command.Cancel();
+      } else {
+        command.Schedule();
+      }
+    }
+
+    previous = current;
+  });
+  return *this;
+}
+
+WPI_IGNORE_DEPRECATED
+Trigger Trigger::WhenActive(Command* command) {
+  return OnTrue(command);
 }
 
 Trigger Trigger::WhenActive(std::function<void()> toRun,
@@ -35,15 +222,18 @@ Trigger Trigger::WhenActive(std::function<void()> toRun,
 }
 
 Trigger Trigger::WhileActiveContinous(Command* command) {
-  this->IfHigh([command] { command->Schedule(); });
-  this->Falling().IfHigh([command] { command->Cancel(); });
-  return *this;
-}
+  m_loop->Bind([condition = m_condition, previous = m_condition(),
+                command = std::move(command)]() mutable {
+    bool current = condition();
 
-Trigger Trigger::WhileActiveContinous(CommandPtr&& command) {
-  auto ptr = std::make_shared<CommandPtr>(std::move(command));
-  this->IfHigh([ptr] { ptr->Schedule(); });
-  this->Falling().IfHigh([ptr] { ptr->Cancel(); });
+    if (current) {
+      command->Schedule();
+    } else if (previous && !current) {
+      command->Cancel();
+    }
+
+    previous = current;
+  });
   return *this;
 }
 
@@ -60,26 +250,32 @@ Trigger Trigger::WhileActiveContinous(
 }
 
 Trigger Trigger::WhileActiveOnce(Command* command) {
-  this->Rising().IfHigh([command] { command->Schedule(); });
-  this->Falling().IfHigh([command] { command->Cancel(); });
-  return *this;
-}
+  m_loop->Bind(
+      [condition = m_condition, previous = m_condition(), command]() mutable {
+        bool current = condition();
 
-Trigger Trigger::WhileActiveOnce(CommandPtr&& command) {
-  auto ptr = std::make_shared<CommandPtr>(std::move(command));
-  this->Rising().IfHigh([ptr] { ptr->Schedule(); });
-  this->Falling().IfHigh([ptr] { ptr->Cancel(); });
+        if (!previous && current) {
+          command->Schedule();
+        } else if (previous && !current) {
+          command->Cancel();
+        }
+
+        previous = current;
+      });
   return *this;
 }
 
 Trigger Trigger::WhenInactive(Command* command) {
-  this->Falling().IfHigh([command] { command->Schedule(); });
-  return *this;
-}
+  m_loop->Bind(
+      [condition = m_condition, previous = m_condition(), command]() mutable {
+        bool current = condition();
 
-Trigger Trigger::WhenInactive(CommandPtr&& command) {
-  this->Falling().IfHigh(
-      [command = std::move(command)] { command.Schedule(); });
+        if (previous && !current) {
+          command->Schedule();
+        }
+
+        previous = current;
+      });
   return *this;
 }
 
@@ -95,28 +291,42 @@ Trigger Trigger::WhenInactive(std::function<void()> toRun,
 }
 
 Trigger Trigger::ToggleWhenActive(Command* command) {
-  this->Rising().IfHigh([command] {
-    if (command->IsScheduled()) {
-      command->Cancel();
-    } else {
-      command->Schedule();
-    }
-  });
-  return *this;
-}
+  m_loop->Bind([condition = m_condition, previous = m_condition(),
+                command = command]() mutable {
+    bool current = condition();
 
-Trigger Trigger::ToggleWhenActive(CommandPtr&& command) {
-  this->Rising().IfHigh([command = std::move(command)] {
-    if (command.IsScheduled()) {
-      command.Cancel();
-    } else {
-      command.Schedule();
+    if (!previous && current) {
+      if (command->IsScheduled()) {
+        command->Cancel();
+      } else {
+        command->Schedule();
+      }
     }
+
+    previous = current;
   });
   return *this;
 }
 
 Trigger Trigger::CancelWhenActive(Command* command) {
-  this->Rising().IfHigh([command] { command->Cancel(); });
+  m_loop->Bind([condition = m_condition, previous = m_condition(),
+                command = std::move(command)]() mutable {
+    bool current = condition();
+
+    if (!previous && current) {
+      command->Cancel();
+    }
+
+    previous = current;
+  });
   return *this;
+}
+WPI_UNIGNORE_DEPRECATED
+
+Trigger Trigger::Debounce(units::second_t debounceTime,
+                          frc::Debouncer::DebounceType type) {
+  return Trigger(m_loop, [debouncer = frc::Debouncer(debounceTime, type),
+                          condition = m_condition]() mutable {
+    return debouncer.Calculate(condition());
+  });
 }

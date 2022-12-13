@@ -41,6 +41,11 @@ frc::SwerveModuleState SwerveModule::GetState() const {
           units::radian_t{m_turningEncoder.GetDistance()}};
 }
 
+frc::SwerveModulePosition SwerveModule::GetPosition() const {
+  return {units::meter_t{m_driveEncoder.GetDistance()},
+          units::radian_t{m_turningEncoder.GetDistance()}};
+}
+
 void SwerveModule::SetDesiredState(
     const frc::SwerveModuleState& referenceState) {
   // Optimize the reference state to avoid spinning further than 90 degrees

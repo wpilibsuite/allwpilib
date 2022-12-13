@@ -4,6 +4,8 @@
 
 #pragma once
 
+#include <compare>
+
 namespace nt::net3 {
 
 /* A sequence number per RFC 1982 */
@@ -26,34 +28,11 @@ class SequenceNumber {
     return tmp;
   }
 
-  friend bool operator<(const SequenceNumber& lhs, const SequenceNumber& rhs);
-  friend bool operator>(const SequenceNumber& lhs, const SequenceNumber& rhs);
-  friend bool operator<=(const SequenceNumber& lhs, const SequenceNumber& rhs);
-  friend bool operator>=(const SequenceNumber& lhs, const SequenceNumber& rhs);
-  friend bool operator==(const SequenceNumber& lhs, const SequenceNumber& rhs);
-  friend bool operator!=(const SequenceNumber& lhs, const SequenceNumber& rhs);
+  friend auto operator<=>(const SequenceNumber& lhs,
+                          const SequenceNumber& rhs) = default;
 
  private:
   unsigned int m_value{0};
 };
-
-bool operator<(const SequenceNumber& lhs, const SequenceNumber& rhs);
-bool operator>(const SequenceNumber& lhs, const SequenceNumber& rhs);
-
-inline bool operator<=(const SequenceNumber& lhs, const SequenceNumber& rhs) {
-  return lhs == rhs || lhs < rhs;
-}
-
-inline bool operator>=(const SequenceNumber& lhs, const SequenceNumber& rhs) {
-  return lhs == rhs || lhs > rhs;
-}
-
-inline bool operator==(const SequenceNumber& lhs, const SequenceNumber& rhs) {
-  return lhs.m_value == rhs.m_value;
-}
-
-inline bool operator!=(const SequenceNumber& lhs, const SequenceNumber& rhs) {
-  return lhs.m_value != rhs.m_value;
-}
 
 }  // namespace nt::net3

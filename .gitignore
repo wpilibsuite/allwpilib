@@ -5,6 +5,10 @@ doxygen.log
 build*/
 !buildSrc/
 
+simgui-ds.json
+simgui-window.json
+simgui.json
+
 # Created by the jenkins test script
 test-reports
 

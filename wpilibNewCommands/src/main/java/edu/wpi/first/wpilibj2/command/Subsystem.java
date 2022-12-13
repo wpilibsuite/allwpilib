@@ -77,4 +77,52 @@ public interface Subsystem {
   default void register() {
     CommandScheduler.getInstance().registerSubsystem(this);
   }
+
+  /**
+   * Constructs a command that runs an action once and finishes. Requires this subsystem.
+   *
+   * @param action the action to run
+   * @return the command
+   * @see InstantCommand
+   */
+  default CommandBase runOnce(Runnable action) {
+    return Commands.runOnce(action, this);
+  }
+
+  /**
+   * Constructs a command that runs an action every iteration until interrupted. Requires this
+   * subsystem.
+   *
+   * @param action the action to run
+   * @return the command
+   * @see RunCommand
+   */
+  default CommandBase run(Runnable action) {
+    return Commands.run(action, this);
+  }
+
+  /**
+   * Constructs a command that runs an action once and another action when the command is
+   * interrupted. Requires this subsystem.
+   *
+   * @param start the action to run on start
+   * @param end the action to run on interrupt
+   * @return the command
+   * @see StartEndCommand
+   */
+  default CommandBase startEnd(Runnable start, Runnable end) {
+    return Commands.startEnd(start, end, this);
+  }
+
+  /**
+   * Constructs a command that runs an action every iteration until interrupted, and then runs a
+   * second action. Requires this subsystem.
+   *
+   * @param run the action to run every iteration
+   * @param end the action to run on interrupt
+   * @return the command
+   */
+  default CommandBase runEnd(Runnable run, Runnable end) {
+    return Commands.runEnd(run, end, this);
+  }
 }

@@ -113,7 +113,7 @@ class PopupState {
 struct DisplayOptions {
   explicit DisplayOptions(const gui::Texture& texture) : texture{texture} {}
 
-  enum Style { kBoxImage = 0, kLine, kLineClosed, kTrack };
+  enum Style { kBoxImage = 0, kLine, kLineClosed, kTrack, kHidden };
 
   static constexpr Style kDefaultStyle = kBoxImage;
   static constexpr float kDefaultWeight = 4.0f;
@@ -547,7 +547,7 @@ ObjectInfo::ObjectInfo(Storage& storage)
                                 DisplayOptions::kDefaultLength.to<float>())},
       m_style{storage.GetString("style"),
               DisplayOptions::kDefaultStyle,
-              {"Box/Image", "Line", "Line (Closed)", "Track"}},
+              {"Box/Image", "Line", "Line (Closed)", "Track", "Hidden"}},
       m_weight{storage.GetFloat("weight", DisplayOptions::kDefaultWeight)},
       m_color{
           storage.GetFloatArray("color", DisplayOptions::kDefaultColorFloat)},
@@ -839,6 +839,8 @@ void PoseFrameData::Draw(ImDrawList* drawList, std::vector<ImVec2>* center,
       center->emplace_back(m_center);
       left->emplace_back(m_corners[4]);
       right->emplace_back(m_corners[5]);
+      break;
+    case DisplayOptions::kHidden:
       break;
   }
 

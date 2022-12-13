@@ -12,7 +12,8 @@ import static org.mockito.Mockito.verify;
 
 import org.junit.jupiter.api.Test;
 
-class SequentialCommandGroupTest extends CommandTestBase {
+class SequentialCommandGroupTest extends CommandTestBase
+    implements MultiCompositionTestBase<SequentialCommandGroup> {
   @Test
   void sequentialGroupScheduleTest() {
     try (CommandScheduler scheduler = new CommandScheduler()) {
@@ -120,5 +121,10 @@ class SequentialCommandGroupTest extends CommandTestBase {
       assertFalse(scheduler.isScheduled(group));
       assertTrue(scheduler.isScheduled(command3));
     }
+  }
+
+  @Override
+  public SequentialCommandGroup compose(Command... members) {
+    return new SequentialCommandGroup(members);
   }
 }

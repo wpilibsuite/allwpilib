@@ -4,6 +4,10 @@
 
 package edu.wpi.first.math.geometry;
 
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import edu.wpi.first.math.MatBuilder;
 import edu.wpi.first.math.MathSharedStore;
 import edu.wpi.first.math.MathUtil;
@@ -17,6 +21,8 @@ import java.util.Objects;
 import org.ejml.dense.row.factory.DecompositionFactory_DDRM;
 
 /** A rotation in a 3D coordinate frame represented by a quaternion. */
+@JsonIgnoreProperties(ignoreUnknown = true)
+@JsonAutoDetect(getterVisibility = JsonAutoDetect.Visibility.NONE)
 public class Rotation3d implements Interpolatable<Rotation3d> {
   private Quaternion m_q = new Quaternion();
 
@@ -28,7 +34,8 @@ public class Rotation3d implements Interpolatable<Rotation3d> {
    *
    * @param q The quaternion.
    */
-  public Rotation3d(Quaternion q) {
+  @JsonCreator
+  public Rotation3d(@JsonProperty(required = true, value = "quaternion") Quaternion q) {
     m_q = q.normalize();
   }
 
@@ -37,6 +44,10 @@ public class Rotation3d implements Interpolatable<Rotation3d> {
    *
    * <p>Extrinsic rotations occur in that order around the axes in the fixed global frame rather
    * than the body frame.
+   *
+   * <p>Angles are measured counterclockwise with the rotation axis pointing "out of the page". If
+   * you point your right thumb along the positive axis direction, your fingers curl in the
+   * direction of positive rotation.
    *
    * @param roll The counterclockwise rotation angle around the X axis (roll) in radians.
    * @param pitch The counterclockwise rotation angle around the Y axis (pitch) in radians.
@@ -90,7 +101,7 @@ public class Rotation3d implements Interpolatable<Rotation3d> {
 
     // Require that the rotation matrix is special orthogonal. This is true if
     // the matrix is orthogonal (RRᵀ = I) and normalized (determinant is 1).
-    if (!R.times(R.transpose()).equals(Matrix.eye(Nat.N3()))) {
+    if (R.times(R.transpose()).minus(Matrix.eye(Nat.N3())).normF() > 1e-9) {
       var builder = new StringBuilder("Rotation matrix isn't orthogonal\n\nR =\n");
       builder.append(R.getStorage().toString()).append('\n');
 
@@ -98,7 +109,7 @@ public class Rotation3d implements Interpolatable<Rotation3d> {
       MathSharedStore.reportError(msg, Thread.currentThread().getStackTrace());
       throw new IllegalArgumentException(msg);
     }
-    if (R.det() != 1.0) {
+    if (Math.abs(R.det() - 1.0) > 1e-9) {
       var builder =
           new StringBuilder("Rotation matrix is orthogonal but not special orthogonal\n\nR =\n");
       builder.append(R.getStorage().toString()).append('\n');
@@ -270,6 +281,7 @@ public class Rotation3d implements Interpolatable<Rotation3d> {
    *
    * @return The quaternion representation of the Rotation3d.
    */
+  @JsonProperty(value = "quaternion")
   public Quaternion getQuaternion() {
     return m_q;
   }

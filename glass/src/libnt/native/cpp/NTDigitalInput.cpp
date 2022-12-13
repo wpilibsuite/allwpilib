@@ -15,8 +15,8 @@ NTDigitalInputModel::NTDigitalInputModel(std::string_view path)
 NTDigitalInputModel::NTDigitalInputModel(nt::NetworkTableInstance inst,
                                          std::string_view path)
     : m_inst{inst},
-      m_value{inst.GetBooleanTopic(fmt::format("{}/Value", path))
-                  .Subscribe(false, {{nt::PubSubOption::SendAll(true)}})},
+      m_value{
+          inst.GetBooleanTopic(fmt::format("{}/Value", path)).Subscribe(false)},
       m_name{inst.GetStringTopic(fmt::format("{}/.name", path)).Subscribe("")},
       m_valueData{fmt::format("NT_DIn:{}", path)},
       m_nameValue{wpi::rsplit(path, '/').second} {
@@ -33,5 +33,5 @@ void NTDigitalInputModel::Update() {
 }
 
 bool NTDigitalInputModel::Exists() {
-  return m_inst.IsConnected() && m_value.Exists();
+  return m_value.Exists();
 }

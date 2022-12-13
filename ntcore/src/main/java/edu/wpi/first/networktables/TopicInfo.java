@@ -43,6 +43,15 @@ public final class TopicInfo {
   private Topic m_topicObject;
 
   /**
+   * Get the instance.
+   *
+   * @return Instance
+   */
+  public NetworkTableInstance getInstance() {
+    return m_inst;
+  }
+
+  /**
    * Get the topic as an object.
    *
    * @return Topic

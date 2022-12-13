@@ -20,43 +20,31 @@ void PrintTo(const json& val, ::std::ostream* os) {
 }  // namespace wpi
 
 namespace nt {
-#if 0
-void PrintTo(const EntryNotification& event, std::ostream* os) {
-  *os << "EntryNotification{listener=";
+
+void PrintTo(const Event& event, std::ostream* os) {
+  *os << "Event{listener=";
   PrintTo(Handle{event.listener}, os);
-  *os << ", entry=";
-  PrintTo(Handle{event.entry}, os);
-  *os << ", name=\"" << event.name << "\", flags=" << event.flags << ", value=";
-  PrintTo(event.value, os);
+  *os << ", flags=" << event.flags;
+  // *os << ", name=\"" << event.name << "\", flags=" << event.flags
+  // << "value=";
+  // PrintTo(event.value, os);
   *os << '}';
 }
-#endif
+
 void PrintTo(const Handle& handle, std::ostream* os) {
   *os << "Handle{";
   switch (handle.GetType()) {
-    case Handle::kConnectionListener:
-      *os << "kConnectionListener";
+    case Handle::kListener:
+      *os << "kListener";
       break;
-    case Handle::kConnectionListenerPoller:
-      *os << "kConnectionListenerPoller";
+    case Handle::kListenerPoller:
+      *os << "kListenerPoller";
       break;
     case Handle::kEntry:
       *os << "kEntry";
       break;
-    case Handle::kEntryListener:
-      *os << "kEntryListener";
-      break;
-    case Handle::kEntryListenerPoller:
-      *os << "kEntryListenerPoller";
-      break;
     case Handle::kInstance:
       *os << "kInstance";
-      break;
-    case Handle::kLogger:
-      *os << "kLogger";
-      break;
-    case Handle::kLoggerPoller:
-      *os << "kLoggerPoller";
       break;
     case Handle::kTopic:
       *os << "kTopic";
@@ -133,37 +121,37 @@ void PrintTo(const Value& value, std::ostream* os) {
     case NT_UNASSIGNED:
       break;
     case NT_BOOLEAN:
-      *os << (value.GetBoolean() ? "true" : "false");
+      *os << "boolean, " << (value.GetBoolean() ? "true" : "false");
       break;
     case NT_DOUBLE:
-      *os << value.GetDouble();
+      *os << "double, " << value.GetDouble();
       break;
     case NT_FLOAT:
-      *os << value.GetFloat();
+      *os << "float, " << value.GetFloat();
       break;
     case NT_INTEGER:
-      *os << value.GetInteger();
+      *os << "int, " << value.GetInteger();
       break;
     case NT_STRING:
-      *os << '"' << value.GetString() << '"';
+      *os << "string, \"" << value.GetString() << '"';
       break;
     case NT_RAW:
-      *os << ::testing::PrintToString(value.GetRaw());
+      *os << "raw, " << ::testing::PrintToString(value.GetRaw());
       break;
     case NT_BOOLEAN_ARRAY:
-      *os << ::testing::PrintToString(value.GetBooleanArray());
+      *os << "boolean[], " << ::testing::PrintToString(value.GetBooleanArray());
       break;
     case NT_DOUBLE_ARRAY:
-      *os << ::testing::PrintToString(value.GetDoubleArray());
+      *os << "double[], " << ::testing::PrintToString(value.GetDoubleArray());
       break;
     case NT_FLOAT_ARRAY:
-      *os << ::testing::PrintToString(value.GetFloatArray());
+      *os << "float[], " << ::testing::PrintToString(value.GetFloatArray());
       break;
     case NT_INTEGER_ARRAY:
-      *os << ::testing::PrintToString(value.GetIntegerArray());
+      *os << "int[], " << ::testing::PrintToString(value.GetIntegerArray());
       break;
     case NT_STRING_ARRAY:
-      *os << ::testing::PrintToString(value.GetStringArray());
+      *os << "string[], " << ::testing::PrintToString(value.GetStringArray());
       break;
     default:
       *os << "UNKNOWN TYPE " << value.type();
@@ -172,10 +160,10 @@ void PrintTo(const Value& value, std::ostream* os) {
   *os << '}';
 }
 
-void PrintTo(const PubSubOptions& options, std::ostream* os) {
-  *os << "PubSubOptions{periodic=" << options.periodic
-      << ", pollStorageSize=" << options.pollStorageSize
-      << ", logging=" << options.sendAll
+void PrintTo(const PubSubOptionsImpl& options, std::ostream* os) {
+  *os << "PubSubOptions{periodicMs=" << options.periodicMs
+      << ", pollStorage=" << options.pollStorage
+      << ", sendAll=" << options.sendAll
       << ", keepDuplicates=" << options.keepDuplicates << '}';
 }
 

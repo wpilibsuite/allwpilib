@@ -13,21 +13,22 @@
 namespace nt {
 
 class PubSubOptionsMatcher
-    : public ::testing::MatcherInterface<const PubSubOptions&> {
+    : public ::testing::MatcherInterface<const PubSubOptionsImpl&> {
  public:
-  explicit PubSubOptionsMatcher(PubSubOptions good) : good{std::move(good)} {}
+  explicit PubSubOptionsMatcher(PubSubOptionsImpl good)
+      : good{std::move(good)} {}
 
-  bool MatchAndExplain(const PubSubOptions& val,
+  bool MatchAndExplain(const PubSubOptionsImpl& val,
                        ::testing::MatchResultListener* listener) const override;
   void DescribeTo(::std::ostream* os) const override;
   void DescribeNegationTo(::std::ostream* os) const override;
 
  private:
-  PubSubOptions good;
+  PubSubOptionsImpl good;
 };
 
-inline ::testing::Matcher<const PubSubOptions&> PubSubOptionsEq(
-    PubSubOptions good) {
+inline ::testing::Matcher<const PubSubOptionsImpl&> PubSubOptionsEq(
+    PubSubOptionsImpl good) {
   return ::testing::MakeMatcher(new PubSubOptionsMatcher(std::move(good)));
 }
 

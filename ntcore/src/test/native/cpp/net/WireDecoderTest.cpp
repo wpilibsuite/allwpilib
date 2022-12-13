@@ -31,7 +31,7 @@ class MockClientMessageHandler : public net::ClientMessageHandler {
                void(std::string_view name, const wpi::json& update));
   MOCK_METHOD3(ClientSubscribe,
                void(int64_t subuid, std::span<const std::string> prefixes,
-                    const PubSubOptions& options));
+                    const PubSubOptionsImpl& options));
   MOCK_METHOD1(ClientUnsubscribe, void(int64_t subuid));
 };
 

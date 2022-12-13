@@ -1,6 +1,6 @@
 import org.gradle.internal.os.OperatingSystem
 
-if (!project.hasProperty('onlylinuxathena') && !project.hasProperty('onlylinuxarm32') && !project.hasProperty('onlylinuxarm64')) {
+if (!project.hasProperty('onlylinuxathena')) {
 
     apply plugin: 'cpp'
     apply plugin: 'c'

@@ -98,39 +98,19 @@ DifferentialDrive::WheelSpeeds DifferentialDrive::ArcadeDriveIK(
     zRotation = std::copysign(zRotation * zRotation, zRotation);
   }
 
-  double leftSpeed;
-  double rightSpeed;
+  double leftSpeed = xSpeed - zRotation;
+  double rightSpeed = xSpeed + zRotation;
 
-  double maxInput =
-      std::copysign(std::max(std::abs(xSpeed), std::abs(zRotation)), xSpeed);
-
-  // Sign is used because `xSpeed >= 0.0` succeeds for -0.0
-  if (!std::signbit(xSpeed)) {
-    // First quadrant, else second quadrant
-    if (!std::signbit(zRotation)) {
-      leftSpeed = maxInput;
-      rightSpeed = xSpeed - zRotation;
-    } else {
-      leftSpeed = xSpeed + zRotation;
-      rightSpeed = maxInput;
-    }
-  } else {
-    // Third quadrant, else fourth quadrant
-    if (!std::signbit(zRotation)) {
-      leftSpeed = xSpeed + zRotation;
-      rightSpeed = maxInput;
-    } else {
-      leftSpeed = maxInput;
-      rightSpeed = xSpeed - zRotation;
-    }
+  // Find the maximum possible value of (throttle + turn) along the vector that
+  // the joystick is pointing, then desaturate the wheel speeds
+  double greaterInput = std::max(std::abs(xSpeed), std::abs(zRotation));
+  double lesserInput = std::min(std::abs(xSpeed), std::abs(zRotation));
+  if (greaterInput == 0.0) {
+    return {0.0, 0.0};
   }
-
-  // Normalize the wheel speeds
-  double maxMagnitude = std::max(std::abs(leftSpeed), std::abs(rightSpeed));
-  if (maxMagnitude > 1.0) {
-    leftSpeed /= maxMagnitude;
-    rightSpeed /= maxMagnitude;
-  }
+  double saturatedInput = (greaterInput + lesserInput) / greaterInput;
+  leftSpeed /= saturatedInput;
+  rightSpeed /= saturatedInput;
 
   return {leftSpeed, rightSpeed};
 }
@@ -144,14 +124,14 @@ DifferentialDrive::WheelSpeeds DifferentialDrive::CurvatureDriveIK(
   double rightSpeed = 0.0;
 
   if (allowTurnInPlace) {
-    leftSpeed = xSpeed + zRotation;
-    rightSpeed = xSpeed - zRotation;
+    leftSpeed = xSpeed - zRotation;
+    rightSpeed = xSpeed + zRotation;
   } else {
-    leftSpeed = xSpeed + std::abs(xSpeed) * zRotation;
-    rightSpeed = xSpeed - std::abs(xSpeed) * zRotation;
+    leftSpeed = xSpeed - std::abs(xSpeed) * zRotation;
+    rightSpeed = xSpeed + std::abs(xSpeed) * zRotation;
   }
 
-  // Normalize wheel speeds
+  // Desaturate wheel speeds
   double maxMagnitude = std::max(std::abs(leftSpeed), std::abs(rightSpeed));
   if (maxMagnitude > 1.0) {
     leftSpeed /= maxMagnitude;

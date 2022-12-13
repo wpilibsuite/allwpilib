@@ -126,7 +126,7 @@ target_compile_features(wpinet PUBLIC cxx_std_20)
 wpilib_target_warnings(wpinet)
 target_link_libraries(wpinet PUBLIC wpiutil)
 
-if (NOT USE_VCPKG_LIBUV)
+if (NOT USE_SYSTEM_LIBUV)
     target_sources(wpinet PRIVATE ${uv_native_src})
     install(DIRECTORY src/main/native/thirdparty/libuv/include/ DESTINATION "${include_dest}/wpinet")
     target_include_directories(wpinet PRIVATE
@@ -149,8 +149,9 @@ if (NOT USE_VCPKG_LIBUV)
         endif()
     endif()
 else()
-    find_package(unofficial-libuv CONFIG REQUIRED)
-    target_link_libraries(wpinet unofficial::libuv::libuv)
+    find_package(PkgConfig REQUIRED)
+    pkg_check_modules(libuv REQUIRED IMPORTED_TARGET libuv)
+    target_link_libraries(wpinet PUBLIC PkgConfig::libuv)
 endif()
 
 if (MSVC)
@@ -164,15 +165,17 @@ else ()
     endif()
 endif()
 
-target_include_directories(wpinet PUBLIC
-                            $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/include>
-                            $<INSTALL_INTERFACE:${include_dest}/wpinet>)
+install(DIRECTORY src/main/native/thirdparty/tcpsockets/include/ DESTINATION "${include_dest}/wpinet")
 target_include_directories(wpinet PUBLIC
                             $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/thirdparty/tcpsockets/include>
                             $<INSTALL_INTERFACE:${include_dest}/wpinet>)
 
-install(TARGETS wpinet EXPORT wpinet DESTINATION "${main_lib_dest}")
 install(DIRECTORY src/main/native/include/ DESTINATION "${include_dest}/wpinet")
+target_include_directories(wpinet PUBLIC
+                            $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/include>
+                            $<INSTALL_INTERFACE:${include_dest}/wpinet>)
+
+install(TARGETS wpinet EXPORT wpinet DESTINATION "${main_lib_dest}")
 
 if (WITH_JAVA AND MSVC)
     install(TARGETS wpinet RUNTIME DESTINATION "${jni_lib_dest}" COMPONENT Runtime)

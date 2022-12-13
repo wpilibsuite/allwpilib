@@ -112,9 +112,10 @@ class NetworkTableEntry final {
   int64_t GetLastChange() const;
 
   /**
-   * Gets the entry's value. If the entry does not exist, returns nullptr.
+   * Gets the entry's value. If the entry does not exist, returns an empty
+   * value.
    *
-   * @return the entry's value or nullptr if it does not exist.
+   * @return the entry's value or an empty value if it does not exist.
    */
   Value GetValue() const;
 
@@ -519,14 +520,7 @@ class NetworkTableEntry final {
    * Equality operator.  Returns true if both instances refer to the same
    * native handle.
    */
-  bool operator==(const NetworkTableEntry& oth) const {
-    return m_handle == oth.m_handle;
-  }
-
-  /** Inequality operator. */
-  bool operator!=(const NetworkTableEntry& oth) const {
-    return !(*this == oth);
-  }
+  bool operator==(const NetworkTableEntry&) const = default;
 
  protected:
   /* Native handle */

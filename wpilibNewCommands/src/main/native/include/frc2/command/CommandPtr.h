@@ -8,10 +8,11 @@
 #include <initializer_list>
 #include <memory>
 #include <span>
+#include <string>
 #include <utility>
 #include <vector>
 
-#include "frc2/command/Command.h"
+#include "frc2/command/CommandBase.h"
 
 namespace frc2 {
 /**
@@ -26,7 +27,7 @@ namespace frc2 {
  */
 class CommandPtr final {
  public:
-  explicit CommandPtr(std::unique_ptr<Command>&& command)
+  explicit CommandPtr(std::unique_ptr<CommandBase>&& command)
       : m_ptr(std::move(command)) {}
 
   template <class T, typename = std::enable_if_t<std::is_base_of_v<
@@ -47,16 +48,8 @@ class CommandPtr final {
   [[nodiscard]] CommandPtr Repeatedly() &&;
 
   /**
-   * Decorates this command to run endlessly, ignoring its ordinary end
-   * conditions. The decorated command can still be interrupted or canceled.
-   *
-   * @return the decorated command
-   */
-  [[nodiscard]] CommandPtr Endlessly() &&;
-
-  /**
    * Decorates this command to run "by proxy" by wrapping it in a
-   * ProxyScheduleCommand. This is useful for "forking off" from command groups
+   * ProxyCommand. This is useful for "forking off" from command groups
    * when the user does not wish to extend the command's requirements to the
    * entire command group.
    *
@@ -228,14 +221,23 @@ class CommandPtr final {
   [[nodiscard]] CommandPtr HandleInterrupt(std::function<void()> handler) &&;
 
   /**
+   * Decorates this Command with a name. Is an inline function for
+   * Command::SetName(std::string_view);
+   *
+   * @param name name
+   * @return the decorated Command
+   */
+  [[nodiscard]] CommandPtr WithName(std::string_view name) &&;
+
+  /**
    * Get a raw pointer to the held command.
    */
-  Command* get() const;
+  CommandBase* get() const;
 
   /**
    * Convert to the underlying unique_ptr.
    */
-  std::unique_ptr<Command> Unwrap() &&;
+  std::unique_ptr<CommandBase> Unwrap() &&;
 
   /**
    * Schedules this command.
@@ -250,8 +252,8 @@ class CommandPtr final {
 
   /**
    * Whether or not the command is currently scheduled. Note that this does not
-   * detect whether the command is being run by a CommandGroup, only whether it
-   * is directly being run by the scheduler.
+   * detect whether the command is in a composition, only whether it is directly
+   * being run by the scheduler.
    *
    * @return Whether the command is scheduled.
    */
@@ -268,13 +270,19 @@ class CommandPtr final {
   bool HasRequirement(Subsystem* requirement) const;
 
   /**
+   * Check if this CommandPtr object is valid and wasn't moved-from.
+   */
+  explicit operator bool() const;
+
+  /**
    * Convert a vector of CommandPtr objects to their underlying unique_ptrs.
    */
   static std::vector<std::unique_ptr<Command>> UnwrapVector(
       std::vector<CommandPtr>&& vec);
 
  private:
-  std::unique_ptr<Command> m_ptr;
+  std::unique_ptr<CommandBase> m_ptr;
+  void AssertValid() const;
 };
 
 }  // namespace frc2

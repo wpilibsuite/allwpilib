@@ -4,7 +4,7 @@
 
 package edu.wpi.first.wpilibj;
 
-import static java.util.Objects.requireNonNull;
+import static edu.wpi.first.util.ErrorMessages.requireNonNullParam;
 
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
@@ -142,8 +142,8 @@ public class Ultrasonic implements Sendable, AutoCloseable {
    * @param echoChannel The digital input object that times the return pulse to determine the range.
    */
   public Ultrasonic(DigitalOutput pingChannel, DigitalInput echoChannel) {
-    requireNonNull(pingChannel, "Provided ping channel was null");
-    requireNonNull(echoChannel, "Provided echo channel was null");
+    requireNonNullParam(pingChannel, "pingChannel", "Ultrasonic");
+    requireNonNullParam(echoChannel, "echoChannel", "Ultrasonic");
 
     m_allocatedChannels = false;
     m_pingChannel = pingChannel;

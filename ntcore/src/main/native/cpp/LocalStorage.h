@@ -25,9 +25,12 @@ class Logger;
 
 namespace nt {
 
+class IListenerStorage;
+
 class LocalStorage final : public net::ILocalStorage {
  public:
-  LocalStorage(int inst, wpi::Logger& logger);
+  LocalStorage(int inst, IListenerStorage& listenerStorage,
+               wpi::Logger& logger);
   LocalStorage(const LocalStorage&) = delete;
   LocalStorage& operator=(const LocalStorage&) = delete;
   ~LocalStorage() final;
@@ -41,8 +44,8 @@ class LocalStorage final : public net::ILocalStorage {
                                bool ack) final;
   void NetworkSetValue(NT_Topic topicHandle, const Value& value) final;
 
-  void StartNetwork(net::NetworkStartupInterface& startup) final;
-  void SetNetwork(net::NetworkInterface* network) final;
+  void StartNetwork(net::NetworkStartupInterface& startup,
+                    net::NetworkInterface* network) final;
   void ClearNetwork() final;
 
   // User functions.  These are the actual implementations of the corresponding
@@ -90,24 +93,23 @@ class LocalStorage final : public net::ILocalStorage {
 
   NT_Subscriber Subscribe(NT_Topic topic, NT_Type type,
                           std::string_view typeStr,
-                          std::span<const PubSubOption> options);
+                          const PubSubOptions& options);
 
   void Unsubscribe(NT_Subscriber sub);
 
   NT_MultiSubscriber SubscribeMultiple(
-      std::span<const std::string_view> prefixes,
-      std::span<const PubSubOption> options);
+      std::span<const std::string_view> prefixes, const PubSubOptions& options);
 
   void UnsubscribeMultiple(NT_MultiSubscriber subHandle);
 
   NT_Publisher Publish(NT_Topic topic, NT_Type type, std::string_view typeStr,
                        const wpi::json& properties,
-                       std::span<const PubSubOption> options);
+                       const PubSubOptions& options);
 
   void Unpublish(NT_Handle pubentry);
 
   NT_Entry GetEntry(NT_Topic topic, NT_Type type, std::string_view typeStr,
-                    std::span<const PubSubOption> options);
+                    const PubSubOptions& options);
 
   void ReleaseEntry(NT_Entry entry);
 
@@ -189,49 +191,15 @@ class LocalStorage final : public net::ILocalStorage {
   int64_t GetEntryLastChange(NT_Entry entry);
 
   //
-  // Topic listener functions
+  // Listener functions
   //
 
-  NT_TopicListener AddTopicListener(
-      std::span<const std::string_view> prefixes, unsigned int mask,
-      std::function<void(const TopicNotification&)> callback);
-  NT_TopicListener AddTopicListener(
-      NT_Handle handle, unsigned int mask,
-      std::function<void(const TopicNotification&)> callback);
+  void AddListener(NT_Listener listener,
+                   std::span<const std::string_view> prefixes,
+                   unsigned int mask);
+  void AddListener(NT_Listener listener, NT_Handle handle, unsigned int mask);
 
-  NT_TopicListenerPoller CreateTopicListenerPoller();
-  void DestroyTopicListenerPoller(NT_TopicListenerPoller poller);
-
-  NT_TopicListener AddPolledTopicListener(
-      NT_TopicListenerPoller poller, std::span<const std::string_view> prefixes,
-      unsigned int mask);
-  NT_TopicListener AddPolledTopicListener(NT_TopicListenerPoller poller,
-                                          NT_Handle handle, unsigned int mask);
-
-  std::vector<TopicNotification> ReadTopicListenerQueue(
-      NT_TopicListenerPoller poller);
-
-  void RemoveTopicListener(NT_TopicListener listener);
-
-  //
-  // Value listener functions
-  //
-
-  NT_ValueListener AddValueListener(
-      NT_Handle subentry, unsigned int mask,
-      std::function<void(const ValueNotification&)> callback);
-
-  NT_ValueListenerPoller CreateValueListenerPoller();
-  void DestroyValueListenerPoller(NT_ValueListenerPoller poller);
-
-  NT_ValueListener AddPolledValueListener(NT_ValueListenerPoller poller,
-                                          NT_Handle subentry,
-                                          unsigned int mask);
-
-  std::vector<ValueNotification> ReadValueListenerQueue(
-      NT_ValueListenerPoller poller);
-
-  void RemoveValueListener(NT_ValueListener listener);
+  void RemoveListener(NT_Listener listener, unsigned int mask);
 
   //
   // Data log functions
@@ -239,6 +207,8 @@ class LocalStorage final : public net::ILocalStorage {
   NT_DataLogger StartDataLog(wpi::log::DataLog& log, std::string_view prefix,
                              std::string_view logPrefix);
   void StopDataLog(NT_DataLogger logger);
+
+  void Reset();
 
  private:
   class Impl;

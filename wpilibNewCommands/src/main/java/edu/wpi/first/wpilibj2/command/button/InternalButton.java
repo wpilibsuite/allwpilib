@@ -12,6 +12,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
  *
  * <p>This class is provided by the NewCommands VendorDep
  */
+@SuppressWarnings("deprecation")
 public class InternalButton extends Button {
   // need to be references, so they can be mutated after being captured in the constructor.
   private final AtomicBoolean m_pressed;

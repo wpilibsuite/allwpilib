@@ -36,12 +36,16 @@ class SuppliedValueWidget : public ShuffleboardWidget<SuppliedValueWidget<T>> {
   void BuildInto(std::shared_ptr<nt::NetworkTable> parentTable,
                  std::shared_ptr<nt::NetworkTable> metaTable) override {
     this->BuildMetadata(metaTable);
-    m_controllablePub =
-        nt::BooleanTopic{metaTable->GetTopic("Controllable")}.Publish();
-    m_controllablePub.Set(false);
+    if (!m_controllablePub) {
+      m_controllablePub =
+          nt::BooleanTopic{metaTable->GetTopic("Controllable")}.Publish();
+      m_controllablePub.Set(false);
+    }
 
-    m_entry =
-        parentTable->GetTopic(this->GetTitle()).GenericPublish(m_typeString);
+    if (!m_entry) {
+      m_entry =
+          parentTable->GetTopic(this->GetTitle()).GenericPublish(m_typeString);
+    }
     m_setter(m_entry, m_supplier());
   }
 

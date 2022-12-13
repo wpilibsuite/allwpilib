@@ -7,6 +7,7 @@ package edu.wpi.first.math.kinematics;
 import edu.wpi.first.math.MathSharedStore;
 import edu.wpi.first.math.MathUsageId;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.geometry.Twist2d;
 import org.ejml.simple.SimpleMatrix;
 
 /**
@@ -151,6 +152,28 @@ public class MecanumDriveKinematics {
         chassisSpeedsVector.get(0, 0),
         chassisSpeedsVector.get(1, 0),
         chassisSpeedsVector.get(2, 0));
+  }
+
+  /**
+   * Performs forward kinematics to return the resulting Twist2d from the given wheel deltas. This
+   * method is often used for odometry -- determining the robot's position on the field using
+   * changes in the distance driven by each wheel on the robot.
+   *
+   * @param wheelDeltas The distances driven by each wheel.
+   * @return The resulting Twist2d.
+   */
+  public Twist2d toTwist2d(MecanumDriveWheelPositions wheelDeltas) {
+    var wheelDeltasVector = new SimpleMatrix(4, 1);
+    wheelDeltasVector.setColumn(
+        0,
+        0,
+        wheelDeltas.frontLeftMeters,
+        wheelDeltas.frontRightMeters,
+        wheelDeltas.rearLeftMeters,
+        wheelDeltas.rearRightMeters);
+    var twist = m_forwardKinematics.mult(wheelDeltasVector);
+
+    return new Twist2d(twist.get(0, 0), twist.get(1, 0), twist.get(2, 0));
   }
 
   /**
