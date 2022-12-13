@@ -36,7 +36,7 @@ import java.util.Optional;
  * <p>Pose3ds in the JSON are measured using the normal FRC co-ordinate system, NWU with the 
  * origin at the bottom-right corner of the blue alliance wall.  {@link #setOrigin(OriginPosition)} 
  * can be used to change the poses returned from {@link AprilTagFieldLayout#getTagPose(int)} to 
- * be from the perspective of a specifc alliance.  
+ * be from the perspective of a specific alliance.  
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonAutoDetect(getterVisibility = JsonAutoDetect.Visibility.NONE)
