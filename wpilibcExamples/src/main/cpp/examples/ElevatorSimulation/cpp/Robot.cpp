@@ -83,6 +83,7 @@ class Robot : public frc::TimedRobot {
     m_encoder.SetDistancePerPulse(kArmEncoderDistPerPulse);
 
     // Put Mechanism 2d to SmartDashboard
+    // To view the Elevator Sim in the simulator, select Network Tables -> SmartDashboard -> Elevator Sim
     frc::SmartDashboard::PutData("Elevator Sim", &m_mech2d);
   }
 
@@ -124,7 +125,7 @@ class Robot : public frc::TimedRobot {
     m_motor.Set(0.0);
   }
 };
-// To view the Elevator Sim in the simulator, select Network Tables -> SmartDashboard -> Elevator Sim
+
 
 #ifndef RUNNING_FRC_TESTS
 int main() {
