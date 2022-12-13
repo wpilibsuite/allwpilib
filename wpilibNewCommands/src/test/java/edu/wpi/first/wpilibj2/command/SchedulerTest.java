@@ -70,4 +70,18 @@ class SchedulerTest extends CommandTestBase {
       assertEquals(counter.get(), 2);
     }
   }
+
+  @Test
+  void scheduleScheduledNoOp() {
+    try (CommandScheduler scheduler = new CommandScheduler()) {
+      AtomicInteger counter = new AtomicInteger();
+
+      Command command = Commands.startEnd(counter::incrementAndGet, () -> {});
+
+      scheduler.schedule(command);
+      scheduler.schedule(command);
+
+      assertEquals(counter.get(), 1);
+    }
+  }
 }
