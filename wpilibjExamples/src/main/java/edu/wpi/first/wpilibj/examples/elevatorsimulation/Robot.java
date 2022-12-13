@@ -76,6 +76,7 @@ public class Robot extends TimedRobot {
     m_encoder.setDistancePerPulse(kElevatorEncoderDistPerPulse);
 
     // Publish Mechanism2d to SmartDashboard
+    // To view the Elevator Sim in the simulator, select Network Tables -> SmartDashboard -> Elevator Sim
     SmartDashboard.putData("Elevator Sim", m_mech2d);
   }
 
@@ -109,7 +110,6 @@ public class Robot extends TimedRobot {
       m_motor.set(0.0);
     }
   }
-  // To view the Elevator Sim in the simulator, select Network Tables -> SmartDashboard -> Elevator Sim
 
   @Override
   public void disabledInit() {
