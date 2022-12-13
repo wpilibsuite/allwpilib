@@ -34,7 +34,7 @@ inline void NetworkLoopQueue::Publish(NT_Publisher pubHandle,
                                       std::string_view name,
                                       std::string_view typeStr,
                                       const wpi::json& properties,
-                                      const PubSubOptions& options) {
+                                      const PubSubOptionsImpl& options) {
   std::scoped_lock lock{m_mutex};
   m_queue.emplace_back(
       ClientMessage{PublishMsg{pubHandle, topicHandle, std::string{name},
@@ -57,7 +57,7 @@ inline void NetworkLoopQueue::SetProperties(NT_Topic topicHandle,
 
 inline void NetworkLoopQueue::Subscribe(NT_Subscriber subHandle,
                                         std::span<const std::string> topicNames,
-                                        const PubSubOptions& options) {
+                                        const PubSubOptionsImpl& options) {
   std::scoped_lock lock{m_mutex};
   m_queue.emplace_back(ClientMessage{SubscribeMsg{
       subHandle, {topicNames.begin(), topicNames.end()}, options}});

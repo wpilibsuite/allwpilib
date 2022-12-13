@@ -93,24 +93,23 @@ class LocalStorage final : public net::ILocalStorage {
 
   NT_Subscriber Subscribe(NT_Topic topic, NT_Type type,
                           std::string_view typeStr,
-                          std::span<const PubSubOption> options);
+                          const PubSubOptions& options);
 
   void Unsubscribe(NT_Subscriber sub);
 
   NT_MultiSubscriber SubscribeMultiple(
-      std::span<const std::string_view> prefixes,
-      std::span<const PubSubOption> options);
+      std::span<const std::string_view> prefixes, const PubSubOptions& options);
 
   void UnsubscribeMultiple(NT_MultiSubscriber subHandle);
 
   NT_Publisher Publish(NT_Topic topic, NT_Type type, std::string_view typeStr,
                        const wpi::json& properties,
-                       std::span<const PubSubOption> options);
+                       const PubSubOptions& options);
 
   void Unpublish(NT_Handle pubentry);
 
   NT_Entry GetEntry(NT_Topic topic, NT_Type type, std::string_view typeStr,
-                    std::span<const PubSubOption> options);
+                    const PubSubOptions& options);
 
   void ReleaseEntry(NT_Entry entry);
 

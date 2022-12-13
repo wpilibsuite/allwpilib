@@ -51,7 +51,7 @@ struct ServerMessage;
 
 class Event;
 class Handle;
-class PubSubOptions;
+class PubSubOptionsImpl;
 class Value;
 
 void PrintTo(const Event& event, std::ostream* os);
@@ -60,6 +60,6 @@ void PrintTo(const net3::Message3& msg, std::ostream* os);
 void PrintTo(const net::ClientMessage& msg, std::ostream* os);
 void PrintTo(const net::ServerMessage& msg, std::ostream* os);
 void PrintTo(const Value& value, std::ostream* os);
-void PrintTo(const PubSubOptions& options, std::ostream* os);
+void PrintTo(const PubSubOptionsImpl& options, std::ostream* os);
 
 }  // namespace nt

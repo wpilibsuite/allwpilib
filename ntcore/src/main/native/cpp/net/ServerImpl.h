@@ -83,10 +83,11 @@ class ServerStartup final : public NetworkStartupInterface {
   // NetworkStartupInterface interface
   void Publish(NT_Publisher pubHandle, NT_Topic topicHandle,
                std::string_view name, std::string_view typeStr,
-               const wpi::json& properties, const PubSubOptions& options) final;
+               const wpi::json& properties,
+               const PubSubOptionsImpl& options) final;
   void Subscribe(NT_Subscriber subHandle,
                  std::span<const std::string> topicNames,
-                 const PubSubOptions& options) final;
+                 const PubSubOptionsImpl& options) final;
   void SetValue(NT_Publisher pubHandle, const Value& value) final;
 
  private:

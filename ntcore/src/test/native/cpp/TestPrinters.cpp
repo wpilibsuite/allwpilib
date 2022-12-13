@@ -160,10 +160,10 @@ void PrintTo(const Value& value, std::ostream* os) {
   *os << '}';
 }
 
-void PrintTo(const PubSubOptions& options, std::ostream* os) {
+void PrintTo(const PubSubOptionsImpl& options, std::ostream* os) {
   *os << "PubSubOptions{periodicMs=" << options.periodicMs
-      << ", pollStorageSize=" << options.pollStorageSize
-      << ", logging=" << options.sendAll
+      << ", pollStorage=" << options.pollStorage
+      << ", sendAll=" << options.sendAll
       << ", keepDuplicates=" << options.keepDuplicates << '}';
 }
 

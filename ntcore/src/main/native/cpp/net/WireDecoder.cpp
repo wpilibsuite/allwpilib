@@ -226,7 +226,7 @@ static void WireDecodeTextImpl(std::string_view in, T& out,
           }
 
           // options
-          PubSubOptions options;
+          PubSubOptionsImpl options;
           auto optionsIt = params->find("options");
           if (optionsIt != params->end()) {
             auto joptions = optionsIt->second.get_ptr<wpi::json::object_t*>();
@@ -243,6 +243,7 @@ static void WireDecodeTextImpl(std::string_view in, T& out,
                 error = "periodic value must be a number";
                 goto err;
               }
+              options.periodic = val;
               options.periodicMs = val * 1000;
             }
 
