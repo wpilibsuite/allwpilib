@@ -22,7 +22,7 @@
 namespace frc {
 namespace detail {
 WPILIB_DLLEXPORT
-void ReportProfiledPIDController();
+int IncrementAndGetProfiledPIDControllerInstances();
 }  // namespace detail
 
 /**
@@ -59,7 +59,10 @@ class ProfiledPIDController
   ProfiledPIDController(double Kp, double Ki, double Kd,
                         Constraints constraints, units::second_t period = 20_ms)
       : m_controller(Kp, Ki, Kd, period), m_constraints(constraints) {
-    detail::ReportProfiledPIDController();
+    int instances = detail::IncrementAndGetProfiledPIDControllerInstances();
+    wpi::math::MathSharedStore::ReportUsage(
+        wpi::math::MathUsageId::kController_ProfiledPIDController, instances);
+    wpi::SendableRegistry::Add(this, "ProfiledPIDController", instances);
   }
 
   ~ProfiledPIDController() override = default;
