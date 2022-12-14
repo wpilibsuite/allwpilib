@@ -49,7 +49,7 @@ public class CommandXboxController extends CommandGenericHID {
   }
 
   /**
-   * Constructs an event instance around the left bumper's digital signal.
+   * Constructs an event instance around the right bumper's digital signal.
    *
    * @param loop the event loop instance to attach the event to.
    * @return an event instance representing the right bumper's digital signal attached to the given
@@ -71,7 +71,7 @@ public class CommandXboxController extends CommandGenericHID {
   }
 
   /**
-   * Constructs an event instance around the right bumper's digital signal.
+   * Constructs an event instance around the left bumper's digital signal.
    *
    * @param loop the event loop instance to attach the event to.
    * @return an event instance representing the left bumper's digital signal attached to the given
