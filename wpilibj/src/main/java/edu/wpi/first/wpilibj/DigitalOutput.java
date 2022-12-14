@@ -114,7 +114,7 @@ public class DigitalOutput extends DigitalSource implements Sendable {
   }
 
   /**
-   * Enable a PWM PPS Output on this line.
+   * Enable a PWM PPS (Pulse Per Second) Output on this line.
    *
    * <p>Allocate one of the 6 DO PWM generator resources.
    *

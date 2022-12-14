@@ -106,7 +106,7 @@ class DigitalOutput : public DigitalSource,
   void SetPWMRate(double rate);
 
   /**
-   * Enable a PWM PPS Output on this line.
+   * Enable a PWM PPS (Pulse Per Second) Output on this line.
    *
    * Allocate one of the 6 DO PWM generator resources from this module.
    *
