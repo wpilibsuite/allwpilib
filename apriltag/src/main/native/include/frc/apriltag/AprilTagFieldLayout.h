@@ -31,10 +31,10 @@ namespace frc {
  * "width" and "length" values.  This is to account for arbitrary field sizes
  * when transforming the poses.
  *
-+ * Pose3ds in the JSON are measured using the normal FRC coordinate system, NWU
-+ * with the origin at the bottom-right corner of the blue alliance wall.
-+ * SetOrigin(OriginPosition) can be used to change the poses returned from
-+ * GetTagPose(int) to be from the perspective of a specific alliance. */
+ * Pose3ds in the JSON are measured using the normal FRC coordinate system, NWU 
+ * with the origin at the bottom-right corner of the blue alliance wall.
+ * SetOrigin(OriginPosition) can be used to change the poses returned from
+ * GetTagPose(int) to be from the perspective of a specific alliance. */
 class WPILIB_DLLEXPORT AprilTagFieldLayout {
  public:
   enum class OriginPosition {
