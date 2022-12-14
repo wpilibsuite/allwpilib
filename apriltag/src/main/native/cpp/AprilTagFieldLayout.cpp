@@ -29,7 +29,7 @@ AprilTagFieldLayout::AprilTagFieldLayout(std::string_view path) {
     m_apriltags[tag.ID] = tag;
   }
   m_fieldWidth = units::meter_t{json.at("field").at("width").get<double>()};
-  m_fieldLength = units::meter_t{json.at("field").at("height").get<double>()};
+  m_fieldLength = units::meter_t{json.at("field").at("length").get<double>()};
 }
 
 AprilTagFieldLayout::AprilTagFieldLayout(std::vector<AprilTag> apriltags,
