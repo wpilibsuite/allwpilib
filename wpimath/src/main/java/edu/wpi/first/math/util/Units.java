@@ -200,16 +200,6 @@ public final class Units {
   }
 
   /**
-   * Convert the RPM of a rotating object to its angular velocity
-   *
-   * @param rpm rotations per minute of object
-   * @return Angular velocity in rad/s
-   */
-  public static double rpmToAngularVelocity(double rpm) {
-    return rpm * (Math.PI / 30.0);
-  }
-
-  /**
    * Convert the RPM of a rotating object to its linear velocity
    *
    * @param rpm rotations per minute of object
@@ -217,17 +207,7 @@ public final class Units {
    * @return Linear velocity in meters per second
    */
   public static double rpmToLinearVelocity(double rpm, double radius) {
-    return rpmToAngularVelocity(rpm) * radius;
-  }
-
-  /**
-   * Convert the angular velocity of a rotating object to its RPM
-   *
-   * @param angularVelocity angular velocity of object
-   * @return RPM of object
-   */
-  public static double angularVelocityToRPM(double angularVelocity) {
-    return angularVelocity * (30.0 / Math.PI);
+    return rotationsPerMinuteToRadiansPerSecond(rpm) * radius;
   }
 
   /**
@@ -238,6 +218,6 @@ public final class Units {
    * @return RPM of object
    */
   public static double linearVelocityToRPM(double linearVelocity, double radius) {
-    return angularVelocityToRPM(linearVelocity / radius);
+    return radiansPerSecondToRotationsPerMinute(linearVelocity / radius);
   }
 }
