@@ -176,4 +176,68 @@ public final class Units {
   public static double lbsToKilograms(double lbs) {
     return lbs * kKilogramsPerLb;
   }
+
+  /**
+   * Convert the linear velocity of an object to its angular velocity
+   *
+   * @param linearVelocity linear velocity in meters per second
+   * @param radius radius of object in meters
+   * @return angular velocity of object in rad/s
+   */
+  public static double linearVelocityToAngularVelocity(double linearVelocity, double radius) {
+    return linearVelocity / radius;
+  }
+
+  /**
+   * Convert the angular velocity of an object to its linear velocity
+   *
+   * @param angularVelocity angular velocity in rad/s
+   * @param radius radius of rotating object in meters
+   * @return linear velocity of object in meters per second
+   */
+  public static double angularVelocityToLinearVelocity(double angularVelocity, double radius) {
+    return angularVelocity * radius;
+  }
+
+  /**
+   * Convert the RPM of a rotating object to its angular velocity
+   *
+   * @param rpm rotations per minute of object
+   * @return Angular velocity in rad/s
+   */
+  public static double rpmToAngularVelocity(double rpm) {
+    return rpm * (Math.PI / 30.0);
+  }
+
+  /**
+   * Convert the RPM of a rotating object to its linear velocity
+   *
+   * @param rpm rotations per minute of object
+   * @param radius radius of object in meters
+   * @return Linear velocity in meters per second
+   */
+  public static double rpmToLinearVelocity(double rpm, double radius) {
+    return rpmToAngularVelocity(rpm) * radius;
+  }
+
+  /**
+   * Convert the angular velocity of a rotating object to its RPM
+   *
+   * @param angularVelocity angular velocity of object
+   * @return RPM of object
+   */
+  public static double angularVelocityToRPM(double angularVelocity) {
+    return angularVelocity * (30.0 / Math.PI);
+  }
+
+  /**
+   * Convert the angular velocity of a rotating object to its RPM
+   *
+   * @param linearVelocity linear velocity of rotating object
+   * @param radius radius of rotating object
+   * @return RPM of object
+   */
+  public static double linearVelocityToRPM(double linearVelocity, double radius) {
+    return angularVelocityToRPM(linearVelocity / radius);
+  }
 }
