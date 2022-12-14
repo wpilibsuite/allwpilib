@@ -207,7 +207,7 @@ public final class Units {
    * @return Linear velocity in meters per second
    */
   public static double rotationsPerMinuteToMetersPerSecond(double rpm, double radius) {
-    return rotationsPerMinuteToRadiansPerSecond(rpm) * radius;
+    return radiansPerSecondToMetersPerSecond(rotationsPerMinuteToRadiansPerSecond(rpm), radius);
   }
 
   /**
