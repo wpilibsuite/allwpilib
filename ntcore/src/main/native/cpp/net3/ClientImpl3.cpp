@@ -640,34 +640,3 @@ void ClientImpl3::SendPeriodic(uint64_t curTimeMs) {
 void ClientImpl3::SetLocal(net::LocalInterface* local) {
   m_impl->m_local = local;
 }
-
-ClientStartup3::ClientStartup3(ClientImpl3& client) : m_client{client} {}
-
-ClientStartup3::~ClientStartup3() = default;
-
-void ClientStartup3::Publish(NT_Publisher pubHandle, NT_Topic topicHandle,
-                             std::string_view name, std::string_view typeStr,
-                             const wpi::json& properties,
-                             const PubSubOptionsImpl& options) {
-  WPI_DEBUG4(m_client.m_impl->m_logger, "StartupPublish({}, {}, {}, {})",
-             pubHandle, topicHandle, name, typeStr);
-  m_client.m_impl->Publish(pubHandle, topicHandle, name, typeStr, properties,
-                           options);
-}
-
-void ClientStartup3::Subscribe(NT_Subscriber subHandle,
-                               std::span<const std::string> prefixes,
-                               const PubSubOptionsImpl& options) {
-  // NT3 ignores subscribes, so no action required
-}
-
-void ClientStartup3::SetValue(NT_Publisher pubHandle, const Value& value) {
-  WPI_DEBUG4(m_client.m_impl->m_logger, "StartupSetValue({})", pubHandle);
-  // Similar to Client::SetValue(), except always set value and queue
-  unsigned int index = Handle{pubHandle}.GetIndex();
-  assert(index < m_client.m_impl->m_publishers.size() &&
-         m_client.m_impl->m_publishers[index]);
-  auto& publisher = *m_client.m_impl->m_publishers[index];
-  publisher.entry->value = value;
-  publisher.outValues.emplace_back(value);
-}

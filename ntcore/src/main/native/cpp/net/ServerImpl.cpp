@@ -168,8 +168,6 @@ class ClientData4Base : public ClientData, protected ClientMessageHandler {
 };
 
 class ClientDataLocal final : public ClientData4Base {
-  friend class net::ServerStartup;
-
  public:
   ClientDataLocal(SImpl& server, int id, wpi::Logger& logger)
       : ClientData4Base{"", "", "", true, [](uint32_t) {}, server, id, logger} {
@@ -2300,6 +2298,7 @@ void ServerImpl::HandleLocal(std::span<const ClientMessage> msgs) {
 }
 
 void ServerImpl::SetLocal(LocalInterface* local) {
+  WPI_DEBUG4(m_impl->m_logger, "SetLocal()");
   m_impl->m_local = local;
 
   // create server meta topics
@@ -2361,23 +2360,4 @@ std::string ServerImpl::DumpPersistent() {
 
 std::string ServerImpl::LoadPersistent(std::string_view in) {
   return m_impl->LoadPersistent(in);
-}
-
-void ServerStartup::Publish(NT_Publisher pubHandle, NT_Topic topicHandle,
-                            std::string_view name, std::string_view typeStr,
-                            const wpi::json& properties,
-                            const PubSubOptionsImpl& options) {
-  m_server.m_impl->m_localClient->ClientPublish(pubHandle, name, typeStr,
-                                                properties);
-}
-
-void ServerStartup::Subscribe(NT_Subscriber subHandle,
-                              std::span<const std::string> topicNames,
-                              const PubSubOptionsImpl& options) {
-  m_server.m_impl->m_localClient->ClientSubscribe(subHandle, topicNames,
-                                                  options);
-}
-
-void ServerStartup::SetValue(NT_Publisher pubHandle, const Value& value) {
-  m_server.m_impl->m_localClient->ClientSetValue(pubHandle, value);
 }

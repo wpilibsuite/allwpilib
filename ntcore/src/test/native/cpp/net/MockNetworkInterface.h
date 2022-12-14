@@ -28,21 +28,6 @@ class MockLocalInterface : public LocalInterface {
               (override));
 };
 
-class MockNetworkStartupInterface : public NetworkStartupInterface {
- public:
-  MOCK_METHOD(void, Publish,
-              (NT_Publisher pubHandle, NT_Topic topicHandle,
-               std::string_view name, std::string_view typeStr,
-               const wpi::json& properties, const PubSubOptionsImpl& options),
-              (override));
-  MOCK_METHOD(void, Subscribe,
-              (NT_Subscriber subHandle, std::span<const std::string> prefixes,
-               const PubSubOptionsImpl& options),
-              (override));
-  MOCK_METHOD(void, SetValue, (NT_Publisher pubHandle, const Value& value),
-              (override));
-};
-
 class MockNetworkInterface : public NetworkInterface {
  public:
   MOCK_METHOD(void, Publish,
@@ -77,9 +62,7 @@ class MockLocalStorage : public ILocalStorage {
               (override));
   MOCK_METHOD(void, NetworkSetValue, (NT_Topic topicHandle, const Value& value),
               (override));
-  MOCK_METHOD(void, StartNetwork,
-              (NetworkStartupInterface & startup, NetworkInterface* network),
-              (override));
+  MOCK_METHOD(void, StartNetwork, (NetworkInterface * network), (override));
   MOCK_METHOD(void, ClearNetwork, (), (override));
 };
 

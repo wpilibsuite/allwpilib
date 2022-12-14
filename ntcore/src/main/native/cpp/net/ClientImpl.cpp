@@ -55,6 +55,7 @@ class CImpl : public ServerMessageHandler {
   void HandleLocal(std::vector<ClientMessage>&& msgs);
   bool SendControl(uint64_t curTimeMs);
   void SendValues(uint64_t curTimeMs);
+  void SendInitialValues();
   bool CheckNetworkReady();
 
   // ServerMessageHandler interface
@@ -229,7 +230,7 @@ bool CImpl::SendControl(uint64_t curTimeMs) {
 }
 
 void CImpl::SendValues(uint64_t curTimeMs) {
-  DEBUG4("SendPeriodic({})", curTimeMs);
+  DEBUG4("SendValues({})", curTimeMs);
 
   // can't send value updates until we have a RTT
   if (!m_haveTimeOffset) {
@@ -264,6 +265,36 @@ void CImpl::SendValues(uint64_t curTimeMs) {
       }
       pub->outValues.resize(0);
       pub->nextSendMs = curTimeMs + pub->periodMs;
+    }
+  }
+}
+
+void CImpl::SendInitialValues() {
+  DEBUG4("SendInitialValues()");
+
+  // ensure all control messages are sent ahead of value updates
+  if (!SendControl(0)) {
+    return;
+  }
+
+  // only send time=0 values (as we don't have a RTT yet)
+  auto writer = m_wire.SendBinary();
+  for (auto&& pub : m_publishers) {
+    if (pub && !pub->outValues.empty()) {
+      bool sent = false;
+      for (auto&& val : pub->outValues) {
+        if (val.server_time() == 0) {
+          DEBUG4("Sending {} value time={} server_time={}", pub->handle,
+                 val.time(), val.server_time());
+          WireEncodeBinary(writer.Add(), Handle{pub->handle}.GetIndex(), 0,
+                           val);
+          sent = true;
+        }
+      }
+      if (sent) {
+        std::erase_if(pub->outValues,
+                      [](const auto& v) { return v.server_time() == 0; });
+      }
     }
   }
 }
@@ -434,46 +465,7 @@ void ClientImpl::SetLocal(LocalInterface* local) {
   m_impl->m_local = local;
 }
 
-ClientStartup::ClientStartup(ClientImpl& client)
-    : m_client{client},
-      m_binaryWriter{client.m_impl->m_wire.SendBinary()},
-      m_textWriter{client.m_impl->m_wire.SendText()} {}
-
-ClientStartup::~ClientStartup() {
-  m_client.m_impl->m_wire.Flush();
-}
-
-void ClientStartup::Publish(NT_Publisher pubHandle, NT_Topic topicHandle,
-                            std::string_view name, std::string_view typeStr,
-                            const wpi::json& properties,
-                            const PubSubOptionsImpl& options) {
-  WPI_DEBUG4(m_client.m_impl->m_logger, "StartupPublish({}, {}, {}, {})",
-             pubHandle, topicHandle, name, typeStr);
-  m_client.m_impl->Publish(pubHandle, topicHandle, name, typeStr, properties,
-                           options);
-  WireEncodePublish(m_textWriter.Add(), Handle{pubHandle}.GetIndex(), name,
-                    typeStr, properties);
-}
-
-void ClientStartup::Subscribe(NT_Subscriber subHandle,
-                              std::span<const std::string> prefixes,
-                              const PubSubOptionsImpl& options) {
-  WPI_DEBUG4(m_client.m_impl->m_logger, "StartupSubscribe({})", subHandle);
-  WireEncodeSubscribe(m_textWriter.Add(), Handle{subHandle}.GetIndex(),
-                      prefixes, options);
-}
-
-void ClientStartup::SetValue(NT_Publisher pubHandle, const Value& value) {
-  WPI_DEBUG4(m_client.m_impl->m_logger, "StartupSetValue({})", pubHandle);
-  // Similar to Client::SetValue(), except always set lastValue and send
-  unsigned int index = Handle{pubHandle}.GetIndex();
-  assert(index < m_client.m_impl->m_publishers.size() &&
-         m_client.m_impl->m_publishers[index]);
-  auto& publisher = *m_client.m_impl->m_publishers[index];
-  // only send time 0 values until we have a RTT
-  if (value.server_time() == 0) {
-    WireEncodeBinary(m_binaryWriter.Add(), index, 0, value);
-  } else {
-    publisher.outValues.emplace_back(value);
-  }
+void ClientImpl::SendInitial() {
+  m_impl->SendInitialValues();
+  m_impl->m_wire.Flush();
 }
