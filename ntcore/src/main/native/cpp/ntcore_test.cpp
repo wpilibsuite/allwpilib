@@ -11,12 +11,12 @@
 #include "Value_internal.h"
 
 extern "C" {
-struct NT_String* NT_GetStringForTesting(const char* string, int* struct_size) {
-  struct NT_String* str =
+struct NT_String* NT_GetStringForTesting(const char* str, int* struct_size) {
+  struct NT_String* strout =
       static_cast<NT_String*>(wpi::safe_calloc(1, sizeof(NT_String)));
-  nt::ConvertToC(string, str);
+  nt::ConvertToC(str, strout);
   *struct_size = sizeof(NT_String);
-  return str;
+  return strout;
 }
 
 struct NT_TopicInfo* NT_GetTopicInfoForTesting(const char* name,

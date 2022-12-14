@@ -88,14 +88,9 @@ std::vector<std::string> NetworkTable::GetHierarchy(std::string_view key) {
 
 NetworkTable::NetworkTable(NT_Inst inst, std::string_view path,
                            const private_init&)
-    : m_inst(inst),
-      m_path(path),
-      m_topicSub{::nt::SubscribeMultiple(inst, {{fmt::format("{}/", path)}},
-                                         {{PubSubOption::TopicsOnly(true)}})} {}
+    : m_inst(inst), m_path(path) {}
 
-NetworkTable::~NetworkTable() {
-  ::nt::UnsubscribeMultiple(m_topicSub);
-}
+NetworkTable::~NetworkTable() = default;
 
 NetworkTableInstance NetworkTable::GetInstance() const {
   return NetworkTableInstance{m_inst};
@@ -405,8 +400,8 @@ NT_Listener NetworkTable::AddSubTableListener(SubTableListener listener) {
   // a shared_ptr to it.
   auto notified_tables = std::make_shared<wpi::StringMap<char>>();
 
-  return ::nt::AddListener(
-      m_topicSub, NT_EVENT_PUBLISH | NT_EVENT_IMMEDIATE,
+  return NetworkTableInstance{m_inst}.AddListener(
+      {{fmt::format("{}/", m_path)}}, NT_EVENT_PUBLISH | NT_EVENT_IMMEDIATE,
       [this, cb = std::move(listener), notified_tables](const Event& event) {
         auto topicInfo = event.GetTopicInfo();
         if (!topicInfo) {

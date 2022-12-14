@@ -15,7 +15,7 @@ class raw_ostream;
 }  // namespace wpi
 
 namespace nt {
-class PubSubOptions;
+class PubSubOptionsImpl;
 class Value;
 }  // namespace nt
 
@@ -33,10 +33,10 @@ void WireEncodeSetProperties(wpi::raw_ostream& os, std::string_view name,
                              const wpi::json& update);
 void WireEncodeSubscribe(wpi::raw_ostream& os, int64_t subuid,
                          std::span<const std::string_view> topicNames,
-                         const PubSubOptions& options);
+                         const PubSubOptionsImpl& options);
 void WireEncodeSubscribe(wpi::raw_ostream& os, int64_t subuid,
                          std::span<const std::string> topicNames,
-                         const PubSubOptions& options);
+                         const PubSubOptionsImpl& options);
 void WireEncodeUnsubscribe(wpi::raw_ostream& os, int64_t subuid);
 
 // encoders for server text messages (avoids need to construct a Message struct)

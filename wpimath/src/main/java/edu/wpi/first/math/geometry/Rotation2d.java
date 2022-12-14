@@ -173,6 +173,7 @@ public class Rotation2d implements Interpolatable<Rotation2d> {
    * Returns the radian value of the Rotation2d.
    *
    * @return The radian value of the Rotation2d.
+   * @see edu.wpi.first.math.MathUtil#angleModulus(double) to constrain the angle within (-pi, pi]
    */
   @JsonProperty
   public double getRadians() {
@@ -183,6 +184,8 @@ public class Rotation2d implements Interpolatable<Rotation2d> {
    * Returns the degree value of the Rotation2d.
    *
    * @return The degree value of the Rotation2d.
+   * @see edu.wpi.first.math.MathUtil#inputModulus(double, double, double) to constrain the angle
+   *     within (-180, 180]
    */
   public double getDegrees() {
     return Math.toDegrees(m_value);

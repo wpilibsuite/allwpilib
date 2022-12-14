@@ -24,7 +24,7 @@ struct PublishMsg {
   std::string name;
   std::string typeStr;
   wpi::json properties;
-  PubSubOptions options;  // will be empty when coming from network
+  PubSubOptionsImpl options;  // will be empty when coming from network
 };
 
 struct UnpublishMsg {
@@ -44,7 +44,7 @@ struct SubscribeMsg {
   static constexpr std::string_view kMethodStr = "subscribe";
   NT_Subscriber subHandle{0};
   std::vector<std::string> topicNames;
-  PubSubOptions options;
+  PubSubOptionsImpl options;
 };
 
 struct UnsubscribeMsg {

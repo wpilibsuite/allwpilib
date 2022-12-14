@@ -254,8 +254,8 @@ class FMSSimModel : public glass::FMSModel {
   void SetAutonomous(bool val) override {
     HALSIM_SetDriverStationAutonomous(val);
   }
-  void SetGameSpecificMessage(const char* val) override {
-    HALSIM_SetGameSpecificMessage(val);
+  void SetGameSpecificMessage(std::string_view val) override {
+    HALSIM_SetGameSpecificMessage(val.data(), val.size());
   }
 
   void Update() override;

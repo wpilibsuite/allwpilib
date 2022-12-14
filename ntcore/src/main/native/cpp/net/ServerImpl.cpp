@@ -159,7 +159,7 @@ class ClientData4Base : public ClientData, protected ClientMessageHandler {
   void ClientSetProperties(std::string_view name,
                            const wpi::json& update) final;
   void ClientSubscribe(int64_t subuid, std::span<const std::string> topicNames,
-                       const PubSubOptions& options) final;
+                       const PubSubOptionsImpl& options) final;
   void ClientUnsubscribe(int64_t subuid) final;
 
   void ClientSetValue(int64_t pubuid, const Value& value);
@@ -168,8 +168,6 @@ class ClientData4Base : public ClientData, protected ClientMessageHandler {
 };
 
 class ClientDataLocal final : public ClientData4Base {
-  friend class net::ServerStartup;
-
  public:
   ClientDataLocal(SImpl& server, int id, wpi::Logger& logger)
       : ClientData4Base{"", "", "", true, [](uint32_t) {}, server, id, logger} {
@@ -362,7 +360,7 @@ struct PublisherData {
 
 struct SubscriberData {
   SubscriberData(ClientData* client, std::span<const std::string> topicNames,
-                 int64_t subuid, const PubSubOptions& options)
+                 int64_t subuid, const PubSubOptionsImpl& options)
       : client{client},
         topicNames{topicNames.begin(), topicNames.end()},
         subuid{subuid},
@@ -374,7 +372,7 @@ struct SubscriberData {
   }
 
   void Update(std::span<const std::string> topicNames_,
-              const PubSubOptions& options_) {
+              const PubSubOptionsImpl& options_) {
     topicNames = {topicNames_.begin(), topicNames_.end()};
     options = options_;
     periodMs = std::lround(options_.periodicMs / 10.0) * 10;
@@ -388,7 +386,7 @@ struct SubscriberData {
   ClientData* client;
   std::vector<std::string> topicNames;
   int64_t subuid;
-  PubSubOptions options;
+  PubSubOptionsImpl options;
   // in options as double, but copy here as integer; rounded to the nearest
   // 10 ms
   uint32_t periodMs;
@@ -463,10 +461,11 @@ struct Writer : public mpack_writer_t {
 };
 }  // namespace
 
-static void WriteOptions(mpack_writer_t& w, const PubSubOptions& options) {
-  int size = (options.sendAll ? 1 : 0) + (options.topicsOnly ? 1 : 0) +
-             (options.periodicMs != PubSubOptions::kDefaultPeriodicMs ? 1 : 0) +
-             (options.prefixMatch ? 1 : 0);
+static void WriteOptions(mpack_writer_t& w, const PubSubOptionsImpl& options) {
+  int size =
+      (options.sendAll ? 1 : 0) + (options.topicsOnly ? 1 : 0) +
+      (options.periodicMs != PubSubOptionsImpl::kDefaultPeriodicMs ? 1 : 0) +
+      (options.prefixMatch ? 1 : 0);
   mpack_start_map(&w, size);
   if (options.sendAll) {
     mpack_write_str(&w, "all");
@@ -476,7 +475,7 @@ static void WriteOptions(mpack_writer_t& w, const PubSubOptions& options) {
     mpack_write_str(&w, "topicsonly");
     mpack_write_bool(&w, true);
   }
-  if (options.periodicMs != PubSubOptions::kDefaultPeriodicMs) {
+  if (options.periodicMs != PubSubOptionsImpl::kDefaultPeriodicMs) {
     mpack_write_str(&w, "periodic");
     mpack_write_float(&w, options.periodicMs / 1000.0);
   }
@@ -616,7 +615,7 @@ void ClientData4Base::ClientSetProperties(std::string_view name,
 
 void ClientData4Base::ClientSubscribe(int64_t subuid,
                                       std::span<const std::string> topicNames,
-                                      const PubSubOptions& options) {
+                                      const PubSubOptionsImpl& options) {
   DEBUG4("ClientSubscribe({}, ({}), {})", m_id, fmt::join(topicNames, ","),
          subuid);
   auto& sub = m_subscribers[subuid];
@@ -2299,6 +2298,7 @@ void ServerImpl::HandleLocal(std::span<const ClientMessage> msgs) {
 }
 
 void ServerImpl::SetLocal(LocalInterface* local) {
+  WPI_DEBUG4(m_impl->m_logger, "SetLocal()");
   m_impl->m_local = local;
 
   // create server meta topics
@@ -2360,23 +2360,4 @@ std::string ServerImpl::DumpPersistent() {
 
 std::string ServerImpl::LoadPersistent(std::string_view in) {
   return m_impl->LoadPersistent(in);
-}
-
-void ServerStartup::Publish(NT_Publisher pubHandle, NT_Topic topicHandle,
-                            std::string_view name, std::string_view typeStr,
-                            const wpi::json& properties,
-                            const PubSubOptions& options) {
-  m_server.m_impl->m_localClient->ClientPublish(pubHandle, name, typeStr,
-                                                properties);
-}
-
-void ServerStartup::Subscribe(NT_Subscriber subHandle,
-                              std::span<const std::string> topicNames,
-                              const PubSubOptions& options) {
-  m_server.m_impl->m_localClient->ClientSubscribe(subHandle, topicNames,
-                                                  options);
-}
-
-void ServerStartup::SetValue(NT_Publisher pubHandle, const Value& value) {
-  m_server.m_impl->m_localClient->ClientSetValue(pubHandle, value);
 }

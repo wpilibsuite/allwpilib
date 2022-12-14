@@ -128,10 +128,12 @@ public class Notifier implements AutoCloseable {
             error = cause;
           }
           DriverStation.reportError(
-              "Unhandled exception: " + error.toString(), error.getStackTrace());
+              "Unhandled exception in Notifier thread: " + error.toString(), error.getStackTrace());
           DriverStation.reportError(
-              "The loopFunc() method (or methods called by it) should have handled "
-                  + "the exception above.",
+              "The Runnable for this Notifier (or methods called by it) should have handled "
+                  + "the exception above.\n"
+                  + "  The above stacktrace can help determine where the error occurred.\n"
+                  + "  See https://wpilib.org/stacktrace for more information.",
               false);
         });
     m_thread.start();

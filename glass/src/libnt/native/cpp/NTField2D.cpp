@@ -112,10 +112,7 @@ NTField2DModel::NTField2DModel(nt::NetworkTableInstance inst,
                                std::string_view path)
     : m_path{fmt::format("{}/", path)},
       m_inst{inst},
-      m_tableSub{inst,
-                 {{m_path}},
-                 {{nt::PubSubOption::SendAll(true),
-                   nt::PubSubOption::Periodic(0.05)}}},
+      m_tableSub{inst, {{m_path}}, {.periodic = 0.05, .sendAll = true}},
       m_nameTopic{inst.GetTopic(fmt::format("{}/.name", path))},
       m_poller{inst} {
   m_poller.AddListener(m_tableSub, nt::EventFlags::kTopic |

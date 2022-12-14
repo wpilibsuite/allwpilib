@@ -33,11 +33,10 @@ import java.util.Optional;
  * meters with "width" and "length" values. This is to account for arbitrary field sizes when
  * transforming the poses.
  *
- * <p>Pose3ds are assumed to be measured from the bottom-left corner of the field, when the blue
- * alliance is at the left. By default, Pose3ds will be returned as declared when calling {@link
- * AprilTagFieldLayout#getTagPose(int)}. {@link #setOrigin(OriginPosition)} can be used to transform
- * the poses returned from {@link AprilTagFieldLayout#getTagPose(int)} to be correct relative to a
- * different coordinate frame.
+ * <p>Pose3ds in the JSON are measured using the normal FRC coordinate system, NWU with the origin
+ * at the bottom-right corner of the blue alliance wall. {@link #setOrigin(OriginPosition)} can be
+ * used to change the poses returned from {@link AprilTagFieldLayout#getTagPose(int)} to be from the
+ * perspective of a specific alliance.
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonAutoDetect(getterVisibility = JsonAutoDetect.Visibility.NONE)

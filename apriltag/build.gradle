@@ -30,6 +30,7 @@ apply from: "${rootDir}/shared/opencv.gradle"
 
 dependencies {
     implementation project(':wpimath')
+    devImplementation project(':wpimath')
 }
 
 sourceSets {

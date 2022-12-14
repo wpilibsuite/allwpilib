@@ -47,7 +47,7 @@ class NTFMSModel : public FMSModel {
   void SetEnabled(bool val) override {}
   void SetTest(bool val) override {}
   void SetAutonomous(bool val) override {}
-  void SetGameSpecificMessage(const char* val) override {}
+  void SetGameSpecificMessage(std::string_view val) override {}
 
   void Update() override;
   bool Exists() override;

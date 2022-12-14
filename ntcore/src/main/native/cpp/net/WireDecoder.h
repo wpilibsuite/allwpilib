@@ -17,7 +17,7 @@ class json;
 }  // namespace wpi
 
 namespace nt {
-class PubSubOptions;
+class PubSubOptionsImpl;
 class Value;
 }  // namespace nt
 
@@ -35,7 +35,7 @@ class ClientMessageHandler {
                                    const wpi::json& update) = 0;
   virtual void ClientSubscribe(int64_t subuid,
                                std::span<const std::string> topicNames,
-                               const PubSubOptions& options) = 0;
+                               const PubSubOptionsImpl& options) = 0;
   virtual void ClientUnsubscribe(int64_t subuid) = 0;
 };
 

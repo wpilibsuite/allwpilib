@@ -22,7 +22,6 @@ public final class NetworkTable {
   private final String m_path;
   private final String m_pathWithSep;
   private final NetworkTableInstance m_inst;
-  private final MultiSubscriber m_topicSub;
 
   /**
    * Gets the "base name" of a key. For example, "/foo/bar" becomes "bar". If the key has a trailing
@@ -115,8 +114,6 @@ public final class NetworkTable {
     m_path = path;
     m_pathWithSep = path + PATH_SEPARATOR;
     m_inst = inst;
-    m_topicSub =
-        new MultiSubscriber(inst, new String[] {m_pathWithSep}, PubSubOption.topicsOnly(true));
   }
 
   /**
@@ -533,7 +530,7 @@ public final class NetworkTable {
     final NetworkTable parent = this;
 
     return m_inst.addListener(
-        m_topicSub,
+        new String[] {m_pathWithSep},
         EnumSet.of(NetworkTableEvent.Kind.kPublish, NetworkTableEvent.Kind.kImmediate),
         new Consumer<NetworkTableEvent>() {
           final Set<String> m_notifiedTables = new HashSet<>();
@@ -582,9 +579,5 @@ public final class NetworkTable {
   @Override
   public int hashCode() {
     return Objects.hash(m_inst, m_path);
-  }
-
-  void close() {
-    m_topicSub.close();
   }
 }

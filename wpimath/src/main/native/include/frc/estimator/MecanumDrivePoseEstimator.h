@@ -10,7 +10,6 @@
 #include <wpi/array.h>
 
 #include "frc/EigenCore.h"
-#include "frc/estimator/UnscentedKalmanFilter.h"
 #include "frc/geometry/Pose2d.h"
 #include "frc/geometry/Rotation2d.h"
 #include "frc/interpolation/TimeInterpolatableBuffer.h"
@@ -32,15 +31,6 @@ namespace frc {
  * AddVisionMeasurement() can be called as infrequently as you want; if you
  * never call it, then this class will behave mostly like regular encoder
  * odometry.
- *
- * The state-space system used internally has the following states (x) and
- * outputs (y):
- *
- * <strong> x = [x, y, theta]ᵀ </strong> in the field
- * coordinate system containing x position, y position, and heading.
- *
- * <strong> y = [x, y, theta]ᵀ </strong> from vision containing x position, y
- * position, and heading.
  */
 class WPILIB_DLLEXPORT MecanumDrivePoseEstimator {
  public:
@@ -53,11 +43,11 @@ class WPILIB_DLLEXPORT MecanumDrivePoseEstimator {
    * The default standard deviations of the vision measurements are
    * 0.45 meters for x, 0.45 meters for y, and 0.45 radians for heading.
    *
-   * @param kinematics               A correctly-configured kinematics object
-   *                                 for your drivetrain.
-   * @param gyroAngle                The current gyro angle.
-   * @param wheelPositions           The distance measured by each wheel.
-   * @param initialPose              The starting pose estimate.
+   * @param kinematics A correctly-configured kinematics object for your
+   *     drivetrain.
+   * @param gyroAngle The current gyro angle.
+   * @param wheelPositions The distance measured by each wheel.
+   * @param initialPose The starting pose estimate.
    */
   MecanumDrivePoseEstimator(MecanumDriveKinematics& kinematics,
                             const Rotation2d& gyroAngle,
@@ -67,23 +57,18 @@ class WPILIB_DLLEXPORT MecanumDrivePoseEstimator {
   /**
    * Constructs a MecanumDrivePoseEstimator.
    *
-   * @param kinematics               A correctly-configured kinematics object
-   *                                 for your drivetrain.
-   * @param gyroAngle                The current gyro angle.
-   * @param wheelPositions           The distance measured by each wheel.
-   * @param initialPose              The starting pose estimate.
-
-   * @param stateStdDevs             Standard deviations of model states.
-   *                                 Increase these numbers to trust your
-   *                                 model's state estimates less. This matrix
-   *                                 is in the form [x, y, theta]ᵀ, with units
-   *                                 in meters and radians.
-   * @param visionMeasurementStdDevs Standard deviations of the vision
-   *                                 measurements. Increase these numbers to
-   *                                 trust global measurements from vision
-   *                                 less. This matrix is in the form
-   *                                 [x, y, theta]ᵀ, with units in meters and
-   *                                 radians.
+   * @param kinematics A correctly-configured kinematics object for your
+   *     drivetrain.
+   * @param gyroAngle The current gyro angle.
+   * @param wheelPositions The distance measured by each wheel.
+   * @param initialPose The starting pose estimate.
+   * @param stateStdDevs Standard deviations of the pose estimate (x position in
+   *     meters, y position in meters, and heading in radians). Increase these
+   *     numbers to trust your state estimate less.
+   * @param visionMeasurementStdDevs Standard deviations of the vision pose
+   *     measurement (x position in meters, y position in meters, and heading in
+   *     radians). Increase these numbers to trust the vision pose measurement
+   *     less.
    */
   MecanumDrivePoseEstimator(
       MecanumDriveKinematics& kinematics, const Rotation2d& gyroAngle,
@@ -92,16 +77,14 @@ class WPILIB_DLLEXPORT MecanumDrivePoseEstimator {
       const wpi::array<double, 3>& visionMeasurementStdDevs);
 
   /**
-   * Sets the pose estimator's trust of global measurements. This might be used
+   * Sets the pose estimator's trust in vision measurements. This might be used
    * to change trust in vision measurements after the autonomous period, or to
    * change trust as distance to a vision target increases.
    *
-   * @param visionMeasurementStdDevs Standard deviations of the vision
-   *                                 measurements. Increase these numbers to
-   *                                 trust global measurements from vision
-   *                                 less. This matrix is in the form
-   *                                 [x, y, theta]ᵀ, with units in meters and
-   *                                 radians.
+   * @param visionMeasurementStdDevs Standard deviations of the vision pose
+   *     measurement (x position in meters, y position in meters, and heading in
+   *     radians). Increase these numbers to trust the vision pose measurement
+   *     less.
    */
   void SetVisionMeasurementStdDevs(
       const wpi::array<double, 3>& visionMeasurementStdDevs);
@@ -139,15 +122,13 @@ class WPILIB_DLLEXPORT MecanumDrivePoseEstimator {
    * one meter or so of the current pose estimate.
    *
    * @param visionRobotPose The pose of the robot as measured by the vision
-   *                        camera.
-   * @param timestamp       The timestamp of the vision measurement in seconds.
-   *                        Note that if you don't use your own time source by
-   *                        calling UpdateWithTime() then you must use a
-   *                        timestamp with an epoch since FPGA startup
-   *                        (i.e. the epoch of this timestamp is the same
-   *                        epoch as Timer#GetFPGATimestamp.) This means
-   *                        that you should use Timer#GetFPGATimestamp as your
-   *                        time source or sync the epochs.
+   *     camera.
+   * @param timestamp The timestamp of the vision measurement in seconds. Note
+   *     that if you don't use your own time source by calling UpdateWithTime()
+   *     then you must use a timestamp with an epoch since FPGA startup (i.e.,
+   *     the epoch of this timestamp is the same epoch as
+   *     frc::Timer::GetFPGATimestamp().) This means that you should use
+   *     frc::Timer::GetFPGATimestamp() as your time source or sync the epochs.
    */
   void AddVisionMeasurement(const Pose2d& visionRobotPose,
                             units::second_t timestamp);
@@ -167,25 +148,18 @@ class WPILIB_DLLEXPORT MecanumDrivePoseEstimator {
    * method will continue to apply to future measurements until a subsequent
    * call to SetVisionMeasurementStdDevs() or this method.
    *
-   * @param visionRobotPose          The pose of the robot as measured by the
-   *                                 vision camera.
-   * @param timestamp                The timestamp of the vision measurement in
-   *                                 seconds. Note that if you don't use your
-   *                                 own time source by calling
-   *                                 UpdateWithTime(), then you must use a
-   *                                 timestamp with an epoch since FPGA startup
-   *                                 (i.e. the epoch of this timestamp is the
-   *                                 same epoch as
-   *                                 frc::Timer::GetFPGATimestamp(). This means
-   *                                 that you should use
-   *                                 frc::Timer::GetFPGATimestamp() as your
-   *                                 time source in this case.
-   * @param visionMeasurementStdDevs Standard deviations of the vision
-   *                                 measurements. Increase these numbers to
-   *                                 trust global measurements from vision
-   *                                 less. This matrix is in the form
-   *                                 [x, y, theta]ᵀ, with units in meters and
-   *                                 radians.
+   * @param visionRobotPose The pose of the robot as measured by the vision
+   *     camera.
+   * @param timestamp The timestamp of the vision measurement in seconds. Note
+   *     that if you don't use your own time source by calling UpdateWithTime(),
+   *     then you must use a timestamp with an epoch since FPGA startup (i.e.,
+   *     the epoch of this timestamp is the same epoch as
+   *     frc::Timer::GetFPGATimestamp(). This means that you should use
+   *     frc::Timer::GetFPGATimestamp() as your time source in this case.
+   * @param visionMeasurementStdDevs Standard deviations of the vision pose
+   *     measurement (x position in meters, y position in meters, and heading in
+   *     radians). Increase these numbers to trust the vision pose measurement
+   *     less.
    */
   void AddVisionMeasurement(
       const Pose2d& visionRobotPose, units::second_t timestamp,
@@ -195,8 +169,8 @@ class WPILIB_DLLEXPORT MecanumDrivePoseEstimator {
   }
 
   /**
-   * Updates the the Kalman Filter using only wheel encoder
-   * information. This should be called every loop.
+   * Updates the pose estimator with wheel encoder and gyro information. This
+   * should be called every loop.
    *
    * @param gyroAngle   The current gyro angle.
    * @param wheelPositions The distances measured at each wheel.
@@ -206,8 +180,8 @@ class WPILIB_DLLEXPORT MecanumDrivePoseEstimator {
                 const MecanumDriveWheelPositions& wheelPositions);
 
   /**
-   * Updates the the Kalman Filter using only wheel encoder
-   * information. This should be called every loop.
+   * Updates the pose estimator with wheel encoder and gyro information. This
+   * should be called every loop.
    *
    * @param currentTime Time at which this method was called, in seconds.
    * @param gyroAngle   The current gyroscope angle.

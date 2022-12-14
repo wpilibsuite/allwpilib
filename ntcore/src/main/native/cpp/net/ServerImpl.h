@@ -29,12 +29,9 @@ namespace nt::net {
 
 struct ClientMessage;
 class LocalInterface;
-class ServerStartup;
 class WireConnection;
 
 class ServerImpl final {
-  friend class ServerStartup;
-
  public:
   using SetPeriodicFunc = std::function<void(uint32_t repeatMs)>;
   using Connected3Func =
@@ -74,23 +71,6 @@ class ServerImpl final {
  private:
   class Impl;
   std::unique_ptr<Impl> m_impl;
-};
-
-class ServerStartup final : public NetworkStartupInterface {
- public:
-  explicit ServerStartup(ServerImpl& server) : m_server{server} {}
-
-  // NetworkStartupInterface interface
-  void Publish(NT_Publisher pubHandle, NT_Topic topicHandle,
-               std::string_view name, std::string_view typeStr,
-               const wpi::json& properties, const PubSubOptions& options) final;
-  void Subscribe(NT_Subscriber subHandle,
-                 std::span<const std::string> topicNames,
-                 const PubSubOptions& options) final;
-  void SetValue(NT_Publisher pubHandle, const Value& value) final;
-
- private:
-  ServerImpl& m_server;
 };
 
 }  // namespace nt::net

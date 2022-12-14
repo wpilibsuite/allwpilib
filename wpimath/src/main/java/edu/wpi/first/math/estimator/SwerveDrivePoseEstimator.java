@@ -31,14 +31,6 @@ import java.util.Objects;
  *
  * <p>{@link SwerveDrivePoseEstimator#addVisionMeasurement} can be called as infrequently as you
  * want; if you never call it, then this class will behave as regular encoder odometry.
- *
- * <p>The state-space system used internally has the following states (x) and outputs (y):
- *
- * <p><strong> x = [x, y, theta]ᵀ </strong> in the field coordinate system containing x position, y
- * position, and heading.
- *
- * <p><strong> y = [x, y, theta]ᵀ </strong> from vision containing x position, y position, and
- * heading.
  */
 public class SwerveDrivePoseEstimator {
   private final SwerveDriveKinematics m_kinematics;
@@ -82,14 +74,14 @@ public class SwerveDrivePoseEstimator {
    *
    * @param kinematics A correctly-configured kinematics object for your drivetrain.
    * @param gyroAngle The current gyro angle.
-   * @param modulePositions The current distance measurements and rotations of the swerve modules.
+   * @param modulePositions The current distance and rotation measurements of the swerve modules.
    * @param initialPoseMeters The starting pose estimate.
-   * @param stateStdDevs Standard deviations of model states. Increase these numbers to trust your
-   *     model's state estimates less. This matrix is in the form [x, y, theta]ᵀ, with units in
-   *     meters and radians.
-   * @param visionMeasurementStdDevs Standard deviations of the vision measurements. Increase these
-   *     numbers to trust global measurements from vision less. This matrix is in the form [x, y,
-   *     theta]ᵀ, with units in meters and radians.
+   * @param stateStdDevs Standard deviations of the pose estimate (x position in meters, y position
+   *     in meters, and heading in radians). Increase these numbers to trust your state estimate
+   *     less.
+   * @param visionMeasurementStdDevs Standard deviations of the vision pose measurement (x position
+   *     in meters, y position in meters, and heading in radians). Increase these numbers to trust
+   *     the vision pose measurement less.
    */
   public SwerveDrivePoseEstimator(
       SwerveDriveKinematics kinematics,
@@ -176,10 +168,12 @@ public class SwerveDrivePoseEstimator {
    *
    * @param visionRobotPoseMeters The pose of the robot as measured by the vision camera.
    * @param timestampSeconds The timestamp of the vision measurement in seconds. Note that if you
-   *     don't use your own time source by calling {@link SwerveDrivePoseEstimator#updateWithTime}
-   *     then you must use a timestamp with an epoch since FPGA startup (i.e. the epoch of this
-   *     timestamp is the same epoch as Timer.getFPGATimestamp.) This means that you should use
-   *     Timer.getFPGATimestamp as your time source or sync the epochs.
+   *     don't use your own time source by calling {@link
+   *     SwerveDrivePoseEstimator#updateWithTime(double,Rotation2d,SwerveModulePosition[])} then you
+   *     must use a timestamp with an epoch since FPGA startup (i.e., the epoch of this timestamp is
+   *     the same epoch as {@link edu.wpi.first.wpilibj.Timer#getFPGATimestamp()}.) This means that
+   *     you should use {@link edu.wpi.first.wpilibj.Timer#getFPGATimestamp()} as your time source
+   *     or sync the epochs.
    */
   public void addVisionMeasurement(Pose2d visionRobotPoseMeters, double timestampSeconds) {
     // Step 1: Get the pose odometry measured at the moment the vision measurement was made.
@@ -231,13 +225,15 @@ public class SwerveDrivePoseEstimator {
    *
    * @param visionRobotPoseMeters The pose of the robot as measured by the vision camera.
    * @param timestampSeconds The timestamp of the vision measurement in seconds. Note that if you
-   *     don't use your own time source by calling {@link SwerveDrivePoseEstimator#updateWithTime}
-   *     then you must use a timestamp with an epoch since FPGA startup (i.e. the epoch of this
-   *     timestamp is the same epoch as Timer.getFPGATimestamp.) This means that you should use
-   *     Timer.getFPGATimestamp as your time source in this case.
-   * @param visionMeasurementStdDevs Standard deviations of the vision measurements. Increase these
-   *     numbers to trust global measurements from vision less. This matrix is in the form [x, y,
-   *     theta]ᵀ, with units in meters and radians.
+   *     don't use your own time source by calling {@link
+   *     SwerveDrivePoseEstimator#updateWithTime(double,Rotation2d,SwerveModulePosition[])}, then
+   *     you must use a timestamp with an epoch since FPGA startup (i.e., the epoch of this
+   *     timestamp is the same epoch as {@link edu.wpi.first.wpilibj.Timer#getFPGATimestamp()}. This
+   *     means that you should use {@link edu.wpi.first.wpilibj.Timer#getFPGATimestamp()} as your
+   *     time source in this case.
+   * @param visionMeasurementStdDevs Standard deviations of the vision pose measurement (x position
+   *     in meters, y position in meters, and heading in radians). Increase these numbers to trust
+   *     the vision pose measurement less.
    */
   public void addVisionMeasurement(
       Pose2d visionRobotPoseMeters,
@@ -248,7 +244,7 @@ public class SwerveDrivePoseEstimator {
   }
 
   /**
-   * Updates the Kalman Filter using only wheel encoder information. This should be called every
+   * Updates the pose estimator with wheel encoder and gyro information. This should be called every
    * loop.
    *
    * @param gyroAngle The current gyro angle.
@@ -260,7 +256,7 @@ public class SwerveDrivePoseEstimator {
   }
 
   /**
-   * Updates the Kalman Filter using only wheel encoder information. This should be called every
+   * Updates the pose estimator with wheel encoder and gyro information. This should be called every
    * loop.
    *
    * @param currentTimeSeconds Time at which this method was called, in seconds.

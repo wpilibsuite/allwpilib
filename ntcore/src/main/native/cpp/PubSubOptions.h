@@ -4,30 +4,33 @@
 
 #pragma once
 
-#include <span>
-
 #include "ntcore_cpp.h"
 
 namespace nt {
 
-// options built from array of PubSubOption
-class PubSubOptions {
+// internal helper class for PubSubOptions
+class PubSubOptionsImpl : public PubSubOptions {
  public:
-  PubSubOptions() = default;
-  explicit PubSubOptions(std::span<const PubSubOption> options);
+  constexpr PubSubOptionsImpl() : PubSubOptionsImpl{kDefaultPubSubOptions} {}
+
+  /*implicit*/ constexpr PubSubOptionsImpl(  // NOLINT
+      const PubSubOptions& options)
+      : PubSubOptions{options} {
+    if (periodic == 0) {
+      periodic = kDefaultPeriodic;
+    }
+    periodicMs = static_cast<unsigned int>(periodic * 1000);
+    if (pollStorage == 0) {
+      if (sendAll) {
+        pollStorage = 20;
+      } else {
+        pollStorage = 1;
+      }
+    }
+  }
 
   static constexpr unsigned int kDefaultPeriodicMs = 100;
-
   unsigned int periodicMs = kDefaultPeriodicMs;
-  size_t pollStorageSize = 1;
-  bool sendAll = false;
-  bool topicsOnly = false;
-  bool prefixMatch = false;
-  bool keepDuplicates = false;
-  bool fromRemote = true;
-  bool fromLocal = true;
-  unsigned int excludePub = 0;
-  bool excludeSelf = false;
 };
 
 }  // namespace nt

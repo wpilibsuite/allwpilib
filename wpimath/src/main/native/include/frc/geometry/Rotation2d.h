@@ -132,6 +132,7 @@ class WPILIB_DLLEXPORT Rotation2d {
    * Returns the radian value of the rotation.
    *
    * @return The radian value of the rotation.
+   * @see AngleModulus to constrain the angle within (-pi, pi]
    */
   constexpr units::radian_t Radians() const { return m_value; }
 
@@ -139,6 +140,7 @@ class WPILIB_DLLEXPORT Rotation2d {
    * Returns the degree value of the rotation.
    *
    * @return The degree value of the rotation.
+   * @see InputModulus to constrain the angle within (-180, 180]
    */
   constexpr units::degree_t Degrees() const { return m_value; }
 
