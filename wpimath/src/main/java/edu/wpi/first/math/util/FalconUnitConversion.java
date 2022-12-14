@@ -12,7 +12,7 @@ public final class FalconUnitConversion {
      * Convert Falcon500 integrated encoder velocity to angular velocity
      *
      * @param falconVelocity velocity reported by Falcon500. ticks per 100ms
-     * @param gearRatio gear ratio between motor and rotating object
+     * @param gearRatio gear ratio between motor and rotating object. Number of input rotations / number of output rotations
      * @return angular velocity of rotating object in rad/s
      */
     public static double falcon500VelocityToRadiansPerSecond(double falconVelocity, double gearRatio) {
@@ -33,7 +33,7 @@ public final class FalconUnitConversion {
      * Convert angular velocity of an object to Falcon500 native velocity units, ticks per 100ms
      *
      * @param angularVelocity angular velocity of object in rad/s
-     * @param gearRatio gear ratio between motor and rotating object
+     * @param gearRatio gear ratio between motor and rotating object. Number of input rotations / number of output rotations
      * @return Falcon500 native velocity units, ticks per 100ms
      */
     public static double radiansPerSecondToFalcon500Velocity(double angularVelocity, double gearRatio) {
@@ -56,7 +56,7 @@ public final class FalconUnitConversion {
      *
      * @param falconVelocity linear velocity in meters per second
      * @param radius radius of rotating object in meters
-     * @param gearRatio gear ratio between motor and rotating object
+     * @param gearRatio gear ratio between motor and rotating object. Number of input rotations / number of output rotations
      * @return linear velocity of rotating object in meters per second
      */
     public static double falcon500VelocityToMetersPerSecond(double falconVelocity, double radius, double gearRatio) {
@@ -79,7 +79,7 @@ public final class FalconUnitConversion {
      *
      * @param linearVelocity of object in meters per second
      * @param radius radius of rotating object
-     * @param gearRatio gear ratio between motor and rotating object
+     * @param gearRatio gear ratio between motor and rotating object. Number of input rotations / number of output rotations
      * @return Falcon500 native velocity units, ticks per 100ms
      */
     public static double metersPerSecondToFalcon500Velocity(double linearVelocity, double radius, double gearRatio) {
