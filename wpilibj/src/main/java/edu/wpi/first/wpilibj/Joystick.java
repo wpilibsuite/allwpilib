@@ -291,7 +291,7 @@ public class Joystick extends GenericHID {
    * @return The magnitude of the direction vector
    */
   public double getMagnitude() {
-    return Math.hypot(getX(), getY());
+    return Math.sqrt(Math.pow(getX(), 2) + Math.pow(getY(), 2));
   }
 
   /**
