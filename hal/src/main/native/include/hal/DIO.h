@@ -95,6 +95,16 @@ void HAL_SetDigitalPWMDutyCycle(HAL_DigitalPWMHandle pwmGenerator,
                                 double dutyCycle, int32_t* status);
 
 /**
+ * Configures the digital PWM to be a PPS signal with specified duty cycle.
+ *
+ * @param[in] pwmGenerator the digital PWM handle
+ * @param[in] dutyCycle    the percent duty cycle to output [0..1]
+ * @param[out] status      Error status variable. 0 on success.
+ */
+void HAL_SetDigitalPWMPPS(HAL_DigitalPWMHandle pwmGenerator, double dutyCycle,
+                          int32_t* status);
+
+/**
  * Configures which DO channel the PWM signal is output on.
  *
  * @param[in] pwmGenerator the digital PWM handle
