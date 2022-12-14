@@ -184,7 +184,7 @@ public final class Units {
    * @param radius radius of object in meters
    * @return angular velocity of object in rad/s
    */
-  public static double linearVelocityToAngularVelocity(double linearVelocity, double radius) {
+  public static double metersPerSecondToRadiansPerSecond(double linearVelocity, double radius) {
     return linearVelocity / radius;
   }
 
@@ -195,7 +195,7 @@ public final class Units {
    * @param radius radius of rotating object in meters
    * @return linear velocity of object in meters per second
    */
-  public static double angularVelocityToLinearVelocity(double angularVelocity, double radius) {
+  public static double radiansPerSecondToMetersPerSecond(double angularVelocity, double radius) {
     return angularVelocity * radius;
   }
 
@@ -206,7 +206,7 @@ public final class Units {
    * @param radius radius of object in meters
    * @return Linear velocity in meters per second
    */
-  public static double rpmToLinearVelocity(double rpm, double radius) {
+  public static double rotationsPerMinuteToMetersPerSecond(double rpm, double radius) {
     return rotationsPerMinuteToRadiansPerSecond(rpm) * radius;
   }
 
@@ -217,7 +217,7 @@ public final class Units {
    * @param radius radius of rotating object
    * @return RPM of object
    */
-  public static double linearVelocityToRPM(double linearVelocity, double radius) {
-    return radiansPerSecondToRotationsPerMinute(linearVelocity / radius);
+  public static double metersPerSecondToRotationPerMinute(double linearVelocity, double radius) {
+    return radiansPerSecondToRotationsPerMinute(metersPerSecondToRadiansPerSecond(linearVelocity, radius));
   }
 }

@@ -60,7 +60,7 @@ public final class FalconUnitConversion {
      * @return linear velocity of rotating object in meters per second
      */
     public static double falcon500VelocityToLinearVelocity(double falconVelocity, double radius, double gearRatio) {
-        return Units.rpmToLinearVelocity(falcon500VelocityToRPM(falconVelocity), radius) / gearRatio;
+        return Units.rotationsPerMinuteToMetersPerSecond(falcon500VelocityToRPM(falconVelocity), radius) / gearRatio;
     }
 
     /**
@@ -83,7 +83,7 @@ public final class FalconUnitConversion {
      * @return Falcon500 native velocity units, ticks per 100ms
      */
     public static double linearVelocityToFalcon500Velocity(double linearVelocity, double radius, double gearRatio) {
-        return rpmToFalcon500Velocity(Units.linearVelocityToRPM(linearVelocity, radius)) * gearRatio;
+        return rpmToFalcon500Velocity(Units.metersPerSecondToRotationPerMinute(linearVelocity, radius)) * gearRatio;
     }
 
     /**
