@@ -116,7 +116,7 @@ BooleanEvent Joystick::Top(EventLoop* loop) const {
 }
 
 double Joystick::GetMagnitude() const {
-  return std::hypot(GetX(), GetY());
+  return std::sqrt(std::pow(GetX(), 2) + std::pow(GetY(), 2));
 }
 
 double Joystick::GetDirectionRadians() const {
