@@ -413,7 +413,7 @@ public final class NetworkTable {
    * @param value the value that will be assigned
    * @return False if the table key already exists with a different type
    */
-  boolean putValue(String key, NetworkTableValue value) {
+  public boolean putValue(String key, NetworkTableValue value) {
     return getEntry(key).setValue(value);
   }
 
@@ -424,7 +424,7 @@ public final class NetworkTable {
    * @param defaultValue the default value to set if key doesn't exist.
    * @return False if the table key exists with a different type
    */
-  boolean setDefaultValue(String key, NetworkTableValue defaultValue) {
+  public boolean setDefaultValue(String key, NetworkTableValue defaultValue) {
     return getEntry(key).setDefaultValue(defaultValue);
   }
 
@@ -434,7 +434,7 @@ public final class NetworkTable {
    * @param key the key of the value to look up
    * @return the value associated with the given key, or nullptr if the key does not exist
    */
-  NetworkTableValue getValue(String key) {
+  public NetworkTableValue getValue(String key) {
     return getEntry(key).getValue();
   }
 
