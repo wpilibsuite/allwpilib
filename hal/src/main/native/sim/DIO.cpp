@@ -151,6 +151,23 @@ void HAL_SetDigitalPWMDutyCycle(HAL_DigitalPWMHandle pwmGenerator,
   SimDigitalPWMData[id].dutyCycle = dutyCycle;
 }
 
+void HAL_SetDigitalPWMPPS(HAL_DigitalPWMHandle pwmGenerator, double dutyCycle,
+                          int32_t* status) {
+  auto port = digitalPWMHandles->Get(pwmGenerator);
+  if (port == nullptr) {
+    *status = HAL_HANDLE_ERROR;
+    return;
+  }
+  int32_t id = *port;
+  if (dutyCycle > 1.0) {
+    dutyCycle = 1.0;
+  }
+  if (dutyCycle < 0.0) {
+    dutyCycle = 0.0;
+  }
+  SimDigitalPWMData[id].dutyCycle = dutyCycle;
+}
+
 void HAL_SetDigitalPWMOutputChannel(HAL_DigitalPWMHandle pwmGenerator,
                                     int32_t channel, int32_t* status) {
   auto port = digitalPWMHandles->Get(pwmGenerator);
