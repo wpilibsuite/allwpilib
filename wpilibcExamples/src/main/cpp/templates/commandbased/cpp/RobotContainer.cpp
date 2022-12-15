@@ -4,18 +4,20 @@
 
 #include "RobotContainer.h"
 
-RobotContainer::RobotContainer() : m_autonomousCommand(&m_subsystem) {
+#include "commands/Autos.h"
+
+RobotContainer::RobotContainer() {
   // Initialize all of your commands and subsystems here
 
   // Configure the button bindings
-  ConfigureButtonBindings();
+  ConfigureBindings();
 }
 
-void RobotContainer::ConfigureButtonBindings() {
+void RobotContainer::ConfigureBindings() {
   // Configure your button bindings here
 }
 
-frc2::Command* RobotContainer::GetAutonomousCommand() {
+frc2::CommandPtr RobotContainer::GetAutonomousCommand() {
   // An example command will be run in autonomous
-  return &m_autonomousCommand;
+  return autos::ExampleAuto(&m_subsystem);
 }

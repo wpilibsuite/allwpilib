@@ -8,6 +8,12 @@ ExampleSubsystem::ExampleSubsystem() {
   // Implementation of subsystem constructor goes here.
 }
 
+frc2::CommandPtr ExampleSubsystem::ExampleMethodCommand() {
+  // Inline construction of command goes here.
+  // Subsystem::RunOnce implicitly requires `this` subsystem.
+  return RunOnce([/* this */] { /* one-time action goes here */ });
+}
+
 void ExampleSubsystem::Periodic() {
   // Implementation of subsystem periodic method goes here.
 }

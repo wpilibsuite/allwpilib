@@ -4,11 +4,26 @@
 
 package edu.wpi.first.wpilibj.templates.commandbased.subsystems;
 
+import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class ExampleSubsystem extends SubsystemBase {
   /** Creates a new ExampleSubsystem. */
   public ExampleSubsystem() {}
+
+  /**
+   * Example command factory method.
+   *
+   * @return a command
+   */
+  public CommandBase exampleMethodCommand() {
+    // Inline construction of command goes here.
+    // Subsystem::RunOnce implicitly requires `this` subsystem.
+    return runOnce(
+        () -> {
+          /* one-time action goes here */
+        });
+  }
 
   @Override
   public void periodic() {
