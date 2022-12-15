@@ -4,6 +4,8 @@
 
 #include "frc2/command/ConditionalCommand.h"
 
+#include <wpi/sendable/SendableBuilder.h>
+
 using namespace frc2;
 
 ConditionalCommand::ConditionalCommand(std::unique_ptr<Command>&& onTrue,
@@ -49,4 +51,22 @@ bool ConditionalCommand::IsFinished() {
 
 bool ConditionalCommand::RunsWhenDisabled() const {
   return m_runsWhenDisabled;
+}
+
+void ConditionalCommand::InitSendable(wpi::SendableBuilder& builder) {
+  CommandBase::InitSendable(builder);
+  builder.AddStringProperty(
+      "onTrue", [this] { return m_onTrue->GetName(); }, nullptr);
+  builder.AddStringProperty(
+      "onFalse", [this] { return m_onFalse->GetName(); }, nullptr);
+  builder.AddStringProperty(
+      "selected",
+      [this] {
+        if (m_selectedCommand) {
+          return m_selectedCommand->GetName();
+        } else {
+          return std::string{"null"};
+        }
+      },
+      nullptr);
 }

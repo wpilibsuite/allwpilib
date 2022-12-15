@@ -4,6 +4,8 @@
 
 #include "frc2/command/SequentialCommandGroup.h"
 
+#include <wpi/sendable/SendableBuilder.h>
+
 using namespace frc2;
 
 SequentialCommandGroup::SequentialCommandGroup(
@@ -78,4 +80,9 @@ void SequentialCommandGroup::AddCommands(
     }
     m_commands.emplace_back(std::move(command));
   }
+}
+
+void SequentialCommandGroup::InitSendable(wpi::SendableBuilder& builder) {
+  CommandBase::InitSendable(builder);
+  builder.AddIntegerProperty("index", [this] { return m_currentCommandIndex; }, nullptr);
 }

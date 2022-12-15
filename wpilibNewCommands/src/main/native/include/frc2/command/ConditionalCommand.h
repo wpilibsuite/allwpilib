@@ -73,6 +73,8 @@ class ConditionalCommand
 
   bool RunsWhenDisabled() const override;
 
+  void InitSendable(wpi::SendableBuilder& builder) override;
+
  private:
   std::unique_ptr<Command> m_onTrue;
   std::unique_ptr<Command> m_onFalse;

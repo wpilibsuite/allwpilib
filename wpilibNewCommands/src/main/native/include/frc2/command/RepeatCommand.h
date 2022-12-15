@@ -70,6 +70,8 @@ class RepeatCommand : public CommandHelper<CommandBase, RepeatCommand> {
 
   Command::InterruptionBehavior GetInterruptionBehavior() const override;
 
+  void InitSendable(wpi::SendableBuilder& builder) override;
+
  private:
   std::unique_ptr<Command> m_command;
   bool m_ended;

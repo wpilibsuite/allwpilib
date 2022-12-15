@@ -291,4 +291,12 @@ class CommandDecoratorTest extends CommandTestBase {
       assertEquals(2, second.get());
     }
   }
+
+  @Test
+  void withNameTest() {
+    InstantCommand command = new InstantCommand();
+    String name = "Named";
+    Command named = command.withName(name);
+    assertEquals(name, named.getName());
+  }
 }

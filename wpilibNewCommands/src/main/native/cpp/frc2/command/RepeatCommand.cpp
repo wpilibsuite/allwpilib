@@ -4,6 +4,8 @@
 
 #include "frc2/command/RepeatCommand.h"
 
+#include <wpi/sendable/SendableBuilder.h>
+
 using namespace frc2;
 
 RepeatCommand::RepeatCommand(std::unique_ptr<Command>&& command) {
@@ -11,6 +13,7 @@ RepeatCommand::RepeatCommand(std::unique_ptr<Command>&& command) {
   m_command = std::move(command);
   m_command->SetComposed(true);
   AddRequirements(m_command->GetRequirements());
+  SetName(std::string{"Repeat("}.append(m_command->GetName()).append(")"));
 }
 
 void RepeatCommand::Initialize() {
@@ -45,4 +48,10 @@ bool RepeatCommand::RunsWhenDisabled() const {
 
 Command::InterruptionBehavior RepeatCommand::GetInterruptionBehavior() const {
   return m_command->GetInterruptionBehavior();
+}
+
+void RepeatCommand::InitSendable(wpi::SendableBuilder& builder) {
+  CommandBase::InitSendable(builder);
+  builder.AddStringProperty(
+      "command", [this] { return m_command->GetName(); }, nullptr);
 }

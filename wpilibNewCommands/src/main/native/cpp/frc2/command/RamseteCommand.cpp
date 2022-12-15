@@ -6,6 +6,8 @@
 
 #include <utility>
 
+#include <wpi/sendable/SendableBuilder.h>
+
 using namespace frc2;
 
 RamseteCommand::RamseteCommand(
@@ -157,4 +159,12 @@ void RamseteCommand::End(bool interrupted) {
 
 bool RamseteCommand::IsFinished() {
   return m_timer.HasElapsed(m_trajectory.TotalTime());
+}
+
+void RamseteCommand::InitSendable(wpi::SendableBuilder& builder) {
+  CommandBase::InitSendable(builder);
+  builder.AddDoubleProperty(
+      "leftVelocity", [this] { return m_prevSpeeds.left.value(); }, nullptr);
+  builder.AddDoubleProperty(
+      "rightVelocity", [this] { return m_prevSpeeds.right.value(); }, nullptr);
 }

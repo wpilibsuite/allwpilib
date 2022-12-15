@@ -12,6 +12,8 @@ WrapperCommand::WrapperCommand(std::unique_ptr<Command>&& command) {
   CommandScheduler::GetInstance().RequireUngrouped(command.get());
   m_command = std::move(command);
   m_command->SetComposed(true);
+  // copy the wrapped command's name
+  SetName(m_command->GetName());
 }
 
 void WrapperCommand::Initialize() {

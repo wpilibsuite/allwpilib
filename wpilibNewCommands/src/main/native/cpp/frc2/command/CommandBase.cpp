@@ -64,4 +64,21 @@ void CommandBase::InitSendable(wpi::SendableBuilder& builder) {
           Cancel();
         }
       });
+  builder.AddBooleanProperty(
+      ".isParented", [this] { return IsComposed(); }, nullptr);
+  builder.AddStringProperty(
+      "interruptBehavior",
+      [this] {
+        switch (GetInterruptionBehavior()) {
+          case Command::InterruptionBehavior::kCancelIncoming:
+            return "kCancelIncoming";
+          case Command::InterruptionBehavior::kCancelSelf:
+            return "kCancelSelf";
+          default:
+            return "Invalid";
+        }
+      },
+      nullptr);
+  builder.AddBooleanProperty(
+      "runsWhenDisabled", [this] { return RunsWhenDisabled(); }, nullptr);
 }

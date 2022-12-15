@@ -105,8 +105,7 @@ CommandPtr Command::HandleInterrupt(std::function<void(void)> handler) && {
 }
 
 CommandPtr Command::WithName(std::string_view name) && {
-  SetName(name);
-  return std::move(*this).ToPtr();
+  return std::move(*this).ToPtr().WithName(name);
 }
 
 void Command::Schedule() {

@@ -91,6 +91,8 @@ class SequentialCommandGroup
 
   Command::InterruptionBehavior GetInterruptionBehavior() const override;
 
+  void InitSendable(wpi::SendableBuilder& builder) override;
+
  private:
   void AddCommands(std::vector<std::unique_ptr<Command>>&& commands) final;
 

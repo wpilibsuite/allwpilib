@@ -61,6 +61,8 @@ class ProxyCommand : public CommandHelper<CommandBase, ProxyCommand> {
 
   bool IsFinished() override;
 
+  void InitSendable(wpi::SendableBuilder& builder) override;
+
  private:
   wpi::unique_function<Command*()> m_supplier;
   Command* m_command = nullptr;
