@@ -43,7 +43,6 @@ struct JoystickDataCache {
   HAL_JoystickButtons buttons[HAL_kMaxJoysticks];
   HAL_AllianceStationID allianceStation;
   float matchTime;
-  bool updated;
 };
 static_assert(std::is_standard_layout_v<JoystickDataCache>);
 // static_assert(std::is_trivial_v<JoystickDataCache>);
@@ -114,7 +113,9 @@ void JoystickDataCache::Update() {
 static HAL_ControlWord newestControlWord;
 static JoystickDataCache caches[3];
 static JoystickDataCache* currentRead = &caches[0];
-static JoystickDataCache* currentCache = &caches[1];
+static JoystickDataCache* currentReadLocal = &caches[0];
+static std::atomic<JoystickDataCache*> currentCache{&caches[1]};
+static JoystickDataCache* lastGiven = &caches[1];
 static JoystickDataCache* cacheToUpdate = &caches[2];
 
 static wpi::mutex cacheMutex;
@@ -476,11 +477,18 @@ static void tcpOccur(void) {
 
 static void udpOccur(void) {
   cacheToUpdate->Update();
-  {
-    std::scoped_lock lock{cacheMutex};
-    std::swap(currentCache, cacheToUpdate);
-    currentCache->updated = true;
+
+  JoystickDataCache* given = cacheToUpdate;
+  JoystickDataCache* prev = currentCache.exchange(cacheToUpdate);
+  if (prev == nullptr) {
+    cacheToUpdate = currentReadLocal;
+    currentReadLocal = lastGiven;
+  } else {
+    // Current read local does not update
+    cacheToUpdate = prev;
   }
+  lastGiven = given;
+
   driverStation->newDataEvents.Wakeup();
 }
 
@@ -506,9 +514,9 @@ void HAL_RefreshDSData(void) {
   FRC_NetworkCommunication_getControlWord(
       reinterpret_cast<ControlWord_t*>(&controlWord));
   std::scoped_lock lock{cacheMutex};
-  if (currentCache->updated) {
-    std::swap(currentCache, currentRead);
-    currentCache->updated = false;
+  JoystickDataCache* prev = currentCache.exchange(nullptr);
+  if (prev != nullptr) {
+    currentRead = prev;
   }
   newestControlWord = controlWord;
 
