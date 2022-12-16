@@ -204,10 +204,6 @@ static jobject MakeJObject(JNIEnv* env, const apriltag_detection_t* detect,
       (jdouble)detect->c[1], carr, pose1transArr, pose1rotArr, err1,
       pose2transArr, pose2rotArr, err2);
 
-  // TODO we don't seem to need this... or at least, it doesnt leak rn
-  // env->ReleaseDoubleArrayElements(harr, h, 0);
-  // env->ReleaseDoubleArrayElements(carr, corners, 0);
-
   return ret;
 }
 
