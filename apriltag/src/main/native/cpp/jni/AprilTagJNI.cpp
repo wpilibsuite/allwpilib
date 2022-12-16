@@ -33,87 +33,85 @@
 #include <algorithm>
 #include <cmath>
 
+#include <wpi/DenseMap.h>
+
 using namespace wpi::java;
 
-struct DetectorState {
-  int id;
-  apriltag_detector_t* td;
-  apriltag_family_t* tf;
-  void (*tf_destroy)(apriltag_family_t*);
-};
+namespace {
+template<typename T>
+using LambdaUniquePtr = std::unique_ptr<T, void(*)(T*)>;
 
-static std::vector<DetectorState> detectors;
+struct DetectorState {
+  LambdaUniquePtr<apriltag_detector_t> td;
+  LambdaUniquePtr<apriltag_family_t> tf;
+};
+}
+
+static wpi::mutex detectorMutex;
+static wpi::DenseMap<jint, DetectorState> detectors;
+static jint detectorCount;
 
 extern "C" {
 
 /*
  * Class:     edu_wpi_first_apriltag_jni_AprilTagJNI
  * Method:    aprilTagCreate
- * Signature: (Ljava/lang/String;DDIZZ)J
+ * Signature: (Ljava/lang/String;DDIZZ)I
  */
-JNIEXPORT jlong JNICALL
+JNIEXPORT jint JNICALL
 Java_edu_wpi_first_apriltag_jni_AprilTagJNI_aprilTagCreate
   (JNIEnv* env, jclass cls, jstring jstr, jdouble decimate, jdouble blur,
    jint threads, jboolean debug, jboolean refine_edges)
 {
   // Initialize tag detector with options
-  apriltag_family_t* tf = nullptr;
-  // const char *famname = fam;
-  const char* famname = env->GetStringUTFChars(jstr, nullptr);
+  LambdaUniquePtr<apriltag_family_t> tf{nullptr, [](apriltag_family_t*){}};
 
-  void (*tf_destroy_func)(apriltag_family_t*);
+  JStringRef famname(env, jstr);
 
-  if (!strcmp(famname, "tag36h11")) {
-    tf = tag36h11_create();
-    tf_destroy_func = tag36h11_destroy;
-  } else if (!strcmp(famname, "tag25h9")) {
-    tf = tag25h9_create();
-    tf_destroy_func = tag25h9_destroy;
-  } else if (!strcmp(famname, "tag16h5")) {
-    tf = tag16h5_create();
-    tf_destroy_func = tag16h5_destroy;
-  } else if (!strcmp(famname, "tagCircle21h7")) {
-    tf = tagCircle21h7_create();
-    tf_destroy_func = tagCircle21h7_destroy;
-  } else if (!strcmp(famname, "tagCircle49h12")) {
-    tf = tagCircle49h12_create();
-    tf_destroy_func = tagCircle49h12_destroy;
-  } else if (!strcmp(famname, "tagStandard41h12")) {
-    tf = tagStandard41h12_create();
-    tf_destroy_func = tagStandard41h12_destroy;
-  } else if (!strcmp(famname, "tagStandard52h13")) {
-    tf = tagStandard52h13_create();
-    tf_destroy_func = tagStandard52h13_destroy;
-  } else if (!strcmp(famname, "tagCustom48h12")) {
-    tf = tagCustom48h12_create();
-    tf_destroy_func = tagCustom48h12_destroy;
+  using std::operator""sv;
+  if (famname.str().compare("tag36h11"sv) == 0) {
+    tf = {tag36h11_create(), tag36h11_destroy};
+  } else if (famname.str().compare("tag25h9"sv) == 0) {
+    tf = {tag25h9_create(), tag25h9_destroy};
+  } else if (famname.str().compare("tag16h5"sv) == 0) {
+    tf = {tag16h5_create(), tag16h5_destroy};
+  } else if (famname.str().compare("tagCircle21h7"sv) == 0) {
+    tf = {tagCircle21h7_create(), tagCircle21h7_destroy};
+  } else if (famname.str().compare("tagCircle49h12"sv) == 0) {
+    tf = {tagCircle49h12_create(), tagCircle49h12_destroy};
+  } else if (famname.str().compare("tagStandard41h12"sv) == 0) {
+    tf = {tagStandard41h12_create(), tagStandard41h12_destroy};
+  } else if (famname.str().compare("tagStandard52h13"sv) == 0) {
+    tf = {tagStandard52h13_create(), tagStandard52h13_destroy};
+  } else if (famname.str().compare("tagCustom48h12"sv) == 0) {
+    tf = {tagCustom48h12_create(), tagCustom48h12_destroy};
   } else {
     std::printf("Unrecognized tag family name. Use e.g. \"tag36h11\".\n");
-    env->ReleaseStringUTFChars(jstr, famname);
-    return 0;
+    return -1;
   }
 
-  apriltag_detector_t* td = apriltag_detector_create();
-  apriltag_detector_add_family(td, tf);
+  if (tf == nullptr) {
+    std::printf("Failed to allocate tag\n");
+    return -1;
+  }
+
+  LambdaUniquePtr<apriltag_detector_t> td{apriltag_detector_create(), apriltag_detector_destroy};
+  if (td == nullptr) {
+    std::printf("Failed to allocate detector\n");
+    return -1;
+  }
+
+  apriltag_detector_add_family(td.get(), tf.get());
   td->quad_decimate = static_cast<float>(decimate);
   td->quad_sigma = static_cast<float>(blur);
   td->nthreads = threads;
   td->debug = debug;
   td->refine_edges = refine_edges;
 
-  env->ReleaseStringUTFChars(jstr, famname);
-
-  // std::printf("Looking for max\n");
-  auto max = std::max_element(detectors.begin(), detectors.end(),
-                              [](DetectorState& a, DetectorState& b) {
-                                return a.id < b.id;
-                              });  // detectors.size();
-  int index = 0;
-  if (max != detectors.end())
-    index = max->id + 1;
-  detectors.push_back({index, td, tf, tf_destroy_func});
-  std::printf("Created detector at idx %i\n", index);
-  return (jlong)index;
+  std::scoped_lock lock{detectorMutex};
+  jint idx = detectorCount++;
+  detectors.insert({idx, DetectorState{std::move(td), std::move(tf)}});
+  return idx;
 }
 
 static JClass detectionClass;
@@ -215,11 +213,11 @@ static jobject MakeJObject(JNIEnv* env, const apriltag_detection_t* detect,
 /*
  * Class:     edu_wpi_first_apriltag_jni_AprilTagJNI
  * Method:    aprilTagDetectInternal
- * Signature: (JJIIZDDDDDI)[Ljava/lang/Object;
+ * Signature: (IJIIZDDDDDI)[Ljava/lang/Object;
  */
 JNIEXPORT jobjectArray JNICALL
 Java_edu_wpi_first_apriltag_jni_AprilTagJNI_aprilTagDetectInternal
-  (JNIEnv* env, jclass cls, jlong detectIdx, jlong pData, jint rows, jint cols,
+  (JNIEnv* env, jclass cls, jint detectIdx, jlong pData, jint rows, jint cols,
    jboolean doPoseEstimation, jdouble tagWidthMeters, jdouble fx, jdouble fy,
    jdouble cx, jdouble cy, jint nIters)
 {
@@ -234,15 +232,19 @@ Java_edu_wpi_first_apriltag_jni_AprilTagJNI_aprilTagDetectInternal
                    reinterpret_cast<uint8_t*>(pData)};
 
   // Get our detector
-  auto state =
-      std::find_if(detectors.begin(), detectors.end(),
-                   [&](DetectorState& s) { return s.id == detectIdx; });
-  if (state == detectors.end()) {
-    return nullptr;
+  DetectorState* state;
+  {
+    std::scoped_lock lock{detectorMutex};
+    auto detectorIterator = detectors.find((jint)detectIdx);
+    if (detectorIterator == detectors.end()) {
+      return nullptr;
+    }
+
+    state = &detectorIterator->second;
   }
 
   // And run the detector on our new image
-  zarray_t* detections = apriltag_detector_detect(state->td, &im);
+  zarray_t* detections = apriltag_detector_detect(state->td.get(), &im);
 
   int size = zarray_size(detections);
 
@@ -292,29 +294,13 @@ Java_edu_wpi_first_apriltag_jni_AprilTagJNI_aprilTagDetectInternal
 /*
  * Class:     edu_wpi_first_apriltag_jni_AprilTagJNI
  * Method:    aprilTagDestroy
- * Signature: (J)V
+ * Signature: (I)V
  */
 JNIEXPORT void JNICALL
 Java_edu_wpi_first_apriltag_jni_AprilTagJNI_aprilTagDestroy
-  (JNIEnv* env, jclass clazz, jlong detectIdx)
+  (JNIEnv* env, jclass clazz, jint detectIdx)
 {
-  auto state =
-      std::find_if(detectors.begin(), detectors.end(),
-                   [&](DetectorState& s) { return s.id == detectIdx; });
-
-  if (state == detectors.end()) {
-    return;
-  }
-
-  if (state->td) {
-    apriltag_detector_destroy(state->td);
-    state->td = nullptr;
-  }
-  if (state->tf) {
-    state->tf_destroy(state->tf);
-    state->tf = nullptr;
-  }
-
-  detectors.erase(detectors.begin() + detectIdx);
+  std::scoped_lock lock{detectorMutex};
+  detectors.erase(detectIdx);
 }
 }  // extern "C"
