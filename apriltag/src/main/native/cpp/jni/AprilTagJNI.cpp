@@ -42,8 +42,8 @@ template <typename T>
 using LambdaUniquePtr = std::unique_ptr<T, void (*)(T*)>;
 
 struct DetectorState {
-  LambdaUniquePtr<apriltag_detector_t> td;
   LambdaUniquePtr<apriltag_family_t> tf;
+  LambdaUniquePtr<apriltag_detector_t> td;
 };
 }  // namespace
 
@@ -111,7 +111,7 @@ Java_edu_wpi_first_apriltag_jni_AprilTagJNI_aprilTagCreate
 
   std::scoped_lock lock{detectorMutex};
   jint idx = detectorCount++;
-  detectors.insert({idx, DetectorState{std::move(td), std::move(tf)}});
+  detectors.insert({idx, DetectorState{std::move(tf), std::move(td)}});
   return idx;
 }
 
