@@ -45,7 +45,7 @@ struct DetectorState {
   LambdaUniquePtr<apriltag_detector_t> td;
   LambdaUniquePtr<apriltag_family_t> tf;
 };
-}
+}  // namespace
 
 static wpi::mutex detectorMutex;
 static wpi::DenseMap<jint, DetectorState> detectors;
