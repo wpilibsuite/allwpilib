@@ -68,7 +68,7 @@ Java_edu_wpi_first_apriltag_jni_AprilTagJNI_aprilTagCreate
 
   JStringRef famname(env, jstr);
 
-  using std::operator""sv;
+  using namespace std::string_view_literals;
   if (famname.str().compare("tag36h11"sv) == 0) {
     tf = {tag36h11_create(), tag36h11_destroy};
   } else if (famname.str().compare("tag25h9"sv) == 0) {
