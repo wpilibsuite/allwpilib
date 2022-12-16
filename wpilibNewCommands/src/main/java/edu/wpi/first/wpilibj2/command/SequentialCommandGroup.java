@@ -4,6 +4,7 @@
 
 package edu.wpi.first.wpilibj2.command;
 
+import edu.wpi.first.util.sendable.SendableBuilder;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -103,5 +104,12 @@ public class SequentialCommandGroup extends CommandGroupBase {
   @Override
   public InterruptionBehavior getInterruptionBehavior() {
     return m_interruptBehavior;
+  }
+
+  @Override
+  public void initSendable(SendableBuilder builder) {
+    super.initSendable(builder);
+
+    builder.addIntegerProperty("index", () -> m_currentCommandIndex, null);
   }
 }

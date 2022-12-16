@@ -10,10 +10,13 @@
 #endif
 
 #include <memory>
+#include <string>
 #include <type_traits>
 #include <unordered_map>
 #include <utility>
 #include <vector>
+
+#include <wpi/sendable/SendableBuilder.h>
 
 #include "frc2/command/CommandBase.h"
 #include "frc2/command/PrintCommand.h"
@@ -120,6 +123,21 @@ class SelectCommand : public CommandHelper<CommandBase, SelectCommand<Key>> {
 
   Command::InterruptionBehavior GetInterruptionBehavior() const override {
     return m_interruptBehavior;
+  }
+
+  void InitSendable(wpi::SendableBuilder& builder) override {
+    CommandBase::InitSendable(builder);
+
+    builder.AddStringProperty(
+        "selected",
+        [this] {
+          if (m_selectedCommand) {
+            return m_selectedCommand->GetName();
+          } else {
+            return std::string{"null"};
+          }
+        },
+        nullptr);
   }
 
  protected:

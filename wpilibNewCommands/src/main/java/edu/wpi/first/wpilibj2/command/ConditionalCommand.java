@@ -6,6 +6,7 @@ package edu.wpi.first.wpilibj2.command;
 
 import static edu.wpi.first.util.ErrorMessages.requireNonNullParam;
 
+import edu.wpi.first.util.sendable.SendableBuilder;
 import java.util.function.BooleanSupplier;
 
 /**
@@ -70,5 +71,22 @@ public class ConditionalCommand extends CommandBase {
   @Override
   public boolean runsWhenDisabled() {
     return m_onTrue.runsWhenDisabled() && m_onFalse.runsWhenDisabled();
+  }
+
+  @Override
+  public void initSendable(SendableBuilder builder) {
+    super.initSendable(builder);
+    builder.addStringProperty("onTrue", m_onTrue::getName, null);
+    builder.addStringProperty("onFalse", m_onFalse::getName, null);
+    builder.addStringProperty(
+        "selected",
+        () -> {
+          if (m_selectedCommand == null) {
+            return "null";
+          } else {
+            return m_selectedCommand.getName();
+          }
+        },
+        null);
   }
 }

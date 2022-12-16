@@ -4,13 +4,17 @@
 
 #include "frc2/command/ProxyCommand.h"
 
+#include <wpi/sendable/SendableBuilder.h>
+
 using namespace frc2;
 
 ProxyCommand::ProxyCommand(wpi::unique_function<Command*()> supplier)
     : m_supplier(std::move(supplier)) {}
 
 ProxyCommand::ProxyCommand(Command* command)
-    : m_supplier([command] { return command; }) {}
+    : m_supplier([command] { return command; }) {
+  SetName(std::string{"Proxy("}.append(command->GetName()).append(")"));
+}
 
 ProxyCommand::ProxyCommand(std::unique_ptr<Command> command)
     : m_supplier([command = std::move(command)] { return command.get(); }) {}
@@ -34,4 +38,18 @@ bool ProxyCommand::IsFinished() {
   // not null but if called otherwise and m_command is null, it's UB, so we can
   // do whatever we want -- like return true.
   return m_command == nullptr || !m_command->IsScheduled();
+}
+
+void ProxyCommand::InitSendable(wpi::SendableBuilder& builder) {
+  CommandBase::InitSendable(builder);
+  builder.AddStringProperty(
+      "proxied",
+      [this] {
+        if (m_command) {
+          return m_command->GetName();
+        } else {
+          return std::string{"null"};
+        }
+      },
+      nullptr);
 }

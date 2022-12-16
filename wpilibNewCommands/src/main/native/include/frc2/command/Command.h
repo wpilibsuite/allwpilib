@@ -282,8 +282,7 @@ safe) semantics.
   [[nodiscard]] CommandPtr HandleInterrupt(std::function<void()> handler) &&;
 
   /**
-   * Decorates this Command with a name. Is an inline function for
-   * #SetName(std::string_view);
+   * Decorates this Command with a name.
    *
    * @param name name
    * @return the decorated Command

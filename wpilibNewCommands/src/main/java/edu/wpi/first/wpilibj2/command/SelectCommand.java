@@ -6,6 +6,7 @@ package edu.wpi.first.wpilibj2.command;
 
 import static edu.wpi.first.util.ErrorMessages.requireNonNullParam;
 
+import edu.wpi.first.util.sendable.SendableBuilder;
 import java.util.Map;
 import java.util.function.Supplier;
 
@@ -107,5 +108,13 @@ public class SelectCommand extends CommandBase {
   @Override
   public InterruptionBehavior getInterruptionBehavior() {
     return m_interruptBehavior;
+  }
+
+  @Override
+  public void initSendable(SendableBuilder builder) {
+    super.initSendable(builder);
+
+    builder.addStringProperty(
+        "selected", () -> m_selectedCommand == null ? "null" : m_selectedCommand.getName(), null);
   }
 }

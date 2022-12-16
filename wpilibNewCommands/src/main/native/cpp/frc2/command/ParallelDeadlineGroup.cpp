@@ -4,6 +4,8 @@
 
 #include "frc2/command/ParallelDeadlineGroup.h"
 
+#include <wpi/sendable/SendableBuilder.h>
+
 using namespace frc2;
 
 ParallelDeadlineGroup::ParallelDeadlineGroup(
@@ -92,4 +94,11 @@ void ParallelDeadlineGroup::SetDeadline(std::unique_ptr<Command>&& deadline) {
   m_commands.emplace_back(std::move(deadline), false);
   AddRequirements(m_deadline->GetRequirements());
   m_runWhenDisabled &= m_deadline->RunsWhenDisabled();
+}
+
+void ParallelDeadlineGroup::InitSendable(wpi::SendableBuilder& builder) {
+  CommandBase::InitSendable(builder);
+
+  builder.AddStringProperty(
+      "deadline", [this] { return m_deadline->GetName(); }, nullptr);
 }

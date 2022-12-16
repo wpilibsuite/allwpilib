@@ -6,6 +6,7 @@ package edu.wpi.first.wpilibj2.command;
 
 import static edu.wpi.first.util.ErrorMessages.requireNonNullParam;
 
+import edu.wpi.first.util.sendable.SendableBuilder;
 import java.util.function.Supplier;
 
 /**
@@ -36,6 +37,7 @@ public class ProxyCommand extends CommandBase {
    */
   public ProxyCommand(Command command) {
     this(() -> command);
+    setName("Proxy(" + command.getName() + ")");
   }
 
   @Override
@@ -72,5 +74,12 @@ public class ProxyCommand extends CommandBase {
   @Override
   public boolean runsWhenDisabled() {
     return true;
+  }
+
+  @Override
+  public void initSendable(SendableBuilder builder) {
+    super.initSendable(builder);
+    builder.addStringProperty(
+        "proxied", () -> m_command == null ? "null" : m_command.getName(), null);
   }
 }

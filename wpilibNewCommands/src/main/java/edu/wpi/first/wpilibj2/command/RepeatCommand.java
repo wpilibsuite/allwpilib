@@ -6,6 +6,8 @@ package edu.wpi.first.wpilibj2.command;
 
 import static edu.wpi.first.util.ErrorMessages.requireNonNullParam;
 
+import edu.wpi.first.util.sendable.SendableBuilder;
+
 /**
  * A command that runs another command repeatedly, restarting it when it ends, until this command is
  * interrupted. Command instances that are passed to it cannot be added to any other groups, or
@@ -31,6 +33,7 @@ public class RepeatCommand extends CommandBase {
     m_command = requireNonNullParam(command, "command", "RepeatCommand");
     CommandScheduler.getInstance().registerComposedCommands(command);
     m_requirements.addAll(command.getRequirements());
+    setName("Repeat(" + command.getName() + ")");
   }
 
   @Override
@@ -71,5 +74,11 @@ public class RepeatCommand extends CommandBase {
   @Override
   public InterruptionBehavior getInterruptionBehavior() {
     return m_command.getInterruptionBehavior();
+  }
+
+  @Override
+  public void initSendable(SendableBuilder builder) {
+    super.initSendable(builder);
+    builder.addStringProperty("command", m_command::getName, null);
   }
 }

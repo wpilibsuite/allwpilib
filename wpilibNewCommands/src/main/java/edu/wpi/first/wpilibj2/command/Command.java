@@ -446,14 +446,15 @@ public interface Command {
   default void setName(String name) {}
 
   /**
-   * Decorates this Command with a name. Is an inline function for #setName(String);
+   * Decorates this Command with a name.
    *
    * @param name name
    * @return the decorated Command
    */
-  default Command withName(String name) {
-    this.setName(name);
-    return this;
+  default WrapperCommand withName(String name) {
+    WrapperCommand wrapper = new WrapperCommand(Command.this) {};
+    wrapper.setName(name);
+    return wrapper;
   }
 
   /**

@@ -26,6 +26,8 @@ public abstract class WrapperCommand extends CommandBase {
   protected WrapperCommand(Command command) {
     CommandScheduler.getInstance().registerComposedCommands(command);
     m_command = command;
+    // copy the wrapped command's name
+    setName(command.getName());
   }
 
   /** The initial subroutine of a command. Called once when the command is initially scheduled. */

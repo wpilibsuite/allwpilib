@@ -221,8 +221,9 @@ CommandPtr CommandPtr::HandleInterrupt(std::function<void(void)> handler) && {
 
 CommandPtr CommandPtr::WithName(std::string_view name) && {
   AssertValid();
-  m_ptr->SetName(name);
-  return std::move(*this);
+  WrapperCommand wrapper{std::move(m_ptr)};
+  wrapper.SetName(name);
+  return std::move(wrapper).ToPtr();
 }
 
 CommandBase* CommandPtr::get() const {

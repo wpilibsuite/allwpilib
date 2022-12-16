@@ -174,6 +174,8 @@ class RamseteCommand : public CommandHelper<CommandBase, RamseteCommand> {
 
   bool IsFinished() override;
 
+  void InitSendable(wpi::SendableBuilder& builder) override;
+
  private:
   frc::Trajectory m_trajectory;
   std::function<frc::Pose2d()> m_pose;

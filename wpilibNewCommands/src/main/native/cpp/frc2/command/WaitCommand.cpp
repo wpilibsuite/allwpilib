@@ -6,6 +6,7 @@
 
 #include <fmt/format.h>
 #include <frc/fmt/Units.h>
+#include <wpi/sendable/SendableBuilder.h>
 
 using namespace frc2;
 
@@ -28,4 +29,10 @@ bool WaitCommand::IsFinished() {
 
 bool WaitCommand::RunsWhenDisabled() const {
   return true;
+}
+
+void WaitCommand::InitSendable(wpi::SendableBuilder& builder) {
+  CommandBase::InitSendable(builder);
+  builder.AddDoubleProperty(
+      "duration", [this] { return m_duration.value(); }, nullptr);
 }
