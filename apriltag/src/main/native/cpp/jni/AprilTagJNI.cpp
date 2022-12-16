@@ -38,8 +38,8 @@
 using namespace wpi::java;
 
 namespace {
-template<typename T>
-using LambdaUniquePtr = std::unique_ptr<T, void(*)(T*)>;
+template <typename T>
+using LambdaUniquePtr = std::unique_ptr<T, void (*)(T*)>;
 
 struct DetectorState {
   LambdaUniquePtr<apriltag_detector_t> td;
@@ -64,7 +64,7 @@ Java_edu_wpi_first_apriltag_jni_AprilTagJNI_aprilTagCreate
    jint threads, jboolean debug, jboolean refine_edges)
 {
   // Initialize tag detector with options
-  LambdaUniquePtr<apriltag_family_t> tf{nullptr, [](apriltag_family_t*){}};
+  LambdaUniquePtr<apriltag_family_t> tf{nullptr, [](apriltag_family_t*) {}};
 
   JStringRef famname(env, jstr);
 
@@ -95,7 +95,8 @@ Java_edu_wpi_first_apriltag_jni_AprilTagJNI_aprilTagCreate
     return -1;
   }
 
-  LambdaUniquePtr<apriltag_detector_t> td{apriltag_detector_create(), apriltag_detector_destroy};
+  LambdaUniquePtr<apriltag_detector_t> td{apriltag_detector_create(),
+                                          apriltag_detector_destroy};
   if (td == nullptr) {
     std::printf("Failed to allocate detector\n");
     return -1;
