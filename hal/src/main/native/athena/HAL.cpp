@@ -12,7 +12,6 @@
 #include <cstdio>
 #include <cstdlib>
 #include <fstream>
-#include <iostream>
 #include <thread>
 
 #include <FRC_NetworkCommunication/FRCComm.h>
