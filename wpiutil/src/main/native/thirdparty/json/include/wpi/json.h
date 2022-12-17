@@ -1,9 +1,3 @@
-/*----------------------------------------------------------------------------*/
-/* Modifications Copyright (c) 2017-2019 FIRST. All Rights Reserved.          */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
 /*
     __ _____ _____ _____
  __|  |   __|     |   | |  JSON for Modern C++
@@ -2899,14 +2893,14 @@ class json
     {
         std::allocator<T> alloc;
 
-		using AllocatorTraits = std::allocator_traits<std::allocator<T>>;
+        using AllocatorTraits = std::allocator_traits<std::allocator<T>>;
 
-		auto deleter = [&](T * object)
-		{
-			AllocatorTraits::deallocate(alloc, object, 1);
-		};
-		std::unique_ptr<T, decltype(deleter)> object(AllocatorTraits::allocate(alloc, 1), deleter);
-		AllocatorTraits::construct(alloc, object.get(), std::forward<Args>(args)...);
+        auto deleter = [&](T * object)
+        {
+            AllocatorTraits::deallocate(alloc, object, 1);
+        };
+        std::unique_ptr<T, decltype(deleter)> object(AllocatorTraits::allocate(alloc, 1), deleter);
+        AllocatorTraits::construct(alloc, object.get(), std::forward<Args>(args)...);
         assert(object != nullptr);
         return object.release();
     }
@@ -5254,8 +5248,8 @@ class json
                 if (is_string())
                 {
                     std::allocator<std::string> alloc;
-					std::allocator_traits<decltype(alloc)>::destroy(alloc, m_value.string);
-					std::allocator_traits<decltype(alloc)>::deallocate(alloc, m_value.string, 1);
+                    std::allocator_traits<decltype(alloc)>::destroy(alloc, m_value.string);
+                    std::allocator_traits<decltype(alloc)>::deallocate(alloc, m_value.string, 1);
                     m_value.string = nullptr;
                 }
 
@@ -5358,8 +5352,8 @@ class json
                 if (is_string())
                 {
                     std::allocator<std::string> alloc;
-					std::allocator_traits<decltype(alloc)>::destroy(alloc, m_value.string);
-					std::allocator_traits<decltype(alloc)>::deallocate(alloc, m_value.string, 1);
+                    std::allocator_traits<decltype(alloc)>::destroy(alloc, m_value.string);
+                    std::allocator_traits<decltype(alloc)>::deallocate(alloc, m_value.string, 1);
                     m_value.string = nullptr;
                 }
 

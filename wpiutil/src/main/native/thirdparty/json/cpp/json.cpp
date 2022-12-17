@@ -1,41 +1,14 @@
-/*----------------------------------------------------------------------------*/
-/* Modifications Copyright (c) 2017-2018 FIRST. All Rights Reserved.          */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
-/*
-    __ _____ _____ _____
- __|  |   __|     |   | |  JSON for Modern C++
-|  |  |__   |  |  | | | |  version 3.1.2
-|_____|_____|_____|_|___|  https://github.com/nlohmann/json
-
-Licensed under the MIT License <http://opensource.org/licenses/MIT>.
-Copyright (c) 2013-2018 Niels Lohmann <http://nlohmann.me>.
-
-Permission is hereby  granted, free of charge, to any  person obtaining a copy
-of this software and associated  documentation files (the "Software"), to deal
-in the Software  without restriction, including without  limitation the rights
-to  use, copy,  modify, merge,  publish, distribute,  sublicense, and/or  sell
-copies  of  the Software,  and  to  permit persons  to  whom  the Software  is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-
-THE SOFTWARE  IS PROVIDED "AS  IS", WITHOUT WARRANTY  OF ANY KIND,  EXPRESS OR
-IMPLIED,  INCLUDING BUT  NOT  LIMITED TO  THE  WARRANTIES OF  MERCHANTABILITY,
-FITNESS FOR  A PARTICULAR PURPOSE AND  NONINFRINGEMENT. IN NO EVENT  SHALL THE
-AUTHORS  OR COPYRIGHT  HOLDERS  BE  LIABLE FOR  ANY  CLAIM,  DAMAGES OR  OTHER
-LIABILITY, WHETHER IN AN ACTION OF  CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE  OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
-*/
 #define WPI_JSON_IMPLEMENTATION
 #include "wpi/json.h"
 
 #include "fmt/format.h"
 #include "wpi/raw_ostream.h"
+#include "wpi/raw_os_ostream.h"
+
+#include "./json_parser.h"
+#include "./json_binary_reader.h"
+#include "./json_binary_writer.h"
+#include "wpi/json_serializer.h"
 
 namespace wpi {
 namespace detail {
@@ -82,6 +55,62 @@ other_error other_error::create(int id_, std::string_view what_arg)
 }
 
 }  // namespace detail
+
+
+json json::meta()
+{
+    json result;
+
+    result["copyright"] = "(C) 2013-2017 Niels Lohmann, (C) 2017-2018 FIRST";
+    result["name"] = "WPI version of JSON for Modern C++";
+    result["url"] = "https://github.com/wpilibsuite/allwpilib";
+    result["version"]["string"] =
+        std::to_string(NLOHMANN_JSON_VERSION_MAJOR) + "." +
+        std::to_string(NLOHMANN_JSON_VERSION_MINOR) + "." +
+        std::to_string(NLOHMANN_JSON_VERSION_PATCH);
+    result["version"]["major"] = NLOHMANN_JSON_VERSION_MAJOR;
+    result["version"]["minor"] = NLOHMANN_JSON_VERSION_MINOR;
+    result["version"]["patch"] = NLOHMANN_JSON_VERSION_PATCH;
+
+#ifdef _WIN32
+    result["platform"] = "win32";
+#elif defined __linux__
+    result["platform"] = "linux";
+#elif defined __APPLE__
+    result["platform"] = "apple";
+#elif defined __unix__
+    result["platform"] = "unix";
+#else
+    result["platform"] = "unknown";
+#endif
+
+#if defined(__ICC) || defined(__INTEL_COMPILER)
+    result["compiler"] = {{"family", "icc"}, {"version", __INTEL_COMPILER}};
+#elif defined(__clang__)
+    result["compiler"] = {{"family", "clang"}, {"version", __clang_version__}};
+#elif defined(__GNUC__) || defined(__GNUG__)
+    result["compiler"] = {{"family", "gcc"}, {"version", std::to_string(__GNUC__) + "." + std::to_string(__GNUC_MINOR__) + "." + std::to_string(__GNUC_PATCHLEVEL__)}};
+#elif defined(__HP_cc) || defined(__HP_aCC)
+    result["compiler"] = "hp"
+#elif defined(__IBMCPP__)
+    result["compiler"] = {{"family", "ilecpp"}, {"version", __IBMCPP__}};
+#elif defined(_MSC_VER)
+    result["compiler"] = {{"family", "msvc"}, {"version", _MSC_VER}};
+#elif defined(__PGI)
+    result["compiler"] = {{"family", "pgcpp"}, {"version", __PGI}};
+#elif defined(__SUNPRO_CC)
+    result["compiler"] = {{"family", "sunpro"}, {"version", __SUNPRO_CC}};
+#else
+    result["compiler"] = {{"family", "unknown"}, {"version", "unknown"}};
+#endif
+
+#ifdef __cplusplus
+    result["compiler"]["c++"] = std::to_string(__cplusplus);
+#else
+    result["compiler"]["c++"] = "unknown";
+#endif
+    return result;
+}
 
 json::json_value::json_value(value_t t)
 {
@@ -298,59 +327,31 @@ json::json(const json& other)
     assert_invariant();
 }
 
-json json::meta()
+
+std::string json::dump(const int indent, const char indent_char,
+                 const bool ensure_ascii) const
 {
-    json result;
-
-    result["copyright"] = "(C) 2013-2017 Niels Lohmann, (C) 2017-2018 FIRST";
-    result["name"] = "WPI version of JSON for Modern C++";
-    result["url"] = "https://github.com/wpilibsuite/allwpilib";
-    result["version"]["string"] =
-        std::to_string(NLOHMANN_JSON_VERSION_MAJOR) + "." +
-        std::to_string(NLOHMANN_JSON_VERSION_MINOR) + "." +
-        std::to_string(NLOHMANN_JSON_VERSION_PATCH);
-    result["version"]["major"] = NLOHMANN_JSON_VERSION_MAJOR;
-    result["version"]["minor"] = NLOHMANN_JSON_VERSION_MINOR;
-    result["version"]["patch"] = NLOHMANN_JSON_VERSION_PATCH;
-
-#ifdef _WIN32
-    result["platform"] = "win32";
-#elif defined __linux__
-    result["platform"] = "linux";
-#elif defined __APPLE__
-    result["platform"] = "apple";
-#elif defined __unix__
-    result["platform"] = "unix";
-#else
-    result["platform"] = "unknown";
-#endif
-
-#if defined(__ICC) || defined(__INTEL_COMPILER)
-    result["compiler"] = {{"family", "icc"}, {"version", __INTEL_COMPILER}};
-#elif defined(__clang__)
-    result["compiler"] = {{"family", "clang"}, {"version", __clang_version__}};
-#elif defined(__GNUC__) || defined(__GNUG__)
-    result["compiler"] = {{"family", "gcc"}, {"version", std::to_string(__GNUC__) + "." + std::to_string(__GNUC_MINOR__) + "." + std::to_string(__GNUC_PATCHLEVEL__)}};
-#elif defined(__HP_cc) || defined(__HP_aCC)
-    result["compiler"] = "hp"
-#elif defined(__IBMCPP__)
-    result["compiler"] = {{"family", "ilecpp"}, {"version", __IBMCPP__}};
-#elif defined(_MSC_VER)
-    result["compiler"] = {{"family", "msvc"}, {"version", _MSC_VER}};
-#elif defined(__PGI)
-    result["compiler"] = {{"family", "pgcpp"}, {"version", __PGI}};
-#elif defined(__SUNPRO_CC)
-    result["compiler"] = {{"family", "sunpro"}, {"version", __SUNPRO_CC}};
-#else
-    result["compiler"] = {{"family", "unknown"}, {"version", "unknown"}};
-#endif
-
-#ifdef __cplusplus
-    result["compiler"]["c++"] = std::to_string(__cplusplus);
-#else
-    result["compiler"]["c++"] = "unknown";
-#endif
+    std::string result;
+    raw_string_ostream os(result);
+    dump(os, indent, indent_char, ensure_ascii);
     return result;
+}
+
+void json::dump(raw_ostream& os, int indent, const char indent_char,
+          const bool ensure_ascii) const
+{
+    serializer s(os, indent_char);
+
+    if (indent >= 0)
+    {
+        s.dump(*this, true, ensure_ascii, static_cast<unsigned int>(indent));
+    }
+    else
+    {
+        s.dump(*this, false, ensure_ascii, 0);
+    }
+
+    os.flush();
 }
 
 json::reference json::at(size_type idx)
@@ -1063,6 +1064,67 @@ bool operator<(json::const_reference lhs, json::const_reference rhs) noexcept
     return operator<(lhs_type, rhs_type);
 }
 
+raw_ostream& operator<<(raw_ostream& o, const json& j)
+{
+    j.dump(o, 0);
+    return o;
+}
+
+std::ostream& operator<<(std::ostream& o, const json& j)
+{
+    raw_os_ostream os(o);
+    j.dump(os, 0);
+    return o;
+}
+
+json json::parse(std::string_view s,
+                        const parser_callback_t cb,
+                        const bool allow_exceptions)
+{
+    raw_mem_istream is(std::span<const char>(s.data(), s.size()));
+    return parse(is, cb, allow_exceptions);
+}
+
+json json::parse(std::span<const uint8_t> arr,
+                        const parser_callback_t cb,
+                        const bool allow_exceptions)
+{
+    raw_mem_istream is(arr);
+    return parse(is, cb, allow_exceptions);
+}
+
+json json::parse(raw_istream& i,
+                        const parser_callback_t cb,
+                        const bool allow_exceptions)
+{
+    json result;
+    parser(i, cb, allow_exceptions).parse(true, result);
+    return result;
+}
+
+bool json::accept(std::string_view s)
+{
+    raw_mem_istream is(std::span<const char>(s.data(), s.size()));
+    return parser(is).accept(true);
+}
+
+bool json::accept(std::span<const uint8_t> arr)
+{
+    raw_mem_istream is(arr);
+    return parser(is).accept(true);
+}
+
+bool json::accept(raw_istream& i)
+{
+    return parser(i).accept(true);
+}
+
+raw_istream& operator>>(raw_istream& i, json& j)
+{
+    json::parser(i).parse(false, j);
+    return i;
+}
+
 const char* json::type_name() const noexcept
 {
     {
@@ -1084,6 +1146,131 @@ const char* json::type_name() const noexcept
                 return "number";
         }
     }
+}
+
+std::vector<uint8_t> json::to_cbor(const json& j)
+{
+    std::vector<uint8_t> result;
+    raw_uvector_ostream os(result);
+    to_cbor(os, j);
+    return result;
+}
+
+std::span<uint8_t> json::to_cbor(const json& j, std::vector<uint8_t>& buf)
+{
+    buf.clear();
+    raw_uvector_ostream os(buf);
+    to_cbor(os, j);
+    return os.array();
+}
+
+std::span<uint8_t> json::to_cbor(const json& j, SmallVectorImpl<uint8_t>& buf)
+{
+    buf.clear();
+    raw_usvector_ostream os(buf);
+    to_cbor(os, j);
+    return os.array();
+}
+
+void json::to_cbor(raw_ostream& os, const json& j)
+{
+    binary_writer(os).write_cbor(j);
+}
+
+std::vector<uint8_t> json::to_msgpack(const json& j)
+{
+    std::vector<uint8_t> result;
+    raw_uvector_ostream os(result);
+    to_msgpack(os, j);
+    return result;
+}
+
+std::span<uint8_t> json::to_msgpack(const json& j, std::vector<uint8_t>& buf)
+{
+    buf.clear();
+    raw_uvector_ostream os(buf);
+    to_msgpack(os, j);
+    return os.array();
+}
+
+std::span<uint8_t> json::to_msgpack(const json& j, SmallVectorImpl<uint8_t>& buf)
+{
+    buf.clear();
+    raw_usvector_ostream os(buf);
+    to_msgpack(os, j);
+    return os.array();
+}
+
+void json::to_msgpack(raw_ostream& os, const json& j)
+{
+    binary_writer(os).write_msgpack(j);
+}
+
+std::vector<uint8_t> json::to_ubjson(const json& j,
+                                     const bool use_size,
+                                     const bool use_type)
+{
+    std::vector<uint8_t> result;
+    raw_uvector_ostream os(result);
+    to_ubjson(os, j, use_size, use_type);
+    return result;
+}
+
+std::span<uint8_t> json::to_ubjson(const json& j, std::vector<uint8_t>& buf,
+                              const bool use_size, const bool use_type)
+{
+    buf.clear();
+    raw_uvector_ostream os(buf);
+    to_ubjson(os, j, use_size, use_type);
+    return os.array();
+}
+
+std::span<uint8_t> json::to_ubjson(const json& j, SmallVectorImpl<uint8_t>& buf,
+                              const bool use_size, const bool use_type)
+{
+    buf.clear();
+    raw_usvector_ostream os(buf);
+    to_ubjson(os, j, use_size, use_type);
+    return os.array();
+}
+
+void json::to_ubjson(raw_ostream& os, const json& j,
+                     const bool use_size, const bool use_type)
+{
+    binary_writer(os).write_ubjson(j, use_size, use_type);
+}
+
+json json::from_cbor(raw_istream& is, const bool strict)
+{
+    return binary_reader(is).parse_cbor(strict);
+}
+
+json json::from_cbor(std::span<const uint8_t> arr, const bool strict)
+{
+    raw_mem_istream is(arr);
+    return from_cbor(is, strict);
+}
+
+json json::from_msgpack(raw_istream& is, const bool strict)
+{
+    return binary_reader(is).parse_msgpack(strict);
+}
+
+json json::from_msgpack(std::span<const uint8_t> arr, const bool strict)
+{
+    raw_mem_istream is(arr);
+    return from_msgpack(is, strict);
+}
+
+json json::from_ubjson(raw_istream& is, const bool strict)
+{
+    return binary_reader(is).parse_ubjson(strict);
+}
+
+json json::from_ubjson(std::span<const uint8_t> arr, const bool strict)
+{
+    raw_mem_istream is(arr);
+    return from_ubjson(is, strict);
 }
 
 json json::patch(const json& json_patch) const
