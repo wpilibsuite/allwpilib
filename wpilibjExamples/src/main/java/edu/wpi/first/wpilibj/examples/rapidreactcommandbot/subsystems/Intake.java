@@ -17,8 +17,8 @@ public class Intake extends SubsystemBase {
   private final DoubleSolenoid m_pistons =
       new DoubleSolenoid(
           PneumaticsModuleType.REVPH,
-          IntakeConstants.kSolenoidPorts[1],
-          IntakeConstants.kSolenoidPorts[2]);
+          IntakeConstants.kSolenoidPorts[0],
+          IntakeConstants.kSolenoidPorts[1]);
 
   /** Returns a command that deploys the intake, and then runs the intake motor indefinitely. */
   public CommandBase intakeCommand() {
