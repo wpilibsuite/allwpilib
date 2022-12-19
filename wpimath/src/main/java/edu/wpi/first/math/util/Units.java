@@ -178,7 +178,8 @@ public final class Units {
    * @return RPM of object.
    */
   public static double metersPerSecondToRotationPerMinute(double linearVelocity, double radius) {
-    return radiansPerSecondToRotationsPerMinute(metersPerSecondToRadiansPerSecond(linearVelocity, radius));
+    return radiansPerSecondToRotationsPerMinute(
+        metersPerSecondToRadiansPerSecond(linearVelocity, radius));
   }
 
   /**
