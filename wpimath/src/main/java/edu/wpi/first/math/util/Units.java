@@ -124,7 +124,7 @@ public final class Units {
    * @return Radians per second converted from rotations per minute.
    */
   public static double rotationsPerMinuteToRadiansPerSecond(double rpm) {
-    return rpm * Math.PI / (kSecondsPerMinute / 2);
+    return rotationsToRadians(rpm) / kSecondsPerMinute;
   }
 
   /**
@@ -134,7 +134,51 @@ public final class Units {
    * @return Rotations per minute converted from radians per second.
    */
   public static double radiansPerSecondToRotationsPerMinute(double radiansPerSecond) {
-    return radiansPerSecond * (kSecondsPerMinute / 2) / Math.PI;
+    return rotationsToRadians(radiansPerSecond) * kSecondsPerMinute;
+  }
+
+  /**
+   * Convert the linear velocity of an object to its angular velocity
+   *
+   * @param linearVelocity linear velocity in meters per second
+   * @param radius radius of object in meters
+   * @return angular velocity of object in rad/s
+   */
+  public static double metersPerSecondToRadiansPerSecond(double linearVelocity, double radius) {
+    return linearVelocity / radius;
+  }
+
+  /**
+   * Convert the angular velocity of an object to its linear velocity
+   *
+   * @param angularVelocity angular velocity in rad/s
+   * @param radius radius of rotating object in meters
+   * @return linear velocity of object in meters per second
+   */
+  public static double radiansPerSecondToMetersPerSecond(double angularVelocity, double radius) {
+    return angularVelocity * radius;
+  }
+
+  /**
+   * Convert the RPM of a rotating object to its linear velocity
+   *
+   * @param rpm rotations per minute of object
+   * @param radius radius of object in meters
+   * @return Linear velocity in meters per second
+   */
+  public static double rotationsPerMinuteToMetersPerSecond(double rpm, double radius) {
+    return radiansPerSecondToMetersPerSecond(rotationsPerMinuteToRadiansPerSecond(rpm), radius);
+  }
+
+  /**
+   * Convert the angular velocity of a rotating object to its RPM
+   *
+   * @param linearVelocity linear velocity of rotating object
+   * @param radius radius of rotating object
+   * @return RPM of object
+   */
+  public static double metersPerSecondToRotationPerMinute(double linearVelocity, double radius) {
+    return radiansPerSecondToRotationsPerMinute(metersPerSecondToRadiansPerSecond(linearVelocity, radius));
   }
 
   /**

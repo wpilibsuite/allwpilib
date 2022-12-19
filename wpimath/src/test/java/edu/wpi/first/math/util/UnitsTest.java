@@ -73,4 +73,24 @@ class UnitsTest extends UtilityClassTest<Units> {
   void lbsToKilogramsTest() {
     assertEquals(0.453592, Units.lbsToKilograms(1), 1e-2);
   }
+
+  @Test
+  void metersPerSecondToRadiansPerSecond() {
+    assertEquals(2.0, Units.metersPerSecondToRadiansPerSecond(4.0, 2.0), 1e-2);
+  }
+
+  @Test
+  void radiansPerSecondToMetersPerSecond() {
+    assertEquals(4.0, Units.radiansPerSecondToMetersPerSecond(2.0, 2.0), 1e-2);
+  }
+
+  @Test
+  void rotationsPerMinuteToMetersPerSecond() {
+    assertEquals(377, Units.rotationsPerMinuteToMetersPerSecond(300, 12), 1e-2);
+  }
+
+  @Test
+  void metersPerSecondToRotationPerMinute() {
+    assertEquals(300, Units.metersPerSecondToRotationPerMinute(377, 12), 1e-2);
+  }
 }
