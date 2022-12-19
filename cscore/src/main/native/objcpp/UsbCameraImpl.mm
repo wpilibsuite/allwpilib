@@ -671,6 +671,7 @@ CS_Source CreateUsbCameraPath(std::string_view name, std::string_view path,
 }
 
 std::vector<UsbCameraInfo> EnumerateUsbCameras(CS_Status* status) {
+  @autoreleasepool {
   (void)status;
     std::vector<UsbCameraInfo> retval;
     NSArray<AVCaptureDeviceType>* deviceTypes = @[AVCaptureDeviceTypeBuiltInWideAngleCamera, AVCaptureDeviceTypeExternalUnknown];
@@ -688,6 +689,7 @@ std::vector<UsbCameraInfo> EnumerateUsbCameras(CS_Status* status) {
     }
 
     return retval;
+  }
 }
 
 void SetUsbCameraPath(CS_Source source, std::string_view path,
