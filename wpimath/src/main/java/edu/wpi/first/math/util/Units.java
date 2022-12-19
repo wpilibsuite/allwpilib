@@ -124,7 +124,7 @@ public final class Units {
    * @return Radians per second converted from rotations per minute.
    */
   public static double rotationsPerMinuteToRadiansPerSecond(double rpm) {
-    return rotationsToRadians(rpm) / kSecondsPerMinute;
+    return rpm * Math.PI / (kSecondsPerMinute / 2);
   }
 
   /**
@@ -134,7 +134,7 @@ public final class Units {
    * @return Rotations per minute converted from radians per second.
    */
   public static double radiansPerSecondToRotationsPerMinute(double radiansPerSecond) {
-    return rotationsToRadians(radiansPerSecond) * kSecondsPerMinute;
+    return radiansPerSecond * (kSecondsPerMinute / 2) / Math.PI;
   }
 
   /**
