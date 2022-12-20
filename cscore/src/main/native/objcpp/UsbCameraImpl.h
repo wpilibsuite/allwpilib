@@ -1,6 +1,8 @@
 #pragma once
 
 #import <AVFoundation/AVFoundation.h>
+#import "UsbCameraDelegate.h"
+#import "UsbCameraImplObjc.h"
 
 #include <memory>
 #include <string>
@@ -11,8 +13,10 @@
 namespace cs {
 class UsbCameraImpl : public SourceImpl {
  public:
-  UsbCameraImpl(std::string_view name, wpi::Logger& logger, Notifier& notifier, Telemetry& telemetry, std::string_view path);
-  UsbCameraImpl(std::string_view name, wpi::Logger& logger, Notifier& notifier, Telemetry& telemetry, int deviceId);
+  UsbCameraImpl(std::string_view name, wpi::Logger& logger, Notifier& notifier,
+                Telemetry& telemetry, std::string_view path);
+  UsbCameraImpl(std::string_view name, wpi::Logger& logger, Notifier& notifier,
+                Telemetry& telemetry, int deviceId);
   ~UsbCameraImpl() override;
 
   void Start() override;
@@ -41,11 +45,33 @@ class UsbCameraImpl : public SourceImpl {
   void NumSinksChanged() override;
   void NumSinksEnabledChanged() override;
 
-  void SetNewPath(std::string_view path, CS_Status* status);
-  std::string GetCurrentPath();
-  std::string GetCameraName();
- private:
+  cs::Notifier& objcGetNotifier() { return m_notifier; }
 
-  id m_objc;
+  void objcSwapVideoModes(std::vector<VideoMode>& modes) {
+    std::scoped_lock lock(m_mutex);
+    m_videoModes.swap(modes);
+  }
+
+  void objcSetVideoMode(const VideoMode& mode) {
+    std::scoped_lock lock(m_mutex);
+    m_mode = mode;
+  }
+
+  const VideoMode& objcGetVideoMode() const {
+    return m_mode;
+  }
+
+  std::vector<std::pair<VideoMode, AVCaptureDeviceFormat*>>& objcGetPlatformVideoModes() {
+    return m_platformModes;
+  }
+
+  UsbCameraImplObjc* cppGetObjc() {
+    return m_objc;
+  }
+
+ private:
+  UsbCameraImplObjc* m_objc;
+  std::vector<std::pair<VideoMode, AVCaptureDeviceFormat*>> m_platformModes;
+  VideoMode m_mode;
 };
-}
+}  // namespace cs
