@@ -21,18 +21,20 @@ int main() {
 //0x111000007ca313a
 //EAB7A68F-EC2B-4487-AADF-D8A91C1CB782
 
-  CS_Source source = cs::CreateUsbCameraPath("Cam", "44413434-0000-0000-0000-000000000001", &status);
+  CS_Source source = cs::CreateUsbCameraPath("Cam", "0x10000007ca313a", &status);
   CS_Source source2 = cs::CreateUsbCameraPath("Cam2", "EAB7A68F-EC2B-4487-AADF-D8A91C1CB782", &status);
+
+  cs::SetSourceFPS(source2, 12, &status);
 
   auto info = cs::GetUsbCameraInfo(source, &status);
   std::cout << info.name << " " << info.path << std::endl;
 
   auto res = CFRunLoopRunInMode(kCFRunLoopDefaultMode, 1, false);
-  cs::SetSourceConnectionStrategy(source, CS_CONNECTION_KEEP_OPEN, &status);
-  auto modes = cs::EnumerateSourceVideoModes(source, &status);
+  cs::SetSourceConnectionStrategy(source2, CS_CONNECTION_KEEP_OPEN, &status);
+  auto modes = cs::EnumerateSourceVideoModes(source2, &status);
   std::cout << modes.size() << std::endl;
   for (auto&& mode : modes) {
-    std::cout << mode.width << "x" << mode.height << " at " << mode.fps << " FPS" << std::endl;
+    std::cout << mode.width << "x" << mode.height << " at " << mode.fps << " FPS " << mode.pixelFormat << std::endl;
   }
 
   CS_Sink sink = cs::CreateMjpegServer("Server", "", 1234, &status);

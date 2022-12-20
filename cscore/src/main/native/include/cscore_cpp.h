@@ -90,6 +90,11 @@ struct VideoMode : public CS_VideoMode {
     return pixelFormat == other.pixelFormat && width == other.width &&
            height == other.height && fps == other.fps;
   }
+
+  bool CompareWithoutFps(const VideoMode& other) const {
+    return pixelFormat == other.pixelFormat && width == other.width &&
+           height == other.height;
+  }
 };
 
 /**

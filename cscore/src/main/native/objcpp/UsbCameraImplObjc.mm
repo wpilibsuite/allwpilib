@@ -80,8 +80,51 @@ using namespace cs;
                     status:(CS_Status*)status {
   return false;
 }
+
+- (void)internalSetMode:(const cs::VideoMode&)newMode status:(CS_Status*)status {
+  auto sharedThis = self.cppImpl.lock();
+    if (!sharedThis) {
+      *status = CS_READ_FAILED;
+      return;
+    }
+// If device is not connected, just apply and leave.
+    if (!self.propertiesCached) {
+      sharedThis->objcSetVideoMode(newMode);
+      *status = CS_OK;
+      return;
+    }
+
+    if (newMode != sharedThis->objcGetVideoMode()) {
+      AVCaptureDeviceFormat* newModeType = [self deviceCheckModeValid: &newMode];
+      if (newModeType == nil) {
+        NSLog(@"Invalid Set Mode");
+        *status = CS_UNSUPPORTED_MODE;
+        return;
+      }
+
+      self.currentFormat = newModeType;
+      sharedThis->objcSetVideoMode(newMode);
+      [self deviceDisconnect];
+      [self deviceConnect];
+      sharedThis->objcGetNotifier().NotifySourceVideoMode(*sharedThis, newMode);
+    }
+    *status = CS_OK;
+}
+
 - (bool)setFPS:(int)fps status:(CS_Status*)status {
-  return false;
+  dispatch_async_and_wait(self.sessionQueue, ^{
+    auto sharedThis = self.cppImpl.lock();
+    if (!sharedThis) {
+      *status = CS_READ_FAILED;
+      return;
+    }
+    VideoMode newMode;
+    newMode = sharedThis->objcGetVideoMode();
+    newMode.fps = fps;
+
+    [self internalSetMode:newMode status: status];
+  });
+  return true;
 }
 
 - (void)numSinksChanged {
@@ -144,9 +187,13 @@ using namespace cs;
 }
 
 static cs::VideoMode::PixelFormat FourCCToPixelFormat(FourCharCode fourcc) {
-  // TODO Make this a lot better
-  (void)fourcc;
-  return cs::VideoMode::PixelFormat::kBGR;
+  switch (fourcc) {
+    case kCVPixelFormatType_422YpCbCr8_yuvs:
+    case kCVPixelFormatType_422YpCbCr8FullRange:
+      return cs::VideoMode::PixelFormat::kYUYV;
+    default:
+    return cs::VideoMode::PixelFormat::kBGR;
+  }
 }
 
 - (void)deviceCacheVideoModes {
@@ -178,11 +225,11 @@ static cs::VideoMode::PixelFormat FourCCToPixelFormat(FourCharCode fourcc) {
       NSArray<AVFrameRateRange*>* frameRates =
           format.videoSupportedFrameRateRanges;
 
+      CameraModeStore store;
+
       for (AVFrameRateRange* rate in frameRates) {
         NSLog(@"%@ %@", format, rate);
         CMTime frameDuration = rate.minFrameDuration;
-
-        NSLog(@"%d %lld", frameDuration.timescale, frameDuration.value);
 
         int fps = 30;
         if (frameDuration.value != 0) {
@@ -216,12 +263,15 @@ static cs::VideoMode::PixelFormat FourCCToPixelFormat(FourCharCode fourcc) {
   auto match =
       std::find_if(platformModes.begin(), platformModes.end(),
                    [&](std::pair<VideoMode, AVCaptureDeviceFormat*>& input) {
-                     return input.first == *toCheck;
+                     return input.first.CompareWithoutFps(*toCheck);
                    });
 
   if (match == platformModes.end()) {
     return nil;
   }
+
+  // Check FPS
+
   return match->second;
 }
 

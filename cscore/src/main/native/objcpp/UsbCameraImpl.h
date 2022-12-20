@@ -11,6 +11,16 @@
 #include "SourceImpl.h"
 
 namespace cs {
+struct CameraFPSRange {
+  int min;
+  int max;
+};
+struct CameraModeStore {
+  VideoMode mode;
+  AVCaptureDeviceFormat* format;
+  std::vector<CameraFPSRange> fpsRanges;
+};
+
 class UsbCameraImpl : public SourceImpl {
  public:
   UsbCameraImpl(std::string_view name, wpi::Logger& logger, Notifier& notifier,
@@ -63,7 +73,7 @@ class UsbCameraImpl : public SourceImpl {
 
   const VideoMode& objcGetVideoMode() const { return m_mode; }
 
-  std::vector<std::pair<VideoMode, AVCaptureDeviceFormat*>>&
+  std::vector<CameraModeStore>&
   objcGetPlatformVideoModes() {
     return m_platformModes;
   }
@@ -72,7 +82,7 @@ class UsbCameraImpl : public SourceImpl {
 
  private:
   UsbCameraImplObjc* m_objc;
-  std::vector<std::pair<VideoMode, AVCaptureDeviceFormat*>> m_platformModes;
+  std::vector<CameraModeStore> m_platformModes;
   VideoMode m_mode;
 };
 }  // namespace cs
