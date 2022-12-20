@@ -15,7 +15,7 @@ class UsbCameraImpl;
 //     //IplImage* m_inputImageHeader;
 //     //IplImage* m_outputImageHeader;
 // }
-@property (nonatomic) std::weak_ptr<cs::UsbCameraImpl> cppImpl;
+@property(nonatomic) std::weak_ptr<cs::UsbCameraImpl> cppImpl;
 
 - (void)captureOutput:(AVCaptureOutput*)captureOutput
     didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer

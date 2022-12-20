@@ -182,14 +182,12 @@ static cs::VideoMode::PixelFormat FourCCToPixelFormat(FourCharCode fourcc) {
         NSLog(@"%@ %@", format, rate);
         CMTime frameDuration = rate.minFrameDuration;
 
-
-
         NSLog(@"%d %lld", frameDuration.timescale, frameDuration.value);
 
         int fps = 30;
         if (frameDuration.value != 0) {
           fps = frameDuration.timescale /
-                          static_cast<double>(frameDuration.value);
+                static_cast<double>(frameDuration.value);
         }
 
         VideoMode newMode = {videoFormat, static_cast<int>(s1.width),
@@ -335,9 +333,8 @@ static cs::VideoMode::PixelFormat FourCCToPixelFormat(FourCharCode fourcc) {
 - (bool)deviceConnect {
   OSType pixelFormat = kCVPixelFormatType_32BGRA;
 
-  NSDictionary* pixelBufferOptions = @{
-    (id)kCVPixelBufferPixelFormatTypeKey: @(pixelFormat)
-  };
+  NSDictionary* pixelBufferOptions =
+      @{(id)kCVPixelBufferPixelFormatTypeKey : @(pixelFormat)};
 
   if (self.session != nil) {
     return true;

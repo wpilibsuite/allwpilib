@@ -61,17 +61,14 @@ class UsbCameraImpl : public SourceImpl {
     PutFrame(std::move(image), time);
   }
 
-  const VideoMode& objcGetVideoMode() const {
-    return m_mode;
-  }
+  const VideoMode& objcGetVideoMode() const { return m_mode; }
 
-  std::vector<std::pair<VideoMode, AVCaptureDeviceFormat*>>& objcGetPlatformVideoModes() {
+  std::vector<std::pair<VideoMode, AVCaptureDeviceFormat*>>&
+  objcGetPlatformVideoModes() {
     return m_platformModes;
   }
 
-  UsbCameraImplObjc* cppGetObjc() {
-    return m_objc;
-  }
+  UsbCameraImplObjc* cppGetObjc() { return m_objc; }
 
  private:
   UsbCameraImplObjc* m_objc;

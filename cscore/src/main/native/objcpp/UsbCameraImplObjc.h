@@ -58,7 +58,6 @@ class UsbCameraImpl;
 - (void)numSinksChanged;
 - (void)numSinksEnabledChanged;
 
-
 - (void)getCurrentCameraPath:(std::string*)path;
 - (void)getCameraName:(std::string*)name;
 - (void)setNewCameraPath:(std::string_view*)path;

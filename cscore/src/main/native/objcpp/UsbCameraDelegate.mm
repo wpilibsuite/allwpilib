@@ -44,7 +44,6 @@
     return;
   }
 
-
   if (pixelFormat != kCVPixelFormatType_32BGRA) {
     NSLog(@"Unknown Pixel Format %u", pixelFormat);
     CVPixelBufferUnlockBaseAddress(imageBuffer, 0);
@@ -53,10 +52,9 @@
 
   size_t currSize = width * 3 * height;
 
-
   auto tmpMat = cv::Mat(height, width, CV_8UC4, baseaddress, rowBytes);
   auto image = sharedThis->AllocImage(cs::VideoMode::PixelFormat::kBGR, width,
-     height, currSize);
+                                      height, currSize);
   cv::cvtColor(tmpMat, image->AsMat(), cv::COLOR_BGRA2BGR);
 
   // std::cout << "Row bytes " <<rowBytes << std::endl;
