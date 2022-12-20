@@ -42,14 +42,14 @@ public class AprilTagJNI {
   }
 
   // Returns a pointer to a apriltag_detector_t
-  public static native long aprilTagCreate(
+  public static native int aprilTagCreate(
       String fam, double decimate, double blur, int threads, boolean debug, boolean refine_edges);
 
   // Destroy and free a previously created detector.
-  public static native void aprilTagDestroy(long detector);
+  public static native void aprilTagDestroy(int detector);
 
   private static native Object[] aprilTagDetectInternal(
-      long detector,
+      int detector,
       long imgAddr,
       int rows,
       int cols,
@@ -63,7 +63,7 @@ public class AprilTagJNI {
 
   // Detect targets given a GRAY frame. Returns a pointer toa zarray
   public static DetectionResult[] aprilTagDetect(
-      long detector,
+      int detector,
       Mat img,
       boolean doPoseEstimation,
       double tagWidth,
