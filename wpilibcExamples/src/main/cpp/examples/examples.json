@@ -1,18 +1,5 @@
 [
   {
-    "name": "Motor Controller",
-    "description": "Demonstrate controlling a single motor with a Joystick.",
-    "tags": [
-      "Robot and Motor",
-      "Actuators",
-      "Joystick",
-      "Complete List"
-    ],
-    "foldername": "MotorControl",
-    "gradlebase": "cpp",
-    "commandversion": 2
-  },
-  {
     "name": "Motor Control With Encoder",
     "description": "Demonstrate controlling a single motor with a Joystick and displaying the net movement of the motor using an encoder.",
     "tags": [
