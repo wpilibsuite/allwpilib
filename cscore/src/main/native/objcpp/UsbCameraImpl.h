@@ -57,6 +57,10 @@ class UsbCameraImpl : public SourceImpl {
     m_mode = mode;
   }
 
+  void objcPutFrame(std::unique_ptr<Image> image, Frame::Time time) {
+    PutFrame(std::move(image), time);
+  }
+
   const VideoMode& objcGetVideoMode() const {
     return m_mode;
   }

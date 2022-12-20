@@ -144,14 +144,9 @@ using namespace cs;
 }
 
 static cs::VideoMode::PixelFormat FourCCToPixelFormat(FourCharCode fourcc) {
-  switch (fourcc) {
-    case kCVPixelFormatType_422YpCbCr8_yuvs:
-      return cs::VideoMode::PixelFormat::kYUYV; // yuvs
-    case kCVPixelFormatType_420YpCbCr8BiPlanarVideoRange:
-      return {};
-    default:
-    return cs::VideoMode::PixelFormat::kUnknown;
-  }
+  // TODO Make this a lot better
+  (void)fourcc;
+  return cs::VideoMode::PixelFormat::kBGR;
 }
 
 - (void)deviceCacheVideoModes {
@@ -338,6 +333,12 @@ static cs::VideoMode::PixelFormat FourCCToPixelFormat(FourCharCode fourcc) {
 }
 
 - (bool)deviceConnect {
+  OSType pixelFormat = kCVPixelFormatType_32BGRA;
+
+  NSDictionary* pixelBufferOptions = @{
+    (id)kCVPixelBufferPixelFormatTypeKey: @(pixelFormat)
+  };
+
   if (self.session != nil) {
     return true;
   }
@@ -383,6 +384,7 @@ static cs::VideoMode::PixelFormat FourCCToPixelFormat(FourCharCode fourcc) {
     NSLog(@"Callback failed");
     goto err;
   }
+  self.callback.cppImpl = self.cppImpl;
 
   self.videoOutput = [[AVCaptureVideoDataOutput alloc] init];
   if (self.videoOutput == nil) {
@@ -392,6 +394,8 @@ static cs::VideoMode::PixelFormat FourCCToPixelFormat(FourCharCode fourcc) {
 
   [self.videoOutput setSampleBufferDelegate:self.callback
                                       queue:self.sessionQueue];
+
+  self.videoOutput.videoSettings = pixelBufferOptions;
 
   self.session = [[AVCaptureSession alloc] init];
   if (self.session == nil) {

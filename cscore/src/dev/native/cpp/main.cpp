@@ -18,9 +18,11 @@ int main() {
     std::cout << cam.name << std::endl;
     std::cout << cam.path << std::endl;
   }
+//0x111000007ca313a
+//EAB7A68F-EC2B-4487-AADF-D8A91C1CB782
 
-
-  CS_Source source = cs::CreateUsbCameraPath("Cam", "0x111000007ca313a", &status);
+  CS_Source source = cs::CreateUsbCameraPath("Cam", "44413434-0000-0000-0000-000000000001", &status);
+  CS_Source source2 = cs::CreateUsbCameraPath("Cam2", "EAB7A68F-EC2B-4487-AADF-D8A91C1CB782", &status);
 
   auto info = cs::GetUsbCameraInfo(source, &status);
   std::cout << info.name << " " << info.path << std::endl;
@@ -33,12 +35,19 @@ int main() {
     std::cout << mode.width << "x" << mode.height << " at " << mode.fps << " FPS" << std::endl;
   }
 
+  CS_Sink sink = cs::CreateMjpegServer("Server", "", 1234, &status);
+  cs::SetSinkSource(sink, source, &status);
+
+  CS_Sink sink2 = cs::CreateMjpegServer("Server2", "", 1235, &status);
+  cs::SetSinkSource(sink2, source2, &status);
+
+
   //cs::SetUsbCameraPath(source, "EAB7A68F-EC2B-4487-AADF-D8A91C1CB782", &status);
 
   //auto runLoop = CFRunLoopGetMain();
 
 
-  //res = CFRunLoopRunInMode(kCFRunLoopDefaultMode, 20, false);
+  res = CFRunLoopRunInMode(kCFRunLoopDefaultMode, 60, false);
   printf("%d\n", res);
   //std::this_thread::sleep_for(std::chrono::seconds(20));
 
