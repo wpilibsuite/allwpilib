@@ -869,7 +869,7 @@ namespace units
 	 *				- A `std::ratio` defining the conversion factor to the base unit type. (e.g. `std::ratio<1,12>` for inches to feet)
 	 *				- A base unit that the unit is derived from (or a unit category. Must be of type `unit` or `base_unit`)
 	 *				- An exponent representing factors of PI required by the conversion. (e.g. `std::ratio<-1>` for a radians to degrees conversion)
-	 *				- a ratio representing a datum translation required for the conversion (e.g. `std::ratio<32>` for a farenheit to celsius conversion)
+	 *				- a ratio representing a datum translation required for the conversion (e.g. `std::ratio<32>` for a fahrenheit to celsius conversion)
 	 *
 	 *				Typically, a specific unit, like `meters`, would be implemented as a type alias
 	 *				of `unit`, i.e. `using meters = unit<std::ratio<1>, units::category::length_unit`, or

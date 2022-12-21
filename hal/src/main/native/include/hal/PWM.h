@@ -22,7 +22,7 @@ extern "C" {
  * Initializes a PWM port.
  *
  * @param[in] portHandle the port to initialize
- * @param[in] allocationLocation  the location where the allocation is occuring
+ * @param[in] allocationLocation  the location where the allocation is occurring
  *                                (can be null)
  * @param[out] status             Error status variable. 0 on success.
  * @return the created pwm handle
