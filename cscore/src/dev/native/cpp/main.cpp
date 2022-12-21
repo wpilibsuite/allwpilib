@@ -24,7 +24,11 @@ int main() {
   CS_Source source = cs::CreateUsbCameraPath("Cam", "0x10000007ca313a", &status);
   CS_Source source2 = cs::CreateUsbCameraPath("Cam2", "EAB7A68F-EC2B-4487-AADF-D8A91C1CB782", &status);
 
-  cs::SetSourceFPS(source2, 12, &status);
+  cs::VideoMode mode{cs::VideoMode::PixelFormat::kBGR, 640, 480, 5};
+  cs::SetSourceVideoMode(source2, mode, &status);
+
+  //cs::SetSourceFPS(source2, 50, &status);
+  printf("Status %d\n", status);
 
   auto info = cs::GetUsbCameraInfo(source, &status);
   std::cout << info.name << " " << info.path << std::endl;

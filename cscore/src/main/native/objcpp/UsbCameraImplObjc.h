@@ -13,6 +13,7 @@ class UsbCameraImpl;
 @interface UsbCameraImplObjc : NSObject
 
 @property(nonatomic) AVCaptureDeviceFormat* currentFormat;
+@property(nonatomic) int currentFPS;
 @property(nonatomic) std::weak_ptr<cs::UsbCameraImpl> cppImpl;
 @property(nonatomic) dispatch_queue_t sessionQueue;
 @property(nonatomic) NSString* path;

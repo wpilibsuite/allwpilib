@@ -14,7 +14,10 @@ namespace cs {
 struct CameraFPSRange {
   int min;
   int max;
+
+  bool IsWithinRange(int fps) { return fps >= min && fps <= max; }
 };
+
 struct CameraModeStore {
   VideoMode mode;
   AVCaptureDeviceFormat* format;
@@ -73,8 +76,7 @@ class UsbCameraImpl : public SourceImpl {
 
   const VideoMode& objcGetVideoMode() const { return m_mode; }
 
-  std::vector<CameraModeStore>&
-  objcGetPlatformVideoModes() {
+  std::vector<CameraModeStore>& objcGetPlatformVideoModes() {
     return m_platformModes;
   }
 

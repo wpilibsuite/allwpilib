@@ -69,46 +69,86 @@ using namespace cs;
 }
 
 - (bool)setVideoMode:(const cs::VideoMode&)mode status:(CS_Status*)status {
-  return false;
-}
-- (bool)setPixelFormat:(cs::VideoMode::PixelFormat)pixelFormat
-                status:(CS_Status*)status {
-  return false;
-}
-- (bool)setResolutionWidth:(int)width
-                withHeight:(int)height
-                    status:(CS_Status*)status {
-  return false;
-}
-
-- (void)internalSetMode:(const cs::VideoMode&)newMode status:(CS_Status*)status {
-  auto sharedThis = self.cppImpl.lock();
+  dispatch_async_and_wait(self.sessionQueue, ^{
+    auto sharedThis = self.cppImpl.lock();
     if (!sharedThis) {
       *status = CS_READ_FAILED;
       return;
     }
-// If device is not connected, just apply and leave.
-    if (!self.propertiesCached) {
-      sharedThis->objcSetVideoMode(newMode);
-      *status = CS_OK;
+
+    [self internalSetMode:mode status:status];
+  });
+  return true;
+}
+- (bool)setPixelFormat:(cs::VideoMode::PixelFormat)pixelFormat
+                status:(CS_Status*)status {
+  dispatch_async_and_wait(self.sessionQueue, ^{
+    auto sharedThis = self.cppImpl.lock();
+    if (!sharedThis) {
+      *status = CS_READ_FAILED;
+      return;
+    }
+    VideoMode newMode;
+    newMode = sharedThis->objcGetVideoMode();
+    newMode.pixelFormat = pixelFormat;
+
+    [self internalSetMode:newMode status:status];
+  });
+  return true;
+}
+- (bool)setResolutionWidth:(int)width
+                withHeight:(int)height
+                    status:(CS_Status*)status {
+  dispatch_async_and_wait(self.sessionQueue, ^{
+    auto sharedThis = self.cppImpl.lock();
+    if (!sharedThis) {
+      *status = CS_READ_FAILED;
+      return;
+    }
+    VideoMode newMode;
+    newMode = sharedThis->objcGetVideoMode();
+    newMode.width = width;
+    newMode.height = height;
+
+    [self internalSetMode:newMode status:status];
+  });
+  return true;
+}
+
+- (void)internalSetMode:(const cs::VideoMode&)newMode
+                 status:(CS_Status*)status {
+  auto sharedThis = self.cppImpl.lock();
+  if (!sharedThis) {
+    *status = CS_READ_FAILED;
+    return;
+  }
+  // If device is not connected, just apply and leave.
+  if (!self.propertiesCached) {
+    sharedThis->objcSetVideoMode(newMode);
+    *status = CS_OK;
+    return;
+  }
+
+  if (newMode != sharedThis->objcGetVideoMode()) {
+    NSLog(@"Trying Mode %d %d %d %d", newMode.pixelFormat, newMode.width,
+          newMode.height, newMode.fps);
+    int localFPS = 0;
+    AVCaptureDeviceFormat* newModeType = [self deviceCheckModeValid:&newMode
+                                                            withFps:&localFPS];
+    if (newModeType == nil) {
+      NSLog(@"Invalid Set Mode");
+      *status = CS_UNSUPPORTED_MODE;
       return;
     }
 
-    if (newMode != sharedThis->objcGetVideoMode()) {
-      AVCaptureDeviceFormat* newModeType = [self deviceCheckModeValid: &newMode];
-      if (newModeType == nil) {
-        NSLog(@"Invalid Set Mode");
-        *status = CS_UNSUPPORTED_MODE;
-        return;
-      }
-
-      self.currentFormat = newModeType;
-      sharedThis->objcSetVideoMode(newMode);
-      [self deviceDisconnect];
-      [self deviceConnect];
-      sharedThis->objcGetNotifier().NotifySourceVideoMode(*sharedThis, newMode);
-    }
-    *status = CS_OK;
+    self.currentFormat = newModeType;
+    self.currentFPS = localFPS;
+    sharedThis->objcSetVideoMode(newMode);
+    [self deviceDisconnect];
+    [self deviceConnect];
+    sharedThis->objcGetNotifier().NotifySourceVideoMode(*sharedThis, newMode);
+  }
+  *status = CS_OK;
 }
 
 - (bool)setFPS:(int)fps status:(CS_Status*)status {
@@ -122,7 +162,7 @@ using namespace cs;
     newMode = sharedThis->objcGetVideoMode();
     newMode.fps = fps;
 
-    [self internalSetMode:newMode status: status];
+    [self internalSetMode:newMode status:status];
   });
   return true;
 }
@@ -192,7 +232,7 @@ static cs::VideoMode::PixelFormat FourCCToPixelFormat(FourCharCode fourcc) {
     case kCVPixelFormatType_422YpCbCr8FullRange:
       return cs::VideoMode::PixelFormat::kYUYV;
     default:
-    return cs::VideoMode::PixelFormat::kBGR;
+      return cs::VideoMode::PixelFormat::kBGR;
   }
 }
 
@@ -205,7 +245,7 @@ static cs::VideoMode::PixelFormat FourCCToPixelFormat(FourCharCode fourcc) {
   if (!sharedThis) {
     return;
   }
-  std::vector<std::pair<VideoMode, AVCaptureDeviceFormat*>>& platformModes =
+  std::vector<CameraModeStore>& platformModes =
       sharedThis->objcGetPlatformVideoModes();
   platformModes.clear();
 
@@ -226,24 +266,31 @@ static cs::VideoMode::PixelFormat FourCCToPixelFormat(FourCharCode fourcc) {
           format.videoSupportedFrameRateRanges;
 
       CameraModeStore store;
+      store.mode.pixelFormat = videoFormat;
+      store.mode.width = static_cast<int>(s1.width);
+      store.mode.height = static_cast<int>(s1.height);
+      store.format = format;
+      int maxFps = 0;
 
       for (AVFrameRateRange* rate in frameRates) {
-        NSLog(@"%@ %@", format, rate);
-        CMTime frameDuration = rate.minFrameDuration;
+        CMTime highest = rate.minFrameDuration;
+        CMTime lowest = rate.maxFrameDuration;
 
-        int fps = 30;
-        if (frameDuration.value != 0) {
-          fps = frameDuration.timescale /
-                static_cast<double>(frameDuration.value);
+        int highestFps = highest.timescale / static_cast<double>(highest.value);
+        int lowestFps = lowest.timescale / static_cast<double>(lowest.value);
+
+        NSLog(@"%d %lld", lowest.timescale, lowest.value);
+
+        store.fpsRanges.emplace_back(CameraFPSRange{lowestFps, highestFps});
+        if (highestFps > maxFps) {
+          maxFps = highestFps;
         }
-
-        VideoMode newMode = {videoFormat, static_cast<int>(s1.width),
-                             static_cast<int>(s1.height), fps};
-
-        modes.emplace_back(newMode);
-        platformModes.emplace_back(newMode, format);
-        count++;
       }
+      store.mode.fps = maxFps;
+
+      modes.emplace_back(store.mode);
+      platformModes.emplace_back(store);
+      count++;
     }
   }
 
@@ -252,27 +299,39 @@ static cs::VideoMode::PixelFormat FourCCToPixelFormat(FourCharCode fourcc) {
                                              CS_SOURCE_VIDEOMODES_UPDATED);
 }
 
-- (AVCaptureDeviceFormat*)deviceCheckModeValid:(const cs::VideoMode*)toCheck {
+- (AVCaptureDeviceFormat*)deviceCheckModeValid:(const cs::VideoMode*)toCheck
+                                       withFps:(int*)fps {
   auto sharedThis = self.cppImpl.lock();
   if (!sharedThis) {
     return nil;
   }
-  std::vector<std::pair<VideoMode, AVCaptureDeviceFormat*>>& platformModes =
+
+  NSLog(@"Checking mode %d %d %d %d", toCheck->pixelFormat, toCheck->width,
+        toCheck->height, toCheck->fps);
+  std::vector<CameraModeStore>& platformModes =
       sharedThis->objcGetPlatformVideoModes();
   // Find the matching mode
-  auto match =
-      std::find_if(platformModes.begin(), platformModes.end(),
-                   [&](std::pair<VideoMode, AVCaptureDeviceFormat*>& input) {
-                     return input.first.CompareWithoutFps(*toCheck);
-                   });
+  auto match = std::find_if(platformModes.begin(), platformModes.end(),
+                            [&](CameraModeStore& input) {
+                              return input.mode.CompareWithoutFps(*toCheck);
+                            });
 
   if (match == platformModes.end()) {
+    NSLog(@"No match even without fps");
     return nil;
   }
 
   // Check FPS
+  for (CameraFPSRange& range : match->fpsRanges) {
+    NSLog(@"Checking Range %d %d", range.min, range.max);
+    if (range.IsWithinRange(toCheck->fps)) {
+      *fps = toCheck->fps;
+      return match->format;
+    }
+  }
 
-  return match->second;
+  NSLog(@"No Matching FPS");
+  return nil;
 }
 
 - (void)deviceCacheMode {
@@ -285,7 +344,7 @@ static cs::VideoMode::PixelFormat FourCCToPixelFormat(FourCharCode fourcc) {
     return;
   }
 
-  std::vector<std::pair<VideoMode, AVCaptureDeviceFormat*>>& platformModes =
+  std::vector<CameraModeStore>& platformModes =
       sharedThis->objcGetPlatformVideoModes();
 
   if (platformModes.size() == 0) {
@@ -293,23 +352,27 @@ static cs::VideoMode::PixelFormat FourCCToPixelFormat(FourCharCode fourcc) {
   }
 
   if (self.currentFormat == nil) {
+    int localFps = 0;
     self.currentFormat =
-        [self deviceCheckModeValid:&sharedThis->objcGetVideoMode()];
+        [self deviceCheckModeValid:&sharedThis->objcGetVideoMode()
+                           withFps:&localFps];
     if (self.currentFormat == nil) {
       self.currentFormat = self.videoDevice.activeFormat;
-      auto result =
-          std::find_if(platformModes.begin(), platformModes.end(),
-                       [f = self.currentFormat](
-                           std::pair<VideoMode, AVCaptureDeviceFormat*>& i) {
-                         return [f isEqual:i.second];
-                       });
+      auto result = std::find_if(platformModes.begin(), platformModes.end(),
+                                 [f = self.currentFormat](CameraModeStore& i) {
+                                   return [f isEqual:i.format];
+                                 });
       if (result == platformModes.end()) {
-        auto&& firstSupported = platformModes[0];
-        self.currentFormat = firstSupported.second;
-        sharedThis->objcSetVideoMode(firstSupported.first);
+        auto& firstSupported = platformModes[0];
+        self.currentFormat = firstSupported.format;
+        self.currentFPS = firstSupported.mode.fps;
+        sharedThis->objcSetVideoMode(firstSupported.mode);
       } else {
-        sharedThis->objcSetVideoMode(result->first);
+        self.currentFPS = result->mode.fps;
+        sharedThis->objcSetVideoMode(result->mode);
       }
+    } else {
+      self.currentFPS = localFps;
     }
   }
 
@@ -320,21 +383,7 @@ static cs::VideoMode::PixelFormat FourCCToPixelFormat(FourCharCode fourcc) {
 }
 
 - (void)deviceSetMode {
-  auto sharedThis = self.cppImpl.lock();
-  if (!sharedThis) {
-    return;
-  }
-
-  // TODO Set mode on callback
-
   self.deviceValid = true;
-
-  NSLog(@"Setting mode to %@", self.currentFormat);
-  [self.videoDevice lockForConfiguration:nil];
-  self.videoDevice.activeFormat = self.currentFormat;
-  // TODO FPS
-  // self.videoDevice.activeVideoMaxFrameDuration = self.currentFormat.;
-  [self.videoDevice unlockForConfiguration];
 }
 
 - (bool)deviceStreamOn {
@@ -346,6 +395,20 @@ static cs::VideoMode::PixelFormat FourCCToPixelFormat(FourCharCode fourcc) {
   }
   self.streaming = true;
   [self.session startRunning];
+
+  // NSLog(@"Setting FPS to %d %@", self.currentFPS, self.currentFormat);
+  [self.videoDevice lockForConfiguration:nil];
+  if (self.currentFormat != nil) {
+    self.videoDevice.activeFormat = self.currentFormat;
+  }
+  if (self.currentFPS != 0) {
+    self.videoDevice.activeVideoMinFrameDuration =
+        CMTimeMake(1, self.currentFPS);
+    self.videoDevice.activeVideoMaxFrameDuration =
+        CMTimeMake(1, self.currentFPS);
+  }
+  [self.videoDevice unlockForConfiguration];
+
   return true;
 }
 
