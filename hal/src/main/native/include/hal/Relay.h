@@ -27,7 +27,7 @@ extern "C" {
  * @param[in] portHandle         the port handle to initialize
  * @param[in] fwd                true for the forward port, false for the
  *                               reverse port
- * @param[in] allocationLocation the location where the allocation is occuring
+ * @param[in] allocationLocation the location where the allocation is occurring
  *                               (can be null)
  * @param[out] status            Error status variable. 0 on success.
  * @return the created relay handle

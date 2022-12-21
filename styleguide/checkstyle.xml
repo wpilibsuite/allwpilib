@@ -109,7 +109,7 @@ module PUBLIC "-//Puppy Crawl//DTD Check Configuration 1.3//EN"
                     COMPACT_CTOR_DEF" />
     </module>
     <module name="SuppressionXpathSingleFilter">
-      <!-- suppresion is required till https://github.com/checkstyle/checkstyle/issues/7541 -->
+      <!-- suppression is required till https://github.com/checkstyle/checkstyle/issues/7541 -->
       <property name="id" value="RightCurlyAlone" />
       <property name="query"
         value="//RCURLY[parent::SLIST[count(./*)=1]

@@ -218,7 +218,7 @@ index f84895c18..6a50205b1 100644
  #elif ((__GNUC__ * 100) + __GNUC_MINOR__) >= 402
 -// Pragma based warning suppression was introduced in GGC 4.2.  Additionally
 -// this warning is "enabled by default".  The warning still appears if -Wall is
--// suppressed.  Apparently GCC suppresses it when -w is specifed, which is odd.
+-// suppressed.  Apparently GCC suppresses it when -w is specified, which is odd.
 -#pragma GCC diagnostic warning "-w"
 +#pragma GCC diagnostic warning "-Wunknown-pragmas"
 +#pragma GCC diagnostic warning "-Winaccessible-base"

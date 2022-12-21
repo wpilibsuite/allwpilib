@@ -22,7 +22,7 @@ extern "C" {
  * Initializes an analog gyro.
  *
  * @param[in] handle handle to the analog port
- * @param[in] allocationLocation the location where the allocation is occuring
+ * @param[in] allocationLocation the location where the allocation is occurring
  *                                (can be null)
  * @param[out] status the error code, or 0 for success
  * @return the initialized gyro handle

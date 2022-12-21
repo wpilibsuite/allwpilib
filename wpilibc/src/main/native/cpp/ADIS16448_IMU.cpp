@@ -689,7 +689,7 @@ int ADIS16448_IMU::ConfigDecRate(uint16_t DecimationSetting) {
 
   /* Check max */
   if (DecimationSetting > 9) {
-    REPORT_ERROR("Attemted to write an invalid decimation value. Capping at 9");
+    REPORT_ERROR("Attempted to write an invalid decimation value. Capping at 9");
     DecimationSetting = 9;
   }
 

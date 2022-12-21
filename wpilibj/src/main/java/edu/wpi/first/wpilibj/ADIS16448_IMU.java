@@ -491,12 +491,12 @@ public class ADIS16448_IMU implements AutoCloseable, NTSendable {
     /* Check max */
     if (m_decRate > 9) {
       DriverStation.reportError(
-          "Attemted to write an invalid decimation value. Capping at 9", false);
+          "Attempted to write an invalid decimation value. Capping at 9", false);
       m_decRate = 9;
     }
     if (m_decRate < 0) {
       DriverStation.reportError(
-          "Attemted to write an invalid decimation value. Capping at 0", false);
+          "Attempted to write an invalid decimation value. Capping at 0", false);
       m_decRate = 0;
     }
 
@@ -550,7 +550,7 @@ public class ADIS16448_IMU implements AutoCloseable, NTSendable {
       m_offset_data_gyro_rate_x = new double[size];
       m_offset_data_gyro_rate_y = new double[size];
       m_offset_data_gyro_rate_z = new double[size];
-      // Set acculumate count to 0
+      // Set accumulate count to 0
       m_accum_count = 0;
     }
   }

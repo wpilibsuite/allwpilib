@@ -565,7 +565,7 @@ public class ADIS16470_IMU implements AutoCloseable, NTSendable {
       return 2;
     }
     if (m_reg > 1999) {
-      DriverStation.reportError("Attemted to write an invalid deimation value.", false);
+      DriverStation.reportError("Attempted to write an invalid deimation value.", false);
       m_reg = 1999;
     }
     m_scaled_sample_rate = (((m_reg + 1.0) / 2000.0) * 1000000.0);

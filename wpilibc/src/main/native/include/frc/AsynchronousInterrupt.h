@@ -82,7 +82,7 @@ class AsynchronousInterrupt {
    * @param source the DigitalSource the interrupts are triggered from
    * @param f the callback function to call when the interrupt is triggered
    * @param arg the first argument, interrupt was triggered on rising edge
-   * @param args the remaing arguments, interrupt was triggered on falling edge
+   * @param args the remaining arguments, interrupt was triggered on falling edge
    */
   template <typename Callable, typename Arg, typename... Args>
   AsynchronousInterrupt(DigitalSource& source, Callable&& f, Arg&& arg,
@@ -99,7 +99,7 @@ class AsynchronousInterrupt {
    * @param source the DigitalSource the interrupts are triggered from
    * @param f the callback function to call when the interrupt is triggered
    * @param arg the first argument, interrupt was triggered on rising edge
-   * @param args the remaing arguments, interrupt was triggered on falling edge
+   * @param args the remaining arguments, interrupt was triggered on falling edge
    */
   template <typename Callable, typename Arg, typename... Args>
   AsynchronousInterrupt(DigitalSource* source, Callable&& f, Arg&& arg,
@@ -116,7 +116,7 @@ class AsynchronousInterrupt {
    * @param source the DigitalSource the interrupts are triggered from
    * @param f the callback function to call when the interrupt is triggered
    * @param arg the first argument, interrupt was triggered on rising edge
-   * @param args the remaing arguments, interrupt was triggered on falling edge
+   * @param args the remaining arguments, interrupt was triggered on falling edge
    */
   template <typename Callable, typename Arg, typename... Args>
   AsynchronousInterrupt(std::shared_ptr<DigitalSource> source, Callable&& f,
