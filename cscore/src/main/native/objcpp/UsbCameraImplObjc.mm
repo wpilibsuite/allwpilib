@@ -394,20 +394,23 @@ static cs::VideoMode::PixelFormat FourCCToPixelFormat(FourCharCode fourcc) {
     return false;
   }
   self.streaming = true;
+
   [self.session startRunning];
 
-  // NSLog(@"Setting FPS to %d %@", self.currentFPS, self.currentFormat);
-  [self.videoDevice lockForConfiguration:nil];
-  if (self.currentFormat != nil) {
-    self.videoDevice.activeFormat = self.currentFormat;
+  if ([self.videoDevice lockForConfiguration:nil]) {
+    if (self.currentFormat != nil) {
+      self.videoDevice.activeFormat = self.currentFormat;
+    }
+    if (self.currentFPS != 0) {
+      self.videoDevice.activeVideoMinFrameDuration =
+          CMTimeMake(1, self.currentFPS);
+      self.videoDevice.activeVideoMaxFrameDuration =
+          CMTimeMake(1, self.currentFPS);
+    }
+    [self.videoDevice unlockForConfiguration];
+  } else {
+    NSLog(@"Failed to lock for configuration");
   }
-  if (self.currentFPS != 0) {
-    self.videoDevice.activeVideoMinFrameDuration =
-        CMTimeMake(1, self.currentFPS);
-    self.videoDevice.activeVideoMaxFrameDuration =
-        CMTimeMake(1, self.currentFPS);
-  }
-  [self.videoDevice unlockForConfiguration];
 
   return true;
 }
@@ -506,6 +509,7 @@ static cs::VideoMode::PixelFormat FourCCToPixelFormat(FourCharCode fourcc) {
                                       queue:self.sessionQueue];
 
   self.videoOutput.videoSettings = pixelBufferOptions;
+  self.videoOutput.alwaysDiscardsLateVideoFrames = YES;
 
   self.session = [[AVCaptureSession alloc] init];
   if (self.session == nil) {
