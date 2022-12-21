@@ -4,7 +4,7 @@ Date: Sat, 7 May 2022 22:17:19 -0400
 Subject: [PATCH 05/28] Threading updates
 
 - Remove guards for threads and exception
-- Prefer scope guard over lock guard
+- Prefer scope gaurd over lock gaurd
 ---
  llvm/include/llvm/Support/Compiler.h |  6 -----
  llvm/lib/Support/ErrorHandling.cpp   | 38 +++++-----------------------
