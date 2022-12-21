@@ -131,7 +131,7 @@ namespace cmd {
 [[nodiscard]] CommandPtr Wait(units::second_t duration);
 
 /**
- * Constructs a command that does nothing, finishing once a command becomes
+ * Constructs a command that does nothing, finishing once a condition becomes
  * true.
  *
  * @param condition the condition
