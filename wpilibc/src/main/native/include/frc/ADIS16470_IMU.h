@@ -93,7 +93,8 @@ class ADIS16470_IMU : public nt::NTSendable,
                          CalibrationTime cal_time);
 
   /**
-   * @brief Destructor. Kills the acquisition loop and closes the SPI peripheral.
+   * @brief Destructor. Kills the acquisition loop and closes the SPI
+   * peripheral.
    */
   ~ADIS16470_IMU() override;
 
