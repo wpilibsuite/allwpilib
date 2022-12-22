@@ -5,7 +5,6 @@
 #include "frc/apriltag/AprilTagDetection.h"
 
 #include <type_traits>
-#include <version>
 
 #ifdef _WIN32
 #pragma warning(disable : 4200)
@@ -23,11 +22,6 @@ static_assert(sizeof(AprilTagDetection) == sizeof(apriltag_detection_t),
               "structure sizes don't match");
 static_assert(std::is_standard_layout_v<AprilTagDetection>,
               "AprilTagDetection is not standard layout?");
-#ifdef __cpp_lib_is_layout_compatible
-static_assert(
-    std::is_layout_compatible_v<AprilTagDetection, apriltag_detection_t>,
-    "not layout compatible");
-#endif
 
 std::string_view AprilTagDetection::GetFamily() const {
   return static_cast<const apriltag_family_t*>(family)->name;
