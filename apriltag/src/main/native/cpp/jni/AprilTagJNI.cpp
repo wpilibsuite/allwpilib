@@ -789,7 +789,7 @@ Java_edu_wpi_first_apriltag_jni_AprilTagJNI_estimatePoseOrthogonalIteration
   std::memcpy(&det, &cdet, sizeof(det));
 
   auto res =
-    det.EstimatePoseOrthogonalIteration({tagSize, fx, fy, cx, cy}, nIters);
+      det.EstimatePoseOrthogonalIteration({tagSize, fx, fy, cx, cy}, nIters);
 
   matd_destroy(cdet.H);
   return MakeJObject(env, res);
