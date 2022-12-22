@@ -15,7 +15,16 @@ import java.util.Arrays;
 /** A detection of an AprilTag tag. */
 public class AprilTagDetection {
   /** A pose estimate. */
+  @SuppressWarnings("MemberName")
   public class PoseEstimate {
+    /**
+     * Constructs a pose estimate.
+     *
+     * @param pose1 first pose
+     * @param pose2 second pose
+     * @param error1 error of first pose
+     * @param error2 error of second pose
+     */
     public PoseEstimate(Transform3d pose1, Transform3d pose2, double error1, double error2) {
       this.pose1 = pose1;
       this.pose2 = pose2;
@@ -54,6 +63,7 @@ public class AprilTagDetection {
   }
 
   /** Configuration for the pose estimator. */
+  @SuppressWarnings("MemberName")
   public class PoseEstimatorConfig {
     public double tagSize; // in meters
     public double fx; // in pixels
@@ -139,7 +149,7 @@ public class AprilTagDetection {
    * @param ndx Corner index (range is 0-3, inclusive)
    * @return Corner point X coordinate
    */
-  public double GetCornerX(int ndx) {
+  public double getCornerX(int ndx) {
     return m_corners[ndx * 2];
   }
 
@@ -150,7 +160,7 @@ public class AprilTagDetection {
    * @param ndx Corner index (range is 0-3, inclusive)
    * @return Corner point Y coordinate
    */
-  public double GetCornerY(int ndx) {
+  public double getCornerY(int ndx) {
     return m_corners[ndx * 2 + 1];
   }
 
