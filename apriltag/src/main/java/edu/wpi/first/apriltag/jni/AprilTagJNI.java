@@ -5,6 +5,7 @@
 package edu.wpi.first.apriltag.jni;
 
 import edu.wpi.first.apriltag.AprilTagDetection;
+import edu.wpi.first.apriltag.AprilTagPoseEstimate;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.util.RuntimeLoader;
 import java.io.IOException;
@@ -106,7 +107,7 @@ public class AprilTagJNI {
   public static native Transform3d estimatePoseHomography(
       double[] homography, double tagSize, double fx, double fy, double cx, double cy);
 
-  public static native AprilTagDetection.PoseEstimate estimatePoseOrthogonalIteration(
+  public static native AprilTagPoseEstimate estimatePoseOrthogonalIteration(
       double[] homography,
       double[] corners,
       double tagSize,

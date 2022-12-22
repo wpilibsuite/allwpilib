@@ -9,16 +9,7 @@
 
 #include "edu_wpi_first_apriltag_jni_AprilTagJNI.h"
 #include "frc/apriltag/AprilTagDetector.h"
-
-#ifdef _WIN32
-#pragma warning(disable : 4200)
-#elif defined(__clang__)
-#pragma clang diagnostic ignored "-Wc99-extensions"
-#elif defined(__GNUC__)
-#pragma GCC diagnostic ignored "-Wpedantic"
-#endif
-
-#include "apriltag.h"
+#include "frc/apriltag/AprilTagPoseEstimator.h"
 
 using namespace frc;
 using namespace wpi::java;
@@ -36,7 +27,7 @@ static JException nullPointerEx;
 
 static const JClassInit classes[] = {
     {"edu/wpi/first/apriltag/AprilTagDetection", &detectionCls},
-    {"edu/wpi/first/apriltag/AprilTagDetection$PoseEstimate", &poseEstimateCls},
+    {"edu/wpi/first/apriltag/AprilTagPoseEstimate", &poseEstimateCls},
     {"edu/wpi/first/math/geometry/Quaternion", &quaternionCls},
     {"edu/wpi/first/math/geometry/Rotation3d", &rotation3dCls},
     {"edu/wpi/first/math/geometry/Transform3d", &transform3dCls},
@@ -94,47 +85,6 @@ JNIEXPORT void JNICALL JNI_OnUnload(JavaVM* vm, void* reserved) {
 }  // extern "C"
 
 //
-// Conversions from Java objects to C++
-//
-
-static matd_t* FromJavaHomography(JNIEnv* env, jdoubleArray homography) {
-  if (!homography) {
-    nullPointerEx.Throw(env, "homography cannot be null");
-    return nullptr;
-  }
-
-  JDoubleArrayRef harr{env, homography};
-  if (harr.size() != 9) {
-    illegalArgEx.Throw(env, "homography array must be size 9");
-    return nullptr;
-  }
-  matd_t* hmat = matd_create(3, 3);
-  std::memcpy(hmat->data, harr.array().data(), 9 * sizeof(double));
-  return hmat;
-}
-
-static bool FromJavaCorners(JNIEnv* env, jdoubleArray corners,
-                            apriltag_detection_t* det) {
-  if (!corners) {
-    nullPointerEx.Throw(env, "corners cannot be null");
-    return false;
-  }
-
-  JDoubleArrayRef carr{env, corners};
-  if (carr.size() != 8) {
-    illegalArgEx.Throw(env, "corners array must be size 8");
-    return false;
-  }
-
-  auto arr = carr.array();
-  for (int i = 0; i < 4; i++) {
-    det->p[i][0] = arr[i * 2];
-    det->p[i][1] = arr[i * 2 + 1];
-  }
-  return true;
-}
-
-//
 // Conversions from C++ to Java objects
 //
 
@@ -147,25 +97,27 @@ static jobject MakeJObject(JNIEnv* env, const AprilTagDetection& detect) {
 
   JLocal<jstring> fam{env, MakeJString(env, detect.GetFamily())};
 
-  // we need the raw data structure for maximum efficiency
-  auto detectc = reinterpret_cast<const apriltag_detection_t*>(&detect);
+  auto homography = detect.GetHomography();
   JLocal<jdoubleArray> harr{
       env, MakeJDoubleArray(
-               env, {reinterpret_cast<const jdouble*>(detectc->H->data), 9})};
+               env, {reinterpret_cast<const jdouble*>(homography.data()),
+                     homography.size()})};
 
-  jdouble corners[8];
-  for (int i = 0; i < 4; i++) {
-    corners[i * 2] = detectc->p[i][0];
-    corners[i * 2 + 1] = detectc->p[i][1];
-  }
-  JLocal<jdoubleArray> carr{env, MakeJDoubleArray(env, corners)};
+  double cornersBuf[8];
+  auto corners = detect.GetCorners(cornersBuf);
+  JLocal<jdoubleArray> carr{
+      env,
+      MakeJDoubleArray(env, {reinterpret_cast<const jdouble*>(corners.data()),
+                             corners.size()})};
+
+  auto center = detect.GetCenter();
 
   return env->NewObject(detectionCls, constructor, fam.obj(),
                         static_cast<jint>(detect.GetId()),
                         static_cast<jint>(detect.GetHamming()),
                         static_cast<jfloat>(detect.GetDecisionMargin()),
-                        harr.obj(), static_cast<jdouble>(detectc->c[0]),
-                        static_cast<jdouble>(detectc->c[1]), carr.obj());
+                        harr.obj(), static_cast<jdouble>(center.x),
+                        static_cast<jdouble>(center.y), carr.obj());
 }
 
 static jobjectArray MakeJObject(JNIEnv* env,
@@ -231,8 +183,7 @@ static jobject MakeJObject(JNIEnv* env, const Transform3d& xform) {
   return env->NewObject(transform3dCls, constructor, xlate.obj(), rot.obj());
 }
 
-static jobject MakeJObject(JNIEnv* env,
-                           const AprilTagDetection::PoseEstimate& est) {
+static jobject MakeJObject(JNIEnv* env, const AprilTagPoseEstimate& est) {
   static jmethodID constructor =
       env->GetMethodID(poseEstimateCls, "<init>",
                        "(Ledu/wpi/first/math/geometry/Transform3d;"
@@ -751,21 +702,19 @@ Java_edu_wpi_first_apriltag_jni_AprilTagJNI_estimatePoseHomography
   (JNIEnv* env, jclass, jdoubleArray homography, jdouble tagSize, jdouble fx,
    jdouble fy, jdouble cx, jdouble cy)
 {
-  // reconstruct a basic det--only need H
-  union {
-    apriltag_detection_t cdet;
-    AprilTagDetection det;
-  } u;
-  u.cdet.H = FromJavaHomography(env, homography);
-  if (!u.cdet.H) {
+  if (!homography) {
+    nullPointerEx.Throw(env, "homography cannot be null");
+    return nullptr;
+  }
+  JDoubleArrayRef harr{env, homography};
+  if (harr.size() != 9) {
+    illegalArgEx.Throw(env, "homography array must be size 9");
     return nullptr;
   }
 
-  auto res =
-      u.det.EstimatePoseHomography({units::meter_t{tagSize}, fx, fy, cx, cy});
-
-  matd_destroy(u.cdet.H);
-  return MakeJObject(env, res);
+  return MakeJObject(env, AprilTagPoseEstimator::EstimateHomography(
+                              std::span<const double, 9>{harr.array()},
+                              {units::meter_t{tagSize}, fx, fy, cx, cy}));
 }
 
 /*
@@ -778,24 +727,33 @@ Java_edu_wpi_first_apriltag_jni_AprilTagJNI_estimatePoseOrthogonalIteration
   (JNIEnv* env, jclass, jdoubleArray homography, jdoubleArray corners,
    jdouble tagSize, jdouble fx, jdouble fy, jdouble cx, jdouble cy, jint nIters)
 {
-  // reconstruct a basic det--only need H and c
-  union {
-    apriltag_detection_t cdet;
-    AprilTagDetection det;
-  } u;
-  if (!FromJavaCorners(env, corners, &u.cdet)) {
+  // homography
+  if (!homography) {
+    nullPointerEx.Throw(env, "homography cannot be null");
     return nullptr;
   }
-  u.cdet.H = FromJavaHomography(env, homography);
-  if (!u.cdet.H) {
+  JDoubleArrayRef harr{env, homography};
+  if (harr.size() != 9) {
+    illegalArgEx.Throw(env, "homography array must be size 9");
     return nullptr;
   }
 
-  auto res = u.det.EstimatePoseOrthogonalIteration(
-      {units::meter_t{tagSize}, fx, fy, cx, cy}, nIters);
+  // corners
+  if (!corners) {
+    nullPointerEx.Throw(env, "corners cannot be null");
+    return nullptr;
+  }
+  JDoubleArrayRef carr{env, corners};
+  if (carr.size() != 8) {
+    illegalArgEx.Throw(env, "corners array must be size 8");
+    return nullptr;
+  }
 
-  matd_destroy(u.cdet.H);
-  return MakeJObject(env, res);
+  return MakeJObject(env,
+                     AprilTagPoseEstimator::EstimateOrthogonalIteration(
+                         std::span<const double, 9>{harr.array()},
+                         std::span<const double, 8>{carr.array()},
+                         {units::meter_t{tagSize}, fx, fy, cx, cy}, nIters));
 }
 
 /*
@@ -808,23 +766,32 @@ Java_edu_wpi_first_apriltag_jni_AprilTagJNI_estimatePose
   (JNIEnv* env, jclass, jdoubleArray homography, jdoubleArray corners,
    jdouble tagSize, jdouble fx, jdouble fy, jdouble cx, jdouble cy)
 {
-  // reconstruct a basic det--only need H and c
-  union {
-    apriltag_detection_t cdet;
-    AprilTagDetection det;
-  } u;
-  if (!FromJavaCorners(env, corners, &u.cdet)) {
+  // homography
+  if (!homography) {
+    nullPointerEx.Throw(env, "homography cannot be null");
     return nullptr;
   }
-  u.cdet.H = FromJavaHomography(env, homography);
-  if (!u.cdet.H) {
+  JDoubleArrayRef harr{env, homography};
+  if (harr.size() != 9) {
+    illegalArgEx.Throw(env, "homography array must be size 9");
     return nullptr;
   }
 
-  auto res = u.det.EstimatePose({units::meter_t{tagSize}, fx, fy, cx, cy});
+  // corners
+  if (!corners) {
+    nullPointerEx.Throw(env, "corners cannot be null");
+    return nullptr;
+  }
+  JDoubleArrayRef carr{env, corners};
+  if (carr.size() != 8) {
+    illegalArgEx.Throw(env, "corners array must be size 8");
+    return nullptr;
+  }
 
-  matd_destroy(u.cdet.H);
-  return MakeJObject(env, res);
+  return MakeJObject(env, AprilTagPoseEstimator::Estimate(
+                              std::span<const double, 9>{harr.array()},
+                              std::span<const double, 8>{carr.array()},
+                              {units::meter_t{tagSize}, fx, fy, cx, cy}));
 }
 
 }  // extern "C"
