@@ -761,7 +761,8 @@ Java_edu_wpi_first_apriltag_jni_AprilTagJNI_estimatePoseHomography
     return nullptr;
   }
 
-  auto res = u.det.EstimatePoseHomography({tagSize, fx, fy, cx, cy});
+  auto res =
+      u.det.EstimatePoseHomography({units::meter_t{tagSize}, fx, fy, cx, cy});
 
   matd_destroy(u.cdet.H);
   return MakeJObject(env, res);
@@ -790,8 +791,8 @@ Java_edu_wpi_first_apriltag_jni_AprilTagJNI_estimatePoseOrthogonalIteration
     return nullptr;
   }
 
-  auto res =
-      u.det.EstimatePoseOrthogonalIteration({tagSize, fx, fy, cx, cy}, nIters);
+  auto res = u.det.EstimatePoseOrthogonalIteration(
+      {units::meter_t{tagSize}, fx, fy, cx, cy}, nIters);
 
   matd_destroy(u.cdet.H);
   return MakeJObject(env, res);
@@ -820,7 +821,7 @@ Java_edu_wpi_first_apriltag_jni_AprilTagJNI_estimatePose
     return nullptr;
   }
 
-  auto res = u.det.EstimatePose({tagSize, fx, fy, cx, cy});
+  auto res = u.det.EstimatePose({units::meter_t{tagSize}, fx, fy, cx, cy});
 
   matd_destroy(u.cdet.H);
   return MakeJObject(env, res);

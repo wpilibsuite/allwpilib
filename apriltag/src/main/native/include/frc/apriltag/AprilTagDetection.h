@@ -9,6 +9,7 @@
 #include <span>
 #include <string_view>
 
+#include <units/length.h>
 #include <wpi/SymbolExports.h>
 
 #include "frc/EigenCore.h"
@@ -52,11 +53,11 @@ class WPILIB_DLLEXPORT AprilTagDetection {
 
   /** Configuration for the pose estimator. */
   struct PoseEstimatorConfig {
-    double tagSize;  // in meters
-    double fx;       // in pixels
-    double fy;       // in pixels
-    double cx;       // in pixels
-    double cy;       // in pixels
+    units::meter_t tagSize;
+    double fx;  // in pixels
+    double fy;  // in pixels
+    double cx;  // in pixels
+    double cy;  // in pixels
   };
 
   /**

@@ -58,7 +58,7 @@ static apriltag_detection_info_t MakeDetectionInfo(
     const AprilTagDetection::PoseEstimatorConfig& config) {
   return {reinterpret_cast<apriltag_detection_t*>(
               const_cast<AprilTagDetection*>(det)),
-          config.tagSize,
+          config.tagSize.value(),
           config.fx,
           config.fy,
           config.cx,
