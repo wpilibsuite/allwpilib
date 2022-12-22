@@ -16,7 +16,7 @@ import java.util.Arrays;
 public class AprilTagDetection {
   /** A pose estimate. */
   @SuppressWarnings("MemberName")
-  public class PoseEstimate {
+  public static class PoseEstimate {
     /**
      * Constructs a pose estimate.
      *
@@ -64,7 +64,7 @@ public class AprilTagDetection {
 
   /** Configuration for the pose estimator. */
   @SuppressWarnings("MemberName")
-  public class PoseEstimatorConfig {
+  public static class PoseEstimatorConfig {
     public double tagSize; // in meters
     public double fx; // in pixels
     public double fy; // in pixels
