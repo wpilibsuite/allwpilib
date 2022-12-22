@@ -5,6 +5,7 @@
 #include "frc/apriltag/AprilTagDetector.h"
 
 #include <cmath>
+#include <numbers>
 
 #ifdef _WIN32
 #pragma warning(disable : 4200)
@@ -47,7 +48,8 @@ void AprilTagDetector::Results::Destroy() {
 
 AprilTagDetector::AprilTagDetector() : m_impl{apriltag_detector_create()} {
   // apriltag_detector_create does not appropriately initialize qtp.critical_rad
-  static_cast<apriltag_detector_t*>(m_impl)->qtp.critical_rad = 10 * M_PI / 180;
+  static_cast<apriltag_detector_t*>(m_impl)->qtp.critical_rad =
+      10 * std::numbers::pi / 180;
 }
 
 AprilTagDetector& AprilTagDetector::operator=(AprilTagDetector&& rhs) {
