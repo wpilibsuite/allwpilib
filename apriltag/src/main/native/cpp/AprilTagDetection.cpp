@@ -5,6 +5,8 @@
 #include "frc/apriltag/AprilTagDetection.h"
 
 #include <algorithm>
+#include <type_traits>
+#include <version>
 
 #include <Eigen/QR>
 
@@ -20,6 +22,16 @@
 #include "apriltag_pose.h"
 
 using namespace frc;
+
+static_assert(sizeof(AprilTagDetection) == sizeof(apriltag_detection_t),
+              "structure sizes don't match");
+static_assert(std::is_standard_layout_v<AprilTagDetection>,
+              "AprilTagDetection is not standard layout?");
+#ifdef __cpp_lib_is_layout_compatible
+static_assert(
+    std::is_layout_compatible_v<AprilTagDetection, apriltag_detection_t>,
+    "not layout compatible");
+#endif
 
 static Eigen::Matrix3d OrthogonalizeRotationMatrix(
     const Eigen::Matrix3d& input) {
