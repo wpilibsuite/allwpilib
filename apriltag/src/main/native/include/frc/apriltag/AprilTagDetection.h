@@ -28,7 +28,7 @@ class WPILIB_DLLEXPORT AprilTagDetection {
   };
 
   /** A pair of pose estimates. */
-  struct PoseEstimate {
+  struct WPILIB_DLLEXPORT PoseEstimate {
     /** Pose 1. */
     Transform3d pose1;
 

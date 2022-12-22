@@ -30,7 +30,8 @@ class WPILIB_DLLEXPORT AprilTagDetector {
    * Array of detection results. Each array element is a pointer to an
    * AprilTagDetection.
    */
-  class Results : public std::span<AprilTagDetection const* const> {
+  class WPILIB_DLLEXPORT Results
+      : public std::span<AprilTagDetection const* const> {
     struct private_init {};
     friend class AprilTagDetector;
 
