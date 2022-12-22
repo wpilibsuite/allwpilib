@@ -21,8 +21,6 @@ namespace frc {
  */
 class WPILIB_DLLEXPORT AprilTagDetection {
  public:
-  AprilTagDetection() = delete;
-
   /** A point. Used for center and corner points. */
   struct Point {
     double x;

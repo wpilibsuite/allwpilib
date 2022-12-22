@@ -3,6 +3,7 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #include <cstdio>
+#include <cstring>
 
 #include <wpi/jni_util.h>
 
@@ -751,16 +752,17 @@ Java_edu_wpi_first_apriltag_jni_AprilTagJNI_estimatePoseHomography
    jdouble fy, jdouble cx, jdouble cy)
 {
   // reconstruct a basic det--only need H
-  apriltag_detection_t det;
-  det.H = FromJavaHomography(env, homography);
-  if (!det.H) {
+  apriltag_detection_t cdet;
+  cdet.H = FromJavaHomography(env, homography);
+  if (!cdet.H) {
     return nullptr;
   }
+  AprilTagDetection det;
+  std::memcpy(&det, &cdet, sizeof(det));
 
-  auto res = reinterpret_cast<AprilTagDetection*>(&det)->EstimatePoseHomography(
-      {tagSize, fx, fy, cx, cy});
+  auto res = det.EstimatePoseHomography({tagSize, fx, fy, cx, cy});
 
-  matd_destroy(det.H);
+  matd_destroy(cdet.H);
   return MakeJObject(env, res);
 }
 
@@ -775,20 +777,21 @@ Java_edu_wpi_first_apriltag_jni_AprilTagJNI_estimatePoseOrthogonalIteration
    jdouble tagSize, jdouble fx, jdouble fy, jdouble cx, jdouble cy, jint nIters)
 {
   // reconstruct a basic det--only need H and c
-  apriltag_detection_t det;
-  if (!FromJavaCorners(env, corners, &det)) {
+  apriltag_detection_t cdet;
+  if (!FromJavaCorners(env, corners, &cdet)) {
     return nullptr;
   }
-  det.H = FromJavaHomography(env, homography);
-  if (!det.H) {
+  cdet.H = FromJavaHomography(env, homography);
+  if (!cdet.H) {
     return nullptr;
   }
+  AprilTagDetection det;
+  std::memcpy(&det, &cdet, sizeof(det));
 
   auto res =
-      reinterpret_cast<AprilTagDetection*>(&det)
-          ->EstimatePoseOrthogonalIteration({tagSize, fx, fy, cx, cy}, nIters);
+    det.EstimatePoseOrthogonalIteration({tagSize, fx, fy, cx, cy}, nIters);
 
-  matd_destroy(det.H);
+  matd_destroy(cdet.H);
   return MakeJObject(env, res);
 }
 
@@ -803,19 +806,20 @@ Java_edu_wpi_first_apriltag_jni_AprilTagJNI_estimatePose
    jdouble tagSize, jdouble fx, jdouble fy, jdouble cx, jdouble cy)
 {
   // reconstruct a basic det--only need H and c
-  apriltag_detection_t det;
-  if (!FromJavaCorners(env, corners, &det)) {
+  apriltag_detection_t cdet;
+  if (!FromJavaCorners(env, corners, &cdet)) {
     return nullptr;
   }
-  det.H = FromJavaHomography(env, homography);
-  if (!det.H) {
+  cdet.H = FromJavaHomography(env, homography);
+  if (!cdet.H) {
     return nullptr;
   }
+  AprilTagDetection det;
+  std::memcpy(&det, &cdet, sizeof(det));
 
-  auto res = reinterpret_cast<AprilTagDetection*>(&det)->EstimatePose(
-      {tagSize, fx, fy, cx, cy});
+  auto res = det.EstimatePose({tagSize, fx, fy, cx, cy});
 
-  matd_destroy(det.H);
+  matd_destroy(cdet.H);
   return MakeJObject(env, res);
 }
 
