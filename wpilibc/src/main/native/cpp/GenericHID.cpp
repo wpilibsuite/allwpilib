@@ -134,15 +134,17 @@ void GenericHID::SetOutputs(int value) {
 }
 
 void GenericHID::SetRumble(RumbleType type, double value) {
-  if (value < 0) {
-    value = 0;
-  } else if (value > 1) {
-    value = 1;
-  }
+  value = std::clamp(value, 0, 1);
+  double rumbleValue = value * 65535;
+
   if (type == kLeftRumble) {
-    m_leftRumble = value * 65535;
+    m_leftRumble = rumbleValue;
+  } else if (type == kRightRumble) {
+    m_rightRumble = rumbleValue;
   } else {
-    m_rightRumble = value * 65535;
+    m_leftRumble = rumbleValue;
+    m_rightRumble = rumbleValue;
   }
+
   HAL_SetJoystickOutputs(m_port, m_outputs, m_leftRumble, m_rightRumble);
 }
