@@ -4,10 +4,11 @@
 
 package edu.wpi.first.apriltag.jni;
 
+import edu.wpi.first.apriltag.AprilTagDetection;
+import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.util.RuntimeLoader;
 import java.io.IOException;
 import java.util.concurrent.atomic.AtomicBoolean;
-import org.opencv.core.Mat;
 
 public class AprilTagJNI {
   static boolean libraryLoaded = false;
@@ -41,49 +42,86 @@ public class AprilTagJNI {
     }
   }
 
-  // Returns a pointer to a apriltag_detector_t
-  public static native int aprilTagCreate(
-      String fam, double decimate, double blur, int threads, boolean debug, boolean refine_edges);
+  public static native long createDetector();
 
-  // Destroy and free a previously created detector.
-  public static native void aprilTagDestroy(int detector);
+  public static native void destroyDetector(long det);
 
-  private static native Object[] aprilTagDetectInternal(
-      int detector,
-      long imgAddr,
-      int rows,
-      int cols,
-      boolean doPoseEstimation,
-      double tagWidth,
+  public static native void setNumThreads(long det, int val);
+
+  public static native int getNumThreads(long det);
+
+  public static native void setQuadDecimate(long det, float val);
+
+  public static native float getQuadDecimate(long det);
+
+  public static native void setQuadSigma(long det, float val);
+
+  public static native float getQuadSigma(long det);
+
+  public static native void setRefineEdges(long det, boolean val);
+
+  public static native boolean getRefineEdges(long det);
+
+  public static native void setDecodeSharpening(long det, double val);
+
+  public static native double getDecodeSharpening(long det);
+
+  public static native void setDebug(long det, boolean val);
+
+  public static native boolean getDebug(long det);
+
+  public static native void setQuadMinClusterPixels(long det, int val);
+
+  public static native int getQuadMinClusterPixels(long det);
+
+  public static native void setQuadMaxNumMaxima(long det, int val);
+
+  public static native int getQuadMaxNumMaxima(long det);
+
+  public static native void setQuadCriticalAngle(long det, float val);
+
+  public static native float getQuadCriticalAngle(long det);
+
+  public static native void setQuadMaxLineFitMSE(long det, float val);
+
+  public static native float getQuadMaxLineFitMSE(long det);
+
+  public static native void setQuadMinWhiteBlackDiff(long det, int val);
+
+  public static native int getQuadMinWhiteBlackDiff(long det);
+
+  public static native void setQuadDeglitch(long det, boolean val);
+
+  public static native boolean getQuadDeglitch(long det);
+
+  public static native boolean addFamily(long det, String fam, int bitsCorrected);
+
+  public static native void removeFamily(long det, String fam);
+
+  public static native void clearFamilies(long det);
+
+  public static native AprilTagDetection[] detect(
+      long det, int width, int height, int stride, long bufAddr);
+
+  public static native Transform3d estimatePoseHomography(
+      double[] homography, double tagSize, double fx, double fy, double cx, double cy);
+
+  public static native AprilTagDetection.PoseEstimate estimatePoseOrthogonalIteration(
+      double[] homography,
+      double[] corners,
+      double tagSize,
       double fx,
       double fy,
       double cx,
       double cy,
       int nIters);
 
-  // Detect targets given a GRAY frame. Returns a pointer toa zarray
-  public static DetectionResult[] aprilTagDetect(
-      int detector,
-      Mat img,
-      boolean doPoseEstimation,
-      double tagWidth,
+  public static native Transform3d estimatePose(
+      double[] homography,
+      double[] corners,
+      double tagSize,
       double fx,
       double fy,
       double cx,
-      double cy,
-      int nIters) {
-    return (DetectionResult[])
-        aprilTagDetectInternal(
-            detector,
-            img.dataAddr(),
-            img.rows(),
-            img.cols(),
-            doPoseEstimation,
-            tagWidth,
-            fx,
-            fy,
-            cx,
-            cy,
-            nIters);
-  }
+      double cy);
 }
