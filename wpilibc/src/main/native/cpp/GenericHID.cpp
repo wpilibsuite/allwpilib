@@ -134,7 +134,7 @@ void GenericHID::SetOutputs(int value) {
 }
 
 void GenericHID::SetRumble(RumbleType type, double value) {
-  value = std::clamp(value, 0, 1);
+  value = std::clamp(value, 0.0, 1.0);
   double rumbleValue = value * 65535;
 
   if (type == kLeftRumble) {

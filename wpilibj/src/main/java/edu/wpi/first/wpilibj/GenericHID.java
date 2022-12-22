@@ -410,6 +410,7 @@ public class GenericHID {
         this.m_rightRumble = rumbleValue;
         break;
       case kBothRumble:
+      default:
         this.m_leftRumble = rumbleValue;
         this.m_rightRumble = rumbleValue;
         break;
