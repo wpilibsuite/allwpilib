@@ -223,7 +223,7 @@ public class AprilTagDetector implements AutoCloseable {
   }
 
   /**
-   * Sets minimum brightness offset. When we build our model of black & white pixels, we add an
+   * Sets minimum brightness offset. When we build our model of black &amp; white pixels, we add an
    * extra check that the white model must be (overall) brighter than the black model. How much
    * brighter? (in pixel values, [0,255]). Default is 5.
    *
@@ -275,7 +275,7 @@ public class AprilTagDetector implements AutoCloseable {
    * Adds a family of tags to be detected.
    *
    * @param fam Family name, e.g. "tag16h5"
-   * @param bitsCorrected
+   * @param bitsCorrected maximum number of bits to correct
    * @throws IllegalArgumentException if family name not recognized
    */
   public void addFamily(String fam, int bitsCorrected) {
