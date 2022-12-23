@@ -89,6 +89,7 @@ NT_GetInteger
 NT_GetIntegerArray
 NT_GetNetworkMode
 NT_GetRaw
+NT_GetServerTimeOffset
 NT_GetString
 NT_GetStringArray
 NT_GetStringForTesting

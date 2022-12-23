@@ -35,6 +35,9 @@ class IListenerStorage {
   virtual void Notify(unsigned int flags, unsigned int level,
                       std::string_view filename, unsigned int line,
                       std::string_view message) = 0;
+  virtual void NotifyTimeSync(std::span<const NT_Listener> handles,
+                              unsigned int flags, int64_t serverTimeOffset,
+                              int64_t rtt2, bool valid) = 0;
 
   void Notify(std::span<const NT_Listener> handles, unsigned int flags,
               const ConnectionInfo* info) {

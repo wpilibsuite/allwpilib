@@ -18,6 +18,7 @@
 
 #include "Value_internal.h"
 #include "ntcore.h"
+#include "ntcore_cpp.h"
 
 using namespace nt;
 
@@ -52,6 +53,12 @@ static void ConvertToC(const LogMessage& in, NT_LogMessage* out) {
   ConvertToC(in.message, &out->message);
 }
 
+static void ConvertToC(const TimeSyncEventData& in, NT_TimeSyncEventData* out) {
+  out->serverTimeOffset = in.serverTimeOffset;
+  out->rtt2 = in.rtt2;
+  out->valid = in.valid;
+}
+
 static void ConvertToC(const Event& in, NT_Event* out) {
   out->listener = in.listener;
   out->flags = in.flags;
@@ -70,6 +77,10 @@ static void ConvertToC(const Event& in, NT_Event* out) {
   } else if ((in.flags & NT_EVENT_LOGMESSAGE) != 0) {
     if (auto v = in.GetLogMessage()) {
       return ConvertToC(*v, &out->data.logMessage);
+    }
+  } else if ((in.flags & NT_EVENT_TIMESYNC) != 0) {
+    if (auto v = in.GetTimeSyncEventData()) {
+      return ConvertToC(*v, &out->data.timeSyncData);
     }
   }
   out->flags = NT_EVENT_NONE;  // sanity to make sure we don't dispose
@@ -551,15 +562,25 @@ struct NT_ConnectionInfo* NT_GetConnections(NT_Inst inst, size_t* count) {
   return ConvertToC<NT_ConnectionInfo>(conn_v, count);
 }
 
+int64_t NT_GetServerTimeOffset(NT_Inst inst, NT_Bool* valid) {
+  if (auto v = nt::GetServerTimeOffset(inst)) {
+    *valid = true;
+    return *v;
+  } else {
+    *valid = false;
+    return 0;
+  }
+}
+
 /*
  * Utility Functions
  */
 
-uint64_t NT_Now(void) {
+int64_t NT_Now(void) {
   return nt::Now();
 }
 
-void NT_SetNow(uint64_t timestamp) {
+void NT_SetNow(int64_t timestamp) {
   nt::SetNow(timestamp);
 }
 

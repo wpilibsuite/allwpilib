@@ -9,6 +9,7 @@
 #include <cassert>
 #include <functional>
 #include <memory>
+#include <optional>
 #include <span>
 #include <string>
 #include <string_view>
@@ -80,6 +81,8 @@ struct EventFlags {
   static constexpr unsigned int kValueAll = kValueRemote | kValueLocal;
   /** Log message. */
   static constexpr unsigned int kLogMessage = NT_EVENT_LOGMESSAGE;
+  /** Time synchronized with server. */
+  static constexpr unsigned int kTimeSync = NT_EVENT_TIMESYNC;
 };
 
 /** NetworkTables Topic Information */
@@ -186,6 +189,29 @@ class LogMessage {
   std::string message;
 };
 
+/** NetworkTables time sync event data. */
+class TimeSyncEventData {
+ public:
+  TimeSyncEventData() = default;
+  TimeSyncEventData(int64_t serverTimeOffset, int64_t rtt2, bool valid)
+      : serverTimeOffset{serverTimeOffset}, rtt2{rtt2}, valid{valid} {}
+
+  /**
+   * Offset between local time and server time, in microseconds. Add this value
+   * to local time to get the estimated equivalent server time.
+   */
+  int64_t serverTimeOffset;
+
+  /** Measured round trip time divided by 2, in microseconds. */
+  int64_t rtt2;
+
+  /**
+   * If serverTimeOffset and RTT are valid. An event with this set to false is
+   * sent when the client disconnects.
+   */
+  bool valid;
+};
+
 /** NetworkTables event */
 class Event {
  public:
@@ -208,6 +234,11 @@ class Event {
       : listener{listener},
         flags{flags},
         data{LogMessage{level, filename, line, message}} {}
+  Event(NT_Listener listener, unsigned int flags, int64_t serverTimeOffset,
+        int64_t rtt2, bool valid)
+      : listener{listener},
+        flags{flags},
+        data{TimeSyncEventData{serverTimeOffset, rtt2, valid}} {}
 
   /** Listener that triggered this event. */
   NT_Listener listener{0};
@@ -215,11 +246,12 @@ class Event {
   /**
    * Event flags (NT_EventFlags). Also indicates the data included with the
    * event:
-   * - NT_NOTIFY_CONNECTED or NT_NOTIFY_DISCONNECTED: GetConnectionInfo()
-   * - NT_NOTIFY_PUBLISH, NT_NOTIFY_UNPUBLISH, or NT_NOTIFY_PROPERTIES:
+   * - NT_EVENT_CONNECTED or NT_EVENT_DISCONNECTED: GetConnectionInfo()
+   * - NT_EVENT_PUBLISH, NT_EVENT_UNPUBLISH, or NT_EVENT_PROPERTIES:
    *   GetTopicInfo()
-   * - NT_NOTIFY_VALUE, NT_NOTIFY_VALUE_LOCAL: GetValueData()
-   * - NT_NOTIFY_LOGMESSAGE: GetLogMessage()
+   * - NT_EVENT_VALUE, NT_EVENT_VALUE_LOCAL: GetValueData()
+   * - NT_EVENT_LOGMESSAGE: GetLogMessage()
+   * - NT_EVENT_TIMESYNC: GetTimeSyncEventData()
    */
   unsigned int flags{0};
 
@@ -232,31 +264,40 @@ class Event {
   bool Is(unsigned int kind) const { return (flags & kind) != 0; }
 
   /** Event data; content depends on flags. */
-  std::variant<ConnectionInfo, TopicInfo, ValueEventData, LogMessage> data;
+  std::variant<ConnectionInfo, TopicInfo, ValueEventData, LogMessage,
+               TimeSyncEventData>
+      data;
 
   const ConnectionInfo* GetConnectionInfo() const {
-    return std::get_if<nt::ConnectionInfo>(&data);
+    return std::get_if<ConnectionInfo>(&data);
   }
   ConnectionInfo* GetConnectionInfo() {
-    return std::get_if<nt::ConnectionInfo>(&data);
+    return std::get_if<ConnectionInfo>(&data);
   }
 
   const TopicInfo* GetTopicInfo() const {
-    return std::get_if<nt::TopicInfo>(&data);
+    return std::get_if<TopicInfo>(&data);
   }
-  TopicInfo* GetTopicInfo() { return std::get_if<nt::TopicInfo>(&data); }
+  TopicInfo* GetTopicInfo() { return std::get_if<TopicInfo>(&data); }
 
   const ValueEventData* GetValueEventData() const {
-    return std::get_if<nt::ValueEventData>(&data);
+    return std::get_if<ValueEventData>(&data);
   }
   ValueEventData* GetValueEventData() {
-    return std::get_if<nt::ValueEventData>(&data);
+    return std::get_if<ValueEventData>(&data);
   }
 
   const LogMessage* GetLogMessage() const {
-    return std::get_if<nt::LogMessage>(&data);
+    return std::get_if<LogMessage>(&data);
   }
-  LogMessage* GetLogMessage() { return std::get_if<nt::LogMessage>(&data); }
+  LogMessage* GetLogMessage() { return std::get_if<LogMessage>(&data); }
+
+  const TimeSyncEventData* GetTimeSyncEventData() const {
+    return std::get_if<TimeSyncEventData>(&data);
+  }
+  TimeSyncEventData* GetTimeSyncEventData() {
+    return std::get_if<TimeSyncEventData>(&data);
+  }
 };
 
 /** NetworkTables publish/subscribe options. */
@@ -1106,6 +1147,20 @@ std::vector<ConnectionInfo> GetConnections(NT_Inst inst);
  * @return True if connected.
  */
 bool IsConnected(NT_Inst inst);
+
+/**
+ * Get the time offset between server time and local time. Add this value to
+ * local time to get the estimated equivalent server time. In non-client modes,
+ * this always returns 0. In client mode, this returns the time offset only if
+ * the client and server are connected and have exchanged synchronization
+ * messages. Note the time offset may change over time as it is periodically
+ * updated; to receive updates as events, add a listener to the "time sync"
+ * event.
+ *
+ * @param inst instance handle
+ * @return Time offset in microseconds (optional)
+ */
+std::optional<int64_t> GetServerTimeOffset(NT_Inst inst);
 
 /** @} */
 

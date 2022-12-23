@@ -6,6 +6,7 @@
 
 #include <atomic>
 #include <memory>
+#include <optional>
 #include <string>
 #include <string_view>
 #include <utility>
@@ -56,6 +57,9 @@ class InstanceImpl {
   std::shared_ptr<NetworkServer> GetServer();
   std::shared_ptr<INetworkClient> GetClient();
 
+  std::optional<int64_t> GetServerTimeOffset();
+  void AddTimeSyncListener(NT_Listener listener, unsigned int eventMask);
+
   void Reset();
 
   ListenerStorage listenerStorage;
@@ -77,6 +81,8 @@ class InstanceImpl {
   std::shared_ptr<NetworkServer> m_networkServer;
   std::shared_ptr<INetworkClient> m_networkClient;
   std::vector<std::pair<std::string, unsigned int>> m_servers;
+  std::optional<int64_t> m_serverTimeOffset{0};
+  int64_t m_rtt2 = 0;
   int m_inst;
 };
 

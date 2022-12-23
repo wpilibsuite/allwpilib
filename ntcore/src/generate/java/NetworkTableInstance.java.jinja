@@ -10,6 +10,7 @@ import edu.wpi.first.util.datalog.DataLog;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.OptionalLong;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.TimeUnit;
@@ -949,6 +950,21 @@ public final class NetworkTableInstance implements AutoCloseable {
    */
   public boolean isConnected() {
     return NetworkTablesJNI.isConnected(m_handle);
+  }
+
+  /**
+   * Get the time offset between server time and local time. Add this value to
+   * local time to get the estimated equivalent server time. In non-client
+   * modes, this always returns 0. In client mode, this returns the time offset
+   * only if the client and server are connected and have exchanged
+   * synchronization messages. Note the time offset may change over time as it
+   * is periodically updated; to receive updates as events, add a listener to
+   * the "time sync" event.
+   *
+   * @return Time offset in microseconds (optional)
+   */
+  public OptionalLong getServerTimeOffset() {
+    return NetworkTablesJNI.getServerTimeOffset(m_handle);
   }
 
   /**

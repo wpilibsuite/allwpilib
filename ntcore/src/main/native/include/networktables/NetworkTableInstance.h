@@ -6,6 +6,7 @@
 
 #include <functional>
 #include <memory>
+#include <optional>
 #include <span>
 #include <string>
 #include <string_view>
@@ -613,6 +614,19 @@ class NetworkTableInstance final {
    * @return True if connected.
    */
   bool IsConnected() const;
+
+  /**
+   * Get the time offset between server time and local time. Add this value to
+   * local time to get the estimated equivalent server time. In non-client
+   * modes, this always returns 0. In client mode, this returns the time offset
+   * only if the client and server are connected and have exchanged
+   * synchronization messages. Note the time offset may change over time as it
+   * is periodically updated; to receive updates as events, add a listener to
+   * the "time sync" event.
+   *
+   * @return Time offset in microseconds (optional)
+   */
+  std::optional<int64_t> GetServerTimeOffset() const;
 
   /** @} */
 

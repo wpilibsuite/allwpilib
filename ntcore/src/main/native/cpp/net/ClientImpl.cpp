@@ -49,6 +49,8 @@ struct PublisherData {
 class CImpl : public ServerMessageHandler {
  public:
   CImpl(uint64_t curTimeMs, int inst, WireConnection& wire, wpi::Logger& logger,
+        std::function<void(int64_t serverTimeOffset, int64_t rtt2, bool valid)>
+            timeSyncUpdated,
         std::function<void(uint32_t repeatMs)> setPeriodic);
 
   void ProcessIncomingBinary(std::span<const uint8_t> data);
@@ -76,6 +78,8 @@ class CImpl : public ServerMessageHandler {
   WireConnection& m_wire;
   wpi::Logger& m_logger;
   LocalInterface* m_local{nullptr};
+  std::function<void(int64_t serverTimeOffset, int64_t rtt2, bool valid)>
+      m_timeSyncUpdated;
   std::function<void(uint32_t repeatMs)> m_setPeriodic;
 
   // indexed by publisher index
@@ -102,12 +106,15 @@ class CImpl : public ServerMessageHandler {
 
 }  // namespace
 
-CImpl::CImpl(uint64_t curTimeMs, int inst, WireConnection& wire,
-             wpi::Logger& logger,
-             std::function<void(uint32_t repeatMs)> setPeriodic)
+CImpl::CImpl(
+    uint64_t curTimeMs, int inst, WireConnection& wire, wpi::Logger& logger,
+    std::function<void(int64_t serverTimeOffset, int64_t rtt2, bool valid)>
+        timeSyncUpdated,
+    std::function<void(uint32_t repeatMs)> setPeriodic)
     : m_inst{inst},
       m_wire{wire},
       m_logger{logger},
+      m_timeSyncUpdated{std::move(timeSyncUpdated)},
       m_setPeriodic{std::move(setPeriodic)},
       m_nextPingTimeMs{curTimeMs + kPingIntervalMs} {
   // immediately send RTT ping
@@ -151,6 +158,7 @@ void CImpl::ProcessIncomingBinary(std::span<const uint8_t> data) {
         m_serverTimeOffsetUs = value.server_time() + rtt2 - now;
         DEBUG3("Time offset: {}", m_serverTimeOffsetUs);
         m_haveTimeOffset = true;
+        m_timeSyncUpdated(m_serverTimeOffsetUs, m_rtt2Us, true);
       }
       continue;
     }
@@ -424,14 +432,24 @@ void CImpl::ServerPropertiesUpdate(std::string_view name,
 class ClientImpl::Impl final : public CImpl {
  public:
   Impl(uint64_t curTimeMs, int inst, WireConnection& wire, wpi::Logger& logger,
+       std::function<void(int64_t serverTimeOffset, int64_t rtt2, bool valid)>
+           timeSyncUpdated,
        std::function<void(uint32_t repeatMs)> setPeriodic)
-      : CImpl{curTimeMs, inst, wire, logger, std::move(setPeriodic)} {}
+      : CImpl{curTimeMs,
+              inst,
+              wire,
+              logger,
+              std::move(timeSyncUpdated),
+              std::move(setPeriodic)} {}
 };
 
-ClientImpl::ClientImpl(uint64_t curTimeMs, int inst, WireConnection& wire,
-                       wpi::Logger& logger,
-                       std::function<void(uint32_t repeatMs)> setPeriodic)
+ClientImpl::ClientImpl(
+    uint64_t curTimeMs, int inst, WireConnection& wire, wpi::Logger& logger,
+    std::function<void(int64_t serverTimeOffset, int64_t rtt2, bool valid)>
+        timeSyncUpdated,
+    std::function<void(uint32_t repeatMs)> setPeriodic)
     : m_impl{std::make_unique<Impl>(curTimeMs, inst, wire, logger,
+                                    std::move(timeSyncUpdated),
                                     std::move(setPeriodic))} {}
 
 ClientImpl::~ClientImpl() = default;

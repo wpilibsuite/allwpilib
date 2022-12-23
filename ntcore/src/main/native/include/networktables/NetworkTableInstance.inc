@@ -181,6 +181,11 @@ inline bool NetworkTableInstance::IsConnected() const {
   return ::nt::IsConnected(m_handle);
 }
 
+inline std::optional<int64_t> NetworkTableInstance::GetServerTimeOffset()
+    const {
+  return ::nt::GetServerTimeOffset(m_handle);
+}
+
 inline NT_DataLogger NetworkTableInstance::StartEntryDataLog(
     wpi::log::DataLog& log, std::string_view prefix,
     std::string_view logPrefix) {
