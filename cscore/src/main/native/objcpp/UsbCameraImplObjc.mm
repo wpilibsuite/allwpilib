@@ -10,16 +10,21 @@ using namespace cs;
   switch ([AVCaptureDevice authorizationStatusForMediaType:AVMediaTypeVideo]) {
     case AVAuthorizationStatusAuthorized:
       NSLog(@"Already Authorized");
+      self.isAuthorized = true;
       break;
     default:
       NSLog(@"Authorization Failed");
+      self.isAuthorized = false;
       // TODO log
       break;
     case AVAuthorizationStatusNotDetermined:
+      NSLog(@"Authorization Not Determined");
       dispatch_suspend(self.sessionQueue);
       [AVCaptureDevice requestAccessForMediaType:AVMediaTypeVideo
                                completionHandler:^(BOOL granted) {
                                  (void)granted;
+                                 NSLog(@"Completeion %d", granted);
+                                 self.isAuthorized = granted;
                                  dispatch_resume(self.sessionQueue);
                                }];
       break;
@@ -395,6 +400,8 @@ static cs::VideoMode::PixelFormat FourCCToPixelFormat(FourCharCode fourcc) {
   }
   self.streaming = true;
 
+  NSLog(@"Starting %@ %d", self.currentFormat, self.currentFPS);
+
   [self.session startRunning];
 
   if ([self.videoDevice lockForConfiguration:nil]) {
@@ -447,6 +454,11 @@ static cs::VideoMode::PixelFormat FourCCToPixelFormat(FourCharCode fourcc) {
 }
 
 - (bool)deviceConnect {
+
+  if (!self.isAuthorized) {
+    return false;
+  }
+
   OSType pixelFormat = kCVPixelFormatType_32BGRA;
 
   NSDictionary* pixelBufferOptions =

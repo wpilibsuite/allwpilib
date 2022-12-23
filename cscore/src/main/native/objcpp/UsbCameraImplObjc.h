@@ -21,6 +21,7 @@ class UsbCameraImpl;
 @property(nonatomic) bool propertiesCached;
 @property(nonatomic) bool streaming;
 @property(nonatomic) bool deviceValid;
+@property(nonatomic) bool isAuthorized;
 
 @property(nonatomic) AVCaptureDevice* videoDevice;
 @property(nonatomic) AVCaptureDeviceInput* videoInput;
