@@ -154,11 +154,11 @@ class AprilTagDetectorTest {
       assertEquals(1, results[0].getId());
       assertEquals(0, results[0].getHamming());
 
-      AprilTagPoseEstimator.Config cfg = new AprilTagPoseEstimator.Config(0.2, 500, 500, 320, 240);
-      AprilTagPoseEstimate est =
-          AprilTagPoseEstimator.estimateOrthogonalIteration(results[0], cfg, 50);
+      var estimator =
+          new AprilTagPoseEstimator(new AprilTagPoseEstimator.Config(0.2, 500, 500, 320, 240));
+      AprilTagPoseEstimate est = estimator.estimateOrthogonalIteration(results[0], 50);
       assertEquals(new Transform3d(), est.pose2);
-      Transform3d pose = AprilTagPoseEstimator.estimate(results[0], cfg);
+      Transform3d pose = estimator.estimate(results[0]);
       assertEquals(est.pose1, pose);
     } finally {
       image.release();

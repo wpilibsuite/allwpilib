@@ -8,11 +8,7 @@ import edu.wpi.first.apriltag.jni.AprilTagJNI;
 import edu.wpi.first.math.geometry.Transform3d;
 
 /** Pose estimators for AprilTag tags. */
-public final class AprilTagPoseEstimator {
-  private AprilTagPoseEstimator() {
-    throw new UnsupportedOperationException("This is a utility class!");
-  }
-
+public class AprilTagPoseEstimator {
   /** Configuration for the pose estimator. */
   @SuppressWarnings("MemberName")
   public static class Config {
@@ -64,26 +60,55 @@ public final class AprilTagPoseEstimator {
   }
 
   /**
+   * Creates estimator.
+   *
+   * @param config Configuration
+   */
+  public AprilTagPoseEstimator(Config config) {
+    m_config = new Config(config.tagSize, config.fx, config.fy, config.cx, config.cy);
+  }
+
+  /**
+   * Sets estimator configuration.
+   *
+   * @param config Configuration
+   */
+  public void setConfig(Config config) {
+    m_config.tagSize = config.tagSize;
+    m_config.fx = config.fx;
+    m_config.fy = config.fy;
+    m_config.cx = config.cx;
+    m_config.cy = config.cy;
+  }
+
+  /**
+   * Gets estimator configuration.
+   *
+   * @return Configuration
+   */
+  public Config getConfig() {
+    return new Config(m_config.tagSize, m_config.fx, m_config.fy, m_config.cx, m_config.cy);
+  }
+
+  /**
    * Estimates the pose of the tag using the homography method described in [1].
    *
    * @param detection Tag detection
-   * @param config Estimator configuration
    * @return Pose estimate
    */
-  public static Transform3d estimateHomography(AprilTagDetection detection, Config config) {
-    return estimateHomography(detection.getHomography(), config);
+  public Transform3d estimateHomography(AprilTagDetection detection) {
+    return estimateHomography(detection.getHomography());
   }
 
   /**
    * Estimates the pose of the tag using the homography method described in [1].
    *
    * @param homography Homography 3x3 matrix data
-   * @param config Estimator configuration
    * @return Pose estimate
    */
-  public static Transform3d estimateHomography(double[] homography, Config config) {
+  public Transform3d estimateHomography(double[] homography) {
     return AprilTagJNI.estimatePoseHomography(
-        homography, config.tagSize, config.fx, config.fy, config.cx, config.cy);
+        homography, m_config.tagSize, m_config.fx, m_config.fy, m_config.cx, m_config.cy);
   }
 
   /**
@@ -106,14 +131,11 @@ public final class AprilTagPoseEstimator {
    * 2006. doi: 10.1109/TPAMI.2006.252
    *
    * @param detection Tag detection
-   * @param config Estimator configuration
    * @param nIters Number of iterations
    * @return Initial and (possibly) second pose estimates
    */
-  public static AprilTagPoseEstimate estimateOrthogonalIteration(
-      AprilTagDetection detection, Config config, int nIters) {
-    return estimateOrthogonalIteration(
-        detection.getHomography(), detection.getCorners(), config, nIters);
+  public AprilTagPoseEstimate estimateOrthogonalIteration(AprilTagDetection detection, int nIters) {
+    return estimateOrthogonalIteration(detection.getHomography(), detection.getCorners(), nIters);
   }
 
   /**
@@ -122,14 +144,20 @@ public final class AprilTagPoseEstimator {
    *
    * @param homography Homography 3x3 matrix data
    * @param corners Corner point array (X and Y for each corner in order)
-   * @param config Estimator configuration
    * @param nIters Number of iterations
    * @return Initial and (possibly) second pose estimates
    */
-  public static AprilTagPoseEstimate estimateOrthogonalIteration(
-      double[] homography, double[] corners, Config config, int nIters) {
+  public AprilTagPoseEstimate estimateOrthogonalIteration(
+      double[] homography, double[] corners, int nIters) {
     return AprilTagJNI.estimatePoseOrthogonalIteration(
-        homography, corners, config.tagSize, config.fx, config.fy, config.cx, config.cy, nIters);
+        homography,
+        corners,
+        m_config.tagSize,
+        m_config.fx,
+        m_config.fy,
+        m_config.cx,
+        m_config.cy,
+        nIters);
   }
 
   /**
@@ -138,11 +166,10 @@ public final class AprilTagPoseEstimator {
    * object-space error.
    *
    * @param detection Tag detection
-   * @param config Estimator configuration
    * @return Pose estimate
    */
-  public static Transform3d estimate(AprilTagDetection detection, Config config) {
-    return estimate(detection.getHomography(), detection.getCorners(), config);
+  public Transform3d estimate(AprilTagDetection detection) {
+    return estimate(detection.getHomography(), detection.getCorners());
   }
 
   /**
@@ -152,11 +179,12 @@ public final class AprilTagPoseEstimator {
    *
    * @param homography Homography 3x3 matrix data
    * @param corners Corner point array (X and Y for each corner in order)
-   * @param config Estimator configuration
    * @return Pose estimate
    */
-  public static Transform3d estimate(double[] homography, double[] corners, Config config) {
+  public Transform3d estimate(double[] homography, double[] corners) {
     return AprilTagJNI.estimatePose(
-        homography, corners, config.tagSize, config.fx, config.fy, config.cx, config.cy);
+        homography, corners, m_config.tagSize, m_config.fx, m_config.fy, m_config.cx, m_config.cy);
   }
+
+  private final Config m_config;
 }

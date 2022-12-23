@@ -89,15 +89,15 @@ static Transform3d DoEstimateHomography(
 }
 
 Transform3d AprilTagPoseEstimator::EstimateHomography(
-    const AprilTagDetection& detection, const Config& config) {
+    const AprilTagDetection& detection) const {
   return DoEstimateHomography(
-      reinterpret_cast<const apriltag_detection_t*>(&detection), config);
+      reinterpret_cast<const apriltag_detection_t*>(&detection), m_config);
 }
 
 Transform3d AprilTagPoseEstimator::EstimateHomography(
-    std::span<const double, 9> homography, const Config& config) {
+    std::span<const double, 9> homography) const {
   auto detection = MakeBasicDet(homography, nullptr);
-  auto rv = DoEstimateHomography(&detection, config);
+  auto rv = DoEstimateHomography(&detection, m_config);
   matd_destroy(detection.H);
   return rv;
 }
@@ -114,17 +114,17 @@ static AprilTagPoseEstimate DoEstimateOrthogonalIteration(
 }
 
 AprilTagPoseEstimate AprilTagPoseEstimator::EstimateOrthogonalIteration(
-    const AprilTagDetection& detection, const Config& config, int nIters) {
+    const AprilTagDetection& detection, int nIters) const {
   return DoEstimateOrthogonalIteration(
-      reinterpret_cast<const apriltag_detection_t*>(&detection), config,
+      reinterpret_cast<const apriltag_detection_t*>(&detection), m_config,
       nIters);
 }
 
 AprilTagPoseEstimate AprilTagPoseEstimator::EstimateOrthogonalIteration(
     std::span<const double, 9> homography, std::span<const double, 8> corners,
-    const Config& config, int nIters) {
+    int nIters) const {
   auto detection = MakeBasicDet(homography, &corners);
-  auto rv = DoEstimateOrthogonalIteration(&detection, config, nIters);
+  auto rv = DoEstimateOrthogonalIteration(&detection, m_config, nIters);
   matd_destroy(detection.H);
   return rv;
 }
@@ -137,17 +137,17 @@ static Transform3d DoEstimate(const apriltag_detection_t* detection,
   return MakePose(pose);
 }
 
-Transform3d AprilTagPoseEstimator::Estimate(const AprilTagDetection& detection,
-                                            const Config& config) {
+Transform3d AprilTagPoseEstimator::Estimate(
+    const AprilTagDetection& detection) const {
   return DoEstimate(reinterpret_cast<const apriltag_detection_t*>(&detection),
-                    config);
+                    m_config);
 }
 
 Transform3d AprilTagPoseEstimator::Estimate(
-    std::span<const double, 9> homography, std::span<const double, 8> corners,
-    const Config& config) {
+    std::span<const double, 9> homography,
+    std::span<const double, 8> corners) const {
   auto detection = MakeBasicDet(homography, &corners);
-  auto rv = DoEstimate(&detection, config);
+  auto rv = DoEstimate(&detection, m_config);
   matd_destroy(detection.H);
   return rv;
 }

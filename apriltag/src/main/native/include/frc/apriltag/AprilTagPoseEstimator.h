@@ -17,10 +17,8 @@ namespace frc {
 class AprilTagDetection;
 
 /** Pose estimators for AprilTag tags. */
-class WPILIB_DLLEXPORT AprilTagPoseEstimator final {
+class WPILIB_DLLEXPORT AprilTagPoseEstimator {
  public:
-  AprilTagPoseEstimator() = delete;
-
   /** Configuration for the pose estimator. */
   struct Config {
     bool operator==(const Config&) const = default;
@@ -42,24 +40,41 @@ class WPILIB_DLLEXPORT AprilTagPoseEstimator final {
   };
 
   /**
+   * Creates estimator.
+   *
+   * @param config Configuration
+   */
+  explicit AprilTagPoseEstimator(const Config& config) : m_config{config} {}
+
+  /**
+   * Sets estimator configuration.
+   *
+   * @param config Configuration
+   */
+  void SetConfig(const Config& config) { m_config = config; }
+
+  /**
+   * Gets estimator configuration.
+   *
+   * @return Configuration
+   */
+  const Config& GetConfig() const { return m_config; }
+
+  /**
    * Estimates the pose of the tag using the homography method described in [1].
    *
    * @param detection Tag detection
-   * @param config Estimator configuration
    * @return Pose estimate
    */
-  static Transform3d EstimateHomography(const AprilTagDetection& detection,
-                                        const Config& config);
+  Transform3d EstimateHomography(const AprilTagDetection& detection) const;
 
   /**
    * Estimates the pose of the tag using the homography method described in [1].
    *
    * @param homography Homography 3x3 matrix data
-   * @param config Estimator configuration
    * @return Pose estimate
    */
-  static Transform3d EstimateHomography(std::span<const double, 9> homography,
-                                        const Config& config);
+  Transform3d EstimateHomography(std::span<const double, 9> homography) const;
 
   /**
    * Estimates the pose of the tag. This returns one or two possible poses for
@@ -82,12 +97,11 @@ class WPILIB_DLLEXPORT AprilTagPoseEstimator final {
    *      vol. 28, no. 12, pp. 2024-2030, Dec. 2006. doi: 10.1109/TPAMI.2006.252
    *
    * @param detection Tag detection
-   * @param config Estimator configuration
    * @param nIters Number of iterations
    * @return Initial and (possibly) second pose estimates
    */
-  static AprilTagPoseEstimate EstimateOrthogonalIteration(
-      const AprilTagDetection& detection, const Config& config, int nIters);
+  AprilTagPoseEstimate EstimateOrthogonalIteration(
+      const AprilTagDetection& detection, int nIters) const;
 
   /**
    * Estimates the pose of the tag. This returns one or two possible poses for
@@ -95,13 +109,12 @@ class WPILIB_DLLEXPORT AprilTagPoseEstimator final {
    *
    * @param homography Homography 3x3 matrix data
    * @param corners Corner point array (X and Y for each corner in order)
-   * @param config Estimator configuration
    * @param nIters Number of iterations
    * @return Initial and (possibly) second pose estimates
    */
-  static AprilTagPoseEstimate EstimateOrthogonalIteration(
+  AprilTagPoseEstimate EstimateOrthogonalIteration(
       std::span<const double, 9> homography, std::span<const double, 8> corners,
-      const Config& config, int nIters);
+      int nIters) const;
 
   /**
    * Estimates tag pose. This method is an easier to use interface to
@@ -109,11 +122,9 @@ class WPILIB_DLLEXPORT AprilTagPoseEstimator final {
    * pose with the lower object-space error.
    *
    * @param detection Tag detection
-   * @param config Estimator configuration
    * @return Pose estimate
    */
-  static Transform3d Estimate(const AprilTagDetection& detection,
-                              const Config& config);
+  Transform3d Estimate(const AprilTagDetection& detection) const;
 
   /**
    * Estimates tag pose. This method is an easier to use interface to
@@ -122,12 +133,13 @@ class WPILIB_DLLEXPORT AprilTagPoseEstimator final {
    *
    * @param homography Homography 3x3 matrix data
    * @param corners Corner point array (X and Y for each corner in order)
-   * @param config Estimator configuration
    * @return Pose estimate
    */
-  static Transform3d Estimate(std::span<const double, 9> homography,
-                              std::span<const double, 8> corners,
-                              const Config& config);
+  Transform3d Estimate(std::span<const double, 9> homography,
+                       std::span<const double, 8> corners) const;
+
+ private:
+  Config m_config;
 };
 
 }  // namespace frc
