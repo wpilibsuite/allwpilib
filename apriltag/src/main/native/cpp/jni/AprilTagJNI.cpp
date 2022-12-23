@@ -17,6 +17,8 @@ using namespace wpi::java;
 static JavaVM* jvm = nullptr;
 
 static JClass detectionCls;
+static JClass detectorConfigCls;
+static JClass detectorQTPCls;
 static JClass poseEstimateCls;
 static JClass quaternionCls;
 static JClass rotation3dCls;
@@ -27,6 +29,9 @@ static JException nullPointerEx;
 
 static const JClassInit classes[] = {
     {"edu/wpi/first/apriltag/AprilTagDetection", &detectionCls},
+    {"edu/wpi/first/apriltag/AprilTagDetector$Config", &detectorConfigCls},
+    {"edu/wpi/first/apriltag/AprilTagDetector$QuadThresholdParameters",
+     &detectorQTPCls},
     {"edu/wpi/first/apriltag/AprilTagPoseEstimate", &poseEstimateCls},
     {"edu/wpi/first/math/geometry/Quaternion", &quaternionCls},
     {"edu/wpi/first/math/geometry/Rotation3d", &rotation3dCls},
@@ -85,6 +90,83 @@ JNIEXPORT void JNICALL JNI_OnUnload(JavaVM* vm, void* reserved) {
 }  // extern "C"
 
 //
+// Conversions from Java to C++ objects
+//
+
+static AprilTagDetector::Config FromJavaDetectorConfig(JNIEnv* env,
+                                                       jobject jconfig) {
+  if (!jconfig) {
+    return {};
+  }
+#define FIELD(name, sig)                                          \
+  static jfieldID name##Field = nullptr;                          \
+  if (!name##Field) {                                             \
+    name##Field = env->GetFieldID(detectorConfigCls, #name, sig); \
+  }
+
+  FIELD(numThreads, "I");
+  FIELD(quadDecimate, "F");
+  FIELD(quadSigma, "F");
+  FIELD(refineEdges, "Z");
+  FIELD(decodeSharpening, "D");
+  FIELD(debug, "Z");
+
+#undef FIELD
+
+#define FIELD(ctype, jtype, name) \
+  .name = static_cast<ctype>(env->Get##jtype##Field(jconfig, name##Field))
+
+  return {
+      FIELD(int, Int, numThreads),
+      FIELD(float, Float, quadDecimate),
+      FIELD(float, Float, quadSigma),
+      FIELD(bool, Boolean, refineEdges),
+      FIELD(double, Double, decodeSharpening),
+      FIELD(bool, Boolean, debug),
+  };
+
+#undef GET
+#undef FIELD
+}
+
+static AprilTagDetector::QuadThresholdParameters FromJavaDetectorQTP(
+    JNIEnv* env, jobject jparams) {
+  if (!jparams) {
+    return {};
+  }
+#define FIELD(name, sig)                                       \
+  static jfieldID name##Field = nullptr;                       \
+  if (!name##Field) {                                          \
+    name##Field = env->GetFieldID(detectorQTPCls, #name, sig); \
+  }
+
+  FIELD(minClusterPixels, "I");
+  FIELD(maxNumMaxima, "I");
+  FIELD(criticalAngle, "D");
+  FIELD(maxLineFitMSE, "F");
+  FIELD(minWhiteBlackDiff, "I");
+  FIELD(deglitch, "Z");
+
+#undef FIELD
+
+#define FIELD(ctype, jtype, name) \
+  .name = static_cast<ctype>(env->Get##jtype##Field(jparams, name##Field))
+
+  return {
+      FIELD(int, Int, minClusterPixels),
+      FIELD(int, Int, maxNumMaxima),
+      .criticalAngle = units::radian_t{static_cast<double>(
+          env->GetDoubleField(jparams, criticalAngleField))},
+      FIELD(float, Float, maxLineFitMSE),
+      FIELD(int, Int, minWhiteBlackDiff),
+      FIELD(bool, Boolean, deglitch),
+  };
+
+#undef GET
+#undef FIELD
+}
+
+//
 // Conversions from C++ to Java objects
 //
 
@@ -131,6 +213,40 @@ static jobjectArray MakeJObject(JNIEnv* env,
     env->SetObjectArrayElement(jarr, i, elem.obj());
   }
   return jarr;
+}
+
+static jobject MakeJObject(JNIEnv* env,
+                           const AprilTagDetector::Config& config) {
+  static jmethodID constructor =
+      env->GetMethodID(detectorConfigCls, "<init>", "(IFFZDZ)V");
+  if (!constructor) {
+    return nullptr;
+  }
+
+  return env->NewObject(detectorConfigCls, constructor,
+                        static_cast<jint>(config.numThreads),
+                        static_cast<jfloat>(config.quadDecimate),
+                        static_cast<jfloat>(config.quadSigma),
+                        static_cast<jboolean>(config.refineEdges),
+                        static_cast<jdouble>(config.decodeSharpening),
+                        static_cast<jboolean>(config.debug));
+}
+
+static jobject MakeJObject(
+    JNIEnv* env, const AprilTagDetector::QuadThresholdParameters& params) {
+  static jmethodID constructor =
+      env->GetMethodID(detectorQTPCls, "<init>", "(IIDFIZ)V");
+  if (!constructor) {
+    return nullptr;
+  }
+
+  return env->NewObject(detectorQTPCls, constructor,
+                        static_cast<jint>(params.minClusterPixels),
+                        static_cast<jint>(params.maxNumMaxima),
+                        static_cast<jdouble>(params.criticalAngle),
+                        static_cast<jfloat>(params.maxLineFitMSE),
+                        static_cast<jint>(params.minWhiteBlackDiff),
+                        static_cast<jboolean>(params.deglitch));
 }
 
 static jobject MakeJObject(JNIEnv* env, const Translation3d& xlate) {
@@ -227,389 +343,71 @@ Java_edu_wpi_first_apriltag_jni_AprilTagJNI_destroyDetector
 
 /*
  * Class:     edu_wpi_first_apriltag_jni_AprilTagJNI
- * Method:    setNumThreads
- * Signature: (JI)V
+ * Method:    setDetectorConfig
+ * Signature: (JLjava/lang/Object;)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_apriltag_jni_AprilTagJNI_setNumThreads
-  (JNIEnv* env, jclass, jlong det, jint val)
+Java_edu_wpi_first_apriltag_jni_AprilTagJNI_setDetectorConfig
+  (JNIEnv* env, jclass, jlong det, jobject config)
 {
   if (det == 0) {
     nullPointerEx.Throw(env, "det cannot be null");
     return;
   }
-  reinterpret_cast<AprilTagDetector*>(det)->SetNumThreads(val);
+  reinterpret_cast<AprilTagDetector*>(det)->SetConfig(
+      FromJavaDetectorConfig(env, config));
 }
 
 /*
  * Class:     edu_wpi_first_apriltag_jni_AprilTagJNI
- * Method:    getNumThreads
- * Signature: (J)I
+ * Method:    getDetectorConfig
+ * Signature: (J)Ljava/lang/Object;
  */
-JNIEXPORT jint JNICALL
-Java_edu_wpi_first_apriltag_jni_AprilTagJNI_getNumThreads
+JNIEXPORT jobject JNICALL
+Java_edu_wpi_first_apriltag_jni_AprilTagJNI_getDetectorConfig
   (JNIEnv* env, jclass, jlong det)
 {
   if (det == 0) {
     nullPointerEx.Throw(env, "det cannot be null");
-    return 0;
+    return nullptr;
   }
-  return reinterpret_cast<AprilTagDetector*>(det)->GetNumThreads();
+  return MakeJObject(env,
+                     reinterpret_cast<AprilTagDetector*>(det)->GetConfig());
 }
 
 /*
  * Class:     edu_wpi_first_apriltag_jni_AprilTagJNI
- * Method:    setQuadDecimate
- * Signature: (JF)V
+ * Method:    setDetectorQTP
+ * Signature: (JLjava/lang/Object;)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_apriltag_jni_AprilTagJNI_setQuadDecimate
-  (JNIEnv* env, jclass, jlong det, jfloat val)
+Java_edu_wpi_first_apriltag_jni_AprilTagJNI_setDetectorQTP
+  (JNIEnv* env, jclass, jlong det, jobject params)
 {
   if (det == 0) {
     nullPointerEx.Throw(env, "det cannot be null");
     return;
   }
-  reinterpret_cast<AprilTagDetector*>(det)->SetQuadDecimate(val);
+  reinterpret_cast<AprilTagDetector*>(det)->SetQuadThresholdParameters(
+      FromJavaDetectorQTP(env, params));
 }
 
 /*
  * Class:     edu_wpi_first_apriltag_jni_AprilTagJNI
- * Method:    getQuadDecimate
- * Signature: (J)F
+ * Method:    getDetectorQTP
+ * Signature: (J)Ljava/lang/Object;
  */
-JNIEXPORT jfloat JNICALL
-Java_edu_wpi_first_apriltag_jni_AprilTagJNI_getQuadDecimate
+JNIEXPORT jobject JNICALL
+Java_edu_wpi_first_apriltag_jni_AprilTagJNI_getDetectorQTP
   (JNIEnv* env, jclass, jlong det)
 {
   if (det == 0) {
     nullPointerEx.Throw(env, "det cannot be null");
-    return 0;
+    return nullptr;
   }
-  return reinterpret_cast<AprilTagDetector*>(det)->GetQuadDecimate();
-}
-
-/*
- * Class:     edu_wpi_first_apriltag_jni_AprilTagJNI
- * Method:    setQuadSigma
- * Signature: (JF)V
- */
-JNIEXPORT void JNICALL
-Java_edu_wpi_first_apriltag_jni_AprilTagJNI_setQuadSigma
-  (JNIEnv* env, jclass, jlong det, jfloat val)
-{
-  if (det == 0) {
-    nullPointerEx.Throw(env, "det cannot be null");
-    return;
-  }
-  reinterpret_cast<AprilTagDetector*>(det)->SetQuadSigma(val);
-}
-
-/*
- * Class:     edu_wpi_first_apriltag_jni_AprilTagJNI
- * Method:    getQuadSigma
- * Signature: (J)F
- */
-JNIEXPORT jfloat JNICALL
-Java_edu_wpi_first_apriltag_jni_AprilTagJNI_getQuadSigma
-  (JNIEnv* env, jclass, jlong det)
-{
-  if (det == 0) {
-    nullPointerEx.Throw(env, "det cannot be null");
-    return 0;
-  }
-  return reinterpret_cast<AprilTagDetector*>(det)->GetQuadSigma();
-}
-
-/*
- * Class:     edu_wpi_first_apriltag_jni_AprilTagJNI
- * Method:    setRefineEdges
- * Signature: (JZ)V
- */
-JNIEXPORT void JNICALL
-Java_edu_wpi_first_apriltag_jni_AprilTagJNI_setRefineEdges
-  (JNIEnv* env, jclass, jlong det, jboolean val)
-{
-  if (det == 0) {
-    nullPointerEx.Throw(env, "det cannot be null");
-    return;
-  }
-  reinterpret_cast<AprilTagDetector*>(det)->SetRefineEdges(val);
-}
-
-/*
- * Class:     edu_wpi_first_apriltag_jni_AprilTagJNI
- * Method:    getRefineEdges
- * Signature: (J)Z
- */
-JNIEXPORT jboolean JNICALL
-Java_edu_wpi_first_apriltag_jni_AprilTagJNI_getRefineEdges
-  (JNIEnv* env, jclass, jlong det)
-{
-  if (det == 0) {
-    nullPointerEx.Throw(env, "det cannot be null");
-    return false;
-  }
-  return reinterpret_cast<AprilTagDetector*>(det)->GetRefineEdges();
-}
-
-/*
- * Class:     edu_wpi_first_apriltag_jni_AprilTagJNI
- * Method:    setDecodeSharpening
- * Signature: (JD)V
- */
-JNIEXPORT void JNICALL
-Java_edu_wpi_first_apriltag_jni_AprilTagJNI_setDecodeSharpening
-  (JNIEnv* env, jclass, jlong det, jdouble val)
-{
-  if (det == 0) {
-    nullPointerEx.Throw(env, "det cannot be null");
-    return;
-  }
-  reinterpret_cast<AprilTagDetector*>(det)->SetDecodeSharpening(val);
-}
-
-/*
- * Class:     edu_wpi_first_apriltag_jni_AprilTagJNI
- * Method:    getDecodeSharpening
- * Signature: (J)D
- */
-JNIEXPORT jdouble JNICALL
-Java_edu_wpi_first_apriltag_jni_AprilTagJNI_getDecodeSharpening
-  (JNIEnv* env, jclass, jlong det)
-{
-  if (det == 0) {
-    nullPointerEx.Throw(env, "det cannot be null");
-    return 0;
-  }
-  return reinterpret_cast<AprilTagDetector*>(det)->GetDecodeSharpening();
-}
-
-/*
- * Class:     edu_wpi_first_apriltag_jni_AprilTagJNI
- * Method:    setDebug
- * Signature: (JZ)V
- */
-JNIEXPORT void JNICALL
-Java_edu_wpi_first_apriltag_jni_AprilTagJNI_setDebug
-  (JNIEnv* env, jclass, jlong det, jboolean val)
-{
-  if (det == 0) {
-    nullPointerEx.Throw(env, "det cannot be null");
-    return;
-  }
-  reinterpret_cast<AprilTagDetector*>(det)->SetDebug(val);
-}
-
-/*
- * Class:     edu_wpi_first_apriltag_jni_AprilTagJNI
- * Method:    getDebug
- * Signature: (J)Z
- */
-JNIEXPORT jboolean JNICALL
-Java_edu_wpi_first_apriltag_jni_AprilTagJNI_getDebug
-  (JNIEnv* env, jclass, jlong det)
-{
-  if (det == 0) {
-    nullPointerEx.Throw(env, "det cannot be null");
-    return false;
-  }
-  return reinterpret_cast<AprilTagDetector*>(det)->GetDebug();
-}
-
-/*
- * Class:     edu_wpi_first_apriltag_jni_AprilTagJNI
- * Method:    setQuadMinClusterPixels
- * Signature: (JI)V
- */
-JNIEXPORT void JNICALL
-Java_edu_wpi_first_apriltag_jni_AprilTagJNI_setQuadMinClusterPixels
-  (JNIEnv* env, jclass, jlong det, jint val)
-{
-  if (det == 0) {
-    nullPointerEx.Throw(env, "det cannot be null");
-    return;
-  }
-  reinterpret_cast<AprilTagDetector*>(det)->SetQuadMinClusterPixels(val);
-}
-
-/*
- * Class:     edu_wpi_first_apriltag_jni_AprilTagJNI
- * Method:    getQuadMinClusterPixels
- * Signature: (J)I
- */
-JNIEXPORT jint JNICALL
-Java_edu_wpi_first_apriltag_jni_AprilTagJNI_getQuadMinClusterPixels
-  (JNIEnv* env, jclass, jlong det)
-{
-  if (det == 0) {
-    nullPointerEx.Throw(env, "det cannot be null");
-    return 0;
-  }
-  return reinterpret_cast<AprilTagDetector*>(det)->GetQuadMinClusterPixels();
-}
-
-/*
- * Class:     edu_wpi_first_apriltag_jni_AprilTagJNI
- * Method:    setQuadMaxNumMaxima
- * Signature: (JI)V
- */
-JNIEXPORT void JNICALL
-Java_edu_wpi_first_apriltag_jni_AprilTagJNI_setQuadMaxNumMaxima
-  (JNIEnv* env, jclass, jlong det, jint val)
-{
-  if (det == 0) {
-    nullPointerEx.Throw(env, "det cannot be null");
-    return;
-  }
-  reinterpret_cast<AprilTagDetector*>(det)->SetQuadMaxNumMaxima(val);
-}
-
-/*
- * Class:     edu_wpi_first_apriltag_jni_AprilTagJNI
- * Method:    getQuadMaxNumMaxima
- * Signature: (J)I
- */
-JNIEXPORT jint JNICALL
-Java_edu_wpi_first_apriltag_jni_AprilTagJNI_getQuadMaxNumMaxima
-  (JNIEnv* env, jclass, jlong det)
-{
-  if (det == 0) {
-    nullPointerEx.Throw(env, "det cannot be null");
-    return 0;
-  }
-  return reinterpret_cast<AprilTagDetector*>(det)->GetQuadMaxNumMaxima();
-}
-
-/*
- * Class:     edu_wpi_first_apriltag_jni_AprilTagJNI
- * Method:    setQuadCriticalAngle
- * Signature: (JF)V
- */
-JNIEXPORT void JNICALL
-Java_edu_wpi_first_apriltag_jni_AprilTagJNI_setQuadCriticalAngle
-  (JNIEnv* env, jclass, jlong det, jfloat val)
-{
-  if (det == 0) {
-    nullPointerEx.Throw(env, "det cannot be null");
-    return;
-  }
-  reinterpret_cast<AprilTagDetector*>(det)->SetQuadCriticalAngle(
-      units::radian_t{val});
-}
-
-/*
- * Class:     edu_wpi_first_apriltag_jni_AprilTagJNI
- * Method:    getQuadCriticalAngle
- * Signature: (J)F
- */
-JNIEXPORT jfloat JNICALL
-Java_edu_wpi_first_apriltag_jni_AprilTagJNI_getQuadCriticalAngle
-  (JNIEnv* env, jclass, jlong det)
-{
-  if (det == 0) {
-    nullPointerEx.Throw(env, "det cannot be null");
-    return 0;
-  }
-  return reinterpret_cast<AprilTagDetector*>(det)
-      ->GetQuadCriticalAngle()
-      .value();
-}
-
-/*
- * Class:     edu_wpi_first_apriltag_jni_AprilTagJNI
- * Method:    setQuadMaxLineFitMSE
- * Signature: (JF)V
- */
-JNIEXPORT void JNICALL
-Java_edu_wpi_first_apriltag_jni_AprilTagJNI_setQuadMaxLineFitMSE
-  (JNIEnv* env, jclass, jlong det, jfloat val)
-{
-  if (det == 0) {
-    nullPointerEx.Throw(env, "det cannot be null");
-    return;
-  }
-  reinterpret_cast<AprilTagDetector*>(det)->SetQuadMaxLineFitMSE(val);
-}
-
-/*
- * Class:     edu_wpi_first_apriltag_jni_AprilTagJNI
- * Method:    getQuadMaxLineFitMSE
- * Signature: (J)F
- */
-JNIEXPORT jfloat JNICALL
-Java_edu_wpi_first_apriltag_jni_AprilTagJNI_getQuadMaxLineFitMSE
-  (JNIEnv* env, jclass, jlong det)
-{
-  if (det == 0) {
-    nullPointerEx.Throw(env, "det cannot be null");
-    return 0;
-  }
-  return reinterpret_cast<AprilTagDetector*>(det)->GetQuadMaxLineFitMSE();
-}
-
-/*
- * Class:     edu_wpi_first_apriltag_jni_AprilTagJNI
- * Method:    setQuadMinWhiteBlackDiff
- * Signature: (JI)V
- */
-JNIEXPORT void JNICALL
-Java_edu_wpi_first_apriltag_jni_AprilTagJNI_setQuadMinWhiteBlackDiff
-  (JNIEnv* env, jclass, jlong det, jint val)
-{
-  if (det == 0) {
-    nullPointerEx.Throw(env, "det cannot be null");
-    return;
-  }
-  reinterpret_cast<AprilTagDetector*>(det)->SetQuadMinWhiteBlackDiff(val);
-}
-
-/*
- * Class:     edu_wpi_first_apriltag_jni_AprilTagJNI
- * Method:    getQuadMinWhiteBlackDiff
- * Signature: (J)I
- */
-JNIEXPORT jint JNICALL
-Java_edu_wpi_first_apriltag_jni_AprilTagJNI_getQuadMinWhiteBlackDiff
-  (JNIEnv* env, jclass, jlong det)
-{
-  if (det == 0) {
-    nullPointerEx.Throw(env, "det cannot be null");
-    return 0;
-  }
-  return reinterpret_cast<AprilTagDetector*>(det)->GetQuadMinWhiteBlackDiff();
-}
-
-/*
- * Class:     edu_wpi_first_apriltag_jni_AprilTagJNI
- * Method:    setQuadDeglitch
- * Signature: (JZ)V
- */
-JNIEXPORT void JNICALL
-Java_edu_wpi_first_apriltag_jni_AprilTagJNI_setQuadDeglitch
-  (JNIEnv* env, jclass, jlong det, jboolean val)
-{
-  if (det == 0) {
-    nullPointerEx.Throw(env, "det cannot be null");
-    return;
-  }
-  reinterpret_cast<AprilTagDetector*>(det)->SetQuadDeglitch(val);
-}
-
-/*
- * Class:     edu_wpi_first_apriltag_jni_AprilTagJNI
- * Method:    getQuadDeglitch
- * Signature: (J)Z
- */
-JNIEXPORT jboolean JNICALL
-Java_edu_wpi_first_apriltag_jni_AprilTagJNI_getQuadDeglitch
-  (JNIEnv* env, jclass, jlong det)
-{
-  if (det == 0) {
-    nullPointerEx.Throw(env, "det cannot be null");
-    return false;
-  }
-  return reinterpret_cast<AprilTagDetector*>(det)->GetQuadDeglitch();
+  return MakeJObject(
+      env,
+      reinterpret_cast<AprilTagDetector*>(det)->GetQuadThresholdParameters());
 }
 
 /*

@@ -10,7 +10,9 @@ public final class DevMain {
     System.out.println("Hello World!");
     AprilTagDetector detector = new AprilTagDetector();
     detector.addFamily("tag16h5");
-    detector.setRefineEdges(false);
+    AprilTagDetector.Config config = new AprilTagDetector.Config();
+    config.refineEdges = false;
+    detector.setConfig(config);
     detector.close();
   }
 

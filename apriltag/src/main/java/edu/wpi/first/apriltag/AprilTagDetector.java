@@ -13,6 +13,175 @@ import org.opencv.core.Mat;
  * Detect().
  */
 public class AprilTagDetector implements AutoCloseable {
+  /** Detector configuration. */
+  @SuppressWarnings("MemberName")
+  public static class Config {
+    /**
+     * How many threads should be used for computation. Default is single-threaded operation (1
+     * thread).
+     */
+    public int numThreads = 1;
+
+    /**
+     * Quad decimation. Detection of quads can be done on a lower-resolution image, improving speed
+     * at a cost of pose accuracy and a slight decrease in detection rate. Decoding the binary
+     * payload is still done at full resolution. Default is 2.0.
+     */
+    public float quadDecimate = 2.0f;
+
+    /**
+     * What Gaussian blur should be applied to the segmented image (used for quad detection). Very
+     * noisy images benefit from non-zero values (e.g. 0.8). Default is 0.0.
+     */
+    public float quadSigma;
+
+    /**
+     * When true, the edges of the each quad are adjusted to "snap to" strong gradients nearby. This
+     * is useful when decimation is employed, as it can increase the quality of the initial quad
+     * estimate substantially. Generally recommended to be on (true). Default is true.
+     *
+     * <p>Very computationally inexpensive. Option is ignored if quad_decimate = 1.
+     */
+    public boolean refineEdges = true;
+
+    /**
+     * How much sharpening should be done to decoded images. This can help decode small tags but may
+     * or may not help in odd lighting conditions or low light conditions. Default is 0.25.
+     */
+    public double decodeSharpening = 0.25;
+
+    /**
+     * Debug mode. When true, the decoder writes a variety of debugging images to the current
+     * working directory at various stages through the detection process. This is slow and should
+     * *not* be used on space-limited systems such as the RoboRIO. Default is disabled (false).
+     */
+    public boolean debug;
+
+    public Config() {}
+
+    Config(
+        int numThreads,
+        float quadDecimate,
+        float quadSigma,
+        boolean refineEdges,
+        double decodeSharpening,
+        boolean debug) {
+      this.numThreads = numThreads;
+      this.quadDecimate = quadDecimate;
+      this.quadSigma = quadSigma;
+      this.refineEdges = refineEdges;
+      this.decodeSharpening = decodeSharpening;
+      this.debug = debug;
+    }
+
+    @Override
+    public int hashCode() {
+      return numThreads
+          + Float.hashCode(quadDecimate)
+          + Float.hashCode(quadSigma)
+          + Boolean.hashCode(refineEdges)
+          + Double.hashCode(decodeSharpening)
+          + Boolean.hashCode(debug);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+      if (!(obj instanceof Config)) {
+        return false;
+      }
+
+      Config other = (Config) obj;
+      return numThreads == other.numThreads
+          && quadDecimate == other.quadDecimate
+          && quadSigma == other.quadSigma
+          && refineEdges == other.refineEdges
+          && decodeSharpening == other.decodeSharpening
+          && debug == other.debug;
+    }
+  }
+
+  /** Quad threshold parameters. */
+  @SuppressWarnings("MemberName")
+  public static class QuadThresholdParameters {
+    /** Threshold used to reject quads containing too few pixels. Default is 5 pixels. */
+    public int minClusterPixels = 5;
+
+    /**
+     * How many corner candidates to consider when segmenting a group of pixels into a quad. Default
+     * is 10.
+     */
+    public int maxNumMaxima = 10;
+
+    /**
+     * Critical angle, in radians. The detector will reject quads where pairs of edges have angles
+     * that are close to straight or close to 180 degrees. Zero means that no quads are rejected.
+     * Default is 10 degrees.
+     */
+    public double criticalAngle = 10 * Math.PI / 180.0;
+
+    /**
+     * When fitting lines to the contours, the maximum mean squared error allowed. This is useful in
+     * rejecting contours that are far from being quad shaped; rejecting these quads "early" saves
+     * expensive decoding processing. Default is 10.0.
+     */
+    public float maxLineFitMSE = 10.0f;
+
+    /**
+     * Minimum brightness offset. When we build our model of black &amp; white pixels, we add an
+     * extra check that the white model must be (overall) brighter than the black model. How much
+     * brighter? (in pixel values, [0,255]). Default is 5.
+     */
+    public int minWhiteBlackDiff = 5;
+
+    /**
+     * Whether the thresholded image be should be deglitched. Only useful for very noisy images.
+     * Default is disabled (false).
+     */
+    public boolean deglitch;
+
+    public QuadThresholdParameters() {}
+
+    QuadThresholdParameters(
+        int minClusterPixels,
+        int maxNumMaxima,
+        double criticalAngle,
+        float maxLineFitMSE,
+        int minWhiteBlackDiff,
+        boolean deglitch) {
+      this.minClusterPixels = minClusterPixels;
+      this.maxNumMaxima = maxNumMaxima;
+      this.criticalAngle = criticalAngle;
+      this.maxLineFitMSE = maxLineFitMSE;
+      this.minWhiteBlackDiff = minWhiteBlackDiff;
+      this.deglitch = deglitch;
+    }
+
+    @Override
+    public int hashCode() {
+      return minClusterPixels
+          + maxNumMaxima
+          + Double.hashCode(criticalAngle)
+          + Float.hashCode(maxLineFitMSE)
+          + minWhiteBlackDiff
+          + Boolean.hashCode(deglitch);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+      if (!(obj instanceof QuadThresholdParameters)) {
+        return false;
+      }
+
+      QuadThresholdParameters other = (QuadThresholdParameters) obj;
+      return minClusterPixels == other.minClusterPixels
+          && maxNumMaxima == other.maxNumMaxima
+          && criticalAngle == other.criticalAngle
+          && maxLineFitMSE == other.maxLineFitMSE
+          && minWhiteBlackDiff == other.minWhiteBlackDiff
+          && deglitch == other.deglitch;
+    }
+  }
+
   public AprilTagDetector() {
     m_native = AprilTagJNI.createDetector();
   }
@@ -26,239 +195,39 @@ public class AprilTagDetector implements AutoCloseable {
   }
 
   /**
-   * Sets how many threads should be used for computation. Default is single-threaded operation (1
-   * thread).
+   * Sets detector configuration.
    *
-   * @param val number of threads
+   * @param config Configuration
    */
-  public void setNumThreads(int val) {
-    AprilTagJNI.setNumThreads(m_native, val);
+  public void setConfig(Config config) {
+    AprilTagJNI.setDetectorConfig(m_native, config);
   }
 
   /**
-   * Gets how many threads are being used for computation.
+   * Gets detector configuration.
    *
-   * @return number of threads
+   * @return Configuration
    */
-  public int getNumThreads() {
-    return AprilTagJNI.getNumThreads(m_native);
+  public Config getConfig() {
+    return AprilTagJNI.getDetectorConfig(m_native);
   }
 
   /**
-   * Sets the quad decimation. Detection of quads can be done on a lower-resolution image, improving
-   * speed at a cost of pose accuracy and a slight decrease in detection rate. Decoding the binary
-   * payload is still done at full resolution. Default is 2.0.
+   * Sets quad threshold parameters.
    *
-   * @param val decimation amount
+   * @param params Parameters
    */
-  public void setQuadDecimate(float val) {
-    AprilTagJNI.setQuadDecimate(m_native, val);
+  public void setQuadThresholdParameters(QuadThresholdParameters params) {
+    AprilTagJNI.setDetectorQTP(m_native, params);
   }
 
   /**
-   * Gets the quad decimation setting.
+   * Gets quad threshold parameters.
    *
-   * @return decimation amount
+   * @return Parameters
    */
-  public float getQuadDecimate() {
-    return AprilTagJNI.getQuadDecimate(m_native);
-  }
-
-  /**
-   * Sets what Gaussian blur should be applied to the segmented image (used for quad detection?).
-   * Very noisy images benefit from non-zero values (e.g. 0.8). Default is 0.0.
-   *
-   * @param val standard deviation in pixels
-   */
-  public void setQuadSigma(float val) {
-    AprilTagJNI.setQuadSigma(m_native, val);
-  }
-
-  /**
-   * Gets the Guassian blur setting.
-   *
-   * @return standard deviation in pixels
-   */
-  public float getQuadSigma() {
-    return AprilTagJNI.getQuadSigma(m_native);
-  }
-
-  /**
-   * Sets the refine edges option. When true, the edges of the each quad are adjusted to "snap to"
-   * strong gradients nearby. This is useful when decimation is employed, as it can increase the
-   * quality of the initial quad estimate substantially. Generally recommended to be on (true).
-   * Default is true.
-   *
-   * <p>Very computationally inexpensive. Option is ignored if quad_decimate = 1.
-   *
-   * @param val true to enable refine edges
-   */
-  public void setRefineEdges(boolean val) {
-    AprilTagJNI.setRefineEdges(m_native, val);
-  }
-
-  /**
-   * Gets the refine edges option setting.
-   *
-   * @return true if refine edges is enabled
-   */
-  public boolean getRefineEdges() {
-    return AprilTagJNI.getRefineEdges(m_native);
-  }
-
-  /**
-   * Sets how much sharpening should be done to decoded images. This can help decode small tags but
-   * may or may not help in odd lighting conditions or low light conditions. Default is 0.25.
-   *
-   * @param val sharpening amount
-   */
-  public void setDecodeSharpening(double val) {
-    AprilTagJNI.setDecodeSharpening(m_native, val);
-  }
-
-  /**
-   * Gets the decode sharpening setting.
-   *
-   * @return sharpening amount
-   */
-  public double getDecodeSharpening() {
-    return AprilTagJNI.getDecodeSharpening(m_native);
-  }
-
-  /**
-   * Sets debug mode. When true, the decoder writes a variety of debugging images to the current
-   * working directory at various stages through the detection process. This is slow and should
-   * *not* be used on space-limited systems such as the RoboRIO. Default is disabled (false).
-   *
-   * @param val true to enable debug mode
-   */
-  public void setDebug(boolean val) {
-    AprilTagJNI.setDebug(m_native, val);
-  }
-
-  /**
-   * Gets debug mode setting.
-   *
-   * @return true if debug mode is enabled
-   */
-  public boolean getDebug() {
-    return AprilTagJNI.getDebug(m_native);
-  }
-
-  /**
-   * Sets threshold used to reject quads containing too few pixels. Default is 5 pixels.
-   *
-   * @param val minimum number of pixels
-   */
-  public void setQuadMinClusterPixels(int val) {
-    AprilTagJNI.setQuadMinClusterPixels(m_native, val);
-  }
-
-  /**
-   * Gets minimum number of pixel threshold setting.
-   *
-   * @return number of pixels
-   */
-  public int getQuadMinClusterPixels() {
-    return AprilTagJNI.getQuadMinClusterPixels(m_native);
-  }
-
-  /**
-   * Sets how many corner candidates to consider when segmenting a group of pixels into a quad.
-   * Default is 10.
-   *
-   * @param val number of candidates
-   */
-  public void setQuadMaxNumMaxima(int val) {
-    AprilTagJNI.setQuadMaxNumMaxima(m_native, val);
-  }
-
-  /**
-   * Gets corner candidates setting.
-   *
-   * @return number of candidates
-   */
-  public int getQuadMaxNumMaxima() {
-    return AprilTagJNI.getQuadMaxNumMaxima(m_native);
-  }
-
-  /**
-   * Sets critical angle. The detector will reject quads where pairs of edges have angles that are
-   * close to straight or close to 180 degrees. Zero means that no quads are rejected. Default is 10
-   * degrees.
-   *
-   * @param val critical angle, in radians
-   */
-  public void setQuadCriticalAngle(float val) {
-    AprilTagJNI.setQuadCriticalAngle(m_native, val);
-  }
-
-  /**
-   * Gets critical angle setting.
-   *
-   * @return critical angle, in radians
-   */
-  public float getQuadCriticalAngle() {
-    return AprilTagJNI.getQuadCriticalAngle(m_native);
-  }
-
-  /**
-   * When fitting lines to the contours, sets the maximum mean squared error allowed. This is useful
-   * in rejecting contours that are far from being quad shaped; rejecting these quads "early" saves
-   * expensive decoding processing. Default is 10.0.
-   *
-   * @param val allowable maximum mean squared error
-   */
-  public void setQuadMaxLineFitMSE(float val) {
-    AprilTagJNI.setQuadMaxLineFitMSE(m_native, val);
-  }
-
-  /**
-   * Gets the maximum mean squared error setting.
-   *
-   * @return allowable maximum mean squared error
-   */
-  public float getQuadMaxLineFitMSE() {
-    return AprilTagJNI.getQuadMaxLineFitMSE(m_native);
-  }
-
-  /**
-   * Sets minimum brightness offset. When we build our model of black &amp; white pixels, we add an
-   * extra check that the white model must be (overall) brighter than the black model. How much
-   * brighter? (in pixel values, [0,255]). Default is 5.
-   *
-   * @param val minimum offset in pixel values [0,255]
-   */
-  public void setQuadMinWhiteBlackDiff(int val) {
-    AprilTagJNI.setQuadMinWhiteBlackDiff(m_native, val);
-  }
-
-  /**
-   * Gets minimum brightness offset setting.
-   *
-   * @return minimum offset in pixel values [0, 255]
-   */
-  public int getQuadMinWhiteBlackDiff() {
-    return AprilTagJNI.getQuadMinWhiteBlackDiff(m_native);
-  }
-
-  /**
-   * Sets if the thresholded image be should be deglitched. Only useful for very noisy images.
-   * Default is disabled (false).
-   *
-   * @param val true to enable
-   */
-  public void setQuadDeglitch(boolean val) {
-    AprilTagJNI.setQuadDeglitch(m_native, val);
-  }
-
-  /**
-   * Gets the deglitch setting.
-   *
-   * @return true if enabled
-   */
-  public boolean getQuadDeglitch() {
-    return AprilTagJNI.getQuadDeglitch(m_native);
+  public QuadThresholdParameters getQuadThresholdParameters() {
+    return AprilTagJNI.getDetectorQTP(m_native);
   }
 
   /**

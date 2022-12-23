@@ -7,5 +7,5 @@
 int main() {
   frc::AprilTagDetector detector;
   detector.AddFamily("tag16h5");
-  detector.SetRefineEdges(false);
+  detector.SetConfig({.refineEdges = false});
 }

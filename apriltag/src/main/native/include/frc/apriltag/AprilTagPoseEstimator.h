@@ -23,6 +23,8 @@ class WPILIB_DLLEXPORT AprilTagPoseEstimator final {
 
   /** Configuration for the pose estimator. */
   struct Config {
+    bool operator==(const Config&) const = default;
+
     /** The tag size. */
     units::meter_t tagSize;
 

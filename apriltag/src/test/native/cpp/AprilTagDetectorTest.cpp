@@ -7,11 +7,30 @@
 
 using namespace frc;
 
-TEST(AprilTagDetectorTest, NumThreads) {
+TEST(AprilTagDetectorTest, ConfigDefaults) {
   AprilTagDetector detector;
-  ASSERT_EQ(detector.GetNumThreads(), 1);
-  detector.SetNumThreads(2);
-  ASSERT_EQ(detector.GetNumThreads(), 2);
+  auto config = detector.GetConfig();
+  ASSERT_EQ(config, AprilTagDetector::Config{});
+}
+
+TEST(AprilTagDetectorTest, QtpDefaults) {
+  AprilTagDetector detector;
+  auto params = detector.GetQuadThresholdParameters();
+  ASSERT_EQ(params, AprilTagDetector::QuadThresholdParameters{});
+}
+
+TEST(AprilTagDetectorTest, SetConfigNumThreads) {
+  AprilTagDetector detector;
+  detector.SetConfig({.numThreads = 2});
+  auto config = detector.GetConfig();
+  ASSERT_EQ(config.numThreads, 2);
+}
+
+TEST(AprilTagDetectorTest, QtpMinClusterPixels) {
+  AprilTagDetector detector;
+  detector.SetQuadThresholdParameters({.minClusterPixels = 8});
+  auto params = detector.GetQuadThresholdParameters();
+  ASSERT_EQ(params.minClusterPixels, 8);
 }
 
 TEST(AprilTagDetectorTest, Add16h5) {

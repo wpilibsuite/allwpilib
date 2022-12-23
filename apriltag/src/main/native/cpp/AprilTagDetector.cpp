@@ -46,11 +46,7 @@ void AprilTagDetector::Results::Destroy() {
   }
 }
 
-AprilTagDetector::AprilTagDetector() : m_impl{apriltag_detector_create()} {
-  // apriltag_detector_create does not appropriately initialize qtp.critical_rad
-  static_cast<apriltag_detector_t*>(m_impl)->qtp.critical_rad =
-      static_cast<float>(10 * std::numbers::pi / 180);
-}
+AprilTagDetector::AprilTagDetector() : m_impl{apriltag_detector_create()} {}
 
 AprilTagDetector& AprilTagDetector::operator=(AprilTagDetector&& rhs) {
   Destroy();
@@ -58,106 +54,57 @@ AprilTagDetector& AprilTagDetector::operator=(AprilTagDetector&& rhs) {
   rhs.m_impl = nullptr;
   m_families = std::move(rhs.m_families);
   rhs.m_families.clear();
+  m_qtpCriticalAngle = rhs.m_qtpCriticalAngle;
   return *this;
 }
 
-void AprilTagDetector::SetNumThreads(int val) {
-  static_cast<apriltag_detector_t*>(m_impl)->nthreads = val;
+void AprilTagDetector::SetConfig(const Config& config) {
+  auto& impl = *static_cast<apriltag_detector_t*>(m_impl);
+  impl.nthreads = config.numThreads;
+  impl.quad_decimate = config.quadDecimate;
+  impl.quad_sigma = config.quadSigma;
+  impl.refine_edges = config.refineEdges;
+  impl.decode_sharpening = config.decodeSharpening;
+  impl.debug = config.debug;
 }
 
-int AprilTagDetector::GetNumThreads() const {
-  return static_cast<apriltag_detector_t*>(m_impl)->nthreads;
+AprilTagDetector::Config AprilTagDetector::GetConfig() const {
+  auto& impl = *static_cast<apriltag_detector_t*>(m_impl);
+  return {
+      .numThreads = impl.nthreads,
+      .quadDecimate = impl.quad_decimate,
+      .quadSigma = impl.quad_sigma,
+      .refineEdges = impl.refine_edges,
+      .decodeSharpening = impl.decode_sharpening,
+      .debug = impl.debug,
+  };
 }
 
-void AprilTagDetector::SetQuadDecimate(float val) {
-  static_cast<apriltag_detector_t*>(m_impl)->quad_decimate = val;
+void AprilTagDetector::SetQuadThresholdParameters(
+    const QuadThresholdParameters& params) {
+  auto& qtp = static_cast<apriltag_detector_t*>(m_impl)->qtp;
+  qtp.min_cluster_pixels = params.minClusterPixels;
+  qtp.max_nmaxima = params.maxNumMaxima;
+  qtp.critical_rad = params.criticalAngle.value();
+  qtp.cos_critical_rad = std::cos(params.criticalAngle.value());
+  qtp.max_line_fit_mse = params.maxLineFitMSE;
+  qtp.min_white_black_diff = params.minWhiteBlackDiff;
+  qtp.deglitch = params.deglitch;
+
+  m_qtpCriticalAngle = params.criticalAngle;
 }
 
-float AprilTagDetector::GetQuadDecimate() const {
-  return static_cast<apriltag_detector_t*>(m_impl)->quad_decimate;
-}
-
-void AprilTagDetector::SetQuadSigma(float val) {
-  static_cast<apriltag_detector_t*>(m_impl)->quad_sigma = val;
-}
-
-float AprilTagDetector::GetQuadSigma() const {
-  return static_cast<apriltag_detector_t*>(m_impl)->quad_sigma;
-}
-
-void AprilTagDetector::SetRefineEdges(bool val) {
-  static_cast<apriltag_detector_t*>(m_impl)->refine_edges = val;
-}
-
-bool AprilTagDetector::GetRefineEdges() const {
-  return static_cast<apriltag_detector_t*>(m_impl)->refine_edges;
-}
-
-void AprilTagDetector::SetDecodeSharpening(double val) {
-  static_cast<apriltag_detector_t*>(m_impl)->decode_sharpening = val;
-}
-
-double AprilTagDetector::GetDecodeSharpening() const {
-  return static_cast<apriltag_detector_t*>(m_impl)->decode_sharpening;
-}
-
-void AprilTagDetector::SetDebug(bool val) {
-  static_cast<apriltag_detector_t*>(m_impl)->debug = val;
-}
-
-bool AprilTagDetector::GetDebug() const {
-  return static_cast<apriltag_detector_t*>(m_impl)->debug;
-}
-
-void AprilTagDetector::SetQuadMinClusterPixels(int val) {
-  static_cast<apriltag_detector_t*>(m_impl)->qtp.min_cluster_pixels = val;
-}
-
-int AprilTagDetector::GetQuadMinClusterPixels() const {
-  return static_cast<apriltag_detector_t*>(m_impl)->qtp.min_cluster_pixels;
-}
-
-void AprilTagDetector::SetQuadMaxNumMaxima(int val) {
-  static_cast<apriltag_detector_t*>(m_impl)->qtp.max_nmaxima = val;
-}
-
-int AprilTagDetector::GetQuadMaxNumMaxima() const {
-  return static_cast<apriltag_detector_t*>(m_impl)->qtp.max_nmaxima;
-}
-
-void AprilTagDetector::SetQuadCriticalAngle(units::radian_t val) {
-  static_cast<apriltag_detector_t*>(m_impl)->qtp.critical_rad = val.value();
-  static_cast<apriltag_detector_t*>(m_impl)->qtp.cos_critical_rad =
-      std::cos(val.value());
-}
-
-units::radian_t AprilTagDetector::GetQuadCriticalAngle() const {
-  return units::radian_t{
-      static_cast<apriltag_detector_t*>(m_impl)->qtp.critical_rad};
-}
-
-void AprilTagDetector::SetQuadMaxLineFitMSE(float val) {
-  static_cast<apriltag_detector_t*>(m_impl)->qtp.max_line_fit_mse = val;
-}
-
-float AprilTagDetector::GetQuadMaxLineFitMSE() const {
-  return static_cast<apriltag_detector_t*>(m_impl)->qtp.max_line_fit_mse;
-}
-
-void AprilTagDetector::SetQuadMinWhiteBlackDiff(int val) {
-  static_cast<apriltag_detector_t*>(m_impl)->qtp.min_white_black_diff = val;
-}
-
-int AprilTagDetector::GetQuadMinWhiteBlackDiff() const {
-  return static_cast<apriltag_detector_t*>(m_impl)->qtp.min_white_black_diff;
-}
-
-void AprilTagDetector::SetQuadDeglitch(bool val) {
-  static_cast<apriltag_detector_t*>(m_impl)->qtp.deglitch = val;
-}
-
-bool AprilTagDetector::GetQuadDeglitch() const {
-  return static_cast<apriltag_detector_t*>(m_impl)->qtp.deglitch;
+AprilTagDetector::QuadThresholdParameters
+AprilTagDetector::GetQuadThresholdParameters() const {
+  auto& qtp = static_cast<apriltag_detector_t*>(m_impl)->qtp;
+  return {
+      .minClusterPixels = qtp.min_cluster_pixels,
+      .maxNumMaxima = qtp.max_nmaxima,
+      .criticalAngle = m_qtpCriticalAngle,
+      .maxLineFitMSE = qtp.max_line_fit_mse,
+      .minWhiteBlackDiff = qtp.min_white_black_diff,
+      .deglitch = qtp.deglitch != 0,
+  };
 }
 
 bool AprilTagDetector::AddFamily(std::string_view fam, int bitsCorrected) {

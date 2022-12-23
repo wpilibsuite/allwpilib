@@ -53,10 +53,33 @@ class AprilTagDetectorTest {
   }
 
   @Test
-  void testNumThreads() {
-    assertEquals(1, detector.getNumThreads());
-    detector.setNumThreads(2);
-    assertEquals(2, detector.getNumThreads());
+  void testConfigDefaults() {
+    var config = detector.getConfig();
+    assertEquals(new AprilTagDetector.Config(), config);
+  }
+
+  @Test
+  void testQtpDefaults() {
+    var params = detector.getQuadThresholdParameters();
+    assertEquals(new AprilTagDetector.QuadThresholdParameters(), params);
+  }
+
+  @Test
+  void testSetConfigNumThreads() {
+    var newConfig = new AprilTagDetector.Config();
+    newConfig.numThreads = 2;
+    detector.setConfig(newConfig);
+    var config = detector.getConfig();
+    assertEquals(2, config.numThreads);
+  }
+
+  @Test
+  void testQtpMinClusterPixels() {
+    var newParams = new AprilTagDetector.QuadThresholdParameters();
+    newParams.minClusterPixels = 8;
+    detector.setQuadThresholdParameters(newParams);
+    var params = detector.getQuadThresholdParameters();
+    assertEquals(8, params.minClusterPixels);
   }
 
   @Test

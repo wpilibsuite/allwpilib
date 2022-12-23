@@ -38,6 +38,29 @@ public final class AprilTagPoseEstimator {
     public double fy;
     public double cx;
     public double cy;
+
+    @Override
+    public int hashCode() {
+      return Double.hashCode(tagSize)
+          + Double.hashCode(fx)
+          + Double.hashCode(fy)
+          + Double.hashCode(cx)
+          + Double.hashCode(cy);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+      if (!(obj instanceof Config)) {
+        return false;
+      }
+
+      Config other = (Config) obj;
+      return tagSize == other.tagSize
+          && fx == other.fx
+          && fy == other.fy
+          && cx == other.cx
+          && cy == other.cy;
+    }
   }
 
   /**

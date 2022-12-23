@@ -5,6 +5,7 @@
 package edu.wpi.first.apriltag.jni;
 
 import edu.wpi.first.apriltag.AprilTagDetection;
+import edu.wpi.first.apriltag.AprilTagDetector;
 import edu.wpi.first.apriltag.AprilTagPoseEstimate;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.util.RuntimeLoader;
@@ -47,53 +48,14 @@ public class AprilTagJNI {
 
   public static native void destroyDetector(long det);
 
-  public static native void setNumThreads(long det, int val);
+  public static native void setDetectorConfig(long det, AprilTagDetector.Config config);
 
-  public static native int getNumThreads(long det);
+  public static native AprilTagDetector.Config getDetectorConfig(long det);
 
-  public static native void setQuadDecimate(long det, float val);
+  public static native void setDetectorQTP(
+      long det, AprilTagDetector.QuadThresholdParameters params);
 
-  public static native float getQuadDecimate(long det);
-
-  public static native void setQuadSigma(long det, float val);
-
-  public static native float getQuadSigma(long det);
-
-  public static native void setRefineEdges(long det, boolean val);
-
-  public static native boolean getRefineEdges(long det);
-
-  public static native void setDecodeSharpening(long det, double val);
-
-  public static native double getDecodeSharpening(long det);
-
-  public static native void setDebug(long det, boolean val);
-
-  public static native boolean getDebug(long det);
-
-  public static native void setQuadMinClusterPixels(long det, int val);
-
-  public static native int getQuadMinClusterPixels(long det);
-
-  public static native void setQuadMaxNumMaxima(long det, int val);
-
-  public static native int getQuadMaxNumMaxima(long det);
-
-  public static native void setQuadCriticalAngle(long det, float val);
-
-  public static native float getQuadCriticalAngle(long det);
-
-  public static native void setQuadMaxLineFitMSE(long det, float val);
-
-  public static native float getQuadMaxLineFitMSE(long det);
-
-  public static native void setQuadMinWhiteBlackDiff(long det, int val);
-
-  public static native int getQuadMinWhiteBlackDiff(long det);
-
-  public static native void setQuadDeglitch(long det, boolean val);
-
-  public static native boolean getQuadDeglitch(long det);
+  public static native AprilTagDetector.QuadThresholdParameters getDetectorQTP(long det);
 
   public static native boolean addFamily(long det, String fam, int bitsCorrected);
 
