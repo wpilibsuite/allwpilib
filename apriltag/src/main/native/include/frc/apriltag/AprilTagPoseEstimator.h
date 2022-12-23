@@ -23,11 +23,20 @@ class WPILIB_DLLEXPORT AprilTagPoseEstimator final {
 
   /** Configuration for the pose estimator. */
   struct Config {
+    /** The tag size. */
     units::meter_t tagSize;
-    double fx;  // in pixels
-    double fy;  // in pixels
-    double cx;  // in pixels
-    double cy;  // in pixels
+
+    /** Camera horizontal focal length, in pixels. */
+    double fx;
+
+    /** Camera vertical focal length, in pixels. */
+    double fy;
+
+    /** Camera horizontal focal center, in pixels. */
+    double cx;
+
+    /** Camera vertical focal center, in pixels. */
+    double cy;
   };
 
   /**

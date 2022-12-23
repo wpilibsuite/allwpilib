@@ -16,11 +16,28 @@ public final class AprilTagPoseEstimator {
   /** Configuration for the pose estimator. */
   @SuppressWarnings("MemberName")
   public static class Config {
-    public double tagSize; // in meters
-    public double fx; // in pixels
-    public double fy; // in pixels
-    public double cx; // in pixels
-    public double cy; // in pixels
+    /**
+     * Creates a pose estimator configuration.
+     *
+     * @param tagSize tag size, in meters
+     * @param fx camera horizontal focal length, in pixels
+     * @param fy camera vertical focal length, in pixels
+     * @param cx camera horizontal focal center, in pixels
+     * @param cy camera vertical focal center, in pixels
+     */
+    public Config(double tagSize, double fx, double fy, double cx, double cy) {
+      this.tagSize = tagSize;
+      this.fx = fx;
+      this.fy = fy;
+      this.cx = cx;
+      this.cy = cy;
+    }
+
+    public double tagSize;
+    public double fx;
+    public double fy;
+    public double cx;
+    public double cy;
   }
 
   /**
