@@ -4,6 +4,8 @@
 
 #include "RobotContainer.h"
 
+#include <frc2/command/button/Trigger.h>
+
 #include "commands/Autos.h"
 #include "commands/ExampleCommand.h"
 
@@ -17,12 +19,13 @@ RobotContainer::RobotContainer() {
 void RobotContainer::ConfigureBindings() {
   // Configure your button bindings here
 
-  // Schedule `ExampleCommand` when the Y button is pressed on the Xbox
-  // controller
-  m_driverController.Y().OnTrue(ExampleCommand(&m_subsystem).ToPtr());
+  // Schedule `ExampleCommand` when `exampleCondition` changes to `true`
+  frc2::Trigger([this] {
+    return m_subsystem.ExampleCondition();
+  }).OnTrue(ExampleCommand(&m_subsystem).ToPtr());
 
-  // Schedule `ExampleMethodCommand` when the B button is pressed, cancelling on
-  // release.
+  // Schedule `ExampleMethodCommand` when the Xbox controller's B button is
+  // pressed, cancelling on release.
   m_driverController.B().WhileTrue(m_subsystem.ExampleMethodCommand());
 }
 
