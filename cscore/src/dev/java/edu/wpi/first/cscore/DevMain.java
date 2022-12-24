@@ -12,6 +12,15 @@ public final class DevMain {
     System.out.println("Hello World!");
     System.out.println(RuntimeDetector.getPlatformPath());
     System.out.println(CameraServerJNI.getHostname());
+
+    UsbCamera camera = new UsbCamera("Cam", "EAB7A68F-EC2B-4487-AADF-D8A91C1CB782");
+    MjpegServer server = new MjpegServer("Server", 1234);
+    server.setSource(camera);
+
+    CameraServerJNI.runOsxRunLoopTimeout(10);
+
+    server.close();
+    camera.close();
   }
 
   private DevMain() {}

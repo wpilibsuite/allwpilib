@@ -5,9 +5,9 @@
 #include <fmt/core.h>
 #include <iostream>
 #include <thread>
-#include <CoreFoundation/CFRunLoop.h>
 
 #include "cscore.h"
+#include "cscore_runloop.h"
 
 int main() {
   fmt::print("{}\n", cs::GetHostname());
@@ -33,7 +33,7 @@ int main() {
   //auto info = cs::GetUsbCameraInfo(source, &status);
   //std::cout << info.name << " " << info.path << std::endl;
 
-  auto res = CFRunLoopRunInMode(kCFRunLoopDefaultMode, 1, false);
+  auto res = cs::RunOsxRunLoopTimeout(1);
   cs::SetSourceConnectionStrategy(source2, CS_CONNECTION_KEEP_OPEN, &status);
   auto modes = cs::EnumerateSourceVideoModes(source2, &status);
   std::cout << modes.size() << std::endl;
@@ -53,7 +53,7 @@ int main() {
   //auto runLoop = CFRunLoopGetMain();
 
 
-  res = CFRunLoopRunInMode(kCFRunLoopDefaultMode, 60, false);
+  res = cs::RunOsxRunLoopTimeout(60);
   printf("%d\n", res);
   //std::this_thread::sleep_for(std::chrono::seconds(20));
 

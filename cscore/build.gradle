@@ -2,7 +2,7 @@ import org.gradle.internal.os.OperatingSystem
 
 ext {
     nativeName = 'cscore'
-    devMain = 'edu.wpi.cscore.DevMain'
+    devMain = 'edu.wpi.first.cscore.DevMain'
 }
 
 // Removed because having the objective-cpp plugin added breaks
@@ -156,6 +156,12 @@ apply from: "${rootDir}/shared/opencv.gradle"
 Action<List<String>> symbolFilter = { symbols ->
     symbols.removeIf({ !it.startsWith('CS_') })
 } as Action<List<String>>;
+
+run {
+    if (OperatingSystem.current().isMacOsX()) {
+        jvmArgs("-XstartOnFirstThread");
+    }
+}
 
 nativeUtils.exportsConfigs {
     cscore {

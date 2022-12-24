@@ -1,6 +1,69 @@
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
+
 #import "UsbCameraImplObjc.h"
 #include "UsbCameraImpl.h"
 #include "Notifier.h"
+#include "Log.h"
+
+template <typename S, typename... Args>
+inline void NamedLog(UsbCameraImplObjc* objc, unsigned int level,
+                     const char* file, unsigned int line, const S& format,
+                     Args&&... args) {
+  auto sharedThis = objc.cppImpl.lock();
+  if (!sharedThis) {
+    return;
+  }
+
+  wpi::Logger& logger = sharedThis->objcGetLogger();
+  std::string_view name = sharedThis->GetName();
+
+  if (logger.HasLogger() && level >= logger.min_level()) {
+    cs::NamedLogV(logger, level, file, line, name, format,
+                  fmt::make_format_args(args...));
+  }
+}
+
+#define OBJCLOG(level, format, ...)         \
+  NamedLog(self, level, __FILE__, __LINE__, \
+           FMT_STRING(format) __VA_OPT__(, ) __VA_ARGS__)
+
+#define OBJCERROR(format, ...) \
+  OBJCLOG(::wpi::WPI_LOG_ERROR, format __VA_OPT__(, ) __VA_ARGS__)
+#define OBJCWARNING(format, ...) \
+  OBJCLOG(::wpi::WPI_LOG_WARNING, format __VA_OPT__(, ) __VA_ARGS__)
+#define OBJCINFO(format, ...) \
+  OBJCLOG(::wpi::WPI_LOG_INFO, format __VA_OPT__(, ) __VA_ARGS__)
+
+#ifdef NDEBUG
+#define OBJCDEBUG(format, ...) \
+  do {                         \
+  } while (0)
+#define OBJCDEBUG1(format, ...) \
+  do {                          \
+  } while (0)
+#define OBJCDEBUG2(format, ...) \
+  do {                          \
+  } while (0)
+#define OBJCDEBUG3(format, ...) \
+  do {                          \
+  } while (0)
+#define OBJCDEBUG4(format, ...) \
+  do {                          \
+  } while (0)
+#else
+#define OBJCDEBUG(format, ...) \
+  OBJCLOG(::wpi::WPI_LOG_DEBUG, format __VA_OPT__(, ) __VA_ARGS__)
+#define OBJCDEBUG1(format, ...) \
+  OBJCLOG(::wpi::WPI_LOG_DEBUG1, format __VA_OPT__(, ) __VA_ARGS__)
+#define OBJCDEBUG2(format, ...) \
+  OBJCLOG(::wpi::WPI_LOG_DEBUG2, format __VA_OPT__(, ) __VA_ARGS__)
+#define OBJCDEBUG3(format, ...) \
+  OBJCLOG(::wpi::WPI_LOG_DEBUG3, format __VA_OPT__(, ) __VA_ARGS__)
+#define OBJCDEBUG4(format, ...) \
+  OBJCLOG(::wpi::WPI_LOG_DEBUG4, format __VA_OPT__(, ) __VA_ARGS__)
+#endif
 
 using namespace cs;
 
@@ -9,21 +72,19 @@ using namespace cs;
 - (void)start {
   switch ([AVCaptureDevice authorizationStatusForMediaType:AVMediaTypeVideo]) {
     case AVAuthorizationStatusAuthorized:
-      NSLog(@"Already Authorized");
       self.isAuthorized = true;
       break;
     default:
-      NSLog(@"Authorization Failed");
+      OBJCERROR(
+          "Camera access explicitly blocked for application. No cameras are "
+          "accessable");
       self.isAuthorized = false;
       // TODO log
       break;
     case AVAuthorizationStatusNotDetermined:
-      NSLog(@"Authorization Not Determined");
       dispatch_suspend(self.sessionQueue);
       [AVCaptureDevice requestAccessForMediaType:AVMediaTypeVideo
                                completionHandler:^(BOOL granted) {
-                                 (void)granted;
-                                 NSLog(@"Completeion %d", granted);
                                  self.isAuthorized = granted;
                                  dispatch_resume(self.sessionQueue);
                                }];
@@ -56,21 +117,29 @@ using namespace cs;
 
 // Standard common camera properties
 - (void)setBrightness:(int)brightness status:(CS_Status*)status {
+  *status = CS_INVALID_PROPERTY;
 }
 - (int)getBrightness:(CS_Status*)status {
+  *status = CS_INVALID_PROPERTY;
   return 0;
 }
 - (void)setWhiteBalanceAuto:(CS_Status*)status {
+  *status = CS_INVALID_PROPERTY;
 }
 - (void)setWhiteBalanceHoldCurrent:(CS_Status*)status {
+  *status = CS_INVALID_PROPERTY;
 }
 - (void)setWhiteBalanceManual:(int)value status:(CS_Status*)status {
+  *status = CS_INVALID_PROPERTY;
 }
 - (void)setExposureAuto:(CS_Status*)status {
+  *status = CS_INVALID_PROPERTY;
 }
 - (void)setExposureHoldCurrent:(CS_Status*)status {
+  *status = CS_INVALID_PROPERTY;
 }
 - (void)setExposureManual:(int)value status:(CS_Status*)status {
+  *status = CS_INVALID_PROPERTY;
 }
 
 - (bool)setVideoMode:(const cs::VideoMode&)mode status:(CS_Status*)status {
@@ -135,13 +204,12 @@ using namespace cs;
   }
 
   if (newMode != sharedThis->objcGetVideoMode()) {
-    NSLog(@"Trying Mode %d %d %d %d", newMode.pixelFormat, newMode.width,
-          newMode.height, newMode.fps);
+    OBJCDEBUG3("Trying Mode {} {} {} {}", newMode.pixelFormat, newMode.width,
+               newMode.height, newMode.fps);
     int localFPS = 0;
     AVCaptureDeviceFormat* newModeType = [self deviceCheckModeValid:&newMode
                                                             withFps:&localFPS];
     if (newModeType == nil) {
-      NSLog(@"Invalid Set Mode");
       *status = CS_UNSUPPORTED_MODE;
       return;
     }
@@ -284,8 +352,6 @@ static cs::VideoMode::PixelFormat FourCCToPixelFormat(FourCharCode fourcc) {
         int highestFps = highest.timescale / static_cast<double>(highest.value);
         int lowestFps = lowest.timescale / static_cast<double>(lowest.value);
 
-        NSLog(@"%d %lld", lowest.timescale, lowest.value);
-
         store.fpsRanges.emplace_back(CameraFPSRange{lowestFps, highestFps});
         if (highestFps > maxFps) {
           maxFps = highestFps;
@@ -311,8 +377,8 @@ static cs::VideoMode::PixelFormat FourCCToPixelFormat(FourCharCode fourcc) {
     return nil;
   }
 
-  NSLog(@"Checking mode %d %d %d %d", toCheck->pixelFormat, toCheck->width,
-        toCheck->height, toCheck->fps);
+  OBJCDEBUG3("Checking mode {} {} {} {}", toCheck->pixelFormat, toCheck->width,
+             toCheck->height, toCheck->fps);
   std::vector<CameraModeStore>& platformModes =
       sharedThis->objcGetPlatformVideoModes();
   // Find the matching mode
@@ -322,20 +388,18 @@ static cs::VideoMode::PixelFormat FourCCToPixelFormat(FourCharCode fourcc) {
                             });
 
   if (match == platformModes.end()) {
-    NSLog(@"No match even without fps");
     return nil;
   }
 
   // Check FPS
   for (CameraFPSRange& range : match->fpsRanges) {
-    NSLog(@"Checking Range %d %d", range.min, range.max);
+    OBJCDEBUG3("Checking Range {} {}", range.min, range.max);
     if (range.IsWithinRange(toCheck->fps)) {
       *fps = toCheck->fps;
       return match->format;
     }
   }
 
-  NSLog(@"No Matching FPS");
   return nil;
 }
 
@@ -400,8 +464,6 @@ static cs::VideoMode::PixelFormat FourCCToPixelFormat(FourCharCode fourcc) {
   }
   self.streaming = true;
 
-  NSLog(@"Starting %@ %d", self.currentFormat, self.currentFPS);
-
   [self.session startRunning];
 
   if ([self.videoDevice lockForConfiguration:nil]) {
@@ -416,7 +478,7 @@ static cs::VideoMode::PixelFormat FourCCToPixelFormat(FourCharCode fourcc) {
     }
     [self.videoDevice unlockForConfiguration];
   } else {
-    NSLog(@"Failed to lock for configuration");
+    OBJCERROR("Failed to lock for configuration");
   }
 
   return true;
@@ -439,6 +501,9 @@ static cs::VideoMode::PixelFormat FourCCToPixelFormat(FourCharCode fourcc) {
 }
 
 - (void)deviceDisconnect {
+  std::string pathStr = [self.path UTF8String];
+  OBJCINFO("Disconnected from {}", pathStr);
+
   [self deviceStreamOff];
   self.session = nil;
   self.videoOutput = nil;
@@ -454,8 +519,10 @@ static cs::VideoMode::PixelFormat FourCCToPixelFormat(FourCharCode fourcc) {
 }
 
 - (bool)deviceConnect {
-
   if (!self.isAuthorized) {
+    OBJCERROR(
+        "Camera access not authorized for application. No cameras are "
+        "accessable");
     return false;
   }
 
@@ -474,13 +541,11 @@ static cs::VideoMode::PixelFormat FourCCToPixelFormat(FourCharCode fourcc) {
   }
 
   if (self.path == nil) {
-    NSLog(@"Starting for device id %d", self.deviceId);
+    OBJCINFO("Starting for device id {}", self.deviceId);
     // Enumerate Devices
     CS_Status status = 0;
     auto cameras = cs::EnumerateUsbCameras(&status);
     if (static_cast<int>(cameras.size()) <= self.deviceId) {
-      NSLog(@"Path for index %d not found. Only %d exist", self.deviceId,
-            static_cast<int>(cameras.size()));
       return false;
     }
     std::string& path = cameras[self.deviceId].path;
@@ -489,31 +554,32 @@ static cs::VideoMode::PixelFormat FourCCToPixelFormat(FourCharCode fourcc) {
                                        encoding:NSUTF8StringEncoding];
   }
 
-  NSLog(@"Starting for path %@", self.path);
+  std::string pathStr = [self.path UTF8String];
+  OBJCINFO("Connecting to USB camera on {}", pathStr);
 
   self.videoDevice = [AVCaptureDevice deviceWithUniqueID:self.path];
   if (self.videoDevice == nil) {
-    NSLog(@"Device Not found");
+    OBJCWARNING("Device Not found");
     goto err;
   }
 
   self.videoInput = [AVCaptureDeviceInput deviceInputWithDevice:self.videoDevice
                                                           error:nil];
   if (self.videoInput == nil) {
-    NSLog(@"Video Input Failed");
+    OBJCWARNING("Creating AVCaptureDeviceInput failed");
     goto err;
   }
 
   self.callback = [[UsbCameraDelegate alloc] init];
   if (self.callback == nil) {
-    NSLog(@"Callback failed");
+    OBJCWARNING("Creating Camera Callback failed");
     goto err;
   }
   self.callback.cppImpl = self.cppImpl;
 
   self.videoOutput = [[AVCaptureVideoDataOutput alloc] init];
   if (self.videoOutput == nil) {
-    NSLog(@"Video Output Failed");
+    OBJCWARNING("Creating AVCaptureVideoDataOutput failed");
     goto err;
   }
 
@@ -525,7 +591,7 @@ static cs::VideoMode::PixelFormat FourCCToPixelFormat(FourCharCode fourcc) {
 
   self.session = [[AVCaptureSession alloc] init];
   if (self.session == nil) {
-    NSLog(@"Session failed");
+    OBJCWARNING("Creating AVCaptureSession failed");
     goto err;
   }
 
@@ -537,17 +603,17 @@ static cs::VideoMode::PixelFormat FourCCToPixelFormat(FourCharCode fourcc) {
 
   [self.session addInput:self.videoInput];
   [self.session addOutput:self.videoOutput];
-  //
 
   sharedThis->SetDescription([self.videoDevice.localizedName UTF8String]);
 
   if (!self.propertiesCached) {
-    NSLog(@"Caching properties");
+    OBJCDEBUG3("Caching properties");
     [self deviceCacheProperties];
     [self deviceCacheVideoModes];
     [self deviceCacheMode];
     self.propertiesCached = true;
   } else {
+    OBJCDEBUG3("Restoring Video Mode");
     [self deviceSetMode];
   }
 
@@ -570,13 +636,18 @@ err:
 
 // Helpers
 - (void)sessionRuntimeError:(NSNotification*)notification {
-  NSError* error = notification.userInfo[AVCaptureSessionErrorKey];
-  NSLog(@"Capture session runtime error: %@", error);
+  @autoreleasepool {
+    NSError* error = notification.userInfo[AVCaptureSessionErrorKey];
+    const char* str = [error.description UTF8String];
+    if (str) {
+      std::string errorStr = str;
+      OBJCERROR("Capture session runtime error: {}", errorStr);
+    }
+  }
 }
 
 - (void)cameraDisconnected:(NSNotification*)notification {
   AVCaptureDevice* device = notification.object;
-  NSLog(@"Device Disconnected: %@", device.uniqueID);
   dispatch_async(self.sessionQueue, ^{
     if (self.path != nil && [device.uniqueID isEqualToString:self.path]) {
       [self deviceDisconnect];
@@ -586,7 +657,6 @@ err:
 
 - (void)cameraConnected:(NSNotification*)notification {
   AVCaptureDevice* device = notification.object;
-  NSLog(@"Device Connected: %@", device.uniqueID);
   dispatch_async(self.sessionQueue, ^{
     if (self.path == nil || [device.uniqueID isEqualToString:self.path]) {
       [self deviceConnect];

@@ -1,3 +1,7 @@
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
+
 #pragma once
 
 #import <AVFoundation/AVFoundation.h>
@@ -79,6 +83,8 @@ class UsbCameraImpl : public SourceImpl {
   std::vector<CameraModeStore>& objcGetPlatformVideoModes() {
     return m_platformModes;
   }
+
+  wpi::Logger& objcGetLogger() { return m_logger; }
 
   UsbCameraImplObjc* cppGetObjc() { return m_objc; }
 

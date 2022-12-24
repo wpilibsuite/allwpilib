@@ -1,3 +1,7 @@
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
+
 #pragma once
 
 #import <AVFoundation/AVFoundation.h>
@@ -9,12 +13,7 @@ class UsbCameraImpl;
 
 @interface UsbCameraDelegate
     : NSObject <AVCaptureVideoDataOutputSampleBufferDelegate>
-// {
-//     @public
-//     UsbCameraImpl* m_source;
-//     //IplImage* m_inputImageHeader;
-//     //IplImage* m_outputImageHeader;
-// }
+
 @property(nonatomic) std::weak_ptr<cs::UsbCameraImpl> cppImpl;
 
 - (void)captureOutput:(AVCaptureOutput*)captureOutput
