@@ -125,7 +125,7 @@ TEST(DiscretizationTest, DiscretizeSlowModelAQTaylor) {
   frc::Matrixd<2, 2> discA;
   frc::Matrixd<2, 2> discATaylor;
 
-  // Continuous Q should be positive semidefinite
+  // Continuous Q should be positive semi-definite
   Eigen::SelfAdjointEigenSolver<Eigen::MatrixXd> esCont{contQ};
   for (int i = 0; i < contQ.rows(); ++i) {
     EXPECT_GE(esCont.eigenvalues()[i], 0);

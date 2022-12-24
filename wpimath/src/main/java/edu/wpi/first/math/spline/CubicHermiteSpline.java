@@ -63,9 +63,9 @@ public class CubicHermiteSpline extends Spline {
   }
 
   /**
-   * Returns the coefficients matrix.
+   * Returns the coefficients' matrix.
    *
-   * @return The coefficients matrix.
+   * @return The coefficients' matrix.
    */
   @Override
   protected SimpleMatrix getCoefficients() {

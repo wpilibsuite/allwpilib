@@ -130,7 +130,7 @@ class DiscretizationTest {
 
     final var dt = 1.0;
 
-    // Continuous Q should be positive semidefinite
+    // Continuous Q should be positive semi-definite
     final var esCont = contQ.getStorage().eig();
     for (int i = 0; i < contQ.getNumRows(); ++i) {
       assertTrue(esCont.getEigenvalue(i).real >= 0);
@@ -161,7 +161,7 @@ class DiscretizationTest {
             + discQIntegrated);
     assertTrue(discA.minus(discATaylor).normF() < 1e-10);
 
-    // Discrete Q should be positive semidefinite
+    // Discrete Q should be positive semi-definite
     final var esDisc = discQTaylor.getStorage().eig();
     for (int i = 0; i < discQTaylor.getNumRows(); ++i) {
       assertTrue(esDisc.getEigenvalue(i).real >= 0);
@@ -176,7 +176,7 @@ class DiscretizationTest {
 
     final var dt = 0.005;
 
-    // Continuous Q should be positive semidefinite
+    // Continuous Q should be positive semi-definite
     final var esCont = contQ.getStorage().eig();
     for (int i = 0; i < contQ.getNumRows(); ++i) {
       assertTrue(esCont.getEigenvalue(i).real >= 0);

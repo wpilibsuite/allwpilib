@@ -94,7 +94,7 @@ public class KalmanFilter<States extends Num, Inputs extends Num, Outputs extend
     // S = CPCᵀ + R
     var S = C.times(P).times(C.transpose()).plus(discR);
 
-    // We want to put K = PCᵀS⁻¹ into Ax = b form so we can solve it more
+    // We want to put K = PCᵀS⁻¹ into Ax = b form, so we can solve it more
     // efficiently.
     //
     // K = PCᵀS⁻¹
@@ -169,7 +169,7 @@ public class KalmanFilter<States extends Num, Inputs extends Num, Outputs extend
    * Returns an element of the state estimate x-hat.
    *
    * @param row Row of x-hat.
-   * @return the state estimate x-hat at i.
+   * @return the state estimate x-hat at 'i'.
    */
   public double getXhat(int row) {
     return m_xHat.get(row, 0);

@@ -297,7 +297,7 @@ public class ProfiledPIDController implements Sendable {
    */
   public double calculate(double measurement) {
     if (m_controller.isContinuousInputEnabled()) {
-      // Get error which is smallest distance between goal and measurement
+      // Get error which is the smallest distance between goal and measurement
       double errorBound = (m_maximumInput - m_minimumInput) / 2.0;
       double goalMinDistance =
           MathUtil.inputModulus(m_goal.position - measurement, -errorBound, errorBound);

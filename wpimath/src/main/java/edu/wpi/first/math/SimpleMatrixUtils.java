@@ -192,7 +192,7 @@ public final class SimpleMatrixUtils {
    *
    * @param src The matrix to decompose.
    * @return The decomposed matrix.
-   * @throws RuntimeException if the matrix could not be decomposed (ie. is not positive
+   * @throws RuntimeException if the matrix could not be decomposed (i.e. is not positive
    *     semidefinite).
    */
   public static SimpleMatrix lltDecompose(SimpleMatrix src) {
@@ -206,7 +206,7 @@ public final class SimpleMatrixUtils {
    * @param src The matrix to decompose.
    * @param lowerTriangular if we want to decompose to the lower triangular Cholesky matrix.
    * @return The decomposed matrix.
-   * @throws RuntimeException if the matrix could not be decomposed (ie. is not positive
+   * @throws RuntimeException if the matrix could not be decomposed (i.e. is not positive
    *     semidefinite).
    */
   public static SimpleMatrix lltDecompose(SimpleMatrix src, boolean lowerTriangular) {

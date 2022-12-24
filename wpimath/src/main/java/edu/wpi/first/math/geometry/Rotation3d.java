@@ -178,7 +178,7 @@ public class Rotation3d implements Interpolatable<Rotation3d> {
       return;
     } else if (dotNorm < -1.0 + 1E-9) {
       // If the dot product is -1, the two vectors point in opposite directions
-      // so a 180 degree rotation is required. Any orthogonal vector can be used
+      // so a 180-degree rotation is required. Any orthogonal vector can be used
       // for it. Q in the QR decomposition is an orthonormal basis, so it
       // contains orthogonal unit vectors.
       var X =

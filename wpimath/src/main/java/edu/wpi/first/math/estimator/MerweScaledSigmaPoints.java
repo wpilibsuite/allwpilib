@@ -72,7 +72,7 @@ public class MerweScaledSigmaPoints<S extends Num> {
    *
    * @param x An array of the means.
    * @param s Square-root covariance of the filter.
-   * @return Two dimensional array of sigma points. Each column contains all of the sigmas for one
+   * @return Two-dimensional array of sigma points. Each column contains all the sigmas for one
    *     dimension in the problem space. Ordered by Xi_0, Xi_{1..n}, Xi_{n+1..2n}.
    */
   public Matrix<S, ?> squareRootSigmaPoints(Matrix<S, N1> x, Matrix<S, S> s) {

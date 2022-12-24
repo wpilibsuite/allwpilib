@@ -10,7 +10,7 @@ public final class Drake {
   private Drake() {}
 
   /**
-   * Solves the discrete alegebraic Riccati equation.
+   * Solves the discrete algebraic Riccati equation.
    *
    * @param A System matrix.
    * @param B Input matrix.
@@ -33,7 +33,7 @@ public final class Drake {
   }
 
   /**
-   * Solves the discrete alegebraic Riccati equation.
+   * Solves the discrete algebraic Riccati equation.
    *
    * @param <States> Number of states.
    * @param <Inputs> Number of inputs.
@@ -55,7 +55,7 @@ public final class Drake {
   }
 
   /**
-   * Solves the discrete alegebraic Riccati equation.
+   * Solves the discrete algebraic Riccati equation.
    *
    * @param A System matrix.
    * @param B Input matrix.
@@ -85,7 +85,7 @@ public final class Drake {
   }
 
   /**
-   * Solves the discrete alegebraic Riccati equation.
+   * Solves the discrete algebraic Riccati equation.
    *
    * @param <States> Number of states.
    * @param <Inputs> Number of inputs.

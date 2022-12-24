@@ -130,7 +130,7 @@ public final class WPIMathJNI {
    * matrix.
    *
    * @param mat Array of elements of the matrix to be updated.
-   * @param lowerTriangular Whether or not mat is lower triangular.
+   * @param lowerTriangular Whether mat is lower triangular.
    * @param rows How many rows there are.
    * @param vec Vector to use for the rank update.
    * @param sigma Sigma value to use for the rank update.

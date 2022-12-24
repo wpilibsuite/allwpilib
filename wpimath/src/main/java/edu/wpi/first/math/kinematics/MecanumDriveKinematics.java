@@ -16,7 +16,7 @@ import org.ejml.simple.SimpleMatrix;
  *
  * <p>The inverse kinematics (converting from a desired chassis velocity to individual wheel speeds)
  * uses the relative locations of the wheels with respect to the center of rotation. The center of
- * rotation for inverse kinematics is also variable. This means that you can set your set your
+ * rotation for inverse kinematics is also variable. This means that you can set your
  * center of rotation in a corner of the robot to perform special evasion maneuvers.
  *
  * <p>Forward kinematics (converting an array of wheel speeds into the overall chassis motion) is

@@ -33,7 +33,7 @@ class SwerveDriveOdometryTest {
 
   @Test
   void testTwoIterations() {
-    // 5 units/sec  in the x axis (forward)
+    // 5 units/sec  in the x-axis (forward)
     final SwerveModulePosition[] wheelDeltas = {
       new SwerveModulePosition(0.5, Rotation2d.fromDegrees(0)),
       new SwerveModulePosition(0.5, Rotation2d.fromDegrees(0)),
@@ -59,7 +59,7 @@ class SwerveDriveOdometryTest {
 
   @Test
   void test90degreeTurn() {
-    // This is a 90 degree turn about the point between front left and rear left wheels
+    // This is a 90-degree turn about the point between front left and rear left wheels
     //        Module 0: speed 18.84955592153876 angle 90.0
     //        Module 1: speed 42.14888838624436 angle 26.565051177077986
     //        Module 2: speed 18.84955592153876 angle -90.0
