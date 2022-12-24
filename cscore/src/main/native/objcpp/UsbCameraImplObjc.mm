@@ -93,12 +93,12 @@ using namespace cs;
       break;
   }
   dispatch_async(self.sessionQueue, ^{
-    [[NSNotificationCenter defaultCenter]
+    [[NSNotificationCenter self.notificationCenter]
         addObserver:self
            selector:@selector(cameraConnected:)
                name:AVCaptureDeviceWasConnectedNotification
              object:nil];
-    [[NSNotificationCenter defaultCenter]
+    [[NSNotificationCenter self.notificationCenter]
         addObserver:self
            selector:@selector(cameraDisconnected:)
                name:AVCaptureDeviceWasDisconnectedNotification
@@ -499,6 +499,7 @@ static cs::VideoMode::PixelFormat FourCCToPixelFormat(FourCharCode fourcc) {
   // TODO pass in name, make this queue specific
   self.sessionQueue =
       dispatch_queue_create("session queue", DISPATCH_QUEUE_SERIAL);
+  self.notificationCenter = [NSNotificationCenter new];
   return self;
 }
 
@@ -597,7 +598,7 @@ static cs::VideoMode::PixelFormat FourCCToPixelFormat(FourCharCode fourcc) {
     goto err;
   }
 
-  [[NSNotificationCenter defaultCenter]
+  [[NSNotificationCenter self.notificationCenter]
       addObserver:self
          selector:@selector(sessionRuntimeError:)
              name:AVCaptureSessionRuntimeErrorNotification

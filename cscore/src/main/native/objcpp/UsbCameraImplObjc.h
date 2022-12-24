@@ -20,6 +20,7 @@ class UsbCameraImpl;
 @property(nonatomic) int currentFPS;
 @property(nonatomic) std::weak_ptr<cs::UsbCameraImpl> cppImpl;
 @property(nonatomic) dispatch_queue_t sessionQueue;
+@property(nonatomic) NSNotificationCenter* notificationCenter;
 @property(nonatomic) NSString* path;
 @property(nonatomic) int deviceId;
 @property(nonatomic) bool propertiesCached;
