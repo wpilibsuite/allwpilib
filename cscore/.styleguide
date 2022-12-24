@@ -1,7 +1,3 @@
-modifiedFileExclude {
-  objcpp
-}
-
 cHeaderFileInclude {
   _c\.h$
 }
@@ -15,6 +11,10 @@ cppHeaderFileInclude {
 
 cppSrcFileInclude {
   \.cpp$
+}
+
+modifiedFileExclude {
+  objcpp
 }
 
 licenseUpdateExclude {
