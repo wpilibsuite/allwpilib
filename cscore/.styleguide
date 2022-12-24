@@ -13,7 +13,7 @@ cppSrcFileInclude {
   \.cpp$
 }
 
-modifiedFileExclude {
+modifiableFileExclude {
   objcpp
 }
 
