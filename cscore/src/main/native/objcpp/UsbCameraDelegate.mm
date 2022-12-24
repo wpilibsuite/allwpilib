@@ -29,8 +29,6 @@
     return;
   }
 
-  NSLog(@"Got Capture");
-
   // Buffer always comes in a 32BGRA
   auto imageBuffer = CMSampleBufferGetImageBuffer(sampleBuffer);
 
@@ -61,7 +59,6 @@
                                       height, currSize);
   cv::cvtColor(tmpMat, image->AsMat(), cv::COLOR_BGRA2BGR);
 
-  // std::cout << "Row bytes " <<rowBytes << std::endl;
   CVPixelBufferUnlockBaseAddress(imageBuffer, 0);
 
   sharedThis->objcPutFrame(std::move(image), wpi::Now());
