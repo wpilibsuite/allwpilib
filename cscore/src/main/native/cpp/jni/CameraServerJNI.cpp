@@ -2232,29 +2232,35 @@ Java_edu_wpi_first_cscore_CameraServerJNI_freeRawFrame
  * Method:    runOsxRunLoop
  * Signature: ()V
  */
-JNIEXPORT void JNICALL Java_edu_wpi_first_cscore_CameraServerJNI_runOsxRunLoop
-  (JNIEnv *, jclass) {
-    cs::RunOsxRunLoop();
-  }
+JNIEXPORT void JNICALL
+Java_edu_wpi_first_cscore_CameraServerJNI_runOsxRunLoop
+  (JNIEnv*, jclass)
+{
+  cs::RunOsxRunLoop();
+}
 
 /*
  * Class:     edu_wpi_first_cscore_CameraServerJNI
  * Method:    runOsxRunLoopTimeout
  * Signature: (D)I
  */
-JNIEXPORT jint JNICALL Java_edu_wpi_first_cscore_CameraServerJNI_runOsxRunLoopTimeout
-  (JNIEnv *, jclass, jdouble timeoutSeconds) {
-    return cs::RunOsxRunLoopTimeout(timeoutSeconds);
-  }
+JNIEXPORT jint JNICALL
+Java_edu_wpi_first_cscore_CameraServerJNI_runOsxRunLoopTimeout
+  (JNIEnv*, jclass, jdouble timeoutSeconds)
+{
+  return cs::RunOsxRunLoopTimeout(timeoutSeconds);
+}
 
 /*
  * Class:     edu_wpi_first_cscore_CameraServerJNI
  * Method:    stopOsxMainRunLoop
  * Signature: ()V
  */
-JNIEXPORT void JNICALL Java_edu_wpi_first_cscore_CameraServerJNI_stopOsxMainRunLoop
-  (JNIEnv *, jclass) {
-    return cs::StopOsxMainRunLoop();
-  }
+JNIEXPORT void JNICALL
+Java_edu_wpi_first_cscore_CameraServerJNI_stopOsxMainRunLoop
+  (JNIEnv*, jclass)
+{
+  return cs::StopOsxMainRunLoop();
+}
 
 }  // extern "C"
