@@ -13,7 +13,7 @@ import java.util.function.BooleanSupplier;
 /**
  * A state machine representing a complete action to be performed by the robot. Commands are run by
  * the {@link CommandScheduler}, and can be composed into CommandGroups to allow users to build
- * complicated multi-step actions without the need to roll the state machine logic themselves.
+ * complicated multistep actions without the need to roll the state machine logic themselves.
  *
  * <p>Commands are run synchronously from the main robot loop; no multithreading is used, unless
  * specified explicitly from the command implementation.
@@ -299,7 +299,7 @@ public interface Command {
   /**
    * Decorates this command to only run if this condition is not met. If the command is already
    * running and the condition changes to true, the command will not stop running. The requirements
-   * of this command will be kept for the new conditonal command.
+   * of this command will be kept for the new conditional command.
    *
    * @param condition the condition that will prevent the command from running
    * @return the decorated command
@@ -390,7 +390,7 @@ public interface Command {
   }
 
   /**
-   * Whether or not the command is currently scheduled. Note that this does not detect whether the
+   * Whether the command is currently scheduled. Note that this does not detect whether the
    * command is in a composition, only whether it is directly being run by the scheduler.
    *
    * @return Whether the command is scheduled.
@@ -439,7 +439,7 @@ public interface Command {
   }
 
   /**
-   * Sets the name of this Command. Nullop if not overridden.
+   * Sets the name of this Command. Null-op if not overridden.
    *
    * @param name The display name of the Command.
    */

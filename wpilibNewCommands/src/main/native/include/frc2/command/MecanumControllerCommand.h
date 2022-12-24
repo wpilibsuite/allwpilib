@@ -61,7 +61,7 @@ class MecanumControllerCommand
    *
    * <p>Note: The controllers will *not* set the outputVolts to zero upon
    * completion of the path this is left to the user, since it is not
-   * appropriate for paths with nonstationary endstates.
+   * appropriate for paths with non-stationary endstates.
    *
    * @param trajectory           The trajectory to follow.
    * @param pose                 A function that supplies the robot pose,

@@ -29,7 +29,7 @@ public class SelectCommand extends CommandBase {
   private InterruptionBehavior m_interruptBehavior = InterruptionBehavior.kCancelIncoming;
 
   /**
-   * Creates a new selectcommand.
+   * Creates a new SelectCommand.
    *
    * @param commands the map of commands to choose from
    * @param selector the selector to determine which command to run
@@ -53,7 +53,7 @@ public class SelectCommand extends CommandBase {
   }
 
   /**
-   * Creates a new selectcommand.
+   * Creates a new SelectCommand.
    *
    * @param toRun a supplier providing the command to run
    * @deprecated Replace with {@link ProxyCommand}

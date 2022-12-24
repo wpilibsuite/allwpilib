@@ -62,7 +62,7 @@ public class CommandGenericHID {
    * attached to {@link CommandScheduler#getDefaultButtonLoop() the default command scheduler button
    * loop}.
    *
-   * <p>The POV angles start at 0 in the up direction, and increase clockwise (eg right is 90,
+   * <p>The POV angles start at 0 in the up direction, and increase clockwise (e.g. right is 90,
    * upper-left is 315).
    *
    * @param angle POV angle in degrees, or -1 for the center / not pressed.
@@ -75,7 +75,7 @@ public class CommandGenericHID {
   /**
    * Constructs a Trigger instance based around this angle of a POV on the HID.
    *
-   * <p>The POV angles start at 0 in the up direction, and increase clockwise (eg right is 90,
+   * <p>The POV angles start at 0 in the up direction, and increase clockwise (e.g. right is 90,
    * upper-left is 315).
    *
    * @param pov index of the POV to read (starting at 0). Defaults to 0.

@@ -238,7 +238,7 @@ safe) semantics.
    * Decorates this command to only run if this condition is not met. If the
    * command is already running and the condition changes to true, the command
    * will not stop running. The requirements of this command will be kept for
-   * the new conditonal command.
+   * the new conditional command.
    *
    * @param condition the condition that will prevent the command from running
    * @return the decorated command
@@ -378,7 +378,7 @@ safe) semantics.
   virtual std::string GetName() const;
 
   /**
-   * Sets the name of this Command. Nullop if not overridden.
+   * Sets the name of this Command. Null-op if not overridden.
    *
    * @param name The display name of the Command.
    */

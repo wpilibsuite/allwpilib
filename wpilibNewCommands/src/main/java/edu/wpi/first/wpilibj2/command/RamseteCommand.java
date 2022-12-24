@@ -54,7 +54,7 @@ public class RamseteCommand extends CommandBase {
    * units of volts.
    *
    * <p>Note: The controller will *not* set the outputVolts to zero upon completion of the path -
-   * this is left to the user, since it is not appropriate for paths with nonstationary endstates.
+   * this is left to the user, since it is not appropriate for paths with non-stationary endstates.
    *
    * @param trajectory The trajectory to follow.
    * @param pose A function that supplies the robot pose - use one of the odometry classes to

@@ -64,7 +64,7 @@ public class MecanumControllerCommand extends CommandBase {
    * 12 as a voltage output to the motor.
    *
    * <p>Note: The controllers will *not* set the outputVolts to zero upon completion of the path
-   * this is left to the user, since it is not appropriate for paths with nonstationary endstates.
+   * this is left to the user, since it is not appropriate for paths with non-stationary endstates.
    *
    * @param trajectory The trajectory to follow.
    * @param pose A function that supplies the robot pose - use one of the odometry classes to
@@ -152,7 +152,7 @@ public class MecanumControllerCommand extends CommandBase {
    * 12 as a voltage output to the motor.
    *
    * <p>Note: The controllers will *not* set the outputVolts to zero upon completion of the path
-   * this is left to the user, since it is not appropriate for paths with nonstationary endstates.
+   * this is left to the user, since it is not appropriate for paths with non-stationary endstates.
    *
    * <p>Note 2: The final rotation of the robot will be set to the rotation of the final pose in the
    * trajectory. The robot will not follow the rotations from the poses at each timestep. If
