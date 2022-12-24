@@ -32,5 +32,6 @@ std::span<const double, 9> AprilTagDetection::GetHomography() const {
 }
 
 Eigen::Matrix3d AprilTagDetection::GetHomographyMatrix() const {
-  return Eigen::Map<Eigen::Matrix3d>{static_cast<matd_t*>(H)->data};
+  return Eigen::Map<Eigen::Matrix<double, 3, 3, Eigen::RowMajor>>{
+      static_cast<matd_t*>(H)->data};
 }

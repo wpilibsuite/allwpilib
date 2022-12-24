@@ -50,7 +50,8 @@ static Transform3d MakePose(const apriltag_pose_t& pose) {
                         units::meter_t{pose.t->data[1]},
                         units::meter_t{pose.t->data[2]}},
           Rotation3d{OrthogonalizeRotationMatrix(
-              Eigen::Map<Eigen::Matrix3d>{pose.R->data})}};
+              Eigen::Map<Eigen::Matrix<double, 3, 3, Eigen::RowMajor>>{
+                  pose.R->data})}};
 }
 
 static apriltag_detection_info_t MakeDetectionInfo(
