@@ -4,6 +4,8 @@
 
 #import <AVFoundation/AVFoundation.h>
 #include "UsbCameraListener.h"
+
+#pragma GCC diagnostic ignored "-Wunused-parameter"
 #include "Notifier.h"
 
 using namespace cs;
@@ -79,7 +81,6 @@ using namespace cs;
       }
     });
   }
-  // modifiedFileExclude
 }
 
 @end

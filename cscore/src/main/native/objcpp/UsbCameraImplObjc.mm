@@ -4,6 +4,8 @@
 
 #import "UsbCameraImplObjc.h"
 #include "UsbCameraImpl.h"
+
+#pragma GCC diagnostic ignored "-Wunused-parameter"
 #include "Notifier.h"
 #include "Log.h"
 

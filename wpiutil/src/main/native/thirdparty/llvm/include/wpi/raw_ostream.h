@@ -135,9 +135,7 @@ public:
   /// So that the stream could keep at least tell() + ExtraSize bytes
   /// without re-allocations. reserveExtraSpace() does not change
   /// the size/data of the stream.
-  virtual void reserveExtraSpace(uint64_t ExtraSize) {
-    (void)ExtraSize;
-  }
+  virtual void reserveExtraSpace(uint64_t ExtraSize) {}
 
   /// Set the stream to be buffered, with an automatically determined buffer
   /// size.

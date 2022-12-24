@@ -1,3 +1,7 @@
+modifiedFileExclude {
+  objcpp$
+}
+
 cHeaderFileInclude {
   _c\.h$
 }

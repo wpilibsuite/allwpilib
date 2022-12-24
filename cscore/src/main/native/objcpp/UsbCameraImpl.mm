@@ -11,6 +11,7 @@
 #include <string>
 #include <wpi/timestamp.h>
 
+#pragma GCC diagnostic ignored "-Wunused-parameter"
 #include "Handle.h"
 #include "Log.h"
 #include "Notifier.h"
