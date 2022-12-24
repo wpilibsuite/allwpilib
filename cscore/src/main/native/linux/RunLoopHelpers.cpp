@@ -6,6 +6,8 @@
 
 namespace cs {
 void RunOsxRunLoop() {}
-int RunOsxRunLoopTimeout(double timeoutSeconds) { return 0; }
+int RunOsxRunLoopTimeout(double timeoutSeconds) {
+  return 0;
+}
 void StopOsxMainRunLoop() {}
 }  // namespace cs
