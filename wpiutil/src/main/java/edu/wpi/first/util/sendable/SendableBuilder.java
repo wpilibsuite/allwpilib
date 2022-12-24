@@ -31,7 +31,7 @@ public interface SendableBuilder extends AutoCloseable {
   void setSmartDashboardType(String type);
 
   /**
-   * Set a flag indicating if this sendable should be treated as an actuator. By default this flag
+   * Set a flag indicating if this Sendable should be treated as an actuator. By default, this flag
    * is false.
    *
    * @param value true if actuator, false if not

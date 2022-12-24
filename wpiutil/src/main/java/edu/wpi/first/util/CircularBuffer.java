@@ -4,7 +4,7 @@
 
 package edu.wpi.first.util;
 
-/** This is a simple circular buffer so we don't need to "bucket brigade" copy old values. */
+/** This is a simple circular buffer, so we don't need to "bucket brigade" copy old values. */
 public class CircularBuffer {
   private double[] m_data;
 

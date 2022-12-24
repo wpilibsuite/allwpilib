@@ -31,7 +31,7 @@ public class DataLogReader implements Iterable<DataLogRecord> {
    * Constructs from a file.
    *
    * @param filename filename
-   * @throws IOException if could not open/read file
+   * @throws IOException if unable to open/read file
    */
   public DataLogReader(String filename) throws IOException {
     RandomAccessFile f = new RandomAccessFile(filename, "r");
