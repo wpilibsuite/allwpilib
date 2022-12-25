@@ -5,7 +5,7 @@
 #pragma once
 
 namespace cs {
-void RunOsxRunLoop();
-int RunOsxRunLoopTimeout(double timeoutSeconds);
-void StopOsxMainRunLoop();
+void RunMainRunLoop();
+int RunMainRunLoopTimeout(double timeoutSeconds);
+void StopMainRunLoop();
 }  // namespace cs
