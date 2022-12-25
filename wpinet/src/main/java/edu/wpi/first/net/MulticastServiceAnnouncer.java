@@ -31,7 +31,7 @@ public class MulticastServiceAnnouncer implements AutoCloseable {
     String[] values = txt.values().toArray(String[]::new);
     m_handle =
         WPINetJNI.createMulticastServiceAnnouncer(serviceName, serviceType, port, keys, values);
-    m_cleanable = WpiCleaner.getInstance().register(this, cleanupAction(m_handle));
+    m_cleanable = WpiCleaner.register(this, cleanupAction(m_handle));
   }
 
   /**
@@ -44,7 +44,7 @@ public class MulticastServiceAnnouncer implements AutoCloseable {
   public MulticastServiceAnnouncer(String serviceName, String serviceType, int port) {
     m_handle =
         WPINetJNI.createMulticastServiceAnnouncer(serviceName, serviceType, port, null, null);
-    m_cleanable = WpiCleaner.getInstance().register(this, cleanupAction(m_handle));
+    m_cleanable = WpiCleaner.register(this, cleanupAction(m_handle));
   }
 
   @Override

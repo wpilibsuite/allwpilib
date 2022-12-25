@@ -23,7 +23,7 @@ public class MulticastServiceResolver implements AutoCloseable {
    */
   public MulticastServiceResolver(String serviceType) {
     m_handle = WPINetJNI.createMulticastServiceResolver(serviceType);
-    m_cleanable = WpiCleaner.getInstance().register(this, cleanupAction(m_handle));
+    m_cleanable = WpiCleaner.register(this, cleanupAction(m_handle));
   }
 
   @Override

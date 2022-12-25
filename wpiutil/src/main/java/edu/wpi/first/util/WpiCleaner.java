@@ -5,24 +5,27 @@
 package edu.wpi.first.util;
 
 import java.lang.ref.Cleaner;
+import java.lang.ref.Cleaner.Cleanable;
 
+/**
+ * Cleaner object for WPILib objects.
+ */
 public final class WpiCleaner {
 
   private WpiCleaner() {
     throw new UnsupportedOperationException("This is a utility class!");
   }
 
-  private static Cleaner instance;
+  private static final Cleaner instance = Cleaner.create();
 
   /**
-   * Gets the global WPI cleaner instance.
+   * Register an object with the cleaner.
    *
-   * @return global cleaner instance.
+   * @param object The object to register.
+   * @param runnable The runnable to call on cleanup.
+   * @return The registered Cleanable.
    */
-  public static synchronized Cleaner getInstance() {
-    if (instance == null) {
-      instance = Cleaner.create();
-    }
-    return instance;
+  public static Cleanable register(Object object, Runnable runnable) {
+    return instance.register(object, runnable);
   }
 }
