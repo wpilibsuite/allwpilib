@@ -85,7 +85,7 @@ public class Encoder implements CounterBase, Sendable, AutoCloseable {
    * <p>The encoder will start counting immediately.
    *
    * @param channelA The 'a' channel DIO channel. 0-9 are on-board, 10-25 are on the MXP port
-   * @param channelB The b channel DIO channel. 0-9 are on-board, 10-25 are on the MXP port
+   * @param channelB The 'b' channel DIO channel. 0-9 are on-board, 10-25 are on the MXP port
    * @param reverseDirection represents the orientation of the encoder and inverts the output values
    *     if necessary so forward represents positive values.
    */

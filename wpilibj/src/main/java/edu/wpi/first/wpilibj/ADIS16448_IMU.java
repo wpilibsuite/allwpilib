@@ -1136,6 +1136,7 @@ public class ADIS16448_IMU implements AutoCloseable, NTSendable {
    * @return Barometric Pressure in PSI
    */
   public synchronized double getBarometricPressure() {
+    // mbar to PSI conversion
     return m_baro * 0.0145;
   }
 
