@@ -139,7 +139,7 @@ constexpr bool kDrakeAssertIsDisarmed = false;
     expression;                                                 \
   } while (0)
 #else
-// Assertions are disabled, so just type-check the expression.
+// Assertions are disabled, so just typecheck the expression.
 namespace drake {
 constexpr bool kDrakeAssertIsArmed = false;
 constexpr bool kDrakeAssertIsDisarmed = true;
