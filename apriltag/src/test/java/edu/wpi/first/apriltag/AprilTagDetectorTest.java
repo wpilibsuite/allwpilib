@@ -187,7 +187,8 @@ class AprilTagDetectorTest {
 
       var estimator =
           new AprilTagPoseEstimator(
-              new AprilTagPoseEstimator.Config(0.2, 500, 500, image.cols() / 2, image.rows() / 2));
+              new AprilTagPoseEstimator.Config(
+                  0.2, 500, 500, image.cols() / 2.0, image.rows() / 2.0));
       AprilTagPoseEstimate est = estimator.estimateOrthogonalIteration(results[0], 50);
 
       assertEquals(Units.degreesToRadians(45), est.pose1.getRotation().getX(), 0.1);
@@ -219,7 +220,8 @@ class AprilTagDetectorTest {
 
       var estimator =
           new AprilTagPoseEstimator(
-              new AprilTagPoseEstimator.Config(0.2, 500, 500, image.cols() / 2, image.rows() / 2));
+              new AprilTagPoseEstimator.Config(
+                  0.2, 500, 500, image.cols() / 2.0, image.rows() / 2.0));
       AprilTagPoseEstimate est = estimator.estimateOrthogonalIteration(results[0], 50);
 
       assertEquals(Units.degreesToRadians(0), est.pose1.getRotation().getX(), 0.1);
@@ -248,7 +250,8 @@ class AprilTagDetectorTest {
 
       var estimator =
           new AprilTagPoseEstimator(
-              new AprilTagPoseEstimator.Config(0.2, 500, 500, image.cols() / 2, image.rows() / 2));
+              new AprilTagPoseEstimator.Config(
+                  0.2, 500, 500, image.cols() / 2.0, image.rows() / 2.0));
       AprilTagPoseEstimate est = estimator.estimateOrthogonalIteration(results[0], 50);
 
       assertEquals(Units.degreesToRadians(0), est.pose1.getRotation().getX(), 0.1);
