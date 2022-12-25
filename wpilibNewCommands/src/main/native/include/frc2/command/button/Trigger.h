@@ -329,7 +329,7 @@ class Trigger {
    */
   WPI_DEPRECATED("Use WhileTrue(Command) and construct a RunCommand manually")
   Trigger WhileActiveContinuous(std::function<void()> toRun,
-                               std::initializer_list<Subsystem*> requirements);
+                                std::initializer_list<Subsystem*> requirements);
 
   /**
    * Binds a runnable to execute repeatedly while the trigger is active.
@@ -340,7 +340,7 @@ class Trigger {
    */
   WPI_DEPRECATED("Use WhileTrue(Command) and construct a RunCommand manually")
   Trigger WhileActiveContinuous(std::function<void()> toRun,
-                               std::span<Subsystem* const> requirements = {});
+                                std::span<Subsystem* const> requirements = {});
 
   /**
    * Binds a command to be started when the trigger becomes active, and

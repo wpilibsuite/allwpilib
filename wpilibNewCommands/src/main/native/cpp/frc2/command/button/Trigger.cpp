@@ -241,7 +241,7 @@ Trigger Trigger::WhileActiveContinuous(
     std::function<void()> toRun,
     std::initializer_list<Subsystem*> requirements) {
   return WhileActiveContinuous(std::move(toRun),
-                              {requirements.begin(), requirements.end()});
+                               {requirements.begin(), requirements.end()});
 }
 
 Trigger Trigger::WhileActiveContinuous(
