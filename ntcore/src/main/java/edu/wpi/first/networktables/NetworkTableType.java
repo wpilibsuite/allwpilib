@@ -131,7 +131,7 @@ public enum NetworkTableType {
       return "float[]";
     } else if (data instanceof long[] || data instanceof Long[]) {
       return "int[]";
-    } else if (data instanceof double[] || data instanceof Double[]) {
+    } else if (data instanceof double[] || data instanceof Double[] || data instanceof Number[]) {
       // If typeof Number class, return "double[]" as the type. Functions as a "catch-all".
       return "double[]";
     } else if (data instanceof String[]) {
