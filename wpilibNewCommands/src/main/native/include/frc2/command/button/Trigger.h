@@ -284,7 +284,7 @@ class Trigger {
   WPI_DEPRECATED(
       "Use WhileTrue(Command) with RepeatCommand, or bind command::Schedule "
       "with IfHigh(std::function<void()>).")
-  Trigger WhileActiveContinous(Command* command);
+  Trigger WhileActiveContinuous(Command* command);
 
   /**
    * Binds a command to be started repeatedly while the trigger is active, and
@@ -302,7 +302,7 @@ class Trigger {
   WPI_DEPRECATED(
       "Use WhileTrue(Command) with RepeatCommand, or bind command::Schedule "
       "with IfHigh(std::function<void()>).")
-  Trigger WhileActiveContinous(T&& command) {
+  Trigger WhileActiveContinuous(T&& command) {
     m_loop->Bind([condition = m_condition, previous = m_condition(),
                   command = std::make_unique<std::remove_reference_t<T>>(
                       std::forward<T>(command))]() mutable {
@@ -328,7 +328,7 @@ class Trigger {
    * @deprecated Use WhileTrue(Command) and construct a RunCommand manually
    */
   WPI_DEPRECATED("Use WhileTrue(Command) and construct a RunCommand manually")
-  Trigger WhileActiveContinous(std::function<void()> toRun,
+  Trigger WhileActiveContinuous(std::function<void()> toRun,
                                std::initializer_list<Subsystem*> requirements);
 
   /**
@@ -339,7 +339,7 @@ class Trigger {
    * @deprecated Use WhileTrue(Command) and construct a RunCommand manually
    */
   WPI_DEPRECATED("Use WhileTrue(Command) and construct a RunCommand manually")
-  Trigger WhileActiveContinous(std::function<void()> toRun,
+  Trigger WhileActiveContinuous(std::function<void()> toRun,
                                std::span<Subsystem* const> requirements = {});
 
   /**

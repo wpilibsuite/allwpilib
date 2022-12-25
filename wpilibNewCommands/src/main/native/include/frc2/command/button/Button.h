@@ -121,7 +121,7 @@ class Button : public Trigger {
                          Command, std::remove_reference_t<T>>>>
   WPI_DEPRECATED("Replace with Trigger#WhileTrue(command.Repeatedly())")
   Button WhileHeld(T&& command) {
-    WhileActiveContinous(std::forward<T>(command));
+    WhileActiveContinuous(std::forward<T>(command));
     return *this;
   }
 
