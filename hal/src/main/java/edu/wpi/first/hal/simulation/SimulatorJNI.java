@@ -28,4 +28,6 @@ public class SimulatorJNI extends JNIWrapper {
   public static native void stepTimingAsync(long delta);
 
   public static native void resetHandles();
+
+  public static native void resetAllSimData();
 }

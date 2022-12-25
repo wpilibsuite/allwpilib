@@ -15,6 +15,7 @@
 #include "hal/HAL.h"
 #include "hal/handles/HandlesInternal.h"
 #include "hal/simulation/MockHooks.h"
+#include "hal/simulation/Reset.h"
 
 using namespace wpi::java;
 
@@ -263,5 +264,17 @@ Java_edu_wpi_first_hal_simulation_SimulatorJNI_resetHandles
   (JNIEnv*, jclass)
 {
   hal::HandleBase::ResetGlobalHandles();
+}
+
+/*
+ * Class:     edu_wpi_first_hal_simulation_SimulatorJNI
+ * Method:    resetAllSimData
+ * Signature: ()V
+ */
+JNIEXPORT void JNICALL
+Java_edu_wpi_first_hal_simulation_SimulatorJNI_resetAllSimData
+  (JNIEnv*, jclass)
+{
+  HALSIM_ResetAllSimData();
 }
 }  // extern "C"
