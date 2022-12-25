@@ -23,7 +23,7 @@ public class CircularBuffer {
    */
   public CircularBuffer(int size) {
     m_data = new double[size];
-    Arrays.fill( m_data,0.0);
+    Arrays.fill(m_data, 0.0);
   }
 
   /**
@@ -150,7 +150,7 @@ public class CircularBuffer {
 
   /** Sets internal buffer contents to zero. */
   public void clear() {
-    Arrays.fill(m_data,0.0);
+    Arrays.fill(m_data, 0.0);
     m_front = 0;
     m_length = 0;
   }

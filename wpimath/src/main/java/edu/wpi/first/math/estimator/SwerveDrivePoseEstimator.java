@@ -19,7 +19,6 @@ import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.util.WPIUtilJNI;
-
 import java.util.Arrays;
 import java.util.Map;
 import java.util.Objects;
@@ -373,17 +372,13 @@ public class SwerveDrivePoseEstimator {
       }
       InterpolationRecord record = (InterpolationRecord) obj;
       return Objects.equals(gyroAngle, record.gyroAngle)
-          && Arrays.equals(modulePositions,record.modulePositions)
+          && Arrays.equals(modulePositions, record.modulePositions)
           && Objects.equals(poseMeters, record.poseMeters);
     }
 
     @Override
     public int hashCode() {
-      return Objects.hash(
-              gyroAngle,
-              Arrays.hashCode(modulePositions),
-              poseMeters
-      );
+      return Objects.hash(gyroAngle, Arrays.hashCode(modulePositions), poseMeters);
     }
   }
 }

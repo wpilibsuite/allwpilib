@@ -128,7 +128,7 @@ public class LinearFilter {
     }
 
     double[] ffGains = new double[taps];
-    Arrays.fill(ffGains,1.0 / taps);
+    Arrays.fill(ffGains, 1.0 / taps);
 
     double[] fbGains = new double[0];
 
