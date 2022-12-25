@@ -221,7 +221,7 @@ Trigger Trigger::WhenActive(std::function<void()> toRun,
   return WhenActive(InstantCommand(std::move(toRun), requirements));
 }
 
-Trigger Trigger::WhileActiveContinuous(Command* command) {
+Trigger Trigger::WhileActiveContinous(Command* command) {
   m_loop->Bind([condition = m_condition, previous = m_condition(),
                 command = std::move(command)]() mutable {
     bool current = condition();
@@ -237,16 +237,16 @@ Trigger Trigger::WhileActiveContinuous(Command* command) {
   return *this;
 }
 
-Trigger Trigger::WhileActiveContinuous(
+Trigger Trigger::WhileActiveContinous(
     std::function<void()> toRun,
     std::initializer_list<Subsystem*> requirements) {
-  return WhileActiveContinuous(std::move(toRun),
-                               {requirements.begin(), requirements.end()});
+  return WhileActiveContinous(std::move(toRun),
+                              {requirements.begin(), requirements.end()});
 }
 
-Trigger Trigger::WhileActiveContinuous(
+Trigger Trigger::WhileActiveContinous(
     std::function<void()> toRun, std::span<Subsystem* const> requirements) {
-  return WhileActiveContinuous(InstantCommand(std::move(toRun), requirements));
+  return WhileActiveContinous(InstantCommand(std::move(toRun), requirements));
 }
 
 Trigger Trigger::WhileActiveOnce(Command* command) {

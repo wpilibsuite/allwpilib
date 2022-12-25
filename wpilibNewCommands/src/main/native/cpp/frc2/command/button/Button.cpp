@@ -33,7 +33,7 @@ Button Button::WhenPressed(std::function<void()> toRun,
 
 Button Button::WhileHeld(Command* command) {
   WPI_IGNORE_DEPRECATED
-  WhileActiveContinuous(command);
+  WhileActiveContinous(command);
   WPI_UNIGNORE_DEPRECATED
   return *this;
 }
@@ -41,7 +41,7 @@ Button Button::WhileHeld(Command* command) {
 Button Button::WhileHeld(std::function<void()> toRun,
                          std::initializer_list<Subsystem*> requirements) {
   WPI_IGNORE_DEPRECATED
-  WhileActiveContinuous(std::move(toRun), requirements);
+  WhileActiveContinous(std::move(toRun), requirements);
   WPI_UNIGNORE_DEPRECATED
   return *this;
 }
@@ -49,7 +49,7 @@ Button Button::WhileHeld(std::function<void()> toRun,
 Button Button::WhileHeld(std::function<void()> toRun,
                          std::span<Subsystem* const> requirements) {
   WPI_IGNORE_DEPRECATED
-  WhileActiveContinuous(std::move(toRun), requirements);
+  WhileActiveContinous(std::move(toRun), requirements);
   WPI_UNIGNORE_DEPRECATED
   return *this;
 }
