@@ -7,11 +7,8 @@ package edu.wpi.first.util;
 import java.lang.ref.Cleaner;
 import java.lang.ref.Cleaner.Cleanable;
 
-/**
- * Cleaner object for WPILib objects.
- */
+/** Cleaner object for WPILib objects. */
 public final class WpiCleaner {
-
   private WpiCleaner() {
     throw new UnsupportedOperationException("This is a utility class!");
   }
