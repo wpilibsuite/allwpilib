@@ -171,7 +171,7 @@ public final class Units {
   }
 
   /**
-   * Convert the angular velocity of a rotating object to its RPM.
+   * Convert the linear velocity of a rotating object to its RPM.
    *
    * @param linearVelocity linear velocity of rotating object.
    * @param radius radius of rotating object.
