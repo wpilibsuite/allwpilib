@@ -219,8 +219,8 @@ public class MecanumDrive extends RobotDriveBase implements Sendable, AutoClosea
   /**
    * Cartesian inverse kinematics for Mecanum platform.
    *
-   * <p>Angles are measured clockwise from the positive X axis. The robot's speed is independent
-   * of its angle or rotation rate.
+   * <p>Angles are measured clockwise from the positive X axis. The robot's speed is independent of
+   * its angle or rotation rate.
    *
    * @param xSpeed The robot's speed along the X axis [-1.0..1.0]. Forward is positive.
    * @param ySpeed The robot's speed along the Y axis [-1.0..1.0]. Left is positive.

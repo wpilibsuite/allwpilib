@@ -41,9 +41,9 @@ public final class Filesystem {
   }
 
   /**
-   * Obtains the deployment directory of the program, which is the remote location src/main/deploy is
-   * deployed to by default. On the roboRIO, this is /home/lvuser/deploy. In simulation, it is where
-   * the simulation was launched from, in the subdirectory "src/main/deploy"
+   * Obtains the deployment directory of the program, which is the remote location src/main/deploy
+   * is deployed to by default. On the roboRIO, this is /home/lvuser/deploy. In simulation, it is
+   * where the simulation was launched from, in the subdirectory "src/main/deploy"
    * (`pwd`/src/main/deploy).
    *
    * @return The deployment directory

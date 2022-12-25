@@ -46,7 +46,8 @@ public class SwerveControllerCommand extends CommandBase {
    * position controllers which need to be put into a velocity PID.
    *
    * <p>Note: The controllers will *not* set the outputVolts to zero upon completion of the path.
-   * This is left to the user to do since it is not appropriate for paths with non-stationary endstates.
+   * This is left to the user to do since it is not appropriate for paths with non-stationary
+   * endstates.
    *
    * @param trajectory The trajectory to follow.
    * @param pose A function that supplies the robot pose - use one of the odometry classes to

@@ -90,8 +90,8 @@ public final class Resource {
 
   /**
    * Free an allocated resource. After a resource is no longer needed, for example a destructor is
-   * called for a channel assignment class, Free will release the resource value, so it can be reused
-   * somewhere else in the program.
+   * called for a channel assignment class, Free will release the resource value, so it can be
+   * reused somewhere else in the program.
    *
    * @param index The index of the resource to free.
    */

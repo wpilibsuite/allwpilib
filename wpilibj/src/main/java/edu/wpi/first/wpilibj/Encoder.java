@@ -139,8 +139,8 @@ public class Encoder implements CounterBase, Sendable, AutoCloseable {
   }
 
   /**
-   * Encoder constructor. Construct an Encoder given a and b channels. Using an index pulse forces 4x
-   * encoding
+   * Encoder constructor. Construct an Encoder given a and b channels. Using an index pulse forces
+   * 4x encoding
    *
    * <p>The encoder will start counting immediately.
    *
@@ -160,8 +160,8 @@ public class Encoder implements CounterBase, Sendable, AutoCloseable {
   }
 
   /**
-   * Encoder constructor. Construct an Encoder given a and b channels. Using an index pulse forces 4x
-   * encoding
+   * Encoder constructor. Construct an Encoder given a and b channels. Using an index pulse forces
+   * 4x encoding
    *
    * <p>The encoder will start counting immediately.
    *
@@ -174,8 +174,8 @@ public class Encoder implements CounterBase, Sendable, AutoCloseable {
   }
 
   /**
-   * Encoder constructor. Construct an Encoder given a and b channels as digital inputs. This is used
-   * in the case where the digital inputs are shared. The Encoder class will not allocate the
+   * Encoder constructor. Construct an Encoder given a and b channels as digital inputs. This is
+   * used in the case where the digital inputs are shared. The Encoder class will not allocate the
    * digital inputs and assume that they already are counted.
    *
    * <p>The encoder will start counting immediately.
@@ -190,8 +190,8 @@ public class Encoder implements CounterBase, Sendable, AutoCloseable {
   }
 
   /**
-   * Encoder constructor. Construct an Encoder given a and b channels as digital inputs. This is used
-   * in the case where the digital inputs are shared. The Encoder class will not allocate the
+   * Encoder constructor. Construct an Encoder given a and b channels as digital inputs. This is
+   * used in the case where the digital inputs are shared. The Encoder class will not allocate the
    * digital inputs and assume that they already are counted.
    *
    * <p>The encoder will start counting immediately.
@@ -204,8 +204,8 @@ public class Encoder implements CounterBase, Sendable, AutoCloseable {
   }
 
   /**
-   * Encoder constructor. Construct an Encoder given a and b channels as digital inputs. This is used
-   * in the case where the digital inputs are shared. The Encoder class will not allocate the
+   * Encoder constructor. Construct an Encoder given a and b channels as digital inputs. This is
+   * used in the case where the digital inputs are shared. The Encoder class will not allocate the
    * digital inputs and assume that they already are counted.
    *
    * <p>The encoder will start counting immediately.

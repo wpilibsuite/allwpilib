@@ -233,8 +233,8 @@ public class Pose3d implements Interpolatable<Pose3d> {
   }
 
   /**
-   * Returns a Twist3d that maps this pose to the end pose. If c is the output of {@code a.Log(b)}, then
-   * {@code a.Exp(c)} would yield b.
+   * Returns a Twist3d that maps this pose to the end pose. If c is the output of {@code a.Log(b)},
+   * then {@code a.Exp(c)} would yield b.
    *
    * @param end The end pose for the transformation.
    * @return The twist that maps this to end.

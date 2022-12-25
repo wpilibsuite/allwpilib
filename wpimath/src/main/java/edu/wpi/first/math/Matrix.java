@@ -573,8 +573,7 @@ public class Matrix<R extends Num, C extends Num> {
    * Decompose "this" matrix using Cholesky Decomposition. If the "this" matrix is zeros, it will
    * return the zero matrix.
    *
-   * @param lowerTriangular Whether we want to decompose to the lower triangular Cholesky
-   *     matrix.
+   * @param lowerTriangular Whether we want to decompose to the lower triangular Cholesky matrix.
    * @return The decomposed matrix.
    * @throws RuntimeException if the matrix could not be decomposed(i.e. is not positive
    *     semi-definite).

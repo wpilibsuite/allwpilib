@@ -144,9 +144,9 @@ public class AnalogEncoder implements Sendable, AutoCloseable {
 
   /**
    * Set the distance per rotation of the encoder. This sets the multiplier used to determine the
-   * distance driven based on the rotation value from the encoder. Set this value based on how
-   * far the mechanism travels in 1 rotation of the encoder, and factor in gearing reductions
-   * following the encoder shaft. This distance can be in any units you like, linear or angular.
+   * distance driven based on the rotation value from the encoder. Set this value based on how far
+   * the mechanism travels in 1 rotation of the encoder, and factor in gearing reductions following
+   * the encoder shaft. This distance can be in any units you like, linear or angular.
    *
    * @param distancePerRotation the distance per rotation of the encoder
    */
