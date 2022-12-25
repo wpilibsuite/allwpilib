@@ -41,12 +41,12 @@ public final class Filesystem {
   }
 
   /**
-   * Obtains the deploy directory of the program, which is the remote location src/main/deploy is
+   * Obtains the deployment directory of the program, which is the remote location src/main/deploy is
    * deployed to by default. On the roboRIO, this is /home/lvuser/deploy. In simulation, it is where
    * the simulation was launched from, in the subdirectory "src/main/deploy"
    * (`pwd`/src/main/deploy).
    *
-   * @return The deploy directory
+   * @return The deployment directory
    */
   public static File getDeployDirectory() {
     if (RobotBase.isReal()) {

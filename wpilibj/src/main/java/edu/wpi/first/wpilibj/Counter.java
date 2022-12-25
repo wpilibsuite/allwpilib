@@ -331,7 +331,7 @@ public class Counter implements CounterBase, Sendable, AutoCloseable {
 
   /**
    * Set standard up / down counting mode on this counter. Up and down counts are sourced
-   * independently from two inputs.
+   * independently of two inputs.
    */
   public void setUpDownCounterMode() {
     CounterJNI.setCounterUpDownMode(m_counter);
@@ -385,7 +385,7 @@ public class Counter implements CounterBase, Sendable, AutoCloseable {
   }
 
   /**
-   * Reset the Counter to zero. Set the counter value to zero. This doesn't effect the running state
+   * Reset the Counter to zero. Set the counter value to zero. This doesn't affect the running state
    * of the counter, just sets the current value to zero.
    */
   @Override
@@ -425,7 +425,7 @@ public class Counter implements CounterBase, Sendable, AutoCloseable {
   /**
    * Determine if the clock is stopped. Determine if the clocked input is stopped based on the
    * MaxPeriod value set using the SetMaxPeriod method. If the clock exceeds the MaxPeriod, then the
-   * device (and counter) are assumed to be stopped and it returns true.
+   * device (and counter) are assumed to be stopped, and it returns true.
    *
    * @return true if the most recent counter period exceeds the MaxPeriod value set by SetMaxPeriod.
    */

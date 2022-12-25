@@ -42,7 +42,7 @@ public class AddressableLED implements AutoCloseable {
   /**
    * Sets the length of the LED strip.
    *
-   * <p>Calling this is an expensive call, so its best to call it once, then just update data.
+   * <p>Calling this is an expensive call, so it's best to call it once, then just update data.
    *
    * <p>The max length is 5460 LEDs.
    *
@@ -53,7 +53,7 @@ public class AddressableLED implements AutoCloseable {
   }
 
   /**
-   * Sets the led output data.
+   * Sets the LED output data.
    *
    * <p>If the output is enabled, this will start writing the next data cycle. It is safe to call,
    * even while output is enabled.

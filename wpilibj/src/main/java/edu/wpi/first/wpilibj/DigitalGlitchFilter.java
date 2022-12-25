@@ -15,7 +15,7 @@ import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * Class to enable glitch filtering on a set of digital inputs. This class will manage adding and
- * removing digital inputs from a FPGA glitch filter. The filter lets the user configure the time
+ * removing digital inputs from an FPGA glitch filter. The filter lets the user configure the time
  * that an input must remain high or low before it is classified as high or low.
  */
 public class DigitalGlitchFilter implements Sendable, AutoCloseable {

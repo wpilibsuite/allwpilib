@@ -72,7 +72,7 @@ public class ExternalDirectionCounter implements Sendable, AutoCloseable {
   }
 
   /**
-   * Sets to revese the counter direction.
+   * Sets to reverse the counter direction.
    *
    * @param reverseDirection True to reverse counting direction.
    */

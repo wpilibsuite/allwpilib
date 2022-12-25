@@ -246,7 +246,7 @@ public final class Preferences {
   }
 
   /**
-   * Returns whether or not there is a key with the given name.
+   * Returns whether there is a key with the given name.
    *
    * @param key the key
    * @return if there is a value at the given key

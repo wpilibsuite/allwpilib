@@ -9,14 +9,14 @@ import edu.wpi.first.hal.util.CheckedAllocationException;
 
 /**
  * Track resources in the program. The Resource class is a convenient way of keeping track of
- * allocated arbitrary resources in the program. Resources are just indices that have an lower and
+ * allocated arbitrary resources in the program. Resources are just indices that have a lower and
  * upper bound that are tracked by this class. In the library they are used for tracking allocation
  * of hardware channels but this is purely arbitrary. The resource class does not do any actual
  * allocation, but simply tracks if a given index is currently in use.
  *
  * <p><b>WARNING:</b> this should only be statically allocated. When the program loads into memory
  * all the static constructors are called. At that time a linked list of all the "Resources" is
- * created. Then when the program actually starts - in the Robot constructor, all resources are
+ * created. Then, when the program actually starts - in the Robot constructor, all resources are
  * initialized. This ensures that the program is restartable in memory without having to
  * unload/reload.
  */
@@ -71,7 +71,7 @@ public final class Resource {
 
   /**
    * Allocate a specific resource value. The user requests a specific resource value, i.e. channel
-   * number and it is verified unallocated, then returned.
+   * number, and it is verified unallocated, then returned.
    *
    * @param index The resource to allocate
    * @return The index of the allocated block
@@ -90,7 +90,7 @@ public final class Resource {
 
   /**
    * Free an allocated resource. After a resource is no longer needed, for example a destructor is
-   * called for a channel assignment class, Free will release the resource value so it can be reused
+   * called for a channel assignment class, Free will release the resource value, so it can be reused
    * somewhere else in the program.
    *
    * @param index The index of the resource to free.

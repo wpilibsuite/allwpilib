@@ -5,7 +5,7 @@
 package edu.wpi.first.wpilibj.shuffleboard;
 
 /**
- * Represents the type of a widget in Shuffleboard. Using this is preferred over specifying raw
+ * Represents the type of widget in Shuffleboard. Using this is preferred over specifying raw
  * strings, to avoid typos and having to know or look up the exact string name for a desired widget.
  *
  * @see BuiltInWidgets the built-in widget types

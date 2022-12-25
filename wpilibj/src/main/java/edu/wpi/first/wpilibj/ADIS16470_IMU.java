@@ -1005,28 +1005,28 @@ public class ADIS16470_IMU implements AutoCloseable, NTSendable {
   }
 
   /**
-   * @return X axis complementary angle
+   * @return X-axis complementary angle
    */
   public synchronized double getXComplementaryAngle() {
     return m_compAngleX;
   }
 
   /**
-   * @return Y axis complementary angle
+   * @return Y-axis complementary angle
    */
   public synchronized double getYComplementaryAngle() {
     return m_compAngleY;
   }
 
   /**
-   * @return X axis filtered acceleration angle
+   * @return X-axis filtered acceleration angle
    */
   public synchronized double getXFilteredAccelAngle() {
     return m_accelAngleX;
   }
 
   /**
-   * @return Y axis filtered acceleration angle
+   * @return Y-axis filtered acceleration angle
    */
   public synchronized double getYFilteredAccelAngle() {
     return m_accelAngleY;

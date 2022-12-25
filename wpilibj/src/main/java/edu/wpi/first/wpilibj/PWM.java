@@ -213,7 +213,7 @@ public class PWM implements Sendable, AutoCloseable {
     return PWMJNI.getPWMRaw(m_handle);
   }
 
-  /** Temporarily disables the PWM output. The next set call will reenable the output. */
+  /** Temporarily disables the PWM output. The next set call will re-enable the output. */
   public void setDisabled() {
     PWMJNI.setPWMDisabled(m_handle);
   }

@@ -22,7 +22,7 @@ import edu.wpi.first.util.sendable.SendableBuilder;
  * upper limit, then the output is true. If the analog value is in between, then the trigger output
  * state maintains its most recent value.
  *
- * <p>The InWindow output indicates whether or not the analog signal is inside the range defined by
+ * <p>The InWindow output indicates whether the analog signal is inside the range defined by
  * the limits.
  *
  * <p>The RisingPulse and FallingPulse outputs detect an instantaneous transition from above the

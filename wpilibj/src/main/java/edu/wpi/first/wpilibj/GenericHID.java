@@ -147,7 +147,7 @@ public class GenericHID {
   /**
    * Get the angle in degrees of a POV on the HID.
    *
-   * <p>The POV angles start at 0 in the up direction, and increase clockwise (eg right is 90,
+   * <p>The POV angles start at 0 in the up direction, and increase clockwise (e.g. right is 90,
    * upper-left is 315).
    *
    * @param pov The index of the POV to read (starting at 0). Defaults to 0.
@@ -160,7 +160,7 @@ public class GenericHID {
   /**
    * Get the angle in degrees of the default POV (index 0) on the HID.
    *
-   * <p>The POV angles start at 0 in the up direction, and increase clockwise (eg right is 90,
+   * <p>The POV angles start at 0 in the up direction, and increase clockwise (e.g. right is 90,
    * upper-left is 315).
    *
    * @return the angle of the POV in degrees, or -1 if the POV is not pressed.
@@ -186,7 +186,7 @@ public class GenericHID {
   /**
    * Constructs a BooleanEvent instance based around this angle of a POV on the HID.
    *
-   * <p>The POV angles start at 0 in the up direction, and increase clockwise (eg right is 90,
+   * <p>The POV angles start at 0 in the up direction, and increase clockwise (e.g. right is 90,
    * upper-left is 315).
    *
    * @param pov index of the POV to read (starting at 0). Defaults to 0.
@@ -352,10 +352,10 @@ public class GenericHID {
   }
 
   /**
-   * Get the axis type of a joystick axis.
+   * Get the axis type of joystick axis.
    *
    * @param axis The axis to read, starting at 0.
-   * @return the axis type of a joystick axis.
+   * @return the axis type of joystick axis.
    */
   public int getAxisType(int axis) {
     return DriverStation.getJoystickAxisType(m_port, axis);

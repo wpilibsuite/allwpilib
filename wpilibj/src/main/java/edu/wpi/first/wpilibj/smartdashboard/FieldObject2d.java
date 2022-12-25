@@ -64,7 +64,7 @@ public class FieldObject2d implements AutoCloseable {
   }
 
   /**
-   * Set multiple poses from an list of Pose objects. The total number of poses is limited to 85.
+   * Set multiple poses from a list of Pose objects. The total number of poses is limited to 85.
    *
    * @param poses list of 2D poses
    */
@@ -77,7 +77,7 @@ public class FieldObject2d implements AutoCloseable {
   }
 
   /**
-   * Set multiple poses from an list of Pose objects. The total number of poses is limited to 85.
+   * Set multiple poses from a list of Pose objects. The total number of poses is limited to 85.
    *
    * @param poses list of 2D poses
    */
