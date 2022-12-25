@@ -196,6 +196,8 @@ model {
                                         setFailOnNoMatchingTests(false)
                                     }
                                     testTask.classpath = sourceSets.test.runtimeClasspath
+                                    testTask.dependsOn it.tasks.install
+
                                     testTask.systemProperty 'junit.jupiter.extensions.autodetection.enabled', 'true'
                                     testTask.testLogging {
                                         events "failed"
