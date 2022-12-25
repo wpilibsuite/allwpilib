@@ -30,6 +30,8 @@ if (project.name != 'wpilibcExamples') {
 nativeUtils.setSinglePrintPerPlatform()
 nativeUtils.enableSourceLink()
 
+nativeUtils.wpi.addMacMinimumVersionArg()
+
 nativeUtils.platformConfigs.each {
     if (it.name.contains('osx')) {
         it.linker.args << '-Wl,-rpath,\'@loader_path\''
