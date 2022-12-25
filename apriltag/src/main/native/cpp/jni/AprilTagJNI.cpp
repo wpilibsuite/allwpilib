@@ -2,302 +2,594 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
+#include <cstdio>
+#include <cstring>
+
 #include <wpi/jni_util.h>
 
 #include "edu_wpi_first_apriltag_jni_AprilTagJNI.h"
+#include "frc/apriltag/AprilTagDetector.h"
+#include "frc/apriltag/AprilTagPoseEstimator.h"
 
-#ifdef _WIN32
-#pragma warning(push)
-#pragma warning(disable : 4200)
-#endif
-
-#if defined(__GNUC__)
-#pragma GCC diagnostic ignored "-Wpedantic"
-#endif
-#include "apriltag.h"
-#ifdef _WIN32
-#pragma warning(pop)
-#endif
-
-#include "tag36h11.h"
-#include "tag25h9.h"
-#include "tag16h5.h"
-#include "tagCircle21h7.h"
-#include "tagCircle49h12.h"
-#include "tagCustom48h12.h"
-#include "tagStandard41h12.h"
-#include "tagStandard52h13.h"
-#include "apriltag_pose.h"
-
-#include <vector>
-#include <algorithm>
-#include <cmath>
-
-#include <wpi/DenseMap.h>
-
+using namespace frc;
 using namespace wpi::java;
 
-namespace {
-template <typename T>
-using LambdaUniquePtr = std::unique_ptr<T, void (*)(T*)>;
+static JavaVM* jvm = nullptr;
 
-struct DetectorState {
-  LambdaUniquePtr<apriltag_family_t> tf;
-  LambdaUniquePtr<apriltag_detector_t> td;
-};
-}  // namespace
+static JClass detectionCls;
+static JClass detectorConfigCls;
+static JClass detectorQTPCls;
+static JClass poseEstimateCls;
+static JClass quaternionCls;
+static JClass rotation3dCls;
+static JClass transform3dCls;
+static JClass translation3dCls;
+static JException illegalArgEx;
+static JException nullPointerEx;
 
-static wpi::mutex detectorMutex;
-static wpi::DenseMap<jint, DetectorState> detectors;
-static jint detectorCount;
+static const JClassInit classes[] = {
+    {"edu/wpi/first/apriltag/AprilTagDetection", &detectionCls},
+    {"edu/wpi/first/apriltag/AprilTagDetector$Config", &detectorConfigCls},
+    {"edu/wpi/first/apriltag/AprilTagDetector$QuadThresholdParameters",
+     &detectorQTPCls},
+    {"edu/wpi/first/apriltag/AprilTagPoseEstimate", &poseEstimateCls},
+    {"edu/wpi/first/math/geometry/Quaternion", &quaternionCls},
+    {"edu/wpi/first/math/geometry/Rotation3d", &rotation3dCls},
+    {"edu/wpi/first/math/geometry/Transform3d", &transform3dCls},
+    {"edu/wpi/first/math/geometry/Translation3d", &translation3dCls}};
+
+static const JExceptionInit exceptions[] = {
+    {"java/lang/IllegalArgumentException", &illegalArgEx},
+    {"java/lang/NullPointerException", &nullPointerEx}};
 
 extern "C" {
 
-/*
- * Class:     edu_wpi_first_apriltag_jni_AprilTagJNI
- * Method:    aprilTagCreate
- * Signature: (Ljava/lang/String;DDIZZ)I
- */
-JNIEXPORT jint JNICALL
-Java_edu_wpi_first_apriltag_jni_AprilTagJNI_aprilTagCreate
-  (JNIEnv* env, jclass cls, jstring jstr, jdouble decimate, jdouble blur,
-   jint threads, jboolean debug, jboolean refine_edges)
-{
-  // Initialize tag detector with options
-  LambdaUniquePtr<apriltag_family_t> tf{nullptr, [](apriltag_family_t*) {}};
-
-  JStringRef famname(env, jstr);
-
-  using namespace std::string_view_literals;
-  if (famname.str().compare("tag36h11"sv) == 0) {
-    tf = {tag36h11_create(), tag36h11_destroy};
-  } else if (famname.str().compare("tag25h9"sv) == 0) {
-    tf = {tag25h9_create(), tag25h9_destroy};
-  } else if (famname.str().compare("tag16h5"sv) == 0) {
-    tf = {tag16h5_create(), tag16h5_destroy};
-  } else if (famname.str().compare("tagCircle21h7"sv) == 0) {
-    tf = {tagCircle21h7_create(), tagCircle21h7_destroy};
-  } else if (famname.str().compare("tagCircle49h12"sv) == 0) {
-    tf = {tagCircle49h12_create(), tagCircle49h12_destroy};
-  } else if (famname.str().compare("tagStandard41h12"sv) == 0) {
-    tf = {tagStandard41h12_create(), tagStandard41h12_destroy};
-  } else if (famname.str().compare("tagStandard52h13"sv) == 0) {
-    tf = {tagStandard52h13_create(), tagStandard52h13_destroy};
-  } else if (famname.str().compare("tagCustom48h12"sv) == 0) {
-    tf = {tagCustom48h12_create(), tagCustom48h12_destroy};
-  } else {
-    std::printf("Unrecognized tag family name. Use e.g. \"tag36h11\".\n");
-    return -1;
-  }
-
-  if (tf == nullptr) {
-    std::printf("Failed to allocate tag\n");
-    return -1;
-  }
-
-  LambdaUniquePtr<apriltag_detector_t> td{apriltag_detector_create(),
-                                          apriltag_detector_destroy};
-  if (td == nullptr) {
-    std::printf("Failed to allocate detector\n");
-    return -1;
-  }
-
-  apriltag_detector_add_family(td.get(), tf.get());
-  td->quad_decimate = static_cast<float>(decimate);
-  td->quad_sigma = static_cast<float>(blur);
-  td->nthreads = threads;
-  td->debug = debug;
-  td->refine_edges = refine_edges;
-
-  std::scoped_lock lock{detectorMutex};
-  jint idx = detectorCount++;
-  detectors.insert({idx, DetectorState{std::move(tf), std::move(td)}});
-  return idx;
-}
-
-static JClass detectionClass;
-
 JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM* vm, void* reserved) {
+  jvm = vm;
+
   JNIEnv* env;
   if (vm->GetEnv(reinterpret_cast<void**>(&env), JNI_VERSION_1_6) != JNI_OK) {
     return JNI_ERR;
   }
 
-  detectionClass = JClass(env, "edu/wpi/first/apriltag/jni/DetectionResult");
+  // Cache references to classes
+  for (auto& c : classes) {
+    *c.cls = JClass(env, c.name);
+    if (!*c.cls) {
+      std::fprintf(stderr, "could not load class %s\n", c.name);
+      return JNI_ERR;
+    }
+  }
 
-  if (!detectionClass) {
-    std::printf("Couldn't find class!");
-    return JNI_ERR;
+  for (auto& c : exceptions) {
+    *c.cls = JException(env, c.name);
+    if (!*c.cls) {
+      std::fprintf(stderr, "could not load exception %s\n", c.name);
+      return JNI_ERR;
+    }
   }
 
   return JNI_VERSION_1_6;
 }
 
-static jobject MakeJObject(JNIEnv* env, const apriltag_detection_t* detect,
-                           apriltag_pose_t& pose1, apriltag_pose_t& pose2,
-                           double error1, double error2) {
-  // Constructor signature must match Java! I = int, F = float, [D = double
-  // array
-  static jmethodID constructor =
-      env->GetMethodID(detectionClass, "<init>", "(IIF[DDD[D[D[DD[D[DD)V");
+JNIEXPORT void JNICALL JNI_OnUnload(JavaVM* vm, void* reserved) {
+  JNIEnv* env;
+  if (vm->GetEnv(reinterpret_cast<void**>(&env), JNI_VERSION_1_6) != JNI_OK) {
+    return;
+  }
+  // Delete global references
+  for (auto& c : classes) {
+    c.cls->free(env);
+  }
+  for (auto& c : exceptions) {
+    c.cls->free(env);
+  }
+  jvm = nullptr;
+}
 
+}  // extern "C"
+
+//
+// Conversions from Java to C++ objects
+//
+
+static AprilTagDetector::Config FromJavaDetectorConfig(JNIEnv* env,
+                                                       jobject jconfig) {
+  if (!jconfig) {
+    return {};
+  }
+#define FIELD(name, sig)                                          \
+  static jfieldID name##Field = nullptr;                          \
+  if (!name##Field) {                                             \
+    name##Field = env->GetFieldID(detectorConfigCls, #name, sig); \
+  }
+
+  FIELD(numThreads, "I");
+  FIELD(quadDecimate, "F");
+  FIELD(quadSigma, "F");
+  FIELD(refineEdges, "Z");
+  FIELD(decodeSharpening, "D");
+  FIELD(debug, "Z");
+
+#undef FIELD
+
+#define FIELD(ctype, jtype, name) \
+  .name = static_cast<ctype>(env->Get##jtype##Field(jconfig, name##Field))
+
+  return {
+      FIELD(int, Int, numThreads),
+      FIELD(float, Float, quadDecimate),
+      FIELD(float, Float, quadSigma),
+      FIELD(bool, Boolean, refineEdges),
+      FIELD(double, Double, decodeSharpening),
+      FIELD(bool, Boolean, debug),
+  };
+
+#undef GET
+#undef FIELD
+}
+
+static AprilTagDetector::QuadThresholdParameters FromJavaDetectorQTP(
+    JNIEnv* env, jobject jparams) {
+  if (!jparams) {
+    return {};
+  }
+#define FIELD(name, sig)                                       \
+  static jfieldID name##Field = nullptr;                       \
+  if (!name##Field) {                                          \
+    name##Field = env->GetFieldID(detectorQTPCls, #name, sig); \
+  }
+
+  FIELD(minClusterPixels, "I");
+  FIELD(maxNumMaxima, "I");
+  FIELD(criticalAngle, "D");
+  FIELD(maxLineFitMSE, "F");
+  FIELD(minWhiteBlackDiff, "I");
+  FIELD(deglitch, "Z");
+
+#undef FIELD
+
+#define FIELD(ctype, jtype, name) \
+  .name = static_cast<ctype>(env->Get##jtype##Field(jparams, name##Field))
+
+  return {
+      FIELD(int, Int, minClusterPixels),
+      FIELD(int, Int, maxNumMaxima),
+      .criticalAngle = units::radian_t{static_cast<double>(
+          env->GetDoubleField(jparams, criticalAngleField))},
+      FIELD(float, Float, maxLineFitMSE),
+      FIELD(int, Int, minWhiteBlackDiff),
+      FIELD(bool, Boolean, deglitch),
+  };
+
+#undef GET
+#undef FIELD
+}
+
+//
+// Conversions from C++ to Java objects
+//
+
+static jobject MakeJObject(JNIEnv* env, const AprilTagDetection& detect) {
+  static jmethodID constructor = env->GetMethodID(
+      detectionCls, "<init>", "(Ljava/lang/String;IIF[DDD[D)V");
   if (!constructor) {
     return nullptr;
   }
 
-  if (!detect) {
-    return nullptr;
-  }
+  JLocal<jstring> fam{env, MakeJString(env, detect.GetFamily())};
 
-  // We have to copy the homography matrix and coners into jdoubles
-  jdouble h[9];  // = new jdouble[9]{};
-  for (int i = 0; i < 9; i++) {
-    h[i] = detect->H->data[i];
-  }
+  auto homography = detect.GetHomography();
+  JLocal<jdoubleArray> harr{
+      env, MakeJDoubleArray(
+               env, {reinterpret_cast<const jdouble*>(homography.data()),
+                     homography.size()})};
 
-  jdouble corners[8];  // = new jdouble[8]{};
-  for (int i = 0; i < 4; i++) {
-    corners[i * 2] = detect->p[i][0];
-    corners[i * 2 + 1] = detect->p[i][1];
-  }
+  double cornersBuf[8];
+  auto corners = detect.GetCorners(cornersBuf);
+  JLocal<jdoubleArray> carr{
+      env,
+      MakeJDoubleArray(env, {reinterpret_cast<const jdouble*>(corners.data()),
+                             corners.size()})};
 
-  jdoubleArray harr = MakeJDoubleArray(env, {h, 9});
-  jdoubleArray carr = MakeJDoubleArray(env, {corners, 8});
+  auto center = detect.GetCenter();
 
-  // The rotation of the target is encoded as a 3 by 3 rotation matrix, we'll
-  // convert to a row-major array
-  jdouble pose1RotMat[9] = {0};
-  jdouble pose2RotMat[9] = {0};
-
-  for (int i = 0; i < 9; i++) {
-    if (pose1.R) {
-      pose1RotMat[i] = pose1.R->data[i];
-    }
-    if (pose2.R) {
-      pose2RotMat[i] = pose2.R->data[i];
-    }
-  }
-
-  // And translation a 3x1 vector (todo check axis order)
-  jdouble pose1Trans[3] = {0};
-  jdouble pose2Trans[3] = {0};
-  for (int i = 0; i < 3; i++) {
-    if (pose1.t) {
-      pose1Trans[i] = pose1.t->data[i];
-    }
-    if (pose2.t) {
-      pose2Trans[i] = pose2.t->data[i];
-    }
-  }
-
-  jdoubleArray pose1rotArr = MakeJDoubleArray(env, {pose1RotMat, 9});
-  jdoubleArray pose2rotArr = MakeJDoubleArray(env, {pose2RotMat, 9});
-  jdoubleArray pose1transArr = MakeJDoubleArray(env, {pose1Trans, 3});
-  jdoubleArray pose2transArr = MakeJDoubleArray(env, {pose2Trans, 3});
-  jdouble err1 = error1;
-  jdouble err2 = error2;
-
-  // Actually call the constructor
-  auto ret = env->NewObject(
-      detectionClass, constructor, (jint)detect->id, (jint)detect->hamming,
-      (jfloat)detect->decision_margin, harr, (jdouble)detect->c[0],
-      (jdouble)detect->c[1], carr, pose1transArr, pose1rotArr, err1,
-      pose2transArr, pose2rotArr, err2);
-
-  return ret;
+  return env->NewObject(detectionCls, constructor, fam.obj(),
+                        static_cast<jint>(detect.GetId()),
+                        static_cast<jint>(detect.GetHamming()),
+                        static_cast<jfloat>(detect.GetDecisionMargin()),
+                        harr.obj(), static_cast<jdouble>(center.x),
+                        static_cast<jdouble>(center.y), carr.obj());
 }
 
-/*
- * Class:     edu_wpi_first_apriltag_jni_AprilTagJNI
- * Method:    aprilTagDetectInternal
- * Signature: (IJIIZDDDDDI)[Ljava/lang/Object;
- */
-JNIEXPORT jobjectArray JNICALL
-Java_edu_wpi_first_apriltag_jni_AprilTagJNI_aprilTagDetectInternal
-  (JNIEnv* env, jclass cls, jint detectIdx, jlong pData, jint rows, jint cols,
-   jboolean doPoseEstimation, jdouble tagWidthMeters, jdouble fx, jdouble fy,
-   jdouble cx, jdouble cy, jint nIters)
-{
-  // No image, can't do anything
-  if (!pData) {
-    return nullptr;
-  }
-
-  // Make an image_u8_t header for the Mat data
-  image_u8_t im = {static_cast<int32_t>(cols), static_cast<int32_t>(rows),
-                   static_cast<int32_t>(cols),
-                   reinterpret_cast<uint8_t*>(pData)};
-
-  // Get our detector
-  DetectorState* state;
-  {
-    std::scoped_lock lock{detectorMutex};
-    auto detectorIterator = detectors.find((jint)detectIdx);
-    if (detectorIterator == detectors.end()) {
-      return nullptr;
-    }
-
-    state = &detectorIterator->second;
-  }
-
-  // And run the detector on our new image
-  zarray_t* detections = apriltag_detector_detect(state->td.get(), &im);
-
-  int size = zarray_size(detections);
-
-  // Object array to return to Java
-  jobjectArray jarr = env->NewObjectArray(size, detectionClass, nullptr);
+static jobjectArray MakeJObject(JNIEnv* env,
+                                std::span<const AprilTagDetection* const> arr) {
+  jobjectArray jarr = env->NewObjectArray(arr.size(), detectionCls, nullptr);
   if (!jarr) {
-    std::printf("Couldn't make array\n");
     return nullptr;
   }
-
-  // Global pose
-  apriltag_pose_t pose1;
-  std::memset(&pose1, 0, sizeof(pose1));
-
-  apriltag_pose_t pose2;
-  std::memset(&pose2, 0, sizeof(pose2));
-
-  // std::printf("Created array %llu! Got %i targets!\n", &jarr, size);
-  //  Add our detected targets to the array
-  for (int i = 0; i < size; ++i) {
-    apriltag_detection_t* det = nullptr;
-    zarray_get(detections, i, &det);
-
-    if (det != nullptr) {
-      double err1 =
-          HUGE_VAL;  // Should get overwritten if pose estimation is happening
-      double err2 = HUGE_VAL;
-      if (doPoseEstimation) {
-        // Feed results to the pose estimator
-        apriltag_detection_info_t info{det, tagWidthMeters, fx, fy, cx, cy};
-        estimate_tag_pose_orthogonal_iteration(&info, &err1, &pose1, &err2,
-                                               &pose2, nIters);
-      }
-
-      jobject obj = MakeJObject(env, det, pose1, pose2, err1, err2);
-
-      env->SetObjectArrayElement(jarr, i, obj);
-    }
+  for (size_t i = 0; i < arr.size(); ++i) {
+    JLocal<jobject> elem{env, MakeJObject(env, *arr[i])};
+    env->SetObjectArrayElement(jarr, i, elem.obj());
   }
-
-  // Now that stuff's in our Java-side array, we can clean up native memory
-  apriltag_detections_destroy(detections);
-
   return jarr;
 }
 
+static jobject MakeJObject(JNIEnv* env,
+                           const AprilTagDetector::Config& config) {
+  static jmethodID constructor =
+      env->GetMethodID(detectorConfigCls, "<init>", "(IFFZDZ)V");
+  if (!constructor) {
+    return nullptr;
+  }
+
+  return env->NewObject(detectorConfigCls, constructor,
+                        static_cast<jint>(config.numThreads),
+                        static_cast<jfloat>(config.quadDecimate),
+                        static_cast<jfloat>(config.quadSigma),
+                        static_cast<jboolean>(config.refineEdges),
+                        static_cast<jdouble>(config.decodeSharpening),
+                        static_cast<jboolean>(config.debug));
+}
+
+static jobject MakeJObject(
+    JNIEnv* env, const AprilTagDetector::QuadThresholdParameters& params) {
+  static jmethodID constructor =
+      env->GetMethodID(detectorQTPCls, "<init>", "(IIDFIZ)V");
+  if (!constructor) {
+    return nullptr;
+  }
+
+  return env->NewObject(detectorQTPCls, constructor,
+                        static_cast<jint>(params.minClusterPixels),
+                        static_cast<jint>(params.maxNumMaxima),
+                        static_cast<jdouble>(params.criticalAngle),
+                        static_cast<jfloat>(params.maxLineFitMSE),
+                        static_cast<jint>(params.minWhiteBlackDiff),
+                        static_cast<jboolean>(params.deglitch));
+}
+
+static jobject MakeJObject(JNIEnv* env, const Translation3d& xlate) {
+  static jmethodID constructor =
+      env->GetMethodID(translation3dCls, "<init>", "(DDD)V");
+  if (!constructor) {
+    return nullptr;
+  }
+
+  return env->NewObject(
+      translation3dCls, constructor, static_cast<jdouble>(xlate.X()),
+      static_cast<jdouble>(xlate.Y()), static_cast<jdouble>(xlate.Z()));
+}
+
+static jobject MakeJObject(JNIEnv* env, const Quaternion& q) {
+  static jmethodID constructor =
+      env->GetMethodID(quaternionCls, "<init>", "(DDDD)V");
+  if (!constructor) {
+    return nullptr;
+  }
+
+  return env->NewObject(quaternionCls, constructor, static_cast<jdouble>(q.W()),
+                        static_cast<jdouble>(q.X()),
+                        static_cast<jdouble>(q.Y()),
+                        static_cast<jdouble>(q.Z()));
+}
+
+static jobject MakeJObject(JNIEnv* env, const Rotation3d& rot) {
+  static jmethodID constructor = env->GetMethodID(
+      rotation3dCls, "<init>", "(Ledu/wpi/first/math/geometry/Quaternion;)V");
+  if (!constructor) {
+    return nullptr;
+  }
+
+  JLocal<jobject> q{env, MakeJObject(env, rot.GetQuaternion())};
+  return env->NewObject(rotation3dCls, constructor, q.obj());
+}
+
+static jobject MakeJObject(JNIEnv* env, const Transform3d& xform) {
+  static jmethodID constructor =
+      env->GetMethodID(transform3dCls, "<init>",
+                       "(Ledu/wpi/first/math/geometry/Translation3d;"
+                       "Ledu/wpi/first/math/geometry/Rotation3d;)V");
+  if (!constructor) {
+    return nullptr;
+  }
+
+  JLocal<jobject> xlate{env, MakeJObject(env, xform.Translation())};
+  JLocal<jobject> rot{env, MakeJObject(env, xform.Rotation())};
+  return env->NewObject(transform3dCls, constructor, xlate.obj(), rot.obj());
+}
+
+static jobject MakeJObject(JNIEnv* env, const AprilTagPoseEstimate& est) {
+  static jmethodID constructor =
+      env->GetMethodID(poseEstimateCls, "<init>",
+                       "(Ledu/wpi/first/math/geometry/Transform3d;"
+                       "Ledu/wpi/first/math/geometry/Transform3d;DD)V");
+  if (!constructor) {
+    return nullptr;
+  }
+
+  JLocal<jobject> pose1{env, MakeJObject(env, est.pose1)};
+  JLocal<jobject> pose2{env, MakeJObject(env, est.pose2)};
+  return env->NewObject(poseEstimateCls, constructor, pose1.obj(), pose2.obj(),
+                        static_cast<jdouble>(est.error1),
+                        static_cast<jdouble>(est.error2));
+}
+
+extern "C" {
+
 /*
  * Class:     edu_wpi_first_apriltag_jni_AprilTagJNI
- * Method:    aprilTagDestroy
- * Signature: (I)V
+ * Method:    createDetector
+ * Signature: ()J
+ */
+JNIEXPORT jlong JNICALL
+Java_edu_wpi_first_apriltag_jni_AprilTagJNI_createDetector
+  (JNIEnv* env, jclass)
+{
+  return reinterpret_cast<jlong>(new AprilTagDetector);
+}
+
+/*
+ * Class:     edu_wpi_first_apriltag_jni_AprilTagJNI
+ * Method:    destroyDetector
+ * Signature: (J)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_apriltag_jni_AprilTagJNI_aprilTagDestroy
-  (JNIEnv* env, jclass clazz, jint detectIdx)
+Java_edu_wpi_first_apriltag_jni_AprilTagJNI_destroyDetector
+  (JNIEnv* env, jclass, jlong det)
 {
-  std::scoped_lock lock{detectorMutex};
-  detectors.erase(detectIdx);
+  delete reinterpret_cast<AprilTagDetector*>(det);
 }
+
+/*
+ * Class:     edu_wpi_first_apriltag_jni_AprilTagJNI
+ * Method:    setDetectorConfig
+ * Signature: (JLjava/lang/Object;)V
+ */
+JNIEXPORT void JNICALL
+Java_edu_wpi_first_apriltag_jni_AprilTagJNI_setDetectorConfig
+  (JNIEnv* env, jclass, jlong det, jobject config)
+{
+  if (det == 0) {
+    nullPointerEx.Throw(env, "det cannot be null");
+    return;
+  }
+  reinterpret_cast<AprilTagDetector*>(det)->SetConfig(
+      FromJavaDetectorConfig(env, config));
+}
+
+/*
+ * Class:     edu_wpi_first_apriltag_jni_AprilTagJNI
+ * Method:    getDetectorConfig
+ * Signature: (J)Ljava/lang/Object;
+ */
+JNIEXPORT jobject JNICALL
+Java_edu_wpi_first_apriltag_jni_AprilTagJNI_getDetectorConfig
+  (JNIEnv* env, jclass, jlong det)
+{
+  if (det == 0) {
+    nullPointerEx.Throw(env, "det cannot be null");
+    return nullptr;
+  }
+  return MakeJObject(env,
+                     reinterpret_cast<AprilTagDetector*>(det)->GetConfig());
+}
+
+/*
+ * Class:     edu_wpi_first_apriltag_jni_AprilTagJNI
+ * Method:    setDetectorQTP
+ * Signature: (JLjava/lang/Object;)V
+ */
+JNIEXPORT void JNICALL
+Java_edu_wpi_first_apriltag_jni_AprilTagJNI_setDetectorQTP
+  (JNIEnv* env, jclass, jlong det, jobject params)
+{
+  if (det == 0) {
+    nullPointerEx.Throw(env, "det cannot be null");
+    return;
+  }
+  reinterpret_cast<AprilTagDetector*>(det)->SetQuadThresholdParameters(
+      FromJavaDetectorQTP(env, params));
+}
+
+/*
+ * Class:     edu_wpi_first_apriltag_jni_AprilTagJNI
+ * Method:    getDetectorQTP
+ * Signature: (J)Ljava/lang/Object;
+ */
+JNIEXPORT jobject JNICALL
+Java_edu_wpi_first_apriltag_jni_AprilTagJNI_getDetectorQTP
+  (JNIEnv* env, jclass, jlong det)
+{
+  if (det == 0) {
+    nullPointerEx.Throw(env, "det cannot be null");
+    return nullptr;
+  }
+  return MakeJObject(
+      env,
+      reinterpret_cast<AprilTagDetector*>(det)->GetQuadThresholdParameters());
+}
+
+/*
+ * Class:     edu_wpi_first_apriltag_jni_AprilTagJNI
+ * Method:    addFamily
+ * Signature: (JLjava/lang/String;I)Z
+ */
+JNIEXPORT jboolean JNICALL
+Java_edu_wpi_first_apriltag_jni_AprilTagJNI_addFamily
+  (JNIEnv* env, jclass, jlong det, jstring fam, jint bitsCorrected)
+{
+  if (det == 0) {
+    nullPointerEx.Throw(env, "det cannot be null");
+    return false;
+  }
+  if (!fam) {
+    nullPointerEx.Throw(env, "fam cannot be null");
+    return false;
+  }
+  return reinterpret_cast<AprilTagDetector*>(det)->AddFamily(
+      JStringRef{env, fam}, bitsCorrected);
+}
+
+/*
+ * Class:     edu_wpi_first_apriltag_jni_AprilTagJNI
+ * Method:    removeFamily
+ * Signature: (JLjava/lang/String;)V
+ */
+JNIEXPORT void JNICALL
+Java_edu_wpi_first_apriltag_jni_AprilTagJNI_removeFamily
+  (JNIEnv* env, jclass, jlong det, jstring fam)
+{
+  if (det == 0) {
+    nullPointerEx.Throw(env, "det cannot be null");
+    return;
+  }
+  if (!fam) {
+    nullPointerEx.Throw(env, "fam cannot be null");
+    return;
+  }
+  reinterpret_cast<AprilTagDetector*>(det)->RemoveFamily(JStringRef{env, fam});
+}
+
+/*
+ * Class:     edu_wpi_first_apriltag_jni_AprilTagJNI
+ * Method:    clearFamilies
+ * Signature: (J)V
+ */
+JNIEXPORT void JNICALL
+Java_edu_wpi_first_apriltag_jni_AprilTagJNI_clearFamilies
+  (JNIEnv* env, jclass, jlong det)
+{
+  if (det == 0) {
+    nullPointerEx.Throw(env, "det cannot be null");
+    return;
+  }
+  reinterpret_cast<AprilTagDetector*>(det)->ClearFamilies();
+}
+
+/*
+ * Class:     edu_wpi_first_apriltag_jni_AprilTagJNI
+ * Method:    detect
+ * Signature: (JIIIJ)[Ljava/lang/Object;
+ */
+JNIEXPORT jobjectArray JNICALL
+Java_edu_wpi_first_apriltag_jni_AprilTagJNI_detect
+  (JNIEnv* env, jclass, jlong det, jint width, jint height, jint stride,
+   jlong bufAddr)
+{
+  if (det == 0) {
+    nullPointerEx.Throw(env, "det cannot be null");
+    return nullptr;
+  }
+  if (bufAddr == 0) {
+    nullPointerEx.Throw(env, "bufAddr cannot be null");
+    return nullptr;
+  }
+  return MakeJObject(
+      env, reinterpret_cast<AprilTagDetector*>(det)->Detect(
+               width, height, stride, reinterpret_cast<uint8_t*>(bufAddr)));
+}
+
+/*
+ * Class:     edu_wpi_first_apriltag_jni_AprilTagJNI
+ * Method:    estimatePoseHomography
+ * Signature: ([DDDDDD)Ljava/lang/Object;
+ */
+JNIEXPORT jobject JNICALL
+Java_edu_wpi_first_apriltag_jni_AprilTagJNI_estimatePoseHomography
+  (JNIEnv* env, jclass, jdoubleArray homography, jdouble tagSize, jdouble fx,
+   jdouble fy, jdouble cx, jdouble cy)
+{
+  if (!homography) {
+    nullPointerEx.Throw(env, "homography cannot be null");
+    return nullptr;
+  }
+  JDoubleArrayRef harr{env, homography};
+  if (harr.size() != 9) {
+    illegalArgEx.Throw(env, "homography array must be size 9");
+    return nullptr;
+  }
+
+  AprilTagPoseEstimator estimator({units::meter_t{tagSize}, fx, fy, cx, cy});
+  return MakeJObject(env, estimator.EstimateHomography(
+                              std::span<const double, 9>{harr.array()}));
+}
+
+/*
+ * Class:     edu_wpi_first_apriltag_jni_AprilTagJNI
+ * Method:    estimatePoseOrthogonalIteration
+ * Signature: ([D[DDDDDDI)Ljava/lang/Object;
+ */
+JNIEXPORT jobject JNICALL
+Java_edu_wpi_first_apriltag_jni_AprilTagJNI_estimatePoseOrthogonalIteration
+  (JNIEnv* env, jclass, jdoubleArray homography, jdoubleArray corners,
+   jdouble tagSize, jdouble fx, jdouble fy, jdouble cx, jdouble cy, jint nIters)
+{
+  // homography
+  if (!homography) {
+    nullPointerEx.Throw(env, "homography cannot be null");
+    return nullptr;
+  }
+  JDoubleArrayRef harr{env, homography};
+  if (harr.size() != 9) {
+    illegalArgEx.Throw(env, "homography array must be size 9");
+    return nullptr;
+  }
+
+  // corners
+  if (!corners) {
+    nullPointerEx.Throw(env, "corners cannot be null");
+    return nullptr;
+  }
+  JDoubleArrayRef carr{env, corners};
+  if (carr.size() != 8) {
+    illegalArgEx.Throw(env, "corners array must be size 8");
+    return nullptr;
+  }
+
+  AprilTagPoseEstimator estimator({units::meter_t{tagSize}, fx, fy, cx, cy});
+  return MakeJObject(env,
+                     estimator.EstimateOrthogonalIteration(
+                         std::span<const double, 9>{harr.array()},
+                         std::span<const double, 8>{carr.array()}, nIters));
+}
+
+/*
+ * Class:     edu_wpi_first_apriltag_jni_AprilTagJNI
+ * Method:    estimatePose
+ * Signature: ([D[DDDDDD)Ljava/lang/Object;
+ */
+JNIEXPORT jobject JNICALL
+Java_edu_wpi_first_apriltag_jni_AprilTagJNI_estimatePose
+  (JNIEnv* env, jclass, jdoubleArray homography, jdoubleArray corners,
+   jdouble tagSize, jdouble fx, jdouble fy, jdouble cx, jdouble cy)
+{
+  // homography
+  if (!homography) {
+    nullPointerEx.Throw(env, "homography cannot be null");
+    return nullptr;
+  }
+  JDoubleArrayRef harr{env, homography};
+  if (harr.size() != 9) {
+    illegalArgEx.Throw(env, "homography array must be size 9");
+    return nullptr;
+  }
+
+  // corners
+  if (!corners) {
+    nullPointerEx.Throw(env, "corners cannot be null");
+    return nullptr;
+  }
+  JDoubleArrayRef carr{env, corners};
+  if (carr.size() != 8) {
+    illegalArgEx.Throw(env, "corners array must be size 8");
+    return nullptr;
+  }
+
+  AprilTagPoseEstimator estimator({units::meter_t{tagSize}, fx, fy, cx, cy});
+  return MakeJObject(
+      env, estimator.Estimate(std::span<const double, 9>{harr.array()},
+                              std::span<const double, 8>{carr.array()}));
+}
+
 }  // extern "C"
