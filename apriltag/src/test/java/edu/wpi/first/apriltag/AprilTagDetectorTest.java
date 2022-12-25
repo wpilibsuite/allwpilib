@@ -166,6 +166,10 @@ class AprilTagDetectorTest {
     }
   }
 
+  /**
+   * This tag is rotated such that the top is closer to the camera than the bottom. In the camera
+   * frame, with +x to the right, this is a rotation about +X by 45 degrees.
+   */
   @Test
   void testPoseRotatedX() {
     detector.addFamily("tag16h5");
@@ -194,6 +198,10 @@ class AprilTagDetectorTest {
     }
   }
 
+  /**
+   * This tag is rotated such that the right is closer to the camera than the left. In the camera
+   * frame, with +y down, this is a rotation of 45 degrees about +y.
+   */
   @Test
   void testPoseRotatedY() {
     detector.addFamily("tag16h5");
@@ -222,6 +230,7 @@ class AprilTagDetectorTest {
     }
   }
 
+  /** This tag is facing right at the camera -- no rotation should be observed. */
   @Test
   void testPoseStraightOn() {
     detector.addFamily("tag16h5");
