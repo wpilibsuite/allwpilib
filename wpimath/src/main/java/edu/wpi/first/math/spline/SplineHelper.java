@@ -46,7 +46,7 @@ public final class SplineHelper {
    * Returns quintic splines from a set of waypoints.
    *
    * @param waypoints The waypoints
-   * @return List of splines.
+   * @return array of splines.
    */
   public static QuinticHermiteSpline[] getQuinticSplinesFromWaypoints(List<Pose2d> waypoints) {
     QuinticHermiteSpline[] splines = new QuinticHermiteSpline[waypoints.size() - 1];

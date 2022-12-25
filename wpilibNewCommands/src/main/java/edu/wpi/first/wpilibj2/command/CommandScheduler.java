@@ -103,10 +103,7 @@ public final class CommandScheduler implements NTSendable, AutoCloseable {
           disable();
           cancelAll();
         });
-    LiveWindow.setDisabledListener(
-        () -> {
-          enable();
-        });
+    LiveWindow.setDisabledListener(this::enable);
   }
 
   /**

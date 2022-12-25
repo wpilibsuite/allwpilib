@@ -36,8 +36,7 @@ public class DataLogReader implements Iterable<DataLogRecord> {
   public DataLogReader(String filename) throws IOException {
     RandomAccessFile f = new RandomAccessFile(filename, "r");
     FileChannel channel = f.getChannel();
-    MappedByteBuffer buf = channel.map(FileChannel.MapMode.READ_ONLY, 0, channel.size());
-    m_buf = buf;
+    m_buf = channel.map(FileChannel.MapMode.READ_ONLY, 0, channel.size());
     m_buf.order(ByteOrder.LITTLE_ENDIAN);
     channel.close();
     f.close();

@@ -15,7 +15,7 @@ public class PubSubOption {
     disableRemote,
     disableLocal,
     excludePublisher,
-    excludeSelf;
+    excludeSelf
   }
 
   PubSubOption(Kind kind, boolean value) {
