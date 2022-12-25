@@ -13,6 +13,7 @@
 #include "cscore_cpp.h"
 #include "cscore_cv.h"
 #include "cscore_raw.h"
+#include "cscore_runloop.h"
 #include "edu_wpi_first_cscore_CameraServerJNI.h"
 
 namespace cv {
@@ -2224,6 +2225,42 @@ Java_edu_wpi_first_cscore_CameraServerJNI_freeRawFrame
   cs::RawFrame* ptr =
       reinterpret_cast<cs::RawFrame*>(static_cast<intptr_t>(rawFrame));
   delete ptr;
+}
+
+/*
+ * Class:     edu_wpi_first_cscore_CameraServerJNI
+ * Method:    runOsxRunLoop
+ * Signature: ()V
+ */
+JNIEXPORT void JNICALL
+Java_edu_wpi_first_cscore_CameraServerJNI_runOsxRunLoop
+  (JNIEnv*, jclass)
+{
+  cs::RunOsxRunLoop();
+}
+
+/*
+ * Class:     edu_wpi_first_cscore_CameraServerJNI
+ * Method:    runOsxRunLoopTimeout
+ * Signature: (D)I
+ */
+JNIEXPORT jint JNICALL
+Java_edu_wpi_first_cscore_CameraServerJNI_runOsxRunLoopTimeout
+  (JNIEnv*, jclass, jdouble timeoutSeconds)
+{
+  return cs::RunOsxRunLoopTimeout(timeoutSeconds);
+}
+
+/*
+ * Class:     edu_wpi_first_cscore_CameraServerJNI
+ * Method:    stopOsxMainRunLoop
+ * Signature: ()V
+ */
+JNIEXPORT void JNICALL
+Java_edu_wpi_first_cscore_CameraServerJNI_stopOsxMainRunLoop
+  (JNIEnv*, jclass)
+{
+  return cs::StopOsxMainRunLoop();
 }
 
 }  // extern "C"

@@ -154,7 +154,7 @@ template <typename T>
 inline std::span<T>
 UnlimitedHandleResource<THandle, TStruct, typeValue, TMutex>::GetAll(
     wpi::SmallVectorImpl<T>& vec) {
-  ForEach([&](THandle handle, const TStruct& data) { vec.push_back(handle); });
+  ForEach([&](THandle handle, const TStruct&) { vec.push_back(handle); });
   return vec;
 }
 

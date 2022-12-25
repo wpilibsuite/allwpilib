@@ -390,4 +390,10 @@ public class CameraServerJNI {
   public static native long allocateRawFrame();
 
   public static native void freeRawFrame(long frame);
+
+  public static native void runOsxRunLoop();
+
+  public static native int runOsxRunLoopTimeout(double timeoutSeconds);
+
+  public static native void stopOsxMainRunLoop();
 }
