@@ -4,10 +4,9 @@
 
 package edu.wpi.first.net;
 
+import edu.wpi.first.util.WpiCleaner;
 import java.lang.ref.Cleaner.Cleanable;
 import java.util.Map;
-
-import edu.wpi.first.util.WpiCleaner;
 
 /** Class to announce over mDNS that a service is available. */
 public class MulticastServiceAnnouncer implements AutoCloseable {
@@ -19,16 +18,19 @@ public class MulticastServiceAnnouncer implements AutoCloseable {
    *
    * @param serviceName service name
    * @param serviceType service type
-   * @param port        port
-   * @param txt         txt
+   * @param port port
+   * @param txt txt
    */
   public MulticastServiceAnnouncer(
       String serviceName, String serviceType, int port, Map<String, String> txt) {
     String[] keys = txt.keySet().toArray(String[]::new);
     String[] values = txt.values().toArray(String[]::new);
-    m_handle = WPINetJNI.createMulticastServiceAnnouncer(serviceName, serviceType, port, keys, values);
+    m_handle =
+        WPINetJNI.createMulticastServiceAnnouncer(serviceName, serviceType, port, keys, values);
     int localHandle = m_handle;
-    m_cleanable = WpiCleaner.getInstance().register(this, () -> WPINetJNI.freeMulticastServiceAnnouncer(localHandle));
+    m_cleanable =
+        WpiCleaner.getInstance()
+            .register(this, () -> WPINetJNI.freeMulticastServiceAnnouncer(localHandle));
   }
 
   /**
@@ -36,12 +38,15 @@ public class MulticastServiceAnnouncer implements AutoCloseable {
    *
    * @param serviceName service name
    * @param serviceType service type
-   * @param port        port
+   * @param port port
    */
   public MulticastServiceAnnouncer(String serviceName, String serviceType, int port) {
-    m_handle = WPINetJNI.createMulticastServiceAnnouncer(serviceName, serviceType, port, null, null);
+    m_handle =
+        WPINetJNI.createMulticastServiceAnnouncer(serviceName, serviceType, port, null, null);
     int localHandle = m_handle;
-    m_cleanable = WpiCleaner.getInstance().register(this, () -> WPINetJNI.freeMulticastServiceAnnouncer(localHandle));
+    m_cleanable =
+        WpiCleaner.getInstance()
+            .register(this, () -> WPINetJNI.freeMulticastServiceAnnouncer(localHandle));
   }
 
   @Override

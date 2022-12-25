@@ -2,7 +2,7 @@ package edu.wpi.first.util;
 
 import java.lang.ref.Cleaner;
 
-public class WpiCleaner {
+public final class WpiCleaner {
 
   private WpiCleaner() {
     throw new UnsupportedOperationException("This is a utility class!");
@@ -10,7 +10,12 @@ public class WpiCleaner {
 
   private static Cleaner instance;
 
-  public synchronized static Cleaner getInstance() {
+  /**
+   * Gets the global WPI cleaner instance.
+   *
+   * @return global cleaner instance.
+   */
+  public static synchronized Cleaner getInstance() {
     if (instance == null) {
       instance = Cleaner.create();
     }
