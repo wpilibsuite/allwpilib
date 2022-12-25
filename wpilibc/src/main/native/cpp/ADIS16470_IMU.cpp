@@ -195,7 +195,7 @@ bool ADIS16470_IMU::SwitchToStandardSPI() {
          */
         m_spi->ReadAutoReceivedData(trashBuffer, std::min(data_count, 200),
                                     0_s);
-        /*Get the reamining data count */
+        /*Get the remaining data count */
         data_count = m_spi->ReadAutoReceivedData(trashBuffer, 0, 0_s);
       }
     }
@@ -485,7 +485,7 @@ ADIS16470_IMU::~ADIS16470_IMU() {
  * @brief Main acquisition loop. Typically called asynchronously and free-wheels
  *while the robot code is active.
  *
- * This is the main acquisiton loop for the IMU. During each iteration, data
+ * This is the main acquisition loop for the IMU. During each iteration, data
  *read using auto SPI is extracted from the FPGA FIFO, split, scaled, and
  *integrated. Each X, Y, and Z value is 32-bits split across 4 indices (bytes)
  *in the buffer. Auto SPI puts one byte in each index location. Each index is

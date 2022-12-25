@@ -23,7 +23,7 @@ class EventLoop;
  */
 class GenericHID {
  public:
-  enum RumbleType { kLeftRumble, kRightRumble };
+  enum RumbleType { kLeftRumble, kRightRumble, kBothRumble };
 
   enum HIDType {
     kUnknown = -1,

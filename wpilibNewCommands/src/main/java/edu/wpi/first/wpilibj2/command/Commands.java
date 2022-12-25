@@ -105,7 +105,7 @@ public final class Commands {
   }
 
   /**
-   * Constructs a command that does nothing, finishing once a command becomes true.
+   * Constructs a command that does nothing, finishing once a condition becomes true.
    *
    * @param condition the condition
    * @return the command
