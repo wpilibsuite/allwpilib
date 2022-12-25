@@ -3,11 +3,34 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #include "cscore_runloop.h"
+#include <wpi/Synchronization.h>
+
+static wpi::Event& GetInstance() {
+  static wpi::Event event;
+  return event;
+}
 
 namespace cs {
-void RunOsxRunLoop() {}
-int RunOsxRunLoopTimeout(double timeoutSeconds) {
-  return 0;
+void RunMainRunLoop() {
+  wpi::Event& event = GetInstance();
+  wpi::WaitForObject(event.GetHandle());
 }
-void StopOsxMainRunLoop() {}
+
+int RunMainRunLoopTimeout(double timeoutSeconds) {
+  wpi::Event& event = GetInstance();
+  bool timedOut = false;
+  bool signaled = wpi::WaitForObject(event.GetHandle(), timeoutSeconds, &timedOut);
+  if (timedOut) {
+    return 3;
+  }
+  if (signaled) {
+    return 2;
+  }
+  return 1;
+}
+
+void StopMainRunLoop() {
+  wpi::Event& event = GetInstance();
+  event.Set();
+}
 }  // namespace cs

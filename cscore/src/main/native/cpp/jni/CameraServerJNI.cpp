@@ -2229,38 +2229,38 @@ Java_edu_wpi_first_cscore_CameraServerJNI_freeRawFrame
 
 /*
  * Class:     edu_wpi_first_cscore_CameraServerJNI
- * Method:    runOsxRunLoop
+ * Method:    runMainRunLoop
  * Signature: ()V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_cscore_CameraServerJNI_runOsxRunLoop
+Java_edu_wpi_first_cscore_CameraServerJNI_runMainRunLoop
   (JNIEnv*, jclass)
 {
-  cs::RunOsxRunLoop();
+  cs::RunMainRunLoop();
 }
 
 /*
  * Class:     edu_wpi_first_cscore_CameraServerJNI
- * Method:    runOsxRunLoopTimeout
+ * Method:    runMainRunLoopTimeout
  * Signature: (D)I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_first_cscore_CameraServerJNI_runOsxRunLoopTimeout
+Java_edu_wpi_first_cscore_CameraServerJNI_runMainRunLoopTimeout
   (JNIEnv*, jclass, jdouble timeoutSeconds)
 {
-  return cs::RunOsxRunLoopTimeout(timeoutSeconds);
+  return cs::RunMainRunLoopTimeout(timeoutSeconds);
 }
 
 /*
  * Class:     edu_wpi_first_cscore_CameraServerJNI
- * Method:    stopOsxMainRunLoop
+ * Method:    stopMainRunLoop
  * Signature: ()V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_cscore_CameraServerJNI_stopOsxMainRunLoop
+Java_edu_wpi_first_cscore_CameraServerJNI_stopMainRunLoop
   (JNIEnv*, jclass)
 {
-  return cs::StopOsxMainRunLoop();
+  return cs::StopMainRunLoop();
 }
 
 }  // extern "C"
