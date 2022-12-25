@@ -114,8 +114,8 @@ public class AprilTagFieldLayout {
    * Sets the origin based on a predefined enumeration of coordinate frame origins. The origins are
    * calculated from the field dimensions.
    *
-   * <p>This transforms the Pose3d objects returned by {@link #getTagPose(int)} to return the correct pose
-   * relative to a predefined coordinate frame.
+   * <p>This transforms the Pose3d objects returned by {@link #getTagPose(int)} to return the
+   * correct pose relative to a predefined coordinate frame.
    *
    * @param origin The predefined origin
    */
@@ -139,8 +139,8 @@ public class AprilTagFieldLayout {
   /**
    * Sets the origin for tag pose transformation.
    *
-   * <p>This transforms the Pose3d objects returned by {@link #getTagPose(int)} to return the correct pose
-   * relative to the provided origin.
+   * <p>This transforms the Pose3d objects returned by {@link #getTagPose(int)} to return the
+   * correct pose relative to the provided origin.
    *
    * @param origin The new origin for tag transformations
    */
