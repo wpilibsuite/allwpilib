@@ -116,7 +116,7 @@ public class Ultrasonic implements Sendable, AutoCloseable {
   }
 
   /**
-   * Create an instance of the Ultrasonic Sensor. This is designed to sub channel the Daventech
+   * Create an instance of the Ultrasonic Sensor. This is designed to support the Daventech
    * SRF04 and Vex ultrasonic sensors.
    *
    * @param pingChannel The digital output channel that sends the pulse to initiate the sensor

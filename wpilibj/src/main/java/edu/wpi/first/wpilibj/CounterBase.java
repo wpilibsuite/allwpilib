@@ -13,7 +13,7 @@ package edu.wpi.first.wpilibj;
  * before use.
  */
 public interface CounterBase {
-  /** The number of edges for the counter-base to increment or decrement on. */
+  /** The number of edges for the CounterBase to increment or decrement on. */
   enum EncodingType {
     /** Count only the rising edge. */
     k1X(0),

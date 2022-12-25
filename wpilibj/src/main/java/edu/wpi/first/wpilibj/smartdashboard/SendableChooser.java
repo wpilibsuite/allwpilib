@@ -43,7 +43,7 @@ public class SendableChooser<V> implements NTSendable, AutoCloseable {
   private static final String OPTIONS = "options";
   /** The key for the instance number. */
   private static final String INSTANCE = ".instance";
-  /** A map linking strings to the objects to represent. */
+  /** A map linking strings to the objects they represent. */
   private final Map<String, V> m_map = new LinkedHashMap<>();
 
   private String m_defaultChoice = "";

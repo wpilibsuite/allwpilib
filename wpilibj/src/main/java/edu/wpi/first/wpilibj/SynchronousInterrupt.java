@@ -108,7 +108,7 @@ public class SynchronousInterrupt implements AutoCloseable {
 
     // Rising edge result is the interrupt bit set in the byte 0xFF
     // Falling edge result is the interrupt bit set in the byte 0xFF00
-    // Set any bit set to be true for that edge, and the 2 results
+    // Set any bit set to be true for that edge, and then conduct a logical AND on the 2 results
     // together to match the existing enum for all interrupts
     boolean rising = (result & 0xFF) != 0;
     boolean falling = (result & 0xFF00) != 0;

@@ -63,9 +63,9 @@ public class QuinticHermiteSpline extends Spline {
   }
 
   /**
-   * Returns the coefficients' matrix.
+   * Returns the matrix containing the coefficients.
    *
-   * @return The coefficients' matrix.
+   * @return matrix containing the coefficients.
    */
   @Override
   protected SimpleMatrix getCoefficients() {

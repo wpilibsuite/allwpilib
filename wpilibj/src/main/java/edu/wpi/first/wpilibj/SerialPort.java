@@ -326,7 +326,7 @@ public class SerialPort implements AutoCloseable {
   /**
    * Reset the serial port driver to a known state.
    *
-   * <p>Empty to transmit and receive buffers in the device and formatted I/O.
+   * <p>Empty the transmit and receive buffers in the device and formatted I/O.
    */
   public void reset() {
     SerialPortJNI.serialClear(m_portHandle);

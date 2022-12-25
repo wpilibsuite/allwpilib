@@ -211,7 +211,7 @@ public class DetectionResult {
     a.getQ(Q, false);
     a.getR(R, false);
 
-    // Fix signs in R if they're < 0, so it's close to an identity matrix
+    // Fix signs in R if they're < 0 so it's close to an identity matrix
     // (our QR decomposition implementation sometimes flips the signs of columns)
     for (int colR = 0; colR < 3; ++colR) {
       if (R.get(colR, colR) < 0) {

@@ -352,7 +352,7 @@ public class GenericHID {
   }
 
   /**
-   * Get the axis type of joystick axis.
+   * Get the axis type of the provided joystick axis.
    *
    * @param axis The axis to read, starting at 0.
    * @return the axis type of joystick axis.

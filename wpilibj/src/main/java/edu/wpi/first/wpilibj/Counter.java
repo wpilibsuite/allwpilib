@@ -331,7 +331,7 @@ public class Counter implements CounterBase, Sendable, AutoCloseable {
 
   /**
    * Set standard up / down counting mode on this counter. Up and down counts are sourced
-   * independently of two inputs.
+   * independently from two inputs.
    */
   public void setUpDownCounterMode() {
     CounterJNI.setCounterUpDownMode(m_counter);
