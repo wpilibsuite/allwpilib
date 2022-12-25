@@ -9,6 +9,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.fail;
 
 import edu.wpi.first.math.geometry.Transform3d;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.util.RuntimeLoader;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -160,6 +161,99 @@ class AprilTagDetectorTest {
       assertEquals(new Transform3d(), est.pose2);
       Transform3d pose = estimator.estimate(results[0]);
       assertEquals(est.pose1, pose);
+    } finally {
+      image.release();
+    }
+  }
+
+  /**
+   * This tag is rotated such that the top is closer to the camera than the bottom. In the camera
+   * frame, with +x to the right, this is a rotation about +X by 45 degrees.
+   */
+  @Test
+  void testPoseRotatedX() {
+    detector.addFamily("tag16h5");
+
+    Mat image;
+    try {
+      image = loadImage("tag2_45deg_X.png");
+    } catch (IOException ex) {
+      fail(ex);
+      return;
+    }
+    try {
+      AprilTagDetection[] results = detector.detect(image);
+      assertEquals(1, results.length);
+
+      var estimator =
+          new AprilTagPoseEstimator(
+              new AprilTagPoseEstimator.Config(0.2, 500, 500, image.cols() / 2, image.rows() / 2));
+      AprilTagPoseEstimate est = estimator.estimateOrthogonalIteration(results[0], 50);
+
+      assertEquals(Units.degreesToRadians(45), est.pose1.getRotation().getX(), 0.1);
+      assertEquals(Units.degreesToRadians(0), est.pose1.getRotation().getY(), 0.1);
+      assertEquals(Units.degreesToRadians(0), est.pose1.getRotation().getZ(), 0.1);
+    } finally {
+      image.release();
+    }
+  }
+
+  /**
+   * This tag is rotated such that the right is closer to the camera than the left. In the camera
+   * frame, with +y down, this is a rotation of 45 degrees about +y.
+   */
+  @Test
+  void testPoseRotatedY() {
+    detector.addFamily("tag16h5");
+
+    Mat image;
+    try {
+      image = loadImage("tag2_45deg_y.png");
+    } catch (IOException ex) {
+      fail(ex);
+      return;
+    }
+    try {
+      AprilTagDetection[] results = detector.detect(image);
+      assertEquals(1, results.length);
+
+      var estimator =
+          new AprilTagPoseEstimator(
+              new AprilTagPoseEstimator.Config(0.2, 500, 500, image.cols() / 2, image.rows() / 2));
+      AprilTagPoseEstimate est = estimator.estimateOrthogonalIteration(results[0], 50);
+
+      assertEquals(Units.degreesToRadians(0), est.pose1.getRotation().getX(), 0.1);
+      assertEquals(Units.degreesToRadians(45), est.pose1.getRotation().getY(), 0.1);
+      assertEquals(Units.degreesToRadians(0), est.pose1.getRotation().getZ(), 0.1);
+    } finally {
+      image.release();
+    }
+  }
+
+  /** This tag is facing right at the camera -- no rotation should be observed. */
+  @Test
+  void testPoseStraightOn() {
+    detector.addFamily("tag16h5");
+
+    Mat image;
+    try {
+      image = loadImage("tag2_16h5_straight.png");
+    } catch (IOException ex) {
+      fail(ex);
+      return;
+    }
+    try {
+      AprilTagDetection[] results = detector.detect(image);
+      assertEquals(1, results.length);
+
+      var estimator =
+          new AprilTagPoseEstimator(
+              new AprilTagPoseEstimator.Config(0.2, 500, 500, image.cols() / 2, image.rows() / 2));
+      AprilTagPoseEstimate est = estimator.estimateOrthogonalIteration(results[0], 50);
+
+      assertEquals(Units.degreesToRadians(0), est.pose1.getRotation().getX(), 0.1);
+      assertEquals(Units.degreesToRadians(0), est.pose1.getRotation().getY(), 0.1);
+      assertEquals(Units.degreesToRadians(0), est.pose1.getRotation().getZ(), 0.1);
     } finally {
       image.release();
     }
