@@ -28,7 +28,7 @@ index df7a58b..55b8442 100644
      const Eigen::Ref<const Eigen::MatrixXd>& A,
      const Eigen::Ref<const Eigen::MatrixXd>& B,
 @@ -71,6 +73,7 @@ J = Σ [uₖ] [0 R][uₖ] ΔT
- @throws std::runtime_error if Q − NR⁻¹Nᵀ is not positive semi-definite.
+ @throws std::runtime_error if Q − NR⁻¹Nᵀ is not positive semidefinite.
  @throws std::runtime_error if R is not positive definite.
  */
 +WPILIB_DLLEXPORT

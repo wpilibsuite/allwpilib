@@ -102,7 +102,7 @@ SelfAdjointView<MatrixType, UpLo>::eigenvalues() const
   * \f[ \|A\|_2 = \max_x \frac{\|Ax\|_2}{\|x\|_2} \f]
   * where the maximum is over all vectors and the norm on the right is the
   * Euclidean vector norm. The norm equals the largest singular value, which is
-  * the square root of the largest eigenvalue of the positive semi-definite
+  * the square root of the largest eigenvalue of the positive semidefinite
   * matrix \f$ A^*A \f$.
   *
   * The current implementation uses the eigenvalues of \f$ A^*A \f$, as computed

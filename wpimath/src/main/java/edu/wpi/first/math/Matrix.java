@@ -576,7 +576,7 @@ public class Matrix<R extends Num, C extends Num> {
    * @param lowerTriangular Whether we want to decompose to the lower triangular Cholesky matrix.
    * @return The decomposed matrix.
    * @throws RuntimeException if the matrix could not be decomposed(i.e. is not positive
-   *     semi-definite).
+   *     semidefinite).
    */
   public Matrix<R, C> lltDecompose(boolean lowerTriangular) {
     SimpleMatrix temp = m_storage.copy();

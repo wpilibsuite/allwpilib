@@ -15,7 +15,7 @@ Riccati equation:
 
 AᵀXA − X − AᵀXB(BᵀXB + R)⁻¹BᵀXA + Q = 0
 
-@throws std::exception if Q is not positive semi-definite.
+@throws std::exception if Q is not positive semidefinite.
 @throws std::exception if R is not positive definite.
 
 Based on the Schur Vector approach outlined in this paper:
@@ -70,7 +70,7 @@ J = Σ [uₖ] [0 R][uₖ] ΔT
    k=0
 @endverbatim
 
-@throws std::runtime_error if Q − NR⁻¹Nᵀ is not positive semi-definite.
+@throws std::runtime_error if Q − NR⁻¹Nᵀ is not positive semidefinite.
 @throws std::runtime_error if R is not positive definite.
 */
 WPILIB_DLLEXPORT
