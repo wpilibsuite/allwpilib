@@ -4,9 +4,6 @@
 
 #include "RobotContainer.h"
 
-#include "commands/Autos.h"
-#include "commands/ExampleCommand.h"
-
 RobotContainer::RobotContainer() {
   ConfigureBindings();
 }
