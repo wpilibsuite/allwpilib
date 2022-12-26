@@ -16,7 +16,7 @@ void SolveDAREandVerify(const Eigen::Ref<const MatrixXd>& A,
                         const Eigen::Ref<const MatrixXd>& Q,
                         const Eigen::Ref<const MatrixXd>& R) {
   MatrixXd X = DiscreteAlgebraicRiccatiEquation(A, B, Q, R);
-  // Check that X is positive semidefinite.
+  // Check that X is positive semi-definite.
   EXPECT_TRUE(
       CompareMatrices(X, X.transpose(), 1E-10, MatrixCompareType::absolute));
   int n = X.rows();
@@ -43,7 +43,7 @@ void SolveDAREandVerify(const Eigen::Ref<const MatrixXd>& A,
                         const Eigen::Ref<const MatrixXd>& R,
                         const Eigen::Ref<const MatrixXd>& N) {
   MatrixXd X = DiscreteAlgebraicRiccatiEquation(A, B, Q, R, N);
-  // Check that X is positive semidefinite.
+  // Check that X is positive semi-definite.
   EXPECT_TRUE(
       CompareMatrices(X, X.transpose(), 1E-10, MatrixCompareType::absolute));
   int n = X.rows();
