@@ -11,5 +11,5 @@ RobotContainer::RobotContainer() {
 void RobotContainer::ConfigureBindings() {}
 
 frc2::CommandPtr RobotContainer::GetAutonomousCommand() {
-  return nullptr;
+  return &m_autonomousCommand;
 }
