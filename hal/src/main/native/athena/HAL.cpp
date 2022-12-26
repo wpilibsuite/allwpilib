@@ -304,7 +304,6 @@ void InitializeRoboRioComments(void) {
           std::string_view(reinterpret_cast<const char*>(fileBuffer->begin()),
                            fileBuffer->size());
     } else {
-      return;
       roboRioCommentsStringSize = 0;
       roboRioCommentsStringInitialized = true;
       return;
