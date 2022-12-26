@@ -11,6 +11,17 @@
     "commandversion": 2
   },
   {
+    "name": "Barebones Command Robot",
+    "description": "A more barebones version of the Command Robot template",
+    "tags": [
+      "Command"
+    ],
+    "foldername": "barebonescommandbased",
+    "gradlebase": "java",
+    "mainclass": "Main",
+    "commandversion": 2
+  },
+  {
     "name": "Timed Robot",
     "description": "Timed style",
     "tags": [
