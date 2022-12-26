@@ -77,7 +77,7 @@ public final class SmartDashboard {
   }
 
   /**
-   * Maps the specified key (where the key is the name of the {@link Sendable} to the specified
+   * Maps the specified key (where the key is the name of the {@link Sendable}) to the specified
    * value in this table. The value can be retrieved by calling the get method with a key that is
    * equal to the original key.
    *

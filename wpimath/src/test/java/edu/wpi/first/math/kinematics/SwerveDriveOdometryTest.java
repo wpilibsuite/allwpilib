@@ -33,7 +33,7 @@ class SwerveDriveOdometryTest {
 
   @Test
   void testTwoIterations() {
-    // 5 units/sec  in the x axis (forward)
+    // 5 units/sec  in the x-axis (forward)
     final SwerveModulePosition[] wheelDeltas = {
       new SwerveModulePosition(0.5, Rotation2d.fromDegrees(0)),
       new SwerveModulePosition(0.5, Rotation2d.fromDegrees(0)),

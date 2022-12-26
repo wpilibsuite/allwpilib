@@ -209,8 +209,8 @@ public class Pose2d implements Interpolatable<Pose2d> {
   }
 
   /**
-   * Returns a Twist2d that maps this pose to the end pose. If c is the output of a.Log(b), then
-   * a.Exp(c) would yield b.
+   * Returns a Twist2d that maps this pose to the end pose. If c is the output of {@code a.Log(b)},
+   * then {@code a.Exp(c)} would yield b.
    *
    * @param end The end pose for the transformation.
    * @return The twist that maps this to end.

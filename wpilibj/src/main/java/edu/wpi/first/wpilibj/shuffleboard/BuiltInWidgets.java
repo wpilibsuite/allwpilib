@@ -473,7 +473,7 @@ public enum BuiltInWidgets implements WidgetType {
    */
   kCameraStream("Camera Stream"),
   /**
-   * Displays a field2d object.<br>
+   * Displays a Field2d object.<br>
    * Supported types:
    *
    * <ul>

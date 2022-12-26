@@ -45,7 +45,7 @@ public abstract class Spline {
     }
 
     // This simply multiplies by the coefficients. We need to divide out t some
-    // n number of times where n is the derivative we want to take.
+    // n number of times when n is the derivative we want to take.
     SimpleMatrix combined = coefficients.mult(polynomialBases);
 
     // Get x and y

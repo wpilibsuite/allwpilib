@@ -35,7 +35,7 @@ public class PIDController implements Sendable, AutoCloseable {
 
   private double m_minimumInput;
 
-  // Do the endpoints wrap around? eg. Absolute encoder
+  // Do the endpoints wrap around? e.g. Absolute encoder
   private boolean m_continuous;
 
   // The error at the time of the most recent call to calculate()

@@ -200,7 +200,7 @@ public class ExtendedKalmanFilter<States extends Num, Inputs extends Num, Output
    * Returns an element of the state estimate x-hat.
    *
    * @param row Row of x-hat.
-   * @return the value of the state estimate x-hat at i.
+   * @return the value of the state estimate x-hat at that row.
    */
   @Override
   public double getXhat(int row) {
@@ -249,7 +249,7 @@ public class ExtendedKalmanFilter<States extends Num, Inputs extends Num, Output
    * Project the model into the future with a new control input u.
    *
    * @param u New control input from controller.
-   * @param f The function used to linearlize the model.
+   * @param f The function used to linearize the model.
    * @param dtSeconds Timestep for prediction.
    */
   public void predict(

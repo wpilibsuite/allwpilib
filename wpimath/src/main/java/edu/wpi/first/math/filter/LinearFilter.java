@@ -167,7 +167,7 @@ public class LinearFilter {
     // [s₁ⁿ⁻¹ ⋯ sₙⁿ⁻¹][aₙ]      [δₙ₋₁,d]
     //
     // where δᵢ,ⱼ are the Kronecker delta. The FIR gains are the elements of the
-    // vector a in reverse order divided by hᵈ.
+    // vector 'a' in reverse order divided by hᵈ.
     //
     // The order of accuracy of the approximation is of the form O(hⁿ⁻ᵈ).
 

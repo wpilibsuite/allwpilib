@@ -1160,7 +1160,7 @@ public final class DriverStation {
   public static void refreshData() {
     DriverStationJNI.refreshDSData();
 
-    // Get the status of all of the joysticks
+    // Get the status of all the joysticks
     for (byte stick = 0; stick < kJoystickPorts; stick++) {
       m_joystickAxesCache[stick].m_count =
           DriverStationJNI.getJoystickAxes(stick, m_joystickAxesCache[stick].m_axes);

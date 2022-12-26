@@ -218,7 +218,7 @@ public class MecanumControllerCommand extends CommandBase {
    * trajectory. The user should implement a velocity PID on the desired output wheel velocities.
    *
    * <p>Note: The controllers will *not* set the outputVolts to zero upon completion of the path -
-   * this is left to the user, since it is not appropriate for paths with non-stationary end-states.
+   * this is left to the user, since it is not appropriate for paths with nonstationary end-states.
    *
    * @param trajectory The trajectory to follow.
    * @param pose A function that supplies the robot pose - use one of the odometry classes to
@@ -286,7 +286,7 @@ public class MecanumControllerCommand extends CommandBase {
    * trajectory. The user should implement a velocity PID on the desired output wheel velocities.
    *
    * <p>Note: The controllers will *not* set the outputVolts to zero upon completion of the path -
-   * this is left to the user, since it is not appropriate for paths with non-stationary end-states.
+   * this is left to the user, since it is not appropriate for paths with nonstationary end-states.
    *
    * <p>Note 2: The final rotation of the robot will be set to the rotation of the final pose in the
    * trajectory. The robot will not follow the rotations from the poses at each timestep. If

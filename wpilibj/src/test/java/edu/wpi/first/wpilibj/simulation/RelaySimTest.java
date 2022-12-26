@@ -18,7 +18,7 @@ import org.junit.jupiter.api.Test;
 
 class RelaySimTest {
   @Test
-  void testInitializationBidrectional() {
+  void testInitializationBidirectional() {
     HAL.initialize(500, 0);
 
     RelaySim sim = new RelaySim(0);

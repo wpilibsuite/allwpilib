@@ -33,7 +33,7 @@ public class Button extends Trigger {
   /**
    * Creates a new button with the given condition determining whether it is pressed.
    *
-   * @param isPressed returns whether or not the trigger should be active
+   * @param isPressed returns whether the trigger should be active
    * @deprecated Replace with Trigger.
    */
   @Deprecated
@@ -141,8 +141,8 @@ public class Button extends Trigger {
   }
 
   /**
-   * Toggles the command whenever the button is pressed (on then off then on). The command is set to
-   * be interruptible.
+   * Toggles the command whenever the button is pressed (on, then off, then on). The command is set
+   * to be interruptible.
    *
    * @param command the command to start
    * @return this button, so calls can be chained

@@ -284,7 +284,7 @@ public class UnscentedKalmanFilter<States extends Num, Inputs extends Num, Outpu
    * Returns an element of the state estimate x-hat.
    *
    * @param row Row of x-hat.
-   * @return the value of the state estimate x-hat at i.
+   * @return the value of the state estimate x-hat at 'i'.
    */
   @Override
   public double getXhat(int row) {

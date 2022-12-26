@@ -45,8 +45,9 @@ public class SwerveControllerCommand extends CommandBase {
    * trajectory. This command will not return output voltages but rather raw module states from the
    * position controllers which need to be put into a velocity PID.
    *
-   * <p>Note: The controllers will *not* set the outputVolts to zero upon completion of the path-
-   * this is left to the user, since it is not appropriate for paths with nonstationary endstates.
+   * <p>Note: The controllers will *not* set the outputVolts to zero upon completion of the path.
+   * This is left to the user to do since it is not appropriate for paths with nonstationary
+   * endstates.
    *
    * @param trajectory The trajectory to follow.
    * @param pose A function that supplies the robot pose - use one of the odometry classes to
@@ -88,8 +89,8 @@ public class SwerveControllerCommand extends CommandBase {
    * trajectory. This command will not return output voltages but rather raw module states from the
    * position controllers which need to be put into a velocity PID.
    *
-   * <p>Note: The controllers will *not* set the outputVolts to zero upon completion of the path-
-   * this is left to the user, since it is not appropriate for paths with nonstationary endstates.
+   * <p>Note: The controllers will *not* set the outputVolts to zero upon completion of the path.
+   * This is left to the user since it is not appropriate for paths with nonstationary endstates.
    *
    * <p>Note 2: The final rotation of the robot will be set to the rotation of the final pose in the
    * trajectory. The robot will not follow the rotations from the poses at each timestep. If

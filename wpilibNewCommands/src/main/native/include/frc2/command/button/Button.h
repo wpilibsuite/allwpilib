@@ -243,7 +243,7 @@ class Button : public Trigger {
 
   /**
    * Binds a command to start when the button is pressed, and be canceled when
-   * it is pessed again.  Transfers command ownership to the button scheduler,
+   * it is pressed again.  Transfers command ownership to the button scheduler,
    * so the user does not have to worry about lifespan - rvalue refs will be
    * *moved*, lvalue refs will be *copied.*
    *
