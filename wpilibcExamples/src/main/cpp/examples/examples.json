@@ -1,6 +1,6 @@
 [
   {
-    "name": "Motor Control With Encoder",
+    "name": "Motor Control",
     "description": "Demonstrate controlling a single motor with a Joystick and displaying the net movement of the motor using an encoder.",
     "tags": [
       "Robot and Motor",
@@ -10,7 +10,7 @@
       "Joystick",
       "Complete List"
     ],
-    "foldername": "MotorControlEncoder",
+    "foldername": "MotorControl",
     "gradlebase": "cpp",
     "commandversion": 2
   },
