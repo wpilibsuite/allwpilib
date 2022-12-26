@@ -29,7 +29,7 @@ class Robot : public frc::TimedRobot {
   void TestExit() override;
 
  private:
-  frc2::CommandPtr m_autonomousCommand = nullptr;
+  frc2::Command* m_autonomousCommand = nullptr;
 
   RobotContainer m_container;
 };
