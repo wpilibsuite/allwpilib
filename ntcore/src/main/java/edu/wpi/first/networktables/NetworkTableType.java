@@ -118,8 +118,10 @@ public enum NetworkTableType {
     } else if (data instanceof Float) {
       return "float";
     } else if (data instanceof Long) {
+      // Checking Long because NT supports 64-bit integers
       return "int";
     } else if (data instanceof Double || data instanceof Number) {
+      // If typeof Number class, return "double" as the type. Functions as a "catch-all".
       return "double";
     } else if (data instanceof String) {
       return "string";
@@ -130,6 +132,7 @@ public enum NetworkTableType {
     } else if (data instanceof long[] || data instanceof Long[]) {
       return "int[]";
     } else if (data instanceof double[] || data instanceof Double[] || data instanceof Number[]) {
+      // If typeof Number class, return "double[]" as the type. Functions as a "catch-all".
       return "double[]";
     } else if (data instanceof String[]) {
       return "string[]";

@@ -117,11 +117,7 @@ public class MecanumControllerCommand extends CommandBase {
     m_desiredRotation =
         requireNonNullParam(desiredRotation, "desiredRotation", "MecanumControllerCommand");
 
-    m_maxWheelVelocityMetersPerSecond =
-        requireNonNullParam(
-            maxWheelVelocityMetersPerSecond,
-            "maxWheelVelocityMetersPerSecond",
-            "MecanumControllerCommand");
+    m_maxWheelVelocityMetersPerSecond = maxWheelVelocityMetersPerSecond;
 
     m_frontLeftController =
         requireNonNullParam(frontLeftController, "frontLeftController", "MecanumControllerCommand");
@@ -258,11 +254,7 @@ public class MecanumControllerCommand extends CommandBase {
     m_desiredRotation =
         requireNonNullParam(desiredRotation, "desiredRotation", "MecanumControllerCommand");
 
-    m_maxWheelVelocityMetersPerSecond =
-        requireNonNullParam(
-            maxWheelVelocityMetersPerSecond,
-            "maxWheelVelocityMetersPerSecond",
-            "MecanumControllerCommand");
+    m_maxWheelVelocityMetersPerSecond = maxWheelVelocityMetersPerSecond;
 
     m_frontLeftController = null;
     m_rearLeftController = null;
