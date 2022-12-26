@@ -16,6 +16,7 @@
       "Command"
     ],
     "foldername": "barebonescommandbased",
+    "gradlebase": "cpp",
     "commandversion": 2
   },
   {

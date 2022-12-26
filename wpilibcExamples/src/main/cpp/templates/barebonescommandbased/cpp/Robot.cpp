@@ -28,7 +28,7 @@ void Robot::AutonomousInit() {
 
 void Robot::AutonomousPeriodic() {}
 
-void Robot:AutonomousExit() {}
+void Robot::AutonomousExit() {}
 
 void Robot::TeleopInit() {
   if (m_autonomousCommand) {
