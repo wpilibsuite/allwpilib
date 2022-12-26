@@ -80,6 +80,70 @@ SwerveControllerCommand<NumModules>::SwerveControllerCommand(
 }
 
 template <size_t NumModules>
+SwerveControllerCommand<NumModules>::SwerveControllerCommand(
+    frc::Trajectory trajectory, std::function<frc::Pose2d()> pose,
+    frc::SwerveDriveKinematics<NumModules> kinematics,
+    frc::HolonomicDriveController controller,
+    std::function<frc::Rotation2d()> desiredRotation,
+    std::function<void(std::array<frc::SwerveModuleState, NumModules>)> output,
+    std::initializer_list<Subsystem*> requirements)
+    : m_trajectory(std::move(trajectory)),
+      m_pose(std::move(pose)),
+      m_kinematics(kinematics),
+      m_controller(std::move(controller)),
+      m_desiredRotation(std::move(desiredRotation)),
+      m_outputStates(output) {
+  this->AddRequirements(requirements);
+}
+
+template <size_t NumModules>
+SwerveControllerCommand<NumModules>::SwerveControllerCommand(
+    frc::Trajectory trajectory, std::function<frc::Pose2d()> pose,
+    frc::SwerveDriveKinematics<NumModules> kinematics,
+    frc::HolonomicDriveController controller,
+    std::function<void(std::array<frc::SwerveModuleState, NumModules>)> output,
+    std::initializer_list<Subsystem*> requirements)
+    : m_trajectory(std::move(trajectory)),
+      m_pose(std::move(pose)),
+      m_kinematics(kinematics),
+      m_controller(std::move(controller)),
+      m_outputStates(output) {
+  this->AddRequirements(requirements);
+}
+
+template <size_t NumModules>
+SwerveControllerCommand<NumModules>::SwerveControllerCommand(
+    frc::Trajectory trajectory, std::function<frc::Pose2d()> pose,
+    frc::SwerveDriveKinematics<NumModules> kinematics,
+    frc::HolonomicDriveController controller,
+    std::function<frc::Rotation2d()> desiredRotation,
+    std::function<void(std::array<frc::SwerveModuleState, NumModules>)> output,
+    std::span<Subsystem* const> requirements)
+    : m_trajectory(std::move(trajectory)),
+      m_pose(std::move(pose)),
+      m_kinematics(kinematics),
+      m_controller(std::move(controller)),
+      m_desiredRotation(std::move(desiredRotation)),
+      m_outputStates(output) {
+  this->AddRequirements(requirements);
+}
+
+template <size_t NumModules>
+SwerveControllerCommand<NumModules>::SwerveControllerCommand(
+    frc::Trajectory trajectory, std::function<frc::Pose2d()> pose,
+    frc::SwerveDriveKinematics<NumModules> kinematics,
+    frc::HolonomicDriveController controller,
+    std::function<void(std::array<frc::SwerveModuleState, NumModules>)> output,
+    std::span<Subsystem* const> requirements)
+    : m_trajectory(std::move(trajectory)),
+      m_pose(std::move(pose)),
+      m_kinematics(kinematics),
+      m_controller(std::move(controller)),
+      m_outputStates(output) {
+  this->AddRequirements(requirements);
+}
+
+template <size_t NumModules>
 void SwerveControllerCommand<NumModules>::Initialize() {
   if (m_desiredRotation == nullptr) {
     m_desiredRotation = [&] {
