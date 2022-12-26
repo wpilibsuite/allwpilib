@@ -117,7 +117,7 @@ public class Encoder implements CounterBase, Sendable, AutoCloseable {
    * @param encodingType either k1X, k2X, or k4X to indicate 1X, 2X or 4X decoding. If 4X is
    *     selected, then an encoder FPGA object is used and the returned counts will be 4x the
    *     encoder spec'd value since all rising and falling edges are counted. If 1X or 2X are
-   *     selected then an m_counter object will be used and the returned value will either exactly
+   *     selected, then a counter object will be used and the returned value will either exactly
    *     match the spec'd count or be double (2x) the spec'd count.
    */
   public Encoder(
@@ -217,7 +217,7 @@ public class Encoder implements CounterBase, Sendable, AutoCloseable {
    * @param encodingType either k1X, k2X, or k4X to indicate 1X, 2X or 4X decoding. If 4X is
    *     selected, then an encoder FPGA object is used and the returned counts will be 4x the
    *     encoder spec'd value since all rising and falling edges are counted. If 1X or 2X are
-   *     selected then an m_counter object will be used and the returned value will either exactly
+   *     selected then a counter object will be used and the returned value will either exactly
    *     match the spec'd count or be double (2x) the spec'd count.
    */
   public Encoder(

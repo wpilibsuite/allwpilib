@@ -425,7 +425,7 @@ public class Counter implements CounterBase, Sendable, AutoCloseable {
   /**
    * Determine if the clock is stopped. Determine if the clocked input is stopped based on the
    * MaxPeriod value set using the SetMaxPeriod method. If the clock exceeds the MaxPeriod, then the
-   * device (and counter) are assumed to be stopped, and it returns true.
+   * device (and counter) are assumed to be stopped and the method will return true.
    *
    * @return true if the most recent counter period exceeds the MaxPeriod value set by SetMaxPeriod.
    */

@@ -6,7 +6,7 @@ package edu.wpi.first.wpilibj;
 
 /**
  * Interface for counting the number of ticks on a digital input channel. Encoders, Gear tooth
- * sensors, and counters should all subclass this, so it can be used to build more advanced classes
+ * sensors, and counters should all subclass this in order to build more advanced classes
  * for control and driving.
  *
  * <p>All counters will immediately start counting - reset() them if you need them to be zeroed

@@ -151,73 +151,73 @@ class GenericHID {
   BooleanEvent POV(int pov, int angle, EventLoop* loop) const;
 
   /**
-   * Constructs a BooleanEvent instance based around the 0-degree angle (up) of
+   * Constructs a BooleanEvent instance based around the 0 degree angle (up) of
    * the default (index 0) POV on the HID.
    *
-   * @return a BooleanEvent instance based around the 0-degree angle of a POV on
+   * @return a BooleanEvent instance based around the 0 degree angle of a POV on
    * the HID.
    */
   BooleanEvent POVUp(EventLoop* loop) const;
 
   /**
-   * Constructs a BooleanEvent instance based around the 45-degree angle (right
+   * Constructs a BooleanEvent instance based around the 45 degree angle (right
    * up) of the default (index 0) POV on the HID.
    *
-   * @return a BooleanEvent instance based around the 45-degree angle of a POV
+   * @return a BooleanEvent instance based around the 45 degree angle of a POV
    * on the HID.
    */
   BooleanEvent POVUpRight(EventLoop* loop) const;
 
   /**
-   * Constructs a BooleanEvent instance based around the 90-degree angle (right)
+   * Constructs a BooleanEvent instance based around the 90 degree angle (right)
    * of the default (index 0) POV on the HID.
    *
-   * @return a BooleanEvent instance based around the 90-degree angle of a POV
+   * @return a BooleanEvent instance based around the 90 degree angle of a POV
    * on the HID.
    */
   BooleanEvent POVRight(EventLoop* loop) const;
 
   /**
-   * Constructs a BooleanEvent instance based around the 135-degree angle (right
+   * Constructs a BooleanEvent instance based around the 135 degree angle (right
    * down) of the default (index 0) POV on the HID.
    *
-   * @return a BooleanEvent instance based around the 135-degree angle of a POV
+   * @return a BooleanEvent instance based around the 135 degree angle of a POV
    * on the HID.
    */
   BooleanEvent POVDownRight(EventLoop* loop) const;
 
   /**
-   * Constructs a BooleanEvent instance based around the 180-degree angle (down)
+   * Constructs a BooleanEvent instance based around the 180 degree angle (down)
    * of the default (index 0) POV on the HID.
    *
-   * @return a BooleanEvent instance based around the 180-degree angle of a POV
+   * @return a BooleanEvent instance based around the 180 degree angle of a POV
    * on the HID.
    */
   BooleanEvent POVDown(EventLoop* loop) const;
 
   /**
-   * Constructs a BooleanEvent instance based around the 225-degree angle (down
+   * Constructs a BooleanEvent instance based around the 225 degree angle (down
    * left) of the default (index 0) POV on the HID.
    *
-   * @return a BooleanEvent instance based around the 225-degree angle of a POV
+   * @return a BooleanEvent instance based around the 225 degree angle of a POV
    * on the HID.
    */
   BooleanEvent POVDownLeft(EventLoop* loop) const;
 
   /**
-   * Constructs a BooleanEvent instance based around the 270-degree angle (left)
+   * Constructs a BooleanEvent instance based around the 270 degree angle (left)
    * of the default (index 0) POV on the HID.
    *
-   * @return a BooleanEvent instance based around the 270-degree angle of a POV
+   * @return a BooleanEvent instance based around the 270 degree angle of a POV
    * on the HID.
    */
   BooleanEvent POVLeft(EventLoop* loop) const;
 
   /**
-   * Constructs a BooleanEvent instance based around the 315-degree angle (left
+   * Constructs a BooleanEvent instance based around the 315 degree angle (left
    * up) of the default (index 0) POV on the HID.
    *
-   * @return a BooleanEvent instance based around the 315-degree angle of a POV
+   * @return a BooleanEvent instance based around the 315 degree angle of a POV
    * on the HID.
    */
   BooleanEvent POVUpLeft(EventLoop* loop) const;

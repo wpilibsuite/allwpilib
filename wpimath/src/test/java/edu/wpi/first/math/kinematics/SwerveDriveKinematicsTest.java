@@ -183,7 +183,7 @@ class SwerveDriveKinematicsTest {
     an arc with radius 24 (and circumference 150.796), and the back-right wheel travels an arc with
     radius √(24² + 24²) and circumference 213.2584. As for angles, the front-right wheel
     should be pointing straight forward, the back-left wheel should be pointing straight right,
-    and the back-right wheel should be at a -45-degree angle
+    and the back-right wheel should be at a -45 degree angle
     */
 
     assertAll(
@@ -208,7 +208,7 @@ class SwerveDriveKinematicsTest {
 
     /*
     We already know that our omega should be 2π from the previous test. Next, we need to determine
-    the vx and vy of our chassis center. Because our COR is at a 45-degree angle from the center,
+    the vx and vy of our chassis center. Because our COR is at a 45 degree angle from the center,
     we know that vx and vy must be the same. Furthermore, we know that the center of mass makes
     a full revolution about the center of revolution once every second. Therefore, the center of
     mass must be moving at 106.629in/sec. Recalling that the ratios of a 45/45/90 triangle are
@@ -232,7 +232,7 @@ class SwerveDriveKinematicsTest {
 
     /*
     We already know that our omega should be 2π from the previous test. Next, we need to determine
-    the vx and vy of our chassis center. Because our COR is at a 45-degree angle from the center,
+    the vx and vy of our chassis center. Because our COR is at a 45 degree angle from the center,
     we know that vx and vy must be the same. Furthermore, we know that the center of mass makes
     a full revolution about the center of revolution once every second. Therefore, the center of
     mass must be moving at 106.629in/sec. Recalling that the ratios of a 45/45/90 triangle are

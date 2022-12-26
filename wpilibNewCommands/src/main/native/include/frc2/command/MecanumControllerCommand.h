@@ -61,7 +61,7 @@ class MecanumControllerCommand
    *
    * <p>Note: The controllers will *not* set the outputVolts to zero upon
    * completion of the path this is left to the user, since it is not
-   * appropriate for paths with non-stationary endstates.
+   * appropriate for paths with nonstationary endstates.
    *
    * @param trajectory           The trajectory to follow.
    * @param pose                 A function that supplies the robot pose,
@@ -268,7 +268,7 @@ class MecanumControllerCommand
    *
    * <p>Note: The controllers will *not* set the outputVolts to zero upon
    * completion of the path - this is left to the user, since it is not
-   * appropriate for paths with non-stationary end-states.
+   * appropriate for paths with nonstationary end-states.
    *
    * @param trajectory       The trajectory to follow.
    * @param pose             A function that supplies the robot pose - use one
@@ -306,7 +306,7 @@ class MecanumControllerCommand
    *
    * <p>Note: The controllers will *not* set the outputVolts to zero upon
    * completion of the path - this is left to the user, since it is not
-   * appropriate for paths with non-stationary end-states.
+   * appropriate for paths with nonstationary end-states.
    *
    * <p>Note 2: The final rotation of the robot will be set to the rotation of
    * the final pose in the trajectory. The robot will not follow the rotations
@@ -346,7 +346,7 @@ class MecanumControllerCommand
    *
    * <p>Note: The controllers will *not* set the outputVolts to zero upon
    * completion of the path - this is left to the user, since it is not
-   * appropriate for paths with non-stationary end-states.
+   * appropriate for paths with nonstationary end-states.
    *
    * @param trajectory       The trajectory to follow.
    * @param pose             A function that supplies the robot pose - use one
@@ -384,7 +384,7 @@ class MecanumControllerCommand
    *
    * <p>Note: The controllers will *not* set the outputVolts to zero upon
    * completion of the path - this is left to the user, since it is not
-   * appropriate for paths with non-stationary end-states.
+   * appropriate for paths with nonstationary end-states.
    *
    * <p>Note2: The final rotation of the robot will be set to the rotation of
    * the final pose in the trajectory. The robot will not follow the rotations

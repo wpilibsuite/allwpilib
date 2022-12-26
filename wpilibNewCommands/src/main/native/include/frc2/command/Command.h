@@ -378,7 +378,7 @@ safe) semantics.
   virtual std::string GetName() const;
 
   /**
-   * Sets the name of this Command. Null-op if not overridden.
+   * Sets the name of this Command. Nullop if not overridden.
    *
    * @param name The display name of the Command.
    */

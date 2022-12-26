@@ -141,7 +141,7 @@ public class Button extends Trigger {
   }
 
   /**
-   * Toggles the command whenever the button is pressed (on then, off then, on). The command is set
+   * Toggles the command whenever the button is pressed (on, then off, then on). The command is set
    * to be interruptible.
    *
    * @param command the command to start

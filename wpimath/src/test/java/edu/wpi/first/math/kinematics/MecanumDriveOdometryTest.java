@@ -62,7 +62,7 @@ class MecanumDriveOdometryTest {
 
   @Test
   void test90degreeTurn() {
-    // This is a 90-degree turn about the point between front left and rear left wheels
+    // This is a 90 degree turn about the point between front left and rear left wheels
     // fl -13.328649 fr 39.985946 rl -13.328649 rr 39.985946
     final var wheelPositions = new MecanumDriveWheelPositions(-13.328, 39.986, -13.329, 39.986);
     m_odometry.resetPosition(new Rotation2d(), new MecanumDriveWheelPositions(), new Pose2d());

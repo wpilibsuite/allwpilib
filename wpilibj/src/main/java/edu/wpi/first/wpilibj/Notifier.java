@@ -183,7 +183,7 @@ public class Notifier implements AutoCloseable {
 
   /**
    * Register for periodic event notification. A timer event is queued for periodic event
-   * notification. Each time the interrupt occurs, the event will be immediately re-queued for the
+   * notification. Each time the interrupt occurs, the event will be immediately requeued for the
    * same time interval.
    *
    * <p>The user-provided callback should be written in a nonblocking manner so the callback can be
