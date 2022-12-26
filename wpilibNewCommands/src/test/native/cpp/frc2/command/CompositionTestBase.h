@@ -65,7 +65,7 @@ REGISTER_TYPED_TEST_SUITE_P(SingleCompositionInterruptibilityTest, CancelSelf,
   INSTANTIATE_TYPED_TEST_SUITE_P(Suite, SingleCompositionInterruptibilityTest, \
                                  CompositionType);                             \
   INSTANTIATE_TYPED_TEST_SUITE_P(Suite, SingleCompositionRunsWhenDisabledTest, \
-                                 CompositionType);
+                                 CompositionType)
 }  // namespace single
 
 inline namespace multi {
@@ -199,6 +199,6 @@ REGISTER_TYPED_TEST_SUITE_P(MultiCompositionInterruptibilityTest, AllCancelSelf,
   INSTANTIATE_TYPED_TEST_SUITE_P(Suite, MultiCompositionInterruptibilityTest, \
                                  CompositionType);                            \
   INSTANTIATE_TYPED_TEST_SUITE_P(Suite, MultiCompositionRunsWhenDisabledTest, \
-                                 CompositionType);
+                                 CompositionType)
 }  // namespace multi
 }  // namespace frc2
