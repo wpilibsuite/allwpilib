@@ -13,7 +13,5 @@ class RobotContainer {
   frc2::CommandPtr GetAutonomousCommand();
 
  private:
-  ExampleSubsystem m_subsystem;
-
   void ConfigureBindings();
 };
