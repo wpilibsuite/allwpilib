@@ -188,6 +188,62 @@ public class CommandGenericHID {
   }
 
   /**
+   * Constructs a Trigger instance that is true when the axis value is less than {@code threshold},
+   * attached to {@link CommandScheduler#getDefaultButtonLoop() the default command scheduler button
+   * loop}.
+   *
+   * @param axis The axis to read, starting at 0
+   * @param threshold The value below which this trigger should return true.
+   * @return a Trigger instance that is true when the axis value is less than the provided
+   *     threshold.
+   */
+  public Trigger axisLessThan(int axis, double threshold) {
+    return axisLessThan(axis, threshold, CommandScheduler.getInstance().getDefaultButtonLoop());
+  }
+
+  /**
+   * Constructs a Trigger instance that is true when the axis value is less than {@code threshold},
+   * attached to the given loop.
+   *
+   * @param axis The axis to read, starting at 0
+   * @param threshold The value below which this trigger should return true.
+   * @param loop the event loop instance to attach the trigger to
+   * @return a Trigger instance that is true when the axis value is less than the provided
+   *     threshold.
+   */
+  public Trigger axisLessThan(int axis, double threshold, EventLoop loop) {
+    return m_hid.axisLessThan(axis, threshold, loop).castTo(Trigger::new);
+  }
+
+  /**
+   * Constructs a Trigger instance that is true when the axis value is less than {@code threshold},
+   * attached to {@link CommandScheduler#getDefaultButtonLoop() the default command scheduler button
+   * loop}.
+   *
+   * @param axis The axis to read, starting at 0
+   * @param threshold The value above which this trigger should return true.
+   * @return a Trigger instance that is true when the axis value is greater than the provided
+   *     threshold.
+   */
+  public Trigger axisGreaterThan(int axis, double threshold) {
+    return axisGreaterThan(axis, threshold, CommandScheduler.getInstance().getDefaultButtonLoop());
+  }
+
+  /**
+   * Constructs a Trigger instance that is true when the axis value is greater than {@code
+   * threshold}, attached to the given loop.
+   *
+   * @param axis The axis to read, starting at 0
+   * @param threshold The value above which this trigger should return true.
+   * @param loop the event loop instance to attach the trigger to.
+   * @return a Trigger instance that is true when the axis value is greater than the provided
+   *     threshold.
+   */
+  public Trigger axisGreaterThan(int axis, double threshold, EventLoop loop) {
+    return m_hid.axisGreaterThan(axis, threshold, loop).castTo(Trigger::new);
+  }
+
+  /**
    * Get the value of the axis.
    *
    * @param axis The axis to read, starting at 0.
