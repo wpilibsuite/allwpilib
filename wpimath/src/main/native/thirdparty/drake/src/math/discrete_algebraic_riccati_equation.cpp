@@ -385,7 +385,7 @@ void reorder_eigen(Eigen::Ref<Eigen::MatrixXd> S, Eigen::Ref<Eigen::MatrixXd> T,
  *
  * AᵀXA − X − AᵀXB(BᵀXB + R)⁻¹BᵀXA + Q = 0
  *
- * @throws std::exception if Q is not positive semidefinite.
+ * @throws std::exception if Q is not positive semi-definite.
  * @throws std::exception if R is not positive definite.
  *
  * Based on the Schur Vector approach outlined in this paper:

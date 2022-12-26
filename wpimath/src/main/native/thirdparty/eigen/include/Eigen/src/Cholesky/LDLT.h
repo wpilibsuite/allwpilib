@@ -27,7 +27,7 @@ namespace internal {
 
   template<typename MatrixType, int UpLo> struct LDLT_Traits;
 
-  // PositiveSemiDef means positive semidefinite and non-zero; same for NegativeSemiDef
+  // PositiveSemiDef means positive semi-definite and non-zero; same for NegativeSemiDef
   enum SignMatrix { PositiveSemiDef, NegativeSemiDef, ZeroSign, Indefinite };
 }
 
