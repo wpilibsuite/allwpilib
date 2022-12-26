@@ -53,6 +53,10 @@ dependencies {
     implementation project(':wpilibNewCommands')
 }
 
+tasks.withType(com.github.spotbugs.snom.SpotBugsTask).configureEach {
+    onlyIf { false }
+}
+
 def simProjects = ['halsim_gui']
 
 deploy {

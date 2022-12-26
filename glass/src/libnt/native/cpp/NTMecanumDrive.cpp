@@ -22,16 +22,16 @@ NTMecanumDriveModel::NTMecanumDriveModel(nt::NetworkTableInstance inst,
                          .Subscribe(0)},
       m_flPercent{
           inst.GetDoubleTopic(fmt::format("{}/Front Left Motor Speed", path))
-              .GetEntry(0, {{nt::PubSubOption::SendAll(true)}})},
+              .GetEntry(0)},
       m_frPercent{
           inst.GetDoubleTopic(fmt::format("{}/Front Right Motor Speed", path))
-              .GetEntry(0, {{nt::PubSubOption::SendAll(true)}})},
+              .GetEntry(0)},
       m_rlPercent{
           inst.GetDoubleTopic(fmt::format("{}/Rear Left Motor Speed", path))
-              .GetEntry(0, {{nt::PubSubOption::SendAll(true)}})},
+              .GetEntry(0)},
       m_rrPercent{
           inst.GetDoubleTopic(fmt::format("{}/Rear Right Motor Speed", path))
-              .GetEntry(0, {{nt::PubSubOption::SendAll(true)}})},
+              .GetEntry(0)},
       m_nameValue{wpi::rsplit(path, '/').second},
       m_flPercentData{fmt::format("NTMcnmDriveFL:{}", path)},
       m_frPercentData{fmt::format("NTMcnmDriveFR:{}", path)},
@@ -81,5 +81,5 @@ void NTMecanumDriveModel::Update() {
 }
 
 bool NTMecanumDriveModel::Exists() {
-  return m_inst.IsConnected() && m_flPercent.Exists();
+  return m_flPercent.Exists();
 }

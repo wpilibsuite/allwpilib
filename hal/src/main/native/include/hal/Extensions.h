@@ -10,8 +10,7 @@
  * @defgroup hal_extensions Simulator Extensions
  * @ingroup hal_capi
  * HAL Simulator Extensions.  These are libraries that provide additional
- * simulator functionality, such as a Gazebo interface, or a more light weight
- * simulation.
+ * simulator functionality.
  *
  * An extension must expose the HALSIM_InitExtension entry point which is
  * invoked after the library is loaded.

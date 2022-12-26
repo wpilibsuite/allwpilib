@@ -25,7 +25,6 @@ std::string GetTypeName(const T& type) {
 }
 
 class PerpetualCommand;
-class ProxyScheduleCommand;
 
 /**
  * A state machine representing a complete action to be performed by the robot.
@@ -225,7 +224,7 @@ safe) semantics.
 
   /**
    * Decorates this command to run "by proxy" by wrapping it in a
-   * ProxyScheduleCommand. This is useful for "forking off" from command groups
+   * ProxyCommand. This is useful for "forking off" from command groups
    * when the user does not wish to extend the command's requirements to the
    * entire command group.
    *
@@ -283,6 +282,14 @@ safe) semantics.
   [[nodiscard]] CommandPtr HandleInterrupt(std::function<void()> handler) &&;
 
   /**
+   * Decorates this Command with a name.
+   *
+   * @param name name
+   * @return the decorated Command
+   */
+  [[nodiscard]] CommandPtr WithName(std::string_view name) &&;
+
+  /**
    * Schedules this command.
    */
   void Schedule();
@@ -294,9 +301,9 @@ safe) semantics.
   void Cancel();
 
   /**
-   * Whether or not the command is currently scheduled.  Note that this does not
-   * detect whether the command is being run by a CommandGroup, only whether it
-   * is directly being run by the scheduler.
+   * Whether or not the command is currently scheduled. Note that this does not
+   * detect whether the command is in a composition, only whether it is directly
+   * being run by the scheduler.
    *
    * @return Whether the command is scheduled.
    */
@@ -316,13 +323,32 @@ safe) semantics.
    * Whether the command is currently grouped in a command group.  Used as extra
    * insurance to prevent accidental independent use of grouped commands.
    */
+  bool IsComposed() const;
+
+  /**
+   * Sets whether the command is currently composed in a command composition.
+   * Can be used to "reclaim" a command if a composition is no longer going to
+   * use it.  NOT ADVISED!
+   */
+  void SetComposed(bool isComposed);
+
+  /**
+   * Whether the command is currently grouped in a command group.  Used as extra
+   * insurance to prevent accidental independent use of grouped commands.
+   *
+   * @deprecated Moved to IsComposed()
+   */
+  WPI_DEPRECATED("Moved to IsComposed()")
   bool IsGrouped() const;
 
   /**
    * Sets whether the command is currently grouped in a command group.  Can be
    * used to "reclaim" a command if a group is no longer going to use it.  NOT
    * ADVISED!
+   *
+   * @deprecated Moved to SetComposed()
    */
+  WPI_DEPRECATED("Moved to SetComposed()")
   void SetGrouped(bool grouped);
 
   /**
@@ -343,7 +369,26 @@ safe) semantics.
     return InterruptionBehavior::kCancelSelf;
   }
 
+  /**
+   * Gets the name of this Command. Defaults to the simple class name if not
+   * overridden.
+   *
+   * @return The display name of the Command
+   */
   virtual std::string GetName() const;
+
+  /**
+   * Sets the name of this Command. Nullop if not overridden.
+   *
+   * @param name The display name of the Command.
+   */
+  virtual void SetName(std::string_view name);
+
+  /**
+   * Transfers ownership of this command to a unique pointer.  Used for
+   * decorator methods.
+   */
+  virtual CommandPtr ToPtr() && = 0;
 
  protected:
   /**
@@ -352,7 +397,7 @@ safe) semantics.
    */
   virtual std::unique_ptr<Command> TransferOwnership() && = 0;
 
-  bool m_isGrouped = false;
+  bool m_isComposed = false;
 };
 
 /**

@@ -27,7 +27,7 @@ class MecanumDriveOdometryTest : public ::testing::Test {
 TEST_F(MecanumDriveOdometryTest, MultipleConsecutiveUpdates) {
   MecanumDriveWheelPositions wheelDeltas{3.536_m, 3.536_m, 3.536_m, 3.536_m};
 
-  odometry.ResetPosition(Pose2d{}, 0_rad, wheelDeltas);
+  odometry.ResetPosition(0_rad, wheelDeltas, Pose2d{});
 
   odometry.Update(0_deg, wheelDeltas);
   auto secondPose = odometry.Update(0_deg, wheelDeltas);
@@ -38,7 +38,7 @@ TEST_F(MecanumDriveOdometryTest, MultipleConsecutiveUpdates) {
 }
 
 TEST_F(MecanumDriveOdometryTest, TwoIterations) {
-  odometry.ResetPosition(Pose2d{}, 0_rad, zero);
+  odometry.ResetPosition(0_rad, zero, Pose2d{});
   MecanumDriveWheelPositions wheelDeltas{0.3536_m, 0.3536_m, 0.3536_m,
                                          0.3536_m};
 
@@ -51,7 +51,7 @@ TEST_F(MecanumDriveOdometryTest, TwoIterations) {
 }
 
 TEST_F(MecanumDriveOdometryTest, 90DegreeTurn) {
-  odometry.ResetPosition(Pose2d{}, 0_rad, zero);
+  odometry.ResetPosition(0_rad, zero, Pose2d{});
   MecanumDriveWheelPositions wheelDeltas{-13.328_m, 39.986_m, -13.329_m,
                                          39.986_m};
   odometry.Update(0_deg, MecanumDriveWheelPositions{});
@@ -63,7 +63,7 @@ TEST_F(MecanumDriveOdometryTest, 90DegreeTurn) {
 }
 
 TEST_F(MecanumDriveOdometryTest, GyroAngleReset) {
-  odometry.ResetPosition(Pose2d{}, 90_deg, zero);
+  odometry.ResetPosition(90_deg, zero, Pose2d{});
 
   MecanumDriveWheelPositions wheelDeltas{0.3536_m, 0.3536_m, 0.3536_m,
                                          0.3536_m};

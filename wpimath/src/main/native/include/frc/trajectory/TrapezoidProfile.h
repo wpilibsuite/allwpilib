@@ -68,10 +68,7 @@ class TrapezoidProfile {
    public:
     Distance_t position{0};
     Velocity_t velocity{0};
-    bool operator==(const State& rhs) const {
-      return position == rhs.position && velocity == rhs.velocity;
-    }
-    bool operator!=(const State& rhs) const { return !(*this == rhs); }
+    bool operator==(const State&) const = default;
   };
 
   /**

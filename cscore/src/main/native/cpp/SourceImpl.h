@@ -50,6 +50,7 @@ class SourceImpl : public PropertyContainer {
 
   void SetConnectionStrategy(CS_ConnectionStrategy strategy) {
     m_strategy = static_cast<int>(strategy);
+    NumSinksChanged();
   }
   bool IsEnabled() const {
     return m_strategy == CS_CONNECTION_KEEP_OPEN ||

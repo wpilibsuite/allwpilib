@@ -9,11 +9,11 @@
 using namespace frc2;
 
 WrapperCommand::WrapperCommand(std::unique_ptr<Command>&& command) {
-  if (!CommandGroupBase::RequireUngrouped(*command)) {
-    return;
-  }
+  CommandScheduler::GetInstance().RequireUngrouped(command.get());
   m_command = std::move(command);
-  m_command->SetGrouped(true);
+  m_command->SetComposed(true);
+  // copy the wrapped command's name
+  SetName(m_command->GetName());
 }
 
 void WrapperCommand::Initialize() {

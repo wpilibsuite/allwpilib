@@ -112,10 +112,7 @@ NTField2DModel::NTField2DModel(nt::NetworkTableInstance inst,
                                std::string_view path)
     : m_path{fmt::format("{}/", path)},
       m_inst{inst},
-      m_tableSub{inst,
-                 {{m_path}},
-                 {{nt::PubSubOption::SendAll(true),
-                   nt::PubSubOption::Periodic(0.05)}}},
+      m_tableSub{inst, {{m_path}}, {.periodic = 0.05, .sendAll = true}},
       m_nameTopic{inst.GetTopic(fmt::format("{}/.name", path))},
       m_poller{inst} {
   m_poller.AddListener(m_tableSub, nt::EventFlags::kTopic |
@@ -171,7 +168,7 @@ void NTField2DModel::Update() {
 }
 
 bool NTField2DModel::Exists() {
-  return m_inst.IsConnected() && m_nameTopic.Exists();
+  return m_nameTopic.Exists();
 }
 
 bool NTField2DModel::IsReadOnly() {

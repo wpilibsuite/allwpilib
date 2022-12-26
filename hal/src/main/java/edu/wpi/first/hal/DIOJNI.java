@@ -39,5 +39,7 @@ public class DIOJNI extends JNIWrapper {
 
   public static native void setDigitalPWMDutyCycle(int pwmGenerator, double dutyCycle);
 
+  public static native void setDigitalPWMPPS(int pwmGenerator, double dutyCycle);
+
   public static native void setDigitalPWMOutputChannel(int pwmGenerator, int channel);
 }

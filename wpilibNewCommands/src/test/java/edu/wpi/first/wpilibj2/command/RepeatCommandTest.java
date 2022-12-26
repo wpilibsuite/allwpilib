@@ -6,19 +6,14 @@ package edu.wpi.first.wpilibj2.command;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import edu.wpi.first.hal.HAL;
-import edu.wpi.first.wpilibj.simulation.DriverStationSim;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import org.junit.jupiter.api.Test;
 
-class RepeatCommandTest {
+class RepeatCommandTest extends CommandTestBase
+    implements SingleCompositionTestBase<RepeatCommand> {
   @Test
   void callsMethodsCorrectly() {
-    HAL.initialize(500, 0);
-    // enable so that we don't need to mess with `runsWhenDisabled` for each command
-    DriverStationSim.setEnabled(true);
-
     var initCounter = new AtomicInteger(0);
     var exeCounter = new AtomicInteger(0);
     var isFinishedCounter = new AtomicInteger(0);
@@ -56,7 +51,7 @@ class RepeatCommandTest {
 
     isFinishedHook.set(true);
     CommandScheduler.getInstance().run();
-    assertEquals(2, initCounter.get());
+    assertEquals(1, initCounter.get());
     assertEquals(2, exeCounter.get());
     assertEquals(2, isFinishedCounter.get());
     assertEquals(1, endCounter.get());
@@ -67,5 +62,10 @@ class RepeatCommandTest {
     assertEquals(3, exeCounter.get());
     assertEquals(3, isFinishedCounter.get());
     assertEquals(1, endCounter.get());
+  }
+
+  @Override
+  public RepeatCommand composeSingle(Command member) {
+    return member.repeatedly();
   }
 }

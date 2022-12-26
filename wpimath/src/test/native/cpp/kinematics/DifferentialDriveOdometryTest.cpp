@@ -13,7 +13,7 @@ static constexpr double kEpsilon = 1E-9;
 using namespace frc;
 
 TEST(DifferentialDriveOdometryTest, EncoderDistances) {
-  DifferentialDriveOdometry odometry{45_deg};
+  DifferentialDriveOdometry odometry{45_deg, 0_m, 0_m};
 
   const auto& pose =
       odometry.Update(135_deg, 0_m, units::meter_t{5 * std::numbers::pi});

@@ -15,6 +15,10 @@ import java.util.Objects;
 
 /**
  * A rotation in a 2D coordinate frame represented by a point on the unit circle (cosine and sine).
+ *
+ * <p>The angle is continuous, that is if a Rotation2d is constructed with 361 degrees, it will
+ * return 361 degrees. This allows algorithms that wouldn't want to see a discontinuity in the
+ * rotations as it sweeps past from 360 to 0 on the second time around.
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonAutoDetect(getterVisibility = JsonAutoDetect.Visibility.NONE)
@@ -63,7 +67,7 @@ public class Rotation2d implements Interpolatable<Rotation2d> {
   /**
    * Constructs and returns a Rotation2d with the given radian value.
    *
-   * @param radians The value of the angle in degrees.
+   * @param radians The value of the angle in radians.
    * @return The rotation object with the desired angle value.
    */
   public static Rotation2d fromRadians(double radians) {
@@ -169,6 +173,7 @@ public class Rotation2d implements Interpolatable<Rotation2d> {
    * Returns the radian value of the Rotation2d.
    *
    * @return The radian value of the Rotation2d.
+   * @see edu.wpi.first.math.MathUtil#angleModulus(double) to constrain the angle within (-pi, pi]
    */
   @JsonProperty
   public double getRadians() {
@@ -179,6 +184,8 @@ public class Rotation2d implements Interpolatable<Rotation2d> {
    * Returns the degree value of the Rotation2d.
    *
    * @return The degree value of the Rotation2d.
+   * @see edu.wpi.first.math.MathUtil#inputModulus(double, double, double) to constrain the angle
+   *     within (-180, 180]
    */
   public double getDegrees() {
     return Math.toDegrees(m_value);

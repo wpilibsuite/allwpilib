@@ -106,6 +106,19 @@ class DigitalOutput : public DigitalSource,
   void SetPWMRate(double rate);
 
   /**
+   * Enable a PWM PPS (Pulse Per Second) Output on this line.
+   *
+   * Allocate one of the 6 DO PWM generator resources from this module.
+   *
+   * Supply the duty-cycle to output.
+   *
+   * The resolution of the duty cycle is 8-bit.
+   *
+   * @param dutyCycle The duty-cycle to start generating. [0..1]
+   */
+  void EnablePPS(double dutyCycle);
+
+  /**
    * Enable a PWM Output on this line.
    *
    * Allocate one of the 6 DO PWM generator resources from this module.

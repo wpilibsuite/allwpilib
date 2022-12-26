@@ -11,6 +11,7 @@
 #include <vector>
 
 #include "networktables/Topic.h"
+#include "ntcore_cpp.h"
 
 namespace wpi {
 class json;
@@ -295,7 +296,8 @@ class UnitTopic final : public Topic {
    * @return subscriber
    */
   [[nodiscard]] SubscriberType Subscribe(
-      ParamType defaultValue, std::span<const PubSubOption> options = {});
+      ParamType defaultValue,
+      const PubSubOptions& options = kDefaultPubSubOptions);
 
   /**
    * Create a new subscriber to the topic, with specific type string.
@@ -315,7 +317,7 @@ class UnitTopic final : public Topic {
    */
   [[nodiscard]] SubscriberType SubscribeEx(
       std::string_view typeString, ParamType defaultValue,
-      std::span<const PubSubOption> options = {});
+      const PubSubOptions& options = kDefaultPubSubOptions);
 
   /**
    * Create a new publisher to the topic.
@@ -333,7 +335,7 @@ class UnitTopic final : public Topic {
    * @return publisher
    */
   [[nodiscard]] PublisherType Publish(
-      std::span<const PubSubOption> options = {});
+      const PubSubOptions& options = kDefaultPubSubOptions);
 
   /**
    * Create a new publisher to the topic, with type string and initial
@@ -355,7 +357,7 @@ class UnitTopic final : public Topic {
    */
   [[nodiscard]] PublisherType PublishEx(
       std::string_view typeString, const wpi::json& properties,
-      std::span<const PubSubOption> options = {});
+      const PubSubOptions& options = kDefaultPubSubOptions);
 
   /**
    * Create a new entry for the topic.
@@ -377,8 +379,9 @@ class UnitTopic final : public Topic {
    * @param options publish and/or subscribe options
    * @return entry
    */
-  [[nodiscard]] EntryType GetEntry(ParamType defaultValue,
-                                   std::span<const PubSubOption> options = {});
+  [[nodiscard]] EntryType GetEntry(
+      ParamType defaultValue,
+      const PubSubOptions& options = kDefaultPubSubOptions);
 
   /**
    * Create a new entry for the topic, with specific type string.
@@ -403,7 +406,7 @@ class UnitTopic final : public Topic {
    */
   [[nodiscard]] EntryType GetEntryEx(
       std::string_view typeString, ParamType defaultValue,
-      std::span<const PubSubOption> options = {});
+      const PubSubOptions& options = kDefaultPubSubOptions);
 };
 
 }  // namespace nt

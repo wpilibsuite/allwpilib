@@ -95,6 +95,23 @@ void DigitalOutput::SetPWMRate(double rate) {
   FRC_CheckErrorStatus(status, "Channel {}", m_channel);
 }
 
+void DigitalOutput::EnablePPS(double dutyCycle) {
+  if (m_pwmGenerator != HAL_kInvalidHandle) {
+    return;
+  }
+
+  int32_t status = 0;
+
+  m_pwmGenerator = HAL_AllocateDigitalPWM(&status);
+  FRC_CheckErrorStatus(status, "Channel {}", m_channel);
+
+  HAL_SetDigitalPWMPPS(m_pwmGenerator, dutyCycle, &status);
+  FRC_CheckErrorStatus(status, "Channel {}", m_channel);
+
+  HAL_SetDigitalPWMOutputChannel(m_pwmGenerator, m_channel, &status);
+  FRC_CheckErrorStatus(status, "Channel {}", m_channel);
+}
+
 void DigitalOutput::EnablePWM(double initialDutyCycle) {
   if (m_pwmGenerator != HAL_kInvalidHandle) {
     return;

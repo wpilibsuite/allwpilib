@@ -4,7 +4,7 @@
 
 package edu.wpi.first.wpilibj2.command;
 
-import static edu.wpi.first.wpilibj.util.ErrorMessages.requireNonNullParam;
+import static edu.wpi.first.util.ErrorMessages.requireNonNullParam;
 
 import edu.wpi.first.math.controller.HolonomicDriveController;
 import edu.wpi.first.math.controller.PIDController;
@@ -70,23 +70,17 @@ public class SwerveControllerCommand extends CommandBase {
       Supplier<Rotation2d> desiredRotation,
       Consumer<SwerveModuleState[]> outputModuleStates,
       Subsystem... requirements) {
-    m_trajectory = requireNonNullParam(trajectory, "trajectory", "SwerveControllerCommand");
-    m_pose = requireNonNullParam(pose, "pose", "SwerveControllerCommand");
-    m_kinematics = requireNonNullParam(kinematics, "kinematics", "SwerveControllerCommand");
-
-    m_controller =
+    this(
+        trajectory,
+        pose,
+        kinematics,
         new HolonomicDriveController(
             requireNonNullParam(xController, "xController", "SwerveControllerCommand"),
             requireNonNullParam(yController, "yController", "SwerveControllerCommand"),
-            requireNonNullParam(thetaController, "thetaController", "SwerveControllerCommand"));
-
-    m_outputModuleStates =
-        requireNonNullParam(outputModuleStates, "outputModuleStates", "SwerveControllerCommand");
-
-    m_desiredRotation =
-        requireNonNullParam(desiredRotation, "desiredRotation", "SwerveControllerCommand");
-
-    addRequirements(requirements);
+            requireNonNullParam(thetaController, "thetaController", "SwerveControllerCommand")),
+        desiredRotation,
+        outputModuleStates,
+        requirements);
   }
 
   /**
@@ -132,6 +126,85 @@ public class SwerveControllerCommand extends CommandBase {
             trajectory.getStates().get(trajectory.getStates().size() - 1).poseMeters.getRotation(),
         outputModuleStates,
         requirements);
+  }
+
+  /**
+   * Constructs a new SwerveControllerCommand that when executed will follow the provided
+   * trajectory. This command will not return output voltages but rather raw module states from the
+   * position controllers which need to be put into a velocity PID.
+   *
+   * <p>Note: The controllers will *not* set the outputVolts to zero upon completion of the path-
+   * this is left to the user, since it is not appropriate for paths with nonstationary endstates.
+   *
+   * <p>Note 2: The final rotation of the robot will be set to the rotation of the final pose in the
+   * trajectory. The robot will not follow the rotations from the poses at each timestep. If
+   * alternate rotation behavior is desired, the other constructor with a supplier for rotation
+   * should be used.
+   *
+   * @param trajectory The trajectory to follow.
+   * @param pose A function that supplies the robot pose - use one of the odometry classes to
+   *     provide this.
+   * @param kinematics The kinematics for the robot drivetrain.
+   * @param controller The HolonomicDriveController for the drivetrain.
+   * @param outputModuleStates The raw output module states from the position controllers.
+   * @param requirements The subsystems to require.
+   */
+  public SwerveControllerCommand(
+      Trajectory trajectory,
+      Supplier<Pose2d> pose,
+      SwerveDriveKinematics kinematics,
+      HolonomicDriveController controller,
+      Consumer<SwerveModuleState[]> outputModuleStates,
+      Subsystem... requirements) {
+    this(
+        trajectory,
+        pose,
+        kinematics,
+        controller,
+        () ->
+            trajectory.getStates().get(trajectory.getStates().size() - 1).poseMeters.getRotation(),
+        outputModuleStates,
+        requirements);
+  }
+
+  /**
+   * Constructs a new SwerveControllerCommand that when executed will follow the provided
+   * trajectory. This command will not return output voltages but rather raw module states from the
+   * position controllers which need to be put into a velocity PID.
+   *
+   * <p>Note: The controllers will *not* set the outputVolts to zero upon completion of the path-
+   * this is left to the user, since it is not appropriate for paths with nonstationary endstates.
+   *
+   * @param trajectory The trajectory to follow.
+   * @param pose A function that supplies the robot pose - use one of the odometry classes to
+   *     provide this.
+   * @param kinematics The kinematics for the robot drivetrain.
+   * @param controller The HolonomicDriveController for the drivetrain.
+   * @param desiredRotation The angle that the drivetrain should be facing. This is sampled at each
+   *     time step.
+   * @param outputModuleStates The raw output module states from the position controllers.
+   * @param requirements The subsystems to require.
+   */
+  public SwerveControllerCommand(
+      Trajectory trajectory,
+      Supplier<Pose2d> pose,
+      SwerveDriveKinematics kinematics,
+      HolonomicDriveController controller,
+      Supplier<Rotation2d> desiredRotation,
+      Consumer<SwerveModuleState[]> outputModuleStates,
+      Subsystem... requirements) {
+    m_trajectory = requireNonNullParam(trajectory, "trajectory", "SwerveControllerCommand");
+    m_pose = requireNonNullParam(pose, "pose", "SwerveControllerCommand");
+    m_kinematics = requireNonNullParam(kinematics, "kinematics", "SwerveControllerCommand");
+    m_controller = requireNonNullParam(controller, "controller", "SwerveControllerCommand");
+
+    m_desiredRotation =
+        requireNonNullParam(desiredRotation, "desiredRotation", "SwerveControllerCommand");
+
+    m_outputModuleStates =
+        requireNonNullParam(outputModuleStates, "outputModuleStates", "SwerveControllerCommand");
+
+    addRequirements(requirements);
   }
 
   @Override

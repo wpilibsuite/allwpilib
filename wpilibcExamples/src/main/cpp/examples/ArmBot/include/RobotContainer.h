@@ -4,15 +4,12 @@
 
 #pragma once
 
-#include <frc/XboxController.h>
-#include <frc/smartdashboard/SendableChooser.h>
 #include <frc2/command/Command.h>
+#include <frc2/command/button/CommandXboxController.h>
 
 #include "Constants.h"
 #include "subsystems/ArmSubsystem.h"
 #include "subsystems/DriveSubsystem.h"
-
-namespace ac = AutoConstants;
 
 /**
  * This class is where the bulk of the robot should be declared.  Since
@@ -35,15 +32,14 @@ class RobotContainer {
 
  private:
   // The driver's controller
-  frc::XboxController m_driverController{OIConstants::kDriverControllerPort};
+  frc2::CommandXboxController m_driverController{
+      OIConstants::kDriverControllerPort};
 
   // The robot's subsystems and commands are defined here...
 
   // The robot's subsystems
   DriveSubsystem m_drive;
   ArmSubsystem m_arm;
-
-  // The chooser for the autonomous routines
 
   void ConfigureButtonBindings();
 };

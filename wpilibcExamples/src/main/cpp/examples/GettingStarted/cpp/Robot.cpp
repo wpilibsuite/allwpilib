@@ -11,11 +11,11 @@
 class Robot : public frc::TimedRobot {
  public:
   Robot() {
-    m_right.SetInverted(true);
-    m_robotDrive.SetExpiration(100_ms);
     // We need to invert one side of the drivetrain so that positive voltages
     // result in both sides moving forward. Depending on how your robot's
     // gearbox is constructed, you might have to invert the left side instead.
+    m_right.SetInverted(true);
+    m_robotDrive.SetExpiration(100_ms);
     m_timer.Start();
   }
 

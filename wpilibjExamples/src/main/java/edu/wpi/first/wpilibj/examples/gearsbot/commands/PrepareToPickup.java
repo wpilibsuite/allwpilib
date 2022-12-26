@@ -7,6 +7,7 @@ package edu.wpi.first.wpilibj.examples.gearsbot.commands;
 import edu.wpi.first.wpilibj.examples.gearsbot.subsystems.Claw;
 import edu.wpi.first.wpilibj.examples.gearsbot.subsystems.Elevator;
 import edu.wpi.first.wpilibj.examples.gearsbot.subsystems.Wrist;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 
 /** Make sure the robot is in a state to pickup soda cans. */
@@ -21,6 +22,6 @@ public class PrepareToPickup extends SequentialCommandGroup {
   public PrepareToPickup(Claw claw, Wrist wrist, Elevator elevator) {
     addCommands(
         new OpenClaw(claw),
-        parallel(new SetWristSetpoint(0, wrist), new SetElevatorSetpoint(0, elevator)));
+        Commands.parallel(new SetWristSetpoint(0, wrist), new SetElevatorSetpoint(0, elevator)));
   }
 }

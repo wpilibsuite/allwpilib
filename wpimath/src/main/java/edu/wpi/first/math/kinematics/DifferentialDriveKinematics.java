@@ -6,6 +6,7 @@ package edu.wpi.first.math.kinematics;
 
 import edu.wpi.first.math.MathSharedStore;
 import edu.wpi.first.math.MathUsageId;
+import edu.wpi.first.math.geometry.Twist2d;
 
 /**
  * Helper class that converts a chassis velocity (dx and dtheta components) to left and right wheel
@@ -56,5 +57,21 @@ public class DifferentialDriveKinematics {
             - trackWidthMeters / 2 * chassisSpeeds.omegaRadiansPerSecond,
         chassisSpeeds.vxMetersPerSecond
             + trackWidthMeters / 2 * chassisSpeeds.omegaRadiansPerSecond);
+  }
+
+  /**
+   * Performs forward kinematics to return the resulting Twist2d from the given left and right side
+   * distance deltas. This method is often used for odometry -- determining the robot's position on
+   * the field using changes in the distance driven by each wheel on the robot.
+   *
+   * @param leftDistanceMeters The distance measured by the left side encoder.
+   * @param rightDistanceMeters The distance measured by the right side encoder.
+   * @return The resulting Twist2d.
+   */
+  public Twist2d toTwist2d(double leftDistanceMeters, double rightDistanceMeters) {
+    return new Twist2d(
+        (leftDistanceMeters + rightDistanceMeters) / 2,
+        0,
+        (rightDistanceMeters - leftDistanceMeters) / trackWidthMeters);
   }
 }

@@ -3,6 +3,7 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #include "CommandTestBase.h"
+#include "CompositionTestBase.h"
 #include "frc2/command/InstantCommand.h"
 #include "frc2/command/SequentialCommandGroup.h"
 #include "frc2/command/WaitUntilCommand.h"
@@ -132,3 +133,6 @@ TEST_F(SequentialCommandGroupTest, SequentialGroupRequirement) {
   EXPECT_TRUE(scheduler.IsScheduled(&command3));
   EXPECT_FALSE(scheduler.IsScheduled(&group));
 }
+
+INSTANTIATE_MULTI_COMMAND_COMPOSITION_TEST_SUITE(SequentialCommandGroupTest,
+                                                 SequentialCommandGroup);

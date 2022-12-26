@@ -4,6 +4,8 @@ pluginManagement {
         maven {
             url = 'https://frcmaven.wpi.edu/artifactory/ex-gradle'
         }
+        mavenCentral()
+        gradlePluginPortal()
     }
 }
 
@@ -38,9 +40,6 @@ include 'outlineviewer'
 include 'roborioteamnumbersetter'
 include 'datalogtool'
 include 'sapphire'
-include 'simulation:gz_msgs'
-include 'simulation:frc_gazebo_plugins'
-include 'simulation:halsim_gazebo'
 include 'simulation:halsim_ds_socket'
 include 'simulation:halsim_gui'
 include 'simulation:halsim_ws_core'
@@ -53,6 +52,7 @@ include 'myRobot'
 include 'docs'
 include 'msvcruntime'
 include 'ntcoreffi'
+include 'apriltag'
 
 buildCache {
     def cred = {

@@ -20,13 +20,11 @@ class EventLoop {
   EventLoop& operator=(const EventLoop&) = delete;
 
   /**
-   * Bind a new action to run whenever the condition is true.
+   * Bind a new action to run.
    *
-   * @param condition the condition to listen to.
    * @param action the action to run.
    */
-  void Bind(std::function<bool()> condition,
-            wpi::unique_function<void()> action);
+  void Bind(wpi::unique_function<void()> action);
 
   /**
    * Poll all bindings.
@@ -39,12 +37,6 @@ class EventLoop {
   void Clear();
 
  private:
-  struct Binding {
-    std::function<bool()> condition;
-    wpi::unique_function<void()> action;
-
-    void Poll();
-  };
-  std::vector<Binding> m_bindings;
+  std::vector<wpi::unique_function<void()>> m_bindings;
 };
 }  // namespace frc

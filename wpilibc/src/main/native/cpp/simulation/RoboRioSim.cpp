@@ -284,6 +284,16 @@ void RoboRioSim::SetBrownoutVoltage(units::volt_t vInVoltage) {
   HALSIM_SetRoboRioBrownoutVoltage(vInVoltage.value());
 }
 
+std::string RoboRioSim::GetSerialNumber() {
+  char serialNum[9];
+  size_t len = HALSIM_GetRoboRioSerialNumber(serialNum, sizeof(serialNum));
+  return std::string(serialNum, len);
+}
+
+void RoboRioSim::SetSerialNumber(std::string_view serialNumber) {
+  HALSIM_SetRoboRioSerialNumber(serialNumber.data(), serialNumber.size());
+}
+
 void RoboRioSim::ResetData() {
   HALSIM_ResetRoboRioData();
 }

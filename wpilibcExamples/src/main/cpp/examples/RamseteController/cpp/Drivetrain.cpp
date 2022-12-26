@@ -28,7 +28,9 @@ void Drivetrain::UpdateOdometry() {
 }
 
 void Drivetrain::ResetOdometry(const frc::Pose2d& pose) {
-  m_odometry.ResetPosition(pose, m_gyro.GetRotation2d());
+  m_odometry.ResetPosition(m_gyro.GetRotation2d(),
+                           units::meter_t{m_leftEncoder.GetDistance()},
+                           units::meter_t{m_rightEncoder.GetDistance()}, pose);
 }
 
 frc::Pose2d Drivetrain::GetPose() const {

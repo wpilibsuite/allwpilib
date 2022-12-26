@@ -72,7 +72,7 @@ class CommandGenericHID : public frc::GenericHID {
    * @param loop  the event loop instance to attach the event to. Defaults to
    * {@link CommandScheduler::GetDefaultButtonLoop() the default command
    * scheduler button loop}.
-   * @return a Trigger instance based around the 90-degree angle of a POV on the
+   * @return a Trigger instance based around the 0-degree angle of a POV on the
    * HID.
    */
   Trigger POVUp(frc::EventLoop* loop = CommandScheduler::GetInstance()
@@ -85,7 +85,7 @@ class CommandGenericHID : public frc::GenericHID {
    * @param loop  the event loop instance to attach the event to. Defaults to
    * {@link CommandScheduler::GetDefaultButtonLoop() the default command
    * scheduler button loop}.
-   * @return a Trigger instance based around the 90-degree angle of a POV on the
+   * @return a Trigger instance based around the 45-degree angle of a POV on the
    * HID.
    */
   Trigger POVUpRight(frc::EventLoop* loop = CommandScheduler::GetInstance()
@@ -122,8 +122,8 @@ class CommandGenericHID : public frc::GenericHID {
    * @param loop  the event loop instance to attach the event to. Defaults to
    * {@link CommandScheduler::GetDefaultButtonLoop() the default command
    * scheduler button loop}.
-   * @return a Trigger instance based around the 90-degree angle of a POV on the
-   * HID.
+   * @return a Trigger instance based around the 180-degree angle of a POV on
+   * the HID.
    */
   Trigger POVDown(frc::EventLoop* loop = CommandScheduler::GetInstance()
                                              .GetDefaultButtonLoop()) const;
@@ -135,8 +135,8 @@ class CommandGenericHID : public frc::GenericHID {
    * @param loop  the event loop instance to attach the event to. Defaults to
    * {@link CommandScheduler::GetDefaultButtonLoop() the default command
    * scheduler button loop}.
-   * @return a Trigger instance based around the 90-degree angle of a POV on the
-   * HID.
+   * @return a Trigger instance based around the 225-degree angle of a POV on
+   * the HID.
    */
   Trigger POVDownLeft(frc::EventLoop* loop = CommandScheduler::GetInstance()
                                                  .GetDefaultButtonLoop()) const;
@@ -148,8 +148,8 @@ class CommandGenericHID : public frc::GenericHID {
    * @param loop  the event loop instance to attach the event to. Defaults to
    * {@link CommandScheduler::GetDefaultButtonLoop() the default command
    * scheduler button loop}.
-   * @return a Trigger instance based around the 90-degree angle of a POV on the
-   * HID.
+   * @return a Trigger instance based around the 270-degree angle of a POV on
+   * the HID.
    */
   Trigger POVLeft(frc::EventLoop* loop = CommandScheduler::GetInstance()
                                              .GetDefaultButtonLoop()) const;
@@ -161,20 +161,20 @@ class CommandGenericHID : public frc::GenericHID {
    * @param loop  the event loop instance to attach the event to. Defaults to
    * {@link CommandScheduler::GetDefaultButtonLoop() the default command
    * scheduler button loop}.
-   * @return a Trigger instance based around the 90-degree angle of a POV on the
-   * HID.
+   * @return a Trigger instance based around the 315-degree angle of a POV on
+   * the HID.
    */
   Trigger POVUpLeft(frc::EventLoop* loop = CommandScheduler::GetInstance()
                                                .GetDefaultButtonLoop()) const;
 
   /**
-   * Constructs a Trigger instance based around the center (not pressed) of the
-   * default (index 0) POV on the HID.
+   * Constructs a Trigger instance based around the center (not pressed)
+   * position of the default (index 0) POV on the HID.
    *
    * @param loop  the event loop instance to attach the event to. Defaults to
    * {@link CommandScheduler::GetDefaultButtonLoop() the default command
    * scheduler button loop}.
-   * @return a Trigger instance based around the 90-degree angle of a POV on the
+   * @return a Trigger instance based around the center position of a POV on the
    * HID.
    */
   Trigger POVCenter(frc::EventLoop* loop = CommandScheduler::GetInstance()

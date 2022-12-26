@@ -4,8 +4,6 @@
 
 package edu.wpi.first.wpilibj.examples.drivedistanceoffboard;
 
-import static edu.wpi.first.wpilibj.XboxController.Button;
-
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.examples.drivedistanceoffboard.Constants.DriveConstants;
@@ -13,10 +11,9 @@ import edu.wpi.first.wpilibj.examples.drivedistanceoffboard.Constants.OIConstant
 import edu.wpi.first.wpilibj.examples.drivedistanceoffboard.commands.DriveDistanceProfiled;
 import edu.wpi.first.wpilibj.examples.drivedistanceoffboard.subsystems.DriveSubsystem;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.RunCommand;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.TrapezoidProfileCommand;
-import edu.wpi.first.wpilibj2.command.button.JoystickButton;
+import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -28,8 +25,13 @@ public class RobotContainer {
   // The robot's subsystems
   private final DriveSubsystem m_robotDrive = new DriveSubsystem();
 
+  // Retained command references
+  private final Command m_driveFullSpeed = Commands.runOnce(() -> m_robotDrive.setMaxOutput(1));
+  private final Command m_driveHalfSpeed = Commands.runOnce(() -> m_robotDrive.setMaxOutput(0.5));
+
   // The driver's controller
-  XboxController m_driverController = new XboxController(OIConstants.kDriverControllerPort);
+  CommandXboxController m_driverController =
+      new CommandXboxController(OIConstants.kDriverControllerPort);
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
@@ -41,10 +43,10 @@ public class RobotContainer {
     m_robotDrive.setDefaultCommand(
         // A split-stick arcade command, with forward/backward controlled by the left
         // hand, and turning controlled by the right.
-        new RunCommand(
+        Commands.run(
             () ->
                 m_robotDrive.arcadeDrive(
-                    -m_driverController.getLeftY(), m_driverController.getRightX()),
+                    -m_driverController.getLeftY(), -m_driverController.getRightX()),
             m_robotDrive));
   }
 
@@ -52,15 +54,18 @@ public class RobotContainer {
    * Use this method to define your button->command mappings. Buttons can be created by
    * instantiating a {@link edu.wpi.first.wpilibj.GenericHID} or one of its subclasses ({@link
    * edu.wpi.first.wpilibj.Joystick} or {@link XboxController}), and then passing it to a {@link
-   * JoystickButton}.
+   * edu.wpi.first.wpilibj2.command.button.JoystickButton}.
    */
   private void configureButtonBindings() {
+    // Drive at half speed when the bumper is held
+    m_driverController.rightBumper().onTrue(m_driveHalfSpeed).onFalse(m_driveFullSpeed);
+
     // Drive forward by 3 meters when the 'A' button is pressed, with a timeout of 10 seconds
-    new JoystickButton(m_driverController, Button.kA.value)
-        .onTrue(new DriveDistanceProfiled(3, m_robotDrive).withTimeout(10));
+    m_driverController.a().onTrue(new DriveDistanceProfiled(3, m_robotDrive).withTimeout(10));
 
     // Do the same thing as above when the 'B' button is pressed, but defined inline
-    new JoystickButton(m_driverController, Button.kB.value)
+    m_driverController
+        .b()
         .onTrue(
             new TrapezoidProfileCommand(
                     new TrapezoidProfile(
@@ -76,11 +81,6 @@ public class RobotContainer {
                     m_robotDrive)
                 .beforeStarting(m_robotDrive::resetEncoders)
                 .withTimeout(10));
-
-    // Drive at half speed when the bumper is held
-    new JoystickButton(m_driverController, Button.kRightBumper.value)
-        .onTrue(new InstantCommand(() -> m_robotDrive.setMaxOutput(0.5)))
-        .onFalse(new InstantCommand(() -> m_robotDrive.setMaxOutput(1)));
   }
 
   /**
@@ -89,6 +89,6 @@ public class RobotContainer {
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand() {
-    return new InstantCommand();
+    return Commands.none();
   }
 }

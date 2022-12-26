@@ -159,8 +159,7 @@ public class Button extends Trigger {
    *
    * @param command the command to start
    * @return this button, so calls can be chained
-   * @deprecated Instead, pass {@link #rising()} as an end condition to {@link
-   *     Command#until(BooleanSupplier)}.
+   * @deprecated Instead, pass this as an end condition to {@link Command#until(BooleanSupplier)}.
    */
   @Deprecated
   public Button cancelWhenPressed(final Command command) {

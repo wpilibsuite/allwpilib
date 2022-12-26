@@ -10,10 +10,14 @@ HatchSubsystem::HatchSubsystem()
     : m_hatchSolenoid{frc::PneumaticsModuleType::CTREPCM,
                       kHatchSolenoidPorts[0], kHatchSolenoidPorts[1]} {}
 
-void HatchSubsystem::GrabHatch() {
-  m_hatchSolenoid.Set(frc::DoubleSolenoid::kForward);
+frc2::CommandPtr HatchSubsystem::GrabHatchCommand() {
+  // implicitly require `this`
+  return this->RunOnce(
+      [this] { m_hatchSolenoid.Set(frc::DoubleSolenoid::kForward); });
 }
 
-void HatchSubsystem::ReleaseHatch() {
-  m_hatchSolenoid.Set(frc::DoubleSolenoid::kReverse);
+frc2::CommandPtr HatchSubsystem::ReleaseHatchCommand() {
+  // implicitly require `this`
+  return this->RunOnce(
+      [this] { m_hatchSolenoid.Set(frc::DoubleSolenoid::kReverse); });
 }

@@ -44,8 +44,7 @@ class LocalStorage final : public net::ILocalStorage {
                                bool ack) final;
   void NetworkSetValue(NT_Topic topicHandle, const Value& value) final;
 
-  void StartNetwork(net::NetworkStartupInterface& startup,
-                    net::NetworkInterface* network) final;
+  void StartNetwork(net::NetworkInterface* network) final;
   void ClearNetwork() final;
 
   // User functions.  These are the actual implementations of the corresponding
@@ -93,24 +92,23 @@ class LocalStorage final : public net::ILocalStorage {
 
   NT_Subscriber Subscribe(NT_Topic topic, NT_Type type,
                           std::string_view typeStr,
-                          std::span<const PubSubOption> options);
+                          const PubSubOptions& options);
 
   void Unsubscribe(NT_Subscriber sub);
 
   NT_MultiSubscriber SubscribeMultiple(
-      std::span<const std::string_view> prefixes,
-      std::span<const PubSubOption> options);
+      std::span<const std::string_view> prefixes, const PubSubOptions& options);
 
   void UnsubscribeMultiple(NT_MultiSubscriber subHandle);
 
   NT_Publisher Publish(NT_Topic topic, NT_Type type, std::string_view typeStr,
                        const wpi::json& properties,
-                       std::span<const PubSubOption> options);
+                       const PubSubOptions& options);
 
   void Unpublish(NT_Handle pubentry);
 
   NT_Entry GetEntry(NT_Topic topic, NT_Type type, std::string_view typeStr,
-                    std::span<const PubSubOption> options);
+                    const PubSubOptions& options);
 
   void ReleaseEntry(NT_Entry entry);
 
@@ -208,6 +206,8 @@ class LocalStorage final : public net::ILocalStorage {
   NT_DataLogger StartDataLog(wpi::log::DataLog& log, std::string_view prefix,
                              std::string_view logPrefix);
   void StopDataLog(NT_DataLogger logger);
+
+  void Reset();
 
  private:
   class Impl;

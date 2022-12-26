@@ -56,6 +56,8 @@ class InstanceImpl {
   std::shared_ptr<NetworkServer> GetServer();
   std::shared_ptr<INetworkClient> GetClient();
 
+  void Reset();
+
   ListenerStorage listenerStorage;
   LoggerImpl logger_impl;
   wpi::Logger logger;

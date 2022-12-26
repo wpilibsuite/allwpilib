@@ -10,7 +10,7 @@ namespace nt {
 
 inline MultiSubscriber::MultiSubscriber(
     NetworkTableInstance inst, std::span<const std::string_view> prefixes,
-    std::span<const PubSubOption> options)
+    const PubSubOptions& options)
     : m_handle{::nt::SubscribeMultiple(inst.GetHandle(), prefixes, options)} {}
 
 inline MultiSubscriber::MultiSubscriber(MultiSubscriber&& rhs)

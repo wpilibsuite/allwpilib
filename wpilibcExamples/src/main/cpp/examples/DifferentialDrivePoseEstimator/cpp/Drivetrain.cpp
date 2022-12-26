@@ -27,8 +27,6 @@ void Drivetrain::Drive(units::meters_per_second_t xSpeed,
 
 void Drivetrain::UpdateOdometry() {
   m_poseEstimator.Update(m_gyro.GetRotation2d(),
-                         {units::meters_per_second_t{m_leftEncoder.GetRate()},
-                          units::meters_per_second_t{m_rightEncoder.GetRate()}},
                          units::meter_t{m_leftEncoder.GetDistance()},
                          units::meter_t{m_rightEncoder.GetDistance()});
 

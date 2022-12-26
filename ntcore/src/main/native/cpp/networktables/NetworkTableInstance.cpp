@@ -122,7 +122,7 @@ NT_Listener NetworkTableInstance::AddListener(Subscriber& subscriber,
                            std::move(listener));
 }
 
-NT_Listener NetworkTableInstance::AddListener(NetworkTableEntry& entry,
+NT_Listener NetworkTableInstance::AddListener(const NetworkTableEntry& entry,
                                               int eventMask,
                                               ListenerCallback listener) {
   if (::nt::GetInstanceFromHandle(entry.GetHandle()) != m_handle) {

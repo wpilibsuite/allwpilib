@@ -39,6 +39,7 @@ static JClass eventCls;
 static JClass floatCls;
 static JClass logMessageCls;
 static JClass longCls;
+static JClass pubSubOptionsCls;
 static JClass topicInfoCls;
 static JClass valueCls;
 static JClass valueEventDataCls;
@@ -54,6 +55,7 @@ static const JClassInit classes[] = {
     {"java/lang/Float", &floatCls},
     {"edu/wpi/first/networktables/LogMessage", &logMessageCls},
     {"java/lang/Long", &longCls},
+    {"edu/wpi/first/networktables/PubSubOptions", &pubSubOptionsCls},
     {"edu/wpi/first/networktables/TopicInfo", &topicInfoCls},
     {"edu/wpi/first/networktables/NetworkTableValue", &valueCls},
     {"edu/wpi/first/networktables/ValueEventData", &valueEventDataCls}};
@@ -117,20 +119,45 @@ JNIEXPORT void JNICALL JNI_OnUnload(JavaVM* vm, void* reserved) {
 // Conversions from Java objects to C++
 //
 
-static std::span<const nt::PubSubOption> FromJavaPubSubOptions(
-    JNIEnv* env, jintArray optionTypes, jdoubleArray optionValues,
-    wpi::SmallVectorImpl<nt::PubSubOption>& arr) {
-  JIntArrayRef types{env, optionTypes};
-  JDoubleArrayRef values{env, optionValues};
-  if (types.size() != values.size()) {
+static nt::PubSubOptions FromJavaPubSubOptions(JNIEnv* env, jobject joptions) {
+  if (!joptions) {
     return {};
   }
-  arr.clear();
-  arr.reserve(types.size());
-  for (size_t i = 0, iend = types.size(); i != iend; ++i) {
-    arr.emplace_back(static_cast<NT_PubSubOptionType>(types[i]), values[i]);
+#define FIELD(name, sig)                                         \
+  static jfieldID name##Field = nullptr;                         \
+  if (!name##Field) {                                            \
+    name##Field = env->GetFieldID(pubSubOptionsCls, #name, sig); \
   }
-  return arr;
+
+  FIELD(pollStorage, "I");
+  FIELD(periodic, "D");
+  FIELD(excludePublisher, "I");
+  FIELD(sendAll, "Z");
+  FIELD(topicsOnly, "Z");
+  FIELD(keepDuplicates, "Z");
+  FIELD(prefixMatch, "Z");
+  FIELD(disableRemote, "Z");
+  FIELD(disableLocal, "Z");
+  FIELD(excludeSelf, "Z");
+
+#undef FIELD
+
+#define FIELD(ctype, jtype, name) \
+  .name = static_cast<ctype>(env->Get##jtype##Field(joptions, name##Field))
+
+  return {FIELD(unsigned int, Int, pollStorage),
+          FIELD(double, Double, periodic),
+          FIELD(NT_Publisher, Int, excludePublisher),
+          FIELD(bool, Boolean, sendAll),
+          FIELD(bool, Boolean, topicsOnly),
+          FIELD(bool, Boolean, keepDuplicates),
+          FIELD(bool, Boolean, prefixMatch),
+          FIELD(bool, Boolean, disableRemote),
+          FIELD(bool, Boolean, disableLocal),
+          FIELD(bool, Boolean, excludeSelf)};
+
+#undef GET
+#undef FIELD
 }
 
 //
@@ -356,7 +383,7 @@ Java_edu_wpi_first_networktables_NetworkTablesJNI_getInstanceFromHandle
  * Signature: (ILjava/lang/String;)I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_first_networktables_NetworkTablesJNI_getEntry__ILjava_lang_String_2
+Java_edu_wpi_first_networktables_NetworkTablesJNI_getEntry
   (JNIEnv* env, jclass, jint inst, jstring key)
 {
   if (!key) {
@@ -720,17 +747,15 @@ Java_edu_wpi_first_networktables_NetworkTablesJNI_setTopicProperties
 /*
  * Class:     edu_wpi_first_networktables_NetworkTablesJNI
  * Method:    subscribe
- * Signature: (IILjava/lang/String;[I[D)I
+ * Signature: (IILjava/lang/String;Ljava/lang/Object;)I
  */
 JNIEXPORT jint JNICALL
 Java_edu_wpi_first_networktables_NetworkTablesJNI_subscribe
-  (JNIEnv* env, jclass, jint topic, jint type, jstring typeStr,
-   jintArray optionTypes, jdoubleArray optionValues)
+  (JNIEnv* env, jclass, jint topic, jint type, jstring typeStr, jobject options)
 {
-  wpi::SmallVector<nt::PubSubOption, 4> options;
-  return nt::Subscribe(
-      topic, static_cast<NT_Type>(type), JStringRef{env, typeStr},
-      FromJavaPubSubOptions(env, optionTypes, optionValues, options));
+  return nt::Subscribe(topic, static_cast<NT_Type>(type),
+                       JStringRef{env, typeStr},
+                       FromJavaPubSubOptions(env, options));
 }
 
 /*
@@ -748,28 +773,26 @@ Java_edu_wpi_first_networktables_NetworkTablesJNI_unsubscribe
 /*
  * Class:     edu_wpi_first_networktables_NetworkTablesJNI
  * Method:    publish
- * Signature: (IILjava/lang/String;[I[D)I
+ * Signature: (IILjava/lang/String;Ljava/lang/Object;)I
  */
 JNIEXPORT jint JNICALL
 Java_edu_wpi_first_networktables_NetworkTablesJNI_publish
-  (JNIEnv* env, jclass, jint topic, jint type, jstring typeStr,
-   jintArray optionTypes, jdoubleArray optionValues)
+  (JNIEnv* env, jclass, jint topic, jint type, jstring typeStr, jobject options)
 {
-  wpi::SmallVector<nt::PubSubOption, 4> options;
-  return nt::Publish(
-      topic, static_cast<NT_Type>(type), JStringRef{env, typeStr},
-      FromJavaPubSubOptions(env, optionTypes, optionValues, options));
+  return nt::Publish(topic, static_cast<NT_Type>(type),
+                     JStringRef{env, typeStr},
+                     FromJavaPubSubOptions(env, options));
 }
 
 /*
  * Class:     edu_wpi_first_networktables_NetworkTablesJNI
  * Method:    publishEx
- * Signature: (IILjava/lang/String;Ljava/lang/String;[I[D)I
+ * Signature: (IILjava/lang/String;Ljava/lang/String;Ljava/lang/Object;)I
  */
 JNIEXPORT jint JNICALL
 Java_edu_wpi_first_networktables_NetworkTablesJNI_publishEx
   (JNIEnv* env, jclass, jint topic, jint type, jstring typeStr,
-   jstring properties, jintArray optionTypes, jdoubleArray optionValues)
+   jstring properties, jobject options)
 {
   wpi::json j;
   try {
@@ -783,10 +806,9 @@ Java_edu_wpi_first_networktables_NetworkTablesJNI_publishEx
     illegalArgEx.Throw(env, "properties is not a JSON object");
     return 0;
   }
-  wpi::SmallVector<nt::PubSubOption, 4> options;
-  return nt::PublishEx(
-      topic, static_cast<NT_Type>(type), JStringRef{env, typeStr}, j,
-      FromJavaPubSubOptions(env, optionTypes, optionValues, options));
+  return nt::PublishEx(topic, static_cast<NT_Type>(type),
+                       JStringRef{env, typeStr}, j,
+                       FromJavaPubSubOptions(env, options));
 }
 
 /*
@@ -803,18 +825,16 @@ Java_edu_wpi_first_networktables_NetworkTablesJNI_unpublish
 
 /*
  * Class:     edu_wpi_first_networktables_NetworkTablesJNI
- * Method:    getEntry
- * Signature: (IILjava/lang/String;[I[D)I
+ * Method:    getEntryImpl
+ * Signature: (IILjava/lang/String;Ljava/lang/Object;)I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_first_networktables_NetworkTablesJNI_getEntry__IILjava_lang_String_2_3I_3D
-  (JNIEnv* env, jclass, jint topic, jint type, jstring typeStr,
-   jintArray optionTypes, jdoubleArray optionValues)
+Java_edu_wpi_first_networktables_NetworkTablesJNI_getEntryImpl
+  (JNIEnv* env, jclass, jint topic, jint type, jstring typeStr, jobject options)
 {
-  wpi::SmallVector<nt::PubSubOption, 4> options;
-  return nt::GetEntry(
-      topic, static_cast<NT_Type>(type), JStringRef{env, typeStr},
-      FromJavaPubSubOptions(env, optionTypes, optionValues, options));
+  return nt::GetEntry(topic, static_cast<NT_Type>(type),
+                      JStringRef{env, typeStr},
+                      FromJavaPubSubOptions(env, options));
 }
 
 /*
@@ -856,12 +876,11 @@ Java_edu_wpi_first_networktables_NetworkTablesJNI_getTopicFromHandle
 /*
  * Class:     edu_wpi_first_networktables_NetworkTablesJNI
  * Method:    subscribeMultiple
- * Signature: (I[Ljava/lang/Object;[I[D)I
+ * Signature: (I[Ljava/lang/Object;Ljava/lang/Object;)I
  */
 JNIEXPORT jint JNICALL
 Java_edu_wpi_first_networktables_NetworkTablesJNI_subscribeMultiple
-  (JNIEnv* env, jclass, jint inst, jobjectArray prefixes, jintArray optionTypes,
-   jdoubleArray optionValues)
+  (JNIEnv* env, jclass, jint inst, jobjectArray prefixes, jobject options)
 {
   if (!prefixes) {
     nullPointerEx.Throw(env, "prefixes cannot be null");
@@ -884,10 +903,8 @@ Java_edu_wpi_first_networktables_NetworkTablesJNI_subscribeMultiple
     prefixStringViews.emplace_back(prefixStrings.back());
   }
 
-  wpi::SmallVector<nt::PubSubOption, 4> options;
-  return nt::SubscribeMultiple(
-      inst, prefixStringViews,
-      FromJavaPubSubOptions(env, optionTypes, optionValues, options));
+  return nt::SubscribeMultiple(inst, prefixStringViews,
+                               FromJavaPubSubOptions(env, options));
 }
 
 /*

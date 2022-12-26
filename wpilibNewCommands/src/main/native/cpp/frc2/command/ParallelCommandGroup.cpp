@@ -56,13 +56,14 @@ bool ParallelCommandGroup::RunsWhenDisabled() const {
   return m_runWhenDisabled;
 }
 
+Command::InterruptionBehavior ParallelCommandGroup::GetInterruptionBehavior()
+    const {
+  return m_interruptBehavior;
+}
+
 void ParallelCommandGroup::AddCommands(
     std::vector<std::unique_ptr<Command>>&& commands) {
-  for (auto&& command : commands) {
-    if (!RequireUngrouped(*command)) {
-      return;
-    }
-  }
+  CommandScheduler::GetInstance().RequireUngrouped(commands);
 
   if (isRunning) {
     throw FRC_MakeError(frc::err::CommandIllegalUse,
@@ -72,9 +73,13 @@ void ParallelCommandGroup::AddCommands(
 
   for (auto&& command : commands) {
     if (RequirementsDisjoint(this, command.get())) {
-      command->SetGrouped(true);
+      command->SetComposed(true);
       AddRequirements(command->GetRequirements());
       m_runWhenDisabled &= command->RunsWhenDisabled();
+      if (command->GetInterruptionBehavior() ==
+          Command::InterruptionBehavior::kCancelSelf) {
+        m_interruptBehavior = Command::InterruptionBehavior::kCancelSelf;
+      }
       m_commands.emplace_back(std::move(command), false);
     } else {
       throw FRC_MakeError(frc::err::CommandIllegalUse,

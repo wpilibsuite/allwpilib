@@ -70,19 +70,8 @@ class WPILIB_DLLEXPORT Pose2d {
 
   /**
    * Checks equality between this Pose2d and another object.
-   *
-   * @param other The other object.
-   * @return Whether the two objects are equal.
    */
-  bool operator==(const Pose2d& other) const;
-
-  /**
-   * Checks inequality between this Pose2d and another object.
-   *
-   * @param other The other object.
-   * @return Whether the two objects are not equal.
-   */
-  bool operator!=(const Pose2d& other) const;
+  bool operator==(const Pose2d&) const = default;
 
   /**
    * Returns the underlying translation.
@@ -141,7 +130,7 @@ class WPILIB_DLLEXPORT Pose2d {
   constexpr Pose2d TransformBy(const Transform2d& other) const;
 
   /**
-   * Returns the other pose relative to the current pose.
+   * Returns the current pose relative to the given pose.
    *
    * This function can often be used for trajectory tracking or pose
    * stabilization algorithms to get the error between the reference and the

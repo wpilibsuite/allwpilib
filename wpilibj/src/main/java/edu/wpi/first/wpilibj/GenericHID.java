@@ -5,6 +5,7 @@
 package edu.wpi.first.wpilibj;
 
 import edu.wpi.first.hal.DriverStationJNI;
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.event.BooleanEvent;
 import edu.wpi.first.wpilibj.event.EventLoop;
 import java.util.HashMap;
@@ -21,7 +22,8 @@ public class GenericHID {
   /** Represents a rumble output on the JoyStick. */
   public enum RumbleType {
     kLeftRumble,
-    kRightRumble
+    kRightRumble,
+    kBothRumble
   }
 
   public enum HIDType {
@@ -397,16 +399,24 @@ public class GenericHID {
    * @param value The normalized value (0 to 1) to set the rumble to
    */
   public void setRumble(RumbleType type, double value) {
-    if (value < 0) {
-      value = 0;
-    } else if (value > 1) {
-      value = 1;
+    value = MathUtil.clamp(value, 0, 1);
+    short rumbleValue = (short) (value * 65535);
+
+    switch (type) {
+      case kLeftRumble:
+        this.m_leftRumble = rumbleValue;
+        break;
+      case kRightRumble:
+        this.m_rightRumble = rumbleValue;
+        break;
+      case kBothRumble:
+      default:
+        this.m_leftRumble = rumbleValue;
+        this.m_rightRumble = rumbleValue;
+        break;
     }
-    if (type == RumbleType.kLeftRumble) {
-      m_leftRumble = (short) (value * 65535);
-    } else {
-      m_rightRumble = (short) (value * 65535);
-    }
-    DriverStationJNI.setJoystickOutputs((byte) m_port, m_outputs, m_leftRumble, m_rightRumble);
+
+    DriverStationJNI.setJoystickOutputs(
+        (byte) this.m_port, this.m_outputs, this.m_leftRumble, this.m_rightRumble);
   }
 }

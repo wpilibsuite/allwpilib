@@ -475,7 +475,9 @@ public class ADIS16470_IMU implements AutoCloseable, NTSendable {
     }
   }
 
-  /** @return */
+  /**
+   * @return
+   */
   boolean switchToAutoSPI() {
     // No SPI port has been set up. Go set one up first.
     if (m_spi == null) {
@@ -565,7 +567,7 @@ public class ADIS16470_IMU implements AutoCloseable, NTSendable {
       return 2;
     }
     if (m_reg > 1999) {
-      DriverStation.reportError("Attemted to write an invalid deimation value.", false);
+      DriverStation.reportError("Attempted to write an invalid deimation value.", false);
       m_reg = 1999;
     }
     m_scaled_sample_rate = (((m_reg + 1.0) / 2000.0) * 1000000.0);
@@ -926,7 +928,9 @@ public class ADIS16470_IMU implements AutoCloseable, NTSendable {
     return compAngle;
   }
 
-  /** @return Yaw axis angle in degrees (CCW positive) */
+  /**
+   * @return Yaw axis angle in degrees (CCW positive)
+   */
   public synchronized double getAngle() {
     switch (m_yaw_axis) {
       case kX:
@@ -948,7 +952,9 @@ public class ADIS16470_IMU implements AutoCloseable, NTSendable {
     return m_integ_angle;
   }
 
-  /** @return Yaw axis angular rate in degrees per second (CCW positive) */
+  /**
+   * @return Yaw axis angular rate in degrees per second (CCW positive)
+   */
   public synchronized double getRate() {
     if (m_yaw_axis == IMUAxis.kX) {
       if (m_simGyroRateX != null) {
@@ -970,42 +976,58 @@ public class ADIS16470_IMU implements AutoCloseable, NTSendable {
     }
   }
 
-  /** @return Yaw Axis */
+  /**
+   * @return Yaw Axis
+   */
   public IMUAxis getYawAxis() {
     return m_yaw_axis;
   }
 
-  /** @return current acceleration in the X axis */
+  /**
+   * @return current acceleration in the X axis
+   */
   public synchronized double getAccelX() {
     return m_accel_x * 9.81;
   }
 
-  /** @return current acceleration in the Y axis */
+  /**
+   * @return current acceleration in the Y axis
+   */
   public synchronized double getAccelY() {
     return m_accel_y * 9.81;
   }
 
-  /** @return current acceleration in the Z axis */
+  /**
+   * @return current acceleration in the Z axis
+   */
   public synchronized double getAccelZ() {
     return m_accel_z * 9.81;
   }
 
-  /** @return X axis complementary angle */
+  /**
+   * @return X axis complementary angle
+   */
   public synchronized double getXComplementaryAngle() {
     return m_compAngleX;
   }
 
-  /** @return Y axis complementary angle */
+  /**
+   * @return Y axis complementary angle
+   */
   public synchronized double getYComplementaryAngle() {
     return m_compAngleY;
   }
 
-  /** @return X axis filtered acceleration angle */
+  /**
+   * @return X axis filtered acceleration angle
+   */
   public synchronized double getXFilteredAccelAngle() {
     return m_accelAngleX;
   }
 
-  /** @return Y axis filtered acceleration angle */
+  /**
+   * @return Y axis filtered acceleration angle
+   */
   public synchronized double getYFilteredAccelAngle() {
     return m_accelAngleY;
   }

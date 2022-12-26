@@ -80,7 +80,11 @@ public class DriveSubsystem extends SubsystemBase {
     m_rightEncoder.setDistancePerPulse(DriveConstants.kEncoderDistancePerPulse);
 
     resetEncoders();
-    m_odometry = new DifferentialDriveOdometry(Rotation2d.fromDegrees(getHeading()));
+    m_odometry =
+        new DifferentialDriveOdometry(
+            Rotation2d.fromDegrees(getHeading()),
+            m_leftEncoder.getDistance(),
+            m_rightEncoder.getDistance());
 
     if (RobotBase.isSimulation()) { // If our robot is simulated
       // This class simulates our drivetrain's motion around the field.
@@ -174,7 +178,11 @@ public class DriveSubsystem extends SubsystemBase {
   public void resetOdometry(Pose2d pose) {
     resetEncoders();
     m_drivetrainSimulator.setPose(pose);
-    m_odometry.resetPosition(pose, Rotation2d.fromDegrees(getHeading()));
+    m_odometry.resetPosition(
+        Rotation2d.fromDegrees(getHeading()),
+        m_leftEncoder.getDistance(),
+        m_rightEncoder.getDistance(),
+        pose);
   }
 
   /**

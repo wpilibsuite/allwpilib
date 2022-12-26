@@ -66,25 +66,27 @@ void NetworkTablesSettings::Thread::Main() {
       } else if (m_mode == 2) {
         nt::StartClient3(m_inst, m_clientName);
       }
+
+      unsigned int port = m_mode == 1 ? m_port4 : m_port3;
       if (!wpi::contains(serverTeam, '.') &&
           (team = wpi::parse_integer<unsigned int>(serverTeam, 10))) {
-        nt::SetServerTeam(m_inst, team.value(), 0);
+        nt::SetServerTeam(m_inst, team.value(), port);
       } else {
         wpi::SmallVector<std::string_view, 4> serverNames;
         std::vector<std::pair<std::string_view, unsigned int>> servers;
         wpi::split(serverTeam, serverNames, ',', -1, false);
         for (auto&& serverName : serverNames) {
-          servers.emplace_back(serverName, 0);
+          servers.emplace_back(serverName, port);
         }
         nt::SetServer(m_inst, servers);
       }
 
       if (m_dsClient) {
-        nt::StartDSClient(m_inst, 0);
+        nt::StartDSClient(m_inst, port);
       }
     } else if (m_mode == 3) {
       nt::StartServer(m_inst, m_iniName.c_str(), m_listenAddress.c_str(),
-                      NT_DEFAULT_PORT3, NT_DEFAULT_PORT4);
+                      m_port3, m_port4);
     }
   }
 }
@@ -99,6 +101,8 @@ NetworkTablesSettings::NetworkTablesSettings(std::string_view clientName,
       m_serverTeam{storage.GetString("serverTeam")},
       m_listenAddress{storage.GetString("listenAddress")},
       m_clientName{storage.GetString("clientName", clientName)},
+      m_port3{storage.GetInt("port3", NT_DEFAULT_PORT3)},
+      m_port4{storage.GetInt("port4", NT_DEFAULT_PORT4)},
       m_dsClient{storage.GetBool("dsClient", true)} {
   m_thread.Start(inst);
 }
@@ -117,21 +121,54 @@ void NetworkTablesSettings::Update() {
   thr->m_serverTeam = m_serverTeam;
   thr->m_listenAddress = m_listenAddress;
   thr->m_clientName = m_clientName;
+  thr->m_port3 = m_port3;
+  thr->m_port4 = m_port4;
   thr->m_dsClient = m_dsClient;
   thr->m_cond.notify_one();
+}
+
+static void LimitPortRange(int* port) {
+  if (*port < 0) {
+    *port = 0;
+  } else if (*port > 65535) {
+    *port = 65535;
+  }
 }
 
 bool NetworkTablesSettings::Display() {
   m_mode.Combo("Mode", m_serverOption ? 4 : 3);
   switch (m_mode.GetValue()) {
     case 1:
-    case 2:
+    case 2: {
       ImGui::InputText("Team/IP", &m_serverTeam);
+      int* port = m_mode.GetValue() == 1 ? &m_port4 : &m_port3;
+      if (ImGui::InputInt("Port", port)) {
+        LimitPortRange(port);
+      }
+      ImGui::SameLine();
+      if (ImGui::SmallButton("Default")) {
+        *port = m_mode.GetValue() == 1 ? NT_DEFAULT_PORT4 : NT_DEFAULT_PORT3;
+      }
       ImGui::InputText("Network Identity", &m_clientName);
       ImGui::Checkbox("Get Address from DS", &m_dsClient);
       break;
+    }
     case 3:
       ImGui::InputText("Listen Address", &m_listenAddress);
+      if (ImGui::InputInt("NT3 port", &m_port3)) {
+        LimitPortRange(&m_port3);
+      }
+      ImGui::SameLine();
+      if (ImGui::SmallButton("Default##default3")) {
+        m_port3 = NT_DEFAULT_PORT3;
+      }
+      if (ImGui::InputInt("NT4 port", &m_port4)) {
+        LimitPortRange(&m_port4);
+      }
+      ImGui::SameLine();
+      if (ImGui::SmallButton("Default##default4")) {
+        m_port4 = NT_DEFAULT_PORT4;
+      }
       ImGui::InputText("Persistent Filename", &m_persistentFilename);
       break;
     default:

@@ -19,7 +19,6 @@
 #include <wpi/SmallVector.h>
 #include <wpi/sendable/SendableRegistry.h>
 
-#include "frc2/command/CommandGroupBase.h"
 #include "frc2/command/CommandPtr.h"
 #include "frc2/command/Subsystem.h"
 
@@ -118,15 +117,10 @@ void CommandScheduler::Schedule(Command* command) {
     return;
   }
 
-  if (command->IsGrouped()) {
-    throw FRC_MakeError(frc::err::CommandIllegalUse,
-                        "A command that is part of a command group "
-                        "cannot be independently scheduled");
-    return;
-  }
-  if (m_impl->disabled ||
-      (frc::RobotState::IsDisabled() && !command->RunsWhenDisabled()) ||
-      m_impl->scheduledCommands.contains(command)) {
+  RequireUngrouped(command);
+
+  if (m_impl->disabled || m_impl->scheduledCommands.contains(command) ||
+      (frc::RobotState::IsDisabled() && !command->RunsWhenDisabled())) {
     return;
   }
 
@@ -258,6 +252,11 @@ void CommandScheduler::Run() {
 }
 
 void CommandScheduler::RegisterSubsystem(Subsystem* subsystem) {
+  if (m_impl->subsystems.find(subsystem) != m_impl->subsystems.end()) {
+    std::puts("Tried to register an already-registered subsystem");
+    return;
+  }
+
   m_impl->subsystems[subsystem] = nullptr;
 }
 
@@ -302,12 +301,13 @@ void CommandScheduler::SetDefaultCommand(Subsystem* subsystem,
     throw FRC_MakeError(frc::err::CommandIllegalUse, "{}",
                         "Default commands must require their subsystem!");
   }
-  if (defaultCommand.get()->IsFinished()) {
-    throw FRC_MakeError(frc::err::CommandIllegalUse, "{}",
-                        "Default commands should not end!");
-  }
+  RequireUngrouped(defaultCommand.get());
 
   SetDefaultCommandImpl(subsystem, std::move(defaultCommand).Unwrap());
+}
+
+void CommandScheduler::RemoveDefaultCommand(Subsystem* subsystem) {
+  m_impl->subsystems[subsystem] = nullptr;
 }
 
 Command* CommandScheduler::GetDefaultCommand(const Subsystem* subsystem) const {
@@ -429,6 +429,28 @@ void CommandScheduler::OnCommandInterrupt(Action action) {
 
 void CommandScheduler::OnCommandFinish(Action action) {
   m_impl->finishActions.emplace_back(std::move(action));
+}
+
+void CommandScheduler::RequireUngrouped(const Command* command) {
+  if (command->IsComposed()) {
+    throw FRC_MakeError(
+        frc::err::CommandIllegalUse,
+        "Commands cannot be added to more than one CommandGroup");
+  }
+}
+
+void CommandScheduler::RequireUngrouped(
+    std::span<const std::unique_ptr<Command>> commands) {
+  for (auto&& command : commands) {
+    RequireUngrouped(command.get());
+  }
+}
+
+void CommandScheduler::RequireUngrouped(
+    std::initializer_list<const Command*> commands) {
+  for (auto&& command : commands) {
+    RequireUngrouped(command);
+  }
 }
 
 void CommandScheduler::InitSendable(nt::NTSendableBuilder& builder) {

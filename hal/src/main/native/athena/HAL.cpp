@@ -18,6 +18,9 @@
 #include <FRC_NetworkCommunication/LoadOut.h>
 #include <FRC_NetworkCommunication/UsageReporting.h>
 #include <fmt/format.h>
+#include <wpi/MemoryBuffer.h>
+#include <wpi/StringExtras.h>
+#include <wpi/fs.h>
 #include <wpi/mutex.h>
 #include <wpi/timestamp.h>
 
@@ -82,6 +85,7 @@ void InitializeHAL() {
 }  // namespace init
 
 void ReleaseFPGAInterrupt(int32_t interruptNumber) {
+  hal::init::CheckInit();
   if (!global) {
     return;
   }
@@ -252,6 +256,7 @@ HAL_RuntimeType HAL_GetRuntimeType(void) {
 }
 
 int32_t HAL_GetFPGAVersion(int32_t* status) {
+  hal::init::CheckInit();
   if (!global) {
     *status = NiFpga_Status_ResourceNotInitialized;
     return 0;
@@ -260,6 +265,7 @@ int32_t HAL_GetFPGAVersion(int32_t* status) {
 }
 
 int64_t HAL_GetFPGARevision(int32_t* status) {
+  hal::init::CheckInit();
   if (!global) {
     *status = NiFpga_Status_ResourceNotInitialized;
     return 0;
@@ -267,7 +273,22 @@ int64_t HAL_GetFPGARevision(int32_t* status) {
   return global->readRevision(status);
 }
 
+size_t HAL_GetSerialNumber(char* buffer, size_t size) {
+  const char* serialNum = std::getenv("serialnum");
+  if (serialNum) {
+    std::strncpy(buffer, serialNum, size);
+    buffer[size - 1] = '\0';
+    return std::strlen(buffer);
+  } else {
+    if (size > 0) {
+      buffer[0] = '\0';
+    }
+    return 0;
+  }
+}
+
 uint64_t HAL_GetFPGATime(int32_t* status) {
+  hal::init::CheckInit();
   if (!global) {
     *status = NiFpga_Status_ResourceNotInitialized;
     return 0;
@@ -314,6 +335,7 @@ uint64_t HAL_ExpandFPGATime(uint32_t unexpandedLower, int32_t* status) {
 }
 
 HAL_Bool HAL_GetFPGAButton(int32_t* status) {
+  hal::init::CheckInit();
   if (!global) {
     *status = NiFpga_Status_ResourceNotInitialized;
     return false;
@@ -322,6 +344,7 @@ HAL_Bool HAL_GetFPGAButton(int32_t* status) {
 }
 
 HAL_Bool HAL_GetSystemActive(int32_t* status) {
+  hal::init::CheckInit();
   if (!watchdog) {
     *status = NiFpga_Status_ResourceNotInitialized;
     return false;
@@ -330,6 +353,7 @@ HAL_Bool HAL_GetSystemActive(int32_t* status) {
 }
 
 HAL_Bool HAL_GetBrownedOut(int32_t* status) {
+  hal::init::CheckInit();
   if (!watchdog) {
     *status = NiFpga_Status_ResourceNotInitialized;
     return false;

@@ -4,21 +4,22 @@
 
 #include "frc2/command/ConditionalCommand.h"
 
+#include <wpi/sendable/SendableBuilder.h>
+
 using namespace frc2;
 
 ConditionalCommand::ConditionalCommand(std::unique_ptr<Command>&& onTrue,
                                        std::unique_ptr<Command>&& onFalse,
                                        std::function<bool()> condition)
     : m_condition{std::move(condition)} {
-  if (!CommandGroupBase::RequireUngrouped({onTrue.get(), onFalse.get()})) {
-    return;
-  }
+  CommandScheduler::GetInstance().RequireUngrouped(
+      {onTrue.get(), onFalse.get()});
 
   m_onTrue = std::move(onTrue);
   m_onFalse = std::move(onFalse);
 
-  m_onTrue->SetGrouped(true);
-  m_onFalse->SetGrouped(true);
+  m_onTrue->SetComposed(true);
+  m_onFalse->SetComposed(true);
 
   m_runsWhenDisabled &= m_onTrue->RunsWhenDisabled();
   m_runsWhenDisabled &= m_onFalse->RunsWhenDisabled();
@@ -50,4 +51,22 @@ bool ConditionalCommand::IsFinished() {
 
 bool ConditionalCommand::RunsWhenDisabled() const {
   return m_runsWhenDisabled;
+}
+
+void ConditionalCommand::InitSendable(wpi::SendableBuilder& builder) {
+  CommandBase::InitSendable(builder);
+  builder.AddStringProperty(
+      "onTrue", [this] { return m_onTrue->GetName(); }, nullptr);
+  builder.AddStringProperty(
+      "onFalse", [this] { return m_onFalse->GetName(); }, nullptr);
+  builder.AddStringProperty(
+      "selected",
+      [this] {
+        if (m_selectedCommand) {
+          return m_selectedCommand->GetName();
+        } else {
+          return std::string{"null"};
+        }
+      },
+      nullptr);
 }
