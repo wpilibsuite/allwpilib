@@ -45,11 +45,18 @@ class RobotController {
   static int64_t GetFPGARevision();
 
   /**
-   * Returns the serial number of the roboRIO.
+   * Return the serial number of the roboRIO.
    *
    * @return The serial number of the roboRIO.
    */
   static std::string GetSerialNumber();
+
+  /**
+   * Return the comments from the roboRIO web interface.
+   *
+   * @return The comments from the roboRIO web interface.
+   */
+  static std::string GetComments();
 
   /**
    * Read the microsecond-resolution timer on the FPGA.

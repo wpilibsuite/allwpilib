@@ -294,6 +294,16 @@ void RoboRioSim::SetSerialNumber(std::string_view serialNumber) {
   HALSIM_SetRoboRioSerialNumber(serialNumber.data(), serialNumber.size());
 }
 
+std::string RoboRioSim::GetComments() {
+  char comments[65];
+  size_t len = HALSIM_GetRoboRioComments(comments, sizeof(comments));
+  return std::string(comments, len);
+}
+
+void RoboRioSim::SetComments(std::string_view comments) {
+  HALSIM_SetRoboRioComments(comments.data(), comments.size());
+}
+
 void RoboRioSim::ResetData() {
   HALSIM_ResetRoboRioData();
 }
