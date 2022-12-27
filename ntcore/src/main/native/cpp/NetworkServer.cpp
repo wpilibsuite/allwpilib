@@ -108,6 +108,7 @@ class NSImpl {
          unsigned int port3, unsigned int port4,
          net::ILocalStorage& localStorage, IConnectionList& connList,
          wpi::Logger& logger, std::function<void()> initDone);
+  ~NSImpl();
 
   void HandleLocal();
   void LoadPersistent();
@@ -131,6 +132,7 @@ class NSImpl {
   std::shared_ptr<uv::Timer> m_savePersistentTimer;
   std::shared_ptr<uv::Async<>> m_flushLocal;
   std::shared_ptr<uv::Async<>> m_flush;
+  bool m_shutdown = false;
 
   std::vector<net::ClientMessage> m_localMsgs;
 
@@ -344,6 +346,10 @@ NSImpl::NSImpl(std::string_view persistentFilename,
   });
 }
 
+NSImpl::~NSImpl() {
+  m_loopRunner.ExecAsync([this](uv::Loop&) { m_shutdown = true; });
+}
+
 void NSImpl::HandleLocal() {
   m_localQueue.ReadQueue(&m_localMsgs);
   m_serverImpl.HandleLocal(m_localMsgs);
@@ -395,6 +401,9 @@ void NSImpl::SavePersistent(std::string_view filename, std::string_view data) {
 }
 
 void NSImpl::Init() {
+  if (m_shutdown) {
+    return;
+  }
   auto errs = m_serverImpl.LoadPersistent(m_persistentData);
   if (!errs.empty()) {
     WARNING("error reading persistent file: {}", errs);
