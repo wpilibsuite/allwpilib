@@ -71,7 +71,7 @@ public class TimedRobot extends IterativeRobotBase {
   // just passed to the JNI bindings.
   private final int m_notifier = NotifierJNI.initializeNotifier();
 
-  private double m_startTime;
+  private final double m_startTime;
 
   private final PriorityQueue<Callback> m_callbacks = new PriorityQueue<>();
 
@@ -116,9 +116,9 @@ public class TimedRobot extends IterativeRobotBase {
     // Loop forever, calling the appropriate mode-dependent function
     while (true) {
       // We don't have to check there's an element in the queue first because
-      // there's always at least one (the constructor adds one). It's reenqueued
+      // there's always at least one (the constructor adds one). It's re added to the queue
       // at the end of the loop.
-      var callback = m_callbacks.poll();
+      Callback callback = m_callbacks.poll();
 
       NotifierJNI.updateNotifierAlarm(m_notifier, (long) (callback.expirationTime * 1e6));
 
@@ -151,19 +151,6 @@ public class TimedRobot extends IterativeRobotBase {
   }
 
   /**
-   * Add a callback to run at a specific period.
-   *
-   * <p>This is scheduled on TimedRobot's Notifier, so TimedRobot and the callback run
-   * synchronously. Interactions between them are thread-safe.
-   *
-   * @param callback The callback to run.
-   * @param periodSeconds The period at which to run the callback in seconds.
-   */
-  public void addPeriodic(Runnable callback, double periodSeconds) {
-    m_callbacks.add(new Callback(callback, m_startTime, periodSeconds, 0.0));
-  }
-
-  /**
    * Add a callback to run at a specific period with a starting time offset.
    *
    * <p>This is scheduled on TimedRobot's Notifier, so TimedRobot and the callback run
@@ -176,5 +163,42 @@ public class TimedRobot extends IterativeRobotBase {
    */
   public void addPeriodic(Runnable callback, double periodSeconds, double offsetSeconds) {
     m_callbacks.add(new Callback(callback, m_startTime, periodSeconds, offsetSeconds));
+  }
+
+  /**
+   * Add a callback to run at a specific period.
+   *
+   * <p>This is scheduled on TimedRobot's Notifier, so TimedRobot and the callback run
+   * synchronously. Interactions between them are thread-safe.
+   *
+   * @param callback The callback to run.
+   * @param periodSeconds The period at which to run the callback in seconds.
+   */
+  public void addPeriodic(Runnable callback, double periodSeconds) {
+    addPeriodic(callback, periodSeconds, 0.0);
+  }
+
+  /**
+   * Add a callback to run at the currently set periodic loop rate.
+   *
+   * <p>This is scheduled on TimedRobot's Notifier, so TimedRobot and the callback run
+   * synchronously. Interactions between them are thread-safe.
+   *
+   * @param callback The callback to run.
+   */
+  public void addPeriodic(Runnable callback) {
+    addPeriodic(callback, getPeriod());
+  }
+
+  /**
+   * Add a callback to run at the default periodic loop rate.
+   *
+   * <p>This is scheduled on TimedRobot's Notifier, so TimedRobot and the callback run
+   * synchronously. Interactions between them are thread-safe.
+   *
+   * @param callback The callback to run.
+   */
+  public void addDefaultPeriodic(Runnable callback) {
+    addPeriodic(callback, kDefaultPeriod);
   }
 }
