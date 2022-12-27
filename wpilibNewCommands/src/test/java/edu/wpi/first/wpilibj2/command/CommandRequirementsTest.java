@@ -14,60 +14,53 @@ import org.junit.jupiter.api.Test;
 class CommandRequirementsTest extends CommandTestBase {
   @Test
   void requirementInterruptTest() {
-    try (CommandScheduler scheduler = new CommandScheduler()) {
-      Subsystem requirement = new SubsystemBase() {};
+    Subsystem requirement = new SubsystemBase() {};
 
-      MockCommandHolder interruptedHolder = new MockCommandHolder(true, requirement);
-      Command interrupted = interruptedHolder.getMock();
-      MockCommandHolder interrupterHolder = new MockCommandHolder(true, requirement);
-      Command interrupter = interrupterHolder.getMock();
+    MockCommandHolder interruptedHolder = new MockCommandHolder(true, requirement);
+    Command interrupted = interruptedHolder.getMock();
+    MockCommandHolder interrupterHolder = new MockCommandHolder(true, requirement);
+    Command interrupter = interrupterHolder.getMock();
 
-      scheduler.schedule(interrupted);
-      scheduler.run();
-      scheduler.schedule(interrupter);
-      scheduler.run();
+    interrupted.schedule();
+    CommandScheduler.getInstance().run();
+    interrupter.schedule();
+    CommandScheduler.getInstance().run();
 
-      verify(interrupted).initialize();
-      verify(interrupted).execute();
-      verify(interrupted).end(true);
+    verify(interrupted).initialize();
+    verify(interrupted).execute();
+    verify(interrupted).end(true);
 
-      verify(interrupter).initialize();
-      verify(interrupter).execute();
+    verify(interrupter).initialize();
+    verify(interrupter).execute();
 
-      assertFalse(scheduler.isScheduled(interrupted));
-      assertTrue(scheduler.isScheduled(interrupter));
-    }
+    assertFalse(interrupted.isScheduled());
+    assertTrue(interrupter.isScheduled());
   }
 
   @Test
   void requirementUninterruptibleTest() {
-    try (CommandScheduler scheduler = new CommandScheduler()) {
-      Subsystem requirement = new SubsystemBase() {};
+    Subsystem requirement = new SubsystemBase() {};
 
-      Command notInterrupted =
-          new RunCommand(() -> {}, requirement)
-              .withInterruptBehavior(Command.InterruptionBehavior.kCancelIncoming);
-      MockCommandHolder interrupterHolder = new MockCommandHolder(true, requirement);
-      Command interrupter = interrupterHolder.getMock();
+    Command notInterrupted =
+        new RunCommand(() -> {}, requirement)
+            .withInterruptBehavior(Command.InterruptionBehavior.kCancelIncoming);
+    MockCommandHolder interrupterHolder = new MockCommandHolder(true, requirement);
+    Command interrupter = interrupterHolder.getMock();
 
-      scheduler.schedule(notInterrupted);
-      scheduler.schedule(interrupter);
+    notInterrupted.schedule();
+    interrupter.schedule();
 
-      assertTrue(scheduler.isScheduled(notInterrupted));
-      assertFalse(scheduler.isScheduled(interrupter));
-    }
+    assertTrue(notInterrupted.isScheduled());
+    assertFalse(interrupter.isScheduled());
   }
 
   @Test
   void defaultCommandRequirementErrorTest() {
-    try (CommandScheduler scheduler = new CommandScheduler()) {
-      Subsystem system = new SubsystemBase() {};
+    Subsystem system = new SubsystemBase() {};
 
-      Command missingRequirement = new WaitUntilCommand(() -> false);
+    Command missingRequirement = new WaitUntilCommand(() -> false);
 
-      assertThrows(
-          IllegalArgumentException.class,
-          () -> scheduler.setDefaultCommand(system, missingRequirement));
-    }
+    assertThrows(
+        IllegalArgumentException.class, () -> system.setDefaultCommand(missingRequirement));
   }
 }

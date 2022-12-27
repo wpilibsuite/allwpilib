@@ -30,7 +30,6 @@ class NetworkButtonTest extends CommandTestBase {
 
   @Test
   void setNetworkButtonTest() {
-    var scheduler = CommandScheduler.getInstance();
     var commandHolder = new MockCommandHolder(true);
     var command = commandHolder.getMock();
     var pub = m_inst.getTable("TestTable").getBooleanTopic("Test").publish();
@@ -38,11 +37,11 @@ class NetworkButtonTest extends CommandTestBase {
     var button = new NetworkButton(m_inst, "TestTable", "Test");
     pub.set(false);
     button.onTrue(command);
-    scheduler.run();
+    CommandScheduler.getInstance().run();
     verify(command, never()).schedule();
     pub.set(true);
-    scheduler.run();
-    scheduler.run();
+    CommandScheduler.getInstance().run();
+    CommandScheduler.getInstance().run();
     verify(command).schedule();
   }
 }

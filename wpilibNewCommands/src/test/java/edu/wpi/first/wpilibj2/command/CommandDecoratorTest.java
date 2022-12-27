@@ -21,21 +21,21 @@ class CommandDecoratorTest extends CommandTestBase {
   void withTimeoutTest() {
     HAL.initialize(500, 0);
     SimHooks.pauseTiming();
-    try (CommandScheduler scheduler = new CommandScheduler()) {
+    try {
       Command command1 = new WaitCommand(10);
 
       Command timeout = command1.withTimeout(2);
 
-      scheduler.schedule(timeout);
-      scheduler.run();
+      timeout.schedule();
+      CommandScheduler.getInstance().run();
 
-      assertFalse(scheduler.isScheduled(command1));
-      assertTrue(scheduler.isScheduled(timeout));
+      assertFalse(command1.isScheduled());
+      assertTrue(timeout.isScheduled());
 
       SimHooks.stepTiming(3);
-      scheduler.run();
+      CommandScheduler.getInstance().run();
 
-      assertFalse(scheduler.isScheduled(timeout));
+      assertFalse(timeout.isScheduled());
     } finally {
       SimHooks.resumeTiming();
     }
@@ -43,253 +43,229 @@ class CommandDecoratorTest extends CommandTestBase {
 
   @Test
   void untilTest() {
-    try (CommandScheduler scheduler = new CommandScheduler()) {
-      AtomicBoolean condition = new AtomicBoolean();
+    AtomicBoolean condition = new AtomicBoolean();
 
-      Command command = new WaitCommand(10).until(condition::get);
+    Command command = new WaitCommand(10).until(condition::get);
 
-      scheduler.schedule(command);
-      scheduler.run();
-      assertTrue(scheduler.isScheduled(command));
-      condition.set(true);
-      scheduler.run();
-      assertFalse(scheduler.isScheduled(command));
-    }
+    command.schedule();
+    CommandScheduler.getInstance().run();
+    assertTrue(command.isScheduled());
+    condition.set(true);
+    CommandScheduler.getInstance().run();
+    assertFalse(command.isScheduled());
   }
 
   @Test
   void ignoringDisableTest() {
-    try (CommandScheduler scheduler = new CommandScheduler()) {
-      var command = new RunCommand(() -> {}).ignoringDisable(true);
+    var command = new RunCommand(() -> {}).ignoringDisable(true);
 
-      setDSEnabled(false);
+    setDSEnabled(false);
 
-      scheduler.schedule(command);
+    command.schedule();
 
-      scheduler.run();
-      assertTrue(scheduler.isScheduled(command));
-    }
+    CommandScheduler.getInstance().run();
+    assertTrue(command.isScheduled());
   }
 
   @Test
   void beforeStartingTest() {
-    try (CommandScheduler scheduler = new CommandScheduler()) {
-      AtomicBoolean condition = new AtomicBoolean();
-      condition.set(false);
+    AtomicBoolean condition = new AtomicBoolean();
+    condition.set(false);
 
-      Command command = new InstantCommand();
+    Command command = new InstantCommand();
 
-      scheduler.schedule(command.beforeStarting(() -> condition.set(true)));
+    command.beforeStarting(() -> condition.set(true)).schedule();
 
-      assertTrue(condition.get());
-    }
+    assertTrue(condition.get());
   }
 
   @Test
   void andThenLambdaTest() {
-    try (CommandScheduler scheduler = new CommandScheduler()) {
-      AtomicBoolean condition = new AtomicBoolean();
-      condition.set(false);
+    AtomicBoolean condition = new AtomicBoolean();
+    condition.set(false);
 
-      Command command = new InstantCommand();
+    Command command = new InstantCommand();
 
-      scheduler.schedule(command.andThen(() -> condition.set(true)));
+    command.andThen(() -> condition.set(true)).schedule();
 
-      assertFalse(condition.get());
+    assertFalse(condition.get());
 
-      scheduler.run();
+    CommandScheduler.getInstance().run();
 
-      assertTrue(condition.get());
-    }
+    assertTrue(condition.get());
   }
 
   @Test
   void andThenTest() {
-    try (CommandScheduler scheduler = new CommandScheduler()) {
-      AtomicBoolean condition = new AtomicBoolean();
-      condition.set(false);
+    AtomicBoolean condition = new AtomicBoolean();
+    condition.set(false);
 
-      Command command1 = new InstantCommand();
-      Command command2 = new InstantCommand(() -> condition.set(true));
+    Command command1 = new InstantCommand();
+    Command command2 = new InstantCommand(() -> condition.set(true));
 
-      scheduler.schedule(command1.andThen(command2));
+    command1.andThen(command2).schedule();
 
-      assertFalse(condition.get());
+    assertFalse(condition.get());
 
-      scheduler.run();
+    CommandScheduler.getInstance().run();
 
-      assertTrue(condition.get());
-    }
+    assertTrue(condition.get());
   }
 
   @Test
   void deadlineWithTest() {
-    try (CommandScheduler scheduler = new CommandScheduler()) {
-      AtomicBoolean condition = new AtomicBoolean();
-      condition.set(false);
+    AtomicBoolean condition = new AtomicBoolean();
+    condition.set(false);
 
-      Command dictator = new WaitUntilCommand(condition::get);
-      Command endsBefore = new InstantCommand();
-      Command endsAfter = new WaitUntilCommand(() -> false);
+    Command dictator = new WaitUntilCommand(condition::get);
+    Command endsBefore = new InstantCommand();
+    Command endsAfter = new WaitUntilCommand(() -> false);
 
-      Command group = dictator.deadlineWith(endsBefore, endsAfter);
+    Command group = dictator.deadlineWith(endsBefore, endsAfter);
 
-      scheduler.schedule(group);
-      scheduler.run();
+    group.schedule();
+    CommandScheduler.getInstance().run();
 
-      assertTrue(scheduler.isScheduled(group));
+    assertTrue(group.isScheduled());
 
-      condition.set(true);
-      scheduler.run();
+    condition.set(true);
+    CommandScheduler.getInstance().run();
 
-      assertFalse(scheduler.isScheduled(group));
-    }
+    assertFalse(group.isScheduled());
   }
 
   @Test
   void alongWithTest() {
-    try (CommandScheduler scheduler = new CommandScheduler()) {
-      AtomicBoolean condition = new AtomicBoolean();
-      condition.set(false);
+    AtomicBoolean condition = new AtomicBoolean();
+    condition.set(false);
 
-      Command command1 = new WaitUntilCommand(condition::get);
-      Command command2 = new InstantCommand();
+    Command command1 = new WaitUntilCommand(condition::get);
+    Command command2 = new InstantCommand();
 
-      Command group = command1.alongWith(command2);
+    Command group = command1.alongWith(command2);
 
-      scheduler.schedule(group);
-      scheduler.run();
+    group.schedule();
+    CommandScheduler.getInstance().run();
 
-      assertTrue(scheduler.isScheduled(group));
+    assertTrue(group.isScheduled());
 
-      condition.set(true);
-      scheduler.run();
+    condition.set(true);
+    CommandScheduler.getInstance().run();
 
-      assertFalse(scheduler.isScheduled(group));
-    }
+    assertFalse(group.isScheduled());
   }
 
   @Test
   void raceWithTest() {
-    try (CommandScheduler scheduler = new CommandScheduler()) {
-      Command command1 = new WaitUntilCommand(() -> false);
-      Command command2 = new InstantCommand();
+    Command command1 = new WaitUntilCommand(() -> false);
+    Command command2 = new InstantCommand();
 
-      Command group = command1.raceWith(command2);
+    Command group = command1.raceWith(command2);
 
-      scheduler.schedule(group);
-      scheduler.run();
+    group.schedule();
+    CommandScheduler.getInstance().run();
 
-      assertFalse(scheduler.isScheduled(group));
-    }
+    assertFalse(group.isScheduled());
   }
 
   @SuppressWarnings("removal") // Command.perpetually()
   @Test
   void perpetuallyTest() {
-    try (CommandScheduler scheduler = new CommandScheduler()) {
-      Command command = new InstantCommand();
+    Command command = new InstantCommand();
 
-      Command perpetual = command.perpetually();
+    Command perpetual = command.perpetually();
 
-      scheduler.schedule(perpetual);
-      scheduler.run();
-      scheduler.run();
-      scheduler.run();
+    perpetual.schedule();
+    CommandScheduler.getInstance().run();
+    CommandScheduler.getInstance().run();
+    CommandScheduler.getInstance().run();
 
-      assertTrue(scheduler.isScheduled(perpetual));
-    }
+    assertTrue(perpetual.isScheduled());
   }
 
   @Test
   void unlessTest() {
-    try (CommandScheduler scheduler = new CommandScheduler()) {
-      AtomicBoolean unlessCondition = new AtomicBoolean(true);
-      AtomicBoolean hasRunCondition = new AtomicBoolean(false);
+    AtomicBoolean unlessCondition = new AtomicBoolean(true);
+    AtomicBoolean hasRunCondition = new AtomicBoolean(false);
 
-      Command command =
-          new InstantCommand(() -> hasRunCondition.set(true)).unless(unlessCondition::get);
+    Command command =
+        new InstantCommand(() -> hasRunCondition.set(true)).unless(unlessCondition::get);
 
-      scheduler.schedule(command);
-      scheduler.run();
-      assertFalse(hasRunCondition.get());
+    command.schedule();
+    CommandScheduler.getInstance().run();
+    assertFalse(hasRunCondition.get());
 
-      unlessCondition.set(false);
-      scheduler.schedule(command);
-      scheduler.run();
-      assertTrue(hasRunCondition.get());
-    }
+    unlessCondition.set(false);
+    command.schedule();
+    CommandScheduler.getInstance().run();
+    assertTrue(hasRunCondition.get());
   }
 
   @Test
   void finallyDoTest() {
-    try (CommandScheduler scheduler = new CommandScheduler()) {
-      AtomicInteger first = new AtomicInteger(0);
-      AtomicInteger second = new AtomicInteger(0);
+    AtomicInteger first = new AtomicInteger(0);
+    AtomicInteger second = new AtomicInteger(0);
 
-      Command command =
-          new FunctionalCommand(
-                  () -> {},
-                  () -> {},
-                  interrupted -> {
-                    if (!interrupted) {
-                      first.incrementAndGet();
-                    }
-                  },
-                  () -> true)
-              .finallyDo(
-                  interrupted -> {
-                    if (!interrupted) {
-                      // to differentiate between "didn't run" and "ran before command's `end()`
-                      second.addAndGet(1 + first.get());
-                    }
-                  });
+    Command command =
+        new FunctionalCommand(
+                () -> {},
+                () -> {},
+                interrupted -> {
+                  if (!interrupted) {
+                    first.incrementAndGet();
+                  }
+                },
+                () -> true)
+            .finallyDo(
+                interrupted -> {
+                  if (!interrupted) {
+                    // to differentiate between "didn't run" and "ran before command's `end()`
+                    second.addAndGet(1 + first.get());
+                  }
+                });
 
-      scheduler.schedule(command);
-      assertEquals(0, first.get());
-      assertEquals(0, second.get());
-      scheduler.run();
-      assertEquals(1, first.get());
-      // if `second == 0`, neither of the lambdas ran.
-      // if `second == 1`, the second lambda ran before the first one
-      assertEquals(2, second.get());
-    }
+    command.schedule();
+    assertEquals(0, first.get());
+    assertEquals(0, second.get());
+    CommandScheduler.getInstance().run();
+    assertEquals(1, first.get());
+    // if `second == 0`, neither of the lambdas ran.
+    // if `second == 1`, the second lambda ran before the first one
+    assertEquals(2, second.get());
   }
 
   // handleInterruptTest() implicitly tests the interrupt=true branch of finallyDo()
   @Test
   void handleInterruptTest() {
-    try (CommandScheduler scheduler = new CommandScheduler()) {
-      AtomicInteger first = new AtomicInteger(0);
-      AtomicInteger second = new AtomicInteger(0);
+    AtomicInteger first = new AtomicInteger(0);
+    AtomicInteger second = new AtomicInteger(0);
 
-      Command command =
-          new FunctionalCommand(
-                  () -> {},
-                  () -> {},
-                  interrupted -> {
-                    if (interrupted) {
-                      first.incrementAndGet();
-                    }
-                  },
-                  () -> false)
-              .handleInterrupt(
-                  () -> {
-                    // to differentiate between "didn't run" and "ran before command's `end()`
-                    second.addAndGet(1 + first.get());
-                  });
+    Command command =
+        new FunctionalCommand(
+                () -> {},
+                () -> {},
+                interrupted -> {
+                  if (interrupted) {
+                    first.incrementAndGet();
+                  }
+                },
+                () -> false)
+            .handleInterrupt(
+                () -> {
+                  // to differentiate between "didn't run" and "ran before command's `end()`
+                  second.addAndGet(1 + first.get());
+                });
 
-      scheduler.schedule(command);
-      scheduler.run();
-      assertEquals(0, first.get());
-      assertEquals(0, second.get());
+    command.schedule();
+    CommandScheduler.getInstance().run();
+    assertEquals(0, first.get());
+    assertEquals(0, second.get());
 
-      scheduler.cancel(command);
-      assertEquals(1, first.get());
-      // if `second == 0`, neither of the lambdas ran.
-      // if `second == 1`, the second lambda ran before the first one
-      assertEquals(2, second.get());
-    }
+    command.cancel();
+    assertEquals(1, first.get());
+    // if `second == 0`, neither of the lambdas ran.
+    // if `second == 1`, the second lambda ran before the first one
+    assertEquals(2, second.get());
   }
 
   @Test

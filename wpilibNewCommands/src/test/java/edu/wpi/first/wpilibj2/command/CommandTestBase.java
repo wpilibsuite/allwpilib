@@ -4,16 +4,18 @@
 
 package edu.wpi.first.wpilibj2.command;
 
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.simulation.DriverStationSim;
 import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
 import java.util.Set;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.parallel.ResourceLock;
 
 /** Basic setup for all {@link Command tests}. */
+@ResourceLock("CommandScheduler")
 public class CommandTestBase {
   protected CommandTestBase() {}
 
@@ -25,6 +27,15 @@ public class CommandTestBase {
     CommandScheduler.getInstance().clearComposedCommands();
 
     setDSEnabled(true);
+  }
+
+  @AfterEach
+  void commandCleanup() {
+    CommandScheduler.getInstance().cancelAll();
+    CommandScheduler.getInstance().disable();
+    CommandScheduler.getInstance().getActiveButtonLoop().clear();
+    CommandScheduler.getInstance().clearComposedCommands();
+    CommandScheduler.getInstance().close();
   }
 
   public void setDSEnabled(boolean enabled) {
@@ -49,6 +60,9 @@ public class CommandTestBase {
       when(m_mockCommand.isFinished()).thenReturn(false);
       when(m_mockCommand.runsWhenDisabled()).thenReturn(runWhenDisabled);
       when(m_mockCommand.getInterruptionBehavior()).thenReturn(InterruptionBehavior.kCancelSelf);
+      doCallRealMethod().when(m_mockCommand).schedule();
+      when(m_mockCommand.isScheduled()).thenCallRealMethod();
+      doCallRealMethod().when(m_mockCommand).cancel();
     }
 
     public Command getMock() {

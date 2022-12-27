@@ -14,36 +14,32 @@ import org.junit.jupiter.api.Test;
 class ProxyCommandTest extends CommandTestBase {
   @Test
   void proxyCommandScheduleTest() {
-    try (CommandScheduler scheduler = new CommandScheduler()) {
-      MockCommandHolder command1Holder = new MockCommandHolder(true);
-      Command command1 = command1Holder.getMock();
+    MockCommandHolder command1Holder = new MockCommandHolder(true);
+    Command command1 = command1Holder.getMock();
 
-      ProxyCommand scheduleCommand = new ProxyCommand(command1);
+    ProxyCommand scheduleCommand = new ProxyCommand(command1);
 
-      scheduler.schedule(scheduleCommand);
+    scheduleCommand.schedule();
 
-      verify(command1).schedule();
-    }
+    verify(command1).schedule();
   }
 
   @Test
   void proxyCommandEndTest() {
-    try (CommandScheduler scheduler = CommandScheduler.getInstance()) {
-      AtomicBoolean cond = new AtomicBoolean();
+    AtomicBoolean cond = new AtomicBoolean();
 
-      WaitUntilCommand command = new WaitUntilCommand(cond::get);
+    WaitUntilCommand command = new WaitUntilCommand(cond::get);
 
-      ProxyCommand scheduleCommand = new ProxyCommand(command);
+    ProxyCommand scheduleCommand = new ProxyCommand(command);
 
-      scheduler.schedule(scheduleCommand);
+    scheduleCommand.schedule();
 
-      scheduler.run();
-      assertTrue(scheduler.isScheduled(scheduleCommand));
+    CommandScheduler.getInstance().run();
+    assertTrue(scheduleCommand.isScheduled());
 
-      cond.set(true);
-      scheduler.run();
-      scheduler.run();
-      assertFalse(scheduler.isScheduled(scheduleCommand));
-    }
+    cond.set(true);
+    CommandScheduler.getInstance().run();
+    CommandScheduler.getInstance().run();
+    assertFalse(scheduleCommand.isScheduled());
   }
 }

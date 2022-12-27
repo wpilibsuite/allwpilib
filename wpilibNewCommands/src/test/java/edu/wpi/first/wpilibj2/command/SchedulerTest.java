@@ -13,75 +13,65 @@ import org.junit.jupiter.api.Test;
 class SchedulerTest extends CommandTestBase {
   @Test
   void schedulerLambdaTestNoInterrupt() {
-    try (CommandScheduler scheduler = new CommandScheduler()) {
-      AtomicInteger counter = new AtomicInteger();
+    AtomicInteger counter = new AtomicInteger();
 
-      scheduler.onCommandInitialize(command -> counter.incrementAndGet());
-      scheduler.onCommandExecute(command -> counter.incrementAndGet());
-      scheduler.onCommandFinish(command -> counter.incrementAndGet());
+    CommandScheduler.getInstance().onCommandInitialize(command -> counter.incrementAndGet());
+    CommandScheduler.getInstance().onCommandExecute(command -> counter.incrementAndGet());
+    CommandScheduler.getInstance().onCommandFinish(command -> counter.incrementAndGet());
 
-      scheduler.schedule(new InstantCommand());
-      scheduler.run();
+    new InstantCommand().schedule();
+    CommandScheduler.getInstance().run();
 
-      assertEquals(counter.get(), 3);
-    }
+    assertEquals(counter.get(), 3);
   }
 
   @Test
   void schedulerInterruptLambdaTest() {
-    try (CommandScheduler scheduler = new CommandScheduler()) {
-      AtomicInteger counter = new AtomicInteger();
+    AtomicInteger counter = new AtomicInteger();
 
-      scheduler.onCommandInterrupt(command -> counter.incrementAndGet());
+    CommandScheduler.getInstance().onCommandInterrupt(command -> counter.incrementAndGet());
 
-      Command command = new WaitCommand(10);
+    Command command = new WaitCommand(10);
 
-      scheduler.schedule(command);
-      scheduler.cancel(command);
+    command.schedule();
+    command.cancel();
 
-      assertEquals(counter.get(), 1);
-    }
+    assertEquals(counter.get(), 1);
   }
 
   @Test
   void unregisterSubsystemTest() {
-    try (CommandScheduler scheduler = new CommandScheduler()) {
-      Subsystem system = new SubsystemBase() {};
+    Subsystem system = new Subsystem() {};
 
-      scheduler.registerSubsystem(system);
-      assertDoesNotThrow(() -> scheduler.unregisterSubsystem(system));
-    }
+    CommandScheduler.getInstance().registerSubsystem(system);
+    assertDoesNotThrow(() -> CommandScheduler.getInstance().unregisterSubsystem(system));
   }
 
   @Test
   void schedulerCancelAllTest() {
-    try (CommandScheduler scheduler = new CommandScheduler()) {
-      AtomicInteger counter = new AtomicInteger();
+    AtomicInteger counter = new AtomicInteger();
 
-      scheduler.onCommandInterrupt(command -> counter.incrementAndGet());
+    CommandScheduler.getInstance().onCommandInterrupt(command -> counter.incrementAndGet());
 
-      Command command = new WaitCommand(10);
-      Command command2 = new WaitCommand(10);
+    Command command = new WaitCommand(10);
+    Command command2 = new WaitCommand(10);
 
-      scheduler.schedule(command);
-      scheduler.schedule(command2);
-      scheduler.cancelAll();
+    command.schedule();
+    command2.schedule();
+    CommandScheduler.getInstance().cancelAll();
 
-      assertEquals(counter.get(), 2);
-    }
+    assertEquals(counter.get(), 2);
   }
 
   @Test
   void scheduleScheduledNoOp() {
-    try (CommandScheduler scheduler = new CommandScheduler()) {
-      AtomicInteger counter = new AtomicInteger();
+    AtomicInteger counter = new AtomicInteger();
 
-      Command command = Commands.startEnd(counter::incrementAndGet, () -> {});
+    Command command = Commands.startEnd(counter::incrementAndGet, () -> {});
 
-      scheduler.schedule(command);
-      scheduler.schedule(command);
+    command.schedule();
+    command.schedule();
 
-      assertEquals(counter.get(), 1);
-    }
+    assertEquals(counter.get(), 1);
   }
 }

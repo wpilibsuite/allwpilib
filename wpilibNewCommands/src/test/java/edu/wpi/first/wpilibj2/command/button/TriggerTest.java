@@ -26,45 +26,42 @@ import org.junit.jupiter.api.Test;
 class TriggerTest extends CommandTestBase {
   @Test
   void onTrueTest() {
-    CommandScheduler scheduler = CommandScheduler.getInstance();
     AtomicBoolean finished = new AtomicBoolean(false);
     Command command1 = new WaitUntilCommand(finished::get);
 
     InternalButton button = new InternalButton();
     button.setPressed(false);
     button.onTrue(command1);
-    scheduler.run();
+    CommandScheduler.getInstance().run();
     assertFalse(command1.isScheduled());
     button.setPressed(true);
-    scheduler.run();
+    CommandScheduler.getInstance().run();
     assertTrue(command1.isScheduled());
     finished.set(true);
-    scheduler.run();
+    CommandScheduler.getInstance().run();
     assertFalse(command1.isScheduled());
   }
 
   @Test
   void onFalseTest() {
-    CommandScheduler scheduler = CommandScheduler.getInstance();
     AtomicBoolean finished = new AtomicBoolean(false);
     Command command1 = new WaitUntilCommand(finished::get);
 
     InternalButton button = new InternalButton();
     button.setPressed(true);
     button.onFalse(command1);
-    scheduler.run();
+    CommandScheduler.getInstance().run();
     assertFalse(command1.isScheduled());
     button.setPressed(false);
-    scheduler.run();
+    CommandScheduler.getInstance().run();
     assertTrue(command1.isScheduled());
     finished.set(true);
-    scheduler.run();
+    CommandScheduler.getInstance().run();
     assertFalse(command1.isScheduled());
   }
 
   @Test
   void whileTrueRepeatedlyTest() {
-    CommandScheduler scheduler = CommandScheduler.getInstance();
     AtomicInteger inits = new AtomicInteger(0);
     AtomicInteger counter = new AtomicInteger(0);
     // the repeatedly() here is the point!
@@ -79,23 +76,22 @@ class TriggerTest extends CommandTestBase {
     InternalButton button = new InternalButton();
     button.setPressed(false);
     button.whileTrue(command1);
-    scheduler.run();
+    CommandScheduler.getInstance().run();
     assertEquals(0, inits.get());
     button.setPressed(true);
-    scheduler.run();
+    CommandScheduler.getInstance().run();
     assertEquals(1, inits.get());
-    scheduler.run();
+    CommandScheduler.getInstance().run();
     assertEquals(1, inits.get());
-    scheduler.run();
+    CommandScheduler.getInstance().run();
     assertEquals(2, inits.get());
     button.setPressed(false);
-    scheduler.run();
+    CommandScheduler.getInstance().run();
     assertEquals(2, inits.get());
   }
 
   @Test
   void whileTrueLambdaRunTest() {
-    CommandScheduler scheduler = CommandScheduler.getInstance();
     AtomicInteger counter = new AtomicInteger(0);
     // the repeatedly() here is the point!
     Command command1 = new RunCommand(counter::incrementAndGet);
@@ -103,21 +99,20 @@ class TriggerTest extends CommandTestBase {
     InternalButton button = new InternalButton();
     button.setPressed(false);
     button.whileTrue(command1);
-    scheduler.run();
+    CommandScheduler.getInstance().run();
     assertEquals(0, counter.get());
     button.setPressed(true);
-    scheduler.run();
+    CommandScheduler.getInstance().run();
     assertEquals(1, counter.get());
-    scheduler.run();
+    CommandScheduler.getInstance().run();
     assertEquals(2, counter.get());
     button.setPressed(false);
-    scheduler.run();
+    CommandScheduler.getInstance().run();
     assertEquals(2, counter.get());
   }
 
   @Test
   void whileTrueOnceTest() {
-    CommandScheduler scheduler = CommandScheduler.getInstance();
     AtomicInteger startCounter = new AtomicInteger(0);
     AtomicInteger endCounter = new AtomicInteger(0);
     Command command1 =
@@ -126,23 +121,22 @@ class TriggerTest extends CommandTestBase {
     InternalButton button = new InternalButton();
     button.setPressed(false);
     button.whileTrue(command1);
-    scheduler.run();
+    CommandScheduler.getInstance().run();
     assertEquals(0, startCounter.get());
     assertEquals(0, endCounter.get());
     button.setPressed(true);
-    scheduler.run();
-    scheduler.run();
+    CommandScheduler.getInstance().run();
+    CommandScheduler.getInstance().run();
     assertEquals(1, startCounter.get());
     assertEquals(0, endCounter.get());
     button.setPressed(false);
-    scheduler.run();
+    CommandScheduler.getInstance().run();
     assertEquals(1, startCounter.get());
     assertEquals(1, endCounter.get());
   }
 
   @Test
   void toggleOnTrueTest() {
-    CommandScheduler scheduler = CommandScheduler.getInstance();
     AtomicInteger startCounter = new AtomicInteger(0);
     AtomicInteger endCounter = new AtomicInteger(0);
     Command command1 =
@@ -151,27 +145,26 @@ class TriggerTest extends CommandTestBase {
     InternalButton button = new InternalButton();
     button.setPressed(false);
     button.toggleOnTrue(command1);
-    scheduler.run();
+    CommandScheduler.getInstance().run();
     assertEquals(0, startCounter.get());
     assertEquals(0, endCounter.get());
     button.setPressed(true);
-    scheduler.run();
-    scheduler.run();
+    CommandScheduler.getInstance().run();
+    CommandScheduler.getInstance().run();
     assertEquals(1, startCounter.get());
     assertEquals(0, endCounter.get());
     button.setPressed(false);
-    scheduler.run();
+    CommandScheduler.getInstance().run();
     assertEquals(1, startCounter.get());
     assertEquals(0, endCounter.get());
     button.setPressed(true);
-    scheduler.run();
+    CommandScheduler.getInstance().run();
     assertEquals(1, startCounter.get());
     assertEquals(1, endCounter.get());
   }
 
   @Test
   void cancelWhenActiveTest() {
-    CommandScheduler scheduler = CommandScheduler.getInstance();
     AtomicInteger startCounter = new AtomicInteger(0);
     AtomicInteger endCounter = new AtomicInteger(0);
 
@@ -182,14 +175,14 @@ class TriggerTest extends CommandTestBase {
 
     button.setPressed(false);
     command1.schedule();
-    scheduler.run();
+    CommandScheduler.getInstance().run();
     assertEquals(1, startCounter.get());
     assertEquals(0, endCounter.get());
     button.setPressed(true);
-    scheduler.run();
+    CommandScheduler.getInstance().run();
     assertEquals(1, startCounter.get());
     assertEquals(1, endCounter.get());
-    scheduler.run();
+    CommandScheduler.getInstance().run();
     assertEquals(1, startCounter.get());
     assertEquals(1, endCounter.get());
   }
@@ -212,12 +205,10 @@ class TriggerTest extends CommandTestBase {
     buttonWhileActiveContinuous.whileActiveContinuous(counter::incrementAndGet);
     buttonWhenInactive.whenInactive(counter::incrementAndGet);
 
-    CommandScheduler scheduler = CommandScheduler.getInstance();
-
-    scheduler.run();
+    CommandScheduler.getInstance().run();
     buttonWhenActive.setPressed(true);
     buttonWhenInactive.setPressed(false);
-    scheduler.run();
+    CommandScheduler.getInstance().run();
 
     assertEquals(counter.get(), 4);
   }
@@ -249,7 +240,6 @@ class TriggerTest extends CommandTestBase {
 
   @Test
   void debounceTest() {
-    CommandScheduler scheduler = CommandScheduler.getInstance();
     MockCommandHolder commandHolder = new MockCommandHolder(true);
     Command command = commandHolder.getMock();
 
@@ -259,13 +249,13 @@ class TriggerTest extends CommandTestBase {
     debounced.onTrue(command);
 
     button.setPressed(true);
-    scheduler.run();
+    CommandScheduler.getInstance().run();
     verify(command, never()).schedule();
 
     SimHooks.stepTiming(0.3);
 
     button.setPressed(true);
-    scheduler.run();
+    CommandScheduler.getInstance().run();
     verify(command).schedule();
   }
 
