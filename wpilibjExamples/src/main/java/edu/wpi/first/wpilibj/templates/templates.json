@@ -11,12 +11,12 @@
     "commandversion": 2
   },
   {
-    "name": "Barebones Command Robot",
-    "description": "A more barebones version of the Command Robot template",
+    "name": "Command Robot Skeleton (Advanced)",
+    "description": "Skeleton (stub) code for Command Robot",
     "tags": [
       "Command"
     ],
-    "foldername": "barebonescommandbased",
+    "foldername": "commandbasedskeleton",
     "gradlebase": "java",
     "mainclass": "Main",
     "commandversion": 2
