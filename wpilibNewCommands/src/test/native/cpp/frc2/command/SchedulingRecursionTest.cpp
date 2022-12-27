@@ -39,7 +39,7 @@ class SelfCancellingCommand
  * href="https://github.com/wpilibsuite/allwpilib/issues/4259">wpilibsuite/allwpilib#4259</a>.
  */
 TEST_F(SchedulingRecursionTest, CancelFromInitialize) {
-  CommandScheduler scheduler = GetScheduler();
+  auto scheduler = GetScheduler();
   bool hasOtherRun = false;
   TestSubsystem requirement;
   auto selfCancels = SelfCancellingCommand(&scheduler, &requirement);
@@ -57,8 +57,8 @@ TEST_F(SchedulingRecursionTest, CancelFromInitialize) {
 }
 
 TEST_P(SchedulingRecursionTest,
-       DISABLED_DefaultCommandGetsRescheduledAfterSelfCanceling) {
-  CommandScheduler scheduler = GetScheduler();
+       DefaultCommandGetsRescheduledAfterSelfCanceling) {
+  auto scheduler = GetScheduler();
   bool hasOtherRun = false;
   TestSubsystem requirement;
   auto selfCancels =
@@ -92,7 +92,7 @@ class CancelEndCommand : public CommandHelper<CommandBase, CancelEndCommand> {
 };
 
 TEST_F(SchedulingRecursionTest, CancelFromEnd) {
-  CommandScheduler scheduler = GetScheduler();
+  auto scheduler = GetScheduler();
   int counter = 0;
   CancelEndCommand selfCancels{&scheduler, counter};
 

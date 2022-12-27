@@ -11,6 +11,7 @@
 
 #include "frc2/command/CommandHelper.h"
 #include "frc2/command/CommandScheduler.h"
+#include "frc2/command/CommandPtr.h"
 #include "frc2/command/SetUtilities.h"
 #include "frc2/command/SubsystemBase.h"
 #include "gmock/gmock.h"
@@ -26,7 +27,7 @@ class TestSubsystem : public SubsystemBase {};
  */
 class MockCommand : public CommandHelper<CommandBase, MockCommand> {
  public:
-  MOCK_CONST_METHOD0(GetRequirements, wpi::SmallSet<Subsystem*, 4>());
+  // MOCK_CONST_METHOD0(GetRequirements, wpi::SmallSet<Subsystem*, 4>());
   MOCK_METHOD0(IsFinished, bool());
   MOCK_CONST_METHOD0(RunsWhenDisabled, bool());
   MOCK_METHOD0(Initialize, void());
@@ -35,8 +36,8 @@ class MockCommand : public CommandHelper<CommandBase, MockCommand> {
 
   MockCommand() {
     m_requirements = {};
-    EXPECT_CALL(*this, GetRequirements())
-        .WillRepeatedly(::testing::Return(m_requirements));
+    // EXPECT_CALL(*this, GetRequirements())
+    // .WillRepeatedly(::testing::Return(m_requirements));
     EXPECT_CALL(*this, IsFinished()).WillRepeatedly(::testing::Return(false));
     EXPECT_CALL(*this, RunsWhenDisabled())
         .WillRepeatedly(::testing::Return(true));
@@ -44,9 +45,10 @@ class MockCommand : public CommandHelper<CommandBase, MockCommand> {
 
   MockCommand(std::initializer_list<Subsystem*> requirements,
               bool finished = false, bool runWhenDisabled = true) {
-    m_requirements.insert(requirements.begin(), requirements.end());
-    EXPECT_CALL(*this, GetRequirements())
-        .WillRepeatedly(::testing::Return(m_requirements));
+    AddRequirements(requirements);
+    // m_requirements.insert(requirements.begin(), requirements.end());
+    // EXPECT_CALL(*this, GetRequirements())
+    //     .WillRepeatedly(::testing::Return(m_requirements));
     EXPECT_CALL(*this, IsFinished())
         .WillRepeatedly(::testing::Return(finished));
     EXPECT_CALL(*this, RunsWhenDisabled())
@@ -59,8 +61,8 @@ class MockCommand : public CommandHelper<CommandBase, MockCommand> {
     EXPECT_CALL(*this, RunsWhenDisabled())
         .WillRepeatedly(::testing::Return(other.RunsWhenDisabled()));
     std::swap(m_requirements, other.m_requirements);
-    EXPECT_CALL(*this, GetRequirements())
-        .WillRepeatedly(::testing::Return(m_requirements));
+    // EXPECT_CALL(*this, GetRequirements())
+    // .WillRepeatedly(::testing::Return(m_requirements));
   }
 
   MockCommand(const MockCommand& other) : CommandHelper{other} {}
@@ -84,7 +86,7 @@ class CommandTestBase : public ::testing::Test {
   CommandTestBase();
 
  protected:
-  CommandScheduler GetScheduler();
+  CommandScheduler& GetScheduler();
 
   void SetUp() override;
 

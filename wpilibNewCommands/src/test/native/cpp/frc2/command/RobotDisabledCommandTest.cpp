@@ -14,7 +14,7 @@ using namespace frc2;
 class RobotDisabledCommandTest : public CommandTestBase {};
 
 TEST_F(RobotDisabledCommandTest, RobotDisabledCommandCancel) {
-  CommandScheduler scheduler = GetScheduler();
+  auto& scheduler = GetScheduler();
 
   MockCommand command({}, false, false);
 
@@ -35,7 +35,7 @@ TEST_F(RobotDisabledCommandTest, RobotDisabledCommandCancel) {
 }
 
 TEST_F(RobotDisabledCommandTest, RunWhenDisabled) {
-  CommandScheduler scheduler = GetScheduler();
+  auto& scheduler = GetScheduler();
 
   MockCommand command1;
   MockCommand command2;
@@ -53,7 +53,7 @@ TEST_F(RobotDisabledCommandTest, RunWhenDisabled) {
 }
 
 TEST_F(RobotDisabledCommandTest, SequentialGroupRunWhenDisabled) {
-  CommandScheduler scheduler = GetScheduler();
+  auto& scheduler = GetScheduler();
 
   SequentialCommandGroup runWhenDisabled{MockCommand(), MockCommand()};
   SequentialCommandGroup dontRunWhenDisabled{MockCommand(),
@@ -69,7 +69,7 @@ TEST_F(RobotDisabledCommandTest, SequentialGroupRunWhenDisabled) {
 }
 
 TEST_F(RobotDisabledCommandTest, ParallelGroupRunWhenDisabled) {
-  CommandScheduler scheduler = GetScheduler();
+  auto& scheduler = GetScheduler();
 
   ParallelCommandGroup runWhenDisabled{MockCommand(), MockCommand()};
   ParallelCommandGroup dontRunWhenDisabled{MockCommand(),
@@ -85,7 +85,7 @@ TEST_F(RobotDisabledCommandTest, ParallelGroupRunWhenDisabled) {
 }
 
 TEST_F(RobotDisabledCommandTest, ParallelRaceRunWhenDisabled) {
-  CommandScheduler scheduler = GetScheduler();
+  auto& scheduler = GetScheduler();
 
   ParallelRaceGroup runWhenDisabled{MockCommand(), MockCommand()};
   ParallelRaceGroup dontRunWhenDisabled{MockCommand(),
@@ -101,7 +101,7 @@ TEST_F(RobotDisabledCommandTest, ParallelRaceRunWhenDisabled) {
 }
 
 TEST_F(RobotDisabledCommandTest, ParallelDeadlineRunWhenDisabled) {
-  CommandScheduler scheduler = GetScheduler();
+  auto& scheduler = GetScheduler();
 
   ParallelDeadlineGroup runWhenDisabled{MockCommand(), MockCommand()};
   ParallelDeadlineGroup dontRunWhenDisabled{MockCommand(),
@@ -117,7 +117,7 @@ TEST_F(RobotDisabledCommandTest, ParallelDeadlineRunWhenDisabled) {
 }
 
 TEST_F(RobotDisabledCommandTest, ConditionalCommandRunWhenDisabled) {
-  CommandScheduler scheduler = GetScheduler();
+  auto& scheduler = GetScheduler();
 
   ConditionalCommand runWhenDisabled{MockCommand(), MockCommand(),
                                      [] { return true; }};
@@ -134,7 +134,7 @@ TEST_F(RobotDisabledCommandTest, ConditionalCommandRunWhenDisabled) {
 }
 
 TEST_F(RobotDisabledCommandTest, SelectCommandRunWhenDisabled) {
-  CommandScheduler scheduler = GetScheduler();
+  auto& scheduler = GetScheduler();
 
   SelectCommand<int> runWhenDisabled{[] { return 1; },
                                      std::pair(1, MockCommand()),

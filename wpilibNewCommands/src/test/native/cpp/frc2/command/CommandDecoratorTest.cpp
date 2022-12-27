@@ -17,7 +17,7 @@ using namespace frc2;
 class CommandDecoratorTest : public CommandTestBase {};
 
 TEST_F(CommandDecoratorTest, WithTimeout) {
-  CommandScheduler scheduler = GetScheduler();
+  auto& scheduler = GetScheduler();
 
   frc::sim::PauseTiming();
 
@@ -37,7 +37,7 @@ TEST_F(CommandDecoratorTest, WithTimeout) {
 }
 
 TEST_F(CommandDecoratorTest, Until) {
-  CommandScheduler scheduler = GetScheduler();
+  auto& scheduler = GetScheduler();
 
   bool finished = false;
 
@@ -55,7 +55,7 @@ TEST_F(CommandDecoratorTest, Until) {
 }
 
 TEST_F(CommandDecoratorTest, IgnoringDisable) {
-  CommandScheduler scheduler = GetScheduler();
+  auto& scheduler = GetScheduler();
 
   auto command = RunCommand([] {}, {}).IgnoringDisable(true);
 
@@ -68,7 +68,7 @@ TEST_F(CommandDecoratorTest, IgnoringDisable) {
 }
 
 TEST_F(CommandDecoratorTest, BeforeStarting) {
-  CommandScheduler scheduler = GetScheduler();
+  auto& scheduler = GetScheduler();
 
   bool finished = false;
 
@@ -86,7 +86,7 @@ TEST_F(CommandDecoratorTest, BeforeStarting) {
 }
 
 TEST_F(CommandDecoratorTest, AndThen) {
-  CommandScheduler scheduler = GetScheduler();
+  auto& scheduler = GetScheduler();
 
   bool finished = false;
 
@@ -105,7 +105,7 @@ TEST_F(CommandDecoratorTest, AndThen) {
 }
 
 TEST_F(CommandDecoratorTest, Perpetually) {
-  CommandScheduler scheduler = GetScheduler();
+  auto& scheduler = GetScheduler();
 
   WPI_IGNORE_DEPRECATED
   auto command = InstantCommand([] {}, {}).Perpetually();
@@ -120,7 +120,7 @@ TEST_F(CommandDecoratorTest, Perpetually) {
 }
 
 TEST_F(CommandDecoratorTest, Unless) {
-  CommandScheduler scheduler = GetScheduler();
+  auto& scheduler = GetScheduler();
 
   bool hasRun = false;
   bool unlessBool = true;
@@ -141,7 +141,7 @@ TEST_F(CommandDecoratorTest, Unless) {
 }
 
 TEST_F(CommandDecoratorTest, FinallyDo) {
-  CommandScheduler scheduler = GetScheduler();
+  auto& scheduler = GetScheduler();
   int first = 0;
   int second = 0;
   CommandPtr command = FunctionalCommand([] {}, [] {},
@@ -172,7 +172,7 @@ TEST_F(CommandDecoratorTest, FinallyDo) {
 // handleInterruptTest() implicitly tests the interrupt=true branch of
 // finallyDo()
 TEST_F(CommandDecoratorTest, HandleInterrupt) {
-  CommandScheduler scheduler = GetScheduler();
+  auto& scheduler = GetScheduler();
   int first = 0;
   int second = 0;
   CommandPtr command = FunctionalCommand([] {}, [] {},

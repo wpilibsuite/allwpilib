@@ -9,7 +9,7 @@ using namespace frc2;
 class InstantCommandTest : public CommandTestBase {};
 
 TEST_F(InstantCommandTest, InstantCommandSchedule) {
-  CommandScheduler scheduler = GetScheduler();
+  auto& scheduler = GetScheduler();
 
   int counter = 0;
 

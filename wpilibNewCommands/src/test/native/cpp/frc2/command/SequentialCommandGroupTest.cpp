@@ -12,7 +12,7 @@ using namespace frc2;
 class SequentialCommandGroupTest : public CommandTestBase {};
 
 TEST_F(SequentialCommandGroupTest, SequentialGroupSchedule) {
-  CommandScheduler scheduler = GetScheduler();
+  auto& scheduler = GetScheduler();
 
   std::unique_ptr<MockCommand> command1Holder = std::make_unique<MockCommand>();
   std::unique_ptr<MockCommand> command2Holder = std::make_unique<MockCommand>();
@@ -51,7 +51,7 @@ TEST_F(SequentialCommandGroupTest, SequentialGroupSchedule) {
 }
 
 TEST_F(SequentialCommandGroupTest, SequentialGroupInterrupt) {
-  CommandScheduler scheduler = GetScheduler();
+  auto& scheduler = GetScheduler();
 
   std::unique_ptr<MockCommand> command1Holder = std::make_unique<MockCommand>();
   std::unique_ptr<MockCommand> command2Holder = std::make_unique<MockCommand>();
@@ -90,7 +90,7 @@ TEST_F(SequentialCommandGroupTest, SequentialGroupInterrupt) {
 }
 
 TEST_F(SequentialCommandGroupTest, SequentialGroupNotScheduledCancel) {
-  CommandScheduler scheduler = GetScheduler();
+  auto& scheduler = GetScheduler();
 
   SequentialCommandGroup group{InstantCommand(), InstantCommand()};
 
@@ -98,7 +98,7 @@ TEST_F(SequentialCommandGroupTest, SequentialGroupNotScheduledCancel) {
 }
 
 TEST_F(SequentialCommandGroupTest, SequentialGroupCopy) {
-  CommandScheduler scheduler = GetScheduler();
+  auto& scheduler = GetScheduler();
 
   bool finished = false;
 
@@ -114,7 +114,7 @@ TEST_F(SequentialCommandGroupTest, SequentialGroupCopy) {
 }
 
 TEST_F(SequentialCommandGroupTest, SequentialGroupRequirement) {
-  CommandScheduler scheduler = GetScheduler();
+  auto& scheduler = GetScheduler();
 
   TestSubsystem requirement1;
   TestSubsystem requirement2;

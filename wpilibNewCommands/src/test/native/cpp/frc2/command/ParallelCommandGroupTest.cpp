@@ -12,7 +12,7 @@ using namespace frc2;
 class ParallelCommandGroupTest : public CommandTestBase {};
 
 TEST_F(ParallelCommandGroupTest, ParallelGroupSchedule) {
-  CommandScheduler scheduler = GetScheduler();
+  auto& scheduler = GetScheduler();
 
   std::unique_ptr<MockCommand> command1Holder = std::make_unique<MockCommand>();
   std::unique_ptr<MockCommand> command2Holder = std::make_unique<MockCommand>();
@@ -42,7 +42,7 @@ TEST_F(ParallelCommandGroupTest, ParallelGroupSchedule) {
 }
 
 TEST_F(ParallelCommandGroupTest, ParallelGroupInterrupt) {
-  CommandScheduler scheduler = GetScheduler();
+  auto& scheduler = GetScheduler();
 
   std::unique_ptr<MockCommand> command1Holder = std::make_unique<MockCommand>();
   std::unique_ptr<MockCommand> command2Holder = std::make_unique<MockCommand>();
@@ -73,7 +73,7 @@ TEST_F(ParallelCommandGroupTest, ParallelGroupInterrupt) {
 }
 
 TEST_F(ParallelCommandGroupTest, ParallelGroupNotScheduledCancel) {
-  CommandScheduler scheduler = GetScheduler();
+  auto& scheduler = GetScheduler();
 
   ParallelCommandGroup group((InstantCommand(), InstantCommand()));
 
@@ -81,7 +81,7 @@ TEST_F(ParallelCommandGroupTest, ParallelGroupNotScheduledCancel) {
 }
 
 TEST_F(ParallelCommandGroupTest, ParallelGroupCopy) {
-  CommandScheduler scheduler = GetScheduler();
+  auto& scheduler = GetScheduler();
 
   bool finished = false;
 
@@ -97,7 +97,7 @@ TEST_F(ParallelCommandGroupTest, ParallelGroupCopy) {
 }
 
 TEST_F(ParallelCommandGroupTest, ParallelGroupRequirement) {
-  CommandScheduler scheduler = GetScheduler();
+  auto& scheduler = GetScheduler();
 
   TestSubsystem requirement1;
   TestSubsystem requirement2;

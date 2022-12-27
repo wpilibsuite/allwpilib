@@ -6,7 +6,6 @@
 
 #include "CommandTestBase.h"
 #include "frc2/command/CommandScheduler.h"
-#include "frc2/command/ConditionalCommand.h"
 #include "frc2/command/FunctionalCommand.h"
 #include "frc2/command/InstantCommand.h"
 #include "frc2/command/ParallelCommandGroup.h"
@@ -14,12 +13,13 @@
 #include "frc2/command/ParallelRaceGroup.h"
 #include "frc2/command/SelectCommand.h"
 #include "frc2/command/SequentialCommandGroup.h"
+#include "frc2/command/StartEndCommand.h"
 
 using namespace frc2;
 class CommandRequirementsTest : public CommandTestBase {};
 
 TEST_F(CommandRequirementsTest, RequirementInterrupt) {
-  CommandScheduler scheduler = GetScheduler();
+  auto& scheduler = CommandScheduler::GetInstance();
 
   TestSubsystem requirement;
 
@@ -46,7 +46,7 @@ TEST_F(CommandRequirementsTest, RequirementInterrupt) {
 }
 
 TEST_F(CommandRequirementsTest, RequirementUninterruptible) {
-  CommandScheduler scheduler = GetScheduler();
+  auto& scheduler = GetScheduler();
 
   TestSubsystem requirement;
 

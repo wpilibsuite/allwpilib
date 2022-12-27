@@ -91,6 +91,18 @@ CommandScheduler& CommandScheduler::GetInstance() {
   return scheduler;
 }
 
+void CommandScheduler::ResetInstance() {
+  // Warn if not in simulation
+  if constexpr (!frc::RobotBase::IsSimulation()) {
+    FRC_ReportError(\
+        frc::warn::Warning,
+        "CommandScheduler singleton should not be reset outside of tests!");
+    return;
+  }
+  std::make_unique<Impl>().swap(m_impl);
+  m_watchdog.Reset();
+}
+
 void CommandScheduler::SetPeriod(units::second_t period) {
   m_watchdog.SetTimeout(period);
 }

@@ -11,7 +11,7 @@ using namespace frc2;
 class SchedulerTest : public CommandTestBase {};
 
 TEST_F(SchedulerTest, SchedulerLambdaTestNoInterrupt) {
-  CommandScheduler scheduler = GetScheduler();
+  auto& scheduler = GetScheduler();
 
   InstantCommand command;
 
@@ -28,7 +28,7 @@ TEST_F(SchedulerTest, SchedulerLambdaTestNoInterrupt) {
 }
 
 TEST_F(SchedulerTest, SchedulerLambdaInterrupt) {
-  CommandScheduler scheduler = GetScheduler();
+  auto& scheduler = GetScheduler();
 
   RunCommand command([] {}, {});
 
@@ -44,7 +44,7 @@ TEST_F(SchedulerTest, SchedulerLambdaInterrupt) {
 }
 
 TEST_F(SchedulerTest, UnregisterSubsystem) {
-  CommandScheduler scheduler = GetScheduler();
+  auto& scheduler = GetScheduler();
 
   TestSubsystem system;
 
@@ -54,7 +54,7 @@ TEST_F(SchedulerTest, UnregisterSubsystem) {
 }
 
 TEST_F(SchedulerTest, SchedulerCancelAll) {
-  CommandScheduler scheduler = GetScheduler();
+  auto& scheduler = GetScheduler();
 
   RunCommand command([] {}, {});
   RunCommand command2([] {}, {});
@@ -72,7 +72,7 @@ TEST_F(SchedulerTest, SchedulerCancelAll) {
 }
 
 TEST_F(SchedulerTest, ScheduleScheduledNoOp) {
-  CommandScheduler scheduler = GetScheduler();
+  auto& scheduler = GetScheduler();
 
   int counter = 0;
 

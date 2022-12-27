@@ -10,7 +10,7 @@ using namespace frc2;
 class PerpetualCommandTest : public CommandTestBase {};
 
 TEST_F(PerpetualCommandTest, PerpetualCommandSchedule) {
-  CommandScheduler scheduler = GetScheduler();
+  auto& scheduler = GetScheduler();
 
   bool check = false;
 
