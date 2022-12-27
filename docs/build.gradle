@@ -41,7 +41,8 @@ cppProjectZips.add(project(':wpiutil').cppHeadersZip)
 
 doxygen {
     // Doxygen binaries are unavailable for arm64, they must be provided by the system
-    if (!it.targetPlatform.operatingSystem.isArm64()) {
+    String arch = System.getProperty("os.arch");
+    if (!(arch.equals("arm64") || arch.equals("aarch64"))) {
         executables {
             doxygen version : '1.9.4',
             baseURI : 'https://frcmaven.wpi.edu/artifactory/generic-release-mirror/doxygen'
