@@ -13,7 +13,7 @@
     "name": "Command Robot Skeleton (Advanced)",
     "description": "Skeleton (stub) code for Command Robot",
     "tags": [
-      "Command"
+      "Command", "Skeleton"
     ],
     "foldername": "commandbasedskeleton",
     "gradlebase": "cpp",
