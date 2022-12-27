@@ -14,10 +14,10 @@ import edu.wpi.first.wpilibj.TimedRobot;
  */
 public class Robot extends TimedRobot {
   // define ports for digitalcommunication with light controller
-  private static final int kAlliancePort = 0;
-  private static final int kEnabledPort = 1;
-  private static final int kAutonomousPort = 2;
-  private static final int kAlertPort = 3;
+  static final int kAlliancePort = 0;
+  static final int kEnabledPort = 1;
+  static final int kAutonomousPort = 2;
+  static final int kAlertPort = 3;
 
   private final DigitalOutput m_allianceOutput = new DigitalOutput(kAlliancePort);
   private final DigitalOutput m_enabledOutput = new DigitalOutput(kEnabledPort);
@@ -38,5 +38,14 @@ public class Robot extends TimedRobot {
     // pull alert port high if match time remaining is between 30 and 25 seconds
     var matchTime = DriverStation.getMatchTime();
     m_alertOutput.set(matchTime <= 30 && matchTime >= 25);
+  }
+
+  @Override
+  public void close() {
+    m_allianceOutput.close();
+    m_enabledOutput.close();
+    m_autonomousOutput.close();
+    m_alertOutput.close();
+    super.close();
   }
 }
