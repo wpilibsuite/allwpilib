@@ -113,12 +113,15 @@ void InstanceImpl::StartServer(std::string_view persistFilename,
 }
 
 void InstanceImpl::StopServer() {
-  std::scoped_lock lock{m_mutex};
-  if ((networkMode & NT_NET_MODE_SERVER) == 0) {
-    return;
+  std::shared_ptr<NetworkServer> server;
+  {
+    std::scoped_lock lock{m_mutex};
+    if ((networkMode & NT_NET_MODE_SERVER) == 0) {
+      return;
+    }
+    server = std::move(m_networkServer);
+    networkMode = NT_NET_MODE_NONE;
   }
-  m_networkServer.reset();
-  networkMode = NT_NET_MODE_NONE;
 }
 
 void InstanceImpl::StartClient3(std::string_view identity) {
