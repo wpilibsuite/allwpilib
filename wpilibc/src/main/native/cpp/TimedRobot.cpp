@@ -32,8 +32,8 @@ void TimedRobot::StartCompetition() {
   // Loop forever, calling the appropriate mode-dependent function
   while (true) {
     // We don't have to check there's an element in the queue first because
-    // there's always at least one (the constructor adds one). It's re added to the queue
-    // at the end of the loop.
+    // there's always at least one (the constructor adds one). It's re added to
+    // the queue at the end of the loop.
     auto callback = m_callbacks.pop();
 
     int32_t status = 0;
