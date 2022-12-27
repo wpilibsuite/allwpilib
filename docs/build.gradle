@@ -40,9 +40,12 @@ cppProjectZips.add(project(':wpinet').cppHeadersZip)
 cppProjectZips.add(project(':wpiutil').cppHeadersZip)
 
 doxygen {
-    executables {
-        doxygen version : '1.9.4',
-        baseURI : 'https://frcmaven.wpi.edu/artifactory/generic-release-mirror/doxygen'
+    // Doxygen binaries are unavailable for arm64, they must be provided by the system
+    if (!it.targetPlatform.operatingSystem.isArm64()) {
+        executables {
+            doxygen version : '1.9.4',
+            baseURI : 'https://frcmaven.wpi.edu/artifactory/generic-release-mirror/doxygen'
+        }
     }
 }
 
