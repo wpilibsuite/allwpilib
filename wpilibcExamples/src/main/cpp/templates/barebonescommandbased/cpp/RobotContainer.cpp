@@ -3,6 +3,7 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #include "RobotContainer.h"
+#include <frc2/command/Commands.h>
 
 RobotContainer::RobotContainer() {
   ConfigureBindings();
@@ -11,5 +12,5 @@ RobotContainer::RobotContainer() {
 void RobotContainer::ConfigureBindings() {}
 
 frc2::CommandPtr RobotContainer::GetAutonomousCommand() {
-  return frc2::PrintCommand("No autonomous command configured");
+  return frc2::cmd::Print("No autonomous command configured");
 }
