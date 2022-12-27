@@ -4,9 +4,9 @@
 
 #pragma once
 
-#include "RobotContainer.h"
-
 #include <frc/TimedRobot.h>
+
+#include "RobotContainer.h"
 
 class Robot : public frc::TimedRobot {
  public:
