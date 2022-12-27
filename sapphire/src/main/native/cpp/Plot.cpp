@@ -296,7 +296,7 @@ void PlotView::EmitContextMenu(){
             if(actions[i] == Plot::PlotDelete){
                 m_plotStorage.erase(m_plotStorage.begin()+i);
                 m_plots.erase(m_plots.begin()+i);
-                for(int j = i; j < m_plots.size(); j++){
+                for(size_t j = i; j < m_plots.size(); j++){
                     m_plots[j]->m_name = fmt::format("Plot {}", j+1);
                 }
             }

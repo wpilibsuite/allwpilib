@@ -5,7 +5,6 @@
 #include <vector>
 
 #include <span>
-
 #include "glass/other/Field2D.h"
 #include "DataLog.h"
 
@@ -76,7 +75,6 @@ class LogField2DModel : public glass::Field2DModel {
   std::string m_nameValue;
   float& m_nowRef;
   float m_now;
-  class ObjectModel;
   using Objects = std::vector<std::unique_ptr<ObjectModel>>;
   Objects m_objects;
 

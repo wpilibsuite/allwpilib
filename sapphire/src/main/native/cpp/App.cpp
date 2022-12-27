@@ -39,7 +39,6 @@ static std::unique_ptr<LogViewLoader> viewLoader;
 
 static glass::Window* m_logSelectorWindow;
 static glass::Window* m_timeManagerWindow;
-static glass::Window* m_plotWindow;
 static std::unique_ptr<Selector> m_selector;
 
 static glass::Window* m_entryManagerWindow;
@@ -74,7 +73,7 @@ static void DisplayMenuBar() {
     }
     ImGui::EndMenu();
   }
-  
+
   windowManager->DisplayMenu();
   plotProvider->DisplayMenu();
   viewLoader->DisplayMenu();
