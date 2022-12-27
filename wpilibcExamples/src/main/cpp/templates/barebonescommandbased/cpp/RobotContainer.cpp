@@ -9,3 +9,7 @@ RobotContainer::RobotContainer() {
 }
 
 void RobotContainer::ConfigureBindings() {}
+
+frc2::CommandPtr RobotContainer::GetAutonomousCommand() {
+  return frc2::PrintCommand("No autonomous command configured")
+}
