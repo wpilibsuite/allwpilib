@@ -177,28 +177,4 @@ public class TimedRobot extends IterativeRobotBase {
   public void addPeriodic(Runnable callback, double periodSeconds) {
     addPeriodic(callback, periodSeconds, 0.0);
   }
-
-  /**
-   * Add a callback to run at the currently set periodic loop rate.
-   *
-   * <p>This is scheduled on TimedRobot's Notifier, so TimedRobot and the callback run
-   * synchronously. Interactions between them are thread-safe.
-   *
-   * @param callback The callback to run.
-   */
-  public void addPeriodic(Runnable callback) {
-    addPeriodic(callback, getPeriod());
-  }
-
-  /**
-   * Add a callback to run at the default periodic loop rate.
-   *
-   * <p>This is scheduled on TimedRobot's Notifier, so TimedRobot and the callback run
-   * synchronously. Interactions between them are thread-safe.
-   *
-   * @param callback The callback to run.
-   */
-  public void addDefaultPeriodic(Runnable callback) {
-    addPeriodic(callback, kDefaultPeriod);
-  }
 }
