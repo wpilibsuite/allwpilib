@@ -9,7 +9,3 @@ RobotContainer::RobotContainer() {
 }
 
 void RobotContainer::ConfigureBindings() {}
-
-frc2::Command* RobotContainer::GetAutonomousCommand() {
-  return nullptr;
-}

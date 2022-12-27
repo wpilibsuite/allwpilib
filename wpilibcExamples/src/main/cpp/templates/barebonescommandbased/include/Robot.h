@@ -4,12 +4,9 @@
 
 #pragma once
 
-#include <optional>
+#include "RobotContainer.h"
 
 #include <frc/TimedRobot.h>
-#include <frc2/command/CommandPtr.h>
-
-#include "RobotContainer.h"
 
 class Robot : public frc::TimedRobot {
  public:
@@ -29,7 +26,5 @@ class Robot : public frc::TimedRobot {
   void TestExit() override;
 
  private:
-  frc2::Command* m_autonomousCommand = nullptr;
-
   RobotContainer m_container;
 };
