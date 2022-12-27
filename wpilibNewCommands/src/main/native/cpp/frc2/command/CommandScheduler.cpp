@@ -91,6 +91,11 @@ CommandScheduler& CommandScheduler::GetInstance() {
   return scheduler;
 }
 
+void CommandScheduler::ResetInstance() {
+  CommandScheduler& instance = GetInstance();
+  std::make_unique<Impl>().swap(instance.m_impl);
+}
+
 void CommandScheduler::SetPeriod(units::second_t period) {
   m_watchdog.SetTimeout(period);
 }
