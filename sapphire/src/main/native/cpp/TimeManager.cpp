@@ -12,6 +12,13 @@ void TimeManager::Display() {
   ImGui::SliderFloat("timestamp", &m_timestamp, m_timestart, m_timestop);
   ImGui::SameLine();
   ImGui::Checkbox("Play", &m_isPlaying);
+  for(auto& control : m_controls){
+    if(ImGui::Button(control.m_name.c_str())){
+      m_timestamp += control.m_speed;
+    }
+    ImGui::SameLine();
+  }
+  ImGui::TextUnformatted("Playback Control");
   if(m_isPlaying){
     double deltaT = (ImGui::GetTime()-m_lastTime) * m_selected->m_speed;
     m_timestamp += deltaT;

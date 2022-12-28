@@ -33,7 +33,12 @@ class TimeManager : public glass::View{
         TimeOption{"4", 4.0},
         TimeOption{"8", 8.0}
     };
+    TimeOption m_controls[2] = {
+        TimeOption{"-10", -10.0},
+        TimeOption{"+10", +10.0}
+    };
     TimeOption* m_selected = &m_options[3];
+    
     double m_lastTime = 0;
     float m_timestart = 0;
     float m_timestop = 0;

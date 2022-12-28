@@ -45,7 +45,7 @@ void Selector::Display() {
   ImGui::SameLine();
   ImGui::TextUnformatted(logFile.c_str());
   ImGui::TextUnformatted(logFileMessage.c_str());
-
+  
   if(ImGui::Button("Load Video")) {
     videoFileSelector = std::make_unique<pfd::open_file>(
       "Select Video File", "",
