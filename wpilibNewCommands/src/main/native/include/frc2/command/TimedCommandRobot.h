@@ -11,8 +11,8 @@
 namespace frc2 {
 
 /**
- * The TimedCommandRobot class extends the {@link TimedRobot} class in order to ease
- * functionality for Command Based Programming.
+ * The TimedCommandRobot class extends the {@link TimedRobot} class in order to
+ * ease functionality for Command Based Programming.
  */
 class TimedCommandRobot : public frc::TimedRobot {
  private:
@@ -25,7 +25,8 @@ class TimedCommandRobot : public frc::TimedRobot {
    * @param mainPeriod periodic rate of the Main Robot Loop in seconds.
    * @param schedulerPeriod periodic rate of the CommandScheduler in seconds.
    */
-  TimedCommandRobot(units::second_t mainPeriod, units::second_t schedulerPeriod);
+  TimedCommandRobot(units::second_t mainPeriod,
+                    units::second_t schedulerPeriod);
 
   /**
    * Constructor for TimedCommandRobot.

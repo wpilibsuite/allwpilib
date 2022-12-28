@@ -8,14 +8,15 @@
 
 using namespace frc2;
 
-TimedCommandRobot::TimedCommandRobot (units::second_t mainPeriod,
-                           units::second_t schedulerPeriod)
+TimedCommandRobot::TimedCommandRobot(units::second_t mainPeriod,
+                                     units::second_t schedulerPeriod)
     : frc::TimedRobot(mainPeriod) {
   AddPeriodic([] { CommandScheduler::GetInstance().Run(); }, schedulerPeriod,
               kSchedulerOffset);
 }
 
-TimedCommandRobot::TimedCommandRobot (units::second_t period) : frc::TimedRobot(period) {
+TimedCommandRobot::TimedCommandRobot(units::second_t period)
+    : frc::TimedRobot(period) {
   AddPeriodic([] { CommandScheduler::GetInstance().Run(); }, period,
               kSchedulerOffset);
 }
