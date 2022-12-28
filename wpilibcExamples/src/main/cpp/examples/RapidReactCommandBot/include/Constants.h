@@ -8,6 +8,7 @@
 
 #include <units/angle.h>
 #include <units/angular_velocity.h>
+#include <units/angular_acceleration.h>
 #include <units/length.h>
 #include <units/time.h>
 #include <units/voltage.h>
@@ -58,12 +59,14 @@ constexpr auto kShooterTolerance = 50_tps;
 
 // These are not real PID gains, and will have to be tuned for your specific
 // robot.
-constexpr double kP = 1;
+constexpr double kP = 0.1;
 
 constexpr units::volt_t kS = 0.05_V;
 constexpr auto kV =
     // Should have value 12V at free speed...
     12.0_V / kShooterFree;
+
+constexpr auto kA = 1.0_V / 100_tr_per_s_sq;
 
 constexpr double kFeederSpeed = 0.5;
 }  // namespace ShooterConstants

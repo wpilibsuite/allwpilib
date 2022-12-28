@@ -9,6 +9,11 @@
 #include <frc/TimedRobot.h>
 #include <frc2/command/CommandPtr.h>
 
+#ifndef ROBORIO
+#include "ShooterSim.h"  
+#endif
+
+
 #include "RapidReactCommandBot.h"
 
 class Robot : public frc::TimedRobot {
@@ -27,4 +32,8 @@ class Robot : public frc::TimedRobot {
  private:
   RapidReactCommandBot m_robot;
   std::optional<frc2::CommandPtr> m_autonomousCommand;
+
+  #ifndef ROBORIO
+  ShooterSim m_sim;
+  #endif
 };

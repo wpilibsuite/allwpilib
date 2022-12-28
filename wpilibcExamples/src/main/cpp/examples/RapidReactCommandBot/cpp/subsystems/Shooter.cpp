@@ -4,6 +4,7 @@
 
 #include "subsystems/Shooter.h"
 
+#include <frc2/command/button/Trigger.h>
 #include <frc2/command/Commands.h>
 
 Shooter::Shooter() {
@@ -12,10 +13,11 @@ Shooter::Shooter() {
       ShooterConstants::kEncoderDistancePerPulse);
 
   SetDefaultCommand(RunOnce([this] {
-                      m_shooterMotor.Disable();
-                      m_feederMotor.Disable();
+                      m_shooterMotor.Set(0.0);
+                      m_feederMotor.Set(0.0);
                     })
                         .AndThen(Run([] {}))
+                        .IgnoringDisable(true)
                         .WithName("Idle"));
 }
 
