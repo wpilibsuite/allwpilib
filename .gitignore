@@ -19,6 +19,9 @@ test-reports
 .idea/
 out/
 
+# Fleet
+.fleet
+
 # Created by http://www.gitignore.io
 
 ### Linux ###
