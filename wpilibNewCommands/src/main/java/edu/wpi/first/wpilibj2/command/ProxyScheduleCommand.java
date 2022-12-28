@@ -22,7 +22,10 @@ public class ProxyScheduleCommand extends CommandBase {
    * when they are all no longer scheduled.
    *
    * @param toSchedule the commands to schedule
+   * @deprecated Replace with {@link ProxyCommand}, composing multiple of them in a {@link
+   *     ParallelRaceGroup} if needed.
    */
+  @Deprecated
   public ProxyScheduleCommand(Command... toSchedule) {
     m_toSchedule = Set.of(toSchedule);
   }

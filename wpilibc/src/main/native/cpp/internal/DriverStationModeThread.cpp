@@ -39,7 +39,7 @@ void DriverStationModeThread::InTest(bool entering) {
 }
 
 void DriverStationModeThread::Run() {
-  wpi::Event event{true, false};
+  wpi::Event event{false, false};
   HAL_ProvideNewDataEventHandle(event.GetHandle());
 
   while (m_keepAlive.load()) {

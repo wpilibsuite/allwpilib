@@ -40,6 +40,8 @@ class WaitCommand : public CommandHelper<CommandBase, WaitCommand> {
 
   bool RunsWhenDisabled() const override;
 
+  void InitSendable(wpi::SendableBuilder& builder) override;
+
  protected:
   frc::Timer m_timer;
 

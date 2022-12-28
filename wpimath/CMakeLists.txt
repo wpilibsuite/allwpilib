@@ -126,12 +126,12 @@ install(DIRECTORY src/main/native/thirdparty/gcem/include/ DESTINATION "${includ
 target_include_directories(wpimath SYSTEM PUBLIC
                           $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/thirdparty/gcem/include>)
 
+install(DIRECTORY src/main/native/include/ DESTINATION "${include_dest}/wpimath")
 target_include_directories(wpimath PUBLIC
                             $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/include>
                             $<INSTALL_INTERFACE:${include_dest}/wpimath>)
 
 install(TARGETS wpimath EXPORT wpimath DESTINATION "${main_lib_dest}")
-install(DIRECTORY src/main/native/include/ DESTINATION "${include_dest}/wpimath")
 
 if (WITH_JAVA AND MSVC)
     install(TARGETS wpimath RUNTIME DESTINATION "${jni_lib_dest}" COMPONENT Runtime)

@@ -4,9 +4,8 @@
 
 #pragma once
 
-#include <frc2/command/Command.h>
+#include <frc2/command/CommandPtr.h>
 
-#include "commands/ExampleCommand.h"
 #include "subsystems/ExampleSubsystem.h"
 
 /**
@@ -20,12 +19,11 @@ class RobotContainer {
  public:
   RobotContainer();
 
-  frc2::Command* GetAutonomousCommand();
+  frc2::CommandPtr GetAutonomousCommand();
 
  private:
-  // The robot's subsystems and commands are defined here...
+  // The robot's subsystems are defined here...
   ExampleSubsystem m_subsystem;
-  ExampleCommand m_autonomousCommand;
 
-  void ConfigureButtonBindings();
+  void ConfigureBindings();
 };

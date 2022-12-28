@@ -4,10 +4,6 @@
 
 #include "RobotContainer.h"
 
-#include <frc/shuffleboard/Shuffleboard.h>
-#include <frc2/command/Commands.h>
-#include <frc2/command/button/JoystickButton.h>
-
 #include "commands/DriveDistanceProfiled.h"
 
 RobotContainer::RobotContainer() {
@@ -20,7 +16,7 @@ RobotContainer::RobotContainer() {
   m_drive.SetDefaultCommand(frc2::cmd::Run(
       [this] {
         m_drive.ArcadeDrive(-m_driverController.GetLeftY(),
-                            m_driverController.GetRightX());
+                            -m_driverController.GetRightX());
       },
       {&m_drive}));
 }
@@ -29,39 +25,38 @@ void RobotContainer::ConfigureButtonBindings() {
   // Configure your button bindings here
 
   // While holding the shoulder button, drive at half speed
-  frc2::JoystickButton(&m_driverController,
-                       frc::XboxController::Button::kRightBumper)
-      .OnTrue(&m_driveHalfSpeed)
-      .OnFalse(&m_driveFullSpeed);
+  m_driverController.RightBumper()
+      .OnTrue(m_driveHalfSpeed.get())
+      .OnFalse(m_driveFullSpeed.get());
 
   // Drive forward by 3 meters when the 'A' button is pressed, with a timeout of
   // 10 seconds
-  frc2::JoystickButton(&m_driverController, frc::XboxController::Button::kA)
-      .OnTrue(DriveDistanceProfiled(3_m, &m_drive).WithTimeout(10_s));
+  m_driverController.A().OnTrue(
+      DriveDistanceProfiled(3_m, &m_drive).WithTimeout(10_s));
 
   // Do the same thing as above when the 'B' button is pressed, but defined
   // inline
-  frc2::JoystickButton(&m_driverController, frc::XboxController::Button::kB)
-      .OnTrue(
-          frc2::TrapezoidProfileCommand<units::meters>(
-              frc::TrapezoidProfile<units::meters>(
-                  // Limit the max acceleration and velocity
-                  {DriveConstants::kMaxSpeed, DriveConstants::kMaxAcceleration},
-                  // End at desired position in meters; implicitly starts at 0
-                  {3_m, 0_mps}),
-              // Pipe the profile state to the drive
-              [this](auto setpointState) {
-                m_drive.SetDriveStates(setpointState, setpointState);
-              },
-              // Require the drive
-              {&m_drive})
-              .ToPtr()
-              .BeforeStarting(
-                  frc2::cmd::RunOnce([this]() { m_drive.ResetEncoders(); }, {}))
-              .WithTimeout(10_s));
+  m_driverController.B().OnTrue(
+      frc2::TrapezoidProfileCommand<units::meters>(
+          frc::TrapezoidProfile<units::meters>(
+              // Limit the max acceleration and velocity
+              {DriveConstants::kMaxSpeed, DriveConstants::kMaxAcceleration},
+              // End at desired position in meters; implicitly starts at 0
+              {3_m, 0_mps}),
+          // Pipe the profile state to the drive
+          [this](auto setpointState) {
+            m_drive.SetDriveStates(setpointState, setpointState);
+          },
+          // Require the drive
+          {&m_drive})
+          // Convert to CommandPtr
+          .ToPtr()
+          .BeforeStarting(
+              frc2::cmd::RunOnce([this]() { m_drive.ResetEncoders(); }, {}))
+          .WithTimeout(10_s));
 }
 
 frc2::Command* RobotContainer::GetAutonomousCommand() {
   // Runs the chosen command in autonomous
-  return new frc2::InstantCommand([] {});
+  return nullptr;
 }

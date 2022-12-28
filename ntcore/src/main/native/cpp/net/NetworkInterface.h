@@ -15,7 +15,7 @@ class json;
 }  // namespace wpi
 
 namespace nt {
-class PubSubOptions;
+class PubSubOptionsImpl;
 class Value;
 }  // namespace nt
 
@@ -35,32 +35,27 @@ class LocalInterface {
   virtual void NetworkSetValue(NT_Topic topicHandle, const Value& value) = 0;
 };
 
-class NetworkStartupInterface {
+class NetworkInterface {
  public:
-  virtual ~NetworkStartupInterface() = default;
+  virtual ~NetworkInterface() = default;
 
   virtual void Publish(NT_Publisher pubHandle, NT_Topic topicHandle,
                        std::string_view name, std::string_view typeStr,
                        const wpi::json& properties,
-                       const PubSubOptions& options) = 0;
-  virtual void Subscribe(NT_Subscriber subHandle,
-                         std::span<const std::string> topicNames,
-                         const PubSubOptions& options) = 0;
-  virtual void SetValue(NT_Publisher pubHandle, const Value& value) = 0;
-};
-
-class NetworkInterface : public NetworkStartupInterface {
- public:
+                       const PubSubOptionsImpl& options) = 0;
   virtual void Unpublish(NT_Publisher pubHandle, NT_Topic topicHandle) = 0;
   virtual void SetProperties(NT_Topic topicHandle, std::string_view name,
                              const wpi::json& update) = 0;
+  virtual void Subscribe(NT_Subscriber subHandle,
+                         std::span<const std::string> topicNames,
+                         const PubSubOptionsImpl& options) = 0;
   virtual void Unsubscribe(NT_Subscriber subHandle) = 0;
+  virtual void SetValue(NT_Publisher pubHandle, const Value& value) = 0;
 };
 
 class ILocalStorage : public LocalInterface {
  public:
-  virtual void StartNetwork(NetworkStartupInterface& startup,
-                            NetworkInterface* network) = 0;
+  virtual void StartNetwork(NetworkInterface* network) = 0;
   virtual void ClearNetwork() = 0;
 };
 

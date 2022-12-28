@@ -144,7 +144,7 @@ public class CommandGenericHID {
   }
 
   /**
-   * Constructs a Trigger instance based around the 45-degree angle (down left) of the default
+   * Constructs a Trigger instance based around the 225-degree angle (down left) of the default
    * (index 0) POV on the HID, attached to {@link CommandScheduler#getDefaultButtonLoop() the
    * default command scheduler button loop}.
    *
@@ -177,11 +177,11 @@ public class CommandGenericHID {
   }
 
   /**
-   * Constructs a Trigger instance based around the center (not pressed) of the default (index 0)
-   * POV on the HID, attached to {@link CommandScheduler#getDefaultButtonLoop() the default command
-   * scheduler button loop}.
+   * Constructs a Trigger instance based around the center (not pressed) position of the default
+   * (index 0) POV on the HID, attached to {@link CommandScheduler#getDefaultButtonLoop() the
+   * default command scheduler button loop}.
    *
-   * @return a Trigger instance based around the center of a POV on the HID.
+   * @return a Trigger instance based around the center position of a POV on the HID.
    */
   public Trigger povCenter() {
     return pov(-1);

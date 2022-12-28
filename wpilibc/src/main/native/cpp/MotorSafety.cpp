@@ -24,7 +24,7 @@ class Thread : public wpi::SafeThread {
 };
 
 void Thread::Main() {
-  wpi::Event event{true, false};
+  wpi::Event event{false, false};
   HAL_ProvideNewDataEventHandle(event.GetHandle());
 
   int safetyCounter = 0;
@@ -159,7 +159,9 @@ void MotorSafety::Check() {
   }
 
   if (stopTime < Timer::GetFPGATimestamp()) {
-    FRC_ReportError(err::Timeout, "{}... Output not updated often enough",
+    FRC_ReportError(err::Timeout,
+                    "{}... Output not updated often enough. See "
+                    "https://docs.wpilib.org/motorsafety for more information.",
                     GetDescription());
 
     try {

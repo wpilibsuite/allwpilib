@@ -4,15 +4,13 @@
 
 package edu.wpi.first.wpilibj.examples.armbot;
 
-import static edu.wpi.first.wpilibj.XboxController.Button;
-
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.examples.armbot.Constants.OIConstants;
 import edu.wpi.first.wpilibj.examples.armbot.subsystems.ArmSubsystem;
 import edu.wpi.first.wpilibj.examples.armbot.subsystems.DriveSubsystem;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.RunCommand;
+import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 
 /**
@@ -27,7 +25,8 @@ public class RobotContainer {
   private final ArmSubsystem m_robotArm = new ArmSubsystem();
 
   // The driver's controller
-  XboxController m_driverController = new XboxController(OIConstants.kDriverControllerPort);
+  CommandXboxController m_driverController =
+      new CommandXboxController(OIConstants.kDriverControllerPort);
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
@@ -39,10 +38,10 @@ public class RobotContainer {
     m_robotDrive.setDefaultCommand(
         // A split-stick arcade command, with forward/backward controlled by the left
         // hand, and turning controlled by the right.
-        new RunCommand(
+        Commands.run(
             () ->
                 m_robotDrive.arcadeDrive(
-                    -m_driverController.getLeftY(), m_driverController.getRightX()),
+                    -m_driverController.getLeftY(), -m_driverController.getRightX()),
             m_robotDrive));
   }
 
@@ -54,9 +53,10 @@ public class RobotContainer {
    */
   private void configureButtonBindings() {
     // Move the arm to 2 radians above horizontal when the 'A' button is pressed.
-    new JoystickButton(m_driverController, Button.kA.value)
+    m_driverController
+        .a()
         .onTrue(
-            new InstantCommand(
+            Commands.runOnce(
                 () -> {
                   m_robotArm.setGoal(2);
                   m_robotArm.enable();
@@ -64,9 +64,10 @@ public class RobotContainer {
                 m_robotArm));
 
     // Move the arm to neutral position when the 'B' button is pressed.
-    new JoystickButton(m_driverController, Button.kB.value)
+    m_driverController
+        .b()
         .onTrue(
-            new InstantCommand(
+            Commands.runOnce(
                 () -> {
                   m_robotArm.setGoal(Constants.ArmConstants.kArmOffsetRads);
                   m_robotArm.enable();
@@ -74,13 +75,13 @@ public class RobotContainer {
                 m_robotArm));
 
     // Disable the arm controller when Y is pressed.
-    new JoystickButton(m_driverController, Button.kY.value)
-        .onTrue(new InstantCommand(m_robotArm::disable));
+    m_driverController.y().onTrue(Commands.runOnce(m_robotArm::disable));
 
     // Drive at half speed when the bumper is held
-    new JoystickButton(m_driverController, Button.kRightBumper.value)
-        .onTrue(new InstantCommand(() -> m_robotDrive.setMaxOutput(0.5)))
-        .onFalse(new InstantCommand(() -> m_robotDrive.setMaxOutput(1)));
+    m_driverController
+        .rightBumper()
+        .onTrue(Commands.runOnce(() -> m_robotDrive.setMaxOutput(0.5)))
+        .onFalse(Commands.runOnce(() -> m_robotDrive.setMaxOutput(1.0)));
   }
 
   /**
@@ -97,6 +98,6 @@ public class RobotContainer {
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand() {
-    return new InstantCommand();
+    return Commands.none();
   }
 }

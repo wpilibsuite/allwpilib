@@ -4,6 +4,9 @@
 
 package edu.wpi.first.wpilibj;
 
+import edu.wpi.first.hal.ControlWord;
+import edu.wpi.first.hal.DriverStationJNI;
+import edu.wpi.first.util.WPIUtilJNI;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
@@ -24,12 +27,49 @@ public abstract class MotorSafety {
   private final Object m_thisMutex = new Object();
   private static final Set<MotorSafety> m_instanceList = new LinkedHashSet<>();
   private static final Object m_listMutex = new Object();
+  private static Thread m_safetyThread;
+
+  @SuppressWarnings("PMD.AssignmentInOperand")
+  private static void threadMain() {
+    int event = WPIUtilJNI.createEvent(false, false);
+    DriverStationJNI.provideNewDataEventHandle(event);
+    ControlWord controlWord = new ControlWord();
+
+    int safetyCounter = 0;
+    while (true) {
+      boolean timedOut;
+      try {
+        timedOut = WPIUtilJNI.waitForObjectTimeout(event, 0.1);
+      } catch (InterruptedException e) {
+        DriverStationJNI.removeNewDataEventHandle(event);
+        WPIUtilJNI.destroyEvent(event);
+        Thread.currentThread().interrupt();
+        return;
+      }
+      if (!timedOut) {
+        DriverStationJNI.getControlWord(controlWord);
+        if (!(controlWord.getEnabled() && controlWord.getDSAttached())) {
+          safetyCounter = 0;
+        }
+        if (++safetyCounter >= 4) {
+          checkMotors();
+          safetyCounter = 0;
+        }
+      } else {
+        safetyCounter = 0;
+      }
+    }
+  }
 
   /** MotorSafety constructor. */
   public MotorSafety() {
     synchronized (m_listMutex) {
       m_instanceList.add(this);
-      // TODO Threads
+      if (m_safetyThread == null) {
+        m_safetyThread = new Thread(() -> threadMain(), "MotorSafety Thread");
+        m_safetyThread.setDaemon(true);
+        m_safetyThread.start();
+      }
     }
   }
 
@@ -96,7 +136,10 @@ public abstract class MotorSafety {
     }
 
     if (stopTime < Timer.getFPGATimestamp()) {
-      DriverStation.reportError(getDescription() + "... Output not updated often enough.", false);
+      DriverStation.reportError(
+          getDescription()
+              + "... Output not updated often enough. See https://docs.wpilib.org/motorsafety for more information.",
+          false);
 
       stopMotor();
     }

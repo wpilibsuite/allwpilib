@@ -108,19 +108,8 @@ class WPILIB_DLLEXPORT Transform3d {
 
   /**
    * Checks equality between this Transform3d and another object.
-   *
-   * @param other The other object.
-   * @return Whether the two objects are equal.
    */
-  bool operator==(const Transform3d& other) const;
-
-  /**
-   * Checks inequality between this Transform3d and another object.
-   *
-   * @param other The other object.
-   * @return Whether the two objects are not equal.
-   */
-  bool operator!=(const Transform3d& other) const;
+  bool operator==(const Transform3d&) const = default;
 
  private:
   Translation3d m_translation;

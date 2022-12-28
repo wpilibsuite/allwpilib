@@ -32,5 +32,22 @@ struct WPILIB_DLLEXPORT MecanumDriveWheelPositions {
    * Distance driven by the rear-right wheel.
    */
   units::meter_t rearRight = 0_m;
+
+  /**
+   * Checks equality between this MecanumDriveWheelPositions and another object.
+   *
+   * @param other The other object.
+   * @return Whether the two objects are equal.
+   */
+  bool operator==(const MecanumDriveWheelPositions& other) const = default;
+
+  /**
+   * Checks inequality between this MecanumDriveWheelPositions and another
+   * object.
+   *
+   * @param other The other object.
+   * @return Whether the two objects are not equal.
+   */
+  bool operator!=(const MecanumDriveWheelPositions& other) const = default;
 };
 }  // namespace frc

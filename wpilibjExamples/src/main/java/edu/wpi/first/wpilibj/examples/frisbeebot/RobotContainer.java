@@ -4,20 +4,13 @@
 
 package edu.wpi.first.wpilibj.examples.frisbeebot;
 
-import static edu.wpi.first.wpilibj.XboxController.Button;
-
-import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.examples.frisbeebot.Constants.AutoConstants;
 import edu.wpi.first.wpilibj.examples.frisbeebot.Constants.OIConstants;
 import edu.wpi.first.wpilibj.examples.frisbeebot.subsystems.DriveSubsystem;
 import edu.wpi.first.wpilibj.examples.frisbeebot.subsystems.ShooterSubsystem;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.ConditionalCommand;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.RunCommand;
-import edu.wpi.first.wpilibj2.command.WaitCommand;
-import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
-import edu.wpi.first.wpilibj2.command.button.JoystickButton;
+import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -30,29 +23,34 @@ public class RobotContainer {
   private final DriveSubsystem m_robotDrive = new DriveSubsystem();
   private final ShooterSubsystem m_shooter = new ShooterSubsystem();
 
-  // A simple autonomous routine that shoots the loaded frisbees
-  private final Command m_autoCommand =
-      // Start the command by spinning up the shooter...
-      new InstantCommand(m_shooter::enable, m_shooter)
-          .andThen(
+  private final Command m_spinUpShooter = Commands.runOnce(m_shooter::enable, m_shooter);
+  private final Command m_stopShooter = Commands.runOnce(m_shooter::disable, m_shooter);
+
+  // An autonomous routine that shoots the loaded frisbees
+  Command m_autonomousCommand =
+      Commands.sequence(
+              // Start the command by spinning up the shooter...
+              Commands.runOnce(m_shooter::enable, m_shooter),
               // Wait until the shooter is at speed before feeding the frisbees
-              new WaitUntilCommand(m_shooter::atSetpoint),
+              Commands.waitUntil(m_shooter::atSetpoint),
               // Start running the feeder
-              new InstantCommand(m_shooter::runFeeder, m_shooter),
+              Commands.runOnce(m_shooter::runFeeder, m_shooter),
               // Shoot for the specified time
-              new WaitCommand(AutoConstants.kAutoShootTimeSeconds))
-          // Add a timeout (will end the command if, for instance, the shooter never gets up to
-          // speed)
+              Commands.waitSeconds(AutoConstants.kAutoShootTimeSeconds))
+          // Add a timeout (will end the command if, for instance, the shooter
+          // never gets up to speed)
           .withTimeout(AutoConstants.kAutoTimeoutSeconds)
           // When the command ends, turn off the shooter and the feeder
           .andThen(
-              () -> {
-                m_shooter.disable();
-                m_shooter.stopFeeder();
-              });
+              Commands.runOnce(
+                  () -> {
+                    m_shooter.disable();
+                    m_shooter.stopFeeder();
+                  }));
 
   // The driver's controller
-  XboxController m_driverController = new XboxController(OIConstants.kDriverControllerPort);
+  CommandXboxController m_driverController =
+      new CommandXboxController(OIConstants.kDriverControllerPort);
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
@@ -64,45 +62,55 @@ public class RobotContainer {
     m_robotDrive.setDefaultCommand(
         // A split-stick arcade command, with forward/backward controlled by the left
         // hand, and turning controlled by the right.
-        new RunCommand(
+        Commands.run(
             () ->
                 m_robotDrive.arcadeDrive(
-                    -m_driverController.getLeftY(), m_driverController.getRightX()),
+                    -m_driverController.getLeftY(), -m_driverController.getRightX()),
             m_robotDrive));
   }
 
   /**
-   * Use this method to define your button->command mappings. Buttons can be created by
-   * instantiating a {@link edu.wpi.first.wpilibj.GenericHID} or one of its subclasses ({@link
-   * edu.wpi.first.wpilibj.Joystick} or {@link XboxController}), and then passing it to a {@link
-   * edu.wpi.first.wpilibj2.command.button.JoystickButton}.
+   * Use this method to define your button->command mappings. Buttons can be created via the button
+   * factories on {@link edu.wpi.first.wpilibj2.command.button.CommandGenericHID} or one of its
+   * subclasses ({@link edu.wpi.first.wpilibj2.command.button.CommandJoystick} or {@link
+   * CommandXboxController}).
    */
   private void configureButtonBindings() {
+    // Configure your button bindings here
+
+    // We can bind commands while retaining references to them in RobotContainer
+
     // Spin up the shooter when the 'A' button is pressed
-    new JoystickButton(m_driverController, Button.kA.value)
-        .onTrue(new InstantCommand(m_shooter::enable, m_shooter));
+    m_driverController.a().onTrue(m_spinUpShooter);
 
     // Turn off the shooter when the 'B' button is pressed
-    new JoystickButton(m_driverController, Button.kB.value)
-        .onTrue(new InstantCommand(m_shooter::disable, m_shooter));
+    m_driverController.b().onTrue(m_stopShooter);
 
-    // Run the feeder when the 'X' button is held, but only if the shooter is at speed
-    new JoystickButton(m_driverController, Button.kX.value)
-        .onTrue(
-            new ConditionalCommand(
-                // Run the feeder
-                new InstantCommand(m_shooter::runFeeder, m_shooter),
-                // Do nothing
-                new InstantCommand(),
-                // Determine which of the above to do based on whether the shooter has reached the
-                // desired speed
-                m_shooter::atSetpoint))
-        .onFalse(new InstantCommand(m_shooter::stopFeeder, m_shooter));
+    // We can also write them as temporary variables outside the bindings
 
-    // Drive at half speed when the bumper is held
-    new JoystickButton(m_driverController, Button.kRightBumper.value)
-        .onTrue(new InstantCommand(() -> m_robotDrive.setMaxOutput(0.5)))
-        .onFalse(new InstantCommand(() -> m_robotDrive.setMaxOutput(1)));
+    // Shoots if the shooter wheel has reached the target speed
+    Command shoot =
+        Commands.either(
+            // Run the feeder
+            Commands.runOnce(m_shooter::runFeeder, m_shooter),
+            // Do nothing
+            Commands.none(),
+            // Determine which of the above to do based on whether the shooter has reached the
+            // desired speed
+            m_shooter::atSetpoint);
+
+    Command stopFeeder = Commands.runOnce(m_shooter::stopFeeder, m_shooter);
+
+    // Shoot when the 'X' button is pressed
+    m_driverController.x().onTrue(shoot).onFalse(stopFeeder);
+
+    // We can also define commands inline at the binding!
+
+    // While holding the shoulder button, drive at half speed
+    m_driverController
+        .rightBumper()
+        .onTrue(Commands.runOnce(() -> m_robotDrive.setMaxOutput(0.5)))
+        .onFalse(Commands.runOnce(() -> m_robotDrive.setMaxOutput(1)));
   }
 
   /**
@@ -111,6 +119,6 @@ public class RobotContainer {
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand() {
-    return m_autoCommand;
+    return m_autonomousCommand;
   }
 }

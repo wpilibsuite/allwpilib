@@ -66,14 +66,6 @@ struct WPILIB_DLLEXPORT Twist3d {
   }
 
   /**
-   * Checks inequality between this Twist3d and another object.
-   *
-   * @param other The other object.
-   * @return Whether the two objects are not equal.
-   */
-  bool operator!=(const Twist3d& other) const { return !operator==(other); }
-
-  /**
    * Scale this by a given factor.
    *
    * @param factor The factor by which to scale.

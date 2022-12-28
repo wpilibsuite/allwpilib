@@ -77,7 +77,7 @@ TEST(Rotation2dTest, Constexpr) {
 
   static_assert(defaultCtor.Radians() == 0_rad);
   static_assert(degreeCtor.Degrees() == 270_deg);
-  static_assert(negated.Radians() == (-5_rad));
+  static_assert(negated.Radians() == -5_rad);
   static_assert(multiplied.Radians() == 10_rad);
   static_assert(subtracted == rotation45);
   static_assert(radianCtor != degreeCtor);

@@ -34,7 +34,7 @@ class MecanumDriveOdometryTest {
   void testMultipleConsecutiveUpdates() {
     var wheelPositions = new MecanumDriveWheelPositions(3.536, 3.536, 3.536, 3.536);
 
-    m_odometry.resetPosition(new Pose2d(), new Rotation2d(), wheelPositions);
+    m_odometry.resetPosition(new Rotation2d(), wheelPositions, new Pose2d());
 
     m_odometry.update(new Rotation2d(), wheelPositions);
     var secondPose = m_odometry.update(new Rotation2d(), wheelPositions);
@@ -49,7 +49,7 @@ class MecanumDriveOdometryTest {
   void testTwoIterations() {
     // 5 units/sec  in the x axis (forward)
     final var wheelPositions = new MecanumDriveWheelPositions(0.3536, 0.3536, 0.3536, 0.3536);
-    m_odometry.resetPosition(new Pose2d(), new Rotation2d(), new MecanumDriveWheelPositions());
+    m_odometry.resetPosition(new Rotation2d(), new MecanumDriveWheelPositions(), new Pose2d());
 
     m_odometry.update(new Rotation2d(), new MecanumDriveWheelPositions());
     var pose = m_odometry.update(new Rotation2d(), wheelPositions);
@@ -65,7 +65,7 @@ class MecanumDriveOdometryTest {
     // This is a 90 degree turn about the point between front left and rear left wheels
     // fl -13.328649 fr 39.985946 rl -13.328649 rr 39.985946
     final var wheelPositions = new MecanumDriveWheelPositions(-13.328, 39.986, -13.329, 39.986);
-    m_odometry.resetPosition(new Pose2d(), new Rotation2d(), new MecanumDriveWheelPositions());
+    m_odometry.resetPosition(new Rotation2d(), new MecanumDriveWheelPositions(), new Pose2d());
 
     m_odometry.update(new Rotation2d(), new MecanumDriveWheelPositions());
     final var pose = m_odometry.update(Rotation2d.fromDegrees(90.0), wheelPositions);
@@ -81,7 +81,7 @@ class MecanumDriveOdometryTest {
     var gyro = Rotation2d.fromDegrees(90.0);
     var fieldAngle = Rotation2d.fromDegrees(0.0);
     m_odometry.resetPosition(
-        new Pose2d(new Translation2d(), fieldAngle), gyro, new MecanumDriveWheelPositions());
+        gyro, new MecanumDriveWheelPositions(), new Pose2d(new Translation2d(), fieldAngle));
     var speeds = new MecanumDriveWheelPositions(3.536, 3.536, 3.536, 3.536);
     m_odometry.update(gyro, new MecanumDriveWheelPositions());
     var pose = m_odometry.update(gyro, speeds);

@@ -7,6 +7,7 @@
 #include <utility>
 
 #include <fmt/format.h>
+#include <hal/DriverStation.h>
 #include <hal/FRCUsageReporting.h>
 #include <hal/Notifier.h>
 #include <hal/Threads.h>
@@ -95,7 +96,21 @@ Notifier::Notifier(int priority, std::function<void()> handler) {
 
       // call callback
       if (handler) {
-        handler();
+        try {
+          handler();
+        } catch (const frc::RuntimeError& e) {
+          e.Report();
+          FRC_ReportError(
+              err::Error,
+              "Error in Notifier thread."
+              "  The above stacktrace can help determine where the error "
+              "occurred.\n"
+              "  See https://wpilib.org/stacktrace for more information.\n");
+          throw;
+        } catch (const std::exception& e) {
+          HAL_SendError(1, err::Error, 0, e.what(), "", "", 1);
+          throw;
+        }
       }
     }
   });

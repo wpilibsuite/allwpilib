@@ -11,66 +11,48 @@ namespace frc {
 template <size_t NumModules>
 SwerveDriveOdometry<NumModules>::SwerveDriveOdometry(
     SwerveDriveKinematics<NumModules> kinematics, const Rotation2d& gyroAngle,
-    const wpi::array<SwerveModulePosition, NumModules> modulePositions,
+    const wpi::array<SwerveModulePosition, NumModules>& modulePositions,
     const Pose2d& initialPose)
-    : m_kinematics(kinematics),
-      m_pose(initialPose),
-      m_previousModulePositions(modulePositions) {
+    : m_kinematics(kinematics), m_pose(initialPose) {
   m_previousAngle = m_pose.Rotation();
   m_gyroOffset = m_pose.Rotation() - gyroAngle;
+
+  for (size_t i = 0; i < NumModules; i++) {
+    m_previousModulePositions[i] = {modulePositions[i].distance,
+                                    modulePositions[i].angle};
+  }
+
   wpi::math::MathSharedStore::ReportUsage(
       wpi::math::MathUsageId::kOdometry_SwerveDrive, 1);
 }
 
 template <size_t NumModules>
-template <typename... ModulePositions>
 void SwerveDriveOdometry<NumModules>::ResetPosition(
-    const Pose2d& pose, const Rotation2d& gyroAngle,
-    ModulePositions&&... wheelPositions) {
-  static_assert(sizeof...(wheelPositions) == NumModules,
-                "Number of modules is not consistent with number of wheel "
-                "locations provided in constructor.");
-
-  wpi::array<SwerveModulePosition, NumModules> modulePositions{
-      wheelPositions...};
-  this->ResetPosition(pose, gyroAngle, modulePositions);
-}
-
-template <size_t NumModules>
-void SwerveDriveOdometry<NumModules>::ResetPosition(
-    const Pose2d& pose, const Rotation2d& gyroAngle,
-    const wpi::array<SwerveModulePosition, NumModules> modulePositions) {
+    const Rotation2d& gyroAngle,
+    const wpi::array<SwerveModulePosition, NumModules>& modulePositions,
+    const Pose2d& pose) {
   m_pose = pose;
   m_previousAngle = pose.Rotation();
   m_gyroOffset = m_pose.Rotation() - gyroAngle;
-  m_previousModulePositions = modulePositions;
-}
 
-template <size_t NumModules>
-template <typename... ModulePositions>
-const Pose2d& frc::SwerveDriveOdometry<NumModules>::Update(
-    const Rotation2d& gyroAngle, ModulePositions&&... wheelPositions) {
-  static_assert(sizeof...(wheelPositions) == NumModules,
-                "Number of modules is not consistent with number of wheel "
-                "locations provided in constructor.");
-
-  wpi::array<SwerveModulePosition, NumModules> modulePositions{
-      wheelPositions...};
-
-  return this->Update(gyroAngle, modulePositions);
+  for (size_t i = 0; i < NumModules; i++) {
+    m_previousModulePositions[i].distance = modulePositions[i].distance;
+  }
 }
 
 template <size_t NumModules>
 const Pose2d& frc::SwerveDriveOdometry<NumModules>::Update(
     const Rotation2d& gyroAngle,
-    const wpi::array<SwerveModulePosition, NumModules> modulePositions) {
+    const wpi::array<SwerveModulePosition, NumModules>& modulePositions) {
   auto moduleDeltas =
       wpi::array<SwerveModulePosition, NumModules>(wpi::empty_array);
-  for (size_t index = 0; index < modulePositions.size(); index++) {
+  for (size_t index = 0; index < NumModules; index++) {
     auto lastPosition = m_previousModulePositions[index];
     auto currentPosition = modulePositions[index];
     moduleDeltas[index] = {currentPosition.distance - lastPosition.distance,
                            currentPosition.angle};
+
+    m_previousModulePositions[index].distance = modulePositions[index].distance;
   }
 
   auto angle = gyroAngle + m_gyroOffset;
@@ -82,7 +64,6 @@ const Pose2d& frc::SwerveDriveOdometry<NumModules>::Update(
 
   m_previousAngle = angle;
   m_pose = {newPose.Translation(), angle};
-  m_previousModulePositions = modulePositions;
 
   return m_pose;
 }

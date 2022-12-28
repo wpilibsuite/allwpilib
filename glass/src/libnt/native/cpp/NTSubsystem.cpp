@@ -34,5 +34,5 @@ void NTSubsystemModel::Update() {
 }
 
 bool NTSubsystemModel::Exists() {
-  return m_inst.IsConnected() && m_defaultCommand.Exists();
+  return m_defaultCommand.Exists();
 }

@@ -103,19 +103,8 @@ class WPILIB_DLLEXPORT Transform2d {
 
   /**
    * Checks equality between this Transform2d and another object.
-   *
-   * @param other The other object.
-   * @return Whether the two objects are equal.
    */
-  bool operator==(const Transform2d& other) const;
-
-  /**
-   * Checks inequality between this Transform2d and another object.
-   *
-   * @param other The other object.
-   * @return Whether the two objects are not equal.
-   */
-  bool operator!=(const Transform2d& other) const;
+  bool operator==(const Transform2d&) const = default;
 
  private:
   Translation2d m_translation;

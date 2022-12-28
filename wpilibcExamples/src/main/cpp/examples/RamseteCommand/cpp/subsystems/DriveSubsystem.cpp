@@ -16,7 +16,7 @@ DriveSubsystem::DriveSubsystem()
       m_right2{kRightMotor2Port},
       m_leftEncoder{kLeftEncoderPorts[0], kLeftEncoderPorts[1]},
       m_rightEncoder{kRightEncoderPorts[0], kRightEncoderPorts[1]},
-      m_odometry{m_gyro.GetRotation2d()} {
+      m_odometry{m_gyro.GetRotation2d(), units::meter_t{0}, units::meter_t{0}} {
   // We need to invert one side of the drivetrain so that positive voltages
   // result in both sides moving forward. Depending on how your robot's
   // gearbox is constructed, you might have to invert the left side instead.
@@ -86,5 +86,7 @@ frc::DifferentialDriveWheelSpeeds DriveSubsystem::GetWheelSpeeds() {
 
 void DriveSubsystem::ResetOdometry(frc::Pose2d pose) {
   ResetEncoders();
-  m_odometry.ResetPosition(pose, m_gyro.GetRotation2d());
+  m_odometry.ResetPosition(m_gyro.GetRotation2d(),
+                           units::meter_t{m_leftEncoder.GetDistance()},
+                           units::meter_t{m_rightEncoder.GetDistance()}, pose);
 }

@@ -22,37 +22,36 @@ wpi::json Topic::GetProperties() const {
   return ::nt::GetTopicProperties(m_handle);
 }
 
-GenericSubscriber Topic::GenericSubscribe(
-    std::span<const PubSubOption> options) {
+GenericSubscriber Topic::GenericSubscribe(const PubSubOptions& options) {
   return GenericSubscribe("", options);
 }
 
-GenericSubscriber Topic::GenericSubscribe(
-    std::string_view typeString, std::span<const PubSubOption> options) {
+GenericSubscriber Topic::GenericSubscribe(std::string_view typeString,
+                                          const PubSubOptions& options) {
   return GenericSubscriber{::nt::Subscribe(
       m_handle, ::nt::GetTypeFromString(typeString), typeString, options)};
 }
 
 GenericPublisher Topic::GenericPublish(std::string_view typeString,
-                                       std::span<const PubSubOption> options) {
+                                       const PubSubOptions& options) {
   return GenericPublisher{::nt::Publish(
       m_handle, ::nt::GetTypeFromString(typeString), typeString, options)};
 }
 
-GenericPublisher Topic::GenericPublishEx(
-    std::string_view typeString, const wpi::json& properties,
-    std::span<const PubSubOption> options) {
+GenericPublisher Topic::GenericPublishEx(std::string_view typeString,
+                                         const wpi::json& properties,
+                                         const PubSubOptions& options) {
   return GenericPublisher{::nt::PublishEx(m_handle,
                                           ::nt::GetTypeFromString(typeString),
                                           typeString, properties, options)};
 }
 
-GenericEntry Topic::GetGenericEntry(std::span<const PubSubOption> options) {
+GenericEntry Topic::GetGenericEntry(const PubSubOptions& options) {
   return GetGenericEntry("", options);
 }
 
 GenericEntry Topic::GetGenericEntry(std::string_view typeString,
-                                    std::span<const PubSubOption> options) {
+                                    const PubSubOptions& options) {
   return GenericEntry{::nt::GetEntry(
       m_handle, ::nt::GetTypeFromString(typeString), typeString, options)};
 }

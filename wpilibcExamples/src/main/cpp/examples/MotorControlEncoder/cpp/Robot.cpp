@@ -15,7 +15,7 @@
  * operator control part of the program, the joystick is read and the value is
  * written to the motor.
  *
- * Joystick analog values range from -1 to 1 and speed controller inputs as
+ * Joystick analog values range from -1 to 1 and motor controller inputs as
  * range from -1 to 1 making it easy to work together.
  *
  * In addition, the encoder value of an encoder connected to ports 0 and 1 is

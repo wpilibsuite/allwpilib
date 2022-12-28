@@ -208,4 +208,22 @@ class RoboRioSimTest {
       assertEquals(kTestFaults, RobotController.getFaultCount3V3());
     }
   }
+
+  @Test
+  void testSerialNumber() {
+    RoboRioSim.resetData();
+
+    final String kSerialNumber = "Hello";
+
+    RoboRioSim.setSerialNumber(kSerialNumber);
+    assertEquals(kSerialNumber, RoboRioSim.getSerialNumber());
+    assertEquals(kSerialNumber, RobotController.getSerialNumber());
+
+    // Make sure it truncates at 8 characters properly
+    final String kSerialNumberOverflow = "SerialNumber";
+    final String kSerialNumberTruncated = kSerialNumberOverflow.substring(0, 8);
+    RoboRioSim.setSerialNumber(kSerialNumberOverflow);
+    assertEquals(kSerialNumberTruncated, RoboRioSim.getSerialNumber());
+    assertEquals(kSerialNumberTruncated, RobotController.getSerialNumber());
+  }
 }

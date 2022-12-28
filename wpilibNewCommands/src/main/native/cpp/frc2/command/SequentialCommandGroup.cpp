@@ -4,6 +4,8 @@
 
 #include "frc2/command/SequentialCommandGroup.h"
 
+#include <wpi/sendable/SendableBuilder.h>
+
 using namespace frc2;
 
 SequentialCommandGroup::SequentialCommandGroup(
@@ -53,11 +55,14 @@ bool SequentialCommandGroup::RunsWhenDisabled() const {
   return m_runWhenDisabled;
 }
 
+Command::InterruptionBehavior SequentialCommandGroup::GetInterruptionBehavior()
+    const {
+  return m_interruptBehavior;
+}
+
 void SequentialCommandGroup::AddCommands(
     std::vector<std::unique_ptr<Command>>&& commands) {
-  if (!RequireUngrouped(commands)) {
-    return;
-  }
+  CommandScheduler::GetInstance().RequireUngrouped(commands);
 
   if (m_currentCommandIndex != invalid_index) {
     throw FRC_MakeError(frc::err::CommandIllegalUse,
@@ -66,9 +71,19 @@ void SequentialCommandGroup::AddCommands(
   }
 
   for (auto&& command : commands) {
-    command->SetGrouped(true);
+    command->SetComposed(true);
     AddRequirements(command->GetRequirements());
     m_runWhenDisabled &= command->RunsWhenDisabled();
+    if (command->GetInterruptionBehavior() ==
+        Command::InterruptionBehavior::kCancelSelf) {
+      m_interruptBehavior = Command::InterruptionBehavior::kCancelSelf;
+    }
     m_commands.emplace_back(std::move(command));
   }
+}
+
+void SequentialCommandGroup::InitSendable(wpi::SendableBuilder& builder) {
+  CommandBase::InitSendable(builder);
+  builder.AddIntegerProperty(
+      "index", [this] { return m_currentCommandIndex; }, nullptr);
 }

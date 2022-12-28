@@ -72,11 +72,15 @@ All artifacts are based at `edu.wpi.first.artifactname` in the repository.
 * wpigui
   * imgui
 
-* ntcore
-  * wpiutil
-
 * wpimath
   * wpiutil
+
+* wpinet
+  * wpiutil
+
+* ntcore
+  * wpiutil
+  * wpinet
 
 * glass/libglass
   * wpiutil
@@ -85,6 +89,7 @@ All artifacts are based at `edu.wpi.first.artifactname` in the repository.
 
 * glass/libglassnt
   * wpiutil
+  * wpinet
   * ntcore
   * wpimath
   * wpigui
@@ -94,6 +99,7 @@ All artifacts are based at `edu.wpi.first.artifactname` in the repository.
 
 * halsim
   * wpiutil
+  * wpinet
   * ntcore
   * wpimath
   * wpigui
@@ -102,12 +108,14 @@ All artifacts are based at `edu.wpi.first.artifactname` in the repository.
 
 * cscore
   * opencv
+  * wpinet
   * wpiutil
 
 * cameraserver
   * ntcore
   * cscore
   * opencv
+  * wpinet
   * wpiutil
 
 * wpilibj
@@ -115,6 +123,7 @@ All artifacts are based at `edu.wpi.first.artifactname` in the repository.
   * cameraserver
   * ntcore
   * cscore
+  * wpinet
   * wpiutil
 
 * wpilibc
@@ -123,6 +132,7 @@ All artifacts are based at `edu.wpi.first.artifactname` in the repository.
   * ntcore
   * cscore
   * wpimath
+  * wpinet
   * wpiutil
 
 * wpilibNewCommands
@@ -132,6 +142,7 @@ All artifacts are based at `edu.wpi.first.artifactname` in the repository.
   * ntcore
   * cscore
   * wpimath
+  * wpinet
   * wpiutil
 
 

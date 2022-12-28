@@ -13,7 +13,7 @@ concurrency:
 jobs:
   update:
     name: "Update"
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v3
       - name: Fetch all history and metadata

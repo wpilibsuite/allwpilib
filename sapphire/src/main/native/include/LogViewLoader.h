@@ -83,12 +83,12 @@ class LogViewLoader : public glass::WindowManager {
   class DataLogProvider{
    public:
     DataLogProvider(LogViewLoader* loader, std::string_view name, DataLogModel* log, wpi::StringMap<Builder>& typeMap);
+    LogViewLoader* m_loader;
     std::string_view m_name;
     DataLogModel* m_log;
     wpi::StringMap<Builder>& m_typeMap;
     std::vector<std::unique_ptr<ModelEntry> > m_models;
     std::vector<std::unique_ptr<ViewEntry> > m_views;
-    LogViewLoader* m_loader;
     void Show(ViewEntry* entry, glass::Window* window);
     void Update();
   };

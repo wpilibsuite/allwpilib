@@ -33,10 +33,10 @@ class WPILIB_DLLEXPORT MecanumDriveOdometry {
    * @param wheelPositions The current distances measured by each wheel.
    * @param initialPose The starting position of the robot on the field.
    */
-  explicit MecanumDriveOdometry(MecanumDriveKinematics kinematics,
-                                const Rotation2d& gyroAngle,
-                                const MecanumDriveWheelPositions wheelPositions,
-                                const Pose2d& initialPose = Pose2d{});
+  explicit MecanumDriveOdometry(
+      MecanumDriveKinematics kinematics, const Rotation2d& gyroAngle,
+      const MecanumDriveWheelPositions& wheelPositions,
+      const Pose2d& initialPose = Pose2d{});
 
   /**
    * Resets the robot's position on the field.
@@ -44,12 +44,13 @@ class WPILIB_DLLEXPORT MecanumDriveOdometry {
    * The gyroscope angle does not need to be reset here on the user's robot
    * code. The library automatically takes care of offsetting the gyro angle.
    *
-   * @param pose The position on the field that your robot is at.
    * @param gyroAngle The angle reported by the gyroscope.
    * @param wheelPositions The current distances measured by each wheel.
+   * @param pose The position on the field that your robot is at.
    */
-  void ResetPosition(const Pose2d& pose, const Rotation2d& gyroAngle,
-                     const MecanumDriveWheelPositions wheelPositions) {
+  void ResetPosition(const Rotation2d& gyroAngle,
+                     const MecanumDriveWheelPositions& wheelPositions,
+                     const Pose2d& pose) {
     m_pose = pose;
     m_previousAngle = pose.Rotation();
     m_gyroOffset = m_pose.Rotation() - gyroAngle;
@@ -74,7 +75,7 @@ class WPILIB_DLLEXPORT MecanumDriveOdometry {
    * @return The new pose of the robot.
    */
   const Pose2d& Update(const Rotation2d& gyroAngle,
-                       const MecanumDriveWheelPositions wheelPositions);
+                       const MecanumDriveWheelPositions& wheelPositions);
 
  private:
   MecanumDriveKinematics m_kinematics;

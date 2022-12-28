@@ -8,20 +8,13 @@ using namespace frc;
 
 EventLoop::EventLoop() {}
 
-void EventLoop::Binding::Poll() {
-  if (condition()) {
-    action();
-  }
-}
-
-void EventLoop::Bind(std::function<bool()> condition,
-                     wpi::unique_function<void()> action) {
-  m_bindings.emplace_back(Binding{condition, std::move(action)});
+void EventLoop::Bind(wpi::unique_function<void()> action) {
+  m_bindings.emplace_back(std::move(action));
 }
 
 void EventLoop::Poll() {
-  for (Binding& binding : m_bindings) {
-    binding.Poll();
+  for (wpi::unique_function<void()>& action : m_bindings) {
+    action();
   }
 }
 

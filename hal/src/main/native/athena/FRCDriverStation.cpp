@@ -19,6 +19,7 @@
 #include <wpi/condition_variable.h>
 #include <wpi/mutex.h>
 
+#include "HALInitializer.h"
 #include "hal/DriverStation.h"
 #include "hal/Errors.h"
 
@@ -42,7 +43,6 @@ struct JoystickDataCache {
   HAL_JoystickButtons buttons[HAL_kMaxJoysticks];
   HAL_AllianceStationID allianceStation;
   float matchTime;
-  bool updated;
 };
 static_assert(std::is_standard_layout_v<JoystickDataCache>);
 // static_assert(std::is_trivial_v<JoystickDataCache>);
@@ -113,7 +113,9 @@ void JoystickDataCache::Update() {
 static HAL_ControlWord newestControlWord;
 static JoystickDataCache caches[3];
 static JoystickDataCache* currentRead = &caches[0];
-static JoystickDataCache* currentCache = &caches[1];
+static JoystickDataCache* currentReadLocal = &caches[0];
+static std::atomic<JoystickDataCache*> currentCache{&caches[1]};
+static JoystickDataCache* lastGiven = &caches[1];
 static JoystickDataCache* cacheToUpdate = &caches[2];
 
 static wpi::mutex cacheMutex;
@@ -170,6 +172,38 @@ static int32_t HAL_GetMatchInfoInternal(HAL_MatchInfo* info) {
   return status;
 }
 
+namespace {
+struct TcpCache {
+  TcpCache() { std::memset(this, 0, sizeof(*this)); }
+  void Update(uint32_t mask);
+  void CloneTo(TcpCache* other) { std::memcpy(other, this, sizeof(*this)); }
+
+  HAL_MatchInfo matchInfo;
+  HAL_JoystickDescriptor descriptors[HAL_kMaxJoysticks];
+};
+static_assert(std::is_standard_layout_v<TcpCache>);
+}  // namespace
+
+static std::atomic_uint32_t tcpMask{0xFFFFFFFF};
+static TcpCache tcpCache;
+static TcpCache tcpCurrent;
+static wpi::mutex tcpCacheMutex;
+
+constexpr uint32_t combinedMatchInfoMask = kTcpRecvMask_MatchInfoOld |
+                                           kTcpRecvMask_MatchInfo |
+                                           kTcpRecvMask_GameSpecific;
+
+void TcpCache::Update(uint32_t mask) {
+  if ((mask & combinedMatchInfoMask) != 0) {
+    HAL_GetMatchInfoInternal(&matchInfo);
+  }
+  for (int i = 0; i < HAL_kMaxJoysticks; i++) {
+    if ((mask & (1 << i)) != 0) {
+      HAL_GetJoystickDescriptorInternal(i, &descriptors[i]);
+    }
+  }
+}
+
 namespace hal::init {
 void InitializeFRCDriverStation() {
   std::memset(&newestControlWord, 0, sizeof(newestControlWord));
@@ -177,6 +211,15 @@ void InitializeFRCDriverStation() {
   driverStation = &ds;
 }
 }  // namespace hal::init
+
+namespace hal {
+static void DefaultPrintErrorImpl(const char* line, size_t size) {
+  std::fwrite(line, size, 1, stderr);
+}
+}  // namespace hal
+
+static std::atomic<void (*)(const char* line, size_t size)> gPrintErrorImpl{
+    hal::DefaultPrintErrorImpl};
 
 extern "C" {
 
@@ -255,7 +298,8 @@ int32_t HAL_SendError(HAL_Bool isError, int32_t errorCode, HAL_Bool isLVCode,
       if (callStack && callStack[0] != '\0') {
         fmt::format_to(fmt::appender{buf}, "{}\n", callStack);
       }
-      std::fwrite(buf.data(), buf.size(), 1, stderr);
+      auto printError = gPrintErrorImpl.load();
+      printError(buf.data(), buf.size());
     }
     if (i == KEEP_MSGS) {
       // replace the oldest one
@@ -272,6 +316,10 @@ int32_t HAL_SendError(HAL_Bool isError, int32_t errorCode, HAL_Bool isLVCode,
     prevMsgTime[i] = curTime;
   }
   return retval;
+}
+
+void HAL_SetPrintErrorImpl(void (*func)(const char* line, size_t size)) {
+  gPrintErrorImpl.store(func ? func : hal::DefaultPrintErrorImpl);
 }
 
 int32_t HAL_SendConsoleLine(const char* line) {
@@ -324,11 +372,16 @@ void HAL_GetAllJoystickData(HAL_JoystickAxes* axes, HAL_JoystickPOVs* povs,
 
 int32_t HAL_GetJoystickDescriptor(int32_t joystickNum,
                                   HAL_JoystickDescriptor* desc) {
-  return HAL_GetJoystickDescriptorInternal(joystickNum, desc);
+  CHECK_JOYSTICK_NUMBER(joystickNum);
+  std::scoped_lock lock{tcpCacheMutex};
+  *desc = tcpCurrent.descriptors[joystickNum];
+  return 0;
 }
 
 int32_t HAL_GetMatchInfo(HAL_MatchInfo* info) {
-  return HAL_GetMatchInfoInternal(info);
+  std::scoped_lock lock{tcpCacheMutex};
+  *info = tcpCurrent.matchInfo;
+  return 0;
 }
 
 HAL_AllianceStationID HAL_GetAllianceStation(int32_t* status) {
@@ -373,7 +426,6 @@ void HAL_FreeJoystickName(char* name) {
 }
 
 int32_t HAL_GetJoystickAxisType(int32_t joystickNum, int32_t axis) {
-  CHECK_JOYSTICK_NUMBER(joystickNum);
   HAL_JoystickDescriptor joystickDesc;
   if (HAL_GetJoystickDescriptor(joystickNum, &joystickDesc) < 0) {
     return -1;
@@ -416,20 +468,44 @@ void HAL_ObserveUserProgramTest(void) {
 
 // Constant number to be used for our occur handle
 constexpr int32_t refNumber = 42;
+constexpr int32_t tcpRefNumber = 94;
+
+static void tcpOccur(void) {
+  uint32_t mask = FRC_NetworkCommunication_getNewTcpRecvMask();
+  tcpMask.fetch_or(mask);
+}
+
+static void udpOccur(void) {
+  cacheToUpdate->Update();
+
+  JoystickDataCache* given = cacheToUpdate;
+  JoystickDataCache* prev = currentCache.exchange(cacheToUpdate);
+  if (prev == nullptr) {
+    cacheToUpdate = currentReadLocal;
+    currentReadLocal = lastGiven;
+  } else {
+    // Current read local does not update
+    cacheToUpdate = prev;
+  }
+  lastGiven = given;
+
+  driverStation->newDataEvents.Wakeup();
+}
 
 static void newDataOccur(uint32_t refNum) {
-  // Since we could get other values, require our specific handle
-  // to signal our threads
-  if (refNum != refNumber) {
-    return;
+  switch (refNum) {
+    case refNumber:
+      udpOccur();
+      break;
+
+    case tcpRefNumber:
+      tcpOccur();
+      break;
+
+    default:
+      std::printf("Unknown occur %u\n", refNum);
+      break;
   }
-  cacheToUpdate->Update();
-  {
-    std::scoped_lock lock{cacheMutex};
-    std::swap(currentCache, cacheToUpdate);
-    currentCache->updated = true;
-  }
-  driverStation->newDataEvents.Wakeup();
 }
 
 void HAL_RefreshDSData(void) {
@@ -438,14 +514,22 @@ void HAL_RefreshDSData(void) {
   FRC_NetworkCommunication_getControlWord(
       reinterpret_cast<ControlWord_t*>(&controlWord));
   std::scoped_lock lock{cacheMutex};
-  if (currentCache->updated) {
-    std::swap(currentCache, currentRead);
-    currentCache->updated = false;
+  JoystickDataCache* prev = currentCache.exchange(nullptr);
+  if (prev != nullptr) {
+    currentRead = prev;
   }
   newestControlWord = controlWord;
+
+  uint32_t mask = tcpMask.exchange(0);
+  if (mask != 0) {
+    tcpCache.Update(mask);
+    std::scoped_lock tcpLock(tcpCacheMutex);
+    tcpCache.CloneTo(&tcpCurrent);
+  }
 }
 
 void HAL_ProvideNewDataEventHandle(WPI_EventHandle handle) {
+  hal::init::CheckInit();
   driverStation->newDataEvents.Add(handle);
 }
 
@@ -465,5 +549,6 @@ void InitializeDriverStation() {
   NetCommRPCProxy_SetOccurFuncPointer(newDataOccur);
   // Set up our occur reference number
   setNewDataOccurRef(refNumber);
+  FRC_NetworkCommunication_setNewTcpDataOccurRef(tcpRefNumber);
 }
 }  // namespace hal

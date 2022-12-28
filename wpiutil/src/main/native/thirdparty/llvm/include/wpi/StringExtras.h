@@ -709,4 +709,16 @@ template <>
 std::optional<long double> parse_float<long double>(
     std::string_view str) noexcept;
 
+/**
+ * Unescapes a C-style string (reverse operation to raw_ostream::write_escaped).
+ * Scans through @p str until either the end is reached or an unescaped double
+ * quote character is found.
+ *
+ * @param str input string
+ * @param buf buffer for unescaped characters
+ * @return pair of the unescaped string and any remaining input
+ */
+std::pair<std::string_view, std::string_view> UnescapeCString(
+    std::string_view str, SmallVectorImpl<char>& buf);
+
 }  // namespace wpi

@@ -1,7 +1,6 @@
 apply from: "${rootDir}/shared/resources.gradle"
 
 ext {
-    skipJniCheck = true
     baseId = 'wpinet'
     groupId = 'edu.wpi.first.net'
 

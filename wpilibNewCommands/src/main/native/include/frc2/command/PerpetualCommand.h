@@ -13,13 +13,12 @@
 #include <utility>
 
 #include "frc2/command/CommandBase.h"
-#include "frc2/command/CommandGroupBase.h"
 #include "frc2/command/CommandHelper.h"
 
 namespace frc2 {
 /**
  * A command that runs another command in perpetuity, ignoring that command's
- * end conditions.  While this class does not extend {@link CommandGroupBase},
+ * end conditions.  While this class does not extend frc2::CommandGroupBase,
  * it is still considered a CommandGroup, as it allows one to compose another
  * command within it; the command instances that are passed to it cannot be
  * added to any other groups, or scheduled individually.

@@ -85,8 +85,5 @@ class PIDSubsystem : public SubsystemBase {
    * @param setpoint the setpoint of the PIDController (for feedforward)
    */
   virtual void UseOutput(double output, double setpoint) = 0;
-
- private:
-  double m_setpoint{0};
 };
 }  // namespace frc2

@@ -4,11 +4,17 @@
 
 #pragma once
 
+#include <frc2/command/CommandPtr.h>
 #include <frc2/command/SubsystemBase.h>
 
 class ExampleSubsystem : public frc2::SubsystemBase {
  public:
   ExampleSubsystem();
+
+  /**
+   * Example command factory method.
+   */
+  frc2::CommandPtr ExampleMethodCommand();
 
   /**
    * Will be called periodically whenever the CommandScheduler runs.

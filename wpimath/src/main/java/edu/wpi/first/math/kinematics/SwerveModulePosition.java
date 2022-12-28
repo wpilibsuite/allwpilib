@@ -15,7 +15,7 @@ public class SwerveModulePosition implements Comparable<SwerveModulePosition> {
   /** Angle of the module. */
   public Rotation2d angle = Rotation2d.fromDegrees(0);
 
-  /** Constructs a SwerveModulePosition with zeros for speed and angle. */
+  /** Constructs a SwerveModulePosition with zeros for distance and angle. */
   public SwerveModulePosition() {}
 
   /**
@@ -44,7 +44,7 @@ public class SwerveModulePosition implements Comparable<SwerveModulePosition> {
 
   /**
    * Compares two swerve module positions. One swerve module is "greater" than the other if its
-   * speed is higher than the other.
+   * distance is higher than the other.
    *
    * @param other The other swerve module.
    * @return 1 if this is greater, 0 if both are equal, -1 if other is greater.
@@ -57,6 +57,6 @@ public class SwerveModulePosition implements Comparable<SwerveModulePosition> {
   @Override
   public String toString() {
     return String.format(
-        "SwerveModulePosition(Distance: %.2f m/s, Angle: %s)", distanceMeters, angle);
+        "SwerveModulePosition(Distance: %.2f m, Angle: %s)", distanceMeters, angle);
   }
 }

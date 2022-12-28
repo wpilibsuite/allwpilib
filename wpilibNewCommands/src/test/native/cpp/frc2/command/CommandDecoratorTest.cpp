@@ -198,3 +198,10 @@ TEST_F(CommandDecoratorTest, HandleInterrupt) {
   // if `second == 1`, the second lambda ran before the first one
   EXPECT_EQ(2, second);
 }
+
+TEST_F(CommandDecoratorTest, WithName) {
+  InstantCommand command;
+  std::string name{"Named"};
+  CommandPtr named = std::move(command).WithName(name);
+  EXPECT_EQ(name, named.get()->GetName());
+}

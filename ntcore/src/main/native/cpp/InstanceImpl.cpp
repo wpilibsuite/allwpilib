@@ -174,3 +174,15 @@ std::shared_ptr<INetworkClient> InstanceImpl::GetClient() {
   std::scoped_lock lock{m_mutex};
   return m_networkClient;
 }
+
+void InstanceImpl::Reset() {
+  std::scoped_lock lock{m_mutex};
+  m_networkServer.reset();
+  m_networkClient.reset();
+  m_servers.clear();
+  networkMode = NT_NET_MODE_NONE;
+
+  listenerStorage.Reset();
+  // connectionList should have been cleared by destroying networkClient/server
+  localStorage.Reset();
+}

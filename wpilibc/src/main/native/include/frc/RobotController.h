@@ -6,6 +6,8 @@
 
 #include <stdint.h>
 
+#include <string>
+
 #include <units/voltage.h>
 
 namespace frc {
@@ -41,6 +43,13 @@ class RobotController {
    * @return FPGA Revision number.
    */
   static int64_t GetFPGARevision();
+
+  /**
+   * Returns the serial number of the roboRIO.
+   *
+   * @return The serial number of the roboRIO.
+   */
+  static std::string GetSerialNumber();
 
   /**
    * Read the microsecond-resolution timer on the FPGA.

@@ -88,15 +88,6 @@ enum NT_NetworkMode {
   NT_NET_MODE_LOCAL = 0x10,    /* running in local-only mode */
 };
 
-/** Pub/sub option types */
-enum NT_PubSubOptionType {
-  NT_PUBSUB_PERIODIC = 1,   /* period between transmissions */
-  NT_PUBSUB_SENDALL,        /* all value changes are sent */
-  NT_PUBSUB_TOPICSONLY,     /* only send topic changes, no value changes */
-  NT_PUBSUB_POLLSTORAGE,    /* polling storage for subscription */
-  NT_PUBSUB_KEEPDUPLICATES, /* preserve duplicate values */
-};
-
 /** Event notification flags. */
 enum NT_EventFlags {
   NT_EVENT_NONE = 0,
@@ -280,16 +271,74 @@ struct NT_Event {
   } data;
 };
 
-/** NetworkTables publish/subscribe option. */
-struct NT_PubSubOption {
-  /** Option type. */
-  enum NT_PubSubOptionType type;
+/** NetworkTables publish/subscribe options. */
+struct NT_PubSubOptions {
+  /**
+   * Structure size. Must be set to sizeof(NT_PubSubOptions).
+   */
+  unsigned int structSize;
 
   /**
-   * Option value.  1 (true) or 0 (false) for immediate and logging options,
-   * time between updates, in seconds, for periodic option.
+   * Polling storage size for a subscription. Specifies the maximum number of
+   * updates NetworkTables should store between calls to the subscriber's
+   * ReadQueue() function. If zero, defaults to 1 if sendAll is false, 20 if
+   * sendAll is true.
    */
-  double value;
+  unsigned int pollStorage;
+
+  /**
+   * How frequently changes will be sent over the network, in seconds.
+   * NetworkTables may send more frequently than this (e.g. use a combined
+   * minimum period for all values) or apply a restricted range to this value.
+   * The default is 100 ms.
+   */
+  double periodic;
+
+  /**
+   * For subscriptions, if non-zero, value updates for ReadQueue() are not
+   * queued for this publisher.
+   */
+  NT_Publisher excludePublisher;
+
+  /**
+   * Send all value changes over the network.
+   */
+  NT_Bool sendAll;
+
+  /**
+   * For subscriptions, don't ask for value changes (only topic announcements).
+   */
+  NT_Bool topicsOnly;
+
+  /**
+   * Perform prefix match on subscriber topic names. Is ignored/overridden by
+   * Subscribe() functions; only present in struct for the purposes of getting
+   * information about subscriptions.
+   */
+  NT_Bool prefixMatch;
+
+  /**
+   * Preserve duplicate value changes (rather than ignoring them).
+   */
+  NT_Bool keepDuplicates;
+
+  /**
+   * For subscriptions, if remote value updates should not be queued for
+   * ReadQueue(). See also disableLocal.
+   */
+  NT_Bool disableRemote;
+
+  /**
+   * For subscriptions, if local value updates should not be queued for
+   * ReadQueue(). See also disableRemote.
+   */
+  NT_Bool disableLocal;
+
+  /**
+   * For entries, don't queue (for ReadQueue) value updates for the entry's
+   * internal publisher.
+   */
+  NT_Bool excludeSelf;
 };
 
 /**
@@ -677,13 +726,11 @@ NT_Bool NT_SetTopicProperties(NT_Topic topic, const char* properties);
  * @param type expected type
  * @param typeStr expected type string
  * @param options subscription options
- * @param options_len number of elements in options array
  * @return Subscriber handle
  */
 NT_Subscriber NT_Subscribe(NT_Topic topic, enum NT_Type type,
                            const char* typeStr,
-                           const struct NT_PubSubOption* options,
-                           size_t options_len);
+                           const struct NT_PubSubOptions* options);
 
 /**
  * Stops subscriber.
@@ -699,12 +746,10 @@ void NT_Unsubscribe(NT_Subscriber sub);
  * @param type type
  * @param typeStr type string
  * @param options publish options
- * @param options_len number of elements in options array
  * @return Publisher handle
  */
 NT_Publisher NT_Publish(NT_Topic topic, enum NT_Type type, const char* typeStr,
-                        const struct NT_PubSubOption* options,
-                        size_t options_len);
+                        const struct NT_PubSubOptions* options);
 
 /**
  * Creates a new publisher to a topic.
@@ -714,13 +759,11 @@ NT_Publisher NT_Publish(NT_Topic topic, enum NT_Type type, const char* typeStr,
  * @param typeStr type string
  * @param properties initial properties (JSON object)
  * @param options publish options
- * @param options_len number of elements in options array
  * @return Publisher handle
  */
 NT_Publisher NT_PublishEx(NT_Topic topic, enum NT_Type type,
                           const char* typeStr, const char* properties,
-                          const struct NT_PubSubOption* options,
-                          size_t options_len);
+                          const struct NT_PubSubOptions* options);
 
 /**
  * Stops publisher.
@@ -736,12 +779,10 @@ void NT_Unpublish(NT_Handle pubentry);
  * @param type type
  * @param typeStr type string
  * @param options publish options
- * @param options_len number of elements in options array
  * @return Entry handle
  */
 NT_Entry NT_GetEntryEx(NT_Topic topic, enum NT_Type type, const char* typeStr,
-                       const struct NT_PubSubOption* options,
-                       size_t options_len);
+                       const struct NT_PubSubOptions* options);
 
 /**
  * Stops entry subscriber/publisher.
@@ -781,14 +822,12 @@ NT_Topic NT_GetTopicFromHandle(NT_Handle pubsubentry);
  * @param prefixes topic name prefixes
  * @param prefixes_len number of elements in prefixes array
  * @param options subscriber options
- * @param options_len number of elements in options array
  * @return subscriber handle
  */
 NT_MultiSubscriber NT_SubscribeMultiple(NT_Inst inst,
                                         const struct NT_String* prefixes,
                                         size_t prefixes_len,
-                                        const struct NT_PubSubOption* options,
-                                        size_t options_len);
+                                        const struct NT_PubSubOptions* options);
 
 /**
  * Unsubscribes a multi-subscriber.

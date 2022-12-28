@@ -59,6 +59,8 @@ class ListenerStorage final : public IListenerStorage {
 
   bool WaitForListenerQueue(double timeout);
 
+  void Reset();
+
  private:
   // these assume the mutex is already held
   NT_Listener DoAddListener(NT_ListenerPoller pollerHandle);

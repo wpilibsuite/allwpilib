@@ -13,16 +13,16 @@ buildscript {
 
 plugins {
     id 'base'
-    id 'edu.wpi.first.wpilib.versioning.WPILibVersioningPlugin' version '4.1.0'
+    id 'edu.wpi.first.wpilib.versioning.WPILibVersioningPlugin' version '2023.0.1'
     id 'edu.wpi.first.wpilib.repositories.WPILibRepositoriesPlugin' version '2020.2'
     id 'edu.wpi.first.NativeUtils' apply false
-    id 'edu.wpi.first.GradleJni' version '1.0.0'
+    id 'edu.wpi.first.GradleJni' version '1.1.0'
     id 'edu.wpi.first.GradleVsCode'
     id 'idea'
     id 'visual-studio'
     id 'net.ltgt.errorprone' version '2.0.2' apply false
     id 'com.github.johnrengelman.shadow' version '7.1.2' apply false
-    id 'com.diffplug.spotless' version '6.4.2' apply false
+    id 'com.diffplug.spotless' version '6.12.0' apply false
     id 'com.github.spotbugs' version '5.0.8' apply false
 }
 
@@ -136,8 +136,10 @@ subprojects {
     }
 
     // Sign outputs with Developer ID
-    if (project.hasProperty("developerID")) {
-        tasks.withType(AbstractLinkTask) { task ->
+    tasks.withType(AbstractLinkTask) { task ->
+        task.inputs.property "HasDeveloperId", project.hasProperty("developerID")
+
+        if (project.hasProperty("developerID")) {
             // Don't sign any executables because codesign complains
             // about relative rpath.
             if (!(task instanceof LinkExecutable)) {
