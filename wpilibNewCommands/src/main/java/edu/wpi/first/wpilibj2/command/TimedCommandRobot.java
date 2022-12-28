@@ -7,34 +7,34 @@ package edu.wpi.first.wpilibj2.command;
 import edu.wpi.first.wpilibj.TimedRobot;
 
 /**
- * The CommandRobot class extends the {@link TimedRobot} class in order to ease functionality for
+ * The TimedCommandRobot class extends the {@link TimedRobot} class in order to ease functionality for
  * Command Based Programming.
  */
-public class CommandRobot extends TimedRobot {
+public class TimedCommandRobot extends TimedRobot {
   private static final double kSchedulerOffset = 0.005;
 
   /**
-   * Constructor for CommandRobot.
+   * Constructor for TimedCommandRobot.
    *
    * @param mainPeriod periodic rate of the Main Robot Loop in seconds.
    * @param schedulerPeriod periodic rate of the CommandScheduler in seconds.
    */
-  public CommandRobot(double mainPeriod, double schedulerPeriod) {
+  public TimedCommandRobot(double mainPeriod, double schedulerPeriod) {
     super(mainPeriod);
     addPeriodic(CommandScheduler.getInstance()::run, schedulerPeriod, kSchedulerOffset);
   }
 
   /**
-   * Constructor for CommandRobot.
+   * Constructor for TimedCommandRobot.
    *
    * @param period period to set for both the CommandScheduler and the Main Robot Loop in seconds.
    */
-  public CommandRobot(double period) {
+  public TimedCommandRobot(double period) {
     this(period, period);
   }
 
   /** Set both the CommandScheduler and the Main Robot Loop to run at the default periodic rate. */
-  public CommandRobot() {
+  public TimedCommandRobot() {
     this(kDefaultPeriod);
   }
 }

@@ -4,35 +4,35 @@
 
 #pragma once
 
-#include <frc/TimedRobot.h>
+#include <frc/TimedCommandRobot.h>
 #include <units/math.h>
 #include <units/time.h>
 
 namespace frc2 {
 
 /**
- * The CommandRobot class extends the {@link TimedRobot} class in order to ease
+ * The TimedCommandRobot class extends the {@link TimedRobot} class in order to ease
  * functionality for Command Based Programming.
  */
-class CommandRobot : public frc::TimedRobot {
+class TimedCommandRobot : public frc::TimedRobot {
  private:
   static constexpr auto kSchedulerOffset = 5_ms;
 
  public:
   /**
-   * Constructor for CommandRobot.
+   * Constructor for TimedCommandRobot.
    *
    * @param mainPeriod periodic rate of the Main Robot Loop in seconds.
    * @param schedulerPeriod periodic rate of the CommandScheduler in seconds.
    */
-  CommandRobot(units::second_t mainPeriod, units::second_t schedulerPeriod);
+  TimedCommandRobot(units::second_t mainPeriod, units::second_t schedulerPeriod);
 
   /**
-   * Constructor for CommandRobot.
+   * Constructor for TimedCommandRobot.
    *
    * @param period period to set for both the CommandScheduler and the Main
    * Robot Loop in seconds. Defaults to default periodic rate.
    */
-  explicit CommandRobot(units::second_t period = kDefaultPeriod);
+  explicit TimedCommandRobot(units::second_t period = kDefaultPeriod);
 };
 }  // namespace frc2
