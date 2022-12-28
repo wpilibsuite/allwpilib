@@ -19,8 +19,3 @@ CommandRobot::CommandRobot(units::second_t period) : frc::TimedRobot(period) {
   AddPeriodic([] { CommandScheduler::GetInstance().Run(); }, period,
               kSchedulerOffset);
 }
-
-CommandRobot::CommandRobot() : frc::TimedRobot(kDefaultPeriod) {
-  AddPeriodic([] { CommandScheduler::GetInstance().Run(); }, kDefaultPeriod,
-              kSchedulerOffset);
-}
