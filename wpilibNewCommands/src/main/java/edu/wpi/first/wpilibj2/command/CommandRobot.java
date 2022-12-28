@@ -16,8 +16,8 @@ public class CommandRobot extends TimedRobot {
   /**
    * Constructor for CommandRobot.
    *
-   * @param mainPeriod periodic rate of the Main Robot Loop in ms.
-   * @param schedulerPeriod periodic rate of the CommandScheduler in ms.
+   * @param mainPeriod periodic rate of the Main Robot Loop in seconds.
+   * @param schedulerPeriod periodic rate of the CommandScheduler in seconds.
    */
   public CommandRobot(double mainPeriod, double schedulerPeriod) {
     super(mainPeriod);
@@ -27,7 +27,7 @@ public class CommandRobot extends TimedRobot {
   /**
    * Constructor for CommandRobot.
    *
-   * @param period period to set for both the CommandScheduler and the Main Robot Loop in ms.
+   * @param period period to set for both the CommandScheduler and the Main Robot Loop in seconds.
    */
   public CommandRobot(double period) {
     this(period, period);

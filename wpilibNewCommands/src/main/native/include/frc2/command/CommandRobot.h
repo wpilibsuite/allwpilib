@@ -22,8 +22,8 @@ class CommandRobot : public frc::TimedRobot {
   /**
    * Constructor for CommandRobot.
    *
-   * @param mainPeriod periodic rate of the Main Robot Loop in ms.
-   * @param schedulerPeriod periodic rate of the CommandScheduler in ms.
+   * @param mainPeriod periodic rate of the Main Robot Loop in seconds.
+   * @param schedulerPeriod periodic rate of the CommandScheduler in seconds.
    */
   CommandRobot(units::second_t mainPeriod, units::second_t schedulerPeriod);
 
@@ -31,13 +31,13 @@ class CommandRobot : public frc::TimedRobot {
    * Constructor for CommandRobot.
    *
    * @param period period to set for both the CommandScheduler and the Main
-   * Robot Loop in ms.
+   * Robot Loop in seconds.
    */
   explicit CommandRobot(units::second_t period);
 
   /**
    * Set both the CommandScheduler and the Main Robot Loop to run at the default
-   * periodic rate
+   * periodic rate.
    */
   CommandRobot();
 };
