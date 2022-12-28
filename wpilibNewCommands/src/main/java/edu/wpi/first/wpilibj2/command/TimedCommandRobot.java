@@ -7,8 +7,8 @@ package edu.wpi.first.wpilibj2.command;
 import edu.wpi.first.wpilibj.TimedRobot;
 
 /**
- * The TimedCommandRobot class extends the {@link TimedRobot} class in order to ease functionality for
- * Command Based Programming.
+ * The TimedCommandRobot class extends the {@link TimedRobot} class in order to ease functionality
+ * for Command Based Programming.
  */
 public class TimedCommandRobot extends TimedRobot {
   private static final double kSchedulerOffset = 0.005;
