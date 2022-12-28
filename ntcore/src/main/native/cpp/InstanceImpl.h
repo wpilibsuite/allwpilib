@@ -81,7 +81,7 @@ class InstanceImpl {
   std::shared_ptr<NetworkServer> m_networkServer;
   std::shared_ptr<INetworkClient> m_networkClient;
   std::vector<std::pair<std::string, unsigned int>> m_servers;
-  std::optional<int64_t> m_serverTimeOffset{0};
+  std::optional<int64_t> m_serverTimeOffset;
   int64_t m_rtt2 = 0;
   int m_inst;
 };

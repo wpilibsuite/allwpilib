@@ -110,6 +110,9 @@ void InstanceImpl::StartServer(std::string_view persistFilename,
         networkMode &= ~NT_NET_MODE_STARTING;
       });
   networkMode = NT_NET_MODE_SERVER | NT_NET_MODE_STARTING;
+  listenerStorage.NotifyTimeSync({}, NT_EVENT_TIMESYNC, 0, 0, true);
+  m_serverTimeOffset = 0;
+  m_rtt2 = 0;
 }
 
 void InstanceImpl::StopServer() {
@@ -121,6 +124,9 @@ void InstanceImpl::StopServer() {
     }
     server = std::move(m_networkServer);
     networkMode = NT_NET_MODE_NONE;
+    listenerStorage.NotifyTimeSync({}, NT_EVENT_TIMESYNC, 0, 0, false);
+    m_serverTimeOffset.reset();
+    m_rtt2 = 0;
   }
 }
 
@@ -129,8 +135,6 @@ void InstanceImpl::StartClient3(std::string_view identity) {
   if (networkMode != NT_NET_MODE_NONE) {
     return;
   }
-  listenerStorage.NotifyTimeSync({}, NT_EVENT_TIMESYNC, 0, 0, false);
-  m_serverTimeOffset.reset();
   m_networkClient = std::make_shared<NetworkClient3>(
       m_inst, identity, localStorage, connectionList, logger);
   if (!m_servers.empty()) {
@@ -144,8 +148,6 @@ void InstanceImpl::StartClient4(std::string_view identity) {
   if (networkMode != NT_NET_MODE_NONE) {
     return;
   }
-  listenerStorage.NotifyTimeSync({}, NT_EVENT_TIMESYNC, 0, 0, false);
-  m_serverTimeOffset.reset();
   m_networkClient = std::make_shared<NetworkClient>(
       m_inst, identity, localStorage, connectionList, logger,
       [this](int64_t serverTimeOffset, int64_t rtt2, bool valid) {
@@ -179,8 +181,8 @@ void InstanceImpl::StopClient() {
   client.reset();
   {
     std::scoped_lock lock{m_mutex};
-    listenerStorage.NotifyTimeSync({}, NT_EVENT_TIMESYNC, 0, 0, true);
-    m_serverTimeOffset = 0;
+    listenerStorage.NotifyTimeSync({}, NT_EVENT_TIMESYNC, 0, 0, false);
+    m_serverTimeOffset.reset();
     m_rtt2 = 0;
   }
 }
@@ -229,7 +231,7 @@ void InstanceImpl::Reset() {
   m_networkClient.reset();
   m_servers.clear();
   networkMode = NT_NET_MODE_NONE;
-  m_serverTimeOffset = 0;
+  m_serverTimeOffset.reset();
   m_rtt2 = 0;
 
   listenerStorage.Reset();

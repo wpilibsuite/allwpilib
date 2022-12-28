@@ -28,8 +28,7 @@ class TimeSyncTest {
   @Test
   void testLocal() {
     var offset = m_inst.getServerTimeOffset();
-    assertTrue(offset.isPresent());
-    assertEquals(0L, offset.getAsLong());
+    assertFalse(offset.isPresent());
   }
 
   @Test
@@ -41,8 +40,7 @@ class TimeSyncTest {
 
     m_inst.stopServer();
     offset = m_inst.getServerTimeOffset();
-    assertTrue(offset.isPresent());
-    assertEquals(0L, offset.getAsLong());
+    assertFalse(offset.isPresent());
   }
 
   @Test
@@ -53,8 +51,7 @@ class TimeSyncTest {
 
     m_inst.stopClient();
     offset = m_inst.getServerTimeOffset();
-    assertTrue(offset.isPresent());
-    assertEquals(0L, offset.getAsLong());
+    assertFalse(offset.isPresent());
   }
 
   @Test
@@ -65,7 +62,6 @@ class TimeSyncTest {
 
     m_inst.stopClient();
     offset = m_inst.getServerTimeOffset();
-    assertTrue(offset.isPresent());
-    assertEquals(0L, offset.getAsLong());
+    assertFalse(offset.isPresent());
   }
 }

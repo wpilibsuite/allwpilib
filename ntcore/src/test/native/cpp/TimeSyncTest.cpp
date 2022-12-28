@@ -17,8 +17,7 @@ class TimeSyncTest : public ::testing::Test {
 
 TEST_F(TimeSyncTest, TestLocal) {
   auto offset = m_inst.GetServerTimeOffset();
-  ASSERT_TRUE(offset);
-  ASSERT_EQ(0, *offset);
+  ASSERT_FALSE(offset);
 }
 
 TEST_F(TimeSyncTest, TestServer) {
@@ -29,8 +28,7 @@ TEST_F(TimeSyncTest, TestServer) {
 
   m_inst.StopServer();
   offset = m_inst.GetServerTimeOffset();
-  ASSERT_TRUE(offset);
-  ASSERT_EQ(0, *offset);
+  ASSERT_FALSE(offset);
 }
 
 TEST_F(TimeSyncTest, TestClient3) {
@@ -40,8 +38,7 @@ TEST_F(TimeSyncTest, TestClient3) {
 
   m_inst.StopClient();
   offset = m_inst.GetServerTimeOffset();
-  ASSERT_TRUE(offset);
-  ASSERT_EQ(0, *offset);
+  ASSERT_FALSE(offset);
 }
 
 TEST_F(TimeSyncTest, TestClient4) {
@@ -51,6 +48,5 @@ TEST_F(TimeSyncTest, TestClient4) {
 
   m_inst.StopClient();
   offset = m_inst.GetServerTimeOffset();
-  ASSERT_TRUE(offset);
-  ASSERT_EQ(0, *offset);
+  ASSERT_FALSE(offset);
 }
