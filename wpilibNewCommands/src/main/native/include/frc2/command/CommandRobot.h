@@ -32,8 +32,8 @@ class CommandRobot : public frc::TimedRobot {
         *
         * @param period period to set for both the CommandScheduler and the Main Robot Loop in ms.
         */
-        CommandRobot(units::second_t period);
-        
+        explicit CommandRobot(units::second_t period);
+
         /**
         * Set both the CommandScheduler and the Main Robot Loop to run at the default periodic rate
         */
