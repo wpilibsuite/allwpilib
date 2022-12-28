@@ -4,6 +4,8 @@
 
 #include "glass/Window.h"
 
+#include <IconsFontAwesome6.h>
+#include <imgui.h>
 #include <imgui_internal.h>
 #include <wpi/StringExtras.h>
 
@@ -59,9 +61,43 @@ void Window::Display() {
                 m_id.c_str());
 
   if (Begin(label, &m_visible, m_flags)) {
-    if (m_renamePopupEnabled) {
-      PopupEditName(nullptr, &m_name);
+    if (ImGui::BeginPopupContextItem(nullptr)) {
+      if (m_renamePopupEnabled) {
+        ItemEditName(&m_name);
+      }
+      m_view->Settings();
+
+      ImGui::EndPopup();
     }
+
+    if (!ImGui::IsWindowDocked()) {
+      auto restoreData = ImGui::GetCurrentContext()->LastItemData;
+      ImVec2 restorePosition = ImGui::GetCursorPos();
+
+      ImGuiStyle& style = ImGui::GetStyle();
+      const ImGuiWindow* window = ImGui::GetCurrentWindow();
+      const ImRect titleBarRect = window->TitleBarRect();
+
+      ImGui::PushClipRect(titleBarRect.Min, titleBarRect.Max, false);
+      ImGui::SetCursorPos(
+          {titleBarRect.GetWidth() - (style.FramePadding.x * 2) -
+               (style.ItemInnerSpacing.x * 2) - (ImGui::GetFontSize() * 2),
+           style.FramePadding.y / 2});
+
+      ImGui::PushStyleColor(ImGuiCol_Button, {0, 0, 0, 0});
+      if (ImGui::Button(ICON_FA_GEAR)) {
+        ImGui::OpenPopup(restoreData.ID);
+      }
+      ImGui::PopStyleColor();
+
+      ImGui::PopClipRect();
+
+      ImGui::SetCursorPos(restorePosition);
+      // Restore the previous last item so it's like this was part of the title
+      // bar natively
+      ImGui::GetCurrentContext()->LastItemData = restoreData;
+    }
+
     m_view->Display();
   } else {
     m_view->Hidden();

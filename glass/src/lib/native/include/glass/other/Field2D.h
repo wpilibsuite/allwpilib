@@ -46,6 +46,7 @@ class Field2DView : public View {
   explicit Field2DView(Field2DModel* model) : m_model{model} {}
 
   void Display() override;
+  void Settings() override;
 
  private:
   Field2DModel* m_model;

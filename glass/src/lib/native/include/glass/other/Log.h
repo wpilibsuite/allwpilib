@@ -35,6 +35,7 @@ class LogView : public View {
   explicit LogView(LogData* data) : m_data{data} {}
 
   void Display() override;
+  void Settings() override;
 
  private:
   LogData* m_data;

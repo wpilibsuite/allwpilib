@@ -251,6 +251,7 @@ class NetworkTablesView : public View {
       : m_model{model}, m_flags{defaultFlags} {}
 
   void Display() override;
+  void Settings() override;
 
  private:
   NetworkTablesModel* m_model;

@@ -1217,10 +1217,10 @@ void glass::DisplayField2D(Field2DModel* model, const ImVec2& contentSize) {
 }
 
 void Field2DView::Display() {
-  if (ImGui::BeginPopupContextItem()) {
-    DisplayField2DSettings(m_model);
-    ImGui::EndPopup();
-  }
   DisplayField2D(m_model, ImGui::GetWindowContentRegionMax() -
                               ImGui::GetWindowContentRegionMin());
+}
+
+void Field2DView::Settings() {
+  DisplayField2DSettings(m_model);
 }

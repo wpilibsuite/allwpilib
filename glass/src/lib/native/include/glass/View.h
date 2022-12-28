@@ -35,6 +35,12 @@ class View {
    * ImGui::Begin() returns false).
    */
   virtual void Hidden();
+
+  /**
+   * Called from within ImGui::BeginContextPopupItem() and ImGui::EndPopup().
+   * Used to display the settings for the view
+   */
+  virtual void Settings();
 };
 
 /**
