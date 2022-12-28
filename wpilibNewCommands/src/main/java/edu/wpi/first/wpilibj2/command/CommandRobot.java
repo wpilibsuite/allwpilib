@@ -11,7 +11,7 @@ import edu.wpi.first.wpilibj.TimedRobot;
  * Command Based Programming.
  */
 public class CommandRobot extends TimedRobot {
-  private final double kSchedulerOffset = 0.005;
+  private static final double kSchedulerOffset = 0.005;
 
   /**
    * Constructor for CommandRobot.
@@ -33,7 +33,7 @@ public class CommandRobot extends TimedRobot {
     this(period, period);
   }
 
-  /** Set both the CommandScheduler and the Main Robot Loop to run at the default periodic rate */
+  /** Set both the CommandScheduler and the Main Robot Loop to run at the default periodic rate. */
   public CommandRobot() {
     this(kDefaultPeriod);
   }
