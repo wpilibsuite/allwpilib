@@ -3,7 +3,6 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #include "Robot.h"
-#include "ShooterSim.h"
 #include <frc/DriverStation.h>
 
 void Robot::RobotInit() {
@@ -19,10 +18,11 @@ void Robot::RobotPeriodic() {
   // This must be called from the robot's periodic block in order for anything
   // in the Command-based framework to work.
   frc2::CommandScheduler::GetInstance().Run();
+}
 
-  #ifndef ROBORIO
-  m_sim.SimulationPeriodic();
-  #endif
+void Robot::SimulationPeriodic() {
+  m_driveSim.SimulationPeriodic();
+  m_shooterSim.SimulationPeriodic();
 }
 
 void Robot::DisabledInit() {}

@@ -9,17 +9,15 @@
 #include <frc/TimedRobot.h>
 #include <frc2/command/CommandPtr.h>
 
-#ifndef ROBORIO
-#include "ShooterSim.h"  
-#endif
-
-
+#include "sim/DriveSim.h"
+#include "sim/ShooterSim.h"  
 #include "RapidReactCommandBot.h"
 
 class Robot : public frc::TimedRobot {
  public:
   void RobotInit() override;
   void RobotPeriodic() override;
+  void SimulationPeriodic() override;
   void DisabledInit() override;
   void DisabledPeriodic() override;
   void AutonomousInit() override;
@@ -33,7 +31,6 @@ class Robot : public frc::TimedRobot {
   RapidReactCommandBot m_robot;
   std::optional<frc2::CommandPtr> m_autonomousCommand;
 
-  #ifndef ROBORIO
-  ShooterSim m_sim;
-  #endif
+  DriveSim m_driveSim;
+  ShooterSim m_shooterSim;
 };

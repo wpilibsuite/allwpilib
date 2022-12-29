@@ -7,7 +7,6 @@ import edu.wpi.first.wpilibj.examples.rapidreactcommandbot.Constants.ShooterCons
 import edu.wpi.first.wpilibj.simulation.EncoderSim;
 import edu.wpi.first.wpilibj.simulation.FlywheelSim;
 import edu.wpi.first.wpilibj.simulation.PWMSim;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class ShooterSim {
   private final PWMSim m_shooterMotor = new PWMSim(ShooterConstants.kShooterMotorPort);
@@ -24,11 +23,8 @@ public class ShooterSim {
           1.0);
 
   public void simulationPeriodic() {
-    double volts = m_shooterMotor.getSpeed() * RobotController.getBatteryVoltage();
-    m_flywheelSim.setInputVoltage(volts);
+    m_flywheelSim.setInputVoltage(m_shooterMotor.getSpeed() * RobotController.getBatteryVoltage());
     m_flywheelSim.update(0.02);
-
-    SmartDashboard.putNumber("~kv", volts / m_flywheelSim.getAngularVelocityRadPerSec());
 
     m_shooterEncoder.setRate(m_flywheelSim.getAngularVelocityRPM() / 60.0);
   }

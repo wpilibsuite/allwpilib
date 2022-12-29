@@ -10,6 +10,8 @@
 #include <units/angular_velocity.h>
 #include <units/angular_acceleration.h>
 #include <units/length.h>
+#include <units/velocity.h>
+#include <units/acceleration.h>
 #include <units/time.h>
 #include <units/voltage.h>
 
@@ -29,6 +31,14 @@ inline constexpr units::meter_t kWheelDiameter = 6.0_in;
 inline constexpr double kEncoderDistancePerPulse =
     // Assumes the encoders are directly mounted on the wheel shafts
     ((kWheelDiameter * std::numbers::pi) / kEncoderCPR).value();
+
+constexpr auto kTrackwidth = 0.69_m;
+
+constexpr auto kv = 1.98 * 1_V / 1_mps;
+constexpr auto ka = 0.2 * 1_V / 1_mps_sq;
+
+constexpr auto kvAngular = 1.5 * 1_V / 1_mps;
+constexpr auto kaAngular = 0.3 * 1_V / 1_mps_sq;
 
 }  // namespace DriveConstants
 
