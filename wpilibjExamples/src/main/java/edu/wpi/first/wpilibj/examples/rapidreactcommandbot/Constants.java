@@ -31,6 +31,18 @@ public final class Constants {
     public static final double kEncoderDistancePerPulse =
         // Assumes the encoders are directly mounted on the wheel shafts
         (kWheelDiameterMeters * Math.PI) / (double) kEncoderCPR;
+
+    // Linear constants
+    public static final double ksVolts = 0.22;
+    public static final double kvVoltSecondsPerMeter = 1.98;
+    public static final double kaVoltSecondsSquaredPerMeter = 0.2;
+
+    // Angular constants
+    public static final double kvVoltSecondsPerRadian = 1.5;
+    public static final double kaVoltSecondsSquaredPerRadian = 0.3;
+
+    public static final double kDriveGearing = 8;
+    public static final double kTrackwidthMeters = 0.69;
   }
 
   public static final class ShooterConstants {
