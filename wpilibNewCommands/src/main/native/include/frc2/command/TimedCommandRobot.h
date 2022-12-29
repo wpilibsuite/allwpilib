@@ -5,7 +5,6 @@
 #pragma once
 
 #include <frc/TimedRobot.h>
-#include <units/math.h>
 #include <units/time.h>
 
 namespace frc2 {
