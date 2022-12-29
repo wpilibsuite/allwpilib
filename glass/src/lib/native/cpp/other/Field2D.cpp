@@ -1224,3 +1224,7 @@ void Field2DView::Display() {
 void Field2DView::Settings() {
   DisplayField2DSettings(m_model);
 }
+
+bool Field2DView::HasSettings() {
+  return true;
+}

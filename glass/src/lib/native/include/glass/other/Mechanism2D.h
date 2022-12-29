@@ -56,6 +56,7 @@ class Mechanism2DView : public View {
 
   void Display() override;
   void Settings() override;
+  bool HasSettings() override;
 
  private:
   Mechanism2DModel* m_model;

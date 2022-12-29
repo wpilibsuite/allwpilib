@@ -76,3 +76,7 @@ void LogView::Settings() {
     ImGui::SetClipboardText(buf.c_str());
   }
 }
+
+bool LogView::HasSettings() {
+  return true;
+}

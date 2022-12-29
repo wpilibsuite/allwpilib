@@ -193,11 +193,6 @@ void ConfigurePlatformSaveFile(const std::string& name);
 void EmitViewMenu();
 
 /**
- * Settings button similar to ImGui::CloseButton.
- */
-bool HamburgerButton(const ImVec2 position);
-
-/**
  * Pixel formats for texture pixel data.
  */
 enum PixelFormat { kPixelRGBA, kPixelBGRA };

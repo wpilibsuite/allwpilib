@@ -252,6 +252,7 @@ class NetworkTablesView : public View {
 
   void Display() override;
   void Settings() override;
+  bool HasSettings() override;
 
  private:
   NetworkTablesModel* m_model;

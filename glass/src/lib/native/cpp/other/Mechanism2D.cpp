@@ -256,3 +256,7 @@ void Mechanism2DView::Display() {
 void Mechanism2DView::Settings() {
   DisplayMechanism2DSettings(m_model);
 }
+
+bool Mechanism2DView::HasSettings() {
+  return true;
+}

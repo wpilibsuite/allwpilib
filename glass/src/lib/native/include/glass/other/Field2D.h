@@ -47,6 +47,7 @@ class Field2DView : public View {
 
   void Display() override;
   void Settings() override;
+  bool HasSettings() override;
 
  private:
   Field2DModel* m_model;

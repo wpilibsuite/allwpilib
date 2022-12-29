@@ -1608,3 +1608,7 @@ void NetworkTablesView::Settings() {
   m_flags.Update();
   m_flags.DisplayMenu();
 }
+
+bool NetworkTablesView::HasSettings() {
+  return true;
+}

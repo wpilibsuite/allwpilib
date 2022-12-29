@@ -41,6 +41,11 @@ class View {
    * Used to display the settings for the view
    */
   virtual void Settings();
+
+  /**
+   * If the view has settings and if the result of Settings should be displayed.
+   */
+  virtual bool HasSettings();
 };
 
 /**

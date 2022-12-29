@@ -27,3 +27,7 @@ std::unique_ptr<View> glass::MakeFunctionView(
 void View::Hidden() {}
 
 void View::Settings() {}
+
+bool View::HasSettings() {
+  return false;
+}

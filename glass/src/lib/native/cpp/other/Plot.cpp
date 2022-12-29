@@ -183,6 +183,7 @@ class PlotView : public View {
 
   void Display() override;
   void Settings() override;
+  bool HasSettings() override;
 
   void MovePlot(PlotView* fromView, size_t fromIndex, size_t toIndex);
 
@@ -965,6 +966,10 @@ void PlotView::Settings() {
 
     ImGui::PopID();
   }
+}
+
+bool PlotView::HasSettings() {
+  return true;
 }
 
 PlotProvider::~PlotProvider() = default;
