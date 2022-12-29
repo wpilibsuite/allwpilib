@@ -37,10 +37,11 @@ public class Shooter extends SubsystemBase {
     setDefaultCommand(
         runOnce(
                 () -> {
-                  m_shooterMotor.disable();
-                  m_feederMotor.disable();
+                  m_shooterMotor.set(0);
+                  m_feederMotor.set(0);
                 })
             .andThen(run(() -> {}))
+            .ignoringDisable(true)
             .withName("Idle"));
   }
 
@@ -55,7 +56,7 @@ public class Shooter extends SubsystemBase {
             // Run the shooter flywheel at the desired setpoint using feedforward and feedback
             run(
                 () ->
-                    m_shooterMotor.set(
+                    m_shooterMotor.setVoltage(
                         m_shooterFeedforward.calculate(setpointRotationsPerSecond)
                             + m_shooterFeedback.calculate(
                                 m_shooterEncoder.getRate(), setpointRotationsPerSecond))),
