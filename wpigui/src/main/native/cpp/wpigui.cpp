@@ -8,6 +8,8 @@
 #include <cstdio>
 #include <cstring>
 
+#define IMGUI_DEFINE_MATH_OPERATORS
+
 #include <GLFW/glfw3.h>
 #include <IconsFontAwesome6.h>
 #include <imgui.h>
@@ -544,6 +546,52 @@ void gui::EmitViewMenu() {
     }
     ImGui::EndMenu();
   }
+}
+
+bool gui::HamburgerButton(const ImVec2 position) {
+  const ImGuiStyle& style = ImGui::GetStyle();
+
+  ImGuiWindow* window = ImGui::GetCurrentWindow();
+
+  // Frame padding on both sides, then one character in the middle
+  const ImRect bb{
+      position, position + ImVec2(ImGui::GetFontSize(), ImGui::GetFontSize()) +
+                    style.FramePadding * 2.0f};
+
+  ImGuiID id = ImGui::GetID("#SETTINGS");
+  ImGui::ItemAdd(bb, id);
+
+  bool hovered, held;
+  bool pressed = ImGui::ButtonBehavior(bb, id, &hovered, &held);
+
+  ImU32 bgCol =
+      ImGui::GetColorU32(held ? ImGuiCol_ButtonActive : ImGuiCol_ButtonHovered);
+  ImVec2 center = bb.GetCenter();
+  if (hovered) {
+    window->DrawList->AddCircleFilled(
+        center, ImMax(2.0f, ImGui::GetFontSize() * 0.5f + 1.0f), bgCol, 12);
+  }
+
+  ImU32 fgCol = ImGui::GetColorU32(ImGuiCol_Text);
+
+  const float xPadding = bb.GetWidth() / 4.0f;
+  const float yPadding = bb.GetHeight() / 10.0f;
+  const int amountOfLines = 3;
+
+  ImVec2 lineStart = {bb.Min.x + xPadding, bb.Min.y + yPadding};
+  ImVec2 lineEnd = {bb.Max.x - xPadding, bb.Min.y + yPadding};
+
+  ImVec2 increment = {0.0,
+                      (bb.GetHeight() - (yPadding * 2)) / (amountOfLines + 1)};
+
+  for (int i = 0; i < amountOfLines; i++) {
+    lineStart += increment;
+    lineEnd += increment;
+
+    window->DrawList->AddLine(lineStart, lineEnd, fgCol);
+  }
+
+  return pressed;
 }
 
 bool gui::UpdateTextureFromImage(ImTextureID* texture, int width, int height,

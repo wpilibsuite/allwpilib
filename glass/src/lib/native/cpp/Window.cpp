@@ -4,10 +4,10 @@
 
 #include "glass/Window.h"
 
-#include <IconsFontAwesome6.h>
 #include <imgui.h>
 #include <imgui_internal.h>
 #include <wpi/StringExtras.h>
+#include <wpigui.h>
 
 #include "glass/Context.h"
 #include "glass/Storage.h"
@@ -61,41 +61,47 @@ void Window::Display() {
                 m_id.c_str());
 
   if (Begin(label, &m_visible, m_flags)) {
-    if (ImGui::BeginPopupContextItem(nullptr)) {
+    bool isClicked = (ImGui::IsMouseReleased(ImGuiMouseButton_Right) &&
+                      ImGui::IsItemHovered());
+    ImGuiWindow* window = ImGui::GetCurrentWindow();
+
+    bool settingsButtonClicked = false;
+    if (!ImGui::IsWindowDocked()) {
+      const ImGuiItemFlags itemFlagsRestore =
+          ImGui::GetCurrentContext()->CurrentItemFlags;
+
+      ImGui::GetCurrentContext()->CurrentItemFlags |=
+          ImGuiItemFlags_NoNavDefaultFocus;
+      window->DC.NavLayerCurrent = ImGuiNavLayer_Menu;
+
+      // Allow to draw outside of normal window
+      ImGui::PushClipRect(window->OuterRectClipped.Min,
+                          window->OuterRectClipped.Max, false);
+
+      const ImRect titleBarRect = ImGui::GetCurrentWindow()->TitleBarRect();
+      const ImVec2 position = {titleBarRect.Max.x -
+                                   (ImGui::GetStyle().FramePadding.x * 2) -
+                                   (ImGui::GetFontSize() * 2) -
+                                   (ImGui::GetStyle().ItemInnerSpacing.x),
+                               titleBarRect.Min.y};
+      settingsButtonClicked = wpi::gui::HamburgerButton(position);
+      ImGui::PopClipRect();
+
+      ImGui::GetCurrentContext()->CurrentItemFlags = itemFlagsRestore;
+    }
+    if (settingsButtonClicked || isClicked) {
+      ImGui::OpenPopup(window->ID);
+    }
+
+    if (ImGui::BeginPopupEx(window->ID, ImGuiWindowFlags_AlwaysAutoResize |
+                                            ImGuiWindowFlags_NoTitleBar |
+                                            ImGuiWindowFlags_NoSavedSettings)) {
       if (m_renamePopupEnabled) {
         ItemEditName(&m_name);
       }
       m_view->Settings();
 
       ImGui::EndPopup();
-    }
-
-    if (!ImGui::IsWindowDocked()) {
-      auto restoreData = ImGui::GetCurrentContext()->LastItemData;
-      ImVec2 restorePosition = ImGui::GetCursorPos();
-
-      ImGuiStyle& style = ImGui::GetStyle();
-      const ImGuiWindow* window = ImGui::GetCurrentWindow();
-      const ImRect titleBarRect = window->TitleBarRect();
-
-      ImGui::PushClipRect(titleBarRect.Min, titleBarRect.Max, false);
-      ImGui::SetCursorPos(
-          {titleBarRect.GetWidth() - (style.FramePadding.x * 2) -
-               (style.ItemInnerSpacing.x * 2) - (ImGui::GetFontSize() * 2),
-           style.FramePadding.y / 2});
-
-      ImGui::PushStyleColor(ImGuiCol_Button, {0, 0, 0, 0});
-      if (ImGui::Button(ICON_FA_GEAR)) {
-        ImGui::OpenPopup(restoreData.ID);
-      }
-      ImGui::PopStyleColor();
-
-      ImGui::PopClipRect();
-
-      ImGui::SetCursorPos(restorePosition);
-      // Restore the previous last item so it's like this was part of the title
-      // bar natively
-      ImGui::GetCurrentContext()->LastItemData = restoreData;
     }
 
     m_view->Display();
