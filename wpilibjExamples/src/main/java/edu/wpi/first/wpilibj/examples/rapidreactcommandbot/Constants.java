@@ -49,7 +49,7 @@ public final class Constants {
     public static final double kShooterToleranceRPS = 50;
 
     // These are not real PID gains, and will have to be tuned for your specific robot.
-    public static final double kP = 1;
+    public static final double kP = 0.1;
 
     // On a real robot the feedforward constants should be empirically determined; these are
     // reasonable guesses.
@@ -57,6 +57,10 @@ public final class Constants {
     public static final double kVVoltSecondsPerRotation =
         // Should have value 12V at free speed...
         12.0 / kShooterFreeRPS;
+
+    public static final double kVVoltSecondPerRadian = 0.000360;
+
+    public static final double kAVoltSecondsSquaredPerRadian = 0.00159154943091895356;
 
     public static final double kFeederSpeed = 0.5;
   }
