@@ -24,7 +24,7 @@ std::unique_ptr<DataLogModel>& Selector::GetNextModel(){
       return log;
     }
   }
-  auto& ref = m_logs.emplace_back(std::move(std::make_unique<DataLogModel>()));
+  auto& ref = m_logs.emplace_back(std::make_unique<DataLogModel>());
   return ref;
 }
 

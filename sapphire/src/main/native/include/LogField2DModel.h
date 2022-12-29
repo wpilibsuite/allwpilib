@@ -60,7 +60,7 @@ class LogField2DModel : public glass::Field2DModel {
 
   void Update() override;
   bool Exists() override {return true;}
-  bool IsReadOnly() {return true;}
+  bool IsReadOnly() override {return true;}
 
   glass::FieldObjectModel* AddFieldObject(std::string_view name) override;
   void RemoveFieldObject(std::string_view name) override;
