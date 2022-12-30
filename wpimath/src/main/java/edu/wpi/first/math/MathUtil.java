@@ -145,6 +145,7 @@ public final class MathUtil {
   public static double inverseAngleModulus(double angleRadians) {
     return inputModulus(angleRadians, 0, 2 * Math.PI);
   }
+
   /**
    * Perform linear interpolation between two values.
    *
