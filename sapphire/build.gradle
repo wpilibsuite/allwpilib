@@ -99,7 +99,7 @@ if (!project.hasProperty('onlylinuxathena') && !project.hasProperty('onlylinuxra
                     }
                 }
                 binaries.all {
-                    if (it.targetPlatform.name == nativeUtils.wpi.platforms.roborio || it.targetPlatform.name == nativeUtils.wpi.platforms.linuxarm32 || it.targetPlatform.name == nativeUtils.wpi.platforms.linuxarm64) {
+                    if (it.targetPlatform.name == nativeUtils.wpi.platforms.roborio) {
                         it.buildable = false
                         return
                     }
@@ -116,6 +116,9 @@ if (!project.hasProperty('onlylinuxathena') && !project.hasProperty('onlylinuxra
                         it.linker.args << '-framework' << 'Kerberos'
                     } else {
                         it.linker.args << '-lX11'
+                        if (it.targetPlatform.name.startsWith('linuxarm')) {
+                            it.linker.args << '-lGL'
+                        }
                     }
                 }
                 binaries
