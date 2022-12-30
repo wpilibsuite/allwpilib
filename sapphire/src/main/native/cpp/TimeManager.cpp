@@ -61,4 +61,4 @@ void TimeManager::Display() {
   }
   m_lastTime = ImGui::GetTime();
   ImGui::PopID();
-};
+}

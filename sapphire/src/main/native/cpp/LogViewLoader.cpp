@@ -47,7 +47,7 @@ LogViewLoader::DataLogProvider::DataLogProvider(LogViewLoader* loader,
         Show(view.get(), nullptr);
     }
 
-};
+}
 void LogViewLoader::Register(std::string_view typeName, CreateModelFunc createModel,
                 CreateViewFunc createView){
     m_typeMap[typeName] = Builder{std::move(createModel), std::move(createView)};

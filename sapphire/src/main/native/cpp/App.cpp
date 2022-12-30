@@ -39,7 +39,6 @@ static std::unique_ptr<LogViewLoader> viewLoader;
 
 static glass::Window* m_logSelectorWindow;
 static glass::Window* m_timeManagerWindow;
-static std::unique_ptr<Selector> m_selector;
 
 static glass::Window* m_entryManagerWindow;
 
@@ -110,7 +109,8 @@ void Application(std::string_view saveDir) {
   
   windowManager = std::make_unique<glass::WindowManager>(storage);
 
-  std::unique_ptr<Selector> selector = std::make_unique<Selector>();
+  auto selector = std::make_unique<Selector>();
+  
   auto& logs = selector->GetDataLogs();
 
   auto  logViewer = std::make_unique<DataLogView>(logs);
@@ -132,11 +132,21 @@ void Application(std::string_view saveDir) {
   m_logSelectorWindow = windowManager->AddWindow(
     "Log Selector", std::move(selector));
 
+  m_logSelectorWindow->SetDefaultPos(10, 10);
+  m_logSelectorWindow->SetFlags(ImGuiWindowFlags_AlwaysAutoResize);
+
   m_entryManagerWindow = windowManager->AddWindow(
     "Entry Manager", std::move(logViewer));
 
+  m_entryManagerWindow->SetDefaultPos(315, 10);
+  m_entryManagerWindow->SetDefaultSize(300, 400);
+
   m_timeManagerWindow = windowManager->AddWindow(
     "Time Manager", std::move(timeManager));
+
+  m_timeManagerWindow->SetDefaultPos(10, 115);
+  m_timeManagerWindow->SetFlags(ImGuiWindowFlags_AlwaysAutoResize);
+
 
   gui::AddWindowScaler([](float scale) { gDefaultScale = scale; });
   gui::AddLateExecute(DisplayMenuBar);
