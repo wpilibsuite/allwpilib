@@ -171,7 +171,7 @@ class PneumaticsBase {
    * them.
    *
    * @param mask The bitmask of solenoids to reserve
-   * @return 0 if successful, mask of solenoids that couldn't be allocated
+   * @return 0 if successful; mask of solenoids that couldn't be allocated
    * otherwise
    */
   virtual int CheckAndReserveSolenoids(int mask) = 0;

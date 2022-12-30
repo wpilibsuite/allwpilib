@@ -200,7 +200,7 @@ public interface PneumaticsBase extends AutoCloseable {
    * Check to see if the masked solenoids can be reserved, and if not reserve them.
    *
    * @param mask The bitmask of solenoids to reserve
-   * @return 0 if successful, mask of solenoids that couldn't be allocated otherwise
+   * @return 0 if successful; mask of solenoids that couldn't be allocated otherwise
    */
   int checkAndReserveSolenoids(int mask);
 
