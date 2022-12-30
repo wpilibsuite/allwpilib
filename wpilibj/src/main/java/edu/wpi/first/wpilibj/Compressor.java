@@ -131,9 +131,9 @@ public class Compressor implements Sendable, AutoCloseable {
   }
 
   /**
-   * Enables the compressor in digital mode. The compressor will turn on when the pressure switch
-   * indicates that the system is not full, and will turn off when the pressure switch indicates
-   * that the system is full.
+   * Enables the compressor in digital mode using the digital pressure switch. The compressor will
+   * turn on when the pressure switch indicates that the system is not full, and will turn off when
+   * the pressure switch indicates that the system is full.
    */
   public void enableDigital() {
     m_module.enableCompressorDigital();
@@ -141,9 +141,10 @@ public class Compressor implements Sendable, AutoCloseable {
 
   /**
    * If supported by the device, enables the compressor in analog mode. This mode uses an analog
-   * pressure sensor to cycle the compressor. The compressor will turn on when the pressure drops
-   * below {@code minPressure} and will turn off when the pressure reaches {@code maxPressure}. This
-   * mode is only supported by the REV PH with the REV Analog Pressure Sensor.
+   * pressure sensor connected to analog channel 0 to cycle the compressor. The compressor will turn
+   * on when the pressure drops below {@code minPressure} and will turn off when the pressure
+   * reaches {@code maxPressure}. This mode is only supported by the REV PH with the REV Analog
+   * Pressure Sensor connected to analog channel 0.
    *
    * <p>On CTRE PCM, this will enable digital control.
    *
@@ -158,8 +159,9 @@ public class Compressor implements Sendable, AutoCloseable {
 
   /**
    * If supported by the device, enables the compressor in hybrid mode. This mode uses both a
-   * digital pressure switch and an analog pressure sensor to cycle the compressor. This mode is
-   * only supported by the REV PH with the REV Analog Pressure Sensor.
+   * digital pressure switch and an analog pressure sensor connected to analog channel 0 to cycle
+   * the compressor. This mode is only supported by the REV PH with the REV Analog Pressure Sensor
+   * connected to analog channel 0.
    *
    * <p>The compressor will turn on when <i>both</i>:
    *

@@ -16,7 +16,7 @@ namespace frc {
 /** Module class for controlling a REV Robotics Pneumatic Hub. */
 class PneumaticHub : public PneumaticsBase {
  public:
-  /** Constructs a PneumaticHub with the default id (1). */
+  /** Constructs a PneumaticHub with the default ID (1). */
   PneumaticHub();
 
   /**
@@ -41,9 +41,9 @@ class PneumaticHub : public PneumaticsBase {
 
   /**
    * Enables the compressor in analog mode. This mode uses an analog pressure
-   * sensor to cycle the compressor. The compressor will turn on when the
-   * pressure drops below {@code minPressure} and will turn off when the
-   * pressure reaches {@code maxPressure}.
+   * sensor connected to analog channel 0 to cycle the compressor. The
+   * compressor will turn on when the pressure drops below {@code minPressure}
+   * and will turn off when the pressure reaches {@code maxPressure}.
    *
    * @param minPressure The minimum pressure. The compressor will turn on when
    * the pressure drops below this value.
@@ -56,7 +56,8 @@ class PneumaticHub : public PneumaticsBase {
 
   /**
    * Enables the compressor in hybrid mode. This mode uses both a digital
-   * pressure switch and an analog pressure sensor to cycle the compressor.
+   * pressure switch and an analog pressure sensor connected to analog channel 0
+   * to cycle the compressor.
    *
    * The compressor will turn on when \a both:
    *

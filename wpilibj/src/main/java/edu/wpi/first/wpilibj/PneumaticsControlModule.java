@@ -66,7 +66,7 @@ public class PneumaticsControlModule implements PneumaticsBase {
   private final DataStore m_dataStore;
   private final int m_handle;
 
-  /** Constructs a PneumaticsControlModule with the default id (0). */
+  /** Constructs a PneumaticsControlModule with the default ID (0). */
   public PneumaticsControlModule() {
     this(SensorUtil.getDefaultCTREPCMModule());
   }

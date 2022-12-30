@@ -32,7 +32,7 @@ class PneumaticsBase {
   /**
    * Returns the state of the pressure switch.
    *
-   * @return True if pressure switch is indicates that the system is full,
+   * @return True if pressure switch indicates that the system is full,
    * otherwise false.
    */
   virtual bool GetPressureSwitch() const = 0;
@@ -48,18 +48,20 @@ class PneumaticsBase {
   virtual void DisableCompressor() = 0;
 
   /**
-   * Enables the compressor in digital mode. The compressor will turn on when
-   * the pressure switch indicates that the system is not full, and will turn
-   * off when the pressure switch indicates that the system is full.
+   * Enables the compressor in digital mode using the digital pressure switch.
+   * The compressor will turn on when the pressure switch indicates that the
+   * system is not full, and will turn off when the pressure switch indicates
+   * that the system is full.
    */
   virtual void EnableCompressorDigital() = 0;
 
   /**
    * If supported by the device, enables the compressor in analog mode. This
-   * mode uses an analog pressure sensor to cycle the compressor. The compressor
-   * will turn on when the pressure drops below {@code minPressure} and will
-   * turn off when the pressure reaches {@code maxPressure}. This mode is only
-   * supported by the REV PH with the REV Analog Pressure Sensor.
+   * mode uses an analog pressure sensor connected to analog channel 0 to cycle
+   * the compressor. The compressor will turn on when the pressure drops below
+   * {@code minPressure} and will turn off when the pressure reaches {@code
+   * maxPressure}. This mode is only supported by the REV PH with the REV Analog
+   * Pressure Sensor connected to analog channel 0.
    *
    * On CTRE PCM, this will enable digital control.
    *
@@ -74,9 +76,10 @@ class PneumaticsBase {
 
   /**
    * If supported by the device, enables the compressor in hybrid mode. This
-   * mode uses both a digital pressure switch and an analog pressure sensor to
-   * cycle the compressor. This mode is only supported by the REV PH with the
-   * REV Analog Pressure Sensor.
+   * mode uses both a digital pressure switch and an analog pressure sensor
+   * connected to analog channel 0 to cycle the compressor. This mode is only
+   * supported by the REV PH with the REV Analog Pressure Sensor connected to
+   * analog channel 0.
    *
    * The compressor will turn on when \a both:
    *
@@ -120,7 +123,7 @@ class PneumaticsBase {
   virtual void SetSolenoids(int mask, int values) = 0;
 
   /**
-   * Gets solenoid values.
+   * Gets a bitmask of solenoid values.
    *
    * @return values
    */
@@ -134,9 +137,9 @@ class PneumaticsBase {
   virtual int GetModuleNumber() const = 0;
 
   /**
-   * Get the disabled solenoids.
+   * Get a bitmask of disabled solenoids.
    *
-   * @return disabled list
+   * @return bitmask of disabled solenoids
    */
   virtual int GetSolenoidDisabledList() const = 0;
 
@@ -167,7 +170,7 @@ class PneumaticsBase {
    * Check to see if the masked solenoids can be reserved, and if not reserve
    * them.
    *
-   * @param mask The solenoid mask to reserve
+   * @param mask The bitmask of solenoids to reserve
    * @return 0 if successful, mask of solenoids that couldn't be allocated
    * otherwise
    */
@@ -176,7 +179,7 @@ class PneumaticsBase {
   /**
    * Unreserve the masked solenoids.
    *
-   * @param mask The solenoid mask to unreserve
+   * @param mask The bitmask of solenoids to unreserve
    */
   virtual void UnreserveSolenoids(int mask) = 0;
 

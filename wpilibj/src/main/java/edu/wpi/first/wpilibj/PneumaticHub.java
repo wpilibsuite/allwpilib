@@ -128,7 +128,7 @@ public class PneumaticHub implements PneumaticsBase {
   private final DataStore m_dataStore;
   private final int m_handle;
 
-  /** Constructs a PneumaticHub with the default id (1). */
+  /** Constructs a PneumaticHub with the default ID (1). */
   public PneumaticHub() {
     this(SensorUtil.getDefaultREVPHModule());
   }
@@ -272,9 +272,9 @@ public class PneumaticHub implements PneumaticsBase {
   }
 
   /**
-   * Enables the compressor in analog mode. This mode uses an analog pressure sensor to cycle the
-   * compressor. The compressor will turn on when the pressure drops below {@code minPressure} and
-   * will turn off when the pressure reaches {@code maxPressure}.
+   * Enables the compressor in analog mode. This mode uses an analog pressure sensor connected to
+   * analog channel 0 to cycle the compressor. The compressor will turn on when the pressure drops
+   * below {@code minPressure} and will turn off when the pressure reaches {@code maxPressure}.
    *
    * @param minPressure The minimum pressure in PSI. The compressor will turn on when the pressure
    *     drops below this value.
@@ -301,7 +301,7 @@ public class PneumaticHub implements PneumaticsBase {
 
   /**
    * Enables the compressor in hybrid mode. This mode uses both a digital pressure switch and an
-   * analog pressure sensor to cycle the compressor.
+   * analog pressure sensor connected to analog channel 0 to cycle the compressor.
    *
    * <p>The compressor will turn on when <i>both</i>:
    *

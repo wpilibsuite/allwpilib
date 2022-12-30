@@ -45,7 +45,7 @@ public interface PneumaticsBase extends AutoCloseable {
   void setSolenoids(int mask, int values);
 
   /**
-   * Gets solenoid values.
+   * Gets a bitmask of solenoid values.
    *
    * @return values
    */
@@ -59,9 +59,9 @@ public interface PneumaticsBase extends AutoCloseable {
   int getModuleNumber();
 
   /**
-   * Get the disabled solenoids.
+   * Get a bitmask of disabled solenoids.
    *
-   * @return disabled list
+   * @return bitmask of disabled solenoids
    */
   int getSolenoidDisabledList();
 
@@ -105,17 +105,18 @@ public interface PneumaticsBase extends AutoCloseable {
   void disableCompressor();
 
   /**
-   * Enables the compressor in digital mode. The compressor will turn on when the pressure switch
-   * indicates that the system is not full, and will turn off when the pressure switch indicates
-   * that the system is full.
+   * Enables the compressor in digital mode using the digital pressure switch. The compressor will
+   * turn on when the pressure switch indicates that the system is not full, and will turn off when
+   * the pressure switch indicates that the system is full.
    */
   void enableCompressorDigital();
 
   /**
    * If supported by the device, enables the compressor in analog mode. This mode uses an analog
-   * pressure sensor to cycle the compressor. The compressor will turn on when the pressure drops
-   * below {@code minPressure} and will turn off when the pressure reaches {@code maxPressure}. This
-   * mode is only supported by the REV PH with the REV Analog Pressure Sensor.
+   * pressure sensor connected to analog channel 0 to cycle the compressor. The compressor will turn
+   * on when the pressure drops below {@code minPressure} and will turn off when the pressure
+   * reaches {@code maxPressure}. This mode is only supported by the REV PH with the REV Analog
+   * Pressure Sensor connected to analog channel 0.
    *
    * <p>On CTRE PCM, this will enable digital control.
    *
@@ -128,8 +129,9 @@ public interface PneumaticsBase extends AutoCloseable {
 
   /**
    * If supported by the device, enables the compressor in hybrid mode. This mode uses both a
-   * digital pressure switch and an analog pressure sensor to cycle the compressor. This mode is
-   * only supported by the REV PH with the REV Analog Pressure Sensor.
+   * digital pressure switch and an analog pressure sensor connected to analog channel 0 to cycle
+   * the compressor. This mode is only supported by the REV PH with the REV Analog Pressure Sensor
+   * connected to analog channel 0.
    *
    * <p>The compressor will turn on when <i>both</i>:
    *
@@ -197,7 +199,7 @@ public interface PneumaticsBase extends AutoCloseable {
   /**
    * Check to see if the masked solenoids can be reserved, and if not reserve them.
    *
-   * @param mask The solenoid mask to reserve
+   * @param mask The bitmask of solenoids to reserve
    * @return 0 if successful, mask of solenoids that couldn't be allocated otherwise
    */
   int checkAndReserveSolenoids(int mask);
@@ -205,7 +207,7 @@ public interface PneumaticsBase extends AutoCloseable {
   /**
    * Unreserve the masked solenoids.
    *
-   * @param mask The solenoid mask to unreserve
+   * @param mask The bitmask of solenoids to unreserve
    */
   void unreserveSolenoids(int mask);
 
