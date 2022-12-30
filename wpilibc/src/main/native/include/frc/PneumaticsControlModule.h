@@ -13,23 +13,52 @@
 #include "PneumaticsBase.h"
 
 namespace frc {
+/** Module class for controlling a Cross The Road Electronics Pneumatics Control
+ * Module. */
 class PneumaticsControlModule : public PneumaticsBase {
  public:
+  /** Constructs a PneumaticsControlModule with the default id (0). */
   PneumaticsControlModule();
+
+  /**
+   * Constructs a PneumaticsControlModule.
+   *
+   * @param module module number to construct
+   */
   explicit PneumaticsControlModule(int module);
 
   ~PneumaticsControlModule() override = default;
 
   bool GetCompressor() const override;
 
+  /**
+   * Disables the compressor. The compressor will not turn on until
+   * EnableCompressorDigital() is called.
+   */
   void DisableCompressor() override;
 
   void EnableCompressorDigital() override;
 
+  /**
+   * Enables the compressor in digital mode. Analog mode is unsupported by the
+   * CTRE PCM.
+   *
+   * @param minPressure Unsupported.
+   * @param maxPressure Unsupported.
+   * @see EnableCompressorDigital()
+   */
   void EnableCompressorAnalog(
       units::pounds_per_square_inch_t minPressure,
       units::pounds_per_square_inch_t maxPressure) override;
 
+  /**
+   * Enables the compressor in digital mode. Hybrid mode is unsupported by the
+   * CTRE PCM.
+   *
+   * @param minPressure Unsupported.
+   * @param maxPressure Unsupported.
+   * @see EnableCompressorDigital()
+   */
   void EnableCompressorHybrid(
       units::pounds_per_square_inch_t minPressure,
       units::pounds_per_square_inch_t maxPressure) override;
@@ -40,16 +69,67 @@ class PneumaticsControlModule : public PneumaticsBase {
 
   units::ampere_t GetCompressorCurrent() const override;
 
+  /**
+   * Return whether the compressor current is currently too high.
+   *
+   * @return True if the compressor current is too high, otherwise false.
+   * @see GetCompressorCurrentTooHighStickyFault()
+   */
   bool GetCompressorCurrentTooHighFault() const;
+
+  /**
+   * Returns whether the compressor current has been too high since sticky
+   * faults were last cleared. This fault is persistent and can be cleared by
+   * ClearAllStickyFaults()
+   *
+   * @return True if the compressor current has been too high since sticky
+   * faults were last cleared.
+   * @see GetCompressorCurrentTooHighFault()
+   */
   bool GetCompressorCurrentTooHighStickyFault() const;
+
+  /**
+   * Returns whether the compressor is currently shorted.
+   *
+   * @return True if the compressor is currently shorted, otherwise false.
+   * @see GetCompressorShortedStickyFault()
+   */
   bool GetCompressorShortedFault() const;
+
+  /**
+   * Returns whether the compressor has been shorted since sticky faults were
+   * last cleared. This fault is persistent and can be cleared by
+   * ClearAllStickyFaults()
+   *
+   * @return True if the compressor has been shorted since sticky faults were
+   * last cleared, otherwise false.
+   * @see GetCompressorShortedFault()
+   */
   bool GetCompressorShortedStickyFault() const;
+
+  /**
+   * Returns whether the compressor is currently disconnected.
+   *
+   * @return True if compressor is currently disconnected, otherwise false.
+   * @see GetCompressorNotConnectedStickyFault()
+   */
   bool GetCompressorNotConnectedFault() const;
+
+  /**
+   * Returns whether the compressor has been disconnected since sticky faults
+   * were last cleared. This fault is persistent and can be cleared by
+   * ClearAllStickyFaults()}
+   *
+   * @return True if the compressor has been disconnected since sticky faults
+   * were last cleared, otherwise false.
+   * @see GetCompressorNotConnectedFault()
+   */
   bool GetCompressorNotConnectedStickyFault() const;
 
   bool GetSolenoidVoltageFault() const;
   bool GetSolenoidVoltageStickyFault() const;
 
+  /** Clears all sticky faults on this device. */
   void ClearAllStickyFaults();
 
   void SetSolenoids(int mask, int values) override;
@@ -74,8 +154,20 @@ class PneumaticsControlModule : public PneumaticsBase {
 
   void UnreserveCompressor() override;
 
+  /**
+   * Unsupported by the CTRE PCM.
+   *
+   * @param channel Unsupported.
+   * @return 0
+   */
   units::volt_t GetAnalogVoltage(int channel) const override;
 
+  /**
+   * Unsupported by the CTRE PCM.
+   *
+   * @param channel Unsupported.
+   * @return 0
+   */
   units::pounds_per_square_inch_t GetPressure(int channel) const override;
 
   Solenoid MakeSolenoid(int channel) override;

@@ -84,37 +84,42 @@ public class Compressor implements Sendable, AutoCloseable {
   }
 
   /**
-   * Get the pressure switch value.
+   * Returns the state of the pressure switch.
    *
-   * @return true if the pressure is low
+   * @return True if pressure switch indicates that the system is not full, otherwise false.
    */
   public boolean getPressureSwitchValue() {
     return m_module.getPressureSwitch();
   }
 
   /**
-   * Get the current being used by the compressor.
+   * Get the current drawn by the compressor.
    *
-   * @return current consumed by the compressor in amps
+   * @return Current drawn by the compressor in amps.
    */
   public double getCurrent() {
     return m_module.getCompressorCurrent();
   }
 
   /**
-   * Query the analog input voltage (on channel 0) (if supported).
+   * If supported by the device, returns the analog input voltage (on channel 0).
    *
-   * @return The analog input voltage, in volts
+   * <p>This function is only supported by the REV PH. On CTRE PCM, this will return 0.
+   *
+   * @return The analog input voltage, in volts.
    */
   public double getAnalogVoltage() {
     return m_module.getAnalogVoltage(0);
   }
 
   /**
-   * Query the analog sensor pressure (on channel 0) (if supported). Note this is only for use with
-   * the REV Analog Pressure Sensor.
+   * If supported by the device, returns the pressure (in PSI) read by the analog pressure sensor
+   * (on channel 0).
    *
-   * @return The analog sensor pressure, in PSI
+   * <p>This function is only supported by the REV PH with the REV Analog Pressure Sensor. On CTRE
+   * PCM, this will return 0.
+   *
+   * @return The pressure (in PSI) read by the analog pressure sensor.
    */
   public double getPressure() {
     return m_module.getPressure(0);
@@ -125,41 +130,69 @@ public class Compressor implements Sendable, AutoCloseable {
     m_module.disableCompressor();
   }
 
-  /** Enable compressor closed loop control using digital input. */
+  /**
+   * Enables the compressor in digital mode. The compressor will turn on when the pressure switch
+   * indicates that the system is not full, and will turn off when the pressure switch indicates
+   * that the system is full.
+   */
   public void enableDigital() {
     m_module.enableCompressorDigital();
   }
 
   /**
-   * Enable compressor closed loop control using analog input. Note this is only for use with the
-   * REV Analog Pressure Sensor.
+   * If supported by the device, enables the compressor in analog mode. This mode uses an analog
+   * pressure sensor to cycle the compressor. The compressor will turn on when the pressure drops
+   * below {@code minPressure} and will turn off when the pressure reaches {@code maxPressure}. This
+   * mode is only supported by the REV PH with the REV Analog Pressure Sensor.
    *
    * <p>On CTRE PCM, this will enable digital control.
    *
-   * @param minPressure The minimum pressure in PSI to enable compressor
-   * @param maxPressure The maximum pressure in PSI to disable compressor
+   * @param minPressure The minimum pressure in PSI. The compressor will turn on when the pressure
+   *     drops below this value.
+   * @param maxPressure The maximum pressure in PSI. The compressor will turn off when the pressure
+   *     reaches this value.
    */
   public void enableAnalog(double minPressure, double maxPressure) {
     m_module.enableCompressorAnalog(minPressure, maxPressure);
   }
 
   /**
-   * Enable compressor closed loop control using hybrid input. Note this is only for use with the
-   * REV Analog Pressure Sensor.
+   * If supported by the device, enables the compressor in hybrid mode. This mode uses both a
+   * digital pressure switch and an analog pressure sensor to cycle the compressor. This mode is
+   * only supported by the REV PH with the REV Analog Pressure Sensor.
+   *
+   * <p>The compressor will turn on when <i>both</i>:
+   *
+   * <ul>
+   *   <li>The digital pressure switch indicates the system is not full AND
+   *   <li>The analog pressure sensor indicates that the pressure in the system is below the
+   *       specified minimum pressure.
+   * </ul>
+   *
+   * <p>The compressor will turn off when <i>either</i>:
+   *
+   * <ul>
+   *   <li>The digital pressure switch is disconnected or indicates that the system is full OR
+   *   <li>The pressure detected by the analog sensor is greater than the specified maximum
+   *       pressure.
+   * </ul>
    *
    * <p>On CTRE PCM, this will enable digital control.
    *
-   * @param minPressure The minimum pressure in PSI to enable compressor
-   * @param maxPressure The maximum pressure in PSI to disable compressor
+   * @param minPressure The minimum pressure in PSI. The compressor will turn on when the pressure
+   *     drops below this value and the pressure switch indicates that the system is not full.
+   * @param maxPressure The maximum pressure in PSI. The compressor will turn off when the pressure
+   *     reaches this value or the pressure switch is disconnected or indicates that the system is
+   *     full.
    */
   public void enableHybrid(double minPressure, double maxPressure) {
     m_module.enableCompressorHybrid(minPressure, maxPressure);
   }
 
   /**
-   * Gets the current operating mode of the Compressor.
+   * Returns the active compressor configuration.
    *
-   * @return true if compressor is operating on closed-loop mode
+   * @return The active compressor configuration.
    */
   public CompressorConfigType getConfigType() {
     return m_module.getCompressorConfigType();
