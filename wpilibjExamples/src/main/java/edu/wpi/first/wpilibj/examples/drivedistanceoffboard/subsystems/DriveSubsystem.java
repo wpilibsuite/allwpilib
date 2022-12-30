@@ -25,12 +25,8 @@ public class DriveSubsystem extends SubsystemBase {
 
   private final ExampleSmartMotorController m_rightFollower =
       new ExampleSmartMotorController(DriveConstants.kRightMotor2Port);
-
-  /**
-   * The feedforward controller (note that these are example values only).
-   *
-   * @see edu.wpi.first.wpilibj.examples.drivedistanceoffboard.Constants.DriveConstants
-   */
+  
+  // The feedforward controller.
   private final SimpleMotorFeedforward m_feedforward =
       new SimpleMotorFeedforward(
           DriveConstants.ksVolts,
