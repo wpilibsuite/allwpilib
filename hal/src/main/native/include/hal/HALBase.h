@@ -77,14 +77,18 @@ int64_t HAL_GetFPGARevision(int32_t* status);
 /**
  * Returns the serial number.
  *
- * @return Serial number.
+ * @param[out] buffer The serial number.
+ * @param size The maximum characters to copy into buffer.
+ * @return Number of characters copied into buffer.
  */
 size_t HAL_GetSerialNumber(char* buffer, size_t size);
 
 /**
  * Returns the comments from the roboRIO web interface.
  *
- * @return Comments.
+ * @param[out] buffer The comments string.
+ * @param size The maximum characters to copy into buffer.
+ * @return Number of characters copied into buffer.
  */
 size_t HAL_GetComments(char* buffer, size_t size);
 
