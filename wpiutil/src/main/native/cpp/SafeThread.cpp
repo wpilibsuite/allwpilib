@@ -2,9 +2,29 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
+#include <atomic>
+
 #include "wpi/SafeThread.h"
 
 using namespace wpi;
+
+// thread start/stop notifications for bindings that need to set up
+// per-thread state
+
+static void* DefaultOnThreadStart() {
+  return nullptr;
+}
+static void DefaultOnThreadEnd(void*) {}
+
+static std::atomic<void* (*)()> gOnSafeThreadStart{DefaultOnThreadStart};
+static std::atomic<void (*)(void*)> gOnSafeThreadEnd{DefaultOnThreadEnd};
+
+namespace wpi::impl {
+void SetSafeThreadNotifers(void* (*OnStart)(), void (*OnEnd)(void*)) {
+  gOnSafeThreadStart = OnStart ? OnStart : DefaultOnThreadStart;
+  gOnSafeThreadEnd = OnEnd ? OnEnd : DefaultOnThreadEnd;
+}
+}  // namespace wpi::impl
 
 void SafeThread::Stop() {
   m_active = false;
@@ -43,7 +63,11 @@ void detail::SafeThreadOwnerBase::Start(std::shared_ptr<SafeThreadBase> thr) {
   if (auto thr = m_thread.lock()) {
     return;
   }
-  m_stdThread = std::thread([=] { thr->Main(); });
+  m_stdThread = std::thread([=] {
+    void* opaque = (gOnSafeThreadStart.load())();
+    thr->Main();
+    (gOnSafeThreadEnd.load())(opaque);
+  });
   thr->m_threadId = m_stdThread.get_id();
   m_thread = thr;
 }
