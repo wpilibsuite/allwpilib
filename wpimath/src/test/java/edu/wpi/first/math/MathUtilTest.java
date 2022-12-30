@@ -88,4 +88,24 @@ class MathUtilTest {
     assertEquals(MathUtil.angleModulus(Math.PI / 2), Math.PI / 2);
     assertEquals(MathUtil.angleModulus(-Math.PI / 2), -Math.PI / 2);
   }
+
+  @Test
+  void testInverseAngleModulus() {
+    // Angle is already fine
+    assertEquals(MathUtil.inverseAngleModulus(Math.toRadians(45)), Math.toRadians(45), 1e-6);
+    assertEquals(MathUtil.inverseAngleModulus(Math.toRadians(65)), Math.toRadians(65), 1e-6);
+
+    // Angle is signed negative
+    assertEquals(MathUtil.inverseAngleModulus(Math.toRadians(-45)), Math.toRadians(315), 1e-6);
+    assertEquals(MathUtil.inverseAngleModulus(Math.toRadians(-65)), Math.toRadians(295), 1e-6);
+
+    // |Angle| is greater than 180°
+    // Positive
+    assertEquals(MathUtil.inverseAngleModulus(Math.toRadians(185)), Math.toRadians(185), 1e-6);
+    assertEquals(MathUtil.inverseAngleModulus(Math.toRadians(270)), Math.toRadians(270), 1e-6);
+
+    // Negative
+    assertEquals(MathUtil.inverseAngleModulus(Math.toRadians(-185)), Math.toRadians(175), 1e-6);
+    assertEquals(MathUtil.inverseAngleModulus(Math.toRadians(-270)), Math.toRadians(90), 1e-6);
+  }
 }
