@@ -9,6 +9,9 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import edu.wpi.first.math.interpolation.Interpolatable;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
 import java.util.Objects;
 
 /** Represents a 2D pose containing translational and rotational elements. */
@@ -236,6 +239,18 @@ public class Pose2d implements Interpolatable<Pose2d> {
             .times(Math.hypot(halfThetaByTanOfHalfDtheta, halfDtheta));
 
     return new Twist2d(translationPart.getX(), translationPart.getY(), dtheta);
+  }
+
+  /**
+   * Returns the nearest Pose2d from a list of poses
+   *
+   * @param poses The list of poses to find the nearest.
+   * @return The nearest Pose2d form the list.
+   */
+  public Pose2d nearest(List<Pose2d> poses) {
+    return Collections.min(
+        poses,
+        Comparator.comparing((other) -> this.getTranslation().getDistance(other.getTranslation())));
   }
 
   @Override

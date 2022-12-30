@@ -10,6 +10,9 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.interpolation.Interpolatable;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
 import java.util.Objects;
 
 /**
@@ -183,6 +186,16 @@ public class Translation2d implements Interpolatable<Translation2d> {
    */
   public Translation2d div(double scalar) {
     return new Translation2d(m_x / scalar, m_y / scalar);
+  }
+
+  /**
+   * Returns the nearest Translation2d from a list of translations.
+   *
+   * @param translations The list of translations.
+   * @return The nearest Translation2d from the list.
+   */
+  public Translation2d nearest(List<Translation2d> translations) {
+    return Collections.min(translations, Comparator.comparing(this::getDistance));
   }
 
   @Override

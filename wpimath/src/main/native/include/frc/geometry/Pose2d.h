@@ -4,6 +4,8 @@
 
 #pragma once
 
+#include <vector>
+
 #include <wpi/SymbolExports.h>
 
 #include "Transform2d.h"
@@ -175,6 +177,13 @@ class WPILIB_DLLEXPORT Pose2d {
    * @return The twist that maps this to end.
    */
   Twist2d Log(const Pose2d& end) const;
+
+  /**
+   * Returns the nearest Pose2d from a vector of poses
+   * @param poses The vector of poses.
+   * @return The nearest Pose2d from the vector.
+   */
+  Pose2d Nearest(std::vector<Pose2d> poses) const;
 
  private:
   Translation2d m_translation;

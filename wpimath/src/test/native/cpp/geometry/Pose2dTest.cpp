@@ -3,6 +3,7 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #include <cmath>
+#include <cstdlib>
 
 #include "frc/geometry/Pose2d.h"
 #include "gtest/gtest.h"
@@ -52,6 +53,46 @@ TEST(Pose2dTest, Minus) {
   EXPECT_DOUBLE_EQ(5.0 * std::sqrt(2.0), transform.X().value());
   EXPECT_NEAR(0.0, transform.Y().value(), 1e-9);
   EXPECT_DOUBLE_EQ(0.0, transform.Rotation().Degrees().value());
+}
+
+TEST(Pose2dTest, Nearest) {
+  const Pose2d origin{0_m, 0_m, 0_deg};
+
+  const Pose2d pose1{
+      Translation2d{1_m,
+                    Rotation2d{units::degree_t{(double)(std::rand() % 360)}}},
+      0_deg};
+  const Pose2d pose2{
+      Translation2d{2_m,
+                    Rotation2d{units::degree_t{(double)(std::rand() % 360)}}},
+      0_deg};
+  const Pose2d pose3{
+      Translation2d{3_m,
+                    Rotation2d{units::degree_t{(double)(std::rand() % 360)}}},
+      0_deg};
+  const Pose2d pose4{
+      Translation2d{4_m,
+                    Rotation2d{units::degree_t{(double)(std::rand() % 360)}}},
+      0_deg};
+  const Pose2d pose5{
+      Translation2d{5_m,
+                    Rotation2d{units::degree_t{(double)(std::rand() % 360)}}},
+      0_deg};
+
+  EXPECT_EQ(origin.Nearest(std::vector{pose5, pose3, pose4}).X().value(),
+            pose3.X().value());
+  EXPECT_EQ(origin.Nearest(std::vector{pose5, pose3, pose4}).Y().value(),
+            pose3.Y().value());
+
+  EXPECT_EQ(origin.Nearest(std::vector{pose1, pose2, pose3}).X().value(),
+            pose1.X().value());
+  EXPECT_EQ(origin.Nearest(std::vector{pose1, pose2, pose3}).Y().value(),
+            pose1.Y().value());
+
+  EXPECT_EQ(origin.Nearest(std::vector{pose4, pose2, pose3}).X().value(),
+            pose2.X().value());
+  EXPECT_EQ(origin.Nearest(std::vector{pose4, pose2, pose3}).Y().value(),
+            pose2.Y().value());
 }
 
 TEST(Pose2dTest, Constexpr) {

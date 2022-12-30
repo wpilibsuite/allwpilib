@@ -8,6 +8,7 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
+import java.util.List;
 import org.junit.jupiter.api.Test;
 
 class Pose2dTest {
@@ -64,5 +65,31 @@ class Pose2dTest {
         () -> assertEquals(5.0 * Math.sqrt(2.0), transform.getX(), kEpsilon),
         () -> assertEquals(0.0, transform.getY(), kEpsilon),
         () -> assertEquals(0.0, transform.getRotation().getDegrees(), kEpsilon));
+  }
+
+  @Test
+  void testNearest() {
+    var origin = new Pose2d();
+
+    // each poseX is X units away from the origin at a random angle.
+    var pose1 =
+        new Pose2d(
+            new Translation2d(1, Rotation2d.fromDegrees(Math.random() * 360)), new Rotation2d());
+    var pose2 =
+        new Pose2d(
+            new Translation2d(2, Rotation2d.fromDegrees(Math.random() * 360)), new Rotation2d());
+    var pose3 =
+        new Pose2d(
+            new Translation2d(3, Rotation2d.fromDegrees(Math.random() * 360)), new Rotation2d());
+    var pose4 =
+        new Pose2d(
+            new Translation2d(4, Rotation2d.fromDegrees(Math.random() * 360)), new Rotation2d());
+    var pose5 =
+        new Pose2d(
+            new Translation2d(5, Rotation2d.fromDegrees(Math.random() * 360)), new Rotation2d());
+
+    assertEquals(origin.nearest(List.of(pose5, pose3, pose4)), pose3);
+    assertEquals(origin.nearest(List.of(pose1, pose2, pose3)), pose1);
+    assertEquals(origin.nearest(List.of(pose4, pose2, pose3)), pose2);
   }
 }

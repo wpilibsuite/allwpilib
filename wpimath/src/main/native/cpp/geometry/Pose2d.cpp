@@ -67,6 +67,14 @@ Twist2d Pose2d::Log(const Pose2d& end) const {
   return {translationPart.X(), translationPart.Y(), units::radian_t{dtheta}};
 }
 
+Pose2d Pose2d::Nearest(std::vector<Pose2d> poses) const {
+  return *std::min_element(
+      poses.begin(), poses.end(), [this](const Pose2d& a, const Pose2d& b) {
+        return this->Translation().Distance(a.Translation()) <
+               this->Translation().Distance(b.Translation());
+      });
+}
+
 void frc::to_json(wpi::json& json, const Pose2d& pose) {
   json = wpi::json{{"translation", pose.Translation()},
                    {"rotation", pose.Rotation()}};

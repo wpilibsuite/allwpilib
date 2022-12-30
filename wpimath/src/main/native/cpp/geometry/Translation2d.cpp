@@ -23,6 +23,14 @@ bool Translation2d::operator==(const Translation2d& other) const {
          units::math::abs(m_y - other.m_y) < 1E-9_m;
 }
 
+Translation2d Translation2d::Nearest(
+    const std::vector<Translation2d> translations) const {
+  return *std::min_element(translations.begin(), translations.end(),
+                           [this](Translation2d a, Translation2d b) {
+                             return this->Distance(a) < this->Distance(b);
+                           });
+}
+
 void frc::to_json(wpi::json& json, const Translation2d& translation) {
   json =
       wpi::json{{"x", translation.X().value()}, {"y", translation.Y().value()}};

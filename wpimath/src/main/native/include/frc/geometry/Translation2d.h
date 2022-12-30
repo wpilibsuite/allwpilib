@@ -4,6 +4,8 @@
 
 #pragma once
 
+#include <vector>
+
 #include <wpi/SymbolExports.h>
 
 #include "Rotation2d.h"
@@ -169,6 +171,13 @@ class WPILIB_DLLEXPORT Translation2d {
    * @return Whether the two objects are equal.
    */
   bool operator==(const Translation2d& other) const;
+
+  /**
+   * Returns the nearest Translation2d from a vector of translations
+   * @param translations The vector of translations.
+   * @return The nearest Translation2d from the vector.
+   */
+  Translation2d Nearest(const std::vector<Translation2d> translations) const;
 
  private:
   units::meter_t m_x = 0_m;

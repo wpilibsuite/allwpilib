@@ -94,6 +94,54 @@ TEST(Translation2dTest, PolarConstructor) {
   EXPECT_DOUBLE_EQ(std::sqrt(3.0), two.Y().value());
 }
 
+TEST(Translation2dTest, Nearest) {
+  const Translation2d origin{0_m, 0_m};
+
+  const Translation2d translation1{
+      1_m, Rotation2d{units::degree_t{(double)(std::rand() % 360)}}};
+  const Translation2d translation2{
+      2_m, Rotation2d{units::degree_t{(double)(std::rand() % 360)}}};
+  const Translation2d translation3{
+      3_m, Rotation2d{units::degree_t{(double)(std::rand() % 360)}}};
+  const Translation2d translation4{
+      4_m, Rotation2d{units::degree_t{(double)(std::rand() % 360)}}};
+  const Translation2d translation5{
+      5_m, Rotation2d{units::degree_t{(double)(std::rand() % 360)}}};
+
+  EXPECT_EQ(
+      origin.Nearest(std::vector{translation5, translation3, translation4})
+          .X()
+          .value(),
+      translation3.X().value());
+  EXPECT_EQ(
+      origin.Nearest(std::vector{translation5, translation3, translation4})
+          .Y()
+          .value(),
+      translation3.Y().value());
+
+  EXPECT_EQ(
+      origin.Nearest(std::vector{translation1, translation2, translation3})
+          .X()
+          .value(),
+      translation1.X().value());
+  EXPECT_EQ(
+      origin.Nearest(std::vector{translation1, translation2, translation3})
+          .Y()
+          .value(),
+      translation1.Y().value());
+
+  EXPECT_EQ(
+      origin.Nearest(std::vector{translation4, translation2, translation3})
+          .X()
+          .value(),
+      translation2.X().value());
+  EXPECT_EQ(
+      origin.Nearest(std::vector{translation4, translation2, translation3})
+          .Y()
+          .value(),
+      translation2.Y().value());
+}
+
 TEST(Translation2dTest, Constexpr) {
   constexpr Translation2d defaultCtor;
   constexpr Translation2d componentCtor{1_m, 2_m};
