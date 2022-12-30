@@ -245,7 +245,7 @@ public class Pose2d implements Interpolatable<Pose2d> {
    * Returns the nearest Pose2d from a list of poses.
    *
    * @param poses The list of poses to find the nearest.
-   * @return The nearest Pose2d form the list.
+   * @return The nearest Pose2d from the list.
    */
   public Pose2d nearest(List<Pose2d> poses) {
     return Collections.min(
