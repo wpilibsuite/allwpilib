@@ -98,15 +98,15 @@ TEST(Translation2dTest, Nearest) {
   const Translation2d origin{0_m, 0_m};
 
   const Translation2d translation1{
-      1_m, Rotation2d{units::degree_t{(double)(std::rand() % 360)}}};
+      1_m, Rotation2d{units::degree_t{static_cast<double>(std::rand() % 360)}}};
   const Translation2d translation2{
-      2_m, Rotation2d{units::degree_t{(double)(std::rand() % 360)}}};
+      2_m, Rotation2d{units::degree_t{static_cast<double>(std::rand() % 360)}}};
   const Translation2d translation3{
-      3_m, Rotation2d{units::degree_t{(double)(std::rand() % 360)}}};
+      3_m, Rotation2d{units::degree_t{static_cast<double>(std::rand() % 360)}}};
   const Translation2d translation4{
-      4_m, Rotation2d{units::degree_t{(double)(std::rand() % 360)}}};
+      4_m, Rotation2d{units::degree_t{static_cast<double>(std::rand() % 360)}}};
   const Translation2d translation5{
-      5_m, Rotation2d{units::degree_t{(double)(std::rand() % 360)}}};
+      5_m, Rotation2d{units::degree_t{static_cast<double>(std::rand() % 360)}}};
 
   EXPECT_EQ(
       origin.Nearest(std::vector{translation5, translation3, translation4})
