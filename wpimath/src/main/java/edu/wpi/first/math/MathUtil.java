@@ -125,7 +125,8 @@ public final class MathUtil {
   }
 
   /**
-   * Wraps an angle to the range -pi to pi radians.
+   * Wraps an angle to the range (-pi, pi) radians. This is useful if you need to convert an
+   * unsigned angle to a signed one.
    *
    * @param angleRadians Angle to wrap in radians.
    * @return The wrapped angle.
@@ -134,6 +135,16 @@ public final class MathUtil {
     return inputModulus(angleRadians, -Math.PI, Math.PI);
   }
 
+  /**
+   * Convert an angle in the range (-pi, pi) to one within (0, 2pi). This is useful if you need to
+   * convert a signed angle to an unsigned one.
+   *
+   * @param angleRadians Angle to wrap in radians.
+   * @return The wrapped angle.
+   */
+  public static double inverseAngleModulus(double angleRadians) {
+    return inputModulus(angleRadians, 0, 2 * Math.PI);
+  }
   /**
    * Perform linear interpolation between two values.
    *
