@@ -122,7 +122,7 @@ void HALSIM_StepTiming(uint64_t delta) {
     int32_t status = 0;
     uint64_t curTime = HAL_GetFPGATime(&status);
     uint64_t nextTimeout = HALSIM_GetNextNotifierTimeout();
-    uint64_t step = std::min(delta, nextTimeout - curTime);
+    uint64_t step = (std::min)(delta, nextTimeout - curTime);
 
     StepTiming(step);
     delta -= step;

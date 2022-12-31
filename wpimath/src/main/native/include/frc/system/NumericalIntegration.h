@@ -99,7 +99,7 @@ T RKDP(F&& f, T x, U u, units::second_t dt, double maxError = 1e-6) {
   while (dtElapsed < dt.value()) {
     do {
       // Only allow us to advance up to the dt remaining
-      h = std::min(h, dt.value() - dtElapsed);
+      h = (std::min)(h, dt.value() - dtElapsed);
 
       // clang-format off
       T k1 = f(x, u);

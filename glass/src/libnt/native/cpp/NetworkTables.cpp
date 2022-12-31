@@ -600,138 +600,42 @@ NetworkTablesModel::Entry* NetworkTablesModel::AddEntry(NT_Topic topic) {
   return entry.get();
 }
 
+NetworkTablesModel::Client::Subscriber::Subscriber(
+    nt::meta::ClientSubscriber&& oth)
+    : ClientSubscriber{std::move(oth)},
+      topicsStr{StringArrayToString(topics)} {}
+
 void NetworkTablesModel::Client::UpdatePublishers(
     std::span<const uint8_t> data) {
-  mpack_reader_t r;
-  mpack_reader_init_data(&r, data);
-  uint32_t numPub = mpack_expect_array_max(&r, 1000);
-  std::vector<ClientPublisher> newPublishers;
-  newPublishers.reserve(numPub);
-  for (uint32_t i = 0; i < numPub; ++i) {
-    ClientPublisher pub;
-    uint32_t numMapElem = mpack_expect_map(&r);
-    for (uint32_t j = 0; j < numMapElem; ++j) {
-      std::string key;
-      mpack_expect_str(&r, &key);
-      if (key == "uid") {
-        pub.uid = mpack_expect_i64(&r);
-      } else if (key == "topic") {
-        mpack_expect_str(&r, &pub.topic);
-      } else {
-        mpack_discard(&r);
-      }
-    }
-    mpack_done_map(&r);
-    newPublishers.emplace_back(std::move(pub));
-  }
-  mpack_done_array(&r);
-  if (mpack_reader_destroy(&r) == mpack_ok) {
-    publishers = std::move(newPublishers);
+  if (auto pubs = nt::meta::DecodeClientPublishers(data)) {
+    publishers = std::move(*pubs);
   } else {
     fmt::print(stderr, "Failed to update publishers\n");
   }
 }
 
-static void DecodeSubscriberOptions(
-    mpack_reader_t& r, NetworkTablesModel::SubscriberOptions* options) {
-  *options = NetworkTablesModel::SubscriberOptions{};
-  uint32_t numMapElem = mpack_expect_map(&r);
-  for (uint32_t j = 0; j < numMapElem; ++j) {
-    std::string key;
-    mpack_expect_str(&r, &key);
-    if (key == "topicsonly") {
-      options->topicsOnly = mpack_expect_bool(&r);
-    } else if (key == "all") {
-      options->sendAll = mpack_expect_bool(&r);
-    } else if (key == "periodic") {
-      options->periodic = mpack_expect_float(&r);
-    } else if (key == "prefix") {
-      options->prefixMatch = mpack_expect_bool(&r);
-    } else {
-      // TODO: Save other options
-      mpack_discard(&r);
-    }
-  }
-  mpack_done_map(&r);
-}
-
 void NetworkTablesModel::Client::UpdateSubscribers(
     std::span<const uint8_t> data) {
-  mpack_reader_t r;
-  mpack_reader_init_data(&r, data);
-  uint32_t numSub = mpack_expect_array_max(&r, 1000);
-  std::vector<ClientSubscriber> newSubscribers;
-  newSubscribers.reserve(numSub);
-  for (uint32_t i = 0; i < numSub; ++i) {
-    ClientSubscriber sub;
-    uint32_t numMapElem = mpack_expect_map(&r);
-    for (uint32_t j = 0; j < numMapElem; ++j) {
-      std::string key;
-      mpack_expect_str(&r, &key);
-      if (key == "uid") {
-        sub.uid = mpack_expect_i64(&r);
-      } else if (key == "topics") {
-        uint32_t numPrefix = mpack_expect_array_max(&r, 100);
-        sub.topics.reserve(numPrefix);
-        for (uint32_t k = 0; k < numPrefix; ++k) {
-          std::string val;
-          if (mpack_expect_str(&r, &val) == mpack_ok) {
-            sub.topics.emplace_back(std::move(val));
-          }
-        }
-        sub.topicsStr = StringArrayToString(sub.topics);
-        mpack_done_array(&r);
-      } else if (key == "options") {
-        DecodeSubscriberOptions(r, &sub.options);
-      } else {
-        mpack_discard(&r);
-      }
+  if (auto subs = nt::meta::DecodeClientSubscribers(data)) {
+    subscribers.clear();
+    subscribers.reserve(subs->size());
+    for (auto&& sub : *subs) {
+      subscribers.emplace_back(std::move(sub));
     }
-    mpack_done_map(&r);
-    newSubscribers.emplace_back(std::move(sub));
-  }
-  mpack_done_array(&r);
-  if (mpack_reader_destroy(&r) == mpack_ok) {
-    subscribers = std::move(newSubscribers);
   } else {
     fmt::print(stderr, "Failed to update subscribers\n");
   }
 }
 
 void NetworkTablesModel::UpdateClients(std::span<const uint8_t> data) {
-  mpack_reader_t r;
-  mpack_reader_init_data(&r, data);
-  uint32_t numClients = mpack_expect_array_max(&r, 100);
-  std::vector<Client> clientsArr;
-  clientsArr.reserve(numClients);
-  for (uint32_t i = 0; i < numClients; ++i) {
-    Client client;
-    uint32_t numMapElem = mpack_expect_map(&r);
-    for (uint32_t j = 0; j < numMapElem; ++j) {
-      std::string key;
-      mpack_expect_str(&r, &key);
-      if (key == "id") {
-        mpack_expect_str(&r, &client.id);
-      } else if (key == "conn") {
-        mpack_expect_str(&r, &client.conn);
-      } else if (key == "ver") {
-        uint16_t val = mpack_expect_u16(&r);
-        client.version = fmt::format("{}.{}", val >> 8, val & 0xff);
-      } else {
-        mpack_discard(&r);
-      }
-    }
-    mpack_done_map(&r);
-    clientsArr.emplace_back(std::move(client));
-  }
-  mpack_done_array(&r);
-  if (mpack_reader_destroy(&r) != mpack_ok) {
+  auto clientsArr = nt::meta::DecodeClients(data);
+  if (!clientsArr) {
     return;
   }
 
   // we need to create a new map so deletions are reflected
   std::map<std::string, Client, std::less<>> newClients;
-  for (auto&& client : clientsArr) {
+  for (auto&& client : *clientsArr) {
     auto& newClient = newClients[client.id];
     newClient = std::move(client);
     auto it = m_clients.find(newClient.id);
@@ -1499,8 +1403,8 @@ void glass::DisplayNetworkTablesInfo(NetworkTablesModel* model) {
         if (CollapsingHeader(client.second.id.c_str())) {
           PushID(client.second.id.c_str());
           ImGui::Indent();
-          ImGui::Text("%s (version %s)", client.second.conn.c_str(),
-                      client.second.version.c_str());
+          ImGui::Text("%s (version %u.%u)", client.second.conn.c_str(),
+                      client.second.version >> 8, client.second.version & 0xff);
           DisplayClient(client.second);
           ImGui::Unindent();
           PopID();

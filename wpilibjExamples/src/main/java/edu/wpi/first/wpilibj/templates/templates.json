@@ -11,6 +11,17 @@
     "commandversion": 2
   },
   {
+    "name": "Command Robot Skeleton (Advanced)",
+    "description": "Skeleton (stub) code for Command Robot",
+    "tags": [
+      "Command", "Skeleton"
+    ],
+    "foldername": "commandbasedskeleton",
+    "gradlebase": "java",
+    "mainclass": "Main",
+    "commandversion": 2
+  },
+  {
     "name": "Timed Robot",
     "description": "Timed style",
     "tags": [

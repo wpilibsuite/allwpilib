@@ -193,7 +193,7 @@ bool ADIS16470_IMU::SwitchToStandardSPI() {
       while (data_count > 0) {
         /* Receive data, max of 200 words at a time (prevent potential segfault)
          */
-        m_spi->ReadAutoReceivedData(trashBuffer, std::min(data_count, 200),
+        m_spi->ReadAutoReceivedData(trashBuffer, (std::min)(data_count, 200),
                                     0_s);
         /*Get the remaining data count */
         data_count = m_spi->ReadAutoReceivedData(trashBuffer, 0, 0_s);
