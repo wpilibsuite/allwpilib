@@ -87,4 +87,31 @@ public class SlewRateLimiter {
     m_prevVal = value;
     m_prevTime = WPIUtilJNI.now() * 1e-6;
   }
+
+  /**
+   * Provides the most recently calculated filtered value.
+   *
+   * @return The most recently calculated filtered value.
+   */
+  public double previousValue() {
+    return m_prevVal;
+  }
+
+  /**
+   * Provides the current positive rate limit.
+   *
+   * @return The current positive rate limit.
+   */
+  public double positiveRateLimit() {
+    return m_positiveRateLimit;
+  }
+
+  /**
+   * Provides the current negative rate limit.
+   *
+   * @return The current negative rate limit.
+   */
+  public double negativeRateLimit() {
+    return m_negativeRateLimit;
+  }
 }
