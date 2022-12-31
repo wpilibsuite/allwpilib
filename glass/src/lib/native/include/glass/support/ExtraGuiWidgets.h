@@ -96,6 +96,6 @@ bool HeaderDeleteButton(const char* label);
 /**
  * Settings button similar to ImGui::CloseButton.
  */
-bool HamburgerButton(const ImVec2 position);
+bool HamburgerButton(const ImGuiID id, const ImVec2 position);
 
 }  // namespace glass

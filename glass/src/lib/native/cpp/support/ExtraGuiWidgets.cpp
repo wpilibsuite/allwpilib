@@ -4,6 +4,8 @@
 
 #include "glass/support/ExtraGuiWidgets.h"
 
+#include <imgui.h>
+
 #define IMGUI_DEFINE_MATH_OPERATORS
 #include <imgui_internal.h>
 
@@ -174,7 +176,7 @@ bool HeaderDeleteButton(const char* label) {
   return rv;
 }
 
-bool HamburgerButton(const ImVec2 position) {
+bool HamburgerButton(const ImGuiID id, const ImVec2 position) {
   const ImGuiStyle& style = ImGui::GetStyle();
 
   ImGuiWindow* window = ImGui::GetCurrentWindow();
@@ -184,37 +186,33 @@ bool HamburgerButton(const ImVec2 position) {
       position, position + ImVec2(ImGui::GetFontSize(), ImGui::GetFontSize()) +
                     style.FramePadding * 2.0f};
 
-  ImGuiID id = ImGui::GetID("#SETTINGS");
   ImGui::ItemAdd(bb, id);
 
   bool hovered, held;
   bool pressed = ImGui::ButtonBehavior(bb, id, &hovered, &held);
 
-  ImU32 bgCol =
+  const ImU32 bgCol =
       ImGui::GetColorU32(held ? ImGuiCol_ButtonActive : ImGuiCol_ButtonHovered);
-  ImVec2 center = bb.GetCenter();
+  const ImVec2 center = bb.GetCenter();
   if (hovered) {
     window->DrawList->AddCircleFilled(
         center, ImMax(2.0f, ImGui::GetFontSize() * 0.5f + 1.0f), bgCol, 12);
   }
 
-  ImU32 fgCol = ImGui::GetColorU32(ImGuiCol_Text);
+  const ImU32 fgCol = ImGui::GetColorU32(ImGuiCol_Text);
 
-  const float xPadding = bb.GetWidth() / 4.0f;
-  const float yPadding = bb.GetHeight() / 10.0f;
-  const int amountOfLines = 3;
+  const float halfLineWidth = ImGui::GetFontSize() * 0.5 * 0.7071;
+  const float halfTotalHeight = halfLineWidth * 0.875;
+  ImVec2 lineStart = {center.x - halfLineWidth, center.y - halfTotalHeight};
+  ImVec2 lineEnd = {center.x + halfLineWidth, center.y - halfTotalHeight};
 
-  ImVec2 lineStart = {bb.Min.x + xPadding, bb.Min.y + yPadding};
-  ImVec2 lineEnd = {bb.Max.x - xPadding, bb.Min.y + yPadding};
+  ImVec2 increment = {0.0, halfTotalHeight};
 
-  ImVec2 increment = {0.0,
-                      (bb.GetHeight() - (yPadding * 2)) / (amountOfLines + 1)};
+  for (int i = 0; i < 3; i++) {
+    window->DrawList->AddLine(lineStart, lineEnd, fgCol);
 
-  for (int i = 0; i < amountOfLines; i++) {
     lineStart += increment;
     lineEnd += increment;
-
-    window->DrawList->AddLine(lineStart, lineEnd, fgCol);
   }
 
   return pressed;

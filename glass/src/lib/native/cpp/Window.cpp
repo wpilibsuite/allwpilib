@@ -67,7 +67,11 @@ void Window::Display() {
       ImGuiWindow* window = ImGui::GetCurrentWindow();
 
       bool settingsButtonClicked = false;
-      if (!ImGui::IsWindowDocked()) {
+      // Not docked, and window has just enough for the circles not to be
+      // touching
+      if (!ImGui::IsWindowDocked() &&
+          ImGui::GetWindowWidth() > (ImGui::GetFontSize() + 2) * 3 +
+                                        ImGui::GetStyle().FramePadding.x * 2) {
         const ImGuiItemFlags itemFlagsRestore =
             ImGui::GetCurrentContext()->CurrentItemFlags;
 
@@ -81,11 +85,12 @@ void Window::Display() {
 
         const ImRect titleBarRect = ImGui::GetCurrentWindow()->TitleBarRect();
         const ImVec2 position = {titleBarRect.Max.x -
-                                     (ImGui::GetStyle().FramePadding.x * 2) -
-                                     (ImGui::GetFontSize() * 2) -
-                                     (ImGui::GetStyle().ItemInnerSpacing.x),
+                                     (ImGui::GetStyle().FramePadding.x * 3) -
+                                     (ImGui::GetFontSize() * 2),
                                  titleBarRect.Min.y};
-        settingsButtonClicked = HamburgerButton(position);
+        settingsButtonClicked =
+            HamburgerButton(ImGui::GetID("#SETTINGS"), position);
+
         ImGui::PopClipRect();
 
         ImGui::GetCurrentContext()->CurrentItemFlags = itemFlagsRestore;
