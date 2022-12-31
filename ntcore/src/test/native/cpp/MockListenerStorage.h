@@ -36,6 +36,10 @@ class MockListenerStorage : public IListenerStorage {
                std::string_view filename, unsigned int line,
                std::string_view message),
               (override));
+  MOCK_METHOD(void, NotifyTimeSync,
+              (std::span<const NT_Listener> handles, unsigned int flags,
+               int64_t serverTimeOffset, int64_t rtt2, bool valid),
+              (override));
 };
 
 }  // namespace nt

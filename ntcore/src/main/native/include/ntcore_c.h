@@ -115,6 +115,8 @@ enum NT_EventFlags {
   NT_EVENT_VALUE_ALL = NT_EVENT_VALUE_REMOTE | NT_EVENT_VALUE_LOCAL,
   /** Log message. */
   NT_EVENT_LOGMESSAGE = 0x100,
+  /** Time synchronized with server. */
+  NT_EVENT_TIMESYNC = 0x200,
 };
 
 /*
@@ -247,6 +249,24 @@ struct NT_LogMessage {
   char* message;
 };
 
+/** NetworkTables time sync event data. */
+struct NT_TimeSyncEventData {
+  /**
+   * Offset between local time and server time, in microseconds. Add this value
+   * to local time to get the estimated equivalent server time.
+   */
+  int64_t serverTimeOffset;
+
+  /** Measured round trip time divided by 2, in microseconds. */
+  int64_t rtt2;
+
+  /**
+   * If serverTimeOffset and RTT are valid. An event with this set to false is
+   * sent when the client disconnects.
+   */
+  NT_Bool valid;
+};
+
 /** NetworkTables event */
 struct NT_Event {
   /** Listener that triggered this event. */
@@ -259,6 +279,7 @@ struct NT_Event {
    * - NT_EVENT_PUBLISH, NT_EVENT_UNPUBLISH, or NT_EVENT_PROPERTIES: topicInfo
    * - NT_EVENT_VALUE_REMOTE, NT_NOTIFY_VALUE_LOCAL: valueData
    * - NT_EVENT_LOGMESSAGE: logMessage
+   * - NT_EVENT_TIMESYNC: timeSyncData
    */
   unsigned int flags;
 
@@ -268,6 +289,7 @@ struct NT_Event {
     struct NT_TopicInfo topicInfo;
     struct NT_ValueEventData valueData;
     struct NT_LogMessage logMessage;
+    struct NT_TimeSyncEventData timeSyncData;
   } data;
 };
 
@@ -1190,6 +1212,22 @@ struct NT_ConnectionInfo* NT_GetConnections(NT_Inst inst, size_t* count);
  */
 NT_Bool NT_IsConnected(NT_Inst inst);
 
+/**
+ * Get the time offset between server time and local time. Add this value to
+ * local time to get the estimated equivalent server time. In server mode, this
+ * always returns a valid value of 0. In client mode, this returns the time
+ * offset only if the client and server are connected and have exchanged
+ * synchronization messages. Note the time offset may change over time as it is
+ * periodically updated; to receive updates as events, add a listener to the
+ * "time sync" event.
+ *
+ * @param inst instance handle
+ * @param valid set to true if the return value is valid, false otherwise
+ *              (output)
+ * @return Time offset in microseconds (if valid is set to true)
+ */
+int64_t NT_GetServerTimeOffset(NT_Inst inst, NT_Bool* valid);
+
 /** @} */
 
 /**
@@ -1286,7 +1324,7 @@ void NT_DisposeEvent(struct NT_Event* event);
  *
  * @return Timestamp
  */
-uint64_t NT_Now(void);
+int64_t NT_Now(void);
 
 /**
  * Sets the current timestamp used for timestamping values that do not
@@ -1297,7 +1335,7 @@ uint64_t NT_Now(void);
  *
  * @param timestamp timestamp (1 us increments)
  */
-void NT_SetNow(uint64_t timestamp);
+void NT_SetNow(int64_t timestamp);
 
 /** @} */
 

@@ -58,6 +58,15 @@ inline NetworkTableListener NetworkTableListener::CreateConnectionListener(
       std::move(listener))};
 }
 
+inline NetworkTableListener NetworkTableListener::CreateTimeSyncListener(
+    NetworkTableInstance inst, bool immediate_notify,
+    ListenerCallback listener) {
+  return NetworkTableListener{::nt::AddListener(
+      inst.GetHandle(),
+      NT_EVENT_TIMESYNC | (immediate_notify ? NT_EVENT_IMMEDIATE : 0),
+      std::move(listener))};
+}
+
 inline NetworkTableListener NetworkTableListener::CreateLogger(
     NetworkTableInstance inst, unsigned int minLevel, unsigned int maxLevel,
     ListenerCallback listener) {
@@ -150,6 +159,13 @@ inline NT_Listener NetworkTableListenerPoller::AddConnectionListener(
   return ::nt::AddPolledListener(
       m_handle, ::nt::GetInstanceFromHandle(m_handle),
       NT_EVENT_CONNECTION | (immediate_notify ? NT_EVENT_IMMEDIATE : 0));
+}
+
+inline NT_Listener NetworkTableListenerPoller::AddTimeSyncListener(
+    bool immediate_notify) {
+  return ::nt::AddPolledListener(
+      m_handle, ::nt::GetInstanceFromHandle(m_handle),
+      NT_EVENT_TIMESYNC | (immediate_notify ? NT_EVENT_IMMEDIATE : 0));
 }
 
 inline NT_Listener NetworkTableListenerPoller::AddLogger(

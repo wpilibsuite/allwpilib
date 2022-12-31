@@ -32,9 +32,11 @@ class WireConnection;
 
 class ClientImpl {
  public:
-  ClientImpl(uint64_t curTimeMs, int inst, WireConnection& wire,
-             wpi::Logger& logger,
-             std::function<void(uint32_t repeatMs)> setPeriodic);
+  ClientImpl(
+      uint64_t curTimeMs, int inst, WireConnection& wire, wpi::Logger& logger,
+      std::function<void(int64_t serverTimeOffset, int64_t rtt2, bool valid)>
+          timeSyncUpdated,
+      std::function<void(uint32_t repeatMs)> setPeriodic);
   ~ClientImpl();
 
   void ProcessIncomingText(std::string_view data);
