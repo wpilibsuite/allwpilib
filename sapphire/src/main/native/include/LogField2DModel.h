@@ -28,7 +28,7 @@ class LogField2DModel : public glass::Field2DModel {
 
     void UpdatePoses(const wpi::log::DataLogRecord& value);
 
-    void Update() {}
+    void Update() override {}
     void Update(double time) {
         auto value = m_entry->GetRecordAt((time)*1e6);
         if (value.GetEntry() != -1) {
