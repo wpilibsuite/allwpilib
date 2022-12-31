@@ -8,8 +8,6 @@
 #include <cstdio>
 #include <cstring>
 
-#define IMGUI_DEFINE_MATH_OPERATORS
-
 #include <GLFW/glfw3.h>
 #include <IconsFontAwesome6.h>
 #include <imgui.h>
