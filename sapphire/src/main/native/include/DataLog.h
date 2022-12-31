@@ -27,6 +27,7 @@ struct EntryData {
                                                m_type{start.type}, 
                                                m_metadata{start.metadata} {};   
   wpi::log::DataLogRecord GetRecordAt(int timestamp);
+  wpi::log::DataLogRecord GetPrevRecord(int timestamp);
   wpi::log::DataLogRecord GetNextRecord(int timestamp);
   
   std::string GetName() const { return m_name; }

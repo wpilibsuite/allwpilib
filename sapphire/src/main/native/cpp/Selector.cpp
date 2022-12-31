@@ -46,14 +46,14 @@ void Selector::Display() {
   ImGui::TextUnformatted(logFile.c_str());
   ImGui::TextUnformatted(logFileMessage.c_str());
   
-  if(ImGui::Button("Load Video")) {
-    videoFileSelector = std::make_unique<pfd::open_file>(
-      "Select Video File", "",
-      std::vector<std::string>{ "Video Files", "*.mp4 *.MP4 *.mov"},
-      pfd::opt::none);
-  }
-  ImGui::SameLine();
-  ImGui::TextUnformatted(videoFile.c_str());
+  // if(ImGui::Button("Load Video")) {
+  //   videoFileSelector = std::make_unique<pfd::open_file>(
+  //     "Select Video File", "",
+  //     std::vector<std::string>{ "Video Files", "*.mp4 *.MP4 *.mov"},
+  //     pfd::opt::none);
+  // }
+  // ImGui::SameLine();
+  // ImGui::TextUnformatted(videoFile.c_str());
 
   if(logFileSelector && logFileSelector->ready(0)) {
     auto result = logFileSelector->result();
@@ -84,13 +84,13 @@ void Selector::Display() {
     logFileSelector.reset();
   }
 
-  if(videoFileSelector && videoFileSelector->ready(0)) {
-    auto result = videoFileSelector->result();
-    if(!result.empty()) {
-      videoFile = result[0];
-    }
-    videoFileSelector.reset();
-  }
+  // if(videoFileSelector && videoFileSelector->ready(0)) {
+  //   auto result = videoFileSelector->result();
+  //   if(!result.empty()) {
+  //     videoFile = result[0];
+  //   }
+  //   videoFileSelector.reset();
+  // }
 
 }
 

@@ -37,6 +37,7 @@ wpi::log::DataLogRecord EntryData::GetRecordAt(int timestamp){
   }
   return record;
 }
+
 wpi::log::DataLogRecord EntryData::GetNextRecord(int timestamp){
   wpi::log::DataLogRecord record;
   for(auto& entry : m_datapoints){
@@ -47,6 +48,15 @@ wpi::log::DataLogRecord EntryData::GetNextRecord(int timestamp){
   return record;
 }
 
+wpi::log::DataLogRecord EntryData::GetPrevRecord(int timestamp){
+  wpi::log::DataLogRecord record;
+  for(auto& entry : m_datapoints){
+    if(entry.first < timestamp && (entry.first > record.GetTimestamp() || record.GetTimestamp() >= timestamp)){
+      record = entry.second;
+    }
+  }
+  return record;
+}
 
 std::map<int, wpi::log::DataLogRecord>::iterator EntryData::GetIterator(int timestamp){
   auto it = m_datapoints.begin();
@@ -282,22 +292,33 @@ void EmitEntryDragDrop(EntryData *data, std::string name){
   }
 }
 
-void EmitEntry(EntryData *data, std::string name, float *offset, DataLogFlags flags){
+void EmitEntry(EntryData *data, std::string name, DataLogFlags flags){
   
   ImGui::PushID(name.c_str());
   
   ImGui::Selectable(name.c_str());
   EmitEntryDragDrop(data, name);
 
-  int expandedts = static_cast<int>((timestamp+*offset)*1000000);
+  int expandedts = static_cast<int>((timestamp+*data->offset)*1000000);
   auto record = data->GetRecordAt(expandedts);
 
   if (ImGui::BeginPopupContextItem(name.c_str())) {
     if(ImGui::MenuItem("Next Event")){
       auto temp = data->GetNextRecord(record.GetTimestamp());
       if(temp.GetEntry() != -1){
-        *offset = (temp.GetTimestamp()+TIMESTAMP_FUDGE_FACTOR)/1000000.0;
+        *data->offset = (temp.GetTimestamp()+TIMESTAMP_FUDGE_FACTOR)/1000000.0 - timestamp;
         record = temp;
+      }
+    }
+    if(ImGui::MenuItem("Previous Event")){
+      if(*data->offset > record.GetTimestamp()){
+        *data->offset = record.GetTimestamp(); 
+      } else {
+        auto temp = data->GetPrevRecord(record.GetTimestamp());
+        if(temp.GetEntry() != -1){
+          *data->offset = (temp.GetTimestamp()+TIMESTAMP_FUDGE_FACTOR)/1000000.0 - timestamp;
+          record = temp;
+        }
       }
     }
     ImGui::EndPopup();
@@ -310,14 +331,14 @@ void EmitEntry(EntryData *data, std::string name, float *offset, DataLogFlags fl
   ImGui::NextColumn();
   
   if(flags.ShowLastUpdate){
-    ImGui::Text("%fs (%fs ago)", record.GetTimestamp()/1000000.0, (timestamp+*offset)-(record.GetTimestamp()/1000000.0));
+    ImGui::Text("%fs (%fs ago)", record.GetTimestamp()/1000000.0, (timestamp+*data->offset)-(record.GetTimestamp()/1000000.0));
     ImGui::NextColumn();
   }
   if(flags.ShowNextUpdate){
     auto temp = data->GetNextRecord(record.GetTimestamp());
     if(temp.GetEntry() != -1){
       float next = temp.GetTimestamp()/1000000.0;
-      ImGui::Text("%fs (%fs later)", next, (next) - timestamp+*offset);
+      ImGui::Text("%fs (%fs later)", next, (next) - timestamp+*data->offset);
     } else {
       ImGui::Text("No Next Record");
     }
@@ -327,11 +348,10 @@ void EmitEntry(EntryData *data, std::string name, float *offset, DataLogFlags fl
   ImGui::PopID();
 }
 
-void EmitTree(const std::vector<EntryNode>& tree, float *timestamp, DataLogFlags flags) {
+void EmitTree(const std::vector<EntryNode>& tree, DataLogFlags flags) {
   for(auto &&node : tree){
     if(node.m_entry){
-    
-      EmitEntry(node.m_entry, node.m_name, timestamp, flags);
+      EmitEntry(node.m_entry, node.m_name, flags);
     }
     if(!node.m_children.empty()){
       ImGui::PushID(node.m_name.c_str());
@@ -346,7 +366,7 @@ void EmitTree(const std::vector<EntryNode>& tree, float *timestamp, DataLogFlags
       }
       ImGui::Separator();
       if(open){
-        EmitTree(node.m_children, timestamp, flags);
+        EmitTree(node.m_children, flags);
         ImGui::TreePop();
       }
       ImGui::PopID();
@@ -375,7 +395,7 @@ void DataLogView::DisplayDataLog(DataLogModel* log){
     ImGui::Text("Next Update");
     ImGui::NextColumn();
   }
-  EmitTree(log->GetTreeRoot(), &log->m_offset, log->m_flags);
+  EmitTree(log->GetTreeRoot(), log->m_flags);
   
   ImGui::Columns();
 }
