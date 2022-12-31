@@ -22,6 +22,7 @@
 #include "Plot.h"
 #include "LogViewLoader.h"
 #include "TimeManager.h"
+#include "TextLog.h"
 
 using namespace sapphire;
 
@@ -119,6 +120,8 @@ void Application(std::string_view saveDir) {
 
   auto& timestamp = logViewer->GetTimestamp();
 
+  auto  textLog = std::make_unique<TextLog>(storage, timestamp);
+
   plotProvider = std::make_unique<PlotProvider>(plotStorage, timestamp);
   viewLoader = std::make_unique<LogViewLoader>(viewStorage, timestamp);
   
@@ -146,6 +149,9 @@ void Application(std::string_view saveDir) {
 
   m_timeManagerWindow->SetDefaultPos(10, 115);
   m_timeManagerWindow->SetFlags(ImGuiWindowFlags_AlwaysAutoResize);
+
+  windowManager->AddWindow(
+    "Text Log", std::move(textLog));
 
 
   gui::AddWindowScaler([](float scale) { gDefaultScale = scale; });

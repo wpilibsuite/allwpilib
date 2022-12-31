@@ -232,7 +232,7 @@ std::string EntryNode::TreeToString(int depth){
   }
   return ret;
 }
-std::string sapphire::GetFormattedEntryValue(EntryData& data, int timestamp, wpi::log::DataLogRecord record){
+std::string sapphire::GetFormattedEntryValue(EntryData& data, wpi::log::DataLogRecord record){
     if (data.m_type == "double") {
         double val;
         if (record.GetDouble(&val)) {
@@ -326,7 +326,7 @@ void EmitEntry(EntryData *data, std::string name, DataLogFlags flags){
   
 
   ImGui::NextColumn();
-  std::string value = (record.GetEntry() == -1) ? "" : GetFormattedEntryValue(*data, expandedts, record);
+  std::string value = (record.GetEntry() == -1) ? "" : GetFormattedEntryValue(*data, record);
   ImGui::TextUnformatted(value.c_str());
   ImGui::NextColumn();
   
@@ -439,6 +439,3 @@ void DataLogView::Display() {
     }
   }
 }
-
-
-

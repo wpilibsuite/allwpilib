@@ -43,7 +43,7 @@ struct EntryData {
   int finishTimestamp = INT_MAX;
 };
 
-std::string GetFormattedEntryValue(EntryData& data, int timestamp, wpi::log::DataLogRecord record);
+std::string GetFormattedEntryValue(EntryData& data, wpi::log::DataLogRecord record);
 
 // Contains information about the structure of the datalog
 struct EntryNode {
