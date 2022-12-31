@@ -7,8 +7,8 @@ package edu.wpi.first.networktables;
 import java.util.EnumSet;
 
 /**
- * Topic change listener. This queues topic change events matching the specified mask. Code using
- * the listener must periodically call readQueue() to read the events.
+ * Event listener poller. This queues events matching the specified mask. Code using the listener
+ * must periodically call readQueue() to read the events.
  */
 public final class NetworkTableListenerPoller implements AutoCloseable {
   /**
@@ -88,6 +88,22 @@ public final class NetworkTableListenerPoller implements AutoCloseable {
    */
   public int addConnectionListener(boolean immediateNotify) {
     EnumSet<NetworkTableEvent.Kind> eventKinds = EnumSet.of(NetworkTableEvent.Kind.kConnection);
+    if (immediateNotify) {
+      eventKinds.add(NetworkTableEvent.Kind.kImmediate);
+    }
+    return NetworkTablesJNI.addListener(m_handle, m_inst.getHandle(), eventKinds);
+  }
+
+  /**
+   * Add a time synchronization listener. The callback function is called asynchronously on a
+   * separate thread, so it's important to use synchronization or atomics when accessing any shared
+   * state from the callback function.
+   *
+   * @param immediateNotify notify listener of current time synchronization value
+   * @return Listener handle
+   */
+  public int addTimeSyncListener(boolean immediateNotify) {
+    EnumSet<NetworkTableEvent.Kind> eventKinds = EnumSet.of(NetworkTableEvent.Kind.kTimeSync);
     if (immediateNotify) {
       eventKinds.add(NetworkTableEvent.Kind.kImmediate);
     }

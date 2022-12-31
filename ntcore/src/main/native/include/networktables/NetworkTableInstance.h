@@ -393,6 +393,20 @@ class NetworkTableInstance final {
                                     ListenerCallback callback) const;
 
   /**
+   * Add a time synchronization listener. The callback function is called
+   * asynchronously on a separate thread, so it's important to use
+   * synchronization or atomics when accessing any shared state from the
+   * callback function.
+   *
+   * @param immediate_notify  notify listener of current time synchronization
+   *                          value
+   * @param callback          listener to add
+   * @return Listener handle
+   */
+  NT_Listener AddTimeSyncListener(bool immediate_notify,
+                                  ListenerCallback callback) const;
+
+  /**
    * Add a listener for changes on a particular topic. The callback
    * function is called asynchronously on a separate thread, so it's important
    * to use synchronization or atomics when accessing any shared state from the
