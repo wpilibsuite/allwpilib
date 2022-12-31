@@ -33,8 +33,8 @@ DifferentialDriveVoltageConstraint::MinMaxAcceleration(
   auto wheelSpeeds =
       m_kinematics.ToWheelSpeeds({speed, 0_mps, speed * curvature});
 
-  auto maxWheelSpeed = std::max(wheelSpeeds.left, wheelSpeeds.right);
-  auto minWheelSpeed = std::min(wheelSpeeds.left, wheelSpeeds.right);
+  auto maxWheelSpeed = (std::max)(wheelSpeeds.left, wheelSpeeds.right);
+  auto minWheelSpeed = (std::min)(wheelSpeeds.left, wheelSpeeds.right);
 
   // Calculate maximum/minimum possible accelerations from motor dynamics
   // and max/min wheel speeds
