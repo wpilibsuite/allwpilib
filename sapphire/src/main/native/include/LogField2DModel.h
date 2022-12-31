@@ -20,16 +20,17 @@ class LogField2DModel : public glass::Field2DModel {
 
   class ObjectModel : public glass::FieldObjectModel{
    public:
-    ObjectModel(std::string_view name, EntryData * entry, float& now)
-        : m_name{name}, m_entry{entry}, m_now{now} {}
+    ObjectModel(std::string_view name, EntryData * entry)
+        : m_name{name}, m_entry{entry} {}
     ~ObjectModel() override = default;
     const char* GetName() const override { return m_name.c_str(); }
     EntryData * GetEntry() const { return m_entry; }
 
     void UpdatePoses(const wpi::log::DataLogRecord& value);
 
-    void Update() override {
-        auto value = m_entry->GetRecordAt(m_now*1e6);
+    void Update() {}
+    void Update(double time) {
+        auto value = m_entry->GetRecordAt((time)*1e6);
         if (value.GetEntry() != -1) {
             UpdatePoses(value);
         }
@@ -49,7 +50,6 @@ class LogField2DModel : public glass::Field2DModel {
     EntryData *m_entry;
 
     std::vector<frc::Pose2d> m_poses;
-    float& m_now;
   };
   // path is to the table containing ".type", excluding the trailing /
   LogField2DModel(DataLogModel& model, std::string_view path, float& nowRef);

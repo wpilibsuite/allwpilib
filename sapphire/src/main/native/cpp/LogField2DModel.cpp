@@ -64,7 +64,7 @@ void LogField2DModel::Update() {
     if(m_now != m_nowRef + m_model.m_offset){ 
         m_now = m_nowRef + m_model.m_offset;
         for(auto& object : m_objects){
-            object->Update();
+            object->Update(m_nowRef + m_model.m_offset);
         }
     }
 }
@@ -78,7 +78,7 @@ glass::FieldObjectModel* LogField2DModel::AddFieldObject(std::string_view name) 
     auto dataNode = m_model.GetEntryNode(fullName);
     if(dataNode == nullptr){ return nullptr;}
     it = m_objects.emplace(
-        it, std::make_unique<ObjectModel>(fullName, dataNode->m_entry, m_nowRef));
+        it, std::make_unique<ObjectModel>(fullName, dataNode->m_entry));
   }
   return it->get();
 
