@@ -102,21 +102,21 @@ class SlewRateLimiter {
    *
    * @return The most recently calculated filtered value.
    */
-  Unit_t previousValue() { return m_prevVal; }
+  Unit_t PreviousValue() { return m_prevVal; }
 
   /**
    * Provides the current positive rate limit.
    *
    * @return The current positive rate limit.
    */
-  Rate_t positiveRateLimit() { return m_positiveRateLimit; }
+  Rate_t PositiveRateLimit() { return m_positiveRateLimit; }
 
   /**
    * Provides the current negative rate limit.
    *
    * @return The current negative rate limit.
    */
-  Rate_t negativeRateLimit() { return m_negativeRateLimit; }
+  Rate_t NegativeRateLimit() { return m_negativeRateLimit; }
 
  private:
   Rate_t m_positiveRateLimit;
