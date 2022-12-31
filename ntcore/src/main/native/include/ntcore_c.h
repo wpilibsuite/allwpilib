@@ -1702,6 +1702,170 @@ struct NT_String* NT_GetValueStringArray(const struct NT_Value* value,
 /** @} */
 /** @} */
 
+/**
+ * @defgroup ntcore_c_meta_api ntcore C meta-topic API
+ *
+ * Meta-topic decoders for C.
+ *
+ * @{
+ */
+
+/**
+ * Subscriber options. Different from PubSubOptions in this reflects only
+ * options that are sent over the network.
+ */
+struct NT_Meta_SubscriberOptions {
+  double periodic;
+  NT_Bool topicsOnly;
+  NT_Bool sendAll;
+  NT_Bool prefixMatch;
+};
+
+/**
+ * Topic publisher (as published via `$pub$<topic>`).
+ */
+struct NT_Meta_TopicPublisher {
+  struct NT_String client;
+  uint64_t pubuid;
+};
+
+/**
+ * Topic subscriber (as published via `$sub$<topic>`).
+ */
+struct NT_Meta_TopicSubscriber {
+  struct NT_String client;
+  uint64_t subuid;
+  struct NT_Meta_SubscriberOptions options;
+};
+
+/**
+ * Client publisher (as published via `$clientpub$<client>` or `$serverpub`).
+ */
+struct NT_Meta_ClientPublisher {
+  int64_t uid;
+  struct NT_String topic;
+};
+
+/**
+ * Client subscriber (as published via `$clientsub$<client>` or `$serversub`).
+ */
+struct NT_Meta_ClientSubscriber {
+  int64_t uid;
+  size_t topicsCount;
+  struct NT_String* topics;
+  struct NT_Meta_SubscriberOptions options;
+};
+
+/**
+ * Client (as published via `$clients`).
+ */
+struct NT_Meta_Client {
+  struct NT_String id;
+  struct NT_String conn;
+  uint16_t version;
+};
+
+/**
+ * Decodes `$pub$<topic>` meta-topic data.
+ *
+ * @param data data contents
+ * @param size size of data contents
+ * @param count number of elements in returned array (output)
+ * @return Array of TopicPublishers, or NULL on decoding error.
+ */
+struct NT_Meta_TopicPublisher* NT_Meta_DecodeTopicPublishers(
+    const uint8_t* data, size_t size, size_t* count);
+
+/**
+ * Decodes `$sub$<topic>` meta-topic data.
+ *
+ * @param data data contents
+ * @param size size of data contents
+ * @param count number of elements in returned array (output)
+ * @return Array of TopicSubscribers, or NULL on decoding error.
+ */
+struct NT_Meta_TopicSubscriber* NT_Meta_DecodeTopicSubscribers(
+    const uint8_t* data, size_t size, size_t* count);
+
+/**
+ * Decodes `$clientpub$<topic>` meta-topic data.
+ *
+ * @param data data contents
+ * @param size size of data contents
+ * @param count number of elements in returned array (output)
+ * @return Array of ClientPublishers, or NULL on decoding error.
+ */
+struct NT_Meta_ClientPublisher* NT_Meta_DecodeClientPublishers(
+    const uint8_t* data, size_t size, size_t* count);
+
+/**
+ * Decodes `$clientsub$<topic>` meta-topic data.
+ *
+ * @param data data contents
+ * @param size size of data contents
+ * @param count number of elements in returned array (output)
+ * @return Array of ClientSubscribers, or NULL on decoding error.
+ */
+struct NT_Meta_ClientSubscriber* NT_Meta_DecodeClientSubscribers(
+    const uint8_t* data, size_t size, size_t* count);
+
+/**
+ * Decodes `$clients` meta-topic data.
+ *
+ * @param data data contents
+ * @param size size of data contents
+ * @param count number of elements in returned array (output)
+ * @return Array of Clients, or NULL on decoding error.
+ */
+struct NT_Meta_Client* NT_Meta_DecodeClients(const uint8_t* data, size_t size,
+                                             size_t* count);
+
+/**
+ * Frees an array of NT_Meta_TopicPublisher.
+ *
+ * @param arr   pointer to the array to free
+ * @param count size of the array to free
+ */
+void NT_Meta_FreeTopicPublishers(struct NT_Meta_TopicPublisher* arr,
+                                 size_t count);
+
+/**
+ * Frees an array of NT_Meta_TopicSubscriber.
+ *
+ * @param arr   pointer to the array to free
+ * @param count size of the array to free
+ */
+void NT_Meta_FreeTopicSubscribers(struct NT_Meta_TopicSubscriber* arr,
+                                  size_t count);
+
+/**
+ * Frees an array of NT_Meta_ClientPublisher.
+ *
+ * @param arr   pointer to the array to free
+ * @param count size of the array to free
+ */
+void NT_Meta_FreeClientPublishers(struct NT_Meta_ClientPublisher* arr,
+                                  size_t count);
+
+/**
+ * Frees an array of NT_Meta_ClientSubscriber.
+ *
+ * @param arr   pointer to the array to free
+ * @param count size of the array to free
+ */
+void NT_Meta_FreeClientSubscribers(struct NT_Meta_ClientSubscriber* arr,
+                                   size_t count);
+
+/**
+ * Frees an array of NT_Meta_Client.
+ *
+ * @param arr   pointer to the array to free
+ * @param count size of the array to free
+ */
+void NT_Meta_FreeClients(struct NT_Meta_Client* arr, size_t count);
+
+/** @} */
+
 #ifdef __cplusplus
 }  // extern "C"
 #endif
