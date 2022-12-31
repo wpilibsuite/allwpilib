@@ -46,7 +46,6 @@ nativeUtils.platformConfigs.each {
 // the flags.
 nativeUtils.platformConfigs.named(nativeUtils.wpi.platforms.roborio).configure {
     cppCompiler.args.remove('-Wno-error=deprecated-declarations')
-    cppCompiler.args.add('-Werror=deprecated-declarations')
 }
 
 nativeUtils.platformConfigs.linuxathena.linker.args.add("-Wl,--fatal-warnings")
