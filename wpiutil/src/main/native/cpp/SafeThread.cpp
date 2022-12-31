@@ -18,18 +18,19 @@ static void DefaultOnThreadEnd(void*) {}
 
 using OnThreadStartFn = void* (*)();
 using OnThreadEndFn = void (*)(void*);
-static wpi::mutex gSafeThreadNotifierLock;
-static int gSafeThreadRefcount;
-static OnThreadStartFn gOnSafeThreadStart{DefaultOnThreadStart};
-static OnThreadEndFn gOnSafeThreadEnd{DefaultOnThreadEnd};
+static std::atomic<int> gSafeThreadRefcount;
+static std::atomic<OnThreadStartFn> gOnSafeThreadStart{DefaultOnThreadStart};
+static std::atomic<OnThreadEndFn> gOnSafeThreadEnd{DefaultOnThreadEnd};
 
 namespace wpi::impl {
 void SetSafeThreadNotifiers(OnThreadStartFn OnStart, OnThreadEndFn OnEnd) {
-  std::unique_lock lock(gSafeThreadNotifierLock);
   if (gSafeThreadRefcount != 0) {
     throw std::runtime_error(
         "cannot set notifier while safe threads are running");
   }
+  // Note: there's a race here, but if you're not calling this function on
+  // the main thread before you start anything else, you're using this function
+  // incorrectly
   gOnSafeThreadStart = OnStart ? OnStart : DefaultOnThreadStart;
   gOnSafeThreadEnd = OnEnd ? OnEnd : DefaultOnThreadEnd;
 }
@@ -73,21 +74,11 @@ void detail::SafeThreadOwnerBase::Start(std::shared_ptr<SafeThreadBase> thr) {
     return;
   }
   m_stdThread = std::thread([=] {
-    OnThreadStartFn onStart;
-    OnThreadEndFn onEnd;
-    {
-      std::unique_lock lock(gSafeThreadNotifierLock);
-      gSafeThreadRefcount++;
-      onStart = gOnSafeThreadStart;
-      onEnd = gOnSafeThreadEnd;
-    }
-    void* opaque = onStart();
+    gSafeThreadRefcount++;
+    void* opaque = (gOnSafeThreadStart.load())();
     thr->Main();
-    onEnd(opaque);
-    {
-      std::unique_lock lock(gSafeThreadNotifierLock);
-      gSafeThreadRefcount--;
-    }
+    (gOnSafeThreadEnd.load())(opaque);
+    gSafeThreadRefcount--;
   });
   thr->m_threadId = m_stdThread.get_id();
   m_thread = thr;
