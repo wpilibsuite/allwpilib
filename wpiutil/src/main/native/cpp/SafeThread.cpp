@@ -24,7 +24,7 @@ static OnThreadStartFn gOnSafeThreadStart{DefaultOnThreadStart};
 static OnThreadEndFn gOnSafeThreadEnd{DefaultOnThreadEnd};
 
 namespace wpi::impl {
-void SetSafeThreadNotifers(OnThreadStartFn OnStart, OnThreadEndFn OnEnd) {
+void SetSafeThreadNotifiers(OnThreadStartFn OnStart, OnThreadEndFn OnEnd) {
   std::unique_lock lock(gSafeThreadNotifierLock);
   if (gSafeThreadRefcount != 0) {
     throw std::runtime_error(
