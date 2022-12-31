@@ -10,7 +10,7 @@ using namespace sapphire;
 void TextLog::DragDropAccept(){
     if(const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("EntryData")){
         auto source = *static_cast<EntryData**>(payload->Data);
-        EntryDataObject obj{*source};
+        EntryDataObject obj{*source, m_nowRef + *source->offset};
         data.push_back(obj);
         ReconstructLog();
     }
@@ -25,6 +25,7 @@ void TextLog::DragDropTarget(){
 
 void TextLog::ReconstructLog(){
     std::map<int, std::string> split_log;
+    text = "";
     for(auto& entry : data){
         std::map<int, std::string> filtered;
         for(auto it = entry.m_data.m_datapoints.begin(); it != entry.m_data.m_datapoints.end(); it++){
@@ -50,6 +51,14 @@ void TextLog::Display() {
     DragDropTarget();
     ImGui::Text("Beginning of Text Log:");
     ImGui::TextUnformatted(text.c_str());
-    
+
+    for(auto& entry : data){
+        if(entry.m_lastTime != m_nowRef + *entry.m_data.offset){
+            ReconstructLog();
+            entry.m_lastTime = m_nowRef + *entry.m_data.offset;
+            break;
+        }
+    }
+
     ImGui::PopID();
 }

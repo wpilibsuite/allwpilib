@@ -15,15 +15,17 @@ public:
                                                   m_nowRef{timestamp}  {};
     void Display() override;
     struct EntryDataObject {
-        EntryDataObject(EntryData& data) : m_data{data},
+        EntryDataObject(EntryData& data, float startingTime) : m_data{data},
                                           isShowing{true},
                                           _color{1.0, 1.0, 1.0, 1.0},
-                                          m_color{_color} {};
+                                          m_color{_color},
+                                          m_lastTime{startingTime} {};
         void EmitContextMenu();
         EntryData& m_data;
         bool isShowing;
         std::vector<float> _color;
         glass::ColorSetting m_color;
+        double m_lastTime;
     };
     std::string m_name;
     std::vector<EntryDataObject> data;
