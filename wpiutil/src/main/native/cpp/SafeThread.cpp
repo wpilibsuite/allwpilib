@@ -27,7 +27,8 @@ namespace wpi::impl {
 void SetSafeThreadNotifers(OnThreadStartFn OnStart, OnThreadEndFn OnEnd) {
   std::unique_lock lock(gSafeThreadNotifierLock);
   if (gSafeThreadRefcount != 0) {
-    throw std::runtime_error("cannot set notifier while safe threads are running");
+    throw std::runtime_error(
+        "cannot set notifier while safe threads are running");
   }
   gOnSafeThreadStart = OnStart ? OnStart : DefaultOnThreadStart;
   gOnSafeThreadEnd = OnEnd ? OnEnd : DefaultOnThreadEnd;
