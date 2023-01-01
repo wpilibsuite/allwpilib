@@ -13,9 +13,10 @@ import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.examples.rapidreactcommandbot.Constants.ShooterConstants;
 import edu.wpi.first.wpilibj.motorcontrol.PWMSparkMax;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
-public class Shooter extends SubsystemBase {
+public class Shooter extends SubsystemBase implements AutoCloseable {
   private final PWMSparkMax m_shooterMotor = new PWMSparkMax(ShooterConstants.kShooterMotorPort);
   private final PWMSparkMax m_feederMotor = new PWMSparkMax(ShooterConstants.kFeederMotorPort);
   private final Encoder m_shooterEncoder =
@@ -61,7 +62,21 @@ public class Shooter extends SubsystemBase {
                             + m_shooterFeedback.calculate(
                                 m_shooterEncoder.getRate(), setpointRotationsPerSecond))),
             // Wait until the shooter has reached the setpoint, and then run the feeder
-            waitUntil(m_shooterFeedback::atSetpoint).andThen(() -> m_feederMotor.set(1)))
+            waitUntil(m_shooterFeedback::atSetpoint)
+                .andThen(() -> m_feederMotor.set(ShooterConstants.kFeederSpeed)))
         .withName("Shoot");
+  }
+
+  @Override
+  public void close() {
+    m_feederMotor.close();
+    m_shooterEncoder.close();
+    m_shooterFeedback.close();
+    m_shooterMotor.close();
+    CommandScheduler.getInstance().unregisterSubsystem(this);
+  }
+
+  public double getShooterVelocity() {
+    return m_shooterEncoder.getRate();
   }
 }

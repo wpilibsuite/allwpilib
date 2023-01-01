@@ -88,5 +88,5 @@ constexpr int kDriverControllerPort = 0;
 namespace AutoConstants {
 constexpr units::second_t kTimeout = 3.0_s;
 constexpr units::meter_t kDriveDistance = 2.0_m;
-constexpr double kDriveSpeed = 0.5;
+constexpr double kDriveSpeed = 0.3;
 }  // namespace AutoConstants

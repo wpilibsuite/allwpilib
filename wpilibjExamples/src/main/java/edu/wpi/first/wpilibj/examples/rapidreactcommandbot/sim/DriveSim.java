@@ -9,6 +9,7 @@ import edu.wpi.first.wpilibj.simulation.DifferentialDrivetrainSim.KitbotGearing;
 import edu.wpi.first.wpilibj.simulation.EncoderSim;
 import edu.wpi.first.wpilibj.simulation.PWMSim;
 
+/** Simulation controller for the drivetrain. */
 public class DriveSim {
   private final PWMSim m_leftLeader = new PWMSim(DriveConstants.kLeftMotor1Port);
   private final PWMSim m_leftFollower = new PWMSim(DriveConstants.kLeftMotor2Port);
@@ -30,6 +31,7 @@ public class DriveSim {
           KitbotGearing.k10p71.value,
           null);
 
+  /** Call this to advance the simulation by 20 ms. */
   public void simulationPeriodic() {
     double battery = RobotController.getBatteryVoltage();
     m_drive.setInputs(battery * m_leftLeader.getSpeed(), battery * m_rightLeader.getSpeed());
