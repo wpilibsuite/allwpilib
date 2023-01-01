@@ -10,6 +10,7 @@ foreach(example ${EXAMPLES})
   file(GLOB_RECURSE sources src/main/cpp/examples/${example}/cpp/*.cpp
                             src/main/cpp/examples/${example}/c/*.c)
   add_executable(${example} ${sources})
+  wpilib_target_warnings(${example})
   target_include_directories(${example} PUBLIC src/main/cpp/examples/${example}/include)
   target_link_libraries(${example} wpilibc wpilibNewCommands)
 
@@ -28,6 +29,7 @@ foreach(template ${TEMPLATES})
   file(GLOB_RECURSE sources src/main/cpp/templates/${template}/cpp/*.cpp
                             src/main/cpp/templates/${template}/c/*.c)
   add_executable(${template} ${sources})
+  wpilib_target_warnings(${template})
   target_include_directories(${template} PUBLIC src/main/cpp/templates/${template}/include)
   target_link_libraries(${template} wpilibc wpilibNewCommands)
 endforeach()
