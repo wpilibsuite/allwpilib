@@ -6,13 +6,13 @@
 
 #include <numbers>
 
-#include <units/angle.h>
-#include <units/angular_velocity.h>
-#include <units/angular_acceleration.h>
-#include <units/length.h>
-#include <units/velocity.h>
 #include <units/acceleration.h>
+#include <units/angle.h>
+#include <units/angular_acceleration.h>
+#include <units/angular_velocity.h>
+#include <units/length.h>
 #include <units/time.h>
+#include <units/velocity.h>
 #include <units/voltage.h>
 
 namespace DriveConstants {
@@ -88,5 +88,5 @@ inline constexpr int kDriverControllerPort = 0;
 namespace AutoConstants {
 constexpr units::second_t kTimeout = 3.0_s;
 constexpr units::meter_t kDriveDistance = 2.0_m;
-constexpr double kDriveSpeed = 0.5;
+constexpr double kDriveSpeed = 0.3;
 }  // namespace AutoConstants

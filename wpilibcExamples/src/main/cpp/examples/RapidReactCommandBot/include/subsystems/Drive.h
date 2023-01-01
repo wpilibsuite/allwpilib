@@ -38,6 +38,16 @@ class Drive : public frc2::SubsystemBase {
   [[nodiscard]]
   frc2::CommandPtr DriveDistanceCommand(units::meter_t distance, double speed);
 
+  /**
+   * Get the distance measured by the left encoder.
+   */
+  units::meter_t GetLeftEncoder();
+
+  /**
+   * Get the distance measured by the right encoder.
+   */
+  units::meter_t GetRightEncoder();
+
  private:
   frc::PWMSparkMax m_leftLeader{DriveConstants::kLeftMotor1Port};
   frc::PWMSparkMax m_leftFollower{DriveConstants::kLeftMotor2Port};

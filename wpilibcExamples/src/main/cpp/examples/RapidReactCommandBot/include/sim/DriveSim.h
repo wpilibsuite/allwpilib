@@ -4,17 +4,24 @@
 
 #pragma once
 
-#include "Constants.h"
-
 #include <frc/RobotController.h>
+#include <frc/simulation/DifferentialDrivetrainSim.h>
 #include <frc/simulation/EncoderSim.h>
 #include <frc/simulation/PWMSim.h>
-#include <frc/simulation/DifferentialDrivetrainSim.h>
 #include <frc/system/plant/LinearSystemId.h>
 
+#include "Constants.h"
+
+/**
+ * Simulation controller for the drivetrain.
+ */
 class DriveSim {
  public:
   DriveSim();
+
+  /**
+   * Call this to advance the simulation by 20 ms.
+   */
   void SimulationPeriodic();
 
  private:

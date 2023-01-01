@@ -5,22 +5,21 @@
 #include "sim/DriveSim.h"
 
 DriveSim::DriveSim()
-  :
-  m_leftEncoder{frc::sim::EncoderSim::CreateForChannel(DriveConstants::kLeftEncoderPorts[0])},
-  m_rightEncoder{frc::sim::EncoderSim::CreateForChannel(DriveConstants::kRightEncoderPorts[0])},
-  m_drive{
-    frc::LinearSystemId::IdentifyDrivetrainSystem(
-      DriveConstants::kv, DriveConstants::ka,
-      DriveConstants::kvAngular, DriveConstants::kaAngular),
-    DriveConstants::kTrackwidth,
-    frc::DCMotor::NEO(2),
-    frc::sim::DifferentialDrivetrainSim::KitbotGearing::k10p71,
-    DriveConstants::kWheelDiameter / 2.0}
-{}
+    : m_leftEncoder{frc::sim::EncoderSim::CreateForChannel(
+          DriveConstants::kLeftEncoderPorts[0])},
+      m_rightEncoder{frc::sim::EncoderSim::CreateForChannel(
+          DriveConstants::kRightEncoderPorts[0])},
+      m_drive{frc::LinearSystemId::IdentifyDrivetrainSystem(
+                  DriveConstants::kv, DriveConstants::ka,
+                  DriveConstants::kvAngular, DriveConstants::kaAngular),
+              DriveConstants::kTrackwidth, frc::DCMotor::NEO(2),
+              frc::sim::DifferentialDrivetrainSim::KitbotGearing::k10p71,
+              DriveConstants::kWheelDiameter / 2.0} {}
 
 void DriveSim::SimulationPeriodic() {
   auto battery = frc::RobotController::GetBatteryVoltage();
-  m_drive.SetInputs(battery * m_leftLeader.GetSpeed(), battery * m_rightLeader.GetSpeed());
+  m_drive.SetInputs(battery * m_leftLeader.GetSpeed(),
+                    battery * m_rightLeader.GetSpeed());
 
   m_drive.Update(20_ms);
 

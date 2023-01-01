@@ -90,7 +90,7 @@ public final class Constants {
   public static final class AutoConstants {
     public static final double kTimeoutSeconds = 3;
     public static final double kDriveDistanceMeters = 2;
-    public static final double kDriveSpeed = 0.5;
+    public static final double kDriveSpeed = 0.4;
   }
 
   public static final class OIConstants {

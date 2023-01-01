@@ -1,3 +1,7 @@
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
+
 package edu.wpi.first.wpilibj.examples.rapidreactcommandbot.sim;
 
 import edu.wpi.first.math.system.plant.DCMotor;
@@ -9,11 +13,10 @@ import edu.wpi.first.wpilibj.simulation.DifferentialDrivetrainSim.KitbotGearing;
 import edu.wpi.first.wpilibj.simulation.EncoderSim;
 import edu.wpi.first.wpilibj.simulation.PWMSim;
 
+/** Simulation controller for the drivetrain. */
 public class DriveSim {
   private final PWMSim m_leftLeader = new PWMSim(DriveConstants.kLeftMotor1Port);
-  private final PWMSim m_leftFollower = new PWMSim(DriveConstants.kLeftMotor2Port);
   private final PWMSim m_rightLeader = new PWMSim(DriveConstants.kRightMotor1Port);
-  private final PWMSim m_rightFollower = new PWMSim(DriveConstants.kRightMotor2Port);
 
   private final EncoderSim m_leftEncoder =
       EncoderSim.createForChannel(DriveConstants.kLeftEncoderPorts[0]);
@@ -30,6 +33,7 @@ public class DriveSim {
           KitbotGearing.k10p71.value,
           null);
 
+  /** Call this to advance the simulation by 20 ms. */
   public void simulationPeriodic() {
     double battery = RobotController.getBatteryVoltage();
     m_drive.setInputs(battery * m_leftLeader.getSpeed(), battery * m_rightLeader.getSpeed());
