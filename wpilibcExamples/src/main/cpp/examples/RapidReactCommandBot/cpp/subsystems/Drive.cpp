@@ -37,8 +37,7 @@ frc2::CommandPtr Drive::DriveDistanceCommand(units::meter_t distance,
       // Drive forward at specified speed
       .AndThen(Run([this, speed] { m_drive.ArcadeDrive(speed, 0.0); }))
       .Until([this, distance] {
-        return units::math::max(GetLeftEncoder(),
-                                GetRightEncoder()) >=
+        return units::math::max(GetLeftEncoder(), GetRightEncoder()) >=
                distance;
       })
       // Stop the drive when the command ends

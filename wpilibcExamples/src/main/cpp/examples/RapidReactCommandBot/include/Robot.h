@@ -9,9 +9,9 @@
 #include <frc/TimedRobot.h>
 #include <frc2/command/CommandPtr.h>
 
-#include "sim/DriveSim.h"
-#include "sim/ShooterSim.h"  
 #include "RapidReactCommandBot.h"
+#include "sim/DriveSim.h"
+#include "sim/ShooterSim.h"
 
 class Robot : public frc::TimedRobot {
  public:
