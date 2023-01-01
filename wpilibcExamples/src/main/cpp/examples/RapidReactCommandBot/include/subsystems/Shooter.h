@@ -22,6 +22,11 @@ class Shooter : public frc2::SubsystemBase {
   Shooter();
 
   /**
+   * Returns the current velocity of the flywheel.
+   */
+  units::turns_per_second_t GetShooterVelocity();
+
+  /**
    * Returns a command to shoot the balls currently stored in the robot. Spins
    * the shooter flywheel up to the specified setpoint, and then runs the feeder
    * motor.

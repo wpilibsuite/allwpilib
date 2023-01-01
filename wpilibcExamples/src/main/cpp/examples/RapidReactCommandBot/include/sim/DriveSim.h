@@ -12,9 +12,16 @@
 #include <frc/simulation/DifferentialDrivetrainSim.h>
 #include <frc/system/plant/LinearSystemId.h>
 
+/**
+ * Simulation controller for the drivetrain.
+ */
 class DriveSim {
  public:
   DriveSim();
+
+  /**
+   * Call this to advance the simulation by 20 ms.
+   */
   void SimulationPeriodic();
 
  private:

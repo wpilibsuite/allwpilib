@@ -12,13 +12,31 @@
 #include <frc/simulation/FlywheelSim.h>
 #include <frc/system/plant/LinearSystemId.h>
 
+/**
+ * Simulation controller for the shooter subsystem.
+ */
 class ShooterSim {
  public:
   ShooterSim();
+
+  /**
+   * Call this to advance the simulation by 20 ms.
+   */
   void SimulationPeriodic();
+
+  /**
+   * Returns the duty cycle applied to the shooter motor.
+   */
+  double GetShooterMotor();
+
+  /**
+   * Returns the duty cycle applied to the feeder motor.
+   */
+  double GetFeederMotor();
 
  private:
   frc::sim::PWMSim m_shooterMotor;
+  frc::sim::PWMSim m_feederMotor;
   frc::sim::EncoderSim m_encoder;
   frc::sim::FlywheelSim m_flywheel;
 };
