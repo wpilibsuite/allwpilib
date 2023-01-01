@@ -7,8 +7,8 @@
 #include <frc/simulation/DriverStationSim.h>
 #include <frc2/command/CommandScheduler.h>
 
-#include "subsystems/Shooter.h"
 #include "sim/ShooterSim.h"
+#include "subsystems/Shooter.h"
 
 class ShooterTest : public testing::Test {
  public:
@@ -16,9 +16,10 @@ class ShooterTest : public testing::Test {
     frc2::CommandScheduler::GetInstance().CancelAll();
     frc2::CommandScheduler::GetInstance().ClearButtons();
   }
+
  protected:
   Shooter shooter;  // real subsystem
-  ShooterSim sim;  // simulation controller
+  ShooterSim sim;   // simulation controller
 };
 
 TEST_F(ShooterTest, IdleCommand) {
@@ -40,10 +41,11 @@ TEST_F(ShooterTest, IdleCommand) {
 }
 
 TEST_F(ShooterTest, ShootCommand) {
-  frc2::CommandPtr commandHolder = shooter.ShootCommand(ShooterConstants::kShooterTarget);
+  frc2::CommandPtr commandHolder =
+      shooter.ShootCommand(ShooterConstants::kShooterTarget);
   frc2::Command* command = commandHolder.get();
   EXPECT_STREQ("Shoot", command->GetName().c_str());
-  
+
   frc::sim::DriverStationSim::SetEnabled(true);
   frc::sim::DriverStationSim::NotifyNewData();
 
@@ -56,6 +58,8 @@ TEST_F(ShooterTest, ShootCommand) {
     sim.SimulationPeriodic();
     EXPECT_NE(0.0, sim.GetShooterMotor());
   }
-  EXPECT_NEAR(ShooterConstants::kShooterTarget.value(), shooter.GetShooterVelocity().value(), ShooterConstants::kShooterTolerance.value());
+  EXPECT_NEAR(ShooterConstants::kShooterTarget.value(),
+              shooter.GetShooterVelocity().value(),
+              ShooterConstants::kShooterTolerance.value());
   EXPECT_DOUBLE_EQ(ShooterConstants::kFeederSpeed, sim.GetFeederMotor());
 }

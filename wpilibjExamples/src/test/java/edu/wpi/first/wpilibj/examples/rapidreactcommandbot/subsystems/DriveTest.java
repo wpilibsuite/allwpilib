@@ -1,3 +1,7 @@
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
+
 package edu.wpi.first.wpilibj.examples.rapidreactcommandbot.subsystems;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -14,23 +18,23 @@ import org.junit.jupiter.api.Test;
 class DriveTest {
   @BeforeEach
   void setup() {
-    drive = new Drive();
-    sim = new DriveSim();
+    m_drive = new Drive();
+    m_sim = new DriveSim();
   }
 
   @AfterEach
   void tearDown() {
-    drive.close();
+    m_drive.close();
     CommandScheduler.getInstance().cancelAll();
   }
 
-  Drive drive; // real subsystem
-  DriveSim sim; // simulation controller
+  Drive m_drive; // real subsystem
+  DriveSim m_sim; // simulation controller
 
   @Test
   void driveDistanceTest() {
     Command command =
-        drive.driveDistanceCommand(AutoConstants.kDriveDistanceMeters, AutoConstants.kDriveSpeed);
+        m_drive.driveDistanceCommand(AutoConstants.kDriveDistanceMeters, AutoConstants.kDriveSpeed);
 
     DriverStationSim.setEnabled(true);
     DriverStationSim.notifyNewData();
@@ -39,9 +43,9 @@ class DriveTest {
 
     for (int i = 0; i < 150; i++) {
       CommandScheduler.getInstance().run();
-      sim.simulationPeriodic();
+      m_sim.simulationPeriodic();
     }
-    assertEquals(AutoConstants.kDriveDistanceMeters, drive.getLeftEncoder(), 0.3);
-    assertEquals(AutoConstants.kDriveDistanceMeters, drive.getRightEncoder(), 0.3);
+    assertEquals(AutoConstants.kDriveDistanceMeters, m_drive.getLeftEncoder(), 0.3);
+    assertEquals(AutoConstants.kDriveDistanceMeters, m_drive.getRightEncoder(), 0.3);
   }
 }

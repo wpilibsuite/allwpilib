@@ -4,8 +4,8 @@
 
 #include "subsystems/Shooter.h"
 
-#include <frc2/command/button/Trigger.h>
 #include <frc2/command/Commands.h>
+#include <frc2/command/button/Trigger.h>
 
 Shooter::Shooter() {
   m_shooterFeedback.SetTolerance(ShooterConstants::kShooterTolerance.value());
@@ -39,6 +39,8 @@ frc2::CommandPtr Shooter::ShootCommand(units::turns_per_second_t setpoint) {
              // run the feeder
              frc2::cmd::WaitUntil([this] {
                return m_shooterFeedback.AtSetpoint();
-             }).AndThen([this] { m_feederMotor.Set(ShooterConstants::kFeederSpeed); }))
+             }).AndThen([this] {
+               m_feederMotor.Set(ShooterConstants::kFeederSpeed);
+             }))
       .WithName("Shoot");
 }
