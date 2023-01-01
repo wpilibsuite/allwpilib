@@ -40,6 +40,7 @@ public class Robot extends TimedRobot {
     m_alertOutput.set(matchTime <= 30 && matchTime >= 25);
   }
 
+  /** Close all resources. */
   @Override
   public void close() {
     m_allianceOutput.close();
