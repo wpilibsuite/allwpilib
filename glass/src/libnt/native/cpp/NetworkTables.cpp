@@ -1601,11 +1601,11 @@ void NetworkTablesFlagsSettings::DisplayMenu() {
 }
 
 void NetworkTablesView::Display() {
+  m_flags.Update();
   DisplayNetworkTables(m_model, m_flags.GetFlags());
 }
 
 void NetworkTablesView::Settings() {
-  m_flags.Update();
   m_flags.DisplayMenu();
 }
 
