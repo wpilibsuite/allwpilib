@@ -115,11 +115,13 @@
   },
   {
     "name": "Ultrasonic",
-    "description": "Demonstrate maintaining a set distance using an ultrasonic sensor.",
+    "description": "Demonstrate using the Ultrasonic class with a ping-response ultrasonic sensor.",
     "tags": [
       "Sensors",
-      "Robot and Motor",
-      "Analog"
+      "Hardware",
+      "Ultrasonic",
+      "SmartDashboard",
+      "Shuffleboard"
     ],
     "foldername": "ultrasonic",
     "gradlebase": "java",
@@ -131,8 +133,9 @@
     "description": "Demonstrate maintaining a set distance using an ultrasonic sensor and PID Control.",
     "tags": [
       "Sensors",
-      "Robot and Motor",
-      "Analog"
+      "Ultrasonic",
+      "PID",
+      "Differential Drive"
     ],
     "foldername": "ultrasonicpid",
     "gradlebase": "java",
@@ -141,11 +144,13 @@
   },
   {
     "name": "Potentiometer PID",
-    "description": "An example to demonstrate the use of a potentiometer and PID control to reach elevator position setpoints.",
+    "description": "An example to demonstrate the use of a potentiometer and PID control to maintain elevator position setpoints.",
     "tags": [
       "Sensors",
       "Actuators",
       "Analog",
+      "Elevator",
+      "PID",
       "Joystick"
     ],
     "foldername": "potentiometerpid",

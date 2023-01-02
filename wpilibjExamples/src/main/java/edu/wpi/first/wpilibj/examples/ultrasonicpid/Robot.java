@@ -6,8 +6,8 @@ package edu.wpi.first.wpilibj.examples.ultrasonicpid;
 
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.filter.MedianFilter;
-import edu.wpi.first.wpilibj.AnalogInput;
 import edu.wpi.first.wpilibj.TimedRobot;
+import edu.wpi.first.wpilibj.Ultrasonic;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.motorcontrol.PWMSparkMax;
 
@@ -16,45 +16,58 @@ import edu.wpi.first.wpilibj.motorcontrol.PWMSparkMax;
  * reach and maintain a set distance from an object.
  */
 public class Robot extends TimedRobot {
-  // distance in inches the robot wants to stay from an object
-  private static final double kHoldDistance = 12.0;
-
-  // factor to convert sensor values to a distance in inches
-  private static final double kValueToInches = 0.125;
+  // distance the robot wants to stay from an object
+  // (one meter)
+  static final double kHoldDistanceMillimeters = 1.0e3;
 
   // proportional speed constant
-  private static final double kP = 7.0;
-
+  // negative because applying positive voltage will bring us closer to the target
+  private static final double kP = -0.001;
   // integral speed constant
-  private static final double kI = 0.018;
-
+  private static final double kI = 0.0;
   // derivative speed constant
-  private static final double kD = 1.5;
+  private static final double kD = 0.0;
 
-  private static final int kLeftMotorPort = 0;
-  private static final int kRightMotorPort = 1;
-  private static final int kUltrasonicPort = 0;
+  static final int kLeftMotorPort = 0;
+  static final int kRightMotorPort = 1;
 
-  // median filter to discard outliers; filters over 5 samples
+  static final int kUltrasonicPingPort = 0;
+  static final int kUltrasonicEchoPort = 1;
+
+  // Ultrasonic sensors tend to be quite noisy and susceptible to sudden outliers,
+  // so measurements are filtered with a 5-sample median filter
   private final MedianFilter m_filter = new MedianFilter(5);
 
-  private final AnalogInput m_ultrasonic = new AnalogInput(kUltrasonicPort);
-  private final DifferentialDrive m_robotDrive =
-      new DifferentialDrive(new PWMSparkMax(kLeftMotorPort), new PWMSparkMax(kRightMotorPort));
+  private final Ultrasonic m_ultrasonic = new Ultrasonic(kUltrasonicPingPort, kUltrasonicEchoPort);
+  private final PWMSparkMax m_leftMotor = new PWMSparkMax(kLeftMotorPort);
+  private final PWMSparkMax m_rightMotor = new PWMSparkMax(kRightMotorPort);
+  private final DifferentialDrive m_robotDrive = new DifferentialDrive(m_leftMotor, m_rightMotor);
   private final PIDController m_pidController = new PIDController(kP, kI, kD);
 
   @Override
   public void teleopInit() {
     // Set setpoint of the pid controller
-    m_pidController.setSetpoint(kHoldDistance * kValueToInches);
+    m_pidController.setSetpoint(kHoldDistanceMillimeters);
   }
 
   @Override
   public void teleopPeriodic() {
-    // returned value is filtered with a rolling median filter, since ultrasonics
-    // tend to be quite noisy and susceptible to sudden outliers
-    double pidOutput = m_pidController.calculate(m_filter.calculate(m_ultrasonic.getVoltage()));
+    double measurement = m_ultrasonic.getRangeMM();
+    double filteredMeasurement = m_filter.calculate(measurement);
+    System.out.println("filteredMeasurement = " + filteredMeasurement);
+    double pidOutput = m_pidController.calculate(filteredMeasurement);
+    System.out.println("pidOutput = " + pidOutput);
 
-    m_robotDrive.arcadeDrive(pidOutput, 0);
+    // disable input squaring -- PID output is linear
+    m_robotDrive.arcadeDrive(pidOutput, 0, false);
+  }
+
+  @Override
+  public void close() {
+    m_leftMotor.close();
+    m_rightMotor.close();
+    m_ultrasonic.close();
+    m_robotDrive.close();
+    super.close();
   }
 }
