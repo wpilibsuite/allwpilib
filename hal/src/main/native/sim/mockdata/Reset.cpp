@@ -2,6 +2,8 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
+#include <wpi/GlobalState.h>
+
 #include <hal/simulation/AccelerometerData.h>
 #include <hal/simulation/AddressableLEDData.h>
 #include <hal/simulation/AnalogGyroData.h>
@@ -107,3 +109,6 @@ extern "C" void HALSIM_ResetAllSimData(void) {
     HALSIM_ResetSPIData(i);
   }
 }
+
+static wpi::impl::RegisterGlobalStateResetHelper _(
+    wpi::impl::GSPriorityHalSimData, HALSIM_ResetAllSimData);

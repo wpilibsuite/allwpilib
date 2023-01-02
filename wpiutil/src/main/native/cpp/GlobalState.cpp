@@ -52,13 +52,13 @@ void ResetGlobalState() {
   GetGlobalState().Reset();
 }
 
-void RegisterGlobalStateReset(int priority, std::function<void()> fn) {
+void impl::RegisterGlobalStateReset(int priority, std::function<void()> fn) {
   GetGlobalState().Register(priority, std::move(fn));
 }
 
 #else  // !__FRC_ROBORIO__
 
 void ResetGlobalState() {}
-void RegisterGlobalStateReset(int priority, std::function<void()> fn) {}
+void impl::RegisterGlobalStateReset(int priority, std::function<void()> fn) {}
 
 #endif

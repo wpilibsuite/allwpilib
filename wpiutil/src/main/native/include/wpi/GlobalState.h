@@ -28,25 +28,21 @@ using ResetCallback = std::function<void()>;
 
 // networktables should be reset first, as resetting some of the later items
 // may setup networktables listeners and/or callbacks
-static constexpr int GSPriorityNT = 10;
-// SmartDashboard
-static constexpr int GSPrioritySD = 15;
-// LiveWindow
-static constexpr int GSPriorityLW = 20;
-// MotorSafety
-static constexpr int GSPriorityMS = 25;
-// SendableRegistry
-static constexpr int GSPrioritySR = 30;
-// Periodic callbacks
-static constexpr int GSPriorityHalCallbacks = 35;
-// HAL handles
-static constexpr int GSPriorityHalHandles = 40;
-// HAL simulation data
-static constexpr int GSPriorityHalSimData = 45;
+static constexpr int GSPriorityNT = 100;
+// various singletons
+static constexpr int GSPrioritySmartDashboard = 150;
+static constexpr int GSPriorityShuffleboard = 200;
+static constexpr int GSPriorityLiveWindow = 250;
+static constexpr int GSPriorityMotorSafety = 300;
+static constexpr int GSPrioritySendableRegistry = 350;
+// HAL related data
+static constexpr int GSPriorityHalCallbacks = 600;
+static constexpr int GSPriorityHalHandles = 650;
+static constexpr int GSPriorityHalSimData = 700;
 
 // vendors should be reset after all WPILib things. They are generally
 // not going to depend on each other
-static constexpr int GSPriorityVendor = 90;
+static constexpr int GSPriorityVendor = 900;
 
 /**
  * Registers a reset function. Intended to be used internally and by vendors.

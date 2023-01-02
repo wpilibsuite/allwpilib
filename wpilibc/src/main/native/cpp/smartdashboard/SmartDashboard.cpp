@@ -7,6 +7,7 @@
 #include <hal/FRCUsageReporting.h>
 #include <networktables/NetworkTable.h>
 #include <networktables/NetworkTableInstance.h>
+#include <wpi/GlobalState.h>
 #include <wpi/StringMap.h>
 #include <wpi/mutex.h>
 #include <wpi/sendable/SendableRegistry.h>
@@ -39,11 +40,9 @@ static Instance& GetInstance() {
 }
 
 #ifndef __FRC_ROBORIO__
-namespace frc::impl {
-void ResetSmartDashboardInstance() {
-  std::make_unique<Instance>().swap(GetInstanceHolder());
-}
-}  // namespace frc::impl
+static wpi::impl::RegisterGlobalStateResetHelper _(
+    wpi::impl::GSPrioritySmartDashboard,
+    []() { std::make_unique<Instance>().swap(GetInstanceHolder()); });
 #endif
 
 void SmartDashboard::init() {
