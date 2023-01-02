@@ -182,6 +182,8 @@ class PlotView : public View {
   PlotView(PlotProvider* provider, Storage& storage);
 
   void Display() override;
+  void Settings() override;
+  bool HasSettings() override;
 
   void MovePlot(PlotView* fromView, size_t fromIndex, size_t toIndex);
 
@@ -767,71 +769,6 @@ PlotView::PlotView(PlotProvider* provider, Storage& storage)
 }
 
 void PlotView::Display() {
-  if (ImGui::BeginPopupContextItem()) {
-    if (ImGui::Button("Add plot")) {
-      m_plotsStorage.emplace_back(std::make_unique<Storage>());
-      m_plots.emplace_back(std::make_unique<Plot>(*m_plotsStorage.back()));
-    }
-
-    for (size_t i = 0; i < m_plots.size(); ++i) {
-      auto& plot = m_plots[i];
-      ImGui::PushID(i);
-
-      char name[64];
-      if (!plot->GetName().empty()) {
-        std::snprintf(name, sizeof(name), "%s", plot->GetName().c_str());
-      } else {
-        std::snprintf(name, sizeof(name), "Plot %d", static_cast<int>(i));
-      }
-
-      char label[90];
-      std::snprintf(label, sizeof(label), "%s###header%d", name,
-                    static_cast<int>(i));
-
-      bool open = ImGui::CollapsingHeader(label);
-
-      // DND source and target for Plot
-      if (ImGui::BeginDragDropSource()) {
-        PlotSeriesRef ref = {this, i, 0};
-        ImGui::SetDragDropPayload("Plot", &ref, sizeof(ref));
-        ImGui::TextUnformatted(name);
-        ImGui::EndDragDropSource();
-      }
-      plot->DragDropTarget(*this, i, false);
-
-      if (open) {
-        if (ImGui::Button("Move Up")) {
-          if (i > 0) {
-            std::swap(m_plotsStorage[i - 1], m_plotsStorage[i]);
-            std::swap(m_plots[i - 1], plot);
-          }
-        }
-
-        ImGui::SameLine();
-        if (ImGui::Button("Move Down")) {
-          if (i < (m_plots.size() - 1)) {
-            std::swap(m_plotsStorage[i], m_plotsStorage[i + 1]);
-            std::swap(plot, m_plots[i + 1]);
-          }
-        }
-
-        ImGui::SameLine();
-        if (ImGui::Button("Delete")) {
-          m_plotsStorage.erase(m_plotsStorage.begin() + i);
-          m_plots.erase(m_plots.begin() + i);
-          ImGui::PopID();
-          continue;
-        }
-
-        plot->EmitSettings(i);
-      }
-
-      ImGui::PopID();
-    }
-
-    ImGui::EndPopup();
-  }
-
   if (m_plots.empty()) {
     if (ImGui::Button("Add plot")) {
       m_plotsStorage.emplace_back(std::make_unique<Storage>());
@@ -966,6 +903,73 @@ PlotProvider::PlotProvider(Storage& storage) : WindowManager{storage} {
     EraseWindows();
     m_storage.EraseChildren();
   });
+}
+
+void PlotView::Settings() {
+  if (ImGui::Button("Add plot")) {
+    m_plotsStorage.emplace_back(std::make_unique<Storage>());
+    m_plots.emplace_back(std::make_unique<Plot>(*m_plotsStorage.back()));
+  }
+
+  for (size_t i = 0; i < m_plots.size(); ++i) {
+    auto& plot = m_plots[i];
+    ImGui::PushID(i);
+
+    char name[64];
+    if (!plot->GetName().empty()) {
+      std::snprintf(name, sizeof(name), "%s", plot->GetName().c_str());
+    } else {
+      std::snprintf(name, sizeof(name), "Plot %d", static_cast<int>(i));
+    }
+
+    char label[90];
+    std::snprintf(label, sizeof(label), "%s###header%d", name,
+                  static_cast<int>(i));
+
+    bool open = ImGui::CollapsingHeader(label);
+
+    // DND source and target for Plot
+    if (ImGui::BeginDragDropSource()) {
+      PlotSeriesRef ref = {this, i, 0};
+      ImGui::SetDragDropPayload("Plot", &ref, sizeof(ref));
+      ImGui::TextUnformatted(name);
+      ImGui::EndDragDropSource();
+    }
+    plot->DragDropTarget(*this, i, false);
+
+    if (open) {
+      if (ImGui::Button("Move Up")) {
+        if (i > 0) {
+          std::swap(m_plotsStorage[i - 1], m_plotsStorage[i]);
+          std::swap(m_plots[i - 1], plot);
+        }
+      }
+
+      ImGui::SameLine();
+      if (ImGui::Button("Move Down")) {
+        if (i < (m_plots.size() - 1)) {
+          std::swap(m_plotsStorage[i], m_plotsStorage[i + 1]);
+          std::swap(plot, m_plots[i + 1]);
+        }
+      }
+
+      ImGui::SameLine();
+      if (ImGui::Button("Delete")) {
+        m_plotsStorage.erase(m_plotsStorage.begin() + i);
+        m_plots.erase(m_plots.begin() + i);
+        ImGui::PopID();
+        continue;
+      }
+
+      plot->EmitSettings(i);
+    }
+
+    ImGui::PopID();
+  }
+}
+
+bool PlotView::HasSettings() {
+  return true;
 }
 
 PlotProvider::~PlotProvider() = default;

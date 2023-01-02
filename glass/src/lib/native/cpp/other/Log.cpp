@@ -62,18 +62,21 @@ void glass::DisplayLog(LogData* data, bool autoScroll) {
 }
 
 void LogView::Display() {
-  if (ImGui::BeginPopupContextItem()) {
-    ImGui::Checkbox("Auto-scroll", &m_autoScroll);
-    if (ImGui::Selectable("Clear")) {
-      m_data->Clear();
-    }
-    const auto& buf = m_data->GetBuffer();
-    if (ImGui::Selectable("Copy to Clipboard", false,
-                          buf.empty() ? ImGuiSelectableFlags_Disabled : 0)) {
-      ImGui::SetClipboardText(buf.c_str());
-    }
-    ImGui::EndPopup();
-  }
-
   DisplayLog(m_data, m_autoScroll);
+}
+
+void LogView::Settings() {
+  ImGui::Checkbox("Auto-scroll", &m_autoScroll);
+  if (ImGui::Selectable("Clear")) {
+    m_data->Clear();
+  }
+  const auto& buf = m_data->GetBuffer();
+  if (ImGui::Selectable("Copy to Clipboard", false,
+                        buf.empty() ? ImGuiSelectableFlags_Disabled : 0)) {
+    ImGui::SetClipboardText(buf.c_str());
+  }
+}
+
+bool LogView::HasSettings() {
+  return true;
 }

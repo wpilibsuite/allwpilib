@@ -546,15 +546,24 @@ void glass::PopID() {
 bool glass::PopupEditName(const char* label, std::string* name) {
   bool rv = false;
   if (ImGui::BeginPopupContextItem(label)) {
-    ImGui::Text("Edit name:");
-    if (ImGui::InputText("##editname", name)) {
-      rv = true;
-    }
-    if (ImGui::Button("Close") || ImGui::IsKeyPressedMap(ImGuiKey_Enter) ||
-        ImGui::IsKeyPressedMap(ImGuiKey_KeyPadEnter)) {
-      ImGui::CloseCurrentPopup();
-    }
+    rv = ItemEditName(name);
+
     ImGui::EndPopup();
   }
+  return rv;
+}
+
+bool glass::ItemEditName(std::string* name) {
+  bool rv = false;
+
+  ImGui::Text("Edit name:");
+  if (ImGui::InputText("##editname", name)) {
+    rv = true;
+  }
+  if (ImGui::Button("Close") || ImGui::IsKeyPressedMap(ImGuiKey_Enter) ||
+      ImGui::IsKeyPressedMap(ImGuiKey_KeyPadEnter)) {
+    ImGui::CloseCurrentPopup();
+  }
+
   return rv;
 }

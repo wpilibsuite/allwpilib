@@ -1506,9 +1506,13 @@ void NetworkTablesFlagsSettings::DisplayMenu() {
 
 void NetworkTablesView::Display() {
   m_flags.Update();
-  if (ImGui::BeginPopupContextItem()) {
-    m_flags.DisplayMenu();
-    ImGui::EndPopup();
-  }
   DisplayNetworkTables(m_model, m_flags.GetFlags());
+}
+
+void NetworkTablesView::Settings() {
+  m_flags.DisplayMenu();
+}
+
+bool NetworkTablesView::HasSettings() {
+  return true;
 }
