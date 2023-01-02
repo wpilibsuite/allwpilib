@@ -7,9 +7,9 @@
 #include <cstdio>
 #include <vector>
 
+#include <wpi/GlobalState.h>
 #include <wpi/mutex.h>
 #include <wpi/spinlock.h>
-#include <wpi/GlobalState.h>
 
 #ifdef _WIN32
 #include <Windows.h>

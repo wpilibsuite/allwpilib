@@ -97,6 +97,4 @@ HAL_Handle createHandle(int16_t index, HAL_HandleEnum handleType,
 }  // namespace hal
 
 static wpi::impl::RegisterGlobalStateResetHelper _(
-    wpi::impl::GSPriorityHalHandles,
-    hal::HandleBase::ResetGlobalHandles
-);
+    wpi::impl::GSPriorityHalHandles, hal::HandleBase::ResetGlobalHandles);

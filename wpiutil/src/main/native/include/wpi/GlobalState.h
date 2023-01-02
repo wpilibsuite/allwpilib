@@ -6,6 +6,7 @@
 #define WPIUTIL_WPI_GLOBALSTATE_H_
 
 #include <functional>
+#include <utility>
 
 namespace wpi {
 
@@ -84,4 +85,4 @@ struct RegisterGlobalStateResetHelper {
 }  // namespace impl
 }  // namespace wpi
 
-#endif
+#endif  // WPIUTIL_WPI_GLOBALSTATE_H_

@@ -2,8 +2,6 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include <wpi/GlobalState.h>
-
 #include <hal/simulation/AccelerometerData.h>
 #include <hal/simulation/AddressableLEDData.h>
 #include <hal/simulation/AnalogGyroData.h>
@@ -26,6 +24,8 @@
 #include <hal/simulation/SPIAccelerometerData.h>
 #include <hal/simulation/SPIData.h>
 #include <hal/simulation/SimDeviceData.h>
+
+#include <wpi/GlobalState.h>
 
 #include "../PortsInternal.h"
 
