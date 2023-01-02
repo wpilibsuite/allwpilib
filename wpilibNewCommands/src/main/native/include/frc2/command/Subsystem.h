@@ -38,7 +38,7 @@ class CommandPtr;
  */
 class Subsystem {
  public:
-  ~Subsystem();
+  virtual ~Subsystem();
   /**
    * This method is called periodically by the CommandScheduler.  Useful for
    * updating subsystem-specific state that you don't want to offload to a
