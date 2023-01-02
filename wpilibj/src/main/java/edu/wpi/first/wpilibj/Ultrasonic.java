@@ -90,9 +90,6 @@ public class Ultrasonic implements Sendable, AutoCloseable {
       m_pingChannel.setSimDevice(m_simDevice);
       m_echoChannel.setSimDevice(m_simDevice);
     }
-    if (m_task == null) {
-      m_task = new UltrasonicChecker();
-    }
     final boolean originalMode = m_automaticEnabled;
     setAutomaticMode(false); // kill task when adding a new sensor
     m_sensors.add(this);
@@ -217,14 +214,18 @@ public class Ultrasonic implements Sendable, AutoCloseable {
       }
 
       // Start round robin task
+      m_task = new UltrasonicChecker();
       m_task.start();
     } else {
-      // Wait for background task to stop running
-      try {
-        m_task.join();
-      } catch (InterruptedException ex) {
-        Thread.currentThread().interrupt();
-        ex.printStackTrace();
+      if (m_task != null) {
+        // Wait for background task to stop running
+        try {
+          m_task.join();
+          m_task = null;
+        } catch (InterruptedException ex) {
+          Thread.currentThread().interrupt();
+          ex.printStackTrace();
+        }
       }
 
       /* Clear all the counters (data now invalid) since automatic mode is
