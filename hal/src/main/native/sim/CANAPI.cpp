@@ -93,6 +93,9 @@ HAL_CANHandle HAL_InitializeCAN(HAL_CANManufacturer manufacturer,
 
 void HAL_CleanCAN(HAL_CANHandle handle) {
   auto data = canHandles->Free(handle);
+  if (data == nullptr) {
+    return;
+  }
 
   std::scoped_lock lock(data->mapMutex);
 

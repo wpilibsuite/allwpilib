@@ -710,6 +710,9 @@ void HAL_StopDMA(HAL_DMAHandle handle, int32_t* status) {
 
 void* HAL_GetDMADirectPointer(HAL_DMAHandle handle) {
   auto dma = dmaHandles->Get(handle);
+  if (dma == nullptr) {
+    return nullptr;
+  }
   return dma.get();
 }
 
