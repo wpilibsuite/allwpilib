@@ -15,23 +15,23 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
  */
 public class Robot extends TimedRobot {
   // Creates a ping-response Ultrasonic object on DIO 1 and 2.
-  Ultrasonic m_ultrasonic = new Ultrasonic(1, 2);
+  Ultrasonic m_rangeFinder = new Ultrasonic(1, 2);
 
   @Override
   public void robotInit() {
     // Add the ultrasonic on the "Sensors" tab of the dashboard
     // Data will update automatically
-    Shuffleboard.getTab("Sensors").add(m_ultrasonic);
+    Shuffleboard.getTab("Sensors").add(m_rangeFinder);
   }
 
   @Override
   public void teleopPeriodic() {
     // We can read the distance in millimeters
-    double distanceMillimeters = m_ultrasonic.getRangeMM();
+    double distanceMillimeters = m_rangeFinder.getRangeMM();
     // ... or in inches
-    double distanceInches = m_ultrasonic.getRangeInches();
+    double distanceInches = m_rangeFinder.getRangeInches();
 
-    // Alternatively, publish the data itself periodically
+    // We can also publish the data itself periodically
     SmartDashboard.putNumber("Distance[mm]", distanceMillimeters);
     SmartDashboard.putNumber("Distance[inch]", distanceInches);
   }
@@ -41,18 +41,18 @@ public class Robot extends TimedRobot {
     // By default, the Ultrasonic class polls all ultrasonic sensors in a round-robin to prevent
     // them from interfering from one another.
     // However, manual polling is also possible -- note that this disables automatic mode!
-    m_ultrasonic.ping();
+    m_rangeFinder.ping();
   }
 
   @Override
   public void testPeriodic() {
-    if (m_ultrasonic.isRangeValid()) {
+    if (m_rangeFinder.isRangeValid()) {
       // Data is valid, publish it
-      SmartDashboard.putNumber("Distance[mm]", m_ultrasonic.getRangeMM());
-      SmartDashboard.putNumber("Distance[inch]", m_ultrasonic.getRangeInches());
+      SmartDashboard.putNumber("Distance[mm]", m_rangeFinder.getRangeMM());
+      SmartDashboard.putNumber("Distance[inch]", m_rangeFinder.getRangeInches());
 
       // Ping for next measurement
-      m_ultrasonic.ping();
+      m_rangeFinder.ping();
     }
   }
 

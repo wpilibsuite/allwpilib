@@ -54,9 +54,7 @@ public class Robot extends TimedRobot {
   public void teleopPeriodic() {
     double measurement = m_ultrasonic.getRangeMM();
     double filteredMeasurement = m_filter.calculate(measurement);
-    System.out.println("filteredMeasurement = " + filteredMeasurement);
     double pidOutput = m_pidController.calculate(filteredMeasurement);
-    System.out.println("pidOutput = " + pidOutput);
 
     // disable input squaring -- PID output is linear
     m_robotDrive.arcadeDrive(pidOutput, 0, false);

@@ -84,8 +84,6 @@ class UltrasonicPIDTest {
 
               m_ultrasonicSim.setRangeMeters(range);
               m_distanceMM = range * 1.0e3;
-
-              System.out.println(m_distanceMM);
             });
 
     m_thread.start();

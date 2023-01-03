@@ -40,7 +40,7 @@ public class Robot extends TimedRobot {
   private final MotorController m_elevatorMotor = new PWMSparkMax(kMotorChannel);
   private final Joystick m_joystick = new Joystick(kJoystickChannel);
 
-  int m_index;
+  private int m_index;
 
   @Override
   public void teleopInit() {
