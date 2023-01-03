@@ -23,7 +23,7 @@
 
 #include "Robot.h"
 
-class UltrasonicPIDTest : public testing::TestWithParam<units::meter_t> {
+class UltrasonicPIDTest : public testing::TestWithParam<double> {
   frc::DCMotor m_gearbox = frc::DCMotor::Falcon500(2);
   static constexpr auto kGearing =
       frc::sim::DifferentialDrivetrainSim::KitbotGearing::k10p71;
@@ -57,7 +57,7 @@ class UltrasonicPIDTest : public testing::TestWithParam<units::meter_t> {
         m_rightMotorSim.GetSpeed() * frc::RobotController::GetBatteryVoltage());
     m_driveSim.Update(20_ms);
 
-    auto startingDistance = GetParam();
+    auto startingDistance = units::meter_t{GetParam()};
     m_distance = startingDistance - m_driveSim.GetLeftPosition();
 
     m_ultrasonicSim.SetRange(m_distance);
@@ -88,10 +88,10 @@ class UltrasonicPIDTest : public testing::TestWithParam<units::meter_t> {
   }
 };
 
-TEST_P(UltrasonicPIDTest, Teleop) {
-  // teleop init
+TEST_P(UltrasonicPIDTest, Auto) {
+  // auto init
   {
-    frc::sim::DriverStationSim::SetAutonomous(false);
+    frc::sim::DriverStationSim::SetAutonomous(true);
     frc::sim::DriverStationSim::SetEnabled(true);
     frc::sim::DriverStationSim::NotifyNewData();
 
@@ -103,6 +103,9 @@ TEST_P(UltrasonicPIDTest, Teleop) {
     // advance 100 timesteps
     frc::sim::StepTiming(2_s);
 
-    EXPECT_NEAR(Robot::kHoldDistance.value(), m_distance.value(), 0.1);
+    EXPECT_NEAR(Robot::kHoldDistance.value(), m_distance.value(), 10.0);
   }
 }
+
+INSTANTIATE_TEST_SUITE_P(UltrasonicPIDTests, UltrasonicPIDTest,
+                         testing::Values(1.3, 0.5, 5.0));

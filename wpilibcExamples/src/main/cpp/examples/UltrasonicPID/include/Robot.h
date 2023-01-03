@@ -18,8 +18,8 @@
  */
 class Robot : public frc::TimedRobot {
  public:
-  void TeleopInit() override;
-  void TeleopPeriodic() override;
+  void AutonomousInit() override;
+  void AutonomousPeriodic() override;
 
   // distance the robot wants to stay from an object
   static constexpr units::millimeter_t kHoldDistance = 1_m;

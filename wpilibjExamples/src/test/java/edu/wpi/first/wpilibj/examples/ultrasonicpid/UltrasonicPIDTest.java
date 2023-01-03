@@ -108,16 +108,16 @@ class UltrasonicPIDTest {
 
   @ValueSource(doubles = {1.3, 0.5, 5.0})
   @ParameterizedTest
-  void teleopTest(double distance) {
+  void autoTest(double distance) {
     // set up distance
     {
       m_startToObject = distance;
     }
     startThread();
 
-    // teleop init
+    // auto init
     {
-      DriverStationSim.setAutonomous(false);
+      DriverStationSim.setAutonomous(true);
       DriverStationSim.setEnabled(true);
       DriverStationSim.notifyNewData();
 

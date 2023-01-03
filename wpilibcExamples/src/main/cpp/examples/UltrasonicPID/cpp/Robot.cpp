@@ -4,12 +4,12 @@
 
 #include "Robot.h"
 
-void Robot::TeleopInit() {
+void Robot::AutonomousInit() {
   // Set setpoint of the pid controller
   m_pidController.SetSetpoint(kHoldDistance.value());
 }
 
-void Robot::TeleopPeriodic() {
+void Robot::AutonomousPeriodic() {
   units::millimeter_t measurement = m_ultrasonic.GetRange();
   units::millimeter_t filteredMeasurement = m_filter.Calculate(measurement);
   double pidOutput = m_pidController.Calculate(filteredMeasurement.value());

@@ -45,13 +45,13 @@ public class Robot extends TimedRobot {
   private final PIDController m_pidController = new PIDController(kP, kI, kD);
 
   @Override
-  public void teleopInit() {
+  public void autonomousInit() {
     // Set setpoint of the pid controller
     m_pidController.setSetpoint(kHoldDistanceMillimeters);
   }
 
   @Override
-  public void teleopPeriodic() {
+  public void autonomousPeriodic() {
     double measurement = m_ultrasonic.getRangeMM();
     double filteredMeasurement = m_filter.calculate(measurement);
     double pidOutput = m_pidController.calculate(filteredMeasurement);
