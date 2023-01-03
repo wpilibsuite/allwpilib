@@ -8,6 +8,7 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.interpolation.Interpolatable;
 import java.util.Collections;
 import java.util.Comparator;
@@ -242,7 +243,8 @@ public class Pose2d implements Interpolatable<Pose2d> {
   }
 
   /**
-   * Returns the nearest Pose2d from a list of poses.
+   * Returns the nearest Pose2d from a list of poses. If two or more poses in the list have the same
+   * distance from this pose, return the one with the closest rotation component.
    *
    * @param poses The list of poses to find the nearest.
    * @return The nearest Pose2d from the list.
@@ -250,7 +252,17 @@ public class Pose2d implements Interpolatable<Pose2d> {
   public Pose2d nearest(List<Pose2d> poses) {
     return Collections.min(
         poses,
-        Comparator.comparing(other -> this.getTranslation().getDistance(other.getTranslation())));
+        Comparator.comparing(
+                (Pose2d other) -> {
+                  System.out.println(this.getTranslation().getDistance(other.getTranslation()));
+                  return this.getTranslation().getDistance(other.getTranslation());
+                })
+            .thenComparing(
+                (Pose2d other) -> {
+                  return Math.abs(
+                      MathUtil.angleModulus(
+                          this.getRotation().minus(other.getRotation()).getRadians()));
+                }));
   }
 
   @Override

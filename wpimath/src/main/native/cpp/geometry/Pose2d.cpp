@@ -8,6 +8,8 @@
 
 #include <wpi/json.h>
 
+#include "frc/MathUtil.h"
+
 using namespace frc;
 
 Transform2d Pose2d::operator-(const Pose2d& other) const {
@@ -70,8 +72,19 @@ Twist2d Pose2d::Log(const Pose2d& end) const {
 Pose2d Pose2d::Nearest(std::vector<Pose2d> poses) const {
   return *std::min_element(
       poses.begin(), poses.end(), [this](const Pose2d& a, const Pose2d& b) {
-        return this->Translation().Distance(a.Translation()) <
-               this->Translation().Distance(b.Translation());
+        auto aDistance = this->Translation().Distance(a.Translation());
+        auto bDistance = this->Translation().Distance(b.Translation());
+
+        // If the distances are equal sort by difference in rotation
+        if (aDistance == bDistance) {
+          return std::abs(
+                     AngleModulus((this->Rotation() - a.Rotation()).Radians())
+                         .value()) <
+                 std::abs(
+                     AngleModulus((this->Rotation() - b.Rotation()).Radians())
+                         .value());
+        }
+        return aDistance < bDistance;
       });
 }
 

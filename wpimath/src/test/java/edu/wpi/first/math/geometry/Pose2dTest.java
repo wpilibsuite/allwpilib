@@ -71,25 +71,50 @@ class Pose2dTest {
   void testNearest() {
     var origin = new Pose2d();
 
+    // Distance sort
     // each poseX is X units away from the origin at a random angle.
-    var pose1 =
+    final var pose1 =
         new Pose2d(
             new Translation2d(1, Rotation2d.fromDegrees(Math.random() * 360)), new Rotation2d());
-    var pose2 =
+    final var pose2 =
         new Pose2d(
             new Translation2d(2, Rotation2d.fromDegrees(Math.random() * 360)), new Rotation2d());
-    var pose3 =
+    final var pose3 =
         new Pose2d(
             new Translation2d(3, Rotation2d.fromDegrees(Math.random() * 360)), new Rotation2d());
-    var pose4 =
+    final var pose4 =
         new Pose2d(
             new Translation2d(4, Rotation2d.fromDegrees(Math.random() * 360)), new Rotation2d());
-    var pose5 =
+    final var pose5 =
         new Pose2d(
             new Translation2d(5, Rotation2d.fromDegrees(Math.random() * 360)), new Rotation2d());
 
-    assertEquals(origin.nearest(List.of(pose5, pose3, pose4)), pose3);
-    assertEquals(origin.nearest(List.of(pose1, pose2, pose3)), pose1);
-    assertEquals(origin.nearest(List.of(pose4, pose2, pose3)), pose2);
+    assertEquals(pose3, origin.nearest(List.of(pose5, pose3, pose4)));
+    assertEquals(pose1, origin.nearest(List.of(pose1, pose2, pose3)));
+    assertEquals(pose2, origin.nearest(List.of(pose4, pose2, pose3)));
+
+    // Rotation component sort (when distance is the same)
+    // Use the same translation because using different angles at the same distance can cause
+    // rounding error.
+    final var translation = new Translation2d(1, new Rotation2d());
+
+    final var poseA = new Pose2d(translation, Rotation2d.fromDegrees(0));
+    final var poseB = new Pose2d(translation, Rotation2d.fromDegrees(30));
+    final var poseC = new Pose2d(translation, Rotation2d.fromDegrees(120));
+    final var poseD = new Pose2d(translation, Rotation2d.fromDegrees(90));
+    final var poseE = new Pose2d(translation, Rotation2d.fromDegrees(-180));
+
+    assertEquals(
+        poseA, new Pose2d(0, 0, Rotation2d.fromDegrees(360)).nearest(List.of(poseA, poseB, poseD)));
+    assertEquals(
+        poseB,
+        new Pose2d(0, 0, Rotation2d.fromDegrees(-335)).nearest(List.of(poseB, poseC, poseD)));
+    assertEquals(
+        poseC,
+        new Pose2d(0, 0, Rotation2d.fromDegrees(-120)).nearest(List.of(poseB, poseC, poseD)));
+    assertEquals(
+        poseD, new Pose2d(0, 0, Rotation2d.fromDegrees(85)).nearest(List.of(poseA, poseC, poseD)));
+    assertEquals(
+        poseE, new Pose2d(0, 0, Rotation2d.fromDegrees(170)).nearest(List.of(poseA, poseD, poseE)));
   }
 }
