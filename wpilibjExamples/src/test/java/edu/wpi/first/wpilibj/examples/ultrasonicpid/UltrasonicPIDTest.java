@@ -46,7 +46,7 @@ class UltrasonicPIDTest {
   // distance between the robot's starting position and the object
   // we will update this in a moment
   private double m_startToObject = Double.POSITIVE_INFINITY;
-  private double m_distanceMM = 0.0;
+  private double m_distanceMM;
 
   // We're not using @BeforeEach so m_startToObject gets initialized properly
   private void startThread() {

@@ -8,24 +8,19 @@
 #include <thread>
 
 #include <frc/RobotController.h>
-#include <hal/simulation/MockHooks.h>
-#include <frc/simulation/DriverStationSim.h>
-#include <frc/system/plant/DCMotor.h>
-#include <frc/simulation/SimHooks.h>
-#include <frc/simulation/PWMSim.h>
-#include <frc/simulation/ElevatorSim.h>
 #include <frc/simulation/AnalogInputSim.h>
+#include <frc/simulation/DriverStationSim.h>
+#include <frc/simulation/ElevatorSim.h>
 #include <frc/simulation/JoystickSim.h>
-#include <units/time.h>
+#include <frc/simulation/PWMSim.h>
+#include <frc/simulation/SimHooks.h>
+#include <frc/system/plant/DCMotor.h>
+#include <hal/simulation/MockHooks.h>
 #include <units/length.h>
 #include <units/mass.h>
+#include <units/time.h>
 
 #include "Robot.h"
-
-void callback(void* param) {
-  auto fixture = reinterpret_cast<PotentiometerPIDTest*>(param);
-  fixture->SimPeriodicBefore();
-}
 
 class PotentiometerPIDTest : public testing::Test {
   frc::DCMotor m_elevatorGearbox = frc::DCMotor::Vex775Pro(4);
@@ -67,11 +62,16 @@ class PotentiometerPIDTest : public testing::Test {
             .value());
   }
 
+  static void CallSimPeriodicBefore(void* param) {
+    static_cast<PotentiometerPIDTest*>(param)->SimPeriodicBefore();
+  }
+
   void SetUp() override {
     frc::sim::PauseTiming();
     frc::sim::DriverStationSim::ResetData();
 
-    m_callback = HALSIM_RegisterSimPeriodicBeforeCallback(callback, this);
+    m_callback =
+        HALSIM_RegisterSimPeriodicBeforeCallback(CallSimPeriodicBefore, this);
 
     m_thread = std::thread([&] { m_robot.StartCompetition(); });
     frc::sim::StepTiming(0.0_ms);  // Wait for Notifiers

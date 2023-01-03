@@ -14,8 +14,9 @@
 #include <units/length.h>
 
 /**
- * This is a sample program to demonstrate how to use a soft potentiometer and a PID controller to
- * reach and maintain position setpoints on an elevator mechanism.
+ * This is a sample program to demonstrate how to use a soft potentiometer and a
+ * PID controller to reach and maintain position setpoints on an elevator
+ * mechanism.
  */
 class Robot : public frc::TimedRobot {
  public:
@@ -30,11 +31,13 @@ class Robot : public frc::TimedRobot {
   static constexpr units::meter_t kFullHeight = 1.5_m;
 
   // Bottom, middle, and top elevator setpoints
-  static constexpr std::array<units::meter_t, 3> kSetpoints = {{0.2_m, 0.8_m, 1.4_m}};
+  static constexpr std::array<units::meter_t, 3> kSetpoints = {
+      {0.2_m, 0.8_m, 1.4_m}};
 
  private:
   // proportional speed constant
-  // negative because applying positive voltage will bring us closer to the target
+  // negative because applying positive voltage will bring us closer to the
+  // target
   static constexpr double kP = 0.7;
   // integral speed constant
   static constexpr double kI = 0.35;

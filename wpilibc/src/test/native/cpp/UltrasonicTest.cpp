@@ -33,13 +33,9 @@ TEST(UltrasonicTest, AutomaticModeToggle) {
 }
 
 TEST(UltrasonicTest, AutomaticModeOnWithZeroInstances) {
-  EXPECT_NO_THROW({
-    frc::Ultrasonic::SetAutomaticMode(true);
-  });
+  EXPECT_NO_THROW({ frc::Ultrasonic::SetAutomaticMode(true); });
 }
 
 TEST(UltrasonicTest, AutomaticModeOffWithZeroInstances) {
-  EXPECT_NO_THROW({
-    frc::Ultrasonic::SetAutomaticMode(false);
-  });
+  EXPECT_NO_THROW({ frc::Ultrasonic::SetAutomaticMode(false); });
 }

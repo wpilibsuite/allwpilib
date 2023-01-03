@@ -9,7 +9,8 @@
 
 using namespace frc::sim;
 
-UltrasonicSim::UltrasonicSim(const frc::Ultrasonic& ultrasonic) : UltrasonicSim(0, ultrasonic.GetEchoChannel()) {}
+UltrasonicSim::UltrasonicSim(const frc::Ultrasonic& ultrasonic)
+    : UltrasonicSim(0, ultrasonic.GetEchoChannel()) {}
 
 UltrasonicSim::UltrasonicSim(int ping, int echo) {
   frc::sim::SimDeviceSim deviceSim{"Ultrasonic", echo};

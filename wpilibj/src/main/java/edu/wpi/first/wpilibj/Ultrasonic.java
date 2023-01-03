@@ -199,7 +199,7 @@ public class Ultrasonic implements Sendable, AutoCloseable {
    *     sensors fire at the same time. If another scheduling algorithm is preferred, it can be
    *     implemented by pinging the sensors manually and waiting for the results to come back.
    */
-  public static void setAutomaticMode(boolean enabling) {
+  public static synchronized void setAutomaticMode(boolean enabling) {
     if (enabling == m_automaticEnabled) {
       return; // ignore the case of no change
     }

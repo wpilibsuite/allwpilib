@@ -4,8 +4,8 @@
 
 #include "Robot.h"
 
-#include <frc/smartdashboard/SmartDashboard.h>
 #include <frc/shuffleboard/Shuffleboard.h>
+#include <frc/smartdashboard/SmartDashboard.h>
 #include <units/length.h>
 
 void Robot::RobotInit() {
@@ -27,9 +27,9 @@ void Robot::TeleopPeriodic() {
 }
 
 void Robot::TestInit() {
-  // By default, the Ultrasonic class polls all ultrasonic sensors in a round-robin to prevent
-  // them from interfering from one another.
-  // However, manual polling is also possible -- note that this disables automatic mode!
+  // By default, the Ultrasonic class polls all ultrasonic sensors in a
+  // round-robin to prevent them from interfering from one another. However,
+  // manual polling is also possible -- note that this disables automatic mode!
   m_rangeFinder.Ping();
 }
 

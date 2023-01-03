@@ -4,12 +4,12 @@
 
 #pragma once
 
-#include <frc/Ultrasonic.h>
 #include <frc/TimedRobot.h>
+#include <frc/Ultrasonic.h>
 
 /**
- * This is a sample program demonstrating how to read from a ping-response ultrasonic sensor with
- * the {@link Ultrasonic class}.
+ * This is a sample program demonstrating how to read from a ping-response
+ * ultrasonic sensor with the {@link Ultrasonic class}.
  */
 class Robot : public frc::TimedRobot {
  public:
