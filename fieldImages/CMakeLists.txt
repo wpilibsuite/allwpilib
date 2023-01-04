@@ -11,7 +11,7 @@ if (WITH_JAVA)
     set(CMAKE_JAVA_INCLUDE_PATH fieldImages.jar ${JACKSON_JARS})
 
     file(GLOB_RECURSE JAVA_SOURCES src/main/java/*.java)
-    file(GLOB_RECURSE JAVA_RESOURCES src/main/native/resources/*.json src/main/native/resources/*.png src/main/native/resources/*.jpg)
+    file(GLOB_RECURSE JAVA_RESOURCES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} src/main/native/resources/*.json src/main/native/resources/*.png src/main/native/resources/*.jpg)
     add_jar(field_images_jar SOURCES ${JAVA_SOURCES} RESOURCES NAMESPACE "edu/wpi/first/fields" ${JAVA_RESOURCES} OUTPUT_NAME fieldImages)
 
     get_property(FIELD_IMAGES_JAR_FILE TARGET field_images_jar PROPERTY JAR_FILE)
