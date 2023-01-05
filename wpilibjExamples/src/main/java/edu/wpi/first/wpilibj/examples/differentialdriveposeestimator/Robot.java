@@ -5,12 +5,19 @@
 package edu.wpi.first.wpilibj.examples.differentialdriveposeestimator;
 
 import edu.wpi.first.math.filter.SlewRateLimiter;
+import edu.wpi.first.networktables.DoubleArrayTopic;
+import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.XboxController;
 
 public class Robot extends TimedRobot {
+
+  private final NetworkTableInstance inst = NetworkTableInstance.getDefault();
+  private final DoubleArrayTopic m_doubleArrayTopic =
+      inst.getDoubleArrayTopic("m_doubleArrayTopic");
+
   private final XboxController m_controller = new XboxController(0);
-  private final Drivetrain m_drive = new Drivetrain();
+  private final Drivetrain m_drive = new Drivetrain(m_doubleArrayTopic);
 
   // Slew rate limiters to make joystick inputs more gentle; 1/3 sec from 0 to 1.
   private final SlewRateLimiter m_speedLimiter = new SlewRateLimiter(3);
@@ -21,12 +28,22 @@ public class Robot extends TimedRobot {
     teleopPeriodic();
     m_drive.updateOdometry();
   }
+  @Override
+  public void simulationPeriodic(){
+    m_drive.simulationPeriodic(); 
+  }
+
+  @Override
+  public void robotPeriodic(){
+    m_drive.periodic(); 
+
+  }
 
   @Override
   public void teleopPeriodic() {
     // Get the x speed. We are inverting this because Xbox controllers return
     // negative values when we push forward.
-    final var xSpeed = -m_speedLimiter.calculate(m_controller.getLeftY()) * Drivetrain.kMaxSpeed;
+    final var xSpeed = -m_speedLimiter.calculate(m_controller.getLeftY())* Drivetrain.kMaxSpeed;
 
     // Get the rate of angular rotation. We are inverting this because we want a
     // positive value when we pull to the left (remember, CCW is positive in
