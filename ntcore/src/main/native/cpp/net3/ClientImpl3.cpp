@@ -91,7 +91,7 @@ class CImpl : public MessageHandler3 {
 
   void ProcessIncoming(std::span<const uint8_t> data);
   void HandleLocal(std::span<const net::ClientMessage> msgs);
-  void SendPeriodic(uint64_t curTimeMs, bool initial);
+  void SendPeriodic(uint64_t curTimeMs, bool initial, bool flush);
   void SendValue(Writer& out, Entry* entry, const Value& value);
   bool CheckNetworkReady();
 
@@ -223,7 +223,7 @@ void CImpl::HandleLocal(std::span<const net::ClientMessage> msgs) {
   }
 }
 
-void CImpl::SendPeriodic(uint64_t curTimeMs, bool initial) {
+void CImpl::SendPeriodic(uint64_t curTimeMs, bool initial, bool flush) {
   DEBUG4("SendPeriodic({})", curTimeMs);
 
   // rate limit sends
@@ -258,7 +258,8 @@ void CImpl::SendPeriodic(uint64_t curTimeMs, bool initial) {
   // send any pending updates due to be sent
   bool checkedNetwork = false;
   for (auto&& pub : m_publishers) {
-    if (pub && !pub->outValues.empty() && curTimeMs >= pub->nextSendMs) {
+    if (pub && !pub->outValues.empty() &&
+        (flush || curTimeMs >= pub->nextSendMs)) {
       if (!checkedNetwork) {
         if (!CheckNetworkReady()) {
           return;
@@ -420,7 +421,7 @@ void CImpl::ServerHelloDone() {
   }
 
   // send initial assignments
-  SendPeriodic(m_initTimeMs, true);
+  SendPeriodic(m_initTimeMs, true, true);
 
   m_state = kStateRunning;
   m_setPeriodic(m_periodMs);
@@ -633,8 +634,8 @@ void ClientImpl3::HandleLocal(std::span<const net::ClientMessage> msgs) {
   m_impl->HandleLocal(msgs);
 }
 
-void ClientImpl3::SendPeriodic(uint64_t curTimeMs) {
-  m_impl->SendPeriodic(curTimeMs, false);
+void ClientImpl3::SendPeriodic(uint64_t curTimeMs, bool flush) {
+  m_impl->SendPeriodic(curTimeMs, false, flush);
 }
 
 void ClientImpl3::SetLocal(net::LocalInterface* local) {
