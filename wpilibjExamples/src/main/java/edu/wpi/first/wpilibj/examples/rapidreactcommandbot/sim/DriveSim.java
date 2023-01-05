@@ -16,9 +16,7 @@ import edu.wpi.first.wpilibj.simulation.PWMSim;
 /** Simulation controller for the drivetrain. */
 public class DriveSim {
   private final PWMSim m_leftLeader = new PWMSim(DriveConstants.kLeftMotor1Port);
-  private final PWMSim m_leftFollower = new PWMSim(DriveConstants.kLeftMotor2Port);
   private final PWMSim m_rightLeader = new PWMSim(DriveConstants.kRightMotor1Port);
-  private final PWMSim m_rightFollower = new PWMSim(DriveConstants.kRightMotor2Port);
 
   private final EncoderSim m_leftEncoder =
       EncoderSim.createForChannel(DriveConstants.kLeftEncoderPorts[0]);

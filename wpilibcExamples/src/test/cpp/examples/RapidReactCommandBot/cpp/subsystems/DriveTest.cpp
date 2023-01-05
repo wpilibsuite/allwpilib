@@ -24,7 +24,6 @@ class DriveTest : public testing::Test {
 TEST_F(DriveTest, DriveDistance) {
   frc2::CommandPtr commandHolder = drive.DriveDistanceCommand(
       AutoConstants::kDriveDistance, AutoConstants::kDriveSpeed);
-  frc2::Command* command = commandHolder.get();
 
   frc::sim::DriverStationSim::SetEnabled(true);
   frc::sim::DriverStationSim::NotifyNewData();
