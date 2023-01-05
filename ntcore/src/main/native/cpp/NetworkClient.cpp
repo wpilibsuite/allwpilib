@@ -215,7 +215,7 @@ NCImpl3::NCImpl3(int inst, std::string_view id,
     m_sendValuesTimer->timeout.connect([this] {
       if (m_clientImpl) {
         HandleLocal();
-        m_clientImpl->SendPeriodic(m_loop.Now().count());
+        m_clientImpl->SendPeriodic(m_loop.Now().count(), false);
       }
     });
 
@@ -224,7 +224,7 @@ NCImpl3::NCImpl3(int inst, std::string_view id,
     m_flush->wakeup.connect([this] {
       if (m_clientImpl) {
         HandleLocal();
-        m_clientImpl->SendPeriodic(m_loop.Now().count());
+        m_clientImpl->SendPeriodic(m_loop.Now().count(), true);
       }
     });
     m_flushAtomic = m_flush.get();
@@ -355,7 +355,7 @@ NCImpl4::NCImpl4(
     m_sendValuesTimer->timeout.connect([this] {
       if (m_clientImpl) {
         HandleLocal();
-        m_clientImpl->SendValues(m_loop.Now().count());
+        m_clientImpl->SendValues(m_loop.Now().count(), false);
       }
     });
 
@@ -364,7 +364,7 @@ NCImpl4::NCImpl4(
     m_flush->wakeup.connect([this] {
       if (m_clientImpl) {
         HandleLocal();
-        m_clientImpl->SendValues(m_loop.Now().count());
+        m_clientImpl->SendValues(m_loop.Now().count(), true);
       }
     });
     m_flushAtomic = m_flush.get();
@@ -501,16 +501,15 @@ void NetworkClient::StopDSClient() {
 }
 
 void NetworkClient::FlushLocal() {
-  m_impl->m_loopRunner.ExecAsync([this](uv::Loop&) { m_impl->HandleLocal(); });
+  if (auto async = m_impl->m_flushLocalAtomic.load(std::memory_order_relaxed)) {
+    async->UnsafeSend();
+  }
 }
 
 void NetworkClient::Flush() {
-  m_impl->m_loopRunner.ExecAsync([this](uv::Loop&) {
-    m_impl->HandleLocal();
-    if (m_impl->m_clientImpl) {
-      m_impl->m_clientImpl->SendValues(m_impl->m_loop.Now().count());
-    }
-  });
+  if (auto async = m_impl->m_flushAtomic.load(std::memory_order_relaxed)) {
+    async->UnsafeSend();
+  }
 }
 
 class NetworkClient3::Impl final : public NCImpl3 {
