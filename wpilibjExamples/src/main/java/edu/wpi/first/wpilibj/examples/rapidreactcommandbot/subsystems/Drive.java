@@ -111,6 +111,7 @@ public class Drive extends SubsystemBase implements AutoCloseable {
     return m_rightEncoder.getDistance();
   }
 
+  @Override
   public void close() {
     m_drive.close();
     m_rightEncoder.close();
