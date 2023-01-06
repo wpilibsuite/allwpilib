@@ -1,0 +1,73 @@
+import org.gradle.internal.os.OperatingSystem
+
+if (!project.hasProperty('onlylinuxathena')) {
+
+    description = "Process Starter"
+
+    apply plugin: 'c'
+    apply plugin: 'objective-cpp'
+    apply plugin: 'visual-studio'
+    apply plugin: 'edu.wpi.first.NativeUtils'
+
+    ext {
+        nativeName = 'processstarter'
+    }
+
+    apply from: "${rootDir}/shared/config.gradle"
+
+    project(':').libraryBuild.dependsOn build
+
+    model {
+        components {
+            // By default, a development executable will be generated. This is to help the case of
+            // testing specific functionality of the library.
+            "${nativeName}"(NativeExecutableSpec) {
+                baseName = 'processstarter'
+                binaries.all {
+                    if (it.targetPlatform.operatingSystem.isMacOsX()) {
+                        it.sources {
+                            macObjC(ObjectiveCppSourceSet) {
+                                source {
+                                    srcDirs 'src/main/native/osx'
+                                    include '**/*.mm'
+                                }
+                                exportedHeaders {
+                                    srcDirs 'src/main/native/include'
+                                    include '**/*.h'
+                                }
+                            }
+                        }
+                    } else if (it.targetPlatform.operatingSystem.isLinux()) {
+                        it.sources {
+                            linuxC(CSourceSet) {
+                                source {
+                                    srcDirs 'src/main/native/linux'
+                                    include '**/*.c'
+                                }
+                                exportedHeaders {
+                                    srcDirs 'src/main/native/include'
+                                    include '**/*.h'
+                                }
+                            }
+                        }
+                    } else if (it.targetPlatform.operatingSystem.isWindows()) {
+                        it.sources {
+                            windowsC(CSourceSet) {
+                                source {
+                                    srcDirs 'src/main/native/windows'
+                                    include '**/*.c'
+                                }
+                                exportedHeaders {
+                                    srcDirs 'src/main/native/include'
+                                    include '**/*.h'
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    apply from: 'publish.gradle'
+}
