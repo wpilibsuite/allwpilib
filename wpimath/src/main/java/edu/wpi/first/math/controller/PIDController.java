@@ -231,7 +231,8 @@ public class PIDController implements Sendable, AutoCloseable {
    * @return Whether the error is within the acceptable bounds.
    */
   public boolean atSetpoint() {
-    return m_haveMeasurement && m_haveSetpoint 
+    return m_haveMeasurement
+        && m_haveSetpoint
         && Math.abs(m_positionError) < m_positionTolerance
         && Math.abs(m_velocityError) < m_velocityTolerance;
   }
@@ -366,6 +367,7 @@ public class PIDController implements Sendable, AutoCloseable {
     m_prevError = 0;
     m_totalError = 0;
     m_velocityError = 0;
+    m_haveMeasurement = false;
   }
 
   @Override
