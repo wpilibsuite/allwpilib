@@ -13,7 +13,7 @@ TEST(SwerveModulePositionTest, Equality) {
   EXPECT_EQ(position1, position2);
 }
 
-TEST(SwerveModulePositionTest, InEquality) {
+TEST(SwerveModulePositionTest, Inequality) {
   frc::SwerveModulePosition position1{1_m, 90_deg};
   frc::SwerveModulePosition position2{2_m, 90_deg};
   frc::SwerveModulePosition position3{1_m, 89_deg};

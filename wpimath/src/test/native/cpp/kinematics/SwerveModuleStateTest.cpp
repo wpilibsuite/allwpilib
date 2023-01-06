@@ -47,7 +47,7 @@ TEST(SwerveModuleStateTest, Equality) {
   EXPECT_EQ(state1, state2);
 }
 
-TEST(SwerveModuleStateTest, InEquality) {
+TEST(SwerveModuleStateTest, Inequality) {
   frc::SwerveModuleState state1{1_mps, 90_deg};
   frc::SwerveModuleState state2{2_mps, 90_deg};
   frc::SwerveModuleState state3{1_mps, 89_deg};
