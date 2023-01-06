@@ -9,14 +9,16 @@
 using namespace frc;
 
 bool SwerveModuleState::operator==(const SwerveModuleState& other) const {
-  return units::math::abs(speed - other.speed) < 1E-9_mps && angle == other.angle;
+  return units::math::abs(speed - other.speed) < 1E-9_mps &&
+         angle == other.angle;
 }
 
-SwerveModuleState SwerveModuleState::Optimize(const SwerveModuleState &desiredState, const Rotation2d &currentAngle) {
-    auto delta = desiredState.angle - currentAngle;
-    if (units::math::abs(delta.Degrees()) > 90_deg) {
-      return {-desiredState.speed, desiredState.angle + Rotation2d{180_deg}};
-    } else {
-      return {desiredState.speed, desiredState.angle};
-    }
+SwerveModuleState SwerveModuleState::Optimize(
+    const SwerveModuleState& desiredState, const Rotation2d& currentAngle) {
+  auto delta = desiredState.angle - currentAngle;
+  if (units::math::abs(delta.Degrees()) > 90_deg) {
+    return {-desiredState.speed, desiredState.angle + Rotation2d{180_deg}};
+  } else {
+    return {desiredState.speed, desiredState.angle};
+  }
 }

@@ -3,12 +3,13 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #include "frc/kinematics/SwerveModulePosition.h"
-#include "frc/kinematics/SwerveModuleState.h"
 
+#include "frc/kinematics/SwerveModuleState.h"
 #include "units/math.h"
 
 using namespace frc;
 
 bool SwerveModulePosition::operator==(const SwerveModulePosition& other) const {
-  return units::math::abs(distance - other.distance) < 1E-9_m && angle == other.angle;
+  return units::math::abs(distance - other.distance) < 1E-9_m &&
+         angle == other.angle;
 }
