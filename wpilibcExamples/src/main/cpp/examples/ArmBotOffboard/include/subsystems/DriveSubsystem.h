@@ -4,10 +4,13 @@
 
 #pragma once
 
+#include <functional>
+
 #include <frc/Encoder.h>
 #include <frc/drive/DifferentialDrive.h>
 #include <frc/motorcontrol/MotorControllerGroup.h>
 #include <frc/motorcontrol/PWMSparkMax.h>
+#include <frc2/command/Commands.h>
 #include <frc2/command/SubsystemBase.h>
 
 #include "Constants.h"
@@ -22,14 +25,6 @@ class DriveSubsystem : public frc2::SubsystemBase {
   void Periodic() override;
 
   // Subsystem methods go here.
-
-  /**
-   * Drives the robot using arcade controls.
-   *
-   * @param fwd the commanded forward movement
-   * @param rot the commanded rotation
-   */
-  void ArcadeDrive(double fwd, double rot);
 
   /**
    * Resets the drive encoders to currently read a position of 0.
@@ -63,7 +58,10 @@ class DriveSubsystem : public frc2::SubsystemBase {
    *
    * @param maxOutput the maximum output to which the drive will be constrained
    */
-  void SetMaxOutput(double maxOutput);
+  frc2::CommandPtr SetMaxOutputCommand(double maxOutput);
+
+  frc2::CommandPtr ArcadeDriveCommand(std::function<double()> fwd,
+                                      std::function<double()> rot);
 
  private:
   // Components (e.g. motor controllers and sensors) should generally be

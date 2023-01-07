@@ -137,14 +137,14 @@ public abstract class RobotBase implements AutoCloseable {
    * completion before Autonomous is entered.
    *
    * <p>This must be used to ensure that the communications code starts. In the future it would be
-   * nice to put this code into it's own task that loads on boot so ensure that it runs.
+   * nice to put this code into its own task that loads on boot so ensure that it runs.
    */
   protected RobotBase() {
     final NetworkTableInstance inst = NetworkTableInstance.getDefault();
     m_threadId = Thread.currentThread().getId();
     setupCameraServerShared();
     setupMathShared();
-    // subscribe to "" to force persistent values to progagate to local
+    // subscribe to "" to force persistent values to propagate to local
     m_suball = new MultiSubscriber(inst, new String[] {""});
     if (isReal()) {
       inst.startServer("/home/lvuser/networktables.json");

@@ -30,18 +30,6 @@ TEST(NumericalIntegrationTest, ExponentialWithU) {
   EXPECT_NEAR(y1(0), std::exp(0.1) - std::exp(0), 1e-3);
 }
 
-// Tests that integrating dx/dt = e^x works with RKF45.
-TEST(NumericalIntegrationTest, ExponentialRKF45) {
-  frc::Vectord<1> y0{0.0};
-
-  frc::Vectord<1> y1 = frc::RKF45(
-      [](const frc::Vectord<1>& x, const frc::Vectord<1>& u) {
-        return frc::Vectord<1>{std::exp(x(0))};
-      },
-      y0, frc::Vectord<1>{0.0}, 0.1_s);
-  EXPECT_NEAR(y1(0), std::exp(0.1) - std::exp(0), 1e-3);
-}
-
 // Tests that integrating dx/dt = e^x works with RKDP
 TEST(NumericalIntegrationTest, ExponentialRKDP) {
   frc::Vectord<1> y0{0.0};

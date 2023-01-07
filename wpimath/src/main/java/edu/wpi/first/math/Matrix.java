@@ -573,10 +573,9 @@ public class Matrix<R extends Num, C extends Num> {
    * Decompose "this" matrix using Cholesky Decomposition. If the "this" matrix is zeros, it will
    * return the zero matrix.
    *
-   * @param lowerTriangular Whether or not we want to decompose to the lower triangular Cholesky
-   *     matrix.
+   * @param lowerTriangular Whether we want to decompose to the lower triangular Cholesky matrix.
    * @return The decomposed matrix.
-   * @throws RuntimeException if the matrix could not be decomposed(ie. is not positive
+   * @throws RuntimeException if the matrix could not be decomposed(i.e. is not positive
    *     semidefinite).
    */
   public Matrix<R, C> lltDecompose(boolean lowerTriangular) {
@@ -670,10 +669,10 @@ public class Matrix<R extends Num, C extends Num> {
    * same symbolic meaning they both must be either Double.NaN, Double.POSITIVE_INFINITY, or
    * Double.NEGATIVE_INFINITY.
    *
-   * <p>NOTE:It is recommend to use {@link Matrix#isEqual(Matrix, double)} over this method when
+   * <p>NOTE:It is recommended to use {@link Matrix#isEqual(Matrix, double)} over this method when
    * checking if two matrices are equal as {@link Matrix#isEqual(Matrix, double)} will return false
    * if an element is uncountable. This method should only be used when uncountable elements need to
-   * compared.
+   * be compared.
    *
    * @param other The {@link Matrix} to check against this one.
    * @param tolerance The tolerance to check equality with.
@@ -709,7 +708,7 @@ public class Matrix<R extends Num, C extends Num> {
    *
    * @param v Vector to use for the update.
    * @param sigma Sigma to use for the update.
-   * @param lowerTriangular Whether or not this matrix is lower triangular.
+   * @param lowerTriangular Whether this matrix is lower triangular.
    */
   public void rankUpdate(Matrix<R, N1> v, double sigma, boolean lowerTriangular) {
     WPIMathJNI.rankUpdate(this.getData(), this.getNumRows(), v.getData(), sigma, lowerTriangular);

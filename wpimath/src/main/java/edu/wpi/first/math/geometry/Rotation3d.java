@@ -45,6 +45,10 @@ public class Rotation3d implements Interpolatable<Rotation3d> {
    * <p>Extrinsic rotations occur in that order around the axes in the fixed global frame rather
    * than the body frame.
    *
+   * <p>Angles are measured counterclockwise with the rotation axis pointing "out of the page". If
+   * you point your right thumb along the positive axis direction, your fingers curl in the
+   * direction of positive rotation.
+   *
    * @param roll The counterclockwise rotation angle around the X axis (roll) in radians.
    * @param pitch The counterclockwise rotation angle around the Y axis (pitch) in radians.
    * @param yaw The counterclockwise rotation angle around the Z axis (yaw) in radians.
@@ -97,7 +101,7 @@ public class Rotation3d implements Interpolatable<Rotation3d> {
 
     // Require that the rotation matrix is special orthogonal. This is true if
     // the matrix is orthogonal (RRᵀ = I) and normalized (determinant is 1).
-    if (!R.times(R.transpose()).equals(Matrix.eye(Nat.N3()))) {
+    if (R.times(R.transpose()).minus(Matrix.eye(Nat.N3())).normF() > 1e-9) {
       var builder = new StringBuilder("Rotation matrix isn't orthogonal\n\nR =\n");
       builder.append(R.getStorage().toString()).append('\n');
 
@@ -105,7 +109,7 @@ public class Rotation3d implements Interpolatable<Rotation3d> {
       MathSharedStore.reportError(msg, Thread.currentThread().getStackTrace());
       throw new IllegalArgumentException(msg);
     }
-    if (R.det() != 1.0) {
+    if (Math.abs(R.det() - 1.0) > 1e-9) {
       var builder =
           new StringBuilder("Rotation matrix is orthogonal but not special orthogonal\n\nR =\n");
       builder.append(R.getStorage().toString()).append('\n');

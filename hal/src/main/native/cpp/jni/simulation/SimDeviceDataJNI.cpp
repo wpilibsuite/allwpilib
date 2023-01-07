@@ -242,6 +242,9 @@ static SIM_JniHandle AllocateDeviceCallback(
 static void FreeDeviceCallback(JNIEnv* env, SIM_JniHandle handle,
                                FreeDeviceCallbackFunc freeCallback) {
   auto callback = deviceCallbackHandles->Free(handle);
+  if (callback == nullptr) {
+    return;
+  }
   freeCallback(callback->getCallbackId());
   callback->free(env);
 }
@@ -296,6 +299,9 @@ static SIM_JniHandle AllocateValueCallback(
 static void FreeValueCallback(JNIEnv* env, SIM_JniHandle handle,
                               FreeValueCallbackFunc freeCallback) {
   auto callback = valueCallbackHandles->Free(handle);
+  if (callback == nullptr) {
+    return;
+  }
   freeCallback(callback->getCallbackId());
   callback->free(env);
 }

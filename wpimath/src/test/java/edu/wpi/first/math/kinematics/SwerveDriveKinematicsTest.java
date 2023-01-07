@@ -211,7 +211,7 @@ class SwerveDriveKinematicsTest {
     the vx and vy of our chassis center. Because our COR is at a 45 degree angle from the center,
     we know that vx and vy must be the same. Furthermore, we know that the center of mass makes
     a full revolution about the center of revolution once every second. Therefore, the center of
-    mass must be moving at 106.629in/sec. Recalling that the ratios of a 45/45/90 triagle are
+    mass must be moving at 106.629in/sec. Recalling that the ratios of a 45/45/90 triangle are
     1:√(2)/2:√(2)/2, we find that the COM vx is -75.398, and vy is 75.398.
     */
 
@@ -235,7 +235,7 @@ class SwerveDriveKinematicsTest {
     the vx and vy of our chassis center. Because our COR is at a 45 degree angle from the center,
     we know that vx and vy must be the same. Furthermore, we know that the center of mass makes
     a full revolution about the center of revolution once every second. Therefore, the center of
-    mass must be moving at 106.629in/sec. Recalling that the ratios of a 45/45/90 triagle are
+    mass must be moving at 106.629in/sec. Recalling that the ratios of a 45/45/90 triangle are
     1:√(2)/2:√(2)/2, we find that the COM vx is -75.398, and vy is 75.398.
     */
 

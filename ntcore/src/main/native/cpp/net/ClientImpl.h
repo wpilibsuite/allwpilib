@@ -21,23 +21,22 @@ class Logger;
 }  // namespace wpi
 
 namespace nt {
-class PubSubOptions;
+class PubSubOptionsImpl;
 class Value;
 }  // namespace nt
 
 namespace nt::net {
 
 struct ClientMessage;
-class ClientStartup;
 class WireConnection;
 
 class ClientImpl {
-  friend class ClientStartup;
-
  public:
-  ClientImpl(uint64_t curTimeMs, int inst, WireConnection& wire,
-             wpi::Logger& logger,
-             std::function<void(uint32_t repeatMs)> setPeriodic);
+  ClientImpl(
+      uint64_t curTimeMs, int inst, WireConnection& wire, wpi::Logger& logger,
+      std::function<void(int64_t serverTimeOffset, int64_t rtt2, bool valid)>
+          timeSyncUpdated,
+      std::function<void(uint32_t repeatMs)> setPeriodic);
   ~ClientImpl();
 
   void ProcessIncomingText(std::string_view data);
@@ -48,31 +47,11 @@ class ClientImpl {
   void SendValues(uint64_t curTimeMs);
 
   void SetLocal(LocalInterface* local);
+  void SendInitial();
 
  private:
   class Impl;
   std::unique_ptr<Impl> m_impl;
-};
-
-class ClientStartup final : public NetworkStartupInterface {
- public:
-  explicit ClientStartup(ClientImpl& client);
-  ~ClientStartup() final;
-  ClientStartup(const ClientStartup&) = delete;
-  ClientStartup& operator=(const ClientStartup&) = delete;
-
-  // NetworkStartupInterface interface
-  void Publish(NT_Publisher pubHandle, NT_Topic topicHandle,
-               std::string_view name, std::string_view typeStr,
-               const wpi::json& properties, const PubSubOptions& options) final;
-  void Subscribe(NT_Subscriber subHandle, std::span<const std::string> prefixes,
-                 const PubSubOptions& options) final;
-  void SetValue(NT_Publisher pubHandle, const Value& value) final;
-
- private:
-  ClientImpl& m_client;
-  BinaryWriter m_binaryWriter;
-  TextWriter m_textWriter;
 };
 
 }  // namespace nt::net

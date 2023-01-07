@@ -88,15 +88,6 @@ enum NT_NetworkMode {
   NT_NET_MODE_LOCAL = 0x10,    /* running in local-only mode */
 };
 
-/** Pub/sub option types */
-enum NT_PubSubOptionType {
-  NT_PUBSUB_PERIODIC = 1,   /* period between transmissions */
-  NT_PUBSUB_SENDALL,        /* all value changes are sent */
-  NT_PUBSUB_TOPICSONLY,     /* only send topic changes, no value changes */
-  NT_PUBSUB_POLLSTORAGE,    /* polling storage for subscription */
-  NT_PUBSUB_KEEPDUPLICATES, /* preserve duplicate values */
-};
-
 /** Event notification flags. */
 enum NT_EventFlags {
   NT_EVENT_NONE = 0,
@@ -124,6 +115,8 @@ enum NT_EventFlags {
   NT_EVENT_VALUE_ALL = NT_EVENT_VALUE_REMOTE | NT_EVENT_VALUE_LOCAL,
   /** Log message. */
   NT_EVENT_LOGMESSAGE = 0x100,
+  /** Time synchronized with server. */
+  NT_EVENT_TIMESYNC = 0x200,
 };
 
 /*
@@ -256,6 +249,24 @@ struct NT_LogMessage {
   char* message;
 };
 
+/** NetworkTables time sync event data. */
+struct NT_TimeSyncEventData {
+  /**
+   * Offset between local time and server time, in microseconds. Add this value
+   * to local time to get the estimated equivalent server time.
+   */
+  int64_t serverTimeOffset;
+
+  /** Measured round trip time divided by 2, in microseconds. */
+  int64_t rtt2;
+
+  /**
+   * If serverTimeOffset and RTT are valid. An event with this set to false is
+   * sent when the client disconnects.
+   */
+  NT_Bool valid;
+};
+
 /** NetworkTables event */
 struct NT_Event {
   /** Listener that triggered this event. */
@@ -268,6 +279,7 @@ struct NT_Event {
    * - NT_EVENT_PUBLISH, NT_EVENT_UNPUBLISH, or NT_EVENT_PROPERTIES: topicInfo
    * - NT_EVENT_VALUE_REMOTE, NT_NOTIFY_VALUE_LOCAL: valueData
    * - NT_EVENT_LOGMESSAGE: logMessage
+   * - NT_EVENT_TIMESYNC: timeSyncData
    */
   unsigned int flags;
 
@@ -277,19 +289,78 @@ struct NT_Event {
     struct NT_TopicInfo topicInfo;
     struct NT_ValueEventData valueData;
     struct NT_LogMessage logMessage;
+    struct NT_TimeSyncEventData timeSyncData;
   } data;
 };
 
-/** NetworkTables publish/subscribe option. */
-struct NT_PubSubOption {
-  /** Option type. */
-  enum NT_PubSubOptionType type;
+/** NetworkTables publish/subscribe options. */
+struct NT_PubSubOptions {
+  /**
+   * Structure size. Must be set to sizeof(NT_PubSubOptions).
+   */
+  unsigned int structSize;
 
   /**
-   * Option value.  1 (true) or 0 (false) for immediate and logging options,
-   * time between updates, in seconds, for periodic option.
+   * Polling storage size for a subscription. Specifies the maximum number of
+   * updates NetworkTables should store between calls to the subscriber's
+   * ReadQueue() function. If zero, defaults to 1 if sendAll is false, 20 if
+   * sendAll is true.
    */
-  double value;
+  unsigned int pollStorage;
+
+  /**
+   * How frequently changes will be sent over the network, in seconds.
+   * NetworkTables may send more frequently than this (e.g. use a combined
+   * minimum period for all values) or apply a restricted range to this value.
+   * The default is 100 ms.
+   */
+  double periodic;
+
+  /**
+   * For subscriptions, if non-zero, value updates for ReadQueue() are not
+   * queued for this publisher.
+   */
+  NT_Publisher excludePublisher;
+
+  /**
+   * Send all value changes over the network.
+   */
+  NT_Bool sendAll;
+
+  /**
+   * For subscriptions, don't ask for value changes (only topic announcements).
+   */
+  NT_Bool topicsOnly;
+
+  /**
+   * Perform prefix match on subscriber topic names. Is ignored/overridden by
+   * Subscribe() functions; only present in struct for the purposes of getting
+   * information about subscriptions.
+   */
+  NT_Bool prefixMatch;
+
+  /**
+   * Preserve duplicate value changes (rather than ignoring them).
+   */
+  NT_Bool keepDuplicates;
+
+  /**
+   * For subscriptions, if remote value updates should not be queued for
+   * ReadQueue(). See also disableLocal.
+   */
+  NT_Bool disableRemote;
+
+  /**
+   * For subscriptions, if local value updates should not be queued for
+   * ReadQueue(). See also disableRemote.
+   */
+  NT_Bool disableLocal;
+
+  /**
+   * For entries, don't queue (for ReadQueue) value updates for the entry's
+   * internal publisher.
+   */
+  NT_Bool excludeSelf;
 };
 
 /**
@@ -677,13 +748,11 @@ NT_Bool NT_SetTopicProperties(NT_Topic topic, const char* properties);
  * @param type expected type
  * @param typeStr expected type string
  * @param options subscription options
- * @param options_len number of elements in options array
  * @return Subscriber handle
  */
 NT_Subscriber NT_Subscribe(NT_Topic topic, enum NT_Type type,
                            const char* typeStr,
-                           const struct NT_PubSubOption* options,
-                           size_t options_len);
+                           const struct NT_PubSubOptions* options);
 
 /**
  * Stops subscriber.
@@ -699,12 +768,10 @@ void NT_Unsubscribe(NT_Subscriber sub);
  * @param type type
  * @param typeStr type string
  * @param options publish options
- * @param options_len number of elements in options array
  * @return Publisher handle
  */
 NT_Publisher NT_Publish(NT_Topic topic, enum NT_Type type, const char* typeStr,
-                        const struct NT_PubSubOption* options,
-                        size_t options_len);
+                        const struct NT_PubSubOptions* options);
 
 /**
  * Creates a new publisher to a topic.
@@ -714,13 +781,11 @@ NT_Publisher NT_Publish(NT_Topic topic, enum NT_Type type, const char* typeStr,
  * @param typeStr type string
  * @param properties initial properties (JSON object)
  * @param options publish options
- * @param options_len number of elements in options array
  * @return Publisher handle
  */
 NT_Publisher NT_PublishEx(NT_Topic topic, enum NT_Type type,
                           const char* typeStr, const char* properties,
-                          const struct NT_PubSubOption* options,
-                          size_t options_len);
+                          const struct NT_PubSubOptions* options);
 
 /**
  * Stops publisher.
@@ -736,12 +801,10 @@ void NT_Unpublish(NT_Handle pubentry);
  * @param type type
  * @param typeStr type string
  * @param options publish options
- * @param options_len number of elements in options array
  * @return Entry handle
  */
 NT_Entry NT_GetEntryEx(NT_Topic topic, enum NT_Type type, const char* typeStr,
-                       const struct NT_PubSubOption* options,
-                       size_t options_len);
+                       const struct NT_PubSubOptions* options);
 
 /**
  * Stops entry subscriber/publisher.
@@ -781,14 +844,12 @@ NT_Topic NT_GetTopicFromHandle(NT_Handle pubsubentry);
  * @param prefixes topic name prefixes
  * @param prefixes_len number of elements in prefixes array
  * @param options subscriber options
- * @param options_len number of elements in options array
  * @return subscriber handle
  */
 NT_MultiSubscriber NT_SubscribeMultiple(NT_Inst inst,
                                         const struct NT_String* prefixes,
                                         size_t prefixes_len,
-                                        const struct NT_PubSubOption* options,
-                                        size_t options_len);
+                                        const struct NT_PubSubOptions* options);
 
 /**
  * Unsubscribes a multi-subscriber.
@@ -1151,6 +1212,22 @@ struct NT_ConnectionInfo* NT_GetConnections(NT_Inst inst, size_t* count);
  */
 NT_Bool NT_IsConnected(NT_Inst inst);
 
+/**
+ * Get the time offset between server time and local time. Add this value to
+ * local time to get the estimated equivalent server time. In server mode, this
+ * always returns a valid value of 0. In client mode, this returns the time
+ * offset only if the client and server are connected and have exchanged
+ * synchronization messages. Note the time offset may change over time as it is
+ * periodically updated; to receive updates as events, add a listener to the
+ * "time sync" event.
+ *
+ * @param inst instance handle
+ * @param valid set to true if the return value is valid, false otherwise
+ *              (output)
+ * @return Time offset in microseconds (if valid is set to true)
+ */
+int64_t NT_GetServerTimeOffset(NT_Inst inst, NT_Bool* valid);
+
 /** @} */
 
 /**
@@ -1247,7 +1324,7 @@ void NT_DisposeEvent(struct NT_Event* event);
  *
  * @return Timestamp
  */
-uint64_t NT_Now(void);
+int64_t NT_Now(void);
 
 /**
  * Sets the current timestamp used for timestamping values that do not
@@ -1258,7 +1335,7 @@ uint64_t NT_Now(void);
  *
  * @param timestamp timestamp (1 us increments)
  */
-void NT_SetNow(uint64_t timestamp);
+void NT_SetNow(int64_t timestamp);
 
 /** @} */
 
@@ -1623,6 +1700,170 @@ struct NT_String* NT_GetValueStringArray(const struct NT_Value* value,
 
 /** @} */
 /** @} */
+/** @} */
+
+/**
+ * @defgroup ntcore_c_meta_api ntcore C meta-topic API
+ *
+ * Meta-topic decoders for C.
+ *
+ * @{
+ */
+
+/**
+ * Subscriber options. Different from PubSubOptions in this reflects only
+ * options that are sent over the network.
+ */
+struct NT_Meta_SubscriberOptions {
+  double periodic;
+  NT_Bool topicsOnly;
+  NT_Bool sendAll;
+  NT_Bool prefixMatch;
+};
+
+/**
+ * Topic publisher (as published via `$pub$<topic>`).
+ */
+struct NT_Meta_TopicPublisher {
+  struct NT_String client;
+  uint64_t pubuid;
+};
+
+/**
+ * Topic subscriber (as published via `$sub$<topic>`).
+ */
+struct NT_Meta_TopicSubscriber {
+  struct NT_String client;
+  uint64_t subuid;
+  struct NT_Meta_SubscriberOptions options;
+};
+
+/**
+ * Client publisher (as published via `$clientpub$<client>` or `$serverpub`).
+ */
+struct NT_Meta_ClientPublisher {
+  int64_t uid;
+  struct NT_String topic;
+};
+
+/**
+ * Client subscriber (as published via `$clientsub$<client>` or `$serversub`).
+ */
+struct NT_Meta_ClientSubscriber {
+  int64_t uid;
+  size_t topicsCount;
+  struct NT_String* topics;
+  struct NT_Meta_SubscriberOptions options;
+};
+
+/**
+ * Client (as published via `$clients`).
+ */
+struct NT_Meta_Client {
+  struct NT_String id;
+  struct NT_String conn;
+  uint16_t version;
+};
+
+/**
+ * Decodes `$pub$<topic>` meta-topic data.
+ *
+ * @param data data contents
+ * @param size size of data contents
+ * @param count number of elements in returned array (output)
+ * @return Array of TopicPublishers, or NULL on decoding error.
+ */
+struct NT_Meta_TopicPublisher* NT_Meta_DecodeTopicPublishers(
+    const uint8_t* data, size_t size, size_t* count);
+
+/**
+ * Decodes `$sub$<topic>` meta-topic data.
+ *
+ * @param data data contents
+ * @param size size of data contents
+ * @param count number of elements in returned array (output)
+ * @return Array of TopicSubscribers, or NULL on decoding error.
+ */
+struct NT_Meta_TopicSubscriber* NT_Meta_DecodeTopicSubscribers(
+    const uint8_t* data, size_t size, size_t* count);
+
+/**
+ * Decodes `$clientpub$<topic>` meta-topic data.
+ *
+ * @param data data contents
+ * @param size size of data contents
+ * @param count number of elements in returned array (output)
+ * @return Array of ClientPublishers, or NULL on decoding error.
+ */
+struct NT_Meta_ClientPublisher* NT_Meta_DecodeClientPublishers(
+    const uint8_t* data, size_t size, size_t* count);
+
+/**
+ * Decodes `$clientsub$<topic>` meta-topic data.
+ *
+ * @param data data contents
+ * @param size size of data contents
+ * @param count number of elements in returned array (output)
+ * @return Array of ClientSubscribers, or NULL on decoding error.
+ */
+struct NT_Meta_ClientSubscriber* NT_Meta_DecodeClientSubscribers(
+    const uint8_t* data, size_t size, size_t* count);
+
+/**
+ * Decodes `$clients` meta-topic data.
+ *
+ * @param data data contents
+ * @param size size of data contents
+ * @param count number of elements in returned array (output)
+ * @return Array of Clients, or NULL on decoding error.
+ */
+struct NT_Meta_Client* NT_Meta_DecodeClients(const uint8_t* data, size_t size,
+                                             size_t* count);
+
+/**
+ * Frees an array of NT_Meta_TopicPublisher.
+ *
+ * @param arr   pointer to the array to free
+ * @param count size of the array to free
+ */
+void NT_Meta_FreeTopicPublishers(struct NT_Meta_TopicPublisher* arr,
+                                 size_t count);
+
+/**
+ * Frees an array of NT_Meta_TopicSubscriber.
+ *
+ * @param arr   pointer to the array to free
+ * @param count size of the array to free
+ */
+void NT_Meta_FreeTopicSubscribers(struct NT_Meta_TopicSubscriber* arr,
+                                  size_t count);
+
+/**
+ * Frees an array of NT_Meta_ClientPublisher.
+ *
+ * @param arr   pointer to the array to free
+ * @param count size of the array to free
+ */
+void NT_Meta_FreeClientPublishers(struct NT_Meta_ClientPublisher* arr,
+                                  size_t count);
+
+/**
+ * Frees an array of NT_Meta_ClientSubscriber.
+ *
+ * @param arr   pointer to the array to free
+ * @param count size of the array to free
+ */
+void NT_Meta_FreeClientSubscribers(struct NT_Meta_ClientSubscriber* arr,
+                                   size_t count);
+
+/**
+ * Frees an array of NT_Meta_Client.
+ *
+ * @param arr   pointer to the array to free
+ * @param count size of the array to free
+ */
+void NT_Meta_FreeClients(struct NT_Meta_Client* arr, size_t count);
+
 /** @} */
 
 #ifdef __cplusplus

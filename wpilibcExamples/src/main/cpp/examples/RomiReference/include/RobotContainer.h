@@ -51,7 +51,7 @@ class RobotContainer {
                         OnBoardIO::ChannelMode::INPUT};
 
   // Example button
-  frc2::Button m_onboardButtonA{
+  frc2::Trigger m_onboardButtonA{
       [this] { return m_onboardIO.GetButtonAPressed(); }};
 
   // Autonomous commands.

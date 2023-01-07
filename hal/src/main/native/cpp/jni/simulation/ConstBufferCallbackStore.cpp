@@ -116,6 +116,9 @@ SIM_JniHandle sim::AllocateConstBufferCallback(
 void sim::FreeConstBufferCallback(JNIEnv* env, SIM_JniHandle handle, jint index,
                                   FreeConstBufferCallbackFunc freeCallback) {
   auto callback = callbackHandles->Free(handle);
+  if (callback == nullptr) {
+    return;
+  }
   freeCallback(index, callback->getCallbackId());
   callback->free(env);
 }

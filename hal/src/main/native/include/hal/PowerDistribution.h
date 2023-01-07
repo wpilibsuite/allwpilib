@@ -37,7 +37,7 @@ extern "C" {
  *
  * @param[in] moduleNumber       the module number to initialize
  * @param[in] type               the type of module to intialize
- * @param[in] allocationLocation the location where the allocation is occuring
+ * @param[in] allocationLocation the location where the allocation is occurring
  * @param[out] status            Error status variable. 0 on success.
  * @return the created PowerDistribution
  */

@@ -240,6 +240,30 @@ void HAL_SetDigitalPWMDutyCycle(HAL_DigitalPWMHandle pwmGenerator,
   }
 }
 
+void HAL_SetDigitalPWMPPS(HAL_DigitalPWMHandle pwmGenerator, double dutyCycle,
+                          int32_t* status) {
+  auto port = digitalPWMHandles->Get(pwmGenerator);
+  if (port == nullptr) {
+    *status = HAL_HANDLE_ERROR;
+    return;
+  }
+  int32_t id = *port;
+  digitalSystem->writePWMPeriodPower(0xffff, status);
+  double rawDutyCycle = 31.0 * dutyCycle;
+  if (rawDutyCycle > 30.5) {
+    rawDutyCycle = 30.5;
+  }
+  {
+    std::scoped_lock lock(digitalPwmMutex);
+    if (id < 4)
+      digitalSystem->writePWMDutyCycleA(id, static_cast<uint8_t>(rawDutyCycle),
+                                        status);
+    else
+      digitalSystem->writePWMDutyCycleB(
+          id - 4, static_cast<uint8_t>(rawDutyCycle), status);
+  }
+}
+
 void HAL_SetDigitalPWMOutputChannel(HAL_DigitalPWMHandle pwmGenerator,
                                     int32_t channel, int32_t* status) {
   auto port = digitalPWMHandles->Get(pwmGenerator);

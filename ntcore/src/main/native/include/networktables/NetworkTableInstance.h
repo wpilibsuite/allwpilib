@@ -6,6 +6,7 @@
 
 #include <functional>
 #include <memory>
+#include <optional>
 #include <span>
 #include <string>
 #include <string_view>
@@ -392,6 +393,20 @@ class NetworkTableInstance final {
                                     ListenerCallback callback) const;
 
   /**
+   * Add a time synchronization listener. The callback function is called
+   * asynchronously on a separate thread, so it's important to use
+   * synchronization or atomics when accessing any shared state from the
+   * callback function.
+   *
+   * @param immediate_notify  notify listener of current time synchronization
+   *                          value
+   * @param callback          listener to add
+   * @return Listener handle
+   */
+  NT_Listener AddTimeSyncListener(bool immediate_notify,
+                                  ListenerCallback callback) const;
+
+  /**
    * Add a listener for changes on a particular topic. The callback
    * function is called asynchronously on a separate thread, so it's important
    * to use synchronization or atomics when accessing any shared state from the
@@ -447,7 +462,7 @@ class NetworkTableInstance final {
    * @param listener Listener function
    * @return Listener handle
    */
-  NT_Listener AddListener(NetworkTableEntry& entry, int eventMask,
+  NT_Listener AddListener(const NetworkTableEntry& entry, int eventMask,
                           ListenerCallback listener);
 
   /**
@@ -614,6 +629,19 @@ class NetworkTableInstance final {
    */
   bool IsConnected() const;
 
+  /**
+   * Get the time offset between server time and local time. Add this value to
+   * local time to get the estimated equivalent server time. In server mode,
+   * this always returns 0. In client mode, this returns the time offset only if
+   * the client and server are connected and have exchanged synchronization
+   * messages. Note the time offset may change over time as it is periodically
+   * updated; to receive updates as events, add a listener to the "time sync"
+   * event.
+   *
+   * @return Time offset in microseconds (optional)
+   */
+  std::optional<int64_t> GetServerTimeOffset() const;
+
   /** @} */
 
   /**
@@ -688,14 +716,7 @@ class NetworkTableInstance final {
    * Equality operator.  Returns true if both instances refer to the same
    * native handle.
    */
-  bool operator==(const NetworkTableInstance& other) const {
-    return m_handle == other.m_handle;
-  }
-
-  /** Inequality operator. */
-  bool operator!=(const NetworkTableInstance& other) const {
-    return !(*this == other);
-  }
+  bool operator==(const NetworkTableInstance&) const = default;
 
  private:
   /* Native handle */

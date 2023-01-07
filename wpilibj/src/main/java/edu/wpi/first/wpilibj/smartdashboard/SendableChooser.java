@@ -4,7 +4,7 @@
 
 package edu.wpi.first.wpilibj.smartdashboard;
 
-import static edu.wpi.first.wpilibj.util.ErrorMessages.requireNonNullParam;
+import static edu.wpi.first.util.ErrorMessages.requireNonNullParam;
 
 import edu.wpi.first.networktables.IntegerPublisher;
 import edu.wpi.first.networktables.IntegerTopic;
@@ -43,7 +43,7 @@ public class SendableChooser<V> implements NTSendable, AutoCloseable {
   private static final String OPTIONS = "options";
   /** The key for the instance number. */
   private static final String INSTANCE = ".instance";
-  /** A map linking strings to the objects the represent. */
+  /** A map linking strings to the objects they represent. */
   private final Map<String, V> m_map = new LinkedHashMap<>();
 
   private String m_defaultChoice = "";

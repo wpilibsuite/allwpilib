@@ -93,31 +93,29 @@ inline bool UnitTopic<T>::IsMatchingUnit() const {
 }
 
 template <typename T>
-inline UnitSubscriber<T> UnitTopic<T>::Subscribe(
-    T defaultValue, std::span<const PubSubOption> options) {
+inline UnitSubscriber<T> UnitTopic<T>::Subscribe(T defaultValue,
+                                                 const PubSubOptions& options) {
   return UnitSubscriber<T>{
       ::nt::Subscribe(m_handle, NT_DOUBLE, "double", options), defaultValue};
 }
 
 template <typename T>
 inline UnitSubscriber<T> UnitTopic<T>::SubscribeEx(
-    std::string_view typeString, T defaultValue,
-    std::span<const PubSubOption> options) {
+    std::string_view typeString, T defaultValue, const PubSubOptions& options) {
   return UnitSubscriber<T>{
       ::nt::Subscribe(m_handle, NT_DOUBLE, typeString, options), defaultValue};
 }
 
 template <typename T>
-inline UnitPublisher<T> UnitTopic<T>::Publish(
-    std::span<const PubSubOption> options) {
+inline UnitPublisher<T> UnitTopic<T>::Publish(const PubSubOptions& options) {
   return UnitPublisher<T>{::nt::PublishEx(m_handle, NT_DOUBLE, "double",
                                           {{"unit", T{}.name()}}, options)};
 }
 
 template <typename T>
-inline UnitPublisher<T> UnitTopic<T>::PublishEx(
-    std::string_view typeString, const wpi::json& properties,
-    std::span<const PubSubOption> options) {
+inline UnitPublisher<T> UnitTopic<T>::PublishEx(std::string_view typeString,
+                                                const wpi::json& properties,
+                                                const PubSubOptions& options) {
   wpi::json props = properties;
   props["unit"] = T{}.name();
   return UnitPublisher<T>{
@@ -125,16 +123,16 @@ inline UnitPublisher<T> UnitTopic<T>::PublishEx(
 }
 
 template <typename T>
-inline UnitEntry<T> UnitTopic<T>::GetEntry(
-    T defaultValue, std::span<const PubSubOption> options) {
+inline UnitEntry<T> UnitTopic<T>::GetEntry(T defaultValue,
+                                           const PubSubOptions& options) {
   return UnitEntry<T>{::nt::GetEntry(m_handle, NT_DOUBLE, "double", options),
                       defaultValue};
 }
 
 template <typename T>
-inline UnitEntry<T> UnitTopic<T>::GetEntryEx(
-    std::string_view typeString, T defaultValue,
-    std::span<const PubSubOption> options) {
+inline UnitEntry<T> UnitTopic<T>::GetEntryEx(std::string_view typeString,
+                                             T defaultValue,
+                                             const PubSubOptions& options) {
   return UnitEntry<T>{::nt::GetEntry(m_handle, NT_DOUBLE, typeString, options),
                       defaultValue};
 }

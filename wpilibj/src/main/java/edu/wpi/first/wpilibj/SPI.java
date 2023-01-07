@@ -12,7 +12,7 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.IntBuffer;
 
-/** Represents a SPI bus port. */
+/** Represents an SPI bus port. */
 public class SPI implements AutoCloseable {
   public enum Port {
     kOnboardCS0(SPIJNI.ONBOARD_CS0_PORT),
@@ -84,7 +84,7 @@ public class SPI implements AutoCloseable {
   }
 
   /**
-   * Configure the order that bits are sent and received on the wire to be most significant bit
+   * Configure the order that bits are sent and received on the wire to be the most significant bit
    * first.
    *
    * @deprecated Does not work, will be removed.
@@ -95,7 +95,7 @@ public class SPI implements AutoCloseable {
   }
 
   /**
-   * Configure the order that bits are sent and received on the wire to be least significant bit
+   * Configure the order that bits are sent and received on the wire to be the least significant bit
    * first.
    *
    * @deprecated Does not work, will be removed.

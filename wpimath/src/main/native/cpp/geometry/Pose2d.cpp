@@ -15,14 +15,6 @@ Transform2d Pose2d::operator-(const Pose2d& other) const {
   return Transform2d{pose.Translation(), pose.Rotation()};
 }
 
-bool Pose2d::operator==(const Pose2d& other) const {
-  return m_translation == other.m_translation && m_rotation == other.m_rotation;
-}
-
-bool Pose2d::operator!=(const Pose2d& other) const {
-  return !operator==(other);
-}
-
 Pose2d Pose2d::RelativeTo(const Pose2d& other) const {
   const Transform2d transform{other, *this};
   return {transform.Translation(), transform.Rotation()};

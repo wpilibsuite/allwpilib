@@ -149,7 +149,7 @@ public class CAN implements Closeable {
   }
 
   /**
-   * Read a CAN packet. The will continuously return the last packet received, without accounting
+   * Read a CAN packet. This will continuously return the last packet received, without accounting
    * for packet age.
    *
    * @param apiId The API ID to read.
@@ -161,7 +161,7 @@ public class CAN implements Closeable {
   }
 
   /**
-   * Read a CAN packet. The will return the last packet received until the packet is older then the
+   * Read a CAN packet. This will return the last packet received until the packet is older than the
    * requested timeout. Then it will return false.
    *
    * @param apiId The API ID to read.

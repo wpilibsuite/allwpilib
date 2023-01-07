@@ -13,7 +13,7 @@ buildscript {
 
 plugins {
     id 'base'
-    id 'edu.wpi.first.wpilib.versioning.WPILibVersioningPlugin' version '2023.0.0'
+    id 'edu.wpi.first.wpilib.versioning.WPILibVersioningPlugin' version '2023.0.1'
     id 'edu.wpi.first.wpilib.repositories.WPILibRepositoriesPlugin' version '2020.2'
     id 'edu.wpi.first.NativeUtils' apply false
     id 'edu.wpi.first.GradleJni' version '1.1.0'
@@ -22,7 +22,7 @@ plugins {
     id 'visual-studio'
     id 'net.ltgt.errorprone' version '2.0.2' apply false
     id 'com.github.johnrengelman.shadow' version '7.1.2' apply false
-    id 'com.diffplug.spotless' version '6.4.2' apply false
+    id 'com.diffplug.spotless' version '6.12.0' apply false
     id 'com.github.spotbugs' version '5.0.8' apply false
 }
 

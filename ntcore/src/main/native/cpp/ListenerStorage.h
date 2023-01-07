@@ -41,6 +41,8 @@ class ListenerStorage final : public IListenerStorage {
               NT_Topic topic, NT_Handle subentry, const Value& value) final;
   void Notify(unsigned int flags, unsigned int level, std::string_view filename,
               unsigned int line, std::string_view message) final;
+  void NotifyTimeSync(std::span<const NT_Listener> handles, unsigned int flags,
+                      int64_t serverTimeOffset, int64_t rtt2, bool valid) final;
 
   // user-facing functions
   NT_Listener AddListener(ListenerCallback callback);
@@ -105,6 +107,7 @@ class ListenerStorage final : public IListenerStorage {
   VectorSet<ListenerData*> m_topicListeners;
   VectorSet<ListenerData*> m_valueListeners;
   VectorSet<ListenerData*> m_logListeners;
+  VectorSet<ListenerData*> m_timeSyncListeners;
 
   class Thread;
   wpi::SafeThreadOwner<Thread> m_thread;

@@ -68,7 +68,9 @@ struct VideoMode : public CS_VideoMode {
     kYUYV = CS_PIXFMT_YUYV,
     kRGB565 = CS_PIXFMT_RGB565,
     kBGR = CS_PIXFMT_BGR,
-    kGray = CS_PIXFMT_GRAY
+    kGray = CS_PIXFMT_GRAY,
+    kY16 = CS_PIXFMT_Y16,
+    kUYVY = CS_PIXFMT_UYVY
   };
   VideoMode() {
     pixelFormat = 0;
@@ -89,7 +91,10 @@ struct VideoMode : public CS_VideoMode {
            height == other.height && fps == other.fps;
   }
 
-  bool operator!=(const VideoMode& other) const { return !(*this == other); }
+  bool CompareWithoutFps(const VideoMode& other) const {
+    return pixelFormat == other.pixelFormat && width == other.width &&
+           height == other.height;
+  }
 };
 
 /**

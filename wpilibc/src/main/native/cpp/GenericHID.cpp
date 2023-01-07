@@ -89,6 +89,20 @@ BooleanEvent GenericHID::POVCenter(EventLoop* loop) const {
   return POV(360, loop);
 }
 
+BooleanEvent GenericHID::AxisLessThan(int axis, double threshold,
+                                      EventLoop* loop) const {
+  return BooleanEvent(loop, [this, axis, threshold]() {
+    return this->GetRawAxis(axis) < threshold;
+  });
+}
+
+BooleanEvent GenericHID::AxisGreaterThan(int axis, double threshold,
+                                         EventLoop* loop) const {
+  return BooleanEvent(loop, [this, axis, threshold]() {
+    return this->GetRawAxis(axis) > threshold;
+  });
+}
+
 int GenericHID::GetAxisCount() const {
   return DriverStation::GetStickAxisCount(m_port);
 }
@@ -134,15 +148,17 @@ void GenericHID::SetOutputs(int value) {
 }
 
 void GenericHID::SetRumble(RumbleType type, double value) {
-  if (value < 0) {
-    value = 0;
-  } else if (value > 1) {
-    value = 1;
-  }
+  value = std::clamp(value, 0.0, 1.0);
+  double rumbleValue = value * 65535;
+
   if (type == kLeftRumble) {
-    m_leftRumble = value * 65535;
+    m_leftRumble = rumbleValue;
+  } else if (type == kRightRumble) {
+    m_rightRumble = rumbleValue;
   } else {
-    m_rightRumble = value * 65535;
+    m_leftRumble = rumbleValue;
+    m_rightRumble = rumbleValue;
   }
+
   HAL_SetJoystickOutputs(m_port, m_outputs, m_leftRumble, m_rightRumble);
 }

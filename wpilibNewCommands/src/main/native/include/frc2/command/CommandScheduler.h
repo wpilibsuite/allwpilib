@@ -201,6 +201,15 @@ class CommandScheduler final : public nt::NTSendable,
   void SetDefaultCommand(Subsystem* subsystem, CommandPtr&& defaultCommand);
 
   /**
+   * Removes the default command for a subsystem. The current default command
+   * will run until another command is scheduled that requires the subsystem, at
+   * which point the current default command will not be re-scheduled.
+   *
+   * @param subsystem the subsystem whose default command will be removed
+   */
+  void RemoveDefaultCommand(Subsystem* subsystem);
+
+  /**
    * Gets the default command associated with this subsystem.  Null if this
    * subsystem has no default command associated with it.
    *
@@ -350,6 +359,34 @@ class CommandScheduler final : public nt::NTSendable,
    * @param action the action to perform
    */
   void OnCommandFinish(Action action);
+
+  /**
+   * Requires that the specified command hasn't been already added to a
+   * composition.
+   *
+   * @param command The command to check
+   * @throws if the given commands have already been composed.
+   */
+  void RequireUngrouped(const Command* command);
+
+  /**
+   * Requires that the specified commands not have been already added to a
+   * composition.
+   *
+   * @param commands The commands to check
+   * @throws if the given commands have already been composed.
+   */
+  void RequireUngrouped(std::span<const std::unique_ptr<Command>> commands);
+
+  /**
+   * Requires that the specified commands not have been already added to a
+   * composition.
+   *
+   * @param commands The commands to check
+   * @throws IllegalArgumentException if the given commands have already been
+   * composed.
+   */
+  void RequireUngrouped(std::initializer_list<const Command*> commands);
 
   void InitSendable(nt::NTSendableBuilder& builder) override;
 

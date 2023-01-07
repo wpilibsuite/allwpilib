@@ -9,6 +9,7 @@
 #include <cassert>
 #include <functional>
 #include <memory>
+#include <optional>
 #include <span>
 #include <string>
 #include <string_view>
@@ -80,6 +81,8 @@ struct EventFlags {
   static constexpr unsigned int kValueAll = kValueRemote | kValueLocal;
   /** Log message. */
   static constexpr unsigned int kLogMessage = NT_EVENT_LOGMESSAGE;
+  /** Time synchronized with server. */
+  static constexpr unsigned int kTimeSync = NT_EVENT_TIMESYNC;
 };
 
 /** NetworkTables Topic Information */
@@ -186,6 +189,29 @@ class LogMessage {
   std::string message;
 };
 
+/** NetworkTables time sync event data. */
+class TimeSyncEventData {
+ public:
+  TimeSyncEventData() = default;
+  TimeSyncEventData(int64_t serverTimeOffset, int64_t rtt2, bool valid)
+      : serverTimeOffset{serverTimeOffset}, rtt2{rtt2}, valid{valid} {}
+
+  /**
+   * Offset between local time and server time, in microseconds. Add this value
+   * to local time to get the estimated equivalent server time.
+   */
+  int64_t serverTimeOffset;
+
+  /** Measured round trip time divided by 2, in microseconds. */
+  int64_t rtt2;
+
+  /**
+   * If serverTimeOffset and RTT are valid. An event with this set to false is
+   * sent when the client disconnects.
+   */
+  bool valid;
+};
+
 /** NetworkTables event */
 class Event {
  public:
@@ -208,6 +234,11 @@ class Event {
       : listener{listener},
         flags{flags},
         data{LogMessage{level, filename, line, message}} {}
+  Event(NT_Listener listener, unsigned int flags, int64_t serverTimeOffset,
+        int64_t rtt2, bool valid)
+      : listener{listener},
+        flags{flags},
+        data{TimeSyncEventData{serverTimeOffset, rtt2, valid}} {}
 
   /** Listener that triggered this event. */
   NT_Listener listener{0};
@@ -215,11 +246,12 @@ class Event {
   /**
    * Event flags (NT_EventFlags). Also indicates the data included with the
    * event:
-   * - NT_NOTIFY_CONNECTED or NT_NOTIFY_DISCONNECTED: GetConnectionInfo()
-   * - NT_NOTIFY_PUBLISH, NT_NOTIFY_UNPUBLISH, or NT_NOTIFY_PROPERTIES:
+   * - NT_EVENT_CONNECTED or NT_EVENT_DISCONNECTED: GetConnectionInfo()
+   * - NT_EVENT_PUBLISH, NT_EVENT_UNPUBLISH, or NT_EVENT_PROPERTIES:
    *   GetTopicInfo()
-   * - NT_NOTIFY_VALUE, NT_NOTIFY_VALUE_LOCAL: GetValueData()
-   * - NT_NOTIFY_LOGMESSAGE: GetLogMessage()
+   * - NT_EVENT_VALUE, NT_EVENT_VALUE_LOCAL: GetValueData()
+   * - NT_EVENT_LOGMESSAGE: GetLogMessage()
+   * - NT_EVENT_TIMESYNC: GetTimeSyncEventData()
    */
   unsigned int flags{0};
 
@@ -232,101 +264,121 @@ class Event {
   bool Is(unsigned int kind) const { return (flags & kind) != 0; }
 
   /** Event data; content depends on flags. */
-  std::variant<ConnectionInfo, TopicInfo, ValueEventData, LogMessage> data;
+  std::variant<ConnectionInfo, TopicInfo, ValueEventData, LogMessage,
+               TimeSyncEventData>
+      data;
 
   const ConnectionInfo* GetConnectionInfo() const {
-    return std::get_if<nt::ConnectionInfo>(&data);
+    return std::get_if<ConnectionInfo>(&data);
   }
   ConnectionInfo* GetConnectionInfo() {
-    return std::get_if<nt::ConnectionInfo>(&data);
+    return std::get_if<ConnectionInfo>(&data);
   }
 
   const TopicInfo* GetTopicInfo() const {
-    return std::get_if<nt::TopicInfo>(&data);
+    return std::get_if<TopicInfo>(&data);
   }
-  TopicInfo* GetTopicInfo() { return std::get_if<nt::TopicInfo>(&data); }
+  TopicInfo* GetTopicInfo() { return std::get_if<TopicInfo>(&data); }
 
   const ValueEventData* GetValueEventData() const {
-    return std::get_if<nt::ValueEventData>(&data);
+    return std::get_if<ValueEventData>(&data);
   }
   ValueEventData* GetValueEventData() {
-    return std::get_if<nt::ValueEventData>(&data);
+    return std::get_if<ValueEventData>(&data);
   }
 
   const LogMessage* GetLogMessage() const {
-    return std::get_if<nt::LogMessage>(&data);
+    return std::get_if<LogMessage>(&data);
   }
-  LogMessage* GetLogMessage() { return std::get_if<nt::LogMessage>(&data); }
+  LogMessage* GetLogMessage() { return std::get_if<LogMessage>(&data); }
+
+  const TimeSyncEventData* GetTimeSyncEventData() const {
+    return std::get_if<TimeSyncEventData>(&data);
+  }
+  TimeSyncEventData* GetTimeSyncEventData() {
+    return std::get_if<TimeSyncEventData>(&data);
+  }
 };
 
-/** NetworkTables publish/subscribe option. */
-class PubSubOption {
- public:
-  constexpr PubSubOption(NT_PubSubOptionType type, double value)
-      : type{type}, value{value} {}
+/** NetworkTables publish/subscribe options. */
+struct PubSubOptions {
+  /**
+   * Default value of periodic.
+   */
+  static constexpr double kDefaultPeriodic = 0.1;
 
   /**
-   * How frequently changes will be sent over the network. NetworkTables may
-   * send more frequently than this (e.g. use a combined minimum period for all
-   * values) or apply a restricted range to this value. The default if
-   * unspecified (and the immediate flag is false) is 100 ms. This option and
-   * the immediate option override each other.
-   *
-   * @param time time between updates, in seconds
-   * @return option
+   * Structure size. Must be set to sizeof(PubSubOptions).
    */
-  static constexpr PubSubOption Periodic(double time) {
-    return PubSubOption{NT_PUBSUB_PERIODIC, time};
-  }
+  unsigned int structSize = sizeof(PubSubOptions);
 
   /**
-   * If enabled, sends all value changes over the network even if only sent
-   * periodically. This option defaults to disabled.
-   *
-   * @param enabled True to enable, false to disable
-   * @return option
+   * Polling storage size for a subscription. Specifies the maximum number of
+   * updates NetworkTables should store between calls to the subscriber's
+   * ReadQueue() function. If zero, defaults to 1 if sendAll is false, 20 if
+   * sendAll is true.
    */
-  static constexpr PubSubOption SendAll(bool enabled) {
-    return PubSubOption{NT_PUBSUB_SENDALL, enabled ? 1.0 : 0.0};
-  }
+  unsigned int pollStorage = 0;
 
   /**
-   * If enabled, no value changes are sent over the network. This option
-   * defaults to disabled.
-   *
-   * @param enabled True to enable, false to disable
-   * @return option
+   * How frequently changes will be sent over the network, in seconds.
+   * NetworkTables may send more frequently than this (e.g. use a combined
+   * minimum period for all values) or apply a restricted range to this value.
+   * The default is 100 ms.
    */
-  static constexpr PubSubOption TopicsOnly(bool enabled) {
-    return PubSubOption{NT_PUBSUB_TOPICSONLY, enabled ? 1.0 : 0.0};
-  }
+  double periodic = kDefaultPeriodic;
 
   /**
-   * If enabled, preserves duplicate value changes (rather than ignoring them).
-   * This option defaults to disabled.
-   *
-   * @param enabled True to enable, false to disable
-   * @return option
+   * For subscriptions, if non-zero, value updates for ReadQueue() are not
+   * queued for this publisher.
    */
-  static constexpr PubSubOption KeepDuplicates(bool enabled) {
-    return PubSubOption{NT_PUBSUB_KEEPDUPLICATES, enabled ? 1.0 : 0.0};
-  }
+  NT_Publisher excludePublisher = 0;
 
   /**
-   * Polling storage for subscription. Specifies the maximum number of updates
-   * NetworkTables should store between calls to the subscriber's poll()
-   * function. Defaults to 1 if SendAll is false, 20 if SendAll is true.
-   *
-   * @param depth number of entries to save for polling.
-   * @return option
+   * Send all value changes over the network.
    */
-  static constexpr PubSubOption PollStorage(int depth) {
-    return PubSubOption{NT_PUBSUB_POLLSTORAGE, static_cast<double>(depth)};
-  }
+  bool sendAll = false;
 
-  NT_PubSubOptionType type;
-  double value;
+  /**
+   * For subscriptions, don't ask for value changes (only topic announcements).
+   */
+  bool topicsOnly = false;
+
+  /**
+   * Preserve duplicate value changes (rather than ignoring them).
+   */
+  bool keepDuplicates = false;
+
+  /**
+   * Perform prefix match on subscriber topic names. Is ignored/overridden by
+   * Subscribe() functions; only present in struct for the purposes of getting
+   * information about subscriptions.
+   */
+  bool prefixMatch = false;
+
+  /**
+   * For subscriptions, if remote value updates should not be queued for
+   * ReadQueue(). See also disableLocal.
+   */
+  bool disableRemote = false;
+
+  /**
+   * For subscriptions, if local value updates should not be queued for
+   * ReadQueue(). See also disableRemote.
+   */
+  bool disableLocal = false;
+
+  /**
+   * For entries, don't queue (for ReadQueue) value updates for the entry's
+   * internal publisher.
+   */
+  bool excludeSelf = false;
 };
+
+/**
+ * Default publish/subscribe options.
+ */
+constexpr PubSubOptions kDefaultPubSubOptions;
 
 /**
  * @defgroup ntcore_instance_func Instance Functions
@@ -694,7 +746,7 @@ bool SetTopicProperties(NT_Topic topic, const wpi::json& update);
  * @return Subscriber handle
  */
 NT_Subscriber Subscribe(NT_Topic topic, NT_Type type, std::string_view typeStr,
-                        std::span<const PubSubOption> options = {});
+                        const PubSubOptions& options = kDefaultPubSubOptions);
 
 /**
  * Stops subscriber.
@@ -713,7 +765,7 @@ void Unsubscribe(NT_Subscriber sub);
  * @return Publisher handle
  */
 NT_Publisher Publish(NT_Topic topic, NT_Type type, std::string_view typeStr,
-                     std::span<const PubSubOption> options = {});
+                     const PubSubOptions& options = kDefaultPubSubOptions);
 
 /**
  * Creates a new publisher to a topic.
@@ -727,7 +779,7 @@ NT_Publisher Publish(NT_Topic topic, NT_Type type, std::string_view typeStr,
  */
 NT_Publisher PublishEx(NT_Topic topic, NT_Type type, std::string_view typeStr,
                        const wpi::json& properties,
-                       std::span<const PubSubOption> options = {});
+                       const PubSubOptions& options = kDefaultPubSubOptions);
 
 /**
  * Stops publisher.
@@ -746,7 +798,7 @@ void Unpublish(NT_Handle pubentry);
  * @return Entry handle
  */
 NT_Entry GetEntry(NT_Topic topic, NT_Type type, std::string_view typeStr,
-                  std::span<const PubSubOption> options = {});
+                  const PubSubOptions& options = kDefaultPubSubOptions);
 
 /**
  * Stops entry subscriber/publisher.
@@ -789,7 +841,7 @@ NT_Topic GetTopicFromHandle(NT_Handle pubsubentry);
  */
 NT_MultiSubscriber SubscribeMultiple(
     NT_Inst inst, std::span<const std::string_view> prefixes,
-    std::span<const PubSubOption> options = {});
+    const PubSubOptions& options = kDefaultPubSubOptions);
 
 /**
  * Unsubscribes a multi-subscriber.
@@ -1096,6 +1148,19 @@ std::vector<ConnectionInfo> GetConnections(NT_Inst inst);
  */
 bool IsConnected(NT_Inst inst);
 
+/**
+ * Get the time offset between server time and local time. Add this value to
+ * local time to get the estimated equivalent server time. In server mode, this
+ * always returns 0. In client mode, this returns the time offset only if the
+ * client and server are connected and have exchanged synchronization messages.
+ * Note the time offset may change over time as it is periodically updated; to
+ * receive updates as events, add a listener to the "time sync" event.
+ *
+ * @param inst instance handle
+ * @return Time offset in microseconds (optional)
+ */
+std::optional<int64_t> GetServerTimeOffset(NT_Inst inst);
+
 /** @} */
 
 /**
@@ -1229,4 +1294,119 @@ NT_Listener AddPolledLogger(NT_ListenerPoller poller, unsigned int min_level,
 /** @} */
 /** @} */
 
+/**
+ * NetworkTables meta-topic decoding functions.
+ */
+namespace meta {
+
+/**
+ * @defgroup ntcore_cpp_meta_api ntcore C++ meta-topic API
+ *
+ * Meta-topic decoders for C++.
+ *
+ * @{
+ */
+
+/**
+ * Subscriber options. Different from PubSubOptions in this reflects only
+ * options that are sent over the network.
+ */
+struct SubscriberOptions {
+  double periodic = 0.1;
+  bool topicsOnly = false;
+  bool sendAll = false;
+  bool prefixMatch = false;
+  // std::string otherStr;
+};
+
+/**
+ * Topic publisher (as published via `$pub$<topic>`).
+ */
+struct TopicPublisher {
+  std::string client;
+  uint64_t pubuid = 0;
+};
+
+/**
+ * Topic subscriber (as published via `$sub$<topic>`).
+ */
+struct TopicSubscriber {
+  std::string client;
+  uint64_t subuid = 0;
+  SubscriberOptions options;
+};
+
+/**
+ * Client publisher (as published via `$clientpub$<client>` or `$serverpub`).
+ */
+struct ClientPublisher {
+  int64_t uid = -1;
+  std::string topic;
+};
+
+/**
+ * Client subscriber (as published via `$clientsub$<client>` or `$serversub`).
+ */
+struct ClientSubscriber {
+  int64_t uid = -1;
+  std::vector<std::string> topics;
+  SubscriberOptions options;
+};
+
+/**
+ * Client (as published via `$clients`).
+ */
+struct Client {
+  std::string id;
+  std::string conn;
+  uint16_t version = 0;
+};
+
+/**
+ * Decodes `$pub$<topic>` meta-topic data.
+ *
+ * @param data data contents
+ * @return Vector of TopicPublishers, or empty optional on decoding error.
+ */
+std::optional<std::vector<TopicPublisher>> DecodeTopicPublishers(
+    std::span<const uint8_t> data);
+
+/**
+ * Decodes `$sub$<topic>` meta-topic data.
+ *
+ * @param data data contents
+ * @return Vector of TopicSubscribers, or empty optional on decoding error.
+ */
+std::optional<std::vector<TopicSubscriber>> DecodeTopicSubscribers(
+    std::span<const uint8_t> data);
+
+/**
+ * Decodes `$clientpub$<topic>` meta-topic data.
+ *
+ * @param data data contents
+ * @return Vector of ClientPublishers, or empty optional on decoding error.
+ */
+std::optional<std::vector<ClientPublisher>> DecodeClientPublishers(
+    std::span<const uint8_t> data);
+
+/**
+ * Decodes `$clientsub$<topic>` meta-topic data.
+ *
+ * @param data data contents
+ * @return Vector of ClientSubscribers, or empty optional on decoding error.
+ */
+std::optional<std::vector<ClientSubscriber>> DecodeClientSubscribers(
+    std::span<const uint8_t> data);
+
+/**
+ * Decodes `$clients` meta-topic data.
+ *
+ * @param data data contents
+ * @return Vector of Clients, or empty optional on decoding error.
+ */
+std::optional<std::vector<Client>> DecodeClients(std::span<const uint8_t> data);
+
+/** @} */
+
+}  // namespace meta
 }  // namespace nt

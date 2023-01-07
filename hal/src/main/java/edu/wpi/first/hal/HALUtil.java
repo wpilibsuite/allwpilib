@@ -22,6 +22,10 @@ public final class HALUtil extends JNIWrapper {
 
   public static native int getFPGARevision();
 
+  public static native String getSerialNumber();
+
+  public static native String getComments();
+
   public static native long getFPGATime();
 
   public static native int getHALRuntimeType();

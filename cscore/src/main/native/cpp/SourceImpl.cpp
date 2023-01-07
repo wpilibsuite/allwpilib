@@ -198,6 +198,10 @@ bool SourceImpl::SetConfigJson(const wpi::json& config, CS_Status* status) {
         mode.pixelFormat = cs::VideoMode::kBGR;
       } else if (wpi::equals_lower(str, "gray")) {
         mode.pixelFormat = cs::VideoMode::kGray;
+      } else if (wpi::equals_lower(str, "y16")) {
+        mode.pixelFormat = cs::VideoMode::kY16;
+      } else if (wpi::equals_lower(str, "uyvy")) {
+        mode.pixelFormat = cs::VideoMode::kUYVY;
       } else {
         SWARNING("SetConfigJson: could not understand pixel format value '{}'",
                  str);
@@ -359,6 +363,12 @@ wpi::json SourceImpl::GetConfigJsonObject(CS_Status* status) {
       break;
     case VideoMode::kGray:
       pixelFormat = "gray";
+      break;
+    case VideoMode::kY16:
+      pixelFormat = "y16";
+      break;
+    case VideoMode::kUYVY:
+      pixelFormat = "uyvy";
       break;
     default:
       break;

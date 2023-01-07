@@ -3,7 +3,9 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #include "CommandTestBase.h"
+#include "CompositionTestBase.h"
 #include "frc2/command/FunctionalCommand.h"
+#include "frc2/command/RepeatCommand.h"
 
 using namespace frc2;
 class RepeatCommandTest : public CommandTestBase {};
@@ -47,7 +49,7 @@ TEST_F(RepeatCommandTest, CallsMethodsCorrectly) {
 
   isFinishedHook = true;
   scheduler.Run();
-  EXPECT_EQ(2, initCounter);
+  EXPECT_EQ(1, initCounter);
   EXPECT_EQ(2, exeCounter);
   EXPECT_EQ(2, isFinishedCounter);
   EXPECT_EQ(1, endCounter);
@@ -59,3 +61,6 @@ TEST_F(RepeatCommandTest, CallsMethodsCorrectly) {
   EXPECT_EQ(3, isFinishedCounter);
   EXPECT_EQ(1, endCounter);
 }
+
+INSTANTIATE_SINGLE_COMMAND_COMPOSITION_TEST_SUITE(RepeatCommandTest,
+                                                  RepeatCommand);

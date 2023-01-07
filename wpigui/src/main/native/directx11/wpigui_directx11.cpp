@@ -134,6 +134,11 @@ bool gui::PlatformInitRenderer() {
 }
 
 void gui::PlatformRenderFrame() {
+  if (gContext->reloadFonts) {
+    ImGui_ImplDX11_InvalidateDeviceObjects();
+    ImGui_ImplDX11_CreateDeviceObjects();
+    gContext->reloadFonts = false;
+  }
   ImGui_ImplDX11_NewFrame();
 
   CommonRenderFrame();

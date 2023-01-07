@@ -41,6 +41,8 @@ class NetworkTablesSettings {
   std::string& m_serverTeam;
   std::string& m_listenAddress;
   std::string& m_clientName;
+  int& m_port3;
+  int& m_port4;
   bool& m_dsClient;
 
   class Thread : public wpi::SafeThread {
@@ -56,6 +58,8 @@ class NetworkTablesSettings {
     std::string m_serverTeam;
     std::string m_listenAddress;
     std::string m_clientName;
+    int m_port3;
+    int m_port4;
     bool m_dsClient;
   };
   wpi::SafeThreadOwner<Thread> m_thread;

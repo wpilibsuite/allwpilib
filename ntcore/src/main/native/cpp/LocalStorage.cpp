@@ -34,6 +34,15 @@ static constexpr size_t kMaxListeners = 512;
 
 namespace {
 
+static constexpr bool IsSpecial(std::string_view name) {
+  return name.empty() ? false : name.front() == '$';
+}
+
+static constexpr bool PrefixMatch(std::string_view name,
+                                  std::string_view prefix, bool special) {
+  return (!special || !prefix.empty()) && wpi::starts_with(name, prefix);
+}
+
 // Utility wrapper for making a set-like vector
 template <typename T>
 class VectorSet : public std::vector<T> {
@@ -66,7 +75,7 @@ struct TopicData {
   static constexpr auto kType = Handle::kTopic;
 
   TopicData(NT_Topic handle, std::string_view name)
-      : handle{handle}, name{name} {}
+      : handle{handle}, name{name}, special{IsSpecial(name)} {}
 
   bool Exists() const { return onNetwork || !localPublishers.empty(); }
 
@@ -75,9 +84,10 @@ struct TopicData {
   // invariants
   wpi::SignalObject<NT_Topic> handle;
   std::string name;
+  bool special;
 
   Value lastValue;  // also stores timestamp
-  bool lastValueNetwork{false};
+  Value lastValueNetwork;
   NT_Type type{NT_UNASSIGNED};
   std::string typeStr;
   unsigned int flags{0};            // for NT3 APIs
@@ -97,11 +107,13 @@ struct TopicData {
   VectorSet<NT_Listener> listeners;
 };
 
-struct PubSubConfig : public PubSubOptions {
+struct PubSubConfig : public PubSubOptionsImpl {
   PubSubConfig() = default;
   PubSubConfig(NT_Type type, std::string_view typeStr,
-               std::span<const PubSubOption> options)
-      : PubSubOptions{options}, type{type}, typeStr{typeStr} {}
+               const PubSubOptions& options)
+      : PubSubOptionsImpl{options}, type{type}, typeStr{typeStr} {
+    prefixMatch = false;
+  }
 
   NT_Type type{NT_UNASSIGNED};
   std::string typeStr;
@@ -131,7 +143,7 @@ struct SubscriberData {
       : handle{handle},
         topic{topic},
         config{std::move(config)},
-        pollStorage{config.pollStorageSize} {}
+        pollStorage{config.pollStorage} {}
 
   void UpdateActive();
 
@@ -170,8 +182,8 @@ struct MultiSubscriberData {
 
   MultiSubscriberData(NT_MultiSubscriber handle,
                       std::span<const std::string_view> prefixes,
-                      PubSubOptions options)
-      : handle{handle}, options{std::move(options)} {
+                      const PubSubOptionsImpl& options)
+      : handle{handle}, options{options} {
     this->options.prefixMatch = true;
     this->prefixes.reserve(prefixes.size());
     for (auto&& prefix : prefixes) {
@@ -179,14 +191,25 @@ struct MultiSubscriberData {
     }
   }
 
+  bool Matches(std::string_view name, bool special);
+
   // invariants
   wpi::SignalObject<NT_MultiSubscriber> handle;
   std::vector<std::string> prefixes;
-  PubSubOptions options;
+  PubSubOptionsImpl options;
 
   // value listeners
   VectorSet<NT_Listener> valueListeners;
 };
+
+bool MultiSubscriberData::Matches(std::string_view name, bool special) {
+  for (auto&& prefix : prefixes) {
+    if (PrefixMatch(name, prefix, special)) {
+      return true;
+    }
+  }
+  return false;
+}
 
 struct ListenerData {
   ListenerData(NT_Listener handle, SubscriberData* subscriber,
@@ -261,8 +284,9 @@ struct LSImpl {
   void CheckReset(TopicData* topic);
 
   bool SetValue(TopicData* topic, const Value& value, unsigned int eventFlags,
-                bool isDuplicate);
-  void NotifyValue(TopicData* topic, unsigned int eventFlags, bool isDuplicate);
+                bool isDuplicate, const PublisherData* publisher);
+  void NotifyValue(TopicData* topic, unsigned int eventFlags, bool isDuplicate,
+                   const PublisherData* publisher);
 
   void SetFlags(TopicData* topic, unsigned int flags);
   void SetPersistent(TopicData* topic, bool value);
@@ -403,6 +427,7 @@ void SubscriberData::UpdateActive() {
 }
 
 void LSImpl::NotifyTopic(TopicData* topic, unsigned int eventFlags) {
+  DEBUG4("NotifyTopic({}, {})", topic->name, eventFlags);
   auto topicInfo = topic->GetTopicInfo();
   if (!topic->listeners.empty()) {
     m_listenerStorage.Notify(topic->listeners, eventFlags, topicInfo);
@@ -410,12 +435,9 @@ void LSImpl::NotifyTopic(TopicData* topic, unsigned int eventFlags) {
 
   wpi::SmallVector<NT_Listener, 32> listeners;
   for (auto listener : m_topicPrefixListeners) {
-    if (listener->multiSubscriber) {
-      for (auto&& prefix : listener->multiSubscriber->prefixes) {
-        if (wpi::starts_with(topic->name, prefix)) {
-          listeners.emplace_back(listener->handle);
-        }
-      }
+    if (listener->multiSubscriber &&
+        listener->multiSubscriber->Matches(topic->name, topic->special)) {
+      listeners.emplace_back(listener->handle);
     }
   }
   if (!listeners.empty()) {
@@ -461,7 +483,7 @@ void LSImpl::CheckReset(TopicData* topic) {
     return;
   }
   topic->lastValue = {};
-  topic->lastValueNetwork = false;
+  topic->lastValueNetwork = {};
   topic->type = NT_UNASSIGNED;
   topic->typeStr.clear();
   topic->flags = 0;
@@ -470,18 +492,18 @@ void LSImpl::CheckReset(TopicData* topic) {
 }
 
 bool LSImpl::SetValue(TopicData* topic, const Value& value,
-                      unsigned int eventFlags, bool isDuplicate) {
+                      unsigned int eventFlags, bool isDuplicate,
+                      const PublisherData* publisher) {
+  DEBUG4("SetValue({}, {}, {}, {})", topic->name, value.time(), eventFlags,
+         isDuplicate);
   if (topic->type != NT_UNASSIGNED && topic->type != value.type()) {
     return false;
   }
-  bool isNetwork = (eventFlags & NT_EVENT_VALUE_REMOTE) != 0;
-  if (!topic->lastValue || topic->lastValueNetwork == isNetwork ||
-      value.time() >= topic->lastValue.time()) {
+  if (!topic->lastValue || value.time() >= topic->lastValue.time()) {
     // TODO: notify option even if older value
     topic->type = value.type();
     topic->lastValue = value;
-    topic->lastValueNetwork = isNetwork;
-    NotifyValue(topic, eventFlags, isDuplicate);
+    NotifyValue(topic, eventFlags, isDuplicate, publisher);
   }
   if (!isDuplicate && topic->datalogType == value.type()) {
     for (auto&& datalog : topic->datalogs) {
@@ -492,10 +514,15 @@ bool LSImpl::SetValue(TopicData* topic, const Value& value,
 }
 
 void LSImpl::NotifyValue(TopicData* topic, unsigned int eventFlags,
-                         bool isDuplicate) {
+                         bool isDuplicate, const PublisherData* publisher) {
+  bool isNetwork = (eventFlags & NT_EVENT_VALUE_REMOTE) != 0;
   for (auto&& subscriber : topic->localSubscribers) {
     if (subscriber->active &&
-        (subscriber->config.keepDuplicates || !isDuplicate)) {
+        (subscriber->config.keepDuplicates || !isDuplicate) &&
+        ((isNetwork && !subscriber->config.disableRemote) ||
+         (!isNetwork && !subscriber->config.disableLocal)) &&
+        (!publisher || (publisher && (subscriber->config.excludePublisher !=
+                                      publisher->handle)))) {
       subscriber->pollStorage.emplace_back(topic->lastValue);
       subscriber->handle.Set();
       if (!subscriber->valueListeners.empty()) {
@@ -872,7 +899,7 @@ MultiSubscriberData* LSImpl::AddMultiSubscriber(
   // subscribe to any already existing topics
   for (auto&& topic : m_topics) {
     for (auto&& prefix : prefixes) {
-      if (wpi::starts_with(topic->name, prefix)) {
+      if (PrefixMatch(topic->name, prefix, topic->special)) {
         topic->multiSubscribers.Add(subscriber);
         break;
       }
@@ -993,10 +1020,8 @@ void LSImpl::AddListenerImpl(NT_Listener listenerHandle,
   if ((eventMask & NT_EVENT_IMMEDIATE) != 0 &&
       (eventMask & (NT_EVENT_PUBLISH | NT_EVENT_VALUE_ALL)) != 0) {
     for (auto&& topic : m_topics) {
-      for (auto&& prefix : subscriber->prefixes) {
-        if (wpi::starts_with(topic->name, prefix) && topic->Exists()) {
-          topics.emplace_back(topic.get());
-        }
+      if (topic->Exists() && subscriber->Matches(topic->name, topic->special)) {
+        topics.emplace_back(topic.get());
       }
     }
   }
@@ -1067,10 +1092,8 @@ void LSImpl::AddListener(NT_Listener listenerHandle,
     return;
   }
   // subscribe to make sure topic updates are received
-  PubSubOptions options;
-  options.topicsOnly = (eventMask & NT_EVENT_VALUE_ALL) == 0;
-  options.prefixMatch = true;
-  auto sub = AddMultiSubscriber(prefixes, options);
+  auto sub = AddMultiSubscriber(
+      prefixes, {.topicsOnly = (eventMask & NT_EVENT_VALUE_ALL) == 0});
   AddListenerImpl(listenerHandle, sub, eventMask, true);
 }
 
@@ -1122,11 +1145,8 @@ TopicData* LSImpl::GetOrCreateTopic(std::string_view name) {
     topic = m_topics.Add(m_inst, name);
     // attach multi-subscribers
     for (auto&& sub : m_multiSubscribers) {
-      for (auto&& prefix : sub->prefixes) {
-        if (wpi::starts_with(name, prefix)) {
-          topic->multiSubscribers.Add(sub.get());
-          break;
-        }
+      if (sub->Matches(name, topic->special)) {
+        topic->multiSubscribers.Add(sub.get());
       }
     }
   }
@@ -1218,16 +1238,20 @@ bool LSImpl::PublishLocalValue(PublisherData* publisher, const Value& value,
     return false;
   }
   if (publisher->active) {
-    bool isDuplicate;
+    bool isDuplicate, isNetworkDuplicate;
     if (force || publisher->config.keepDuplicates) {
       isDuplicate = false;
+      isNetworkDuplicate = false;
     } else {
       isDuplicate = (publisher->topic->lastValue == value);
+      isNetworkDuplicate = (publisher->topic->lastValueNetwork == value);
     }
-    if (!isDuplicate && m_network) {
+    if (!isNetworkDuplicate && m_network) {
+      publisher->topic->lastValueNetwork = value;
       m_network->SetValue(publisher->handle, value);
     }
-    return SetValue(publisher->topic, value, NT_EVENT_VALUE_LOCAL, isDuplicate);
+    return SetValue(publisher->topic, value, NT_EVENT_VALUE_LOCAL, isDuplicate,
+                    publisher);
   } else {
     return false;
   }
@@ -1241,6 +1265,9 @@ bool LSImpl::SetEntryValue(NT_Handle pubentryHandle, const Value& value) {
   if (!publisher) {
     if (auto entry = m_entries.Get(pubentryHandle)) {
       publisher = PublishEntry(entry, value.type());
+      if (entry->subscriber->config.excludeSelf) {
+        entry->subscriber->config.excludePublisher = publisher->handle;
+      }
     }
     if (!publisher) {
       return false;
@@ -1346,41 +1373,44 @@ void LocalStorage::NetworkPropertiesUpdate(std::string_view name,
 void LocalStorage::NetworkSetValue(NT_Topic topicHandle, const Value& value) {
   std::scoped_lock lock{m_mutex};
   if (auto topic = m_impl->m_topics.Get(topicHandle)) {
-    m_impl->SetValue(topic, value, NT_EVENT_VALUE_REMOTE,
-                     value == topic->lastValue);
+    if (m_impl->SetValue(topic, value, NT_EVENT_VALUE_REMOTE,
+                         value == topic->lastValue, nullptr)) {
+      topic->lastValueNetwork = value;
+    }
   }
 }
 
-void LocalStorage::StartNetwork(net::NetworkStartupInterface& startup,
-                                net::NetworkInterface* network) {
+void LocalStorage::StartNetwork(net::NetworkInterface* network) {
+  WPI_DEBUG4(m_impl->m_logger, "StartNetwork()");
   std::scoped_lock lock{m_mutex};
+  m_impl->m_network = network;
   // publish all active publishers to the network and send last values
   // only send value once per topic
   for (auto&& topic : m_impl->m_topics) {
     PublisherData* anyPublisher = nullptr;
     for (auto&& publisher : topic->localPublishers) {
       if (publisher->active) {
-        startup.Publish(publisher->handle, topic->handle, topic->name,
-                        topic->typeStr, topic->properties, publisher->config);
+        network->Publish(publisher->handle, topic->handle, topic->name,
+                         topic->typeStr, topic->properties, publisher->config);
         anyPublisher = publisher;
       }
     }
     if (anyPublisher && topic->lastValue) {
-      startup.SetValue(anyPublisher->handle, topic->lastValue);
+      network->SetValue(anyPublisher->handle, topic->lastValue);
     }
   }
   for (auto&& subscriber : m_impl->m_subscribers) {
-    startup.Subscribe(subscriber->handle, {{subscriber->topic->name}},
-                      subscriber->config);
+    network->Subscribe(subscriber->handle, {{subscriber->topic->name}},
+                       subscriber->config);
   }
   for (auto&& subscriber : m_impl->m_multiSubscribers) {
-    startup.Subscribe(subscriber->handle, subscriber->prefixes,
-                      subscriber->options);
+    network->Subscribe(subscriber->handle, subscriber->prefixes,
+                       subscriber->options);
   }
-  m_impl->m_network = network;
 }
 
 void LocalStorage::ClearNetwork() {
+  WPI_DEBUG4(m_impl->m_logger, "ClearNetwork()");
   std::scoped_lock lock{m_mutex};
   m_impl->m_network = nullptr;
   // treat as an unannounce all from the network side
@@ -1613,7 +1643,7 @@ TopicInfo LocalStorage::GetTopicInfo(NT_Topic topicHandle) {
 
 NT_Subscriber LocalStorage::Subscribe(NT_Topic topicHandle, NT_Type type,
                                       std::string_view typeStr,
-                                      std::span<const PubSubOption> options) {
+                                      const PubSubOptions& options) {
   std::scoped_lock lock{m_mutex};
 
   // Get the topic
@@ -1640,8 +1670,7 @@ void LocalStorage::Unsubscribe(NT_Subscriber subHandle) {
 }
 
 NT_MultiSubscriber LocalStorage::SubscribeMultiple(
-    std::span<const std::string_view> prefixes,
-    std::span<const PubSubOption> options) {
+    std::span<const std::string_view> prefixes, const PubSubOptions& options) {
   std::scoped_lock lock{m_mutex};
 
   if (m_impl->m_multiSubscribers.size() >= kMaxMultiSubscribers) {
@@ -1650,9 +1679,7 @@ NT_MultiSubscriber LocalStorage::SubscribeMultiple(
     return 0;
   }
 
-  PubSubOptions opts{options};
-  opts.prefixMatch = true;
-  return m_impl->AddMultiSubscriber(prefixes, opts)->handle;
+  return m_impl->AddMultiSubscriber(prefixes, options)->handle;
 }
 
 void LocalStorage::UnsubscribeMultiple(NT_MultiSubscriber subHandle) {
@@ -1663,7 +1690,7 @@ void LocalStorage::UnsubscribeMultiple(NT_MultiSubscriber subHandle) {
 NT_Publisher LocalStorage::Publish(NT_Topic topicHandle, NT_Type type,
                                    std::string_view typeStr,
                                    const wpi::json& properties,
-                                   std::span<const PubSubOption> options) {
+                                   const PubSubOptions& options) {
   std::scoped_lock lock{m_mutex};
 
   // Get the topic
@@ -1713,7 +1740,7 @@ void LocalStorage::Unpublish(NT_Handle pubentryHandle) {
 
 NT_Entry LocalStorage::GetEntry(NT_Topic topicHandle, NT_Type type,
                                 std::string_view typeStr,
-                                std::span<const PubSubOption> options) {
+                                const PubSubOptions& options) {
   std::scoped_lock lock{m_mutex};
 
   // Get the topic

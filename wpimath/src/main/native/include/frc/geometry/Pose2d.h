@@ -70,19 +70,8 @@ class WPILIB_DLLEXPORT Pose2d {
 
   /**
    * Checks equality between this Pose2d and another object.
-   *
-   * @param other The other object.
-   * @return Whether the two objects are equal.
    */
-  bool operator==(const Pose2d& other) const;
-
-  /**
-   * Checks inequality between this Pose2d and another object.
-   *
-   * @param other The other object.
-   * @return Whether the two objects are not equal.
-   */
-  bool operator!=(const Pose2d& other) const;
+  bool operator==(const Pose2d&) const = default;
 
   /**
    * Returns the underlying translation.

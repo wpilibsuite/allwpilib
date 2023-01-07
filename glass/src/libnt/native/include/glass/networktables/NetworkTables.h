@@ -28,25 +28,6 @@ class DataSource;
 
 class NetworkTablesModel : public Model {
  public:
-  struct SubscriberOptions {
-    float periodic = 0.1f;
-    bool immediate = false;
-    bool sendAll = false;
-    bool prefixMatch = false;
-    // std::string otherStr;
-  };
-
-  struct TopicPublisher {
-    std::string client;
-    uint64_t pubuid;
-  };
-
-  struct TopicSubscriber {
-    std::string client;
-    uint64_t subuid;
-    SubscriberOptions options;
-  };
-
   struct EntryValueTreeNode;
 
   struct ValueSource {
@@ -103,8 +84,8 @@ class NetworkTablesModel : public Model {
     /** Publisher (created when the value changes). */
     NT_Publisher publisher{0};
 
-    std::vector<TopicPublisher> publishers;
-    std::vector<TopicSubscriber> subscribers;
+    std::vector<nt::meta::TopicPublisher> publishers;
+    std::vector<nt::meta::TopicSubscriber> subscribers;
   };
 
   struct TreeNode {
@@ -126,24 +107,18 @@ class NetworkTablesModel : public Model {
     std::vector<TreeNode> children;
   };
 
-  struct ClientPublisher {
-    int64_t uid = -1;
-    std::string topic;
-  };
+  struct Client : public nt::meta::Client {
+    Client() = default;
+    /*implicit*/ Client(nt::meta::Client&& oth)  // NOLINT
+        : nt::meta::Client{std::move(oth)} {}
 
-  struct ClientSubscriber {
-    int64_t uid = -1;
-    std::vector<std::string> topics;
-    std::string topicsStr;
-    SubscriberOptions options;
-  };
+    struct Subscriber : public nt::meta::ClientSubscriber {
+      /*implicit*/ Subscriber(nt::meta::ClientSubscriber&& oth);  // NOLINT
+      std::string topicsStr;
+    };
 
-  struct Client {
-    std::string id;
-    std::string conn;
-    std::string version;
-    std::vector<ClientPublisher> publishers;
-    std::vector<ClientSubscriber> subscribers;
+    std::vector<nt::meta::ClientPublisher> publishers;
+    std::vector<Subscriber> subscribers;
 
     void UpdatePublishers(std::span<const uint8_t> data);
     void UpdateSubscribers(std::span<const uint8_t> data);
@@ -251,6 +226,8 @@ class NetworkTablesView : public View {
       : m_model{model}, m_flags{defaultFlags} {}
 
   void Display() override;
+  void Settings() override;
+  bool HasSettings() override;
 
  private:
   NetworkTablesModel* m_model;

@@ -22,7 +22,7 @@ extern "C" {
  * Initializes the analog output port using the given port object.
  *
  * @param[in] portHandle handle to the port
- * @param[in] allocationLocation the location where the allocation is occuring
+ * @param[in] allocationLocation the location where the allocation is occurring
  *                               (can be null)
  * @param[out] status Error status variable. 0 on success.
  * @return the created analog output handle

@@ -13,12 +13,9 @@ nativeUtils.withCrossLinuxArm64()
 nativeUtils {
     wpi {
         configureDependencies {
-            wpiVersion = "-1"
-            niLibVersion = "2023.1.0"
+            niLibVersion = "2023.3.0"
             opencvVersion = "4.6.0-3"
-            googleTestVersion = "1.11.0-4"
-            imguiVersion = "1.88-9"
-            wpimathVersion = "-1"
+            googleTestVersion = "1.12.1-1"
         }
     }
 }
@@ -33,23 +30,27 @@ if (project.name != 'wpilibcExamples') {
 nativeUtils.setSinglePrintPerPlatform()
 nativeUtils.enableSourceLink()
 
+nativeUtils.wpi.addMacMinimumVersionArg()
+
 nativeUtils.platformConfigs.each {
     if (it.name.contains('osx')) {
         it.linker.args << '-Wl,-rpath,\'@loader_path\''
         it.linker.args << "-headerpad_max_install_names"
-    } else {
+    } else if (it.name.contains('linux')) {
         it.linker.args << '-Wl,-rpath,\'$ORIGIN\''
     }
 }
 
-// Suppress OpenCV warning
+// NativeUtils adds the following OpenCV warning suppression for Linux, but not
+// for macOS
 // https://github.com/opencv/opencv/issues/20269
-nativeUtils.platformConfigs.each {
-    if (it.name == nativeUtils.wpi.platforms.linuxx64) {
-        it.cppCompiler.args.add("-Wno-deprecated-enum-enum-conversion")
-    } else if (it.name.contains('osx')) {
-        it.cppCompiler.args.add("-Wno-deprecated-anon-enum-enum-conversion")
-    }
+nativeUtils.platformConfigs.osxuniversal.cppCompiler.args.add("-Wno-deprecated-anon-enum-enum-conversion")
+
+// NativeUtils uses the wrong compiler arguments for roboRIO targets, but it's
+// too late to fix NativeUtils for the 2023 season. This temporarily overwrites
+// the flags.
+nativeUtils.platformConfigs.named(nativeUtils.wpi.platforms.roborio).configure {
+    cppCompiler.args.remove('-Wno-error=deprecated-declarations')
 }
 
 nativeUtils.platformConfigs.linuxathena.linker.args.add("-Wl,--fatal-warnings")

@@ -14,8 +14,7 @@ NTGyroModel::NTGyroModel(std::string_view path)
 
 NTGyroModel::NTGyroModel(nt::NetworkTableInstance inst, std::string_view path)
     : m_inst{inst},
-      m_angle{inst.GetDoubleTopic(fmt::format("{}/Value", path))
-                  .Subscribe(0, {{nt::PubSubOption::SendAll(true)}})},
+      m_angle{inst.GetDoubleTopic(fmt::format("{}/Value", path)).Subscribe(0)},
       m_name{inst.GetStringTopic(fmt::format("{}/.name", path)).Subscribe({})},
       m_angleData{fmt::format("NT_Gyro:{}", path)},
       m_nameValue{wpi::rsplit(path, '/').second} {}
@@ -30,5 +29,5 @@ void NTGyroModel::Update() {
 }
 
 bool NTGyroModel::Exists() {
-  return m_inst.IsConnected() && m_angle.Exists();
+  return m_angle.Exists();
 }

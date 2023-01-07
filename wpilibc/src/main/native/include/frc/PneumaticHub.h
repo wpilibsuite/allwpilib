@@ -13,23 +13,72 @@
 #include "PneumaticsBase.h"
 
 namespace frc {
+/** Module class for controlling a REV Robotics Pneumatic Hub. */
 class PneumaticHub : public PneumaticsBase {
  public:
+  /** Constructs a PneumaticHub with the default ID (1). */
   PneumaticHub();
+
+  /**
+   * Constructs a PneumaticHub.
+   *
+   * @param module module number to construct
+   */
   explicit PneumaticHub(int module);
 
   ~PneumaticHub() override = default;
 
   bool GetCompressor() const override;
 
+  /**
+   * Disables the compressor. The compressor will not turn on until
+   * EnableCompressorDigital(), EnableCompressorAnalog(), or
+   * EnableCompressorHybrid() are called.
+   */
   void DisableCompressor() override;
 
   void EnableCompressorDigital() override;
 
+  /**
+   * Enables the compressor in analog mode. This mode uses an analog pressure
+   * sensor connected to analog channel 0 to cycle the compressor. The
+   * compressor will turn on when the pressure drops below {@code minPressure}
+   * and will turn off when the pressure reaches {@code maxPressure}.
+   *
+   * @param minPressure The minimum pressure. The compressor will turn on when
+   * the pressure drops below this value.
+   * @param maxPressure The maximum pressure. The compressor will turn off when
+   * the pressure reaches this value.
+   */
   void EnableCompressorAnalog(
       units::pounds_per_square_inch_t minPressure,
       units::pounds_per_square_inch_t maxPressure) override;
 
+  /**
+   * Enables the compressor in hybrid mode. This mode uses both a digital
+   * pressure switch and an analog pressure sensor connected to analog channel 0
+   * to cycle the compressor.
+   *
+   * The compressor will turn on when \a both:
+   *
+   * - The digital pressure switch indicates the system is not full AND
+   * - The analog pressure sensor indicates that the pressure in the system is
+   * below the specified minimum pressure.
+   *
+   * The compressor will turn off when \a either:
+   *
+   * - The digital pressure switch is disconnected or indicates that the system
+   * is full OR
+   * - The pressure detected by the analog sensor is greater than the specified
+   * maximum pressure.
+   *
+   * @param minPressure The minimum pressure. The compressor will turn on when
+   * the pressure drops below this value and the pressure switch indicates that
+   * the system is not full.
+   * @param maxPressure The maximum pressure. The compressor will turn off when
+   * the pressure reaches this value or the pressure switch is disconnected or
+   * indicates that the system is full.
+   */
   void EnableCompressorHybrid(
       units::pounds_per_square_inch_t minPressure,
       units::pounds_per_square_inch_t maxPressure) override;
@@ -76,6 +125,11 @@ class PneumaticHub : public PneumaticsBase {
     uint32_t UniqueId;
   };
 
+  /**
+   * Returns the hardware and firmware versions of this device.
+   *
+   * @return The hardware and firmware versions.
+   */
   Version GetVersion() const;
 
   struct Faults {
@@ -103,6 +157,11 @@ class PneumaticHub : public PneumaticsBase {
     uint32_t HardwareFault : 1;
   };
 
+  /**
+   * Returns the faults currently active on this device.
+   *
+   * @return The faults.
+   */
   Faults GetFaults() const;
 
   struct StickyFaults {
@@ -115,20 +174,60 @@ class PneumaticHub : public PneumaticsBase {
     uint32_t HasReset : 1;
   };
 
+  /**
+   * Returns the sticky faults currently active on this device.
+   *
+   * @return The sticky faults.
+   */
   StickyFaults GetStickyFaults() const;
 
+  /** Clears the sticky faults. */
   void ClearStickyFaults();
 
+  /**
+   * Returns the current input voltage for this device.
+   *
+   * @return The input voltage.
+   */
   units::volt_t GetInputVoltage() const;
 
+  /**
+   * Returns the current voltage of the regulated 5v supply.
+   *
+   * @return The current voltage of the 5v supply.
+   */
   units::volt_t Get5VRegulatedVoltage() const;
 
+  /**
+   * Returns the total current drawn by all solenoids.
+   *
+   * @return Total current drawn by all solenoids.
+   */
   units::ampere_t GetSolenoidsTotalCurrent() const;
 
+  /**
+   * Returns the current voltage of the solenoid power supply.
+   *
+   * @return The current voltage of the solenoid power supply.
+   */
   units::volt_t GetSolenoidsVoltage() const;
 
+  /**
+   * Returns the raw voltage of the specified analog input channel.
+   *
+   * @param channel The analog input channel to read voltage from.
+   * @return The voltage of the specified analog input channel.
+   */
   units::volt_t GetAnalogVoltage(int channel) const override;
 
+  /**
+   * Returns the pressure read by an analog pressure sensor on the specified
+   * analog input channel.
+   *
+   * @param channel The analog input channel to read pressure from.
+   * @return The pressure read by an analog pressure sensor on the specified
+   * analog input channel.
+   */
   units::pounds_per_square_inch_t GetPressure(int channel) const override;
 
  private:

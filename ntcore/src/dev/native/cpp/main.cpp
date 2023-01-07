@@ -63,8 +63,7 @@ void bench() {
   // add "typical" set of subscribers on client and server
   nt::SubscribeMultiple(client, {{std::string_view{}}});
   nt::Subscribe(nt::GetTopic(client, "highrate"), NT_DOUBLE, "double",
-                {{nt::PubSubOption::KeepDuplicates(true),
-                  nt::PubSubOption::SendAll(true)}});
+                {.sendAll = true, .keepDuplicates = true});
   nt::SubscribeMultiple(server, {{std::string_view{}}});
   auto pub = nt::Publish(nt::GetTopic(server, "highrate"), NT_DOUBLE, "double");
   nt::SetDouble(pub, 0);

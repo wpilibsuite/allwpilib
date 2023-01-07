@@ -60,8 +60,8 @@ class WPILIB_DLLEXPORT DifferentialDriveOdometry {
     m_previousAngle = pose.Rotation();
     m_gyroOffset = m_pose.Rotation() - gyroAngle;
 
-    m_prevLeftDistance = 0_m;
-    m_prevRightDistance = 0_m;
+    m_prevLeftDistance = leftDistance;
+    m_prevRightDistance = rightDistance;
   }
 
   /**

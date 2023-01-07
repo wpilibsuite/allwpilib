@@ -33,7 +33,7 @@ public class KalmanFilterLatencyCompensator<S extends Num, I extends Num, O exte
    * @param observer The observer.
    * @param u The input at the timestamp.
    * @param localY The local output at the timestamp
-   * @param timestampSeconds The timesnap of the state.
+   * @param timestampSeconds The timestamp of the state.
    */
   public void addObserverState(
       KalmanTypeFilter<S, I, O> observer,
@@ -117,7 +117,7 @@ public class KalmanFilterLatencyCompensator<S extends Num, I extends Num, O exte
 
       // Index of snapshot taken before the global measurement. Since we already
       // handled the case where the index points to the first snapshot, this
-      // computation is guaranteed to be nonnegative.
+      // computation is guaranteed to be non-negative.
       int prevIdx = nextIdx - 1;
 
       // Find the snapshot closest in time to global measurement

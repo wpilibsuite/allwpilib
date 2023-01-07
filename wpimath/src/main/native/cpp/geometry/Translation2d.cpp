@@ -23,10 +23,6 @@ bool Translation2d::operator==(const Translation2d& other) const {
          units::math::abs(m_y - other.m_y) < 1E-9_m;
 }
 
-bool Translation2d::operator!=(const Translation2d& other) const {
-  return !operator==(other);
-}
-
 void frc::to_json(wpi::json& json, const Translation2d& translation) {
   json =
       wpi::json{{"x", translation.X().value()}, {"y", translation.Y().value()}};

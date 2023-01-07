@@ -56,12 +56,6 @@ public abstract class CommandBase implements Sendable, Command {
     SendableRegistry.setName(this, name);
   }
 
-  @Override
-  public CommandBase withName(String name) {
-    this.setName(name);
-    return this;
-  }
-
   /**
    * Gets the subsystem name of this Command.
    *
@@ -104,6 +98,9 @@ public abstract class CommandBase implements Sendable, Command {
           }
         });
     builder.addBooleanProperty(
-        ".isParented", () -> CommandGroupBase.getGroupedCommands().contains(this), null);
+        ".isParented", () -> CommandScheduler.getInstance().isComposed(this), null);
+    builder.addStringProperty(
+        "interruptBehavior", () -> getInterruptionBehavior().toString(), null);
+    builder.addBooleanProperty("runsWhenDisabled", this::runsWhenDisabled, null);
   }
 }

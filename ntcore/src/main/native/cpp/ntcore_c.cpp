@@ -2,6 +2,8 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
+#include "ntcore_c.h"
+
 #include <stdint.h>
 
 #include <cassert>
@@ -16,6 +18,7 @@
 
 #include "Value_internal.h"
 #include "ntcore.h"
+#include "ntcore_cpp.h"
 
 using namespace nt;
 
@@ -50,6 +53,12 @@ static void ConvertToC(const LogMessage& in, NT_LogMessage* out) {
   ConvertToC(in.message, &out->message);
 }
 
+static void ConvertToC(const TimeSyncEventData& in, NT_TimeSyncEventData* out) {
+  out->serverTimeOffset = in.serverTimeOffset;
+  out->rtt2 = in.rtt2;
+  out->valid = in.valid;
+}
+
 static void ConvertToC(const Event& in, NT_Event* out) {
   out->listener = in.listener;
   out->flags = in.flags;
@@ -68,6 +77,10 @@ static void ConvertToC(const Event& in, NT_Event* out) {
   } else if ((in.flags & NT_EVENT_LOGMESSAGE) != 0) {
     if (auto v = in.GetLogMessage()) {
       return ConvertToC(*v, &out->data.logMessage);
+    }
+  } else if ((in.flags & NT_EVENT_TIMESYNC) != 0) {
+    if (auto v = in.GetTimeSyncEventData()) {
+      return ConvertToC(*v, &out->data.timeSyncData);
     }
   }
   out->flags = NT_EVENT_NONE;  // sanity to make sure we don't dispose
@@ -99,6 +112,21 @@ static void DisposeEvent(NT_Event* event) {
   } else if ((event->flags & NT_EVENT_LOGMESSAGE) != 0) {
     DisposeLogMessage(&event->data.logMessage);
   }
+}
+
+static PubSubOptions ConvertToCpp(const NT_PubSubOptions* in) {
+  PubSubOptions out;
+  out.pollStorage = in->pollStorage;
+  out.periodic = in->periodic;
+  out.excludePublisher = in->excludePublisher;
+  out.sendAll = in->sendAll;
+  out.topicsOnly = in->topicsOnly;
+  out.prefixMatch = in->prefixMatch;
+  out.keepDuplicates = in->keepDuplicates;
+  out.disableRemote = in->disableRemote;
+  out.disableLocal = in->disableLocal;
+  out.excludeSelf = in->excludeSelf;
+  return out;
 }
 
 extern "C" {
@@ -314,14 +342,8 @@ NT_Bool NT_SetTopicProperties(NT_Topic topic, const char* properties) {
 }
 
 NT_Subscriber NT_Subscribe(NT_Topic topic, NT_Type type, const char* typeStr,
-                           const struct NT_PubSubOption* options,
-                           size_t options_len) {
-  wpi::SmallVector<nt::PubSubOption> o;
-  o.reserve(options_len);
-  for (size_t i = 0; i < options_len; ++i) {
-    o.emplace_back(options[i].type, options[i].value);
-  }
-  return nt::Subscribe(topic, type, typeStr, o);
+                           const struct NT_PubSubOptions* options) {
+  return nt::Subscribe(topic, type, typeStr, ConvertToCpp(options));
 }
 
 void NT_Unsubscribe(NT_Subscriber sub) {
@@ -329,20 +351,13 @@ void NT_Unsubscribe(NT_Subscriber sub) {
 }
 
 NT_Publisher NT_Publish(NT_Topic topic, NT_Type type, const char* typeStr,
-                        const struct NT_PubSubOption* options,
-                        size_t options_len) {
-  wpi::SmallVector<nt::PubSubOption> o;
-  o.reserve(options_len);
-  for (size_t i = 0; i < options_len; ++i) {
-    o.emplace_back(options[i].type, options[i].value);
-  }
-  return nt::Publish(topic, type, typeStr, o);
+                        const struct NT_PubSubOptions* options) {
+  return nt::Publish(topic, type, typeStr, ConvertToCpp(options));
 }
 
 NT_Publisher NT_PublishEx(NT_Topic topic, NT_Type type, const char* typeStr,
                           const char* properties,
-                          const struct NT_PubSubOption* options,
-                          size_t options_len) {
+                          const struct NT_PubSubOptions* options) {
   wpi::json j;
   if (properties[0] == '\0') {
     // gracefully handle empty string
@@ -355,13 +370,7 @@ NT_Publisher NT_PublishEx(NT_Topic topic, NT_Type type, const char* typeStr,
     }
   }
 
-  wpi::SmallVector<nt::PubSubOption> o;
-  o.reserve(options_len);
-  for (size_t i = 0; i < options_len; ++i) {
-    o.emplace_back(options[i].type, options[i].value);
-  }
-
-  return nt::PublishEx(topic, type, typeStr, j, o);
+  return nt::PublishEx(topic, type, typeStr, j, ConvertToCpp(options));
 }
 
 void NT_Unpublish(NT_Handle pubentry) {
@@ -369,14 +378,8 @@ void NT_Unpublish(NT_Handle pubentry) {
 }
 
 NT_Entry NT_GetEntryEx(NT_Topic topic, NT_Type type, const char* typeStr,
-                       const struct NT_PubSubOption* options,
-                       size_t options_len) {
-  wpi::SmallVector<nt::PubSubOption> o;
-  o.reserve(options_len);
-  for (size_t i = 0; i < options_len; ++i) {
-    o.emplace_back(options[i].type, options[i].value);
-  }
-  return nt::GetEntry(topic, type, typeStr, o);
+                       const struct NT_PubSubOptions* options) {
+  return nt::GetEntry(topic, type, typeStr, ConvertToCpp(options));
 }
 
 void NT_ReleaseEntry(NT_Entry entry) {
@@ -559,15 +562,25 @@ struct NT_ConnectionInfo* NT_GetConnections(NT_Inst inst, size_t* count) {
   return ConvertToC<NT_ConnectionInfo>(conn_v, count);
 }
 
+int64_t NT_GetServerTimeOffset(NT_Inst inst, NT_Bool* valid) {
+  if (auto v = nt::GetServerTimeOffset(inst)) {
+    *valid = true;
+    return *v;
+  } else {
+    *valid = false;
+    return 0;
+  }
+}
+
 /*
  * Utility Functions
  */
 
-uint64_t NT_Now(void) {
+int64_t NT_Now(void) {
   return nt::Now();
 }
 
-void NT_SetNow(uint64_t timestamp) {
+void NT_SetNow(int64_t timestamp) {
   nt::SetNow(timestamp);
 }
 

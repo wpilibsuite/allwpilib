@@ -18,6 +18,10 @@
     <Bug pattern="DMI_RANDOM_USED_ONLY_ONCE" />
   </Match>
   <Match>
+    <Bug pattern="EC_BAD_ARRAY_COMPARE" />
+    <Class name="edu.wpi.first.math.estimator.SwerveDrivePoseEstimator$InterpolationRecord" />
+  </Match>
+  <Match>
     <Bug pattern="EI_EXPOSE_REP" />
   </Match>
   <Match>
@@ -63,6 +67,10 @@
   <Match>
     <Bug pattern="NS_DANGEROUS_NON_SHORT_CIRCUIT" />
     <Source name="SequentialCommandGroup.java" />
+  </Match>
+  <Match>
+    <Bug pattern="NS_DANGEROUS_NON_SHORT_CIRCUIT" />
+    <Source name="SelectCommand.java" />
   </Match>
   <Match>
     <Bug pattern="RV_RETURN_VALUE_IGNORED_BAD_PRACTICE" />
@@ -117,6 +125,9 @@
   </Match>
   <Match>
     <Bug pattern="VA_FORMAT_STRING_USES_NEWLINE" />
+  </Match>
+  <Match>
+    <Bug pattern="SC_START_IN_CTOR" />
   </Match>
   <Match>
     <Bug pattern="RV_RETURN_VALUE_OF_PUTIFABSENT_IGNORED" />

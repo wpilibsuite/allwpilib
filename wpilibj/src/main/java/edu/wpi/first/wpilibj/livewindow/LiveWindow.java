@@ -84,7 +84,7 @@ public final class LiveWindow {
    *
    * <p>If it's being enabled, turn off the scheduler and remove all the commands from the queue and
    * enable all the components registered for LiveWindow. If it's being disabled, stop all the
-   * registered components and reenable the scheduler.
+   * registered components and re-enable the scheduler.
    *
    * <p>TODO: add code to disable PID loops when enabling LiveWindow. The commands should reenable
    * the PID loops themselves when they get rescheduled. This prevents arms from starting to move

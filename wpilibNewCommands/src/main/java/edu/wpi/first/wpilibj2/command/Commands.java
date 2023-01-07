@@ -4,7 +4,7 @@
 
 package edu.wpi.first.wpilibj2.command;
 
-import static edu.wpi.first.wpilibj.util.ErrorMessages.requireNonNullParam;
+import static edu.wpi.first.util.ErrorMessages.requireNonNullParam;
 
 import java.util.Map;
 import java.util.function.BooleanSupplier;
@@ -100,12 +100,12 @@ public final class Commands {
    * @return the command
    * @see WaitCommand
    */
-  public static CommandBase wait(double seconds) {
+  public static CommandBase waitSeconds(double seconds) {
     return new WaitCommand(seconds);
   }
 
   /**
-   * Constructs a command that does nothing, finishing once a command becomes true.
+   * Constructs a command that does nothing, finishing once a condition becomes true.
    *
    * @param condition the condition
    * @return the command

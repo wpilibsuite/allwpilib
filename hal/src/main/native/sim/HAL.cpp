@@ -280,6 +280,14 @@ int64_t HAL_GetFPGARevision(int32_t* status) {
   return 0;  // TODO: Find a better number to return;
 }
 
+size_t HAL_GetSerialNumber(char* buffer, size_t size) {
+  return HALSIM_GetRoboRioSerialNumber(buffer, size);
+}
+
+size_t HAL_GetComments(char* buffer, size_t size) {
+  return HALSIM_GetRoboRioComments(buffer, size);
+}
+
 uint64_t HAL_GetFPGATime(int32_t* status) {
   return hal::GetFPGATime();
 }

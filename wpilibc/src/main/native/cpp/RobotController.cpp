@@ -4,6 +4,8 @@
 
 #include "frc/RobotController.h"
 
+#include <cstddef>
+
 #include <hal/CAN.h>
 #include <hal/HALBase.h>
 #include <hal/Power.h>
@@ -24,6 +26,19 @@ int64_t RobotController::GetFPGARevision() {
   int64_t revision = HAL_GetFPGARevision(&status);
   FRC_CheckErrorStatus(status, "GetFPGARevision");
   return revision;
+}
+
+std::string RobotController::GetSerialNumber() {
+  // Serial number is 8 characters
+  char serialNum[9];
+  size_t len = HAL_GetSerialNumber(serialNum, sizeof(serialNum));
+  return std::string(serialNum, len);
+}
+
+std::string RobotController::GetComments() {
+  char comments[65];
+  size_t len = HAL_GetComments(comments, sizeof(comments));
+  return std::string(comments, len);
 }
 
 uint64_t RobotController::GetFPGATime() {

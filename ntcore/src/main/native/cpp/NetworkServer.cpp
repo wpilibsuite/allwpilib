@@ -108,6 +108,7 @@ class NSImpl {
          unsigned int port3, unsigned int port4,
          net::ILocalStorage& localStorage, IConnectionList& connList,
          wpi::Logger& logger, std::function<void()> initDone);
+  ~NSImpl();
 
   void HandleLocal();
   void LoadPersistent();
@@ -131,6 +132,7 @@ class NSImpl {
   std::shared_ptr<uv::Timer> m_savePersistentTimer;
   std::shared_ptr<uv::Async<>> m_flushLocal;
   std::shared_ptr<uv::Async<>> m_flush;
+  bool m_shutdown = false;
 
   std::vector<net::ClientMessage> m_localMsgs;
 
@@ -245,17 +247,12 @@ void ServerConnection4::ProcessWsUpgrade() {
   m_websocket->open.connect([this, name = std::string{name}](std::string_view) {
     m_wire = std::make_shared<net::WebSocketConnection>(*m_websocket);
     // TODO: set local flag appropriately
-    m_clientId = m_server.m_serverImpl.AddClient(
+    std::string dedupName;
+    std::tie(dedupName, m_clientId) = m_server.m_serverImpl.AddClient(
         name, m_connInfo, false, *m_wire,
         [this](uint32_t repeatMs) { UpdatePeriodicTimer(repeatMs); });
-    if (m_clientId < 0) {
-      INFO("duplicate connection name '{}' (from {}), closing", name,
-           m_connInfo);
-      m_websocket->Fail(409, fmt::format("duplicate name '{}'", name));
-      return;
-    }
-    INFO("CONNECTED NT4 client '{}' (from {})", name, m_connInfo);
-    m_info.remote_id = name;
+    INFO("CONNECTED NT4 client '{}' (from {})", dedupName, m_connInfo);
+    m_info.remote_id = dedupName;
     m_server.AddConnection(this, m_info);
     m_websocket->closed.connect([this](uint16_t, std::string_view reason) {
       INFO("DISCONNECTED NT4 client '{}' (from {}): {}", m_info.remote_id,
@@ -339,16 +336,18 @@ NSImpl::NSImpl(std::string_view persistentFilename,
   m_localMsgs.reserve(net::NetworkLoopQueue::kInitialQueueSize);
   m_loopRunner.ExecAsync([=, this](uv::Loop& loop) {
     // connect local storage to server
-    {
-      net::ServerStartup startup{m_serverImpl};
-      m_localStorage.StartNetwork(startup, &m_localQueue);
-    }
     m_serverImpl.SetLocal(&m_localStorage);
+    m_localStorage.StartNetwork(&m_localQueue);
+    HandleLocal();
 
     // load persistent file first, then initialize
     uv::QueueWork(
         m_loop, [this] { LoadPersistent(); }, [this] { Init(); });
   });
+}
+
+NSImpl::~NSImpl() {
+  m_loopRunner.ExecAsync([this](uv::Loop&) { m_shutdown = true; });
 }
 
 void NSImpl::HandleLocal() {
@@ -402,6 +401,9 @@ void NSImpl::SavePersistent(std::string_view filename, std::string_view data) {
 }
 
 void NSImpl::Init() {
+  if (m_shutdown) {
+    return;
+  }
   auto errs = m_serverImpl.LoadPersistent(m_persistentData);
   if (!errs.empty()) {
     WARNING("error reading persistent file: {}", errs);

@@ -4,7 +4,7 @@
 
 package edu.wpi.first.wpilibj.counter;
 
-import static edu.wpi.first.wpilibj.util.ErrorMessages.requireNonNullParam;
+import static edu.wpi.first.util.ErrorMessages.requireNonNullParam;
 
 import edu.wpi.first.hal.CounterJNI;
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
@@ -72,7 +72,7 @@ public class ExternalDirectionCounter implements Sendable, AutoCloseable {
   }
 
   /**
-   * Sets to revese the counter direction.
+   * Sets to reverse the counter direction.
    *
    * @param reverseDirection True to reverse counting direction.
    */

@@ -13,7 +13,9 @@ public class VideoMode {
     kYUYV(2),
     kRGB565(3),
     kBGR(4),
-    kGray(5);
+    kGray(5),
+    kY16(6),
+    kUYVY(7);
 
     private final int value;
 

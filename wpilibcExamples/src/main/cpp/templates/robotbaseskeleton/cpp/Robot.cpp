@@ -26,7 +26,7 @@ void Robot::StartCompetition() {
 
   frc::internal::DriverStationModeThread modeThread;
 
-  wpi::Event event{true, false};
+  wpi::Event event{false, false};
   frc::DriverStation::ProvideRefreshedDataEventHandle(event.GetHandle());
 
   // Tell the DS that the robot is ready to be enabled

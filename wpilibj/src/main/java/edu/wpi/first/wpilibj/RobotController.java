@@ -37,6 +37,27 @@ public final class RobotController {
   }
 
   /**
+   * Return the serial number of the roboRIO.
+   *
+   * @return The serial number of the roboRIO.
+   */
+  public static String getSerialNumber() {
+    return HALUtil.getSerialNumber();
+  }
+
+  /**
+   * Return the comments from the roboRIO web interface.
+   *
+   * <p>The comments string is cached after the first call to this function on the RoboRIO - restart
+   * the robot code to reload the comments string after changing it in the web interface.
+   *
+   * @return the comments from the roboRIO web interface.
+   */
+  public static String getComments() {
+    return HALUtil.getComments();
+  }
+
+  /**
    * Read the microsecond timer from the FPGA.
    *
    * @return The current time in microseconds according to the FPGA.

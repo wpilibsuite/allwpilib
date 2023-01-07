@@ -8,6 +8,7 @@
 #include <pthread.h>
 #endif
 
+#include <atomic>
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
@@ -43,7 +44,6 @@ struct JoystickDataCache {
   HAL_JoystickButtons buttons[kJoystickPorts];
   HAL_AllianceStationID allianceStation;
   double matchTime;
-  bool updated;
 };
 static_assert(std::is_standard_layout_v<JoystickDataCache>);
 // static_assert(std::is_trivial_v<JoystickDataCache>);
@@ -74,7 +74,9 @@ void JoystickDataCache::Update() {
 static HAL_ControlWord newestControlWord;
 static JoystickDataCache caches[3];
 static JoystickDataCache* currentRead = &caches[0];
-static JoystickDataCache* currentCache = &caches[1];
+static JoystickDataCache* currentReadLocal = &caches[0];
+static std::atomic<JoystickDataCache*> currentCache{&caches[1]};
+static JoystickDataCache* lastGiven = &caches[1];
 static JoystickDataCache* cacheToUpdate = &caches[2];
 
 static ::FRCDriverStation* driverStation;
@@ -85,6 +87,15 @@ void InitializeDriverStation() {
   driverStation = &ds;
 }
 }  // namespace hal::init
+
+namespace hal {
+static void DefaultPrintErrorImpl(const char* line, size_t size) {
+  std::fwrite(line, size, 1, stderr);
+}
+}  // namespace hal
+
+static std::atomic<void (*)(const char* line, size_t size)> gPrintErrorImpl{
+    hal::DefaultPrintErrorImpl};
 
 extern "C" {
 
@@ -138,7 +149,8 @@ int32_t HAL_SendError(HAL_Bool isError, int32_t errorCode, HAL_Bool isLVCode,
       if (callStack && callStack[0] != '\0') {
         fmt::format_to(fmt::appender{buf}, "{}\n", callStack);
       }
-      std::fwrite(buf.data(), buf.size(), 1, stderr);
+      auto printError = gPrintErrorImpl.load();
+      printError(buf.data(), buf.size());
     }
     if (i == KEEP_MSGS) {
       // replace the oldest one
@@ -155,6 +167,10 @@ int32_t HAL_SendError(HAL_Bool isError, int32_t errorCode, HAL_Bool isLVCode,
     prevMsgTime[i] = curTime;
   }
   return retval;
+}
+
+void HAL_SetPrintErrorImpl(void (*func)(const char* line, size_t size)) {
+  gPrintErrorImpl.store(func ? func : hal::DefaultPrintErrorImpl);
 }
 
 int32_t HAL_SendConsoleLine(const char* line) {
@@ -315,9 +331,9 @@ void HAL_RefreshDSData(void) {
   controlWord.fmsAttached = SimDriverStationData->fmsAttached;
   controlWord.dsAttached = SimDriverStationData->dsAttached;
   std::scoped_lock lock{driverStation->cacheMutex};
-  if (currentCache->updated) {
-    std::swap(currentCache, currentRead);
-    currentCache->updated = false;
+  JoystickDataCache* prev = currentCache.exchange(nullptr);
+  if (prev != nullptr) {
+    currentRead = prev;
   }
   newestControlWord = controlWord;
 }
@@ -353,11 +369,18 @@ void NewDriverStationData() {
     return;
   }
   cacheToUpdate->Update();
-  {
-    std::scoped_lock lock{driverStation->cacheMutex};
-    std::swap(currentCache, cacheToUpdate);
-    currentCache->updated = true;
+
+  JoystickDataCache* given = cacheToUpdate;
+  JoystickDataCache* prev = currentCache.exchange(cacheToUpdate);
+  if (prev == nullptr) {
+    cacheToUpdate = currentReadLocal;
+    currentReadLocal = lastGiven;
+  } else {
+    // Current read local does not update
+    cacheToUpdate = prev;
   }
+  lastGiven = given;
+
   driverStation->newDataEvents.Wakeup();
   SimDriverStationData->CallNewDataCallbacks();
 }

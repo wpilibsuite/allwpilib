@@ -114,11 +114,31 @@ public class DigitalOutput extends DigitalSource implements Sendable {
   }
 
   /**
+   * Enable a PWM PPS (Pulse Per Second) Output on this line.
+   *
+   * <p>Allocate one of the 6 DO PWM generator resources.
+   *
+   * <p>Supply the duty-cycle to output.
+   *
+   * <p>The resolution of the duty cycle is 8-bit.
+   *
+   * @param dutyCycle The duty-cycle to start generating. [0..1]
+   */
+  public void enablePPS(double dutyCycle) {
+    if (m_pwmGenerator != invalidPwmGenerator) {
+      return;
+    }
+    m_pwmGenerator = DIOJNI.allocateDigitalPWM();
+    DIOJNI.setDigitalPWMPPS(m_pwmGenerator, dutyCycle);
+    DIOJNI.setDigitalPWMOutputChannel(m_pwmGenerator, m_channel);
+  }
+
+  /**
    * Enable a PWM Output on this line.
    *
    * <p>Allocate one of the 6 DO PWM generator resources.
    *
-   * <p>Supply the initial duty-cycle to output so as to avoid a glitch when first starting.
+   * <p>Supply the initial duty-cycle to output in order to avoid a glitch when first starting.
    *
    * <p>The resolution of the duty cycle is 8-bit for low frequencies (1kHz or less) but is reduced
    * the higher the frequency of the PWM signal is.

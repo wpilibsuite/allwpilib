@@ -23,7 +23,7 @@ extern "C" {
  *
  * @param[in] portHandle         the port handle to create from
  * @param[in] input              true for input, false for output
- * @param[in] allocationLocation the location where the allocation is occuring
+ * @param[in] allocationLocation the location where the allocation is occurring
  *                               (can be null)
  * @param[out] status            Error status variable. 0 on success.
  * @return the created digital handle
@@ -93,6 +93,16 @@ void HAL_SetDigitalPWMRate(double rate, int32_t* status);
  */
 void HAL_SetDigitalPWMDutyCycle(HAL_DigitalPWMHandle pwmGenerator,
                                 double dutyCycle, int32_t* status);
+
+/**
+ * Configures the digital PWM to be a PPS signal with specified duty cycle.
+ *
+ * @param[in] pwmGenerator the digital PWM handle
+ * @param[in] dutyCycle    the percent duty cycle to output [0..1]
+ * @param[out] status      Error status variable. 0 on success.
+ */
+void HAL_SetDigitalPWMPPS(HAL_DigitalPWMHandle pwmGenerator, double dutyCycle,
+                          int32_t* status);
 
 /**
  * Configures which DO channel the PWM signal is output on.

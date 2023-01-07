@@ -201,4 +201,6 @@ void PopID();
 
 bool PopupEditName(const char* label, std::string* name);
 
+bool ItemEditName(std::string* name);
+
 }  // namespace glass

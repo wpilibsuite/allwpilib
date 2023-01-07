@@ -8,14 +8,6 @@
 
 using namespace frc;
 
-bool AprilTag::operator==(const AprilTag& other) const {
-  return ID == other.ID && pose == other.pose;
-}
-
-bool AprilTag::operator!=(const AprilTag& other) const {
-  return !operator==(other);
-}
-
 void frc::to_json(wpi::json& json, const AprilTag& apriltag) {
   json = wpi::json{{"ID", apriltag.ID}, {"pose", apriltag.pose}};
 }

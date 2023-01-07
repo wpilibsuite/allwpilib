@@ -4,7 +4,7 @@
 
 package edu.wpi.first.wpilibj;
 
-import static edu.wpi.first.wpilibj.util.ErrorMessages.requireNonNullParam;
+import static edu.wpi.first.util.ErrorMessages.requireNonNullParam;
 
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
@@ -246,7 +246,7 @@ public final class Preferences {
   }
 
   /**
-   * Returns whether or not there is a key with the given name.
+   * Returns whether there is a key with the given name.
    *
    * @param key the key
    * @return if there is a value at the given key

@@ -21,7 +21,7 @@ public final class RuntimeLoader<T> {
   private static String defaultExtractionRoot;
 
   /**
-   * Gets the default extration root location (~/.wpilib/nativecache).
+   * Gets the default extraction root location (~/.wpilib/nativecache).
    *
    * @return The default extraction root location.
    */
@@ -87,20 +87,20 @@ public final class RuntimeLoader<T> {
     } catch (UnsatisfiedLinkError ule) {
       // Then load the hash from the resources
       String hashName = RuntimeDetector.getHashLibraryResource(m_libraryName);
-      String resname = RuntimeDetector.getLibraryResource(m_libraryName);
+      String resName = RuntimeDetector.getLibraryResource(m_libraryName);
       try (InputStream hashIs = m_loadClass.getResourceAsStream(hashName)) {
         if (hashIs == null) {
           throw new IOException(getLoadErrorMessage(ule));
         }
-        try (Scanner scanner = new Scanner(hashIs, StandardCharsets.UTF_8.name())) {
+        try (Scanner scanner = new Scanner(hashIs, StandardCharsets.UTF_8)) {
           String hash = scanner.nextLine();
-          File jniLibrary = new File(m_extractionRoot, resname + "." + hash);
+          File jniLibrary = new File(m_extractionRoot, resName + "." + hash);
           try {
             // Try to load from an already extracted hash
             System.load(jniLibrary.getAbsolutePath());
           } catch (UnsatisfiedLinkError ule2) {
             // If extraction failed, extract
-            try (InputStream resIs = m_loadClass.getResourceAsStream(resname)) {
+            try (InputStream resIs = m_loadClass.getResourceAsStream(resName)) {
               if (resIs == null) {
                 throw new IOException(getLoadErrorMessage(ule));
               }
@@ -137,9 +137,9 @@ public final class RuntimeLoader<T> {
       System.loadLibrary(m_libraryName);
     } catch (UnsatisfiedLinkError ule) {
       // Then load the hash from the input file
-      String resname = RuntimeDetector.getLibraryResource(m_libraryName);
+      String resName = RuntimeDetector.getLibraryResource(m_libraryName);
       String hash;
-      try (InputStream is = m_loadClass.getResourceAsStream(resname)) {
+      try (InputStream is = m_loadClass.getResourceAsStream(resName)) {
         if (is == null) {
           throw new IOException(getLoadErrorMessage(ule));
         }
@@ -165,13 +165,13 @@ public final class RuntimeLoader<T> {
       if (hash == null) {
         throw new IOException("Weird Hash?");
       }
-      File jniLibrary = new File(m_extractionRoot, resname + "." + hash);
+      File jniLibrary = new File(m_extractionRoot, resName + "." + hash);
       try {
         // Try to load from an already extracted hash
         System.load(jniLibrary.getAbsolutePath());
       } catch (UnsatisfiedLinkError ule2) {
         // If extraction failed, extract
-        try (InputStream resIs = m_loadClass.getResourceAsStream(resname)) {
+        try (InputStream resIs = m_loadClass.getResourceAsStream(resName)) {
           if (resIs == null) {
             throw new IOException(getLoadErrorMessage(ule));
           }

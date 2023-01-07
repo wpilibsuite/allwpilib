@@ -10,6 +10,7 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.util.sendable.SendableBuilder;
+import edu.wpi.first.util.sendable.SendableRegistry;
 
 /**
  * Implements a PID control loop whose setpoint is constrained by a trapezoid profile. Users should
@@ -52,6 +53,8 @@ public class ProfiledPIDController implements Sendable {
     m_controller = new PIDController(Kp, Ki, Kd, period);
     m_constraints = constraints;
     instances++;
+
+    SendableRegistry.add(this, "ProfiledPIDController", instances);
     MathSharedStore.reportUsage(MathUsageId.kController_ProfiledPIDController, instances);
   }
 
@@ -294,7 +297,7 @@ public class ProfiledPIDController implements Sendable {
    */
   public double calculate(double measurement) {
     if (m_controller.isContinuousInputEnabled()) {
-      // Get error which is smallest distance between goal and measurement
+      // Get error which is the smallest distance between goal and measurement
       double errorBound = (m_maximumInput - m_minimumInput) / 2.0;
       double goalMinDistance =
           MathUtil.inputModulus(m_goal.position - measurement, -errorBound, errorBound);

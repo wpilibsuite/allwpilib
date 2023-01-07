@@ -29,7 +29,7 @@ AprilTagFieldLayout::AprilTagFieldLayout(std::string_view path) {
     m_apriltags[tag.ID] = tag;
   }
   m_fieldWidth = units::meter_t{json.at("field").at("width").get<double>()};
-  m_fieldLength = units::meter_t{json.at("field").at("height").get<double>()};
+  m_fieldLength = units::meter_t{json.at("field").at("length").get<double>()};
 }
 
 AprilTagFieldLayout::AprilTagFieldLayout(std::vector<AprilTag> apriltags,
@@ -79,16 +79,6 @@ void AprilTagFieldLayout::Serialize(std::string_view path) {
   wpi::json json = *this;
   output << json;
   output.flush();
-}
-
-bool AprilTagFieldLayout::operator==(const AprilTagFieldLayout& other) const {
-  return m_apriltags == other.m_apriltags && m_origin == other.m_origin &&
-         m_fieldLength == other.m_fieldLength &&
-         m_fieldWidth == other.m_fieldWidth;
-}
-
-bool AprilTagFieldLayout::operator!=(const AprilTagFieldLayout& other) const {
-  return !operator==(other);
 }
 
 void frc::to_json(wpi::json& json, const AprilTagFieldLayout& layout) {

@@ -103,8 +103,8 @@ DifferentialDrive::WheelSpeeds DifferentialDrive::ArcadeDriveIK(
 
   // Find the maximum possible value of (throttle + turn) along the vector that
   // the joystick is pointing, then desaturate the wheel speeds
-  double greaterInput = std::max(std::abs(xSpeed), std::abs(zRotation));
-  double lesserInput = std::min(std::abs(xSpeed), std::abs(zRotation));
+  double greaterInput = (std::max)(std::abs(xSpeed), std::abs(zRotation));
+  double lesserInput = (std::min)(std::abs(xSpeed), std::abs(zRotation));
   if (greaterInput == 0.0) {
     return {0.0, 0.0};
   }

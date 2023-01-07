@@ -9,18 +9,19 @@
 namespace nt {
 
 bool PubSubOptionsMatcher::MatchAndExplain(
-    const PubSubOptions& val, ::testing::MatchResultListener* listener) const {
+    const PubSubOptionsImpl& val,
+    ::testing::MatchResultListener* listener) const {
   bool match = true;
-  if (val.periodic != good.periodic) {
+  if (val.periodicMs != good.periodicMs) {
     *listener << "periodic mismatch ";
     match = false;
   }
-  if (val.pollStorageSize != good.pollStorageSize) {
-    *listener << "pollStorageSize mismatch ";
+  if (val.pollStorage != good.pollStorage) {
+    *listener << "pollStorage mismatch ";
     match = false;
   }
   if (val.sendAll != good.sendAll) {
-    *listener << "logging mismatch ";
+    *listener << "sendAll mismatch ";
     match = false;
   }
   if (val.keepDuplicates != good.keepDuplicates) {

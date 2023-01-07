@@ -356,6 +356,12 @@ void UsbCameraImpl::ProcessFrame(IMFSample* videoSample,
                         tmpMat.total());
       tmpMat.copyTo(dest->AsMat());
       break;
+    case cs::VideoMode::PixelFormat::kY16:
+      tmpMat = cv::Mat(mode.height, mode.width, CV_8UC2, ptr, pitch);
+      dest =
+          AllocImage(VideoMode::kY16, tmpMat.cols, tmpMat.rows, tmpMat.total());
+      tmpMat.copyTo(dest->AsMat());
+      break;
     case cs::VideoMode::PixelFormat::kBGR:
       tmpMat = cv::Mat(mode.height, mode.width, CV_8UC3, ptr, pitch);
       dest = AllocImage(VideoMode::kBGR, tmpMat.cols, tmpMat.rows,
@@ -365,6 +371,12 @@ void UsbCameraImpl::ProcessFrame(IMFSample* videoSample,
     case cs::VideoMode::PixelFormat::kYUYV:
       tmpMat = cv::Mat(mode.height, mode.width, CV_8UC2, ptr, pitch);
       dest = AllocImage(VideoMode::kYUYV, tmpMat.cols, tmpMat.rows,
+                        tmpMat.total() * 2);
+      tmpMat.copyTo(dest->AsMat());
+      break;
+    case cs::VideoMode::PixelFormat::kUYVY:
+      tmpMat = cv::Mat(mode.height, mode.width, CV_8UC2, ptr, pitch);
+      dest = AllocImage(VideoMode::kUYVY, tmpMat.cols, tmpMat.rows,
                         tmpMat.total() * 2);
       tmpMat.copyTo(dest->AsMat());
       break;
@@ -461,9 +473,10 @@ LRESULT UsbCameraImpl::PumpMain(HWND hwnd, UINT uiMsg, WPARAM wParam,
 
 static cs::VideoMode::PixelFormat GetFromGUID(const GUID& guid) {
   // Compare GUID to one of the supported ones
-  if (IsEqualGUID(guid, MFVideoFormat_NV12)) {
-    // GrayScale
+  if (IsEqualGUID(guid, MFVideoFormat_L8)) {
     return cs::VideoMode::PixelFormat::kGray;
+  } else if (IsEqualGUID(guid, MFVideoFormat_L16)) {
+    return cs::VideoMode::PixelFormat::kY16;
   } else if (IsEqualGUID(guid, MFVideoFormat_YUY2)) {
     return cs::VideoMode::PixelFormat::kYUYV;
   } else if (IsEqualGUID(guid, MFVideoFormat_RGB24)) {
@@ -472,6 +485,8 @@ static cs::VideoMode::PixelFormat GetFromGUID(const GUID& guid) {
     return cs::VideoMode::PixelFormat::kMJPEG;
   } else if (IsEqualGUID(guid, MFVideoFormat_RGB565)) {
     return cs::VideoMode::PixelFormat::kRGB565;
+  } else if (IsEqualGUID(guid, MFVideoFormat_UYVY)) {
+    return cs::VideoMode::PixelFormat::kUYVY;
   } else {
     return cs::VideoMode::PixelFormat::kUnknown;
   }

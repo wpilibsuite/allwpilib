@@ -50,7 +50,10 @@ public final class NetworkTableEvent {
     kValueAll(0x0080 | 0x0040),
 
     /** Log message. */
-    kLogMessage(0x0100);
+    kLogMessage(0x0100),
+
+    /** Time synchronized with server. */
+    kTimeSync(0x0200);
 
     private final int value;
 
@@ -101,6 +104,9 @@ public final class NetworkTableEvent {
   /** Log message (for log message events). */
   public final LogMessage logMessage;
 
+  /** Log message (for log message events). */
+  public final TimeSyncEventData timeSyncData;
+
   /**
    * Constructor. This should generally only be used internally to NetworkTables.
    *
@@ -111,6 +117,7 @@ public final class NetworkTableEvent {
    * @param topicInfo Topic information
    * @param valueData Value data
    * @param logMessage Log message
+   * @param timeSyncData Time sync data
    */
   public NetworkTableEvent(
       NetworkTableInstance inst,
@@ -119,7 +126,8 @@ public final class NetworkTableEvent {
       ConnectionInfo connInfo,
       TopicInfo topicInfo,
       ValueEventData valueData,
-      LogMessage logMessage) {
+      LogMessage logMessage,
+      TimeSyncEventData timeSyncData) {
     this.m_inst = inst;
     this.listener = listener;
     this.m_flags = flags;
@@ -127,6 +135,7 @@ public final class NetworkTableEvent {
     this.topicInfo = topicInfo;
     this.valueData = valueData;
     this.logMessage = logMessage;
+    this.timeSyncData = timeSyncData;
   }
 
   /* Network table instance. */

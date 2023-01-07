@@ -36,6 +36,14 @@ extern "C" {
 int32_t HAL_SendError(HAL_Bool isError, int32_t errorCode, HAL_Bool isLVCode,
                       const char* details, const char* location,
                       const char* callStack, HAL_Bool printMsg);
+
+/**
+ * Set the print function used by HAL_SendError
+ *
+ * @param func Function called by HAL_SendError when stderr is printed
+ */
+void HAL_SetPrintErrorImpl(void (*func)(const char* line, size_t size));
+
 /**
  * Sends a line to the driver station console.
  *

@@ -31,10 +31,10 @@ class Robot : public frc::TimedRobot {
  public:
   void RobotInit() override {
     // Add a widget titled 'Max Speed' with a number slider.
-    m_maxSpeed = &frc::Shuffleboard::GetTab("Configuration")
-                      .Add("Max Speed", 1)
-                      .WithWidget("Number Slider")
-                      .GetEntry();
+    m_maxSpeed = frc::Shuffleboard::GetTab("Configuration")
+                     .Add("Max Speed", 1)
+                     .WithWidget("Number Slider")
+                     .GetEntry();
 
     // Create a 'DriveBase' tab and add the drivetrain object to it.
     frc::ShuffleboardTab& driveBaseTab = frc::Shuffleboard::GetTab("DriveBase");

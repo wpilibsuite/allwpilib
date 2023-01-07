@@ -107,8 +107,11 @@ class NCImpl3 : public NCImpl {
 
 class NCImpl4 : public NCImpl {
  public:
-  NCImpl4(int inst, std::string_view id, net::ILocalStorage& localStorage,
-          IConnectionList& connList, wpi::Logger& logger);
+  NCImpl4(
+      int inst, std::string_view id, net::ILocalStorage& localStorage,
+      IConnectionList& connList, wpi::Logger& logger,
+      std::function<void(int64_t serverTimeOffset, int64_t rtt2, bool valid)>
+          timeSyncUpdated);
   ~NCImpl4() override;
 
   void HandleLocal();
@@ -116,6 +119,8 @@ class NCImpl4 : public NCImpl {
   void WsConnected(wpi::WebSocket& ws, uv::Tcp& tcp);
   void Disconnect(std::string_view reason) override;
 
+  std::function<void(int64_t serverTimeOffset, int64_t rtt2, bool valid)>
+      m_timeSyncUpdated;
   std::shared_ptr<net::WebSocketConnection> m_wire;
   std::unique_ptr<net::ClientImpl> m_clientImpl;
 };
@@ -304,11 +309,9 @@ void NCImpl3::TcpConnected(uv::Tcp& tcp) {
           }
         });
 
-        {
-          net3::ClientStartup3 startup{*m_clientImpl};
-          m_localStorage.StartNetwork(startup, &m_localQueue);
-        }
         m_clientImpl->SetLocal(&m_localStorage);
+        m_localStorage.StartNetwork(&m_localQueue);
+        HandleLocal();
       });
 
   tcp.SetData(clientImpl);
@@ -327,10 +330,13 @@ void NCImpl3::Disconnect(std::string_view reason) {
   NCImpl::Disconnect(reason);
 }
 
-NCImpl4::NCImpl4(int inst, std::string_view id,
-                 net::ILocalStorage& localStorage, IConnectionList& connList,
-                 wpi::Logger& logger)
-    : NCImpl{inst, id, localStorage, connList, logger} {
+NCImpl4::NCImpl4(
+    int inst, std::string_view id, net::ILocalStorage& localStorage,
+    IConnectionList& connList, wpi::Logger& logger,
+    std::function<void(int64_t serverTimeOffset, int64_t rtt2, bool valid)>
+        timeSyncUpdated)
+    : NCImpl{inst, id, localStorage, connList, logger},
+      m_timeSyncUpdated{std::move(timeSyncUpdated)} {
   m_loopRunner.ExecAsync([this](uv::Loop& loop) {
     m_parallelConnect = wpi::ParallelTcpConnector::Create(
         loop, kReconnectRate, m_logger,
@@ -423,17 +429,16 @@ void NCImpl4::WsConnected(wpi::WebSocket& ws, uv::Tcp& tcp) {
 
   m_wire = std::make_shared<net::WebSocketConnection>(ws);
   m_clientImpl = std::make_unique<net::ClientImpl>(
-      m_loop.Now().count(), m_inst, *m_wire, m_logger,
+      m_loop.Now().count(), m_inst, *m_wire, m_logger, m_timeSyncUpdated,
       [this](uint32_t repeatMs) {
         DEBUG4("Setting periodic timer to {}", repeatMs);
         m_sendValuesTimer->Start(uv::Timer::Time{repeatMs},
                                  uv::Timer::Time{repeatMs});
       });
-  {
-    net::ClientStartup startup{*m_clientImpl};
-    m_localStorage.StartNetwork(startup, &m_localQueue);
-  }
   m_clientImpl->SetLocal(&m_localStorage);
+  m_localStorage.StartNetwork(&m_localQueue);
+  HandleLocal();
+  m_clientImpl->SendInitial();
   ws.closed.connect([this, &ws](uint16_t, std::string_view reason) {
     if (!ws.GetStream().IsLoopClosing()) {
       Disconnect(reason);
@@ -456,20 +461,26 @@ void NCImpl4::Disconnect(std::string_view reason) {
   m_clientImpl.reset();
   m_wire.reset();
   NCImpl::Disconnect(reason);
+  m_timeSyncUpdated(0, 0, false);
 }
 
 class NetworkClient::Impl final : public NCImpl4 {
  public:
   Impl(int inst, std::string_view id, net::ILocalStorage& localStorage,
-       IConnectionList& connList, wpi::Logger& logger)
-      : NCImpl4{inst, id, localStorage, connList, logger} {}
+       IConnectionList& connList, wpi::Logger& logger,
+       std::function<void(int64_t serverTimeOffset, int64_t rtt2, bool valid)>
+           timeSyncUpdated)
+      : NCImpl4{inst,     id,     localStorage,
+                connList, logger, std::move(timeSyncUpdated)} {}
 };
 
-NetworkClient::NetworkClient(int inst, std::string_view id,
-                             net::ILocalStorage& localStorage,
-                             IConnectionList& connList, wpi::Logger& logger)
-    : m_impl{std::make_unique<Impl>(inst, id, localStorage, connList, logger)} {
-}
+NetworkClient::NetworkClient(
+    int inst, std::string_view id, net::ILocalStorage& localStorage,
+    IConnectionList& connList, wpi::Logger& logger,
+    std::function<void(int64_t serverTimeOffset, int64_t rtt2, bool valid)>
+        timeSyncUpdated)
+    : m_impl{std::make_unique<Impl>(inst, id, localStorage, connList, logger,
+                                    std::move(timeSyncUpdated))} {}
 
 NetworkClient::~NetworkClient() {
   m_impl->m_localStorage.ClearNetwork();

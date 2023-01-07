@@ -27,17 +27,19 @@ class SimpleWidget final : public ShuffleboardWidget<SimpleWidget> {
 
   /**
    * Gets the NetworkTable entry that contains the data for this widget.
-   * The widget owns the entry.
+   * The widget owns the entry; the returned pointer's lifetime is the same as
+   * that of the widget.
    */
-  nt::GenericEntry& GetEntry();
+  nt::GenericEntry* GetEntry();
 
   /**
    * Gets the NetworkTable entry that contains the data for this widget.
-   * The widget owns the entry.
+   * The widget owns the entry; the returned pointer's lifetime is the same as
+   * that of the widget.
    *
    * @param typeString NT type string
    */
-  nt::GenericEntry& GetEntry(std::string_view typeString);
+  nt::GenericEntry* GetEntry(std::string_view typeString);
 
   void BuildInto(std::shared_ptr<nt::NetworkTable> parentTable,
                  std::shared_ptr<nt::NetworkTable> metaTable) override;

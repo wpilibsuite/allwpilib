@@ -19,7 +19,7 @@ class InterpolatingTreeMapTest {
     table.put(312.0, 550.0);
     table.put(326.0, 650.0);
 
-    // Key below minimum gives smallest value
+    // Key below minimum gives the smallest value
     assertEquals(450.0, table.get(100.0));
 
     // Minimum key gives exact value
@@ -48,7 +48,7 @@ class InterpolatingTreeMapTest {
     table.put(312.0, 550.0);
     table.put(326.0, 650.0);
 
-    // Key below minimum gives smallest value
+    // Key below minimum gives the smallest value
     assertEquals(450.0, table.get(100.0));
 
     // Minimum key gives exact value
@@ -84,7 +84,7 @@ class InterpolatingTreeMapTest {
     table.put(312, 550);
     table.put(326, 650);
 
-    // Key below minimum gives smallest value
+    // Key below minimum gives the smallest value
     assertEquals(450.0, table.get(100));
 
     // Minimum key gives exact value
@@ -113,7 +113,7 @@ class InterpolatingTreeMapTest {
     table.put(312L, 550L);
     table.put(326L, 650L);
 
-    // Key below minimum gives smallest value
+    // Key below minimum gives the smallest value
     assertEquals(450.0, table.get(100L));
 
     // Minimum key gives exact value

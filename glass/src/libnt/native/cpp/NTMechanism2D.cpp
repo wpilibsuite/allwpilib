@@ -240,10 +240,7 @@ NTMechanism2DModel::NTMechanism2DModel(nt::NetworkTableInstance inst,
                                        std::string_view path)
     : m_inst{inst},
       m_path{fmt::format("{}/", path)},
-      m_tableSub{inst,
-                 {{m_path}},
-                 {{nt::PubSubOption::SendAll(true),
-                   nt::PubSubOption::Periodic(0.05)}}},
+      m_tableSub{inst, {{m_path}}, {.periodic = 0.05, .sendAll = true}},
       m_nameTopic{m_inst.GetTopic(fmt::format("{}/.name", path))},
       m_dimensionsTopic{m_inst.GetTopic(fmt::format("{}/dims", path))},
       m_bgColorTopic{m_inst.GetTopic(fmt::format("{}/backgroundColor", path))},
@@ -335,7 +332,7 @@ void NTMechanism2DModel::Update() {
 }
 
 bool NTMechanism2DModel::Exists() {
-  return m_inst.IsConnected() && m_nameTopic.Exists();
+  return m_nameTopic.Exists();
 }
 
 bool NTMechanism2DModel::IsReadOnly() {

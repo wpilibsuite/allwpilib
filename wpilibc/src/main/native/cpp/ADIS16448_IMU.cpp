@@ -196,7 +196,7 @@ bool ADIS16448_IMU::SwitchToStandardSPI() {
       while (data_count > 0) {
         /* Dequeue 200 at a time, or the remainder of the buffer if less than
          * 200 */
-        m_spi->ReadAutoReceivedData(trashBuffer, std::min(200, data_count),
+        m_spi->ReadAutoReceivedData(trashBuffer, (std::min)(200, data_count),
                                     0_s);
         /* Update remaining buffer count */
         data_count = m_spi->ReadAutoReceivedData(trashBuffer, 0, 0_s);
@@ -331,7 +331,7 @@ int ADIS16448_IMU::ConfigCalTime(CalibrationTime new_cal_time) {
 void ADIS16448_IMU::Calibrate() {
   std::scoped_lock sync(m_mutex);
   // Calculate the running average
-  int gyroAverageSize = std::min(m_accum_count, m_avg_size);
+  int gyroAverageSize = (std::min)(m_accum_count, m_avg_size);
   double accum_gyro_rate_x = 0.0;
   double accum_gyro_rate_y = 0.0;
   double accum_gyro_rate_z = 0.0;
@@ -689,7 +689,8 @@ int ADIS16448_IMU::ConfigDecRate(uint16_t DecimationSetting) {
 
   /* Check max */
   if (DecimationSetting > 9) {
-    REPORT_ERROR("Attemted to write an invalid decimation value. Capping at 9");
+    REPORT_ERROR(
+        "Attempted to write an invalid decimation value. Capping at 9");
     DecimationSetting = 9;
   }
 

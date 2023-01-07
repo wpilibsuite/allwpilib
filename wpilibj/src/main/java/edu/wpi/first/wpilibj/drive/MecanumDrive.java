@@ -4,7 +4,7 @@
 
 package edu.wpi.first.wpilibj.drive;
 
-import static java.util.Objects.requireNonNull;
+import static edu.wpi.first.util.ErrorMessages.requireNonNullParam;
 
 import edu.wpi.first.hal.FRCNetComm.tInstances;
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
@@ -109,10 +109,10 @@ public class MecanumDrive extends RobotDriveBase implements Sendable, AutoClosea
       MotorController rearLeftMotor,
       MotorController frontRightMotor,
       MotorController rearRightMotor) {
-    requireNonNull(frontLeftMotor, "Front-left motor cannot be null");
-    requireNonNull(rearLeftMotor, "Rear-left motor cannot be null");
-    requireNonNull(frontRightMotor, "Front-right motor cannot be null");
-    requireNonNull(rearRightMotor, "Rear-right motor cannot be null");
+    requireNonNullParam(frontLeftMotor, "frontLeftMotor", "MecanumDrive");
+    requireNonNullParam(rearLeftMotor, "rearLeftMotor", "MecanumDrive");
+    requireNonNullParam(frontRightMotor, "frontRightMotor", "MecanumDrive");
+    requireNonNullParam(rearRightMotor, "rearRightMotor", "MecanumDrive");
 
     m_frontLeftMotor = frontLeftMotor;
     m_rearLeftMotor = rearLeftMotor;
@@ -135,7 +135,7 @@ public class MecanumDrive extends RobotDriveBase implements Sendable, AutoClosea
    * Drive method for Mecanum platform.
    *
    * <p>Angles are measured counterclockwise from the positive X axis. The robot's speed is
-   * independent from its angle or rotation rate.
+   * independent of its angle or rotation rate.
    *
    * @param xSpeed The robot's speed along the X axis [-1.0..1.0]. Forward is positive.
    * @param ySpeed The robot's speed along the Y axis [-1.0..1.0]. Left is positive.
@@ -150,7 +150,7 @@ public class MecanumDrive extends RobotDriveBase implements Sendable, AutoClosea
    * Drive method for Mecanum platform.
    *
    * <p>Angles are measured counterclockwise from the positive X axis. The robot's speed is
-   * independent from its angle or rotation rate.
+   * independent of its angle or rotation rate.
    *
    * @param xSpeed The robot's speed along the Y axis [-1.0..1.0]. Forward is positive.
    * @param ySpeed The robot's speed along the X axis [-1.0..1.0]. Left is positive.
@@ -183,7 +183,7 @@ public class MecanumDrive extends RobotDriveBase implements Sendable, AutoClosea
    * Drive method for Mecanum platform.
    *
    * <p>Angles are measured counterclockwise from straight ahead. The speed at which the robot
-   * drives (translation) is independent from its angle or rotation rate.
+   * drives (translation) is independent of its angle or rotation rate.
    *
    * @param magnitude The robot's speed at a given angle [-1.0..1.0]. Forward is positive.
    * @param angle The gyro heading around the Z axis at which the robot drives.
@@ -204,7 +204,7 @@ public class MecanumDrive extends RobotDriveBase implements Sendable, AutoClosea
    * Cartesian inverse kinematics for Mecanum platform.
    *
    * <p>Angles are measured counterclockwise from the positive X axis. The robot's speed is
-   * independent from its angle or rotation rate.
+   * independent of its angle or rotation rate.
    *
    * @param xSpeed The robot's speed along the X axis [-1.0..1.0]. Forward is positive.
    * @param ySpeed The robot's speed along the Y axis [-1.0..1.0]. Left is positive.
@@ -219,8 +219,8 @@ public class MecanumDrive extends RobotDriveBase implements Sendable, AutoClosea
   /**
    * Cartesian inverse kinematics for Mecanum platform.
    *
-   * <p>Angles are measured clockwise from the positive X axis. The robot's speed is independent
-   * from its angle or rotation rate.
+   * <p>Angles are measured clockwise from the positive X axis. The robot's speed is independent of
+   * its angle or rotation rate.
    *
    * @param xSpeed The robot's speed along the X axis [-1.0..1.0]. Forward is positive.
    * @param ySpeed The robot's speed along the Y axis [-1.0..1.0]. Left is positive.

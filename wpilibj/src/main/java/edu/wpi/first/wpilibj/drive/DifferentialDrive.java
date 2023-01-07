@@ -4,7 +4,7 @@
 
 package edu.wpi.first.wpilibj.drive;
 
-import static java.util.Objects.requireNonNull;
+import static edu.wpi.first.util.ErrorMessages.requireNonNullParam;
 
 import edu.wpi.first.hal.FRCNetComm.tInstances;
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
@@ -129,8 +129,8 @@ public class DifferentialDrive extends RobotDriveBase implements Sendable, AutoC
    * @param rightMotor Right motor.
    */
   public DifferentialDrive(MotorController leftMotor, MotorController rightMotor) {
-    requireNonNull(leftMotor, "Left motor cannot be null");
-    requireNonNull(rightMotor, "Right motor cannot be null");
+    requireNonNullParam(leftMotor, "leftMotor", "DifferentialDrive");
+    requireNonNullParam(rightMotor, "rightMotor", "DifferentialDrive");
 
     m_leftMotor = leftMotor;
     m_rightMotor = rightMotor;

@@ -21,11 +21,11 @@ NTFMSModel::NTFMSModel(nt::NetworkTableInstance inst, std::string_view path)
           inst.GetStringTopic(fmt::format("{}/GameSpecificMessage", path))
               .Subscribe("")},
       m_alliance{inst.GetBooleanTopic(fmt::format("{}/IsRedAlliance", path))
-                     .Subscribe(false, {{nt::PubSubOption::SendAll(true)}})},
+                     .Subscribe(false)},
       m_station{inst.GetIntegerTopic(fmt::format("{}/StationNumber", path))
-                    .Subscribe(0, {{nt::PubSubOption::SendAll(true)}})},
+                    .Subscribe(0)},
       m_controlWord{inst.GetIntegerTopic(fmt::format("{}/FMSControlData", path))
-                        .Subscribe(0, {{nt::PubSubOption::SendAll(true)}})},
+                        .Subscribe(0)},
       m_fmsAttached{fmt::format("NT_FMS:FMSAttached:{}", path)},
       m_dsAttached{fmt::format("NT_FMS:DSAttached:{}", path)},
       m_allianceStationId{fmt::format("NT_FMS:AllianceStationID:{}", path)},
@@ -73,5 +73,5 @@ void NTFMSModel::Update() {
 }
 
 bool NTFMSModel::Exists() {
-  return m_inst.IsConnected() && m_controlWord.Exists();
+  return m_controlWord.Exists();
 }

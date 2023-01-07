@@ -31,13 +31,10 @@ namespace frc {
  * "width" and "length" values.  This is to account for arbitrary field sizes
  * when transforming the poses.
  *
- * Pose3ds are assumed to be measured from the bottom-left corner of the field,
- * when the blue alliance is at the left. By default, Pose3ds will be returned
- * as declared when calling GetTagPose(int).
- * SetOrigin(AprilTagFieldLayout::OriginPosition) can be used to transform the
- * poses returned by GetTagPose(int) to be correct relative to a different
- * coordinate frame.
- */
+ * Pose3ds in the JSON are measured using the normal FRC coordinate system, NWU
+ * with the origin at the bottom-right corner of the blue alliance wall.
+ * SetOrigin(OriginPosition) can be used to change the poses returned from
+ * GetTagPose(int) to be from the perspective of a specific alliance. */
 class WPILIB_DLLEXPORT AprilTagFieldLayout {
  public:
   enum class OriginPosition {
@@ -103,19 +100,8 @@ class WPILIB_DLLEXPORT AprilTagFieldLayout {
 
   /*
    * Checks equality between this AprilTagFieldLayout and another object.
-   *
-   * @param other The other object.
-   * @return Whether the two objects are equal.
    */
-  bool operator==(const AprilTagFieldLayout& other) const;
-
-  /**
-   * Checks inequality between this AprilTagFieldLayout and another object.
-   *
-   * @param other The other object.
-   * @return Whether the two objects are not equal.
-   */
-  bool operator!=(const AprilTagFieldLayout& other) const;
+  bool operator==(const AprilTagFieldLayout&) const = default;
 
  private:
   std::unordered_map<int, AprilTag> m_apriltags;

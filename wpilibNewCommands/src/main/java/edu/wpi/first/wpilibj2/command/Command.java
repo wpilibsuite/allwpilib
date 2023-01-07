@@ -4,7 +4,7 @@
 
 package edu.wpi.first.wpilibj2.command;
 
-import static edu.wpi.first.wpilibj.util.ErrorMessages.requireNonNullParam;
+import static edu.wpi.first.util.ErrorMessages.requireNonNullParam;
 
 import edu.wpi.first.util.function.BooleanConsumer;
 import java.util.Set;
@@ -13,7 +13,7 @@ import java.util.function.BooleanSupplier;
 /**
  * A state machine representing a complete action to be performed by the robot. Commands are run by
  * the {@link CommandScheduler}, and can be composed into CommandGroups to allow users to build
- * complicated multi-step actions without the need to roll the state machine logic themselves.
+ * complicated multistep actions without the need to roll the state machine logic themselves.
  *
  * <p>Commands are run synchronously from the main robot loop; no multithreading is used, unless
  * specified explicitly from the command implementation.
@@ -67,11 +67,11 @@ public interface Command {
    * finishes normally, the command will be interrupted and un-scheduled. Note that the timeout only
    * applies to the command returned by this method; the calling command is not itself changed.
    *
-   * <p>Note: This decorator works by composing this command within a CommandGroup. The command
-   * cannot be used independently after being decorated, or be re-decorated with a different
-   * decorator, unless it is manually cleared from the list of grouped commands with {@link
-   * CommandGroupBase#clearGroupedCommand(Command)}. The decorated command can, however, be further
-   * decorated without issue.
+   * <p>Note: This decorator works by adding this command to a composition. The command the
+   * decorator was called on cannot be scheduled independently or be added to a different
+   * composition (namely, decorators), unless it is manually cleared from the list of composed
+   * commands with {@link CommandScheduler#removeComposedCommand(Command)}. The command composition
+   * returned from this method can be further decorated without issue.
    *
    * @param seconds the timeout duration
    * @return the command with the timeout added
@@ -86,11 +86,11 @@ public interface Command {
    * that this only applies to the command returned by this method; the calling command is not
    * itself changed.
    *
-   * <p>Note: This decorator works by composing this command within a CommandGroup. The command
-   * cannot be used independently after being decorated, or be re-decorated with a different
-   * decorator, unless it is manually cleared from the list of grouped commands with {@link
-   * CommandGroupBase#clearGroupedCommand(Command)}. The decorated command can, however, be further
-   * decorated without issue.
+   * <p>Note: This decorator works by adding this command to a composition. The command the
+   * decorator was called on cannot be scheduled independently or be added to a different
+   * composition (namely, decorators), unless it is manually cleared from the list of composed
+   * commands with {@link CommandScheduler#removeComposedCommand(Command)}. The command composition
+   * returned from this method can be further decorated without issue.
    *
    * @param condition the interrupt condition
    * @return the command with the interrupt condition added
@@ -105,11 +105,11 @@ public interface Command {
    * that this only applies to the command returned by this method; the calling command is not
    * itself changed.
    *
-   * <p>Note: This decorator works by composing this command within a CommandGroup. The command
-   * cannot be used independently after being decorated, or be re-decorated with a different
-   * decorator, unless it is manually cleared from the list of grouped commands with {@link
-   * CommandGroupBase#clearGroupedCommand(Command)}. The decorated command can, however, be further
-   * decorated without issue.
+   * <p>Note: This decorator works by adding this command to a composition. The command the
+   * decorator was called on cannot be scheduled independently or be added to a different
+   * composition (namely, decorators), unless it is manually cleared from the list of composed
+   * commands with {@link CommandScheduler#removeComposedCommand(Command)}. The command composition
+   * returned from this method can be further decorated without issue.
    *
    * @param condition the interrupt condition
    * @return the command with the interrupt condition added
@@ -123,11 +123,11 @@ public interface Command {
   /**
    * Decorates this command with a runnable to run before this command starts.
    *
-   * <p>Note: This decorator works by composing this command within a CommandGroup. The command
-   * cannot be used independently after being decorated, or be re-decorated with a different
-   * decorator, unless it is manually cleared from the list of grouped commands with {@link
-   * CommandGroupBase#clearGroupedCommand(Command)}. The decorated command can, however, be further
-   * decorated without issue.
+   * <p>Note: This decorator works by adding this command to a composition. The command the
+   * decorator was called on cannot be scheduled independently or be added to a different
+   * composition (namely, decorators), unless it is manually cleared from the list of composed
+   * commands with {@link CommandScheduler#removeComposedCommand(Command)}. The command composition
+   * returned from this method can be further decorated without issue.
    *
    * @param toRun the Runnable to run
    * @param requirements the required subsystems
@@ -140,11 +140,11 @@ public interface Command {
   /**
    * Decorates this command with another command to run before this command starts.
    *
-   * <p>Note: This decorator works by composing this command within a CommandGroup. The command
-   * cannot be used independently after being decorated, or be re-decorated with a different
-   * decorator, unless it is manually cleared from the list of grouped commands with {@link
-   * CommandGroupBase#clearGroupedCommand(Command)}. The decorated command can, however, be further
-   * decorated without issue.
+   * <p>Note: This decorator works by adding this command to a composition. The command the
+   * decorator was called on cannot be scheduled independently or be added to a different
+   * composition (namely, decorators), unless it is manually cleared from the list of composed
+   * commands with {@link CommandScheduler#removeComposedCommand(Command)}. The command composition
+   * returned from this method can be further decorated without issue.
    *
    * @param before the command to run before this one
    * @return the decorated command
@@ -156,11 +156,11 @@ public interface Command {
   /**
    * Decorates this command with a runnable to run after the command finishes.
    *
-   * <p>Note: This decorator works by composing this command within a CommandGroup. The command
-   * cannot be used independently after being decorated, or be re-decorated with a different
-   * decorator, unless it is manually cleared from the list of grouped commands with {@link
-   * CommandGroupBase#clearGroupedCommand(Command)}. The decorated command can, however, be further
-   * decorated without issue.
+   * <p>Note: This decorator works by adding this command to a composition. The command the
+   * decorator was called on cannot be scheduled independently or be added to a different
+   * composition (namely, decorators), unless it is manually cleared from the list of composed
+   * commands with {@link CommandScheduler#removeComposedCommand(Command)}. The command composition
+   * returned from this method can be further decorated without issue.
    *
    * @param toRun the Runnable to run
    * @param requirements the required subsystems
@@ -174,11 +174,11 @@ public interface Command {
    * Decorates this command with a set of commands to run after it in sequence. Often more
    * convenient/less-verbose than constructing a new {@link SequentialCommandGroup} explicitly.
    *
-   * <p>Note: This decorator works by composing this command within a CommandGroup. The command
-   * cannot be used independently after being decorated, or be re-decorated with a different
-   * decorator, unless it is manually cleared from the list of grouped commands with {@link
-   * CommandGroupBase#clearGroupedCommand(Command)}. The decorated command can, however, be further
-   * decorated without issue.
+   * <p>Note: This decorator works by adding this command to a composition. The command the
+   * decorator was called on cannot be scheduled independently or be added to a different
+   * composition (namely, decorators), unless it is manually cleared from the list of composed
+   * commands with {@link CommandScheduler#removeComposedCommand(Command)}. The command composition
+   * returned from this method can be further decorated without issue.
    *
    * @param next the commands to run next
    * @return the decorated command
@@ -194,11 +194,11 @@ public interface Command {
    * command ends and interrupting all the others. Often more convenient/less-verbose than
    * constructing a new {@link ParallelDeadlineGroup} explicitly.
    *
-   * <p>Note: This decorator works by composing this command within a CommandGroup. The command
-   * cannot be used independently after being decorated, or be re-decorated with a different
-   * decorator, unless it is manually cleared from the list of grouped commands with {@link
-   * CommandGroupBase#clearGroupedCommand(Command)}. The decorated command can, however, be further
-   * decorated without issue.
+   * <p>Note: This decorator works by adding this command to a composition. The command the
+   * decorator was called on cannot be scheduled independently or be added to a different
+   * composition (namely, decorators), unless it is manually cleared from the list of composed
+   * commands with {@link CommandScheduler#removeComposedCommand(Command)}. The command composition
+   * returned from this method can be further decorated without issue.
    *
    * @param parallel the commands to run in parallel
    * @return the decorated command
@@ -212,11 +212,11 @@ public interface Command {
    * command ends. Often more convenient/less-verbose than constructing a new {@link
    * ParallelCommandGroup} explicitly.
    *
-   * <p>Note: This decorator works by composing this command within a CommandGroup. The command
-   * cannot be used independently after being decorated, or be re-decorated with a different
-   * decorator, unless it is manually cleared from the list of grouped commands with {@link
-   * CommandGroupBase#clearGroupedCommand(Command)}. The decorated command can, however, be further
-   * decorated without issue.
+   * <p>Note: This decorator works by adding this command to a composition. The command the
+   * decorator was called on cannot be scheduled independently or be added to a different
+   * composition (namely, decorators), unless it is manually cleared from the list of composed
+   * commands with {@link CommandScheduler#removeComposedCommand(Command)}. The command composition
+   * returned from this method can be further decorated without issue.
    *
    * @param parallel the commands to run in parallel
    * @return the decorated command
@@ -232,11 +232,11 @@ public interface Command {
    * command ends. Often more convenient/less-verbose than constructing a new {@link
    * ParallelRaceGroup} explicitly.
    *
-   * <p>Note: This decorator works by composing this command within a CommandGroup. The command
-   * cannot be used independently after being decorated, or be re-decorated with a different
-   * decorator, unless it is manually cleared from the list of grouped commands with {@link
-   * CommandGroupBase#clearGroupedCommand(Command)}. The decorated command can, however, be further
-   * decorated without issue.
+   * <p>Note: This decorator works by adding this command to a composition. The command the
+   * decorator was called on cannot be scheduled independently or be added to a different
+   * composition (namely, decorators), unless it is manually cleared from the list of composed
+   * commands with {@link CommandScheduler#removeComposedCommand(Command)}. The command composition
+   * returned from this method can be further decorated without issue.
    *
    * @param parallel the commands to run in parallel
    * @return the decorated command
@@ -251,11 +251,11 @@ public interface Command {
    * Decorates this command to run perpetually, ignoring its ordinary end conditions. The decorated
    * command can still be interrupted or canceled.
    *
-   * <p>Note: This decorator works by composing this command within a CommandGroup. The command
-   * cannot be used independently after being decorated, or be re-decorated with a different
-   * decorator, unless it is manually cleared from the list of grouped commands with {@link
-   * CommandGroupBase#clearGroupedCommand(Command)}. The decorated command can, however, be further
-   * decorated without issue.
+   * <p>Note: This decorator works by adding this command to a composition. The command the
+   * decorator was called on cannot be scheduled independently or be added to a different
+   * composition (namely, decorators), unless it is manually cleared from the list of composed
+   * commands with {@link CommandScheduler#removeComposedCommand(Command)}. The command composition
+   * returned from this method can be further decorated without issue.
    *
    * @return the decorated command
    * @deprecated PerpetualCommand violates the assumption that execute() doesn't get called after
@@ -273,11 +273,11 @@ public interface Command {
    * Decorates this command to run repeatedly, restarting it when it ends, until this command is
    * interrupted. The decorated command can still be canceled.
    *
-   * <p>Note: This decorator works by composing this command within a CommandGroup. The command
-   * cannot be used independently after being decorated, or be re-decorated with a different
-   * decorator, unless it is manually cleared from the list of grouped commands with {@link
-   * CommandGroupBase#clearGroupedCommand(Command)}. The decorated command can, however, be further
-   * decorated without issue.
+   * <p>Note: This decorator works by adding this command to a composition. The command the
+   * decorator was called on cannot be scheduled independently or be added to a different
+   * composition (namely, decorators), unless it is manually cleared from the list of composed
+   * commands with {@link CommandScheduler#removeComposedCommand(Command)}. The command composition
+   * returned from this method can be further decorated without issue.
    *
    * @return the decorated command
    */
@@ -286,20 +286,20 @@ public interface Command {
   }
 
   /**
-   * Decorates this command to run "by proxy" by wrapping it in a {@link ProxyScheduleCommand}. This
-   * is useful for "forking off" from command groups when the user does not wish to extend the
-   * command's requirements to the entire command group.
+   * Decorates this command to run "by proxy" by wrapping it in a {@link ProxyCommand}. This is
+   * useful for "forking off" from command compositions when the user does not wish to extend the
+   * command's requirements to the entire command composition.
    *
    * @return the decorated command
    */
-  default ProxyScheduleCommand asProxy() {
-    return new ProxyScheduleCommand(this);
+  default ProxyCommand asProxy() {
+    return new ProxyCommand(this);
   }
 
   /**
    * Decorates this command to only run if this condition is not met. If the command is already
    * running and the condition changes to true, the command will not stop running. The requirements
-   * of this command will be kept for the new conditonal command.
+   * of this command will be kept for the new conditional command.
    *
    * @param condition the condition that will prevent the command from running
    * @return the decorated command
@@ -390,8 +390,8 @@ public interface Command {
   }
 
   /**
-   * Whether or not the command is currently scheduled. Note that this does not detect whether the
-   * command is being run by a CommandGroup, only whether it is directly being run by the scheduler.
+   * Whether the command is currently scheduled. Note that this does not detect whether the command
+   * is in a composition, only whether it is directly being run by the scheduler.
    *
    * @return Whether the command is scheduled.
    */
@@ -446,14 +446,15 @@ public interface Command {
   default void setName(String name) {}
 
   /**
-   * Decorates this Command with a name. Is an inline function for #setName(String);
+   * Decorates this Command with a name.
    *
    * @param name name
    * @return the decorated Command
    */
-  default Command withName(String name) {
-    this.setName(name);
-    return this;
+  default WrapperCommand withName(String name) {
+    WrapperCommand wrapper = new WrapperCommand(Command.this) {};
+    wrapper.setName(name);
+    return wrapper;
   }
 
   /**

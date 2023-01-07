@@ -525,6 +525,42 @@ public final class RoboRioSim {
     RoboRioDataJNI.setBrownoutVoltage(vInVoltage);
   }
 
+  /**
+   * Get the serial number.
+   *
+   * @return The serial number.
+   */
+  public static String getSerialNumber() {
+    return RoboRioDataJNI.getSerialNumber();
+  }
+
+  /**
+   * Set the serial number.
+   *
+   * @param serialNumber The serial number.
+   */
+  public static void setSerialNumber(String serialNumber) {
+    RoboRioDataJNI.setSerialNumber(serialNumber);
+  }
+
+  /**
+   * Get the comments string.
+   *
+   * @return The comments string.
+   */
+  public static String getComments() {
+    return RoboRioDataJNI.getComments();
+  }
+
+  /**
+   * Set the comments string.
+   *
+   * @param comments The comments string.
+   */
+  public static void setComments(String comments) {
+    RoboRioDataJNI.setComments(comments);
+  }
+
   /** Reset all simulation data. */
   public static void resetData() {
     RoboRioDataJNI.resetData();

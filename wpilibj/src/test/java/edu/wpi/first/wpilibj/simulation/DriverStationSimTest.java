@@ -37,7 +37,7 @@ class DriverStationSimTest {
   }
 
   @Test
-  void testAutonomus() {
+  void testAutonomous() {
     HAL.initialize(500, 0);
     DriverStationSim.resetData();
 
