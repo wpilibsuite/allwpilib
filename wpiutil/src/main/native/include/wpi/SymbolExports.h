@@ -5,7 +5,7 @@
 #pragma once
 
 #ifdef _WIN32
-#ifndef __GNUC__
+#ifdef _MSC_VER
 #pragma warning(disable : 4251)
 #endif
 
