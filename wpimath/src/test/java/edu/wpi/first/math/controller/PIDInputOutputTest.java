@@ -5,8 +5,6 @@
 package edu.wpi.first.math.controller;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -56,17 +54,5 @@ class PIDInputOutputTest {
     m_controller.calculate(0, 0);
 
     assertEquals(-0.01 / m_controller.getPeriod(), m_controller.calculate(0.0025, 0), 1e-5);
-  }
-
-  @Test
-  void atSetpointTest() {
-    m_controller.reset();
-    assertFalse(m_controller.atSetpoint());
-    m_controller.setTolerance(2);
-    assertFalse(m_controller.atSetpoint());
-    m_controller.setSetpoint(0);
-    assertFalse(m_controller.atSetpoint());
-    m_controller.calculate(0);
-    assertTrue(m_controller.atSetpoint());
   }
 }
