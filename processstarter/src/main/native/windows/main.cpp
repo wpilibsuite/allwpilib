@@ -70,7 +70,10 @@ int main() {
         Status = GetEnvironmentVariableW(L"JAVA_HOME", ExePathRaw, 1024);
         std::wstring JavawLocal = L"javaw";
         if (Status != 0 && Status < 1024) {
-            JavawLocal = ExePathRaw;
+            std::filesystem::path JavaHomePath{ExePathRaw};
+            JavaHomePath /= "bin";
+            JavaHomePath /= "javaw.exe";
+            JavawLocal = JavaHomePath;
         }
 
         if (!CreateProcessW(JavawLocal.c_str(), ToRun.data(), NULL, NULL, FALSE, 0, NULL, NULL, &si, &pi)) {
@@ -80,12 +83,5 @@ int main() {
     }
 
     Status = WaitForSingleObject(pi.hProcess, 3000); // Wait for 3 seconds
-    if (Status != WAIT_TIMEOUT) {
-
-    }
-
-    printf("Hello!\n");
-
-
-    return 0;
+    return Status == WAIT_TIMEOUT ? 0 : 1;
 }
