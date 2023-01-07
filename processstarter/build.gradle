@@ -4,7 +4,7 @@ if (!project.hasProperty('onlylinuxathena')) {
 
     description = "Process Starter"
 
-    apply plugin: 'c'
+    apply plugin: 'cpp'
     apply plugin: 'objective-cpp'
     apply plugin: 'visual-studio'
     apply plugin: 'edu.wpi.first.NativeUtils'
@@ -39,10 +39,10 @@ if (!project.hasProperty('onlylinuxathena')) {
                         }
                     } else if (it.targetPlatform.operatingSystem.isLinux()) {
                         it.sources {
-                            linuxC(CSourceSet) {
+                            linuxC(CppSourceSet) {
                                 source {
                                     srcDirs 'src/main/native/linux'
-                                    include '**/*.c'
+                                    include '**/*.cpp'
                                 }
                                 exportedHeaders {
                                     srcDirs 'src/main/native/include'
@@ -52,10 +52,10 @@ if (!project.hasProperty('onlylinuxathena')) {
                         }
                     } else if (it.targetPlatform.operatingSystem.isWindows()) {
                         it.sources {
-                            windowsC(CSourceSet) {
+                            windowsC(CppSourceSet) {
                                 source {
                                     srcDirs 'src/main/native/windows'
-                                    include '**/*.c'
+                                    include '**/*.cpp'
                                 }
                                 exportedHeaders {
                                     srcDirs 'src/main/native/include'
