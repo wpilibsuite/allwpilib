@@ -5,7 +5,7 @@
 package edu.wpi.first.apriltag;
 
 public enum AprilTagFields {
-  k2022RapidReact("2022-rapidreact.json");
+  k2022RapidReact("2022-rapidreact.json"),
   k2023ChargedUp("2023-chargedup.json");
 
   public static final String kBaseResourceDir = "/edu/wpi/first/apriltag/";
