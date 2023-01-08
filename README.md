@@ -6,7 +6,6 @@
 
 Welcome to the WPILib project. This repository contains the HAL, WPILibJ, and WPILibC projects. These are the core libraries for creating robot programs for the roboRIO.
 
-
 - [WPILib Project](#wpilib-project)
   - [WPILib Mission](#wpilib-mission)
 - [Building WPILib](#building-wpilib)
