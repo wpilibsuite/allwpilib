@@ -10,12 +10,16 @@ namespace frc {
 
 // C++ generated from resource files
 std::string_view GetResource_2022_rapidreact_json();
+std::string_view GetResource_2023_chargedup_json();
 
 AprilTagFieldLayout LoadAprilTagLayoutField(AprilTagField field) {
   std::string_view fieldString;
   switch (field) {
     case AprilTagField::k2022RapidReact:
       fieldString = GetResource_2022_rapidreact_json();
+      break;
+    case AprilTagField::k2023ChargedUp:
+      fieldString = GetResource_2023_chargedup_json();
       break;
     case AprilTagField::kNumFields:
       throw std::invalid_argument("Invalid Field");
