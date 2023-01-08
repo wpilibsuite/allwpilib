@@ -132,7 +132,13 @@ void frc::MecanumDrivePoseEstimator::AddVisionMeasurement(
                            sample.value().wheelPositions,
                            sample.value().pose.Exp(scaledTwist));
 
-  // Step 6: Replay odometry inputs between sample time and latest recorded
+  // Step 6: Record the current pose to allow multiple measurements from the
+  // same timestamp
+  m_poseBuffer.AddSample(timestamp,
+                         {GetEstimatedPosition(), sample.value().gyroAngle,
+                          sample.get().wheelPositions});
+
+  // Step 7: Replay odometry inputs between sample time and latest recorded
   // sample to update the pose buffer and correct odometry.
   auto internal_buf = m_poseBuffer.GetInternalBuffer();
 
