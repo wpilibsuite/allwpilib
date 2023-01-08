@@ -35,7 +35,7 @@ public class PIDController implements Sendable, AutoCloseable {
 
   private double m_minimumInput;
 
-  // Do the endpoints wrap around? eg. Absolute encoder
+  // Do the endpoints wrap around? e.g. Absolute encoder
   private boolean m_continuous;
 
   // The error at the time of the most recent call to calculate()
@@ -175,12 +175,39 @@ public class PIDController implements Sendable, AutoCloseable {
   }
 
   /**
+   * Returns the position tolerance of this controller.
+   *
+   * @return the position tolerance of the controller.
+   */
+  public double getPositionTolerance() {
+    return m_positionTolerance;
+  }
+
+  /**
+   * Returns the velocity tolerance of this controller.
+   *
+   * @return the velocity tolerance of the controller.
+   */
+  public double getVelocityTolerance() {
+    return m_velocityTolerance;
+  }
+
+  /**
    * Sets the setpoint for the PIDController.
    *
    * @param setpoint The desired setpoint.
    */
   public void setSetpoint(double setpoint) {
     m_setpoint = setpoint;
+
+    if (m_continuous) {
+      double errorBound = (m_maximumInput - m_minimumInput) / 2.0;
+      m_positionError = MathUtil.inputModulus(m_setpoint - m_measurement, -errorBound, errorBound);
+    } else {
+      m_positionError = m_setpoint - m_measurement;
+    }
+
+    m_velocityError = (m_positionError - m_prevError) / m_period;
   }
 
   /**
@@ -200,18 +227,8 @@ public class PIDController implements Sendable, AutoCloseable {
    * @return Whether the error is within the acceptable bounds.
    */
   public boolean atSetpoint() {
-    double positionError;
-    if (m_continuous) {
-      double errorBound = (m_maximumInput - m_minimumInput) / 2.0;
-      positionError = MathUtil.inputModulus(m_setpoint - m_measurement, -errorBound, errorBound);
-    } else {
-      positionError = m_setpoint - m_measurement;
-    }
-
-    double velocityError = (positionError - m_prevError) / m_period;
-
-    return Math.abs(positionError) < m_positionTolerance
-        && Math.abs(velocityError) < m_velocityTolerance;
+    return Math.abs(m_positionError) < m_positionTolerance
+        && Math.abs(m_velocityError) < m_velocityTolerance;
   }
 
   /**
@@ -303,8 +320,7 @@ public class PIDController implements Sendable, AutoCloseable {
    * @return The next controller output.
    */
   public double calculate(double measurement, double setpoint) {
-    // Set setpoint to provided value
-    setSetpoint(setpoint);
+    m_setpoint = setpoint;
     return calculate(measurement);
   }
 
@@ -322,7 +338,7 @@ public class PIDController implements Sendable, AutoCloseable {
       double errorBound = (m_maximumInput - m_minimumInput) / 2.0;
       m_positionError = MathUtil.inputModulus(m_setpoint - m_measurement, -errorBound, errorBound);
     } else {
-      m_positionError = m_setpoint - measurement;
+      m_positionError = m_setpoint - m_measurement;
     }
 
     m_velocityError = (m_positionError - m_prevError) / m_period;
@@ -340,8 +356,10 @@ public class PIDController implements Sendable, AutoCloseable {
 
   /** Resets the previous error and the integral term. */
   public void reset() {
+    m_positionError = 0;
     m_prevError = 0;
     m_totalError = 0;
+    m_velocityError = 0;
   }
 
   @Override

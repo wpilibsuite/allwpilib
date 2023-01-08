@@ -39,7 +39,7 @@ std::unique_ptr<CallbackStore> RoboRioSim::RegisterVInVoltageCallback(
 }
 
 units::volt_t RoboRioSim::GetVInVoltage() {
-  return units::volt_t(HALSIM_GetRoboRioVInVoltage());
+  return units::volt_t{HALSIM_GetRoboRioVInVoltage()};
 }
 
 void RoboRioSim::SetVInVoltage(units::volt_t vInVoltage) {
@@ -56,7 +56,7 @@ std::unique_ptr<CallbackStore> RoboRioSim::RegisterVInCurrentCallback(
 }
 
 units::ampere_t RoboRioSim::GetVInCurrent() {
-  return units::ampere_t(HALSIM_GetRoboRioVInCurrent());
+  return units::ampere_t{HALSIM_GetRoboRioVInCurrent()};
 }
 
 void RoboRioSim::SetVInCurrent(units::ampere_t vInCurrent) {
@@ -73,7 +73,7 @@ std::unique_ptr<CallbackStore> RoboRioSim::RegisterUserVoltage6VCallback(
 }
 
 units::volt_t RoboRioSim::GetUserVoltage6V() {
-  return units::volt_t(HALSIM_GetRoboRioUserVoltage6V());
+  return units::volt_t{HALSIM_GetRoboRioUserVoltage6V()};
 }
 
 void RoboRioSim::SetUserVoltage6V(units::volt_t userVoltage6V) {
@@ -90,7 +90,7 @@ std::unique_ptr<CallbackStore> RoboRioSim::RegisterUserCurrent6VCallback(
 }
 
 units::ampere_t RoboRioSim::GetUserCurrent6V() {
-  return units::ampere_t(HALSIM_GetRoboRioUserCurrent6V());
+  return units::ampere_t{HALSIM_GetRoboRioUserCurrent6V()};
 }
 
 void RoboRioSim::SetUserCurrent6V(units::ampere_t userCurrent6V) {
@@ -124,7 +124,7 @@ std::unique_ptr<CallbackStore> RoboRioSim::RegisterUserVoltage5VCallback(
 }
 
 units::volt_t RoboRioSim::GetUserVoltage5V() {
-  return units::volt_t(HALSIM_GetRoboRioUserVoltage5V());
+  return units::volt_t{HALSIM_GetRoboRioUserVoltage5V()};
 }
 
 void RoboRioSim::SetUserVoltage5V(units::volt_t userVoltage5V) {
@@ -141,7 +141,7 @@ std::unique_ptr<CallbackStore> RoboRioSim::RegisterUserCurrent5VCallback(
 }
 
 units::ampere_t RoboRioSim::GetUserCurrent5V() {
-  return units::ampere_t(HALSIM_GetRoboRioUserCurrent5V());
+  return units::ampere_t{HALSIM_GetRoboRioUserCurrent5V()};
 }
 
 void RoboRioSim::SetUserCurrent5V(units::ampere_t userCurrent5V) {
@@ -175,7 +175,7 @@ std::unique_ptr<CallbackStore> RoboRioSim::RegisterUserVoltage3V3Callback(
 }
 
 units::volt_t RoboRioSim::GetUserVoltage3V3() {
-  return units::volt_t(HALSIM_GetRoboRioUserVoltage3V3());
+  return units::volt_t{HALSIM_GetRoboRioUserVoltage3V3()};
 }
 
 void RoboRioSim::SetUserVoltage3V3(units::volt_t userVoltage3V3) {
@@ -192,7 +192,7 @@ std::unique_ptr<CallbackStore> RoboRioSim::RegisterUserCurrent3V3Callback(
 }
 
 units::ampere_t RoboRioSim::GetUserCurrent3V3() {
-  return units::ampere_t(HALSIM_GetRoboRioUserCurrent3V3());
+  return units::ampere_t{HALSIM_GetRoboRioUserCurrent3V3()};
 }
 
 void RoboRioSim::SetUserCurrent3V3(units::ampere_t userCurrent3V3) {
@@ -277,11 +277,31 @@ std::unique_ptr<CallbackStore> RoboRioSim::RegisterBrownoutVoltageCallback(
 }
 
 units::volt_t RoboRioSim::GetBrownoutVoltage() {
-  return units::volt_t(HALSIM_GetRoboRioBrownoutVoltage());
+  return units::volt_t{HALSIM_GetRoboRioBrownoutVoltage()};
 }
 
 void RoboRioSim::SetBrownoutVoltage(units::volt_t vInVoltage) {
   HALSIM_SetRoboRioBrownoutVoltage(vInVoltage.value());
+}
+
+std::string RoboRioSim::GetSerialNumber() {
+  char serialNum[9];
+  size_t len = HALSIM_GetRoboRioSerialNumber(serialNum, sizeof(serialNum));
+  return std::string(serialNum, len);
+}
+
+void RoboRioSim::SetSerialNumber(std::string_view serialNumber) {
+  HALSIM_SetRoboRioSerialNumber(serialNumber.data(), serialNumber.size());
+}
+
+std::string RoboRioSim::GetComments() {
+  char comments[65];
+  size_t len = HALSIM_GetRoboRioComments(comments, sizeof(comments));
+  return std::string(comments, len);
+}
+
+void RoboRioSim::SetComments(std::string_view comments) {
+  HALSIM_SetRoboRioComments(comments.data(), comments.size());
 }
 
 void RoboRioSim::ResetData() {

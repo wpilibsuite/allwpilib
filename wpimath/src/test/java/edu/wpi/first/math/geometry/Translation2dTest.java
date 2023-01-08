@@ -21,8 +21,8 @@ class Translation2dTest {
     var sum = one.plus(two);
 
     assertAll(
-        () -> assertEquals(sum.getX(), 3.0, kEpsilon),
-        () -> assertEquals(sum.getY(), 8.0, kEpsilon));
+        () -> assertEquals(3.0, sum.getX(), kEpsilon),
+        () -> assertEquals(8.0, sum.getY(), kEpsilon));
   }
 
   @Test
@@ -33,8 +33,8 @@ class Translation2dTest {
     var difference = one.minus(two);
 
     assertAll(
-        () -> assertEquals(difference.getX(), -1.0, kEpsilon),
-        () -> assertEquals(difference.getY(), -2.0, kEpsilon));
+        () -> assertEquals(-1.0, difference.getX(), kEpsilon),
+        () -> assertEquals(-2.0, difference.getY(), kEpsilon));
   }
 
   @Test
@@ -43,8 +43,8 @@ class Translation2dTest {
     var rotated = another.rotateBy(Rotation2d.fromDegrees(90.0));
 
     assertAll(
-        () -> assertEquals(rotated.getX(), 0.0, kEpsilon),
-        () -> assertEquals(rotated.getY(), 3.0, kEpsilon));
+        () -> assertEquals(0.0, rotated.getX(), kEpsilon),
+        () -> assertEquals(3.0, rotated.getY(), kEpsilon));
   }
 
   @Test
@@ -53,8 +53,8 @@ class Translation2dTest {
     var mult = original.times(3);
 
     assertAll(
-        () -> assertEquals(mult.getX(), 9.0, kEpsilon),
-        () -> assertEquals(mult.getY(), 15.0, kEpsilon));
+        () -> assertEquals(9.0, mult.getX(), kEpsilon),
+        () -> assertEquals(15.0, mult.getY(), kEpsilon));
   }
 
   @Test
@@ -63,21 +63,21 @@ class Translation2dTest {
     var div = original.div(2);
 
     assertAll(
-        () -> assertEquals(div.getX(), 1.5, kEpsilon),
-        () -> assertEquals(div.getY(), 2.5, kEpsilon));
+        () -> assertEquals(1.5, div.getX(), kEpsilon),
+        () -> assertEquals(2.5, div.getY(), kEpsilon));
   }
 
   @Test
   void testNorm() {
     var one = new Translation2d(3.0, 5.0);
-    assertEquals(one.getNorm(), Math.hypot(3.0, 5.0), kEpsilon);
+    assertEquals(Math.hypot(3.0, 5.0), one.getNorm(), kEpsilon);
   }
 
   @Test
   void testDistance() {
     var one = new Translation2d(1, 1);
     var two = new Translation2d(6, 6);
-    assertEquals(one.getDistance(two), 5 * Math.sqrt(2), kEpsilon);
+    assertEquals(5.0 * Math.sqrt(2.0), one.getDistance(two), kEpsilon);
   }
 
   @Test
@@ -86,8 +86,8 @@ class Translation2dTest {
     var inverted = original.unaryMinus();
 
     assertAll(
-        () -> assertEquals(inverted.getX(), 4.5, kEpsilon),
-        () -> assertEquals(inverted.getY(), -7, kEpsilon));
+        () -> assertEquals(4.5, inverted.getX(), kEpsilon),
+        () -> assertEquals(-7.0, inverted.getY(), kEpsilon));
   }
 
   @Test
@@ -109,9 +109,9 @@ class Translation2dTest {
     var one = new Translation2d(Math.sqrt(2), Rotation2d.fromDegrees(45.0));
     var two = new Translation2d(2, Rotation2d.fromDegrees(60.0));
     assertAll(
-        () -> assertEquals(one.getX(), 1.0, kEpsilon),
-        () -> assertEquals(one.getY(), 1.0, kEpsilon),
-        () -> assertEquals(two.getX(), 1.0, kEpsilon),
-        () -> assertEquals(two.getY(), Math.sqrt(3), kEpsilon));
+        () -> assertEquals(1.0, one.getX(), kEpsilon),
+        () -> assertEquals(1.0, one.getY(), kEpsilon),
+        () -> assertEquals(1.0, two.getX(), kEpsilon),
+        () -> assertEquals(Math.sqrt(3.0), two.getY(), kEpsilon));
   }
 }

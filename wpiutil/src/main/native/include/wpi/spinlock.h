@@ -9,7 +9,7 @@
 #include <mutex>
 #include <thread>
 
-#include "Compiler.h"
+#include "wpi/Compiler.h"
 
 namespace wpi {
 

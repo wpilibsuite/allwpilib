@@ -14,6 +14,8 @@ namespace frc2 {
  * A subsystem that generates and runs trapezoidal motion profiles
  * automatically.  The user specifies how to use the current state of the motion
  * profile by overriding the `UseState` method.
+ *
+ * This class is provided by the NewCommands VendorDep
  */
 template <class Distance>
 class TrapezoidProfileSubsystem : public SubsystemBase {

@@ -33,9 +33,8 @@ public class KalmanFilterLatencyCompensator<S extends Num, I extends Num, O exte
    * @param observer The observer.
    * @param u The input at the timestamp.
    * @param localY The local output at the timestamp
-   * @param timestampSeconds The timesnap of the state.
+   * @param timestampSeconds The timestamp of the state.
    */
-  @SuppressWarnings("ParameterName")
   public void addObserverState(
       KalmanTypeFilter<S, I, O> observer,
       Matrix<I, N1> u,
@@ -60,7 +59,6 @@ public class KalmanFilterLatencyCompensator<S extends Num, I extends Num, O exte
    * @param globalMeasurementCorrect The function take calls correct() on the observer.
    * @param timestampSeconds The timestamp of the measurement.
    */
-  @SuppressWarnings("ParameterName")
   public <R extends Num> void applyPastGlobalMeasurement(
       Nat<R> rows,
       KalmanTypeFilter<S, I, O> observer,
@@ -74,15 +72,18 @@ public class KalmanFilterLatencyCompensator<S extends Num, I extends Num, O exte
       return;
     }
 
-    // This index starts at one because we use the previous state later on, and we always want to
-    // have a "previous state".
-    int maxIdx = m_pastObserverSnapshots.size() - 1;
-    int low = 1;
-    int high = Math.max(maxIdx, 1);
+    // Use a less verbose name for timestamp
+    double timestamp = timestampSeconds;
 
+    int maxIdx = m_pastObserverSnapshots.size() - 1;
+    int low = 0;
+    int high = maxIdx;
+
+    // Perform a binary search to find the index of first snapshot whose
+    // timestamp is greater than or equal to the global measurement timestamp
     while (low != high) {
       int mid = (low + high) / 2;
-      if (m_pastObserverSnapshots.get(mid).getKey() < timestampSeconds) {
+      if (m_pastObserverSnapshots.get(mid).getKey() < timestamp) {
         // This index and everything under it are less than the requested timestamp. Therefore, we
         // can discard them.
         low = mid + 1;
@@ -93,16 +94,37 @@ public class KalmanFilterLatencyCompensator<S extends Num, I extends Num, O exte
       }
     }
 
-    // We are simply assigning this index to a new variable to avoid confusion
-    // with variable names.
-    int index = low;
-    double timestamp = timestampSeconds;
-    int indexOfClosestEntry =
-        Math.abs(timestamp - m_pastObserverSnapshots.get(index - 1).getKey())
-                <= Math.abs(
-                    timestamp - m_pastObserverSnapshots.get(Math.min(index, maxIdx)).getKey())
-            ? index - 1
-            : index;
+    int indexOfClosestEntry;
+
+    if (low == 0) {
+      // If the global measurement is older than any snapshot, throw out the
+      // measurement because there's no state estimate into which to incorporate
+      // the measurement
+      if (timestamp < m_pastObserverSnapshots.get(low).getKey()) {
+        return;
+      }
+
+      // If the first snapshot has same timestamp as the global measurement, use
+      // that snapshot
+      indexOfClosestEntry = 0;
+    } else if (low == maxIdx && m_pastObserverSnapshots.get(low).getKey() < timestamp) {
+      // If all snapshots are older than the global measurement, use the newest
+      // snapshot
+      indexOfClosestEntry = maxIdx;
+    } else {
+      // Index of snapshot taken after the global measurement
+      int nextIdx = low;
+
+      // Index of snapshot taken before the global measurement. Since we already
+      // handled the case where the index points to the first snapshot, this
+      // computation is guaranteed to be non-negative.
+      int prevIdx = nextIdx - 1;
+
+      // Find the snapshot closest in time to global measurement
+      double prevTimeDiff = Math.abs(timestamp - m_pastObserverSnapshots.get(prevIdx).getKey());
+      double nextTimeDiff = Math.abs(timestamp - m_pastObserverSnapshots.get(nextIdx).getKey());
+      indexOfClosestEntry = prevTimeDiff <= nextTimeDiff ? prevIdx : nextIdx;
+    }
 
     double lastTimestamp =
         m_pastObserverSnapshots.get(indexOfClosestEntry).getKey() - nominalDtSeconds;
@@ -141,14 +163,12 @@ public class KalmanFilterLatencyCompensator<S extends Num, I extends Num, O exte
   }
 
   /** This class contains all the information about our observer at a given time. */
-  @SuppressWarnings("MemberName")
   public class ObserverSnapshot {
     public final Matrix<S, N1> xHat;
     public final Matrix<S, S> errorCovariances;
     public final Matrix<I, N1> inputs;
     public final Matrix<O, N1> localMeasurements;
 
-    @SuppressWarnings("ParameterName")
     private ObserverSnapshot(
         KalmanTypeFilter<S, I, O> observer, Matrix<I, N1> u, Matrix<O, N1> localY) {
       this.xHat = observer.getXhat();

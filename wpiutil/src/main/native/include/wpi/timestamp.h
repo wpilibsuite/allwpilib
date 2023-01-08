@@ -33,6 +33,14 @@ void WPI_SetNowImpl(uint64_t (*func)(void));
  */
 uint64_t WPI_Now(void);
 
+/**
+ * Return the current system time in microseconds since the Unix epoch
+ * (January 1st, 1970 00:00 UTC).
+ *
+ * @return Time in microseconds.
+ */
+uint64_t WPI_GetSystemTime(void);
+
 #ifdef __cplusplus
 }  // extern "C"
 #endif
@@ -61,6 +69,14 @@ void SetNowImpl(uint64_t (*func)());
  * @return Time in microseconds.
  */
 uint64_t Now(void);
+
+/**
+ * Return the current system time in microseconds since the Unix epoch
+ * (January 1st, 1970 00:00 UTC).
+ *
+ * @return Time in microseconds.
+ */
+uint64_t GetSystemTime();
 
 }  // namespace wpi
 #endif

@@ -4,8 +4,7 @@
 
 package edu.wpi.first.wpilibj;
 
-import static edu.wpi.first.wpilibj.util.ErrorMessages.requireNonNullParam;
-import static java.util.Objects.requireNonNull;
+import static edu.wpi.first.util.ErrorMessages.requireNonNullParam;
 
 import edu.wpi.first.hal.CounterJNI;
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
@@ -192,7 +191,6 @@ public class Counter implements CounterBase, Sendable, AutoCloseable {
    *
    * @return the Counter's FPGA index
    */
-  @SuppressWarnings("AbbreviationAsWordInName")
   public int getFPGAIndex() {
     return m_index;
   }
@@ -280,7 +278,7 @@ public class Counter implements CounterBase, Sendable, AutoCloseable {
    * @param source the digital source to count
    */
   public void setDownSource(DigitalSource source) {
-    requireNonNull(source, "The Digital Source given was null");
+    requireNonNullParam(source, "source", "setDownSource");
 
     if (m_downSource != null && m_allocatedDownSource) {
       m_downSource.close();
@@ -313,7 +311,9 @@ public class Counter implements CounterBase, Sendable, AutoCloseable {
    * @param fallingEdge true to count the falling edge
    */
   public void setDownSourceEdge(boolean risingEdge, boolean fallingEdge) {
-    requireNonNull(m_downSource, "Down Source must be set before setting the edge!");
+    if (m_downSource == null) {
+      throw new IllegalStateException("Down Source must be set before setting the edge!");
+    }
 
     CounterJNI.setCounterDownSourceEdge(m_counter, risingEdge, fallingEdge);
   }
@@ -385,7 +385,7 @@ public class Counter implements CounterBase, Sendable, AutoCloseable {
   }
 
   /**
-   * Reset the Counter to zero. Set the counter value to zero. This doesn't effect the running state
+   * Reset the Counter to zero. Set the counter value to zero. This doesn't affect the running state
    * of the counter, just sets the current value to zero.
    */
   @Override
@@ -425,7 +425,7 @@ public class Counter implements CounterBase, Sendable, AutoCloseable {
   /**
    * Determine if the clock is stopped. Determine if the clocked input is stopped based on the
    * MaxPeriod value set using the SetMaxPeriod method. If the clock exceeds the MaxPeriod, then the
-   * device (and counter) are assumed to be stopped and it returns true.
+   * device (and counter) are assumed to be stopped and the method will return true.
    *
    * @return true if the most recent counter period exceeds the MaxPeriod value set by SetMaxPeriod.
    */

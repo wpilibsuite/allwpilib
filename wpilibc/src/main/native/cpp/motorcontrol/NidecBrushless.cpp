@@ -73,7 +73,8 @@ int NidecBrushless::GetChannel() const {
 void NidecBrushless::InitSendable(wpi::SendableBuilder& builder) {
   builder.SetSmartDashboardType("Nidec Brushless");
   builder.SetActuator(true);
-  builder.SetSafeState([=] { StopMotor(); });
+  builder.SetSafeState([=, this] { StopMotor(); });
   builder.AddDoubleProperty(
-      "Value", [=] { return Get(); }, [=](double value) { Set(value); });
+      "Value", [=, this] { return Get(); },
+      [=, this](double value) { Set(value); });
 }

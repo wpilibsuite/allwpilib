@@ -25,7 +25,7 @@ import java.util.List;
 import java.util.Random;
 import org.junit.jupiter.api.Test;
 
-public class KalmanFilterTest {
+class KalmanFilterTest {
   private static LinearSystem<N2, N1, N1> elevatorPlant;
 
   private static final double kDt = 0.00505;
@@ -34,8 +34,7 @@ public class KalmanFilterTest {
     createElevator();
   }
 
-  @SuppressWarnings("LocalVariableName")
-  public static void createElevator() {
+  private static void createElevator() {
     var motors = DCMotor.getVex775Pro(2);
 
     var m = 5.0;
@@ -61,8 +60,7 @@ public class KalmanFilterTest {
           new Matrix<>(Nat.N3(), Nat.N3())); // D
 
   @Test
-  @SuppressWarnings("LocalVariableName")
-  public void testElevatorKalmanFilter() {
+  void testElevatorKalmanFilter() {
     var Q = VecBuilder.fill(0.05, 1.0);
     var R = VecBuilder.fill(0.0001);
 
@@ -70,7 +68,7 @@ public class KalmanFilterTest {
   }
 
   @Test
-  public void testSwerveKFStationary() {
+  void testSwerveKFStationary() {
     var random = new Random();
 
     var filter =
@@ -99,7 +97,7 @@ public class KalmanFilterTest {
   }
 
   @Test
-  public void testSwerveKFMovingWithoutAccelerating() {
+  void testSwerveKFMovingWithoutAccelerating() {
     var random = new Random();
 
     var filter =
@@ -136,8 +134,7 @@ public class KalmanFilterTest {
   }
 
   @Test
-  @SuppressWarnings("LocalVariableName")
-  public void testSwerveKFMovingOverTrajectory() {
+  void testSwerveKFMovingOverTrajectory() {
     var random = new Random();
 
     var filter =

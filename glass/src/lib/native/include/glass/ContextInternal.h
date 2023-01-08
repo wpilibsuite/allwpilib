@@ -6,42 +6,40 @@
 
 #include <stdint.h>
 
+#include <functional>
 #include <memory>
+#include <string>
+#include <vector>
 
-#include <imgui.h>
-#include <wpi/SmallString.h>
 #include <wpi/SmallVector.h>
 #include <wpi/StringMap.h>
 
 #include "glass/Context.h"
-#include "glass/support/IniSaverInfo.h"
-#include "glass/support/IniSaverString.h"
+#include "glass/Storage.h"
 
 namespace glass {
 
 class DataSource;
 
-class DataSourceName {
+class Context {
  public:
-  DataSourceName() = default;
-  explicit DataSourceName(DataSource* source) : source{source} {}
+  Context();
+  Context(const Context&) = delete;
+  Context& operator=(const Context&) = delete;
+  ~Context();
 
-  bool ReadIni(std::string_view name_, std::string_view value) {
-    return name->ReadIni(name_, value);
-  }
-  void WriteIni(ImGuiTextBuffer* out) { name->WriteIni(out); }
-
-  std::unique_ptr<NameInfo> name{new NameInfo};
-  DataSource* source = nullptr;
-};
-
-struct Context {
-  wpi::SmallString<128> curId;
-  wpi::SmallVector<size_t, 32> idStack;
-  wpi::StringMap<std::unique_ptr<Storage>> storage;
+  std::vector<std::function<void()>> workspaceInit;
+  std::vector<std::function<void()>> workspaceReset;
+  std::string storageLoadDir = ".";
+  std::string storageAutoSaveDir = ".";
+  std::string storageName = "imgui";
+  wpi::SmallVector<Storage*, 32> storageStack;
+  wpi::StringMap<std::unique_ptr<Storage>> storageRoots;
   wpi::StringMap<bool> deviceHidden;
-  IniSaverString<DataSourceName> sources{"Data Sources"};
+  wpi::StringMap<DataSource*> sources;
+  Storage& sourceNameStorage;
   uint64_t zeroTime = 0;
+  bool isPlatformSaveDir = false;
 };
 
 extern Context* gContext;

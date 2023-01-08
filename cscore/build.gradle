@@ -2,16 +2,16 @@ import org.gradle.internal.os.OperatingSystem
 
 ext {
     nativeName = 'cscore'
-    devMain = 'edu.wpi.cscore.DevMain'
+    devMain = 'edu.wpi.first.cscore.DevMain'
 }
 
 // Removed because having the objective-cpp plugin added breaks
 // embedded tools and its toolchain check. It causes an obj-cpp
 // source set to be added to all binaries, even cross binaries
 // with no support.
-// if (OperatingSystem.current().isMacOsX()) {
-//     apply plugin: 'objective-cpp'
-// }
+if (OperatingSystem.current().isMacOsX()) {
+    apply plugin: 'objective-cpp'
+}
 
 apply from: "${rootDir}/shared/jni/setupBuild.gradle"
 
@@ -23,8 +23,8 @@ model {
             enableCheckTask true
             javaCompileTasks << compileJava
             jniCrossCompileOptions << JniCrossCompileOptions(nativeUtils.wpi.platforms.roborio)
-            jniCrossCompileOptions << JniCrossCompileOptions(nativeUtils.wpi.platforms.raspbian)
-            jniCrossCompileOptions << JniCrossCompileOptions(nativeUtils.wpi.platforms.aarch64bionic)
+            jniCrossCompileOptions << JniCrossCompileOptions(nativeUtils.wpi.platforms.linuxarm32)
+            jniCrossCompileOptions << JniCrossCompileOptions(nativeUtils.wpi.platforms.linuxarm64)
 
             sources {
                 cpp {
@@ -45,6 +45,7 @@ model {
                     return
                 }
                 lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
+                lib project: ':wpinet', library: 'wpinet', linkage: 'shared'
 
                 if (it.targetPlatform.operatingSystem.linux) {
                     it.linker.args '-Wl,--version-script=' + file('src/main/native/LinuxSymbolScript.txt')
@@ -52,6 +53,20 @@ model {
                     it.linker.args '-exported_symbols_list'
                     it.linker.args file('src/main/native/MacSymbolScript.txt').toString()
                 }
+            }
+        }
+    }
+    binaries {
+        all {
+            if (!it.buildable || !(it instanceof NativeBinarySpec)) {
+                return
+            }
+            if (it.component.name == "${nativeName}JNI") {
+                lib project: ':wpinet', library: 'wpinet', linkage: 'static'
+                lib project: ':wpiutil', library: 'wpiutil', linkage: 'static'
+            } else {
+                lib project: ':wpinet', library: 'wpinet', linkage: 'shared'
+                lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
             }
         }
     }
@@ -72,16 +87,16 @@ ext {
     splitSetup = {
         if (it.targetPlatform.operatingSystem.isMacOsX()) {
             it.sources {
-                // macObjCpp(ObjectiveCppSourceSet) {
-                //     source {
-                //         srcDirs = ['src/main/native/objcpp']
-                //         include '**/*.mm'
-                //     }
-                //     exportedHeaders {
-                //         srcDirs 'src/main/native/include'
-                //         include '**/*.h'
-                //     }
-                // }
+                macObjCpp(ObjectiveCppSourceSet) {
+                    source {
+                        srcDirs = ['src/main/native/objcpp']
+                        include '**/*.mm'
+                    }
+                    exportedHeaders {
+                        srcDirs 'src/main/native/include', 'src/main/native/cpp'
+                        include '**/*.h'
+                    }
+                }
                 cscoreMacCpp(CppSourceSet) {
                     source {
                         srcDirs 'src/main/native/osx'
@@ -142,21 +157,14 @@ Action<List<String>> symbolFilter = { symbols ->
     symbols.removeIf({ !it.startsWith('CS_') })
 } as Action<List<String>>;
 
+run {
+    if (OperatingSystem.current().isMacOsX()) {
+        jvmArgs("-XstartOnFirstThread");
+    }
+}
+
 nativeUtils.exportsConfigs {
     cscore {
-        x86ExcludeSymbols = [
-            '_CT??_R0?AV_System_error',
-            '_CT??_R0?AVexception',
-            '_CT??_R0?AVfailure',
-            '_CT??_R0?AVruntime_error',
-            '_CT??_R0?AVsystem_error',
-            '_CTA5?AVfailure',
-            '_TI5?AVfailure',
-            '_CT??_R0?AVout_of_range',
-            '_CTA3?AVout_of_range',
-            '_TI3?AVout_of_range',
-            '_CT??_R0?AVbad_cast'
-        ]
         x64ExcludeSymbols = [
             '_CT??_R0?AV_System_error',
             '_CT??_R0?AVexception',
@@ -172,28 +180,29 @@ nativeUtils.exportsConfigs {
         ]
     }
     cscoreJNI {
-        x86SymbolFilter = symbolFilter
         x64SymbolFilter = symbolFilter
     }
     cscoreJNICvStatic {
-        x86SymbolFilter = symbolFilter
         x64SymbolFilter = symbolFilter
     }
 }
+
+apply from: "${rootDir}/shared/imgui.gradle"
 
 model {
     components {
         examplesMap.each { key, value ->
             if (key == "usbviewer") {
-                if (!project.hasProperty('onlylinuxathena') && !project.hasProperty('onlylinuxraspbian') && !project.hasProperty('onlylinuxaarch64bionic')) {
+                if (!project.hasProperty('onlylinuxathena')) {
                     "${key}"(NativeExecutableSpec) {
                         targetBuildTypes 'debug'
                         binaries.all {
                             lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
+                            lib project: ':wpinet', library: 'wpinet', linkage: 'shared'
                             lib project: ':wpigui', library: 'wpigui', linkage: 'static'
                             lib library: 'cscore', linkage: 'shared'
-                            nativeUtils.useRequiredLibrary(it, 'imgui_static')
-                            if (it.targetPlatform.name == nativeUtils.wpi.platforms.roborio || it.targetPlatform.name == nativeUtils.wpi.platforms.raspbian || it.targetPlatform.name == nativeUtils.wpi.platforms.aarch64bionic) {
+                            nativeUtils.useRequiredLibrary(it, 'imgui')
+                            if (it.targetPlatform.name == nativeUtils.wpi.platforms.roborio) {
                                 it.buildable = false
                                 return
                             }
@@ -203,6 +212,9 @@ model {
                                 it.linker.args << '-framework' << 'Metal' << '-framework' << 'MetalKit' << '-framework' << 'Cocoa' << '-framework' << 'IOKit' << '-framework' << 'CoreFoundation' << '-framework' << 'CoreVideo' << '-framework' << 'QuartzCore'
                             } else {
                                 it.linker.args << '-lX11'
+                                if (it.targetPlatform.name.startsWith('linuxarm')) {
+                                    it.linker.args << '-lGL'
+                                }
                             }
                         }
                         sources {
@@ -220,6 +232,7 @@ model {
                     targetBuildTypes 'debug'
                     binaries.all {
                         lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
+                        lib project: ':wpinet', library: 'wpinet', linkage: 'shared'
                         lib library: 'cscore', linkage: 'shared'
                     }
                     sources {

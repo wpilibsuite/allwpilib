@@ -1,0 +1,10 @@
+{
+    "game" : "Infinite Recharge",
+    "field-image" : "2020-field.png",
+    "field-corners": {
+        "top-left" : [96, 25],
+        "bottom-right" : [1040, 514]
+    },
+    "field-size" : [52.4375, 26.9375],
+    "field-unit" : "foot"
+    }

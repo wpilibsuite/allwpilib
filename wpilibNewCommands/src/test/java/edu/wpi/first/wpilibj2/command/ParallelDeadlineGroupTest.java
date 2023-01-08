@@ -11,9 +11,11 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.internal.verification.VerificationModeFactory.times;
 
+import java.util.Arrays;
 import org.junit.jupiter.api.Test;
 
-class ParallelDeadlineGroupTest extends CommandTestBase {
+class ParallelDeadlineGroupTest extends CommandTestBase
+    implements MultiCompositionTestBase<ParallelDeadlineGroup> {
   @Test
   void parallelDeadlineScheduleTest() {
     try (CommandScheduler scheduler = new CommandScheduler()) {
@@ -85,10 +87,10 @@ class ParallelDeadlineGroupTest extends CommandTestBase {
 
   @Test
   void parallelDeadlineRequirementTest() {
-    Subsystem system1 = new TestSubsystem();
-    Subsystem system2 = new TestSubsystem();
-    Subsystem system3 = new TestSubsystem();
-    Subsystem system4 = new TestSubsystem();
+    Subsystem system1 = new SubsystemBase() {};
+    Subsystem system2 = new SubsystemBase() {};
+    Subsystem system3 = new SubsystemBase() {};
+    Subsystem system4 = new SubsystemBase() {};
 
     try (CommandScheduler scheduler = new CommandScheduler()) {
       MockCommandHolder command1Holder = new MockCommandHolder(true, system1, system2);
@@ -110,9 +112,9 @@ class ParallelDeadlineGroupTest extends CommandTestBase {
 
   @Test
   void parallelDeadlineRequirementErrorTest() {
-    Subsystem system1 = new TestSubsystem();
-    Subsystem system2 = new TestSubsystem();
-    Subsystem system3 = new TestSubsystem();
+    Subsystem system1 = new SubsystemBase() {};
+    Subsystem system2 = new SubsystemBase() {};
+    Subsystem system3 = new SubsystemBase() {};
 
     MockCommandHolder command1Holder = new MockCommandHolder(true, system1, system2);
     Command command1 = command1Holder.getMock();
@@ -121,5 +123,10 @@ class ParallelDeadlineGroupTest extends CommandTestBase {
 
     assertThrows(
         IllegalArgumentException.class, () -> new ParallelDeadlineGroup(command1, command2));
+  }
+
+  @Override
+  public ParallelDeadlineGroup compose(Command... members) {
+    return new ParallelDeadlineGroup(members[0], Arrays.copyOfRange(members, 1, members.length));
   }
 }

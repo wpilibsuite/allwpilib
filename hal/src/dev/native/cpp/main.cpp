@@ -8,5 +8,5 @@
 
 int main() {
   fmt::print("Hello World\n");
-  fmt::print("{}\n", HAL_GetRuntimeType());
+  fmt::print("{}\n", static_cast<int32_t>(HAL_GetRuntimeType()));
 }

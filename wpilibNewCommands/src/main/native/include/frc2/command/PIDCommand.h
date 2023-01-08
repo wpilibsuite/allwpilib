@@ -6,9 +6,9 @@
 
 #include <functional>
 #include <initializer_list>
+#include <span>
 
 #include <frc/controller/PIDController.h>
-#include <wpi/span.h>
 
 #include "frc2/command/CommandBase.h"
 #include "frc2/command/CommandHelper.h"
@@ -19,6 +19,8 @@ namespace frc2 {
  * default - to add exit conditions and/or other behavior, subclass this class.
  * The controller calculation and output are performed synchronously in the
  * command's execute() method.
+ *
+ * This class is provided by the NewCommands VendorDep
  *
  * @see PIDController
  */
@@ -54,7 +56,7 @@ class PIDCommand : public CommandHelper<CommandBase, PIDCommand> {
              std::function<double()> measurementSource,
              std::function<double()> setpointSource,
              std::function<void(double)> useOutput,
-             wpi::span<Subsystem* const> requirements = {});
+             std::span<Subsystem* const> requirements = {});
 
   /**
    * Creates a new PIDCommand, which controls the given output with a
@@ -84,7 +86,7 @@ class PIDCommand : public CommandHelper<CommandBase, PIDCommand> {
   PIDCommand(PIDController controller,
              std::function<double()> measurementSource, double setpoint,
              std::function<void(double)> useOutput,
-             wpi::span<Subsystem* const> requirements = {});
+             std::span<Subsystem* const> requirements = {});
 
   PIDCommand(PIDCommand&& other) = default;
 

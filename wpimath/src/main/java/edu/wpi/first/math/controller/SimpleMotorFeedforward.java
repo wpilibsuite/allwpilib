@@ -9,7 +9,6 @@ import edu.wpi.first.math.Nat;
 import edu.wpi.first.math.system.plant.LinearSystemId;
 
 /** A helper class that computes feedforward outputs for a simple permanent-magnet DC motor. */
-@SuppressWarnings("MemberName")
 public class SimpleMotorFeedforward {
   public final double ks;
   public final double kv;
@@ -128,7 +127,7 @@ public class SimpleMotorFeedforward {
   }
 
   /**
-   * Calculates the maximum achievable acceleration given a maximum voltage supply and a velocity.
+   * Calculates the minimum achievable acceleration given a maximum voltage supply and a velocity.
    * Useful for ensuring that velocity and acceleration constraints for a trapezoidal profile are
    * simultaneously achievable - enter the velocity constraint, and this will give you a
    * simultaneously-achievable acceleration constraint.

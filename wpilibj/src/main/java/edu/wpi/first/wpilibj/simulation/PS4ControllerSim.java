@@ -17,6 +17,7 @@ public class PS4ControllerSim extends GenericHIDSim {
     super(joystick);
     setAxisCount(6);
     setButtonCount(14);
+    setPOVCount(1);
   }
 
   /**
@@ -28,6 +29,7 @@ public class PS4ControllerSim extends GenericHIDSim {
     super(port);
     setAxisCount(6);
     setButtonCount(14);
+    setPOVCount(1);
   }
 
   /**
@@ -67,7 +69,7 @@ public class PS4ControllerSim extends GenericHIDSim {
   }
 
   /**
-   * Change the L2 axis axis value of the controller.
+   * Change the L2 axis value of the controller.
    *
    * @param value the new value
    */

@@ -6,6 +6,7 @@
 
 #include "glass/Context.h"
 #include "glass/DataSource.h"
+#include "glass/Storage.h"
 #include "glass/other/DeviceTree.h"
 
 using namespace glass;
@@ -26,10 +27,10 @@ void glass::DisplayAnalogOutputsDevice(AnalogOutputsModel* model) {
       PushID(i);
 
       // build label
-      std::string* name = GetStorage().GetStringRef("name");
+      std::string& name = GetStorage().GetString("name");
       char label[128];
-      if (!name->empty()) {
-        std::snprintf(label, sizeof(label), "%s [%d]###name", name->c_str(), i);
+      if (!name.empty()) {
+        std::snprintf(label, sizeof(label), "%s [%d]###name", name.c_str(), i);
       } else {
         std::snprintf(label, sizeof(label), "Out[%d]###name", i);
       }
@@ -37,9 +38,9 @@ void glass::DisplayAnalogOutputsDevice(AnalogOutputsModel* model) {
       double value = analogOutData->GetValue();
       DeviceDouble(label, true, &value, analogOutData);
 
-      if (PopupEditName("name", name)) {
+      if (PopupEditName("name", &name)) {
         if (analogOutData) {
-          analogOutData->SetName(name->c_str());
+          analogOutData->SetName(name);
         }
       }
       PopID();

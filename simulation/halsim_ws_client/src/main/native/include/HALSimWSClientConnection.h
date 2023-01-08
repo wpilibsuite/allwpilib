@@ -8,10 +8,10 @@
 #include <utility>
 
 #include <HALSimBaseWebSocketConnection.h>
-#include <wpi/WebSocket.h>
 #include <wpi/mutex.h>
-#include <wpi/uv/Buffer.h>
-#include <wpi/uv/Stream.h>
+#include <wpinet/WebSocket.h>
+#include <wpinet/uv/Buffer.h>
+#include <wpinet/uv/Stream.h>
 
 #include "HALSimWS.h"
 

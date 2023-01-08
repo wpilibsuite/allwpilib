@@ -1,0 +1,10 @@
+{
+"game" : "Destination: Deep Space",
+"field-image" : "2019-field.jpg",
+"field-corners": {
+	"top-left" : [217, 40],
+	"bottom-right" : [1372, 615]
+},
+"field-size" : [54, 27],
+"field-unit" : "foot"
+}

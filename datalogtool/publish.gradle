@@ -1,0 +1,109 @@
+apply plugin: 'maven-publish'
+
+def baseArtifactId = 'DataLogTool'
+def artifactGroupId = 'edu.wpi.first.tools'
+def zipBaseName = '_GROUP_edu_wpi_first_tools_ID_DataLogTool_CLS'
+
+def outputsFolder = file("$project.buildDir/outputs")
+
+model {
+    tasks {
+        // Create the run task.
+        $.components.datalogtool.binaries.each { bin ->
+            if (bin.buildable && bin.name.toLowerCase().contains("debug") && nativeUtils.isNativeDesktopPlatform(bin.targetPlatform)) {
+                Task run = project.tasks.create("run", Exec) {
+                    commandLine bin.tasks.install.runScriptFile.get().asFile.toString()
+                }
+                run.dependsOn bin.tasks.install
+            }
+        }
+    }
+    publishing {
+        def dataLogToolTaskList = []
+        $.components.each { component ->
+            component.binaries.each { binary ->
+                if (binary in NativeExecutableBinarySpec && binary.component.name.contains("datalogtool")) {
+                    if (binary.buildable && (binary.name.contains('Release') || binary.name.contains('release'))) {
+                        // We are now in the binary that we want.
+                        // This is the default application path for the ZIP task.
+                        def applicationPath = binary.executable.file
+                        def icon = file("$project.projectDir/src/main/native/mac/datalogtool.icns")
+
+                        // Create the macOS bundle.
+                        def bundleTask = project.tasks.create("bundleDataLogToolOsxApp" + binary.targetPlatform.architecture.name, Copy) {
+                            description("Creates a macOS application bundle for DataLogTool")
+                            from(file("$project.projectDir/Info.plist"))
+                            into(file("$project.buildDir/outputs/bundles/$binary.targetPlatform.architecture.name/DataLogTool.app/Contents"))
+                            into("MacOS") { with copySpec { from binary.executable.file } }
+                            into("Resources") { with copySpec { from icon } }
+
+                            inputs.property "HasDeveloperId", project.hasProperty("developerID")
+
+                            doLast {
+                                if (project.hasProperty("developerID")) {
+                                    // Get path to binary.
+                                    exec {
+                                        workingDir rootDir
+                                        def args = [
+                                            "sh",
+                                            "-c",
+                                            "codesign --force --strict --deep " +
+                                            "--timestamp --options=runtime " +
+                                            "--verbose -s ${project.findProperty("developerID")} " +
+                                            "$project.buildDir/outputs/bundles/$binary.targetPlatform.architecture.name/DataLogTool.app/"
+                                        ]
+                                        commandLine args
+                                    }
+                                }
+                            }
+                        }
+
+                        // Reset the application path if we are creating a bundle.
+                        if (binary.targetPlatform.operatingSystem.isMacOsX()) {
+                            applicationPath = file("$project.buildDir/outputs/bundles/$binary.targetPlatform.architecture.name")
+                            project.build.dependsOn bundleTask
+                        }
+
+                        // Create the ZIP.
+                        def task = project.tasks.create("copyDataLogToolExecutable" + binary.targetPlatform.architecture.name, Zip) {
+                            description("Copies the DataLogTool executable to the outputs directory.")
+                            destinationDirectory = outputsFolder
+
+                            archiveBaseName = '_M_' + zipBaseName
+                            duplicatesStrategy = 'exclude'
+                            classifier = nativeUtils.getPublishClassifier(binary)
+
+                            from(licenseFile) {
+                                into '/'
+                            }
+
+                            from(applicationPath)
+                            into(nativeUtils.getPlatformPath(binary))
+                        }
+
+                        if (binary.targetPlatform.operatingSystem.isMacOsX()) {
+                            bundleTask.dependsOn binary.tasks.link
+                            task.dependsOn(bundleTask)
+                        }
+
+                        task.dependsOn binary.tasks.link
+                        dataLogToolTaskList.add(task)
+                        project.build.dependsOn task
+                        project.artifacts { task }
+                        addTaskToCopyAllOutputs(task)
+                    }
+                }
+            }
+        }
+
+        publications {
+            datalogtool(MavenPublication) {
+                dataLogToolTaskList.each { artifact it }
+
+                artifactId = baseArtifactId
+                groupId = artifactGroupId
+                version wpilibVersioning.version.get()
+            }
+        }
+    }
+}

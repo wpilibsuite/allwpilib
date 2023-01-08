@@ -2,7 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include <wpi/numbers>
+#include <numbers>
 
 #include "frc/controller/ProfiledPIDController.h"
 #include "gtest/gtest.h"
@@ -40,8 +40,8 @@ TEST_F(ProfiledPIDInputOutputTest, ContinuousInput1) {
 
 TEST_F(ProfiledPIDInputOutputTest, ContinuousInput2) {
   controller->SetP(1);
-  controller->EnableContinuousInput(-units::radian_t{wpi::numbers::pi},
-                                    units::radian_t{wpi::numbers::pi});
+  controller->EnableContinuousInput(-units::radian_t{std::numbers::pi},
+                                    units::radian_t{std::numbers::pi});
 
   static constexpr units::radian_t kSetpoint{-3.4826633343199735};
   static constexpr units::radian_t kMeasurement{-3.1352207333939606};
@@ -52,13 +52,13 @@ TEST_F(ProfiledPIDInputOutputTest, ContinuousInput2) {
 
   // Error must be less than half the input range at all times
   EXPECT_LT(units::math::abs(controller->GetSetpoint().position - kMeasurement),
-            units::radian_t{wpi::numbers::pi});
+            units::radian_t{std::numbers::pi});
 }
 
 TEST_F(ProfiledPIDInputOutputTest, ContinuousInput3) {
   controller->SetP(1);
-  controller->EnableContinuousInput(-units::radian_t{wpi::numbers::pi},
-                                    units::radian_t{wpi::numbers::pi});
+  controller->EnableContinuousInput(-units::radian_t{std::numbers::pi},
+                                    units::radian_t{std::numbers::pi});
 
   static constexpr units::radian_t kSetpoint{-3.5176604690006377};
   static constexpr units::radian_t kMeasurement{3.1191729343822456};
@@ -69,13 +69,13 @@ TEST_F(ProfiledPIDInputOutputTest, ContinuousInput3) {
 
   // Error must be less than half the input range at all times
   EXPECT_LT(units::math::abs(controller->GetSetpoint().position - kMeasurement),
-            units::radian_t{wpi::numbers::pi});
+            units::radian_t{std::numbers::pi});
 }
 
 TEST_F(ProfiledPIDInputOutputTest, ContinuousInput4) {
   controller->SetP(1);
   controller->EnableContinuousInput(0_rad,
-                                    units::radian_t{2.0 * wpi::numbers::pi});
+                                    units::radian_t{2.0 * std::numbers::pi});
 
   static constexpr units::radian_t kSetpoint{2.78};
   static constexpr units::radian_t kMeasurement{3.12};
@@ -86,7 +86,7 @@ TEST_F(ProfiledPIDInputOutputTest, ContinuousInput4) {
 
   // Error must be less than half the input range at all times
   EXPECT_LT(units::math::abs(controller->GetSetpoint().position - kMeasurement),
-            units::radian_t{wpi::numbers::pi});
+            units::radian_t{std::numbers::pi});
 }
 
 TEST_F(ProfiledPIDInputOutputTest, ProportionalGainOutput) {

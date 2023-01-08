@@ -8,6 +8,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import edu.wpi.first.hal.HAL;
 import edu.wpi.first.wpilibj.simulation.SimHooks;
+import java.util.concurrent.atomic.AtomicInteger;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -29,9 +30,9 @@ class NotifierCommandTest extends CommandTestBase {
   @ResourceLock("timing")
   void notifierCommandScheduleTest() {
     try (CommandScheduler scheduler = new CommandScheduler()) {
-      Counter counter = new Counter();
+      AtomicInteger counter = new AtomicInteger(0);
 
-      NotifierCommand command = new NotifierCommand(counter::increment, 0.01);
+      NotifierCommand command = new NotifierCommand(counter::incrementAndGet, 0.01);
 
       scheduler.schedule(command);
       for (int i = 0; i < 5; ++i) {
@@ -39,7 +40,7 @@ class NotifierCommandTest extends CommandTestBase {
       }
       scheduler.cancel(command);
 
-      assertEquals(2, counter.m_counter);
+      assertEquals(2, counter.get());
     }
   }
 }

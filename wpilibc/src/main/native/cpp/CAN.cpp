@@ -45,20 +45,20 @@ CAN::~CAN() {
 void CAN::WritePacket(const uint8_t* data, int length, int apiId) {
   int32_t status = 0;
   HAL_WriteCANPacket(m_handle, data, length, apiId, &status);
-  FRC_CheckErrorStatus(status, "{}", "WritePacket");
+  FRC_CheckErrorStatus(status, "WritePacket");
 }
 
 void CAN::WritePacketRepeating(const uint8_t* data, int length, int apiId,
                                int repeatMs) {
   int32_t status = 0;
   HAL_WriteCANPacketRepeating(m_handle, data, length, apiId, repeatMs, &status);
-  FRC_CheckErrorStatus(status, "{}", "WritePacketRepeating");
+  FRC_CheckErrorStatus(status, "WritePacketRepeating");
 }
 
 void CAN::WriteRTRFrame(int length, int apiId) {
   int32_t status = 0;
   HAL_WriteCANRTRFrame(m_handle, length, apiId, &status);
-  FRC_CheckErrorStatus(status, "{}", "WriteRTRFrame");
+  FRC_CheckErrorStatus(status, "WriteRTRFrame");
 }
 
 int CAN::WritePacketNoError(const uint8_t* data, int length, int apiId) {
@@ -83,7 +83,7 @@ int CAN::WriteRTRFrameNoError(int length, int apiId) {
 void CAN::StopPacketRepeating(int apiId) {
   int32_t status = 0;
   HAL_StopCANPacketRepeating(m_handle, apiId, &status);
-  FRC_CheckErrorStatus(status, "{}", "StopPacketRepeating");
+  FRC_CheckErrorStatus(status, "StopPacketRepeating");
 }
 
 bool CAN::ReadPacketNew(int apiId, CANData* data) {
@@ -94,7 +94,7 @@ bool CAN::ReadPacketNew(int apiId, CANData* data) {
     return false;
   }
   if (status != 0) {
-    FRC_CheckErrorStatus(status, "{}", "ReadPacketNew");
+    FRC_CheckErrorStatus(status, "ReadPacketNew");
     return false;
   } else {
     return true;
@@ -109,7 +109,7 @@ bool CAN::ReadPacketLatest(int apiId, CANData* data) {
     return false;
   }
   if (status != 0) {
-    FRC_CheckErrorStatus(status, "{}", "ReadPacketLatest");
+    FRC_CheckErrorStatus(status, "ReadPacketLatest");
     return false;
   } else {
     return true;
@@ -125,7 +125,7 @@ bool CAN::ReadPacketTimeout(int apiId, int timeoutMs, CANData* data) {
     return false;
   }
   if (status != 0) {
-    FRC_CheckErrorStatus(status, "{}", "ReadPacketTimeout");
+    FRC_CheckErrorStatus(status, "ReadPacketTimeout");
     return false;
   } else {
     return true;

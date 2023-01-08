@@ -4,13 +4,19 @@
 
 package edu.wpi.first.wpilibj2.command;
 
+import static edu.wpi.first.util.ErrorMessages.requireNonNullParam;
+
 import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.util.sendable.SendableRegistry;
 import java.util.HashSet;
 import java.util.Set;
 
-/** A {@link Sendable} base class for {@link Command}s. */
+/**
+ * A {@link Sendable} base class for {@link Command}s.
+ *
+ * <p>This class is provided by the NewCommands VendorDep
+ */
 public abstract class CommandBase implements Sendable, Command {
   protected Set<Subsystem> m_requirements = new HashSet<>();
 
@@ -25,7 +31,9 @@ public abstract class CommandBase implements Sendable, Command {
    * @param requirements the requirements to add
    */
   public final void addRequirements(Subsystem... requirements) {
-    m_requirements.addAll(Set.of(requirements));
+    for (Subsystem requirement : requirements) {
+      m_requirements.add(requireNonNullParam(requirement, "requirement", "addRequirements"));
+    }
   }
 
   @Override
@@ -43,19 +51,9 @@ public abstract class CommandBase implements Sendable, Command {
    *
    * @param name name
    */
+  @Override
   public void setName(String name) {
     SendableRegistry.setName(this, name);
-  }
-
-  /**
-   * Decorates this Command with a name. Is an inline function for #setName(String);
-   *
-   * @param name name
-   * @return the decorated Command
-   */
-  public CommandBase withName(String name) {
-    this.setName(name);
-    return this;
   }
 
   /**
@@ -100,6 +98,9 @@ public abstract class CommandBase implements Sendable, Command {
           }
         });
     builder.addBooleanProperty(
-        ".isParented", () -> CommandGroupBase.getGroupedCommands().contains(this), null);
+        ".isParented", () -> CommandScheduler.getInstance().isComposed(this), null);
+    builder.addStringProperty(
+        "interruptBehavior", () -> getInterruptionBehavior().toString(), null);
+    builder.addBooleanProperty("runsWhenDisabled", this::runsWhenDisabled, null);
   }
 }

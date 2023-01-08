@@ -18,39 +18,39 @@ constexpr empty_array_t empty_array;
  * This class is a wrapper around std::array that does compile time size
  * checking.
  *
- * std::array's implicit constructor can lead result in uninitialized elements
- * if the number of arguments doesn't match the std::array size.
+ * std::array's implicit constructor can result in uninitialized elements if the
+ * number of arguments doesn't match the std::array size.
  */
 template <typename T, size_t N>
 class array : public std::array<T, N> {
  public:
-  explicit array(empty_array_t) {}
+  constexpr explicit array(empty_array_t) {}
 
   template <typename... Ts>
-  array(T arg, Ts&&... args)  // NOLINT
-      : std::array<T, N>{arg, std::forward<Ts>(args)...} {
+  constexpr array(T arg, Ts&&... args)  // NOLINT
+      : std::array<T, N>{std::forward<T>(arg), std::forward<Ts>(args)...} {
     static_assert(1 + sizeof...(args) == N, "Dimension mismatch");
   }
 
-  array(const array<T, N>&) = default;
-  array& operator=(const array<T, N>&) = default;
-  array(array<T, N>&&) = default;
-  array& operator=(array<T, N>&&) = default;
+  constexpr array(const array<T, N>&) = default;
+  constexpr array& operator=(const array<T, N>&) = default;
+  constexpr array(array<T, N>&&) = default;
+  constexpr array& operator=(array<T, N>&&) = default;
 
-  array(const std::array<T, N>& rhs) {  // NOLINT
+  constexpr array(const std::array<T, N>& rhs) {  // NOLINT
     *static_cast<std::array<T, N>*>(this) = rhs;
   }
 
-  array& operator=(const std::array<T, N>& rhs) {
+  constexpr array& operator=(const std::array<T, N>& rhs) {
     *static_cast<std::array<T, N>*>(this) = rhs;
     return *this;
   }
 
-  array(std::array<T, N>&& rhs) {  // NOLINT
+  constexpr array(std::array<T, N>&& rhs) {  // NOLINT
     *static_cast<std::array<T, N>*>(this) = rhs;
   }
 
-  array& operator=(std::array<T, N>&& rhs) {
+  constexpr array& operator=(std::array<T, N>&& rhs) {
     *static_cast<std::array<T, N>*>(this) = rhs;
     return *this;
   }

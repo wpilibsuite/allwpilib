@@ -56,7 +56,7 @@ void DigitalGlitchFilter::DoAdd(DigitalSource* input, int requestedIndex) {
     // We don't support GlitchFilters on AnalogTriggers.
     if (input->IsAnalogTrigger()) {
       throw FRC_MakeError(
-          -1, "{}", "Analog Triggers not supported for DigitalGlitchFilters");
+          -1, "Analog Triggers not supported for DigitalGlitchFilters");
     }
     int32_t status = 0;
     HAL_SetFilterSelect(input->GetPortHandleForRouting(), requestedIndex,

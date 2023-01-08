@@ -13,6 +13,8 @@ namespace frc2 {
  * A subsystem that uses a PIDController to control an output.  The controller
  * is run synchronously from the subsystem's periodic() method.
  *
+ * This class is provided by the NewCommands VendorDep
+ *
  * @see PIDController
  */
 class PIDSubsystem : public SubsystemBase {
@@ -83,8 +85,5 @@ class PIDSubsystem : public SubsystemBase {
    * @param setpoint the setpoint of the PIDController (for feedforward)
    */
   virtual void UseOutput(double output, double setpoint) = 0;
-
- private:
-  double m_setpoint{0};
 };
 }  // namespace frc2

@@ -34,9 +34,10 @@ templatesTree.list(new FilenameFilter() {
             templatesMap.put(it, [])
         }
 
-nativeUtils.platformConfigs.named(nativeUtils.wpi.platforms.roborio).configure {
-    cppCompiler.args.remove('-Wno-error=deprecated-declarations')
-    cppCompiler.args.add('-Werror=deprecated-declarations')
+nativeUtils.platformConfigs.named(nativeUtils.wpi.platforms.windowsx64).configure {
+    linker.args.remove('/DEBUG:FULL')
+    cppCompiler.debugArgs.remove('/Zi')
+    cCompiler.debugArgs.remove('/Zi')
 }
 
 ext {
@@ -58,14 +59,15 @@ model {
                     binary.buildable = false
                     return
                 }
-                lib project: ':wpilibOldCommands', library: 'wpilibOldCommands', linkage: 'shared'
                 lib project: ':wpilibNewCommands', library: 'wpilibNewCommands', linkage: 'shared'
+                lib project: ':apriltag', library: 'apriltag', linkage: 'shared'
                 lib project: ':wpilibc', library: 'wpilibc', linkage: 'shared'
                 lib project: ':wpimath', library: 'wpimath', linkage: 'shared'
-                lib project: ':ntcore', library: 'ntcore', linkage: 'shared'
+                project(':ntcore').addNtcoreDependency(binary, 'shared')
                 lib project: ':cscore', library: 'cscore', linkage: 'shared'
                 project(':hal').addHalDependency(binary, 'shared')
                 lib project: ':cameraserver', library: 'cameraserver', linkage: 'shared'
+                lib project: ':wpinet', library: 'wpinet', linkage: 'shared'
                 lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
             }
             sources {
@@ -88,11 +90,13 @@ model {
                 binaries.all { binary ->
                     lib project: ':wpilibNewCommands', library: 'wpilibNewCommands', linkage: 'shared'
                     lib project: ':wpilibc', library: 'wpilibc', linkage: 'shared'
+                    lib project: ':apriltag', library: 'apriltag', linkage: 'shared'
                     lib project: ':wpimath', library: 'wpimath', linkage: 'shared'
-                    lib project: ':ntcore', library: 'ntcore', linkage: 'shared'
+                    project(':ntcore').addNtcoreDependency(binary, 'shared')
                     lib project: ':cscore', library: 'cscore', linkage: 'shared'
                     project(':hal').addHalDependency(binary, 'shared')
                     lib project: ':cameraserver', library: 'cameraserver', linkage: 'shared'
+                    lib project: ':wpinet', library: 'wpinet', linkage: 'shared'
                     lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
                     if (binary.targetPlatform.name == nativeUtils.wpi.platforms.roborio) {
                         nativeUtils.useRequiredLibrary(binary, 'ni_link_libraries', 'ni_runtime_libraries')
@@ -135,19 +139,14 @@ model {
                 binaries.all { binary ->
                     lib project: ':wpilibNewCommands', library: 'wpilibNewCommands', linkage: 'shared'
                     lib project: ':wpilibc', library: 'wpilibc', linkage: 'shared'
+                    lib project: ':apriltag', library: 'apriltag', linkage: 'shared'
                     lib project: ':wpimath', library: 'wpimath', linkage: 'shared'
-                    lib project: ':ntcore', library: 'ntcore', linkage: 'shared'
+                    project(':ntcore').addNtcoreDependency(binary, 'shared')
                     lib project: ':cscore', library: 'cscore', linkage: 'shared'
                     project(':hal').addHalDependency(binary, 'shared')
                     lib project: ':cameraserver', library: 'cameraserver', linkage: 'shared'
+                    lib project: ':wpinet', library: 'wpinet', linkage: 'shared'
                     lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
-                    binary.tasks.withType(CppCompile) {
-                        if (!(binary.toolChain in VisualCpp)) {
-                            cppCompiler.args "-Wno-error=deprecated-declarations"
-                        } else {
-                            cppCompiler.args "/wd4996"
-                        }
-                    }
                     if (binary.targetPlatform.name == nativeUtils.wpi.platforms.roborio) {
                         nativeUtils.useRequiredLibrary(binary, 'ni_link_libraries', 'ni_runtime_libraries')
                     }
@@ -206,11 +205,13 @@ model {
         withType(GoogleTestTestSuiteBinarySpec) {
             lib project: ':wpilibNewCommands', library: 'wpilibNewCommands', linkage: 'shared'
             lib project: ':wpilibc', library: 'wpilibc', linkage: 'shared'
+            lib project: ':apriltag', library: 'apriltag', linkage: 'shared'
             lib project: ':wpimath', library: 'wpimath', linkage: 'shared'
-            lib project: ':ntcore', library: 'ntcore', linkage: 'shared'
+            project(':ntcore').addNtcoreDependency(it, 'shared')
             lib project: ':cscore', library: 'cscore', linkage: 'shared'
             project(':hal').addHalDependency(it, 'shared')
             lib project: ':cameraserver', library: 'cameraserver', linkage: 'shared'
+            lib project: ':wpinet', library: 'wpinet', linkage: 'shared'
             lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
             if (it.targetPlatform.name == nativeUtils.wpi.platforms.roborio) {
                 nativeUtils.useRequiredLibrary(it, 'ni_link_libraries', 'ni_runtime_libraries')

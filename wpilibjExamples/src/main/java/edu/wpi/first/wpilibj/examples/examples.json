@@ -90,6 +90,17 @@
     "commandversion": 2
   },
   {
+    "name": "EventLoop",
+    "description": "Demonstrate managing a ball system using EventLoop and BooleanEvent.",
+    "tags": [
+      "EventLoop"
+    ],
+    "foldername": "eventloop",
+    "gradlebase": "java",
+    "mainclass": "Main",
+    "commandversion": 2
+  },
+  {
     "name": "Relay",
     "description": "Demonstrate controlling a Relay from Joystick buttons.",
     "tags": [
@@ -218,20 +229,7 @@
     "commandversion": 2
   },
   {
-    "name": "Motor Controller",
-    "description": "Demonstrate controlling a single motor with a joystick",
-    "tags": [
-      "Actuators",
-      "Joystick",
-      "Robot and Motor"
-    ],
-    "foldername": "motorcontrol",
-    "gradlebase": "java",
-    "mainclass": "Main",
-    "commandversion": 2
-  },
-  {
-    "name": "Motor Control With Encoder",
+    "name": "Motor Control",
     "description": "Demonstrate controlling a single motor with a Joystick and displaying the net movement of the motor using an encoder.",
     "tags": [
       "Robot and Motor",
@@ -241,7 +239,7 @@
       "Joystick",
       "Complete List"
     ],
-    "foldername": "motorcontrolencoder",
+    "foldername": "motorcontrol",
     "gradlebase": "java",
     "mainclass": "Main",
     "commandversion": 2
@@ -325,6 +323,19 @@
       "Lambdas"
     ],
     "foldername": "hatchbotinlined",
+    "gradlebase": "java",
+    "mainclass": "Main",
+    "commandversion": 2
+  },
+  {
+    "name": "Rapid React Command Bot",
+    "description": "A fully-functional command-based fender bot for the 2022 game using the new command framework.",
+    "tags": [
+      "Complete robot",
+      "Command-based",
+      "Lambdas"
+    ],
+    "foldername": "rapidreactcommandbot",
     "gradlebase": "java",
     "mainclass": "Main",
     "commandversion": 2
@@ -701,9 +712,21 @@
       "Sensors",
       "Simulation",
       "Physics",
-      "Mechanism2d"
+      "Mechanism2d",
+      "Preferences"
     ],
     "foldername": "armsimulation",
+    "gradlebase": "java",
+    "mainclass": "Main",
+    "commandversion": 2
+  },
+  {
+    "name": "UnitTesting",
+    "description": "Demonstrates basic unit testing for a robot project.",
+    "tags": [
+      "Testing"
+    ],
+    "foldername": "unittest",
     "gradlebase": "java",
     "mainclass": "Main",
     "commandversion": 2
@@ -770,5 +793,27 @@
     "gradlebase": "javaromi",
     "mainclass": "Main",
     "commandversion": 2
+  },
+  {
+    "name": "Digital Communication Sample",
+    "description": "An example program that communicates with external devices (such as an Arduino) using the roboRIO's DIO",
+    "tags": [
+      "Digital"
+    ],
+    "foldername": "digitalcommunication",
+    "gradlebase": "java",
+    "commandversion": 2,
+    "mainclass": "Main"
+  },
+  {
+    "name": "I2C Communication Sample",
+    "description": "An example program that communicates with external devices (such as an Arduino) using the roboRIO's I2C port",
+    "tags": [
+      "I2C"
+    ],
+    "foldername": "i2ccommunication",
+    "gradlebase": "java",
+    "commandversion": 2,
+    "mainclass": "Main"
   }
 ]

@@ -8,6 +8,7 @@
 
 #include "glass/Context.h"
 #include "glass/DataSource.h"
+#include "glass/Storage.h"
 
 using namespace glass;
 
@@ -18,10 +19,10 @@ void glass::DisplayAnalogInput(AnalogInputModel* model, int index) {
   }
 
   // build label
-  std::string* name = GetStorage().GetStringRef("name");
+  std::string& name = GetStorage().GetString("name");
   char label[128];
-  if (!name->empty()) {
-    std::snprintf(label, sizeof(label), "%s [%d]###name", name->c_str(), index);
+  if (!name.empty()) {
+    std::snprintf(label, sizeof(label), "%s [%d]###name", name.c_str(), index);
   } else {
     std::snprintf(label, sizeof(label), "In[%d]###name", index);
   }
@@ -42,8 +43,8 @@ void glass::DisplayAnalogInput(AnalogInputModel* model, int index) {
   }
 
   // context menu to change name
-  if (PopupEditName("name", name)) {
-    voltageData->SetName(name->c_str());
+  if (PopupEditName("name", &name)) {
+    voltageData->SetName(name);
   }
 }
 

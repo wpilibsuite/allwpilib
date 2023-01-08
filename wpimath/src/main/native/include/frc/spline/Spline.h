@@ -9,7 +9,7 @@
 
 #include <wpi/array.h>
 
-#include "Eigen/Core"
+#include "frc/EigenCore.h"
 #include "frc/geometry/Pose2d.h"
 #include "units/curvature.h"
 #include "units/length.h"
@@ -55,7 +55,7 @@ class Spline {
    * @return The pose and curvature at that point.
    */
   PoseWithCurvature GetPoint(double t) const {
-    Eigen::Vector<double, Degree + 1> polynomialBases;
+    Vectord<Degree + 1> polynomialBases;
 
     // Populate the polynomial bases
     for (int i = 0; i <= Degree; i++) {
@@ -64,7 +64,7 @@ class Spline {
 
     // This simply multiplies by the coefficients. We need to divide out t some
     // n number of times where n is the derivative we want to take.
-    Eigen::Vector<double, 6> combined = Coefficients() * polynomialBases;
+    Vectord<6> combined = Coefficients() * polynomialBases;
 
     double dx, dy, ddx, ddy;
 
@@ -90,8 +90,8 @@ class Spline {
         (dx * ddy - ddx * dy) / ((dx * dx + dy * dy) * std::hypot(dx, dy));
 
     return {
-        {FromVector(combined.template block<2, 1>(0, 0)), Rotation2d(dx, dy)},
-        units::curvature_t(curvature)};
+        {FromVector(combined.template block<2, 1>(0, 0)), Rotation2d{dx, dy}},
+        units::curvature_t{curvature}};
   }
 
  protected:
@@ -100,7 +100,7 @@ class Spline {
    *
    * @return The coefficients of the spline.
    */
-  virtual Eigen::Matrix<double, 6, Degree + 1> Coefficients() const = 0;
+  virtual Matrixd<6, Degree + 1> Coefficients() const = 0;
 
   /**
    * Converts a Translation2d into a vector that is compatible with Eigen.
@@ -119,7 +119,7 @@ class Spline {
    * @return The Translation2d.
    */
   static Translation2d FromVector(const Eigen::Vector2d& vector) {
-    return Translation2d(units::meter_t(vector(0)), units::meter_t(vector(1)));
+    return Translation2d{units::meter_t{vector(0)}, units::meter_t{vector(1)}};
   }
 };
 }  // namespace frc

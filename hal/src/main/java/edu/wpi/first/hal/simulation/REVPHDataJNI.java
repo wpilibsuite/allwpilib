@@ -6,7 +6,6 @@ package edu.wpi.first.hal.simulation;
 
 import edu.wpi.first.hal.JNIWrapper;
 
-@SuppressWarnings("AbbreviationAsWordInName")
 public class REVPHDataJNI extends JNIWrapper {
   public static native int registerInitializedCallback(
       int index, NotifyCallback callback, boolean initialNotify);
@@ -35,14 +34,14 @@ public class REVPHDataJNI extends JNIWrapper {
 
   public static native void setCompressorOn(int index, boolean compressorOn);
 
-  public static native int registerClosedLoopEnabledCallback(
+  public static native int registerCompressorConfigTypeCallback(
       int index, NotifyCallback callback, boolean initialNotify);
 
-  public static native void cancelClosedLoopEnabledCallback(int index, int uid);
+  public static native void cancelCompressorConfigTypeCallback(int index, int uid);
 
-  public static native boolean getClosedLoopEnabled(int index);
+  public static native int getCompressorConfigType(int index);
 
-  public static native void setClosedLoopEnabled(int index, boolean closeLoopEnabled);
+  public static native void setCompressorConfigType(int index, int configType);
 
   public static native int registerPressureSwitchCallback(
       int index, NotifyCallback callback, boolean initialNotify);

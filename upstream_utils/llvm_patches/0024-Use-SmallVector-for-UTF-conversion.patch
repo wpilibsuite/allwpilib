@@ -1,0 +1,152 @@
+From f58b9bad86f61c35cc530ff113ccbb13415261c8 Mon Sep 17 00:00:00 2001
+From: PJ Reiniger <pj.reiniger@gmail.com>
+Date: Mon, 9 May 2022 00:04:30 -0400
+Subject: [PATCH 24/28] Use SmallVector for UTF conversion
+
+---
+ llvm/include/llvm/Support/ConvertUTF.h    |  6 +++---
+ llvm/lib/Support/ConvertUTFWrapper.cpp    |  6 +++---
+ llvm/unittests/Support/ConvertUTFTest.cpp | 22 +++++++++++-----------
+ 3 files changed, 17 insertions(+), 17 deletions(-)
+
+diff --git a/llvm/include/llvm/Support/ConvertUTF.h b/llvm/include/llvm/Support/ConvertUTF.h
+index b085c8a17..c82947006 100644
+--- a/llvm/include/llvm/Support/ConvertUTF.h
++++ b/llvm/include/llvm/Support/ConvertUTF.h
+@@ -213,7 +213,7 @@ bool ConvertUTF8toWide(const char *Source, std::wstring &Result);
+ * Converts a std::wstring to a UTF-8 encoded std::string.
+ * \return true on success.
+ */
+-bool convertWideToUTF8(const std::wstring &Source, std::string &Result);
++bool convertWideToUTF8(const std::wstring &Source, SmallVectorImpl<char> &Result);
+ 
+ 
+ /**
+@@ -268,7 +268,7 @@ bool hasUTF16ByteOrderMark(span<const char> SrcBytes);
+  * \param [out] Out Converted UTF-8 is stored here on success.
+  * \returns true on success
+  */
+-bool convertUTF16ToUTF8String(span<const char> SrcBytes, std::string &Out);
++bool convertUTF16ToUTF8String(span<const char> SrcBytes, SmallVectorImpl<char> &Out);
+ 
+ /**
+ * Converts a UTF16 string into a UTF8 std::string.
+@@ -277,7 +277,7 @@ bool convertUTF16ToUTF8String(span<const char> SrcBytes, std::string &Out);
+ * \param [out] Out Converted UTF-8 is stored here on success.
+ * \returns true on success
+ */
+-bool convertUTF16ToUTF8String(span<const UTF16> Src, std::string &Out);
++bool convertUTF16ToUTF8String(span<const UTF16> Src, SmallVectorImpl<char> &Out);
+ 
+ /**
+  * Converts a UTF-8 string into a UTF-16 string with native endianness.
+diff --git a/llvm/lib/Support/ConvertUTFWrapper.cpp b/llvm/lib/Support/ConvertUTFWrapper.cpp
+index cff30f16c..d3689d92a 100644
+--- a/llvm/lib/Support/ConvertUTFWrapper.cpp
++++ b/llvm/lib/Support/ConvertUTFWrapper.cpp
+@@ -84,7 +84,7 @@ bool hasUTF16ByteOrderMark(span<const char> S) {
+            (S[0] == '\xfe' && S[1] == '\xff')));
+ }
+ 
+-bool convertUTF16ToUTF8String(span<const char> SrcBytes, std::string &Out) {
++bool convertUTF16ToUTF8String(span<const char> SrcBytes, SmallVectorImpl<char> &Out) {
+   assert(Out.empty());
+ 
+   // Error out on an uneven byte count.
+@@ -135,7 +135,7 @@ bool convertUTF16ToUTF8String(span<const char> SrcBytes, std::string &Out) {
+   return true;
+ }
+ 
+-bool convertUTF16ToUTF8String(span<const UTF16> Src, std::string &Out)
++bool convertUTF16ToUTF8String(span<const UTF16> Src, SmallVectorImpl<char> &Out)
+ {
+   return convertUTF16ToUTF8String(
+       span<const char>(reinterpret_cast<const char *>(Src.data()),
+@@ -213,7 +213,7 @@ bool ConvertUTF8toWide(const char *Source, std::wstring &Result) {
+   return ConvertUTF8toWide(std::string_view(Source), Result);
+ }
+ 
+-bool convertWideToUTF8(const std::wstring &Source, std::string &Result) {
++bool convertWideToUTF8(const std::wstring &Source, SmallVectorImpl<char> &Result) {
+   if (sizeof(wchar_t) == 1) {
+     const UTF8 *Start = reinterpret_cast<const UTF8 *>(Source.data());
+     const UTF8 *End =
+diff --git a/llvm/unittests/Support/ConvertUTFTest.cpp b/llvm/unittests/Support/ConvertUTFTest.cpp
+index 2fee8ad5c..7d7650b1c 100644
+--- a/llvm/unittests/Support/ConvertUTFTest.cpp
++++ b/llvm/unittests/Support/ConvertUTFTest.cpp
+@@ -19,22 +19,22 @@ TEST(ConvertUTFTest, ConvertUTF16LittleEndianToUTF8String) {
+   // Src is the look of disapproval.
+   alignas(UTF16) static const char Src[] = "\xff\xfe\xa0\x0c_\x00\xa0\x0c";
+   span<const char> Ref(Src, sizeof(Src) - 1);
+-  std::string Result;
++  SmallString<20> Result;
+   bool Success = convertUTF16ToUTF8String(Ref, Result);
+   EXPECT_TRUE(Success);
+   std::string Expected("\xe0\xb2\xa0_\xe0\xb2\xa0");
+-  EXPECT_EQ(Expected, Result);
++  EXPECT_EQ(Expected, std::string{Result});
+ }
+ 
+ TEST(ConvertUTFTest, ConvertUTF16BigEndianToUTF8String) {
+   // Src is the look of disapproval.
+   alignas(UTF16) static const char Src[] = "\xfe\xff\x0c\xa0\x00_\x0c\xa0";
+   span<const char> Ref(Src, sizeof(Src) - 1);
+-  std::string Result;
++  SmallString<20> Result;
+   bool Success = convertUTF16ToUTF8String(Ref, Result);
+   EXPECT_TRUE(Success);
+   std::string Expected("\xe0\xb2\xa0_\xe0\xb2\xa0");
+-  EXPECT_EQ(Expected, Result);
++  EXPECT_EQ(Expected, std::string{Result});
+ }
+ 
+ TEST(ConvertUTFTest, ConvertUTF8ToUTF16String) {
+@@ -51,16 +51,16 @@ TEST(ConvertUTFTest, ConvertUTF8ToUTF16String) {
+ }
+ 
+ TEST(ConvertUTFTest, OddLengthInput) {
+-  std::string Result;
++  SmallString<20> Result;
+   bool Success = convertUTF16ToUTF8String(span<const char>("xxxxx", 5), Result);
+   EXPECT_FALSE(Success);
+ }
+ 
+ TEST(ConvertUTFTest, Empty) {
+-  std::string Result;
++  SmallString<20> Result;
+   bool Success = convertUTF16ToUTF8String(span<const char>(), Result);
+   EXPECT_TRUE(Success);
+-  EXPECT_TRUE(Result.empty());
++  EXPECT_TRUE(std::string{Result}.empty());
+ }
+ 
+ TEST(ConvertUTFTest, HasUTF16BOM) {
+@@ -83,11 +83,11 @@ TEST(ConvertUTFTest, UTF16WrappersForConvertUTF16ToUTF8String) {
+   // Src is the look of disapproval.
+   alignas(UTF16) static const char Src[] = "\xff\xfe\xa0\x0c_\x00\xa0\x0c";
+   span<const UTF16> SrcRef((const UTF16 *)Src, 4);
+-  std::string Result;
++  SmallString<20> Result;
+   bool Success = convertUTF16ToUTF8String(SrcRef, Result);
+   EXPECT_TRUE(Success);
+   std::string Expected("\xe0\xb2\xa0_\xe0\xb2\xa0");
+-  EXPECT_EQ(Expected, Result);
++  EXPECT_EQ(Expected, std::string{Result});
+ }
+ 
+ TEST(ConvertUTFTest, ConvertUTF8toWide) {
+@@ -107,11 +107,11 @@ TEST(ConvertUTFTest, ConvertUTF8toWide) {
+ TEST(ConvertUTFTest, convertWideToUTF8) {
+   // Src is the look of disapproval.
+   static const wchar_t Src[] = L"\x0ca0_\x0ca0";
+-  std::string Result;
++  SmallString<20> Result;
+   bool Success = convertWideToUTF8(Src, Result);
+   EXPECT_TRUE(Success);
+   std::string Expected("\xe0\xb2\xa0_\xe0\xb2\xa0");
+-  EXPECT_EQ(Expected, Result);
++  EXPECT_EQ(Expected, std::string{Result});
+ }
+ 
+ struct ConvertUTFResultContainer {

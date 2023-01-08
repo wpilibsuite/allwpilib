@@ -6,7 +6,7 @@
 
 using namespace frc2;
 
-ScheduleCommand::ScheduleCommand(wpi::span<Command* const> toSchedule) {
+ScheduleCommand::ScheduleCommand(std::span<Command* const> toSchedule) {
   SetInsert(m_toSchedule, toSchedule);
 }
 

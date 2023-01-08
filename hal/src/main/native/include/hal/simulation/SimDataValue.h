@@ -87,9 +87,21 @@ template <typename T, HAL_Value (*MakeValue)(T), const char* (*GetName)(),
           T (*GetDefault)() = nullptr>
 class SimDataValue final : public impl::SimDataValueBase<T, MakeValue> {
  public:
+// FIXME: GCC 12.1 gives the false positive "the address of <GetDefault> will
+// never be NULL" because it doesn't realize the default template parameter can
+// make GetDefault nullptr. In C++20, replace "T (*GetDefault)() = nullptr" with
+// "T (*GetDefault)() = [] { return T(); }" and unconditionally call
+// GetDefault() to fix the warning.
+#if __GNUC__ >= 12
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Waddress"
+#endif  // __GNUC__ >= 12
   SimDataValue()
       : impl::SimDataValueBase<T, MakeValue>(
             GetDefault != nullptr ? GetDefault() : T()) {}
+#if __GNUC__ >= 12
+#pragma GCC diagnostic pop
+#endif  // __GNUC__ >= 12
   explicit SimDataValue(T value)
       : impl::SimDataValueBase<T, MakeValue>(value) {}
 
@@ -136,22 +148,24 @@ class SimDataValue final : public impl::SimDataValueBase<T, MakeValue> {
  * @param DATA the backing data array
  * @param LOWERNAME the lowercase name of the backing data variable
  */
-#define HAL_SIMDATAVALUE_DEFINE_CAPI(TYPE, NS, CAPINAME, DATA, LOWERNAME)  \
-  int32_t NS##_Register##CAPINAME##Callback(                               \
-      int32_t index, HAL_NotifyCallback callback, void* param,             \
-      HAL_Bool initialNotify) {                                            \
-    return DATA[index].LOWERNAME.RegisterCallback(callback, param,         \
-                                                  initialNotify);          \
-  }                                                                        \
-                                                                           \
-  void NS##_Cancel##CAPINAME##Callback(int32_t index, int32_t uid) {       \
-    DATA[index].LOWERNAME.CancelCallback(uid);                             \
-  }                                                                        \
-                                                                           \
-  TYPE NS##_Get##CAPINAME(int32_t index) { return DATA[index].LOWERNAME; } \
-                                                                           \
-  void NS##_Set##CAPINAME(int32_t index, TYPE LOWERNAME) {                 \
-    DATA[index].LOWERNAME = LOWERNAME;                                     \
+#define HAL_SIMDATAVALUE_DEFINE_CAPI(TYPE, NS, CAPINAME, DATA, LOWERNAME) \
+  int32_t NS##_Register##CAPINAME##Callback(                              \
+      int32_t index, HAL_NotifyCallback callback, void* param,            \
+      HAL_Bool initialNotify) {                                           \
+    return DATA[index].LOWERNAME.RegisterCallback(callback, param,        \
+                                                  initialNotify);         \
+  }                                                                       \
+                                                                          \
+  void NS##_Cancel##CAPINAME##Callback(int32_t index, int32_t uid) {      \
+    DATA[index].LOWERNAME.CancelCallback(uid);                            \
+  }                                                                       \
+                                                                          \
+  TYPE NS##_Get##CAPINAME(int32_t index) {                                \
+    return DATA[index].LOWERNAME;                                         \
+  }                                                                       \
+                                                                          \
+  void NS##_Set##CAPINAME(int32_t index, TYPE LOWERNAME) {                \
+    DATA[index].LOWERNAME = LOWERNAME;                                    \
   }
 
 /**
@@ -220,9 +234,13 @@ class SimDataValue final : public impl::SimDataValueBase<T, MakeValue> {
     DATA->LOWERNAME.CancelCallback(uid);                                     \
   }                                                                          \
                                                                              \
-  TYPE NS##_Get##CAPINAME(void) { return DATA->LOWERNAME; }                  \
+  TYPE NS##_Get##CAPINAME(void) {                                            \
+    return DATA->LOWERNAME;                                                  \
+  }                                                                          \
                                                                              \
-  void NS##_Set##CAPINAME(TYPE LOWERNAME) { DATA->LOWERNAME = LOWERNAME; }
+  void NS##_Set##CAPINAME(TYPE LOWERNAME) {                                  \
+    DATA->LOWERNAME = LOWERNAME;                                             \
+  }
 
 /**
  * Define a stub standard C API for simulation data.
@@ -249,7 +267,9 @@ class SimDataValue final : public impl::SimDataValueBase<T, MakeValue> {
                                                                       \
   void NS##_Cancel##CAPINAME##Callback(int32_t index, int32_t uid) {} \
                                                                       \
-  TYPE NS##_Get##CAPINAME(int32_t index) { return RETURN; }           \
+  TYPE NS##_Get##CAPINAME(int32_t index) {                            \
+    return RETURN;                                                    \
+  }                                                                   \
                                                                       \
   void NS##_Set##CAPINAME(int32_t index, TYPE) {}
 
@@ -269,18 +289,20 @@ class SimDataValue final : public impl::SimDataValueBase<T, MakeValue> {
  * @param CAPINAME the C API name (usually first letter capitalized)
  * @param RETURN what to return from the Get function
  */
-#define HAL_SIMDATAVALUE_STUB_CAPI_CHANNEL(TYPE, NS, CAPINAME, RETURN)       \
-  int32_t NS##_Register##CAPINAME##Callback(                                 \
-      int32_t index, int32_t channel, HAL_NotifyCallback callback,           \
-      void* param, HAL_Bool initialNotify) {                                 \
-    return 0;                                                                \
-  }                                                                          \
-                                                                             \
-  void NS##_Cancel##CAPINAME##Callback(int32_t index, int32_t channel,       \
-                                       int32_t uid) {}                       \
-                                                                             \
-  TYPE NS##_Get##CAPINAME(int32_t index, int32_t channel) { return RETURN; } \
-                                                                             \
+#define HAL_SIMDATAVALUE_STUB_CAPI_CHANNEL(TYPE, NS, CAPINAME, RETURN) \
+  int32_t NS##_Register##CAPINAME##Callback(                           \
+      int32_t index, int32_t channel, HAL_NotifyCallback callback,     \
+      void* param, HAL_Bool initialNotify) {                           \
+    return 0;                                                          \
+  }                                                                    \
+                                                                       \
+  void NS##_Cancel##CAPINAME##Callback(int32_t index, int32_t channel, \
+                                       int32_t uid) {}                 \
+                                                                       \
+  TYPE NS##_Get##CAPINAME(int32_t index, int32_t channel) {            \
+    return RETURN;                                                     \
+  }                                                                    \
+                                                                       \
   void NS##_Set##CAPINAME(int32_t index, int32_t channel, TYPE) {}
 
 /**
@@ -306,7 +328,9 @@ class SimDataValue final : public impl::SimDataValueBase<T, MakeValue> {
                                                                           \
   void NS##_Cancel##CAPINAME##Callback(int32_t uid) {}                    \
                                                                           \
-  TYPE NS##_Get##CAPINAME(void) { return RETURN; }                        \
+  TYPE NS##_Get##CAPINAME(void) {                                         \
+    return RETURN;                                                        \
+  }                                                                       \
                                                                           \
   void NS##_Set##CAPINAME(TYPE) {}
 

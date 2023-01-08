@@ -4,8 +4,9 @@
 
 #pragma once
 
+#include <span>
+
 #include <wpi/SmallVector.h>
-#include <wpi/span.h>
 
 #include "frc2/command/CommandBase.h"
 #include "frc2/command/CommandHelper.h"
@@ -13,10 +14,12 @@
 
 namespace frc2 {
 /**
- * Schedules the given commands when this command is initialized.  Useful for
- * forking off from CommandGroups.  Note that if run from a CommandGroup, the
- * group will not know about the status of the scheduled commands, and will
- * treat this command as finishing instantly.
+ * Schedules the given commands when this command is initialized. Useful for
+ * forking off from CommandGroups. Note that if run from a composition, the
+ * composition will not know about the status of the scheduled commands, and
+ * will treat this command as finishing instantly.
+ *
+ * This class is provided by the NewCommands VendorDep
  */
 class ScheduleCommand : public CommandHelper<CommandBase, ScheduleCommand> {
  public:
@@ -26,7 +29,7 @@ class ScheduleCommand : public CommandHelper<CommandBase, ScheduleCommand> {
    *
    * @param toSchedule the commands to schedule
    */
-  explicit ScheduleCommand(wpi::span<Command* const> toSchedule);
+  explicit ScheduleCommand(std::span<Command* const> toSchedule);
 
   explicit ScheduleCommand(Command* toSchedule);
 

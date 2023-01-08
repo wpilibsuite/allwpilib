@@ -12,9 +12,9 @@
 
 namespace frc {
 /**
- * A change in distance along arc since the last pose update. We can use ideas
- * from differential calculus to create new Pose2ds from a Twist2d and vise
- * versa.
+ * A change in distance along a 2D arc since the last pose update. We can use
+ * ideas from differential calculus to create new Pose2ds from a Twist2d and
+ * vise versa.
  *
  * A Twist can be used to represent a difference between two poses.
  */
@@ -47,11 +47,13 @@ struct WPILIB_DLLEXPORT Twist2d {
   }
 
   /**
-   * Checks inequality between this Twist2d and another object.
+   * Scale this by a given factor.
    *
-   * @param other The other object.
-   * @return Whether the two objects are not equal.
+   * @param factor The factor by which to scale.
+   * @return The scaled Twist2d.
    */
-  bool operator!=(const Twist2d& other) const { return !operator==(other); }
+  constexpr Twist2d operator*(double factor) const {
+    return Twist2d{dx * factor, dy * factor, dtheta * factor};
+  }
 };
 }  // namespace frc

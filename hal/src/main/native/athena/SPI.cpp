@@ -125,8 +125,8 @@ void HAL_InitializeSPI(HAL_SPIPort port, int32_t* status) {
       // CS0 is not a DIO port, so nothing to allocate
       handle = open("/dev/spidev0.0", O_RDWR);
       if (handle < 0) {
-        fmt::print("Failed to open SPI port {}: {}\n", port,
-                   std::strerror(errno));
+        fmt::print("Failed to open SPI port {}: {}\n",
+                   static_cast<int32_t>(port), std::strerror(errno));
         CommonSPIPortFree();
         return;
       }
@@ -147,8 +147,8 @@ void HAL_InitializeSPI(HAL_SPIPort port, int32_t* status) {
       }
       handle = open("/dev/spidev0.1", O_RDWR);
       if (handle < 0) {
-        fmt::print("Failed to open SPI port {}: {}\n", port,
-                   std::strerror(errno));
+        fmt::print("Failed to open SPI port {}: {}\n",
+                   static_cast<int32_t>(port), std::strerror(errno));
         CommonSPIPortFree();
         HAL_FreeDIOPort(digitalHandles[0]);
         return;
@@ -170,8 +170,8 @@ void HAL_InitializeSPI(HAL_SPIPort port, int32_t* status) {
       }
       handle = open("/dev/spidev0.2", O_RDWR);
       if (handle < 0) {
-        fmt::print("Failed to open SPI port {}: {}\n", port,
-                   std::strerror(errno));
+        fmt::print("Failed to open SPI port {}: {}\n",
+                   static_cast<int32_t>(port), std::strerror(errno));
         CommonSPIPortFree();
         HAL_FreeDIOPort(digitalHandles[1]);
         return;
@@ -193,8 +193,8 @@ void HAL_InitializeSPI(HAL_SPIPort port, int32_t* status) {
       }
       handle = open("/dev/spidev0.3", O_RDWR);
       if (handle < 0) {
-        fmt::print("Failed to open SPI port {}: {}\n", port,
-                   std::strerror(errno));
+        fmt::print("Failed to open SPI port {}: {}\n",
+                   static_cast<int32_t>(port), std::strerror(errno));
         CommonSPIPortFree();
         HAL_FreeDIOPort(digitalHandles[2]);
         return;
@@ -240,8 +240,8 @@ void HAL_InitializeSPI(HAL_SPIPort port, int32_t* status) {
           digitalSystem->readEnableMXPSpecialFunction(status) | 0x00F0, status);
       handle = open("/dev/spidev1.0", O_RDWR);
       if (handle < 0) {
-        fmt::print("Failed to open SPI port {}: {}\n", port,
-                   std::strerror(errno));
+        fmt::print("Failed to open SPI port {}: {}\n",
+                   static_cast<int32_t>(port), std::strerror(errno));
         HAL_FreeDIOPort(digitalHandles[5]);  // free the first port allocated
         HAL_FreeDIOPort(digitalHandles[6]);  // free the second port allocated
         HAL_FreeDIOPort(digitalHandles[7]);  // free the third port allocated
@@ -364,19 +364,27 @@ void HAL_SetSPISpeed(HAL_SPIPort port, int32_t speed) {
   ioctl(HAL_GetSPIHandle(port), SPI_IOC_WR_MAX_SPEED_HZ, &speed);
 }
 
-void HAL_SetSPIOpts(HAL_SPIPort port, HAL_Bool msbFirst,
-                    HAL_Bool sampleOnTrailing, HAL_Bool clkIdleHigh) {
+void HAL_SetSPIMode(HAL_SPIPort port, HAL_SPIMode mode) {
   if (port < 0 || port >= kSpiMaxHandles) {
     return;
   }
 
-  uint8_t mode = 0;
-  mode |= (!msbFirst ? 8 : 0);
-  mode |= (clkIdleHigh ? 2 : 0);
-  mode |= (sampleOnTrailing ? 1 : 0);
+  uint8_t mode8 = mode & SPI_MODE_3;
 
   std::scoped_lock lock(spiApiMutexes[port]);
-  ioctl(HAL_GetSPIHandle(port), SPI_IOC_WR_MODE, &mode);
+  ioctl(HAL_GetSPIHandle(port), SPI_IOC_WR_MODE, &mode8);
+}
+
+HAL_SPIMode HAL_GetSPIMode(HAL_SPIPort port) {
+  if (port < 0 || port >= kSpiMaxHandles) {
+    return HAL_SPI_kMode0;
+  }
+
+  uint8_t mode8 = 0;
+
+  std::scoped_lock lock(spiApiMutexes[port]);
+  ioctl(HAL_GetSPIHandle(port), SPI_IOC_RD_MODE, &mode8);
+  return static_cast<HAL_SPIMode>(mode8 & SPI_MODE_3);
 }
 
 void HAL_SetSPIChipSelectActiveHigh(HAL_SPIPort port, int32_t* status) {
@@ -496,9 +504,8 @@ void HAL_InitSPIAuto(HAL_SPIPort port, int32_t bufferSize, int32_t* status) {
   }
 
   // configure DMA
-  tDMAChannelDescriptor desc;
-  spiSystem->getSystemInterface()->getDmaDescriptor(g_SpiAutoData_index, &desc);
-  spiAutoDMA = std::make_unique<tDMAManager>(desc.channel, bufferSize, status);
+  spiAutoDMA =
+      std::make_unique<tDMAManager>(g_SpiAutoData_index, bufferSize, status);
 }
 
 void HAL_FreeSPIAuto(HAL_SPIPort port, int32_t* status) {

@@ -10,9 +10,10 @@ import edu.wpi.first.hal.HAL;
 import edu.wpi.first.hal.SimDevice;
 import edu.wpi.first.hal.SimDouble;
 import edu.wpi.first.hal.SimEnum;
+import edu.wpi.first.networktables.DoublePublisher;
+import edu.wpi.first.networktables.DoubleTopic;
 import edu.wpi.first.networktables.NTSendable;
 import edu.wpi.first.networktables.NTSendableBuilder;
-import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.util.sendable.SendableRegistry;
 import edu.wpi.first.wpilibj.interfaces.Accelerometer;
 import java.nio.ByteBuffer;
@@ -118,9 +119,7 @@ public class ADXL345_SPI implements Accelerometer, NTSendable, AutoCloseable {
    */
   private void init(Range range) {
     m_spi.setClockRate(500000);
-    m_spi.setMSBFirst();
-    m_spi.setSampleDataOnTrailingEdge();
-    m_spi.setClockActiveLow();
+    m_spi.setMode(SPI.Mode.kMode3);
     m_spi.setChipSelectActiveHigh();
 
     // Turn on the measurements
@@ -236,15 +235,18 @@ public class ADXL345_SPI implements Accelerometer, NTSendable, AutoCloseable {
   @Override
   public void initSendable(NTSendableBuilder builder) {
     builder.setSmartDashboardType("3AxisAccelerometer");
-    NetworkTableEntry entryX = builder.getEntry("X");
-    NetworkTableEntry entryY = builder.getEntry("Y");
-    NetworkTableEntry entryZ = builder.getEntry("Z");
+    DoublePublisher pubX = new DoubleTopic(builder.getTopic("X")).publish();
+    DoublePublisher pubY = new DoubleTopic(builder.getTopic("Y")).publish();
+    DoublePublisher pubZ = new DoubleTopic(builder.getTopic("Z")).publish();
+    builder.addCloseable(pubX);
+    builder.addCloseable(pubY);
+    builder.addCloseable(pubZ);
     builder.setUpdateTable(
         () -> {
           AllAxes data = getAccelerations();
-          entryX.setDouble(data.XAxis);
-          entryY.setDouble(data.YAxis);
-          entryZ.setDouble(data.ZAxis);
+          pubX.set(data.XAxis);
+          pubY.set(data.YAxis);
+          pubZ.set(data.ZAxis);
         });
   }
 }

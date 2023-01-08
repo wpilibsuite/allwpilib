@@ -7,13 +7,13 @@
 #include <chrono>
 
 #include <fmt/format.h>
-#include <wpi/HttpUtil.h>
 #include <wpi/SmallString.h>
 #include <wpi/StringExtras.h>
-#include <wpi/TCPAcceptor.h>
 #include <wpi/fmt/raw_ostream.h>
-#include <wpi/raw_socket_istream.h>
-#include <wpi/raw_socket_ostream.h>
+#include <wpinet/HttpUtil.h>
+#include <wpinet/TCPAcceptor.h>
+#include <wpinet/raw_socket_istream.h>
+#include <wpinet/raw_socket_ostream.h>
 
 #include "Handle.h"
 #include "Instance.h"
@@ -460,6 +460,12 @@ void MjpegServerImpl::ConnThread::SendHTML(wpi::raw_ostream& os,
       case VideoMode::kGray:
         os << "gray";
         break;
+      case VideoMode::kY16:
+        os << "Y16";
+        break;
+      case VideoMode::kUYVY:
+        os << "UYVY";
+        break;
       default:
         os << "unknown";
         break;
@@ -495,7 +501,7 @@ void MjpegServerImpl::ConnThread::SendJSON(wpi::raw_ostream& os,
     auto kind = source.GetPropertyKind(prop);
     fmt::print(os, "\n\"name\": \"{}\"", name);
     fmt::print(os, ",\n\"id\": \"{}\"", prop);
-    fmt::print(os, ",\n\"type\": \"{}\"", kind);
+    fmt::print(os, ",\n\"type\": \"{}\"", static_cast<int>(kind));
     fmt::print(os, ",\n\"min\": \"{}\"", source.GetPropertyMin(prop, &status));
     fmt::print(os, ",\n\"max\": \"{}\"", source.GetPropertyMax(prop, &status));
     fmt::print(os, ",\n\"step\": \"{}\"",
@@ -568,6 +574,12 @@ void MjpegServerImpl::ConnThread::SendJSON(wpi::raw_ostream& os,
         break;
       case VideoMode::kGray:
         os << "gray";
+        break;
+      case VideoMode::kY16:
+        os << "Y16";
+        break;
+      case VideoMode::kUYVY:
+        os << "UYVY";
         break;
       default:
         os << "unknown";
@@ -650,7 +662,7 @@ void MjpegServerImpl::Stop() {
 // Send HTTP response and a stream of JPG-frames
 void MjpegServerImpl::ConnThread::SendStream(wpi::raw_socket_ostream& os) {
   if (m_noStreaming) {
-    SERROR("{}", "Too many simultaneous client streams");
+    SERROR("Too many simultaneous client streams");
     SendError(os, 503, "Too many simultaneous streams");
     return;
   }
@@ -663,7 +675,7 @@ void MjpegServerImpl::ConnThread::SendStream(wpi::raw_socket_ostream& os) {
   SendHeader(oss, 200, "OK", "multipart/x-mixed-replace;boundary=" BOUNDARY);
   os << oss.str();
 
-  SDEBUG("{}", "Headers send, sending stream now");
+  SDEBUG("Headers send, sending stream now");
 
   Frame::Time lastFrameTime = 0;
   Frame::Time timePerFrame = 0;
@@ -685,7 +697,7 @@ void MjpegServerImpl::ConnThread::SendStream(wpi::raw_socket_ostream& os) {
       std::this_thread::sleep_for(std::chrono::milliseconds(200));
       continue;
     }
-    SDEBUG4("{}", "waiting for frame");
+    SDEBUG4("waiting for frame");
     Frame frame = source->GetNextFrame(0.225);  // blocks
     if (!m_active) {
       break;
@@ -740,8 +752,10 @@ void MjpegServerImpl::ConnThread::SendStream(wpi::raw_socket_ostream& os) {
         // for adding it if required.
         addDHT = JpegNeedsDHT(data, &size, &locSOF);
         break;
-      case VideoMode::kYUYV:
+      case VideoMode::kUYVY:
       case VideoMode::kRGB565:
+      case VideoMode::kYUYV:
+      case VideoMode::kY16:
       default:
         // Bad frame; sleep for 10 ms so we don't consume all processor time.
         std::this_thread::sleep_for(std::chrono::milliseconds(10));
@@ -783,7 +797,7 @@ void MjpegServerImpl::ConnThread::ProcessRequest() {
   wpi::SmallString<128> reqBuf;
   std::string_view req = is.getline(reqBuf, 4096);
   if (is.has_error()) {
-    SDEBUG("{}", "error getting request string");
+    SDEBUG("error getting request string");
     return;
   }
 
@@ -797,14 +811,14 @@ void MjpegServerImpl::ConnThread::ProcessRequest() {
   // compatibility, others are for Axis camera compatibility.
   if ((pos = req.find("POST /stream")) != std::string_view::npos) {
     kind = kStream;
-    parameters = req.substr(req.find('?', pos + 12)).substr(1);
+    parameters = wpi::substr(wpi::substr(req, req.find('?', pos + 12)), 1);
   } else if ((pos = req.find("GET /?action=stream")) !=
              std::string_view::npos) {
     kind = kStream;
-    parameters = req.substr(req.find('&', pos + 19)).substr(1);
+    parameters = wpi::substr(wpi::substr(req, req.find('&', pos + 19)), 1);
   } else if ((pos = req.find("GET /stream.mjpg")) != std::string_view::npos) {
     kind = kStream;
-    parameters = req.substr(req.find('?', pos + 16)).substr(1);
+    parameters = wpi::substr(wpi::substr(req, req.find('?', pos + 16)), 1);
   } else if (req.find("GET /settings") != std::string_view::npos &&
              req.find(".json") != std::string_view::npos) {
     kind = kGetSettings;
@@ -820,11 +834,11 @@ void MjpegServerImpl::ConnThread::ProcessRequest() {
   } else if ((pos = req.find("GET /?action=command")) !=
              std::string_view::npos) {
     kind = kCommand;
-    parameters = req.substr(req.find('&', pos + 20)).substr(1);
+    parameters = wpi::substr(wpi::substr(req, req.find('&', pos + 20)), 1);
   } else if (req.find("GET / ") != std::string_view::npos || req == "GET /\n") {
     kind = kRootPage;
   } else {
-    SDEBUG("{}", "HTTP request resource not found");
+    SDEBUG("HTTP request resource not found");
     SendError(os, 404, "Resource not found");
     return;
   }
@@ -833,7 +847,7 @@ void MjpegServerImpl::ConnThread::ProcessRequest() {
   pos = parameters.find_first_not_of(
       "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_"
       "-=&1234567890%./");
-  parameters = parameters.substr(0, pos);
+  parameters = wpi::substr(parameters, 0, pos);
   SDEBUG("command parameters: \"{}\"", parameters);
 
   // Read the rest of the HTTP request.
@@ -866,11 +880,11 @@ void MjpegServerImpl::ConnThread::ProcessRequest() {
         SendHeader(os, 200, "OK", "text/plain");
         os << "Ignored due to no connected source."
            << "\r\n";
-        SDEBUG("{}", "Ignored due to no connected source.");
+        SDEBUG("Ignored due to no connected source.");
       }
       break;
     case kGetSettings:
-      SDEBUG("{}", "request for JSON file");
+      SDEBUG("request for JSON file");
       if (auto source = GetSource()) {
         SendJSON(os, *source, true);
       } else {
@@ -878,7 +892,7 @@ void MjpegServerImpl::ConnThread::ProcessRequest() {
       }
       break;
     case kGetSourceConfig:
-      SDEBUG("{}", "request for JSON file");
+      SDEBUG("request for JSON file");
       if (auto source = GetSource()) {
         SendHeader(os, 200, "OK", "application/json");
         CS_Status status = CS_OK;
@@ -889,7 +903,7 @@ void MjpegServerImpl::ConnThread::ProcessRequest() {
       }
       break;
     case kRootPage:
-      SDEBUG("{}", "request for root page");
+      SDEBUG("request for root page");
       SendHeader(os, 200, "OK", "text/html");
       if (auto source = GetSource()) {
         SendHTML(os, *source, false);
@@ -900,7 +914,7 @@ void MjpegServerImpl::ConnThread::ProcessRequest() {
       break;
   }
 
-  SDEBUG("{}", "leaving HTTP client thread");
+  SDEBUG("leaving HTTP client thread");
 }
 
 // worker thread for clients that connected to this server
@@ -927,7 +941,7 @@ void MjpegServerImpl::ServerThreadMain() {
     return;
   }
 
-  SDEBUG("{}", "waiting for clients to connect");
+  SDEBUG("waiting for clients to connect");
   while (m_active) {
     auto stream = m_acceptor->accept();
     if (!stream) {
@@ -977,7 +991,7 @@ void MjpegServerImpl::ServerThreadMain() {
     thr->m_cond.notify_one();
   }
 
-  SDEBUG("{}", "leaving server thread");
+  SDEBUG("leaving server thread");
 }
 
 void MjpegServerImpl::SetSourceImpl(std::shared_ptr<SourceImpl> source) {

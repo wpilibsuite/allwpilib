@@ -14,7 +14,6 @@
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
-#include <iostream>
 #include <stdexcept>
 #include <string>
 #include <thread>
@@ -83,7 +82,7 @@ HAL_SerialPortHandle HAL_InitializeSerialPortDirect(HAL_SerialPort port,
 
   serialPort->portId = open(portName, O_RDWR | O_NOCTTY);
   if (serialPort->portId < 0) {
-    *status = errno;
+    *status = -errno;
     if (*status == EACCES) {
       *status = HAL_CONSOLE_OUT_ENABLED_ERROR;
     }
@@ -94,8 +93,20 @@ HAL_SerialPortHandle HAL_InitializeSerialPortDirect(HAL_SerialPort port,
   std::memset(&serialPort->tty, 0, sizeof(serialPort->tty));
 
   serialPort->baudRate = B9600;
-  cfsetospeed(&serialPort->tty, static_cast<speed_t>(serialPort->baudRate));
-  cfsetispeed(&serialPort->tty, static_cast<speed_t>(serialPort->baudRate));
+  if (cfsetospeed(&serialPort->tty,
+                  static_cast<speed_t>(serialPort->baudRate)) != 0) {
+    *status = -errno;
+    close(serialPort->portId);
+    serialPortHandles->Free(handle);
+    return HAL_kInvalidHandle;
+  }
+  if (cfsetispeed(&serialPort->tty,
+                  static_cast<speed_t>(serialPort->baudRate)) != 0) {
+    *status = -errno;
+    close(serialPort->portId);
+    serialPortHandles->Free(handle);
+    return HAL_kInvalidHandle;
+  }
 
   serialPort->tty.c_cflag &= ~PARENB;
   serialPort->tty.c_cflag &= ~CSTOPB;
@@ -115,9 +126,14 @@ HAL_SerialPortHandle HAL_InitializeSerialPortDirect(HAL_SerialPort port,
    */
   serialPort->tty.c_oflag = ~OPOST;
 
-  tcflush(serialPort->portId, TCIOFLUSH);
+  if (tcflush(serialPort->portId, TCIOFLUSH) != 0) {
+    *status = -errno;
+    close(serialPort->portId);
+    serialPortHandles->Free(handle);
+    return HAL_kInvalidHandle;
+  }
   if (tcsetattr(serialPort->portId, TCSANOW, &serialPort->tty) != 0) {
-    *status = errno;
+    *status = -errno;
     close(serialPort->portId);
     serialPortHandles->Free(handle);
     return HAL_kInvalidHandle;

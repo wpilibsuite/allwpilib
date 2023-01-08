@@ -15,7 +15,7 @@ import edu.wpi.first.wpilibj.simulation.testutils.DoubleCallback;
 import edu.wpi.first.wpilibj.simulation.testutils.IntCallback;
 import org.junit.jupiter.api.Test;
 
-public class RoboRioSimTest {
+class RoboRioSimTest {
   @Test
   void testFPGAButton() {
     RoboRioSim.resetData();
@@ -207,5 +207,42 @@ public class RoboRioSimTest {
       assertEquals(kTestFaults, RoboRioSim.getUserFaults3V3());
       assertEquals(kTestFaults, RobotController.getFaultCount3V3());
     }
+  }
+
+  @Test
+  void testSerialNumber() {
+    RoboRioSim.resetData();
+
+    final String kSerialNumber = "Hello";
+
+    RoboRioSim.setSerialNumber(kSerialNumber);
+    assertEquals(kSerialNumber, RoboRioSim.getSerialNumber());
+    assertEquals(kSerialNumber, RobotController.getSerialNumber());
+
+    // Make sure it truncates at 8 characters properly
+    final String kSerialNumberOverflow = "SerialNumber";
+    final String kSerialNumberTruncated = kSerialNumberOverflow.substring(0, 8);
+    RoboRioSim.setSerialNumber(kSerialNumberOverflow);
+    assertEquals(kSerialNumberTruncated, RoboRioSim.getSerialNumber());
+    assertEquals(kSerialNumberTruncated, RobotController.getSerialNumber());
+  }
+
+  @Test
+  void testComments() {
+    RoboRioSim.resetData();
+
+    final String kComments = "Hello! These are comments in the roboRIO web interface!";
+
+    RoboRioSim.setComments(kComments);
+    assertEquals(kComments, RoboRioSim.getComments());
+    assertEquals(kComments, RobotController.getComments());
+
+    final String kCommentsOverflow =
+        "Hello! These are comments in the roboRIO web interface!"
+            + " This comment exceeds 64 characters!";
+    final String kCommentsTruncated = kCommentsOverflow.substring(0, 64);
+    RoboRioSim.setComments(kCommentsOverflow);
+    assertEquals(kCommentsTruncated, RoboRioSim.getComments());
+    assertEquals(kCommentsTruncated, RobotController.getComments());
   }
 }

@@ -17,7 +17,7 @@ public interface Gyro extends AutoCloseable {
 
   /**
    * Reset the gyro. Resets the gyro to a heading of zero. This can be used if there is significant
-   * drift in the gyro and it needs to be recalibrated after it has been running.
+   * drift in the gyro, and it needs to be recalibrated after it has been running.
    */
   void reset();
 

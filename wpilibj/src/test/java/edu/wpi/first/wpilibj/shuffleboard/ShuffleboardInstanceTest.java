@@ -9,13 +9,14 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-public class ShuffleboardInstanceTest {
+class ShuffleboardInstanceTest {
   private NetworkTableInstance m_ntInstance;
   private ShuffleboardInstance m_shuffleboardInstance;
 
@@ -32,7 +33,7 @@ public class ShuffleboardInstanceTest {
 
   @Test
   void testPathFluent() {
-    NetworkTableEntry entry =
+    GenericEntry entry =
         m_shuffleboardInstance
             .getTab("Tab Title")
             .getLayout("Layout Title", "List Layout")
@@ -45,13 +46,13 @@ public class ShuffleboardInstanceTest {
         () ->
             assertEquals(
                 "/Shuffleboard/Tab Title/Layout Title/Data",
-                entry.getName(),
+                entry.getTopic().getName(),
                 "Entry path generated incorrectly"));
   }
 
   @Test
   void testNestedLayoutsFluent() {
-    NetworkTableEntry entry =
+    GenericEntry entry =
         m_shuffleboardInstance
             .getTab("Tab")
             .getLayout("First", "List")
@@ -66,7 +67,7 @@ public class ShuffleboardInstanceTest {
         () ->
             assertEquals(
                 "/Shuffleboard/Tab/First/Second/Third/Fourth/Value",
-                entry.getName(),
+                entry.getTopic().getName(),
                 "Entry path generated incorrectly"));
   }
 
@@ -78,14 +79,14 @@ public class ShuffleboardInstanceTest {
     ShuffleboardLayout third = second.getLayout("Third", "List");
     ShuffleboardLayout fourth = third.getLayout("Fourth", "List");
     SimpleWidget widget = fourth.add("Value", "string");
-    NetworkTableEntry entry = widget.getEntry();
+    GenericEntry entry = widget.getEntry();
 
     assertAll(
         () -> assertEquals("string", entry.getString(null), "Wrong entry value"),
         () ->
             assertEquals(
                 "/Shuffleboard/Tab/First/Second/Third/Fourth/Value",
-                entry.getName(),
+                entry.getTopic().getName(),
                 "Entry path generated incorrectly"));
   }
 

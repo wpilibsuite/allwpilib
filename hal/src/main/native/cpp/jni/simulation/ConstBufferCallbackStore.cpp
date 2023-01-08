@@ -58,9 +58,8 @@ void ConstBufferCallbackStore::performCallback(const char* name,
     std::fflush(stdout);
   }
 
-  auto toCallbackArr = MakeJByteArray(
-      env, std::string_view{reinterpret_cast<const char*>(buffer),
-                            static_cast<size_t>(length)});
+  auto toCallbackArr =
+      MakeJByteArray(env, {buffer, static_cast<size_t>(length)});
 
   env->CallVoidMethod(m_call, sim::GetConstBufferCallback(),
                       MakeJString(env, name), toCallbackArr,
@@ -117,6 +116,9 @@ SIM_JniHandle sim::AllocateConstBufferCallback(
 void sim::FreeConstBufferCallback(JNIEnv* env, SIM_JniHandle handle, jint index,
                                   FreeConstBufferCallbackFunc freeCallback) {
   auto callback = callbackHandles->Free(handle);
+  if (callback == nullptr) {
+    return;
+  }
   freeCallback(index, callback->getCallbackId());
   callback->free(env);
 }

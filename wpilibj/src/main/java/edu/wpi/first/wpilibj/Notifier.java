@@ -4,12 +4,18 @@
 
 package edu.wpi.first.wpilibj;
 
-import static java.util.Objects.requireNonNull;
+import static edu.wpi.first.util.ErrorMessages.requireNonNullParam;
 
 import edu.wpi.first.hal.NotifierJNI;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.ReentrantLock;
 
+/**
+ * Notifiers run a callback function on a separate thread at a specified period.
+ *
+ * <p>If startSingle() is used, the callback will run once. If startPeriodic() is used, the callback
+ * will run repeatedly with the given period until stop() is called.
+ */
 public class Notifier implements AutoCloseable {
   // The thread waiting on the HAL alarm.
   private Thread m_thread;
@@ -29,12 +35,6 @@ public class Notifier implements AutoCloseable {
   // If periodic, the period of the calling; if just once, stores how long it
   // is until we call the handler.
   private double m_periodSeconds;
-
-  @Override
-  @SuppressWarnings("NoFinalizer")
-  protected void finalize() {
-    close();
-  }
 
   @Override
   public void close() {
@@ -81,7 +81,7 @@ public class Notifier implements AutoCloseable {
    *     or StartPeriodic.
    */
   public Notifier(Runnable run) {
-    requireNonNull(run);
+    requireNonNullParam(run, "run", "Notifier");
 
     m_handler = run;
     m_notifier.set(NotifierJNI.initializeNotifier());
@@ -99,7 +99,7 @@ public class Notifier implements AutoCloseable {
                   break;
                 }
 
-                Runnable handler = null;
+                Runnable handler;
                 m_processLock.lock();
                 try {
                   handler = m_handler;
@@ -128,10 +128,12 @@ public class Notifier implements AutoCloseable {
             error = cause;
           }
           DriverStation.reportError(
-              "Unhandled exception: " + error.toString(), error.getStackTrace());
+              "Unhandled exception in Notifier thread: " + error.toString(), error.getStackTrace());
           DriverStation.reportError(
-              "The loopFunc() method (or methods called by it) should have handled "
-                  + "the exception above.",
+              "The Runnable for this Notifier (or methods called by it) should have handled "
+                  + "the exception above.\n"
+                  + "  The above stacktrace can help determine where the error occurred.\n"
+                  + "  See https://wpilib.org/stacktrace for more information.",
               false);
         });
     m_thread.start();
@@ -183,6 +185,9 @@ public class Notifier implements AutoCloseable {
    * Register for periodic event notification. A timer event is queued for periodic event
    * notification. Each time the interrupt occurs, the event will be immediately requeued for the
    * same time interval.
+   *
+   * <p>The user-provided callback should be written in a nonblocking manner so the callback can be
+   * recalled at the next periodic event notification.
    *
    * @param periodSeconds Period in seconds to call the handler starting one period after the call
    *     to this method.

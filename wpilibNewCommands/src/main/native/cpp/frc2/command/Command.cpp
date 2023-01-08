@@ -4,16 +4,19 @@
 
 #include "frc2/command/Command.h"
 
+#include "frc2/command/CommandHelper.h"
 #include "frc2/command/CommandScheduler.h"
+#include "frc2/command/ConditionalCommand.h"
 #include "frc2/command/InstantCommand.h"
 #include "frc2/command/ParallelCommandGroup.h"
 #include "frc2/command/ParallelDeadlineGroup.h"
 #include "frc2/command/ParallelRaceGroup.h"
 #include "frc2/command/PerpetualCommand.h"
-#include "frc2/command/ProxyScheduleCommand.h"
+#include "frc2/command/RepeatCommand.h"
 #include "frc2/command/SequentialCommandGroup.h"
 #include "frc2/command/WaitCommand.h"
 #include "frc2/command/WaitUntilCommand.h"
+#include "frc2/command/WrapperCommand.h"
 
 using namespace frc2;
 
@@ -22,7 +25,7 @@ Command::~Command() {
 }
 
 Command& Command::operator=(const Command& rhs) {
-  m_isGrouped = false;
+  m_isComposed = false;
   return *this;
 }
 
@@ -30,62 +33,83 @@ void Command::Initialize() {}
 void Command::Execute() {}
 void Command::End(bool interrupted) {}
 
-ParallelRaceGroup Command::WithTimeout(units::second_t duration) && {
-  std::vector<std::unique_ptr<Command>> temp;
-  temp.emplace_back(std::make_unique<WaitCommand>(duration));
-  temp.emplace_back(std::move(*this).TransferOwnership());
-  return ParallelRaceGroup(std::move(temp));
+CommandPtr Command::WithTimeout(units::second_t duration) && {
+  return std::move(*this).ToPtr().WithTimeout(duration);
 }
 
-ParallelRaceGroup Command::WithInterrupt(std::function<bool()> condition) && {
-  std::vector<std::unique_ptr<Command>> temp;
-  temp.emplace_back(std::make_unique<WaitUntilCommand>(std::move(condition)));
-  temp.emplace_back(std::move(*this).TransferOwnership());
-  return ParallelRaceGroup(std::move(temp));
+CommandPtr Command::Until(std::function<bool()> condition) && {
+  return std::move(*this).ToPtr().Until(std::move(condition));
 }
 
-SequentialCommandGroup Command::BeforeStarting(
+CommandPtr Command::IgnoringDisable(bool doesRunWhenDisabled) && {
+  return std::move(*this).ToPtr().IgnoringDisable(doesRunWhenDisabled);
+}
+
+CommandPtr Command::WithInterruptBehavior(
+    InterruptionBehavior interruptBehavior) && {
+  return std::move(*this).ToPtr().WithInterruptBehavior(interruptBehavior);
+}
+
+CommandPtr Command::WithInterrupt(std::function<bool()> condition) && {
+  return std::move(*this).ToPtr().Until(std::move(condition));
+}
+
+CommandPtr Command::BeforeStarting(
     std::function<void()> toRun,
     std::initializer_list<Subsystem*> requirements) && {
   return std::move(*this).BeforeStarting(
       std::move(toRun), {requirements.begin(), requirements.end()});
 }
 
-SequentialCommandGroup Command::BeforeStarting(
-    std::function<void()> toRun, wpi::span<Subsystem* const> requirements) && {
-  std::vector<std::unique_ptr<Command>> temp;
-  temp.emplace_back(
-      std::make_unique<InstantCommand>(std::move(toRun), requirements));
-  temp.emplace_back(std::move(*this).TransferOwnership());
-  return SequentialCommandGroup(std::move(temp));
+CommandPtr Command::BeforeStarting(
+    std::function<void()> toRun, std::span<Subsystem* const> requirements) && {
+  return std::move(*this).ToPtr().BeforeStarting(std::move(toRun),
+                                                 requirements);
 }
 
-SequentialCommandGroup Command::AndThen(
-    std::function<void()> toRun,
-    std::initializer_list<Subsystem*> requirements) && {
+CommandPtr Command::AndThen(std::function<void()> toRun,
+                            std::initializer_list<Subsystem*> requirements) && {
   return std::move(*this).AndThen(std::move(toRun),
                                   {requirements.begin(), requirements.end()});
 }
 
-SequentialCommandGroup Command::AndThen(
-    std::function<void()> toRun, wpi::span<Subsystem* const> requirements) && {
-  std::vector<std::unique_ptr<Command>> temp;
-  temp.emplace_back(std::move(*this).TransferOwnership());
-  temp.emplace_back(
-      std::make_unique<InstantCommand>(std::move(toRun), requirements));
-  return SequentialCommandGroup(std::move(temp));
+CommandPtr Command::AndThen(std::function<void()> toRun,
+                            std::span<Subsystem* const> requirements) && {
+  return std::move(*this).ToPtr().AndThen(std::move(toRun), requirements);
 }
 
 PerpetualCommand Command::Perpetually() && {
+  WPI_IGNORE_DEPRECATED
   return PerpetualCommand(std::move(*this).TransferOwnership());
+  WPI_UNIGNORE_DEPRECATED
 }
 
-ProxyScheduleCommand Command::AsProxy() {
-  return ProxyScheduleCommand(this);
+CommandPtr Command::Repeatedly() && {
+  return std::move(*this).ToPtr().Repeatedly();
 }
 
-void Command::Schedule(bool interruptible) {
-  CommandScheduler::GetInstance().Schedule(interruptible, this);
+CommandPtr Command::AsProxy() && {
+  return std::move(*this).ToPtr().AsProxy();
+}
+
+CommandPtr Command::Unless(std::function<bool()> condition) && {
+  return std::move(*this).ToPtr().Unless(std::move(condition));
+}
+
+CommandPtr Command::FinallyDo(std::function<void(bool)> end) && {
+  return std::move(*this).ToPtr().FinallyDo(std::move(end));
+}
+
+CommandPtr Command::HandleInterrupt(std::function<void(void)> handler) && {
+  return std::move(*this).ToPtr().HandleInterrupt(std::move(handler));
+}
+
+CommandPtr Command::WithName(std::string_view name) && {
+  return std::move(*this).ToPtr().WithName(name);
+}
+
+void Command::Schedule() {
+  CommandScheduler::GetInstance().Schedule(this);
 }
 
 void Command::Cancel() {
@@ -108,12 +132,22 @@ std::string Command::GetName() const {
   return GetTypeName(*this);
 }
 
+void Command::SetName(std::string_view name) {}
+
+bool Command::IsComposed() const {
+  return m_isComposed;
+}
+
+void Command::SetComposed(bool isComposed) {
+  m_isComposed = isComposed;
+}
+
 bool Command::IsGrouped() const {
-  return m_isGrouped;
+  return IsComposed();
 }
 
 void Command::SetGrouped(bool grouped) {
-  m_isGrouped = grouped;
+  SetComposed(grouped);
 }
 
 namespace frc2 {

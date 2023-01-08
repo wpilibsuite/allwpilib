@@ -11,6 +11,7 @@
 
 namespace frc2 {
 class Command;
+class CommandPtr;
 /**
  * A robot subsystem.  Subsystems are the basic unit of robot organization in
  * the Command-based framework; they encapsulate low-level hardware objects
@@ -29,13 +30,15 @@ class Command;
  * SubsystemBase class offers a simple base for user implementations
  * that handles this.
  *
+ * This class is provided by the NewCommands VendorDep
+ *
  * @see Command
  * @see CommandScheduler
  * @see SubsystemBase
  */
 class Subsystem {
  public:
-  ~Subsystem();
+  virtual ~Subsystem();
   /**
    * This method is called periodically by the CommandScheduler.  Useful for
    * updating subsystem-specific state that you don't want to offload to a
@@ -70,6 +73,17 @@ class Subsystem {
   }
 
   /**
+   * Sets the default Command of the subsystem.  The default command will be
+   * automatically scheduled when no other commands are scheduled that require
+   * the subsystem. Default commands should generally not end on their own, i.e.
+   * their IsFinished() method should always return false.  Will automatically
+   * register this subsystem with the CommandScheduler.
+   *
+   * @param defaultCommand the default command to associate with this subsystem
+   */
+  void SetDefaultCommand(CommandPtr&& defaultCommand);
+
+  /**
    * Gets the default command for this subsystem.  Returns null if no default
    * command is currently associated with the subsystem.
    *
@@ -90,5 +104,41 @@ class Subsystem {
    * Periodic() method to be called when the scheduler runs.
    */
   void Register();
+
+  /**
+   * Constructs a command that runs an action once and finishes. Requires this
+   * subsystem.
+   *
+   * @param action the action to run
+   */
+  [[nodiscard]] CommandPtr RunOnce(std::function<void()> action);
+
+  /**
+   * Constructs a command that runs an action every iteration until interrupted.
+   * Requires this subsystem.
+   *
+   * @param action the action to run
+   */
+  [[nodiscard]] CommandPtr Run(std::function<void()> action);
+
+  /**
+   * Constructs a command that runs an action once and another action when the
+   * command is interrupted. Requires this subsystem.
+   *
+   * @param start the action to run on start
+   * @param end the action to run on interrupt
+   */
+  [[nodiscard]] CommandPtr StartEnd(std::function<void()> start,
+                                    std::function<void()> end);
+
+  /**
+   * Constructs a command that runs an action every iteration until interrupted,
+   * and then runs a second action. Requires this subsystem.
+   *
+   * @param run the action to run every iteration
+   * @param end the action to run on interrupt
+   */
+  [[nodiscard]] CommandPtr RunEnd(std::function<void()> run,
+                                  std::function<void()> end);
 };
 }  // namespace frc2

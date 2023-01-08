@@ -40,7 +40,7 @@ class Drivetrain : public frc2::SubsystemBase {
   /**
    * @return The robots heading in degrees.
    */
-  double GetHeading();
+  double GetHeading() const;
 
   /**
    * Reset the robots sensors to the zero states.
@@ -50,12 +50,12 @@ class Drivetrain : public frc2::SubsystemBase {
   /**
    * @return The distance driven (average of left and right encoders).
    */
-  double GetDistance();
+  double GetDistance() const;
 
   /**
    * @return The distance to the obstacle detected by the rangefinder.
    */
-  double GetDistanceToObstacle();
+  double GetDistanceToObstacle() const;
 
   /**
    * Log the data periodically. This method is automatically called

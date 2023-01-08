@@ -6,8 +6,9 @@
 
 #include <utility>
 
+#include <wpi/sendable/SendableBuilder.h>
+
 using namespace frc2;
-using namespace units;
 
 RamseteCommand::RamseteCommand(
     frc::Trajectory trajectory, std::function<frc::Pose2d()> pose,
@@ -16,7 +17,7 @@ RamseteCommand::RamseteCommand(
     frc::DifferentialDriveKinematics kinematics,
     std::function<frc::DifferentialDriveWheelSpeeds()> wheelSpeeds,
     frc2::PIDController leftController, frc2::PIDController rightController,
-    std::function<void(volt_t, volt_t)> output,
+    std::function<void(units::volt_t, units::volt_t)> output,
     std::initializer_list<Subsystem*> requirements)
     : m_trajectory(std::move(trajectory)),
       m_pose(std::move(pose)),
@@ -38,8 +39,8 @@ RamseteCommand::RamseteCommand(
     frc::DifferentialDriveKinematics kinematics,
     std::function<frc::DifferentialDriveWheelSpeeds()> wheelSpeeds,
     frc2::PIDController leftController, frc2::PIDController rightController,
-    std::function<void(volt_t, volt_t)> output,
-    wpi::span<Subsystem* const> requirements)
+    std::function<void(units::volt_t, units::volt_t)> output,
+    std::span<Subsystem* const> requirements)
     : m_trajectory(std::move(trajectory)),
       m_pose(std::move(pose)),
       m_controller(controller),
@@ -75,7 +76,7 @@ RamseteCommand::RamseteCommand(
     frc::DifferentialDriveKinematics kinematics,
     std::function<void(units::meters_per_second_t, units::meters_per_second_t)>
         output,
-    wpi::span<Subsystem* const> requirements)
+    std::span<Subsystem* const> requirements)
     : m_trajectory(std::move(trajectory)),
       m_pose(std::move(pose)),
       m_controller(controller),
@@ -127,13 +128,13 @@ void RamseteCommand::Execute() {
         (targetWheelSpeeds.right - m_prevSpeeds.right) / dt);
 
     auto leftOutput =
-        volt_t(m_leftController->Calculate(m_speeds().left.value(),
-                                           targetWheelSpeeds.left.value())) +
+        units::volt_t{m_leftController->Calculate(
+            m_speeds().left.value(), targetWheelSpeeds.left.value())} +
         leftFeedforward;
 
     auto rightOutput =
-        volt_t(m_rightController->Calculate(m_speeds().right.value(),
-                                            targetWheelSpeeds.right.value())) +
+        units::volt_t{m_rightController->Calculate(
+            m_speeds().right.value(), targetWheelSpeeds.right.value())} +
         rightFeedforward;
 
     m_outputVolts(leftOutput, rightOutput);
@@ -158,4 +159,12 @@ void RamseteCommand::End(bool interrupted) {
 
 bool RamseteCommand::IsFinished() {
   return m_timer.HasElapsed(m_trajectory.TotalTime());
+}
+
+void RamseteCommand::InitSendable(wpi::SendableBuilder& builder) {
+  CommandBase::InitSendable(builder);
+  builder.AddDoubleProperty(
+      "leftVelocity", [this] { return m_prevSpeeds.left.value(); }, nullptr);
+  builder.AddDoubleProperty(
+      "rightVelocity", [this] { return m_prevSpeeds.right.value(); }, nullptr);
 }

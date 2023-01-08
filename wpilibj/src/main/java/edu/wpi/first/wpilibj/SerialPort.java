@@ -84,48 +84,6 @@ public class SerialPort implements AutoCloseable {
   /**
    * Create an instance of a Serial Port class.
    *
-   * <p>Prefer to use the constructor that doesn't take a port name, but in some cases the automatic
-   * detection might not work correctly.
-   *
-   * @param baudRate The baud rate to configure the serial port.
-   * @param port The Serial port to use
-   * @param portName The direct portName to use
-   * @param dataBits The number of data bits per transfer. Valid values are between 5 and 8 bits.
-   * @param parity Select the type of parity checking to use.
-   * @param stopBits The number of stop bits to use as defined by the enum StopBits.
-   * @deprecated Will be removed for 2019
-   */
-  @Deprecated
-  public SerialPort(
-      final int baudRate,
-      String portName,
-      Port port,
-      final int dataBits,
-      Parity parity,
-      StopBits stopBits) {
-    m_portHandle = SerialPortJNI.serialInitializePortDirect((byte) port.value, portName);
-    SerialPortJNI.serialSetBaudRate(m_portHandle, baudRate);
-    SerialPortJNI.serialSetDataBits(m_portHandle, (byte) dataBits);
-    SerialPortJNI.serialSetParity(m_portHandle, (byte) parity.value);
-    SerialPortJNI.serialSetStopBits(m_portHandle, (byte) stopBits.value);
-
-    // Set the default read buffer size to 1 to return bytes immediately
-    setReadBufferSize(1);
-
-    // Set the default timeout to 5 seconds.
-    setTimeout(5.0);
-
-    // Don't wait until the buffer is full to transmit.
-    setWriteBufferMode(WriteBufferMode.kFlushOnAccess);
-
-    disableTermination();
-
-    HAL.report(tResourceType.kResourceType_SerialPort, port.value + 1);
-  }
-
-  /**
-   * Create an instance of a Serial Port class.
-   *
    * @param baudRate The baud rate to configure the serial port.
    * @param port The Serial port to use
    * @param dataBits The number of data bits per transfer. Valid values are between 5 and 8 bits.
@@ -206,9 +164,8 @@ public class SerialPort implements AutoCloseable {
   /**
    * Enable termination and specify the termination character.
    *
-   * <p>Termination is currently only implemented for receive. When the the terminator is received,
-   * the read() or readString() will return fewer bytes than requested, stopping after the
-   * terminator.
+   * <p>Termination is currently only implemented for receive. When the terminator is received, the
+   * read() or readString() will return fewer bytes than requested, stopping after the terminator.
    *
    * @param terminator The character to use for termination.
    */
@@ -219,9 +176,8 @@ public class SerialPort implements AutoCloseable {
   /**
    * Enable termination with the default terminator '\n'
    *
-   * <p>Termination is currently only implemented for receive. When the the terminator is received,
-   * the read() or readString() will return fewer bytes than requested, stopping after the
-   * terminator.
+   * <p>Termination is currently only implemented for receive. When the terminator is received, the
+   * read() or readString() will return fewer bytes than requested, stopping after the terminator.
    *
    * <p>The default terminator is '\n'
    */
@@ -310,7 +266,7 @@ public class SerialPort implements AutoCloseable {
    * <p>This defines the timeout for transactions with the hardware. It will affect reads if less
    * bytes are available than the read buffer size (defaults to 1) and very large writes.
    *
-   * @param timeout The number of seconds to to wait for I/O.
+   * @param timeout The number of seconds to wait for I/O.
    */
   public void setTimeout(double timeout) {
     SerialPortJNI.serialSetTimeout(m_portHandle, timeout);

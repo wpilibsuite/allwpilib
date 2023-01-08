@@ -1,0 +1,22 @@
+From 49d5945dde1d182fd2d75cdf550120951796cb1f Mon Sep 17 00:00:00 2001
+From: Tyler Veness <calcmogul@gmail.com>
+Date: Sat, 21 May 2022 22:58:06 -0700
+Subject: [PATCH 8/9] Fix Win32 warning suppression pragma
+
+---
+ src/win/util.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/win/util.c b/src/win/util.c
+index 7a5dd2ef..d9888aec 100644
+--- a/src/win/util.c
++++ b/src/win/util.c
+@@ -1750,7 +1750,7 @@ int uv_os_uname(uv_utsname_t* buffer) {
+   } else {
+     /* Silence GetVersionEx() deprecation warning. */
+     #ifdef _MSC_VER
+-    #pragma warning(suppress : 4996)
++    #pragma warning(disable : 4996)
+     #endif
+     if (GetVersionExW(&os_info) == 0) {
+       r = uv_translate_sys_error(GetLastError());

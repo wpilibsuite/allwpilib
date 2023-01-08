@@ -4,7 +4,16 @@
 
 package edu.wpi.first.wpilibj;
 
+import edu.wpi.first.hal.PortsJNI;
+import edu.wpi.first.hal.REVPHFaults;
 import edu.wpi.first.hal.REVPHJNI;
+import edu.wpi.first.hal.REVPHStickyFaults;
+import edu.wpi.first.hal.REVPHVersion;
+import java.io.File;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -16,12 +25,53 @@ public class PneumaticHub implements PneumaticsBase {
     private int m_refCount;
     private int m_reservedMask;
     private boolean m_compressorReserved;
+    public int[] m_oneShotDurMs = new int[PortsJNI.getNumREVPHChannels()];
     private final Object m_reserveLock = new Object();
 
     DataStore(int module) {
       m_handle = REVPHJNI.initialize(module);
       m_module = module;
       m_handleMap.put(module, this);
+
+      final REVPHVersion version = REVPHJNI.getVersion(m_handle);
+      final String fwVersion =
+          version.firmwareMajor + "." + version.firmwareMinor + "." + version.firmwareFix;
+
+      if (version.firmwareMajor > 0 && RobotBase.isReal()) {
+        // Write PH firmware version to roboRIO
+        final String fileName = "REV_PH_" + String.format("%02d", module) + "_WPILib_Version.ini";
+        final File file = new File("/tmp/frc_versions/" + fileName);
+        try {
+          if (file.exists() && !file.delete()) {
+            throw new IOException("Failed to delete " + fileName);
+          }
+
+          if (!file.createNewFile()) {
+            throw new IOException("Failed to create new " + fileName);
+          }
+
+          try (OutputStream output = Files.newOutputStream(file.toPath())) {
+            output.write("[Version]\n".getBytes(StandardCharsets.UTF_8));
+            output.write("model=REV PH\n".getBytes(StandardCharsets.UTF_8));
+            output.write(
+                ("deviceID=" + Integer.toHexString(0x9052600 | module) + "\n")
+                    .getBytes(StandardCharsets.UTF_8));
+            output.write(("currentVersion=" + fwVersion).getBytes(StandardCharsets.UTF_8));
+          }
+        } catch (IOException ex) {
+          DriverStation.reportError(
+              "Could not write " + fileName + ": " + ex.toString(), ex.getStackTrace());
+        }
+      }
+
+      // Check PH firmware version
+      if (version.firmwareMajor > 0 && version.firmwareMajor < 22) {
+        throw new IllegalStateException(
+            "The Pneumatic Hub has firmware version "
+                + fwVersion
+                + ", and must be updated to version 2022.0.0 or later "
+                + "using the REV Hardware Client.");
+      }
     }
 
     @Override
@@ -63,10 +113,22 @@ public class PneumaticHub implements PneumaticsBase {
     }
   }
 
+  /** Converts volts to PSI per the REV Analog Pressure Sensor datasheet. */
+  private static double voltsToPsi(double sensorVoltage, double supplyVoltage) {
+    double pressure = 250 * (sensorVoltage / supplyVoltage) - 25;
+    return pressure;
+  }
+
+  /** Converts PSI to volts per the REV Analog Pressure Sensor datasheet. */
+  private static double psiToVolts(double pressure, double supplyVoltage) {
+    double voltage = supplyVoltage * (0.004 * pressure + 0.1);
+    return voltage;
+  }
+
   private final DataStore m_dataStore;
   private final int m_handle;
 
-  /** Constructs a PneumaticHub with the default id (1). */
+  /** Constructs a PneumaticHub with the default ID (1). */
   public PneumaticHub() {
     this(SensorUtil.getDefaultREVPHModule());
   }
@@ -92,13 +154,8 @@ public class PneumaticHub implements PneumaticsBase {
   }
 
   @Override
-  public void setClosedLoopControl(boolean enabled) {
-    REVPHJNI.setClosedLoopControl(m_handle, enabled);
-  }
-
-  @Override
-  public boolean getClosedLoopControl() {
-    return REVPHJNI.getClosedLoopControl(m_handle);
+  public CompressorConfigType getCompressorConfigType() {
+    return CompressorConfigType.fromValue(REVPHJNI.getCompressorConfig(m_handle));
   }
 
   @Override
@@ -128,14 +185,12 @@ public class PneumaticHub implements PneumaticsBase {
 
   @Override
   public void fireOneShot(int index) {
-    // TODO Combine APIs
-    // REVPHJNI.fireOneShot(m_handle, index, durMs);
+    REVPHJNI.fireOneShot(m_handle, index, m_dataStore.m_oneShotDurMs[index]);
   }
 
   @Override
   public void setOneShotDuration(int index, int durMs) {
-    // TODO Combine APIs
-    // REVPHJNI.setOneShotDuration(m_handle, index, durMs);
+    m_dataStore.m_oneShotDurMs[index] = durMs;
   }
 
   @Override
@@ -197,7 +252,186 @@ public class PneumaticHub implements PneumaticsBase {
 
   @Override
   public int getSolenoidDisabledList() {
-    // TODO Get this working
-    return 0;
+    int raw = REVPHJNI.getStickyFaultsNative(m_handle);
+    return raw & 0xFFFF;
+  }
+
+  /**
+   * Disables the compressor. The compressor will not turn on until {@link
+   * #enableCompressorDigital()}, {@link #enableCompressorAnalog(double, double)}, or {@link
+   * #enableCompressorHybrid(double, double)} are called.
+   */
+  @Override
+  public void disableCompressor() {
+    REVPHJNI.setClosedLoopControlDisabled(m_handle);
+  }
+
+  @Override
+  public void enableCompressorDigital() {
+    REVPHJNI.setClosedLoopControlDigital(m_handle);
+  }
+
+  /**
+   * Enables the compressor in analog mode. This mode uses an analog pressure sensor connected to
+   * analog channel 0 to cycle the compressor. The compressor will turn on when the pressure drops
+   * below {@code minPressure} and will turn off when the pressure reaches {@code maxPressure}.
+   *
+   * @param minPressure The minimum pressure in PSI. The compressor will turn on when the pressure
+   *     drops below this value.
+   * @param maxPressure The maximum pressure in PSI. The compressor will turn off when the pressure
+   *     reaches this value.
+   */
+  @Override
+  public void enableCompressorAnalog(double minPressure, double maxPressure) {
+    if (minPressure >= maxPressure) {
+      throw new IllegalArgumentException("maxPressure must be greater than minPressure");
+    }
+    if (minPressure < 0 || minPressure > 120) {
+      throw new IllegalArgumentException(
+          "minPressure must be between 0 and 120 PSI, got " + minPressure);
+    }
+    if (maxPressure < 0 || maxPressure > 120) {
+      throw new IllegalArgumentException(
+          "maxPressure must be between 0 and 120 PSI, got " + maxPressure);
+    }
+    double minAnalogVoltage = psiToVolts(minPressure, 5);
+    double maxAnalogVoltage = psiToVolts(maxPressure, 5);
+    REVPHJNI.setClosedLoopControlAnalog(m_handle, minAnalogVoltage, maxAnalogVoltage);
+  }
+
+  /**
+   * Enables the compressor in hybrid mode. This mode uses both a digital pressure switch and an
+   * analog pressure sensor connected to analog channel 0 to cycle the compressor.
+   *
+   * <p>The compressor will turn on when <i>both</i>:
+   *
+   * <ul>
+   *   <li>The digital pressure switch indicates the system is not full AND
+   *   <li>The analog pressure sensor indicates that the pressure in the system is below the
+   *       specified minimum pressure.
+   * </ul>
+   *
+   * <p>The compressor will turn off when <i>either</i>:
+   *
+   * <ul>
+   *   <li>The digital pressure switch is disconnected or indicates that the system is full OR
+   *   <li>The pressure detected by the analog sensor is greater than the specified maximum
+   *       pressure.
+   * </ul>
+   *
+   * @param minPressure The minimum pressure in PSI. The compressor will turn on when the pressure
+   *     drops below this value and the pressure switch indicates that the system is not full.
+   * @param maxPressure The maximum pressure in PSI. The compressor will turn off when the pressure
+   *     reaches this value or the pressure switch is disconnected or indicates that the system is
+   *     full.
+   */
+  @Override
+  public void enableCompressorHybrid(double minPressure, double maxPressure) {
+    if (minPressure >= maxPressure) {
+      throw new IllegalArgumentException("maxPressure must be greater than minPressure");
+    }
+    if (minPressure < 0 || minPressure > 120) {
+      throw new IllegalArgumentException(
+          "minPressure must be between 0 and 120 PSI, got " + minPressure);
+    }
+    if (maxPressure < 0 || maxPressure > 120) {
+      throw new IllegalArgumentException(
+          "maxPressure must be between 0 and 120 PSI, got " + maxPressure);
+    }
+    double minAnalogVoltage = psiToVolts(minPressure, 5);
+    double maxAnalogVoltage = psiToVolts(maxPressure, 5);
+    REVPHJNI.setClosedLoopControlHybrid(m_handle, minAnalogVoltage, maxAnalogVoltage);
+  }
+
+  /**
+   * Returns the raw voltage of the specified analog input channel.
+   *
+   * @param channel The analog input channel to read voltage from.
+   * @return The voltage of the specified analog input channel.
+   */
+  @Override
+  public double getAnalogVoltage(int channel) {
+    return REVPHJNI.getAnalogVoltage(m_handle, channel);
+  }
+
+  /**
+   * Returns the pressure read by an analog pressure sensor on the specified analog input channel.
+   *
+   * @param channel The analog input channel to read pressure from.
+   * @return The pressure read by an analog pressure sensor on the specified analog input channel.
+   */
+  @Override
+  public double getPressure(int channel) {
+    double sensorVoltage = REVPHJNI.getAnalogVoltage(m_handle, channel);
+    double supplyVoltage = REVPHJNI.get5VVoltage(m_handle);
+    return voltsToPsi(sensorVoltage, supplyVoltage);
+  }
+
+  /** Clears the sticky faults. */
+  public void clearStickyFaults() {
+    REVPHJNI.clearStickyFaults(m_handle);
+  }
+
+  /**
+   * Returns the hardware and firmware versions of this device.
+   *
+   * @return The hardware and firmware versions.
+   */
+  public REVPHVersion getVersion() {
+    return REVPHJNI.getVersion(m_handle);
+  }
+
+  /**
+   * Returns the faults currently active on this device.
+   *
+   * @return The faults.
+   */
+  public REVPHFaults getFaults() {
+    return REVPHJNI.getFaults(m_handle);
+  }
+
+  /**
+   * Returns the sticky faults currently active on this device.
+   *
+   * @return The sticky faults.
+   */
+  public REVPHStickyFaults getStickyFaults() {
+    return REVPHJNI.getStickyFaults(m_handle);
+  }
+
+  /**
+   * Returns the current input voltage for this device.
+   *
+   * @return The input voltage.
+   */
+  public double getInputVoltage() {
+    return REVPHJNI.getInputVoltage(m_handle);
+  }
+
+  /**
+   * Returns the current voltage of the regulated 5v supply.
+   *
+   * @return The current voltage of the 5v supply.
+   */
+  public double get5VRegulatedVoltage() {
+    return REVPHJNI.get5VVoltage(m_handle);
+  }
+
+  /**
+   * Returns the total current (in amps) drawn by all solenoids.
+   *
+   * @return Total current drawn by all solenoids in amps.
+   */
+  public double getSolenoidsTotalCurrent() {
+    return REVPHJNI.getSolenoidCurrent(m_handle);
+  }
+
+  /**
+   * Returns the current voltage of the solenoid power supply.
+   *
+   * @return The current voltage of the solenoid power supply.
+   */
+  public double getSolenoidsVoltage() {
+    return REVPHJNI.getSolenoidVoltage(m_handle);
   }
 }

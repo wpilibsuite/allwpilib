@@ -6,26 +6,17 @@
 
 #include <algorithm>
 
+#include <wpi/MathExtras.h>
 #include <wpi/json.h>
 
 #include "units/math.h"
 
 using namespace frc;
 
-bool Trajectory::State::operator==(const Trajectory::State& other) const {
-  return t == other.t && velocity == other.velocity &&
-         acceleration == other.acceleration && pose == other.pose &&
-         curvature == other.curvature;
-}
-
-bool Trajectory::State::operator!=(const Trajectory::State& other) const {
-  return !operator==(other);
-}
-
 Trajectory::State Trajectory::State::Interpolate(State endValue,
                                                  double i) const {
   // Find the new [t] value.
-  const auto newT = Lerp(t, endValue.t, i);
+  const auto newT = wpi::Lerp(t, endValue.t, i);
 
   // Find the delta time between the current state and the interpolated state.
   const auto deltaT = newT - t;
@@ -45,7 +36,7 @@ Trajectory::State Trajectory::State::Interpolate(State endValue,
   const units::meters_per_second_t newV = velocity + (acceleration * deltaT);
 
   // Calculate the change in position.
-  // delta_s = v_0 t + 0.5 at^2
+  // delta_s = v_0 t + 0.5at²
   const units::meter_t newS =
       (velocity * deltaT + 0.5 * acceleration * deltaT * deltaT) *
       (reversing ? -1.0 : 1.0);
@@ -58,8 +49,8 @@ Trajectory::State Trajectory::State::Interpolate(State endValue,
       newS / endValue.pose.Translation().Distance(pose.Translation());
 
   return {newT, newV, acceleration,
-          Lerp(pose, endValue.pose, interpolationFrac),
-          Lerp(curvature, endValue.curvature, interpolationFrac)};
+          wpi::Lerp(pose, endValue.pose, interpolationFrac),
+          wpi::Lerp(curvature, endValue.curvature, interpolationFrac)};
 }
 
 Trajectory::Trajectory(const std::vector<State>& states) : m_states(states) {
@@ -161,12 +152,4 @@ void frc::from_json(const wpi::json& json, Trajectory::State& state) {
   state.acceleration =
       units::meters_per_second_squared_t{json.at("acceleration").get<double>()};
   state.curvature = units::curvature_t{json.at("curvature").get<double>()};
-}
-
-bool Trajectory::operator==(const Trajectory& other) const {
-  return m_states == other.States();
-}
-
-bool Trajectory::operator!=(const Trajectory& other) const {
-  return !operator==(other);
 }

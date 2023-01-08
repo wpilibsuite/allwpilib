@@ -4,12 +4,17 @@
 
 package edu.wpi.first.wpilibj;
 
+import edu.wpi.first.hal.ControlWord;
+import edu.wpi.first.hal.DriverStationJNI;
+import edu.wpi.first.util.WPIUtilJNI;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
 /**
- * This base class runs a watchdog timer and calls the subclass's StopMotor() function if the
- * timeout expires.
+ * The Motor Safety feature acts as a watchdog timer for an individual motor. It operates by
+ * maintaining a timer that tracks how long it has been since the feed() method has been called for
+ * that actuator. Code in the Driver Station class initiates a comparison of these timers to the
+ * timeout values for any actuator with safety enabled every 5 received packets (100ms nominal).
  *
  * <p>The subclass should call feed() whenever the motor value is updated.
  */
@@ -22,11 +27,49 @@ public abstract class MotorSafety {
   private final Object m_thisMutex = new Object();
   private static final Set<MotorSafety> m_instanceList = new LinkedHashSet<>();
   private static final Object m_listMutex = new Object();
+  private static Thread m_safetyThread;
+
+  @SuppressWarnings("PMD.AssignmentInOperand")
+  private static void threadMain() {
+    int event = WPIUtilJNI.createEvent(false, false);
+    DriverStationJNI.provideNewDataEventHandle(event);
+    ControlWord controlWord = new ControlWord();
+
+    int safetyCounter = 0;
+    while (true) {
+      boolean timedOut;
+      try {
+        timedOut = WPIUtilJNI.waitForObjectTimeout(event, 0.1);
+      } catch (InterruptedException e) {
+        DriverStationJNI.removeNewDataEventHandle(event);
+        WPIUtilJNI.destroyEvent(event);
+        Thread.currentThread().interrupt();
+        return;
+      }
+      if (!timedOut) {
+        DriverStationJNI.getControlWord(controlWord);
+        if (!(controlWord.getEnabled() && controlWord.getDSAttached())) {
+          safetyCounter = 0;
+        }
+        if (++safetyCounter >= 4) {
+          checkMotors();
+          safetyCounter = 0;
+        }
+      } else {
+        safetyCounter = 0;
+      }
+    }
+  }
 
   /** MotorSafety constructor. */
   public MotorSafety() {
     synchronized (m_listMutex) {
       m_instanceList.add(this);
+      if (m_safetyThread == null) {
+        m_safetyThread = new Thread(() -> threadMain(), "MotorSafety Thread");
+        m_safetyThread.setDaemon(true);
+        m_safetyThread.start();
+      }
     }
   }
 
@@ -93,7 +136,10 @@ public abstract class MotorSafety {
     }
 
     if (stopTime < Timer.getFPGATimestamp()) {
-      DriverStation.reportError(getDescription() + "... Output not updated often enough.", false);
+      DriverStation.reportError(
+          getDescription()
+              + "... Output not updated often enough. See https://docs.wpilib.org/motorsafety for more information.",
+          false);
 
       stopMotor();
     }

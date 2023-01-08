@@ -19,7 +19,7 @@
 class SetElevatorSetpoint
     : public frc2::CommandHelper<frc2::CommandBase, SetElevatorSetpoint> {
  public:
-  explicit SetElevatorSetpoint(double setpoint, Elevator* elevator);
+  explicit SetElevatorSetpoint(double setpoint, Elevator& elevator);
   void Initialize() override;
   bool IsFinished() override;
 

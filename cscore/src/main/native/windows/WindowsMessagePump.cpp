@@ -89,7 +89,7 @@ static std::shared_ptr<ClassHolder> GetClassHolder() {
 WindowsMessagePump::WindowsMessagePump(
     std::function<LRESULT(HWND, UINT, WPARAM, LPARAM)> callback) {
   m_callback = callback;
-  auto handle = CreateEvent(NULL, true, false, NULL);
+  auto handle = CreateEventA(NULL, true, false, NULL);
   m_mainThread = std::thread([=] { ThreadMain(handle); });
   auto waitResult = WaitForSingleObject(handle, 1000);
   if (waitResult == WAIT_OBJECT_0) {
@@ -98,7 +98,7 @@ WindowsMessagePump::WindowsMessagePump(
 }
 
 WindowsMessagePump::~WindowsMessagePump() {
-  auto res = SendMessage(hwnd, WM_CLOSE, NULL, NULL);
+  auto res = SendMessageA(hwnd, WM_CLOSE, NULL, NULL);
   if (m_mainThread.joinable())
     m_mainThread.join();
 }
@@ -110,28 +110,28 @@ void WindowsMessagePump::ThreadMain(HANDLE eventHandle) {
   MFStartup(MF_VERSION);
 
   auto classHolder = GetClassHolder();
-  hwnd = CreateWindowEx(0, classHolder->class_name, "dummy_name", 0, 0, 0, 0, 0,
-                        HWND_MESSAGE, NULL, NULL, this);
+  hwnd = CreateWindowExA(0, classHolder->class_name, "dummy_name", 0, 0, 0, 0,
+                         0, HWND_MESSAGE, NULL, NULL, this);
 
   // Register for device notifications
   HDEVNOTIFY g_hdevnotify = NULL;
   HDEVNOTIFY g_hdevnotify2 = NULL;
 
-  DEV_BROADCAST_DEVICEINTERFACE di = {0};
+  DEV_BROADCAST_DEVICEINTERFACE_A di = {0};
   di.dbcc_size = sizeof(di);
   di.dbcc_devicetype = DBT_DEVTYP_DEVICEINTERFACE;
   di.dbcc_classguid = KSCATEGORY_CAPTURE;
 
   g_hdevnotify =
-      RegisterDeviceNotification(hwnd, &di, DEVICE_NOTIFY_WINDOW_HANDLE);
+      RegisterDeviceNotificationA(hwnd, &di, DEVICE_NOTIFY_WINDOW_HANDLE);
 
-  DEV_BROADCAST_DEVICEINTERFACE di2 = {0};
+  DEV_BROADCAST_DEVICEINTERFACE_A di2 = {0};
   di2.dbcc_size = sizeof(di2);
   di2.dbcc_devicetype = DBT_DEVTYP_DEVICEINTERFACE;
   di2.dbcc_classguid = KSCATEGORY_VIDEO_CAMERA;
 
   g_hdevnotify2 =
-      RegisterDeviceNotification(hwnd, &di2, DEVICE_NOTIFY_WINDOW_HANDLE);
+      RegisterDeviceNotificationA(hwnd, &di2, DEVICE_NOTIFY_WINDOW_HANDLE);
 
   SetEvent(eventHandle);
 

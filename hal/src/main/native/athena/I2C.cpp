@@ -54,6 +54,10 @@ void HAL_InitializeI2C(HAL_I2CPort port, int32_t* status) {
   }
 
   if (port == HAL_I2C_kOnboard) {
+    HAL_SendError(0, 0, 0,
+                  "Onboard I2C port is subject to system lockups. See Known "
+                  "Issues page for details",
+                  "", "", true);
     std::scoped_lock lock(digitalI2COnBoardMutex);
     i2COnboardObjCount++;
     if (i2COnboardObjCount > 1) {

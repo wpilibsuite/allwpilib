@@ -21,29 +21,29 @@ test {
     finalizedBy jacocoTestReport
 }
 
-if (project.hasProperty('onlylinuxathena') || project.hasProperty('onlylinuxraspbian') || project.hasProperty('onlylinuxaarch64bionic')) {
+if (project.hasProperty('onlylinuxathena') || project.hasProperty('onlylinuxarm32') || project.hasProperty('onlylinuxarm64')) {
     test.enabled = false
 }
 
 dependencies {
     implementation project(':wpilibj')
-
+    implementation project(':apriltag')
     implementation project(':wpimath')
     implementation project(':hal')
     implementation project(':wpiutil')
+    implementation project(':wpinet')
     implementation project(':ntcore')
     implementation project(':cscore')
     implementation project(':cameraserver')
-    implementation project(':wpilibOldCommands')
     implementation project(':wpilibNewCommands')
 
-    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.4.2'
-    testImplementation 'org.junit.jupiter:junit-jupiter-params:5.4.2'
-    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.4.2'
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.2'
+    testImplementation 'org.junit.jupiter:junit-jupiter-params:5.8.2'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.2'
 }
 
 jacoco {
-    toolVersion = "0.8.4"
+    toolVersion = "0.8.8"
 }
 
 jacocoTestReport {
@@ -108,17 +108,20 @@ model {
             }
             binaries.all { binary ->
                 lib project: ':wpilibNewCommands', library: 'wpilibNewCommands', linkage: 'shared'
+                lib project: ':apriltag', library: 'apriltag', linkage: 'shared'
                 lib project: ':wpilibc', library: 'wpilibc', linkage: 'shared'
                 lib project: ':wpimath', library: 'wpimath', linkage: 'shared'
-                lib project: ':wpimath', library: 'wpimathJNI', linkage: 'shared'
-                lib project: ':ntcore', library: 'ntcore', linkage: 'shared'
+                lib project: ':wpimath', library: 'wpimathJNIShared', linkage: 'shared'
+                project(':ntcore').addNtcoreDependency(binary, 'shared')
+                project(':ntcore').addNtcoreJniDependency(binary)
                 lib project: ':cscore', library: 'cscore', linkage: 'shared'
-                lib project: ':ntcore', library: 'ntcoreJNIShared', linkage: 'shared'
                 lib project: ':cscore', library: 'cscoreJNIShared', linkage: 'shared'
                 project(':hal').addHalDependency(binary, 'shared')
                 project(':hal').addHalJniDependency(binary)
                 lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
-                lib project: ':wpiutil', library: 'wpiutilJNI', linkage: 'shared'
+                lib project: ':wpiutil', library: 'wpiutilJNIShared', linkage: 'shared'
+                lib project: ':wpinet', library: 'wpinet', linkage: 'shared'
+                lib project: ':wpinet', library: 'wpinetJNIShared', linkage: 'shared'
                 lib project: ':cameraserver', library: 'cameraserver', linkage: 'shared'
                 if (binary.targetPlatform.name == nativeUtils.wpi.platforms.roborio) {
                     nativeUtils.useRequiredLibrary(binary, 'ni_link_libraries', 'ni_runtime_libraries')
@@ -172,8 +175,9 @@ model {
 
                             new groovy.json.JsonSlurper().parseText(exampleFile.text).each { entry ->
                                 project.tasks.create("run${entry.foldername}", JavaExec) { run ->
-                                    mainClass = "edu.wpi.first.wpilibj.examples." + entry.foldername + ".Main"
-                                    classpath = sourceSets.main.runtimeClasspath
+                                    run.group "run examples"
+                                    run.mainClass = "edu.wpi.first.wpilibj.examples." + entry.foldername + "." + entry.mainclass
+                                    run.classpath = sourceSets.main.runtimeClasspath
                                     run.dependsOn it.tasks.install
                                     run.systemProperty 'java.library.path', filePath
                                     run.environment 'LD_LIBRARY_PATH', filePath
@@ -183,6 +187,25 @@ model {
                                     if (org.gradle.internal.os.OperatingSystem.current().isMacOsX()) {
                                         run.jvmArgs = ['-XstartOnFirstThread']
                                     }
+                                }
+                                project.tasks.create("test${entry.foldername}", Test) { testTask ->
+                                    testTask.group "verification"
+                                    testTask.useJUnitPlatform()
+                                    testTask.filter {
+                                        includeTestsMatching("edu.wpi.first.wpilibj.examples.${entry.foldername}.*")
+                                        setFailOnNoMatchingTests(false)
+                                    }
+                                    testTask.classpath = sourceSets.test.runtimeClasspath
+                                    testTask.dependsOn it.tasks.install
+
+                                    testTask.systemProperty 'junit.jupiter.extensions.autodetection.enabled', 'true'
+                                    testTask.testLogging {
+                                        events "failed"
+                                        exceptionFormat "full"
+                                    }
+                                    testTask.systemProperty 'java.library.path', filePath
+                                    testTask.environment 'LD_LIBRARY_PATH', filePath
+                                    testTask.workingDir filePath
                                 }
                             }
 

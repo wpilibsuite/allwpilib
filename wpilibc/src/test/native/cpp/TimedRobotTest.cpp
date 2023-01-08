@@ -9,6 +9,7 @@
 #include <atomic>
 #include <thread>
 
+#include "frc/livewindow/LiveWindow.h"
 #include "frc/simulation/DriverStationSim.h"
 #include "frc/simulation/SimHooks.h"
 #include "gtest/gtest.h"
@@ -16,7 +17,7 @@
 using namespace frc;
 
 namespace {
-class TimedRobotTest : public ::testing::Test {
+class TimedRobotTest : public ::testing::TestWithParam<bool> {
  protected:
   void SetUp() override { frc::sim::PauseTiming(); }
 
@@ -304,8 +305,11 @@ TEST_F(TimedRobotTest, TeleopMode) {
   robotThread.join();
 }
 
-TEST_F(TimedRobotTest, TestMode) {
+TEST_P(TimedRobotTest, TestMode) {
+  bool isTestLW = GetParam();
+
   MockRobot robot;
+  robot.EnableLiveWindowInTest(isTestLW);
 
   std::thread robotThread{[&] { robot.StartCompetition(); }};
 
@@ -321,6 +325,7 @@ TEST_F(TimedRobotTest, TestMode) {
   EXPECT_EQ(0u, robot.m_autonomousInitCount);
   EXPECT_EQ(0u, robot.m_teleopInitCount);
   EXPECT_EQ(0u, robot.m_testInitCount);
+  EXPECT_FALSE(frc::LiveWindow::IsEnabled());
 
   EXPECT_EQ(0u, robot.m_robotPeriodicCount);
   EXPECT_EQ(0u, robot.m_simulationPeriodicCount);
@@ -342,6 +347,9 @@ TEST_F(TimedRobotTest, TestMode) {
   EXPECT_EQ(0u, robot.m_autonomousInitCount);
   EXPECT_EQ(0u, robot.m_teleopInitCount);
   EXPECT_EQ(1u, robot.m_testInitCount);
+  EXPECT_EQ(isTestLW, frc::LiveWindow::IsEnabled());
+
+  EXPECT_THROW(robot.EnableLiveWindowInTest(isTestLW), std::runtime_error);
 
   EXPECT_EQ(1u, robot.m_robotPeriodicCount);
   EXPECT_EQ(1u, robot.m_simulationPeriodicCount);
@@ -375,6 +383,32 @@ TEST_F(TimedRobotTest, TestMode) {
   EXPECT_EQ(0u, robot.m_autonomousExitCount);
   EXPECT_EQ(0u, robot.m_teleopExitCount);
   EXPECT_EQ(0u, robot.m_testExitCount);
+
+  frc::sim::DriverStationSim::SetEnabled(false);
+  frc::sim::DriverStationSim::SetAutonomous(false);
+  frc::sim::DriverStationSim::SetTest(false);
+  frc::sim::DriverStationSim::NotifyNewData();
+  frc::sim::StepTiming(20_ms);  // Wait for Notifiers
+
+  EXPECT_EQ(1u, robot.m_robotInitCount);
+  EXPECT_EQ(1u, robot.m_simulationInitCount);
+  EXPECT_EQ(1u, robot.m_disabledInitCount);
+  EXPECT_EQ(0u, robot.m_autonomousInitCount);
+  EXPECT_EQ(0u, robot.m_teleopInitCount);
+  EXPECT_EQ(1u, robot.m_testInitCount);
+  EXPECT_FALSE(frc::LiveWindow::IsEnabled());
+
+  EXPECT_EQ(3u, robot.m_robotPeriodicCount);
+  EXPECT_EQ(3u, robot.m_simulationPeriodicCount);
+  EXPECT_EQ(1u, robot.m_disabledPeriodicCount);
+  EXPECT_EQ(0u, robot.m_autonomousPeriodicCount);
+  EXPECT_EQ(0u, robot.m_teleopPeriodicCount);
+  EXPECT_EQ(2u, robot.m_testPeriodicCount);
+
+  EXPECT_EQ(0u, robot.m_disabledExitCount);
+  EXPECT_EQ(0u, robot.m_autonomousExitCount);
+  EXPECT_EQ(0u, robot.m_teleopExitCount);
+  EXPECT_EQ(1u, robot.m_testExitCount);
 
   robot.EndCompetition();
   robotThread.join();
@@ -418,6 +452,7 @@ TEST_F(TimedRobotTest, ModeChange) {
   frc::sim::DriverStationSim::SetEnabled(true);
   frc::sim::DriverStationSim::SetAutonomous(true);
   frc::sim::DriverStationSim::SetTest(false);
+  frc::sim::DriverStationSim::NotifyNewData();
 
   frc::sim::StepTiming(20_ms);
 
@@ -435,6 +470,7 @@ TEST_F(TimedRobotTest, ModeChange) {
   frc::sim::DriverStationSim::SetEnabled(true);
   frc::sim::DriverStationSim::SetAutonomous(false);
   frc::sim::DriverStationSim::SetTest(false);
+  frc::sim::DriverStationSim::NotifyNewData();
 
   frc::sim::StepTiming(20_ms);
 
@@ -452,6 +488,7 @@ TEST_F(TimedRobotTest, ModeChange) {
   frc::sim::DriverStationSim::SetEnabled(true);
   frc::sim::DriverStationSim::SetAutonomous(false);
   frc::sim::DriverStationSim::SetTest(true);
+  frc::sim::DriverStationSim::NotifyNewData();
 
   frc::sim::StepTiming(20_ms);
 
@@ -469,6 +506,7 @@ TEST_F(TimedRobotTest, ModeChange) {
   frc::sim::DriverStationSim::SetEnabled(false);
   frc::sim::DriverStationSim::SetAutonomous(false);
   frc::sim::DriverStationSim::SetTest(false);
+  frc::sim::DriverStationSim::NotifyNewData();
 
   frc::sim::StepTiming(20_ms);
 
@@ -568,3 +606,5 @@ TEST_F(TimedRobotTest, AddPeriodicWithOffset) {
   robot.EndCompetition();
   robotThread.join();
 }
+
+INSTANTIATE_TEST_SUITE_P(TimedRobotTests, TimedRobotTest, testing::Bool());

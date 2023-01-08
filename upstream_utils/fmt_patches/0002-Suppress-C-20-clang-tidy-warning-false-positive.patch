@@ -1,0 +1,22 @@
+From 1d8e07241d380d13383a6ff479f3895ef49ce514 Mon Sep 17 00:00:00 2001
+From: Tyler Veness <calcmogul@gmail.com>
+Date: Fri, 2 Sep 2022 15:12:54 -0700
+Subject: [PATCH 2/2] Suppress C++20 clang-tidy warning false positive
+
+---
+ include/fmt/core.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/include/fmt/core.h b/include/fmt/core.h
+index f6a37af..5c210bc 100644
+--- a/include/fmt/core.h
++++ b/include/fmt/core.h
+@@ -2952,7 +2952,7 @@ class format_string_checker {
+       basic_string_view<Char> format_str, ErrorHandler eh)
+       : context_(format_str, num_args, types_, eh),
+         parse_funcs_{&parse_format_specs<Args, parse_context_type>...},
+-        types_{
++        types_{  // NOLINT(clang-analyzer-optin.cplusplus.UninitializedObject)
+             mapped_type_constant<Args,
+                                  basic_format_context<Char*, Char>>::value...} {
+   }

@@ -1,0 +1,76 @@
+import org.gradle.internal.os.OperatingSystem
+
+if (!project.hasProperty('onlylinuxathena')) {
+
+    apply plugin: 'cpp'
+    apply plugin: 'c'
+    apply plugin: 'java'
+    apply plugin: 'google-test-test-suite'
+    apply plugin: 'visual-studio'
+    apply plugin: 'edu.wpi.first.NativeUtils'
+
+    if (OperatingSystem.current().isWindows()) {
+        apply plugin: 'windows-resources'
+    }
+
+    dependencies {
+        implementation "com.fasterxml.jackson.core:jackson-annotations:2.12.4"
+        implementation "com.fasterxml.jackson.core:jackson-core:2.12.4"
+        implementation "com.fasterxml.jackson.core:jackson-databind:2.12.4"
+    }
+
+    ext {
+        nativeName = 'fieldImages'
+        baseId = nativeName
+        groupId = 'edu.wpi.first.fieldImages'
+        devMain = "edu.wpi.first.fieldImages.DevMain"
+    }
+
+    apply from: "${rootDir}/shared/resources.gradle"
+    apply from: "${rootDir}/shared/config.gradle"
+    apply from: "${rootDir}/shared/java/javacommon.gradle"
+
+    def generateTask = createGenerateResourcesTask('main', 'FIELDS', 'fields', project)
+
+    project(':').libraryBuild.dependsOn build
+    tasks.withType(CppCompile) {
+        dependsOn generateTask
+    }
+
+    sourceSets {
+        main {
+            resources {
+                srcDirs 'src/main/native/resources'
+            }
+        }
+    }
+
+    model {
+        components {
+            "${nativeName}"(NativeLibrarySpec) {
+                baseName = 'fieldImages'
+                sources {
+                    cpp {
+                        source {
+                            srcDirs "$buildDir/generated/main/cpp"
+                            include '**/*.cpp'
+                        }
+                        exportedHeaders {
+                            srcDirs 'src/main/native/include'
+                        }
+                    }
+                    if (OperatingSystem.current().isWindows()) {
+                        rc {
+                            source {
+                                srcDirs 'src/main/native/win'
+                                include '*.rc'
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    apply from: 'publish.gradle'
+}

@@ -10,7 +10,7 @@ public final class Drake {
   private Drake() {}
 
   /**
-   * Solves the discrete alegebraic Riccati equation.
+   * Solves the discrete algebraic Riccati equation.
    *
    * @param A System matrix.
    * @param B Input matrix.
@@ -18,7 +18,6 @@ public final class Drake {
    * @param R Input cost matrix.
    * @return Solution of DARE.
    */
-  @SuppressWarnings({"LocalVariableName", "ParameterName"})
   public static SimpleMatrix discreteAlgebraicRiccatiEquation(
       SimpleMatrix A, SimpleMatrix B, SimpleMatrix Q, SimpleMatrix R) {
     var S = new SimpleMatrix(A.numRows(), A.numCols());
@@ -34,7 +33,7 @@ public final class Drake {
   }
 
   /**
-   * Solves the discrete alegebraic Riccati equation.
+   * Solves the discrete algebraic Riccati equation.
    *
    * @param <States> Number of states.
    * @param <Inputs> Number of inputs.
@@ -44,7 +43,6 @@ public final class Drake {
    * @param R Input cost matrix.
    * @return Solution of DARE.
    */
-  @SuppressWarnings({"ParameterName", "MethodTypeParameterName"})
   public static <States extends Num, Inputs extends Num>
       Matrix<States, States> discreteAlgebraicRiccatiEquation(
           Matrix<States, States> A,
@@ -57,7 +55,7 @@ public final class Drake {
   }
 
   /**
-   * Solves the discrete alegebraic Riccati equation.
+   * Solves the discrete algebraic Riccati equation.
    *
    * @param A System matrix.
    * @param B Input matrix.
@@ -66,7 +64,6 @@ public final class Drake {
    * @param N State-input cross-term cost matrix.
    * @return Solution of DARE.
    */
-  @SuppressWarnings({"LocalVariableName", "ParameterName"})
   public static SimpleMatrix discreteAlgebraicRiccatiEquation(
       SimpleMatrix A, SimpleMatrix B, SimpleMatrix Q, SimpleMatrix R, SimpleMatrix N) {
     // See
@@ -88,7 +85,7 @@ public final class Drake {
   }
 
   /**
-   * Solves the discrete alegebraic Riccati equation.
+   * Solves the discrete algebraic Riccati equation.
    *
    * @param <States> Number of states.
    * @param <Inputs> Number of inputs.
@@ -99,7 +96,6 @@ public final class Drake {
    * @param N State-input cross-term cost matrix.
    * @return Solution of DARE.
    */
-  @SuppressWarnings({"ParameterName", "MethodTypeParameterName"})
   public static <States extends Num, Inputs extends Num>
       Matrix<States, States> discreteAlgebraicRiccatiEquation(
           Matrix<States, States> A,

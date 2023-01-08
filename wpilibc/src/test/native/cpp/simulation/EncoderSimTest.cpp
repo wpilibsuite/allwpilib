@@ -91,7 +91,9 @@ TEST(EncoderSimTest, Period) {
   auto cb = sim.RegisterPeriodCallback(callback.GetCallback(), false);
   sim.SetPeriod(123.456);
   EXPECT_EQ(123.456, sim.GetPeriod());
+  WPI_IGNORE_DEPRECATED
   EXPECT_EQ(123.456, encoder.GetPeriod().value());
+  WPI_UNIGNORE_DEPRECATED
   EXPECT_EQ(kDefaultDistancePerPulse / 123.456, encoder.GetRate());
 
   EXPECT_TRUE(callback.WasTriggered());
@@ -110,7 +112,9 @@ TEST(EncoderSimTest, SetMaxPeriod) {
   DoubleCallback callback;
   auto cb = sim.RegisterMaxPeriodCallback(callback.GetCallback(), false);
 
+  WPI_IGNORE_DEPRECATED
   encoder.SetMaxPeriod(units::second_t{123.456});
+  WPI_UNIGNORE_DEPRECATED
   EXPECT_EQ(123.456, sim.GetMaxPeriod());
 
   EXPECT_TRUE(callback.WasTriggered());

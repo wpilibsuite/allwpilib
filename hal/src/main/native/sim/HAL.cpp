@@ -57,6 +57,10 @@ static std::vector<std::pair<void*, void (*)(void*)>> gOnShutdown;
 static SimPeriodicCallbackRegistry gSimPeriodicBefore;
 static SimPeriodicCallbackRegistry gSimPeriodicAfter;
 
+namespace hal {
+void InitializeDriverStation();
+}  // namespace hal
+
 namespace hal::init {
 void InitializeHAL() {
   InitializeAccelerometerData();
@@ -276,6 +280,14 @@ int64_t HAL_GetFPGARevision(int32_t* status) {
   return 0;  // TODO: Find a better number to return;
 }
 
+size_t HAL_GetSerialNumber(char* buffer, size_t size) {
+  return HALSIM_GetRoboRioSerialNumber(buffer, size);
+}
+
+size_t HAL_GetComments(char* buffer, size_t size) {
+  return HALSIM_GetRoboRioComments(buffer, size);
+}
+
 uint64_t HAL_GetFPGATime(int32_t* status) {
   return hal::GetFPGATime();
 }
@@ -335,7 +347,7 @@ HAL_Bool HAL_Initialize(int32_t timeout, int32_t mode) {
   hal::init::HAL_IsInitialized.store(true);
 
   hal::RestartTiming();
-  HAL_InitializeDriverStation();
+  hal::InitializeDriverStation();
 
   initialized = true;
 
@@ -407,6 +419,11 @@ int32_t HALSIM_RegisterSimPeriodicAfterCallback(
 
 void HALSIM_CancelSimPeriodicAfterCallback(int32_t uid) {
   gSimPeriodicAfter.Cancel(uid);
+}
+
+void HALSIM_CancelAllSimPeriodicCallbacks(void) {
+  gSimPeriodicBefore.Reset();
+  gSimPeriodicAfter.Reset();
 }
 
 int64_t HAL_Report(int32_t resource, int32_t instanceNumber, int32_t context,

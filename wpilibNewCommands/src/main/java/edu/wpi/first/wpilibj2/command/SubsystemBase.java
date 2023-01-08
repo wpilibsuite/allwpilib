@@ -11,6 +11,8 @@ import edu.wpi.first.util.sendable.SendableRegistry;
 /**
  * A base for subsystems that handles registration in the constructor, and provides a more intuitive
  * method for setting the default command.
+ *
+ * <p>This class is provided by the NewCommands VendorDep
  */
 public abstract class SubsystemBase implements Subsystem, Sendable {
   /** Constructor. */

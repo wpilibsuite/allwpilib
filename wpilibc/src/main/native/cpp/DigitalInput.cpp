@@ -4,7 +4,6 @@
 
 #include "frc/DigitalInput.h"
 
-#include <iostream>
 #include <limits>
 
 #include <hal/DIO.h>
@@ -70,5 +69,5 @@ int DigitalInput::GetChannel() const {
 void DigitalInput::InitSendable(wpi::SendableBuilder& builder) {
   builder.SetSmartDashboardType("Digital Input");
   builder.AddBooleanProperty(
-      "Value", [=] { return Get(); }, nullptr);
+      "Value", [=, this] { return Get(); }, nullptr);
 }

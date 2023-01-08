@@ -30,7 +30,7 @@ Trajectory TrajectoryGenerator::GenerateTrajectory(
     Spline<3>::ControlVector initial,
     const std::vector<Translation2d>& interiorWaypoints,
     Spline<3>::ControlVector end, const TrajectoryConfig& config) {
-  const Transform2d flip{Translation2d(), Rotation2d(180_deg)};
+  const Transform2d flip{Translation2d{}, 180_deg};
 
   // Make theta normal for trajectory generation if path is reversed.
   // Flip the headings.
@@ -76,7 +76,7 @@ Trajectory TrajectoryGenerator::GenerateTrajectory(
 Trajectory TrajectoryGenerator::GenerateTrajectory(
     std::vector<Spline<5>::ControlVector> controlVectors,
     const TrajectoryConfig& config) {
-  const Transform2d flip{Translation2d(), Rotation2d(180_deg)};
+  const Transform2d flip{Translation2d{}, 180_deg};
   // Make theta normal for trajectory generation if path is reversed.
   if (config.IsReversed()) {
     for (auto& vector : controlVectors) {
@@ -112,7 +112,7 @@ Trajectory TrajectoryGenerator::GenerateTrajectory(
 Trajectory TrajectoryGenerator::GenerateTrajectory(
     const std::vector<Pose2d>& waypoints, const TrajectoryConfig& config) {
   auto newWaypoints = waypoints;
-  const Transform2d flip{Translation2d(), Rotation2d(180_deg)};
+  const Transform2d flip{Translation2d{}, 180_deg};
   if (config.IsReversed()) {
     for (auto& waypoint : newWaypoints) {
       waypoint = waypoint + flip;
@@ -140,4 +140,9 @@ Trajectory TrajectoryGenerator::GenerateTrajectory(
       points, config.Constraints(), config.StartVelocity(),
       config.EndVelocity(), config.MaxVelocity(), config.MaxAcceleration(),
       config.IsReversed());
+}
+
+void TrajectoryGenerator::SetErrorHandler(
+    std::function<void(const char*)> func) {
+  s_errorFunc = std::move(func);
 }

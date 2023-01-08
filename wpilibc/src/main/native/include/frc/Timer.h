@@ -5,7 +5,6 @@
 #pragma once
 
 #include <units/time.h>
-#include <wpi/deprecated.h>
 
 namespace frc {
 
@@ -93,18 +92,6 @@ class Timer {
    * @return       True if the period has passed.
    */
   bool HasElapsed(units::second_t period) const;
-
-  /**
-   * Check if the period specified has passed and if it has, advance the start
-   * time by that period. This is useful to decide if it's time to do periodic
-   * work without drifting later by the time it took to get around to checking.
-   *
-   * @param period The period to check for.
-   * @return       True if the period has passed.
-   * @deprecated Use AdvanceIfElapsed() instead.
-   */
-  WPI_DEPRECATED("Use AdvanceIfElapsed() instead.")
-  bool HasPeriodPassed(units::second_t period);
 
   /**
    * Check if the period specified has passed and if it has, advance the start

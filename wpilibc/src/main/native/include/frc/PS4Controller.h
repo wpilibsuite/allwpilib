@@ -99,6 +99,15 @@ class PS4Controller : public GenericHID {
   bool GetSquareButtonReleased();
 
   /**
+   * Constructs an event instance around the square button's digital signal.
+   *
+   * @param loop the event loop instance to attach the event to.
+   * @return an event instance representing the square button's digital signal
+   * attached to the given loop.
+   */
+  BooleanEvent Square(EventLoop* loop) const;
+
+  /**
    * Read the value of the Cross button on the controller.
    *
    * @return The state of the button.
@@ -118,6 +127,15 @@ class PS4Controller : public GenericHID {
    * @return Whether the button was released since the last check.
    */
   bool GetCrossButtonReleased();
+
+  /**
+   * Constructs an event instance around the cross button's digital signal.
+   *
+   * @param loop the event loop instance to attach the event to.
+   * @return an event instance representing the cross button's digital signal
+   * attached to the given loop.
+   */
+  BooleanEvent Cross(EventLoop* loop) const;
 
   /**
    * Read the value of the Circle button on the controller.
@@ -141,6 +159,15 @@ class PS4Controller : public GenericHID {
   bool GetCircleButtonReleased();
 
   /**
+   * Constructs an event instance around the circle button's digital signal.
+   *
+   * @param loop the event loop instance to attach the event to.
+   * @return an event instance representing the circle button's digital signal
+   * attached to the given loop.
+   */
+  BooleanEvent Circle(EventLoop* loop) const;
+
+  /**
    * Read the value of the Triangle button on the controller.
    *
    * @return The state of the button.
@@ -160,6 +187,15 @@ class PS4Controller : public GenericHID {
    * @return Whether the button was released since the last check.
    */
   bool GetTriangleButtonReleased();
+
+  /**
+   * Constructs an event instance around the triangle button's digital signal.
+   *
+   * @param loop the event loop instance to attach the event to.
+   * @return an event instance representing the triangle button's digital signal
+   * attached to the given loop.
+   */
+  BooleanEvent Triangle(EventLoop* loop) const;
 
   /**
    * Read the value of the L1 button on the controller.
@@ -183,6 +219,15 @@ class PS4Controller : public GenericHID {
   bool GetL1ButtonReleased();
 
   /**
+   * Constructs an event instance around the L1 button's digital signal.
+   *
+   * @param loop the event loop instance to attach the event to.
+   * @return an event instance representing the L1 button's digital signal
+   * attached to the given loop.
+   */
+  BooleanEvent L1(EventLoop* loop) const;
+
+  /**
    * Read the value of the R1 button on the controller.
    *
    * @return The state of the button.
@@ -202,6 +247,15 @@ class PS4Controller : public GenericHID {
    * @return Whether the button was released since the last check.
    */
   bool GetR1ButtonReleased();
+
+  /**
+   * Constructs an event instance around the R1 button's digital signal.
+   *
+   * @param loop the event loop instance to attach the event to.
+   * @return an event instance representing the R1 button's digital signal
+   * attached to the given loop.
+   */
+  BooleanEvent R1(EventLoop* loop) const;
 
   /**
    * Read the value of the L2 button on the controller.
@@ -225,6 +279,15 @@ class PS4Controller : public GenericHID {
   bool GetL2ButtonReleased();
 
   /**
+   * Constructs an event instance around the L2 button's digital signal.
+   *
+   * @param loop the event loop instance to attach the event to.
+   * @return an event instance representing the L2 button's digital signal
+   * attached to the given loop.
+   */
+  BooleanEvent L2(EventLoop* loop) const;
+
+  /**
    * Read the value of the R2 button on the controller.
    *
    * @return The state of the button.
@@ -244,6 +307,15 @@ class PS4Controller : public GenericHID {
    * @return Whether the button was released since the last check.
    */
   bool GetR2ButtonReleased();
+
+  /**
+   * Constructs an event instance around the R2 button's digital signal.
+   *
+   * @param loop the event loop instance to attach the event to.
+   * @return an event instance representing the R2 button's digital signal
+   * attached to the given loop.
+   */
+  BooleanEvent R2(EventLoop* loop) const;
 
   /**
    * Read the value of the Share button on the controller.
@@ -267,6 +339,15 @@ class PS4Controller : public GenericHID {
   bool GetShareButtonReleased();
 
   /**
+   * Constructs an event instance around the share button's digital signal.
+   *
+   * @param loop the event loop instance to attach the event to.
+   * @return an event instance representing the share button's digital signal
+   * attached to the given loop.
+   */
+  BooleanEvent Share(EventLoop* loop) const;
+
+  /**
    * Read the value of the Options button on the controller.
    *
    * @return The state of the button.
@@ -286,6 +367,15 @@ class PS4Controller : public GenericHID {
    * @return Whether the button was released since the last check.
    */
   bool GetOptionsButtonReleased();
+
+  /**
+   * Constructs an event instance around the options button's digital signal.
+   *
+   * @param loop the event loop instance to attach the event to.
+   * @return an event instance representing the options button's digital signal
+   * attached to the given loop.
+   */
+  BooleanEvent Options(EventLoop* loop) const;
 
   /**
    * Read the value of the L3 button (pressing the left analog stick) on the
@@ -310,6 +400,15 @@ class PS4Controller : public GenericHID {
   bool GetL3ButtonReleased();
 
   /**
+   * Constructs an event instance around the L3 button's digital signal.
+   *
+   * @param loop the event loop instance to attach the event to.
+   * @return an event instance representing the L3 button's digital signal
+   * attached to the given loop.
+   */
+  BooleanEvent L3(EventLoop* loop) const;
+
+  /**
    * Read the value of the R3 button (pressing the right analog stick) on the
    * controller.
    *
@@ -330,6 +429,15 @@ class PS4Controller : public GenericHID {
    * @return Whether the button was released since the last check.
    */
   bool GetR3ButtonReleased();
+
+  /**
+   * Constructs an event instance around the R3 button's digital signal.
+   *
+   * @param loop the event loop instance to attach the event to.
+   * @return an event instance representing the R3 button's digital signal
+   * attached to the given loop.
+   */
+  BooleanEvent R3(EventLoop* loop) const;
 
   /**
    * Read the value of the PS button on the controller.
@@ -353,6 +461,15 @@ class PS4Controller : public GenericHID {
   bool GetPSButtonReleased();
 
   /**
+   * Constructs an event instance around the PS button's digital signal.
+   *
+   * @param loop the event loop instance to attach the event to.
+   * @return an event instance representing the PS button's digital signal
+   * attached to the given loop.
+   */
+  BooleanEvent PS(EventLoop* loop) const;
+
+  /**
    * Read the value of the touchpad button on the controller.
    *
    * @return The state of the button.
@@ -372,6 +489,15 @@ class PS4Controller : public GenericHID {
    * @return Whether the touchpad was released since the last check.
    */
   bool GetTouchpadReleased();
+
+  /**
+   * Constructs an event instance around the touchpad's digital signal.
+   *
+   * @param loop the event loop instance to attach the event to.
+   * @return an event instance representing the touchpad's digital signal
+   * attached to the given loop.
+   */
+  BooleanEvent Touchpad(EventLoop* loop) const;
 
   struct Button {
     static constexpr int kSquare = 1;

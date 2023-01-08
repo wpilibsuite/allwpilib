@@ -6,11 +6,9 @@
 
 #include <stdint.h>
 
+#include <span>
 #include <string>
 #include <string_view>
-
-#include <wpi/deprecated.h>
-#include <wpi/span.h>
 
 #include "cscore.h"
 #include "cscore_cv.h"
@@ -28,13 +26,6 @@ class CameraServer {
   static constexpr int kSize640x480 = 0;
   static constexpr int kSize320x240 = 1;
   static constexpr int kSize160x120 = 2;
-
-  /**
-   * Get the CameraServer instance.
-   * @deprecated Use the static methods
-   */
-  WPI_DEPRECATED("Use static methods")
-  static CameraServer* GetInstance();
 
   /**
    * Start automatically capturing images to send to the dashboard.
@@ -118,7 +109,7 @@ class CameraServer {
    *
    * @param hosts Array of Camera host IPs/DNS names
    */
-  static cs::AxisCamera AddAxisCamera(wpi::span<const std::string> hosts);
+  static cs::AxisCamera AddAxisCamera(std::span<const std::string> hosts);
 
   /**
    * Adds an Axis IP camera.
@@ -163,7 +154,7 @@ class CameraServer {
    * @param hosts Array of Camera host IPs/DNS names
    */
   static cs::AxisCamera AddAxisCamera(std::string_view name,
-                                      wpi::span<const std::string> hosts);
+                                      std::span<const std::string> hosts);
 
   /**
    * Adds an Axis IP camera.

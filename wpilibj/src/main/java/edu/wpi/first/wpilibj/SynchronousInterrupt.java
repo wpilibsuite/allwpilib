@@ -4,7 +4,7 @@
 
 package edu.wpi.first.wpilibj;
 
-import static edu.wpi.first.wpilibj.util.ErrorMessages.requireNonNullParam;
+import static edu.wpi.first.util.ErrorMessages.requireNonNullParam;
 
 import edu.wpi.first.hal.InterruptJNI;
 
@@ -21,14 +21,13 @@ public class SynchronousInterrupt implements AutoCloseable {
 
   private final int m_handle;
 
-  @SuppressWarnings("JavadocMethod")
+  /** Event trigger combinations for a synchronous interrupt. */
   public enum WaitResult {
     kTimeout(0x0),
     kRisingEdge(0x1),
     kFallingEdge(0x100),
     kBoth(0x101);
 
-    @SuppressWarnings("MemberName")
     public final int value;
 
     WaitResult(int value) {
@@ -91,7 +90,7 @@ public class SynchronousInterrupt implements AutoCloseable {
    *     interrupt was read.
    * @return The raw hardware interrupt result
    */
-  int waitForInterruptRaw(double timeoutSeconds, boolean ignorePrevious) {
+  long waitForInterruptRaw(double timeoutSeconds, boolean ignorePrevious) {
     return InterruptJNI.waitForInterrupt(m_handle, timeoutSeconds, ignorePrevious);
   }
 
@@ -102,14 +101,14 @@ public class SynchronousInterrupt implements AutoCloseable {
    * @param ignorePrevious True to ignore if a previous interrupt has occurred, and only wait for a
    *     new trigger. False will consider if an interrupt has occurred since the last time the
    *     interrupt was read.
-   * @return Result of which edges were triggered, or if an timeout occurred.
+   * @return Result of which edges were triggered, or if a timeout occurred.
    */
   public WaitResult waitForInterrupt(double timeoutSeconds, boolean ignorePrevious) {
-    int result = InterruptJNI.waitForInterrupt(m_handle, timeoutSeconds, ignorePrevious);
+    long result = InterruptJNI.waitForInterrupt(m_handle, timeoutSeconds, ignorePrevious);
 
     // Rising edge result is the interrupt bit set in the byte 0xFF
     // Falling edge result is the interrupt bit set in the byte 0xFF00
-    // Set any bit set to be true for that edge, and AND the 2 results
+    // Set any bit set to be true for that edge, and then conduct a logical AND on the 2 results
     // together to match the existing enum for all interrupts
     boolean rising = (result & 0xFF) != 0;
     boolean falling = (result & 0xFF00) != 0;
@@ -120,7 +119,7 @@ public class SynchronousInterrupt implements AutoCloseable {
    * Wait for an interrupt, ignoring any previously occurring interrupts.
    *
    * @param timeoutSeconds The timeout in seconds. 0 or less will return immediately.
-   * @return Result of which edges were triggered, or if an timeout occurred.
+   * @return Result of which edges were triggered, or if a timeout occurred.
    */
   public WaitResult waitForInterrupt(double timeoutSeconds) {
     return waitForInterrupt(timeoutSeconds, true);

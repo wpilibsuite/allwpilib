@@ -4,19 +4,16 @@
 
 #pragma once
 
-#include <string_view>
-
 #include "glass/WindowManager.h"
-#include "glass/support/IniSaverBase.h"
 
 namespace glass {
 
 class PlotProvider : private WindowManager {
  public:
-  explicit PlotProvider(std::string_view iniName);
+  explicit PlotProvider(Storage& storage);
   ~PlotProvider() override;
 
-  void GlobalInit() override;
+  using WindowManager::GlobalInit;
 
   /**
    * Pauses or unpauses all plots.
@@ -33,24 +30,6 @@ class PlotProvider : private WindowManager {
   void DisplayMenu() override;
 
  private:
-  void DisplayWindows() override;
-
-  class IniSaver : public IniSaverBase {
-   public:
-    explicit IniSaver(std::string_view typeName, PlotProvider* provider,
-                      bool forSeries);
-
-    void* IniReadOpen(const char* name) override;
-    void IniReadLine(void* entry, const char* lineStr) override;
-    void IniWriteAll(ImGuiTextBuffer* out_buf) override;
-
-   private:
-    PlotProvider* m_provider;
-    bool m_forSeries;
-  };
-
-  IniSaver m_plotSaver;
-  IniSaver m_seriesSaver;
   bool m_paused = false;
 };
 

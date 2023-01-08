@@ -6,10 +6,10 @@
 
 #include <functional>
 #include <initializer_list>
+#include <span>
 
 #include <frc/Timer.h>
 #include <frc/trajectory/TrapezoidProfile.h>
-#include <wpi/span.h>
 
 #include "frc2/command/CommandBase.h"
 #include "frc2/command/CommandHelper.h"
@@ -18,6 +18,8 @@ namespace frc2 {
 /**
  * A command that runs a TrapezoidProfile.  Useful for smoothly controlling
  * mechanism motion.
+ *
+ * This class is provided by the NewCommands VendorDep
  *
  * @see TrapezoidProfile
  */
@@ -56,7 +58,7 @@ class TrapezoidProfileCommand
    */
   TrapezoidProfileCommand(frc::TrapezoidProfile<Distance> profile,
                           std::function<void(State)> output,
-                          wpi::span<Subsystem* const> requirements = {})
+                          std::span<Subsystem* const> requirements = {})
       : m_profile(profile), m_output(output) {
     this->AddRequirements(requirements);
   }

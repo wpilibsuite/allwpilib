@@ -6,6 +6,8 @@
 
 #include <hal/FRCUsageReporting.h>
 
+#include "frc/event/BooleanEvent.h"
+
 using namespace frc;
 
 PS4Controller::PS4Controller(int port) : GenericHID(port) {
@@ -48,6 +50,10 @@ bool PS4Controller::GetSquareButtonReleased() {
   return GetRawButtonReleased(Button::kSquare);
 }
 
+BooleanEvent PS4Controller::Square(EventLoop* loop) const {
+  return BooleanEvent(loop, [this]() { return this->GetSquareButton(); });
+}
+
 bool PS4Controller::GetCrossButton() const {
   return GetRawButton(Button::kCross);
 }
@@ -58,6 +64,10 @@ bool PS4Controller::GetCrossButtonPressed() {
 
 bool PS4Controller::GetCrossButtonReleased() {
   return GetRawButtonReleased(Button::kCross);
+}
+
+BooleanEvent PS4Controller::Cross(EventLoop* loop) const {
+  return BooleanEvent(loop, [this]() { return this->GetCrossButton(); });
 }
 
 bool PS4Controller::GetCircleButton() const {
@@ -72,6 +82,10 @@ bool PS4Controller::GetCircleButtonReleased() {
   return GetRawButtonReleased(Button::kCircle);
 }
 
+BooleanEvent PS4Controller::Circle(EventLoop* loop) const {
+  return BooleanEvent(loop, [this]() { return this->GetCircleButton(); });
+}
+
 bool PS4Controller::GetTriangleButton() const {
   return GetRawButton(Button::kTriangle);
 }
@@ -82,6 +96,10 @@ bool PS4Controller::GetTriangleButtonPressed() {
 
 bool PS4Controller::GetTriangleButtonReleased() {
   return GetRawButtonReleased(Button::kTriangle);
+}
+
+BooleanEvent PS4Controller::Triangle(EventLoop* loop) const {
+  return BooleanEvent(loop, [this]() { return this->GetTriangleButton(); });
 }
 
 bool PS4Controller::GetL1Button() const {
@@ -96,6 +114,10 @@ bool PS4Controller::GetL1ButtonReleased() {
   return GetRawButtonReleased(Button::kL1);
 }
 
+BooleanEvent PS4Controller::L1(EventLoop* loop) const {
+  return BooleanEvent(loop, [this]() { return this->GetL1Button(); });
+}
+
 bool PS4Controller::GetR1Button() const {
   return GetRawButton(Button::kR1);
 }
@@ -106,6 +128,10 @@ bool PS4Controller::GetR1ButtonPressed() {
 
 bool PS4Controller::GetR1ButtonReleased() {
   return GetRawButtonReleased(Button::kR1);
+}
+
+BooleanEvent PS4Controller::R1(EventLoop* loop) const {
+  return BooleanEvent(loop, [this]() { return this->GetR1Button(); });
 }
 
 bool PS4Controller::GetL2Button() const {
@@ -120,6 +146,10 @@ bool PS4Controller::GetL2ButtonReleased() {
   return GetRawButtonReleased(Button::kL2);
 }
 
+BooleanEvent PS4Controller::L2(EventLoop* loop) const {
+  return BooleanEvent(loop, [this]() { return this->GetL2Button(); });
+}
+
 bool PS4Controller::GetR2Button() const {
   return GetRawButton(Button::kR2);
 }
@@ -130,6 +160,10 @@ bool PS4Controller::GetR2ButtonPressed() {
 
 bool PS4Controller::GetR2ButtonReleased() {
   return GetRawButtonReleased(Button::kR2);
+}
+
+BooleanEvent PS4Controller::R2(EventLoop* loop) const {
+  return BooleanEvent(loop, [this]() { return this->GetR2Button(); });
 }
 
 bool PS4Controller::GetShareButton() const {
@@ -144,6 +178,10 @@ bool PS4Controller::GetShareButtonReleased() {
   return GetRawButtonReleased(Button::kShare);
 }
 
+BooleanEvent PS4Controller::Share(EventLoop* loop) const {
+  return BooleanEvent(loop, [this]() { return this->GetShareButton(); });
+}
+
 bool PS4Controller::GetOptionsButton() const {
   return GetRawButton(Button::kOptions);
 }
@@ -154,6 +192,10 @@ bool PS4Controller::GetOptionsButtonPressed() {
 
 bool PS4Controller::GetOptionsButtonReleased() {
   return GetRawButtonReleased(Button::kOptions);
+}
+
+BooleanEvent PS4Controller::Options(EventLoop* loop) const {
+  return BooleanEvent(loop, [this]() { return this->GetOptionsButton(); });
 }
 
 bool PS4Controller::GetL3Button() const {
@@ -168,6 +210,10 @@ bool PS4Controller::GetL3ButtonReleased() {
   return GetRawButtonReleased(Button::kL3);
 }
 
+BooleanEvent PS4Controller::L3(EventLoop* loop) const {
+  return BooleanEvent(loop, [this]() { return this->GetL3Button(); });
+}
+
 bool PS4Controller::GetR3Button() const {
   return GetRawButton(Button::kR3);
 }
@@ -178,6 +224,10 @@ bool PS4Controller::GetR3ButtonPressed() {
 
 bool PS4Controller::GetR3ButtonReleased() {
   return GetRawButtonReleased(Button::kR3);
+}
+
+BooleanEvent PS4Controller::R3(EventLoop* loop) const {
+  return BooleanEvent(loop, [this]() { return this->GetR3Button(); });
 }
 
 bool PS4Controller::GetPSButton() const {
@@ -192,6 +242,10 @@ bool PS4Controller::GetPSButtonReleased() {
   return GetRawButtonReleased(Button::kPS);
 }
 
+BooleanEvent PS4Controller::PS(EventLoop* loop) const {
+  return BooleanEvent(loop, [this]() { return this->GetPSButton(); });
+}
+
 bool PS4Controller::GetTouchpad() const {
   return GetRawButton(Button::kTouchpad);
 }
@@ -202,4 +256,8 @@ bool PS4Controller::GetTouchpadPressed() {
 
 bool PS4Controller::GetTouchpadReleased() {
   return GetRawButtonReleased(Button::kTouchpad);
+}
+
+BooleanEvent PS4Controller::Touchpad(EventLoop* loop) const {
+  return BooleanEvent(loop, [this]() { return this->GetTouchpad(); });
 }

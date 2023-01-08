@@ -81,12 +81,14 @@ test {
     finalizedBy jacocoTestReport
 }
 
-if (project.hasProperty('onlylinuxathena') || project.hasProperty('onlylinuxraspbian') || project.hasProperty('onlylinuxaarch64bionic')) {
+if (project.hasProperty('onlylinuxathena') || project.hasProperty('onlylinuxarm32') || project.hasProperty('onlylinuxarm64')) {
     test.enabled = false
 }
 
 repositories {
-    mavenCentral()
+    maven {
+        url = 'https://frcmaven.wpi.edu/artifactory/ex-mvn'
+    }
     //maven.url "https://oss.sonatype.org/content/repositories/snapshots/"
 }
 
@@ -99,14 +101,20 @@ tasks.withType(JavaCompile).configureEach {
         '--release',
         '11',
         '-encoding',
-        'UTF8'
+        'UTF8',
+        "-Werror",
+        "-Xlint:all",
+        // ignore AutoCloseable warnings
+        "-Xlint:-try",
+        // ignore missing serialVersionUID warnings
+        "-Xlint:-serial",
     ]
 }
 
 dependencies {
-    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.4.2'
-    testImplementation 'org.junit.jupiter:junit-jupiter-params:5.4.2'
-    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.4.2'
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.2'
+    testImplementation 'org.junit.jupiter:junit-jupiter-params:5.8.2'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.2'
 
     devImplementation sourceSets.main.output
 }
@@ -120,7 +128,7 @@ task run(type: JavaExec) {
 build.dependsOn devClasses
 
 jacoco {
-    toolVersion = "0.8.4"
+    toolVersion = "0.8.8"
 }
 
 jacocoTestReport {

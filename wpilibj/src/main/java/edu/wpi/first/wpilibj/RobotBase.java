@@ -14,6 +14,7 @@ import edu.wpi.first.hal.HALUtil;
 import edu.wpi.first.math.MathShared;
 import edu.wpi.first.math.MathSharedStore;
 import edu.wpi.first.math.MathUsageId;
+import edu.wpi.first.networktables.MultiSubscriber;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
@@ -37,6 +38,8 @@ public abstract class RobotBase implements AutoCloseable {
   /** The ID of the main Java thread. */
   // This is usually 1, but it is best to make sure
   private static long m_threadId = -1;
+
+  private final MultiSubscriber m_suball;
 
   private static void setupCameraServerShared() {
     CameraServerShared shared =
@@ -134,20 +137,34 @@ public abstract class RobotBase implements AutoCloseable {
    * completion before Autonomous is entered.
    *
    * <p>This must be used to ensure that the communications code starts. In the future it would be
-   * nice to put this code into it's own task that loads on boot so ensure that it runs.
+   * nice to put this code into its own task that loads on boot so ensure that it runs.
    */
   protected RobotBase() {
     final NetworkTableInstance inst = NetworkTableInstance.getDefault();
     m_threadId = Thread.currentThread().getId();
     setupCameraServerShared();
     setupMathShared();
-    inst.setNetworkIdentity("Robot");
+    // subscribe to "" to force persistent values to propagate to local
+    m_suball = new MultiSubscriber(inst, new String[] {""});
     if (isReal()) {
-      inst.startServer("/home/lvuser/networktables.ini");
+      inst.startServer("/home/lvuser/networktables.json");
     } else {
       inst.startServer();
     }
-    inst.getTable("LiveWindow").getSubTable(".status").getEntry("LW Enabled").setBoolean(false);
+
+    // wait for the NT server to actually start
+    try {
+      int count = 0;
+      while (inst.getNetworkMode().contains(NetworkTableInstance.NetworkMode.kStarting)) {
+        Thread.sleep(10);
+        count++;
+        if (count > 100) {
+          throw new InterruptedException();
+        }
+      }
+    } catch (InterruptedException ex) {
+      System.err.println("timed out while waiting for NT server to start");
+    }
 
     LiveWindow.setEnabled(false);
     Shuffleboard.disableActuatorWidgets();
@@ -158,7 +175,9 @@ public abstract class RobotBase implements AutoCloseable {
   }
 
   @Override
-  public void close() {}
+  public void close() {
+    m_suball.close();
+  }
 
   /**
    * Get the current runtime type.
@@ -239,33 +258,9 @@ public abstract class RobotBase implements AutoCloseable {
    * controls.
    *
    * @return True if the robot is currently operating in Tele-Op mode.
-   * @deprecated Use isTeleop() instead.
-   */
-  @Deprecated(since = "2022", forRemoval = true)
-  public boolean isOperatorControl() {
-    return DriverStation.isTeleop();
-  }
-
-  /**
-   * Determine if the robot is currently in Operator Control mode as determined by the field
-   * controls.
-   *
-   * @return True if the robot is currently operating in Tele-Op mode.
    */
   public boolean isTeleop() {
     return DriverStation.isTeleop();
-  }
-
-  /**
-   * Determine if the robot is current in Operator Control mode and enabled as determined by the
-   * field controls.
-   *
-   * @return True if the robot is currently operating in Tele-Op mode while enabled.
-   * @deprecated Use isTeleopEnabled() instead.
-   */
-  @Deprecated(since = "2022", forRemoval = true)
-  public boolean isOperatorControlEnabled() {
-    return DriverStation.isTeleopEnabled();
   }
 
   /**
@@ -278,42 +273,17 @@ public abstract class RobotBase implements AutoCloseable {
     return DriverStation.isTeleopEnabled();
   }
 
-  /**
-   * Indicates if new data is available from the driver station.
-   *
-   * @return Has new data arrived over the network since the last time this function was called?
-   */
-  public boolean isNewDataAvailable() {
-    return DriverStation.isNewControlData();
-  }
-
   /** Provide an alternate "main loop" via startCompetition(). */
   public abstract void startCompetition();
 
   /** Ends the main loop in startCompetition(). */
   public abstract void endCompetition();
 
-  @SuppressWarnings("MissingJavadocMethod")
-  public static boolean getBooleanProperty(String name, boolean defaultValue) {
-    String propVal = System.getProperty(name);
-    if (propVal == null) {
-      return defaultValue;
-    }
-    if ("false".equalsIgnoreCase(propVal)) {
-      return false;
-    } else if ("true".equalsIgnoreCase(propVal)) {
-      return true;
-    } else {
-      throw new IllegalStateException(propVal);
-    }
-  }
-
   private static final ReentrantLock m_runMutex = new ReentrantLock();
   private static RobotBase m_robotCopy;
   private static boolean m_suppressExitWarning;
 
   /** Run the robot main loop. */
-  @SuppressWarnings("PMD.AvoidCatchingThrowable")
   private static <T extends RobotBase> void runRobot(Supplier<T> robotSupplier) {
     System.out.println("********** Robot program starting **********");
 

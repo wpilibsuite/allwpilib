@@ -4,7 +4,6 @@
 
 package edu.wpi.first.hal;
 
-@SuppressWarnings("AbbreviationAsWordInName")
 public class DIOJNI extends JNIWrapper {
   public static native int initializeDIOPort(int halPortHandle, boolean input);
 
@@ -22,7 +21,9 @@ public class DIOJNI extends JNIWrapper {
 
   public static native boolean getDIODirection(int dioPortHandle);
 
-  public static native void pulse(int dioPortHandle, double pulseLength);
+  public static native void pulse(int dioPortHandle, double pulseLengthSeconds);
+
+  public static native void pulseMultiple(long channelMask, double pulseLengthSeconds);
 
   public static native boolean isPulsing(int dioPortHandle);
 
@@ -37,6 +38,8 @@ public class DIOJNI extends JNIWrapper {
   public static native void setDigitalPWMRate(double rate);
 
   public static native void setDigitalPWMDutyCycle(int pwmGenerator, double dutyCycle);
+
+  public static native void setDigitalPWMPPS(int pwmGenerator, double dutyCycle);
 
   public static native void setDigitalPWMOutputChannel(int pwmGenerator, int channel);
 }

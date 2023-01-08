@@ -18,7 +18,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
 
-public class DriverStationSimTest {
+class DriverStationSimTest {
   @Test
   void testEnabled() {
     HAL.initialize(500, 0);
@@ -37,7 +37,7 @@ public class DriverStationSimTest {
   }
 
   @Test
-  void testAutonomus() {
+  void testAutonomous() {
     HAL.initialize(500, 0);
     DriverStationSim.resetData();
 
@@ -137,6 +137,7 @@ public class DriverStationSimTest {
       // B1
       allianceStation = AllianceStationID.Blue1;
       DriverStationSim.setAllianceStationId(allianceStation);
+      DriverStationSim.notifyNewData();
       assertEquals(allianceStation, DriverStationSim.getAllianceStationId());
       assertEquals(DriverStation.Alliance.Blue, DriverStation.getAlliance());
       assertEquals(1, DriverStation.getLocation());
@@ -146,6 +147,7 @@ public class DriverStationSimTest {
       // B2
       allianceStation = AllianceStationID.Blue2;
       DriverStationSim.setAllianceStationId(allianceStation);
+      DriverStationSim.notifyNewData();
       assertEquals(allianceStation, DriverStationSim.getAllianceStationId());
       assertEquals(DriverStation.Alliance.Blue, DriverStation.getAlliance());
       assertEquals(2, DriverStation.getLocation());
@@ -155,6 +157,7 @@ public class DriverStationSimTest {
       // B3
       allianceStation = AllianceStationID.Blue3;
       DriverStationSim.setAllianceStationId(allianceStation);
+      DriverStationSim.notifyNewData();
       assertEquals(allianceStation, DriverStationSim.getAllianceStationId());
       assertEquals(DriverStation.Alliance.Blue, DriverStation.getAlliance());
       assertEquals(3, DriverStation.getLocation());
@@ -164,6 +167,7 @@ public class DriverStationSimTest {
       // R1
       allianceStation = AllianceStationID.Red1;
       DriverStationSim.setAllianceStationId(allianceStation);
+      DriverStationSim.notifyNewData();
       assertEquals(allianceStation, DriverStationSim.getAllianceStationId());
       assertEquals(DriverStation.Alliance.Red, DriverStation.getAlliance());
       assertEquals(1, DriverStation.getLocation());
@@ -173,6 +177,7 @@ public class DriverStationSimTest {
       // R2
       allianceStation = AllianceStationID.Red2;
       DriverStationSim.setAllianceStationId(allianceStation);
+      DriverStationSim.notifyNewData();
       assertEquals(allianceStation, DriverStationSim.getAllianceStationId());
       assertEquals(DriverStation.Alliance.Red, DriverStation.getAlliance());
       assertEquals(2, DriverStation.getLocation());
@@ -182,6 +187,7 @@ public class DriverStationSimTest {
       // R3
       allianceStation = AllianceStationID.Red3;
       DriverStationSim.setAllianceStationId(allianceStation);
+      DriverStationSim.notifyNewData();
       assertEquals(allianceStation, DriverStationSim.getAllianceStationId());
       assertEquals(DriverStation.Alliance.Red, DriverStation.getAlliance());
       assertEquals(3, DriverStation.getLocation());
@@ -192,7 +198,7 @@ public class DriverStationSimTest {
 
   @ParameterizedTest
   @EnumSource(DriverStation.MatchType.class)
-  public void testMatchType(DriverStation.MatchType matchType) {
+  void testMatchType(DriverStation.MatchType matchType) {
     HAL.initialize(500, 0);
     DriverStationSim.resetData();
 
@@ -202,7 +208,7 @@ public class DriverStationSimTest {
   }
 
   @Test
-  public void testReplayNumber() {
+  void testReplayNumber() {
     HAL.initialize(500, 0);
     DriverStationSim.resetData();
 
@@ -212,7 +218,7 @@ public class DriverStationSimTest {
   }
 
   @Test
-  public void testMatchNumber() {
+  void testMatchNumber() {
     HAL.initialize(500, 0);
     DriverStationSim.resetData();
 
@@ -222,7 +228,7 @@ public class DriverStationSimTest {
   }
 
   @Test
-  public void testMatchTime() {
+  void testMatchTime() {
     HAL.initialize(500, 0);
     DriverStationSim.resetData();
 
@@ -230,6 +236,7 @@ public class DriverStationSimTest {
     try (CallbackStore cb = DriverStationSim.registerMatchTimeCallback(callback, false)) {
       final double testTime = 19.174;
       DriverStationSim.setMatchTime(testTime);
+      DriverStationSim.notifyNewData();
       assertEquals(testTime, DriverStationSim.getMatchTime());
       assertEquals(testTime, DriverStation.getMatchTime());
       assertTrue(callback.wasTriggered());
@@ -238,7 +245,7 @@ public class DriverStationSimTest {
   }
 
   @Test
-  public void testSetGameSpecificMessage() {
+  void testSetGameSpecificMessage() {
     HAL.initialize(500, 0);
     DriverStationSim.resetData();
 
@@ -249,7 +256,7 @@ public class DriverStationSimTest {
   }
 
   @Test
-  public void testSetEventName() {
+  void testSetEventName() {
     HAL.initialize(500, 0);
     DriverStationSim.resetData();
 

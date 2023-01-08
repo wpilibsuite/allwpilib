@@ -17,7 +17,7 @@
 class SetWristSetpoint
     : public frc2::CommandHelper<frc2::CommandBase, SetWristSetpoint> {
  public:
-  explicit SetWristSetpoint(double setpoint, Wrist* wrist);
+  explicit SetWristSetpoint(double setpoint, Wrist& wrist);
   void Initialize() override;
   bool IsFinished() override;
 

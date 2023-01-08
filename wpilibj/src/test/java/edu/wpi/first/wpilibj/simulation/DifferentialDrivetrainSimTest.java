@@ -30,7 +30,7 @@ import org.junit.jupiter.api.Test;
 
 class DifferentialDrivetrainSimTest {
   @Test
-  public void testConvergence() {
+  void testConvergence() {
     var motor = DCMotor.getNEO(2);
     var plant =
         LinearSystemId.createDrivetrainVelocitySystem(
@@ -62,7 +62,7 @@ class DifferentialDrivetrainSimTest {
                 .addConstraint(new DifferentialDriveKinematicsConstraint(kinematics, 1)));
 
     for (double t = 0; t < traj.getTotalTimeSeconds(); t += 0.020) {
-      var state = traj.sample(0.020);
+      var state = traj.sample(t);
       var ramseteOut = ramsete.calculate(sim.getPose(), state);
 
       var wheelSpeeds = kinematics.toWheelSpeeds(ramseteOut);
@@ -96,7 +96,7 @@ class DifferentialDrivetrainSimTest {
   }
 
   @Test
-  public void testCurrent() {
+  void testCurrent() {
     var motor = DCMotor.getNEO(2);
     var plant =
         LinearSystemId.createDrivetrainVelocitySystem(
@@ -126,7 +126,7 @@ class DifferentialDrivetrainSimTest {
   }
 
   @Test
-  public void testModelStability() {
+  void testModelStability() {
     var motor = DCMotor.getNEO(2);
     var plant =
         LinearSystemId.createDrivetrainVelocitySystem(

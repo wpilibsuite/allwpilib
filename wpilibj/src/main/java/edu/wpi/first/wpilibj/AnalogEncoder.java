@@ -7,6 +7,7 @@ package edu.wpi.first.wpilibj;
 import edu.wpi.first.hal.SimDevice;
 import edu.wpi.first.hal.SimDevice.Direction;
 import edu.wpi.first.hal.SimDouble;
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.util.sendable.SendableRegistry;
@@ -23,6 +24,7 @@ public class AnalogEncoder implements Sendable, AutoCloseable {
 
   protected SimDevice m_simDevice;
   protected SimDouble m_simPosition;
+  protected SimDouble m_simAbsolutePosition;
 
   /**
    * Construct a new AnalogEncoder attached to a specific AnalogIn channel.
@@ -51,6 +53,7 @@ public class AnalogEncoder implements Sendable, AutoCloseable {
 
     if (m_simDevice != null) {
       m_simPosition = m_simDevice.createDouble("Position", Direction.kInput, 0.0);
+      m_simAbsolutePosition = m_simDevice.createDouble("absPosition", Direction.kInput, 0.0);
     }
 
     // Limits need to be 25% from each end
@@ -59,6 +62,11 @@ public class AnalogEncoder implements Sendable, AutoCloseable {
     m_counter.setDownSource(m_analogTrigger, AnalogTriggerType.kFallingPulse);
 
     SendableRegistry.addLW(this, "Analog Encoder", m_analogInput.getChannel());
+  }
+
+  private boolean doubleEquals(double a, double b) {
+    double epsilon = 0.00001d;
+    return Math.abs(a - b) < epsilon;
   }
 
   /**
@@ -80,7 +88,8 @@ public class AnalogEncoder implements Sendable, AutoCloseable {
       double pos = m_analogInput.getVoltage();
       double counter2 = m_counter.get();
       double pos2 = m_analogInput.getVoltage();
-      if (counter == counter2 && pos == pos2) {
+      if (counter == counter2 && doubleEquals(pos, pos2)) {
+        pos = pos / RobotController.getVoltage5V();
         double position = counter + pos - m_positionOffset;
         m_lastPosition = position;
         return position;
@@ -93,11 +102,28 @@ public class AnalogEncoder implements Sendable, AutoCloseable {
   }
 
   /**
+   * Get the absolute position of the analog encoder.
+   *
+   * <p>getAbsolutePosition() - getPositionOffset() will give an encoder absolute position relative
+   * to the last reset. This could potentially be negative, which needs to be accounted for.
+   *
+   * <p>This will not account for rollovers, and will always be just the raw absolute position.
+   *
+   * @return the absolute position
+   */
+  public double getAbsolutePosition() {
+    if (m_simAbsolutePosition != null) {
+      return m_simAbsolutePosition.get();
+    }
+
+    return m_analogInput.getVoltage() / RobotController.getVoltage5V();
+  }
+
+  /**
    * Get the offset of position relative to the last reset.
    *
-   * <p>getPositionInRotation() - getPositionOffset() will give an encoder absolute position
-   * relative to the last reset. This could potentially be negative, which needs to be accounted
-   * for.
+   * <p>getAbsolutePosition() - getPositionOffset() will give an encoder absolute position relative
+   * to the last reset. This could potentially be negative, which needs to be accounted for.
    *
    * @return the position offset
    */
@@ -106,10 +132,21 @@ public class AnalogEncoder implements Sendable, AutoCloseable {
   }
 
   /**
+   * Set the position offset.
+   *
+   * <p>This must be in the range of 0-1.
+   *
+   * @param offset the offset
+   */
+  public void setPositionOffset(double offset) {
+    m_positionOffset = MathUtil.clamp(offset, 0.0, 1.0);
+  }
+
+  /**
    * Set the distance per rotation of the encoder. This sets the multiplier used to determine the
-   * distance driven based on the rotation value from the encoder. Set this value based on the how
-   * far the mechanism travels in 1 rotation of the encoder, and factor in gearing reductions
-   * following the encoder shaft. This distance can be in any units you like, linear or angular.
+   * distance driven based on the rotation value from the encoder. Set this value based on how far
+   * the mechanism travels in 1 rotation of the encoder, and factor in gearing reductions following
+   * the encoder shaft. This distance can be in any units you like, linear or angular.
    *
    * @param distancePerRotation the distance per rotation of the encoder
    */
@@ -148,7 +185,7 @@ public class AnalogEncoder implements Sendable, AutoCloseable {
   /** Reset the Encoder distance to zero. */
   public void reset() {
     m_counter.reset();
-    m_positionOffset = m_analogInput.getVoltage();
+    m_positionOffset = m_analogInput.getVoltage() / RobotController.getVoltage5V();
   }
 
   @Override

@@ -2,8 +2,11 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
+#include <numbers>
+
 #include <frc/Encoder.h>
 #include <frc/Joystick.h>
+#include <frc/Preferences.h>
 #include <frc/RobotController.h>
 #include <frc/TimedRobot.h>
 #include <frc/controller/PIDController.h>
@@ -21,7 +24,6 @@
 #include <frc/util/Color8Bit.h>
 #include <units/angle.h>
 #include <units/moment_of_inertia.h>
-#include <wpi/numbers>
 
 /**
  * This is a sample program to demonstrate how to use a state-space controller
@@ -33,13 +35,18 @@ class Robot : public frc::TimedRobot {
   static constexpr int kEncoderBChannel = 1;
   static constexpr int kJoystickPort = 0;
 
+  static constexpr std::string_view kArmPositionKey = "ArmPosition";
+  static constexpr std::string_view kArmPKey = "ArmP";
+
   // The P gain for the PID controller that drives this arm.
-  static constexpr double kArmKp = 50.0;
+  double kArmKp = 50.0;
+
+  units::degree_t armPosition = 75.0_deg;
 
   // distance per pulse = (angle per revolution) / (pulses per revolution)
   //  = (2 * PI rads) / (4096 pulses)
   static constexpr double kArmEncoderDistPerPulse =
-      2.0 * wpi::numbers::pi / 4096.0;
+      2.0 * std::numbers::pi / 4096.0;
 
   // The arm gearbox represents a gearbox containing two Vex 775pro motors.
   frc::DCMotor m_armGearbox = frc::DCMotor::Vex775Pro(2);
@@ -81,13 +88,22 @@ class Robot : public frc::TimedRobot {
 
     // Put Mechanism 2d to SmartDashboard
     frc::SmartDashboard::PutData("Arm Sim", &m_mech2d);
+
+    // Set the Arm position setpoint and P constant to Preferences if the keys
+    // don't already exist
+    if (!frc::Preferences::ContainsKey(kArmPositionKey)) {
+      frc::Preferences::SetDouble(kArmPositionKey, armPosition.value());
+    }
+    if (!frc::Preferences::ContainsKey(kArmPKey)) {
+      frc::Preferences::SetDouble(kArmPKey, kArmKp);
+    }
   }
 
   void SimulationPeriodic() override {
     // In this method, we update our simulation of what our arm is doing
     // First, we set our "inputs" (voltages)
-    m_armSim.SetInput(Eigen::Vector<double, 1>{
-        m_motor.Get() * frc::RobotController::GetInputVoltage()});
+    m_armSim.SetInput(frc::Vectord<1>{m_motor.Get() *
+                                      frc::RobotController::GetInputVoltage()});
 
     // Next, we update it. The standard loop time is 20ms.
     m_armSim.Update(20_ms);
@@ -103,13 +119,23 @@ class Robot : public frc::TimedRobot {
     m_arm->SetAngle(m_armSim.GetAngle());
   }
 
+  void TeleopInit() override {
+    // Read Preferences for Arm setpoint and kP on entering Teleop
+    armPosition = units::degree_t{
+        frc::Preferences::GetDouble(kArmPositionKey, armPosition.value())};
+    if (kArmKp != frc::Preferences::GetDouble(kArmPKey, kArmKp)) {
+      kArmKp = frc::Preferences::GetDouble(kArmPKey, kArmKp);
+      m_controller.SetP(kArmKp);
+    }
+  }
+
   void TeleopPeriodic() override {
     if (m_joystick.GetTrigger()) {
-      // Here, we run PID control like normal, with a constant setpoint of 75
-      // degrees.
+      // Here, we run PID control like normal, with a setpoint read from
+      // preferences in degrees.
       double pidOutput = m_controller.Calculate(
-          m_encoder.GetDistance(), (units::radian_t(75_deg)).value());
-      m_motor.SetVoltage(units::volt_t(pidOutput));
+          m_encoder.GetDistance(), (units::radian_t{armPosition}.value()));
+      m_motor.SetVoltage(units::volt_t{pidOutput});
     } else {
       // Otherwise, we disable the motor.
       m_motor.Set(0.0);

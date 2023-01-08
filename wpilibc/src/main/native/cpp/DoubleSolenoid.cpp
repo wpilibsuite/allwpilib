@@ -65,7 +65,9 @@ DoubleSolenoid::DoubleSolenoid(PneumaticsModuleType moduleType,
                      forwardChannel, reverseChannel} {}
 
 DoubleSolenoid::~DoubleSolenoid() {
-  m_module->UnreserveSolenoids(m_mask);
+  if (m_module) {
+    m_module->UnreserveSolenoids(m_mask);
+  }
 }
 
 void DoubleSolenoid::Set(Value value) {
@@ -127,10 +129,10 @@ bool DoubleSolenoid::IsRevSolenoidDisabled() const {
 void DoubleSolenoid::InitSendable(wpi::SendableBuilder& builder) {
   builder.SetSmartDashboardType("Double Solenoid");
   builder.SetActuator(true);
-  builder.SetSafeState([=] { Set(kOff); });
+  builder.SetSafeState([=, this] { Set(kOff); });
   builder.AddSmallStringProperty(
       "Value",
-      [=](wpi::SmallVectorImpl<char>& buf) -> std::string_view {
+      [=, this](wpi::SmallVectorImpl<char>& buf) -> std::string_view {
         switch (Get()) {
           case kForward:
             return "Forward";
@@ -140,7 +142,7 @@ void DoubleSolenoid::InitSendable(wpi::SendableBuilder& builder) {
             return "Off";
         }
       },
-      [=](std::string_view value) {
+      [=, this](std::string_view value) {
         Value lvalue = kOff;
         if (value == "Forward") {
           lvalue = kForward;

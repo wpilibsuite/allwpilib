@@ -8,7 +8,7 @@
 
 #include "glass/DataSource.h"
 #include "glass/hardware/Encoder.h"
-#include "glass/support/IniSaverInfo.h"
+#include "glass/support/NameSetting.h"
 
 using namespace glass;
 
@@ -28,17 +28,18 @@ void DisplayDIOImpl(DIOModel* model, int index, bool outputsEnabled) {
   auto dutyCycleData = dutyCycle ? dutyCycle->GetValueData() : nullptr;
 
   bool exists = model->Exists();
-  auto& info = dioData->GetNameInfo();
+  NameSetting dioName{dioData->GetName()};
   char label[128];
   if (exists && dpwmData) {
-    dpwmData->GetNameInfo().GetLabel(label, sizeof(label), "PWM", index);
+    NameSetting{dpwmData->GetName()}.GetLabel(label, sizeof(label), "PWM",
+                                              index);
     if (auto simDevice = dpwm->GetSimDevice()) {
       LabelSimDevice(label, simDevice);
     } else {
       dpwmData->LabelText(label, "%0.3f", dpwmData->GetValue());
     }
   } else if (exists && encoder) {
-    info.GetLabel(label, sizeof(label), " In", index);
+    dioName.GetLabel(label, sizeof(label), " In", index);
     if (auto simDevice = encoder->GetSimDevice()) {
       LabelSimDevice(label, simDevice);
     } else {
@@ -48,7 +49,8 @@ void DisplayDIOImpl(DIOModel* model, int index, bool outputsEnabled) {
       ImGui::PopStyleColor();
     }
   } else if (exists && dutyCycleData) {
-    dutyCycleData->GetNameInfo().GetLabel(label, sizeof(label), "Dty", index);
+    NameSetting{dutyCycleData->GetName()}.GetLabel(label, sizeof(label), "Dty",
+                                                   index);
     if (auto simDevice = dutyCycle->GetSimDevice()) {
       LabelSimDevice(label, simDevice);
     } else {
@@ -60,10 +62,10 @@ void DisplayDIOImpl(DIOModel* model, int index, bool outputsEnabled) {
   } else {
     const char* name = model->GetName();
     if (name[0] != '\0') {
-      info.GetLabel(label, sizeof(label), name);
+      dioName.GetLabel(label, sizeof(label), name);
     } else {
-      info.GetLabel(label, sizeof(label), model->IsInput() ? " In" : "Out",
-                    index);
+      dioName.GetLabel(label, sizeof(label), model->IsInput() ? " In" : "Out",
+                       index);
     }
     if (auto simDevice = model->GetSimDevice()) {
       LabelSimDevice(label, simDevice);
@@ -87,12 +89,12 @@ void DisplayDIOImpl(DIOModel* model, int index, bool outputsEnabled) {
       }
     }
   }
-  if (info.PopupEditName(index)) {
+  if (dioName.PopupEditName(index)) {
     if (dpwmData) {
-      dpwmData->SetName(info.GetName());
+      dpwmData->SetName(dioName.GetName());
     }
     if (dutyCycleData) {
-      dutyCycleData->SetName(info.GetName());
+      dutyCycleData->SetName(dioName.GetName());
     }
   }
 }

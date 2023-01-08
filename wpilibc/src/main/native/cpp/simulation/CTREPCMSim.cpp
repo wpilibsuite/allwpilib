@@ -14,12 +14,13 @@
 using namespace frc;
 using namespace frc::sim;
 
-CTREPCMSim::CTREPCMSim() : m_index{SensorUtil::GetDefaultCTREPCMModule()} {}
+CTREPCMSim::CTREPCMSim()
+    : PneumaticsBaseSim{SensorUtil::GetDefaultCTREPCMModule()} {}
 
-CTREPCMSim::CTREPCMSim(int module) : m_index{module} {}
+CTREPCMSim::CTREPCMSim(int module) : PneumaticsBaseSim{module} {}
 
 CTREPCMSim::CTREPCMSim(const PneumaticsBase& pneumatics)
-    : m_index{pneumatics.GetModuleNumber()} {}
+    : PneumaticsBaseSim{pneumatics.GetModuleNumber()} {}
 
 std::unique_ptr<CallbackStore> CTREPCMSim::RegisterInitializedCallback(
     NotifyCallback callback, bool initialNotify) {

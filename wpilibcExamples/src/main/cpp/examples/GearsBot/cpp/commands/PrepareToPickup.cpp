@@ -10,7 +10,7 @@
 #include "commands/SetElevatorSetpoint.h"
 #include "commands/SetWristSetpoint.h"
 
-PrepareToPickup::PrepareToPickup(Claw* claw, Wrist* wrist, Elevator* elevator) {
+PrepareToPickup::PrepareToPickup(Claw& claw, Wrist& wrist, Elevator& elevator) {
   SetName("PrepareToPickup");
   AddCommands(OpenClaw(claw),
               frc2::ParallelCommandGroup(SetElevatorSetpoint(0, elevator),

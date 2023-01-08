@@ -16,12 +16,12 @@ class json;
 namespace frc {
 
 /**
- * Represents a translation in 2d space.
+ * Represents a translation in 2D space.
  * This object can be used to represent a point or a vector.
  *
  * This assumes that you are using conventional mathematical axes.
- * When the robot is placed on the origin, facing toward the X direction,
- * moving forward increases the X, whereas moving to the left increases the Y.
+ * When the robot is at the origin facing in the positive X direction, forward
+ * is positive X and left is positive Y.
  */
 class WPILIB_DLLEXPORT Translation2d {
  public:
@@ -37,7 +37,7 @@ class WPILIB_DLLEXPORT Translation2d {
    * @param x The x component of the translation.
    * @param y The y component of the translation.
    */
-  Translation2d(units::meter_t x, units::meter_t y);
+  constexpr Translation2d(units::meter_t x, units::meter_t y);
 
   /**
    * Constructs a Translation2d with the provided distance and angle. This is
@@ -46,13 +46,12 @@ class WPILIB_DLLEXPORT Translation2d {
    * @param distance The distance from the origin to the end of the translation.
    * @param angle The angle between the x-axis and the translation vector.
    */
-  Translation2d(units::meter_t distance, const Rotation2d& angle);
+  constexpr Translation2d(units::meter_t distance, const Rotation2d& angle);
 
   /**
-   * Calculates the distance between two translations in 2d space.
+   * Calculates the distance between two translations in 2D space.
    *
-   * This function uses the pythagorean theorem to calculate the distance.
-   * distance = std::sqrt((x2 - x1)^2 + (y2 - y1)^2)
+   * The distance between translations is defined as √((x₂−x₁)²+(y₂−y₁)²).
    *
    * @param other The translation to compute the distance to.
    *
@@ -63,16 +62,16 @@ class WPILIB_DLLEXPORT Translation2d {
   /**
    * Returns the X component of the translation.
    *
-   * @return The x component of the translation.
+   * @return The X component of the translation.
    */
-  units::meter_t X() const { return m_x; }
+  constexpr units::meter_t X() const { return m_x; }
 
   /**
    * Returns the Y component of the translation.
    *
-   * @return The y component of the translation.
+   * @return The Y component of the translation.
    */
-  units::meter_t Y() const { return m_y; }
+  constexpr units::meter_t Y() const { return m_y; }
 
   /**
    * Returns the norm, or distance from the origin to the translation.
@@ -82,79 +81,86 @@ class WPILIB_DLLEXPORT Translation2d {
   units::meter_t Norm() const;
 
   /**
-   * Applies a rotation to the translation in 2d space.
+   * Returns the angle this translation forms with the positive X axis.
+   *
+   * @return The angle of the translation
+   */
+  constexpr Rotation2d Angle() const;
+
+  /**
+   * Applies a rotation to the translation in 2D space.
    *
    * This multiplies the translation vector by a counterclockwise rotation
    * matrix of the given angle.
    *
+   * <pre>
    * [x_new]   [other.cos, -other.sin][x]
    * [y_new] = [other.sin,  other.cos][y]
+   * </pre>
    *
-   * For example, rotating a Translation2d of {2, 0} by 90 degrees will return a
-   * Translation2d of {0, 2}.
+   * For example, rotating a Translation2d of &lt;2, 0&gt; by 90 degrees will
+   * return a Translation2d of &lt;0, 2&gt;.
    *
    * @param other The rotation to rotate the translation by.
    *
    * @return The new rotated translation.
    */
-  Translation2d RotateBy(const Rotation2d& other) const;
+  constexpr Translation2d RotateBy(const Rotation2d& other) const;
 
   /**
-   * Adds two translations in 2d space and returns the sum. This is similar to
-   * vector addition.
+   * Returns the sum of two translations in 2D space.
    *
-   * For example, Translation2d{1.0, 2.5} + Translation2d{2.0, 5.5} =
-   * Translation2d{3.0, 8.0}
+   * For example, Translation3d{1.0, 2.5} + Translation3d{2.0, 5.5} =
+   * Translation3d{3.0, 8.0}.
    *
    * @param other The translation to add.
    *
    * @return The sum of the translations.
    */
-  Translation2d operator+(const Translation2d& other) const;
+  constexpr Translation2d operator+(const Translation2d& other) const;
 
   /**
-   * Subtracts the other translation from the other translation and returns the
-   * difference.
+   * Returns the difference between two translations.
    *
    * For example, Translation2d{5.0, 4.0} - Translation2d{1.0, 2.0} =
-   * Translation2d{4.0, 2.0}
+   * Translation2d{4.0, 2.0}.
    *
    * @param other The translation to subtract.
    *
    * @return The difference between the two translations.
    */
-  Translation2d operator-(const Translation2d& other) const;
+  constexpr Translation2d operator-(const Translation2d& other) const;
 
   /**
    * Returns the inverse of the current translation. This is equivalent to
-   * rotating by 180 degrees, flipping the point over both axes, or simply
-   * negating both components of the translation.
+   * rotating by 180 degrees, flipping the point over both axes, or negating all
+   * components of the translation.
    *
    * @return The inverse of the current translation.
    */
-  Translation2d operator-() const;
+  constexpr Translation2d operator-() const;
 
   /**
-   * Multiplies the translation by a scalar and returns the new translation.
+   * Returns the translation multiplied by a scalar.
    *
-   * For example, Translation2d{2.0, 2.5} * 2 = Translation2d{4.0, 5.0}
+   * For example, Translation2d{2.0, 2.5} * 2 = Translation2d{4.0, 5.0}.
    *
    * @param scalar The scalar to multiply by.
    *
    * @return The scaled translation.
    */
-  Translation2d operator*(double scalar) const;
+  constexpr Translation2d operator*(double scalar) const;
 
   /**
-   * Divides the translation by a scalar and returns the new translation.
+   * Returns the translation divided by a scalar.
    *
-   * For example, Translation2d{2.0, 2.5} / 2 = Translation2d{1.0, 1.25}
+   * For example, Translation2d{2.0, 2.5} / 2 = Translation2d{1.0, 1.25}.
    *
    * @param scalar The scalar to divide by.
    *
    * @return The scaled translation.
    */
-  Translation2d operator/(double scalar) const;
+  constexpr Translation2d operator/(double scalar) const;
 
   /**
    * Checks equality between this Translation2d and another object.
@@ -163,14 +169,6 @@ class WPILIB_DLLEXPORT Translation2d {
    * @return Whether the two objects are equal.
    */
   bool operator==(const Translation2d& other) const;
-
-  /**
-   * Checks inequality between this Translation2d and another object.
-   *
-   * @param other The other object.
-   * @return Whether the two objects are not equal.
-   */
-  bool operator!=(const Translation2d& other) const;
 
  private:
   units::meter_t m_x = 0_m;
@@ -184,3 +182,5 @@ WPILIB_DLLEXPORT
 void from_json(const wpi::json& json, Translation2d& state);
 
 }  // namespace frc
+
+#include "Translation2d.inc"

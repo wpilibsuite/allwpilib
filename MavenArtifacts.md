@@ -69,24 +69,53 @@ All artifacts are based at `edu.wpi.first.artifactname` in the repository.
 
 * wpiutil
 
-* hal
+* wpigui
+  * imgui
+
+* wpimath
   * wpiutil
 
-* halsim
-  * imgui
+* wpinet
   * wpiutil
 
 * ntcore
   * wpiutil
+  * wpinet
+
+* glass/libglass
+  * wpiutil
+  * wpimath
+  * wpigui
+
+* glass/libglassnt
+  * wpiutil
+  * wpinet
+  * ntcore
+  * wpimath
+  * wpigui
+
+* hal
+  * wpiutil
+
+* halsim
+  * wpiutil
+  * wpinet
+  * ntcore
+  * wpimath
+  * wpigui
+  * libglass
+  * libglassnt
 
 * cscore
   * opencv
+  * wpinet
   * wpiutil
 
 * cameraserver
   * ntcore
   * cscore
   * opencv
+  * wpinet
   * wpiutil
 
 * wpilibj
@@ -94,6 +123,7 @@ All artifacts are based at `edu.wpi.first.artifactname` in the repository.
   * cameraserver
   * ntcore
   * cscore
+  * wpinet
   * wpiutil
 
 * wpilibc
@@ -101,6 +131,8 @@ All artifacts are based at `edu.wpi.first.artifactname` in the repository.
   * cameraserver
   * ntcore
   * cscore
+  * wpimath
+  * wpinet
   * wpiutil
 
 * wpilibNewCommands
@@ -109,15 +141,10 @@ All artifacts are based at `edu.wpi.first.artifactname` in the repository.
   * cameraserver
   * ntcore
   * cscore
+  * wpimath
+  * wpinet
   * wpiutil
 
-* wpilibNewCommands
-  * wpilibc
-  * hal
-  * cameraserver
-  * ntcore
-  * cscore
-  * wpiutil
 
 ### Third Party Artifacts
 
@@ -128,3 +155,4 @@ All artifacts are based at `edu.wpi.first.thirdparty.frcYEAR` in the repository.
 * googletest
 * imgui
 * opencv
+* libssh

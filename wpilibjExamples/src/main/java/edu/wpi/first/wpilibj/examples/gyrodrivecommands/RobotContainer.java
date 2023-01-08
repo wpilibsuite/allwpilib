@@ -45,7 +45,7 @@ public class RobotContainer {
         new RunCommand(
             () ->
                 m_robotDrive.arcadeDrive(
-                    m_driverController.getLeftY(), m_driverController.getRightX()),
+                    -m_driverController.getLeftY(), -m_driverController.getRightX()),
             m_robotDrive));
   }
 
@@ -58,12 +58,12 @@ public class RobotContainer {
   private void configureButtonBindings() {
     // Drive at half speed when the right bumper is held
     new JoystickButton(m_driverController, Button.kR1.value)
-        .whenPressed(() -> m_robotDrive.setMaxOutput(0.5))
-        .whenReleased(() -> m_robotDrive.setMaxOutput(1));
+        .onTrue(new InstantCommand(() -> m_robotDrive.setMaxOutput(0.5)))
+        .onFalse(new InstantCommand(() -> m_robotDrive.setMaxOutput(1)));
 
     // Stabilize robot to drive straight with gyro when left bumper is held
     new JoystickButton(m_driverController, Button.kL1.value)
-        .whenHeld(
+        .whileTrue(
             new PIDCommand(
                 new PIDController(
                     DriveConstants.kStabilizationP,
@@ -74,17 +74,17 @@ public class RobotContainer {
                 // Setpoint is 0
                 0,
                 // Pipe the output to the turning controls
-                output -> m_robotDrive.arcadeDrive(m_driverController.getLeftY(), output),
+                output -> m_robotDrive.arcadeDrive(-m_driverController.getLeftY(), output),
                 // Require the robot drive
                 m_robotDrive));
 
     // Turn to 90 degrees when the 'X' button is pressed, with a 5 second timeout
     new JoystickButton(m_driverController, Button.kCross.value)
-        .whenPressed(new TurnToAngle(90, m_robotDrive).withTimeout(5));
+        .onTrue(new TurnToAngle(90, m_robotDrive).withTimeout(5));
 
     // Turn to -90 degrees with a profile when the Circle button is pressed, with a 5 second timeout
     new JoystickButton(m_driverController, Button.kCircle.value)
-        .whenPressed(new TurnToAngleProfiled(-90, m_robotDrive).withTimeout(5));
+        .onTrue(new TurnToAngleProfiled(-90, m_robotDrive).withTimeout(5));
   }
 
   /**

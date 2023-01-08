@@ -6,7 +6,7 @@
 
 #include <wpi/MathExtras.h>
 
-#include "Eigen/Core"
+#include "frc/EigenCore.h"
 #include "frc/controller/LinearPlantInversionFeedforward.h"
 #include "frc/system/plant/LinearSystemId.h"
 #include "units/time.h"
@@ -35,7 +35,7 @@ class SimpleMotorFeedforward {
    *
    * @param kS The static gain, in volts.
    * @param kV The velocity gain, in volt seconds per distance.
-   * @param kA The acceleration gain, in volt seconds^2 per distance.
+   * @param kA The acceleration gain, in volt seconds² per distance.
    */
   constexpr SimpleMotorFeedforward(
       units::volt_t kS, units::unit_t<kv_unit> kV,
@@ -46,7 +46,7 @@ class SimpleMotorFeedforward {
    * Calculates the feedforward from the gains and setpoints.
    *
    * @param velocity     The velocity setpoint, in distance per second.
-   * @param acceleration The acceleration setpoint, in distance per second^2.
+   * @param acceleration The acceleration setpoint, in distance per second².
    * @return The computed feedforward, in volts.
    */
   constexpr units::volt_t Calculate(units::unit_t<Velocity> velocity,
@@ -70,8 +70,8 @@ class SimpleMotorFeedforward {
     auto plant = LinearSystemId::IdentifyVelocitySystem<Distance>(kV, kA);
     LinearPlantInversionFeedforward<1, 1> feedforward{plant, dt};
 
-    Eigen::Vector<double, 1> r{currentVelocity.value()};
-    Eigen::Vector<double, 1> nextR{nextVelocity.value()};
+    Vectord<1> r{currentVelocity.value()};
+    Vectord<1> nextR{nextVelocity.value()};
 
     return kS * wpi::sgn(currentVelocity.value()) +
            units::volt_t{feedforward.Calculate(r, nextR)(0)};

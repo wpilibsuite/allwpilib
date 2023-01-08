@@ -5,6 +5,7 @@
 #include "CommandTestBase.h"
 #include "frc2/command/InstantCommand.h"
 #include "frc2/command/RunCommand.h"
+#include "frc2/command/StartEndCommand.h"
 
 using namespace frc2;
 class SchedulerTest : public CommandTestBase {};
@@ -68,4 +69,17 @@ TEST_F(SchedulerTest, SchedulerCancelAll) {
   scheduler.CancelAll();
 
   EXPECT_EQ(counter, 2);
+}
+
+TEST_F(SchedulerTest, ScheduleScheduledNoOp) {
+  CommandScheduler scheduler = GetScheduler();
+
+  int counter = 0;
+
+  StartEndCommand command([&counter] { counter++; }, [] {});
+
+  scheduler.Schedule(&command);
+  scheduler.Schedule(&command);
+
+  EXPECT_EQ(counter, 1);
 }

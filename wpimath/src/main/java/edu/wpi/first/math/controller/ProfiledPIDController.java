@@ -10,6 +10,7 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.util.sendable.SendableBuilder;
+import edu.wpi.first.util.sendable.SendableRegistry;
 
 /**
  * Implements a PID control loop whose setpoint is constrained by a trapezoid profile. Users should
@@ -33,7 +34,6 @@ public class ProfiledPIDController implements Sendable {
    * @param Kd The derivative coefficient.
    * @param constraints Velocity and acceleration constraints for goal.
    */
-  @SuppressWarnings("ParameterName")
   public ProfiledPIDController(
       double Kp, double Ki, double Kd, TrapezoidProfile.Constraints constraints) {
     this(Kp, Ki, Kd, constraints, 0.02);
@@ -48,12 +48,13 @@ public class ProfiledPIDController implements Sendable {
    * @param constraints Velocity and acceleration constraints for goal.
    * @param period The period between controller updates in seconds. The default is 0.02 seconds.
    */
-  @SuppressWarnings("ParameterName")
   public ProfiledPIDController(
       double Kp, double Ki, double Kd, TrapezoidProfile.Constraints constraints, double period) {
     m_controller = new PIDController(Kp, Ki, Kd, period);
     m_constraints = constraints;
     instances++;
+
+    SendableRegistry.add(this, "ProfiledPIDController", instances);
     MathSharedStore.reportUsage(MathUsageId.kController_ProfiledPIDController, instances);
   }
 
@@ -66,7 +67,6 @@ public class ProfiledPIDController implements Sendable {
    * @param Ki Integral coefficient
    * @param Kd Differential coefficient
    */
-  @SuppressWarnings("ParameterName")
   public void setPID(double Kp, double Ki, double Kd) {
     m_controller.setPID(Kp, Ki, Kd);
   }
@@ -76,7 +76,6 @@ public class ProfiledPIDController implements Sendable {
    *
    * @param Kp proportional coefficient
    */
-  @SuppressWarnings("ParameterName")
   public void setP(double Kp) {
     m_controller.setP(Kp);
   }
@@ -86,7 +85,6 @@ public class ProfiledPIDController implements Sendable {
    *
    * @param Ki integral coefficient
    */
-  @SuppressWarnings("ParameterName")
   public void setI(double Ki) {
     m_controller.setI(Ki);
   }
@@ -96,7 +94,6 @@ public class ProfiledPIDController implements Sendable {
    *
    * @param Kd differential coefficient
    */
-  @SuppressWarnings("ParameterName")
   public void setD(double Kd) {
     m_controller.setD(Kd);
   }
@@ -135,6 +132,24 @@ public class ProfiledPIDController implements Sendable {
    */
   public double getPeriod() {
     return m_controller.getPeriod();
+  }
+
+  /**
+   * Returns the position tolerance of this controller.
+   *
+   * @return the position tolerance of the controller.
+   */
+  public double getPositionTolerance() {
+    return m_controller.getPositionTolerance();
+  }
+
+  /**
+   * Returns the velocity tolerance of this controller.
+   *
+   * @return the velocity tolerance of the controller.
+   */
+  public double getVelocityTolerance() {
+    return m_controller.getVelocityTolerance();
   }
 
   /**
@@ -282,7 +297,7 @@ public class ProfiledPIDController implements Sendable {
    */
   public double calculate(double measurement) {
     if (m_controller.isContinuousInputEnabled()) {
-      // Get error which is smallest distance between goal and measurement
+      // Get error which is the smallest distance between goal and measurement
       double errorBound = (m_maximumInput - m_minimumInput) / 2.0;
       double goalMinDistance =
           MathUtil.inputModulus(m_goal.position - measurement, -errorBound, errorBound);

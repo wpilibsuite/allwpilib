@@ -16,7 +16,7 @@ void Drivetrain::Drive(units::meters_per_second_t xSpeed,
                           xSpeed, ySpeed, rot, m_gyro.GetRotation2d())
                     : frc::ChassisSpeeds{xSpeed, ySpeed, rot});
 
-  m_kinematics.NormalizeWheelSpeeds(&states, kMaxSpeed);
+  m_kinematics.DesaturateWheelSpeeds(&states, kMaxSpeed);
 
   auto [fl, fr, bl, br] = states;
 
@@ -27,9 +27,9 @@ void Drivetrain::Drive(units::meters_per_second_t xSpeed,
 }
 
 void Drivetrain::UpdateOdometry() {
-  m_poseEstimator.Update(m_gyro.GetRotation2d(), m_frontLeft.GetState(),
-                         m_frontRight.GetState(), m_backLeft.GetState(),
-                         m_backRight.GetState());
+  m_poseEstimator.Update(m_gyro.GetRotation2d(),
+                         {m_frontLeft.GetPosition(), m_frontRight.GetPosition(),
+                          m_backLeft.GetPosition(), m_backRight.GetPosition()});
 
   // Also apply vision measurements. We use 0.3 seconds in the past as an
   // example -- on a real robot, this must be calculated based either on latency

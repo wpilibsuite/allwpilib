@@ -7,7 +7,7 @@
 #include <cmath>
 #include <random>
 
-#include "Eigen/Core"
+#include "frc/EigenCore.h"
 #include "frc/controller/LinearPlantInversionFeedforward.h"
 #include "frc/controller/LinearQuadraticRegulator.h"
 #include "frc/estimator/KalmanFilter.h"
@@ -45,8 +45,7 @@ class StateSpaceTest : public testing::Test {
 
 void Update(const LinearSystem<2, 1, 1>& plant, LinearSystemLoop<2, 1, 1>& loop,
             double noise) {
-  Eigen::Vector<double, 1> y =
-      plant.CalculateY(loop.Xhat(), loop.U()) + Eigen::Vector<double, 1>{noise};
+  Vectord<1> y = plant.CalculateY(loop.Xhat(), loop.U()) + Vectord<1>{noise};
   loop.Correct(y);
   loop.Predict(kDt);
 }
@@ -55,7 +54,7 @@ TEST_F(StateSpaceTest, CorrectPredictLoop) {
   std::default_random_engine generator;
   std::normal_distribution<double> dist{0.0, kPositionStddev};
 
-  Eigen::Vector<double, 2> references{2.0, 0.0};
+  Vectord<2> references{2.0, 0.0};
   loop.SetNextR(references);
 
   for (int i = 0; i < 1000; i++) {

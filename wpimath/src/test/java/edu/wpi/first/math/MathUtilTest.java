@@ -10,7 +10,7 @@ import org.junit.jupiter.api.Test;
 
 class MathUtilTest {
   @Test
-  void testApplyDeadband() {
+  void testApplyDeadbandUnityScale() {
     // < 0
     assertEquals(-1.0, MathUtil.applyDeadband(-1.0, 0.02));
     assertEquals((-0.03 + 0.02) / (1.0 - 0.02), MathUtil.applyDeadband(-0.03, 0.02));
@@ -25,6 +25,27 @@ class MathUtilTest {
     assertEquals(0.0, MathUtil.applyDeadband(0.02, 0.02));
     assertEquals((0.03 - 0.02) / (1.0 - 0.02), MathUtil.applyDeadband(0.03, 0.02));
     assertEquals(1.0, MathUtil.applyDeadband(1.0, 0.02));
+  }
+
+  @Test
+  void testApplyDeadbandArbitraryScale() {
+    // < 0
+    assertEquals(-2.5, MathUtil.applyDeadband(-2.5, 0.02, 2.5));
+    assertEquals(0.0, MathUtil.applyDeadband(-0.02, 0.02, 2.5));
+    assertEquals(0.0, MathUtil.applyDeadband(-0.01, 0.02, 2.5));
+
+    // == 0
+    assertEquals(0.0, MathUtil.applyDeadband(0.0, 0.02, 2.5));
+
+    // > 0
+    assertEquals(0.0, MathUtil.applyDeadband(0.01, 0.02, 2.5));
+    assertEquals(0.0, MathUtil.applyDeadband(0.02, 0.02, 2.5));
+    assertEquals(2.5, MathUtil.applyDeadband(2.5, 0.02, 2.5));
+  }
+
+  @Test
+  void testApplyDeadbandLargeMaxMagnitude() {
+    assertEquals(80.0, MathUtil.applyDeadband(100.0, 20, Double.POSITIVE_INFINITY));
   }
 
   @Test

@@ -6,8 +6,8 @@
 
 #include "Robot.h"
 
-OpenClaw::OpenClaw(Claw* claw)
-    : frc2::CommandHelper<frc2::WaitCommand, OpenClaw>(1_s), m_claw(claw) {
+OpenClaw::OpenClaw(Claw& claw)
+    : frc2::CommandHelper<frc2::WaitCommand, OpenClaw>(1_s), m_claw(&claw) {
   SetName("OpenClaw");
   AddRequirements({m_claw});
 }

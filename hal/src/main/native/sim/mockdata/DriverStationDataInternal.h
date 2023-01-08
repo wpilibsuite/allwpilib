@@ -107,11 +107,11 @@ class DriverStationData {
 
   void SetJoystickIsXbox(int32_t stick, HAL_Bool isXbox);
   void SetJoystickType(int32_t stick, int32_t type);
-  void SetJoystickName(int32_t stick, const char* name);
+  void SetJoystickName(int32_t stick, const char* name, size_t size);
   void SetJoystickAxisType(int32_t stick, int32_t axis, int32_t type);
 
-  void SetGameSpecificMessage(const char* message);
-  void SetEventName(const char* name);
+  void SetGameSpecificMessage(const char* message, size_t size);
+  void SetEventName(const char* name, size_t size);
   void SetMatchType(HAL_MatchType type);
   void SetMatchNumber(int32_t matchNumber);
   void SetReplayNumber(int32_t replayNumber);
@@ -126,7 +126,7 @@ class DriverStationData {
   SimDataValue<HAL_AllianceStationID, MakeAllianceStationIdValue,
                GetAllianceStationIdName>
       allianceStationId{static_cast<HAL_AllianceStationID>(0)};
-  SimDataValue<double, HAL_MakeDouble, GetMatchTimeName> matchTime{0.0};
+  SimDataValue<double, HAL_MakeDouble, GetMatchTimeName> matchTime{-1.0};
 
  private:
   SimCallbackRegistry<HAL_JoystickAxesCallback, GetJoystickAxesName>

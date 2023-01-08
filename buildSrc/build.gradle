@@ -1,9 +1,13 @@
 repositories {
     maven {
-        url "https://plugins.gradle.org/m2/"
         mavenLocal()
+        maven {
+            url = 'https://frcmaven.wpi.edu/artifactory/ex-gradle'
+        }
+        mavenCentral()
+        url "https://plugins.gradle.org/m2/"
     }
 }
 dependencies {
-    implementation "edu.wpi.first:native-utils:2022.3.1"
+    implementation "edu.wpi.first:native-utils:2023.11.1"
 }

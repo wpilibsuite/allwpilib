@@ -57,7 +57,8 @@ public class Drivetrain {
   private final DifferentialDriveKinematics m_kinematics =
       new DifferentialDriveKinematics(kTrackWidth);
   private final DifferentialDriveOdometry m_odometry =
-      new DifferentialDriveOdometry(m_gyro.getRotation2d());
+      new DifferentialDriveOdometry(
+          m_gyro.getRotation2d(), m_leftEncoder.getDistance(), m_rightEncoder.getDistance());
 
   // Gains are for example purposes only - must be determined for your own
   // robot!
@@ -113,7 +114,6 @@ public class Drivetrain {
    * @param xSpeed the speed for the x axis
    * @param rot the rotation
    */
-  @SuppressWarnings("ParameterName")
   public void drive(double xSpeed, double rot) {
     setSpeeds(m_kinematics.toWheelSpeeds(new ChassisSpeeds(xSpeed, 0, rot)));
   }
@@ -129,7 +129,8 @@ public class Drivetrain {
     m_leftEncoder.reset();
     m_rightEncoder.reset();
     m_drivetrainSimulator.setPose(pose);
-    m_odometry.resetPosition(pose, m_gyro.getRotation2d());
+    m_odometry.resetPosition(
+        m_gyro.getRotation2d(), m_leftEncoder.getDistance(), m_rightEncoder.getDistance(), pose);
   }
 
   /** Check the current robot pose. */
@@ -144,8 +145,8 @@ public class Drivetrain {
     // simulated encoder and gyro. We negate the right side so that positive
     // voltages make the right side move forward.
     m_drivetrainSimulator.setInputs(
-        m_leftLeader.get() * RobotController.getInputVoltage(),
-        -m_rightLeader.get() * RobotController.getInputVoltage());
+        m_leftGroup.get() * RobotController.getInputVoltage(),
+        m_rightGroup.get() * RobotController.getInputVoltage());
     m_drivetrainSimulator.update(0.02);
 
     m_leftEncoderSim.setDistance(m_drivetrainSimulator.getLeftPositionMeters());

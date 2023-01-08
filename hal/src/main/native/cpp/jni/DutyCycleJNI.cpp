@@ -74,15 +74,15 @@ Java_edu_wpi_first_hal_DutyCycleJNI_getOutput
 
 /*
  * Class:     edu_wpi_first_hal_DutyCycleJNI
- * Method:    getOutputRaw
+ * Method:    getHighTime
  * Signature: (I)I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_first_hal_DutyCycleJNI_getOutputRaw
+Java_edu_wpi_first_hal_DutyCycleJNI_getHighTime
   (JNIEnv* env, jclass, jint handle)
 {
   int32_t status = 0;
-  auto retVal = HAL_GetDutyCycleOutputRaw(
+  auto retVal = HAL_GetDutyCycleHighTime(
       static_cast<HAL_DutyCycleHandle>(handle), &status);
   CheckStatus(env, status);
   return retVal;

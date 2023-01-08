@@ -6,11 +6,11 @@
 
 #include <functional>
 #include <initializer_list>
+#include <span>
 #include <utility>
 
 #include <frc/controller/ProfiledPIDController.h>
 #include <units/time.h>
-#include <wpi/span.h>
 
 #include "frc2/command/CommandBase.h"
 #include "frc2/command/CommandHelper.h"
@@ -21,6 +21,8 @@ namespace frc2 {
  * by default - to add exit conditions and/or other behavior, subclass this
  * class. The controller calculation and output are performed synchronously in
  * the command's execute() method.
+ *
+ * This class is provided by the NewCommands VendorDep
  *
  * @see ProfiledPIDController<Distance>
  */
@@ -70,7 +72,7 @@ class ProfiledPIDCommand
                      std::function<Distance_t()> measurementSource,
                      std::function<State()> goalSource,
                      std::function<void(double, State)> useOutput,
-                     wpi::span<Subsystem* const> requirements = {})
+                     std::span<Subsystem* const> requirements = {})
       : m_controller{controller},
         m_measurement{std::move(measurementSource)},
         m_goal{std::move(goalSource)},
@@ -95,7 +97,7 @@ class ProfiledPIDCommand
                      std::initializer_list<Subsystem*> requirements)
       : ProfiledPIDCommand(
             controller, measurementSource,
-            [&goalSource]() {
+            [goalSource = std::move(goalSource)]() {
               return State{goalSource(), Velocity_t{0}};
             },
             useOutput, requirements) {}
@@ -114,10 +116,10 @@ class ProfiledPIDCommand
                      std::function<Distance_t()> measurementSource,
                      std::function<Distance_t()> goalSource,
                      std::function<void(double, State)> useOutput,
-                     wpi::span<Subsystem* const> requirements = {})
+                     std::span<Subsystem* const> requirements = {})
       : ProfiledPIDCommand(
             controller, measurementSource,
-            [&goalSource]() {
+            [goalSource = std::move(goalSource)]() {
               return State{goalSource(), Velocity_t{0}};
             },
             useOutput, requirements) {}
@@ -153,7 +155,7 @@ class ProfiledPIDCommand
   ProfiledPIDCommand(frc::ProfiledPIDController<Distance> controller,
                      std::function<Distance_t()> measurementSource, State goal,
                      std::function<void(double, State)> useOutput,
-                     wpi::span<Subsystem* const> requirements = {})
+                     std::span<Subsystem* const> requirements = {})
       : ProfiledPIDCommand(
             controller, measurementSource, [goal] { return goal; }, useOutput,
             requirements) {}
@@ -191,7 +193,7 @@ class ProfiledPIDCommand
                      std::function<Distance_t()> measurementSource,
                      Distance_t goal,
                      std::function<void(double, State)> useOutput,
-                     wpi::span<Subsystem* const> requirements = {})
+                     std::span<Subsystem* const> requirements = {})
       : ProfiledPIDCommand(
             controller, measurementSource, [goal] { return goal; }, useOutput,
             requirements) {}

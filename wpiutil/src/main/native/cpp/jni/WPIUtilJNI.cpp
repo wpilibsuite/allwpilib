@@ -5,7 +5,7 @@
 #include <jni.h>
 
 #include "edu_wpi_first_util_WPIUtilJNI.h"
-#include "wpi/PortForwarder.h"
+#include "fmt/format.h"
 #include "wpi/Synchronization.h"
 #include "wpi/jni_util.h"
 #include "wpi/timestamp.h"
@@ -38,7 +38,20 @@ JNIEXPORT void JNICALL JNI_OnUnload(JavaVM* vm, void* reserved) {
   if (vm->GetEnv(reinterpret_cast<void**>(&env), JNI_VERSION_1_6) != JNI_OK) {
     return;
   }
+
   interruptedEx.free(env);
+}
+
+/*
+ * Class:     edu_wpi_first_util_WPIUtilJNI
+ * Method:    writeStderr
+ * Signature: (Ljava/lang/String;)V
+ */
+JNIEXPORT void JNICALL
+Java_edu_wpi_first_util_WPIUtilJNI_writeStderr
+  (JNIEnv* env, jclass, jstring str)
+{
+  fmt::print(stderr, "{}", JStringRef{env, str});
 }
 
 /*
@@ -52,6 +65,19 @@ Java_edu_wpi_first_util_WPIUtilJNI_enableMockTime
 {
   mockTimeEnabled = true;
   wpi::SetNowImpl([] { return mockNow; });
+}
+
+/*
+ * Class:     edu_wpi_first_util_WPIUtilJNI
+ * Method:    disableMockTime
+ * Signature: ()V
+ */
+JNIEXPORT void JNICALL
+Java_edu_wpi_first_util_WPIUtilJNI_disableMockTime
+  (JNIEnv*, jclass)
+{
+  mockTimeEnabled = false;
+  wpi::SetNowImpl(nullptr);
 }
 
 /*
@@ -84,28 +110,14 @@ Java_edu_wpi_first_util_WPIUtilJNI_now
 
 /*
  * Class:     edu_wpi_first_util_WPIUtilJNI
- * Method:    addPortForwarder
- * Signature: (ILjava/lang/String;I)V
+ * Method:    getSystemTime
+ * Signature: ()J
  */
-JNIEXPORT void JNICALL
-Java_edu_wpi_first_util_WPIUtilJNI_addPortForwarder
-  (JNIEnv* env, jclass, jint port, jstring remoteHost, jint remotePort)
+JNIEXPORT jlong JNICALL
+Java_edu_wpi_first_util_WPIUtilJNI_getSystemTime
+  (JNIEnv*, jclass)
 {
-  wpi::PortForwarder::GetInstance().Add(static_cast<unsigned int>(port),
-                                        JStringRef{env, remoteHost}.str(),
-                                        static_cast<unsigned int>(remotePort));
-}
-
-/*
- * Class:     edu_wpi_first_util_WPIUtilJNI
- * Method:    removePortForwarder
- * Signature: (I)V
- */
-JNIEXPORT void JNICALL
-Java_edu_wpi_first_util_WPIUtilJNI_removePortForwarder
-  (JNIEnv* env, jclass, jint port)
-{
-  wpi::PortForwarder::GetInstance().Remove(port);
+  return wpi::GetSystemTime();
 }
 
 /*
@@ -235,7 +247,7 @@ Java_edu_wpi_first_util_WPIUtilJNI_waitForObjects
   JIntArrayRef handlesArr{env, handles};
   wpi::SmallVector<WPI_Handle, 8> signaledBuf;
   signaledBuf.resize(handlesArr.size());
-  wpi::span<const WPI_Handle> handlesArr2{
+  std::span<const WPI_Handle> handlesArr2{
       reinterpret_cast<const WPI_Handle*>(handlesArr.array().data()),
       handlesArr.size()};
 
@@ -259,7 +271,7 @@ Java_edu_wpi_first_util_WPIUtilJNI_waitForObjectsTimeout
   JIntArrayRef handlesArr{env, handles};
   wpi::SmallVector<WPI_Handle, 8> signaledBuf;
   signaledBuf.resize(handlesArr.size());
-  wpi::span<const WPI_Handle> handlesArr2{
+  std::span<const WPI_Handle> handlesArr2{
       reinterpret_cast<const WPI_Handle*>(handlesArr.array().data()),
       handlesArr.size()};
 

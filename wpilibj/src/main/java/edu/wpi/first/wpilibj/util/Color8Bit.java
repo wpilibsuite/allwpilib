@@ -53,4 +53,18 @@ public class Color8Bit {
   public int hashCode() {
     return Objects.hash(red, green, blue);
   }
+
+  @Override
+  public String toString() {
+    return toHexString();
+  }
+
+  /**
+   * Return this color represented as a hex string.
+   *
+   * @return a string of the format <code>#RRGGBB</code>
+   */
+  public String toHexString() {
+    return String.format("#%02X%02X%02X", red, green, blue);
+  }
 }

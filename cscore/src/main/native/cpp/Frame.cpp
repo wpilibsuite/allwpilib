@@ -217,7 +217,7 @@ Image* Frame::ConvertImpl(Image* image, VideoMode::PixelFormat pixelFormat,
   // Color convert
   switch (pixelFormat) {
     case VideoMode::kRGB565:
-      // If source is YUYV or Gray, need to convert to BGR first
+      // If source is YUYV, UYVY, Gray, or Y16, need to convert to BGR first
       if (cur->pixelFormat == VideoMode::kYUYV) {
         // Check to see if BGR version already exists...
         if (Image* newImage =
@@ -225,6 +225,14 @@ Image* Frame::ConvertImpl(Image* image, VideoMode::PixelFormat pixelFormat,
           cur = newImage;
         } else {
           cur = ConvertYUYVToBGR(cur);
+        }
+      } else if (cur->pixelFormat == VideoMode::kUYVY) {
+        // Check to see if BGR version already exists...
+        if (Image* newImage =
+                GetExistingImage(cur->width, cur->height, VideoMode::kBGR)) {
+          cur = newImage;
+        } else {
+          cur = ConvertUYVYToBGR(cur);
         }
       } else if (cur->pixelFormat == VideoMode::kGray) {
         // Check to see if BGR version already exists...
@@ -234,18 +242,35 @@ Image* Frame::ConvertImpl(Image* image, VideoMode::PixelFormat pixelFormat,
         } else {
           cur = ConvertGrayToBGR(cur);
         }
-      }
-      return ConvertBGRToRGB565(cur);
-    case VideoMode::kGray:
-      // If source is YUYV or RGB565, need to convert to BGR first
-      if (cur->pixelFormat == VideoMode::kYUYV) {
+      } else if (cur->pixelFormat == VideoMode::kY16) {
         // Check to see if BGR version already exists...
         if (Image* newImage =
                 GetExistingImage(cur->width, cur->height, VideoMode::kBGR)) {
           cur = newImage;
+        } else if (Image* newImage = GetExistingImage(cur->width, cur->height,
+                                                      VideoMode::kGray)) {
+          cur = ConvertGrayToBGR(newImage);
         } else {
-          cur = ConvertYUYVToBGR(cur);
+          cur = ConvertGrayToBGR(ConvertY16ToGray(cur));
         }
+      }
+      return ConvertBGRToRGB565(cur);
+    case VideoMode::kGray:
+    case VideoMode::kY16:
+      // If source is also grayscale, convert directly
+      if (pixelFormat == VideoMode::kGray &&
+          cur->pixelFormat == VideoMode::kY16) {
+        return ConvertY16ToGray(cur);
+      } else if (pixelFormat == VideoMode::kY16 &&
+                 cur->pixelFormat == VideoMode::kGray) {
+        return ConvertGrayToY16(cur);
+      }
+      // If source is YUYV, UYVY, convert directly to Gray
+      // If RGB565, need to convert to BGR first
+      if (cur->pixelFormat == VideoMode::kYUYV) {
+        cur = ConvertYUYVToGray(cur);
+      } else if (cur->pixelFormat == VideoMode::kUYVY) {
+        cur = ConvertUYVYToGray(cur);
       } else if (cur->pixelFormat == VideoMode::kRGB565) {
         // Check to see if BGR version already exists...
         if (Image* newImage =
@@ -254,12 +279,18 @@ Image* Frame::ConvertImpl(Image* image, VideoMode::PixelFormat pixelFormat,
         } else {
           cur = ConvertRGB565ToBGR(cur);
         }
+        cur = ConvertBGRToGray(cur);
       }
-      return ConvertBGRToGray(cur);
+      if (pixelFormat == VideoMode::kY16) {
+        cur = ConvertGrayToY16(cur);
+      }
+      return cur;
     case VideoMode::kBGR:
     case VideoMode::kMJPEG:
       if (cur->pixelFormat == VideoMode::kYUYV) {
         cur = ConvertYUYVToBGR(cur);
+      } else if (cur->pixelFormat == VideoMode::kUYVY) {
+        cur = ConvertUYVYToBGR(cur);
       } else if (cur->pixelFormat == VideoMode::kRGB565) {
         cur = ConvertRGB565ToBGR(cur);
       } else if (cur->pixelFormat == VideoMode::kGray) {
@@ -268,9 +299,23 @@ Image* Frame::ConvertImpl(Image* image, VideoMode::PixelFormat pixelFormat,
         } else {
           return ConvertGrayToMJPEG(cur, defaultJpegQuality);
         }
+      } else if (cur->pixelFormat == VideoMode::kY16) {
+        // Check to see if Gray version already exists...
+        if (Image* newImage =
+                GetExistingImage(cur->width, cur->height, VideoMode::kGray)) {
+          cur = newImage;
+        } else {
+          cur = ConvertY16ToGray(cur);
+        }
+        if (pixelFormat == VideoMode::kBGR) {
+          return ConvertGrayToBGR(cur);
+        } else {
+          return ConvertGrayToMJPEG(cur, defaultJpegQuality);
+        }
       }
       break;
     case VideoMode::kYUYV:
+    case VideoMode::kUYVY:
     default:
       return nullptr;  // Unsupported
   }
@@ -341,6 +386,72 @@ Image* Frame::ConvertYUYVToBGR(Image* image) {
 
   // Convert
   cv::cvtColor(image->AsMat(), newImage->AsMat(), cv::COLOR_YUV2BGR_YUYV);
+
+  // Save the result
+  Image* rv = newImage.release();
+  if (m_impl) {
+    std::scoped_lock lock(m_impl->mutex);
+    m_impl->images.push_back(rv);
+  }
+  return rv;
+}
+
+Image* Frame::ConvertYUYVToGray(Image* image) {
+  if (!image || image->pixelFormat != VideoMode::kYUYV) {
+    return nullptr;
+  }
+
+  // Allocate a grayscale image
+  auto newImage =
+      m_impl->source.AllocImage(VideoMode::kGray, image->width, image->height,
+                                image->width * image->height);
+
+  // Convert
+  cv::cvtColor(image->AsMat(), newImage->AsMat(), cv::COLOR_YUV2GRAY_YUYV);
+
+  // Save the result
+  Image* rv = newImage.release();
+  if (m_impl) {
+    std::scoped_lock lock(m_impl->mutex);
+    m_impl->images.push_back(rv);
+  }
+  return rv;
+}
+
+Image* Frame::ConvertUYVYToBGR(Image* image) {
+  if (!image || image->pixelFormat != VideoMode::kUYVY) {
+    return nullptr;
+  }
+
+  // Allocate a BGR image
+  auto newImage =
+      m_impl->source.AllocImage(VideoMode::kBGR, image->width, image->height,
+                                image->width * image->height * 3);
+
+  // Convert
+  cv::cvtColor(image->AsMat(), newImage->AsMat(), cv::COLOR_YUV2BGR_UYVY);
+
+  // Save the result
+  Image* rv = newImage.release();
+  if (m_impl) {
+    std::scoped_lock lock(m_impl->mutex);
+    m_impl->images.push_back(rv);
+  }
+  return rv;
+}
+
+Image* Frame::ConvertUYVYToGray(Image* image) {
+  if (!image || image->pixelFormat != VideoMode::kUYVY) {
+    return nullptr;
+  }
+
+  // Allocate a grayscale image
+  auto newImage =
+      m_impl->source.AllocImage(VideoMode::kGray, image->width, image->height,
+                                image->width * image->height);
+
+  // Convert
+  cv::cvtColor(image->AsMat(), newImage->AsMat(), cv::COLOR_YUV2GRAY_UYVY);
 
   // Save the result
   Image* rv = newImage.release();
@@ -509,6 +620,50 @@ Image* Frame::ConvertGrayToMJPEG(Image* image, int quality) {
   return rv;
 }
 
+Image* Frame::ConvertGrayToY16(Image* image) {
+  if (!image || image->pixelFormat != VideoMode::kGray) {
+    return nullptr;
+  }
+
+  // Allocate a Y16 image
+  auto newImage =
+      m_impl->source.AllocImage(VideoMode::kY16, image->width, image->height,
+                                image->width * image->height * 2);
+
+  // Convert with linear scaling
+  image->AsMat().convertTo(newImage->AsMat(), CV_16U, 256);
+
+  // Save the result
+  Image* rv = newImage.release();
+  if (m_impl) {
+    std::scoped_lock lock(m_impl->mutex);
+    m_impl->images.push_back(rv);
+  }
+  return rv;
+}
+
+Image* Frame::ConvertY16ToGray(Image* image) {
+  if (!image || image->pixelFormat != VideoMode::kY16) {
+    return nullptr;
+  }
+
+  // Allocate a Grayscale image
+  auto newImage =
+      m_impl->source.AllocImage(VideoMode::kGray, image->width, image->height,
+                                image->width * image->height);
+
+  // Scale min to 0 and max to 255
+  cv::normalize(image->AsMat(), newImage->AsMat(), 255, 0, cv::NORM_MINMAX);
+
+  // Save the result
+  Image* rv = newImage.release();
+  if (m_impl) {
+    std::scoped_lock lock(m_impl->mutex);
+    m_impl->images.push_back(rv);
+  }
+  return rv;
+}
+
 Image* Frame::GetImageImpl(int width, int height,
                            VideoMode::PixelFormat pixelFormat,
                            int requiredJpegQuality, int defaultJpegQuality) {
@@ -523,7 +678,8 @@ Image* Frame::GetImageImpl(int width, int height,
 
   WPI_DEBUG4(Instance::GetInstance().logger,
              "converting image from {}x{} type {} to {}x{} type {}", cur->width,
-             cur->height, cur->pixelFormat, width, height, pixelFormat);
+             cur->height, static_cast<int>(cur->pixelFormat), width, height,
+             static_cast<int>(pixelFormat));
 
   // If the source image is a JPEG, we need to decode it before we can do
   // anything else with it.  Note that if the destination format is JPEG, we

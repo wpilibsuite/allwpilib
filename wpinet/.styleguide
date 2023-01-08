@@ -1,0 +1,36 @@
+cppHeaderFileInclude {
+  \.h$
+  \.inc$
+  \.inl$
+}
+
+cppSrcFileInclude {
+  \.cpp$
+}
+
+generatedFileExclude {
+  src/main/native/thirdparty/
+
+  src/main/native/cpp/http_parser\.cpp$
+  src/main/native/include/wpinet/http_parser\.h$
+  src/main/native/resources/
+  src/main/native/linux/AvahiClient
+}
+
+licenseUpdateExclude {
+}
+
+repoRootNameOverride {
+  wpinet
+}
+
+includeGuardRoots {
+  wpinet/src/main/native/cpp/
+  wpinet/src/main/native/include/wpinet/
+  wpinet/src/test/native/cpp/
+}
+
+includeOtherLibs {
+  ^fmt/
+  ^wpi/
+}

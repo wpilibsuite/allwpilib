@@ -23,7 +23,7 @@ extern "C" {
  *
  * @param[in] portHandle         the port handle to create from
  * @param[in] input              true for input, false for output
- * @param[in] allocationLocation the location where the allocation is occuring
+ * @param[in] allocationLocation the location where the allocation is occurring
  *                               (can be null)
  * @param[out] status            Error status variable. 0 on success.
  * @return the created digital handle
@@ -95,6 +95,16 @@ void HAL_SetDigitalPWMDutyCycle(HAL_DigitalPWMHandle pwmGenerator,
                                 double dutyCycle, int32_t* status);
 
 /**
+ * Configures the digital PWM to be a PPS signal with specified duty cycle.
+ *
+ * @param[in] pwmGenerator the digital PWM handle
+ * @param[in] dutyCycle    the percent duty cycle to output [0..1]
+ * @param[out] status      Error status variable. 0 on success.
+ */
+void HAL_SetDigitalPWMPPS(HAL_DigitalPWMHandle pwmGenerator, double dutyCycle,
+                          int32_t* status);
+
+/**
  * Configures which DO channel the PWM signal is output on.
  *
  * @param[in] pwmGenerator the digital PWM handle
@@ -150,11 +160,24 @@ HAL_Bool HAL_GetDIODirection(HAL_DigitalHandle dioPortHandle, int32_t* status);
  * single pulse going at any time.
  *
  * @param[in] dioPortHandle the digital port handle
- * @param[in] pulseLength   the active length of the pulse (in seconds)
+ * @param[in] pulseLengthSeconds   the active length of the pulse (in seconds)
  * @param[out] status       Error status variable. 0 on success.
  */
-void HAL_Pulse(HAL_DigitalHandle dioPortHandle, double pulseLength,
+void HAL_Pulse(HAL_DigitalHandle dioPortHandle, double pulseLengthSeconds,
                int32_t* status);
+
+/**
+ * Generates a single digital pulse on multiple channels.
+ *
+ * Write a pulse to the channels enabled by the mask. There can only be a
+ * single pulse going at any time.
+ *
+ * @param[in] channelMask the channel mask
+ * @param[in] pulseLengthSeconds   the active length of the pulse (in seconds)
+ * @param[out] status       Error status variable. 0 on success.
+ */
+void HAL_PulseMultiple(uint32_t channelMask, double pulseLengthSeconds,
+                       int32_t* status);
 
 /**
  * Checks a DIO line to see if it is currently generating a pulse.

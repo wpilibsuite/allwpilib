@@ -39,7 +39,9 @@ Solenoid::Solenoid(PneumaticsModuleType moduleType, int channel)
                channel} {}
 
 Solenoid::~Solenoid() {
-  m_module->UnreserveSolenoids(m_mask);
+  if (m_module) {
+    m_module->UnreserveSolenoids(m_mask);
+  }
 }
 
 void Solenoid::Set(bool on) {
@@ -75,7 +77,8 @@ void Solenoid::StartPulse() {
 void Solenoid::InitSendable(wpi::SendableBuilder& builder) {
   builder.SetSmartDashboardType("Solenoid");
   builder.SetActuator(true);
-  builder.SetSafeState([=] { Set(false); });
+  builder.SetSafeState([=, this] { Set(false); });
   builder.AddBooleanProperty(
-      "Value", [=] { return Get(); }, [=](bool value) { Set(value); });
+      "Value", [=, this] { return Get(); },
+      [=, this](bool value) { Set(value); });
 }

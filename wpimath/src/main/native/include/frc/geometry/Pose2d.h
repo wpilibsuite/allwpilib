@@ -17,13 +17,12 @@ class json;
 namespace frc {
 
 /**
- * Represents a 2d pose containing translational and rotational elements.
+ * Represents a 2D pose containing translational and rotational elements.
  */
 class WPILIB_DLLEXPORT Pose2d {
  public:
   /**
    * Constructs a pose at the origin facing toward the positive X axis.
-   * (Translation2d{0, 0} and Rotation{0})
    */
   constexpr Pose2d() = default;
 
@@ -33,31 +32,33 @@ class WPILIB_DLLEXPORT Pose2d {
    * @param translation The translational component of the pose.
    * @param rotation The rotational component of the pose.
    */
-  Pose2d(Translation2d translation, Rotation2d rotation);
+  constexpr Pose2d(Translation2d translation, Rotation2d rotation);
 
   /**
-   * Convenience constructors that takes in x and y values directly instead of
-   * having to construct a Translation2d.
+   * Constructs a pose with x and y translations instead of a separate
+   * Translation2d.
    *
    * @param x The x component of the translational component of the pose.
    * @param y The y component of the translational component of the pose.
    * @param rotation The rotational component of the pose.
    */
-  Pose2d(units::meter_t x, units::meter_t y, Rotation2d rotation);
+  constexpr Pose2d(units::meter_t x, units::meter_t y, Rotation2d rotation);
 
   /**
    * Transforms the pose by the given transformation and returns the new
    * transformed pose.
    *
+   * <pre>
    * [x_new]    [cos, -sin, 0][transform.x]
    * [y_new] += [sin,  cos, 0][transform.y]
-   * [t_new]    [0,    0,   1][transform.t]
+   * [t_new]    [  0,    0, 1][transform.t]
+   * </pre>
    *
    * @param other The transform to transform the pose by.
    *
    * @return The transformed pose.
    */
-  Pose2d operator+(const Transform2d& other) const;
+  constexpr Pose2d operator+(const Transform2d& other) const;
 
   /**
    * Returns the Transform2d that maps the one pose to another.
@@ -69,47 +70,54 @@ class WPILIB_DLLEXPORT Pose2d {
 
   /**
    * Checks equality between this Pose2d and another object.
-   *
-   * @param other The other object.
-   * @return Whether the two objects are equal.
    */
-  bool operator==(const Pose2d& other) const;
-
-  /**
-   * Checks inequality between this Pose2d and another object.
-   *
-   * @param other The other object.
-   * @return Whether the two objects are not equal.
-   */
-  bool operator!=(const Pose2d& other) const;
+  bool operator==(const Pose2d&) const = default;
 
   /**
    * Returns the underlying translation.
    *
    * @return Reference to the translational component of the pose.
    */
-  const Translation2d& Translation() const { return m_translation; }
+  constexpr const Translation2d& Translation() const { return m_translation; }
 
   /**
    * Returns the X component of the pose's translation.
    *
    * @return The x component of the pose's translation.
    */
-  units::meter_t X() const { return m_translation.X(); }
+  constexpr units::meter_t X() const { return m_translation.X(); }
 
   /**
    * Returns the Y component of the pose's translation.
    *
    * @return The y component of the pose's translation.
    */
-  units::meter_t Y() const { return m_translation.Y(); }
+  constexpr units::meter_t Y() const { return m_translation.Y(); }
 
   /**
    * Returns the underlying rotation.
    *
    * @return Reference to the rotational component of the pose.
    */
-  const Rotation2d& Rotation() const { return m_rotation; }
+  constexpr const Rotation2d& Rotation() const { return m_rotation; }
+
+  /**
+   * Multiplies the current pose by a scalar.
+   *
+   * @param scalar The scalar.
+   *
+   * @return The new scaled Pose2d.
+   */
+  constexpr Pose2d operator*(double scalar) const;
+
+  /**
+   * Divides the current pose by a scalar.
+   *
+   * @param scalar The scalar.
+   *
+   * @return The new scaled Pose2d.
+   */
+  constexpr Pose2d operator/(double scalar) const;
 
   /**
    * Transforms the pose by the given transformation and returns the new pose.
@@ -119,10 +127,10 @@ class WPILIB_DLLEXPORT Pose2d {
    *
    * @return The transformed pose.
    */
-  Pose2d TransformBy(const Transform2d& other) const;
+  constexpr Pose2d TransformBy(const Transform2d& other) const;
 
   /**
-   * Returns the other pose relative to the current pose.
+   * Returns the current pose relative to the given pose.
    *
    * This function can often be used for trajectory tracking or pose
    * stabilization algorithms to get the error between the reference and the
@@ -152,7 +160,7 @@ class WPILIB_DLLEXPORT Pose2d {
    * @param twist The change in pose in the robot's coordinate frame since the
    * previous pose update. For example, if a non-holonomic robot moves forward
    * 0.01 meters and changes angle by 0.5 degrees since the previous pose
-   * update, the twist would be Twist2d{0.01, 0.0, toRadians(0.5)}
+   * update, the twist would be Twist2d{0.01_m, 0_m, 0.5_deg}.
    *
    * @return The new pose of the robot.
    */
@@ -180,3 +188,5 @@ WPILIB_DLLEXPORT
 void from_json(const wpi::json& json, Pose2d& pose);
 
 }  // namespace frc
+
+#include "Pose2d.inc"

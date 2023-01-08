@@ -11,7 +11,6 @@ import edu.wpi.first.math.numbers.N4;
 import java.util.Random;
 import org.ejml.simple.SimpleMatrix;
 
-@SuppressWarnings("ParameterName")
 public final class StateSpaceUtil {
   private static Random rand = new Random();
 
@@ -31,7 +30,6 @@ public final class StateSpaceUtil {
    *     output measurement.
    * @return Process noise or measurement noise covariance matrix.
    */
-  @SuppressWarnings("MethodTypeParameterName")
   public static <States extends Num> Matrix<States, States> makeCovarianceMatrix(
       Nat<States> states, Matrix<States, N1> stdDevs) {
     var result = new Matrix<>(states, states);
@@ -61,24 +59,28 @@ public final class StateSpaceUtil {
   /**
    * Creates a cost matrix from the given vector for use with LQR.
    *
-   * <p>The cost matrix is constructed using Bryson's rule. The inverse square of each element in
-   * the input is taken and placed on the cost matrix diagonal.
+   * <p>The cost matrix is constructed using Bryson's rule. The inverse square of each tolerance is
+   * placed on the cost matrix diagonal. If a tolerance is infinity, its cost matrix entry is set to
+   * zero.
    *
-   * @param <States> Nat representing the states of the system.
-   * @param costs An array. For a Q matrix, its elements are the maximum allowed excursions of the
-   *     states from the reference. For an R matrix, its elements are the maximum allowed excursions
-   *     of the control inputs from no actuation.
+   * @param <Elements> Nat representing the number of system states or inputs.
+   * @param tolerances An array. For a Q matrix, its elements are the maximum allowed excursions of
+   *     the states from the reference. For an R matrix, its elements are the maximum allowed
+   *     excursions of the control inputs from no actuation.
    * @return State excursion or control effort cost matrix.
    */
-  @SuppressWarnings("MethodTypeParameterName")
-  public static <States extends Num> Matrix<States, States> makeCostMatrix(
-      Matrix<States, N1> costs) {
-    Matrix<States, States> result =
-        new Matrix<>(new SimpleMatrix(costs.getNumRows(), costs.getNumRows()));
+  public static <Elements extends Num> Matrix<Elements, Elements> makeCostMatrix(
+      Matrix<Elements, N1> tolerances) {
+    Matrix<Elements, Elements> result =
+        new Matrix<>(new SimpleMatrix(tolerances.getNumRows(), tolerances.getNumRows()));
     result.fill(0.0);
 
-    for (int i = 0; i < costs.getNumRows(); i++) {
-      result.set(i, i, 1.0 / (Math.pow(costs.get(i, 0), 2)));
+    for (int i = 0; i < tolerances.getNumRows(); i++) {
+      if (tolerances.get(i, 0) == Double.POSITIVE_INFINITY) {
+        result.set(i, i, 0.0);
+      } else {
+        result.set(i, i, 1.0 / (Math.pow(tolerances.get(i, 0), 2)));
+      }
     }
 
     return result;
@@ -97,7 +99,6 @@ public final class StateSpaceUtil {
    * @param B Input matrix.
    * @return If the system is stabilizable.
    */
-  @SuppressWarnings("MethodTypeParameterName")
   public static <States extends Num, Inputs extends Num> boolean isStabilizable(
       Matrix<States, States> A, Matrix<States, Inputs> B) {
     return WPIMathJNI.isStabilizable(A.getNumRows(), B.getNumCols(), A.getData(), B.getData());
@@ -116,7 +117,6 @@ public final class StateSpaceUtil {
    * @param C Output matrix.
    * @return If the system is detectable.
    */
-  @SuppressWarnings("MethodTypeParameterName")
   public static <States extends Num, Outputs extends Num> boolean isDetectable(
       Matrix<States, States> A, Matrix<Outputs, States> C) {
     return WPIMathJNI.isStabilizable(
@@ -142,7 +142,6 @@ public final class StateSpaceUtil {
    * @param <I> The number of inputs.
    * @return The clamped input.
    */
-  @SuppressWarnings({"ParameterName", "LocalVariableName"})
   public static <I extends Num> Matrix<I, N1> clampInputMaxMagnitude(
       Matrix<I, N1> u, Matrix<I, N1> umin, Matrix<I, N1> umax) {
     var result = new Matrix<I, N1>(new SimpleMatrix(u.getNumRows(), 1));
@@ -153,7 +152,7 @@ public final class StateSpaceUtil {
   }
 
   /**
-   * Normalize all inputs if any excedes the maximum magnitude. Useful for systems such as
+   * Renormalize all inputs if any exceeds the maximum magnitude. Useful for systems such as
    * differential drivetrains.
    *
    * @param u The input vector.
@@ -161,7 +160,7 @@ public final class StateSpaceUtil {
    * @param <I> The number of inputs.
    * @return The normalizedInput
    */
-  public static <I extends Num> Matrix<I, N1> normalizeInputVector(
+  public static <I extends Num> Matrix<I, N1> desaturateInputVector(
       Matrix<I, N1> u, double maxMagnitude) {
     double maxValue = u.maxAbs();
     boolean isCapped = maxValue > maxMagnitude;

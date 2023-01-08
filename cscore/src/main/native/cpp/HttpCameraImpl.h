@@ -9,17 +9,17 @@
 #include <functional>
 #include <initializer_list>
 #include <memory>
+#include <span>
 #include <string>
 #include <string_view>
 #include <thread>
 #include <vector>
 
-#include <wpi/HttpUtil.h>
 #include <wpi/SmallString.h>
 #include <wpi/StringMap.h>
 #include <wpi/condition_variable.h>
 #include <wpi/raw_istream.h>
-#include <wpi/span.h>
+#include <wpinet/HttpUtil.h>
 
 #include "SourceImpl.h"
 #include "cscore_cpp.h"
@@ -55,7 +55,7 @@ class HttpCameraImpl : public SourceImpl {
   void NumSinksEnabledChanged() override;
 
   CS_HttpCameraKind GetKind() const;
-  bool SetUrls(wpi::span<const std::string> urls, CS_Status* status);
+  bool SetUrls(std::span<const std::string> urls, CS_Status* status);
   std::vector<std::string> GetUrls() const;
 
   // Property data

@@ -15,7 +15,7 @@ set_property(TARGET wpigui PROPERTY POSITION_INDEPENDENT_CODE ON)
 set_property(TARGET wpigui PROPERTY FOLDER "libraries")
 
 wpilib_target_warnings(wpigui)
-target_link_libraries(wpigui PUBLIC imgui wpiutil)
+target_link_libraries(wpigui PUBLIC imgui)
 
 target_include_directories(wpigui PUBLIC
                             $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/include>

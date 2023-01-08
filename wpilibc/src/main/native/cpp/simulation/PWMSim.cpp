@@ -10,11 +10,15 @@
 #include <hal/simulation/PWMData.h>
 
 #include "frc/PWM.h"
+#include "frc/motorcontrol/PWMMotorController.h"
 
 using namespace frc;
 using namespace frc::sim;
 
 PWMSim::PWMSim(const PWM& pwm) : m_index{pwm.GetChannel()} {}
+
+PWMSim::PWMSim(const PWMMotorController& motorctrl)
+    : m_index{motorctrl.GetChannel()} {}
 
 PWMSim::PWMSim(int channel) : m_index{channel} {}
 

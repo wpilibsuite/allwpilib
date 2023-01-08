@@ -11,9 +11,9 @@ import edu.wpi.first.wpilibj.AnalogEncoder;
 import edu.wpi.first.wpilibj.AnalogInput;
 import org.junit.jupiter.api.Test;
 
-public class AnalogEncoderSimTest {
+class AnalogEncoderSimTest {
   @Test
-  public void testBasic() {
+  void testBasic() {
     try (var analogInput = new AnalogInput(0);
         var analogEncoder = new AnalogEncoder(analogInput)) {
       var encoderSim = new AnalogEncoderSim(analogEncoder);

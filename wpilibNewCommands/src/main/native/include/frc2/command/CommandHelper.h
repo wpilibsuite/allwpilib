@@ -9,6 +9,7 @@
 #include <utility>
 
 #include "frc2/command/Command.h"
+#include "frc2/command/CommandPtr.h"
 
 namespace frc2 {
 
@@ -17,6 +18,8 @@ namespace frc2 {
  *
  * <p>Note: ALWAYS create a subclass by extending CommandHelper<Base, Subclass>,
  * or decorators will not function!
+ *
+ * This class is provided by the NewCommands VendorDep
  */
 template <typename Base, typename CRTP,
           typename = std::enable_if_t<std::is_base_of_v<Command, Base>>>
@@ -25,6 +28,11 @@ class CommandHelper : public Base {
 
  public:
   CommandHelper() = default;
+
+  CommandPtr ToPtr() && override {
+    return CommandPtr(
+        std::make_unique<CRTP>(std::move(*static_cast<CRTP*>(this))));
+  }
 
  protected:
   std::unique_ptr<Command> TransferOwnership() && override {

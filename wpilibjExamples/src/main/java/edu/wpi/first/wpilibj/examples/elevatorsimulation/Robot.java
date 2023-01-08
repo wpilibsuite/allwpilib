@@ -59,6 +59,7 @@ public class Robot extends TimedRobot {
           kElevatorDrumRadius,
           kMinElevatorHeight,
           kMaxElevatorHeight,
+          true,
           VecBuilder.fill(0.01));
   private final EncoderSim m_encoderSim = new EncoderSim(m_encoder);
 
@@ -75,6 +76,8 @@ public class Robot extends TimedRobot {
     m_encoder.setDistancePerPulse(kElevatorEncoderDistPerPulse);
 
     // Publish Mechanism2d to SmartDashboard
+    // To view the Elevator Sim in the simulator, select Network Tables -> SmartDashboard ->
+    // Elevator Sim
     SmartDashboard.putData("Elevator Sim", m_mech2d);
   }
 

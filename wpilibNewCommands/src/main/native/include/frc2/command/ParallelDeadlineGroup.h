@@ -18,36 +18,40 @@
 
 namespace frc2 {
 /**
- * A CommandGroup that runs a set of commands in parallel, ending only when a
- * specific command (the "deadline") ends, interrupting all other commands that
- * are still running at that point.
+ * A command composition that runs a set of commands in parallel, ending only
+ * when a specific command (the "deadline") ends, interrupting all other
+ * commands that are still running at that point.
  *
- * <p>As a rule, CommandGroups require the union of the requirements of their
- * component commands.
+ * <p>The rules for command compositions apply: command instances that are
+ * passed to it are owned by the composition and cannot be added to any other
+ * composition or scheduled individually, and the composition requires all
+ * subsystems its components require.
+ *
+ * This class is provided by the NewCommands VendorDep
  */
 class ParallelDeadlineGroup
     : public CommandHelper<CommandGroupBase, ParallelDeadlineGroup> {
  public:
   /**
-   * Creates a new ParallelDeadlineGroup.  The given commands (including the
-   * deadline) will be executed simultaneously.  The CommandGroup will finish
-   * when the deadline finishes, interrupting all other still-running commands.
-   * If the CommandGroup is interrupted, only the commands still running will be
+   * Creates a new ParallelDeadlineGroup. The given commands (including the
+   * deadline) will be executed simultaneously. The composition will finish when
+   * the deadline finishes, interrupting all other still-running commands. If
+   * the composition is interrupted, only the commands still running will be
    * interrupted.
    *
-   * @param deadline the command that determines when the group ends
+   * @param deadline the command that determines when the composition ends
    * @param commands the commands to be executed
    */
   ParallelDeadlineGroup(std::unique_ptr<Command>&& deadline,
                         std::vector<std::unique_ptr<Command>>&& commands);
   /**
-   * Creates a new ParallelDeadlineGroup.  The given commands (including the
-   * deadline) will be executed simultaneously.  The CommandGroup will finish
-   * when the deadline finishes, interrupting all other still-running commands.
-   * If the CommandGroup is interrupted, only the commands still running will be
+   * Creates a new ParallelDeadlineGroup. The given commands (including the
+   * deadline) will be executed simultaneously. The composition will finish when
+   * the deadline finishes, interrupting all other still-running commands. If
+   * the composition is interrupted, only the commands still running will be
    * interrupted.
    *
-   * @param deadline the command that determines when the group ends
+   * @param deadline the command that determines when the composition ends
    * @param commands the commands to be executed
    */
   template <class T, class... Types,
@@ -80,15 +84,19 @@ class ParallelDeadlineGroup
     AddCommands(std::move(foo));
   }
 
-  void Initialize() override;
+  void Initialize() final;
 
-  void Execute() override;
+  void Execute() final;
 
-  void End(bool interrupted) override;
+  void End(bool interrupted) final;
 
-  bool IsFinished() override;
+  bool IsFinished() final;
 
   bool RunsWhenDisabled() const override;
+
+  Command::InterruptionBehavior GetInterruptionBehavior() const override;
+
+  void InitSendable(wpi::SendableBuilder& builder) override;
 
  private:
   void AddCommands(std::vector<std::unique_ptr<Command>>&& commands) final;
@@ -98,6 +106,8 @@ class ParallelDeadlineGroup
   std::vector<std::pair<std::unique_ptr<Command>, bool>> m_commands;
   Command* m_deadline;
   bool m_runWhenDisabled{true};
+  Command::InterruptionBehavior m_interruptBehavior{
+      Command::InterruptionBehavior::kCancelIncoming};
   bool m_finished{true};
 };
 }  // namespace frc2

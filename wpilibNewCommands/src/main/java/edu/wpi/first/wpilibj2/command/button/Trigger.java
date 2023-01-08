@@ -4,9 +4,11 @@
 
 package edu.wpi.first.wpilibj2.command.button;
 
-import static edu.wpi.first.wpilibj.util.ErrorMessages.requireNonNullParam;
+import static edu.wpi.first.util.ErrorMessages.requireNonNullParam;
 
-import edu.wpi.first.wpilibj.Debouncer;
+import edu.wpi.first.math.filter.Debouncer;
+import edu.wpi.first.wpilibj.event.BooleanEvent;
+import edu.wpi.first.wpilibj.event.EventLoop;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -14,86 +16,251 @@ import edu.wpi.first.wpilibj2.command.Subsystem;
 import java.util.function.BooleanSupplier;
 
 /**
- * This class provides an easy way to link commands to inputs.
+ * This class provides an easy way to link commands to conditions.
  *
  * <p>It is very easy to link a button to a command. For instance, you could link the trigger button
  * of a joystick to a "score" command.
  *
- * <p>It is encouraged that teams write a subclass of Trigger if they want to have something unusual
- * (for instance, if they want to react to the user holding a button while the robot is reading a
- * certain sensor input). For this, they only have to write the {@link Trigger#get()} method to get
- * the full functionality of the Trigger class.
+ * <p>Triggers can easily be composed for advanced functionality using the {@link
+ * #and(BooleanSupplier)}, {@link #or(BooleanSupplier)}, {@link #negate()} operators.
+ *
+ * <p>This class is provided by the NewCommands VendorDep
  */
-public class Trigger {
-  private final BooleanSupplier m_isActive;
+public class Trigger implements BooleanSupplier {
+  private final BooleanSupplier m_condition;
+  private final EventLoop m_loop;
 
   /**
-   * Creates a new trigger with the given condition determining whether it is active.
+   * Creates a new trigger based on the given condition.
    *
-   * @param isActive returns whether or not the trigger should be active
+   * @param loop The loop instance that polls this trigger.
+   * @param condition the condition represented by this trigger
    */
-  public Trigger(BooleanSupplier isActive) {
-    m_isActive = isActive;
+  public Trigger(EventLoop loop, BooleanSupplier condition) {
+    m_loop = requireNonNullParam(loop, "loop", "Trigger");
+    m_condition = requireNonNullParam(condition, "condition", "Trigger");
   }
 
   /**
-   * Creates a new trigger that is always inactive. Useful only as a no-arg constructor for
-   * subclasses that will be overriding {@link Trigger#get()} anyway.
+   * Creates a new trigger based on the given condition.
+   *
+   * <p>Polled by the default scheduler button loop.
+   *
+   * @param condition the condition represented by this trigger
    */
+  public Trigger(BooleanSupplier condition) {
+    this(CommandScheduler.getInstance().getDefaultButtonLoop(), condition);
+  }
+
+  /** Creates a new trigger that is always `false`. */
+  @Deprecated
   public Trigger() {
-    m_isActive = () -> false;
+    this(() -> false);
   }
 
   /**
-   * Returns whether or not the trigger is active.
+   * Starts the given command whenever the condition changes from `false` to `true`.
    *
-   * <p>This method will be called repeatedly a command is linked to the Trigger.
-   *
-   * @return whether or not the trigger condition is active.
+   * @param command the command to start
+   * @return this trigger, so calls can be chained
    */
-  public boolean get() {
-    return m_isActive.getAsBoolean();
+  public Trigger onTrue(Command command) {
+    requireNonNullParam(command, "command", "onRising");
+    m_loop.bind(
+        new Runnable() {
+          private boolean m_pressedLast = m_condition.getAsBoolean();
+
+          @Override
+          public void run() {
+            boolean pressed = m_condition.getAsBoolean();
+
+            if (!m_pressedLast && pressed) {
+              command.schedule();
+            }
+
+            m_pressedLast = pressed;
+          }
+        });
+    return this;
+  }
+
+  /**
+   * Starts the given command whenever the condition changes from `true` to `false`.
+   *
+   * @param command the command to start
+   * @return this trigger, so calls can be chained
+   */
+  public Trigger onFalse(Command command) {
+    requireNonNullParam(command, "command", "onFalling");
+    m_loop.bind(
+        new Runnable() {
+          private boolean m_pressedLast = m_condition.getAsBoolean();
+
+          @Override
+          public void run() {
+            boolean pressed = m_condition.getAsBoolean();
+
+            if (m_pressedLast && !pressed) {
+              command.schedule();
+            }
+
+            m_pressedLast = pressed;
+          }
+        });
+    return this;
+  }
+
+  /**
+   * Starts the given command when the condition changes to `true` and cancels it when the condition
+   * changes to `false`.
+   *
+   * <p>Doesn't re-start the command if it ends while the condition is still `true`. If the command
+   * should restart, see {@link edu.wpi.first.wpilibj2.command.RepeatCommand}.
+   *
+   * @param command the command to start
+   * @return this trigger, so calls can be chained
+   */
+  public Trigger whileTrue(Command command) {
+    requireNonNullParam(command, "command", "whileHigh");
+    m_loop.bind(
+        new Runnable() {
+          private boolean m_pressedLast = m_condition.getAsBoolean();
+
+          @Override
+          public void run() {
+            boolean pressed = m_condition.getAsBoolean();
+
+            if (!m_pressedLast && pressed) {
+              command.schedule();
+            } else if (m_pressedLast && !pressed) {
+              command.cancel();
+            }
+
+            m_pressedLast = pressed;
+          }
+        });
+    return this;
+  }
+
+  /**
+   * Starts the given command when the condition changes to `false` and cancels it when the
+   * condition changes to `true`.
+   *
+   * <p>Doesn't re-start the command if it ends while the condition is still `false`. If the command
+   * should restart, see {@link edu.wpi.first.wpilibj2.command.RepeatCommand}.
+   *
+   * @param command the command to start
+   * @return this trigger, so calls can be chained
+   */
+  public Trigger whileFalse(Command command) {
+    requireNonNullParam(command, "command", "whileLow");
+    m_loop.bind(
+        new Runnable() {
+          private boolean m_pressedLast = m_condition.getAsBoolean();
+
+          @Override
+          public void run() {
+            boolean pressed = m_condition.getAsBoolean();
+
+            if (m_pressedLast && !pressed) {
+              command.schedule();
+            } else if (!m_pressedLast && pressed) {
+              command.cancel();
+            }
+
+            m_pressedLast = pressed;
+          }
+        });
+    return this;
+  }
+
+  /**
+   * Toggles a command when the condition changes from `false` to `true`.
+   *
+   * @param command the command to toggle
+   * @return this trigger, so calls can be chained
+   */
+  public Trigger toggleOnTrue(Command command) {
+    requireNonNullParam(command, "command", "toggleOnRising");
+    m_loop.bind(
+        new Runnable() {
+          private boolean m_pressedLast = m_condition.getAsBoolean();
+
+          @Override
+          public void run() {
+            boolean pressed = m_condition.getAsBoolean();
+
+            if (!m_pressedLast && pressed) {
+              if (command.isScheduled()) {
+                command.cancel();
+              } else {
+                command.schedule();
+              }
+            }
+
+            m_pressedLast = pressed;
+          }
+        });
+    return this;
+  }
+
+  /**
+   * Toggles a command when the condition changes from `true` to the low state.
+   *
+   * @param command the command to toggle
+   * @return this trigger, so calls can be chained
+   */
+  public Trigger toggleOnFalse(Command command) {
+    requireNonNullParam(command, "command", "toggleOnFalling");
+    m_loop.bind(
+        new Runnable() {
+          private boolean m_pressedLast = m_condition.getAsBoolean();
+
+          @Override
+          public void run() {
+            boolean pressed = m_condition.getAsBoolean();
+
+            if (m_pressedLast && !pressed) {
+              if (command.isScheduled()) {
+                command.cancel();
+              } else {
+                command.schedule();
+              }
+            }
+
+            m_pressedLast = pressed;
+          }
+        });
+    return this;
   }
 
   /**
    * Starts the given command whenever the trigger just becomes active.
    *
    * @param command the command to start
-   * @param interruptible whether the command is interruptible
    * @return this trigger, so calls can be chained
+   * @deprecated Use {@link #onTrue(Command)} instead.
    */
-  public Trigger whenActive(final Command command, boolean interruptible) {
+  @Deprecated
+  public Trigger whenActive(final Command command) {
     requireNonNullParam(command, "command", "whenActive");
 
-    CommandScheduler.getInstance()
-        .addButton(
-            new Runnable() {
-              private boolean m_pressedLast = get();
+    m_loop.bind(
+        new Runnable() {
+          private boolean m_pressedLast = m_condition.getAsBoolean();
 
-              @Override
-              public void run() {
-                boolean pressed = get();
+          @Override
+          public void run() {
+            boolean pressed = m_condition.getAsBoolean();
 
-                if (!m_pressedLast && pressed) {
-                  command.schedule(interruptible);
-                }
+            if (!m_pressedLast && pressed) {
+              command.schedule();
+            }
 
-                m_pressedLast = pressed;
-              }
-            });
-
+            m_pressedLast = pressed;
+          }
+        });
     return this;
-  }
-
-  /**
-   * Starts the given command whenever the trigger just becomes active. The command is set to be
-   * interruptible.
-   *
-   * @param command the command to start
-   * @return this trigger, so calls can be chained
-   */
-  public Trigger whenActive(final Command command) {
-    return whenActive(command, true);
   }
 
   /**
@@ -102,7 +269,9 @@ public class Trigger {
    * @param toRun the runnable to run
    * @param requirements the required subsystems
    * @return this trigger, so calls can be chained
+   * @deprecated Replace with {@link #onTrue(Command)}, creating the InstantCommand manually
    */
+  @Deprecated
   public Trigger whenActive(final Runnable toRun, Subsystem... requirements) {
     return whenActive(new InstantCommand(toRun, requirements));
   }
@@ -110,48 +279,39 @@ public class Trigger {
   /**
    * Constantly starts the given command while the button is held.
    *
-   * <p>{@link Command#schedule(boolean)} will be called repeatedly while the trigger is active, and
-   * will be canceled when the trigger becomes inactive.
+   * <p>{@link Command#schedule()} will be called repeatedly while the trigger is active, and will
+   * be canceled when the trigger becomes inactive.
    *
    * @param command the command to start
-   * @param interruptible whether the command is interruptible
    * @return this trigger, so calls can be chained
+   * @deprecated Use {@link #whileTrue(Command)} with {@link
+   *     edu.wpi.first.wpilibj2.command.RepeatCommand RepeatCommand}, or bind {@link
+   *     Command#schedule() command::schedule} to {@link BooleanEvent#ifHigh(Runnable)} (passing no
+   *     requirements).
    */
-  public Trigger whileActiveContinuous(final Command command, boolean interruptible) {
+  @Deprecated
+  public Trigger whileActiveContinuous(final Command command) {
     requireNonNullParam(command, "command", "whileActiveContinuous");
 
-    CommandScheduler.getInstance()
-        .addButton(
-            new Runnable() {
-              private boolean m_pressedLast = get();
+    m_loop.bind(
+        new Runnable() {
+          private boolean m_pressedLast = m_condition.getAsBoolean();
 
-              @Override
-              public void run() {
-                boolean pressed = get();
+          @Override
+          public void run() {
+            boolean pressed = m_condition.getAsBoolean();
 
-                if (pressed) {
-                  command.schedule(interruptible);
-                } else if (m_pressedLast) {
-                  command.cancel();
-                }
+            if (pressed) {
+              command.schedule();
+            } else if (m_pressedLast) {
+              command.cancel();
+            }
 
-                m_pressedLast = pressed;
-              }
-            });
+            m_pressedLast = pressed;
+          }
+        });
+
     return this;
-  }
-
-  /**
-   * Constantly starts the given command while the button is held.
-   *
-   * <p>{@link Command#schedule(boolean)} will be called repeatedly while the trigger is active, and
-   * will be canceled when the trigger becomes inactive. The command is set to be interruptible.
-   *
-   * @param command the command to start
-   * @return this trigger, so calls can be chained
-   */
-  public Trigger whileActiveContinuous(final Command command) {
-    return whileActiveContinuous(command, true);
   }
 
   /**
@@ -160,7 +320,9 @@ public class Trigger {
    * @param toRun the runnable to run
    * @param requirements the required subsystems
    * @return this trigger, so calls can be chained
+   * @deprecated Use {@link #whileTrue(Command)} and construct a RunCommand manually
    */
+  @Deprecated
   public Trigger whileActiveContinuous(final Runnable toRun, Subsystem... requirements) {
     return whileActiveContinuous(new InstantCommand(toRun, requirements));
   }
@@ -170,81 +332,61 @@ public class Trigger {
    * inactive, but does not re-start it in-between.
    *
    * @param command the command to start
-   * @param interruptible whether the command is interruptible
    * @return this trigger, so calls can be chained
+   * @deprecated Use {@link #whileTrue(Command)} instead.
    */
-  public Trigger whileActiveOnce(final Command command, boolean interruptible) {
+  @Deprecated
+  public Trigger whileActiveOnce(final Command command) {
     requireNonNullParam(command, "command", "whileActiveOnce");
 
-    CommandScheduler.getInstance()
-        .addButton(
-            new Runnable() {
-              private boolean m_pressedLast = get();
+    m_loop.bind(
+        new Runnable() {
+          private boolean m_pressedLast = m_condition.getAsBoolean();
 
-              @Override
-              public void run() {
-                boolean pressed = get();
+          @Override
+          public void run() {
+            boolean pressed = m_condition.getAsBoolean();
 
-                if (!m_pressedLast && pressed) {
-                  command.schedule(interruptible);
-                } else if (m_pressedLast && !pressed) {
-                  command.cancel();
-                }
+            if (!m_pressedLast && pressed) {
+              command.schedule();
+            } else if (m_pressedLast && !pressed) {
+              command.cancel();
+            }
 
-                m_pressedLast = pressed;
-              }
-            });
+            m_pressedLast = pressed;
+          }
+        });
     return this;
-  }
-
-  /**
-   * Starts the given command when the trigger initially becomes active, and ends it when it becomes
-   * inactive, but does not re-start it in-between. The command is set to be interruptible.
-   *
-   * @param command the command to start
-   * @return this trigger, so calls can be chained
-   */
-  public Trigger whileActiveOnce(final Command command) {
-    return whileActiveOnce(command, true);
   }
 
   /**
    * Starts the command when the trigger becomes inactive.
    *
    * @param command the command to start
-   * @param interruptible whether the command is interruptible
    * @return this trigger, so calls can be chained
+   * @deprecated Use {@link #onFalse(Command)} instead.
    */
-  public Trigger whenInactive(final Command command, boolean interruptible) {
+  @Deprecated
+  public Trigger whenInactive(final Command command) {
     requireNonNullParam(command, "command", "whenInactive");
 
-    CommandScheduler.getInstance()
-        .addButton(
-            new Runnable() {
-              private boolean m_pressedLast = get();
+    m_loop.bind(
+        new Runnable() {
+          private boolean m_pressedLast = m_condition.getAsBoolean();
 
-              @Override
-              public void run() {
-                boolean pressed = get();
+          @Override
+          public void run() {
+            boolean pressed = m_condition.getAsBoolean();
 
-                if (m_pressedLast && !pressed) {
-                  command.schedule(interruptible);
-                }
+            if (m_pressedLast && !pressed) {
+              command.schedule();
+            }
 
-                m_pressedLast = pressed;
-              }
-            });
+            m_pressedLast = pressed;
+          }
+        });
+
     return this;
-  }
-
-  /**
-   * Starts the command when the trigger becomes inactive. The command is set to be interruptible.
-   *
-   * @param command the command to start
-   * @return this trigger, so calls can be chained
-   */
-  public Trigger whenInactive(final Command command) {
-    return whenInactive(command, true);
   }
 
   /**
@@ -253,7 +395,9 @@ public class Trigger {
    * @param toRun the runnable to run
    * @param requirements the required subsystems
    * @return this trigger, so calls can be chained
+   * @deprecated Construct the InstantCommand manually and replace with {@link #onFalse(Command)}
    */
+  @Deprecated
   public Trigger whenInactive(final Runnable toRun, Subsystem... requirements) {
     return whenInactive(new InstantCommand(toRun, requirements));
   }
@@ -262,43 +406,34 @@ public class Trigger {
    * Toggles a command when the trigger becomes active.
    *
    * @param command the command to toggle
-   * @param interruptible whether the command is interruptible
    * @return this trigger, so calls can be chained
+   * @deprecated Use {@link #toggleOnTrue(Command)} instead.
    */
-  public Trigger toggleWhenActive(final Command command, boolean interruptible) {
+  @Deprecated
+  public Trigger toggleWhenActive(final Command command) {
     requireNonNullParam(command, "command", "toggleWhenActive");
 
-    CommandScheduler.getInstance()
-        .addButton(
-            new Runnable() {
-              private boolean m_pressedLast = get();
+    m_loop.bind(
+        new Runnable() {
+          private boolean m_pressedLast = m_condition.getAsBoolean();
 
-              @Override
-              public void run() {
-                boolean pressed = get();
+          @Override
+          public void run() {
+            boolean pressed = m_condition.getAsBoolean();
 
-                if (!m_pressedLast && pressed) {
-                  if (command.isScheduled()) {
-                    command.cancel();
-                  } else {
-                    command.schedule(interruptible);
-                  }
-                }
-
-                m_pressedLast = pressed;
+            if (!m_pressedLast && pressed) {
+              if (command.isScheduled()) {
+                command.cancel();
+              } else {
+                command.schedule();
               }
-            });
-    return this;
-  }
+            }
 
-  /**
-   * Toggles a command when the trigger becomes active. The command is set to be interruptible.
-   *
-   * @param command the command to toggle
-   * @return this trigger, so calls can be chained
-   */
-  public Trigger toggleWhenActive(final Command command) {
-    return toggleWhenActive(command, true);
+            m_pressedLast = pressed;
+          }
+        });
+
+    return this;
   }
 
   /**
@@ -306,49 +441,54 @@ public class Trigger {
    *
    * @param command the command to cancel
    * @return this trigger, so calls can be chained
+   * @deprecated Instead, pass this as an end condition to {@link Command#until(BooleanSupplier)}.
    */
+  @Deprecated
   public Trigger cancelWhenActive(final Command command) {
     requireNonNullParam(command, "command", "cancelWhenActive");
 
-    CommandScheduler.getInstance()
-        .addButton(
-            new Runnable() {
-              private boolean m_pressedLast = get();
+    m_loop.bind(
+        new Runnable() {
+          private boolean m_pressedLast = m_condition.getAsBoolean();
 
-              @Override
-              public void run() {
-                boolean pressed = get();
+          @Override
+          public void run() {
+            boolean pressed = m_condition.getAsBoolean();
 
-                if (!m_pressedLast && pressed) {
-                  command.cancel();
-                }
+            if (!m_pressedLast && pressed) {
+              command.cancel();
+            }
 
-                m_pressedLast = pressed;
-              }
-            });
+            m_pressedLast = pressed;
+          }
+        });
+
     return this;
   }
 
-  /**
-   * Composes this trigger with another trigger, returning a new trigger that is active when both
-   * triggers are active.
-   *
-   * @param trigger the trigger to compose with
-   * @return the trigger that is active when both triggers are active
-   */
-  public Trigger and(Trigger trigger) {
-    return new Trigger(() -> get() && trigger.get());
+  @Override
+  public boolean getAsBoolean() {
+    return m_condition.getAsBoolean();
   }
 
   /**
-   * Composes this trigger with another trigger, returning a new trigger that is active when either
-   * trigger is active.
+   * Composes two triggers with logical AND.
    *
-   * @param trigger the trigger to compose with
-   * @return the trigger that is active when either trigger is active
+   * @param trigger the condition to compose with
+   * @return A trigger which is active when both component triggers are active.
    */
-  public Trigger or(Trigger trigger) {
-    return new Trigger(() -> get() || trigger.get());
+  public Trigger and(BooleanSupplier trigger) {
+    return new Trigger(() -> m_condition.getAsBoolean() && trigger.getAsBoolean());
+  }
+
+  /**
+   * Composes two triggers with logical OR.
+   *
+   * @param trigger the condition to compose with
+   * @return A trigger which is active when either component trigger is active.
+   */
+  public Trigger or(BooleanSupplier trigger) {
+    return new Trigger(() -> m_condition.getAsBoolean() || trigger.getAsBoolean());
   }
 
   /**
@@ -358,24 +498,36 @@ public class Trigger {
    * @return the negated trigger
    */
   public Trigger negate() {
-    return new Trigger(() -> !get());
+    return new Trigger(() -> !m_condition.getAsBoolean());
   }
 
   /**
    * Creates a new debounced trigger from this trigger - it will become active when this trigger has
    * been active for longer than the specified period.
    *
-   * @param seconds the debounce period
-   * @return the debounced trigger
+   * @param seconds The debounce period.
+   * @return The debounced trigger (rising edges debounced only)
    */
   public Trigger debounce(double seconds) {
+    return debounce(seconds, Debouncer.DebounceType.kRising);
+  }
+
+  /**
+   * Creates a new debounced trigger from this trigger - it will become active when this trigger has
+   * been active for longer than the specified period.
+   *
+   * @param seconds The debounce period.
+   * @param type The debounce type.
+   * @return The debounced trigger.
+   */
+  public Trigger debounce(double seconds, Debouncer.DebounceType type) {
     return new Trigger(
         new BooleanSupplier() {
-          Debouncer m_debouncer = new Debouncer(seconds);
+          final Debouncer m_debouncer = new Debouncer(seconds, type);
 
           @Override
           public boolean getAsBoolean() {
-            return m_debouncer.calculate(get());
+            return m_debouncer.calculate(m_condition.getAsBoolean());
           }
         });
   }

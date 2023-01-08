@@ -5,19 +5,21 @@
 #pragma once
 
 #include <initializer_list>
+#include <span>
 #include <string>
 #include <string_view>
 
 #include <wpi/SmallSet.h>
 #include <wpi/sendable/Sendable.h>
 #include <wpi/sendable/SendableHelper.h>
-#include <wpi/span.h>
 
 #include "frc2/command/Command.h"
 
 namespace frc2 {
 /**
  * A Sendable base class for Commands.
+ *
+ * This class is provided by the NewCommands VendorDep
  */
 class CommandBase : public Command,
                     public wpi::Sendable,
@@ -35,7 +37,7 @@ class CommandBase : public Command,
    *
    * @param requirements the Subsystem requirements to add
    */
-  void AddRequirements(wpi::span<Subsystem* const> requirements);
+  void AddRequirements(std::span<Subsystem* const> requirements);
 
   /**
    * Adds the specified Subsystem requirements to the command.
@@ -63,7 +65,7 @@ class CommandBase : public Command,
    *
    * @param name name
    */
-  void SetName(std::string_view name);
+  void SetName(std::string_view name) override;
 
   /**
    * Gets the name of this Command.

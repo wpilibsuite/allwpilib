@@ -370,7 +370,16 @@ enum class BuiltInWidgets {
    * </td></tr>
    * </table>
    */
-  kCameraStream
+  kCameraStream,
+  /**
+   * Displays a field2d object.<br>
+   * Supported types:
+   *
+   * <ul>
+   *   <li>Field2d
+   * </ul>
+   */
+  kField,
 };
 
 }  // namespace frc

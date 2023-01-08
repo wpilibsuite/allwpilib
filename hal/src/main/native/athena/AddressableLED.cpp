@@ -6,11 +6,11 @@
 
 #include <cstring>
 
-#include <FRC_FPGA_ChipObject/fpgainterfacecapi/NiFpga_HMB.h>
 #include <fmt/format.h>
 
 #include "ConstantsInternal.h"
 #include "DigitalInternal.h"
+#include "FPGACalls.h"
 #include "HALInitializer.h"
 #include "HALInternal.h"
 #include "PortsInternal.h"
@@ -43,6 +43,8 @@ void InitializeAddressableLED() {
   addressableLEDHandles = &alH;
 }
 }  // namespace hal::init
+
+static constexpr const char* HmbName = "HMB_0_LED";
 
 extern "C" {
 
@@ -101,8 +103,8 @@ HAL_AddressableLEDHandle HAL_InitializeAddressableLED(
 
   uint32_t session = led->led->getSystemInterface()->getHandle();
 
-  *status = NiFpga_OpenHostMemoryBuffer(session, "HMB_0_LED", &led->ledBuffer,
-                                        &led->ledBufferSize);
+  *status = hal::HAL_NiFpga_OpenHmb(session, HmbName, &led->ledBufferSize,
+                                    &led->ledBuffer);
 
   if (*status != 0) {
     addressableLEDHandles->Free(handle);
@@ -113,6 +115,12 @@ HAL_AddressableLEDHandle HAL_InitializeAddressableLED(
 }
 
 void HAL_FreeAddressableLED(HAL_AddressableLEDHandle handle) {
+  auto led = addressableLEDHandles->Get(handle);
+  if (!led) {
+    return;
+  }
+  uint32_t session = led->led->getSystemInterface()->getHandle();
+  hal::HAL_NiFpga_CloseHmb(session, HmbName);
   addressableLEDHandles->Free(handle);
 }
 

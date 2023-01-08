@@ -207,4 +207,41 @@ TEST(RoboRioSimTest, Set3V3) {
   EXPECT_EQ(kTestFaults, RobotController::GetFaultCount3V3());
 }
 
+TEST(RoboRioSimTest, SetSerialNumber) {
+  const std::string kSerialNum = "Hello";
+
+  RoboRioSim::ResetData();
+
+  RoboRioSim::SetSerialNumber(kSerialNum);
+  EXPECT_EQ(kSerialNum, RoboRioSim::GetSerialNumber());
+  EXPECT_EQ(kSerialNum, RobotController::GetSerialNumber());
+
+  const std::string kSerialNumberOverflow = "SerialNumber";
+  const std::string kSerialNumberTruncated = kSerialNumberOverflow.substr(0, 8);
+
+  RoboRioSim::SetSerialNumber(kSerialNumberOverflow);
+  EXPECT_EQ(kSerialNumberTruncated, RoboRioSim::GetSerialNumber());
+  EXPECT_EQ(kSerialNumberTruncated, RobotController::GetSerialNumber());
+}
+
+TEST(RoboRioSimTest, SetComments) {
+  const std::string kComments =
+      "Hello! These are comments in the roboRIO web interface!";
+
+  RoboRioSim::ResetData();
+
+  RoboRioSim::SetComments(kComments);
+  EXPECT_EQ(kComments, RoboRioSim::GetComments());
+  EXPECT_EQ(kComments, RobotController::GetComments());
+
+  const std::string kCommentsOverflow =
+      "Hello! These are comments in the roboRIO web interface! This comment "
+      "exceeds 64 characters!";
+  const std::string kCommentsTruncated = kCommentsOverflow.substr(0, 64);
+
+  RoboRioSim::SetComments(kCommentsOverflow);
+  EXPECT_EQ(kCommentsTruncated, RoboRioSim::GetComments());
+  EXPECT_EQ(kCommentsTruncated, RobotController::GetComments());
+}
+
 }  // namespace frc::sim

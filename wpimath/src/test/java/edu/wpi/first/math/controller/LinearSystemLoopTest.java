@@ -21,8 +21,8 @@ import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import java.util.Random;
 import org.junit.jupiter.api.Test;
 
-public class LinearSystemLoopTest {
-  public static final double kDt = 0.00505;
+class LinearSystemLoopTest {
+  private static final double kDt = 0.00505;
   private static final double kPositionStddev = 0.0001;
   private static final Random random = new Random();
 
@@ -40,7 +40,6 @@ public class LinearSystemLoopTest {
   private final LinearSystemLoop<N2, N1, N1> m_loop =
       new LinearSystemLoop<>(m_plant, m_controller, m_observer, 12, 0.00505);
 
-  @SuppressWarnings("LocalVariableName")
   private static void updateTwoState(
       LinearSystem<N2, N1, N1> plant, LinearSystemLoop<N2, N1, N1> loop, double noise) {
     Matrix<N1, N1> y = plant.calculateY(loop.getXHat(), loop.getU()).plus(VecBuilder.fill(noise));
@@ -50,8 +49,7 @@ public class LinearSystemLoopTest {
   }
 
   @Test
-  @SuppressWarnings("LocalVariableName")
-  public void testStateSpaceEnabled() {
+  void testStateSpaceEnabled() {
     m_loop.reset(VecBuilder.fill(0, 0));
     Matrix<N2, N1> references = VecBuilder.fill(2.0, 0.0);
     var constraints = new TrapezoidProfile.Constraints(4, 3);
@@ -79,8 +77,7 @@ public class LinearSystemLoopTest {
   }
 
   @Test
-  @SuppressWarnings("LocalVariableName")
-  public void testFlywheelEnabled() {
+  void testFlywheelEnabled() {
     LinearSystem<N1, N1, N1> plant =
         LinearSystemId.createFlywheelSystem(DCMotor.getNEO(2), 0.00289, 1.0);
     KalmanFilter<N1, N1, N1> observer =

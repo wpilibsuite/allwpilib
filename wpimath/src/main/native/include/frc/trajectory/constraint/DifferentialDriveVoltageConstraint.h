@@ -44,8 +44,8 @@ class WPILIB_DLLEXPORT DifferentialDriveVoltageConstraint
                             units::meters_per_second_t speed) const override;
 
  private:
-  const SimpleMotorFeedforward<units::meter>& m_feedforward;
-  const DifferentialDriveKinematics& m_kinematics;
+  SimpleMotorFeedforward<units::meter> m_feedforward;
+  DifferentialDriveKinematics m_kinematics;
   units::volt_t m_maxVoltage;
 };
 }  // namespace frc

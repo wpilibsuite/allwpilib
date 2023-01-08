@@ -155,7 +155,7 @@ static void DisplaySimDevice(const char* name, void* data,
 }
 
 void SimDeviceGui::Initialize() {
-  HALSimGui::halProvider.Register(
+  HALSimGui::halProvider->Register(
       "Other Devices", [] { return true; },
       [] { return std::make_unique<glass::DeviceTreeModel>(); },
       [](glass::Window* win, glass::Model* model) {
@@ -170,7 +170,7 @@ void SimDeviceGui::Initialize() {
           static_cast<glass::DeviceTreeModel*>(model)->Display();
         });
       });
-  HALSimGui::halProvider.ShowDefault("Other Devices");
+  HALSimGui::halProvider->ShowDefault("Other Devices");
 
   auto model = std::make_unique<SimDevicesModel>();
   gSimDevicesModel = model.get();
@@ -185,7 +185,7 @@ glass::DataSource* SimDeviceGui::GetValueSource(HAL_SimValueHandle handle) {
 }
 
 glass::DeviceTreeModel& SimDeviceGui::GetDeviceTree() {
-  static auto model = HALSimGui::halProvider.GetModel("Other Devices");
+  static auto model = HALSimGui::halProvider->GetModel("Other Devices");
   assert(model);
   return *static_cast<glass::DeviceTreeModel*>(model);
 }

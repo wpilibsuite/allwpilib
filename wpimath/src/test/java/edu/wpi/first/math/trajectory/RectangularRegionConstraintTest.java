@@ -16,7 +16,7 @@ import edu.wpi.first.math.util.Units;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 
-public class RectangularRegionConstraintTest {
+class RectangularRegionConstraintTest {
   @Test
   void testConstraint() {
     // Create constraints

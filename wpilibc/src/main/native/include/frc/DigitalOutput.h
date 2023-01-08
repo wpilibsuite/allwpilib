@@ -5,6 +5,7 @@
 #pragma once
 
 #include <hal/Types.h>
+#include <units/time.h>
 #include <wpi/sendable/Sendable.h>
 #include <wpi/sendable/SendableHelper.h>
 
@@ -79,11 +80,11 @@ class DigitalOutput : public DigitalSource,
    * Output a single pulse on the digital output line.
    *
    * Send a single pulse on the digital output line where the pulse duration is
-   * specified in seconds. Maximum pulse length is 0.0016 seconds.
+   * specified in seconds. Maximum of 65535 microseconds.
    *
-   * @param length The pulse length in seconds
+   * @param pulseLength The pulse length in seconds
    */
-  void Pulse(double length);
+  void Pulse(units::second_t pulseLength);
 
   /**
    * Determine if the pulse is still going.
@@ -103,6 +104,19 @@ class DigitalOutput : public DigitalSource,
    * @param rate The frequency to output all digital output PWM signals.
    */
   void SetPWMRate(double rate);
+
+  /**
+   * Enable a PWM PPS (Pulse Per Second) Output on this line.
+   *
+   * Allocate one of the 6 DO PWM generator resources from this module.
+   *
+   * Supply the duty-cycle to output.
+   *
+   * The resolution of the duty cycle is 8-bit.
+   *
+   * @param dutyCycle The duty-cycle to start generating. [0..1]
+   */
+  void EnablePPS(double dutyCycle);
 
   /**
    * Enable a PWM Output on this line.

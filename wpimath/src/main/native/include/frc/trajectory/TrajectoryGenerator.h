@@ -119,9 +119,7 @@ class WPILIB_DLLEXPORT TrajectoryGenerator {
    *
    * @param func Error reporting function.
    */
-  static void SetErrorHandler(std::function<void(const char*)> func) {
-    s_errorFunc = std::move(func);
-  }
+  static void SetErrorHandler(std::function<void(const char*)> func);
 
  private:
   static void ReportError(const char* error);

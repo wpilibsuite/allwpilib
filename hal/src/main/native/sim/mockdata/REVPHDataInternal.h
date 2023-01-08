@@ -13,13 +13,18 @@ class REVPHData {
   HAL_SIMDATAVALUE_DEFINE_NAME(Initialized)
   HAL_SIMDATAVALUE_DEFINE_NAME(SolenoidOutput)
   HAL_SIMDATAVALUE_DEFINE_NAME(CompressorOn)
-  HAL_SIMDATAVALUE_DEFINE_NAME(ClosedLoopEnabled)
+  HAL_SIMDATAVALUE_DEFINE_NAME(CompressorConfigType)
   HAL_SIMDATAVALUE_DEFINE_NAME(PressureSwitch)
   HAL_SIMDATAVALUE_DEFINE_NAME(CompressorCurrent)
 
   static LLVM_ATTRIBUTE_ALWAYS_INLINE constexpr HAL_Bool
   GetSolenoidOutputDefault() {
     return false;
+  }
+
+  static inline HAL_Value MakeCompressorConfigTypeValue(
+      HAL_REVPHCompressorConfigType value) {
+    return HAL_MakeEnum(value);
   }
 
  public:
@@ -30,8 +35,10 @@ class REVPHData {
       solenoidOutput[kNumREVPHChannels];
   SimDataValue<HAL_Bool, HAL_MakeBoolean, GetCompressorOnName> compressorOn{
       false};
-  SimDataValue<HAL_Bool, HAL_MakeBoolean, GetClosedLoopEnabledName>
-      closedLoopEnabled{true};
+  SimDataValue<HAL_REVPHCompressorConfigType, MakeCompressorConfigTypeValue,
+               GetCompressorConfigTypeName>
+      compressorConfigType{HAL_REVPHCompressorConfigType::
+                               HAL_REVPHCompressorConfigType_kDisabled};
   SimDataValue<HAL_Bool, HAL_MakeBoolean, GetPressureSwitchName> pressureSwitch{
       false};
   SimDataValue<double, HAL_MakeDouble, GetCompressorCurrentName>

@@ -4,15 +4,20 @@
 
 package edu.wpi.first.wpilibj;
 
-import static edu.wpi.first.wpilibj.util.ErrorMessages.requireNonNullParam;
+import static edu.wpi.first.util.ErrorMessages.requireNonNullParam;
 
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
-import edu.wpi.first.networktables.EntryListenerFlags;
+import edu.wpi.first.networktables.MultiSubscriber;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
+import edu.wpi.first.networktables.NetworkTableEvent;
 import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.networktables.NetworkTableListener;
+import edu.wpi.first.networktables.StringPublisher;
+import edu.wpi.first.networktables.Topic;
 import java.util.Collection;
+import java.util.EnumSet;
 
 /**
  * The preferences class provides a relatively simple way to save important values to the roboRIO to
@@ -30,37 +35,58 @@ import java.util.Collection;
 public final class Preferences {
   /** The Preferences table name. */
   private static final String TABLE_NAME = "Preferences";
-  /** The singleton instance. */
-  private static Preferences instance;
   /** The network table. */
-  private static final NetworkTable m_table;
+  private static NetworkTable m_table;
 
-  /**
-   * Returns the preferences instance.
-   *
-   * @return the preferences instance
-   * @deprecated Use the static methods
-   */
-  @Deprecated
-  public static synchronized Preferences getInstance() {
-    if (instance == null) {
-      instance = new Preferences();
-    }
-    return instance;
-  }
+  private static StringPublisher m_typePublisher;
+  private static MultiSubscriber m_tableSubscriber;
+  private static NetworkTableListener m_listener;
 
   /** Creates a preference class. */
   private Preferences() {}
 
   static {
-    m_table = NetworkTableInstance.getDefault().getTable(TABLE_NAME);
-    m_table.getEntry(".type").setString("RobotPreferences");
+    setNetworkTableInstance(NetworkTableInstance.getDefault());
+    HAL.report(tResourceType.kResourceType_Preferences, 0);
+  }
+
+  /**
+   * Set the NetworkTable instance used for entries. For testing purposes; use with caution.
+   *
+   * @param inst NetworkTable instance
+   */
+  public static synchronized void setNetworkTableInstance(NetworkTableInstance inst) {
+    m_table = inst.getTable(TABLE_NAME);
+    if (m_typePublisher != null) {
+      m_typePublisher.close();
+    }
+    m_typePublisher = m_table.getStringTopic(".type").publish();
+    m_typePublisher.set("RobotPreferences");
+
+    // Subscribe to all Preferences; this ensures we get the latest values
+    // ahead of a getter call.
+    if (m_tableSubscriber != null) {
+      m_tableSubscriber.close();
+    }
+    m_tableSubscriber = new MultiSubscriber(inst, new String[] {m_table.getPath() + "/"});
+
     // Listener to set all Preferences values to persistent
     // (for backwards compatibility with old dashboards).
-    m_table.addEntryListener(
-        (table, key, entry, value, flags) -> entry.setPersistent(),
-        EntryListenerFlags.kImmediate | EntryListenerFlags.kNew);
-    HAL.report(tResourceType.kResourceType_Preferences, 0);
+    if (m_listener != null) {
+      m_listener.close();
+    }
+    m_listener =
+        NetworkTableListener.createListener(
+            m_tableSubscriber,
+            EnumSet.of(NetworkTableEvent.Kind.kImmediate, NetworkTableEvent.Kind.kPublish),
+            event -> {
+              if (event.topicInfo != null) {
+                Topic topic = event.topicInfo.getTopic();
+                if (!topic.equals(m_typePublisher.getTopic())) {
+                  event.topicInfo.getTopic().setPersistent(true);
+                }
+              }
+            });
   }
 
   /**
@@ -88,19 +114,6 @@ public final class Preferences {
   }
 
   /**
-   * Puts the given string into the preferences table.
-   *
-   * @param key the key
-   * @param value the value
-   * @throws NullPointerException if value is null
-   * @deprecated Use {@link #setString(String, String)}
-   */
-  @Deprecated
-  public static void putString(String key, String value) {
-    setString(key, value);
-  }
-
-  /**
    * Puts the given string into the preferences table if it doesn't already exist.
    *
    * @param key The key
@@ -109,6 +122,7 @@ public final class Preferences {
   public static void initString(String key, String value) {
     NetworkTableEntry entry = m_table.getEntry(key);
     entry.setDefaultString(value);
+    entry.setPersistent();
   }
 
   /**
@@ -124,18 +138,6 @@ public final class Preferences {
   }
 
   /**
-   * Puts the given int into the preferences table.
-   *
-   * @param key the key
-   * @param value the value
-   * @deprecated Use {@link #setInt(String, int)}
-   */
-  @Deprecated
-  public static void putInt(String key, int value) {
-    setInt(key, value);
-  }
-
-  /**
    * Puts the given int into the preferences table if it doesn't already exist.
    *
    * @param key The key
@@ -144,6 +146,7 @@ public final class Preferences {
   public static void initInt(String key, int value) {
     NetworkTableEntry entry = m_table.getEntry(key);
     entry.setDefaultDouble(value);
+    entry.setPersistent();
   }
 
   /**
@@ -159,18 +162,6 @@ public final class Preferences {
   }
 
   /**
-   * Puts the given double into the preferences table.
-   *
-   * @param key the key
-   * @param value the value
-   * @deprecated Use {@link #setDouble(String, double)}
-   */
-  @Deprecated
-  public static void putDouble(String key, double value) {
-    setDouble(key, value);
-  }
-
-  /**
    * Puts the given double into the preferences table if it doesn't already exist.
    *
    * @param key The key
@@ -179,6 +170,7 @@ public final class Preferences {
   public static void initDouble(String key, double value) {
     NetworkTableEntry entry = m_table.getEntry(key);
     entry.setDefaultDouble(value);
+    entry.setPersistent();
   }
 
   /**
@@ -194,18 +186,6 @@ public final class Preferences {
   }
 
   /**
-   * Puts the given float into the preferences table.
-   *
-   * @param key the key
-   * @param value the value
-   * @deprecated Use {@link #setFloat(String, float)}
-   */
-  @Deprecated
-  public static void putFloat(String key, float value) {
-    setFloat(key, value);
-  }
-
-  /**
    * Puts the given float into the preferences table if it doesn't already exist.
    *
    * @param key The key
@@ -214,6 +194,7 @@ public final class Preferences {
   public static void initFloat(String key, float value) {
     NetworkTableEntry entry = m_table.getEntry(key);
     entry.setDefaultDouble(value);
+    entry.setPersistent();
   }
 
   /**
@@ -229,18 +210,6 @@ public final class Preferences {
   }
 
   /**
-   * Puts the given boolean into the preferences table.
-   *
-   * @param key the key
-   * @param value the value
-   * @deprecated Use {@link #setBoolean(String, boolean)}
-   */
-  @Deprecated
-  public static void putBoolean(String key, boolean value) {
-    setBoolean(key, value);
-  }
-
-  /**
    * Puts the given boolean into the preferences table if it doesn't already exist.
    *
    * @param key The key
@@ -249,6 +218,7 @@ public final class Preferences {
   public static void initBoolean(String key, boolean value) {
     NetworkTableEntry entry = m_table.getEntry(key);
     entry.setDefaultBoolean(value);
+    entry.setPersistent();
   }
 
   /**
@@ -264,18 +234,6 @@ public final class Preferences {
   }
 
   /**
-   * Puts the given long into the preferences table.
-   *
-   * @param key the key
-   * @param value the value
-   * @deprecated Use {@link #setLong(String, long)}
-   */
-  @Deprecated
-  public static void putLong(String key, long value) {
-    setLong(key, value);
-  }
-
-  /**
    * Puts the given long into the preferences table if it doesn't already exist.
    *
    * @param key The key
@@ -284,10 +242,11 @@ public final class Preferences {
   public static void initLong(String key, long value) {
     NetworkTableEntry entry = m_table.getEntry(key);
     entry.setDefaultDouble(value);
+    entry.setPersistent();
   }
 
   /**
-   * Returns whether or not there is a key with the given name.
+   * Returns whether there is a key with the given name.
    *
    * @param key the key
    * @return if there is a value at the given key
@@ -302,7 +261,9 @@ public final class Preferences {
    * @param key the key
    */
   public static void remove(String key) {
-    m_table.delete(key);
+    NetworkTableEntry entry = m_table.getEntry(key);
+    entry.clearPersistent();
+    entry.unpublish();
   }
 
   /** Remove all preferences. */

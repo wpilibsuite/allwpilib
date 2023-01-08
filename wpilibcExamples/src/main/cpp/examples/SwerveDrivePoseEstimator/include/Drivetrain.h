@@ -4,12 +4,13 @@
 
 #pragma once
 
+#include <numbers>
+
 #include <frc/AnalogGyro.h>
 #include <frc/estimator/SwerveDrivePoseEstimator.h>
 #include <frc/geometry/Translation2d.h>
 #include <frc/kinematics/SwerveDriveKinematics.h>
 #include <frc/kinematics/SwerveDriveOdometry.h>
-#include <wpi/numbers>
 
 #include "SwerveModule.h"
 
@@ -27,7 +28,7 @@ class Drivetrain {
 
   static constexpr auto kMaxSpeed = 3.0_mps;  // 3 meters per second
   static constexpr units::radians_per_second_t kMaxAngularSpeed{
-      wpi::numbers::pi};  // 1/2 rotation per second
+      std::numbers::pi};  // 1/2 rotation per second
 
  private:
   frc::Translation2d m_frontLeftLocation{+0.381_m, +0.381_m};
@@ -36,7 +37,7 @@ class Drivetrain {
   frc::Translation2d m_backRightLocation{-0.381_m, -0.381_m};
 
   SwerveModule m_frontLeft{1, 2, 0, 1, 2, 3};
-  SwerveModule m_frontRight{2, 3, 4, 5, 6, 7};
+  SwerveModule m_frontRight{3, 4, 4, 5, 6, 7};
   SwerveModule m_backLeft{5, 6, 8, 9, 10, 11};
   SwerveModule m_backRight{7, 8, 12, 13, 14, 15};
 
@@ -49,6 +50,11 @@ class Drivetrain {
   // Gains are for example purposes only - must be determined for your own
   // robot!
   frc::SwerveDrivePoseEstimator<4> m_poseEstimator{
-      frc::Rotation2d(), frc::Pose2d(), m_kinematics,
-      {0.1, 0.1, 0.1},   {0.05},        {0.1, 0.1, 0.1}};
+      m_kinematics,
+      frc::Rotation2d{},
+      {m_frontLeft.GetPosition(), m_frontRight.GetPosition(),
+       m_backLeft.GetPosition(), m_backRight.GetPosition()},
+      frc::Pose2d{},
+      {0.1, 0.1, 0.1},
+      {0.1, 0.1, 0.1}};
 };

@@ -13,15 +13,18 @@
     <exclude name="AccessorClassGeneration" />
     <exclude name="AccessorMethodGeneration" />
     <exclude name="AvoidPrintStackTrace" />
+    <exclude name="AvoidReassigningCatchVariables" />
     <exclude name="AvoidReassigningParameters" />
     <exclude name="AvoidUsingHardCodedIP" />
     <exclude name="ConstantsInInterface" />
     <exclude name="JUnitAssertionsShouldIncludeMessage" />
     <exclude name="JUnitTestContainsTooManyAsserts" />
+    <exclude name="JUnitTestsShouldIncludeAssert" />
     <exclude name="JUnit4TestShouldUseAfterAnnotation" />
     <exclude name="JUnit4TestShouldUseBeforeAnnotation" />
     <exclude name="JUnit4TestShouldUseTestAnnotation" />
     <exclude name="LooseCoupling" />
+    <exclude name="PreserveStackTrace" />
     <exclude name="ReplaceHashtableWithMap" />
     <exclude name="ReplaceVectorWithList" />
     <exclude name="SwitchStmtsShouldHaveDefault" />
@@ -37,6 +40,7 @@
 
   <rule ref="category/java/design.xml">
     <exclude name="AvoidThrowingRawExceptionTypes" />
+    <exclude name="CognitiveComplexity" />
     <exclude name="CyclomaticComplexity" />
     <exclude name="DataClass" />
     <exclude name="ExcessiveClassLength" />
@@ -57,12 +61,16 @@
 
   <rule ref="category/java/errorprone.xml">
     <exclude name="AssignmentToNonFinalStatic" />
+    <exclude name="AvoidCatchingThrowable" />
     <exclude name="AvoidDuplicateLiterals" />
     <exclude name="AvoidLiteralsInIfCondition" />
     <exclude name="BeanMembersShouldSerialize" />
+    <exclude name="CloseResource" />
     <exclude name="ConstructorCallsOverridableMethod" />
     <exclude name="DataflowAnomalyAnalysis" />
-    <exclude name="DoNotCallSystemExit" />
+    <exclude name="DoNotTerminateVM" />
+    <exclude name="EmptyCatchBlock" />
+    <exclude name="EmptyWhileStmt" />
     <exclude name="FinalizeDoesNotCallSuperFinalize" />
     <exclude name="JUnitSpelling" />
     <exclude name="MissingSerialVersionUID" />
@@ -83,8 +91,8 @@
 
   <rule name="UnnecessaryCastRule" language="java"
     message="Avoid unnecessary casts"
-    class="net.sourceforge.pmd.lang.java.rule.migrating.UnnecessaryCastRule"
-    externalInfoUrl="https://github.com/pmd/pmd/blob/master/pmd-java/src/main/java/net/sourceforge/pmd/lang/java/rule/migrating/UnnecessaryCastRule.java" />
+    class="net.sourceforge.pmd.lang.java.rule.codestyle.UnnecessaryCastRule"
+    externalInfoUrl="https://github.com/pmd/pmd/blob/master/pmd-java/src/main/java/net/sourceforge/pmd/lang/java/rule/codestyle/UnnecessaryCastRule.java" />
 
   <!-- Custom Rules -->
   <rule name="UseRequireNonNull"

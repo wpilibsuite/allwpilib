@@ -46,7 +46,7 @@ void ShuffleboardInstance::Update() {
     for (auto& entry : m_impl->tabs) {
       tabTitles.emplace_back(entry.second->GetTitle());
     }
-    m_impl->rootMetaTable->GetEntry("Tabs").ForceSetStringArray(tabTitles);
+    m_impl->rootMetaTable->GetEntry("Tabs").SetStringArray(tabTitles);
     m_impl->tabsChanged = false;
   }
   for (auto& entry : m_impl->tabs) {
@@ -75,9 +75,9 @@ void ShuffleboardInstance::DisableActuatorWidgets() {
 }
 
 void ShuffleboardInstance::SelectTab(int index) {
-  m_impl->rootMetaTable->GetEntry("Selected").ForceSetDouble(index);
+  m_impl->rootMetaTable->GetEntry("Selected").SetDouble(index);
 }
 
 void ShuffleboardInstance::SelectTab(std::string_view title) {
-  m_impl->rootMetaTable->GetEntry("Selected").ForceSetString(title);
+  m_impl->rootMetaTable->GetEntry("Selected").SetString(title);
 }

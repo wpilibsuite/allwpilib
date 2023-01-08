@@ -11,7 +11,7 @@ import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.util.Units;
 import org.junit.jupiter.api.Test;
 
-public class SingleJointedArmSimTest {
+class SingleJointedArmSimTest {
   SingleJointedArmSim m_sim =
       new SingleJointedArmSim(
           DCMotor.getVex775Pro(2),
@@ -24,7 +24,7 @@ public class SingleJointedArmSimTest {
           true);
 
   @Test
-  public void testArmDisabled() {
+  void testArmDisabled() {
     m_sim.setState(VecBuilder.fill(0.0, 0.0));
 
     for (int i = 0; i < 12 / 0.02; i++) {

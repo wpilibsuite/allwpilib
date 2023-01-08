@@ -21,6 +21,9 @@ class DigitalSource;
  */
 class SynchronousInterrupt {
  public:
+  /**
+   * Event trigger combinations for a synchronous interrupt.
+   */
   enum WaitResult {
     kTimeout = 0x0,
     kRisingEdge = 0x1,
@@ -62,7 +65,7 @@ class SynchronousInterrupt {
    *
    * @param timeout The timeout to wait for. 0s or less will return immediately.
    * @param ignorePrevious True to ignore any previous interrupts, false to
-   * return interrupt value if an interrupt has occured since last call.
+   * return interrupt value if an interrupt has occurred since last call.
    * @return The edge(s) that were triggered, or timeout.
    */
   WaitResult WaitForInterrupt(units::second_t timeout,
