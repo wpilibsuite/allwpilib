@@ -33,7 +33,7 @@ public class SwerveModuleState implements Comparable<SwerveModuleState> {
   public boolean equals(Object obj) {
     if (obj instanceof SwerveModuleState) {
       SwerveModuleState other = (SwerveModuleState) obj;
-      return Math.abs(other.speedMetersPerSecond - speedMetersPerSecond) < 1E-9 
+      return Math.abs(other.speedMetersPerSecond - speedMetersPerSecond) < 1E-9
           && angle.equals(other.angle);
     }
     return false;
