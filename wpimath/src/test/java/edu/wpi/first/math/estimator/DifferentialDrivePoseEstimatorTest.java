@@ -227,4 +227,43 @@ class DifferentialDrivePoseEstimatorTest {
       assertEquals(0.0, maxError, 0.2, "Incorrect max error");
     }
   }
+
+  @Test
+  void testSimultaneousVisionMeasurements() {
+    var kinematics = new DifferentialDriveKinematics(1);
+
+    var estimator =
+        new DifferentialDrivePoseEstimator(
+            kinematics,
+            new Rotation2d(),
+            0,
+            0,
+            new Pose2d(1, 2, Rotation2d.fromDegrees(270)),
+            VecBuilder.fill(0.02, 0.02, 0.01),
+            VecBuilder.fill(0.1, 0.1, 0.1));
+
+    estimator.updateWithTime(0, new Rotation2d(), 0, 0);
+
+    var visionMeasurements = new Pose2d[]{
+        new Pose2d(0, 0, Rotation2d.fromDegrees(0)),
+        new Pose2d(3, 1, Rotation2d.fromDegrees(90)),
+        new Pose2d(2, 4, Rotation2d.fromRadians(180)),
+    };
+
+    for (int i = 0; i < 1000; i++) {
+        for (var measurement : visionMeasurements) {
+            estimator.addVisionMeasurement(measurement, 0);
+        }
+    }
+
+    for (var measurement : visionMeasurements) {
+        var errorLog = "Estimator converged to one vision measurement: " + estimator.getEstimatedPosition().toString() + " -> " + measurement.toString();
+
+        var dx = Math.abs(measurement.getX() - estimator.getEstimatedPosition().getX());
+        var dy = Math.abs(measurement.getY() - estimator.getEstimatedPosition().getY());
+        var dtheta = Math.abs(measurement.getRotation().getDegrees() - estimator.getEstimatedPosition().getRotation().getDegrees());
+
+        assertEquals(dx > 0.08 || dy > 0.08 || dtheta > 0.08, true, errorLog);
+    }
+  }
 }
