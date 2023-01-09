@@ -125,7 +125,7 @@ void DifferentialDrivePoseEstimator::AddVisionMeasurement(
   // same timestamp
   m_poseBuffer.AddSample(
       timestamp, {GetEstimatedPosition(), sample.value().gyroAngle,
-                  sample.get().leftDistance, sample.value().rightDistance});
+                  sample.value().leftDistance, sample.value().rightDistance});
 
   // Step 7: Replay odometry inputs between sample time and latest recorded
   // sample to update the pose buffer and correct odometry.
