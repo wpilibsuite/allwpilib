@@ -214,22 +214,27 @@ TEST(MecanumDrivePoseEstimatorTest, SimultaneousVisionMeasurements) {
 
   frc::MecanumDriveWheelPositions wheelPositions;
 
-  frc::MecanumDrivePoseEstimator estimator{kinematics,      frc::Rotation2d{},
-                                           wheelPositions,  frc::Pose2d{1_m, 2_m, frc::Rotation2d{270_deg}},
-                                           {0.1, 0.1, 0.1}, {0.45, 0.45, 0.1}};
-  
+  frc::MecanumDrivePoseEstimator estimator{
+      kinematics,      frc::Rotation2d{},
+      wheelPositions,  frc::Pose2d{1_m, 2_m, frc::Rotation2d{270_deg}},
+      {0.1, 0.1, 0.1}, {0.45, 0.45, 0.1}};
+
   estimator.UpdateWithTime(0_s, frc::Rotation2d{}, wheelPositions);
 
   for (int i = 0; i < 1000; i++) {
-    estimator.AddVisionMeasurement(frc::Pose2d{0_m, 0_m, frc::Rotation2d{0_deg}}, 0_s);
-    estimator.AddVisionMeasurement(frc::Pose2d{3_m, 1_m, frc::Rotation2d{90_deg}}, 0_s);
-    estimator.AddVisionMeasurement(frc::Pose2d{2_m, 4_m, frc::Rotation2d{180_deg}}, 0_s);
+    estimator.AddVisionMeasurement(
+        frc::Pose2d{0_m, 0_m, frc::Rotation2d{0_deg}}, 0_s);
+    estimator.AddVisionMeasurement(
+        frc::Pose2d{3_m, 1_m, frc::Rotation2d{90_deg}}, 0_s);
+    estimator.AddVisionMeasurement(
+        frc::Pose2d{2_m, 4_m, frc::Rotation2d{180_deg}}, 0_s);
   }
 
   {
     auto dx = units::math::abs(estimator.GetEstimatedPosition().X() - 0_m);
     auto dy = units::math::abs(estimator.GetEstimatedPosition().Y() - 0_m);
-    auto dtheta = units::math::abs(estimator.GetEstimatedPosition().Rotation().Radians() - 0_deg);
+    auto dtheta = units::math::abs(
+        estimator.GetEstimatedPosition().Rotation().Radians() - 0_deg);
 
     EXPECT_TRUE(dx > 0.08_m || dy > 0.08_m || dtheta > 0.08_rad);
   }
@@ -237,7 +242,8 @@ TEST(MecanumDrivePoseEstimatorTest, SimultaneousVisionMeasurements) {
   {
     auto dx = units::math::abs(estimator.GetEstimatedPosition().X() - 3_m);
     auto dy = units::math::abs(estimator.GetEstimatedPosition().Y() - 1_m);
-    auto dtheta = units::math::abs(estimator.GetEstimatedPosition().Rotation().Radians() - 90_deg);
+    auto dtheta = units::math::abs(
+        estimator.GetEstimatedPosition().Rotation().Radians() - 90_deg);
 
     EXPECT_TRUE(dx > 0.08_m || dy > 0.08_m || dtheta > 0.08_rad);
   }
@@ -245,7 +251,8 @@ TEST(MecanumDrivePoseEstimatorTest, SimultaneousVisionMeasurements) {
   {
     auto dx = units::math::abs(estimator.GetEstimatedPosition().X() - 2_m);
     auto dy = units::math::abs(estimator.GetEstimatedPosition().Y() - 4_m);
-    auto dtheta = units::math::abs(estimator.GetEstimatedPosition().Rotation().Radians() - 180_deg);
+    auto dtheta = units::math::abs(
+        estimator.GetEstimatedPosition().Rotation().Radians() - 180_deg);
 
     EXPECT_TRUE(dx > 0.08_m || dy > 0.08_m || dtheta > 0.08_rad);
   }
