@@ -25,5 +25,13 @@ struct WPILIB_DLLEXPORT SwerveModulePosition {
    * Angle of the module.
    */
   Rotation2d angle;
+
+  /**
+   * Checks equality between this SwerveModulePosition and another object.
+   *
+   * @param other The other object.
+   * @return Whether the two objects are equal.
+   */
+  bool operator==(const SwerveModulePosition& other) const;
 };
 }  // namespace frc
