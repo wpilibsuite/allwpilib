@@ -234,8 +234,6 @@ TEST(SwerveDrivePoseEstimatorTest, SimultaneousVisionMeasurements) {
   
   estimator.UpdateWithTime(0_s, frc::Rotation2d{}, {fl, fr, bl, br});
 
-  auto time = wpi::Now();
-
   for (int i = 0; i < 1000; i++) {
     estimator.AddVisionMeasurement(frc::Pose2d{0_m, 0_m, frc::Rotation2d{0_deg}}, 0_s);
     estimator.AddVisionMeasurement(frc::Pose2d{3_m, 1_m, frc::Rotation2d{90_deg}}, 0_s);
