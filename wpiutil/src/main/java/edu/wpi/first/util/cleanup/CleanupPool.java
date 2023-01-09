@@ -46,5 +46,6 @@ public class CleanupPool implements AutoCloseable {
         e.printStackTrace();
       }
     }
+    m_closers.clear();
   }
 }

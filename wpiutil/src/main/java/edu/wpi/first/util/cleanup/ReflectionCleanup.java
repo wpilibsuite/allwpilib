@@ -20,11 +20,10 @@ public interface ReflectionCleanup extends AutoCloseable {
         if (field.isAnnotationPresent(SkipCleanup.class)) {
           continue;
         }
-        if (!AutoCloseable.class.isAssignableFrom(root)) {
+        if (!AutoCloseable.class.isAssignableFrom(field.getType())) {
           continue;
         }
         if (field.trySetAccessible()) {
-
           try {
             AutoCloseable c = (AutoCloseable)field.get(this);
             c.close();
