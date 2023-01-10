@@ -435,7 +435,8 @@ void CommandScheduler::RequireUngrouped(const Command* command) {
   if (command->IsComposed()) {
     throw FRC_MakeError(
         frc::err::CommandIllegalUse,
-        "Commands cannot be added to more than one CommandGroup");
+        "Commands that have been composed may not be added to another composition or scheduled"
+        "individually!");
   }
 }
 
