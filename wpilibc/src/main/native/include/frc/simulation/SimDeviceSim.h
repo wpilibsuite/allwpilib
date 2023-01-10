@@ -43,6 +43,20 @@ class SimDeviceSim {
   SimDeviceSim(const char* name, int index, int channel);
 
   /**
+   * Constructs a SimDeviceSim.
+   *
+   * @param handle the low level handle for the corresponding SimDevice.
+   */
+  explicit SimDeviceSim(HAL_SimDeviceHandle handle);
+
+  /**
+   * Get the name of this object.
+   *
+   * @return name
+   */
+  std::string GetName() const;
+
+  /**
    * Get the property object with the given name.
    *
    * @param name the property name
