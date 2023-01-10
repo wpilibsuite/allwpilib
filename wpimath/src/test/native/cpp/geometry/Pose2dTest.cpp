@@ -79,26 +79,20 @@ TEST(Pose2dTest, Nearest) {
                              static_cast<double>(std::rand() % 360)}}},
       0_deg};
 
-  EXPECT_DOUBLE_EQ(
-      pose3.X().value(),
-      origin.Nearest(std::vector{pose5, pose3, pose4}).X().value());
-  EXPECT_DOUBLE_EQ(
-      pose3.Y().value(),
-      origin.Nearest(std::vector{pose5, pose3, pose4}).Y().value());
+  EXPECT_DOUBLE_EQ(pose3.X().value(),
+                   origin.Nearest({pose5, pose3, pose4}).X().value());
+  EXPECT_DOUBLE_EQ(pose3.Y().value(),
+                   origin.Nearest({pose5, pose3, pose4}).Y().value());
 
-  EXPECT_DOUBLE_EQ(
-      pose1.X().value(),
-      origin.Nearest(std::vector{pose1, pose2, pose3}).X().value());
-  EXPECT_DOUBLE_EQ(
-      pose1.Y().value(),
-      origin.Nearest(std::vector{pose1, pose2, pose3}).Y().value());
+  EXPECT_DOUBLE_EQ(pose1.X().value(),
+                   origin.Nearest({pose1, pose2, pose3}).X().value());
+  EXPECT_DOUBLE_EQ(pose1.Y().value(),
+                   origin.Nearest({pose1, pose2, pose3}).Y().value());
 
-  EXPECT_DOUBLE_EQ(
-      pose2.X().value(),
-      origin.Nearest(std::vector{pose4, pose2, pose3}).X().value());
-  EXPECT_DOUBLE_EQ(
-      pose2.Y().value(),
-      origin.Nearest(std::vector{pose4, pose2, pose3}).Y().value());
+  EXPECT_DOUBLE_EQ(pose2.X().value(),
+                   origin.Nearest({pose4, pose2, pose3}).X().value());
+  EXPECT_DOUBLE_EQ(pose2.Y().value(),
+                   origin.Nearest({pose4, pose2, pose3}).Y().value());
 
   // Rotation component sort (when distance is the same)
   // Use the same translation because using different angles at the same
@@ -113,31 +107,31 @@ TEST(Pose2dTest, Nearest) {
 
   EXPECT_DOUBLE_EQ(poseA.Rotation().Degrees().value(),
                    Pose2d(0_m, 0_m, Rotation2d{360_deg})
-                       .Nearest(std::vector{poseA, poseB, poseD})
+                       .Nearest({poseA, poseB, poseD})
                        .Rotation()
                        .Degrees()
                        .value());
   EXPECT_DOUBLE_EQ(poseB.Rotation().Degrees().value(),
                    Pose2d(0_m, 0_m, Rotation2d{-335_deg})
-                       .Nearest(std::vector{poseB, poseC, poseD})
+                       .Nearest({poseB, poseC, poseD})
                        .Rotation()
                        .Degrees()
                        .value());
   EXPECT_DOUBLE_EQ(poseC.Rotation().Degrees().value(),
                    Pose2d(0_m, 0_m, Rotation2d{-120_deg})
-                       .Nearest(std::vector{poseB, poseC, poseD})
+                       .Nearest({poseB, poseC, poseD})
                        .Rotation()
                        .Degrees()
                        .value());
   EXPECT_DOUBLE_EQ(poseD.Rotation().Degrees().value(),
                    Pose2d(0_m, 0_m, Rotation2d{85_deg})
-                       .Nearest(std::vector{poseA, poseC, poseD})
+                       .Nearest({poseA, poseC, poseD})
                        .Rotation()
                        .Degrees()
                        .value());
   EXPECT_DOUBLE_EQ(poseE.Rotation().Degrees().value(),
                    Pose2d(0_m, 0_m, Rotation2d{170_deg})
-                       .Nearest(std::vector{poseA, poseD, poseE})
+                       .Nearest({poseA, poseD, poseE})
                        .Rotation()
                        .Degrees()
                        .value());

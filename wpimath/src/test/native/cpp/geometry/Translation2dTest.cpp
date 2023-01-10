@@ -109,36 +109,24 @@ TEST(Translation2dTest, Nearest) {
       5_m, Rotation2d{units::degree_t{static_cast<double>(std::rand() % 360)}}};
 
   EXPECT_EQ(
-      origin.Nearest(std::vector{translation5, translation3, translation4})
-          .X()
-          .value(),
+      origin.Nearest({translation5, translation3, translation4}).X().value(),
       translation3.X().value());
   EXPECT_EQ(
-      origin.Nearest(std::vector{translation5, translation3, translation4})
-          .Y()
-          .value(),
+      origin.Nearest({translation5, translation3, translation4}).Y().value(),
       translation3.Y().value());
 
   EXPECT_EQ(
-      origin.Nearest(std::vector{translation1, translation2, translation3})
-          .X()
-          .value(),
+      origin.Nearest({translation1, translation2, translation3}).X().value(),
       translation1.X().value());
   EXPECT_EQ(
-      origin.Nearest(std::vector{translation1, translation2, translation3})
-          .Y()
-          .value(),
+      origin.Nearest({translation1, translation2, translation3}).Y().value(),
       translation1.Y().value());
 
   EXPECT_EQ(
-      origin.Nearest(std::vector{translation4, translation2, translation3})
-          .X()
-          .value(),
+      origin.Nearest({translation4, translation2, translation3}).X().value(),
       translation2.X().value());
   EXPECT_EQ(
-      origin.Nearest(std::vector{translation4, translation2, translation3})
-          .Y()
-          .value(),
+      origin.Nearest({translation4, translation2, translation3}).Y().value(),
       translation2.Y().value());
 }
 

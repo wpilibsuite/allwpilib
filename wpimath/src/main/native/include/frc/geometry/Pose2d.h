@@ -4,7 +4,8 @@
 
 #pragma once
 
-#include <vector>
+#include <initializer_list>
+#include <span>
 
 #include <wpi/SymbolExports.h>
 
@@ -179,11 +180,18 @@ class WPILIB_DLLEXPORT Pose2d {
   Twist2d Log(const Pose2d& end) const;
 
   /**
-   * Returns the nearest Pose2d from a vector of poses
-   * @param poses The vector of poses.
-   * @return The nearest Pose2d from the vector.
+   * Returns the nearest Pose2d from a collection of poses
+   * @param poses The collection of poses.
+   * @return The nearest Pose2d from the collection.
    */
-  Pose2d Nearest(std::vector<Pose2d> poses) const;
+  Pose2d Nearest(std::span<Pose2d const> poses) const;
+
+  /**
+   * Returns the nearest Pose2d from a collection of poses
+   * @param poses The collection of poses.
+   * @return The nearest Pose2d from the collection.
+   */
+  Pose2d Nearest(std::initializer_list<Pose2d> poses) const;
 
  private:
   Translation2d m_translation;

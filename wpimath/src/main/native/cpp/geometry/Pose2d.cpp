@@ -69,7 +69,7 @@ Twist2d Pose2d::Log(const Pose2d& end) const {
   return {translationPart.X(), translationPart.Y(), units::radian_t{dtheta}};
 }
 
-Pose2d Pose2d::Nearest(std::vector<Pose2d> poses) const {
+Pose2d Pose2d::Nearest(std::span<Pose2d const> poses) const {
   return *std::min_element(
       poses.begin(), poses.end(), [this](const Pose2d& a, const Pose2d& b) {
         auto aDistance = this->Translation().Distance(a.Translation());
@@ -77,12 +77,23 @@ Pose2d Pose2d::Nearest(std::vector<Pose2d> poses) const {
 
         // If the distances are equal sort by difference in rotation
         if (aDistance == bDistance) {
-          return std::abs(
-                     AngleModulus((this->Rotation() - a.Rotation()).Radians())
-                         .value()) <
-                 std::abs(
-                     AngleModulus((this->Rotation() - b.Rotation()).Radians())
-                         .value());
+          return std::abs((this->Rotation() - a.Rotation()).Radians().value()) <
+                 std::abs((this->Rotation() - b.Rotation()).Radians().value());
+        }
+        return aDistance < bDistance;
+      });
+}
+
+Pose2d Pose2d::Nearest(std::initializer_list<Pose2d> poses) const {
+  return *std::min_element(
+      poses.begin(), poses.end(), [this](const Pose2d& a, const Pose2d& b) {
+        auto aDistance = this->Translation().Distance(a.Translation());
+        auto bDistance = this->Translation().Distance(b.Translation());
+
+        // If the distances are equal sort by difference in rotation
+        if (aDistance == bDistance) {
+          return std::abs((this->Rotation() - a.Rotation()).Radians().value()) <
+                 std::abs((this->Rotation() - b.Rotation()).Radians().value());
         }
         return aDistance < bDistance;
       });

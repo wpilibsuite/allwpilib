@@ -4,7 +4,8 @@
 
 #pragma once
 
-#include <vector>
+#include <initializer_list>
+#include <span>
 
 #include <wpi/SymbolExports.h>
 
@@ -173,11 +174,20 @@ class WPILIB_DLLEXPORT Translation2d {
   bool operator==(const Translation2d& other) const;
 
   /**
-   * Returns the nearest Translation2d from a vector of translations
-   * @param translations The vector of translations.
-   * @return The nearest Translation2d from the vector.
+   * Returns the nearest Translation2d from a collection of translations
+   * @param translations The collection of translations.
+   * @return The nearest Translation2d from the collection.
    */
-  Translation2d Nearest(const std::vector<Translation2d> translations) const;
+  Translation2d Nearest(
+      const std::span<Translation2d const> translations) const;
+
+  /**
+   * Returns the nearest Translation2d from a collection of translations
+   * @param translations The collection of translations.
+   * @return The nearest Translation2d from the collection.
+   */
+  Translation2d Nearest(
+      const std::initializer_list<Translation2d> translations) const;
 
  private:
   units::meter_t m_x = 0_m;

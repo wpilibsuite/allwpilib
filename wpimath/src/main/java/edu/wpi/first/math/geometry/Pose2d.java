@@ -8,7 +8,6 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.interpolation.Interpolatable;
 import java.util.Collections;
 import java.util.Comparator;
@@ -258,11 +257,8 @@ public class Pose2d implements Interpolatable<Pose2d> {
                   return this.getTranslation().getDistance(other.getTranslation());
                 })
             .thenComparing(
-                (Pose2d other) -> {
-                  return Math.abs(
-                      MathUtil.angleModulus(
-                          this.getRotation().minus(other.getRotation()).getRadians()));
-                }));
+                (Pose2d other) ->
+                    Math.abs(this.getRotation().minus(other.getRotation()).getRadians())));
   }
 
   @Override
