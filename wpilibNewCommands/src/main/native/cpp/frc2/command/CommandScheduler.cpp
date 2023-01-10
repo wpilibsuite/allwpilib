@@ -433,10 +433,10 @@ void CommandScheduler::OnCommandFinish(Action action) {
 
 void CommandScheduler::RequireUngrouped(const Command* command) {
   if (command->IsComposed()) {
-    throw FRC_MakeError(
-        frc::err::CommandIllegalUse,
-        "Commands that have been composed may not be added to another composition or scheduled"
-        "individually!");
+    throw FRC_MakeError(frc::err::CommandIllegalUse,
+                        "Commands that have been composed may not be added to "
+                        "another composition or scheduled"
+                        "individually!");
   }
 }
 

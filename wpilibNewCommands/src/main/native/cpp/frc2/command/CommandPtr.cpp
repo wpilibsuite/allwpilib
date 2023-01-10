@@ -226,7 +226,7 @@ CommandPtr CommandPtr::WithName(std::string_view name) && {
   return std::move(wrapper).ToPtr();
 }
 
-CommandBase* CommandPtr::get() const & {
+CommandBase* CommandPtr::get() const& {
   AssertValid();
   return m_ptr.get();
 }
@@ -236,27 +236,27 @@ std::unique_ptr<CommandBase> CommandPtr::Unwrap() && {
   return std::move(m_ptr);
 }
 
-void CommandPtr::Schedule() const & {
+void CommandPtr::Schedule() const& {
   AssertValid();
   CommandScheduler::GetInstance().Schedule(*this);
 }
 
-void CommandPtr::Cancel() const & {
+void CommandPtr::Cancel() const& {
   AssertValid();
   CommandScheduler::GetInstance().Cancel(*this);
 }
 
-bool CommandPtr::IsScheduled() const & {
+bool CommandPtr::IsScheduled() const& {
   AssertValid();
   return CommandScheduler::GetInstance().IsScheduled(*this);
 }
 
-bool CommandPtr::HasRequirement(Subsystem* requirement) const & {
+bool CommandPtr::HasRequirement(Subsystem* requirement) const& {
   AssertValid();
   return m_ptr->HasRequirement(requirement);
 }
 
-CommandPtr::operator bool() const & {
+CommandPtr::operator bool() const& {
   return m_ptr.operator bool();
 }
 
