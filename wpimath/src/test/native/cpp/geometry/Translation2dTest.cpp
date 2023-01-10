@@ -108,24 +108,24 @@ TEST(Translation2dTest, Nearest) {
   const Translation2d translation5{
       5_m, Rotation2d{units::degree_t{static_cast<double>(std::rand() % 360)}}};
 
-  EXPECT_EQ(
+  EXPECT_DOUBLE_EQ(
       origin.Nearest({translation5, translation3, translation4}).X().value(),
       translation3.X().value());
-  EXPECT_EQ(
+  EXPECT_DOUBLE_EQ(
       origin.Nearest({translation5, translation3, translation4}).Y().value(),
       translation3.Y().value());
 
-  EXPECT_EQ(
+  EXPECT_DOUBLE_EQ(
       origin.Nearest({translation1, translation2, translation3}).X().value(),
       translation1.X().value());
-  EXPECT_EQ(
+  EXPECT_DOUBLE_EQ(
       origin.Nearest({translation1, translation2, translation3}).Y().value(),
       translation1.Y().value());
 
-  EXPECT_EQ(
+  EXPECT_DOUBLE_EQ(
       origin.Nearest({translation4, translation2, translation3}).X().value(),
       translation2.X().value());
-  EXPECT_EQ(
+  EXPECT_DOUBLE_EQ(
       origin.Nearest({translation4, translation2, translation3}).Y().value(),
       translation2.Y().value());
 }
