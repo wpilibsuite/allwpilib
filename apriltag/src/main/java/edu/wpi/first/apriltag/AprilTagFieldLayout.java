@@ -37,8 +37,8 @@ import java.util.Optional;
  * at the bottom-right corner of the blue alliance wall. {@link #setOrigin(OriginPosition)} can be
  * used to change the poses returned from {@link AprilTagFieldLayout#getTagPose(int)} to be from the
  * perspective of a specific alliance.
- * 
- * <p>Tag poses represent the center of the tag, with a zero rotation representing a tag that is 
+ *
+ * <p>Tag poses represent the center of the tag, with a zero rotation representing a tag that is
  * upright and facing away from the (blue) alliance wall (that is, towards the opposing alliance).
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
