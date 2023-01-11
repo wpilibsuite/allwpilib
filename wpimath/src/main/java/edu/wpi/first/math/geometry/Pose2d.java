@@ -252,10 +252,7 @@ public class Pose2d implements Interpolatable<Pose2d> {
     return Collections.min(
         poses,
         Comparator.comparing(
-                (Pose2d other) -> {
-                  System.out.println(this.getTranslation().getDistance(other.getTranslation()));
-                  return this.getTranslation().getDistance(other.getTranslation());
-                })
+                (Pose2d other) -> this.getTranslation().getDistance(other.getTranslation()))
             .thenComparing(
                 (Pose2d other) ->
                     Math.abs(this.getRotation().minus(other.getRotation()).getRadians())));
