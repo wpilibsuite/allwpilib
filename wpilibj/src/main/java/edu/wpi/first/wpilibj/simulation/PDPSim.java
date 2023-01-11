@@ -75,7 +75,8 @@ public class PDPSim {
    * @return the {@link CallbackStore} object associated with this callback. Save a reference to
    *     this object so GC doesn't cancel the callback.
    */
-  public CallbackStore registerChannelCountCallback(NotifyCallback callback, boolean initialNotify) {
+  public CallbackStore registerChannelCountCallback(
+      NotifyCallback callback, boolean initialNotify) {
     int uid =
         PowerDistributionDataJNI.registerChannelCountCallback(m_index, callback, initialNotify);
     return new CallbackStore(m_index, uid, PowerDistributionDataJNI::cancelChannelCountCallback);

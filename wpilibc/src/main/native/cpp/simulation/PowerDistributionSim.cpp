@@ -40,7 +40,7 @@ void PowerDistributionSim::SetInitialized(bool initialized) {
 
 std::unique_ptr<CallbackStore>
 PowerDistributionSim::RegisterChannelCountCallback(NotifyCallback callback,
-                                                  bool initialNotify) {
+                                                   bool initialNotify) {
   auto store = std::make_unique<CallbackStore>(
       m_index, -1, callback,
       &HALSIM_CancelPowerDistributionChannelCountCallback);

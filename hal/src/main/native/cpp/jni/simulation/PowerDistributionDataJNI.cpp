@@ -65,7 +65,7 @@ Java_edu_wpi_first_hal_simulation_PowerDistributionDataJNI_setInitialized
 
 /*
  * Class:     edu_wpi_first_hal_simulation_PowerDistributionDataJNI
- * Method:    registerInitializedCallback
+ * Method:    registerChannelCountCallback
  * Signature: (ILjava/lang/Object;Z)I
  */
 JNIEXPORT jint JNICALL
