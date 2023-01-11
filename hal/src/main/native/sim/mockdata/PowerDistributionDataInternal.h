@@ -12,6 +12,7 @@ namespace hal {
 
 class PowerDistributionData {
   HAL_SIMDATAVALUE_DEFINE_NAME(Initialized)
+  HAL_SIMDATAVALUE_DEFINE_NAME(ChannelCount)
   HAL_SIMDATAVALUE_DEFINE_NAME(Temperature)
   HAL_SIMDATAVALUE_DEFINE_NAME(Voltage)
   HAL_SIMDATAVALUE_DEFINE_NAME(Current)
@@ -23,6 +24,8 @@ class PowerDistributionData {
  public:
   SimDataValue<HAL_Bool, HAL_MakeBoolean, GetInitializedName> initialized{
       false};
+  SimDataValue<int, HAL_MakeInt, GetChannelCountName> channelCount{
+      kNumPDSimChannels};
   SimDataValue<double, HAL_MakeDouble, GetTemperatureName> temperature{0.0};
   SimDataValue<double, HAL_MakeDouble, GetVoltageName> voltage{12.0};
   SimDataValue<double, HAL_MakeDouble, GetCurrentName, GetCurrentDefault>

@@ -58,6 +58,31 @@ class PowerDistributionSim {
   void SetInitialized(bool initialized);
 
   /**
+   * Register a callback to be run whenever the PowerDistribution channel
+   * count changes.
+   *
+   * @param callback the callback
+   * @param initialNotify whether to call the callback with the initial state
+   * @return the CallbackStore object associated with this callback
+   */
+  [[nodiscard]] std::unique_ptr<CallbackStore> RegisterChannelCountCallback(
+      NotifyCallback callback, bool initialNotify);
+
+  /**
+   * Check the channel count of the PowerDistribution.
+   *
+   * @return the PowerDistribution channel count
+   */
+  int GetChannelCount() const;
+
+  /**
+   * Define the PowerDistribution channel count.
+   *
+   * @param channelCount the new PowerDistribution channel count
+   */
+  void SetChannelCount(int channelCount);
+
+  /**
    * Register a callback to be run whenever the PowerDistribution temperature
    * changes.
    *

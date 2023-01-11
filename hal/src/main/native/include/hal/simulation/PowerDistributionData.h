@@ -21,6 +21,12 @@ HAL_Bool HALSIM_GetPowerDistributionInitialized(int32_t index);
 void HALSIM_SetPowerDistributionInitialized(int32_t index,
                                             HAL_Bool initialized);
 
+int32_t HALSIM_RegisterPowerDistributionChannelCountCallback(int32_t index,
+    HAL_NotifyCallback callback, void* param, HAL_Bool initialNotify);
+void HALSIM_CancelPowerDistributionChannelCountCallback(int32_t index, int32_t uid);
+int HALSIM_GetPowerDistributionChannelCount(int32_t index);
+void HALSIM_SetPowerDistributionChannelCount(int32_t index, int channelCount);
+
 int32_t HALSIM_RegisterPowerDistributionTemperatureCallback(
     int32_t index, HAL_NotifyCallback callback, void* param,
     HAL_Bool initialNotify);

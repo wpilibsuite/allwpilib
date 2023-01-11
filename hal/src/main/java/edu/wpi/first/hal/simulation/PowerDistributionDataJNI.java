@@ -16,6 +16,15 @@ public class PowerDistributionDataJNI extends JNIWrapper {
 
   public static native void setInitialized(int index, boolean initialized);
 
+  public static native int registerChannelCountCallback(
+      int index, NotifyCallback callback, boolean initialNotify);
+
+  public static native void cancelChannelCountCallback(int index, int uid);
+
+  public static native int getChannelCount(int index);
+
+  public static native void setChannelCount(int index, int channelCount);
+
   public static native int registerTemperatureCallback(
       int index, NotifyCallback callback, boolean initialNotify);
 
