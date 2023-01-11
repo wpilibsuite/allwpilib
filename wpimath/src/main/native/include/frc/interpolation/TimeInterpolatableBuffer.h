@@ -76,7 +76,7 @@ class TimeInterpolatableBuffer {
 
       if (last_not_greater_than == m_pastSnapshots.begin() ||
           last_not_greater_than->first < time) {
-        // To cases handled together:
+        // Two cases handled together:
         // 1. All entries come after the sample
         // 2. Some entries come before the sample, but none are recorded with
         // the same time
