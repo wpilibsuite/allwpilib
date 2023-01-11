@@ -36,7 +36,7 @@ namespace frc {
  * SetOrigin(OriginPosition) can be used to change the poses returned from
  * GetTagPose(int) to be from the perspective of a specific alliance. 
  * 
- *  Tag poses represent the center of the tag, with a zero rotation representing 
+ * Tag poses represent the center of the tag, with a zero rotation representing 
  * a tag that is upright and facing away from the (blue) alliance wall (that is, 
  * towards the opposing alliance). */
 class WPILIB_DLLEXPORT AprilTagFieldLayout {
