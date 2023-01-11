@@ -218,6 +218,11 @@ TEST(SwerveDrivePoseEstimatorTest, BadInitialPose) {
 }
 
 TEST(SwerveDrivePoseEstimatorTest, SimultaneousVisionMeasurements) {
+  // This tests for multiple vision measurements appled at the same time.
+  // The expected behavior is that all measurements affect the estimated pose.
+  // The alternative result is that only one vision measurement affects the
+  // outcome. If that were the case, after 1000 measurements, the estimated
+  // pose would converge to that measurement.
   frc::SwerveDriveKinematics<4> kinematics{
       frc::Translation2d{1_m, 1_m}, frc::Translation2d{1_m, -1_m},
       frc::Translation2d{-1_m, -1_m}, frc::Translation2d{-1_m, 1_m}};
