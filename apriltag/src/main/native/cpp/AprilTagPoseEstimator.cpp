@@ -105,27 +105,30 @@ Transform3d AprilTagPoseEstimator::EstimateHomography(
 
 static AprilTagPoseEstimate DoEstimateOrthogonalIteration(
     const apriltag_detection_t* detection,
-    const AprilTagPoseEstimator::Config& config, int nIters) {
+    const AprilTagPoseEstimator::Config& config, int nIters,
+    double min_improvement) {
   auto info = MakeDetectionInfo(detection, config);
   apriltag_pose_t pose1, pose2;
   double err1, err2;
   estimate_tag_pose_orthogonal_iteration(&info, &err1, &pose1, &err2, &pose2,
-                                         nIters);
+                                         nIters, min_improvement);
   return {MakePose(pose1), MakePose(pose2), err1, err2};
 }
 
 AprilTagPoseEstimate AprilTagPoseEstimator::EstimateOrthogonalIteration(
-    const AprilTagDetection& detection, int nIters) const {
+    const AprilTagDetection& detection, int nIters,
+    double min_improvement) const {
   return DoEstimateOrthogonalIteration(
       reinterpret_cast<const apriltag_detection_t*>(&detection), m_config,
-      nIters);
+      nIters, min_improvement);
 }
 
 AprilTagPoseEstimate AprilTagPoseEstimator::EstimateOrthogonalIteration(
     std::span<const double, 9> homography, std::span<const double, 8> corners,
-    int nIters) const {
+    int nIters, double min_improvement) const {
   auto detection = MakeBasicDet(homography, &corners);
-  auto rv = DoEstimateOrthogonalIteration(&detection, m_config, nIters);
+  auto rv = DoEstimateOrthogonalIteration(&detection, m_config, nIters,
+                                          min_improvement);
   matd_destroy(detection.H);
   return rv;
 }

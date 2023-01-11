@@ -132,10 +132,14 @@ public class AprilTagPoseEstimator {
    *
    * @param detection Tag detection
    * @param nIters Number of iterations
+   * @param min_improvement_per_iteration Min object-space error improvement; if less than this,
+   *     solver will exit early. 1e-7 is a reasonable choice.
    * @return Initial and (possibly) second pose estimates
    */
-  public AprilTagPoseEstimate estimateOrthogonalIteration(AprilTagDetection detection, int nIters) {
-    return estimateOrthogonalIteration(detection.getHomography(), detection.getCorners(), nIters);
+  public AprilTagPoseEstimate estimateOrthogonalIteration(
+      AprilTagDetection detection, int nIters, double min_improvement_per_iteration) {
+    return estimateOrthogonalIteration(
+        detection.getHomography(), detection.getCorners(), nIters, min_improvement_per_iteration);
   }
 
   /**
@@ -145,10 +149,12 @@ public class AprilTagPoseEstimator {
    * @param homography Homography 3x3 matrix data
    * @param corners Corner point array (X and Y for each corner in order)
    * @param nIters Number of iterations
+   * @param min_improvement_per_iteration Min object-space error improvement; if less than this,
+   *     solver will exit early. 1e-7 is a reasonable choice.
    * @return Initial and (possibly) second pose estimates
    */
   public AprilTagPoseEstimate estimateOrthogonalIteration(
-      double[] homography, double[] corners, int nIters) {
+      double[] homography, double[] corners, int nIters, double min_improvement_per_iteration) {
     return AprilTagJNI.estimatePoseOrthogonalIteration(
         homography,
         corners,
