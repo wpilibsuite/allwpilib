@@ -104,25 +104,25 @@ class Robot : public frc::TimedRobot {
         const frc::AprilTagDetection::Point c = detection->GetCenter();
         int ll = 10;
         line(mat, cv::Point(c.x - ll, c.y), cv::Point(c.x + ll, c.y),
-            crossColor, 2);
+             crossColor, 2);
         line(mat, cv::Point(c.x, c.y - ll), cv::Point(c.x, c.y + ll),
-            crossColor, 2);
+             crossColor, 2);
 
         // identify the tag
         putText(mat, std::to_string(detection->GetId()),
-            cv::Point(c.x + ll, c.y), cv::FONT_HERSHEY_SIMPLEX, 1,
-            crossColor, 3);
+                cv::Point(c.x + ll, c.y), cv::FONT_HERSHEY_SIMPLEX, 1,
+                crossColor, 3);
 
         // determine pose
         frc::Transform3d pose = estimator.Estimate(*detection);
 
         // put pose into dashbaord
         std::stringstream dashboardString;
-        dashboardString << "Translation: " << units::length::to_string(pose.X()) 
+        dashboardString << "Translation: " << units::length::to_string(pose.X())
                         << ", " << units::length::to_string(pose.Y()) << ", "
                         << units::length::to_string(pose.Z());
         frc::Rotation3d rotation = pose.Rotation();
-        dashboardString << "; Rotation: " 
+        dashboardString << "; Rotation: "
                         << units::angle::to_string(rotation.X()) << ", "
                         << units::angle::to_string(rotation.Y()) << ", " 
                         << units::angle::to_string(rotation.Z());
@@ -135,7 +135,8 @@ class Robot : public frc::TimedRobot {
       std::stringstream tags_s;
       if (tags.size() > 0) {
         if (tags.size() > 1) {
-          std::copy(tags.begin(), tags.end()-1, std::ostream_iterator<int>(tags_s, ","));
+          std::copy(tags.begin(), tags.end() - 1,
+                    std::ostream_iterator<int>(tags_s, ","));
         }
         tags_s << tags.back();
       }
