@@ -5,7 +5,6 @@
 int main(int argc, char* argv[]) {
   (void)argc;
   (void)argv;
-  // Get process name with argv
   NSString* exePathPlat = [[NSBundle mainBundle] bundlePath];
   NSString* identifier = [[NSBundle mainBundle] bundleIdentifier];
   if (identifier == nil) {
