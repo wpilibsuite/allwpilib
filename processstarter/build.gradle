@@ -15,6 +15,16 @@ if (!project.hasProperty('onlylinuxathena')) {
 
     apply from: "${rootDir}/shared/config.gradle"
 
+    // Replace shared crt with static crt.
+    // Note this means no wpilib binaries can be dependencies
+    nativeUtils.platformConfigs.named(nativeUtils.wpi.platforms.windowsx64).configure {
+        cppCompiler.debugArgs.remove('/MDd')
+        cppCompiler.debugArgs.add('/MTd')
+        cppCompiler.releaseArgs.remove('/MD')
+        cppCompiler.releaseArgs.add('/MT')
+    }
+
+
     project(':').libraryBuild.dependsOn build
 
     model {
