@@ -3,28 +3,28 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #include <cstdio>
-#include <thread>
 #include <span>
-#include <string>
 #include <sstream>
+#include <string>
+#include <thread>
 
-#include <units/length.h>
-#include <units/angle.h>
 
 #include <cameraserver/CameraServer.h>
-#include <frc/apriltag/AprilTagDetector.h>
+#include <frc/TimedRobot.h>
 #include <frc/apriltag/AprilTagDetection.h>
+#include <frc/apriltag/AprilTagDetector.h>
 #include <frc/apriltag/AprilTagPoseEstimator.h>
 #include <frc/geometry/Transform3d.h>
-#include <frc/TimedRobot.h>
 #include <frc/smartdashboard/SmartDashboard.h>
 #include <opencv2/core/core.hpp>
 #include <opencv2/core/types.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
+#include <units/angle.h>
+#include <units/length.h>
 
 /**
  * This is a demo program showing the detection of AprilTags.
- * The image is acquired from the USB camera, then any detected AprilTags 
+ * The image is acquired from the USB camera, then any detected AprilTags
  * are marked up on the image and sent to the dashboard.
  */
 class Robot : public frc::TimedRobot {
@@ -43,9 +43,9 @@ class Robot : public frc::TimedRobot {
         .fx = 699.3778103158814,
         .fy = 677.7161226393544,
         .cx = 345.6059345433618,
-        .cy = 207.12741326228522
-        };
-    frc::AprilTagPoseEstimator estimator = frc::AprilTagPoseEstimator(poseEstConfig);
+        .cy = 207.12741326228522};
+    frc::AprilTagPoseEstimator estimator =
+		frc::AprilTagPoseEstimator(poseEstConfig);
 
     // Get the USB camera from CameraServer
     cs::UsbCamera camera = frc::CameraServer::StartAutomaticCapture();
@@ -82,7 +82,8 @@ class Robot : public frc::TimedRobot {
       cv::cvtColor(mat, grayMat, cv::COLOR_BGR2GRAY);
 
       cv::Size g_size = grayMat.size();
-      frc::AprilTagDetector::Results detections = detector.Detect (g_size.width, g_size.height, grayMat.data);
+      frc::AprilTagDetector::Results detections =
+		  detector.Detect(g_size.width, g_size.height, grayMat.data);
 
       // have not seen any tags yet
       tags.clear();
@@ -96,27 +97,38 @@ class Robot : public frc::TimedRobot {
           int j = (i + 1) % 4;
           const frc::AprilTagDetection::Point pti = detection->GetCorner(i);
           const frc::AprilTagDetection::Point ptj = detection->GetCorner(j);
-          line(mat, cv::Point(pti.x, pti.y), cv::Point(ptj.x, ptj.y), outlineColor, 2);
+          line(mat, cv::Point(pti.x, pti.y), cv::Point(ptj.x, ptj.y),
+		      outlineColor, 2);
         }
 
         // mark the center of the tag
         const frc::AprilTagDetection::Point c = detection->GetCenter();
         int ll = 10;
-        line(mat, cv::Point(c.x - ll, c.y), cv::Point(c.x + ll, c.y), crossColor, 2);
-        line(mat, cv::Point(c.x, c.y - ll), cv::Point(c.x, c.y + ll), crossColor, 2);
+        line(mat, cv::Point(c.x - ll, c.y), cv::Point(c.x + ll, c.y),
+			crossColor, 2);
+        line(mat, cv::Point(c.x, c.y - ll), cv::Point(c.x, c.y + ll),
+			crossColor, 2);
 
         // identify the tag
-        putText(mat, std::to_string(detection->GetId()), cv::Point(c.x + ll, c.y), cv::FONT_HERSHEY_SIMPLEX, 1, crossColor, 3);
+        putText(mat, std::to_string(detection->GetId()),
+		    cv::Point(c.x + ll, c.y), cv::FONT_HERSHEY_SIMPLEX, 1,
+			crossColor, 3);
 
         // determine pose
         frc::Transform3d pose = estimator.Estimate(*detection);
 
         // put pose into dashbaord
         std::stringstream dashboardString;
-        dashboardString << "Translation: " << units::length::to_string(pose.X()) << ", " << units::length::to_string(pose.Y()) << ", " << units::length::to_string(pose.Z());
+        dashboardString << "Translation: " << units::length::to_string(pose.X()) 
+		                << ", " << units::length::to_string(pose.Y()) << ", "
+						<< units::length::to_string(pose.Z());
         frc::Rotation3d rotation = pose.Rotation();
-        dashboardString << "; Rotation: " << units::angle::to_string(rotation.X()) << ", " <<  units::angle::to_string(rotation.Y()) << ", " <<  units::angle::to_string(rotation.Z());
-        frc::SmartDashboard::PutString("pose_" + std::to_string(detection->GetId()), dashboardString.str());
+        dashboardString << "; Rotation: " 
+		                << units::angle::to_string(rotation.X()) << ", "
+						<< units::angle::to_string(rotation.Y()) << ", " 
+						<< units::angle::to_string(rotation.Z());
+        frc::SmartDashboard::PutString("pose_" + std::to_string(detection->GetId()),
+		    dashboardString.str());
       }
 
       // put list of tags onto dashboard

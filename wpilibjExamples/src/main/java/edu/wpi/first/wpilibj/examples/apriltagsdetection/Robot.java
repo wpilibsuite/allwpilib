@@ -24,11 +24,10 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 /**
  * This is a demo program showing the detection of AprilTags.
- * The image is acquired from the USB camera, then any detected AprilTags 
+ * The image is acquired from the USB camera, then any detected AprilTags
  * are marked up on the image and sent to the dashboard.
  */
 public class Robot extends TimedRobot {
-
   @Override
   public void robotInit() {
     Thread visionThread = new Thread(() -> apriltagVisionThreadProc());
@@ -44,7 +43,7 @@ public class Robot extends TimedRobot {
     // Set up Pose Estimator - parameters are for a Microsoft Lifecam HD-3000 (https://www.chiefdelphi.com/t/wpilib-apriltagdetector-sample-code/421411/21)
     AprilTagPoseEstimator.Config poseEstConfig = new AprilTagPoseEstimator.Config(0.1524, 699.3778103158814, 677.7161226393544, 345.6059345433618, 207.12741326228522);
     AprilTagPoseEstimator estimator = new AprilTagPoseEstimator(poseEstConfig);
-  
+
     // Get the UsbCamera from CameraServer
     UsbCamera camera = CameraServer.startAutomaticCapture();
     // Set the resolution
