@@ -8,7 +8,6 @@
 #include <string>
 #include <thread>
 
-
 #include <cameraserver/CameraServer.h>
 #include <frc/TimedRobot.h>
 #include <frc/apriltag/AprilTagDetection.h>
@@ -45,7 +44,7 @@ class Robot : public frc::TimedRobot {
         .cx = 345.6059345433618,
         .cy = 207.12741326228522};
     frc::AprilTagPoseEstimator estimator =
-		frc::AprilTagPoseEstimator(poseEstConfig);
+        frc::AprilTagPoseEstimator(poseEstConfig);
 
     // Get the USB camera from CameraServer
     cs::UsbCamera camera = frc::CameraServer::StartAutomaticCapture();
@@ -83,7 +82,7 @@ class Robot : public frc::TimedRobot {
 
       cv::Size g_size = grayMat.size();
       frc::AprilTagDetector::Results detections =
-		  detector.Detect(g_size.width, g_size.height, grayMat.data);
+          detector.Detect(g_size.width, g_size.height, grayMat.data);
 
       // have not seen any tags yet
       tags.clear();
@@ -98,21 +97,21 @@ class Robot : public frc::TimedRobot {
           const frc::AprilTagDetection::Point pti = detection->GetCorner(i);
           const frc::AprilTagDetection::Point ptj = detection->GetCorner(j);
           line(mat, cv::Point(pti.x, pti.y), cv::Point(ptj.x, ptj.y),
-		      outlineColor, 2);
+              outlineColor, 2);
         }
 
         // mark the center of the tag
         const frc::AprilTagDetection::Point c = detection->GetCenter();
         int ll = 10;
         line(mat, cv::Point(c.x - ll, c.y), cv::Point(c.x + ll, c.y),
-			crossColor, 2);
+            crossColor, 2);
         line(mat, cv::Point(c.x, c.y - ll), cv::Point(c.x, c.y + ll),
-			crossColor, 2);
+            crossColor, 2);
 
         // identify the tag
         putText(mat, std::to_string(detection->GetId()),
-		    cv::Point(c.x + ll, c.y), cv::FONT_HERSHEY_SIMPLEX, 1,
-			crossColor, 3);
+            cv::Point(c.x + ll, c.y), cv::FONT_HERSHEY_SIMPLEX, 1,
+            crossColor, 3);
 
         // determine pose
         frc::Transform3d pose = estimator.Estimate(*detection);
@@ -120,15 +119,16 @@ class Robot : public frc::TimedRobot {
         // put pose into dashbaord
         std::stringstream dashboardString;
         dashboardString << "Translation: " << units::length::to_string(pose.X()) 
-		                << ", " << units::length::to_string(pose.Y()) << ", "
-						<< units::length::to_string(pose.Z());
+                        << ", " << units::length::to_string(pose.Y()) << ", "
+                        << units::length::to_string(pose.Z());
         frc::Rotation3d rotation = pose.Rotation();
         dashboardString << "; Rotation: " 
-		                << units::angle::to_string(rotation.X()) << ", "
-						<< units::angle::to_string(rotation.Y()) << ", " 
-						<< units::angle::to_string(rotation.Z());
-        frc::SmartDashboard::PutString("pose_" + std::to_string(detection->GetId()),
-		    dashboardString.str());
+                        << units::angle::to_string(rotation.X()) << ", "
+                        << units::angle::to_string(rotation.Y()) << ", " 
+                        << units::angle::to_string(rotation.Z());
+        frc::SmartDashboard::PutString(
+            "pose_" + std::to_string(detection->GetId()),
+            dashboardString.str());
       }
 
       // put list of tags onto dashboard
