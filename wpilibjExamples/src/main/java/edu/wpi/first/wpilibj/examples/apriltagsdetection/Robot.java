@@ -4,13 +4,6 @@
 
 package edu.wpi.first.wpilibj.examples.apriltagsdetection;
 
-import java.util.ArrayList;
-
-import org.opencv.core.Mat;
-import org.opencv.core.Point;
-import org.opencv.core.Scalar;
-import org.opencv.imgproc.Imgproc;
-
 import edu.wpi.first.apriltag.AprilTagDetection;
 import edu.wpi.first.apriltag.AprilTagDetector;
 import edu.wpi.first.apriltag.AprilTagPoseEstimator;
@@ -21,6 +14,11 @@ import edu.wpi.first.cscore.UsbCamera;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import java.util.ArrayList;
+import org.opencv.core.Mat;
+import org.opencv.core.Point;
+import org.opencv.core.Scalar;
+import org.opencv.imgproc.Imgproc;
 
 /**
  * This is a demo program showing the detection of AprilTags.
@@ -41,7 +39,9 @@ public class Robot extends TimedRobot {
     detector.addFamily("tag16h5", 0);
 
     // Set up Pose Estimator - parameters are for a Microsoft Lifecam HD-3000 (https://www.chiefdelphi.com/t/wpilib-apriltagdetector-sample-code/421411/21)
-    AprilTagPoseEstimator.Config poseEstConfig = new AprilTagPoseEstimator.Config(0.1524, 699.3778103158814, 677.7161226393544, 345.6059345433618, 207.12741326228522);
+    AprilTagPoseEstimator.Config poseEstConfig = new AprilTagPoseEstimator.Config(
+      0.1524, 699.3778103158814, 677.7161226393544, 345.6059345433618, 207.12741326228522
+    );
     AprilTagPoseEstimator estimator = new AprilTagPoseEstimator(poseEstConfig);
 
     // Get the UsbCamera from CameraServer
@@ -103,7 +103,8 @@ public class Robot extends TimedRobot {
         Imgproc.line(mat, new Point(cx, cy - ll), new Point(cx, cy + ll), crossColor, 2);
 
         // identify the tag
-        Imgproc.putText(mat, Integer.toString(detection.getId()), new Point (cx + ll, cy), Imgproc.FONT_HERSHEY_SIMPLEX, 1, crossColor, 3);
+        Imgproc.putText(mat, Integer.toString(detection.getId()), new Point(cx + ll, cy),
+          Imgproc.FONT_HERSHEY_SIMPLEX, 1, crossColor, 3);
 
         // determine pose
         Transform3d pose = estimator.estimate(detection);
