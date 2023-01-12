@@ -26,7 +26,7 @@ if (!project.hasProperty('onlylinuxathena')) {
                 binaries.all {
                     if (it.targetPlatform.operatingSystem.isMacOsX()) {
                         it.sources {
-                            macObjC(ObjectiveCppSourceSet) {
+                            macObjCpp(ObjectiveCppSourceSet) {
                                 source {
                                     srcDirs 'src/main/native/osx'
                                     include '**/*.mm'
@@ -39,7 +39,7 @@ if (!project.hasProperty('onlylinuxathena')) {
                         }
                     } else if (it.targetPlatform.operatingSystem.isLinux()) {
                         it.sources {
-                            linuxC(CppSourceSet) {
+                            linuxCpp(CppSourceSet) {
                                 source {
                                     srcDirs 'src/main/native/linux'
                                     include '**/*.cpp'
@@ -52,7 +52,7 @@ if (!project.hasProperty('onlylinuxathena')) {
                         }
                     } else if (it.targetPlatform.operatingSystem.isWindows()) {
                         it.sources {
-                            windowsC(CppSourceSet) {
+                            windowsCpp(CppSourceSet) {
                                 source {
                                     srcDirs 'src/main/native/windows'
                                     include '**/*.cpp'
