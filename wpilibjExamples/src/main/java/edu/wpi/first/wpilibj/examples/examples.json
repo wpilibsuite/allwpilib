@@ -297,10 +297,10 @@
   },
   {
     "name": "AprilTags Detection",
-    "description": "An example program that acquires images from an attached USB camera, detects AprilTags, outlines the tags, sends the image to the dashboard, and send information about the detected tags to SmartDashboard.",
+    "description": "on-roboRIO detection of AprilTags using an attached USB camera.",
     "tags": [
       "Vision",
-      "Complete List"
+      "AprilTags"
     ],
     "foldername": "apriltagsdetection",
     "gradlebase": "java",
