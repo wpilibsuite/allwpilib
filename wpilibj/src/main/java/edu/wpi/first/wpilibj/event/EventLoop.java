@@ -8,7 +8,7 @@ import java.util.Collection;
 import java.util.LinkedHashSet;
 
 /** The loop polling {@link BooleanEvent} objects and executing the actions bound to them. */
-public final class EventLoop {
+public final class EventLoop implements Cloneable {
   private final Collection<Runnable> m_bindings = new LinkedHashSet<>();
 
   /**
@@ -28,5 +28,10 @@ public final class EventLoop {
   /** Clear all bindings. */
   public void clear() {
     m_bindings.clear();
+  }
+
+  @Override
+  protected Object clone() throws CloneNotSupportedException {
+    return super.clone();
   }
 }
