@@ -264,7 +264,7 @@
     "description": "on-roboRIO detection of AprilTags using an attached USB camera.",
     "tags": [
       "Vision",
-	  "AprilTags",
+	  "AprilTags"
     ],
     "foldername": "AprilTagsDetection",
     "gradlebase": "cpp",
