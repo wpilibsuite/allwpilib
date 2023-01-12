@@ -21,9 +21,8 @@ import org.opencv.core.Scalar;
 import org.opencv.imgproc.Imgproc;
 
 /**
- * This is a demo program showing the detection of AprilTags.
- * The image is acquired from the USB camera, then any detected AprilTags
- * are marked up on the image and sent to the dashboard.
+ * This is a demo program showing the detection of AprilTags. The image is acquired from the USB
+ * camera, then any detected AprilTags are marked up on the image and sent to the dashboard.
  */
 public class Robot extends TimedRobot {
   @Override
@@ -38,10 +37,11 @@ public class Robot extends TimedRobot {
     // look for tag16h5, don't correct any error bits
     detector.addFamily("tag16h5", 0);
 
-    // Set up Pose Estimator - parameters are for a Microsoft Lifecam HD-3000 (https://www.chiefdelphi.com/t/wpilib-apriltagdetector-sample-code/421411/21)
-    AprilTagPoseEstimator.Config poseEstConfig = new AprilTagPoseEstimator.Config(
-      0.1524, 699.3778103158814, 677.7161226393544, 345.6059345433618, 207.12741326228522
-    );
+    // Set up Pose Estimator - parameters are for a Microsoft Lifecam HD-3000
+    // (https://www.chiefdelphi.com/t/wpilib-apriltagdetector-sample-code/421411/21)
+    AprilTagPoseEstimator.Config poseEstConfig =
+        new AprilTagPoseEstimator.Config(
+            0.1524, 699.3778103158814, 677.7161226393544, 345.6059345433618, 207.12741326228522);
     AprilTagPoseEstimator estimator = new AprilTagPoseEstimator(poseEstConfig);
 
     // Get the UsbCamera from CameraServer
@@ -103,8 +103,14 @@ public class Robot extends TimedRobot {
         Imgproc.line(mat, new Point(cx, cy - ll), new Point(cx, cy + ll), crossColor, 2);
 
         // identify the tag
-        Imgproc.putText(mat, Integer.toString(detection.getId()), new Point(cx + ll, cy),
-          Imgproc.FONT_HERSHEY_SIMPLEX, 1, crossColor, 3);
+        Imgproc.putText(
+            mat,
+            Integer.toString(detection.getId()),
+            new Point(cx + ll, cy),
+            Imgproc.FONT_HERSHEY_SIMPLEX,
+            1,
+            crossColor,
+            3);
 
         // determine pose
         Transform3d pose = estimator.estimate(detection);
@@ -123,5 +129,4 @@ public class Robot extends TimedRobot {
 
     detector.close();
   }
-
 }
