@@ -24,7 +24,6 @@ if (!project.hasProperty('onlylinuxathena')) {
         cppCompiler.releaseArgs.add('/MT')
     }
 
-
     project(':').libraryBuild.dependsOn build
 
     model {
