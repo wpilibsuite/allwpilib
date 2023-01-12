@@ -70,7 +70,7 @@ int main(int argc, char* argv[]) {
     };
 
     if (![task launchAndReturnError:nil]) {
-      return 2;
+      return 1;
     }
   }
 
