@@ -97,7 +97,7 @@ class Robot : public frc::TimedRobot {
           const frc::AprilTagDetection::Point pti = detection->GetCorner(i);
           const frc::AprilTagDetection::Point ptj = detection->GetCorner(j);
           line(mat, cv::Point(pti.x, pti.y), cv::Point(ptj.x, ptj.y),
-              outlineColor, 2);
+               outlineColor, 2);
         }
 
         // mark the center of the tag
@@ -124,7 +124,7 @@ class Robot : public frc::TimedRobot {
         frc::Rotation3d rotation = pose.Rotation();
         dashboardString << "; Rotation: "
                         << units::angle::to_string(rotation.X()) << ", "
-                        << units::angle::to_string(rotation.Y()) << ", " 
+                        << units::angle::to_string(rotation.Y()) << ", "
                         << units::angle::to_string(rotation.Z());
         frc::SmartDashboard::PutString(
             "pose_" + std::to_string(detection->GetId()),
