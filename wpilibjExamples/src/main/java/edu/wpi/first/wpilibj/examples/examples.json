@@ -296,6 +296,18 @@
     "commandversion": 2
   },
   {
+    "name": "AprilTags Detection",
+    "description": "An example program that acquires images from an attached USB camera, detects AprilTags, outlines the tags, sends the image to the dashboard, and send information about the detected tags to SmartDashboard.",
+    "tags": [
+      "Vision",
+      "Complete List"
+    ],
+    "foldername": "apriltagsdetection",
+    "gradlebase": "java",
+    "mainclass": "Main",
+    "commandversion": 2
+  },
+  {
     "name": "Shuffleboard Sample",
     "description": "An example program that adds data to various Shuffleboard tabs that demonstrates the Shuffleboard API",
     "tags": [

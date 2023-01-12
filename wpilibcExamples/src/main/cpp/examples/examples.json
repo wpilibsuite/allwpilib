@@ -260,6 +260,17 @@
     "commandversion": 2
   },
   {
+    "name": "AprilTags Detection",
+    "description": "An example program that acquires images from an attached USB camera, detects AprilTags, outlines the tags, sends the image to the dashboard, and sends information about the detected tags to SmartDashboard.",
+    "tags": [
+      "Vision",
+      "Complete List"
+    ],
+    "foldername": "AprilTagsDetection",
+    "gradlebase": "cpp",
+    "commandversion": 2
+  },
+  {
     "name": "I2C Communication",
     "description": "An example program that communicates with external devices (such as an Arduino) using the roboRIO's I2C port",
     "tags": [
