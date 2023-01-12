@@ -66,7 +66,7 @@ class Gyro3D: virtual public Gyro {
          * @return the current heading of the robot as a Rotation3d.
          */
         virtual Rotation3d GetRotation3d() const {
-            return units::degree_t{GetRoll(), GetPitch(), GetYaw()};
+            return Rotation3d{GetRoll(), GetPitch(), GetYaw()};
         }
 };
 
