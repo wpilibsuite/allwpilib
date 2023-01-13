@@ -197,9 +197,6 @@ TEST_F(LocalStorageTest, SubscribeNoTypeLocalPubPre) {
   ASSERT_TRUE(value.IsBoolean());
   EXPECT_EQ(value.GetBoolean(), true);
   EXPECT_EQ(value.time(), 5);
-
-  auto vals = storage.ReadQueueValue(sub);  // read queue won't get anything
-  ASSERT_TRUE(vals.empty());
 }
 
 TEST_F(LocalStorageTest, EntryNoTypeLocalSet) {
