@@ -126,7 +126,7 @@ public class Robot extends TimedRobot {
     }
   }
   // To view the Elevator Sim in the simulator, select Network Tables -> SmartDashboard -> Elevator Sim
-  // If you are on keyboard, ppress Z to move the elevator
+  // If you are on keyboard, press Z to move the elevator
 
   @Override
   public void disabledInit() {
