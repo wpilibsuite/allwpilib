@@ -50,7 +50,6 @@ class TrajectoryGeneratorTest {
   }
 
   @Test
-  @SuppressWarnings("LocalVariableName")
   void testGenerationAndConstraints() {
     Trajectory trajectory = getTrajectory(new ArrayList<>());
 

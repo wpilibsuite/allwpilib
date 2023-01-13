@@ -41,24 +41,32 @@ public class PIDTest extends AbstractComsSetup {
   private PIDController m_controller = null;
   private static MotorEncoderFixture<?> me = null;
 
-  @SuppressWarnings({"MemberName", "EmptyLineSeparator", "MultipleVariableDeclarations"})
-  private final Double k_p, k_i, k_d;
+  private final Double m_p;
+  private final Double m_i;
+  private final Double m_d;
 
   @Override
   protected Logger getClassLogger() {
     return logger;
   }
 
-  @SuppressWarnings({"ParameterName", "MissingJavadocMethod"})
+  /**
+   * PIDTest constructor.
+   *
+   * @param p P gain.
+   * @param i I gain.
+   * @param d D gain.
+   * @param mef Motor encoder fixture.
+   */
   public PIDTest(Double p, Double i, Double d, MotorEncoderFixture<?> mef) {
     logger.fine("Constructor with: " + mef.getType());
     if (PIDTest.me != null && !PIDTest.me.equals(mef)) {
       PIDTest.me.teardown();
     }
     PIDTest.me = mef;
-    this.k_p = p;
-    this.k_i = i;
-    this.k_d = d;
+    this.m_p = p;
+    this.m_i = i;
+    this.m_d = d;
   }
 
   @Parameters
@@ -97,7 +105,7 @@ public class PIDTest extends AbstractComsSetup {
     m_table = NetworkTableInstance.getDefault().getTable("TEST_PID");
     m_builder = new SendableBuilderImpl();
     m_builder.setTable(m_table);
-    m_controller = new PIDController(k_p, k_i, k_d);
+    m_controller = new PIDController(m_p, m_i, m_d);
     m_controller.initSendable(m_builder);
   }
 
@@ -128,9 +136,9 @@ public class PIDTest extends AbstractComsSetup {
         m_controller.getPositionError(),
         0);
     m_builder.update();
-    assertEquals(k_p, m_table.getEntry("Kp").getDouble(9999999), 0);
-    assertEquals(k_i, m_table.getEntry("Ki").getDouble(9999999), 0);
-    assertEquals(k_d, m_table.getEntry("Kd").getDouble(9999999), 0);
+    assertEquals(m_p, m_table.getEntry("Kp").getDouble(9999999), 0);
+    assertEquals(m_i, m_table.getEntry("Ki").getDouble(9999999), 0);
+    assertEquals(m_d, m_table.getEntry("Kd").getDouble(9999999), 0);
     assertEquals(reference, m_table.getEntry("reference").getDouble(9999999), 0);
     assertFalse(m_table.getEntry("enabled").getBoolean(true));
   }

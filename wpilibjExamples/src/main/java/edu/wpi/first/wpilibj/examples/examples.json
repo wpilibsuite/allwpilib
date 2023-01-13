@@ -115,11 +115,13 @@
   },
   {
     "name": "Ultrasonic",
-    "description": "Demonstrate maintaining a set distance using an ultrasonic sensor.",
+    "description": "Demonstrate using the Ultrasonic class with a ping-response ultrasonic sensor.",
     "tags": [
       "Sensors",
-      "Robot and Motor",
-      "Analog"
+      "Hardware",
+      "Ultrasonic",
+      "SmartDashboard",
+      "Shuffleboard"
     ],
     "foldername": "ultrasonic",
     "gradlebase": "java",
@@ -131,8 +133,9 @@
     "description": "Demonstrate maintaining a set distance using an ultrasonic sensor and PID Control.",
     "tags": [
       "Sensors",
-      "Robot and Motor",
-      "Analog"
+      "Ultrasonic",
+      "PID",
+      "Differential Drive"
     ],
     "foldername": "ultrasonicpid",
     "gradlebase": "java",
@@ -141,11 +144,13 @@
   },
   {
     "name": "Potentiometer PID",
-    "description": "An example to demonstrate the use of a potentiometer and PID control to reach elevator position setpoints.",
+    "description": "An example to demonstrate the use of a potentiometer and PID control to maintain elevator position setpoints.",
     "tags": [
       "Sensors",
       "Actuators",
       "Analog",
+      "Elevator",
+      "PID",
       "Joystick"
     ],
     "foldername": "potentiometerpid",
@@ -229,20 +234,7 @@
     "commandversion": 2
   },
   {
-    "name": "Motor Controller",
-    "description": "Demonstrate controlling a single motor with a joystick",
-    "tags": [
-      "Actuators",
-      "Joystick",
-      "Robot and Motor"
-    ],
-    "foldername": "motorcontrol",
-    "gradlebase": "java",
-    "mainclass": "Main",
-    "commandversion": 2
-  },
-  {
-    "name": "Motor Control With Encoder",
+    "name": "Motor Control",
     "description": "Demonstrate controlling a single motor with a Joystick and displaying the net movement of the motor using an encoder.",
     "tags": [
       "Robot and Motor",
@@ -252,7 +244,7 @@
       "Joystick",
       "Complete List"
     ],
-    "foldername": "motorcontrolencoder",
+    "foldername": "motorcontrol",
     "gradlebase": "java",
     "mainclass": "Main",
     "commandversion": 2
@@ -336,6 +328,19 @@
       "Lambdas"
     ],
     "foldername": "hatchbotinlined",
+    "gradlebase": "java",
+    "mainclass": "Main",
+    "commandversion": 2
+  },
+  {
+    "name": "Rapid React Command Bot",
+    "description": "A fully-functional command-based fender bot for the 2022 game using the new command framework.",
+    "tags": [
+      "Complete robot",
+      "Command-based",
+      "Lambdas"
+    ],
+    "foldername": "rapidreactcommandbot",
     "gradlebase": "java",
     "mainclass": "Main",
     "commandversion": 2
@@ -721,6 +726,17 @@
     "commandversion": 2
   },
   {
+    "name": "UnitTesting",
+    "description": "Demonstrates basic unit testing for a robot project.",
+    "tags": [
+      "Testing"
+    ],
+    "foldername": "unittest",
+    "gradlebase": "java",
+    "mainclass": "Main",
+    "commandversion": 2
+  },
+  {
     "name": "DifferentialDrivePoseEstimator",
     "description": "Demonstrates the use of the DifferentialDrivePoseEstimator as a replacement for differential drive odometry.",
     "tags": [
@@ -787,7 +803,8 @@
     "name": "Digital Communication Sample",
     "description": "An example program that communicates with external devices (such as an Arduino) using the roboRIO's DIO",
     "tags": [
-      "Digital"
+      "Digital",
+      "Unit Testing"
     ],
     "foldername": "digitalcommunication",
     "gradlebase": "java",

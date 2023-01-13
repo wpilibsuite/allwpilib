@@ -18,11 +18,13 @@
 
 namespace frc2 {
 /**
- * A CommandGroup that runs a set of commands in parallel, ending when any one
- * of the commands ends and interrupting all the others.
+ * A composition that runs a set of commands in parallel, ending when any one of
+ * the commands ends and interrupting all the others.
  *
- * <p>As a rule, CommandGroups require the union of the requirements of their
- * component commands.
+ * <p>The rules for command compositions apply: command instances that are
+ * passed to it are owned by the composition and cannot be added to any other
+ * composition or scheduled individually, and the composition requires all
+ * subsystems its components require.
  *
  * This class is provided by the NewCommands VendorDep
  */
@@ -30,11 +32,11 @@ class ParallelRaceGroup
     : public CommandHelper<CommandGroupBase, ParallelRaceGroup> {
  public:
   /**
-   * Creates a new ParallelCommandRace.  The given commands will be executed
+   * Creates a new ParallelCommandRace. The given commands will be executed
    * simultaneously, and will "race to the finish" - the first command to finish
    * ends the entire command, with all other commands being interrupted.
    *
-   * @param commands the commands to include in this group.
+   * @param commands the commands to include in this composition.
    */
   explicit ParallelRaceGroup(std::vector<std::unique_ptr<Command>>&& commands);
 
@@ -62,21 +64,25 @@ class ParallelRaceGroup
     AddCommands(std::move(foo));
   }
 
-  void Initialize() override;
+  void Initialize() final;
 
-  void Execute() override;
+  void Execute() final;
 
-  void End(bool interrupted) override;
+  void End(bool interrupted) final;
 
-  bool IsFinished() override;
+  bool IsFinished() final;
 
   bool RunsWhenDisabled() const override;
+
+  Command::InterruptionBehavior GetInterruptionBehavior() const override;
 
  private:
   void AddCommands(std::vector<std::unique_ptr<Command>>&& commands) final;
 
   std::vector<std::unique_ptr<Command>> m_commands;
   bool m_runWhenDisabled{true};
+  Command::InterruptionBehavior m_interruptBehavior{
+      Command::InterruptionBehavior::kCancelIncoming};
   bool m_finished{false};
   bool isRunning = false;
 };

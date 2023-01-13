@@ -9,7 +9,7 @@ import java.util.Set;
 /**
  * Schedules the given commands when this command is initialized, and ends when all the commands are
  * no longer scheduled. Useful for forking off from CommandGroups. If this command is interrupted,
- * it will cancel all of the commands.
+ * it will cancel all the commands.
  *
  * <p>This class is provided by the NewCommands VendorDep
  */
@@ -22,7 +22,10 @@ public class ProxyScheduleCommand extends CommandBase {
    * when they are all no longer scheduled.
    *
    * @param toSchedule the commands to schedule
+   * @deprecated Replace with {@link ProxyCommand}, composing multiple of them in a {@link
+   *     ParallelRaceGroup} if needed.
    */
+  @Deprecated
   public ProxyScheduleCommand(Command... toSchedule) {
     m_toSchedule = Set.of(toSchedule);
   }

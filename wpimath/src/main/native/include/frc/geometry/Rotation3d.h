@@ -11,10 +11,14 @@
 #include "frc/EigenCore.h"
 #include "units/angle.h"
 
+namespace wpi {
+class json;
+}  // namespace wpi
+
 namespace frc {
 
 /**
- * A rotation in a 3D coordinate frame.
+ * A rotation in a 3D coordinate frame represented by a quaternion.
  */
 class WPILIB_DLLEXPORT Rotation3d {
  public:
@@ -36,6 +40,10 @@ class WPILIB_DLLEXPORT Rotation3d {
    * Extrinsic rotations occur in that order around the axes in the fixed global
    * frame rather than the body frame.
    *
+   * Angles are measured counterclockwise with the rotation axis pointing "out
+   * of the page". If you point your right thumb along the positive axis
+   * direction, your fingers curl in the direction of positive rotation.
+   *
    * @param roll The counterclockwise rotation angle around the X axis (roll).
    * @param pitch The counterclockwise rotation angle around the Y axis (pitch).
    * @param yaw The counterclockwise rotation angle around the Z axis (yaw).
@@ -50,6 +58,26 @@ class WPILIB_DLLEXPORT Rotation3d {
    * @param angle The rotation around the axis.
    */
   Rotation3d(const Vectord<3>& axis, units::radian_t angle);
+
+  /**
+   * Constructs a Rotation3d from a rotation matrix.
+   *
+   * @param rotationMatrix The rotation matrix.
+   * @throws std::domain_error if the rotation matrix isn't special orthogonal.
+   */
+  explicit Rotation3d(const Matrixd<3, 3>& rotationMatrix);
+
+  /**
+   * Constructs a Rotation3d that rotates the initial vector onto the final
+   * vector.
+   *
+   * This is useful for turning a 3D vector (final) into an orientation relative
+   * to a coordinate system vector (initial).
+   *
+   * @param initial The initial vector.
+   * @param final The final vector.
+   */
+  Rotation3d(const Vectord<3>& initial, const Vectord<3>& final);
 
   /**
    * Adds two rotations together.
@@ -79,6 +107,7 @@ class WPILIB_DLLEXPORT Rotation3d {
 
   /**
    * Multiplies the current rotation by a scalar.
+   *
    * @param scalar The scalar.
    *
    * @return The new scaled Rotation3d.
@@ -86,20 +115,18 @@ class WPILIB_DLLEXPORT Rotation3d {
   Rotation3d operator*(double scalar) const;
 
   /**
-   * Checks equality between this Rotation3d and another object.
+   * Divides the current rotation by a scalar.
    *
-   * @param other The other object.
-   * @return Whether the two objects are equal.
+   * @param scalar The scalar.
+   *
+   * @return The new scaled Rotation3d.
    */
-  bool operator==(const Rotation3d& other) const;
+  Rotation3d operator/(double scalar) const;
 
   /**
-   * Checks inequality between this Rotation3d and another object.
-   *
-   * @param other The other object.
-   * @return Whether the two objects are not equal.
+   * Checks equality between this Rotation3d and another object.
    */
-  bool operator!=(const Rotation3d& other) const;
+  bool operator==(const Rotation3d&) const = default;
 
   /**
    * Adds the new rotation to the current rotation.
@@ -149,5 +176,11 @@ class WPILIB_DLLEXPORT Rotation3d {
  private:
   Quaternion m_q;
 };
+
+WPILIB_DLLEXPORT
+void to_json(wpi::json& json, const Rotation3d& rotation);
+
+WPILIB_DLLEXPORT
+void from_json(const wpi::json& json, Rotation3d& rotation);
 
 }  // namespace frc

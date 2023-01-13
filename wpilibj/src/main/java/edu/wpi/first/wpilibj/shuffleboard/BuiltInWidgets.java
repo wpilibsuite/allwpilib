@@ -12,7 +12,7 @@ import edu.wpi.first.wpilibj.interfaces.Accelerometer.Range;
  * <p>For example, setting a number to be displayed with a slider:
  *
  * <pre>{@code
- * NetworkTableEntry example = Shuffleboard.getTab("My Tab")
+ * GenericEntry example = Shuffleboard.getTab("My Tab")
  *   .add("My Number", 0)
  *   .withWidget(BuiltInWidgets.kNumberSlider)
  *   .withProperties(Map.of("min", 0, "max", 1))
@@ -473,7 +473,7 @@ public enum BuiltInWidgets implements WidgetType {
    */
   kCameraStream("Camera Stream"),
   /**
-   * Displays a field2d object.<br>
+   * Displays a Field2d object.<br>
    * Supported types:
    *
    * <ul>

@@ -4,7 +4,7 @@
 
 package edu.wpi.first.wpilibj;
 
-import static java.util.Objects.requireNonNull;
+import static edu.wpi.first.util.ErrorMessages.requireNonNullParam;
 
 import edu.wpi.first.hal.NotifierJNI;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -81,7 +81,7 @@ public class Notifier implements AutoCloseable {
    *     or StartPeriodic.
    */
   public Notifier(Runnable run) {
-    requireNonNull(run);
+    requireNonNullParam(run, "run", "Notifier");
 
     m_handler = run;
     m_notifier.set(NotifierJNI.initializeNotifier());
@@ -128,10 +128,12 @@ public class Notifier implements AutoCloseable {
             error = cause;
           }
           DriverStation.reportError(
-              "Unhandled exception: " + error.toString(), error.getStackTrace());
+              "Unhandled exception in Notifier thread: " + error.toString(), error.getStackTrace());
           DriverStation.reportError(
-              "The loopFunc() method (or methods called by it) should have handled "
-                  + "the exception above.",
+              "The Runnable for this Notifier (or methods called by it) should have handled "
+                  + "the exception above.\n"
+                  + "  The above stacktrace can help determine where the error occurred.\n"
+                  + "  See https://wpilib.org/stacktrace for more information.",
               false);
         });
     m_thread.start();

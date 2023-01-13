@@ -8,7 +8,6 @@ import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
-@SuppressWarnings("PMD.SingularField")
 public class Robot extends TimedRobot {
   private DutyCycleEncoder m_dutyCycleEncoder;
 

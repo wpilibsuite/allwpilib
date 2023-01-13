@@ -23,7 +23,7 @@ class EventLoop;
  */
 class GenericHID {
  public:
-  enum RumbleType { kLeftRumble, kRightRumble };
+  enum RumbleType { kLeftRumble, kRightRumble, kBothRumble };
 
   enum HIDType {
     kUnknown = -1,
@@ -120,6 +120,141 @@ class GenericHID {
    * @return the angle of the POV in degrees, or -1 if the POV is not pressed.
    */
   int GetPOV(int pov = 0) const;
+
+  /**
+   * Constructs a BooleanEvent instance based around this angle of a POV on the
+   * HID.
+   *
+   * <p>The POV angles start at 0 in the up direction, and increase clockwise
+   * (eg right is 90, upper-left is 315).
+   *
+   * @param loop the event loop instance to attach the event to.
+   * @param angle POV angle in degrees, or -1 for the center / not pressed.
+   * @return a BooleanEvent instance based around this angle of a POV on the
+   * HID.
+   */
+  BooleanEvent POV(int angle, EventLoop* loop) const;
+
+  /**
+   * Constructs a BooleanEvent instance based around this angle of a POV on the
+   * HID.
+   *
+   * <p>The POV angles start at 0 in the up direction, and increase clockwise
+   * (eg right is 90, upper-left is 315).
+   *
+   * @param loop the event loop instance to attach the event to.
+   * @param pov   index of the POV to read (starting at 0). Defaults to 0.
+   * @param angle POV angle in degrees, or -1 for the center / not pressed.
+   * @return a BooleanEvent instance based around this angle of a POV on the
+   * HID.
+   */
+  BooleanEvent POV(int pov, int angle, EventLoop* loop) const;
+
+  /**
+   * Constructs a BooleanEvent instance based around the 0 degree angle (up) of
+   * the default (index 0) POV on the HID.
+   *
+   * @return a BooleanEvent instance based around the 0 degree angle of a POV on
+   * the HID.
+   */
+  BooleanEvent POVUp(EventLoop* loop) const;
+
+  /**
+   * Constructs a BooleanEvent instance based around the 45 degree angle (right
+   * up) of the default (index 0) POV on the HID.
+   *
+   * @return a BooleanEvent instance based around the 45 degree angle of a POV
+   * on the HID.
+   */
+  BooleanEvent POVUpRight(EventLoop* loop) const;
+
+  /**
+   * Constructs a BooleanEvent instance based around the 90 degree angle (right)
+   * of the default (index 0) POV on the HID.
+   *
+   * @return a BooleanEvent instance based around the 90 degree angle of a POV
+   * on the HID.
+   */
+  BooleanEvent POVRight(EventLoop* loop) const;
+
+  /**
+   * Constructs a BooleanEvent instance based around the 135 degree angle (right
+   * down) of the default (index 0) POV on the HID.
+   *
+   * @return a BooleanEvent instance based around the 135 degree angle of a POV
+   * on the HID.
+   */
+  BooleanEvent POVDownRight(EventLoop* loop) const;
+
+  /**
+   * Constructs a BooleanEvent instance based around the 180 degree angle (down)
+   * of the default (index 0) POV on the HID.
+   *
+   * @return a BooleanEvent instance based around the 180 degree angle of a POV
+   * on the HID.
+   */
+  BooleanEvent POVDown(EventLoop* loop) const;
+
+  /**
+   * Constructs a BooleanEvent instance based around the 225 degree angle (down
+   * left) of the default (index 0) POV on the HID.
+   *
+   * @return a BooleanEvent instance based around the 225 degree angle of a POV
+   * on the HID.
+   */
+  BooleanEvent POVDownLeft(EventLoop* loop) const;
+
+  /**
+   * Constructs a BooleanEvent instance based around the 270 degree angle (left)
+   * of the default (index 0) POV on the HID.
+   *
+   * @return a BooleanEvent instance based around the 270 degree angle of a POV
+   * on the HID.
+   */
+  BooleanEvent POVLeft(EventLoop* loop) const;
+
+  /**
+   * Constructs a BooleanEvent instance based around the 315 degree angle (left
+   * up) of the default (index 0) POV on the HID.
+   *
+   * @return a BooleanEvent instance based around the 315 degree angle of a POV
+   * on the HID.
+   */
+  BooleanEvent POVUpLeft(EventLoop* loop) const;
+
+  /**
+   * Constructs a BooleanEvent instance based around the center (not pressed) of
+   * the default (index 0) POV on the HID.
+   *
+   * @return a BooleanEvent instance based around the center of a POV on the
+   * HID.
+   */
+  BooleanEvent POVCenter(EventLoop* loop) const;
+
+  /**
+   * Constructs an event instance that is true when the axis value is less than
+   * threshold
+   *
+   * @param axis The axis to read, starting at 0.
+   * @param threshold The value below which this trigger should return true.
+   * @param loop the event loop instance to attach the event to.
+   * @return an event instance that is true when the axis value is less than the
+   * provided threshold.
+   */
+  BooleanEvent AxisLessThan(int axis, double threshold, EventLoop* loop) const;
+
+  /**
+   * Constructs an event instance that is true when the axis value is greater
+   * than threshold
+   *
+   * @param axis The axis to read, starting at 0.
+   * @param threshold The value above which this trigger should return true.
+   * @param loop the event loop instance to attach the event to.
+   * @return an event instance that is true when the axis value is greater than
+   * the provided threshold.
+   */
+  BooleanEvent AxisGreaterThan(int axis, double threshold,
+                               EventLoop* loop) const;
 
   /**
    * Get the number of axes for the HID.

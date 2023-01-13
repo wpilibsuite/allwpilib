@@ -4,7 +4,6 @@
 
 package edu.wpi.first.hal;
 
-@SuppressWarnings("AbbreviationAsWordInName")
 public class CTREPCMJNI extends JNIWrapper {
   public static native int initialize(int module);
 

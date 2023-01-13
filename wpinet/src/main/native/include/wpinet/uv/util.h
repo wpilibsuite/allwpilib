@@ -10,6 +10,10 @@
 #include <cstring>
 #include <string_view>
 
+#ifdef _WIN32
+#pragma comment(lib, "Ws2_32.lib")
+#endif
+
 namespace wpi::uv {
 
 /**

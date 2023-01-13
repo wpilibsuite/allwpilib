@@ -36,7 +36,7 @@ class ScheduleCommandTest extends CommandTestBase {
           new SequentialCommandGroup(new InstantCommand(), scheduleCommand);
 
       scheduler.schedule(group);
-      scheduler.schedule(new InstantCommand().endlessly());
+      scheduler.schedule(new RunCommand(() -> {}));
       scheduler.run();
       assertDoesNotThrow(scheduler::run);
     }

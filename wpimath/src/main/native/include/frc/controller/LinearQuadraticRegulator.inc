@@ -4,8 +4,6 @@
 
 #pragma once
 
-#include <frc/fmt/Eigen.h>
-
 #include <stdexcept>
 #include <string>
 
@@ -14,6 +12,7 @@
 #include "drake/math/discrete_algebraic_riccati_equation.h"
 #include "frc/StateSpaceUtil.h"
 #include "frc/controller/LinearQuadraticRegulator.h"
+#include "frc/fmt/Eigen.h"
 #include "frc/system/Discretization.h"
 #include "unsupported/Eigen/MatrixFunctions"
 #include "wpimath/MathShared.h"

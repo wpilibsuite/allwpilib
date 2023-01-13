@@ -16,7 +16,8 @@ import static org.mockito.Mockito.verify;
 
 import org.junit.jupiter.api.Test;
 
-class ParallelRaceGroupTest extends CommandTestBase {
+class ParallelRaceGroupTest extends CommandTestBase
+    implements MultiCompositionTestBase<ParallelRaceGroup> {
   @Test
   void parallelRaceScheduleTest() {
     try (CommandScheduler scheduler = new CommandScheduler()) {
@@ -137,8 +138,8 @@ class ParallelRaceGroupTest extends CommandTestBase {
     Command command1 = command1Holder.getMock();
     MockCommandHolder command2Holder = new MockCommandHolder(true, system2);
     Command command2 = command2Holder.getMock();
-    MockCommandHolder endlessCommandHolder = new MockCommandHolder(true);
-    Command command3 = new EndlessCommand(endlessCommandHolder.getMock());
+    MockCommandHolder command3Holder = new MockCommandHolder(true);
+    Command command3 = command3Holder.getMock();
 
     Command group1 = new SequentialCommandGroup(command1, command2);
     assertNotNull(group1);
@@ -153,6 +154,7 @@ class ParallelRaceGroupTest extends CommandTestBase {
       command2Holder.setFinished(true);
       // at this point the sequential group should be done
       assertDoesNotThrow(() -> scheduler.run());
+      assertFalse(scheduler.isScheduled(group2));
     }
   }
 
@@ -200,5 +202,10 @@ class ParallelRaceGroupTest extends CommandTestBase {
 
       assertFalse(scheduler.isScheduled(group));
     }
+  }
+
+  @Override
+  public ParallelRaceGroup compose(Command... members) {
+    return new ParallelRaceGroup(members);
   }
 }

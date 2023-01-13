@@ -5,7 +5,6 @@
 package edu.wpi.first.math.kinematics;
 
 /** Represents the motor voltages for a mecanum drive drivetrain. */
-@SuppressWarnings("MemberName")
 public class MecanumDriveMotorVoltages {
   /** Voltage of the front left motor. */
   public double frontLeftVoltage;

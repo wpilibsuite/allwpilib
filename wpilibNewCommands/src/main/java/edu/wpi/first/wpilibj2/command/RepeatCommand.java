@@ -4,21 +4,24 @@
 
 package edu.wpi.first.wpilibj2.command;
 
-import static edu.wpi.first.wpilibj2.command.CommandGroupBase.registerGroupedCommands;
-import static edu.wpi.first.wpilibj2.command.CommandGroupBase.requireUngrouped;
+import static edu.wpi.first.util.ErrorMessages.requireNonNullParam;
+
+import edu.wpi.first.util.sendable.SendableBuilder;
 
 /**
  * A command that runs another command repeatedly, restarting it when it ends, until this command is
- * interrupted. While this class does not extend {@link CommandGroupBase}, it is still considered a
- * CommandGroup, as it allows one to compose another command within it; the command instances that
- * are passed to it cannot be added to any other groups, or scheduled individually.
+ * interrupted. Command instances that are passed to it cannot be added to any other groups, or
+ * scheduled individually.
  *
- * <p>As a rule, CommandGroups require the union of the requirements of their component commands.
+ * <p>The rules for command compositions apply: command instances that are passed to it cannot be
+ * added to any other composition or scheduled individually,and the composition requires all
+ * subsystems its components require.
  *
  * <p>This class is provided by the NewCommands VendorDep
  */
 public class RepeatCommand extends CommandBase {
   protected final Command m_command;
+  private boolean m_ended;
 
   /**
    * Creates a new RepeatCommand. Will run another command repeatedly, restarting it whenever it
@@ -27,24 +30,29 @@ public class RepeatCommand extends CommandBase {
    * @param command the command to run repeatedly
    */
   public RepeatCommand(Command command) {
-    requireUngrouped(command);
-    registerGroupedCommands(command);
-    m_command = command;
+    m_command = requireNonNullParam(command, "command", "RepeatCommand");
+    CommandScheduler.getInstance().registerComposedCommands(command);
     m_requirements.addAll(command.getRequirements());
+    setName("Repeat(" + command.getName() + ")");
   }
 
   @Override
   public void initialize() {
+    m_ended = false;
     m_command.initialize();
   }
 
   @Override
   public void execute() {
+    if (m_ended) {
+      m_ended = false;
+      m_command.initialize();
+    }
     m_command.execute();
     if (m_command.isFinished()) {
       // restart command
       m_command.end(false);
-      m_command.initialize();
+      m_ended = true;
     }
   }
 
@@ -64,7 +72,13 @@ public class RepeatCommand extends CommandBase {
   }
 
   @Override
-  public RepeatCommand repeat() {
-    return this;
+  public InterruptionBehavior getInterruptionBehavior() {
+    return m_command.getInterruptionBehavior();
+  }
+
+  @Override
+  public void initSendable(SendableBuilder builder) {
+    super.initSendable(builder);
+    builder.addStringProperty("command", m_command::getName, null);
   }
 }

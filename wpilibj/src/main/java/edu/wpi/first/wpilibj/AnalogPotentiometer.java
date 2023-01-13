@@ -23,8 +23,8 @@ public class AnalogPotentiometer implements Sendable, AutoCloseable {
    * AnalogPotentiometer constructor.
    *
    * <p>Use the fullRange and offset values so that the output produces meaningful values. I.E: you
-   * have a 270 degree potentiometer and you want the output to be degrees with the halfway point as
-   * 0 degrees. The fullRange value is 270.0(degrees) and the offset is -135.0 since the halfway
+   * have a 270 degree potentiometer, and you want the output to be degrees with the halfway point
+   * as 0 degrees. The fullRange value is 270.0(degrees) and the offset is -135.0 since the halfway
    * point after scaling is 135 degrees. This will calculate the result from the fullRange times the
    * fraction of the supply voltage, plus the offset.
    *
@@ -43,8 +43,8 @@ public class AnalogPotentiometer implements Sendable, AutoCloseable {
    * AnalogPotentiometer constructor.
    *
    * <p>Use the fullRange and offset values so that the output produces meaningful values. I.E: you
-   * have a 270 degree potentiometer and you want the output to be degrees with the halfway point as
-   * 0 degrees. The fullRange value is 270.0(degrees) and the offset is -135.0 since the halfway
+   * have a 270 degree potentiometer, and you want the output to be degrees with the halfway point
+   * as 0 degrees. The fullRange value is 270.0(degrees) and the offset is -135.0 since the halfway
    * point after scaling is 135 degrees. This will calculate the result from the fullRange times the
    * fraction of the supply voltage, plus the offset.
    *
@@ -66,7 +66,7 @@ public class AnalogPotentiometer implements Sendable, AutoCloseable {
    * AnalogPotentiometer constructor.
    *
    * <p>Use the scale value so that the output produces meaningful values. I.E: you have a 270
-   * degree potentiometer and you want the output to be degrees with the starting point as 0
+   * degree potentiometer, and you want the output to be degrees with the starting point as 0
    * degrees. The scale value is 270.0(degrees).
    *
    * @param channel The analog input channel this potentiometer is plugged into. 0-3 are on-board
@@ -81,7 +81,7 @@ public class AnalogPotentiometer implements Sendable, AutoCloseable {
    * AnalogPotentiometer constructor.
    *
    * <p>Use the fullRange and offset values so that the output produces meaningful values. I.E: you
-   * have a 270 degree potentiometer and you want the output to be degrees with the starting point
+   * have a 270 degree potentiometer, and you want the output to be degrees with the starting point
    * as 0 degrees. The scale value is 270.0(degrees).
    *
    * @param input The {@link AnalogInput} this potentiometer is plugged into.

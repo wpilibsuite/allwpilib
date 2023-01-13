@@ -22,7 +22,6 @@ package edu.wpi.first.util.datalog;
  * For this reason (as well as the fact that timestamps can be set to arbitrary values), records in
  * the log are not guaranteed to be sorted by timestamp.
  */
-@SuppressWarnings({"PMD.TooManyMethods", "PMD.ExcessivePublicCount"})
 public final class DataLog implements AutoCloseable {
   /**
    * Construct a new Data Log. The log will be initially created with a temporary filename.
@@ -112,7 +111,7 @@ public final class DataLog implements AutoCloseable {
    * @param name Name
    * @param type Data type
    * @param metadata Initial metadata (e.g. data properties)
-   * @param timestamp Time stamp (may be 0 to indicate now)
+   * @param timestamp Time stamp (0 to indicate now)
    * @return Entry index
    */
   public int start(String name, String type, String metadata, long timestamp) {
@@ -152,7 +151,7 @@ public final class DataLog implements AutoCloseable {
    * Finish an entry.
    *
    * @param entry Entry index
-   * @param timestamp Time stamp (may be 0 to indicate now)
+   * @param timestamp Time stamp (0 to indicate now)
    */
   public void finish(int entry, long timestamp) {
     DataLogJNI.finish(m_impl, entry, timestamp);
@@ -172,7 +171,7 @@ public final class DataLog implements AutoCloseable {
    *
    * @param entry Entry index
    * @param metadata New metadata for the entry
-   * @param timestamp Time stamp (may be 0 to indicate now)
+   * @param timestamp Time stamp (0 to indicate now)
    */
   public void setMetadata(int entry, String metadata, long timestamp) {
     DataLogJNI.setMetadata(m_impl, entry, metadata, timestamp);
@@ -193,7 +192,7 @@ public final class DataLog implements AutoCloseable {
    *
    * @param entry Entry index, as returned by Start()
    * @param data Data to record
-   * @param timestamp Time stamp (may be 0 to indicate now)
+   * @param timestamp Time stamp (0 to indicate now)
    */
   public void appendRaw(int entry, byte[] data, long timestamp) {
     DataLogJNI.appendRaw(m_impl, entry, data, timestamp);

@@ -10,16 +10,13 @@ using namespace glass;
 
 EnumSetting::EnumSetting(std::string& str, int defaultValue,
                          std::initializer_list<const char*> choices)
-    : m_str{str}, m_choices{choices}, m_value{defaultValue} {
-  // override default value if str is one of the choices
-  int i = 0;
-  for (auto choice : choices) {
-    if (str == choice) {
-      m_value = i;
-      break;
-    }
-    ++i;
+    : m_str{str}, m_choices{choices}, m_defaultValue{defaultValue} {}
+
+int EnumSetting::GetValue() const {
+  if (m_value == -1) {
+    UpdateValue();
   }
+  return m_value;
 }
 
 void EnumSetting::SetValue(int value) {
@@ -29,6 +26,9 @@ void EnumSetting::SetValue(int value) {
 
 bool EnumSetting::Combo(const char* label, int numOptions,
                         int popup_max_height_in_items) {
+  if (m_value == -1) {
+    UpdateValue();
+  }
   if (ImGui::Combo(
           label, &m_value, m_choices.data(),
           numOptions < 0 ? m_choices.size() : static_cast<size_t>(numOptions),
@@ -37,4 +37,18 @@ bool EnumSetting::Combo(const char* label, int numOptions,
     return true;
   }
   return false;
+}
+
+void EnumSetting::UpdateValue() const {
+  // override default value if str is one of the choices
+  int i = 0;
+  for (auto choice : m_choices) {
+    if (m_str == choice) {
+      m_value = i;
+      return;
+    }
+    ++i;
+  }
+  // no match, default it
+  m_value = m_defaultValue;
 }

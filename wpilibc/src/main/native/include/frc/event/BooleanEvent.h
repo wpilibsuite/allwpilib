@@ -19,7 +19,7 @@ namespace frc {
 /**
  * This class provides an easy way to link actions to inputs. Each object
  * represents a boolean condition to which callback actions can be bound using
- * {@link #IfHigh(wpi::unique_function<void()>)}.
+ * {@link #IfHigh(std::function<void()>)}.
  *
  * <p>These events can easily be composed using factories such as {@link
  * #operator!},
@@ -51,7 +51,7 @@ class BooleanEvent {
    *
    * @param action the action to run if this event is active.
    */
-  void IfHigh(wpi::unique_function<void()> action);
+  void IfHigh(std::function<void()> action);
 
   operator std::function<bool()>();  // NOLINT
 
@@ -64,8 +64,7 @@ class BooleanEvent {
    * second.
    * @return an instance of the subclass.
    */
-  template <class T,
-            typename = std::enable_if_t<std::is_base_of_v<BooleanEvent, T>>>
+  template <class T>
   T CastTo(std::function<T(EventLoop*, std::function<bool()>)> ctor =
                [](EventLoop* loop, std::function<bool()> condition) {
                  return T(loop, condition);

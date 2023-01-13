@@ -90,8 +90,8 @@ class Spline {
         (dx * ddy - ddx * dy) / ((dx * dx + dy * dy) * std::hypot(dx, dy));
 
     return {
-        {FromVector(combined.template block<2, 1>(0, 0)), Rotation2d(dx, dy)},
-        units::curvature_t(curvature)};
+        {FromVector(combined.template block<2, 1>(0, 0)), Rotation2d{dx, dy}},
+        units::curvature_t{curvature}};
   }
 
  protected:
@@ -119,7 +119,7 @@ class Spline {
    * @return The Translation2d.
    */
   static Translation2d FromVector(const Eigen::Vector2d& vector) {
-    return Translation2d(units::meter_t(vector(0)), units::meter_t(vector(1)));
+    return Translation2d{units::meter_t{vector(0)}, units::meter_t{vector(1)}};
   }
 };
 }  // namespace frc

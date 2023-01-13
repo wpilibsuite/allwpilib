@@ -22,7 +22,6 @@ public class SingleJointedArmSim extends LinearSystemSim<N2, N1, N1> {
   private final double m_gearing;
 
   // The length of the arm.
-  @SuppressWarnings("MemberName")
   private final double m_r;
 
   // The minimum angle that the arm is capable of.
@@ -115,7 +114,6 @@ public class SingleJointedArmSim extends LinearSystemSim<N2, N1, N1> {
    * @param armMassKg The mass of the arm.
    * @param simulateGravity Whether gravity should be simulated or not.
    */
-  @SuppressWarnings("ParameterName")
   public SingleJointedArmSim(
       DCMotor gearbox,
       double gearing,
@@ -150,7 +148,6 @@ public class SingleJointedArmSim extends LinearSystemSim<N2, N1, N1> {
    * @param simulateGravity Whether gravity should be simulated or not.
    * @param measurementStdDevs The standard deviations of the measurements.
    */
-  @SuppressWarnings("ParameterName")
   public SingleJointedArmSim(
       DCMotor gearbox,
       double gearing,
@@ -180,7 +177,7 @@ public class SingleJointedArmSim extends LinearSystemSim<N2, N1, N1> {
    * @return Whether the arm would hit the lower limit.
    */
   public boolean wouldHitLowerLimit(double currentAngleRads) {
-    return currentAngleRads < this.m_minAngle;
+    return currentAngleRads <= this.m_minAngle;
   }
 
   /**
@@ -190,7 +187,7 @@ public class SingleJointedArmSim extends LinearSystemSim<N2, N1, N1> {
    * @return Whether the arm would hit the upper limit.
    */
   public boolean wouldHitUpperLimit(double currentAngleRads) {
-    return currentAngleRads > this.m_maxAngle;
+    return currentAngleRads >= this.m_maxAngle;
   }
 
   /**
@@ -270,7 +267,6 @@ public class SingleJointedArmSim extends LinearSystemSim<N2, N1, N1> {
    * @param dtSeconds The time difference between controller updates.
    */
   @Override
-  @SuppressWarnings({"ParameterName", "LambdaParameterName"})
   protected Matrix<N2, N1> updateX(Matrix<N2, N1> currentXhat, Matrix<N1, N1> u, double dtSeconds) {
     // Horizontal case:
     // Torque = F * r = I * alpha
@@ -283,8 +279,8 @@ public class SingleJointedArmSim extends LinearSystemSim<N2, N1, N1> {
     // cos(theta)]]
     Matrix<N2, N1> updatedXhat =
         NumericalIntegration.rkdp(
-            (Matrix<N2, N1> x, Matrix<N1, N1> u_) -> {
-              Matrix<N2, N1> xdot = m_plant.getA().times(x).plus(m_plant.getB().times(u_));
+            (Matrix<N2, N1> x, Matrix<N1, N1> _u) -> {
+              Matrix<N2, N1> xdot = m_plant.getA().times(x).plus(m_plant.getB().times(_u));
               if (m_simulateGravity) {
                 xdot =
                     xdot.plus(

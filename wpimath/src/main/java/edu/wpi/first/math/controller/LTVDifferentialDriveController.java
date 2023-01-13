@@ -38,17 +38,15 @@ public class LTVDifferentialDriveController {
   private Matrix<N5, N1> m_tolerance = new Matrix<>(Nat.N5(), Nat.N1());
 
   /** States of the drivetrain system. */
-  enum State {
+  private enum State {
     kX(0),
     kY(1),
     kHeading(2),
     kLeftVelocity(3),
     kRightVelocity(4);
 
-    @SuppressWarnings("MemberName")
     public final int value;
 
-    @SuppressWarnings("ParameterName")
     State(int i) {
       this.value = i;
     }
@@ -64,7 +62,6 @@ public class LTVDifferentialDriveController {
    * @param relems The maximum desired control effort for each input.
    * @param dt Discretization timestep in seconds.
    */
-  @SuppressWarnings("LocalVariableName")
   public LTVDifferentialDriveController(
       LinearSystem<N2, N2, N2> plant,
       double trackwidth,
@@ -73,6 +70,8 @@ public class LTVDifferentialDriveController {
       double dt) {
     m_trackwidth = trackwidth;
 
+    // Control law derivation is in section 8.7 of
+    // https://file.tavsys.net/control/controls-engineering-in-frc.pdf
     var A =
         new MatBuilder<>(Nat.N5(), Nat.N5())
             .fill(
@@ -186,7 +185,6 @@ public class LTVDifferentialDriveController {
    * @param rightVelocityRef The desired right velocity in meters per second.
    * @return Left and right output voltages of the LTV controller.
    */
-  @SuppressWarnings("LocalVariableName")
   public DifferentialDriveWheelVoltages calculate(
       Pose2d currentPose,
       double leftVelocity,

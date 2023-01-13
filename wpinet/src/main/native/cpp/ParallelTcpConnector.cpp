@@ -26,7 +26,7 @@ ParallelTcpConnector::ParallelTcpConnector(
       m_reconnectTimer{uv::Timer::Create(loop)} {
   m_reconnectTimer->timeout.connect([this] {
     if (!IsConnected()) {
-      WPI_DEBUG1(m_logger, "{}", "timed out, reconnecting");
+      WPI_DEBUG1(m_logger, "timed out, reconnecting");
       Connect();
     }
   });
@@ -40,7 +40,7 @@ void ParallelTcpConnector::Close() {
 }
 
 void ParallelTcpConnector::SetServers(
-    wpi::span<const std::pair<std::string, unsigned int>> servers) {
+    std::span<const std::pair<std::string, unsigned int>> servers) {
   m_servers.assign(servers.begin(), servers.end());
   if (!IsConnected()) {
     Connect();
@@ -70,7 +70,7 @@ void ParallelTcpConnector::Connect() {
   CancelAll();
   m_reconnectTimer->Start(m_reconnectRate);
 
-  WPI_DEBUG3(m_logger, "{}", "starting new connection attempts");
+  WPI_DEBUG3(m_logger, "starting new connection attempts");
 
   // kick off parallel lookups
   for (auto&& server : m_servers) {
@@ -154,7 +154,7 @@ void ParallelTcpConnector::Connect() {
 }
 
 void ParallelTcpConnector::CancelAll(wpi::uv::Tcp* except) {
-  WPI_DEBUG4(m_logger, "{}", "canceling previous attempts");
+  WPI_DEBUG4(m_logger, "canceling previous attempts");
   for (auto&& resolverWeak : m_resolvers) {
     if (auto resolver = resolverWeak.lock()) {
       WPI_DEBUG4(m_logger, "canceling GetAddrInfo({})",

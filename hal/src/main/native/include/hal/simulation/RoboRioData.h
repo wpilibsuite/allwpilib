@@ -4,8 +4,13 @@
 
 #pragma once
 
+#include <cstddef>
+
 #include "hal/Types.h"
 #include "hal/simulation/NotifyListener.h"
+
+typedef void (*HAL_RoboRioStringCallback)(const char* name, void* param,
+                                          const char* str, size_t size);
 
 #ifdef __cplusplus
 extern "C" {
@@ -120,6 +125,18 @@ int32_t HALSIM_RegisterRoboRioBrownoutVoltageCallback(
 void HALSIM_CancelRoboRioBrownoutVoltageCallback(int32_t uid);
 double HALSIM_GetRoboRioBrownoutVoltage(void);
 void HALSIM_SetRoboRioBrownoutVoltage(double brownoutVoltage);
+
+int32_t HALSIM_RegisterRoboRioSerialNumberCallback(
+    HAL_RoboRioStringCallback callback, void* param, HAL_Bool initialNotify);
+void HALSIM_CancelRoboRioSerialNumberCallback(int32_t uid);
+size_t HALSIM_GetRoboRioSerialNumber(char* buffer, size_t size);
+void HALSIM_SetRoboRioSerialNumber(const char* serialNumber, size_t size);
+
+int32_t HALSIM_RegisterRoboRioCommentsCallback(
+    HAL_RoboRioStringCallback callback, void* param, HAL_Bool initialNotify);
+void HALSIM_CancelRoboRioCommentsCallback(int32_t uid);
+size_t HALSIM_GetRoboRioComments(char* buffer, size_t size);
+void HALSIM_SetRoboRioComments(const char* comments, size_t size);
 
 void HALSIM_RegisterRoboRioAllCallbacks(HAL_NotifyCallback callback,
                                         void* param, HAL_Bool initialNotify);

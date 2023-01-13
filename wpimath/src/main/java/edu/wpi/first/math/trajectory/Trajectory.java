@@ -44,7 +44,6 @@ public class Trajectory {
    * @param t The fraction for interpolation.
    * @return The interpolated value.
    */
-  @SuppressWarnings("ParameterName")
   private static double lerp(double startValue, double endValue, double t) {
     return startValue + (endValue - startValue) * t;
   }
@@ -57,7 +56,6 @@ public class Trajectory {
    * @param t The fraction for interpolation.
    * @return The interpolated pose.
    */
-  @SuppressWarnings("ParameterName")
   private static Pose2d lerp(Pose2d startValue, Pose2d endValue, double t) {
     return startValue.plus((endValue.minus(startValue)).times(t));
   }
@@ -254,7 +252,6 @@ public class Trajectory {
    * Represents a time-parameterized trajectory. The trajectory contains of various States that
    * represent the pose, curvature, time elapsed, velocity, and acceleration at that point.
    */
-  @SuppressWarnings("MemberName")
   public static class State {
     // The time elapsed since the beginning of the trajectory.
     @JsonProperty("time")
@@ -309,7 +306,6 @@ public class Trajectory {
      * @param i The interpolant (fraction).
      * @return The interpolated state.
      */
-    @SuppressWarnings("ParameterName")
     State interpolate(State endValue, double i) {
       // Find the new t value.
       final double newT = lerp(timeSeconds, endValue.timeSeconds, i);

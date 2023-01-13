@@ -25,6 +25,15 @@ HAL_ENUM(HAL_SPIPort) {
 };
 // clang-format on
 
+// clang-format off
+HAL_ENUM(HAL_SPIMode) {
+  HAL_SPI_kMode0 = 0,
+  HAL_SPI_kMode1 = 1,
+  HAL_SPI_kMode2 = 2,
+  HAL_SPI_kMode3 = 3,
+};
+// clang-format on
+
 #ifdef __cplusplus
 namespace hal {
 

@@ -4,24 +4,18 @@
 
 package edu.wpi.first.hal;
 
-@SuppressWarnings("AbbreviationAsWordInName")
+@SuppressWarnings("MemberName")
 public class REVPHVersion {
-  @SuppressWarnings("MemberName")
   public final int firmwareMajor;
 
-  @SuppressWarnings("MemberName")
   public final int firmwareMinor;
 
-  @SuppressWarnings("MemberName")
   public final int firmwareFix;
 
-  @SuppressWarnings("MemberName")
   public final int hardwareMinor;
 
-  @SuppressWarnings("MemberName")
   public final int hardwareMajor;
 
-  @SuppressWarnings("MemberName")
   public final int uniqueId;
 
   /**

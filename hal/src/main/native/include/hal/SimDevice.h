@@ -8,8 +8,8 @@
 
 #ifdef __cplusplus
 #include <initializer_list>
-
-#include <wpi/span.h>
+#include <span>
+#include <string>
 #endif
 
 #include "hal/Types.h"
@@ -66,6 +66,14 @@ HAL_SimDeviceHandle HAL_CreateSimDevice(const char* name);
  * @param handle simulated device handle
  */
 void HAL_FreeSimDevice(HAL_SimDeviceHandle handle);
+
+/**
+ * Get the name of a simulated device
+ *
+ * @param handle simulated device handle
+ * @return name of the simulated device
+ */
+const char* HAL_GetSimDeviceName(HAL_SimDeviceHandle handle);
 
 /**
  * Creates a value on a simulated device.
@@ -733,6 +741,15 @@ class SimDevice {
   operator HAL_SimDeviceHandle() const { return m_handle; }  // NOLINT
 
   /**
+   * Get the name of the simulated device.
+   *
+   * @return name
+   */
+  std::string GetName() const {
+    return std::string(HAL_GetSimDeviceName(m_handle));
+  }
+
+  /**
    * Creates a value on the simulated device.
    *
    * If not in simulation, results in an "empty" object that evaluates to false
@@ -832,7 +849,7 @@ class SimDevice {
    * @return simulated enum value object
    */
   SimEnum CreateEnum(const char* name, int32_t direction,
-                     wpi::span<const char* const> options,
+                     std::span<const char* const> options,
                      int32_t initialValue) {
     return HAL_CreateSimValueEnum(m_handle, name, direction, options.size(),
                                   const_cast<const char**>(options.data()),
@@ -885,8 +902,8 @@ class SimDevice {
    * @return simulated enum value object
    */
   SimEnum CreateEnumDouble(const char* name, int32_t direction,
-                           wpi::span<const char* const> options,
-                           wpi::span<const double> optionValues,
+                           std::span<const char* const> options,
+                           std::span<const double> optionValues,
                            int32_t initialValue) {
     if (options.size() != optionValues.size()) {
       return {};

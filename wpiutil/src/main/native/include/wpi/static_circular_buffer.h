@@ -38,10 +38,7 @@ class static_circular_buffer {
       ++(*this);
       return retval;
     }
-    bool operator==(const iterator& other) const {
-      return m_buffer == other.m_buffer && m_index == other.m_index;
-    }
-    bool operator!=(const iterator& other) const { return !(*this == other); }
+    bool operator==(const iterator&) const = default;
     reference operator*() { return (*m_buffer)[m_index]; }
 
    private:
@@ -69,12 +66,7 @@ class static_circular_buffer {
       ++(*this);
       return retval;
     }
-    bool operator==(const const_iterator& other) const {
-      return m_buffer == other.m_buffer && m_index == other.m_index;
-    }
-    bool operator!=(const const_iterator& other) const {
-      return !(*this == other);
-    }
+    bool operator==(const const_iterator&) const = default;
     const_reference operator*() const { return (*m_buffer)[m_index]; }
 
    private:

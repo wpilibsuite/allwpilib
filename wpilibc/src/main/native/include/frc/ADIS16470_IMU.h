@@ -93,7 +93,8 @@ class ADIS16470_IMU : public nt::NTSendable,
                          CalibrationTime cal_time);
 
   /**
-   * @brief Destructor. Kills the acquisiton loop and closes the SPI peripheral.
+   * @brief Destructor. Kills the acquisition loop and closes the SPI
+   * peripheral.
    */
   ~ADIS16470_IMU() override;
 
@@ -158,6 +159,8 @@ class ADIS16470_IMU : public nt::NTSendable,
   IMUAxis GetYawAxis() const;
 
   int SetYawAxis(IMUAxis yaw_axis);
+
+  bool IsConnected() const;
 
   // IMU yaw axis
   IMUAxis m_yaw_axis;
@@ -296,6 +299,10 @@ class ADIS16470_IMU : public nt::NTSendable,
   static constexpr double deg_to_rad = 0.0174532;
   static constexpr double grav = 9.81;
 
+  /** @brief Resources **/
+  DigitalInput* m_reset_in;
+  DigitalOutput* m_status_led;
+
   /**
    * @brief Switches to standard SPI operation. Primarily used when exiting auto
    * SPI mode.
@@ -378,10 +385,12 @@ class ADIS16470_IMU : public nt::NTSendable,
   SPI* m_spi = nullptr;
   DigitalInput* m_auto_interrupt = nullptr;
   double m_scaled_sample_rate = 2500.0;  // Default sample rate setting
+  bool m_connected{false};
 
   std::thread m_acquire_task;
 
   hal::SimDevice m_simDevice;
+  hal::SimBoolean m_simConnected;
   hal::SimDouble m_simGyroAngleX;
   hal::SimDouble m_simGyroAngleY;
   hal::SimDouble m_simGyroAngleZ;

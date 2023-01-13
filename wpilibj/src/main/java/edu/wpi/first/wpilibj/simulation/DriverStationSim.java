@@ -5,8 +5,10 @@
 package edu.wpi.first.wpilibj.simulation;
 
 import edu.wpi.first.hal.AllianceStationID;
+import edu.wpi.first.hal.DriverStationJNI;
 import edu.wpi.first.hal.simulation.DriverStationDataJNI;
 import edu.wpi.first.hal.simulation.NotifyCallback;
+import edu.wpi.first.util.WPIUtilJNI;
 import edu.wpi.first.wpilibj.DriverStation;
 
 /** Class to control a simulated driver station. */
@@ -138,7 +140,6 @@ public final class DriverStationSim {
    *
    * @param eStop true to activate
    */
-  @SuppressWarnings("ParameterName")
   public static void setEStop(boolean eStop) {
     DriverStationDataJNI.setEStop(eStop);
   }
@@ -311,8 +312,17 @@ public final class DriverStationSim {
 
   /** Updates DriverStation data so that new values are visible to the user program. */
   public static void notifyNewData() {
+    int handle = WPIUtilJNI.createEvent(false, false);
+    DriverStationJNI.provideNewDataEventHandle(handle);
     DriverStationDataJNI.notifyNewData();
-    DriverStation.waitForData();
+    try {
+      WPIUtilJNI.waitForObject(handle);
+    } catch (InterruptedException e) {
+      e.printStackTrace();
+    }
+    DriverStationJNI.removeNewDataEventHandle(handle);
+    WPIUtilJNI.destroyEvent(handle);
+    DriverStation.refreshData();
   }
 
   /**

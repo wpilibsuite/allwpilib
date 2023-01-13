@@ -4,7 +4,7 @@
 
 package edu.wpi.first.wpilibj.examples.shuffleboard;
 
-import edu.wpi.first.networktables.NetworkTableEntry;
+import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.wpilibj.AnalogPotentiometer;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.TimedRobot;
@@ -22,7 +22,7 @@ public class Robot extends TimedRobot {
 
   private final PWMSparkMax m_elevatorMotor = new PWMSparkMax(2);
   private final AnalogPotentiometer m_elevatorPot = new AnalogPotentiometer(0);
-  private NetworkTableEntry m_maxSpeed;
+  private GenericEntry m_maxSpeed;
 
   @Override
   public void robotInit() {

@@ -1,19 +1,6 @@
 [
   {
-    "name": "Motor Controller",
-    "description": "Demonstrate controlling a single motor with a Joystick.",
-    "tags": [
-      "Robot and Motor",
-      "Actuators",
-      "Joystick",
-      "Complete List"
-    ],
-    "foldername": "MotorControl",
-    "gradlebase": "cpp",
-    "commandversion": 2
-  },
-  {
-    "name": "Motor Control With Encoder",
+    "name": "Motor Control",
     "description": "Demonstrate controlling a single motor with a Joystick and displaying the net movement of the motor using an encoder.",
     "tags": [
       "Robot and Motor",
@@ -23,7 +10,7 @@
       "Joystick",
       "Complete List"
     ],
-    "foldername": "MotorControlEncoder",
+    "foldername": "MotorControl",
     "gradlebase": "cpp",
     "commandversion": 2
   },
@@ -135,12 +122,13 @@
   },
   {
     "name": "Ultrasonic",
-    "description": "Demonstrate maintaining a set distance using an ultrasonic sensor.",
+    "description": "Demonstrate using the Ultrasonic class with a ping-response ultrasonic sensor.",
     "tags": [
-      "Robot and Motor",
-      "Complete List",
       "Sensors",
-      "Analog"
+      "Hardware",
+      "Ultrasonic",
+      "SmartDashboard",
+      "Shuffleboard"
     ],
     "foldername": "Ultrasonic",
     "gradlebase": "cpp",
@@ -148,12 +136,12 @@
   },
   {
     "name": "UltrasonicPID",
-    "description": "Demonstrate maintaining a set distance using an ultrasonic sensor and PID control.",
+    "description": "Demonstrate maintaining a set distance using an ultrasonic sensor and PID Control.",
     "tags": [
-      "Robot and Motor",
-      "Complete List",
       "Sensors",
-      "Analog"
+      "Ultrasonic",
+      "PID",
+      "Differential Drive"
     ],
     "foldername": "UltrasonicPID",
     "gradlebase": "cpp",
@@ -199,11 +187,12 @@
   },
   {
     "name": "PotentiometerPID",
-    "description": "An example to demonstrate the use of a potentiometer and PID control to reach elevator position setpoints.",
+    "description": "An example to demonstrate the use of a potentiometer and PID control to maintain elevator position setpoints.",
     "tags": [
       "Joystick",
       "Actuators",
-      "Complete List",
+      "PID",
+      "Elevator",
       "Sensors",
       "Analog"
     ],
@@ -353,6 +342,18 @@
       "Lambdas"
     ],
     "foldername": "HatchbotInlined",
+    "gradlebase": "cpp",
+    "commandversion": 2
+  },
+  {
+    "name": "Rapid React Command Bot",
+    "description": "A fully-functional command-based fender bot for the 2022 game using the new command framework.",
+    "tags": [
+      "Complete robot",
+      "Command-based",
+      "Lambdas"
+    ],
+    "foldername": "RapidReactCommandBot",
     "gradlebase": "cpp",
     "commandversion": 2
   },
@@ -610,7 +611,6 @@
     ],
     "foldername": "StateSpaceFlywheel",
     "gradlebase": "cpp",
-    "mainclass": "Main",
     "commandversion": 2
   },
   {
@@ -629,7 +629,6 @@
     ],
     "foldername": "StateSpaceFlywheelSysId",
     "gradlebase": "cpp",
-    "mainclass": "Main",
     "commandversion": 2
   },
   {
@@ -645,7 +644,6 @@
     ],
     "foldername": "StateSpaceElevator",
     "gradlebase": "cpp",
-    "mainclass": "Main",
     "commandversion": 2
   },
   {
@@ -661,7 +659,6 @@
     ],
     "foldername": "StateSpaceArm",
     "gradlebase": "cpp",
-    "mainclass": "Main",
     "commandversion": 2
   },
   {
@@ -678,7 +675,6 @@
     ],
     "foldername": "ElevatorSimulation",
     "gradlebase": "cpp",
-    "mainclass": "Main",
     "commandversion": 2
   },
   {
@@ -694,7 +690,6 @@
     ],
     "foldername": "DifferentialDrivePoseEstimator",
     "gradlebase": "cpp",
-    "mainclass": "Main",
     "commandversion": 2
   },
   {
@@ -710,7 +705,6 @@
     ],
     "foldername": "MecanumDrivePoseEstimator",
     "gradlebase": "cpp",
-    "mainclass": "Main",
     "commandversion": 2
   },
   {
@@ -728,7 +722,16 @@
     ],
     "foldername": "ArmSimulation",
     "gradlebase": "cpp",
-    "mainclass": "Main",
+    "commandversion": 2
+  },
+  {
+    "name": "UnitTesting",
+    "description": "Demonstrates basic unit testing for a robot project.",
+    "tags": [
+      "Testing"
+    ],
+    "foldername": "UnitTest",
+    "gradlebase": "cpp",
     "commandversion": 2
   },
   {
@@ -746,7 +749,6 @@
     ],
     "foldername": "SimpleDifferentialDriveSimulation",
     "gradlebase": "cpp",
-    "mainclass": "Main",
     "commandversion": 2
   },
   {
@@ -764,7 +766,6 @@
     ],
     "foldername": "StateSpaceDifferentialDriveSimulation",
     "gradlebase": "cpp",
-    "mainclass": "Main",
     "commandversion": 2
   },
   {
@@ -781,7 +782,6 @@
     ],
     "foldername": "SwerveDrivePoseEstimator",
     "gradlebase": "cpp",
-    "mainclass": "Main",
     "commandversion": 2
   }
 ]

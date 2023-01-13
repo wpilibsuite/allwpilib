@@ -4,11 +4,13 @@
 
 #include "glass/Window.h"
 
+#include <imgui.h>
 #include <imgui_internal.h>
 #include <wpi/StringExtras.h>
 
 #include "glass/Context.h"
 #include "glass/Storage.h"
+#include "glass/support/ExtraGuiWidgets.h"
 
 using namespace glass;
 
@@ -59,9 +61,57 @@ void Window::Display() {
                 m_id.c_str());
 
   if (Begin(label, &m_visible, m_flags)) {
-    if (m_renamePopupEnabled) {
-      PopupEditName(nullptr, &m_name);
+    if (m_renamePopupEnabled || m_view->HasSettings()) {
+      bool isClicked = (ImGui::IsMouseReleased(ImGuiMouseButton_Right) &&
+                        ImGui::IsItemHovered());
+      ImGuiWindow* window = ImGui::GetCurrentWindow();
+
+      bool settingsButtonClicked = false;
+      // Not docked, and window has just enough for the circles not to be
+      // touching
+      if (!ImGui::IsWindowDocked() &&
+          ImGui::GetWindowWidth() > (ImGui::GetFontSize() + 2) * 3 +
+                                        ImGui::GetStyle().FramePadding.x * 2) {
+        const ImGuiItemFlags itemFlagsRestore =
+            ImGui::GetCurrentContext()->CurrentItemFlags;
+
+        ImGui::GetCurrentContext()->CurrentItemFlags |=
+            ImGuiItemFlags_NoNavDefaultFocus;
+        window->DC.NavLayerCurrent = ImGuiNavLayer_Menu;
+
+        // Allow to draw outside of normal window
+        ImGui::PushClipRect(window->OuterRectClipped.Min,
+                            window->OuterRectClipped.Max, false);
+
+        const ImRect titleBarRect = ImGui::GetCurrentWindow()->TitleBarRect();
+        const ImVec2 position = {titleBarRect.Max.x -
+                                     (ImGui::GetStyle().FramePadding.x * 3) -
+                                     (ImGui::GetFontSize() * 2),
+                                 titleBarRect.Min.y};
+        settingsButtonClicked =
+            HamburgerButton(ImGui::GetID("#SETTINGS"), position);
+
+        ImGui::PopClipRect();
+
+        ImGui::GetCurrentContext()->CurrentItemFlags = itemFlagsRestore;
+      }
+      if (settingsButtonClicked || isClicked) {
+        ImGui::OpenPopup(window->ID);
+      }
+
+      if (ImGui::BeginPopupEx(window->ID,
+                              ImGuiWindowFlags_AlwaysAutoResize |
+                                  ImGuiWindowFlags_NoTitleBar |
+                                  ImGuiWindowFlags_NoSavedSettings)) {
+        if (m_renamePopupEnabled) {
+          ItemEditName(&m_name);
+        }
+        m_view->Settings();
+
+        ImGui::EndPopup();
+      }
     }
+
     m_view->Display();
   } else {
     m_view->Hidden();

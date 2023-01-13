@@ -25,7 +25,6 @@ import edu.wpi.first.math.trajectory.Trajectory;
  * <p>See section 8.9 in Controls Engineering in FRC for a derivation of the control law we used
  * shown in theorem 8.9.1.
  */
-@SuppressWarnings("MemberName")
 public class LTVUnicycleController {
   // LUT from drivetrain linear velocity to LQR gain
   private final InterpolatingMatrixTreeMap<Double, N2, N3> m_table =
@@ -36,30 +35,14 @@ public class LTVUnicycleController {
   private boolean m_enabled = true;
 
   /** States of the drivetrain system. */
-  enum State {
+  private enum State {
     kX(0),
     kY(1),
     kHeading(2);
 
-    @SuppressWarnings("MemberName")
     public final int value;
 
-    @SuppressWarnings("ParameterName")
     State(int i) {
-      this.value = i;
-    }
-  }
-
-  /** Inputs of the drivetrain system. */
-  enum Input {
-    kLeftVelocity(3),
-    kRightVelocity(4);
-
-    @SuppressWarnings("MemberName")
-    public final int value;
-
-    @SuppressWarnings("ParameterName")
-    Input(int i) {
       this.value = i;
     }
   }
@@ -108,9 +91,41 @@ public class LTVUnicycleController {
    * @param maxVelocity The maximum velocity in meters per second for the controller gain lookup
    *     table. The default is 9 m/s.
    */
-  @SuppressWarnings("LocalVariableName")
   public LTVUnicycleController(
       Vector<N3> qelems, Vector<N2> relems, double dt, double maxVelocity) {
+    // The change in global pose for a unicycle is defined by the following
+    // three equations.
+    //
+    // ẋ = v cosθ
+    // ẏ = v sinθ
+    // θ̇ = ω
+    //
+    // Here's the model as a vector function where x = [x  y  θ]ᵀ and
+    // u = [v  ω]ᵀ.
+    //
+    //           [v cosθ]
+    // f(x, u) = [v sinθ]
+    //           [  ω   ]
+    //
+    // To create an LQR, we need to linearize this.
+    //
+    //               [0  0  −v sinθ]                  [cosθ  0]
+    // ∂f(x, u)/∂x = [0  0   v cosθ]    ∂f(x, u)/∂u = [sinθ  0]
+    //               [0  0     0   ]                  [ 0    1]
+    //
+    // We're going to make a cross-track error controller, so we'll apply a
+    // clockwise rotation matrix to the global tracking error to transform it
+    // into the robot's coordinate frame. Since the cross-track error is always
+    // measured from the robot's coordinate frame, the model used to compute the
+    // LQR should be linearized around θ = 0 at all times.
+    //
+    //     [0  0  −v sin0]        [cos0  0]
+    // A = [0  0   v cos0]    B = [sin0  0]
+    //     [0  0     0   ]        [ 0    1]
+    //
+    //     [0  0  0]              [1  0]
+    // A = [0  0  v]          B = [0  0]
+    //     [0  0  0]              [0  1]
     var A = new Matrix<>(Nat.N3(), Nat.N3());
     var B = new MatBuilder<>(Nat.N3(), Nat.N2()).fill(1.0, 0.0, 0.0, 0.0, 0.0, 1.0);
     var Q = StateSpaceUtil.makeCostMatrix(qelems);
@@ -172,7 +187,6 @@ public class LTVUnicycleController {
 
     m_poseError = poseRef.relativeTo(currentPose);
 
-    @SuppressWarnings("LocalVariableName")
     var K = m_table.get(linearVelocityRef);
     var e =
         new MatBuilder<>(Nat.N3(), Nat.N1())

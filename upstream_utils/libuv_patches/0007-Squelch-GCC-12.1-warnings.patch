@@ -1,4 +1,4 @@
-From 5266f44aa4ad009f384cc8afd63bb3414fe9e553 Mon Sep 17 00:00:00 2001
+From ee8a72764f602928cc08d16d661602c0aefde050 Mon Sep 17 00:00:00 2001
 From: Tyler Veness <calcmogul@gmail.com>
 Date: Tue, 17 May 2022 21:36:57 -0700
 Subject: [PATCH 7/9] Squelch GCC 12.1 warnings
@@ -9,10 +9,10 @@ Subject: [PATCH 7/9] Squelch GCC 12.1 warnings
  2 files changed, 18 insertions(+)
 
 diff --git a/src/unix/stream.c b/src/unix/stream.c
-index 4176395..779e8ff 100644
+index c6cc50e7..fa25812a 100644
 --- a/src/unix/stream.c
 +++ b/src/unix/stream.c
-@@ -941,7 +941,16 @@ static void uv__write_callbacks(uv_stream_t* stream) {
+@@ -938,7 +938,16 @@ static void uv__write_callbacks(uv_stream_t* stream) {
    if (QUEUE_EMPTY(&stream->write_completed_queue))
      return;
  
@@ -30,10 +30,10 @@ index 4176395..779e8ff 100644
    while (!QUEUE_EMPTY(&pq)) {
      /* Pop a req off write_completed_queue. */
 diff --git a/src/uv-common.c b/src/uv-common.c
-index 534119c..00d0332 100644
+index c9a32c03..8ab600df 100644
 --- a/src/uv-common.c
 +++ b/src/uv-common.c
-@@ -502,7 +502,16 @@ void uv_walk(uv_loop_t* loop, uv_walk_cb walk_cb, void* arg) {
+@@ -504,7 +504,16 @@ void uv_walk(uv_loop_t* loop, uv_walk_cb walk_cb, void* arg) {
    QUEUE* q;
    uv_handle_t* h;
  

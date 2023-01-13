@@ -4,12 +4,9 @@
 
 package edu.wpi.first.wpilibj2.command;
 
-import static edu.wpi.first.wpilibj2.command.CommandGroupBase.registerGroupedCommands;
-import static edu.wpi.first.wpilibj2.command.CommandGroupBase.requireUngrouped;
-
 /**
  * A command that runs another command in perpetuity, ignoring that command's end conditions. While
- * this class does not extend {@link CommandGroupBase}, it is still considered a CommandGroup, as it
+ * this class does not extend {@link CommandGroupBase}, it is still considered a composition, as it
  * allows one to compose another command within it; the command instances that are passed to it
  * cannot be added to any other groups, or scheduled individually.
  *
@@ -17,7 +14,10 @@ import static edu.wpi.first.wpilibj2.command.CommandGroupBase.requireUngrouped;
  *
  * <p>This class is provided by the NewCommands VendorDep
  *
- * @deprecated Replaced by {@link EndlessCommand}.
+ * @deprecated PerpetualCommand violates the assumption that execute() doesn't get called after
+ *     isFinished() returns true -- an assumption that should be valid. This was unsafe/undefined
+ *     behavior from the start, and RepeatCommand provides an easy way to achieve similar end
+ *     results with slightly different (and safe) semantics.
  */
 @Deprecated(forRemoval = true, since = "2023")
 public class PerpetualCommand extends CommandBase {
@@ -30,8 +30,7 @@ public class PerpetualCommand extends CommandBase {
    * @param command the command to run perpetually
    */
   public PerpetualCommand(Command command) {
-    requireUngrouped(command);
-    registerGroupedCommands(command);
+    CommandScheduler.getInstance().registerComposedCommands(command);
     m_command = command;
     m_requirements.addAll(command.getRequirements());
   }
@@ -54,11 +53,5 @@ public class PerpetualCommand extends CommandBase {
   @Override
   public boolean runsWhenDisabled() {
     return m_command.runsWhenDisabled();
-  }
-
-  @SuppressWarnings("removal") // Command.perpetually()
-  @Override
-  public PerpetualCommand perpetually() {
-    return this;
   }
 }

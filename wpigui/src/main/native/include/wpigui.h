@@ -30,8 +30,10 @@ void DestroyContext();
  * @param title main application window title
  * @param width main application window width
  * @param height main application window height
+ * @param configFlags ImGui configuration flags
  */
-bool Initialize(const char* title, int width, int height);
+bool Initialize(const char* title, int width, int height,
+                ImGuiConfigFlags configFlags = ImGuiConfigFlags_None);
 
 /**
  * Runs main GUI loop.  On some OS'es this must be called from the main thread.

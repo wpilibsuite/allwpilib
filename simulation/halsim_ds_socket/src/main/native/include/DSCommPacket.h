@@ -5,10 +5,10 @@
 #pragma once
 
 #include <array>
+#include <span>
 
 #include <DSCommJoystickPacket.h>
 #include <hal/simulation/DriverStationData.h>
-#include <wpi/span.h>
 #include <wpinet/raw_uv_ostream.h>
 
 class DSCommPacketTest;
@@ -20,8 +20,8 @@ class DSCommPacket {
 
  public:
   DSCommPacket(void);
-  void DecodeTCP(wpi::span<const uint8_t> packet);
-  void DecodeUDP(wpi::span<const uint8_t> packet);
+  void DecodeTCP(std::span<const uint8_t> packet);
+  void DecodeUDP(std::span<const uint8_t> packet);
   void SendUDPToHALSim(void);
   void SetupSendBuffer(wpi::raw_uv_ostream& buf);
 
@@ -53,11 +53,11 @@ class DSCommPacket {
   void SetAlliance(uint8_t station_code);
   void SetupSendHeader(wpi::raw_uv_ostream& buf);
   void SetupJoystickTag(wpi::raw_uv_ostream& buf);
-  void ReadMatchtimeTag(wpi::span<const uint8_t> tagData);
-  void ReadJoystickTag(wpi::span<const uint8_t> data, int index);
-  void ReadNewMatchInfoTag(wpi::span<const uint8_t> data);
-  void ReadGameSpecificMessageTag(wpi::span<const uint8_t> data);
-  void ReadJoystickDescriptionTag(wpi::span<const uint8_t> data);
+  void ReadMatchtimeTag(std::span<const uint8_t> tagData);
+  void ReadJoystickTag(std::span<const uint8_t> data, int index);
+  void ReadNewMatchInfoTag(std::span<const uint8_t> data);
+  void ReadGameSpecificMessageTag(std::span<const uint8_t> data);
+  void ReadJoystickDescriptionTag(std::span<const uint8_t> data);
 
   uint8_t m_hi;
   uint8_t m_lo;

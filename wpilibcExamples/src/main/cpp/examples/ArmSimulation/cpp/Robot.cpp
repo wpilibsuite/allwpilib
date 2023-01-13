@@ -2,6 +2,8 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
+#include <numbers>
+
 #include <frc/Encoder.h>
 #include <frc/Joystick.h>
 #include <frc/Preferences.h>
@@ -22,7 +24,6 @@
 #include <frc/util/Color8Bit.h>
 #include <units/angle.h>
 #include <units/moment_of_inertia.h>
-#include <wpi/numbers>
 
 /**
  * This is a sample program to demonstrate how to use a state-space controller
@@ -45,7 +46,7 @@ class Robot : public frc::TimedRobot {
   // distance per pulse = (angle per revolution) / (pulses per revolution)
   //  = (2 * PI rads) / (4096 pulses)
   static constexpr double kArmEncoderDistPerPulse =
-      2.0 * wpi::numbers::pi / 4096.0;
+      2.0 * std::numbers::pi / 4096.0;
 
   // The arm gearbox represents a gearbox containing two Vex 775pro motors.
   frc::DCMotor m_armGearbox = frc::DCMotor::Vex775Pro(2);
@@ -120,8 +121,8 @@ class Robot : public frc::TimedRobot {
 
   void TeleopInit() override {
     // Read Preferences for Arm setpoint and kP on entering Teleop
-    armPosition = units::degree_t(
-        frc::Preferences::GetDouble(kArmPositionKey, armPosition.value()));
+    armPosition = units::degree_t{
+        frc::Preferences::GetDouble(kArmPositionKey, armPosition.value())};
     if (kArmKp != frc::Preferences::GetDouble(kArmPKey, kArmKp)) {
       kArmKp = frc::Preferences::GetDouble(kArmPKey, kArmKp);
       m_controller.SetP(kArmKp);
@@ -133,8 +134,8 @@ class Robot : public frc::TimedRobot {
       // Here, we run PID control like normal, with a setpoint read from
       // preferences in degrees.
       double pidOutput = m_controller.Calculate(
-          m_encoder.GetDistance(), (units::radian_t(armPosition).value()));
-      m_motor.SetVoltage(units::volt_t(pidOutput));
+          m_encoder.GetDistance(), (units::radian_t{armPosition}.value()));
+      m_motor.SetVoltage(units::volt_t{pidOutput});
     } else {
       // Otherwise, we disable the motor.
       m_motor.Set(0.0);

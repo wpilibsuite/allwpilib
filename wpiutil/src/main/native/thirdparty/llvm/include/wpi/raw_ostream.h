@@ -14,7 +14,7 @@
 #define WPIUTIL_WPI_RAW_OSTREAM_H
 
 #include "wpi/SmallVector.h"
-#include "wpi/span.h"
+#include <span>
 #include <cassert>
 #include <cstddef>
 #include <cstdint>
@@ -199,7 +199,7 @@ public:
     return *this;
   }
 
-  raw_ostream &operator<<(span<const uint8_t> Arr) {
+  raw_ostream &operator<<(std::span<const uint8_t> Arr) {
     // Inline fast path, particularly for arrays with a known length.
     size_t Size = Arr.size();
 
@@ -675,9 +675,9 @@ public:
 
   void flush() = delete;
 
-  /// Return an span for the vector contents.
-  span<uint8_t> array() { return {OS.data(), OS.size()}; }
-  span<const uint8_t> array() const { return {OS.data(), OS.size()}; }
+  /// Return an std::span for the vector contents.
+  std::span<uint8_t> array() { return {OS.data(), OS.size()}; }
+  std::span<const uint8_t> array() const { return {OS.data(), OS.size()}; }
 };
 
 /// A raw_ostream that writes to a vector.  This is a
@@ -709,9 +709,9 @@ public:
 
   void flush() = delete;
 
-  /// Return a span for the vector contents.
-  span<uint8_t> array() { return {OS.data(), OS.size()}; }
-  span<const uint8_t> array() const { return {OS.data(), OS.size()}; }
+  /// Return a std::span for the vector contents.
+  std::span<uint8_t> array() { return {OS.data(), OS.size()}; }
+  std::span<const uint8_t> array() const { return {OS.data(), OS.size()}; }
 };
 
 

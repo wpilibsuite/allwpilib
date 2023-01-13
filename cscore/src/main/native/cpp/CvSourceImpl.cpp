@@ -139,7 +139,7 @@ CS_Property CreateSourcePropertyCallback(
 }
 
 void SetSourceEnumPropertyChoices(CS_Source source, CS_Property property,
-                                  wpi::span<const std::string> choices,
+                                  std::span<const std::string> choices,
                                   CS_Status* status) {
   auto data = Instance::GetInstance().GetSource(source);
   if (!data || (data->kind & SourceMask) == 0) {

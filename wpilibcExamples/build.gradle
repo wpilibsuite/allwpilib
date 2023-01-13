@@ -60,9 +60,10 @@ model {
                     return
                 }
                 lib project: ':wpilibNewCommands', library: 'wpilibNewCommands', linkage: 'shared'
+                lib project: ':apriltag', library: 'apriltag', linkage: 'shared'
                 lib project: ':wpilibc', library: 'wpilibc', linkage: 'shared'
                 lib project: ':wpimath', library: 'wpimath', linkage: 'shared'
-                lib project: ':ntcore', library: 'ntcore', linkage: 'shared'
+                project(':ntcore').addNtcoreDependency(binary, 'shared')
                 lib project: ':cscore', library: 'cscore', linkage: 'shared'
                 project(':hal').addHalDependency(binary, 'shared')
                 lib project: ':cameraserver', library: 'cameraserver', linkage: 'shared'
@@ -89,8 +90,9 @@ model {
                 binaries.all { binary ->
                     lib project: ':wpilibNewCommands', library: 'wpilibNewCommands', linkage: 'shared'
                     lib project: ':wpilibc', library: 'wpilibc', linkage: 'shared'
+                    lib project: ':apriltag', library: 'apriltag', linkage: 'shared'
                     lib project: ':wpimath', library: 'wpimath', linkage: 'shared'
-                    lib project: ':ntcore', library: 'ntcore', linkage: 'shared'
+                    project(':ntcore').addNtcoreDependency(binary, 'shared')
                     lib project: ':cscore', library: 'cscore', linkage: 'shared'
                     project(':hal').addHalDependency(binary, 'shared')
                     lib project: ':cameraserver', library: 'cameraserver', linkage: 'shared'
@@ -137,8 +139,9 @@ model {
                 binaries.all { binary ->
                     lib project: ':wpilibNewCommands', library: 'wpilibNewCommands', linkage: 'shared'
                     lib project: ':wpilibc', library: 'wpilibc', linkage: 'shared'
+                    lib project: ':apriltag', library: 'apriltag', linkage: 'shared'
                     lib project: ':wpimath', library: 'wpimath', linkage: 'shared'
-                    lib project: ':ntcore', library: 'ntcore', linkage: 'shared'
+                    project(':ntcore').addNtcoreDependency(binary, 'shared')
                     lib project: ':cscore', library: 'cscore', linkage: 'shared'
                     project(':hal').addHalDependency(binary, 'shared')
                     lib project: ':cameraserver', library: 'cameraserver', linkage: 'shared'
@@ -202,8 +205,9 @@ model {
         withType(GoogleTestTestSuiteBinarySpec) {
             lib project: ':wpilibNewCommands', library: 'wpilibNewCommands', linkage: 'shared'
             lib project: ':wpilibc', library: 'wpilibc', linkage: 'shared'
+            lib project: ':apriltag', library: 'apriltag', linkage: 'shared'
             lib project: ':wpimath', library: 'wpimath', linkage: 'shared'
-            lib project: ':ntcore', library: 'ntcore', linkage: 'shared'
+            project(':ntcore').addNtcoreDependency(it, 'shared')
             lib project: ':cscore', library: 'cscore', linkage: 'shared'
             project(':hal').addHalDependency(it, 'shared')
             lib project: ':cameraserver', library: 'cameraserver', linkage: 'shared'

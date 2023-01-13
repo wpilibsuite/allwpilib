@@ -47,7 +47,6 @@ class QuaternionTest {
             + q3.getZ() * q3.getZ());
   }
 
-  @SuppressWarnings("LocalVariableName")
   @Test
   void testTimes() {
     // 90° CCW rotations around each axis

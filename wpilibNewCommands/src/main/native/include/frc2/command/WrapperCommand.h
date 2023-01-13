@@ -13,7 +13,6 @@
 #include <utility>
 
 #include "frc2/command/CommandBase.h"
-#include "frc2/command/CommandGroupBase.h"
 #include "frc2/command/CommandHelper.h"
 
 namespace frc2 {
@@ -63,6 +62,10 @@ class WrapperCommand : public CommandHelper<CommandBase, WrapperCommand> {
   void End(bool interrupted) override;
 
   bool RunsWhenDisabled() const override;
+
+  InterruptionBehavior GetInterruptionBehavior() const override;
+
+  wpi::SmallSet<Subsystem*, 4> GetRequirements() const override;
 
  protected:
   std::unique_ptr<Command> m_command;

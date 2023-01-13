@@ -76,7 +76,7 @@ Frame SourceImpl::GetCurFrame() {
 Frame SourceImpl::GetNextFrame() {
   std::unique_lock lock{m_frameMutex};
   auto oldTime = m_frame.GetTime();
-  m_frameCv.wait(lock, [=] { return m_frame.GetTime() != oldTime; });
+  m_frameCv.wait(lock, [=, this] { return m_frame.GetTime() != oldTime; });
   return m_frame;
 }
 
@@ -85,7 +85,7 @@ Frame SourceImpl::GetNextFrame(double timeout) {
   auto oldTime = m_frame.GetTime();
   if (!m_frameCv.wait_for(
           lock, std::chrono::milliseconds(static_cast<int>(timeout * 1000)),
-          [=] { return m_frame.GetTime() != oldTime; })) {
+          [=, this] { return m_frame.GetTime() != oldTime; })) {
     m_frame = Frame{*this, "timed out getting frame", wpi::Now()};
   }
   return m_frame;
@@ -198,6 +198,10 @@ bool SourceImpl::SetConfigJson(const wpi::json& config, CS_Status* status) {
         mode.pixelFormat = cs::VideoMode::kBGR;
       } else if (wpi::equals_lower(str, "gray")) {
         mode.pixelFormat = cs::VideoMode::kGray;
+      } else if (wpi::equals_lower(str, "y16")) {
+        mode.pixelFormat = cs::VideoMode::kY16;
+      } else if (wpi::equals_lower(str, "uyvy")) {
+        mode.pixelFormat = cs::VideoMode::kUYVY;
       } else {
         SWARNING("SetConfigJson: could not understand pixel format value '{}'",
                  str);
@@ -359,6 +363,12 @@ wpi::json SourceImpl::GetConfigJsonObject(CS_Status* status) {
       break;
     case VideoMode::kGray:
       pixelFormat = "gray";
+      break;
+    case VideoMode::kY16:
+      pixelFormat = "y16";
+      break;
+    case VideoMode::kUYVY:
+      pixelFormat = "uyvy";
       break;
     default:
       break;

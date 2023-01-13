@@ -1,0 +1,90 @@
+plugins {
+    id 'c'
+    id 'maven-publish'
+}
+
+apply plugin: 'edu.wpi.first.NativeUtils'
+
+apply from: '../shared/config.gradle'
+
+def symbolFile = project.file("src/main/native/symbols.txt")
+
+nativeUtils {
+    privateExportsConfigs {
+        ntcoreffi {
+            exportsFile = symbolFile
+            performStripAllSymbols = true
+        }
+    }
+}
+
+def generatedHeaders = file("$buildDir/generated/headers")
+def generatedFile = file("$buildDir/generated/headers/ExportedSymbols.h")
+
+def generateSymbols = tasks.register('generateFfiSymbols') {
+    inputs.file(symbolFile)
+    outputs.file(generatedFile)
+
+    doLast {
+        def symbolText = symbolFile as String[]
+        symbolText = symbolText.collect {
+            "AddFunctionToLink(${it});"
+        }.join('\n')
+        symbolText += '\n'
+        generatedFile.text = symbolText
+    }
+}
+
+model {
+    components {
+        ntcoreffi(NativeLibrarySpec) {
+            sources {
+                c {
+                    source {
+                        srcDirs = ['src/main/native/c']
+                        includes = ['**/*.c']
+                    }
+                    exportedHeaders {
+                        srcDir 'src/main/native/include'
+                        srcDir generatedHeaders
+                    }
+                }
+            }
+            binaries.all { binary ->
+                if (binary instanceof StaticLibraryBinarySpec) {
+                    binary.buildable = false
+                    return
+                }
+                binary.tasks.withType(AbstractNativeSourceCompileTask) {
+                    it.dependsOn generateSymbols
+                }
+                project(':ntcore').addNtcoreDependency(binary, 'static')
+                lib project: ':wpinet', library: 'wpinet', linkage: 'static'
+                lib project: ':wpiutil', library: 'wpiutil', linkage: 'static'
+            }
+        }
+    }
+}
+
+def nativeName = 'ntcoreffi'
+def baseArtifactId = nativeName
+def artifactGroupId = "edu.wpi.first.${nativeName}"
+def zipBaseName = "_GROUP_edu_wpi_first_${nativeName}_ID_${nativeName}-cpp_CLS"
+
+model {
+    publishing {
+        def taskList = createComponentZipTasks($.components, [nativeName], zipBaseName, Zip, project, includeStandardZipFormat)
+
+        publications {
+            cpp(MavenPublication) {
+                taskList.each {
+                    artifact it
+                }
+
+                artifactId = "${baseArtifactId}-cpp"
+                groupId artifactGroupId
+                version wpilibVersioning.version.get()
+            }
+        }
+    }
+}

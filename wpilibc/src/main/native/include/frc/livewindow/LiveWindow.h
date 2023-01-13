@@ -51,6 +51,11 @@ class LiveWindow final {
    */
   static void DisableAllTelemetry();
 
+  /**
+   * Enable ALL telemetry.
+   */
+  static void EnableAllTelemetry();
+
   static bool IsEnabled();
 
   /**

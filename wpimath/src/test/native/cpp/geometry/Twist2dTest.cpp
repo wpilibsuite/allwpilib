@@ -3,8 +3,7 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #include <cmath>
-
-#include <wpi/numbers>
+#include <numbers>
 
 #include "frc/geometry/Pose2d.h"
 #include "gtest/gtest.h"
@@ -13,7 +12,7 @@ using namespace frc;
 
 TEST(Twist2dTest, Straight) {
   const Twist2d straight{5_m, 0_m, 0_rad};
-  const auto straightPose = Pose2d().Exp(straight);
+  const auto straightPose = Pose2d{}.Exp(straight);
 
   EXPECT_DOUBLE_EQ(5.0, straightPose.X().value());
   EXPECT_DOUBLE_EQ(0.0, straightPose.Y().value());
@@ -21,8 +20,8 @@ TEST(Twist2dTest, Straight) {
 }
 
 TEST(Twist2dTest, QuarterCircle) {
-  const Twist2d quarterCircle{5_m / 2.0 * wpi::numbers::pi, 0_m,
-                              units::radian_t{wpi::numbers::pi / 2.0}};
+  const Twist2d quarterCircle{5_m / 2.0 * std::numbers::pi, 0_m,
+                              units::radian_t{std::numbers::pi / 2.0}};
   const auto quarterCirclePose = Pose2d{}.Exp(quarterCircle);
 
   EXPECT_DOUBLE_EQ(5.0, quarterCirclePose.X().value());
@@ -52,16 +51,26 @@ TEST(Twist2dTest, Inequality) {
 }
 
 TEST(Twist2dTest, Pose2dLog) {
-  const Pose2d end{5_m, 5_m, Rotation2d{90_deg}};
+  const Pose2d end{5_m, 5_m, 90_deg};
   const Pose2d start;
 
   const auto twist = start.Log(end);
 
-  Twist2d expected{units::meter_t{5.0 / 2.0 * wpi::numbers::pi}, 0_m,
-                   units::radian_t{wpi::numbers::pi / 2.0}};
+  Twist2d expected{units::meter_t{5.0 / 2.0 * std::numbers::pi}, 0_m,
+                   units::radian_t{std::numbers::pi / 2.0}};
   EXPECT_EQ(expected, twist);
 
   // Make sure computed twist gives back original end pose
   const auto reapplied = start.Exp(twist);
   EXPECT_EQ(end, reapplied);
+}
+
+TEST(Twist2dTest, Constexpr) {
+  constexpr Twist2d defaultCtor;
+  constexpr Twist2d componentCtor{1_m, 2_m, 3_rad};
+  constexpr auto multiplied = componentCtor * 2;
+
+  static_assert(defaultCtor.dx == 0_m);
+  static_assert(componentCtor.dy == 2_m);
+  static_assert(multiplied.dtheta == 6_rad);
 }

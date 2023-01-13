@@ -12,13 +12,15 @@
 
 using namespace frc;
 
+namespace {
+
 /**
  * States of the drivetrain system.
  */
 class State {
  public:
   /// X position in global coordinate frame.
-  static constexpr int kX = 0;
+  [[maybe_unused]] static constexpr int kX = 0;
 
   /// Y position in global coordinate frame.
   static constexpr int kY = 1;
@@ -27,17 +29,21 @@ class State {
   static constexpr int kHeading = 2;
 
   /// Left encoder velocity.
-  static constexpr int kLeftVelocity = 3;
+  [[maybe_unused]] static constexpr int kLeftVelocity = 3;
 
   /// Right encoder velocity.
-  static constexpr int kRightVelocity = 4;
+  [[maybe_unused]] static constexpr int kRightVelocity = 4;
 };
+
+}  // namespace
 
 LTVDifferentialDriveController::LTVDifferentialDriveController(
     const frc::LinearSystem<2, 2, 2>& plant, units::meter_t trackwidth,
     const wpi::array<double, 5>& Qelems, const wpi::array<double, 2>& Relems,
     units::second_t dt)
     : m_trackwidth{trackwidth} {
+  // Control law derivation is in section 8.7 of
+  // https://file.tavsys.net/control/controls-engineering-in-frc.pdf
   Matrixd<5, 5> A{
       {0.0, 0.0, 0.0, 0.5, 0.5},
       {0.0, 0.0, 0.0, 0.0, 0.0},

@@ -19,7 +19,6 @@ import org.junit.jupiter.api.Test;
 
 class ElevatorSimTest {
   @Test
-  @SuppressWarnings({"LocalVariableName", "resource"})
   void testStateSpaceSimWithElevator() {
     RoboRioSim.resetData();
 

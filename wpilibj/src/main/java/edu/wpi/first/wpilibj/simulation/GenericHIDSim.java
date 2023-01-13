@@ -118,7 +118,7 @@ public class GenericHIDSim {
   }
 
   /**
-   * Set the type of an axis.
+   * Set the type of the provided axis channel.
    *
    * @param axis the axis
    * @param type the type

@@ -105,6 +105,15 @@ class Async final : public HandleImpl<Async<T...>, uv_async_t> {
   }
 
   /**
+   * Wakeup the event loop and emit the event.
+   * This function assumes the loop still exists, which makes it a bit faster.
+   *
+   * It’s safe to call this function from any thread.
+   * An async event will be emitted on the loop thread.
+   */
+  void UnsafeSend() { Invoke(&uv_async_send, this->GetRaw()); }
+
+  /**
    * Signal generated (on event loop thread) when the async event occurs.
    */
   sig::Signal<T...> wakeup;
@@ -160,6 +169,15 @@ class Async<> final : public HandleImpl<Async<>, uv_async_t> {
       }
     }
   }
+
+  /**
+   * Wakeup the event loop and emit the event.
+   * This function assumes the loop still exists, which makes it a bit faster.
+   *
+   * It’s safe to call this function from any thread.
+   * An async event will be emitted on the loop thread.
+   */
+  void UnsafeSend() { Invoke(&uv_async_send, GetRaw()); }
 
   /**
    * Signal generated (on event loop thread) when the async event occurs.

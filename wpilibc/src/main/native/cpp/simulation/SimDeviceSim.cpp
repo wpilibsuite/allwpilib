@@ -27,6 +27,12 @@ SimDeviceSim::SimDeviceSim(const char* name, int index, int channel) {
       fmt::format("{}[{},{}]", name, index, channel).c_str());
 }
 
+SimDeviceSim::SimDeviceSim(HAL_SimDeviceHandle handle) : m_handle(handle) {}
+
+std::string SimDeviceSim::GetName() const {
+  return std::string(HALSIM_GetSimDeviceName(m_handle));
+}
+
 hal::SimValue SimDeviceSim::GetValue(const char* name) const {
   return HALSIM_GetSimValueHandle(m_handle, name);
 }

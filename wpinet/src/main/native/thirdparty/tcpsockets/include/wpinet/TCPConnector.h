@@ -25,9 +25,8 @@
 #define WPINET_TCPCONNECTOR_H_
 
 #include <memory>
+#include <span>
 #include <utility>
-
-#include <wpi/span.h>
 
 #include "wpinet/NetworkStream.h"
 
@@ -41,7 +40,7 @@ class TCPConnector {
                                                 Logger& logger,
                                                 int timeout = 0);
   static std::unique_ptr<NetworkStream> connect_parallel(
-      span<const std::pair<const char*, int>> servers, Logger& logger,
+      std::span<const std::pair<const char*, int>> servers, Logger& logger,
       int timeout = 0);
 };
 

@@ -5,6 +5,7 @@
 #include <jni.h>
 
 #include "edu_wpi_first_util_WPIUtilJNI.h"
+#include "fmt/format.h"
 #include "wpi/Synchronization.h"
 #include "wpi/jni_util.h"
 #include "wpi/timestamp.h"
@@ -39,6 +40,18 @@ JNIEXPORT void JNICALL JNI_OnUnload(JavaVM* vm, void* reserved) {
   }
 
   interruptedEx.free(env);
+}
+
+/*
+ * Class:     edu_wpi_first_util_WPIUtilJNI
+ * Method:    writeStderr
+ * Signature: (Ljava/lang/String;)V
+ */
+JNIEXPORT void JNICALL
+Java_edu_wpi_first_util_WPIUtilJNI_writeStderr
+  (JNIEnv* env, jclass, jstring str)
+{
+  fmt::print(stderr, "{}", JStringRef{env, str});
 }
 
 /*
@@ -234,7 +247,7 @@ Java_edu_wpi_first_util_WPIUtilJNI_waitForObjects
   JIntArrayRef handlesArr{env, handles};
   wpi::SmallVector<WPI_Handle, 8> signaledBuf;
   signaledBuf.resize(handlesArr.size());
-  wpi::span<const WPI_Handle> handlesArr2{
+  std::span<const WPI_Handle> handlesArr2{
       reinterpret_cast<const WPI_Handle*>(handlesArr.array().data()),
       handlesArr.size()};
 
@@ -258,7 +271,7 @@ Java_edu_wpi_first_util_WPIUtilJNI_waitForObjectsTimeout
   JIntArrayRef handlesArr{env, handles};
   wpi::SmallVector<WPI_Handle, 8> signaledBuf;
   signaledBuf.resize(handlesArr.size());
-  wpi::span<const WPI_Handle> handlesArr2{
+  std::span<const WPI_Handle> handlesArr2{
       reinterpret_cast<const WPI_Handle*>(handlesArr.array().data()),
       handlesArr.size()};
 

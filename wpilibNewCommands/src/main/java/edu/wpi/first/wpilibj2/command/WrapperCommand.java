@@ -4,31 +4,30 @@
 
 package edu.wpi.first.wpilibj2.command;
 
-import static edu.wpi.first.wpilibj2.command.CommandGroupBase.registerGroupedCommands;
-import static edu.wpi.first.wpilibj2.command.CommandGroupBase.requireUngrouped;
-
 import java.util.Set;
 
 /**
  * A class used internally to wrap commands while overriding a specific method; all other methods
  * will call through to the wrapped command.
  *
- * <p>Wrapped commands may only be used through the wrapper, trying to directly schedule them or add
- * them to a group will throw an exception.
+ * <p>The rules for command compositions apply: command instances that are passed to it cannot be
+ * added to any other composition or scheduled individually, and the composition requires all
+ * subsystems its components require.
  */
-public abstract class WrapperCommand implements Command {
+public abstract class WrapperCommand extends CommandBase {
   protected final Command m_command;
 
   /**
    * Wrap a command.
    *
    * @param command the command being wrapped. Trying to directly schedule this command or add it to
-   *     a group will throw an exception.
+   *     a composition will throw an exception.
    */
   protected WrapperCommand(Command command) {
-    requireUngrouped(command);
-    registerGroupedCommands(command);
+    CommandScheduler.getInstance().registerComposedCommands(command);
     m_command = command;
+    // copy the wrapped command's name
+    setName(command.getName());
   }
 
   /** The initial subroutine of a command. Called once when the command is initially scheduled. */
@@ -95,13 +94,8 @@ public abstract class WrapperCommand implements Command {
     return m_command.runsWhenDisabled();
   }
 
-  /**
-   * Gets the name of this Command.
-   *
-   * @return Name
-   */
   @Override
-  public String getName() {
-    return m_command.getName();
+  public InterruptionBehavior getInterruptionBehavior() {
+    return m_command.getInterruptionBehavior();
   }
 }

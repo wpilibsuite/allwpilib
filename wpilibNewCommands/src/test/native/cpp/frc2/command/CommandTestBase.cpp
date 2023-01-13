@@ -19,6 +19,7 @@ CommandScheduler CommandTestBase::GetScheduler() {
 
 void CommandTestBase::SetUp() {
   frc::sim::DriverStationSim::SetEnabled(true);
+  frc::sim::DriverStationSim::NotifyNewData();
 }
 
 void CommandTestBase::TearDown() {
@@ -27,4 +28,5 @@ void CommandTestBase::TearDown() {
 
 void CommandTestBase::SetDSEnabled(bool enabled) {
   frc::sim::DriverStationSim::SetEnabled(enabled);
+  frc::sim::DriverStationSim::NotifyNewData();
 }

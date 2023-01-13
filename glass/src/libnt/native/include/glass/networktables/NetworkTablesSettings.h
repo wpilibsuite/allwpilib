@@ -22,7 +22,7 @@ class Storage;
 
 class NetworkTablesSettings {
  public:
-  explicit NetworkTablesSettings(Storage& storage,
+  explicit NetworkTablesSettings(std::string_view clientName, Storage& storage,
                                  NT_Inst inst = nt::GetDefaultInstance());
 
   /**
@@ -37,9 +37,12 @@ class NetworkTablesSettings {
   bool m_restart = true;
   bool m_serverOption = true;
   EnumSetting m_mode;
-  std::string& m_iniName;
+  std::string& m_persistentFilename;
   std::string& m_serverTeam;
   std::string& m_listenAddress;
+  std::string& m_clientName;
+  int& m_port3;
+  int& m_port4;
   bool& m_dsClient;
 
   class Thread : public wpi::SafeThread {
@@ -54,6 +57,9 @@ class NetworkTablesSettings {
     std::string m_iniName;
     std::string m_serverTeam;
     std::string m_listenAddress;
+    std::string m_clientName;
+    int m_port3;
+    int m_port4;
     bool m_dsClient;
   };
   wpi::SafeThreadOwner<Thread> m_thread;

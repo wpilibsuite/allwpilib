@@ -164,9 +164,8 @@ public class SerialPort implements AutoCloseable {
   /**
    * Enable termination and specify the termination character.
    *
-   * <p>Termination is currently only implemented for receive. When the the terminator is received,
-   * the read() or readString() will return fewer bytes than requested, stopping after the
-   * terminator.
+   * <p>Termination is currently only implemented for receive. When the terminator is received, the
+   * read() or readString() will return fewer bytes than requested, stopping after the terminator.
    *
    * @param terminator The character to use for termination.
    */
@@ -177,9 +176,8 @@ public class SerialPort implements AutoCloseable {
   /**
    * Enable termination with the default terminator '\n'
    *
-   * <p>Termination is currently only implemented for receive. When the the terminator is received,
-   * the read() or readString() will return fewer bytes than requested, stopping after the
-   * terminator.
+   * <p>Termination is currently only implemented for receive. When the terminator is received, the
+   * read() or readString() will return fewer bytes than requested, stopping after the terminator.
    *
    * <p>The default terminator is '\n'
    */
@@ -268,7 +266,7 @@ public class SerialPort implements AutoCloseable {
    * <p>This defines the timeout for transactions with the hardware. It will affect reads if less
    * bytes are available than the read buffer size (defaults to 1) and very large writes.
    *
-   * @param timeout The number of seconds to to wait for I/O.
+   * @param timeout The number of seconds to wait for I/O.
    */
   public void setTimeout(double timeout) {
     SerialPortJNI.serialSetTimeout(m_portHandle, timeout);

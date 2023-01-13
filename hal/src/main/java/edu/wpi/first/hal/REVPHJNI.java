@@ -4,7 +4,6 @@
 
 package edu.wpi.first.hal;
 
-@SuppressWarnings("AbbreviationAsWordInName")
 public class REVPHJNI extends JNIWrapper {
   public static final int COMPRESSOR_CONFIG_TYPE_DISABLED = 0;
   public static final int COMPRESSOR_CONFIG_TYPE_DIGITAL = 1;

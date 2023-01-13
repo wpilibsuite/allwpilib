@@ -41,6 +41,24 @@ class WPILIB_DLLEXPORT DifferentialDriveAccelerationLimiter {
       units::radians_per_second_squared_t maxAngularAccel);
 
   /**
+   * Constructs a DifferentialDriveAccelerationLimiter.
+   *
+   * @param system The differential drive dynamics.
+   * @param trackwidth The distance between the differential drive's left and
+   *                   right wheels.
+   * @param minLinearAccel The minimum (most negative) linear acceleration.
+   * @param maxLinearAccel The maximum (most positive) linear acceleration.
+   * @param maxAngularAccel The maximum angular acceleration.
+   * @throws std::invalid_argument if minimum linear acceleration is greater
+   * than maximum linear acceleration
+   */
+  DifferentialDriveAccelerationLimiter(
+      LinearSystem<2, 2, 2> system, units::meter_t trackwidth,
+      units::meters_per_second_squared_t minLinearAccel,
+      units::meters_per_second_squared_t maxLinearAccel,
+      units::radians_per_second_squared_t maxAngularAccel);
+
+  /**
    * Returns the next voltage pair subject to acceleraiton constraints.
    *
    * @param leftVelocity The left wheel velocity.
@@ -57,6 +75,7 @@ class WPILIB_DLLEXPORT DifferentialDriveAccelerationLimiter {
  private:
   LinearSystem<2, 2, 2> m_system;
   units::meter_t m_trackwidth;
+  units::meters_per_second_squared_t m_minLinearAccel;
   units::meters_per_second_squared_t m_maxLinearAccel;
   units::radians_per_second_squared_t m_maxAngularAccel;
 };

@@ -4,6 +4,8 @@
 
 #include "frc/geometry/Quaternion.h"
 
+#include <wpi/json.h>
+
 using namespace frc;
 
 Quaternion::Quaternion(double w, double x, double y, double z)
@@ -16,20 +18,19 @@ Quaternion Quaternion::operator*(const Quaternion& other) const {
   const auto& r2 = other.m_r;
   const auto& v2 = other.m_v;
 
+  // v₁ x v₂
   Eigen::Vector3d cross{v1(1) * v2(2) - v2(1) * v1(2),
                         v2(0) * v1(2) - v1(0) * v2(2),
                         v1(0) * v2(1) - v2(0) * v1(1)};
 
+  // v = r₁v₂ + r₂v₁ + v₁ x v₂
   Eigen::Vector3d v = r1 * v2 + r2 * v1 + cross;
+
   return Quaternion{r1 * r2 - v1.dot(v2), v(0), v(1), v(2)};
 }
 
 bool Quaternion::operator==(const Quaternion& other) const {
   return std::abs(m_r * other.m_r + m_v.dot(other.m_v)) > 1.0 - 1E-9;
-}
-
-bool Quaternion::operator!=(const Quaternion& other) const {
-  return !operator==(other);
 }
 
 Quaternion Quaternion::Inverse() const {
@@ -77,4 +78,17 @@ Eigen::Vector3d Quaternion::ToRotationVector() const {
       return 2.0 * std::atan2(norm, W()) / norm * m_v;
     }
   }
+}
+
+void frc::to_json(wpi::json& json, const Quaternion& quaternion) {
+  json = wpi::json{{"W", quaternion.W()},
+                   {"X", quaternion.X()},
+                   {"Y", quaternion.Y()},
+                   {"Z", quaternion.Z()}};
+}
+
+void frc::from_json(const wpi::json& json, Quaternion& quaternion) {
+  quaternion =
+      Quaternion{json.at("W").get<double>(), json.at("X").get<double>(),
+                 json.at("Y").get<double>(), json.at("Z").get<double>()};
 }

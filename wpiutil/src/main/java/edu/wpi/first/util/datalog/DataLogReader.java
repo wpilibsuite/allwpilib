@@ -9,7 +9,6 @@ import java.io.RandomAccessFile;
 import java.nio.BufferUnderflowException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
-import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
 import java.nio.charset.StandardCharsets;
 import java.util.NoSuchElementException;
@@ -31,13 +30,12 @@ public class DataLogReader implements Iterable<DataLogRecord> {
    * Constructs from a file.
    *
    * @param filename filename
-   * @throws IOException if could not open/read file
+   * @throws IOException if unable to open/read file
    */
   public DataLogReader(String filename) throws IOException {
     RandomAccessFile f = new RandomAccessFile(filename, "r");
     FileChannel channel = f.getChannel();
-    MappedByteBuffer buf = channel.map(FileChannel.MapMode.READ_ONLY, 0, channel.size());
-    m_buf = buf;
+    m_buf = channel.map(FileChannel.MapMode.READ_ONLY, 0, channel.size());
     m_buf.order(ByteOrder.LITTLE_ENDIAN);
     channel.close();
     f.close();
@@ -114,7 +112,6 @@ public class DataLogReader implements Iterable<DataLogRecord> {
     return val;
   }
 
-  @SuppressWarnings("PMD.PreserveStackTrace")
   DataLogRecord getRecord(int pos) {
     try {
       int lenbyte = m_buf.get(pos) & 0xff;

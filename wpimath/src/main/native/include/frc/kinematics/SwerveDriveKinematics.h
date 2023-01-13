@@ -13,7 +13,9 @@
 #include "frc/EigenCore.h"
 #include "frc/geometry/Rotation2d.h"
 #include "frc/geometry/Translation2d.h"
+#include "frc/geometry/Twist2d.h"
 #include "frc/kinematics/ChassisSpeeds.h"
+#include "frc/kinematics/SwerveModulePosition.h"
 #include "frc/kinematics/SwerveModuleState.h"
 #include "units/velocity.h"
 #include "wpimath/MathShared.h"
@@ -129,7 +131,7 @@ class SwerveDriveKinematics {
    */
   wpi::array<SwerveModuleState, NumModules> ToSwerveModuleStates(
       const ChassisSpeeds& chassisSpeeds,
-      const Translation2d& centerOfRotation = Translation2d()) const;
+      const Translation2d& centerOfRotation = Translation2d{}) const;
 
   /**
    * Performs forward kinematics to return the resulting chassis state from the
@@ -163,6 +165,38 @@ class SwerveDriveKinematics {
       wpi::array<SwerveModuleState, NumModules> moduleStates) const;
 
   /**
+   * Performs forward kinematics to return the resulting Twist2d from the
+   * given module position deltas. This method is often used for odometry --
+   * determining the robot's position on the field using data from the
+   * real-world position delta and angle of each module on the robot.
+   *
+   * @param wheelDeltas The latest change in position of the modules (as a
+   * SwerveModulePosition type) as measured from respective encoders and gyros.
+   * The order of the swerve module states should be same as passed into the
+   * constructor of this class.
+   *
+   * @return The resulting Twist2d.
+   */
+  template <typename... ModuleDeltas>
+  Twist2d ToTwist2d(ModuleDeltas&&... wheelDeltas) const;
+
+  /**
+   * Performs forward kinematics to return the resulting Twist2d from the
+   * given module position deltas. This method is often used for odometry --
+   * determining the robot's position on the field using data from the
+   * real-world position delta and angle of each module on the robot.
+   *
+   * @param wheelDeltas The latest change in position of the modules (as a
+   * SwerveModulePosition type) as measured from respective encoders and gyros.
+   * The order of the swerve module states should be same as passed into the
+   * constructor of this class.
+   *
+   * @return The resulting Twist2d.
+   */
+  Twist2d ToTwist2d(
+      wpi::array<SwerveModulePosition, NumModules> wheelDeltas) const;
+
+  /**
    * Renormalizes the wheel speeds if any individual speed is above the
    * specified maximum.
    *
@@ -180,6 +214,34 @@ class SwerveDriveKinematics {
   static void DesaturateWheelSpeeds(
       wpi::array<SwerveModuleState, NumModules>* moduleStates,
       units::meters_per_second_t attainableMaxSpeed);
+
+  /**
+   * Renormalizes the wheel speeds if any individual speed is above the
+   * specified maximum, as well as getting rid of joystick saturation at edges
+   * of joystick.
+   *
+   * Sometimes, after inverse kinematics, the requested speed
+   * from one or more modules may be above the max attainable speed for the
+   * driving motor on that module. To fix this issue, one can reduce all the
+   * wheel speeds to make sure that all requested module speeds are at-or-below
+   * the absolute threshold, while maintaining the ratio of speeds between
+   * modules.
+   *
+   * @param moduleStates Reference to array of module states. The array will be
+   * mutated with the normalized speeds!
+   * @param currentChassisSpeed Current speed of the robot
+   * @param attainableMaxModuleSpeed The absolute max speed a module can reach
+   * @param attainableMaxRobotTranslationSpeed The absolute max speed the robot
+   * can reach while translating
+   * @param attainableMaxRobotRotationSpeed The absolute max speed the robot can
+   * reach while rotating
+   */
+  static void DesaturateWheelSpeeds(
+      wpi::array<SwerveModuleState, NumModules>* moduleStates,
+      ChassisSpeeds currentChassisSpeed,
+      units::meters_per_second_t attainableMaxModuleSpeed,
+      units::meters_per_second_t attainableMaxRobotTranslationSpeed,
+      units::radians_per_second_t attainableMaxRobotRotationSpeed);
 
  private:
   mutable Matrixd<NumModules * 2, 3> m_inverseKinematics;

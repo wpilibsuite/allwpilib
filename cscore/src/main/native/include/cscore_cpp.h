@@ -8,12 +8,12 @@
 #include <stdint.h>
 
 #include <functional>
+#include <span>
 #include <string>
 #include <string_view>
 #include <vector>
 
 #include <wpi/SmallVector.h>
-#include <wpi/span.h>
 
 #include "cscore_c.h"
 
@@ -68,7 +68,9 @@ struct VideoMode : public CS_VideoMode {
     kYUYV = CS_PIXFMT_YUYV,
     kRGB565 = CS_PIXFMT_RGB565,
     kBGR = CS_PIXFMT_BGR,
-    kGray = CS_PIXFMT_GRAY
+    kGray = CS_PIXFMT_GRAY,
+    kY16 = CS_PIXFMT_Y16,
+    kUYVY = CS_PIXFMT_UYVY
   };
   VideoMode() {
     pixelFormat = 0;
@@ -89,7 +91,10 @@ struct VideoMode : public CS_VideoMode {
            height == other.height && fps == other.fps;
   }
 
-  bool operator!=(const VideoMode& other) const { return !(*this == other); }
+  bool CompareWithoutFps(const VideoMode& other) const {
+    return pixelFormat == other.pixelFormat && width == other.width &&
+           height == other.height;
+  }
 };
 
 /**
@@ -203,7 +208,7 @@ CS_Source CreateUsbCameraPath(std::string_view name, std::string_view path,
 CS_Source CreateHttpCamera(std::string_view name, std::string_view url,
                            CS_HttpCameraKind kind, CS_Status* status);
 CS_Source CreateHttpCamera(std::string_view name,
-                           wpi::span<const std::string> urls,
+                           std::span<const std::string> urls,
                            CS_HttpCameraKind kind, CS_Status* status);
 CS_Source CreateCvSource(std::string_view name, const VideoMode& mode,
                          CS_Status* status);
@@ -230,7 +235,7 @@ bool IsSourceConnected(CS_Source source, CS_Status* status);
 bool IsSourceEnabled(CS_Source source, CS_Status* status);
 CS_Property GetSourceProperty(CS_Source source, std::string_view name,
                               CS_Status* status);
-wpi::span<CS_Property> EnumerateSourceProperties(
+std::span<CS_Property> EnumerateSourceProperties(
     CS_Source source, wpi::SmallVectorImpl<CS_Property>& vec,
     CS_Status* status);
 VideoMode GetSourceVideoMode(CS_Source source, CS_Status* status);
@@ -249,7 +254,7 @@ std::string GetSourceConfigJson(CS_Source source, CS_Status* status);
 wpi::json GetSourceConfigJsonObject(CS_Source source, CS_Status* status);
 std::vector<VideoMode> EnumerateSourceVideoModes(CS_Source source,
                                                  CS_Status* status);
-wpi::span<CS_Sink> EnumerateSourceSinks(CS_Source source,
+std::span<CS_Sink> EnumerateSourceSinks(CS_Source source,
                                         wpi::SmallVectorImpl<CS_Sink>& vec,
                                         CS_Status* status);
 CS_Source CopySource(CS_Source source, CS_Status* status);
@@ -285,7 +290,7 @@ UsbCameraInfo GetUsbCameraInfo(CS_Source source, CS_Status* status);
  * @{
  */
 CS_HttpCameraKind GetHttpCameraKind(CS_Source source, CS_Status* status);
-void SetHttpCameraUrls(CS_Source source, wpi::span<const std::string> urls,
+void SetHttpCameraUrls(CS_Source source, std::span<const std::string> urls,
                        CS_Status* status);
 std::vector<std::string> GetHttpCameraUrls(CS_Source source, CS_Status* status);
 /** @} */
@@ -304,7 +309,7 @@ CS_Property CreateSourceProperty(CS_Source source, std::string_view name,
                                  int step, int defaultValue, int value,
                                  CS_Status* status);
 void SetSourceEnumPropertyChoices(CS_Source source, CS_Property property,
-                                  wpi::span<const std::string> choices,
+                                  std::span<const std::string> choices,
                                   CS_Status* status);
 /** @} */
 
@@ -335,7 +340,7 @@ std::string_view GetSinkDescription(CS_Sink sink,
                                     CS_Status* status);
 CS_Property GetSinkProperty(CS_Sink sink, std::string_view name,
                             CS_Status* status);
-wpi::span<CS_Property> EnumerateSinkProperties(
+std::span<CS_Property> EnumerateSinkProperties(
     CS_Sink sink, wpi::SmallVectorImpl<CS_Property>& vec, CS_Status* status);
 void SetSinkSource(CS_Sink sink, CS_Source source, CS_Status* status);
 CS_Property GetSinkSourceProperty(CS_Sink sink, std::string_view name,
@@ -430,9 +435,9 @@ void Shutdown();
  */
 std::vector<UsbCameraInfo> EnumerateUsbCameras(CS_Status* status);
 
-wpi::span<CS_Source> EnumerateSourceHandles(
+std::span<CS_Source> EnumerateSourceHandles(
     wpi::SmallVectorImpl<CS_Source>& vec, CS_Status* status);
-wpi::span<CS_Sink> EnumerateSinkHandles(wpi::SmallVectorImpl<CS_Sink>& vec,
+std::span<CS_Sink> EnumerateSinkHandles(wpi::SmallVectorImpl<CS_Sink>& vec,
                                         CS_Status* status);
 
 std::string GetHostname();

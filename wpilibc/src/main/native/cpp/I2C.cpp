@@ -18,14 +18,14 @@ I2C::I2C(Port port, int deviceAddress)
   int32_t status = 0;
 
   if (port == I2C::Port::kOnboard) {
-    FRC_ReportError(warn::Warning, "{}",
+    FRC_ReportError(warn::Warning,
                     "Onboard I2C port is subject to system lockups. See Known "
                     "Issues page for "
                     "details");
   }
 
   HAL_InitializeI2C(m_port, &status);
-  FRC_CheckErrorStatus(status, "Port {}", port);
+  FRC_CheckErrorStatus(status, "Port {}", static_cast<int>(port));
 
   HAL_Report(HALUsageReporting::kResourceType_I2C, deviceAddress);
 }
@@ -74,7 +74,7 @@ bool I2C::Read(int registerAddress, int count, uint8_t* buffer) {
     throw FRC_MakeError(err::ParameterOutOfRange, "count {}", count);
   }
   if (!buffer) {
-    throw FRC_MakeError(err::NullParameter, "{}", "buffer");
+    throw FRC_MakeError(err::NullParameter, "buffer");
   }
   uint8_t regAddr = registerAddress;
   return Transaction(&regAddr, sizeof(regAddr), buffer, count);
@@ -85,7 +85,7 @@ bool I2C::ReadOnly(int count, uint8_t* buffer) {
     throw FRC_MakeError(err::ParameterOutOfRange, "count {}", count);
   }
   if (!buffer) {
-    throw FRC_MakeError(err::NullParameter, "{}", "buffer");
+    throw FRC_MakeError(err::NullParameter, "buffer");
   }
   return HAL_ReadI2C(m_port, m_deviceAddress, buffer, count) < 0;
 }

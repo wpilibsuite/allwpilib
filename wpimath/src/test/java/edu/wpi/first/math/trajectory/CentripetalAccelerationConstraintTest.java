@@ -12,7 +12,6 @@ import java.util.Collections;
 import org.junit.jupiter.api.Test;
 
 class CentripetalAccelerationConstraintTest {
-  @SuppressWarnings("LocalVariableName")
   @Test
   void testCentripetalAccelerationConstraint() {
     double maxCentripetalAcceleration = Units.feetToMeters(7.0); // 7 feet per second squared

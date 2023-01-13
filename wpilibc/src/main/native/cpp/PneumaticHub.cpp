@@ -148,7 +148,7 @@ void PneumaticHub::EnableCompressorAnalog(
     units::pounds_per_square_inch_t minPressure,
     units::pounds_per_square_inch_t maxPressure) {
   if (minPressure >= maxPressure) {
-    throw FRC_MakeError(err::InvalidParameter, "{}",
+    throw FRC_MakeError(err::InvalidParameter,
                         "maxPressure must be greater than minPresure");
   }
   if (minPressure < 0_psi || minPressure > 120_psi) {
@@ -173,7 +173,7 @@ void PneumaticHub::EnableCompressorHybrid(
     units::pounds_per_square_inch_t minPressure,
     units::pounds_per_square_inch_t maxPressure) {
   if (minPressure >= maxPressure) {
-    throw FRC_MakeError(err::InvalidParameter, "{}",
+    throw FRC_MakeError(err::InvalidParameter,
                         "maxPressure must be greater than minPresure");
   }
   if (minPressure < 0_psi || minPressure > 120_psi) {

@@ -11,10 +11,10 @@
 #include <functional>
 #include <initializer_list>
 #include <memory>
+#include <span>
 #include <utility>
 
 #include <wpi/Signal.h>
-#include <wpi/span.h>
 
 #include "wpinet/uv/Buffer.h"
 #include "wpinet/uv/Handle.h"
@@ -128,7 +128,8 @@ class Stream : public Handle {
    * @param bufs The buffers to be written to the stream.
    * @param req write request
    */
-  void Write(span<const Buffer> bufs, const std::shared_ptr<WriteReq>& req);
+  void Write(std::span<const Buffer> bufs,
+             const std::shared_ptr<WriteReq>& req);
 
   /**
    * Write data to the stream.
@@ -164,8 +165,8 @@ class Stream : public Handle {
    * @param bufs The buffers to be written to the stream.
    * @param callback Callback function to call when the write completes
    */
-  void Write(span<const Buffer> bufs,
-             std::function<void(span<Buffer>, Error)> callback);
+  void Write(std::span<const Buffer> bufs,
+             std::function<void(std::span<Buffer>, Error)> callback);
 
   /**
    * Write data to the stream.
@@ -181,7 +182,7 @@ class Stream : public Handle {
    * @param callback Callback function to call when the write completes
    */
   void Write(std::initializer_list<Buffer> bufs,
-             std::function<void(span<Buffer>, Error)> callback) {
+             std::function<void(std::span<Buffer>, Error)> callback) {
     Write({bufs.begin(), bufs.end()}, std::move(callback));
   }
 
@@ -195,7 +196,7 @@ class Stream : public Handle {
    * @param bufs The buffers to be written to the stream.
    * @return Number of bytes written.
    */
-  int TryWrite(span<const Buffer> bufs);
+  int TryWrite(std::span<const Buffer> bufs);
 
   /**
    * Queue a write request if it can be completed immediately.
@@ -222,7 +223,7 @@ class Stream : public Handle {
    * @param send send stream
    * @return Number of bytes written.
    */
-  int TryWrite2(span<const Buffer> bufs, Stream& send);
+  int TryWrite2(std::span<const Buffer> bufs, Stream& send);
 
   /**
    * Same as TryWrite() and extended write function for sending handles over a

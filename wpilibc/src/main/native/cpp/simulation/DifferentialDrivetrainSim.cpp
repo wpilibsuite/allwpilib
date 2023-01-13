@@ -82,20 +82,20 @@ double DifferentialDrivetrainSim::GetState(int state) const {
 }
 
 Rotation2d DifferentialDrivetrainSim::GetHeading() const {
-  return Rotation2d(units::radian_t(GetOutput(State::kHeading)));
+  return units::radian_t{GetOutput(State::kHeading)};
 }
 
 Pose2d DifferentialDrivetrainSim::GetPose() const {
-  return Pose2d(units::meter_t(GetOutput(State::kX)),
-                units::meter_t(GetOutput(State::kY)), GetHeading());
+  return Pose2d{units::meter_t{GetOutput(State::kX)},
+                units::meter_t{GetOutput(State::kY)}, GetHeading()};
 }
 
 units::ampere_t DifferentialDrivetrainSim::GetLeftCurrentDraw() const {
   auto loadIleft =
       m_motor.Current(
-          units::radians_per_second_t(m_x(State::kLeftVelocity) *
-                                      m_currentGearing / m_wheelRadius.value()),
-          units::volt_t(m_u(0))) *
+          units::radians_per_second_t{m_x(State::kLeftVelocity) *
+                                      m_currentGearing / m_wheelRadius.value()},
+          units::volt_t{m_u(0)}) *
       wpi::sgn(m_u(0));
 
   return loadIleft;
@@ -104,9 +104,9 @@ units::ampere_t DifferentialDrivetrainSim::GetLeftCurrentDraw() const {
 units::ampere_t DifferentialDrivetrainSim::GetRightCurrentDraw() const {
   auto loadIRight =
       m_motor.Current(
-          units::radians_per_second_t(m_x(State::kRightVelocity) *
-                                      m_currentGearing / m_wheelRadius.value()),
-          units::volt_t(m_u(1))) *
+          units::radians_per_second_t{m_x(State::kRightVelocity) *
+                                      m_currentGearing / m_wheelRadius.value()},
+          units::volt_t{m_u(1)}) *
       wpi::sgn(m_u(1));
 
   return loadIRight;

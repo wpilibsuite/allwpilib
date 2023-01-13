@@ -116,6 +116,26 @@ public class Pose2d implements Interpolatable<Pose2d> {
   }
 
   /**
+   * Multiplies the current pose by a scalar.
+   *
+   * @param scalar The scalar.
+   * @return The new scaled Pose2d.
+   */
+  public Pose2d times(double scalar) {
+    return new Pose2d(m_translation.times(scalar), m_rotation.times(scalar));
+  }
+
+  /**
+   * Divides the current pose by a scalar.
+   *
+   * @param scalar The scalar.
+   * @return The new scaled Pose2d.
+   */
+  public Pose2d div(double scalar) {
+    return times(1.0 / scalar);
+  }
+
+  /**
    * Transforms the pose by the given transformation and returns the new pose. See + operator for
    * the matrix multiplication performed.
    *
@@ -125,11 +145,11 @@ public class Pose2d implements Interpolatable<Pose2d> {
   public Pose2d transformBy(Transform2d other) {
     return new Pose2d(
         m_translation.plus(other.getTranslation().rotateBy(m_rotation)),
-        m_rotation.plus(other.getRotation()));
+        other.getRotation().plus(m_rotation));
   }
 
   /**
-   * Returns the other pose relative to the current pose.
+   * Returns the current pose relative to the given pose.
    *
    * <p>This function can often be used for trajectory tracking or pose stabilization algorithms to
    * get the error between the reference and the current pose.
@@ -189,8 +209,8 @@ public class Pose2d implements Interpolatable<Pose2d> {
   }
 
   /**
-   * Returns a Twist2d that maps this pose to the end pose. If c is the output of a.Log(b), then
-   * a.Exp(c) would yield b.
+   * Returns a Twist2d that maps this pose to the end pose. If c is the output of {@code a.Log(b)},
+   * then {@code a.Exp(c)} would yield b.
    *
    * @param end The end pose for the transformation.
    * @return The twist that maps this to end.
@@ -244,7 +264,6 @@ public class Pose2d implements Interpolatable<Pose2d> {
   }
 
   @Override
-  @SuppressWarnings("ParameterName")
   public Pose2d interpolate(Pose2d endValue, double t) {
     if (t < 0) {
       return this;

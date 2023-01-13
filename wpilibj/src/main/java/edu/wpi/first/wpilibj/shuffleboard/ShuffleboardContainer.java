@@ -5,11 +5,14 @@
 package edu.wpi.first.wpilibj.shuffleboard;
 
 import edu.wpi.first.cscore.VideoSource;
+import edu.wpi.first.networktables.NetworkTableType;
+import edu.wpi.first.util.function.FloatSupplier;
 import edu.wpi.first.util.sendable.Sendable;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
+import java.util.function.LongSupplier;
 import java.util.function.Supplier;
 
 /** Common interface for objects that can contain shuffleboard components. */
@@ -123,6 +126,19 @@ public interface ShuffleboardContainer extends ShuffleboardValue {
   SimpleWidget add(String title, Object defaultValue);
 
   /**
+   * Adds a widget to this container to display the given data.
+   *
+   * @param title the title of the widget
+   * @param typeString the NT type string
+   * @param defaultValue the default value of the widget
+   * @return a widget to display the sendable data
+   * @throws IllegalArgumentException if a widget already exists in this container with the given
+   *     title
+   * @see #addPersistent(String, Object) add(String title, Object defaultValue)
+   */
+  SimpleWidget add(String title, String typeString, Object defaultValue);
+
+  /**
    * Adds a widget to this container to display a video stream.
    *
    * @param title the title of the widget
@@ -161,6 +177,45 @@ public interface ShuffleboardContainer extends ShuffleboardValue {
    *     title
    */
   SuppliedValueWidget<Double> addNumber(String title, DoubleSupplier valueSupplier);
+
+  /**
+   * Adds a widget to this container. The widget will display the data provided by the value
+   * supplier. Changes made on the dashboard will not propagate to the widget object, and will be
+   * overridden by values from the value supplier.
+   *
+   * @param title the title of the widget
+   * @param valueSupplier the supplier for values
+   * @return a widget to display data
+   * @throws IllegalArgumentException if a widget already exists in this container with the given
+   *     title
+   */
+  SuppliedValueWidget<Double> addDouble(String title, DoubleSupplier valueSupplier);
+
+  /**
+   * Adds a widget to this container. The widget will display the data provided by the value
+   * supplier. Changes made on the dashboard will not propagate to the widget object, and will be
+   * overridden by values from the value supplier.
+   *
+   * @param title the title of the widget
+   * @param valueSupplier the supplier for values
+   * @return a widget to display data
+   * @throws IllegalArgumentException if a widget already exists in this container with the given
+   *     title
+   */
+  SuppliedValueWidget<Float> addFloat(String title, FloatSupplier valueSupplier);
+
+  /**
+   * Adds a widget to this container. The widget will display the data provided by the value
+   * supplier. Changes made on the dashboard will not propagate to the widget object, and will be
+   * overridden by values from the value supplier.
+   *
+   * @param title the title of the widget
+   * @param valueSupplier the supplier for values
+   * @return a widget to display data
+   * @throws IllegalArgumentException if a widget already exists in this container with the given
+   *     title
+   */
+  SuppliedValueWidget<Long> addInteger(String title, LongSupplier valueSupplier);
 
   /**
    * Adds a widget to this container. The widget will display the data provided by the value
@@ -212,6 +267,32 @@ public interface ShuffleboardContainer extends ShuffleboardValue {
    * @throws IllegalArgumentException if a widget already exists in this container with the given
    *     title
    */
+  SuppliedValueWidget<float[]> addFloatArray(String title, Supplier<float[]> valueSupplier);
+
+  /**
+   * Adds a widget to this container. The widget will display the data provided by the value
+   * supplier. Changes made on the dashboard will not propagate to the widget object, and will be
+   * overridden by values from the value supplier.
+   *
+   * @param title the title of the widget
+   * @param valueSupplier the supplier for values
+   * @return a widget to display data
+   * @throws IllegalArgumentException if a widget already exists in this container with the given
+   *     title
+   */
+  SuppliedValueWidget<long[]> addIntegerArray(String title, Supplier<long[]> valueSupplier);
+
+  /**
+   * Adds a widget to this container. The widget will display the data provided by the value
+   * supplier. Changes made on the dashboard will not propagate to the widget object, and will be
+   * overridden by values from the value supplier.
+   *
+   * @param title the title of the widget
+   * @param valueSupplier the supplier for values
+   * @return a widget to display data
+   * @throws IllegalArgumentException if a widget already exists in this container with the given
+   *     title
+   */
   SuppliedValueWidget<boolean[]> addBooleanArray(String title, Supplier<boolean[]> valueSupplier);
 
   /**
@@ -225,7 +306,24 @@ public interface ShuffleboardContainer extends ShuffleboardValue {
    * @throws IllegalArgumentException if a widget already exists in this container with the given
    *     title
    */
-  SuppliedValueWidget<byte[]> addRaw(String title, Supplier<byte[]> valueSupplier);
+  default SuppliedValueWidget<byte[]> addRaw(String title, Supplier<byte[]> valueSupplier) {
+    return addRaw(title, "raw", valueSupplier);
+  }
+
+  /**
+   * Adds a widget to this container. The widget will display the data provided by the value
+   * supplier. Changes made on the dashboard will not propagate to the widget object, and will be
+   * overridden by values from the value supplier.
+   *
+   * @param title the title of the widget
+   * @param typeString the NT type string for the value
+   * @param valueSupplier the supplier for values
+   * @return a widget to display data
+   * @throws IllegalArgumentException if a widget already exists in this container with the given
+   *     title
+   */
+  SuppliedValueWidget<byte[]> addRaw(
+      String title, String typeString, Supplier<byte[]> valueSupplier);
 
   /**
    * Adds a widget to this container to display a simple piece of data. Unlike {@link #add(String,
@@ -240,8 +338,25 @@ public interface ShuffleboardContainer extends ShuffleboardValue {
    * @see #add(String, Object) add(String title, Object defaultValue)
    */
   default SimpleWidget addPersistent(String title, Object defaultValue) {
+    return addPersistent(title, NetworkTableType.getStringFromObject(defaultValue), defaultValue);
+  }
+
+  /**
+   * Adds a widget to this container to display a simple piece of data. Unlike {@link #add(String,
+   * Object)}, the value in the widget will be saved on the robot and will be used when the robot
+   * program next starts rather than {@code defaultValue}.
+   *
+   * @param title the title of the widget
+   * @param typeString the NT type string
+   * @param defaultValue the default value of the widget
+   * @return a widget to display the sendable data
+   * @throws IllegalArgumentException if a widget already exists in this container with the given
+   *     title
+   * @see #add(String, Object) add(String title, Object defaultValue)
+   */
+  default SimpleWidget addPersistent(String title, String typeString, Object defaultValue) {
     SimpleWidget widget = add(title, defaultValue);
-    widget.getEntry().setPersistent();
+    widget.getEntry(typeString).getTopic().setPersistent(true);
     return widget;
   }
 }

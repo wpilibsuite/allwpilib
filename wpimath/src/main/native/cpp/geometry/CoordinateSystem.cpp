@@ -23,50 +23,9 @@ CoordinateSystem::CoordinateSystem(const CoordinateAxis& positiveX,
   R.block<3, 1>(0, 1) = positiveY.m_axis;
   R.block<3, 1>(0, 2) = positiveZ.m_axis;
 
-  // Require that the change of basis matrix is special orthogonal. This is true
-  // if the axes used are orthogonal and normalized. The CoordinateAxis class
-  // already normalizes itself, so we just need to check for orthogonality.
-  if (R * R.transpose() != Matrixd<3, 3>::Identity()) {
-    throw std::domain_error("Coordinate system isn't special orthogonal");
-  }
-
-  // Turn change of basis matrix into a quaternion since it's a pure rotation
-  // https://www.euclideanspace.com/maths/geometry/rotations/conversions/matrixToQuaternion/
-  double trace = R(0, 0) + R(1, 1) + R(2, 2);
-  double w;
-  double x;
-  double y;
-  double z;
-
-  if (trace > 0.0) {
-    double s = 0.5 / std::sqrt(trace + 1.0);
-    w = 0.25 / s;
-    x = (R(2, 1) - R(1, 2)) * s;
-    y = (R(0, 2) - R(2, 0)) * s;
-    z = (R(1, 0) - R(0, 1)) * s;
-  } else {
-    if (R(0, 0) > R(1, 1) && R(0, 0) > R(2, 2)) {
-      double s = 2.0 * std::sqrt(1.0 + R(0, 0) - R(1, 1) - R(2, 2));
-      w = (R(2, 1) - R(1, 2)) / s;
-      x = 0.25 * s;
-      y = (R(0, 1) + R(1, 0)) / s;
-      z = (R(0, 2) + R(2, 0)) / s;
-    } else if (R(1, 1) > R(2, 2)) {
-      double s = 2.0 * std::sqrt(1.0 + R(1, 1) - R(0, 0) - R(2, 2));
-      w = (R(0, 2) - R(2, 0)) / s;
-      x = (R(0, 1) + R(1, 0)) / s;
-      y = 0.25 * s;
-      z = (R(1, 2) + R(2, 1)) / s;
-    } else {
-      double s = 2.0 * std::sqrt(1.0 + R(2, 2) - R(0, 0) - R(1, 1));
-      w = (R(1, 0) - R(0, 1)) / s;
-      x = (R(0, 2) + R(2, 0)) / s;
-      y = (R(1, 2) + R(2, 1)) / s;
-      z = 0.25 * s;
-    }
-  }
-
-  m_rotation = Rotation3d{Quaternion{w, x, y, z}};
+  // The change of basis matrix should be a pure rotation. The Rotation3d
+  // constructor will verify this by checking for special orthogonality.
+  m_rotation = Rotation3d{R};
 }
 
 const CoordinateSystem& CoordinateSystem::NWU() {
@@ -102,6 +61,13 @@ Rotation3d CoordinateSystem::Convert(const Rotation3d& rotation,
 Pose3d CoordinateSystem::Convert(const Pose3d& pose,
                                  const CoordinateSystem& from,
                                  const CoordinateSystem& to) {
-  return pose.RelativeTo(
-      Pose3d{Translation3d{}, to.m_rotation - from.m_rotation});
+  return Pose3d{Convert(pose.Translation(), from, to),
+                Convert(pose.Rotation(), from, to)};
+}
+
+Transform3d CoordinateSystem::Convert(const Transform3d& transform,
+                                      const CoordinateSystem& from,
+                                      const CoordinateSystem& to) {
+  return Transform3d{Convert(transform.Translation(), from, to),
+                     Convert(transform.Rotation(), from, to)};
 }

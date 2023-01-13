@@ -4,6 +4,8 @@
 
 #include "frc/IterativeRobotBase.h"
 
+#include <frc/DriverStation.h>
+
 #include <fmt/format.h>
 #include <hal/DriverStation.h>
 #include <networktables/NetworkTableInstance.h>
@@ -92,11 +94,24 @@ void IterativeRobotBase::SetNetworkTablesFlushEnabled(bool enabled) {
   m_ntFlushEnabled = enabled;
 }
 
+void IterativeRobotBase::EnableLiveWindowInTest(bool testLW) {
+  if (IsTest()) {
+    throw FRC_MakeError(err::IncompatibleMode,
+                        "Can't configure test mode while in test mode!");
+  }
+  m_lwEnabledInTest = testLW;
+}
+
+bool IterativeRobotBase::IsLiveWindowEnabledInTest() {
+  return m_lwEnabledInTest;
+}
+
 units::second_t IterativeRobotBase::GetPeriod() const {
   return m_period;
 }
 
 void IterativeRobotBase::LoopFunc() {
+  DriverStation::RefreshData();
   m_watchdog.Reset();
 
   // Get current mode
@@ -122,8 +137,10 @@ void IterativeRobotBase::LoopFunc() {
     } else if (m_lastMode == Mode::kTeleop) {
       TeleopExit();
     } else if (m_lastMode == Mode::kTest) {
-      LiveWindow::SetEnabled(false);
-      Shuffleboard::DisableActuatorWidgets();
+      if (m_lwEnabledInTest) {
+        LiveWindow::SetEnabled(false);
+        Shuffleboard::DisableActuatorWidgets();
+      }
       TestExit();
     }
 
@@ -138,8 +155,10 @@ void IterativeRobotBase::LoopFunc() {
       TeleopInit();
       m_watchdog.AddEpoch("TeleopInit()");
     } else if (mode == Mode::kTest) {
-      LiveWindow::SetEnabled(true);
-      Shuffleboard::EnableActuatorWidgets();
+      if (m_lwEnabledInTest) {
+        LiveWindow::SetEnabled(true);
+        Shuffleboard::EnableActuatorWidgets();
+      }
       TestInit();
       m_watchdog.AddEpoch("TestInit()");
     }
@@ -187,7 +206,7 @@ void IterativeRobotBase::LoopFunc() {
 
   // Flush NetworkTables
   if (m_ntFlushEnabled) {
-    nt::NetworkTableInstance::GetDefault().Flush();
+    nt::NetworkTableInstance::GetDefault().FlushLocal();
   }
 
   // Warn on loop time overruns

@@ -17,6 +17,7 @@
 #include "hal/HALBase.h"
 #include "hal/handles/HandlesInternal.h"
 #include "hal/handles/LimitedHandleResource.h"
+#include "hal/roborio/InterruptManager.h"
 
 using namespace hal;
 
@@ -24,7 +25,9 @@ namespace {
 
 struct Interrupt {
   std::unique_ptr<tInterrupt> anInterrupt;
-  std::unique_ptr<tInterruptManager> manager;
+  InterruptManager& manager = InterruptManager::GetInstance();
+  NiFpga_IrqContext irqContext = nullptr;
+  uint32_t mask;
 };
 
 }  // namespace
@@ -55,8 +58,8 @@ HAL_InterruptHandle HAL_InitializeInterrupts(int32_t* status) {
   // Expects the calling leaf class to allocate an interrupt index.
   anInterrupt->anInterrupt.reset(tInterrupt::create(interruptIndex, status));
   anInterrupt->anInterrupt->writeConfig_WaitForAck(false, status);
-  anInterrupt->manager = std::make_unique<tInterruptManager>(
-      (1u << interruptIndex) | (1u << (interruptIndex + 8u)), true, status);
+  anInterrupt->irqContext = anInterrupt->manager.GetContext();
+  anInterrupt->mask = (1u << interruptIndex) | (1u << (interruptIndex + 8u));
   return handle;
 }
 
@@ -65,6 +68,9 @@ void HAL_CleanInterrupts(HAL_InterruptHandle interruptHandle) {
   interruptHandles->Free(interruptHandle);
   if (anInterrupt == nullptr) {
     return;
+  }
+  if (anInterrupt->irqContext) {
+    anInterrupt->manager.ReleaseContext(anInterrupt->irqContext);
   }
 }
 
@@ -78,8 +84,33 @@ int64_t HAL_WaitForInterrupt(HAL_InterruptHandle interruptHandle,
     return 0;
   }
 
-  result = anInterrupt->manager->watch(static_cast<int32_t>(timeout * 1e3),
-                                       ignorePrevious, status);
+  result = anInterrupt->manager.WaitForInterrupt(
+      anInterrupt->irqContext, anInterrupt->mask, ignorePrevious,
+      static_cast<uint32_t>(timeout * 1e3), status);
+
+  // Don't report a timeout as an error - the return code is enough to tell
+  // that a timeout happened.
+  if (*status == -NiFpga_Status_IrqTimeout) {
+    *status = NiFpga_Status_Success;
+  }
+
+  return result;
+}
+
+int64_t HAL_WaitForMultipleInterrupts(HAL_InterruptHandle interruptHandle,
+                                      int64_t mask, double timeout,
+                                      HAL_Bool ignorePrevious,
+                                      int32_t* status) {
+  uint32_t result;
+  auto anInterrupt = interruptHandles->Get(interruptHandle);
+  if (anInterrupt == nullptr) {
+    *status = HAL_HANDLE_ERROR;
+    return 0;
+  }
+
+  result = anInterrupt->manager.WaitForInterrupt(
+      anInterrupt->irqContext, mask, ignorePrevious,
+      static_cast<uint32_t>(timeout * 1e3), status);
 
   // Don't report a timeout as an error - the return code is enough to tell
   // that a timeout happened.

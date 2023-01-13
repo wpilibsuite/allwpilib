@@ -40,6 +40,7 @@ class LinearQuadraticRegulator {
    * @param Qelems The maximum desired error tolerance for each state.
    * @param Relems The maximum desired control effort for each input.
    * @param dt     Discretization timestep.
+   * @throws std::invalid_argument If the system is uncontrollable.
    */
   template <int Outputs>
   LinearQuadraticRegulator(const LinearSystem<States, Inputs, Outputs>& plant,
@@ -54,6 +55,7 @@ class LinearQuadraticRegulator {
    * @param Qelems The maximum desired error tolerance for each state.
    * @param Relems The maximum desired control effort for each input.
    * @param dt     Discretization timestep.
+   * @throws std::invalid_argument If the system is uncontrollable.
    */
   LinearQuadraticRegulator(const Matrixd<States, States>& A,
                            const Matrixd<States, Inputs>& B,
@@ -68,6 +70,7 @@ class LinearQuadraticRegulator {
    * @param Q  The state cost matrix.
    * @param R  The input cost matrix.
    * @param dt Discretization timestep.
+   * @throws std::invalid_argument If the system is uncontrollable.
    */
   LinearQuadraticRegulator(const Matrixd<States, States>& A,
                            const Matrixd<States, Inputs>& B,
@@ -84,6 +87,7 @@ class LinearQuadraticRegulator {
    * @param R  The input cost matrix.
    * @param N  The state-input cross-term cost matrix.
    * @param dt Discretization timestep.
+   * @throws std::invalid_argument If the system is uncontrollable.
    */
   LinearQuadraticRegulator(const Matrixd<States, States>& A,
                            const Matrixd<States, Inputs>& B,

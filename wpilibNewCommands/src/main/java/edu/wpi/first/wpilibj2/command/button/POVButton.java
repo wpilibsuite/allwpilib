@@ -4,7 +4,7 @@
 
 package edu.wpi.first.wpilibj2.command.button;
 
-import static edu.wpi.first.wpilibj.util.ErrorMessages.requireNonNullParam;
+import static edu.wpi.first.util.ErrorMessages.requireNonNullParam;
 
 import edu.wpi.first.wpilibj.GenericHID;
 
@@ -13,6 +13,7 @@ import edu.wpi.first.wpilibj.GenericHID;
  *
  * <p>This class is provided by the NewCommands VendorDep
  */
+@SuppressWarnings("deprecation")
 public class POVButton extends Button {
   /**
    * Creates a POV button for triggering commands.

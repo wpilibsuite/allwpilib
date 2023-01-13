@@ -44,12 +44,13 @@ class CommandRequirementsTest extends CommandTestBase {
     try (CommandScheduler scheduler = new CommandScheduler()) {
       Subsystem requirement = new SubsystemBase() {};
 
-      MockCommandHolder interruptedHolder = new MockCommandHolder(true, requirement);
-      Command notInterrupted = interruptedHolder.getMock();
+      Command notInterrupted =
+          new RunCommand(() -> {}, requirement)
+              .withInterruptBehavior(Command.InterruptionBehavior.kCancelIncoming);
       MockCommandHolder interrupterHolder = new MockCommandHolder(true, requirement);
       Command interrupter = interrupterHolder.getMock();
 
-      scheduler.schedule(false, notInterrupted);
+      scheduler.schedule(notInterrupted);
       scheduler.schedule(interrupter);
 
       assertTrue(scheduler.isScheduled(notInterrupted));
@@ -63,12 +64,10 @@ class CommandRequirementsTest extends CommandTestBase {
       Subsystem system = new SubsystemBase() {};
 
       Command missingRequirement = new WaitUntilCommand(() -> false);
-      Command ends = new InstantCommand(() -> {}, system);
 
       assertThrows(
           IllegalArgumentException.class,
           () -> scheduler.setDefaultCommand(system, missingRequirement));
-      assertThrows(IllegalArgumentException.class, () -> scheduler.setDefaultCommand(system, ends));
     }
   }
 }

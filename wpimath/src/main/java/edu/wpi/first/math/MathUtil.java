@@ -142,7 +142,6 @@ public final class MathUtil {
    * @param t How far between the two values to interpolate. This is clamped to [0, 1].
    * @return The interpolated value.
    */
-  @SuppressWarnings("ParameterName")
   public static double interpolate(double startValue, double endValue, double t) {
     return startValue + (endValue - startValue) * MathUtil.clamp(t, 0, 1);
   }

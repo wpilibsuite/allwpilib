@@ -21,6 +21,9 @@ namespace frc {
 int RunHALInitialization();
 
 namespace impl {
+#ifndef __FRC_ROBORIO__
+void ResetMotorSafety();
+#endif
 
 template <class Robot>
 void RunRobot(wpi::mutex& m, Robot** robot) {
@@ -34,7 +37,7 @@ void RunRobot(wpi::mutex& m, Robot** robot) {
   } catch (const frc::RuntimeError& e) {
     e.Report();
     FRC_ReportError(
-        err::Error, "{}",
+        err::Error,
         "The robot program quit unexpectedly."
         " This is usually due to a code error.\n"
         "  The above stacktrace can help determine where the error occurred.\n"
@@ -103,6 +106,9 @@ int StartRobot() {
     impl::RunRobot<Robot>(m, &robot);
   }
 
+#ifndef __FRC_ROBORIO__
+  frc::impl::ResetMotorSafety();
+#endif
   HAL_Shutdown();
 
   return 0;
@@ -175,14 +181,6 @@ class RobotBase {
   bool IsTest() const;
 
   /**
-   * Indicates if new data is available from the driver station.
-   *
-   * @return Has new data arrived over the network since the last time this
-   *         function was called?
-   */
-  bool IsNewDataAvailable() const;
-
-  /**
    * Gets the ID of the main robot thread.
    */
   static std::thread::id GetThreadId();
@@ -216,7 +214,9 @@ class RobotBase {
    *
    * @return If the robot is running in simulation.
    */
-  static constexpr bool IsSimulation() { return !IsReal(); }
+  static constexpr bool IsSimulation() {
+    return !IsReal();
+  }
 
   /**
    * Constructor for a generic robot program.

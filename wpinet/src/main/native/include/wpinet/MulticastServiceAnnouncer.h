@@ -8,20 +8,19 @@
 
 #ifdef __cplusplus
 #include <memory>
+#include <span>
 #include <string>
 #include <string_view>
 #include <utility>
-
-#include <wpi/span.h>
 namespace wpi {
 class MulticastServiceAnnouncer {
  public:
   MulticastServiceAnnouncer(
       std::string_view serviceName, std::string_view serviceType, int port,
-      wpi::span<const std::pair<std::string, std::string>> txt);
+      std::span<const std::pair<std::string, std::string>> txt);
   MulticastServiceAnnouncer(
       std::string_view serviceName, std::string_view serviceType, int port,
-      wpi::span<const std::pair<std::string_view, std::string_view>> txt);
+      std::span<const std::pair<std::string_view, std::string_view>> txt);
   MulticastServiceAnnouncer(std::string_view serviceName,
                             std::string_view serviceType, int port);
   ~MulticastServiceAnnouncer() noexcept;
@@ -34,9 +33,6 @@ class MulticastServiceAnnouncer {
   std::unique_ptr<Impl> pImpl;
 };
 }  // namespace wpi
-#endif
-
-#ifdef __cplusplus
 extern "C" {
 #endif
 

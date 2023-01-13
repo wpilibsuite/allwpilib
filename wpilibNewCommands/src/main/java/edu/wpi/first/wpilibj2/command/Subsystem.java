@@ -6,7 +6,7 @@ package edu.wpi.first.wpilibj2.command;
 
 /**
  * A robot subsystem. Subsystems are the basic unit of robot organization in the Command-based
- * framework; they encapsulate low-level hardware objects (motor controllers, sensors, etc) and
+ * framework; they encapsulate low-level hardware objects (motor controllers, sensors, etc.) and
  * provide methods through which they can be used by {@link Command}s. Subsystems are used by the
  * {@link CommandScheduler}'s resource management system to ensure multiple robot actions are not
  * "fighting" over the same hardware; Commands that use a subsystem should include that subsystem in
@@ -76,5 +76,53 @@ public interface Subsystem {
    */
   default void register() {
     CommandScheduler.getInstance().registerSubsystem(this);
+  }
+
+  /**
+   * Constructs a command that runs an action once and finishes. Requires this subsystem.
+   *
+   * @param action the action to run
+   * @return the command
+   * @see InstantCommand
+   */
+  default CommandBase runOnce(Runnable action) {
+    return Commands.runOnce(action, this);
+  }
+
+  /**
+   * Constructs a command that runs an action every iteration until interrupted. Requires this
+   * subsystem.
+   *
+   * @param action the action to run
+   * @return the command
+   * @see RunCommand
+   */
+  default CommandBase run(Runnable action) {
+    return Commands.run(action, this);
+  }
+
+  /**
+   * Constructs a command that runs an action once and another action when the command is
+   * interrupted. Requires this subsystem.
+   *
+   * @param start the action to run on start
+   * @param end the action to run on interrupt
+   * @return the command
+   * @see StartEndCommand
+   */
+  default CommandBase startEnd(Runnable start, Runnable end) {
+    return Commands.startEnd(start, end, this);
+  }
+
+  /**
+   * Constructs a command that runs an action every iteration until interrupted, and then runs a
+   * second action. Requires this subsystem.
+   *
+   * @param run the action to run every iteration
+   * @param end the action to run on interrupt
+   * @return the command
+   */
+  default CommandBase runEnd(Runnable run, Runnable end) {
+    return Commands.runEnd(run, end, this);
   }
 }

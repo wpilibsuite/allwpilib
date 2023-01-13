@@ -107,8 +107,8 @@ public class AnalogInput implements Sendable, AutoCloseable {
   }
 
   /**
-   * Get the factory scaling least significant bit weight constant. The least significant bit weight
-   * constant for the channel that was calibrated in manufacturing and stored in an eeprom.
+   * Get the factory scaling the least significant bit weight constant. The least significant bit
+   * weight constant for the channel that was calibrated in manufacturing and stored in an eeprom.
    *
    * <p>Volts = ((LSB_Weight * 1e-9) * raw) - (Offset * 1e-9)
    *

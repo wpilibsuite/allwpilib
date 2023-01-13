@@ -18,12 +18,12 @@ class DifferentialDriveTest {
     assertEquals(1.0, speeds.right, 1e-9);
 
     // Forward left turn
-    speeds = DifferentialDrive.arcadeDriveIK(0.5, -0.5, false);
+    speeds = DifferentialDrive.arcadeDriveIK(0.5, 0.5, false);
     assertEquals(0.0, speeds.left, 1e-9);
     assertEquals(0.5, speeds.right, 1e-9);
 
     // Forward right turn
-    speeds = DifferentialDrive.arcadeDriveIK(0.5, 0.5, false);
+    speeds = DifferentialDrive.arcadeDriveIK(0.5, -0.5, false);
     assertEquals(0.5, speeds.left, 1e-9);
     assertEquals(0.0, speeds.right, 1e-9);
 
@@ -33,32 +33,32 @@ class DifferentialDriveTest {
     assertEquals(-1.0, speeds.right, 1e-9);
 
     // Backward left turn
-    speeds = DifferentialDrive.arcadeDriveIK(-0.5, -0.5, false);
+    speeds = DifferentialDrive.arcadeDriveIK(-0.5, 0.5, false);
     assertEquals(-0.5, speeds.left, 1e-9);
     assertEquals(0.0, speeds.right, 1e-9);
 
     // Backward right turn
-    speeds = DifferentialDrive.arcadeDriveIK(-0.5, 0.5, false);
+    speeds = DifferentialDrive.arcadeDriveIK(-0.5, -0.5, false);
     assertEquals(0.0, speeds.left, 1e-9);
     assertEquals(-0.5, speeds.right, 1e-9);
 
     // Left turn (xSpeed with negative sign)
-    speeds = DifferentialDrive.arcadeDriveIK(-0.0, -1.0, false);
+    speeds = DifferentialDrive.arcadeDriveIK(-0.0, 1.0, false);
     assertEquals(-1.0, speeds.left, 1e-9);
     assertEquals(1.0, speeds.right, 1e-9);
 
     // Left turn (xSpeed with positive sign)
-    speeds = DifferentialDrive.arcadeDriveIK(0.0, -1.0, false);
+    speeds = DifferentialDrive.arcadeDriveIK(0.0, 1.0, false);
     assertEquals(-1.0, speeds.left, 1e-9);
     assertEquals(1.0, speeds.right, 1e-9);
 
     // Right turn (xSpeed with negative sign)
-    speeds = DifferentialDrive.arcadeDriveIK(-0.0, 1.0, false);
+    speeds = DifferentialDrive.arcadeDriveIK(-0.0, -1.0, false);
     assertEquals(1.0, speeds.left, 1e-9);
     assertEquals(-1.0, speeds.right, 1e-9);
 
     // Right turn (xSpeed with positive sign)
-    speeds = DifferentialDrive.arcadeDriveIK(0.0, 1.0, false);
+    speeds = DifferentialDrive.arcadeDriveIK(0.0, -1.0, false);
     assertEquals(1.0, speeds.left, 1e-9);
     assertEquals(-1.0, speeds.right, 1e-9);
   }
@@ -71,12 +71,12 @@ class DifferentialDriveTest {
     assertEquals(1.0, speeds.right, 1e-9);
 
     // Forward left turn
-    speeds = DifferentialDrive.arcadeDriveIK(0.5, -0.5, true);
+    speeds = DifferentialDrive.arcadeDriveIK(0.5, 0.5, true);
     assertEquals(0.0, speeds.left, 1e-9);
     assertEquals(0.25, speeds.right, 1e-9);
 
     // Forward right turn
-    speeds = DifferentialDrive.arcadeDriveIK(0.5, 0.5, true);
+    speeds = DifferentialDrive.arcadeDriveIK(0.5, -0.5, true);
     assertEquals(0.25, speeds.left, 1e-9);
     assertEquals(0.0, speeds.right, 1e-9);
 
@@ -86,32 +86,32 @@ class DifferentialDriveTest {
     assertEquals(-1.0, speeds.right, 1e-9);
 
     // Backward left turn
-    speeds = DifferentialDrive.arcadeDriveIK(-0.5, -0.5, true);
+    speeds = DifferentialDrive.arcadeDriveIK(-0.5, 0.5, true);
     assertEquals(-0.25, speeds.left, 1e-9);
     assertEquals(0.0, speeds.right, 1e-9);
 
     // Backward right turn
-    speeds = DifferentialDrive.arcadeDriveIK(-0.5, 0.5, true);
+    speeds = DifferentialDrive.arcadeDriveIK(-0.5, -0.5, true);
     assertEquals(0.0, speeds.left, 1e-9);
     assertEquals(-0.25, speeds.right, 1e-9);
 
     // Left turn (xSpeed with negative sign)
-    speeds = DifferentialDrive.arcadeDriveIK(-0.0, -1.0, false);
+    speeds = DifferentialDrive.arcadeDriveIK(-0.0, 1.0, false);
     assertEquals(-1.0, speeds.left, 1e-9);
     assertEquals(1.0, speeds.right, 1e-9);
 
     // Left turn (xSpeed with positive sign)
-    speeds = DifferentialDrive.arcadeDriveIK(0.0, -1.0, false);
+    speeds = DifferentialDrive.arcadeDriveIK(0.0, 1.0, false);
     assertEquals(-1.0, speeds.left, 1e-9);
     assertEquals(1.0, speeds.right, 1e-9);
 
     // Right turn (xSpeed with negative sign)
-    speeds = DifferentialDrive.arcadeDriveIK(-0.0, 1.0, false);
+    speeds = DifferentialDrive.arcadeDriveIK(-0.0, -1.0, false);
     assertEquals(1.0, speeds.left, 1e-9);
     assertEquals(-1.0, speeds.right, 1e-9);
 
     // Right turn (xSpeed with positive sign)
-    speeds = DifferentialDrive.arcadeDriveIK(0.0, 1.0, false);
+    speeds = DifferentialDrive.arcadeDriveIK(0.0, -1.0, false);
     assertEquals(1.0, speeds.left, 1e-9);
     assertEquals(-1.0, speeds.right, 1e-9);
   }
@@ -124,12 +124,12 @@ class DifferentialDriveTest {
     assertEquals(1.0, speeds.right, 1e-9);
 
     // Forward left turn
-    speeds = DifferentialDrive.curvatureDriveIK(0.5, -0.5, false);
+    speeds = DifferentialDrive.curvatureDriveIK(0.5, 0.5, false);
     assertEquals(0.25, speeds.left, 1e-9);
     assertEquals(0.75, speeds.right, 1e-9);
 
     // Forward right turn
-    speeds = DifferentialDrive.curvatureDriveIK(0.5, 0.5, false);
+    speeds = DifferentialDrive.curvatureDriveIK(0.5, -0.5, false);
     assertEquals(0.75, speeds.left, 1e-9);
     assertEquals(0.25, speeds.right, 1e-9);
 
@@ -139,12 +139,12 @@ class DifferentialDriveTest {
     assertEquals(-1.0, speeds.right, 1e-9);
 
     // Backward left turn
-    speeds = DifferentialDrive.curvatureDriveIK(-0.5, -0.5, false);
+    speeds = DifferentialDrive.curvatureDriveIK(-0.5, 0.5, false);
     assertEquals(-0.75, speeds.left, 1e-9);
     assertEquals(-0.25, speeds.right, 1e-9);
 
     // Backward right turn
-    speeds = DifferentialDrive.curvatureDriveIK(-0.5, 0.5, false);
+    speeds = DifferentialDrive.curvatureDriveIK(-0.5, -0.5, false);
     assertEquals(-0.25, speeds.left, 1e-9);
     assertEquals(-0.75, speeds.right, 1e-9);
   }
@@ -157,12 +157,12 @@ class DifferentialDriveTest {
     assertEquals(1.0, speeds.right, 1e-9);
 
     // Forward left turn
-    speeds = DifferentialDrive.curvatureDriveIK(0.5, -0.5, true);
+    speeds = DifferentialDrive.curvatureDriveIK(0.5, 0.5, true);
     assertEquals(0.0, speeds.left, 1e-9);
     assertEquals(1.0, speeds.right, 1e-9);
 
     // Forward right turn
-    speeds = DifferentialDrive.curvatureDriveIK(0.5, 0.5, true);
+    speeds = DifferentialDrive.curvatureDriveIK(0.5, -0.5, true);
     assertEquals(1.0, speeds.left, 1e-9);
     assertEquals(0.0, speeds.right, 1e-9);
 
@@ -172,12 +172,12 @@ class DifferentialDriveTest {
     assertEquals(-1.0, speeds.right, 1e-9);
 
     // Backward left turn
-    speeds = DifferentialDrive.curvatureDriveIK(-0.5, -0.5, true);
+    speeds = DifferentialDrive.curvatureDriveIK(-0.5, 0.5, true);
     assertEquals(-1.0, speeds.left, 1e-9);
     assertEquals(0.0, speeds.right, 1e-9);
 
     // Backward right turn
-    speeds = DifferentialDrive.curvatureDriveIK(-0.5, 0.5, true);
+    speeds = DifferentialDrive.curvatureDriveIK(-0.5, -0.5, true);
     assertEquals(0.0, speeds.left, 1e-9);
     assertEquals(-1.0, speeds.right, 1e-9);
   }
@@ -261,12 +261,12 @@ class DifferentialDriveTest {
     assertEquals(1.0, right.get(), 1e-9);
 
     // Forward left turn
-    drive.arcadeDrive(0.5, -0.5, false);
+    drive.arcadeDrive(0.5, 0.5, false);
     assertEquals(0.0, left.get(), 1e-9);
     assertEquals(0.5, right.get(), 1e-9);
 
     // Forward right turn
-    drive.arcadeDrive(0.5, 0.5, false);
+    drive.arcadeDrive(0.5, -0.5, false);
     assertEquals(0.5, left.get(), 1e-9);
     assertEquals(0.0, right.get(), 1e-9);
 
@@ -276,12 +276,12 @@ class DifferentialDriveTest {
     assertEquals(-1.0, right.get(), 1e-9);
 
     // Backward left turn
-    drive.arcadeDrive(-0.5, -0.5, false);
+    drive.arcadeDrive(-0.5, 0.5, false);
     assertEquals(-0.5, left.get(), 1e-9);
     assertEquals(0.0, right.get(), 1e-9);
 
     // Backward right turn
-    drive.arcadeDrive(-0.5, 0.5, false);
+    drive.arcadeDrive(-0.5, -0.5, false);
     assertEquals(0.0, left.get(), 1e-9);
     assertEquals(-0.5, right.get(), 1e-9);
   }
@@ -299,12 +299,12 @@ class DifferentialDriveTest {
     assertEquals(1.0, right.get(), 1e-9);
 
     // Forward left turn
-    drive.arcadeDrive(0.5, -0.5, true);
+    drive.arcadeDrive(0.5, 0.5, true);
     assertEquals(0.0, left.get(), 1e-9);
     assertEquals(0.25, right.get(), 1e-9);
 
     // Forward right turn
-    drive.arcadeDrive(0.5, 0.5, true);
+    drive.arcadeDrive(0.5, -0.5, true);
     assertEquals(0.25, left.get(), 1e-9);
     assertEquals(0.0, right.get(), 1e-9);
 
@@ -314,12 +314,12 @@ class DifferentialDriveTest {
     assertEquals(-1.0, right.get(), 1e-9);
 
     // Backward left turn
-    drive.arcadeDrive(-0.5, -0.5, true);
+    drive.arcadeDrive(-0.5, 0.5, true);
     assertEquals(-0.25, left.get(), 1e-9);
     assertEquals(0.0, right.get(), 1e-9);
 
     // Backward right turn
-    drive.arcadeDrive(-0.5, 0.5, true);
+    drive.arcadeDrive(-0.5, -0.5, true);
     assertEquals(0.0, left.get(), 1e-9);
     assertEquals(-0.25, right.get(), 1e-9);
   }
@@ -337,12 +337,12 @@ class DifferentialDriveTest {
     assertEquals(1.0, right.get(), 1e-9);
 
     // Forward left turn
-    drive.curvatureDrive(0.5, -0.5, false);
+    drive.curvatureDrive(0.5, 0.5, false);
     assertEquals(0.25, left.get(), 1e-9);
     assertEquals(0.75, right.get(), 1e-9);
 
     // Forward right turn
-    drive.curvatureDrive(0.5, 0.5, false);
+    drive.curvatureDrive(0.5, -0.5, false);
     assertEquals(0.75, left.get(), 1e-9);
     assertEquals(0.25, right.get(), 1e-9);
 
@@ -352,12 +352,12 @@ class DifferentialDriveTest {
     assertEquals(-1.0, right.get(), 1e-9);
 
     // Backward left turn
-    drive.curvatureDrive(-0.5, -0.5, false);
+    drive.curvatureDrive(-0.5, 0.5, false);
     assertEquals(-0.75, left.get(), 1e-9);
     assertEquals(-0.25, right.get(), 1e-9);
 
     // Backward right turn
-    drive.curvatureDrive(-0.5, 0.5, false);
+    drive.curvatureDrive(-0.5, -0.5, false);
     assertEquals(-0.25, left.get(), 1e-9);
     assertEquals(-0.75, right.get(), 1e-9);
   }
@@ -375,12 +375,12 @@ class DifferentialDriveTest {
     assertEquals(1.0, right.get(), 1e-9);
 
     // Forward left turn
-    drive.curvatureDrive(0.5, -0.5, true);
+    drive.curvatureDrive(0.5, 0.5, true);
     assertEquals(0.0, left.get(), 1e-9);
     assertEquals(1.0, right.get(), 1e-9);
 
     // Forward right turn
-    drive.curvatureDrive(0.5, 0.5, true);
+    drive.curvatureDrive(0.5, -0.5, true);
     assertEquals(1.0, left.get(), 1e-9);
     assertEquals(0.0, right.get(), 1e-9);
 
@@ -390,12 +390,12 @@ class DifferentialDriveTest {
     assertEquals(-1.0, right.get(), 1e-9);
 
     // Backward left turn
-    drive.curvatureDrive(-0.5, -0.5, true);
+    drive.curvatureDrive(-0.5, 0.5, true);
     assertEquals(-1.0, left.get(), 1e-9);
     assertEquals(0.0, right.get(), 1e-9);
 
     // Backward right turn
-    drive.curvatureDrive(-0.5, 0.5, true);
+    drive.curvatureDrive(-0.5, -0.5, true);
     assertEquals(0.0, left.get(), 1e-9);
     assertEquals(-1.0, right.get(), 1e-9);
   }

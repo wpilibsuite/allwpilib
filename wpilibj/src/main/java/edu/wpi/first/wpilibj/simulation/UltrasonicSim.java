@@ -9,6 +9,7 @@ import edu.wpi.first.hal.SimDouble;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Ultrasonic;
 
+/** Class to control a simulated {@link edu.wpi.first.wpilibj.Ultrasonic}. */
 public class UltrasonicSim {
   private final SimBoolean m_simRangeValid;
   private final SimDouble m_simRange;
@@ -19,7 +20,18 @@ public class UltrasonicSim {
    * @param ultrasonic The real ultrasonic to simulate
    */
   public UltrasonicSim(Ultrasonic ultrasonic) {
-    SimDeviceSim simDevice = new SimDeviceSim("Ultrasonic", ultrasonic.getEchoChannel());
+    // ping parameter is unused
+    this(-1, ultrasonic.getEchoChannel());
+  }
+
+  /**
+   * Constructor.
+   *
+   * @param ping unused.
+   * @param echo the ultrasonic's echo channel.
+   */
+  public UltrasonicSim(@SuppressWarnings("unused") int ping, int echo) {
+    SimDeviceSim simDevice = new SimDeviceSim("Ultrasonic", echo);
     m_simRangeValid = simDevice.getBoolean("Range Valid");
     m_simRange = simDevice.getDouble("Range (in)");
   }

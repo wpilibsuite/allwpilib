@@ -31,7 +31,7 @@ TEST(Translation2dTest, Difference) {
 
 TEST(Translation2dTest, RotateBy) {
   const Translation2d another{3_m, 0_m};
-  const auto rotated = another.RotateBy(Rotation2d(90_deg));
+  const auto rotated = another.RotateBy(90_deg);
 
   EXPECT_NEAR(0.0, rotated.X().value(), 1e-9);
   EXPECT_DOUBLE_EQ(3.0, rotated.Y().value());
@@ -92,4 +92,22 @@ TEST(Translation2dTest, PolarConstructor) {
   Translation2d two{2_m, Rotation2d{60_deg}};
   EXPECT_DOUBLE_EQ(1.0, two.X().value());
   EXPECT_DOUBLE_EQ(std::sqrt(3.0), two.Y().value());
+}
+
+TEST(Translation2dTest, Constexpr) {
+  constexpr Translation2d defaultCtor;
+  constexpr Translation2d componentCtor{1_m, 2_m};
+  constexpr auto added = defaultCtor + componentCtor;
+  constexpr auto subtracted = defaultCtor - componentCtor;
+  constexpr auto negated = -componentCtor;
+  constexpr auto multiplied = componentCtor * 2;
+  constexpr auto divided = componentCtor / 2;
+
+  static_assert(defaultCtor.X() == 0_m);
+  static_assert(componentCtor.Y() == 2_m);
+  static_assert(added.X() == 1_m);
+  static_assert(subtracted.Y() == (-2_m));
+  static_assert(negated.X() == (-1_m));
+  static_assert(multiplied.X() == 2_m);
+  static_assert(divided.Y() == 1_m);
 }

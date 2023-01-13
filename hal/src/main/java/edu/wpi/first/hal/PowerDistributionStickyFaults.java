@@ -4,89 +4,62 @@
 
 package edu.wpi.first.hal;
 
+@SuppressWarnings("MemberName")
 public class PowerDistributionStickyFaults {
-  @SuppressWarnings("MemberName")
   public final boolean Channel0BreakerFault;
 
-  @SuppressWarnings("MemberName")
   public final boolean Channel1BreakerFault;
 
-  @SuppressWarnings("MemberName")
   public final boolean Channel2BreakerFault;
 
-  @SuppressWarnings("MemberName")
   public final boolean Channel3BreakerFault;
 
-  @SuppressWarnings("MemberName")
   public final boolean Channel4BreakerFault;
 
-  @SuppressWarnings("MemberName")
   public final boolean Channel5BreakerFault;
 
-  @SuppressWarnings("MemberName")
   public final boolean Channel6BreakerFault;
 
-  @SuppressWarnings("MemberName")
   public final boolean Channel7BreakerFault;
 
-  @SuppressWarnings("MemberName")
   public final boolean Channel8BreakerFault;
 
-  @SuppressWarnings("MemberName")
   public final boolean Channel9BreakerFault;
 
-  @SuppressWarnings("MemberName")
   public final boolean Channel10BreakerFault;
 
-  @SuppressWarnings("MemberName")
   public final boolean Channel11BreakerFault;
 
-  @SuppressWarnings("MemberName")
   public final boolean Channel12BreakerFault;
 
-  @SuppressWarnings("MemberName")
   public final boolean Channel13BreakerFault;
 
-  @SuppressWarnings("MemberName")
   public final boolean Channel14BreakerFault;
 
-  @SuppressWarnings("MemberName")
   public final boolean Channel15BreakerFault;
 
-  @SuppressWarnings("MemberName")
   public final boolean Channel16BreakerFault;
 
-  @SuppressWarnings("MemberName")
   public final boolean Channel17BreakerFault;
 
-  @SuppressWarnings("MemberName")
   public final boolean Channel18BreakerFault;
 
-  @SuppressWarnings("MemberName")
   public final boolean Channel19BreakerFault;
 
-  @SuppressWarnings("MemberName")
   public final boolean Channel20BreakerFault;
 
-  @SuppressWarnings("MemberName")
   public final boolean Channel21BreakerFault;
 
-  @SuppressWarnings("MemberName")
   public final boolean Channel22BreakerFault;
 
-  @SuppressWarnings("MemberName")
   public final boolean Channel23BreakerFault;
 
-  @SuppressWarnings("MemberName")
   public final boolean Brownout;
 
-  @SuppressWarnings("MemberName")
   public final boolean CanWarning;
 
-  @SuppressWarnings("MemberName")
   public final boolean CanBusOff;
 
-  @SuppressWarnings("MemberName")
   public final boolean HasReset;
 
   /**

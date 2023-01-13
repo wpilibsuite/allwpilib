@@ -35,7 +35,7 @@ public class PIDController implements Sendable, AutoCloseable {
 
   private double m_minimumInput;
 
-  // Do the endpoints wrap around? eg. Absolute encoder
+  // Do the endpoints wrap around? e.g. Absolute encoder
   private boolean m_continuous;
 
   // The error at the time of the most recent call to calculate()
@@ -172,6 +172,24 @@ public class PIDController implements Sendable, AutoCloseable {
    */
   public double getPeriod() {
     return m_period;
+  }
+
+  /**
+   * Returns the position tolerance of this controller.
+   *
+   * @return the position tolerance of the controller.
+   */
+  public double getPositionTolerance() {
+    return m_positionTolerance;
+  }
+
+  /**
+   * Returns the velocity tolerance of this controller.
+   *
+   * @return the velocity tolerance of the controller.
+   */
+  public double getVelocityTolerance() {
+    return m_velocityTolerance;
   }
 
   /**

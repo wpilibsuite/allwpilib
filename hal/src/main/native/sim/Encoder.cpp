@@ -53,7 +53,7 @@ bool GetEncoderBaseHandle(HAL_EncoderHandle handle,
                           HAL_FPGAEncoderHandle* fpgaHandle,
                           HAL_CounterHandle* counterHandle) {
   auto encoder = encoderHandles->Get(handle);
-  if (!handle) {
+  if (!encoder) {
     return false;
   }
 
@@ -363,7 +363,7 @@ double HAL_GetEncoderDistancePerPulse(HAL_EncoderHandle encoderHandle,
     return 0.0;
   }
 
-  return encoder->distancePerPulse;
+  return SimEncoderData[encoder->index].distancePerPulse;
 }
 
 HAL_EncoderEncodingType HAL_GetEncoderEncodingType(

@@ -128,9 +128,7 @@ public class LinearFilter {
     }
 
     double[] ffGains = new double[taps];
-    for (int i = 0; i < ffGains.length; i++) {
-      ffGains[i] = 1.0 / taps;
-    }
+    Arrays.fill(ffGains, 1.0 / taps);
 
     double[] fbGains = new double[0];
 
@@ -154,7 +152,6 @@ public class LinearFilter {
    * @throws IllegalArgumentException if derivative &lt; 1, samples &lt;= 0, or derivative &gt;=
    *     samples.
    */
-  @SuppressWarnings("LocalVariableName")
   public static LinearFilter finiteDifference(int derivative, int[] stencil, double period) {
     // See
     // https://en.wikipedia.org/wiki/Finite_difference_coefficient#Arbitrary_stencil_points
@@ -168,7 +165,7 @@ public class LinearFilter {
     // [s₁ⁿ⁻¹ ⋯ sₙⁿ⁻¹][aₙ]      [δₙ₋₁,d]
     //
     // where δᵢ,ⱼ are the Kronecker delta. The FIR gains are the elements of the
-    // vector a in reverse order divided by hᵈ.
+    // vector 'a' in reverse order divided by hᵈ.
     //
     // The order of accuracy of the approximation is of the form O(hⁿ⁻ᵈ).
 

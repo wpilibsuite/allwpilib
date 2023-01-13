@@ -48,10 +48,17 @@ auto SendableChooser<T>::GetSelected()
 template <class T>
 void SendableChooser<T>::InitSendable(nt::NTSendableBuilder& builder) {
   builder.SetSmartDashboardType("String Chooser");
-  builder.GetEntry(kInstance).SetDouble(m_instance);
+  {
+    std::scoped_lock lock(m_mutex);
+    m_instancePubs.emplace_back(
+        nt::IntegerTopic{builder.GetTopic(kInstance)}.Publish());
+    m_instancePubs.back().Set(m_instance);
+    m_activePubs.emplace_back(
+        nt::StringTopic{builder.GetTopic(kActive)}.Publish());
+  }
   builder.AddStringArrayProperty(
       kOptions,
-      [=] {
+      [=, this] {
         std::vector<std::string> keys;
         for (const auto& choice : m_choices) {
           keys.emplace_back(choice.first());
@@ -66,13 +73,13 @@ void SendableChooser<T>::InitSendable(nt::NTSendableBuilder& builder) {
       nullptr);
   builder.AddSmallStringProperty(
       kDefault,
-      [=](wpi::SmallVectorImpl<char>&) -> std::string_view {
+      [=, this](wpi::SmallVectorImpl<char>&) -> std::string_view {
         return m_defaultChoice;
       },
       nullptr);
   builder.AddSmallStringProperty(
       kActive,
-      [=](wpi::SmallVectorImpl<char>& buf) -> std::string_view {
+      [=, this](wpi::SmallVectorImpl<char>& buf) -> std::string_view {
         std::scoped_lock lock(m_mutex);
         if (m_haveSelected) {
           buf.assign(m_selected.begin(), m_selected.end());
@@ -82,18 +89,15 @@ void SendableChooser<T>::InitSendable(nt::NTSendableBuilder& builder) {
         }
       },
       nullptr);
-  {
-    std::scoped_lock lock(m_mutex);
-    m_activeEntries.emplace_back(builder.GetEntry(kActive));
-  }
-  builder.AddStringProperty(kSelected, nullptr, [=](std::string_view val) {
-    std::scoped_lock lock(m_mutex);
-    m_haveSelected = true;
-    m_selected = val;
-    for (auto& entry : m_activeEntries) {
-      entry.SetString(val);
-    }
-  });
+  builder.AddStringProperty(kSelected, nullptr,
+                            [=, this](std::string_view val) {
+                              std::scoped_lock lock(m_mutex);
+                              m_haveSelected = true;
+                              m_selected = val;
+                              for (auto& pub : m_activePubs) {
+                                pub.Set(val);
+                              }
+                            });
 }
 
 template <class T>

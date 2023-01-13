@@ -9,5 +9,6 @@
 namespace hal {
 
 constexpr int32_t kSystemClockTicksPerMicrosecond = 40;
+constexpr int32_t kDutyCycleScaleFactor = 4e7 - 1;
 
 }  // namespace hal

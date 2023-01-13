@@ -66,7 +66,7 @@ class CommandScheduleTest extends CommandTestBase {
       MockCommandHolder command3Holder = new MockCommandHolder(true);
       Command command3 = command3Holder.getMock();
 
-      scheduler.schedule(true, command1, command2, command3);
+      scheduler.schedule(command1, command2, command3);
       assertTrue(scheduler.isScheduled(command1, command2, command3));
       scheduler.run();
       assertTrue(scheduler.isScheduled(command1, command2, command3));

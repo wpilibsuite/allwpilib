@@ -7,7 +7,6 @@ package edu.wpi.first.math.controller;
 import edu.wpi.first.math.Drake;
 import edu.wpi.first.math.MathSharedStore;
 import edu.wpi.first.math.Matrix;
-import edu.wpi.first.math.Nat;
 import edu.wpi.first.math.Num;
 import edu.wpi.first.math.StateSpaceUtil;
 import edu.wpi.first.math.Vector;
@@ -23,18 +22,14 @@ import org.ejml.simple.SimpleMatrix;
  * <p>For more on the underlying math, read
  * https://file.tavsys.net/control/controls-engineering-in-frc.pdf.
  */
-@SuppressWarnings("ClassTypeParameterName")
 public class LinearQuadraticRegulator<States extends Num, Inputs extends Num, Outputs extends Num> {
   /** The current reference state. */
-  @SuppressWarnings("MemberName")
   private Matrix<States, N1> m_r;
 
   /** The computed and capped controller output. */
-  @SuppressWarnings("MemberName")
   private Matrix<Inputs, N1> m_u;
 
   // Controller gain.
-  @SuppressWarnings("MemberName")
   private Matrix<Inputs, States> m_K;
 
   /**
@@ -44,6 +39,7 @@ public class LinearQuadraticRegulator<States extends Num, Inputs extends Num, Ou
    * @param qelms The maximum desired error tolerance for each state.
    * @param relms The maximum desired control effort for each input.
    * @param dtSeconds Discretization timestep.
+   * @throws IllegalArgumentException If the system is uncontrollable.
    */
   public LinearQuadraticRegulator(
       LinearSystem<States, Inputs, Outputs> plant,
@@ -66,8 +62,8 @@ public class LinearQuadraticRegulator<States extends Num, Inputs extends Num, Ou
    * @param qelms The maximum desired error tolerance for each state.
    * @param relms The maximum desired control effort for each input.
    * @param dtSeconds Discretization timestep.
+   * @throws IllegalArgumentException If the system is uncontrollable.
    */
-  @SuppressWarnings({"ParameterName", "LocalVariableName"})
   public LinearQuadraticRegulator(
       Matrix<States, States> A,
       Matrix<States, Inputs> B,
@@ -90,8 +86,8 @@ public class LinearQuadraticRegulator<States extends Num, Inputs extends Num, Ou
    * @param Q The state cost matrix.
    * @param R The input cost matrix.
    * @param dtSeconds Discretization timestep.
+   * @throws IllegalArgumentException If the system is uncontrollable.
    */
-  @SuppressWarnings({"LocalVariableName", "ParameterName"})
   public LinearQuadraticRegulator(
       Matrix<States, States> A,
       Matrix<States, Inputs> B,
@@ -141,8 +137,8 @@ public class LinearQuadraticRegulator<States extends Num, Inputs extends Num, Ou
    * @param R The input cost matrix.
    * @param N The state-input cross-term cost matrix.
    * @param dtSeconds Discretization timestep.
+   * @throws IllegalArgumentException If the system is uncontrollable.
    */
-  @SuppressWarnings({"ParameterName", "LocalVariableName"})
   public LinearQuadraticRegulator(
       Matrix<States, States> A,
       Matrix<States, Inputs> B,
@@ -167,24 +163,6 @@ public class LinearQuadraticRegulator<States extends Num, Inputs extends Num, Ou
 
     m_r = new Matrix<>(new SimpleMatrix(B.getNumRows(), 1));
     m_u = new Matrix<>(new SimpleMatrix(B.getNumCols(), 1));
-
-    reset();
-  }
-
-  /**
-   * Constructs a controller with the given coefficients and plant.
-   *
-   * @param states The number of states.
-   * @param inputs The number of inputs.
-   * @param k The gain matrix.
-   */
-  @SuppressWarnings("ParameterName")
-  public LinearQuadraticRegulator(
-      Nat<States> states, Nat<Inputs> inputs, Matrix<Inputs, States> k) {
-    m_K = k;
-
-    m_r = new Matrix<>(states, Nat.N1());
-    m_u = new Matrix<>(inputs, Nat.N1());
 
     reset();
   }
@@ -248,7 +226,6 @@ public class LinearQuadraticRegulator<States extends Num, Inputs extends Num, Ou
    * @param x The current state x.
    * @return The next controller output.
    */
-  @SuppressWarnings("ParameterName")
   public Matrix<Inputs, N1> calculate(Matrix<States, N1> x) {
     m_u = m_K.times(m_r.minus(x));
     return m_u;
@@ -261,7 +238,6 @@ public class LinearQuadraticRegulator<States extends Num, Inputs extends Num, Ou
    * @param nextR the next reference vector r.
    * @return The next controller output.
    */
-  @SuppressWarnings("ParameterName")
   public Matrix<Inputs, N1> calculate(Matrix<States, N1> x, Matrix<States, N1> nextR) {
     m_r = nextR;
     return calculate(x);

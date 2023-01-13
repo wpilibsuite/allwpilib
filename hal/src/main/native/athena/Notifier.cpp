@@ -20,6 +20,7 @@
 #include "hal/HAL.h"
 #include "hal/Threads.h"
 #include "hal/handles/UnlimitedHandleResource.h"
+#include "hal/roborio/InterruptManager.h"
 
 using namespace hal;
 
@@ -106,15 +107,21 @@ static void alarmCallback() {
 }
 
 static void notifierThreadMain() {
-  tRioStatusCode status = 0;
-  tInterruptManager manager{1 << kTimerInterruptNumber, true, &status};
+  InterruptManager& manager = InterruptManager::GetInstance();
+  NiFpga_IrqContext context = manager.GetContext();
+  uint32_t mask = 1 << kTimerInterruptNumber;
+  int32_t status = 0;
+
   while (notifierRunning) {
-    auto triggeredMask = manager.watch(10000, false, &status);
+    status = 0;
+    auto triggeredMask =
+        manager.WaitForInterrupt(context, mask, false, 10000, &status);
     if (!notifierRunning) {
       break;
     }
-    if (triggeredMask == 0)
+    if (triggeredMask == 0) {
       continue;
+    }
     alarmCallback();
   }
 }
@@ -195,8 +202,9 @@ void HAL_SetNotifierName(HAL_NotifierHandle notifierHandle, const char* name,
 
 void HAL_StopNotifier(HAL_NotifierHandle notifierHandle, int32_t* status) {
   auto notifier = notifierHandles->Get(notifierHandle);
-  if (!notifier)
+  if (!notifier) {
     return;
+  }
 
   {
     std::scoped_lock lock(notifier->mutex);
@@ -209,8 +217,9 @@ void HAL_StopNotifier(HAL_NotifierHandle notifierHandle, int32_t* status) {
 
 void HAL_CleanNotifier(HAL_NotifierHandle notifierHandle, int32_t* status) {
   auto notifier = notifierHandles->Free(notifierHandle);
-  if (!notifier)
+  if (!notifier) {
     return;
+  }
 
   // Just in case HAL_StopNotifier() wasn't called...
   {
@@ -244,8 +253,9 @@ void HAL_CleanNotifier(HAL_NotifierHandle notifierHandle, int32_t* status) {
 void HAL_UpdateNotifierAlarm(HAL_NotifierHandle notifierHandle,
                              uint64_t triggerTime, int32_t* status) {
   auto notifier = notifierHandles->Get(notifierHandle);
-  if (!notifier)
+  if (!notifier) {
     return;
+  }
 
   {
     std::scoped_lock lock(notifier->mutex);
@@ -270,8 +280,9 @@ void HAL_UpdateNotifierAlarm(HAL_NotifierHandle notifierHandle,
 void HAL_CancelNotifierAlarm(HAL_NotifierHandle notifierHandle,
                              int32_t* status) {
   auto notifier = notifierHandles->Get(notifierHandle);
-  if (!notifier)
+  if (!notifier) {
     return;
+  }
 
   {
     std::scoped_lock lock(notifier->mutex);
@@ -282,8 +293,9 @@ void HAL_CancelNotifierAlarm(HAL_NotifierHandle notifierHandle,
 uint64_t HAL_WaitForNotifierAlarm(HAL_NotifierHandle notifierHandle,
                                   int32_t* status) {
   auto notifier = notifierHandles->Get(notifierHandle);
-  if (!notifier)
+  if (!notifier) {
     return 0;
+  }
   std::unique_lock lock(notifier->mutex);
   notifier->cond.wait(lock, [&] {
     return !notifier->active || notifier->triggeredTime != UINT64_MAX;

@@ -41,7 +41,6 @@ class Translation3dTest {
         () -> assertEquals(-3.0, difference.getZ(), kEpsilon));
   }
 
-  @SuppressWarnings("LocalVariableName")
   @Test
   void testRotateBy() {
     var xAxis = VecBuilder.fill(1.0, 0.0, 0.0);
@@ -139,7 +138,6 @@ class Translation3dTest {
 
   @Test
   void testPolarConstructor() {
-    @SuppressWarnings("LocalVariableName")
     var zAxis = VecBuilder.fill(0.0, 0.0, 1.0);
 
     var one = new Translation3d(Math.sqrt(2), new Rotation3d(zAxis, Units.degreesToRadians(45.0)));

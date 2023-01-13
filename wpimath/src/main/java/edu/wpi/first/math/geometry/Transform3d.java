@@ -47,13 +47,23 @@ public class Transform3d {
   }
 
   /**
-   * Scales the transform by the scalar.
+   * Multiplies the transform by the scalar.
    *
    * @param scalar The scalar.
    * @return The scaled Transform3d.
    */
   public Transform3d times(double scalar) {
     return new Transform3d(m_translation.times(scalar), m_rotation.times(scalar));
+  }
+
+  /**
+   * Divides the transform by the scalar.
+   *
+   * @param scalar The scalar.
+   * @return The scaled Transform3d.
+   */
+  public Transform3d div(double scalar) {
+    return times(1.0 / scalar);
   }
 
   /**

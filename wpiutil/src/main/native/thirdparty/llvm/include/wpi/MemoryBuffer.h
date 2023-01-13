@@ -21,10 +21,9 @@
 
 #include <cstddef>
 #include <memory>
+#include <span>
 #include <string_view>
 #include <system_error>
-
-#include "wpi/span.h"
 
 // Duplicated from fs.h to avoid a dependency
 namespace fs {
@@ -61,7 +60,7 @@ class MemoryBuffer {
   const uint8_t* end() const { return m_bufferEnd; }
   size_t size() const { return m_bufferEnd - m_bufferStart; }
 
-  span<const uint8_t> GetBuffer() const { return {begin(), end()}; }
+  std::span<const uint8_t> GetBuffer() const { return {begin(), end()}; }
 
   /// Return an identifier for this buffer, typically the filename it was read
   /// from.
@@ -98,14 +97,14 @@ class MemoryBuffer {
 
   /// Open the specified memory range as a MemoryBuffer.
   static std::unique_ptr<MemoryBuffer> GetMemBuffer(
-      span<const uint8_t> inputData, std::string_view bufferName = "");
+      std::span<const uint8_t> inputData, std::string_view bufferName = "");
 
   static std::unique_ptr<MemoryBuffer> GetMemBuffer(MemoryBufferRef ref);
 
   /// Open the specified memory range as a MemoryBuffer, copying the contents
   /// and taking ownership of it.
   static std::unique_ptr<MemoryBuffer> GetMemBufferCopy(
-      span<const uint8_t> inputData, std::string_view bufferName = "");
+      std::span<const uint8_t> inputData, std::string_view bufferName = "");
 
   /// Map a subrange of the specified file as a MemoryBuffer.
   static std::unique_ptr<MemoryBuffer> GetFileSlice(std::string_view filename,
@@ -145,7 +144,7 @@ class WritableMemoryBuffer : public MemoryBuffer {
   // guaranteed to have been initialized with a mutable buffer.
   uint8_t* begin() { return const_cast<uint8_t*>(MemoryBuffer::begin()); }
   uint8_t* end() { return const_cast<uint8_t*>(MemoryBuffer::end()); }
-  span<uint8_t> GetBuffer() { return {begin(), end()}; }
+  std::span<uint8_t> GetBuffer() { return {begin(), end()}; }
 
   static std::unique_ptr<WritableMemoryBuffer> GetFile(
       std::string_view filename, std::error_code& ec, int64_t fileSize = -1);
@@ -196,7 +195,7 @@ class WriteThroughMemoryBuffer : public MemoryBuffer {
   // guaranteed to have been initialized with a mutable buffer.
   uint8_t* begin() { return const_cast<uint8_t*>(MemoryBuffer::begin()); }
   uint8_t* end() { return const_cast<uint8_t*>(MemoryBuffer::end()); }
-  span<uint8_t> GetBuffer() { return {begin(), end()}; }
+  std::span<uint8_t> GetBuffer() { return {begin(), end()}; }
 
   static std::unique_ptr<WriteThroughMemoryBuffer> GetFile(
       std::string_view filename, std::error_code& ec, int64_t fileSize = -1);
@@ -218,22 +217,22 @@ class WriteThroughMemoryBuffer : public MemoryBuffer {
 };
 
 class MemoryBufferRef {
-  span<const uint8_t> m_buffer;
+  std::span<const uint8_t> m_buffer;
   std::string_view m_id;
 
  public:
   MemoryBufferRef() = default;
   MemoryBufferRef(MemoryBuffer& buffer)  // NOLINT
       : m_buffer(buffer.GetBuffer()), m_id(buffer.GetBufferIdentifier()) {}
-  MemoryBufferRef(span<const uint8_t> buffer, std::string_view id)
+  MemoryBufferRef(std::span<const uint8_t> buffer, std::string_view id)
       : m_buffer(buffer), m_id(id) {}
 
-  span<const uint8_t> GetBuffer() const { return m_buffer; }
+  std::span<const uint8_t> GetBuffer() const { return m_buffer; }
 
   std::string_view GetBufferIdentifier() const { return m_id; }
 
-  const uint8_t* begin() const { return m_buffer.begin(); }
-  const uint8_t* end() const { return m_buffer.end(); }
+  const uint8_t* begin() const { return &*m_buffer.begin(); }
+  const uint8_t* end() const { return &*m_buffer.end(); }
   size_t size() const { return m_buffer.size(); }
 };
 

@@ -342,6 +342,50 @@ class XboxController : public GenericHID {
    */
   BooleanEvent Start(EventLoop* loop) const;
 
+  /**
+   * Constructs an event instance around the axis value of the left trigger. The
+   * returned trigger will be true when the axis value is greater than {@code
+   * threshold}.
+   * @param threshold the minimum axis value for the returned event to be true.
+   * This value should be in the range [0, 1] where 0 is the unpressed state of
+   * the axis.
+   * @param loop the event loop instance to attach the event to.
+   * @return an event instance that is true when the left trigger's axis exceeds
+   * the provided threshold, attached to the given event loop
+   */
+  BooleanEvent LeftTrigger(double threshold, EventLoop* loop) const;
+
+  /**
+   * Constructs an event instance around the axis value of the left trigger.
+   * The returned trigger will be true when the axis value is greater than 0.5.
+   * @param loop the event loop instance to attach the event to.
+   * @return an event instance that is true when the right trigger's axis
+   * exceeds 0.5, attached to the given event loop
+   */
+  BooleanEvent LeftTrigger(EventLoop* loop) const;
+
+  /**
+   * Constructs an event instance around the axis value of the right trigger.
+   * The returned trigger will be true when the axis value is greater than
+   * {@code threshold}.
+   * @param threshold the minimum axis value for the returned event to be true.
+   * This value should be in the range [0, 1] where 0 is the unpressed state of
+   * the axis.
+   * @param loop the event loop instance to attach the event to.
+   * @return an event instance that is true when the right trigger's axis
+   * exceeds the provided threshold, attached to the given event loop
+   */
+  BooleanEvent RightTrigger(double threshold, EventLoop* loop) const;
+
+  /**
+   * Constructs an event instance around the axis value of the right trigger.
+   * The returned trigger will be true when the axis value is greater than 0.5.
+   * @param loop the event loop instance to attach the event to.
+   * @return an event instance that is true when the right trigger's axis
+   * exceeds 0.5, attached to the given event loop
+   */
+  BooleanEvent RightTrigger(EventLoop* loop) const;
+
   struct Button {
     static constexpr int kLeftBumper = 5;
     static constexpr int kRightBumper = 6;

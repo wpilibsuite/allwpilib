@@ -28,7 +28,7 @@ public class BooleanArrayLogEntry extends DataLogEntry {
    * Appends a record to the log.
    *
    * @param value Value to record
-   * @param timestamp Time stamp (may be 0 to indicate now)
+   * @param timestamp Time stamp (0 to indicate now)
    */
   public void append(boolean[] value, long timestamp) {
     m_log.appendBooleanArray(m_entry, value, timestamp);

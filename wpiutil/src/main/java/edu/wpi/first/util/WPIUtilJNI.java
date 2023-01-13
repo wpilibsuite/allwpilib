@@ -54,6 +54,8 @@ public class WPIUtilJNI {
     libraryLoaded = true;
   }
 
+  public static native void writeStderr(String str);
+
   public static native void enableMockTime();
 
   public static native void disableMockTime();
@@ -79,7 +81,7 @@ public class WPIUtilJNI {
   public static native boolean releaseSemaphore(int semHandle, int releaseCount);
 
   /**
-   * Waits for an handle to be signaled.
+   * Waits for a handle to be signaled.
    *
    * @param handle handle to wait on
    * @throws InterruptedException on failure (e.g. object was destroyed)
@@ -87,7 +89,7 @@ public class WPIUtilJNI {
   public static native void waitForObject(int handle) throws InterruptedException;
 
   /**
-   * Waits for an handle to be signaled, with timeout.
+   * Waits for a handle to be signaled, with timeout.
    *
    * @param handle handle to wait on
    * @param timeout timeout in seconds

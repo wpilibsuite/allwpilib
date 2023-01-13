@@ -11,9 +11,11 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.internal.verification.VerificationModeFactory.times;
 
+import java.util.Arrays;
 import org.junit.jupiter.api.Test;
 
-class ParallelDeadlineGroupTest extends CommandTestBase {
+class ParallelDeadlineGroupTest extends CommandTestBase
+    implements MultiCompositionTestBase<ParallelDeadlineGroup> {
   @Test
   void parallelDeadlineScheduleTest() {
     try (CommandScheduler scheduler = new CommandScheduler()) {
@@ -121,5 +123,10 @@ class ParallelDeadlineGroupTest extends CommandTestBase {
 
     assertThrows(
         IllegalArgumentException.class, () -> new ParallelDeadlineGroup(command1, command2));
+  }
+
+  @Override
+  public ParallelDeadlineGroup compose(Command... members) {
+    return new ParallelDeadlineGroup(members[0], Arrays.copyOfRange(members, 1, members.length));
   }
 }

@@ -13,6 +13,10 @@ cppSrcFileInclude {
   \.cpp$
 }
 
+modifiableFileExclude {
+  objcpp
+}
+
 licenseUpdateExclude {
   src/main/native/cpp/default_init_allocator\.h$
 }

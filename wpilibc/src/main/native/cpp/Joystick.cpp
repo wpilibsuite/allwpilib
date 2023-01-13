@@ -5,9 +5,9 @@
 #include "frc/Joystick.h"
 
 #include <cmath>
+#include <numbers>
 
 #include <hal/FRCUsageReporting.h>
-#include <wpi/numbers>
 
 #include "frc/event/BooleanEvent.h"
 
@@ -116,7 +116,7 @@ BooleanEvent Joystick::Top(EventLoop* loop) const {
 }
 
 double Joystick::GetMagnitude() const {
-  return std::sqrt(std::pow(GetX(), 2) + std::pow(GetY(), 2));
+  return std::hypot(GetX(), GetY());
 }
 
 double Joystick::GetDirectionRadians() const {
@@ -124,5 +124,5 @@ double Joystick::GetDirectionRadians() const {
 }
 
 double Joystick::GetDirectionDegrees() const {
-  return (180 / wpi::numbers::pi) * GetDirectionRadians();
+  return (180 / std::numbers::pi) * GetDirectionRadians();
 }

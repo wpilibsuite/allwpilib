@@ -4,6 +4,8 @@
 
 #pragma once
 
+#include <numbers>
+
 #include <frc/AnalogGyro.h>
 #include <frc/Encoder.h>
 #include <frc/controller/PIDController.h>
@@ -16,7 +18,6 @@
 #include <units/angular_velocity.h>
 #include <units/length.h>
 #include <units/velocity.h>
-#include <wpi/numbers>
 
 /**
  * Represents a differential drive style drivetrain.
@@ -34,9 +35,9 @@ class Drivetrain {
     // distance traveled for one rotation of the wheel divided by the encoder
     // resolution.
     m_leftEncoder.SetDistancePerPulse(
-        2 * wpi::numbers::pi * kWheelRadius.value() / kEncoderResolution);
+        2 * std::numbers::pi * kWheelRadius.value() / kEncoderResolution);
     m_rightEncoder.SetDistancePerPulse(
-        2 * wpi::numbers::pi * kWheelRadius.value() / kEncoderResolution);
+        2 * std::numbers::pi * kWheelRadius.value() / kEncoderResolution);
 
     m_leftEncoder.Reset();
     m_rightEncoder.Reset();
@@ -45,7 +46,7 @@ class Drivetrain {
   static constexpr units::meters_per_second_t kMaxSpeed =
       3.0_mps;  // 3 meters per second
   static constexpr units::radians_per_second_t kMaxAngularSpeed{
-      wpi::numbers::pi};  // 1/2 rotation per second
+      std::numbers::pi};  // 1/2 rotation per second
 
   void SetSpeeds(const frc::DifferentialDriveWheelSpeeds& speeds);
   void Drive(units::meters_per_second_t xSpeed,
@@ -78,10 +79,12 @@ class Drivetrain {
   // Gains are for example purposes only - must be determined for your own
   // robot!
   frc::DifferentialDrivePoseEstimator m_poseEstimator{
-      frc::Rotation2d(),
-      frc::Pose2d(),
-      {0.01, 0.01, 0.01, 0.01, 0.01},
-      {0.1, 0.1, 0.1},
+      m_kinematics,
+      m_gyro.GetRotation2d(),
+      units::meter_t{m_leftEncoder.GetDistance()},
+      units::meter_t{m_rightEncoder.GetDistance()},
+      frc::Pose2d{},
+      {0.01, 0.01, 0.01},
       {0.1, 0.1, 0.1}};
 
   // Gains are for example purposes only - must be determined for your own

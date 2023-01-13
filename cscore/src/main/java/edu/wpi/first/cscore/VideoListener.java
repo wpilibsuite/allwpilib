@@ -64,7 +64,6 @@ public class VideoListener implements AutoCloseable {
   private static boolean s_waitQueue;
   private static final Condition s_waitQueueCond = s_lock.newCondition();
 
-  @SuppressWarnings("PMD.AvoidCatchingThrowable")
   private static void startThread() {
     s_thread =
         new Thread(

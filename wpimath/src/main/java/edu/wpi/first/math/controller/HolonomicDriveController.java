@@ -8,6 +8,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.trajectory.Trajectory;
+import edu.wpi.first.math.util.Units;
 
 /**
  * This holonomic drive controller can be used to follow trajectories using a holonomic drivetrain
@@ -20,7 +21,6 @@ import edu.wpi.first.math.trajectory.Trajectory;
  * are decoupled from translations, users can specify a custom heading that the drivetrain should
  * point toward. This heading reference is profiled for smoothness.
  */
-@SuppressWarnings("MemberName")
 public class HolonomicDriveController {
   private Pose2d m_poseError = new Pose2d();
   private Rotation2d m_rotationError = new Rotation2d();
@@ -40,12 +40,12 @@ public class HolonomicDriveController {
    * @param yController A PID Controller to respond to error in the field-relative y direction.
    * @param thetaController A profiled PID controller to respond to error in angle.
    */
-  @SuppressWarnings("ParameterName")
   public HolonomicDriveController(
       PIDController xController, PIDController yController, ProfiledPIDController thetaController) {
     m_xController = xController;
     m_yController = yController;
     m_thetaController = thetaController;
+    m_thetaController.enableContinuousInput(0, Units.degreesToRadians(360.0));
   }
 
   /**
@@ -75,15 +75,17 @@ public class HolonomicDriveController {
   /**
    * Returns the next output of the holonomic drive controller.
    *
-   * @param currentPose The current pose.
-   * @param poseRef The desired pose.
-   * @param linearVelocityRefMeters The linear velocity reference.
-   * @param angleRef The angular reference.
+   * @param currentPose The current pose, as measured by odometry or pose estimator.
+   * @param trajectoryPose The desired trajectory pose, as sampled for the current timestep.
+   * @param desiredLinearVelocityMetersPerSecond The desired linear velocity.
+   * @param desiredHeading The desired heading.
    * @return The next output of the holonomic drive controller.
    */
-  @SuppressWarnings("LocalVariableName")
   public ChassisSpeeds calculate(
-      Pose2d currentPose, Pose2d poseRef, double linearVelocityRefMeters, Rotation2d angleRef) {
+      Pose2d currentPose,
+      Pose2d trajectoryPose,
+      double desiredLinearVelocityMetersPerSecond,
+      Rotation2d desiredHeading) {
     // If this is the first run, then we need to reset the theta controller to the current pose's
     // heading.
     if (m_firstRun) {
@@ -92,21 +94,22 @@ public class HolonomicDriveController {
     }
 
     // Calculate feedforward velocities (field-relative).
-    double xFF = linearVelocityRefMeters * poseRef.getRotation().getCos();
-    double yFF = linearVelocityRefMeters * poseRef.getRotation().getSin();
+    double xFF = desiredLinearVelocityMetersPerSecond * trajectoryPose.getRotation().getCos();
+    double yFF = desiredLinearVelocityMetersPerSecond * trajectoryPose.getRotation().getSin();
     double thetaFF =
-        m_thetaController.calculate(currentPose.getRotation().getRadians(), angleRef.getRadians());
+        m_thetaController.calculate(
+            currentPose.getRotation().getRadians(), desiredHeading.getRadians());
 
-    m_poseError = poseRef.relativeTo(currentPose);
-    m_rotationError = angleRef.minus(currentPose.getRotation());
+    m_poseError = trajectoryPose.relativeTo(currentPose);
+    m_rotationError = desiredHeading.minus(currentPose.getRotation());
 
     if (!m_enabled) {
       return ChassisSpeeds.fromFieldRelativeSpeeds(xFF, yFF, thetaFF, currentPose.getRotation());
     }
 
     // Calculate feedback velocities (based on position error).
-    double xFeedback = m_xController.calculate(currentPose.getX(), poseRef.getX());
-    double yFeedback = m_yController.calculate(currentPose.getY(), poseRef.getY());
+    double xFeedback = m_xController.calculate(currentPose.getX(), trajectoryPose.getX());
+    double yFeedback = m_yController.calculate(currentPose.getY(), trajectoryPose.getY());
 
     // Return next output.
     return ChassisSpeeds.fromFieldRelativeSpeeds(
@@ -116,15 +119,15 @@ public class HolonomicDriveController {
   /**
    * Returns the next output of the holonomic drive controller.
    *
-   * @param currentPose The current pose.
-   * @param desiredState The desired trajectory state.
-   * @param angleRef The desired end-angle.
+   * @param currentPose The current pose, as measured by odometry or pose estimator.
+   * @param desiredState The desired trajectory pose, as sampled for the current timestep.
+   * @param desiredHeading The desired heading.
    * @return The next output of the holonomic drive controller.
    */
   public ChassisSpeeds calculate(
-      Pose2d currentPose, Trajectory.State desiredState, Rotation2d angleRef) {
+      Pose2d currentPose, Trajectory.State desiredState, Rotation2d desiredHeading) {
     return calculate(
-        currentPose, desiredState.poseMeters, desiredState.velocityMetersPerSecond, angleRef);
+        currentPose, desiredState.poseMeters, desiredState.velocityMetersPerSecond, desiredHeading);
   }
 
   /**

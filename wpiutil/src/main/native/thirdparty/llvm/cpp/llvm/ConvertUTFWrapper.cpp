@@ -6,7 +6,7 @@
 //
 //===----------------------------------------------------------------------===//
 
-#include "wpi/span.h"
+#include <span>
 #include "wpi/ConvertUTF.h"
 #include "wpi/SmallVector.h"
 #include "wpi/ErrorHandling.h"
@@ -21,7 +21,7 @@ bool ConvertUTF8toWide(unsigned WideCharWidth, std::string_view Source,
                        char *&ResultPtr, const UTF8 *&ErrorPtr) {
   assert(WideCharWidth == 1 || WideCharWidth == 2 || WideCharWidth == 4);
   ConversionResult result = conversionOK;
-  // Copy the character span over.
+  // Copy the character std::span over.
   if (WideCharWidth == 1) {
     const UTF8 *Pos = reinterpret_cast<const UTF8*>(Source.data());
     if (!isLegalUTF8String(&Pos, reinterpret_cast<const UTF8*>(Source.data() + Source.size()))) {
@@ -78,13 +78,13 @@ bool ConvertCodePointToUTF8(unsigned Source, char *&ResultPtr) {
   return true;
 }
 
-bool hasUTF16ByteOrderMark(span<const char> S) {
+bool hasUTF16ByteOrderMark(std::span<const char> S) {
   return (S.size() >= 2 &&
           ((S[0] == '\xff' && S[1] == '\xfe') ||
            (S[0] == '\xfe' && S[1] == '\xff')));
 }
 
-bool convertUTF16ToUTF8String(span<const char> SrcBytes, SmallVectorImpl<char> &Out) {
+bool convertUTF16ToUTF8String(std::span<const char> SrcBytes, SmallVectorImpl<char> &Out) {
   assert(Out.empty());
 
   // Error out on an uneven byte count.
@@ -95,8 +95,8 @@ bool convertUTF16ToUTF8String(span<const char> SrcBytes, SmallVectorImpl<char> &
   if (SrcBytes.empty())
     return true;
 
-  const UTF16 *Src = reinterpret_cast<const UTF16 *>(SrcBytes.begin());
-  const UTF16 *SrcEnd = reinterpret_cast<const UTF16 *>(SrcBytes.end());
+  const UTF16 *Src = reinterpret_cast<const UTF16 *>(&*SrcBytes.begin());
+  const UTF16 *SrcEnd = reinterpret_cast<const UTF16 *>(&*SrcBytes.begin() + SrcBytes.size());
 
   assert((uintptr_t)Src % sizeof(UTF16) == 0);
 
@@ -135,10 +135,10 @@ bool convertUTF16ToUTF8String(span<const char> SrcBytes, SmallVectorImpl<char> &
   return true;
 }
 
-bool convertUTF16ToUTF8String(span<const UTF16> Src, SmallVectorImpl<char> &Out)
+bool convertUTF16ToUTF8String(std::span<const UTF16> Src, SmallVectorImpl<char> &Out)
 {
   return convertUTF16ToUTF8String(
-      span<const char>(reinterpret_cast<const char *>(Src.data()),
+      std::span<const char>(reinterpret_cast<const char *>(Src.data()),
       Src.size() * sizeof(UTF16)), Out);
 }
 
@@ -225,7 +225,7 @@ bool convertWideToUTF8(const std::wstring &Source, SmallVectorImpl<char> &Result
     return true;
   } else if (sizeof(wchar_t) == 2) {
     return convertUTF16ToUTF8String(
-        span<const UTF16>(reinterpret_cast<const UTF16 *>(Source.data()),
+        std::span<const UTF16>(reinterpret_cast<const UTF16 *>(Source.data()),
                               Source.size()),
         Result);
   } else if (sizeof(wchar_t) == 4) {

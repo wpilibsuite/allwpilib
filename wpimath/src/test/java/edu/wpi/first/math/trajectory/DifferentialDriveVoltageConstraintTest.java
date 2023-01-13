@@ -20,7 +20,6 @@ import java.util.Collections;
 import org.junit.jupiter.api.Test;
 
 class DifferentialDriveVoltageConstraintTest {
-  @SuppressWarnings("LocalVariableName")
   @Test
   void testDifferentialDriveVoltageConstraint() {
     // Pick an unreasonably large kA to ensure the constraint has to do some work
