@@ -78,7 +78,7 @@ add_library(imgui STATIC
 )
 target_compile_definitions(imgui PUBLIC IMGUI_IMPL_OPENGL_LOADER_GL3W)
 if (MSVC)
-    target_sources(imgui PRIVATE ${imgui_SOURCE_DIR}/backends/imgui_impl_dx11.cpp)
+    target_sources(imgui PRIVATE ${imgui_SOURCE_DIR}/backends/imgui_impl_dx12.cpp)
 else()
     if (APPLE)
         target_compile_options(imgui PRIVATE -fobjc-arc)

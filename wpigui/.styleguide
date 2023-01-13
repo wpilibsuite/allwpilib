@@ -18,7 +18,7 @@ repoRootNameOverride {
 includeGuardRoots {
   wpigui/src/main/native/cpp/
   wpigui/src/main/native/include/
-  wpigui/src/main/native/directx11/
+  wpigui/src/main/native/directx12/
   wpigui/src/main/native/metal/
   wpigui/src/main/native/opengl3/
 }

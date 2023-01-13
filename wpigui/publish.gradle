@@ -18,7 +18,7 @@ task cppSourcesZip(type: Zip) {
     from('src/main/native/cpp') {
         into '/'
     }
-    from('src/main/native/directx11') {
+    from('src/main/native/directx12') {
         into '/'
     }
     from('src/main/native/metal') {

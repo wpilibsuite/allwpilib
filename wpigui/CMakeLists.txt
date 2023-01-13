@@ -4,7 +4,7 @@ include(CompileWarnings)
 include(LinkMacOSGUI)
 
 file(GLOB wpigui_src src/main/native/cpp/*.cpp)
-file(GLOB wpigui_windows_src src/main/native/directx11/*.cpp)
+file(GLOB wpigui_windows_src src/main/native/directx12/*.cpp)
 file(GLOB wpigui_mac_src src/main/native/metal/*.mm)
 file(GLOB wpigui_unix_src src/main/native/opengl3/*.cpp)
 

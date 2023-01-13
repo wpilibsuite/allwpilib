@@ -37,7 +37,7 @@ if (!project.hasProperty('onlylinuxathena')) {
                     return
                 }
                 if (it.targetPlatform.operatingSystem.isWindows()) {
-                    it.linker.args << 'Gdi32.lib' << 'Shell32.lib' << 'd3d11.lib' << 'd3dcompiler.lib'
+                    it.linker.args << 'Gdi32.lib' << 'Shell32.lib' << 'd3d12.lib' << 'd3dcompiler.lib'
                 } else if (it.targetPlatform.operatingSystem.isMacOsX()) {
                     it.linker.args << '-framework' << 'Metal' << '-framework' << 'MetalKit' << '-framework' << 'Cocoa' << '-framework' << 'IOKit' << '-framework' << 'CoreFoundation' << '-framework' << 'CoreVideo' << '-framework' << 'QuartzCore'
                 } else {
