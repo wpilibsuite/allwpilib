@@ -47,7 +47,7 @@ static bool CreateDeviceD3D(HWND hWnd) {
   sd.BufferCount = 2;
   sd.BufferDesc.Width = 0;
   sd.BufferDesc.Height = 0;
-  sd.BufferDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;S
+  sd.BufferDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
   sd.BufferDesc.RefreshRate.Numerator = 60;
   sd.BufferDesc.RefreshRate.Denominator = 1;
   sd.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH;
