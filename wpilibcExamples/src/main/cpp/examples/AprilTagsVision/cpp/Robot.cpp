@@ -25,6 +25,9 @@
  * This is a demo program showing the detection of AprilTags.
  * The image is acquired from the USB camera, then any detected AprilTags
  * are marked up on the image and sent to the dashboard.
+ *
+ * Be aware that the performance on this is much worse than a coprocessor
+ * solution!
  */
 class Robot : public frc::TimedRobot {
 #if defined(__linux__) || defined(_WIN32)
@@ -43,8 +46,7 @@ class Robot : public frc::TimedRobot {
         .fy = 677.7161226393544,
         .cx = 345.6059345433618,
         .cy = 207.12741326228522};
-    frc::AprilTagPoseEstimator estimator =
-        frc::AprilTagPoseEstimator(poseEstConfig);
+    frc::AprilTagPoseEstimator estimator(poseEstConfig);
 
     // Get the USB camera from CameraServer
     cs::UsbCamera camera = frc::CameraServer::StartAutomaticCapture();
@@ -63,13 +65,12 @@ class Robot : public frc::TimedRobot {
 
     // Instantiate once
     std::vector<int> tags;
-    cv::Scalar outlineColor = cv::Scalar(0, 255, 0);
-    cv::Scalar crossColor = cv::Scalar(0, 0, 255);
+    cv::Scalar outlineColor{0, 255, 0};
+    cv::Scalar crossColor{0, 0, 255};
 
     while (true) {
       // Tell the CvSink to grab a frame from the camera and
-      // put it
-      // in the source mat.  If there is an error notify the
+      // put it in the source mat.  If there is an error notify the
       // output.
       if (cvSink.GrabFrame(mat) == 0) {
         // Send the output the error.
@@ -118,14 +119,19 @@ class Robot : public frc::TimedRobot {
 
         // put pose into dashbaord
         std::stringstream dashboardString;
-        dashboardString << "Translation: " << units::length::to_string(pose.X())
-                        << ", " << units::length::to_string(pose.Y()) << ", "
-                        << units::length::to_string(pose.Z());
+        dashboardString << "Translation: ";
+        dashboardString << units::length::to_string(pose.X());
+        dashboardString << ", ";
+        dashboardString << units::length::to_string(pose.Y());
+        dashboardString << ", ";
+        dashboardString << units::length::to_string(pose.Z());
         frc::Rotation3d rotation = pose.Rotation();
-        dashboardString << "; Rotation: "
-                        << units::angle::to_string(rotation.X()) << ", "
-                        << units::angle::to_string(rotation.Y()) << ", "
-                        << units::angle::to_string(rotation.Z());
+        dashboardString << "; Rotation: ";
+        dashboardString << units::angle::to_string(rotation.X());
+        dashboardString << ", ";
+        dashboardString << units::angle::to_string(rotation.Y());
+        dashboardString << ", ";
+        dashboardString << units::angle::to_string(rotation.Z());
         frc::SmartDashboard::PutString(
             "pose_" + std::to_string(detection->GetId()),
             dashboardString.str());

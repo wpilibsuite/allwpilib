@@ -260,13 +260,13 @@
     "commandversion": 2
   },
   {
-    "name": "AprilTags Detection",
+    "name": "AprilTags Vision",
     "description": "on-roboRIO detection of AprilTags using an attached USB camera.",
     "tags": [
       "Vision",
 	  "AprilTags"
     ],
-    "foldername": "AprilTagsDetection",
+    "foldername": "AprilTagsVision",
     "gradlebase": "cpp",
     "commandversion": 2
   },
