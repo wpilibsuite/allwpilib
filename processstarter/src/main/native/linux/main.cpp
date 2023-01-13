@@ -58,8 +58,6 @@ int main(int argc, char* argv[]) {
   ToRun += JarPath;
   ToRun += "\"";
 
-  printf("%s\n%s\n%s\n%s\n%s\n", exePath.c_str(), JarPath.c_str(), ParentPath.c_str(), ToolsFolder.c_str(), Java.c_str());
-
   pid = 0;
   std::string data = JarPath;
   std::string jarArg = "-jar";
@@ -72,7 +70,7 @@ int main(int argc, char* argv[]) {
     if (home != nullptr) {
       std::filesystem::path javaHomePath{home};
       javaHomePath /= "bin";
-      javaHomePath /= "javaw.exe";
+      javaHomePath /= "java";
       javaLocal = javaHomePath;
     }
 
