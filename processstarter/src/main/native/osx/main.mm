@@ -28,22 +28,22 @@ int main(int argc, char* argv[]) {
     return 1;
   }
 
-  std::filesystem::path JarPath{exePath};
-  JarPath.replace_extension("jar");
-  std::filesystem::path ParentPath{exePath.parent_path()};
+  std::filesystem::path jarPath{exePath};
+  jarPath.replace_extension("jar");
+  std::filesystem::path parentPath{exePath.parent_path()};
 
-  if (!ParentPath.has_parent_path()) {
+  if (!parentPath.has_parent_path()) {
     return 1;
   }
-  std::filesystem::path ToolsFolder{ParentPath.parent_path()};
+  std::filesystem::path toolsFolder{parentPath.parent_path()};
 
-  std::filesystem::path Java = ToolsFolder / "jdk" / "bin" / "java";
+  std::filesystem::path java = toolsFolder / "jdk" / "bin" / "java";
 
   NSArray<NSString*>* Arguments =
-      @[ @"-jar", [NSString stringWithFormat:@"%s", JarPath.c_str()] ];
+      @[ @"-jar", [NSString stringWithFormat:@"%s", jarPath.c_str()] ];
 
   NSTask* task = [[NSTask alloc] init];
-  task.launchPath = [NSString stringWithFormat:@"%s", Java.c_str()];
+  task.launchPath = [NSString stringWithFormat:@"%s", java.c_str()];
   task.arguments = Arguments;
   task.terminationHandler = ^(NSTask* t) {
     (void)t;

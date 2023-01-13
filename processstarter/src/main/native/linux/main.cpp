@@ -41,19 +41,19 @@ int main(int argc, char* argv[]) {
     return 1;
   }
 
-  std::filesystem::path JarPath{exePath};
-  JarPath.replace_extension("jar");
-  std::filesystem::path ParentPath{exePath.parent_path()};
+  std::filesystem::path jarPath{exePath};
+  jarPath.replace_extension("jar");
+  std::filesystem::path parentPath{exePath.parent_path()};
 
-  if (!ParentPath.has_parent_path()) {
+  if (!parentPath.has_parent_path()) {
     return 1;
   }
-  std::filesystem::path ToolsFolder{ParentPath.parent_path()};
+  std::filesystem::path toolsFolder{parentPath.parent_path()};
 
-  std::filesystem::path Java = ToolsFolder / "jdk" / "bin" / "java";
+  std::filesystem::path Java = toolsFolder / "jdk" / "bin" / "java";
 
   pid = 0;
-  std::string data = JarPath;
+  std::string data = jarPath;
   std::string jarArg = "-jar";
   char* const arguments[] = {jarArg.data(), data.data(), nullptr};
 
