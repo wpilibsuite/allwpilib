@@ -5,6 +5,7 @@
 package edu.wpi.first.wpilibj.examples.elevatorsimulation;
 
 import edu.wpi.first.math.VecBuilder;
+import edu.wpi.first.math.controller.ElevatorFeedforward;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.util.Units;
@@ -29,9 +30,15 @@ public class Robot extends TimedRobot {
   private static final int kEncoderBChannel = 1;
   private static final int kJoystickPort = 0;
 
-  private static final double kElevatorKp = 10.0;
-  private static final double kElevatorKi = 4.0;
-  private static final double kElevatorKd = 0.1;
+  private static final double kElevatorKp = 5.0;
+  private static final double kElevatorKi = 0.0;
+  private static final double kElevatorKd = 0.0;
+
+  private static final double kElevatorkS =0.0;
+  private static final double kElevatorkG =0.0;
+  private static final double kElevatorkV =0.762;
+  private static final double kElevatorkA =0.762;
+  
   private static final double kElevatorGearing = 10.0;
   private static final double kElevatorDrumRadius = Units.inchesToMeters(2.0);
   private static final double kCarriageMass = 4.0; // kg
@@ -48,6 +55,7 @@ public class Robot extends TimedRobot {
 
   // Standard classes for controlling our elevator
   private final PIDController m_controller = new PIDController(kElevatorKp, kElevatorKi, kElevatorKd);
+  ElevatorFeedforward feedforward = new ElevatorFeedforward(kElevatorkS, kElevatorkG, kElevatorkV, kElevatorkA);
   private final Encoder m_encoder = new Encoder(kEncoderAChannel, kEncoderBChannel);
   private final PWMSparkMax m_motor = new PWMSparkMax(kMotorPort);
   private final Joystick m_joystick = new Joystick(kJoystickPort);
@@ -104,16 +112,23 @@ public class Robot extends TimedRobot {
 
   @Override
   public void teleopPeriodic() {
+
+    SmartDashboard.putNumber("setpoint", 30);
+    SmartDashboard.putNumber("target", Units.metersToInches(m_encoder.getDistance()));
+
     if (m_joystick.getTrigger()) {
       // Here, we run PID control like normal, with a constant setpoint of 30in.
       double pidOutput = m_controller.calculate(m_encoder.getDistance(), Units.inchesToMeters(30));
-      m_motor.setVoltage(pidOutput);
+      double feedForwardOutput = feedforward.calculate(1); // velocity
+      m_motor.setVoltage(pidOutput + feedForwardOutput);
+      System.out.println(pidOutput + feedForwardOutput);
     } else {
       // Otherwise, we disable the motor.
       m_motor.set(0.0);
     }
   }
   // To view the Elevator Sim in the simulator, select Network Tables -> SmartDashboard -> Elevator Sim
+  // Press Z to move the elevator on keyboard
 
   @Override
   public void disabledInit() {
