@@ -2,29 +2,29 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
+#include <poll.h>
+#include <spawn.h>
 #include <sys/syscall.h>
 #include <sys/types.h>
 #include <unistd.h>
-#include <limits.h>
-#include <stdio.h>
-#include <string.h>
-#include <poll.h>
 
+#include <climits>
+#include <cstdio>
+#include <cstring>
 #include <filesystem>
-#include <spawn.h>
 
 int main(int argc, char* argv[]) {
   char path[PATH_MAX];
   char dest[PATH_MAX];
-  memset(dest, 0, sizeof(dest));  // readlink does not null terminate!
+  std::memset(dest, 0, sizeof(dest));  // readlink does not null terminate!
   pid_t pid = getpid();
-  sprintf(path, "/proc/%d/exe", pid);
+  std::snprintf(path, PATH_MAX, "/proc/%d/exe", pid);
   int readlink_len = readlink(path, dest, PATH_MAX);
   if (readlink_len < 0) {
-    perror("readlink");
+    std::perror("readlink");
     return 1;
   } else if (readlink_len == PATH_MAX) {
-    printf("Truncation occured\n");
+    std::printf("Truncation occured\n");
     return 1;
   }
 
@@ -60,7 +60,7 @@ int main(int argc, char* argv[]) {
   int status =
       posix_spawn(&pid, Java.c_str(), nullptr, nullptr, arguments, environ);
   if (status != 0) {
-    char* home = getenv("JAVA_HOME");
+    char* home = std::getenv("JAVA_HOME");
     std::string javaLocal = "java";
     if (home != nullptr) {
       std::filesystem::path javaHomePath{home};
