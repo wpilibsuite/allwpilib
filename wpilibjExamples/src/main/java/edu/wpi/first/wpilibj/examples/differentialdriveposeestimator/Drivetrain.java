@@ -40,7 +40,8 @@ import java.nio.file.Paths;
 import java.nio.file.Path;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj.RobotController; 
+import edu.wpi.first.wpilibj.RobotController;
+import edu.wpi.first.apriltag.AprilTagFields;
 
 /** Represents a differential drive style drivetrain. */
 public class Drivetrain {
@@ -134,7 +135,7 @@ public class Drivetrain {
     m_cameraToObjectEntry = cameraToObjectTopic.getEntry(m_defaultVal);
 
     try {
-      m_aprilTagFieldLayout = new AprilTagFieldLayout(Paths.get("/Users/bowdenwoolsey/WPIlib/allwpilib/wpilibjExamples/src/main/java/edu/wpi/first/wpilibj/examples/differentialdriveposeestimator/2022-rapidreact.json"));
+      m_aprilTagFieldLayout = AprilTagFieldLayout.loadFromResource(AprilTagFields.k2022RapidReact.m_resourceFile); 
       m_objectInField = m_aprilTagFieldLayout.getTagPose(0).get();
 
     } catch (IOException e) {
