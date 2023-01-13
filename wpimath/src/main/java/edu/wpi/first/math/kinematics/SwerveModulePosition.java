@@ -32,14 +32,15 @@ public class SwerveModulePosition implements Comparable<SwerveModulePosition> {
   @Override
   public boolean equals(Object obj) {
     if (obj instanceof SwerveModulePosition) {
-      return Double.compare(distanceMeters, ((SwerveModulePosition) obj).distanceMeters) == 0;
+      SwerveModulePosition other = (SwerveModulePosition) obj;
+      return Math.abs(other.distanceMeters - distanceMeters) < 1E-9 && angle.equals(other.angle);
     }
     return false;
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(distanceMeters);
+    return Objects.hash(distanceMeters, angle);
   }
 
   /**

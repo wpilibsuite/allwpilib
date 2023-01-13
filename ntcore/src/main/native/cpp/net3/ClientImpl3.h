@@ -38,7 +38,7 @@ class ClientImpl3 {
   void ProcessIncoming(std::span<const uint8_t> data);
   void HandleLocal(std::span<const net::ClientMessage> msgs);
 
-  void SendPeriodic(uint64_t curTimeMs);
+  void SendPeriodic(uint64_t curTimeMs, bool flush);
 
   void SetLocal(net::LocalInterface* local);
 

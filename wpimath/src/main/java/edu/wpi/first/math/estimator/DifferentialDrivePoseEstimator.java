@@ -212,7 +212,16 @@ public class DifferentialDrivePoseEstimator {
         sample.get().rightMeters,
         sample.get().poseMeters.exp(scaledTwist));
 
-    // Step 6: Replay odometry inputs between sample time and latest recorded sample to update the
+    // Step 6: Record the current pose to allow multiple measurements from the same timestamp
+    m_poseBuffer.addSample(
+        timestampSeconds,
+        new InterpolationRecord(
+            getEstimatedPosition(),
+            sample.get().gyroAngle,
+            sample.get().leftMeters,
+            sample.get().rightMeters));
+
+    // Step 7: Replay odometry inputs between sample time and latest recorded sample to update the
     // pose buffer and correct odometry.
     for (Map.Entry<Double, InterpolationRecord> entry :
         m_poseBuffer.getInternalBuffer().tailMap(timestampSeconds).entrySet()) {
