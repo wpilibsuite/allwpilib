@@ -4,12 +4,7 @@
 
 #include <poll.h>
 #include <spawn.h>
-
-#if __has_include(<sys/pidfd.h>)
-#include <sys/pidfd.h>
-#else
 #include <sys/syscall.h>
-#endif
 #include <sys/types.h>
 #include <unistd.h>
 
@@ -81,11 +76,7 @@ int main(int argc, char* argv[]) {
     }
   }
 
-#if __has_include(<sys/pidfd.h>)
-  int childPid = pidfd_open(pid, 0);
-#else
   int childPid = syscall(SYS_pidfd_open, pid, 0);
-#endif
   if (childPid <= 0) {
     return 1;
   }
