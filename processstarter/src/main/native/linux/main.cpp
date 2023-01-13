@@ -26,8 +26,6 @@ int main(int argc, char* argv[]) {
   } else if (readlink_len == PATH_MAX) {
     printf("Truncation occured\n");
     return 1;
-  } else {
-    printf("%s\n", dest);
   }
 
   std::filesystem::path exePath{dest};
@@ -53,10 +51,6 @@ int main(int argc, char* argv[]) {
   std::filesystem::path ToolsFolder{ParentPath.parent_path()};
 
   std::filesystem::path Java = ToolsFolder / "jdk" / "bin" / "java";
-
-  std::string ToRun = "-jar \"";
-  ToRun += JarPath;
-  ToRun += "\"";
 
   pid = 0;
   std::string data = JarPath;

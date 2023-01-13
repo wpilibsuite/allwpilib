@@ -39,10 +39,6 @@ int main(int argc, char* argv[]) {
 
   std::filesystem::path Java = ToolsFolder / "jdk" / "bin" / "java";
 
-  std::string ToRun = "-jar \"";
-  ToRun += JarPath;
-  ToRun += "\"";
-
   NSArray<NSString*>* Arguments =
       @[ @"-jar", [NSString stringWithFormat:@"%s", JarPath.c_str()] ];
 
