@@ -10,6 +10,7 @@
 #include <frc/StateSpaceUtil.h>
 #include <frc/TimedRobot.h>
 #include <frc/controller/PIDController.h>
+#include <frc/controller/ElevatorFeedforward.h>
 #include <frc/motorcontrol/PWMSparkMax.h>
 #include <frc/simulation/BatterySim.h>
 #include <frc/simulation/ElevatorSim.h>
@@ -36,9 +37,15 @@ class Robot : public frc::TimedRobot {
   static constexpr int kEncoderBChannel = 1;
   static constexpr int kJoystickPort = 0;
 
-  static constexpr double kElevatorKp = 10.0;
-  static constexpr double kElevatorKi = 4.0;
-  static constexpr double kElevatorKd = 0.1;
+  static constexpr double kElevatorKp = 5.0;
+  static constexpr double kElevatorKi = 0.0;
+  static constexpr double kElevatorKd = 0.0;
+
+  static constexpr double kElevatorkS = 0.0;
+  static constexpr double kElevatorkG = 0.0;
+  static constexpr double kElevatorkV = 0.762;
+  static constexpr double kElevatorkA = 0.762;
+
   static constexpr double kElevatorGearing = 10.0;
   static constexpr units::meter_t kElevatorDrumRadius = 2_in;
   static constexpr units::kilogram_t kCarriageMass = 4.0_kg;
@@ -56,6 +63,7 @@ class Robot : public frc::TimedRobot {
 
   // Standard classes for controlling our elevator
   frc2::PIDController m_controller{kElevatorKp, kElevatorKi, kElevatorKd};
+  frc::ElevatorFeedforward<units::meters> feedforward(kElevatorkS, kElevatorkG, kElevatorkV, kElevatorkA);
   frc::Encoder m_encoder{kEncoderAChannel, kEncoderBChannel};
   frc::PWMSparkMax m_motor{kMotorPort};
   frc::Joystick m_joystick{kJoystickPort};
@@ -116,13 +124,15 @@ class Robot : public frc::TimedRobot {
       // Here, we run PID control like normal, with a constant setpoint of 30in.
       double pidOutput = m_controller.Calculate(m_encoder.GetDistance(),
                                                 units::meter_t{30_in}.value());
-      m_motor.SetVoltage(units::volt_t{pidOutput});
+      double feedForwardOutput = feedforward.Calculate(1) // velocity
+      m_motor.SetVoltage(units::volt_t{pidOutput + feedForwardOutput});
     } else {
       // Otherwise, we disable the motor.
       m_motor.Set(0.0);
     }
   }
   // To view the Elevator Sim in the simulator, select Network Tables -> SmartDashboard -> Elevator Sim
+  // Press Z to move the elevator on keyboard
 
   void DisabledInit() override {
     // This just makes sure that our simulation code knows that the motor's off.

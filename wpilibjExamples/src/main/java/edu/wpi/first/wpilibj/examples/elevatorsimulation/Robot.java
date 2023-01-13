@@ -34,10 +34,10 @@ public class Robot extends TimedRobot {
   private static final double kElevatorKi = 0.0;
   private static final double kElevatorKd = 0.0;
 
-  private static final double kElevatorkS =0.0;
-  private static final double kElevatorkG =0.0;
-  private static final double kElevatorkV =0.762;
-  private static final double kElevatorkA =0.762;
+  private static final double kElevatorkS = 0.0;
+  private static final double kElevatorkG = 0.0;
+  private static final double kElevatorkV = 0.762;
+  private static final double kElevatorkA = 0.762;
   
   private static final double kElevatorGearing = 10.0;
   private static final double kElevatorDrumRadius = Units.inchesToMeters(2.0);
