@@ -25,7 +25,7 @@ import org.opencv.imgproc.Imgproc;
  * The image is acquired from the USB camera, then any detected AprilTags
  * are marked up on the image and sent to the dashboard.
  *
- * Be aware that the performance on this is much worse than a coprocessor
+ * <p>Be aware that the performance on this is much worse than a coprocessor
  * solution!
  */
 public class Robot extends TimedRobot {
