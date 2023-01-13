@@ -57,7 +57,8 @@ int main(int argc, char* argv[]) {
   std::string jarArg = "-jar";
   char* const arguments[] = {jarArg.data(), data.data(), nullptr};
 
-  int status = posix_spawn(&pid, Java.c_str(), nullptr, nullptr, arguments, environ);
+  int status =
+      posix_spawn(&pid, Java.c_str(), nullptr, nullptr, arguments, environ);
   if (status != 0) {
     char* home = getenv("JAVA_HOME");
     std::string javaLocal = "java";
@@ -68,7 +69,8 @@ int main(int argc, char* argv[]) {
       javaLocal = javaHomePath;
     }
 
-    status = posix_spawn(&pid, javaLocal.c_str(), nullptr, nullptr, arguments, environ);
+    status = posix_spawn(&pid, javaLocal.c_str(), nullptr, nullptr, arguments,
+                         environ);
     if (status != 0) {
       return 1;
     }
