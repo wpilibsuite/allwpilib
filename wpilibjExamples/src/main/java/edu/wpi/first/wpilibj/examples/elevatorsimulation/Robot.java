@@ -113,8 +113,6 @@ public class Robot extends TimedRobot {
   @Override
   public void teleopPeriodic() {
 
-    SmartDashboard.putNumber("setpoint", 30);
-    SmartDashboard.putNumber("target", Units.metersToInches(m_encoder.getDistance()));
 
     if (m_joystick.getTrigger()) {
       // Here, we run PID control like normal, with a constant setpoint of 30in.
