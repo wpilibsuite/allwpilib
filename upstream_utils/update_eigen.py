@@ -67,14 +67,10 @@ def eigen_inclusions(dp, f):
         "SparseCore",
         "SparseLU",
         "SparseQR",
-        "StlSupport",
         "misc",
         "plugins",
     ]
-    modules_rgx = r"|".join("/" + m for m in modules)
-
-    # "Std" matches StdDeque, StdList, and StdVector headers. Other modules are excluded.
-    return bool(re.search(modules_rgx, abspath) or "Std" in f)
+    return bool(re.search(r"|".join("/" + m for m in modules), abspath))
 
 
 def unsupported_inclusions(dp, f):
