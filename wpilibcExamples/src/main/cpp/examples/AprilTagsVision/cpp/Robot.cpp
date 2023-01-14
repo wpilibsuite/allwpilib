@@ -9,12 +9,14 @@
 #include <thread>
 
 #include <cameraserver/CameraServer.h>
+#include <fmt/format.h>
 #include <frc/TimedRobot.h>
 #include <frc/apriltag/AprilTagDetection.h>
 #include <frc/apriltag/AprilTagDetector.h>
 #include <frc/apriltag/AprilTagPoseEstimator.h>
 #include <frc/geometry/Transform3d.h>
-#include <frc/smartdashboard/SmartDashboard.h>
+#include <networktables/IntegerArrayTopic.h>
+#include <networktables/NetworkTableInstance.h>
 #include <opencv2/core/core.hpp>
 #include <opencv2/core/types.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
@@ -64,9 +66,14 @@ class Robot : public frc::TimedRobot {
     cv::Mat grayMat;
 
     // Instantiate once
-    std::vector<int> tags;
+    std::vector<int64_t> tags;
     cv::Scalar outlineColor{0, 255, 0};
     cv::Scalar crossColor{0, 0, 255};
+
+    // We'll output to NT
+    auto tagsTable =
+        nt::NetworkTableInstance::GetDefault().GetTable("apriltags");
+    auto pubTags = tagsTable->GetIntegerArrayTopic("tags").Publish();
 
     while (true) {
       // Tell the CvSink to grab a frame from the camera and
@@ -117,36 +124,20 @@ class Robot : public frc::TimedRobot {
         // determine pose
         frc::Transform3d pose = estimator.Estimate(*detection);
 
-        // put pose into dashbaord
-        std::stringstream dashboardString;
-        dashboardString << "Translation: ";
-        dashboardString << units::length::to_string(pose.X());
-        dashboardString << ", ";
-        dashboardString << units::length::to_string(pose.Y());
-        dashboardString << ", ";
-        dashboardString << units::length::to_string(pose.Z());
+        // put pose into NT
         frc::Rotation3d rotation = pose.Rotation();
-        dashboardString << "; Rotation: ";
-        dashboardString << units::angle::to_string(rotation.X());
-        dashboardString << ", ";
-        dashboardString << units::angle::to_string(rotation.Y());
-        dashboardString << ", ";
-        dashboardString << units::angle::to_string(rotation.Z());
-        frc::SmartDashboard::PutString(
-            "pose_" + std::to_string(detection->GetId()),
-            dashboardString.str());
+        tagsTable->GetEntry(fmt::format("pose_{}", detection->GetId()))
+            .SetDoubleArray(
+                {{ pose.X().value(),
+                   pose.Y().value(),
+                   pose.Z().value(),
+                   rotation.X().value(),
+                   rotation.Y().value(),
+                   rotation.Z().value() }});
       }
 
-      // put list of tags onto dashboard
-      std::stringstream tags_s;
-      if (tags.size() > 0) {
-        if (tags.size() > 1) {
-          std::copy(tags.begin(), tags.end() - 1,
-                    std::ostream_iterator<int>(tags_s, ","));
-        }
-        tags_s << tags.back();
-      }
-      frc::SmartDashboard::PutString("tags", tags_s.str());
+      // put list of tags onto NT
+      pubTags.Set(tags);
 
       // Give the output stream a new image to display
       outputStream.PutFrame(mat);

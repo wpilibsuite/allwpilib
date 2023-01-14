@@ -11,9 +11,12 @@ import edu.wpi.first.cameraserver.CameraServer;
 import edu.wpi.first.cscore.CvSink;
 import edu.wpi.first.cscore.CvSource;
 import edu.wpi.first.cscore.UsbCamera;
+import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
+import edu.wpi.first.networktables.IntegerArrayPublisher;
+import edu.wpi.first.networktables.NetworkTable;
+import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.TimedRobot;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import java.util.ArrayList;
 import org.opencv.core.Mat;
 import org.opencv.core.Point;
@@ -61,9 +64,13 @@ public class Robot extends TimedRobot {
     var grayMat = new Mat();
 
     // Instantiate once
-    ArrayList<Integer> tags = new ArrayList<>();
+    ArrayList<Long> tags = new ArrayList<>();
     var outlineColor = new Scalar(0, 255, 0);
     var crossColor = new Scalar(0, 0, 255);
+
+    // We'll output to NT
+    NetworkTable tagsTable = NetworkTableInstance.getDefault().getTable("apriltags");
+    IntegerArrayPublisher pubTags = tagsTable.getIntegerArrayTopic("tags").publish();
 
     // This cannot be 'true'. The program will never exit if it is. This
     // lets the robot stop this thread when restarting robot code or
@@ -87,7 +94,7 @@ public class Robot extends TimedRobot {
 
       for (AprilTagDetection detection : detections) {
         // remember we saw this tag
-        tags.add(detection.getId());
+        tags.add((long) detection.getId());
 
         // draw lines around the tag
         for (var i = 0; i <= 3; i++) {
@@ -118,17 +125,23 @@ public class Robot extends TimedRobot {
         Transform3d pose = estimator.estimate(detection);
 
         // put pose into dashbaord
-        var dashboardString = pose.toString();
-        SmartDashboard.putString("pose_" + detection.getId(), dashboardString);
+        Rotation3d rot = pose.getRotation();
+        tagsTable
+            .getEntry("pose_" + detection.getId())
+            .setDoubleArray(
+                new double[] {
+                  pose.getX(), pose.getY(), pose.getZ(), rot.getX(), rot.getY(), rot.getZ()
+                });
       }
 
       // put list of tags onto dashboard
-      SmartDashboard.putString("tags", tags.toString());
+      pubTags.set(tags.stream().mapToLong(Long::longValue).toArray());
 
       // Give the output stream a new image to display
       outputStream.putFrame(mat);
     }
 
+    pubTags.close();
     detector.close();
   }
 }
