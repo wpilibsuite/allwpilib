@@ -9,14 +9,18 @@ import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.Nat;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Twist2d;
+import edu.wpi.first.math.geometry.Twist3d;
 import edu.wpi.first.math.interpolation.Interpolatable;
 import edu.wpi.first.math.interpolation.TimeInterpolatableBuffer;
 import edu.wpi.first.math.kinematics.DifferentialDriveKinematics;
 import edu.wpi.first.math.kinematics.DifferentialDriveOdometry;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
+import edu.wpi.first.math.numbers.N6;
 import edu.wpi.first.util.WPIUtilJNI;
 import java.util.Map;
 import java.util.Objects;
@@ -37,13 +41,43 @@ import java.util.Objects;
 public class DifferentialDrivePoseEstimator {
   private final DifferentialDriveKinematics m_kinematics;
   private final DifferentialDriveOdometry m_odometry;
-  private final Matrix<N3, N1> m_q = new Matrix<>(Nat.N3(), Nat.N1());
-  private Matrix<N3, N3> m_visionK = new Matrix<>(Nat.N3(), Nat.N3());
+  private final Matrix<N6, N1> m_q = new Matrix<>(Nat.N6(), Nat.N1());
+  private Matrix<N6, N6> m_visionK = new Matrix<>(Nat.N6(), Nat.N6());
 
   private static final double kBufferDuration = 1.5;
 
   private final TimeInterpolatableBuffer<InterpolationRecord> m_poseBuffer =
       TimeInterpolatableBuffer.createBuffer(kBufferDuration);
+
+  /**
+   * Constructs a DifferentialDrivePoseEstimator with default standard deviations for the model and
+   * vision measurements.
+   *
+   * <p>The default standard deviations of the model states are 0.02 meters for x, 0.02 meters for
+   * y, and 0.01 radians for heading. The default standard deviations of the vision measurements are
+   * 0.1 meters for x, 0.1 meters for y, and 0.1 radians for heading.
+   *
+   * @param kinematics A correctly-configured kinematics object for your drivetrain.
+   * @param gyroAngle The current gyro angle.
+   * @param leftDistanceMeters The distance traveled by the left encoder.
+   * @param rightDistanceMeters The distance traveled by the right encoder.
+   * @param initialPoseMeters The starting pose estimate.
+   */
+  public DifferentialDrivePoseEstimator(
+      DifferentialDriveKinematics kinematics,
+      Rotation3d gyroAngle,
+      double leftDistanceMeters,
+      double rightDistanceMeters,
+      Pose3d initialPoseMeters) {
+    this(
+        kinematics,
+        gyroAngle,
+        leftDistanceMeters,
+        rightDistanceMeters,
+        initialPoseMeters,
+        VecBuilder.fill(0.02, 0.02, 0.02, 0.01, 0.01, 0.01),
+        VecBuilder.fill(0.1, 0.1, 0.1, 0.1, 0.1, 0.1));
+  }
 
   /**
    * Constructs a DifferentialDrivePoseEstimator with default standard deviations for the model and
@@ -92,12 +126,12 @@ public class DifferentialDrivePoseEstimator {
    */
   public DifferentialDrivePoseEstimator(
       DifferentialDriveKinematics kinematics,
-      Rotation2d gyroAngle,
+      Rotation3d gyroAngle,
       double leftDistanceMeters,
       double rightDistanceMeters,
-      Pose2d initialPoseMeters,
-      Matrix<N3, N1> stateStdDevs,
-      Matrix<N3, N1> visionMeasurementStdDevs) {
+      Pose3d initialPoseMeters,
+      Matrix<N6, N1> stateStdDevs,
+      Matrix<N6, N1> visionMeasurementStdDevs) {
     m_kinematics = kinematics;
     m_odometry =
         new DifferentialDriveOdometry(
@@ -108,7 +142,47 @@ public class DifferentialDrivePoseEstimator {
     }
 
     // Initialize vision R
-    setVisionMeasurementStdDevs(visionMeasurementStdDevs);
+    setVisionMeasurementStdDevs3d(visionMeasurementStdDevs);
+  }
+
+  /**
+   * Constructs a DifferentialDrivePoseEstimator.
+   *
+   * @param kinematics A correctly-configured kinematics object for your drivetrain.
+   * @param gyroAngle The gyro angle of the robot.
+   * @param leftDistanceMeters The distance traveled by the left encoder.
+   * @param rightDistanceMeters The distance traveled by the right encoder.
+   * @param initialPoseMeters The estimated initial pose.
+   * @param stateStdDevs Standard deviations of the pose estimate (x position in meters, y position
+   *     in meters, and heading in radians). Increase these numbers to trust your state estimate
+   *     less.
+   * @param visionMeasurementStdDevs Standard deviations of the vision pose measurement (x position
+   *     in meters, y position in meters, and heading in radians). Increase these numbers to trust
+   *     the vision pose measurement less.
+   */
+  public DifferentialDrivePoseEstimator(
+      DifferentialDriveKinematics kinematics,
+      Rotation2d gyroAngle,
+      double leftDistanceMeters,
+      double rightDistanceMeters,
+      Pose2d initialPoseMeters,
+      Matrix<N3, N1> stateStdDevs,
+      Matrix<N3, N1> visionMeasurementStdDevs) {
+    this(
+        kinematics,
+        new Rotation3d(0, 0, gyroAngle.getRadians()),
+        leftDistanceMeters,
+        rightDistanceMeters,
+        new Pose3d(initialPoseMeters),
+        VecBuilder.fill(
+            stateStdDevs.get(0, 0), stateStdDevs.get(1, 0), 0, 0, 0, stateStdDevs.get(2, 0)),
+        VecBuilder.fill(
+            visionMeasurementStdDevs.get(0, 0),
+            visionMeasurementStdDevs.get(1, 0),
+            0,
+            0,
+            0,
+            visionMeasurementStdDevs.get(2, 0)));
   }
 
   /**
@@ -121,14 +195,34 @@ public class DifferentialDrivePoseEstimator {
    *     theta]ᵀ, with units in meters and radians.
    */
   public void setVisionMeasurementStdDevs(Matrix<N3, N1> visionMeasurementStdDevs) {
-    var r = new double[3];
-    for (int i = 0; i < 3; ++i) {
+    setVisionMeasurementStdDevs3d(
+        VecBuilder.fill(
+            visionMeasurementStdDevs.get(0, 0),
+            visionMeasurementStdDevs.get(1, 0),
+            0,
+            0,
+            0,
+            visionMeasurementStdDevs.get(2, 0)));
+  }
+
+  /**
+   * Sets the pose estimator's trust of global measurements. This might be used to change trust in
+   * vision measurements after the autonomous period, or to change trust as distance to a vision
+   * target increases.
+   *
+   * @param visionMeasurementStdDevs Standard deviations of the vision measurements. Increase these
+   *     numbers to trust global measurements from vision less. This matrix is in the form [x, y,
+   *     theta]ᵀ, with units in meters and radians.
+   */
+  public void setVisionMeasurementStdDevs3d(Matrix<N6, N1> visionMeasurementStdDevs) {
+    var r = new double[6];
+    for (int i = 0; i < 6; ++i) {
       r[i] = visionMeasurementStdDevs.get(i, 0) * visionMeasurementStdDevs.get(i, 0);
     }
 
     // Solve for closed form Kalman gain for continuous Kalman filter with A = 0
     // and C = I. See wpimath/algorithms.md.
-    for (int row = 0; row < 3; ++row) {
+    for (int row = 0; row < 6; ++row) {
       if (m_q.get(row, 0) == 0.0) {
         m_visionK.set(row, row, 0.0);
       } else {
@@ -150,13 +244,36 @@ public class DifferentialDrivePoseEstimator {
    * @param poseMeters The position on the field that your robot is at.
    */
   public void resetPosition(
+      Rotation3d gyroAngle,
+      double leftPositionMeters,
+      double rightPositionMeters,
+      Pose3d poseMeters) {
+    // Reset state estimate and error covariance
+    m_odometry.resetPosition(gyroAngle, leftPositionMeters, rightPositionMeters, poseMeters);
+    m_poseBuffer.clear();
+  }
+
+  /**
+   * Resets the robot's position on the field.
+   *
+   * <p>The gyroscope angle does not need to be reset here on the user's robot code. The library
+   * automatically takes care of offsetting the gyro angle.
+   *
+   * @param gyroAngle The angle reported by the gyroscope.
+   * @param leftPositionMeters The distance traveled by the left encoder.
+   * @param rightPositionMeters The distance traveled by the right encoder.
+   * @param poseMeters The position on the field that your robot is at.
+   */
+  public void resetPosition(
       Rotation2d gyroAngle,
       double leftPositionMeters,
       double rightPositionMeters,
       Pose2d poseMeters) {
-    // Reset state estimate and error covariance
-    m_odometry.resetPosition(gyroAngle, leftPositionMeters, rightPositionMeters, poseMeters);
-    m_poseBuffer.clear();
+    resetPosition(
+        new Rotation3d(0, 0, gyroAngle.getRadians()),
+        leftPositionMeters,
+        rightPositionMeters,
+        new Pose3d(poseMeters));
   }
 
   /**
@@ -166,6 +283,15 @@ public class DifferentialDrivePoseEstimator {
    */
   public Pose2d getEstimatedPosition() {
     return m_odometry.getPoseMeters();
+  }
+
+  /**
+   * Gets the estimated robot pose.
+   *
+   * @return The estimated robot pose in meters.
+   */
+  public Pose3d getEstimatedPosition3d() {
+    return m_odometry.getPoseMeters3d();
   }
 
   /**
@@ -189,6 +315,30 @@ public class DifferentialDrivePoseEstimator {
    *     or sync the epochs.
    */
   public void addVisionMeasurement(Pose2d visionRobotPoseMeters, double timestampSeconds) {
+    addVisionMeasurement(new Pose3d(visionRobotPoseMeters), timestampSeconds);
+  }
+
+  /**
+   * Adds a vision measurement to the Kalman Filter. This will correct the odometry pose estimate
+   * while still accounting for measurement noise.
+   *
+   * <p>This method can be called as infrequently as you want, as long as you are calling {@link
+   * DifferentialDrivePoseEstimator#update} every loop.
+   *
+   * <p>To promote stability of the pose estimate and make it robust to bad vision data, we
+   * recommend only adding vision measurements that are already within one meter or so of the
+   * current pose estimate.
+   *
+   * @param visionRobotPoseMeters The pose of the robot as measured by the vision camera.
+   * @param timestampSeconds The timestamp of the vision measurement in seconds. Note that if you
+   *     don't use your own time source by calling {@link
+   *     DifferentialDrivePoseEstimator#updateWithTime(double,Rotation2d,double,double)} then you
+   *     must use a timestamp with an epoch since FPGA startup (i.e., the epoch of this timestamp is
+   *     the same epoch as {@link edu.wpi.first.wpilibj.Timer#getFPGATimestamp()}.) This means that
+   *     you should use {@link edu.wpi.first.wpilibj.Timer#getFPGATimestamp()} as your time source
+   *     or sync the epochs.
+   */
+  public void addVisionMeasurement(Pose3d visionRobotPoseMeters, double timestampSeconds) {
     // Step 0: If this measurement is old enough to be outside the pose buffer's timespan, skip.
     if (m_poseBuffer.getInternalBuffer().lastKey() - kBufferDuration > timestampSeconds) {
       return;
@@ -206,11 +356,19 @@ public class DifferentialDrivePoseEstimator {
 
     // Step 3: We should not trust the twist entirely, so instead we scale this twist by a Kalman
     // gain matrix representing how much we trust vision measurements compared to our current pose.
-    var k_times_twist = m_visionK.times(VecBuilder.fill(twist.dx, twist.dy, twist.dtheta));
+    var k_times_twist =
+        m_visionK.times(
+            VecBuilder.fill(twist.dx, twist.dy, twist.dz, twist.rx, twist.ry, twist.rz));
 
     // Step 4: Convert back to Twist2d.
     var scaledTwist =
-        new Twist2d(k_times_twist.get(0, 0), k_times_twist.get(1, 0), k_times_twist.get(2, 0));
+        new Twist3d(
+            k_times_twist.get(0, 0),
+            k_times_twist.get(1, 0),
+            k_times_twist.get(2, 0),
+            k_times_twist.get(3, 0),
+            k_times_twist.get(4, 0),
+            k_times_twist.get(5, 0));
 
     // Step 5: Reset Odometry to state at sample with vision adjustment.
     m_odometry.resetPosition(
@@ -223,7 +381,7 @@ public class DifferentialDrivePoseEstimator {
     m_poseBuffer.addSample(
         timestampSeconds,
         new InterpolationRecord(
-            getEstimatedPosition(),
+            getEstimatedPosition3d(),
             sample.get().gyroAngle,
             sample.get().leftMeters,
             sample.get().rightMeters));
@@ -268,11 +426,46 @@ public class DifferentialDrivePoseEstimator {
    *     the vision pose measurement less.
    */
   public void addVisionMeasurement(
+      Pose3d visionRobotPoseMeters,
+      double timestampSeconds,
+      Matrix<N6, N1> visionMeasurementStdDevs) {
+    setVisionMeasurementStdDevs3d(visionMeasurementStdDevs);
+    addVisionMeasurement(visionRobotPoseMeters, timestampSeconds);
+  }
+
+  /**
+   * Adds a vision measurement to the Kalman Filter. This will correct the odometry pose estimate
+   * while still accounting for measurement noise.
+   *
+   * <p>This method can be called as infrequently as you want, as long as you are calling {@link
+   * DifferentialDrivePoseEstimator#update} every loop.
+   *
+   * <p>To promote stability of the pose estimate and make it robust to bad vision data, we
+   * recommend only adding vision measurements that are already within one meter or so of the
+   * current pose estimate.
+   *
+   * <p>Note that the vision measurement standard deviations passed into this method will continue
+   * to apply to future measurements until a subsequent call to {@link
+   * DifferentialDrivePoseEstimator#setVisionMeasurementStdDevs(Matrix)} or this method.
+   *
+   * @param visionRobotPoseMeters The pose of the robot as measured by the vision camera.
+   * @param timestampSeconds The timestamp of the vision measurement in seconds. Note that if you
+   *     don't use your own time source by calling {@link
+   *     DifferentialDrivePoseEstimator#updateWithTime(double,Rotation2d,double,double)}, then you
+   *     must use a timestamp with an epoch since FPGA startup (i.e., the epoch of this timestamp is
+   *     the same epoch as {@link edu.wpi.first.wpilibj.Timer#getFPGATimestamp()}). This means that
+   *     you should use {@link edu.wpi.first.wpilibj.Timer#getFPGATimestamp()} as your time source
+   *     in this case.
+   * @param visionMeasurementStdDevs Standard deviations of the vision pose measurement (x position
+   *     in meters, y position in meters, and heading in radians). Increase these numbers to trust
+   *     the vision pose measurement less.
+   */
+  public void addVisionMeasurement(
       Pose2d visionRobotPoseMeters,
       double timestampSeconds,
       Matrix<N3, N1> visionMeasurementStdDevs) {
     setVisionMeasurementStdDevs(visionMeasurementStdDevs);
-    addVisionMeasurement(visionRobotPoseMeters, timestampSeconds);
+    addVisionMeasurement(new Pose3d(visionRobotPoseMeters), timestampSeconds);
   }
 
   /**
@@ -286,6 +479,22 @@ public class DifferentialDrivePoseEstimator {
    */
   public Pose2d update(
       Rotation2d gyroAngle, double distanceLeftMeters, double distanceRightMeters) {
+    return update(
+            new Rotation3d(0, 0, gyroAngle.getRadians()), distanceLeftMeters, distanceRightMeters)
+        .toPose2d();
+  }
+
+  /**
+   * Updates the pose estimator with wheel encoder and gyro information. This should be called every
+   * loop.
+   *
+   * @param gyroAngle The current gyro angle.
+   * @param distanceLeftMeters The total distance travelled by the left wheel in meters.
+   * @param distanceRightMeters The total distance travelled by the right wheel in meters.
+   * @return The estimated pose of the robot in meters.
+   */
+  public Pose3d update(
+      Rotation3d gyroAngle, double distanceLeftMeters, double distanceRightMeters) {
     return updateWithTime(
         WPIUtilJNI.now() * 1.0e-6, gyroAngle, distanceLeftMeters, distanceRightMeters);
   }
@@ -305,13 +514,36 @@ public class DifferentialDrivePoseEstimator {
       Rotation2d gyroAngle,
       double distanceLeftMeters,
       double distanceRightMeters) {
+    return updateWithTime(
+            currentTimeSeconds,
+            new Rotation3d(0, 0, gyroAngle.getRadians()),
+            distanceLeftMeters,
+            distanceRightMeters)
+        .toPose2d();
+  }
+
+  /**
+   * Updates the pose estimator with wheel encoder and gyro information. This should be called every
+   * loop.
+   *
+   * @param currentTimeSeconds Time at which this method was called, in seconds.
+   * @param gyroAngle The current gyro angle.
+   * @param distanceLeftMeters The total distance travelled by the left wheel in meters.
+   * @param distanceRightMeters The total distance travelled by the right wheel in meters.
+   * @return The estimated pose of the robot in meters.
+   */
+  public Pose3d updateWithTime(
+      double currentTimeSeconds,
+      Rotation3d gyroAngle,
+      double distanceLeftMeters,
+      double distanceRightMeters) {
     m_odometry.update(gyroAngle, distanceLeftMeters, distanceRightMeters);
     m_poseBuffer.addSample(
         currentTimeSeconds,
         new InterpolationRecord(
-            getEstimatedPosition(), gyroAngle, distanceLeftMeters, distanceRightMeters));
+            getEstimatedPosition3d(), gyroAngle, distanceLeftMeters, distanceRightMeters));
 
-    return getEstimatedPosition();
+    return getEstimatedPosition3d();
   }
 
   /**
@@ -320,10 +552,10 @@ public class DifferentialDrivePoseEstimator {
    */
   private class InterpolationRecord implements Interpolatable<InterpolationRecord> {
     // The pose observed given the current sensor inputs and the previous pose.
-    private final Pose2d poseMeters;
+    private final Pose3d poseMeters;
 
     // The current gyro angle.
-    private final Rotation2d gyroAngle;
+    private final Rotation3d gyroAngle;
 
     // The distance traveled by the left encoder.
     private final double leftMeters;
@@ -340,7 +572,7 @@ public class DifferentialDrivePoseEstimator {
      * @param rightMeters The distanced traveled by the right encoder.
      */
     private InterpolationRecord(
-        Pose2d poseMeters, Rotation2d gyro, double leftMeters, double rightMeters) {
+        Pose3d poseMeters, Rotation3d gyro, double leftMeters, double rightMeters) {
       this.poseMeters = poseMeters;
       this.gyroAngle = gyro;
       this.leftMeters = leftMeters;
@@ -372,8 +604,15 @@ public class DifferentialDrivePoseEstimator {
         var gyro_lerp = gyroAngle.interpolate(endValue.gyroAngle, t);
 
         // Create a twist to represent this change based on the interpolated sensor inputs.
-        Twist2d twist = m_kinematics.toTwist2d(left_lerp - leftMeters, right_lerp - rightMeters);
-        twist.dtheta = gyro_lerp.minus(gyroAngle).getRadians();
+        Twist2d twist2d = m_kinematics.toTwist2d(left_lerp - leftMeters, right_lerp - rightMeters);
+        var twist =
+            new Twist3d(
+                twist2d.dx,
+                twist2d.dy,
+                0,
+                gyro_lerp.minus(gyroAngle).getX(),
+                gyro_lerp.minus(gyroAngle).getY(),
+                gyro_lerp.minus(gyroAngle).getZ());
 
         return new InterpolationRecord(poseMeters.exp(twist), gyro_lerp, left_lerp, right_lerp);
       }
