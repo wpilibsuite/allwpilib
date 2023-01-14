@@ -11,6 +11,7 @@ cppSrcFileInclude {
 includeOtherLibs {
   ^cameraserver/
   ^cscore
+  ^fmt/
   ^frc/
   ^frc2/
   ^hal/
