@@ -39,7 +39,7 @@ public class SwerveDriveKinematics {
 
   private final int m_numModules;
   private final Translation2d[] m_modules;
-  private final SwerveModuleState[] m_moduleStates;
+  private SwerveModuleState[] m_moduleStates;
   private Translation2d m_prevCoR = new Translation2d();
 
   /**
@@ -132,6 +132,7 @@ public class SwerveDriveKinematics {
 
     var moduleStatesMatrix = m_inverseKinematics.mult(chassisSpeedsVector);
 
+    m_moduleStates = new SwerveModuleState[m_numModules];
     for (int i = 0; i < m_numModules; i++) {
       double x = moduleStatesMatrix.get(i * 2, 0);
       double y = moduleStatesMatrix.get(i * 2 + 1, 0);
