@@ -7,7 +7,9 @@ package edu.wpi.first.wpilibj.examples.elevatorsimulation;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.controller.ElevatorFeedforward;
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.system.plant.DCMotor;
+import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.Joystick;
@@ -30,14 +32,14 @@ public class Robot extends TimedRobot {
   private static final int kEncoderBChannel = 1;
   private static final int kJoystickPort = 0;
 
-  private static final double kElevatorKp = 5.0;
-  private static final double kElevatorKi = 0.0;
-  private static final double kElevatorKd = 0.0;
+  private static final double kElevatorKp = 5;
+  private static final double kElevatorKi = 0;
+  private static final double kElevatorKd = 0;
 
-  private static final double kElevatorkS = 0.0;
-  private static final double kElevatorkG = 0.0;
-  private static final double kElevatorkV = 0.762;
-  private static final double kElevatorkA = 0.762;
+  private static final double kElevatorkS =0.0;
+  private static final double kElevatorkG =0.762;
+  private static final double kElevatorkV =0.762;
+  private static final double kElevatorkA =0.0;
   
   private static final double kElevatorGearing = 10.0;
   private static final double kElevatorDrumRadius = Units.inchesToMeters(2.0);
@@ -54,7 +56,9 @@ public class Robot extends TimedRobot {
   private final DCMotor m_elevatorGearbox = DCMotor.getVex775Pro(4);
 
   // Standard classes for controlling our elevator
-  private final PIDController m_controller = new PIDController(kElevatorKp, kElevatorKi, kElevatorKd);
+  private final ProfiledPIDController m_controller = new ProfiledPIDController(
+    kElevatorKp, kElevatorKi, kElevatorKd,
+    new TrapezoidProfile.Constraints(2.45, 2.45));
   ElevatorFeedforward feedforward = new ElevatorFeedforward(kElevatorkS, kElevatorkG, kElevatorkV, kElevatorkA);
   private final Encoder m_encoder = new Encoder(kEncoderAChannel, kEncoderBChannel);
   private final PWMSparkMax m_motor = new PWMSparkMax(kMotorPort);
@@ -113,20 +117,18 @@ public class Robot extends TimedRobot {
   @Override
   public void teleopPeriodic() {
 
-
     if (m_joystick.getTrigger()) {
       // Here, we run PID control like normal, with a constant setpoint of 30in.
+      var setpoint = m_controller.getSetpoint();
       double pidOutput = m_controller.calculate(m_encoder.getDistance(), Units.inchesToMeters(30));
-      double feedForwardOutput = feedforward.calculate(1); // velocity
+      double feedForwardOutput = feedforward.calculate(setpoint.velocity); // velocity
       m_motor.setVoltage(pidOutput + feedForwardOutput);
-      System.out.println(pidOutput + feedForwardOutput);
     } else {
       // Otherwise, we disable the motor.
       m_motor.set(0.0);
     }
   }
   // To view the Elevator Sim in the simulator, select Network Tables -> SmartDashboard -> Elevator Sim
-  // If you are on keyboard, press Z to move the elevator
 
   @Override
   public void disabledInit() {
