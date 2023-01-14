@@ -97,10 +97,12 @@ public class SwerveDriveKinematics {
     if (chassisSpeeds.vxMetersPerSecond == 0.0
         && chassisSpeeds.vyMetersPerSecond == 0.0
         && chassisSpeeds.omegaRadiansPerSecond == 0.0) {
+      SwerveModuleState[] newStates = new SwerveModuleState[m_numModules];
       for (int i = 0; i < m_numModules; i++) {
-        m_moduleStates[i].speedMetersPerSecond = 0.0;
+        newStates[i] = new SwerveModuleState(0.0, m_moduleStates[i].angle);
       }
 
+      m_moduleStates = newStates;
       return m_moduleStates;
     }
 
