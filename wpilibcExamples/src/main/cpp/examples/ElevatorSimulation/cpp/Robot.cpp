@@ -129,7 +129,7 @@ class Robot : public frc::TimedRobot {
       // Here, we run PID control like normal, with a constant setpoint of 30in.
       double pidOutput = m_controller.Calculate(m_encoder.GetDistance(),
                                                 units::meter_t{30_in}.value());
-      double feedForwardOutput = feedforward.Calculate(m_controller.GetSetpoint().velocity); // velocity
+      units::volt_t feedForwardOutput = feedforward.Calculate(m_controller.GetSetpoint().velocity); // velocity
       m_motor.SetVoltage(units::volt_t{pidOutput + feedForwardOutput});
     } else {
       // Otherwise, we disable the motor.
