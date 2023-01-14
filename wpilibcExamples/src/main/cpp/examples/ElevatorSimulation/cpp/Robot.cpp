@@ -41,10 +41,11 @@ class Robot : public frc::TimedRobot {
   static constexpr double kElevatorKi = 0.0;
   static constexpr double kElevatorKd = 0.0;
 
-  static constexpr double kElevatorkS = 0.0;
-  static constexpr double kElevatorkG = 0.0;
-  static constexpr double kElevatorkV = 0.762;
-  static constexpr double kElevatorkA = 0.762;
+  static constexpr units::volt_t kElevatorkS = 0.0_V;
+  static constexpr units::volt_t kElevatorkG = 0.0_V;
+  static constexpr units::unit_t<units::compound_unit<units::volts, units::inverse<units::compound_unit<units::compound_unit<units::meters, units::inverse<units::seconds>>, units::inverse<units::seconds>>>>> kElevatorkA = 0.762_V * 1_s * 1_s / (1_m * 1_m);
+  static constexpr units::unit_t<units::compound_unit<units::volts, units::inverse<units::compound_unit<units::meters, units::inverse<units::seconds>>>>> kElevatorkV = 0.762_V * 1_s / 1_m;
+
 
   static constexpr double kElevatorGearing = 10.0;
   static constexpr units::meter_t kElevatorDrumRadius = 2_in;
@@ -62,8 +63,11 @@ class Robot : public frc::TimedRobot {
   frc::DCMotor m_elevatorGearbox = frc::DCMotor::Vex775Pro(4);
 
   // Standard classes for controlling our elevator
-  frc2::PIDController m_controller{kElevatorKp, kElevatorKi, kElevatorKd};
-  frc::ElevatorFeedforward<units::meters> feedforward(kElevatorkS, kElevatorkG, kElevatorkV, kElevatorkA);
+  frc::ProfiledPIDController<units::meters> m_controller(
+  kElevatorKp, kElevatorKi, kElevatorKd,
+  frc::TrapezoidProfile<units::meters>::Constraints{2.45_mps, 2.45_mps_sq});
+
+  frc::ElevatorFeedforward<units::meters> feedforward(units::volt_t(kElevatorkS), units::volt_t(kElevatorkG), units::unit_t<units::compound_unit<units::volts, units::inverse<units::compound_unit<units::meters, units::inverse<units::seconds>>>>>(kElevatorkV), units::unit_t<units::compound_unit<units::volts, units::inverse<units::compound_unit<units::compound_unit<units::meters, units::inverse<units::seconds>>, units::inverse<units::seconds>>>>>(kElevatorkA));
   frc::Encoder m_encoder{kEncoderAChannel, kEncoderBChannel};
   frc::PWMSparkMax m_motor{kMotorPort};
   frc::Joystick m_joystick{kJoystickPort};
@@ -121,10 +125,11 @@ class Robot : public frc::TimedRobot {
 
   void TeleopPeriodic() override {
     if (m_joystick.GetTrigger()) {
+      
       // Here, we run PID control like normal, with a constant setpoint of 30in.
       double pidOutput = m_controller.Calculate(m_encoder.GetDistance(),
                                                 units::meter_t{30_in}.value());
-      double feedForwardOutput = feedforward.Calculate(1) // velocity
+      double feedForwardOutput = feedforward.Calculate(m_controller.GetSetpoint().velocity); // velocity
       m_motor.SetVoltage(units::volt_t{pidOutput + feedForwardOutput});
     } else {
       // Otherwise, we disable the motor.
