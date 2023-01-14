@@ -296,6 +296,18 @@
     "commandversion": 2
   },
   {
+    "name": "AprilTags Vision",
+    "description": "on-roboRIO detection of AprilTags using an attached USB camera.",
+    "tags": [
+      "Vision",
+      "AprilTags"
+    ],
+    "foldername": "apriltagsvision",
+    "gradlebase": "java",
+    "mainclass": "Main",
+    "commandversion": 2
+  },
+  {
     "name": "Shuffleboard Sample",
     "description": "An example program that adds data to various Shuffleboard tabs that demonstrates the Shuffleboard API",
     "tags": [

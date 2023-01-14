@@ -260,6 +260,17 @@
     "commandversion": 2
   },
   {
+    "name": "AprilTags Vision",
+    "description": "on-roboRIO detection of AprilTags using an attached USB camera.",
+    "tags": [
+      "Vision",
+      "AprilTags"
+    ],
+    "foldername": "AprilTagsVision",
+    "gradlebase": "cpp",
+    "commandversion": 2
+  },
+  {
     "name": "I2C Communication",
     "description": "An example program that communicates with external devices (such as an Arduino) using the roboRIO's I2C port",
     "tags": [
