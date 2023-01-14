@@ -7,8 +7,10 @@ package edu.wpi.first.math.kinematics;
 import edu.wpi.first.math.MathSharedStore;
 import edu.wpi.first.math.MathUsageId;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Twist2d;
+import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Twist3d;
 
 /**
  * Class for differential drive odometry. Odometry allows you to track the robot's position on the
@@ -21,13 +23,36 @@ import edu.wpi.first.math.geometry.Twist2d;
  * pose resets also require the encoders to be reset to zero.
  */
 public class DifferentialDriveOdometry {
-  private Pose2d m_poseMeters;
+  private Pose3d m_poseMeters;
 
-  private Rotation2d m_gyroOffset;
-  private Rotation2d m_previousAngle;
+  private Rotation3d m_gyroOffset;
+  private Rotation3d m_previousAngle;
 
   private double m_prevLeftDistance;
   private double m_prevRightDistance;
+
+  /**
+   * Constructs a DifferentialDriveOdometry object.
+   *
+   * @param gyroAngle The angle reported by the gyroscope.
+   * @param leftDistanceMeters The distance traveled by the left encoder.
+   * @param rightDistanceMeters The distance traveled by the right encoder.
+   * @param initialPoseMeters The starting position of the robot on the field.
+   */
+  public DifferentialDriveOdometry(
+      Rotation3d gyroAngle,
+      double leftDistanceMeters,
+      double rightDistanceMeters,
+      Pose3d initialPoseMeters) {
+    m_poseMeters = initialPoseMeters;
+    m_gyroOffset = m_poseMeters.getRotation().minus(gyroAngle);
+    m_previousAngle = initialPoseMeters.getRotation();
+
+    m_prevLeftDistance = leftDistanceMeters;
+    m_prevRightDistance = rightDistanceMeters;
+
+    MathSharedStore.reportUsage(MathUsageId.kOdometry_DifferentialDrive, 1);
+  }
 
   /**
    * Constructs a DifferentialDriveOdometry object.
@@ -42,14 +67,23 @@ public class DifferentialDriveOdometry {
       double leftDistanceMeters,
       double rightDistanceMeters,
       Pose2d initialPoseMeters) {
-    m_poseMeters = initialPoseMeters;
-    m_gyroOffset = m_poseMeters.getRotation().minus(gyroAngle);
-    m_previousAngle = initialPoseMeters.getRotation();
+    this(
+        new Rotation3d(0, 0, gyroAngle.getRadians()),
+        leftDistanceMeters,
+        rightDistanceMeters,
+        new Pose3d(initialPoseMeters));
+  }
 
-    m_prevLeftDistance = leftDistanceMeters;
-    m_prevRightDistance = rightDistanceMeters;
-
-    MathSharedStore.reportUsage(MathUsageId.kOdometry_DifferentialDrive, 1);
+  /**
+   * Constructs a DifferentialDriveOdometry object.
+   *
+   * @param gyroAngle The angle reported by the gyroscope.
+   * @param leftDistanceMeters The distance traveled by the left encoder.
+   * @param rightDistanceMeters The distance traveled by the right encoder.
+   */
+  public DifferentialDriveOdometry(
+      Rotation3d gyroAngle, double leftDistanceMeters, double rightDistanceMeters) {
+    this(gyroAngle, leftDistanceMeters, rightDistanceMeters, new Pose3d());
   }
 
   /**
@@ -76,10 +110,10 @@ public class DifferentialDriveOdometry {
    * @param poseMeters The position on the field that your robot is at.
    */
   public void resetPosition(
-      Rotation2d gyroAngle,
+      Rotation3d gyroAngle,
       double leftDistanceMeters,
       double rightDistanceMeters,
-      Pose2d poseMeters) {
+      Pose3d poseMeters) {
     m_poseMeters = poseMeters;
     m_previousAngle = poseMeters.getRotation();
     m_gyroOffset = m_poseMeters.getRotation().minus(gyroAngle);
@@ -89,11 +123,80 @@ public class DifferentialDriveOdometry {
   }
 
   /**
+   * Resets the robot's position on the field.
+   *
+   * <p>The gyroscope angle does not need to be reset here on the user's robot code. The library
+   * automatically takes care of offsetting the gyro angle.
+   *
+   * @param gyroAngle The angle reported by the gyroscope.
+   * @param leftDistanceMeters The distance traveled by the left encoder.
+   * @param rightDistanceMeters The distance traveled by the right encoder.
+   * @param poseMeters The position on the field that your robot is at.
+   */
+  public void resetPosition(
+      Rotation2d gyroAngle,
+      double leftDistanceMeters,
+      double rightDistanceMeters,
+      Pose2d poseMeters) {
+    resetPosition(
+        new Rotation3d(0, 0, gyroAngle.getRadians()),
+        leftDistanceMeters,
+        rightDistanceMeters,
+        new Pose3d(poseMeters));
+  }
+
+  /**
    * Returns the position of the robot on the field.
    *
    * @return The pose of the robot (x and y are in meters).
    */
   public Pose2d getPoseMeters() {
+    return m_poseMeters.toPose2d();
+  }
+
+  /**
+   * Returns the position of the robot on the field.
+   *
+   * @return The pose of the robot (x and y are in meters).
+   */
+  public Pose3d getPoseMeters3d() {
+    return m_poseMeters;
+  }
+
+  /**
+   * Updates the robot position on the field using distance measurements from encoders. This method
+   * is more numerically accurate than using velocities to integrate the pose and is also
+   * advantageous for teams that are using lower CPR encoders.
+   *
+   * @param gyroAngle The angle reported by the gyroscope.
+   * @param leftDistanceMeters The distance traveled by the left encoder.
+   * @param rightDistanceMeters The distance traveled by the right encoder.
+   * @return The new pose of the robot.
+   */
+  public Pose3d update(
+      Rotation3d gyroAngle, double leftDistanceMeters, double rightDistanceMeters) {
+    double deltaLeftDistance = leftDistanceMeters - m_prevLeftDistance;
+    double deltaRightDistance = rightDistanceMeters - m_prevRightDistance;
+
+    m_prevLeftDistance = leftDistanceMeters;
+    m_prevRightDistance = rightDistanceMeters;
+
+    double averageDeltaDistance = (deltaLeftDistance + deltaRightDistance) / 2.0;
+    var angle = gyroAngle.plus(m_gyroOffset);
+
+    var newPose =
+        m_poseMeters.exp(
+            new Twist3d(
+                averageDeltaDistance,
+                0.0,
+                0.0,
+                angle.minus(m_previousAngle).getX(),
+                angle.minus(m_previousAngle).getY(),
+                angle.minus(m_previousAngle).getZ()));
+
+    m_previousAngle = angle;
+
+    m_poseMeters = new Pose3d(newPose.getTranslation(), angle);
     return m_poseMeters;
   }
 
@@ -109,22 +212,8 @@ public class DifferentialDriveOdometry {
    */
   public Pose2d update(
       Rotation2d gyroAngle, double leftDistanceMeters, double rightDistanceMeters) {
-    double deltaLeftDistance = leftDistanceMeters - m_prevLeftDistance;
-    double deltaRightDistance = rightDistanceMeters - m_prevRightDistance;
-
-    m_prevLeftDistance = leftDistanceMeters;
-    m_prevRightDistance = rightDistanceMeters;
-
-    double averageDeltaDistance = (deltaLeftDistance + deltaRightDistance) / 2.0;
-    var angle = gyroAngle.plus(m_gyroOffset);
-
-    var newPose =
-        m_poseMeters.exp(
-            new Twist2d(averageDeltaDistance, 0.0, angle.minus(m_previousAngle).getRadians()));
-
-    m_previousAngle = angle;
-
-    m_poseMeters = new Pose2d(newPose.getTranslation(), angle);
-    return m_poseMeters;
+    return update(
+            new Rotation3d(0, 0, gyroAngle.getRadians()), leftDistanceMeters, rightDistanceMeters)
+        .toPose2d();
   }
 }
