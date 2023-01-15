@@ -105,12 +105,12 @@ class WPILIB_DLLEXPORT HolonomicDriveController {
   /**
    * Returns the X PIDController
    */
-  frc2::PIDController& xController();
+  PIDController& getXController();
 
   /**
    * Returns the Y PIDController
    */
-  frc2::PIDController& yController();
+  PIDController& getYController();
 
  private:
   Pose2d m_poseError;

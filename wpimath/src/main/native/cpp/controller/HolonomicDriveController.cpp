@@ -77,14 +77,14 @@ void HolonomicDriveController::SetEnabled(bool enabled) {
   m_enabled = enabled;
 }
 
-ProfiledPIDController& HolonomicDriveController::getThetaController(){
+ProfiledPIDController<units::radian>& HolonomicDriveController::getThetaController() {
   return m_thetaController;
 }
 
-PIDController& HolonomicDriveController::getXController(){
+PIDController& HolonomicDriveController::getXController() {
   return m_xController;
 }
 
-PIDController& HolonomicDriveController::getYController(){
+PIDController& HolonomicDriveController::getYController() {
   return m_yController;
 }
