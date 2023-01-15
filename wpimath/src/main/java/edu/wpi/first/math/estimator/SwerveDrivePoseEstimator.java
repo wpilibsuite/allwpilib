@@ -21,7 +21,7 @@ import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
-import edu.wpi.first.math.numbers.N6;
+import edu.wpi.first.math.numbers.N4;
 import edu.wpi.first.util.WPIUtilJNI;
 import java.util.Arrays;
 import java.util.Map;
@@ -40,9 +40,9 @@ import java.util.Objects;
 public class SwerveDrivePoseEstimator {
   private final SwerveDriveKinematics m_kinematics;
   private final SwerveDriveOdometry m_odometry;
-  private final Matrix<N6, N1> m_q = new Matrix<>(Nat.N6(), Nat.N1());
+  private final Matrix<N4, N1> m_q = new Matrix<>(Nat.N4(), Nat.N1());
   private final int m_numModules;
-  private Matrix<N6, N6> m_visionK = new Matrix<>(Nat.N6(), Nat.N6());
+  private Matrix<N4, N4> m_visionK = new Matrix<>(Nat.N4(), Nat.N4());
 
   private static final double kBufferDuration = 1.5;
 
@@ -99,8 +99,8 @@ public class SwerveDrivePoseEstimator {
         gyroAngle,
         modulePositions,
         initialPoseMeters,
-        VecBuilder.fill(0.1, 0.1, 0.1, 0.1, 0.1, 0.1),
-        VecBuilder.fill(0.9, 0.9, 0.9, 0.9, 0.9, 0.9));
+        VecBuilder.fill(0.1, 0.1, 0.1, 0.1),
+        VecBuilder.fill(0.9, 0.9, 0.9, 0.9));
   }
 
   /**
@@ -122,12 +122,12 @@ public class SwerveDrivePoseEstimator {
       Rotation3d gyroAngle,
       SwerveModulePosition[] modulePositions,
       Pose3d initialPoseMeters,
-      Matrix<N6, N1> stateStdDevs,
-      Matrix<N6, N1> visionMeasurementStdDevs) {
+      Matrix<N4, N1> stateStdDevs,
+      Matrix<N4, N1> visionMeasurementStdDevs) {
     m_kinematics = kinematics;
     m_odometry = new SwerveDriveOdometry(kinematics, gyroAngle, modulePositions, initialPoseMeters);
 
-    for (int i = 0; i < 3; ++i) {
+    for (int i = 0; i < 4; ++i) {
       m_q.set(i, 0, stateStdDevs.get(i, 0) * stateStdDevs.get(i, 0));
     }
 
@@ -162,13 +162,10 @@ public class SwerveDrivePoseEstimator {
         new Rotation3d(0, 0, gyroAngle.getRadians()),
         modulePositions,
         new Pose3d(initialPoseMeters),
-        VecBuilder.fill(
-            stateStdDevs.get(0, 0), stateStdDevs.get(1, 0), 0, 0, 0, stateStdDevs.get(2, 0)),
+        VecBuilder.fill(stateStdDevs.get(0, 0), stateStdDevs.get(1, 0), 0, stateStdDevs.get(2, 0)),
         VecBuilder.fill(
             visionMeasurementStdDevs.get(0, 0),
             visionMeasurementStdDevs.get(1, 0),
-            0,
-            0,
             0,
             visionMeasurementStdDevs.get(2, 0)));
   }
@@ -188,8 +185,6 @@ public class SwerveDrivePoseEstimator {
             visionMeasurementStdDevs.get(0, 0),
             visionMeasurementStdDevs.get(1, 0),
             0,
-            0,
-            0,
             visionMeasurementStdDevs.get(2, 0)));
   }
 
@@ -202,15 +197,15 @@ public class SwerveDrivePoseEstimator {
    *     numbers to trust global measurements from vision less. This matrix is in the form [x, y,
    *     theta]ᵀ, with units in meters and radians.
    */
-  public void setVisionMeasurementStdDevs3d(Matrix<N6, N1> visionMeasurementStdDevs) {
-    var r = new double[6];
-    for (int i = 0; i < 6; ++i) {
+  public void setVisionMeasurementStdDevs3d(Matrix<N4, N1> visionMeasurementStdDevs) {
+    var r = new double[4];
+    for (int i = 0; i < 4; ++i) {
       r[i] = visionMeasurementStdDevs.get(i, 0) * visionMeasurementStdDevs.get(i, 0);
     }
 
     // Solve for closed form Kalman gain for continuous Kalman filter with A = 0
     // and C = I. See wpimath/algorithms.md.
-    for (int row = 0; row < 6; ++row) {
+    for (int row = 0; row < 4; ++row) {
       if (m_q.get(row, 0) == 0.0) {
         m_visionK.set(row, row, 0.0);
       } else {
@@ -334,9 +329,11 @@ public class SwerveDrivePoseEstimator {
 
     // Step 3: We should not trust the twist entirely, so instead we scale this twist by a Kalman
     // gain matrix representing how much we trust vision measurements compared to our current pose.
-    var k_times_twist =
-        m_visionK.times(
-            VecBuilder.fill(twist.dx, twist.dy, twist.dz, twist.rx, twist.ry, twist.rz));
+    var k_times_twist = m_visionK.times(VecBuilder.fill(twist.dx, twist.dy, twist.dz, 0));
+
+    var twist_rotation = new Rotation3d(VecBuilder.fill(twist.rx, twist.ry, twist.rz));
+    var scaled_twist_rotation =
+        twist_rotation.times(m_visionK.get(3, 3)).getQuaternion().toRotationVector();
 
     // Step 4: Convert back to Twist2d.
     var scaledTwist =
@@ -344,9 +341,9 @@ public class SwerveDrivePoseEstimator {
             k_times_twist.get(0, 0),
             k_times_twist.get(1, 0),
             k_times_twist.get(2, 0),
-            k_times_twist.get(3, 0),
-            k_times_twist.get(4, 0),
-            k_times_twist.get(5, 0));
+            scaled_twist_rotation.get(0, 0),
+            scaled_twist_rotation.get(1, 0),
+            scaled_twist_rotation.get(2, 0));
 
     // Step 5: Reset Odometry to state at sample with vision adjustment.
     m_odometry.resetPosition(
@@ -398,7 +395,7 @@ public class SwerveDrivePoseEstimator {
   public void addVisionMeasurement(
       Pose3d visionRobotPoseMeters,
       double timestampSeconds,
-      Matrix<N6, N1> visionMeasurementStdDevs) {
+      Matrix<N4, N1> visionMeasurementStdDevs) {
     setVisionMeasurementStdDevs3d(visionMeasurementStdDevs);
     addVisionMeasurement(visionRobotPoseMeters, timestampSeconds);
   }
@@ -575,6 +572,7 @@ public class SwerveDrivePoseEstimator {
 
         // Find the new gyro angle.
         var gyro_lerp = gyroAngle.interpolate(endValue.gyroAngle, t);
+        var gyro_difference = gyro_lerp.minus(gyroAngle).getQuaternion().toRotationVector();
 
         // Create a twist to represent this change based on the interpolated sensor inputs.
         Twist2d twist2d = m_kinematics.toTwist2d(moduleDeltas);
@@ -583,9 +581,9 @@ public class SwerveDrivePoseEstimator {
                 twist2d.dx,
                 twist2d.dy,
                 0,
-                gyro_lerp.minus(gyroAngle).getX(),
-                gyro_lerp.minus(gyroAngle).getY(),
-                gyro_lerp.minus(gyroAngle).getZ());
+                gyro_difference.get(0, 0),
+                gyro_difference.get(1, 0),
+                gyro_difference.get(2, 0));
 
         return new InterpolationRecord(poseMeters.exp(twist), gyro_lerp, modulePositions);
       }
