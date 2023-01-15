@@ -73,6 +73,16 @@ public class Rotation3d implements Interpolatable<Rotation3d> {
   }
 
   /**
+   * Constructs a Rotation3d with the given rotation vector representation. This representation is
+   * equivalent to axis-angle, where the normalized axis is multiplied by the scalar angle.
+   *
+   * @param rvec The rotation vector.
+   */
+  public Rotation3d(Vector<N3> rvec) {
+    this(rvec, rvec.norm());
+  }
+
+  /**
    * Constructs a Rotation3d with the given axis-angle representation. The axis doesn't have to be
    * normalized.
    *
