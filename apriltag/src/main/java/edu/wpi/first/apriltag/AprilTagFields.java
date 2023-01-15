@@ -27,7 +27,7 @@ public enum AprilTagFields {
    * @return AprilTagFieldLayout of the field
    * @throws IOException If the layout does not exist
    */
-  public AprilTagFieldLayout getFieldLayout() throws IOException {
+  public AprilTagFieldLayout loadAprilTagLayoutField() throws IOException {
     return AprilTagFieldLayout.loadFromResource(m_resourceFile);
   }
 }

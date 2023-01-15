@@ -23,13 +23,13 @@ class LoadConfigTest {
   @ParameterizedTest
   @EnumSource(AprilTagFields.class)
   void testLoad(AprilTagFields field) {
-    AprilTagFieldLayout layout = Assertions.assertDoesNotThrow(field::getFieldLayout);
+    AprilTagFieldLayout layout = Assertions.assertDoesNotThrow(field::loadAprilTagLayoutField);
     assertNotNull(layout);
   }
 
   @Test
   void test2022RapidReact() throws IOException {
-    AprilTagFieldLayout layout = AprilTagFields.k2022RapidReact.getFieldLayout();
+    AprilTagFieldLayout layout = AprilTagFields.k2022RapidReact.loadAprilTagLayoutField();
 
     // Blue Hangar Truss - Hub
     Pose3d expectedPose =
