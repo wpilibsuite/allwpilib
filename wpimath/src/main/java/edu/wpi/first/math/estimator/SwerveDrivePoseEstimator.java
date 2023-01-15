@@ -235,12 +235,11 @@ public class SwerveDrivePoseEstimator {
   /**
    * Resets the robot's position on the field.
    *
-   * <p>The gyroscope angle does not need to be reset here on the user's robot code. The library
+   * <p>The gyroscope angle does not need to be reset in the user's robot code. The library
    * automatically takes care of offsetting the gyro angle.
    *
    * @param gyroAngle The angle reported by the gyroscope.
-   * @param leftPositionMeters The distance traveled by the left encoder.
-   * @param rightPositionMeters The distance traveled by the right encoder.
+   * @param modulePositions The current distance measurements and rotations of the swerve modules.
    * @param poseMeters The position on the field that your robot is at.
    */
   public void resetPosition(
