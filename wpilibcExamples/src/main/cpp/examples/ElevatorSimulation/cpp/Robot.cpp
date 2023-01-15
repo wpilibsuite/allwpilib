@@ -10,6 +10,7 @@
 #include <frc/StateSpaceUtil.h>
 #include <frc/TimedRobot.h>
 #include <frc/controller/PIDController.h>
+#include <frc/controller/ProfiledPIDController.h>
 #include <frc/controller/ElevatorFeedforward.h>
 #include <frc/motorcontrol/PWMSparkMax.h>
 #include <frc/simulation/BatterySim.h>
@@ -63,11 +64,12 @@ class Robot : public frc::TimedRobot {
   frc::DCMotor m_elevatorGearbox = frc::DCMotor::Vex775Pro(4);
 
   // Standard classes for controlling our elevator
-  frc::ProfiledPIDController<units::meters> m_controller(
+  frc::TrapezoidProfile<units::meters>::Constraints m_constraints{2.45_mps, 2.45_mps_sq};
+  frc::ProfiledPIDController<units::meters> m_controller{
   kElevatorKp, kElevatorKi, kElevatorKd,
-  frc::TrapezoidProfile<units::meters>::Constraints{2.45_mps, 2.45_mps_sq});
+  m_constraints};
 
-  frc::ElevatorFeedforward<units::meters> feedforward(units::volt_t(kElevatorkS), units::volt_t(kElevatorkG), units::unit_t<units::compound_unit<units::volts, units::inverse<units::compound_unit<units::meters, units::inverse<units::seconds>>>>>(kElevatorkV), units::unit_t<units::compound_unit<units::volts, units::inverse<units::compound_unit<units::compound_unit<units::meters, units::inverse<units::seconds>>, units::inverse<units::seconds>>>>>(kElevatorkA));
+  frc::ElevatorFeedforward feedforward(units::volt_t(kElevatorkS), units::volt_t(kElevatorkG), units::unit_t<units::compound_unit<units::volts, units::inverse<units::compound_unit<units::meters, units::inverse<units::seconds>>>>>(kElevatorkV), units::unit_t<units::compound_unit<units::volts, units::inverse<units::compound_unit<units::compound_unit<units::meters, units::inverse<units::seconds>>, units::inverse<units::seconds>>>>>(kElevatorkA));
   frc::Encoder m_encoder{kEncoderAChannel, kEncoderBChannel};
   frc::PWMSparkMax m_motor{kMotorPort};
   frc::Joystick m_joystick{kJoystickPort};
