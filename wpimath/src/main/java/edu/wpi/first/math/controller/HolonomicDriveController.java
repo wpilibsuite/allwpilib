@@ -135,23 +135,29 @@ public class HolonomicDriveController {
   }
 
   /**
-   * Returns the rotation ProfiledPIDController
+   * Returns the heading controller.
+   *
+   * @return heading ProfiledPIDController
    */
-  public ProfiledPIDController getThetaController(){
+  public ProfiledPIDController getThetaController() {
     return m_thetaController;
   }
 
   /**
-   * Returns the X PIDController
+   * Returns the y controller.
+   *
+   * @return X PIDController
    */
-  public PIDController getXController(){
+  public PIDController getXController() {
     return m_xController;
   }
 
   /**
-   * Returns the Y PIDController
+   * Returns the y controller.
+   *
+   * @return Y PIDController
    */
-  public PIDController getYController(){
+  public PIDController getYController() {
     return m_yController;
   }
 }
