@@ -133,4 +133,25 @@ public class HolonomicDriveController {
   public void setEnabled(boolean enabled) {
     m_enabled = enabled;
   }
+
+  /**
+   * Returns the rotation ProfiledPIDController
+   */
+  public ProfiledPIDController getThetaController(){
+    return m_thetaController;
+  }
+
+  /**
+   * Returns the X PIDController
+   */
+  public PIDController getXController(){
+    return m_xController;
+  }
+
+  /**
+   * Returns the Y PIDController
+   */
+  public PIDController getYController(){
+    return m_yController;
+  }
 }
