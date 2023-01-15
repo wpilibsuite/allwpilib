@@ -189,7 +189,10 @@ public class AprilTagFieldLayout {
   }
 
   /**
-   * Deserializes a field layout from a resource within a jar file.
+   * Deserializes a field layout from a resource within a internal jar file.
+   *
+   * <p>Users should use {@link #AprilTagFieldLayout(String)} and use the deploy directory for
+   * custom layouts.
    *
    * @param resourcePath The absolute path of the resource
    * @return The deserialized layout

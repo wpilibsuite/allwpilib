@@ -4,6 +4,8 @@
 
 package edu.wpi.first.apriltag;
 
+import java.io.IOException;
+
 public enum AprilTagFields {
   k2022RapidReact("2022-rapidreact.json"),
   k2023ChargedUp("2023-chargedup.json");
@@ -17,5 +19,15 @@ public enum AprilTagFields {
 
   AprilTagFields(String resourceFile) {
     m_resourceFile = kBaseResourceDir + resourceFile;
+  }
+
+  /**
+   * Get a {@link AprilTagFieldLayout} from the resource JSON.
+   *
+   * @return AprilTagFieldLayout of the field
+   * @throws IOException If the layout does not exist
+   */
+  public AprilTagFieldLayout getFieldLayout() throws IOException {
+    return AprilTagFieldLayout.loadFromResource(m_resourceFile);
   }
 }
