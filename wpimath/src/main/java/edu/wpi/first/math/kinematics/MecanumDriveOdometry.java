@@ -170,6 +170,7 @@ public class MecanumDriveOdometry {
    */
   public Pose3d update(Rotation3d gyroAngle, MecanumDriveWheelPositions wheelPositions) {
     var angle = gyroAngle.plus(m_gyroOffset);
+    var angle_difference = angle.minus(m_previousAngle).getQuaternion().toRotationVector();
 
     var wheelDeltas =
         new MecanumDriveWheelPositions(
@@ -184,9 +185,9 @@ public class MecanumDriveOdometry {
             twist2d.dx,
             twist2d.dy,
             0,
-            angle.minus(m_previousAngle).getX(),
-            angle.minus(m_previousAngle).getY(),
-            angle.minus(m_previousAngle).getZ());
+            angle_difference.get(0, 0),
+            angle_difference.get(1, 0),
+            angle_difference.get(2, 0));
     var newPose = m_poseMeters.exp(twist);
 
     m_previousAngle = angle;
