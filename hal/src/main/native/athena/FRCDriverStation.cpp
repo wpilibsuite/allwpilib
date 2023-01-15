@@ -114,7 +114,7 @@ static HAL_ControlWord newestControlWord;
 static JoystickDataCache caches[3];
 static JoystickDataCache* currentRead = &caches[0];
 static JoystickDataCache* currentReadLocal = &caches[0];
-static std::atomic<JoystickDataCache*> currentCache{&caches[1]};
+static std::atomic<JoystickDataCache*> currentCache{nullptr};
 static JoystickDataCache* lastGiven = &caches[1];
 static JoystickDataCache* cacheToUpdate = &caches[2];
 
@@ -508,7 +508,7 @@ static void newDataOccur(uint32_t refNum) {
   }
 }
 
-void HAL_RefreshDSData(void) {
+HAL_Bool HAL_RefreshDSData(void) {
   HAL_ControlWord controlWord;
   std::memset(&controlWord, 0, sizeof(controlWord));
   FRC_NetworkCommunication_getControlWord(
@@ -526,6 +526,7 @@ void HAL_RefreshDSData(void) {
     std::scoped_lock tcpLock(tcpCacheMutex);
     tcpCache.CloneTo(&tcpCurrent);
   }
+  return prev != nullptr;
 }
 
 void HAL_ProvideNewDataEventHandle(WPI_EventHandle handle) {
@@ -550,5 +551,14 @@ void InitializeDriverStation() {
   // Set up our occur reference number
   setNewDataOccurRef(refNumber);
   FRC_NetworkCommunication_setNewTcpDataOccurRef(tcpRefNumber);
+}
+
+void WaitForInitialPacket() {
+  wpi::Event waitForInitEvent;
+  driverStation->newDataEvents.Add(waitForInitEvent.GetHandle());
+  bool timed_out = false;
+  wpi::WaitForObject(waitForInitEvent.GetHandle(), 0.1, &timed_out);
+  // Don't care what the result is, just want to give it a chance.
+  driverStation->newDataEvents.Remove(waitForInitEvent.GetHandle());
 }
 }  // namespace hal
