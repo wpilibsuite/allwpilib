@@ -16,6 +16,7 @@ public interface ReflectionCleanup extends AutoCloseable {
    * Default implementation that uses reflection to find all AutoCloseable fields not marked
    * SkipCleanup and call close() on them. Call this from your `close()` method with the class level
    * you want to close.
+   * @param cls the class level to clean up
    */
   @SuppressWarnings("PMD.AvoidCatchingGenericException")
   default void reflectionCleanup(Class<? extends ReflectionCleanup> cls) {
