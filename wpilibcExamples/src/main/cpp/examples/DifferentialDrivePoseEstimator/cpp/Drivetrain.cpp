@@ -103,8 +103,8 @@ void Drivetrain::UpdateOdometry() {
   frc::Pose2d visionMeasurement2d = visionMeasurement3d.ToPose2d();
 
   // Apply vision measurements. For simulation purposes only, we don't input a
-  // latency delay -- on a real robot, this must be calculated based either on known
-  // latency or timestamps.
+  // latency delay -- on a real robot, this must be calculated based either on
+  // known latency or timestamps.
   m_poseEstimator.AddVisionMeasurement(visionMeasurement2d,
                                        frc::Timer::GetFPGATimestamp());
 }

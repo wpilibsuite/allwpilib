@@ -71,8 +71,6 @@ public class Drivetrain {
   private final DifferentialDriveKinematics m_kinematics =
       new DifferentialDriveKinematics(kTrackWidth);
 
-  private AprilTagFieldLayout m_aprilTagFieldLayout;
-
   private final Pose3d m_objectInField;
 
   private final Transform3d m_robotToCamera =
@@ -134,10 +132,10 @@ public class Drivetrain {
     m_cameraToObjectEntry = cameraToObjectTopic.getEntry(m_defaultVal);
 
     try {
-      m_aprilTagFieldLayout =
-          AprilTagFieldLayout.loadFromResource(AprilTagFields.k2022RapidReact.m_resourceFile);
-      m_objectInField = m_aprilTagFieldLayout.getTagPose(0).get();
-
+      m_objectInField =
+          AprilTagFieldLayout.loadFromResource(AprilTagFields.k2022RapidReact.m_resourceFile)
+              .getTagPose(0)
+              .get();
     } catch (IOException e) {
       e.printStackTrace();
       throw new RuntimeException();
