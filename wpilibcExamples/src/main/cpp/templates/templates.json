@@ -13,7 +13,8 @@
     "name": "Command Robot Skeleton (Advanced)",
     "description": "Skeleton (stub) code for Command Robot",
     "tags": [
-      "Command", "Skeleton"
+      "Command",
+      "Skeleton"
     ],
     "foldername": "commandbasedskeleton",
     "gradlebase": "cpp",
@@ -33,7 +34,8 @@
     "name": "Timed Skeleton (Advanced)",
     "description": "Skeleton (stub) code for TimedRobot",
     "tags": [
-      "Timed", "Skeleton"
+      "Timed",
+      "Skeleton"
     ],
     "foldername": "timedskeleton",
     "gradlebase": "cpp",
@@ -43,7 +45,8 @@
     "name": "RobotBase Skeleton (Advanced)",
     "description": "Skeleton (stub) code for RobotBase",
     "tags": [
-      "RobotBase", "Skeleton"
+      "RobotBase",
+      "Skeleton"
     ],
     "foldername": "robotbaseskeleton",
     "gradlebase": "cpp",
@@ -53,7 +56,8 @@
     "name": "Romi - Command Robot",
     "description": "Romi - Command style",
     "tags": [
-      "Command", "Romi"
+      "Command",
+      "Romi"
     ],
     "foldername": "commandbased",
     "gradlebase": "cppromi",
@@ -63,7 +67,8 @@
     "name": "Romi - Timed Robot",
     "description": "Romi - Timed style",
     "tags": [
-      "Timed", "Romi"
+      "Timed",
+      "Romi"
     ],
     "foldername": "timed",
     "gradlebase": "cppromi",
