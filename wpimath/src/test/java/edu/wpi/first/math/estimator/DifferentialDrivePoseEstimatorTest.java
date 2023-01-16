@@ -8,9 +8,13 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform2d;
+import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.DifferentialDriveKinematics;
 import edu.wpi.first.math.trajectory.Trajectory;
@@ -302,5 +306,178 @@ class DifferentialDrivePoseEstimatorTest {
         odometryPose.getRotation().getRadians(),
         estimator.getEstimatedPosition().getRotation().getRadians(),
         "Incorrect Final Theta");
+  }
+
+  @Test
+  void testAccuracy3d() {
+    var kinematics = new DifferentialDriveKinematics(1);
+
+    var estimator =
+        new DifferentialDrivePoseEstimator(
+            kinematics,
+            new Rotation3d(),
+            0,
+            0,
+            new Pose3d());
+    var trajectory =
+        TrajectoryGenerator.generateTrajectory(
+            List.of(
+                new Pose2d(0, 0, Rotation2d.fromDegrees(45)),
+                new Pose2d(3, 0, Rotation2d.fromDegrees(-90)),
+                new Pose2d(0, 0, Rotation2d.fromDegrees(135)),
+                new Pose2d(-3, 0, Rotation2d.fromDegrees(-90)),
+                new Pose2d(0, 0, Rotation2d.fromDegrees(45))),
+            new TrajectoryConfig(2, 2));
+
+    testFollowTrajectory3d(
+        kinematics,
+        estimator,
+        trajectory,
+        state ->
+            new ChassisSpeeds(
+                state.velocityMetersPerSecond,
+                0,
+                state.velocityMetersPerSecond * state.curvatureRadPerMeter),
+        state -> state.poseMeters,
+        new Pose3d(0, 0, 0, new Rotation3d(VecBuilder.fill(1, 1, 1))),
+        new Pose3d(0, 0, 0, new Rotation3d(VecBuilder.fill(1, 1, 1))),
+        0.02,
+        0.1,
+        0.25,
+        true);
+  }
+
+  void testFollowTrajectory3d(
+      final DifferentialDriveKinematics kinematics,
+      final DifferentialDrivePoseEstimator estimator,
+      final Trajectory trajectory,
+      final Function<Trajectory.State, ChassisSpeeds> chassisSpeedsGenerator,
+      final Function<Trajectory.State, Pose2d> visionMeasurementGenerator,
+      final Pose3d startingPose,
+      final Pose3d endingPose,
+      final double dt,
+      final double visionUpdateRate,
+      final double visionUpdateDelay,
+      final boolean checkError) {
+    double leftDistanceMeters = 0;
+    double rightDistanceMeters = 0;
+
+    estimator.resetPosition(
+        new Rotation3d(), leftDistanceMeters, rightDistanceMeters, startingPose);
+
+    var rand = new Random(3538);
+
+    double t = 0.0;
+
+    System.out.print("time, est_x, est_y, est_z, est_roll, est_pitch, est_yaw, true_x, true_y, true_z, true_roll, true_pitch, true_yaw\n");
+
+    final TreeMap<Double, Pose3d> visionUpdateQueue = new TreeMap<>();
+    final TreeMap<Double, Pose3d> visionUpdateRecord = new TreeMap<>();
+
+    double maxError = Double.NEGATIVE_INFINITY;
+    double errorSum = 0;
+    while (t <= trajectory.getTotalTimeSeconds()) {
+      var groundTruthState = trajectory.sample(t);
+
+      // We are due for a new vision measurement if it's been `visionUpdateRate` seconds since the
+      // last vision measurement
+      if (visionUpdateQueue.isEmpty() || visionUpdateQueue.lastKey() + visionUpdateRate < t) {
+        var gaussianNoise  = new Transform3d(new Translation3d(rand.nextGaussian() * 0.1, rand.nextGaussian() * 0.1, rand.nextGaussian() * 0.1), new Rotation3d(VecBuilder.fill(
+          rand.nextGaussian() * 0.1, rand.nextGaussian() * 0.1, rand.nextGaussian() * 0.1
+        )));
+        var visionTransform2d = visionMeasurementGenerator.apply(groundTruthState).minus(trajectory.getInitialPose());
+        var visionTransform3d = new Transform3d(new Translation3d(visionTransform2d.getX(), visionTransform2d.getY(), 0),
+          new Rotation3d(0, 0, visionTransform2d.getRotation().getRadians()));
+
+
+        Pose3d newVisionPose =
+            startingPose
+                .transformBy(visionTransform3d)
+                .plus(gaussianNoise);
+
+        visionUpdateQueue.put(t, newVisionPose);
+        visionUpdateRecord.put(t, newVisionPose);
+      }
+
+      // We should apply the oldest vision measurement if it has been `visionUpdateDelay` seconds
+      // since it was measured
+      if (!visionUpdateQueue.isEmpty() && visionUpdateQueue.firstKey() + visionUpdateDelay < t) {
+        var visionEntry = visionUpdateQueue.pollFirstEntry();
+        estimator.addVisionMeasurement(visionEntry.getValue(), visionEntry.getKey());
+      }
+
+      var chassisSpeeds = chassisSpeedsGenerator.apply(groundTruthState);
+
+      var wheelSpeeds = kinematics.toWheelSpeeds(chassisSpeeds);
+
+      leftDistanceMeters += wheelSpeeds.leftMetersPerSecond * dt;
+      rightDistanceMeters += wheelSpeeds.rightMetersPerSecond * dt;
+
+      var trajectoryRotation2d = groundTruthState.poseMeters.getRotation().minus(trajectory.getInitialPose().getRotation());
+      var trajectoryRotation3d = new Rotation3d(0, 0, trajectoryRotation2d.getRadians());
+
+      var gaussianNoise = new Rotation3d(VecBuilder.fill(0.01 * rand.nextGaussian(), 0.01 * rand.nextGaussian(), 0.01 * rand.nextGaussian()));
+
+      
+
+      var xHat =
+          estimator.updateWithTime(
+              t,
+              trajectoryRotation3d.plus(gaussianNoise),
+              leftDistanceMeters,
+              rightDistanceMeters);
+
+      var xHatRotationVector = xHat.getRotation().getQuaternion().toRotationVector();
+
+      var poseFromStartingPosition = groundTruthState.poseMeters.minus(trajectory.getInitialPose());
+      var poseFromStartingPosition3d = new Transform3d(new Translation3d(poseFromStartingPosition.getX(), poseFromStartingPosition.getY(), 0), 
+        new Rotation3d(VecBuilder.fill(0, 0, poseFromStartingPosition.getRotation().getRadians())));
+
+      var groundTruthIn3dFrame = startingPose.plus(poseFromStartingPosition3d);
+      var groundTruthIn3dFrameRotationVector = groundTruthIn3dFrame.getRotation().getQuaternion().toRotationVector();
+
+      System.out.printf(
+          "%f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f\n",
+          t,
+          xHat.getX(),
+          xHat.getY(),
+          xHat.getZ(),
+          xHatRotationVector.get(0, 0),
+          xHatRotationVector.get(1, 0),
+          xHatRotationVector.get(2, 0),
+          groundTruthIn3dFrame.getX(),
+          groundTruthIn3dFrame.getY(),
+          groundTruthIn3dFrame.getZ(),
+          groundTruthIn3dFrameRotationVector.get(0, 0),
+          groundTruthIn3dFrameRotationVector.get(1, 0),
+          groundTruthIn3dFrameRotationVector.get(2, 0));
+
+
+
+      double error =
+          startingPose.plus(poseFromStartingPosition3d).getTranslation().getDistance(xHat.getTranslation());
+      if (error > maxError) {
+        maxError = error;
+      }
+      errorSum += error;
+
+      t += dt;
+    }
+
+    System.out.print("time, est_x, est_y, est_z, est_roll, est_pitch, est_yaw\n");
+
+    while (!visionUpdateRecord.isEmpty()) {
+      var visionUpdate = visionUpdateRecord.pollFirstEntry();
+      var visionUpdateRotationVector = visionUpdate.getValue().getRotation().getQuaternion().toRotationVector();
+      System.out.printf(
+        "%f, %f, %f, %f, %f, %f, %f\n",
+        visionUpdate.getKey(),
+        visionUpdate.getValue().getX(),
+        visionUpdate.getValue().getY(),
+        visionUpdate.getValue().getZ(),
+        visionUpdateRotationVector.get(0, 0),
+        visionUpdateRotationVector.get(1, 0),
+        visionUpdateRotationVector.get(2, 0));
+    }
   }
 }
