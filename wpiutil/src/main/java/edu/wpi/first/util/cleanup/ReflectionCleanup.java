@@ -12,7 +12,6 @@ import java.lang.reflect.Field;
  * close them.
  */
 public interface ReflectionCleanup extends AutoCloseable {
-
   /**
    * Default implementation that uses reflection to find all AutoCloseable fields not marked
    * SkipCleanup and call close() on them. Call this from your `close()` method with the class level

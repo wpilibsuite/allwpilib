@@ -52,7 +52,6 @@ class CleanupPoolTest {
     objects.add(new AutoCloseableObject());
 
     try (CleanupPool pool = new CleanupPool()) {
-
       for (AutoCloseableObject autoCloseableObject : objects) {
         pool.register(autoCloseableObject);
       }
@@ -74,7 +73,6 @@ class CleanupPoolTest {
     String message = "This is a known failure";
 
     try (CleanupPool pool = new CleanupPool()) {
-
       for (AutoCloseableObject autoCloseableObject : objects) {
         pool.register(autoCloseableObject);
       }
@@ -97,7 +95,6 @@ class CleanupPoolTest {
     objects.add(new AutoCloseableObject());
 
     try (CleanupPool pool = new CleanupPool()) {
-
       for (AutoCloseableObject autoCloseableObject : objects) {
         pool.register(new FailingAutoCloseableObject());
         pool.register(autoCloseableObject);
@@ -117,7 +114,6 @@ class CleanupPoolTest {
     objects.add(new AutoCloseableObject());
 
     try (CleanupPool pool = new CleanupPool()) {
-
       for (AutoCloseableObject autoCloseableObject : objects) {
         pool.register(autoCloseableObject);
       }
@@ -145,7 +141,6 @@ class CleanupPoolTest {
     objects.add(new AutoCloseableObjectWithCallback(() -> order.add(2)));
 
     try (CleanupPool pool = new CleanupPool()) {
-
       for (AutoCloseable autoCloseableObject : objects) {
         pool.register(autoCloseableObject);
       }

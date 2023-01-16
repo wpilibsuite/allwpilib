@@ -12,7 +12,6 @@ import java.util.Deque;
  * An object containing a Stack of AutoCloseable objects that are closed when this object is closed.
  */
 public class CleanupPool implements AutoCloseable {
-
   // Use a Deque instead of a Stack, as Stack's iterators go the wrong way, and docs
   // state ArrayDeque is faster anyway.
   private final Deque<AutoCloseable> m_closers = new ArrayDeque<AutoCloseable>();
