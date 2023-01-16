@@ -144,7 +144,7 @@ public class HolonomicDriveController {
   }
 
   /**
-   * Returns the y controller.
+   * Returns the x controller.
    *
    * @return X PIDController
    */
