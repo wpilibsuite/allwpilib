@@ -20,7 +20,7 @@ import edu.wpi.first.math.kinematics.DifferentialDriveKinematics;
 import edu.wpi.first.math.kinematics.DifferentialDriveOdometry;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
-import edu.wpi.first.math.numbers.N4;
+import edu.wpi.first.math.numbers.N6;
 import edu.wpi.first.util.WPIUtilJNI;
 import java.util.Map;
 import java.util.Objects;
@@ -41,8 +41,8 @@ import java.util.Objects;
 public class DifferentialDrivePoseEstimator {
   private final DifferentialDriveKinematics m_kinematics;
   private final DifferentialDriveOdometry m_odometry;
-  private final Matrix<N4, N1> m_q = new Matrix<>(Nat.N4(), Nat.N1());
-  private Matrix<N4, N4> m_visionK = new Matrix<>(Nat.N4(), Nat.N4());
+  private final Matrix<N6, N1> m_q = new Matrix<>(Nat.N6(), Nat.N1());
+  private Matrix<N6, N6> m_visionK = new Matrix<>(Nat.N6(), Nat.N6());
 
   private static final double kBufferDuration = 1.5;
 
@@ -53,9 +53,9 @@ public class DifferentialDrivePoseEstimator {
    * Constructs a DifferentialDrivePoseEstimator with default standard deviations for the model and
    * vision measurements.
    *
-   * <p>The default standard deviations of the model states are 0.02 meters for x, 0.02 meters for
-   * y, and 0.01 radians for heading. The default standard deviations of the vision measurements are
-   * 0.1 meters for x, 0.1 meters for y, and 0.1 radians for heading.
+   * <p>The default standard deviations of the model states are 0.02 meters for x, y, and z, and
+   * 0.01 radians for roll, pitch, and yaw. The default standard deviations of the vision
+   * measurements are 0.1 meters for x, y, and z, and 0.1 radians for roll, pitch, and yaw.
    *
    * @param kinematics A correctly-configured kinematics object for your drivetrain.
    * @param gyroAngle The current gyro angle.
@@ -75,8 +75,8 @@ public class DifferentialDrivePoseEstimator {
         leftDistanceMeters,
         rightDistanceMeters,
         initialPoseMeters,
-        VecBuilder.fill(0.02, 0.02, 0.02, 0.01),
-        VecBuilder.fill(0.1, 0.1, 0.1, 0.1));
+        VecBuilder.fill(0.02, 0.02, 0.02, 0.01, 0.01, 0.01),
+        VecBuilder.fill(0.1, 0.1, 0.1, 0.1, 0.1, 0.1));
   }
 
   /**
@@ -117,12 +117,12 @@ public class DifferentialDrivePoseEstimator {
    * @param leftDistanceMeters The distance traveled by the left encoder.
    * @param rightDistanceMeters The distance traveled by the right encoder.
    * @param initialPoseMeters The estimated initial pose.
-   * @param stateStdDevs Standard deviations of the pose estimate (x position in meters, y position
-   *     in meters, and heading in radians). Increase these numbers to trust your state estimate
-   *     less.
-   * @param visionMeasurementStdDevs Standard deviations of the vision pose measurement (x position
-   *     in meters, y position in meters, and heading in radians). Increase these numbers to trust
-   *     the vision pose measurement less.
+   * @param stateStdDevs Standard deviations of the pose estimate (x, y, and z position in meters,
+   *     with roll, pitch and yaw angle in radians). Increase these numbers to trust your state
+   *     estimate less.
+   * @param visionMeasurementStdDevs Standard deviations of the vision pose measurement (x, y, and
+   *     z position in meters, with roll, pitch and yaw angle in radians). Increase these numbers
+   *     to trust the vision pose measurement less.
    */
   public DifferentialDrivePoseEstimator(
       DifferentialDriveKinematics kinematics,
@@ -130,14 +130,14 @@ public class DifferentialDrivePoseEstimator {
       double leftDistanceMeters,
       double rightDistanceMeters,
       Pose3d initialPoseMeters,
-      Matrix<N4, N1> stateStdDevs,
-      Matrix<N4, N1> visionMeasurementStdDevs) {
+      Matrix<N6, N1> stateStdDevs,
+      Matrix<N6, N1> visionMeasurementStdDevs) {
     m_kinematics = kinematics;
     m_odometry =
         new DifferentialDriveOdometry(
             gyroAngle, leftDistanceMeters, rightDistanceMeters, initialPoseMeters);
 
-    for (int i = 0; i < 4; ++i) {
+    for (int i = 0; i < 6; ++i) {
       m_q.set(i, 0, stateStdDevs.get(i, 0) * stateStdDevs.get(i, 0));
     }
 
@@ -174,10 +174,13 @@ public class DifferentialDrivePoseEstimator {
         leftDistanceMeters,
         rightDistanceMeters,
         new Pose3d(initialPoseMeters),
-        VecBuilder.fill(stateStdDevs.get(0, 0), stateStdDevs.get(1, 0), 0, stateStdDevs.get(2, 0)),
+        VecBuilder.fill(
+            stateStdDevs.get(0, 0), stateStdDevs.get(1, 0), 0, 0, 0, stateStdDevs.get(2, 0)),
         VecBuilder.fill(
             visionMeasurementStdDevs.get(0, 0),
             visionMeasurementStdDevs.get(1, 0),
+            0,
+            0,
             0,
             visionMeasurementStdDevs.get(2, 0)));
   }
@@ -197,6 +200,8 @@ public class DifferentialDrivePoseEstimator {
             visionMeasurementStdDevs.get(0, 0),
             visionMeasurementStdDevs.get(1, 0),
             0,
+            0,
+            0,
             visionMeasurementStdDevs.get(2, 0)));
   }
 
@@ -207,17 +212,17 @@ public class DifferentialDrivePoseEstimator {
    *
    * @param visionMeasurementStdDevs Standard deviations of the vision measurements. Increase these
    *     numbers to trust global measurements from vision less. This matrix is in the form [x, y,
-   *     theta]ᵀ, with units in meters and radians.
+   *     z, roll, pitch, yaw]ᵀ, with units in meters and radians.
    */
-  public void setVisionMeasurementStdDevs3d(Matrix<N4, N1> visionMeasurementStdDevs) {
-    var r = new double[4];
-    for (int i = 0; i < 4; ++i) {
+  public void setVisionMeasurementStdDevs3d(Matrix<N6, N1> visionMeasurementStdDevs) {
+    var r = new double[6];
+    for (int i = 0; i < 6; ++i) {
       r[i] = visionMeasurementStdDevs.get(i, 0) * visionMeasurementStdDevs.get(i, 0);
     }
 
     // Solve for closed form Kalman gain for continuous Kalman filter with A = 0
     // and C = I. See wpimath/algorithms.md.
-    for (int row = 0; row < 4; ++row) {
+    for (int row = 0; row < 6; ++row) {
       if (m_q.get(row, 0) == 0.0) {
         m_visionK.set(row, row, 0.0);
       } else {
@@ -351,11 +356,9 @@ public class DifferentialDrivePoseEstimator {
 
     // Step 3: We should not trust the twist entirely, so instead we scale this twist by a Kalman
     // gain matrix representing how much we trust vision measurements compared to our current pose.
-    var k_times_twist = m_visionK.times(VecBuilder.fill(twist.dx, twist.dy, twist.dz, 0));
-
-    var twist_rotation = new Rotation3d(VecBuilder.fill(twist.rx, twist.ry, twist.rz));
-    var scaled_twist_rotation =
-        twist_rotation.times(m_visionK.get(3, 3)).getQuaternion().toRotationVector();
+    var k_times_twist =
+        m_visionK.times(
+            VecBuilder.fill(twist.dx, twist.dy, twist.dz, twist.rx, twist.ry, twist.rz));
 
     // Step 4: Convert back to Twist2d.
     var scaledTwist =
@@ -363,9 +366,9 @@ public class DifferentialDrivePoseEstimator {
             k_times_twist.get(0, 0),
             k_times_twist.get(1, 0),
             k_times_twist.get(2, 0),
-            scaled_twist_rotation.get(0, 0),
-            scaled_twist_rotation.get(1, 0),
-            scaled_twist_rotation.get(2, 0));
+            k_times_twist.get(3, 0),
+            k_times_twist.get(4, 0),
+            k_times_twist.get(5, 0));
 
     // Step 5: Reset Odometry to state at sample with vision adjustment.
     m_odometry.resetPosition(
@@ -425,7 +428,7 @@ public class DifferentialDrivePoseEstimator {
   public void addVisionMeasurement(
       Pose3d visionRobotPoseMeters,
       double timestampSeconds,
-      Matrix<N4, N1> visionMeasurementStdDevs) {
+      Matrix<N6, N1> visionMeasurementStdDevs) {
     setVisionMeasurementStdDevs3d(visionMeasurementStdDevs);
     addVisionMeasurement(visionRobotPoseMeters, timestampSeconds);
   }
