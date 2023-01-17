@@ -51,7 +51,7 @@ void Drivetrain::PublishCameraToObject(
     nt::DoubleArrayEntry& cameraToObjectEntry,
     frc::sim::DifferentialDrivetrainSim drivetrainSimulator) {
   frc::Pose3d robotInField{drivetrainSimulator.GetPose()};
-  frc::Pose3d cameraInField = robotInField.operator+(robotToCamera);
+  frc::Pose3d cameraInField = robotInField + robotToCamera;
   frc::Transform3d cameraToObject{cameraInField, objectInField};
 
   // Publishes double array with Translation3D elements {x, y, z} and Rotation3D
