@@ -117,7 +117,7 @@ class Drivetrain {
   static constexpr units::meter_t kWheelRadius = 0.0508_m;
   static constexpr int kEncoderResolution = 4096;
 
-  static constexpr double m_defaultVal[] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
+  static constexpr std::array<double, 7> kDefaultVal{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
 
   frc::Transform3d m_robotToCamera{
       frc::Translation3d{1_m, 1_m, 1_m},
