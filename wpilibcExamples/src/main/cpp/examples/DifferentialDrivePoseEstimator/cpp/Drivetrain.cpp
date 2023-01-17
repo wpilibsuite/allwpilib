@@ -77,10 +77,7 @@ frc::Pose3d Drivetrain::ObjectToRobotPose(
   frc::Rotation3d rotation{frc::Quaternion{val[3], val[4], val[5], val[6]}};
   frc::Transform3d cameraToObject{translation, rotation};
 
-  frc::Pose3d robotPose =
-      frc::ObjectToRobotPose(objectInField, cameraToObject, robotToCamera);
-
-  return robotPose;
+  return frc::ObjectToRobotPose(objectInField, cameraToObject, robotToCamera);
 }
 
 void Drivetrain::UpdateOdometry() {
