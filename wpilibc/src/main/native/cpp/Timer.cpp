@@ -54,6 +54,13 @@ void Timer::Start() {
   }
 }
 
+void Timer::Restart() {
+    if(m_running)
+      Stop();
+    Reset();
+    Start();
+}
+
 void Timer::Stop() {
   if (m_running) {
     m_accumulatedTime = Get();

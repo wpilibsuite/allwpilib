@@ -76,6 +76,12 @@ class Timer {
    */
   void Start();
 
+/**
+ * Restart the timer by stopping the timer (if it is not already stopped) then resting
+ * the internal counter then starting the timer gain.
+ */
+  void Restart();
+
   /**
    * Stop the timer.
    *
