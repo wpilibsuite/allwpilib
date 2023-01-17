@@ -121,7 +121,7 @@ class Drivetrain {
 
   frc::Transform3d m_robotToCamera{
       frc::Translation3d{1_m, 1_m, 1_m},
-      frc::Rotation3d{units::radian_t{0}, units::radian_t{0},
+      frc::Rotation3d{0_rad, 0_rad,
                       units::radian_t{std::numbers::pi / 2}}};
 
   nt::NetworkTableInstance m_inst{nt::NetworkTableInstance::GetDefault()};
