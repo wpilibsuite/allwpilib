@@ -53,9 +53,8 @@ class Robot : public frc::TimedRobot {
 
   static constexpr units::volt_t kElevatorkS = 0.0_V;
   static constexpr units::volt_t kElevatorkG = 0.0_V;
-  static constexpr units::unit_t<ka_unit> kElevatorkA =
-      0.762_V * 1_s * 1_s / (1_m * 1_m);
-  static constexpr units::unit_t<kv_unit> kElevatorkV = 0.762_V * 1_s / 1_m;
+  static constexpr auto kElevatorkA = 0.762_V * 1_s * 1_s / (1_m * 1_m);
+  static constexpr auto kElevatorkV = 0.762_V * 1_s / 1_m;
 
   static constexpr double kElevatorGearing = 10.0;
   static constexpr units::meter_t kElevatorDrumRadius = 2_in;
@@ -145,7 +144,8 @@ class Robot : public frc::TimedRobot {
           m_controller.Calculate(units::meter_t{m_encoder.GetDistance()});
       units::volt_t feedForwardOutput = feedforward.Calculate(
           m_controller.GetSetpoint().velocity);  // velocity
-      m_motor.SetVoltage(units::volt_t{pidOutput + feedForwardOutput});
+      m_motor.SetVoltage(units::volt_t{pidOutput} +
+                         units::volt_t{feedForwardOutput});
     } else {
       // Otherwise, we disable the motor.
       m_motor.Set(0.0);
