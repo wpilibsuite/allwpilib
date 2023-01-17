@@ -158,6 +158,27 @@ public class MecanumDrivePoseEstimator {
   public Pose2d getEstimatedPosition() {
     return m_poseEstimate;
   }
+  /**
+   * Gets the estimated robot pose at timestampSeconds.
+   *
+   * @param timestampSeconds The timestamp of the vision measurement in seconds. Note that if you
+   *     don't use your own time source by calling {@link
+   *     MecanumDrivePoseEstimator#updateWithTime(double,Rotation2d,MecanumDriveWheelPositions)}
+   *     then you must use a timestamp with an epoch since FPGA startup (i.e., the epoch of this
+   *     timestamp is the same epoch as {@link edu.wpi.first.wpilibj.Timer#getFPGATimestamp()}.)
+   *     This means that you should use {@link edu.wpi.first.wpilibj.Timer#getFPGATimestamp()} as
+   *     your time source or sync the epochs.
+   * @return The estimated robot pose in meters.
+   */
+  public Pose2d getEstimatedPosition(double timestampSeconds) {
+    if(m_poseBuffer.getInternalBuffer().isEmpty()) return m_poseEstimate;
+    // current to old odometry delta
+    var delta = new Transform2d(
+      m_odometry.getPoseMeters(),
+      m_poseBuffer.getSample(timestampSeconds).get().poseMeters
+    );
+    return m_poseEstimate.transformBy(delta);
+  }
 
   /**
    * Adds a vision measurement to the Kalman Filter. This will correct the odometry pose estimate
