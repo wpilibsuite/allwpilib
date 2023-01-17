@@ -105,7 +105,9 @@ public class Timer {
    * internal counter then starting the timer gain.
    */
   public void restart() {
-    if (m_running) stop();
+    if (m_running) {
+      stop();
+    }
     reset();
     start();
   }
