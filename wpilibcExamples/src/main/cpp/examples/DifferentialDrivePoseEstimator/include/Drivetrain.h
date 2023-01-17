@@ -128,7 +128,7 @@ class Drivetrain {
   nt::DoubleArrayTopic m_cameraToObjectTopic{
       m_inst.GetDoubleArrayTopic("m_cameraToObjectTopic")};
   nt::DoubleArrayEntry m_cameraToObjectEntry =
-      m_cameraToObjectTopic.GetEntry(m_defaultVal);
+      m_cameraToObjectTopic.GetEntry(kDefaultVal);
   nt::DoubleArrayEntry& m_cameraToObjectEntryRef = m_cameraToObjectEntry;
 
   frc::AprilTagFieldLayout m_aprilTagFieldLayout{
