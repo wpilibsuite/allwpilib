@@ -12,6 +12,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Twist2d;
 import edu.wpi.first.math.geometry.Twist3d;
 import edu.wpi.first.math.interpolation.Interpolatable;
@@ -345,8 +346,10 @@ public class DifferentialDrivePoseEstimator {
       return;
     }
 
+    var record = sample.get();
+
     // Step 2: Measure the twist between the odometry pose and the vision pose.
-    var twist = sample.get().poseMeters.log(visionRobotPoseMeters);
+    var twist = record.poseMeters.log(visionRobotPoseMeters);
 
     // Step 3: We should not trust the twist entirely, so instead we scale this twist by a Kalman
     // gain matrix representing how much we trust vision measurements compared to our current pose.
@@ -365,24 +368,68 @@ public class DifferentialDrivePoseEstimator {
             twist_axis.get(1, 0) * k_times_twist.get(3, 0),
             twist_axis.get(2, 0) * k_times_twist.get(3, 0));
 
-    System.out.println(twist.toString());
-    System.out.println(scaledTwist.toString());
+
+    var twist_rot = new Rotation3d(VecBuilder.fill(twist.rx, twist.ry, twist.rz)).getQuaternion();
+
+    var twist_error = new Transform3d(record.poseMeters.exp(twist), visionRobotPoseMeters);
+    var twist_error_rvec = twist_error.getRotation().getQuaternion();
+
+    var record_rvec = record.poseMeters.getRotation().getQuaternion();
+    var vision_pose_rvec = visionRobotPoseMeters.getRotation().getQuaternion();
+
+    var record_exp_pose = record.poseMeters.exp(twist);
+    var record_exp_pose_rvec = record_exp_pose.getRotation().getQuaternion();
+
+    System.out.println(String.format("AAAA %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f,. %f, %f, %f, %f, %f",
+      timestampSeconds,
+      record.poseMeters.getX(), 
+      record.poseMeters.getY(), 
+      record.poseMeters.getZ(), 
+      record_rvec.getW(),
+      record_rvec.getX(),
+      record_rvec.getY(),
+      record_rvec.getZ(),
+      visionRobotPoseMeters.getX(), 
+      visionRobotPoseMeters.getY(), 
+      visionRobotPoseMeters.getZ(), 
+      vision_pose_rvec.getW(),
+      vision_pose_rvec.getX(),
+      vision_pose_rvec.getY(),
+      vision_pose_rvec.getZ(),
+      twist.dx,
+      twist.dy,
+      twist.dz,
+      twist_rot.getW(),
+      twist_rot.getX(),
+      twist_rot.getY(),
+      twist_rot.getZ(),
+      record_exp_pose.getX(),
+      record_exp_pose.getY(),
+      record_exp_pose.getZ(),
+      record_exp_pose_rvec.getW(),
+      record_exp_pose_rvec.getX(),
+      record_exp_pose_rvec.getY(),
+      record_exp_pose_rvec.getZ(),
+      twist_error.getX(),
+      twist_error.getY(),
+      twist_error.getZ(),
+      twist_error_rvec.getW(),
+      twist_error_rvec.getX(),
+      twist_error_rvec.getY(),
+      twist_error_rvec.getZ()));
 
     // Step 5: Reset Odometry to state at sample with vision adjustment.
     m_odometry.resetPosition(
-        sample.get().gyroAngle,
-        sample.get().leftMeters,
-        sample.get().rightMeters,
-        sample.get().poseMeters.exp(scaledTwist));
+        record.gyroAngle,
+        record.leftMeters,
+        record.rightMeters,
+        record.poseMeters.exp(scaledTwist));
 
     // Step 6: Record the current pose to allow multiple measurements from the same timestamp
     m_poseBuffer.addSample(
         timestampSeconds,
         new InterpolationRecord(
-            getEstimatedPosition3d(),
-            sample.get().gyroAngle,
-            sample.get().leftMeters,
-            sample.get().rightMeters));
+            getEstimatedPosition3d(), record.gyroAngle, record.leftMeters, record.rightMeters));
 
     // Step 7: Replay odometry inputs between sample time and latest recorded sample to update the
     // pose buffer and correct odometry.
