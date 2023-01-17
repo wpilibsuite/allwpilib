@@ -56,7 +56,7 @@ void Drivetrain::PublishCameraToObject(
 
   // Publishes double array with Translation3D elements {x, y, z} and Rotation3D
   // elements {w, x, y, z} which describe the cameraToObject transformation.
-  double val[] = {cameraToObject.X().value(),
+  std::array<double, 7> val{cameraToObject.X().value(),
                   cameraToObject.Y().value(),
                   cameraToObject.Z().value(),
                   cameraToObject.Rotation().GetQuaternion().W(),
