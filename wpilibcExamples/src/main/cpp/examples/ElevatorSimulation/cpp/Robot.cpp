@@ -44,9 +44,9 @@ class Robot : public frc::TimedRobot {
 
   static constexpr units::volt_t kElevatorkS = 0.0_V;
   static constexpr units::volt_t kElevatorkG = 0.0_V;
-  static constexpr units::unit_t<units::compound_unit<units::volts, units::inverse<units::compound_unit<units::compound_unit<units::meters, units::inverse<units::seconds>>, units::inverse<units::seconds>>>>> kElevatorkA = 0.762_V * 1_s * 1_s / (1_m * 1_m);
-  static constexpr units::unit_t<units::compound_unit<units::volts, units::inverse<units::compound_unit<units::meters, units::inverse<units::seconds>>>>> kElevatorkV = 0.762_V * 1_s / 1_m;
-
+  static constexpr units::unit_t<ka_unit> kElevatorkA =
+      0.762_V * 1_s * 1_s / (1_m * 1_m);
+  static constexpr units::unit_t<kV_unit> kElevatorkV = 0.762_V * 1_s / 1_m;
 
   static constexpr double kElevatorGearing = 10.0;
   static constexpr units::meter_t kElevatorDrumRadius = 2_in;
@@ -64,12 +64,22 @@ class Robot : public frc::TimedRobot {
   frc::DCMotor m_elevatorGearbox = frc::DCMotor::Vex775Pro(4);
 
   // Standard classes for controlling our elevator
-  frc::TrapezoidProfile<units::meters>::Constraints m_constraints{2.45_mps, 2.45_mps_sq};
+  frc::TrapezoidProfile<units::meters>::Constraints m_constraints{2.45_mps,
+                                                                  2.45_mps_sq};
   frc::ProfiledPIDController<units::meters> m_controller{
-  kElevatorKp, kElevatorKi, kElevatorKd,
-  m_constraints};
+      kElevatorKp, kElevatorKi, kElevatorKd, m_constraints};
 
-  frc::ElevatorFeedforward feedforward(units::volt_t(kElevatorkS), units::volt_t(kElevatorkG), units::unit_t<units::compound_unit<units::volts, units::inverse<units::compound_unit<units::meters, units::inverse<units::seconds>>>>>(kElevatorkV), units::unit_t<units::compound_unit<units::volts, units::inverse<units::compound_unit<units::compound_unit<units::meters, units::inverse<units::seconds>>, units::inverse<units::seconds>>>>>(kElevatorkA));
+  frc::ElevatorFeedforward feedforward(
+      units::volt_t(kElevatorkS), units::volt_t(kElevatorkG),
+      units::unit_t<units::compound_unit<
+          units::volts, units::inverse<units::compound_unit<
+                            units::meters, units::inverse<units::seconds>>>>>(
+          kElevatorkV),
+      units::unit_t<units::compound_unit<
+          units::volts, units::inverse<units::compound_unit<
+                            units::compound_unit<
+                                units::meters, units::inverse<units::seconds>>,
+                            units::inverse<units::seconds>>>>>(kElevatorkA));
   frc::Encoder m_encoder{kEncoderAChannel, kEncoderBChannel};
   frc::PWMSparkMax m_motor{kMotorPort};
   frc::Joystick m_joystick{kJoystickPort};
@@ -127,19 +137,21 @@ class Robot : public frc::TimedRobot {
 
   void TeleopPeriodic() override {
     if (m_joystick.GetTrigger()) {
-      
       // Here, we run PID control like normal, with a constant setpoint of 30in.
-      double pidOutput = m_controller.Calculate(m_encoder.GetDistance(),
-                                                units::meter_t{30_in}.value());
-      units::volt_t feedForwardOutput = feedforward.Calculate(m_controller.GetSetpoint().velocity); // velocity
+      m_controller.SetGoal(units::meter_t{30_in});
+      double pidOutput =
+          m_controller.Calculate(units::meter_t{m_encoder.GetDistance()});
+      units::volt_t feedForwardOutput = feedforward.Calculate(
+          m_controller.GetSetpoint().velocity);  // velocity
       m_motor.SetVoltage(units::volt_t{pidOutput + feedForwardOutput});
     } else {
       // Otherwise, we disable the motor.
       m_motor.Set(0.0);
     }
   }
-  // To view the Elevator Sim in the simulator, select Network Tables -> SmartDashboard -> Elevator Sim
-  // If you are on keyboard, press Z to move the elevator
+  // To view the Elevator Sim in the simulator, select Network Tables ->
+  // SmartDashboard -> Elevator Sim If you are on keyboard, press Z to move the
+  // elevator
 
   void DisabledInit() override {
     // This just makes sure that our simulation code knows that the motor's off.
