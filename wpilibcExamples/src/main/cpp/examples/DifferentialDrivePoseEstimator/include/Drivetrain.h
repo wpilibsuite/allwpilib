@@ -117,12 +117,12 @@ class Drivetrain {
   static constexpr units::meter_t kWheelRadius = 0.0508_m;
   static constexpr int kEncoderResolution = 4096;
 
-  static constexpr std::array<double, 7> kDefaultVal{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
+  static constexpr std::array<double, 7> kDefaultVal{0.0, 0.0, 0.0, 0.0,
+                                                     0.0, 0.0, 0.0};
 
   frc::Transform3d m_robotToCamera{
       frc::Translation3d{1_m, 1_m, 1_m},
-      frc::Rotation3d{0_rad, 0_rad,
-                      units::radian_t{std::numbers::pi / 2}}};
+      frc::Rotation3d{0_rad, 0_rad, units::radian_t{std::numbers::pi / 2}}};
 
   nt::NetworkTableInstance m_inst{nt::NetworkTableInstance::GetDefault()};
   nt::DoubleArrayTopic m_cameraToObjectTopic{
