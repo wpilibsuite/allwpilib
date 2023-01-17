@@ -163,8 +163,8 @@ public class SwerveDrivePoseEstimator {
   /**
    * Gets the estimated robot pose at timestampSeconds.
    *
-   * @param timestampSeconds The timestamp of the pose estimate in seconds. Note that if you
-   *     don't use your own time source by calling {@link
+   * @param timestampSeconds The timestamp of the pose estimate in seconds. Note that if you don't
+   *     use your own time source by calling {@link
    *     SwerveDrivePoseEstimator#updateWithTime(double,Rotation2d,SwerveModulePosition[])} then you
    *     must use a timestamp with an epoch since FPGA startup (i.e., the epoch of this timestamp is
    *     the same epoch as {@link edu.wpi.first.wpilibj.Timer#getFPGATimestamp()}.) This means that
@@ -173,15 +173,14 @@ public class SwerveDrivePoseEstimator {
    * @return The estimated robot pose in meters.
    */
   public Pose2d getEstimatedPosition(double timestampSeconds) {
-    if(m_poseBuffer.getInternalBuffer().isEmpty()) return m_poseEstimate;
+    if (m_poseBuffer.getInternalBuffer().isEmpty()) return m_poseEstimate;
     // current to old odometry delta
-    var delta = new Transform2d(
-      m_odometry.getPoseMeters(),
-      m_poseBuffer.getSample(timestampSeconds).get().poseMeters
-    );
+    var delta =
+        new Transform2d(
+            m_odometry.getPoseMeters(), m_poseBuffer.getSample(timestampSeconds).get().poseMeters);
     return m_poseEstimate.transformBy(delta);
   }
-  
+
   /**
    * Adds a vision measurement to the Kalman Filter. This will correct the odometry pose estimate
    * while still accounting for measurement noise.
@@ -209,15 +208,15 @@ public class SwerveDrivePoseEstimator {
     if (sample.isEmpty()) {
       return;
     }
-    
+
     // Step 2: Apply the odometry delta in the time since the vision timestamp to estimate the
     // "current" vision pose
     var delta = new Transform2d(sample.get().poseMeters, m_odometry.getPoseMeters());
     visionRobotPoseMeters = visionRobotPoseMeters.transformBy(delta);
-    
+
     // Step 3: Measure the twist between the estimated pose and the "current" vision pose
     var twist = m_poseEstimate.log(visionRobotPoseMeters);
-    
+
     // Step 4: We should not trust the twist entirely, so instead we scale this twist by a Kalman
     // gain matrix representing how much we trust vision measurements compared to our current pose.
     var k_times_twist = m_visionK.times(VecBuilder.fill(twist.dx, twist.dy, twist.dtheta));
@@ -225,15 +224,15 @@ public class SwerveDrivePoseEstimator {
     // Step 5: The Kalman gains scale the vision twists independent of other vision measurements,
     // so applying multiple vision measurements before the next update will have different results
     // depending on the order they are applied in. We can sum the Kalman gains applied before the
-    // next update and use that to effectively average the twist for multiple vision measurements. 
-    var weighted_k_times_twist = k_times_twist.elementTimes(
-            m_visionKSum.diag().extractColumnVector(0).elementPower(-1));
+    // next update and use that to effectively average the twist for multiple vision measurements.
+    var weighted_k_times_twist =
+        k_times_twist.elementTimes(m_visionKSum.diag().extractColumnVector(0).elementPower(-1));
     m_visionKSum = m_visionKSum.plus(m_visionK);
 
     // Step 5: Convert back to Twist2d.
     double[] scaledTwistVals = weighted_k_times_twist.getData();
     var scaledTwist = new Twist2d(scaledTwistVals[0], scaledTwistVals[1], scaledTwistVals[2]);
-    
+
     // Step 6: Apply scaled twist to the last estimated pose
     m_poseEstimate = m_poseEstimate.exp(scaledTwist);
   }
@@ -308,11 +307,12 @@ public class SwerveDrivePoseEstimator {
       internalModulePositions[i] =
           new SwerveModulePosition(modulePositions[i].distanceMeters, modulePositions[i].angle);
     }
-    
+
     // update odometry
     var lastOdom = m_odometry.getPoseMeters();
     var currOdom = m_odometry.update(gyroAngle, modulePositions);
-    m_poseBuffer.addSample(currentTimeSeconds, new InterpolationRecord(currOdom, internalModulePositions));
+    m_poseBuffer.addSample(
+        currentTimeSeconds, new InterpolationRecord(currOdom, internalModulePositions));
 
     // apply odometry update to pose estimate
     m_poseEstimate = m_poseEstimate.transformBy(new Transform2d(lastOdom, currOdom));
@@ -340,8 +340,7 @@ public class SwerveDrivePoseEstimator {
      * @param pose The pose observed given the current sensor inputs and the previous pose.
      * @param wheelPositions The distances and rotations measured at each wheel.
      */
-    private InterpolationRecord(
-        Pose2d poseMeters, SwerveModulePosition[] modulePositions) {
+    private InterpolationRecord(Pose2d poseMeters, SwerveModulePosition[] modulePositions) {
       this.poseMeters = poseMeters;
       this.modulePositions = modulePositions;
     }

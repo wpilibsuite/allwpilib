@@ -183,12 +183,11 @@ public class DifferentialDrivePoseEstimator {
    * @return The estimated robot pose in meters.
    */
   public Pose2d getEstimatedPosition(double timestampSeconds) {
-    if(m_poseBuffer.getInternalBuffer().isEmpty()) return m_poseEstimate;
+    if (m_poseBuffer.getInternalBuffer().isEmpty()) return m_poseEstimate;
     // current to old odometry delta
-    var delta = new Transform2d(
-      m_odometry.getPoseMeters(),
-      m_poseBuffer.getSample(timestampSeconds).get().poseMeters
-    );
+    var delta =
+        new Transform2d(
+            m_odometry.getPoseMeters(), m_poseBuffer.getSample(timestampSeconds).get().poseMeters);
     return m_poseEstimate.transformBy(delta);
   }
 
@@ -224,10 +223,10 @@ public class DifferentialDrivePoseEstimator {
     // "current" vision pose
     var delta = new Transform2d(sample.get().poseMeters, m_odometry.getPoseMeters());
     visionRobotPoseMeters = visionRobotPoseMeters.transformBy(delta);
-    
+
     // Step 3: Measure the twist between the estimated pose and the "current" vision pose
     var twist = m_poseEstimate.log(visionRobotPoseMeters);
-    
+
     // Step 4: We should not trust the twist entirely, so instead we scale this twist by a Kalman
     // gain matrix representing how much we trust vision measurements compared to our current pose.
     var k_times_twist = m_visionK.times(VecBuilder.fill(twist.dx, twist.dy, twist.dtheta));
@@ -235,15 +234,15 @@ public class DifferentialDrivePoseEstimator {
     // Step 5: The Kalman gains scale the vision twists independent of other vision measurements,
     // so applying multiple vision measurements before the next update will have different results
     // depending on the order they are applied in. We can sum the Kalman gains applied before the
-    // next update and use that to effectively average the twist for multiple vision measurements. 
-    var weighted_k_times_twist = k_times_twist.elementTimes(
-            m_visionKSum.diag().extractColumnVector(0).elementPower(-1));
+    // next update and use that to effectively average the twist for multiple vision measurements.
+    var weighted_k_times_twist =
+        k_times_twist.elementTimes(m_visionKSum.diag().extractColumnVector(0).elementPower(-1));
     m_visionKSum = m_visionKSum.plus(m_visionK);
 
     // Step 5: Convert back to Twist2d.
     double[] scaledTwistVals = weighted_k_times_twist.getData();
     var scaledTwist = new Twist2d(scaledTwistVals[0], scaledTwistVals[1], scaledTwistVals[2]);
-    
+
     // Step 6: Apply scaled twist to the last estimated pose
     m_poseEstimate = m_poseEstimate.exp(scaledTwist);
   }
@@ -318,8 +317,7 @@ public class DifferentialDrivePoseEstimator {
     var currOdom = m_odometry.update(gyroAngle, distanceLeftMeters, distanceRightMeters);
     m_poseBuffer.addSample(
         currentTimeSeconds,
-        new InterpolationRecord(
-            currOdom, distanceLeftMeters, distanceRightMeters));
+        new InterpolationRecord(currOdom, distanceLeftMeters, distanceRightMeters));
 
     // apply odometry update to pose estimate
     m_poseEstimate = m_poseEstimate.transformBy(new Transform2d(lastOdom, currOdom));
@@ -351,8 +349,7 @@ public class DifferentialDrivePoseEstimator {
      * @param leftMeters The distance traveled by the left encoder.
      * @param rightMeters The distanced traveled by the right encoder.
      */
-    private InterpolationRecord(
-        Pose2d poseMeters, double leftMeters, double rightMeters) {
+    private InterpolationRecord(Pose2d poseMeters, double leftMeters, double rightMeters) {
       this.poseMeters = poseMeters;
       this.leftMeters = leftMeters;
       this.rightMeters = rightMeters;
