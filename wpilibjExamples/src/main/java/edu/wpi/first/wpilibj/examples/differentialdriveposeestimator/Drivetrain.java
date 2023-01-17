@@ -229,10 +229,7 @@ public class Drivetrain {
     Rotation3d rotation = new Rotation3d(new Quaternion(val[3], val[4], val[5], val[6]));
     Transform3d cameraToObject = new Transform3d(translation, rotation);
 
-    Pose3d robotPose =
-        ComputerVisionUtil.objectToRobotPose(objectInField, cameraToObject, robotToCamera);
-
-    return robotPose;
+    return ComputerVisionUtil.objectToRobotPose(objectInField, cameraToObject, robotToCamera);
   }
 
   /** Updates the field-relative position. */
