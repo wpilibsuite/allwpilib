@@ -10,6 +10,7 @@ import edu.wpi.first.math.Nat;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Twist2d;
 import edu.wpi.first.math.interpolation.Interpolatable;
 import edu.wpi.first.math.interpolation.TimeInterpolatableBuffer;
@@ -19,7 +20,6 @@ import edu.wpi.first.math.kinematics.MecanumDriveWheelPositions;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.util.WPIUtilJNI;
-import java.util.Map;
 import java.util.Objects;
 
 /**
@@ -38,6 +38,8 @@ public class MecanumDrivePoseEstimator {
   private final MecanumDriveOdometry m_odometry;
   private final Matrix<N3, N1> m_q = new Matrix<>(Nat.N3(), Nat.N1());
   private Matrix<N3, N3> m_visionK = new Matrix<>(Nat.N3(), Nat.N3());
+  private Matrix<N3, N3> m_visionKSum = Matrix.eye(Nat.N3());
+  private Pose2d m_poseEstimate;
 
   private final TimeInterpolatableBuffer<InterpolationRecord> m_poseBuffer =
       TimeInterpolatableBuffer.createBuffer(1.5);
@@ -92,6 +94,7 @@ public class MecanumDrivePoseEstimator {
       Matrix<N3, N1> visionMeasurementStdDevs) {
     m_kinematics = kinematics;
     m_odometry = new MecanumDriveOdometry(kinematics, gyroAngle, wheelPositions, initialPoseMeters);
+    m_poseEstimate = m_odometry.getPoseMeters();
 
     for (int i = 0; i < 3; ++i) {
       m_q.set(i, 0, stateStdDevs.get(i, 0) * stateStdDevs.get(i, 0));
@@ -142,7 +145,9 @@ public class MecanumDrivePoseEstimator {
       Rotation2d gyroAngle, MecanumDriveWheelPositions wheelPositions, Pose2d poseMeters) {
     // Reset state estimate and error covariance
     m_odometry.resetPosition(gyroAngle, wheelPositions, poseMeters);
+    m_poseEstimate = poseMeters;
     m_poseBuffer.clear();
+    m_visionKSum = Matrix.eye(Nat.N3());
   }
 
   /**
@@ -151,7 +156,7 @@ public class MecanumDrivePoseEstimator {
    * @return The estimated robot pose in meters.
    */
   public Pose2d getEstimatedPosition() {
-    return m_odometry.getPoseMeters();
+    return m_poseEstimate;
   }
 
   /**
@@ -182,35 +187,32 @@ public class MecanumDrivePoseEstimator {
       return;
     }
 
-    // Step 2: Measure the twist between the odometry pose and the vision pose.
-    var twist = sample.get().poseMeters.log(visionRobotPoseMeters);
-
-    // Step 3: We should not trust the twist entirely, so instead we scale this twist by a Kalman
+    // Step 2: Apply the odometry delta in the time since the vision timestamp to estimate the
+    // "current" vision pose
+    var delta = new Transform2d(sample.get().poseMeters, m_odometry.getPoseMeters());
+    visionRobotPoseMeters = visionRobotPoseMeters.transformBy(delta);
+    
+    // Step 3: Measure the twist between the estimated pose and the "current" vision pose
+    var twist = m_poseEstimate.log(visionRobotPoseMeters);
+    
+    // Step 4: We should not trust the twist entirely, so instead we scale this twist by a Kalman
     // gain matrix representing how much we trust vision measurements compared to our current pose.
     var k_times_twist = m_visionK.times(VecBuilder.fill(twist.dx, twist.dy, twist.dtheta));
 
-    // Step 4: Convert back to Twist2d.
-    var scaledTwist =
-        new Twist2d(k_times_twist.get(0, 0), k_times_twist.get(1, 0), k_times_twist.get(2, 0));
+    // Step 5: The Kalman gains scale the vision twists independent of other vision measurements,
+    // so applying multiple vision measurements before the next update will have different results
+    // depending on the order they are applied in. We can sum the Kalman gains applied before the
+    // next update and use that to effectively average the twist for multiple vision measurements. 
+    var weighted_k_times_twist = k_times_twist.elementTimes(
+            m_visionKSum.diag().extractColumnVector(0).elementPower(-1));
+    m_visionKSum = m_visionKSum.plus(m_visionK);
 
-    // Step 5: Reset Odometry to state at sample with vision adjustment.
-    m_odometry.resetPosition(
-        sample.get().gyroAngle,
-        sample.get().wheelPositions,
-        sample.get().poseMeters.exp(scaledTwist));
-
-    // Step 6: Record the current pose to allow multiple measurements from the same timestamp
-    m_poseBuffer.addSample(
-        timestampSeconds,
-        new InterpolationRecord(
-            getEstimatedPosition(), sample.get().gyroAngle, sample.get().wheelPositions));
-
-    // Step 7: Replay odometry inputs between sample time and latest recorded sample to update the
-    // pose buffer and correct odometry.
-    for (Map.Entry<Double, InterpolationRecord> entry :
-        m_poseBuffer.getInternalBuffer().tailMap(timestampSeconds).entrySet()) {
-      updateWithTime(entry.getKey(), entry.getValue().gyroAngle, entry.getValue().wheelPositions);
-    }
+    // Step 5: Convert back to Twist2d.
+    double[] scaledTwistVals = weighted_k_times_twist.getData();
+    var scaledTwist = new Twist2d(scaledTwistVals[0], scaledTwistVals[1], scaledTwistVals[2]);
+    
+    // Step 6: Apply scaled twist to the last estimated pose
+    m_poseEstimate = m_poseEstimate.exp(scaledTwist);
   }
 
   /**
@@ -271,18 +273,24 @@ public class MecanumDrivePoseEstimator {
    */
   public Pose2d updateWithTime(
       double currentTimeSeconds, Rotation2d gyroAngle, MecanumDriveWheelPositions wheelPositions) {
-    m_odometry.update(gyroAngle, wheelPositions);
-
+    // update odometry
+    var lastOdom = m_odometry.getPoseMeters();
+    var currOdom = m_odometry.update(gyroAngle, wheelPositions);
     m_poseBuffer.addSample(
         currentTimeSeconds,
         new InterpolationRecord(
-            getEstimatedPosition(),
-            gyroAngle,
+            currOdom,
             new MecanumDriveWheelPositions(
                 wheelPositions.frontLeftMeters,
                 wheelPositions.frontRightMeters,
                 wheelPositions.rearLeftMeters,
                 wheelPositions.rearRightMeters)));
+
+    // apply odometry update to pose estimate
+    m_poseEstimate = m_poseEstimate.transformBy(new Transform2d(lastOdom, currOdom));
+
+    // reset kalman gain sum matrix
+    m_visionKSum = Matrix.eye(Nat.N3());
 
     return getEstimatedPosition();
   }
@@ -295,9 +303,6 @@ public class MecanumDrivePoseEstimator {
     // The pose observed given the current sensor inputs and the previous pose.
     private final Pose2d poseMeters;
 
-    // The current gyro angle.
-    private final Rotation2d gyroAngle;
-
     // The distances traveled by each wheel encoder.
     private final MecanumDriveWheelPositions wheelPositions;
 
@@ -305,13 +310,11 @@ public class MecanumDrivePoseEstimator {
      * Constructs an Interpolation Record with the specified parameters.
      *
      * @param pose The pose observed given the current sensor inputs and the previous pose.
-     * @param gyro The current gyro angle.
      * @param wheelPositions The distances traveled by each wheel encoder.
      */
     private InterpolationRecord(
-        Pose2d poseMeters, Rotation2d gyro, MecanumDriveWheelPositions wheelPositions) {
+        Pose2d poseMeters, MecanumDriveWheelPositions wheelPositions) {
       this.poseMeters = poseMeters;
-      this.gyroAngle = gyro;
       this.wheelPositions = wheelPositions;
     }
 
@@ -357,13 +360,13 @@ public class MecanumDrivePoseEstimator {
                 wheels_lerp.rearRightMeters - this.wheelPositions.rearRightMeters);
 
         // Find the new gyro angle.
-        var gyro_lerp = gyroAngle.interpolate(endValue.gyroAngle, t);
+        var gyro_lerp = poseMeters.getRotation().interpolate(endValue.poseMeters.getRotation(), t);
 
         // Create a twist to represent this change based on the interpolated sensor inputs.
         Twist2d twist = m_kinematics.toTwist2d(wheels_delta);
-        twist.dtheta = gyro_lerp.minus(gyroAngle).getRadians();
+        twist.dtheta = gyro_lerp.minus(poseMeters.getRotation()).getRadians();
 
-        return new InterpolationRecord(poseMeters.exp(twist), gyro_lerp, wheels_lerp);
+        return new InterpolationRecord(poseMeters.exp(twist), wheels_lerp);
       }
     }
 
@@ -376,14 +379,13 @@ public class MecanumDrivePoseEstimator {
         return false;
       }
       InterpolationRecord record = (InterpolationRecord) obj;
-      return Objects.equals(gyroAngle, record.gyroAngle)
-          && Objects.equals(wheelPositions, record.wheelPositions)
+      return Objects.equals(wheelPositions, record.wheelPositions)
           && Objects.equals(poseMeters, record.poseMeters);
     }
 
     @Override
     public int hashCode() {
-      return Objects.hash(gyroAngle, wheelPositions, poseMeters);
+      return Objects.hash(wheelPositions, poseMeters);
     }
   }
 }
