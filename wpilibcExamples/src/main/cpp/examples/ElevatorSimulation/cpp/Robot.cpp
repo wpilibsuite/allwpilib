@@ -33,6 +33,15 @@
  * to control an arm.
  */
 class Robot : public frc::TimedRobot {
+  using Distance = units::meters;
+  using Velocity =
+      units::compound_unit<Distance, units::inverse<units::seconds>>;
+  using Acceleration =
+      units::compound_unit<Velocity, units::inverse<units::seconds>>;
+  using kv_unit = units::compound_unit<units::volts, units::inverse<Velocity>>;
+  using ka_unit =
+      units::compound_unit<units::volts, units::inverse<Acceleration>>;
+
   static constexpr int kMotorPort = 0;
   static constexpr int kEncoderAChannel = 0;
   static constexpr int kEncoderBChannel = 1;
@@ -46,7 +55,7 @@ class Robot : public frc::TimedRobot {
   static constexpr units::volt_t kElevatorkG = 0.0_V;
   static constexpr units::unit_t<ka_unit> kElevatorkA =
       0.762_V * 1_s * 1_s / (1_m * 1_m);
-  static constexpr units::unit_t<kV_unit> kElevatorkV = 0.762_V * 1_s / 1_m;
+  static constexpr units::unit_t<kv_unit> kElevatorkV = 0.762_V * 1_s / 1_m;
 
   static constexpr double kElevatorGearing = 10.0;
   static constexpr units::meter_t kElevatorDrumRadius = 2_in;
@@ -69,17 +78,10 @@ class Robot : public frc::TimedRobot {
   frc::ProfiledPIDController<units::meters> m_controller{
       kElevatorKp, kElevatorKi, kElevatorKd, m_constraints};
 
-  frc::ElevatorFeedforward feedforward(
-      units::volt_t(kElevatorkS), units::volt_t(kElevatorkG),
-      units::unit_t<units::compound_unit<
-          units::volts, units::inverse<units::compound_unit<
-                            units::meters, units::inverse<units::seconds>>>>>(
-          kElevatorkV),
-      units::unit_t<units::compound_unit<
-          units::volts, units::inverse<units::compound_unit<
-                            units::compound_unit<
-                                units::meters, units::inverse<units::seconds>>,
-                            units::inverse<units::seconds>>>>>(kElevatorkA));
+  frc::ElevatorFeedforward feedforward(units::volt_t(kElevatorkS),
+                                       units::volt_t(kElevatorkG),
+                                       units::unit_t<kv_unit>(kElevatorkV),
+                                       units::unit_t<ka_unit>(kElevatorkA));
   frc::Encoder m_encoder{kEncoderAChannel, kEncoderBChannel};
   frc::PWMSparkMax m_motor{kMotorPort};
   frc::Joystick m_joystick{kJoystickPort};
