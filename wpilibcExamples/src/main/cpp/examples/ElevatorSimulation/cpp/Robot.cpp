@@ -33,14 +33,6 @@
  * to control an arm.
  */
 class Robot : public frc::TimedRobot {
-  using Distance = units::meters;
-  using Velocity =
-      units::compound_unit<Distance, units::inverse<units::seconds>>;
-  using Acceleration =
-      units::compound_unit<Velocity, units::inverse<units::seconds>>;
-  using kv_unit = units::compound_unit<units::volts, units::inverse<Velocity>>;
-  using ka_unit =
-      units::compound_unit<units::volts, units::inverse<Acceleration>>;
 
   static constexpr int kMotorPort = 0;
   static constexpr int kEncoderAChannel = 0;
