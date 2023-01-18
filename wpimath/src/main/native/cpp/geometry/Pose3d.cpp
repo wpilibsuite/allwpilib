@@ -82,7 +82,7 @@ Pose3d Pose3d::Exp(const Twist3d& twist) const {
   // http://asrl.utias.utoronto.ca/~tdb/bib/barfoot_ser17_identities.pdf
   Matrixd<3, 3> J;
   if (thetaSq < 1E-9 * 1E-9) {
-    // V = I + 0.5ω
+    // J = I + 0.5ω
     J = Matrixd<3, 3>::Identity() + 0.5 * Omega;
   } else {
     double theta = std::sqrt(thetaSq);
