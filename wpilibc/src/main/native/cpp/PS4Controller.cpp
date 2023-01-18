@@ -4,11 +4,11 @@
 
 #include "frc/PS4Controller.h"
 
+#include <frc/MathUtil.h>
+
 #include <hal/FRCUsageReporting.h>
 
 #include "frc/event/BooleanEvent.h"
-
-#include <frc/MathUtil.h>
 
 using namespace frc;
 
@@ -37,7 +37,7 @@ double PS4Controller::GetLeftY() const {
 }
 
 double PS4Controller::GetDeadbandLeftY(double deadband) const {
-    return frc::ApplyDeadband(GetLeftY(), deadband, 1.0);
+  return frc::ApplyDeadband(GetLeftY(), deadband, 1.0);
 }
 
 double PS4Controller::GetRightY() const {
@@ -45,7 +45,7 @@ double PS4Controller::GetRightY() const {
 }
 
 double PS4Controller::GetDeadbandRightY(double deadband) const {
-    return frc::ApplyDeadband(GetRightY(), deadband, 1.0);
+  return frc::ApplyDeadband(GetRightY(), deadband, 1.0);
 }
 
 double PS4Controller::GetL2Axis() const {

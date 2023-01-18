@@ -4,11 +4,11 @@
 
 #include "frc/XboxController.h"
 
+#include <frc/MathUtil.h>
+
 #include <hal/FRCUsageReporting.h>
 
 #include "frc/event/BooleanEvent.h"
-
-#include <frc/MathUtil.h>
 
 using namespace frc;
 
@@ -37,7 +37,7 @@ double XboxController::GetLeftY() const {
 }
 
 double XboxController::GetDeadbandLeftY(double deadband) const {
-    return frc::ApplyDeadband(GetLeftY(), deadband, 1.0);
+  return frc::ApplyDeadband(GetLeftY(), deadband, 1.0);
 }
 
 double XboxController::GetRightY() const {
@@ -45,7 +45,7 @@ double XboxController::GetRightY() const {
 }
 
 double XboxController::GetDeadbandRightY(double deadband) const {
-    return frc::ApplyDeadband(GetRightY(), deadband, 1.0);
+  return frc::ApplyDeadband(GetRightY(), deadband, 1.0);
 }
 
 double XboxController::GetLeftTriggerAxis() const {

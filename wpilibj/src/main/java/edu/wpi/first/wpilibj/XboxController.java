@@ -111,8 +111,9 @@ public class XboxController extends GenericHID {
   }
 
   /**
-   * Check the value of the X axis value of left side of the controller against the provided deadband value.
-   * The value returned from the axis is already scaled if greater than the deadband.
+   * Check the value of the X axis value of left side of the controller against the provided
+   * deadband value. The value returned from the axis is already scaled if greater than the
+   * deadband.
    *
    * @param deadband range around zero deadband value.
    * @return The deadband checked axis value.
@@ -122,8 +123,9 @@ public class XboxController extends GenericHID {
   }
 
   /**
-   * Check the value of the X axis value of left side of the controller against the provided deadband value.
-   * The value returned from the axis is already scaled if greater than the deadband. Uses the default deadband value {@link XboxController#kDefaultDeadband}
+   * Check the value of the X axis value of left side of the controller against the provided
+   * deadband value. The value returned from the axis is already scaled if greater than the
+   * deadband. Uses the default deadband value {@link XboxController#kDefaultDeadband}
    *
    * @return The deadband checked axis value.
    */
@@ -141,8 +143,9 @@ public class XboxController extends GenericHID {
   }
 
   /**
-   * Check the value of the X axis value of right side of the controller against the provided deadband value.
-   * The value returned from the axis is already scaled if greater than the deadband.
+   * Check the value of the X axis value of right side of the controller against the provided
+   * deadband value. The value returned from the axis is already scaled if greater than the
+   * deadband.
    *
    * @param deadband range around zero deadband value.
    * @return The deadband checked axis value.
@@ -152,8 +155,9 @@ public class XboxController extends GenericHID {
   }
 
   /**
-   * Check the value of the X axis value of right side of the controller against the provided deadband value.
-   * The value returned from the axis is already scaled if greater than the deadband. Uses the default deadband value {@link XboxController#kDefaultDeadband}
+   * Check the value of the X axis value of right side of the controller against the provided
+   * deadband value. The value returned from the axis is already scaled if greater than the
+   * deadband. Uses the default deadband value {@link XboxController#kDefaultDeadband}
    *
    * @return The deadband checked axis value.
    */
@@ -171,8 +175,9 @@ public class XboxController extends GenericHID {
   }
 
   /**
-   * Check the value of the Y axis value of left side of the controller against the provided deadband value.
-   * The value returned from the axis is already scaled if greater than the deadband.
+   * Check the value of the Y axis value of left side of the controller against the provided
+   * deadband value. The value returned from the axis is already scaled if greater than the
+   * deadband.
    *
    * @param deadband range around zero deadband value.
    * @return The deadband checked axis value.
@@ -182,8 +187,9 @@ public class XboxController extends GenericHID {
   }
 
   /**
-   * Check the value of the Y axis value of left side of the controller against the provided deadband value.
-   * The value returned from the axis is already scaled if greater than the deadband. Uses the default deadband value {@link XboxController#kDefaultDeadband}
+   * Check the value of the Y axis value of left side of the controller against the provided
+   * deadband value. The value returned from the axis is already scaled if greater than the
+   * deadband. Uses the default deadband value {@link XboxController#kDefaultDeadband}
    *
    * @return The deadband checked axis value.
    */
@@ -201,8 +207,9 @@ public class XboxController extends GenericHID {
   }
 
   /**
-   * Check the value of the Y axis value of right side of the controller against the provided deadband value.
-   * The value returned from the axis is already scaled if greater than the deadband.
+   * Check the value of the Y axis value of right side of the controller against the provided
+   * deadband value. The value returned from the axis is already scaled if greater than the
+   * deadband.
    *
    * @param deadband range around zero deadband value.
    * @return The deadband checked axis value.
@@ -212,8 +219,9 @@ public class XboxController extends GenericHID {
   }
 
   /**
-   * Check the value of the Y axis value of right side of the controller against the provided deadband value.
-   * The value returned from the axis is already scaled if greater than the deadband. Uses the default deadband value {@link XboxController#kDefaultDeadband}
+   * Check the value of the Y axis value of right side of the controller against the provided
+   * deadband value. The value returned from the axis is already scaled if greater than the
+   * deadband. Uses the default deadband value {@link XboxController#kDefaultDeadband}
    *
    * @return The deadband checked axis value.
    */

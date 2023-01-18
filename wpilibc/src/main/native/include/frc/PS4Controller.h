@@ -41,8 +41,9 @@ class PS4Controller : public GenericHID {
   double GetLeftX() const;
 
   /**
-   * Check the value of the X axis value of left side of the controller against the provided deadband value.
-   * The value returned from the axis is already scaled if greater than the deadband.
+   * Check the value of the X axis value of left side of the controller against
+   * the provided deadband value. The value returned from the axis is already
+   * scaled if greater than the deadband.
    *
    * @param deadband range around zero deadband value.
    * @return The deadband checked axis value.
@@ -55,8 +56,9 @@ class PS4Controller : public GenericHID {
   double GetRightX() const;
 
   /**
-   * Check the value of the X axis value of right side of the controller against the provided deadband value.
-   * The value returned from the axis is already scaled if greater than the deadband.
+   * Check the value of the X axis value of right side of the controller against
+   * the provided deadband value. The value returned from the axis is already
+   * scaled if greater than the deadband.
    *
    * @param deadband range around zero deadband value.
    * @return The deadband checked axis value.
@@ -68,13 +70,14 @@ class PS4Controller : public GenericHID {
    */
   double GetLeftY() const;
 
-    /**
-     * Check the value of the Y axis value of left side of the controller against the provided deadband value.
-     * The value returned from the axis is already scaled if greater than the deadband.
-     *
-     * @param deadband range around zero deadband value.
-     * @return The deadband checked axis value.
-     */
+  /**
+   * Check the value of the Y axis value of left side of the controller against
+   * the provided deadband value. The value returned from the axis is already
+   * scaled if greater than the deadband.
+   *
+   * @param deadband range around zero deadband value.
+   * @return The deadband checked axis value.
+   */
   double GetDeadbandLeftY(double deadband = kDefaultDeadband) const;
 
   /**
@@ -82,13 +85,14 @@ class PS4Controller : public GenericHID {
    */
   double GetRightY() const;
 
-    /**
-     * Check the value of the Y axis value of right side of the controller against the provided deadband value.
-     * The value returned from the axis is already scaled if greater than the deadband.
-     *
-     * @param deadband range around zero deadband value.
-     * @return The deadband checked axis value.
-     */
+  /**
+   * Check the value of the Y axis value of right side of the controller against
+   * the provided deadband value. The value returned from the axis is already
+   * scaled if greater than the deadband.
+   *
+   * @param deadband range around zero deadband value.
+   * @return The deadband checked axis value.
+   */
   double GetDeadbandRightY(double deadband = kDefaultDeadband) const;
 
   /**

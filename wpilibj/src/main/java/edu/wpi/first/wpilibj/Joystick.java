@@ -173,8 +173,9 @@ public class Joystick extends GenericHID {
   }
 
   /**
-   * Get the deadband checked X value of the joystick. This depends on the mapping of the joystick connected to the
-   * current port. This value is already scaled if it is greater than the deadband values.
+   * Get the deadband checked X value of the joystick. This depends on the mapping of the joystick
+   * connected to the current port. This value is already scaled if it is greater than the deadband
+   * values.
    *
    * @param deadband range around zero deadband value.
    * @return The deadband checked X value of the joystick.
@@ -184,8 +185,9 @@ public class Joystick extends GenericHID {
   }
 
   /**
-   * Get the deadband checked X value of the joystick. This depends on the mapping of the joystick connected to the
-   * current port. This value is already scaled if it is greater than the deadband values. Uses the default deadband value {@link Joystick#kDefaultDeadband}.
+   * Get the deadband checked X value of the joystick. This depends on the mapping of the joystick
+   * connected to the current port. This value is already scaled if it is greater than the deadband
+   * values. Uses the default deadband value {@link Joystick#kDefaultDeadband}.
    *
    * @return The deadband checked X value of the joystick.
    */
@@ -204,8 +206,9 @@ public class Joystick extends GenericHID {
   }
 
   /**
-   * Get the deadband checked Y value of the joystick. This depends on the mapping of the joystick connected to the
-   * current port. This value is already scaled if it is greater than the deadband values.
+   * Get the deadband checked Y value of the joystick. This depends on the mapping of the joystick
+   * connected to the current port. This value is already scaled if it is greater than the deadband
+   * values.
    *
    * @param deadband range around zero deadband value.
    * @return The deadband checked Y value of the joystick.
@@ -215,8 +218,9 @@ public class Joystick extends GenericHID {
   }
 
   /**
-   * Get the deadband checked Y value of the joystick. This depends on the mapping of the joystick connected to the
-   * current port. This value is already scaled if it is greater than the deadband values. Uses the default deadband value {@link Joystick#kDefaultDeadband}.
+   * Get the deadband checked Y value of the joystick. This depends on the mapping of the joystick
+   * connected to the current port. This value is already scaled if it is greater than the deadband
+   * values. Uses the default deadband value {@link Joystick#kDefaultDeadband}.
    *
    * @return The deadband checked Y value of the joystick.
    */
@@ -234,8 +238,9 @@ public class Joystick extends GenericHID {
   }
 
   /**
-   * Get the deadband checked Z value of the joystick. This depends on the mapping of the joystick connected to the
-   * current port. This value is already scaled if it is greater than the deadband values.
+   * Get the deadband checked Z value of the joystick. This depends on the mapping of the joystick
+   * connected to the current port. This value is already scaled if it is greater than the deadband
+   * values.
    *
    * @param deadband range around zero deadband value.
    * @return The deadband checked Z value of the joystick.
@@ -245,8 +250,9 @@ public class Joystick extends GenericHID {
   }
 
   /**
-   * Get the deadband checked Z value of the joystick. This depends on the mapping of the joystick connected to the
-   * current port. This value is already scaled if it is greater than the deadband values. Uses the default deadband value {@link Joystick#kDefaultDeadband}.
+   * Get the deadband checked Z value of the joystick. This depends on the mapping of the joystick
+   * connected to the current port. This value is already scaled if it is greater than the deadband
+   * values. Uses the default deadband value {@link Joystick#kDefaultDeadband}.
    *
    * @return The deadband checked Z value of the joystick.
    */

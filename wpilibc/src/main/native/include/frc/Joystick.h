@@ -20,7 +20,7 @@ namespace frc {
  */
 class Joystick : public GenericHID {
  public:
- static constexpr double kDefaultDeadband = 0.1;
+  static constexpr double kDefaultDeadband = 0.1;
 
   static constexpr int kDefaultXChannel = 0;
   static constexpr int kDefaultYChannel = 1;
@@ -124,8 +124,9 @@ class Joystick : public GenericHID {
   double GetX() const;
 
   /**
-   * Get the deadband checked X value of the joystick. This depends on the mapping of the joystick connected to the
-   * current port. This value is already scaled if it is greater than the deadband values.
+   * Get the deadband checked X value of the joystick. This depends on the
+   * mapping of the joystick connected to the current port. This value is
+   * already scaled if it is greater than the deadband values.
    *
    * @param deadband range around zero deadband value.
    * @return The deadband checked X value of the joystick.
@@ -140,8 +141,9 @@ class Joystick : public GenericHID {
   double GetY() const;
 
   /**
-   * Get the deadband checked Y value of the joystick. This depends on the mapping of the joystick connected to the
-   * current port. This value is already scaled if it is greater than the deadband values.
+   * Get the deadband checked Y value of the joystick. This depends on the
+   * mapping of the joystick connected to the current port. This value is
+   * already scaled if it is greater than the deadband values.
    *
    * @param deadband range around zero deadband value.
    * @return The deadband checked Y value of the joystick.
@@ -156,8 +158,9 @@ class Joystick : public GenericHID {
   double GetZ() const;
 
   /**
-   * Get the deadband checked Z value of the joystick. This depends on the mapping of the joystick connected to the
-   * current port. This value is already scaled if it is greater than the deadband values.
+   * Get the deadband checked Z value of the joystick. This depends on the
+   * mapping of the joystick connected to the current port. This value is
+   * already scaled if it is greater than the deadband values.
    *
    * @param deadband range around zero deadband value.
    * @return The deadband checked Z value of the joystick.

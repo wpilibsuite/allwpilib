@@ -4,9 +4,10 @@
 
 #include "frc/Joystick.h"
 
+#include <frc/MathUtil.h>
+
 #include <cmath>
 #include <numbers>
-#include <frc/MathUtil.h>
 
 #include <hal/FRCUsageReporting.h>
 
@@ -69,7 +70,7 @@ double Joystick::GetX() const {
 }
 
 double Joystick::GetDeadbandX(double deadband) const {
-    return frc::ApplyDeadband(GetX(), deadband, 1.0);
+  return frc::ApplyDeadband(GetX(), deadband, 1.0);
 }
 
 double Joystick::GetY() const {
@@ -77,7 +78,7 @@ double Joystick::GetY() const {
 }
 
 double Joystick::GetDeadbandY(double deadband) const {
-    return frc::ApplyDeadband(GetY(), deadband, 1.0);
+  return frc::ApplyDeadband(GetY(), deadband, 1.0);
 }
 
 double Joystick::GetZ() const {
@@ -85,7 +86,7 @@ double Joystick::GetZ() const {
 }
 
 double Joystick::GetDeadbandZ(double deadband) const {
-    return frc::ApplyDeadband(GetZ(), deadband, 1.0);
+  return frc::ApplyDeadband(GetZ(), deadband, 1.0);
 }
 
 double Joystick::GetTwist() const {
