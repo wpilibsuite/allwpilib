@@ -101,8 +101,8 @@ public class Timer {
   }
 
   /**
-   * Restart the timer by stopping the timer, if it is not already stopped, then resting the
-   * internal counter, then starting the timer gain.
+   * Restart the timer by stopping the timer, if it is not already stopped, resetting the
+   * accumulated time, then starting the timer again.
    */
   public void restart() {
     if (m_running) {
