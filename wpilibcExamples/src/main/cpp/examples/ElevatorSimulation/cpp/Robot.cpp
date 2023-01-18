@@ -44,8 +44,8 @@ class Robot : public frc::TimedRobot {
 
   static constexpr units::volt_t kElevatorkS = 0.0_V;
   static constexpr units::volt_t kElevatorkG = 0.0_V;
-  static constexpr auto kElevatorkA = 0.762_V * 1_s * 1_s / (1_m * 1_m);
   static constexpr auto kElevatorkV = 0.762_V * 1_s / 1_m;
+  static constexpr auto kElevatorkA = 0.762_V * 1_s * 1_s / (1_m);
 
   static constexpr double kElevatorGearing = 10.0;
   static constexpr units::meter_t kElevatorDrumRadius = 2_in;
