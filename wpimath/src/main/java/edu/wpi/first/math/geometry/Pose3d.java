@@ -14,6 +14,7 @@ import edu.wpi.first.math.Nat;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.Vector;
 import edu.wpi.first.math.interpolation.Interpolatable;
+import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import java.util.Objects;
 
@@ -200,34 +201,43 @@ public class Pose3d implements Interpolatable<Pose3d> {
    * @return The new pose of the robot.
    */
   public Pose3d exp(Twist3d twist) {
+    // Implemented from equations 77-84 in https://ethaneade.org/lie.pdf
+    final var u = VecBuilder.fill(twist.dx, twist.dy, twist.dz);
+    final var omega = VecBuilder.fill(twist.rx, twist.ry, twist.rz);
     final var Omega = rotationVectorToMatrix(VecBuilder.fill(twist.rx, twist.ry, twist.rz));
-    final var OmegaSq = Omega.times(Omega);
-
     double thetaSq = twist.rx * twist.rx + twist.ry * twist.ry + twist.rz * twist.rz;
+    double theta = Math.sqrt(thetaSq);
 
-    // Get left Jacobian of SO3. See first line in right column of
-    // http://asrl.utias.utoronto.ca/~tdb/bib/barfoot_ser17_identities.pdf
-    Matrix<N3, N3> J;
+    // Implemented from equations 77-84 in https://ethaneade.org/lie.pdf
+    double A;
+    double B;
+    double C;
     if (thetaSq < 1E-9 * 1E-9) {
-      // J = I + 0.5ω
-      J = Matrix.eye(Nat.N3()).plus(Omega.times(0.5));
+      // A = 1/1! - θ²/3! + θ⁴/5!
+      // B = 1/2! - θ²/4! + θ⁴/6!
+      // C = 1/3! - θ²/5! + θ⁴/7!
+      A = 1 - thetaSq / 6.0 + thetaSq * thetaSq / 120.0;
+      B = 1 / 2.0 - thetaSq / 24.0 + thetaSq * thetaSq / 720.0;
+      C = 1 / 6.0 - thetaSq / 120.0 + thetaSq * thetaSq / 5040.0;
     } else {
-      double theta = Math.sqrt(thetaSq);
-      // J = I + (1 − cos(θ))/θ² ω + (θ − sin(θ))/θ³ ω²
-      J =
-          Matrix.eye(Nat.N3())
-              .plus(Omega.times((1.0 - Math.cos(theta)) / thetaSq))
-              .plus(OmegaSq.times((theta - Math.sin(theta)) / (thetaSq * theta)));
+      // A = sin(θ)/θ
+      // B = (1 - cos(θ) / θ²
+      // C = (1 - A) / θ²
+      A = Math.sin(theta) / theta;
+      B = (1 - Math.cos(theta)) / thetaSq;
+      C = (1 - A) / thetaSq;
     }
 
-    // Get translation component
-    final var translation =
-        J.times(new MatBuilder<>(Nat.N3(), Nat.N1()).fill(twist.dx, twist.dy, twist.dz));
-
+    Matrix<N3, N3> R = Matrix.eye(Nat.N3()).plus(Omega.times(A)).plus(Omega.times(Omega).times(B));
+    Matrix<N3, N3> V = Matrix.eye(Nat.N3()).plus(Omega.times(B)).plus(Omega.times(Omega).times(C));
+    Matrix<N3, N1> translation_component = V.times(u);
     final var transform =
         new Transform3d(
-            new Translation3d(translation.get(0, 0), translation.get(1, 0), translation.get(2, 0)),
-            new Rotation3d(twist.rx, twist.ry, twist.rz));
+            new Translation3d(
+                translation_component.get(0, 0),
+                translation_component.get(1, 0),
+                translation_component.get(2, 0)),
+            new Rotation3d(R));
 
     return this.plus(transform);
   }
