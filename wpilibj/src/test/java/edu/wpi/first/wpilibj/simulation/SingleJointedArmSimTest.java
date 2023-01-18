@@ -20,7 +20,7 @@ class SingleJointedArmSimTest {
   void testArmDisabled() {
     m_sim.setState(VecBuilder.fill(0.0, 0.0));
 
-    for (int i = 0; i < 10 / 0.02; i++) {
+    for (int i = 0; i < 12 / 0.02; i++) {
       m_sim.setInput(0.0);
       m_sim.update(0.020);
     }
