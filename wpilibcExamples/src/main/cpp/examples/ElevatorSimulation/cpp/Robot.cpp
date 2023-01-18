@@ -132,7 +132,7 @@ class Robot : public frc::TimedRobot {
       double pidOutput =
           m_controller.Calculate(units::meter_t{m_encoder.GetDistance()});
       units::volt_t feedForwardOutput = m_feedforward.Calculate(
-          m_controller.GetSetpoint().velocity);  // velocity
+          m_controller.GetSetpoint().velocity);
       m_motor.SetVoltage(units::volt_t{pidOutput} +
                          units::volt_t{feedForwardOutput});
     } else {
