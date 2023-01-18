@@ -84,7 +84,7 @@ Vectord<2> SingleJointedArmSim::UpdateX(const Vectord<2>& currentXhat,
   // torque on the arm, J is the mass-moment of inertia about the pivot axis,
   // and α is the angular acceleration in rad/s². Rearranging yields: α = F⋅r/J
   //
-  // We substitute in F = m⋅g⋅cos(y), where θ is the angle from horizontal:
+  // We substitute in F = m⋅g⋅cos(θ), where θ is the angle from horizontal:
   //
   //   α = (m⋅g⋅cos(θ))⋅r/J
   //
@@ -99,8 +99,8 @@ Vectord<2> SingleJointedArmSim::UpdateX(const Vectord<2>& currentXhat,
   //
   // This acceleration is next added to the linear system dynamics ẋ=Ax+Bu
   //
-  //   f(x, u) = Ax + Bu + [[0] [α]]
-  //   f(x, u) = Ax + Bu + [[0] [3/2⋅g⋅cos(θ)/L]]
+  //   f(x, u) = Ax + Bu + [0  α]ᵀ
+  //   f(x, u) = Ax + Bu + [0  (3/2⋅g⋅cos(θ)/L)]ᵀ
 
   Vectord<2> updatedXhat = RKDP(
       [&](const auto& x, const auto& u) -> Vectord<2> {
