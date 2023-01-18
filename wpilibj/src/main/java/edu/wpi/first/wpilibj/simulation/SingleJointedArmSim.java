@@ -282,8 +282,8 @@ public class SingleJointedArmSim extends LinearSystemSim<N2, N1, N1> {
             (Matrix<N2, N1> x, Matrix<N1, N1> _u) -> {
               Matrix<N2, N1> xdot = m_plant.getA().times(x).plus(m_plant.getB().times(_u));
               if (m_simulateGravity) {
-                double alpha_grav = 3.0 / 2.0 * -9.8 / (m_armLenMeters) * Math.cos(x.get(0, 0));
-                xdot = xdot.plus(VecBuilder.fill(0, alpha_grav));
+                double alphaGrav = 3.0 / 2.0 * -9.8 * Math.cos(x.get(0, 0) / m_armLenMeters);
+                xdot = xdot.plus(VecBuilder.fill(0, alphaGrav));
               }
               return xdot;
             },
