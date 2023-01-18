@@ -121,7 +121,7 @@ public class Robot extends TimedRobot {
       var setpoint = m_controller.getSetpoint();
       double pidOutput = m_controller.calculate(m_encoder.getDistance(), Units.inchesToMeters(30));
       double feedforwardOutput = m_feedforward.calculate(setpoint.velocity);
-      m_motor.setVoltage(pidOutput + feedForwardOutput);
+      m_motor.setVoltage(pidOutput + feedforwardOutput);
     } else {
       // Otherwise, we disable the motor.
       m_motor.set(0.0);
