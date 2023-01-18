@@ -55,6 +55,9 @@ public class PIDController implements Sendable, AutoCloseable {
   private double m_setpoint;
   private double m_measurement;
 
+  private boolean m_haveMeasurement;
+  private boolean m_haveSetpoint;
+
   /**
    * Allocates a PIDController with the given constants for kp, ki, and kd and a default period of
    * 0.02 seconds.
@@ -199,6 +202,7 @@ public class PIDController implements Sendable, AutoCloseable {
    */
   public void setSetpoint(double setpoint) {
     m_setpoint = setpoint;
+    m_haveSetpoint = true;
 
     if (m_continuous) {
       double errorBound = (m_maximumInput - m_minimumInput) / 2.0;
@@ -227,7 +231,9 @@ public class PIDController implements Sendable, AutoCloseable {
    * @return Whether the error is within the acceptable bounds.
    */
   public boolean atSetpoint() {
-    return Math.abs(m_positionError) < m_positionTolerance
+    return m_haveMeasurement
+        && m_haveSetpoint
+        && Math.abs(m_positionError) < m_positionTolerance
         && Math.abs(m_velocityError) < m_velocityTolerance;
   }
 
@@ -333,6 +339,7 @@ public class PIDController implements Sendable, AutoCloseable {
   public double calculate(double measurement) {
     m_measurement = measurement;
     m_prevError = m_positionError;
+    m_haveMeasurement = true;
 
     if (m_continuous) {
       double errorBound = (m_maximumInput - m_minimumInput) / 2.0;
@@ -360,6 +367,7 @@ public class PIDController implements Sendable, AutoCloseable {
     m_prevError = 0;
     m_totalError = 0;
     m_velocityError = 0;
+    m_haveMeasurement = false;
   }
 
   @Override

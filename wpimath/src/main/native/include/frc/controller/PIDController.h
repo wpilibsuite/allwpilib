@@ -252,6 +252,9 @@ class WPILIB_DLLEXPORT PIDController
 
   double m_setpoint = 0;
   double m_measurement = 0;
+
+  bool m_haveSetpoint = false;
+  bool m_haveMeasurement = false;
 };
 
 }  // namespace frc2

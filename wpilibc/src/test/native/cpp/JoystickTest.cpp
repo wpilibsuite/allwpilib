@@ -10,6 +10,11 @@
 
 using namespace frc;
 
+// https://github.com/wpilibsuite/allwpilib/issues/1550
+TEST(JoystickTest, FastDeconstruction) {
+  Joystick joystick{0};
+}
+
 AXIS_TEST(Joystick, X)
 AXIS_TEST(Joystick, Y)
 AXIS_TEST(Joystick, Z)

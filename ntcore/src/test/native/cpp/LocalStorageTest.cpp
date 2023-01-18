@@ -197,9 +197,6 @@ TEST_F(LocalStorageTest, SubscribeNoTypeLocalPubPre) {
   ASSERT_TRUE(value.IsBoolean());
   EXPECT_EQ(value.GetBoolean(), true);
   EXPECT_EQ(value.time(), 5);
-
-  auto vals = storage.ReadQueueValue(sub);  // read queue won't get anything
-  ASSERT_TRUE(vals.empty());
 }
 
 TEST_F(LocalStorageTest, EntryNoTypeLocalSet) {
@@ -914,6 +911,50 @@ TEST_F(LocalStorageTest, EntryExcludeSelf) {
   storage.NetworkSetValue(remoteTopic, Value::MakeDouble(2.0, 60));
   EXPECT_THAT(storage.ReadQueueDouble(entry),
               ElementsAre(TSEq<TimestampedDouble>(2.0, 60)));
+}
+
+TEST_F(LocalStorageTest, ReadQueueInitialLocal) {
+  EXPECT_CALL(network, Publish(_, _, _, _, _, _));
+  EXPECT_CALL(network, SetValue(_, _));
+  EXPECT_CALL(network, Subscribe(_, _, _)).Times(3);
+
+  auto pub = storage.Publish(fooTopic, NT_DOUBLE, "double", {}, {});
+  storage.SetEntryValue(pub, Value::MakeDouble(1.0, 50));
+
+  auto subBoth =
+      storage.Subscribe(fooTopic, NT_DOUBLE, "double", kDefaultPubSubOptions);
+  auto subLocal =
+      storage.Subscribe(fooTopic, NT_DOUBLE, "double", {.disableRemote = true});
+  auto subRemote =
+      storage.Subscribe(fooTopic, NT_DOUBLE, "double", {.disableLocal = true});
+
+  EXPECT_THAT(storage.ReadQueueDouble(subBoth),
+              ElementsAre(TSEq<TimestampedDouble>(1.0, 50)));
+  EXPECT_THAT(storage.ReadQueueDouble(subLocal),
+              ElementsAre(TSEq<TimestampedDouble>(1.0, 50)));
+  EXPECT_THAT(storage.ReadQueueDouble(subRemote), IsEmpty());
+}
+
+TEST_F(LocalStorageTest, ReadQueueInitialRemote) {
+  EXPECT_CALL(network, Subscribe(_, _, _)).Times(3);
+
+  auto remoteTopic =
+      storage.NetworkAnnounce("foo", "double", wpi::json::object(), 0);
+  storage.NetworkSetValue(remoteTopic, Value::MakeDouble(2.0, 60));
+
+  auto subBoth =
+      storage.Subscribe(fooTopic, NT_DOUBLE, "double", kDefaultPubSubOptions);
+  auto subLocal =
+      storage.Subscribe(fooTopic, NT_DOUBLE, "double", {.disableRemote = true});
+  auto subRemote =
+      storage.Subscribe(fooTopic, NT_DOUBLE, "double", {.disableLocal = true});
+
+  // network set
+  EXPECT_THAT(storage.ReadQueueDouble(subBoth),
+              ElementsAre(TSEq<TimestampedDouble>(2.0, 60)));
+  EXPECT_THAT(storage.ReadQueueDouble(subRemote),
+              ElementsAre(TSEq<TimestampedDouble>(2.0, 60)));
+  EXPECT_THAT(storage.ReadQueueDouble(subLocal), IsEmpty());
 }
 
 }  // namespace nt

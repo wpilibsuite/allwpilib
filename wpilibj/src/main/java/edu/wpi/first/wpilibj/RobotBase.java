@@ -395,6 +395,9 @@ public abstract class RobotBase implements AutoCloseable {
       throw new IllegalStateException("Failed to initialize. Terminating");
     }
 
+    // Force refresh DS data
+    DriverStation.refreshData();
+
     // Call a CameraServer JNI function to force OpenCV native library loading
     // Needed because all the OpenCV JNI functions don't have built in loading
     CameraServerJNI.enumerateSinks();

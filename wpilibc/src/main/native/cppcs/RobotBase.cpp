@@ -41,6 +41,7 @@ int frc::RunHALInitialization() {
     std::puts("FATAL ERROR: HAL could not be initialized");
     return -1;
   }
+  DriverStation::RefreshData();
   HAL_Report(HALUsageReporting::kResourceType_Language,
              HALUsageReporting::kLanguage_CPlusPlus, 0, GetWPILibVersion());
 
