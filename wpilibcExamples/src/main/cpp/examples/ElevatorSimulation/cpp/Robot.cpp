@@ -68,7 +68,7 @@ class Robot : public frc::TimedRobot {
   frc::ProfiledPIDController<units::meters> m_controller{
       kElevatorKp, kElevatorKi, kElevatorKd, m_constraints};
 
-  frc::ElevatorFeedforward feedforward{kElevatorkS, kElevatorkG, kElevatorkV,
+  frc::ElevatorFeedforward m_feedforward{kElevatorkS, kElevatorkG, kElevatorkV,
                                        kElevatorkA};
   frc::Encoder m_encoder{kEncoderAChannel, kEncoderBChannel};
   frc::PWMSparkMax m_motor{kMotorPort};
@@ -131,7 +131,7 @@ class Robot : public frc::TimedRobot {
       m_controller.SetGoal(units::meter_t{30_in});
       double pidOutput =
           m_controller.Calculate(units::meter_t{m_encoder.GetDistance()});
-      units::volt_t feedForwardOutput = feedforward.Calculate(
+      units::volt_t feedForwardOutput = m_feedforward.Calculate(
           m_controller.GetSetpoint().velocity);  // velocity
       m_motor.SetVoltage(units::volt_t{pidOutput} +
                          units::volt_t{feedForwardOutput});
