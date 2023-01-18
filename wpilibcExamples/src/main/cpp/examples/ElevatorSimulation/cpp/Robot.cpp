@@ -141,8 +141,7 @@ class Robot : public frc::TimedRobot {
     }
   }
   // To view the Elevator Sim in the simulator, select Network Tables ->
-  // SmartDashboard -> Elevator Sim If you are on keyboard, press Z to move the
-  // elevator
+  // SmartDashboard -> Elevator Sim
 
   void DisabledInit() override {
     // This just makes sure that our simulation code knows that the motor's off.
