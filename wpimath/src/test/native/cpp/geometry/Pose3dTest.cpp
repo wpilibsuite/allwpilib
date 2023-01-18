@@ -4,9 +4,10 @@
 
 #include <cmath>
 
+#include <wpi/array.h>
+
 #include "frc/geometry/Pose3d.h"
 #include "gtest/gtest.h"
-#include <wpi/array.h>
 
 using namespace frc;
 

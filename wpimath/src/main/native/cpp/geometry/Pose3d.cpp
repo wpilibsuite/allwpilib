@@ -91,11 +91,11 @@ Pose3d Pose3d::Exp(const Twist3d& twist) const {
     B = 1 / 2.0 - thetaSq / 24 + thetaSq * thetaSq / 720;
     C = 1 / 6.0 - thetaSq / 120 + thetaSq * thetaSq / 5040;
   } else {
-    // A = sin(θ)/θ
-    // B = (1 - cos(θ)) / θ²
+    // A = std::sin(θ)/θ
+    // B = (1 - std::cos(θ)) / θ²
     // C = (1 - A) / θ²
-    A = sin(theta) / theta;
-    B = (1 - cos(theta)) / thetaSq;
+    A = std::sin(theta) / theta;
+    B = (1 - std::cos(theta)) / thetaSq;
     C = (1 - A) / thetaSq;
   }
 
@@ -124,23 +124,19 @@ Twist3d Pose3d::Log(const Pose3d& end) const {
   auto theta = rvec.norm();
   auto thetaSq = theta * theta;
 
-  double A;
-  double B;
   double C;
   if (theta < 1E-9) {
     // Taylor Expansions around θ = 0
     // A = 1/1! - θ²/3! + θ⁴/5!
     // B = 1/2! - θ²/4! + θ⁴/6!
     // C = 1/6 * (1/2 + θ²/5! + θ⁴/7!)
-    A = 1 - thetaSq / 6 + thetaSq * thetaSq / 120;
-    B = 1 / 2.0 - thetaSq / 24 + thetaSq * thetaSq / 720;
     C = 1 / 6.0 - thetaSq / 120 + thetaSq * thetaSq / 5040;
   } else {
-    // A = sin(θ)/θ
-    // B = (1 - cos(θ)) / θ²
+    // A = std::sin(θ)/θ
+    // B = (1 - std::cos(θ)) / θ²
     // C = (1 - A/(2*B)) / θ²
-    A = sin(theta) / theta;
-    B = (1 - cos(theta)) / thetaSq;
+    double A = std::sin(theta) / theta;
+    double B = (1 - std::cos(theta)) / thetaSq;
     C = (1 - A / (2 * B)) / thetaSq;
   }
 
