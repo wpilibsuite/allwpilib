@@ -21,7 +21,7 @@ SingleJointedArmSim::SingleJointedArmSim(
     units::radian_t maxAngle, units::kilogram_t armMass, bool simulateGravity,
     const std::array<double, 1>& measurementStdDevs)
     : LinearSystemSim<2, 1, 1>(system, measurementStdDevs),
-      m_r(armLength),
+      m_armLen(armLength),
       m_minAngle(minAngle),
       m_maxAngle(maxAngle),
       m_armMass(armMass),
@@ -78,24 +78,37 @@ void SingleJointedArmSim::SetInputVoltage(units::volt_t voltage) {
 Vectord<2> SingleJointedArmSim::UpdateX(const Vectord<2>& currentXhat,
                                         const Vectord<1>& u,
                                         units::second_t dt) {
-  // Horizontal case:
-  // Torque = F * r = I * alpha
-  // alpha = F * r / I
-  // Since F = mg,
-  // alpha = m * g * r / I
-  // Finally, multiply RHS by cos(theta) to account for the arm angle
-  // This acceleration is added to the linear system dynamics x-dot = Ax + Bu
-  // We therefore find that f(x, u) = Ax + Bu + [[0] [m * g * r / I *
-  // std::cos(theta)]]
+  // The torque on the arm is given by τ = F⋅r, where F is the force applied by
+  // gravity and r the distance from pivot to center of mass. Recall from
+  // dynamics that the sum of torques for a rigid body is τ = J⋅α, were τ is
+  // torque on the arm, J is the mass-moment of inertia about the pivot axis,
+  // and α is the angular acceleration in rad/s². Rearranging yields: α = F⋅r/J
+  //
+  // We substitute in F = m⋅g⋅cos(y), where θ is the angle from horizontal:
+  //
+  //   α = (m⋅g⋅cos(θ))⋅r/J
+  //
+  // Multiply RHS by cos(θ) to account for the arm angle. Further, we know the
+  // arm mass-moment of inertia J of our arm is given by J=1/3 mL², modeled as a
+  // rod rotating about it's end, where L is the overall rod length. The mass
+  // distribution is assumed to be uniform. Substitute r=L/2 to find:
+  //
+  //   α = (m⋅g⋅cos(θ))⋅r/(1/3 mL²)
+  //   α = (m⋅g⋅cos(θ))⋅(L/2)/(1/3 mL²)
+  //   α = 3/2⋅g⋅cos(θ)/L
+  //
+  // This acceleration is next added to the linear system dynamics ẋ=Ax+Bu
+  //
+  //   f(x, u) = Ax + Bu + [[0] [α]]
+  //   f(x, u) = Ax + Bu + [[0] [3/2⋅g⋅cos(θ)/L]]
 
   Vectord<2> updatedXhat = RKDP(
       [&](const auto& x, const auto& u) -> Vectord<2> {
         Vectord<2> xdot = m_plant.A() * x + m_plant.B() * u;
 
         if (m_simulateGravity) {
-          xdot += Vectord<2>{0.0, (m_armMass * m_r * -9.8 * 3.0 /
-                                   (m_armMass * m_r * m_r) * std::cos(x(0)))
-                                      .value()};
+          xdot += Vectord<2>{
+              0.0, (3.0 / 2.0 * -9.8 / m_armLen * std::cos(x(0))).value()};
         }
         return xdot;
       },

@@ -146,7 +146,7 @@ class SingleJointedArmSim : public LinearSystemSim<2, 1, 1> {
                      units::second_t dt) override;
 
  private:
-  units::meter_t m_r;
+  units::meter_t m_armLen;
   units::radian_t m_minAngle;
   units::radian_t m_maxAngle;
   units::kilogram_t m_armMass;

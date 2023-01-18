@@ -22,7 +22,7 @@ public class SingleJointedArmSim extends LinearSystemSim<N2, N1, N1> {
   private final double m_gearing;
 
   // The length of the arm.
-  private final double m_r;
+  private final double m_armLenMeters;
 
   // The minimum angle that the arm is capable of.
   private final double m_minAngle;
@@ -95,7 +95,7 @@ public class SingleJointedArmSim extends LinearSystemSim<N2, N1, N1> {
     super(plant, measurementStdDevs);
     m_gearbox = gearbox;
     m_gearing = gearing;
-    m_r = armLengthMeters;
+    m_armLenMeters = armLengthMeters;
     m_minAngle = minAngleRads;
     m_maxAngle = maxAngleRads;
     m_armMass = armMassKg;
@@ -163,7 +163,7 @@ public class SingleJointedArmSim extends LinearSystemSim<N2, N1, N1> {
         measurementStdDevs);
     m_gearbox = gearbox;
     m_gearing = gearing;
-    m_r = armLengthMeters;
+    m_armLenMeters = armLengthMeters;
     m_minAngle = minAngleRads;
     m_maxAngle = maxAngleRads;
     m_armMass = armMassKg;
@@ -268,30 +268,37 @@ public class SingleJointedArmSim extends LinearSystemSim<N2, N1, N1> {
    */
   @Override
   protected Matrix<N2, N1> updateX(Matrix<N2, N1> currentXhat, Matrix<N1, N1> u, double dtSeconds) {
-    // Horizontal case:
-    // Torque = F * r = I * alpha
-    // alpha = F * r / I
-    // Since F = mg,
-    // alpha = m * g * r / I
-    // Finally, multiply RHS by cos(theta) to account for the arm angle
-    // This acceleration is added to the linear system dynamics x-dot = Ax + Bu
-    // We therefore find that f(x, u) = Ax + Bu + [[0] [m * g * r / I *
-    // cos(theta)]]
+    // The torque on the arm is given by τ = F⋅r, where F is the force applied by
+    // gravity and r the distance from pivot to center of mass. Recall from
+    // dynamics that the sum of torques for a rigid body is τ = J⋅α, were τ is
+    // torque on the arm, J is the mass-moment of inertia about the pivot axis,
+    // and α is the angular acceleration in rad/s². Rearranging yields: α = F⋅r/J
+    //
+    // We substitute in F = m⋅g⋅cos(y), where θ is the angle from horizontal:
+    //
+    //   α = (m⋅g⋅cos(θ))⋅r/J
+    //
+    // Multiply RHS by cos(θ) to account for the arm angle. Further, we know the
+    // arm mass-moment of inertia J of our arm is given by J=1/3 mL², modeled as a
+    // rod rotating about it's end, where L is the overall rod length. The mass
+    // distribution is assumed to be uniform. Substitute r=L/2 to find:
+    //
+    //   α = (m⋅g⋅cos(θ))⋅r/(1/3 mL²)
+    //   α = (m⋅g⋅cos(θ))⋅(L/2)/(1/3 mL²)
+    //   α = 3/2⋅g⋅cos(θ)/L
+    //
+    // This acceleration is next added to the linear system dynamics ẋ=Ax+Bu
+    //
+    //   f(x, u) = Ax + Bu + [[0] [α]]
+    //   f(x, u) = Ax + Bu + [[0] [3/2⋅g⋅cos(θ)/L]]
+
     Matrix<N2, N1> updatedXhat =
         NumericalIntegration.rkdp(
             (Matrix<N2, N1> x, Matrix<N1, N1> _u) -> {
               Matrix<N2, N1> xdot = m_plant.getA().times(x).plus(m_plant.getB().times(_u));
               if (m_simulateGravity) {
-                xdot =
-                    xdot.plus(
-                        VecBuilder.fill(
-                            0,
-                            m_armMass
-                                * m_r
-                                * -9.8
-                                * 3.0
-                                / (m_armMass * m_r * m_r)
-                                * Math.cos(x.get(0, 0))));
+                double alpha_grav = 3.0 / 2.0 * -9.8 / (m_armLenMeters) * Math.cos(x.get(0, 0));
+                xdot = xdot.plus(VecBuilder.fill(0, alpha_grav));
               }
               return xdot;
             },
