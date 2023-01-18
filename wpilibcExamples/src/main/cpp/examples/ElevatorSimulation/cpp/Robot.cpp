@@ -77,10 +77,10 @@ class Robot : public frc::TimedRobot {
   frc::ProfiledPIDController<units::meters> m_controller{
       kElevatorKp, kElevatorKi, kElevatorKd, m_constraints};
 
-  frc::ElevatorFeedforward feedforward(units::volt_t(kElevatorkS),
-                                       units::volt_t(kElevatorkG),
-                                       units::unit_t<kv_unit>(kElevatorkV),
-                                       units::unit_t<ka_unit>(kElevatorkA));
+  frc::ElevatorFeedforward feedforward(kElevatorkS,
+                                       kElevatorkG,
+                                       kElevatorkV,
+                                       kElevatorkA);
   frc::Encoder m_encoder{kEncoderAChannel, kEncoderBChannel};
   frc::PWMSparkMax m_motor{kMotorPort};
   frc::Joystick m_joystick{kJoystickPort};
