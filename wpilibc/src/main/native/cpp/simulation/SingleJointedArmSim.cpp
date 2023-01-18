@@ -18,13 +18,12 @@ using namespace frc::sim;
 SingleJointedArmSim::SingleJointedArmSim(
     const LinearSystem<2, 1, 1>& system, const DCMotor& gearbox, double gearing,
     units::meter_t armLength, units::radian_t minAngle,
-    units::radian_t maxAngle, units::kilogram_t armMass, bool simulateGravity,
+    units::radian_t maxAngle, bool simulateGravity,
     const std::array<double, 1>& measurementStdDevs)
     : LinearSystemSim<2, 1, 1>(system, measurementStdDevs),
       m_armLen(armLength),
       m_minAngle(minAngle),
       m_maxAngle(maxAngle),
-      m_armMass(armMass),
       m_gearbox(gearbox),
       m_gearing(gearing),
       m_simulateGravity(simulateGravity) {}
@@ -32,12 +31,12 @@ SingleJointedArmSim::SingleJointedArmSim(
 SingleJointedArmSim::SingleJointedArmSim(
     const DCMotor& gearbox, double gearing, units::kilogram_square_meter_t moi,
     units::meter_t armLength, units::radian_t minAngle,
-    units::radian_t maxAngle, units::kilogram_t armMass, bool simulateGravity,
+    units::radian_t maxAngle, bool simulateGravity,
     const std::array<double, 1>& measurementStdDevs)
     : SingleJointedArmSim(
           LinearSystemId::SingleJointedArmSystem(gearbox, moi, gearing),
-          gearbox, gearing, armLength, minAngle, maxAngle, armMass,
-          simulateGravity, measurementStdDevs) {}
+          gearbox, gearing, armLength, minAngle, maxAngle, simulateGravity,
+          measurementStdDevs) {}
 
 bool SingleJointedArmSim::WouldHitLowerLimit(units::radian_t armAngle) const {
   return armAngle <= m_minAngle;

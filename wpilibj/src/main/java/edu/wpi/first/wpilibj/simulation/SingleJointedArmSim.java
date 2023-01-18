@@ -30,9 +30,6 @@ public class SingleJointedArmSim extends LinearSystemSim<N2, N1, N1> {
   // The maximum angle that the arm is capable of.
   private final double m_maxAngle;
 
-  // The mass of the arm.
-  private final double m_armMass;
-
   // Whether the simulator should simulate gravity.
   private final boolean m_simulateGravity;
 
@@ -98,7 +95,6 @@ public class SingleJointedArmSim extends LinearSystemSim<N2, N1, N1> {
     m_armLenMeters = armLengthMeters;
     m_minAngle = minAngleRads;
     m_maxAngle = maxAngleRads;
-    m_armMass = armMassKg;
     m_simulateGravity = simulateGravity;
   }
 
@@ -121,7 +117,6 @@ public class SingleJointedArmSim extends LinearSystemSim<N2, N1, N1> {
       double armLengthMeters,
       double minAngleRads,
       double maxAngleRads,
-      double armMassKg,
       boolean simulateGravity) {
     this(
         gearbox,
@@ -130,7 +125,6 @@ public class SingleJointedArmSim extends LinearSystemSim<N2, N1, N1> {
         armLengthMeters,
         minAngleRads,
         maxAngleRads,
-        armMassKg,
         simulateGravity,
         null);
   }
@@ -144,7 +138,6 @@ public class SingleJointedArmSim extends LinearSystemSim<N2, N1, N1> {
    * @param armLengthMeters The length of the arm.
    * @param minAngleRads The minimum angle that the arm is capable of.
    * @param maxAngleRads The maximum angle that the arm is capable of.
-   * @param armMassKg The mass of the arm.
    * @param simulateGravity Whether gravity should be simulated or not.
    * @param measurementStdDevs The standard deviations of the measurements.
    */
@@ -155,7 +148,6 @@ public class SingleJointedArmSim extends LinearSystemSim<N2, N1, N1> {
       double armLengthMeters,
       double minAngleRads,
       double maxAngleRads,
-      double armMassKg,
       boolean simulateGravity,
       Matrix<N1, N1> measurementStdDevs) {
     super(
@@ -166,7 +158,6 @@ public class SingleJointedArmSim extends LinearSystemSim<N2, N1, N1> {
     m_armLenMeters = armLengthMeters;
     m_minAngle = minAngleRads;
     m_maxAngle = maxAngleRads;
-    m_armMass = armMassKg;
     m_simulateGravity = simulateGravity;
   }
 

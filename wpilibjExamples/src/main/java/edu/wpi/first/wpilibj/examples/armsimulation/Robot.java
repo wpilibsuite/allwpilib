@@ -67,7 +67,6 @@ public class Robot extends TimedRobot {
           m_armLength,
           Units.degreesToRadians(-75),
           Units.degreesToRadians(255),
-          m_armMass,
           true,
           VecBuilder.fill(kArmEncoderDistPerPulse) // Add noise with a std-dev of 1 tick
           );

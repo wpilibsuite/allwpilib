@@ -14,14 +14,7 @@ import org.junit.jupiter.api.Test;
 class SingleJointedArmSimTest {
   SingleJointedArmSim m_sim =
       new SingleJointedArmSim(
-          DCMotor.getVex775Pro(2),
-          100,
-          3.0,
-          Units.inchesToMeters(19.0 / 2.0),
-          -Math.PI,
-          0.0,
-          10.0 / 2.2,
-          true);
+          DCMotor.getVex775Pro(2), 100, 3.0, Units.inchesToMeters(19.0 / 2.0), -Math.PI, 0.0, true);
 
   @Test
   void testArmDisabled() {

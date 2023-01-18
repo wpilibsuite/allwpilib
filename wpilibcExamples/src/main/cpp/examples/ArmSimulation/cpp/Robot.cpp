@@ -68,7 +68,6 @@ class Robot : public frc::TimedRobot {
       30_in,
       -75_deg,
       255_deg,
-      5_kg,
       true,
       {kArmEncoderDistPerPulse}};
   frc::sim::EncoderSim m_encoderSim{m_encoder};
