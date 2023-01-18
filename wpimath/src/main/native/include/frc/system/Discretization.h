@@ -44,9 +44,9 @@ void DiscretizeAB(const Matrixd<States, States>& contA,
   // M = [A  B]
   //     [0  0]
   Matrixd<States + Inputs, States + Inputs> M;
-  M.setZero();
   M.template block<States, States>(0, 0) = contA;
   M.template block<States, Inputs>(0, States) = contB;
+  M.template block<Inputs, States + Inputs>(States, 0).setZero();
 
   // ϕ = eᴹᵀ = [A_d  B_d]
   //           [ 0    I ]
