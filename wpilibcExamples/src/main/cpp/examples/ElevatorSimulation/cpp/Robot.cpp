@@ -9,9 +9,9 @@
 #include <frc/RobotController.h>
 #include <frc/StateSpaceUtil.h>
 #include <frc/TimedRobot.h>
+#include <frc/controller/ElevatorFeedforward.h>
 #include <frc/controller/PIDController.h>
 #include <frc/controller/ProfiledPIDController.h>
-#include <frc/controller/ElevatorFeedforward.h>
 #include <frc/motorcontrol/PWMSparkMax.h>
 #include <frc/simulation/BatterySim.h>
 #include <frc/simulation/ElevatorSim.h>
@@ -33,7 +33,6 @@
  * to control an arm.
  */
 class Robot : public frc::TimedRobot {
-
   static constexpr int kMotorPort = 0;
   static constexpr int kEncoderAChannel = 0;
   static constexpr int kEncoderBChannel = 1;
@@ -69,9 +68,7 @@ class Robot : public frc::TimedRobot {
   frc::ProfiledPIDController<units::meters> m_controller{
       kElevatorKp, kElevatorKi, kElevatorKd, m_constraints};
 
-  frc::ElevatorFeedforward feedforward{kElevatorkS,
-                                       kElevatorkG,
-                                       kElevatorkV,
+  frc::ElevatorFeedforward feedforward{kElevatorkS, kElevatorkG, kElevatorkV,
                                        kElevatorkA};
   frc::Encoder m_encoder{kEncoderAChannel, kEncoderBChannel};
   frc::PWMSparkMax m_motor{kMotorPort};

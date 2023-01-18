@@ -6,7 +6,6 @@ package edu.wpi.first.wpilibj.examples.elevatorsimulation;
 
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.controller.ElevatorFeedforward;
-import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
@@ -36,11 +35,11 @@ public class Robot extends TimedRobot {
   private static final double kElevatorKi = 0;
   private static final double kElevatorKd = 0;
 
-  private static final double kElevatorkS =0.0;
-  private static final double kElevatorkG =0.762;
-  private static final double kElevatorkV =0.762;
-  private static final double kElevatorkA =0.0;
-  
+  private static final double kElevatorkS = 0.0;
+  private static final double kElevatorkG = 0.762;
+  private static final double kElevatorkV = 0.762;
+  private static final double kElevatorkA = 0.0;
+
   private static final double kElevatorGearing = 10.0;
   private static final double kElevatorDrumRadius = Units.inchesToMeters(2.0);
   private static final double kCarriageMass = 4.0; // kg
@@ -56,10 +55,11 @@ public class Robot extends TimedRobot {
   private final DCMotor m_elevatorGearbox = DCMotor.getVex775Pro(4);
 
   // Standard classes for controlling our elevator
-  private final ProfiledPIDController m_controller = new ProfiledPIDController(
-    kElevatorKp, kElevatorKi, kElevatorKd,
-    new TrapezoidProfile.Constraints(2.45, 2.45));
-  ElevatorFeedforward feedforward = new ElevatorFeedforward(kElevatorkS, kElevatorkG, kElevatorkV, kElevatorkA);
+  private final ProfiledPIDController m_controller =
+      new ProfiledPIDController(
+          kElevatorKp, kElevatorKi, kElevatorKd, new TrapezoidProfile.Constraints(2.45, 2.45));
+  ElevatorFeedforward feedforward =
+      new ElevatorFeedforward(kElevatorkS, kElevatorkG, kElevatorkV, kElevatorkA);
   private final Encoder m_encoder = new Encoder(kEncoderAChannel, kEncoderBChannel);
   private final PWMSparkMax m_motor = new PWMSparkMax(kMotorPort);
   private final Joystick m_joystick = new Joystick(kJoystickPort);
@@ -116,7 +116,6 @@ public class Robot extends TimedRobot {
 
   @Override
   public void teleopPeriodic() {
-
     if (m_joystick.getTrigger()) {
       // Here, we run PID control like normal, with a constant setpoint of 30in.
       var setpoint = m_controller.getSetpoint();
@@ -128,7 +127,8 @@ public class Robot extends TimedRobot {
       m_motor.set(0.0);
     }
   }
-  // To view the Elevator Sim in the simulator, select Network Tables -> SmartDashboard -> Elevator Sim
+  // To view the Elevator Sim in the simulator, select Network Tables -> SmartDashboard -> Elevator
+  // Sim
 
   @Override
   public void disabledInit() {
