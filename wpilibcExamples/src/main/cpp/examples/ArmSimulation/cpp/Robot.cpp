@@ -63,8 +63,8 @@ class Robot : public frc::TimedRobot {
   // with a standard deviation of 1 encoder tick.
   frc::sim::SingleJointedArmSim m_armSim{
       m_armGearbox,
-      600.0,
-      frc::sim::SingleJointedArmSim::EstimateMOI(30_in, 5_kg),
+      200.0,
+      frc::sim::SingleJointedArmSim::EstimateMOI(30_in, 8_kg),
       30_in,
       -75_deg,
       255_deg,
