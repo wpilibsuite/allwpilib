@@ -369,22 +369,4 @@ public class Pose3d implements Interpolatable<Pose3d> {
             rotation.get(0, 0),
             0.0);
   }
-
-  /**
-   * Applies the hat operator to a rotation vector.
-   *
-   * <p>It takes a rotation vector and returns the corresponding matrix representation of the Lie
-   * algebra element (a 3x3 rotation matrix).
-   *
-   * @param rotation The rotation vector.
-   * @return The rotation vector as a 3x3 rotation matrix.
-   */
-  private Vector<N3> rotationMatrixToVector(Matrix<N3, N3> rotation) {
-    // Given a rotation matrix
-    //         [ 0 -c  b]
-    // Omega = [ c  0 -a]
-    //         [-b  a  0],
-    //  construct a rotation vector <a, b, c>
-    return VecBuilder.fill(rotation.get(2, 1), rotation.get(0, 2), rotation.get(1, 0));
-  }
 }

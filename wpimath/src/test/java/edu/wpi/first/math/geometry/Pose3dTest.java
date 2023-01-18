@@ -196,14 +196,13 @@ class Pose3dTest {
                 new Translation3d(-0.084654, -0.019305, -0.030022),
                 new Rotation3d(new Quaternion(0.620243, 0.429104, 0.479384, 0.44873))));
 
+    final var eps = 1E-5;
     for (int i = 0; i < initial_poses.size(); i++) {
       var start = initial_poses.get(i);
       var end = final_poses.get(i);
 
       var twist = start.log(end);
       var start_exp = start.exp(twist);
-
-      final var eps = 1E-5;
 
       assertAll(
           () -> assertEquals(start_exp.getX(), end.getX(), eps),
