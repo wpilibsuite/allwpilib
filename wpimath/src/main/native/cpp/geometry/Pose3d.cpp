@@ -71,34 +71,43 @@ Pose3d Pose3d::RelativeTo(const Pose3d& other) const {
 }
 
 Pose3d Pose3d::Exp(const Twist3d& twist) const {
-  Matrixd<3, 3> Omega = RotationVectorToMatrix(
-      Vectord<3>{twist.rx.value(), twist.ry.value(), twist.rz.value()});
-  Matrixd<3, 3> OmegaSq = Omega * Omega;
+  // Implementation from Section 3.2 of https://ethaneade.org/lie.pdf
+  auto u = Vectord<3>{twist.dx.value(), twist.dy.value(), twist.dz.value()};
+  auto rvec = Vectord<3>{twist.rx.value(), twist.ry.value(), twist.rz.value()};
+  auto omega = RotationVectorToMatrix(rvec);
+  auto omegaSq = omega * omega;
+  auto theta = rvec.norm();
+  auto thetaSq = theta * theta;
 
-  double thetaSq =
-      (twist.rx * twist.rx + twist.ry * twist.ry + twist.rz * twist.rz).value();
-
-  // Get left Jacobian of SO3. See first line in right column of
-  // http://asrl.utias.utoronto.ca/~tdb/bib/barfoot_ser17_identities.pdf
-  Matrixd<3, 3> J;
-  if (thetaSq < 1E-9 * 1E-9) {
-    // V = I + 0.5ω
-    J = Matrixd<3, 3>::Identity() + 0.5 * Omega;
+  double A;
+  double B;
+  double C;
+  if (theta < 1E-9) {
+    // Taylor Expansions around θ = 0
+    // A = 1/1! - θ²/3! + θ⁴/5!
+    // B = 1/2! - θ²/4! + θ⁴/6!
+    // C = 1/3! - θ²/5! + θ⁴/7!
+    A = 1 - thetaSq / 6 + thetaSq * thetaSq / 120;
+    B = 1 / 2.0 - thetaSq / 24 + thetaSq * thetaSq / 720;
+    C = 1 / 6.0 - thetaSq / 120 + thetaSq * thetaSq / 5040;
   } else {
-    double theta = std::sqrt(thetaSq);
-    // J = I + (1 − std::cos(θ))/θ² ω + (θ − std::sin(θ))/θ³ ω²
-    J = Matrixd<3, 3>::Identity() + (1.0 - std::cos(theta)) / thetaSq * Omega +
-        (theta - std::sin(theta)) / (thetaSq * theta) * OmegaSq;
+    // A = sin(θ)/θ
+    // B = (1 - cos(θ)) / θ²
+    // C = (1 - A) / θ²
+    A = sin(theta) / theta;
+    B = (1 - cos(theta)) / thetaSq;
+    C = (1 - A) / thetaSq;
   }
 
-  // Get translation component
-  Vectord<3> translation =
-      J * Vectord<3>{twist.dx.value(), twist.dy.value(), twist.dz.value()};
+  auto R = Matrixd<3, 3>::Identity() + A * omega + B * omegaSq;
+  auto V = Matrixd<3, 3>::Identity() + B * omega + C * omegaSq;
 
-  const Transform3d transform{Translation3d{units::meter_t{translation(0)},
-                                            units::meter_t{translation(1)},
-                                            units::meter_t{translation(2)}},
-                              Rotation3d{twist.rx, twist.ry, twist.rz}};
+  auto translation_component = V * u;
+  const Transform3d transform{
+      Translation3d{units::meter_t{translation_component(0)},
+                    units::meter_t{translation_component(1)},
+                    units::meter_t{translation_component(2)}},
+      Rotation3d{R}};
 
   return *this + transform;
 }
@@ -106,38 +115,45 @@ Pose3d Pose3d::Exp(const Twist3d& twist) const {
 Twist3d Pose3d::Log(const Pose3d& end) const {
   const auto transform = end.RelativeTo(*this);
 
-  Vectord<3> rotVec = transform.Rotation().GetQuaternion().ToRotationVector();
+  auto u = Vectord<3>{transform.X().value(), transform.Y().value(),
+                      transform.Z().value()};
+  auto rvec = transform.Rotation().GetQuaternion().ToRotationVector();
 
-  Matrixd<3, 3> Omega = RotationVectorToMatrix(rotVec);
-  Matrixd<3, 3> OmegaSq = Omega * Omega;
+  auto omega = RotationVectorToMatrix(rvec);
+  auto omegaSq = omega * omega;
+  auto theta = rvec.norm();
+  auto thetaSq = theta * theta;
 
-  double thetaSq = rotVec.squaredNorm();
-
-  // Get left Jacobian inverse of SO3. See fourth line in right column of
-  // http://asrl.utias.utoronto.ca/~tdb/bib/barfoot_ser17_identities.pdf
-  Matrixd<3, 3> Jinv;
-  if (thetaSq < 1E-9 * 1E-9) {
-    // J⁻¹ = I − 0.5ω + 1/12 ω²
-    Jinv = Matrixd<3, 3>::Identity() - 0.5 * Omega + 1.0 / 12.0 * OmegaSq;
+  double A;
+  double B;
+  double C;
+  if (theta < 1E-9) {
+    // Taylor Expansions around θ = 0
+    // A = 1/1! - θ²/3! + θ⁴/5!
+    // B = 1/2! - θ²/4! + θ⁴/6!
+    // C = 1/6 * (1/2 + θ²/5! + θ⁴/7!)
+    A = 1 - thetaSq / 6 + thetaSq * thetaSq / 120;
+    B = 1 / 2.0 - thetaSq / 24 + thetaSq * thetaSq / 720;
+    C = 1 / 6.0 - thetaSq / 120 + thetaSq * thetaSq / 5040;
   } else {
-    double theta = std::sqrt(thetaSq);
-    double halfTheta = 0.5 * theta;
-
-    // J⁻¹ = I − 0.5ω + (1 − 0.5θ std::cos(θ/2) / std::sin(θ/2))/θ² ω²
-    Jinv = Matrixd<3, 3>::Identity() - 0.5 * Omega +
-           (1.0 - 0.5 * theta * std::cos(halfTheta) / std::sin(halfTheta)) /
-               thetaSq * OmegaSq;
+    // A = sin(θ)/θ
+    // B = (1 - cos(θ)) / θ²
+    // C = (1 - A/(2*B)) / θ²
+    A = sin(theta) / theta;
+    B = (1 - cos(theta)) / thetaSq;
+    C = (1 - A / (2 * B)) / thetaSq;
   }
 
-  // Get dtranslation component
-  Vectord<3> dtranslation =
-      Jinv * Vectord<3>{transform.X().value(), transform.Y().value(),
-                        transform.Z().value()};
+  auto V_inv = Matrixd<3, 3>::Identity() - 0.5 * omega + C * omegaSq;
 
-  return Twist3d{
-      units::meter_t{dtranslation(0)}, units::meter_t{dtranslation(1)},
-      units::meter_t{dtranslation(2)}, units::radian_t{rotVec(0)},
-      units::radian_t{rotVec(1)},      units::radian_t{rotVec(2)}};
+  auto translation_component = V_inv * u;
+
+  return Twist3d{units::meter_t{translation_component(0)},
+                 units::meter_t{translation_component(1)},
+                 units::meter_t{translation_component(2)},
+                 units::radian_t{rvec(0)},
+                 units::radian_t{rvec(1)},
+                 units::radian_t{rvec(2)}};
 }
 
 Pose2d Pose3d::ToPose2d() const {
