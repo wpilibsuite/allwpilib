@@ -100,7 +100,7 @@ Vectord<2> SingleJointedArmSim::UpdateX(const Vectord<2>& currentXhat,
   // This acceleration is next added to the linear system dynamics ẋ=Ax+Bu
   //
   //   f(x, u) = Ax + Bu + [0  α]ᵀ
-  //   f(x, u) = Ax + Bu + [0  (3/2⋅g⋅cos(θ)/L)]ᵀ
+  //   f(x, u) = Ax + Bu + [0  3/2⋅g⋅cos(θ)/L]ᵀ
 
   Vectord<2> updatedXhat = RKDP(
       [&](const auto& x, const auto& u) -> Vectord<2> {

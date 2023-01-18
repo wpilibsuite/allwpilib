@@ -274,7 +274,7 @@ public class SingleJointedArmSim extends LinearSystemSim<N2, N1, N1> {
     // torque on the arm, J is the mass-moment of inertia about the pivot axis,
     // and α is the angular acceleration in rad/s². Rearranging yields: α = F⋅r/J
     //
-  // We substitute in F = m⋅g⋅cos(θ), where θ is the angle from horizontal:
+    // We substitute in F = m⋅g⋅cos(θ), where θ is the angle from horizontal:
     //
     //   α = (m⋅g⋅cos(θ))⋅r/J
     //
@@ -290,7 +290,7 @@ public class SingleJointedArmSim extends LinearSystemSim<N2, N1, N1> {
     // This acceleration is next added to the linear system dynamics ẋ=Ax+Bu
     //
     //   f(x, u) = Ax + Bu + [0  α]ᵀ
-    //   f(x, u) = Ax + Bu + [0  (3/2⋅g⋅cos(θ)/L)]ᵀ
+    //   f(x, u) = Ax + Bu + [0  3/2⋅g⋅cos(θ)/L]ᵀ
 
     Matrix<N2, N1> updatedXhat =
         NumericalIntegration.rkdp(
