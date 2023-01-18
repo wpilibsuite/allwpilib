@@ -18,6 +18,8 @@ namespace frc {
  */
 class PS4Controller : public GenericHID {
  public:
+  static constexpr double kDefaultDeadband = 0.05;
+
   /**
    * Construct an instance of an PS4 controller.
    *
@@ -35,31 +37,59 @@ class PS4Controller : public GenericHID {
 
   /**
    * Get the X axis value of left side of the controller.
-   *
-   * @return the axis value.
    */
   double GetLeftX() const;
 
   /**
-   * Get the X axis value of right side of the controller.
+   * Check the value of the X axis value of left side of the controller against the provided deadband value.
+   * The value returned from the axis is already scaled if greater than the deadband.
    *
-   * @return the axis value.
+   * @param deadband range around zero deadband value.
+   * @return The deadband checked axis value.
+   */
+  double GetDeadbandLeftX(double deadband = kDefaultDeadband) const;
+
+  /**
+   * Get the X axis value of right side of the controller.
    */
   double GetRightX() const;
 
   /**
-   * Get the Y axis value of left side of the controller.
+   * Check the value of the X axis value of right side of the controller against the provided deadband value.
+   * The value returned from the axis is already scaled if greater than the deadband.
    *
-   * @return the axis value.
+   * @param deadband range around zero deadband value.
+   * @return The deadband checked axis value.
+   */
+  double GetDeadbandRightX(double deadband = kDefaultDeadband) const;
+
+  /**
+   * Get the Y axis value of left side of the controller.
    */
   double GetLeftY() const;
 
+    /**
+     * Check the value of the Y axis value of left side of the controller against the provided deadband value.
+     * The value returned from the axis is already scaled if greater than the deadband.
+     *
+     * @param deadband range around zero deadband value.
+     * @return The deadband checked axis value.
+     */
+  double GetDeadbandLeftY(double deadband = kDefaultDeadband) const;
+
   /**
    * Get the Y axis value of right side of the controller.
-   *
-   * @return the axis value.
    */
   double GetRightY() const;
+
+    /**
+     * Check the value of the Y axis value of right side of the controller against the provided deadband value.
+     * The value returned from the axis is already scaled if greater than the deadband.
+     *
+     * @param deadband range around zero deadband value.
+     * @return The deadband checked axis value.
+     */
+  double GetDeadbandRightY(double deadband = kDefaultDeadband) const;
 
   /**
    * Get the L2 axis value of the controller. Note that this axis is bound to

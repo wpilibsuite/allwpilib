@@ -6,6 +6,7 @@
 
 #include <cmath>
 #include <numbers>
+#include <frc/MathUtil.h>
 
 #include <hal/FRCUsageReporting.h>
 
@@ -67,12 +68,24 @@ double Joystick::GetX() const {
   return GetRawAxis(m_axes[Axis::kX]);
 }
 
+double Joystick::GetDeadbandX(double deadband) const {
+    return frc::ApplyDeadband(GetX(), deadband, 1.0);
+}
+
 double Joystick::GetY() const {
   return GetRawAxis(m_axes[Axis::kY]);
 }
 
+double Joystick::GetDeadbandY(double deadband) const {
+    return frc::ApplyDeadband(GetY(), deadband, 1.0);
+}
+
 double Joystick::GetZ() const {
   return GetRawAxis(m_axes[Axis::kZ]);
+}
+
+double Joystick::GetDeadbandZ(double deadband) const {
+    return frc::ApplyDeadband(GetZ(), deadband, 1.0);
 }
 
 double Joystick::GetTwist() const {

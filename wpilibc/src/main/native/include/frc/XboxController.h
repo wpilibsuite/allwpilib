@@ -19,6 +19,8 @@ namespace frc {
  */
 class XboxController : public GenericHID {
  public:
+  static constexpr double kDefaultDeadband = 0.05;
+
   /**
    * Construct an instance of an Xbox controller.
    *
@@ -40,19 +42,55 @@ class XboxController : public GenericHID {
   double GetLeftX() const;
 
   /**
+   * Check the value of the X axis value of left side of the controller against the provided deadband value.
+   * The value returned from the axis is already scaled if greater than the deadband.
+   *
+   * @param deadband range around zero deadband value.
+   * @return The deadband checked axis value.
+   */
+  double GetDeadbandLeftX(double deadband = kDefaultDeadband) const;
+
+  /**
    * Get the X axis value of right side of the controller.
    */
   double GetRightX() const;
+
+  /**
+   * Check the value of the X axis value of right side of the controller against the provided deadband value.
+   * The value returned from the axis is already scaled if greater than the deadband.
+   *
+   * @param deadband range around zero deadband value.
+   * @return The deadband checked axis value.
+   */
+  double GetDeadbandRightX(double deadband = kDefaultDeadband) const;
 
   /**
    * Get the Y axis value of left side of the controller.
    */
   double GetLeftY() const;
 
+    /**
+     * Check the value of the Y axis value of left side of the controller against the provided deadband value.
+     * The value returned from the axis is already scaled if greater than the deadband.
+     *
+     * @param deadband range around zero deadband value.
+     * @return The deadband checked axis value.
+     */
+  double GetDeadbandLeftY(double deadband = kDefaultDeadband) const;
+
   /**
    * Get the Y axis value of right side of the controller.
    */
   double GetRightY() const;
+
+    /**
+     * Check the value of the Y axis value of right side of the controller against the provided deadband value.
+     * The value returned from the axis is already scaled if greater than the deadband.
+     *
+     * @param deadband range around zero deadband value.
+     * @return The deadband checked axis value.
+     */
+  double GetDeadbandRightY(double deadband = kDefaultDeadband) const;
 
   /**
    * Get the left trigger (LT) axis value of the controller. Note that this axis

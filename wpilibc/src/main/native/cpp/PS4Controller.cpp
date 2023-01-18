@@ -8,6 +8,8 @@
 
 #include "frc/event/BooleanEvent.h"
 
+#include <frc/MathUtil.h>
+
 using namespace frc;
 
 PS4Controller::PS4Controller(int port) : GenericHID(port) {
@@ -18,16 +20,32 @@ double PS4Controller::GetLeftX() const {
   return GetRawAxis(Axis::kLeftX);
 }
 
+double PS4Controller::GetDeadbandLeftX(double deadband) const {
+  return frc::ApplyDeadband(GetLeftX(), deadband, 1.0);
+}
+
 double PS4Controller::GetRightX() const {
   return GetRawAxis(Axis::kRightX);
+}
+
+double PS4Controller::GetDeadbandRightX(double deadband) const {
+  return frc::ApplyDeadband(GetRightX(), deadband, 1.0);
 }
 
 double PS4Controller::GetLeftY() const {
   return GetRawAxis(Axis::kLeftY);
 }
 
+double PS4Controller::GetDeadbandLeftY(double deadband) const {
+    return frc::ApplyDeadband(GetLeftY(), deadband, 1.0);
+}
+
 double PS4Controller::GetRightY() const {
   return GetRawAxis(Axis::kRightY);
+}
+
+double PS4Controller::GetDeadbandRightY(double deadband) const {
+    return frc::ApplyDeadband(GetRightY(), deadband, 1.0);
 }
 
 double PS4Controller::GetL2Axis() const {

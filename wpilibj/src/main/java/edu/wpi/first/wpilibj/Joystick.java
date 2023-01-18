@@ -6,6 +6,7 @@ package edu.wpi.first.wpilibj;
 
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.event.BooleanEvent;
 import edu.wpi.first.wpilibj.event.EventLoop;
 
@@ -17,6 +18,8 @@ import edu.wpi.first.wpilibj.event.EventLoop;
  * and the mapping of ports to hardware buttons depends on the code in the Driver Station.
  */
 public class Joystick extends GenericHID {
+  public static final double kDefaultDeadband = 0.1;
+
   public static final byte kDefaultXChannel = 0;
   public static final byte kDefaultYChannel = 1;
   public static final byte kDefaultZChannel = 2;
@@ -170,6 +173,27 @@ public class Joystick extends GenericHID {
   }
 
   /**
+   * Get the deadband checked X value of the joystick. This depends on the mapping of the joystick connected to the
+   * current port. This value is already scaled if it is greater than the deadband values.
+   *
+   * @param deadband range around zero deadband value.
+   * @return The deadband checked X value of the joystick.
+   */
+  public double getDeadbandX(double deadband) {
+    return MathUtil.applyDeadband(getX(), deadband, 1);
+  }
+
+  /**
+   * Get the deadband checked X value of the joystick. This depends on the mapping of the joystick connected to the
+   * current port. This value is already scaled if it is greater than the deadband values. Uses the default deadband value {@link Joystick#kDefaultDeadband}.
+   *
+   * @return The deadband checked X value of the joystick.
+   */
+  public double getDeadbandX() {
+    return getDeadbandX(kDefaultDeadband);
+  }
+
+  /**
    * Get the Y value of the joystick. This depends on the mapping of the joystick connected to the
    * current port.
    *
@@ -180,12 +204,54 @@ public class Joystick extends GenericHID {
   }
 
   /**
+   * Get the deadband checked Y value of the joystick. This depends on the mapping of the joystick connected to the
+   * current port. This value is already scaled if it is greater than the deadband values.
+   *
+   * @param deadband range around zero deadband value.
+   * @return The deadband checked Y value of the joystick.
+   */
+  public double getDeadbandY(double deadband) {
+    return MathUtil.applyDeadband(getY(), deadband, 1);
+  }
+
+  /**
+   * Get the deadband checked Y value of the joystick. This depends on the mapping of the joystick connected to the
+   * current port. This value is already scaled if it is greater than the deadband values. Uses the default deadband value {@link Joystick#kDefaultDeadband}.
+   *
+   * @return The deadband checked Y value of the joystick.
+   */
+  public double getDeadbandY() {
+    return getDeadbandY(kDefaultDeadband);
+  }
+
+  /**
    * Get the z position of the HID.
    *
    * @return the z position
    */
   public double getZ() {
     return getRawAxis(m_axes[AxisType.kZ.value]);
+  }
+
+  /**
+   * Get the deadband checked Z value of the joystick. This depends on the mapping of the joystick connected to the
+   * current port. This value is already scaled if it is greater than the deadband values.
+   *
+   * @param deadband range around zero deadband value.
+   * @return The deadband checked Z value of the joystick.
+   */
+  public double getDeadbandZ(double deadband) {
+    return MathUtil.applyDeadband(getZ(), deadband, 1);
+  }
+
+  /**
+   * Get the deadband checked Z value of the joystick. This depends on the mapping of the joystick connected to the
+   * current port. This value is already scaled if it is greater than the deadband values. Uses the default deadband value {@link Joystick#kDefaultDeadband}.
+   *
+   * @return The deadband checked Z value of the joystick.
+   */
+  public double getDeadbandZ() {
+    return getDeadbandZ(kDefaultDeadband);
   }
 
   /**

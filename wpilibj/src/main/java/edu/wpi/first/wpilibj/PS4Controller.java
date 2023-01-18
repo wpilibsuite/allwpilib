@@ -6,6 +6,7 @@ package edu.wpi.first.wpilibj;
 
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.event.BooleanEvent;
 import edu.wpi.first.wpilibj.event.EventLoop;
 
@@ -17,6 +18,8 @@ import edu.wpi.first.wpilibj.event.EventLoop;
  * and the mapping of ports to hardware buttons depends on the code in the Driver Station.
  */
 public class PS4Controller extends GenericHID {
+  public static final double kDefaultDeadband = 0.05;
+
   /**
    * Construct an instance of a device.
    *
@@ -104,37 +107,121 @@ public class PS4Controller extends GenericHID {
   /**
    * Get the X axis value of left side of the controller.
    *
-   * @return the axis value.
+   * @return The axis value.
    */
   public double getLeftX() {
-    return getRawAxis(Axis.kLeftX.value);
+    return getRawAxis(XboxController.Axis.kLeftX.value);
+  }
+
+  /**
+   * Check the value of the X axis value of left side of the controller against the provided deadband value.
+   * The value returned from the axis is already scaled if greater than the deadband.
+   *
+   * @param deadband range around zero deadband value.
+   * @return The deadband checked axis value.
+   */
+  public double getDeadbandLeftX(double deadband) {
+    return MathUtil.applyDeadband(getLeftX(), deadband, 1);
+  }
+
+  /**
+   * Check the value of the X axis value of left side of the controller against the provided deadband value.
+   * The value returned from the axis is already scaled if greater than the deadband. Uses the default deadband value {@link PS4Controller#kDefaultDeadband}
+   *
+   * @return The deadband checked axis value.
+   */
+  public double getDeadbandLeftX() {
+    return getDeadbandLeftX(kDefaultDeadband);
   }
 
   /**
    * Get the X axis value of right side of the controller.
    *
-   * @return the axis value.
+   * @return The axis value.
    */
   public double getRightX() {
-    return getRawAxis(Axis.kRightX.value);
+    return getRawAxis(XboxController.Axis.kRightX.value);
+  }
+
+  /**
+   * Check the value of the X axis value of right side of the controller against the provided deadband value.
+   * The value returned from the axis is already scaled if greater than the deadband.
+   *
+   * @param deadband range around zero deadband value.
+   * @return The deadband checked axis value.
+   */
+  public double getDeadbandRightX(double deadband) {
+    return MathUtil.applyDeadband(getRightX(), deadband, 1);
+  }
+
+  /**
+   * Check the value of the X axis value of right side of the controller against the provided deadband value.
+   * The value returned from the axis is already scaled if greater than the deadband. Uses the default deadband value {@link PS4Controller#kDefaultDeadband}
+   *
+   * @return The deadband checked axis value.
+   */
+  public double getDeadbandRightX() {
+    return getDeadbandRightX(kDefaultDeadband);
   }
 
   /**
    * Get the Y axis value of left side of the controller.
    *
-   * @return the axis value.
+   * @return The axis value.
    */
   public double getLeftY() {
-    return getRawAxis(Axis.kLeftY.value);
+    return getRawAxis(XboxController.Axis.kLeftY.value);
+  }
+
+  /**
+   * Check the value of the Y axis value of left side of the controller against the provided deadband value.
+   * The value returned from the axis is already scaled if greater than the deadband.
+   *
+   * @param deadband range around zero deadband value.
+   * @return The deadband checked axis value.
+   */
+  public double getDeadbandLeftY(double deadband) {
+    return MathUtil.applyDeadband(getLeftY(), deadband, 1);
+  }
+
+  /**
+   * Check the value of the Y axis value of left side of the controller against the provided deadband value.
+   * The value returned from the axis is already scaled if greater than the deadband. Uses the default deadband value {@link PS4Controller#kDefaultDeadband}
+   *
+   * @return The deadband checked axis value.
+   */
+  public double getDeadbandLeftY() {
+    return getDeadbandLeftY(kDefaultDeadband);
   }
 
   /**
    * Get the Y axis value of right side of the controller.
    *
-   * @return the axis value.
+   * @return The axis value.
    */
   public double getRightY() {
-    return getRawAxis(Axis.kRightY.value);
+    return getRawAxis(XboxController.Axis.kRightY.value);
+  }
+
+  /**
+   * Check the value of the Y axis value of right side of the controller against the provided deadband value.
+   * The value returned from the axis is already scaled if greater than the deadband.
+   *
+   * @param deadband range around zero deadband value.
+   * @return The deadband checked axis value.
+   */
+  public double getDeadbandRightY(double deadband) {
+    return MathUtil.applyDeadband(getRightY(), deadband, 1);
+  }
+
+  /**
+   * Check the value of the Y axis value of right side of the controller against the provided deadband value.
+   * The value returned from the axis is already scaled if greater than the deadband. Uses the default deadband value {@link PS4Controller#kDefaultDeadband}
+   *
+   * @return The deadband checked axis value.
+   */
+  public double getDeadbandRightY() {
+    return getDeadbandRightY(kDefaultDeadband);
   }
 
   /**

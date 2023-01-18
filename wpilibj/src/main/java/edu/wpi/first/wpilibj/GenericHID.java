@@ -26,6 +26,7 @@ public class GenericHID {
     kBothRumble
   }
 
+  /** Represents the different types of HID devices */
   public enum HIDType {
     kUnknown(-1),
     kXInputUnknown(0),

@@ -8,6 +8,8 @@
 
 #include "frc/event/BooleanEvent.h"
 
+#include <frc/MathUtil.h>
+
 using namespace frc;
 
 XboxController::XboxController(int port) : GenericHID(port) {
@@ -18,16 +20,32 @@ double XboxController::GetLeftX() const {
   return GetRawAxis(Axis::kLeftX);
 }
 
+double XboxController::GetDeadbandLeftX(double deadband) const {
+  return frc::ApplyDeadband(GetLeftX(), deadband, 1.0);
+}
+
 double XboxController::GetRightX() const {
   return GetRawAxis(Axis::kRightX);
+}
+
+double XboxController::GetDeadbandRightX(double deadband) const {
+  return frc::ApplyDeadband(GetRightX(), deadband, 1.0);
 }
 
 double XboxController::GetLeftY() const {
   return GetRawAxis(Axis::kLeftY);
 }
 
+double XboxController::GetDeadbandLeftY(double deadband) const {
+    return frc::ApplyDeadband(GetLeftY(), deadband, 1.0);
+}
+
 double XboxController::GetRightY() const {
   return GetRawAxis(Axis::kRightY);
+}
+
+double XboxController::GetDeadbandRightY(double deadband) const {
+    return frc::ApplyDeadband(GetRightY(), deadband, 1.0);
 }
 
 double XboxController::GetLeftTriggerAxis() const {
