@@ -255,7 +255,7 @@ public class Pose3d implements Interpolatable<Pose3d> {
     final var transform = end.relativeTo(this);
 
     final var rvec = transform.getRotation().getQuaternion().toRotationVector();
-    
+
     final var omega = rotationVectorToMatrix(rvec);
     final var theta = transform.getRotation().getAngle();
     final var thetaSq = theta * theta;
@@ -277,14 +277,14 @@ public class Pose3d implements Interpolatable<Pose3d> {
       // C = (1 - A/(2*B)) / θ²
       A = Math.sin(theta) / theta;
       B = (1 - Math.cos(theta)) / thetaSq;
-      C = (1 - A/(2*B)) / thetaSq;
+      C = (1 - A / (2 * B)) / thetaSq;
     }
 
     final var V_inv = Matrix.eye(Nat.N3()).minus(omega.times(0.5)).plus(omega.pow(2).times(C));
 
-    final var twist_translation = V_inv.times(VecBuilder.fill(transform.getX(), transform.getY(), transform.getZ()));
+    final var twist_translation =
+        V_inv.times(VecBuilder.fill(transform.getX(), transform.getY(), transform.getZ()));
 
-    
     return new Twist3d(
         twist_translation.get(0, 0),
         twist_translation.get(1, 0),
