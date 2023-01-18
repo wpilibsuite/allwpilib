@@ -201,35 +201,36 @@ public class Pose3d implements Interpolatable<Pose3d> {
    * @return The new pose of the robot.
    */
   public Pose3d exp(Twist3d twist) {
-    // Implemented from equations 77-84 in https://ethaneade.org/lie.pdf
+    // Implementation from Section 3.2 of https://ethaneade.org/lie.pdf
     final var u = VecBuilder.fill(twist.dx, twist.dy, twist.dz);
-    final var omega = VecBuilder.fill(twist.rx, twist.ry, twist.rz);
-    final var Omega = rotationVectorToMatrix(VecBuilder.fill(twist.rx, twist.ry, twist.rz));
-    double thetaSq = twist.rx * twist.rx + twist.ry * twist.ry + twist.rz * twist.rz;
-    double theta = Math.sqrt(thetaSq);
+    final var rvec = VecBuilder.fill(twist.rx, twist.ry, twist.rz);
+    final var omega = rotationVectorToMatrix(rvec);
+    final var omegaSq = omega.pow(2);
+    double theta = rvec.norm();
+    double thetaSq = theta * theta;
 
-    // Implemented from equations 77-84 in https://ethaneade.org/lie.pdf
     double A;
     double B;
     double C;
-    if (thetaSq < 1E-9 * 1E-9) {
+    if (theta < 1E-9) {
+      // Taylor Expansions around θ = 0
       // A = 1/1! - θ²/3! + θ⁴/5!
       // B = 1/2! - θ²/4! + θ⁴/6!
       // C = 1/3! - θ²/5! + θ⁴/7!
-      A = 1 - thetaSq / 6.0 + thetaSq * thetaSq / 120.0;
-      B = 1 / 2.0 - thetaSq / 24.0 + thetaSq * thetaSq / 720.0;
-      C = 1 / 6.0 - thetaSq / 120.0 + thetaSq * thetaSq / 5040.0;
+      A = 1 - thetaSq / 6 + thetaSq * thetaSq / 120;
+      B = 1 / 2.0 - thetaSq / 24 + thetaSq * thetaSq / 720;
+      C = 1 / 6.0 - thetaSq / 120 + thetaSq * thetaSq / 5040;
     } else {
       // A = sin(θ)/θ
-      // B = (1 - cos(θ) / θ²
+      // B = (1 - cos(θ)) / θ²
       // C = (1 - A) / θ²
       A = Math.sin(theta) / theta;
       B = (1 - Math.cos(theta)) / thetaSq;
       C = (1 - A) / thetaSq;
     }
 
-    Matrix<N3, N3> R = Matrix.eye(Nat.N3()).plus(Omega.times(A)).plus(Omega.times(Omega).times(B));
-    Matrix<N3, N3> V = Matrix.eye(Nat.N3()).plus(Omega.times(B)).plus(Omega.times(Omega).times(C));
+    Matrix<N3, N3> R = Matrix.eye(Nat.N3()).plus(omega.times(A)).plus(omegaSq.times(B));
+    Matrix<N3, N3> V = Matrix.eye(Nat.N3()).plus(omega.times(B)).plus(omegaSq.times(C));
     Matrix<N3, N1> translation_component = V.times(u);
     final var transform =
         new Transform3d(
@@ -250,50 +251,47 @@ public class Pose3d implements Interpolatable<Pose3d> {
    * @return The twist that maps this to end.
    */
   public Twist3d log(Pose3d end) {
+    // Implementation from Section 3.2 of https://ethaneade.org/lie.pdf
     final var transform = end.relativeTo(this);
 
-    final var rotVec = transform.getRotation().getQuaternion().toRotationVector();
+    final var rvec = transform.getRotation().getQuaternion().toRotationVector();
+    
+    final var omega = rotationVectorToMatrix(rvec);
+    final var theta = transform.getRotation().getAngle();
+    final var thetaSq = theta * theta;
 
-    final var Omega = rotationVectorToMatrix(rotVec);
-    final var OmegaSq = Omega.times(Omega);
-
-    double thetaSq =
-        rotVec.get(0, 0) * rotVec.get(0, 0)
-            + rotVec.get(1, 0) * rotVec.get(1, 0)
-            + rotVec.get(2, 0) * rotVec.get(2, 0);
-
-    // Get left Jacobian inverse of SO3. See fourth line in right column of
-    // http://asrl.utias.utoronto.ca/~tdb/bib/barfoot_ser17_identities.pdf
-    Matrix<N3, N3> Jinv;
-    if (thetaSq < 1E-9 * 1E-9) {
-      // J⁻¹ = I − 0.5ω + 1/12 ω²
-      Jinv = Matrix.eye(Nat.N3()).minus(Omega.times(0.5)).plus(OmegaSq.times(1.0 / 12.0));
+    double A;
+    double B;
+    double C;
+    if (theta < 1E-9) {
+      // Taylor Expansions around θ = 0
+      // A = 1/1! - θ²/3! + θ⁴/5!
+      // B = 1/2! - θ²/4! + θ⁴/6!
+      // C = 1/6 * (1/2 + θ²/5! + θ⁴/7!)
+      A = 1 - thetaSq / 6 + thetaSq * thetaSq / 120;
+      B = 1 / 2.0 - thetaSq / 24 + thetaSq * thetaSq / 720;
+      C = 1 / 6.0 - thetaSq / 120 + thetaSq * thetaSq / 5040;
     } else {
-      double theta = Math.sqrt(thetaSq);
-      double halfTheta = 0.5 * theta;
-
-      // J⁻¹ = I − 0.5ω + (1 − 0.5θ cos(θ/2) / sin(θ/2))/θ² ω²
-      Jinv =
-          Matrix.eye(Nat.N3())
-              .minus(Omega.times(0.5))
-              .plus(
-                  OmegaSq.times(
-                      (1.0 - 0.5 * theta * Math.cos(halfTheta) / Math.sin(halfTheta)) / thetaSq));
+      // A = sin(θ)/θ
+      // B = (1 - cos(θ)) / θ²
+      // C = (1 - A/(2*B)) / θ²
+      A = Math.sin(theta) / theta;
+      B = (1 - Math.cos(theta)) / thetaSq;
+      C = (1 - A/(2*B)) / thetaSq;
     }
 
-    // Get dtranslation component
-    final var dtranslation =
-        Jinv.times(
-            new MatBuilder<>(Nat.N3(), Nat.N1())
-                .fill(transform.getX(), transform.getY(), transform.getZ()));
+    final var V_inv = Matrix.eye(Nat.N3()).minus(omega.times(0.5)).plus(omega.pow(2).times(C));
 
+    final var twist_translation = V_inv.times(VecBuilder.fill(transform.getX(), transform.getY(), transform.getZ()));
+
+    
     return new Twist3d(
-        dtranslation.get(0, 0),
-        dtranslation.get(1, 0),
-        dtranslation.get(2, 0),
-        rotVec.get(0, 0),
-        rotVec.get(1, 0),
-        rotVec.get(2, 0));
+        twist_translation.get(0, 0),
+        twist_translation.get(1, 0),
+        twist_translation.get(2, 0),
+        rvec.get(0, 0),
+        rvec.get(1, 0),
+        rvec.get(2, 0));
   }
 
   /**
@@ -370,5 +368,23 @@ public class Pose3d implements Interpolatable<Pose3d> {
             -rotation.get(1, 0),
             rotation.get(0, 0),
             0.0);
+  }
+
+  /**
+   * Applies the hat operator to a rotation vector.
+   *
+   * <p>It takes a rotation vector and returns the corresponding matrix representation of the Lie
+   * algebra element (a 3x3 rotation matrix).
+   *
+   * @param rotation The rotation vector.
+   * @return The rotation vector as a 3x3 rotation matrix.
+   */
+  private Vector<N3> rotationMatrixToVector(Matrix<N3, N3> rotation) {
+    // Given a rotation matrix
+    //         [ 0 -c  b]
+    // Omega = [ c  0 -a]
+    //         [-b  a  0],
+    //  construct a rotation vector <a, b, c>
+    return VecBuilder.fill(rotation.get(2, 1), rotation.get(0, 2), rotation.get(1, 0));
   }
 }
