@@ -113,6 +113,7 @@ Pose3d Pose3d::Exp(const Twist3d& twist) const {
 }
 
 Twist3d Pose3d::Log(const Pose3d& end) const {
+  // Implementation from Section 3.2 of https://ethaneade.org/lie.pdf
   const auto transform = end.RelativeTo(*this);
 
   auto u = Vectord<3>{transform.X().value(), transform.Y().value(),
