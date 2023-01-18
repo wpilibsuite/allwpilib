@@ -14,13 +14,13 @@ import org.junit.jupiter.api.Test;
 class SingleJointedArmSimTest {
   SingleJointedArmSim m_sim =
       new SingleJointedArmSim(
-          DCMotor.getVex775Pro(2), 100, 3.0, Units.inchesToMeters(19.0 / 2.0), -Math.PI, 0.0, true);
+          DCMotor.getVex775Pro(2), 300, 3.0, Units.inchesToMeters(30.0), -Math.PI, 0.0, true);
 
   @Test
   void testArmDisabled() {
     m_sim.setState(VecBuilder.fill(0.0, 0.0));
 
-    for (int i = 0; i < 12 / 0.02; i++) {
+    for (int i = 0; i < 10 / 0.02; i++) {
       m_sim.setInput(0.0);
       m_sim.update(0.020);
     }
