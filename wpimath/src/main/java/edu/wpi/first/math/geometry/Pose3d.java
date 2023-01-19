@@ -14,6 +14,7 @@ import edu.wpi.first.math.Nat;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.Vector;
 import edu.wpi.first.math.interpolation.Interpolatable;
+import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import java.util.Objects;
 
@@ -200,34 +201,44 @@ public class Pose3d implements Interpolatable<Pose3d> {
    * @return The new pose of the robot.
    */
   public Pose3d exp(Twist3d twist) {
-    final var Omega = rotationVectorToMatrix(VecBuilder.fill(twist.rx, twist.ry, twist.rz));
-    final var OmegaSq = Omega.times(Omega);
+    // Implementation from Section 3.2 of https://ethaneade.org/lie.pdf
+    final var u = VecBuilder.fill(twist.dx, twist.dy, twist.dz);
+    final var rvec = VecBuilder.fill(twist.rx, twist.ry, twist.rz);
+    final var omega = rotationVectorToMatrix(rvec);
+    final var omegaSq = omega.pow(2);
+    double theta = rvec.norm();
+    double thetaSq = theta * theta;
 
-    double thetaSq = twist.rx * twist.rx + twist.ry * twist.ry + twist.rz * twist.rz;
-
-    // Get left Jacobian of SO3. See first line in right column of
-    // http://asrl.utias.utoronto.ca/~tdb/bib/barfoot_ser17_identities.pdf
-    Matrix<N3, N3> J;
-    if (thetaSq < 1E-9 * 1E-9) {
-      // J = I + 0.5ω
-      J = Matrix.eye(Nat.N3()).plus(Omega.times(0.5));
+    double A;
+    double B;
+    double C;
+    if (theta < 1E-9) {
+      // Taylor Expansions around θ = 0
+      // A = 1/1! - θ²/3! + θ⁴/5!
+      // B = 1/2! - θ²/4! + θ⁴/6!
+      // C = 1/3! - θ²/5! + θ⁴/7!
+      A = 1 - thetaSq / 6 + thetaSq * thetaSq / 120;
+      B = 1 / 2.0 - thetaSq / 24 + thetaSq * thetaSq / 720;
+      C = 1 / 6.0 - thetaSq / 120 + thetaSq * thetaSq / 5040;
     } else {
-      double theta = Math.sqrt(thetaSq);
-      // J = I + (1 − cos(θ))/θ² ω + (θ − sin(θ))/θ³ ω²
-      J =
-          Matrix.eye(Nat.N3())
-              .plus(Omega.times((1.0 - Math.cos(theta)) / thetaSq))
-              .plus(OmegaSq.times((theta - Math.sin(theta)) / (thetaSq * theta)));
+      // A = sin(θ)/θ
+      // B = (1 - cos(θ)) / θ²
+      // C = (1 - A) / θ²
+      A = Math.sin(theta) / theta;
+      B = (1 - Math.cos(theta)) / thetaSq;
+      C = (1 - A) / thetaSq;
     }
 
-    // Get translation component
-    final var translation =
-        J.times(new MatBuilder<>(Nat.N3(), Nat.N1()).fill(twist.dx, twist.dy, twist.dz));
-
+    Matrix<N3, N3> R = Matrix.eye(Nat.N3()).plus(omega.times(A)).plus(omegaSq.times(B));
+    Matrix<N3, N3> V = Matrix.eye(Nat.N3()).plus(omega.times(B)).plus(omegaSq.times(C));
+    Matrix<N3, N1> translation_component = V.times(u);
     final var transform =
         new Transform3d(
-            new Translation3d(translation.get(0, 0), translation.get(1, 0), translation.get(2, 0)),
-            new Rotation3d(twist.rx, twist.ry, twist.rz));
+            new Translation3d(
+                translation_component.get(0, 0),
+                translation_component.get(1, 0),
+                translation_component.get(2, 0)),
+            new Rotation3d(R));
 
     return this.plus(transform);
   }
@@ -240,50 +251,43 @@ public class Pose3d implements Interpolatable<Pose3d> {
    * @return The twist that maps this to end.
    */
   public Twist3d log(Pose3d end) {
+    // Implementation from Section 3.2 of https://ethaneade.org/lie.pdf
     final var transform = end.relativeTo(this);
 
-    final var rotVec = transform.getRotation().getQuaternion().toRotationVector();
+    final var rvec = transform.getRotation().getQuaternion().toRotationVector();
 
-    final var Omega = rotationVectorToMatrix(rotVec);
-    final var OmegaSq = Omega.times(Omega);
+    final var omega = rotationVectorToMatrix(rvec);
+    final var theta = transform.getRotation().getAngle();
+    final var thetaSq = theta * theta;
 
-    double thetaSq =
-        rotVec.get(0, 0) * rotVec.get(0, 0)
-            + rotVec.get(1, 0) * rotVec.get(1, 0)
-            + rotVec.get(2, 0) * rotVec.get(2, 0);
-
-    // Get left Jacobian inverse of SO3. See fourth line in right column of
-    // http://asrl.utias.utoronto.ca/~tdb/bib/barfoot_ser17_identities.pdf
-    Matrix<N3, N3> Jinv;
-    if (thetaSq < 1E-9 * 1E-9) {
-      // J⁻¹ = I − 0.5ω + 1/12 ω²
-      Jinv = Matrix.eye(Nat.N3()).minus(Omega.times(0.5)).plus(OmegaSq.times(1.0 / 12.0));
+    double C;
+    if (theta < 1E-9) {
+      // Taylor Expansions around θ = 0
+      // A = 1/1! - θ²/3! + θ⁴/5!
+      // B = 1/2! - θ²/4! + θ⁴/6!
+      // C = 1/6 * (1/2 + θ²/5! + θ⁴/7!)
+      C = 1 / 6.0 - thetaSq / 120 + thetaSq * thetaSq / 5040;
     } else {
-      double theta = Math.sqrt(thetaSq);
-      double halfTheta = 0.5 * theta;
-
-      // J⁻¹ = I − 0.5ω + (1 − 0.5θ cos(θ/2) / sin(θ/2))/θ² ω²
-      Jinv =
-          Matrix.eye(Nat.N3())
-              .minus(Omega.times(0.5))
-              .plus(
-                  OmegaSq.times(
-                      (1.0 - 0.5 * theta * Math.cos(halfTheta) / Math.sin(halfTheta)) / thetaSq));
+      // A = sin(θ)/θ
+      // B = (1 - cos(θ)) / θ²
+      // C = (1 - A/(2*B)) / θ²
+      double A = Math.sin(theta) / theta;
+      double B = (1 - Math.cos(theta)) / thetaSq;
+      C = (1 - A / (2 * B)) / thetaSq;
     }
 
-    // Get dtranslation component
-    final var dtranslation =
-        Jinv.times(
-            new MatBuilder<>(Nat.N3(), Nat.N1())
-                .fill(transform.getX(), transform.getY(), transform.getZ()));
+    final var V_inv = Matrix.eye(Nat.N3()).minus(omega.times(0.5)).plus(omega.pow(2).times(C));
+
+    final var twist_translation =
+        V_inv.times(VecBuilder.fill(transform.getX(), transform.getY(), transform.getZ()));
 
     return new Twist3d(
-        dtranslation.get(0, 0),
-        dtranslation.get(1, 0),
-        dtranslation.get(2, 0),
-        rotVec.get(0, 0),
-        rotVec.get(1, 0),
-        rotVec.get(2, 0));
+        twist_translation.get(0, 0),
+        twist_translation.get(1, 0),
+        twist_translation.get(2, 0),
+        rvec.get(0, 0),
+        rvec.get(1, 0),
+        rvec.get(2, 0));
   }
 
   /**
