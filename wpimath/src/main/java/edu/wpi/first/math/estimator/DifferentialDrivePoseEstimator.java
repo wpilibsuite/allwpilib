@@ -12,7 +12,6 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
-import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Twist2d;
 import edu.wpi.first.math.geometry.Twist3d;
 import edu.wpi.first.math.interpolation.Interpolatable;
@@ -367,17 +366,6 @@ public class DifferentialDrivePoseEstimator {
             twist_axis.get(0, 0) * k_times_twist.get(3, 0),
             twist_axis.get(1, 0) * k_times_twist.get(3, 0),
             twist_axis.get(2, 0) * k_times_twist.get(3, 0));
-
-    var twist_rot = new Rotation3d(VecBuilder.fill(twist.rx, twist.ry, twist.rz)).getQuaternion();
-
-    var twist_error = new Transform3d(record.poseMeters.exp(twist), visionRobotPoseMeters);
-    var twist_error_rvec = twist_error.getRotation().getQuaternion();
-
-    var record_rvec = record.poseMeters.getRotation().getQuaternion();
-    var vision_pose_rvec = visionRobotPoseMeters.getRotation().getQuaternion();
-
-    var record_exp_pose = record.poseMeters.exp(twist);
-    var record_exp_pose_rvec = record_exp_pose.getRotation().getQuaternion();
 
     // Step 5: Reset Odometry to state at sample with vision adjustment.
     m_odometry.resetPosition(

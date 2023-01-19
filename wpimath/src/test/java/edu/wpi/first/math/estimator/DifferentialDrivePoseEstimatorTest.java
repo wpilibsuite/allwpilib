@@ -432,8 +432,6 @@ class DifferentialDrivePoseEstimatorTest {
           estimator.updateWithTime(
               t, trajectoryRotation3d.plus(gaussianNoise), leftDistanceMeters, rightDistanceMeters);
 
-      var xHatRotationVector = xHat.getRotation().getQuaternion().toRotationVector();
-
       var poseFromStartingPosition = groundTruthState.poseMeters.minus(trajectory.getInitialPose());
       var poseFromStartingPosition3d =
           new Transform3d(
@@ -441,10 +439,6 @@ class DifferentialDrivePoseEstimatorTest {
                   poseFromStartingPosition.getX(), poseFromStartingPosition.getY(), 0),
               new Rotation3d(
                   VecBuilder.fill(0, 0, poseFromStartingPosition.getRotation().getRadians())));
-
-      var groundTruthIn3dFrame = startingPose.plus(poseFromStartingPosition3d);
-      var groundTruthIn3dFrameRotationVector =
-          groundTruthIn3dFrame.getRotation().getQuaternion().toRotationVector();
 
       double error =
           startingPose
@@ -457,12 +451,6 @@ class DifferentialDrivePoseEstimatorTest {
       errorSum += error;
 
       t += dt;
-    }
-
-    while (!visionUpdateRecord.isEmpty()) {
-      var visionUpdate = visionUpdateRecord.pollFirstEntry();
-      var visionUpdateRotationVector =
-          visionUpdate.getValue().getRotation().getQuaternion().toRotationVector();
     }
 
     assertEquals(
