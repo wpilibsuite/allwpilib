@@ -35,10 +35,10 @@ public class Robot extends TimedRobot {
   private static final double kElevatorKi = 0;
   private static final double kElevatorKd = 0;
 
-  private static final double kElevatorkS = 0.0; // volts
-  private static final double kElevatorkG = 0.762; // volts
-  private static final double kElevatorkV = 0.762; // volt seconds per meters
-  private static final double kElevatorkA = 0.0; // volt seconds² per meters
+  private static final double kElevatorkS = 0.0; // volts (V)
+  private static final double kElevatorkG = 0.762; // volts (V)
+  private static final double kElevatorkV = 0.762; // volt per velocity (V/(m/s²))
+  private static final double kElevatorkA = 0.0; // volt per acceleration (V/(m/s))
 
   private static final double kElevatorGearing = 10.0;
   private static final double kElevatorDrumRadius = Units.inchesToMeters(2.0);
