@@ -378,7 +378,6 @@ class DifferentialDrivePoseEstimatorTest {
     double t = 0.0;
 
     final TreeMap<Double, Pose3d> visionUpdateQueue = new TreeMap<>();
-    final TreeMap<Double, Pose3d> visionUpdateRecord = new TreeMap<>();
 
     double maxError = Double.NEGATIVE_INFINITY;
     double errorSum = 0;
@@ -409,7 +408,6 @@ class DifferentialDrivePoseEstimatorTest {
         Pose3d newVisionPose = startingPose.transformBy(visionTransform3d).plus(gaussianNoise);
 
         visionUpdateQueue.put(t, newVisionPose);
-        visionUpdateRecord.put(t, newVisionPose);
       }
 
       // We should apply the oldest vision measurement if it has been `visionUpdateDelay` seconds
