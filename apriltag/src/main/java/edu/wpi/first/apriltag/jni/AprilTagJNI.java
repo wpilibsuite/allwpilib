@@ -77,7 +77,8 @@ public class AprilTagJNI {
       double fy,
       double cx,
       double cy,
-      int nIters);
+      int nIters,
+      double min_improvement);
 
   public static native Transform3d estimatePose(
       double[] homography,

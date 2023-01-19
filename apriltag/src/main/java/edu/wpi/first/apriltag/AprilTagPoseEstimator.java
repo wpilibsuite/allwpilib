@@ -163,7 +163,8 @@ public class AprilTagPoseEstimator {
         m_config.fy,
         m_config.cx,
         m_config.cy,
-        nIters);
+        nIters,
+        minImprovementPerIter);
   }
 
   /**
