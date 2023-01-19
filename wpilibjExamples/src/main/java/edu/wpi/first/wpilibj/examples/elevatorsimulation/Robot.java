@@ -44,6 +44,7 @@ public class Robot extends TimedRobot {
   private static final double kElevatorDrumRadius = Units.inchesToMeters(2.0);
   private static final double kCarriageMass = 4.0; // kg
 
+  private static final double kSetpoint = 30;
   private static final double kMinElevatorHeight = Units.inchesToMeters(2);
   private static final double kMaxElevatorHeight = Units.inchesToMeters(50);
 
@@ -118,17 +119,16 @@ public class Robot extends TimedRobot {
   public void teleopPeriodic() {
     if (m_joystick.getTrigger()) {
       // Here, we run PID control like normal, with a constant setpoint of 30in.
-      var setpoint = m_controller.getSetpoint();
-      double pidOutput = m_controller.calculate(m_encoder.getDistance(), Units.inchesToMeters(30));
-      double feedforwardOutput = m_feedforward.calculate(setpoint.velocity);
+      m_controller.setGoal(Units.inchesToMeters(kSetpoint));
+      double pidOutput = m_controller.calculate(m_encoder.getDistance());
+      double feedforwardOutput = m_feedforward.calculate(m_controller.getSetpoint().velocity);
       m_motor.setVoltage(pidOutput + feedforwardOutput);
     } else {
       // Otherwise, we disable the motor.
       m_motor.set(0.0);
     }
   }
-  // To view the Elevator Sim in the simulator, select Network Tables -> SmartDashboard -> Elevator
-  // Sim
+  // To view the Elevator in the simulator, select Network Tables -> SmartDashboard -> Elevator Sim
 
   @Override
   public void disabledInit() {

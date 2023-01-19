@@ -44,13 +44,14 @@ class Robot : public frc::TimedRobot {
 
   static constexpr units::volt_t kElevatorkS = 0.0_V;
   static constexpr units::volt_t kElevatorkG = 0.0_V;
-  static constexpr auto kElevatorkV = 0.762_V * 1_s / 1_m;
-  static constexpr auto kElevatorkA = 0.762_V * 1_s * 1_s / (1_m);
+  static constexpr auto kElevatorkV = 0.762_V / 1_mps;
+  static constexpr auto kElevatorkA = 0.762_V / 1_mps_sq;
 
   static constexpr double kElevatorGearing = 10.0;
   static constexpr units::meter_t kElevatorDrumRadius = 2_in;
   static constexpr units::kilogram_t kCarriageMass = 4.0_kg;
 
+  static constexpr units::inch_t kSetpoint = 30_in;
   static constexpr units::meter_t kMinElevatorHeight = 2_in;
   static constexpr units::meter_t kMaxElevatorHeight = 50_in;
 
@@ -128,19 +129,19 @@ class Robot : public frc::TimedRobot {
   void TeleopPeriodic() override {
     if (m_joystick.GetTrigger()) {
       // Here, we run PID control like normal, with a constant setpoint of 30in.
-      m_controller.SetGoal(units::meter_t{30_in});
+      m_controller.SetGoal(kSetpoint);
       double pidOutput =
           m_controller.Calculate(units::meter_t{m_encoder.GetDistance()});
       units::volt_t feedforwardOutput =
           m_feedforward.Calculate(m_controller.GetSetpoint().velocity);
       m_motor.SetVoltage(units::volt_t{pidOutput} +
-                         units::volt_t{feedforwardOutput});
+                         feedforwardOutput);
     } else {
       // Otherwise, we disable the motor.
       m_motor.Set(0.0);
     }
   }
-  // To view the Elevator Sim in the simulator, select Network Tables ->
+  // To view the Elevator in the simulator, select Network Tables ->
   // SmartDashboard -> Elevator Sim
 
   void DisabledInit() override {
