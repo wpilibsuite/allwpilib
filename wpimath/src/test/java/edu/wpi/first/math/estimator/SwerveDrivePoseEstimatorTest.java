@@ -165,6 +165,11 @@ class SwerveDrivePoseEstimatorTest {
 
     double t = 0.0;
 
+    System.out.print(
+        "time, est_x, est_y, est_theta, true_x, true_y, true_theta, "
+            + "distance_1, distance_2, distance_3, distance_4, "
+            + "angle_1, angle_2, angle_3, angle_4\n");
+
     final TreeMap<Double, Pose2d> visionUpdateQueue = new TreeMap<>();
 
     double maxError = Double.NEGATIVE_INFINITY;
@@ -213,6 +218,24 @@ class SwerveDrivePoseEstimatorTest {
                   .plus(new Rotation2d(rand.nextGaussian() * 0.05))
                   .minus(trajectory.getInitialPose().getRotation()),
               positions);
+
+      System.out.printf(
+          "%f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f\n",
+          t,
+          xHat.getX(),
+          xHat.getY(),
+          xHat.getRotation().getRadians(),
+          groundTruthState.poseMeters.getX(),
+          groundTruthState.poseMeters.getY(),
+          groundTruthState.poseMeters.getRotation().getRadians(),
+          positions[0].distanceMeters,
+          positions[1].distanceMeters,
+          positions[2].distanceMeters,
+          positions[3].distanceMeters,
+          positions[0].angle.getRadians(),
+          positions[1].angle.getRadians(),
+          positions[2].angle.getRadians(),
+          positions[3].angle.getRadians());
 
       double error =
           groundTruthState.poseMeters.getTranslation().getDistance(xHat.getTranslation());
