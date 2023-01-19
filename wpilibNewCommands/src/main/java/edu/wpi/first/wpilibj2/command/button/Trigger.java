@@ -205,7 +205,7 @@ public class Trigger implements BooleanSupplier {
   }
 
   /**
-   * Toggles a command when the condition changes from `true` to 'false'.
+   * Toggles a command when the condition changes from `true` to `false`.
    *
    * @param command the command to toggle
    * @return this trigger, so calls can be chained
