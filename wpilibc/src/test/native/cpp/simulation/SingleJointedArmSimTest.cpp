@@ -8,8 +8,8 @@
 #include "gtest/gtest.h"
 
 TEST(SingleJointedArmTest, Disabled) {
-  frc::sim::SingleJointedArmSim sim(frc::DCMotor::Vex775Pro(2), 100, 3_kg_sq_m,
-                                    9.5_in, -180_deg, 0_deg, 10_lb, true);
+  frc::sim::SingleJointedArmSim sim(frc::DCMotor::Vex775Pro(2), 300, 3_kg_sq_m,
+                                    30_in, -180_deg, 0_deg, true);
   sim.SetState(frc::Vectord<2>{0.0, 0.0});
 
   for (size_t i = 0; i < 12 / 0.02; ++i) {
