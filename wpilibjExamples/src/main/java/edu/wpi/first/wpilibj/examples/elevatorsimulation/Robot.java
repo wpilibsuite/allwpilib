@@ -35,16 +35,16 @@ public class Robot extends TimedRobot {
   private static final double kElevatorKi = 0;
   private static final double kElevatorKd = 0;
 
-  private static final double kElevatorkS = 0.0;
-  private static final double kElevatorkG = 0.762;
-  private static final double kElevatorkV = 0.762;
-  private static final double kElevatorkA = 0.0;
+  private static final double kElevatorkS = 0.0; // volts
+  private static final double kElevatorkG = 0.762; // volts
+  private static final double kElevatorkV = 0.762; // volt seconds per meters
+  private static final double kElevatorkA = 0.0; // volt seconds² per meters
 
   private static final double kElevatorGearing = 10.0;
   private static final double kElevatorDrumRadius = Units.inchesToMeters(2.0);
   private static final double kCarriageMass = 4.0; // kg
 
-  private static final double kSetpoint = 30;
+  private static final double kSetpoint = Units.inchesToMeters(30);
   private static final double kMinElevatorHeight = Units.inchesToMeters(2);
   private static final double kMaxElevatorHeight = Units.inchesToMeters(50);
 
@@ -119,7 +119,7 @@ public class Robot extends TimedRobot {
   public void teleopPeriodic() {
     if (m_joystick.getTrigger()) {
       // Here, we run PID control like normal, with a constant setpoint of 30in.
-      m_controller.setGoal(Units.inchesToMeters(kSetpoint));
+      m_controller.setGoal(kSetpoint);
       double pidOutput = m_controller.calculate(m_encoder.getDistance());
       double feedforwardOutput = m_feedforward.calculate(m_controller.getSetpoint().velocity);
       m_motor.setVoltage(pidOutput + feedforwardOutput);

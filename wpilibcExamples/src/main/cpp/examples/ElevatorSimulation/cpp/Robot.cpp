@@ -51,7 +51,7 @@ class Robot : public frc::TimedRobot {
   static constexpr units::meter_t kElevatorDrumRadius = 2_in;
   static constexpr units::kilogram_t kCarriageMass = 4.0_kg;
 
-  static constexpr units::inch_t kSetpoint = 30_in;
+  static constexpr units::meter_t kSetpoint = 30_in;
   static constexpr units::meter_t kMinElevatorHeight = 2_in;
   static constexpr units::meter_t kMaxElevatorHeight = 50_in;
 
