@@ -134,8 +134,7 @@ class Robot : public frc::TimedRobot {
           m_controller.Calculate(units::meter_t{m_encoder.GetDistance()});
       units::volt_t feedforwardOutput =
           m_feedforward.Calculate(m_controller.GetSetpoint().velocity);
-      m_motor.SetVoltage(units::volt_t{pidOutput} +
-                         feedforwardOutput);
+      m_motor.SetVoltage(units::volt_t{pidOutput} + feedforwardOutput);
     } else {
       // Otherwise, we disable the motor.
       m_motor.Set(0.0);
