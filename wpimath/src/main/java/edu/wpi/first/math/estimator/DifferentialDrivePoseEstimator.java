@@ -379,46 +379,6 @@ public class DifferentialDrivePoseEstimator {
     var record_exp_pose = record.poseMeters.exp(twist);
     var record_exp_pose_rvec = record_exp_pose.getRotation().getQuaternion();
 
-    System.out.println(
-        String.format(
-            "AAAA %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f,. %f, %f, %f, %f, %f",
-            timestampSeconds,
-            record.poseMeters.getX(),
-            record.poseMeters.getY(),
-            record.poseMeters.getZ(),
-            record_rvec.getW(),
-            record_rvec.getX(),
-            record_rvec.getY(),
-            record_rvec.getZ(),
-            visionRobotPoseMeters.getX(),
-            visionRobotPoseMeters.getY(),
-            visionRobotPoseMeters.getZ(),
-            vision_pose_rvec.getW(),
-            vision_pose_rvec.getX(),
-            vision_pose_rvec.getY(),
-            vision_pose_rvec.getZ(),
-            twist.dx,
-            twist.dy,
-            twist.dz,
-            twist_rot.getW(),
-            twist_rot.getX(),
-            twist_rot.getY(),
-            twist_rot.getZ(),
-            record_exp_pose.getX(),
-            record_exp_pose.getY(),
-            record_exp_pose.getZ(),
-            record_exp_pose_rvec.getW(),
-            record_exp_pose_rvec.getX(),
-            record_exp_pose_rvec.getY(),
-            record_exp_pose_rvec.getZ(),
-            twist_error.getX(),
-            twist_error.getY(),
-            twist_error.getZ(),
-            twist_error_rvec.getW(),
-            twist_error_rvec.getX(),
-            twist_error_rvec.getY(),
-            twist_error_rvec.getZ()));
-
     // Step 5: Reset Odometry to state at sample with vision adjustment.
     m_odometry.resetPosition(
         record.gyroAngle,

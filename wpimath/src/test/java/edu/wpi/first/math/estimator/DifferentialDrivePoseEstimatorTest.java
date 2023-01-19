@@ -365,9 +365,6 @@ class DifferentialDrivePoseEstimatorTest {
 
     double t = 0.0;
 
-    System.out.print(
-        "time, est_x, est_y, est_z, est_roll, est_pitch, est_yaw, true_x, true_y, true_z, true_roll, true_pitch, true_yaw\n");
-
     final TreeMap<Double, Pose3d> visionUpdateQueue = new TreeMap<>();
     final TreeMap<Double, Pose3d> visionUpdateRecord = new TreeMap<>();
 
@@ -449,22 +446,6 @@ class DifferentialDrivePoseEstimatorTest {
       var groundTruthIn3dFrameRotationVector =
           groundTruthIn3dFrame.getRotation().getQuaternion().toRotationVector();
 
-      System.out.printf(
-          "%f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f\n",
-          t,
-          xHat.getX(),
-          xHat.getY(),
-          xHat.getZ(),
-          xHatRotationVector.get(0, 0),
-          xHatRotationVector.get(1, 0),
-          xHatRotationVector.get(2, 0),
-          groundTruthIn3dFrame.getX(),
-          groundTruthIn3dFrame.getY(),
-          groundTruthIn3dFrame.getZ(),
-          groundTruthIn3dFrameRotationVector.get(0, 0),
-          groundTruthIn3dFrameRotationVector.get(1, 0),
-          groundTruthIn3dFrameRotationVector.get(2, 0));
-
       double error =
           startingPose
               .plus(poseFromStartingPosition3d)
@@ -478,21 +459,10 @@ class DifferentialDrivePoseEstimatorTest {
       t += dt;
     }
 
-    System.out.print("time, est_x, est_y, est_z, est_roll, est_pitch, est_yaw\n");
-
     while (!visionUpdateRecord.isEmpty()) {
       var visionUpdate = visionUpdateRecord.pollFirstEntry();
       var visionUpdateRotationVector =
           visionUpdate.getValue().getRotation().getQuaternion().toRotationVector();
-      System.out.printf(
-          "%f, %f, %f, %f, %f, %f, %f\n",
-          visionUpdate.getKey(),
-          visionUpdate.getValue().getX(),
-          visionUpdate.getValue().getY(),
-          visionUpdate.getValue().getZ(),
-          visionUpdateRotationVector.get(0, 0),
-          visionUpdateRotationVector.get(1, 0),
-          visionUpdateRotationVector.get(2, 0));
     }
 
     assertEquals(
