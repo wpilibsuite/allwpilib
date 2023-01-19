@@ -116,7 +116,8 @@ __declspec(dllexport)
     }
   });
 
-  if (!gui::Initialize("Robot Simulation", 1280, 720)) {
+  if (!gui::Initialize("Robot Simulation", 1280, 720,
+                       ImGuiConfigFlags_DockingEnable)) {
     return 0;
   }
   HAL_RegisterExtensionListener(
