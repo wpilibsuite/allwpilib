@@ -33,6 +33,14 @@ public class SimDeviceJNI extends JNIWrapper {
    */
   public static native void freeSimDevice(int handle);
 
+  /**
+   * Get the name of a simulated device.
+   *
+   * @param handle simulated device handle
+   * @return name of the simulated device
+   */
+  public static native String getSimDeviceName(int handle);
+
   private static native int createSimValueNative(
       int device, String name, int direction, int type, long value1, double value2);
 

@@ -363,7 +363,7 @@ double HAL_GetEncoderDistancePerPulse(HAL_EncoderHandle encoderHandle,
     return 0.0;
   }
 
-  return encoder->distancePerPulse;
+  return SimEncoderData[encoder->index].distancePerPulse;
 }
 
 HAL_EncoderEncodingType HAL_GetEncoderEncodingType(

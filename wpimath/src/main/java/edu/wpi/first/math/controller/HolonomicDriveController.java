@@ -139,4 +139,31 @@ public class HolonomicDriveController {
   public void setEnabled(boolean enabled) {
     m_enabled = enabled;
   }
+
+  /**
+   * Returns the heading controller.
+   *
+   * @return heading ProfiledPIDController
+   */
+  public ProfiledPIDController getThetaController() {
+    return m_thetaController;
+  }
+
+  /**
+   * Returns the x controller.
+   *
+   * @return X PIDController
+   */
+  public PIDController getXController() {
+    return m_xController;
+  }
+
+  /**
+   * Returns the y controller.
+   *
+   * @return Y PIDController
+   */
+  public PIDController getYController() {
+    return m_yController;
+  }
 }

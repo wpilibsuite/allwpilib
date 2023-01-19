@@ -232,7 +232,10 @@ class CommandPtr final {
   /**
    * Get a raw pointer to the held command.
    */
-  CommandBase* get() const;
+  CommandBase* get() const&;
+
+  // Prevent calls on a temporary, as the returned pointer would be invalid
+  CommandBase* get() && = delete;
 
   /**
    * Convert to the underlying unique_ptr.
@@ -242,13 +245,19 @@ class CommandPtr final {
   /**
    * Schedules this command.
    */
-  void Schedule() const;
+  void Schedule() const&;
+
+  // Prevent calls on a temporary, as the returned pointer would be invalid
+  void Schedule() && = delete;
 
   /**
    * Cancels this command. Will call End(true). Commands will be canceled
    * regardless of interruption behavior.
    */
-  void Cancel() const;
+  void Cancel() const&;
+
+  // Prevent calls on a temporary, as the returned pointer would be invalid
+  void Cancel() && = delete;
 
   /**
    * Whether or not the command is currently scheduled. Note that this does not
@@ -257,7 +266,10 @@ class CommandPtr final {
    *
    * @return Whether the command is scheduled.
    */
-  bool IsScheduled() const;
+  bool IsScheduled() const&;
+
+  // Prevent calls on a temporary, as the returned pointer would be invalid
+  void IsScheduled() && = delete;
 
   /**
    * Whether the command requires a given subsystem.  Named "HasRequirement"
@@ -267,12 +279,18 @@ class CommandPtr final {
    * @param requirement the subsystem to inquire about
    * @return whether the subsystem is required
    */
-  bool HasRequirement(Subsystem* requirement) const;
+  bool HasRequirement(Subsystem* requirement) const&;
+
+  // Prevent calls on a temporary, as the returned pointer would be invalid
+  void HasRequirement(Subsystem* requirement) && = delete;
 
   /**
    * Check if this CommandPtr object is valid and wasn't moved-from.
    */
-  explicit operator bool() const;
+  explicit operator bool() const&;
+
+  // Prevent calls on a temporary, as the returned pointer would be invalid
+  explicit operator bool() && = delete;
 
   /**
    * Convert a vector of CommandPtr objects to their underlying unique_ptrs.

@@ -54,8 +54,8 @@ public class Robot extends TimedRobot {
   private final Joystick m_joystick = new Joystick(kJoystickPort);
 
   // Simulation classes help us simulate what's going on, including gravity.
-  private static final double m_armReduction = 600;
-  private static final double m_armMass = 5.0; // Kilograms
+  private static final double m_armReduction = 200;
+  private static final double m_armMass = 8.0; // Kilograms
   private static final double m_armLength = Units.inchesToMeters(30);
   // This arm sim represents an arm that can travel from -75 degrees (rotated down front)
   // to 255 degrees (rotated down in the back).
@@ -67,7 +67,6 @@ public class Robot extends TimedRobot {
           m_armLength,
           Units.degreesToRadians(-75),
           Units.degreesToRadians(255),
-          m_armMass,
           true,
           VecBuilder.fill(kArmEncoderDistPerPulse) // Add noise with a std-dev of 1 tick
           );
