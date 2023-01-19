@@ -495,15 +495,16 @@ class DifferentialDrivePoseEstimatorTest {
           visionUpdateRotationVector.get(2, 0));
     }
 
-    var endingRotationVector = endingPose.getRotation().getQuaternion().toRotationVector();
-    var estimatedRotationVector = endingPose.getRotation().getQuaternion().toRotationVector();
-
     assertEquals(
         endingPose.getX(), estimator.getEstimatedPosition3d().getX(), 0.08, "Incorrect Final X");
     assertEquals(
         endingPose.getY(), estimator.getEstimatedPosition3d().getY(), 0.08, "Incorrect Final Y");
     assertEquals(
         endingPose.getZ(), estimator.getEstimatedPosition3d().getZ(), 0.08, "Incorrect Final Z");
+
+    var endingRotationVector = endingPose.getRotation().getQuaternion().toRotationVector();
+    var estimatedRotationVector = endingPose.getRotation().getQuaternion().toRotationVector();
+
     assertEquals(
         endingRotationVector.get(0, 0),
         estimatedRotationVector.get(0, 0),
