@@ -4,7 +4,6 @@
 
 package edu.wpi.first.wpilibj.examples.differentialdriveposeestimator;
 
-import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.ComputerVisionUtil;
 import edu.wpi.first.math.VecBuilder;
@@ -133,9 +132,7 @@ public class Drivetrain {
 
     try {
       m_objectInField =
-          AprilTagFieldLayout.loadFromResource(AprilTagFields.k2022RapidReact.m_resourceFile)
-              .getTagPose(0)
-              .get();
+          AprilTagFields.k2022RapidReact.loadAprilTagLayoutField().getTagPose(0).get();
     } catch (IOException e) {
       e.printStackTrace();
       throw new RuntimeException();
