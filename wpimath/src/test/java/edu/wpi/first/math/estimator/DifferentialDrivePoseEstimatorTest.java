@@ -143,8 +143,6 @@ class DifferentialDrivePoseEstimatorTest {
 
     double t = 0.0;
 
-    System.out.print("time, est_x, est_y, est_theta, true_x, true_y, true_theta\n");
-
     final TreeMap<Double, Pose2d> visionUpdateQueue = new TreeMap<>();
 
     double maxError = Double.NEGATIVE_INFINITY;
@@ -190,16 +188,6 @@ class DifferentialDrivePoseEstimatorTest {
                   .minus(trajectory.getInitialPose().getRotation()),
               leftDistanceMeters,
               rightDistanceMeters);
-
-      System.out.printf(
-          "%f, %f, %f, %f, %f, %f, %f\n",
-          t,
-          xHat.getX(),
-          xHat.getY(),
-          xHat.getRotation().getRadians(),
-          groundTruthState.poseMeters.getX(),
-          groundTruthState.poseMeters.getY(),
-          groundTruthState.poseMeters.getRotation().getRadians());
 
       double error =
           groundTruthState.poseMeters.getTranslation().getDistance(xHat.getTranslation());
