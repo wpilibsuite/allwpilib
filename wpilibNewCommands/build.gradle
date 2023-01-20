@@ -67,6 +67,7 @@ model {
                 project(':ntcore').addNtcoreJniDependency(it)
                 lib project: ':wpinet', library: 'wpinetJNIShared', linkage: 'shared'
                 lib project: ':wpiutil', library: 'wpiutilJNIShared', linkage: 'shared'
+                lib project: ':wpimath', library: 'wpimathJNIShared', linkage: 'shared'
                 project(':hal').addHalJniDependency(it)
             }
 
