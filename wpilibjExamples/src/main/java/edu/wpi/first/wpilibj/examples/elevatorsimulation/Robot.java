@@ -53,6 +53,7 @@ public class Robot extends TimedRobot {
   private static final double kElevatorEncoderDistPerPulse =
       2.0 * Math.PI * kElevatorDrumRadius / 4096;
 
+  // This gearbox represents a gearbox containing 4 Vex 775pro motors.
   private final DCMotor m_elevatorGearbox = DCMotor.getVex775Pro(4);
 
   // Standard classes for controlling our elevator
