@@ -21,6 +21,9 @@ public interface ReflectionCleanup extends AutoCloseable {
    */
   @SuppressWarnings("PMD.AvoidCatchingGenericException")
   default void reflectionCleanup(Class<? extends ReflectionCleanup> cls) {
+    if (!cls.isAssignableFrom(this.getClass())) {
+      return;
+    }
     for (Field field : cls.getDeclaredFields()) {
       if (field.isAnnotationPresent(SkipCleanup.class)) {
         continue;
