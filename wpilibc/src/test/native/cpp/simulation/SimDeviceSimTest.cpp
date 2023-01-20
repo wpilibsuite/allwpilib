@@ -20,6 +20,8 @@ TEST(SimDeviceSimTest, Basic) {
   EXPECT_FALSE(simBool.Get());
   simBool.Set(true);
   EXPECT_TRUE(devBool.Get());
+
+  EXPECT_EQ(sim.GetName(), "test");
 }
 
 TEST(SimDeviceSimTest, EnumerateDevices) {

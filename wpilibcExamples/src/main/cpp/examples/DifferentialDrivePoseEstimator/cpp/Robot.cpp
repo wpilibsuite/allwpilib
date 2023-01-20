@@ -15,6 +15,8 @@ class Robot : public frc::TimedRobot {
     m_drive.UpdateOdometry();
   }
 
+  void RobotPeriodic() override { m_drive.Periodic(); }
+
   void TeleopPeriodic() override {
     // Get the x speed. We are inverting this because Xbox controllers return
     // negative values when we push forward.
@@ -30,6 +32,8 @@ class Robot : public frc::TimedRobot {
 
     m_drive.Drive(xSpeed, rot);
   }
+
+  void SimulationPeriodic() override { m_drive.SimulationPeriodic(); }
 
  private:
   frc::XboxController m_controller{0};

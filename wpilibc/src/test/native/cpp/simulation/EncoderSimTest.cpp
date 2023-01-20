@@ -198,7 +198,7 @@ TEST(EncoderSimTest, SetDistancePerPulse) {
   DoubleCallback callback;
   auto cb = sim.RegisterDistancePerPulseCallback(callback.GetCallback(), false);
 
-  encoder.SetDistancePerPulse(.03405);
+  sim.SetDistancePerPulse(.03405);
   EXPECT_EQ(.03405, sim.GetDistancePerPulse());
   EXPECT_EQ(.03405, encoder.GetDistancePerPulse());
   EXPECT_TRUE(callback.WasTriggered());

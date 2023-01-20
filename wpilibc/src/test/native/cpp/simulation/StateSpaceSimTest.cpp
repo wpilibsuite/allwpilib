@@ -18,7 +18,6 @@
 #include "frc/simulation/LinearSystemSim.h"
 #include "frc/simulation/PWMSim.h"
 #include "frc/simulation/RoboRioSim.h"
-#include "frc/simulation/SingleJointedArmSim.h"
 #include "frc/system/plant/LinearSystemId.h"
 #include "gtest/gtest.h"
 

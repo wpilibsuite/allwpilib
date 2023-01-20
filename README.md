@@ -40,7 +40,7 @@ Using Gradle makes building WPILib very straightforward. It only has a few depen
 
 ## Requirements
 
-- [JDK 11](https://adoptopenjdk.net/)
+- [JDK 11](https://adoptium.net/temurin/releases/?version=11)
     - Note that the JRE is insufficient; the full JDK is required
     - On Ubuntu, run `sudo apt install openjdk-11-jdk`
     - On Windows, install the JDK 11 .msi from the link above
@@ -48,7 +48,7 @@ Using Gradle makes building WPILib very straightforward. It only has a few depen
 - C++ compiler
     - On Linux, install GCC 11 or greater
     - On Windows, install [Visual Studio Community 2022](https://visualstudio.microsoft.com/vs/community/) and select the C++ programming language during installation (Gradle can't use the build tools for Visual Studio)
-    - On macOS, install the Xcode command-line build tools via `xcode-select --install`
+    - On macOS, install the Xcode command-line build tools via `xcode-select --install`. Xcode 13 or later is required.
 - ARM compiler toolchain
     - Run `./gradlew installRoboRioToolchain` after cloning this repository
     - If the WPILib installer was used, this toolchain is already installed

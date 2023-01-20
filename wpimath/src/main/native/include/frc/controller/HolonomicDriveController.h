@@ -103,6 +103,21 @@ class WPILIB_DLLEXPORT HolonomicDriveController {
    */
   void SetEnabled(bool enabled);
 
+  /**
+   * Returns the rotation ProfiledPIDController
+   */
+  ProfiledPIDController<units::radian>& getThetaController();
+
+  /**
+   * Returns the X PIDController
+   */
+  PIDController& getXController();
+
+  /**
+   * Returns the Y PIDController
+   */
+  PIDController& getYController();
+
  private:
   Pose2d m_poseError;
   Rotation2d m_rotationError;

@@ -79,3 +79,16 @@ ChassisSpeeds HolonomicDriveController::Calculate(
 void HolonomicDriveController::SetEnabled(bool enabled) {
   m_enabled = enabled;
 }
+
+ProfiledPIDController<units::radian>&
+HolonomicDriveController::getThetaController() {
+  return m_thetaController;
+}
+
+PIDController& HolonomicDriveController::getXController() {
+  return m_xController;
+}
+
+PIDController& HolonomicDriveController::getYController() {
+  return m_yController;
+}

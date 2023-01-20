@@ -39,11 +39,13 @@
     "commandversion": 2
   },
   {
-    "name":"Mechanism2d",
-    "foldername":"Mechanism2d",
-    "gradlebase":"cpp",
-    "description":"An example usage of Mechanism2d to display mechanism states on a dashboard.",
-    "tags":["Mechanism2d"],
+    "name": "Mechanism2d",
+    "foldername": "Mechanism2d",
+    "gradlebase": "cpp",
+    "description": "An example usage of Mechanism2d to display mechanism states on a dashboard.",
+    "tags": [
+      "Mechanism2d"
+    ],
     "commandversion": 2
   },
   {
@@ -122,12 +124,13 @@
   },
   {
     "name": "Ultrasonic",
-    "description": "Demonstrate maintaining a set distance using an ultrasonic sensor.",
+    "description": "Demonstrate using the Ultrasonic class with a ping-response ultrasonic sensor.",
     "tags": [
-      "Robot and Motor",
-      "Complete List",
       "Sensors",
-      "Analog"
+      "Hardware",
+      "Ultrasonic",
+      "SmartDashboard",
+      "Shuffleboard"
     ],
     "foldername": "Ultrasonic",
     "gradlebase": "cpp",
@@ -135,12 +138,12 @@
   },
   {
     "name": "UltrasonicPID",
-    "description": "Demonstrate maintaining a set distance using an ultrasonic sensor and PID control.",
+    "description": "Demonstrate maintaining a set distance using an ultrasonic sensor and PID Control.",
     "tags": [
-      "Robot and Motor",
-      "Complete List",
       "Sensors",
-      "Analog"
+      "Ultrasonic",
+      "PID",
+      "Differential Drive"
     ],
     "foldername": "UltrasonicPID",
     "gradlebase": "cpp",
@@ -186,11 +189,12 @@
   },
   {
     "name": "PotentiometerPID",
-    "description": "An example to demonstrate the use of a potentiometer and PID control to reach elevator position setpoints.",
+    "description": "An example to demonstrate the use of a potentiometer and PID control to maintain elevator position setpoints.",
     "tags": [
       "Joystick",
       "Actuators",
-      "Complete List",
+      "PID",
+      "Elevator",
       "Sensors",
       "Analog"
     ],
@@ -258,6 +262,17 @@
     "commandversion": 2
   },
   {
+    "name": "AprilTags Vision",
+    "description": "on-roboRIO detection of AprilTags using an attached USB camera.",
+    "tags": [
+      "Vision",
+      "AprilTags"
+    ],
+    "foldername": "AprilTagsVision",
+    "gradlebase": "cpp",
+    "commandversion": 2
+  },
+  {
     "name": "I2C Communication",
     "description": "An example program that communicates with external devices (such as an Arduino) using the roboRIO's I2C port",
     "tags": [
@@ -277,7 +292,6 @@
     "gradlebase": "cpp",
     "commandversion": 2
   },
-
   {
     "name": "Axis Camera Sample",
     "description": "An example program that acquires images from an Axis network camera and adds some annotation to the image as you might do for showing operators the result of some image recognition, and sends it to the dashboard for display. This demonstrates the use of the AxisCamera class.",

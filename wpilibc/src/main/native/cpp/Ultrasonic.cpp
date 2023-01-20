@@ -85,10 +85,7 @@ int Ultrasonic::GetEchoChannel() const {
 }
 
 void Ultrasonic::Ping() {
-  if (m_automaticEnabled) {
-    throw FRC_MakeError(err::IncompatibleMode,
-                        "cannot call Ping() in automatic mode");
-  }
+  SetAutomaticMode(false);  // turn off automatic round-robin if pinging
 
   // Reset the counter to zero (invalid data now)
   m_counter.Reset();
@@ -138,7 +135,7 @@ void Ultrasonic::SetAutomaticMode(bool enabling) {
 units::meter_t Ultrasonic::GetRange() const {
   if (IsRangeValid()) {
     if (m_simRange) {
-      return units::meter_t{m_simRange.Get()};
+      return units::inch_t{m_simRange.Get()};
     }
     return m_counter.GetPeriod() * kSpeedOfSound / 2.0;
   } else {

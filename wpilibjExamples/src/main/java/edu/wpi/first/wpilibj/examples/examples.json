@@ -115,11 +115,13 @@
   },
   {
     "name": "Ultrasonic",
-    "description": "Demonstrate maintaining a set distance using an ultrasonic sensor.",
+    "description": "Demonstrate using the Ultrasonic class with a ping-response ultrasonic sensor.",
     "tags": [
       "Sensors",
-      "Robot and Motor",
-      "Analog"
+      "Hardware",
+      "Ultrasonic",
+      "SmartDashboard",
+      "Shuffleboard"
     ],
     "foldername": "ultrasonic",
     "gradlebase": "java",
@@ -131,8 +133,9 @@
     "description": "Demonstrate maintaining a set distance using an ultrasonic sensor and PID Control.",
     "tags": [
       "Sensors",
-      "Robot and Motor",
-      "Analog"
+      "Ultrasonic",
+      "PID",
+      "Differential Drive"
     ],
     "foldername": "ultrasonicpid",
     "gradlebase": "java",
@@ -141,11 +144,13 @@
   },
   {
     "name": "Potentiometer PID",
-    "description": "An example to demonstrate the use of a potentiometer and PID control to reach elevator position setpoints.",
+    "description": "An example to demonstrate the use of a potentiometer and PID control to maintain elevator position setpoints.",
     "tags": [
       "Sensors",
       "Actuators",
       "Analog",
+      "Elevator",
+      "PID",
       "Joystick"
     ],
     "foldername": "potentiometerpid",
@@ -220,9 +225,12 @@
     "mainclass": "Main",
     "commandversion": 2
   },
-  {"name": "Mechanism2d",
+  {
+    "name": "Mechanism2d",
     "description": "An example usage of Mechanism2d to display mechanism states on a dashboard.",
-    "tags": ["Mechanism2d"],
+    "tags": [
+      "Mechanism2d"
+    ],
     "foldername": "mechanism2d",
     "gradlebase": "java",
     "mainclass": "Main",
@@ -286,6 +294,18 @@
       "Vision"
     ],
     "foldername": "axiscamera",
+    "gradlebase": "java",
+    "mainclass": "Main",
+    "commandversion": 2
+  },
+  {
+    "name": "AprilTags Vision",
+    "description": "on-roboRIO detection of AprilTags using an attached USB camera.",
+    "tags": [
+      "Vision",
+      "AprilTags"
+    ],
+    "foldername": "apriltagsvision",
     "gradlebase": "java",
     "mainclass": "Main",
     "commandversion": 2
@@ -798,7 +818,8 @@
     "name": "Digital Communication Sample",
     "description": "An example program that communicates with external devices (such as an Arduino) using the roboRIO's DIO",
     "tags": [
-      "Digital"
+      "Digital",
+      "Unit Testing"
     ],
     "foldername": "digitalcommunication",
     "gradlebase": "java",

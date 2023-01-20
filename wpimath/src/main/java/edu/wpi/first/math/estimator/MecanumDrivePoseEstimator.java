@@ -199,7 +199,13 @@ public class MecanumDrivePoseEstimator {
         sample.get().wheelPositions,
         sample.get().poseMeters.exp(scaledTwist));
 
-    // Step 6: Replay odometry inputs between sample time and latest recorded sample to update the
+    // Step 6: Record the current pose to allow multiple measurements from the same timestamp
+    m_poseBuffer.addSample(
+        timestampSeconds,
+        new InterpolationRecord(
+            getEstimatedPosition(), sample.get().gyroAngle, sample.get().wheelPositions));
+
+    // Step 7: Replay odometry inputs between sample time and latest recorded sample to update the
     // pose buffer and correct odometry.
     for (Map.Entry<Double, InterpolationRecord> entry :
         m_poseBuffer.getInternalBuffer().tailMap(timestampSeconds).entrySet()) {

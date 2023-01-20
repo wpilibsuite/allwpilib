@@ -125,7 +125,7 @@ public class DriverStationJNI extends JNIWrapper {
 
   public static native int sendConsoleLine(String line);
 
-  public static native void refreshDSData();
+  public static native boolean refreshDSData();
 
   public static native void provideNewDataEventHandle(int handle);
 

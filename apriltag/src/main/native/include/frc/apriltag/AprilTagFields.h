@@ -14,6 +14,7 @@ namespace frc {
 
 enum class AprilTagField {
   k2022RapidReact,
+  k2023ChargedUp,
 
   // This is a placeholder for denoting the last supported field. This should
   // always be the last entry in the enum and should not be used by users
