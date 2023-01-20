@@ -21,7 +21,10 @@ public interface ReflectionCleanup extends AutoCloseable {
    */
   @SuppressWarnings("PMD.AvoidCatchingGenericException")
   default void reflectionCleanup(Class<? extends ReflectionCleanup> cls) {
-    if (!cls.isAssignableFrom(this.getClass())) {
+    if (!cls.isAssignableFrom(getClass())) {
+      System.out.println("Passed in class is not assignable from \"this\"");
+      System.out.println("Expected something in the hierarchy of" + cls.getName());
+      System.out.println("This is " + getClass().getName());
       return;
     }
     for (Field field : cls.getDeclaredFields()) {
