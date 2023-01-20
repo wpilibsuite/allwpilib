@@ -281,4 +281,19 @@ void HAL_ReadCANPacketTimeout(HAL_CANHandle handle, int32_t apiId,
     }
   }
 }
+
+uint32_t HAL_StartCANStream(HAL_CANHandle handle, int32_t apiId, int32_t depth,
+                            int32_t* status) {
+  auto can = canHandles->Get(handle);
+  if (!can) {
+    *status = HAL_HANDLE_ERROR;
+    return 0;
+  }
+
+  uint32_t messageId = CreateCANId(can.get(), apiId);
+
+  uint32_t session = 0;
+  HAL_CAN_OpenStreamSession(&session, messageId, 0x1FFFFFFF, depth, status);
+  return session;
+}
 }  // extern "C"
