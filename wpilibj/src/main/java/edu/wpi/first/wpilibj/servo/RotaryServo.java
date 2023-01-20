@@ -12,8 +12,8 @@ import edu.wpi.first.wpilibj.PWM;
 
 /* Common base class for all rotary servos */
 public abstract class RotaryServo extends PWM {
-  protected double m_maxServoAngle;
   protected double m_minServoAngle;
+  protected double m_maxServoAngle;
 
   /**
    * Constructor.<br>

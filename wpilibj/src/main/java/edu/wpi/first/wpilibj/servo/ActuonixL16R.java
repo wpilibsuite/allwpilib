@@ -16,7 +16,6 @@ package edu.wpi.first.wpilibj.servo;
  * </ul>
  */
 public class ActuonixL16R extends LinearServo {
-
   public enum Stroke {
     _50mm(0.050),
     _100mm(0.100),
