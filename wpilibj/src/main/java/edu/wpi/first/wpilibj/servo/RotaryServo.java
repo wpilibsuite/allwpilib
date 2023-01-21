@@ -73,7 +73,7 @@ public abstract class RotaryServo extends PWM {
    *
    * @param angle The angle in radians to set the servo.
    */
-  public void setAngle(double angle) {
+  public void setAngleRads(double angle) {
     if (angle < m_minServoAngleRads) {
       angle = m_minServoAngleRads;
     } else if (angle > m_maxServoAngleRads) {
@@ -91,7 +91,7 @@ public abstract class RotaryServo extends PWM {
    *
    * @return The angle in radians to which the servo is set.
    */
-  public double getAngle() {
+  public double getAngleRads() {
     return getPosition() * getServoAngleRange() + m_minServoAngleRads;
   }
 
