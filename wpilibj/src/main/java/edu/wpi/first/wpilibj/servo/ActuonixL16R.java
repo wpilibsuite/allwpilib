@@ -21,21 +21,21 @@ public class ActuonixL16R extends LinearServo {
     _100mm(0.100),
     _140mm(0.140);
 
-    private double strokeMetres;
+    private double value;
 
-    private Stroke(double value) {
-      this.strokeMetres = value;
+    Stroke(double distanceMetres) {
+      this.value = distanceMetres;
     }
   }
 
   /**
-   * Constructor for a Actuonix L16-R servo<br>
+   * Constructor for a Actuonix L16-R servo.<br>
    *
    * @param channel The PWM channel to which the servo is attached. 0-9 are on-board, 10-19 are on
    *     the MXP port
    */
   public ActuonixL16R(final int channel, final Stroke stroke) {
-    super("ActuonixL16R", channel, stroke.strokeMetres);
+    super("ActuonixL16R", channel, stroke.value);
 
     setBounds(2.0, 1.8, 1.5, 1.2, 1.0);
   }

@@ -5,7 +5,7 @@
 package edu.wpi.first.wpilibj.servo;
 
 /* Hitec HS-322HD servo provided in the FIRST Kit of Parts in 2008. */
-public class HS322HD extends Servo {
+public class HS322HD extends RotaryServo {
   /**
    * Constructor for a Hitec HS-322HD.<br>
    *
