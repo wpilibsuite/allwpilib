@@ -3,7 +3,7 @@
     "name": "Getting Started",
     "description": "An example program which demonstrates the simplest autonomous and teleoperated routines.",
     "tags": [
-      "Getting Started with Java"
+      "Basic Robot"
     ],
     "foldername": "gettingstarted",
     "gradlebase": "java",
@@ -14,10 +14,9 @@
     "name": "Tank Drive",
     "description": "Demonstrate the use of the DifferentialDrive class doing teleop driving with tank steering",
     "tags": [
-      "Actuators",
-      "Joystick",
-      "Robot and Motor",
-      "Safety"
+      "Basic Robot",
+      "Differential Drive",
+      "Joystick"
     ],
     "foldername": "tankdrive",
     "gradlebase": "java",
@@ -28,7 +27,9 @@
     "name": "Arcade Drive",
     "description": "Demonstrates the use of the DifferentialDrive class to drive a robot with Arcade Drive.",
     "tags": [
-      "Getting Started with Java"
+      "Basic Robot",
+      "Differential Drive",
+      "Joystick"
     ],
     "foldername": "arcadedrive",
     "gradlebase": "java",
@@ -39,10 +40,9 @@
     "name": "Mecanum Drive",
     "description": "Demonstrate the use of the MecanumDrive class doing teleop driving with Mecanum steering",
     "tags": [
-      "Actuators",
-      "Joystick",
-      "Robot and Motor",
-      "Safety"
+      "Basic Robot",
+      "Mecanum Drive",
+      "Joystick"
     ],
     "foldername": "mecanumdrive",
     "gradlebase": "java",
@@ -53,9 +53,9 @@
     "name": "PDP CAN Monitoring",
     "description": "Demonstrate using CAN to monitor the voltage, current, and temperature in the Power Distribution Panel.",
     "tags": [
-      "Complete List",
-      "CAN",
-      "Sensors"
+      "Hardware",
+      "PDP",
+      "SmartDashboard"
     ],
     "foldername": "canpdp",
     "gradlebase": "java",
@@ -66,10 +66,9 @@
     "name": "Solenoids",
     "description": "Demonstrate controlling a single and double solenoid from Joystick buttons.",
     "tags": [
-      "Actuators",
+      "Hardware",
       "Joystick",
-      "Pneumatics",
-      "Complete List"
+      "Pneumatics"
     ],
     "foldername": "solenoid",
     "gradlebase": "java",
@@ -80,9 +79,9 @@
     "name": "Encoder",
     "description": "Demonstrate displaying the value of a quadrature encoder on the SmartDashboard.",
     "tags": [
-      "Complete List",
-      "Digital",
-      "Sensors"
+      "Hardware",
+      "Encoder",
+      "SmartDashboard"
     ],
     "foldername": "encoder",
     "gradlebase": "java",
@@ -93,6 +92,8 @@
     "name": "EventLoop",
     "description": "Demonstrate managing a ball system using EventLoop and BooleanEvent.",
     "tags": [
+      "Basic Robot",
+      "Flywheel",
       "EventLoop"
     ],
     "foldername": "eventloop",
@@ -104,9 +105,9 @@
     "name": "Relay",
     "description": "Demonstrate controlling a Relay from Joystick buttons.",
     "tags": [
-      "Actuators",
-      "Joystick",
-      "Complete List"
+      "Hardware",
+      "Relay",
+      "Joystick"
     ],
     "foldername": "relay",
     "gradlebase": "java",
@@ -117,7 +118,6 @@
     "name": "Ultrasonic",
     "description": "Demonstrate using the Ultrasonic class with a ping-response ultrasonic sensor.",
     "tags": [
-      "Sensors",
       "Hardware",
       "Ultrasonic",
       "SmartDashboard",
@@ -132,7 +132,7 @@
     "name": "Ultrasonic PID",
     "description": "Demonstrate maintaining a set distance using an ultrasonic sensor and PID Control.",
     "tags": [
-      "Sensors",
+      "Basic Robot",
       "Ultrasonic",
       "PID",
       "Differential Drive"
@@ -146,8 +146,7 @@
     "name": "Potentiometer PID",
     "description": "An example to demonstrate the use of a potentiometer and PID control to maintain elevator position setpoints.",
     "tags": [
-      "Sensors",
-      "Actuators",
+      "Basic Robot",
       "Analog",
       "Elevator",
       "PID",
@@ -160,11 +159,12 @@
   },
   {
     "name": "Elevator with trapezoid profiled PID",
-    "description": "An example to demonstrate the use of an encoder and trapezoid profiled PID control to reach elevator position setpoints.",
+    "description": "Demonstrate the use of trapezoid profiles with a smart motor controller's PID to reach elevator position setpoints.",
     "tags": [
-      "Digital",
-      "Sensors",
-      "Actuators",
+      "Basic Robot",
+      "Elevator",
+      "Trapezoid Profile",
+      "Smart Motor Controller",
       "Joystick"
     ],
     "foldername": "elevatortrapezoidprofile",
@@ -176,9 +176,9 @@
     "name": "Elevator with profiled PID controller",
     "description": "An example to demonstrate the use of an encoder and trapezoid profiled PID control to reach elevator position setpoints.",
     "tags": [
-      "Digital",
-      "Sensors",
-      "Actuators",
+      "Basic Robot",
+      "Elevator",
+      "Profiled PID",
       "Joystick"
     ],
     "foldername": "elevatorprofiledpid",
@@ -188,10 +188,12 @@
   },
   {
     "name": "Gyro",
-    "description": "An example program showing how to drive straight with using a gyro sensor.",
+    "description": "An example program showing how to drive straight using a gyro sensor.",
     "tags": [
-      "Sensors",
-      "Robot and Motor",
+      "Basic Robot",
+      "Differential Drive",
+      "PID",
+      "Gyro",
       "Analog",
       "Joystick"
     ],
@@ -204,8 +206,9 @@
     "name": "Gyro Mecanum",
     "description": "An example program showing how to perform mecanum drive with field oriented controls.",
     "tags": [
-      "Sensors",
-      "Robot and Motor",
+      "Basic Robot",
+      "Mecanum Drive",
+      "Gyro",
       "Analog",
       "Joystick"
     ],
@@ -218,7 +221,8 @@
     "name": "HID Rumble",
     "description": "An example program showing how to make human interface devices rumble.",
     "tags": [
-      "Joystick"
+      "Hardware",
+      "XboxController"
     ],
     "foldername": "hidrumble",
     "gradlebase": "java",
@@ -229,6 +233,12 @@
     "name": "Mechanism2d",
     "description": "An example usage of Mechanism2d to display mechanism states on a dashboard.",
     "tags": [
+      "Basic Robot",
+      "Elevator",
+      "Arm",
+      "Analog",
+      "Joystick",
+      "SmartDashboard",
       "Mechanism2d"
     ],
     "foldername": "mechanism2d",
@@ -240,12 +250,10 @@
     "name": "Motor Control",
     "description": "Demonstrate controlling a single motor with a Joystick and displaying the net movement of the motor using an encoder.",
     "tags": [
-      "Robot and Motor",
-      "Digital",
-      "Sensors",
-      "Actuators",
-      "Joystick",
-      "Complete List"
+      "Basic Robot",
+      "Encoder",
+      "SmartDashboard",
+      "Joystick"
     ],
     "foldername": "motorcontrol",
     "gradlebase": "java",
@@ -256,7 +264,15 @@
     "name": "GearsBot",
     "description": "A fully functional example CommandBased program for WPIs GearsBot robot, ported to the new CommandBased library. This code can run on your computer if it supports simulation.",
     "tags": [
-      "Complete Robot"
+      "Complete Robot",
+      "Command-based",
+      "Differential Drive",
+      "Elevator",
+      "Arm",
+      "Analog",
+      "Digital Input",
+      "SmartDashboard",
+      "XboxController"
     ],
     "foldername": "gearsbot",
     "gradlebase": "java",
@@ -267,8 +283,7 @@
     "name": "Simple Vision",
     "description": "Demonstrate the use of the CameraServer class to stream from a USB Webcam without processing the images.",
     "tags": [
-      "Vision",
-      "Complete List"
+      "Vision"
     ],
     "foldername": "quickvision",
     "gradlebase": "java",
@@ -279,8 +294,7 @@
     "name": "Intermediate Vision",
     "description": "An example program that acquires images from an attached USB camera and adds some annotation to the image as you might do for showing operators the result of some image recognition, and sends it to the dashboard for display.",
     "tags": [
-      "Vision",
-      "Complete List"
+      "Vision"
     ],
     "foldername": "intermediatevision",
     "gradlebase": "java",
@@ -314,8 +328,12 @@
     "name": "Shuffleboard Sample",
     "description": "An example program that adds data to various Shuffleboard tabs that demonstrates the Shuffleboard API",
     "tags": [
-      "Shuffleboard",
-      "Dashboards"
+      "Basic Robot",
+      "Differential Drive",
+      "Elevator",
+      "Analog",
+      "Encoder",
+      "Shuffleboard"
     ],
     "foldername": "shuffleboard",
     "gradlebase": "java",
@@ -326,8 +344,12 @@
     "name": "'Traditional' Hatchbot",
     "description": "A fully-functional command-based hatchbot for the 2019 game using the new command framework.  Written in the 'traditional' style, i.e. commands are given their own classes.",
     "tags": [
-      "Complete robot",
-      "Command-based"
+      "Complete Robot",
+      "Command-based",
+      "Differential Drive",
+      "Encoder",
+      "Pneumatics",
+      "XboxController"
     ],
     "foldername": "hatchbottraditional",
     "gradlebase": "java",
@@ -338,9 +360,12 @@
     "name": "'Inlined' Hatchbot",
     "description": "A fully-functional command-based hatchbot for the 2019 game using the new command framework.  Written in the 'inlined' style, i.e. many commands are defined inline with lambdas.",
     "tags": [
-      "Complete robot",
+      "Complete Robot",
       "Command-based",
-      "Lambdas"
+      "Differential Drive",
+      "Encoder",
+      "Pneumatics",
+      "PS4Controller"
     ],
     "foldername": "hatchbotinlined",
     "gradlebase": "java",
@@ -351,9 +376,16 @@
     "name": "Rapid React Command Bot",
     "description": "A fully-functional command-based fender bot for the 2022 game using the new command framework.",
     "tags": [
-      "Complete robot",
+      "Complete Robot",
       "Command-based",
-      "Lambdas"
+      "Differential Drive",
+      "Intake",
+      "Flywheel",
+      "Encoder",
+      "Pneumatics",
+      "Digital Input",
+      "PID",
+      "XboxController"
     ],
     "foldername": "rapidreactcommandbot",
     "gradlebase": "java",
@@ -387,7 +419,12 @@
     "name": "Frisbeebot",
     "description": "An example robot project for a simple frisbee shooter for the 2013 FRC game, Ultimate Ascent, demonstrating use of PID functionality in the command framework",
     "tags": [
+      "Complete Robot",
       "Command-based",
+      "Differential Drive",
+      "Flywheel",
+      "Encoder",
+      "XboxController",
       "PID"
     ],
     "foldername": "frisbeebot",
@@ -400,7 +437,11 @@
     "description": "An example command-based robot project demonstrating simple PID functionality utilizing a gyroscope to keep a robot driving straight and to turn to specified angles.",
     "tags": [
       "Command-based",
+      "Differential Drive",
+      "Encoder",
+      "PS4Controller",
       "PID",
+      "Profiled PID",
       "Gyro"
     ],
     "foldername": "gyrodrivecommands",
@@ -412,7 +453,11 @@
     "name": "SwerveBot",
     "description": "An example program for a swerve drive that uses swerve drive kinematics and odometry.",
     "tags": [
-      "SwerveBot"
+      "Swerve Drive",
+      "Odometry",
+      "XboxController",
+      "Gyro",
+      "Encoder"
     ],
     "foldername": "swervebot",
     "gradlebase": "java",
@@ -423,7 +468,11 @@
     "name": "MecanumBot",
     "description": "An example program for a mecanum drive that uses mecanum drive kinematics and odometry.",
     "tags": [
-      "MecanumBot"
+      "Mecanum Drive",
+      "Odometry",
+      "Encoder",
+      "Gyro",
+      "XboxController"
     ],
     "foldername": "mecanumbot",
     "gradlebase": "java",
@@ -434,7 +483,11 @@
     "name": "DifferentialDriveBot",
     "description": "An example program for a differential drive that uses differential drive kinematics and odometry.",
     "tags": [
-      "MecanumBot"
+      "Differential Drive",
+      "Odometry",
+      "Encoder",
+      "Gyro",
+      "XboxController"
     ],
     "foldername": "differentialdrivebot",
     "gradlebase": "java",
@@ -445,11 +498,15 @@
     "name": "RamseteCommand",
     "description": "An example command-based robot demonstrating the use of a RamseteCommand to follow a pregenerated trajectory.",
     "tags": [
-      "RamseteCommand",
-      "PID",
+      "Differential Drive",
+      "Command-based",
       "Ramsete",
       "Trajectory",
-      "Path following"
+      "Path Following",
+      "Odometry",
+      "Encoder",
+      "Gyro",
+      "XboxController"
     ],
     "foldername": "ramsetecommand",
     "gradlebase": "java",
@@ -460,7 +517,9 @@
     "name": "Arcade Drive Xbox Controller",
     "description": "Demonstrates the use of the DifferentialDrive class to drive a robot with Arcade Drive and an Xbox Controller",
     "tags": [
-      "Getting Started with Java"
+      "Basic Robot",
+      "Differential Drive",
+      "XboxController"
     ],
     "foldername": "arcadedrivexboxcontroller",
     "gradlebase": "java",
@@ -471,7 +530,9 @@
     "name": "Tank Drive Xbox Controller",
     "description": "Demonstrates the use of the DifferentialDrive class to drive a robot with Tank Drive and an Xbox Controller",
     "tags": [
-      "Getting Started with Java"
+      "Basic Robot",
+      "Differential Drive",
+      "XboxController"
     ],
     "foldername": "tankdrivexboxcontroller",
     "gradlebase": "java",
@@ -482,7 +543,10 @@
     "name": "Duty Cycle Encoder",
     "description": "Demonstrates the use of the Duty Cycle Encoder class",
     "tags": [
-      "Getting Started with Java"
+      "Hardware",
+      "Duty Cycle",
+      "Encoder",
+      "SmartDashboard"
     ],
     "foldername": "dutycycleencoder",
     "gradlebase": "java",
@@ -493,7 +557,9 @@
     "name": "Duty Cycle Input",
     "description": "Demonstrates the use of the Duty Cycle class",
     "tags": [
-      "Getting Started with Java"
+      "Hardware",
+      "Duty Cycle",
+      "SmartDashboard"
     ],
     "foldername": "dutycycleinput",
     "gradlebase": "java",
@@ -504,7 +570,9 @@
     "name": "Addressable LED",
     "description": "Demonstrates the use of the Addressable LED class",
     "tags": [
-      "Getting Started with Java"
+      "Hardware",
+      "Basic Robot",
+      "AddressableLEDs"
     ],
     "foldername": "addressableled",
     "gradlebase": "java",
@@ -515,7 +583,9 @@
     "name": "DMA",
     "description": "Demonstrates the use of the DMA class",
     "tags": [
-      "Advanced Java"
+      "Hardware",
+      "DMA",
+      "SmartDashboard"
     ],
     "foldername": "dma",
     "gradlebase": "java",
@@ -526,9 +596,12 @@
     "name": "ArmBot",
     "description": "An example command-based robot demonstrating the use of a ProfiledPIDSubsystem to control an arm.",
     "tags": [
-      "ArmBot",
-      "PID",
-      "Motion Profile"
+      "Command-based",
+      "Arm",
+      "Encoder",
+      "Profiled PID",
+      "XboxController",
+      "Differential Drive"
     ],
     "foldername": "armbot",
     "gradlebase": "java",
@@ -539,9 +612,12 @@
     "name": "ArmBotOffboard",
     "description": "An example command-based robot demonstrating the use of a TrapezoidProfileSubsystem to control an arm with an offboard PID.",
     "tags": [
-      "ArmBotOffboard",
-      "PID",
-      "Motion Profile"
+      "Command-based",
+      "Arm",
+      "Smart Motor Controller",
+      "Trapezoid Profile",
+      "XboxController",
+      "Differential Drive"
     ],
     "foldername": "armbotoffboard",
     "gradlebase": "java",
@@ -552,9 +628,11 @@
     "name": "DriveDistanceOffboard",
     "description": "An example command-based robot demonstrating the use of a TrapezoidProfileCommand to drive a robot a set distance with offboard PID on the drive.",
     "tags": [
-      "DriveDistance",
-      "PID",
-      "Motion Profile"
+      "Command-based",
+      "Differential Drive",
+      "Trapezoid Profile",
+      "Smart Motor Controller",
+      "XboxController"
     ],
     "foldername": "drivedistanceoffboard",
     "gradlebase": "java",
@@ -565,11 +643,14 @@
     "name": "MecanumControllerCommand",
     "description": "An example command-based robot demonstrating the use of a MecanumControllerCommand to follow a pregenerated trajectory.",
     "tags": [
-      "MecanumControllerCommand",
-      "Mecanum",
-      "PID",
+      "Command-based",
+      "Mecanum Drive",
+      "Gyro",
+      "Encoder",
+      "Odometry",
       "Trajectory",
-      "Path following"
+      "Path Following",
+      "XboxController"
     ],
     "foldername": "mecanumcontrollercommand",
     "gradlebase": "java",
@@ -580,11 +661,14 @@
     "name": "SwerveControllerCommand",
     "description": "An example command-based robot demonstrating the use of a SwerveControllerCommand to follow a pregenerated trajectory.",
     "tags": [
-      "SwerveControllerCommand",
-      "Swerve",
-      "PID",
+      "Command-based",
+      "Swerve Drive",
+      "Gyro",
+      "Encoder",
+      "Odometry",
       "Trajectory",
-      "Path following"
+      "Path Following",
+      "XboxController"
     ],
     "foldername": "swervecontrollercommand",
     "gradlebase": "java",
@@ -595,7 +679,14 @@
     "name": "RamseteController",
     "description": "An example robot demonstrating the use of RamseteController.",
     "tags": [
-      "RamseteController"
+      "Basic Robot",
+      "Differential Drive",
+      "Ramsete",
+      "PID",
+      "Odometry",
+      "Path Following",
+      "Trajectory",
+      "XboxController"
     ],
     "foldername": "ramsetecontroller",
     "gradlebase": "java",
@@ -606,13 +697,11 @@
     "name": "StateSpaceFlywheel",
     "description": "An example state-space controller for a flywheel.",
     "tags": [
-      "StateSpaceFlywheel",
+      "Basic Robot",
       "Flywheel",
-      "State Space",
-      "Model",
-      "Digital",
-      "Sensors",
-      "Actuators",
+      "State-Space",
+      "LQR",
+      "Encoder",
       "Joystick"
     ],
     "foldername": "statespaceflywheel",
@@ -624,14 +713,12 @@
     "name": "StateSpaceFlywheelSysId",
     "description": "An example state-space controller for controlling a flywheel with System Identification.",
     "tags": [
-      "StateSpaceFlywheelSysId",
-      "FRC Characterization",
+      "Basic Robot",
       "Flywheel",
-      "Characterization",
-      "State space",
-      "Digital",
-      "Sensors",
-      "Actuators",
+      "SysId",
+      "State-Space",
+      "LQR",
+      "Encoder",
       "Joystick"
     ],
     "foldername": "statespaceflywheelsysid",
@@ -643,11 +730,11 @@
     "name": "StateSpaceElevator",
     "description": "An example state-space controller for controlling an elevator.",
     "tags": [
+      "Basic Robot",
       "Elevator",
-      "State Space",
-      "Digital",
-      "Sensors",
-      "Actuators",
+      "State-Space",
+      "LQR",
+      "Encoder",
       "Joystick"
     ],
     "foldername": "statespaceelevator",
@@ -659,11 +746,11 @@
     "name": "StateSpaceArm",
     "description": "An example state-space controller for controlling an arm.",
     "tags": [
+      "Basic Robot",
       "Arm",
-      "State space",
-      "Digital",
-      "Sensors",
-      "Actuators",
+      "State-Space",
+      "LQR",
+      "Encoder",
       "Joystick"
     ],
     "foldername": "statespacearm",
@@ -675,12 +762,13 @@
     "name": "SimpleDifferentialDriveSimulation",
     "description": "An example of a minimal drivetrain simulation project without the command-based library.",
     "tags": [
-      "Drivetrain",
-      "State space",
-      "Digital",
-      "Sensors",
-      "Actuators",
-      "Joystick",
+      "Differential Drive",
+      "State-Space",
+      "Ramsete",
+      "Path Following",
+      "Trajectory",
+      "Encoder",
+      "XboxController",
       "Simulation"
     ],
     "foldername": "simpledifferentialdrivesimulation",
@@ -692,12 +780,10 @@
     "name": "StateSpaceDriveSimulation",
     "description": "An example of drivetrain simulation in combination with a RAMSETE path following controller and the Field2d class.",
     "tags": [
-      "Drivetrain",
-      "State space",
-      "Digital",
-      "Sensors",
-      "Actuators",
-      "Joystick",
+      "Command-based",
+      "Differential Drive",
+      "State-Space",
+      "XboxController",
       "Simulation"
     ],
     "foldername": "statespacedifferentialdrivesimulation",
@@ -709,12 +795,10 @@
     "name": "ElevatorSimulation",
     "description": "Demonstrates the use of physics simulation with a simple elevator.",
     "tags": [
+      "Basic Robot",
       "Elevator",
-      "State space",
-      "Digital",
-      "Sensors",
+      "State-Space",
       "Simulation",
-      "Physics",
       "Mechanism2d"
     ],
     "foldername": "elevatorsimulation",
@@ -726,12 +810,10 @@
     "name": "ArmSimulation",
     "description": "Demonstrates the use of physics simulation with a simple single-jointedarm.",
     "tags": [
+      "Basic Robot",
       "Arm",
-      "State space",
-      "Digital",
-      "Sensors",
+      "State-Space",
       "Simulation",
-      "Physics",
       "Mechanism2d",
       "Preferences"
     ],
@@ -744,7 +826,8 @@
     "name": "UnitTesting",
     "description": "Demonstrates basic unit testing for a robot project.",
     "tags": [
-      "Testing"
+      "Intake",
+      "Pneumatics"
     ],
     "foldername": "unittest",
     "gradlebase": "java",
@@ -755,13 +838,12 @@
     "name": "DifferentialDrivePoseEstimator",
     "description": "Demonstrates the use of the DifferentialDrivePoseEstimator as a replacement for differential drive odometry.",
     "tags": [
-      "Drivetrain",
-      "State space",
+      "Differential Drive",
+      "State-Space",
+      "Pose Estimator",
       "Vision",
-      "Filter",
-      "Odometry",
-      "Pose",
-      "Differential drive"
+      "PID",
+      "XboxController"
     ],
     "foldername": "differentialdriveposeestimator",
     "gradlebase": "java",
@@ -772,13 +854,12 @@
     "name": "MecanumDrivePoseEstimator",
     "description": "Demonstrates the use of the MecanumDrivePoseEstimator as a replacement for mecanum drive odometry.",
     "tags": [
-      "Drivetrain",
-      "State space",
+      "Mecanum Drive",
+      "State-Space",
+      "Pose Estimator",
       "Vision",
-      "Filter",
-      "Odometry",
-      "Pose",
-      "Mecanum"
+      "PID",
+      "XboxController"
     ],
     "foldername": "mecanumdriveposeestimator",
     "gradlebase": "java",
@@ -789,13 +870,12 @@
     "name": "SwerveDrivePoseEstimator",
     "description": "Demonstrates the use of the SwerveDrivePoseEstimator as a replacement for swerve drive odometry.",
     "tags": [
-      "Drivetrain",
-      "State space",
+      "Swerve Drive",
+      "State-Space",
+      "Pose Estimator",
       "Vision",
-      "Filter",
-      "Odometry",
-      "Pose",
-      "Swerve"
+      "PID",
+      "XboxController"
     ],
     "foldername": "swervedriveposeestimator",
     "gradlebase": "java",
@@ -806,8 +886,11 @@
     "name": "RomiReference",
     "description": "An example command-based robot program that can be used with the Romi reference robot design.",
     "tags": [
-      "Drivetrain",
-      "Romi"
+      "Romi",
+      "Command-based",
+      "Differential Drive",
+      "Digital Input",
+      "Joystick"
     ],
     "foldername": "romireference",
     "gradlebase": "javaromi",
@@ -818,8 +901,8 @@
     "name": "Digital Communication Sample",
     "description": "An example program that communicates with external devices (such as an Arduino) using the roboRIO's DIO",
     "tags": [
-      "Digital",
-      "Unit Testing"
+      "Hardware",
+      "Digital Output"
     ],
     "foldername": "digitalcommunication",
     "gradlebase": "java",
@@ -830,6 +913,7 @@
     "name": "I2C Communication Sample",
     "description": "An example program that communicates with external devices (such as an Arduino) using the roboRIO's I2C port",
     "tags": [
+      "Hardware",
       "I2C"
     ],
     "foldername": "i2ccommunication",
