@@ -43,6 +43,7 @@ struct JoystickDataCache {
   HAL_JoystickButtons buttons[HAL_kMaxJoysticks];
   HAL_AllianceStationID allianceStation;
   float matchTime;
+  HAL_ControlWord controlWord;
 };
 static_assert(std::is_standard_layout_v<JoystickDataCache>);
 // static_assert(std::is_trivial_v<JoystickDataCache>);
@@ -104,6 +105,8 @@ void JoystickDataCache::Update() {
   FRC_NetworkCommunication_getAllianceStation(
       reinterpret_cast<AllianceStationID_t*>(&allianceStation));
   FRC_NetworkCommunication_getMatchTime(&matchTime);
+  FRC_NetworkCommunication_getControlWord(
+      reinterpret_cast<ControlWord_t*>(&controlWord));
 }
 
 #define CHECK_JOYSTICK_NUMBER(stickNum)                  \
@@ -513,12 +516,22 @@ HAL_Bool HAL_RefreshDSData(void) {
   std::memset(&controlWord, 0, sizeof(controlWord));
   FRC_NetworkCommunication_getControlWord(
       reinterpret_cast<ControlWord_t*>(&controlWord));
-  std::scoped_lock lock{cacheMutex};
-  JoystickDataCache* prev = currentCache.exchange(nullptr);
-  if (prev != nullptr) {
-    currentRead = prev;
+  JoystickDataCache* prev;
+  {
+    std::scoped_lock lock{cacheMutex};
+    prev = currentCache.exchange(nullptr);
+    if (prev != nullptr) {
+      currentRead = prev;
+    }
+    // If newest state shows we have a DS attached, just use the
+    // control word out of the cache, As it will be the one in sync
+    // with the data. Otherwise use the state that shows disconnected.
+    if (controlWord.dsAttached) {
+      newestControlWord = currentRead->controlWord;
+    } else {
+      newestControlWord = controlWord;
+    }
   }
-  newestControlWord = controlWord;
 
   uint32_t mask = tcpMask.exchange(0);
   if (mask != 0) {
