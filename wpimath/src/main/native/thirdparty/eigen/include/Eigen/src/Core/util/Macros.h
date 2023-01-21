@@ -58,6 +58,16 @@
 // Compiler identification, EIGEN_COMP_*
 //------------------------------------------------------------------------------------------
 
+/// \internal Disable NEON features in Intellisense
+#if __INTELLISENSE__
+#ifdef __ARM_NEON
+#undef __ARM_NEON
+#endif
+#ifdef __ARM_NEON__
+#undef __ARM_NEON__
+#endif
+#endif
+
 /// \internal EIGEN_COMP_GNUC set to 1 for all compilers compatible with GCC
 #ifdef __GNUC__
   #define EIGEN_COMP_GNUC (__GNUC__*10+__GNUC_MINOR__)
