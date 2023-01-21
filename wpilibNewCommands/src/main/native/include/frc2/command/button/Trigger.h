@@ -194,8 +194,7 @@ class Trigger {
   Trigger ToggleOnFalse(Command* command);
 
   /**
-   * Toggles a command when the condition changes from `true` to the low
-   * state.
+   * Toggles a command when the condition changes from `true` to `false`.
    *
    * <p>Takes a raw pointer, and so is non-owning; users are responsible for the
    * lifespan of the command.
