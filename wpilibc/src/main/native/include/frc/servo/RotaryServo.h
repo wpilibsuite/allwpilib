@@ -4,6 +4,8 @@
 
 #pragma once
 
+#include <units/angle.h>
+
 #include "frc/PWM.h"
 
 namespace frc {
@@ -55,7 +57,7 @@ class RotaryServo : public PWM {
    *
    * @param angle The angle in degrees to set the servo.
    */
-  void SetAngle(double angle);
+  void SetAngle(units::radian_t angle);
 
   /**
    * Get the servo angle.
@@ -63,23 +65,23 @@ class RotaryServo : public PWM {
    * This returns the commanded angle, not the angle that the servo is actually
    * at, as the servo does not report its own angle.
    *
-   * @return The angle in degrees to which the servo is set.
+   * @return The angle in radians to which the servo is set.
    */
-  double GetAngle() const;
+  units::radian_t GetAngle() const;
 
   /**
    * Get the maximum angle of the servo.
    *
-   * @return The maximum angle of the servo in degrees.
+   * @return The maximum angle of the servo in radians.
    */
-  double GetMaxAngle() const;
+  units::radian_t GetMaxAngle() const;
 
   /**
    * Get the minimum angle of the servo.
    *
-   * @return The minimum angle of the servo in degrees.
+   * @return The minimum angle of the servo in radians.
    */
-  double GetMinAngle() const;
+  units::radian_t GetMinAngle() const;
 
   void InitSendable(wpi::SendableBuilder& builder) override;
 
@@ -91,14 +93,14 @@ class RotaryServo : public PWM {
    * @param channel The PWM channel to which the servo is attached. 0-9 are
    *                on-board, 10-19 are on the MXP port
    */
-  RotaryServo(std::string_view name, int channel, double minServoAngle,
-              double maxServoAngle);
+  RotaryServo(std::string_view name, int channel, units::radian_t minServoAngle,
+              units::radian_t maxServoAngle);
 
  private:
-  double GetServoAngleRange() const;
+  units::radian_t GetServoAngleRange() const;
 
-  double m_minServoAngle;
-  double m_maxServoAngle;
+  units::radian_t m_minServoAngle;
+  units::radian_t m_maxServoAngle;
 };
 
 }  // namespace frc

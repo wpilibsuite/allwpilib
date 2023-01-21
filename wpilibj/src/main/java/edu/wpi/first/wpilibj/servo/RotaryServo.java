@@ -16,21 +16,24 @@ public abstract class RotaryServo extends PWM {
   protected double m_maxServoAngle;
 
   /**
-   * Constructor.<br>
+   * Constructor.
    *
+   * @param name Name to use for SendableRegistry
    * @param channel The PWM channel to which the servo is attached. 0-9 are on-board, 10-19 are on
    *     the MXP port
+   * @param minServoAngleRads Minimum servo angle in radians which can be commanded.
+   * @param maxServoAngleRads Maximum servo angle in radians which can be commanded.
    */
   protected RotaryServo(
       final String name,
       final int channel,
-      final double minServoAngle,
-      final double maxServoAngle) {
+      final double minServoAngleRads,
+      final double maxServoAngleRads) {
     super(channel);
     setPeriodMultiplier(PeriodMultiplier.k4X);
 
-    m_minServoAngle = minServoAngle;
-    m_maxServoAngle = maxServoAngle;
+    m_minServoAngle = minServoAngleRads;
+    m_maxServoAngle = maxServoAngleRads;
 
     HAL.report(tResourceType.kResourceType_Servo, getChannel() + 1);
     SendableRegistry.setName(this, name, getChannel());
@@ -64,20 +67,20 @@ public abstract class RotaryServo extends PWM {
    * Set the servo angle.
    *
    * <p>Servo angles that are out of the supported range of the servo simply "saturate" in that
-   * direction In other words, if the servo has a range of (X degrees to Y degrees) than angles of
-   * less than X result in an angle of X being set and angles of more than Y degrees result in an
-   * angle of Y being set.
+   * direction In other words, if the servo has a range of (X rads to Y rads) than angles of less
+   * than X result in an angle of X being set and angles of more than Y rads result in an angle of Y
+   * being set.
    *
-   * @param degrees The angle in degrees to set the servo.
+   * @param angle The angle in radians to set the servo.
    */
-  public void setAngle(double degrees) {
-    if (degrees < m_minServoAngle) {
-      degrees = m_minServoAngle;
-    } else if (degrees > m_maxServoAngle) {
-      degrees = m_maxServoAngle;
+  public void setAngle(double angle) {
+    if (angle < m_minServoAngle) {
+      angle = m_minServoAngle;
+    } else if (angle > m_maxServoAngle) {
+      angle = m_maxServoAngle;
     }
 
-    setPosition((degrees - m_minServoAngle) / getServoAngleRange());
+    setPosition((angle - m_minServoAngle) / getServoAngleRange());
   }
 
   /**
@@ -86,7 +89,7 @@ public abstract class RotaryServo extends PWM {
    * <p>This returns the commanded angle, not the angle that the servo is actually at, as the servo
    * does not report its own angle.
    *
-   * @return The angle in degrees to which the servo is set.
+   * @return The angle in radians to which the servo is set.
    */
   public double getAngle() {
     return getPosition() * getServoAngleRange() + m_minServoAngle;

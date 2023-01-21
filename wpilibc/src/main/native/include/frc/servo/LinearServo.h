@@ -63,8 +63,8 @@ class LinearServo : public PWM {
   /**
    * Get the servo extend distance
    *
-   * This returns the commanded distance, not the distance that the servo is actually
-   * at, as the servo does not report its own distance.
+   * This returns the commanded distance, not the distance that the servo is
+   * actually at, as the servo does not report its own distance.
    *
    * @return The distance in metres to which the servo is set.
    */

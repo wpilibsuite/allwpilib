@@ -4,6 +4,8 @@
 
 package edu.wpi.first.wpilibj.servo;
 
+import edu.wpi.first.math.util.Units;
+
 /* Hitec HS-322HD servo provided in the FIRST Kit of Parts in 2008. */
 public class HS322HD extends RotaryServo {
   /**
@@ -13,7 +15,7 @@ public class HS322HD extends RotaryServo {
    *     the MXP port
    */
   public HS322HD(final int channel) {
-    super("HS322HD", channel, 0.0, 180.0);
+    super("HS322HD", channel, 0.0, Units.degreesToRadians(180.0));
 
     setBounds(2.4, 0, 0, 0, 0.6);
   }

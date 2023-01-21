@@ -63,7 +63,7 @@ public abstract class LinearServo extends PWM {
    * result in the servo being fully retracted and distances of greater than 50mm result in the
    * servo being fully extended.
    *
-   * @param distanceMetres The extend distance in metres in metres to set the servo.
+   * @param distanceMetres The extend distance in metres to set the servo.
    */
   public void setExtendDistance(double distanceMetres) {
     if (distanceMetres < 0.0) {

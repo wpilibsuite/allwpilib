@@ -22,30 +22,31 @@ double RotaryServo::Get() const {
   return GetPosition();
 }
 
-void RotaryServo::SetAngle(double degrees) {
-  if (degrees < m_minServoAngle) {
-    degrees = m_minServoAngle;
-  } else if (degrees > m_maxServoAngle) {
-    degrees = m_maxServoAngle;
+void RotaryServo::SetAngle(units::radian_t angle) {
+  if (angle < m_minServoAngle) {
+    angle = m_minServoAngle;
+  } else if (angle > m_maxServoAngle) {
+    angle = m_maxServoAngle;
   }
 
-  SetPosition((degrees - m_minServoAngle) / GetServoAngleRange());
+  SetPosition((angle - m_minServoAngle) / GetServoAngleRange());
 }
 
-double RotaryServo::GetAngle() const {
+units::radian_t RotaryServo::GetAngle() const {
   return GetPosition() * GetServoAngleRange() + m_minServoAngle;
 }
 
-double RotaryServo::GetMaxAngle() const {
+units::radian_t RotaryServo::GetMaxAngle() const {
   return m_maxServoAngle;
 }
 
-double RotaryServo::GetMinAngle() const {
+units::radian_t RotaryServo::GetMinAngle() const {
   return m_minServoAngle;
 }
 
 RotaryServo::RotaryServo(std::string_view name, int channel,
-                         double minServoAngle, double maxServoAngle)
+                         units::radian_t minServoAngle,
+                         units::radian_t maxServoAngle)
     : PWM(channel),
       m_minServoAngle(minServoAngle),
       m_maxServoAngle(maxServoAngle) {
@@ -63,6 +64,6 @@ void RotaryServo::InitSendable(wpi::SendableBuilder& builder) {
       [=, this](double value) { Set(value); });
 }
 
-double RotaryServo::GetServoAngleRange() const {
+units::radian_t RotaryServo::GetServoAngleRange() const {
   return m_maxServoAngle - m_minServoAngle;
 }
