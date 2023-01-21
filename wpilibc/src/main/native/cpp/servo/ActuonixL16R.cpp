@@ -6,7 +6,15 @@
 
 using namespace frc;
 
-ActuonixL16R::ActuonixL16R(int channel)
-    : LinearServo("ActuonixL16R", channel, 50_mm) {
+ActuonixL16R::ActuonixL16R(int channel, Stroke stroke)
+    : LinearServo("ActuonixL16R", channel, [stroke]() {
+        if (stroke == Stroke::_50mm) {
+          return 50_mm;
+        } else if (stroke == Stroke::_100mm) {
+          return 100_mm;
+        } else {
+          return 140_mm;
+        }
+      }()) {
   SetBounds(2.0, 1.8, 1.5, 1.2, 1.0);
 }

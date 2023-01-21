@@ -21,7 +21,9 @@ namespace frc {
  */
 class ActuonixL16R : public LinearServo {
  public:
-  explicit ActuonixL16R(int channel);
+  enum class Stroke { _50mm = 0, _100mm = 1, _140mm = 2 };
+
+  explicit ActuonixL16R(int channel, Stroke stroke);
 
   ActuonixL16R(ActuonixL16R&&) = default;
   ActuonixL16R& operator=(ActuonixL16R&&) = default;
