@@ -33,6 +33,7 @@ public class ActuonixL16R extends LinearServo {
    *
    * @param channel The PWM channel to which the servo is attached. 0-9 are on-board, 10-19 are on
    *     the MXP port
+   * @param stroke The stroke length of the actuonix servo (either 50, 100, or 140 mm).
    */
   public ActuonixL16R(final int channel, final Stroke stroke) {
     super("ActuonixL16R", channel, stroke.value);
