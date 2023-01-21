@@ -59,6 +59,7 @@ RotaryServo::RotaryServo(std::string_view name, int channel,
 
 void RotaryServo::InitSendable(wpi::SendableBuilder& builder) {
   builder.SetSmartDashboardType("Servo");
+  builder.SetActuator(true);
   builder.AddDoubleProperty(
       "Value", [=, this] { return Get(); },
       [=, this](double value) { Set(value); });

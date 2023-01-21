@@ -102,6 +102,7 @@ public abstract class RotaryServo extends PWM {
   @Override
   public void initSendable(SendableBuilder builder) {
     builder.setSmartDashboardType("Servo");
+    builder.setActuator(true);
     builder.addDoubleProperty("Value", this::get, this::set);
   }
 }
