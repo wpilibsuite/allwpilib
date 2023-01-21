@@ -297,7 +297,7 @@ public class Rotation3d implements Interpolatable<Rotation3d> {
     final var y = m_q.getY();
     final var z = m_q.getZ();
 
-    // https://en.wikipedia.org/wiki/Conversion_between_quaternions_and_Euler_angles#Quaternion_to_Euler_angles_conversion
+    // https://en.wikipedia.org/wiki/Conversion_between_quaternions_and_Euler_angles#Quaternion_to_Euler_angles_(in_3-2-1_sequence)_conversion
     return Math.atan2(2.0 * (w * x + y * z), 1.0 - 2.0 * (x * x + y * y));
   }
 
@@ -312,7 +312,7 @@ public class Rotation3d implements Interpolatable<Rotation3d> {
     final var y = m_q.getY();
     final var z = m_q.getZ();
 
-    // https://en.wikipedia.org/wiki/Conversion_between_quaternions_and_Euler_angles#Quaternion_to_Euler_angles_conversion
+    // https://en.wikipedia.org/wiki/Conversion_between_quaternions_and_Euler_angles#Quaternion_to_Euler_angles_(in_3-2-1_sequence)_conversion
     double ratio = 2.0 * (w * y - z * x);
     if (Math.abs(ratio) >= 1.0) {
       return Math.copySign(Math.PI / 2.0, ratio);
@@ -332,7 +332,7 @@ public class Rotation3d implements Interpolatable<Rotation3d> {
     final var y = m_q.getY();
     final var z = m_q.getZ();
 
-    // https://en.wikipedia.org/wiki/Conversion_between_quaternions_and_Euler_angles#Quaternion_to_Euler_angles_conversion
+    // https://en.wikipedia.org/wiki/Conversion_between_quaternions_and_Euler_angles#Quaternion_to_Euler_angles_(in_3-2-1_sequence)_conversion
     return Math.atan2(2.0 * (w * z + x * y), 1.0 - 2.0 * (y * y + z * z));
   }
 
