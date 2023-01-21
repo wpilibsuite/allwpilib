@@ -12,8 +12,8 @@ import edu.wpi.first.wpilibj.PWM;
 
 /* Common base class for all rotary servos */
 public abstract class RotaryServo extends PWM {
-  protected double m_minServoAngleRads;
-  protected double m_maxServoAngleRads;
+  protected double m_minServoAngleRadians;
+  protected double m_maxServoAngleRadians;
 
   /**
    * Constructor.
@@ -21,19 +21,19 @@ public abstract class RotaryServo extends PWM {
    * @param name Name to use for SendableRegistry.
    * @param channel The PWM channel to which the servo is attached. 0-9 are on-board, 10-19 are on
    *     the MXP port.
-   * @param minServoAngleRads Minimum servo angle in radians which can be commanded.
-   * @param maxServoAngleRads Maximum servo angle in radians which can be commanded.
+   * @param minServoAngleRadians Minimum servo angle in radians which can be commanded.
+   * @param maxServoAngleRadians Maximum servo angle in radians which can be commanded.
    */
   protected RotaryServo(
       final String name,
       final int channel,
-      final double minServoAngleRads,
-      final double maxServoAngleRads) {
+      final double minServoAngleRadians,
+      final double maxServoAngleRadians) {
     super(channel);
     setPeriodMultiplier(PeriodMultiplier.k4X);
 
-    m_minServoAngleRads = minServoAngleRads;
-    m_maxServoAngleRads = maxServoAngleRads;
+    m_minServoAngleRadians = minServoAngleRadians;
+    m_maxServoAngleRadians = maxServoAngleRadians;
 
     HAL.report(tResourceType.kResourceType_Servo, getChannel() + 1);
     SendableRegistry.setName(this, name, getChannel());
@@ -73,14 +73,14 @@ public abstract class RotaryServo extends PWM {
    *
    * @param angle The angle in radians to set the servo.
    */
-  public void setAngleRads(double angle) {
-    if (angle < m_minServoAngleRads) {
-      angle = m_minServoAngleRads;
-    } else if (angle > m_maxServoAngleRads) {
-      angle = m_maxServoAngleRads;
+  public void setAngleRadians(double angle) {
+    if (angle < m_minServoAngleRadians) {
+      angle = m_minServoAngleRadians;
+    } else if (angle > m_maxServoAngleRadians) {
+      angle = m_maxServoAngleRadians;
     }
 
-    setPosition((angle - m_minServoAngleRads) / getServoAngleRange());
+    setPosition((angle - m_minServoAngleRadians) / getServoAngleRange());
   }
 
   /**
@@ -91,12 +91,12 @@ public abstract class RotaryServo extends PWM {
    *
    * @return The angle in radians to which the servo is set.
    */
-  public double getAngleRads() {
-    return getPosition() * getServoAngleRange() + m_minServoAngleRads;
+  public double getAngleRadians() {
+    return getPosition() * getServoAngleRange() + m_minServoAngleRadians;
   }
 
   private double getServoAngleRange() {
-    return m_maxServoAngleRads - m_minServoAngleRads;
+    return m_maxServoAngleRadians - m_minServoAngleRadians;
   }
 
   @Override
