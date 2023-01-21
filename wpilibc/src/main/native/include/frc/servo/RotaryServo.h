@@ -89,9 +89,11 @@ class RotaryServo : public PWM {
   /**
    * Constructor for a rotary servo PWM.
    *
-   * @param name Name to use for SendableRegistry
+   * @param name Name to use for SendableRegistry.
    * @param channel The PWM channel to which the servo is attached. 0-9 are
    *                on-board, 10-19 are on the MXP port
+   * @param minServoAngle Minimum servo angle in radians which can be commanded.
+   * @param maxServoAngle Maximum servo angle in radians which can be commanded.
    */
   RotaryServo(std::string_view name, int channel, units::radian_t minServoAngle,
               units::radian_t maxServoAngle);

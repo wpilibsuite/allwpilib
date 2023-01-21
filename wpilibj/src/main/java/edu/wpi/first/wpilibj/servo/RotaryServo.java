@@ -12,15 +12,15 @@ import edu.wpi.first.wpilibj.PWM;
 
 /* Common base class for all rotary servos */
 public abstract class RotaryServo extends PWM {
-  protected double m_minServoAngle;
-  protected double m_maxServoAngle;
+  protected double m_minServoAngleRads;
+  protected double m_maxServoAngleRads;
 
   /**
    * Constructor.
    *
-   * @param name Name to use for SendableRegistry
+   * @param name Name to use for SendableRegistry.
    * @param channel The PWM channel to which the servo is attached. 0-9 are on-board, 10-19 are on
-   *     the MXP port
+   *     the MXP port.
    * @param minServoAngleRads Minimum servo angle in radians which can be commanded.
    * @param maxServoAngleRads Maximum servo angle in radians which can be commanded.
    */
@@ -32,8 +32,8 @@ public abstract class RotaryServo extends PWM {
     super(channel);
     setPeriodMultiplier(PeriodMultiplier.k4X);
 
-    m_minServoAngle = minServoAngleRads;
-    m_maxServoAngle = maxServoAngleRads;
+    m_minServoAngleRads = minServoAngleRads;
+    m_maxServoAngleRads = maxServoAngleRads;
 
     HAL.report(tResourceType.kResourceType_Servo, getChannel() + 1);
     SendableRegistry.setName(this, name, getChannel());
@@ -74,13 +74,13 @@ public abstract class RotaryServo extends PWM {
    * @param angle The angle in radians to set the servo.
    */
   public void setAngle(double angle) {
-    if (angle < m_minServoAngle) {
-      angle = m_minServoAngle;
-    } else if (angle > m_maxServoAngle) {
-      angle = m_maxServoAngle;
+    if (angle < m_minServoAngleRads) {
+      angle = m_minServoAngleRads;
+    } else if (angle > m_maxServoAngleRads) {
+      angle = m_maxServoAngleRads;
     }
 
-    setPosition((angle - m_minServoAngle) / getServoAngleRange());
+    setPosition((angle - m_minServoAngleRads) / getServoAngleRange());
   }
 
   /**
@@ -92,11 +92,11 @@ public abstract class RotaryServo extends PWM {
    * @return The angle in radians to which the servo is set.
    */
   public double getAngle() {
-    return getPosition() * getServoAngleRange() + m_minServoAngle;
+    return getPosition() * getServoAngleRange() + m_minServoAngleRads;
   }
 
   private double getServoAngleRange() {
-    return m_maxServoAngle - m_minServoAngle;
+    return m_maxServoAngleRads - m_minServoAngleRads;
   }
 
   @Override

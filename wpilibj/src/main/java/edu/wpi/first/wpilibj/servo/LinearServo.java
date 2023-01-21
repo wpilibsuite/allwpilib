@@ -15,16 +15,18 @@ public abstract class LinearServo extends PWM {
   protected double m_strokeMetres;
 
   /**
-   * Constructor.<br>
+   * Constructor.
    *
+   * @param name Name to use for SendableRegistry
    * @param channel The PWM channel to which the servo is attached. 0-9 are on-board, 10-19 are on
    *     the MXP port
+   * @param strokeMeters Stroke distance of the linear servo in meters.
    */
-  protected LinearServo(final String name, final int channel, final double stroke) {
+  protected LinearServo(final String name, final int channel, final double strokeMeters) {
     super(channel);
     setPeriodMultiplier(PeriodMultiplier.k4X);
 
-    m_strokeMetres = stroke;
+    m_strokeMetres = strokeMeters;
 
     HAL.report(tResourceType.kResourceType_Servo, getChannel() + 1);
     SendableRegistry.setName(this, name, getChannel());

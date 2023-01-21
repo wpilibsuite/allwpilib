@@ -76,9 +76,10 @@ class LinearServo : public PWM {
   /**
    * Constructor for a linear servo PWM.
    *
-   * @param name Name to use for SendableRegistry
+   * @param name Name to use for SendableRegistry.
    * @param channel The PWM channel to which the servo is attached. 0-9 are
-   *                on-board, 10-19 are on the MXP port
+   *                on-board, 10-19 are on the MXP port.
+   * @param strokeM Stroke distance of the linear servo.
    */
   LinearServo(std::string_view name, int channel, units::meter_t stroke);
 

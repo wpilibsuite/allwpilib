@@ -8,6 +8,7 @@
 
 namespace frc {
 
+/* Hitec HS-322HD servo provided in the FIRST Kit of Parts in 2008. */
 class HS322HD : public RotaryServo {
  public:
   explicit HS322HD(int channel);
