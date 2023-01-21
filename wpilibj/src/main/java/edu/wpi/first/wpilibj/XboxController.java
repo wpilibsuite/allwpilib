@@ -539,13 +539,13 @@ public class XboxController extends GenericHID {
   }
 
   /**
-   * Constructs an event instance around the axis value of the right trigger. The returned trigger
+   * Constructs an event instance around the axis value of the left trigger. The returned trigger
    * will be true when the axis value is greater than {@code threshold}.
    *
    * @param threshold the minimum axis value for the returned {@link BooleanEvent} to be true. This
    *     value should be in the range [0, 1] where 0 is the unpressed state of the axis.
    * @param loop the event loop instance to attach the event to.
-   * @return an event instance that is true when the right trigger's axis exceeds the provided
+   * @return an event instance that is true when the left trigger's axis exceeds the provided
    *     threshold, attached to the given event loop
    */
   public BooleanEvent leftTrigger(double threshold, EventLoop loop) {
@@ -553,11 +553,11 @@ public class XboxController extends GenericHID {
   }
 
   /**
-   * Constructs an event instance around the axis value of the right trigger. The returned trigger
+   * Constructs an event instance around the axis value of the left trigger. The returned trigger
    * will be true when the axis value is greater than 0.5.
    *
    * @param loop the event loop instance to attach the event to.
-   * @return an event instance that is true when the right trigger's axis exceeds the provided
+   * @return an event instance that is true when the left trigger's axis exceeds the provided
    *     threshold, attached to the given event loop
    */
   public BooleanEvent leftTrigger(EventLoop loop) {
