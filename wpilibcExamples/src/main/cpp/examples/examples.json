@@ -666,6 +666,7 @@
     "description": "Demonstrates the use of physics simulation with a simple elevator.",
     "tags": [
       "Elevator",
+      "ProfiledPID",
       "State space",
       "Digital",
       "Sensors",
