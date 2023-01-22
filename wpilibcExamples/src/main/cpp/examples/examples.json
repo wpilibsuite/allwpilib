@@ -759,7 +759,6 @@
     "tags": [
       "Basic Robot",
       "Elevator",
-      "Profiled PID",
       "State-Space",
       "Simulation",
       "Mechanism2d"
