@@ -761,7 +761,8 @@
       "Elevator",
       "State-Space",
       "Simulation",
-      "Mechanism2d"
+      "Mechanism2d",
+      "Profiled PID"
     ],
     "foldername": "ElevatorSimulation",
     "gradlebase": "cpp",
