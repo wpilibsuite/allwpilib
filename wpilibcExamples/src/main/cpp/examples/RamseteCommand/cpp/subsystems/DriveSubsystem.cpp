@@ -23,8 +23,8 @@ DriveSubsystem::DriveSubsystem()
   m_rightMotors.SetInverted(true);
 
   // Set the distance per pulse for the encoders
-  m_leftEncoder.SetDistancePerPulse(kEncoderDistancePerPulse);
-  m_rightEncoder.SetDistancePerPulse(kEncoderDistancePerPulse);
+  m_leftEncoder.SetDistancePerPulse(kEncoderDistancePerPulse.value());
+  m_rightEncoder.SetDistancePerPulse(kEncoderDistancePerPulse.value());
 
   ResetEncoders();
 }
