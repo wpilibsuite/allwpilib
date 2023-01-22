@@ -360,8 +360,16 @@ void NSImpl::LoadPersistent() {
   auto size = fs::file_size(m_persistentFilename, ec);
   wpi::raw_fd_istream is{m_persistentFilename, ec};
   if (ec.value() != 0) {
-    INFO("could not open persistent file '{}': {}", m_persistentFilename,
-         ec.message());
+    INFO(
+        "could not open persistent file '{}': {} "
+        "(this can be ignored if you aren't expecting persistent values)",
+        m_persistentFilename, ec.message());
+    // try to write an empty file so it doesn't happen again
+    wpi::raw_fd_ostream os{m_persistentFilename, ec, fs::F_Text};
+    if (ec.value() == 0) {
+      os << "[]\n";
+      os.close();
+    }
     return;
   }
   is.readinto(m_persistentData, size);
