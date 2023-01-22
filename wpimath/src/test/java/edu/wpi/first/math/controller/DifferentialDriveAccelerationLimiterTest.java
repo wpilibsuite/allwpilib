@@ -231,7 +231,6 @@ class DifferentialDriveAccelerationLimiterTest {
               .times(xAccelLimiter)
               .plus(plant.getB().times(new MatBuilder<>(Nat.N2(), Nat.N1()).fill(12.0, 12.0)));
       final double a = (accels.get(0, 0) + accels.get(1, 0)) / 2.0;
-      System.out.println(a);
       assertTrue(Math.abs(a) > maxA);
       assertTrue(Math.abs(a) > -minA);
     }

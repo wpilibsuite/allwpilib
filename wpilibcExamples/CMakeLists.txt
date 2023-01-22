@@ -12,7 +12,7 @@ foreach(example ${EXAMPLES})
   add_executable(${example} ${sources})
   wpilib_target_warnings(${example})
   target_include_directories(${example} PUBLIC src/main/cpp/examples/${example}/include)
-  target_link_libraries(${example} wpilibc wpilibNewCommands)
+  target_link_libraries(${example} apriltag wpilibc wpilibNewCommands)
 
   if (WITH_TESTS AND EXISTS ${CMAKE_SOURCE_DIR}/wpilibcExamples/src/test/cpp/examples/${example})
     wpilib_add_test(${example} src/test/cpp/examples/${example}/cpp)
@@ -21,7 +21,7 @@ foreach(example ${EXAMPLES})
                                src/main/cpp/examples/${example}/include
                                src/test/cpp/examples/${example}/include)
     target_compile_definitions(${example}_test PUBLIC RUNNING_FRC_TESTS)
-    target_link_libraries(${example}_test wpilibc wpilibNewCommands gmock_main)
+    target_link_libraries(${example}_test apriltag wpilibc wpilibNewCommands gmock_main)
   endif()
 endforeach()
 

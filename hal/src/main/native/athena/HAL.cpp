@@ -50,6 +50,7 @@ using namespace hal;
 
 namespace hal {
 void InitializeDriverStation();
+void WaitForInitialPacket();
 namespace init {
 void InitializeHAL() {
   InitializeCTREPCM();
@@ -545,6 +546,8 @@ HAL_Bool HAL_Initialize(int32_t timeout, int32_t mode) {
     }
     return rv;
   });
+
+  hal::WaitForInitialPacket();
 
   initialized = true;
   return true;

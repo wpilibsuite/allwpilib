@@ -69,7 +69,7 @@ bool ADXRS450_Gyro::IsConnected() const {
   return m_connected;
 }
 
-static bool CalcParity(int v) {
+static bool CalcParity(uint32_t v) {
   bool parity = false;
   while (v != 0) {
     parity = !parity;
@@ -87,7 +87,7 @@ static inline int BytesToIntBE(uint8_t* buf) {
 }
 
 uint16_t ADXRS450_Gyro::ReadRegister(int reg) {
-  int cmd = 0x80000000 | static_cast<int>(reg) << 17;
+  uint32_t cmd = 0x80000000 | static_cast<int>(reg) << 17;
   if (!CalcParity(cmd)) {
     cmd |= 1u;
   }

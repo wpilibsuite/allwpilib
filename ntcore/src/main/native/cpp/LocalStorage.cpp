@@ -96,6 +96,7 @@ struct TopicData {
   NT_Entry entry{0};  // cached entry for GetEntry()
 
   bool onNetwork{false};  // true if there are any remote publishers
+  bool lastValueFromNetwork{false};
 
   wpi::SmallVector<DataLoggerEntry, 1> datalogs;
   NT_Type datalogType{NT_UNASSIGNED};
@@ -484,6 +485,7 @@ void LSImpl::CheckReset(TopicData* topic) {
   }
   topic->lastValue = {};
   topic->lastValueNetwork = {};
+  topic->lastValueFromNetwork = false;
   topic->type = NT_UNASSIGNED;
   topic->typeStr.clear();
   topic->flags = 0;
@@ -503,6 +505,7 @@ bool LSImpl::SetValue(TopicData* topic, const Value& value,
     // TODO: notify option even if older value
     topic->type = value.type();
     topic->lastValue = value;
+    topic->lastValueFromNetwork = false;
     NotifyValue(topic, eventFlags, isDuplicate, publisher);
   }
   if (!isDuplicate && topic->datalogType == value.type()) {
@@ -857,6 +860,17 @@ SubscriberData* LSImpl::AddLocalSubscriber(TopicData* topic,
   if (m_network) {
     DEBUG4("-> NetworkSubscribe({})", topic->name);
     m_network->Subscribe(subscriber->handle, {{topic->name}}, config);
+  }
+
+  // queue current value
+  if (subscriber->active) {
+    if (!topic->lastValueFromNetwork && !config.disableLocal) {
+      subscriber->pollStorage.emplace_back(topic->lastValue);
+      subscriber->handle.Set();
+    } else if (topic->lastValueFromNetwork && !config.disableRemote) {
+      subscriber->pollStorage.emplace_back(topic->lastValueNetwork);
+      subscriber->handle.Set();
+    }
   }
   return subscriber;
 }
@@ -1376,6 +1390,7 @@ void LocalStorage::NetworkSetValue(NT_Topic topicHandle, const Value& value) {
     if (m_impl->SetValue(topic, value, NT_EVENT_VALUE_REMOTE,
                          value == topic->lastValue, nullptr)) {
       topic->lastValueNetwork = value;
+      topic->lastValueFromNetwork = true;
     }
   }
 }

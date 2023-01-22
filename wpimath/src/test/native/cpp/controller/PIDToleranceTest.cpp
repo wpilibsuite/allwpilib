@@ -13,16 +13,14 @@ TEST(PIDToleranceTest, InitialTolerance) {
   frc2::PIDController controller{0.5, 0.0, 0.0};
   controller.EnableContinuousInput(-kRange / 2, kRange / 2);
 
-  EXPECT_TRUE(controller.AtSetpoint());
+  EXPECT_FALSE(controller.AtSetpoint());
 }
 
 TEST(PIDToleranceTest, AbsoluteTolerance) {
   frc2::PIDController controller{0.5, 0.0, 0.0};
   controller.EnableContinuousInput(-kRange / 2, kRange / 2);
 
-  EXPECT_TRUE(controller.AtSetpoint())
-      << "Error was not in tolerance when it should have been. Error was "
-      << controller.GetPositionError();
+  EXPECT_FALSE(controller.AtSetpoint());
 
   controller.SetTolerance(kTolerance);
   controller.SetSetpoint(kSetpoint);
