@@ -10,9 +10,9 @@
 void Robot::RobotInit() {
   // Publish elements to shuffleboard.
   frc::ShuffleboardTab& tab = frc::Shuffleboard::GetTab("Pneumatics");
-  tab.Add("Single Solenoid", &m_solenoid);
-  tab.Add("Double Solenoid", &m_doubleSolenoid);
-  tab.Add("Compressor", &m_compressor);
+  tab.Add("Single Solenoid", m_solenoid);
+  tab.Add("Double Solenoid", m_doubleSolenoid);
+  tab.Add("Compressor", m_compressor);
 
   // Also publish some raw data
   tab.AddDouble("PH Pressure [PSI]", [&] {
@@ -45,7 +45,7 @@ void Robot::RobotInit() {
                                     frc::CompressorConfigType::Analog);
   m_compressorModeChooser.AddOption("Hybrid",
                                     frc::CompressorConfigType::Hybrid);
-  tab.Add("Chooser", &m_compressorModeChooser);
+  tab.Add("Chooser", m_compressorModeChooser);
 }
 
 void Robot::TeleopPeriodic() {

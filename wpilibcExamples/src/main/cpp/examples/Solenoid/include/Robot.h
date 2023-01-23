@@ -13,7 +13,6 @@
 #include <frc/TimedRobot.h>
 #include <frc/smartdashboard/SendableChooser.h>
 
-
 /**
  * This is a sample program showing the use of the solenoid classes during
  * operator control.
@@ -62,7 +61,8 @@ class Robot : public frc::TimedRobot {
   // the scale parameter in the AnalogPotentiometer constructor is scaled from
   // 1 instead of 5, so if r is the raw AnalogPotentiometer output, the
   // pressure is 250r-25
-  static constexpr double kScale = 250, kOffset = -25;
+  static constexpr double kScale = 250;
+  static constexpr double kOffset = -25;
   frc::AnalogPotentiometer m_pressureTransducer{/* the AnalogIn port*/ 2,
                                                 kScale, kOffset};
 
@@ -73,7 +73,4 @@ class Robot : public frc::TimedRobot {
   static constexpr int kDoubleSolenoidForward = 2;
   static constexpr int kDoubleSolenoidReverse = 3;
   static constexpr int kCompressorButton = 4;
-
-
-
 };
