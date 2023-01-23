@@ -11,7 +11,7 @@ void Robot::RobotInit() {
   // Publish elements to shuffleboard.
   frc::ShuffleboardTab& tab = frc::Shuffleboard::GetTab("Pneumatics");
   tab.Add("Single Solenoid", &m_solenoid);
-  tab.Add("Souble Solenoid", &m_doubleSolenoid);
+  tab.Add("Double Solenoid", &m_doubleSolenoid);
   tab.Add("Compressor", &m_compressor);
 
   // Also publish some raw data
@@ -31,6 +31,11 @@ void Robot::RobotInit() {
     // Get compressor current draw.
     units::ampere_t compressorCurrent = m_compressor.GetCurrent();
     return compressorCurrent.value();
+  });
+  tab.AddBoolean("Pressure Switch", [&] {
+    // Get the digital pressure switch connected to the PCM/PH.
+    // The switch is open when the pressure is over ~120 PSI.
+    return m_compressor.GetPressureSwitchValue();
   });
 
   // Add the options and send the chooser to the dashboard.

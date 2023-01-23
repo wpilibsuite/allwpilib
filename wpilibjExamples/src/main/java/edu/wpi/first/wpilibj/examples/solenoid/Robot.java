@@ -70,7 +70,7 @@ public class Robot extends TimedRobot {
     // Publish elements to shuffleboard.
     ShuffleboardTab tab = Shuffleboard.getTab("Pneumatics");
     tab.add("Single Solenoid", m_solenoid);
-    tab.add("Souble Solenoid", m_doubleSolenoid);
+    tab.add("Double Solenoid", m_doubleSolenoid);
     tab.add("Compressor", m_compressor);
 
     // Also publish some raw data
@@ -94,6 +94,11 @@ public class Robot extends TimedRobot {
           // Get compressor current draw.
           return m_compressor.getCurrent();
         });
+    tab.addBoolean("Pressure Switch", () -> {
+      // Get the digital pressure switch connected to the PCM/PH.
+      // The switch is open when the pressure is over ~120 PSI.
+      return m_compressor.getPressureSwitchValue();
+    });
 
     // Add the options and send the chooser to the dashboard.
     m_compressorModeChooser.setDefaultOption("Digital", CompressorConfigType.Digital);
