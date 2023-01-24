@@ -7,7 +7,8 @@ package edu.wpi.first.wpilibj.examples.solenoid;
 // Using "import static an.enum.or.constants.inner.class.*;" helps reduce verbosity
 // this replaces "DoubleSolenoid.Value.kForward" with just kForward
 // further reading is available at https://www.geeksforgeeks.org/static-import-java/
-import static edu.wpi.first.wpilibj.DoubleSolenoid.Value.*;
+import static edu.wpi.first.wpilibj.DoubleSolenoid.Value.kForward;
+import static edu.wpi.first.wpilibj.DoubleSolenoid.Value.kReverse;
 
 import edu.wpi.first.wpilibj.AnalogPotentiometer;
 import edu.wpi.first.wpilibj.Compressor;
