@@ -96,11 +96,13 @@ public class Robot extends TimedRobot {
           // Get compressor current draw.
           return m_compressor.getCurrent();
         });
-    tab.addBoolean("Pressure Switch", () -> {
-      // Get the digital pressure switch connected to the PCM/PH.
-      // The switch is open when the pressure is over ~120 PSI.
-      return m_compressor.getPressureSwitchValue();
-    });
+    tab.addBoolean(
+        "Pressure Switch",
+        () -> {
+          // Get the digital pressure switch connected to the PCM/PH.
+          // The switch is open when the pressure is over ~120 PSI.
+          return m_compressor.getPressureSwitchValue();
+        });
 
     // Add the options and send the chooser to the dashboard.
     m_compressorModeChooser.setDefaultOption("Digital", CompressorConfigType.Digital);
