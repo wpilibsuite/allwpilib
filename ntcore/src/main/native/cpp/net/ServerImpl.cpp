@@ -2129,7 +2129,7 @@ void SImpl::SetFlags(ClientData* client, TopicData* topic, unsigned int flags) {
 void SImpl::SetValue(ClientData* client, TopicData* topic, const Value& value) {
   // update retained value if from same client or timestamp newer
   if (!topic->lastValue || topic->lastValueClient == client ||
-      value.time() >= topic->lastValue.time()) {
+      topic->lastValue.time() == 0 || value.time() >= topic->lastValue.time()) {
     DEBUG4("updating '{}' last value (time was {} is {})", topic->name,
            topic->lastValue.time(), value.time());
     topic->lastValue = value;
