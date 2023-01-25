@@ -5,6 +5,8 @@
 #pragma once
 
 #include <units/length.h>
+#include <wpi/sendable/Sendable.h>
+#include <wpi/sendable/SendableHelper.h>
 
 #include "frc/PWM.h"
 
@@ -13,7 +15,8 @@ namespace frc {
 /**
  * Common base class for all linear servos.
  */
-class LinearServo : public PWM {
+class LinearServo : public wpi::Sendable,
+                    public wpi::SendableHelper<LinearServo> {
  public:
   LinearServo(LinearServo&&) = default;
   LinearServo& operator=(LinearServo&&) = default;
@@ -82,6 +85,8 @@ class LinearServo : public PWM {
    * @param stroke Stroke distance of the linear servo.
    */
   LinearServo(std::string_view name, int channel, units::meter_t stroke);
+
+  PWM m_pwm;
 
  private:
   units::meter_t m_stroke;

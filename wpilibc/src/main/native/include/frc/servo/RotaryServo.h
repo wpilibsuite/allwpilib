@@ -5,6 +5,8 @@
 #pragma once
 
 #include <units/angle.h>
+#include <wpi/sendable/Sendable.h>
+#include <wpi/sendable/SendableHelper.h>
 
 #include "frc/PWM.h"
 
@@ -13,7 +15,8 @@ namespace frc {
 /**
  * Common base class for all rotary servos.
  */
-class RotaryServo : public PWM {
+class RotaryServo : public wpi::Sendable,
+                    public wpi::SendableHelper<RotaryServo> {
  public:
   RotaryServo(RotaryServo&&) = default;
   RotaryServo& operator=(RotaryServo&&) = default;
@@ -97,6 +100,8 @@ class RotaryServo : public PWM {
    */
   RotaryServo(std::string_view name, int channel, units::radian_t minServoAngle,
               units::radian_t maxServoAngle);
+
+  PWM m_pwm;
 
  private:
   units::radian_t GetServoAngleRange() const;

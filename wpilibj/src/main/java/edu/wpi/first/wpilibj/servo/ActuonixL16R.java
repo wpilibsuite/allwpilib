@@ -38,6 +38,6 @@ public class ActuonixL16R extends LinearServo {
   public ActuonixL16R(final int channel, final Stroke stroke) {
     super("ActuonixL16R", channel, stroke.value);
 
-    setBounds(2.0, 1.8, 1.5, 1.2, 1.0);
+    m_pwm.setBounds(2.0, 1.8, 1.5, 1.2, 1.0);
   }
 }

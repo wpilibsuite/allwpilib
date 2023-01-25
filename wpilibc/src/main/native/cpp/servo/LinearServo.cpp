@@ -11,15 +11,15 @@
 using namespace frc;
 
 void LinearServo::Set(double value) {
-  SetPosition(value);
+  m_pwm.SetPosition(value);
 }
 
 void LinearServo::SetOffline() {
-  SetRaw(0);
+  m_pwm.SetRaw(0);
 }
 
 double LinearServo::Get() const {
-  return GetPosition();
+  return m_pwm.GetPosition();
 }
 
 void LinearServo::SetExtendDistance(units::meter_t distance) {
@@ -29,21 +29,21 @@ void LinearServo::SetExtendDistance(units::meter_t distance) {
     distance = m_stroke;
   }
 
-  SetPosition(distance / m_stroke);
+  m_pwm.SetPosition(distance / m_stroke);
 }
 
 units::meter_t LinearServo::GetExtendDistance() const {
-  return GetPosition() * m_stroke;
+  return m_pwm.GetPosition() * m_stroke;
 }
 
 LinearServo::LinearServo(std::string_view name, int channel,
                          units::meter_t stroke)
-    : PWM(channel), m_stroke(stroke) {
+    : m_pwm(channel, false), m_stroke(stroke) {
   // Assign defaults for period multiplier for the servo PWM control signal
-  SetPeriodMultiplier(kPeriodMultiplier_4X);
+  m_pwm.SetPeriodMultiplier(PWM::kPeriodMultiplier_4X);
 
   HAL_Report(HALUsageReporting::kResourceType_Servo, channel + 1);
-  wpi::SendableRegistry::SetName(this, name, channel);
+  wpi::SendableRegistry::AddLW(this, name, channel);
 }
 
 void LinearServo::InitSendable(wpi::SendableBuilder& builder) {

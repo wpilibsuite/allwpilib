@@ -17,6 +17,6 @@ public class HS322HD extends RotaryServo {
   public HS322HD(final int channel) {
     super("HS322HD", channel, 0.0, Units.degreesToRadians(180.0));
 
-    setBounds(2.4, 0, 0, 0, 0.6);
+    m_pwm.setBounds(2.4, 0, 0, 0, 0.6);
   }
 }

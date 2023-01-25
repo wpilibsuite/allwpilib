@@ -6,12 +6,15 @@ package edu.wpi.first.wpilibj.servo;
 
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
+import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.util.sendable.SendableRegistry;
 import edu.wpi.first.wpilibj.PWM;
 
 /* Common base class for all linear servos */
-public abstract class LinearServo extends PWM {
+public abstract class LinearServo implements AutoCloseable, Sendable {
+  protected PWM m_pwm;
+
   protected double m_strokeMetres;
 
   /**
@@ -23,13 +26,13 @@ public abstract class LinearServo extends PWM {
    * @param strokeMeters Stroke distance of the linear servo in meters.
    */
   protected LinearServo(final String name, final int channel, final double strokeMeters) {
-    super(channel);
-    setPeriodMultiplier(PeriodMultiplier.k4X);
+    m_pwm = new PWM(channel, false);
+    m_pwm.setPeriodMultiplier(PWM.PeriodMultiplier.k4X);
 
     m_strokeMetres = strokeMeters;
 
-    HAL.report(tResourceType.kResourceType_Servo, getChannel() + 1);
-    SendableRegistry.setName(this, name, getChannel());
+    HAL.report(tResourceType.kResourceType_Servo, channel + 1);
+    SendableRegistry.addLW(this, name, channel);
   }
 
   /**
@@ -41,7 +44,7 @@ public abstract class LinearServo extends PWM {
    * @param value Position from 0.0 to 1.0.
    */
   public void set(double value) {
-    setPosition(value);
+    m_pwm.setPosition(value);
   }
 
   /**
@@ -54,7 +57,7 @@ public abstract class LinearServo extends PWM {
    * @return Position from 0.0 to 1.0.
    */
   public double get() {
-    return getPosition();
+    return m_pwm.getPosition();
   }
 
   /**
@@ -74,7 +77,7 @@ public abstract class LinearServo extends PWM {
       distanceMetres = m_strokeMetres;
     }
 
-    setPosition(distanceMetres / m_strokeMetres);
+    m_pwm.setPosition(distanceMetres / m_strokeMetres);
   }
 
   /**
@@ -86,7 +89,14 @@ public abstract class LinearServo extends PWM {
    * @return The distance in metres to which the servo is set.
    */
   public double getExtendDistance() {
-    return getPosition() * m_strokeMetres;
+    return m_pwm.getPosition() * m_strokeMetres;
+  }
+
+  /** Free the resource associated with the PWM channel and set the value to 0. */
+  @Override
+  public void close() {
+    SendableRegistry.remove(this);
+    m_pwm.close();
   }
 
   @Override

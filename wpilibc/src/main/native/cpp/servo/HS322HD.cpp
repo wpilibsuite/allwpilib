@@ -8,5 +8,5 @@ using namespace frc;
 
 HS322HD::HS322HD(int channel)
     : RotaryServo("HS322HD", channel, 0.0_rad, 180.0_rad) {
-  SetBounds(2.4, 0, 0, 0, 0.6);
+  m_pwm.SetBounds(2.4, 0, 0, 0, 0.6);
 }

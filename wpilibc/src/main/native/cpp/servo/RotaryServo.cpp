@@ -11,15 +11,15 @@
 using namespace frc;
 
 void RotaryServo::Set(double value) {
-  SetPosition(value);
+  m_pwm.SetPosition(value);
 }
 
 void RotaryServo::SetOffline() {
-  SetRaw(0);
+  m_pwm.SetRaw(0);
 }
 
 double RotaryServo::Get() const {
-  return GetPosition();
+  return m_pwm.GetPosition();
 }
 
 void RotaryServo::SetAngle(units::radian_t angle) {
@@ -29,11 +29,11 @@ void RotaryServo::SetAngle(units::radian_t angle) {
     angle = m_maxServoAngle;
   }
 
-  SetPosition((angle - m_minServoAngle) / GetServoAngleRange());
+  m_pwm.SetPosition((angle - m_minServoAngle) / GetServoAngleRange());
 }
 
 units::radian_t RotaryServo::GetAngle() const {
-  return GetPosition() * GetServoAngleRange() + m_minServoAngle;
+  return m_pwm.GetPosition() * GetServoAngleRange() + m_minServoAngle;
 }
 
 units::radian_t RotaryServo::GetMaxAngle() const {
@@ -47,14 +47,14 @@ units::radian_t RotaryServo::GetMinAngle() const {
 RotaryServo::RotaryServo(std::string_view name, int channel,
                          units::radian_t minServoAngle,
                          units::radian_t maxServoAngle)
-    : PWM(channel),
+    : m_pwm(channel, false),
       m_minServoAngle(minServoAngle),
       m_maxServoAngle(maxServoAngle) {
   // Assign defaults for period multiplier for the servo PWM control signal
-  SetPeriodMultiplier(kPeriodMultiplier_4X);
+  m_pwm.SetPeriodMultiplier(PWM::kPeriodMultiplier_4X);
 
   HAL_Report(HALUsageReporting::kResourceType_Servo, channel + 1);
-  wpi::SendableRegistry::SetName(this, name, channel);
+  wpi::SendableRegistry::AddLW(this, name, channel);
 }
 
 void RotaryServo::InitSendable(wpi::SendableBuilder& builder) {

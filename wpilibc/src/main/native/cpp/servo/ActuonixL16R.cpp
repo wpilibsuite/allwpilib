@@ -16,5 +16,5 @@ ActuonixL16R::ActuonixL16R(int channel, Stroke stroke)
           return 140_mm;
         }
       }()) {
-  SetBounds(2.0, 1.8, 1.5, 1.2, 1.0);
+  m_pwm.SetBounds(2.0, 1.8, 1.5, 1.2, 1.0);
 }

@@ -6,12 +6,15 @@ package edu.wpi.first.wpilibj.servo;
 
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
+import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.util.sendable.SendableRegistry;
 import edu.wpi.first.wpilibj.PWM;
 
 /* Common base class for all rotary servos */
-public abstract class RotaryServo extends PWM {
+public abstract class RotaryServo implements AutoCloseable, Sendable {
+  protected PWM m_pwm;
+
   protected double m_minServoAngleRadians;
   protected double m_maxServoAngleRadians;
 
@@ -29,14 +32,14 @@ public abstract class RotaryServo extends PWM {
       final int channel,
       final double minServoAngleRadians,
       final double maxServoAngleRadians) {
-    super(channel);
-    setPeriodMultiplier(PeriodMultiplier.k4X);
+    m_pwm = new PWM(channel, false);
+    m_pwm.setPeriodMultiplier(PWM.PeriodMultiplier.k4X);
 
     m_minServoAngleRadians = minServoAngleRadians;
     m_maxServoAngleRadians = maxServoAngleRadians;
 
-    HAL.report(tResourceType.kResourceType_Servo, getChannel() + 1);
-    SendableRegistry.setName(this, name, getChannel());
+    HAL.report(tResourceType.kResourceType_Servo, channel + 1);
+    SendableRegistry.addLW(this, name, channel);
   }
 
   /**
@@ -47,7 +50,7 @@ public abstract class RotaryServo extends PWM {
    * @param value Position from 0.0 to 1.0.
    */
   public void set(double value) {
-    setPosition(value);
+    m_pwm.setPosition(value);
   }
 
   /**
@@ -60,7 +63,7 @@ public abstract class RotaryServo extends PWM {
    * @return Position from 0.0 to 1.0.
    */
   public double get() {
-    return getPosition();
+    return m_pwm.getPosition();
   }
 
   /**
@@ -80,7 +83,7 @@ public abstract class RotaryServo extends PWM {
       angle = m_maxServoAngleRadians;
     }
 
-    setPosition((angle - m_minServoAngleRadians) / getServoAngleRange());
+    m_pwm.setPosition((angle - m_minServoAngleRadians) / getServoAngleRange());
   }
 
   /**
@@ -92,11 +95,18 @@ public abstract class RotaryServo extends PWM {
    * @return The angle in radians to which the servo is set.
    */
   public double getAngleRadians() {
-    return getPosition() * getServoAngleRange() + m_minServoAngleRadians;
+    return m_pwm.getPosition() * getServoAngleRange() + m_minServoAngleRadians;
   }
 
   private double getServoAngleRange() {
     return m_maxServoAngleRadians - m_minServoAngleRadians;
+  }
+
+  /** Free the resource associated with the PWM channel and set the value to 0. */
+  @Override
+  public void close() {
+    SendableRegistry.remove(this);
+    m_pwm.close();
   }
 
   @Override
