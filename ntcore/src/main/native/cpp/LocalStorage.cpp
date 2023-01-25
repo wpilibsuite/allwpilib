@@ -501,7 +501,8 @@ bool LSImpl::SetValue(TopicData* topic, const Value& value,
   if (topic->type != NT_UNASSIGNED && topic->type != value.type()) {
     return false;
   }
-  if (!topic->lastValue || value.time() >= topic->lastValue.time()) {
+  if (!topic->lastValue || topic->lastValue.time() == 0 ||
+      value.time() >= topic->lastValue.time()) {
     // TODO: notify option even if older value
     topic->type = value.type();
     topic->lastValue = value;

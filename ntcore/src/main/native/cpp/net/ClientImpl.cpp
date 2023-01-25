@@ -268,6 +268,10 @@ void CImpl::SendValues(uint64_t curTimeMs, bool flush) {
         int64_t time = val.time();
         if (time != 0) {
           time += m_serverTimeOffsetUs;
+          // make sure resultant time isn't exactly 0
+          if (time == 0) {
+            time = 1;
+          }
         }
         WireEncodeBinary(writer.Add(), Handle{pub->handle}.GetIndex(), time,
                          val);
