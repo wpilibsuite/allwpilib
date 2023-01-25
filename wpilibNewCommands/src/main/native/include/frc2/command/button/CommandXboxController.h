@@ -10,7 +10,7 @@
 
 namespace frc2 {
 /**
- * A subclass of {@link XboxController} with {@link Trigger} factories for
+ * A version of {@link XboxController} with {@link Trigger} factories for
  * command-based.
  *
  * @see XboxController

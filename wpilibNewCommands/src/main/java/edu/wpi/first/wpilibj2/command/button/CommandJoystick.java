@@ -9,7 +9,7 @@ import edu.wpi.first.wpilibj.event.EventLoop;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 
 /**
- * A subclass of {@link Joystick} with {@link Trigger} factories for command-based.
+ * A version of {@link Joystick} with {@link Trigger} factories for command-based.
  *
  * @see Joystick
  */
