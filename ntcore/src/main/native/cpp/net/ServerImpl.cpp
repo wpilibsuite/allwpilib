@@ -656,10 +656,13 @@ void ClientData4Base::ClientSubscribe(int64_t subuid,
 
     // is client already subscribed?
     bool wasSubscribed = false;
+    bool wasSubscribedValue = false;
     for (auto subscriber : topic->subscribers) {
       if (subscriber->client == this) {
         wasSubscribed = true;
-        break;
+        if (!subscriber->options.topicsOnly) {
+          wasSubscribedValue = true;
+        }
       }
     }
 
@@ -673,16 +676,17 @@ void ClientData4Base::ClientSubscribe(int64_t subuid,
       m_server.UpdateMetaTopicSub(topic.get());
     }
 
-    if (!wasSubscribed && added && !removed) {
-      // announce topic to client
+    // announce topic to client if not previously announced
+    if (added && !removed && !wasSubscribed) {
       DEBUG4("client {}: announce {}", m_id, topic->name);
       SendAnnounce(topic.get(), std::nullopt);
+    }
 
-      // send last value
-      if (!sub->options.topicsOnly && topic->lastValue) {
-        DEBUG4("send last value for {} to client {}", topic->name, m_id);
-        SendValue(topic.get(), topic->lastValue, kSendAll);
-      }
+    // send last value
+    if (added && !sub->options.topicsOnly && !wasSubscribedValue &&
+        topic->lastValue) {
+      DEBUG4("send last value for {} to client {}", topic->name, m_id);
+      SendValue(topic.get(), topic->lastValue, kSendAll);
     }
   }
 

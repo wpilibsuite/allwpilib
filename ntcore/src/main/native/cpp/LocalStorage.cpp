@@ -909,6 +909,7 @@ std::unique_ptr<EntryData> LSImpl::RemoveEntry(NT_Entry entryHandle) {
 
 MultiSubscriberData* LSImpl::AddMultiSubscriber(
     std::span<const std::string_view> prefixes, const PubSubOptions& options) {
+  DEBUG4("AddMultiSubscriber({})", fmt::join(prefixes, ","));
   auto subscriber = m_multiSubscribers.Add(m_inst, prefixes, options);
   // subscribe to any already existing topics
   for (auto&& topic : m_topics) {
@@ -920,6 +921,7 @@ MultiSubscriberData* LSImpl::AddMultiSubscriber(
     }
   }
   if (m_network) {
+    DEBUG4("-> NetworkSubscribe");
     m_network->Subscribe(subscriber->handle, subscriber->prefixes,
                          subscriber->options);
   }
