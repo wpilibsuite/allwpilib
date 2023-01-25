@@ -858,7 +858,7 @@ SubscriberData* LSImpl::AddLocalSubscriber(TopicData* topic,
         topic->name, config.typeStr, topic->typeStr);
   }
   if (m_network) {
-    DEBUG4("-> NetworkSubscribe");
+    DEBUG4("-> NetworkSubscribe({})", topic->name);
     m_network->Subscribe(subscriber->handle, {{topic->name}}, config);
   }
 
