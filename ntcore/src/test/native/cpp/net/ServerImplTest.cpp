@@ -95,12 +95,20 @@ static std::string EncodeText(const T& msgs) {
 }
 
 template <typename T>
-static std::vector<uint8_t> EncodeBinary(const T& msgs) {
+static std::vector<uint8_t> EncodeServerBinary(const T& msgs) {
   std::vector<uint8_t> data;
   wpi::raw_uvector_ostream os{data};
   for (auto&& msg : msgs) {
-    if (auto m = std::get_if<net::ServerValueMsg>(&msg.contents)) {
-      net::WireEncodeBinary(os, m->topic, m->value.time(), m->value);
+    if constexpr (std::is_same_v<typename T::value_type, net::ServerMessage>) {
+      if (auto m = std::get_if<net::ServerValueMsg>(&msg.contents)) {
+        net::WireEncodeBinary(os, m->topic, m->value.time(), m->value);
+      }
+    } else if constexpr (std::is_same_v<typename T::value_type,
+                                        net::ClientMessage>) {
+      if (auto m = std::get_if<net::ClientValueMsg>(&msg.contents)) {
+        net::WireEncodeBinary(os, Handle{m->pubHandle}.GetIndex(),
+                              m->value.time(), m->value);
+      }
     }
   }
   return data;
@@ -231,8 +239,9 @@ TEST_F(ServerImplTest, ClientSubTopicOnlyThenValue) {
       std::vector<net::ServerMessage> smsgs;
       smsgs.emplace_back(net::ServerMessage{
           net::ServerValueMsg{3, Value::MakeDouble(1.0, 10)}});
-      EXPECT_CALL(wire,
-                  Binary(wpi::SpanEq(EncodeBinary(smsgs))));  // SendValues()
+      EXPECT_CALL(
+          wire,
+          Binary(wpi::SpanEq(EncodeServerBinary(smsgs))));  // SendValues()
     }
     EXPECT_CALL(wire, Flush());  // SendValues()
   }
@@ -264,6 +273,61 @@ TEST_F(ServerImplTest, ClientSubTopicOnlyThenValue) {
   }
 
   server.SendValues(id, 200);
+}
+
+TEST_F(ServerImplTest, ZeroTimestampNegativeTime) {
+  // publish before client connect
+  server.SetLocal(&local);
+  NT_Publisher pubHandle = nt::Handle{0, 1, nt::Handle::kPublisher};
+  NT_Topic topicHandle = nt::Handle{0, 1, nt::Handle::kTopic};
+  NT_Subscriber subHandle = nt::Handle{0, 1, nt::Handle::kSubscriber};
+  Value defaultValue = Value::MakeDouble(1.0, 10);
+  defaultValue.SetTime(0);
+  defaultValue.SetServerTime(0);
+  Value value = Value::MakeDouble(5, -10);
+  {
+    ::testing::InSequence seq;
+    EXPECT_CALL(local, NetworkAnnounce("test", "double", wpi::json::object(),
+                                       pubHandle))
+        .WillOnce(Return(topicHandle));
+    EXPECT_CALL(local, NetworkSetValue(topicHandle, defaultValue));
+    EXPECT_CALL(local, NetworkSetValue(topicHandle, value));
+  }
+
+  {
+    std::vector<net::ClientMessage> msgs;
+    msgs.emplace_back(net::ClientMessage{net::PublishMsg{
+        pubHandle, topicHandle, "test", "double", wpi::json::object(), {}}});
+    msgs.emplace_back(
+        net::ClientMessage{net::ClientValueMsg{pubHandle, defaultValue}});
+    msgs.emplace_back(
+        net::ClientMessage{net::SubscribeMsg{subHandle, {"test"}, {}}});
+    server.HandleLocal(msgs);
+  }
+
+  // client connect; it should get already-published topic as soon as it
+  // subscribes
+  ::testing::StrictMock<net::MockWireConnection> wire;
+  MockSetPeriodicFunc setPeriodic;
+  {
+    ::testing::InSequence seq;
+    EXPECT_CALL(wire, Flush());  // AddClient()
+  }
+  auto [name, id] = server.AddClient("test", "connInfo", false, wire,
+                                     setPeriodic.AsStdFunction());
+
+  // publish and send non-default value with negative time offset
+  {
+    NT_Subscriber pubHandle2 = nt::Handle{0, 2, nt::Handle::kPublisher};
+    std::vector<net::ClientMessage> msgs;
+    msgs.emplace_back(net::ClientMessage{net::PublishMsg{
+        pubHandle2, topicHandle, "test", "double", wpi::json::object(), {}}});
+    server.ProcessIncomingText(id, EncodeText(msgs));
+    msgs.clear();
+    msgs.emplace_back(
+        net::ClientMessage{net::ClientValueMsg{pubHandle2, value}});
+    server.ProcessIncomingBinary(id, EncodeServerBinary(msgs));
+  }
 }
 
 }  // namespace nt
