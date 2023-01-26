@@ -128,17 +128,18 @@ class Robot : public frc::TimedRobot {
 
   void TeleopPeriodic() override {
     if (m_joystick.GetTrigger()) {
-      // Here, we run PID control like normal, with a constant setpoint of 30in.
+      // Here, we set the constant setpoint of 30in.
       m_controller.SetGoal(kSetpoint);
-      double pidOutput =
+    } else {
+      // Otherwise, we update the setpoint to 0.
+      m_controller.SetGoal(0.0);
+    }
+    // With the setpoint value we run PID control like normal
+    double pidOutput =
           m_controller.Calculate(units::meter_t{m_encoder.GetDistance()});
       units::volt_t feedforwardOutput =
           m_feedforward.Calculate(m_controller.GetSetpoint().velocity);
       m_motor.SetVoltage(units::volt_t{pidOutput} + feedforwardOutput);
-    } else {
-      // Otherwise, we disable the motor.
-      m_motor.Set(0.0);
-    }
   }
   // To view the Elevator in the simulator, select Network Tables ->
   // SmartDashboard -> Elevator Sim
