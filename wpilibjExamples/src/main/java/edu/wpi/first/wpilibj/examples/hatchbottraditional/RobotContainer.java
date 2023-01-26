@@ -79,20 +79,24 @@ public class RobotContainer {
     // Log Shuffleboard events for command initialize, execute, finish, interrupt
     CommandScheduler.getInstance()
         .onCommandInitialize(
-            command -> Shuffleboard.addEventMarker(
-                "Command initialized", command.getName(), EventImportance.kNormal));
+            command ->
+                Shuffleboard.addEventMarker(
+                    "Command initialized", command.getName(), EventImportance.kNormal));
     CommandScheduler.getInstance()
         .onCommandExecute(
-            command -> Shuffleboard.addEventMarker(
-                "Command executed", command.getName(), EventImportance.kNormal));
+            command ->
+                Shuffleboard.addEventMarker(
+                    "Command executed", command.getName(), EventImportance.kNormal));
     CommandScheduler.getInstance()
         .onCommandFinish(
-            command -> Shuffleboard.addEventMarker(
-                "Command finished", command.getName(), EventImportance.kNormal));
+            command ->
+                Shuffleboard.addEventMarker(
+                    "Command finished", command.getName(), EventImportance.kNormal));
     CommandScheduler.getInstance()
         .onCommandInterrupt(
-            command -> Shuffleboard.addEventMarker(
-                "Command interrupted", command.getName(), EventImportance.kNormal));
+            command ->
+                Shuffleboard.addEventMarker(
+                    "Command interrupted", command.getName(), EventImportance.kNormal));
   }
 
   /**

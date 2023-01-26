@@ -28,5 +28,8 @@ void HatchSubsystem::InitSendable(wpi::SendableBuilder& builder) {
   SubsystemBase::InitSendable(builder);
 
   // Publish the solenoid state to telemetry.
-  builder.AddBooleanProperty("extended", [this] { return m_hatchSolenoid.Get() == frc::DoubleSolenoid::kForward; }, nullptr);
+  builder.AddBooleanProperty(
+      "extended",
+      [this] { return m_hatchSolenoid.Get() == frc::DoubleSolenoid::kForward; },
+      nullptr);
 }

@@ -48,8 +48,11 @@ void DriveSubsystem::SetMaxOutput(double maxOutput) {
 
 void DriveSubsystem::InitSendable(wpi::SendableBuilder& builder) {
   SubsystemBase::InitSendable(builder);
-  
+
   // Publish encoder distances to telemetry.
-  builder.AddDoubleProperty("leftDistance", [this] {return m_leftEncoder.GetDistance(); }, nullptr);
-  builder.AddDoubleProperty("rightDistance", [this] {return m_rightEncoder.GetDistance(); }, nullptr);
+  builder.AddDoubleProperty(
+      "leftDistance", [this] { return m_leftEncoder.GetDistance(); }, nullptr);
+  builder.AddDoubleProperty(
+      "rightDistance", [this] { return m_rightEncoder.GetDistance(); },
+      nullptr);
 }
