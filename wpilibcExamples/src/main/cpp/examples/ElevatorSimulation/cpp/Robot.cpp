@@ -136,10 +136,10 @@ class Robot : public frc::TimedRobot {
     }
     // With the setpoint value we run PID control like normal
     double pidOutput =
-          m_controller.Calculate(units::meter_t{m_encoder.GetDistance()});
-      units::volt_t feedforwardOutput =
-          m_feedforward.Calculate(m_controller.GetSetpoint().velocity);
-      m_motor.SetVoltage(units::volt_t{pidOutput} + feedforwardOutput);
+        m_controller.Calculate(units::meter_t{m_encoder.GetDistance()});
+    units::volt_t feedforwardOutput =
+        m_feedforward.Calculate(m_controller.GetSetpoint().velocity);
+    m_motor.SetVoltage(units::volt_t{pidOutput} + feedforwardOutput);
   }
   // To view the Elevator in the simulator, select Network Tables ->
   // SmartDashboard -> Elevator Sim
