@@ -28,10 +28,9 @@
 #include <units/length.h>
 #include <units/moment_of_inertia.h>
 
-/**
- * This is a sample program to demonstrate how to use a state-space controller
- * to control an arm.
- */
+/** This is a sample program to demonstrate the use of elevator simulation with
+ * existing code. */
+
 class Robot : public frc::TimedRobot {
   static constexpr int kMotorPort = 0;
   static constexpr int kEncoderAChannel = 0;
