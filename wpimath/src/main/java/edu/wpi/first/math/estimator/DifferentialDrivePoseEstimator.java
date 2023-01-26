@@ -212,20 +212,21 @@ public class DifferentialDrivePoseEstimator {
    *     or sync the epochs.
    */
   public void addVisionMeasurement(Pose2d visionRobotPoseMeters, double timestampSeconds) {
-    // Step 1: Get the pose odometry measured at the moment the vision measurement was made.
+    // Step 1: Get the odometry pose measured at the moment the vision measurement was made.
     var sample = m_poseBuffer.getSample(timestampSeconds);
 
     if (sample.isEmpty()) {
       return;
     }
 
-    // Step 2: Apply the odometry delta in the time since the vision timestamp to estimate the
-    // "current" vision pose
+    // Step 2: Get the odometry delta in the time since the vision measurement,
     var delta = new Transform2d(sample.get().poseMeters, m_odometry.getPoseMeters());
-    visionRobotPoseMeters = visionRobotPoseMeters.transformBy(delta);
+    // and apply its inverse to the current pose estimate to get the estimate at the time
+    // of the vision measurement
+    var old_estimate = m_poseEstimate.transformBy(delta.inverse());
 
-    // Step 3: Measure the twist between the estimated pose and the "current" vision pose
-    var twist = m_poseEstimate.log(visionRobotPoseMeters);
+    // Step 3: Measure the twist between the "old" estimated pose and the vision pose
+    var twist = old_estimate.log(visionRobotPoseMeters);
 
     // Step 4: We should not trust the twist entirely, so instead we scale this twist by a Kalman
     // gain matrix representing how much we trust vision measurements compared to our current pose.
@@ -243,8 +244,11 @@ public class DifferentialDrivePoseEstimator {
     double[] scaledTwistVals = weighted_k_times_twist.getData();
     var scaledTwist = new Twist2d(scaledTwistVals[0], scaledTwistVals[1], scaledTwistVals[2]);
 
-    // Step 6: Apply scaled twist to the last estimated pose
-    m_poseEstimate = m_poseEstimate.exp(scaledTwist);
+    // Step 6: Apply scaled twist to the "old" estimated pose
+    old_estimate = old_estimate.exp(scaledTwist);
+
+    // Step 7: Re-apply odometry delta to get the "current" estimated pose
+    m_poseEstimate = old_estimate.transformBy(delta);
   }
 
   /**
