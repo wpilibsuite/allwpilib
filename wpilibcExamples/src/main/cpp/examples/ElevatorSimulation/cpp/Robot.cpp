@@ -132,7 +132,7 @@ class Robot : public frc::TimedRobot {
       m_controller.SetGoal(kSetpoint);
     } else {
       // Otherwise, we update the setpoint to 0.
-      m_controller.SetGoal(0.0);
+      m_controller.SetGoal(0.0_m);
     }
     // With the setpoint value we run PID control like normal
     double pidOutput =
