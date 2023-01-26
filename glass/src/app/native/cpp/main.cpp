@@ -52,6 +52,7 @@ static bool gSetEnterKey = false;
 static bool gKeyEdit = false;
 static int* gEnterKey;
 static void (*gPrevKeyCallback)(GLFWwindow*, int, int, int, int);
+static bool gNetworkTablesDebugLog = false;
 
 static void RemapEnterKeyCallback(GLFWwindow* window, int key, int scancode,
                                   int action, int mods) {
@@ -72,9 +73,8 @@ static void RemapEnterKeyCallback(GLFWwindow* window, int key, int scancode,
 static void NtInitialize() {
   auto inst = nt::GetDefaultInstance();
   auto poller = nt::CreateListenerPoller(inst);
-  nt::AddPolledListener(
-      poller, inst,
-      NT_EVENT_CONNECTION | NT_EVENT_IMMEDIATE | NT_EVENT_LOGMESSAGE);
+  nt::AddPolledListener(poller, inst, NT_EVENT_CONNECTION | NT_EVENT_IMMEDIATE);
+  nt::AddPolledLogger(poller, 0, 100);
   gui::AddEarlyExecute([poller] {
     auto win = gui::GetSystemWindow();
     if (!win) {
@@ -98,6 +98,8 @@ static void NtInitialize() {
           level = "ERROR: ";
         } else if (msg->level >= NT_LOG_WARNING) {
           level = "WARNING: ";
+        } else if (!gNetworkTablesDebugLog) {
+          return;
         }
         gNetworkTablesLog.Append(fmt::format(
             "{}{} ({}:{})\n", level, msg->message, msg->filename, msg->line));
@@ -232,6 +234,8 @@ int main(int argc, char** argv) {
       if (gNetworkTablesLogWindow) {
         gNetworkTablesLogWindow->DisplayMenuItem("NetworkTables Log");
       }
+      ImGui::MenuItem("NetworkTables Debug Logging", nullptr,
+                      &gNetworkTablesDebugLog);
       ImGui::Separator();
       gNtProvider->DisplayMenu();
       ImGui::EndMenu();
