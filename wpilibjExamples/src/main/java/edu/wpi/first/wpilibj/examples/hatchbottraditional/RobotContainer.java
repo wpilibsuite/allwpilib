@@ -17,9 +17,11 @@ import edu.wpi.first.wpilibj.examples.hatchbottraditional.commands.HalveDriveSpe
 import edu.wpi.first.wpilibj.examples.hatchbottraditional.commands.ReleaseHatch;
 import edu.wpi.first.wpilibj.examples.hatchbottraditional.subsystems.DriveSubsystem;
 import edu.wpi.first.wpilibj.examples.hatchbottraditional.subsystems.HatchSubsystem;
+import edu.wpi.first.wpilibj.shuffleboard.EventImportance;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 
 /**
@@ -70,6 +72,27 @@ public class RobotContainer {
 
     // Put the chooser on the dashboard
     Shuffleboard.getTab("Autonomous").add(m_chooser);
+    // Put subsystems to dashboard.
+    Shuffleboard.getTab("Drivetrain").add(m_robotDrive);
+    Shuffleboard.getTab("HatchSubsystem").add(m_hatchSubsystem);
+
+    // Log Shuffleboard events for command initialize, execute, finish, interrupt
+    CommandScheduler.getInstance()
+        .onCommandInitialize(
+            command -> Shuffleboard.addEventMarker(
+                "Command initialized", command.getName(), EventImportance.kNormal));
+    CommandScheduler.getInstance()
+        .onCommandExecute(
+            command -> Shuffleboard.addEventMarker(
+                "Command executed", command.getName(), EventImportance.kNormal));
+    CommandScheduler.getInstance()
+        .onCommandFinish(
+            command -> Shuffleboard.addEventMarker(
+                "Command finished", command.getName(), EventImportance.kNormal));
+    CommandScheduler.getInstance()
+        .onCommandInterrupt(
+            command -> Shuffleboard.addEventMarker(
+                "Command interrupted", command.getName(), EventImportance.kNormal));
   }
 
   /**
