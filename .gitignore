@@ -9,6 +9,8 @@ simgui-ds.json
 simgui-window.json
 simgui.json
 
+networktables.json
+
 # Created by the jenkins test script
 test-reports
 
