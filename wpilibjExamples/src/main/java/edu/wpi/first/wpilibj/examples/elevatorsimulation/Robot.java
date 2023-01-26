@@ -119,15 +119,16 @@ public class Robot extends TimedRobot {
   @Override
   public void teleopPeriodic() {
     if (m_joystick.getTrigger()) {
-      // Here, we run PID control like normal, with a constant setpoint of 30in.
+      // Here, we set the constant setpoint of 30in.
       m_controller.setGoal(kSetpoint);
-      double pidOutput = m_controller.calculate(m_encoder.getDistance());
-      double feedforwardOutput = m_feedforward.calculate(m_controller.getSetpoint().velocity);
-      m_motor.setVoltage(pidOutput + feedforwardOutput);
     } else {
-      // Otherwise, we disable the motor.
-      m_motor.set(0.0);
+      // Otherwise, we update the setpoint to 0.
+      m_controller.setGoal(0.0);
     }
+    // With the setpoint value we run PID control like normal
+    double pidOutput = m_controller.calculate(m_encoder.getDistance());
+    double feedforwardOutput = m_feedforward.calculate(m_controller.getSetpoint().velocity);
+    m_motor.setVoltage(pidOutput + feedforwardOutput);
   }
   // To view the Elevator in the simulator, select Network Tables -> SmartDashboard -> Elevator Sim
 
