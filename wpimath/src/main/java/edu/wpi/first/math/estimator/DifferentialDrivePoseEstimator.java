@@ -170,6 +170,7 @@ public class DifferentialDrivePoseEstimator {
   public Pose2d getEstimatedPosition() {
     return m_poseEstimate;
   }
+
   /**
    * Gets the estimated robot pose at timestampSeconds.
    *
@@ -183,7 +184,9 @@ public class DifferentialDrivePoseEstimator {
    * @return The estimated robot pose in meters.
    */
   public Pose2d getEstimatedPosition(double timestampSeconds) {
-    if (m_poseBuffer.getInternalBuffer().isEmpty()) return m_poseEstimate;
+    if (m_poseBuffer.getInternalBuffer().isEmpty()) {
+      return m_poseEstimate;
+    }
     // current to old odometry delta
     var delta =
         new Transform2d(
