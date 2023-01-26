@@ -97,16 +97,11 @@ TEST(Translation2dTest, PolarConstructor) {
 TEST(Translation2dTest, Nearest) {
   const Translation2d origin{0_m, 0_m};
 
-  const Translation2d translation1{
-      1_m, Rotation2d{units::degree_t{static_cast<double>(std::rand() % 360)}}};
-  const Translation2d translation2{
-      2_m, Rotation2d{units::degree_t{static_cast<double>(std::rand() % 360)}}};
-  const Translation2d translation3{
-      3_m, Rotation2d{units::degree_t{static_cast<double>(std::rand() % 360)}}};
-  const Translation2d translation4{
-      4_m, Rotation2d{units::degree_t{static_cast<double>(std::rand() % 360)}}};
-  const Translation2d translation5{
-      5_m, Rotation2d{units::degree_t{static_cast<double>(std::rand() % 360)}}};
+  const Translation2d translation1{1_m, Rotation2d{45_deg}};
+  const Translation2d translation2{2_m, Rotation2d{90_deg}};
+  const Translation2d translation3{3_m, Rotation2d{135_deg}};
+  const Translation2d translation4{4_m, Rotation2d{180_deg}};
+  const Translation2d translation5{5_m, Rotation2d{270_deg}};
 
   EXPECT_DOUBLE_EQ(
       origin.Nearest({translation5, translation3, translation4}).X().value(),

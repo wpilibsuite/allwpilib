@@ -58,26 +58,11 @@ TEST(Pose2dTest, Minus) {
 TEST(Pose2dTest, Nearest) {
   const Pose2d origin{0_m, 0_m, 0_deg};
 
-  const Pose2d pose1{
-      Translation2d{1_m, Rotation2d{units::degree_t{
-                             static_cast<double>(std::rand() % 360)}}},
-      0_deg};
-  const Pose2d pose2{
-      Translation2d{2_m, Rotation2d{units::degree_t{
-                             static_cast<double>(std::rand() % 360)}}},
-      0_deg};
-  const Pose2d pose3{
-      Translation2d{3_m, Rotation2d{units::degree_t{
-                             static_cast<double>(std::rand() % 360)}}},
-      0_deg};
-  const Pose2d pose4{
-      Translation2d{4_m, Rotation2d{units::degree_t{
-                             static_cast<double>(std::rand() % 360)}}},
-      0_deg};
-  const Pose2d pose5{
-      Translation2d{5_m, Rotation2d{units::degree_t{
-                             static_cast<double>(std::rand() % 360)}}},
-      0_deg};
+  const Pose2d pose1{Translation2d{1_m, Rotation2d{45_deg}}, 0_deg};
+  const Pose2d pose2{Translation2d{2_m, Rotation2d{90_deg}}, 0_deg};
+  const Pose2d pose3{Translation2d{3_m, Rotation2d{135_deg}}, 0_deg};
+  const Pose2d pose4{Translation2d{4_m, Rotation2d{180_deg}}, 0_deg};
+  const Pose2d pose5{Translation2d{5_m, Rotation2d{270_deg}}, 0_deg};
 
   EXPECT_DOUBLE_EQ(pose3.X().value(),
                    origin.Nearest({pose5, pose3, pose4}).X().value());

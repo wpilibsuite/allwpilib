@@ -121,11 +121,11 @@ class Translation2dTest {
     var origin = new Translation2d();
 
     // each translationX is X units away from the origin at a random angle.
-    var translation1 = new Translation2d(1, Rotation2d.fromDegrees(Math.random() * 360));
-    var translation2 = new Translation2d(2, Rotation2d.fromDegrees(Math.random() * 360));
-    var translation3 = new Translation2d(3, Rotation2d.fromDegrees(Math.random() * 360));
-    var translation4 = new Translation2d(4, Rotation2d.fromDegrees(Math.random() * 360));
-    var translation5 = new Translation2d(5, Rotation2d.fromDegrees(Math.random() * 360));
+    var translation1 = new Translation2d(1, Rotation2d.fromDegrees(45));
+    var translation2 = new Translation2d(2, Rotation2d.fromDegrees(90));
+    var translation3 = new Translation2d(3, Rotation2d.fromDegrees(135));
+    var translation4 = new Translation2d(4, Rotation2d.fromDegrees(180));
+    var translation5 = new Translation2d(5, Rotation2d.fromDegrees(270));
 
     assertEquals(origin.nearest(List.of(translation5, translation3, translation4)), translation3);
     assertEquals(origin.nearest(List.of(translation1, translation2, translation3)), translation1);

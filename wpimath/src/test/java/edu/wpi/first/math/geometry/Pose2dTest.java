@@ -74,20 +74,15 @@ class Pose2dTest {
     // Distance sort
     // each poseX is X units away from the origin at a random angle.
     final var pose1 =
-        new Pose2d(
-            new Translation2d(1, Rotation2d.fromDegrees(Math.random() * 360)), new Rotation2d());
+        new Pose2d(new Translation2d(1, Rotation2d.fromDegrees(45)), new Rotation2d());
     final var pose2 =
-        new Pose2d(
-            new Translation2d(2, Rotation2d.fromDegrees(Math.random() * 360)), new Rotation2d());
+        new Pose2d(new Translation2d(2, Rotation2d.fromDegrees(90)), new Rotation2d());
     final var pose3 =
-        new Pose2d(
-            new Translation2d(3, Rotation2d.fromDegrees(Math.random() * 360)), new Rotation2d());
+        new Pose2d(new Translation2d(3, Rotation2d.fromDegrees(135)), new Rotation2d());
     final var pose4 =
-        new Pose2d(
-            new Translation2d(4, Rotation2d.fromDegrees(Math.random() * 360)), new Rotation2d());
+        new Pose2d(new Translation2d(4, Rotation2d.fromDegrees(180)), new Rotation2d());
     final var pose5 =
-        new Pose2d(
-            new Translation2d(5, Rotation2d.fromDegrees(Math.random() * 360)), new Rotation2d());
+        new Pose2d(new Translation2d(5, Rotation2d.fromDegrees(270)), new Rotation2d());
 
     assertEquals(pose3, origin.nearest(List.of(pose5, pose3, pose4)));
     assertEquals(pose1, origin.nearest(List.of(pose1, pose2, pose3)));
