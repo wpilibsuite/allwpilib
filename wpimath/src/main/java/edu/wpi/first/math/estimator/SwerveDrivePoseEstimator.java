@@ -22,6 +22,7 @@ import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.util.WPIUtilJNI;
 import java.util.Arrays;
 import java.util.Objects;
+import java.util.Optional;
 
 /**
  * This class wraps {@link SwerveDriveOdometry Swerve Drive Odometry} to fuse latency-compensated
@@ -153,7 +154,7 @@ public class SwerveDrivePoseEstimator {
   }
 
   /**
-   * Gets the estimated robot pose.
+   * Gets the current estimated robot pose.
    *
    * @return The estimated robot pose in meters.
    */
@@ -162,7 +163,9 @@ public class SwerveDrivePoseEstimator {
   }
 
   /**
-   * Gets the estimated robot pose at timestampSeconds.
+   * Gets the estimated robot pose at timestampSeconds. If the buffer is empty, or the requested
+   * timestamp is outside the buffer history, an empty Optional is returned. The buffer history size
+   * used is 1.5 seconds.
    *
    * @param timestampSeconds The timestamp of the pose estimate in seconds. Note that if you don't
    *     use your own time source by calling {@link
@@ -171,18 +174,21 @@ public class SwerveDrivePoseEstimator {
    *     the same epoch as {@link edu.wpi.first.wpilibj.Timer#getFPGATimestamp()}.) This means that
    *     you should use {@link edu.wpi.first.wpilibj.Timer#getFPGATimestamp()} as your time source
    *     or sync the epochs.
-   * @return The estimated robot pose in meters.
+   * @return The estimated robot pose in meters at that timestamp or an empty Optional.
    */
-  public Pose2d getEstimatedPosition(double timestampSeconds) {
-    if (m_poseBuffer.getInternalBuffer().isEmpty()) {
-      return m_poseEstimate;
+  public Optional<Pose2d> getEstimatedPosition(double timestampSeconds) {
+    var bufferMap = m_poseBuffer.getInternalBuffer();
+    if (bufferMap.isEmpty()
+        || timestampSeconds < bufferMap.firstKey()
+        || timestampSeconds > bufferMap.lastKey()) {
+      return Optional.empty();
     }
     // Find the odometry delta between now and the given timestamp,
     var delta =
         new Transform2d(
             m_odometry.getPoseMeters(), m_poseBuffer.getSample(timestampSeconds).get().poseMeters);
     // and apply it to the current pose estimate.
-    return m_poseEstimate.transformBy(delta);
+    return Optional.of(m_poseEstimate.transformBy(delta));
   }
 
   /**
@@ -190,7 +196,10 @@ public class SwerveDrivePoseEstimator {
    * while still accounting for measurement noise.
    *
    * <p>This method can be called as infrequently as you want, as long as you are calling {@link
-   * SwerveDrivePoseEstimator#update} every loop.
+   * SwerveDrivePoseEstimator#update} every loop beforehand.
+   *
+   * <p>Vision measurements with timestamps outside of the odometry pose buffer will be ignored. The
+   * buffer history size used is 1.5 seconds.
    *
    * <p>To promote stability of the pose estimate and make it robust to bad vision data, we
    * recommend only adding vision measurements that are already within one meter or so of the
@@ -209,7 +218,9 @@ public class SwerveDrivePoseEstimator {
     // Step 1: Get the odometry pose measured at the moment the vision measurement was made.
     var sample = m_poseBuffer.getSample(timestampSeconds);
 
-    if (sample.isEmpty()) {
+    if (sample.isEmpty()
+        || timestampSeconds < m_poseBuffer.getInternalBuffer().firstKey()
+        || timestampSeconds > m_poseBuffer.getInternalBuffer().lastKey()) {
       return;
     }
 
