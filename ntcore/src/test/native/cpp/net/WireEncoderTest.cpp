@@ -172,14 +172,15 @@ TEST_F(WireEncoderTextTest, MessageSubscribe) {
   ASSERT_TRUE(net::WireEncodeText(os, msg));
   ASSERT_EQ(os.str(),
             "{\"method\":\"subscribe\",\"params\":{"
-            "\"options\":{},\"topics\":[\"a\",\"b\"],\"subuid\":5}}");
+            "\"options\":{},\"topics\":[\"a\",\"b\"],\"subuid\":402653189}}");
 }
 
 TEST_F(WireEncoderTextTest, MessageUnsubscribe) {
   net::ClientMessage msg{
       net::UnsubscribeMsg{Handle{0, 5, Handle::kSubscriber}}};
   ASSERT_TRUE(net::WireEncodeText(os, msg));
-  ASSERT_EQ(os.str(), "{\"method\":\"unsubscribe\",\"params\":{\"subuid\":5}}");
+  ASSERT_EQ(os.str(),
+            "{\"method\":\"unsubscribe\",\"params\":{\"subuid\":402653189}}");
 }
 
 TEST_F(WireEncoderTextTest, MessageAnnounce) {
