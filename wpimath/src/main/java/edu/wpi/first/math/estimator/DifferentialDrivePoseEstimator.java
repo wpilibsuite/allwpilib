@@ -187,10 +187,11 @@ public class DifferentialDrivePoseEstimator {
     if (m_poseBuffer.getInternalBuffer().isEmpty()) {
       return m_poseEstimate;
     }
-    // current to old odometry delta
+    // Find the odometry delta between now and the given timestamp,
     var delta =
         new Transform2d(
             m_odometry.getPoseMeters(), m_poseBuffer.getSample(timestampSeconds).get().poseMeters);
+    // and apply it to the current pose estimate.
     return m_poseEstimate.transformBy(delta);
   }
 
@@ -225,10 +226,10 @@ public class DifferentialDrivePoseEstimator {
     // Step 2: Get the odometry delta in the time since the vision measurement,
     var delta = new Transform2d(sample.get().poseMeters, m_odometry.getPoseMeters());
     // and apply its inverse to the current pose estimate to get the estimate at the time
-    // of the vision measurement
+    // of the vision measurement.
     var old_estimate = m_poseEstimate.transformBy(delta.inverse());
 
-    // Step 3: Measure the twist between the "old" estimated pose and the vision pose
+    // Step 3: Measure the twist between the "old" estimated pose and the vision pose.
     var twist = old_estimate.log(visionRobotPoseMeters);
 
     // Step 4: We should not trust the twist entirely, so instead we scale this twist by a Kalman
@@ -247,10 +248,10 @@ public class DifferentialDrivePoseEstimator {
     double[] scaledTwistVals = weighted_k_times_twist.getData();
     var scaledTwist = new Twist2d(scaledTwistVals[0], scaledTwistVals[1], scaledTwistVals[2]);
 
-    // Step 6: Apply scaled twist to the "old" estimated pose
+    // Step 6: Apply scaled twist to the "old" estimated pose.
     old_estimate = old_estimate.exp(scaledTwist);
 
-    // Step 7: Re-apply odometry delta to get the "current" estimated pose
+    // Step 7: Re-apply odometry delta to get the "current" estimated pose.
     m_poseEstimate = old_estimate.transformBy(delta);
   }
 
@@ -319,17 +320,17 @@ public class DifferentialDrivePoseEstimator {
       Rotation2d gyroAngle,
       double distanceLeftMeters,
       double distanceRightMeters) {
-    // update odometry
+    // Update the internal odometry.
     var lastOdom = m_odometry.getPoseMeters();
     var currOdom = m_odometry.update(gyroAngle, distanceLeftMeters, distanceRightMeters);
     m_poseBuffer.addSample(
         currentTimeSeconds,
         new InterpolationRecord(currOdom, distanceLeftMeters, distanceRightMeters));
 
-    // apply odometry update to pose estimate
+    // Apply this odometry update to the current pose estimate as well.
     m_poseEstimate = m_poseEstimate.transformBy(new Transform2d(lastOdom, currOdom));
 
-    // reset kalman gain sum matrix
+    // Reset the Kalman gain sum matrix.
     m_visionKSum = Matrix.eye(Nat.N3());
 
     return getEstimatedPosition();
