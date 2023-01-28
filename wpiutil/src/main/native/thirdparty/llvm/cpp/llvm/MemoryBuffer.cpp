@@ -237,16 +237,16 @@ static std::unique_ptr<WritableMemoryBuffer> GetMemoryBufferForStream(
 #endif
   // Read into Buffer until we hit EOF.
   do {
-    size_t size = buffer.size();
-    buffer.resize_for_overwrite(size + ChunkSize);
+    size_t prevSize = buffer.size();
+    buffer.resize_for_overwrite(prevSize + ChunkSize);
 #ifdef _WIN32
     if (!ReadFile(f, buffer.begin() + size, ChunkSize, &readBytes, nullptr)) {
       ec = mapWindowsError(GetLastError());
       return nullptr;
     }
 #else
-    readBytes =
-        sys::RetryAfterSignal(-1, ::read, f, buffer.begin() + size, ChunkSize);
+    readBytes = sys::RetryAfterSignal(-1, ::read, f, buffer.begin() + prevSize,
+                                      ChunkSize);
     if (readBytes == -1) {
       ec = std::error_code(errno, std::generic_category());
       return nullptr;
