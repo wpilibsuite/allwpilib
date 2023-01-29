@@ -332,8 +332,7 @@ public class MecanumControllerCommand extends CommandBase {
     m_prevSpeeds =
         m_kinematics.toWheelSpeeds(new ChassisSpeeds(initialXVelocity, initialYVelocity, 0.0));
 
-    m_timer.reset();
-    m_timer.start();
+    m_timer.restart();
   }
 
   @Override

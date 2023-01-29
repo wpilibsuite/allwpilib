@@ -88,8 +88,7 @@ TEST_F(SwerveControllerCommandTest, ReachesReference) {
       m_rotController,
       [&](auto moduleStates) { m_moduleStates = moduleStates; }, {&subsystem});
 
-  m_timer.Reset();
-  m_timer.Start();
+  m_timer.Restart();x
 
   command.Initialize();
   while (!command.IsFinished()) {

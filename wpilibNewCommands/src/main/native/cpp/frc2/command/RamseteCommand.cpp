@@ -92,8 +92,7 @@ void RamseteCommand::Initialize() {
   m_prevSpeeds = m_kinematics.ToWheelSpeeds(
       frc::ChassisSpeeds{initialState.velocity, 0_mps,
                          initialState.velocity * initialState.curvature});
-  m_timer.Reset();
-  m_timer.Start();
+  m_timer.Restart
   if (m_usePID) {
     m_leftController->Reset();
     m_rightController->Reset();
