@@ -5,6 +5,7 @@
 package edu.wpi.first.wpilibj.simulation;
 
 import edu.wpi.first.math.Matrix;
+import edu.wpi.first.math.Nat;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N2;
 import edu.wpi.first.math.system.LinearSystem;
@@ -74,7 +75,8 @@ public class DCMotorSim extends LinearSystemSim<N2, N1, N2> {
    * @param gearing The gearing of the DC motor (numbers greater than 1 represent reductions).
    * @param measurementStdDevs The standard deviations of the measurements.
    */
-  public DCMotorSim(double kV, double kA, DCMotor gearbox, double gearing, Matrix<N2, N1> measurementStdDevs) {
+  public DCMotorSim(
+      double kV, double kA, DCMotor gearbox, double gearing, Matrix<N2, N1> measurementStdDevs) {
     super(identifySystem(kV, kA), measurementStdDevs);
     m_gearbox = gearbox;
     m_gearing = gearing;
@@ -171,15 +173,17 @@ public class DCMotorSim extends LinearSystemSim<N2, N1, N2> {
   }
 
   /**
-   * 
-   * 
+   * Identifies a position and velocity system, based on velocity and acceleration gains.
+   *
+   * <p>This is useful for identifying a state space system for use with {@link DCMotorSim}.
+   *
    * @param kV The velocity gain, in volts/(unit/sec)
    * @param kA The acceleration gain, in volts/(unit/sec²)
    * @return A LinearSystem representing the given characterized constants.
    * @throws IllegalArgumentException if kV &lt;= 0 or kA &lt;= 0.
    * @see <a href="https://github.com/wpilibsuite/sysid">https://github.com/wpilibsuite/sysid</a>
    */
-  public static LinearSystemSim<N2, N1, N2> identifySystem(double kV, double kA) {
+  public static LinearSystem<N2, N1, N2> identifySystem(double kV, double kA) {
     if (kV <= 0.0) {
       throw new IllegalArgumentException("Kv must be greater than zero.");
     }
@@ -191,6 +195,6 @@ public class DCMotorSim extends LinearSystemSim<N2, N1, N2> {
         Matrix.mat(Nat.N2(), Nat.N2()).fill(0.0, 1.0, 0.0, -kV / kA),
         Matrix.mat(Nat.N2(), Nat.N1()).fill(0, 1.0 / kA),
         Matrix.eye(Nat.N2()),
-        Matrix.mat(Nat.N2(), Nat.N1()).fill(0.0, 0.0));
+        new Matrix<>(Nat.N2(), Nat.N1()));
   }
 }

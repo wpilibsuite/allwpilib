@@ -50,6 +50,19 @@ public class FlywheelSim extends LinearSystemSim<N1, N1, N1> {
     m_gearing = gearing;
   }
 
+  public FlywheelSim(double kV, double kA, DCMotor gearbox, double gearing) {
+    super(LinearSystemId.identifyVelocitySystem(kV, kA));
+    m_gearbox = gearbox;
+    m_gearing = gearing;
+  }
+
+  public FlywheelSim(
+      double kV, double kA, DCMotor gearbox, double gearing, Matrix<N1, N1> measurementStdDevs) {
+    super(LinearSystemId.identifyVelocitySystem(kV, kA), measurementStdDevs);
+    m_gearbox = gearbox;
+    m_gearing = gearing;
+  }
+
   /**
    * Creates a simulated flywheel mechanism.
    *

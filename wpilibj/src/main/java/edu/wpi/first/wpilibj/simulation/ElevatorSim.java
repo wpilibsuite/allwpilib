@@ -5,6 +5,7 @@
 package edu.wpi.first.wpilibj.simulation;
 
 import edu.wpi.first.math.Matrix;
+import edu.wpi.first.math.Nat;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N2;
@@ -30,8 +31,8 @@ public class ElevatorSim extends LinearSystemSim<N2, N1, N1> {
   // The max allowable height for the elevator.
   private final double m_maxHeight;
 
-  // Whether the simulator should simulate gravity.
-  private final boolean m_simulateGravity;
+  // The acceleration applied to the system due to gravity.
+  private final double m_gravityAccel;
 
   /**
    * Creates a simulated elevator mechanism.
@@ -90,7 +91,38 @@ public class ElevatorSim extends LinearSystemSim<N2, N1, N1> {
     m_drumRadius = drumRadiusMeters;
     m_minHeight = minHeightMeters;
     m_maxHeight = maxHeightMeters;
-    m_simulateGravity = simulateGravity;
+    m_gravityAccel = simulateGravity ? -9.81 : 0;
+  }
+
+  public ElevatorSim(
+      double kG,
+      double kV,
+      double kA,
+      DCMotor gearbox,
+      double gearing,
+      double drumRadiusMeters,
+      double minHeightMeters,
+      double maxHeightMeters) {
+    this(kG, kV, kA, gearbox, gearing, drumRadiusMeters, minHeightMeters, maxHeightMeters, null);
+  }
+
+  public ElevatorSim(
+      double kG,
+      double kV,
+      double kA,
+      DCMotor gearbox,
+      double gearing,
+      double drumRadiusMeters,
+      double minHeightMeters,
+      double maxHeightMeters,
+      Matrix<N1, N1> measurementStdDevs) {
+    super(identifySystem(kV, kA), measurementStdDevs);
+    m_gearbox = gearbox;
+    m_gearing = gearing;
+    m_drumRadius = drumRadiusMeters;
+    m_minHeight = minHeightMeters;
+    m_maxHeight = maxHeightMeters;
+    m_gravityAccel = kG / kA;
   }
 
   /**
@@ -152,7 +184,7 @@ public class ElevatorSim extends LinearSystemSim<N2, N1, N1> {
     m_drumRadius = drumRadiusMeters;
     m_minHeight = minHeightMeters;
     m_maxHeight = maxHeightMeters;
-    m_simulateGravity = simulateGravity;
+    m_gravityAccel = simulateGravity ? -9.81 : 0.0;
   }
 
   /**
@@ -238,6 +270,35 @@ public class ElevatorSim extends LinearSystemSim<N2, N1, N1> {
   }
 
   /**
+   * Identifies 1dof system, based on velocity and acceleration gains.
+   *
+   * <p>
+   * This is useful for identifying a state space system for use with
+   * {@link ElevatorSim}.
+   *
+   * @param kV The velocity gain, in volts/(unit/sec)
+   * @param kA The acceleration gain, in volts/(unit/sec²)
+   * @return A LinearSystem representing the given characterized constants.
+   * @throws IllegalArgumentException if kV &lt;= 0 or kA &lt;= 0.
+   * @see <a href=
+   *      "https://github.com/wpilibsuite/sysid">https://github.com/wpilibsuite/sysid</a>
+   */
+  private static LinearSystem<N2, N1, N1> identifySystem(double kV, double kA) {
+    if (kV <= 0.0) {
+      throw new IllegalArgumentException("Kv must be greater than zero.");
+    }
+    if (kA <= 0.0) {
+      throw new IllegalArgumentException("Ka must be greater than zero.");
+    }
+
+    return new LinearSystem<N2, N1, N1>(
+        Matrix.mat(Nat.N2(), Nat.N2()).fill(0.0, 1.0, 0.0, -kV / kA),
+        Matrix.mat(Nat.N2(), Nat.N1()).fill(0, 1.0 / kA),
+        Matrix.mat(Nat.N1(), Nat.N2()).fill(1, 0),
+        new Matrix<>(Nat.N1(), Nat.N1()));
+  }
+
+  /**
    * Updates the state of the elevator.
    *
    * @param currentXhat The current state estimate.
@@ -249,13 +310,12 @@ public class ElevatorSim extends LinearSystemSim<N2, N1, N1> {
     // Calculate updated x-hat from Runge-Kutta.
     var updatedXhat =
         NumericalIntegration.rkdp(
-            (x, _u) -> {
-              Matrix<N2, N1> xdot = m_plant.getA().times(x).plus(m_plant.getB().times(_u));
-              if (m_simulateGravity) {
-                xdot = xdot.plus(VecBuilder.fill(0, -9.8));
-              }
-              return xdot;
-            },
+            (x, _u) ->
+                m_plant
+                    .getA()
+                    .times(x)
+                    .plus(m_plant.getB().times(_u))
+                    .plus(VecBuilder.fill(0, m_gravityAccel)),
             currentXhat,
             u,
             dtSeconds);

@@ -5,6 +5,7 @@
 package edu.wpi.first.wpilibj.simulation;
 
 import edu.wpi.first.math.Matrix;
+import edu.wpi.first.math.Nat;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N2;
@@ -30,8 +31,8 @@ public class SingleJointedArmSim extends LinearSystemSim<N2, N1, N1> {
   // The maximum angle that the arm is capable of.
   private final double m_maxAngle;
 
-  // Whether the simulator should simulate gravity.
-  private final boolean m_simulateGravity;
+  // The acceleration applied to the system due to gravity.
+  private final double m_gravityAccel;
 
   /**
    * Creates a simulated arm mechanism.
@@ -90,7 +91,38 @@ public class SingleJointedArmSim extends LinearSystemSim<N2, N1, N1> {
     m_armLenMeters = armLengthMeters;
     m_minAngle = minAngleRads;
     m_maxAngle = maxAngleRads;
-    m_simulateGravity = simulateGravity;
+    m_gravityAccel = simulateGravity ? -9.81 : 0;
+  }
+
+  public SingleJointedArmSim(
+      double kG,
+      double kV,
+      double kA,
+      DCMotor gearbox,
+      double gearing,
+      double armLengthMeters,
+      double minAngleRads,
+      double maxAngleRads) {
+    this(kG, kV, kA, gearbox, gearing, armLengthMeters, minAngleRads, maxAngleRads, null);
+  }
+
+  public SingleJointedArmSim(
+      double kG,
+      double kV,
+      double kA,
+      DCMotor gearbox,
+      double gearing,
+      double armLengthMeters,
+      double minAngleRads,
+      double maxAngleRads,
+      Matrix<N1, N1> measurementStdDevs) {
+    super(identifySystem(kV, kA), measurementStdDevs);
+    m_gearbox = gearbox;
+    m_gearing = gearing;
+    m_armLenMeters = armLengthMeters;
+    m_minAngle = minAngleRads;
+    m_maxAngle = maxAngleRads;
+    m_gravityAccel = kG / kA;
   }
 
   /**
@@ -152,7 +184,7 @@ public class SingleJointedArmSim extends LinearSystemSim<N2, N1, N1> {
     m_armLenMeters = armLengthMeters;
     m_minAngle = minAngleRads;
     m_maxAngle = maxAngleRads;
-    m_simulateGravity = simulateGravity;
+    m_gravityAccel = simulateGravity ? -9.81 : 0.0;
   }
 
   /**
@@ -244,6 +276,21 @@ public class SingleJointedArmSim extends LinearSystemSim<N2, N1, N1> {
     return 1.0 / 3.0 * massKg * lengthMeters * lengthMeters;
   }
 
+  public static LinearSystem<N2, N1, N1> identifySystem(double kV, double kA) {
+    if (kV <= 0.0) {
+      throw new IllegalArgumentException("Kv must be greater than zero.");
+    }
+    if (kA <= 0.0) {
+      throw new IllegalArgumentException("Ka must be greater than zero.");
+    }
+
+    return new LinearSystem<N2, N1, N1>(
+        Matrix.mat(Nat.N2(), Nat.N2()).fill(0.0, 1.0, 0.0, -kV / kA),
+        Matrix.mat(Nat.N2(), Nat.N1()).fill(0, 1.0 / kA),
+        Matrix.mat(Nat.N1(), Nat.N2()).fill(1, 0),
+        new Matrix<>(Nat.N1(), Nat.N1()));
+  }
+
   /**
    * Updates the state of the arm.
    *
@@ -279,14 +326,15 @@ public class SingleJointedArmSim extends LinearSystemSim<N2, N1, N1> {
 
     Matrix<N2, N1> updatedXhat =
         NumericalIntegration.rkdp(
-            (Matrix<N2, N1> x, Matrix<N1, N1> _u) -> {
-              Matrix<N2, N1> xdot = m_plant.getA().times(x).plus(m_plant.getB().times(_u));
-              if (m_simulateGravity) {
-                double alphaGrav = 3.0 / 2.0 * -9.8 * Math.cos(x.get(0, 0)) / m_armLenMeters;
-                xdot = xdot.plus(VecBuilder.fill(0, alphaGrav));
-              }
-              return xdot;
-            },
+            (Matrix<N2, N1> x, Matrix<N1, N1> _u) ->
+                m_plant
+                    .getA()
+                    .times(x)
+                    .plus(m_plant.getB().times(_u))
+                    .plus(
+                        VecBuilder.fill(
+                            0,
+                            3.0 / 2.0 * m_gravityAccel * Math.cos(x.get(0, 0)) / m_armLenMeters)),
             currentXhat,
             u,
             dtSeconds);
