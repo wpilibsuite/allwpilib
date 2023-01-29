@@ -6,6 +6,7 @@
 
 #include <functional>
 #include <initializer_list>
+#include <memory>
 #include <span>
 #include <string>
 #include <type_traits>
