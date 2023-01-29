@@ -251,6 +251,8 @@ public final class NetworkTablesJNI {
 
   public static native void setServerTeam(int inst, int team, int port);
 
+  public static native void disconnect(int inst);
+
   public static native void startDSClient(int inst, int port);
 
   public static native void stopDSClient(int inst);

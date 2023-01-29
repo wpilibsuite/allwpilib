@@ -492,6 +492,11 @@ void NetworkClient::SetServers(
   m_impl->SetServers(servers, NT_DEFAULT_PORT4);
 }
 
+void NetworkClient::Disconnect() {
+  m_impl->m_loopRunner.ExecAsync(
+      [this](auto&) { m_impl->Disconnect("requested by application"); });
+}
+
 void NetworkClient::StartDSClient(unsigned int port) {
   m_impl->StartDSClient(port);
 }
@@ -533,6 +538,11 @@ NetworkClient3::~NetworkClient3() {
 void NetworkClient3::SetServers(
     std::span<const std::pair<std::string, unsigned int>> servers) {
   m_impl->SetServers(servers, NT_DEFAULT_PORT3);
+}
+
+void NetworkClient3::Disconnect() {
+  m_impl->m_loopRunner.ExecAsync(
+      [this](auto&) { m_impl->Disconnect("requested by application"); });
 }
 
 void NetworkClient3::StartDSClient(unsigned int port) {

@@ -1088,6 +1088,14 @@ void SetServer(
 void SetServerTeam(NT_Inst inst, unsigned int team, unsigned int port);
 
 /**
+ * Disconnects the client if it's running and connected. This will automatically
+ * start reconnection attempts to the current server list.
+ *
+ * @param inst instance handle
+ */
+void Disconnect(NT_Inst inst);
+
+/**
  * Starts requesting server address from Driver Station.
  * This connects to the Driver Station running on localhost to obtain the
  * server IP address.

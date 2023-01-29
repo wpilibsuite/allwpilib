@@ -912,6 +912,16 @@ public final class NetworkTableInstance implements AutoCloseable {
   }
 
   /**
+   * Disconnects the client if it's running and connected. This will automatically start
+   * reconnection attempts to the current server list.
+   *
+   * @param inst instance handle
+   */
+  public void disconnect() {
+    NetworkTablesJNI.disconnect(m_handle);
+  }
+
+  /**
    * Starts requesting server address from Driver Station. This connects to the Driver Station
    * running on localhost to obtain the server IP address, and connects with the default port.
    */

@@ -537,6 +537,10 @@ void NT_SetServerTeam(NT_Inst inst, unsigned int team, unsigned int port) {
   nt::SetServerTeam(inst, team, port);
 }
 
+void NT_Disconnect(NT_Inst inst) {
+  nt::Disconnect(inst);
+}
+
 void NT_StartDSClient(NT_Inst inst, unsigned int port) {
   nt::StartDSClient(inst, port);
 }
