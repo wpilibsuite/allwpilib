@@ -159,13 +159,11 @@ namespace cmd {
  * @param commands map of commands to select from
  */
 template <typename Key, class... Types>
-[[nodiscard]] CommandPtr Select(
-    std::function<Key()> selector,
-    std::pair<Key, Types>&&... commands) {
+[[nodiscard]] CommandPtr Select(std::function<Key()> selector,
+                                std::pair<Key, Types>&&... commands) {
   std::vector<std::pair<Key, std::unique_ptr<Command>>> vec;
 
-  ((void)vec.emplace_back(commands.first,
-                          std::move(commands.second).Unwrap()),
+  ((void)vec.emplace_back(commands.first, std::move(commands.second).Unwrap()),
    ...);
 
   return SelectCommand(std::move(selector), std::move(vec)).ToPtr();
