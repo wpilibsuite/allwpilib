@@ -240,7 +240,8 @@ static std::unique_ptr<WritableMemoryBuffer> GetMemoryBufferForStream(
     size_t prevSize = buffer.size();
     buffer.resize_for_overwrite(prevSize + ChunkSize);
 #ifdef _WIN32
-    if (!ReadFile(f, buffer.begin() + size, ChunkSize, &readBytes, nullptr)) {
+    if (!ReadFile(f, buffer.begin() + prevSize, ChunkSize, &readBytes,
+                  nullptr)) {
       ec = mapWindowsError(GetLastError());
       return nullptr;
     }
