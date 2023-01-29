@@ -112,8 +112,7 @@ TEST_F(MecanumControllerCommandTest, ReachesReference) {
       },
       {&subsystem});
 
-  m_timer.Reset();
-  m_timer.Start();
+  m_timer.Restart();
 
   command.Initialize();
   while (!command.IsFinished()) {

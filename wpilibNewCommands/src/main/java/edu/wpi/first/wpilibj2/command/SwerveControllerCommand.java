@@ -210,8 +210,7 @@ public class SwerveControllerCommand extends CommandBase {
 
   @Override
   public void initialize() {
-    m_timer.reset();
-    m_timer.start();
+    m_timer.restart();
   }
 
   @Override
