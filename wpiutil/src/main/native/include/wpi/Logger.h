@@ -79,24 +79,6 @@ class Logger {
   WPI_LOG(inst, ::wpi::WPI_LOG_WARNING, format __VA_OPT__(, ) __VA_ARGS__)
 #define WPI_INFO(inst, format, ...) \
   WPI_LOG(inst, ::wpi::WPI_LOG_INFO, format __VA_OPT__(, ) __VA_ARGS__)
-
-#ifdef NDEBUG
-#define WPI_DEBUG(inst, format, ...) \
-  do {                               \
-  } while (0)
-#define WPI_DEBUG1(inst, format, ...) \
-  do {                                \
-  } while (0)
-#define WPI_DEBUG2(inst, format, ...) \
-  do {                                \
-  } while (0)
-#define WPI_DEBUG3(inst, format, ...) \
-  do {                                \
-  } while (0)
-#define WPI_DEBUG4(inst, format, ...) \
-  do {                                \
-  } while (0)
-#else
 #define WPI_DEBUG(inst, format, ...) \
   WPI_LOG(inst, ::wpi::WPI_LOG_DEBUG, format __VA_OPT__(, ) __VA_ARGS__)
 #define WPI_DEBUG1(inst, format, ...) \
@@ -107,7 +89,6 @@ class Logger {
   WPI_LOG(inst, ::wpi::WPI_LOG_DEBUG3, format __VA_OPT__(, ) __VA_ARGS__)
 #define WPI_DEBUG4(inst, format, ...) \
   WPI_LOG(inst, ::wpi::WPI_LOG_DEBUG4, format __VA_OPT__(, ) __VA_ARGS__)
-#endif
 
 }  // namespace wpi
 

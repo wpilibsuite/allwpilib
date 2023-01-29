@@ -142,10 +142,9 @@ bool nt::net::WireEncodeText(wpi::raw_ostream& os, const ClientMessage& msg) {
   } else if (auto m = std::get_if<SetPropertiesMsg>(&msg.contents)) {
     WireEncodeSetProperties(os, m->name, m->update);
   } else if (auto m = std::get_if<SubscribeMsg>(&msg.contents)) {
-    WireEncodeSubscribe(os, Handle{m->subHandle}.GetIndex(), m->topicNames,
-                        m->options);
+    WireEncodeSubscribe(os, m->subHandle, m->topicNames, m->options);
   } else if (auto m = std::get_if<UnsubscribeMsg>(&msg.contents)) {
-    WireEncodeUnsubscribe(os, Handle{m->subHandle}.GetIndex());
+    WireEncodeUnsubscribe(os, m->subHandle);
   } else {
     return false;
   }
