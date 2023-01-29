@@ -162,6 +162,7 @@ double PIDController::Calculate(double measurement) {
 
 double PIDController::Calculate(double measurement, double setpoint) {
   m_setpoint = setpoint;
+  m_haveSetpoint = true;
   return Calculate(measurement);
 }
 

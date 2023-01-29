@@ -327,6 +327,7 @@ public class PIDController implements Sendable, AutoCloseable {
    */
   public double calculate(double measurement, double setpoint) {
     m_setpoint = setpoint;
+    m_haveSetpoint = true;
     return calculate(measurement);
   }
 
