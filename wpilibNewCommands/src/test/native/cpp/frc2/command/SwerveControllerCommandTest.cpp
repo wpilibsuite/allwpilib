@@ -88,9 +88,10 @@ TEST_F(SwerveControllerCommandTest, ReachesReference) {
       m_rotController,
       [&](auto moduleStates) { m_moduleStates = moduleStates; }, {&subsystem});
 
-  m_timer.Restart();x
+  m_timer.Restart();
+  x
 
-  command.Initialize();
+      command.Initialize();
   while (!command.IsFinished()) {
     command.Execute();
     m_angle = trajectory.Sample(m_timer.Get()).pose.Rotation();

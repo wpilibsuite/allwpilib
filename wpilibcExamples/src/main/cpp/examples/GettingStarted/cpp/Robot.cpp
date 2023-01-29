@@ -19,9 +19,7 @@ class Robot : public frc::TimedRobot {
     m_timer.Start();
   }
 
-  void AutonomousInit() override {
-    m_timer.Restart();
-  }
+  void AutonomousInit() override { m_timer.Restart(); }
 
   void AutonomousPeriodic() override {
     // Drive for 2 seconds
