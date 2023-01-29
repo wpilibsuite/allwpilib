@@ -179,7 +179,7 @@ class WPILIB_DLLEXPORT Translation2d {
    * @return The nearest Translation2d from the collection.
    */
   Translation2d Nearest(
-      const std::span<Translation2d const> translations) const;
+      const std::span<const Translation2d> translations) const;
 
   /**
    * Returns the nearest Translation2d from a collection of translations

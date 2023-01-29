@@ -184,7 +184,7 @@ class WPILIB_DLLEXPORT Pose2d {
    * @param poses The collection of poses.
    * @return The nearest Pose2d from the collection.
    */
-  Pose2d Nearest(std::span<Pose2d const> poses) const;
+  Pose2d Nearest(std::span<const Pose2d> poses) const;
 
   /**
    * Returns the nearest Pose2d from a collection of poses

@@ -69,7 +69,7 @@ Twist2d Pose2d::Log(const Pose2d& end) const {
   return {translationPart.X(), translationPart.Y(), units::radian_t{dtheta}};
 }
 
-Pose2d Pose2d::Nearest(std::span<Pose2d const> poses) const {
+Pose2d Pose2d::Nearest(std::span<const Pose2d> poses) const {
   return *std::min_element(
       poses.begin(), poses.end(), [this](const Pose2d& a, const Pose2d& b) {
         auto aDistance = this->Translation().Distance(a.Translation());

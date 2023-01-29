@@ -24,7 +24,7 @@ bool Translation2d::operator==(const Translation2d& other) const {
 }
 
 Translation2d Translation2d::Nearest(
-    const std::span<Translation2d const> translations) const {
+    const std::span<const Translation2d> translations) const {
   return *std::min_element(translations.begin(), translations.end(),
                            [this](Translation2d a, Translation2d b) {
                              return this->Distance(a) < this->Distance(b);
