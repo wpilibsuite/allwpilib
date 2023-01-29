@@ -8,6 +8,7 @@
 #include <initializer_list>
 #include <span>
 #include <string>
+#include <type_traits>
 #include <utility>
 #include <vector>
 
@@ -156,13 +157,17 @@ namespace cmd {
  * @param selector the selector function
  * @param commands map of commands to select from
  */
-template <typename Key>
+template <typename Key, class... Types>
 [[nodiscard]] CommandPtr Select(
     std::function<Key()> selector,
-    std::vector<std::pair<Key, CommandPtr>> commands) {
-  return SelectCommand(std::move(selector),
-                       CommandPtr::UnwrapVector(std::move(commands)))
-      .ToPtr();
+    std::pair<Key, Types>&&... commands) {
+  std::vector<std::pair<Key, std::unique_ptr<Command>>> vec;
+
+  ((void)vec.emplace_back(commands.first,
+                          std::move(commands.second).Unwrap()),
+   ...);
+
+  return SelectCommand(std::move(selector), std::move(vec)).ToPtr();
 }
 
 // Command Groups
