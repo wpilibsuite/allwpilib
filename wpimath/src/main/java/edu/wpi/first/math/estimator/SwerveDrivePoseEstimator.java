@@ -22,7 +22,6 @@ import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.util.WPIUtilJNI;
 import java.util.Arrays;
 import java.util.Objects;
-import java.util.Optional;
 
 /**
  * This class wraps {@link SwerveDriveOdometry Swerve Drive Odometry} to fuse latency-compensated
@@ -40,7 +39,6 @@ public class SwerveDrivePoseEstimator {
   private final Matrix<N3, N1> m_q = new Matrix<>(Nat.N3(), Nat.N1());
   private final int m_numModules;
   private Matrix<N3, N3> m_visionK = new Matrix<>(Nat.N3(), Nat.N3());
-  private Matrix<N3, N3> m_visionKSum = Matrix.eye(Nat.N3());
   private Pose2d m_poseEstimate;
 
   private final TimeInterpolatableBuffer<InterpolationRecord> m_poseBuffer =
@@ -150,7 +148,6 @@ public class SwerveDrivePoseEstimator {
     m_odometry.resetPosition(gyroAngle, modulePositions, poseMeters);
     m_poseEstimate = poseMeters;
     m_poseBuffer.clear();
-    m_visionKSum = Matrix.eye(Nat.N3());
   }
 
   /**
@@ -160,35 +157,6 @@ public class SwerveDrivePoseEstimator {
    */
   public Pose2d getEstimatedPosition() {
     return m_poseEstimate;
-  }
-
-  /**
-   * Gets the estimated robot pose at timestampSeconds. If the buffer is empty, or the requested
-   * timestamp is outside the buffer history, an empty Optional is returned. The buffer history size
-   * used is 1.5 seconds.
-   *
-   * @param timestampSeconds The timestamp of the pose estimate in seconds. Note that if you don't
-   *     use your own time source by calling {@link
-   *     SwerveDrivePoseEstimator#updateWithTime(double,Rotation2d,SwerveModulePosition[])} then you
-   *     must use a timestamp with an epoch since FPGA startup (i.e., the epoch of this timestamp is
-   *     the same epoch as {@link edu.wpi.first.wpilibj.Timer#getFPGATimestamp()}.) This means that
-   *     you should use {@link edu.wpi.first.wpilibj.Timer#getFPGATimestamp()} as your time source
-   *     or sync the epochs.
-   * @return The estimated robot pose in meters at that timestamp or an empty Optional.
-   */
-  public Optional<Pose2d> getEstimatedPosition(double timestampSeconds) {
-    var bufferMap = m_poseBuffer.getInternalBuffer();
-    if (bufferMap.isEmpty()
-        || timestampSeconds < bufferMap.firstKey()
-        || timestampSeconds > bufferMap.lastKey()) {
-      return Optional.empty();
-    }
-    // Find the odometry delta between now and the given timestamp,
-    var delta =
-        new Transform2d(
-            m_odometry.getPoseMeters(), m_poseBuffer.getSample(timestampSeconds).get().poseMeters);
-    // and apply it to the current pose estimate.
-    return Optional.of(m_poseEstimate.transformBy(delta));
   }
 
   /**
@@ -237,16 +205,8 @@ public class SwerveDrivePoseEstimator {
     // gain matrix representing how much we trust vision measurements compared to our current pose.
     var k_times_twist = m_visionK.times(VecBuilder.fill(twist.dx, twist.dy, twist.dtheta));
 
-    // Step 5: The Kalman gains scale the vision twists independent of other vision measurements,
-    // so applying multiple vision measurements before the next update will have different results
-    // depending on the order they are applied in. We can sum the Kalman gains applied before the
-    // next update and use that to effectively average the twist for multiple vision measurements.
-    var weighted_k_times_twist =
-        k_times_twist.elementTimes(m_visionKSum.diag().extractColumnVector(0).elementPower(-1));
-    m_visionKSum = m_visionKSum.plus(m_visionK);
-
     // Step 5: Convert back to Twist2d.
-    double[] scaledTwistVals = weighted_k_times_twist.getData();
+    double[] scaledTwistVals = k_times_twist.getData();
     var scaledTwist = new Twist2d(scaledTwistVals[0], scaledTwistVals[1], scaledTwistVals[2]);
 
     // Step 6: Apply scaled twist to the "old" estimated pose.
@@ -335,9 +295,6 @@ public class SwerveDrivePoseEstimator {
 
     // Apply this odometry update to the current pose estimate as well.
     m_poseEstimate = m_poseEstimate.transformBy(new Transform2d(lastOdom, currOdom));
-
-    // Reset the Kalman gain sum matrix.
-    m_visionKSum = Matrix.eye(Nat.N3());
 
     return getEstimatedPosition();
   }
