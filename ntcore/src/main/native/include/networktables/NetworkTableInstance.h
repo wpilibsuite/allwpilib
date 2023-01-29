@@ -589,8 +589,6 @@ class NetworkTableInstance final {
   /**
    * Disconnects the client if it's running and connected. This will
    * automatically start reconnection attempts to the current server list.
-   *
-   * @param inst instance handle
    */
   void Disconnect();
 
