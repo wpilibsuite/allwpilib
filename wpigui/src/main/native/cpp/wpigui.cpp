@@ -4,6 +4,8 @@
 
 #include "wpigui.h"
 
+#include <stdint.h>
+
 #include <algorithm>
 #include <chrono>
 #include <cstdio>
@@ -364,7 +366,7 @@ void gui::Main() {
       double sleepTime = (1.0 / gContext->fps) - (glfwGetTime() - startTime);
       if (sleepTime > 1e-6) {
         std::this_thread::sleep_for(
-            std::chrono::microseconds(static_cast<long>(sleepTime * 1e6)));
+            std::chrono::microseconds(static_cast<int64_t>(sleepTime * 1e6)));
       }
     }
   }
