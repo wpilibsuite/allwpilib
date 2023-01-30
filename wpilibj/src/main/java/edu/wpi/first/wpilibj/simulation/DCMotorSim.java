@@ -183,7 +183,7 @@ public class DCMotorSim extends LinearSystemSim<N2, N1, N2> {
    * @throws IllegalArgumentException if kV &lt;= 0 or kA &lt;= 0.
    * @see <a href="https://github.com/wpilibsuite/sysid">https://github.com/wpilibsuite/sysid</a>
    */
-  public static LinearSystem<N2, N1, N2> identifySystem(double kV, double kA) {
+  private static LinearSystem<N2, N1, N2> identifySystem(double kV, double kA) {
     if (kV <= 0.0) {
       throw new IllegalArgumentException("Kv must be greater than zero.");
     }

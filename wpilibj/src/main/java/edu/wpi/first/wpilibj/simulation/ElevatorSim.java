@@ -5,7 +5,6 @@
 package edu.wpi.first.wpilibj.simulation;
 
 import edu.wpi.first.math.Matrix;
-import edu.wpi.first.math.Nat;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N2;
@@ -116,7 +115,7 @@ public class ElevatorSim extends LinearSystemSim<N2, N1, N1> {
       double minHeightMeters,
       double maxHeightMeters,
       Matrix<N1, N1> measurementStdDevs) {
-    super(identifySystem(kV, kA), measurementStdDevs);
+    super(LinearSystemId.identifyPositionSystem(kV, kA), measurementStdDevs);
     m_gearbox = gearbox;
     m_gearing = gearing;
     m_drumRadius = drumRadiusMeters;
@@ -267,35 +266,6 @@ public class ElevatorSim extends LinearSystemSim<N2, N1, N1> {
    */
   public void setInputVoltage(double volts) {
     setInput(volts);
-  }
-
-  /**
-   * Identifies 1dof system, based on velocity and acceleration gains.
-   *
-   * <p>
-   * This is useful for identifying a state space system for use with
-   * {@link ElevatorSim}.
-   *
-   * @param kV The velocity gain, in volts/(unit/sec)
-   * @param kA The acceleration gain, in volts/(unit/sec²)
-   * @return A LinearSystem representing the given characterized constants.
-   * @throws IllegalArgumentException if kV &lt;= 0 or kA &lt;= 0.
-   * @see <a href=
-   *      "https://github.com/wpilibsuite/sysid">https://github.com/wpilibsuite/sysid</a>
-   */
-  private static LinearSystem<N2, N1, N1> identifySystem(double kV, double kA) {
-    if (kV <= 0.0) {
-      throw new IllegalArgumentException("Kv must be greater than zero.");
-    }
-    if (kA <= 0.0) {
-      throw new IllegalArgumentException("Ka must be greater than zero.");
-    }
-
-    return new LinearSystem<N2, N1, N1>(
-        Matrix.mat(Nat.N2(), Nat.N2()).fill(0.0, 1.0, 0.0, -kV / kA),
-        Matrix.mat(Nat.N2(), Nat.N1()).fill(0, 1.0 / kA),
-        Matrix.mat(Nat.N1(), Nat.N2()).fill(1, 0),
-        new Matrix<>(Nat.N1(), Nat.N1()));
   }
 
   /**

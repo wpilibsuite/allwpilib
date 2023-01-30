@@ -5,7 +5,6 @@
 package edu.wpi.first.wpilibj.simulation;
 
 import edu.wpi.first.math.Matrix;
-import edu.wpi.first.math.Nat;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N2;
@@ -116,7 +115,7 @@ public class SingleJointedArmSim extends LinearSystemSim<N2, N1, N1> {
       double minAngleRads,
       double maxAngleRads,
       Matrix<N1, N1> measurementStdDevs) {
-    super(identifySystem(kV, kA), measurementStdDevs);
+    super(LinearSystemId.identifyPositionSystem(kV, kA), measurementStdDevs);
     m_gearbox = gearbox;
     m_gearing = gearing;
     m_armLenMeters = armLengthMeters;
@@ -274,21 +273,6 @@ public class SingleJointedArmSim extends LinearSystemSim<N2, N1, N1> {
    */
   public static double estimateMOI(double lengthMeters, double massKg) {
     return 1.0 / 3.0 * massKg * lengthMeters * lengthMeters;
-  }
-
-  public static LinearSystem<N2, N1, N1> identifySystem(double kV, double kA) {
-    if (kV <= 0.0) {
-      throw new IllegalArgumentException("Kv must be greater than zero.");
-    }
-    if (kA <= 0.0) {
-      throw new IllegalArgumentException("Ka must be greater than zero.");
-    }
-
-    return new LinearSystem<N2, N1, N1>(
-        Matrix.mat(Nat.N2(), Nat.N2()).fill(0.0, 1.0, 0.0, -kV / kA),
-        Matrix.mat(Nat.N2(), Nat.N1()).fill(0, 1.0 / kA),
-        Matrix.mat(Nat.N1(), Nat.N2()).fill(1, 0),
-        new Matrix<>(Nat.N1(), Nat.N1()));
   }
 
   /**
