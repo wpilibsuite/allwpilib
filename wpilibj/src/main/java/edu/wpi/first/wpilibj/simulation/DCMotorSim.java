@@ -54,8 +54,8 @@ public class DCMotorSim extends LinearSystemSim<N2, N1, N2> {
   /**
    * Creates a simulated DC motor mechanism.
    *
-   * @param kV The velocity gain, in volts/(unit/sec)
-   * @param kA The acceleration gain, in volts/(unit/sec²)
+   * @param kV The velocity gain, in volts/(unit/sec).
+   * @param kA The acceleration gain, in volts/(unit/sec²).
    * @param gearbox The type of and number of motors in the DC motor gearbox.
    * @param gearing The gearing of the DC motor (numbers greater than 1 represent reductions).
    */
@@ -66,8 +66,8 @@ public class DCMotorSim extends LinearSystemSim<N2, N1, N2> {
   /**
    * Creates a simulated DC motor mechanism.
    *
-   * @param kV The velocity gain, in volts/(unit/sec)
-   * @param kA The acceleration gain, in volts/(unit/sec²)
+   * @param kV The velocity gain, in volts/(unit/sec).
+   * @param kA The acceleration gain, in volts/(unit/sec²).
    * @param gearbox The type of and number of motors in the DC motor gearbox.
    * @param gearing The gearing of the DC motor (numbers greater than 1 represent reductions).
    * @param measurementStdDevs The standard deviations of the measurements.

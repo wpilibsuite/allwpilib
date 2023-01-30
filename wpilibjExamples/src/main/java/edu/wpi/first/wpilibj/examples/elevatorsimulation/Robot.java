@@ -60,7 +60,7 @@ public class Robot extends TimedRobot {
           kMinElevatorHeight,
           kMaxElevatorHeight,
           true,
-          VecBuilder.fill(0.01));
+          VecBuilder.fill(0.01, 0.01));
   private final EncoderSim m_encoderSim = new EncoderSim(m_encoder);
 
   // Create a Mechanism2d visualization of the elevator

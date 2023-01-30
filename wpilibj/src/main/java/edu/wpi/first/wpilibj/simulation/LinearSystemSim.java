@@ -188,9 +188,10 @@ public class LinearSystemSim<States extends Num, Inputs extends Num, Outputs ext
    * <p>This method exists to convert common linear systems used for state space control into their
    * simulation equivalents. Linear systems used in simulation are different from those used in
    * control because control typically measures only one output (eg. position), while both outputs
-   * are necessary in simulation. The input system is a <N2, N1, N1> linear system because that is
-   * commonly returned in {@link edu.wpi.first.math.system.plant.LinearSystemId} and type erasure
-   * prevents it from being any size.
+   * are necessary in simulation. The input system is a {@literal <}N2, N1, N1{@literal >} linear
+   * system because that is commonly returned in {@link
+   * edu.wpi.first.math.system.plant.LinearSystemId} and type erasure prevents it from being any
+   * size.
    *
    * @param system The original linear system, with 2 states, 1 input, and 1 output.
    * @return A modified linear system, with 2 states, 1 input, and 2 outputs for use in simulation.

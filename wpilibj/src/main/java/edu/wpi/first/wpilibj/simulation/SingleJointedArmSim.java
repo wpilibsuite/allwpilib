@@ -93,6 +93,18 @@ public class SingleJointedArmSim extends LinearSystemSim<N2, N1, N2> {
     m_gravityAccel = simulateGravity ? -9.81 : 0;
   }
 
+  /**
+   * Creates a simulated arm mechanism.
+   *
+   * @param kG The gravity gain, in volts.
+   * @param kV The velocity gain, in volts/(unit/sec).
+   * @param kA The acceleration gain, in volts/(unit/sec²).
+   * @param gearbox The type of and number of motors in the arm gearbox.
+   * @param gearing The gearing of the arm (numbers greater than 1 represent reductions).
+   * @param armLengthMeters The length of the arm.
+   * @param minAngleRads The minimum angle that the arm is capable of.
+   * @param maxAngleRads The maximum angle that the arm is capable of.
+   */
   public SingleJointedArmSim(
       double kG,
       double kV,
@@ -105,6 +117,19 @@ public class SingleJointedArmSim extends LinearSystemSim<N2, N1, N2> {
     this(kG, kV, kA, gearbox, gearing, armLengthMeters, minAngleRads, maxAngleRads, null);
   }
 
+  /**
+   * Creates a simulated arm mechanism.
+   *
+   * @param kG The gravity gain, in volts.
+   * @param kV The velocity gain, in volts/(unit/sec).
+   * @param kA The acceleration gain, in volts/(unit/sec²).
+   * @param gearbox The type of and number of motors in the arm gearbox.
+   * @param gearing The gearing of the arm (numbers greater than 1 represent reductions).
+   * @param armLengthMeters The length of the arm.
+   * @param minAngleRads The minimum angle that the arm is capable of.
+   * @param maxAngleRads The maximum angle that the arm is capable of.
+   * @param measurementStdDevs The standard deviations of the measurements.
+   */
   public SingleJointedArmSim(
       double kG,
       double kV,
@@ -233,7 +258,7 @@ public class SingleJointedArmSim extends LinearSystemSim<N2, N1, N2> {
    * @return The current arm angle.
    */
   public double getAngleRads() {
-    return m_y.get(0, 0);
+    return getOutput(0);
   }
 
   /**
@@ -242,7 +267,7 @@ public class SingleJointedArmSim extends LinearSystemSim<N2, N1, N2> {
    * @return The current arm velocity.
    */
   public double getVelocityRadPerSec() {
-    return m_x.get(1, 0);
+    return getOutput(1);
   }
 
   /**

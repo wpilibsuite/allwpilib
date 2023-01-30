@@ -33,7 +33,7 @@ class ElevatorSimTest {
             0.0,
             3.0,
             true,
-            VecBuilder.fill(0.01));
+            VecBuilder.fill(0.01, 0.01));
 
     try (var motor = new PWMVictorSPX(0);
         var encoder = new Encoder(0, 1)) {
@@ -71,7 +71,7 @@ class ElevatorSimTest {
             0.0,
             1.0,
             true,
-            VecBuilder.fill(0.01));
+            VecBuilder.fill(0.01, 0.01));
 
     for (int i = 0; i < 100; i++) {
       sim.setInput(VecBuilder.fill(0));

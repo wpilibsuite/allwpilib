@@ -93,6 +93,18 @@ public class ElevatorSim extends LinearSystemSim<N2, N1, N2> {
     m_gravityAccel = simulateGravity ? -9.81 : 0;
   }
 
+  /**
+   * Creates a simulated elevator mechanism.
+   *
+   * @param kG The gravity gain, in volts.
+   * @param kV The velocity gain, in volts/(unit/sec).
+   * @param kA The acceleration gain, in volts/(unit/sec²).
+   * @param gearbox The type of and number of motors in the elevator gearbox.
+   * @param gearing The gearing of the elevator (numbers greater than 1 represent reductions).
+   * @param drumRadiusMeters The radius of the drum that the elevator spool is wrapped around.
+   * @param minHeightMeters The min allowable height of the elevator.
+   * @param maxHeightMeters The max allowable height of the elevator.
+   */
   public ElevatorSim(
       double kG,
       double kV,
@@ -105,6 +117,19 @@ public class ElevatorSim extends LinearSystemSim<N2, N1, N2> {
     this(kG, kV, kA, gearbox, gearing, drumRadiusMeters, minHeightMeters, maxHeightMeters, null);
   }
 
+  /**
+   * Creates a simulated elevator mechanism.
+   *
+   * @param kG The gravity gain, in volts.
+   * @param kV The velocity gain, in volts/(unit/sec).
+   * @param kA The acceleration gain, in volts/(unit/sec²).
+   * @param gearbox The type of and number of motors in the elevator gearbox.
+   * @param gearing The gearing of the elevator (numbers greater than 1 represent reductions).
+   * @param drumRadiusMeters The radius of the drum that the elevator spool is wrapped around.
+   * @param minHeightMeters The min allowable height of the elevator.
+   * @param maxHeightMeters The max allowable height of the elevator.
+   * @param measurementStdDevs The standard deviations of the measurements.
+   */
   public ElevatorSim(
       double kG,
       double kV,
@@ -243,7 +268,7 @@ public class ElevatorSim extends LinearSystemSim<N2, N1, N2> {
    * @return The velocity of the elevator.
    */
   public double getVelocityMetersPerSecond() {
-    return m_x.get(1, 0);
+    return getOutput(1);
   }
 
   /**
