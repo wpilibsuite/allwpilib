@@ -163,6 +163,13 @@ enum Style { kStyleClassic = 0, kStyleDark, kStyleLight };
 void SetStyle(Style style);
 
 /**
+ * Sets the FPS limit.  Using this function makes this setting persistent.
+ *
+ * @param fps FPS (0=vsync)
+ */
+void SetFPS(int fps);
+
+/**
  * Sets the clear (background) color.
  *
  * @param color Color

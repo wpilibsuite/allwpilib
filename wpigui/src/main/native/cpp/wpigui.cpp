@@ -5,8 +5,10 @@
 #include "wpigui.h"
 
 #include <algorithm>
+#include <chrono>
 #include <cstdio>
 #include <cstring>
+#include <thread>
 
 #include <GLFW/glfw3.h>
 #include <IconsFontAwesome6.h>
@@ -88,6 +90,8 @@ static void IniReadLine(ImGuiContext* ctx, ImGuiSettingsHandler* handler,
     impl->userScale = num;
   } else if (std::strncmp(lineStr, "style=", 6) == 0) {
     impl->style = num;
+  } else if (std::strncmp(lineStr, "fps=", 4) == 0) {
+    impl->fps = num;
   }
 }
 
@@ -98,9 +102,10 @@ static void IniWriteAll(ImGuiContext* ctx, ImGuiSettingsHandler* handler,
   }
   out_buf->appendf(
       "[MainWindow][GLOBAL]\nwidth=%d\nheight=%d\nmaximized=%d\n"
-      "xpos=%d\nypos=%d\nuserScale=%d\nstyle=%d\n\n",
+      "xpos=%d\nypos=%d\nuserScale=%d\nstyle=%d\nfps=%d\n\n",
       gContext->width, gContext->height, gContext->maximized ? 1 : 0,
-      gContext->xPos, gContext->yPos, gContext->userScale, gContext->style);
+      gContext->xPos, gContext->yPos, gContext->userScale, gContext->style,
+      gContext->fps);
 }
 
 void gui::CreateContext() {
@@ -331,6 +336,8 @@ bool gui::Initialize(const char* title, int width, int height,
 void gui::Main() {
   // Main loop
   while (!glfwWindowShouldClose(gContext->window) && !gContext->exit) {
+    double startTime = glfwGetTime();
+
     // Poll and handle events (inputs, window resize, etc.)
     glfwPollEvents();
     gContext->isPlatformRendering = true;
@@ -349,6 +356,15 @@ void gui::Main() {
       if (io.WantSaveIniSettings) {
         gContext->saveSettings(false);
         io.WantSaveIniSettings = false;  // reset flag
+      }
+    }
+
+    // if FPS limiting, sleep until next frame time
+    if (gContext->fps != 0) {
+      double sleepTime = (1.0 / gContext->fps) - (glfwGetTime() - startTime);
+      if (sleepTime > 1e-6) {
+        std::this_thread::sleep_for(
+            std::chrono::microseconds(static_cast<long>(sleepTime * 1e6)));
       }
     }
   }
@@ -477,6 +493,10 @@ void gui::SetStyle(Style style) {
   }
 }
 
+void gui::SetFPS(int fps) {
+  gContext->fps = fps;
+}
+
 void gui::SetClearColor(ImVec4 color) {
   gContext->clearColor = color;
 }
@@ -535,6 +555,27 @@ void gui::EmitViewMenu() {
         if (ImGui::MenuItem(label, nullptr, &selected)) {
           gContext->userScale = i;
         }
+      }
+      ImGui::EndMenu();
+    }
+
+    if (ImGui::BeginMenu("Frame Rate")) {
+      bool selected;
+      selected = gContext->fps == 0;
+      if (ImGui::MenuItem("vsync", nullptr, &selected)) {
+        gContext->fps = 0;
+      }
+      selected = gContext->fps == 30;
+      if (ImGui::MenuItem("30 fps", nullptr, &selected)) {
+        gContext->fps = 30;
+      }
+      selected = gContext->fps == 60;
+      if (ImGui::MenuItem("60 fps", nullptr, &selected)) {
+        gContext->fps = 60;
+      }
+      selected = gContext->fps == 120;
+      if (ImGui::MenuItem("120 fps", nullptr, &selected)) {
+        gContext->fps = 120;
       }
       ImGui::EndMenu();
     }
