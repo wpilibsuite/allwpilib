@@ -14,7 +14,7 @@ import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.system.plant.LinearSystemId;
 
 /** Represents a simulated single jointed arm mechanism. */
-public class SingleJointedArmSim extends LinearSystemSim<N2, N1, N1> {
+public class SingleJointedArmSim extends LinearSystemSim<N2, N1, N2> {
   // The gearbox for the arm.
   private final DCMotor m_gearbox;
 
@@ -83,8 +83,8 @@ public class SingleJointedArmSim extends LinearSystemSim<N2, N1, N1> {
       double minAngleRads,
       double maxAngleRads,
       boolean simulateGravity,
-      Matrix<N1, N1> measurementStdDevs) {
-    super(plant, measurementStdDevs);
+      Matrix<N2, N1> measurementStdDevs) {
+    super(LinearSystemSim.convertControlToSim(plant), measurementStdDevs);
     m_gearbox = gearbox;
     m_gearing = gearing;
     m_armLenMeters = armLengthMeters;
@@ -114,8 +114,10 @@ public class SingleJointedArmSim extends LinearSystemSim<N2, N1, N1> {
       double armLengthMeters,
       double minAngleRads,
       double maxAngleRads,
-      Matrix<N1, N1> measurementStdDevs) {
-    super(LinearSystemId.identifyPositionSystem(kV, kA), measurementStdDevs);
+      Matrix<N2, N1> measurementStdDevs) {
+    super(
+        LinearSystemSim.convertControlToSim(LinearSystemId.identifyPositionSystem(kV, kA)),
+        measurementStdDevs);
     m_gearbox = gearbox;
     m_gearing = gearing;
     m_armLenMeters = armLengthMeters;
@@ -174,9 +176,10 @@ public class SingleJointedArmSim extends LinearSystemSim<N2, N1, N1> {
       double minAngleRads,
       double maxAngleRads,
       boolean simulateGravity,
-      Matrix<N1, N1> measurementStdDevs) {
+      Matrix<N2, N1> measurementStdDevs) {
     super(
-        LinearSystemId.createSingleJointedArmSystem(gearbox, jKgMetersSquared, gearing),
+        LinearSystemSim.convertControlToSim(
+            LinearSystemId.createSingleJointedArmSystem(gearbox, jKgMetersSquared, gearing)),
         measurementStdDevs);
     m_gearbox = gearbox;
     m_gearing = gearing;

@@ -14,7 +14,7 @@ import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.system.plant.LinearSystemId;
 
 /** Represents a simulated elevator mechanism. */
-public class ElevatorSim extends LinearSystemSim<N2, N1, N1> {
+public class ElevatorSim extends LinearSystemSim<N2, N1, N2> {
   // Gearbox for the elevator.
   private final DCMotor m_gearbox;
 
@@ -83,8 +83,8 @@ public class ElevatorSim extends LinearSystemSim<N2, N1, N1> {
       double minHeightMeters,
       double maxHeightMeters,
       boolean simulateGravity,
-      Matrix<N1, N1> measurementStdDevs) {
-    super(plant, measurementStdDevs);
+      Matrix<N2, N1> measurementStdDevs) {
+    super(LinearSystemSim.convertControlToSim(plant), measurementStdDevs);
     m_gearbox = gearbox;
     m_gearing = gearing;
     m_drumRadius = drumRadiusMeters;
@@ -114,8 +114,10 @@ public class ElevatorSim extends LinearSystemSim<N2, N1, N1> {
       double drumRadiusMeters,
       double minHeightMeters,
       double maxHeightMeters,
-      Matrix<N1, N1> measurementStdDevs) {
-    super(LinearSystemId.identifyPositionSystem(kV, kA), measurementStdDevs);
+      Matrix<N2, N1> measurementStdDevs) {
+    super(
+        LinearSystemSim.convertControlToSim(LinearSystemId.identifyPositionSystem(kV, kA)),
+        measurementStdDevs);
     m_gearbox = gearbox;
     m_gearing = gearing;
     m_drumRadius = drumRadiusMeters;
@@ -174,9 +176,11 @@ public class ElevatorSim extends LinearSystemSim<N2, N1, N1> {
       double minHeightMeters,
       double maxHeightMeters,
       boolean simulateGravity,
-      Matrix<N1, N1> measurementStdDevs) {
+      Matrix<N2, N1> measurementStdDevs) {
     super(
-        LinearSystemId.createElevatorSystem(gearbox, carriageMassKg, drumRadiusMeters, gearing),
+        LinearSystemSim.convertControlToSim(
+            LinearSystemId.createElevatorSystem(
+                gearbox, carriageMassKg, drumRadiusMeters, gearing)),
         measurementStdDevs);
     m_gearbox = gearbox;
     m_gearing = gearing;
