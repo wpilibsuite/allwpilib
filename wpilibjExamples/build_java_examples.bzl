@@ -1,4 +1,4 @@
-load("//shared/bazel/rules:java_rules.bzl", "wpilib_java_binary", "wpilib_java_library")
+load("//shared/bazel/rules:java_rules.bzl", "wpilib_java_binary", "wpilib_java_junit5_test", "wpilib_java_library")
 
 EXAMPLES_FOLDERS = [
     "addressableled",
@@ -38,11 +38,11 @@ EXAMPLES_FOLDERS = [
     "mecanumdriveposeestimator",
     "mechanism2d",
     "motorcontrol",
-    "motorcontrolencoder",
     "potentiometerpid",
     "quickvision",
     "ramsetecommand",
     "ramsetecontroller",
+    "rapidreactcommandbot",
     "relay",
     "romireference",
     "schedulereventlogging",
@@ -62,6 +62,7 @@ EXAMPLES_FOLDERS = [
     "tankdrivexboxcontroller",
     "ultrasonic",
     "ultrasonicpid",
+    "unittest",
 ]
 
 COMMANDS_V2_FOLDERS = [
@@ -83,6 +84,7 @@ COMMANDS_V2_FOLDERS = [
 
 TEMPLATES_FOLDERS = [
     "commandbased",
+    "commandbasedskeleton",
     "educational",
     "robotbaseskeleton",
     "romicommandbased",
@@ -90,6 +92,11 @@ TEMPLATES_FOLDERS = [
     "romitimed",
     "timed",
     "timedskeleton",
+]
+
+TEST_FOLDERS = [
+    "addressableled",
+    "unittest",
 ]
 
 def build_examples(halsim_deps):
@@ -135,6 +142,23 @@ def build_templates():
                 "//wpilibNewCommands/src/main/java/edu/wpi/first/wpilibj2/command:wpilibNewCommands",
                 "//wpimath/src/main/java/edu/wpi/first/math:wpimath",
                 "//hal/src/main/java/edu/wpi/first/hal",
+                "//wpiutil/src/main/java/edu/wpi/first/util:wpiutil",
+            ],
+            tags = ["wpi-example"],
+        )
+
+def build_tests():
+    for folder in TEST_FOLDERS:
+        wpilib_java_junit5_test(
+            name = folder + "-test",
+            srcs = native.glob(["src/test/java/edu/wpi/first/wpilibj/examples/" + folder + "/**/*.java"]),
+            deps = [
+                ":" + folder + "-example",
+                "//wpilibj/src/main/java/edu/wpi/first/wpilibj",
+                "//wpilibNewCommands/src/main/java/edu/wpi/first/wpilibj2/command:wpilibNewCommands",
+                "//wpimath/src/main/java/edu/wpi/first/math:wpimath",
+                "//hal/src/main/java/edu/wpi/first/hal",
+                "//ntcore/src/main/java/edu/wpi/first/networktables",
                 "//wpiutil/src/main/java/edu/wpi/first/util:wpiutil",
             ],
             tags = ["wpi-example"],

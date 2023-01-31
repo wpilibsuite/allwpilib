@@ -1,7 +1,7 @@
 load("@rules_cc//cc:defs.bzl", "objc_library")
 
 OBJC_COMPILER_FLAGS = [
-    "-std=c++17",
+    "-std=c++20",
     "-stdlib=libc++",
     "-fobjc-weak",
     "-fobjc-arc",

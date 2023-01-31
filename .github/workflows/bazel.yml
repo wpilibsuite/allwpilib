@@ -41,7 +41,7 @@ jobs:
         shell: bash
 
       - name: Build
-        run: bazel ${{ matrix.action }} -k ... --config=remote ${{ matrix.config }} --nojava_header_compilation --verbose_failures --test_verbose_timeout_warnings
+        run: bazel ${{ matrix.action }} -k ...   --config=remote ${{ matrix.config }} --nojava_header_compilation --verbose_failures --test_verbose_timeout_warnings
         shell: bash
 
   build-linux:
@@ -131,7 +131,7 @@ jobs:
       - name: Install Buildifier
         run: |
           cd $(mktemp -d)
-          GO111MODULE=on go get github.com/bazelbuild/buildtools/buildifier@5.1.0
+          GO111MODULE=on go get github.com/bazelbuild/buildtools/buildifier@6.0.0
 
       - uses: actions/checkout@v3
         with: { fetch-depth: 0 }

@@ -1,4 +1,5 @@
 load("//shared/bazel/rules:cc_rules.bzl", "wpilib_cc_static_and_shared_library")
+load("//shared/bazel/rules:objectivec_rules.bzl", "wpilib_objc_library")
 load("//shared/bazel/rules/jni:cc_jni.bzl", "wpilib_jni_cc_library")
 
 WIN_SRCS = glob([
@@ -22,6 +23,28 @@ filegroup(
     }),
 )
 
+wpilib_objc_library(
+    name = "cscore-mac",
+    srcs = glob([
+        "objcpp/**/*.mm",
+        "cpp/*.h",
+    ]),
+    hdrs = glob([
+        "include/**/*",
+        "objcpp/**/*.h",
+    ]),
+    includes = [
+        "cpp",
+        "include",
+        "objcpp",
+    ],
+    deps = [
+        "//wpinet/src/main/native:wpinet.static",
+        "//wpiutil/src/main/native:wpiutil.static",
+        "@bazelrio//libraries/cpp/opencv",
+    ],
+)
+
 wpilib_cc_static_and_shared_library(
     name = "cscore",
     srcs = [":native-srcs"] + glob(
@@ -35,7 +58,10 @@ wpilib_cc_static_and_shared_library(
     ],
     standard_deps = [
         "@bazelrio//libraries/cpp/opencv",
-    ],
+    ] + select({
+        "@bazel_tools//src/conditions:darwin": [":cscore-mac"],
+        "//conditions:default": [],
+    }),
     strip_include_prefix = "include",
     visibility = ["//visibility:public"],
     wpi_maybe_shared_deps = [

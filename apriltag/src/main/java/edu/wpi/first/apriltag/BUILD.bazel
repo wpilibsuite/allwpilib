@@ -1,0 +1,18 @@
+load("//shared/bazel/rules/jni:java_jni.bzl", "wpilib_java_jni_library")
+
+wpilib_java_jni_library(
+    name = "apriltag",
+    srcs = glob(["**/*.java"]),
+    native_libs = ["//apriltag/src/main/native:apriltagjni"],
+    resource_strip_prefix = "apriltag/src/main/native/resources",
+    resources = ["//apriltag/src/main/native/resources:java-resources"],
+    visibility = ["//visibility:public"],
+    deps = [
+        "//wpimath/src/main/java/edu/wpi/first/math:wpimath",
+        "//wpiutil/src/main/java/edu/wpi/first/util:wpiutil",
+        "@bazelrio//libraries/java/opencv",
+        "@maven//:com_fasterxml_jackson_core_jackson_annotations",
+        "@maven//:com_fasterxml_jackson_core_jackson_core",
+        "@maven//:com_fasterxml_jackson_core_jackson_databind",
+    ],
+)

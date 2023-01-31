@@ -1,4 +1,4 @@
-load("//shared/bazel/rules:cc_rules.bzl", "wpilib_cc_binary", "wpilib_cc_library")
+load("//shared/bazel/rules:cc_rules.bzl", "wpilib_cc_binary", "wpilib_cc_library", "wpilib_cc_test")
 
 EXAMPLE_FOLDERS = [
     "AddressableLED",
@@ -39,11 +39,11 @@ EXAMPLE_FOLDERS = [
     "MecanumDrivePoseEstimator",
     "Mechanism2d",
     "MotorControl",
-    "MotorControlEncoder",
     "PotentiometerPID",
     "QuickVision",
     "RamseteCommand",
     "RamseteController",
+    "RapidReactCommandBot",
     "Relay",
     "RomiReference",
     "SchedulerEventLogging",
@@ -63,6 +63,7 @@ EXAMPLE_FOLDERS = [
     "TankDriveXboxController",
     "Ultrasonic",
     "UltrasonicPID",
+    "UnitTest",
 ]
 
 COMMANDS_V2_FOLDERS = [
@@ -84,10 +85,15 @@ COMMANDS_V2_FOLDERS = [
 
 TEMPLATES_FOLDERS = [
     "commandbased",
-    "oldcommandbased",
+    "commandbasedskeleton",
     "robotbaseskeleton",
     "timed",
     "timedskeleton",
+]
+
+TESTS_FOLDERS = [
+    "AddressableLED",
+    "UnitTest",
 ]
 
 def build_examples(halsim_deps = []):
@@ -133,4 +139,20 @@ def build_templates():
             ],
             strip_include_prefix = "src/main/cpp/templates/" + folder + "/include",
             tags = ["wpi-example"],
+        )
+
+def build_tests():
+    for folder in TESTS_FOLDERS:
+        example_src_folder = "src/main/cpp/examples/" + folder
+        example_test_folder = "src/test/cpp/examples/" + folder
+        wpilib_cc_test(
+            name = folder + "-test",
+            srcs = native.glob([example_test_folder + "/**/*.cpp", example_src_folder + "/cpp/**/*.cpp", example_src_folder + "/c/**/*.c"]),
+            deps = [
+                "//wpilibNewCommands/src/main/native:wpilibNewCommands.shared",
+                ":{}-examples-headers".format(folder),
+                "@gtest",
+            ],
+            defines = ["RUNNING_FRC_TESTS=1"],
+            tags = ["wpi-example", "no-tsan", "no-asan", "no-ubsan"],
         )
