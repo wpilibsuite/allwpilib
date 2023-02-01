@@ -349,6 +349,9 @@
       "Differential Drive",
       "Encoder",
       "Pneumatics",
+      "Shuffleboard",
+      "Sendable",
+      "DataLog",
       "XboxController"
     ],
     "foldername": "hatchbottraditional",
@@ -365,6 +368,9 @@
       "Differential Drive",
       "Encoder",
       "Pneumatics",
+      "Shuffleboard",
+      "Sendable",
+      "DataLog",
       "PS4Controller"
     ],
     "foldername": "hatchbotinlined",
@@ -399,18 +405,6 @@
       "Command-based"
     ],
     "foldername": "selectcommand",
-    "gradlebase": "java",
-    "mainclass": "Main",
-    "commandversion": 2
-  },
-  {
-    "name": "Scheduler Event Logging",
-    "description": "An example showing how to use Shuffleboard to log Command events from the CommandScheduler in the new command framework",
-    "tags": [
-      "Command-based",
-      "Shuffleboard"
-    ],
-    "foldername": "schedulereventlogging",
     "gradlebase": "java",
     "mainclass": "Main",
     "commandversion": 2

@@ -7,6 +7,7 @@ package edu.wpi.first.wpilibj.examples.hatchbotinlined.subsystems;
 import static edu.wpi.first.wpilibj.DoubleSolenoid.Value.kForward;
 import static edu.wpi.first.wpilibj.DoubleSolenoid.Value.kReverse;
 
+import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
 import edu.wpi.first.wpilibj.examples.hatchbotinlined.Constants.HatchConstants;
@@ -31,5 +32,12 @@ public class HatchSubsystem extends SubsystemBase {
   public CommandBase releaseHatchCommand() {
     // implicitly require `this`
     return this.runOnce(() -> m_hatchSolenoid.set(kReverse));
+  }
+
+  @Override
+  public void initSendable(SendableBuilder builder) {
+    super.initSendable(builder);
+    // Publish the solenoid state to telemetry.
+    builder.addBooleanProperty("extended", () -> m_hatchSolenoid.get() == kForward, null);
   }
 }

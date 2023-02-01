@@ -27,6 +27,8 @@ class HatchSubsystem : public frc2::SubsystemBase {
    */
   frc2::CommandPtr ReleaseHatchCommand();
 
+  void InitSendable(wpi::SendableBuilder& builder) override;
+
  private:
   // Components (e.g. motor controllers and sensors) should generally be
   // declared private and exposed only through public methods.

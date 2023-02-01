@@ -356,6 +356,9 @@
       "Command-based",
       "Differential Drive",
       "Encoder",
+      "Shuffleboard",
+      "Sendable",
+      "DataLog",
       "Pneumatics",
       "XboxController"
     ],
@@ -371,6 +374,9 @@
       "Command-based",
       "Differential Drive",
       "Encoder",
+      "Shuffleboard",
+      "Sendable",
+      "DataLog",
       "Pneumatics",
       "PS4Controller"
     ],
@@ -404,17 +410,6 @@
       "Command-based"
     ],
     "foldername": "SelectCommand",
-    "gradlebase": "cpp",
-    "commandversion": 2
-  },
-  {
-    "name": "Scheduler Event Logging",
-    "description": "An example showing how to use Shuffleboard to log Command events from the CommandScheduler in the new command framework",
-    "tags": [
-      "Command-based",
-      "Shuffleboard"
-    ],
-    "foldername": "SchedulerEventLogging",
     "gradlebase": "cpp",
     "commandversion": 2
   },
