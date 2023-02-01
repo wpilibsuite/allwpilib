@@ -487,7 +487,7 @@ void GlfwSystemJoystick::GetData(HALJoystickData* data, bool mapGamepad) const {
     }
   } else {
     std::memcpy(data->axes.axes, sysAxes,
-                data->axes.count * sizeof(&data->axes.axes[0]));
+                data->axes.count * sizeof(data->axes.axes[0]));
   }
 
   data->povs.count = data->desc.povCount;
