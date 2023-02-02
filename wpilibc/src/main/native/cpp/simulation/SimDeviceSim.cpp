@@ -11,20 +11,37 @@
 #include <hal/SimDevice.h>
 #include <hal/simulation/SimDeviceData.h>
 
+#include "frc/Errors.h"
+
 using namespace frc;
 using namespace frc::sim;
 
 SimDeviceSim::SimDeviceSim(const char* name)
-    : m_handle{HALSIM_GetSimDeviceHandle(name)} {}
+    : m_handle{HALSIM_GetSimDeviceHandle(name)} {
+  if (m_handle == 0) {
+    throw FRC_MakeError(err::InvalidParameter,
+                        "No sim device exists with name '{}'.", name);
+  }
+}
 
 SimDeviceSim::SimDeviceSim(const char* name, int index) {
   m_handle =
       HALSIM_GetSimDeviceHandle(fmt::format("{}[{}]", name, index).c_str());
+  if (m_handle == 0) {
+    throw FRC_MakeError(err::InvalidParameter,
+                        "No sim device exists with name '{}[{}]'.", name,
+                        index);
+  }
 }
 
 SimDeviceSim::SimDeviceSim(const char* name, int index, int channel) {
   m_handle = HALSIM_GetSimDeviceHandle(
       fmt::format("{}[{},{}]", name, index, channel).c_str());
+  if (m_handle == 0) {
+    throw FRC_MakeError(err::InvalidParameter,
+                        "No sim device exists with name '{}[{},{}]'.", name,
+                        index, channel);
+  }
 }
 
 SimDeviceSim::SimDeviceSim(HAL_SimDeviceHandle handle) : m_handle(handle) {}
