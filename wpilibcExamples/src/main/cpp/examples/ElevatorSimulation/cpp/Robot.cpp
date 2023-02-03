@@ -9,7 +9,9 @@
 #include <frc/RobotController.h>
 #include <frc/StateSpaceUtil.h>
 #include <frc/TimedRobot.h>
+#include <frc/controller/ElevatorFeedforward.h>
 #include <frc/controller/PIDController.h>
+#include <frc/controller/ProfiledPIDController.h>
 #include <frc/motorcontrol/PWMSparkMax.h>
 #include <frc/simulation/BatterySim.h>
 #include <frc/simulation/ElevatorSim.h>
@@ -27,8 +29,7 @@
 #include <units/moment_of_inertia.h>
 
 /**
- * This is a sample program to demonstrate how to use a state-space controller
- * to control an arm.
+ * This is a sample program to demonstrate the use of elevator simulation.
  */
 class Robot : public frc::TimedRobot {
   static constexpr int kMotorPort = 0;
@@ -37,10 +38,19 @@ class Robot : public frc::TimedRobot {
   static constexpr int kJoystickPort = 0;
 
   static constexpr double kElevatorKp = 5.0;
+  static constexpr double kElevatorKi = 0.0;
+  static constexpr double kElevatorKd = 0.0;
+
+  static constexpr units::volt_t kElevatorkS = 0.0_V;
+  static constexpr units::volt_t kElevatorkG = 0.0_V;
+  static constexpr auto kElevatorkV = 0.762_V / 1_mps;
+  static constexpr auto kElevatorkA = 0.762_V / 1_mps_sq;
+
   static constexpr double kElevatorGearing = 10.0;
   static constexpr units::meter_t kElevatorDrumRadius = 2_in;
   static constexpr units::kilogram_t kCarriageMass = 4.0_kg;
 
+  static constexpr units::meter_t kSetpoint = 30_in;
   static constexpr units::meter_t kMinElevatorHeight = 2_in;
   static constexpr units::meter_t kMaxElevatorHeight = 50_in;
 
@@ -53,7 +63,13 @@ class Robot : public frc::TimedRobot {
   frc::DCMotor m_elevatorGearbox = frc::DCMotor::Vex775Pro(4);
 
   // Standard classes for controlling our elevator
-  frc2::PIDController m_controller{kElevatorKp, 0, 0};
+  frc::TrapezoidProfile<units::meters>::Constraints m_constraints{2.45_mps,
+                                                                  2.45_mps_sq};
+  frc::ProfiledPIDController<units::meters> m_controller{
+      kElevatorKp, kElevatorKi, kElevatorKd, m_constraints};
+
+  frc::ElevatorFeedforward m_feedforward{kElevatorkS, kElevatorkG, kElevatorkV,
+                                         kElevatorkA};
   frc::Encoder m_encoder{kEncoderAChannel, kEncoderBChannel};
   frc::PWMSparkMax m_motor{kMotorPort};
   frc::Joystick m_joystick{kJoystickPort};
@@ -111,15 +127,21 @@ class Robot : public frc::TimedRobot {
 
   void TeleopPeriodic() override {
     if (m_joystick.GetTrigger()) {
-      // Here, we run PID control like normal, with a constant setpoint of 30in.
-      double pidOutput = m_controller.Calculate(m_encoder.GetDistance(),
-                                                units::meter_t{30_in}.value());
-      m_motor.SetVoltage(units::volt_t{pidOutput});
+      // Here, we set the constant setpoint of 30in.
+      m_controller.SetGoal(kSetpoint);
     } else {
-      // Otherwise, we disable the motor.
-      m_motor.Set(0.0);
+      // Otherwise, we update the setpoint to 0.
+      m_controller.SetGoal(0.0_m);
     }
+    // With the setpoint value we run PID control like normal
+    double pidOutput =
+        m_controller.Calculate(units::meter_t{m_encoder.GetDistance()});
+    units::volt_t feedforwardOutput =
+        m_feedforward.Calculate(m_controller.GetSetpoint().velocity);
+    m_motor.SetVoltage(units::volt_t{pidOutput} + feedforwardOutput);
   }
+  // To view the Elevator in the simulator, select Network Tables ->
+  // SmartDashboard -> Elevator Sim
 
   void DisabledInit() override {
     // This just makes sure that our simulation code knows that the motor's off.

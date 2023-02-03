@@ -5,8 +5,10 @@
 package edu.wpi.first.wpilibj.examples.elevatorsimulation;
 
 import edu.wpi.first.math.VecBuilder;
-import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.controller.ElevatorFeedforward;
+import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.system.plant.DCMotor;
+import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.Joystick;
@@ -22,18 +24,27 @@ import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismRoot2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
-/** This is a sample program to demonstrate the use of elevator simulation with existing code. */
+/** This is a sample program to demonstrate the use of elevator simulation. */
 public class Robot extends TimedRobot {
   private static final int kMotorPort = 0;
   private static final int kEncoderAChannel = 0;
   private static final int kEncoderBChannel = 1;
   private static final int kJoystickPort = 0;
 
-  private static final double kElevatorKp = 5.0;
+  private static final double kElevatorKp = 5;
+  private static final double kElevatorKi = 0;
+  private static final double kElevatorKd = 0;
+
+  private static final double kElevatorkS = 0.0; // volts (V)
+  private static final double kElevatorkG = 0.762; // volts (V)
+  private static final double kElevatorkV = 0.762; // volt per velocity (V/(m/s))
+  private static final double kElevatorkA = 0.0; // volt per acceleration (V/(m/s²))
+
   private static final double kElevatorGearing = 10.0;
   private static final double kElevatorDrumRadius = Units.inchesToMeters(2.0);
   private static final double kCarriageMass = 4.0; // kg
 
+  private static final double kSetpoint = Units.inchesToMeters(30);
   private static final double kMinElevatorHeight = Units.inchesToMeters(2);
   private static final double kMaxElevatorHeight = Units.inchesToMeters(50);
 
@@ -42,10 +53,15 @@ public class Robot extends TimedRobot {
   private static final double kElevatorEncoderDistPerPulse =
       2.0 * Math.PI * kElevatorDrumRadius / 4096;
 
+  // This gearbox represents a gearbox containing 4 Vex 775pro motors.
   private final DCMotor m_elevatorGearbox = DCMotor.getVex775Pro(4);
 
   // Standard classes for controlling our elevator
-  private final PIDController m_controller = new PIDController(kElevatorKp, 0, 0);
+  private final ProfiledPIDController m_controller =
+      new ProfiledPIDController(
+          kElevatorKp, kElevatorKi, kElevatorKd, new TrapezoidProfile.Constraints(2.45, 2.45));
+  ElevatorFeedforward m_feedforward =
+      new ElevatorFeedforward(kElevatorkS, kElevatorkG, kElevatorkV, kElevatorkA);
   private final Encoder m_encoder = new Encoder(kEncoderAChannel, kEncoderBChannel);
   private final PWMSparkMax m_motor = new PWMSparkMax(kMotorPort);
   private final Joystick m_joystick = new Joystick(kJoystickPort);
@@ -103,14 +119,18 @@ public class Robot extends TimedRobot {
   @Override
   public void teleopPeriodic() {
     if (m_joystick.getTrigger()) {
-      // Here, we run PID control like normal, with a constant setpoint of 30in.
-      double pidOutput = m_controller.calculate(m_encoder.getDistance(), Units.inchesToMeters(30));
-      m_motor.setVoltage(pidOutput);
+      // Here, we set the constant setpoint of 30in.
+      m_controller.setGoal(kSetpoint);
     } else {
-      // Otherwise, we disable the motor.
-      m_motor.set(0.0);
+      // Otherwise, we update the setpoint to 0.
+      m_controller.setGoal(0.0);
     }
+    // With the setpoint value we run PID control like normal
+    double pidOutput = m_controller.calculate(m_encoder.getDistance());
+    double feedforwardOutput = m_feedforward.calculate(m_controller.getSetpoint().velocity);
+    m_motor.setVoltage(pidOutput + feedforwardOutput);
   }
+  // To view the Elevator in the simulator, select Network Tables -> SmartDashboard -> Elevator Sim
 
   @Override
   public void disabledInit() {
