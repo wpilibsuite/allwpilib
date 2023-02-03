@@ -11,7 +11,7 @@ wpilib_cc_static_and_shared_library(
     defines = ["WPILIB_EXPORTS"],
     export_symbols = False,
     standard_deps = [
-        "@bazelrio//libraries/cpp/apriltaglib",
+        "@bzlmodrio-apriltaglib//libraries/cpp/apriltaglib",
     ],
     strip_include_prefix = "include",
     visibility = ["//visibility:public"],

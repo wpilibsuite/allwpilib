@@ -17,7 +17,7 @@ filegroup(
         "@bazel_tools//src/conditions:windows": glob(["windows/*"]),
         # "//shared/bazel/toolchains/conditions:raspbian": glob(["linux/*"]),
         # "//shared/bazel/toolchains/conditions:bionic": glob(["linux/*"]),
-        "@bazelrio//constraints/is_roborio:roborio": glob(["linux/*"]),
+        "@rules_roborio_toolchain//constraints/is_roborio:roborio": glob(["linux/*"]),
     }),
 )
 

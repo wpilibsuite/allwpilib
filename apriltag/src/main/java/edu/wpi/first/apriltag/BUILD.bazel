@@ -10,7 +10,7 @@ wpilib_java_jni_library(
     deps = [
         "//wpimath/src/main/java/edu/wpi/first/math:wpimath",
         "//wpiutil/src/main/java/edu/wpi/first/util:wpiutil",
-        "@bazelrio//libraries/java/opencv",
+        "@bzlmodrio-opencv//libraries/java/opencv",
         "@maven//:com_fasterxml_jackson_core_jackson_annotations",
         "@maven//:com_fasterxml_jackson_core_jackson_core",
         "@maven//:com_fasterxml_jackson_core_jackson_databind",

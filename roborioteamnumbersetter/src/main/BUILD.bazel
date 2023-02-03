@@ -33,6 +33,6 @@ wpilib_cc_binary(
     deps = [
         "//glass/src/lib/native:libglass",
         "//glass/src/libnt/native:libglassnt",
-        "@bazelrio//libraries/cpp/libssh",
+        "@bzlmodrio-libssh//libraries/cpp/libssh",
     ],
 )

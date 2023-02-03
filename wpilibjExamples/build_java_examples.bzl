@@ -111,7 +111,7 @@ def build_examples(halsim_deps):
                 "//wpimath/src/main/java/edu/wpi/first/math:wpimath",
                 "//hal/src/main/java/edu/wpi/first/hal",
                 "//ntcore/src/main/java/edu/wpi/first/networktables",
-                "@bazelrio//libraries/java/opencv",
+                "@bzlmodrio-opencv//libraries/java/opencv",
                 "//cameraserver/src/main/java/edu/wpi/first:cameraserver",
                 "//cscore/src/main/java/edu/wpi/first/cscore",
             ],

@@ -25,14 +25,14 @@ SIM_SRCS = glob([
 SIM_DEPS = []
 
 HAL_DEPS = select({
-    "@bazelrio//constraints/is_roborio:roborio": ATHENA_DEPS,
+    "@rules_roborio_toolchain//constraints/is_roborio:roborio": ATHENA_DEPS,
     "//conditions:default": SIM_DEPS,
 })
 
 filegroup(
     name = "platform-srcs",
     srcs = select({
-        "@bazelrio//constraints/is_roborio:roborio": ATHENA_SRCS,
+        "@rules_roborio_toolchain//constraints/is_roborio:roborio": ATHENA_SRCS,
         "//conditions:default": SIM_SRCS,
     }),
 )

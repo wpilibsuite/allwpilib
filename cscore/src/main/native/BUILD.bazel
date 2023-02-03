@@ -41,7 +41,7 @@ wpilib_objc_library(
     deps = [
         "//wpinet/src/main/native:wpinet.static",
         "//wpiutil/src/main/native:wpiutil.static",
-        "@bazelrio//libraries/cpp/opencv",
+        "@bzlmodrio-opencv//libraries/cpp/opencv",
     ],
 )
 
@@ -57,7 +57,7 @@ wpilib_cc_static_and_shared_library(
         "include",
     ],
     standard_deps = [
-        "@bazelrio//libraries/cpp/opencv",
+        "@bzlmodrio-opencv//libraries/cpp/opencv",
     ] + select({
         "@bazel_tools//src/conditions:darwin": [":cscore-mac"],
         "//conditions:default": [],

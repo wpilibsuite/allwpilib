@@ -13,11 +13,13 @@ jobs:
       matrix:
         include:
           - { os: windows-2022, action: "test", config: "--config=windows", wpimath_config: "--local_cpu_resources=1" }
+          - { os: windows-2022, action: "test", config: "--config=windows --enable_bzlmod", wpimath_config: "--local_cpu_resources=1" }
 #          - { os: windows-2022, config: "--config=roborio" }
 #          - { os: windows-2022, config: "--config=bionic" }
 #          - { os: windows-2022, config: "--config=raspbian" }
 
           - { os: macos-latest,   action: "test", config: "--config=osx -c opt --config=no_example", wpimath_config: "" }
+          - { os: macos-latest,   action: "test", config: "--config=osx -c opt --config=no_example --enable_bzlmod", wpimath_config: "" }
 #          - { os: macos-latest, config: "--config=roborio" }
 #          - { os: macos-latest, config: "--config=bionic" }
 #          - { os: macos-latest, config: "--config=raspbian" }
@@ -30,6 +32,10 @@ jobs:
     steps:
       - uses: actions/checkout@v3
         with: { fetch-depth: 0 }
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
       - uses: bazelbuild/setup-bazelisk@v1
 
       - name: Build wpimath dependencies
@@ -37,7 +43,7 @@ jobs:
         shell: bash
 
       - name: Build wpimath
-        run: bazel ${{ matrix.action }} -k wpimath/... --config=remote ${{ matrix.config }} ${{ matrix.wpimath_config }} --nojava_header_compilation --verbose_failures --test_verbose_timeout_warnings
+        run: bazel build -k wpimath/... --config=remote ${{ matrix.config }} ${{ matrix.wpimath_config }} --nojava_header_compilation --verbose_failures
         shell: bash
 
       - name: Build
@@ -49,10 +55,9 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - container: wpilib/ubuntu-base:22.04
-            artifact-name: Linux Release
+          - { container: "wpilib/ubuntu-base:22.04", artifact-name: "Linux Release", config: "" }
     runs-on: ubuntu-latest
-    name: "Build - ${{ matrix.artifact-name }}${{ matrix.architecture }}"
+    name: "Build - ${{ matrix.artifact-name }}${{ matrix.architecture }} ${{ matrix.config }}"
     container: ${{ matrix.container }}
     steps:
       - uses: actions/checkout@v3
@@ -60,7 +65,7 @@ jobs:
       - uses: bazelbuild/setup-bazelisk@v1
 
       - name: Build and Test
-        run: bazel test ... --config=remote --config=linux -k --verbose_failures --test_verbose_timeout_warnings
+        run: bazel test ... --config=remote --config=linux ${{ matrix.config }} -k --verbose_failures --test_verbose_timeout_warnings
 
 
   repin-maven:

@@ -1,4 +1,4 @@
-load("@__allwpilib_pip_deps//:requirements.bzl", "requirement")
+load("@allwpilib_pip_deps//:requirements.bzl", "requirement")
 load("@rules_python//python:defs.bzl", "py_binary")
 load("//shared/bazel/rules:cc_rules.bzl", "wpilib_cc_library")
 

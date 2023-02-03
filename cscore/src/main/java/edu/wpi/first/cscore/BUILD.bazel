@@ -7,6 +7,6 @@ wpilib_java_jni_library(
     visibility = ["//visibility:public"],
     deps = [
         "//wpiutil/src/main/java/edu/wpi/first/util:wpiutil",
-        "@bazelrio//libraries/java/opencv",
+        "@bzlmodrio-opencv//libraries/java/opencv",
     ],
 )

@@ -1,0 +1,66 @@
+module(
+    name = "allwpilib",
+    version = "2023.1.1",
+    compatibility_level = 2023,
+)
+
+bazel_dep(name = "rules_cc", version = "0.0.4")
+bazel_dep(name = "rules_java", version = "5.3.5")
+bazel_dep(name = "rules_python", version = "0.16.2")
+bazel_dep(name = "googletest", version = "1.12.1", repo_name = "gtest")
+bazel_dep(name = "rules_jvm_external", version = "4.5")
+bazel_dep(name = "bzlmodrio-apriltaglib", version = "3.2.0-3")
+bazel_dep(name = "bzlmodrio-imgui", version = "1.89.1-1")
+bazel_dep(name = "bzlmodrio-libssh", version = "0.95-6")
+bazel_dep(name = "bzlmodrio-ni", version = "2023.3.0")
+bazel_dep(name = "bzlmodrio-opencv", version = "4.6.0-4")
+bazel_dep(name = "rules_roborio_toolchain", version = "2023-7")
+
+maven = use_extension("@rules_jvm_external//:extensions.bzl", "maven")
+maven.install(
+    artifacts = [
+        "org.ejml:ejml-simple:0.41",
+        "com.fasterxml.jackson.core:jackson-annotations:2.12.4",
+        "com.fasterxml.jackson.core:jackson-core:2.12.4",
+        "com.fasterxml.jackson.core:jackson-databind:2.12.4",
+        "org.junit.jupiter:junit-jupiter-api:5.8.2",
+        "org.junit.jupiter:junit-jupiter-params:5.8.2",
+        "org.junit.jupiter:junit-jupiter-engine:5.8.2",
+        "org.junit.platform:junit-platform-commons:1.6.1",
+        "org.junit.platform:junit-platform-console:1.6.1",
+        "org.junit.platform:junit-platform-engine:1.6.1",
+        "org.junit.platform:junit-platform-launcher:1.6.1",
+        "org.junit.platform:junit-platform-suite-api:1.6.1",
+        "com.google.code.gson:gson:2.8.9",
+        "org.hamcrest:hamcrest-all:1.3",
+        "com.googlecode.junit-toolbox:junit-toolbox:2.4",
+        "org.apache.ant:ant:1.10.12",
+        "org.apache.ant:ant-junit:1.10.12",
+        "org.mockito:mockito-core:4.1.0",
+    ],
+    repositories = [
+        "https://repo1.maven.org/maven2",
+    ],
+)
+use_repo(
+    maven,
+    "maven",
+)
+
+pip = use_extension("@rules_python//python:extensions.bzl", "pip")
+pip.parse(
+    name = "allwpilib_pip_deps",
+    requirements_lock = "//:requirements_lock.txt",
+)
+use_repo(pip, "allwpilib_pip_deps")
+
+python = use_extension("@rules_python//python:extensions.bzl", "python")
+python.toolchain(
+    name = "python3_10",
+    python_version = "3.10",
+)
+use_repo(python, "python3_10_toolchains")
+
+register_toolchains(
+    "@python3_10_toolchains//:all",
+)

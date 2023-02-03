@@ -27,5 +27,5 @@ build:osx --linkopt=CoreMedia
 build:osx --linkopt=-framework
 build:osx --linkopt=CoreVideo
 
-# Things not in bazelrio
+# Things not in nativetools
 build:osx --copt=-Wno-shorten-64-to-32

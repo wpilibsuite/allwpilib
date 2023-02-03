@@ -65,7 +65,7 @@ filegroup(
         "@bazel_tools//src/conditions:windows": WIN_UV_SRCS,
         # "//shared/bazel/toolchains/conditions:raspbian": UNIX_UV_SRCS + LINUX_UV_SRCS,
         # "//shared/bazel/toolchains/conditions:bionic": UNIX_UV_SRCS + LINUX_UV_SRCS,
-        "@bazelrio//constraints/is_roborio:roborio": UNIX_UV_SRCS + LINUX_UV_SRCS,
+        "@rules_roborio_toolchain//constraints/is_roborio:roborio": UNIX_UV_SRCS + LINUX_UV_SRCS,
     }) + glob(["src/*"]),
     visibility = ["//wpinet:__subpackages__"],
 )

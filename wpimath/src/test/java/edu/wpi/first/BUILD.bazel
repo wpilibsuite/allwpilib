@@ -7,9 +7,6 @@ wpilib_java_junit5_test(
     deps = [
         "//wpimath/src/main/java/edu/wpi/first/math:wpimath",
         "//wpiutil/src/main/java/edu/wpi/first/util:wpiutil",
-        "@maven//:com_fasterxml_jackson_core_jackson_annotations",
-        "@maven//:com_fasterxml_jackson_core_jackson_core",
-        "@maven//:com_fasterxml_jackson_core_jackson_databind",
         "@maven//:org_ejml_ejml_core",
         "@maven//:org_ejml_ejml_ddense",
         "@maven//:org_ejml_ejml_simple",

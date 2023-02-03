@@ -3,52 +3,64 @@ load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 # Rules Python
 http_archive(
     name = "rules_python",
-    sha256 = "5fa3c738d33acca3b97622a13a741129f67ef43f5fdfcec63b29374cc0574c29",
-    strip_prefix = "rules_python-0.9.0",
-    url = "https://github.com/bazelbuild/rules_python/archive/refs/tags/0.9.0.tar.gz",
-)
-
-# Download BazelRio <3
-http_archive(
-    name = "bazelrio",
-    sha256 = "1a02e98b5940f20edfbb6aae4acf80facc3c9161f1c5d4453cd9ce9648983ad9",
-    strip_prefix = "bazelRio-0f6ee5d9b5752b596f45eefc3c03c16897fca461/bazelrio",
-    url = "https://github.com/bazelRio/bazelRio/archive/0f6ee5d9b5752b596f45eefc3c03c16897fca461.tar.gz",
+    sha256 = "48a838a6e1983e4884b26812b2c748a35ad284fd339eb8e2a6f3adf95307fbcd",
+    strip_prefix = "rules_python-0.16.2",
+    url = "https://github.com/bazelbuild/rules_python/archive/refs/tags/0.16.2.tar.gz",
 )
 
 # Download Extra java rules
-RULES_JVM_EXTERNAL_TAG = "4.2"
+RULES_JVM_EXTERNAL_TAG = "4.5"
 
-RULES_JVM_EXTERNAL_SHA = "cd1a77b7b02e8e008439ca76fd34f5b07aecb8c752961f9640dea15e9e5ba1ca"
+RULES_JVM_EXTERNAL_SHA = "b17d7388feb9bfa7f2fa09031b32707df529f26c91ab9e5d909eb1676badd9a6"
 
 http_archive(
     name = "rules_jvm_external",
     sha256 = RULES_JVM_EXTERNAL_SHA,
     strip_prefix = "rules_jvm_external-%s" % RULES_JVM_EXTERNAL_TAG,
-    url = "https://github.com/bazelbuild/rules_jvm_external/archive/%s.zip" % RULES_JVM_EXTERNAL_TAG,
+    url = "https://github.com/bazelbuild/rules_jvm_external/archive/refs/tags/%s.zip" % RULES_JVM_EXTERNAL_TAG,
 )
 
-load("@bazelrio//:deps.bzl", "setup_bazelrio_dependencies")
+load("@rules_jvm_external//:repositories.bzl", "rules_jvm_external_deps")
 
-setup_bazelrio_dependencies(
+rules_jvm_external_deps()
+
+# local_repository(
+#     name = "bzlmodRio",
+#     path = "../bzlmodRio/bzlmodRio",
+# )
+http_archive(
+    name = "bzlmodRio",
+    sha256 = "4d2fab5423f47df9bb7f2b697104f1cf1794823de9b8501e50aa14d4338bd3a4",
+    strip_prefix = "bzlmodRio-6145f3f8e26590740cce628aba10348c1f64c3bd",
+    url = "https://github.com/bzlmodRio/bzlmodRio/archive/6145f3f8e26590740cce628aba10348c1f64c3bd.tar.gz",
+)
+
+load("@bzlmodRio//private/non_bzlmod:download_dependencies.bzl", "download_dependencies")
+
+download_dependencies(
+    # allwpilib_version = "local",
     apriltaglib_version = "3.2.0-3",
     imgui_version = "1.89.1-1",
     libssh_version = "0.95-6",
-    navx_version = None,
-    ni_version = None,
-    opencv_version = "4.6.0-3",
-    phoenix_version = None,
-    revlib_version = None,
-    toolchain_versions = "2023-7",
-    wpilib_version = None,
+    # navx_version = "local",
+    ni_version = "2023.3.0",
+    opencv_version = "4.6.0-4",  # TODO different than wpilib
+    # phoenix_version = "local",
+    # revlib_version = "local",
+    rules_bazelrio_version = "0.0.9",
+    rules_roborio_toolchain_version = "2023-7",
 )
+
+load("@bzlmodRio//private/non_bzlmod:setup_dependencies.bzl", "setup_dependencies")
+
+setup_dependencies()
 
 load("//shared/bazel/deps:repo.bzl", "load_third_party")
 
 load_third_party()
 
 # Initialize repositories for all packages in requirements_lock.txt.
-load("@__allwpilib_pip_deps//:requirements.bzl", "install_deps")
+load("@allwpilib_pip_deps//:requirements.bzl", "install_deps")
 
 install_deps()
 

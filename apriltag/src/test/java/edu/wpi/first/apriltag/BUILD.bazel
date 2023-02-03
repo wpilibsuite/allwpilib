@@ -10,7 +10,7 @@ wpilib_java_junit5_test(
         "//apriltag/src/main/java/edu/wpi/first/apriltag",
         "//wpimath/src/main/java/edu/wpi/first/math:wpimath",
         "//wpiutil/src/main/java/edu/wpi/first/util:wpiutil",
-        "@bazelrio//libraries/java/opencv",
+        "@bzlmodrio-opencv//libraries/java/opencv",
         "@maven//:com_fasterxml_jackson_core_jackson_databind",
     ],
 )
