@@ -587,6 +587,12 @@ class NetworkTableInstance final {
   void SetServerTeam(unsigned int team, unsigned int port = 0);
 
   /**
+   * Disconnects the client if it's running and connected. This will
+   * automatically start reconnection attempts to the current server list.
+   */
+  void Disconnect();
+
+  /**
    * Starts requesting server address from Driver Station.
    * This connects to the Driver Station running on localhost to obtain the
    * server IP address.

@@ -1300,6 +1300,18 @@ Java_edu_wpi_first_networktables_NetworkTablesJNI_setServerTeam
 
 /*
  * Class:     edu_wpi_first_networktables_NetworkTablesJNI
+ * Method:    disconnect
+ * Signature: (I)V
+ */
+JNIEXPORT void JNICALL
+Java_edu_wpi_first_networktables_NetworkTablesJNI_disconnect
+  (JNIEnv* env, jclass, jint inst)
+{
+  nt::Disconnect(inst);
+}
+
+/*
+ * Class:     edu_wpi_first_networktables_NetworkTablesJNI
  * Method:    startDSClient
  * Signature: (II)V
  */

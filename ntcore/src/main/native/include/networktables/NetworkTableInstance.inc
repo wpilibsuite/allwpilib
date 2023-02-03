@@ -163,6 +163,10 @@ inline void NetworkTableInstance::SetServerTeam(unsigned int team,
   ::nt::SetServerTeam(m_handle, team, port);
 }
 
+inline void NetworkTableInstance::Disconnect() {
+  ::nt::Disconnect(m_handle);
+}
+
 inline void NetworkTableInstance::StartDSClient(unsigned int port) {
   ::nt::StartDSClient(m_handle, port);
 }
