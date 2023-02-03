@@ -47,6 +47,9 @@ import java.util.function.Consumer;
  * <p>This class is provided by the NewCommands VendorDep
  */
 public final class CommandScheduler implements NTSendable, AutoCloseable {
+  // The maximum number of button bindings allowed to be created before emitting a warning
+  private static final int MAX_BUTTONS = 1000;
+
   /** The Singleton Instance. */
   private static CommandScheduler instance;
 
@@ -78,6 +81,7 @@ public final class CommandScheduler implements NTSendable, AutoCloseable {
   private final EventLoop m_defaultButtonLoop = new EventLoop();
   // The set of currently-registered buttons that will be polled every iteration.
   private EventLoop m_activeButtonLoop = m_defaultButtonLoop;
+  private int m_buttonCount = 0;
 
   private boolean m_disabled;
 
@@ -159,6 +163,10 @@ public final class CommandScheduler implements NTSendable, AutoCloseable {
    */
   @Deprecated(since = "2023")
   public void addButton(Runnable button) {
+    if (m_buttonCount > MAX_BUTTONS) {
+      DriverStation.reportWarning("Button count is above " + MAX_BUTTONS, false);
+    }
+    m_buttonCount++;
     m_activeButtonLoop.bind(requireNonNullParam(button, "button", "addButton"));
   }
 
