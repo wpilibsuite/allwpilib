@@ -267,8 +267,8 @@ class DriverStation final {
   /**
    * Return the alliance that the driver station says it is on from the FMS.
    *
-   * If the FMS is not connected, it is set from the team alliance setting on the
-   * driver station.
+   * If the FMS is not connected, it is set from the team alliance setting on
+   * the driver station.
    *
    * This could return kRed or kBlue.
    *
@@ -279,8 +279,8 @@ class DriverStation final {
   /**
    * Return the driver station location from the FMS.
    *
-   * If the FMS is not connected, it is set from the team alliance setting on the
-   * driver station.
+   * If the FMS is not connected, it is set from the team alliance setting on
+   * the driver station.
    *
    * This could return 1, 2, or 3.
    *
