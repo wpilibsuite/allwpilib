@@ -56,7 +56,7 @@ class CImpl : public ServerMessageHandler {
   void ProcessIncomingBinary(std::span<const uint8_t> data);
   void HandleLocal(std::vector<ClientMessage>&& msgs);
   bool SendControl(uint64_t curTimeMs);
-  void SendValues(uint64_t curTimeMs);
+  void SendValues(uint64_t curTimeMs, bool flush);
   void SendInitialValues();
   bool CheckNetworkReady();
 
@@ -237,7 +237,7 @@ bool CImpl::SendControl(uint64_t curTimeMs) {
   return true;
 }
 
-void CImpl::SendValues(uint64_t curTimeMs) {
+void CImpl::SendValues(uint64_t curTimeMs, bool flush) {
   DEBUG4("SendValues({})", curTimeMs);
 
   // can't send value updates until we have a RTT
@@ -254,7 +254,8 @@ void CImpl::SendValues(uint64_t curTimeMs) {
   bool checkedNetwork = false;
   auto writer = m_wire.SendBinary();
   for (auto&& pub : m_publishers) {
-    if (pub && !pub->outValues.empty() && curTimeMs >= pub->nextSendMs) {
+    if (pub && !pub->outValues.empty() &&
+        (flush || curTimeMs >= pub->nextSendMs)) {
       for (auto&& val : pub->outValues) {
         if (!checkedNetwork) {
           if (!CheckNetworkReady()) {
@@ -474,8 +475,8 @@ void ClientImpl::SendControl(uint64_t curTimeMs) {
   m_impl->m_wire.Flush();
 }
 
-void ClientImpl::SendValues(uint64_t curTimeMs) {
-  m_impl->SendValues(curTimeMs);
+void ClientImpl::SendValues(uint64_t curTimeMs, bool flush) {
+  m_impl->SendValues(curTimeMs, flush);
   m_impl->m_wire.Flush();
 }
 

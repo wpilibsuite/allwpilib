@@ -107,6 +107,15 @@ public class SimDevice implements AutoCloseable {
   }
 
   /**
+   * Get the name of the simulated device.
+   *
+   * @return the name
+   */
+  public String getName() {
+    return SimDeviceJNI.getSimDeviceName(m_handle);
+  }
+
+  /**
    * Creates a value on the simulated device.
    *
    * <p>Returns null if not in simulation.

@@ -27,6 +27,8 @@ class SimDeviceSimTest {
       assertFalse(simBool.get());
       simBool.set(true);
       assertTrue(devBool.get());
+
+      assertEquals(dev.getName(), "test");
     }
   }
 

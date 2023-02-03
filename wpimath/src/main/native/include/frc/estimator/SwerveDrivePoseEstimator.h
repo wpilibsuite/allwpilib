@@ -194,10 +194,16 @@ class SwerveDrivePoseEstimator {
 
     // Step 5: Reset Odometry to state at sample with vision adjustment.
     m_odometry.ResetPosition(sample.value().gyroAngle,
-                             sample.value().modulePostions,
+                             sample.value().modulePositions,
                              sample.value().pose.Exp(scaledTwist));
 
-    // Step 6: Replay odometry inputs between sample time and latest recorded
+    // Step 6: Record the current pose to allow multiple measurements from the
+    // same timestamp
+    m_poseBuffer.AddSample(timestamp,
+                           {GetEstimatedPosition(), sample.value().gyroAngle,
+                            sample.value().modulePositions});
+
+    // Step 7: Replay odometry inputs between sample time and latest recorded
     // sample to update the pose buffer and correct odometry.
     auto internal_buf = m_poseBuffer.GetInternalBuffer();
 
@@ -207,7 +213,7 @@ class SwerveDrivePoseEstimator {
 
     for (auto entry = upper_bound; entry != internal_buf.end(); entry++) {
       UpdateWithTime(entry->first, entry->second.gyroAngle,
-                     entry->second.modulePostions);
+                     entry->second.modulePositions);
     }
   }
 
@@ -300,7 +306,7 @@ class SwerveDrivePoseEstimator {
     Rotation2d gyroAngle;
 
     // The distances traveled and rotations meaured at each module.
-    wpi::array<SwerveModulePosition, NumModules> modulePostions;
+    wpi::array<SwerveModulePosition, NumModules> modulePositions;
 
     /**
      * Checks equality between this InterpolationRecord and another object.
@@ -344,14 +350,14 @@ class SwerveDrivePoseEstimator {
 
         for (size_t i = 0; i < NumModules; i++) {
           modulePositions[i].distance =
-              wpi::Lerp(this->modulePostions[i].distance,
-                        endValue.modulePostions[i].distance, i);
+              wpi::Lerp(this->modulePositions[i].distance,
+                        endValue.modulePositions[i].distance, i);
           modulePositions[i].angle =
-              wpi::Lerp(this->modulePostions[i].angle,
-                        endValue.modulePostions[i].angle, i);
+              wpi::Lerp(this->modulePositions[i].angle,
+                        endValue.modulePositions[i].angle, i);
 
           modulesDelta[i].distance =
-              modulePositions[i].distance - this->modulePostions[i].distance;
+              modulePositions[i].distance - this->modulePositions[i].distance;
           modulesDelta[i].angle = modulePositions[i].angle;
         }
 

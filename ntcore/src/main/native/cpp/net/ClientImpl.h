@@ -44,7 +44,7 @@ class ClientImpl {
   void HandleLocal(std::vector<ClientMessage>&& msgs);
 
   void SendControl(uint64_t curTimeMs);
-  void SendValues(uint64_t curTimeMs);
+  void SendValues(uint64_t curTimeMs, bool flush);
 
   void SetLocal(LocalInterface* local);
   void SendInitial();

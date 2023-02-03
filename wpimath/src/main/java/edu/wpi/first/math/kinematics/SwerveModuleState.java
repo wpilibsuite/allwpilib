@@ -32,15 +32,16 @@ public class SwerveModuleState implements Comparable<SwerveModuleState> {
   @Override
   public boolean equals(Object obj) {
     if (obj instanceof SwerveModuleState) {
-      return Double.compare(speedMetersPerSecond, ((SwerveModuleState) obj).speedMetersPerSecond)
-          == 0;
+      SwerveModuleState other = (SwerveModuleState) obj;
+      return Math.abs(other.speedMetersPerSecond - speedMetersPerSecond) < 1E-9
+          && angle.equals(other.angle);
     }
     return false;
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(speedMetersPerSecond);
+    return Objects.hash(speedMetersPerSecond, angle);
   }
 
   /**
