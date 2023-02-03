@@ -972,7 +972,7 @@ public final class DriverStation {
   /**
    * Get the game specific message from the FMS.
    *
-   * If the FMS is not connected, it is set from the game data setting on the driver station.
+   * <p>If the FMS is not connected, it is set from the game data setting on the driver station.
    *
    * @return the game specific message
    */
@@ -1055,7 +1055,7 @@ public final class DriverStation {
   /**
    * Get the current alliance from the FMS.
    *
-   * If the FMS is not connected, it is set from the team aliance setting on the driver station.
+   * <p>If the FMS is not connected, it is set from the team alliance setting on the driver station.
    *
    * @return the current alliance
    */
@@ -1084,7 +1084,7 @@ public final class DriverStation {
   /**
    * Gets the location of the team's driver station controls from the FMS.
    *
-   * If the FMS is not connected, it is set from the team aliance setting on the driver station.
+   * <p>If the FMS is not connected, it is set from the team alliance setting on the driver station.
    *
    * @return the location of the team's driver station controls: 1, 2, or 3
    */
