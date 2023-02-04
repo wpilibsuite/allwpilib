@@ -379,7 +379,7 @@ class SwerveDrivePoseEstimator {
     }
   };
 
-  units::second_t BUFFER_DURATION = 1.5_s;
+  static constexpr units::second_t kBufferDuration = 1.5_s;
 
   SwerveDriveKinematics<NumModules>& m_kinematics;
   SwerveDriveOdometry<NumModules> m_odometry;
