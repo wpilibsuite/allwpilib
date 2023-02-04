@@ -240,7 +240,7 @@ class WPILIB_DLLEXPORT DifferentialDrivePoseEstimator {
                                     double i) const;
   };
 
-  units::second_t BUFFER_DURATION = 1.5_s;
+  static constexpr units::second_t kBufferDuration = 1.5_s;
 
   DifferentialDriveKinematics& m_kinematics;
   DifferentialDriveOdometry m_odometry;
