@@ -106,7 +106,7 @@ Pose2d frc::MecanumDrivePoseEstimator::GetEstimatedPosition() const {
 void frc::MecanumDrivePoseEstimator::AddVisionMeasurement(
     const Pose2d& visionRobotPose, units::second_t timestamp) {
   // Step 0: If this measurement is old enough to be outside the pose buffer's timespan, skip.
-  if (m_poseBuffer.GetInternalBuffer().front().first - BUFFER_DURATION > timestamp) {
+  if (m_poseBuffer.GetInternalBuffer().front().first - kBufferDuration > timestamp) {
     return;
   }
 
