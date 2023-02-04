@@ -248,7 +248,7 @@ class WPILIB_DLLEXPORT DifferentialDrivePoseEstimator {
   Eigen::Matrix3d m_visionK = Eigen::Matrix3d::Zero();
 
   TimeInterpolatableBuffer<InterpolationRecord> m_poseBuffer{
-      BUFFER_DURATION, [this](const InterpolationRecord& start,
+      kBufferDuration, [this](const InterpolationRecord& start,
                     const InterpolationRecord& end, double t) {
         return start.Interpolate(this->m_kinematics, end, t);
       }};
