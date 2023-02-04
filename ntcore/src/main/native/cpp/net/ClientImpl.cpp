@@ -30,9 +30,9 @@ using namespace nt::net;
 
 static constexpr uint32_t kMinPeriodMs = 5;
 
-// maximum number of times the wire can be not ready to send another
+// maximum amount of time the wire can be not ready to send another
 // transmission before we close the connection
-static constexpr int kWireMaxNotReady = 10;
+static constexpr uint32_t kWireMaxNotReadyMs = 1000;
 
 namespace {
 
@@ -58,7 +58,7 @@ class CImpl : public ServerMessageHandler {
   bool SendControl(uint64_t curTimeMs);
   void SendValues(uint64_t curTimeMs, bool flush);
   void SendInitialValues();
-  bool CheckNetworkReady();
+  bool CheckNetworkReady(uint64_t curTimeMs);
 
   // ServerMessageHandler interface
   void ServerAnnounce(std::string_view name, int64_t id,
@@ -98,7 +98,6 @@ class CImpl : public ServerMessageHandler {
   // periodic sweep handling
   uint32_t m_periodMs{kPingIntervalMs + 10};
   uint64_t m_lastSendMs{0};
-  int m_notReadyCount{0};
 
   // outgoing queue
   std::vector<ClientMessage> m_outgoing;
@@ -208,7 +207,7 @@ bool CImpl::SendControl(uint64_t curTimeMs) {
 
   // start a timestamp RTT ping if it's time to do one
   if (curTimeMs >= m_nextPingTimeMs) {
-    if (!CheckNetworkReady()) {
+    if (!CheckNetworkReady(curTimeMs)) {
       return false;
     }
     auto now = wpi::Now();
@@ -219,7 +218,7 @@ bool CImpl::SendControl(uint64_t curTimeMs) {
   }
 
   if (!m_outgoing.empty()) {
-    if (!CheckNetworkReady()) {
+    if (!CheckNetworkReady(curTimeMs)) {
       return false;
     }
     auto writer = m_wire.SendText();
@@ -258,7 +257,7 @@ void CImpl::SendValues(uint64_t curTimeMs, bool flush) {
         (flush || curTimeMs >= pub->nextSendMs)) {
       for (auto&& val : pub->outValues) {
         if (!checkedNetwork) {
-          if (!CheckNetworkReady()) {
+          if (!CheckNetworkReady(curTimeMs)) {
             return;
           }
           checkedNetwork = true;
@@ -312,15 +311,13 @@ void CImpl::SendInitialValues() {
   }
 }
 
-bool CImpl::CheckNetworkReady() {
+bool CImpl::CheckNetworkReady(uint64_t curTimeMs) {
   if (!m_wire.Ready()) {
-    ++m_notReadyCount;
-    if (m_notReadyCount > kWireMaxNotReady) {
+    if (m_lastSendMs != 0 && curTimeMs > (m_lastSendMs + kWireMaxNotReadyMs)) {
       m_wire.Disconnect("transmit stalled");
     }
     return false;
   }
-  m_notReadyCount = 0;
   return true;
 }
 
