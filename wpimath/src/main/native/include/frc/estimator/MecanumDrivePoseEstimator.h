@@ -232,7 +232,7 @@ class WPILIB_DLLEXPORT MecanumDrivePoseEstimator {
                                     double i) const;
   };
 
-  units::second_t BUFFER_DURATION = 1.5_s;
+  static constexpr units::second_t kBufferDuration = 1.5_s;
 
   MecanumDriveKinematics& m_kinematics;
   MecanumDriveOdometry m_odometry;
