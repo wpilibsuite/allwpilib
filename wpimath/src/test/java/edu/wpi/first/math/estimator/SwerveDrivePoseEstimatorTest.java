@@ -303,7 +303,6 @@ class SwerveDrivePoseEstimatorTest {
 
   @Test
   void testDiscardsOldVisionMeasurements() {
-
     var kinematics =
         new SwerveDriveKinematics(
             new Translation2d(1, 1),
