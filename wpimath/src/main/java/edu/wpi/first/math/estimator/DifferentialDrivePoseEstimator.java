@@ -40,8 +40,10 @@ public class DifferentialDrivePoseEstimator {
   private final Matrix<N3, N1> m_q = new Matrix<>(Nat.N3(), Nat.N1());
   private Matrix<N3, N3> m_visionK = new Matrix<>(Nat.N3(), Nat.N3());
 
+  private static final double BUFFER_DURATION = 1.5;
+
   private final TimeInterpolatableBuffer<InterpolationRecord> m_poseBuffer =
-      TimeInterpolatableBuffer.createBuffer(1.5);
+      TimeInterpolatableBuffer.createBuffer(BUFFER_DURATION);
 
   /**
    * Constructs a DifferentialDrivePoseEstimator with default standard deviations for the model and
@@ -187,6 +189,11 @@ public class DifferentialDrivePoseEstimator {
    *     or sync the epochs.
    */
   public void addVisionMeasurement(Pose2d visionRobotPoseMeters, double timestampSeconds) {
+    // Step 0: If this measurement is old enough to be outside the pose buffer's timespan, skip.
+    if (m_poseBuffer.getInternalBuffer().lastKey() - BUFFER_DURATION > timestampSeconds) {
+      return;
+    }
+
     // Step 1: Get the pose odometry measured at the moment the vision measurement was made.
     var sample = m_poseBuffer.getSample(timestampSeconds);
 

@@ -40,8 +40,10 @@ public class SwerveDrivePoseEstimator {
   private final int m_numModules;
   private Matrix<N3, N3> m_visionK = new Matrix<>(Nat.N3(), Nat.N3());
 
+  private static final double BUFFER_DURATION = 1.5;
+
   private final TimeInterpolatableBuffer<InterpolationRecord> m_poseBuffer =
-      TimeInterpolatableBuffer.createBuffer(1.5);
+      TimeInterpolatableBuffer.createBuffer(BUFFER_DURATION);
 
   /**
    * Constructs a SwerveDrivePoseEstimator with default standard deviations for the model and vision
@@ -177,6 +179,11 @@ public class SwerveDrivePoseEstimator {
    *     or sync the epochs.
    */
   public void addVisionMeasurement(Pose2d visionRobotPoseMeters, double timestampSeconds) {
+    // Step 0: If this measurement is old enough to be outside the pose buffer's timespan, skip.
+    if (m_poseBuffer.getInternalBuffer().lastKey() - BUFFER_DURATION > timestampSeconds) {
+      return;
+    }
+
     // Step 1: Get the pose odometry measured at the moment the vision measurement was made.
     var sample = m_poseBuffer.getSample(timestampSeconds);
 
