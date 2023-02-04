@@ -6,12 +6,14 @@ package edu.wpi.first.wpilibj.examples.rapidreactcommandbot.subsystems;
 
 import static edu.wpi.first.wpilibj.examples.rapidreactcommandbot.Constants.StorageConstants;
 
+import edu.wpi.first.wpilibj.telemetry.TelemetryNode;
+import edu.wpi.first.wpilibj.telemetry.TelemetryBuilder;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.motorcontrol.PWMSparkMax;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
-public class Storage extends SubsystemBase {
+public class Storage extends SubsystemBase implements TelemetryNode {
   private final PWMSparkMax m_motor = new PWMSparkMax(StorageConstants.kMotorPort);
   private final DigitalInput m_ballSensor = new DigitalInput(StorageConstants.kBallSensorPort);
 
@@ -29,5 +31,10 @@ public class Storage extends SubsystemBase {
   /** Returns a command that runs the storage motor indefinitely. */
   public CommandBase runCommand() {
     return run(() -> m_motor.set(1)).withName("run");
+  }
+
+  @Override
+  public void declareTelemetry(TelemetryBuilder builder) {
+    builder.publishBoolean("isFull", this::isFull).logOnly();
   }
 }
