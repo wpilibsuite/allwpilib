@@ -125,13 +125,13 @@ TEST_F(WebSocketIntegrationTest, ClientSendText) {
         ++gotData;
         ASSERT_EQ(data, "hello");
       });
+      ws.closed.connect([&](auto code, auto reason) { Finish(); });
     });
   });
 
   clientPipe->Connect(pipeName, [&] {
     auto ws = WebSocket::CreateClient(*clientPipe, "/test", pipeName);
     ws->closed.connect([&](uint16_t code, std::string_view reason) {
-      Finish();
       if (code != 1005 && code != 1006) {
         FAIL() << "Code: " << code << " Reason: " << reason;
       }
