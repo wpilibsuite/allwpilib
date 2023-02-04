@@ -170,6 +170,11 @@ class SwerveDrivePoseEstimator {
    */
   void AddVisionMeasurement(const Pose2d& visionRobotPose,
                             units::second_t timestamp) {
+    // Step 0: If this measurement is old enough to be outside the pose buffer's timespan, skip.
+    if (m_poseBuffer.GetInternalBuffer().front().first - BUFFER_DURATION > timestamp) {
+      return;
+    }
+
     // Step 1: Get the estimated pose from when the vision measurement was made.
     auto sample = m_poseBuffer.Sample(timestamp);
 
@@ -374,13 +379,15 @@ class SwerveDrivePoseEstimator {
     }
   };
 
+  units::second_t BUFFER_DURATION = 1.5_s;
+
   SwerveDriveKinematics<NumModules>& m_kinematics;
   SwerveDriveOdometry<NumModules> m_odometry;
   wpi::array<double, 3> m_q{wpi::empty_array};
   Eigen::Matrix3d m_visionK = Eigen::Matrix3d::Zero();
 
   TimeInterpolatableBuffer<InterpolationRecord> m_poseBuffer{
-      1.5_s, [this](const InterpolationRecord& start,
+      BUFFER_DURATION, [this](const InterpolationRecord& start,
                     const InterpolationRecord& end, double t) {
         return start.Interpolate(this->m_kinematics, end, t);
       }};
