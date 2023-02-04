@@ -39,7 +39,7 @@ public class MecanumDrivePoseEstimator {
   private final Matrix<N3, N1> m_q = new Matrix<>(Nat.N3(), Nat.N1());
   private Matrix<N3, N3> m_visionK = new Matrix<>(Nat.N3(), Nat.N3());
 
-  private static final double BUFFER_DURATION = 1.5;
+  private static final double kBufferDuration = 1.5;
 
   private final TimeInterpolatableBuffer<InterpolationRecord> m_poseBuffer =
       TimeInterpolatableBuffer.createBuffer(BUFFER_DURATION);
