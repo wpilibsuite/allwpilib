@@ -43,7 +43,7 @@ public class DifferentialDrivePoseEstimator {
   private static final double kBufferDuration = 1.5;
 
   private final TimeInterpolatableBuffer<InterpolationRecord> m_poseBuffer =
-      TimeInterpolatableBuffer.createBuffer(BUFFER_DURATION);
+      TimeInterpolatableBuffer.createBuffer(kBufferDuration);
 
   /**
    * Constructs a DifferentialDrivePoseEstimator with default standard deviations for the model and
