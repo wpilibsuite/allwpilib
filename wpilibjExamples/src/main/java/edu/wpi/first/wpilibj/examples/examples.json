@@ -1,7 +1,7 @@
 [
   {
     "name": "Getting Started",
-    "description": "An example program which demonstrates the simplest autonomous and teleoperated routines.",
+    "description": "A differential-drive robot with split-stick Xbox arcade drive with a simple time-based autonomous.",
     "tags": [
       "Basic Robot"
     ],
@@ -12,7 +12,7 @@
   },
   {
     "name": "Tank Drive",
-    "description": "Demonstrate the use of the DifferentialDrive class doing teleop driving with tank steering",
+    "description": "Control a differential drive with twin-joystick tank drive in teleop.",
     "tags": [
       "Basic Robot",
       "Differential Drive",
@@ -25,7 +25,7 @@
   },
   {
     "name": "Arcade Drive",
-    "description": "Demonstrates the use of the DifferentialDrive class to drive a robot with Arcade Drive.",
+    "description": "Control a differential drivetrain with single-joystick arcade drive in teleop.",
     "tags": [
       "Basic Robot",
       "Differential Drive",
@@ -38,7 +38,7 @@
   },
   {
     "name": "Mecanum Drive",
-    "description": "Demonstrate the use of the MecanumDrive class doing teleop driving with Mecanum steering",
+    "description": "Control a mecanum drivetrain with a joystick in teleop.",
     "tags": [
       "Basic Robot",
       "Mecanum Drive",
@@ -51,7 +51,7 @@
   },
   {
     "name": "PDP CAN Monitoring",
-    "description": "Demonstrate using CAN to monitor the voltage, current, and temperature in the Power Distribution Panel.",
+    "description": "Monitor Power Distribution data such as voltage, current, temperature, etc.",
     "tags": [
       "Hardware",
       "PDP",
@@ -64,7 +64,7 @@
   },
   {
     "name": "Solenoids",
-    "description": "Demonstrate controlling a single and double solenoid from Joystick buttons.",
+    "description": "Control a single and double solenoid from joystick buttons.",
     "tags": [
       "Hardware",
       "Joystick",
@@ -77,7 +77,7 @@
   },
   {
     "name": "Encoder",
-    "description": "Demonstrate displaying the value of a quadrature encoder on the SmartDashboard.",
+    "description": "View values from a quadrature encoder.",
     "tags": [
       "Hardware",
       "Encoder",
@@ -90,7 +90,7 @@
   },
   {
     "name": "EventLoop",
-    "description": "Demonstrate managing a ball system using EventLoop and BooleanEvent.",
+    "description": "Manage a ball system using EventLoop and BooleanEvent.",
     "tags": [
       "Basic Robot",
       "Flywheel",
@@ -103,7 +103,7 @@
   },
   {
     "name": "Relay",
-    "description": "Demonstrate controlling a Relay from Joystick buttons.",
+    "description": "Control a relay from joystick buttons.",
     "tags": [
       "Hardware",
       "Relay",
@@ -116,7 +116,7 @@
   },
   {
     "name": "Ultrasonic",
-    "description": "Demonstrate using the Ultrasonic class with a ping-response ultrasonic sensor.",
+    "description": "View values from a ping-response ultrasonic sensor.",
     "tags": [
       "Hardware",
       "Ultrasonic",
@@ -130,7 +130,7 @@
   },
   {
     "name": "Ultrasonic PID",
-    "description": "Demonstrate maintaining a set distance using an ultrasonic sensor and PID Control.",
+    "description": "Maintain a set distance from an obstacle with an ultrasonic sensor and PID control.",
     "tags": [
       "Basic Robot",
       "Ultrasonic",
@@ -144,7 +144,7 @@
   },
   {
     "name": "Potentiometer PID",
-    "description": "An example to demonstrate the use of a potentiometer and PID control to maintain elevator position setpoints.",
+    "description": "Maintain elevator position setpoints with a potentiometer and PID control.",
     "tags": [
       "Basic Robot",
       "Analog",
@@ -159,7 +159,7 @@
   },
   {
     "name": "Elevator with trapezoid profiled PID",
-    "description": "Demonstrate the use of trapezoid profiles with a smart motor controller's PID to reach elevator position setpoints.",
+    "description": "Reach elevator position setpoints with trapezoid profiles and smart motor controller PID.",
     "tags": [
       "Basic Robot",
       "Elevator",
@@ -174,7 +174,7 @@
   },
   {
     "name": "Elevator with profiled PID controller",
-    "description": "An example to demonstrate the use of an encoder and trapezoid profiled PID control to reach elevator position setpoints.",
+    "description": "Reach elevator position setpoints with an encoder and profiled PID control.",
     "tags": [
       "Basic Robot",
       "Elevator",
@@ -188,7 +188,7 @@
   },
   {
     "name": "Gyro",
-    "description": "An example program showing how to drive straight using a gyro sensor.",
+    "description": "Drive a differential drive straight with a gyro sensor.",
     "tags": [
       "Basic Robot",
       "Differential Drive",
@@ -204,7 +204,7 @@
   },
   {
     "name": "Gyro Mecanum",
-    "description": "An example program showing how to perform mecanum drive with field oriented controls.",
+    "description": "Drive a mecanum drivetrain using field-oriented controls with a joystick.",
     "tags": [
       "Basic Robot",
       "Mecanum Drive",
@@ -219,7 +219,7 @@
   },
   {
     "name": "HID Rumble",
-    "description": "An example program showing how to make human interface devices rumble.",
+    "description": "Make human interface devices (HID) rumble.",
     "tags": [
       "Hardware",
       "XboxController"
@@ -231,7 +231,7 @@
   },
   {
     "name": "Mechanism2d",
-    "description": "An example usage of Mechanism2d to display mechanism states on a dashboard.",
+    "description": "Display mechanism states on a dashboard with Mechanism2d.",
     "tags": [
       "Basic Robot",
       "Elevator",
@@ -248,7 +248,7 @@
   },
   {
     "name": "Motor Control",
-    "description": "Demonstrate controlling a single motor with a Joystick and displaying the net movement of the motor using an encoder.",
+    "description": "Control a single motor with a joystick, displaying the movement of the motor using an encoder.",
     "tags": [
       "Basic Robot",
       "Encoder",
@@ -262,7 +262,7 @@
   },
   {
     "name": "GearsBot",
-    "description": "A fully functional example CommandBased program for WPIs GearsBot robot, ported to the new CommandBased library. This code can run on your computer if it supports simulation.",
+    "description": "A fully functional Command-Based program for WPI's GearsBot robot.",
     "tags": [
       "Complete Robot",
       "Command-based",
@@ -281,7 +281,7 @@
   },
   {
     "name": "Simple Vision",
-    "description": "Demonstrate the use of the CameraServer class to stream from a USB Webcam without processing the images.",
+    "description": "Use the CameraServer class to stream from a USB Webcam without processing the images.",
     "tags": [
       "Vision"
     ],
@@ -292,7 +292,7 @@
   },
   {
     "name": "Intermediate Vision",
-    "description": "An example program that acquires images from an attached USB camera and adds some annotation to the image as you might do for showing operators the result of some image recognition, and sends it to the dashboard for display.",
+    "description": "Acquire images from an attached USB camera and add some annotation to the image (as you might do for showing operators the result of some image recognition) and send it to the dashboard for display.",
     "tags": [
       "Vision"
     ],
@@ -303,7 +303,7 @@
   },
   {
     "name": "Axis Camera Sample",
-    "description": "An example program that acquires images from an Axis network camera and adds some annotation to the image as you might do for showing operators the result of some image recognition, and sends it to the dashboard for display. This demonstrates the use of the AxisCamera class.",
+    "description": "Acquire images from an Axis network camera and adds some annotation to the image (as you might do for showing operators the result of some image recognition), and sends it to the dashboard for display.",
     "tags": [
       "Vision"
     ],
@@ -314,7 +314,7 @@
   },
   {
     "name": "AprilTags Vision",
-    "description": "on-roboRIO detection of AprilTags using an attached USB camera.",
+    "description": "On-roboRIO detection of AprilTags using an attached USB camera.",
     "tags": [
       "Vision",
       "AprilTags"
@@ -325,8 +325,8 @@
     "commandversion": 2
   },
   {
-    "name": "Shuffleboard Sample",
-    "description": "An example program that adds data to various Shuffleboard tabs that demonstrates the Shuffleboard API",
+    "name": "Shuffleboard",
+    "description": "Present various data via the Shuffleboard API.",
     "tags": [
       "Basic Robot",
       "Differential Drive",
@@ -342,7 +342,7 @@
   },
   {
     "name": "'Traditional' Hatchbot",
-    "description": "A fully-functional command-based hatchbot for the 2019 game using the new command framework.  Written in the 'traditional' style, i.e. commands are given their own classes.",
+    "description": "A fully-functional command-based hatchbot for the 2019 game, written in the 'traditional' style, i.e. commands are given their own classes.",
     "tags": [
       "Complete Robot",
       "Command-based",
@@ -361,7 +361,7 @@
   },
   {
     "name": "'Inlined' Hatchbot",
-    "description": "A fully-functional command-based hatchbot for the 2019 game using the new command framework.  Written in the 'inlined' style, i.e. many commands are defined inline with lambdas.",
+    "description": "A fully-functional command-based hatchbot for the 2019 game, written in the 'inlined' style, i.e. many commands are defined inline with lambdas.",
     "tags": [
       "Complete Robot",
       "Command-based",
@@ -380,7 +380,7 @@
   },
   {
     "name": "Rapid React Command Bot",
-    "description": "A fully-functional command-based fender bot for the 2022 game using the new command framework.",
+    "description": "A fully-functional command-based fender bot for the 2022 game, written in the 'inlined' style, i.e. many commands are defined inline with lambdas.",
     "tags": [
       "Complete Robot",
       "Command-based",
@@ -400,7 +400,7 @@
   },
   {
     "name": "Select Command Example",
-    "description": "An example showing how to use the SelectCommand class from the new command framework.",
+    "description": "Use SelectCommand to select an autonomous routine.",
     "tags": [
       "Command-based"
     ],
@@ -411,7 +411,7 @@
   },
   {
     "name": "Frisbeebot",
-    "description": "An example robot project for a simple frisbee shooter for the 2013 FRC game, Ultimate Ascent, demonstrating use of PID functionality in the command framework",
+    "description": "A simple frisbee shooter for the 2013 game, demonstrating use of PIDSubsystem.",
     "tags": [
       "Complete Robot",
       "Command-based",
@@ -428,7 +428,7 @@
   },
   {
     "name": "Gyro Drive Commands",
-    "description": "An example command-based robot project demonstrating simple PID functionality utilizing a gyroscope to keep a robot driving straight and to turn to specified angles.",
+    "description": "Control a robot's angle with PID and a gyro, in command-based.",
     "tags": [
       "Command-based",
       "Differential Drive",
@@ -445,7 +445,7 @@
   },
   {
     "name": "SwerveBot",
-    "description": "An example program for a swerve drive that uses swerve drive kinematics and odometry.",
+    "description": "Use kinematics and odometry with a swerve drive.",
     "tags": [
       "Swerve Drive",
       "Odometry",
@@ -460,7 +460,7 @@
   },
   {
     "name": "MecanumBot",
-    "description": "An example program for a mecanum drive that uses mecanum drive kinematics and odometry.",
+    "description": "Use kinematics and odometry with a mecanum drive.",
     "tags": [
       "Mecanum Drive",
       "Odometry",
@@ -475,7 +475,7 @@
   },
   {
     "name": "DifferentialDriveBot",
-    "description": "An example program for a differential drive that uses differential drive kinematics and odometry.",
+    "description": "Use kinematics and odometry with a differential drive.",
     "tags": [
       "Differential Drive",
       "Odometry",
@@ -490,7 +490,7 @@
   },
   {
     "name": "RamseteCommand",
-    "description": "An example command-based robot demonstrating the use of a RamseteCommand to follow a pregenerated trajectory.",
+    "description": "Follow a pre-generated trajectory with a differential drive using RamseteCommand.",
     "tags": [
       "Differential Drive",
       "Command-based",
@@ -509,7 +509,7 @@
   },
   {
     "name": "Arcade Drive Xbox Controller",
-    "description": "Demonstrates the use of the DifferentialDrive class to drive a robot with Arcade Drive and an Xbox Controller",
+    "description": "Control a differential drive with split-stick arcade drive in teleop.",
     "tags": [
       "Basic Robot",
       "Differential Drive",
@@ -522,7 +522,7 @@
   },
   {
     "name": "Tank Drive Xbox Controller",
-    "description": "Demonstrates the use of the DifferentialDrive class to drive a robot with Tank Drive and an Xbox Controller",
+    "description": "Control a differential drive with Xbox tank drive in teleop.",
     "tags": [
       "Basic Robot",
       "Differential Drive",
@@ -535,7 +535,7 @@
   },
   {
     "name": "Duty Cycle Encoder",
-    "description": "Demonstrates the use of the Duty Cycle Encoder class",
+    "description": "View values from a duty-cycle encoder.",
     "tags": [
       "Hardware",
       "Duty Cycle",
@@ -549,7 +549,7 @@
   },
   {
     "name": "Duty Cycle Input",
-    "description": "Demonstrates the use of the Duty Cycle class",
+    "description": "View duty-cycle input.",
     "tags": [
       "Hardware",
       "Duty Cycle",
@@ -562,7 +562,7 @@
   },
   {
     "name": "Addressable LED",
-    "description": "Demonstrates the use of the Addressable LED class",
+    "description": "Display a rainbow pattern on an addressable LED strip.",
     "tags": [
       "Hardware",
       "Basic Robot",
@@ -575,7 +575,7 @@
   },
   {
     "name": "DMA",
-    "description": "Demonstrates the use of the DMA class",
+    "description": "Read various sensors using DMA.",
     "tags": [
       "Hardware",
       "DMA",
@@ -588,7 +588,7 @@
   },
   {
     "name": "ArmBot",
-    "description": "An example command-based robot demonstrating the use of a ProfiledPIDSubsystem to control an arm.",
+    "description": "Control an arm with ProfiledPIDSubsystem.",
     "tags": [
       "Command-based",
       "Arm",
@@ -604,7 +604,7 @@
   },
   {
     "name": "ArmBotOffboard",
-    "description": "An example command-based robot demonstrating the use of a TrapezoidProfileSubsystem to control an arm with an offboard PID.",
+    "description": "Control an arm with TrapezoidProfileSubsystem and smart motor controller PID.",
     "tags": [
       "Command-based",
       "Arm",
@@ -620,7 +620,7 @@
   },
   {
     "name": "DriveDistanceOffboard",
-    "description": "An example command-based robot demonstrating the use of a TrapezoidProfileCommand to drive a robot a set distance with offboard PID on the drive.",
+    "description": "Drive a differential drivetrain a set distance using TrapezoidProfileCommand and smart motor controller PID.",
     "tags": [
       "Command-based",
       "Differential Drive",
@@ -635,7 +635,7 @@
   },
   {
     "name": "MecanumControllerCommand",
-    "description": "An example command-based robot demonstrating the use of a MecanumControllerCommand to follow a pregenerated trajectory.",
+    "description": "Follow a pre-generated trajectory with a mecanum drive using MecanumControllerCommand.",
     "tags": [
       "Command-based",
       "Mecanum Drive",
@@ -653,7 +653,7 @@
   },
   {
     "name": "SwerveControllerCommand",
-    "description": "An example command-based robot demonstrating the use of a SwerveControllerCommand to follow a pregenerated trajectory.",
+    "description": "Follow a pre-generated trajectory with a swerve drive using SwerveControllerCommand.",
     "tags": [
       "Command-based",
       "Swerve Drive",
@@ -671,7 +671,7 @@
   },
   {
     "name": "RamseteController",
-    "description": "An example robot demonstrating the use of RamseteController.",
+    "description": "Follow a pre-generated trajectory with a differential drive using RamseteController.",
     "tags": [
       "Basic Robot",
       "Differential Drive",
@@ -689,7 +689,7 @@
   },
   {
     "name": "StateSpaceFlywheel",
-    "description": "An example state-space controller for a flywheel.",
+    "description": "Control a flywheel using a state-space model (based on values from CAD), with a Kalman Filter and LQR.",
     "tags": [
       "Basic Robot",
       "Flywheel",
@@ -705,7 +705,7 @@
   },
   {
     "name": "StateSpaceFlywheelSysId",
-    "description": "An example state-space controller for controlling a flywheel with System Identification.",
+    "description": "Control a flywheel using a state-space model (based on values from SysId), with a Kalman Filter and LQR.",
     "tags": [
       "Basic Robot",
       "Flywheel",
@@ -722,7 +722,7 @@
   },
   {
     "name": "StateSpaceElevator",
-    "description": "An example state-space controller for controlling an elevator.",
+    "description": "Control an elevator using a state-space model (based on values from CAD), with a Kalman Filter and LQR.",
     "tags": [
       "Basic Robot",
       "Elevator",
@@ -738,7 +738,7 @@
   },
   {
     "name": "StateSpaceArm",
-    "description": "An example state-space controller for controlling an arm.",
+    "description": "Control an arm using a state-space model (based on values from CAD), with a Kalman Filter and LQR.",
     "tags": [
       "Basic Robot",
       "Arm",
@@ -754,7 +754,7 @@
   },
   {
     "name": "SimpleDifferentialDriveSimulation",
-    "description": "An example of a minimal drivetrain simulation project without the command-based library.",
+    "description": "Simulate a differential drivetrain and follow trajectories with RamseteController (non-command-based).",
     "tags": [
       "Differential Drive",
       "State-Space",
@@ -772,7 +772,7 @@
   },
   {
     "name": "StateSpaceDriveSimulation",
-    "description": "An example of drivetrain simulation in combination with a RAMSETE path following controller and the Field2d class.",
+    "description": "Simulate a differential drivetrain and follow trajectories with RamseteCommand (command-based).",
     "tags": [
       "Command-based",
       "Differential Drive",
@@ -787,7 +787,7 @@
   },
   {
     "name": "ElevatorSimulation",
-    "description": "Demonstrates the use of physics simulation with a simple elevator.",
+    "description": "Simulate an elevator.",
     "tags": [
       "Basic Robot",
       "Elevator",
@@ -803,7 +803,7 @@
   },
   {
     "name": "ArmSimulation",
-    "description": "Demonstrates the use of physics simulation with a simple single-jointedarm.",
+    "description": "Simulate a single-jointed arm.",
     "tags": [
       "Basic Robot",
       "Arm",
@@ -819,7 +819,7 @@
   },
   {
     "name": "UnitTesting",
-    "description": "Demonstrates basic unit testing for a robot project.",
+    "description": "Test a robot project with basic unit tests in simulation.",
     "tags": [
       "Intake",
       "Pneumatics"
@@ -831,7 +831,7 @@
   },
   {
     "name": "DifferentialDrivePoseEstimator",
-    "description": "Demonstrates the use of the DifferentialDrivePoseEstimator as a replacement for differential drive odometry.",
+    "description": "Combine differential-drive odometry with vision data using DifferentialDrivePoseEstimator.",
     "tags": [
       "Differential Drive",
       "State-Space",
@@ -847,7 +847,7 @@
   },
   {
     "name": "MecanumDrivePoseEstimator",
-    "description": "Demonstrates the use of the MecanumDrivePoseEstimator as a replacement for mecanum drive odometry.",
+    "description": "Combine mecanum-drive odometry with vision data using MecanumDrivePoseEstimator.",
     "tags": [
       "Mecanum Drive",
       "State-Space",
@@ -863,7 +863,7 @@
   },
   {
     "name": "SwerveDrivePoseEstimator",
-    "description": "Demonstrates the use of the SwerveDrivePoseEstimator as a replacement for swerve drive odometry.",
+    "description": "Combine swerve-drive odometry with vision data using SwerveDrivePoseEstimator.",
     "tags": [
       "Swerve Drive",
       "State-Space",
@@ -894,7 +894,7 @@
   },
   {
     "name": "Digital Communication Sample",
-    "description": "An example program that communicates with external devices (such as an Arduino) using the roboRIO's DIO",
+    "description": "Communicates with external devices (such as an Arduino) using the roboRIO's DIO.",
     "tags": [
       "Hardware",
       "Digital Output"
@@ -906,7 +906,7 @@
   },
   {
     "name": "I2C Communication Sample",
-    "description": "An example program that communicates with external devices (such as an Arduino) using the roboRIO's I2C port",
+    "description": "Communicate with external devices (such as an Arduino) using the roboRIO's I2C port.",
     "tags": [
       "Hardware",
       "I2C"
