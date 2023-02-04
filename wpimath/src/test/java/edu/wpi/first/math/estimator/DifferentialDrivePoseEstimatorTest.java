@@ -269,7 +269,6 @@ class DifferentialDrivePoseEstimatorTest {
 
   @Test
   void testDiscardsStaleVisionMeasurements() {
-
     var kinematics = new DifferentialDriveKinematics(1);
     var estimator =
         new DifferentialDrivePoseEstimator(

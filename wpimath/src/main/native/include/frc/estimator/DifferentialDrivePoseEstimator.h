@@ -249,7 +249,7 @@ class WPILIB_DLLEXPORT DifferentialDrivePoseEstimator {
 
   TimeInterpolatableBuffer<InterpolationRecord> m_poseBuffer{
       kBufferDuration, [this](const InterpolationRecord& start,
-                    const InterpolationRecord& end, double t) {
+                              const InterpolationRecord& end, double t) {
         return start.Interpolate(this->m_kinematics, end, t);
       }};
 };
