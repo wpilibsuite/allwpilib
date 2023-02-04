@@ -50,6 +50,10 @@ void WebSocketConnection::Flush() {
       if (self->m_sendsActive > 0) {
         --self->m_sendsActive;
       }
+    } else {
+      for (auto&& buf : bufs) {
+        buf.Deallocate();
+      }
     }
   });
   m_frames.clear();
