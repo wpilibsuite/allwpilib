@@ -178,7 +178,7 @@ public class MecanumDrivePoseEstimator {
    */
   public void addVisionMeasurement(Pose2d visionRobotPoseMeters, double timestampSeconds) {
     // Step 0: If this measurement is old enough to be outside the pose buffer's timespan, skip.
-    if (m_poseBuffer.getInternalBuffer().lastKey() - BUFFER_DURATION > timestampSeconds) {
+    if (m_poseBuffer.getInternalBuffer().lastKey() - kBufferDuration > timestampSeconds) {
       return;
     }
 
