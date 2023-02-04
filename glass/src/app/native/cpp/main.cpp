@@ -98,8 +98,8 @@ static void NtInitialize() {
           level = "ERROR: ";
         } else if (msg->level >= NT_LOG_WARNING) {
           level = "WARNING: ";
-        } else if (!gNetworkTablesDebugLog) {
-          return;
+        } else if (msg->level < NT_LOG_INFO && !gNetworkTablesDebugLog) {
+          continue;
         }
         gNetworkTablesLog.Append(fmt::format(
             "{}{} ({}:{})\n", level, msg->message, msg->filename, msg->line));
