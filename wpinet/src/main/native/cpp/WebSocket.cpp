@@ -126,6 +126,7 @@ void WebSocket::Close(uint16_t code, std::string_view reason) {
   SendClose(code, reason);
   if (m_state != FAILED && m_state != CLOSED) {
     m_state = CLOSING;
+    closed(code, reason);
   }
 }
 
@@ -337,8 +338,11 @@ void WebSocket::SetClosed(uint16_t code, std::string_view reason, bool failed) {
   if (m_state == FAILED || m_state == CLOSED) {
     return;
   }
+  bool wasClosing = m_state == CLOSING;
   m_state = failed ? FAILED : CLOSED;
-  closed(code, reason);
+  if (!wasClosing) {
+    closed(code, reason);
+  }
 }
 
 void WebSocket::Shutdown() {
