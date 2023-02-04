@@ -48,9 +48,9 @@ using namespace mpack;
 
 static constexpr uint32_t kMinPeriodMs = 5;
 
-// maximum number of times the wire can be not ready to send another
+// maximum amount of time the wire can be not ready to send another
 // transmission before we close the connection
-static constexpr int kWireMaxNotReady = 10;
+static constexpr uint32_t kWireMaxNotReadyMs = 1000;
 
 namespace {
 
@@ -214,7 +214,6 @@ class ClientData4 final : public ClientData4Base {
 
  private:
   std::vector<ServerMessage> m_outgoing;
-  int m_notReadyCount{0};
 
   bool WriteBinary(int64_t id, int64_t time, const Value& value) {
     return WireEncodeBinary(SendBinary().Add(), id, time, value);
@@ -293,7 +292,6 @@ class ClientData3 final : public ClientData, private net3::MessageHandler3 {
 
   std::vector<net3::Message3> m_outgoing;
   int64_t m_nextPubUid{1};
-  int m_notReadyCount{0};
 
   struct TopicData3 {
     explicit TopicData3(TopicData* topic) { UpdateFlags(topic); }
@@ -941,13 +939,11 @@ void ClientData4::SendOutgoing(uint64_t curTimeMs) {
   }
 
   if (!m_wire.Ready()) {
-    ++m_notReadyCount;
-    if (m_notReadyCount > kWireMaxNotReady) {
+    if (m_lastSendMs != 0 && curTimeMs > (m_lastSendMs + kWireMaxNotReadyMs)) {
       m_wire.Disconnect("transmit stalled");
     }
     return;
   }
-  m_notReadyCount = 0;
 
   for (auto&& msg : m_outgoing) {
     if (auto m = std::get_if<ServerValueMsg>(&msg.contents)) {
@@ -1114,13 +1110,11 @@ void ClientData3::SendOutgoing(uint64_t curTimeMs) {
   }
 
   if (!m_wire.Ready()) {
-    ++m_notReadyCount;
-    if (m_notReadyCount > kWireMaxNotReady) {
+    if (m_lastSendMs != 0 && curTimeMs > (m_lastSendMs + kWireMaxNotReadyMs)) {
       m_wire.Disconnect("transmit stalled");
     }
     return;
   }
-  m_notReadyCount = 0;
 
   auto out = m_wire.Send();
   for (auto&& msg : m_outgoing) {
