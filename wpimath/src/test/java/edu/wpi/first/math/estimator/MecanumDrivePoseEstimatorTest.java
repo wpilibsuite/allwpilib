@@ -282,7 +282,6 @@ class MecanumDrivePoseEstimatorTest {
 
   @Test
   void testDiscardsOldVisionMeasurements() {
-
     var kinematics =
         new MecanumDriveKinematics(
             new Translation2d(1, 1),
