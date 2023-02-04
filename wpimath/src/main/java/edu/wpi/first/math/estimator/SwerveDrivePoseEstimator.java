@@ -40,7 +40,7 @@ public class SwerveDrivePoseEstimator {
   private final int m_numModules;
   private Matrix<N3, N3> m_visionK = new Matrix<>(Nat.N3(), Nat.N3());
 
-  private static final double BUFFER_DURATION = 1.5;
+  private static final double kBufferDuration = 1.5;
 
   private final TimeInterpolatableBuffer<InterpolationRecord> m_poseBuffer =
       TimeInterpolatableBuffer.createBuffer(kBufferDuration);
