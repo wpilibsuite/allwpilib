@@ -43,7 +43,7 @@ public class SwerveDrivePoseEstimator {
   private static final double BUFFER_DURATION = 1.5;
 
   private final TimeInterpolatableBuffer<InterpolationRecord> m_poseBuffer =
-      TimeInterpolatableBuffer.createBuffer(BUFFER_DURATION);
+      TimeInterpolatableBuffer.createBuffer(kBufferDuration);
 
   /**
    * Constructs a SwerveDrivePoseEstimator with default standard deviations for the model and vision
