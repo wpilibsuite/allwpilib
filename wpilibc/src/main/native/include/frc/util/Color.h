@@ -5,6 +5,7 @@
 #pragma once
 
 #include <algorithm>
+#include <stdexcept>
 #include <string>
 
 namespace frc {
@@ -809,6 +810,23 @@ class Color {
       default:
         return Color(v, m, v - X);
     }
+  }
+
+  /**
+   * Create a Color from a hex string. Throws an exception if the Hex String is
+   * invalid.
+   *
+   * @param hexString a string of the format <code>#RRGGBB</code>
+   * @return Color object from hex string.
+   */
+  static constexpr Color FromHexString(std::string hexString) {
+    if (hexString.length() != 7 || !hexString.starts_with("#")) {
+      throw std::invalid_argument("Invalid Hex String for Color");
+    }
+
+    int r, g, b;
+    std::sscanf(hexString.c_str(), "#%02x%02x%02x", &r, &g, &b);
+    return Color(r / 255, g / 255, b / 255);
   }
 
   /**

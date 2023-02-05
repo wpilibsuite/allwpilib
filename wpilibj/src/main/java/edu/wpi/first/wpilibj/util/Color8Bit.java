@@ -36,6 +36,22 @@ public class Color8Bit {
     this((int) (color.red * 255), (int) (color.green * 255), (int) (color.blue * 255));
   }
 
+  /**
+   * Create a Color8Bit from a hex string. Throws an exception if the Hex String is invalid.
+   *
+   * @param hexString a string of the format <code>#RRGGBB</code>
+   * @return Color8Bit object from hex string.
+   */
+  public static Color8Bit fromHexString(String hexString) {
+    if (hexString.length() != 7 || !hexString.startsWith("#"))
+      throw new IllegalArgumentException("Invalid Hex String");
+
+    return new Color8Bit(
+        Integer.valueOf(hexString.substring(1, 3), 16),
+        Integer.valueOf(hexString.substring(3, 5), 16),
+        Integer.valueOf(hexString.substring(5, 7), 16));
+  }
+
   @Override
   public boolean equals(Object other) {
     if (this == other) {

@@ -5,6 +5,7 @@
 #pragma once
 
 #include <algorithm>
+#include <stdexcept>
 #include <string>
 
 #include "Color.h"
@@ -42,6 +43,23 @@ class Color8Bit {
 
   constexpr operator Color() const {  // NOLINT
     return Color(red / 255.0, green / 255.0, blue / 255.0);
+  }
+
+  /**
+   * Create a Color8Bit from a hex string. Throws an exception if the Hex String
+   * is invalid.
+   *
+   * @param hexString a string of the format <code>#RRGGBB</code>
+   * @return Color8Bit object from hex string.
+   */
+  static constexpr Color8Bit FromHexString(std::string hexString) {
+    if (hexString.length() != 7 || !hexString.starts_with("#")) {
+      throw std::invalid_argument("Invalid Hex String for Color");
+    }
+
+    int r, g, b;
+    std::sscanf(hexString.c_str(), "#%02x%02x%02x", &r, &g, &b);
+    return Color8Bit(r, g, b);
   }
 
   constexpr bool operator==(const Color8Bit&) const = default;
