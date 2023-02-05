@@ -474,6 +474,7 @@ cs::UsbCamera CameraServer::StartAutomaticCapture() {
 }
 
 cs::UsbCamera CameraServer::StartAutomaticCapture(int dev) {
+  ::GetInstance();
   cs::UsbCamera camera{fmt::format("USB Camera {}", dev), dev};
   StartAutomaticCapture(camera);
   auto csShared = GetCameraServerShared();
@@ -483,6 +484,7 @@ cs::UsbCamera CameraServer::StartAutomaticCapture(int dev) {
 
 cs::UsbCamera CameraServer::StartAutomaticCapture(std::string_view name,
                                                   int dev) {
+  ::GetInstance();
   cs::UsbCamera camera{name, dev};
   StartAutomaticCapture(camera);
   auto csShared = GetCameraServerShared();
@@ -492,6 +494,7 @@ cs::UsbCamera CameraServer::StartAutomaticCapture(std::string_view name,
 
 cs::UsbCamera CameraServer::StartAutomaticCapture(std::string_view name,
                                                   std::string_view path) {
+  ::GetInstance();
   cs::UsbCamera camera{name, path};
   StartAutomaticCapture(camera);
   auto csShared = GetCameraServerShared();
@@ -517,6 +520,7 @@ cs::AxisCamera CameraServer::AddAxisCamera(std::span<const std::string> hosts) {
 
 cs::AxisCamera CameraServer::AddAxisCamera(std::string_view name,
                                            std::string_view host) {
+  ::GetInstance();
   cs::AxisCamera camera{name, host};
   StartAutomaticCapture(camera);
   auto csShared = GetCameraServerShared();
@@ -526,6 +530,7 @@ cs::AxisCamera CameraServer::AddAxisCamera(std::string_view name,
 
 cs::AxisCamera CameraServer::AddAxisCamera(std::string_view name,
                                            const char* host) {
+  ::GetInstance();
   cs::AxisCamera camera{name, host};
   StartAutomaticCapture(camera);
   auto csShared = GetCameraServerShared();
@@ -535,6 +540,7 @@ cs::AxisCamera CameraServer::AddAxisCamera(std::string_view name,
 
 cs::AxisCamera CameraServer::AddAxisCamera(std::string_view name,
                                            const std::string& host) {
+  ::GetInstance();
   cs::AxisCamera camera{name, host};
   StartAutomaticCapture(camera);
   auto csShared = GetCameraServerShared();
@@ -544,6 +550,7 @@ cs::AxisCamera CameraServer::AddAxisCamera(std::string_view name,
 
 cs::AxisCamera CameraServer::AddAxisCamera(std::string_view name,
                                            std::span<const std::string> hosts) {
+  ::GetInstance();
   cs::AxisCamera camera{name, hosts};
   StartAutomaticCapture(camera);
   auto csShared = GetCameraServerShared();
@@ -552,10 +559,11 @@ cs::AxisCamera CameraServer::AddAxisCamera(std::string_view name,
 }
 
 cs::MjpegServer CameraServer::AddSwitchedCamera(std::string_view name) {
+  auto& inst = ::GetInstance();
   // create a dummy CvSource
   cs::CvSource source{name, cs::VideoMode::PixelFormat::kMJPEG, 160, 120, 30};
   cs::MjpegServer server = StartAutomaticCapture(source);
-  ::GetInstance().m_fixedSources[server.GetHandle()] = source.GetHandle();
+  inst.m_fixedSources[server.GetHandle()] = source.GetHandle();
 
   return server;
 }
@@ -632,6 +640,7 @@ cs::CvSink CameraServer::GetVideo(std::string_view name) {
 
 cs::CvSource CameraServer::PutVideo(std::string_view name, int width,
                                     int height) {
+  ::GetInstance();
   cs::CvSource source{name, cs::VideoMode::kMJPEG, width, height, 30};
   StartAutomaticCapture(source);
   return source;
@@ -648,6 +657,7 @@ cs::MjpegServer CameraServer::AddServer(std::string_view name) {
 }
 
 cs::MjpegServer CameraServer::AddServer(std::string_view name, int port) {
+  ::GetInstance();
   cs::MjpegServer server{name, port};
   AddServer(server);
   return server;
