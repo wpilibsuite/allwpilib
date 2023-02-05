@@ -599,13 +599,17 @@ void ClientData4Base::ClientSetProperties(std::string_view name,
   auto topicIt = m_server.m_nameTopics.find(name);
   if (topicIt == m_server.m_nameTopics.end() ||
       !topicIt->second->IsPublished()) {
-    DEBUG3("ignored SetProperties from {} on non-existent topic '{}'", m_id,
-           name);
+    WARNING(
+        "server ignoring SetProperties({}) from client {} on unpublished topic "
+        "'{}'; publish or set a value first",
+        update.dump(), m_id, name);
     return;  // nothing to do
   }
   auto topic = topicIt->second;
   if (topic->special) {
-    DEBUG3("ignored SetProperties from {} on meta topic '{}'", m_id, name);
+    WARNING(
+        "server ignoring SetProperties({}) from client {} on meta topic '{}'",
+        update.dump(), m_id, name);
     return;  // nothing to do
   }
   m_server.SetProperties(nullptr, topic, update);
