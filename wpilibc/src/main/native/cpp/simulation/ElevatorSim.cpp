@@ -41,11 +41,11 @@ ElevatorSim::ElevatorSim(const DCMotor& gearbox, double gearing,
       m_simulateGravity(simulateGravity) {}
 
 bool ElevatorSim::WouldHitLowerLimit(units::meter_t elevatorHeight) const {
-  return elevatorHeight < m_minHeight;
+  return elevatorHeight <= m_minHeight;
 }
 
 bool ElevatorSim::WouldHitUpperLimit(units::meter_t elevatorHeight) const {
-  return elevatorHeight > m_maxHeight;
+  return elevatorHeight >= m_maxHeight;
 }
 
 bool ElevatorSim::HasHitLowerLimit() const {
