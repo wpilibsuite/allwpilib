@@ -816,7 +816,7 @@ class Color {
    * Create a Color from a hex string. Throws an exception if the Hex String is
    * invalid.
    *
-   * @param hexString a string of the format <code>#RRGGBB</code>
+   * @param hexString a string of the format <tt>\#RRGGBB</tt>
    * @return Color object from hex string.
    */
   static constexpr Color FromHexString(std::string hexString) {

@@ -49,7 +49,7 @@ class Color8Bit {
    * Create a Color8Bit from a hex string. Throws an exception if the Hex String
    * is invalid.
    *
-   * @param hexString a string of the format <code>#RRGGBB</code>
+   * @param hexString a string of the format <tt>\#RRGGBB</tt>
    * @return Color8Bit object from hex string.
    */
   static constexpr Color8Bit FromHexString(std::string hexString) {
