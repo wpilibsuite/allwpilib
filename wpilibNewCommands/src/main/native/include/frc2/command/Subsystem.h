@@ -82,6 +82,13 @@ class Subsystem {
    * @param defaultCommand the default command to associate with this subsystem
    */
   void SetDefaultCommand(CommandPtr&& defaultCommand);
+ 
+  /**
+   * Removes the default command for the subsystem.  The current default command
+   * will run until another command is scheduled that requires the subsystem, at
+   * which point the current default command will not be re-scheduled.
+   */
+  void RemoveDefaultCommand();
 
   /**
    * Gets the default command for this subsystem.  Returns null if no default
