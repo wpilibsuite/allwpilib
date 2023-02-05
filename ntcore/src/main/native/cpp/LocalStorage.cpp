@@ -1230,6 +1230,10 @@ PublisherData* LSImpl::PublishEntry(EntryData* entry, NT_Type type) {
   // create publisher
   entry->publisher = AddLocalPublisher(entry->topic, wpi::json::object(),
                                        entry->subscriber->config);
+  // exclude publisher if requested
+  if (entry->subscriber->config.excludeSelf) {
+    entry->subscriber->config.excludePublisher = entry->publisher->handle;
+  }
   return entry->publisher;
 }
 
@@ -1282,9 +1286,6 @@ bool LSImpl::SetEntryValue(NT_Handle pubentryHandle, const Value& value) {
   if (!publisher) {
     if (auto entry = m_entries.Get(pubentryHandle)) {
       publisher = PublishEntry(entry, value.type());
-      if (entry->subscriber->config.excludeSelf) {
-        entry->subscriber->config.excludePublisher = publisher->handle;
-      }
     }
     if (!publisher) {
       return false;
