@@ -28,7 +28,6 @@ class Rotation3dTest {
     assertEquals(rot1, rot2);
     assertEquals(rot1, rvec1);
 
-
     final var yAxis = VecBuilder.fill(0.0, 1.0, 0.0);
     final var rot3 = new Rotation3d(yAxis, Math.PI / 3);
     final var rot4 = new Rotation3d(0.0, Math.PI / 3, 0.0);

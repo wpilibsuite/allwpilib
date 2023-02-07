@@ -60,8 +60,8 @@ class WPILIB_DLLEXPORT Rotation3d {
   Rotation3d(const Vectord<3>& axis, units::radian_t angle);
 
   /**
-   * Constructs a Rotation3d with the given rotation vector representation. The axis
-   * doesn't have to be normalized.
+   * Constructs a Rotation3d with the given rotation vector representation. The
+   * axis doesn't have to be normalized.
    *
    * @param rvec The rotation vector.
    */

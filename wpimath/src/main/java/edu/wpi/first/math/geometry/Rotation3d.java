@@ -82,7 +82,6 @@ public class Rotation3d implements Interpolatable<Rotation3d> {
     this(rvec, rvec.norm());
   }
 
-
   /**
    * Constructs a Rotation3d with the given axis-angle representation. The axis doesn't have to be
    * normalized.

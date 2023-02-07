@@ -82,7 +82,7 @@ Pose3d Pose3d::Exp(const Twist3d& twist) const {
   double A;
   double B;
   double C;
-  if (abs(theta) < 1E-9) {
+  if (std::abs(theta) < 1E-9) {
     // Taylor Expansions around θ = 0
     // A = 1/1! - θ²/3! + θ⁴/5!
     // B = 1/2! - θ²/4! + θ⁴/6!
@@ -99,7 +99,6 @@ Pose3d Pose3d::Exp(const Twist3d& twist) const {
     C = (1 - A) / thetaSq;
   }
 
-  
   Eigen::Matrix3d R = Eigen::Matrix3d::Identity() + A * omega + B * omegaSq;
   Eigen::Matrix3d V = Eigen::Matrix3d::Identity() + B * omega + C * omegaSq;
 
@@ -118,8 +117,9 @@ Twist3d Pose3d::Log(const Pose3d& end) const {
   const auto transform = end.RelativeTo(*this);
 
   Eigen::Vector3d u{transform.X().value(), transform.Y().value(),
-                      transform.Z().value()};
-  Eigen::Vector3d rvec = transform.Rotation().GetQuaternion().ToRotationVector();
+                    transform.Z().value()};
+  Eigen::Vector3d rvec =
+      transform.Rotation().GetQuaternion().ToRotationVector();
 
   Eigen::Matrix3d omega = RotationVectorToMatrix(rvec);
   Eigen::Matrix3d omegaSq = omega * omega;
@@ -127,7 +127,7 @@ Twist3d Pose3d::Log(const Pose3d& end) const {
   double thetaSq = theta * theta;
 
   double C;
-  if (abs(theta) < 1E-9) {
+  if (std::abs(theta) < 1E-9) {
     // Taylor Expansions around θ = 0
     // A = 1/1! - θ²/3! + θ⁴/5!
     // B = 1/2! - θ²/4! + θ⁴/6!
@@ -142,7 +142,8 @@ Twist3d Pose3d::Log(const Pose3d& end) const {
     C = (1 - A / (2 * B)) / thetaSq;
   }
 
-  Eigen::Matrix3d V_inv = Eigen::Matrix3d::Identity() - 0.5 * omega + C * omegaSq;
+  Eigen::Matrix3d V_inv =
+      Eigen::Matrix3d::Identity() - 0.5 * omega + C * omegaSq;
 
   Eigen::Vector3d translation_component = V_inv * u;
 

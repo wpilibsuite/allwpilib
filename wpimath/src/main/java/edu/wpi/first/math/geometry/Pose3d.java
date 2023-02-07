@@ -276,7 +276,8 @@ public class Pose3d implements Interpolatable<Pose3d> {
       C = (1 - A / (2 * B)) / thetaSq;
     }
 
-    final var V_inv = Matrix.eye(Nat.N3()).minus(omega.times(0.5)).plus(omega.times(omega).times(C));
+    final var V_inv =
+        Matrix.eye(Nat.N3()).minus(omega.times(0.5)).plus(omega.times(omega).times(C));
 
     final var twist_translation =
         V_inv.times(VecBuilder.fill(transform.getX(), transform.getY(), transform.getZ()));
