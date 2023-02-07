@@ -212,7 +212,7 @@ public class Pose3d implements Interpolatable<Pose3d> {
     double A;
     double B;
     double C;
-    if (theta < 1E-9) {
+    if (Math.abs(theta) < 1E-9) {
       // Taylor Expansions around θ = 0
       // A = 1/1! - θ²/3! + θ⁴/5!
       // B = 1/2! - θ²/4! + θ⁴/6!
@@ -257,16 +257,16 @@ public class Pose3d implements Interpolatable<Pose3d> {
     final var rvec = transform.getRotation().getQuaternion().toRotationVector();
 
     final var omega = rotationVectorToMatrix(rvec);
-    final var theta = transform.getRotation().getAngle();
+    final var theta = rvec.norm();
     final var thetaSq = theta * theta;
 
     double C;
-    if (theta < 1E-9) {
+    if (Math.abs(theta) < 1E-9) {
       // Taylor Expansions around θ = 0
       // A = 1/1! - θ²/3! + θ⁴/5!
       // B = 1/2! - θ²/4! + θ⁴/6!
       // C = 1/6 * (1/2 + θ²/5! + θ⁴/7!)
-      C = 1 / 6.0 - thetaSq / 120 + thetaSq * thetaSq / 5040;
+      C = 1 / 12.0 - thetaSq / 120 + thetaSq * thetaSq / 5040;
     } else {
       // A = sin(θ)/θ
       // B = (1 - cos(θ)) / θ²
