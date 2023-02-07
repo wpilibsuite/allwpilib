@@ -22,7 +22,6 @@ import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.numbers.N4;
 import edu.wpi.first.util.WPIUtilJNI;
-import java.util.Map;
 import java.util.Objects;
 
 /**
@@ -46,8 +45,10 @@ public class DifferentialDrivePoseEstimator {
 
   private static final double kBufferDuration = 1.5;
 
-  private final TimeInterpolatableBuffer<InterpolationRecord> m_poseBuffer =
+  private final TimeInterpolatableBuffer<Pose3d> m_poseBuffer =
       TimeInterpolatableBuffer.createBuffer(kBufferDuration);
+
+  private Pose3d m_poseEstimate;
 
   /**
    * Constructs a DifferentialDrivePoseEstimator with default standard deviations for the model and
@@ -135,6 +136,7 @@ public class DifferentialDrivePoseEstimator {
     m_odometry =
         new DifferentialDriveOdometry(
             gyroAngle, leftDistanceMeters, rightDistanceMeters, initialPoseMeters);
+    m_poseEstimate = m_odometry.getPoseMeters3d();
 
     for (int i = 0; i < 4; ++i) {
       m_q.set(i, 0, stateStdDevs.get(i, 0) * stateStdDevs.get(i, 0));
@@ -245,6 +247,7 @@ public class DifferentialDrivePoseEstimator {
     // Reset state estimate and error covariance
     m_odometry.resetPosition(gyroAngle, leftPositionMeters, rightPositionMeters, poseMeters);
     m_poseBuffer.clear();
+    m_poseEstimate = m_odometry.getPoseMeters3d();
   }
 
   /**
@@ -276,7 +279,7 @@ public class DifferentialDrivePoseEstimator {
    * @return The estimated robot pose in meters.
    */
   public Pose2d getEstimatedPosition() {
-    return m_odometry.getPoseMeters();
+    return m_poseEstimate.toPose2d();
   }
 
   /**
@@ -285,7 +288,7 @@ public class DifferentialDrivePoseEstimator {
    * @return The estimated robot pose in meters.
    */
   public Pose3d getEstimatedPosition3d() {
-    return m_odometry.getPoseMeters3d();
+    return m_poseEstimate;
   }
 
   /**
@@ -347,8 +350,13 @@ public class DifferentialDrivePoseEstimator {
 
     var record = sample.get();
 
+    var odometry_backtrack = m_odometry.getPoseMeters3d().log(record);
+    var odometry_fastforward = record.log(m_odometry.getPoseMeters3d());
+
+    var old_estimate = m_poseEstimate.exp(odometry_backtrack);
+
     // Step 2: Measure the twist between the odometry pose and the vision pose.
-    var twist = record.poseMeters.log(visionRobotPoseMeters);
+    var twist = old_estimate.log(visionRobotPoseMeters);
 
     // Step 3: We should not trust the twist entirely, so instead we scale this twist by a Kalman
     // gain matrix representing how much we trust vision measurements compared to our current pose.
@@ -367,29 +375,9 @@ public class DifferentialDrivePoseEstimator {
             twist_axis.get(1, 0) * k_times_twist.get(3, 0),
             twist_axis.get(2, 0) * k_times_twist.get(3, 0));
 
-    // Step 5: Reset Odometry to state at sample with vision adjustment.
-    m_odometry.resetPosition(
-        record.gyroAngle,
-        record.leftMeters,
-        record.rightMeters,
-        record.poseMeters.exp(scaledTwist));
+    old_estimate = old_estimate.exp(scaledTwist);
 
-    // Step 6: Record the current pose to allow multiple measurements from the same timestamp
-    m_poseBuffer.addSample(
-        timestampSeconds,
-        new InterpolationRecord(
-            getEstimatedPosition3d(), record.gyroAngle, record.leftMeters, record.rightMeters));
-
-    // Step 7: Replay odometry inputs between sample time and latest recorded sample to update the
-    // pose buffer and correct odometry.
-    for (Map.Entry<Double, InterpolationRecord> entry :
-        m_poseBuffer.getInternalBuffer().tailMap(timestampSeconds).entrySet()) {
-      updateWithTime(
-          entry.getKey(),
-          entry.getValue().gyroAngle,
-          entry.getValue().leftMeters,
-          entry.getValue().rightMeters);
-    }
+    m_poseEstimate = old_estimate.exp(odometry_fastforward);
   }
 
   /**
@@ -531,11 +519,11 @@ public class DifferentialDrivePoseEstimator {
       Rotation3d gyroAngle,
       double distanceLeftMeters,
       double distanceRightMeters) {
-    m_odometry.update(gyroAngle, distanceLeftMeters, distanceRightMeters);
-    m_poseBuffer.addSample(
-        currentTimeSeconds,
-        new InterpolationRecord(
-            getEstimatedPosition3d(), gyroAngle, distanceLeftMeters, distanceRightMeters));
+    var lastOdom = m_odometry.getPoseMeters3d();
+    var currOdom = m_odometry.update(gyroAngle, distanceLeftMeters, distanceRightMeters);
+    m_poseBuffer.addSample(currentTimeSeconds, currOdom);
+
+    m_poseEstimate = m_poseEstimate.exp(lastOdom.log(currOdom));
 
     return getEstimatedPosition3d();
   }
