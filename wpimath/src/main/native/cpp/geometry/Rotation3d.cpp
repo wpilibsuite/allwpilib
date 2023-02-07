@@ -38,6 +38,9 @@ Rotation3d::Rotation3d(units::radian_t roll, units::radian_t pitch,
                    cr * sp * cy + sr * cp * sy, cr * cp * sy - sr * sp * cy};
 }
 
+Rotation3d::Rotation3d(const Eigen::Vector3d& rvec): Rotation3d{rvec, units::radian_t{rvec.norm()}}{}
+
+
 Rotation3d::Rotation3d(const Vectord<3>& axis, units::radian_t angle) {
   double norm = axis.norm();
   if (norm == 0.0) {

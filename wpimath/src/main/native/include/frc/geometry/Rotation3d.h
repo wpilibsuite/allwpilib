@@ -60,12 +60,20 @@ class WPILIB_DLLEXPORT Rotation3d {
   Rotation3d(const Vectord<3>& axis, units::radian_t angle);
 
   /**
+   * Constructs a Rotation3d with the given rotation vector representation. The axis
+   * doesn't have to be normalized.
+   *
+   * @param rvec The rotation vector.
+   */
+  explicit Rotation3d(const Eigen::Vector3d& rvec);
+
+  /**
    * Constructs a Rotation3d from a rotation matrix.
    *
    * @param rotationMatrix The rotation matrix.
    * @throws std::domain_error if the rotation matrix isn't special orthogonal.
    */
-  explicit Rotation3d(const Matrixd<3, 3>& rotationMatrix);
+  explicit Rotation3d(const Eigen::Matrix3d& rotationMatrix);
 
   /**
    * Constructs a Rotation3d that rotates the initial vector onto the final
