@@ -15,7 +15,7 @@ import edu.wpi.first.math.controller.PIDController;
  * <p>This class is provided by the NewCommands VendorDep
  *
  * @see <a
- *     href="https://docs.wpilib.org/en/latest/docs/software/commandbased/pid-subsystems-commands.html#pidsubsystems">PIDSubsystem
+ *     href="https://docs.wpilib.org/en/stable/docs/software/commandbased/pid-subsystems-commands.html#pidsubsystems">PIDSubsystem
  *     on frc-docs</a>
  */
 public abstract class PIDSubsystem extends SubsystemBase {

@@ -28,7 +28,7 @@ import java.util.List;
  * flight).
  *
  * @see <a
- *     href="https://docs.wpilib.org/en/latest/docs/software/hardware-apis/sensors/ultrasonics-software.html">Ultrasonics
+ *     href="https://docs.wpilib.org/en/stable/docs/software/hardware-apis/sensors/ultrasonics-software.html">Ultrasonics
  *     on frc-docs</a>
  */
 public class Ultrasonic implements Sendable, AutoCloseable {

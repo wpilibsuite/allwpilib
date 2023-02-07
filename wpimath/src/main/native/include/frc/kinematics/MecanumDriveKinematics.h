@@ -39,7 +39,7 @@ namespace frc {
  * Forward kinematics is also used for odometry -- determining the position of
  * the robot on the field using encoders and a gyro.
  * @see <a
- * href="https://docs.wpilib.org/en/latest/docs/software/kinematics-and-odometry/mecanum-drive-kinematics.html">MecanumDriveKinematics
+ * href="https://docs.wpilib.org/en/stable/docs/software/kinematics-and-odometry/mecanum-drive-kinematics.html">MecanumDriveKinematics
  * on frc-docs</a>
  */
 class WPILIB_DLLEXPORT MecanumDriveKinematics {

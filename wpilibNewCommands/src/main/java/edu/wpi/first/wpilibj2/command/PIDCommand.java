@@ -19,7 +19,7 @@ import java.util.function.DoubleSupplier;
  * <p>This class is provided by the NewCommands VendorDep
  *
  * @see <a
- *     href="https://docs.wpilib.org/en/latest/docs/software/commandbased/pid-subsystems-commands.html#pidcommand">PIDCommand
+ *     href="https://docs.wpilib.org/en/stable/docs/software/commandbased/pid-subsystems-commands.html#pidcommand">PIDCommand
  *     on frc-docs</a>
  */
 public class PIDCommand extends CommandBase {

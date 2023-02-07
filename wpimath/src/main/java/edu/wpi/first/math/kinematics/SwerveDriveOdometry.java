@@ -18,7 +18,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
  * Furthermore, odometry can be used for latency compensation when using computer-vision systems.
  *
  * @see <a
- *     href="https://docs.wpilib.org/en/latest/docs/software/kinematics-and-odometry/swerve-drive-odometry.html">SwerveDriveOdometry
+ *     href="https://docs.wpilib.org/en/stable/docs/software/kinematics-and-odometry/swerve-drive-odometry.html">SwerveDriveOdometry
  *     on frc-docs</a>
  */
 public class SwerveDriveOdometry {

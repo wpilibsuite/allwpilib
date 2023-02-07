@@ -21,7 +21,7 @@ import java.util.function.Supplier;
  * <p>This class is provided by the NewCommands VendorDep
  *
  * @see <a
- *     href="https://docs.wpilib.org/en/latest/docs/software/commandbased/profilepid-subsystems-commands.html#profiledpidcommand">ProfilePIDCommand
+ *     href="https://docs.wpilib.org/en/stable/docs/software/commandbased/profilepid-subsystems-commands.html#profiledpidcommand">ProfilePIDCommand
  *     on frc-docs</a>
  */
 public class ProfiledPIDCommand extends CommandBase {

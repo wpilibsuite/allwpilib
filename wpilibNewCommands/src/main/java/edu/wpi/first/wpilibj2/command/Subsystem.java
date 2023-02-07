@@ -22,7 +22,7 @@ package edu.wpi.first.wpilibj2.command;
  * <p>This class is provided by the NewCommands VendorDep
  *
  * @see <a
- *     href="https://docs.wpilib.org/en/latest/docs/software/commandbased/subsystems.html">Subsystem
+ *     href="https://docs.wpilib.org/en/stable/docs/software/commandbased/subsystems.html">Subsystem
  *     on frc-docs</a>
  */
 public interface Subsystem {

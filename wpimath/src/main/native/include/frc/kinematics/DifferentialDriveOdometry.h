@@ -22,7 +22,7 @@ namespace frc {
  * It is important that you reset your encoders to zero before using this class.
  * Any subsequent pose resets also require the encoders to be reset to zero.
  * @see <a
- * href="https://docs.wpilib.org/en/latest/docs/software/kinematics-and-odometry/differential-drive-odometry.html">DifferentialDriveOdometry
+ * href="https://docs.wpilib.org/en/stable/docs/software/kinematics-and-odometry/differential-drive-odometry.html">DifferentialDriveOdometry
  * on frc-docs</a>
  */
 class WPILIB_DLLEXPORT DifferentialDriveOdometry {

@@ -19,7 +19,7 @@ import edu.wpi.first.util.sendable.SendableRegistry;
  * for devices like switches etc. that aren't implemented anywhere else.
  *
  * @see <a
- *     href="https://docs.wpilib.org/en/latest/docs/software/hardware-apis/sensors/digital-inputs-software.html">Digital
+ *     href="https://docs.wpilib.org/en/stable/docs/software/hardware-apis/sensors/digital-inputs-software.html">Digital
  *     Inputs on frc-docs</a>
  */
 public class DigitalInput extends DigitalSource implements Sendable {

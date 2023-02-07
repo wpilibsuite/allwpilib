@@ -22,7 +22,7 @@ class DigitalGlitchFilter;
  * as required. This class is only for devices like switches etc. that aren't
  * implemented anywhere else.
  * @see <a
- * href="https://docs.wpilib.org/en/latest/docs/software/hardware-apis/sensors/digital-inputs-software.html">Digital
+ * href="https://docs.wpilib.org/en/stable/docs/software/hardware-apis/sensors/digital-inputs-software.html">Digital
  * Inputs on frc-docs</a>
  */
 class DigitalInput : public DigitalSource,

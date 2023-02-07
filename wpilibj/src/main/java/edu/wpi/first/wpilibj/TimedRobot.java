@@ -159,7 +159,7 @@ public class TimedRobot extends IterativeRobotBase {
    * @param callback The callback to run.
    * @param periodSeconds The period at which to run the callback in seconds.
    * @see <a
-   *     href="https://docs.wpilib.org/en/latest/docs/software/convenience-features/scheduling-functions.html">Scheduling
+   *     href="https://docs.wpilib.org/en/stable/docs/software/convenience-features/scheduling-functions.html">Scheduling
    *     Functions at Custom Frequency on frc-docs</a>
    */
   public void addPeriodic(Runnable callback, double periodSeconds) {
@@ -177,7 +177,7 @@ public class TimedRobot extends IterativeRobotBase {
    * @param offsetSeconds The offset from the common starting time in seconds. This is useful for
    *     scheduling a callback in a different timeslot relative to TimedRobot.
    * @see <a
-   *     href="https://docs.wpilib.org/en/latest/docs/software/convenience-features/scheduling-functions.html">Scheduling
+   *     href="https://docs.wpilib.org/en/stable/docs/software/convenience-features/scheduling-functions.html">Scheduling
    *     Functions at Custom Frequency on frc-docs</a>
    */
   public void addPeriodic(Runnable callback, double periodSeconds, double offsetSeconds) {

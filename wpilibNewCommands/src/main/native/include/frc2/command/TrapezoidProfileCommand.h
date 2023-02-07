@@ -23,7 +23,7 @@ namespace frc2 {
  *
  * @see TrapezoidProfile
  * @see <a
- * href="https://docs.wpilib.org/en/latest/docs/software/commandbased/profile-subsystems-commands.html#trapezoidprofilecommand">TrapezoidProfileCommand
+ * href="https://docs.wpilib.org/en/stable/docs/software/commandbased/profile-subsystems-commands.html#trapezoidprofilecommand">TrapezoidProfileCommand
  * on frc-docs</a>
  */
 template <class Distance>

@@ -26,7 +26,7 @@ namespace frc2 {
  *
  * @see ProfiledPIDController<Distance>
  * @see <a
- * href="https://docs.wpilib.org/en/latest/docs/software/commandbased/profilepid-subsystems-commands.html#profiledpidcommand">ProfilePIDCommand
+ * href="https://docs.wpilib.org/en/stable/docs/software/commandbased/profilepid-subsystems-commands.html#profiledpidcommand">ProfilePIDCommand
  * on frc-docs</a>
  */
 template <class Distance>

@@ -19,7 +19,7 @@ import edu.wpi.first.util.sendable.SendableRegistry;
  * controlled by two separate channels.
  *
  * @see <a
- *     href="https://docs.wpilib.org/en/latest/docs/software/hardware-apis/pneumatics/pneumatics.html#double-solenoids-in-wpilib">Double
+ *     href="https://docs.wpilib.org/en/stable/docs/software/hardware-apis/pneumatics/pneumatics.html#double-solenoids-in-wpilib">Double
  *     Solenoids on frc-docs</a>
  */
 public class DoubleSolenoid implements Sendable, AutoCloseable {

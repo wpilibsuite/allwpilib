@@ -31,7 +31,7 @@ import org.ejml.simple.SimpleMatrix;
  * field using encoders and a gyro.
  *
  * @see <a
- *     href="https://docs.wpilib.org/en/latest/docs/software/kinematics-and-odometry/mecanum-drive-kinematics.html">MecanumDriveKinematics
+ *     href="https://docs.wpilib.org/en/stable/docs/software/kinematics-and-odometry/mecanum-drive-kinematics.html">MecanumDriveKinematics
  *     on frc-docs</a>
  */
 public class MecanumDriveKinematics {

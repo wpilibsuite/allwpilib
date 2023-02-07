@@ -21,7 +21,7 @@ namespace frc {
  *
  * <p>Only 1 LED driver is currently supported by the roboRIO.
  * @see <a
- * href="https://docs.wpilib.org/en/latest/docs/software/hardware-apis/misc/addressable-leds.html">Addressable
+ * href="https://docs.wpilib.org/en/stable/docs/software/hardware-apis/misc/addressable-leds.html">Addressable
  * LEDs on frc-docs</a>
  */
 class AddressableLED {

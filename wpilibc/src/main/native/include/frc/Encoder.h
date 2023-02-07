@@ -36,7 +36,7 @@ class DMASample;
  * All encoders will immediately start counting - Reset() them if you need them
  * to be zeroed before use.
  * @see <a
- * href="https://docs.wpilib.org/en/latest/docs/software/hardware-apis/sensors/encoders-software.html">Encoders
+ * href="https://docs.wpilib.org/en/stable/docs/software/hardware-apis/sensors/encoders-software.html">Encoders
  * on frc-docs</a>
  */
 class Encoder : public CounterBase,

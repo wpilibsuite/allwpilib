@@ -17,7 +17,7 @@ import edu.wpi.first.math.geometry.Twist2d;
  * chassis speed.
  *
  * @see <a
- *     href="https://docs.wpilib.org/en/latest/docs/software/kinematics-and-odometry/differential-drive-kinematics.html">DifferentialDriveKinematics
+ *     href="https://docs.wpilib.org/en/stable/docs/software/kinematics-and-odometry/differential-drive-kinematics.html">DifferentialDriveKinematics
  *     on frc-docs</a>
  */
 public class DifferentialDriveKinematics {

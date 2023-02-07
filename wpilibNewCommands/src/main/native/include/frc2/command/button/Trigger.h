@@ -32,7 +32,7 @@ class Command;
  *
  * <p>This class is provided by the NewCommands VendorDep
  * @see <a
- * href="https://docs.wpilib.org/en/latest/docs/software/commandbased/binding-commands-to-triggers.html">Trigger
+ * href="https://docs.wpilib.org/en/stable/docs/software/commandbased/binding-commands-to-triggers.html">Trigger
  * on frc-docs</a>
  */
 class Trigger {

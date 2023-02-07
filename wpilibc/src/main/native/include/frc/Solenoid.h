@@ -23,7 +23,7 @@ namespace frc {
  * The Solenoid class is typically used for pneumatics solenoids, but could be
  * used for any device within the current spec of the module.
  * @see <a
- * href="https://docs.wpilib.org/en/latest/docs/software/hardware-apis/pneumatics/pneumatics.html#single-solenoids-in-wpilib">Single
+ * href="https://docs.wpilib.org/en/stable/docs/software/hardware-apis/pneumatics/pneumatics.html#single-solenoids-in-wpilib">Single
  * Solenoids on frc-docs</a>
  */
 class Solenoid : public wpi::Sendable, public wpi::SendableHelper<Solenoid> {

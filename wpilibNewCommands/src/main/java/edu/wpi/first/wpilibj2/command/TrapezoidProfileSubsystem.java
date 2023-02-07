@@ -15,7 +15,7 @@ import edu.wpi.first.math.trajectory.TrapezoidProfile;
  * <p>This class is provided by the NewCommands VendorDep
  *
  * @see <a
- *     href="https://docs.wpilib.org/en/latest/docs/software/commandbased/profile-subsystems-commands.html#trapezoidprofilesubsystem">TrapezoidProfileSubsystem
+ *     href="https://docs.wpilib.org/en/stable/docs/software/commandbased/profile-subsystems-commands.html#trapezoidprofilesubsystem">TrapezoidProfileSubsystem
  *     on frc-docs</a>
  */
 public abstract class TrapezoidProfileSubsystem extends SubsystemBase {

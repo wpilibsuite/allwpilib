@@ -29,7 +29,7 @@ import edu.wpi.first.util.sendable.SendableRegistry;
  * before use.
  *
  * @see <a
- *     href="https://docs.wpilib.org/en/latest/docs/software/hardware-apis/sensors/encoders-software.html">Encoders
+ *     href="https://docs.wpilib.org/en/stable/docs/software/hardware-apis/sensors/encoders-software.html">Encoders
  *     on frc-docs</a>
  */
 public class Encoder implements CounterBase, Sendable, AutoCloseable {

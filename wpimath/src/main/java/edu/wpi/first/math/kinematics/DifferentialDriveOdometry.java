@@ -21,7 +21,7 @@ import edu.wpi.first.math.geometry.Twist2d;
  * pose resets also require the encoders to be reset to zero.
  *
  * @see <a
- *     href="https://docs.wpilib.org/en/latest/docs/software/kinematics-and-odometry/differential-drive-odometry.html">DifferentialDriveOdometry
+ *     href="https://docs.wpilib.org/en/stable/docs/software/kinematics-and-odometry/differential-drive-odometry.html">DifferentialDriveOdometry
  *     on frc-docs</a>
  */
 public class DifferentialDriveOdometry {

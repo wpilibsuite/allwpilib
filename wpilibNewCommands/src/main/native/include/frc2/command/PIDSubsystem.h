@@ -17,7 +17,7 @@ namespace frc2 {
  *
  * @see PIDController
  * @see <a
- * href="https://docs.wpilib.org/en/latest/docs/software/commandbased/pid-subsystems-commands.html#pidsubsystems">PIDSubsystem
+ * href="https://docs.wpilib.org/en/stable/docs/software/commandbased/pid-subsystems-commands.html#pidsubsystems">PIDSubsystem
  * on frc-docs</a>
  */
 class PIDSubsystem : public SubsystemBase {

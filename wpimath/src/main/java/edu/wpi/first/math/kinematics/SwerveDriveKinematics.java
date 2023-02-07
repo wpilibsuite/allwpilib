@@ -34,7 +34,7 @@ import org.ejml.simple.SimpleMatrix;
  * field using encoders and a gyro.
  *
  * @see <a
- *     href="https://docs.wpilib.org/en/latest/docs/software/kinematics-and-odometry/swerve-drive-kinematics.html">SwerveDriveKinematics
+ *     href="https://docs.wpilib.org/en/stable/docs/software/kinematics-and-odometry/swerve-drive-kinematics.html">SwerveDriveKinematics
  *     on frc-docs</a>
  */
 public class SwerveDriveKinematics {

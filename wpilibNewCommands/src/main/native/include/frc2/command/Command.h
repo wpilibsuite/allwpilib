@@ -44,7 +44,7 @@ class PerpetualCommand;
  * @see CommandScheduler
  * @see CommandHelper
  * @see <a
- * href="https://docs.wpilib.org/en/latest/docs/software/commandbased/index.html">Command-Based
+ * href="https://docs.wpilib.org/en/stable/docs/software/commandbased/index.html">Command-Based
  * Programming on frc-docs</a>
  */
 class Command {

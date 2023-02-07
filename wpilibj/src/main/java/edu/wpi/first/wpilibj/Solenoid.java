@@ -18,7 +18,7 @@ import edu.wpi.first.util.sendable.SendableRegistry;
  * within the current spec of the module.
  *
  * @see <a
- *     href="https://docs.wpilib.org/en/latest/docs/software/hardware-apis/pneumatics/pneumatics.html#single-solenoids-in-wpilib">Single
+ *     href="https://docs.wpilib.org/en/stable/docs/software/hardware-apis/pneumatics/pneumatics.html#single-solenoids-in-wpilib">Single
  *     Solenoids on frc-docs</a>
  */
 public class Solenoid implements Sendable, AutoCloseable {

@@ -24,7 +24,7 @@ namespace frc2 {
  *
  * @see PIDController
  * @see <a
- * href="https://docs.wpilib.org/en/latest/docs/software/commandbased/pid-subsystems-commands.html#pidcommand">PIDCommand
+ * href="https://docs.wpilib.org/en/stable/docs/software/commandbased/pid-subsystems-commands.html#pidcommand">PIDCommand
  * on frc-docs</a>
  */
 class PIDCommand : public CommandHelper<CommandBase, PIDCommand> {
