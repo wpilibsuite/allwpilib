@@ -15,7 +15,6 @@ import org.junit.jupiter.api.Test;
 
 /** Tests to see if the Notifier is working properly. */
 public class NotifierTest {
-
   @BeforeEach
   void setup() {
     HAL.initialize(500, 0);
