@@ -34,7 +34,6 @@ import edu.wpi.first.util.WPIUtilJNI;
  * you want; if you never call it then this class will behave exactly like regular encoder odometry.
  */
 public class DifferentialDrivePoseEstimator {
-  private final DifferentialDriveKinematics m_kinematics;
   private final DifferentialDriveOdometry m_odometry;
   private final Matrix<N4, N1> m_q = new Matrix<>(Nat.N4(), Nat.N1());
   private Matrix<N4, N4> m_visionK = new Matrix<>(Nat.N4(), Nat.N4());
@@ -128,7 +127,6 @@ public class DifferentialDrivePoseEstimator {
       Pose3d initialPoseMeters,
       Matrix<N4, N1> stateStdDevs,
       Matrix<N4, N1> visionMeasurementStdDevs) {
-    m_kinematics = kinematics;
     m_odometry =
         new DifferentialDriveOdometry(
             gyroAngle, leftDistanceMeters, rightDistanceMeters, initialPoseMeters);
