@@ -4,7 +4,6 @@
 
 package edu.wpi.first.math.estimator;
 
-import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.Nat;
 import edu.wpi.first.math.VecBuilder;
@@ -12,9 +11,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
-import edu.wpi.first.math.geometry.Twist2d;
 import edu.wpi.first.math.geometry.Twist3d;
-import edu.wpi.first.math.interpolation.Interpolatable;
 import edu.wpi.first.math.interpolation.TimeInterpolatableBuffer;
 import edu.wpi.first.math.kinematics.MecanumDriveKinematics;
 import edu.wpi.first.math.kinematics.MecanumDriveOdometry;
@@ -23,8 +20,6 @@ import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.numbers.N4;
 import edu.wpi.first.util.WPIUtilJNI;
-import java.util.Map;
-import java.util.Objects;
 
 /**
  * This class wraps {@link MecanumDriveOdometry Mecanum Drive Odometry} to fuse latency-compensated
@@ -38,15 +33,16 @@ import java.util.Objects;
  * want; if you never call it, then this class will behave mostly like regular encoder odometry.
  */
 public class MecanumDrivePoseEstimator {
-  private final MecanumDriveKinematics m_kinematics;
   private final MecanumDriveOdometry m_odometry;
   private final Matrix<N4, N1> m_q = new Matrix<>(Nat.N4(), Nat.N1());
   private Matrix<N4, N4> m_visionK = new Matrix<>(Nat.N4(), Nat.N4());
 
   private static final double kBufferDuration = 1.5;
 
-  private final TimeInterpolatableBuffer<InterpolationRecord> m_poseBuffer =
+  private final TimeInterpolatableBuffer<Pose3d> m_poseBuffer =
       TimeInterpolatableBuffer.createBuffer(kBufferDuration);
+
+  private Pose3d m_poseEstimate;
 
   /**
    * Constructs a MecanumDrivePoseEstimator with default standard deviations for the model and
@@ -123,8 +119,8 @@ public class MecanumDrivePoseEstimator {
       Pose3d initialPoseMeters,
       Matrix<N4, N1> stateStdDevs,
       Matrix<N4, N1> visionMeasurementStdDevs) {
-    m_kinematics = kinematics;
     m_odometry = new MecanumDriveOdometry(kinematics, gyroAngle, wheelPositions, initialPoseMeters);
+    m_poseEstimate = m_odometry.getPoseMeters3d();
 
     for (int i = 0; i < 4; ++i) {
       m_q.set(i, 0, stateStdDevs.get(i, 0) * stateStdDevs.get(i, 0));
@@ -228,6 +224,7 @@ public class MecanumDrivePoseEstimator {
     // Reset state estimate and error covariance
     m_odometry.resetPosition(gyroAngle, wheelPositions, poseMeters);
     m_poseBuffer.clear();
+    m_poseEstimate = m_odometry.getPoseMeters3d();
   }
 
   /**
@@ -252,7 +249,7 @@ public class MecanumDrivePoseEstimator {
    * @return The estimated robot pose in meters.
    */
   public Pose2d getEstimatedPosition() {
-    return m_odometry.getPoseMeters();
+    return m_poseEstimate.toPose2d();
   }
 
   /**
@@ -261,7 +258,7 @@ public class MecanumDrivePoseEstimator {
    * @return The estimated robot pose in meters.
    */
   public Pose3d getEstimatedPosition3d() {
-    return m_odometry.getPoseMeters3d();
+    return m_poseEstimate;
   }
 
   /**
@@ -321,45 +318,42 @@ public class MecanumDrivePoseEstimator {
       return;
     }
 
+    var record = sample.get();
+
+    var odometry_backtrack = m_odometry.getPoseMeters3d().log(record);
+    var odometry_fastforward =
+        new Twist3d(
+            -odometry_backtrack.dx,
+            -odometry_backtrack.dy,
+            -odometry_backtrack.dz,
+            -odometry_backtrack.rx,
+            -odometry_backtrack.ry,
+            -odometry_backtrack.rz);
+
+    var old_estimate = m_poseEstimate.exp(odometry_backtrack);
+
     // Step 2: Measure the twist between the odometry pose and the vision pose.
-    var twist = sample.get().poseMeters.log(visionRobotPoseMeters);
+    var twist = old_estimate.log(visionRobotPoseMeters);
 
     // Step 3: We should not trust the twist entirely, so instead we scale this twist by a Kalman
     // gain matrix representing how much we trust vision measurements compared to our current pose.
-    var k_times_twist = m_visionK.times(VecBuilder.fill(twist.dx, twist.dy, twist.dz, 0));
+    var twist_rvec = VecBuilder.fill(twist.rx, twist.ry, twist.rz);
+    var twist_angle = twist_rvec.norm();
+    var k_times_twist = m_visionK.times(VecBuilder.fill(twist.dx, twist.dy, twist.dz, twist_angle));
 
-    var twist_rotation = new Rotation3d(VecBuilder.fill(twist.rx, twist.ry, twist.rz));
-    var scaled_twist_rotation =
-        twist_rotation.times(m_visionK.get(3, 3)).getQuaternion().toRotationVector();
-
-    // Step 4: Convert back to Twist2d.
+    // Step 4: Convert back to Twist3d.
     var scaledTwist =
         new Twist3d(
             k_times_twist.get(0, 0),
             k_times_twist.get(1, 0),
             k_times_twist.get(2, 0),
-            scaled_twist_rotation.get(0, 0),
-            scaled_twist_rotation.get(1, 0),
-            scaled_twist_rotation.get(2, 0));
+            twist_rvec.get(0, 0) / twist_angle * k_times_twist.get(3, 0),
+            twist_rvec.get(1, 0) / twist_angle * k_times_twist.get(3, 0),
+            twist_rvec.get(2, 0) / twist_angle * k_times_twist.get(3, 0));
 
-    // Step 5: Reset Odometry to state at sample with vision adjustment.
-    m_odometry.resetPosition(
-        sample.get().gyroAngle,
-        sample.get().wheelPositions,
-        sample.get().poseMeters.exp(scaledTwist));
+    old_estimate = old_estimate.exp(scaledTwist);
 
-    // Step 6: Record the current pose to allow multiple measurements from the same timestamp
-    m_poseBuffer.addSample(
-        timestampSeconds,
-        new InterpolationRecord(
-            getEstimatedPosition3d(), sample.get().gyroAngle, sample.get().wheelPositions));
-
-    // Step 7: Replay odometry inputs between sample time and latest recorded sample to update the
-    // pose buffer and correct odometry.
-    for (Map.Entry<Double, InterpolationRecord> entry :
-        m_poseBuffer.getInternalBuffer().tailMap(timestampSeconds).entrySet()) {
-      updateWithTime(entry.getKey(), entry.getValue().gyroAngle, entry.getValue().wheelPositions);
-    }
+    m_poseEstimate = old_estimate.exp(odometry_fastforward);
   }
 
   /**
@@ -483,127 +477,12 @@ public class MecanumDrivePoseEstimator {
    */
   public Pose3d updateWithTime(
       double currentTimeSeconds, Rotation3d gyroAngle, MecanumDriveWheelPositions wheelPositions) {
-    m_odometry.update(gyroAngle, wheelPositions);
+    var lastOdom = m_odometry.getPoseMeters3d();
+    var currOdom = m_odometry.update(gyroAngle, wheelPositions);
+    m_poseBuffer.addSample(currentTimeSeconds, currOdom);
 
-    m_poseBuffer.addSample(
-        currentTimeSeconds,
-        new InterpolationRecord(
-            getEstimatedPosition3d(),
-            gyroAngle,
-            new MecanumDriveWheelPositions(
-                wheelPositions.frontLeftMeters,
-                wheelPositions.frontRightMeters,
-                wheelPositions.rearLeftMeters,
-                wheelPositions.rearRightMeters)));
+    m_poseEstimate = m_poseEstimate.exp(lastOdom.log(currOdom));
 
     return getEstimatedPosition3d();
-  }
-
-  /**
-   * Represents an odometry record. The record contains the inputs provided as well as the pose that
-   * was observed based on these inputs, as well as the previous record and its inputs.
-   */
-  private class InterpolationRecord implements Interpolatable<InterpolationRecord> {
-    // The pose observed given the current sensor inputs and the previous pose.
-    private final Pose3d poseMeters;
-
-    // The current gyro angle.
-    private final Rotation3d gyroAngle;
-
-    // The distances traveled by each wheel encoder.
-    private final MecanumDriveWheelPositions wheelPositions;
-
-    /**
-     * Constructs an Interpolation Record with the specified parameters.
-     *
-     * @param pose The pose observed given the current sensor inputs and the previous pose.
-     * @param gyro The current gyro angle.
-     * @param wheelPositions The distances traveled by each wheel encoder.
-     */
-    private InterpolationRecord(
-        Pose3d poseMeters, Rotation3d gyro, MecanumDriveWheelPositions wheelPositions) {
-      this.poseMeters = poseMeters;
-      this.gyroAngle = gyro;
-      this.wheelPositions = wheelPositions;
-    }
-
-    /**
-     * Return the interpolated record. This object is assumed to be the starting position, or lower
-     * bound.
-     *
-     * @param endValue The upper bound, or end.
-     * @param t How far between the lower and upper bound we are. This should be bounded in [0, 1].
-     * @return The interpolated value.
-     */
-    @Override
-    public InterpolationRecord interpolate(InterpolationRecord endValue, double t) {
-      if (t < 0) {
-        return this;
-      } else if (t >= 1) {
-        return endValue;
-      } else {
-        // Find the new wheel distances.
-        var wheels_lerp =
-            new MecanumDriveWheelPositions(
-                MathUtil.interpolate(
-                    this.wheelPositions.frontLeftMeters,
-                    endValue.wheelPositions.frontLeftMeters,
-                    t),
-                MathUtil.interpolate(
-                    this.wheelPositions.frontRightMeters,
-                    endValue.wheelPositions.frontRightMeters,
-                    t),
-                MathUtil.interpolate(
-                    this.wheelPositions.rearLeftMeters, endValue.wheelPositions.rearLeftMeters, t),
-                MathUtil.interpolate(
-                    this.wheelPositions.rearRightMeters,
-                    endValue.wheelPositions.rearRightMeters,
-                    t));
-
-        // Find the distance travelled between this measurement and the interpolated measurement.
-        var wheels_delta =
-            new MecanumDriveWheelPositions(
-                wheels_lerp.frontLeftMeters - this.wheelPositions.frontLeftMeters,
-                wheels_lerp.frontRightMeters - this.wheelPositions.frontRightMeters,
-                wheels_lerp.rearLeftMeters - this.wheelPositions.rearLeftMeters,
-                wheels_lerp.rearRightMeters - this.wheelPositions.rearRightMeters);
-
-        // Find the new gyro angle.
-        var gyro_lerp = gyroAngle.interpolate(endValue.gyroAngle, t);
-        var gyro_difference = gyro_lerp.minus(gyroAngle).getQuaternion().toRotationVector();
-
-        // Create a twist to represent this change based on the interpolated sensor inputs.
-        Twist2d twist2d = m_kinematics.toTwist2d(wheels_delta);
-        var twist =
-            new Twist3d(
-                twist2d.dx,
-                twist2d.dy,
-                0,
-                gyro_difference.get(0, 0),
-                gyro_difference.get(1, 0),
-                gyro_difference.get(2, 0));
-
-        return new InterpolationRecord(poseMeters.exp(twist), gyro_lerp, wheels_lerp);
-      }
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-      if (this == obj) {
-        return true;
-      }
-      if (!(obj instanceof InterpolationRecord)) {
-        return false;
-      }
-      InterpolationRecord record = (InterpolationRecord) obj;
-      return Objects.equals(gyroAngle, record.gyroAngle)
-          && Objects.equals(wheelPositions, record.wheelPositions)
-          && Objects.equals(poseMeters, record.poseMeters);
-    }
-
-    @Override
-    public int hashCode() {
-      return Objects.hash(gyroAngle, wheelPositions, poseMeters);
-    }
   }
 }
