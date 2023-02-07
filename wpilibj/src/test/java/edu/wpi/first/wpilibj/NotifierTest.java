@@ -12,9 +12,10 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.parallel.ResourceLock;
 
 /** Tests to see if the Notifier is working properly. */
-public class NotifierTest {
+class NotifierTest {
   @BeforeEach
   void setup() {
     HAL.initialize(500, 0);
@@ -28,7 +29,8 @@ public class NotifierTest {
   }
 
   @Test
-  public void testStartPeriodicAndStop() {
+  @ResourceLock("timing")
+  void testStartPeriodicAndStop() {
     AtomicInteger counter = new AtomicInteger();
     Notifier notifier = new Notifier(counter::getAndIncrement);
     notifier.startPeriodic(1.0);
@@ -46,7 +48,8 @@ public class NotifierTest {
   }
 
   @Test
-  public void testStartSingle() {
+  @ResourceLock("timing")
+  void testStartSingle() {
     AtomicInteger counter = new AtomicInteger();
     Notifier notifier = new Notifier(counter::getAndIncrement);
     notifier.startSingle(1.0);
