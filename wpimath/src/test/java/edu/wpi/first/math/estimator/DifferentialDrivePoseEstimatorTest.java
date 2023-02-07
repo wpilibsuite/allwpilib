@@ -509,10 +509,7 @@ class DifferentialDrivePoseEstimatorTest {
 
       var xHat =
           estimator.updateWithTime(
-              t,
-              trajectoryRotation3d.plus(gaussianNoise),
-              leftDistanceMeters,
-              rightDistanceMeters);
+              t, trajectoryRotation3d.plus(gaussianNoise), leftDistanceMeters, rightDistanceMeters);
 
       var poseFromStartingPosition = groundTruthState.poseMeters.minus(trajectory.getInitialPose());
       var poseFromStartingPosition3d =
