@@ -132,7 +132,7 @@ Twist3d Pose3d::Log(const Pose3d& end) const {
     // A = 1/1! - θ²/3! + θ⁴/5!
     // B = 1/2! - θ²/4! + θ⁴/6!
     // C = 1/6 * (1/2 + θ²/5! + θ⁴/7!)
-    C = 1 / 12.0 - thetaSq / 120 + thetaSq * thetaSq / 5040;
+    C = 1 / 12.0 + thetaSq / 720 + thetaSq * thetaSq / 30240;
   } else {
     // A = std::sin(θ)/θ
     // B = (1 - std::cos(θ)) / θ²
