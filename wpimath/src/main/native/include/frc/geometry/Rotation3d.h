@@ -60,8 +60,9 @@ class WPILIB_DLLEXPORT Rotation3d {
   Rotation3d(const Vectord<3>& axis, units::radian_t angle);
 
   /**
-   * Constructs a Rotation3d with the given rotation vector representation. This representation is
-   * equivalent to axis-angle, where the normalized axis is multiplied by the scalar angle.
+   * Constructs a Rotation3d with the given rotation vector representation. This
+   * representation is equivalent to axis-angle, where the normalized axis is
+   * multiplied by the scalar angle.
    *
    * @param rvec The rotation vector.
    */
