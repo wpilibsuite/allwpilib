@@ -62,7 +62,7 @@ class WPILIB_DLLEXPORT Rotation3d {
   /**
    * Constructs a Rotation3d with the given rotation vector representation. This
    * representation is equivalent to axis-angle, where the normalized axis is
-   * multiplied by the scalar angle.
+   * multiplied by the rotation around the axis in radians.
    *
    * @param rvec The rotation vector.
    */
