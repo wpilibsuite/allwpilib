@@ -87,6 +87,10 @@ Pose3d Pose3d::Exp(const Twist3d& twist) const {
     // A = 1/1! - θ²/3! + θ⁴/5!
     // B = 1/2! - θ²/4! + θ⁴/6!
     // C = 1/3! - θ²/5! + θ⁴/7!
+    // sources:
+    // A: https://www.wolframalpha.com/input?i2d=true&i=series+expansion+of+Divide%5Bsin%5C%2840%29x%5C%2841%29%2Cx%5D+at+x%3D0
+    // B: https://www.wolframalpha.com/input?i2d=true&i=series+expansion+of+Divide%5B1-cos%5C%2840%29x%5C%2841%29%2CPower%5Bx%2C2%5D%5D+at+x%3D0
+    // C: https://www.wolframalpha.com/input?i2d=true&i=series+expansion+of+Divide%5B1-Divide%5Bsin%5C%2840%29x%5C%2841%29%2Cx%5D%2CPower%5Bx%2C2%5D%5D+at+x%3D0
     A = 1 - thetaSq / 6 + thetaSq * thetaSq / 120;
     B = 1 / 2.0 - thetaSq / 24 + thetaSq * thetaSq / 720;
     C = 1 / 6.0 - thetaSq / 120 + thetaSq * thetaSq / 5040;
@@ -132,6 +136,10 @@ Twist3d Pose3d::Log(const Pose3d& end) const {
     // A = 1/1! - θ²/3! + θ⁴/5!
     // B = 1/2! - θ²/4! + θ⁴/6!
     // C = 1/6 * (1/2 + θ²/5! + θ⁴/7!)
+    // sources:
+    // A: https://www.wolframalpha.com/input?i2d=true&i=series+expansion+of+Divide%5Bsin%5C%2840%29x%5C%2841%29%2Cx%5D+at+x%3D0
+    // B: https://www.wolframalpha.com/input?i2d=true&i=series+expansion+of+Divide%5B1-cos%5C%2840%29x%5C%2841%29%2CPower%5Bx%2C2%5D%5D+at+x%3D0
+    // C: https://www.wolframalpha.com/input?i2d=true&i=series+expansion+of+Divide%5B1-Divide%5BDivide%5Bsin%5C%2840%29x%5C%2841%29%2Cx%5D%2C2Divide%5B1-cos%5C%2840%29x%5C%2841%29%2CPower%5Bx%2C2%5D%5D%5D%2CPower%5Bx%2C2%5D%5D+at+x%3D0
     C = 1 / 12.0 + thetaSq / 720 + thetaSq * thetaSq / 30240;
   } else {
     // A = std::sin(θ)/θ
