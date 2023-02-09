@@ -17,12 +17,8 @@ Arm::Arm() {
 
   // Set the Arm position setpoint and P constant to Preferences if the keys
   // don't already exist
-  if (!frc::Preferences::ContainsKey(kArmPositionKey)) {
-    frc::Preferences::SetDouble(kArmPositionKey, m_armSetpoint.value());
-  }
-  if (!frc::Preferences::ContainsKey(kArmPKey)) {
-    frc::Preferences::SetDouble(kArmPKey, m_armKp);
-  }
+  frc::Preferences::InitDouble(kArmPositionKey, m_armSetpoint.value());
+  frc::Preferences::InitDouble(kArmPKey, m_armKp);
 }
 
 void Arm::SimulationPeriodic() {

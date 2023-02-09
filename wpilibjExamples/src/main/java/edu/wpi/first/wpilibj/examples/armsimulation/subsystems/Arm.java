@@ -77,12 +77,8 @@ public class Arm implements AutoCloseable {
     m_armTower.setColor(new Color8Bit(Color.kBlue));
 
     // Set the Arm position setpoint and P constant to Preferences if the keys don't already exist
-    if (!Preferences.containsKey(Constants.kArmPositionKey)) {
-      Preferences.setDouble(Constants.kArmPositionKey, m_armSetpointDegrees);
-    }
-    if (!Preferences.containsKey(Constants.kArmPKey)) {
-      Preferences.setDouble(Constants.kArmPKey, m_armKp);
-    }
+    Preferences.initDouble(Constants.kArmPositionKey, m_armSetpointDegrees);
+    Preferences.initDouble(Constants.kArmPKey, m_armKp);
   }
 
   /** Update the simulation model. */
@@ -132,6 +128,7 @@ public class Arm implements AutoCloseable {
     m_encoder.close();
     m_mech2d.close();
     m_armPivot.close();
+    m_controller.close();
     m_arm.close();
   }
 }

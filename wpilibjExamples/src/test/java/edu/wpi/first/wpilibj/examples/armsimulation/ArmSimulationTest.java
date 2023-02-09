@@ -14,6 +14,7 @@ import edu.wpi.first.wpilibj.simulation.DriverStationSim;
 import edu.wpi.first.wpilibj.simulation.EncoderSim;
 import edu.wpi.first.wpilibj.simulation.JoystickSim;
 import edu.wpi.first.wpilibj.simulation.PWMSim;
+import edu.wpi.first.wpilibj.simulation.RoboRioSim;
 import edu.wpi.first.wpilibj.simulation.SimHooks;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -57,7 +58,12 @@ class ArmSimulationTest {
     m_robot.close();
     m_encoderSim.resetData();
     m_motorSim.resetData();
+    Preferences.remove(Constants.kArmPKey);
+    Preferences.remove(Constants.kArmPositionKey);
     Preferences.removeAll();
+    RoboRioSim.resetData();
+    DriverStationSim.resetData();
+    DriverStationSim.notifyNewData();
   }
 
   @ValueSource(doubles = {Constants.kDefaultArmSetpointDegrees, 25.0, 50.0})
