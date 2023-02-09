@@ -16,6 +16,8 @@
 
 using namespace frc;
 
+inline constexpr auto kPeriod = 20_ms;
+
 namespace {
 class TimedRobotTest : public ::testing::TestWithParam<bool> {
  protected:
@@ -44,6 +46,8 @@ class MockRobot : public TimedRobot {
   std::atomic<uint32_t> m_autonomousPeriodicCount{0};
   std::atomic<uint32_t> m_teleopPeriodicCount{0};
   std::atomic<uint32_t> m_testPeriodicCount{0};
+
+  MockRobot() : TimedRobot{kPeriod} {}
 
   void RobotInit() override { m_robotInitCount++; }
 
@@ -107,7 +111,7 @@ TEST_F(TimedRobotTest, DisabledMode) {
   EXPECT_EQ(0u, robot.m_teleopExitCount);
   EXPECT_EQ(0u, robot.m_testExitCount);
 
-  frc::sim::StepTiming(20_ms);
+  frc::sim::StepTiming(kPeriod);
 
   EXPECT_EQ(1u, robot.m_robotInitCount);
   EXPECT_EQ(1u, robot.m_simulationInitCount);
@@ -128,7 +132,7 @@ TEST_F(TimedRobotTest, DisabledMode) {
   EXPECT_EQ(0u, robot.m_teleopExitCount);
   EXPECT_EQ(0u, robot.m_testExitCount);
 
-  frc::sim::StepTiming(20_ms);
+  frc::sim::StepTiming(kPeriod);
 
   EXPECT_EQ(1u, robot.m_robotInitCount);
   EXPECT_EQ(1u, robot.m_simulationInitCount);
@@ -183,7 +187,7 @@ TEST_F(TimedRobotTest, AutonomousMode) {
   EXPECT_EQ(0u, robot.m_teleopExitCount);
   EXPECT_EQ(0u, robot.m_testExitCount);
 
-  frc::sim::StepTiming(20_ms);
+  frc::sim::StepTiming(kPeriod);
 
   EXPECT_EQ(1u, robot.m_robotInitCount);
   EXPECT_EQ(1u, robot.m_simulationInitCount);
@@ -204,7 +208,7 @@ TEST_F(TimedRobotTest, AutonomousMode) {
   EXPECT_EQ(0u, robot.m_teleopExitCount);
   EXPECT_EQ(0u, robot.m_testExitCount);
 
-  frc::sim::StepTiming(20_ms);
+  frc::sim::StepTiming(kPeriod);
 
   EXPECT_EQ(1u, robot.m_robotInitCount);
   EXPECT_EQ(1u, robot.m_simulationInitCount);
@@ -259,7 +263,7 @@ TEST_F(TimedRobotTest, TeleopMode) {
   EXPECT_EQ(0u, robot.m_teleopExitCount);
   EXPECT_EQ(0u, robot.m_testExitCount);
 
-  frc::sim::StepTiming(20_ms);
+  frc::sim::StepTiming(kPeriod);
 
   EXPECT_EQ(1u, robot.m_robotInitCount);
   EXPECT_EQ(1u, robot.m_simulationInitCount);
@@ -280,7 +284,7 @@ TEST_F(TimedRobotTest, TeleopMode) {
   EXPECT_EQ(0u, robot.m_teleopExitCount);
   EXPECT_EQ(0u, robot.m_testExitCount);
 
-  frc::sim::StepTiming(20_ms);
+  frc::sim::StepTiming(kPeriod);
 
   EXPECT_EQ(1u, robot.m_robotInitCount);
   EXPECT_EQ(1u, robot.m_simulationInitCount);
@@ -339,7 +343,7 @@ TEST_P(TimedRobotTest, TestMode) {
   EXPECT_EQ(0u, robot.m_teleopExitCount);
   EXPECT_EQ(0u, robot.m_testExitCount);
 
-  frc::sim::StepTiming(20_ms);
+  frc::sim::StepTiming(kPeriod);
 
   EXPECT_EQ(1u, robot.m_robotInitCount);
   EXPECT_EQ(1u, robot.m_simulationInitCount);
@@ -363,7 +367,7 @@ TEST_P(TimedRobotTest, TestMode) {
   EXPECT_EQ(0u, robot.m_teleopExitCount);
   EXPECT_EQ(0u, robot.m_testExitCount);
 
-  frc::sim::StepTiming(20_ms);
+  frc::sim::StepTiming(kPeriod);
 
   EXPECT_EQ(1u, robot.m_robotInitCount);
   EXPECT_EQ(1u, robot.m_simulationInitCount);
@@ -436,7 +440,7 @@ TEST_F(TimedRobotTest, ModeChange) {
   EXPECT_EQ(0u, robot.m_teleopExitCount);
   EXPECT_EQ(0u, robot.m_testExitCount);
 
-  frc::sim::StepTiming(20_ms);
+  frc::sim::StepTiming(kPeriod);
 
   EXPECT_EQ(1u, robot.m_disabledInitCount);
   EXPECT_EQ(0u, robot.m_autonomousInitCount);
@@ -454,7 +458,7 @@ TEST_F(TimedRobotTest, ModeChange) {
   frc::sim::DriverStationSim::SetTest(false);
   frc::sim::DriverStationSim::NotifyNewData();
 
-  frc::sim::StepTiming(20_ms);
+  frc::sim::StepTiming(kPeriod);
 
   EXPECT_EQ(1u, robot.m_disabledInitCount);
   EXPECT_EQ(1u, robot.m_autonomousInitCount);
@@ -472,7 +476,7 @@ TEST_F(TimedRobotTest, ModeChange) {
   frc::sim::DriverStationSim::SetTest(false);
   frc::sim::DriverStationSim::NotifyNewData();
 
-  frc::sim::StepTiming(20_ms);
+  frc::sim::StepTiming(kPeriod);
 
   EXPECT_EQ(1u, robot.m_disabledInitCount);
   EXPECT_EQ(1u, robot.m_autonomousInitCount);
@@ -490,7 +494,7 @@ TEST_F(TimedRobotTest, ModeChange) {
   frc::sim::DriverStationSim::SetTest(true);
   frc::sim::DriverStationSim::NotifyNewData();
 
-  frc::sim::StepTiming(20_ms);
+  frc::sim::StepTiming(kPeriod);
 
   EXPECT_EQ(1u, robot.m_disabledInitCount);
   EXPECT_EQ(1u, robot.m_autonomousInitCount);
@@ -508,7 +512,7 @@ TEST_F(TimedRobotTest, ModeChange) {
   frc::sim::DriverStationSim::SetTest(false);
   frc::sim::DriverStationSim::NotifyNewData();
 
-  frc::sim::StepTiming(20_ms);
+  frc::sim::StepTiming(kPeriod);
 
   EXPECT_EQ(2u, robot.m_disabledInitCount);
   EXPECT_EQ(1u, robot.m_autonomousInitCount);
@@ -528,7 +532,7 @@ TEST_F(TimedRobotTest, AddPeriodic) {
   MockRobot robot;
 
   std::atomic<uint32_t> callbackCount{0};
-  robot.AddPeriodic([&] { callbackCount++; }, 10_ms);
+  robot.AddPeriodic([&] { callbackCount++; }, kPeriod / 2.0);
 
   std::thread robotThread{[&] { robot.StartCompetition(); }};
 
@@ -540,13 +544,13 @@ TEST_F(TimedRobotTest, AddPeriodic) {
   EXPECT_EQ(0u, robot.m_disabledPeriodicCount);
   EXPECT_EQ(0u, callbackCount);
 
-  frc::sim::StepTiming(10_ms);
+  frc::sim::StepTiming(kPeriod / 2.0);
 
   EXPECT_EQ(0u, robot.m_disabledInitCount);
   EXPECT_EQ(0u, robot.m_disabledPeriodicCount);
   EXPECT_EQ(1u, callbackCount);
 
-  frc::sim::StepTiming(10_ms);
+  frc::sim::StepTiming(kPeriod / 2.0);
 
   EXPECT_EQ(1u, robot.m_disabledInitCount);
   EXPECT_EQ(1u, robot.m_disabledPeriodicCount);
@@ -560,14 +564,14 @@ TEST_F(TimedRobotTest, AddPeriodicWithOffset) {
   MockRobot robot;
 
   std::atomic<uint32_t> callbackCount{0};
-  robot.AddPeriodic([&] { callbackCount++; }, 10_ms, 5_ms);
+  robot.AddPeriodic([&] { callbackCount++; }, kPeriod / 2.0, kPeriod / 4.0);
 
   // Expirations in this test (ms)
   //
   // Robot | Callback
   // ================
-  //    20 |      15
-  //    40 |      25
+  //     p |    0.75p
+  //    2p |    1.25p
 
   std::thread robotThread{[&] { robot.StartCompetition(); }};
 
@@ -579,25 +583,25 @@ TEST_F(TimedRobotTest, AddPeriodicWithOffset) {
   EXPECT_EQ(0u, robot.m_disabledPeriodicCount);
   EXPECT_EQ(0u, callbackCount);
 
-  frc::sim::StepTiming(7.5_ms);
+  frc::sim::StepTiming(kPeriod * 3.0 / 8.0);
 
   EXPECT_EQ(0u, robot.m_disabledInitCount);
   EXPECT_EQ(0u, robot.m_disabledPeriodicCount);
   EXPECT_EQ(0u, callbackCount);
 
-  frc::sim::StepTiming(7.5_ms);
+  frc::sim::StepTiming(kPeriod * 3.0 / 8.0);
 
   EXPECT_EQ(0u, robot.m_disabledInitCount);
   EXPECT_EQ(0u, robot.m_disabledPeriodicCount);
   EXPECT_EQ(1u, callbackCount);
 
-  frc::sim::StepTiming(5_ms);
+  frc::sim::StepTiming(kPeriod / 4.0);
 
   EXPECT_EQ(1u, robot.m_disabledInitCount);
   EXPECT_EQ(1u, robot.m_disabledPeriodicCount);
   EXPECT_EQ(1u, callbackCount);
 
-  frc::sim::StepTiming(5_ms);
+  frc::sim::StepTiming(kPeriod / 4.0);
 
   EXPECT_EQ(1u, robot.m_disabledInitCount);
   EXPECT_EQ(1u, robot.m_disabledPeriodicCount);
