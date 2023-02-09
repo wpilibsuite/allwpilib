@@ -14,7 +14,7 @@ import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.system.plant.LinearSystemId;
 
 /** Represents a simulated single jointed arm mechanism. */
-public class SingleJointedArmSim extends LinearSystemSim<N2, N1, N1> {
+public class SingleJointedArmSim extends LinearSystemSim<N2, N1, N2> {
   // The gearbox for the arm.
   private final DCMotor m_gearbox;
 
@@ -30,8 +30,8 @@ public class SingleJointedArmSim extends LinearSystemSim<N2, N1, N1> {
   // The maximum angle that the arm is capable of.
   private final double m_maxAngle;
 
-  // Whether the simulator should simulate gravity.
-  private final boolean m_simulateGravity;
+  // The acceleration applied to the system due to gravity.
+  private final double m_gravityAccel;
 
   /**
    * Creates a simulated arm mechanism.
@@ -83,14 +83,72 @@ public class SingleJointedArmSim extends LinearSystemSim<N2, N1, N1> {
       double minAngleRads,
       double maxAngleRads,
       boolean simulateGravity,
-      Matrix<N1, N1> measurementStdDevs) {
-    super(plant, measurementStdDevs);
+      Matrix<N2, N1> measurementStdDevs) {
+    super(LinearSystemSim.convertControlToSim(plant), measurementStdDevs);
     m_gearbox = gearbox;
     m_gearing = gearing;
     m_armLenMeters = armLengthMeters;
     m_minAngle = minAngleRads;
     m_maxAngle = maxAngleRads;
-    m_simulateGravity = simulateGravity;
+    m_gravityAccel = simulateGravity ? -9.81 : 0;
+  }
+
+  /**
+   * Creates a simulated arm mechanism.
+   *
+   * @param kG The gravity gain, in volts.
+   * @param kV The velocity gain, in volts/(unit/sec).
+   * @param kA The acceleration gain, in volts/(unit/sec²).
+   * @param gearbox The type of and number of motors in the arm gearbox.
+   * @param gearing The gearing of the arm (numbers greater than 1 represent reductions).
+   * @param armLengthMeters The length of the arm.
+   * @param minAngleRads The minimum angle that the arm is capable of.
+   * @param maxAngleRads The maximum angle that the arm is capable of.
+   */
+  public SingleJointedArmSim(
+      double kG,
+      double kV,
+      double kA,
+      DCMotor gearbox,
+      double gearing,
+      double armLengthMeters,
+      double minAngleRads,
+      double maxAngleRads) {
+    this(kG, kV, kA, gearbox, gearing, armLengthMeters, minAngleRads, maxAngleRads, null);
+  }
+
+  /**
+   * Creates a simulated arm mechanism.
+   *
+   * @param kG The gravity gain, in volts.
+   * @param kV The velocity gain, in volts/(unit/sec).
+   * @param kA The acceleration gain, in volts/(unit/sec²).
+   * @param gearbox The type of and number of motors in the arm gearbox.
+   * @param gearing The gearing of the arm (numbers greater than 1 represent reductions).
+   * @param armLengthMeters The length of the arm.
+   * @param minAngleRads The minimum angle that the arm is capable of.
+   * @param maxAngleRads The maximum angle that the arm is capable of.
+   * @param measurementStdDevs The standard deviations of the measurements.
+   */
+  public SingleJointedArmSim(
+      double kG,
+      double kV,
+      double kA,
+      DCMotor gearbox,
+      double gearing,
+      double armLengthMeters,
+      double minAngleRads,
+      double maxAngleRads,
+      Matrix<N2, N1> measurementStdDevs) {
+    super(
+        LinearSystemSim.convertControlToSim(LinearSystemId.identifyPositionSystem(kV, kA)),
+        measurementStdDevs);
+    m_gearbox = gearbox;
+    m_gearing = gearing;
+    m_armLenMeters = armLengthMeters;
+    m_minAngle = minAngleRads;
+    m_maxAngle = maxAngleRads;
+    m_gravityAccel = kG / kA;
   }
 
   /**
@@ -143,16 +201,17 @@ public class SingleJointedArmSim extends LinearSystemSim<N2, N1, N1> {
       double minAngleRads,
       double maxAngleRads,
       boolean simulateGravity,
-      Matrix<N1, N1> measurementStdDevs) {
+      Matrix<N2, N1> measurementStdDevs) {
     super(
-        LinearSystemId.createSingleJointedArmSystem(gearbox, jKgMetersSquared, gearing),
+        LinearSystemSim.convertControlToSim(
+            LinearSystemId.createSingleJointedArmSystem(gearbox, jKgMetersSquared, gearing)),
         measurementStdDevs);
     m_gearbox = gearbox;
     m_gearing = gearing;
     m_armLenMeters = armLengthMeters;
     m_minAngle = minAngleRads;
     m_maxAngle = maxAngleRads;
-    m_simulateGravity = simulateGravity;
+    m_gravityAccel = simulateGravity ? -9.81 : 0.0;
   }
 
   /**
@@ -199,7 +258,7 @@ public class SingleJointedArmSim extends LinearSystemSim<N2, N1, N1> {
    * @return The current arm angle.
    */
   public double getAngleRads() {
-    return m_y.get(0, 0);
+    return getOutput(0);
   }
 
   /**
@@ -208,7 +267,7 @@ public class SingleJointedArmSim extends LinearSystemSim<N2, N1, N1> {
    * @return The current arm velocity.
    */
   public double getVelocityRadPerSec() {
-    return m_x.get(1, 0);
+    return getOutput(1);
   }
 
   /**
@@ -279,14 +338,15 @@ public class SingleJointedArmSim extends LinearSystemSim<N2, N1, N1> {
 
     Matrix<N2, N1> updatedXhat =
         NumericalIntegration.rkdp(
-            (Matrix<N2, N1> x, Matrix<N1, N1> _u) -> {
-              Matrix<N2, N1> xdot = m_plant.getA().times(x).plus(m_plant.getB().times(_u));
-              if (m_simulateGravity) {
-                double alphaGrav = 3.0 / 2.0 * -9.8 * Math.cos(x.get(0, 0)) / m_armLenMeters;
-                xdot = xdot.plus(VecBuilder.fill(0, alphaGrav));
-              }
-              return xdot;
-            },
+            (Matrix<N2, N1> x, Matrix<N1, N1> _u) ->
+                m_plant
+                    .getA()
+                    .times(x)
+                    .plus(m_plant.getB().times(_u))
+                    .plus(
+                        VecBuilder.fill(
+                            0,
+                            3.0 / 2.0 * m_gravityAccel * Math.cos(x.get(0, 0)) / m_armLenMeters)),
             currentXhat,
             u,
             dtSeconds);

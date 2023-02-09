@@ -14,7 +14,7 @@ import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.system.plant.LinearSystemId;
 
 /** Represents a simulated elevator mechanism. */
-public class ElevatorSim extends LinearSystemSim<N2, N1, N1> {
+public class ElevatorSim extends LinearSystemSim<N2, N1, N2> {
   // Gearbox for the elevator.
   private final DCMotor m_gearbox;
 
@@ -30,8 +30,8 @@ public class ElevatorSim extends LinearSystemSim<N2, N1, N1> {
   // The max allowable height for the elevator.
   private final double m_maxHeight;
 
-  // Whether the simulator should simulate gravity.
-  private final boolean m_simulateGravity;
+  // The acceleration applied to the system due to gravity.
+  private final double m_gravityAccel;
 
   /**
    * Creates a simulated elevator mechanism.
@@ -83,14 +83,72 @@ public class ElevatorSim extends LinearSystemSim<N2, N1, N1> {
       double minHeightMeters,
       double maxHeightMeters,
       boolean simulateGravity,
-      Matrix<N1, N1> measurementStdDevs) {
-    super(plant, measurementStdDevs);
+      Matrix<N2, N1> measurementStdDevs) {
+    super(LinearSystemSim.convertControlToSim(plant), measurementStdDevs);
     m_gearbox = gearbox;
     m_gearing = gearing;
     m_drumRadius = drumRadiusMeters;
     m_minHeight = minHeightMeters;
     m_maxHeight = maxHeightMeters;
-    m_simulateGravity = simulateGravity;
+    m_gravityAccel = simulateGravity ? -9.81 : 0;
+  }
+
+  /**
+   * Creates a simulated elevator mechanism.
+   *
+   * @param kG The gravity gain, in volts.
+   * @param kV The velocity gain, in volts/(unit/sec).
+   * @param kA The acceleration gain, in volts/(unit/sec²).
+   * @param gearbox The type of and number of motors in the elevator gearbox.
+   * @param gearing The gearing of the elevator (numbers greater than 1 represent reductions).
+   * @param drumRadiusMeters The radius of the drum that the elevator spool is wrapped around.
+   * @param minHeightMeters The min allowable height of the elevator.
+   * @param maxHeightMeters The max allowable height of the elevator.
+   */
+  public ElevatorSim(
+      double kG,
+      double kV,
+      double kA,
+      DCMotor gearbox,
+      double gearing,
+      double drumRadiusMeters,
+      double minHeightMeters,
+      double maxHeightMeters) {
+    this(kG, kV, kA, gearbox, gearing, drumRadiusMeters, minHeightMeters, maxHeightMeters, null);
+  }
+
+  /**
+   * Creates a simulated elevator mechanism.
+   *
+   * @param kG The gravity gain, in volts.
+   * @param kV The velocity gain, in volts/(unit/sec).
+   * @param kA The acceleration gain, in volts/(unit/sec²).
+   * @param gearbox The type of and number of motors in the elevator gearbox.
+   * @param gearing The gearing of the elevator (numbers greater than 1 represent reductions).
+   * @param drumRadiusMeters The radius of the drum that the elevator spool is wrapped around.
+   * @param minHeightMeters The min allowable height of the elevator.
+   * @param maxHeightMeters The max allowable height of the elevator.
+   * @param measurementStdDevs The standard deviations of the measurements.
+   */
+  public ElevatorSim(
+      double kG,
+      double kV,
+      double kA,
+      DCMotor gearbox,
+      double gearing,
+      double drumRadiusMeters,
+      double minHeightMeters,
+      double maxHeightMeters,
+      Matrix<N2, N1> measurementStdDevs) {
+    super(
+        LinearSystemSim.convertControlToSim(LinearSystemId.identifyPositionSystem(kV, kA)),
+        measurementStdDevs);
+    m_gearbox = gearbox;
+    m_gearing = gearing;
+    m_drumRadius = drumRadiusMeters;
+    m_minHeight = minHeightMeters;
+    m_maxHeight = maxHeightMeters;
+    m_gravityAccel = kG / kA;
   }
 
   /**
@@ -143,16 +201,18 @@ public class ElevatorSim extends LinearSystemSim<N2, N1, N1> {
       double minHeightMeters,
       double maxHeightMeters,
       boolean simulateGravity,
-      Matrix<N1, N1> measurementStdDevs) {
+      Matrix<N2, N1> measurementStdDevs) {
     super(
-        LinearSystemId.createElevatorSystem(gearbox, carriageMassKg, drumRadiusMeters, gearing),
+        LinearSystemSim.convertControlToSim(
+            LinearSystemId.createElevatorSystem(
+                gearbox, carriageMassKg, drumRadiusMeters, gearing)),
         measurementStdDevs);
     m_gearbox = gearbox;
     m_gearing = gearing;
     m_drumRadius = drumRadiusMeters;
     m_minHeight = minHeightMeters;
     m_maxHeight = maxHeightMeters;
-    m_simulateGravity = simulateGravity;
+    m_gravityAccel = simulateGravity ? -9.81 : 0.0;
   }
 
   /**
@@ -208,7 +268,7 @@ public class ElevatorSim extends LinearSystemSim<N2, N1, N1> {
    * @return The velocity of the elevator.
    */
   public double getVelocityMetersPerSecond() {
-    return m_x.get(1, 0);
+    return getOutput(1);
   }
 
   /**
@@ -249,13 +309,12 @@ public class ElevatorSim extends LinearSystemSim<N2, N1, N1> {
     // Calculate updated x-hat from Runge-Kutta.
     var updatedXhat =
         NumericalIntegration.rkdp(
-            (x, _u) -> {
-              Matrix<N2, N1> xdot = m_plant.getA().times(x).plus(m_plant.getB().times(_u));
-              if (m_simulateGravity) {
-                xdot = xdot.plus(VecBuilder.fill(0, -9.8));
-              }
-              return xdot;
-            },
+            (x, _u) ->
+                m_plant
+                    .getA()
+                    .times(x)
+                    .plus(m_plant.getB().times(_u))
+                    .plus(VecBuilder.fill(0, m_gravityAccel)),
             currentXhat,
             u,
             dtSeconds);

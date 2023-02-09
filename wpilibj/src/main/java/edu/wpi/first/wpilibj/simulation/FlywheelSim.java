@@ -53,6 +53,36 @@ public class FlywheelSim extends LinearSystemSim<N1, N1, N1> {
   /**
    * Creates a simulated flywheel mechanism.
    *
+   * @param kV The velocity gain, in volts/(unit/sec).
+   * @param kA The acceleration gain, in volts/(unit/sec²).
+   * @param gearbox The type of and number of motors in the flywheel gearbox.
+   * @param gearing The gearing of the flywheel (numbers greater than 1 represent reductions).
+   */
+  public FlywheelSim(double kV, double kA, DCMotor gearbox, double gearing) {
+    super(LinearSystemId.identifyVelocitySystem(kV, kA));
+    m_gearbox = gearbox;
+    m_gearing = gearing;
+  }
+
+  /**
+   * Creates a simulated flywheel mechanism.
+   *
+   * @param kV The velocity gain, in volts/(unit/sec).
+   * @param kA The acceleration gain, in volts/(unit/sec²).
+   * @param gearbox The type of and number of motors in the flywheel gearbox.
+   * @param gearing The gearing of the flywheel (numbers greater than 1 represent reductions).
+   * @param measurementStdDevs The standard deviations of the measurements.
+   */
+  public FlywheelSim(
+      double kV, double kA, DCMotor gearbox, double gearing, Matrix<N1, N1> measurementStdDevs) {
+    super(LinearSystemId.identifyVelocitySystem(kV, kA), measurementStdDevs);
+    m_gearbox = gearbox;
+    m_gearing = gearing;
+  }
+
+  /**
+   * Creates a simulated flywheel mechanism.
+   *
    * @param gearbox The type of and number of motors in the flywheel gearbox.
    * @param gearing The gearing of the flywheel (numbers greater than 1 represent reductions).
    * @param jKgMetersSquared The moment of inertia of the flywheel. If this is unknown, use the

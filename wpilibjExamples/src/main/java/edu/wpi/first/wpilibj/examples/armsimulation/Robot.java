@@ -68,7 +68,7 @@ public class Robot extends TimedRobot {
           Units.degreesToRadians(-75),
           Units.degreesToRadians(255),
           true,
-          VecBuilder.fill(kArmEncoderDistPerPulse) // Add noise with a std-dev of 1 tick
+          VecBuilder.fill(kArmEncoderDistPerPulse, 0) // Add noise with a std-dev of 1 tick
           );
   private final EncoderSim m_encoderSim = new EncoderSim(m_encoder);
 
