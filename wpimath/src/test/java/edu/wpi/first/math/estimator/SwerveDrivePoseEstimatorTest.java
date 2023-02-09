@@ -578,26 +578,26 @@ class SwerveDrivePoseEstimatorTest {
                   poseFromStartingPosition.getX(), poseFromStartingPosition.getY(), 0),
               new Rotation3d(
                   VecBuilder.fill(0, 0, poseFromStartingPosition.getRotation().getRadians())));
-  //  System.out.printf("%f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f%n",
-  //    xHat.getX(),
-  //    xHat.getY(),
-  //    xHat.getZ(),
-  //    xHat.getRotation().getX(),
-  //    xHat.getRotation().getY(),
-  //    xHat.getRotation().getZ(),
-  //    startingPose
-  //             .plus(poseFromStartingPosition3d).getX(),
-  //    startingPose
-  //             .plus(poseFromStartingPosition3d).getY(),
-  //    startingPose
-  //             .plus(poseFromStartingPosition3d).getZ(),
-  //    startingPose
-  //             .plus(poseFromStartingPosition3d).getRotation().getX(),
-  //    startingPose
-  //             .plus(poseFromStartingPosition3d).getRotation().getY(),
-  //    startingPose
-  //             .plus(poseFromStartingPosition3d).getRotation().getZ()
-  //    );
+      //  System.out.printf("%f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f%n",
+      //    xHat.getX(),
+      //    xHat.getY(),
+      //    xHat.getZ(),
+      //    xHat.getRotation().getX(),
+      //    xHat.getRotation().getY(),
+      //    xHat.getRotation().getZ(),
+      //    startingPose
+      //             .plus(poseFromStartingPosition3d).getX(),
+      //    startingPose
+      //             .plus(poseFromStartingPosition3d).getY(),
+      //    startingPose
+      //             .plus(poseFromStartingPosition3d).getZ(),
+      //    startingPose
+      //             .plus(poseFromStartingPosition3d).getRotation().getX(),
+      //    startingPose
+      //             .plus(poseFromStartingPosition3d).getRotation().getY(),
+      //    startingPose
+      //             .plus(poseFromStartingPosition3d).getRotation().getZ()
+      //    );
 
       double error =
           startingPose
