@@ -30,9 +30,9 @@ template <class T>
 class SendableChooser : public SendableChooserBase {
   wpi::StringMap<T> m_choices;
   static_assert(std::is_copy_constructible_v<T>,
-                "T must be copy-constructable!");
+                "T must be copy-constructible!");
   static_assert(std::is_default_constructible_v<T>,
-                "T must be default-constructable!");
+                "T must be default-constructible!");
 
   template <class U>
   static U _unwrap_smart_ptr(const U& value);
