@@ -47,7 +47,7 @@
   },
   {
     "name": "RobotBase Skeleton (Advanced)",
-    "description": "Skeleton (stub) code for RobotBase - Not for competition use",
+    "description": "Skeleton (stub) code for RobotBase - Not recommended for competition use",
     "tags": [
       "RobotBase",
       "Skeleton"
