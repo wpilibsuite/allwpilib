@@ -47,7 +47,7 @@ import org.ejml.simple.SimpleMatrix;
  * then want to run it at 200Hz! Combining this with Note 1 - the impetus is on YOU as a developer
  * to make sure calculate() gets called at the desired, constant frequency!
  */
-public class LinearFilter {
+public class LinearFilter implements SlidingWindowNumericFilter {
   private final CircularBuffer m_inputs;
   private final CircularBuffer m_outputs;
   private final double[] m_inputGains;
@@ -236,18 +236,13 @@ public class LinearFilter {
     return finiteDifference(derivative, stencil, period);
   }
 
-  /** Reset the filter state. */
+  @Override
   public void reset() {
     m_inputs.clear();
     m_outputs.clear();
   }
 
-  /**
-   * Calculates the next value of the filter.
-   *
-   * @param input Current input value.
-   * @return The filtered value at this step
-   */
+  @Override
   public double calculate(double input) {
     double retVal = 0.0;
 

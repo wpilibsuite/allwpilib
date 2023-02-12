@@ -14,7 +14,7 @@ import java.util.List;
  * especially with processes that generate occasional, extreme outliers (such as values from vision
  * processing, LIDAR, or ultrasonic sensors).
  */
-public class MedianFilter {
+public class MedianFilter implements SlidingWindowNumericFilter {
   private final CircularBuffer m_valueBuffer;
   private final List<Double> m_orderedValues;
   private final int m_size;
@@ -33,12 +33,7 @@ public class MedianFilter {
     m_size = size;
   }
 
-  /**
-   * Calculates the moving-window median for the next value of the input stream.
-   *
-   * @param next The next input value.
-   * @return The median of the moving window, updated to include the next value.
-   */
+  @Override
   public double calculate(double next) {
     // Find insertion point for next value
     int index = Collections.binarySearch(m_orderedValues, next);
@@ -72,7 +67,7 @@ public class MedianFilter {
     }
   }
 
-  /** Resets the filter, clearing the window of all elements. */
+  @Override
   public void reset() {
     m_orderedValues.clear();
     m_valueBuffer.clear();
