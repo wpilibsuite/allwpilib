@@ -457,7 +457,9 @@ void NCImpl4::WsConnected(wpi::WebSocket& ws, uv::Tcp& tcp) {
 }
 
 void NCImpl4::Disconnect(std::string_view reason) {
-  INFO("DISCONNECTED NT4 connection: {}", reason);
+  auto realReason = m_wire->GetDisconnectReason();
+  INFO("DISCONNECTED NT4 connection: {}",
+       realReason.empty() ? reason : realReason);
   m_clientImpl.reset();
   m_wire.reset();
   NCImpl::Disconnect(reason);

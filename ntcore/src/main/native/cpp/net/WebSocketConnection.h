@@ -5,6 +5,8 @@
 #pragma once
 
 #include <memory>
+#include <string>
+#include <string_view>
 #include <vector>
 
 #include <wpi/SmallVector.h>
@@ -33,6 +35,8 @@ class WebSocketConnection final
   void Flush() final;
 
   void Disconnect(std::string_view reason) final;
+
+  std::string_view GetDisconnectReason() const { return m_reason; }
 
  private:
   void StartSendText() final;
@@ -64,6 +68,7 @@ class WebSocketConnection final
   size_t m_binary_pos = 0;
   bool m_in_text = false;
   int m_sendsActive = 0;
+  std::string m_reason;
 };
 
 }  // namespace nt::net

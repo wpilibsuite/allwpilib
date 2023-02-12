@@ -255,8 +255,9 @@ void ServerConnection4::ProcessWsUpgrade() {
     m_info.remote_id = dedupName;
     m_server.AddConnection(this, m_info);
     m_websocket->closed.connect([this](uint16_t, std::string_view reason) {
+      auto realReason = m_wire->GetDisconnectReason();
       INFO("DISCONNECTED NT4 client '{}' (from {}): {}", m_info.remote_id,
-           m_connInfo, reason);
+           m_connInfo, realReason.empty() ? reason : realReason);
       ConnectionClosed();
     });
     m_websocket->text.connect([this](std::string_view data, bool) {
