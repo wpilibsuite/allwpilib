@@ -650,6 +650,11 @@ void ClientData4Base::ClientSubscribe(int64_t subuid,
   }
 
   // see if this immediately subscribes to any topics
+  // for transmit efficiency, we want to batch announcements and values, so
+  // send announcements in first loop and remember what we want to send in
+  // second loop.
+  std::vector<TopicData*> dataToSend;
+  dataToSend.reserve(m_server.m_topics.size());
   for (auto&& topic : m_server.m_topics) {
     bool removed = false;
     if (replace) {
@@ -687,9 +692,13 @@ void ClientData4Base::ClientSubscribe(int64_t subuid,
     // send last value
     if (added && !sub->options.topicsOnly && !wasSubscribedValue &&
         topic->lastValue) {
-      DEBUG4("send last value for {} to client {}", topic->name, m_id);
-      SendValue(topic.get(), topic->lastValue, kSendAll);
+      dataToSend.emplace_back(topic.get());
     }
+  }
+
+  for (auto topic : dataToSend) {
+    DEBUG4("send last value for {} to client {}", topic->name, m_id);
+    SendValue(topic, topic->lastValue, kSendAll);
   }
 
   // update meta data
