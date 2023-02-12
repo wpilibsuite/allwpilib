@@ -4,255 +4,103 @@ import edu.wpi.first.networktables.BooleanPublisher;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.util.datalog.BooleanLogEntry;
 import edu.wpi.first.util.datalog.DataLog;
-import edu.wpi.first.util.function.FloatSupplier;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.function.BooleanSupplier;
-import java.util.function.DoubleSupplier;
-import java.util.function.LongSupplier;
-import java.util.function.Supplier;
 
-public abstract class TelemetryBuilder {
-  private NetworkTable m_networkTable;
+public class TelemetryBuilder {
+  private final NetworkTable m_networkTable;
+  // TODO: this would be started before the match!
   private DataLog m_dataLog;
-  private String m_path;
+
+  public TelemetryBuilder(NetworkTable table) {
+    m_networkTable = table;
+  }
 
   private final Collection<TelemetryProperty> m_props = new ArrayList<>();
-  /**
-   * Publish a boolean .
-   *
-   * @param key  name
-   * @param getter getter function (returns current value)
-   */
+
+  private void update(long timestamp) {
+
+  }
+
+  public void selfMetadata(TelemetryMetadata metadata) {
+
+  }
   public TelemetryProperty publishBoolean(String key, BooleanSupplier getter) {
-    BooleanPublisher pub = m_networkTable.getBooleanTopic(key).publish();
     return new TelemetryProperty() {
-      final BooleanPublisher m_pub = pub;
+      final BooleanPublisher m_pub = m_networkTable.getBooleanTopic(key).publish();
       final BooleanSupplier m_supplier = getter;
       {
         m_closeables.add(m_pub);
       }
 
       @Override
-      protected void update() {
-        m_pub.set(m_supplier.getAsBoolean());
+      protected void update(long timestamp) {
+        m_pub.set(m_supplier.getAsBoolean(), timestamp);
       }
 
       @Override
       protected void applyMetadata(TelemetryMetadata metadata) {
-
+        m_pub.getTopic().setProperties(metadata.toString());
       }
     };
   }
 
-  /**
-   * Publish an integer.
-   *
-   * @param key    name
-   * @param getter getter function (returns current value)
-   */
-  public TelemetryProperty publishInteger(String key, LongSupplier getter) {
-    return null;
+  public TelemetryProperty publishConstBoolean(String key, boolean value) {
+    return new TelemetryProperty() {
+      final BooleanPublisher m_pub = m_networkTable.getBooleanTopic(key).publish();
+      boolean hasPublished = false;
+      {
+        m_closeables.add(m_pub);
+      }
+
+      @Override
+      protected void update(long timestamp) {
+        if (!hasPublished) {
+          m_pub.set(value, timestamp);
+          hasPublished = true;
+        }
+      }
+
+      @Override
+      protected void applyMetadata(TelemetryMetadata metadata) {
+        m_pub.getTopic().setProperties(metadata.toString());
+      }
+    };
   }
 
-  /**
-   * Publish a float .
-   *
-   * @param key    name
-   * @param getter getter function (returns current value)
-   */
-  public TelemetryProperty publishFloat(String key, FloatSupplier getter) {
-    return null;
-  }
-
-  /**
-   * Publish a double .
-   *
-   * @param key    name
-   * @param getter getter function (returns current value)
-   */
-  public TelemetryProperty publishDouble(String key, DoubleSupplier getter) {
-    return null;
-  }
-
-  /**
-   * Publish a string .
-   *
-   * @param key  name
-   * @param getter getter function (returns current value)
-   */
-  abstract TelemetryProperty publishString(String key, Supplier<String> getter);
-
-  /**
-   * Publish a boolean array .
-   *
-   * @param key  name
-   * @param getter getter function (returns current value)
-   */
-  abstract TelemetryProperty publishBooleanArray(String key, Supplier<boolean[]> getter);
-
-  /**
-   * Publish an integer array .
-   *
-   * @param key  name
-   * @param getter getter function (returns current value)
-   */
-  abstract TelemetryProperty publishIntegerArray(String key, Supplier<long[]> getter);
-
-  /**
-   * Publish a float array .
-   *
-   * @param key  name
-   * @param getter getter function (returns current value)
-   */
-  abstract TelemetryProperty publishFloatArray(String key, Supplier<float[]> getter);
-
-  /**
-   * Publish a double array .
-   *
-   * @param key  name
-   * @param getter getter function (returns current value)
-   */
-  abstract TelemetryProperty publishDoubleArray(String key, Supplier<double[]> getter);
-
-  /**
-   * Publish a string array .
-   *
-   * @param key  name
-   * @param getter getter function (returns current value)
-   */
-  abstract TelemetryProperty publishStringArray(String key, Supplier<String[]> getter);
-
-  /**
-   * Publish a raw .
-   *
-   * @param key  name
-   * @param typeString type string
-   * @param getter getter function (returns current value)
-   */
-  abstract TelemetryProperty publishRaw(
-          String key, String typeString, Supplier<byte[]> getter);
-
-  /**
-   * log a boolean .
-   *
-   * @param key  name
-   * @param getter getter function (returns current value)
-   */
   public TelemetryProperty logBoolean(String key, BooleanSupplier getter) {
-    BooleanLogEntry pub = new BooleanLogEntry(m_dataLog, m_path + key);
     return new TelemetryProperty() {
-      final Booleanloger m_pub = pub;
+      final BooleanLogEntry m_log = new BooleanLogEntry(m_dataLog, m_networkTable.getPath() + NetworkTable.PATH_SEPARATOR + key);
       final BooleanSupplier m_supplier = getter;
-      {
-        m_closeables.add(m_pub);
-      }
 
       @Override
-      protected void update() {
-        m_pub.set(m_supplier.getAsBoolean());
+      protected void update(long timestamp) {
+        m_log.append(m_supplier.getAsBoolean(), timestamp);
       }
 
       @Override
       protected void applyMetadata(TelemetryMetadata metadata) {
-
+        m_log.setMetadata(metadata.toString());
       }
     };
   }
 
-  /**
-   * log an integer.
-   *
-   * @param key    name
-   * @param getter getter function (returns current value)
-   */
-  public TelemetryProperty logInteger(String key, LongSupplier getter) {
-    return null;
+  public TelemetryProperty addChild(String key, TelemetryNode child) {
+    TelemetryBuilder builder = new TelemetryBuilder(m_networkTable.getSubTable(key));
+    return new TelemetryProperty() {
+      final TelemetryBuilder m_builder = builder;
+
+      @Override
+      protected void update(long timestamp) {
+        m_builder.update(timestamp);
+      }
+
+      @Override
+      protected void applyMetadata(TelemetryMetadata metadata) {
+        m_builder.selfMetadata(metadata);
+      }
+    };
   }
-
-  /**
-   * log a float .
-   *
-   * @param key    name
-   * @param getter getter function (returns current value)
-   */
-  public TelemetryProperty logFloat(String key, FloatSupplier getter) {
-    return null;
-  }
-
-  /**
-   * log a double .
-   *
-   * @param key    name
-   * @param getter getter function (returns current value)
-   */
-  public TelemetryProperty logDouble(String key, DoubleSupplier getter) {
-    return null;
-  }
-
-  /**
-   * log a string .
-   *
-   * @param key  name
-   * @param getter getter function (returns current value)
-   */
-  abstract TelemetryProperty logString(String key, Supplier<String> getter);
-
-  /**
-   * log a boolean array .
-   *
-   * @param key  name
-   * @param getter getter function (returns current value)
-   */
-  abstract TelemetryProperty logBooleanArray(String key, Supplier<boolean[]> getter);
-
-  /**
-   * log an integer array .
-   *
-   * @param key  name
-   * @param getter getter function (returns current value)
-   */
-  abstract TelemetryProperty logIntegerArray(String key, Supplier<long[]> getter);
-
-  /**
-   * log a float array .
-   *
-   * @param key  name
-   * @param getter getter function (returns current value)
-   */
-  abstract TelemetryProperty logFloatArray(String key, Supplier<float[]> getter);
-
-  /**
-   * log a double array .
-   *
-   * @param key  name
-   * @param getter getter function (returns current value)
-   */
-  abstract TelemetryProperty logDoubleArray(String key, Supplier<double[]> getter);
-
-  /**
-   * log a string array .
-   *
-   * @param key  name
-   * @param getter getter function (returns current value)
-   */
-  abstract TelemetryProperty logStringArray(String key, Supplier<String[]> getter);
-
-  /**
-   * log a raw .
-   *
-   * @param key  name
-   * @param typeString type string
-   * @param getter getter function (returns current value)
-   */
-  abstract TelemetryProperty logRaw(
-          String key, String typeString, Supplier<byte[]> getter);
-
-  /**
-   * log a boolean .
-   *
-   * @param key  name
-   */
-  abstract TelemetryProperty logChild(String key, TelemetryProperty child);
 }

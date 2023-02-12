@@ -35,6 +35,6 @@ public class Storage extends SubsystemBase implements TelemetryNode {
 
   @Override
   public void declareTelemetry(TelemetryBuilder builder) {
-    builder.publishBoolean("isFull", this::isFull).logOnly();
+    builder.publishBoolean("isFull", this::isFull);
   }
 }
