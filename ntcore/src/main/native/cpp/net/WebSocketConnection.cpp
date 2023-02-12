@@ -25,6 +25,12 @@ WebSocketConnection::~WebSocketConnection() {
   for (auto&& buf : m_buf_pool) {
     buf.Deallocate();
   }
+  for (auto&& buf : m_text_buffers) {
+    buf.Deallocate();
+  }
+  for (auto&& buf : m_binary_buffers) {
+    buf.Deallocate();
+  }
 }
 
 void WebSocketConnection::Flush() {
@@ -64,6 +70,7 @@ void WebSocketConnection::Flush() {
 }
 
 void WebSocketConnection::Disconnect(std::string_view reason) {
+  m_reason = reason;
   m_ws.Close(1005, reason);
 }
 

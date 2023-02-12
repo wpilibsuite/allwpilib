@@ -34,6 +34,8 @@ class WebSocketConnection final
 
   void Disconnect(std::string_view reason) final;
 
+  std::string_view GetDisconnectReason() const { return m_reason; }
+
  private:
   void StartSendText() final;
   void FinishSendText() final;
@@ -64,6 +66,7 @@ class WebSocketConnection final
   size_t m_binary_pos = 0;
   bool m_in_text = false;
   int m_sendsActive = 0;
+  std::string m_reason;
 };
 
 }  // namespace nt::net

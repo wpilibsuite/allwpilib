@@ -2289,9 +2289,10 @@ void ServerImpl::SendControl(uint64_t curTimeMs) {
 }
 
 void ServerImpl::SendValues(int clientId, uint64_t curTimeMs) {
-  auto client = m_impl->m_clients[clientId].get();
-  client->SendOutgoing(curTimeMs);
-  client->Flush();
+  if (auto client = m_impl->m_clients[clientId].get()) {
+    client->SendOutgoing(curTimeMs);
+    client->Flush();
+  }
 }
 
 void ServerImpl::HandleLocal(std::span<const ClientMessage> msgs) {
