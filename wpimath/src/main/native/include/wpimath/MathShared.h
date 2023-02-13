@@ -72,9 +72,7 @@ class WPILIB_DLLEXPORT MathSharedStore {
     GetMathShared().ReportUsage(id, count);
   }
 
-  static uint64_t GetTimestamp() {
-    return GetMathShared().GetTimestamp();
-  }
+  static uint64_t GetTimestamp() { return GetMathShared().GetTimestamp(); }
 };
 
 }  // namespace wpi::math
