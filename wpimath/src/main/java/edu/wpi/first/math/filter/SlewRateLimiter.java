@@ -4,8 +4,8 @@
 
 package edu.wpi.first.math.filter;
 
+import edu.wpi.first.math.MathSharedStore;
 import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.util.WPIUtilJNI;
 
 /**
  * A class that limits the rate of change of an input value. Useful for implementing voltage,
@@ -33,7 +33,7 @@ public class SlewRateLimiter {
     m_positiveRateLimit = positiveRateLimit;
     m_negativeRateLimit = negativeRateLimit;
     m_prevVal = initialValue;
-    m_prevTime = WPIUtilJNI.now() * 1e-6;
+    m_prevTime = MathSharedStore.getTimestamp() * 1e-6;
   }
 
   /**
@@ -67,7 +67,7 @@ public class SlewRateLimiter {
    * @return The filtered value, which will not change faster than the slew rate.
    */
   public double calculate(double input) {
-    double currentTime = WPIUtilJNI.now() * 1e-6;
+    double currentTime = MathSharedStore.getTimestamp() * 1e-6;
     double elapsedTime = currentTime - m_prevTime;
     m_prevVal +=
         MathUtil.clamp(
@@ -85,6 +85,6 @@ public class SlewRateLimiter {
    */
   public void reset(double value) {
     m_prevVal = value;
-    m_prevTime = WPIUtilJNI.now() * 1e-6;
+    m_prevTime = MathSharedStore.getTimestamp() * 1e-6;
   }
 }

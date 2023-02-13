@@ -9,6 +9,8 @@
 #include "frc/StateSpaceUtil.h"
 #include "frc/estimator/AngleStatistics.h"
 
+#include "wpimath/MathShared.h"
+
 using namespace frc;
 
 frc::MecanumDrivePoseEstimator::InterpolationRecord
@@ -162,7 +164,7 @@ void frc::MecanumDrivePoseEstimator::AddVisionMeasurement(
 Pose2d frc::MecanumDrivePoseEstimator::Update(
     const Rotation2d& gyroAngle,
     const MecanumDriveWheelPositions& wheelPositions) {
-  return UpdateWithTime(units::microsecond_t(wpi::Now()), gyroAngle,
+  return UpdateWithTime(units::microsecond_t(wpi::math::MathSharedStore::GetTimestamp()), gyroAngle,
                         wheelPositions);
 }
 

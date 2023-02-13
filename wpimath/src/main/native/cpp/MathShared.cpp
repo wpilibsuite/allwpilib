@@ -15,6 +15,9 @@ class DefaultMathShared : public MathShared {
   void ReportWarningV(fmt::string_view format, fmt::format_args args) override {
   }
   void ReportUsage(MathUsageId id, int count) override {}
+  uint64_t GetTimestamp() override {
+    return 0;
+  }
 };
 }  // namespace
 

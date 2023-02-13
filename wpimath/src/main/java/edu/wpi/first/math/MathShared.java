@@ -20,4 +20,7 @@ public interface MathShared {
    * @param count the usage count
    */
   void reportUsage(MathUsageId id, int count);
+
+  /** Get the time in microseconds. */
+  long getTimestamp();
 }

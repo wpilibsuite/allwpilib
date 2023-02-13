@@ -23,6 +23,11 @@ public final class MathSharedStore {
 
             @Override
             public void reportUsage(MathUsageId id, int count) {}
+
+            @Override
+            public long getTimestamp() {
+              return 0;
+            }
           };
     }
     return mathShared;
@@ -55,5 +60,10 @@ public final class MathSharedStore {
    */
   public static void reportUsage(MathUsageId id, int count) {
     getMathShared().reportUsage(id, count);
+  }
+
+  /** Get the time in microseconds. */
+  public static long getTimestamp() {
+    return getMathShared().getTimestamp();
   }
 }

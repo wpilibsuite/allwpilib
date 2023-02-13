@@ -4,7 +4,7 @@
 
 package edu.wpi.first.math.filter;
 
-import edu.wpi.first.util.WPIUtilJNI;
+import edu.wpi.first.math.MathSharedStore;
 
 /**
  * A simple debounce filter for boolean streams. Requires that the boolean change value from
@@ -60,11 +60,11 @@ public class Debouncer {
   }
 
   private void resetTimer() {
-    m_prevTimeSeconds = WPIUtilJNI.now() * 1e-6;
+    m_prevTimeSeconds = MathSharedStore.getTimestamp() * 1e-6;
   }
 
   private boolean hasElapsed() {
-    return (WPIUtilJNI.now() * 1e-6) - m_prevTimeSeconds >= m_debounceTimeSeconds;
+    return (MathSharedStore.getTimestamp() * 1e-6) - m_prevTimeSeconds >= m_debounceTimeSeconds;
   }
 
   /**

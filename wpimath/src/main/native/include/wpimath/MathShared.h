@@ -31,6 +31,7 @@ class WPILIB_DLLEXPORT MathShared {
   virtual void ReportWarningV(fmt::string_view format,
                               fmt::format_args args) = 0;
   virtual void ReportUsage(MathUsageId id, int count) = 0;
+  virtual uint64_t GetTimestamp() = 0;
 
   template <typename S, typename... Args>
   inline void ReportError(const S& format, Args&&... args) {
@@ -69,6 +70,10 @@ class WPILIB_DLLEXPORT MathSharedStore {
 
   static void ReportUsage(MathUsageId id, int count) {
     GetMathShared().ReportUsage(id, count);
+  }
+
+  static uint64_t GetTimestamp() {
+    return GetMathShared().GetTimestamp();
   }
 };
 
