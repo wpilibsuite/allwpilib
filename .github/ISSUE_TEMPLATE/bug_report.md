@@ -25,7 +25,7 @@ If applicable, add screenshots to help explain your problem.
 
 **Desktop (please complete the following information):**
  - OS: [e.g. Windows 11]
- - Project Information: [In Visual Studio Code, press the wpilib button and choose WPILIb: Open Project Information. Press the copy button and paste the data here. If not using VS Code, please include wpilib version, gradle version, java version, C++ version (if applicable), and any third party libraries and versions]
+ - Project Information: [In Visual Studio Code, press the WPILib button and choose WPILib: Open Project Information. Press the copy button and paste the data here. If not using VS Code, please include WPILib version, Gradle version, Java version, C++ version (if applicable), and any third party libraries and versions]
 
 **Additional context**
 Add any other context about the problem here.
