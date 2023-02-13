@@ -50,7 +50,7 @@ static constexpr uint32_t kMinPeriodMs = 5;
 
 // maximum amount of time the wire can be not ready to send another
 // transmission before we close the connection
-static constexpr uint32_t kWireMaxNotReadyMs = 1000;
+static constexpr uint32_t kWireMaxNotReadyUs = 1000000;
 
 namespace {
 
@@ -952,7 +952,9 @@ void ClientData4::SendOutgoing(uint64_t curTimeMs) {
   }
 
   if (!m_wire.Ready()) {
-    if (m_lastSendMs != 0 && curTimeMs > (m_lastSendMs + kWireMaxNotReadyMs)) {
+    uint64_t lastFlushTime = m_wire.GetLastFlushTime();
+    uint64_t now = wpi::Now();
+    if (lastFlushTime != 0 && now > (lastFlushTime + kWireMaxNotReadyUs)) {
       m_wire.Disconnect("transmit stalled");
     }
     return;
@@ -1123,7 +1125,9 @@ void ClientData3::SendOutgoing(uint64_t curTimeMs) {
   }
 
   if (!m_wire.Ready()) {
-    if (m_lastSendMs != 0 && curTimeMs > (m_lastSendMs + kWireMaxNotReadyMs)) {
+    uint64_t lastFlushTime = m_wire.GetLastFlushTime();
+    uint64_t now = wpi::Now();
+    if (lastFlushTime != 0 && now > (lastFlushTime + kWireMaxNotReadyUs)) {
       m_wire.Disconnect("transmit stalled");
     }
     return;
