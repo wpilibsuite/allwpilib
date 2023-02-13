@@ -63,8 +63,12 @@ JNIEXPORT void JNICALL
 Java_edu_wpi_first_util_WPIUtilJNI_enableMockTime
   (JNIEnv*, jclass)
 {
+#ifdef __FRC_ROBORIO__
+  fmt::print(stderr, "WPIUtil: Mocking time is not available on the Rio\n");
+#else
   mockTimeEnabled = true;
   wpi::SetNowImpl([] { return mockNow; });
+#endif
 }
 
 /*
