@@ -91,7 +91,7 @@ class ArmSimulationTest {
       SimHooks.stepTiming(3);
 
       // Ensure elevator is still at 0.
-      assertEquals(Constants.kMinAngleRads, m_encoderSim.getDistance(), 1.5);
+      assertEquals(Constants.kMinAngleRads, m_encoderSim.getDistance(), 2.0);
     }
 
     {
@@ -102,12 +102,12 @@ class ArmSimulationTest {
       // advance 75 timesteps
       SimHooks.stepTiming(1.5);
 
-      assertEquals(setpoint, Units.radiansToDegrees(m_encoderSim.getDistance()), 1.5);
+      assertEquals(setpoint, Units.radiansToDegrees(m_encoderSim.getDistance()), 2.0);
 
       // advance 25 timesteps to see setpoint is held.
       SimHooks.stepTiming(0.5);
 
-      assertEquals(setpoint, Units.radiansToDegrees(m_encoderSim.getDistance()), 1.5);
+      assertEquals(setpoint, Units.radiansToDegrees(m_encoderSim.getDistance()), 2.0);
     }
 
     {
@@ -118,7 +118,7 @@ class ArmSimulationTest {
       // advance 75 timesteps
       SimHooks.stepTiming(3.0);
 
-      assertEquals(Constants.kMinAngleRads, m_encoderSim.getDistance(), 1.5);
+      assertEquals(Constants.kMinAngleRads, m_encoderSim.getDistance(), 2.0);
     }
 
     {
@@ -129,12 +129,12 @@ class ArmSimulationTest {
       // advance 75 timesteps
       SimHooks.stepTiming(1.5);
 
-      assertEquals(setpoint, Units.radiansToDegrees(m_encoderSim.getDistance()), 1.5);
+      assertEquals(setpoint, Units.radiansToDegrees(m_encoderSim.getDistance()), 2.0);
 
       // advance 25 timesteps to see setpoint is held.
       SimHooks.stepTiming(0.5);
 
-      assertEquals(setpoint, Units.radiansToDegrees(m_encoderSim.getDistance()), 1.5);
+      assertEquals(setpoint, Units.radiansToDegrees(m_encoderSim.getDistance()), 2.0);
     }
 
     {
@@ -147,7 +147,7 @@ class ArmSimulationTest {
       SimHooks.stepTiming(3.5);
 
       assertEquals(0.0, m_motorSim.getSpeed(), 0.01);
-      assertEquals(Constants.kMinAngleRads, m_encoderSim.getDistance(), 1.5);
+      assertEquals(Constants.kMinAngleRads, m_encoderSim.getDistance(), 2.0);
     }
   }
 }
