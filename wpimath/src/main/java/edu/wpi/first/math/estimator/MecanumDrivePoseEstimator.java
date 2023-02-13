@@ -264,7 +264,7 @@ public class MecanumDrivePoseEstimator {
    * @return The estimated pose of the robot in meters.
    */
   public Pose2d update(Rotation2d gyroAngle, MecanumDriveWheelPositions wheelPositions) {
-    return updateWithTime(MathSharedStore.getTimestamp() * 1.0e-6, gyroAngle, wheelPositions);
+    return updateWithTime(MathSharedStore.getTimestamp(), gyroAngle, wheelPositions);
   }
 
   /**

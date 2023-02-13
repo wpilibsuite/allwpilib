@@ -131,8 +131,8 @@ public abstract class RobotBase implements AutoCloseable {
           }
 
           @Override
-          public long getTimestamp() {
-            return WPIUtilJNI.now();
+          public double getTimestamp() {
+            return WPIUtilJNI.now() * 1.0e-6;
           }
         });
   }

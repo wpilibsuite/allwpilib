@@ -140,7 +140,9 @@ class WPILibMathShared : public wpi::math::MathShared {
     }
   }
 
-  uint64_t GetTimestamp() override { return wpi::Now(); }
+  units::second_t GetTimestamp() override {
+    return units::microsecond_t(wpi::Now());
+  }
 };
 }  // namespace
 

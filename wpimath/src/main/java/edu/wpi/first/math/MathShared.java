@@ -21,6 +21,6 @@ public interface MathShared {
    */
   void reportUsage(MathUsageId id, int count);
 
-  /** Get the time in microseconds. */
-  long getTimestamp();
+  /** Get the time in seconds. */
+  double getTimestamp();
 }

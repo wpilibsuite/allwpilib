@@ -163,9 +163,7 @@ void frc::MecanumDrivePoseEstimator::AddVisionMeasurement(
 Pose2d frc::MecanumDrivePoseEstimator::Update(
     const Rotation2d& gyroAngle,
     const MecanumDriveWheelPositions& wheelPositions) {
-  return UpdateWithTime(
-      units::microsecond_t(wpi::math::MathSharedStore::GetTimestamp()),
-      gyroAngle, wheelPositions);
+  return UpdateWithTime(wpi::math::MathSharedStore::GetTimestamp(), gyroAngle, wheelPositions);
 }
 
 Pose2d frc::MecanumDrivePoseEstimator::UpdateWithTime(

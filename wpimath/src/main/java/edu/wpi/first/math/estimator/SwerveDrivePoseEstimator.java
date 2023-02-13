@@ -266,7 +266,7 @@ public class SwerveDrivePoseEstimator {
    * @return The estimated pose of the robot in meters.
    */
   public Pose2d update(Rotation2d gyroAngle, SwerveModulePosition[] modulePositions) {
-    return updateWithTime(MathSharedStore.getTimestamp() * 1.0e-6, gyroAngle, modulePositions);
+    return updateWithTime(MathSharedStore.getTimestamp(), gyroAngle, modulePositions);
   }
 
   /**

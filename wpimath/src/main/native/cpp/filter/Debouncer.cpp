@@ -23,13 +23,11 @@ Debouncer::Debouncer(units::second_t debounceTime, DebounceType type)
 }
 
 void Debouncer::ResetTimer() {
-  m_prevTime = units::microsecond_t(wpi::math::MathSharedStore::GetTimestamp());
+  m_prevTime = wpi::math::MathSharedStore::GetTimestamp();
 }
 
 bool Debouncer::HasElapsed() const {
-  return units::microsecond_t(wpi::math::MathSharedStore::GetTimestamp()) -
-             m_prevTime >=
-         m_debounceTime;
+  return wpi::math::MathSharedStore::GetTimestamp() - m_prevTime >= m_debounceTime;
 }
 
 bool Debouncer::Calculate(bool input) {

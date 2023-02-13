@@ -153,9 +153,7 @@ void DifferentialDrivePoseEstimator::AddVisionMeasurement(
 Pose2d DifferentialDrivePoseEstimator::Update(const Rotation2d& gyroAngle,
                                               units::meter_t leftDistance,
                                               units::meter_t rightDistance) {
-  return UpdateWithTime(
-      units::microsecond_t(wpi::math::MathSharedStore::GetTimestamp()),
-      gyroAngle, leftDistance, rightDistance);
+  return UpdateWithTime(wpi::math::MathSharedStore::GetTimestamp(), gyroAngle, leftDistance, rightDistance);
 }
 
 Pose2d DifferentialDrivePoseEstimator::UpdateWithTime(

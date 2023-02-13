@@ -287,10 +287,7 @@ public class DifferentialDrivePoseEstimator {
   public Pose2d update(
       Rotation2d gyroAngle, double distanceLeftMeters, double distanceRightMeters) {
     return updateWithTime(
-        MathSharedStore.getTimestamp() * 1.0e-6,
-        gyroAngle,
-        distanceLeftMeters,
-        distanceRightMeters);
+        MathSharedStore.getTimestamp(), gyroAngle, distanceLeftMeters, distanceRightMeters);
   }
 
   /**

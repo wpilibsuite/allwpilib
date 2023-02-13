@@ -60,11 +60,11 @@ public class Debouncer {
   }
 
   private void resetTimer() {
-    m_prevTimeSeconds = MathSharedStore.getTimestamp() * 1e-6;
+    m_prevTimeSeconds = MathSharedStore.getTimestamp();
   }
 
   private boolean hasElapsed() {
-    return (MathSharedStore.getTimestamp() * 1e-6) - m_prevTimeSeconds >= m_debounceTimeSeconds;
+    return MathSharedStore.getTimestamp() - m_prevTimeSeconds >= m_debounceTimeSeconds;
   }
 
   /**

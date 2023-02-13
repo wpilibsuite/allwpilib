@@ -272,9 +272,7 @@ class SwerveDrivePoseEstimator {
   Pose2d Update(
       const Rotation2d& gyroAngle,
       const wpi::array<SwerveModulePosition, NumModules>& modulePositions) {
-    return UpdateWithTime(
-        units::microsecond_t(wpi::math::MathSharedStore::GetTimestamp()),
-        gyroAngle, modulePositions);
+    return UpdateWithTime(wpi::math::MathSharedStore::GetTimestamp(), gyroAngle, modulePositions);
   }
 
   /**
