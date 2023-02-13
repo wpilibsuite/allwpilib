@@ -15,17 +15,17 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import java.util.function.DoubleSupplier;
 
 public class Drive extends SubsystemBase implements AutoCloseable {
+  private final PWMSparkMax m_leftMotor1 = new PWMSparkMax(DriveConstants.kLeftMotor1Port);
+  private final PWMSparkMax m_leftMotor2 = new PWMSparkMax(DriveConstants.kLeftMotor2Port);
   // The motors on the left side of the drive.
   private final MotorControllerGroup m_leftMotors =
-      new MotorControllerGroup(
-          new PWMSparkMax(DriveConstants.kLeftMotor1Port),
-          new PWMSparkMax(DriveConstants.kLeftMotor2Port));
+      new MotorControllerGroup(m_leftMotor1, m_leftMotor2);
 
+  private final PWMSparkMax m_rightMotor1 = new PWMSparkMax(DriveConstants.kRightMotor1Port);
+  private final PWMSparkMax m_rightMotor2 = new PWMSparkMax(DriveConstants.kRightMotor2Port);
   // The motors on the right side of the drive.
   private final MotorControllerGroup m_rightMotors =
-      new MotorControllerGroup(
-          new PWMSparkMax(DriveConstants.kRightMotor1Port),
-          new PWMSparkMax(DriveConstants.kRightMotor2Port));
+      new MotorControllerGroup(m_rightMotor1, m_rightMotor2);
 
   // The robot's drive
   private final DifferentialDrive m_drive = new DifferentialDrive(m_leftMotors, m_rightMotors);
@@ -113,6 +113,10 @@ public class Drive extends SubsystemBase implements AutoCloseable {
 
   @Override
   public void close() {
+    m_leftMotor1.close();
+    m_leftMotor2.close();
+    m_rightMotor1.close();
+    m_rightMotor2.close();
     m_drive.close();
     m_rightEncoder.close();
     m_leftEncoder.close();
