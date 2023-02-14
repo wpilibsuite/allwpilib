@@ -5,6 +5,7 @@
 #pragma once
 #include <frc/PS4Controller.h>
 
+#include "CommandGenericHID.h"
 #include "Trigger.h"
 #include "frc2/command/CommandScheduler.h"
 
@@ -15,22 +16,9 @@ namespace frc2 {
  *
  * @see PS4Controller
  */
-class CommandPS4Controller : public frc::PS4Controller {
+class CommandPS4Controller : public frc::PS4Controller, CommandGenericHID {
  public:
   using PS4Controller::PS4Controller;
-
-  /**
-   * Constructs an event instance around this button's digital signal.
-   *
-   * @param button the button index
-   * @param loop the event loop instance to attach the event to. Defaults to the
-   * CommandScheduler's default loop.
-   * @return an event instance representing the button's digital signal attached
-   * to the given loop.
-   */
-  Trigger Button(int button,
-                 frc::EventLoop* loop = CommandScheduler::GetInstance()
-                                            .GetDefaultButtonLoop()) const;
 
   /**
    * Constructs an event instance around the square button's digital signal.

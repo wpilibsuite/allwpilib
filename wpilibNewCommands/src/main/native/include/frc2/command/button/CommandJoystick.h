@@ -5,6 +5,7 @@
 #pragma once
 #include <frc/Joystick.h>
 
+#include "CommandGenericHID.h"
 #include "Trigger.h"
 #include "frc2/command/CommandScheduler.h"
 
@@ -15,7 +16,7 @@ namespace frc2 {
  *
  * @see Joystick
  */
-class CommandJoystick : public frc::Joystick {
+class CommandJoystick : public frc::Joystick, CommandGenericHID {
  public:
   using Joystick::Joystick;
 
