@@ -7,6 +7,8 @@
 #include <wpi/mutex.h>
 #include <wpi/timestamp.h>
 
+#include "units/time.h"
+
 using namespace wpi::math;
 
 namespace {

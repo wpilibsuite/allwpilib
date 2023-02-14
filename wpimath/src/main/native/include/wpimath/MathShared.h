@@ -9,6 +9,8 @@
 #include <fmt/format.h>
 #include <wpi/SymbolExports.h>
 
+#include "units/time.h"
+
 namespace wpi::math {
 
 enum class MathUsageId {
