@@ -34,6 +34,8 @@ class WebSocketConnection final
 
   void Flush() final;
 
+  uint64_t GetLastFlushTime() const final { return m_lastFlushTime; }
+
   void Disconnect(std::string_view reason) final;
 
   std::string_view GetDisconnectReason() const { return m_reason; }
@@ -69,6 +71,7 @@ class WebSocketConnection final
   bool m_in_text = false;
   int m_sendsActive = 0;
   std::string m_reason;
+  uint64_t m_lastFlushTime = 0;
 };
 
 }  // namespace nt::net

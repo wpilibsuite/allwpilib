@@ -7,6 +7,7 @@
 #include <span>
 
 #include <wpi/SpanExtras.h>
+#include <wpi/timestamp.h>
 #include <wpinet/WebSocket.h>
 
 using namespace nt;
@@ -67,6 +68,7 @@ void WebSocketConnection::Flush() {
   m_binary_buffers.clear();
   m_text_pos = 0;
   m_binary_pos = 0;
+  m_lastFlushTime = wpi::Now();
 }
 
 void WebSocketConnection::Disconnect(std::string_view reason) {

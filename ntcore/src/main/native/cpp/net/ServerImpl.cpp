@@ -50,7 +50,7 @@ static constexpr uint32_t kMinPeriodMs = 5;
 
 // maximum amount of time the wire can be not ready to send another
 // transmission before we close the connection
-static constexpr uint32_t kWireMaxNotReadyMs = 1000;
+static constexpr uint32_t kWireMaxNotReadyUs = 1000000;
 
 namespace {
 
@@ -650,6 +650,11 @@ void ClientData4Base::ClientSubscribe(int64_t subuid,
   }
 
   // see if this immediately subscribes to any topics
+  // for transmit efficiency, we want to batch announcements and values, so
+  // send announcements in first loop and remember what we want to send in
+  // second loop.
+  std::vector<TopicData*> dataToSend;
+  dataToSend.reserve(m_server.m_topics.size());
   for (auto&& topic : m_server.m_topics) {
     bool removed = false;
     if (replace) {
@@ -687,9 +692,13 @@ void ClientData4Base::ClientSubscribe(int64_t subuid,
     // send last value
     if (added && !sub->options.topicsOnly && !wasSubscribedValue &&
         topic->lastValue) {
-      DEBUG4("send last value for {} to client {}", topic->name, m_id);
-      SendValue(topic.get(), topic->lastValue, kSendAll);
+      dataToSend.emplace_back(topic.get());
     }
+  }
+
+  for (auto topic : dataToSend) {
+    DEBUG4("send last value for {} to client {}", topic->name, m_id);
+    SendValue(topic, topic->lastValue, kSendAll);
   }
 
   // update meta data
@@ -943,7 +952,9 @@ void ClientData4::SendOutgoing(uint64_t curTimeMs) {
   }
 
   if (!m_wire.Ready()) {
-    if (m_lastSendMs != 0 && curTimeMs > (m_lastSendMs + kWireMaxNotReadyMs)) {
+    uint64_t lastFlushTime = m_wire.GetLastFlushTime();
+    uint64_t now = wpi::Now();
+    if (lastFlushTime != 0 && now > (lastFlushTime + kWireMaxNotReadyUs)) {
       m_wire.Disconnect("transmit stalled");
     }
     return;
@@ -1114,7 +1125,9 @@ void ClientData3::SendOutgoing(uint64_t curTimeMs) {
   }
 
   if (!m_wire.Ready()) {
-    if (m_lastSendMs != 0 && curTimeMs > (m_lastSendMs + kWireMaxNotReadyMs)) {
+    uint64_t lastFlushTime = m_wire.GetLastFlushTime();
+    uint64_t now = wpi::Now();
+    if (lastFlushTime != 0 && now > (lastFlushTime + kWireMaxNotReadyUs)) {
       m_wire.Disconnect("transmit stalled");
     }
     return;
