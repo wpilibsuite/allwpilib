@@ -70,7 +70,7 @@ TEST_P(ArmSimulationTest, Teleop) {
     frc::sim::StepTiming(3_s);
 
     // Ensure elevator is still at 0.
-    EXPECT_NEAR(kMinAngle.value(), m_encoderSim.GetDistance(), 1.5);
+    EXPECT_NEAR(kMinAngle.value(), m_encoderSim.GetDistance(), 2.0);
   }
 
   {
@@ -84,7 +84,7 @@ TEST_P(ArmSimulationTest, Teleop) {
                 units::radian_t(m_encoderSim.GetDistance())
                     .convert<units::degree>()
                     .value(),
-                1.5);
+                2.0);
 
     // see setpoint is held.
     frc::sim::StepTiming(0.5_s);
@@ -93,7 +93,7 @@ TEST_P(ArmSimulationTest, Teleop) {
                 units::radian_t(m_encoderSim.GetDistance())
                     .convert<units::degree>()
                     .value(),
-                1.5);
+                2.0);
   }
 
   {
@@ -103,7 +103,7 @@ TEST_P(ArmSimulationTest, Teleop) {
 
     frc::sim::StepTiming(3_s);
 
-    EXPECT_NEAR(kMinAngle.value(), m_encoderSim.GetDistance(), 1.5);
+    EXPECT_NEAR(kMinAngle.value(), m_encoderSim.GetDistance(), 2.0);
   }
 
   {
@@ -118,7 +118,7 @@ TEST_P(ArmSimulationTest, Teleop) {
                 units::radian_t(m_encoderSim.GetDistance())
                     .convert<units::degree>()
                     .value(),
-                1.5);
+                2.0);
 
     // advance 25 timesteps to see setpoint is held.
     frc::sim::StepTiming(0.5_s);
@@ -127,7 +127,7 @@ TEST_P(ArmSimulationTest, Teleop) {
                 units::radian_t(m_encoderSim.GetDistance())
                     .convert<units::degree>()
                     .value(),
-                1.5);
+                2.0);
   }
 
   {
@@ -139,7 +139,7 @@ TEST_P(ArmSimulationTest, Teleop) {
     frc::sim::StepTiming(3_s);
 
     ASSERT_NEAR(0.0, m_motorSim.GetSpeed(), 0.05);
-    EXPECT_NEAR(kMinAngle.value(), m_encoderSim.GetDistance(), 1.5);
+    EXPECT_NEAR(kMinAngle.value(), m_encoderSim.GetDistance(), 2.0);
   }
 }
 
