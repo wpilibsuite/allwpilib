@@ -1,0 +1,28 @@
+package edu.wpi.first.wpilibj.shuffleboard;
+
+/**
+ * Factory methods for metadata of widgets built into Shuffleboard.
+ */
+public class ShuffleboardWidgets {
+{% for widget in widgets %}
+  /**
+   * {{ widget.description }} <br/>
+   *
+{% for prop in widget.properties %}
+   * @param {{ prop.name }} {{ prop.description }}
+{% endfor %}
+   * @return the widget object
+   */
+  public static SendableMetadata {{ widget.name }}({% for prop in widget.properties %}{{ prop.javaType }} {{ prop.name }}{% if not loop.last %}, {% endif %}{% endfor %}) {
+    return object -> object.put("widget", "{{ widget.display }}")
+{% for prop in widget.properties %}
+            .put("{{ prop.name }}", {{ prop.name }})
+{% endfor %}
+        ;
+  }
+
+{% endfor %}
+  private ShuffleboardWidgets() {
+    throw new UnsupportedOperationException("Utility class");
+  }
+}

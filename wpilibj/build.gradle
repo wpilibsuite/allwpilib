@@ -1,3 +1,7 @@
+import com.hubspot.jinjava.Jinjava
+import com.hubspot.jinjava.JinjavaConfig
+import groovy.json.JsonSlurper
+
 evaluationDependsOn(':hal')
 evaluationDependsOn(':ntcore')
 evaluationDependsOn(':cscore')
@@ -39,6 +43,34 @@ task generateJavaVersion() {
         }
         def read = wpilibVersionFileInput.text.replace('${wpilib_version}', version)
         wpilibVersionFileOutput.write(read)
+    }
+}
+
+def widgetTypesInputFile = file("src/generate/widgets.json")
+def widgetJavaTypesInputFile = file("src/generate/ShuffleboardWidgets.java.jinja")
+def widgetJavaTypesOutputFile = file("$buildDir/generated/java/edu/wpi/first/wpilibj/shuffleboard/ShuffleboardWidgets.java")
+
+task generateJavaWidgets() {
+    description = "Generates Java widgets"
+    group = "WPILib"
+
+    inputs.file widgetTypesInputFile
+    inputs.file widgetJavaTypesInputFile
+    outputs.file widgetJavaTypesOutputFile
+
+    doLast {
+        def jsonSlurper = new JsonSlurper()
+        def jsonTypes = jsonSlurper.parse(widgetTypesInputFile)
+
+        def config = JinjavaConfig.newBuilder()
+                .withTrimBlocks(true)
+                .build()
+        def jinjava = new Jinjava(config)
+
+        String template = widgetJavaTypesInputFile.text
+        HashMap<String, ?> replacements = new HashMap<>()
+        replacements.put("widgets", jsonTypes)
+        widgetJavaTypesOutputFile.write(jinjava.render(template, replacements))
     }
 }
 
