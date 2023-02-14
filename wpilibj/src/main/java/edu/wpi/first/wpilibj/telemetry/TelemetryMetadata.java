@@ -1,5 +1,7 @@
 package edu.wpi.first.wpilibj.telemetry;
 
-public interface TelemetryMetadata {
+import com.fasterxml.jackson.databind.JsonNode;
 
+public interface TelemetryMetadata {
+  JsonNode toJson();
 }

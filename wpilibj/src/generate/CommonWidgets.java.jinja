@@ -1,0 +1,29 @@
+package edu.wpi.first.wpilibj.telemetry;
+
+/**
+ * Factory methods for metadata of common widgets.
+ */
+public class CommonWidgets {
+{% for widget in widgets %}
+  /**
+   * {{ widget.description }} <br/>
+   *
+{% for prop in widget.properties %}
+   * @param {{ prop.name }} {{ prop.description }}
+{% endfor %}
+   * @return the widget object
+   */
+  public static TelemetryWidget {{ widget.name }}({% for prop in widget.properties %}{{ prop.javaType }} {{ prop.name }}{% if not loop.last %}, {% endif %}{% endfor %}) {
+    return TelemetryWidget.New("{{ widget.display }}",
+        object -> object
+{% for prop in widget.properties %}
+            .put("{{ prop.name }}", {{ prop.name }})
+{% endfor %}
+    );
+  }
+
+{% endfor %}
+  private CommonWidgets() {
+    throw new UnsupportedOperationException("Utility class");
+  }
+}

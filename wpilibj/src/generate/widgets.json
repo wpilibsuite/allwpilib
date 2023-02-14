@@ -1,0 +1,565 @@
+[
+  {
+    "name": "textView",
+    "display": "Text View",
+    "description": "Displays a value with a simple text field.",
+    "supportedTypes": [
+      "String",
+      "Number",
+      "Boolean"
+    ],
+    "properties": []
+  },
+  {
+    "name": "numberSlider",
+    "display": "Number Slider",
+    "description": "Displays a number with a controllable slider.",
+    "supportedTypes": [
+      "Number"
+    ],
+    "properties": [
+      {
+        "displayName": "Min",
+        "name": "min",
+        "description": "The minimum value of the slider",
+        "displayType": "Number",
+        "javaType": "double",
+        "default": -1.0
+      },
+      {
+        "displayName": "Max",
+        "name": "max",
+        "description": "The maximum value of the slider",
+        "displayType": "Number",
+        "javaType": "double",
+        "default": 1.0
+      },
+      {
+        "displayName": "Block Increment",
+        "name": "increment",
+        "description": "How much to move the slider by with the arrow keys",
+        "displayType": "Number",
+        "javaType": "double",
+        "default": 0.0625
+      }
+    ]
+  },
+  {
+    "name": "numberBar",
+    "display": "Number Bar",
+    "description": "Displays a number with a view-only bar.",
+    "supportedTypes": [
+      "Number"
+    ],
+    "properties": [
+      {
+        "displayName": "Min",
+        "name": "min",
+        "description": "The minimum value of the slider",
+        "displayType": "Number",
+        "javaType": "double",
+        "default": -1.0
+      },
+      {
+        "displayName": "Max",
+        "name": "max",
+        "description": "The maximum value of the slider",
+        "displayType": "Number",
+        "javaType": "double",
+        "default": 1.0
+      },
+      {
+        "displayName": "Center",
+        "name": "center",
+        "description": "The center (\"zero\") value of the bar",
+        "displayType": "Number",
+        "javaType": "double",
+        "default": 0.0
+      }
+    ]
+  },
+  {
+    "name": "dial",
+    "display": "Simple Dial",
+    "description": "Displays a number with a view-only dial. Displayed values are rounded to the nearest integer.",
+    "supportedTypes": [
+      "Number"
+    ],
+    "properties": [
+      {
+        "displayName": "Min",
+        "name": "min",
+        "description": "The minimum value of the slider",
+        "displayType": "Number",
+        "javaType": "double",
+        "default": 0
+      },
+      {
+        "displayName": "Max",
+        "name": "max",
+        "description": "The maximum value of the slider",
+        "displayType": "Number",
+        "javaType": "double",
+        "default": 100
+      },
+      {
+        "displayName": "Show value",
+        "name": "showValue",
+        "description": "Whether or not to show the value as text",
+        "displayType": "Boolean",
+        "javaType": "boolean",
+        "default": true
+      }
+    ]
+  },
+  {
+    "name": "graph",
+    "display": "Graph",
+    "description": "Displays a number with a graph. <strong>NOTE:</strong> graphs can be taxing on the computer running the dashboard. Keep the number of visible data points to a minimum. Making the widget smaller also helps with performance, but may cause the graph to become difficult to read.",
+    "supportedTypes": [
+      "Number",
+      "Number Array"
+    ],
+    "properties": [
+      {
+        "displayName": "Visible time",
+        "name": "visibleTime",
+        "description": "How long, in seconds, should past data be visible for",
+        "displayType": "Number",
+        "javaType": "double",
+        "default": 30
+      }
+    ]
+  },
+  {
+    "name": "booleanBox",
+    "display": "Boolean Box",
+    "description": "Displays a boolean value as a large colored box.",
+    "supportedTypes": [
+      "Boolean"
+    ],
+    "properties": [
+      {
+        "displayName": "Color when true",
+        "name": "colorWhenTrue",
+        "description": "Can be specified as a string ({@code \"#00FF00\"}) or a rgba integer ({@code 0x00FF0000})",
+        "displayType": "Color",
+        "javaType": "String",
+        "default": "\"green\""
+      },
+      {
+        "displayName": "Color when false",
+        "name": "colorWhenFrue",
+        "description": "",
+        "displayType": "Color",
+        "javaType": "String",
+        "default": "\"red\""
+      }
+    ]
+  },
+  {
+    "name": "toggleButton",
+    "display": "Toggle Button",
+    "description": "Displays a boolean with a fixed-size toggle button.",
+    "supportedTypes": [
+      "Boolean"
+    ],
+    "properties": []
+  },
+  {
+    "name": "toggleSwitch",
+    "display": "Toggle Switch",
+    "description": "Displays a boolean with a fixed-size toggle switch.",
+    "supportedTypes": [
+      "Boolean"
+    ],
+    "properties": []
+  },
+  {
+    "name": "voltageView",
+    "display": "Voltage View",
+    "description": "Displays an analog input or a raw number with a number bar.",
+    "supportedTypes": [
+      "Number",
+      "AnalogInput"
+    ],
+    "properties": [
+      {
+        "displayName": "Min",
+        "name": "min",
+        "description": "The minimum value of the slider",
+        "displayType": "Number",
+        "javaType": "double",
+        "default": -1.0
+      },
+      {
+        "displayName": "Max",
+        "name": "max",
+        "description": "The maximum value of the slider",
+        "displayType": "Number",
+        "javaType": "double",
+        "default": 1.0
+      },
+      {
+        "displayName": "Center",
+        "name": "center",
+        "description": "The center (\"zero\") value of the bar",
+        "displayType": "Number",
+        "javaType": "double",
+        "default": 0.0
+      },
+      {
+        "displayName": "Orientation",
+        "name": "orientation",
+        "description": "The orientation of the bar. One of {@code [\"HORIZONTAL\", \"VERTICAL\"]}",
+        "displayType": "\"HORIZONTAL\" or \"VERTICAL\"",
+        "javaType": "String",
+        "default": "\"HORIZONTAL\""
+      },
+      {
+        "displayName": "Number of tick marks",
+        "name": "numOfTickMarks",
+        "description": "The number of discrete ticks on the bar",
+        "displayType": "Number",
+        "javaType": "double",
+        "default": 5
+      },
+      {
+        "displayName": "Block Increment",
+        "name": "increment",
+        "description": "How much to move the slider by with the arrow keys",
+        "displayType": "Number",
+        "javaType": "double",
+        "default": 0.0625
+      }
+    ]
+  },
+  {
+    "name": "powerDistribution",
+    "display": "PDP",
+    "description": "Displays a number with a graph. <strong>NOTE:</strong> graphs can be taxing on the computer running the dashboard. Keep the number of visible data points to a minimum. Making the widget smaller also helps with performance, but may cause the graph to become difficult to read.",
+    "supportedTypes": [
+      "PowerDistribution"
+    ],
+    "properties": [
+      {
+        "displayName": "Show voltage and current values",
+        "name": "visibleTime",
+        "description": "Whether or not to display the voltage and current draw",
+        "displayType": "Boolean",
+        "javaType": "boolean",
+        "default": true
+      }
+    ]
+  },
+  {
+    "name": "comboBoxChooser",
+    "display": "ComboBox Chooser",
+    "description": "Displays a {@link edu.wpi.first.wpilibj.smartdashboard.SendableChooser SendableChooser} with a toggle button for each available option.",
+    "supportedTypes": [
+      "SendableChooser"
+    ],
+    "properties": []
+  },
+  {
+    "name": "encoder",
+    "display": "Encoder",
+    "description": "Displays an {@link edu.wpi.first.wpilibj.Encoder} displaying its speed, total traveled distance, and its distance per tick.",
+    "supportedTypes": [
+      "SendableChooser"
+    ],
+    "properties": []
+  },
+  {
+    "name": "motorController",
+    "display": "Motor Controller",
+    "description": "Displays a {@link edu.wpi.first.wpilibj.motorcontrol.MotorController MotorController}. The motor controller will be controllable from the dashboard when test mode is enabled, but will otherwise be view-only.",
+    "supportedTypes": [
+      "MotorController"
+    ],
+    "properties": [
+      {
+        "displayName": "Orientation",
+        "name": "orientation",
+        "description": "The orientation of the bar. One of {@code [\"HORIZONTAL\", \"VERTICAL\"]}",
+        "displayType": "\"HORIZONTAL\" or \"VERTICAL\"",
+        "javaType": "String",
+        "default": "\"HORIZONTAL\""
+      }
+    ]
+  },
+  {
+    "name": "command",
+    "display": "Command",
+    "description": "Displays a command with a toggle button. Pressing the button will start the command, and the button will automatically release when the command completes.",
+    "supportedTypes": [
+      "Command"
+    ],
+    "properties": []
+  },
+  {
+    "name": "pidCommand",
+    "display": "PID Command",
+    "description": "Displays a PID command with a checkbox and an editor for the PIDF constants. Selecting the checkbox will start the command, and the checkbox will automatically deselect when the command completes.",
+    "supportedTypes": [
+      "PIDCommand"
+    ],
+    "properties": []
+  },
+  {
+    "name": "pidController",
+    "display": "PID Controller",
+    "description": "Displays a PID controller with an editor for the PIDF constants and a toggle switch for enabling and disabling the controller.",
+    "supportedTypes": [
+      "PIDController"
+    ],
+    "properties": []
+  },
+  {
+    "name": "accelerometer",
+    "display": "Accelerometer",
+    "description": "Displays an accelerometer with a number bar displaying the magnitude of the acceleration and text displaying the exact value.",
+    "supportedTypes": [
+      "AnalogAccelerometer"
+    ],
+    "properties": [
+      {
+        "displayName": "Min",
+        "name": "min",
+        "description": "The minimum acceleration value to display",
+        "displayType": "Number",
+        "javaType": "double",
+        "default": -1.0
+      },
+      {
+        "displayName": "Max",
+        "name": "max",
+        "description": "The maximum acceleration value to display",
+        "displayType": "Number",
+        "javaType": "double",
+        "default": 1.0
+      },
+      {
+        "displayName": "Show text",
+        "name": "showText",
+        "description": "Show or hide the acceleration values",
+        "displayType": "Boolean",
+        "javaType": "boolean",
+        "default": true
+      },
+      {
+        "displayName": "Precision",
+        "name": "precision",
+        "description": "How many numbers to display after the decimal point",
+        "displayType": "Number",
+        "javaType": "double",
+        "default": 2
+      },
+      {
+        "displayName": "Show tick marks",
+        "name": "showTickMarks",
+        "description": "Show or hide the tick marks on the number bars",
+        "displayType": "Boolean",
+        "javaType": "boolean",
+        "default": false
+      }
+    ]
+  },
+  {
+    "name": "accelerometer3Axis",
+    "display": "3-Axis Accelerometer",
+    "description": "Displays a 3-axis accelerometer with a number bar for each axis' acceleration.",
+    "supportedTypes": [
+      "Accelerometer"
+    ],
+    "properties": [
+      {
+        "displayName": "Range",
+        "name": "range",
+        "description": "The minimum acceleration value to display",
+        "displayType": "Range",
+        "javaType": "double",
+        "default": "k16G"
+      },
+      {
+        "displayName": "Max",
+        "name": "max",
+        "description": "The maximum acceleration value to display",
+        "displayType": "Number",
+        "javaType": "double",
+        "default": 1.0
+      },
+      {
+        "displayName": "Show value",
+        "name": "showValue",
+        "description": "Show or hide the acceleration values",
+        "displayType": "Boolean",
+        "javaType": "boolean",
+        "default": true
+      },
+      {
+        "displayName": "Precision",
+        "name": "precision",
+        "description": "How many numbers to display after the decimal point",
+        "displayType": "Number",
+        "javaType": "double",
+        "default": 2
+      },
+      {
+        "displayName": "Show tick marks",
+        "name": "showTickMarks",
+        "description": "Show or hide the tick marks on the number bars",
+        "displayType": "Boolean",
+        "javaType": "boolean",
+        "default": false
+      }
+    ]
+  },
+  {
+    "name": "gyro",
+    "display": "Gyro",
+    "description": "Displays a gyro with a dial from 0 to 360 degrees.",
+    "supportedTypes": [
+      "Gyro",
+      "Number"
+    ],
+    "properties": [
+      {
+        "displayName": "Major tick spacing",
+        "name": "majorTickSpacing",
+        "description": "",
+        "displayType": "Degrees",
+        "javaType": "double",
+        "default": 45
+      },
+      {
+        "displayName": "Starting angle",
+        "name": "startingAngle",
+        "description": "How far to rotate the entire dial",
+        "displayType": "Degrees",
+        "javaType": "double",
+        "default": 180
+      },
+      {
+        "displayName": "Show tick mark ring",
+        "name": "showTickMarkRing",
+        "description": "",
+        "displayType": "Boolean",
+        "javaType": "boolean",
+        "default": true
+      }
+    ]
+  },
+  {
+    "name": "relay",
+    "display": "Relay",
+    "description": "Displays a relay with toggle buttons for each supported mode (off, on, forward, reverse).",
+    "supportedTypes": [
+      "Relay"
+    ],
+    "properties": []
+  },
+  {
+    "name": "differentialDrive",
+    "display": "Differential Drivebase",
+    "description": "Displays a differential drive with a widget that displays the speed of each side of the drivebase and a vector for the direction and rotation of the drivebase. The widget will be controllable if the robot is in test mode.",
+    "supportedTypes": [
+      "DifferentialDrive"
+    ],
+    "properties": [
+      {
+        "displayName": "Number of wheels",
+        "name": "numberOfWheels",
+        "description": "",
+        "displayType": "Positive Integer",
+        "javaType": "int",
+        "default": 4
+      },
+      {
+        "displayName": "Wheel diameter",
+        "name": "wheelDiameter",
+        "description": "How far to rotate the entire dial",
+        "displayType": "Pixels",
+        "javaType": "double",
+        "default": 80
+      },
+      {
+        "displayName": "Show velocity vectors",
+        "name": "showVelocityVectors",
+        "description": "",
+        "displayType": "Boolean",
+        "javaType": "boolean",
+        "default": true
+      }
+    ]
+  },
+  {
+    "name": "mecanumDrive",
+    "display": "Mecanum Drivebase",
+    "description": "Displays a mecanum drive with a widget that displays the speed of each wheel, and vectors for the direction and rotation of the drivebase. The widget will be controllable if the robot is in test mode.",
+    "supportedTypes": [
+      "MecanumDrive"
+    ],
+    "properties": [
+      {
+        "displayName": "Show velocity vectors",
+        "name": "showVelocityVectors",
+        "description": "",
+        "displayType": "Boolean",
+        "javaType": "boolean",
+        "default": true
+      }
+    ]
+  },
+  {
+    "name": "cameraStream",
+    "display": "Camera Stream",
+    "description": "Displays a camera stream.",
+    "supportedTypes": [
+      "VideoSource"
+    ],
+    "properties": [
+      {
+        "displayName": "Show crosshair",
+        "name": "showCrosshair",
+        "description": "Show or hide a crosshair on the image",
+        "displayType": "Boolean",
+        "javaType": "boolean",
+        "default": true
+      },
+      {
+        "displayName": "Crosshair color",
+        "name": "crosshairColor",
+        "description": "Can be specified as a string ({@code \"#00FF00\"}) or a rgba integer ({@code 0x00FF0000})",
+        "displayType": "Color",
+        "javaType": "String",
+        "default": "\"white\""
+      },
+      {
+        "displayName": "Show controls",
+        "name": "showControls",
+        "description": "Show or hide the stream controls",
+        "displayType": "Boolean",
+        "javaType": "boolean",
+        "default": true
+      },
+      {
+        "displayName": "Rotation",
+        "name": "rotation",
+        "description": "Rotates the displayed image. One of {@code [\"NONE\", \"QUARTER_CW\", \"QUARTER_CCW\", \"HALF\"]}",
+        "displayType": "{@code [\"NONE\", \"QUARTER_CW\", \"QUARTER_CCW\", \"HALF\"]}",
+        "javaType": "String",
+        "default": "\"NONE\""
+      }
+    ]
+  },
+  {
+    "name": "field2d",
+    "display": "Field",
+    "description": "Displays a Field2d object.",
+    "supportedTypes": [
+      "Field2d"
+    ],
+    "properties": []
+  }
+]
