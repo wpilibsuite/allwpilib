@@ -144,16 +144,18 @@
         "name": "colorWhenTrue",
         "description": "Can be specified as a string ({@code \"#00FF00\"}) or a rgba integer ({@code 0x00FF0000})",
         "displayType": "Color",
-        "javaType": "String",
-        "default": "\"green\""
+        "javaType": "Color",
+        "default": "Color.kGreen",
+        "javaConversion": "colorWhenTrue.toHexString()"
       },
       {
         "displayName": "Color when false",
-        "name": "colorWhenFrue",
+        "name": "colorWhenFalse",
         "description": "",
         "displayType": "Color",
-        "javaType": "String",
-        "default": "\"red\""
+        "javaType": "Color",
+        "default": "Color.kRed",
+        "javaConversion": "colorWhenFalse.toHexString()"
       }
     ]
   },
@@ -378,8 +380,9 @@
         "name": "range",
         "description": "The minimum acceleration value to display",
         "displayType": "Range",
-        "javaType": "double",
-        "default": "k16G"
+        "javaType": "Range",
+        "default": "Range.k16G",
+        "javaConversion": "range.toString()"
       },
       {
         "displayName": "Max",
@@ -532,8 +535,9 @@
         "name": "crosshairColor",
         "description": "Can be specified as a string ({@code \"#00FF00\"}) or a rgba integer ({@code 0x00FF0000})",
         "displayType": "Color",
-        "javaType": "String",
-        "default": "\"white\""
+        "javaType": "Color",
+        "default": "Color.kWhite",
+        "javaConversion": "crosshairColor.toHexString()"
       },
       {
         "displayName": "Show controls",

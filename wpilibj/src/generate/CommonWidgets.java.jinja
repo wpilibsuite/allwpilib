@@ -1,5 +1,8 @@
 package edu.wpi.first.wpilibj.telemetry;
 
+import edu.wpi.first.wpilibj.interfaces.Accelerometer.Range;
+import edu.wpi.first.wpilibj.util.Color;
+
 /**
  * Factory methods for metadata of common widgets.
  */
@@ -8,8 +11,15 @@ public class CommonWidgets {
   /**
    * {{ widget.description }} <br/>
    *
+   * <p>Supports the following data types:
+   * <ul>
+{% for supported in widget.supportedTypes %}
+   * <li> {{ supported }}
+{% endfor %}
+   * </ul>
+   *
 {% for prop in widget.properties %}
-   * @param {{ prop.name }} {{ prop.description }}
+   * @param {{ prop.name }} {{ prop.description }}. Defaults to {{ prop.default }}.
 {% endfor %}
    * @return the widget object
    */
@@ -17,11 +27,36 @@ public class CommonWidgets {
     return TelemetryWidget.New("{{ widget.display }}",
         object -> object
 {% for prop in widget.properties %}
-            .put("{{ prop.name }}", {{ prop.name }})
+            .put("{{ prop.displayName }}", {% if prop.javaConversion %}{{ prop.javaConversion }}{% else %}{{ prop.name }}{% endif %})
 {% endfor %}
     );
   }
 
+{% if widget.properties %}
+  /**
+   * {{ widget.description }} <br/>
+   *
+   * <p>Supports the following data types:
+   * <ul>
+{% for supported in widget.supportedTypes %}
+   * <li> {{ supported }}
+{% endfor %}
+   * </ul>
+   *
+   * <p>All properties are defaulted:
+   * <ul>
+{% for prop in widget.properties %}
+   * <li> {{ prop.name }} = {{ prop.default }}
+{% endfor %}
+   * </ul>
+   *
+   * @return the widget object
+   */
+  public static TelemetryWidget {{ widget.name }}() {
+    return {{ widget.name }}({% for prop in widget.properties %}{{ prop.default }}{% if not loop.last %}, {% endif %}{% endfor %});
+  }
+
+{% endif %}
 {% endfor %}
   private CommonWidgets() {
     throw new UnsupportedOperationException("Utility class");
