@@ -277,9 +277,9 @@ public class PneumaticHub implements PneumaticsBase {
    * below {@code minPressure} and will turn off when the pressure reaches {@code maxPressure}.
    *
    * @param minPressure The minimum pressure in PSI. The compressor will turn on when the pressure
-   *     drops below this value.
+   *     drops below this value. Range 0-120 PSI.
    * @param maxPressure The maximum pressure in PSI. The compressor will turn off when the pressure
-   *     reaches this value.
+   *     reaches this value. Range 0-120 PSI. Must be larger then minPressure.
    */
   @Override
   public void enableCompressorAnalog(double minPressure, double maxPressure) {
@@ -320,10 +320,11 @@ public class PneumaticHub implements PneumaticsBase {
    * </ul>
    *
    * @param minPressure The minimum pressure in PSI. The compressor will turn on when the pressure
-   *     drops below this value and the pressure switch indicates that the system is not full.
+   *     drops below this value and the pressure switch indicates that the system is not full. Range
+   *     0-120 PSI.
    * @param maxPressure The maximum pressure in PSI. The compressor will turn off when the pressure
    *     reaches this value or the pressure switch is disconnected or indicates that the system is
-   *     full.
+   *     full. Range 0-120 PSI. Must be larger then minPressure.
    */
   @Override
   public void enableCompressorHybrid(double minPressure, double maxPressure) {
