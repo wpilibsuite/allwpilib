@@ -1,162 +1,317 @@
 package edu.wpi.first.wpilibj.telemetry;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import edu.wpi.first.networktables.BooleanPublisher;
-import edu.wpi.first.networktables.NetworkTable;
-import edu.wpi.first.util.datalog.BooleanLogEntry;
-import edu.wpi.first.util.datalog.DataLog;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.Map;
+import edu.wpi.first.util.function.FloatSupplier;
 import java.util.function.BooleanSupplier;
+import java.util.function.DoubleSupplier;
+import java.util.function.LongSupplier;
+import java.util.function.Supplier;
 
-public class TelemetryBuilder implements AutoCloseable {
-  private final NetworkTable m_networkTable;
-  // TODO: this would be started before the match!
-  private DataLog m_dataLog;
+public interface TelemetryBuilder {
+  void selfMetadata(TelemetryMetadata metadata);
 
-  private final Collection<TelemetryProperty> m_props = new ArrayList<>();
+  /**
+   * Publish a boolean property.
+   *
+   * @param key the property name
+   * @param getter the property getter
+   * @return the property object, for further configuration
+   */
+  TelemetryProperty publishBoolean(String key, BooleanSupplier getter);
 
-  public TelemetryBuilder(NetworkTable table) {
-    m_networkTable = table;
-  }
+  /**
+   * Publish a constant boolean property.
+   *
+   * @param key the property name
+   * @param value the property value
+   * @return the property object, for further configuration
+   */
+  TelemetryProperty publishConstBoolean(String key, boolean value);
 
-  private void update(long timestamp) {
-    m_props.forEach(it -> it.update(timestamp));
-  }
+  /**
+   * Log a boolean property.
+   *
+   * @param key the property name
+   * @param getter the property getter
+   * @return the property object, for further configuration
+   */
+  TelemetryProperty logBoolean(String key, BooleanSupplier getter);
 
-  public void selfMetadata(TelemetryMetadata metadata) {
-    // TODO think how we want to do this
-    JsonNode json = metadata.toJson();
-    assert json.isObject();
-    for (Iterator<Map.Entry<String, JsonNode>> iter = json.fields(); iter.hasNext(); ) {
-      var field = iter.next();
-      switch (field.getValue().getNodeType()) {
-        case STRING:
-          break;
-        case BOOLEAN:
-          publishConstBoolean("." + field.getKey().toLowerCase(), field.getValue().asBoolean());
-          break;
-        case NUMBER:
-          break;
-        case BINARY:
-          break;
-        case MISSING:
-          break;
-        case NULL:
-          break;
-        case ARRAY:
-          break;
-        case OBJECT:
-          break;
-        case POJO:
-          break;
-      }
-    }
-  }
+  /**
+   * Publish a long property.
+   *
+   * @param key the property name
+   * @param getter the property getter
+   * @return the property object, for further configuration
+   */
+  TelemetryProperty publishInteger(String key, LongSupplier getter);
 
-  public TelemetryProperty publishBoolean(String key, BooleanSupplier getter) {
-    BooleanPublisher pub = m_networkTable.getBooleanTopic(key).publish();
-    TelemetryProperty prop =
-        new TelemetryProperty(pub) {
-          final BooleanPublisher m_pub = pub;
-          final BooleanSupplier m_supplier = getter;
+  /**
+   * Publish a constant long property.
+   *
+   * @param key the property name
+   * @param value the property value
+   * @return the property object, for further configuration
+   */
+  TelemetryProperty publishConstInteger(String key, long value);
 
-          {
-            m_closeables.add(m_pub);
-          }
+  /**
+   * Log a long property.
+   *
+   * @param key the property name
+   * @param getter the property getter
+   * @return the property object, for further configuration
+   */
+  TelemetryProperty logInteger(String key, LongSupplier getter);
 
-          @Override
-          protected void update(long timestamp) {
-            m_pub.set(m_supplier.getAsBoolean(), timestamp);
-          }
+  /**
+   * Publish a float property.
+   *
+   * @param key the property name
+   * @param getter the property getter
+   * @return the property object, for further configuration
+   */
+  TelemetryProperty publishFloat(String key, FloatSupplier getter);
 
-          @Override
-          protected void applyMetadata(TelemetryMetadata metadata) {
-            m_pub.getTopic().setProperties(metadata.toString());
-          }
-        };
-    m_props.add(prop);
-    return prop;
-  }
+  /**
+   * Publish a constant float property.
+   *
+   * @param key the property name
+   * @param value the property value
+   * @return the property object, for further configuration
+   */
+  TelemetryProperty publishConstFloat(String key, float value);
 
-  public TelemetryProperty publishConstBoolean(String key, boolean value) {
-    BooleanPublisher pub = m_networkTable.getBooleanTopic(key).publish();
-    TelemetryProperty prop =
-        new TelemetryProperty(pub) {
-          final BooleanPublisher m_pub = pub;
-          boolean hasPublished = false;
+  /**
+   * Log a float property.
+   *
+   * @param key the property name
+   * @param getter the property getter
+   * @return the property object, for further configuration
+   */
+  TelemetryProperty logFloat(String key, FloatSupplier getter);
 
-          {
-            m_closeables.add(m_pub);
-          }
+  /**
+   * Publish a double property.
+   *
+   * @param key the property name
+   * @param getter the property getter
+   * @return the property object, for further configuration
+   */
+  TelemetryProperty publishDouble(String key, DoubleSupplier getter);
 
-          @Override
-          protected void update(long timestamp) {
-            if (!hasPublished) {
-              m_pub.set(value, timestamp);
-              hasPublished = true;
-            }
-          }
+  /**
+   * Publish a constant double property.
+   *
+   * @param key the property name
+   * @param value the property value
+   * @return the property object, for further configuration
+   */
+  TelemetryProperty publishConstDouble(String key, double value);
 
-          @Override
-          protected void applyMetadata(TelemetryMetadata metadata) {
-            m_pub.getTopic().setProperties(metadata.toString());
-          }
-        };
-    m_props.add(prop);
-    return prop;
-  }
+  /**
+   * Log a double property.
+   *
+   * @param key the property name
+   * @param getter the property getter
+   * @return the property object, for further configuration
+   */
+  TelemetryProperty logDouble(String key, DoubleSupplier getter);
 
-  public TelemetryProperty logBoolean(String key, BooleanSupplier getter) {
-    TelemetryProperty prop =
-        new TelemetryProperty(null) {
-          final BooleanLogEntry m_log =
-              new BooleanLogEntry(
-                  m_dataLog, m_networkTable.getPath() + NetworkTable.PATH_SEPARATOR + key);
-          final BooleanSupplier m_supplier = getter;
+  /**
+   * Publish a String property.
+   *
+   * @param key the property name
+   * @param getter the property getter
+   * @return the property object, for further configuration
+   */
+  TelemetryProperty publishString(String key, Supplier<String> getter);
 
-          @Override
-          protected void update(long timestamp) {
-            m_log.append(m_supplier.getAsBoolean(), timestamp);
-          }
+  /**
+   * Publish a constant String property.
+   *
+   * @param key the property name
+   * @param value the property value
+   * @return the property object, for further configuration
+   */
+  TelemetryProperty publishConstString(String key, String value);
 
-          @Override
-          protected void applyMetadata(TelemetryMetadata metadata) {
-            m_log.setMetadata(metadata.toString());
-          }
-        };
-    m_props.add(prop);
-    return prop;
-  }
+  /**
+   * Log a String property.
+   *
+   * @param key the property name
+   * @param getter the property getter
+   * @return the property object, for further configuration
+   */
+  TelemetryProperty logString(String key, Supplier<String> getter);
 
-  public TelemetryProperty addChild(String key, TelemetryNode child) {
-    TelemetryBuilder builder = new TelemetryBuilder(m_networkTable.getSubTable(key));
+  /**
+   * Publish a byte[] property.
+   *
+   * @param key the property name
+   * @param getter the property getter
+   * @return the property object, for further configuration
+   */
+  TelemetryProperty publishRaw(String key, String typestring, Supplier<byte[]> getter);
 
-    child.declareTelemetry(builder);
+  /**
+   * Publish a constant byte[] property.
+   *
+   * @param key the property name
+   * @param value the property value
+   * @return the property object, for further configuration
+   */
+  TelemetryProperty publishConstRaw(String key, String typestring, byte[] value);
 
-    TelemetryProperty prop =
-        new TelemetryProperty(builder) {
-          final TelemetryBuilder m_builder = builder;
+  /**
+   * Log a byte[] property.
+   *
+   * @param key the property name
+   * @param getter the property getter
+   * @return the property object, for further configuration
+   */
+  TelemetryProperty logRaw(String key, Supplier<byte[]> getter);
 
-          @Override
-          protected void update(long timestamp) {
-            m_builder.update(timestamp);
-          }
+  /**
+   * Publish a boolean[] property.
+   *
+   * @param key the property name
+   * @param getter the property getter
+   * @return the property object, for further configuration
+   */
+  TelemetryProperty publishBooleanArray(String key, Supplier<boolean[]> getter);
 
-          @Override
-          protected void applyMetadata(TelemetryMetadata metadata) {
-            m_builder.selfMetadata(metadata);
-          }
-        };
-    m_props.add(prop);
-    return prop;
-  }
+  /**
+   * Publish a constant boolean[] property.
+   *
+   * @param key the property name
+   * @param value the property value
+   * @return the property object, for further configuration
+   */
+  TelemetryProperty publishConstBooleanArray(String key, boolean[] value);
 
-  @Override
-  public void close() {
-    m_props.forEach(TelemetryProperty::close);
-    m_props.clear();
-  }
+  /**
+   * Log a boolean[] property.
+   *
+   * @param key the property name
+   * @param getter the property getter
+   * @return the property object, for further configuration
+   */
+  TelemetryProperty logBooleanArray(String key, Supplier<boolean[]> getter);
+
+  /**
+   * Publish a long[] property.
+   *
+   * @param key the property name
+   * @param getter the property getter
+   * @return the property object, for further configuration
+   */
+  TelemetryProperty publishIntegerArray(String key, Supplier<long[]> getter);
+
+  /**
+   * Publish a constant long[] property.
+   *
+   * @param key the property name
+   * @param value the property value
+   * @return the property object, for further configuration
+   */
+  TelemetryProperty publishConstIntegerArray(String key, long[] value);
+
+  /**
+   * Log a long[] property.
+   *
+   * @param key the property name
+   * @param getter the property getter
+   * @return the property object, for further configuration
+   */
+  TelemetryProperty logIntegerArray(String key, Supplier<long[]> getter);
+
+  /**
+   * Publish a float[] property.
+   *
+   * @param key the property name
+   * @param getter the property getter
+   * @return the property object, for further configuration
+   */
+  TelemetryProperty publishFloatArray(String key, Supplier<float[]> getter);
+
+  /**
+   * Publish a constant float[] property.
+   *
+   * @param key the property name
+   * @param value the property value
+   * @return the property object, for further configuration
+   */
+  TelemetryProperty publishConstFloatArray(String key, float[] value);
+
+  /**
+   * Log a float[] property.
+   *
+   * @param key the property name
+   * @param getter the property getter
+   * @return the property object, for further configuration
+   */
+  TelemetryProperty logFloatArray(String key, Supplier<float[]> getter);
+
+  /**
+   * Publish a double[] property.
+   *
+   * @param key the property name
+   * @param getter the property getter
+   * @return the property object, for further configuration
+   */
+  TelemetryProperty publishDoubleArray(String key, Supplier<double[]> getter);
+
+  /**
+   * Publish a constant double[] property.
+   *
+   * @param key the property name
+   * @param value the property value
+   * @return the property object, for further configuration
+   */
+  TelemetryProperty publishConstDoubleArray(String key, double[] value);
+
+  /**
+   * Log a double[] property.
+   *
+   * @param key the property name
+   * @param getter the property getter
+   * @return the property object, for further configuration
+   */
+  TelemetryProperty logDoubleArray(String key, Supplier<double[]> getter);
+
+  /**
+   * Publish a String[] property.
+   *
+   * @param key the property name
+   * @param getter the property getter
+   * @return the property object, for further configuration
+   */
+  TelemetryProperty publishStringArray(String key, Supplier<String[]> getter);
+
+  /**
+   * Publish a constant String[] property.
+   *
+   * @param key the property name
+   * @param value the property value
+   * @return the property object, for further configuration
+   */
+  TelemetryProperty publishConstStringArray(String key, String[] value);
+
+  /**
+   * Log a String[] property.
+   *
+   * @param key the property name
+   * @param getter the property getter
+   * @return the property object, for further configuration
+   */
+  TelemetryProperty logStringArray(String key, Supplier<String[]> getter);
+
+  /**
+   * Nest another TelemetryNode under this one.
+   *
+   * @param key the subpath to the child node
+   * @param child the child node
+   * @return the property object, for further configuration
+   */
+  TelemetryProperty addChild(String key, TelemetryNode child);
 }

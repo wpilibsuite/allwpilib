@@ -239,14 +239,14 @@
   {
     "name": "powerDistribution",
     "display": "PDP",
-    "description": "Displays a number with a graph. <strong>NOTE:</strong> graphs can be taxing on the computer running the dashboard. Keep the number of visible data points to a minimum. Making the widget smaller also helps with performance, but may cause the graph to become difficult to read.",
+    "description": "Displays a PowerDistribution.",
     "supportedTypes": [
       "PowerDistribution"
     ],
     "properties": [
       {
         "displayName": "Show voltage and current values",
-        "name": "visibleTime",
+        "name": "showIndicatorText",
         "description": "Whether or not to display the voltage and current draw",
         "displayType": "Boolean",
         "javaType": "boolean",

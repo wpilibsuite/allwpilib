@@ -22,9 +22,17 @@ public abstract class TelemetryProperty implements AutoCloseable {
   }
 
   public TelemetryProperty withWidget(TelemetryWidget widget) {
-    return this;
+    return this.withMetadata(widget);
   }
 
   @Override
-  public void close() {}
+  public void close() {
+    for (AutoCloseable m_closeable : m_closeables) {
+      try {
+        m_closeable.close();
+      } catch (Exception ignored) {
+        // ignored
+      }
+    }
+  }
 }

@@ -3,7 +3,6 @@ package edu.wpi.first.wpilibj.telemetry;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import java.util.function.Function;
 
 public interface TelemetryWidget extends TelemetryMetadata {
@@ -11,10 +10,7 @@ public interface TelemetryWidget extends TelemetryMetadata {
     return new TelemetryWidget() {
       @Override
       public JsonNode toJson() {
-        return propertyBuilder.apply(
-            JsonNodeFactory.instance
-                .objectNode()
-                .put("widget", BuiltInWidgets.kTextView.getWidgetName()));
+        return propertyBuilder.apply(JsonNodeFactory.instance.objectNode().put("widget", name));
       }
     };
   }
