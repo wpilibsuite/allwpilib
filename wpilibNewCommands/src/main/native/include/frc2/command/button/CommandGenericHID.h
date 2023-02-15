@@ -15,7 +15,7 @@ namespace frc2 {
  *
  * @see GenericHID
  */
-class CommandGenericHID : public frc::GenericHID {
+class CommandGenericHID : public virtual frc::GenericHID {
  public:
   using GenericHID::GenericHID;
 
