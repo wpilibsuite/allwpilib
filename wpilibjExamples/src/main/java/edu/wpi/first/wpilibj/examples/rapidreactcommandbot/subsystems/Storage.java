@@ -6,10 +6,15 @@ package edu.wpi.first.wpilibj.examples.rapidreactcommandbot.subsystems;
 
 import static edu.wpi.first.wpilibj.examples.rapidreactcommandbot.Constants.StorageConstants;
 
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.telemetry.CommonWidgets;
 import edu.wpi.first.wpilibj.telemetry.TelemetryNode;
 import edu.wpi.first.wpilibj.telemetry.TelemetryBuilder;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.motorcontrol.PWMSparkMax;
+import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
@@ -21,6 +26,7 @@ public class Storage extends SubsystemBase implements TelemetryNode {
   public Storage() {
     // Set default command to turn off the storage motor and then idle
     setDefaultCommand(runOnce(m_motor::disable).andThen(run(() -> {})).withName("Idle"));
+    Shuffleboard.getTab("Stowing").addBoolean("isNotEmpty", this::isFull).withWidget(BuiltInWidgets.kToggleSwitch);
   }
 
   /** Whether the ball storage is full. */
@@ -35,6 +41,7 @@ public class Storage extends SubsystemBase implements TelemetryNode {
 
   @Override
   public void declareTelemetry(TelemetryBuilder builder) {
-    builder.publishBoolean("isFull", this::isFull);
+    builder.selfMetadata(() -> JsonNodeFactory.instance.objectNode().put("type", "ShuffleboardTab"));
+    builder.publishBoolean("isFull", this::isFull).withWidget(CommonWidgets.booleanBox(Color.kAzure, Color.kBlueViolet));
   }
 }

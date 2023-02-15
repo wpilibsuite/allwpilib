@@ -13,12 +13,14 @@ import edu.wpi.first.hal.PowerDistributionVersion;
 import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.util.sendable.SendableRegistry;
+import edu.wpi.first.wpilibj.telemetry.TelemetryBuilder;
+import edu.wpi.first.wpilibj.telemetry.TelemetryNode;
 
 /**
  * Class for getting voltage, current, temperature, power and energy from the CTRE Power
  * Distribution Panel (PDP) or REV Power Distribution Hub (PDH) over CAN.
  */
-public class PowerDistribution implements Sendable, AutoCloseable {
+public class PowerDistribution implements Sendable, AutoCloseable, TelemetryNode {
   private final int m_handle;
   private final int m_module;
 
@@ -213,5 +215,20 @@ public class PowerDistribution implements Sendable, AutoCloseable {
         "SwitchableChannel",
         () -> PowerDistributionJNI.getSwitchableChannelNoError(m_handle),
         value -> PowerDistributionJNI.setSwitchableChannel(m_handle, value));
+  }
+
+  @Override
+  public void declareTelemetry(TelemetryBuilder builder) {
+    int numChannels = getNumChannels();
+    for (int i = 0; i < numChannels; ++i) {
+      final int chan = i;
+      builder.publishDouble("Chan" + i, () -> getCurrent(chan));
+    }
+    builder.publishDouble("Voltage", this::getVoltage);
+    builder.publishDouble("TotalCurrent", this::getTotalCurrent);
+    builder.publishDouble("Temperature", this::getTemperature);
+    if (getType() == ModuleType.kRev) {
+      builder.publishBoolean("SwitchableChannel", this::getSwitchableChannel);
+    }
   }
 }
