@@ -78,12 +78,10 @@ class SImpl;
 
 class ClientData {
  public:
-  ClientData(std::string_view originalName, std::string_view name,
-             std::string_view connInfo, bool local,
+  ClientData(std::string_view name, std::string_view connInfo, bool local,
              ServerImpl::SetPeriodicFunc setPeriodic, SImpl& server, int id,
              wpi::Logger& logger)
-      : m_originalName{originalName},
-        m_name{name},
+      : m_name{name},
         m_connInfo{connInfo},
         m_local{local},
         m_setPeriodic{std::move(setPeriodic)},
@@ -114,12 +112,10 @@ class ClientData {
       std::string_view name, bool special,
       wpi::SmallVectorImpl<SubscriberData*>& buf);
 
-  std::string_view GetOriginalName() const { return m_originalName; }
   std::string_view GetName() const { return m_name; }
   int GetId() const { return m_id; }
 
  protected:
-  std::string m_originalName;
   std::string m_name;
   std::string m_connInfo;
   bool m_local;  // local to machine
@@ -143,12 +139,10 @@ class ClientData {
 
 class ClientData4Base : public ClientData, protected ClientMessageHandler {
  public:
-  ClientData4Base(std::string_view originalName, std::string_view name,
-                  std::string_view connInfo, bool local,
+  ClientData4Base(std::string_view name, std::string_view connInfo, bool local,
                   ServerImpl::SetPeriodicFunc setPeriodic, SImpl& server,
                   int id, wpi::Logger& logger)
-      : ClientData{originalName, name,   connInfo, local,
-                   setPeriodic,  server, id,       logger} {}
+      : ClientData{name, connInfo, local, setPeriodic, server, id, logger} {}
 
  protected:
   // ClientMessageHandler interface
@@ -170,8 +164,7 @@ class ClientData4Base : public ClientData, protected ClientMessageHandler {
 class ClientDataLocal final : public ClientData4Base {
  public:
   ClientDataLocal(SImpl& server, int id, wpi::Logger& logger)
-      : ClientData4Base{"", "", "", true, [](uint32_t) {}, server, id, logger} {
-  }
+      : ClientData4Base{"", "", true, [](uint32_t) {}, server, id, logger} {}
 
   void ProcessIncomingText(std::string_view data) final {}
   void ProcessIncomingBinary(std::span<const uint8_t> data) final {}
@@ -189,12 +182,10 @@ class ClientDataLocal final : public ClientData4Base {
 
 class ClientData4 final : public ClientData4Base {
  public:
-  ClientData4(std::string_view originalName, std::string_view name,
-              std::string_view connInfo, bool local, WireConnection& wire,
-              ServerImpl::SetPeriodicFunc setPeriodic, SImpl& server, int id,
-              wpi::Logger& logger)
-      : ClientData4Base{originalName, name,   connInfo, local,
-                        setPeriodic,  server, id,       logger},
+  ClientData4(std::string_view name, std::string_view connInfo, bool local,
+              WireConnection& wire, ServerImpl::SetPeriodicFunc setPeriodic,
+              SImpl& server, int id, wpi::Logger& logger)
+      : ClientData4Base{name, connInfo, local, setPeriodic, server, id, logger},
         m_wire{wire} {}
 
   void ProcessIncomingText(std::string_view data) final;
@@ -246,7 +237,7 @@ class ClientData3 final : public ClientData, private net3::MessageHandler3 {
               net3::WireConnection3& wire, ServerImpl::Connected3Func connected,
               ServerImpl::SetPeriodicFunc setPeriodic, SImpl& server, int id,
               wpi::Logger& logger)
-      : ClientData{"", "", connInfo, local, setPeriodic, server, id, logger},
+      : ClientData{"", connInfo, local, setPeriodic, server, id, logger},
         m_connected{std::move(connected)},
         m_wire{wire},
         m_decoder{*this} {}
@@ -1516,39 +1507,29 @@ SImpl::SImpl(wpi::Logger& logger) : m_logger{logger} {
 std::pair<std::string, int> SImpl::AddClient(
     std::string_view name, std::string_view connInfo, bool local,
     WireConnection& wire, ServerImpl::SetPeriodicFunc setPeriodic) {
-  // strip anything after @ in the name
-  name = wpi::split(name, '@').first;
   if (name.empty()) {
     name = "NT4";
   }
   size_t index = m_clients.size();
-  // find an empty slot and check for duplicates
+  // find an empty slot
   // just do a linear search as number of clients is typically small (<10)
-  int duplicateName = 0;
   for (size_t i = 0, end = index; i < end; ++i) {
-    auto& clientData = m_clients[i];
-    if (clientData && clientData->GetOriginalName() == name) {
-      ++duplicateName;
-    } else if (!clientData && index == end) {
+    if (!m_clients[i]) {
       index = i;
+      break;
     }
   }
   if (index == m_clients.size()) {
     m_clients.emplace_back();
   }
 
-  // if duplicate name, de-duplicate
-  std::string dedupName;
-  if (duplicateName > 0) {
-    dedupName = fmt::format("{}@{}", name, duplicateName);
-  } else {
-    dedupName = name;
-  }
+  // ensure name is unique by suffixing index
+  std::string dedupName = fmt::format("{}@{}", name, index);
 
   auto& clientData = m_clients[index];
-  clientData = std::make_unique<ClientData4>(name, dedupName, connInfo, local,
-                                             wire, std::move(setPeriodic),
-                                             *this, index, m_logger);
+  clientData = std::make_unique<ClientData4>(dedupName, connInfo, local, wire,
+                                             std::move(setPeriodic), *this,
+                                             index, m_logger);
 
   // create client meta topics
   clientData->m_metaPub =
