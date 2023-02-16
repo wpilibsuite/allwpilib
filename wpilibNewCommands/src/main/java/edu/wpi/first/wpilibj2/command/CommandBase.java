@@ -26,12 +26,11 @@ public abstract class CommandBase implements Sendable, Command {
   }
 
   /**
-   * Adds the specified subsystems to the requirements of the command.
-   * The scheduler will prevent two commands that require the same subsystem
-   * from being scheduled simultaneously.  
+   * Adds the specified subsystems to the requirements of the command. The scheduler will prevent
+   * two commands that require the same subsystem from being scheduled simultaneously.
    *
-   * Note that the scheduler determines the requirements of a command when it
-   * is scheduled, so this method should normally be called from the command's constructor.
+   * <p>Note that the scheduler determines the requirements of a command when it is scheduled, so
+   * this method should normally be called from the command's constructor.
    *
    * @param requirements the requirements to add
    */
