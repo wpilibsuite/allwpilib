@@ -7,6 +7,7 @@
 #include <cmath>
 #include <cstdlib>
 #include <numeric>
+#include <random>
 #include <string_view>
 #include <thread>
 
@@ -17,12 +18,18 @@
 #include "ntcore_cpp.h"
 
 void bench();
+void stress();
 
 int main(int argc, char* argv[]) {
   if (argc == 2 && std::string_view{argv[1]} == "bench") {
     bench();
     return EXIT_SUCCESS;
   }
+  if (argc == 2 && std::string_view{argv[1]} == "stress") {
+    stress();
+    return EXIT_SUCCESS;
+  }
+
   auto myValue = nt::GetEntry(nt::GetDefaultInstance(), "MyValue");
 
   nt::SetEntryValue(myValue, nt::Value::MakeString("Hello World"));
@@ -105,4 +112,73 @@ void bench() {
   PrintTimes(times);
   fmt::print("-- Flush --\n");
   PrintTimes(flushTimes);
+}
+
+static std::random_device r;
+static std::mt19937 gen(r());
+static std::uniform_real_distribution<double> dist;
+
+void stress() {
+  auto server = nt::CreateInstance();
+  nt::StartServer(server, "stress.json", "127.0.0.1", 0, 10000);
+  nt::SubscribeMultiple(server, {{std::string_view{}}});
+
+  using namespace std::chrono_literals;
+
+  for (int count = 0; count < 10; ++count) {
+    std::thread{[] {
+      auto client = nt::CreateInstance();
+      nt::SubscribeMultiple(client, {{std::string_view{}}});
+      for (int i = 0; i < 300; ++i) {
+        // sleep a random amount of time
+        std::this_thread::sleep_for(0.1s * dist(gen));
+
+        // connect
+        nt::StartClient4(client, "client");
+        nt::SetServer(client, "127.0.0.1", 10000);
+
+        // sleep a random amount of time
+        std::this_thread::sleep_for(0.1s * dist(gen));
+
+        // disconnect
+        nt::StopClient(client);
+      }
+      nt::DestroyInstance(client);
+    }}.detach();
+
+    std::thread{[server, count] {
+      for (int n = 0; n < 300; ++n) {
+        // sleep a random amount of time
+        std::this_thread::sleep_for(0.01s * dist(gen));
+
+        // create publishers
+        NT_Publisher pub[30];
+        for (int i = 0; i < 30; ++i) {
+          pub[i] =
+              nt::Publish(nt::GetTopic(server, fmt::format("{}_{}", count, i)),
+                          NT_DOUBLE, "double", {});
+        }
+
+        // publish values
+        for (int i = 0; i < 200; ++i) {
+          // sleep a random amount of time between each value set
+          std::this_thread::sleep_for(0.001s * dist(gen));
+          for (int i = 0; i < 30; ++i) {
+            nt::SetDouble(pub[i], dist(gen));
+          }
+          nt::FlushLocal(server);
+        }
+
+        // sleep a random amount of time
+        std::this_thread::sleep_for(0.1s * dist(gen));
+
+        // remove publishers
+        for (int i = 0; i < 30; ++i) {
+          nt::Unpublish(pub[i]);
+        }
+      }
+    }}.detach();
+  }
+
+  std::this_thread::sleep_for(100s);
 }
