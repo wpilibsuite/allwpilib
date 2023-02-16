@@ -420,36 +420,46 @@ void NSImpl::Init() {
 
   // set up timers
   m_readLocalTimer = uv::Timer::Create(m_loop);
-  m_readLocalTimer->timeout.connect([this] {
-    HandleLocal();
-    m_serverImpl.SendControl(m_loop.Now().count());
-  });
-  m_readLocalTimer->Start(uv::Timer::Time{100}, uv::Timer::Time{100});
+  if (m_readLocalTimer) {
+    m_readLocalTimer->timeout.connect([this] {
+      HandleLocal();
+      m_serverImpl.SendControl(m_loop.Now().count());
+    });
+    m_readLocalTimer->Start(uv::Timer::Time{100}, uv::Timer::Time{100});
+  }
 
   m_savePersistentTimer = uv::Timer::Create(m_loop);
-  m_savePersistentTimer->timeout.connect([this] {
-    if (m_serverImpl.PersistentChanged()) {
-      uv::QueueWork(
-          m_loop,
-          [this, fn = m_persistentFilename,
-           data = m_serverImpl.DumpPersistent()] { SavePersistent(fn, data); },
-          nullptr);
-    }
-  });
-  m_savePersistentTimer->Start(uv::Timer::Time{1000}, uv::Timer::Time{1000});
+  if (m_savePersistentTimer) {
+    m_savePersistentTimer->timeout.connect([this] {
+      if (m_serverImpl.PersistentChanged()) {
+        uv::QueueWork(
+            m_loop,
+            [this, fn = m_persistentFilename,
+             data = m_serverImpl.DumpPersistent()] {
+              SavePersistent(fn, data);
+            },
+            nullptr);
+      }
+    });
+    m_savePersistentTimer->Start(uv::Timer::Time{1000}, uv::Timer::Time{1000});
+  }
 
   // set up flush async
   m_flush = uv::Async<>::Create(m_loop);
-  m_flush->wakeup.connect([this] {
-    HandleLocal();
-    for (auto&& conn : m_connections) {
-      m_serverImpl.SendValues(conn.conn->GetClientId(), m_loop.Now().count());
-    }
-  });
+  if (m_flush) {
+    m_flush->wakeup.connect([this] {
+      HandleLocal();
+      for (auto&& conn : m_connections) {
+        m_serverImpl.SendValues(conn.conn->GetClientId(), m_loop.Now().count());
+      }
+    });
+  }
   m_flushAtomic = m_flush.get();
 
   m_flushLocal = uv::Async<>::Create(m_loop);
-  m_flushLocal->wakeup.connect([this] { HandleLocal(); });
+  if (m_flushLocal) {
+    m_flushLocal->wakeup.connect([this] { HandleLocal(); });
+  }
   m_flushLocalAtomic = m_flushLocal.get();
 
   INFO("Listening on NT3 port {}, NT4 port {}", m_port3, m_port4);

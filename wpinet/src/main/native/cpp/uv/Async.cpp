@@ -17,6 +17,9 @@ Async<>::~Async() noexcept {
 }
 
 std::shared_ptr<Async<>> Async<>::Create(const std::shared_ptr<Loop>& loop) {
+  if (loop->IsClosing()) {
+    return nullptr;
+  }
   auto h = std::make_shared<Async>(loop, private_init{});
   int err = uv_async_init(loop->GetRaw(), h->GetRaw(), [](uv_async_t* handle) {
     Async& h = *static_cast<Async*>(handle->data);

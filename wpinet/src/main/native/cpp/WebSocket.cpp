@@ -261,11 +261,12 @@ void WebSocket::StartClient(std::string_view uri, std::string_view host,
 
   // Start handshake timer if a timeout was specified
   if (options.handshakeTimeout != (uv::Timer::Time::max)()) {
-    auto timer = uv::Timer::Create(m_stream.GetLoopRef());
-    timer->timeout.connect(
-        [this]() { Terminate(1006, "connection timed out"); });
-    timer->Start(options.handshakeTimeout);
-    m_clientHandshake->timer = timer;
+    if (auto timer = uv::Timer::Create(m_stream.GetLoopRef())) {
+      timer->timeout.connect(
+          [this]() { Terminate(1006, "connection timed out"); });
+      timer->Start(options.handshakeTimeout);
+      m_clientHandshake->timer = timer;
+    }
   }
 }
 

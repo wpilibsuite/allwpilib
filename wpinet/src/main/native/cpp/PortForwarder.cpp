@@ -49,6 +49,9 @@ void PortForwarder::Add(unsigned int port, std::string_view remoteHost,
                         unsigned int remotePort) {
   m_impl->runner.ExecSync([&](uv::Loop& loop) {
     auto server = uv::Tcp::Create(loop);
+    if (!server) {
+      return;
+    }
 
     // bind to local port
     server->Bind("", port);
@@ -71,6 +74,10 @@ void PortForwarder::Add(unsigned int port, std::string_view remoteHost,
       client->SetData(connected);
 
       auto remote = uv::Tcp::Create(loop);
+      if (!remote) {
+        client->Close();
+        return;
+      }
       remote->error.connect(
           [remotePtr = remote.get(),
            clientWeak = std::weak_ptr<uv::Tcp>(client)](uv::Error err) {
