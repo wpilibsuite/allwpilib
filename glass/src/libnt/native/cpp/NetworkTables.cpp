@@ -1049,54 +1049,58 @@ static void CreateTopicMenuItem(NetworkTablesModel* model,
   }
 }
 
+void glass::DisplayNetworkTablesAddMenu(NetworkTablesModel* model,
+                                        std::string_view path,
+                                        NetworkTablesFlags flags) {
+  static char nameBuffer[kTextBufferSize];
+
+  if (ImGui::BeginMenu("Add new...")) {
+    if (ImGui::IsWindowAppearing()) {
+      nameBuffer[0] = '\0';
+    }
+
+    ImGui::InputTextWithHint("New item name", "example", nameBuffer,
+                             kTextBufferSize);
+    std::string fullNewPath;
+    if (path == "/") {
+      path = "";
+    }
+    fullNewPath = fmt::format("{}/{}", path, nameBuffer);
+
+    ImGui::Text("Adding: %s", fullNewPath.c_str());
+    ImGui::Separator();
+    auto entry = model->GetEntry(fullNewPath);
+    bool exists = entry && entry->info.type != NT_Type::NT_UNASSIGNED;
+    bool enabled = (flags & NetworkTablesFlags_CreateNoncanonicalKeys ||
+                    nameBuffer[0] != '\0') &&
+                   !exists;
+
+    CreateTopicMenuItem(model, fullNewPath, NT_STRING, "string", enabled);
+    CreateTopicMenuItem(model, fullNewPath, NT_INTEGER, "int", enabled);
+    CreateTopicMenuItem(model, fullNewPath, NT_FLOAT, "float", enabled);
+    CreateTopicMenuItem(model, fullNewPath, NT_DOUBLE, "double", enabled);
+    CreateTopicMenuItem(model, fullNewPath, NT_BOOLEAN, "boolean", enabled);
+    CreateTopicMenuItem(model, fullNewPath, NT_STRING_ARRAY, "string[]",
+                        enabled);
+    CreateTopicMenuItem(model, fullNewPath, NT_INTEGER_ARRAY, "int[]", enabled);
+    CreateTopicMenuItem(model, fullNewPath, NT_FLOAT_ARRAY, "float[]", enabled);
+    CreateTopicMenuItem(model, fullNewPath, NT_DOUBLE_ARRAY, "double[]",
+                        enabled);
+    CreateTopicMenuItem(model, fullNewPath, NT_BOOLEAN_ARRAY, "boolean[]",
+                        enabled);
+
+    ImGui::EndMenu();
+  }
+}
+
 static void EmitParentContextMenu(NetworkTablesModel* model,
                                   const std::string& path,
                                   NetworkTablesFlags flags) {
-  static char nameBuffer[kTextBufferSize];
   if (ImGui::BeginPopupContextItem(path.c_str())) {
     ImGui::Text("%s", path.c_str());
     ImGui::Separator();
 
-    if (ImGui::BeginMenu("Add new...")) {
-      if (ImGui::IsWindowAppearing()) {
-        nameBuffer[0] = '\0';
-      }
-
-      ImGui::InputTextWithHint("New item name", "example", nameBuffer,
-                               kTextBufferSize);
-      std::string fullNewPath;
-      if (path == "/") {
-        fullNewPath = path + nameBuffer;
-      } else {
-        fullNewPath = fmt::format("{}/{}", path, nameBuffer);
-      }
-
-      ImGui::Text("Adding: %s", fullNewPath.c_str());
-      ImGui::Separator();
-      auto entry = model->GetEntry(fullNewPath);
-      bool exists = entry && entry->info.type != NT_Type::NT_UNASSIGNED;
-      bool enabled = (flags & NetworkTablesFlags_CreateNoncanonicalKeys ||
-                      nameBuffer[0] != '\0') &&
-                     !exists;
-
-      CreateTopicMenuItem(model, fullNewPath, NT_STRING, "string", enabled);
-      CreateTopicMenuItem(model, fullNewPath, NT_INTEGER, "int", enabled);
-      CreateTopicMenuItem(model, fullNewPath, NT_FLOAT, "float", enabled);
-      CreateTopicMenuItem(model, fullNewPath, NT_DOUBLE, "double", enabled);
-      CreateTopicMenuItem(model, fullNewPath, NT_BOOLEAN, "boolean", enabled);
-      CreateTopicMenuItem(model, fullNewPath, NT_STRING_ARRAY, "string[]",
-                          enabled);
-      CreateTopicMenuItem(model, fullNewPath, NT_INTEGER_ARRAY, "int[]",
-                          enabled);
-      CreateTopicMenuItem(model, fullNewPath, NT_FLOAT_ARRAY, "float[]",
-                          enabled);
-      CreateTopicMenuItem(model, fullNewPath, NT_DOUBLE_ARRAY, "double[]",
-                          enabled);
-      CreateTopicMenuItem(model, fullNewPath, NT_BOOLEAN_ARRAY, "boolean[]",
-                          enabled);
-
-      ImGui::EndMenu();
-    }
+    DisplayNetworkTablesAddMenu(model, path, flags);
 
     ImGui::EndPopup();
   }
@@ -1280,7 +1284,6 @@ static void DisplayTable(NetworkTablesModel* model,
   }
   ImGui::TableHeadersRow();
 
-  // EmitParentContextMenu(model, "/", flags);
   if (flags & NetworkTablesFlags_TreeView) {
     switch (category) {
       case ShowPersistent:
@@ -1511,6 +1514,7 @@ void NetworkTablesView::Display() {
 
 void NetworkTablesView::Settings() {
   m_flags.DisplayMenu();
+  DisplayNetworkTablesAddMenu(m_model, {}, m_flags.GetFlags());
 }
 
 bool NetworkTablesView::HasSettings() {

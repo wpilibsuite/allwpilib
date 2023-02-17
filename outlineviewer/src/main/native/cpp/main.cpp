@@ -119,6 +119,7 @@ static void DisplayGui() {
   gui::EmitViewMenu();
   if (ImGui::BeginMenu("View")) {
     gFlagsSettings.DisplayMenu();
+    glass::DisplayNetworkTablesAddMenu(gModel.get());
     ImGui::EndMenu();
   }
 
