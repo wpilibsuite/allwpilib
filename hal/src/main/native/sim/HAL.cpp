@@ -316,6 +316,26 @@ uint64_t HAL_ExpandFPGATime(uint32_t unexpandedLower, int32_t* status) {
   return (upper << 32) + static_cast<uint64_t>(unexpandedLower);
 }
 
+void HAL_WaitMicroseconds(uint64_t waitTime) {
+  int32_t status = 0;
+
+  uint64_t startTime = HAL_GetFPGATime(&status);
+
+  if (status != 0) {
+    return;
+  }
+
+  HAL_NotifierHandle handle = HAL_InitializeNotifier(&status);
+
+  if (status != 0) {
+    return;
+  }
+
+  HAL_UpdateNotifierAlarm(handle, startTime + waitTime, &status);
+  uint64_t end = HAL_WaitForNotifierAlarm(handle, &status);
+  HAL_CleanNotifier(handle, &status);
+}
+
 HAL_Bool HAL_GetFPGAButton(int32_t* status) {
   return SimRoboRioData[0].fpgaButton;
 }

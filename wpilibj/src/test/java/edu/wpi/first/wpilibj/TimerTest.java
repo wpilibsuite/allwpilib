@@ -7,9 +7,11 @@ package edu.wpi.first.wpilibj;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 
 import edu.wpi.first.hal.HAL;
 import edu.wpi.first.wpilibj.simulation.SimHooks;
+import java.util.concurrent.atomic.AtomicBoolean;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -128,5 +130,49 @@ class TimerTest {
     SimHooks.stepTiming(0.5);
     double end = Timer.getFPGATimestamp();
     assertEquals(start + 0.5, end, 1e-9);
+  }
+
+  @Test
+  @ResourceLock("timing")
+  void delaySimTest() {
+    int waitSeconds = 5;
+
+    AtomicBoolean hasFinished = new AtomicBoolean(false);
+
+    Object sync = new Object();
+
+    Thread testThread =
+        new Thread(
+            () -> {
+              synchronized (sync) {
+                sync.notify();
+              }
+              Timer.delaySim(waitSeconds);
+              hasFinished.set(true);
+            });
+
+    testThread.start();
+
+    synchronized (sync) {
+      try {
+        // Wait for thread to start
+        sync.wait(1000);
+      } catch (InterruptedException ex) {
+        fail("Test thread was interrupted");
+      }
+    }
+
+    for (int i = 0; i < 100; i++) {
+      SimHooks.stepTiming(1);
+    }
+
+    try {
+      testThread.interrupt();
+      testThread.join();
+    } catch (InterruptedException ex) {
+      fail("Test thread was interrupted");
+    }
+
+    assertTrue(hasFinished.get());
   }
 }

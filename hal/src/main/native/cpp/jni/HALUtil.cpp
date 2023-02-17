@@ -501,6 +501,18 @@ Java_edu_wpi_first_hal_HALUtil_getFPGATime
 
 /*
  * Class:     edu_wpi_first_hal_HALUtil
+ * Method:    waitMicroseconds
+ * Signature: (J)V
+ */
+JNIEXPORT void JNICALL
+Java_edu_wpi_first_hal_HALUtil_waitMicroseconds
+  (JNIEnv* env, jclass, jlong waitTime)
+{
+  HAL_WaitMicroseconds(waitTime);
+}
+
+/*
+ * Class:     edu_wpi_first_hal_HALUtil
  * Method:    getHALRuntimeType
  * Signature: ()I
  */

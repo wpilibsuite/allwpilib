@@ -4,6 +4,8 @@
 
 package edu.wpi.first.wpilibj;
 
+import edu.wpi.first.hal.HALUtil;
+
 /**
  * A timer class.
  *
@@ -48,6 +50,10 @@ public class Timer {
     } catch (final InterruptedException ex) {
       Thread.currentThread().interrupt();
     }
+  }
+
+  public static void delaySim(final double seconds) {
+    HALUtil.waitMicroseconds((long) (seconds * 1e6));
   }
 
   private double m_startTime;

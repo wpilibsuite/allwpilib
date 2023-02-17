@@ -68,6 +68,8 @@ public final class HALUtil extends JNIWrapper {
    */
   public static native long getFPGATime();
 
+  public static native void waitMicroseconds(long waitTime);
+
   /**
    * Returns the runtime type of the HAL.
    *

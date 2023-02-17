@@ -9,11 +9,16 @@
 
 #include "frc/DriverStation.h"
 #include "frc/RobotController.h"
+#include "hal/HALBase.h"
 
 namespace frc {
 
 void Wait(units::second_t seconds) {
   std::this_thread::sleep_for(std::chrono::duration<double>(seconds.value()));
+}
+
+void WaitSim(units::microsecond_t time) {
+  HAL_WaitMicroseconds(static_cast<uint64_t>(time.value()));
 }
 
 units::second_t GetTime() {

@@ -173,6 +173,12 @@ uint64_t HAL_GetFPGATime(int32_t* status);
 uint64_t HAL_ExpandFPGATime(uint32_t unexpandedLower, int32_t* status);
 
 /**
+ * Blocks the current thread for the given amount of time in microseconds,
+ * utilizing the appropriate clock for the current platform.
+ */
+void HAL_WaitMicroseconds(uint64_t waitTime);
+
+/**
  * Gets the current state of the Robot Signal Light (RSL).
  *
  * @param[out] status the error code, or 0 for success

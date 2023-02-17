@@ -396,6 +396,10 @@ uint64_t HAL_ExpandFPGATime(uint32_t unexpandedLower, int32_t* status) {
   return (upper << 32) + static_cast<uint64_t>(unexpandedLower);
 }
 
+void HAL_WaitMicroseconds(uint64_t waitTime) {
+  std::this_thread::sleep_for(std::chrono::microseconds(waitMicros));
+}
+
 HAL_Bool HAL_GetFPGAButton(int32_t* status) {
   hal::init::CheckInit();
   if (!global) {
