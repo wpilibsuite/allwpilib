@@ -15,6 +15,7 @@
 #include <hal/FRCUsageReporting.h>
 #include <hal/HALBase.h>
 #include <networktables/NetworkTableInstance.h>
+#include <wpi/timestamp.h>
 #include <wpimath/MathShared.h>
 
 #include "WPILibVersion.h"
@@ -137,6 +138,10 @@ class WPILibMathShared : public wpi::math::MathShared {
                    count);
         break;
     }
+  }
+
+  units::second_t GetTimestamp() override {
+    return units::second_t{wpi::Now() * 1.0e-6};
   }
 };
 }  // namespace

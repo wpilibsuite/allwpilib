@@ -4,6 +4,7 @@
 
 package edu.wpi.first.math.estimator;
 
+import edu.wpi.first.math.MathSharedStore;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.Nat;
@@ -17,7 +18,6 @@ import edu.wpi.first.math.kinematics.DifferentialDriveKinematics;
 import edu.wpi.first.math.kinematics.DifferentialDriveOdometry;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
-import edu.wpi.first.util.WPIUtilJNI;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Objects;
@@ -292,7 +292,7 @@ public class DifferentialDrivePoseEstimator {
   public Pose2d update(
       Rotation2d gyroAngle, double distanceLeftMeters, double distanceRightMeters) {
     return updateWithTime(
-        WPIUtilJNI.now() * 1.0e-6, gyroAngle, distanceLeftMeters, distanceRightMeters);
+        MathSharedStore.getTimestamp(), gyroAngle, distanceLeftMeters, distanceRightMeters);
   }
 
   /**

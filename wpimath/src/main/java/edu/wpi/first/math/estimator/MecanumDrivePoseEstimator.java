@@ -4,6 +4,7 @@
 
 package edu.wpi.first.math.estimator;
 
+import edu.wpi.first.math.MathSharedStore;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.Nat;
@@ -18,7 +19,6 @@ import edu.wpi.first.math.kinematics.MecanumDriveOdometry;
 import edu.wpi.first.math.kinematics.MecanumDriveWheelPositions;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
-import edu.wpi.first.util.WPIUtilJNI;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Objects;
@@ -269,7 +269,7 @@ public class MecanumDrivePoseEstimator {
    * @return The estimated pose of the robot in meters.
    */
   public Pose2d update(Rotation2d gyroAngle, MecanumDriveWheelPositions wheelPositions) {
-    return updateWithTime(WPIUtilJNI.now() * 1.0e-6, gyroAngle, wheelPositions);
+    return updateWithTime(MathSharedStore.getTimestamp(), gyroAngle, wheelPositions);
   }
 
   /**

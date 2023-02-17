@@ -10,6 +10,7 @@
 #include <wpi/timestamp.h>
 
 #include "units/time.h"
+#include "wpimath/MathShared.h"
 
 namespace frc {
 /**
@@ -45,7 +46,8 @@ class SlewRateLimiter {
       : m_positiveRateLimit{positiveRateLimit},
         m_negativeRateLimit{negativeRateLimit},
         m_prevVal{initialValue},
-        m_prevTime{units::microsecond_t(wpi::Now())} {}
+        m_prevTime{
+            units::microsecond_t(wpi::math::MathSharedStore::GetTimestamp())} {}
 
   /**
    * Creates a new SlewRateLimiter with the given positive rate limit and
@@ -77,7 +79,7 @@ class SlewRateLimiter {
    * rate.
    */
   Unit_t Calculate(Unit_t input) {
-    units::second_t currentTime = units::microsecond_t(wpi::Now());
+    units::second_t currentTime = wpi::math::MathSharedStore::GetTimestamp();
     units::second_t elapsedTime = currentTime - m_prevTime;
     m_prevVal +=
         std::clamp(input - m_prevVal, m_negativeRateLimit * elapsedTime,
@@ -94,7 +96,7 @@ class SlewRateLimiter {
    */
   void Reset(Unit_t value) {
     m_prevVal = value;
-    m_prevTime = units::microsecond_t(wpi::Now());
+    m_prevTime = wpi::math::MathSharedStore::GetTimestamp();
   }
 
  private:

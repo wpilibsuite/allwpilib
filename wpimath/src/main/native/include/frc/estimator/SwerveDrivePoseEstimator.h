@@ -18,6 +18,7 @@
 #include "frc/kinematics/SwerveDriveKinematics.h"
 #include "frc/kinematics/SwerveDriveOdometry.h"
 #include "units/time.h"
+#include "wpimath/MathShared.h"
 
 namespace frc {
 
@@ -272,7 +273,7 @@ class SwerveDrivePoseEstimator {
   Pose2d Update(
       const Rotation2d& gyroAngle,
       const wpi::array<SwerveModulePosition, NumModules>& modulePositions) {
-    return UpdateWithTime(units::microsecond_t(wpi::Now()), gyroAngle,
+    return UpdateWithTime(wpi::math::MathSharedStore::GetTimestamp(), gyroAngle,
                           modulePositions);
   }
 
