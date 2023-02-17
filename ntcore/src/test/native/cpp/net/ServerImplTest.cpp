@@ -51,7 +51,7 @@ TEST_F(ServerImplTest, AddClient) {
   MockSetPeriodicFunc setPeriodic;
   auto [name, id] = server.AddClient("test", "connInfo", false, wire,
                                      setPeriodic.AsStdFunction());
-  EXPECT_EQ(name, "test");
+  EXPECT_EQ(name, "test@1");
   EXPECT_NE(id, -1);
 }
 
@@ -67,9 +67,9 @@ TEST_F(ServerImplTest, AddDuplicateClient) {
                                        setPeriodic1.AsStdFunction());
   auto [name2, id2] = server.AddClient("test", "connInfo2", false, wire2,
                                        setPeriodic2.AsStdFunction());
-  EXPECT_EQ(name1, "test");
+  EXPECT_EQ(name1, "test@1");
   EXPECT_NE(id1, -1);
-  EXPECT_EQ(name2, "test@1");
+  EXPECT_EQ(name2, "test@2");
   EXPECT_NE(id1, id2);
   EXPECT_NE(id2, -1);
 }
