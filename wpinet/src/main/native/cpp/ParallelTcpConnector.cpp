@@ -24,6 +24,9 @@ ParallelTcpConnector::ParallelTcpConnector(
       m_reconnectRate{reconnectRate},
       m_connected{std::move(connected)},
       m_reconnectTimer{uv::Timer::Create(loop)} {
+  if (!m_reconnectTimer) {
+    return;
+  }
   m_reconnectTimer->timeout.connect([this] {
     if (!IsConnected()) {
       WPI_DEBUG1(m_logger, "timed out, reconnecting");
@@ -86,6 +89,9 @@ void ParallelTcpConnector::Connect() {
           // kick off parallel connection attempts
           for (auto ai = &addrinfo; ai; ai = ai->ai_next) {
             auto tcp = uv::Tcp::Create(m_loop);
+            if (!tcp) {
+              continue;
+            }
             m_attempts.emplace_back(tcp);
 
             auto connreq = std::make_shared<uv::TcpConnectReq>();

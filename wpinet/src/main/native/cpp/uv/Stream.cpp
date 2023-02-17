@@ -35,6 +35,9 @@ WriteReq::WriteReq() {
 }
 
 void Stream::Shutdown(const std::shared_ptr<ShutdownReq>& req) {
+  if (IsLoopClosing()) {
+    return;
+  }
   if (Invoke(&uv_shutdown, req->GetRaw(), GetRawStream(),
              [](uv_shutdown_t* req, int status) {
                auto& h = *static_cast<ShutdownReq*>(req->data);
@@ -50,6 +53,9 @@ void Stream::Shutdown(const std::shared_ptr<ShutdownReq>& req) {
 }
 
 void Stream::Shutdown(std::function<void()> callback) {
+  if (IsLoopClosing()) {
+    return;
+  }
   auto req = std::make_shared<ShutdownReq>();
   if (callback) {
     req->complete.connect(std::move(callback));
@@ -58,6 +64,9 @@ void Stream::Shutdown(std::function<void()> callback) {
 }
 
 void Stream::StartRead() {
+  if (IsLoopClosing()) {
+    return;
+  }
   Invoke(&uv_read_start, GetRawStream(), &Handle::AllocBuf,
          [](uv_stream_t* stream, ssize_t nread, const uv_buf_t* buf) {
            auto& h = *static_cast<Stream*>(stream->data);
@@ -79,6 +88,9 @@ void Stream::StartRead() {
 
 void Stream::Write(std::span<const Buffer> bufs,
                    const std::shared_ptr<WriteReq>& req) {
+  if (IsLoopClosing()) {
+    return;
+  }
   if (Invoke(&uv_write, req->GetRaw(), GetRawStream(), bufs.data(), bufs.size(),
              [](uv_write_t* r, int status) {
                auto& h = *static_cast<WriteReq*>(r->data);
@@ -98,6 +110,9 @@ void Stream::Write(std::span<const Buffer> bufs,
 }
 
 int Stream::TryWrite(std::span<const Buffer> bufs) {
+  if (IsLoopClosing()) {
+    return 0;
+  }
   int val = uv_try_write(GetRawStream(), bufs.data(), bufs.size());
   if (val < 0) {
     this->ReportError(val);
@@ -107,6 +122,9 @@ int Stream::TryWrite(std::span<const Buffer> bufs) {
 }
 
 int Stream::TryWrite2(std::span<const Buffer> bufs, Stream& send) {
+  if (IsLoopClosing()) {
+    return 0;
+  }
   int val = uv_try_write2(GetRawStream(), bufs.data(), bufs.size(),
                           send.GetRawStream());
   if (val < 0) {

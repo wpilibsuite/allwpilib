@@ -18,6 +18,9 @@ GetAddrInfoReq::GetAddrInfoReq() {
 void GetAddrInfo(Loop& loop, const std::shared_ptr<GetAddrInfoReq>& req,
                  std::string_view node, std::string_view service,
                  const addrinfo* hints) {
+  if (loop.IsClosing()) {
+    return;
+  }
   SmallString<128> nodeStr{node};
   SmallString<128> serviceStr{service};
   int err = uv_getaddrinfo(
