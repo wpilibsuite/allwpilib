@@ -21,6 +21,7 @@ import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.util.WPIUtilJNI;
 import java.util.Arrays;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.Objects;
 
 /**
@@ -180,7 +181,11 @@ public class SwerveDrivePoseEstimator {
    */
   public void addVisionMeasurement(Pose2d visionRobotPoseMeters, double timestampSeconds) {
     // Step 0: If this measurement is old enough to be outside the pose buffer's timespan, skip.
-    if (m_poseBuffer.getInternalBuffer().lastKey() - kBufferDuration > timestampSeconds) {
+    try {
+      if (m_poseBuffer.getInternalBuffer().lastKey() - kBufferDuration > timestampSeconds) {
+        return;
+      }
+    } catch (NoSuchElementException ex) {
       return;
     }
 
