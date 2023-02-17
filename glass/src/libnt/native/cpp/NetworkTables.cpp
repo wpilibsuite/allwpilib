@@ -400,6 +400,11 @@ void NetworkTablesModel::ValueSource::UpdateFromValue(
         }
       } else {
         valueChildren.clear();
+        valueStr.clear();
+        wpi::raw_string_ostream os{valueStr};
+        os << '"';
+        os.write_escaped(value.GetString());
+        os << '"';
       }
       break;
     case NT_RAW:
@@ -769,25 +774,32 @@ static bool StringToStringArray(std::string_view in,
   }
   in = wpi::trim(in);
 
-  wpi::SmallVector<std::string_view, 16> inSplit;
-  wpi::SmallString<32> buf;
-
-  wpi::split(in, inSplit, ',', -1, false);
-  for (auto val : inSplit) {
-    val = wpi::trim(val);
-    if (val.empty()) {
-      continue;
-    }
-    if (val.front() != '"' || val.back() != '"') {
-      fmt::print(stderr,
-                 "GUI: NetworkTables: Could not understand value '{}'\n", val);
+  while (!in.empty()) {
+    if (in.front() != '"') {
+      fmt::print(stderr, "GUI: NetworkTables: Expected '\"'");
       return false;
     }
-    val.remove_prefix(1);
-    val.remove_suffix(1);
-    out->emplace_back(wpi::UnescapeCString(val, buf).first);
+    in.remove_prefix(1);
+    wpi::SmallString<128> buf;
+    std::string_view val;
+    std::tie(val, in) = wpi::UnescapeCString(in, buf);
+    out->emplace_back(val);
+    if (!in.empty()) {
+      if (in.front() != '"') {
+        fmt::print(stderr, "GUI: NetworkTables: Error escaping string");
+        return false;
+      }
+      in.remove_prefix(1);
+      in = wpi::ltrim(in);
+    }
+    if (!in.empty()) {
+      if (in.front() != ',') {
+        fmt::print(stderr, "GUI: NetworkTables: Expected ','");
+        return false;
+      }
+      in.remove_prefix(1);
+    }
   }
-
   return true;
 }
 
@@ -826,9 +838,8 @@ static void EmitEntryValueReadonly(const NetworkTablesModel::ValueSource& entry,
       break;
     }
     case NT_STRING: {
-      // GetString() comes from a std::string, so it's null terminated
       ImGui::LabelText(typeStr ? typeStr : "string", "%s",
-                       val.GetString().data());
+                       entry.valueStr.c_str());
       break;
     }
     case NT_BOOLEAN_ARRAY:
@@ -938,13 +949,18 @@ static void EmitEntryValueEditable(NetworkTablesModel::Entry& entry,
       break;
     }
     case NT_STRING: {
-      char* v = GetTextBuffer(val.GetString());
+      char* v = GetTextBuffer(entry.valueStr);
       if (ImGui::InputText(typeStr ? typeStr : "string", v, kTextBufferSize,
                            ImGuiInputTextFlags_EnterReturnsTrue)) {
-        if (entry.publisher == 0) {
-          entry.publisher = nt::Publish(entry.info.topic, NT_STRING, "string");
+        if (v[0] == '"') {
+          if (entry.publisher == 0) {
+            entry.publisher =
+                nt::Publish(entry.info.topic, NT_STRING, "string");
+          }
+          wpi::SmallString<128> buf;
+          nt::SetString(entry.publisher,
+                        wpi::UnescapeCString(v + 1, buf).first);
         }
-        nt::SetString(entry.publisher, v);
       }
       break;
     }
