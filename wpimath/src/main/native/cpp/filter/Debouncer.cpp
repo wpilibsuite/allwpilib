@@ -27,7 +27,8 @@ void Debouncer::ResetTimer() {
 }
 
 bool Debouncer::HasElapsed() const {
-  return wpi::math::MathSharedStore::GetTimestamp() - m_prevTime >= m_debounceTime;
+  return wpi::math::MathSharedStore::GetTimestamp() - m_prevTime >=
+         m_debounceTime;
 }
 
 bool Debouncer::Calculate(bool input) {

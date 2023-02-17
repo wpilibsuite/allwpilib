@@ -74,7 +74,9 @@ class WPILIB_DLLEXPORT MathSharedStore {
     GetMathShared().ReportUsage(id, count);
   }
 
-  static units::second_t GetTimestamp() { return GetMathShared().GetTimestamp(); }
+  static units::second_t GetTimestamp() {
+    return GetMathShared().GetTimestamp();
+  }
 };
 
 }  // namespace wpi::math
