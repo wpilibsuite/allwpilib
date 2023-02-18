@@ -1045,6 +1045,41 @@ static void CreateTopicMenuItem(NetworkTablesModel* model,
         model->AddEntry(nt::GetTopic(model->GetInstance().GetHandle(), path));
     if (entry->publisher == 0) {
       entry->publisher = nt::Publish(entry->info.topic, type, typeStr);
+      // publish a default value so it's editable
+      switch (type) {
+        case NT_BOOLEAN:
+          nt::SetDefaultBoolean(entry->publisher, false);
+          break;
+        case NT_INTEGER:
+          nt::SetDefaultInteger(entry->publisher, 0);
+          break;
+        case NT_FLOAT:
+          nt::SetDefaultFloat(entry->publisher, 0.0);
+          break;
+        case NT_DOUBLE:
+          nt::SetDefaultDouble(entry->publisher, 0.0);
+          break;
+        case NT_STRING:
+          nt::SetDefaultString(entry->publisher, "");
+          break;
+        case NT_BOOLEAN_ARRAY:
+          nt::SetDefaultBooleanArray(entry->publisher, {});
+          break;
+        case NT_INTEGER_ARRAY:
+          nt::SetDefaultIntegerArray(entry->publisher, {});
+          break;
+        case NT_FLOAT_ARRAY:
+          nt::SetDefaultFloatArray(entry->publisher, {});
+          break;
+        case NT_DOUBLE_ARRAY:
+          nt::SetDefaultDoubleArray(entry->publisher, {});
+          break;
+        case NT_STRING_ARRAY:
+          nt::SetDefaultStringArray(entry->publisher, {});
+          break;
+        default:
+          break;
+      }
     }
   }
 }
