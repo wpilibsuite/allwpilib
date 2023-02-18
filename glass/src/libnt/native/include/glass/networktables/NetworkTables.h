@@ -194,6 +194,10 @@ void DisplayNetworkTables(
     NetworkTablesModel* model,
     NetworkTablesFlags flags = NetworkTablesFlags_Default);
 
+void DisplayNetworkTablesAddMenu(
+    NetworkTablesModel* model, std::string_view path = {},
+    NetworkTablesFlags flags = NetworkTablesFlags_Default);
+
 class NetworkTablesFlagsSettings {
  public:
   explicit NetworkTablesFlagsSettings(
