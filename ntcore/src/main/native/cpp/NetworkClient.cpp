@@ -56,6 +56,7 @@ class NCImpl {
   void StopDSClient();
 
   virtual void TcpConnected(uv::Tcp& tcp) = 0;
+  virtual void ForceDisconnect(std::string_view reason) = 0;
   virtual void Disconnect(std::string_view reason);
 
   // invariants
@@ -99,6 +100,7 @@ class NCImpl3 : public NCImpl {
 
   void HandleLocal();
   void TcpConnected(uv::Tcp& tcp) final;
+  void ForceDisconnect(std::string_view reason) override;
   void Disconnect(std::string_view reason) override;
 
   std::shared_ptr<net3::UvStreamConnection3> m_wire;
@@ -117,6 +119,7 @@ class NCImpl4 : public NCImpl {
   void HandleLocal();
   void TcpConnected(uv::Tcp& tcp) final;
   void WsConnected(wpi::WebSocket& ws, uv::Tcp& tcp);
+  void ForceDisconnect(std::string_view reason) override;
   void Disconnect(std::string_view reason) override;
 
   std::function<void(int64_t serverTimeOffset, int64_t rtt2, bool valid)>
@@ -346,6 +349,12 @@ void NCImpl3::TcpConnected(uv::Tcp& tcp) {
   tcp.StartRead();
 }
 
+void NCImpl3::ForceDisconnect(std::string_view reason) {
+  if (m_wire) {
+    m_wire->Disconnect(reason);
+  }
+}
+
 void NCImpl3::Disconnect(std::string_view reason) {
   INFO("DISCONNECTED NT3 connection: {}", reason);
   m_clientImpl.reset();
@@ -491,6 +500,12 @@ void NCImpl4::WsConnected(wpi::WebSocket& ws, uv::Tcp& tcp) {
   });
 }
 
+void NCImpl4::ForceDisconnect(std::string_view reason) {
+  if (m_wire) {
+    m_wire->Disconnect(reason);
+  }
+}
+
 void NCImpl4::Disconnect(std::string_view reason) {
   std::string realReason;
   if (m_wire) {
@@ -534,7 +549,7 @@ void NetworkClient::SetServers(
 
 void NetworkClient::Disconnect() {
   m_impl->m_loopRunner.ExecAsync(
-      [this](auto&) { m_impl->Disconnect("requested by application"); });
+      [this](auto&) { m_impl->ForceDisconnect("requested by application"); });
 }
 
 void NetworkClient::StartDSClient(unsigned int port) {
@@ -582,7 +597,7 @@ void NetworkClient3::SetServers(
 
 void NetworkClient3::Disconnect() {
   m_impl->m_loopRunner.ExecAsync(
-      [this](auto&) { m_impl->Disconnect("requested by application"); });
+      [this](auto&) { m_impl->ForceDisconnect("requested by application"); });
 }
 
 void NetworkClient3::StartDSClient(unsigned int port) {
