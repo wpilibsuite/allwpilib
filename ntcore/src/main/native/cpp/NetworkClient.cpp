@@ -328,7 +328,7 @@ void NCImpl3::TcpConnected(uv::Tcp& tcp) {
         tcp.closed.connect([this, &tcp] {
           DEBUG3("NT3 TCP connection closed");
           if (!tcp.IsLoopClosing()) {
-            Disconnect(m_wire->GetDisconnectReason());
+            Disconnect(m_wire ? m_wire->GetDisconnectReason() : "unknown");
           }
         });
 
@@ -492,7 +492,10 @@ void NCImpl4::WsConnected(wpi::WebSocket& ws, uv::Tcp& tcp) {
 }
 
 void NCImpl4::Disconnect(std::string_view reason) {
-  auto realReason = m_wire->GetDisconnectReason();
+  std::string realReason;
+  if (m_wire) {
+    realReason = m_wire->GetDisconnectReason();
+  }
   INFO("DISCONNECTED NT4 connection: {}",
        realReason.empty() ? reason : realReason);
   m_clientImpl.reset();
