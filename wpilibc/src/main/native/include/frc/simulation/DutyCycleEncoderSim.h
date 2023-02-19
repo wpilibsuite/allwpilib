@@ -33,7 +33,7 @@ class DutyCycleEncoderSim {
   explicit DutyCycleEncoderSim(int channel);
 
   /**
-   * Set the position tin turns.
+   * Set the position in turns.
    *
    * @param turns The position.
    */
