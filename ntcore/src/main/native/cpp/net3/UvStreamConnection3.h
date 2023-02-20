@@ -38,6 +38,8 @@ class UvStreamConnection3 final
 
   void Flush() final;
 
+  uint64_t GetLastFlushTime() const final { return m_lastFlushTime; }
+
   void Disconnect(std::string_view reason) final;
 
   std::string_view GetDisconnectReason() const { return m_reason; }
@@ -54,6 +56,7 @@ class UvStreamConnection3 final
   std::vector<wpi::uv::Buffer> m_buf_pool;
   wpi::raw_uv_ostream m_os;
   std::string m_reason;
+  uint64_t m_lastFlushTime = 0;
   int m_sendsActive = 0;
 };
 

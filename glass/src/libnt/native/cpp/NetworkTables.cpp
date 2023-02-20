@@ -400,6 +400,11 @@ void NetworkTablesModel::ValueSource::UpdateFromValue(
         }
       } else {
         valueChildren.clear();
+        valueStr.clear();
+        wpi::raw_string_ostream os{valueStr};
+        os << '"';
+        os.write_escaped(value.GetString());
+        os << '"';
       }
       break;
     case NT_RAW:
@@ -769,25 +774,32 @@ static bool StringToStringArray(std::string_view in,
   }
   in = wpi::trim(in);
 
-  wpi::SmallVector<std::string_view, 16> inSplit;
-  wpi::SmallString<32> buf;
-
-  wpi::split(in, inSplit, ',', -1, false);
-  for (auto val : inSplit) {
-    val = wpi::trim(val);
-    if (val.empty()) {
-      continue;
-    }
-    if (val.front() != '"' || val.back() != '"') {
-      fmt::print(stderr,
-                 "GUI: NetworkTables: Could not understand value '{}'\n", val);
+  while (!in.empty()) {
+    if (in.front() != '"') {
+      fmt::print(stderr, "GUI: NetworkTables: Expected '\"'");
       return false;
     }
-    val.remove_prefix(1);
-    val.remove_suffix(1);
-    out->emplace_back(wpi::UnescapeCString(val, buf).first);
+    in.remove_prefix(1);
+    wpi::SmallString<128> buf;
+    std::string_view val;
+    std::tie(val, in) = wpi::UnescapeCString(in, buf);
+    out->emplace_back(val);
+    if (!in.empty()) {
+      if (in.front() != '"') {
+        fmt::print(stderr, "GUI: NetworkTables: Error escaping string");
+        return false;
+      }
+      in.remove_prefix(1);
+      in = wpi::ltrim(in);
+    }
+    if (!in.empty()) {
+      if (in.front() != ',') {
+        fmt::print(stderr, "GUI: NetworkTables: Expected ','");
+        return false;
+      }
+      in.remove_prefix(1);
+    }
   }
-
   return true;
 }
 
@@ -826,9 +838,8 @@ static void EmitEntryValueReadonly(const NetworkTablesModel::ValueSource& entry,
       break;
     }
     case NT_STRING: {
-      // GetString() comes from a std::string, so it's null terminated
       ImGui::LabelText(typeStr ? typeStr : "string", "%s",
-                       val.GetString().data());
+                       entry.valueStr.c_str());
       break;
     }
     case NT_BOOLEAN_ARRAY:
@@ -938,13 +949,18 @@ static void EmitEntryValueEditable(NetworkTablesModel::Entry& entry,
       break;
     }
     case NT_STRING: {
-      char* v = GetTextBuffer(val.GetString());
+      char* v = GetTextBuffer(entry.valueStr);
       if (ImGui::InputText(typeStr ? typeStr : "string", v, kTextBufferSize,
                            ImGuiInputTextFlags_EnterReturnsTrue)) {
-        if (entry.publisher == 0) {
-          entry.publisher = nt::Publish(entry.info.topic, NT_STRING, "string");
+        if (v[0] == '"') {
+          if (entry.publisher == 0) {
+            entry.publisher =
+                nt::Publish(entry.info.topic, NT_STRING, "string");
+          }
+          wpi::SmallString<128> buf;
+          nt::SetString(entry.publisher,
+                        wpi::UnescapeCString(v + 1, buf).first);
         }
-        nt::SetString(entry.publisher, v);
       }
       break;
     }
@@ -1045,58 +1061,97 @@ static void CreateTopicMenuItem(NetworkTablesModel* model,
         model->AddEntry(nt::GetTopic(model->GetInstance().GetHandle(), path));
     if (entry->publisher == 0) {
       entry->publisher = nt::Publish(entry->info.topic, type, typeStr);
+      // publish a default value so it's editable
+      switch (type) {
+        case NT_BOOLEAN:
+          nt::SetDefaultBoolean(entry->publisher, false);
+          break;
+        case NT_INTEGER:
+          nt::SetDefaultInteger(entry->publisher, 0);
+          break;
+        case NT_FLOAT:
+          nt::SetDefaultFloat(entry->publisher, 0.0);
+          break;
+        case NT_DOUBLE:
+          nt::SetDefaultDouble(entry->publisher, 0.0);
+          break;
+        case NT_STRING:
+          nt::SetDefaultString(entry->publisher, "");
+          break;
+        case NT_BOOLEAN_ARRAY:
+          nt::SetDefaultBooleanArray(entry->publisher, {});
+          break;
+        case NT_INTEGER_ARRAY:
+          nt::SetDefaultIntegerArray(entry->publisher, {});
+          break;
+        case NT_FLOAT_ARRAY:
+          nt::SetDefaultFloatArray(entry->publisher, {});
+          break;
+        case NT_DOUBLE_ARRAY:
+          nt::SetDefaultDoubleArray(entry->publisher, {});
+          break;
+        case NT_STRING_ARRAY:
+          nt::SetDefaultStringArray(entry->publisher, {});
+          break;
+        default:
+          break;
+      }
     }
+  }
+}
+
+void glass::DisplayNetworkTablesAddMenu(NetworkTablesModel* model,
+                                        std::string_view path,
+                                        NetworkTablesFlags flags) {
+  static char nameBuffer[kTextBufferSize];
+
+  if (ImGui::BeginMenu("Add new...")) {
+    if (ImGui::IsWindowAppearing()) {
+      nameBuffer[0] = '\0';
+    }
+
+    ImGui::InputTextWithHint("New item name", "example", nameBuffer,
+                             kTextBufferSize);
+    std::string fullNewPath;
+    if (path == "/") {
+      path = "";
+    }
+    fullNewPath = fmt::format("{}/{}", path, nameBuffer);
+
+    ImGui::Text("Adding: %s", fullNewPath.c_str());
+    ImGui::Separator();
+    auto entry = model->GetEntry(fullNewPath);
+    bool exists = entry && entry->info.type != NT_Type::NT_UNASSIGNED;
+    bool enabled = (flags & NetworkTablesFlags_CreateNoncanonicalKeys ||
+                    nameBuffer[0] != '\0') &&
+                   !exists;
+
+    CreateTopicMenuItem(model, fullNewPath, NT_STRING, "string", enabled);
+    CreateTopicMenuItem(model, fullNewPath, NT_INTEGER, "int", enabled);
+    CreateTopicMenuItem(model, fullNewPath, NT_FLOAT, "float", enabled);
+    CreateTopicMenuItem(model, fullNewPath, NT_DOUBLE, "double", enabled);
+    CreateTopicMenuItem(model, fullNewPath, NT_BOOLEAN, "boolean", enabled);
+    CreateTopicMenuItem(model, fullNewPath, NT_STRING_ARRAY, "string[]",
+                        enabled);
+    CreateTopicMenuItem(model, fullNewPath, NT_INTEGER_ARRAY, "int[]", enabled);
+    CreateTopicMenuItem(model, fullNewPath, NT_FLOAT_ARRAY, "float[]", enabled);
+    CreateTopicMenuItem(model, fullNewPath, NT_DOUBLE_ARRAY, "double[]",
+                        enabled);
+    CreateTopicMenuItem(model, fullNewPath, NT_BOOLEAN_ARRAY, "boolean[]",
+                        enabled);
+
+    ImGui::EndMenu();
   }
 }
 
 static void EmitParentContextMenu(NetworkTablesModel* model,
                                   const std::string& path,
                                   NetworkTablesFlags flags) {
-  static char nameBuffer[kTextBufferSize];
   if (ImGui::BeginPopupContextItem(path.c_str())) {
     ImGui::Text("%s", path.c_str());
     ImGui::Separator();
 
-    if (ImGui::BeginMenu("Add new...")) {
-      if (ImGui::IsWindowAppearing()) {
-        nameBuffer[0] = '\0';
-      }
-
-      ImGui::InputTextWithHint("New item name", "example", nameBuffer,
-                               kTextBufferSize);
-      std::string fullNewPath;
-      if (path == "/") {
-        fullNewPath = path + nameBuffer;
-      } else {
-        fullNewPath = fmt::format("{}/{}", path, nameBuffer);
-      }
-
-      ImGui::Text("Adding: %s", fullNewPath.c_str());
-      ImGui::Separator();
-      auto entry = model->GetEntry(fullNewPath);
-      bool exists = entry && entry->info.type != NT_Type::NT_UNASSIGNED;
-      bool enabled = (flags & NetworkTablesFlags_CreateNoncanonicalKeys ||
-                      nameBuffer[0] != '\0') &&
-                     !exists;
-
-      CreateTopicMenuItem(model, fullNewPath, NT_STRING, "string", enabled);
-      CreateTopicMenuItem(model, fullNewPath, NT_INTEGER, "int", enabled);
-      CreateTopicMenuItem(model, fullNewPath, NT_FLOAT, "float", enabled);
-      CreateTopicMenuItem(model, fullNewPath, NT_DOUBLE, "double", enabled);
-      CreateTopicMenuItem(model, fullNewPath, NT_BOOLEAN, "boolean", enabled);
-      CreateTopicMenuItem(model, fullNewPath, NT_STRING_ARRAY, "string[]",
-                          enabled);
-      CreateTopicMenuItem(model, fullNewPath, NT_INTEGER_ARRAY, "int[]",
-                          enabled);
-      CreateTopicMenuItem(model, fullNewPath, NT_FLOAT_ARRAY, "float[]",
-                          enabled);
-      CreateTopicMenuItem(model, fullNewPath, NT_DOUBLE_ARRAY, "double[]",
-                          enabled);
-      CreateTopicMenuItem(model, fullNewPath, NT_BOOLEAN_ARRAY, "boolean[]",
-                          enabled);
-
-      ImGui::EndMenu();
-    }
+    DisplayNetworkTablesAddMenu(model, path, flags);
 
     ImGui::EndPopup();
   }
@@ -1280,7 +1335,6 @@ static void DisplayTable(NetworkTablesModel* model,
   }
   ImGui::TableHeadersRow();
 
-  // EmitParentContextMenu(model, "/", flags);
   if (flags & NetworkTablesFlags_TreeView) {
     switch (category) {
       case ShowPersistent:
@@ -1511,6 +1565,7 @@ void NetworkTablesView::Display() {
 
 void NetworkTablesView::Settings() {
   m_flags.DisplayMenu();
+  DisplayNetworkTablesAddMenu(m_model, {}, m_flags.GetFlags());
 }
 
 bool NetworkTablesView::HasSettings() {

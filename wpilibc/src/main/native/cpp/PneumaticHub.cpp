@@ -162,8 +162,10 @@ void PneumaticHub::EnableCompressorAnalog(
                         maxPressure);
   }
   int32_t status = 0;
-  units::volt_t minAnalogVoltage = PSIToVolts(minPressure, 5_V);
-  units::volt_t maxAnalogVoltage = PSIToVolts(maxPressure, 5_V);
+  units::volt_t minAnalogVoltage =
+      PSIToVolts(minPressure, Get5VRegulatedVoltage());
+  units::volt_t maxAnalogVoltage =
+      PSIToVolts(maxPressure, Get5VRegulatedVoltage());
   HAL_SetREVPHClosedLoopControlAnalog(m_handle, minAnalogVoltage.value(),
                                       maxAnalogVoltage.value(), &status);
   FRC_ReportError(status, "Module {}", m_module);
@@ -187,8 +189,10 @@ void PneumaticHub::EnableCompressorHybrid(
                         maxPressure);
   }
   int32_t status = 0;
-  units::volt_t minAnalogVoltage = PSIToVolts(minPressure, 5_V);
-  units::volt_t maxAnalogVoltage = PSIToVolts(maxPressure, 5_V);
+  units::volt_t minAnalogVoltage =
+      PSIToVolts(minPressure, Get5VRegulatedVoltage());
+  units::volt_t maxAnalogVoltage =
+      PSIToVolts(maxPressure, Get5VRegulatedVoltage());
   HAL_SetREVPHClosedLoopControlHybrid(m_handle, minAnalogVoltage.value(),
                                       maxAnalogVoltage.value(), &status);
   FRC_ReportError(status, "Module {}", m_module);

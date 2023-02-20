@@ -4,6 +4,7 @@
 
 package edu.wpi.first.math.estimator;
 
+import edu.wpi.first.math.MathSharedStore;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.Nat;
 import edu.wpi.first.math.VecBuilder;
@@ -19,7 +20,7 @@ import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.numbers.N4;
-import edu.wpi.first.util.WPIUtilJNI;
+import java.util.NoSuchElementException;
 
 /**
  * This class wraps {@link SwerveDriveOdometry Swerve Drive Odometry} to fuse latency-compensated
@@ -308,7 +309,11 @@ public class SwerveDrivePoseEstimator {
    */
   public void addVisionMeasurement(Pose3d visionRobotPoseMeters, double timestampSeconds) {
     // Step 0: If this measurement is old enough to be outside the pose buffer's timespan, skip.
-    if (m_poseBuffer.getInternalBuffer().lastKey() - kBufferDuration > timestampSeconds) {
+    try {
+      if (m_poseBuffer.getInternalBuffer().lastKey() - kBufferDuration > timestampSeconds) {
+        return;
+      }
+    } catch (NoSuchElementException ex) {
       return;
     }
 
@@ -436,7 +441,7 @@ public class SwerveDrivePoseEstimator {
    * @return The estimated pose of the robot in meters.
    */
   public Pose3d update(Rotation3d gyroAngle, SwerveModulePosition[] modulePositions) {
-    return updateWithTime(WPIUtilJNI.now() * 1.0e-6, gyroAngle, modulePositions);
+    return updateWithTime(MathSharedStore.getTimestamp(), gyroAngle, modulePositions);
   }
 
   /**
@@ -448,7 +453,7 @@ public class SwerveDrivePoseEstimator {
    * @return The estimated pose of the robot in meters.
    */
   public Pose2d update(Rotation2d gyroAngle, SwerveModulePosition[] modulePositions) {
-    return updateWithTime(WPIUtilJNI.now() * 1.0e-6, gyroAngle, modulePositions);
+    return updateWithTime(MathSharedStore.getTimestamp(), gyroAngle, modulePositions);
   }
 
   /**

@@ -4,6 +4,7 @@
 
 package edu.wpi.first.math.estimator;
 
+import edu.wpi.first.math.MathSharedStore;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.Nat;
 import edu.wpi.first.math.VecBuilder;
@@ -18,7 +19,7 @@ import edu.wpi.first.math.kinematics.DifferentialDriveOdometry;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.numbers.N4;
-import edu.wpi.first.util.WPIUtilJNI;
+import java.util.NoSuchElementException;
 
 /**
  * This class wraps {@link DifferentialDriveOdometry Differential Drive Odometry} to fuse
@@ -331,7 +332,11 @@ public class DifferentialDrivePoseEstimator {
    */
   public void addVisionMeasurement(Pose3d visionRobotPoseMeters, double timestampSeconds) {
     // Step 0: If this measurement is old enough to be outside the pose buffer's timespan, skip.
-    if (m_poseBuffer.getInternalBuffer().lastKey() - kBufferDuration > timestampSeconds) {
+    try {
+      if (m_poseBuffer.getInternalBuffer().lastKey() - kBufferDuration > timestampSeconds) {
+        return;
+      }
+    } catch (NoSuchElementException ex) {
       return;
     }
 
@@ -478,7 +483,7 @@ public class DifferentialDrivePoseEstimator {
   public Pose3d update(
       Rotation3d gyroAngle, double distanceLeftMeters, double distanceRightMeters) {
     return updateWithTime(
-        WPIUtilJNI.now() * 1.0e-6, gyroAngle, distanceLeftMeters, distanceRightMeters);
+        MathSharedStore.getTimestamp(), gyroAngle, distanceLeftMeters, distanceRightMeters);
   }
 
   /**

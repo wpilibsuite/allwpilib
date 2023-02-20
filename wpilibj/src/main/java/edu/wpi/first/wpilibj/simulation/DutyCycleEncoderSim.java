@@ -18,8 +18,16 @@ public class DutyCycleEncoderSim {
    * @param encoder DutyCycleEncoder to simulate
    */
   public DutyCycleEncoderSim(DutyCycleEncoder encoder) {
-    SimDeviceSim wrappedSimDevice =
-        new SimDeviceSim("DutyCycle:DutyCycleEncoder" + "[" + encoder.getSourceChannel() + "]");
+    this(encoder.getSourceChannel());
+  }
+
+  /**
+   * Constructs from a digital input channel.
+   *
+   * @param channel digital input channel.
+   */
+  public DutyCycleEncoderSim(int channel) {
+    SimDeviceSim wrappedSimDevice = new SimDeviceSim("DutyCycle:DutyCycleEncoder", channel);
     m_simPosition = wrappedSimDevice.getDouble("position");
     m_simDistancePerRotation = wrappedSimDevice.getDouble("distance_per_rot");
   }

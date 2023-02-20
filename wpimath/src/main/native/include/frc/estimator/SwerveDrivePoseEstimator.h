@@ -18,6 +18,7 @@
 #include "frc/kinematics/SwerveDriveKinematics.h"
 #include "frc/kinematics/SwerveDriveOdometry.h"
 #include "units/time.h"
+#include "wpimath/MathShared.h"
 
 namespace frc {
 
@@ -172,8 +173,9 @@ class SwerveDrivePoseEstimator {
                             units::second_t timestamp) {
     // Step 0: If this measurement is old enough to be outside the pose buffer's
     // timespan, skip.
-    if (m_poseBuffer.GetInternalBuffer().front().first - kBufferDuration >
-        timestamp) {
+    if (!m_poseBuffer.GetInternalBuffer().empty() &&
+        m_poseBuffer.GetInternalBuffer().front().first - kBufferDuration >
+            timestamp) {
       return;
     }
 
@@ -271,7 +273,7 @@ class SwerveDrivePoseEstimator {
   Pose2d Update(
       const Rotation2d& gyroAngle,
       const wpi::array<SwerveModulePosition, NumModules>& modulePositions) {
-    return UpdateWithTime(units::microsecond_t(wpi::Now()), gyroAngle,
+    return UpdateWithTime(wpi::math::MathSharedStore::GetTimestamp(), gyroAngle,
                           modulePositions);
   }
 
