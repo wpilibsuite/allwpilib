@@ -64,6 +64,7 @@ doxygen {
             cppIncludeRoots.add(it.absolutePath)
         }
     }
+    cppIncludeRoots << '../ntcore/build/generated/main/native/include/'
 
     if (project.hasProperty('docWarningsAsErrors')) {
         // C++20 shims
