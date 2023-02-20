@@ -51,8 +51,8 @@ public interface Subsystem {
   }
 
   /**
-   * Removes the default command for the subsystem. This will not cancel the default command if
-   * it is currently running.
+   * Removes the default command for the subsystem. This will not cancel the default command if it
+   * is currently running.
    */
   default void removeDefaultCommand() {
     CommandScheduler.getInstance().removeDefaultCommand(this);
