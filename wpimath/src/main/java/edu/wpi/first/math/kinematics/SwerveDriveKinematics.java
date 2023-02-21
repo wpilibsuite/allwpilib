@@ -103,7 +103,16 @@ public class SwerveDriveKinematics {
       }
 
       m_moduleStates = newStates;
-      return m_moduleStates;
+
+      /* Deep copy states so that a user cannot modify the contents of m_moduleStates */
+      var copiedStates = new SwerveModuleState[m_numModules];
+      for (int i = 0; i < m_numModules; i++) {
+        copiedStates[i] =
+            new SwerveModuleState(
+                m_moduleStates[i].speedMetersPerSecond,
+                new Rotation2d(m_moduleStates[i].angle.getRadians()));
+      }
+      return copiedStates;
     }
 
     if (!centerOfRotationMeters.equals(m_prevCoR)) {
@@ -145,7 +154,15 @@ public class SwerveDriveKinematics {
       m_moduleStates[i] = new SwerveModuleState(speed, angle);
     }
 
-    return m_moduleStates;
+    /* Deep copy states so that a user cannot modify the contents of m_moduleStates */
+    var copiedStates = new SwerveModuleState[m_numModules];
+    for (int i = 0; i < m_numModules; i++) {
+      copiedStates[i] =
+          new SwerveModuleState(
+              m_moduleStates[i].speedMetersPerSecond,
+              new Rotation2d(m_moduleStates[i].angle.getRadians()));
+    }
+    return copiedStates;
   }
 
   /**
