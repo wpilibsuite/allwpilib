@@ -294,7 +294,7 @@ public class PneumaticHub implements PneumaticsBase {
       throw new IllegalArgumentException(
           "maxPressure must be between 0 and 120 PSI, got " + maxPressure);
     }
-    
+
     // Send the voltage as it would be if the 5V rail was at exactly 5V.
     // The firmware will compensate for the real 5V rail voltage, which
     // can fluctuate somewhat over time.
@@ -343,7 +343,7 @@ public class PneumaticHub implements PneumaticsBase {
       throw new IllegalArgumentException(
           "maxPressure must be between 0 and 120 PSI, got " + maxPressure);
     }
-    
+
     // Send the voltage as it would be if the 5V rail was at exactly 5V.
     // The firmware will compensate for the real 5V rail voltage, which
     // can fluctuate somewhat over time.
