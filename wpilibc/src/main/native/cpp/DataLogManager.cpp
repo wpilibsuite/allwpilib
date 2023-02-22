@@ -44,9 +44,7 @@ struct Thread final : public wpi::SafeThread {
 struct Instance {
   Instance(std::string_view dir, std::string_view filename, double period);
   wpi::SafeThreadOwner<Thread> owner;
-  ~Instance() {
-    owner.GetThreadSharedPtr()->StopNTLog(); 
-  }
+  ~Instance() { owner.GetThreadSharedPtr()->StopNTLog(); }
 };
 
 }  // namespace
