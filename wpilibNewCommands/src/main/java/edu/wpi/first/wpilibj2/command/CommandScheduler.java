@@ -80,6 +80,8 @@ public final class CommandScheduler implements NTSendable, AutoCloseable {
   private EventLoop m_activeButtonLoop = m_defaultButtonLoop;
 
   private boolean m_disabled;
+  
+  private final boolean m_simulation;
 
   // Lists of user-supplied actions to be executed on scheduling events for every command.
   private final List<Consumer<Command>> m_initActions = new ArrayList<>();
@@ -104,6 +106,8 @@ public final class CommandScheduler implements NTSendable, AutoCloseable {
           cancelAll();
         });
     LiveWindow.setDisabledListener(this::enable);
+    
+    m_simulation = RobotBase.isSimulation();
   }
 
   /**
@@ -278,7 +282,7 @@ public final class CommandScheduler implements NTSendable, AutoCloseable {
     // Run the periodic method of all registered subsystems.
     for (Subsystem subsystem : m_subsystems.keySet()) {
       subsystem.periodic();
-      if (RobotBase.isSimulation()) {
+      if (m_simulation) {
         subsystem.simulationPeriodic();
       }
       m_watchdog.addEpoch(subsystem.getClass().getSimpleName() + ".periodic()");
