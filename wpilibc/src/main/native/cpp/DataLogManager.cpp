@@ -26,6 +26,7 @@ namespace {
 
 struct Thread final : public wpi::SafeThread {
   Thread(std::string_view dir, std::string_view filename, double period);
+  ~Thread();
 
   void Main() final;
 
@@ -43,7 +44,6 @@ struct Thread final : public wpi::SafeThread {
 
 struct Instance {
   Instance(std::string_view dir, std::string_view filename, double period);
-  ~Instance();
   wpi::SafeThreadOwner<Thread> owner;
 };
 
@@ -93,6 +93,10 @@ Thread::Thread(std::string_view dir, std::string_view filename, double period)
       m_log{dir, MakeLogFilename(filename), period},
       m_messageLog{m_log, "messages"} {
   StartNTLog();
+}
+
+Thread::~Thread() {
+  StopNTLog();
 }
 
 void Thread::Main() {
@@ -280,10 +284,6 @@ Instance::Instance(std::string_view dir, std::string_view filename,
   }
 
   owner.Start(logDir, filename, period);
-}
-
-Instance::~Instance() {
-  owner.GetThreadSharedPtr()->StopNTLog();
 }
 
 static Instance& GetInstance(std::string_view dir = "",
