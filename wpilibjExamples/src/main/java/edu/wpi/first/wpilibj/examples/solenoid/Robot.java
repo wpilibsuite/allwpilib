@@ -89,6 +89,7 @@ public class Robot extends TimedRobot {
         });
   }
 
+  @SuppressWarnings("PMD.UnconditionalIfStatement")
   @Override
   public void teleopPeriodic() {
     /*

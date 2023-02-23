@@ -74,10 +74,11 @@ void Robot::TeleopPeriodic() {
       m_compressor.EnableDigital();
 #endif
 #if 1
-      // Enable closed-loop mode based on the analog pressure sensor connected to the PH.
-      // The compressor will run while the pressure reported by the sensor is in the
-      // specified range ([70 PSI, 120 PSI] in this example).
-      // Analog mode exists only on the PH! On the PCM, this enables digital control.
+      // Enable closed-loop mode based on the analog pressure sensor connected
+      // to the PH. The compressor will run while the pressure reported by the
+      // sensor is in the specified range ([70 PSI, 120 PSI] in this example).
+      // Analog mode exists only on the PH! On the PCM, this enables digital
+      // control.
       m_compressor.EnableAnalog(70_psi, 110_psi);
 #endif
 #if 0

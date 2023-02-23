@@ -10,9 +10,9 @@
 #include "Constants.h"
 #include "subsystems/Drive.h"
 #include "subsystems/Intake.h"
+#include "subsystems/Pneumatics.h"
 #include "subsystems/Shooter.h"
 #include "subsystems/Storage.h"
-#include "subsystems/Pneumatics.h"
 
 /**
  * This class is where the bulk of the robot should be declared. Since

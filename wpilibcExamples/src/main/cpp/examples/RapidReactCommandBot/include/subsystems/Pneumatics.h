@@ -7,10 +7,9 @@
 #include <frc/AnalogPotentiometer.h>
 #include <frc/Compressor.h>
 #include <frc/PneumaticsControlModule.h>
-#include <units/pressure.h>
-
 #include <frc2/command/CommandPtr.h>
 #include <frc2/command/SubsystemBase.h>
+#include <units/pressure.h>
 
 #include "Constants.h"
 
