@@ -42,7 +42,7 @@ public abstract class RobotBase implements AutoCloseable {
 
   private final MultiSubscriber m_suball;
 
-  private static RuntimeType m_runtimeType = RuntimeType.getValue(HALUtil.getHALRuntimeType());
+  private static RuntimeType m_runtimeType;
 
   private static void setupCameraServerShared() {
     CameraServerShared shared =
@@ -193,6 +193,10 @@ public abstract class RobotBase implements AutoCloseable {
    * @return Current runtime type.
    */
   public static RuntimeType getRuntimeType() {
+    if (m_runtimeType == null) {
+      m_runtimeType = RuntimeType.getValue(HALUtil.getHALRuntimeType();
+    }
+
     return m_runtimeType;
   }
 
