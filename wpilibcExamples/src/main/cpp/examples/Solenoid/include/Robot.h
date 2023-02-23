@@ -55,17 +55,6 @@ class Robot : public frc::TimedRobot {
   // Compressor connected to a PH with a default CAN ID
   frc::Compressor m_compressor{frc::PneumaticsModuleType::REVPH};
 
-  // External analog pressure sensor
-  // product-specific voltage->pressure conversion, see product manual
-  // in this case, 250(V/5)-25
-  // the scale parameter in the AnalogPotentiometer constructor is scaled from
-  // 1 instead of 5, so if r is the raw AnalogPotentiometer output, the
-  // pressure is 250r-25
-  static constexpr double kScale = 250;
-  static constexpr double kOffset = -25;
-  frc::AnalogPotentiometer m_pressureTransducer{/* the AnalogIn port*/ 2,
-                                                kScale, kOffset};
-
   // A chooser to select the compressor mode from the dashboard
   frc::SendableChooser<frc::CompressorConfigType> m_compressorModeChooser;
 

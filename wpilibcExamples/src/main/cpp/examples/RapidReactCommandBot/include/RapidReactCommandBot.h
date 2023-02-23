@@ -12,6 +12,7 @@
 #include "subsystems/Intake.h"
 #include "subsystems/Shooter.h"
 #include "subsystems/Storage.h"
+#include "subsystems/Pneumatics.h"
 
 /**
  * This class is where the bulk of the robot should be declared. Since
@@ -45,6 +46,7 @@ class RapidReactCommandBot {
   Intake m_intake;
   Shooter m_shooter;
   Storage m_storage;
+  Pneumatics m_pneumatics;
 
   // The driver's controller
   frc2::CommandXboxController m_driverController{

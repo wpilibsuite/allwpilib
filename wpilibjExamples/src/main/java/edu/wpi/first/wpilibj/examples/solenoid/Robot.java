@@ -7,12 +7,11 @@ package edu.wpi.first.wpilibj.examples.solenoid;
 // Using "import static an.enum.or.constants.inner.class.*;" helps reduce verbosity
 // this replaces "DoubleSolenoid.Value.kForward" with just kForward
 // further reading is available at https://www.geeksforgeeks.org/static-import-java/
+
 import static edu.wpi.first.wpilibj.DoubleSolenoid.Value.kForward;
 import static edu.wpi.first.wpilibj.DoubleSolenoid.Value.kReverse;
 
-import edu.wpi.first.wpilibj.AnalogPotentiometer;
 import edu.wpi.first.wpilibj.Compressor;
-import edu.wpi.first.wpilibj.CompressorConfigType;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
@@ -20,7 +19,6 @@ import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
-import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 
 /**
  * This is a sample program showing the use of the solenoid classes during operator control. Three
@@ -37,30 +35,16 @@ public class Robot extends TimedRobot {
   private final Joystick m_stick = new Joystick(0);
 
   // Solenoid corresponds to a single solenoid.
-  // In this case, it's connected to channel 0 of a PCM with the default CAN ID.
-  private final Solenoid m_solenoid = new Solenoid(PneumaticsModuleType.CTREPCM, 0);
+  // In this case, it's connected to channel 0 of a PH with the default CAN ID.
+  private final Solenoid m_solenoid = new Solenoid(PneumaticsModuleType.REVPH, 0);
 
   // DoubleSolenoid corresponds to a double solenoid.
   // In this case, it's connected to channels 1 and 2 of a PH with the default CAN ID.
   private final DoubleSolenoid m_doubleSolenoid =
       new DoubleSolenoid(PneumaticsModuleType.REVPH, 1, 2);
 
-  // Compressor connected to a PH with a default CAN ID
+  // Compressor connected to a PH with a default CAN ID (1)
   private final Compressor m_compressor = new Compressor(PneumaticsModuleType.REVPH);
-
-  // External analog pressure sensor
-  // product-specific voltage->pressure conversion, see product manual
-  // in this case, 250(V/5)-25
-  // the scale parameter in the AnalogPotentiometer constructor is scaled from 1 instead of 5,
-  // so if r is the raw AnalogPotentiometer output, the pressure is 250r-25
-  static final double kScale = 250;
-  static final double kOffset = -25;
-  private final AnalogPotentiometer m_pressureTransducer =
-      new AnalogPotentiometer(/* the AnalogIn port*/ 2, kScale, kOffset);
-
-  // A chooser to select the compressor mode from the dashboard
-  private final SendableChooser<CompressorConfigType> m_compressorModeChooser =
-      new SendableChooser<>();
 
   static final int kSolenoidButton = 1;
   static final int kDoubleSolenoidForwardButton = 2;
@@ -85,16 +69,16 @@ public class Robot extends TimedRobot {
           return m_compressor.getPressure();
         });
     tab.addDouble(
-        "External Pressure [PSI]",
-        () -> {
-          // Get the pressure (in PSI) from an analog pressure sensor connected to the RIO.
-          return m_pressureTransducer.get();
-        });
-    tab.addDouble(
         "Compressor Current",
         () -> {
           // Get compressor current draw.
           return m_compressor.getCurrent();
+        });
+    tab.addBoolean(
+        "Compressor Active",
+        () -> {
+          // Get whether the compressor's closed-loop functionality is enabled.
+          return m_compressor.isEnabled();
         });
     tab.addBoolean(
         "Pressure Switch",
@@ -103,12 +87,6 @@ public class Robot extends TimedRobot {
           // The switch is open when the pressure is over ~120 PSI.
           return m_compressor.getPressureSwitchValue();
         });
-
-    // Add the options and send the chooser to the dashboard.
-    m_compressorModeChooser.setDefaultOption("Digital", CompressorConfigType.Digital);
-    m_compressorModeChooser.addOption("Analog", CompressorConfigType.Analog);
-    m_compressorModeChooser.addOption("Hybrid", CompressorConfigType.Hybrid);
-    tab.add("Chooser", m_compressorModeChooser);
   }
 
   @Override
@@ -130,7 +108,7 @@ public class Robot extends TimedRobot {
       m_doubleSolenoid.set(kReverse);
     }
 
-    // On button press, toggle the compressor with the mode selected from the dashboard.
+    // On button press, toggle the compressor.
     if (m_stick.getRawButtonPressed(kCompressorButton)) {
       // Check whether the compressor is currently enabled.
       boolean isCompressorEnabled = m_compressor.isEnabled();
@@ -138,31 +116,27 @@ public class Robot extends TimedRobot {
         // Disable closed-loop mode on the compressor.
         m_compressor.disable();
       } else {
-        switch (m_compressorModeChooser.getSelected()) {
-          case Digital:
-            // Enable closed-loop mode based on the digital pressure switch connected to the PCM/PH.
-            m_compressor.enableDigital();
-            break;
-          case Analog:
-            // Enable closed-loop mode based on the analog pressure sensor connected to the PH.
-            // The compressor will run while the pressure reported by the sensor is in the
-            // specified range ([70 PSI, 120 PSI] in this example).
-            // Analog mode exists only on the PH! On the PCM, this enables digital control.
-            m_compressor.enableAnalog(70, 110);
-            break;
-          case Hybrid:
-            // Enable closed-loop mode based on both the digital pressure switch and the analog
-            // pressure sensor connected to the PH.
-            // The compressor will run while the pressure reported by the analog sensor is in the
-            // specified range ([70 PSI, 120 PSI] in this example) AND the digital switch reports
-            // that the system is not full.
-            // Hybrid mode exists only on the PH! On the PCM, this enables digital control.
-            m_compressor.enableHybrid(70, 110);
-            break;
-          case Disabled:
-          default:
-            // This shouldn't happen!
-            break;
+        // Change the if statements to select the closed-loop you want to use:
+        if (false) {
+          // Enable closed-loop mode based on the digital pressure switch connected to the PCM/PH.
+          // The switch is open when the pressure is over ~120 PSI.
+          m_compressor.enableDigital();
+        }
+        if (true) {
+          // Enable closed-loop mode based on the analog pressure sensor connected to the PH.
+          // The compressor will run while the pressure reported by the sensor is in the
+          // specified range ([70 PSI, 120 PSI] in this example).
+          // Analog mode exists only on the PH! On the PCM, this enables digital control.
+          m_compressor.enableAnalog(70, 110);
+        }
+        if (false) {
+          // Enable closed-loop mode based on both the digital pressure switch AND the analog
+          // pressure sensor connected to the PH.
+          // The compressor will run while the pressure reported by the analog sensor is in the
+          // specified range ([70 PSI, 120 PSI] in this example) AND the digital switch reports
+          // that the system is not full.
+          // Hybrid mode exists only on the PH! On the PCM, this enables digital control.
+          m_compressor.enableHybrid(70, 110);
         }
       }
     }

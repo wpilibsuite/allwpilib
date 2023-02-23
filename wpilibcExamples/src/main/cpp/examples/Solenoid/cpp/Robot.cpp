@@ -22,11 +22,6 @@ void Robot::RobotInit() {
     units::pounds_per_square_inch_t pressure = m_compressor.GetPressure();
     return pressure.value();
   });
-  tab.AddDouble("External Pressure [PSI]", [&] {
-    // Get the pressure (in PSI) from an analog pressure sensor connected to
-    // the RIO.
-    return m_pressureTransducer.Get();
-  });
   tab.AddDouble("Compressor Current", [&] {
     // Get compressor current draw.
     units::ampere_t compressorCurrent = m_compressor.GetCurrent();
@@ -38,13 +33,6 @@ void Robot::RobotInit() {
     return m_compressor.GetPressureSwitchValue();
   });
 
-  // Add the options and send the chooser to the dashboard.
-  m_compressorModeChooser.SetDefaultOption("Digital",
-                                           frc::CompressorConfigType::Digital);
-  m_compressorModeChooser.AddOption("Analog",
-                                    frc::CompressorConfigType::Analog);
-  m_compressorModeChooser.AddOption("Hybrid",
-                                    frc::CompressorConfigType::Hybrid);
   tab.Add("Chooser", m_compressorModeChooser);
 }
 
@@ -75,35 +63,28 @@ void Robot::TeleopPeriodic() {
       // Disable closed-loop mode on the compressor.
       m_compressor.Disable();
     } else {
-      switch (m_compressorModeChooser.GetSelected()) {
-        case frc::CompressorConfigType::Digital:
-          // Enable closed-loop mode based on the digital pressure switch
-          // connected to the PCM/PH.
-          m_compressor.EnableDigital();
-          break;
-        case frc::CompressorConfigType::Analog:
-          // Enable closed-loop mode based on the analog pressure sensor
-          // connected to the PH. The compressor will run while the pressure
-          // reported by the sensor is in the specified range ([70 PSI, 120
-          // PSI] in this example). Analog mode exists only on the PH! On the
-          // PCM, this enables digital control.
-          m_compressor.EnableAnalog(70_psi, 110_psi);
-          break;
-        case frc::CompressorConfigType::Hybrid:
-          // Enable closed-loop mode based on both the digital pressure switch
-          // and the analog pressure sensor connected to the PH. The
-          // compressor will run while the pressure reported by the analog
-          // sensor is in the specified range ([70 PSI, 120 PSI] in this
-          // example) AND the digital switch reports that the system is not
-          // full. Hybrid mode exists only on the PH! On the PCM, this enables
-          // digital control.
-          m_compressor.EnableHybrid(70_psi, 110_psi);
-          break;
-        case frc::CompressorConfigType::Disabled:
-        default:
-          // This shouldn't happen!
-          break;
-      }
+      // Change the if directives to select the closed-loop you want to use:
+#if 0
+      // Enable closed-loop mode based on the digital pressure switch
+      // connected to the PCM/PH.
+      m_compressor.EnableDigital();
+#endif
+#if 1
+      // Enable closed-loop mode based on the analog pressure sensor connected to the PH.
+      // The compressor will run while the pressure reported by the sensor is in the
+      // specified range ([70 PSI, 120 PSI] in this example).
+      // Analog mode exists only on the PH! On the PCM, this enables digital control.
+      m_compressor.EnableAnalog(70_psi, 110_psi);
+#endif
+#if 0
+      // Enable closed-loop mode based on both the digital pressure switch AND the analog
+      // pressure sensor connected to the PH.
+      // The compressor will run while the pressure reported by the analog sensor is in the
+      // specified range ([70 PSI, 120 PSI] in this example) AND the digital switch reports
+      // that the system is not full.
+      // Hybrid mode exists only on the PH! On the PCM, this enables digital control.
+      m_compressor.EnableHybrid(70_psi, 110_psi);
+#endif
     }
   }
 }
