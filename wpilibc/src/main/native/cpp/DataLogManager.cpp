@@ -283,7 +283,7 @@ Instance::Instance(std::string_view dir, std::string_view filename,
 }
 
 Instance::~Instance() {
-  owner.GetThreadSharedPtr()->StopNTLog(); 
+  owner.GetThreadSharedPtr()->StopNTLog();
 }
 
 static Instance& GetInstance(std::string_view dir = "",
