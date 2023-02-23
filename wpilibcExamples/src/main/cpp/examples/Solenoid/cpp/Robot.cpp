@@ -27,6 +27,10 @@ void Robot::RobotInit() {
     units::ampere_t compressorCurrent = m_compressor.GetCurrent();
     return compressorCurrent.value();
   });
+  tab.AddBoolean("Compressor Active", [&] {
+    // Get whether the compressor is active.
+    return m_compressor.IsEnabled();
+  });
   tab.AddBoolean("Pressure Switch", [&] {
     // Get the digital pressure switch connected to the PCM/PH.
     // The switch is open when the pressure is over ~120 PSI.

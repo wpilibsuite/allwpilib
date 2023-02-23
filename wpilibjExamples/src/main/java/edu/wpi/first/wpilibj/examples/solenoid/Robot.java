@@ -77,7 +77,7 @@ public class Robot extends TimedRobot {
     tab.addBoolean(
         "Compressor Active",
         () -> {
-          // Get whether the compressor's closed-loop functionality is enabled.
+          // Get whether the compressor is active.
           return m_compressor.isEnabled();
         });
     tab.addBoolean(
