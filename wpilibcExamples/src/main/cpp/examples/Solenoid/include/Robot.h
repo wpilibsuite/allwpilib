@@ -43,9 +43,9 @@ class Robot : public frc::TimedRobot {
   frc::Joystick m_stick{0};
 
   // Solenoid corresponds to a single solenoid.
-  // In this case, it's connected to channel 0 of a PCM with the default CAN
+  // In this case, it's connected to channel 0 of a PH with the default CAN
   // ID.
-  frc::Solenoid m_solenoid{frc::PneumaticsModuleType::CTREPCM, 0};
+  frc::Solenoid m_solenoid{frc::PneumaticsModuleType::REVPH, 0};
 
   // DoubleSolenoid corresponds to a double solenoid.
   // In this case, it's connected to channels 1 and 2 of a PH with the default
