@@ -26,7 +26,7 @@ namespace {
 
 struct Thread final : public wpi::SafeThread {
   Thread(std::string_view dir, std::string_view filename, double period);
-  ~Thread();
+  ~Thread() override;
 
   void Main() final;
 
