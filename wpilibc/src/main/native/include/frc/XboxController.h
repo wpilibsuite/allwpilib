@@ -283,9 +283,9 @@ class XboxController : public GenericHID {
   BooleanEvent Y(EventLoop* loop) const;
 
   /**
-   * Whether the Y button was released since the last check.
+   * Read the value of the back button on the controller.
    *
-   * @return Whether the button was released since the last check.
+   * @return The state of the button.
    */
   bool GetBackButton() const;
 
