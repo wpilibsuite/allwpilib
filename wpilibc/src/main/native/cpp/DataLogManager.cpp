@@ -26,6 +26,7 @@ namespace {
 
 struct Thread final : public wpi::SafeThread {
   Thread(std::string_view dir, std::string_view filename, double period);
+  ~Thread() override;
 
   void Main() final;
 
@@ -92,6 +93,10 @@ Thread::Thread(std::string_view dir, std::string_view filename, double period)
       m_log{dir, MakeLogFilename(filename), period},
       m_messageLog{m_log, "messages"} {
   StartNTLog();
+}
+
+Thread::~Thread() {
+  StopNTLog();
 }
 
 void Thread::Main() {
