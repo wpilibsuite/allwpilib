@@ -80,6 +80,11 @@ class interpolating_map {
    */
   void clear() { m_container.clear(); }
 
+  /**
+   * This is invalid if empty
+   */
+  bool empty() { return m_container.empty(); }
+
  private:
   std::map<Key, Value> m_container;
 };

@@ -76,6 +76,10 @@ LTVDifferentialDriveController::LTVDifferentialDriveController(
                      frc::LinearQuadraticRegulator<5, 2>{A, B, Q, R, dt}.K());
     }
   }
+
+  if (m_table.empty()) {
+    throw std::runtime_error("LTVDifferentialDriveController: invalid constructor arguments");
+  }
 }
 
 bool LTVDifferentialDriveController::AtReference() const {

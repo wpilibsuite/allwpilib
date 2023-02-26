@@ -86,6 +86,10 @@ LTVUnicycleController::LTVUnicycleController(
                      frc::LinearQuadraticRegulator<3, 2>{A, B, Q, R, dt}.K());
     }
   }
+
+  if (m_table.empty()) {
+    throw std::runtime_error("LTVUnicycleController: invalid constructor arguments");
+  }
 }
 
 bool LTVUnicycleController::AtReference() const {
