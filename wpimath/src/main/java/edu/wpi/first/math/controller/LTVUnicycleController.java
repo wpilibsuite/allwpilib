@@ -66,6 +66,7 @@ public class LTVUnicycleController {
    * @param dt Discretization timestep in seconds.
    * @param maxVelocity The maximum velocity in meters per second for the controller gain lookup
    *     table. The default is 9 m/s.
+   * @throws IllegalArgumentException if maxVelocity &lt;= 0.
    */
   public LTVUnicycleController(double dt, double maxVelocity) {
     this(VecBuilder.fill(0.0625, 0.125, 2.0), VecBuilder.fill(1.0, 2.0), dt, maxVelocity);
@@ -90,9 +91,14 @@ public class LTVUnicycleController {
    * @param dt Discretization timestep in seconds.
    * @param maxVelocity The maximum velocity in meters per second for the controller gain lookup
    *     table. The default is 9 m/s.
+   * @throws IllegalArgumentException if maxVelocity &lt;= 0.
    */
   public LTVUnicycleController(
       Vector<N3> qelems, Vector<N2> relems, double dt, double maxVelocity) {
+    if (maxVelocity <= 0.0) {
+      throw new IllegalArgumentException("Max velocity must be greater than zero.");
+    }
+
     // The change in global pose for a unicycle is defined by the following
     // three equations.
     //
