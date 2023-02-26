@@ -150,9 +150,11 @@ TEST(Pose3dTest, ComplexTwists) {
 
 TEST(Pose3dTest, TwistNaN) {
   const Pose3d initial{6.32_m, 4.12_m, 0.00_m,
-                       Rotation3d{Quaternion{-0.9999999999999999, 0.0, 0.0, 1.9208309264993548E-8}}};
+                       Rotation3d{Quaternion{-0.9999999999999999, 0.0, 0.0,
+                                             1.9208309264993548E-8}}};
   const Pose3d final{6.33_m, 4.15_m, 0.00_m,
-                     Rotation3d{Quaternion{-0.9999999999999999, 0.0, 0.0, 2.416890209039172E-8}}};
+                     Rotation3d{Quaternion{-0.9999999999999999, 0.0, 0.0,
+                                           2.416890209039172E-8}}};
 
   auto twist = initialPose.Log(finalPose);
 
