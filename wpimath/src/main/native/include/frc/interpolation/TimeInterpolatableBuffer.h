@@ -72,7 +72,7 @@ class TimeInterpolatableBuffer {
           m_pastSnapshots.begin(), m_pastSnapshots.end(), time,
           [](auto t, const auto& pair) { return t < pair.first; });
 
-      // don't access this before ensuring first_after isn't first!
+      // Don't access this before ensuring first_after isn't first.
       auto last_not_greater_than = first_after - 1;
 
       if (first_after == m_pastSnapshots.begin() ||
