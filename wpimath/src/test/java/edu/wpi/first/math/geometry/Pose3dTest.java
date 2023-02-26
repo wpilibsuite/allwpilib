@@ -15,7 +15,7 @@ import java.util.Arrays;
 import org.junit.jupiter.api.Test;
 
 class Pose3dTest {
-  private static final double kEpsilon = 1E-8;
+  private static final double kEpsilon = 1E-9;
 
   @Test
   void testTransformByRotations() {
