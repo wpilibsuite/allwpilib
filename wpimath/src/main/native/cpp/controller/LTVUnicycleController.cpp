@@ -4,6 +4,8 @@
 
 #include "frc/controller/LTVUnicycleController.h"
 
+#include <stdexcept>
+
 #include "frc/StateSpaceUtil.h"
 #include "frc/controller/LinearQuadraticRegulator.h"
 #include "units/math.h"
@@ -37,6 +39,10 @@ LTVUnicycleController::LTVUnicycleController(
 LTVUnicycleController::LTVUnicycleController(
     const wpi::array<double, 3>& Qelems, const wpi::array<double, 2>& Relems,
     units::second_t dt, units::meters_per_second_t maxVelocity) {
+  if (maxVelocity <= 0_mps) {
+    throw std::domain_error("Max velocity must be greater than zero.");
+  }
+
   // The change in global pose for a unicycle is defined by the following three
   // equations.
   //
