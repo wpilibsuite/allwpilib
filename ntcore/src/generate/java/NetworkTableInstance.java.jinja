@@ -494,6 +494,10 @@ public final class NetworkTableInstance implements AutoCloseable {
                     if (listener != null) {
                       try {
                         listener.accept(event);
+                      } catch (InterruptedException ex) {
+                        Thread.currentThread().interrupt();
+                        wasInterrupted = true;
+                        break;
                       } catch (Throwable throwable) {
                         System.err.println(
                             "Unhandled exception during listener callback: "
