@@ -72,9 +72,11 @@ class TimeInterpolatableBuffer {
           m_pastSnapshots.begin(), m_pastSnapshots.end(), time,
           [](auto t, const auto& pair) { return t < pair.first; });
 
+      // don't access this before ensuring first_after isn't first!
       auto last_not_greater_than = first_after - 1;
 
-      if (last_not_greater_than == m_pastSnapshots.begin() ||
+      if (first_after == m_pastSnapshots.begin() ||
+          last_not_greater_than == m_pastSnapshots.begin() ||
           last_not_greater_than->first < time) {
         // Two cases handled together:
         // 1. All entries come after the sample
@@ -124,6 +126,10 @@ class TimeInterpolatableBuffer {
     auto upper_bound = std::lower_bound(
         m_pastSnapshots.begin(), m_pastSnapshots.end(), time,
         [](const auto& pair, auto t) { return t > pair.first; });
+
+    if (upper_bound == m_pastSnapshots.begin()) {
+      return upper_bound->second;
+    }
 
     auto lower_bound = upper_bound - 1;
 
