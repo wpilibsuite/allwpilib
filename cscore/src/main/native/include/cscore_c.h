@@ -323,7 +323,7 @@ void CS_ReleaseSource(CS_Source source, CS_Status* status);
 /** @} */
 
 /**
- * @defgroup cscore_source_prop_cfunc Camera Source Common Property Fuctions
+ * @defgroup cscore_source_prop_cfunc Camera Source Common Property Functions
  * @{
  */
 void CS_SetCameraBrightness(CS_Source source, int brightness,

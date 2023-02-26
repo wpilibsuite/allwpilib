@@ -279,7 +279,7 @@ bool ADIS16470_IMU::SwitchToAutoSPI() {
   }
   // Configure auto stall time
   m_spi->ConfigureAutoStall(HAL_SPI_kOnboardCS0, 5, 1000, 1);
-  // Kick off DMA SPI (Note: Device configration impossible after SPI DMA is
+  // Kick off DMA SPI (Note: Device configuration impossible after SPI DMA is
   // activated) DR High = Data good (data capture should be triggered on the
   // rising edge)
   m_spi->StartAutoTrigger(*m_auto_interrupt, true, false);

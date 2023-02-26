@@ -511,7 +511,7 @@ public class ADIS16470_IMU implements AutoCloseable, NTSendable {
     }
     // Configure auto stall time
     m_spi.configureAutoStall(5, 1000, 1);
-    // Kick off auto SPI (Note: Device configration impossible after auto SPI is
+    // Kick off auto SPI (Note: Device configuration impossible after auto SPI is
     // activated)
     // DR High = Data good (data capture should be triggered on the rising edge)
     m_spi.startAutoTrigger(m_auto_interrupt, true, false);

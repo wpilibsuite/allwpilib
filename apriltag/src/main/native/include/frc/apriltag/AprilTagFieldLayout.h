@@ -79,7 +79,7 @@ class WPILIB_DLLEXPORT AprilTagFieldLayout {
   /**
    * Sets the origin for tag pose transformation.
    *
-   * This tranforms the Pose3ds returned by GetTagPose(int) to return the
+   * This transforms the Pose3ds returned by GetTagPose(int) to return the
    * correct pose relative to the provided origin.
    *
    * @param origin The new origin for tag transformations

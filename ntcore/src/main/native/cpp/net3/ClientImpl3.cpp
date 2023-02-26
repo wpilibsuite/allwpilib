@@ -233,7 +233,7 @@ void CImpl::SendPeriodic(uint64_t curTimeMs, bool initial, bool flush) {
 
   auto out = m_wire.Send();
 
-  // send keep-alives
+  // send keep-alive
   if (curTimeMs >= m_nextKeepAliveTimeMs) {
     if (!CheckNetworkReady(curTimeMs)) {
       return;

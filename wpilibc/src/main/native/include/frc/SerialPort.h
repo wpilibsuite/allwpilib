@@ -16,7 +16,7 @@ namespace frc {
  * Driver for the RS-232 serial port on the roboRIO.
  *
  * The current implementation uses the VISA formatted I/O mode.  This means that
- * all traffic goes through the fomatted buffers.  This allows the intermingled
+ * all traffic goes through the formatted buffers.  This allows the intermingled
  * use of Printf(), Scanf(), and the raw buffer accessors Read() and Write().
  *
  * More information can be found in the NI-VISA User Manual here:

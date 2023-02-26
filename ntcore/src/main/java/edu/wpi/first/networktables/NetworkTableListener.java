@@ -113,7 +113,7 @@ public final class NetworkTableListener implements AutoCloseable {
    * Create a time synchronization listener.
    *
    * @param inst instance
-   * @param immediateNotify notify listener of current time synchonization value
+   * @param immediateNotify notify listener of current time synchronization value
    * @param listener listener function
    * @return Listener
    */

@@ -225,7 +225,7 @@ RobotBase::RobotBase() {
   SetupMathShared();
 
   auto inst = nt::NetworkTableInstance::GetDefault();
-  // subscribe to "" to force persistent values to progagate to local
+  // subscribe to "" to force persistent values to propagate to local
   nt::SubscribeMultiple(inst.GetHandle(), {{std::string_view{}}});
 #ifdef __FRC_ROBORIO__
   inst.StartServer("/home/lvuser/networktables.json");

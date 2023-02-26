@@ -314,7 +314,7 @@ class SwerveDrivePoseEstimator {
     // The current gyroscope angle.
     Rotation2d gyroAngle;
 
-    // The distances traveled and rotations meaured at each module.
+    // The distances traveled and rotations measured at each module.
     wpi::array<SwerveModulePosition, NumModules> modulePositions;
 
     /**
