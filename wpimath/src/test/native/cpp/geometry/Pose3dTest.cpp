@@ -156,7 +156,7 @@ TEST(Pose3dTest, TwistNaN) {
                      Rotation3d{Quaternion{-0.9999999999999999, 0.0, 0.0,
                                            2.416890209039172E-8}}};
 
-  auto twist = initialPose.Log(finalPose);
+  auto twist = initial.Log(final);
 
   EXPECT_FALSE(std::isnan(twist.dx));
   EXPECT_FALSE(std::isnan(twist.dy));
