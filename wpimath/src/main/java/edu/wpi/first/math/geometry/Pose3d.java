@@ -212,7 +212,7 @@ public class Pose3d implements Interpolatable<Pose3d> {
     double A;
     double B;
     double C;
-    if (Math.abs(theta) < 1E-9) {
+    if (Math.abs(theta) < 1E-8) {
       // Taylor Expansions around θ = 0
       // A = 1/1! - θ²/3! + θ⁴/5!
       // B = 1/2! - θ²/4! + θ⁴/6!
