@@ -144,7 +144,8 @@ void DifferentialDrivePoseEstimator::AddVisionMeasurement(
       std::lower_bound(internal_buf.begin(), internal_buf.end(), timestamp,
                        [](const auto& pair, auto t) { return t > pair.first; });
 
-  // first_newer_record + 1 will be invalid if this is at the end for some reason
+  // first_newer_record + 1 will be invalid if this is at the end for some
+  // reason
   if (first_newer_record == internal_buf.end()) {
     return;
   }
