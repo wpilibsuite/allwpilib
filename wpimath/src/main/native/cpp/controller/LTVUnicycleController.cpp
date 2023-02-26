@@ -88,7 +88,8 @@ LTVUnicycleController::LTVUnicycleController(
   }
 
   if (m_table.empty()) {
-    throw std::runtime_error("LTVUnicycleController: invalid constructor arguments");
+    throw std::runtime_error(
+        "LTVUnicycleController: invalid constructor arguments");
   }
 }
 

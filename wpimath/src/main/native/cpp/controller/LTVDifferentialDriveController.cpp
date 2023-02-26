@@ -78,7 +78,8 @@ LTVDifferentialDriveController::LTVDifferentialDriveController(
   }
 
   if (m_table.empty()) {
-    throw std::runtime_error("LTVDifferentialDriveController: invalid constructor arguments");
+    throw std::runtime_error(
+        "LTVDifferentialDriveController: invalid constructor arguments");
   }
 }
 
