@@ -158,10 +158,10 @@ TEST(Pose3dTest, TwistNaN) {
 
   auto twist = initial.Log(final);
 
-  EXPECT_FALSE(std::isnan(twist.dx));
-  EXPECT_FALSE(std::isnan(twist.dy));
-  EXPECT_FALSE(std::isnan(twist.dz));
-  EXPECT_FALSE(std::isnan(twist.rx));
-  EXPECT_FALSE(std::isnan(twist.ry));
-  EXPECT_FALSE(std::isnan(twist.rz));
+  EXPECT_FALSE(std::isnan((double)twist.dx));
+  EXPECT_FALSE(std::isnan((double)twist.dy));
+  EXPECT_FALSE(std::isnan((double)twist.dz));
+  EXPECT_FALSE(std::isnan((double)twist.rx));
+  EXPECT_FALSE(std::isnan((double)twist.ry));
+  EXPECT_FALSE(std::isnan((double)twist.rz));
 }
