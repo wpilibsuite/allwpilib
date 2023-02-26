@@ -1287,7 +1287,7 @@ void ClientData3::EntryAssign(std::string_view name, unsigned int id,
   auto topic = m_server.CreateTopic(this, name, typeStr, properties);
   TopicData3* topic3 = GetTopic3(topic);
   if (topic3->published || topic3->sentAssign) {
-    WARNING("ignorning client {} duplicate publish of '{}'", m_id, name);
+    WARNING("ignoring client {} duplicate publish of '{}'", m_id, name);
     return;
   }
   ++topic3->seqNum;

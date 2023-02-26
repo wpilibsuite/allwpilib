@@ -62,7 +62,7 @@ class FakeEncoderTest : public testing::Test {
 };
 
 /**
- * Test the encoder by reseting it to 0 and reading the value.
+ * Test the encoder by resetting it to 0 and reading the value.
  */
 TEST_F(FakeEncoderTest, DefaultState) {
   EXPECT_DOUBLE_EQ(0.0, m_encoder.Get()) << "The encoder did not start at 0.";

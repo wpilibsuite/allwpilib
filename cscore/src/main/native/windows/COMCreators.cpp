@@ -78,7 +78,7 @@ STDMETHODIMP SourceReaderCB::OnReadSample(HRESULT hrStatus, DWORD dwStreamIndex,
     return S_OK;
   if (SUCCEEDED(hrStatus)) {
     if (pSample) {
-      // Prcoess sample
+      // Process sample
       source->ProcessFrame(pSample, m_mode);
       // DO NOT release the frame
     }

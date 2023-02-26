@@ -28,7 +28,7 @@ class Loop;
  * for I/O.
  *
  * @warning Despite the name, idle handles will signal every loop iteration,
- * not when the loop is actually "idle".  This also means they can easly become
+ * not when the loop is actually "idle".  This also means they can easily become
  * CPU hogs.
  */
 class Idle final : public HandleImpl<Idle, uv_idle_t> {

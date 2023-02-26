@@ -60,9 +60,9 @@ public class AntJunitLauncher {
         FormatterElement.TypeAttribute type = new FormatterElement.TypeAttribute();
         type.setValue("xml");
 
-        FormatterElement formater = new FormatterElement();
-        formater.setType(type);
-        task.addFormatter(formater);
+        FormatterElement formatter = new FormatterElement();
+        formatter.setType(type);
+        task.addFormatter(formatter);
 
         // Create the JUnitTest
         JUnitTest test = new JUnitTest(TestSuite.class.getName());
