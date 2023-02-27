@@ -147,3 +147,21 @@ TEST(Pose3dTest, ComplexTwists) {
                 end.Rotation().GetQuaternion().Z(), eps);
   }
 }
+
+TEST(Pose3dTest, TwistNaN) {
+  const Pose3d initial{6.32_m, 4.12_m, 0.00_m,
+                       Rotation3d{Quaternion{-0.9999999999999999, 0.0, 0.0,
+                                             1.9208309264993548E-8}}};
+  const Pose3d final{6.33_m, 4.15_m, 0.00_m,
+                     Rotation3d{Quaternion{-0.9999999999999999, 0.0, 0.0,
+                                           2.416890209039172E-8}}};
+
+  auto twist = initial.Log(final);
+
+  EXPECT_FALSE(std::isnan(twist.dx.value()));
+  EXPECT_FALSE(std::isnan(twist.dy.value()));
+  EXPECT_FALSE(std::isnan(twist.dz.value()));
+  EXPECT_FALSE(std::isnan(twist.rx.value()));
+  EXPECT_FALSE(std::isnan(twist.ry.value()));
+  EXPECT_FALSE(std::isnan(twist.rz.value()));
+}

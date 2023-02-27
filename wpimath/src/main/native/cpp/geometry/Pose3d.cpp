@@ -82,7 +82,7 @@ Pose3d Pose3d::Exp(const Twist3d& twist) const {
   double A;
   double B;
   double C;
-  if (std::abs(theta) < 1E-9) {
+  if (std::abs(theta) < 1E-8) {
     // Taylor Expansions around θ = 0
     // A = 1/1! - θ²/3! + θ⁴/5!
     // B = 1/2! - θ²/4! + θ⁴/6!
@@ -134,7 +134,7 @@ Twist3d Pose3d::Log(const Pose3d& end) const {
   double thetaSq = theta * theta;
 
   double C;
-  if (std::abs(theta) < 1E-9) {
+  if (std::abs(theta) < 1E-8) {
     // Taylor Expansions around θ = 0
     // A = 1/1! - θ²/3! + θ⁴/5!
     // B = 1/2! - θ²/4! + θ⁴/6!

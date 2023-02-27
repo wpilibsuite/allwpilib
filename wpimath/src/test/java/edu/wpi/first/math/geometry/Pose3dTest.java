@@ -6,6 +6,7 @@ package edu.wpi.first.math.geometry;
 
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
 import edu.wpi.first.math.VecBuilder;
@@ -229,5 +230,27 @@ class Pose3dTest {
                   end.getRotation().getQuaternion().getZ(),
                   eps));
     }
+  }
+
+  @Test
+  void testTwistNaN() {
+    var initialPose =
+        new Pose3d(
+            new Translation3d(6.32, 4.12, 0.00),
+            new Rotation3d(new Quaternion(-0.9999999999999999, 0.0, 0.0, 1.9208309264993548E-8)));
+    var finalPose =
+        new Pose3d(
+            new Translation3d(6.33, 4.15, 0.00),
+            new Rotation3d(new Quaternion(-0.9999999999999999, 0.0, 0.0, 2.416890209039172E-8)));
+
+    var twist = initialPose.log(finalPose);
+
+    assertAll(
+        () -> assertFalse(((Double) twist.dx).isNaN()),
+        () -> assertFalse(((Double) twist.dy).isNaN()),
+        () -> assertFalse(((Double) twist.dz).isNaN()),
+        () -> assertFalse(((Double) twist.rx).isNaN()),
+        () -> assertFalse(((Double) twist.ry).isNaN()),
+        () -> assertFalse(((Double) twist.rz).isNaN()));
   }
 }
