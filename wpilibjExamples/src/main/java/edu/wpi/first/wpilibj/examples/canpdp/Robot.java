@@ -51,5 +51,9 @@ public class Robot extends TimedRobot {
     // Energy is the power summed over time with units Joules.
     double totalEnergy = m_pdp.getTotalEnergy();
     SmartDashboard.putNumber("Total Energy", totalEnergy);
+
+    // Report any faults.
+    // Ignore channels that aren't connected.
+    m_pdp.reportFaults(12, 13, 15, 16);
   }
 }

@@ -1,5 +1,6 @@
 package edu.wpi.first.hal;
 
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -26,5 +27,14 @@ class PowerDistributionFaultsTest {
             arguments(0x4000000, Set.of("HardwareFault")),
             arguments(0x400 | 0x1000, Set.of("Channel10BreakerFault", "Channel12BreakerFault"))
     );
+  }
+
+  @Test
+  void zeroingTest() {
+    int bitfield = 0x400 | 0x1000;
+    assertEquals(Set.of("Channel10BreakerFault", "Channel12BreakerFault"), new PowerDistributionFaults(bitfield).getActiveFaults());
+
+    bitfield &= ~(1 << 10);
+    assertEquals(Set.of("Channel12BreakerFault"), new PowerDistributionFaults(bitfield).getActiveFaults());
   }
 }

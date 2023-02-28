@@ -22,6 +22,9 @@ public class PowerDistribution implements Sendable, AutoCloseable {
   private final int m_handle;
   private final int m_module;
 
+  private static final double FAULT_MESSAGE_INTERVAL = 1.0;
+  private double m_lastFaultReportTime = 0;
+
   public static final int kDefaultModule = PowerDistributionJNI.DEFAULT_MODULE;
 
   public enum ModuleType {
@@ -196,6 +199,37 @@ public class PowerDistribution implements Sendable, AutoCloseable {
     return PowerDistributionJNI.getStickyFaults(m_handle);
   }
 
+  /**
+   * Report all active faults to {@link DriverStation#reportError(String, boolean)}.
+   *
+   * <p>This will only work on a REV PDH. On a CTRE PDP, no faults are reported.
+   *
+   * <p>Messages are throttled to not overwhelm the DS.
+   *
+   * @param ignoredChannels channels that don't have any load connected, and their faults should be ignored.
+   * @return true if there are any active faults.
+   */
+  public boolean reportFaults(int... ignoredChannels) {
+    int mask = PowerDistributionJNI.getFaultsNative(m_handle);
+
+    for (int ignoredChannel : ignoredChannels) {
+      if (ignoredChannel < 0 || ignoredChannel < getNumChannels()) {
+        continue;
+      }
+      mask &= ~(1 << ignoredChannel);
+    }
+    if (mask == 0) {
+      return false;
+    }
+    // Throttle messages to not overwhelm the DS.
+    double currentTime = Timer.getFPGATimestamp();
+    if (currentTime > m_lastFaultReportTime + FAULT_MESSAGE_INTERVAL) {
+      DriverStation.reportError("PowerDistribution Faults: " + new PowerDistributionFaults(mask).getActiveFaults().toString(), false);
+      m_lastFaultReportTime = currentTime;
+    }
+    return true;
+  }
+
   @Override
   public void initSendable(SendableBuilder builder) {
     builder.setSmartDashboardType("PowerDistribution");
@@ -206,12 +240,12 @@ public class PowerDistribution implements Sendable, AutoCloseable {
           "Chan" + i, () -> PowerDistributionJNI.getChannelCurrentNoError(m_handle, chan), null);
     }
     builder.addDoubleProperty(
-        "Voltage", () -> PowerDistributionJNI.getVoltageNoError(m_handle), null);
+            "Voltage", () -> PowerDistributionJNI.getVoltageNoError(m_handle), null);
     builder.addDoubleProperty(
-        "TotalCurrent", () -> PowerDistributionJNI.getTotalCurrent(m_handle), null);
+            "TotalCurrent", () -> PowerDistributionJNI.getTotalCurrent(m_handle), null);
     builder.addBooleanProperty(
-        "SwitchableChannel",
-        () -> PowerDistributionJNI.getSwitchableChannelNoError(m_handle),
-        value -> PowerDistributionJNI.setSwitchableChannel(m_handle, value));
+            "SwitchableChannel",
+            () -> PowerDistributionJNI.getSwitchableChannelNoError(m_handle),
+            value -> PowerDistributionJNI.setSwitchableChannel(m_handle, value));
   }
 }
