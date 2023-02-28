@@ -208,6 +208,7 @@ public class DutyCycleEncoder implements Sendable, AutoCloseable {
    */
   public void setDistancePerRotation(double distancePerRotation) {
     m_distancePerRotation = distancePerRotation;
+    m_simDistancePerRotation.set(distancePerRotation);
   }
 
   /**
