@@ -72,11 +72,11 @@ public class REVPHFaults {
     Channel13Fault = (faults & 0x2000) != 0;
     Channel14Fault = (faults & 0x4000) != 0;
     Channel15Fault = (faults & 0x8000) != 0;
-    CompressorOverCurrent = (faults & 0x8000) != 0;
-    CompressorOpen = (faults & 0x10000) != 0;
-    SolenoidOverCurrent = (faults & 0x20000) != 0;
-    Brownout = (faults & 0x40000) != 0;
-    CanWarning = (faults & 0x80000) != 0;
-    HardwareFault = (faults & 0x100000) != 0;
+    CompressorOverCurrent = (faults & 0x10000) != 0;
+    CompressorOpen = (faults & 0x20000) != 0;
+    SolenoidOverCurrent = (faults & 0x40000) != 0;
+    Brownout = (faults & 0x80000) != 0;
+    CanWarning = (faults & 0x1000000) != 0;
+    HardwareFault = (faults & 0x200000) != 0;
   }
 }
