@@ -13,6 +13,10 @@ ShooterSim::ShooterSim()
                      ShooterConstants::kV, ShooterConstants::kA),
                  frc::DCMotor::NEO(), 1.0} {}
 
+void ShooterSim::CallSimulationPeriodic(void* self) {
+  static_cast<ShooterSim*>(self)->SimulationPeriodic();
+}
+
 void ShooterSim::SimulationPeriodic() {
   m_flywheel.SetInputVoltage(frc::RobotController::GetBatteryVoltage() *
                              m_shooterMotor.GetSpeed());
