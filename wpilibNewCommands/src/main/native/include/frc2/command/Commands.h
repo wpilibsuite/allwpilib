@@ -143,8 +143,8 @@ namespace cmd {
 // Selector Commands
 
 /**
- * Creates a new ProxyCommand that constructs and schedules the supplied command when
- * initialized, and ends when it is no longer scheduled. Useful for lazily
+ * Creates a new ProxyCommand that constructs and schedules the supplied command
+ * when initialized, and ends when it is no longer scheduled. Useful for lazily
  * creating commands at runtime.
  *
  * @param supplier the command supplier

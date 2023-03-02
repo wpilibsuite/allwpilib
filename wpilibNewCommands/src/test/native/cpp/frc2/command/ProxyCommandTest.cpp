@@ -5,8 +5,8 @@
 #include <memory>
 
 #include "CommandTestBase.h"
-#include "frc2/command/Commands.h"
 #include "frc2/command/CommandPtr.h"
+#include "frc2/command/Commands.h"
 #include "frc2/command/InstantCommand.h"
 #include "frc2/command/ProxyCommand.h"
 #include "frc2/command/WaitUntilCommand.h"
@@ -86,7 +86,7 @@ TEST_F(ProxyCommandTest, DeferredOwningCommandSchedule) {
   bool allocated = false;
   bool scheduled = false;
 
-  CommandPtr proxy = cmd::Deferred([&scheduled, &allocated] { 
+  CommandPtr proxy = cmd::Deferred([&scheduled, &allocated] {
     allocated = true;
     return cmd::RunOnce([&scheduled] { scheduled = true; });
   });
@@ -103,7 +103,7 @@ TEST_F(ProxyCommandTest, DeferredOwningCommandEnd) {
   bool allocated = false;
   bool finished = false;
 
-  CommandPtr command = cmd::Deferred([&finished, &allocated] { 
+  CommandPtr command = cmd::Deferred([&finished, &allocated] {
     allocated = true;
     return cmd::WaitUntil([&finished] { return finished; });
   });
