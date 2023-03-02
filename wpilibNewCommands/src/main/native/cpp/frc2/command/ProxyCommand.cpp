@@ -11,6 +11,12 @@ using namespace frc2;
 ProxyCommand::ProxyCommand(wpi::unique_function<Command*()> supplier)
     : m_supplier(std::move(supplier)) {}
 
+ProxyCommand::ProxyCommand(wpi::unique_function<CommandPtr()> supplier)
+    : m_supplier([supplier = std::move(supplier), holder = std::optional<CommandPtr>{}]() mutable {
+      holder = supplier();
+      return holder->get();
+    }) {}
+
 ProxyCommand::ProxyCommand(Command* command)
     : m_supplier([command] { return command; }) {
   SetName(std::string{"Proxy("}.append(command->GetName()).append(")"));
@@ -30,8 +36,6 @@ void ProxyCommand::End(bool interrupted) {
   }
   m_command = nullptr;
 }
-
-void ProxyCommand::Execute() {}
 
 bool ProxyCommand::IsFinished() {
   // because we're between `initialize` and `end`, `m_command` is necessarily

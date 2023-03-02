@@ -143,6 +143,15 @@ namespace cmd {
 // Selector Commands
 
 /**
+ * Creates a new ProxyCommand that constructs and schedules the supplied command when
+ * initialized, and ends when it is no longer scheduled. Useful for lazily
+ * creating commands at runtime.
+ *
+ * @param supplier the command supplier
+ */
+[[nodiscard]] CommandPtr Deferred(wpi::unique_function<CommandPtr()> supplier);
+
+/**
  * Runs one of two commands, based on the boolean selector function.
  *
  * @param onTrue the command to run if the selector function returns true
