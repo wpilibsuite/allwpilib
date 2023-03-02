@@ -17,7 +17,7 @@
 
 #include <wpi/DecayedDerivedFrom.h>
 
-#include "frc2/command/CommandBase.h"
+#include "frc2/command/Command.h"
 #include "frc2/command/CommandHelper.h"
 
 namespace frc2 {
@@ -92,6 +92,8 @@ class ParallelCommandGroup
   bool RunsWhenDisabled() const override;
 
   Command::InterruptionBehavior GetInterruptionBehavior() const override;
+
+  void InitSendable(wpi::SendableBuilder& builder) override;
 
  private:
   void AddCommands(std::vector<std::unique_ptr<Command>>&& commands);

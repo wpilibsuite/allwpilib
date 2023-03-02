@@ -113,6 +113,12 @@ public class SequentialCommandGroup extends Command {
   public void initSendable(SendableBuilder builder) {
     super.initSendable(builder);
 
+    List<String> list = new ArrayList<>(m_commands.size());
+    for (Command command : m_commands) {
+      String name = command.getName();
+      list.add(name);
+    }
+    builder.publishConstStringArray("members", list.toArray(new String[0]));
     builder.addIntegerProperty("index", () -> m_currentCommandIndex, null);
   }
 }
