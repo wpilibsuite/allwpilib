@@ -16,6 +16,10 @@ DriveSim::DriveSim()
               frc::sim::DifferentialDrivetrainSim::KitbotGearing::k10p71,
               DriveConstants::kWheelDiameter / 2.0} {}
 
+void DriveSim::CallSimulationPeriodic(void* self) {
+  static_cast<DriveSim*>(self)->SimulationPeriodic();
+}
+
 void DriveSim::SimulationPeriodic() {
   auto battery = frc::RobotController::GetBatteryVoltage();
   m_drive.SetInputs(battery * m_leftLeader.GetSpeed(),

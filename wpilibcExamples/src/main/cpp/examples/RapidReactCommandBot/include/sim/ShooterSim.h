@@ -20,6 +20,11 @@ class ShooterSim {
   ShooterSim();
 
   /**
+   * Hack to work around lack of method pointer capturing.
+   */
+  static void CallSimulationPeriodic(void* self);
+
+  /**
    * Call this to advance the simulation by 20 ms.
    */
   void SimulationPeriodic();
