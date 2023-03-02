@@ -122,6 +122,13 @@ class SelectCommand : public CommandHelper<Command, SelectCommand<Key>> {
   void InitSendable(wpi::SendableBuilder& builder) override {
     Command::InitSendable(builder);
 
+    std::vector<std::string> names;
+    names.reserve(m_commands.size());
+    for (auto&& command : m_commands) {
+      names.emplace_back(command.second->GetName());
+    }
+    builder.PublishConstStringArray("members", names);
+
     builder.AddStringProperty(
         "selected",
         [this] {

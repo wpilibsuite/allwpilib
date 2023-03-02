@@ -99,6 +99,14 @@ void ParallelDeadlineGroup::SetDeadline(std::unique_ptr<Command>&& deadline) {
 void ParallelDeadlineGroup::InitSendable(wpi::SendableBuilder& builder) {
   Command::InitSendable(builder);
 
+  std::vector<std::string> names;
+  names.reserve(m_commands.size());
+  for (auto&& [command, done] : m_commands) {
+    names.emplace_back(command->GetName());
+  }
+
+  builder.PublishConstStringArray("members", names);
+
   builder.AddStringProperty(
       "deadline", [this] { return m_deadline->GetName(); }, nullptr);
 }

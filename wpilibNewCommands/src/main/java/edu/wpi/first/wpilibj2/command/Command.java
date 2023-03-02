@@ -10,7 +10,9 @@ import edu.wpi.first.util.function.BooleanConsumer;
 import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.util.sendable.SendableRegistry;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.function.BooleanSupplier;
 
@@ -542,9 +544,17 @@ public abstract class Command implements Sendable {
         });
     builder.addBooleanProperty(
         ".isParented", () -> CommandScheduler.getInstance().isComposed(this), null);
-    builder.addStringProperty(
-        "interruptBehavior", () -> getInterruptionBehavior().toString(), null);
-    builder.addBooleanProperty("runsWhenDisabled", this::runsWhenDisabled, null);
+    builder.publishConstString("interruptBehavior", getInterruptionBehavior().toString());
+    builder.publishConstBoolean("runsWhenDisabled", runsWhenDisabled());
+
+    var requirements = getRequirements();
+    List<String> list = new ArrayList<>(requirements.size());
+    for (Subsystem req : requirements) {
+      String simpleName = req.getClass().getSimpleName();
+      list.add(simpleName);
+    }
+    var names = list.toArray(new String[0]);
+    builder.publishConstStringArray("requirements", names);
   }
 
   /**
