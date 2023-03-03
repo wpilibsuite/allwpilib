@@ -113,7 +113,7 @@ if (!project.hasProperty('onlylinuxathena')) {
                     lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
                     lib project: ':wpimath', library: 'wpimath', linkage: 'shared'
                     lib project: ':wpigui', library: 'wpigui', linkage: 'static'
-                    lib project: ':fieldImages', library: 'fieldImages', linkage: 'static'
+                    lib project: ':fieldImages', library: 'fieldImages', linkage: 'shared'
                     nativeUtils.useRequiredLibrary(it, 'imgui')
                 }
                 appendDebugPathToBinaries(binaries)
@@ -145,7 +145,7 @@ if (!project.hasProperty('onlylinuxathena')) {
                     lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
                     lib project: ':wpimath', library: 'wpimath', linkage: 'shared'
                     lib project: ':wpigui', library: 'wpigui', linkage: 'static'
-                    lib project: ':fieldImages', library: 'fieldImages', linkage: 'static'
+                    lib project: ':fieldImages', library: 'fieldImages', linkage: 'shared'
                     nativeUtils.useRequiredLibrary(it, 'imgui')
                 }
                 appendDebugPathToBinaries(binaries)

@@ -11,17 +11,7 @@
 #include <string_view>
 #include <utility>
 
-#include <fields/2018-powerup.h>
-#include <fields/2019-deepspace.h>
-#include <fields/2020-infiniterecharge.h>
-#include <fields/2021-barrel.h>
-#include <fields/2021-bounce.h>
-#include <fields/2021-galacticsearcha.h>
-#include <fields/2021-galacticsearchb.h>
-#include <fields/2021-infiniterecharge.h>
-#include <fields/2021-slalom.h>
-#include <fields/2022-rapidreact.h>
-#include <fields/2023-chargedup.h>
+#include <fields/fields.h>
 #include <fmt/format.h>
 #include <frc/geometry/Pose2d.h>
 #include <frc/geometry/Rotation2d.h>
@@ -270,42 +260,11 @@ class FieldInfo {
   int& m_right;
 };
 
-struct BuiltinField {
-  const char* name;
-  std::string_view (*getJson)();
-  std::string_view (*getImage)();
-};
-
 }  // namespace
 
 static PoseDragState gDragState;
 static PopupState gPopupState;
 static DisplayUnits gDisplayUnits = kDisplayMeters;
-
-static const BuiltinField kBuiltinFields[] = {
-    {"2023 Charged Up", fields::GetResource_2023_chargedup_json,
-     fields::GetResource_2023_field_png},
-    {"2022 Rapid React", fields::GetResource_2022_rapidreact_json,
-     fields::GetResource_2022_field_png},
-    {"2021 Barrel Racing Path", fields::GetResource_2021_barrelracingpath_json,
-     fields::GetResource_2021_barrel_png},
-    {"2021 Bounce Path", fields::GetResource_2021_bouncepath_json,
-     fields::GetResource_2021_bounce_png},
-    {"2021 Galactic Search A", fields::GetResource_2021_galacticsearcha_json,
-     fields::GetResource_2021_galacticsearcha_png},
-    {"2021 Galactic Search B", fields::GetResource_2021_galacticsearchb_json,
-     fields::GetResource_2021_galacticsearchb_png},
-    {"2021 Infinite Recharge", fields::GetResource_2021_infiniterecharge_json,
-     fields::GetResource_2021_field_png},
-    {"2021 Slalom Path", fields::GetResource_2021_slalompath_json,
-     fields::GetResource_2021_slalom_png},
-    {"2020 Infinite Recharge", fields::GetResource_2020_infiniterecharge_json,
-     fields::GetResource_2020_field_png},
-    {"2019 Destination: Deep Space", fields::GetResource_2019_deepspace_json,
-     fields::GetResource_2019_field_jpg},
-    {"2018 Power Up", fields::GetResource_2018_powerup_json,
-     fields::GetResource_2018_field_jpg},
-};
 
 static double ConvertDisplayLength(units::meter_t v) {
   switch (gDisplayUnits) {
@@ -400,7 +359,7 @@ void FieldInfo::DisplaySettings() {
     if (ImGui::Selectable("Custom", m_builtin.empty())) {
       Reset();
     }
-    for (auto&& field : kBuiltinFields) {
+    for (auto&& field : fields::GetFields()) {
       bool selected = field.name == m_builtin;
       if (ImGui::Selectable(field.name, selected)) {
         Reset();
@@ -461,7 +420,7 @@ void FieldInfo::LoadImage() {
   }
   if (!m_texture) {
     if (!m_builtin.empty()) {
-      for (auto&& field : kBuiltinFields) {
+      for (auto&& field : fields::GetFields()) {
         if (field.name == m_builtin) {
           auto jsonstr = field.getJson();
           wpi::raw_mem_istream is{jsonstr.data(), jsonstr.size()};
