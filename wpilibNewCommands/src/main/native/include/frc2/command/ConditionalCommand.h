@@ -73,6 +73,8 @@ class ConditionalCommand
 
   bool RunsWhenDisabled() const override;
 
+  InterruptionBehavior GetInterruptionBehavior() const override;
+
   void InitSendable(wpi::SendableBuilder& builder) override;
 
  private:
