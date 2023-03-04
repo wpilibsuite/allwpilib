@@ -48,6 +48,7 @@ auto SendableChooser<T>::GetSelected()
 template <class T>
 void SendableChooser<T>::InitSendable(nt::NTSendableBuilder& builder) {
   builder.SetSmartDashboardType("String Chooser");
+  builder.SetControllable(true);
   {
     std::scoped_lock lock(m_mutex);
     m_instancePubs.emplace_back(

@@ -121,6 +121,7 @@ public class SendableChooser<V> implements NTSendable, AutoCloseable {
   @Override
   public void initSendable(NTSendableBuilder builder) {
     builder.setSmartDashboardType("String Chooser");
+    builder.setControllable(true);
     IntegerPublisher instancePub = new IntegerTopic(builder.getTopic(INSTANCE)).publish();
     instancePub.set(m_instance);
     builder.addCloseable(instancePub);

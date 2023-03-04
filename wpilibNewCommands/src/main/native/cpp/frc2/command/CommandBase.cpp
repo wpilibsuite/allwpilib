@@ -52,6 +52,7 @@ void CommandBase::SetSubsystem(std::string_view subsystem) {
 
 void CommandBase::InitSendable(wpi::SendableBuilder& builder) {
   builder.SetSmartDashboardType("Command");
+  builder.SetControllable(true);
   builder.AddStringProperty(
       ".name", [this] { return GetName(); }, nullptr);
   builder.AddBooleanProperty(

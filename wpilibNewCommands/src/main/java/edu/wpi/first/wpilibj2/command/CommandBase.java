@@ -86,6 +86,7 @@ public abstract class CommandBase implements Sendable, Command {
   @Override
   public void initSendable(SendableBuilder builder) {
     builder.setSmartDashboardType("Command");
+    builder.setControllable(true);
     builder.addStringProperty(".name", this::getName, null);
     builder.addBooleanProperty(
         "running",
