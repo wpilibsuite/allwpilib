@@ -39,6 +39,14 @@ public interface SendableBuilder extends AutoCloseable {
   void setActuator(boolean value);
 
   /**
+   * Set a flag indicating if this Sendable should be controllable from the dashboard. By default,
+   * this flag is false.
+   *
+   * @param controllable true if controllable, false if not
+   */
+  void setControllable(boolean controllable);
+
+  /**
    * Set the function that should be called to set the Sendable into a safe state. This is called
    * when entering and exiting Live Window mode.
    *

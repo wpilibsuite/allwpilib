@@ -41,6 +41,14 @@ class SendableBuilder {
   virtual void SetActuator(bool value) = 0;
 
   /**
+   * Set a flag indicating if this Sendable should be controllable from the
+   * dashboard. By default, this flag is false.
+   *
+   * @param controllable true if controllable, false if not
+   */
+  virtual void SetControllable(bool controllable) = 0;
+
+  /**
    * Set the function that should be called to set the Sendable into a safe
    * state.  This is called when entering and exiting Live Window mode.
    *

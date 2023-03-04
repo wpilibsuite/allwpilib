@@ -102,7 +102,13 @@ public class SendableBuilderImpl implements NTSendableBuilder {
   private boolean m_controllable;
   private boolean m_actuator;
 
-  private BooleanPublisher m_controllablePub;
+  private final Property<BooleanPublisher, ?> m_controllableProp = new Property<>();
+
+  public SendableBuilderImpl() {
+    m_controllableProp.m_updateNetwork = (pub, time) -> pub.set(isControllable(), time);
+    m_properties.add(m_controllableProp);
+  }
+
   private StringPublisher m_typePub;
   private BooleanPublisher m_actuatorPub;
 
@@ -111,9 +117,7 @@ public class SendableBuilderImpl implements NTSendableBuilder {
   @Override
   @SuppressWarnings("PMD.AvoidCatchingGenericException")
   public void close() {
-    if (m_controllablePub != null) {
-      m_controllablePub.close();
-    }
+    m_controllableProp.close();
     if (m_typePub != null) {
       m_typePub.close();
     }
@@ -139,8 +143,11 @@ public class SendableBuilderImpl implements NTSendableBuilder {
    */
   public void setTable(NetworkTable table) {
     m_table = table;
-    m_controllablePub = table.getBooleanTopic(".controllable").publish();
-    m_controllablePub.setDefault(false);
+
+    // Close any preexisting publishers
+    m_controllableProp.close();
+    // Publish
+    m_controllableProp.m_pub = table.getBooleanTopic(".controllable").publish();
   }
 
   /**
@@ -186,18 +193,12 @@ public class SendableBuilderImpl implements NTSendableBuilder {
 
   /** Hook setters for all properties. */
   public void startListeners() {
-    m_controllable = true;
-    if (m_controllablePub != null) {
-      m_controllablePub.set(true);
-    }
+    setControllable(true);
   }
 
   /** Unhook setters for all properties. */
   public void stopListeners() {
-    m_controllable = false;
-    if (m_controllablePub != null) {
-      m_controllablePub.set(false);
-    }
+    setControllable(false);
   }
 
   /**
@@ -205,10 +206,15 @@ public class SendableBuilderImpl implements NTSendableBuilder {
    * function if one was provided.
    */
   public void startLiveWindowMode() {
+    callSafeState();
+    startListeners();
+  }
+
+  /** Call the safe state method configured by {@link #setSafeState(Runnable)}. */
+  public void callSafeState() {
     if (m_safeState != null) {
       m_safeState.run();
     }
-    startListeners();
   }
 
   /**
@@ -217,9 +223,7 @@ public class SendableBuilderImpl implements NTSendableBuilder {
    */
   public void stopLiveWindowMode() {
     stopListeners();
-    if (m_safeState != null) {
-      m_safeState.run();
-    }
+    callSafeState();
   }
 
   /** Clear properties. */
@@ -264,6 +268,20 @@ public class SendableBuilderImpl implements NTSendableBuilder {
     }
     m_actuatorPub.set(value);
     m_actuator = value;
+  }
+
+  @Override
+  public void setControllable(boolean controllable) {
+    m_controllable = controllable;
+  }
+
+  /**
+   * Is the sendable represented by this builder set as controllable or not.
+   *
+   * @return true if controllable
+   */
+  public boolean isControllable() {
+    return m_controllable;
   }
 
   /**

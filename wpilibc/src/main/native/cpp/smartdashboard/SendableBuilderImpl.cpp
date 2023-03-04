@@ -21,6 +21,15 @@
 
 using namespace frc;
 
+SendableBuilderImpl::SendableBuilderImpl() {
+  auto prop = std::make_unique<PropertyImpl<nt::BooleanTopic>>();
+  m_controllableProp = prop.get();
+  m_controllableProp->updateNetwork = [this](auto& pub, int64_t time) {
+    pub.Set(IsControllable(), time);
+  };
+  m_properties.emplace_back(std::move(prop));
+}
+
 template <typename Topic>
 void SendableBuilderImpl::PropertyImpl<Topic>::Update(bool controllable,
                                                       int64_t time) {
@@ -34,8 +43,7 @@ void SendableBuilderImpl::PropertyImpl<Topic>::Update(bool controllable,
 
 void SendableBuilderImpl::SetTable(std::shared_ptr<nt::NetworkTable> table) {
   m_table = table;
-  m_controllablePublisher = table->GetBooleanTopic(".controllable").Publish();
-  m_controllablePublisher.SetDefault(false);
+  m_controllableProp->pub = table->GetBooleanTopic(".controllable").Publish();
 }
 
 std::shared_ptr<nt::NetworkTable> SendableBuilderImpl::GetTable() {
@@ -50,6 +58,10 @@ bool SendableBuilderImpl::IsActuator() const {
   return m_actuator;
 }
 
+bool SendableBuilderImpl::IsControllable() const {
+  return m_controllable;
+}
+
 void SendableBuilderImpl::Update() {
   uint64_t time = nt::Now();
   for (auto& property : m_properties) {
@@ -61,31 +73,27 @@ void SendableBuilderImpl::Update() {
 }
 
 void SendableBuilderImpl::StartListeners() {
-  m_controllable = true;
-  if (m_controllablePublisher) {
-    m_controllablePublisher.Set(true);
-  }
+  SetControllable(true);
 }
 
 void SendableBuilderImpl::StopListeners() {
-  m_controllable = false;
-  if (m_controllablePublisher) {
-    m_controllablePublisher.Set(false);
-  }
+  SetControllable(false);
 }
 
 void SendableBuilderImpl::StartLiveWindowMode() {
+  CallSafeState();
+  StartListeners();
+}
+
+void SendableBuilderImpl::CallSafeState() {
   if (m_safeState) {
     m_safeState();
   }
-  StartListeners();
 }
 
 void SendableBuilderImpl::StopLiveWindowMode() {
   StopListeners();
-  if (m_safeState) {
-    m_safeState();
-  }
+  CallSafeState();
 }
 
 void SendableBuilderImpl::ClearProperties() {
@@ -105,6 +113,10 @@ void SendableBuilderImpl::SetActuator(bool value) {
   }
   m_actuatorPublisher.Set(value);
   m_actuator = value;
+}
+
+void SendableBuilderImpl::SetControllable(bool controllable) {
+  m_controllable = controllable;
 }
 
 void SendableBuilderImpl::SetSafeState(std::function<void()> func) {

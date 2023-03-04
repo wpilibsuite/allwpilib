@@ -23,7 +23,7 @@ namespace frc {
 
 class SendableBuilderImpl : public nt::NTSendableBuilder {
  public:
-  SendableBuilderImpl() = default;
+  SendableBuilderImpl();
   ~SendableBuilderImpl() override = default;
 
   SendableBuilderImpl(SendableBuilderImpl&&) = default;
@@ -55,6 +55,13 @@ class SendableBuilderImpl : public nt::NTSendableBuilder {
   bool IsActuator() const;
 
   /**
+   * Is the sendable represented by this builder set as controllable or not.
+   *
+   * @return true if controllable
+   */
+  bool IsControllable() const;
+
+  /**
    * Synchronize with network table values by calling the getters for all
    * properties and setters when the network table value has changed.
    */
@@ -77,6 +84,11 @@ class SendableBuilderImpl : public nt::NTSendableBuilder {
   void StartLiveWindowMode();
 
   /**
+   * Call the safe state method configured by SetSafeState().
+   */
+  void CallSafeState();
+
+  /**
    * Stop LiveWindow mode by unhooking the setters for all properties.  Also
    * calls the SafeState function if one was provided.
    */
@@ -89,6 +101,7 @@ class SendableBuilderImpl : public nt::NTSendableBuilder {
 
   void SetSmartDashboardType(std::string_view type) override;
   void SetActuator(bool value) override;
+  void SetControllable(bool controllable) override;
   void SetSafeState(std::function<void()> func) override;
   void SetUpdateTable(wpi::unique_function<void()> func) override;
   nt::Topic GetTopic(std::string_view key) override;
@@ -209,7 +222,7 @@ class SendableBuilderImpl : public nt::NTSendableBuilder {
   bool m_controllable = false;
   bool m_actuator = false;
 
-  nt::BooleanPublisher m_controllablePublisher;
+  PropertyImpl<nt::BooleanTopic>* m_controllableProp;
   nt::StringPublisher m_typePublisher;
   nt::BooleanPublisher m_actuatorPublisher;
 };
