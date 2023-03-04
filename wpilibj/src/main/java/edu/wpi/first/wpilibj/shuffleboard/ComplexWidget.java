@@ -28,7 +28,6 @@ public final class ComplexWidget extends ShuffleboardWidget<ComplexWidget> {
       m_builder = new SendableBuilderImpl();
       m_builder.setTable(parentTable.getSubTable(getTitle()));
       m_sendable.initSendable(m_builder);
-      m_builder.startListeners();
     }
     m_builder.update();
   }

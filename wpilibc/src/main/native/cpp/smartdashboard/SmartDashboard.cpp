@@ -89,7 +89,6 @@ void SmartDashboard::PutData(std::string_view key, wpi::Sendable* data) {
     auto builderPtr = builder.get();
     builderPtr->SetTable(dataTable);
     wpi::SendableRegistry::Publish(uid, std::move(builder));
-    builderPtr->StartListeners();
     dataTable->GetEntry(".name").SetString(key);
   }
 }

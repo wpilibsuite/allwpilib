@@ -38,7 +38,6 @@ void ComplexWidget::BuildInto(std::shared_ptr<nt::NetworkTable> parentTable,
     static_cast<SendableBuilderImpl&>(*m_builder)
         .SetTable(parentTable->GetSubTable(GetTitle()));
     m_sendable.InitSendable(static_cast<SendableBuilderImpl&>(*m_builder));
-    static_cast<SendableBuilderImpl&>(*m_builder).StartListeners();
   }
   m_builder->Update();
 }

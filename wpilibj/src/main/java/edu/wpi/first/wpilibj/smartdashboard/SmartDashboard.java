@@ -71,7 +71,6 @@ public final class SmartDashboard {
       SendableBuilderImpl builder = new SendableBuilderImpl();
       builder.setTable(dataTable);
       SendableRegistry.publish(data, builder);
-      builder.startListeners();
       dataTable.getEntry(".name").setString(key);
     }
   }
