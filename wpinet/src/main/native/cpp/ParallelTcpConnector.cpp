@@ -4,6 +4,8 @@
 
 #include "wpinet/ParallelTcpConnector.h"
 
+#include <cstring>
+
 #include <fmt/format.h>
 #include <wpi/Logger.h>
 
@@ -65,6 +67,29 @@ void ParallelTcpConnector::Succeeded(uv::Tcp& tcp) {
   }
 }
 
+static bool AddressEquals(const sockaddr& a, const sockaddr& b) {
+  if (a.sa_family != b.sa_family) {
+    return false;
+  }
+  if (a.sa_family == AF_INET) {
+    return reinterpret_cast<const sockaddr_in&>(a).sin_addr.s_addr ==
+           reinterpret_cast<const sockaddr_in&>(b).sin_addr.s_addr;
+  }
+  if (a.sa_family == AF_INET6) {
+    return std::memcmp(&reinterpret_cast<const sockaddr_in6&>(a).sin6_addr,
+                       &reinterpret_cast<const sockaddr_in6&>(b).sin6_addr,
+                       sizeof(in6_addr)) == 0;
+  }
+  return false;
+}
+
+static inline sockaddr_storage CopyAddress(const sockaddr& addr,
+                                           socklen_t len) {
+  sockaddr_storage storage;
+  std::memcpy(&storage, &addr, len);
+  return storage;
+}
+
 void ParallelTcpConnector::Connect() {
   if (IsConnected()) {
     return;
@@ -88,11 +113,25 @@ void ParallelTcpConnector::Connect() {
 
           // kick off parallel connection attempts
           for (auto ai = &addrinfo; ai; ai = ai->ai_next) {
+            // check for duplicates
+            bool duplicate = false;
+            for (auto&& attempt : m_attempts) {
+              if (AddressEquals(*ai->ai_addr, reinterpret_cast<const sockaddr&>(
+                                                  attempt.first))) {
+                duplicate = true;
+                break;
+              }
+            }
+            if (duplicate) {
+              continue;
+            }
+
             auto tcp = uv::Tcp::Create(m_loop);
             if (!tcp) {
               continue;
             }
-            m_attempts.emplace_back(tcp);
+            m_attempts.emplace_back(CopyAddress(*ai->ai_addr, ai->ai_addrlen),
+                                    tcp);
 
             auto connreq = std::make_shared<uv::TcpConnectReq>();
             connreq->connected.connect(
@@ -170,8 +209,8 @@ void ParallelTcpConnector::CancelAll(wpi::uv::Tcp* except) {
   }
   m_resolvers.clear();
 
-  for (auto&& tcpWeak : m_attempts) {
-    if (auto tcp = tcpWeak.lock()) {
+  for (auto&& attempt : m_attempts) {
+    if (auto tcp = attempt.second.lock()) {
       if (tcp.get() != except) {
         WPI_DEBUG4(m_logger, "canceling connection attempt ({})",
                    static_cast<void*>(tcp.get()));
