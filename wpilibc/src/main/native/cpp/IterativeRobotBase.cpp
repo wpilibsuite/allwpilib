@@ -95,7 +95,7 @@ void IterativeRobotBase::SetNetworkTablesFlushEnabled(bool enabled) {
 }
 
 void IterativeRobotBase::EnableLiveWindowInTest(bool testLW) {
-  if (IsTest()) {
+  if (IsTestEnabled()) {
     throw FRC_MakeError(err::IncompatibleMode,
                         "Can't configure test mode while in test mode!");
   }

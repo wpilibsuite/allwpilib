@@ -253,7 +253,7 @@ public abstract class IterativeRobotBase extends RobotBase {
    * @throws ConcurrentModificationException if this is called during test mode.
    */
   public void enableLiveWindowInTest(boolean testLW) {
-    if (isTest()) {
+    if (isTestEnabled()) {
       throw new ConcurrentModificationException("Can't configure test mode while in test mode!");
     }
     m_lwEnabledInTest = testLW;
