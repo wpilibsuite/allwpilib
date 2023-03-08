@@ -210,6 +210,10 @@ bool RobotBase::IsTest() const {
   return DriverStation::IsTest();
 }
 
+bool RobotBase::IsTestEnabled() const {
+  return DriverStation::IsTestEnabled();
+}
+
 std::thread::id RobotBase::GetThreadId() {
   return m_threadId;
 }

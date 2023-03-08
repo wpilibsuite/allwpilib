@@ -927,7 +927,7 @@ public final class DriverStation {
   }
 
   /**
-   * Gets a value indicating whether the Driver Station requires the robot to be running in test
+   * Gets a value indicating whether the Driver Station requires the robot to be running in Test
    * mode.
    *
    * @return True if test mode should be enabled, false otherwise.
@@ -936,6 +936,21 @@ public final class DriverStation {
     m_cacheDataMutex.lock();
     try {
       return m_controlWord.getTest();
+    } finally {
+      m_cacheDataMutex.unlock();
+    }
+  }
+
+  /**
+   * Gets a value indicating whether the Driver Station requires the robot to be running in Test
+   * mode and enabled.
+   *
+   * @return True if test mode should be set and the robot should be enabled.
+   */
+  public static boolean isTestEnabled() {
+    m_cacheDataMutex.lock();
+    try {
+      return m_controlWord.getTest() && m_controlWord.getEnabled();
     } finally {
       m_cacheDataMutex.unlock();
     }
