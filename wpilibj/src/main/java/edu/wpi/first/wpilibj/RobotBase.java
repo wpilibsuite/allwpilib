@@ -260,7 +260,7 @@ public abstract class RobotBase implements AutoCloseable {
   }
 
   /**
-   * Determine if the robot is current in Test mode and enabled as determined by the Driver Station
+   * Determine if the robot is current in Test mode and enabled as determined by the Driver Station.
    *
    * @return True if the robot is currently operating in Test mode while enabled.
    */
@@ -270,7 +270,7 @@ public abstract class RobotBase implements AutoCloseable {
 
   /**
    * Determine if the robot is currently in Operator Control mode as determined by the Driver
-   * Station
+   * Station.
    *
    * @return True if the robot is currently operating in Tele-Op mode.
    */
