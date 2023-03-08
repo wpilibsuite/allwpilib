@@ -76,8 +76,8 @@ static bool AddressEquals(const sockaddr& a, const sockaddr& b) {
            reinterpret_cast<const sockaddr_in&>(b).sin_addr.s_addr;
   }
   if (a.sa_family == AF_INET6) {
-    return std::memcmp(&reinterpret_cast<const sockaddr_in6&>(a).sin6_addr,
-                       &reinterpret_cast<const sockaddr_in6&>(b).sin6_addr,
+    return std::memcmp(&(reinterpret_cast<const sockaddr_in6&>(a).sin6_addr),
+                       &(reinterpret_cast<const sockaddr_in6&>(b).sin6_addr),
                        sizeof(in6_addr)) == 0;
   }
   return false;
