@@ -156,6 +156,14 @@ public interface SendableBuilder extends AutoCloseable {
       String key, String typeString, Supplier<byte[]> getter, Consumer<byte[]> setter);
 
   /**
+   * Add a Sendable property as a nested child.
+   *
+   * @param key property name
+   * @param sendable child
+   */
+  void addSendable(String key, Sendable sendable);
+
+  /**
    * Gets the kind of backend being used.
    *
    * @return Backend kind

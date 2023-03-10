@@ -6,7 +6,7 @@
   </Match>
   <Match>
     <Bug pattern="DE_MIGHT_IGNORE" />
-    <Class name="edu.wpi.first.wpilibj.smartdashboard.SendableBuilderImpl$Property" />
+    <Class name="edu.wpi.first.wpilibj.smartdashboard.SendableBuilderImpl$PrimitiveProperty" />
   </Match>
   <Match>
     <Bug pattern="DM_DEFAULT_ENCODING" />

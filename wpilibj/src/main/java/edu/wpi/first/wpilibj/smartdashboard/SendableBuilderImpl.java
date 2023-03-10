@@ -47,6 +47,7 @@ import edu.wpi.first.util.WPIUtilJNI;
 import edu.wpi.first.util.function.BooleanConsumer;
 import edu.wpi.first.util.function.FloatConsumer;
 import edu.wpi.first.util.function.FloatSupplier;
+import edu.wpi.first.util.sendable.Sendable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.BooleanSupplier;
@@ -63,8 +64,15 @@ public class SendableBuilderImpl implements NTSendableBuilder {
     void accept(T value, long time);
   }
 
-  private static class Property<P extends Publisher, S extends Subscriber>
-      implements AutoCloseable {
+  private abstract static class TelemetryProperty implements AutoCloseable {
+    public abstract void update(boolean controllable, long time);
+
+    @Override
+    public abstract void close();
+  }
+
+  private static class PrimitiveProperty<P extends Publisher, S extends Subscriber>
+      extends TelemetryProperty implements AutoCloseable {
     @Override
     @SuppressWarnings("PMD.AvoidCatchingGenericException")
     public void close() {
@@ -80,7 +88,8 @@ public class SendableBuilderImpl implements NTSendableBuilder {
       }
     }
 
-    void update(boolean controllable, long time) {
+    @Override
+    public void update(boolean controllable, long time) {
       if (controllable && m_sub != null && m_updateLocal != null) {
         m_updateLocal.accept(m_sub);
       }
@@ -95,14 +104,30 @@ public class SendableBuilderImpl implements NTSendableBuilder {
     Consumer<S> m_updateLocal;
   }
 
-  private final List<Property<?, ?>> m_properties = new ArrayList<>();
+  private static class SendableProperty extends TelemetryProperty implements AutoCloseable {
+    @Override
+    @SuppressWarnings("PMD.AvoidCatchingGenericException")
+    public void close() {
+      m_childBuilder.close();
+    }
+
+    @Override
+    public void update(boolean controllable, long time) {
+      // Use child's controllability and time.
+      m_childBuilder.update();
+    }
+
+    SendableBuilderImpl m_childBuilder;
+  }
+
+  private final List<TelemetryProperty> m_properties = new ArrayList<>();
   private Runnable m_safeState;
   private final List<Runnable> m_updateTables = new ArrayList<>();
   private NetworkTable m_table;
   private boolean m_controllable;
   private boolean m_actuator;
 
-  private final Property<BooleanPublisher, ?> m_controllableProp = new Property<>();
+  private final PrimitiveProperty<BooleanPublisher, ?> m_controllableProp = new PrimitiveProperty<>();
 
   public SendableBuilderImpl() {
     m_controllableProp.m_updateNetwork = (pub, time) -> pub.set(isControllable(), time);
@@ -124,7 +149,7 @@ public class SendableBuilderImpl implements NTSendableBuilder {
     if (m_actuatorPub != null) {
       m_actuatorPub.close();
     }
-    for (Property<?, ?> property : m_properties) {
+    for (TelemetryProperty property : m_properties) {
       property.close();
     }
     for (AutoCloseable closeable : m_closeables) {
@@ -183,7 +208,7 @@ public class SendableBuilderImpl implements NTSendableBuilder {
   @Override
   public void update() {
     long time = WPIUtilJNI.now();
-    for (Property<?, ?> property : m_properties) {
+    for (TelemetryProperty property : m_properties) {
       property.update(m_controllable, time);
     }
     for (Runnable updateTable : m_updateTables) {
@@ -230,7 +255,7 @@ public class SendableBuilderImpl implements NTSendableBuilder {
   @Override
   public void clearProperties() {
     stopListeners();
-    for (Property<?, ?> property : m_properties) {
+    for (TelemetryProperty property : m_properties) {
       property.close();
     }
     m_properties.clear();
@@ -328,7 +353,7 @@ public class SendableBuilderImpl implements NTSendableBuilder {
    */
   @Override
   public void addBooleanProperty(String key, BooleanSupplier getter, BooleanConsumer setter) {
-    Property<BooleanPublisher, BooleanSubscriber> property = new Property<>();
+    PrimitiveProperty<BooleanPublisher, BooleanSubscriber> property = new PrimitiveProperty<>();
     BooleanTopic topic = m_table.getBooleanTopic(key);
     if (getter != null) {
       property.m_pub = topic.publish();
@@ -355,7 +380,7 @@ public class SendableBuilderImpl implements NTSendableBuilder {
    */
   @Override
   public void addIntegerProperty(String key, LongSupplier getter, LongConsumer setter) {
-    Property<IntegerPublisher, IntegerSubscriber> property = new Property<>();
+    PrimitiveProperty<IntegerPublisher, IntegerSubscriber> property = new PrimitiveProperty<>();
     IntegerTopic topic = m_table.getIntegerTopic(key);
     if (getter != null) {
       property.m_pub = topic.publish();
@@ -382,7 +407,7 @@ public class SendableBuilderImpl implements NTSendableBuilder {
    */
   @Override
   public void addFloatProperty(String key, FloatSupplier getter, FloatConsumer setter) {
-    Property<FloatPublisher, FloatSubscriber> property = new Property<>();
+    PrimitiveProperty<FloatPublisher, FloatSubscriber> property = new PrimitiveProperty<>();
     FloatTopic topic = m_table.getFloatTopic(key);
     if (getter != null) {
       property.m_pub = topic.publish();
@@ -409,7 +434,7 @@ public class SendableBuilderImpl implements NTSendableBuilder {
    */
   @Override
   public void addDoubleProperty(String key, DoubleSupplier getter, DoubleConsumer setter) {
-    Property<DoublePublisher, DoubleSubscriber> property = new Property<>();
+    PrimitiveProperty<DoublePublisher, DoubleSubscriber> property = new PrimitiveProperty<>();
     DoubleTopic topic = m_table.getDoubleTopic(key);
     if (getter != null) {
       property.m_pub = topic.publish();
@@ -436,7 +461,7 @@ public class SendableBuilderImpl implements NTSendableBuilder {
    */
   @Override
   public void addStringProperty(String key, Supplier<String> getter, Consumer<String> setter) {
-    Property<StringPublisher, StringSubscriber> property = new Property<>();
+    PrimitiveProperty<StringPublisher, StringSubscriber> property = new PrimitiveProperty<>();
     StringTopic topic = m_table.getStringTopic(key);
     if (getter != null) {
       property.m_pub = topic.publish();
@@ -464,7 +489,8 @@ public class SendableBuilderImpl implements NTSendableBuilder {
   @Override
   public void addBooleanArrayProperty(
       String key, Supplier<boolean[]> getter, Consumer<boolean[]> setter) {
-    Property<BooleanArrayPublisher, BooleanArraySubscriber> property = new Property<>();
+    PrimitiveProperty<BooleanArrayPublisher, BooleanArraySubscriber> property =
+        new PrimitiveProperty<>();
     BooleanArrayTopic topic = m_table.getBooleanArrayTopic(key);
     if (getter != null) {
       property.m_pub = topic.publish();
@@ -493,7 +519,8 @@ public class SendableBuilderImpl implements NTSendableBuilder {
   @Override
   public void addIntegerArrayProperty(
       String key, Supplier<long[]> getter, Consumer<long[]> setter) {
-    Property<IntegerArrayPublisher, IntegerArraySubscriber> property = new Property<>();
+    PrimitiveProperty<IntegerArrayPublisher, IntegerArraySubscriber> property =
+        new PrimitiveProperty<>();
     IntegerArrayTopic topic = m_table.getIntegerArrayTopic(key);
     if (getter != null) {
       property.m_pub = topic.publish();
@@ -522,7 +549,8 @@ public class SendableBuilderImpl implements NTSendableBuilder {
   @Override
   public void addFloatArrayProperty(
       String key, Supplier<float[]> getter, Consumer<float[]> setter) {
-    Property<FloatArrayPublisher, FloatArraySubscriber> property = new Property<>();
+    PrimitiveProperty<FloatArrayPublisher, FloatArraySubscriber> property =
+        new PrimitiveProperty<>();
     FloatArrayTopic topic = m_table.getFloatArrayTopic(key);
     if (getter != null) {
       property.m_pub = topic.publish();
@@ -551,7 +579,8 @@ public class SendableBuilderImpl implements NTSendableBuilder {
   @Override
   public void addDoubleArrayProperty(
       String key, Supplier<double[]> getter, Consumer<double[]> setter) {
-    Property<DoubleArrayPublisher, DoubleArraySubscriber> property = new Property<>();
+    PrimitiveProperty<DoubleArrayPublisher, DoubleArraySubscriber> property =
+        new PrimitiveProperty<>();
     DoubleArrayTopic topic = m_table.getDoubleArrayTopic(key);
     if (getter != null) {
       property.m_pub = topic.publish();
@@ -580,7 +609,8 @@ public class SendableBuilderImpl implements NTSendableBuilder {
   @Override
   public void addStringArrayProperty(
       String key, Supplier<String[]> getter, Consumer<String[]> setter) {
-    Property<StringArrayPublisher, StringArraySubscriber> property = new Property<>();
+    PrimitiveProperty<StringArrayPublisher, StringArraySubscriber> property =
+        new PrimitiveProperty<>();
     StringArrayTopic topic = m_table.getStringArrayTopic(key);
     if (getter != null) {
       property.m_pub = topic.publish();
@@ -610,7 +640,7 @@ public class SendableBuilderImpl implements NTSendableBuilder {
   @Override
   public void addRawProperty(
       String key, String typeString, Supplier<byte[]> getter, Consumer<byte[]> setter) {
-    Property<RawPublisher, RawSubscriber> property = new Property<>();
+    PrimitiveProperty<RawPublisher, RawSubscriber> property = new PrimitiveProperty<>();
     RawTopic topic = m_table.getRawTopic(key);
     if (getter != null) {
       property.m_pub = topic.publish(typeString);
@@ -626,6 +656,23 @@ public class SendableBuilderImpl implements NTSendableBuilder {
             }
           };
     }
+    m_properties.add(property);
+  }
+
+  @Override
+  public void addSendable(String key, Sendable sendable) {
+    final SendableProperty property = new SendableProperty();
+    var builder = new SendableBuilderImpl();
+    builder.setTable(this.getTable().getSubTable(key));
+
+    // By default, child inherits controllability.
+    // However, child may override its own controllability.
+    // TODO : is this a good idea?
+    builder.setControllable(this.m_controllable);
+    sendable.initSendable(builder);
+
+    property.m_childBuilder = builder;
+
     m_properties.add(property);
   }
 }
