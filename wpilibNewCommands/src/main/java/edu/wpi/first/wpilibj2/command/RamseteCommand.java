@@ -45,7 +45,7 @@ public class RamseteCommand extends CommandBase {
   private final PIDController m_leftController;
   private final PIDController m_rightController;
   private final BiConsumer<Double, Double> m_output;
-  private DifferentialDriveWheelSpeeds m_prevSpeeds;
+  private DifferentialDriveWheelSpeeds m_prevSpeeds = new DifferentialDriveWheelSpeeds();
   private double m_prevTime;
 
   /**
@@ -215,25 +215,7 @@ public class RamseteCommand extends CommandBase {
   @Override
   public void initSendable(SendableBuilder builder) {
     super.initSendable(builder);
-    builder.addDoubleProperty(
-        "leftVelocity",
-        () -> {
-          if (m_prevSpeeds != null) {
-            return m_prevSpeeds.leftMetersPerSecond;
-          } else {
-            return 0;
-          }
-        },
-        null);
-    builder.addDoubleProperty(
-        "rightVelocity",
-        () -> {
-          if (m_prevSpeeds != null) {
-            return m_prevSpeeds.rightMetersPerSecond;
-          } else {
-            return 0;
-          }
-        },
-        null);
+    builder.addDoubleProperty("leftVelocity", () -> m_prevSpeeds.leftMetersPerSecond, null);
+    builder.addDoubleProperty("rightVelocity", () -> m_prevSpeeds.rightMetersPerSecond, null);
   }
 }
