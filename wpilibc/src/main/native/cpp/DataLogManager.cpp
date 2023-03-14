@@ -186,7 +186,7 @@ void Thread::Main() {
       } else {
         dsAttachCount = 0;
       }
-      if (dsAttachCount > 50) {  // 1 second
+      if (dsAttachCount > 300) {  // 6 seconds
         std::time_t now = std::time(nullptr);
         auto tm = std::gmtime(&now);
         if (tm->tm_year > 100) {
@@ -207,7 +207,7 @@ void Thread::Main() {
       } else {
         fmsAttachCount = 0;
       }
-      if (fmsAttachCount > 100) {  // 2 seconds
+      if (fmsAttachCount > 250) {  // 5 seconds
         // match info comes through TCP, so we need to double-check we've
         // actually received it
         auto matchType = DriverStation::GetMatchType();
