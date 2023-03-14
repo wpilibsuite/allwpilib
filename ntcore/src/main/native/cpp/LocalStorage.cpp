@@ -243,7 +243,7 @@ struct DataLoggerData {
   int Start(TopicData* topic, int64_t time) {
     return log.Start(fmt::format("{}{}", logPrefix,
                                  wpi::drop_front(topic->name, prefix.size())),
-                     topic->typeStr,
+                     topic->typeStr == "int" ? "int64" : topic->typeStr,
                      DataLoggerEntry::MakeMetadata(topic->propertiesStr), time);
   }
 
