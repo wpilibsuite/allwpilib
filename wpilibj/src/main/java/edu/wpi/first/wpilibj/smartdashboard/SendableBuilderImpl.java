@@ -4,6 +4,8 @@
 
 package edu.wpi.first.wpilibj.smartdashboard;
 
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import edu.wpi.first.networktables.BooleanArrayPublisher;
 import edu.wpi.first.networktables.BooleanArraySubscriber;
 import edu.wpi.first.networktables.BooleanArrayTopic;
@@ -48,6 +50,8 @@ import edu.wpi.first.util.function.BooleanConsumer;
 import edu.wpi.first.util.function.FloatConsumer;
 import edu.wpi.first.util.function.FloatSupplier;
 import edu.wpi.first.util.sendable.Sendable;
+import edu.wpi.first.util.sendable.SendableMetadata;
+import edu.wpi.first.util.sendable.SendablePropertyBuilder;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.BooleanSupplier;
@@ -72,7 +76,7 @@ public class SendableBuilderImpl implements NTSendableBuilder {
   }
 
   private static class PrimitiveProperty<P extends Publisher, S extends Subscriber>
-      extends TelemetryProperty implements AutoCloseable {
+      extends TelemetryProperty {
     @Override
     @SuppressWarnings("PMD.AvoidCatchingGenericException")
     public void close() {
@@ -102,9 +106,28 @@ public class SendableBuilderImpl implements NTSendableBuilder {
     S m_sub;
     TimedConsumer<P> m_updateNetwork;
     Consumer<S> m_updateLocal;
+    ObjectNode m_metadata = JsonNodeFactory.instance.objectNode();
+
+    SendablePropertyBuilder propertyBuilder(Topic topic) {
+      return new SendablePropertyBuilder() {
+        @Override
+        public SendablePropertyBuilder controllable(boolean controllable) {
+          // TODO : do we want to validate it like this?
+          throw new IllegalStateException("Primitive properties can't be set as controllable!");
+          //        return this;
+        }
+
+        @Override
+        public SendablePropertyBuilder withMetadata(SendableMetadata metadata) {
+          m_metadata.setAll(metadata.getJson());
+          topic.setProperties(m_metadata.toString());
+          return this;
+        }
+      };
+    }
   }
 
-  private static class SendableProperty extends TelemetryProperty implements AutoCloseable {
+  private static class SendableProperty extends TelemetryProperty {
     @Override
     @SuppressWarnings("PMD.AvoidCatchingGenericException")
     public void close() {
@@ -118,6 +141,22 @@ public class SendableBuilderImpl implements NTSendableBuilder {
     }
 
     SendableBuilderImpl m_childBuilder;
+
+    public SendablePropertyBuilder propertyBuilder() {
+      return new SendablePropertyBuilder() {
+        @Override
+        public SendablePropertyBuilder controllable(boolean controllable) {
+          m_childBuilder.setControllable(controllable);
+          return this;
+        }
+
+        @Override
+        public SendablePropertyBuilder withMetadata(SendableMetadata metadata) {
+          m_childBuilder.selfMetadata(metadata);
+          return this;
+        }
+      };
+    }
   }
 
   private final List<TelemetryProperty> m_properties = new ArrayList<>();
@@ -320,6 +359,39 @@ public class SendableBuilderImpl implements NTSendableBuilder {
     m_safeState = func;
   }
 
+  @Override
+  public void selfMetadata(SendableMetadata metadata) {
+    // TODO
+    throw new UnsupportedOperationException("TODO!");
+    //    for (Iterator<Entry<String, JsonNode>> it = metadata.getJson().fields(); it.hasNext(); ) {
+    //      var field = it.next();
+    //      var name = field.getKey();
+    //      var jsonNode = field.getValue();
+    //
+    //      switch (jsonNode.getNodeType()) {
+    //        case STRING:
+    ////          publishConstString(name, jsonNode.textValue());
+    //          break;
+    //        case BOOLEAN:
+    ////          publishConstBoolean(name, jsonNode.booleanValue());
+    //          break;
+    //        case NUMBER:
+    ////          publishConstDouble(name, jsonNode.doubleValue());
+    //          break;
+    //        case ARRAY:
+    //          // TODO : check type of array
+    //          break;
+    //        case BINARY:
+    //          // TODO : check type
+    //          break;
+    //        case OBJECT:
+    //          break;
+    //        case POJO:
+    //          break;
+    //      }
+    //    }
+  }
+
   /**
    * Set the function that should be called to update the network table for things other than
    * properties. Note this function is not passed the network table object; instead it should use
@@ -352,7 +424,8 @@ public class SendableBuilderImpl implements NTSendableBuilder {
    * @param setter setter function (sets new value)
    */
   @Override
-  public void addBooleanProperty(String key, BooleanSupplier getter, BooleanConsumer setter) {
+  public SendablePropertyBuilder addBooleanProperty(
+      String key, BooleanSupplier getter, BooleanConsumer setter) {
     PrimitiveProperty<BooleanPublisher, BooleanSubscriber> property = new PrimitiveProperty<>();
     BooleanTopic topic = m_table.getBooleanTopic(key);
     if (getter != null) {
@@ -369,6 +442,7 @@ public class SendableBuilderImpl implements NTSendableBuilder {
           };
     }
     m_properties.add(property);
+    return property.propertyBuilder(topic);
   }
 
   /**
@@ -379,7 +453,8 @@ public class SendableBuilderImpl implements NTSendableBuilder {
    * @param setter setter function (sets new value)
    */
   @Override
-  public void addIntegerProperty(String key, LongSupplier getter, LongConsumer setter) {
+  public SendablePropertyBuilder addIntegerProperty(
+      String key, LongSupplier getter, LongConsumer setter) {
     PrimitiveProperty<IntegerPublisher, IntegerSubscriber> property = new PrimitiveProperty<>();
     IntegerTopic topic = m_table.getIntegerTopic(key);
     if (getter != null) {
@@ -396,6 +471,7 @@ public class SendableBuilderImpl implements NTSendableBuilder {
           };
     }
     m_properties.add(property);
+    return property.propertyBuilder(topic);
   }
 
   /**
@@ -406,7 +482,8 @@ public class SendableBuilderImpl implements NTSendableBuilder {
    * @param setter setter function (sets new value)
    */
   @Override
-  public void addFloatProperty(String key, FloatSupplier getter, FloatConsumer setter) {
+  public SendablePropertyBuilder addFloatProperty(
+      String key, FloatSupplier getter, FloatConsumer setter) {
     PrimitiveProperty<FloatPublisher, FloatSubscriber> property = new PrimitiveProperty<>();
     FloatTopic topic = m_table.getFloatTopic(key);
     if (getter != null) {
@@ -423,6 +500,7 @@ public class SendableBuilderImpl implements NTSendableBuilder {
           };
     }
     m_properties.add(property);
+    return property.propertyBuilder(topic);
   }
 
   /**
@@ -433,7 +511,8 @@ public class SendableBuilderImpl implements NTSendableBuilder {
    * @param setter setter function (sets new value)
    */
   @Override
-  public void addDoubleProperty(String key, DoubleSupplier getter, DoubleConsumer setter) {
+  public SendablePropertyBuilder addDoubleProperty(
+      String key, DoubleSupplier getter, DoubleConsumer setter) {
     PrimitiveProperty<DoublePublisher, DoubleSubscriber> property = new PrimitiveProperty<>();
     DoubleTopic topic = m_table.getDoubleTopic(key);
     if (getter != null) {
@@ -450,6 +529,7 @@ public class SendableBuilderImpl implements NTSendableBuilder {
           };
     }
     m_properties.add(property);
+    return property.propertyBuilder(topic);
   }
 
   /**
@@ -460,7 +540,8 @@ public class SendableBuilderImpl implements NTSendableBuilder {
    * @param setter setter function (sets new value)
    */
   @Override
-  public void addStringProperty(String key, Supplier<String> getter, Consumer<String> setter) {
+  public SendablePropertyBuilder addStringProperty(
+      String key, Supplier<String> getter, Consumer<String> setter) {
     PrimitiveProperty<StringPublisher, StringSubscriber> property = new PrimitiveProperty<>();
     StringTopic topic = m_table.getStringTopic(key);
     if (getter != null) {
@@ -477,6 +558,7 @@ public class SendableBuilderImpl implements NTSendableBuilder {
           };
     }
     m_properties.add(property);
+    return property.propertyBuilder(topic);
   }
 
   /**
@@ -487,7 +569,7 @@ public class SendableBuilderImpl implements NTSendableBuilder {
    * @param setter setter function (sets new value)
    */
   @Override
-  public void addBooleanArrayProperty(
+  public SendablePropertyBuilder addBooleanArrayProperty(
       String key, Supplier<boolean[]> getter, Consumer<boolean[]> setter) {
     PrimitiveProperty<BooleanArrayPublisher, BooleanArraySubscriber> property =
         new PrimitiveProperty<>();
@@ -507,6 +589,7 @@ public class SendableBuilderImpl implements NTSendableBuilder {
           };
     }
     m_properties.add(property);
+    return property.propertyBuilder(topic);
   }
 
   /**
@@ -517,7 +600,7 @@ public class SendableBuilderImpl implements NTSendableBuilder {
    * @param setter setter function (sets new value)
    */
   @Override
-  public void addIntegerArrayProperty(
+  public SendablePropertyBuilder addIntegerArrayProperty(
       String key, Supplier<long[]> getter, Consumer<long[]> setter) {
     PrimitiveProperty<IntegerArrayPublisher, IntegerArraySubscriber> property =
         new PrimitiveProperty<>();
@@ -537,6 +620,7 @@ public class SendableBuilderImpl implements NTSendableBuilder {
           };
     }
     m_properties.add(property);
+    return property.propertyBuilder(topic);
   }
 
   /**
@@ -547,7 +631,7 @@ public class SendableBuilderImpl implements NTSendableBuilder {
    * @param setter setter function (sets new value)
    */
   @Override
-  public void addFloatArrayProperty(
+  public SendablePropertyBuilder addFloatArrayProperty(
       String key, Supplier<float[]> getter, Consumer<float[]> setter) {
     PrimitiveProperty<FloatArrayPublisher, FloatArraySubscriber> property =
         new PrimitiveProperty<>();
@@ -567,6 +651,7 @@ public class SendableBuilderImpl implements NTSendableBuilder {
           };
     }
     m_properties.add(property);
+    return property.propertyBuilder(topic);
   }
 
   /**
@@ -577,7 +662,7 @@ public class SendableBuilderImpl implements NTSendableBuilder {
    * @param setter setter function (sets new value)
    */
   @Override
-  public void addDoubleArrayProperty(
+  public SendablePropertyBuilder addDoubleArrayProperty(
       String key, Supplier<double[]> getter, Consumer<double[]> setter) {
     PrimitiveProperty<DoubleArrayPublisher, DoubleArraySubscriber> property =
         new PrimitiveProperty<>();
@@ -597,6 +682,7 @@ public class SendableBuilderImpl implements NTSendableBuilder {
           };
     }
     m_properties.add(property);
+    return property.propertyBuilder(topic);
   }
 
   /**
@@ -607,7 +693,7 @@ public class SendableBuilderImpl implements NTSendableBuilder {
    * @param setter setter function (sets new value)
    */
   @Override
-  public void addStringArrayProperty(
+  public SendablePropertyBuilder addStringArrayProperty(
       String key, Supplier<String[]> getter, Consumer<String[]> setter) {
     PrimitiveProperty<StringArrayPublisher, StringArraySubscriber> property =
         new PrimitiveProperty<>();
@@ -627,6 +713,7 @@ public class SendableBuilderImpl implements NTSendableBuilder {
           };
     }
     m_properties.add(property);
+    return property.propertyBuilder(topic);
   }
 
   /**
@@ -638,7 +725,7 @@ public class SendableBuilderImpl implements NTSendableBuilder {
    * @param setter setter function (sets new value)
    */
   @Override
-  public void addRawProperty(
+  public SendablePropertyBuilder addRawProperty(
       String key, String typeString, Supplier<byte[]> getter, Consumer<byte[]> setter) {
     PrimitiveProperty<RawPublisher, RawSubscriber> property = new PrimitiveProperty<>();
     RawTopic topic = m_table.getRawTopic(key);
@@ -657,10 +744,11 @@ public class SendableBuilderImpl implements NTSendableBuilder {
           };
     }
     m_properties.add(property);
+    return property.propertyBuilder(topic);
   }
 
   @Override
-  public void addSendable(String key, Sendable sendable) {
+  public SendablePropertyBuilder addSendable(String key, Sendable sendable) {
     final SendableProperty property = new SendableProperty();
     var builder = new SendableBuilderImpl();
     builder.setTable(this.getTable().getSubTable(key));
@@ -674,5 +762,6 @@ public class SendableBuilderImpl implements NTSendableBuilder {
     property.m_childBuilder = builder;
 
     m_properties.add(property);
+    return property.propertyBuilder();
   }
 }
