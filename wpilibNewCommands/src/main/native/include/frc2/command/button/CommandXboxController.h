@@ -16,7 +16,7 @@ namespace frc2 {
  *
  * @see XboxController
  */
-class CommandXboxController : public frc::XboxController, CommandGenericHID {
+class CommandXboxController : public CommandGenericHID, public virtual frc::XboxController {
  public:
   using XboxController::XboxController;
 

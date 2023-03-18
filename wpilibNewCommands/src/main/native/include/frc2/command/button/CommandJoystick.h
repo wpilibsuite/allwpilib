@@ -16,7 +16,7 @@ namespace frc2 {
  *
  * @see Joystick
  */
-class CommandJoystick : public frc::Joystick, CommandGenericHID {
+class CommandJoystick : public CommandGenericHID, public virtual frc::Joystick {
  public:
   using Joystick::Joystick;
 

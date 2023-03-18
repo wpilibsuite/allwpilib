@@ -16,7 +16,7 @@ namespace frc2 {
  *
  * @see PS4Controller
  */
-class CommandPS4Controller : public frc::PS4Controller, CommandGenericHID {
+class CommandPS4Controller : public CommandGenericHID, public virtual frc::PS4Controller {
  public:
   using PS4Controller::PS4Controller;
 
