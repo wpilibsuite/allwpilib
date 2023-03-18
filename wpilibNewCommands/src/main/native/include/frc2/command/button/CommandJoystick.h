@@ -21,19 +21,6 @@ class CommandJoystick : public CommandGenericHID, public virtual frc::Joystick {
   using Joystick::Joystick;
 
   /**
-   * Constructs an event instance around this button's digital signal.
-   *
-   * @param button the button index
-   * @param loop the event loop instance to attach the event to. Defaults to the
-   * CommandScheduler's default loop.
-   * @return an event instance representing the button's digital signal attached
-   * to the given loop.
-   */
-  class Trigger Button(
-      int button, frc::EventLoop* loop = CommandScheduler::GetInstance()
-                                             .GetDefaultButtonLoop()) const;
-
-  /**
    * Constructs an event instance around the trigger button's digital signal.
    *
    * @param loop the event loop instance to attach the event to. Defaults to the
