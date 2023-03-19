@@ -6,7 +6,7 @@
 
 using namespace frc2;
 
-CommandJoystick::CommandJoystick(int port) : CommandGenericHID(port), Joystick(port) {}
+CommandJoystick::CommandJoystick(int port) : Joystick(port), CommandGenericHID(port) {}
 
 Trigger CommandJoystick::Trigger(frc::EventLoop* loop) const {
   return Joystick::Trigger(loop).CastTo<class Trigger>();

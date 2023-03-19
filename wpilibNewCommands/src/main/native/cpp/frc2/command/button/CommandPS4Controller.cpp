@@ -6,7 +6,7 @@
 
 using namespace frc2;
 
-CommandPS4Controller::CommandPS4Controller(int port) : CommandGenericHID(port), PS4Controller(port) {}
+CommandPS4Controller::CommandPS4Controller(int port) : PS4Controller(port), CommandGenericHID(port) {}
 
 Trigger CommandPS4Controller::Square(frc::EventLoop* loop) const {
   return PS4Controller::Square(loop).CastTo<Trigger>();
