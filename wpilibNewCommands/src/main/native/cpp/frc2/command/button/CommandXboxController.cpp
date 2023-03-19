@@ -6,6 +6,8 @@
 
 using namespace frc2;
 
+CommandXboxController::CommandXboxController(int port) : CommandGenericHID(port), XboxController(port) {}
+
 Trigger CommandXboxController::LeftBumper(frc::EventLoop* loop) const {
   return XboxController::LeftBumper(loop).CastTo<Trigger>();
 }

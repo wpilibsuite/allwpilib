@@ -18,7 +18,7 @@ namespace frc2 {
  */
 class CommandXboxController : public CommandGenericHID, public virtual frc::XboxController {
  public:
-  using XboxController::XboxController;
+  CommandXboxController(int port);
 
   /**
    * Constructs an event instance around the left bumper's digital signal.

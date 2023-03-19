@@ -18,7 +18,7 @@ namespace frc2 {
  */
 class CommandPS4Controller : public CommandGenericHID, public virtual frc::PS4Controller {
  public:
-  using PS4Controller::PS4Controller;
+  CommandPS4Controller(int port);
 
   /**
    * Constructs an event instance around the square button's digital signal.
