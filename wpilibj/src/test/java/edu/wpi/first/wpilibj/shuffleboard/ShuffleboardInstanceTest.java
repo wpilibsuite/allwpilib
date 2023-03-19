@@ -132,8 +132,8 @@ class ShuffleboardInstanceTest {
     try {
       listener =
           m_ntInstance.addListener(
-              m_ntInstance.getTopic("/Shuffleboard/.metadata/Selected"),
-              EnumSet.of(Kind.kValueAll),
+              m_ntInstance.getStringTopic("/Shuffleboard/.metadata/Selected"),
+              EnumSet.of(Kind.kValueAll, Kind.kImmediate),
               event -> counter.incrementAndGet());
 
       // There shouldn't be anything there
