@@ -42,7 +42,7 @@ class Robot : public frc::TimedRobot {
 
     // Put encoders in a list layout.
     frc::ShuffleboardLayout& encoders =
-        driveBaseTab.GetLayout("List Layout", "Encoders")
+        driveBaseTab.GetLayout("Encoders", frc::BuiltInLayouts::kList)
             .WithPosition(0, 0)
             .WithSize(2, 2);
     encoders.Add("Left Encoder", m_leftEncoder);
