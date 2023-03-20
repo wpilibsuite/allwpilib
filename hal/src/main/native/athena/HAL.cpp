@@ -316,11 +316,8 @@ void InitializeRoboRioComments(void) {
       return;
     }
     start += searchString.size();
-    size_t end = fileContents.find("\"", start);
-    if (end == std::string_view::npos) {
-      end = fileContents.size();
-    }
-    std::string_view escapedComments = wpi::slice(fileContents, start, end);
+    std::string_view escapedComments =
+        wpi::slice(fileContents, start, fileContents.size());
     wpi::SmallString<64> buf;
     auto [unescapedComments, rem] = wpi::UnescapeCString(escapedComments, buf);
     unescapedComments.copy(roboRioCommentsString,
