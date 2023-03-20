@@ -361,35 +361,46 @@ public class SendableBuilderImpl implements NTSendableBuilder {
 
   @Override
   public void selfMetadata(SendableMetadata metadata) {
-    // TODO
-    throw new UnsupportedOperationException("TODO!");
-    //    for (Iterator<Entry<String, JsonNode>> it = metadata.getJson().fields(); it.hasNext(); ) {
-    //      var field = it.next();
-    //      var name = field.getKey();
-    //      var jsonNode = field.getValue();
-    //
-    //      switch (jsonNode.getNodeType()) {
-    //        case STRING:
-    ////          publishConstString(name, jsonNode.textValue());
-    //          break;
-    //        case BOOLEAN:
-    ////          publishConstBoolean(name, jsonNode.booleanValue());
-    //          break;
-    //        case NUMBER:
-    ////          publishConstDouble(name, jsonNode.doubleValue());
-    //          break;
-    //        case ARRAY:
-    //          // TODO : check type of array
-    //          break;
-    //        case BINARY:
-    //          // TODO : check type
-    //          break;
-    //        case OBJECT:
-    //          break;
-    //        case POJO:
-    //          break;
-    //      }
-    //    }
+    ObjectNode json = metadata.getJson();
+    for (var it = json.fields(); it.hasNext(); ) {
+      var field = it.next();
+      var name = "." + field.getKey();
+      var value = field.getValue();
+
+      // First, handle direct values.
+      if (value.isValueNode()) {
+        if (value.isBoolean()) {
+          var v = value.booleanValue();
+          // TODO: convert to publishConst
+          addBooleanProperty(name, () -> v, null);
+
+        } else if (value.isDouble()) {
+          var v = value.doubleValue();
+          // TODO: convert to publishConst
+          addDoubleProperty(name, () -> v, null);
+
+        } else if (value.isFloat()) {
+          var v = value.floatValue();
+          // TODO: convert to publishConst
+          addFloatProperty(name, () -> v, null);
+
+        } else if (value.isNumber()) {
+          // All other numbers are integers
+          var v = value.longValue();
+          // TODO: convert to publishConst
+          addIntegerProperty(name, () -> v, null);
+        } else if (value.isTextual()) {
+          var v = value.textValue();
+          // TODO: convert to publishConst
+          addStringProperty(name, () -> v, null);
+        } else {
+          throw new AssertionError("Value node of invalid type: " + value.getNodeType());
+        }
+      } else {
+        // TODO support other types
+        throw new UnsupportedOperationException("TODO!");
+      }
+    }
   }
 
   /**
