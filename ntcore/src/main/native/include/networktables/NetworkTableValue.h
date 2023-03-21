@@ -7,6 +7,7 @@
 #include <stdint.h>
 
 #include <cassert>
+#include <cstring>
 #include <initializer_list>
 #include <memory>
 #include <span>
@@ -15,10 +16,45 @@
 #include <type_traits>
 #include <utility>
 #include <vector>
+#include <version>
 
 #include "ntcore_c.h"
 
 namespace nt {
+
+namespace impl {
+namespace detail {
+// decay_t will remove const, & and volatile from the type
+template <typename T>
+inline constexpr bool is_string_class_decayed = false;
+
+template <typename... T>
+inline constexpr bool is_string_class_decayed<std::basic_string<T...>> = true;
+
+// decay_t will remove const, & and volatile from the type
+template <typename T>
+inline constexpr bool is_vector_class_decayed = false;
+
+template <typename... T>
+inline constexpr bool is_vector_class_decayed<std::vector<T...>> = true;
+}  // namespace detail
+
+template <typename T>
+inline constexpr bool is_string_class =
+    detail::is_string_class_decayed<std::decay_t<T>>;
+
+template <typename TChar, typename TString>
+inline constexpr bool is_string = is_string_class<TString>&&
+    std::is_same_v<TChar, typename TString::value_type>;
+
+template <typename T>
+inline constexpr bool is_vector_class =
+    detail::is_vector_class_decayed<std::decay_t<T>>;
+
+template <typename TElem, typename TVector>
+inline constexpr bool is_vector = is_vector_class<TVector>&&
+    std::is_same_v<TElem, typename TVector::value_type>;
+}  // namespace impl
 
 /**
  * A network table entry value.
@@ -360,14 +396,20 @@ class Value final {
    *             time)
    * @return The entry value
    */
-  static Value MakeString(std::string_view value, int64_t time = 0) {
-    Value val{NT_STRING, time, private_init{}};
-    auto data = std::make_shared<std::string>(value);
-    val.m_val.data.v_string.str = const_cast<char*>(data->c_str());
-    val.m_val.data.v_string.len = data->size();
-    val.m_storage = std::move(data);
-    return val;
-  }
+  static Value MakeString(std::string_view value, int64_t time = 0);
+
+  /**
+   * Creates a string entry value.
+   *
+   * @param alloc allocator
+   * @param value the value
+   * @param time if nonzero, the creation time to use (instead of the current
+   *             time)
+   * @return The entry value
+   */
+  template <typename Alloc>
+  static Value MakeStringAlloc(const Alloc& alloc, std::string_view value,
+                               int64_t time = 0);
 
   /**
    * Creates a string entry value.
@@ -377,53 +419,69 @@ class Value final {
    *             time)
    * @return The entry value
    */
+  template <typename T, typename std::enable_if<impl::is_string<char, T>>::type>
+  static Value MakeString(T&& value, int64_t time = 0);
+
+  /**
+   * Creates a string entry value.
+   *
+   * @param alloc allocator
+   * @param value the value
+   * @param time if nonzero, the creation time to use (instead of the current
+   *             time)
+   * @return The entry value
+   */
+  template <typename Alloc, typename T,
+            typename std::enable_if<impl::is_string<char, T>>::type>
+  static Value MakeStringAlloc(const Alloc& alloc, T&& value, int64_t time = 0);
+
+  /**
+   * Creates a raw entry value.
+   *
+   * @param value the value
+   * @param time if nonzero, the creation time to use (instead of the current
+   *             time)
+   * @return The entry value
+   */
+  static Value MakeRaw(std::span<const uint8_t> value, int64_t time = 0);
+
+  /**
+   * Creates a raw entry value.
+   *
+   * @param alloc allocator
+   * @param value the value
+   * @param time if nonzero, the creation time to use (instead of the current
+   *             time)
+   * @return The entry value
+   */
+  template <typename Alloc>
+  static Value MakeRawAlloc(const Alloc& alloc, std::span<const uint8_t> value,
+                            int64_t time = 0);
+
+  /**
+   * Creates a raw entry value.
+   *
+   * @param value the value
+   * @param time if nonzero, the creation time to use (instead of the current
+   *             time)
+   * @return The entry value
+   */
   template <typename T,
-            typename std::enable_if<std::is_same<T, std::string>::value>::type>
-  static Value MakeString(T&& value, int64_t time = 0) {
-    Value val{NT_STRING, time, private_init{}};
-    auto data = std::make_shared<std::string>(std::forward(value));
-    val.m_val.data.v_string.str = const_cast<char*>(data->c_str());
-    val.m_val.data.v_string.len = data->size();
-    val.m_storage = std::move(data);
-    return val;
-  }
+            typename std::enable_if<impl::is_vector<uint8_t, T>>::type>
+  static Value MakeRaw(T&& value, int64_t time = 0);
 
   /**
    * Creates a raw entry value.
    *
+   * @param alloc allocator
    * @param value the value
    * @param time if nonzero, the creation time to use (instead of the current
    *             time)
    * @return The entry value
    */
-  static Value MakeRaw(std::span<const uint8_t> value, int64_t time = 0) {
-    Value val{NT_RAW, time, private_init{}};
-    auto data =
-        std::make_shared<std::vector<uint8_t>>(value.begin(), value.end());
-    val.m_val.data.v_raw.data = const_cast<uint8_t*>(data->data());
-    val.m_val.data.v_raw.size = data->size();
-    val.m_storage = std::move(data);
-    return val;
-  }
-
-  /**
-   * Creates a raw entry value.
-   *
-   * @param value the value
-   * @param time if nonzero, the creation time to use (instead of the current
-   *             time)
-   * @return The entry value
-   */
-  template <typename T, typename std::enable_if<
-                            std::is_same<T, std::vector<uint8_t>>::value>::type>
-  static Value MakeRaw(T&& value, int64_t time = 0) {
-    Value val{NT_RAW, time, private_init{}};
-    auto data = std::make_shared<std::vector<uint8_t>>(std::forward(value));
-    val.m_val.data.v_raw.data = const_cast<uint8_t*>(data->data());
-    val.m_val.data.v_raw.size = data->size();
-    val.m_storage = std::move(data);
-    return val;
-  }
+  template <typename Alloc, typename T,
+            typename std::enable_if<impl::is_vector<uint8_t, T>>::type>
+  static Value MakeRawAlloc(const Alloc& alloc, T&& value, int64_t time = 0);
 
   /**
    * Creates a boolean array entry value.
@@ -438,15 +496,40 @@ class Value final {
   /**
    * Creates a boolean array entry value.
    *
+   * @param alloc allocator
+   * @param value the value
+   * @param time if nonzero, the creation time to use (instead of the current
+   *             time)
+   * @return The entry value
+   */
+  template <typename Alloc>
+  static Value MakeBooleanArrayAlloc(const Alloc& alloc,
+                                     std::span<const bool> value,
+                                     int64_t time = 0);
+
+  /**
+   * Creates a boolean array entry value.
+   *
    * @param value the value
    * @param time if nonzero, the creation time to use (instead of the current
    *             time)
    * @return The entry value
    */
   static Value MakeBooleanArray(std::initializer_list<bool> value,
-                                int64_t time = 0) {
-    return MakeBooleanArray(std::span(value.begin(), value.end()), time);
-  }
+                                int64_t time = 0);
+
+  /**
+   * Creates a boolean array entry value.
+   *
+   * @param value the value
+   * @param time if nonzero, the creation time to use (instead of the current
+   *             time)
+   * @return The entry value
+   */
+  template <typename Alloc>
+  static Value MakeBooleanArrayAlloc(const Alloc& alloc,
+                                     std::initializer_list<bool> value,
+                                     int64_t time = 0);
 
   /**
    * Creates a boolean array entry value.
@@ -461,15 +544,41 @@ class Value final {
   /**
    * Creates a boolean array entry value.
    *
+   * @param alloc allocator
+   * @param value the value
+   * @param time if nonzero, the creation time to use (instead of the current
+   *             time)
+   * @return The entry value
+   */
+  template <typename Alloc>
+  static Value MakeBooleanArrayAlloc(const Alloc& alloc,
+                                     std::span<const int> value,
+                                     int64_t time = 0);
+
+  /**
+   * Creates a boolean array entry value.
+   *
    * @param value the value
    * @param time if nonzero, the creation time to use (instead of the current
    *             time)
    * @return The entry value
    */
   static Value MakeBooleanArray(std::initializer_list<int> value,
-                                int64_t time = 0) {
-    return MakeBooleanArray(std::span(value.begin(), value.end()), time);
-  }
+                                int64_t time = 0);
+
+  /**
+   * Creates a boolean array entry value.
+   *
+   * @param alloc allocator
+   * @param value the value
+   * @param time if nonzero, the creation time to use (instead of the current
+   *             time)
+   * @return The entry value
+   */
+  template <typename Alloc>
+  static Value MakeBooleanArrayAlloc(const Alloc& alloc,
+                                     std::initializer_list<int> value,
+                                     int64_t time = 0);
 
   /**
    * Creates a boolean array entry value.
@@ -481,7 +590,24 @@ class Value final {
    *
    * @note This function moves the values out of the vector.
    */
-  static Value MakeBooleanArray(std::vector<int>&& value, int64_t time = 0);
+  template <typename T, typename std::enable_if<impl::is_vector<int, T>>::type>
+  static Value MakeBooleanArray(T&& value, int64_t time = 0);
+
+  /**
+   * Creates a boolean array entry value.
+   *
+   * @param alloc allocator
+   * @param value the value
+   * @param time if nonzero, the creation time to use (instead of the current
+   *             time)
+   * @return The entry value
+   *
+   * @note This function moves the values out of the vector.
+   */
+  template <typename Alloc, typename T,
+            typename std::enable_if<impl::is_vector<int, T>>::type>
+  static Value MakeBooleanArrayAlloc(const Alloc& alloc, T&& value,
+                                     int64_t time = 0);
 
   /**
    * Creates an integer array entry value.
@@ -497,15 +623,41 @@ class Value final {
   /**
    * Creates an integer array entry value.
    *
+   * @param alloc allocator
+   * @param value the value
+   * @param time if nonzero, the creation time to use (instead of the current
+   *             time)
+   * @return The entry value
+   */
+  template <typename Alloc>
+  static Value MakeIntegerArrayAlloc(const Alloc& alloc,
+                                     std::span<const int64_t> value,
+                                     int64_t time = 0);
+
+  /**
+   * Creates an integer array entry value.
+   *
    * @param value the value
    * @param time if nonzero, the creation time to use (instead of the current
    *             time)
    * @return The entry value
    */
   static Value MakeIntegerArray(std::initializer_list<int64_t> value,
-                                int64_t time = 0) {
-    return MakeIntegerArray(std::span(value.begin(), value.end()), time);
-  }
+                                int64_t time = 0);
+
+  /**
+   * Creates an integer array entry value.
+   *
+   * @param alloc allocator
+   * @param value the value
+   * @param time if nonzero, the creation time to use (instead of the current
+   *             time)
+   * @return The entry value
+   */
+  template <typename Alloc>
+  static Value MakeIntegerArrayAlloc(const Alloc& alloc,
+                                     std::initializer_list<int64_t> value,
+                                     int64_t time = 0);
 
   /**
    * Creates an integer array entry value.
@@ -517,7 +669,25 @@ class Value final {
    *
    * @note This function moves the values out of the vector.
    */
-  static Value MakeIntegerArray(std::vector<int64_t>&& value, int64_t time = 0);
+  template <typename T,
+            typename std::enable_if<impl::is_vector<int64_t, T>>::type>
+  static Value MakeIntegerArray(T&& value, int64_t time = 0);
+
+  /**
+   * Creates an integer array entry value.
+   *
+   * @param alloc allocator
+   * @param value the value
+   * @param time if nonzero, the creation time to use (instead of the current
+   *             time)
+   * @return The entry value
+   *
+   * @note This function moves the values out of the vector.
+   */
+  template <typename Alloc, typename T,
+            typename std::enable_if<impl::is_vector<int64_t, T>>::type>
+  static Value MakeIntegerArrayAlloc(const Alloc& alloc, T&& value,
+                                     int64_t time = 0);
 
   /**
    * Creates a float array entry value.
@@ -532,15 +702,41 @@ class Value final {
   /**
    * Creates a float array entry value.
    *
+   * @param alloc allocator
+   * @param value the value
+   * @param time if nonzero, the creation time to use (instead of the current
+   *             time)
+   * @return The entry value
+   */
+  template <typename Alloc>
+  static Value MakeFloatArrayAlloc(const Alloc& alloc,
+                                   std::span<const float> value,
+                                   int64_t time = 0);
+
+  /**
+   * Creates a float array entry value.
+   *
    * @param value the value
    * @param time if nonzero, the creation time to use (instead of the current
    *             time)
    * @return The entry value
    */
   static Value MakeFloatArray(std::initializer_list<float> value,
-                              int64_t time = 0) {
-    return MakeFloatArray(std::span(value.begin(), value.end()), time);
-  }
+                              int64_t time = 0);
+
+  /**
+   * Creates a float array entry value.
+   *
+   * @param alloc allocator
+   * @param value the value
+   * @param time if nonzero, the creation time to use (instead of the current
+   *             time)
+   * @return The entry value
+   */
+  template <typename Alloc>
+  static Value MakeFloatArrayAlloc(const Alloc& alloc,
+                                   std::initializer_list<float> value,
+                                   int64_t time = 0);
 
   /**
    * Creates a float array entry value.
@@ -552,7 +748,25 @@ class Value final {
    *
    * @note This function moves the values out of the vector.
    */
-  static Value MakeFloatArray(std::vector<float>&& value, int64_t time = 0);
+  template <typename T,
+            typename std::enable_if<impl::is_vector<float, T>>::type>
+  static Value MakeFloatArray(T&& value, int64_t time = 0);
+
+  /**
+   * Creates a float array entry value.
+   *
+   * @param alloc allocator
+   * @param value the value
+   * @param time if nonzero, the creation time to use (instead of the current
+   *             time)
+   * @return The entry value
+   *
+   * @note This function moves the values out of the vector.
+   */
+  template <typename Alloc, typename T,
+            typename std::enable_if<impl::is_vector<float, T>>::type>
+  static Value MakeFloatArrayAlloc(const Alloc& alloc, T&& value,
+                                   int64_t time = 0);
 
   /**
    * Creates a double array entry value.
@@ -567,15 +781,41 @@ class Value final {
   /**
    * Creates a double array entry value.
    *
+   * @param alloc allocator
+   * @param value the value
+   * @param time if nonzero, the creation time to use (instead of the current
+   *             time)
+   * @return The entry value
+   */
+  template <typename Alloc>
+  static Value MakeDoubleArrayAlloc(const Alloc& alloc,
+                                    std::span<const double> value,
+                                    int64_t time = 0);
+
+  /**
+   * Creates a double array entry value.
+   *
    * @param value the value
    * @param time if nonzero, the creation time to use (instead of the current
    *             time)
    * @return The entry value
    */
   static Value MakeDoubleArray(std::initializer_list<double> value,
-                               int64_t time = 0) {
-    return MakeDoubleArray(std::span(value.begin(), value.end()), time);
-  }
+                               int64_t time = 0);
+
+  /**
+   * Creates a double array entry value.
+   *
+   * @param alloc allocator
+   * @param value the value
+   * @param time if nonzero, the creation time to use (instead of the current
+   *             time)
+   * @return The entry value
+   */
+  template <typename Alloc>
+  static Value MakeDoubleArrayAlloc(const Alloc& alloc,
+                                    std::initializer_list<double> value,
+                                    int64_t time = 0);
 
   /**
    * Creates a double array entry value.
@@ -587,7 +827,25 @@ class Value final {
    *
    * @note This function moves the values out of the vector.
    */
-  static Value MakeDoubleArray(std::vector<double>&& value, int64_t time = 0);
+  template <typename T,
+            typename std::enable_if<impl::is_vector<double, T>>::type>
+  static Value MakeDoubleArray(T&& value, int64_t time = 0);
+
+  /**
+   * Creates a double array entry value.
+   *
+   * @param alloc allocator
+   * @param value the value
+   * @param time if nonzero, the creation time to use (instead of the current
+   *             time)
+   * @return The entry value
+   *
+   * @note This function moves the values out of the vector.
+   */
+  template <typename Alloc, typename T,
+            typename std::enable_if<impl::is_vector<double, T>>::type>
+  static Value MakeDoubleArrayAlloc(const Alloc& alloc, T&& value,
+                                    int64_t time = 0);
 
   /**
    * Creates a string array entry value.
@@ -633,6 +891,12 @@ class Value final {
  private:
   NT_Value m_val;
   std::shared_ptr<void> m_storage;
+
+  template <typename T>
+  static std::shared_ptr<T[]> AllocateArray(size_t nelem);
+
+  template <typename T, typename Alloc>
+  static std::shared_ptr<T[]> AllocateArray(const Alloc& alloc, size_t nelem);
 };
 
 bool operator==(const Value& lhs, const Value& rhs);
@@ -644,3 +908,5 @@ bool operator==(const Value& lhs, const Value& rhs);
 using NetworkTableValue = Value;
 
 }  // namespace nt
+
+#include "NetworkTableValue.inc"
