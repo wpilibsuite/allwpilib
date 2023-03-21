@@ -7,6 +7,8 @@
 #include "NetworkTableValue.h"
 
 #include <algorithm>
+#include <memory>
+#include <utility>
 
 namespace nt {
 
@@ -34,7 +36,7 @@ inline Value Value::MakeStringAlloc(const Alloc& alloc, std::string_view value,
   return val;
 }
 
-template <typename T, typename std::enable_if<impl::is_string<char, T>>::type>
+template <typename T, typename>
 inline Value Value::MakeString(T&& value, int64_t time) {
   auto data = std::make_shared<T>(std::forward<T&&>(value));
   Value val{NT_STRING, time, private_init{}};
@@ -44,8 +46,7 @@ inline Value Value::MakeString(T&& value, int64_t time) {
   return val;
 }
 
-template <typename Alloc, typename T,
-          typename std::enable_if<impl::is_string<char, T>>::type>
+template <typename Alloc, typename T, typename>
 inline Value Value::MakeStringAlloc(const Alloc& alloc, T&& value,
                                     int64_t time) {
   auto data = std::allocate_shared<T>(alloc, std::forward<T&&>(value));
@@ -80,8 +81,7 @@ inline Value Value::MakeRawAlloc(const Alloc& alloc,
   return val;
 }
 
-template <typename T,
-          typename std::enable_if<impl::is_vector<uint8_t, T>>::type>
+template <typename T, typename>
 inline Value Value::MakeRaw(T&& value, int64_t time) {
   Value val{NT_RAW, time, private_init{}};
   auto data = std::make_shared<T>(std::forward<T&&>(value));
@@ -91,8 +91,7 @@ inline Value Value::MakeRaw(T&& value, int64_t time) {
   return val;
 }
 
-template <typename Alloc, typename T,
-          typename std::enable_if<impl::is_vector<uint8_t, T>>::type>
+template <typename Alloc, typename T, typename>
 inline Value Value::MakeRawAlloc(const Alloc& alloc, T&& value, int64_t time) {
   Value val{NT_RAW, time, private_init{}};
   auto data = std::allocate_shared<T>(alloc, std::forward<T&&>(value));
@@ -178,8 +177,7 @@ inline Value Value::MakeBooleanArrayAlloc(const Alloc& alloc,
     return Make##Type##ArrayAlloc(                                            \
         alloc, std::span(value.begin(), value.end()), time);                  \
   }                                                                           \
-  template <typename T,                                                       \
-            typename std::enable_if<impl::is_vector<ctype, T>>::type>         \
+  template <typename T, typename>                                             \
   inline Value Value::Make##Type##Array(T&& value, int64_t time) {            \
     Value val{NT_##TYPE##_ARRAY, time, private_init{}};                       \
     auto data = std::make_shared<T>(std::forward<T&&>(value));                \
@@ -189,8 +187,7 @@ inline Value Value::MakeBooleanArrayAlloc(const Alloc& alloc,
     return val;                                                               \
   }                                                                           \
                                                                               \
-  template <typename Alloc, typename T,                                       \
-            typename std::enable_if<impl::is_vector<ctype, T>>::type>         \
+  template <typename Alloc, typename T, typename>                             \
   inline Value Value::Make##Type##ArrayAlloc(const Alloc& alloc, T&& value,   \
                                              int64_t time) {                  \
     Value val{NT_##TYPE##_ARRAY, time, private_init{}};                       \

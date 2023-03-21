@@ -31,6 +31,18 @@ inline constexpr bool is_string_class_decayed = false;
 template <typename... T>
 inline constexpr bool is_string_class_decayed<std::basic_string<T...>> = true;
 
+template <typename T, typename U, class Enable = void>
+struct is_value_type {
+  static inline constexpr bool value = false;
+};
+
+template <typename T, typename U>
+struct is_value_type<
+    T, U,
+    typename std::enable_if<std::is_same_v<T, typename U::value_type>>::type> {
+  static inline constexpr bool value = true;
+};
+
 // decay_t will remove const, & and volatile from the type
 template <typename T>
 inline constexpr bool is_vector_class_decayed = false;
@@ -45,7 +57,7 @@ inline constexpr bool is_string_class =
 
 template <typename TChar, typename TString>
 inline constexpr bool is_string = is_string_class<TString>&&
-    std::is_same_v<TChar, typename TString::value_type>;
+    detail::is_value_type<TChar, std::decay_t<TString>>::value;
 
 template <typename T>
 inline constexpr bool is_vector_class =
@@ -53,7 +65,7 @@ inline constexpr bool is_vector_class =
 
 template <typename TElem, typename TVector>
 inline constexpr bool is_vector = is_vector_class<TVector>&&
-    std::is_same_v<TElem, typename TVector::value_type>;
+    detail::is_value_type<TElem, std::decay_t<TVector>>::value;
 }  // namespace impl
 
 /**
@@ -419,7 +431,9 @@ class Value final {
    *             time)
    * @return The entry value
    */
-  template <typename T, typename std::enable_if<impl::is_string<char, T>>::type>
+  template <typename T,
+            typename = std::enable_if_t<impl::is_string<char, T> &&
+                                        std::is_rvalue_reference_v<T>>>
   static Value MakeString(T&& value, int64_t time = 0);
 
   /**
@@ -432,7 +446,8 @@ class Value final {
    * @return The entry value
    */
   template <typename Alloc, typename T,
-            typename std::enable_if<impl::is_string<char, T>>::type>
+            typename = std::enable_if_t<impl::is_string<char, T> &&
+                                        std::is_rvalue_reference_v<T>>>
   static Value MakeStringAlloc(const Alloc& alloc, T&& value, int64_t time = 0);
 
   /**
@@ -467,7 +482,8 @@ class Value final {
    * @return The entry value
    */
   template <typename T,
-            typename std::enable_if<impl::is_vector<uint8_t, T>>::type>
+            typename = std::enable_if_t<impl::is_vector<uint8_t, T> &&
+                                        std::is_rvalue_reference_v<T>>>
   static Value MakeRaw(T&& value, int64_t time = 0);
 
   /**
@@ -480,7 +496,8 @@ class Value final {
    * @return The entry value
    */
   template <typename Alloc, typename T,
-            typename std::enable_if<impl::is_vector<uint8_t, T>>::type>
+            typename = std::enable_if_t<impl::is_vector<uint8_t, T> &&
+                                        std::is_rvalue_reference_v<T>>>
   static Value MakeRawAlloc(const Alloc& alloc, T&& value, int64_t time = 0);
 
   /**
@@ -590,7 +607,9 @@ class Value final {
    *
    * @note This function moves the values out of the vector.
    */
-  template <typename T, typename std::enable_if<impl::is_vector<int, T>>::type>
+  template <typename T,
+            typename = std::enable_if_t<impl::is_vector<int, T> &&
+                                        std::is_rvalue_reference_v<T>>>
   static Value MakeBooleanArray(T&& value, int64_t time = 0);
 
   /**
@@ -605,7 +624,8 @@ class Value final {
    * @note This function moves the values out of the vector.
    */
   template <typename Alloc, typename T,
-            typename std::enable_if<impl::is_vector<int, T>>::type>
+            typename = std::enable_if_t<impl::is_vector<int, T> &&
+                                        std::is_rvalue_reference_v<T>>>
   static Value MakeBooleanArrayAlloc(const Alloc& alloc, T&& value,
                                      int64_t time = 0);
 
@@ -670,7 +690,8 @@ class Value final {
    * @note This function moves the values out of the vector.
    */
   template <typename T,
-            typename std::enable_if<impl::is_vector<int64_t, T>>::type>
+            typename = std::enable_if_t<impl::is_vector<int64_t, T> &&
+                                        std::is_rvalue_reference_v<T>>>
   static Value MakeIntegerArray(T&& value, int64_t time = 0);
 
   /**
@@ -685,7 +706,8 @@ class Value final {
    * @note This function moves the values out of the vector.
    */
   template <typename Alloc, typename T,
-            typename std::enable_if<impl::is_vector<int64_t, T>>::type>
+            typename = std::enable_if_t<impl::is_vector<int64_t, T> &&
+                                        std::is_rvalue_reference_v<T>>>
   static Value MakeIntegerArrayAlloc(const Alloc& alloc, T&& value,
                                      int64_t time = 0);
 
@@ -749,7 +771,8 @@ class Value final {
    * @note This function moves the values out of the vector.
    */
   template <typename T,
-            typename std::enable_if<impl::is_vector<float, T>>::type>
+            typename = std::enable_if_t<impl::is_vector<float, T> &&
+                                        std::is_rvalue_reference_v<T>>>
   static Value MakeFloatArray(T&& value, int64_t time = 0);
 
   /**
@@ -764,7 +787,8 @@ class Value final {
    * @note This function moves the values out of the vector.
    */
   template <typename Alloc, typename T,
-            typename std::enable_if<impl::is_vector<float, T>>::type>
+            typename = std::enable_if_t<impl::is_vector<float, T> &&
+                                        std::is_rvalue_reference_v<T>>>
   static Value MakeFloatArrayAlloc(const Alloc& alloc, T&& value,
                                    int64_t time = 0);
 
@@ -828,7 +852,8 @@ class Value final {
    * @note This function moves the values out of the vector.
    */
   template <typename T,
-            typename std::enable_if<impl::is_vector<double, T>>::type>
+            typename = std::enable_if_t<impl::is_vector<double, T> &&
+                                        std::is_rvalue_reference_v<T>>>
   static Value MakeDoubleArray(T&& value, int64_t time = 0);
 
   /**
@@ -843,7 +868,8 @@ class Value final {
    * @note This function moves the values out of the vector.
    */
   template <typename Alloc, typename T,
-            typename std::enable_if<impl::is_vector<double, T>>::type>
+            typename = std::enable_if_t<impl::is_vector<double, T> &&
+                                        std::is_rvalue_reference_v<T>>>
   static Value MakeDoubleArrayAlloc(const Alloc& alloc, T&& value,
                                     int64_t time = 0);
 
