@@ -52,6 +52,7 @@ class SendableBuilderPropertiesTest {
 
           @Override
           public void initSendable(SendableBuilder builder) {
+            builder.setControllable(true);
             builder
                 .addBooleanProperty("boolean", () -> m_boolean, v -> m_boolean = v)
                 .withMetadata(node -> node.put("unit", "meters"));
@@ -96,6 +97,7 @@ class SendableBuilderPropertiesTest {
 
           @Override
           public void initSendable(SendableBuilder builder) {
+            builder.setControllable(true);
             builder
                 .addIntegerProperty("int", () -> m_int, v -> m_int = v)
                 .withMetadata(node -> node.put("unit", "meters"));
@@ -140,6 +142,7 @@ class SendableBuilderPropertiesTest {
 
           @Override
           public void initSendable(SendableBuilder builder) {
+            builder.setControllable(true);
             builder
                 .addFloatProperty("float", () -> m_float, v -> m_float = v)
                 .withMetadata(node -> node.put("unit", "meters"));
@@ -184,6 +187,7 @@ class SendableBuilderPropertiesTest {
 
           @Override
           public void initSendable(SendableBuilder builder) {
+            builder.setControllable(true);
             builder
                 .addDoubleProperty("double", () -> m_double, v -> m_double = v)
                 .withMetadata(node -> node.put("unit", "meters"));
@@ -228,6 +232,7 @@ class SendableBuilderPropertiesTest {
 
           @Override
           public void initSendable(SendableBuilder builder) {
+            builder.setControllable(true);
             builder
                 .addStringProperty("string", () -> m_string, v -> m_string = v)
                 .withMetadata(node -> node.put("unit", "meters"));
