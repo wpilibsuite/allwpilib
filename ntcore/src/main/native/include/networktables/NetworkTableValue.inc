@@ -4,11 +4,11 @@
 
 #pragma once
 
-#include "NetworkTableValue.h"
-
 #include <algorithm>
 #include <memory>
 #include <utility>
+
+#include "NetworkTableValue.h"
 
 namespace nt {
 
@@ -144,7 +144,7 @@ inline Value Value::MakeBooleanArrayAlloc(const Alloc& alloc,
   inline Value Value::Make##Type##Array(std::span<const ctype> value,         \
                                         int64_t time) {                       \
     auto data = AllocateArray<ctype>(value.size());                           \
-    std::memcpy(data.get(), value.data(), value.size());                      \
+    std::memcpy(data.get(), value.data(), value.size() * sizeof(ctype));      \
                                                                               \
     Value val{NT_##TYPE##_ARRAY, time, private_init{}};                       \
     val.m_val.data.arr_##arr_type.arr = data.get();                           \
@@ -157,7 +157,7 @@ inline Value Value::MakeBooleanArrayAlloc(const Alloc& alloc,
   inline Value Value::Make##Type##ArrayAlloc(                                 \
       const Alloc& alloc, std::span<const ctype> value, int64_t time) {       \
     auto data = AllocateArray<ctype>(alloc, value.size());                    \
-    std::memcpy(data.get(), value.data(), value.size());                      \
+    std::memcpy(data.get(), value.data(), value.size() * sizeof(ctype));      \
                                                                               \
     Value val{NT_##TYPE##_ARRAY, time, private_init{}};                       \
     val.m_val.data.arr_##arr_type.arr = data.get();                           \
