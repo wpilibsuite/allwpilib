@@ -8,6 +8,7 @@
 
 #include "frc/StateSpaceUtil.h"
 #include "frc/estimator/AngleStatistics.h"
+#include "wpimath/MathShared.h"
 
 using namespace frc;
 
@@ -105,6 +106,14 @@ Pose2d frc::MecanumDrivePoseEstimator::GetEstimatedPosition() const {
 
 void frc::MecanumDrivePoseEstimator::AddVisionMeasurement(
     const Pose2d& visionRobotPose, units::second_t timestamp) {
+  // Step 0: If this measurement is old enough to be outside the pose buffer's
+  // timespan, skip.
+  if (!m_poseBuffer.GetInternalBuffer().empty() &&
+      m_poseBuffer.GetInternalBuffer().front().first - kBufferDuration >
+          timestamp) {
+    return;
+  }
+
   // Step 1: Get the estimated pose from when the vision measurement was made.
   auto sample = m_poseBuffer.Sample(timestamp);
 
@@ -155,7 +164,7 @@ void frc::MecanumDrivePoseEstimator::AddVisionMeasurement(
 Pose2d frc::MecanumDrivePoseEstimator::Update(
     const Rotation2d& gyroAngle,
     const MecanumDriveWheelPositions& wheelPositions) {
-  return UpdateWithTime(units::microsecond_t(wpi::Now()), gyroAngle,
+  return UpdateWithTime(wpi::math::MathSharedStore::GetTimestamp(), gyroAngle,
                         wheelPositions);
 }
 

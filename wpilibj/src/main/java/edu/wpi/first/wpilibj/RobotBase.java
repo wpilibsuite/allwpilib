@@ -16,6 +16,7 @@ import edu.wpi.first.math.MathSharedStore;
 import edu.wpi.first.math.MathUsageId;
 import edu.wpi.first.networktables.MultiSubscriber;
 import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.util.WPIUtilJNI;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.util.WPILibVersion;
@@ -127,6 +128,11 @@ public abstract class RobotBase implements AutoCloseable {
               default:
                 break;
             }
+          }
+
+          @Override
+          public double getTimestamp() {
+            return WPIUtilJNI.now() * 1.0e-6;
           }
         });
   }
@@ -394,6 +400,9 @@ public abstract class RobotBase implements AutoCloseable {
     if (!HAL.initialize(500, 0)) {
       throw new IllegalStateException("Failed to initialize. Terminating");
     }
+
+    // Force refresh DS data
+    DriverStation.refreshData();
 
     // Call a CameraServer JNI function to force OpenCV native library loading
     // Needed because all the OpenCV JNI functions don't have built in loading

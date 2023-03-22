@@ -257,8 +257,7 @@ void MecanumControllerCommand::Initialize() {
   m_prevSpeeds = m_kinematics.ToWheelSpeeds(
       frc::ChassisSpeeds{initialXVelocity, initialYVelocity, 0_rad_per_s});
 
-  m_timer.Reset();
-  m_timer.Start();
+  m_timer.Restart();
   if (m_usePID) {
     m_frontLeftController->Reset();
     m_rearLeftController->Reset();

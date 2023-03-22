@@ -4,6 +4,7 @@
 
 #include "UvStreamConnection3.h"
 
+#include <wpi/timestamp.h>
 #include <wpinet/uv/Stream.h>
 
 using namespace nt;
@@ -33,6 +34,7 @@ void UvStreamConnection3::Flush() {
   });
   m_buffers.clear();
   m_os.reset();
+  m_lastFlushTime = wpi::Now();
 }
 
 void UvStreamConnection3::Disconnect(std::string_view reason) {

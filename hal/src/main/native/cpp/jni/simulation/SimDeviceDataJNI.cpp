@@ -468,7 +468,11 @@ JNIEXPORT jstring JNICALL
 Java_edu_wpi_first_hal_simulation_SimDeviceDataJNI_getSimDeviceName
   (JNIEnv* env, jclass, jint handle)
 {
-  return MakeJString(env, HALSIM_GetSimDeviceName(handle));
+  const char* name = HALSIM_GetSimDeviceName(handle);
+  if (!name) {
+    return nullptr;
+  }
+  return MakeJString(env, name);
 }
 
 /*

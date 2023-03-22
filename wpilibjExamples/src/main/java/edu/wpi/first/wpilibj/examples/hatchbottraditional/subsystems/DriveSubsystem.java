@@ -4,6 +4,7 @@
 
 package edu.wpi.first.wpilibj.examples.hatchbottraditional.subsystems;
 
+import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.examples.hatchbottraditional.Constants.DriveConstants;
@@ -79,29 +80,19 @@ public class DriveSubsystem extends SubsystemBase {
   }
 
   /**
-   * Gets the left drive encoder.
-   *
-   * @return the left drive encoder
-   */
-  public Encoder getLeftEncoder() {
-    return m_leftEncoder;
-  }
-
-  /**
-   * Gets the right drive encoder.
-   *
-   * @return the right drive encoder
-   */
-  public Encoder getRightEncoder() {
-    return m_rightEncoder;
-  }
-
-  /**
    * Sets the max output of the drive. Useful for scaling the drive to drive more slowly.
    *
    * @param maxOutput the maximum output to which the drive will be constrained
    */
   public void setMaxOutput(double maxOutput) {
     m_drive.setMaxOutput(maxOutput);
+  }
+
+  @Override
+  public void initSendable(SendableBuilder builder) {
+    super.initSendable(builder);
+    // Publish encoder distances to telemetry.
+    builder.addDoubleProperty("leftDistance", m_leftEncoder::getDistance, null);
+    builder.addDoubleProperty("rightDistance", m_rightEncoder::getDistance, null);
   }
 }

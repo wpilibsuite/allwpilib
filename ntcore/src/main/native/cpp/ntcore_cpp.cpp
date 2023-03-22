@@ -685,6 +685,14 @@ void SetServerTeam(NT_Inst inst, unsigned int team, unsigned int port) {
   }
 }
 
+void Disconnect(NT_Inst inst) {
+  if (auto ii = InstanceImpl::GetTyped(inst, Handle::kInstance)) {
+    if (auto client = ii->GetClient()) {
+      client->Disconnect();
+    }
+  }
+}
+
 void StartDSClient(NT_Inst inst, unsigned int port) {
   if (auto ii = InstanceImpl::GetTyped(inst, Handle::kInstance)) {
     if (auto client = ii->GetClient()) {

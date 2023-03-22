@@ -59,6 +59,9 @@ class ParallelTcpConnector
   static std::shared_ptr<ParallelTcpConnector> Create(
       wpi::uv::Loop& loop, wpi::uv::Timer::Time reconnectRate,
       wpi::Logger& logger, std::function<void(wpi::uv::Tcp& tcp)> connected) {
+    if (loop.IsClosing()) {
+      return nullptr;
+    }
     return std::make_shared<ParallelTcpConnector>(
         loop, reconnectRate, logger, std::move(connected), private_init{});
   }

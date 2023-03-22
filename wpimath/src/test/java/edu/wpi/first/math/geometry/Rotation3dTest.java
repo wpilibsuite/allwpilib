@@ -24,17 +24,23 @@ class Rotation3dTest {
     final var xAxis = VecBuilder.fill(1.0, 0.0, 0.0);
     final var rot1 = new Rotation3d(xAxis, Math.PI / 3);
     final var rot2 = new Rotation3d(Math.PI / 3, 0.0, 0.0);
+    final var rvec1 = new Rotation3d(xAxis.times(Math.PI / 3));
     assertEquals(rot1, rot2);
+    assertEquals(rot1, rvec1);
 
     final var yAxis = VecBuilder.fill(0.0, 1.0, 0.0);
     final var rot3 = new Rotation3d(yAxis, Math.PI / 3);
     final var rot4 = new Rotation3d(0.0, Math.PI / 3, 0.0);
+    final var rvec2 = new Rotation3d(yAxis.times(Math.PI / 3));
     assertEquals(rot3, rot4);
+    assertEquals(rot3, rvec2);
 
     final var zAxis = VecBuilder.fill(0.0, 0.0, 1.0);
     final var rot5 = new Rotation3d(zAxis, Math.PI / 3);
     final var rot6 = new Rotation3d(0.0, 0.0, Math.PI / 3);
+    final var rvec3 = new Rotation3d(zAxis.times(Math.PI / 3));
     assertEquals(rot5, rot6);
+    assertEquals(rot5, rvec3);
   }
 
   @Test

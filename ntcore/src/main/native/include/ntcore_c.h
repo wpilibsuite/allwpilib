@@ -1148,6 +1148,14 @@ void NT_SetServerMulti(NT_Inst inst, size_t count, const char** server_names,
 void NT_SetServerTeam(NT_Inst inst, unsigned int team, unsigned int port);
 
 /**
+ * Disconnects the client if it's running and connected. This will automatically
+ * start reconnection attempts to the current server list.
+ *
+ * @param inst instance handle
+ */
+void NT_Disconnect(NT_Inst inst);
+
+/**
  * Starts requesting server address from Driver Station.
  * This connects to the Driver Station running on localhost to obtain the
  * server IP address.

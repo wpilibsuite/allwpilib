@@ -501,7 +501,8 @@ bool LSImpl::SetValue(TopicData* topic, const Value& value,
   if (topic->type != NT_UNASSIGNED && topic->type != value.type()) {
     return false;
   }
-  if (!topic->lastValue || value.time() >= topic->lastValue.time()) {
+  if (!topic->lastValue || topic->lastValue.time() == 0 ||
+      value.time() >= topic->lastValue.time()) {
     // TODO: notify option even if older value
     topic->type = value.type();
     topic->lastValue = value;
@@ -909,6 +910,7 @@ std::unique_ptr<EntryData> LSImpl::RemoveEntry(NT_Entry entryHandle) {
 
 MultiSubscriberData* LSImpl::AddMultiSubscriber(
     std::span<const std::string_view> prefixes, const PubSubOptions& options) {
+  DEBUG4("AddMultiSubscriber({})", fmt::join(prefixes, ","));
   auto subscriber = m_multiSubscribers.Add(m_inst, prefixes, options);
   // subscribe to any already existing topics
   for (auto&& topic : m_topics) {
@@ -920,6 +922,7 @@ MultiSubscriberData* LSImpl::AddMultiSubscriber(
     }
   }
   if (m_network) {
+    DEBUG4("-> NetworkSubscribe");
     m_network->Subscribe(subscriber->handle, subscriber->prefixes,
                          subscriber->options);
   }
@@ -1227,6 +1230,10 @@ PublisherData* LSImpl::PublishEntry(EntryData* entry, NT_Type type) {
   // create publisher
   entry->publisher = AddLocalPublisher(entry->topic, wpi::json::object(),
                                        entry->subscriber->config);
+  // exclude publisher if requested
+  if (entry->subscriber->config.excludeSelf) {
+    entry->subscriber->config.excludePublisher = entry->publisher->handle;
+  }
   return entry->publisher;
 }
 
@@ -1279,9 +1286,6 @@ bool LSImpl::SetEntryValue(NT_Handle pubentryHandle, const Value& value) {
   if (!publisher) {
     if (auto entry = m_entries.Get(pubentryHandle)) {
       publisher = PublishEntry(entry, value.type());
-      if (entry->subscriber->config.excludeSelf) {
-        entry->subscriber->config.excludePublisher = publisher->handle;
-      }
     }
     if (!publisher) {
       return false;

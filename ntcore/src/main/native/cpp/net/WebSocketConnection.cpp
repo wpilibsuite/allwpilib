@@ -7,6 +7,7 @@
 #include <span>
 
 #include <wpi/SpanExtras.h>
+#include <wpi/timestamp.h>
 #include <wpinet/WebSocket.h>
 
 using namespace nt;
@@ -23,6 +24,12 @@ WebSocketConnection::WebSocketConnection(wpi::WebSocket& ws)
 
 WebSocketConnection::~WebSocketConnection() {
   for (auto&& buf : m_buf_pool) {
+    buf.Deallocate();
+  }
+  for (auto&& buf : m_text_buffers) {
+    buf.Deallocate();
+  }
+  for (auto&& buf : m_binary_buffers) {
     buf.Deallocate();
   }
 }
@@ -50,6 +57,10 @@ void WebSocketConnection::Flush() {
       if (self->m_sendsActive > 0) {
         --self->m_sendsActive;
       }
+    } else {
+      for (auto&& buf : bufs) {
+        buf.Deallocate();
+      }
     }
   });
   m_frames.clear();
@@ -57,9 +68,11 @@ void WebSocketConnection::Flush() {
   m_binary_buffers.clear();
   m_text_pos = 0;
   m_binary_pos = 0;
+  m_lastFlushTime = wpi::Now();
 }
 
 void WebSocketConnection::Disconnect(std::string_view reason) {
+  m_reason = reason;
   m_ws.Close(1005, reason);
 }
 

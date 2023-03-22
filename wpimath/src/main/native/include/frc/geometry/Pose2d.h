@@ -4,6 +4,9 @@
 
 #pragma once
 
+#include <initializer_list>
+#include <span>
+
 #include <wpi/SymbolExports.h>
 
 #include "Transform2d.h"
@@ -175,6 +178,20 @@ class WPILIB_DLLEXPORT Pose2d {
    * @return The twist that maps this to end.
    */
   Twist2d Log(const Pose2d& end) const;
+
+  /**
+   * Returns the nearest Pose2d from a collection of poses
+   * @param poses The collection of poses.
+   * @return The nearest Pose2d from the collection.
+   */
+  Pose2d Nearest(std::span<const Pose2d> poses) const;
+
+  /**
+   * Returns the nearest Pose2d from a collection of poses
+   * @param poses The collection of poses.
+   * @return The nearest Pose2d from the collection.
+   */
+  Pose2d Nearest(std::initializer_list<Pose2d> poses) const;
 
  private:
   Translation2d m_translation;

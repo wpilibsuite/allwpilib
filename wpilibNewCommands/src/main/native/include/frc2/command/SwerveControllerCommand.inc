@@ -150,8 +150,7 @@ void SwerveControllerCommand<NumModules>::Initialize() {
       return m_trajectory.States().back().pose.Rotation();
     };
   }
-  m_timer.Reset();
-  m_timer.Start();
+  m_timer.Restart();
 }
 
 template <size_t NumModules>

@@ -143,8 +143,7 @@ public class RamseteCommand extends CommandBase {
                 initialState.velocityMetersPerSecond,
                 0,
                 initialState.curvatureRadPerMeter * initialState.velocityMetersPerSecond));
-    m_timer.reset();
-    m_timer.start();
+    m_timer.restart();
     if (m_usePID) {
       m_leftController.reset();
       m_rightController.reset();

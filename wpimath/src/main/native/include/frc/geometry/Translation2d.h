@@ -4,6 +4,9 @@
 
 #pragma once
 
+#include <initializer_list>
+#include <span>
+
 #include <wpi/SymbolExports.h>
 
 #include "Rotation2d.h"
@@ -169,6 +172,21 @@ class WPILIB_DLLEXPORT Translation2d {
    * @return Whether the two objects are equal.
    */
   bool operator==(const Translation2d& other) const;
+
+  /**
+   * Returns the nearest Translation2d from a collection of translations
+   * @param translations The collection of translations.
+   * @return The nearest Translation2d from the collection.
+   */
+  Translation2d Nearest(std::span<const Translation2d> translations) const;
+
+  /**
+   * Returns the nearest Translation2d from a collection of translations
+   * @param translations The collection of translations.
+   * @return The nearest Translation2d from the collection.
+   */
+  Translation2d Nearest(
+      std::initializer_list<Translation2d> translations) const;
 
  private:
   units::meter_t m_x = 0_m;

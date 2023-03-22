@@ -26,7 +26,14 @@ class DutyCycleEncoderSim {
   explicit DutyCycleEncoderSim(const DutyCycleEncoder& encoder);
 
   /**
-   * Set the position tin turns.
+   * Constructs from a digital input channel.
+   *
+   * @param channel digital input channel
+   */
+  explicit DutyCycleEncoderSim(int channel);
+
+  /**
+   * Set the position in turns.
    *
    * @param turns The position.
    */

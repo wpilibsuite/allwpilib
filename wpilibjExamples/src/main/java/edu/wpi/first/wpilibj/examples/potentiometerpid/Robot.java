@@ -8,7 +8,6 @@ import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj.AnalogPotentiometer;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.TimedRobot;
-import edu.wpi.first.wpilibj.motorcontrol.MotorController;
 import edu.wpi.first.wpilibj.motorcontrol.PWMSparkMax;
 
 /**
@@ -18,7 +17,7 @@ import edu.wpi.first.wpilibj.motorcontrol.PWMSparkMax;
 public class Robot extends TimedRobot {
   static final int kPotChannel = 1;
   static final int kMotorChannel = 7;
-  static final int kJoystickChannel = 0;
+  static final int kJoystickChannel = 3;
 
   // The elevator can move 1.5 meters from top to bottom
   static final double kFullHeightMeters = 1.5;
@@ -37,7 +36,7 @@ public class Robot extends TimedRobot {
   // Scaling is handled internally
   private final AnalogPotentiometer m_potentiometer =
       new AnalogPotentiometer(kPotChannel, kFullHeightMeters);
-  private final MotorController m_elevatorMotor = new PWMSparkMax(kMotorChannel);
+  private final PWMSparkMax m_elevatorMotor = new PWMSparkMax(kMotorChannel);
   private final Joystick m_joystick = new Joystick(kJoystickChannel);
 
   private int m_index;
@@ -64,7 +63,17 @@ public class Robot extends TimedRobot {
     if (m_joystick.getTriggerPressed()) {
       // index of the elevator setpoint wraps around.
       m_index = (m_index + 1) % kSetpointsMeters.length;
+      System.out.println("m_index = " + m_index);
       m_pidController.setSetpoint(kSetpointsMeters[m_index]);
     }
+  }
+
+  @Override
+  public void close() {
+    m_elevatorMotor.close();
+    m_potentiometer.close();
+    m_pidController.close();
+    m_index = 0;
+    super.close();
   }
 }

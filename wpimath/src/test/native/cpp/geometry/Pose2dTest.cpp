@@ -3,6 +3,7 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #include <cmath>
+#include <cstdlib>
 
 #include "frc/geometry/Pose2d.h"
 #include "gtest/gtest.h"
@@ -52,6 +53,73 @@ TEST(Pose2dTest, Minus) {
   EXPECT_DOUBLE_EQ(5.0 * std::sqrt(2.0), transform.X().value());
   EXPECT_NEAR(0.0, transform.Y().value(), 1e-9);
   EXPECT_DOUBLE_EQ(0.0, transform.Rotation().Degrees().value());
+}
+
+TEST(Pose2dTest, Nearest) {
+  const Pose2d origin{0_m, 0_m, 0_deg};
+
+  const Pose2d pose1{Translation2d{1_m, Rotation2d{45_deg}}, 0_deg};
+  const Pose2d pose2{Translation2d{2_m, Rotation2d{90_deg}}, 0_deg};
+  const Pose2d pose3{Translation2d{3_m, Rotation2d{135_deg}}, 0_deg};
+  const Pose2d pose4{Translation2d{4_m, Rotation2d{180_deg}}, 0_deg};
+  const Pose2d pose5{Translation2d{5_m, Rotation2d{270_deg}}, 0_deg};
+
+  EXPECT_DOUBLE_EQ(pose3.X().value(),
+                   origin.Nearest({pose5, pose3, pose4}).X().value());
+  EXPECT_DOUBLE_EQ(pose3.Y().value(),
+                   origin.Nearest({pose5, pose3, pose4}).Y().value());
+
+  EXPECT_DOUBLE_EQ(pose1.X().value(),
+                   origin.Nearest({pose1, pose2, pose3}).X().value());
+  EXPECT_DOUBLE_EQ(pose1.Y().value(),
+                   origin.Nearest({pose1, pose2, pose3}).Y().value());
+
+  EXPECT_DOUBLE_EQ(pose2.X().value(),
+                   origin.Nearest({pose4, pose2, pose3}).X().value());
+  EXPECT_DOUBLE_EQ(pose2.Y().value(),
+                   origin.Nearest({pose4, pose2, pose3}).Y().value());
+
+  // Rotation component sort (when distance is the same)
+  // Use the same translation because using different angles at the same
+  // distance can cause rounding error.
+  const Translation2d translation{1_m, Rotation2d{0_deg}};
+
+  const Pose2d poseA{translation, 0_deg};
+  const Pose2d poseB{translation, Rotation2d{30_deg}};
+  const Pose2d poseC{translation, Rotation2d{120_deg}};
+  const Pose2d poseD{translation, Rotation2d{90_deg}};
+  const Pose2d poseE{translation, Rotation2d{-180_deg}};
+
+  EXPECT_DOUBLE_EQ(poseA.Rotation().Degrees().value(),
+                   Pose2d(0_m, 0_m, Rotation2d{360_deg})
+                       .Nearest({poseA, poseB, poseD})
+                       .Rotation()
+                       .Degrees()
+                       .value());
+  EXPECT_DOUBLE_EQ(poseB.Rotation().Degrees().value(),
+                   Pose2d(0_m, 0_m, Rotation2d{-335_deg})
+                       .Nearest({poseB, poseC, poseD})
+                       .Rotation()
+                       .Degrees()
+                       .value());
+  EXPECT_DOUBLE_EQ(poseC.Rotation().Degrees().value(),
+                   Pose2d(0_m, 0_m, Rotation2d{-120_deg})
+                       .Nearest({poseB, poseC, poseD})
+                       .Rotation()
+                       .Degrees()
+                       .value());
+  EXPECT_DOUBLE_EQ(poseD.Rotation().Degrees().value(),
+                   Pose2d(0_m, 0_m, Rotation2d{85_deg})
+                       .Nearest({poseA, poseC, poseD})
+                       .Rotation()
+                       .Degrees()
+                       .value());
+  EXPECT_DOUBLE_EQ(poseE.Rotation().Degrees().value(),
+                   Pose2d(0_m, 0_m, Rotation2d{170_deg})
+                       .Nearest({poseA, poseD, poseE})
+                       .Rotation()
+                       .Degrees()
+                       .value());
 }
 
 TEST(Pose2dTest, Constexpr) {

@@ -77,6 +77,14 @@ class Timer {
   void Start();
 
   /**
+   * Restart the timer by stopping the timer, if it is not already stopped,
+   * resetting the accumulated time, then starting the timer again. If you
+   * want an event to periodically reoccur at some time interval from the
+   * start time, consider using AdvanceIfElapsed() instead.
+   */
+  void Restart();
+
+  /**
    * Stop the timer.
    *
    * This computes the time as of now and clears the running flag, causing all

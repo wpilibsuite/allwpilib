@@ -283,9 +283,9 @@ class XboxController : public GenericHID {
   BooleanEvent Y(EventLoop* loop) const;
 
   /**
-   * Whether the Y button was released since the last check.
+   * Read the value of the back button on the controller.
    *
-   * @return Whether the button was released since the last check.
+   * @return The state of the button.
    */
   bool GetBackButton() const;
 
@@ -359,7 +359,7 @@ class XboxController : public GenericHID {
    * Constructs an event instance around the axis value of the left trigger.
    * The returned trigger will be true when the axis value is greater than 0.5.
    * @param loop the event loop instance to attach the event to.
-   * @return an event instance that is true when the right trigger's axis
+   * @return an event instance that is true when the left trigger's axis
    * exceeds 0.5, attached to the given event loop
    */
   BooleanEvent LeftTrigger(EventLoop* loop) const;

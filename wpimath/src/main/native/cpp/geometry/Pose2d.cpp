@@ -8,6 +8,8 @@
 
 #include <wpi/json.h>
 
+#include "frc/MathUtil.h"
+
 using namespace frc;
 
 Transform2d Pose2d::operator-(const Pose2d& other) const {
@@ -65,6 +67,36 @@ Twist2d Pose2d::Log(const Pose2d& end) const {
       std::hypot(halfThetaByTanOfHalfDtheta, halfDtheta);
 
   return {translationPart.X(), translationPart.Y(), units::radian_t{dtheta}};
+}
+
+Pose2d Pose2d::Nearest(std::span<const Pose2d> poses) const {
+  return *std::min_element(
+      poses.begin(), poses.end(), [this](const Pose2d& a, const Pose2d& b) {
+        auto aDistance = this->Translation().Distance(a.Translation());
+        auto bDistance = this->Translation().Distance(b.Translation());
+
+        // If the distances are equal sort by difference in rotation
+        if (aDistance == bDistance) {
+          return std::abs((this->Rotation() - a.Rotation()).Radians().value()) <
+                 std::abs((this->Rotation() - b.Rotation()).Radians().value());
+        }
+        return aDistance < bDistance;
+      });
+}
+
+Pose2d Pose2d::Nearest(std::initializer_list<Pose2d> poses) const {
+  return *std::min_element(
+      poses.begin(), poses.end(), [this](const Pose2d& a, const Pose2d& b) {
+        auto aDistance = this->Translation().Distance(a.Translation());
+        auto bDistance = this->Translation().Distance(b.Translation());
+
+        // If the distances are equal sort by difference in rotation
+        if (aDistance == bDistance) {
+          return std::abs((this->Rotation() - a.Rotation()).Radians().value()) <
+                 std::abs((this->Rotation() - b.Rotation()).Radians().value());
+        }
+        return aDistance < bDistance;
+      });
 }
 
 void frc::to_json(wpi::json& json, const Pose2d& pose) {

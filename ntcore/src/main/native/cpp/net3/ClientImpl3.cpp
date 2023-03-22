@@ -13,6 +13,7 @@
 #include <wpi/DenseMap.h>
 #include <wpi/StringMap.h>
 #include <wpi/json.h>
+#include <wpi/timestamp.h>
 
 #include "Handle.h"
 #include "Log.h"
@@ -31,9 +32,9 @@ using namespace nt::net3;
 
 static constexpr uint32_t kMinPeriodMs = 5;
 
-// maximum number of times the wire can be not ready to send another
+// maximum amount of time the wire can be not ready to send another
 // transmission before we close the connection
-static constexpr int kWireMaxNotReady = 10;
+static constexpr uint32_t kWireMaxNotReadyUs = 1000000;
 
 namespace {
 
@@ -93,7 +94,7 @@ class CImpl : public MessageHandler3 {
   void HandleLocal(std::span<const net::ClientMessage> msgs);
   void SendPeriodic(uint64_t curTimeMs, bool initial, bool flush);
   void SendValue(Writer& out, Entry* entry, const Value& value);
-  bool CheckNetworkReady();
+  bool CheckNetworkReady(uint64_t curTimeMs);
 
   // Outgoing handlers
   void Publish(NT_Publisher pubHandle, NT_Topic topicHandle,
@@ -142,7 +143,6 @@ class CImpl : public MessageHandler3 {
   uint32_t m_periodMs{kKeepAliveIntervalMs + 10};
   uint64_t m_lastSendMs{0};
   uint64_t m_nextKeepAliveTimeMs;
-  int m_notReadyCount{0};
 
   // indexed by publisher index
   std::vector<std::unique_ptr<PublisherData>> m_publishers;
@@ -235,7 +235,7 @@ void CImpl::SendPeriodic(uint64_t curTimeMs, bool initial, bool flush) {
 
   // send keep-alives
   if (curTimeMs >= m_nextKeepAliveTimeMs) {
-    if (!CheckNetworkReady()) {
+    if (!CheckNetworkReady(curTimeMs)) {
       return;
     }
     DEBUG4("Sending keep alive");
@@ -246,7 +246,7 @@ void CImpl::SendPeriodic(uint64_t curTimeMs, bool initial, bool flush) {
 
   // send any stored-up flags updates
   if (!m_outgoingFlags.empty()) {
-    if (!CheckNetworkReady()) {
+    if (!CheckNetworkReady(curTimeMs)) {
       return;
     }
     for (auto&& p : m_outgoingFlags) {
@@ -261,7 +261,7 @@ void CImpl::SendPeriodic(uint64_t curTimeMs, bool initial, bool flush) {
     if (pub && !pub->outValues.empty() &&
         (flush || curTimeMs >= pub->nextSendMs)) {
       if (!checkedNetwork) {
-        if (!CheckNetworkReady()) {
+        if (!CheckNetworkReady(curTimeMs)) {
           return;
         }
         checkedNetwork = true;
@@ -302,15 +302,15 @@ void CImpl::SendValue(Writer& out, Entry* entry, const Value& value) {
   }
 }
 
-bool CImpl::CheckNetworkReady() {
+bool CImpl::CheckNetworkReady(uint64_t curTimeMs) {
   if (!m_wire.Ready()) {
-    ++m_notReadyCount;
-    if (m_notReadyCount > kWireMaxNotReady) {
+    uint64_t lastFlushTime = m_wire.GetLastFlushTime();
+    uint64_t now = wpi::Now();
+    if (lastFlushTime != 0 && now > (lastFlushTime + kWireMaxNotReadyUs)) {
       m_wire.Disconnect("transmit stalled");
     }
     return false;
   }
-  m_notReadyCount = 0;
   return true;
 }
 

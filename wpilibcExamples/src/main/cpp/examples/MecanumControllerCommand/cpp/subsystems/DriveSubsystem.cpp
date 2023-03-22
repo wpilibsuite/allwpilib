@@ -50,9 +50,9 @@ void DriveSubsystem::Periodic() {
 void DriveSubsystem::Drive(double xSpeed, double ySpeed, double rot,
                            bool fieldRelative) {
   if (fieldRelative) {
-    m_drive.DriveCartesian(ySpeed, xSpeed, rot, m_gyro.GetRotation2d());
+    m_drive.DriveCartesian(xSpeed, ySpeed, rot, m_gyro.GetRotation2d());
   } else {
-    m_drive.DriveCartesian(ySpeed, xSpeed, rot);
+    m_drive.DriveCartesian(xSpeed, ySpeed, rot);
   }
 }
 

@@ -26,6 +26,8 @@ class WireConnection3 {
 
   virtual void Flush() = 0;
 
+  virtual uint64_t GetLastFlushTime() const = 0;  // in microseconds
+
   virtual void Disconnect(std::string_view reason) = 0;
 
  protected:

@@ -9,6 +9,9 @@
 namespace wpi::uv {
 
 std::shared_ptr<Poll> Poll::Create(Loop& loop, int fd) {
+  if (loop.IsClosing()) {
+    return nullptr;
+  }
   auto h = std::make_shared<Poll>(private_init{});
   int err = uv_poll_init(loop.GetRaw(), h->GetRaw(), fd);
   if (err < 0) {
@@ -20,6 +23,9 @@ std::shared_ptr<Poll> Poll::Create(Loop& loop, int fd) {
 }
 
 std::shared_ptr<Poll> Poll::CreateSocket(Loop& loop, uv_os_sock_t sock) {
+  if (loop.IsClosing()) {
+    return nullptr;
+  }
   auto h = std::make_shared<Poll>(private_init{});
   int err = uv_poll_init_socket(loop.GetRaw(), h->GetRaw(), sock);
   if (err < 0) {
@@ -31,7 +37,7 @@ std::shared_ptr<Poll> Poll::CreateSocket(Loop& loop, uv_os_sock_t sock) {
 }
 
 void Poll::Reuse(int fd, std::function<void()> callback) {
-  if (IsClosing()) {
+  if (IsLoopClosing() || IsClosing()) {
     return;
   }
   if (!m_reuseData) {
@@ -56,7 +62,7 @@ void Poll::Reuse(int fd, std::function<void()> callback) {
 }
 
 void Poll::ReuseSocket(uv_os_sock_t sock, std::function<void()> callback) {
-  if (IsClosing()) {
+  if (IsLoopClosing() || IsClosing()) {
     return;
   }
   if (!m_reuseData) {
@@ -81,6 +87,9 @@ void Poll::ReuseSocket(uv_os_sock_t sock, std::function<void()> callback) {
 }
 
 void Poll::Start(int events) {
+  if (IsLoopClosing()) {
+    return;
+  }
   Invoke(&uv_poll_start, GetRaw(), events,
          [](uv_poll_t* handle, int status, int events) {
            Poll& h = *static_cast<Poll*>(handle->data);

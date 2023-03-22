@@ -84,6 +84,12 @@ class Subsystem {
   void SetDefaultCommand(CommandPtr&& defaultCommand);
 
   /**
+   * Removes the default command for the subsystem.  This will not cancel the
+   * default command if it is currently running.
+   */
+  void RemoveDefaultCommand();
+
+  /**
    * Gets the default command for this subsystem.  Returns null if no default
    * command is currently associated with the subsystem.
    *

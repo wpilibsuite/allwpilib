@@ -52,6 +52,7 @@ include 'docs'
 include 'msvcruntime'
 include 'ntcoreffi'
 include 'apriltag'
+include 'processstarter'
 
 buildCache {
     def cred = {

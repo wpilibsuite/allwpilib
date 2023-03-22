@@ -48,9 +48,9 @@ using namespace mpack;
 
 static constexpr uint32_t kMinPeriodMs = 5;
 
-// maximum number of times the wire can be not ready to send another
+// maximum amount of time the wire can be not ready to send another
 // transmission before we close the connection
-static constexpr int kWireMaxNotReady = 10;
+static constexpr uint32_t kWireMaxNotReadyUs = 1000000;
 
 namespace {
 
@@ -78,12 +78,10 @@ class SImpl;
 
 class ClientData {
  public:
-  ClientData(std::string_view originalName, std::string_view name,
-             std::string_view connInfo, bool local,
+  ClientData(std::string_view name, std::string_view connInfo, bool local,
              ServerImpl::SetPeriodicFunc setPeriodic, SImpl& server, int id,
              wpi::Logger& logger)
-      : m_originalName{originalName},
-        m_name{name},
+      : m_name{name},
         m_connInfo{connInfo},
         m_local{local},
         m_setPeriodic{std::move(setPeriodic)},
@@ -114,12 +112,10 @@ class ClientData {
       std::string_view name, bool special,
       wpi::SmallVectorImpl<SubscriberData*>& buf);
 
-  std::string_view GetOriginalName() const { return m_originalName; }
   std::string_view GetName() const { return m_name; }
   int GetId() const { return m_id; }
 
  protected:
-  std::string m_originalName;
   std::string m_name;
   std::string m_connInfo;
   bool m_local;  // local to machine
@@ -143,12 +139,10 @@ class ClientData {
 
 class ClientData4Base : public ClientData, protected ClientMessageHandler {
  public:
-  ClientData4Base(std::string_view originalName, std::string_view name,
-                  std::string_view connInfo, bool local,
+  ClientData4Base(std::string_view name, std::string_view connInfo, bool local,
                   ServerImpl::SetPeriodicFunc setPeriodic, SImpl& server,
                   int id, wpi::Logger& logger)
-      : ClientData{originalName, name,   connInfo, local,
-                   setPeriodic,  server, id,       logger} {}
+      : ClientData{name, connInfo, local, setPeriodic, server, id, logger} {}
 
  protected:
   // ClientMessageHandler interface
@@ -170,8 +164,7 @@ class ClientData4Base : public ClientData, protected ClientMessageHandler {
 class ClientDataLocal final : public ClientData4Base {
  public:
   ClientDataLocal(SImpl& server, int id, wpi::Logger& logger)
-      : ClientData4Base{"", "", "", true, [](uint32_t) {}, server, id, logger} {
-  }
+      : ClientData4Base{"", "", true, [](uint32_t) {}, server, id, logger} {}
 
   void ProcessIncomingText(std::string_view data) final {}
   void ProcessIncomingBinary(std::span<const uint8_t> data) final {}
@@ -189,12 +182,10 @@ class ClientDataLocal final : public ClientData4Base {
 
 class ClientData4 final : public ClientData4Base {
  public:
-  ClientData4(std::string_view originalName, std::string_view name,
-              std::string_view connInfo, bool local, WireConnection& wire,
-              ServerImpl::SetPeriodicFunc setPeriodic, SImpl& server, int id,
-              wpi::Logger& logger)
-      : ClientData4Base{originalName, name,   connInfo, local,
-                        setPeriodic,  server, id,       logger},
+  ClientData4(std::string_view name, std::string_view connInfo, bool local,
+              WireConnection& wire, ServerImpl::SetPeriodicFunc setPeriodic,
+              SImpl& server, int id, wpi::Logger& logger)
+      : ClientData4Base{name, connInfo, local, setPeriodic, server, id, logger},
         m_wire{wire} {}
 
   void ProcessIncomingText(std::string_view data) final;
@@ -214,7 +205,6 @@ class ClientData4 final : public ClientData4Base {
 
  private:
   std::vector<ServerMessage> m_outgoing;
-  int m_notReadyCount{0};
 
   bool WriteBinary(int64_t id, int64_t time, const Value& value) {
     return WireEncodeBinary(SendBinary().Add(), id, time, value);
@@ -247,7 +237,7 @@ class ClientData3 final : public ClientData, private net3::MessageHandler3 {
               net3::WireConnection3& wire, ServerImpl::Connected3Func connected,
               ServerImpl::SetPeriodicFunc setPeriodic, SImpl& server, int id,
               wpi::Logger& logger)
-      : ClientData{"", "", connInfo, local, setPeriodic, server, id, logger},
+      : ClientData{"", connInfo, local, setPeriodic, server, id, logger},
         m_connected{std::move(connected)},
         m_wire{wire},
         m_decoder{*this} {}
@@ -293,7 +283,6 @@ class ClientData3 final : public ClientData, private net3::MessageHandler3 {
 
   std::vector<net3::Message3> m_outgoing;
   int64_t m_nextPubUid{1};
-  int m_notReadyCount{0};
 
   struct TopicData3 {
     explicit TopicData3(TopicData* topic) { UpdateFlags(topic); }
@@ -601,13 +590,17 @@ void ClientData4Base::ClientSetProperties(std::string_view name,
   auto topicIt = m_server.m_nameTopics.find(name);
   if (topicIt == m_server.m_nameTopics.end() ||
       !topicIt->second->IsPublished()) {
-    DEBUG3("ignored SetProperties from {} on non-existent topic '{}'", m_id,
-           name);
+    WARNING(
+        "server ignoring SetProperties({}) from client {} on unpublished topic "
+        "'{}'; publish or set a value first",
+        update.dump(), m_id, name);
     return;  // nothing to do
   }
   auto topic = topicIt->second;
   if (topic->special) {
-    DEBUG3("ignored SetProperties from {} on meta topic '{}'", m_id, name);
+    WARNING(
+        "server ignoring SetProperties({}) from client {} on meta topic '{}'",
+        update.dump(), m_id, name);
     return;  // nothing to do
   }
   m_server.SetProperties(nullptr, topic, update);
@@ -648,6 +641,11 @@ void ClientData4Base::ClientSubscribe(int64_t subuid,
   }
 
   // see if this immediately subscribes to any topics
+  // for transmit efficiency, we want to batch announcements and values, so
+  // send announcements in first loop and remember what we want to send in
+  // second loop.
+  std::vector<TopicData*> dataToSend;
+  dataToSend.reserve(m_server.m_topics.size());
   for (auto&& topic : m_server.m_topics) {
     bool removed = false;
     if (replace) {
@@ -656,10 +654,13 @@ void ClientData4Base::ClientSubscribe(int64_t subuid,
 
     // is client already subscribed?
     bool wasSubscribed = false;
+    bool wasSubscribedValue = false;
     for (auto subscriber : topic->subscribers) {
       if (subscriber->client == this) {
         wasSubscribed = true;
-        break;
+        if (!subscriber->options.topicsOnly) {
+          wasSubscribedValue = true;
+        }
       }
     }
 
@@ -673,17 +674,22 @@ void ClientData4Base::ClientSubscribe(int64_t subuid,
       m_server.UpdateMetaTopicSub(topic.get());
     }
 
-    if (!wasSubscribed && added && !removed) {
-      // announce topic to client
+    // announce topic to client if not previously announced
+    if (added && !removed && !wasSubscribed) {
       DEBUG4("client {}: announce {}", m_id, topic->name);
       SendAnnounce(topic.get(), std::nullopt);
-
-      // send last value
-      if (!sub->options.topicsOnly && topic->lastValue) {
-        DEBUG4("send last value for {} to client {}", topic->name, m_id);
-        SendValue(topic.get(), topic->lastValue, kSendAll);
-      }
     }
+
+    // send last value
+    if (added && !sub->options.topicsOnly && !wasSubscribedValue &&
+        topic->lastValue) {
+      dataToSend.emplace_back(topic.get());
+    }
+  }
+
+  for (auto topic : dataToSend) {
+    DEBUG4("send last value for {} to client {}", topic->name, m_id);
+    SendValue(topic, topic->lastValue, kSendAll);
   }
 
   // update meta data
@@ -937,13 +943,13 @@ void ClientData4::SendOutgoing(uint64_t curTimeMs) {
   }
 
   if (!m_wire.Ready()) {
-    ++m_notReadyCount;
-    if (m_notReadyCount > kWireMaxNotReady) {
+    uint64_t lastFlushTime = m_wire.GetLastFlushTime();
+    uint64_t now = wpi::Now();
+    if (lastFlushTime != 0 && now > (lastFlushTime + kWireMaxNotReadyUs)) {
       m_wire.Disconnect("transmit stalled");
     }
     return;
   }
-  m_notReadyCount = 0;
 
   for (auto&& msg : m_outgoing) {
     if (auto m = std::get_if<ServerValueMsg>(&msg.contents)) {
@@ -1110,13 +1116,13 @@ void ClientData3::SendOutgoing(uint64_t curTimeMs) {
   }
 
   if (!m_wire.Ready()) {
-    ++m_notReadyCount;
-    if (m_notReadyCount > kWireMaxNotReady) {
+    uint64_t lastFlushTime = m_wire.GetLastFlushTime();
+    uint64_t now = wpi::Now();
+    if (lastFlushTime != 0 && now > (lastFlushTime + kWireMaxNotReadyUs)) {
       m_wire.Disconnect("transmit stalled");
     }
     return;
   }
-  m_notReadyCount = 0;
 
   auto out = m_wire.Send();
   for (auto&& msg : m_outgoing) {
@@ -1501,39 +1507,29 @@ SImpl::SImpl(wpi::Logger& logger) : m_logger{logger} {
 std::pair<std::string, int> SImpl::AddClient(
     std::string_view name, std::string_view connInfo, bool local,
     WireConnection& wire, ServerImpl::SetPeriodicFunc setPeriodic) {
-  // strip anything after @ in the name
-  name = wpi::split(name, '@').first;
   if (name.empty()) {
     name = "NT4";
   }
   size_t index = m_clients.size();
-  // find an empty slot and check for duplicates
+  // find an empty slot
   // just do a linear search as number of clients is typically small (<10)
-  int duplicateName = 0;
   for (size_t i = 0, end = index; i < end; ++i) {
-    auto& clientData = m_clients[i];
-    if (clientData && clientData->GetOriginalName() == name) {
-      ++duplicateName;
-    } else if (!clientData && index == end) {
+    if (!m_clients[i]) {
       index = i;
+      break;
     }
   }
   if (index == m_clients.size()) {
     m_clients.emplace_back();
   }
 
-  // if duplicate name, de-duplicate
-  std::string dedupName;
-  if (duplicateName > 0) {
-    dedupName = fmt::format("{}@{}", name, duplicateName);
-  } else {
-    dedupName = name;
-  }
+  // ensure name is unique by suffixing index
+  std::string dedupName = fmt::format("{}@{}", name, index);
 
   auto& clientData = m_clients[index];
-  clientData = std::make_unique<ClientData4>(name, dedupName, connInfo, local,
-                                             wire, std::move(setPeriodic),
-                                             *this, index, m_logger);
+  clientData = std::make_unique<ClientData4>(dedupName, connInfo, local, wire,
+                                             std::move(setPeriodic), *this,
+                                             index, m_logger);
 
   // create client meta topics
   clientData->m_metaPub =
@@ -2125,7 +2121,7 @@ void SImpl::SetFlags(ClientData* client, TopicData* topic, unsigned int flags) {
 void SImpl::SetValue(ClientData* client, TopicData* topic, const Value& value) {
   // update retained value if from same client or timestamp newer
   if (!topic->lastValue || topic->lastValueClient == client ||
-      value.time() >= topic->lastValue.time()) {
+      topic->lastValue.time() == 0 || value.time() >= topic->lastValue.time()) {
     DEBUG4("updating '{}' last value (time was {} is {})", topic->name,
            topic->lastValue.time(), value.time());
     topic->lastValue = value;
@@ -2287,9 +2283,10 @@ void ServerImpl::SendControl(uint64_t curTimeMs) {
 }
 
 void ServerImpl::SendValues(int clientId, uint64_t curTimeMs) {
-  auto client = m_impl->m_clients[clientId].get();
-  client->SendOutgoing(curTimeMs);
-  client->Flush();
+  if (auto client = m_impl->m_clients[clientId].get()) {
+    client->SendOutgoing(curTimeMs);
+    client->Flush();
+  }
 }
 
 void ServerImpl::HandleLocal(std::span<const ClientMessage> msgs) {

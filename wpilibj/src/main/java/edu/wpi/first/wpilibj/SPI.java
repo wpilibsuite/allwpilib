@@ -16,9 +16,9 @@ import java.nio.IntBuffer;
 public class SPI implements AutoCloseable {
   public enum Port {
     kOnboardCS0(SPIJNI.ONBOARD_CS0_PORT),
-    kOnboardCS1(SPIJNI.ONBOARD_CS0_PORT),
-    kOnboardCS2(SPIJNI.ONBOARD_CS0_PORT),
-    kOnboardCS3(SPIJNI.ONBOARD_CS0_PORT),
+    kOnboardCS1(SPIJNI.ONBOARD_CS1_PORT),
+    kOnboardCS2(SPIJNI.ONBOARD_CS2_PORT),
+    kOnboardCS3(SPIJNI.ONBOARD_CS3_PORT),
     kMXP(SPIJNI.MXP_PORT);
 
     public final int value;

@@ -227,6 +227,9 @@ class DriverStation final {
   /**
    * Returns the game specific message provided by the FMS.
    *
+   * If the FMS is not connected, it is set from the game data setting on the
+   * driver station.
+   *
    * @return A string containing the game specific message.
    */
   static std::string GetGameSpecificMessage();
@@ -262,7 +265,10 @@ class DriverStation final {
   static int GetReplayNumber();
 
   /**
-   * Return the alliance that the driver station says it is on.
+   * Return the alliance that the driver station says it is on from the FMS.
+   *
+   * If the FMS is not connected, it is set from the team alliance setting on
+   * the driver station.
    *
    * This could return kRed or kBlue.
    *
@@ -271,7 +277,10 @@ class DriverStation final {
   static Alliance GetAlliance();
 
   /**
-   * Return the driver station location on the field.
+   * Return the driver station location from the FMS.
+   *
+   * If the FMS is not connected, it is set from the team alliance setting on
+   * the driver station.
    *
    * This could return 1, 2, or 3.
    *

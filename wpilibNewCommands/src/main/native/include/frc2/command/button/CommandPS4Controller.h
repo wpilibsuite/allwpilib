@@ -10,7 +10,7 @@
 
 namespace frc2 {
 /**
- * A subclass of {@link PS4Controller} with {@link Trigger} factories for
+ * A version of {@link PS4Controller} with {@link Trigger} factories for
  * command-based.
  *
  * @see PS4Controller

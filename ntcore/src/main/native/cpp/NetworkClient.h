@@ -38,6 +38,7 @@ class NetworkClient final : public INetworkClient {
 
   void SetServers(
       std::span<const std::pair<std::string, unsigned int>> servers) final;
+  void Disconnect() final;
 
   void StartDSClient(unsigned int port) final;
   void StopDSClient() final;
@@ -59,6 +60,7 @@ class NetworkClient3 final : public INetworkClient {
 
   void SetServers(
       std::span<const std::pair<std::string, unsigned int>> servers) final;
+  void Disconnect() final;
 
   void StartDSClient(unsigned int port) final;
   void StopDSClient() final;

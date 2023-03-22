@@ -4,6 +4,8 @@
 
 #include <cmath>
 
+#include <wpi/array.h>
+
 #include "frc/geometry/Pose3d.h"
 #include "gtest/gtest.h"
 
@@ -94,4 +96,54 @@ TEST(Pose3dTest, ToPose2d) {
   Pose2d expected{1_m, 2_m, 40_deg};
 
   EXPECT_EQ(expected, pose.ToPose2d());
+}
+
+TEST(Pose3dTest, ComplexTwists) {
+  wpi::array<Pose3d, 5> initial_poses{
+      Pose3d{0.698303_m, -0.959096_m, 0.271076_m,
+             Rotation3d{Quaternion{0.86403, -0.076866, 0.147234, 0.475254}}},
+      Pose3d{0.634892_m, -0.765209_m, 0.117543_m,
+             Rotation3d{Quaternion{0.84987, -0.070829, 0.162097, 0.496415}}},
+      Pose3d{0.584827_m, -0.590303_m, -0.02557_m,
+             Rotation3d{Quaternion{0.832743, -0.041991, 0.202188, 0.513708}}},
+      Pose3d{0.505038_m, -0.451479_m, -0.112835_m,
+             Rotation3d{Quaternion{0.816515, -0.002673, 0.226182, 0.531166}}},
+      Pose3d{0.428178_m, -0.329692_m, -0.189707_m,
+             Rotation3d{Quaternion{0.807886, 0.029298, 0.257788, 0.529157}}},
+  };
+
+  wpi::array<Pose3d, 5> final_poses{
+      Pose3d{-0.230448_m, -0.511957_m, 0.198406_m,
+             Rotation3d{Quaternion{0.753984, 0.347016, 0.409105, 0.379106}}},
+      Pose3d{-0.088932_m, -0.343253_m, 0.095018_m,
+             Rotation3d{Quaternion{0.638738, 0.413016, 0.536281, 0.365833}}},
+      Pose3d{-0.107908_m, -0.317552_m, 0.133946_m,
+             Rotation3d{Quaternion{0.653444, 0.417069, 0.465505, 0.427046}}},
+      Pose3d{-0.123383_m, -0.156411_m, -0.047435_m,
+             Rotation3d{Quaternion{0.652983, 0.40644, 0.431566, 0.47135}}},
+      Pose3d{-0.084654_m, -0.019305_m, -0.030022_m,
+             Rotation3d{Quaternion{0.620243, 0.429104, 0.479384, 0.44873}}},
+  };
+
+  for (size_t i = 0; i < initial_poses.size(); i++) {
+    auto start = initial_poses[i];
+    auto end = final_poses[i];
+
+    auto twist = start.Log(end);
+    auto start_exp = start.Exp(twist);
+
+    auto eps = 1E-5;
+
+    EXPECT_NEAR(start_exp.X().value(), end.X().value(), eps);
+    EXPECT_NEAR(start_exp.Y().value(), end.Y().value(), eps);
+    EXPECT_NEAR(start_exp.Z().value(), end.Z().value(), eps);
+    EXPECT_NEAR(start_exp.Rotation().GetQuaternion().W(),
+                end.Rotation().GetQuaternion().W(), eps);
+    EXPECT_NEAR(start_exp.Rotation().GetQuaternion().X(),
+                end.Rotation().GetQuaternion().X(), eps);
+    EXPECT_NEAR(start_exp.Rotation().GetQuaternion().Y(),
+                end.Rotation().GetQuaternion().Y(), eps);
+    EXPECT_NEAR(start_exp.Rotation().GetQuaternion().Z(),
+                end.Rotation().GetQuaternion().Z(), eps);
+  }
 }
