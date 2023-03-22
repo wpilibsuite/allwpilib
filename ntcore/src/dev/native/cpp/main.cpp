@@ -126,11 +126,11 @@ void bench2() {
   auto server = nt::CreateInstance();
 
   // connect client and server
-  nt::StartServer(server, "bench2.json", "127.0.0.1", 0, 10000);
+  nt::StartServer(server, "bench2.json", "127.0.0.1", 10001, 10000);
   nt::StartClient4(client1, "client1");
   nt::StartClient3(client2, "client2");
   nt::SetServer(client1, "127.0.0.1", 10000);
-  //nt::SetServer(client2, "127.0.0.1", 10001);
+  nt::SetServer(client2, "127.0.0.1", 10001);
 
   using namespace std::chrono_literals;
   std::this_thread::sleep_for(1s);
