@@ -533,7 +533,7 @@ int DriverStation::GetReplayNumber() {
   return info.replayNumber;
 }
 
-DriverStation::Alliance DriverStation::GetAlliance() {
+std::optional<DriverStation::Alliance> DriverStation::GetAlliance() {
   int32_t status = 0;
   auto allianceStationID = HAL_GetAllianceStation(&status);
   switch (allianceStationID) {
@@ -546,11 +546,11 @@ DriverStation::Alliance DriverStation::GetAlliance() {
     case HAL_AllianceStationID_kBlue3:
       return kBlue;
     default:
-      return kInvalid;
+      return {};
   }
 }
 
-int DriverStation::GetLocation() {
+std::optional<int> DriverStation::GetLocation() {
   int32_t status = 0;
   auto allianceStationID = HAL_GetAllianceStation(&status);
   switch (allianceStationID) {
@@ -564,7 +564,7 @@ int DriverStation::GetLocation() {
     case HAL_AllianceStationID_kBlue3:
       return 3;
     default:
-      return 0;
+      return {};
   }
 }
 

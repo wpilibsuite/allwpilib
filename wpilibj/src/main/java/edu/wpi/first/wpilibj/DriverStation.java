@@ -21,10 +21,16 @@ import edu.wpi.first.util.datalog.BooleanLogEntry;
 import edu.wpi.first.util.datalog.DataLog;
 import edu.wpi.first.util.datalog.FloatArrayLogEntry;
 import edu.wpi.first.util.datalog.IntegerArrayLogEntry;
+
 import java.nio.ByteBuffer;
+import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.locks.ReentrantLock;
 
-/** Provide access to the network communication data to / from the Driver Station. */
+/**
+ * Provide access to the network communication data to / from the Driver
+ * Station.
+ */
 public final class DriverStation {
   /** Number of Joystick Ports. */
   public static final int kJoystickPorts = 6;
@@ -67,8 +73,7 @@ public final class DriverStation {
   /** The robot alliance that the robot is a part of. */
   public enum Alliance {
     Red,
-    Blue,
-    Invalid
+    Blue
   }
 
   public enum MatchType {
@@ -376,11 +381,9 @@ public final class DriverStation {
 
   // Joystick Cached Data
   private static HALJoystickAxes[] m_joystickAxesCache = new HALJoystickAxes[kJoystickPorts];
-  private static HALJoystickAxesRaw[] m_joystickAxesRawCache =
-      new HALJoystickAxesRaw[kJoystickPorts];
+  private static HALJoystickAxesRaw[] m_joystickAxesRawCache = new HALJoystickAxesRaw[kJoystickPorts];
   private static HALJoystickPOVs[] m_joystickPOVsCache = new HALJoystickPOVs[kJoystickPorts];
-  private static HALJoystickButtons[] m_joystickButtonsCache =
-      new HALJoystickButtons[kJoystickPorts];
+  private static HALJoystickButtons[] m_joystickButtonsCache = new HALJoystickButtons[kJoystickPorts];
   private static MatchInfoData m_matchInfoCache = new MatchInfoData();
   private static ControlWord m_controlWordCache = new ControlWord();
 
@@ -401,10 +404,13 @@ public final class DriverStation {
   /**
    * DriverStation constructor.
    *
-   * <p>The single DriverStation instance is created statically with the instance static member
+   * <p>
+   * The single DriverStation instance is created statically with the instance
+   * static member
    * variable.
    */
-  private DriverStation() {}
+  private DriverStation() {
+  }
 
   static {
     HAL.initialize(500, 0);
@@ -425,9 +431,10 @@ public final class DriverStation {
   }
 
   /**
-   * Report error to Driver Station. Optionally appends Stack trace to error message.
+   * Report error to Driver Station. Optionally appends Stack trace to error
+   * message.
    *
-   * @param error The error to report.
+   * @param error      The error to report.
    * @param printTrace If true, append stack trace to error string
    */
   public static void reportError(String error, boolean printTrace) {
@@ -435,9 +442,10 @@ public final class DriverStation {
   }
 
   /**
-   * Report error to Driver Station. Appends provided stack trace to error message.
+   * Report error to Driver Station. Appends provided stack trace to error
+   * message.
    *
-   * @param error The error to report.
+   * @param error      The error to report.
    * @param stackTrace The stack trace to append
    */
   public static void reportError(String error, StackTraceElement[] stackTrace) {
@@ -445,9 +453,10 @@ public final class DriverStation {
   }
 
   /**
-   * Report warning to Driver Station. Optionally appends Stack trace to warning message.
+   * Report warning to Driver Station. Optionally appends Stack trace to warning
+   * message.
    *
-   * @param warning The warning to report.
+   * @param warning    The warning to report.
    * @param printTrace If true, append stack trace to warning string
    */
   public static void reportWarning(String warning, boolean printTrace) {
@@ -455,9 +464,10 @@ public final class DriverStation {
   }
 
   /**
-   * Report warning to Driver Station. Appends provided stack trace to warning message.
+   * Report warning to Driver Station. Appends provided stack trace to warning
+   * message.
    *
-   * @param warning The warning to report.
+   * @param warning    The warning to report.
    * @param stackTrace The stack trace to append
    */
   public static void reportWarning(String warning, StackTraceElement[] stackTrace) {
@@ -506,7 +516,7 @@ public final class DriverStation {
   /**
    * The state of one joystick button. Button indexes begin at 1.
    *
-   * @param stick The joystick to read.
+   * @param stick  The joystick to read.
    * @param button The button index, beginning at 1.
    * @return The state of the joystick button.
    */
@@ -538,9 +548,10 @@ public final class DriverStation {
   }
 
   /**
-   * Whether one joystick button was pressed since the last check. Button indexes begin at 1.
+   * Whether one joystick button was pressed since the last check. Button indexes
+   * begin at 1.
    *
-   * @param stick The joystick to read.
+   * @param stick  The joystick to read.
    * @param button The button index, beginning at 1.
    * @return Whether the joystick button was pressed since the last check.
    */
@@ -578,9 +589,10 @@ public final class DriverStation {
   }
 
   /**
-   * Whether one joystick button was released since the last check. Button indexes begin at 1.
+   * Whether one joystick button was released since the last check. Button indexes
+   * begin at 1.
    *
-   * @param stick The joystick to read.
+   * @param stick  The joystick to read.
    * @param button The button index, beginning at 1.
    * @return Whether the joystick button was released since the last check.
    */
@@ -618,11 +630,12 @@ public final class DriverStation {
   }
 
   /**
-   * Get the value of the axis on a joystick. This depends on the mapping of the joystick connected
+   * Get the value of the axis on a joystick. This depends on the mapping of the
+   * joystick connected
    * to the specified port.
    *
    * @param stick The joystick to read.
-   * @param axis The analog axis value to read from the joystick.
+   * @param axis  The analog axis value to read from the joystick.
    * @return The value of the axis on the joystick.
    */
   public static double getStickAxis(int stick, int axis) {
@@ -655,7 +668,7 @@ public final class DriverStation {
    * Get the state of a POV on the joystick.
    *
    * @param stick The joystick to read.
-   * @param pov The POV to read.
+   * @param pov   The POV to read.
    * @return the angle of the POV in degrees, or -1 if the POV is not pressed.
    */
   public static int getStickPOV(int stick, int pov) {
@@ -806,7 +819,7 @@ public final class DriverStation {
    * Returns the types of Axes on a given joystick port.
    *
    * @param stick The joystick port number
-   * @param axis The target axis
+   * @param axis  The target axis
    * @return What type of axis the axis is reporting to be
    */
   public static int getJoystickAxisType(int stick, int axis) {
@@ -820,7 +833,9 @@ public final class DriverStation {
   /**
    * Returns if a joystick is connected to the Driver Station.
    *
-   * <p>This makes a best effort guess by looking at the reported number of axis, buttons, and POVs
+   * <p>
+   * This makes a best effort guess by looking at the reported number of axis,
+   * buttons, and POVs
    * attached.
    *
    * @param stick The joystick port number
@@ -833,7 +848,8 @@ public final class DriverStation {
   }
 
   /**
-   * Gets a value indicating whether the Driver Station requires the robot to be enabled.
+   * Gets a value indicating whether the Driver Station requires the robot to be
+   * enabled.
    *
    * @return True if the robot is enabled, false otherwise.
    */
@@ -847,7 +863,8 @@ public final class DriverStation {
   }
 
   /**
-   * Gets a value indicating whether the Driver Station requires the robot to be disabled.
+   * Gets a value indicating whether the Driver Station requires the robot to be
+   * disabled.
    *
    * @return True if the robot should be disabled, false otherwise.
    */
@@ -870,7 +887,8 @@ public final class DriverStation {
   }
 
   /**
-   * Gets a value indicating whether the Driver Station requires the robot to be running in
+   * Gets a value indicating whether the Driver Station requires the robot to be
+   * running in
    * autonomous mode.
    *
    * @return True if autonomous mode should be enabled, false otherwise.
@@ -885,7 +903,8 @@ public final class DriverStation {
   }
 
   /**
-   * Gets a value indicating whether the Driver Station requires the robot to be running in
+   * Gets a value indicating whether the Driver Station requires the robot to be
+   * running in
    * autonomous mode and enabled.
    *
    * @return True if autonomous should be set and the robot should be enabled.
@@ -900,7 +919,8 @@ public final class DriverStation {
   }
 
   /**
-   * Gets a value indicating whether the Driver Station requires the robot to be running in
+   * Gets a value indicating whether the Driver Station requires the robot to be
+   * running in
    * operator-controlled mode.
    *
    * @return True if operator-controlled mode should be enabled, false otherwise.
@@ -910,10 +930,12 @@ public final class DriverStation {
   }
 
   /**
-   * Gets a value indicating whether the Driver Station requires the robot to be running in
+   * Gets a value indicating whether the Driver Station requires the robot to be
+   * running in
    * operator-controller mode and enabled.
    *
-   * @return True if operator-controlled mode should be set and the robot should be enabled.
+   * @return True if operator-controlled mode should be set and the robot should
+   *         be enabled.
    */
   public static boolean isTeleopEnabled() {
     m_cacheDataMutex.lock();
@@ -927,7 +949,8 @@ public final class DriverStation {
   }
 
   /**
-   * Gets a value indicating whether the Driver Station requires the robot to be running in Test
+   * Gets a value indicating whether the Driver Station requires the robot to be
+   * running in Test
    * mode.
    *
    * @return True if test mode should be enabled, false otherwise.
@@ -942,7 +965,8 @@ public final class DriverStation {
   }
 
   /**
-   * Gets a value indicating whether the Driver Station requires the robot to be running in Test
+   * Gets a value indicating whether the Driver Station requires the robot to be
+   * running in Test
    * mode and enabled.
    *
    * @return True if test mode should be set and the robot should be enabled.
@@ -973,7 +997,8 @@ public final class DriverStation {
   /**
    * Gets if the driver station attached to a Field Management System.
    *
-   * @return true if the robot is competing on a field being controlled by a Field Management System
+   * @return true if the robot is competing on a field being controlled by a Field
+   *         Management System
    */
   public static boolean isFMSAttached() {
     m_cacheDataMutex.lock();
@@ -987,7 +1012,9 @@ public final class DriverStation {
   /**
    * Get the game specific message from the FMS.
    *
-   * <p>If the FMS is not connected, it is set from the game data setting on the driver station.
+   * <p>
+   * If the FMS is not connected, it is set from the game data setting on the
+   * driver station.
    *
    * @return the game specific message
    */
@@ -1067,70 +1094,69 @@ public final class DriverStation {
     }
   }
 
+  private static Map<AllianceStationID, Optional<Alliance>> m_allianceMap = Map.of(
+      AllianceStationID.Unknown, Optional.empty(),
+      AllianceStationID.Red1, Optional.of(Alliance.Red),
+      AllianceStationID.Red2, Optional.of(Alliance.Red),
+      AllianceStationID.Red3, Optional.of(Alliance.Red),
+      AllianceStationID.Blue1, Optional.of(Alliance.Blue),
+      AllianceStationID.Blue2, Optional.of(Alliance.Blue),
+      AllianceStationID.Blue3, Optional.of(Alliance.Blue));
+
+  private static Map<AllianceStationID, Optional<Integer>> m_stationMap = Map.of(
+      AllianceStationID.Unknown, Optional.empty(),
+      AllianceStationID.Red1, Optional.of(1),
+      AllianceStationID.Red2, Optional.of(2),
+      AllianceStationID.Red3, Optional.of(3),
+      AllianceStationID.Blue1, Optional.of(1),
+      AllianceStationID.Blue2, Optional.of(2),
+      AllianceStationID.Blue3, Optional.of(3));
+
   /**
    * Get the current alliance from the FMS.
    *
-   * <p>If the FMS is not connected, it is set from the team alliance setting on the driver station.
+   * <p>
+   * If the FMS is not connected, it is set from the team alliance setting on the
+   * driver station.
    *
    * @return the current alliance
    */
-  public static Alliance getAlliance() {
+  public static Optional<Alliance> getAlliance() {
     AllianceStationID allianceStationID = DriverStationJNI.getAllianceStation();
     if (allianceStationID == null) {
-      return Alliance.Invalid;
+      allianceStationID = AllianceStationID.Unknown;
     }
 
-    switch (allianceStationID) {
-      case Red1:
-      case Red2:
-      case Red3:
-        return Alliance.Red;
-
-      case Blue1:
-      case Blue2:
-      case Blue3:
-        return Alliance.Blue;
-
-      default:
-        return Alliance.Invalid;
-    }
+    return m_allianceMap.get(allianceStationID);
   }
 
   /**
    * Gets the location of the team's driver station controls from the FMS.
    *
-   * <p>If the FMS is not connected, it is set from the team alliance setting on the driver station.
+   * <p>
+   * If the FMS is not connected, it is set from the team alliance setting on the
+   * driver station.
    *
    * @return the location of the team's driver station controls: 1, 2, or 3
    */
-  public static int getLocation() {
+  public static Optional<Integer> getLocation() {
     AllianceStationID allianceStationID = DriverStationJNI.getAllianceStation();
     if (allianceStationID == null) {
-      return 0;
+      allianceStationID = AllianceStationID.Unknown;
     }
-    switch (allianceStationID) {
-      case Red1:
-      case Blue1:
-        return 1;
 
-      case Red2:
-      case Blue2:
-        return 2;
-
-      case Blue3:
-      case Red3:
-        return 3;
-
-      default:
-        return 0;
-    }
+    return m_stationMap.get(allianceStationID);
   }
 
   /**
-   * Return the approximate match time. The FMS does not send an official match time to the robots,
-   * but does send an approximate match time. The value will count down the time remaining in the
-   * current period (auto or teleop). Warning: This is not an official time (so it cannot be used to
-   * dispute ref calls or guarantee that a function will trigger before the match ends) The Practice
+   * Return the approximate match time. The FMS does not send an official match
+   * time to the robots,
+   * but does send an approximate match time. The value will count down the time
+   * remaining in the
+   * current period (auto or teleop). Warning: This is not an official time (so it
+   * cannot be used to
+   * dispute ref calls or guarantee that a function will trigger before the match
+   * ends) The Practice
    * Match function of the DS approximates the behavior seen on the field.
    *
    * @return Time remaining in current match period (auto or teleop) in seconds
@@ -1140,8 +1166,10 @@ public final class DriverStation {
   }
 
   /**
-   * Allows the user to specify whether they want joystick connection warnings to be printed to the
-   * console. This setting is ignored when the FMS is connected -- warnings will always be on in
+   * Allows the user to specify whether they want joystick connection warnings to
+   * be printed to the
+   * console. This setting is ignored when the FMS is connected -- warnings will
+   * always be on in
    * that scenario.
    *
    * @param silence Whether warning messages should be silenced.
@@ -1151,7 +1179,8 @@ public final class DriverStation {
   }
 
   /**
-   * Returns whether joystick connection warnings are silenced. This will always return false when
+   * Returns whether joystick connection warnings are silenced. This will always
+   * return false when
    * connected to the FMS.
    *
    * @return Whether joystick connection warnings are silenced.
@@ -1175,7 +1204,8 @@ public final class DriverStation {
   }
 
   /**
-   * Copy data from the DS task for the user. If no new data exists, it will just be returned,
+   * Copy data from the DS task for the user. If no new data exists, it will just
+   * be returned,
    * otherwise the data will be copied from the DS polling loop.
    */
   public static void refreshData() {
@@ -1183,14 +1213,11 @@ public final class DriverStation {
 
     // Get the status of all the joysticks
     for (byte stick = 0; stick < kJoystickPorts; stick++) {
-      m_joystickAxesCache[stick].m_count =
-          DriverStationJNI.getJoystickAxes(stick, m_joystickAxesCache[stick].m_axes);
-      m_joystickAxesRawCache[stick].m_count =
-          DriverStationJNI.getJoystickAxesRaw(stick, m_joystickAxesRawCache[stick].m_axes);
-      m_joystickPOVsCache[stick].m_count =
-          DriverStationJNI.getJoystickPOVs(stick, m_joystickPOVsCache[stick].m_povs);
-      m_joystickButtonsCache[stick].m_buttons =
-          DriverStationJNI.getJoystickButtons(stick, m_buttonCountBuffer);
+      m_joystickAxesCache[stick].m_count = DriverStationJNI.getJoystickAxes(stick, m_joystickAxesCache[stick].m_axes);
+      m_joystickAxesRawCache[stick].m_count = DriverStationJNI.getJoystickAxesRaw(stick,
+          m_joystickAxesRawCache[stick].m_axes);
+      m_joystickPOVsCache[stick].m_count = DriverStationJNI.getJoystickPOVs(stick, m_joystickPOVsCache[stick].m_povs);
+      m_joystickButtonsCache[stick].m_buttons = DriverStationJNI.getJoystickButtons(stick, m_buttonCountBuffer);
       m_joystickButtonsCache[stick].m_count = m_buttonCountBuffer.get(0);
     }
 
@@ -1204,12 +1231,10 @@ public final class DriverStation {
     try {
       for (int i = 0; i < kJoystickPorts; i++) {
         // If buttons weren't pressed and are now, set flags in m_buttonsPressed
-        m_joystickButtonsPressed[i] |=
-            ~m_joystickButtons[i].m_buttons & m_joystickButtonsCache[i].m_buttons;
+        m_joystickButtonsPressed[i] |= ~m_joystickButtons[i].m_buttons & m_joystickButtonsCache[i].m_buttons;
 
         // If buttons were pressed and aren't now, set flags in m_buttonsReleased
-        m_joystickButtonsReleased[i] |=
-            m_joystickButtons[i].m_buttons & ~m_joystickButtonsCache[i].m_buttons;
+        m_joystickButtonsReleased[i] |= m_joystickButtons[i].m_buttons & ~m_joystickButtonsCache[i].m_buttons;
       }
 
       // move cache to actual data
@@ -1259,7 +1284,8 @@ public final class DriverStation {
   }
 
   /**
-   * Reports errors related to unplugged joysticks Throttles the errors so that they don't overwhelm
+   * Reports errors related to unplugged joysticks Throttles the errors so that
+   * they don't overwhelm
    * the DS.
    */
   private static void reportJoystickUnpluggedError(String message) {
@@ -1271,7 +1297,8 @@ public final class DriverStation {
   }
 
   /**
-   * Reports errors related to unplugged joysticks Throttles the errors so that they don't overwhelm
+   * Reports errors related to unplugged joysticks Throttles the errors so that
+   * they don't overwhelm
    * the DS.
    */
   private static void reportJoystickUnpluggedWarning(String message) {
@@ -1287,7 +1314,7 @@ public final class DriverStation {
   /**
    * Starts logging DriverStation data to data log. Repeated calls are ignored.
    *
-   * @param log data log
+   * @param log          data log
    * @param logJoysticks if true, log joystick data
    */
   @SuppressWarnings("PMD.NonThreadSafeSingleton")
@@ -1303,7 +1330,8 @@ public final class DriverStation {
   }
 
   /**
-   * Starts logging DriverStation data to data log, including joystick data. Repeated calls are
+   * Starts logging DriverStation data to data log, including joystick data.
+   * Repeated calls are
    * ignored.
    *
    * @param log data log

@@ -57,16 +57,19 @@ public class DriverStationJNI extends JNIWrapper {
 
   private static native int nativeGetAllianceStation();
 
-  public static final int kRed1AllianceStation = 0;
-  public static final int kRed2AllianceStation = 1;
-  public static final int kRed3AllianceStation = 2;
-  public static final int kBlue1AllianceStation = 3;
-  public static final int kBlue2AllianceStation = 4;
-  public static final int kBlue3AllianceStation = 5;
+  public static final int kUnknownAllianceStation = 0;
+  public static final int kRed1AllianceStation = 1;
+  public static final int kRed2AllianceStation = 2;
+  public static final int kRed3AllianceStation = 3;
+  public static final int kBlue1AllianceStation = 4;
+  public static final int kBlue2AllianceStation = 5;
+  public static final int kBlue3AllianceStation = 6;
 
   @SuppressWarnings("MissingJavadocMethod")
   public static AllianceStationID getAllianceStation() {
     switch (nativeGetAllianceStation()) {
+      case kUnknownAllianceStation:
+        return AllianceStationID.Unknown;
       case kRed1AllianceStation:
         return AllianceStationID.Red1;
       case kRed2AllianceStation:
