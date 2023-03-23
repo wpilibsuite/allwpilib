@@ -866,7 +866,7 @@ void ClientData4::SendValue(TopicData* topic, const Value& value,
       // replace, or append if not present
       auto [it, added] =
           m_outgoingValueMap.try_emplace(topic->id, m_outgoing.size());
-      if (!added) {
+      if (!added && it->second < m_outgoing.size()) {
         if (auto m =
                 std::get_if<ServerValueMsg>(&m_outgoing[it->second].contents)) {
           if (m->topic == topic->id) {  // should always be true
@@ -1018,7 +1018,7 @@ void ClientData3::SendValue(TopicData* topic, const Value& value,
       wpi::DenseMap<NT_Topic, size_t>::iterator it;
       std::tie(it, added) =
           m_outgoingValueMap.try_emplace(topic->id, m_outgoing.size());
-      if (!added) {
+      if (!added && it->second < m_outgoing.size()) {
         auto& msg = m_outgoing[it->second];
         if (msg.Is(net3::Message3::kEntryUpdate) ||
             msg.Is(net3::Message3::kEntryAssign)) {
