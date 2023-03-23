@@ -24,6 +24,8 @@ IterativeRobotBase::IterativeRobotBase(units::second_t period)
 
 void IterativeRobotBase::RobotInit() {}
 
+void IterativeRobotBase::DriverStationConnected() {}
+
 void IterativeRobotBase::SimulationInit() {}
 
 void IterativeRobotBase::DisabledInit() {}
@@ -125,6 +127,11 @@ void IterativeRobotBase::LoopFunc() {
     mode = Mode::kTeleop;
   } else if (word.IsTest()) {
     mode = Mode::kTest;
+  }
+
+  if (!m_calledDsConnected && word.IsDSAttached()) {
+    m_calledDsConnected = true;
+    DriverStationConnected();
   }
 
   // If mode changed, call mode exit and entry functions

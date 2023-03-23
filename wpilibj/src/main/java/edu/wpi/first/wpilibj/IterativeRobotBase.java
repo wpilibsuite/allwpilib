@@ -24,6 +24,8 @@ import java.util.ConcurrentModificationException;
  *
  * <p>robotInit() -- provide for initialization at robot power-on
  *
+ * <p>driverStationConnected() -- provide for initialization the first time the DS is connected
+ *
  * <p>init() functions -- each of the following functions is called once when the appropriate mode
  * is entered:
  *
@@ -69,6 +71,7 @@ public abstract class IterativeRobotBase extends RobotBase {
   private final Watchdog m_watchdog;
   private boolean m_ntFlushEnabled = true;
   private boolean m_lwEnabledInTest = true;
+  private boolean m_calledDsConnected = false;
 
   /**
    * Constructor for IterativeRobotBase.
@@ -97,6 +100,14 @@ public abstract class IterativeRobotBase extends RobotBase {
    * never indicate that the code is ready, causing the robot to be bypassed in a match.
    */
   public void robotInit() {}
+
+  /**
+   * Code that needs to know the DS state should go here.
+   *
+   * <p>Users should override this method for initialization that needs to occur after the DS is
+   * connected, such as needing the alliance information.
+   */
+  public void driverStationConnected() {}
 
   /**
    * Robot-wide simulation initialization code should go here.
@@ -293,6 +304,11 @@ public abstract class IterativeRobotBase extends RobotBase {
       mode = Mode.kTeleop;
     } else if (m_word.isTest()) {
       mode = Mode.kTest;
+    }
+
+    if (!m_calledDsConnected && m_word.isDSAttached()) {
+      m_calledDsConnected = true;
+      driverStationConnected();
     }
 
     // If mode changed, call mode exit and entry functions
