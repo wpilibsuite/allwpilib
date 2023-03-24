@@ -36,7 +36,6 @@ class DifferentialDrivePoseEstimatorTest {
 
     var estimator =
         new DifferentialDrivePoseEstimator(
-            kinematics,
             new Rotation2d(),
             0,
             0,
@@ -77,7 +76,6 @@ class DifferentialDrivePoseEstimatorTest {
 
     var estimator =
         new DifferentialDrivePoseEstimator(
-            kinematics,
             new Rotation2d(),
             0,
             0,
@@ -241,11 +239,8 @@ class DifferentialDrivePoseEstimatorTest {
     // is that all measurements affect the estimated pose. The alternative result is that only one
     // vision measurement affects the outcome. If that were the case, after 1000 measurements, the
     // estimated pose would converge to that measurement.
-    var kinematics = new DifferentialDriveKinematics(1);
-
     var estimator =
         new DifferentialDrivePoseEstimator(
-            kinematics,
             new Rotation2d(),
             0,
             0,
@@ -288,10 +283,8 @@ class DifferentialDrivePoseEstimatorTest {
 
   @Test
   void testDiscardsStaleVisionMeasurements() {
-    var kinematics = new DifferentialDriveKinematics(1);
     var estimator =
         new DifferentialDrivePoseEstimator(
-            kinematics,
             new Rotation2d(),
             0,
             0,
@@ -329,7 +322,6 @@ class DifferentialDrivePoseEstimatorTest {
 
     var estimator =
         new DifferentialDrivePoseEstimator(
-            kinematics,
             new Rotation3d(),
             0,
             0,
@@ -371,7 +363,6 @@ class DifferentialDrivePoseEstimatorTest {
 
     var estimator =
         new DifferentialDrivePoseEstimator(
-            kinematics,
             new Rotation3d(),
             0,
             0,
@@ -569,7 +560,7 @@ class DifferentialDrivePoseEstimatorTest {
   }
 
   private static Rotation3d sampleRotationNoise(Random rand, double stdev) {
-    var rollNoise = rand.nextGaussian() * 0.1;
+    var rollNoise = rand.nextGaussian() * stdev;
     var rollMatrix =
         new MatBuilder<>(Nat.N3(), Nat.N3())
             .fill(
@@ -582,7 +573,7 @@ class DifferentialDrivePoseEstimatorTest {
                 0,
                 0,
                 1);
-    var pitchNoise = rand.nextGaussian() * 0.1;
+    var pitchNoise = rand.nextGaussian() * stdev;
     var pitchMatrix =
         new MatBuilder<>(Nat.N3(), Nat.N3())
             .fill(
@@ -596,7 +587,7 @@ class DifferentialDrivePoseEstimatorTest {
                 0,
                 Math.cos(pitchNoise));
 
-    var yawNoise = rand.nextGaussian() * 0.1;
+    var yawNoise = rand.nextGaussian() * stdev;
     var yawMatrix =
         new MatBuilder<>(Nat.N3(), Nat.N3())
             .fill(
