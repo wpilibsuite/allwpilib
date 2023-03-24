@@ -38,6 +38,10 @@
 
 using namespace hal;
 
+namespace wpi {
+void SetupNowRio();
+}  // namespace wpi
+
 static std::unique_ptr<tGlobal> global;
 static std::unique_ptr<tSysWatchdog> watchdog;
 static uint64_t dsStartTime;
@@ -543,20 +547,8 @@ HAL_Bool HAL_Initialize(int32_t timeout, int32_t mode) {
     return false;
   }
 
-  // Set WPI_Now to use FPGA timestamp
-  wpi::SetNowImpl([]() -> uint64_t {
-    int32_t status = 0;
-    uint64_t rv = HAL_GetFPGATime(&status);
-    if (status != 0) {
-      fmt::print(stderr,
-                 "Call to HAL_GetFPGATime failed in wpi::Now() with status {}. "
-                 "Initialization might have failed. Time will not be correct\n",
-                 status);
-      std::fflush(stderr);
-      return 0u;
-    }
-    return rv;
-  });
+  // Setup WPI_Now to use FPGA timestamp
+  wpi::SetupNowRio();
 
   hal::WaitForInitialPacket();
 
