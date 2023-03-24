@@ -6,6 +6,28 @@
 
 #include <atomic>
 
+#ifdef __FRC_ROBORIO__
+
+#include <stdint.h>
+
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wpedantic"
+#pragma GCC diagnostic ignored "-Wignored-qualifiers"
+
+#include <FRC_FPGA_ChipObject/RoboRIO_FRC_ChipObject_Aliases.h>
+#include <FRC_FPGA_ChipObject/nRoboRIO_FPGANamespace/tGlobal.h>
+
+#pragma GCC diagnostic pop
+
+namespace fpga {
+using namespace nFPGA;
+using namespace nRoboRIO_FPGANamespace;
+}  // namespace fpga
+
+#include <memory>
+
+#endif
+
 #ifdef _WIN32
 #include <windows.h>
 
@@ -13,6 +35,10 @@
 #include <exception>
 #else
 #include <chrono>
+#endif
+
+#ifdef __FRC_ROBORIO__
+static std::unique_ptr<fpga::tGlobal> global;
 #endif
 
 // offset in microseconds
@@ -89,6 +115,12 @@ uint64_t wpi::NowDefault() {
 static std::atomic<uint64_t (*)()> now_impl{wpi::NowDefault};
 
 void wpi::SetNowImpl(uint64_t (*func)(void)) {
+#ifdef __FRC_ROBORIO__
+  if (!global) {
+    int32_t status = 0;
+    global.reset(fpga::tGlobal::create(&status));
+  }
+#endif
   now_impl = func ? func : NowDefault;
 }
 
