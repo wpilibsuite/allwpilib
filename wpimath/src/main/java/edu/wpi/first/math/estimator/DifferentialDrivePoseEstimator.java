@@ -14,7 +14,6 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Twist3d;
 import edu.wpi.first.math.interpolation.TimeInterpolatableBuffer;
-import edu.wpi.first.math.kinematics.DifferentialDriveKinematics;
 import edu.wpi.first.math.kinematics.DifferentialDriveOdometry;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
@@ -54,20 +53,17 @@ public class DifferentialDrivePoseEstimator {
    * 0.01 radians for heading. The default standard deviations of the vision measurements are 0.1
    * meters for x, y, and z, and 0.1 radians for heading.
    *
-   * @param kinematics A correctly-configured kinematics object for your drivetrain.
    * @param gyroAngle The current gyro angle.
    * @param leftDistanceMeters The distance traveled by the left encoder.
    * @param rightDistanceMeters The distance traveled by the right encoder.
    * @param initialPoseMeters The starting pose estimate.
    */
   public DifferentialDrivePoseEstimator(
-      DifferentialDriveKinematics kinematics,
       Rotation3d gyroAngle,
       double leftDistanceMeters,
       double rightDistanceMeters,
       Pose3d initialPoseMeters) {
     this(
-        kinematics,
         gyroAngle,
         leftDistanceMeters,
         rightDistanceMeters,
@@ -84,20 +80,17 @@ public class DifferentialDrivePoseEstimator {
    * y, and 0.01 radians for heading. The default standard deviations of the vision measurements are
    * 0.1 meters for x, 0.1 meters for y, and 0.1 radians for heading.
    *
-   * @param kinematics A correctly-configured kinematics object for your drivetrain.
    * @param gyroAngle The current gyro angle.
    * @param leftDistanceMeters The distance traveled by the left encoder.
    * @param rightDistanceMeters The distance traveled by the right encoder.
    * @param initialPoseMeters The starting pose estimate.
    */
   public DifferentialDrivePoseEstimator(
-      DifferentialDriveKinematics kinematics,
       Rotation2d gyroAngle,
       double leftDistanceMeters,
       double rightDistanceMeters,
       Pose2d initialPoseMeters) {
     this(
-        kinematics,
         gyroAngle,
         leftDistanceMeters,
         rightDistanceMeters,
@@ -109,7 +102,6 @@ public class DifferentialDrivePoseEstimator {
   /**
    * Constructs a DifferentialDrivePoseEstimator.
    *
-   * @param kinematics A correctly-configured kinematics object for your drivetrain.
    * @param gyroAngle The gyro angle of the robot.
    * @param leftDistanceMeters The distance traveled by the left encoder.
    * @param rightDistanceMeters The distance traveled by the right encoder.
@@ -121,7 +113,6 @@ public class DifferentialDrivePoseEstimator {
    *     pose measurement less.
    */
   public DifferentialDrivePoseEstimator(
-      DifferentialDriveKinematics kinematics,
       Rotation3d gyroAngle,
       double leftDistanceMeters,
       double rightDistanceMeters,
@@ -144,7 +135,6 @@ public class DifferentialDrivePoseEstimator {
   /**
    * Constructs a DifferentialDrivePoseEstimator.
    *
-   * @param kinematics A correctly-configured kinematics object for your drivetrain.
    * @param gyroAngle The gyro angle of the robot.
    * @param leftDistanceMeters The distance traveled by the left encoder.
    * @param rightDistanceMeters The distance traveled by the right encoder.
@@ -157,7 +147,6 @@ public class DifferentialDrivePoseEstimator {
    *     the vision pose measurement less.
    */
   public DifferentialDrivePoseEstimator(
-      DifferentialDriveKinematics kinematics,
       Rotation2d gyroAngle,
       double leftDistanceMeters,
       double rightDistanceMeters,
@@ -165,7 +154,6 @@ public class DifferentialDrivePoseEstimator {
       Matrix<N3, N1> stateStdDevs,
       Matrix<N3, N1> visionMeasurementStdDevs) {
     this(
-        kinematics,
         new Rotation3d(0, 0, gyroAngle.getRadians()),
         leftDistanceMeters,
         rightDistanceMeters,

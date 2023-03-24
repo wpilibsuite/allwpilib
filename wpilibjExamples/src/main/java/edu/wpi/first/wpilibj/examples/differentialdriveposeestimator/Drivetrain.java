@@ -86,7 +86,6 @@ public class Drivetrain {
   numbers used  below are robot specific, and should be tuned. */
   private final DifferentialDrivePoseEstimator m_poseEstimator =
       new DifferentialDrivePoseEstimator(
-          m_kinematics,
           m_gyro.getRotation2d(),
           m_leftEncoder.getDistance(),
           m_rightEncoder.getDistance(),
