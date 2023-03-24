@@ -28,7 +28,7 @@ extern "C" {
  * @param errorCode the error code
  * @param isLVCode  true for a LV error code, false for a standard error code
  * @param details   the details of the error
- * @param location  the file location of the errror
+ * @param location  the file location of the error
  * @param callStack the callstack of the error
  * @param printMsg  true to print the error message to stdout as well as to the
  * DS

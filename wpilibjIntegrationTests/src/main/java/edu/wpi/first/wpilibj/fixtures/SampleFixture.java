@@ -13,8 +13,8 @@ public class SampleFixture implements ITestFixture {
   public void setup() {
     /*
      * If this fixture actually accessed the hardware, here is where it would
-     * set up the starting state of the test bench. For example, reseting
-     * encoders, ensuring motors are stopped, reseting any serial communication
+     * set up the starting state of the test bench. For example, resetting
+     * encoders, ensuring motors are stopped, resetting any serial communication
      * if necessary, etc.
      */
   }

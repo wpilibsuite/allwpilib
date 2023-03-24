@@ -138,7 +138,8 @@ Matrixd<sizeof...(Ts), sizeof...(Ts)> MakeCovMatrix(Ts... stdDevs) {
  * Creates a cost matrix from the given vector for use with LQR.
  *
  * The cost matrix is constructed using Bryson's rule. The inverse square of
- * each element in the input is taken and placed on the cost matrix diagonal.
+ * each element in the input is placed on the cost matrix diagonal. If a
+ * tolerance is infinity, its cost matrix entry is set to zero.
  *
  * @param costs An array. For a Q matrix, its elements are the maximum allowed
  *              excursions of the states from the reference. For an R matrix,
@@ -151,7 +152,11 @@ Matrixd<N, N> MakeCostMatrix(const std::array<double, N>& costs) {
   Eigen::DiagonalMatrix<double, N> result;
   auto& diag = result.diagonal();
   for (size_t i = 0; i < N; ++i) {
-    diag(i) = 1.0 / std::pow(costs[i], 2);
+    if (costs[i] == std::numeric_limits<double>::infinity()) {
+      diag(i) = 0.0;
+    } else {
+      diag(i) = 1.0 / std::pow(costs[i], 2);
+    }
   }
   return result;
 }

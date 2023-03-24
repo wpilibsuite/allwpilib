@@ -253,12 +253,10 @@ const char* HAL_GetErrorMessage(int32_t code) {
   }
 }
 
+static HAL_RuntimeType runtimeType = HAL_Runtime_RoboRIO;
+
 HAL_RuntimeType HAL_GetRuntimeType(void) {
-  nLoadOut::tTargetClass targetClass = nLoadOut::getTargetClass();
-  if (targetClass == nLoadOut::kTargetClass_RoboRIO2) {
-    return HAL_Runtime_RoboRIO2;
-  }
-  return HAL_Runtime_RoboRIO;
+  return runtimeType;
 }
 
 int32_t HAL_GetFPGAVersion(int32_t* status) {
@@ -318,11 +316,8 @@ void InitializeRoboRioComments(void) {
       return;
     }
     start += searchString.size();
-    size_t end = fileContents.find("\"", start);
-    if (end == std::string_view::npos) {
-      end = fileContents.size();
-    }
-    std::string_view escapedComments = wpi::slice(fileContents, start, end);
+    std::string_view escapedComments =
+        wpi::slice(fileContents, start, fileContents.size());
     wpi::SmallString<64> buf;
     auto [unescapedComments, rem] = wpi::UnescapeCString(escapedComments, buf);
     unescapedComments.copy(roboRioCommentsString,
@@ -521,6 +516,13 @@ HAL_Bool HAL_Initialize(int32_t timeout, int32_t mode) {
 
   if (status != 0) {
     return false;
+  }
+
+  nLoadOut::tTargetClass targetClass = nLoadOut::getTargetClass();
+  if (targetClass == nLoadOut::kTargetClass_RoboRIO2) {
+    runtimeType = HAL_Runtime_RoboRIO2;
+  } else {
+    runtimeType = HAL_Runtime_RoboRIO;
   }
 
   InterruptManager::Initialize(global->getSystemInterface());

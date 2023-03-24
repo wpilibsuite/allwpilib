@@ -143,7 +143,7 @@ public class CameraServerJNI {
   public static native void releaseSource(int source);
 
   //
-  // Camera Source Common Property Fuctions
+  // Camera Source Common Property Functions
   //
   public static native void setCameraBrightness(int source, int brightness);
 

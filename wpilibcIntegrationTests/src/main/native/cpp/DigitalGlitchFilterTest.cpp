@@ -14,7 +14,7 @@
  *
  * This test actually tests everything except that the actual FPGA
  * implementation works as intended.  We configure the FPGA and then query it to
- * make sure that the acutal configuration matches.
+ * make sure that the actual configuration matches.
  */
 TEST(DigitalGlitchFilterTest, Basic) {
   frc::DigitalInput input1{1};

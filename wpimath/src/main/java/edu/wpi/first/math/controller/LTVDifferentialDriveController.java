@@ -61,6 +61,7 @@ public class LTVDifferentialDriveController {
    * @param qelems The maximum desired error tolerance for each state.
    * @param relems The maximum desired control effort for each input.
    * @param dt Discretization timestep in seconds.
+   * @throws IllegalArgumentException if max velocity of plant with 12 V input &lt;= 0.
    */
   public LTVDifferentialDriveController(
       LinearSystem<N2, N2, N2> plant,
@@ -126,6 +127,11 @@ public class LTVDifferentialDriveController {
             .solve(plant.getB().times(new MatBuilder<>(Nat.N2(), Nat.N1()).fill(12.0, 12.0)))
             .times(-1.0)
             .get(0, 0);
+
+    if (maxV <= 0.0) {
+      throw new IllegalArgumentException(
+          "Max velocity of plant with 12 V input must be greater than zero.");
+    }
 
     for (double velocity = -maxV; velocity < maxV; velocity += 0.01) {
       // The DARE is ill-conditioned if the velocity is close to zero, so don't

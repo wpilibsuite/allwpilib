@@ -294,8 +294,12 @@ public class PneumaticHub implements PneumaticsBase {
       throw new IllegalArgumentException(
           "maxPressure must be between 0 and 120 PSI, got " + maxPressure);
     }
-    double minAnalogVoltage = psiToVolts(minPressure, get5VRegulatedVoltage());
-    double maxAnalogVoltage = psiToVolts(maxPressure, get5VRegulatedVoltage());
+
+    // Send the voltage as it would be if the 5V rail was at exactly 5V.
+    // The firmware will compensate for the real 5V rail voltage, which
+    // can fluctuate somewhat over time.
+    double minAnalogVoltage = psiToVolts(minPressure, 5);
+    double maxAnalogVoltage = psiToVolts(maxPressure, 5);
     REVPHJNI.setClosedLoopControlAnalog(m_handle, minAnalogVoltage, maxAnalogVoltage);
   }
 
@@ -339,8 +343,12 @@ public class PneumaticHub implements PneumaticsBase {
       throw new IllegalArgumentException(
           "maxPressure must be between 0 and 120 PSI, got " + maxPressure);
     }
-    double minAnalogVoltage = psiToVolts(minPressure, get5VRegulatedVoltage());
-    double maxAnalogVoltage = psiToVolts(maxPressure, get5VRegulatedVoltage());
+
+    // Send the voltage as it would be if the 5V rail was at exactly 5V.
+    // The firmware will compensate for the real 5V rail voltage, which
+    // can fluctuate somewhat over time.
+    double minAnalogVoltage = psiToVolts(minPressure, 5);
+    double maxAnalogVoltage = psiToVolts(maxPressure, 5);
     REVPHJNI.setClosedLoopControlHybrid(m_handle, minAnalogVoltage, maxAnalogVoltage);
   }
 

@@ -45,7 +45,7 @@ public class RamseteCommand extends CommandBase {
   private final PIDController m_leftController;
   private final PIDController m_rightController;
   private final BiConsumer<Double, Double> m_output;
-  private DifferentialDriveWheelSpeeds m_prevSpeeds;
+  private DifferentialDriveWheelSpeeds m_prevSpeeds = new DifferentialDriveWheelSpeeds();
   private double m_prevTime;
 
   /**
