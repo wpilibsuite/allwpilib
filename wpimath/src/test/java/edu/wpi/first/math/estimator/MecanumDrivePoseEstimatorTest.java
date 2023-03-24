@@ -576,7 +576,7 @@ class MecanumDrivePoseEstimatorTest {
   }
 
   private static Rotation3d sampleRotationNoise(Random rand, double stdev) {
-    var rollNoise = rand.nextGaussian() * 0.1;
+    var rollNoise = rand.nextGaussian() * stdev;
     var rollMatrix =
         new MatBuilder<>(Nat.N3(), Nat.N3())
             .fill(
@@ -589,7 +589,7 @@ class MecanumDrivePoseEstimatorTest {
                 0,
                 0,
                 1);
-    var pitchNoise = rand.nextGaussian() * 0.1;
+    var pitchNoise = rand.nextGaussian() * stdev;
     var pitchMatrix =
         new MatBuilder<>(Nat.N3(), Nat.N3())
             .fill(
@@ -603,7 +603,7 @@ class MecanumDrivePoseEstimatorTest {
                 0,
                 Math.cos(pitchNoise));
 
-    var yawNoise = rand.nextGaussian() * 0.1;
+    var yawNoise = rand.nextGaussian() * stdev;
     var yawMatrix =
         new MatBuilder<>(Nat.N3(), Nat.N3())
             .fill(
