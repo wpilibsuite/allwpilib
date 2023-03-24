@@ -7,25 +7,18 @@
 #include <atomic>
 
 #ifdef __FRC_ROBORIO__
-
 #include <stdint.h>
-
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wpedantic"
 #pragma GCC diagnostic ignored "-Wignored-qualifiers"
-
 #include <FRC_FPGA_ChipObject/RoboRIO_FRC_ChipObject_Aliases.h>
 #include <FRC_FPGA_ChipObject/nRoboRIO_FPGANamespace/tGlobal.h>
-
 #pragma GCC diagnostic pop
-
 namespace fpga {
 using namespace nFPGA;
 using namespace nRoboRIO_FPGANamespace;
 }  // namespace fpga
-
 #include <memory>
-
 #endif
 
 #ifdef _WIN32
