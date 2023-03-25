@@ -3,6 +3,7 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #include <algorithm>
+#include <array>
 #include <chrono>
 #include <cmath>
 #include <cstdlib>
@@ -18,11 +19,16 @@
 #include "ntcore_cpp.h"
 
 void bench();
+void bench2();
 void stress();
 
 int main(int argc, char* argv[]) {
   if (argc == 2 && std::string_view{argv[1]} == "bench") {
     bench();
+    return EXIT_SUCCESS;
+  }
+  if (argc == 2 && std::string_view{argv[1]} == "bench2") {
+    bench2();
     return EXIT_SUCCESS;
   }
   if (argc == 2 && std::string_view{argv[1]} == "stress") {
@@ -103,6 +109,79 @@ void bench() {
       std::this_thread::sleep_for(0.02s);
       now = nt::Now();
     }
+  }
+  auto stop = std::chrono::high_resolution_clock::now();
+
+  fmt::print("total time: {}us\n",
+             std::chrono::duration_cast<std::chrono::microseconds>(stop - start)
+                 .count());
+  PrintTimes(times);
+  fmt::print("-- Flush --\n");
+  PrintTimes(flushTimes);
+}
+
+void bench2() {
+  // set up instances
+  auto client1 = nt::CreateInstance();
+  auto client2 = nt::CreateInstance();
+  auto server = nt::CreateInstance();
+
+  // connect client and server
+  nt::StartServer(server, "bench2.json", "127.0.0.1", 10001, 10000);
+  nt::StartClient4(client1, "client1");
+  nt::StartClient3(client2, "client2");
+  nt::SetServer(client1, "127.0.0.1", 10000);
+  nt::SetServer(client2, "127.0.0.1", 10001);
+
+  using namespace std::chrono_literals;
+  std::this_thread::sleep_for(1s);
+
+  // add "typical" set of subscribers on client and server
+  nt::SubscribeMultiple(client1, {{std::string_view{}}});
+  nt::SubscribeMultiple(client2, {{std::string_view{}}});
+  nt::SubscribeMultiple(server, {{std::string_view{}}});
+
+  // create 1000 entries
+  std::array<NT_Entry, 1000> pubs;
+  for (int i = 0; i < 1000; ++i) {
+    pubs[i] = nt::GetEntry(
+        nt::GetTopic(server,
+                     fmt::format("/some/long/name/with/lots/of/slashes/{}", i)),
+        NT_DOUBLE_ARRAY, "double[]");
+  }
+
+  // warm up
+  for (int i = 1; i <= 100; ++i) {
+    for (auto pub : pubs) {
+      double vals[3] = {i * 0.01, i * 0.02, i * 0.03};
+      nt::SetDoubleArray(pub, vals);
+    }
+    nt::FlushLocal(server);
+    std::this_thread::sleep_for(0.02s);
+  }
+
+  std::vector<int64_t> flushTimes;
+  flushTimes.reserve(1001);
+
+  std::vector<int64_t> times;
+  times.reserve(1001);
+
+  // benchmark
+  auto start = std::chrono::high_resolution_clock::now();
+  int64_t now = nt::Now();
+  for (int i = 1; i <= 1000; ++i) {
+    for (auto pub : pubs) {
+      double vals[3] = {i * 0.01, i * 0.02, i * 0.03};
+      nt::SetDoubleArray(pub, vals);
+    }
+    int64_t prev = now;
+    now = nt::Now();
+    times.emplace_back(now - prev);
+    nt::FlushLocal(server);
+    nt::Flush(server);
+    flushTimes.emplace_back(nt::Now() - now);
+    std::this_thread::sleep_for(0.02s);
+    now = nt::Now();
   }
   auto stop = std::chrono::high_resolution_clock::now();
 
