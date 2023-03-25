@@ -61,6 +61,9 @@ model {
                 lib project: ':wpimath', library: 'wpimath', linkage: 'shared'
                 lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
             }
+            if (it.targetPlatform.name == nativeUtils.wpi.platforms.roborio) {
+                nativeUtils.useRequiredLibrary(it, 'ni_link_libraries', 'ni_runtime_libraries')
+            }
 
             nativeUtils.useRequiredLibrary(it, 'apriltaglib')
         }
