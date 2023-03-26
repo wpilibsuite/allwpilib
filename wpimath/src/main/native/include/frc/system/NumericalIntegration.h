@@ -122,7 +122,11 @@ T RKDP(F&& f, T x, U u, units::second_t dt, double maxError = 1e-6) {
                               (b1[6] - b2[6]) * k7))
                             .norm();
 
-      h *= 0.9 * std::pow(maxError / truncationError, 1.0 / 5.0);
+      if (truncationError < 1e-9) {
+        h = dt.value() - dtElapsed;
+      } else {
+        h *= 0.9 * std::pow(maxError / truncationError, 1.0 / 5.0);
+      }
     } while (truncationError > maxError);
 
     dtElapsed += h;
