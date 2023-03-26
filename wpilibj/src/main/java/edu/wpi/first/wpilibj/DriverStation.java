@@ -216,78 +216,96 @@ public final class DriverStation {
       m_logAxes = new FloatArrayLogEntry(log, "DS:joystick" + stick + "/axes", timestamp);
       m_logPOVs = new IntegerArrayLogEntry(log, "DS:joystick" + stick + "/povs", timestamp);
 
-      appendButtons(timestamp);
-      appendAxes(timestamp);
-      appendPOVs(timestamp);
+      appendButtons(m_joystickButtons[m_stick], timestamp);
+      appendAxes(m_joystickAxes[m_stick], timestamp);
+      appendPOVs(m_joystickPOVs[m_stick], timestamp);
     }
 
     public void send(long timestamp) {
-      if (m_joystickButtonsCache[m_stick].m_count != m_joystickButtons[m_stick].m_count
-          || m_joystickButtonsCache[m_stick].m_buttons != m_joystickButtons[m_stick].m_buttons) {
-        appendButtons(timestamp);
+      HALJoystickButtons buttons = m_joystickButtons[m_stick];
+      if (buttons.m_count != m_prevButtons.m_count
+          || buttons.m_buttons != m_prevButtons.m_buttons) {
+        appendButtons(buttons, timestamp);
       }
 
-      if (m_joystickAxesCache[m_stick].m_count != m_joystickAxes[m_stick].m_count) {
-        appendAxes(timestamp);
+      HALJoystickAxes axes = m_joystickAxes[m_stick];
+      int count = axes.m_count;
+      boolean needToLog = false;
+      if (count != m_prevAxes.m_count) {
+        needToLog = true;
       } else {
-        int count = m_joystickAxesCache[m_stick].m_count;
         for (int i = 0; i < count; i++) {
-          if (m_joystickAxesCache[m_stick].m_axes[i] != m_joystickAxes[m_stick].m_axes[i]) {
-            appendAxes(timestamp);
-            break;
+          if (axes.m_axes[i] != m_prevAxes.m_axes[i]) {
+            needToLog = true;
           }
         }
       }
+      if (needToLog) {
+        appendAxes(axes, timestamp);
+      }
 
-      if (m_joystickPOVsCache[m_stick].m_count != m_joystickPOVs[m_stick].m_count) {
-        appendPOVs(timestamp);
+      HALJoystickPOVs povs = m_joystickPOVs[m_stick];
+      count = m_joystickPOVs[m_stick].m_count;
+      needToLog = false;
+      if (count != m_prevPOVs.m_count) {
+        needToLog = true;
       } else {
-        int count = m_joystickPOVsCache[m_stick].m_count;
         for (int i = 0; i < count; i++) {
-          if (m_joystickPOVsCache[m_stick].m_povs[i] != m_joystickPOVs[m_stick].m_povs[i]) {
-            appendPOVs(timestamp);
-            break;
+          if (povs.m_povs[i] != m_prevPOVs.m_povs[i]) {
+            needToLog = true;
           }
         }
+      }
+      if (needToLog) {
+        appendPOVs(povs, timestamp);
       }
     }
 
-    void appendButtons(long timestamp) {
-      int count = m_joystickButtonsCache[m_stick].m_count;
+    void appendButtons(HALJoystickButtons buttons, long timestamp) {
+      byte count = buttons.m_count;
       if (m_sizedButtons == null || m_sizedButtons.length != count) {
         m_sizedButtons = new boolean[count];
       }
-      int buttons = m_joystickButtonsCache[m_stick].m_buttons;
+      int buttonsValue = buttons.m_buttons;
       for (int i = 0; i < count; i++) {
-        m_sizedButtons[i] = (buttons & (1 << i)) != 0;
+        m_sizedButtons[i] = (buttonsValue & (1 << i)) != 0;
       }
       m_logButtons.append(m_sizedButtons, timestamp);
+      m_prevButtons.m_count = count;
+      m_prevButtons.m_buttons = buttons.m_buttons;
     }
 
-    void appendAxes(long timestamp) {
-      int count = m_joystickAxesCache[m_stick].m_count;
+    void appendAxes(HALJoystickAxes axes, long timestamp) {
+      int count = axes.m_count;
       if (m_sizedAxes == null || m_sizedAxes.length != count) {
         m_sizedAxes = new float[count];
       }
-      System.arraycopy(m_joystickAxesCache[m_stick].m_axes, 0, m_sizedAxes, 0, count);
+      System.arraycopy(axes.m_axes, 0, m_sizedAxes, 0, count);
       m_logAxes.append(m_sizedAxes, timestamp);
+      m_prevAxes.m_count = count;
+      System.arraycopy(axes.m_axes, 0, m_prevAxes.m_axes, 0, count);
     }
 
-    void appendPOVs(long timestamp) {
-      int count = m_joystickPOVsCache[m_stick].m_count;
+    void appendPOVs(HALJoystickPOVs povs, long timestamp) {
+      int count = povs.m_count;
       if (m_sizedPOVs == null || m_sizedPOVs.length != count) {
         m_sizedPOVs = new long[count];
       }
       for (int i = 0; i < count; i++) {
-        m_sizedPOVs[i] = m_joystickPOVsCache[m_stick].m_povs[i];
+        m_sizedPOVs[i] = povs.m_povs[i];
       }
       m_logPOVs.append(m_sizedPOVs, timestamp);
+      m_prevPOVs.m_count = count;
+      System.arraycopy(povs.m_povs, 0, m_prevPOVs.m_povs, 0, count);
     }
 
     final int m_stick;
     boolean[] m_sizedButtons;
     float[] m_sizedAxes;
     long[] m_sizedPOVs;
+    final HALJoystickButtons m_prevButtons = new HALJoystickButtons();
+    final HALJoystickAxes m_prevAxes = new HALJoystickAxes(DriverStationJNI.kMaxJoystickAxes);
+    final HALJoystickPOVs m_prevPOVs = new HALJoystickPOVs(DriverStationJNI.kMaxJoystickPOVs);
     final BooleanArrayLogEntry m_logButtons;
     final FloatArrayLogEntry m_logAxes;
     final IntegerArrayLogEntry m_logPOVs;
