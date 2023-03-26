@@ -238,7 +238,7 @@ public final class NumericalIntegration {
                     .times(h))
                 .normF();
 
-        if (truncationError < 1e-9) {
+        if (truncationError == 0.0) {
           h = dtSeconds - dtElapsed;
         } else {
           h *= 0.9 * Math.pow(maxError / truncationError, 1.0 / 5.0);
