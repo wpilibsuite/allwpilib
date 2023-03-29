@@ -149,7 +149,7 @@
       },
       {
         "displayName": "Color when false",
-        "name": "colorWhenFrue",
+        "name": "colorWhenFalse",
         "description": "",
         "displayType": "Color",
         "javaType": "String",

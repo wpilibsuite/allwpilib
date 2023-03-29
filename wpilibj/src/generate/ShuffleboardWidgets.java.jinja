@@ -18,7 +18,7 @@ public class ShuffleboardWidgets {
   public static SendableMetadata {{ widget.name }}({% for prop in widget.properties %}{{ prop.javaType }} {{ prop.name }}{% if not loop.last %}, {% endif %}{% endfor %}) {
     return object -> object.put("widget", "{{ widget.display }}")
 {% for prop in widget.properties %}
-            .put("{{ prop.name }}", {{ prop.name }})
+            .put("{{ prop.displayName }}", {{ prop.name }})
 {% endfor %}
         ;
   }
