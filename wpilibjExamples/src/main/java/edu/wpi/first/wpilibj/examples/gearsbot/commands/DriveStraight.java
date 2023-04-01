@@ -30,7 +30,8 @@ public class DriveStraight extends PIDCommand {
         Constants.DriveStraightConstants.kD
       ), 
       drivetrain::getDistance,
-      distance, d -> drivetrain.drive(d, d)
+      distance,
+      d -> drivetrain.drive(d, d)
     );
 
     m_drivetrain = drivetrain;
