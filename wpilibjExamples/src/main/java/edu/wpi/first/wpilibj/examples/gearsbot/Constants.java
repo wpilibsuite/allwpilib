@@ -22,8 +22,13 @@ public  final class Constants {
     public static final int encoderCPR = 1024;
     public static final double wheelDiameterInches = 6;
     public static final double encoderDistancePerPulse = 
-        // Assumes the encoders are directly mounted on the wheel shafts
-        (wheelDiameterInches * Math.PI) / (double) encoderCPR;
+      // Assumes the encoders are directly mounted on the wheel shafts
+      (wheelDiameterInches * Math.PI) / (double) encoderCPR;
 
+  }
+
+  public static final class ClawConstants{
+    public static final int motorPort = 7;
+    public static final int contactPort = 5; 
   }
 }
