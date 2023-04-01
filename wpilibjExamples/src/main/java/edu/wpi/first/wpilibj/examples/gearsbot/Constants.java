@@ -44,4 +44,20 @@ public  final class Constants {
 
     public static final int potentiometerPort = 3;
   };
+  
+  public static final class ElevatorConstants{
+    public static final int motorPort = 5;
+    public static final int potentiometerPort = 2;
+    
+    //these pid constants are not real, and will need to be tuned
+    public static final double kP_real = 4;
+    public static final double kI_real = 0.007;
+    
+    public static final double kP_simulation = 18;
+    public static final double kI_simulation = 0.2;
+
+    public static final double kD = 0.0;
+
+    public static final double kTolerance = 0.005;
+  };
 }
