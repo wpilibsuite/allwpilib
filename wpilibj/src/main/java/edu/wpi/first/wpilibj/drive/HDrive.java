@@ -61,7 +61,7 @@ public class HDrive extends RobotDriveBase implements Sendable, AutoCloseable {
   }
 
   /**
-   * Arcade drive method for differential drive platform. The calculated values
+   * Arcade drive method for H Drive platform. The calculated values
    * will be squared to
    * decrease sensitivity at low speeds.
    *
@@ -77,7 +77,7 @@ public class HDrive extends RobotDriveBase implements Sendable, AutoCloseable {
   }
 
   /**
-   * Arcade drive method for differential drive platform.
+   * Arcade drive method for H Drive platform.
    *
    * @param xSpeed       The robot's speed along the X axis [-1.0..1.0]. Forward
    *                     is positive.
@@ -89,6 +89,7 @@ public class HDrive extends RobotDriveBase implements Sendable, AutoCloseable {
    */
   public void arcadeDrive(double xSpeed, double zRotation, double ySpeed, boolean squareInputs) {
     if (!m_reported) {
+      // TODO add HDrive reporting support instead of dif drive.
       HAL.report(
           tResourceType.kResourceType_RobotDrive, tInstances.kRobotDrive2_DifferentialArcade, 2);
       m_reported = true;
@@ -96,18 +97,19 @@ public class HDrive extends RobotDriveBase implements Sendable, AutoCloseable {
 
     xSpeed = MathUtil.applyDeadband(xSpeed, m_deadband);
     zRotation = MathUtil.applyDeadband(zRotation, m_deadband);
+    ySpeed = MathUtil.applyDeadband(ySpeed, m_deadband);
 
     var speeds = arcadeDriveIK(xSpeed, zRotation, ySpeed, squareInputs);
 
     m_leftMotor.set(speeds.left * m_maxOutput);
     m_rightMotor.set(speeds.right * m_maxOutput);
-    m_lateralMotor.set(ySpeed * m_maxOutput/2);
+    m_lateralMotor.set(speeds.lateral * m_maxOutput);
 
     feed();
   }
 
   /**
-   * Arcade drive inverse kinematics for differential drive platform.
+   * Arcade drive inverse kinematics for H Drive platform.
    *
    * @param xSpeed       The robot's speed along the X axis [-1.0..1.0]. Forward
    *                     is positive.
@@ -128,10 +130,12 @@ public class HDrive extends RobotDriveBase implements Sendable, AutoCloseable {
     if (squareInputs) {
       xSpeed = Math.copySign(xSpeed * xSpeed, xSpeed);
       zRotation = Math.copySign(zRotation * zRotation, zRotation);
+      ySpeed = Math.copySign(ySpeed * ySpeed, ySpeed);
     }
 
     double leftSpeed = xSpeed - zRotation;
     double rightSpeed = xSpeed + zRotation;
+    double lateralSpeed = ySpeed;
 
     // Find the maximum possible value of (throttle + turn + lateral) along the vector
     // that the joystick is pointing, then desaturate the wheel speeds
@@ -143,13 +147,13 @@ public class HDrive extends RobotDriveBase implements Sendable, AutoCloseable {
     double saturatedInput = (greaterInput + lesserInput) / greaterInput;
     leftSpeed /= saturatedInput;
     rightSpeed /= saturatedInput;
-    ySpeed /= saturatedInput;
+    lateralSpeed /= saturatedInput;
 
-    return new WheelSpeeds(leftSpeed, rightSpeed, ySpeed);
+    return new WheelSpeeds(leftSpeed, rightSpeed, lateralSpeed);
   }
 
   /**
-   * Tank drive method for differential drive platform. The calculated values will
+   * Tank drive method for H Drive platform. The calculated values will
    * be squared to
    * decrease sensitivity at low speeds.
    *
@@ -165,7 +169,7 @@ public class HDrive extends RobotDriveBase implements Sendable, AutoCloseable {
   }
 
   /**
-   * Tank drive inverse kinematics for differential drive platform.
+   * Tank drive inverse kinematics for H Drive platform.
    *
    * @param leftSpeed    The robot left side's speed along the X axis [-1.0..1.0].
    *                     Forward is positive.
@@ -193,7 +197,7 @@ public class HDrive extends RobotDriveBase implements Sendable, AutoCloseable {
   }
 
   /**
-   * Tank drive method for differential drive platform.
+   * Tank drive method for H Drive platform.
    *
    * @param leftSpeed    The robot left side's speed along the X axis [-1.0..1.0].
    *                     Forward is positive.
@@ -246,7 +250,7 @@ public class HDrive extends RobotDriveBase implements Sendable, AutoCloseable {
   }
 
   /**
-   * Wheel speeds for a differential drive.
+   * Wheel speeds for a H drive.
    *
    * <p>
    * Uses normalized voltage [-1.0..1.0].
