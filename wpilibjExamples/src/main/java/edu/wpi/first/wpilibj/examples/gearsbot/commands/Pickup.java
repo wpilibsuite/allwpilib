@@ -4,10 +4,11 @@
 
 package edu.wpi.first.wpilibj.examples.gearsbot.commands;
 
+import edu.wpi.first.wpilibj.examples.gearsbot.Constants;
 import edu.wpi.first.wpilibj.examples.gearsbot.subsystems.Claw;
 import edu.wpi.first.wpilibj.examples.gearsbot.subsystems.Elevator;
 import edu.wpi.first.wpilibj.examples.gearsbot.subsystems.Wrist;
-import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 
 /**
@@ -23,8 +24,11 @@ public class Pickup extends SequentialCommandGroup {
    */
   public Pickup(Claw claw, Wrist wrist, Elevator elevator) {
     addCommands(
-        new CloseClaw(claw),
-        Commands.parallel(
-            new SetWristSetpoint(-45, wrist), new SetElevatorSetpoint(0.25, elevator)));
+      new CloseClaw(claw),
+      new ParallelCommandGroup(
+        new SetWristSetpoint(Constants.Positions.Pickup.wristSetpoint, wrist),
+        new SetElevatorSetpoint(Constants.Positions.Pickup.elevatorSetpoint, elevator)
+      )
+    );
   }
 }
