@@ -60,4 +60,9 @@ public  final class Constants {
 
     public static final double kTolerance = 0.005;
   };
+
+  public static final class AutoConstants{
+    public static final double distToBox1 = 0.10;
+    public static final double distToBox2 = 0.60;
+  }
 }
