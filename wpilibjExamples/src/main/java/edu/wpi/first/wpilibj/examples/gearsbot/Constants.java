@@ -31,4 +31,17 @@ public  final class Constants {
     public static final int motorPort = 7;
     public static final int contactPort = 5; 
   }
+
+  public static final class WristConstants{
+    public static final int motorPort = 6;
+
+    //these pid constants are not real, and will need to be tuned
+    public static final double kP = 0.1;
+    public static final double kI = 0.0;
+    public static final double kD = 0.0;
+
+    public static final double kTolerance = 2.5;
+
+    public static final int potentiometerPort = 3;
+  };
 }
