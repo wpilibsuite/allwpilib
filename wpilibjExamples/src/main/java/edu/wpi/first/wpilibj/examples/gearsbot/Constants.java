@@ -73,4 +73,22 @@ public  final class Constants {
     public static final double kD = 0.0;
     
   }
+
+  public static final class Positions{
+
+    public static final class Pickup{
+      public static double wristSetpoint = -45.0;
+      public static double elevatorSetpoint = 0.25;
+    }
+
+    public static final class Place{
+      public static double wristSetpoint = 0.0;
+      public static double elevatorSetpoint = 0.25;
+    }
+
+    public static final class PrepareToPickup{
+      public static double wristSetpoint = 0.0;
+      public static double elevatorSetpoint = 0.0;
+    }
+  }
 }
