@@ -131,12 +131,6 @@ HDrive::HDrive(MotorController& leftMotor,
     return {leftSpeed, rightSpeed, lateralSpeed};
   }
 
-  void DifferentialDrive::StopMotor() {
-    m_leftMotor->StopMotor();
-    m_rightMotor->StopMotor();
-    Feed();
-  }
-
   std::string HDrive::GetDescription() const {
     return "HDrive";
   }
