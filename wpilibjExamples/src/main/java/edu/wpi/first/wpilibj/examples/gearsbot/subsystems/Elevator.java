@@ -6,6 +6,7 @@ package edu.wpi.first.wpilibj.examples.gearsbot.subsystems;
 
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj.AnalogPotentiometer;
+import edu.wpi.first.wpilibj.examples.gearsbot.Constants;
 import edu.wpi.first.wpilibj.examples.gearsbot.Robot;
 import edu.wpi.first.wpilibj.motorcontrol.Victor;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -16,32 +17,24 @@ import edu.wpi.first.wpilibj2.command.PIDSubsystem;
  * values for simulation are different than in the real world do to minor differences.
  */
 public class Elevator extends PIDSubsystem {
-  private final Victor m_motor;
+  private final Victor m_motor= new Victor(Constants.ElevatorConstants.motorPort);
   private final AnalogPotentiometer m_pot;
-
-  private static final double kP_real = 4;
-  private static final double kI_real = 0.07;
-  private static final double kP_simulation = 18;
-  private static final double kI_simulation = 0.2;
 
   /** Create a new elevator subsystem. */
   public Elevator() {
-    super(new PIDController(kP_real, kI_real, 0));
-    if (Robot.isSimulation()) { // Check for simulation and update PID values
-      getController().setPID(kP_simulation, kI_simulation, 0);
-    }
-    getController().setTolerance(0.005);
-
-    m_motor = new Victor(5);
+    super(
+      new PIDController(
+        Robot.isSimulation() ? Constants.ElevatorConstants.kP_simulation : Constants.ElevatorConstants.kP_real,
+        Robot.isSimulation() ? Constants.ElevatorConstants.kI_simulation : Constants.ElevatorConstants.kI_real,
+        Constants.ElevatorConstants.kD
+      )
+    );
+    getController().setTolerance(Constants.ElevatorConstants.kTolerance);
 
     // Conversion value of potentiometer varies between the real world and
     // simulation
-    if (Robot.isReal()) {
-      m_pot = new AnalogPotentiometer(2, -2.0 / 5);
-    } else {
-      m_pot = new AnalogPotentiometer(2); // Defaults to meters
-    }
-
+    m_pot = new AnalogPotentiometer(Constants.ElevatorConstants.potentiometerPort,Robot.isReal()? -2.0 / 5 : 1);
+    
     // Let's name everything on the LiveWindow
     addChild("Motor", m_motor);
     addChild("Pot", m_pot);
