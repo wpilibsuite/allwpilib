@@ -65,4 +65,12 @@ public  final class Constants {
     public static final double distToBox1 = 0.10;
     public static final double distToBox2 = 0.60;
   }
+
+  public static final class DriveStraightConstants{
+    //these pid constants are not real, and will need to be tuned
+    public static final double kP = 4.0;
+    public static final double kI = 0.0;
+    public static final double kD = 0.0;
+    
+  }
 }
