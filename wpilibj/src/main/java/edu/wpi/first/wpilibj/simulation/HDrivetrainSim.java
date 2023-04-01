@@ -14,6 +14,7 @@ import edu.wpi.first.math.numbers.N9;
 import edu.wpi.first.math.system.LinearSystem;
 import edu.wpi.first.math.system.NumericalIntegration;
 import edu.wpi.first.math.system.plant.DCMotor;
+import edu.wpi.first.math.system.plant.HDrivetrainLateralSystemId;
 import edu.wpi.first.math.system.plant.LinearSystemId;
 import edu.wpi.first.wpilibj.RobotController;
 
