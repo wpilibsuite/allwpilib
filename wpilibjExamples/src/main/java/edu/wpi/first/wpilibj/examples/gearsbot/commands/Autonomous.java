@@ -17,13 +17,17 @@ public class Autonomous extends SequentialCommandGroup {
   /** Create a new autonomous command. */
   public Autonomous(Drivetrain drive, Claw claw, Wrist wrist, Elevator elevator) {
     addCommands(
-        new PrepareToPickup(claw, wrist, elevator),
-        new Pickup(claw, wrist, elevator),
-        new SetDistanceToBox(Constants.AutoConstants.distToBox1, drive),
-        // new DriveStraight(4), // Use encoders if ultrasonic is broken
-        new Place(claw, wrist, elevator),
-        new SetDistanceToBox(Constants.AutoConstants.distToBox2, drive),
-        // new DriveStraight(-2), // Use Encoders if ultrasonic is broken
-        Commands.parallel(new SetWristSetpoint(-45, wrist), new CloseClaw(claw)));
+      new PrepareToPickup(claw, wrist, elevator),
+      new Pickup(claw, wrist, elevator),
+      new SetDistanceToBox(Constants.AutoConstants.distToBox1, drive),
+      // new DriveStraight(4), // Use encoders if ultrasonic is broken
+      new Place(claw, wrist, elevator),
+      new SetDistanceToBox(Constants.AutoConstants.distToBox2, drive),
+      // new DriveStraight(-2), // Use Encoders if ultrasonic is broken
+      Commands.parallel(
+        new SetWristSetpoint(Constants.AutoConstants.wristSetpoint, wrist),
+        new CloseClaw(claw)
+      )
+    );
   }
 }
