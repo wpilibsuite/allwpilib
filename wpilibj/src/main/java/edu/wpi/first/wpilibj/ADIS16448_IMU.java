@@ -455,7 +455,7 @@ public class ADIS16448_IMU implements AutoCloseable, NTSendable {
     m_spi.setAutoTransmitData(new byte[] {GLOB_CMD}, 27);
     // Configure auto stall time
     m_spi.configureAutoStall(100, 1000, 255);
-    // Kick off auto SPI (Note: Device configration impossible after auto SPI is
+    // Kick off auto SPI (Note: Device configuration impossible after auto SPI is
     // activated)
     m_spi.startAutoTrigger(m_auto_interrupt, true, false);
 

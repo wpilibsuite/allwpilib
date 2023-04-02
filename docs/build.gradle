@@ -239,7 +239,7 @@ task generateJavaDocs(type: Javadoc) {
     if (JavaVersion.current().isJava8Compatible() && project.hasProperty('docWarningsAsErrors')) {
         // Treat javadoc warnings as errors.
         //
-        // The second argument '-quiet' is a hack. The one paramater
+        // The second argument '-quiet' is a hack. The one parameter
         // addStringOption() doesn't work, so we add '-quiet', which is added
         // anyway by gradle. See https://github.com/gradle/gradle/issues/2354.
         //

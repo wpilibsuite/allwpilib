@@ -86,7 +86,7 @@ public final class LiveWindow {
    * enable all the components registered for LiveWindow. If it's being disabled, stop all the
    * registered components and re-enable the scheduler.
    *
-   * <p>TODO: add code to disable PID loops when enabling LiveWindow. The commands should reenable
+   * <p>TODO: add code to disable PID loops when enabling LiveWindow. The commands should re-enable
    * the PID loops themselves when they get rescheduled. This prevents arms from starting to move
    * around, etc. after a period of adjusting them in LiveWindow mode.
    *

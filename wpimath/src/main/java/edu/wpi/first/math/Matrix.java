@@ -222,7 +222,7 @@ public class Matrix<R extends Num, C extends Num> {
    *
    * <p>c<sub>i,j</sub> = a<sub>i,j</sub>*other<sub>i,j</sub>
    *
-   * @param other The other {@link Matrix} to preform element multiplication on.
+   * @param other The other {@link Matrix} to perform element multiplication on.
    * @return The element by element multiplication of "this" and other.
    */
   public final Matrix<R, C> elementTimes(Matrix<R, C> other) {

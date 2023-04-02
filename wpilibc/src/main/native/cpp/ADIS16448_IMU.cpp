@@ -285,7 +285,7 @@ bool ADIS16448_IMU::SwitchToAutoSPI() {
   m_spi->SetAutoTransmitData({{GLOB_CMD}}, 27);
   // Configure auto stall time
   m_spi->ConfigureAutoStall(HAL_SPI_kMXP, 100, 1000, 255);
-  // Kick off DMA SPI (Note: Device configration impossible after SPI DMA is
+  // Kick off DMA SPI (Note: Device configuration impossible after SPI DMA is
   // activated)
   m_spi->StartAutoTrigger(*m_auto_interrupt, true, false);
   // Check to see if the acquire thread is running. If not, kick one off.

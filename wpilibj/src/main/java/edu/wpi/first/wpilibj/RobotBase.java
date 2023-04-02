@@ -216,7 +216,7 @@ public abstract class RobotBase implements AutoCloseable {
   /**
    * Determine if the Robot is currently disabled.
    *
-   * @return True if the Robot is currently disabled by the field controls.
+   * @return True if the Robot is currently disabled by the Driver Station.
    */
   public boolean isDisabled() {
     return DriverStation.isDisabled();
@@ -225,14 +225,14 @@ public abstract class RobotBase implements AutoCloseable {
   /**
    * Determine if the Robot is currently enabled.
    *
-   * @return True if the Robot is currently enabled by the field controls.
+   * @return True if the Robot is currently enabled by the Driver Station.
    */
   public boolean isEnabled() {
     return DriverStation.isEnabled();
   }
 
   /**
-   * Determine if the robot is currently in Autonomous mode as determined by the field controls.
+   * Determine if the robot is currently in Autonomous mode as determined by the Driver Station.
    *
    * @return True if the robot is currently operating Autonomously.
    */
@@ -241,8 +241,8 @@ public abstract class RobotBase implements AutoCloseable {
   }
 
   /**
-   * Determine if the robot is current in Autonomous mode and enabled as determined by the field
-   * controls.
+   * Determine if the robot is currently in Autonomous mode and enabled as determined by the Driver
+   * Station.
    *
    * @return True if the robot is currently operating autonomously while enabled.
    */
@@ -251,7 +251,7 @@ public abstract class RobotBase implements AutoCloseable {
   }
 
   /**
-   * Determine if the robot is currently in Test mode as determined by the driver station.
+   * Determine if the robot is currently in Test mode as determined by the Driver Station.
    *
    * @return True if the robot is currently operating in Test mode.
    */
@@ -260,8 +260,17 @@ public abstract class RobotBase implements AutoCloseable {
   }
 
   /**
-   * Determine if the robot is currently in Operator Control mode as determined by the field
-   * controls.
+   * Determine if the robot is current in Test mode and enabled as determined by the Driver Station.
+   *
+   * @return True if the robot is currently operating in Test mode while enabled.
+   */
+  public boolean isTestEnabled() {
+    return DriverStation.isTestEnabled();
+  }
+
+  /**
+   * Determine if the robot is currently in Operator Control mode as determined by the Driver
+   * Station.
    *
    * @return True if the robot is currently operating in Tele-Op mode.
    */
@@ -270,8 +279,8 @@ public abstract class RobotBase implements AutoCloseable {
   }
 
   /**
-   * Determine if the robot is current in Operator Control mode and enabled as determined by the
-   * field controls.
+   * Determine if the robot is currently in Operator Control mode and enabled as determined by the
+   * Driver Station.
    *
    * @return True if the robot is currently operating in Tele-Op mode while enabled.
    */

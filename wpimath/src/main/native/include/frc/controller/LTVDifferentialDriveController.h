@@ -41,6 +41,7 @@ class WPILIB_DLLEXPORT LTVDifferentialDriveController {
    * @param Qelems     The maximum desired error tolerance for each state.
    * @param Relems     The maximum desired control effort for each input.
    * @param dt         Discretization timestep.
+   * @throws std::domain_error if max velocity of plant with 12 V input <= 0.
    */
   LTVDifferentialDriveController(const frc::LinearSystem<2, 2, 2>& plant,
                                  units::meter_t trackwidth,

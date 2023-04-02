@@ -79,7 +79,7 @@ public class FieldConfig {
    *
    * @param resourcePath The path to the resource file
    * @return The field configuration
-   * @throws IOException Throws if the resoure could not be loaded
+   * @throws IOException Throws if the resource could not be loaded
    */
   public static FieldConfig loadFromResource(String resourcePath) throws IOException {
     try (InputStream stream = FieldConfig.class.getResourceAsStream(resourcePath);

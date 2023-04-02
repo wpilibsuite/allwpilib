@@ -210,6 +210,14 @@ class DriverStation final {
   static bool IsTest();
 
   /**
+   * Check if the DS is commanding Test mode and if it has enabled the robot.
+   *
+   * @return True if the robot is being commanded to be in Test mode and
+   * enabled.
+   */
+  static bool IsTestEnabled();
+
+  /**
    * Check if the DS is attached.
    *
    * @return True if the DS is connected to the robot

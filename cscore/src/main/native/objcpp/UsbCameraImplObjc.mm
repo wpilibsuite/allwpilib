@@ -79,7 +79,7 @@ using namespace cs;
     default:
       OBJCERROR(
           "Camera access explicitly blocked for application. No cameras are "
-          "accessable");
+          "accessible");
       self.isAuthorized = false;
       // TODO log
       break;
@@ -524,7 +524,7 @@ static cs::VideoMode::PixelFormat FourCCToPixelFormat(FourCharCode fourcc) {
   if (!self.isAuthorized) {
     OBJCERROR(
         "Camera access not authorized for application. No cameras are "
-        "accessable");
+        "accessible");
     return false;
   }
 

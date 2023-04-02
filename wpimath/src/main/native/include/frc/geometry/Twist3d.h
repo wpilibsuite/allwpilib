@@ -15,7 +15,7 @@ namespace frc {
 /**
  * A change in distance along a 3D arc since the last pose update. We can use
  * ideas from differential calculus to create new Pose3ds from a Twist3d and
- * vise versa.
+ * vice versa.
  *
  * A Twist can be used to represent a difference between two poses.
  */
