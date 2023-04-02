@@ -24,17 +24,30 @@ public class Elevator extends PIDSubsystem {
   public Elevator() {
     super(
       new PIDController(
-        Robot.isSimulation() ? Constants.ElevatorConstants.kP_simulation : Constants.ElevatorConstants.kP_real,
-        Robot.isSimulation() ? Constants.ElevatorConstants.kI_simulation : Constants.ElevatorConstants.kI_real,
+        Constants.ElevatorConstants.kP_real,
+        Constants.ElevatorConstants.kI_real,
         Constants.ElevatorConstants.kD
       )
     );
+
+    if (Robot.isSimulation()) { // Check for simulation and update PID values
+      getController().setPID(
+        Constants.ElevatorConstants.kP_simulation,
+        Constants.ElevatorConstants.kI_simulation,
+        Constants.ElevatorConstants.kD
+      );
+    }
     getController().setTolerance(Constants.ElevatorConstants.kTolerance);
 
     // Conversion value of potentiometer varies between the real world and
     // simulation
-    m_pot = new AnalogPotentiometer(Constants.ElevatorConstants.potentiometerPort,Robot.isReal()? -2.0 / 5 : 1);
     
+    if (Robot.isReal()) {
+      m_pot = new AnalogPotentiometer(2, -2.0 / 5);
+    } else {
+      m_pot = new AnalogPotentiometer(2); // Defaults to meters
+    }
+
     // Let's name everything on the LiveWindow
     addChild("Motor", m_motor);
     addChild("Pot", m_pot);
