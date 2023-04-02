@@ -21,29 +21,30 @@ public class Drivetrain extends SubsystemBase {
    * The Drivetrain subsystem incorporates the sensors and actuators attached to the robots chassis.
    * These include four drive motors, a left and right encoder and a gyro.
    */
-  private final MotorController m_leftMotor = new MotorControllerGroup(
-    new PWMSparkMax(Constants.DriveConstants.leftMotorPort1),
-    new PWMSparkMax(Constants.DriveConstants.leftMotorPort2)
-  );
+  private final MotorController m_leftMotor =
+      new MotorControllerGroup(
+          new PWMSparkMax(Constants.DriveConstants.leftMotorPort1),
+          new PWMSparkMax(Constants.DriveConstants.leftMotorPort2));
 
-  private final MotorController m_rightMotor =new MotorControllerGroup(
-    new PWMSparkMax(Constants.DriveConstants.rightMotorPort1),
-    new PWMSparkMax(Constants.DriveConstants.rightMotorPort2)
-  );
+  private final MotorController m_rightMotor =
+      new MotorControllerGroup(
+          new PWMSparkMax(Constants.DriveConstants.rightMotorPort1),
+          new PWMSparkMax(Constants.DriveConstants.rightMotorPort2));
 
   private final DifferentialDrive m_drive = new DifferentialDrive(m_leftMotor, m_rightMotor);
 
-  private final Encoder m_leftEncoder = new Encoder(
-    Constants.DriveConstants.leftEncoderPorts[0],
-    Constants.DriveConstants.leftEncoderPorts[1],
-    Constants.DriveConstants.leftEncoderReversed
-    );
-  private final Encoder m_rightEncoder = new Encoder(
-    Constants.DriveConstants.rightEncoderPorts[0],
-    Constants.DriveConstants.rightEncoderPorts[1],
-    Constants.DriveConstants.rightEncoderReversed
-  );
-  private final AnalogInput m_rangefinder = new AnalogInput(Constants.DriveConstants.rangeFinderPort);
+  private final Encoder m_leftEncoder =
+      new Encoder(
+          Constants.DriveConstants.leftEncoderPorts[0],
+          Constants.DriveConstants.leftEncoderPorts[1],
+          Constants.DriveConstants.leftEncoderReversed);
+  private final Encoder m_rightEncoder =
+      new Encoder(
+          Constants.DriveConstants.rightEncoderPorts[0],
+          Constants.DriveConstants.rightEncoderPorts[1],
+          Constants.DriveConstants.rightEncoderReversed);
+  private final AnalogInput m_rangefinder =
+      new AnalogInput(Constants.DriveConstants.rangeFinderPort);
   private final AnalogGyro m_gyro = new AnalogGyro(Constants.DriveConstants.analogGyroPort);
 
   /** Create a new drivetrain subsystem. */

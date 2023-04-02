@@ -22,11 +22,10 @@ public class PrepareToPickup extends SequentialCommandGroup {
    */
   public PrepareToPickup(Claw claw, Wrist wrist, Elevator elevator) {
     addCommands(
-      new OpenClaw(claw),
-      Commands.parallel(
-        new SetWristSetpoint(Constants.Positions.PrepareToPickup.wristSetpoint, wrist),
-        new SetElevatorSetpoint(Constants.Positions.PrepareToPickup.elevatorSetpoint, elevator)
-        )
-      );
+        new OpenClaw(claw),
+        Commands.parallel(
+            new SetWristSetpoint(Constants.Positions.PrepareToPickup.wristSetpoint, wrist),
+            new SetElevatorSetpoint(
+                Constants.Positions.PrepareToPickup.elevatorSetpoint, elevator)));
   }
 }

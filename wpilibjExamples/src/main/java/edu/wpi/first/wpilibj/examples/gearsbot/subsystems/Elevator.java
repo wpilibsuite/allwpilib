@@ -17,31 +17,29 @@ import edu.wpi.first.wpilibj2.command.PIDSubsystem;
  * values for simulation are different than in the real world do to minor differences.
  */
 public class Elevator extends PIDSubsystem {
-  private final Victor m_motor= new Victor(Constants.ElevatorConstants.motorPort);
+  private final Victor m_motor = new Victor(Constants.ElevatorConstants.motorPort);
   private final AnalogPotentiometer m_pot;
 
   /** Create a new elevator subsystem. */
   public Elevator() {
     super(
-      new PIDController(
-        Constants.ElevatorConstants.kP_real,
-        Constants.ElevatorConstants.kI_real,
-        Constants.ElevatorConstants.kD
-      )
-    );
+        new PIDController(
+            Constants.ElevatorConstants.kP_real,
+            Constants.ElevatorConstants.kI_real,
+            Constants.ElevatorConstants.kD));
 
     if (Robot.isSimulation()) { // Check for simulation and update PID values
-      getController().setPID(
-        Constants.ElevatorConstants.kP_simulation,
-        Constants.ElevatorConstants.kI_simulation,
-        Constants.ElevatorConstants.kD
-      );
+      getController()
+          .setPID(
+              Constants.ElevatorConstants.kP_simulation,
+              Constants.ElevatorConstants.kI_simulation,
+              Constants.ElevatorConstants.kD);
     }
     getController().setTolerance(Constants.ElevatorConstants.kTolerance);
 
     // Conversion value of potentiometer varies between the real world and
     // simulation
-    
+
     if (Robot.isReal()) {
       m_pot = new AnalogPotentiometer(2, -2.0 / 5);
     } else {

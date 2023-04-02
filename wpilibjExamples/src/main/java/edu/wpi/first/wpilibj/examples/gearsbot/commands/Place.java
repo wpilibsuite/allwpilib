@@ -21,9 +21,8 @@ public class Place extends SequentialCommandGroup {
    */
   public Place(Claw claw, Wrist wrist, Elevator elevator) {
     addCommands(
-      new SetElevatorSetpoint(Constants.Positions.Place.elevatorSetpoint, elevator),
-      new SetWristSetpoint(Constants.Positions.Place.wristSetpoint, wrist),
-      new OpenClaw(claw)
-    );
+        new SetElevatorSetpoint(Constants.Positions.Place.elevatorSetpoint, elevator),
+        new SetWristSetpoint(Constants.Positions.Place.wristSetpoint, wrist),
+        new OpenClaw(claw));
   }
 }

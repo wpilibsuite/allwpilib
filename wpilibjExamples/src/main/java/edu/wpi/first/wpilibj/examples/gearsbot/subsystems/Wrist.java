@@ -21,20 +21,18 @@ public class Wrist extends PIDSubsystem {
 
   /** Create a new wrist subsystem. */
   public Wrist() {
-    super(new PIDController(
-      Constants.WristConstants.kP,
-      Constants.WristConstants.kI,
-      Constants.WristConstants.kD
-    ));
+    super(
+        new PIDController(
+            Constants.WristConstants.kP, Constants.WristConstants.kI, Constants.WristConstants.kD));
     getController().setTolerance(Constants.WristConstants.kTolerance);
-
 
     // Conversion value of potentiometer varies between the real world and
     // simulation
     if (Robot.isReal()) {
       m_pot = new AnalogPotentiometer(Constants.WristConstants.potentiometerPort, -270.0 / 5);
     } else {
-      m_pot = new AnalogPotentiometer(Constants.WristConstants.potentiometerPort); // Defaults to degrees
+      // Defaults to degrees
+      m_pot = new AnalogPotentiometer(Constants.WristConstants.potentiometerPort);
     }
 
     // Let's name everything on the LiveWindow
