@@ -1,7 +1,10 @@
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
+
 package edu.wpi.first.wpilibj.examples.gearsbot;
 
 public final class Constants {
-
   public static final class DriveConstants {
     public static final int leftMotorPort1 = 0;
     public static final int leftMotorPort2 = 1;
@@ -73,7 +76,6 @@ public final class Constants {
   }
 
   public static final class Positions {
-
     public static final class Pickup {
       public static final double wristSetpoint = -45.0;
       public static final double elevatorSetpoint = 0.25;
