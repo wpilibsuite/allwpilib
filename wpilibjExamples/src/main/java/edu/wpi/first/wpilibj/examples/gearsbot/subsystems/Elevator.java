@@ -17,7 +17,7 @@ import edu.wpi.first.wpilibj2.command.PIDSubsystem;
  * values for simulation are different than in the real world do to minor differences.
  */
 public class Elevator extends PIDSubsystem {
-  private final Victor m_motor = new Victor(Constants.ElevatorConstants.motorPort);
+  private final Victor m_motor = new Victor(Constants.ElevatorConstants.kMotorPort);
   private final AnalogPotentiometer m_pot;
 
   /** Create a new elevator subsystem. */

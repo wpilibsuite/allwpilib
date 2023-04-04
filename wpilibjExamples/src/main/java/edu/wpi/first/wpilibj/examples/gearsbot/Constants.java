@@ -6,34 +6,34 @@ package edu.wpi.first.wpilibj.examples.gearsbot;
 
 public final class Constants {
   public static final class DriveConstants {
-    public static final int leftMotorPort1 = 0;
-    public static final int leftMotorPort2 = 1;
+    public static final int kLeftMotorPort1 = 0;
+    public static final int kLeftMotorPort2 = 1;
 
-    public static final int rightMotorPort1 = 2;
-    public static final int rightMotorPort2 = 3;
+    public static final int kRightMotorPort1 = 2;
+    public static final int kRightMotorPort2 = 3;
 
-    public static final int[] leftEncoderPorts = {0, 1};
-    public static final int[] rightEncoderPorts = {2, 3};
-    public static final boolean leftEncoderReversed = false;
-    public static final boolean rightEncoderReversed = false;
+    public static final int[] kLeftEncoderPorts = {0, 1};
+    public static final int[] kRightEncoderPorts = {2, 3};
+    public static final boolean kLeftEncoderReversed = false;
+    public static final boolean kRightEncoderReversed = false;
 
-    public static final int rangeFinderPort = 6;
-    public static final int analogGyroPort = 1;
+    public static final int kRangeFinderPort = 6;
+    public static final int kAnalogGyroPort = 1;
 
-    public static final int encoderCPR = 1024;
-    public static final double wheelDiameterInches = 6;
-    public static final double encoderDistancePerPulse =
+    public static final int kEncoderCPR = 1024;
+    public static final double kWheelDiameterInches = 6;
+    public static final double kEncoderDistancePerPulse =
         // Assumes the encoders are directly mounted on the wheel shafts
-        (wheelDiameterInches * Math.PI) / (double) encoderCPR;
+        (kWheelDiameterInches * Math.PI) / (double) kEncoderCPR;
   }
 
   public static final class ClawConstants {
-    public static final int motorPort = 7;
-    public static final int contactPort = 5;
+    public static final int kMotorPort = 7;
+    public static final int kContactPort = 5;
   }
 
   public static final class WristConstants {
-    public static final int motorPort = 6;
+    public static final int kMotorPort = 6;
 
     // these pid constants are not real, and will need to be tuned
     public static final double kP = 0.1;
@@ -42,12 +42,12 @@ public final class Constants {
 
     public static final double kTolerance = 2.5;
 
-    public static final int potentiometerPort = 3;
+    public static final int kPotentiometerPort = 3;
   }
 
   public static final class ElevatorConstants {
-    public static final int motorPort = 5;
-    public static final int potentiometerPort = 2;
+    public static final int kMotorPort = 5;
+    public static final int kPotentiometerPort = 2;
 
     // these pid constants are not real, and will need to be tuned
     public static final double kP_real = 4;
@@ -62,10 +62,10 @@ public final class Constants {
   }
 
   public static final class AutoConstants {
-    public static final double distToBox1 = 0.10;
-    public static final double distToBox2 = 0.60;
+    public static final double kDistToBox1 = 0.10;
+    public static final double kDistToBox2 = 0.60;
 
-    public static final double wristSetpoint = -45.0;
+    public static final double kWristSetpoint = -45.0;
   }
 
   public static final class DriveStraightConstants {
@@ -77,18 +77,18 @@ public final class Constants {
 
   public static final class Positions {
     public static final class Pickup {
-      public static final double wristSetpoint = -45.0;
-      public static final double elevatorSetpoint = 0.25;
+      public static final double kWristSetpoint = -45.0;
+      public static final double kElevatorSetpoint = 0.25;
     }
 
     public static final class Place {
-      public static final double wristSetpoint = 0.0;
-      public static final double elevatorSetpoint = 0.25;
+      public static final double kWristSetpoint = 0.0;
+      public static final double kElevatorSetpoint = 0.25;
     }
 
     public static final class PrepareToPickup {
-      public static final double wristSetpoint = 0.0;
-      public static final double elevatorSetpoint = 0.0;
+      public static final double kWristSetpoint = 0.0;
+      public static final double kElevatorSetpoint = 0.0;
     }
   }
 }

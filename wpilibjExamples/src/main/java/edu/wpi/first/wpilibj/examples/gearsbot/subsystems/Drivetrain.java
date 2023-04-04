@@ -8,7 +8,7 @@ import edu.wpi.first.wpilibj.AnalogGyro;
 import edu.wpi.first.wpilibj.AnalogInput;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
-import edu.wpi.first.wpilibj.examples.gearsbot.Constants;
+import edu.wpi.first.wpilibj.examples.gearsbot.Constants.DriveConstants;
 import edu.wpi.first.wpilibj.examples.gearsbot.Robot;
 import edu.wpi.first.wpilibj.motorcontrol.MotorController;
 import edu.wpi.first.wpilibj.motorcontrol.MotorControllerGroup;
@@ -23,29 +23,29 @@ public class Drivetrain extends SubsystemBase {
    */
   private final MotorController m_leftMotor =
       new MotorControllerGroup(
-          new PWMSparkMax(Constants.DriveConstants.leftMotorPort1),
-          new PWMSparkMax(Constants.DriveConstants.leftMotorPort2));
+          new PWMSparkMax(DriveConstants.kLeftMotorPort1),
+          new PWMSparkMax(DriveConstants.kLeftMotorPort1));
 
   private final MotorController m_rightMotor =
       new MotorControllerGroup(
-          new PWMSparkMax(Constants.DriveConstants.rightMotorPort1),
-          new PWMSparkMax(Constants.DriveConstants.rightMotorPort2));
+          new PWMSparkMax(DriveConstants.kRightMotorPort2),
+          new PWMSparkMax(DriveConstants.kLeftMotorPort2));
 
   private final DifferentialDrive m_drive = new DifferentialDrive(m_leftMotor, m_rightMotor);
 
   private final Encoder m_leftEncoder =
       new Encoder(
-          Constants.DriveConstants.leftEncoderPorts[0],
-          Constants.DriveConstants.leftEncoderPorts[1],
-          Constants.DriveConstants.leftEncoderReversed);
+          DriveConstants.kLeftEncoderPorts[0],
+          DriveConstants.kLeftEncoderPorts[1],
+          DriveConstants.kLeftEncoderReversed);
   private final Encoder m_rightEncoder =
       new Encoder(
-          Constants.DriveConstants.rightEncoderPorts[0],
-          Constants.DriveConstants.rightEncoderPorts[1],
-          Constants.DriveConstants.rightEncoderReversed);
+          DriveConstants.kRightEncoderPorts[0],
+          DriveConstants.kRightEncoderPorts[1],
+          DriveConstants.kRightEncoderReversed);
   private final AnalogInput m_rangefinder =
-      new AnalogInput(Constants.DriveConstants.rangeFinderPort);
-  private final AnalogGyro m_gyro = new AnalogGyro(Constants.DriveConstants.analogGyroPort);
+      new AnalogInput(DriveConstants.kRangeFinderPort);
+  private final AnalogGyro m_gyro = new AnalogGyro(DriveConstants.kAnalogGyroPort);
 
   /** Create a new drivetrain subsystem. */
   public Drivetrain() {
@@ -62,8 +62,8 @@ public class Drivetrain extends SubsystemBase {
     // simulate 360 tick encoders. This if statement allows for the
     // real robot to handle this difference in devices.
     if (Robot.isReal()) {
-      m_leftEncoder.setDistancePerPulse(Constants.DriveConstants.encoderDistancePerPulse);
-      m_rightEncoder.setDistancePerPulse(Constants.DriveConstants.encoderDistancePerPulse);
+      m_leftEncoder.setDistancePerPulse(DriveConstants.kEncoderDistancePerPulse);
+      m_rightEncoder.setDistancePerPulse(DriveConstants.kEncoderDistancePerPulse);
     } else {
       // Circumference = diameter in feet * pi. 360 tick simulated encoders.
       m_leftEncoder.setDistancePerPulse((4.0 / 12.0 * Math.PI) / 360.0);

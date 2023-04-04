@@ -4,7 +4,7 @@
 
 package edu.wpi.first.wpilibj.examples.gearsbot.commands;
 
-import edu.wpi.first.wpilibj.examples.gearsbot.Constants;
+import edu.wpi.first.wpilibj.examples.gearsbot.Constants.Positions;
 import edu.wpi.first.wpilibj.examples.gearsbot.subsystems.Claw;
 import edu.wpi.first.wpilibj.examples.gearsbot.subsystems.Elevator;
 import edu.wpi.first.wpilibj.examples.gearsbot.subsystems.Wrist;
@@ -21,8 +21,8 @@ public class Place extends SequentialCommandGroup {
    */
   public Place(Claw claw, Wrist wrist, Elevator elevator) {
     addCommands(
-        new SetElevatorSetpoint(Constants.Positions.Place.elevatorSetpoint, elevator),
-        new SetWristSetpoint(Constants.Positions.Place.wristSetpoint, wrist),
+        new SetElevatorSetpoint(Positions.Place.kElevatorSetpoint, elevator),
+        new SetWristSetpoint(Positions.Place.kWristSetpoint, wrist),
         new OpenClaw(claw));
   }
 }
