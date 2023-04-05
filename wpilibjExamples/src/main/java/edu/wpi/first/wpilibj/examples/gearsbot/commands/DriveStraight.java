@@ -5,7 +5,7 @@
 package edu.wpi.first.wpilibj.examples.gearsbot.commands;
 
 import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.wpilibj.examples.gearsbot.Constants;
+import edu.wpi.first.wpilibj.examples.gearsbot.Constants.DriveStraightConstants;
 import edu.wpi.first.wpilibj.examples.gearsbot.subsystems.Drivetrain;
 import edu.wpi.first.wpilibj2.command.PIDCommand;
 
@@ -25,9 +25,9 @@ public class DriveStraight extends PIDCommand {
   public DriveStraight(double distance, Drivetrain drivetrain) {
     super(
         new PIDController(
-            Constants.DriveStraightConstants.kP,
-            Constants.DriveStraightConstants.kI,
-            Constants.DriveStraightConstants.kD),
+            DriveStraightConstants.kP,
+            DriveStraightConstants.kI,
+            DriveStraightConstants.kD),
         drivetrain::getDistance,
         distance,
         d -> drivetrain.drive(d, d));
