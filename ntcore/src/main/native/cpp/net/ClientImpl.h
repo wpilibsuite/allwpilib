@@ -40,7 +40,7 @@ class ClientImpl {
   ~ClientImpl();
 
   void ProcessIncomingText(std::string_view data);
-  void ProcessIncomingBinary(std::span<const uint8_t> data);
+  void ProcessIncomingBinary(uint64_t curTimeMs, std::span<const uint8_t> data);
   void HandleLocal(std::vector<ClientMessage>&& msgs);
 
   void SendControl(uint64_t curTimeMs);
