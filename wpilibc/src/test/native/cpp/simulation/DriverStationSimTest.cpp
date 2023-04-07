@@ -129,6 +129,17 @@ TEST(DriverStationTest, AllianceStationId) {
 
   auto cb = DriverStationSim::RegisterAllianceStationIdCallback(
       callback.GetCallback(), false);
+
+  // Unknown
+  allianceStation = HAL_AllianceStationID_kUnknown;
+  DriverStationSim::SetAllianceStationId(allianceStation);
+  frc::sim::DriverStationSim::NotifyNewData();
+  EXPECT_EQ(allianceStation, DriverStationSim::GetAllianceStationId());
+  EXPECT_FALSE(DriverStation::GetAlliance().has_value());
+  EXPECT_FALSE(DriverStation::GetLocation().has_value());
+  EXPECT_TRUE(callback.WasTriggered());
+  EXPECT_EQ(allianceStation, callback.GetLastValue());
+
   // B1
   allianceStation = HAL_AllianceStationID_kBlue1;
   DriverStationSim::SetAllianceStationId(allianceStation);

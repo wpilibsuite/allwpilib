@@ -4,10 +4,13 @@
 
 package edu.wpi.first.wpilibj.examples.i2ccommunication;
 
+import java.util.Optional;
+
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.I2C;
 import edu.wpi.first.wpilibj.I2C.Port;
 import edu.wpi.first.wpilibj.TimedRobot;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 
 /**
  * This is a sample program demonstrating how to communicate to a light controller from the robot
@@ -48,8 +51,14 @@ public class Robot extends TimedRobot {
     // alliance, enabled in teleop mode, with 43 seconds left in the match.
     StringBuilder stateMessage = new StringBuilder(6);
 
+    String allianceString = "U";
+    Optional<Alliance> alliance = DriverStation.getAlliance();
+    if (alliance.isPresent()) {
+      allianceString = alliance.get() == DriverStation.Alliance.Red ? "R" : "B";
+    }
+
     stateMessage
-        .append(DriverStation.getAlliance() == DriverStation.Alliance.Red ? "R" : "B")
+        .append(allianceString)
         .append(DriverStation.isEnabled() ? "E" : "D")
         .append(DriverStation.isAutonomous() ? "A" : "T")
         .append(String.format("%03d", (int) DriverStation.getMatchTime()));
