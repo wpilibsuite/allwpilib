@@ -495,7 +495,7 @@ void NCImpl4::WsConnected(wpi::WebSocket& ws, uv::Tcp& tcp) {
   });
   ws.binary.connect([this](std::span<const uint8_t> data, bool) {
     if (m_clientImpl) {
-      m_clientImpl->ProcessIncomingBinary(data);
+      m_clientImpl->ProcessIncomingBinary(m_loop.Now().count(), data);
     }
   });
 }

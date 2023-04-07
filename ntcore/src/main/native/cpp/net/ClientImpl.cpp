@@ -53,7 +53,7 @@ class CImpl : public ServerMessageHandler {
             timeSyncUpdated,
         std::function<void(uint32_t repeatMs)> setPeriodic);
 
-  void ProcessIncomingBinary(std::span<const uint8_t> data);
+  void ProcessIncomingBinary(uint64_t curTimeMs, std::span<const uint8_t> data);
   void HandleLocal(std::vector<ClientMessage>&& msgs);
   bool SendControl(uint64_t curTimeMs);
   void SendValues(uint64_t curTimeMs, bool flush);
@@ -91,6 +91,7 @@ class CImpl : public ServerMessageHandler {
   // timestamp handling
   static constexpr uint32_t kPingIntervalMs = 3000;
   uint64_t m_nextPingTimeMs{0};
+  uint64_t m_pongTimeMs{0};
   uint32_t m_rtt2Us{UINT32_MAX};
   bool m_haveTimeOffset{false};
   int64_t m_serverTimeOffsetUs{0};
@@ -125,7 +126,8 @@ CImpl::CImpl(
   m_setPeriodic(m_periodMs);
 }
 
-void CImpl::ProcessIncomingBinary(std::span<const uint8_t> data) {
+void CImpl::ProcessIncomingBinary(uint64_t curTimeMs,
+                                  std::span<const uint8_t> data) {
   for (;;) {
     if (data.empty()) {
       break;
@@ -150,6 +152,7 @@ void CImpl::ProcessIncomingBinary(std::span<const uint8_t> data) {
       }
       DEBUG4("RTT ping response time {} value {}", value.time(),
              value.GetInteger());
+      m_pongTimeMs = curTimeMs;
       int64_t now = wpi::Now();
       int64_t rtt2 = (now - value.GetInteger()) / 2;
       if (rtt2 < m_rtt2Us) {
@@ -207,6 +210,12 @@ bool CImpl::SendControl(uint64_t curTimeMs) {
 
   // start a timestamp RTT ping if it's time to do one
   if (curTimeMs >= m_nextPingTimeMs) {
+    // if we didn't receive a response to our last ping, disconnect
+    if (m_nextPingTimeMs != 0 && m_pongTimeMs == 0) {
+      m_wire.Disconnect("timed out");
+      return false;
+    }
+
     if (!CheckNetworkReady(curTimeMs)) {
       return false;
     }
@@ -215,6 +224,7 @@ bool CImpl::SendControl(uint64_t curTimeMs) {
     WireEncodeBinary(m_wire.SendBinary().Add(), -1, 0, Value::MakeInteger(now));
     // drift isn't critical here, so just go from current time
     m_nextPingTimeMs = curTimeMs + kPingIntervalMs;
+    m_pongTimeMs = 0;
   }
 
   if (!m_outgoing.empty()) {
@@ -465,8 +475,9 @@ void ClientImpl::ProcessIncomingText(std::string_view data) {
   WireDecodeText(data, *m_impl, m_impl->m_logger);
 }
 
-void ClientImpl::ProcessIncomingBinary(std::span<const uint8_t> data) {
-  m_impl->ProcessIncomingBinary(data);
+void ClientImpl::ProcessIncomingBinary(uint64_t curTimeMs,
+                                       std::span<const uint8_t> data) {
+  m_impl->ProcessIncomingBinary(curTimeMs, data);
 }
 
 void ClientImpl::HandleLocal(std::vector<ClientMessage>&& msgs) {
