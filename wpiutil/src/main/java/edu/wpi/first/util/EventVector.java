@@ -34,7 +34,7 @@ public class EventVector {
   public void remove(int handle) {
     m_lock.lock();
     try {
-      m_events.removeIf(x -> x.intValue() == handle);
+      m_events.removeIf(x -> x == handle);
     } finally {
       m_lock.unlock();
     }

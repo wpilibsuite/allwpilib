@@ -51,7 +51,7 @@ struct DeviceDescriptor
    // Bootloader version.  Will not change for the life of the product, but additional
    // field upgrade features could be added in newer hardware.
    char bootloaderRev[MAX_STRING_LEN];
-   // Manufacture Date.  Could be a calender date or just the FRC season year.
+   // Manufacture Date.  Could be a calendar date or just the FRC season year.
    // Also helps troubleshooting "old ones" vs "new ones".
    char manufactureDate[MAX_STRING_LEN];
    // General status of the hardware.  For example if the device is in bootloader

@@ -30,9 +30,9 @@ using namespace nt::net;
 
 static constexpr uint32_t kMinPeriodMs = 5;
 
-// maximum number of times the wire can be not ready to send another
+// maximum amount of time the wire can be not ready to send another
 // transmission before we close the connection
-static constexpr int kWireMaxNotReady = 10;
+static constexpr uint32_t kWireMaxNotReadyUs = 1000000;
 
 namespace {
 
@@ -49,14 +49,16 @@ struct PublisherData {
 class CImpl : public ServerMessageHandler {
  public:
   CImpl(uint64_t curTimeMs, int inst, WireConnection& wire, wpi::Logger& logger,
+        std::function<void(int64_t serverTimeOffset, int64_t rtt2, bool valid)>
+            timeSyncUpdated,
         std::function<void(uint32_t repeatMs)> setPeriodic);
 
-  void ProcessIncomingBinary(std::span<const uint8_t> data);
+  void ProcessIncomingBinary(uint64_t curTimeMs, std::span<const uint8_t> data);
   void HandleLocal(std::vector<ClientMessage>&& msgs);
   bool SendControl(uint64_t curTimeMs);
-  void SendValues(uint64_t curTimeMs);
+  void SendValues(uint64_t curTimeMs, bool flush);
   void SendInitialValues();
-  bool CheckNetworkReady();
+  bool CheckNetworkReady(uint64_t curTimeMs);
 
   // ServerMessageHandler interface
   void ServerAnnounce(std::string_view name, int64_t id,
@@ -76,6 +78,8 @@ class CImpl : public ServerMessageHandler {
   WireConnection& m_wire;
   wpi::Logger& m_logger;
   LocalInterface* m_local{nullptr};
+  std::function<void(int64_t serverTimeOffset, int64_t rtt2, bool valid)>
+      m_timeSyncUpdated;
   std::function<void(uint32_t repeatMs)> m_setPeriodic;
 
   // indexed by publisher index
@@ -87,6 +91,7 @@ class CImpl : public ServerMessageHandler {
   // timestamp handling
   static constexpr uint32_t kPingIntervalMs = 3000;
   uint64_t m_nextPingTimeMs{0};
+  uint64_t m_pongTimeMs{0};
   uint32_t m_rtt2Us{UINT32_MAX};
   bool m_haveTimeOffset{false};
   int64_t m_serverTimeOffsetUs{0};
@@ -94,7 +99,6 @@ class CImpl : public ServerMessageHandler {
   // periodic sweep handling
   uint32_t m_periodMs{kPingIntervalMs + 10};
   uint64_t m_lastSendMs{0};
-  int m_notReadyCount{0};
 
   // outgoing queue
   std::vector<ClientMessage> m_outgoing;
@@ -102,12 +106,15 @@ class CImpl : public ServerMessageHandler {
 
 }  // namespace
 
-CImpl::CImpl(uint64_t curTimeMs, int inst, WireConnection& wire,
-             wpi::Logger& logger,
-             std::function<void(uint32_t repeatMs)> setPeriodic)
+CImpl::CImpl(
+    uint64_t curTimeMs, int inst, WireConnection& wire, wpi::Logger& logger,
+    std::function<void(int64_t serverTimeOffset, int64_t rtt2, bool valid)>
+        timeSyncUpdated,
+    std::function<void(uint32_t repeatMs)> setPeriodic)
     : m_inst{inst},
       m_wire{wire},
       m_logger{logger},
+      m_timeSyncUpdated{std::move(timeSyncUpdated)},
       m_setPeriodic{std::move(setPeriodic)},
       m_nextPingTimeMs{curTimeMs + kPingIntervalMs} {
   // immediately send RTT ping
@@ -119,7 +126,8 @@ CImpl::CImpl(uint64_t curTimeMs, int inst, WireConnection& wire,
   m_setPeriodic(m_periodMs);
 }
 
-void CImpl::ProcessIncomingBinary(std::span<const uint8_t> data) {
+void CImpl::ProcessIncomingBinary(uint64_t curTimeMs,
+                                  std::span<const uint8_t> data) {
   for (;;) {
     if (data.empty()) {
       break;
@@ -144,6 +152,7 @@ void CImpl::ProcessIncomingBinary(std::span<const uint8_t> data) {
       }
       DEBUG4("RTT ping response time {} value {}", value.time(),
              value.GetInteger());
+      m_pongTimeMs = curTimeMs;
       int64_t now = wpi::Now();
       int64_t rtt2 = (now - value.GetInteger()) / 2;
       if (rtt2 < m_rtt2Us) {
@@ -151,6 +160,7 @@ void CImpl::ProcessIncomingBinary(std::span<const uint8_t> data) {
         m_serverTimeOffsetUs = value.server_time() + rtt2 - now;
         DEBUG3("Time offset: {}", m_serverTimeOffsetUs);
         m_haveTimeOffset = true;
+        m_timeSyncUpdated(m_serverTimeOffsetUs, m_rtt2Us, true);
       }
       continue;
     }
@@ -200,7 +210,13 @@ bool CImpl::SendControl(uint64_t curTimeMs) {
 
   // start a timestamp RTT ping if it's time to do one
   if (curTimeMs >= m_nextPingTimeMs) {
-    if (!CheckNetworkReady()) {
+    // if we didn't receive a response to our last ping, disconnect
+    if (m_nextPingTimeMs != 0 && m_pongTimeMs == 0) {
+      m_wire.Disconnect("timed out");
+      return false;
+    }
+
+    if (!CheckNetworkReady(curTimeMs)) {
       return false;
     }
     auto now = wpi::Now();
@@ -208,10 +224,11 @@ bool CImpl::SendControl(uint64_t curTimeMs) {
     WireEncodeBinary(m_wire.SendBinary().Add(), -1, 0, Value::MakeInteger(now));
     // drift isn't critical here, so just go from current time
     m_nextPingTimeMs = curTimeMs + kPingIntervalMs;
+    m_pongTimeMs = 0;
   }
 
   if (!m_outgoing.empty()) {
-    if (!CheckNetworkReady()) {
+    if (!CheckNetworkReady(curTimeMs)) {
       return false;
     }
     auto writer = m_wire.SendText();
@@ -229,7 +246,7 @@ bool CImpl::SendControl(uint64_t curTimeMs) {
   return true;
 }
 
-void CImpl::SendValues(uint64_t curTimeMs) {
+void CImpl::SendValues(uint64_t curTimeMs, bool flush) {
   DEBUG4("SendValues({})", curTimeMs);
 
   // can't send value updates until we have a RTT
@@ -246,10 +263,11 @@ void CImpl::SendValues(uint64_t curTimeMs) {
   bool checkedNetwork = false;
   auto writer = m_wire.SendBinary();
   for (auto&& pub : m_publishers) {
-    if (pub && !pub->outValues.empty() && curTimeMs >= pub->nextSendMs) {
+    if (pub && !pub->outValues.empty() &&
+        (flush || curTimeMs >= pub->nextSendMs)) {
       for (auto&& val : pub->outValues) {
         if (!checkedNetwork) {
-          if (!CheckNetworkReady()) {
+          if (!CheckNetworkReady(curTimeMs)) {
             return;
           }
           checkedNetwork = true;
@@ -259,6 +277,10 @@ void CImpl::SendValues(uint64_t curTimeMs) {
         int64_t time = val.time();
         if (time != 0) {
           time += m_serverTimeOffsetUs;
+          // make sure resultant time isn't exactly 0
+          if (time == 0) {
+            time = 1;
+          }
         }
         WireEncodeBinary(writer.Add(), Handle{pub->handle}.GetIndex(), time,
                          val);
@@ -299,15 +321,15 @@ void CImpl::SendInitialValues() {
   }
 }
 
-bool CImpl::CheckNetworkReady() {
+bool CImpl::CheckNetworkReady(uint64_t curTimeMs) {
   if (!m_wire.Ready()) {
-    ++m_notReadyCount;
-    if (m_notReadyCount > kWireMaxNotReady) {
+    uint64_t lastFlushTime = m_wire.GetLastFlushTime();
+    uint64_t now = wpi::Now();
+    if (lastFlushTime != 0 && now > (lastFlushTime + kWireMaxNotReadyUs)) {
       m_wire.Disconnect("transmit stalled");
     }
     return false;
   }
-  m_notReadyCount = 0;
   return true;
 }
 
@@ -424,14 +446,24 @@ void CImpl::ServerPropertiesUpdate(std::string_view name,
 class ClientImpl::Impl final : public CImpl {
  public:
   Impl(uint64_t curTimeMs, int inst, WireConnection& wire, wpi::Logger& logger,
+       std::function<void(int64_t serverTimeOffset, int64_t rtt2, bool valid)>
+           timeSyncUpdated,
        std::function<void(uint32_t repeatMs)> setPeriodic)
-      : CImpl{curTimeMs, inst, wire, logger, std::move(setPeriodic)} {}
+      : CImpl{curTimeMs,
+              inst,
+              wire,
+              logger,
+              std::move(timeSyncUpdated),
+              std::move(setPeriodic)} {}
 };
 
-ClientImpl::ClientImpl(uint64_t curTimeMs, int inst, WireConnection& wire,
-                       wpi::Logger& logger,
-                       std::function<void(uint32_t repeatMs)> setPeriodic)
+ClientImpl::ClientImpl(
+    uint64_t curTimeMs, int inst, WireConnection& wire, wpi::Logger& logger,
+    std::function<void(int64_t serverTimeOffset, int64_t rtt2, bool valid)>
+        timeSyncUpdated,
+    std::function<void(uint32_t repeatMs)> setPeriodic)
     : m_impl{std::make_unique<Impl>(curTimeMs, inst, wire, logger,
+                                    std::move(timeSyncUpdated),
                                     std::move(setPeriodic))} {}
 
 ClientImpl::~ClientImpl() = default;
@@ -443,8 +475,9 @@ void ClientImpl::ProcessIncomingText(std::string_view data) {
   WireDecodeText(data, *m_impl, m_impl->m_logger);
 }
 
-void ClientImpl::ProcessIncomingBinary(std::span<const uint8_t> data) {
-  m_impl->ProcessIncomingBinary(data);
+void ClientImpl::ProcessIncomingBinary(uint64_t curTimeMs,
+                                       std::span<const uint8_t> data) {
+  m_impl->ProcessIncomingBinary(curTimeMs, data);
 }
 
 void ClientImpl::HandleLocal(std::vector<ClientMessage>&& msgs) {
@@ -456,8 +489,8 @@ void ClientImpl::SendControl(uint64_t curTimeMs) {
   m_impl->m_wire.Flush();
 }
 
-void ClientImpl::SendValues(uint64_t curTimeMs) {
-  m_impl->SendValues(curTimeMs);
+void ClientImpl::SendValues(uint64_t curTimeMs, bool flush) {
+  m_impl->SendValues(curTimeMs, flush);
   m_impl->m_wire.Flush();
 }
 

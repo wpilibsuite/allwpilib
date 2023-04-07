@@ -8,6 +8,7 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
+import java.util.List;
 import org.junit.jupiter.api.Test;
 
 class Translation2dTest {
@@ -113,5 +114,21 @@ class Translation2dTest {
         () -> assertEquals(1.0, one.getY(), kEpsilon),
         () -> assertEquals(1.0, two.getX(), kEpsilon),
         () -> assertEquals(Math.sqrt(3.0), two.getY(), kEpsilon));
+  }
+
+  @Test
+  void testNearest() {
+    var origin = new Translation2d();
+
+    // each translationX is X units away from the origin at a random angle.
+    var translation1 = new Translation2d(1, Rotation2d.fromDegrees(45));
+    var translation2 = new Translation2d(2, Rotation2d.fromDegrees(90));
+    var translation3 = new Translation2d(3, Rotation2d.fromDegrees(135));
+    var translation4 = new Translation2d(4, Rotation2d.fromDegrees(180));
+    var translation5 = new Translation2d(5, Rotation2d.fromDegrees(270));
+
+    assertEquals(origin.nearest(List.of(translation5, translation3, translation4)), translation3);
+    assertEquals(origin.nearest(List.of(translation1, translation2, translation3)), translation1);
+    assertEquals(origin.nearest(List.of(translation4, translation2, translation3)), translation2);
   }
 }

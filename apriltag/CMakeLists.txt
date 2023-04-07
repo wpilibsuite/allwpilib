@@ -40,7 +40,7 @@ if (WITH_JAVA)
   set(CMAKE_JAVA_INCLUDE_PATH apriltag.jar ${EJML_JARS} ${JACKSON_JARS})
 
   file(GLOB_RECURSE JAVA_SOURCES src/main/java/*.java)
-  file(GLOB_RECURSE JAVA_RESOURCES src/main/native/resources/*.json)
+  file(GLOB_RECURSE JAVA_RESOURCES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} src/main/native/resources/*.json)
   add_jar(apriltag_jar
     SOURCES ${JAVA_SOURCES}
     RESOURCES NAMESPACE "edu/wpi/first/apriltag" ${JAVA_RESOURCES}

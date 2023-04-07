@@ -39,7 +39,9 @@ static JClass eventCls;
 static JClass floatCls;
 static JClass logMessageCls;
 static JClass longCls;
+static JClass optionalLongCls;
 static JClass pubSubOptionsCls;
+static JClass timeSyncEventDataCls;
 static JClass topicInfoCls;
 static JClass valueCls;
 static JClass valueEventDataCls;
@@ -55,7 +57,9 @@ static const JClassInit classes[] = {
     {"java/lang/Float", &floatCls},
     {"edu/wpi/first/networktables/LogMessage", &logMessageCls},
     {"java/lang/Long", &longCls},
+    {"java/util/OptionalLong", &optionalLongCls},
     {"edu/wpi/first/networktables/PubSubOptions", &pubSubOptionsCls},
+    {"edu/wpi/first/networktables/TimeSyncEventData", &timeSyncEventDataCls},
     {"edu/wpi/first/networktables/TopicInfo", &topicInfoCls},
     {"edu/wpi/first/networktables/NetworkTableValue", &valueCls},
     {"edu/wpi/first/networktables/ValueEventData", &valueEventDataCls}};
@@ -163,6 +167,25 @@ static nt::PubSubOptions FromJavaPubSubOptions(JNIEnv* env, jobject joptions) {
 //
 // Conversions from C++ to Java objects
 //
+
+static jobject MakeJObject(JNIEnv* env, std::optional<int64_t> value) {
+  static jmethodID emptyMethod = nullptr;
+  static jmethodID ofMethod = nullptr;
+  if (!emptyMethod) {
+    emptyMethod = env->GetStaticMethodID(optionalLongCls, "empty",
+                                         "()Ljava/util/OptionalLong;");
+  }
+  if (!ofMethod) {
+    ofMethod = env->GetStaticMethodID(optionalLongCls, "of",
+                                      "(J)Ljava/util/OptionalLong;");
+  }
+  if (value) {
+    return env->CallStaticObjectMethod(optionalLongCls, ofMethod,
+                                       static_cast<jlong>(*value));
+  } else {
+    return env->CallStaticObjectMethod(optionalLongCls, emptyMethod);
+  }
+}
 
 static jobject MakeJObject(JNIEnv* env, const nt::Value& value) {
   static jmethodID booleanConstructor = nullptr;
@@ -275,6 +298,15 @@ static jobject MakeJObject(JNIEnv* env, jobject inst,
                         static_cast<jint>(data.subentry), value.obj());
 }
 
+static jobject MakeJObject(JNIEnv* env, const nt::TimeSyncEventData& data) {
+  static jmethodID constructor =
+      env->GetMethodID(timeSyncEventDataCls, "<init>", "(JJZ)V");
+  return env->NewObject(timeSyncEventDataCls, constructor,
+                        static_cast<jlong>(data.serverTimeOffset),
+                        static_cast<jlong>(data.rtt2),
+                        static_cast<jboolean>(data.valid));
+}
+
 static jobject MakeJObject(JNIEnv* env, jobject inst, const nt::Event& event) {
   static jmethodID constructor =
       env->GetMethodID(eventCls, "<init>",
@@ -282,11 +314,13 @@ static jobject MakeJObject(JNIEnv* env, jobject inst, const nt::Event& event) {
                        "Ledu/wpi/first/networktables/ConnectionInfo;"
                        "Ledu/wpi/first/networktables/TopicInfo;"
                        "Ledu/wpi/first/networktables/ValueEventData;"
-                       "Ledu/wpi/first/networktables/LogMessage;)V");
+                       "Ledu/wpi/first/networktables/LogMessage;"
+                       "Ledu/wpi/first/networktables/TimeSyncEventData;)V");
   JLocal<jobject> connInfo{env, nullptr};
   JLocal<jobject> topicInfo{env, nullptr};
   JLocal<jobject> valueData{env, nullptr};
   JLocal<jobject> logMessage{env, nullptr};
+  JLocal<jobject> timeSyncData{env, nullptr};
   if (auto v = event.GetConnectionInfo()) {
     connInfo = JLocal<jobject>{env, MakeJObject(env, *v)};
   } else if (auto v = event.GetTopicInfo()) {
@@ -295,11 +329,13 @@ static jobject MakeJObject(JNIEnv* env, jobject inst, const nt::Event& event) {
     valueData = JLocal<jobject>{env, MakeJObject(env, inst, *v)};
   } else if (auto v = event.GetLogMessage()) {
     logMessage = JLocal<jobject>{env, MakeJObject(env, *v)};
+  } else if (auto v = event.GetTimeSyncEventData()) {
+    timeSyncData = JLocal<jobject>{env, MakeJObject(env, *v)};
   }
-  return env->NewObject(eventCls, constructor, inst,
-                        static_cast<jint>(event.listener),
-                        static_cast<jint>(event.flags), connInfo.obj(),
-                        topicInfo.obj(), valueData.obj(), logMessage.obj());
+  return env->NewObject(
+      eventCls, constructor, inst, static_cast<jint>(event.listener),
+      static_cast<jint>(event.flags), connInfo.obj(), topicInfo.obj(),
+      valueData.obj(), logMessage.obj(), timeSyncData.obj());
 }
 
 static jobjectArray MakeJObject(JNIEnv* env, std::span<const nt::Value> arr) {
@@ -1264,6 +1300,18 @@ Java_edu_wpi_first_networktables_NetworkTablesJNI_setServerTeam
 
 /*
  * Class:     edu_wpi_first_networktables_NetworkTablesJNI
+ * Method:    disconnect
+ * Signature: (I)V
+ */
+JNIEXPORT void JNICALL
+Java_edu_wpi_first_networktables_NetworkTablesJNI_disconnect
+  (JNIEnv* env, jclass, jint inst)
+{
+  nt::Disconnect(inst);
+}
+
+/*
+ * Class:     edu_wpi_first_networktables_NetworkTablesJNI
  * Method:    startDSClient
  * Signature: (II)V
  */
@@ -1342,6 +1390,18 @@ Java_edu_wpi_first_networktables_NetworkTablesJNI_isConnected
   (JNIEnv*, jclass, jint inst)
 {
   return nt::IsConnected(inst);
+}
+
+/*
+ * Class:     edu_wpi_first_networktables_NetworkTablesJNI
+ * Method:    getServerTimeOffset
+ * Signature: (I)Ljava/lang/Object;
+ */
+JNIEXPORT jobject JNICALL
+Java_edu_wpi_first_networktables_NetworkTablesJNI_getServerTimeOffset
+  (JNIEnv* env, jclass, jint inst)
+{
+  return MakeJObject(env, nt::GetServerTimeOffset(inst));
 }
 
 /*

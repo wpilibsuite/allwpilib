@@ -11,6 +11,9 @@ ConnectReq::ConnectReq() {
 }
 
 void NetworkStream::Listen(int backlog) {
+  if (IsLoopClosing()) {
+    return;
+  }
   Invoke(&uv_listen, GetRawStream(), backlog,
          [](uv_stream_t* handle, int status) {
            auto& h = *static_cast<NetworkStream*>(handle->data);

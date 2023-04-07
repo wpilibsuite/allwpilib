@@ -47,7 +47,7 @@ class MecanumDriveOdometryTest {
 
   @Test
   void testTwoIterations() {
-    // 5 units/sec  in the x axis (forward)
+    // 5 units/sec  in the x-axis (forward)
     final var wheelPositions = new MecanumDriveWheelPositions(0.3536, 0.3536, 0.3536, 0.3536);
     m_odometry.resetPosition(new Rotation2d(), new MecanumDriveWheelPositions(), new Pose2d());
 

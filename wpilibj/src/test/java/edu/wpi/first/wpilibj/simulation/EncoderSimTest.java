@@ -89,4 +89,23 @@ class EncoderSimTest {
       }
     }
   }
+
+  @Test
+  void testDistancePerPulse() {
+    HAL.initialize(500, 0);
+
+    try (Encoder encoder = new Encoder(0, 1)) {
+      EncoderSim sim = new EncoderSim(encoder);
+      sim.resetData();
+
+      DoubleCallback callback = new DoubleCallback();
+      try (CallbackStore cb = sim.registerDistancePerPulseCallback(callback, false)) {
+        sim.setDistancePerPulse(0.03405);
+        assertEquals(0.03405, sim.getDistancePerPulse());
+        assertEquals(0.03405, encoder.getDistancePerPulse());
+        assertTrue(callback.wasTriggered());
+        assertEquals(0.03405, callback.getSetValue());
+      }
+    }
+  }
 }

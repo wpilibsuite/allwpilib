@@ -138,7 +138,7 @@ public class DigitalOutput extends DigitalSource implements Sendable {
    *
    * <p>Allocate one of the 6 DO PWM generator resources.
    *
-   * <p>Supply the initial duty-cycle to output so as to avoid a glitch when first starting.
+   * <p>Supply the initial duty-cycle to output in order to avoid a glitch when first starting.
    *
    * <p>The resolution of the duty cycle is 8-bit for low frequencies (1kHz or less) but is reduced
    * the higher the frequency of the PWM signal is.

@@ -14,6 +14,11 @@ frc2::CommandPtr ExampleSubsystem::ExampleMethodCommand() {
   return RunOnce([/* this */] { /* one-time action goes here */ });
 }
 
+bool ExampleSubsystem::ExampleCondition() {
+  // Query some boolean state, such as a digital sensor.
+  return false;
+}
+
 void ExampleSubsystem::Periodic() {
   // Implementation of subsystem periodic method goes here.
 }

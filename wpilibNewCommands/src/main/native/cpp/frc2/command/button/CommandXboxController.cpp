@@ -49,3 +49,13 @@ Trigger CommandXboxController::Back(frc::EventLoop* loop) const {
 Trigger CommandXboxController::Start(frc::EventLoop* loop) const {
   return XboxController::Start(loop).CastTo<Trigger>();
 }
+
+Trigger CommandXboxController::LeftTrigger(double threshold,
+                                           frc::EventLoop* loop) const {
+  return XboxController::LeftTrigger(threshold, loop).CastTo<Trigger>();
+}
+
+Trigger CommandXboxController::RightTrigger(double threshold,
+                                            frc::EventLoop* loop) const {
+  return XboxController::RightTrigger(threshold, loop).CastTo<Trigger>();
+}

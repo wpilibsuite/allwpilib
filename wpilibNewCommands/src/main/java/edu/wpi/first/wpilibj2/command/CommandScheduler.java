@@ -103,10 +103,7 @@ public final class CommandScheduler implements NTSendable, AutoCloseable {
           disable();
           cancelAll();
         });
-    LiveWindow.setDisabledListener(
-        () -> {
-          enable();
-        });
+    LiveWindow.setDisabledListener(this::enable);
   }
 
   /**
@@ -605,7 +602,7 @@ public final class CommandScheduler implements NTSendable, AutoCloseable {
   public void requireNotComposed(Command command) {
     if (m_composedCommands.contains(command)) {
       throw new IllegalArgumentException(
-          "Commands that have been composed may not be added to another composition or scheduled"
+          "Commands that have been composed may not be added to another composition or scheduled "
               + "individually!");
     }
   }
@@ -619,7 +616,7 @@ public final class CommandScheduler implements NTSendable, AutoCloseable {
   public void requireNotComposed(Collection<Command> commands) {
     if (!Collections.disjoint(commands, getComposedCommands())) {
       throw new IllegalArgumentException(
-          "Commands that have been composed may not be added to another composition or scheduled"
+          "Commands that have been composed may not be added to another composition or scheduled "
               + "individually!");
     }
   }
@@ -629,7 +626,6 @@ public final class CommandScheduler implements NTSendable, AutoCloseable {
    *
    * @param command The command to check
    * @return true if composed
-   * @throws IllegalArgumentException if the given commands have already been composed.
    */
   public boolean isComposed(Command command) {
     return getComposedCommands().contains(command);

@@ -4,10 +4,13 @@
 
 package edu.wpi.first.apriltag.jni;
 
+import edu.wpi.first.apriltag.AprilTagDetection;
+import edu.wpi.first.apriltag.AprilTagDetector;
+import edu.wpi.first.apriltag.AprilTagPoseEstimate;
+import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.util.RuntimeLoader;
 import java.io.IOException;
 import java.util.concurrent.atomic.AtomicBoolean;
-import org.opencv.core.Mat;
 
 public class AprilTagJNI {
   static boolean libraryLoaded = false;
@@ -41,49 +44,47 @@ public class AprilTagJNI {
     }
   }
 
-  // Returns a pointer to a apriltag_detector_t
-  public static native int aprilTagCreate(
-      String fam, double decimate, double blur, int threads, boolean debug, boolean refine_edges);
+  public static native long createDetector();
 
-  // Destroy and free a previously created detector.
-  public static native void aprilTagDestroy(int detector);
+  public static native void destroyDetector(long det);
 
-  private static native Object[] aprilTagDetectInternal(
-      int detector,
-      long imgAddr,
-      int rows,
-      int cols,
-      boolean doPoseEstimation,
-      double tagWidth,
+  public static native void setDetectorConfig(long det, AprilTagDetector.Config config);
+
+  public static native AprilTagDetector.Config getDetectorConfig(long det);
+
+  public static native void setDetectorQTP(
+      long det, AprilTagDetector.QuadThresholdParameters params);
+
+  public static native AprilTagDetector.QuadThresholdParameters getDetectorQTP(long det);
+
+  public static native boolean addFamily(long det, String fam, int bitsCorrected);
+
+  public static native void removeFamily(long det, String fam);
+
+  public static native void clearFamilies(long det);
+
+  public static native AprilTagDetection[] detect(
+      long det, int width, int height, int stride, long bufAddr);
+
+  public static native Transform3d estimatePoseHomography(
+      double[] homography, double tagSize, double fx, double fy, double cx, double cy);
+
+  public static native AprilTagPoseEstimate estimatePoseOrthogonalIteration(
+      double[] homography,
+      double[] corners,
+      double tagSize,
       double fx,
       double fy,
       double cx,
       double cy,
       int nIters);
 
-  // Detect targets given a GRAY frame. Returns a pointer toa zarray
-  public static DetectionResult[] aprilTagDetect(
-      int detector,
-      Mat img,
-      boolean doPoseEstimation,
-      double tagWidth,
+  public static native Transform3d estimatePose(
+      double[] homography,
+      double[] corners,
+      double tagSize,
       double fx,
       double fy,
       double cx,
-      double cy,
-      int nIters) {
-    return (DetectionResult[])
-        aprilTagDetectInternal(
-            detector,
-            img.dataAddr(),
-            img.rows(),
-            img.cols(),
-            doPoseEstimation,
-            tagWidth,
-            fx,
-            fy,
-            cx,
-            cy,
-            nIters);
-  }
+      double cy);
 }

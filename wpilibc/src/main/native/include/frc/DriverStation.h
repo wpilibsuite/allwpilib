@@ -210,6 +210,14 @@ class DriverStation final {
   static bool IsTest();
 
   /**
+   * Check if the DS is commanding Test mode and if it has enabled the robot.
+   *
+   * @return True if the robot is being commanded to be in Test mode and
+   * enabled.
+   */
+  static bool IsTestEnabled();
+
+  /**
    * Check if the DS is attached.
    *
    * @return True if the DS is connected to the robot
@@ -226,6 +234,9 @@ class DriverStation final {
 
   /**
    * Returns the game specific message provided by the FMS.
+   *
+   * If the FMS is not connected, it is set from the game data setting on the
+   * driver station.
    *
    * @return A string containing the game specific message.
    */
@@ -262,7 +273,10 @@ class DriverStation final {
   static int GetReplayNumber();
 
   /**
-   * Return the alliance that the driver station says it is on.
+   * Return the alliance that the driver station says it is on from the FMS.
+   *
+   * If the FMS is not connected, it is set from the team alliance setting on
+   * the driver station.
    *
    * This could return kRed or kBlue.
    *
@@ -271,7 +285,10 @@ class DriverStation final {
   static Alliance GetAlliance();
 
   /**
-   * Return the driver station location on the field.
+   * Return the driver station location from the FMS.
+   *
+   * If the FMS is not connected, it is set from the team alliance setting on
+   * the driver station.
    *
    * This could return 1, 2, or 3.
    *

@@ -63,10 +63,24 @@ void Shuffleboard::AddEventMarker(std::string_view name,
   AddEventMarker(name, "", importance);
 }
 
-detail::ShuffleboardInstance& Shuffleboard::GetInstance() {
-  static detail::ShuffleboardInstance inst(
+static std::unique_ptr<detail::ShuffleboardInstance>& GetInstanceHolder() {
+  static std::unique_ptr<detail::ShuffleboardInstance> instance =
+      std::make_unique<detail::ShuffleboardInstance>(
+          nt::NetworkTableInstance::GetDefault());
+  return instance;
+}
+
+#ifndef __FRC_ROBORIO__
+namespace frc::impl {
+void ResetShuffleboardInstance() {
+  GetInstanceHolder() = std::make_unique<detail::ShuffleboardInstance>(
       nt::NetworkTableInstance::GetDefault());
-  return inst;
+}
+}  // namespace frc::impl
+#endif
+
+detail::ShuffleboardInstance& Shuffleboard::GetInstance() {
+  return *GetInstanceHolder();
 }
 
 detail::RecordingController& Shuffleboard::GetRecordingController() {

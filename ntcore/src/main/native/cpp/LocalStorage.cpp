@@ -96,6 +96,7 @@ struct TopicData {
   NT_Entry entry{0};  // cached entry for GetEntry()
 
   bool onNetwork{false};  // true if there are any remote publishers
+  bool lastValueFromNetwork{false};
 
   wpi::SmallVector<DataLoggerEntry, 1> datalogs;
   NT_Type datalogType{NT_UNASSIGNED};
@@ -242,7 +243,7 @@ struct DataLoggerData {
   int Start(TopicData* topic, int64_t time) {
     return log.Start(fmt::format("{}{}", logPrefix,
                                  wpi::drop_front(topic->name, prefix.size())),
-                     topic->typeStr,
+                     topic->typeStr == "int" ? "int64" : topic->typeStr,
                      DataLoggerEntry::MakeMetadata(topic->propertiesStr), time);
   }
 
@@ -484,6 +485,7 @@ void LSImpl::CheckReset(TopicData* topic) {
   }
   topic->lastValue = {};
   topic->lastValueNetwork = {};
+  topic->lastValueFromNetwork = false;
   topic->type = NT_UNASSIGNED;
   topic->typeStr.clear();
   topic->flags = 0;
@@ -499,10 +501,12 @@ bool LSImpl::SetValue(TopicData* topic, const Value& value,
   if (topic->type != NT_UNASSIGNED && topic->type != value.type()) {
     return false;
   }
-  if (!topic->lastValue || value.time() >= topic->lastValue.time()) {
+  if (!topic->lastValue || topic->lastValue.time() == 0 ||
+      value.time() >= topic->lastValue.time()) {
     // TODO: notify option even if older value
     topic->type = value.type();
     topic->lastValue = value;
+    topic->lastValueFromNetwork = false;
     NotifyValue(topic, eventFlags, isDuplicate, publisher);
   }
   if (!isDuplicate && topic->datalogType == value.type()) {
@@ -858,6 +862,17 @@ SubscriberData* LSImpl::AddLocalSubscriber(TopicData* topic,
     DEBUG4("-> NetworkSubscribe({})", topic->name);
     m_network->Subscribe(subscriber->handle, {{topic->name}}, config);
   }
+
+  // queue current value
+  if (subscriber->active) {
+    if (!topic->lastValueFromNetwork && !config.disableLocal) {
+      subscriber->pollStorage.emplace_back(topic->lastValue);
+      subscriber->handle.Set();
+    } else if (topic->lastValueFromNetwork && !config.disableRemote) {
+      subscriber->pollStorage.emplace_back(topic->lastValueNetwork);
+      subscriber->handle.Set();
+    }
+  }
   return subscriber;
 }
 
@@ -895,6 +910,7 @@ std::unique_ptr<EntryData> LSImpl::RemoveEntry(NT_Entry entryHandle) {
 
 MultiSubscriberData* LSImpl::AddMultiSubscriber(
     std::span<const std::string_view> prefixes, const PubSubOptions& options) {
+  DEBUG4("AddMultiSubscriber({})", fmt::join(prefixes, ","));
   auto subscriber = m_multiSubscribers.Add(m_inst, prefixes, options);
   // subscribe to any already existing topics
   for (auto&& topic : m_topics) {
@@ -906,6 +922,7 @@ MultiSubscriberData* LSImpl::AddMultiSubscriber(
     }
   }
   if (m_network) {
+    DEBUG4("-> NetworkSubscribe");
     m_network->Subscribe(subscriber->handle, subscriber->prefixes,
                          subscriber->options);
   }
@@ -1213,6 +1230,10 @@ PublisherData* LSImpl::PublishEntry(EntryData* entry, NT_Type type) {
   // create publisher
   entry->publisher = AddLocalPublisher(entry->topic, wpi::json::object(),
                                        entry->subscriber->config);
+  // exclude publisher if requested
+  if (entry->subscriber->config.excludeSelf) {
+    entry->subscriber->config.excludePublisher = entry->publisher->handle;
+  }
   return entry->publisher;
 }
 
@@ -1265,9 +1286,6 @@ bool LSImpl::SetEntryValue(NT_Handle pubentryHandle, const Value& value) {
   if (!publisher) {
     if (auto entry = m_entries.Get(pubentryHandle)) {
       publisher = PublishEntry(entry, value.type());
-      if (entry->subscriber->config.excludeSelf) {
-        entry->subscriber->config.excludePublisher = publisher->handle;
-      }
     }
     if (!publisher) {
       return false;
@@ -1376,6 +1394,7 @@ void LocalStorage::NetworkSetValue(NT_Topic topicHandle, const Value& value) {
     if (m_impl->SetValue(topic, value, NT_EVENT_VALUE_REMOTE,
                          value == topic->lastValue, nullptr)) {
       topic->lastValueNetwork = value;
+      topic->lastValueFromNetwork = true;
     }
   }
 }

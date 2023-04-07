@@ -59,6 +59,7 @@ void EventLoopRunner::Stop() {
       h.SetLoopClosing(true);
       h.Close();
     });
+    loop.SetClosing();
   });
   m_owner.Join();
 }

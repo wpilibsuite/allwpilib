@@ -318,7 +318,7 @@ public class ADIS16448_IMU implements AutoCloseable, NTSendable {
       calibrate();
       // Reset accumulated offsets
       reset();
-      // Tell the acquire loop that we're done starting up
+      // Indicate to the acquire loop that we're done starting up
       m_start_up_mode = false;
       // Let the user know the IMU was initiallized successfully
       DriverStation.reportWarning("ADIS16448 IMU Successfully Initialized!", false);
@@ -455,7 +455,7 @@ public class ADIS16448_IMU implements AutoCloseable, NTSendable {
     m_spi.setAutoTransmitData(new byte[] {GLOB_CMD}, 27);
     // Configure auto stall time
     m_spi.configureAutoStall(100, 1000, 255);
-    // Kick off auto SPI (Note: Device configration impossible after auto SPI is
+    // Kick off auto SPI (Note: Device configuration impossible after auto SPI is
     // activated)
     m_spi.startAutoTrigger(m_auto_interrupt, true, false);
 
@@ -1105,28 +1105,28 @@ public class ADIS16448_IMU implements AutoCloseable, NTSendable {
   }
 
   /**
-   * @return X axis complementary angle in degrees
+   * @return X-axis complementary angle in degrees
    */
   public synchronized double getXComplementaryAngle() {
     return m_compAngleX;
   }
 
   /**
-   * @return Y axis complementary angle in degrees
+   * @return Y-axis complementary angle in degrees
    */
   public synchronized double getYComplementaryAngle() {
     return m_compAngleY;
   }
 
   /**
-   * @return X axis filtered acceleration angle in degrees
+   * @return X-axis filtered acceleration angle in degrees
    */
   public synchronized double getXFilteredAccelAngle() {
     return m_accelAngleX;
   }
 
   /**
-   * @return Y axis filtered acceleration angle in degrees
+   * @return Y-axis filtered acceleration angle in degrees
    */
   public synchronized double getYFilteredAccelAngle() {
     return m_accelAngleY;
@@ -1136,7 +1136,7 @@ public class ADIS16448_IMU implements AutoCloseable, NTSendable {
    * @return Barometric Pressure in PSI
    */
   public synchronized double getBarometricPressure() {
-    // mbar to PSI
+    // mbar to PSI conversion
     return m_baro * 0.0145;
   }
 

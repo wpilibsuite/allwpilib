@@ -47,8 +47,7 @@ public class Robot extends TimedRobot {
 
   @Override
   public void autonomousInit() {
-    m_timer.reset();
-    m_timer.start();
+    m_timer.restart();
     m_drive.resetOdometry(m_trajectory.getInitialPose());
   }
 

@@ -68,11 +68,26 @@ class TimeInterpolatableBuffer {
     if (m_pastSnapshots.size() == 0 || time > m_pastSnapshots.back().first) {
       m_pastSnapshots.emplace_back(time, sample);
     } else {
-      m_pastSnapshots.insert(
-          std::upper_bound(
-              m_pastSnapshots.begin(), m_pastSnapshots.end(), time,
-              [](auto t, const auto& pair) { return t < pair.first; }),
-          std::pair(time, sample));
+      auto first_after = std::upper_bound(
+          m_pastSnapshots.begin(), m_pastSnapshots.end(), time,
+          [](auto t, const auto& pair) { return t < pair.first; });
+
+      // Don't access this before ensuring first_after isn't first.
+      auto last_not_greater_than = first_after - 1;
+
+      if (first_after == m_pastSnapshots.begin() ||
+          last_not_greater_than == m_pastSnapshots.begin() ||
+          last_not_greater_than->first < time) {
+        // Two cases handled together:
+        // 1. All entries come after the sample
+        // 2. Some entries come before the sample, but none are recorded with
+        // the same time
+        m_pastSnapshots.insert(first_after, std::pair(time, sample));
+      } else {
+        // Final case:
+        // 3. An entry exists with the same recorded time.
+        last_not_greater_than->second = sample;
+      }
     }
     while (time - m_pastSnapshots[0].first > m_historySize) {
       m_pastSnapshots.erase(m_pastSnapshots.begin());
@@ -111,6 +126,10 @@ class TimeInterpolatableBuffer {
     auto upper_bound = std::lower_bound(
         m_pastSnapshots.begin(), m_pastSnapshots.end(), time,
         [](const auto& pair, auto t) { return t > pair.first; });
+
+    if (upper_bound == m_pastSnapshots.begin()) {
+      return upper_bound->second;
+    }
 
     auto lower_bound = upper_bound - 1;
 

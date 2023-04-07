@@ -149,7 +149,7 @@ class PWM : public wpi::Sendable, public wpi::SendableHelper<PWM> {
   virtual double GetSpeed() const;
 
   /**
-   * Temporarily disables the PWM output. The next set call will reenable
+   * Temporarily disables the PWM output. The next set call will re-enable
    * the output.
    */
   virtual void SetDisabled();

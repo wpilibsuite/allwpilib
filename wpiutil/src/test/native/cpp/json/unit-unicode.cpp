@@ -1028,7 +1028,7 @@ TEST(JsonUnicodeTest, ReadAllUnicode)
     json j;
     CHECK_NOTHROW(f >> j);
 
-    // the array has 1112064 + 1 elemnts (a terminating "null" value)
+    // the array has 1112064 + 1 elements (a terminating "null" value)
     // Note: 1112064 = 0x1FFFFF code points - 2048 invalid values between
     // 0xD800 and 0xDFFF.
     CHECK(j.size() == 1112065);

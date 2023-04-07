@@ -6,9 +6,7 @@
 
 #include <span>
 #include <string>
-#include <string_view>
 #include <utility>
-#include <vector>
 
 #include "ntcore_cpp.h"
 
@@ -20,6 +18,7 @@ class INetworkClient {
 
   virtual void SetServers(
       std::span<const std::pair<std::string, unsigned int>> servers) = 0;
+  virtual void Disconnect() = 0;
 
   virtual void StartDSClient(unsigned int port) = 0;
   virtual void StopDSClient() = 0;

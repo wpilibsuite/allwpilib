@@ -38,7 +38,7 @@ class CommandPtr;
  */
 class Subsystem {
  public:
-  ~Subsystem();
+  virtual ~Subsystem();
   /**
    * This method is called periodically by the CommandScheduler.  Useful for
    * updating subsystem-specific state that you don't want to offload to a
@@ -82,6 +82,12 @@ class Subsystem {
    * @param defaultCommand the default command to associate with this subsystem
    */
   void SetDefaultCommand(CommandPtr&& defaultCommand);
+
+  /**
+   * Removes the default command for the subsystem.  This will not cancel the
+   * default command if it is currently running.
+   */
+  void RemoveDefaultCommand();
 
   /**
    * Gets the default command for this subsystem.  Returns null if no default

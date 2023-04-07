@@ -13,7 +13,7 @@ public class SimDeviceJNI extends JNIWrapper {
    * Creates a simulated device.
    *
    * <p>The device name must be unique. 0 is returned if the device name already exists. If multiple
-   * instances of the same device are desired, recommend appending the instance/unique identifer in
+   * instances of the same device are desired, recommend appending the instance/unique identifier in
    * brackets to the base name, e.g. "device[1]".
    *
    * <p>0 is returned if not in simulation.
@@ -32,6 +32,14 @@ public class SimDeviceJNI extends JNIWrapper {
    * @param handle simulated device handle
    */
   public static native void freeSimDevice(int handle);
+
+  /**
+   * Get the name of a simulated device.
+   *
+   * @param handle simulated device handle
+   * @return name of the simulated device
+   */
+  public static native String getSimDeviceName(int handle);
 
   private static native int createSimValueNative(
       int device, String name, int direction, int type, long value1, double value2);

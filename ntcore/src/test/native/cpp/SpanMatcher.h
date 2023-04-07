@@ -33,8 +33,10 @@ class SpanMatcher : public ::testing::MatcherInterface<std::span<T>> {
 };
 
 template <typename T>
-inline ::testing::Matcher<std::span<const T>> SpanEq(std::span<const T> good) {
-  return ::testing::MakeMatcher(new SpanMatcher(good));
+inline ::testing::Matcher<std::span<const typename T::value_type>> SpanEq(
+    const T& good) {
+  return ::testing::MakeMatcher(
+      new SpanMatcher(std::span<const typename T::value_type>(good)));
 }
 
 template <typename T>

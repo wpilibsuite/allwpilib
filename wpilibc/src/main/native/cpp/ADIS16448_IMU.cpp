@@ -196,7 +196,7 @@ bool ADIS16448_IMU::SwitchToStandardSPI() {
       while (data_count > 0) {
         /* Dequeue 200 at a time, or the remainder of the buffer if less than
          * 200 */
-        m_spi->ReadAutoReceivedData(trashBuffer, std::min(200, data_count),
+        m_spi->ReadAutoReceivedData(trashBuffer, (std::min)(200, data_count),
                                     0_s);
         /* Update remaining buffer count */
         data_count = m_spi->ReadAutoReceivedData(trashBuffer, 0, 0_s);
@@ -285,7 +285,7 @@ bool ADIS16448_IMU::SwitchToAutoSPI() {
   m_spi->SetAutoTransmitData({{GLOB_CMD}}, 27);
   // Configure auto stall time
   m_spi->ConfigureAutoStall(HAL_SPI_kMXP, 100, 1000, 255);
-  // Kick off DMA SPI (Note: Device configration impossible after SPI DMA is
+  // Kick off DMA SPI (Note: Device configuration impossible after SPI DMA is
   // activated)
   m_spi->StartAutoTrigger(*m_auto_interrupt, true, false);
   // Check to see if the acquire thread is running. If not, kick one off.
@@ -331,7 +331,7 @@ int ADIS16448_IMU::ConfigCalTime(CalibrationTime new_cal_time) {
 void ADIS16448_IMU::Calibrate() {
   std::scoped_lock sync(m_mutex);
   // Calculate the running average
-  int gyroAverageSize = std::min(m_accum_count, m_avg_size);
+  int gyroAverageSize = (std::min)(m_accum_count, m_avg_size);
   double accum_gyro_rate_x = 0.0;
   double accum_gyro_rate_y = 0.0;
   double accum_gyro_rate_z = 0.0;

@@ -159,7 +159,7 @@ public class Relay extends MotorSafety implements Sendable, AutoCloseable {
    * <p>When set to kBothDirections, the relay can be set to any of the four states: 0v-0v, 12v-0v,
    * 0v-12v, 12v-12v
    *
-   * <p>When set to kForwardOnly or kReverseOnly, you can specify the constant for the direction or
+   * <p>When set to kForwardOnly or kReverseOnly, you can specify the constant for the direction, or
    * you can simply specify kOff and kOn. Using only kOff and kOn is recommended.
    *
    * @param value The state to set the relay.

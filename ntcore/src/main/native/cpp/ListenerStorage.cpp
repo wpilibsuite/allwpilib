@@ -81,6 +81,9 @@ void ListenerStorage::Activate(NT_Listener listenerHandle, unsigned int mask,
         (deltaMask & 0x1ff0000) != 0) {
       m_logListeners.Add(listener);
     }
+    if ((deltaMask & NT_EVENT_TIMESYNC) != 0) {
+      m_timeSyncListeners.Add(listener);
+    }
   }
 }
 
@@ -233,6 +236,42 @@ void ListenerStorage::Notify(unsigned int flags, unsigned int level,
         listener->handle.Set();
         listener->poller->handle.Set();
       }
+    }
+  }
+}
+
+void ListenerStorage::NotifyTimeSync(std::span<const NT_Listener> handles,
+                                     unsigned int flags,
+                                     int64_t serverTimeOffset, int64_t rtt2,
+                                     bool valid) {
+  if (flags == 0) {
+    return;
+  }
+  std::scoped_lock lock{m_mutex};
+
+  auto doSignal = [&](ListenerData& listener) {
+    if ((flags & listener.eventMask) != 0) {
+      for (auto&& [finishEvent, mask] : listener.sources) {
+        if ((flags & mask) != 0) {
+          listener.poller->queue.emplace_back(listener.handle, flags,
+                                              serverTimeOffset, rtt2, valid);
+          // finishEvent is never set (see InstanceImpl)
+        }
+      }
+      listener.handle.Set();
+      listener.poller->handle.Set();
+    }
+  };
+
+  if (!handles.empty()) {
+    for (auto handle : handles) {
+      if (auto listener = m_listeners.Get(handle)) {
+        doSignal(*listener);
+      }
+    }
+  } else {
+    for (auto&& listener : m_timeSyncListeners) {
+      doSignal(*listener);
     }
   }
 }

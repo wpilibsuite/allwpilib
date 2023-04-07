@@ -89,6 +89,7 @@ NT_GetInteger
 NT_GetIntegerArray
 NT_GetNetworkMode
 NT_GetRaw
+NT_GetServerTimeOffset
 NT_GetString
 NT_GetStringArray
 NT_GetStringForTesting
@@ -130,6 +131,16 @@ NT_GetValueType
 NT_InitString
 NT_InitValue
 NT_IsConnected
+NT_Meta_DecodeClientPublishers
+NT_Meta_DecodeClientSubscribers
+NT_Meta_DecodeClients
+NT_Meta_DecodeTopicPublishers
+NT_Meta_DecodeTopicSubscribers
+NT_Meta_FreeClientPublishers
+NT_Meta_FreeClientSubscribers
+NT_Meta_FreeClients
+NT_Meta_FreeTopicPublishers
+NT_Meta_FreeTopicSubscribers
 NT_Now
 NT_Publish
 NT_PublishEx

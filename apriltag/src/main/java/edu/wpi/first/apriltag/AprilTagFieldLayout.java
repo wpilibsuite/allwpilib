@@ -37,6 +37,9 @@ import java.util.Optional;
  * at the bottom-right corner of the blue alliance wall. {@link #setOrigin(OriginPosition)} can be
  * used to change the poses returned from {@link AprilTagFieldLayout#getTagPose(int)} to be from the
  * perspective of a specific alliance.
+ *
+ * <p>Tag poses represent the center of the tag, with a zero rotation representing a tag that is
+ * upright and facing away from the (blue) alliance wall (that is, towards the opposing alliance).
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonAutoDetect(getterVisibility = JsonAutoDetect.Visibility.NONE)
@@ -114,8 +117,8 @@ public class AprilTagFieldLayout {
    * Sets the origin based on a predefined enumeration of coordinate frame origins. The origins are
    * calculated from the field dimensions.
    *
-   * <p>This transforms the Pose3ds returned by {@link #getTagPose(int)} to return the correct pose
-   * relative to a predefined coordinate frame.
+   * <p>This transforms the Pose3d objects returned by {@link #getTagPose(int)} to return the
+   * correct pose relative to a predefined coordinate frame.
    *
    * @param origin The predefined origin
    */
@@ -139,8 +142,8 @@ public class AprilTagFieldLayout {
   /**
    * Sets the origin for tag pose transformation.
    *
-   * <p>This transforms the Pose3ds returned by {@link #getTagPose(int)} to return the correct pose
-   * relative to the provided origin.
+   * <p>This transforms the Pose3d objects returned by {@link #getTagPose(int)} to return the
+   * correct pose relative to the provided origin.
    *
    * @param origin The new origin for tag transformations
    */
@@ -186,7 +189,10 @@ public class AprilTagFieldLayout {
   }
 
   /**
-   * Deserializes a field layout from a resource within a jar file.
+   * Deserializes a field layout from a resource within a internal jar file.
+   *
+   * <p>Users should use {@link AprilTagFields#loadAprilTagLayoutField()} to load official layouts
+   * and {@link #AprilTagFieldLayout(String)} for custom layouts.
    *
    * @param resourcePath The absolute path of the resource
    * @return The deserialized layout

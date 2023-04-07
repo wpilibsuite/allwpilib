@@ -9,6 +9,8 @@ simgui-ds.json
 simgui-window.json
 simgui.json
 
+networktables.json
+
 # Created by the jenkins test script
 test-reports
 
@@ -18,6 +20,9 @@ test-reports
 *.iws
 .idea/
 out/
+
+# Fleet
+.fleet
 
 # Created by http://www.gitignore.io
 

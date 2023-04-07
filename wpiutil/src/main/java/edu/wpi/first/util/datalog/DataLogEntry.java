@@ -23,7 +23,7 @@ public class DataLogEntry {
    * Updates the metadata for the entry.
    *
    * @param metadata New metadata for the entry
-   * @param timestamp Time stamp (may be 0 to indicate now)
+   * @param timestamp Time stamp (0 to indicate now)
    */
   public void setMetadata(String metadata, long timestamp) {
     m_log.setMetadata(m_entry, metadata, timestamp);
@@ -41,7 +41,7 @@ public class DataLogEntry {
   /**
    * Finishes the entry.
    *
-   * @param timestamp Time stamp (may be 0 to indicate now)
+   * @param timestamp Time stamp (0 to indicate now)
    */
   public void finish(long timestamp) {
     m_log.finish(m_entry, timestamp);

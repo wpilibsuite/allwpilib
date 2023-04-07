@@ -9,7 +9,7 @@ import edu.wpi.first.wpilibj.event.EventLoop;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 
 /**
- * A subclass of {@link XboxController} with {@link Trigger} factories for command-based.
+ * A version of {@link XboxController} with {@link Trigger} factories for command-based.
  *
  * @see XboxController
  */
@@ -255,6 +255,84 @@ public class CommandXboxController extends CommandGenericHID {
    */
   public Trigger back(EventLoop loop) {
     return m_hid.back(loop).castTo(Trigger::new);
+  }
+
+  /**
+   * Constructs a Trigger instance around the axis value of the left trigger. The returned trigger
+   * will be true when the axis value is greater than {@code threshold}.
+   *
+   * @param loop the event loop instance to attach the Trigger to.
+   * @param threshold the minimum axis value for the returned {@link Trigger} to be true. This value
+   *     should be in the range [0, 1] where 0 is the unpressed state of the axis.
+   * @return a Trigger instance that is true when the left trigger's axis exceeds the provided
+   *     threshold, attached to the given event loop
+   */
+  public Trigger leftTrigger(EventLoop loop, double threshold) {
+    return m_hid.leftTrigger(threshold, loop).castTo(Trigger::new);
+  }
+
+  /**
+   * Constructs a Trigger instance around the axis value of the left trigger. The returned trigger
+   * will be true when the axis value is greater than {@code threshold}.
+   *
+   * @param threshold the minimum axis value for the returned {@link Trigger} to be true. This value
+   *     should be in the range [0, 1] where 0 is the unpressed state of the axis.
+   * @return a Trigger instance that is true when the left trigger's axis exceeds the provided
+   *     threshold, attached to the {@link CommandScheduler#getDefaultButtonLoop() default scheduler
+   *     button loop}.
+   */
+  public Trigger leftTrigger(double threshold) {
+    return leftTrigger(CommandScheduler.getInstance().getDefaultButtonLoop(), threshold);
+  }
+
+  /**
+   * Constructs a Trigger instance around the axis value of the left trigger. The returned trigger
+   * will be true when the axis value is greater than 0.5.
+   *
+   * @return a Trigger instance that is true when the left trigger's axis exceeds 0.5, attached to
+   *     the {@link CommandScheduler#getDefaultButtonLoop() default scheduler button loop}.
+   */
+  public Trigger leftTrigger() {
+    return leftTrigger(0.5);
+  }
+
+  /**
+   * Constructs a Trigger instance around the axis value of the right trigger. The returned trigger
+   * will be true when the axis value is greater than {@code threshold}.
+   *
+   * @param threshold the minimum axis value for the returned {@link Trigger} to be true. This value
+   *     should be in the range [0, 1] where 0 is the unpressed state of the axis.
+   * @param loop the event loop instance to attach the Trigger to.
+   * @return a Trigger instance that is true when the right trigger's axis exceeds the provided
+   *     threshold, attached to the given event loop
+   */
+  public Trigger rightTrigger(double threshold, EventLoop loop) {
+    return m_hid.rightTrigger(threshold, loop).castTo(Trigger::new);
+  }
+
+  /**
+   * Constructs a Trigger instance around the axis value of the right trigger. The returned trigger
+   * will be true when the axis value is greater than {@code threshold}.
+   *
+   * @param threshold the minimum axis value for the returned {@link Trigger} to be true. This value
+   *     should be in the range [0, 1] where 0 is the unpressed state of the axis.
+   * @return a Trigger instance that is true when the right trigger's axis exceeds the provided
+   *     threshold, attached to the {@link CommandScheduler#getDefaultButtonLoop() default scheduler
+   *     button loop}.
+   */
+  public Trigger rightTrigger(double threshold) {
+    return rightTrigger(threshold, CommandScheduler.getInstance().getDefaultButtonLoop());
+  }
+
+  /**
+   * Constructs a Trigger instance around the axis value of the right trigger. The returned trigger
+   * will be true when the axis value is greater than 0.5.
+   *
+   * @return a Trigger instance that is true when the right trigger's axis exceeds 0.5, attached to
+   *     the {@link CommandScheduler#getDefaultButtonLoop() default scheduler button loop}.
+   */
+  public Trigger rightTrigger() {
+    return rightTrigger(0.5);
   }
 
   /**

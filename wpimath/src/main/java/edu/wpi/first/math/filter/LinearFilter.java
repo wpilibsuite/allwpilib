@@ -128,9 +128,7 @@ public class LinearFilter {
     }
 
     double[] ffGains = new double[taps];
-    for (int i = 0; i < ffGains.length; i++) {
-      ffGains[i] = 1.0 / taps;
-    }
+    Arrays.fill(ffGains, 1.0 / taps);
 
     double[] fbGains = new double[0];
 
@@ -167,7 +165,7 @@ public class LinearFilter {
     // [s₁ⁿ⁻¹ ⋯ sₙⁿ⁻¹][aₙ]      [δₙ₋₁,d]
     //
     // where δᵢ,ⱼ are the Kronecker delta. The FIR gains are the elements of the
-    // vector a in reverse order divided by hᵈ.
+    // vector 'a' in reverse order divided by hᵈ.
     //
     // The order of accuracy of the approximation is of the form O(hⁿ⁻ᵈ).
 

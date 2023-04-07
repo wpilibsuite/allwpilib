@@ -5,6 +5,7 @@
 #include "frc/controller/LTVDifferentialDriveController.h"
 
 #include <cmath>
+#include <stdexcept>
 
 #include "frc/MathUtil.h"
 #include "frc/StateSpaceUtil.h"
@@ -64,6 +65,11 @@ LTVDifferentialDriveController::LTVDifferentialDriveController(
   // x = -A⁻¹Bu
   units::meters_per_second_t maxV{
       -plant.A().householderQr().solve(plant.B() * Vectord<2>{12.0, 12.0})(0)};
+
+  if (maxV <= 0_mps) {
+    throw std::domain_error(
+        "Max velocity of plant with 12 V input must be greater than zero.");
+  }
 
   for (auto velocity = -maxV; velocity < maxV; velocity += 0.01_mps) {
     // The DARE is ill-conditioned if the velocity is close to zero, so don't

@@ -4,6 +4,8 @@
 
 #include "subsystems/DriveSubsystem.h"
 
+#include <wpi/sendable/SendableBuilder.h>
+
 using namespace DriveConstants;
 
 DriveSubsystem::DriveSubsystem()
@@ -40,14 +42,17 @@ double DriveSubsystem::GetAverageEncoderDistance() {
   return (m_leftEncoder.GetDistance() + m_rightEncoder.GetDistance()) / 2.0;
 }
 
-frc::Encoder& DriveSubsystem::GetLeftEncoder() {
-  return m_leftEncoder;
-}
-
-frc::Encoder& DriveSubsystem::GetRightEncoder() {
-  return m_rightEncoder;
-}
-
 void DriveSubsystem::SetMaxOutput(double maxOutput) {
   m_drive.SetMaxOutput(maxOutput);
+}
+
+void DriveSubsystem::InitSendable(wpi::SendableBuilder& builder) {
+  SubsystemBase::InitSendable(builder);
+
+  // Publish encoder distances to telemetry.
+  builder.AddDoubleProperty(
+      "leftDistance", [this] { return m_leftEncoder.GetDistance(); }, nullptr);
+  builder.AddDoubleProperty(
+      "rightDistance", [this] { return m_rightEncoder.GetDistance(); },
+      nullptr);
 }

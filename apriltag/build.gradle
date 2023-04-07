@@ -4,6 +4,11 @@ ext {
     nativeName = 'apriltag'
     devMain = 'edu.wpi.first.apriltag.DevMain'
     useJava = true
+    useCpp = true
+    sharedCvConfigs = [
+        apriltagDev : [],
+        apriltagTest: []]
+    staticCvConfigs = []
 
     def generateTask = createGenerateResourcesTask('main', 'APRILTAG', 'frc', project)
 
@@ -40,7 +45,6 @@ sourceSets {
         }
     }
 }
-
 
 model {
     components {}

@@ -17,17 +17,23 @@ TEST(Rotation3dTest, InitAxisAngleAndRollPitchYaw) {
   const Eigen::Vector3d xAxis{1.0, 0.0, 0.0};
   const Rotation3d rot1{xAxis, units::radian_t{std::numbers::pi / 3}};
   const Rotation3d rot2{units::radian_t{std::numbers::pi / 3}, 0_rad, 0_rad};
+  const Rotation3d rvec1{Eigen::Vector3d{xAxis * std::numbers::pi / 3}};
   EXPECT_EQ(rot1, rot2);
+  EXPECT_EQ(rot1, rvec1);
 
   const Eigen::Vector3d yAxis{0.0, 1.0, 0.0};
   const Rotation3d rot3{yAxis, units::radian_t{std::numbers::pi / 3}};
   const Rotation3d rot4{0_rad, units::radian_t{std::numbers::pi / 3}, 0_rad};
+  const Rotation3d rvec2{Eigen::Vector3d{yAxis * std::numbers::pi / 3}};
   EXPECT_EQ(rot3, rot4);
+  EXPECT_EQ(rot3, rvec2);
 
   const Eigen::Vector3d zAxis{0.0, 0.0, 1.0};
   const Rotation3d rot5{zAxis, units::radian_t{std::numbers::pi / 3}};
   const Rotation3d rot6{0_rad, 0_rad, units::radian_t{std::numbers::pi / 3}};
+  const Rotation3d rvec3{Eigen::Vector3d{zAxis * std::numbers::pi / 3}};
   EXPECT_EQ(rot5, rot6);
+  EXPECT_EQ(rot5, rvec3);
 }
 
 TEST(Rotation3dTest, InitRotationMatrix) {

@@ -90,6 +90,11 @@ struct VideoMode : public CS_VideoMode {
     return pixelFormat == other.pixelFormat && width == other.width &&
            height == other.height && fps == other.fps;
   }
+
+  bool CompareWithoutFps(const VideoMode& other) const {
+    return pixelFormat == other.pixelFormat && width == other.width &&
+           height == other.height;
+  }
 };
 
 /**
@@ -257,7 +262,7 @@ void ReleaseSource(CS_Source source, CS_Status* status);
 /** @} */
 
 /**
- * @defgroup cscore_camera_property_func Camera Source Common Property Fuctions
+ * @defgroup cscore_camera_property_func Camera Source Common Property Functions
  * @{
  */
 void SetCameraBrightness(CS_Source source, int brightness, CS_Status* status);

@@ -169,7 +169,7 @@ public class KalmanFilter<States extends Num, Inputs extends Num, Outputs extend
    * Returns an element of the state estimate x-hat.
    *
    * @param row Row of x-hat.
-   * @return the state estimate x-hat at i.
+   * @return the state estimate x-hat at that row.
    */
   public double getXhat(int row) {
     return m_xHat.get(row, 0);

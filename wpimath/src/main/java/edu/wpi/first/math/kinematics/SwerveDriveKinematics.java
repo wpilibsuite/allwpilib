@@ -19,8 +19,8 @@ import org.ejml.simple.SimpleMatrix;
  *
  * <p>The inverse kinematics (converting from a desired chassis velocity to individual module
  * states) uses the relative locations of the modules with respect to the center of rotation. The
- * center of rotation for inverse kinematics is also variable. This means that you can set your set
- * your center of rotation in a corner of the robot to perform special evasion maneuvers.
+ * center of rotation for inverse kinematics is also variable. This means that you can set your
+ * center of rotation in a corner of the robot to perform special evasion maneuvers.
  *
  * <p>Forward kinematics (converting an array of module states into the overall chassis motion) is
  * performs the exact opposite of what inverse kinematics does. Since this is an overdetermined
@@ -39,14 +39,15 @@ public class SwerveDriveKinematics {
 
   private final int m_numModules;
   private final Translation2d[] m_modules;
-  private final SwerveModuleState[] m_moduleStates;
+  private SwerveModuleState[] m_moduleStates;
   private Translation2d m_prevCoR = new Translation2d();
 
   /**
    * Constructs a swerve drive kinematics object. This takes in a variable number of wheel locations
-   * as Translation2ds. The order in which you pass in the wheel locations is the same order that
-   * you will receive the module states when performing inverse kinematics. It is also expected that
-   * you pass in the module states in the same order when calling the forward kinematics methods.
+   * as Translation2d objects. The order in which you pass in the wheel locations is the same order
+   * that you will receive the module states when performing inverse kinematics. It is also expected
+   * that you pass in the module states in the same order when calling the forward kinematics
+   * methods.
    *
    * @param wheelsMeters The locations of the wheels relative to the physical center of the robot.
    */
@@ -96,10 +97,12 @@ public class SwerveDriveKinematics {
     if (chassisSpeeds.vxMetersPerSecond == 0.0
         && chassisSpeeds.vyMetersPerSecond == 0.0
         && chassisSpeeds.omegaRadiansPerSecond == 0.0) {
+      SwerveModuleState[] newStates = new SwerveModuleState[m_numModules];
       for (int i = 0; i < m_numModules; i++) {
-        m_moduleStates[i].speedMetersPerSecond = 0.0;
+        newStates[i] = new SwerveModuleState(0.0, m_moduleStates[i].angle);
       }
 
+      m_moduleStates = newStates;
       return m_moduleStates;
     }
 
@@ -131,6 +134,7 @@ public class SwerveDriveKinematics {
 
     var moduleStatesMatrix = m_inverseKinematics.mult(chassisSpeedsVector);
 
+    m_moduleStates = new SwerveModuleState[m_numModules];
     for (int i = 0; i < m_numModules; i++) {
       double x = moduleStatesMatrix.get(i * 2, 0);
       double y = moduleStatesMatrix.get(i * 2 + 1, 0);

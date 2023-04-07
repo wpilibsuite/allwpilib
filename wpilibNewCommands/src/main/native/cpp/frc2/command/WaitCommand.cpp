@@ -15,8 +15,7 @@ WaitCommand::WaitCommand(units::second_t duration) : m_duration{duration} {
 }
 
 void WaitCommand::Initialize() {
-  m_timer.Reset();
-  m_timer.Start();
+  m_timer.Restart();
 }
 
 void WaitCommand::End(bool interrupted) {

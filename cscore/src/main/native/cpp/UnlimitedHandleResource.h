@@ -16,7 +16,7 @@
 namespace cs {
 
 // The UnlimitedHandleResource class is a way to track handles. This version
-// allows an unlimted number of handles that are allocated sequentially. When
+// allows an unlimited number of handles that are allocated sequentially. When
 // possible, indices are reused to save memory usage and keep the array length
 // down.
 // However, automatic array management has not been implemented, but might be in
@@ -154,7 +154,7 @@ template <typename T>
 inline std::span<T>
 UnlimitedHandleResource<THandle, TStruct, typeValue, TMutex>::GetAll(
     wpi::SmallVectorImpl<T>& vec) {
-  ForEach([&](THandle handle, const TStruct& data) { vec.push_back(handle); });
+  ForEach([&](THandle handle, const TStruct&) { vec.push_back(handle); });
   return vec;
 }
 

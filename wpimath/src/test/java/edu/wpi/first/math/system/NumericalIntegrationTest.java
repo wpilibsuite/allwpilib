@@ -31,21 +31,17 @@ class NumericalIntegrationTest {
   }
 
   @Test
-  void testExponentialRKF45() {
-    Matrix<N1, N1> y0 = VecBuilder.fill(0.0);
-
+  void testZeroRKDP() {
     var y1 =
-        NumericalIntegration.rkf45(
+        NumericalIntegration.rkdp(
             (x, u) -> {
-              var y = new Matrix<>(Nat.N1(), Nat.N1());
-              y.set(0, 0, Math.exp(x.get(0, 0)));
-              return y;
+              return VecBuilder.fill(0);
             },
-            y0,
+            VecBuilder.fill(0),
             VecBuilder.fill(0),
             0.1);
 
-    assertEquals(Math.exp(0.1) - Math.exp(0.0), y1.get(0, 0), 1e-3);
+    assertEquals(0.0, y1.get(0, 0), 1e-3);
   }
 
   @Test

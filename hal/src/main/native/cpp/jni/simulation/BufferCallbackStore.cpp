@@ -123,6 +123,9 @@ SIM_JniHandle sim::AllocateBufferCallback(
 void sim::FreeBufferCallback(JNIEnv* env, SIM_JniHandle handle, jint index,
                              FreeBufferCallbackFunc freeCallback) {
   auto callback = callbackHandles->Free(handle);
+  if (callback == nullptr) {
+    return;
+  }
   freeCallback(index, callback->getCallbackId());
   callback->free(env);
 }

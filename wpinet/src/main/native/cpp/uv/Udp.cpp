@@ -38,6 +38,9 @@ UdpSendReq::UdpSendReq() {
 }
 
 std::shared_ptr<Udp> Udp::Create(Loop& loop, unsigned int flags) {
+  if (loop.IsClosing()) {
+    return nullptr;
+  }
   auto h = std::make_shared<Udp>(private_init{});
   int err = uv_udp_init_ex(loop.GetRaw(), h->GetRaw(), flags);
   if (err < 0) {
@@ -135,6 +138,9 @@ void Udp::SetMulticastInterface(std::string_view interfaceAddr) {
 
 void Udp::Send(const sockaddr& addr, std::span<const Buffer> bufs,
                const std::shared_ptr<UdpSendReq>& req) {
+  if (IsLoopClosing()) {
+    return;
+  }
   if (Invoke(&uv_udp_send, req->GetRaw(), GetRaw(), bufs.data(), bufs.size(),
              &addr, [](uv_udp_send_t* r, int status) {
                auto& h = *static_cast<UdpSendReq*>(r->data);
@@ -150,12 +156,18 @@ void Udp::Send(const sockaddr& addr, std::span<const Buffer> bufs,
 
 void Udp::Send(const sockaddr& addr, std::span<const Buffer> bufs,
                std::function<void(std::span<Buffer>, Error)> callback) {
+  if (IsLoopClosing()) {
+    return;
+  }
   Send(addr, bufs,
        std::make_shared<CallbackUdpSendReq>(bufs, std::move(callback)));
 }
 
 void Udp::Send(std::span<const Buffer> bufs,
                const std::shared_ptr<UdpSendReq>& req) {
+  if (IsLoopClosing()) {
+    return;
+  }
   if (Invoke(&uv_udp_send, req->GetRaw(), GetRaw(), bufs.data(), bufs.size(),
              nullptr, [](uv_udp_send_t* r, int status) {
                auto& h = *static_cast<UdpSendReq*>(r->data);
@@ -171,10 +183,16 @@ void Udp::Send(std::span<const Buffer> bufs,
 
 void Udp::Send(std::span<const Buffer> bufs,
                std::function<void(std::span<Buffer>, Error)> callback) {
+  if (IsLoopClosing()) {
+    return;
+  }
   Send(bufs, std::make_shared<CallbackUdpSendReq>(bufs, std::move(callback)));
 }
 
 void Udp::StartRecv() {
+  if (IsLoopClosing()) {
+    return;
+  }
   Invoke(&uv_udp_recv_start, GetRaw(), &AllocBuf,
          [](uv_udp_t* handle, ssize_t nread, const uv_buf_t* buf,
             const sockaddr* addr, unsigned flags) {

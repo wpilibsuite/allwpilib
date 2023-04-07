@@ -107,6 +107,19 @@ class NetworkTableListener final {
       ListenerCallback listener);
 
   /**
+   * Create a time synchronization listener.
+   *
+   * @param inst              instance
+   * @param immediate_notify  notify listener of current time synchronization
+   *                          value
+   * @param listener          listener function
+   * @return Listener
+   */
+  static NetworkTableListener CreateTimeSyncListener(NetworkTableInstance inst,
+                                                     bool immediate_notify,
+                                                     ListenerCallback listener);
+
+  /**
    * Create a listener for log messages.  By default, log messages are sent to
    * stderr; this function sends log messages with the specified levels to the
    * provided callback function instead.  The callback function will only be
@@ -250,6 +263,18 @@ class NetworkTableListenerPoller final {
    * @return Listener handle
    */
   NT_Listener AddConnectionListener(bool immediate_notify);
+
+  /**
+   * Add a time synchronization listener. The callback function is called
+   * asynchronously on a separate thread, so it's important to use
+   * synchronization or atomics when accessing any shared state from the
+   * callback function.
+   *
+   * @param immediate_notify  notify listener of current time synchronization
+   *                          value
+   * @return Listener handle
+   */
+  NT_Listener AddTimeSyncListener(bool immediate_notify);
 
   /**
    * Add logger callback function.  By default, log messages are sent to stderr;

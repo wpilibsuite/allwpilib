@@ -135,7 +135,7 @@ public class MecanumDrive extends RobotDriveBase implements Sendable, AutoClosea
    * Drive method for Mecanum platform.
    *
    * <p>Angles are measured counterclockwise from the positive X axis. The robot's speed is
-   * independent from its angle or rotation rate.
+   * independent of its angle or rotation rate.
    *
    * @param xSpeed The robot's speed along the X axis [-1.0..1.0]. Forward is positive.
    * @param ySpeed The robot's speed along the Y axis [-1.0..1.0]. Left is positive.
@@ -150,10 +150,10 @@ public class MecanumDrive extends RobotDriveBase implements Sendable, AutoClosea
    * Drive method for Mecanum platform.
    *
    * <p>Angles are measured counterclockwise from the positive X axis. The robot's speed is
-   * independent from its angle or rotation rate.
+   * independent of its angle or rotation rate.
    *
-   * @param xSpeed The robot's speed along the Y axis [-1.0..1.0]. Forward is positive.
-   * @param ySpeed The robot's speed along the X axis [-1.0..1.0]. Left is positive.
+   * @param xSpeed The robot's speed along the X axis [-1.0..1.0]. Forward is positive.
+   * @param ySpeed The robot's speed along the Y axis [-1.0..1.0]. Left is positive.
    * @param zRotation The robot's rotation rate around the Z axis [-1.0..1.0]. Counterclockwise is
    *     positive.
    * @param gyroAngle The gyro heading around the Z axis. Use this to implement field-oriented
@@ -183,7 +183,7 @@ public class MecanumDrive extends RobotDriveBase implements Sendable, AutoClosea
    * Drive method for Mecanum platform.
    *
    * <p>Angles are measured counterclockwise from straight ahead. The speed at which the robot
-   * drives (translation) is independent from its angle or rotation rate.
+   * drives (translation) is independent of its angle or rotation rate.
    *
    * @param magnitude The robot's speed at a given angle [-1.0..1.0]. Forward is positive.
    * @param angle The gyro heading around the Z axis at which the robot drives.
@@ -204,7 +204,7 @@ public class MecanumDrive extends RobotDriveBase implements Sendable, AutoClosea
    * Cartesian inverse kinematics for Mecanum platform.
    *
    * <p>Angles are measured counterclockwise from the positive X axis. The robot's speed is
-   * independent from its angle or rotation rate.
+   * independent of its angle or rotation rate.
    *
    * @param xSpeed The robot's speed along the X axis [-1.0..1.0]. Forward is positive.
    * @param ySpeed The robot's speed along the Y axis [-1.0..1.0]. Left is positive.
@@ -219,8 +219,8 @@ public class MecanumDrive extends RobotDriveBase implements Sendable, AutoClosea
   /**
    * Cartesian inverse kinematics for Mecanum platform.
    *
-   * <p>Angles are measured clockwise from the positive X axis. The robot's speed is independent
-   * from its angle or rotation rate.
+   * <p>Angles are measured clockwise from the positive X axis. The robot's speed is independent of
+   * its angle or rotation rate.
    *
    * @param xSpeed The robot's speed along the X axis [-1.0..1.0]. Forward is positive.
    * @param ySpeed The robot's speed along the Y axis [-1.0..1.0]. Left is positive.

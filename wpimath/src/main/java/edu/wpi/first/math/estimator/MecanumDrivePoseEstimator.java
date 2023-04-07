@@ -4,6 +4,7 @@
 
 package edu.wpi.first.math.estimator;
 
+import edu.wpi.first.math.MathSharedStore;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.Nat;
@@ -18,8 +19,8 @@ import edu.wpi.first.math.kinematics.MecanumDriveOdometry;
 import edu.wpi.first.math.kinematics.MecanumDriveWheelPositions;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
-import edu.wpi.first.util.WPIUtilJNI;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.Objects;
 
 /**
@@ -39,8 +40,10 @@ public class MecanumDrivePoseEstimator {
   private final Matrix<N3, N1> m_q = new Matrix<>(Nat.N3(), Nat.N1());
   private Matrix<N3, N3> m_visionK = new Matrix<>(Nat.N3(), Nat.N3());
 
+  private static final double kBufferDuration = 1.5;
+
   private final TimeInterpolatableBuffer<InterpolationRecord> m_poseBuffer =
-      TimeInterpolatableBuffer.createBuffer(1.5);
+      TimeInterpolatableBuffer.createBuffer(kBufferDuration);
 
   /**
    * Constructs a MecanumDrivePoseEstimator with default standard deviations for the model and
@@ -175,6 +178,15 @@ public class MecanumDrivePoseEstimator {
    *     your time source or sync the epochs.
    */
   public void addVisionMeasurement(Pose2d visionRobotPoseMeters, double timestampSeconds) {
+    // Step 0: If this measurement is old enough to be outside the pose buffer's timespan, skip.
+    try {
+      if (m_poseBuffer.getInternalBuffer().lastKey() - kBufferDuration > timestampSeconds) {
+        return;
+      }
+    } catch (NoSuchElementException ex) {
+      return;
+    }
+
     // Step 1: Get the pose odometry measured at the moment the vision measurement was made.
     var sample = m_poseBuffer.getSample(timestampSeconds);
 
@@ -199,7 +211,13 @@ public class MecanumDrivePoseEstimator {
         sample.get().wheelPositions,
         sample.get().poseMeters.exp(scaledTwist));
 
-    // Step 6: Replay odometry inputs between sample time and latest recorded sample to update the
+    // Step 6: Record the current pose to allow multiple measurements from the same timestamp
+    m_poseBuffer.addSample(
+        timestampSeconds,
+        new InterpolationRecord(
+            getEstimatedPosition(), sample.get().gyroAngle, sample.get().wheelPositions));
+
+    // Step 7: Replay odometry inputs between sample time and latest recorded sample to update the
     // pose buffer and correct odometry.
     for (Map.Entry<Double, InterpolationRecord> entry :
         m_poseBuffer.getInternalBuffer().tailMap(timestampSeconds).entrySet()) {
@@ -227,9 +245,9 @@ public class MecanumDrivePoseEstimator {
    *     don't use your own time source by calling {@link
    *     MecanumDrivePoseEstimator#updateWithTime(double,Rotation2d,MecanumDriveWheelPositions)},
    *     then you must use a timestamp with an epoch since FPGA startup (i.e., the epoch of this
-   *     timestamp is the same epoch as {@link edu.wpi.first.wpilibj.Timer#getFPGATimestamp()}. This
-   *     means that you should use {@link edu.wpi.first.wpilibj.Timer#getFPGATimestamp()} as your
-   *     time source in this case.
+   *     timestamp is the same epoch as {@link edu.wpi.first.wpilibj.Timer#getFPGATimestamp()}).
+   *     This means that you should use {@link edu.wpi.first.wpilibj.Timer#getFPGATimestamp()} as
+   *     your time source in this case.
    * @param visionMeasurementStdDevs Standard deviations of the vision pose measurement (x position
    *     in meters, y position in meters, and heading in radians). Increase these numbers to trust
    *     the vision pose measurement less.
@@ -251,7 +269,7 @@ public class MecanumDrivePoseEstimator {
    * @return The estimated pose of the robot in meters.
    */
   public Pose2d update(Rotation2d gyroAngle, MecanumDriveWheelPositions wheelPositions) {
-    return updateWithTime(WPIUtilJNI.now() * 1.0e-6, gyroAngle, wheelPositions);
+    return updateWithTime(MathSharedStore.getTimestamp(), gyroAngle, wheelPositions);
   }
 
   /**

@@ -66,7 +66,7 @@ public class PneumaticsControlModule implements PneumaticsBase {
   private final DataStore m_dataStore;
   private final int m_handle;
 
-  /** Constructs a PneumaticsControlModule with the default id (0). */
+  /** Constructs a PneumaticsControlModule with the default ID (0). */
   public PneumaticsControlModule() {
     this(SensorUtil.getDefaultCTREPCMModule());
   }
@@ -101,26 +101,67 @@ public class PneumaticsControlModule implements PneumaticsBase {
     return CTREPCMJNI.getCompressorCurrent(m_handle);
   }
 
+  /**
+   * Return whether the compressor current is currently too high.
+   *
+   * @return True if the compressor current is too high, otherwise false.
+   * @see #getCompressorCurrentTooHighStickyFault()
+   */
   public boolean getCompressorCurrentTooHighFault() {
     return CTREPCMJNI.getCompressorCurrentTooHighFault(m_handle);
   }
 
+  /**
+   * Returns whether the compressor current has been too high since sticky faults were last cleared.
+   * This fault is persistent and can be cleared by {@link #clearAllStickyFaults()}
+   *
+   * @return True if the compressor current has been too high since sticky faults were last cleared.
+   * @see #getCompressorCurrentTooHighFault()
+   */
   public boolean getCompressorCurrentTooHighStickyFault() {
     return CTREPCMJNI.getCompressorCurrentTooHighStickyFault(m_handle);
   }
 
+  /**
+   * Returns whether the compressor is currently shorted.
+   *
+   * @return True if the compressor is currently shorted, otherwise false.
+   * @see #getCompressorShortedStickyFault()
+   */
   public boolean getCompressorShortedFault() {
     return CTREPCMJNI.getCompressorShortedFault(m_handle);
   }
 
+  /**
+   * Returns whether the compressor has been shorted since sticky faults were last cleared. This
+   * fault is persistent and can be cleared by {@link #clearAllStickyFaults()}
+   *
+   * @return True if the compressor has been shorted since sticky faults were last cleared,
+   *     otherwise false.
+   * @see #getCompressorShortedFault()
+   */
   public boolean getCompressorShortedStickyFault() {
     return CTREPCMJNI.getCompressorShortedStickyFault(m_handle);
   }
 
+  /**
+   * Returns whether the compressor is currently disconnected.
+   *
+   * @return True if compressor is currently disconnected, otherwise false.
+   * @see #getCompressorNotConnectedStickyFault()
+   */
   public boolean getCompressorNotConnectedFault() {
     return CTREPCMJNI.getCompressorNotConnectedFault(m_handle);
   }
 
+  /**
+   * Returns whether the compressor has been disconnected since sticky faults were last cleared.
+   * This fault is persistent and can be cleared by {@link #clearAllStickyFaults()}
+   *
+   * @return True if the compressor has been disconnected since sticky faults were last cleared,
+   *     otherwise false.
+   * @see #getCompressorNotConnectedFault()
+   */
   public boolean getCompressorNotConnectedStickyFault() {
     return CTREPCMJNI.getCompressorNotConnectedStickyFault(m_handle);
   }
@@ -153,6 +194,7 @@ public class PneumaticsControlModule implements PneumaticsBase {
     return CTREPCMJNI.getSolenoidVoltageStickyFault(m_handle);
   }
 
+  /** Clears all sticky faults on this device. */
   public void clearAllStickyFaults() {
     CTREPCMJNI.clearAllStickyFaults(m_handle);
   }
@@ -224,6 +266,10 @@ public class PneumaticsControlModule implements PneumaticsBase {
     }
   }
 
+  /**
+   * Disables the compressor. The compressor will not turn on until {@link
+   * #enableCompressorDigital()} is called.
+   */
   @Override
   public void disableCompressor() {
     CTREPCMJNI.setClosedLoopControl(m_handle, false);
@@ -234,11 +280,25 @@ public class PneumaticsControlModule implements PneumaticsBase {
     CTREPCMJNI.setClosedLoopControl(m_handle, true);
   }
 
+  /**
+   * Enables the compressor in digital mode. Analog mode is unsupported by the CTRE PCM.
+   *
+   * @param minPressure Unsupported.
+   * @param maxPressure Unsupported.
+   * @see #enableCompressorDigital()
+   */
   @Override
   public void enableCompressorAnalog(double minPressure, double maxPressure) {
     CTREPCMJNI.setClosedLoopControl(m_handle, false);
   }
 
+  /**
+   * Enables the compressor in digital mode. Hybrid mode is unsupported by the CTRE PCM.
+   *
+   * @param minPressure Unsupported.
+   * @param maxPressure Unsupported.
+   * @see #enableCompressorDigital()
+   */
   @Override
   public void enableCompressorHybrid(double minPressure, double maxPressure) {
     CTREPCMJNI.setClosedLoopControl(m_handle, false);
@@ -251,11 +311,23 @@ public class PneumaticsControlModule implements PneumaticsBase {
         : CompressorConfigType.Disabled;
   }
 
+  /**
+   * Unsupported by the CTRE PCM.
+   *
+   * @param channel Unsupported.
+   * @return 0
+   */
   @Override
   public double getAnalogVoltage(int channel) {
     return 0;
   }
 
+  /**
+   * Unsupported by the CTRE PCM.
+   *
+   * @param channel Unsupported.
+   * @return 0
+   */
   @Override
   public double getPressure(int channel) {
     return 0;

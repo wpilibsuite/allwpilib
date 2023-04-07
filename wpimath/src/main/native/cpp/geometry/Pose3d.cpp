@@ -71,73 +71,102 @@ Pose3d Pose3d::RelativeTo(const Pose3d& other) const {
 }
 
 Pose3d Pose3d::Exp(const Twist3d& twist) const {
-  Matrixd<3, 3> Omega = RotationVectorToMatrix(
-      Vectord<3>{twist.rx.value(), twist.ry.value(), twist.rz.value()});
-  Matrixd<3, 3> OmegaSq = Omega * Omega;
+  // Implementation from Section 3.2 of https://ethaneade.org/lie.pdf
+  Eigen::Vector3d u{twist.dx.value(), twist.dy.value(), twist.dz.value()};
+  Eigen::Vector3d rvec{twist.rx.value(), twist.ry.value(), twist.rz.value()};
+  Eigen::Matrix3d omega = RotationVectorToMatrix(rvec);
+  Eigen::Matrix3d omegaSq = omega * omega;
+  double theta = rvec.norm();
+  double thetaSq = theta * theta;
 
-  double thetaSq =
-      (twist.rx * twist.rx + twist.ry * twist.ry + twist.rz * twist.rz).value();
-
-  // Get left Jacobian of SO3. See first line in right column of
-  // http://asrl.utias.utoronto.ca/~tdb/bib/barfoot_ser17_identities.pdf
-  Matrixd<3, 3> J;
-  if (thetaSq < 1E-9 * 1E-9) {
-    // V = I + 0.5ω
-    J = Matrixd<3, 3>::Identity() + 0.5 * Omega;
+  double A;
+  double B;
+  double C;
+  if (std::abs(theta) < 1E-7) {
+    // Taylor Expansions around θ = 0
+    // A = 1/1! - θ²/3! + θ⁴/5!
+    // B = 1/2! - θ²/4! + θ⁴/6!
+    // C = 1/3! - θ²/5! + θ⁴/7!
+    // sources:
+    // A:
+    // https://www.wolframalpha.com/input?i2d=true&i=series+expansion+of+Divide%5Bsin%5C%2840%29x%5C%2841%29%2Cx%5D+at+x%3D0
+    // B:
+    // https://www.wolframalpha.com/input?i2d=true&i=series+expansion+of+Divide%5B1-cos%5C%2840%29x%5C%2841%29%2CPower%5Bx%2C2%5D%5D+at+x%3D0
+    // C:
+    // https://www.wolframalpha.com/input?i2d=true&i=series+expansion+of+Divide%5B1-Divide%5Bsin%5C%2840%29x%5C%2841%29%2Cx%5D%2CPower%5Bx%2C2%5D%5D+at+x%3D0
+    A = 1 - thetaSq / 6 + thetaSq * thetaSq / 120;
+    B = 1 / 2.0 - thetaSq / 24 + thetaSq * thetaSq / 720;
+    C = 1 / 6.0 - thetaSq / 120 + thetaSq * thetaSq / 5040;
   } else {
-    double theta = std::sqrt(thetaSq);
-    // J = I + (1 − std::cos(θ))/θ² ω + (θ − std::sin(θ))/θ³ ω²
-    J = Matrixd<3, 3>::Identity() + (1.0 - std::cos(theta)) / thetaSq * Omega +
-        (theta - std::sin(theta)) / (thetaSq * theta) * OmegaSq;
+    // A = std::sin(θ)/θ
+    // B = (1 - std::cos(θ)) / θ²
+    // C = (1 - A) / θ²
+    A = std::sin(theta) / theta;
+    B = (1 - std::cos(theta)) / thetaSq;
+    C = (1 - A) / thetaSq;
   }
 
-  // Get translation component
-  Vectord<3> translation =
-      J * Vectord<3>{twist.dx.value(), twist.dy.value(), twist.dz.value()};
+  Eigen::Matrix3d R = Eigen::Matrix3d::Identity() + A * omega + B * omegaSq;
+  Eigen::Matrix3d V = Eigen::Matrix3d::Identity() + B * omega + C * omegaSq;
 
-  const Transform3d transform{Translation3d{units::meter_t{translation(0)},
-                                            units::meter_t{translation(1)},
-                                            units::meter_t{translation(2)}},
-                              Rotation3d{twist.rx, twist.ry, twist.rz}};
+  auto translation_component = V * u;
+  const Transform3d transform{
+      Translation3d{units::meter_t{translation_component(0)},
+                    units::meter_t{translation_component(1)},
+                    units::meter_t{translation_component(2)}},
+      Rotation3d{R}};
 
   return *this + transform;
 }
 
 Twist3d Pose3d::Log(const Pose3d& end) const {
+  // Implementation from Section 3.2 of https://ethaneade.org/lie.pdf
   const auto transform = end.RelativeTo(*this);
 
-  Vectord<3> rotVec = transform.Rotation().GetQuaternion().ToRotationVector();
+  Eigen::Vector3d u{transform.X().value(), transform.Y().value(),
+                    transform.Z().value()};
+  Eigen::Vector3d rvec =
+      transform.Rotation().GetQuaternion().ToRotationVector();
 
-  Matrixd<3, 3> Omega = RotationVectorToMatrix(rotVec);
-  Matrixd<3, 3> OmegaSq = Omega * Omega;
+  Eigen::Matrix3d omega = RotationVectorToMatrix(rvec);
+  Eigen::Matrix3d omegaSq = omega * omega;
+  double theta = rvec.norm();
+  double thetaSq = theta * theta;
 
-  double thetaSq = rotVec.squaredNorm();
-
-  // Get left Jacobian inverse of SO3. See fourth line in right column of
-  // http://asrl.utias.utoronto.ca/~tdb/bib/barfoot_ser17_identities.pdf
-  Matrixd<3, 3> Jinv;
-  if (thetaSq < 1E-9 * 1E-9) {
-    // J⁻¹ = I − 0.5ω + 1/12 ω²
-    Jinv = Matrixd<3, 3>::Identity() - 0.5 * Omega + 1.0 / 12.0 * OmegaSq;
+  double C;
+  if (std::abs(theta) < 1E-7) {
+    // Taylor Expansions around θ = 0
+    // A = 1/1! - θ²/3! + θ⁴/5!
+    // B = 1/2! - θ²/4! + θ⁴/6!
+    // C = 1/6 * (1/2 + θ²/5! + θ⁴/7!)
+    // sources:
+    // A:
+    // https://www.wolframalpha.com/input?i2d=true&i=series+expansion+of+Divide%5Bsin%5C%2840%29x%5C%2841%29%2Cx%5D+at+x%3D0
+    // B:
+    // https://www.wolframalpha.com/input?i2d=true&i=series+expansion+of+Divide%5B1-cos%5C%2840%29x%5C%2841%29%2CPower%5Bx%2C2%5D%5D+at+x%3D0
+    // C:
+    // https://www.wolframalpha.com/input?i2d=true&i=series+expansion+of+Divide%5B1-Divide%5BDivide%5Bsin%5C%2840%29x%5C%2841%29%2Cx%5D%2C2Divide%5B1-cos%5C%2840%29x%5C%2841%29%2CPower%5Bx%2C2%5D%5D%5D%2CPower%5Bx%2C2%5D%5D+at+x%3D0
+    C = 1 / 12.0 + thetaSq / 720 + thetaSq * thetaSq / 30240;
   } else {
-    double theta = std::sqrt(thetaSq);
-    double halfTheta = 0.5 * theta;
-
-    // J⁻¹ = I − 0.5ω + (1 − 0.5θ std::cos(θ/2) / std::sin(θ/2))/θ² ω²
-    Jinv = Matrixd<3, 3>::Identity() - 0.5 * Omega +
-           (1.0 - 0.5 * theta * std::cos(halfTheta) / std::sin(halfTheta)) /
-               thetaSq * OmegaSq;
+    // A = std::sin(θ)/θ
+    // B = (1 - std::cos(θ)) / θ²
+    // C = (1 - A/(2*B)) / θ²
+    double A = std::sin(theta) / theta;
+    double B = (1 - std::cos(theta)) / thetaSq;
+    C = (1 - A / (2 * B)) / thetaSq;
   }
 
-  // Get dtranslation component
-  Vectord<3> dtranslation =
-      Jinv * Vectord<3>{transform.X().value(), transform.Y().value(),
-                        transform.Z().value()};
+  Eigen::Matrix3d V_inv =
+      Eigen::Matrix3d::Identity() - 0.5 * omega + C * omegaSq;
 
-  return Twist3d{
-      units::meter_t{dtranslation(0)}, units::meter_t{dtranslation(1)},
-      units::meter_t{dtranslation(2)}, units::radian_t{rotVec(0)},
-      units::radian_t{rotVec(1)},      units::radian_t{rotVec(2)}};
+  Eigen::Vector3d translation_component = V_inv * u;
+
+  return Twist3d{units::meter_t{translation_component(0)},
+                 units::meter_t{translation_component(1)},
+                 units::meter_t{translation_component(2)},
+                 units::radian_t{rvec(0)},
+                 units::radian_t{rvec(1)},
+                 units::radian_t{rvec(2)}};
 }
 
 Pose2d Pose3d::ToPose2d() const {

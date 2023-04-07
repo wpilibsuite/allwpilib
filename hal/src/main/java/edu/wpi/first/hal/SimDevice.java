@@ -32,7 +32,7 @@ public class SimDevice implements AutoCloseable {
    * Creates a simulated device.
    *
    * <p>The device name must be unique. Returns null if the device name already exists. If multiple
-   * instances of the same device are desired, recommend appending the instance/unique identifer in
+   * instances of the same device are desired, recommend appending the instance/unique identifier in
    * brackets to the base name, e.g. "device[1]".
    *
    * <p>null is returned if not in simulation.
@@ -104,6 +104,15 @@ public class SimDevice implements AutoCloseable {
    */
   public int getNativeHandle() {
     return m_handle;
+  }
+
+  /**
+   * Get the name of the simulated device.
+   *
+   * @return the name
+   */
+  public String getName() {
+    return SimDeviceJNI.getSimDeviceName(m_handle);
   }
 
   /**

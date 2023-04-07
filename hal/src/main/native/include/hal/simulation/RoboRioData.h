@@ -132,6 +132,12 @@ void HALSIM_CancelRoboRioSerialNumberCallback(int32_t uid);
 size_t HALSIM_GetRoboRioSerialNumber(char* buffer, size_t size);
 void HALSIM_SetRoboRioSerialNumber(const char* serialNumber, size_t size);
 
+int32_t HALSIM_RegisterRoboRioCommentsCallback(
+    HAL_RoboRioStringCallback callback, void* param, HAL_Bool initialNotify);
+void HALSIM_CancelRoboRioCommentsCallback(int32_t uid);
+size_t HALSIM_GetRoboRioComments(char* buffer, size_t size);
+void HALSIM_SetRoboRioComments(const char* comments, size_t size);
+
 void HALSIM_RegisterRoboRioAllCallbacks(HAL_NotifyCallback callback,
                                         void* param, HAL_Bool initialNotify);
 

@@ -206,3 +206,90 @@ TEST(MecanumDrivePoseEstimatorTest, BadInitialPose) {
     }
   }
 }
+
+TEST(MecanumDrivePoseEstimatorTest, SimultaneousVisionMeasurements) {
+  // This tests for multiple vision measurements appled at the same time.
+  // The expected behavior is that all measurements affect the estimated pose.
+  // The alternative result is that only one vision measurement affects the
+  // outcome. If that were the case, after 1000 measurements, the estimated
+  // pose would converge to that measurement.
+  frc::MecanumDriveKinematics kinematics{
+      frc::Translation2d{1_m, 1_m}, frc::Translation2d{1_m, -1_m},
+      frc::Translation2d{-1_m, -1_m}, frc::Translation2d{-1_m, 1_m}};
+
+  frc::MecanumDriveWheelPositions wheelPositions;
+
+  frc::MecanumDrivePoseEstimator estimator{
+      kinematics,      frc::Rotation2d{},
+      wheelPositions,  frc::Pose2d{1_m, 2_m, frc::Rotation2d{270_deg}},
+      {0.1, 0.1, 0.1}, {0.45, 0.45, 0.1}};
+
+  estimator.UpdateWithTime(0_s, frc::Rotation2d{}, wheelPositions);
+
+  for (int i = 0; i < 1000; i++) {
+    estimator.AddVisionMeasurement(
+        frc::Pose2d{0_m, 0_m, frc::Rotation2d{0_deg}}, 0_s);
+    estimator.AddVisionMeasurement(
+        frc::Pose2d{3_m, 1_m, frc::Rotation2d{90_deg}}, 0_s);
+    estimator.AddVisionMeasurement(
+        frc::Pose2d{2_m, 4_m, frc::Rotation2d{180_deg}}, 0_s);
+  }
+
+  {
+    auto dx = units::math::abs(estimator.GetEstimatedPosition().X() - 0_m);
+    auto dy = units::math::abs(estimator.GetEstimatedPosition().Y() - 0_m);
+    auto dtheta = units::math::abs(
+        estimator.GetEstimatedPosition().Rotation().Radians() - 0_deg);
+
+    EXPECT_TRUE(dx > 0.08_m || dy > 0.08_m || dtheta > 0.08_rad);
+  }
+
+  {
+    auto dx = units::math::abs(estimator.GetEstimatedPosition().X() - 3_m);
+    auto dy = units::math::abs(estimator.GetEstimatedPosition().Y() - 1_m);
+    auto dtheta = units::math::abs(
+        estimator.GetEstimatedPosition().Rotation().Radians() - 90_deg);
+
+    EXPECT_TRUE(dx > 0.08_m || dy > 0.08_m || dtheta > 0.08_rad);
+  }
+
+  {
+    auto dx = units::math::abs(estimator.GetEstimatedPosition().X() - 2_m);
+    auto dy = units::math::abs(estimator.GetEstimatedPosition().Y() - 4_m);
+    auto dtheta = units::math::abs(
+        estimator.GetEstimatedPosition().Rotation().Radians() - 180_deg);
+
+    EXPECT_TRUE(dx > 0.08_m || dy > 0.08_m || dtheta > 0.08_rad);
+  }
+}
+
+TEST(MecanumDrivePoseEstimatorTest, TestDiscardStaleVisionMeasurements) {
+  frc::MecanumDriveKinematics kinematics{
+      frc::Translation2d{1_m, 1_m}, frc::Translation2d{1_m, -1_m},
+      frc::Translation2d{-1_m, -1_m}, frc::Translation2d{-1_m, 1_m}};
+
+  frc::MecanumDrivePoseEstimator estimator{
+      kinematics,    frc::Rotation2d{}, frc::MecanumDriveWheelPositions{},
+      frc::Pose2d{}, {0.1, 0.1, 0.1},   {0.45, 0.45, 0.45}};
+
+  // Add enough measurements to fill up the buffer
+  for (auto time = 0.0_s; time < 4_s; time += 0.02_s) {
+    estimator.UpdateWithTime(time, frc::Rotation2d{},
+                             frc::MecanumDriveWheelPositions{});
+  }
+
+  auto odometryPose = estimator.GetEstimatedPosition();
+
+  // Apply a vision measurement from 3 seconds ago
+  estimator.AddVisionMeasurement(
+      frc::Pose2d{frc::Translation2d{10_m, 10_m}, frc::Rotation2d{0.1_rad}},
+      1_s, {0.1, 0.1, 0.1});
+
+  EXPECT_NEAR(odometryPose.X().value(),
+              estimator.GetEstimatedPosition().X().value(), 1e-6);
+  EXPECT_NEAR(odometryPose.Y().value(),
+              estimator.GetEstimatedPosition().Y().value(), 1e-6);
+  EXPECT_NEAR(odometryPose.Rotation().Radians().value(),
+              estimator.GetEstimatedPosition().Rotation().Radians().value(),
+              1e-6);
+}

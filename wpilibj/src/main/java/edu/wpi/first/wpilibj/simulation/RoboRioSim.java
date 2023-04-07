@@ -543,6 +543,24 @@ public final class RoboRioSim {
     RoboRioDataJNI.setSerialNumber(serialNumber);
   }
 
+  /**
+   * Get the comments string.
+   *
+   * @return The comments string.
+   */
+  public static String getComments() {
+    return RoboRioDataJNI.getComments();
+  }
+
+  /**
+   * Set the comments string.
+   *
+   * @param comments The comments string.
+   */
+  public static void setComments(String comments) {
+    RoboRioDataJNI.setComments(comments);
+  }
+
   /** Reset all simulation data. */
   public static void resetData() {
     RoboRioDataJNI.resetData();

@@ -56,6 +56,7 @@ class NCImpl {
   void StopDSClient();
 
   virtual void TcpConnected(uv::Tcp& tcp) = 0;
+  virtual void ForceDisconnect(std::string_view reason) = 0;
   virtual void Disconnect(std::string_view reason);
 
   // invariants
@@ -99,6 +100,7 @@ class NCImpl3 : public NCImpl {
 
   void HandleLocal();
   void TcpConnected(uv::Tcp& tcp) final;
+  void ForceDisconnect(std::string_view reason) override;
   void Disconnect(std::string_view reason) override;
 
   std::shared_ptr<net3::UvStreamConnection3> m_wire;
@@ -107,15 +109,21 @@ class NCImpl3 : public NCImpl {
 
 class NCImpl4 : public NCImpl {
  public:
-  NCImpl4(int inst, std::string_view id, net::ILocalStorage& localStorage,
-          IConnectionList& connList, wpi::Logger& logger);
+  NCImpl4(
+      int inst, std::string_view id, net::ILocalStorage& localStorage,
+      IConnectionList& connList, wpi::Logger& logger,
+      std::function<void(int64_t serverTimeOffset, int64_t rtt2, bool valid)>
+          timeSyncUpdated);
   ~NCImpl4() override;
 
   void HandleLocal();
   void TcpConnected(uv::Tcp& tcp) final;
   void WsConnected(wpi::WebSocket& ws, uv::Tcp& tcp);
+  void ForceDisconnect(std::string_view reason) override;
   void Disconnect(std::string_view reason) override;
 
+  std::function<void(int64_t serverTimeOffset, int64_t rtt2, bool valid)>
+      m_timeSyncUpdated;
   std::shared_ptr<net::WebSocketConnection> m_wire;
   std::unique_ptr<net::ClientImpl> m_clientImpl;
 };
@@ -150,7 +158,9 @@ void NCImpl::SetServers(
       [this, servers = std::move(serversCopy)](uv::Loop&) mutable {
         m_servers = std::move(servers);
         if (m_dsClientServer.first.empty()) {
-          m_parallelConnect->SetServers(m_servers);
+          if (m_parallelConnect) {
+            m_parallelConnect->SetServers(m_servers);
+          }
         }
       });
 }
@@ -162,14 +172,20 @@ void NCImpl::StartDSClient(unsigned int port) {
     }
     m_dsClientServer.second = port == 0 ? NT_DEFAULT_PORT4 : port;
     m_dsClient = wpi::DsClient::Create(m_loop, m_logger);
-    m_dsClient->setIp.connect([this](std::string_view ip) {
-      m_dsClientServer.first = ip;
-      m_parallelConnect->SetServers({{m_dsClientServer}});
-    });
-    m_dsClient->clearIp.connect([this] {
-      m_dsClientServer.first.clear();
-      m_parallelConnect->SetServers(m_servers);
-    });
+    if (m_dsClient) {
+      m_dsClient->setIp.connect([this](std::string_view ip) {
+        m_dsClientServer.first = ip;
+        if (m_parallelConnect) {
+          m_parallelConnect->SetServers({{m_dsClientServer}});
+        }
+      });
+      m_dsClient->clearIp.connect([this] {
+        m_dsClientServer.first.clear();
+        if (m_parallelConnect) {
+          m_parallelConnect->SetServers(m_servers);
+        }
+      });
+    }
   });
 }
 
@@ -186,15 +202,20 @@ void NCImpl::Disconnect(std::string_view reason) {
   if (m_readLocalTimer) {
     m_readLocalTimer->Stop();
   }
-  m_sendValuesTimer->Stop();
+  if (m_sendValuesTimer) {
+    m_sendValuesTimer->Stop();
+  }
   m_localStorage.ClearNetwork();
   m_localQueue.ClearQueue();
   m_connList.RemoveConnection(m_connHandle);
   m_connHandle = 0;
 
   // start trying to connect again
-  uv::Timer::SingleShot(m_loop, kReconnectRate,
-                        [this] { m_parallelConnect->Disconnected(); });
+  uv::Timer::SingleShot(m_loop, kReconnectRate, [this] {
+    if (m_parallelConnect) {
+      m_parallelConnect->Disconnected();
+    }
+  });
 }
 
 NCImpl3::NCImpl3(int inst, std::string_view id,
@@ -207,25 +228,31 @@ NCImpl3::NCImpl3(int inst, std::string_view id,
         [this](uv::Tcp& tcp) { TcpConnected(tcp); });
 
     m_sendValuesTimer = uv::Timer::Create(loop);
-    m_sendValuesTimer->timeout.connect([this] {
-      if (m_clientImpl) {
-        HandleLocal();
-        m_clientImpl->SendPeriodic(m_loop.Now().count());
-      }
-    });
+    if (m_sendValuesTimer) {
+      m_sendValuesTimer->timeout.connect([this] {
+        if (m_clientImpl) {
+          HandleLocal();
+          m_clientImpl->SendPeriodic(m_loop.Now().count(), false);
+        }
+      });
+    }
 
     // set up flush async
     m_flush = uv::Async<>::Create(m_loop);
-    m_flush->wakeup.connect([this] {
-      if (m_clientImpl) {
-        HandleLocal();
-        m_clientImpl->SendPeriodic(m_loop.Now().count());
-      }
-    });
+    if (m_flush) {
+      m_flush->wakeup.connect([this] {
+        if (m_clientImpl) {
+          HandleLocal();
+          m_clientImpl->SendPeriodic(m_loop.Now().count(), true);
+        }
+      });
+    }
     m_flushAtomic = m_flush.get();
 
     m_flushLocal = uv::Async<>::Create(m_loop);
-    m_flushLocal->wakeup.connect([this] { HandleLocal(); });
+    if (m_flushLocal) {
+      m_flushLocal->wakeup.connect([this] { HandleLocal(); });
+    }
     m_flushLocalAtomic = m_flushLocal.get();
   });
 }
@@ -256,8 +283,10 @@ void NCImpl3::TcpConnected(uv::Tcp& tcp) {
   auto clientImpl = std::make_shared<net3::ClientImpl3>(
       m_loop.Now().count(), m_inst, *wire, m_logger, [this](uint32_t repeatMs) {
         DEBUG4("Setting periodic timer to {}", repeatMs);
-        m_sendValuesTimer->Start(uv::Timer::Time{repeatMs},
-                                 uv::Timer::Time{repeatMs});
+        if (m_sendValuesTimer) {
+          m_sendValuesTimer->Start(uv::Timer::Time{repeatMs},
+                                   uv::Timer::Time{repeatMs});
+        }
       });
   clientImpl->Start(
       m_id, [this, wire,
@@ -271,7 +300,9 @@ void NCImpl3::TcpConnected(uv::Tcp& tcp) {
           return;
         }
 
-        m_parallelConnect->Succeeded(tcp);
+        if (m_parallelConnect) {
+          m_parallelConnect->Succeeded(tcp);
+        }
 
         m_wire = std::move(wire);
         m_clientImpl = std::move(clientImpl);
@@ -300,7 +331,7 @@ void NCImpl3::TcpConnected(uv::Tcp& tcp) {
         tcp.closed.connect([this, &tcp] {
           DEBUG3("NT3 TCP connection closed");
           if (!tcp.IsLoopClosing()) {
-            Disconnect(m_wire->GetDisconnectReason());
+            Disconnect(m_wire ? m_wire->GetDisconnectReason() : "unknown");
           }
         });
 
@@ -318,6 +349,12 @@ void NCImpl3::TcpConnected(uv::Tcp& tcp) {
   tcp.StartRead();
 }
 
+void NCImpl3::ForceDisconnect(std::string_view reason) {
+  if (m_wire) {
+    m_wire->Disconnect(reason);
+  }
+}
+
 void NCImpl3::Disconnect(std::string_view reason) {
   INFO("DISCONNECTED NT3 connection: {}", reason);
   m_clientImpl.reset();
@@ -325,44 +362,55 @@ void NCImpl3::Disconnect(std::string_view reason) {
   NCImpl::Disconnect(reason);
 }
 
-NCImpl4::NCImpl4(int inst, std::string_view id,
-                 net::ILocalStorage& localStorage, IConnectionList& connList,
-                 wpi::Logger& logger)
-    : NCImpl{inst, id, localStorage, connList, logger} {
+NCImpl4::NCImpl4(
+    int inst, std::string_view id, net::ILocalStorage& localStorage,
+    IConnectionList& connList, wpi::Logger& logger,
+    std::function<void(int64_t serverTimeOffset, int64_t rtt2, bool valid)>
+        timeSyncUpdated)
+    : NCImpl{inst, id, localStorage, connList, logger},
+      m_timeSyncUpdated{std::move(timeSyncUpdated)} {
   m_loopRunner.ExecAsync([this](uv::Loop& loop) {
     m_parallelConnect = wpi::ParallelTcpConnector::Create(
         loop, kReconnectRate, m_logger,
         [this](uv::Tcp& tcp) { TcpConnected(tcp); });
 
     m_readLocalTimer = uv::Timer::Create(loop);
-    m_readLocalTimer->timeout.connect([this] {
-      if (m_clientImpl) {
-        HandleLocal();
-        m_clientImpl->SendControl(m_loop.Now().count());
-      }
-    });
-    m_readLocalTimer->Start(uv::Timer::Time{100}, uv::Timer::Time{100});
+    if (m_readLocalTimer) {
+      m_readLocalTimer->timeout.connect([this] {
+        if (m_clientImpl) {
+          HandleLocal();
+          m_clientImpl->SendControl(m_loop.Now().count());
+        }
+      });
+      m_readLocalTimer->Start(uv::Timer::Time{100}, uv::Timer::Time{100});
+    }
 
     m_sendValuesTimer = uv::Timer::Create(loop);
-    m_sendValuesTimer->timeout.connect([this] {
-      if (m_clientImpl) {
-        HandleLocal();
-        m_clientImpl->SendValues(m_loop.Now().count());
-      }
-    });
+    if (m_sendValuesTimer) {
+      m_sendValuesTimer->timeout.connect([this] {
+        if (m_clientImpl) {
+          HandleLocal();
+          m_clientImpl->SendValues(m_loop.Now().count(), false);
+        }
+      });
+    }
 
     // set up flush async
     m_flush = uv::Async<>::Create(m_loop);
-    m_flush->wakeup.connect([this] {
-      if (m_clientImpl) {
-        HandleLocal();
-        m_clientImpl->SendValues(m_loop.Now().count());
-      }
-    });
+    if (m_flush) {
+      m_flush->wakeup.connect([this] {
+        if (m_clientImpl) {
+          HandleLocal();
+          m_clientImpl->SendValues(m_loop.Now().count(), true);
+        }
+      });
+    }
     m_flushAtomic = m_flush.get();
 
     m_flushLocal = uv::Async<>::Create(m_loop);
-    m_flushLocal->wakeup.connect([this] { HandleLocal(); });
+    if (m_flushLocal) {
+      m_flushLocal->wakeup.connect([this] { HandleLocal(); });
+    }
     m_flushLocalAtomic = m_flushLocal.get();
   });
 }
@@ -410,7 +458,9 @@ void NCImpl4::TcpConnected(uv::Tcp& tcp) {
 }
 
 void NCImpl4::WsConnected(wpi::WebSocket& ws, uv::Tcp& tcp) {
-  m_parallelConnect->Succeeded(tcp);
+  if (m_parallelConnect) {
+    m_parallelConnect->Succeeded(tcp);
+  }
 
   ConnectionInfo connInfo;
   uv::AddrToName(tcp.GetPeer(), &connInfo.remote_ip, &connInfo.remote_port);
@@ -421,11 +471,13 @@ void NCImpl4::WsConnected(wpi::WebSocket& ws, uv::Tcp& tcp) {
 
   m_wire = std::make_shared<net::WebSocketConnection>(ws);
   m_clientImpl = std::make_unique<net::ClientImpl>(
-      m_loop.Now().count(), m_inst, *m_wire, m_logger,
+      m_loop.Now().count(), m_inst, *m_wire, m_logger, m_timeSyncUpdated,
       [this](uint32_t repeatMs) {
         DEBUG4("Setting periodic timer to {}", repeatMs);
-        m_sendValuesTimer->Start(uv::Timer::Time{repeatMs},
-                                 uv::Timer::Time{repeatMs});
+        if (m_sendValuesTimer) {
+          m_sendValuesTimer->Start(uv::Timer::Time{repeatMs},
+                                   uv::Timer::Time{repeatMs});
+        }
       });
   m_clientImpl->SetLocal(&m_localStorage);
   m_localStorage.StartNetwork(&m_localQueue);
@@ -443,30 +495,47 @@ void NCImpl4::WsConnected(wpi::WebSocket& ws, uv::Tcp& tcp) {
   });
   ws.binary.connect([this](std::span<const uint8_t> data, bool) {
     if (m_clientImpl) {
-      m_clientImpl->ProcessIncomingBinary(data);
+      m_clientImpl->ProcessIncomingBinary(m_loop.Now().count(), data);
     }
   });
 }
 
+void NCImpl4::ForceDisconnect(std::string_view reason) {
+  if (m_wire) {
+    m_wire->Disconnect(reason);
+  }
+}
+
 void NCImpl4::Disconnect(std::string_view reason) {
-  INFO("DISCONNECTED NT4 connection: {}", reason);
+  std::string realReason;
+  if (m_wire) {
+    realReason = m_wire->GetDisconnectReason();
+  }
+  INFO("DISCONNECTED NT4 connection: {}",
+       realReason.empty() ? reason : realReason);
   m_clientImpl.reset();
   m_wire.reset();
   NCImpl::Disconnect(reason);
+  m_timeSyncUpdated(0, 0, false);
 }
 
 class NetworkClient::Impl final : public NCImpl4 {
  public:
   Impl(int inst, std::string_view id, net::ILocalStorage& localStorage,
-       IConnectionList& connList, wpi::Logger& logger)
-      : NCImpl4{inst, id, localStorage, connList, logger} {}
+       IConnectionList& connList, wpi::Logger& logger,
+       std::function<void(int64_t serverTimeOffset, int64_t rtt2, bool valid)>
+           timeSyncUpdated)
+      : NCImpl4{inst,     id,     localStorage,
+                connList, logger, std::move(timeSyncUpdated)} {}
 };
 
-NetworkClient::NetworkClient(int inst, std::string_view id,
-                             net::ILocalStorage& localStorage,
-                             IConnectionList& connList, wpi::Logger& logger)
-    : m_impl{std::make_unique<Impl>(inst, id, localStorage, connList, logger)} {
-}
+NetworkClient::NetworkClient(
+    int inst, std::string_view id, net::ILocalStorage& localStorage,
+    IConnectionList& connList, wpi::Logger& logger,
+    std::function<void(int64_t serverTimeOffset, int64_t rtt2, bool valid)>
+        timeSyncUpdated)
+    : m_impl{std::make_unique<Impl>(inst, id, localStorage, connList, logger,
+                                    std::move(timeSyncUpdated))} {}
 
 NetworkClient::~NetworkClient() {
   m_impl->m_localStorage.ClearNetwork();
@@ -478,6 +547,11 @@ void NetworkClient::SetServers(
   m_impl->SetServers(servers, NT_DEFAULT_PORT4);
 }
 
+void NetworkClient::Disconnect() {
+  m_impl->m_loopRunner.ExecAsync(
+      [this](auto&) { m_impl->ForceDisconnect("requested by application"); });
+}
+
 void NetworkClient::StartDSClient(unsigned int port) {
   m_impl->StartDSClient(port);
 }
@@ -487,16 +561,15 @@ void NetworkClient::StopDSClient() {
 }
 
 void NetworkClient::FlushLocal() {
-  m_impl->m_loopRunner.ExecAsync([this](uv::Loop&) { m_impl->HandleLocal(); });
+  if (auto async = m_impl->m_flushLocalAtomic.load(std::memory_order_relaxed)) {
+    async->UnsafeSend();
+  }
 }
 
 void NetworkClient::Flush() {
-  m_impl->m_loopRunner.ExecAsync([this](uv::Loop&) {
-    m_impl->HandleLocal();
-    if (m_impl->m_clientImpl) {
-      m_impl->m_clientImpl->SendValues(m_impl->m_loop.Now().count());
-    }
-  });
+  if (auto async = m_impl->m_flushAtomic.load(std::memory_order_relaxed)) {
+    async->UnsafeSend();
+  }
 }
 
 class NetworkClient3::Impl final : public NCImpl3 {
@@ -520,6 +593,11 @@ NetworkClient3::~NetworkClient3() {
 void NetworkClient3::SetServers(
     std::span<const std::pair<std::string, unsigned int>> servers) {
   m_impl->SetServers(servers, NT_DEFAULT_PORT3);
+}
+
+void NetworkClient3::Disconnect() {
+  m_impl->m_loopRunner.ExecAsync(
+      [this](auto&) { m_impl->ForceDisconnect("requested by application"); });
 }
 
 void NetworkClient3::StartDSClient(unsigned int port) {

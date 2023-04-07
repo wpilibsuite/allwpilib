@@ -38,6 +38,9 @@ Rotation3d::Rotation3d(units::radian_t roll, units::radian_t pitch,
                    cr * sp * cy + sr * cp * sy, cr * cp * sy - sr * sp * cy};
 }
 
+Rotation3d::Rotation3d(const Eigen::Vector3d& rvec)
+    : Rotation3d{rvec, units::radian_t{rvec.norm()}} {}
+
 Rotation3d::Rotation3d(const Vectord<3>& axis, units::radian_t angle) {
   double norm = axis.norm();
   if (norm == 0.0) {
@@ -184,7 +187,7 @@ units::radian_t Rotation3d::X() const {
   double y = m_q.Y();
   double z = m_q.Z();
 
-  // https://en.wikipedia.org/wiki/Conversion_between_quaternions_and_Euler_angles#Quaternion_to_Euler_angles_conversion
+  // https://en.wikipedia.org/wiki/Conversion_between_quaternions_and_Euler_angles#Quaternion_to_Euler_angles_(in_3-2-1_sequence)_conversion
   return units::radian_t{
       std::atan2(2.0 * (w * x + y * z), 1.0 - 2.0 * (x * x + y * y))};
 }
@@ -195,7 +198,7 @@ units::radian_t Rotation3d::Y() const {
   double y = m_q.Y();
   double z = m_q.Z();
 
-  // https://en.wikipedia.org/wiki/Conversion_between_quaternions_and_Euler_angles#Quaternion_to_Euler_angles_conversion
+  // https://en.wikipedia.org/wiki/Conversion_between_quaternions_and_Euler_angles#Quaternion_to_Euler_angles_(in_3-2-1_sequence)_conversion
   double ratio = 2.0 * (w * y - z * x);
   if (std::abs(ratio) >= 1.0) {
     return units::radian_t{std::copysign(std::numbers::pi / 2.0, ratio)};
@@ -210,7 +213,7 @@ units::radian_t Rotation3d::Z() const {
   double y = m_q.Y();
   double z = m_q.Z();
 
-  // https://en.wikipedia.org/wiki/Conversion_between_quaternions_and_Euler_angles#Quaternion_to_Euler_angles_conversion
+  // https://en.wikipedia.org/wiki/Conversion_between_quaternions_and_Euler_angles#Quaternion_to_Euler_angles_(in_3-2-1_sequence)_conversion
   return units::radian_t{
       std::atan2(2.0 * (w * z + x * y), 1.0 - 2.0 * (y * y + z * z))};
 }

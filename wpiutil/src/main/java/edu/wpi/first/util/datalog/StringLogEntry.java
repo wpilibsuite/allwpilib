@@ -36,7 +36,7 @@ public class StringLogEntry extends DataLogEntry {
    * Appends a record to the log.
    *
    * @param value Value to record
-   * @param timestamp Time stamp (may be 0 to indicate now)
+   * @param timestamp Time stamp (0 to indicate now)
    */
   public void append(String value, long timestamp) {
     m_log.appendString(m_entry, value, timestamp);

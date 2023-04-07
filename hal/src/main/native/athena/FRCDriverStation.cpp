@@ -43,6 +43,7 @@ struct JoystickDataCache {
   HAL_JoystickButtons buttons[HAL_kMaxJoysticks];
   HAL_AllianceStationID allianceStation;
   float matchTime;
+  HAL_ControlWord controlWord;
 };
 static_assert(std::is_standard_layout_v<JoystickDataCache>);
 // static_assert(std::is_trivial_v<JoystickDataCache>);
@@ -104,6 +105,8 @@ void JoystickDataCache::Update() {
   FRC_NetworkCommunication_getAllianceStation(
       reinterpret_cast<AllianceStationID_t*>(&allianceStation));
   FRC_NetworkCommunication_getMatchTime(&matchTime);
+  FRC_NetworkCommunication_getControlWord(
+      reinterpret_cast<ControlWord_t*>(&controlWord));
 }
 
 #define CHECK_JOYSTICK_NUMBER(stickNum)                  \
@@ -114,7 +117,7 @@ static HAL_ControlWord newestControlWord;
 static JoystickDataCache caches[3];
 static JoystickDataCache* currentRead = &caches[0];
 static JoystickDataCache* currentReadLocal = &caches[0];
-static std::atomic<JoystickDataCache*> currentCache{&caches[1]};
+static std::atomic<JoystickDataCache*> currentCache{nullptr};
 static JoystickDataCache* lastGiven = &caches[1];
 static JoystickDataCache* cacheToUpdate = &caches[2];
 
@@ -508,17 +511,27 @@ static void newDataOccur(uint32_t refNum) {
   }
 }
 
-void HAL_RefreshDSData(void) {
+HAL_Bool HAL_RefreshDSData(void) {
   HAL_ControlWord controlWord;
   std::memset(&controlWord, 0, sizeof(controlWord));
   FRC_NetworkCommunication_getControlWord(
       reinterpret_cast<ControlWord_t*>(&controlWord));
-  std::scoped_lock lock{cacheMutex};
-  JoystickDataCache* prev = currentCache.exchange(nullptr);
-  if (prev != nullptr) {
-    currentRead = prev;
+  JoystickDataCache* prev;
+  {
+    std::scoped_lock lock{cacheMutex};
+    prev = currentCache.exchange(nullptr);
+    if (prev != nullptr) {
+      currentRead = prev;
+    }
+    // If newest state shows we have a DS attached, just use the
+    // control word out of the cache, As it will be the one in sync
+    // with the data. Otherwise use the state that shows disconnected.
+    if (controlWord.dsAttached) {
+      newestControlWord = currentRead->controlWord;
+    } else {
+      newestControlWord = controlWord;
+    }
   }
-  newestControlWord = controlWord;
 
   uint32_t mask = tcpMask.exchange(0);
   if (mask != 0) {
@@ -526,6 +539,7 @@ void HAL_RefreshDSData(void) {
     std::scoped_lock tcpLock(tcpCacheMutex);
     tcpCache.CloneTo(&tcpCurrent);
   }
+  return prev != nullptr;
 }
 
 void HAL_ProvideNewDataEventHandle(WPI_EventHandle handle) {
@@ -550,5 +564,14 @@ void InitializeDriverStation() {
   // Set up our occur reference number
   setNewDataOccurRef(refNumber);
   FRC_NetworkCommunication_setNewTcpDataOccurRef(tcpRefNumber);
+}
+
+void WaitForInitialPacket() {
+  wpi::Event waitForInitEvent;
+  driverStation->newDataEvents.Add(waitForInitEvent.GetHandle());
+  bool timed_out = false;
+  wpi::WaitForObject(waitForInitEvent.GetHandle(), 0.1, &timed_out);
+  // Don't care what the result is, just want to give it a chance.
+  driverStation->newDataEvents.Remove(waitForInitEvent.GetHandle());
 }
 }  // namespace hal

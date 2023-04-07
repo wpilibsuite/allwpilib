@@ -240,14 +240,16 @@ class WPILIB_DLLEXPORT DifferentialDrivePoseEstimator {
                                     double i) const;
   };
 
+  static constexpr units::second_t kBufferDuration = 1.5_s;
+
   DifferentialDriveKinematics& m_kinematics;
   DifferentialDriveOdometry m_odometry;
   wpi::array<double, 3> m_q{wpi::empty_array};
   Eigen::Matrix3d m_visionK = Eigen::Matrix3d::Zero();
 
   TimeInterpolatableBuffer<InterpolationRecord> m_poseBuffer{
-      1.5_s, [this](const InterpolationRecord& start,
-                    const InterpolationRecord& end, double t) {
+      kBufferDuration, [this](const InterpolationRecord& start,
+                              const InterpolationRecord& end, double t) {
         return start.Interpolate(this->m_kinematics, end, t);
       }};
 };

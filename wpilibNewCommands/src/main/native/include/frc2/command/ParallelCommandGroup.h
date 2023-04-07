@@ -59,7 +59,7 @@ class ParallelCommandGroup
 
   ParallelCommandGroup(ParallelCommandGroup&& other) = default;
 
-  // No copy constructors for commandgroups
+  // No copy constructors for command groups
   ParallelCommandGroup(const ParallelCommandGroup&) = delete;
 
   // Prevent template expansion from emulating copy ctor

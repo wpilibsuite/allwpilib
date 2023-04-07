@@ -86,7 +86,8 @@ public class DCMotor {
    * @return The speed of the motor.
    */
   public double getSpeed(double torqueNm, double voltageInputVolts) {
-    return voltageInputVolts - 1.0 / KtNMPerAmp * torqueNm * rOhms * KvRadPerSecPerVolt;
+    return voltageInputVolts * KvRadPerSecPerVolt
+        - 1.0 / KtNMPerAmp * torqueNm * rOhms * KvRadPerSecPerVolt;
   }
 
   /**

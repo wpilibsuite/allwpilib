@@ -10,7 +10,7 @@
 
 namespace frc2 {
 /**
- * A subclass of {@link XboxController} with {@link Trigger} factories for
+ * A version of {@link XboxController} with {@link Trigger} factories for
  * command-based.
  *
  * @see XboxController
@@ -141,5 +141,40 @@ class CommandXboxController : public frc::XboxController {
    */
   Trigger Start(frc::EventLoop* loop = CommandScheduler::GetInstance()
                                            .GetDefaultButtonLoop()) const;
+
+  /**
+   * Constructs a Trigger instance around the axis value of the left trigger.
+   * The returned Trigger will be true when the axis value is greater than
+   * {@code threshold}.
+   *
+   * @param threshold the minimum axis value for the returned Trigger to be
+   * true. This value should be in the range [0, 1] where 0 is the unpressed
+   * state of the axis. Defaults to 0.5.
+   * @param loop the event loop instance to attach the Trigger to. Defaults to
+   * the CommandScheduler's default loop.
+   * @return a Trigger instance that is true when the left trigger's axis
+   * exceeds the provided threshold, attached to the given loop
+   */
+  Trigger LeftTrigger(double threshold = 0.5,
+                      frc::EventLoop* loop = CommandScheduler::GetInstance()
+                                                 .GetDefaultButtonLoop()) const;
+
+  /**
+   * Constructs a Trigger instance around the axis value of the right trigger.
+   * The returned Trigger will be true when the axis value is greater than
+   * {@code threshold}.
+   *
+   * @param threshold the minimum axis value for the returned Trigger to be
+   * true. This value should be in the range [0, 1] where 0 is the unpressed
+   * state of the axis. Defaults to 0.5.
+   * @param loop the event loop instance to attach the Trigger to. Defaults to
+   * the CommandScheduler's default loop.
+   * @return a Trigger instance that is true when the right trigger's axis
+   * exceeds the provided threshold, attached to the given loop
+   */
+  Trigger RightTrigger(
+      double threshold = 0.5,
+      frc::EventLoop* loop =
+          CommandScheduler::GetInstance().GetDefaultButtonLoop()) const;
 };
 }  // namespace frc2

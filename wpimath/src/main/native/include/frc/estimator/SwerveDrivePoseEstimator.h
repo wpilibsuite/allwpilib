@@ -18,6 +18,7 @@
 #include "frc/kinematics/SwerveDriveKinematics.h"
 #include "frc/kinematics/SwerveDriveOdometry.h"
 #include "units/time.h"
+#include "wpimath/MathShared.h"
 
 namespace frc {
 
@@ -170,6 +171,14 @@ class SwerveDrivePoseEstimator {
    */
   void AddVisionMeasurement(const Pose2d& visionRobotPose,
                             units::second_t timestamp) {
+    // Step 0: If this measurement is old enough to be outside the pose buffer's
+    // timespan, skip.
+    if (!m_poseBuffer.GetInternalBuffer().empty() &&
+        m_poseBuffer.GetInternalBuffer().front().first - kBufferDuration >
+            timestamp) {
+      return;
+    }
+
     // Step 1: Get the estimated pose from when the vision measurement was made.
     auto sample = m_poseBuffer.Sample(timestamp);
 
@@ -194,10 +203,16 @@ class SwerveDrivePoseEstimator {
 
     // Step 5: Reset Odometry to state at sample with vision adjustment.
     m_odometry.ResetPosition(sample.value().gyroAngle,
-                             sample.value().modulePostions,
+                             sample.value().modulePositions,
                              sample.value().pose.Exp(scaledTwist));
 
-    // Step 6: Replay odometry inputs between sample time and latest recorded
+    // Step 6: Record the current pose to allow multiple measurements from the
+    // same timestamp
+    m_poseBuffer.AddSample(timestamp,
+                           {GetEstimatedPosition(), sample.value().gyroAngle,
+                            sample.value().modulePositions});
+
+    // Step 7: Replay odometry inputs between sample time and latest recorded
     // sample to update the pose buffer and correct odometry.
     auto internal_buf = m_poseBuffer.GetInternalBuffer();
 
@@ -207,7 +222,7 @@ class SwerveDrivePoseEstimator {
 
     for (auto entry = upper_bound; entry != internal_buf.end(); entry++) {
       UpdateWithTime(entry->first, entry->second.gyroAngle,
-                     entry->second.modulePostions);
+                     entry->second.modulePositions);
     }
   }
 
@@ -258,7 +273,7 @@ class SwerveDrivePoseEstimator {
   Pose2d Update(
       const Rotation2d& gyroAngle,
       const wpi::array<SwerveModulePosition, NumModules>& modulePositions) {
-    return UpdateWithTime(units::microsecond_t(wpi::Now()), gyroAngle,
+    return UpdateWithTime(wpi::math::MathSharedStore::GetTimestamp(), gyroAngle,
                           modulePositions);
   }
 
@@ -299,8 +314,8 @@ class SwerveDrivePoseEstimator {
     // The current gyroscope angle.
     Rotation2d gyroAngle;
 
-    // The distances traveled and rotations meaured at each module.
-    wpi::array<SwerveModulePosition, NumModules> modulePostions;
+    // The distances traveled and rotations measured at each module.
+    wpi::array<SwerveModulePosition, NumModules> modulePositions;
 
     /**
      * Checks equality between this InterpolationRecord and another object.
@@ -344,14 +359,14 @@ class SwerveDrivePoseEstimator {
 
         for (size_t i = 0; i < NumModules; i++) {
           modulePositions[i].distance =
-              wpi::Lerp(this->modulePostions[i].distance,
-                        endValue.modulePostions[i].distance, i);
+              wpi::Lerp(this->modulePositions[i].distance,
+                        endValue.modulePositions[i].distance, i);
           modulePositions[i].angle =
-              wpi::Lerp(this->modulePostions[i].angle,
-                        endValue.modulePostions[i].angle, i);
+              wpi::Lerp(this->modulePositions[i].angle,
+                        endValue.modulePositions[i].angle, i);
 
           modulesDelta[i].distance =
-              modulePositions[i].distance - this->modulePostions[i].distance;
+              modulePositions[i].distance - this->modulePositions[i].distance;
           modulesDelta[i].angle = modulePositions[i].angle;
         }
 
@@ -368,14 +383,16 @@ class SwerveDrivePoseEstimator {
     }
   };
 
+  static constexpr units::second_t kBufferDuration = 1.5_s;
+
   SwerveDriveKinematics<NumModules>& m_kinematics;
   SwerveDriveOdometry<NumModules> m_odometry;
   wpi::array<double, 3> m_q{wpi::empty_array};
   Eigen::Matrix3d m_visionK = Eigen::Matrix3d::Zero();
 
   TimeInterpolatableBuffer<InterpolationRecord> m_poseBuffer{
-      1.5_s, [this](const InterpolationRecord& start,
-                    const InterpolationRecord& end, double t) {
+      kBufferDuration, [this](const InterpolationRecord& start,
+                              const InterpolationRecord& end, double t) {
         return start.Interpolate(this->m_kinematics, end, t);
       }};
 };

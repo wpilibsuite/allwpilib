@@ -20,12 +20,16 @@ struct ShuffleboardInstance::Impl {
   bool tabsChanged = false;
   std::shared_ptr<nt::NetworkTable> rootTable;
   std::shared_ptr<nt::NetworkTable> rootMetaTable;
+  nt::StringPublisher selectedTabPub;
 };
 
 ShuffleboardInstance::ShuffleboardInstance(nt::NetworkTableInstance ntInstance)
     : m_impl(new Impl) {
   m_impl->rootTable = ntInstance.GetTable(Shuffleboard::kBaseTableName);
   m_impl->rootMetaTable = m_impl->rootTable->GetSubTable(".metadata");
+  m_impl->selectedTabPub =
+      m_impl->rootMetaTable->GetStringTopic("Selected")
+          .Publish(nt::PubSubOptions{.keepDuplicates = true});
   HAL_Report(HALUsageReporting::kResourceType_Shuffleboard, 0);
 }
 
@@ -75,9 +79,9 @@ void ShuffleboardInstance::DisableActuatorWidgets() {
 }
 
 void ShuffleboardInstance::SelectTab(int index) {
-  m_impl->rootMetaTable->GetEntry("Selected").SetDouble(index);
+  m_impl->selectedTabPub.Set(std::to_string(index));
 }
 
 void ShuffleboardInstance::SelectTab(std::string_view title) {
-  m_impl->rootMetaTable->GetEntry("Selected").SetString(title);
+  m_impl->selectedTabPub.Set(title);
 }

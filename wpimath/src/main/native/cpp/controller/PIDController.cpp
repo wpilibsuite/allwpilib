@@ -78,6 +78,7 @@ double PIDController::GetVelocityTolerance() const {
 
 void PIDController::SetSetpoint(double setpoint) {
   m_setpoint = setpoint;
+  m_haveSetpoint = true;
 
   if (m_continuous) {
     double errorBound = (m_maximumInput - m_minimumInput) / 2.0;
@@ -95,7 +96,8 @@ double PIDController::GetSetpoint() const {
 }
 
 bool PIDController::AtSetpoint() const {
-  return std::abs(m_positionError) < m_positionTolerance &&
+  return m_haveMeasurement && m_haveSetpoint &&
+         std::abs(m_positionError) < m_positionTolerance &&
          std::abs(m_velocityError) < m_velocityTolerance;
 }
 
@@ -137,6 +139,7 @@ double PIDController::GetVelocityError() const {
 double PIDController::Calculate(double measurement) {
   m_measurement = measurement;
   m_prevError = m_positionError;
+  m_haveMeasurement = true;
 
   if (m_continuous) {
     double errorBound = (m_maximumInput - m_minimumInput) / 2.0;
@@ -159,6 +162,7 @@ double PIDController::Calculate(double measurement) {
 
 double PIDController::Calculate(double measurement, double setpoint) {
   m_setpoint = setpoint;
+  m_haveSetpoint = true;
   return Calculate(measurement);
 }
 
@@ -167,6 +171,7 @@ void PIDController::Reset() {
   m_prevError = 0;
   m_totalError = 0;
   m_velocityError = 0;
+  m_haveMeasurement = false;
 }
 
 void PIDController::InitSendable(wpi::SendableBuilder& builder) {

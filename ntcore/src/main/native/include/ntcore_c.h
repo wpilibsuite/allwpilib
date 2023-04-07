@@ -115,6 +115,8 @@ enum NT_EventFlags {
   NT_EVENT_VALUE_ALL = NT_EVENT_VALUE_REMOTE | NT_EVENT_VALUE_LOCAL,
   /** Log message. */
   NT_EVENT_LOGMESSAGE = 0x100,
+  /** Time synchronized with server. */
+  NT_EVENT_TIMESYNC = 0x200,
 };
 
 /*
@@ -247,6 +249,24 @@ struct NT_LogMessage {
   char* message;
 };
 
+/** NetworkTables time sync event data. */
+struct NT_TimeSyncEventData {
+  /**
+   * Offset between local time and server time, in microseconds. Add this value
+   * to local time to get the estimated equivalent server time.
+   */
+  int64_t serverTimeOffset;
+
+  /** Measured round trip time divided by 2, in microseconds. */
+  int64_t rtt2;
+
+  /**
+   * If serverTimeOffset and RTT are valid. An event with this set to false is
+   * sent when the client disconnects.
+   */
+  NT_Bool valid;
+};
+
 /** NetworkTables event */
 struct NT_Event {
   /** Listener that triggered this event. */
@@ -259,6 +279,7 @@ struct NT_Event {
    * - NT_EVENT_PUBLISH, NT_EVENT_UNPUBLISH, or NT_EVENT_PROPERTIES: topicInfo
    * - NT_EVENT_VALUE_REMOTE, NT_NOTIFY_VALUE_LOCAL: valueData
    * - NT_EVENT_LOGMESSAGE: logMessage
+   * - NT_EVENT_TIMESYNC: timeSyncData
    */
   unsigned int flags;
 
@@ -268,6 +289,7 @@ struct NT_Event {
     struct NT_TopicInfo topicInfo;
     struct NT_ValueEventData valueData;
     struct NT_LogMessage logMessage;
+    struct NT_TimeSyncEventData timeSyncData;
   } data;
 };
 
@@ -1126,6 +1148,14 @@ void NT_SetServerMulti(NT_Inst inst, size_t count, const char** server_names,
 void NT_SetServerTeam(NT_Inst inst, unsigned int team, unsigned int port);
 
 /**
+ * Disconnects the client if it's running and connected. This will automatically
+ * start reconnection attempts to the current server list.
+ *
+ * @param inst instance handle
+ */
+void NT_Disconnect(NT_Inst inst);
+
+/**
  * Starts requesting server address from Driver Station.
  * This connects to the Driver Station running on localhost to obtain the
  * server IP address.
@@ -1189,6 +1219,22 @@ struct NT_ConnectionInfo* NT_GetConnections(NT_Inst inst, size_t* count);
  * @return True if connected.
  */
 NT_Bool NT_IsConnected(NT_Inst inst);
+
+/**
+ * Get the time offset between server time and local time. Add this value to
+ * local time to get the estimated equivalent server time. In server mode, this
+ * always returns a valid value of 0. In client mode, this returns the time
+ * offset only if the client and server are connected and have exchanged
+ * synchronization messages. Note the time offset may change over time as it is
+ * periodically updated; to receive updates as events, add a listener to the
+ * "time sync" event.
+ *
+ * @param inst instance handle
+ * @param valid set to true if the return value is valid, false otherwise
+ *              (output)
+ * @return Time offset in microseconds (if valid is set to true)
+ */
+int64_t NT_GetServerTimeOffset(NT_Inst inst, NT_Bool* valid);
 
 /** @} */
 
@@ -1286,7 +1332,7 @@ void NT_DisposeEvent(struct NT_Event* event);
  *
  * @return Timestamp
  */
-uint64_t NT_Now(void);
+int64_t NT_Now(void);
 
 /**
  * Sets the current timestamp used for timestamping values that do not
@@ -1297,7 +1343,7 @@ uint64_t NT_Now(void);
  *
  * @param timestamp timestamp (1 us increments)
  */
-void NT_SetNow(uint64_t timestamp);
+void NT_SetNow(int64_t timestamp);
 
 /** @} */
 
@@ -1662,6 +1708,170 @@ struct NT_String* NT_GetValueStringArray(const struct NT_Value* value,
 
 /** @} */
 /** @} */
+/** @} */
+
+/**
+ * @defgroup ntcore_c_meta_api ntcore C meta-topic API
+ *
+ * Meta-topic decoders for C.
+ *
+ * @{
+ */
+
+/**
+ * Subscriber options. Different from PubSubOptions in this reflects only
+ * options that are sent over the network.
+ */
+struct NT_Meta_SubscriberOptions {
+  double periodic;
+  NT_Bool topicsOnly;
+  NT_Bool sendAll;
+  NT_Bool prefixMatch;
+};
+
+/**
+ * Topic publisher (as published via `$pub$<topic>`).
+ */
+struct NT_Meta_TopicPublisher {
+  struct NT_String client;
+  uint64_t pubuid;
+};
+
+/**
+ * Topic subscriber (as published via `$sub$<topic>`).
+ */
+struct NT_Meta_TopicSubscriber {
+  struct NT_String client;
+  uint64_t subuid;
+  struct NT_Meta_SubscriberOptions options;
+};
+
+/**
+ * Client publisher (as published via `$clientpub$<client>` or `$serverpub`).
+ */
+struct NT_Meta_ClientPublisher {
+  int64_t uid;
+  struct NT_String topic;
+};
+
+/**
+ * Client subscriber (as published via `$clientsub$<client>` or `$serversub`).
+ */
+struct NT_Meta_ClientSubscriber {
+  int64_t uid;
+  size_t topicsCount;
+  struct NT_String* topics;
+  struct NT_Meta_SubscriberOptions options;
+};
+
+/**
+ * Client (as published via `$clients`).
+ */
+struct NT_Meta_Client {
+  struct NT_String id;
+  struct NT_String conn;
+  uint16_t version;
+};
+
+/**
+ * Decodes `$pub$<topic>` meta-topic data.
+ *
+ * @param data data contents
+ * @param size size of data contents
+ * @param count number of elements in returned array (output)
+ * @return Array of TopicPublishers, or NULL on decoding error.
+ */
+struct NT_Meta_TopicPublisher* NT_Meta_DecodeTopicPublishers(
+    const uint8_t* data, size_t size, size_t* count);
+
+/**
+ * Decodes `$sub$<topic>` meta-topic data.
+ *
+ * @param data data contents
+ * @param size size of data contents
+ * @param count number of elements in returned array (output)
+ * @return Array of TopicSubscribers, or NULL on decoding error.
+ */
+struct NT_Meta_TopicSubscriber* NT_Meta_DecodeTopicSubscribers(
+    const uint8_t* data, size_t size, size_t* count);
+
+/**
+ * Decodes `$clientpub$<topic>` meta-topic data.
+ *
+ * @param data data contents
+ * @param size size of data contents
+ * @param count number of elements in returned array (output)
+ * @return Array of ClientPublishers, or NULL on decoding error.
+ */
+struct NT_Meta_ClientPublisher* NT_Meta_DecodeClientPublishers(
+    const uint8_t* data, size_t size, size_t* count);
+
+/**
+ * Decodes `$clientsub$<topic>` meta-topic data.
+ *
+ * @param data data contents
+ * @param size size of data contents
+ * @param count number of elements in returned array (output)
+ * @return Array of ClientSubscribers, or NULL on decoding error.
+ */
+struct NT_Meta_ClientSubscriber* NT_Meta_DecodeClientSubscribers(
+    const uint8_t* data, size_t size, size_t* count);
+
+/**
+ * Decodes `$clients` meta-topic data.
+ *
+ * @param data data contents
+ * @param size size of data contents
+ * @param count number of elements in returned array (output)
+ * @return Array of Clients, or NULL on decoding error.
+ */
+struct NT_Meta_Client* NT_Meta_DecodeClients(const uint8_t* data, size_t size,
+                                             size_t* count);
+
+/**
+ * Frees an array of NT_Meta_TopicPublisher.
+ *
+ * @param arr   pointer to the array to free
+ * @param count size of the array to free
+ */
+void NT_Meta_FreeTopicPublishers(struct NT_Meta_TopicPublisher* arr,
+                                 size_t count);
+
+/**
+ * Frees an array of NT_Meta_TopicSubscriber.
+ *
+ * @param arr   pointer to the array to free
+ * @param count size of the array to free
+ */
+void NT_Meta_FreeTopicSubscribers(struct NT_Meta_TopicSubscriber* arr,
+                                  size_t count);
+
+/**
+ * Frees an array of NT_Meta_ClientPublisher.
+ *
+ * @param arr   pointer to the array to free
+ * @param count size of the array to free
+ */
+void NT_Meta_FreeClientPublishers(struct NT_Meta_ClientPublisher* arr,
+                                  size_t count);
+
+/**
+ * Frees an array of NT_Meta_ClientSubscriber.
+ *
+ * @param arr   pointer to the array to free
+ * @param count size of the array to free
+ */
+void NT_Meta_FreeClientSubscribers(struct NT_Meta_ClientSubscriber* arr,
+                                   size_t count);
+
+/**
+ * Frees an array of NT_Meta_Client.
+ *
+ * @param arr   pointer to the array to free
+ * @param count size of the array to free
+ */
+void NT_Meta_FreeClients(struct NT_Meta_Client* arr, size_t count);
+
 /** @} */
 
 #ifdef __cplusplus

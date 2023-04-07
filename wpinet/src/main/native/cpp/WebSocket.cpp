@@ -37,6 +37,9 @@ class WebSocketWriteReq : public uv::WriteReq {
   std::function<void(std::span<uv::Buffer>, uv::Error)> m_callback;
   SmallVector<uv::Buffer, 4> m_internalBufs;
   SmallVector<uv::Buffer, 4> m_userBufs;
+
+  // for server
+  size_t m_internalBufPos = 0;
 };
 }  // namespace
 
@@ -258,11 +261,12 @@ void WebSocket::StartClient(std::string_view uri, std::string_view host,
 
   // Start handshake timer if a timeout was specified
   if (options.handshakeTimeout != (uv::Timer::Time::max)()) {
-    auto timer = uv::Timer::Create(m_stream.GetLoopRef());
-    timer->timeout.connect(
-        [this]() { Terminate(1006, "connection timed out"); });
-    timer->Start(options.handshakeTimeout);
-    m_clientHandshake->timer = timer;
+    if (auto timer = uv::Timer::Create(m_stream.GetLoopRef())) {
+      timer->timeout.connect(
+          [this]() { Terminate(1006, "connection timed out"); });
+      timer->Start(options.handshakeTimeout);
+      m_clientHandshake->timer = timer;
+    }
   }
 }
 
@@ -597,9 +601,6 @@ void WebSocket::HandleIncoming(uv::Buffer& buf, size_t size) {
 static void WriteFrame(WebSocketWriteReq& req,
                        SmallVectorImpl<uv::Buffer>& bufs, bool server,
                        uint8_t opcode, std::span<const uv::Buffer> data) {
-  SmallVector<uv::Buffer, 4> internalBufs;
-  raw_uv_ostream os{internalBufs, 4096};
-
 #ifdef WPINET_WEBSOCKET_VERBOSE_DEBUG
   if ((opcode & 0x7f) == 0x01) {
     SmallString<128> str;
@@ -619,8 +620,11 @@ static void WriteFrame(WebSocketWriteReq& req,
   }
 #endif
 
+  uint8_t header[10];
+  uint8_t* pHeader = header;
+
   // opcode (includes FIN bit)
-  os << static_cast<unsigned char>(opcode);
+  *pHeader++ = opcode;
 
   // payload length
   uint64_t size = 0;
@@ -628,27 +632,30 @@ static void WriteFrame(WebSocketWriteReq& req,
     size += buf.len;
   }
   if (size < 126) {
-    os << static_cast<unsigned char>((server ? 0x00 : kFlagMasking) | size);
+    *pHeader++ = (server ? 0x00 : kFlagMasking) | size;
   } else if (size <= 0xffff) {
-    os << static_cast<unsigned char>((server ? 0x00 : kFlagMasking) | 126);
-    const uint8_t sizeMsb[] = {static_cast<uint8_t>((size >> 8) & 0xff),
-                               static_cast<uint8_t>(size & 0xff)};
-    os << std::span{sizeMsb};
+    *pHeader++ = (server ? 0x00 : kFlagMasking) | 126;
+    *pHeader++ = (size >> 8) & 0xff;
+    *pHeader++ = size & 0xff;
   } else {
-    os << static_cast<unsigned char>((server ? 0x00 : kFlagMasking) | 127);
-    const uint8_t sizeMsb[] = {static_cast<uint8_t>((size >> 56) & 0xff),
-                               static_cast<uint8_t>((size >> 48) & 0xff),
-                               static_cast<uint8_t>((size >> 40) & 0xff),
-                               static_cast<uint8_t>((size >> 32) & 0xff),
-                               static_cast<uint8_t>((size >> 24) & 0xff),
-                               static_cast<uint8_t>((size >> 16) & 0xff),
-                               static_cast<uint8_t>((size >> 8) & 0xff),
-                               static_cast<uint8_t>(size & 0xff)};
-    os << std::span{sizeMsb};
+    *pHeader++ = (server ? 0x00 : kFlagMasking) | 127;
+    *pHeader++ = (size >> 56) & 0xff;
+    *pHeader++ = (size >> 48) & 0xff;
+    *pHeader++ = (size >> 40) & 0xff;
+    *pHeader++ = (size >> 32) & 0xff;
+    *pHeader++ = (size >> 24) & 0xff;
+    *pHeader++ = (size >> 16) & 0xff;
+    *pHeader++ = (size >> 8) & 0xff;
+    *pHeader++ = size & 0xff;
   }
+  size_t headerSize = pHeader - header;
 
   // clients need to mask the input data
   if (!server) {
+    SmallVector<uv::Buffer, 4> internalBufs;
+    raw_uv_ostream os{internalBufs, 4096};
+
+    os << std::span<const uint8_t>{header, headerSize};
     // generate masking key
     static std::random_device rd;
     static std::default_random_engine gen{rd()};
@@ -669,13 +676,23 @@ static void WriteFrame(WebSocketWriteReq& req,
       }
     }
     bufs.append(internalBufs.begin(), internalBufs.end());
+    req.m_internalBufs.append(internalBufs.begin(), internalBufs.end());
     // don't send the user bufs as we copied their data
   } else {
-    bufs.append(internalBufs.begin(), internalBufs.end());
+    // manage m_internalBufs to efficiently store header
+    if (req.m_internalBufs.empty() ||
+        (req.m_internalBufPos + headerSize) > 4096) {
+      req.m_internalBufs.emplace_back(uv::Buffer::Allocate(4096));
+      req.m_internalBufPos = 0;
+    }
+    char* internalBuf =
+        req.m_internalBufs.back().data().data() + req.m_internalBufPos;
+    std::memcpy(internalBuf, header, headerSize);
+    bufs.emplace_back(internalBuf, headerSize);
+    req.m_internalBufPos += headerSize;
     // servers can just send the buffers directly without masking
     bufs.append(data.begin(), data.end());
   }
-  req.m_internalBufs.append(internalBufs.begin(), internalBufs.end());
   req.m_userBufs.append(data.begin(), data.end());
 }
 

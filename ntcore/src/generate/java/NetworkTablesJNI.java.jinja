@@ -8,6 +8,7 @@ import edu.wpi.first.util.RuntimeLoader;
 import edu.wpi.first.util.datalog.DataLog;
 import java.io.IOException;
 import java.util.EnumSet;
+import java.util.OptionalLong;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public final class NetworkTablesJNI {
@@ -250,6 +251,8 @@ public final class NetworkTablesJNI {
 
   public static native void setServerTeam(int inst, int team, int port);
 
+  public static native void disconnect(int inst);
+
   public static native void startDSClient(int inst, int port);
 
   public static native void stopDSClient(int inst);
@@ -261,6 +264,8 @@ public final class NetworkTablesJNI {
   public static native ConnectionInfo[] getConnections(int inst);
 
   public static native boolean isConnected(int inst);
+
+  public static native OptionalLong getServerTimeOffset(int inst);
 
   public static native long now();
 

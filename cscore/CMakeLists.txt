@@ -11,6 +11,7 @@ file(GLOB
     cscore_native_src src/main/native/cpp/*.cpp)
 file(GLOB cscore_linux_src src/main/native/linux/*.cpp)
 file(GLOB cscore_osx_src src/main/native/osx/*.cpp)
+file(GLOB cscore_osx_objc_src src/main/native/objcpp/*.mm)
 file(GLOB cscore_windows_src src/main/native/windows/*.cpp)
 
 add_library(cscore ${cscore_native_src})
@@ -18,7 +19,9 @@ set_target_properties(cscore PROPERTIES DEBUG_POSTFIX "d")
 
 if(NOT MSVC)
     if (APPLE)
-        target_sources(cscore PRIVATE ${cscore_osx_src})
+        target_sources(cscore PRIVATE ${cscore_osx_src} ${cscore_osx_objc_src})
+        target_compile_options(cscore PRIVATE "-fobjc-arc")
+        set_target_properties(cscore PROPERTIES LINK_FLAGS "-framework CoreFoundation -framework AVFoundation -framework Foundation -framework CoreMedia -framework CoreVideo")
     else()
         target_sources(cscore PRIVATE ${cscore_linux_src})
     endif()

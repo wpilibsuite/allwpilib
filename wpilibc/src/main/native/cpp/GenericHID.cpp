@@ -89,6 +89,20 @@ BooleanEvent GenericHID::POVCenter(EventLoop* loop) const {
   return POV(360, loop);
 }
 
+BooleanEvent GenericHID::AxisLessThan(int axis, double threshold,
+                                      EventLoop* loop) const {
+  return BooleanEvent(loop, [this, axis, threshold]() {
+    return this->GetRawAxis(axis) < threshold;
+  });
+}
+
+BooleanEvent GenericHID::AxisGreaterThan(int axis, double threshold,
+                                         EventLoop* loop) const {
+  return BooleanEvent(loop, [this, axis, threshold]() {
+    return this->GetRawAxis(axis) > threshold;
+  });
+}
+
 int GenericHID::GetAxisCount() const {
   return DriverStation::GetStickAxisCount(m_port);
 }

@@ -66,49 +66,49 @@ class CommandGenericHID : public frc::GenericHID {
                   CommandScheduler::GetInstance().GetDefaultButtonLoop()) const;
 
   /**
-   * Constructs a Trigger instance based around the 0-degree angle (up) of the
+   * Constructs a Trigger instance based around the 0 degree angle (up) of the
    * default (index 0) POV on the HID.
    *
    * @param loop  the event loop instance to attach the event to. Defaults to
    * {@link CommandScheduler::GetDefaultButtonLoop() the default command
    * scheduler button loop}.
-   * @return a Trigger instance based around the 0-degree angle of a POV on the
+   * @return a Trigger instance based around the 0 degree angle of a POV on the
    * HID.
    */
   Trigger POVUp(frc::EventLoop* loop = CommandScheduler::GetInstance()
                                            .GetDefaultButtonLoop()) const;
 
   /**
-   * Constructs a Trigger instance based around the 45-degree angle (right up)
+   * Constructs a Trigger instance based around the 45 degree angle (right up)
    * of the default (index 0) POV on the HID.
    *
    * @param loop  the event loop instance to attach the event to. Defaults to
    * {@link CommandScheduler::GetDefaultButtonLoop() the default command
    * scheduler button loop}.
-   * @return a Trigger instance based around the 45-degree angle of a POV on the
+   * @return a Trigger instance based around the 45 degree angle of a POV on the
    * HID.
    */
   Trigger POVUpRight(frc::EventLoop* loop = CommandScheduler::GetInstance()
                                                 .GetDefaultButtonLoop()) const;
 
   /**
-   * Constructs a Trigger instance based around the 90-degree angle (right) of
+   * Constructs a Trigger instance based around the 90 degree angle (right) of
    * the default (index 0) POV on the HID.
    *
    * @param loop  the event loop instance to attach the event to. Defaults to
    * {@link CommandScheduler::GetDefaultButtonLoop() the default command
    * scheduler button loop}.
-   * @return a Trigger instance based around the 90-degree angle of a POV on the
+   * @return a Trigger instance based around the 90 degree angle of a POV on the
    * HID.
    */
   Trigger POVRight(frc::EventLoop* loop = CommandScheduler::GetInstance()
                                               .GetDefaultButtonLoop()) const;
 
   /**
-   * Constructs a Trigger instance based around the 135-degree angle (right
+   * Constructs a Trigger instance based around the 135 degree angle (right
    * down) of the default (index 0) POV on the HID.
    *
-   * @return a Trigger instance based around the 135-degree angle of a POV on
+   * @return a Trigger instance based around the 135 degree angle of a POV on
    * the HID.
    */
   Trigger POVDownRight(
@@ -116,52 +116,52 @@ class CommandGenericHID : public frc::GenericHID {
           CommandScheduler::GetInstance().GetDefaultButtonLoop()) const;
 
   /**
-   * Constructs a Trigger instance based around the 180-degree angle (down) of
+   * Constructs a Trigger instance based around the 180 degree angle (down) of
    * the default (index 0) POV on the HID.
    *
    * @param loop  the event loop instance to attach the event to. Defaults to
    * {@link CommandScheduler::GetDefaultButtonLoop() the default command
    * scheduler button loop}.
-   * @return a Trigger instance based around the 180-degree angle of a POV on
+   * @return a Trigger instance based around the 180 degree angle of a POV on
    * the HID.
    */
   Trigger POVDown(frc::EventLoop* loop = CommandScheduler::GetInstance()
                                              .GetDefaultButtonLoop()) const;
 
   /**
-   * Constructs a Trigger instance based around the 225-degree angle (down left)
+   * Constructs a Trigger instance based around the 225 degree angle (down left)
    * of the default (index 0) POV on the HID.
    *
    * @param loop  the event loop instance to attach the event to. Defaults to
    * {@link CommandScheduler::GetDefaultButtonLoop() the default command
    * scheduler button loop}.
-   * @return a Trigger instance based around the 225-degree angle of a POV on
+   * @return a Trigger instance based around the 225 degree angle of a POV on
    * the HID.
    */
   Trigger POVDownLeft(frc::EventLoop* loop = CommandScheduler::GetInstance()
                                                  .GetDefaultButtonLoop()) const;
 
   /**
-   * Constructs a Trigger instance based around the 270-degree angle (left) of
+   * Constructs a Trigger instance based around the 270 degree angle (left) of
    * the default (index 0) POV on the HID.
    *
    * @param loop  the event loop instance to attach the event to. Defaults to
    * {@link CommandScheduler::GetDefaultButtonLoop() the default command
    * scheduler button loop}.
-   * @return a Trigger instance based around the 270-degree angle of a POV on
+   * @return a Trigger instance based around the 270 degree angle of a POV on
    * the HID.
    */
   Trigger POVLeft(frc::EventLoop* loop = CommandScheduler::GetInstance()
                                              .GetDefaultButtonLoop()) const;
 
   /**
-   * Constructs a Trigger instance based around the 315-degree angle (left up)
+   * Constructs a Trigger instance based around the 315 degree angle (left up)
    * of the default (index 0) POV on the HID.
    *
    * @param loop  the event loop instance to attach the event to. Defaults to
    * {@link CommandScheduler::GetDefaultButtonLoop() the default command
    * scheduler button loop}.
-   * @return a Trigger instance based around the 315-degree angle of a POV on
+   * @return a Trigger instance based around the 315 degree angle of a POV on
    * the HID.
    */
   Trigger POVUpLeft(frc::EventLoop* loop = CommandScheduler::GetInstance()
@@ -179,5 +179,41 @@ class CommandGenericHID : public frc::GenericHID {
    */
   Trigger POVCenter(frc::EventLoop* loop = CommandScheduler::GetInstance()
                                                .GetDefaultButtonLoop()) const;
+
+  /**
+   * Constructs a Trigger instance that is true when the axis value is less than
+   * {@code threshold}, attached to {@link
+   * CommandScheduler::GetDefaultButtonLoop() the default command scheduler
+   * button loop}.
+   * @param axis The axis to read, starting at 0.
+   * @param threshold The value below which this trigger should return true.
+   * @param loop  the event loop instance to attach the event to. Defaults to
+   * {@link CommandScheduler::GetDefaultButtonLoop() the default command
+   * scheduler button loop}.
+   * @return a Trigger instance that is true when the axis value is less than
+   * the provided threshold.
+   */
+  Trigger AxisLessThan(
+      int axis, double threshold,
+      frc::EventLoop* loop =
+          CommandScheduler::GetInstance().GetDefaultButtonLoop()) const;
+
+  /**
+   * Constructs a Trigger instance that is true when the axis value is greater
+   * than {@code threshold}, attached to {@link
+   * CommandScheduler::GetDefaultButtonLoop() the default command scheduler
+   * button loop}.
+   * @param axis The axis to read, starting at 0.
+   * @param threshold The value below which this trigger should return true.
+   * @param loop  the event loop instance to attach the event to. Defaults to
+   * {@link CommandScheduler::GetDefaultButtonLoop() the default command
+   * scheduler button loop}.
+   * @return a Trigger instance that is true when the axis value is greater than
+   * the provided threshold.
+   */
+  Trigger AxisGreaterThan(
+      int axis, double threshold,
+      frc::EventLoop* loop =
+          CommandScheduler::GetInstance().GetDefaultButtonLoop()) const;
 };
 }  // namespace frc2

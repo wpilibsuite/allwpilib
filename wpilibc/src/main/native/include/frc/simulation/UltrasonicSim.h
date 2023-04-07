@@ -14,16 +14,24 @@ class Ultrasonic;
 namespace sim {
 
 /**
- * Class to control a simulated ADXRS450 gyroscope.
+ * Class to control a simulated {@link Ultrasonic}.
  */
 class UltrasonicSim {
  public:
   /**
-   * Constructs from a ADXRS450_Gyro object.
+   * Constructor.
    *
-   * @param gyro ADXRS450_Gyro to simulate
+   * @param ultrasonic The real ultrasonic to simulate
    */
-  explicit UltrasonicSim(const Ultrasonic& gyro);
+  explicit UltrasonicSim(const Ultrasonic& ultrasonic);
+
+  /**
+   * Constructor.
+   *
+   * @param ping unused.
+   * @param echo the ultrasonic's echo channel.
+   */
+  UltrasonicSim(int ping, int echo);
 
   /**
    * Sets if the range measurement is valid.
@@ -37,7 +45,7 @@ class UltrasonicSim {
    *
    * @param range The range
    */
-  void SetRange(units::meter_t range);
+  void SetRange(units::inch_t range);
 
  private:
   hal::SimBoolean m_simRangeValid;

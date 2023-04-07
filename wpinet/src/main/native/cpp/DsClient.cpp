@@ -21,6 +21,9 @@ DsClient::DsClient(wpi::uv::Loop& loop, wpi::Logger& logger,
     : m_logger{logger},
       m_tcp{uv::Tcp::Create(loop)},
       m_timer{uv::Timer::Create(loop)} {
+  if (!m_tcp || !m_timer) {
+    return;
+  }
   m_tcp->end.connect([this] {
     WPI_DEBUG4(m_logger, "DS connection closed");
     clearIp();

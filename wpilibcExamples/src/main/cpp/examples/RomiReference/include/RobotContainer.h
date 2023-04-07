@@ -41,7 +41,7 @@ class RobotContainer {
   frc2::Command* GetAutonomousCommand();
 
  private:
-  // Assumes a gamepad plugged into channnel 0
+  // Assumes a gamepad plugged into channel 0
   frc::Joystick m_controller{0};
   frc::SendableChooser<frc2::Command*> m_chooser;
 
@@ -51,7 +51,7 @@ class RobotContainer {
                         OnBoardIO::ChannelMode::INPUT};
 
   // Example button
-  frc2::Button m_onboardButtonA{
+  frc2::Trigger m_onboardButtonA{
       [this] { return m_onboardIO.GetButtonAPressed(); }};
 
   // Autonomous commands.

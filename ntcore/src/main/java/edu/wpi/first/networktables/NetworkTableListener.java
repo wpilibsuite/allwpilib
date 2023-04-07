@@ -110,6 +110,19 @@ public final class NetworkTableListener implements AutoCloseable {
   }
 
   /**
+   * Create a time synchronization listener.
+   *
+   * @param inst instance
+   * @param immediateNotify notify listener of current time synchronization value
+   * @param listener listener function
+   * @return Listener
+   */
+  public static NetworkTableListener createTimeSyncListener(
+      NetworkTableInstance inst, boolean immediateNotify, Consumer<NetworkTableEvent> listener) {
+    return new NetworkTableListener(inst, inst.addTimeSyncListener(immediateNotify, listener));
+  }
+
+  /**
    * Create a listener for log messages. By default, log messages are sent to stderr; this function
    * sends log messages with the specified levels to the provided callback function instead. The
    * callback function will only be called for log messages with level greater than or equal to

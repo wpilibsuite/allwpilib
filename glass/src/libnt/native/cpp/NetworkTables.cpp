@@ -400,6 +400,11 @@ void NetworkTablesModel::ValueSource::UpdateFromValue(
         }
       } else {
         valueChildren.clear();
+        valueStr.clear();
+        wpi::raw_string_ostream os{valueStr};
+        os << '"';
+        os.write_escaped(value.GetString());
+        os << '"';
       }
       break;
     case NT_RAW:
@@ -600,138 +605,42 @@ NetworkTablesModel::Entry* NetworkTablesModel::AddEntry(NT_Topic topic) {
   return entry.get();
 }
 
+NetworkTablesModel::Client::Subscriber::Subscriber(
+    nt::meta::ClientSubscriber&& oth)
+    : ClientSubscriber{std::move(oth)},
+      topicsStr{StringArrayToString(topics)} {}
+
 void NetworkTablesModel::Client::UpdatePublishers(
     std::span<const uint8_t> data) {
-  mpack_reader_t r;
-  mpack_reader_init_data(&r, data);
-  uint32_t numPub = mpack_expect_array_max(&r, 1000);
-  std::vector<ClientPublisher> newPublishers;
-  newPublishers.reserve(numPub);
-  for (uint32_t i = 0; i < numPub; ++i) {
-    ClientPublisher pub;
-    uint32_t numMapElem = mpack_expect_map(&r);
-    for (uint32_t j = 0; j < numMapElem; ++j) {
-      std::string key;
-      mpack_expect_str(&r, &key);
-      if (key == "uid") {
-        pub.uid = mpack_expect_i64(&r);
-      } else if (key == "topic") {
-        mpack_expect_str(&r, &pub.topic);
-      } else {
-        mpack_discard(&r);
-      }
-    }
-    mpack_done_map(&r);
-    newPublishers.emplace_back(std::move(pub));
-  }
-  mpack_done_array(&r);
-  if (mpack_reader_destroy(&r) == mpack_ok) {
-    publishers = std::move(newPublishers);
+  if (auto pubs = nt::meta::DecodeClientPublishers(data)) {
+    publishers = std::move(*pubs);
   } else {
     fmt::print(stderr, "Failed to update publishers\n");
   }
 }
 
-static void DecodeSubscriberOptions(
-    mpack_reader_t& r, NetworkTablesModel::SubscriberOptions* options) {
-  *options = NetworkTablesModel::SubscriberOptions{};
-  uint32_t numMapElem = mpack_expect_map(&r);
-  for (uint32_t j = 0; j < numMapElem; ++j) {
-    std::string key;
-    mpack_expect_str(&r, &key);
-    if (key == "topicsonly") {
-      options->topicsOnly = mpack_expect_bool(&r);
-    } else if (key == "all") {
-      options->sendAll = mpack_expect_bool(&r);
-    } else if (key == "periodic") {
-      options->periodic = mpack_expect_float(&r);
-    } else if (key == "prefix") {
-      options->prefixMatch = mpack_expect_bool(&r);
-    } else {
-      // TODO: Save other options
-      mpack_discard(&r);
-    }
-  }
-  mpack_done_map(&r);
-}
-
 void NetworkTablesModel::Client::UpdateSubscribers(
     std::span<const uint8_t> data) {
-  mpack_reader_t r;
-  mpack_reader_init_data(&r, data);
-  uint32_t numSub = mpack_expect_array_max(&r, 1000);
-  std::vector<ClientSubscriber> newSubscribers;
-  newSubscribers.reserve(numSub);
-  for (uint32_t i = 0; i < numSub; ++i) {
-    ClientSubscriber sub;
-    uint32_t numMapElem = mpack_expect_map(&r);
-    for (uint32_t j = 0; j < numMapElem; ++j) {
-      std::string key;
-      mpack_expect_str(&r, &key);
-      if (key == "uid") {
-        sub.uid = mpack_expect_i64(&r);
-      } else if (key == "topics") {
-        uint32_t numPrefix = mpack_expect_array_max(&r, 100);
-        sub.topics.reserve(numPrefix);
-        for (uint32_t k = 0; k < numPrefix; ++k) {
-          std::string val;
-          if (mpack_expect_str(&r, &val) == mpack_ok) {
-            sub.topics.emplace_back(std::move(val));
-          }
-        }
-        sub.topicsStr = StringArrayToString(sub.topics);
-        mpack_done_array(&r);
-      } else if (key == "options") {
-        DecodeSubscriberOptions(r, &sub.options);
-      } else {
-        mpack_discard(&r);
-      }
+  if (auto subs = nt::meta::DecodeClientSubscribers(data)) {
+    subscribers.clear();
+    subscribers.reserve(subs->size());
+    for (auto&& sub : *subs) {
+      subscribers.emplace_back(std::move(sub));
     }
-    mpack_done_map(&r);
-    newSubscribers.emplace_back(std::move(sub));
-  }
-  mpack_done_array(&r);
-  if (mpack_reader_destroy(&r) == mpack_ok) {
-    subscribers = std::move(newSubscribers);
   } else {
     fmt::print(stderr, "Failed to update subscribers\n");
   }
 }
 
 void NetworkTablesModel::UpdateClients(std::span<const uint8_t> data) {
-  mpack_reader_t r;
-  mpack_reader_init_data(&r, data);
-  uint32_t numClients = mpack_expect_array_max(&r, 100);
-  std::vector<Client> clientsArr;
-  clientsArr.reserve(numClients);
-  for (uint32_t i = 0; i < numClients; ++i) {
-    Client client;
-    uint32_t numMapElem = mpack_expect_map(&r);
-    for (uint32_t j = 0; j < numMapElem; ++j) {
-      std::string key;
-      mpack_expect_str(&r, &key);
-      if (key == "id") {
-        mpack_expect_str(&r, &client.id);
-      } else if (key == "conn") {
-        mpack_expect_str(&r, &client.conn);
-      } else if (key == "ver") {
-        uint16_t val = mpack_expect_u16(&r);
-        client.version = fmt::format("{}.{}", val >> 8, val & 0xff);
-      } else {
-        mpack_discard(&r);
-      }
-    }
-    mpack_done_map(&r);
-    clientsArr.emplace_back(std::move(client));
-  }
-  mpack_done_array(&r);
-  if (mpack_reader_destroy(&r) != mpack_ok) {
+  auto clientsArr = nt::meta::DecodeClients(data);
+  if (!clientsArr) {
     return;
   }
 
   // we need to create a new map so deletions are reflected
   std::map<std::string, Client, std::less<>> newClients;
-  for (auto&& client : clientsArr) {
+  for (auto&& client : *clientsArr) {
     auto& newClient = newClients[client.id];
     newClient = std::move(client);
     auto it = m_clients.find(newClient.id);
@@ -865,25 +774,32 @@ static bool StringToStringArray(std::string_view in,
   }
   in = wpi::trim(in);
 
-  wpi::SmallVector<std::string_view, 16> inSplit;
-  wpi::SmallString<32> buf;
-
-  wpi::split(in, inSplit, ',', -1, false);
-  for (auto val : inSplit) {
-    val = wpi::trim(val);
-    if (val.empty()) {
-      continue;
-    }
-    if (val.front() != '"' || val.back() != '"') {
-      fmt::print(stderr,
-                 "GUI: NetworkTables: Could not understand value '{}'\n", val);
+  while (!in.empty()) {
+    if (in.front() != '"') {
+      fmt::print(stderr, "GUI: NetworkTables: Expected '\"'");
       return false;
     }
-    val.remove_prefix(1);
-    val.remove_suffix(1);
-    out->emplace_back(wpi::UnescapeCString(val, buf).first);
+    in.remove_prefix(1);
+    wpi::SmallString<128> buf;
+    std::string_view val;
+    std::tie(val, in) = wpi::UnescapeCString(in, buf);
+    out->emplace_back(val);
+    if (!in.empty()) {
+      if (in.front() != '"') {
+        fmt::print(stderr, "GUI: NetworkTables: Error escaping string");
+        return false;
+      }
+      in.remove_prefix(1);
+      in = wpi::ltrim(in);
+    }
+    if (!in.empty()) {
+      if (in.front() != ',') {
+        fmt::print(stderr, "GUI: NetworkTables: Expected ','");
+        return false;
+      }
+      in.remove_prefix(1);
+    }
   }
-
   return true;
 }
 
@@ -922,9 +838,8 @@ static void EmitEntryValueReadonly(const NetworkTablesModel::ValueSource& entry,
       break;
     }
     case NT_STRING: {
-      // GetString() comes from a std::string, so it's null terminated
       ImGui::LabelText(typeStr ? typeStr : "string", "%s",
-                       val.GetString().data());
+                       entry.valueStr.c_str());
       break;
     }
     case NT_BOOLEAN_ARRAY:
@@ -1034,13 +949,18 @@ static void EmitEntryValueEditable(NetworkTablesModel::Entry& entry,
       break;
     }
     case NT_STRING: {
-      char* v = GetTextBuffer(val.GetString());
+      char* v = GetTextBuffer(entry.valueStr);
       if (ImGui::InputText(typeStr ? typeStr : "string", v, kTextBufferSize,
                            ImGuiInputTextFlags_EnterReturnsTrue)) {
-        if (entry.publisher == 0) {
-          entry.publisher = nt::Publish(entry.info.topic, NT_STRING, "string");
+        if (v[0] == '"') {
+          if (entry.publisher == 0) {
+            entry.publisher =
+                nt::Publish(entry.info.topic, NT_STRING, "string");
+          }
+          wpi::SmallString<128> buf;
+          nt::SetString(entry.publisher,
+                        wpi::UnescapeCString(v + 1, buf).first);
         }
-        nt::SetString(entry.publisher, v);
       }
       break;
     }
@@ -1141,58 +1061,97 @@ static void CreateTopicMenuItem(NetworkTablesModel* model,
         model->AddEntry(nt::GetTopic(model->GetInstance().GetHandle(), path));
     if (entry->publisher == 0) {
       entry->publisher = nt::Publish(entry->info.topic, type, typeStr);
+      // publish a default value so it's editable
+      switch (type) {
+        case NT_BOOLEAN:
+          nt::SetDefaultBoolean(entry->publisher, false);
+          break;
+        case NT_INTEGER:
+          nt::SetDefaultInteger(entry->publisher, 0);
+          break;
+        case NT_FLOAT:
+          nt::SetDefaultFloat(entry->publisher, 0.0);
+          break;
+        case NT_DOUBLE:
+          nt::SetDefaultDouble(entry->publisher, 0.0);
+          break;
+        case NT_STRING:
+          nt::SetDefaultString(entry->publisher, "");
+          break;
+        case NT_BOOLEAN_ARRAY:
+          nt::SetDefaultBooleanArray(entry->publisher, {});
+          break;
+        case NT_INTEGER_ARRAY:
+          nt::SetDefaultIntegerArray(entry->publisher, {});
+          break;
+        case NT_FLOAT_ARRAY:
+          nt::SetDefaultFloatArray(entry->publisher, {});
+          break;
+        case NT_DOUBLE_ARRAY:
+          nt::SetDefaultDoubleArray(entry->publisher, {});
+          break;
+        case NT_STRING_ARRAY:
+          nt::SetDefaultStringArray(entry->publisher, {});
+          break;
+        default:
+          break;
+      }
     }
+  }
+}
+
+void glass::DisplayNetworkTablesAddMenu(NetworkTablesModel* model,
+                                        std::string_view path,
+                                        NetworkTablesFlags flags) {
+  static char nameBuffer[kTextBufferSize];
+
+  if (ImGui::BeginMenu("Add new...")) {
+    if (ImGui::IsWindowAppearing()) {
+      nameBuffer[0] = '\0';
+    }
+
+    ImGui::InputTextWithHint("New item name", "example", nameBuffer,
+                             kTextBufferSize);
+    std::string fullNewPath;
+    if (path == "/") {
+      path = "";
+    }
+    fullNewPath = fmt::format("{}/{}", path, nameBuffer);
+
+    ImGui::Text("Adding: %s", fullNewPath.c_str());
+    ImGui::Separator();
+    auto entry = model->GetEntry(fullNewPath);
+    bool exists = entry && entry->info.type != NT_Type::NT_UNASSIGNED;
+    bool enabled = (flags & NetworkTablesFlags_CreateNoncanonicalKeys ||
+                    nameBuffer[0] != '\0') &&
+                   !exists;
+
+    CreateTopicMenuItem(model, fullNewPath, NT_STRING, "string", enabled);
+    CreateTopicMenuItem(model, fullNewPath, NT_INTEGER, "int", enabled);
+    CreateTopicMenuItem(model, fullNewPath, NT_FLOAT, "float", enabled);
+    CreateTopicMenuItem(model, fullNewPath, NT_DOUBLE, "double", enabled);
+    CreateTopicMenuItem(model, fullNewPath, NT_BOOLEAN, "boolean", enabled);
+    CreateTopicMenuItem(model, fullNewPath, NT_STRING_ARRAY, "string[]",
+                        enabled);
+    CreateTopicMenuItem(model, fullNewPath, NT_INTEGER_ARRAY, "int[]", enabled);
+    CreateTopicMenuItem(model, fullNewPath, NT_FLOAT_ARRAY, "float[]", enabled);
+    CreateTopicMenuItem(model, fullNewPath, NT_DOUBLE_ARRAY, "double[]",
+                        enabled);
+    CreateTopicMenuItem(model, fullNewPath, NT_BOOLEAN_ARRAY, "boolean[]",
+                        enabled);
+
+    ImGui::EndMenu();
   }
 }
 
 static void EmitParentContextMenu(NetworkTablesModel* model,
                                   const std::string& path,
                                   NetworkTablesFlags flags) {
-  static char nameBuffer[kTextBufferSize];
   if (ImGui::BeginPopupContextItem(path.c_str())) {
     ImGui::Text("%s", path.c_str());
     ImGui::Separator();
 
-    if (ImGui::BeginMenu("Add new...")) {
-      if (ImGui::IsWindowAppearing()) {
-        nameBuffer[0] = '\0';
-      }
-
-      ImGui::InputTextWithHint("New item name", "example", nameBuffer,
-                               kTextBufferSize);
-      std::string fullNewPath;
-      if (path == "/") {
-        fullNewPath = path + nameBuffer;
-      } else {
-        fullNewPath = fmt::format("{}/{}", path, nameBuffer);
-      }
-
-      ImGui::Text("Adding: %s", fullNewPath.c_str());
-      ImGui::Separator();
-      auto entry = model->GetEntry(fullNewPath);
-      bool exists = entry && entry->info.type != NT_Type::NT_UNASSIGNED;
-      bool enabled = (flags & NetworkTablesFlags_CreateNoncanonicalKeys ||
-                      nameBuffer[0] != '\0') &&
-                     !exists;
-
-      CreateTopicMenuItem(model, fullNewPath, NT_STRING, "string", enabled);
-      CreateTopicMenuItem(model, fullNewPath, NT_INTEGER, "int", enabled);
-      CreateTopicMenuItem(model, fullNewPath, NT_FLOAT, "float", enabled);
-      CreateTopicMenuItem(model, fullNewPath, NT_DOUBLE, "double", enabled);
-      CreateTopicMenuItem(model, fullNewPath, NT_BOOLEAN, "boolean", enabled);
-      CreateTopicMenuItem(model, fullNewPath, NT_STRING_ARRAY, "string[]",
-                          enabled);
-      CreateTopicMenuItem(model, fullNewPath, NT_INTEGER_ARRAY, "int[]",
-                          enabled);
-      CreateTopicMenuItem(model, fullNewPath, NT_FLOAT_ARRAY, "float[]",
-                          enabled);
-      CreateTopicMenuItem(model, fullNewPath, NT_DOUBLE_ARRAY, "double[]",
-                          enabled);
-      CreateTopicMenuItem(model, fullNewPath, NT_BOOLEAN_ARRAY, "boolean[]",
-                          enabled);
-
-      ImGui::EndMenu();
-    }
+    DisplayNetworkTablesAddMenu(model, path, flags);
 
     ImGui::EndPopup();
   }
@@ -1376,7 +1335,6 @@ static void DisplayTable(NetworkTablesModel* model,
   }
   ImGui::TableHeadersRow();
 
-  // EmitParentContextMenu(model, "/", flags);
   if (flags & NetworkTablesFlags_TreeView) {
     switch (category) {
       case ShowPersistent:
@@ -1499,8 +1457,8 @@ void glass::DisplayNetworkTablesInfo(NetworkTablesModel* model) {
         if (CollapsingHeader(client.second.id.c_str())) {
           PushID(client.second.id.c_str());
           ImGui::Indent();
-          ImGui::Text("%s (version %s)", client.second.conn.c_str(),
-                      client.second.version.c_str());
+          ImGui::Text("%s (version %u.%u)", client.second.conn.c_str(),
+                      client.second.version >> 8, client.second.version & 0xff);
           DisplayClient(client.second);
           ImGui::Unindent();
           PopID();
@@ -1602,9 +1560,14 @@ void NetworkTablesFlagsSettings::DisplayMenu() {
 
 void NetworkTablesView::Display() {
   m_flags.Update();
-  if (ImGui::BeginPopupContextItem()) {
-    m_flags.DisplayMenu();
-    ImGui::EndPopup();
-  }
   DisplayNetworkTables(m_model, m_flags.GetFlags());
+}
+
+void NetworkTablesView::Settings() {
+  m_flags.DisplayMenu();
+  DisplayNetworkTablesAddMenu(m_model, {}, m_flags.GetFlags());
+}
+
+bool NetworkTablesView::HasSettings() {
+  return true;
 }

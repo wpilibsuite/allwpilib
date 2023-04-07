@@ -511,7 +511,7 @@ public class ADIS16470_IMU implements AutoCloseable, NTSendable {
     }
     // Configure auto stall time
     m_spi.configureAutoStall(5, 1000, 1);
-    // Kick off auto SPI (Note: Device configration impossible after auto SPI is
+    // Kick off auto SPI (Note: Device configuration impossible after auto SPI is
     // activated)
     // DR High = Data good (data capture should be triggered on the rising edge)
     m_spi.startAutoTrigger(m_auto_interrupt, true, false);
@@ -1005,28 +1005,28 @@ public class ADIS16470_IMU implements AutoCloseable, NTSendable {
   }
 
   /**
-   * @return X axis complementary angle
+   * @return X-axis complementary angle
    */
   public synchronized double getXComplementaryAngle() {
     return m_compAngleX;
   }
 
   /**
-   * @return Y axis complementary angle
+   * @return Y-axis complementary angle
    */
   public synchronized double getYComplementaryAngle() {
     return m_compAngleY;
   }
 
   /**
-   * @return X axis filtered acceleration angle
+   * @return X-axis filtered acceleration angle
    */
   public synchronized double getXFilteredAccelAngle() {
     return m_accelAngleX;
   }
 
   /**
-   * @return Y axis filtered acceleration angle
+   * @return Y-axis filtered acceleration angle
    */
   public synchronized double getYFilteredAccelAngle() {
     return m_accelAngleY;

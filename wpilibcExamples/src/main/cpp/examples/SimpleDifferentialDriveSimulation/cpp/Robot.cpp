@@ -22,8 +22,7 @@ class Robot : public frc::TimedRobot {
   void RobotPeriodic() override { m_drive.Periodic(); }
 
   void AutonomousInit() override {
-    m_timer.Reset();
-    m_timer.Start();
+    m_timer.Restart();
     m_drive.ResetOdometry(m_trajectory.InitialPose());
   }
 

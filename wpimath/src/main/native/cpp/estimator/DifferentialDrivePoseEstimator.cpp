@@ -8,6 +8,7 @@
 
 #include "frc/StateSpaceUtil.h"
 #include "frc/estimator/AngleStatistics.h"
+#include "wpimath/MathShared.h"
 
 using namespace frc;
 
@@ -94,6 +95,14 @@ Pose2d DifferentialDrivePoseEstimator::GetEstimatedPosition() const {
 
 void DifferentialDrivePoseEstimator::AddVisionMeasurement(
     const Pose2d& visionRobotPose, units::second_t timestamp) {
+  // Step 0: If this measurement is old enough to be outside the pose buffer's
+  // timespan, skip.
+  if (!m_poseBuffer.GetInternalBuffer().empty() &&
+      m_poseBuffer.GetInternalBuffer().front().first - kBufferDuration >
+          timestamp) {
+    return;
+  }
+
   // Step 1: Get the estimated pose from when the vision measurement was made.
   auto sample = m_poseBuffer.Sample(timestamp);
 
@@ -121,7 +130,13 @@ void DifferentialDrivePoseEstimator::AddVisionMeasurement(
       sample.value().gyroAngle, sample.value().leftDistance,
       sample.value().rightDistance, sample.value().pose.Exp(scaledTwist));
 
-  // Step 6: Replay odometry inputs between sample time and latest recorded
+  // Step 6: Record the current pose to allow multiple measurements from the
+  // same timestamp
+  m_poseBuffer.AddSample(
+      timestamp, {GetEstimatedPosition(), sample.value().gyroAngle,
+                  sample.value().leftDistance, sample.value().rightDistance});
+
+  // Step 7: Replay odometry inputs between sample time and latest recorded
   // sample to update the pose buffer and correct odometry.
   auto internal_buf = m_poseBuffer.GetInternalBuffer();
 
@@ -139,7 +154,7 @@ void DifferentialDrivePoseEstimator::AddVisionMeasurement(
 Pose2d DifferentialDrivePoseEstimator::Update(const Rotation2d& gyroAngle,
                                               units::meter_t leftDistance,
                                               units::meter_t rightDistance) {
-  return UpdateWithTime(units::microsecond_t(wpi::Now()), gyroAngle,
+  return UpdateWithTime(wpi::math::MathSharedStore::GetTimestamp(), gyroAngle,
                         leftDistance, rightDistance);
 }
 

@@ -118,8 +118,7 @@ class MecanumControllerCommandTest {
             this::setWheelSpeeds,
             subsystem);
 
-    m_timer.reset();
-    m_timer.start();
+    m_timer.restart();
 
     command.initialize();
     while (!command.isFinished()) {

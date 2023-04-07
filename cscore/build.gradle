@@ -2,16 +2,16 @@ import org.gradle.internal.os.OperatingSystem
 
 ext {
     nativeName = 'cscore'
-    devMain = 'edu.wpi.cscore.DevMain'
+    devMain = 'edu.wpi.first.cscore.DevMain'
 }
 
 // Removed because having the objective-cpp plugin added breaks
 // embedded tools and its toolchain check. It causes an obj-cpp
 // source set to be added to all binaries, even cross binaries
 // with no support.
-// if (OperatingSystem.current().isMacOsX()) {
-//     apply plugin: 'objective-cpp'
-// }
+if (OperatingSystem.current().isMacOsX()) {
+    apply plugin: 'objective-cpp'
+}
 
 apply from: "${rootDir}/shared/jni/setupBuild.gradle"
 
@@ -87,16 +87,16 @@ ext {
     splitSetup = {
         if (it.targetPlatform.operatingSystem.isMacOsX()) {
             it.sources {
-                // macObjCpp(ObjectiveCppSourceSet) {
-                //     source {
-                //         srcDirs = ['src/main/native/objcpp']
-                //         include '**/*.mm'
-                //     }
-                //     exportedHeaders {
-                //         srcDirs 'src/main/native/include'
-                //         include '**/*.h'
-                //     }
-                // }
+                macObjCpp(ObjectiveCppSourceSet) {
+                    source {
+                        srcDirs = ['src/main/native/objcpp']
+                        include '**/*.mm'
+                    }
+                    exportedHeaders {
+                        srcDirs 'src/main/native/include', 'src/main/native/cpp'
+                        include '**/*.h'
+                    }
+                }
                 cscoreMacCpp(CppSourceSet) {
                     source {
                         srcDirs 'src/main/native/osx'
@@ -156,6 +156,12 @@ apply from: "${rootDir}/shared/opencv.gradle"
 Action<List<String>> symbolFilter = { symbols ->
     symbols.removeIf({ !it.startsWith('CS_') })
 } as Action<List<String>>;
+
+run {
+    if (OperatingSystem.current().isMacOsX()) {
+        jvmArgs("-XstartOnFirstThread");
+    }
+}
 
 nativeUtils.exportsConfigs {
     cscore {

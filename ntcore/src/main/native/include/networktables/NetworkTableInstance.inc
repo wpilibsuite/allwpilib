@@ -100,6 +100,13 @@ inline NT_Listener NetworkTableInstance::AddConnectionListener(
       std::move(callback));
 }
 
+inline NT_Listener NetworkTableInstance::AddTimeSyncListener(
+    bool immediate_notify, ListenerCallback callback) const {
+  return ::nt::AddListener(
+      m_handle, NT_EVENT_TIMESYNC | (immediate_notify ? NT_EVENT_IMMEDIATE : 0),
+      std::move(callback));
+}
+
 inline NT_Listener NetworkTableInstance::AddListener(
     std::span<const std::string_view> prefixes, int eventMask,
     ListenerCallback listener) {
@@ -156,6 +163,10 @@ inline void NetworkTableInstance::SetServerTeam(unsigned int team,
   ::nt::SetServerTeam(m_handle, team, port);
 }
 
+inline void NetworkTableInstance::Disconnect() {
+  ::nt::Disconnect(m_handle);
+}
+
 inline void NetworkTableInstance::StartDSClient(unsigned int port) {
   ::nt::StartDSClient(m_handle, port);
 }
@@ -179,6 +190,11 @@ inline std::vector<ConnectionInfo> NetworkTableInstance::GetConnections()
 
 inline bool NetworkTableInstance::IsConnected() const {
   return ::nt::IsConnected(m_handle);
+}
+
+inline std::optional<int64_t> NetworkTableInstance::GetServerTimeOffset()
+    const {
+  return ::nt::GetServerTimeOffset(m_handle);
 }
 
 inline NT_DataLogger NetworkTableInstance::StartEntryDataLog(

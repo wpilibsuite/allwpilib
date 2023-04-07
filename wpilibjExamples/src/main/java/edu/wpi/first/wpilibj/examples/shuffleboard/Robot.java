@@ -10,6 +10,7 @@ import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.motorcontrol.PWMSparkMax;
+import edu.wpi.first.wpilibj.shuffleboard.BuiltInLayouts;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardLayout;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
@@ -41,7 +42,7 @@ public class Robot extends TimedRobot {
     driveBaseTab.add("Tank Drive", m_tankDrive);
     // Put both encoders in a list layout
     ShuffleboardLayout encoders =
-        driveBaseTab.getLayout("List Layout", "Encoders").withPosition(0, 0).withSize(2, 2);
+        driveBaseTab.getLayout("Encoders", BuiltInLayouts.kList).withPosition(0, 0).withSize(2, 2);
     encoders.add("Left Encoder", m_leftEncoder);
     encoders.add("Right Encoder", m_rightEncoder);
 

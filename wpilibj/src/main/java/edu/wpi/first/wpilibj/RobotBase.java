@@ -16,6 +16,7 @@ import edu.wpi.first.math.MathSharedStore;
 import edu.wpi.first.math.MathUsageId;
 import edu.wpi.first.networktables.MultiSubscriber;
 import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.util.WPIUtilJNI;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.util.WPILibVersion;
@@ -128,6 +129,11 @@ public abstract class RobotBase implements AutoCloseable {
                 break;
             }
           }
+
+          @Override
+          public double getTimestamp() {
+            return WPIUtilJNI.now() * 1.0e-6;
+          }
         });
   }
 
@@ -137,14 +143,14 @@ public abstract class RobotBase implements AutoCloseable {
    * completion before Autonomous is entered.
    *
    * <p>This must be used to ensure that the communications code starts. In the future it would be
-   * nice to put this code into it's own task that loads on boot so ensure that it runs.
+   * nice to put this code into its own task that loads on boot so ensure that it runs.
    */
   protected RobotBase() {
     final NetworkTableInstance inst = NetworkTableInstance.getDefault();
     m_threadId = Thread.currentThread().getId();
     setupCameraServerShared();
     setupMathShared();
-    // subscribe to "" to force persistent values to progagate to local
+    // subscribe to "" to force persistent values to propagate to local
     m_suball = new MultiSubscriber(inst, new String[] {""});
     if (isReal()) {
       inst.startServer("/home/lvuser/networktables.json");
@@ -210,7 +216,7 @@ public abstract class RobotBase implements AutoCloseable {
   /**
    * Determine if the Robot is currently disabled.
    *
-   * @return True if the Robot is currently disabled by the field controls.
+   * @return True if the Robot is currently disabled by the Driver Station.
    */
   public boolean isDisabled() {
     return DriverStation.isDisabled();
@@ -219,14 +225,14 @@ public abstract class RobotBase implements AutoCloseable {
   /**
    * Determine if the Robot is currently enabled.
    *
-   * @return True if the Robot is currently enabled by the field controls.
+   * @return True if the Robot is currently enabled by the Driver Station.
    */
   public boolean isEnabled() {
     return DriverStation.isEnabled();
   }
 
   /**
-   * Determine if the robot is currently in Autonomous mode as determined by the field controls.
+   * Determine if the robot is currently in Autonomous mode as determined by the Driver Station.
    *
    * @return True if the robot is currently operating Autonomously.
    */
@@ -235,8 +241,8 @@ public abstract class RobotBase implements AutoCloseable {
   }
 
   /**
-   * Determine if the robot is current in Autonomous mode and enabled as determined by the field
-   * controls.
+   * Determine if the robot is currently in Autonomous mode and enabled as determined by the Driver
+   * Station.
    *
    * @return True if the robot is currently operating autonomously while enabled.
    */
@@ -245,7 +251,7 @@ public abstract class RobotBase implements AutoCloseable {
   }
 
   /**
-   * Determine if the robot is currently in Test mode as determined by the driver station.
+   * Determine if the robot is currently in Test mode as determined by the Driver Station.
    *
    * @return True if the robot is currently operating in Test mode.
    */
@@ -254,8 +260,17 @@ public abstract class RobotBase implements AutoCloseable {
   }
 
   /**
-   * Determine if the robot is currently in Operator Control mode as determined by the field
-   * controls.
+   * Determine if the robot is current in Test mode and enabled as determined by the Driver Station.
+   *
+   * @return True if the robot is currently operating in Test mode while enabled.
+   */
+  public boolean isTestEnabled() {
+    return DriverStation.isTestEnabled();
+  }
+
+  /**
+   * Determine if the robot is currently in Operator Control mode as determined by the Driver
+   * Station.
    *
    * @return True if the robot is currently operating in Tele-Op mode.
    */
@@ -264,8 +279,8 @@ public abstract class RobotBase implements AutoCloseable {
   }
 
   /**
-   * Determine if the robot is current in Operator Control mode and enabled as determined by the
-   * field controls.
+   * Determine if the robot is currently in Operator Control mode and enabled as determined by the
+   * Driver Station.
    *
    * @return True if the robot is currently operating in Tele-Op mode while enabled.
    */
@@ -394,6 +409,9 @@ public abstract class RobotBase implements AutoCloseable {
     if (!HAL.initialize(500, 0)) {
       throw new IllegalStateException("Failed to initialize. Terminating");
     }
+
+    // Force refresh DS data
+    DriverStation.refreshData();
 
     // Call a CameraServer JNI function to force OpenCV native library loading
     // Needed because all the OpenCV JNI functions don't have built in loading

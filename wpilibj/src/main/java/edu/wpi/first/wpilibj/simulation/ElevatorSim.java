@@ -162,7 +162,7 @@ public class ElevatorSim extends LinearSystemSim<N2, N1, N1> {
    * @return Whether the elevator would hit the lower limit.
    */
   public boolean wouldHitLowerLimit(double elevatorHeightMeters) {
-    return elevatorHeightMeters < this.m_minHeight;
+    return elevatorHeightMeters <= this.m_minHeight;
   }
 
   /**
@@ -172,7 +172,7 @@ public class ElevatorSim extends LinearSystemSim<N2, N1, N1> {
    * @return Whether the elevator would hit the upper limit.
    */
   public boolean wouldHitUpperLimit(double elevatorHeightMeters) {
-    return elevatorHeightMeters > this.m_maxHeight;
+    return elevatorHeightMeters >= this.m_maxHeight;
   }
 
   /**

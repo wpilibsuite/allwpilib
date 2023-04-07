@@ -40,9 +40,16 @@ cppProjectZips.add(project(':wpinet').cppHeadersZip)
 cppProjectZips.add(project(':wpiutil').cppHeadersZip)
 
 doxygen {
-    executables {
-        doxygen version : '1.9.4',
-        baseURI : 'https://frcmaven.wpi.edu/artifactory/generic-release-mirror/doxygen'
+    // Doxygen binaries are only provided for x86_64 platforms
+    // Other platforms will need to provide doxygen via their system
+    // See below maven and https://doxygen.nl/download.html for provided binaries
+
+    String arch = System.getProperty("os.arch");
+    if (arch.equals("x86_64") || arch.equals("amd64")) {
+        executables {
+            doxygen version : '1.9.4',
+            baseURI : 'https://frcmaven.wpi.edu/artifactory/generic-release-mirror/doxygen'
+        }
     }
 }
 
@@ -57,6 +64,7 @@ doxygen {
             cppIncludeRoots.add(it.absolutePath)
         }
     }
+    cppIncludeRoots << '../ntcore/build/generated/main/native/include/'
 
     if (project.hasProperty('docWarningsAsErrors')) {
         // C++20 shims
@@ -231,7 +239,7 @@ task generateJavaDocs(type: Javadoc) {
     if (JavaVersion.current().isJava8Compatible() && project.hasProperty('docWarningsAsErrors')) {
         // Treat javadoc warnings as errors.
         //
-        // The second argument '-quiet' is a hack. The one paramater
+        // The second argument '-quiet' is a hack. The one parameter
         // addStringOption() doesn't work, so we add '-quiet', which is added
         // anyway by gradle. See https://github.com/gradle/gradle/issues/2354.
         //

@@ -62,7 +62,7 @@ public class CommandGenericHID {
    * attached to {@link CommandScheduler#getDefaultButtonLoop() the default command scheduler button
    * loop}.
    *
-   * <p>The POV angles start at 0 in the up direction, and increase clockwise (eg right is 90,
+   * <p>The POV angles start at 0 in the up direction, and increase clockwise (e.g. right is 90,
    * upper-left is 315).
    *
    * @param angle POV angle in degrees, or -1 for the center / not pressed.
@@ -75,7 +75,7 @@ public class CommandGenericHID {
   /**
    * Constructs a Trigger instance based around this angle of a POV on the HID.
    *
-   * <p>The POV angles start at 0 in the up direction, and increase clockwise (eg right is 90,
+   * <p>The POV angles start at 0 in the up direction, and increase clockwise (e.g. right is 90,
    * upper-left is 315).
    *
    * @param pov index of the POV to read (starting at 0). Defaults to 0.
@@ -89,88 +89,88 @@ public class CommandGenericHID {
   }
 
   /**
-   * Constructs a Trigger instance based around the 0-degree angle (up) of the default (index 0) POV
+   * Constructs a Trigger instance based around the 0 degree angle (up) of the default (index 0) POV
    * on the HID, attached to {@link CommandScheduler#getDefaultButtonLoop() the default command
    * scheduler button loop}.
    *
-   * @return a Trigger instance based around the 0-degree angle of a POV on the HID.
+   * @return a Trigger instance based around the 0 degree angle of a POV on the HID.
    */
   public Trigger povUp() {
     return pov(0);
   }
 
   /**
-   * Constructs a Trigger instance based around the 45-degree angle (right up) of the default (index
+   * Constructs a Trigger instance based around the 45 degree angle (right up) of the default (index
    * 0) POV on the HID, attached to {@link CommandScheduler#getDefaultButtonLoop() the default
    * command scheduler button loop}.
    *
-   * @return a Trigger instance based around the 45-degree angle of a POV on the HID.
+   * @return a Trigger instance based around the 45 degree angle of a POV on the HID.
    */
   public Trigger povUpRight() {
     return pov(45);
   }
 
   /**
-   * Constructs a Trigger instance based around the 90-degree angle (right) of the default (index 0)
+   * Constructs a Trigger instance based around the 90 degree angle (right) of the default (index 0)
    * POV on the HID, attached to {@link CommandScheduler#getDefaultButtonLoop() the default command
    * scheduler button loop}.
    *
-   * @return a Trigger instance based around the 90-degree angle of a POV on the HID.
+   * @return a Trigger instance based around the 90 degree angle of a POV on the HID.
    */
   public Trigger povRight() {
     return pov(90);
   }
 
   /**
-   * Constructs a Trigger instance based around the 135-degree angle (right down) of the default
+   * Constructs a Trigger instance based around the 135 degree angle (right down) of the default
    * (index 0) POV on the HID, attached to {@link CommandScheduler#getDefaultButtonLoop() the
    * default command scheduler button loop}.
    *
-   * @return a Trigger instance based around the 135-degree angle of a POV on the HID.
+   * @return a Trigger instance based around the 135 degree angle of a POV on the HID.
    */
   public Trigger povDownRight() {
     return pov(135);
   }
 
   /**
-   * Constructs a Trigger instance based around the 180-degree angle (down) of the default (index 0)
+   * Constructs a Trigger instance based around the 180 degree angle (down) of the default (index 0)
    * POV on the HID, attached to {@link CommandScheduler#getDefaultButtonLoop() the default command
    * scheduler button loop}.
    *
-   * @return a Trigger instance based around the 180-degree angle of a POV on the HID.
+   * @return a Trigger instance based around the 180 degree angle of a POV on the HID.
    */
   public Trigger povDown() {
     return pov(180);
   }
 
   /**
-   * Constructs a Trigger instance based around the 225-degree angle (down left) of the default
+   * Constructs a Trigger instance based around the 225 degree angle (down left) of the default
    * (index 0) POV on the HID, attached to {@link CommandScheduler#getDefaultButtonLoop() the
    * default command scheduler button loop}.
    *
-   * @return a Trigger instance based around the 225-degree angle of a POV on the HID.
+   * @return a Trigger instance based around the 225 degree angle of a POV on the HID.
    */
   public Trigger povDownLeft() {
     return pov(225);
   }
 
   /**
-   * Constructs a Trigger instance based around the 270-degree angle (left) of the default (index 0)
+   * Constructs a Trigger instance based around the 270 degree angle (left) of the default (index 0)
    * POV on the HID, attached to {@link CommandScheduler#getDefaultButtonLoop() the default command
    * scheduler button loop}.
    *
-   * @return a Trigger instance based around the 270-degree angle of a POV on the HID.
+   * @return a Trigger instance based around the 270 degree angle of a POV on the HID.
    */
   public Trigger povLeft() {
     return pov(270);
   }
 
   /**
-   * Constructs a Trigger instance based around the 315-degree angle (left up) of the default (index
+   * Constructs a Trigger instance based around the 315 degree angle (left up) of the default (index
    * 0) POV on the HID, attached to {@link CommandScheduler#getDefaultButtonLoop() the default
    * command scheduler button loop}.
    *
-   * @return a Trigger instance based around the 315-degree angle of a POV on the HID.
+   * @return a Trigger instance based around the 315 degree angle of a POV on the HID.
    */
   public Trigger povUpLeft() {
     return pov(315);
@@ -185,6 +185,62 @@ public class CommandGenericHID {
    */
   public Trigger povCenter() {
     return pov(-1);
+  }
+
+  /**
+   * Constructs a Trigger instance that is true when the axis value is less than {@code threshold},
+   * attached to {@link CommandScheduler#getDefaultButtonLoop() the default command scheduler button
+   * loop}.
+   *
+   * @param axis The axis to read, starting at 0
+   * @param threshold The value below which this trigger should return true.
+   * @return a Trigger instance that is true when the axis value is less than the provided
+   *     threshold.
+   */
+  public Trigger axisLessThan(int axis, double threshold) {
+    return axisLessThan(axis, threshold, CommandScheduler.getInstance().getDefaultButtonLoop());
+  }
+
+  /**
+   * Constructs a Trigger instance that is true when the axis value is less than {@code threshold},
+   * attached to the given loop.
+   *
+   * @param axis The axis to read, starting at 0
+   * @param threshold The value below which this trigger should return true.
+   * @param loop the event loop instance to attach the trigger to
+   * @return a Trigger instance that is true when the axis value is less than the provided
+   *     threshold.
+   */
+  public Trigger axisLessThan(int axis, double threshold, EventLoop loop) {
+    return m_hid.axisLessThan(axis, threshold, loop).castTo(Trigger::new);
+  }
+
+  /**
+   * Constructs a Trigger instance that is true when the axis value is less than {@code threshold},
+   * attached to {@link CommandScheduler#getDefaultButtonLoop() the default command scheduler button
+   * loop}.
+   *
+   * @param axis The axis to read, starting at 0
+   * @param threshold The value above which this trigger should return true.
+   * @return a Trigger instance that is true when the axis value is greater than the provided
+   *     threshold.
+   */
+  public Trigger axisGreaterThan(int axis, double threshold) {
+    return axisGreaterThan(axis, threshold, CommandScheduler.getInstance().getDefaultButtonLoop());
+  }
+
+  /**
+   * Constructs a Trigger instance that is true when the axis value is greater than {@code
+   * threshold}, attached to the given loop.
+   *
+   * @param axis The axis to read, starting at 0
+   * @param threshold The value above which this trigger should return true.
+   * @param loop the event loop instance to attach the trigger to.
+   * @return a Trigger instance that is true when the axis value is greater than the provided
+   *     threshold.
+   */
+  public Trigger axisGreaterThan(int axis, double threshold, EventLoop loop) {
+    return m_hid.axisGreaterThan(axis, threshold, loop).castTo(Trigger::new);
   }
 
   /**

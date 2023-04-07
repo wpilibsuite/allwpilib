@@ -4,7 +4,9 @@
 
 #pragma once
 
+#include <functional>
 #include <memory>
+#include <optional>
 #include <span>
 #include <string>
 #include <string_view>
@@ -27,12 +29,16 @@ class IConnectionList;
 
 class NetworkClient final : public INetworkClient {
  public:
-  NetworkClient(int inst, std::string_view id, net::ILocalStorage& localStorage,
-                IConnectionList& connList, wpi::Logger& logger);
+  NetworkClient(
+      int inst, std::string_view id, net::ILocalStorage& localStorage,
+      IConnectionList& connList, wpi::Logger& logger,
+      std::function<void(int64_t serverTimeOffset, int64_t rtt2, bool valid)>
+          timeSyncUpdated);
   ~NetworkClient() final;
 
   void SetServers(
       std::span<const std::pair<std::string, unsigned int>> servers) final;
+  void Disconnect() final;
 
   void StartDSClient(unsigned int port) final;
   void StopDSClient() final;
@@ -54,6 +60,7 @@ class NetworkClient3 final : public INetworkClient {
 
   void SetServers(
       std::span<const std::pair<std::string, unsigned int>> servers) final;
+  void Disconnect() final;
 
   void StartDSClient(unsigned int port) final;
   void StopDSClient() final;

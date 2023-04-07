@@ -34,7 +34,11 @@ namespace frc {
  * Pose3ds in the JSON are measured using the normal FRC coordinate system, NWU
  * with the origin at the bottom-right corner of the blue alliance wall.
  * SetOrigin(OriginPosition) can be used to change the poses returned from
- * GetTagPose(int) to be from the perspective of a specific alliance. */
+ * GetTagPose(int) to be from the perspective of a specific alliance.
+ *
+ * Tag poses represent the center of the tag, with a zero rotation representing
+ * a tag that is upright and facing away from the (blue) alliance wall (that is,
+ * towards the opposing alliance). */
 class WPILIB_DLLEXPORT AprilTagFieldLayout {
  public:
   enum class OriginPosition {
@@ -75,7 +79,7 @@ class WPILIB_DLLEXPORT AprilTagFieldLayout {
   /**
    * Sets the origin for tag pose transformation.
    *
-   * This tranforms the Pose3ds returned by GetTagPose(int) to return the
+   * This transforms the Pose3ds returned by GetTagPose(int) to return the
    * correct pose relative to the provided origin.
    *
    * @param origin The new origin for tag transformations

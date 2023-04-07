@@ -6,7 +6,7 @@ package edu.wpi.first.wpilibj2.command;
 
 /**
  * A robot subsystem. Subsystems are the basic unit of robot organization in the Command-based
- * framework; they encapsulate low-level hardware objects (motor controllers, sensors, etc) and
+ * framework; they encapsulate low-level hardware objects (motor controllers, sensors, etc.) and
  * provide methods through which they can be used by {@link Command}s. Subsystems are used by the
  * {@link CommandScheduler}'s resource management system to ensure multiple robot actions are not
  * "fighting" over the same hardware; Commands that use a subsystem should include that subsystem in
@@ -48,6 +48,14 @@ public interface Subsystem {
    */
   default void setDefaultCommand(Command defaultCommand) {
     CommandScheduler.getInstance().setDefaultCommand(this, defaultCommand);
+  }
+
+  /**
+   * Removes the default command for the subsystem. This will not cancel the default command if it
+   * is currently running.
+   */
+  default void removeDefaultCommand() {
+    CommandScheduler.getInstance().removeDefaultCommand(this);
   }
 
   /**

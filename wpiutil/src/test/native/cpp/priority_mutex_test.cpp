@@ -157,7 +157,7 @@ class HighPriorityThread {
 //
 // To run the test, we need 3 threads, and then 1 thread to kick the test off.
 // The threads must all run on the same core, otherwise they wouldn't starve
-// eachother. The threads and their roles are as follows:
+// each other. The threads and their roles are as follows:
 //
 // Low priority thread:
 //   Holds a lock that the high priority thread needs, and releases it upon
