@@ -23,7 +23,8 @@ namespace frc {
  *
  * RobotInit() -- provide for initialization at robot power-on
  *
- * DriverStationConnected() -- provide for initialization the first time the DS is connected
+ * DriverStationConnected() -- provide for initialization the first time the DS
+ * is connected
  *
  * Init() functions -- each of the following functions is called once when the
  * appropriate mode is entered:
@@ -72,8 +73,8 @@ class IterativeRobotBase : public RobotBase {
   /**
    * Code that needs to know the DS state should go here.
    *
-   * Users should override this method for initialization that needs to occur after the DS is
-   * connected, such as needing the alliance information.
+   * Users should override this method for initialization that needs to occur
+   * after the DS is connected, such as needing the alliance information.
    */
   virtual void DriverStationConnected();
 

@@ -71,7 +71,7 @@ public abstract class IterativeRobotBase extends RobotBase {
   private final Watchdog m_watchdog;
   private boolean m_ntFlushEnabled = true;
   private boolean m_lwEnabledInTest = true;
-  private boolean m_calledDsConnected = false;
+  private boolean m_calledDsConnected;
 
   /**
    * Constructor for IterativeRobotBase.
