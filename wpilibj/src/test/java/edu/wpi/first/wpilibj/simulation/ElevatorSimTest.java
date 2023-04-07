@@ -91,7 +91,7 @@ class ElevatorSimTest {
   @Test
   void testStability() {
     var sim =
-        new ElevatorSim(DCMotor.getVex775Pro(4), 100, 4, Units.inchesToMeters(0.5), 0, 10, true);
+        new ElevatorSim(DCMotor.getVex775Pro(4), 100, 4, Units.inchesToMeters(0.5), 0, 10, false);
 
     sim.setState(VecBuilder.fill(0, 0));
     sim.setInput(12);
