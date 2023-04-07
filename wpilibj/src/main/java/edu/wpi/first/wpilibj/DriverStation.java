@@ -1154,7 +1154,7 @@ public final class DriverStation {
   public static boolean waitForDsConnection(double timeoutSeconds) {
     int event = WPIUtilJNI.createEvent(true, false);
     DriverStationJNI.provideNewDataEventHandle(event);
-    boolean result = false;
+    boolean result;
     try {
       if (timeoutSeconds == 0) {
         WPIUtilJNI.waitForObject(event);

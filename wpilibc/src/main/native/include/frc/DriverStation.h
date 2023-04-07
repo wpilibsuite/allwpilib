@@ -301,7 +301,7 @@ class DriverStation final {
    *
    * @param timeout timeout in seconds. 0 for infinite.
    * @return true if connected, false if timeout
-  */
+   */
   static bool WaitForDsConnection(units::second_t timeout);
 
   /**
