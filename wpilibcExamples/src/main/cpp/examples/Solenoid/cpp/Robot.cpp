@@ -65,7 +65,8 @@ void Robot::TeleopPeriodic() {
       // Disable closed-loop mode on the compressor.
       m_compressor.Disable();
     } else {
-      // Change the if directives to select the closed-loop mode you want to use:
+      // Change the if directives to select the closed-loop mode you want to
+      // use:
 #if 0
       // Enable closed-loop mode based on the digital pressure switch
       // connected to the PCM/PH.
