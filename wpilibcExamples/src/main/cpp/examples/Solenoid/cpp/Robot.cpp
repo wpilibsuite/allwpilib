@@ -36,8 +36,6 @@ void Robot::RobotInit() {
     // The switch is open when the pressure is over ~120 PSI.
     return m_compressor.GetPressureSwitchValue();
   });
-
-  tab.Add("Chooser", m_compressorModeChooser);
 }
 
 void Robot::TeleopPeriodic() {
@@ -67,7 +65,7 @@ void Robot::TeleopPeriodic() {
       // Disable closed-loop mode on the compressor.
       m_compressor.Disable();
     } else {
-      // Change the if directives to select the closed-loop you want to use:
+      // Change the if directives to select the closed-loop mode you want to use:
 #if 0
       // Enable closed-loop mode based on the digital pressure switch
       // connected to the PCM/PH.
@@ -79,7 +77,7 @@ void Robot::TeleopPeriodic() {
       // sensor is in the specified range ([70 PSI, 120 PSI] in this example).
       // Analog mode exists only on the PH! On the PCM, this enables digital
       // control.
-      m_compressor.EnableAnalog(70_psi, 110_psi);
+      m_compressor.EnableAnalog(70_psi, 120_psi);
 #endif
 #if 0
       // Enable closed-loop mode based on both the digital pressure switch AND the analog
@@ -88,7 +86,7 @@ void Robot::TeleopPeriodic() {
       // specified range ([70 PSI, 120 PSI] in this example) AND the digital switch reports
       // that the system is not full.
       // Hybrid mode exists only on the PH! On the PCM, this enables digital control.
-      m_compressor.EnableHybrid(70_psi, 110_psi);
+      m_compressor.EnableHybrid(70_psi, 120_psi);
 #endif
     }
   }

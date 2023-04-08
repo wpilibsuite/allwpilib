@@ -11,7 +11,6 @@
 #include <frc/PneumaticsControlModule.h>
 #include <frc/Solenoid.h>
 #include <frc/TimedRobot.h>
-#include <frc/smartdashboard/SendableChooser.h>
 
 /**
  * This is a sample program showing the use of the solenoid classes during
@@ -54,9 +53,6 @@ class Robot : public frc::TimedRobot {
 
   // Compressor connected to a PH with a default CAN ID
   frc::Compressor m_compressor{frc::PneumaticsModuleType::REVPH};
-
-  // A chooser to select the compressor mode from the dashboard
-  frc::SendableChooser<frc::CompressorConfigType> m_compressorModeChooser;
 
   static constexpr int kSolenoidButton = 1;
   static constexpr int kDoubleSolenoidForward = 2;

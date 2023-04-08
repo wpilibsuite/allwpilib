@@ -16,7 +16,7 @@
 class Pneumatics : frc2::SubsystemBase {
  public:
   Pneumatics();
-  /** Returns a command that runs the storage motor indefinitely. */
+  /** Returns a command that disables the compressor indefinitely. */
   [[nodiscard]] frc2::CommandPtr DisableCompressorCommand();
 
   /**

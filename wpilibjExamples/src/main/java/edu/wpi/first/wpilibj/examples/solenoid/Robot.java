@@ -4,13 +4,6 @@
 
 package edu.wpi.first.wpilibj.examples.solenoid;
 
-// Using "import static an.enum.or.constants.inner.class.*;" helps reduce verbosity
-// this replaces "DoubleSolenoid.Value.kForward" with just kForward
-// further reading is available at https://www.geeksforgeeks.org/static-import-java/
-
-import static edu.wpi.first.wpilibj.DoubleSolenoid.Value.kForward;
-import static edu.wpi.first.wpilibj.DoubleSolenoid.Value.kReverse;
-
 import edu.wpi.first.wpilibj.Compressor;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.Joystick;
@@ -104,9 +97,9 @@ public class Robot extends TimedRobot {
      * If a button is pressed, set the solenoid to the respective channel.
      */
     if (m_stick.getRawButtonPressed(kDoubleSolenoidForwardButton)) {
-      m_doubleSolenoid.set(kForward);
+      m_doubleSolenoid.set(DoubleSolenoid.Value.kForward);
     } else if (m_stick.getRawButtonPressed(kDoubleSolenoidReverseButton)) {
-      m_doubleSolenoid.set(kReverse);
+      m_doubleSolenoid.set(DoubleSolenoid.Value.kReverse);
     }
 
     // On button press, toggle the compressor.
@@ -128,7 +121,7 @@ public class Robot extends TimedRobot {
           // The compressor will run while the pressure reported by the sensor is in the
           // specified range ([70 PSI, 120 PSI] in this example).
           // Analog mode exists only on the PH! On the PCM, this enables digital control.
-          m_compressor.enableAnalog(70, 110);
+          m_compressor.enableAnalog(70, 120);
         }
         if (false) {
           // Enable closed-loop mode based on both the digital pressure switch AND the analog
@@ -137,7 +130,7 @@ public class Robot extends TimedRobot {
           // specified range ([70 PSI, 120 PSI] in this example) AND the digital switch reports
           // that the system is not full.
           // Hybrid mode exists only on the PH! On the PCM, this enables digital control.
-          m_compressor.enableHybrid(70, 110);
+          m_compressor.enableHybrid(70, 120);
         }
       }
     }
