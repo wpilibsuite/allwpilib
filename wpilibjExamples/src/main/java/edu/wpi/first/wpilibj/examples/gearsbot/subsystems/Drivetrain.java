@@ -43,8 +43,7 @@ public class Drivetrain extends SubsystemBase {
           DriveConstants.kRightEncoderPorts[0],
           DriveConstants.kRightEncoderPorts[1],
           DriveConstants.kRightEncoderReversed);
-  private final AnalogInput m_rangefinder =
-      new AnalogInput(DriveConstants.kRangeFinderPort);
+  private final AnalogInput m_rangefinder = new AnalogInput(DriveConstants.kRangeFinderPort);
   private final AnalogGyro m_gyro = new AnalogGyro(DriveConstants.kAnalogGyroPort);
 
   /** Create a new drivetrain subsystem. */

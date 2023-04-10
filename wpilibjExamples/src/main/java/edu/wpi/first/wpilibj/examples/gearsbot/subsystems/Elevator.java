@@ -24,9 +24,7 @@ public class Elevator extends PIDSubsystem {
   public Elevator() {
     super(
         new PIDController(
-            ElevatorConstants.kP_real,
-            ElevatorConstants.kI_real,
-            ElevatorConstants.kD));
+            ElevatorConstants.kP_real, ElevatorConstants.kI_real, ElevatorConstants.kD));
 
     if (Robot.isSimulation()) { // Check for simulation and update PID values
       getController()
@@ -44,7 +42,7 @@ public class Elevator extends PIDSubsystem {
       m_pot = new AnalogPotentiometer(ElevatorConstants.kPotentiometerPort, -2.0 / 5);
     } else {
       // Defaults to meters
-      m_pot = new AnalogPotentiometer(ElevatorConstants.kPotentiometerPort); 
+      m_pot = new AnalogPotentiometer(ElevatorConstants.kPotentiometerPort);
     }
 
     // Let's name everything on the LiveWindow

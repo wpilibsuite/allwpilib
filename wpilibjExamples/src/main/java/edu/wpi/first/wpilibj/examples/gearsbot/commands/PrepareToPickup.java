@@ -25,7 +25,6 @@ public class PrepareToPickup extends SequentialCommandGroup {
         new OpenClaw(claw),
         Commands.parallel(
             new SetWristSetpoint(Positions.PrepareToPickup.kWristSetpoint, wrist),
-            new SetElevatorSetpoint(
-                Positions.PrepareToPickup.kElevatorSetpoint, elevator)));
+            new SetElevatorSetpoint(Positions.PrepareToPickup.kElevatorSetpoint, elevator)));
   }
 }

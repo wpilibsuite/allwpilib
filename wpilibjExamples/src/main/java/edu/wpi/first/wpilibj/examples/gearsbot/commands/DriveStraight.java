@@ -25,9 +25,7 @@ public class DriveStraight extends PIDCommand {
   public DriveStraight(double distance, Drivetrain drivetrain) {
     super(
         new PIDController(
-            DriveStraightConstants.kP,
-            DriveStraightConstants.kI,
-            DriveStraightConstants.kD),
+            DriveStraightConstants.kP, DriveStraightConstants.kI, DriveStraightConstants.kD),
         drivetrain::getDistance,
         distance,
         d -> drivetrain.drive(d, d));
