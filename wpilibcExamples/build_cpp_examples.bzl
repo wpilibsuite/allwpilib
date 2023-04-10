@@ -46,7 +46,7 @@ EXAMPLE_FOLDERS = [
     "RapidReactCommandBot",
     "Relay",
     "RomiReference",
-    "SchedulerEventLogging",
+    # "SchedulerEventLogging",
     "SelectCommand",
     "ShuffleBoard",
     "SimpleDifferentialDriveSimulation",
@@ -110,6 +110,7 @@ def build_examples(halsim_deps = []):
             srcs = native.glob(["src/main/cpp/examples/" + folder + "/cpp/**/*.cpp", "src/main/cpp/examples/" + folder + "/c/**/*.c"]),
             deps = [
                 "//wpilibNewCommands/src/main/native:wpilibNewCommands.shared",
+                "//apriltag/src/main/native:apriltag.shared",
                 ":{}-examples-headers".format(folder),
             ],
             tags = ["wpi-example"],

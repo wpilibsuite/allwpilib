@@ -12,11 +12,5 @@ wpilib_java_library(
         "//wpinet/src/main/java/edu/wpi/first/net:wpinet",
         "//wpiutil/src/main/java/edu/wpi/first/util:wpiutil",
         "@bzlmodrio-opencv//libraries/java/opencv",
-        "@maven//:com_fasterxml_jackson_core_jackson_annotations",
-        "@maven//:com_fasterxml_jackson_core_jackson_core",
-        "@maven//:com_fasterxml_jackson_core_jackson_databind",
-        "@maven//:org_ejml_ejml_core",
-        "@maven//:org_ejml_ejml_ddense",
-        "@maven//:org_ejml_ejml_simple",
     ],
 )

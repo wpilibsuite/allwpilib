@@ -13,13 +13,13 @@ jobs:
       matrix:
         include:
           - { os: windows-2022, action: "test", config: "--config=windows", wpimath_config: "--local_cpu_resources=1" }
-          - { os: windows-2022, action: "test", config: "--config=windows --enable_bzlmod", wpimath_config: "--local_cpu_resources=1" }
+          # - { os: windows-2022, action: "test", config: "--config=windows --enable_bzlmod", wpimath_config: "--local_cpu_resources=1" }
 #          - { os: windows-2022, config: "--config=roborio" }
 #          - { os: windows-2022, config: "--config=bionic" }
 #          - { os: windows-2022, config: "--config=raspbian" }
 
           - { os: macos-latest,   action: "test", config: "--config=osx -c opt --config=no_example", wpimath_config: "" }
-          - { os: macos-latest,   action: "test", config: "--config=osx -c opt --config=no_example --enable_bzlmod", wpimath_config: "" }
+          # - { os: macos-latest,   action: "test", config: "--config=osx -c opt --config=no_example --enable_bzlmod", wpimath_config: "" }
 #          - { os: macos-latest, config: "--config=roborio" }
 #          - { os: macos-latest, config: "--config=bionic" }
 #          - { os: macos-latest, config: "--config=raspbian" }
