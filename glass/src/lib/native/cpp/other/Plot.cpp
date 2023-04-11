@@ -368,6 +368,17 @@ PlotSeries::Action PlotSeries::EmitPlot(PlotView& view, double now, size_t i,
     ImPlot::PlotLineG(label, getter, &getterData, size + 1);
   }
 
+  //Manually generated cursor
+  ImPlotRect plotArea = ImPlot::GetPlotLimits();
+  ImPlotPoint mousePos = ImPlot::GetPlotMousePos();
+  double cursorXs[2], cursorYs[2];
+  cursorXs[0] = mousePos.x;
+  cursorXs[1] = mousePos.x;
+  cursorYs[0] = plotArea.Y.Min;
+  cursorYs[1] = plotArea.Y.Max;
+  ImPlot::PlotLine(label, cursorXs, cursorYs, 2);
+
+
   // DND source for PlotSeries
   if (ImPlot::BeginDragDropSourceItem(label)) {
     EmitDragDropPayload(view, i, plotIndex);
@@ -472,7 +483,7 @@ Plot::PlotAxis::PlotAxis(Storage& storage, int num)
       max{storage.GetDouble("max", 1)},
       lockMin{storage.GetBool("lockMin", false)},
       lockMax{storage.GetBool("lockMax", false)},
-      autoFit{storage.GetBool("autoFit", false)},
+      autoFit{storage.GetBool("autoFit", true)},
       logScale{storage.GetBool("logScale", false)},
       invert{storage.GetBool("invert", false)},
       opposite{storage.GetBool("opposite", num != 0)},
@@ -485,7 +496,7 @@ Plot::Plot(Storage& storage)
       m_name{storage.GetString("name")},
       m_visible{storage.GetBool("visible", true)},
       m_showPause{storage.GetBool("showPause", true)},
-      m_lockPrevX{storage.GetBool("lockPrevX", false)},
+      m_lockPrevX{storage.GetBool("lockPrevX", true)},
       m_legend{storage.GetBool("legend", true)},
       m_legendOutside{storage.GetBool("legendOutside", false)},
       m_legendHorizontal{storage.GetBool("legendHorizontal", false)},
@@ -770,7 +781,7 @@ PlotView::PlotView(PlotProvider* provider, Storage& storage)
 
 void PlotView::Display() {
   if (m_plots.empty()) {
-    if (ImGui::Button("Add plot")) {
+    if (ImGui::Button("Cat Farts")) {
       m_plotsStorage.emplace_back(std::make_unique<Storage>());
       m_plots.emplace_back(std::make_unique<Plot>(*m_plotsStorage.back()));
     }
