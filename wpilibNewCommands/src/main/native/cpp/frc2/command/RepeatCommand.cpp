@@ -39,7 +39,10 @@ bool RepeatCommand::IsFinished() {
 }
 
 void RepeatCommand::End(bool interrupted) {
-  m_command->End(interrupted);
+  if (!m_ended) {
+    m_command->End(interrupted);
+    m_ended = true;
+  }
 }
 
 bool RepeatCommand::RunsWhenDisabled() const {

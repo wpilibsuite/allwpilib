@@ -63,7 +63,10 @@ public class RepeatCommand extends CommandBase {
 
   @Override
   public void end(boolean interrupted) {
-    m_command.end(interrupted);
+    if (!m_ended) {
+      m_command.end(interrupted);
+      m_ended = true;
+    }
   }
 
   @Override
