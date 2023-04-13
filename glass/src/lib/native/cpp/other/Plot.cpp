@@ -68,7 +68,7 @@ class PlotSeries {
   DataSource* GetSource() const { return m_source; }
 
   enum Action { kNone, kMoveUp, kMoveDown, kDelete };
-  Action EmitPlot(PlotView& view, double now, size_t i, size_t plotIndex);
+  Action EmitPlot(PlotView& view, double now, size_t i, size_t plotIndex, double cursorTime=-1);
   void EmitSettings(size_t i);
   void EmitDragDropPayload(PlotView& view, size_t i, size_t plotIndex);
 
@@ -312,12 +312,8 @@ const char* PlotSeries::GetName() const {
 }
 
 PlotSeries::Action PlotSeries::EmitPlot(PlotView& view, double now, size_t i,
-                                        size_t plotIndex) {
+                                        size_t plotIndex, double cursorTime) {
   CheckSource();
-
-  char label[128];
-  std::snprintf(label, sizeof(label), "%s###name%d_%d", GetName(),
-                static_cast<int>(i), static_cast<int>(plotIndex));
 
   int size = m_size;
   int offset = m_offset;
@@ -348,6 +344,34 @@ PlotSeries::Action PlotSeries::EmitPlot(PlotView& view, double now, size_t i,
     return ImPlotPoint{point->x - d->zeroTime, point->y};
   };
 
+  // Calculate if cursor time corresponds to some index of data drawn on the screen
+  int numPoints = getterData.size;
+  int cursorIdx = -1;
+  bool validIdx = false;
+  double cursorVal = 0.0;
+
+  for(int i = 1; i < getterData.size-1; i++){
+    double prevPointTime = getterData.data[i-1].x - getterData.zeroTime;
+    double nextPointTime = getterData.data[i+1].x - getterData.zeroTime;
+    if(cursorTime > prevPointTime && cursorTime < nextPointTime){
+      validIdx = true;
+      cursorIdx = i;
+    }
+  }
+
+  // Handle plot name (which includes value if cursor time is on the plot)
+  char label[128];
+  if(validIdx){
+    cursorVal = getter(cursorIdx, &getterData).y;
+    std::snprintf(label, sizeof(label), "%s %lg###name%d_%d", GetName(), static_cast<double>(cursorVal),
+                  static_cast<int>(i), static_cast<int>(plotIndex));
+  } else {
+    std::snprintf(label, sizeof(label), "%s###name%d_%d", GetName(),
+                  static_cast<int>(i), static_cast<int>(plotIndex));
+  }
+
+
+  // Generate Plot
   if (m_color.GetColorFloat()[3] == IMPLOT_AUTO) {
     SetColor(ImPlot::GetColormapColor(i));
   }
@@ -367,16 +391,6 @@ PlotSeries::Action PlotSeries::EmitPlot(PlotView& view, double now, size_t i,
     ImPlot::SetNextMarkerStyle(m_marker.GetValue() - 1);
     ImPlot::PlotLineG(label, getter, &getterData, size + 1);
   }
-
-  //Manually generated cursor
-  ImPlotRect plotArea = ImPlot::GetPlotLimits();
-  ImPlotPoint mousePos = ImPlot::GetPlotMousePos();
-  double cursorXs[2], cursorYs[2];
-  cursorXs[0] = mousePos.x;
-  cursorXs[1] = mousePos.x;
-  cursorYs[0] = plotArea.Y.Min;
-  cursorYs[1] = plotArea.Y.Max;
-  ImPlot::PlotLine(label, cursorXs, cursorYs, 2);
 
 
   // DND source for PlotSeries
@@ -641,8 +655,26 @@ void Plot::EmitPlot(PlotView& view, double now, bool paused, size_t i) {
 
     ImPlot::SetupFinish();
 
+    
+
+
     for (size_t j = 0; j < m_series.size(); ++j) {
-      switch (m_series[j]->EmitPlot(view, now, j, i)) {
+
+      //Manually generated cursor
+      ImPlotRect plotArea = ImPlot::GetPlotLimits();
+      ImPlotPoint mousePos = ImPlot::GetPlotMousePos();
+      if(mousePos.x > plotArea.X.Min && mousePos.x < plotArea.X.Max){
+        double cursorXs[2], cursorYs[2];
+        cursorXs[0] = mousePos.x;
+        cursorXs[1] = mousePos.x;
+        cursorYs[0] = plotArea.Y.Min;
+        cursorYs[1] = plotArea.Y.Max;
+        ImPlot::PushStyleColor(ImPlotCol_Line, ImVec4(1.0f, 1.0f, 0.0f, 1.0f));
+        ImPlot::PlotLine("Cursor", cursorXs, cursorYs, 2, ImPlotItemFlags_NoLegend);
+        ImPlot::PopStyleColor();
+      }
+
+      switch (m_series[j]->EmitPlot(view, now, j, i, mousePos.x)) {
         case PlotSeries::kMoveUp:
           if (j > 0) {
             std::swap(m_seriesStorage[j - 1], m_seriesStorage[j]);
