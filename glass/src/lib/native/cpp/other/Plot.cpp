@@ -204,7 +204,7 @@ PlotSeries::PlotSeries(Storage& storage)
       m_yAxis{storage.GetInt("yAxis", 0)},
       m_color{storage.GetFloatArray("color", kDefaultColor)},
       m_marker{storage.GetString("marker"),
-               0,
+               3,
                {"None", "Circle", "Square", "Diamond", "Up", "Down", "Left",
                 "Right", "Cross", "Plus", "Asterisk"}},
       m_weight{storage.GetFloat("weight", IMPLOT_AUTO)},
@@ -388,7 +388,12 @@ PlotSeries::Action PlotSeries::EmitPlot(PlotView& view, double now, size_t i,
     } else {
       ImPlot::SetAxis(ImAxis_Y1);
     }
-    ImPlot::SetNextMarkerStyle(m_marker.GetValue() - 1);
+    ImPlotRect plotArea = ImPlot::GetPlotLimits();
+    if(plotArea.Size().x > 5.0 ){
+      ImPlot::SetNextMarkerStyle(-1); //disable markers to prevent clutter
+    } else {
+      ImPlot::SetNextMarkerStyle(m_marker.GetValue() - 1);
+    }
     ImPlot::PlotLineG(label, getter, &getterData, size + 1);
   }
 
