@@ -14,7 +14,7 @@ class RepeatCommandTest extends CommandTestBase
     implements SingleCompositionTestBase<RepeatCommand> {
   @Test
   void callsMethodsCorrectly() {
-    try (CommandScheduler scheduler = CommandScheduler.getInstance()) {
+    try (CommandScheduler scheduler = new CommandScheduler()) {
       var initCounter = new AtomicInteger(0);
       var exeCounter = new AtomicInteger(0);
       var isFinishedCounter = new AtomicInteger(0);
