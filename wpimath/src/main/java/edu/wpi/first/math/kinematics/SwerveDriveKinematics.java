@@ -233,7 +233,11 @@ public class SwerveDriveKinematics {
    */
   public static void desaturateWheelSpeeds(
       SwerveModuleState[] moduleStates, double attainableMaxSpeedMetersPerSecond) {
-    double realMaxSpeed = Collections.max(Arrays.asList(moduleStates)).speedMetersPerSecond;
+    Double[] absoluteModuleSpeeds = new Double[moduleStates.length];
+    for (int i = 0; i < absoluteModuleSpeeds.length; i++) {
+      absoluteModuleSpeeds[i] = Math.abs(moduleStates[i].speedMetersPerSecond);
+    }
+    double realMaxSpeed = Collections.max(Arrays.asList(absoluteModuleSpeeds));
     if (realMaxSpeed > attainableMaxSpeedMetersPerSecond) {
       for (SwerveModuleState moduleState : moduleStates) {
         moduleState.speedMetersPerSecond =
@@ -266,7 +270,11 @@ public class SwerveDriveKinematics {
       double attainableMaxModuleSpeedMetersPerSecond,
       double attainableMaxTranslationalSpeedMetersPerSecond,
       double attainableMaxRotationalVelocityRadiansPerSecond) {
-    double realMaxSpeed = Collections.max(Arrays.asList(moduleStates)).speedMetersPerSecond;
+    Double[] absoluteModuleSpeeds = new Double[moduleStates.length];
+    for (int i = 0; i < absoluteModuleSpeeds.length; i++) {
+      absoluteModuleSpeeds[i] = Math.abs(moduleStates[i].speedMetersPerSecond);
+    }
+    double realMaxSpeed = Collections.max(Arrays.asList(absoluteModuleSpeeds));
 
     if (attainableMaxTranslationalSpeedMetersPerSecond == 0
         || attainableMaxRotationalVelocityRadiansPerSecond == 0

@@ -371,4 +371,21 @@ class SwerveDriveKinematicsTest {
         () -> assertEquals(4.0 * factor, arr[2].speedMetersPerSecond, kEpsilon),
         () -> assertEquals(7.0 * factor, arr[3].speedMetersPerSecond, kEpsilon));
   }
+
+  @Test
+  void testDesaturateNegativeSpeed() {
+    SwerveModuleState fl = new SwerveModuleState(1, new Rotation2d());
+    SwerveModuleState fr = new SwerveModuleState(1, new Rotation2d());
+    SwerveModuleState bl = new SwerveModuleState(-2, new Rotation2d());
+    SwerveModuleState br = new SwerveModuleState(-2, new Rotation2d());
+
+    SwerveModuleState[] arr = { fl, fr, bl, br };
+    SwerveDriveKinematics.desaturateWheelSpeeds(arr, 1);
+
+    assertAll(
+        () -> assertEquals(0.5, arr[0].speedMetersPerSecond, kEpsilon),
+        () -> assertEquals(0.5, arr[1].speedMetersPerSecond, kEpsilon),
+        () -> assertEquals(-1.0, arr[2].speedMetersPerSecond, kEpsilon),
+        () -> assertEquals(-1.0, arr[3].speedMetersPerSecond, kEpsilon));
+  }
 }
