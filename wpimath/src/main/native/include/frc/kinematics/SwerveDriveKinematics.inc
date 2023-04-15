@@ -134,12 +134,13 @@ void SwerveDriveKinematics<NumModules>::DesaturateWheelSpeeds(
     wpi::array<SwerveModuleState, NumModules>* moduleStates,
     units::meters_per_second_t attainableMaxSpeed) {
   auto& states = *moduleStates;
-  auto realMaxSpeed = std::max_element(states.begin(), states.end(),
-                                       [](const auto& a, const auto& b) {
-                                         return units::math::abs(a.speed) <
-                                                units::math::abs(b.speed);
-                                       })
-                          ->speed;
+  auto realMaxSpeed =
+      units::math::abs(std::max_element(states.begin(), states.end(),
+                                        [](const auto& a, const auto& b) {
+                                          return units::math::abs(a.speed) <
+                                                 units::math::abs(b.speed);
+                                        })
+                           ->speed);
 
   if (realMaxSpeed > attainableMaxSpeed) {
     for (auto& module : states) {
@@ -157,12 +158,13 @@ void SwerveDriveKinematics<NumModules>::DesaturateWheelSpeeds(
     units::radians_per_second_t attainableMaxRobotRotationSpeed) {
   auto& states = *moduleStates;
 
-  auto realMaxSpeed = std::max_element(states.begin(), states.end(),
-                                       [](const auto& a, const auto& b) {
-                                         return units::math::abs(a.speed) <
-                                                units::math::abs(b.speed);
-                                       })
-                          ->speed;
+  auto realMaxSpeed =
+      units::math::abs(std::max_element(states.begin(), states.end(),
+                                        [](const auto& a, const auto& b) {
+                                          return units::math::abs(a.speed) <
+                                                 units::math::abs(b.speed);
+                                        })
+                           ->speed);
 
   if (attainableMaxRobotTranslationSpeed == 0_mps ||
       attainableMaxRobotRotationSpeed == 0_rad_per_s || realMaxSpeed == 0_mps) {
