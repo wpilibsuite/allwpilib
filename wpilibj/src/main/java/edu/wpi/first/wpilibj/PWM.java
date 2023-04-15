@@ -140,8 +140,7 @@ public class PWM implements Sendable, AutoCloseable {
    * <p>This is intended to be used by servos.
    *
    * @param pos The position to set the servo between 0.0 and 1.0.
-   * @pre SetMaxPositivePwm() called.
-   * @pre SetMinNegativePwm() called.
+   * @pre setBounds() called.
    */
   public void setPosition(double pos) {
     PWMJNI.setPWMPosition(m_handle, pos);
@@ -153,8 +152,7 @@ public class PWM implements Sendable, AutoCloseable {
    * <p>This is intended to be used by servos.
    *
    * @return The position the servo is set to between 0.0 and 1.0.
-   * @pre SetMaxPositivePwm() called.
-   * @pre SetMinNegativePwm() called.
+   * @pre setBounds() called.
    */
   public double getPosition() {
     return PWMJNI.getPWMPosition(m_handle);
@@ -166,11 +164,7 @@ public class PWM implements Sendable, AutoCloseable {
    * <p>This is intended to be used by motor controllers.
    *
    * @param speed The speed to set the motor controller between -1.0 and 1.0.
-   * @pre SetMaxPositivePwm() called.
-   * @pre SetMinPositivePwm() called.
-   * @pre SetCenterPwm() called.
-   * @pre SetMaxNegativePwm() called.
-   * @pre SetMinNegativePwm() called.
+   * @pre setBounds() called.
    */
   public void setSpeed(double speed) {
     PWMJNI.setPWMSpeed(m_handle, speed);
@@ -182,10 +176,7 @@ public class PWM implements Sendable, AutoCloseable {
    * <p>This is intended to be used by motor controllers.
    *
    * @return The most recently set speed between -1.0 and 1.0.
-   * @pre SetMaxPositivePwm() called.
-   * @pre SetMinPositivePwm() called.
-   * @pre SetMaxNegativePwm() called.
-   * @pre SetMinNegativePwm() called.
+   * @pre setBounds() called.
    */
   public double getSpeed() {
     return PWMJNI.getPWMSpeed(m_handle);
