@@ -71,7 +71,7 @@ class RepeatCommandTest extends CommandTestBase
       assertEquals(4, isFinishedCounter.get());
       assertEquals(2, endCounter.get());
 
-      command.cancel();
+      scheduler.cancel(command);
       assertEquals(2, initCounter.get());
       assertEquals(4, exeCounter.get());
       assertEquals(4, isFinishedCounter.get());
