@@ -17,7 +17,10 @@
 namespace frc {
 
 /**
- * A class for driving addressable LEDs, such as WS2812s and NeoPixels.
+ * A class for driving addressable LEDs, such as WS2812Bs and NeoPixels.
+ *
+ * By default, the timing supports WS2812B LEDs, but is configurable using
+ * SetBitTiming()
  *
  * <p>Only 1 LED driver is currently supported by the roboRIO.
  */
@@ -122,13 +125,13 @@ class AddressableLED {
   /**
    * Sets the bit timing.
    *
-   * <p>By default, the driver is set up to drive WS2812s, so nothing needs to
+   * <p>By default, the driver is set up to drive WS2812Bs, so nothing needs to
    * be set for those.
    *
-   * @param lowTime0 low time for 0 bit
-   * @param highTime0 high time for 0 bit
-   * @param lowTime1 low time for 1 bit
-   * @param highTime1 high time for 1 bit
+   * @param lowTime0 low time for 0 bit (default 400ns)
+   * @param highTime0 high time for 0 bit (default 900ns)
+   * @param lowTime1 low time for 1 bit (default 900ns)
+   * @param highTime1 high time for 1 bit (default 600ns)
    */
   void SetBitTiming(units::nanosecond_t lowTime0, units::nanosecond_t highTime0,
                     units::nanosecond_t lowTime1,
@@ -138,7 +141,7 @@ class AddressableLED {
    * Sets the sync time.
    *
    * <p>The sync time is the time to hold output so LEDs enable. Default set for
-   * WS2812.
+   * WS2812B.
    *
    * @param syncTime the sync time
    */
