@@ -379,7 +379,7 @@ class SwerveDriveKinematicsTest {
     SwerveModuleState bl = new SwerveModuleState(-2, new Rotation2d());
     SwerveModuleState br = new SwerveModuleState(-2, new Rotation2d());
 
-    SwerveModuleState[] arr = { fl, fr, bl, br };
+    SwerveModuleState[] arr = {fl, fr, bl, br};
     SwerveDriveKinematics.desaturateWheelSpeeds(arr, 1);
 
     assertAll(
