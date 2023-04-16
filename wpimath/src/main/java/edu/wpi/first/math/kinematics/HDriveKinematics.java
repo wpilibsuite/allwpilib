@@ -1,5 +1,7 @@
 package edu.wpi.first.math.kinematics;
 
+import edu.wpi.first.math.MathSharedStore;
+import edu.wpi.first.math.MathUsageId;
 import edu.wpi.first.math.geometry.Twist2d;
 
 public class HDriveKinematics {
@@ -7,6 +9,7 @@ public class HDriveKinematics {
 
     public HDriveKinematics(double trackWidthMeters) {
         this.trackWidthMeters = trackWidthMeters;
+        MathSharedStore.reportUsage(MathUsageId.kKinematics_HDrive, 1);
     }
 
     public ChassisSpeeds toChassisSpeeds(HDriveWheelSpeeds wheelSpeeds){
