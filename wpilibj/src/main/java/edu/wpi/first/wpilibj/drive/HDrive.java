@@ -91,7 +91,7 @@ public class HDrive extends RobotDriveBase implements Sendable, AutoCloseable {
     if (!m_reported) {
       // TODO add HDrive reporting support instead of dif drive.
       HAL.report(
-          tResourceType.kResourceType_RobotDrive, tInstances.kRobotDrive2_DifferentialArcade, 2);
+          tResourceType.kResourceType_RobotDrive, tInstances.kRobotDrive2_HDriveArcade, 2);
       m_reported = true;
     }
 
@@ -210,7 +210,7 @@ public class HDrive extends RobotDriveBase implements Sendable, AutoCloseable {
   public void tankDrive(double leftSpeed, double rightSpeed, double ySpeed, boolean squareInputs) {
     if (!m_reported) {
       HAL.report(
-          tResourceType.kResourceType_RobotDrive, tInstances.kRobotDrive2_DifferentialTank, 2);
+          tResourceType.kResourceType_RobotDrive, tInstances.kRobotDrive2_HDriveTank, 2);
       m_reported = true;
     }
 
