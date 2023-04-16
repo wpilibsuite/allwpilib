@@ -49,7 +49,7 @@ public class HDriveOdometry {
     m_prevRightDistance = rightDistanceMeters;
     m_prevLateralDistance = lateralDistanceMeters;
 
-    MathSharedStore.reportUsage(MathUsageId.kOdometry_DifferentialDrive, 1);
+    MathSharedStore.reportUsage(MathUsageId.kOdometry_HDrive, 1);
   }
 
   /**
