@@ -9,6 +9,7 @@ public enum MathUsageId {
   kKinematics_MecanumDrive,
   kKinematics_HDrive,
   kKinematics_SwerveDrive,
+  kKinematics_HDrive,
   kTrajectory_TrapezoidProfile,
   kFilter_Linear,
   kOdometry_DifferentialDrive,

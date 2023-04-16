@@ -34,7 +34,7 @@ HDrive::HDrive(MotorController& leftMotor,
     if (!reported) {
       // TODO HDrive needs its own reporting type
       HAL_Report(HALUsageReporting::kResourceType_RobotDrive,
-                 HALUsageReporting::kRobotDrive2_DifferentialArcade, 2);
+                 HALUsageReporting::kRobotDrive2_HDriveArcade, 2);
       reported = true;
     }
 
@@ -89,7 +89,7 @@ HDrive::HDrive(MotorController& leftMotor,
     static bool reported = false;
     if (!reported) {
       HAL_Report(HALUsageReporting::kResourceType_RobotDrive,
-                 HALUsageReporting::kRobotDrive2_DifferentialTank, 2);
+                 HALUsageReporting::kRobotDrive2_HDriveTank, 2);
       reported = true;
     }
 
