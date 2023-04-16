@@ -269,11 +269,10 @@ public class SwerveDriveKinematics {
       double attainableMaxModuleSpeedMetersPerSecond,
       double attainableMaxTranslationalSpeedMetersPerSecond,
       double attainableMaxRotationalVelocityRadiansPerSecond) {
-    var absoluteModuleSpeeds = new Double[moduleStates.length];
-    for (int i = 0; i < absoluteModuleSpeeds.length; i++) {
-      absoluteModuleSpeeds[i] = Math.abs(moduleStates[i].speedMetersPerSecond);
+    double realMaxSpeed = 0;
+    for (SwerveModuleState moduleState : moduleStates) {
+      realMaxSpeed = Math.max(realMaxSpeed, Math.abs(moduleState.speedMetersPerSecond));
     }
-    double realMaxSpeed = Collections.max(Arrays.asList(absoluteModuleSpeeds));
 
     if (attainableMaxTranslationalSpeedMetersPerSecond == 0
         || attainableMaxRotationalVelocityRadiansPerSecond == 0
