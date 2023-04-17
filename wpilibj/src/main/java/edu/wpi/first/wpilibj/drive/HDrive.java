@@ -1,5 +1,7 @@
 package edu.wpi.first.wpilibj.drive;
 
+import static edu.wpi.first.util.ErrorMessages.requireNonNullParam;
+
 import edu.wpi.first.hal.FRCNetComm.tInstances;
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
@@ -8,8 +10,6 @@ import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.util.sendable.SendableRegistry;
 import edu.wpi.first.wpilibj.motorcontrol.MotorController;
-
-import static edu.wpi.first.util.ErrorMessages.requireNonNullParam;
 
 public class HDrive extends RobotDriveBase implements Sendable, AutoCloseable {
   private static int instances;
@@ -23,24 +23,21 @@ public class HDrive extends RobotDriveBase implements Sendable, AutoCloseable {
   /**
    * Construct a HDrive.
    *
-   * <p>
-   * To pass multiple motors per side, use a {@link
-   * edu.wpi.first.wpilibj.motorcontrol.MotorControllerGroup}. If a motor needs to
-   * be inverted, do
+   * <p>To pass multiple motors per side, use a {@link
+   * edu.wpi.first.wpilibj.motorcontrol.MotorControllerGroup}. If a motor needs to be inverted, do
    * so before passing it in.
    *
-   * @param leftMotor  Left motor.
+   * @param leftMotor Left motor.
    * @param rightMotor Right motor.
    * @param lateralMotor Lateral motor.
-   *
-   * <p>Inputs smaller then {@value edu.wpi.first.wpilibj.drive.RobotDriveBase#kDefaultDeadband} will
-   * be set to 0, and larger values will be scaled so that the full range is still used. This deadband
-   * value can be changed with {@link #setDeadband}.
-   *
-   * <p>{@link edu.wpi.first.wpilibj.MotorSafety} is enabled by default. The tankDrive or arcadeDrive,
-   * methods should be called periodically to avoid Motor Safety timeouts.
+   *     <p>Inputs smaller then {@value edu.wpi.first.wpilibj.drive.RobotDriveBase#kDefaultDeadband}
+   *     will be set to 0, and larger values will be scaled so that the full range is still used.
+   *     This deadband value can be changed with {@link #setDeadband}.
+   *     <p>{@link edu.wpi.first.wpilibj.MotorSafety} is enabled by default. The tankDrive or
+   *     arcadeDrive, methods should be called periodically to avoid Motor Safety timeouts.
    */
-  public HDrive(MotorController leftMotor, MotorController rightMotor, MotorController lateralMotor) {
+  public HDrive(
+      MotorController leftMotor, MotorController rightMotor, MotorController lateralMotor) {
     requireNonNullParam(leftMotor, "leftMotor", "HDrive");
     requireNonNullParam(rightMotor, "rightMotor", "HDrive");
     requireNonNullParam(lateralMotor, "lateralMotor", "HDrive");
@@ -61,15 +58,12 @@ public class HDrive extends RobotDriveBase implements Sendable, AutoCloseable {
   }
 
   /**
-   * Arcade drive method for H Drive platform. The calculated values
-   * will be squared to
-   * decrease sensitivity at low speeds.
+   * Arcade drive method for H Drive platform. The calculated values will be squared to decrease
+   * sensitivity at low speeds.
    *
-   * @param xSpeed    The robot's speed along the X axis [-1.0..1.0]. Forward is
-   *                  positive.
-   * @param zRotation The robot's rotation rate around the Z axis [-1.0..1.0].
-   *                  Counterclockwise is
-   *                  positive.
+   * @param xSpeed The robot's speed along the X axis [-1.0..1.0]. Forward is positive.
+   * @param zRotation The robot's rotation rate around the Z axis [-1.0..1.0]. Counterclockwise is
+   *     positive.
    * @param ySpeed The robot's speed along the robots lateral axis [-1.0..1.0]. Right is positive.
    */
   public void arcadeDrive(double xSpeed, double zRotation, double ySpeed) {
@@ -79,19 +73,16 @@ public class HDrive extends RobotDriveBase implements Sendable, AutoCloseable {
   /**
    * Arcade drive method for H Drive platform.
    *
-   * @param xSpeed       The robot's speed along the X axis [-1.0..1.0]. Forward
-   *                     is positive.
-   * @param zRotation    The robot's rotation rate around the Z axis [-1.0..1.0].
-   *                     Counterclockwise is
-   *                     positive.
+   * @param xSpeed The robot's speed along the X axis [-1.0..1.0]. Forward is positive.
+   * @param zRotation The robot's rotation rate around the Z axis [-1.0..1.0]. Counterclockwise is
+   *     positive.
    * @param ySpeed The robot's speed along the robots lateral axis [-1.0..1.0]. Right is positive.
    * @param squareInputs If set, decreases the input sensitivity at low speeds.
    */
   public void arcadeDrive(double xSpeed, double zRotation, double ySpeed, boolean squareInputs) {
     if (!m_reported) {
       // TODO add HDrive reporting support instead of dif drive.
-      HAL.report(
-          tResourceType.kResourceType_RobotDrive, tInstances.kRobotDrive2_HDriveArcade, 2);
+      HAL.report(tResourceType.kResourceType_RobotDrive, tInstances.kRobotDrive2_HDriveArcade, 2);
       m_reported = true;
     }
 
@@ -111,16 +102,15 @@ public class HDrive extends RobotDriveBase implements Sendable, AutoCloseable {
   /**
    * Arcade drive inverse kinematics for H Drive platform.
    *
-   * @param xSpeed       The robot's speed along the X axis [-1.0..1.0]. Forward
-   *                     is positive.
-   * @param zRotation    The robot's rotation rate around the Z axis [-1.0..1.0].
-   *                     Counterclockwise is
-   *                     positive.
+   * @param xSpeed The robot's speed along the X axis [-1.0..1.0]. Forward is positive.
+   * @param zRotation The robot's rotation rate around the Z axis [-1.0..1.0]. Counterclockwise is
+   *     positive.
    * @param ySpeed The robot's speed along the robots lateral axis [-1.0..1.0]. Right is positive.
    * @param squareInputs If set, decreases the input sensitivity at low speeds.
    * @return Wheel speeds [-1.0..1.0].
    */
-  public static WheelSpeeds arcadeDriveIK(double xSpeed, double zRotation, double ySpeed, boolean squareInputs) {
+  public static WheelSpeeds arcadeDriveIK(
+      double xSpeed, double zRotation, double ySpeed, boolean squareInputs) {
     xSpeed = MathUtil.clamp(xSpeed, -1.0, 1.0);
     zRotation = MathUtil.clamp(zRotation, -1.0, 1.0);
     ySpeed = MathUtil.clamp(ySpeed, -1.0, 1.0);
@@ -135,7 +125,6 @@ public class HDrive extends RobotDriveBase implements Sendable, AutoCloseable {
 
     double leftSpeed = xSpeed - zRotation;
     double rightSpeed = xSpeed + zRotation;
-    double lateralSpeed = ySpeed;
 
     // Find the maximum possible value of (throttle + turn + lateral) along the vector
     // that the joystick is pointing, then desaturate the wheel speeds
@@ -147,21 +136,18 @@ public class HDrive extends RobotDriveBase implements Sendable, AutoCloseable {
     double saturatedInput = (greaterInput + lesserInput) / greaterInput;
     leftSpeed /= saturatedInput;
     rightSpeed /= saturatedInput;
-    lateralSpeed /= saturatedInput;
+    ySpeed /= saturatedInput;
 
-    return new WheelSpeeds(leftSpeed, rightSpeed, lateralSpeed);
+    return new WheelSpeeds(leftSpeed, rightSpeed, ySpeed);
   }
 
   /**
-   * Tank drive method for H Drive platform. The calculated values will
-   * be squared to
-   * decrease sensitivity at low speeds.
+   * Tank drive method for H Drive platform. The calculated values will be squared to decrease
+   * sensitivity at low speeds.
    *
-   * @param leftSpeed  The robot's left side speed along the X axis [-1.0..1.0].
-   *                   Forward is positive.
-   * @param rightSpeed The robot's right side speed along the X axis [-1.0..1.0].
-   *                   Forward is
-   *                   positive.
+   * @param leftSpeed The robot's left side speed along the X axis [-1.0..1.0]. Forward is positive.
+   * @param rightSpeed The robot's right side speed along the X axis [-1.0..1.0]. Forward is
+   *     positive.
    * @param ySpeed The robot's speed along the Y axis [-1.0..1.0]. Right is positive
    */
   public void tankDrive(double leftSpeed, double rightSpeed, double ySpeed) {
@@ -169,48 +155,17 @@ public class HDrive extends RobotDriveBase implements Sendable, AutoCloseable {
   }
 
   /**
-   * Tank drive inverse kinematics for H Drive platform.
-   *
-   * @param leftSpeed    The robot left side's speed along the X axis [-1.0..1.0].
-   *                     Forward is positive.
-   * @param rightSpeed   The robot right side's speed along the X axis
-   *                     [-1.0..1.0]. Forward is
-   *                     positive.
-   * @param ySpeed The robot's speed along the Y axis [-1.0..1.0]. right is negative
-   * @param squareInputs If set, decreases the input sensitivity at low speeds.
-   * @return Wheel speeds [-1.0..1.0].
-   */
-  public static WheelSpeeds tankDriveIK(double leftSpeed, double rightSpeed, double ySpeed, boolean squareInputs) {
-    leftSpeed = MathUtil.clamp(leftSpeed, -1.0, 1.0);
-    rightSpeed = MathUtil.clamp(rightSpeed, -1.0, 1.0);
-    ySpeed = MathUtil.clamp(ySpeed, -1.0, 1.0);
-
-    // Square the inputs (while preserving the sign) to increase fine control
-    // while permitting full power.
-    if (squareInputs) {
-      leftSpeed = Math.copySign(leftSpeed * leftSpeed, leftSpeed);
-      rightSpeed = Math.copySign(rightSpeed * rightSpeed, rightSpeed);
-      ySpeed = Math.copySign(ySpeed * ySpeed, ySpeed);
-    }
-
-    return new WheelSpeeds(leftSpeed, rightSpeed, ySpeed);
-  }
-
-  /**
    * Tank drive method for H Drive platform.
    *
-   * @param leftSpeed    The robot left side's speed along the X axis [-1.0..1.0].
-   *                     Forward is positive.
-   * @param rightSpeed   The robot right side's speed along the X axis
-   *                     [-1.0..1.0]. Forward is
-   *                     positive.
+   * @param leftSpeed The robot left side's speed along the X axis [-1.0..1.0]. Forward is positive.
+   * @param rightSpeed The robot right side's speed along the X axis [-1.0..1.0]. Forward is
+   *     positive.
    * @param ySpeed The robot's speed along the Y axis [-1.0..1.0]. Right is positive
    * @param squareInputs If set, decreases the input sensitivity at low speeds.
    */
   public void tankDrive(double leftSpeed, double rightSpeed, double ySpeed, boolean squareInputs) {
     if (!m_reported) {
-      HAL.report(
-          tResourceType.kResourceType_RobotDrive, tInstances.kRobotDrive2_HDriveTank, 2);
+      HAL.report(tResourceType.kResourceType_RobotDrive, tInstances.kRobotDrive2_HDriveTank, 2);
       m_reported = true;
     }
 
@@ -224,6 +179,33 @@ public class HDrive extends RobotDriveBase implements Sendable, AutoCloseable {
     m_lateralMotor.set(speeds.lateral * m_maxOutput);
 
     feed();
+  }
+
+  /**
+   * Tank drive inverse kinematics for H Drive platform.
+   *
+   * @param leftSpeed The robot left side's speed along the X axis [-1.0..1.0]. Forward is positive.
+   * @param rightSpeed The robot right side's speed along the X axis [-1.0..1.0]. Forward is
+   *     positive.
+   * @param ySpeed The robot's speed along the Y axis [-1.0..1.0]. right is negative
+   * @param squareInputs If set, decreases the input sensitivity at low speeds.
+   * @return Wheel speeds [-1.0..1.0].
+   */
+  public static WheelSpeeds tankDriveIK(
+      double leftSpeed, double rightSpeed, double ySpeed, boolean squareInputs) {
+    leftSpeed = MathUtil.clamp(leftSpeed, -1.0, 1.0);
+    rightSpeed = MathUtil.clamp(rightSpeed, -1.0, 1.0);
+    ySpeed = MathUtil.clamp(ySpeed, -1.0, 1.0);
+
+    // Square the inputs (while preserving the sign) to increase fine control
+    // while permitting full power.
+    if (squareInputs) {
+      leftSpeed = Math.copySign(leftSpeed * leftSpeed, leftSpeed);
+      rightSpeed = Math.copySign(rightSpeed * rightSpeed, rightSpeed);
+      ySpeed = Math.copySign(ySpeed * ySpeed, ySpeed);
+    }
+
+    return new WheelSpeeds(leftSpeed, rightSpeed, ySpeed);
   }
 
   @Override
@@ -252,8 +234,7 @@ public class HDrive extends RobotDriveBase implements Sendable, AutoCloseable {
   /**
    * Wheel speeds for a H drive.
    *
-   * <p>
-   * Uses normalized voltage [-1.0..1.0].
+   * <p>Uses normalized voltage [-1.0..1.0].
    */
   @SuppressWarnings("MemberName")
   public static class WheelSpeeds {
@@ -262,13 +243,12 @@ public class HDrive extends RobotDriveBase implements Sendable, AutoCloseable {
     private double lateral;
 
     /** Constructs a WheelSpeeds with zeroes for left and right speeds. */
-    public WheelSpeeds() {
-    }
+    public WheelSpeeds() {}
 
     /**
      * Constructs a WheelSpeeds.
      *
-     * @param left  The left speed [-1.0..1.0].
+     * @param left The left speed [-1.0..1.0].
      * @param right The right speed [-1.0..1.0].
      * @param lateral The lateral wheel speed [-1.0..1.0].
      */
