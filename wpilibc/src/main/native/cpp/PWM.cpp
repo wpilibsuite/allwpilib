@@ -170,4 +170,10 @@ void PWM::InitSendable(wpi::SendableBuilder& builder) {
   builder.AddDoubleProperty(
       "Value", [=, this] { return GetRaw(); },
       [=, this](double value) { SetRaw(value); });
+  builder.AddDoubleProperty(
+      "Speed", [=, this] { return GetSpeed(); },
+      [=, this](double value) { SetSpeed(value); });
+  builder.AddDoubleProperty(
+      "Position", [=, this] { return GetPosition(); },
+      [=, this](double value) { SetPosition(value); });
 }

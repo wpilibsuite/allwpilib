@@ -261,5 +261,7 @@ public class PWM implements Sendable, AutoCloseable {
     builder.setActuator(true);
     builder.setSafeState(this::setDisabled);
     builder.addDoubleProperty("Value", this::getRaw, value -> setRaw((int) value));
+    builder.addDoubleProperty("Speed", this::getSpeed, value -> setSpeed(value));
+    builder.addDoubleProperty("Position", this::getPosition, value -> setPosition(value));
   }
 }
