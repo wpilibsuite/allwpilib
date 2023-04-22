@@ -15,14 +15,21 @@ import edu.wpi.first.util.sendable.SendableRegistry;
 /**
  * Class implements the PWM generation in the FPGA.
  *
- * <p>The values supplied as arguments for PWM outputs range from -1.0 to 1.0. They are mapped to
- * the hardware dependent values, in this case 0-2000 for the FPGA. Changes are immediately sent to
- * the FPGA, and the update occurs at the next FPGA cycle (5.005ms). There is no delay.
+ * <p>The values supplied as arguments for PWM Speed outputs range from -1.0 to 1.0 and PWM Position
+ * outputs range from 0.0 to 1.0 (for Servos). They are mapped to the hardware dependent values, in
+ * this case 0-2000 for the FPGA. Changes are immediately sent to the FPGA, and the update occurs at
+ * the next FPGA cycle (5.005ms). There is no delay.
  *
- * <p>As of revision 0.1.10 of the FPGA, the FPGA interprets the 0-2000 values as follows: - 2000 =
- * maximum pulse width - 1999 to 1001 = linear scaling from "full forward" to "center" - 1000 =
- * center value - 999 to 2 = linear scaling from "center" to "full reverse" - 1 = minimum pulse
- * width (currently .5ms) - 0 = disabled (i.e. PWM output is held low)
+ * <p>As of revision 0.1.10 of the FPGA, the FPGA interprets the 0-2000 values as follows:
+ *
+ * <ul>
+ *   <li>2000 = maximum pulse width
+ *   <li>1999 to 1001 = linear scaling from "full forward" to "center"
+ *   <li>1000 = center value
+ *   <li>999 to 2 = linear scaling from "center" to "full reverse"
+ *   <li>1 = minimum pulse width (currently .5ms)
+ *   <li>0 = disabled (i.e. PWM output is held low)
+ * </ul>
  */
 public class PWM implements Sendable, AutoCloseable {
   /** Represents the amount to multiply the minimum servo-pulse pwm period by. */
@@ -187,7 +194,8 @@ public class PWM implements Sendable, AutoCloseable {
    *
    * <p>Write a raw value to a PWM channel.
    *
-   * @param value Raw PWM value. Range 0 - 255.
+   * @param value Raw PWM value.
+   * @see PWM
    */
   public void setRaw(int value) {
     PWMJNI.setPWMRaw(m_handle, (short) value);
@@ -198,7 +206,8 @@ public class PWM implements Sendable, AutoCloseable {
    *
    * <p>Read a raw value from a PWM channel.
    *
-   * @return Raw PWM control value. Range: 0 - 255.
+   * @return Raw PWM control value.
+   * @see PWM
    */
   public int getRaw() {
     return PWMJNI.getPWMRaw(m_handle);

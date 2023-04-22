@@ -17,7 +17,8 @@ class DMA;
 /**
  * Class implements the PWM generation in the FPGA.
  *
- * The values supplied as arguments for PWM outputs range from -1.0 to 1.0. They
+ * The values supplied as arguments for PWM Speed outputs range from -1.0 to
+ * 1.0 and PWM Position outputs range from 0.0 to 1.0 (for Servos). They
  * are mapped to the hardware dependent values, in this case 0-2000 for the
  * FPGA. Changes are immediately sent to the FPGA, and the update occurs at the
  * next FPGA cycle (5.005ms). There is no delay.
@@ -83,6 +84,7 @@ class PWM : public wpi::Sendable, public wpi::SendableHelper<PWM> {
    * Write a raw value to a PWM channel.
    *
    * @param value Raw PWM value.
+   * @see PWM
    */
   virtual void SetRaw(uint16_t value);
 
@@ -92,6 +94,7 @@ class PWM : public wpi::Sendable, public wpi::SendableHelper<PWM> {
    * Read a raw value from a PWM channel.
    *
    * @return Raw PWM control value.
+   * @see PWM
    */
   virtual uint16_t GetRaw() const;
 
