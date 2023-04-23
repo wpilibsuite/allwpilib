@@ -6,6 +6,8 @@
 
 #include "frc/PWM.h"
 
+#include <units/angle.h>
+
 namespace frc {
 
 /**
@@ -67,7 +69,7 @@ class Servo : public PWM {
    *
    * @param angle The angle in degrees to set the servo.
    */
-  void SetAngle(double angle);
+  void SetAngle(units::degree_t angle);
 
   /**
    * Get the servo angle.
@@ -77,32 +79,32 @@ class Servo : public PWM {
    *
    * @return The angle in degrees to which the servo is set.
    */
-  double GetAngle() const;
+  units::degree_t GetAngle() const;
 
   /**
    * Get the maximum angle of the servo.
    *
    * @return The maximum angle of the servo in degrees.
    */
-  double GetMaxAngle() const;
+  units::degree_t GetMaxAngle() const;
 
   /**
    * Get the minimum angle of the servo.
    *
    * @return The minimum angle of the servo in degrees.
    */
-  double GetMinAngle() const;
+  units::degree_t GetMinAngle() const;
 
   void InitSendable(wpi::SendableBuilder& builder) override;
 
  private:
-  double GetServoAngleRange() const;
+  units::degree_t GetServoAngleRange() const;
 
-  static constexpr double kMaxServoAngle = 180.0;
-  static constexpr double kMinServoAngle = 0.0;
+  static constexpr units::degree_t kMaxServoAngle = 180.0_deg;
+  static constexpr units::degree_t kMinServoAngle = 0.0_deg;
 
-  static constexpr double kDefaultMaxServoPWM = 2.4;
-  static constexpr double kDefaultMinServoPWM = 0.6;
+  static constexpr units::millisecond_t kDefaultMaxServoPWM = 2.4_ms;
+  static constexpr units::millisecond_t kDefaultMinServoPWM = 0.6_ms;
 };
 
 }  // namespace frc

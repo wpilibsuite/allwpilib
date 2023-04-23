@@ -121,8 +121,8 @@ public class PWM implements Sendable, AutoCloseable {
    *
    * @return The bounds on the PWM pulse widths.
    */
-  public PWMConfigDataResult getRawBounds() {
-    return PWMJNI.getPWMConfigRaw(m_handle);
+  public PWMConfigDataResult getBounds() {
+    return PWMJNI.getPWMConfig(m_handle);
   }
 
   /**
@@ -194,12 +194,12 @@ public class PWM implements Sendable, AutoCloseable {
   /**
    * Set the PWM value directly to the hardware.
    *
-   * <p>Write a raw value to a PWM channel.
+   * <p>Write a millisecond pulse value to a PWM channel.
    *
-   * @param value Raw PWM value. Range 0 - 255.
+   * @param millisecondPulseTime Millisecond pulse PWM value. Range 0 - 4.096.
    */
-  public void setRaw(int value) {
-    PWMJNI.setPWMRaw(m_handle, (short) value);
+  public void setPulseTimeMilliseconds(double millisecondPulseTime) {
+    PWMJNI.setPulseTimeMilliseconds(m_handle, millisecondPulseTime);
   }
 
   /**
@@ -207,10 +207,10 @@ public class PWM implements Sendable, AutoCloseable {
    *
    * <p>Read a raw value from a PWM channel.
    *
-   * @return Raw PWM control value. Range: 0 - 255.
+   * @return Millisecond pulse PWM control value. Range: 0 - 4.096.
    */
-  public int getRaw() {
-    return PWMJNI.getPWMRaw(m_handle);
+  public double getPulseTimeMilliseconds() {
+    return PWMJNI.getPulseTimeMilliseconds(m_handle);
   }
 
   /** Temporarily disables the PWM output. The next set call will re-enable the output. */
@@ -246,6 +246,11 @@ public class PWM implements Sendable, AutoCloseable {
     PWMJNI.latchPWMZero(m_handle);
   }
 
+  /** Sets the PWM output to be a continous high signal while enabled. */
+  public void setAlwaysHighMode() {
+    PWMJNI.setAlwaysHighMode(m_handle);
+  }
+
   /**
    * Get the underlying handle.
    *
@@ -260,6 +265,7 @@ public class PWM implements Sendable, AutoCloseable {
     builder.setSmartDashboardType("PWM");
     builder.setActuator(true);
     builder.setSafeState(this::setDisabled);
-    builder.addDoubleProperty("Value", this::getRaw, value -> setRaw((int) value));
+    builder.addDoubleProperty(
+        "Value", this::getPulseTimeMilliseconds, value -> setPulseTimeMilliseconds(value));
   }
 }

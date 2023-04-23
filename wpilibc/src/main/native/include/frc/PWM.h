@@ -7,6 +7,7 @@
 #include <stdint.h>
 
 #include <hal/Types.h>
+#include <units/time.h>
 #include <wpi/sendable/Sendable.h>
 #include <wpi/sendable/SendableHelper.h>
 
@@ -78,22 +79,22 @@ class PWM : public wpi::Sendable, public wpi::SendableHelper<PWM> {
   PWM& operator=(PWM&&) = default;
 
   /**
-   * Set the PWM value directly to the hardware.
+   * Set the PWM pulse time directly to the hardware.
    *
-   * Write a raw value to a PWM channel.
+   * Write a millisecond value to a PWM channel.
    *
-   * @param value Raw PWM value.
+   * @param time Millisecond PWM value.
    */
-  virtual void SetRaw(uint16_t value);
+  virtual void SetPulseTime(units::millisecond_t time);
 
   /**
-   * Get the PWM value directly from the hardware.
+   * Get the PWM pulse time directly from the hardware.
    *
-   * Read a raw value from a PWM channel.
+   * Read a millisecond value from a PWM channel.
    *
-   * @return Raw PWM control value.
+   * @return Millisond PWM control value.
    */
-  virtual uint16_t GetRaw() const;
+  virtual units::millisecond_t GetPulseTime() const;
 
   /**
    * Set the PWM value based on a position.
@@ -186,24 +187,9 @@ class PWM : public wpi::Sendable, public wpi::SendableHelper<PWM> {
    * @param deadbandMin The low end of the deadband pulse width in ms
    * @param min         The minimum pulse width in ms
    */
-  void SetBounds(double max, double deadbandMax, double center,
-                 double deadbandMin, double min);
-
-  /**
-   * Set the bounds on the PWM values.
-   *
-   * This sets the bounds on the PWM values for a particular each type of
-   * controller. The values determine the upper and lower speeds as well as the
-   * deadband bracket.
-   *
-   * @param max         The Minimum pwm value
-   * @param deadbandMax The high end of the deadband range
-   * @param center      The center speed (off)
-   * @param deadbandMin The low end of the deadband range
-   * @param min         The minimum pwm value
-   */
-  void SetRawBounds(int max, int deadbandMax, int center, int deadbandMin,
-                    int min);
+  void SetBounds(units::millisecond_t max, units::millisecond_t deadbandMax,
+                 units::millisecond_t center, units::millisecond_t deadbandMin,
+                 units::millisecond_t min);
 
   /**
    * Get the bounds on the PWM values.
@@ -218,8 +204,15 @@ class PWM : public wpi::Sendable, public wpi::SendableHelper<PWM> {
    * @param deadbandMin The low end of the deadband range
    * @param min         The minimum pwm value
    */
-  void GetRawBounds(int32_t* max, int32_t* deadbandMax, int32_t* center,
-                    int32_t* deadbandMin, int32_t* min);
+  void GetBounds(units::millisecond_t* max, units::millisecond_t* deadbandMax,
+                 units::millisecond_t* center,
+                 units::millisecond_t* deadbandMin, units::millisecond_t* min);
+
+  /**
+   * Sets the PWM output to be a continous high signal while enabled.
+   *
+   */
+  void SetAlwaysHighMode();
 
   int GetChannel() const;
 

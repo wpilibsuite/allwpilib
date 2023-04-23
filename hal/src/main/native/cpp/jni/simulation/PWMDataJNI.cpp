@@ -64,52 +64,52 @@ Java_edu_wpi_first_hal_simulation_PWMDataJNI_setInitialized
 
 /*
  * Class:     edu_wpi_first_hal_simulation_PWMDataJNI
- * Method:    registerRawValueCallback
+ * Method:    registerPulseMillisecondValueCallback
  * Signature: (ILjava/lang/Object;Z)I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_first_hal_simulation_PWMDataJNI_registerRawValueCallback
+Java_edu_wpi_first_hal_simulation_PWMDataJNI_registerPulseMillisecondValueCallback
   (JNIEnv* env, jclass, jint index, jobject callback, jboolean initialNotify)
 {
   return sim::AllocateCallback(env, index, callback, initialNotify,
-                               &HALSIM_RegisterPWMRawValueCallback);
+                               &HALSIM_RegisterPWMPulseMillisecondValueCallback);
 }
 
 /*
  * Class:     edu_wpi_first_hal_simulation_PWMDataJNI
- * Method:    cancelRawValueCallback
+ * Method:    cancelPulseMillisecondValueCallback
  * Signature: (II)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_hal_simulation_PWMDataJNI_cancelRawValueCallback
+Java_edu_wpi_first_hal_simulation_PWMDataJNI_cancelPulseMillisecondValueCallback
   (JNIEnv* env, jclass, jint index, jint handle)
 {
   return sim::FreeCallback(env, handle, index,
-                           &HALSIM_CancelPWMRawValueCallback);
+                           &HALSIM_CancelPWMPulseMillisecondValueCallback);
 }
 
 /*
  * Class:     edu_wpi_first_hal_simulation_PWMDataJNI
- * Method:    getRawValue
- * Signature: (I)I
+ * Method:    getPulseMillisecondValue
+ * Signature: (I)D
  */
-JNIEXPORT jint JNICALL
-Java_edu_wpi_first_hal_simulation_PWMDataJNI_getRawValue
+JNIEXPORT jdouble JNICALL
+Java_edu_wpi_first_hal_simulation_PWMDataJNI_getPulseMillisecondValue
   (JNIEnv*, jclass, jint index)
 {
-  return HALSIM_GetPWMRawValue(index);
+  return HALSIM_GetPWMPulseMillisecondValue(index);
 }
 
 /*
  * Class:     edu_wpi_first_hal_simulation_PWMDataJNI
- * Method:    setRawValue
- * Signature: (II)V
+ * Method:    setPulseMillisecondValue
+ * Signature: (ID)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_hal_simulation_PWMDataJNI_setRawValue
-  (JNIEnv*, jclass, jint index, jint value)
+Java_edu_wpi_first_hal_simulation_PWMDataJNI_setPulseMillisecondValue
+  (JNIEnv*, jclass, jint index, jdouble value)
 {
-  HALSIM_SetPWMRawValue(index, value);
+  HALSIM_SetPWMPulseMillisecondValue(index, value);
 }
 
 /*

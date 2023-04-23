@@ -234,15 +234,15 @@ void ThrowBoundaryException(JNIEnv* env, double value, double lower,
   env->Throw(static_cast<jthrowable>(ex));
 }
 
-jobject CreatePWMConfigDataResult(JNIEnv* env, int32_t maxPwm,
-                                  int32_t deadbandMaxPwm, int32_t centerPwm,
-                                  int32_t deadbandMinPwm, int32_t minPwm) {
+jobject CreatePWMConfigDataResult(JNIEnv* env, double maxPwm,
+                                  double deadbandMaxPwm, double centerPwm,
+                                  double deadbandMinPwm, double minPwm) {
   static jmethodID constructor =
-      env->GetMethodID(pwmConfigDataResultCls, "<init>", "(IIIII)V");
+      env->GetMethodID(pwmConfigDataResultCls, "<init>", "(DDDDD)V");
   return env->NewObject(
-      pwmConfigDataResultCls, constructor, static_cast<jint>(maxPwm),
-      static_cast<jint>(deadbandMaxPwm), static_cast<jint>(centerPwm),
-      static_cast<jint>(deadbandMinPwm), static_cast<jint>(minPwm));
+      pwmConfigDataResultCls, constructor, static_cast<jdouble>(maxPwm),
+      static_cast<jdouble>(deadbandMaxPwm), static_cast<jdouble>(centerPwm),
+      static_cast<jdouble>(deadbandMinPwm), static_cast<jdouble>(minPwm));
 }
 
 jobject CreateREVPHVersion(JNIEnv* env, uint32_t firmwareMajor,

@@ -10,15 +10,15 @@
 
 using namespace frc;
 
-constexpr double Servo::kMaxServoAngle;
-constexpr double Servo::kMinServoAngle;
+constexpr units::degree_t Servo::kMaxServoAngle;
+constexpr units::degree_t Servo::kMinServoAngle;
 
-constexpr double Servo::kDefaultMaxServoPWM;
-constexpr double Servo::kDefaultMinServoPWM;
+constexpr units::millisecond_t Servo::kDefaultMaxServoPWM;
+constexpr units::millisecond_t Servo::kDefaultMinServoPWM;
 
 Servo::Servo(int channel) : PWM(channel) {
   // Set minimum and maximum PWM values supported by the servo
-  SetBounds(kDefaultMaxServoPWM, 0.0, 0.0, 0.0, kDefaultMinServoPWM);
+  SetBounds(kDefaultMaxServoPWM, 0.0_ms, 0.0_ms, 0.0_ms, kDefaultMinServoPWM);
 
   // Assign defaults for period multiplier for the servo PWM control signal
   SetPeriodMultiplier(kPeriodMultiplier_4X);
@@ -32,14 +32,14 @@ void Servo::Set(double value) {
 }
 
 void Servo::SetOffline() {
-  SetRaw(0);
+  SetDisabled();
 }
 
 double Servo::Get() const {
   return GetPosition();
 }
 
-void Servo::SetAngle(double degrees) {
+void Servo::SetAngle(units::degree_t degrees) {
   if (degrees < kMinServoAngle) {
     degrees = kMinServoAngle;
   } else if (degrees > kMaxServoAngle) {
@@ -49,15 +49,15 @@ void Servo::SetAngle(double degrees) {
   SetPosition((degrees - kMinServoAngle) / GetServoAngleRange());
 }
 
-double Servo::GetAngle() const {
+units::degree_t Servo::GetAngle() const {
   return GetPosition() * GetServoAngleRange() + kMinServoAngle;
 }
 
-double Servo::GetMaxAngle() const {
+units::degree_t Servo::GetMaxAngle() const {
   return kMaxServoAngle;
 }
 
-double Servo::GetMinAngle() const {
+units::degree_t Servo::GetMinAngle() const {
   return kMinServoAngle;
 }
 
@@ -68,6 +68,6 @@ void Servo::InitSendable(wpi::SendableBuilder& builder) {
       [=, this](double value) { Set(value); });
 }
 
-double Servo::GetServoAngleRange() const {
+units::degree_t Servo::GetServoAngleRange() const {
   return kMaxServoAngle - kMinServoAngle;
 }

@@ -54,18 +54,18 @@ PWM::~PWM() {
   FRC_ReportError(status, "Channel {}", m_channel);
 }
 
-void PWM::SetRaw(uint16_t value) {
+void PWM::SetPulseTime(units::millisecond_t time) {
   int32_t status = 0;
-  HAL_SetPWMRaw(m_handle, value, &status);
+  HAL_SetPWMPulseTime(m_handle, time.value(), &status);
   FRC_CheckErrorStatus(status, "Channel {}", m_channel);
 }
 
-uint16_t PWM::GetRaw() const {
+units::millisecond_t PWM::GetPulseTime() const {
   int32_t status = 0;
-  uint16_t value = HAL_GetPWMRaw(m_handle, &status);
+  double value = HAL_GetPWMPulseTime(m_handle, &status);
   FRC_CheckErrorStatus(status, "Channel {}", m_channel);
 
-  return value;
+  return units::millisecond_t{value};
 }
 
 void PWM::SetPosition(double pos) {
@@ -135,27 +135,36 @@ void PWM::EnableDeadbandElimination(bool eliminateDeadband) {
   FRC_CheckErrorStatus(status, "Channel {}", m_channel);
 }
 
-void PWM::SetBounds(double max, double deadbandMax, double center,
-                    double deadbandMin, double min) {
+void PWM::SetBounds(units::millisecond_t max, units::millisecond_t deadbandMax,
+                    units::millisecond_t center,
+                    units::millisecond_t deadbandMin,
+                    units::millisecond_t min) {
   int32_t status = 0;
-  HAL_SetPWMConfig(m_handle, max, deadbandMax, center, deadbandMin, min,
-                   &status);
+  HAL_SetPWMConfig(m_handle, max.value(), deadbandMax.value(), center.value(),
+                   deadbandMin.value(), min.value(), &status);
   FRC_CheckErrorStatus(status, "Channel {}", m_channel);
 }
 
-void PWM::SetRawBounds(int max, int deadbandMax, int center, int deadbandMin,
-                       int min) {
+void PWM::GetBounds(units::millisecond_t* max,
+                    units::millisecond_t* deadbandMax,
+                    units::millisecond_t* center,
+                    units::millisecond_t* deadbandMin,
+                    units::millisecond_t* min) {
   int32_t status = 0;
-  HAL_SetPWMConfigRaw(m_handle, max, deadbandMax, center, deadbandMin, min,
-                      &status);
+  double rawMax, rawDeadbandMax, rawCenter, rawDeadbandMin, rawMin;
+  HAL_GetPWMConfig(m_handle, &rawMax, &rawDeadbandMax, &rawCenter,
+                   &rawDeadbandMin, &rawMin, &status);
+  *max = units::millisecond_t{rawMax};
+  *deadbandMax = units::millisecond_t{rawDeadbandMax};
+  *center = units::millisecond_t{rawCenter};
+  *deadbandMin = units::millisecond_t{rawDeadbandMin};
+  *min = units::millisecond_t{rawMin};
   FRC_CheckErrorStatus(status, "Channel {}", m_channel);
 }
 
-void PWM::GetRawBounds(int* max, int* deadbandMax, int* center,
-                       int* deadbandMin, int* min) {
+void PWM::SetAlwaysHighMode() {
   int32_t status = 0;
-  HAL_GetPWMConfigRaw(m_handle, max, deadbandMax, center, deadbandMin, min,
-                      &status);
+  HAL_SetPWMAlwaysHighMode(m_handle, &status);
   FRC_CheckErrorStatus(status, "Channel {}", m_channel);
 }
 
@@ -168,6 +177,6 @@ void PWM::InitSendable(wpi::SendableBuilder& builder) {
   builder.SetActuator(true);
   builder.SetSafeState([=, this] { SetDisabled(); });
   builder.AddDoubleProperty(
-      "Value", [=, this] { return GetRaw(); },
-      [=, this](double value) { SetRaw(value); });
+      "Value", [=, this] { return GetPulseTime().value(); },
+      [=, this](double value) { SetPulseTime(units::millisecond_t{value}); });
 }

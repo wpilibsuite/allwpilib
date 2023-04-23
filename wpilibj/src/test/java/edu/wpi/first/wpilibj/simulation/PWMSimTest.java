@@ -42,13 +42,13 @@ class PWMSimTest {
 
     IntCallback callback = new IntCallback();
 
-    try (CallbackStore cb = sim.registerRawValueCallback(callback, false);
+    try (CallbackStore cb = sim.registerPulseMillisecondValueCallback(callback, false);
         PWM pwm = new PWM(0)) {
-      sim.setRawValue(229);
-      assertEquals(229, sim.getRawValue());
-      assertEquals(229, pwm.getRaw());
+      sim.setPulseMillisecondValue(2.29);
+      assertEquals(2.29, sim.getPulseMillisecondValue(), 0.001);
+      assertEquals(2.29, pwm.getPulseTimeMilliseconds(), 0.001);
       assertTrue(callback.wasTriggered());
-      assertEquals(229, callback.getSetValue());
+      assertEquals(2.29, callback.getSetValue(), 0.001);
     }
   }
 

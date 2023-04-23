@@ -20,12 +20,12 @@ void HALSIM_CancelPWMInitializedCallback(int32_t index, int32_t uid);
 HAL_Bool HALSIM_GetPWMInitialized(int32_t index);
 void HALSIM_SetPWMInitialized(int32_t index, HAL_Bool initialized);
 
-int32_t HALSIM_RegisterPWMRawValueCallback(int32_t index,
+int32_t HALSIM_RegisterPWMPulseMillisecondValueCallback(int32_t index,
                                            HAL_NotifyCallback callback,
                                            void* param, HAL_Bool initialNotify);
-void HALSIM_CancelPWMRawValueCallback(int32_t index, int32_t uid);
-int32_t HALSIM_GetPWMRawValue(int32_t index);
-void HALSIM_SetPWMRawValue(int32_t index, int32_t rawValue);
+void HALSIM_CancelPWMPulseMillisecondValueCallback(int32_t index, int32_t uid);
+double HALSIM_GetPWMPulseMillisecondValue(int32_t index);
+void HALSIM_SetPWMPulseMillisecondValue(int32_t index, double rawValue);
 
 int32_t HALSIM_RegisterPWMSpeedCallback(int32_t index,
                                         HAL_NotifyCallback callback,
