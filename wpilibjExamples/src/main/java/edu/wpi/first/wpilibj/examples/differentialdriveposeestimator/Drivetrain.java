@@ -4,7 +4,7 @@
 
 package edu.wpi.first.wpilibj.examples.differentialdriveposeestimator;
 
-import edu.wpi.first.apriltag.AprilTagFields;
+import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.math.ComputerVisionUtil;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.controller.PIDController;
@@ -38,7 +38,6 @@ import edu.wpi.first.wpilibj.simulation.DifferentialDrivetrainSim;
 import edu.wpi.first.wpilibj.simulation.EncoderSim;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import java.io.IOException;
 
 /** Represents a differential drive style drivetrain. */
 public class Drivetrain {
@@ -130,13 +129,7 @@ public class Drivetrain {
 
     m_cameraToObjectEntry = cameraToObjectTopic.getEntry(m_defaultVal);
 
-    try {
-      m_objectInField =
-          AprilTagFields.k2022RapidReact.loadAprilTagLayoutField().getTagPose(0).get();
-    } catch (IOException e) {
-      e.printStackTrace();
-      throw new RuntimeException();
-    }
+    m_objectInField = AprilTagFieldLayout.load2023ChargedUpFieldLayout().getTagPose(0).get();
 
     SmartDashboard.putData("Field", m_fieldSim);
     SmartDashboard.putData("FieldEstimation", m_fieldApproximation);
