@@ -48,11 +48,11 @@ std::unique_ptr<CallbackStore> PWMSim::RegisterPulseMillisecondValueCallback(
   return store;
 }
 
-int PWMSim::GetPulseMillisecondValue() const {
+double PWMSim::GetPulseMillisecondValue() const {
   return HALSIM_GetPWMPulseMillisecondValue(m_index);
 }
 
-void PWMSim::SetPulseMillisecondValue(int rawValue) {
+void PWMSim::SetPulseMillisecondValue(double rawValue) {
   HALSIM_SetPWMPulseMillisecondValue(m_index, rawValue);
 }
 

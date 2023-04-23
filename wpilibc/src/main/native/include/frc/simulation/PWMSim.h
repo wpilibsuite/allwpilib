@@ -81,14 +81,14 @@ class PWMSim {
    *
    * @return the PWM pulse millisecond value
    */
-  int GetPulseMillisecondValue() const;
+  double GetPulseMillisecondValue() const;
 
   /**
    * Set the PWM pulse millisecond value.
    *
    * @param rawValue the PWM pulse millisecond value
    */
-  void SetPulseMillisecondValue(int rawValue);
+  void SetPulseMillisecondValue(double rawValue);
 
   /**
    * Register a callback to be run when the PWM speed changes.

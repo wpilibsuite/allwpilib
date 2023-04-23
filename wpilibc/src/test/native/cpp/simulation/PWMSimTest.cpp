@@ -33,15 +33,15 @@ TEST(PWMSimTest, SetRawValue) {
   sim.ResetData();
   EXPECT_FALSE(sim.GetInitialized());
 
-  IntCallback callback;
+  DoubleCallback callback;
 
-  auto cb = sim.RegisterRawValueCallback(callback.GetCallback(), false);
+  auto cb = sim.RegisterPulseMillisecondValueCallback(callback.GetCallback(), false);
   PWM pwm{0};
-  sim.SetRawValue(229);
-  EXPECT_EQ(229, sim.GetRawValue());
-  EXPECT_EQ(229, pwm.GetRaw());
+  sim.SetPulseMillisecondValue(2.29);
+  EXPECT_DOUBLE_EQ(2.29, sim.GetPulseMillisecondValue());
+  EXPECT_DOUBLE_EQ(2.29, pwm.GetPulseTime().value());
   EXPECT_TRUE(callback.WasTriggered());
-  EXPECT_EQ(229, callback.GetLastValue());
+  EXPECT_DOUBLE_EQ(2.29, callback.GetLastValue());
 }
 
 TEST(PWMSimTest, SetSpeed) {

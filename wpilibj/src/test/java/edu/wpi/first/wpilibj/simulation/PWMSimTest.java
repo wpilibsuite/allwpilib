@@ -40,7 +40,7 @@ class PWMSimTest {
     sim.resetData();
     assertFalse(sim.getInitialized());
 
-    IntCallback callback = new IntCallback();
+    DoubleCallback callback = new DoubleCallback();
 
     try (CallbackStore cb = sim.registerPulseMillisecondValueCallback(callback, false);
         PWM pwm = new PWM(0)) {

@@ -19,7 +19,7 @@ class PWMData {
  public:
   SimDataValue<HAL_Bool, HAL_MakeBoolean, GetInitializedName> initialized{
       false};
-  SimDataValue<int32_t, HAL_MakeInt, GetPulseMillisecondValueName> pulseMillisecondValue{0};
+  SimDataValue<double, HAL_MakeDouble, GetPulseMillisecondValueName> pulseMillisecondValue{0};
   SimDataValue<double, HAL_MakeDouble, GetSpeedName> speed{0};
   SimDataValue<double, HAL_MakeDouble, GetPositionName> position{0};
   SimDataValue<int32_t, HAL_MakeInt, GetPeriodScaleName> periodScale{0};
