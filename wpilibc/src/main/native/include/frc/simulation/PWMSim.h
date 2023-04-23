@@ -66,28 +66,29 @@ class PWMSim {
   void SetInitialized(bool initialized);
 
   /**
-   * Register a callback to be run when the PWM raw value changes.
+   * Register a callback to be run when the PWM pulse millisecond value changes.
    *
    * @param callback the callback
    * @param initialNotify whether to run the callback with the initial value
    * @return the CallbackStore object associated with this callback
    */
-  [[nodiscard]] std::unique_ptr<CallbackStore> RegisterRawValueCallback(
-      NotifyCallback callback, bool initialNotify);
+  [[nodiscard]] std::unique_ptr<CallbackStore>
+  RegisterPulseMillisecondValueCallback(NotifyCallback callback,
+                                        bool initialNotify);
 
   /**
-   * Get the PWM raw value.
+   * Get the PWM pulse millisecond value.
    *
-   * @return the PWM raw value
+   * @return the PWM pulse millisecond value
    */
-  int GetRawValue() const;
+  int GetPulseMillisecondValue() const;
 
   /**
-   * Set the PWM raw value.
+   * Set the PWM pulse millisecond value.
    *
-   * @param rawValue the PWM raw value
+   * @param rawValue the PWM pulse millisecond value
    */
-  void SetRawValue(int rawValue);
+  void SetPulseMillisecondValue(int rawValue);
 
   /**
    * Register a callback to be run when the PWM speed changes.

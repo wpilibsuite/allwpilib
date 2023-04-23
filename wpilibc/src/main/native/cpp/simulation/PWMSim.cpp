@@ -39,21 +39,21 @@ void PWMSim::SetInitialized(bool initialized) {
   HALSIM_SetPWMInitialized(m_index, initialized);
 }
 
-std::unique_ptr<CallbackStore> PWMSim::RegisterRawValueCallback(
+std::unique_ptr<CallbackStore> PWMSim::RegisterPulseMillisecondValueCallback(
     NotifyCallback callback, bool initialNotify) {
   auto store = std::make_unique<CallbackStore>(
-      m_index, -1, callback, &HALSIM_CancelPWMRawValueCallback);
-  store->SetUid(HALSIM_RegisterPWMRawValueCallback(m_index, &CallbackStoreThunk,
+      m_index, -1, callback, &HALSIM_CancelPWMPulseMillisecondValueCallback);
+  store->SetUid(HALSIM_RegisterPWMPulseMillisecondValueCallback(m_index, &CallbackStoreThunk,
                                                    store.get(), initialNotify));
   return store;
 }
 
-int PWMSim::GetRawValue() const {
-  return HALSIM_GetPWMRawValue(m_index);
+int PWMSim::GetPulseMillisecondValue() const {
+  return HALSIM_GetPWMPulseMillisecondValue(m_index);
 }
 
-void PWMSim::SetRawValue(int rawValue) {
-  HALSIM_SetPWMRawValue(m_index, rawValue);
+void PWMSim::SetPulseMillisecondValue(int rawValue) {
+  HALSIM_SetPWMPulseMillisecondValue(m_index, rawValue);
 }
 
 std::unique_ptr<CallbackStore> PWMSim::RegisterSpeedCallback(
