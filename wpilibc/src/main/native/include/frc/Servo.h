@@ -69,7 +69,7 @@ class Servo : public PWM {
    *
    * @param angle The angle in degrees to set the servo.
    */
-  void SetAngle(units::degree_t angle);
+  void SetAngle(double angle);
 
   /**
    * Get the servo angle.
@@ -79,29 +79,29 @@ class Servo : public PWM {
    *
    * @return The angle in degrees to which the servo is set.
    */
-  units::degree_t GetAngle() const;
+  double GetAngle() const;
 
   /**
    * Get the maximum angle of the servo.
    *
    * @return The maximum angle of the servo in degrees.
    */
-  units::degree_t GetMaxAngle() const;
+  double GetMaxAngle() const;
 
   /**
    * Get the minimum angle of the servo.
    *
    * @return The minimum angle of the servo in degrees.
    */
-  units::degree_t GetMinAngle() const;
+  double GetMinAngle() const;
 
   void InitSendable(wpi::SendableBuilder& builder) override;
 
  private:
-  units::degree_t GetServoAngleRange() const;
+  double GetServoAngleRange() const;
 
-  static constexpr units::degree_t kMaxServoAngle = 180.0_deg;
-  static constexpr units::degree_t kMinServoAngle = 0.0_deg;
+  static constexpr double kMaxServoAngle = 180.;
+  static constexpr double kMinServoAngle = 0.0;
 
   static constexpr units::millisecond_t kDefaultMaxServoPWM = 2.4_ms;
   static constexpr units::millisecond_t kDefaultMinServoPWM = 0.6_ms;

@@ -10,8 +10,8 @@
 
 using namespace frc;
 
-constexpr units::degree_t Servo::kMaxServoAngle;
-constexpr units::degree_t Servo::kMinServoAngle;
+constexpr double Servo::kMaxServoAngle;
+constexpr double Servo::kMinServoAngle;
 
 constexpr units::millisecond_t Servo::kDefaultMaxServoPWM;
 constexpr units::millisecond_t Servo::kDefaultMinServoPWM;
@@ -39,7 +39,7 @@ double Servo::Get() const {
   return GetPosition();
 }
 
-void Servo::SetAngle(units::degree_t degrees) {
+void Servo::SetAngle(double degrees) {
   if (degrees < kMinServoAngle) {
     degrees = kMinServoAngle;
   } else if (degrees > kMaxServoAngle) {
@@ -49,15 +49,15 @@ void Servo::SetAngle(units::degree_t degrees) {
   SetPosition((degrees - kMinServoAngle) / GetServoAngleRange());
 }
 
-units::degree_t Servo::GetAngle() const {
+double Servo::GetAngle() const {
   return GetPosition() * GetServoAngleRange() + kMinServoAngle;
 }
 
-units::degree_t Servo::GetMaxAngle() const {
+double Servo::GetMaxAngle() const {
   return kMaxServoAngle;
 }
 
-units::degree_t Servo::GetMinAngle() const {
+double Servo::GetMinAngle() const {
   return kMinServoAngle;
 }
 
@@ -68,6 +68,6 @@ void Servo::InitSendable(wpi::SendableBuilder& builder) {
       [=, this](double value) { Set(value); });
 }
 
-units::degree_t Servo::GetServoAngleRange() const {
+double Servo::GetServoAngleRange() const {
   return kMaxServoAngle - kMinServoAngle;
 }
