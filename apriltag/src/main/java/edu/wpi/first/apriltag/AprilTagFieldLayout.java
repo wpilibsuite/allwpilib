@@ -208,8 +208,8 @@ public class AprilTagFieldLayout {
     return loadFromResource(kBaseResourceDir + "2023-chargedup.json");
   }
 
-  @Deprecated(forRemoval = true)
-  private static AprilTagFieldLayout loadFromResource(String resourcePath) {
+  @Deprecated
+  public static AprilTagFieldLayout loadFromResource(String resourcePath) {
     try (InputStream stream = AprilTagFieldLayout.class.getResourceAsStream(resourcePath);
         InputStreamReader reader = new InputStreamReader(stream)) {
       return new ObjectMapper().readerFor(AprilTagFieldLayout.class).readValue(reader);
