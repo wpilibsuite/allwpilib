@@ -39,8 +39,8 @@ SingleJointedArmSim::SingleJointedArmSim(
     const std::array<double, 1>& measurementStdDevs)
     : SingleJointedArmSim(
           LinearSystemId::SingleJointedArmSystem(gearbox, moi, gearing),
-          gearbox, gearing, armLength, minAngle, maxAngle, simulateGravity, startingAngleRad,
-          measurementStdDevs) {}
+          gearbox, gearing, armLength, minAngle, maxAngle, simulateGravity,
+          startingAngleRad, measurementStdDevs) {}
 
 bool SingleJointedArmSim::WouldHitLowerLimit(units::radian_t armAngle) const {
   return armAngle <= m_minAngle;
