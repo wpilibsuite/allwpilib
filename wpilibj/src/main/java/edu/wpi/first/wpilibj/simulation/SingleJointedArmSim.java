@@ -78,27 +78,26 @@ public class SingleJointedArmSim extends LinearSystemSim<N2, N1, N1> {
    * @param maxAngleRads The maximum angle that the arm is capable of.
    * @param simulateGravity Whether gravity should be simulated or not.
    * @param startingAngleRad The initial position of the Arm simulation in radians.
-   *
    */
   public SingleJointedArmSim(
-          LinearSystem<N2, N1, N1> plant,
-          DCMotor gearbox,
-          double gearing,
-          double armLengthMeters,
-          double minAngleRads,
-          double maxAngleRads,
-          boolean simulateGravity,
-          double startingAngleRad) {
+      LinearSystem<N2, N1, N1> plant,
+      DCMotor gearbox,
+      double gearing,
+      double armLengthMeters,
+      double minAngleRads,
+      double maxAngleRads,
+      boolean simulateGravity,
+      double startingAngleRad) {
     this(
-            plant,
-            gearbox,
-            gearing,
-            armLengthMeters,
-            minAngleRads,
-            maxAngleRads,
-            simulateGravity,
-            startingAngleRad,
-            null);
+        plant,
+        gearbox,
+        gearing,
+        armLengthMeters,
+        minAngleRads,
+        maxAngleRads,
+        simulateGravity,
+        startingAngleRad,
+        null);
   }
 
   /**
@@ -158,16 +157,15 @@ public class SingleJointedArmSim extends LinearSystemSim<N2, N1, N1> {
       double startingAngleRad,
       Matrix<N1, N1> measurementStdDevs) {
     this(
-      LinearSystemId.createSingleJointedArmSystem(gearbox, jKgMetersSquared, gearing),
-      gearbox,
-      gearing,
-      armLengthMeters,
-      minAngleRads,
-      maxAngleRads,
-      simulateGravity,
-      startingAngleRad,
-      measurementStdDevs
-    );
+        LinearSystemId.createSingleJointedArmSystem(gearbox, jKgMetersSquared, gearing),
+        gearbox,
+        gearing,
+        armLengthMeters,
+        minAngleRads,
+        maxAngleRads,
+        simulateGravity,
+        startingAngleRad,
+        measurementStdDevs);
   }
 
   /**
