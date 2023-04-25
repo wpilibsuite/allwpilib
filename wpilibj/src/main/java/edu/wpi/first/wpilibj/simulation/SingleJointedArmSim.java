@@ -43,6 +43,8 @@ public class SingleJointedArmSim extends LinearSystemSim<N2, N1, N1> {
    * @param minAngleRads The minimum angle that the arm is capable of.
    * @param maxAngleRads The maximum angle that the arm is capable of.
    * @param simulateGravity Whether gravity should be simulated or not.
+   * @param startingAngleRad The initial position of the Arm simulation in radians.
+   * @param measurementStdDevs The standard deviations of the measurements.
    */
   public SingleJointedArmSim(
       LinearSystem<N2, N1, N1> plant,
@@ -51,16 +53,18 @@ public class SingleJointedArmSim extends LinearSystemSim<N2, N1, N1> {
       double armLengthMeters,
       double minAngleRads,
       double maxAngleRads,
-      boolean simulateGravity) {
-    this(
-        plant,
-        gearbox,
-        gearing,
-        armLengthMeters,
-        minAngleRads,
-        maxAngleRads,
-        simulateGravity,
-        null);
+      boolean simulateGravity,
+      double startingAngleRad,
+      Matrix<N1, N1> measurementStdDevs) {
+    super(plant, measurementStdDevs);
+    m_gearbox = gearbox;
+    m_gearing = gearing;
+    m_armLenMeters = armLengthMeters;
+    m_minAngle = minAngleRads;
+    m_maxAngle = maxAngleRads;
+    m_simulateGravity = simulateGravity;
+
+    setState(VecBuilder.fill(startingAngleRad, 0));
   }
 
   /**
@@ -73,24 +77,28 @@ public class SingleJointedArmSim extends LinearSystemSim<N2, N1, N1> {
    * @param minAngleRads The minimum angle that the arm is capable of.
    * @param maxAngleRads The maximum angle that the arm is capable of.
    * @param simulateGravity Whether gravity should be simulated or not.
-   * @param measurementStdDevs The standard deviations of the measurements.
+   * @param startingAngleRad The initial position of the Arm simulation in radians.
+   *
    */
   public SingleJointedArmSim(
-      LinearSystem<N2, N1, N1> plant,
-      DCMotor gearbox,
-      double gearing,
-      double armLengthMeters,
-      double minAngleRads,
-      double maxAngleRads,
-      boolean simulateGravity,
-      Matrix<N1, N1> measurementStdDevs) {
-    super(plant, measurementStdDevs);
-    m_gearbox = gearbox;
-    m_gearing = gearing;
-    m_armLenMeters = armLengthMeters;
-    m_minAngle = minAngleRads;
-    m_maxAngle = maxAngleRads;
-    m_simulateGravity = simulateGravity;
+          LinearSystem<N2, N1, N1> plant,
+          DCMotor gearbox,
+          double gearing,
+          double armLengthMeters,
+          double minAngleRads,
+          double maxAngleRads,
+          boolean simulateGravity,
+          double startingAngleRad) {
+    this(
+            plant,
+            gearbox,
+            gearing,
+            armLengthMeters,
+            minAngleRads,
+            maxAngleRads,
+            simulateGravity,
+            startingAngleRad,
+            null);
   }
 
   /**
@@ -103,6 +111,7 @@ public class SingleJointedArmSim extends LinearSystemSim<N2, N1, N1> {
    * @param minAngleRads The minimum angle that the arm is capable of.
    * @param maxAngleRads The maximum angle that the arm is capable of.
    * @param simulateGravity Whether gravity should be simulated or not.
+   * @param startingAngleRad The initial position of the Arm simulation in radians.
    */
   public SingleJointedArmSim(
       DCMotor gearbox,
@@ -111,7 +120,8 @@ public class SingleJointedArmSim extends LinearSystemSim<N2, N1, N1> {
       double armLengthMeters,
       double minAngleRads,
       double maxAngleRads,
-      boolean simulateGravity) {
+      boolean simulateGravity,
+      double startingAngleRad) {
     this(
         gearbox,
         gearing,
@@ -120,6 +130,7 @@ public class SingleJointedArmSim extends LinearSystemSim<N2, N1, N1> {
         minAngleRads,
         maxAngleRads,
         simulateGravity,
+        startingAngleRad,
         null);
   }
 
@@ -133,6 +144,7 @@ public class SingleJointedArmSim extends LinearSystemSim<N2, N1, N1> {
    * @param minAngleRads The minimum angle that the arm is capable of.
    * @param maxAngleRads The maximum angle that the arm is capable of.
    * @param simulateGravity Whether gravity should be simulated or not.
+   * @param startingAngleRad The initial position of the Arm simulation in radians.
    * @param measurementStdDevs The standard deviations of the measurements.
    */
   public SingleJointedArmSim(
@@ -143,16 +155,19 @@ public class SingleJointedArmSim extends LinearSystemSim<N2, N1, N1> {
       double minAngleRads,
       double maxAngleRads,
       boolean simulateGravity,
+      double startingAngleRad,
       Matrix<N1, N1> measurementStdDevs) {
-    super(
-        LinearSystemId.createSingleJointedArmSystem(gearbox, jKgMetersSquared, gearing),
-        measurementStdDevs);
-    m_gearbox = gearbox;
-    m_gearing = gearing;
-    m_armLenMeters = armLengthMeters;
-    m_minAngle = minAngleRads;
-    m_maxAngle = maxAngleRads;
-    m_simulateGravity = simulateGravity;
+    this(
+      LinearSystemId.createSingleJointedArmSystem(gearbox, jKgMetersSquared, gearing),
+      gearbox,
+      gearing,
+      armLengthMeters,
+      minAngleRads,
+      maxAngleRads,
+      simulateGravity,
+      startingAngleRad,
+      measurementStdDevs
+    );
   }
 
   /**

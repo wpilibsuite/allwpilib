@@ -31,12 +31,14 @@ class SingleJointedArmSim : public LinearSystemSim<2, 1, 1> {
    * @param minAngle           The minimum angle that the arm is capable of.
    * @param maxAngle           The maximum angle that the arm is capable of.
    * @param simulateGravity    Whether gravity should be simulated or not.
+   * @param startingAngleRad   The initial position of the arm.
    * @param measurementStdDevs The standard deviations of the measurements.
    */
   SingleJointedArmSim(const LinearSystem<2, 1, 1>& system,
                       const DCMotor& gearbox, double gearing,
                       units::meter_t armLength, units::radian_t minAngle,
                       units::radian_t maxAngle, bool simulateGravity,
+                      units::radian_t startingAngleRad,
                       const std::array<double, 1>& measurementStdDevs = {0.0});
   /**
    * Creates a simulated arm mechanism.
@@ -50,12 +52,14 @@ class SingleJointedArmSim : public LinearSystemSim<2, 1, 1> {
    * @param minAngle           The minimum angle that the arm is capable of.
    * @param maxAngle           The maximum angle that the arm is capable of.
    * @param simulateGravity    Whether gravity should be simulated or not.
+   * @param startingAngleRad   The initial position of the arm.
    * @param measurementStdDevs The standard deviation of the measurement noise.
    */
   SingleJointedArmSim(const DCMotor& gearbox, double gearing,
                       units::kilogram_square_meter_t moi,
                       units::meter_t armLength, units::radian_t minAngle,
                       units::radian_t maxAngle, bool simulateGravity,
+                      units::radian_t startingAngleRad,
                       const std::array<double, 1>& measurementStdDevs = {0.0});
 
   /**
