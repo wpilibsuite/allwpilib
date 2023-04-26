@@ -138,6 +138,17 @@ class Command {
   [[nodiscard]] CommandPtr Until(std::function<bool()> condition) &&;
 
   /**
+   * Decorates this command with a run condition.  If the specified condition
+   * becomes false before the command finishes normally, the command will be
+   * interrupted and un-scheduled. Note that this only applies to the command
+   * returned by this method; the calling command is not itself changed.
+   *
+   * @param condition the interrupt condition
+   * @return the command with the interrupt condition added
+   */
+  [[nodiscard]] CommandPtr OnlyWhile(std::function<bool()> condition) &&;
+
+  /**
    * Decorates this command with an interrupt condition.  If the specified
    * condition becomes true before the command finishes normally, the command
    * will be interrupted and un-scheduled. Note that this only applies to the
@@ -244,6 +255,28 @@ safe) semantics.
    * @return the decorated command
    */
   [[nodiscard]] CommandPtr Unless(std::function<bool()> condition) &&;
+
+  /**
+   * Decorates this command to only run if this condition is not met. If the
+   * command is already running and the condition changes to true, the command
+   * will not stop running. The requirements of this command will be kept for
+   * the new conditional command.
+   *
+   * @param condition the condition that will prevent the command from running
+   * @return the decorated command
+   */
+  [[nodiscard]] CommandPtr SkipIf(std::function<bool()> condition) &&;
+
+  /**
+   * Decorates this command to only run if this condition is met. If the command
+   * is already running and the condition changes to false, the command will not
+   * stop running. The requirements of this command will be kept for the new
+   * conditional command.
+   *
+   * @param condition the condition that will allow the command to run
+   * @return the decorated command
+   */
+  [[nodiscard]] CommandPtr OnlyIf(std::function<bool()> condition) &&;
 
   /**
    * Decorates this command to run or stop when disabled.

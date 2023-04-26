@@ -54,6 +54,24 @@ TEST_F(CommandDecoratorTest, Until) {
   EXPECT_FALSE(scheduler.IsScheduled(command));
 }
 
+TEST_F(CommandDecoratorTest, OnlyWhile) {
+  CommandScheduler scheduler = GetScheduler();
+
+  bool run = true;
+
+  auto command = RunCommand([] {}, {}).OnlyWhile([&run] { return run; });
+
+  scheduler.Schedule(command);
+
+  scheduler.Run();
+  EXPECT_TRUE(scheduler.IsScheduled(command));
+
+  run = false;
+
+  scheduler.Run();
+  EXPECT_FALSE(scheduler.IsScheduled(command));
+}
+
 TEST_F(CommandDecoratorTest, IgnoringDisable) {
   CommandScheduler scheduler = GetScheduler();
 
@@ -135,6 +153,48 @@ TEST_F(CommandDecoratorTest, Unless) {
   EXPECT_FALSE(hasRun);
 
   unlessBool = false;
+  scheduler.Schedule(command);
+  scheduler.Run();
+  EXPECT_TRUE(hasRun);
+}
+
+TEST_F(CommandDecoratorTest, SkipIf) {
+  CommandScheduler scheduler = GetScheduler();
+
+  bool hasRun = false;
+  bool skipIfBool = true;
+
+  auto command =
+      InstantCommand([&hasRun] { hasRun = true; }, {}).SkipIf([&skipIfBool] {
+        return skipIfBool;
+      });
+
+  scheduler.Schedule(command);
+  scheduler.Run();
+  EXPECT_FALSE(hasRun);
+
+  skipIfBool = false;
+  scheduler.Schedule(command);
+  scheduler.Run();
+  EXPECT_TRUE(hasRun);
+}
+
+TEST_F(CommandDecoratorTest, OnlyIf) {
+  CommandScheduler scheduler = GetScheduler();
+
+  bool hasRun = false;
+  bool onlyIfBool = false;
+
+  auto command =
+      InstantCommand([&hasRun] { hasRun = true; }, {}).OnlyIf([&onlyIfBool] {
+        return onlyIfBool;
+      });
+
+  scheduler.Schedule(command);
+  scheduler.Run();
+  EXPECT_FALSE(hasRun);
+
+  onlyIfBool = true;
   scheduler.Schedule(command);
   scheduler.Run();
   EXPECT_TRUE(hasRun);
