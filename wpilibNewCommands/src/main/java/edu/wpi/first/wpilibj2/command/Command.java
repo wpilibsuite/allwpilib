@@ -101,10 +101,9 @@ public interface Command {
   }
 
   /**
-   * Decorates this command with an run condition. If the specified condition becomes false
-   * before the command finishes normally, the command will be interrupted and un-scheduled. Note
-   * that this only applies to the command returned by this method; the calling command is not
-   * itself changed.
+   * Decorates this command with a run condition. If the specified condition becomes false before
+   * the command finishes normally, the command will be interrupted and un-scheduled. Note that this
+   * only applies to the command returned by this method; the calling command is not itself changed.
    *
    * <p>Note: This decorator works by adding this command to a composition. The command the
    * decorator was called on cannot be scheduled independently or be added to a different
@@ -358,9 +357,9 @@ public interface Command {
   }
 
   /**
-   * Decorates this command to only run if this condition is met. If the command is already
-   * running and the condition changes to false, the command will not stop running. The requirements
-   * of this command will be kept for the new conditional command.
+   * Decorates this command to only run if this condition is met. If the command is already running
+   * and the condition changes to false, the command will not stop running. The requirements of this
+   * command will be kept for the new conditional command.
    *
    * <p>Note: This decorator works by adding this command to a composition. The command the
    * decorator was called on cannot be scheduled independently or be added to a different
