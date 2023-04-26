@@ -87,8 +87,7 @@ public class SingleJointedArmSim extends LinearSystemSim<N2, N1, N1> {
       double minAngleRads,
       double maxAngleRads,
       boolean simulateGravity,
-      double startingAngleRads
-  ) {
+      double startingAngleRads) {
     this(
         plant,
         gearbox,
@@ -121,8 +120,7 @@ public class SingleJointedArmSim extends LinearSystemSim<N2, N1, N1> {
       double minAngleRads,
       double maxAngleRads,
       boolean simulateGravity,
-      double startingAngleRads
-  ) {
+      double startingAngleRads) {
     this(
         gearbox,
         gearing,
