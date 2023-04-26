@@ -94,9 +94,30 @@ public interface Command {
    *
    * @param condition the interrupt condition
    * @return the command with the interrupt condition added
+   * @see #onlyWhile(BooleanSupplier)
    */
   default ParallelRaceGroup until(BooleanSupplier condition) {
     return raceWith(new WaitUntilCommand(condition));
+  }
+
+  /**
+   * Decorates this command with an run condition. If the specified condition becomes false
+   * before the command finishes normally, the command will be interrupted and un-scheduled. Note
+   * that this only applies to the command returned by this method; the calling command is not
+   * itself changed.
+   *
+   * <p>Note: This decorator works by adding this command to a composition. The command the
+   * decorator was called on cannot be scheduled independently or be added to a different
+   * composition (namely, decorators), unless it is manually cleared from the list of composed
+   * commands with {@link CommandScheduler#removeComposedCommand(Command)}. The command composition
+   * returned from this method can be further decorated without issue.
+   *
+   * @param condition the interrupt condition
+   * @return the command with the interrupt condition added
+   * @see #until(BooleanSupplier)
+   */
+  default ParallelRaceGroup onlyWhile(BooleanSupplier condition) {
+    return raceWith(new WaitUntilCommand(() -> !condition.getAsBoolean()));
   }
 
   /**
@@ -301,11 +322,59 @@ public interface Command {
    * running and the condition changes to true, the command will not stop running. The requirements
    * of this command will be kept for the new conditional command.
    *
+   * <p>Note: This decorator works by adding this command to a composition. The command the
+   * decorator was called on cannot be scheduled independently or be added to a different
+   * composition (namely, decorators), unless it is manually cleared from the list of composed
+   * commands with {@link CommandScheduler#removeComposedCommand(Command)}. The command composition
+   * returned from this method can be further decorated without issue.
+   *
    * @param condition the condition that will prevent the command from running
    * @return the decorated command
+   * @see #skipIf(BooleanSupplier)
+   * @see #onlyIf(BooleanSupplier)
    */
   default ConditionalCommand unless(BooleanSupplier condition) {
     return new ConditionalCommand(new InstantCommand(), this, condition);
+  }
+
+  /**
+   * Decorates this command to only run if this condition is not met. If the command is already
+   * running and the condition changes to true, the command will not stop running. The requirements
+   * of this command will be kept for the new conditional command.
+   *
+   * <p>Note: This decorator works by adding this command to a composition. The command the
+   * decorator was called on cannot be scheduled independently or be added to a different
+   * composition (namely, decorators), unless it is manually cleared from the list of composed
+   * commands with {@link CommandScheduler#removeComposedCommand(Command)}. The command composition
+   * returned from this method can be further decorated without issue.
+   *
+   * @param condition the condition that will prevent the command from running
+   * @return the decorated command
+   * @see #unless(BooleanSupplier)
+   * @see #onlyIf(BooleanSupplier)
+   */
+  default ConditionalCommand skipIf(BooleanSupplier condition) {
+    return new ConditionalCommand(new InstantCommand(), this, condition);
+  }
+
+  /**
+   * Decorates this command to only run if this condition is met. If the command is already
+   * running and the condition changes to false, the command will not stop running. The requirements
+   * of this command will be kept for the new conditional command.
+   *
+   * <p>Note: This decorator works by adding this command to a composition. The command the
+   * decorator was called on cannot be scheduled independently or be added to a different
+   * composition (namely, decorators), unless it is manually cleared from the list of composed
+   * commands with {@link CommandScheduler#removeComposedCommand(Command)}. The command composition
+   * returned from this method can be further decorated without issue.
+   *
+   * @param condition the condition that will allow the command to run
+   * @return the decorated command
+   * @see #unless(BooleanSupplier)
+   * @see #skipIf(BooleanSupplier)
+   */
+  default ConditionalCommand onlyIf(BooleanSupplier condition) {
+    return new ConditionalCommand(this, new InstantCommand(), condition);
   }
 
   /**

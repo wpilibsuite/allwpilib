@@ -58,6 +58,22 @@ class CommandDecoratorTest extends CommandTestBase {
   }
 
   @Test
+  void onlyWhileTest() {
+    try (CommandScheduler scheduler = new CommandScheduler()) {
+      AtomicBoolean condition = new AtomicBoolean(true);
+
+      Command command = new WaitCommand(10).onlyWhile(condition::get);
+
+      scheduler.schedule(command);
+      scheduler.run();
+      assertTrue(scheduler.isScheduled(command));
+      condition.set(false);
+      scheduler.run();
+      assertFalse(scheduler.isScheduled(command));
+    }
+  }
+
+  @Test
   void ignoringDisableTest() {
     try (CommandScheduler scheduler = new CommandScheduler()) {
       var command = new RunCommand(() -> {}).ignoringDisable(true);
@@ -215,6 +231,46 @@ class CommandDecoratorTest extends CommandTestBase {
       assertFalse(hasRunCondition.get());
 
       unlessCondition.set(false);
+      scheduler.schedule(command);
+      scheduler.run();
+      assertTrue(hasRunCondition.get());
+    }
+  }
+
+  @Test
+  void skipIfTest() {
+    try (CommandScheduler scheduler = new CommandScheduler()) {
+      AtomicBoolean skipIfCondition = new AtomicBoolean(true);
+      AtomicBoolean hasRunCondition = new AtomicBoolean(false);
+
+      Command command =
+          new InstantCommand(() -> hasRunCondition.set(true)).skipIf(skipIfCondition::get);
+
+      scheduler.schedule(command);
+      scheduler.run();
+      assertFalse(hasRunCondition.get());
+
+      skipIfCondition.set(false);
+      scheduler.schedule(command);
+      scheduler.run();
+      assertTrue(hasRunCondition.get());
+    }
+  }
+
+  @Test
+  void onlyIfTest() {
+    try (CommandScheduler scheduler = new CommandScheduler()) {
+      AtomicBoolean onlyIfCondition = new AtomicBoolean(false);
+      AtomicBoolean hasRunCondition = new AtomicBoolean(false);
+
+      Command command =
+          new InstantCommand(() -> hasRunCondition.set(true)).onlyIf(onlyIfCondition::get);
+
+      scheduler.schedule(command);
+      scheduler.run();
+      assertFalse(hasRunCondition.get());
+
+      onlyIfCondition.set(true);
       scheduler.schedule(command);
       scheduler.run();
       assertTrue(hasRunCondition.get());
