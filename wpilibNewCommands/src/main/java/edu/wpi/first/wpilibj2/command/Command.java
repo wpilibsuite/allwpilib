@@ -82,9 +82,7 @@ public interface Command {
 
   /**
    * Decorates this command with an interrupt condition. If the specified condition becomes true
-   * before the command finishes normally, the command will be interrupted and un-scheduled. Note
-   * that this only applies to the command returned by this method; the calling command is not
-   * itself changed.
+   * before the command finishes normally, the command will be interrupted and un-scheduled.
    *
    * <p>Note: This decorator works by adding this command to a composition. The command the
    * decorator was called on cannot be scheduled independently or be added to a different
@@ -102,8 +100,7 @@ public interface Command {
 
   /**
    * Decorates this command with a run condition. If the specified condition becomes false before
-   * the command finishes normally, the command will be interrupted and un-scheduled. Note that this
-   * only applies to the command returned by this method; the calling command is not itself changed.
+   * the command finishes normally, the command will be interrupted and un-scheduled.
    *
    * <p>Note: This decorator works by adding this command to a composition. The command the
    * decorator was called on cannot be scheduled independently or be added to a different
