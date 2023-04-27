@@ -100,10 +100,6 @@ CommandPtr Command::Unless(std::function<bool()> condition) && {
   return std::move(*this).ToPtr().Unless(std::move(condition));
 }
 
-CommandPtr Command::SkipIf(std::function<bool()> condition) && {
-  return std::move(*this).ToPtr().SkipIf(std::move(condition));
-}
-
 CommandPtr Command::OnlyIf(std::function<bool()> condition) && {
   return std::move(*this).ToPtr().OnlyIf(std::move(condition));
 }

@@ -238,26 +238,6 @@ class CommandDecoratorTest extends CommandTestBase {
   }
 
   @Test
-  void skipIfTest() {
-    try (CommandScheduler scheduler = new CommandScheduler()) {
-      AtomicBoolean skipIfCondition = new AtomicBoolean(true);
-      AtomicBoolean hasRunCondition = new AtomicBoolean(false);
-
-      Command command =
-          new InstantCommand(() -> hasRunCondition.set(true)).skipIf(skipIfCondition::get);
-
-      scheduler.schedule(command);
-      scheduler.run();
-      assertFalse(hasRunCondition.get());
-
-      skipIfCondition.set(false);
-      scheduler.schedule(command);
-      scheduler.run();
-      assertTrue(hasRunCondition.get());
-    }
-  }
-
-  @Test
   void onlyIfTest() {
     try (CommandScheduler scheduler = new CommandScheduler()) {
       AtomicBoolean onlyIfCondition = new AtomicBoolean(false);

@@ -158,27 +158,6 @@ TEST_F(CommandDecoratorTest, Unless) {
   EXPECT_TRUE(hasRun);
 }
 
-TEST_F(CommandDecoratorTest, SkipIf) {
-  CommandScheduler scheduler = GetScheduler();
-
-  bool hasRun = false;
-  bool skipIfBool = true;
-
-  auto command =
-      InstantCommand([&hasRun] { hasRun = true; }, {}).SkipIf([&skipIfBool] {
-        return skipIfBool;
-      });
-
-  scheduler.Schedule(command);
-  scheduler.Run();
-  EXPECT_FALSE(hasRun);
-
-  skipIfBool = false;
-  scheduler.Schedule(command);
-  scheduler.Run();
-  EXPECT_TRUE(hasRun);
-}
-
 TEST_F(CommandDecoratorTest, OnlyIf) {
   CommandScheduler scheduler = GetScheduler();
 

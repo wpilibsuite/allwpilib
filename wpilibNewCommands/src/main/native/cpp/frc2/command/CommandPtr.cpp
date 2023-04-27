@@ -168,14 +168,6 @@ CommandPtr CommandPtr::Unless(std::function<bool()> condition) && {
   return std::move(*this);
 }
 
-CommandPtr CommandPtr::SkipIf(std::function<bool()> condition) && {
-  AssertValid();
-  m_ptr = std::make_unique<ConditionalCommand>(
-      std::make_unique<InstantCommand>(), std::move(m_ptr),
-      std::move(condition));
-  return std::move(*this);
-}
-
 CommandPtr CommandPtr::OnlyIf(std::function<bool()> condition) && {
   AssertValid();
   m_ptr = std::make_unique<ConditionalCommand>(
