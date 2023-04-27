@@ -113,7 +113,7 @@ public interface Command {
    * @see #until(BooleanSupplier)
    */
   default ParallelRaceGroup onlyWhile(BooleanSupplier condition) {
-    return raceWith(new WaitUntilCommand(() -> !condition.getAsBoolean()));
+    return until(() -> !condition.getAsBoolean());
   }
 
   /**
@@ -348,7 +348,7 @@ public interface Command {
    * @see #unless(BooleanSupplier)
    */
   default ConditionalCommand onlyIf(BooleanSupplier condition) {
-    return new ConditionalCommand(this, new InstantCommand(), condition);
+    return unless(() -> !condition.getAsBoolean());
   }
 
   /**

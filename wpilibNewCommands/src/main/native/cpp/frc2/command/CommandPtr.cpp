@@ -153,11 +153,7 @@ CommandPtr CommandPtr::Until(std::function<bool()> condition) && {
 
 CommandPtr CommandPtr::OnlyWhile(std::function<bool()> condition) && {
   AssertValid();
-  std::vector<std::unique_ptr<Command>> temp;
-  temp.emplace_back(std::make_unique<WaitUntilCommand>(std::not_fn(std::move(condition))));
-  temp.emplace_back(std::move(m_ptr));
-  m_ptr = std::make_unique<ParallelRaceGroup>(std::move(temp));
-  return std::move(*this);
+  return std::move(*this).Until(std::not_fn(std::move(condition)));
 }
 
 CommandPtr CommandPtr::Unless(std::function<bool()> condition) && {
@@ -170,10 +166,7 @@ CommandPtr CommandPtr::Unless(std::function<bool()> condition) && {
 
 CommandPtr CommandPtr::OnlyIf(std::function<bool()> condition) && {
   AssertValid();
-  m_ptr = std::make_unique<ConditionalCommand>(
-      std::move(m_ptr), std::make_unique<InstantCommand>(),
-      std::move(condition));
-  return std::move(*this);
+  return std::move(*this).Unless(std::not_fn(std::move(condition)));
 }
 
 CommandPtr CommandPtr::DeadlineWith(CommandPtr&& parallel) && {
