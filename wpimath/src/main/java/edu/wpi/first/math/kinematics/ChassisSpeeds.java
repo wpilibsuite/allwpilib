@@ -91,7 +91,8 @@ public class ChassisSpeeds {
 
   /**
    * Adds two ChassisSpeeds and returns the sum.
-   * <p>For example, ChassisSpeeds{1.0, 0.5, 0.75} + ChassisSpeeds{2.0, 1.5, 0.25} = 
+   *
+   * <p>For example, ChassisSpeeds{1.0, 0.5, 0.75} + ChassisSpeeds{2.0, 1.5, 0.25} =
    * ChassisSpeeds{3.0, 2.0, 1.0}
    *
    * @param other The ChassisSpeeds to add.
@@ -100,12 +101,13 @@ public class ChassisSpeeds {
   public ChassisSpeeds plus(ChassisSpeeds other) {
     return new ChassisSpeeds(
         vxMetersPerSecond + other.vxMetersPerSecond,
-        vyMetersPerSecond + other.vyMetersPerSecond, 
+        vyMetersPerSecond + other.vyMetersPerSecond,
         omegaRadiansPerSecond + other.omegaRadiansPerSecond);
   }
 
   /**
    * Subtracts the other ChassisSpeeds from the other ChassisSpeeds and returns the difference.
+   *
    * <p>For example, ChassisSpeeds{5.0, 4.0, 2.0} - ChassisSpeeds{1.0, 2.0, 1.0} =
    * ChassisSpeeds{4.0, 2.0, 1.0}
    *
@@ -114,14 +116,14 @@ public class ChassisSpeeds {
    */
   public ChassisSpeeds minus(ChassisSpeeds other) {
     return new ChassisSpeeds(
-        vxMetersPerSecond - other.vxMetersPerSecond, 
+        vxMetersPerSecond - other.vxMetersPerSecond,
         vyMetersPerSecond - other.vyMetersPerSecond,
         omegaRadiansPerSecond - other.omegaRadiansPerSecond);
   }
 
   /**
-   * Returns the inverse of the current ChassisSpeeds.
-   * This is equivalent to negating all components of the ChassisSpeeds.
+   * Returns the inverse of the current ChassisSpeeds. This is equivalent to negating all components
+   * of the ChassisSpeeds.
    *
    * @return The inverse of the current ChassisSpeeds.
    */
@@ -131,6 +133,7 @@ public class ChassisSpeeds {
 
   /**
    * Multiplies the ChassisSpeeds by a scalar and returns the new ChassisSpeeds.
+   *
    * <p>For example, ChassisSpeeds{2.0, 2.5, 1.0} * 2 = ChassisSpeeds{4.0, 5.0, 1.0}
    *
    * @param scalar The scalar to multiply by.
@@ -138,13 +141,12 @@ public class ChassisSpeeds {
    */
   public ChassisSpeeds times(double scalar) {
     return new ChassisSpeeds(
-      vxMetersPerSecond * scalar, 
-      vyMetersPerSecond * scalar, 
-      omegaRadiansPerSecond * scalar);
+        vxMetersPerSecond * scalar, vyMetersPerSecond * scalar, omegaRadiansPerSecond * scalar);
   }
 
   /**
    * Divides the ChassisSpeeds by a scalar and returns the new ChassisSpeeds.
+   *
    * <p>For example, ChassisSpeeds{2.0, 2.5, 1.0} / 2 = ChassisSpeeds{1.0, 1.25, 0.5}
    *
    * @param scalar The scalar to multiply by.
@@ -152,9 +154,7 @@ public class ChassisSpeeds {
    */
   public ChassisSpeeds div(double scalar) {
     return new ChassisSpeeds(
-      vxMetersPerSecond / scalar, 
-      vyMetersPerSecond / scalar, 
-      omegaRadiansPerSecond / scalar);
+        vxMetersPerSecond / scalar, vyMetersPerSecond / scalar, omegaRadiansPerSecond / scalar);
   }
 
   @Override
