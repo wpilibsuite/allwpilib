@@ -91,8 +91,7 @@ public class ChassisSpeeds {
 
   /**
    * Adds two ChassisSpeeds and returns the sum.
-   * <p>
-   * For example, ChassisSpeeds{1.0, 0.5, 0.75} + ChassisSpeeds{2.0, 1.5, 0.25} = 
+   * <p>For example, ChassisSpeeds{1.0, 0.5, 0.75} + ChassisSpeeds{2.0, 1.5, 0.25} = 
    * ChassisSpeeds{3.0, 2.0, 1.0}
    *
    * @param other The ChassisSpeeds to add.
@@ -107,8 +106,7 @@ public class ChassisSpeeds {
 
   /**
    * Subtracts the other ChassisSpeeds from the other ChassisSpeeds and returns the difference.
-   * <p>
-   * For example, ChassisSpeeds{5.0, 4.0, 2.0} - ChassisSpeeds{1.0, 2.0, 1.0} =
+   * <p>For example, ChassisSpeeds{5.0, 4.0, 2.0} - ChassisSpeeds{1.0, 2.0, 1.0} =
    * ChassisSpeeds{4.0, 2.0, 1.0}
    *
    * @param other The ChassisSpeeds to subtract.
@@ -133,8 +131,7 @@ public class ChassisSpeeds {
 
   /**
    * Multiplies the ChassisSpeeds by a scalar and returns the new ChassisSpeeds.
-   * <p>
-   * For example, ChassisSpeeds{2.0, 2.5, 1.0} * 2 = ChassisSpeeds{4.0, 5.0, 1.0}
+   * <p>For example, ChassisSpeeds{2.0, 2.5, 1.0} * 2 = ChassisSpeeds{4.0, 5.0, 1.0}
    *
    * @param scalar The scalar to multiply by.
    * @return The scaled ChassisSpeeds.
@@ -148,8 +145,7 @@ public class ChassisSpeeds {
 
   /**
    * Divides the ChassisSpeeds by a scalar and returns the new ChassisSpeeds.
-   * <p>
-   * For example, ChassisSpeeds{2.0, 2.5, 1.0} / 2 = ChassisSpeeds{1.0, 1.25, 0.5}
+   * <p>For example, ChassisSpeeds{2.0, 2.5, 1.0} / 2 = ChassisSpeeds{1.0, 1.25, 0.5}
    *
    * @param scalar The scalar to multiply by.
    * @return The reference to the new mutated object.
