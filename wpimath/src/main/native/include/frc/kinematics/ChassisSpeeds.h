@@ -84,27 +84,32 @@ struct WPILIB_DLLEXPORT ChassisSpeeds {
 
   /**
    * Adds two ChassisSpeeds and returns the sum.
-   * 
-   * <p>For example, ChassisSpeeds{1.0, 0.5, 0.75} + ChassisSpeeds{2.0, 1.5, 0.25} = 
-   * ChassisSpeeds{3.0, 2.0, 1.0}
+   *
+   * <p>For example, ChassisSpeeds{1.0, 0.5, 0.75} + ChassisSpeeds{2.0, 1.5, 0.25}
+   * = ChassisSpeeds{3.0, 2.0, 1.0}
    *
    * @param other The ChassisSpeeds to add.
-   * 
+   *
    * @return The sum of the ChassisSpeeds.
    */
-  constexpr ChassisSpeeds operator+(const ChassisSpeeds& other) const;
+  constexpr ChassisSpeeds operator+(const ChassisSpeeds& other) const {
+    return {vx + other.vx, vy + other.vy, omega + other.omega};
+  }
 
   /**
-   * Subtracts the other ChassisSpeeds from the other ChassisSpeeds and returns the difference.
-   * 
-   * <p>For example, ChassisSpeeds{5.0, 4.0, 2.0} - ChassisSpeeds{1.0, 2.0, 1.0} =
-   * ChassisSpeeds{4.0, 2.0, 1.0}
+   * Subtracts the other ChassisSpeeds from the other ChassisSpeeds and returns
+   * the difference.
+   *
+   * <p>For example, ChassisSpeeds{5.0, 4.0, 2.0} - ChassisSpeeds{1.0, 2.0, 1.0}
+   * = ChassisSpeeds{4.0, 2.0, 1.0}
    *
    * @param other The ChassisSpeeds to subtract.
-   * 
+   *
    * @return The difference between the two ChassisSpeeds.
    */
-  constexpr ChassisSpeeds operator-(const ChassisSpeeds& other) const;
+  constexpr ChassisSpeeds operator-(const ChassisSpeeds& other) const {
+    return *this + -other;
+  }
 
   /**
    * Returns the inverse of the current ChassisSpeeds.
@@ -112,28 +117,34 @@ struct WPILIB_DLLEXPORT ChassisSpeeds {
    *
    * @return The inverse of the current ChassisSpeeds.
    */
-  constexpr ChassisSpeeds operator-() const;
+  constexpr ChassisSpeeds operator-() const { return {-vx, -vy, -omega}; }
 
   /**
    * Multiplies the ChassisSpeeds by a scalar and returns the new ChassisSpeeds.
-   * 
-   * <p>For example, ChassisSpeeds{2.0, 2.5, 1.0} * 2 = ChassisSpeeds{4.0, 5.0, 1.0}
+   *
+   * <p>For example, ChassisSpeeds{2.0, 2.5, 1.0} * 2 =
+   * ChassisSpeeds{4.0, 5.0, 1.0}
    *
    * @param scalar The scalar to multiply by.
-   * 
+   *
    * @return The scaled ChassisSpeeds.
    */
-  constexpr ChassisSpeeds operator*(double scalar) const;
+  constexpr ChassisSpeeds operator*(double scalar) const {
+    return {scalar * vx, scalar * vy, scalar * omega};
+  }
 
   /**
    * Divides the ChassisSpeeds by a scalar and returns the new ChassisSpeeds.
-   * 
-   * <p>For example, ChassisSpeeds{2.0, 2.5, 1.0} / 2 = ChassisSpeeds{1.0, 1.25, 0.5}
+   *
+   * <p>For example, ChassisSpeeds{2.0, 2.5, 1.0} / 2
+   * = ChassisSpeeds{1.0, 1.25, 0.5}
    *
    * @param scalar The scalar to multiply by.
-   * 
+   *
    * @return The reference to the new mutated object.
    */
-  constexpr ChassisSpeeds operator/(double scalar) const;
+  constexpr ChassisSpeeds operator/(double scalar) const {
+    return operator*(1.0 / scalar);
+  }
 };
 }  // namespace frc
