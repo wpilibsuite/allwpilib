@@ -74,6 +74,9 @@ TEST_P(AllianceTest, Alliance) {
     case HAL_AllianceStationID_kRed3:
       expected = 'R';
       break;
+    case HAL_AllianceStationID_kUnknown:
+      expected = 'U';
+      break;
   }
   EXPECT_EQ(expected, gString.at(0));
 }
