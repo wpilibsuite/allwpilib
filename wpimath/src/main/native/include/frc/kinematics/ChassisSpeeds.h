@@ -85,8 +85,8 @@ struct WPILIB_DLLEXPORT ChassisSpeeds {
   /**
    * Adds two ChassisSpeeds and returns the sum.
    *
-   * <p>For example, ChassisSpeeds{1.0, 0.5, 0.75} + ChassisSpeeds{2.0, 1.5, 0.25}
-   * = ChassisSpeeds{3.0, 2.0, 1.0}
+   * <p>For example, ChassisSpeeds{1.0, 0.5, 1.5} + ChassisSpeeds{2.0, 1.5, 0.5}
+   * = ChassisSpeeds{3.0, 2.0, 2.0}
    *
    * @param other The ChassisSpeeds to add.
    *
