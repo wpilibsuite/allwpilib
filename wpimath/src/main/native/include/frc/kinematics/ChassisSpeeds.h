@@ -122,8 +122,8 @@ struct WPILIB_DLLEXPORT ChassisSpeeds {
   /**
    * Multiplies the ChassisSpeeds by a scalar and returns the new ChassisSpeeds.
    *
-   * <p>For example, ChassisSpeeds{2.0, 2.5, 1.0} * 2 =
-   * ChassisSpeeds{4.0, 5.0, 1.0}
+   * <p>For example, ChassisSpeeds{2.0, 2.5, 1.0} * 2
+   * = ChassisSpeeds{4.0, 5.0, 1.0}
    *
    * @param scalar The scalar to multiply by.
    *
