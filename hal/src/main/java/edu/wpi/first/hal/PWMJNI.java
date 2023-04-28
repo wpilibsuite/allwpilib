@@ -11,28 +11,27 @@ public class PWMJNI extends DIOJNI {
 
   public static native void freePWMPort(int pwmPortHandle);
 
-  public static native void setPWMConfig(
+  public static native void setPWMConfigMicroseconds(
       int pwmPortHandle,
-      double maxPwm,
-      double deadbandMaxPwm,
-      double centerPwm,
-      double deadbandMinPwm,
-      double minPwm);
+      int maxPwm,
+      int deadbandMaxPwm,
+      int centerPwm,
+      int deadbandMinPwm,
+      int minPwm);
 
-  public static native PWMConfigDataResult getPWMConfig(int pwmPortHandle);
+  public static native PWMConfigDataResult getPWMConfigMicroseconds(int pwmPortHandle);
 
   public static native void setPWMEliminateDeadband(int pwmPortHandle, boolean eliminateDeadband);
 
   public static native boolean getPWMEliminateDeadband(int pwmPortHandle);
 
-  public static native void setPulseTimeMilliseconds(
-      int pwmPortHandle, double millisecondPulseTime);
+  public static native void setPulseTimeMicroseconds(int pwmPortHandle, int microsecondPulseTime);
 
   public static native void setPWMSpeed(int pwmPortHandle, double speed);
 
   public static native void setPWMPosition(int pwmPortHandle, double position);
 
-  public static native double getPulseTimeMilliseconds(int pwmPortHandle);
+  public static native int getPulseTimeMicroseconds(int pwmPortHandle);
 
   public static native double getPWMSpeed(int pwmPortHandle);
 

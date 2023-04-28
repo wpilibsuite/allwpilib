@@ -64,52 +64,52 @@ Java_edu_wpi_first_hal_simulation_PWMDataJNI_setInitialized
 
 /*
  * Class:     edu_wpi_first_hal_simulation_PWMDataJNI
- * Method:    registerPulseMillisecondValueCallback
+ * Method:    registerPulseMicrosecondValueCallback
  * Signature: (ILjava/lang/Object;Z)I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_first_hal_simulation_PWMDataJNI_registerPulseMillisecondValueCallback
+Java_edu_wpi_first_hal_simulation_PWMDataJNI_registerPulseMicrosecondValueCallback
   (JNIEnv* env, jclass, jint index, jobject callback, jboolean initialNotify)
 {
   return sim::AllocateCallback(env, index, callback, initialNotify,
-                               &HALSIM_RegisterPWMPulseMillisecondValueCallback);
+                               &HALSIM_RegisterPWMPulseMicrosecondValueCallback);
 }
 
 /*
  * Class:     edu_wpi_first_hal_simulation_PWMDataJNI
- * Method:    cancelPulseMillisecondValueCallback
+ * Method:    cancelPulseMicrosecondValueCallback
  * Signature: (II)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_hal_simulation_PWMDataJNI_cancelPulseMillisecondValueCallback
+Java_edu_wpi_first_hal_simulation_PWMDataJNI_cancelPulseMicrosecondValueCallback
   (JNIEnv* env, jclass, jint index, jint handle)
 {
   return sim::FreeCallback(env, handle, index,
-                           &HALSIM_CancelPWMPulseMillisecondValueCallback);
+                           &HALSIM_CancelPWMPulseMicrosecondValueCallback);
 }
 
 /*
  * Class:     edu_wpi_first_hal_simulation_PWMDataJNI
- * Method:    getPulseMillisecondValue
- * Signature: (I)D
+ * Method:    getPulseMicrosecondValue
+ * Signature: (I)I
  */
-JNIEXPORT jdouble JNICALL
-Java_edu_wpi_first_hal_simulation_PWMDataJNI_getPulseMillisecondValue
+JNIEXPORT jint JNICALL
+Java_edu_wpi_first_hal_simulation_PWMDataJNI_getPulseMicrosecondValue
   (JNIEnv*, jclass, jint index)
 {
-  return HALSIM_GetPWMPulseMillisecondValue(index);
+  return HALSIM_GetPWMPulseMicrosecondValue(index);
 }
 
 /*
  * Class:     edu_wpi_first_hal_simulation_PWMDataJNI
- * Method:    setPulseMillisecondValue
- * Signature: (ID)V
+ * Method:    setPulseMicrosecondValue
+ * Signature: (II)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_hal_simulation_PWMDataJNI_setPulseMillisecondValue
-  (JNIEnv*, jclass, jint index, jdouble value)
+Java_edu_wpi_first_hal_simulation_PWMDataJNI_setPulseMicrosecondValue
+  (JNIEnv*, jclass, jint index, jint value)
 {
-  HALSIM_SetPWMPulseMillisecondValue(index, value);
+  HALSIM_SetPWMPulseMicrosecondValue(index, value);
 }
 
 /*

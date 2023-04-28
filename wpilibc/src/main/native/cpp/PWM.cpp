@@ -54,15 +54,15 @@ PWM::~PWM() {
   FRC_ReportError(status, "Channel {}", m_channel);
 }
 
-void PWM::SetPulseTime(units::millisecond_t time) {
+void PWM::SetPulseTime(units::microsecond_t time) {
   int32_t status = 0;
-  HAL_SetPWMPulseTime(m_handle, time.value(), &status);
+  HAL_SetPWMPulseTimeMicroseconds(m_handle, time.value(), &status);
   FRC_CheckErrorStatus(status, "Channel {}", m_channel);
 }
 
-units::millisecond_t PWM::GetPulseTime() const {
+units::microsecond_t PWM::GetPulseTime() const {
   int32_t status = 0;
-  double value = HAL_GetPWMPulseTime(m_handle, &status);
+  double value = HAL_GetPWMPulseTimeMicroseconds(m_handle, &status);
   FRC_CheckErrorStatus(status, "Channel {}", m_channel);
 
   return units::millisecond_t{value};
@@ -135,30 +135,30 @@ void PWM::EnableDeadbandElimination(bool eliminateDeadband) {
   FRC_CheckErrorStatus(status, "Channel {}", m_channel);
 }
 
-void PWM::SetBounds(units::millisecond_t max, units::millisecond_t deadbandMax,
-                    units::millisecond_t center,
-                    units::millisecond_t deadbandMin,
-                    units::millisecond_t min) {
+void PWM::SetBounds(units::microsecond_t max, units::microsecond_t deadbandMax,
+                    units::microsecond_t center,
+                    units::microsecond_t deadbandMin,
+                    units::microsecond_t min) {
   int32_t status = 0;
-  HAL_SetPWMConfig(m_handle, max.value(), deadbandMax.value(), center.value(),
+  HAL_SetPWMConfigMicroseconds(m_handle, max.value(), deadbandMax.value(), center.value(),
                    deadbandMin.value(), min.value(), &status);
   FRC_CheckErrorStatus(status, "Channel {}", m_channel);
 }
 
-void PWM::GetBounds(units::millisecond_t* max,
-                    units::millisecond_t* deadbandMax,
-                    units::millisecond_t* center,
-                    units::millisecond_t* deadbandMin,
-                    units::millisecond_t* min) {
+void PWM::GetBounds(units::microsecond_t* max,
+                    units::microsecond_t* deadbandMax,
+                    units::microsecond_t* center,
+                    units::microsecond_t* deadbandMin,
+                    units::microsecond_t* min) {
   int32_t status = 0;
-  double rawMax, rawDeadbandMax, rawCenter, rawDeadbandMin, rawMin;
-  HAL_GetPWMConfig(m_handle, &rawMax, &rawDeadbandMax, &rawCenter,
+  int32_t rawMax, rawDeadbandMax, rawCenter, rawDeadbandMin, rawMin;
+  HAL_GetPWMConfigMicroseconds(m_handle, &rawMax, &rawDeadbandMax, &rawCenter,
                    &rawDeadbandMin, &rawMin, &status);
-  *max = units::millisecond_t{rawMax};
-  *deadbandMax = units::millisecond_t{rawDeadbandMax};
-  *center = units::millisecond_t{rawCenter};
-  *deadbandMin = units::millisecond_t{rawDeadbandMin};
-  *min = units::millisecond_t{rawMin};
+  *max = units::microsecond_t{static_cast<double>(rawMax)};
+  *deadbandMax = units::microsecond_t{static_cast<double>(rawDeadbandMax)};
+  *center = units::microsecond_t{static_cast<double>(rawCenter)};
+  *deadbandMin = units::microsecond_t{static_cast<double>(rawDeadbandMin)};
+  *min = units::microsecond_t{static_cast<double>(rawMin)};
   FRC_CheckErrorStatus(status, "Channel {}", m_channel);
 }
 

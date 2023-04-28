@@ -63,36 +63,36 @@ Java_edu_wpi_first_hal_PWMJNI_freePWMPort
 
 /*
  * Class:     edu_wpi_first_hal_PWMJNI
- * Method:    setPWMConfig
- * Signature: (IDDDDD)V
+ * Method:    setPWMConfigMicroseconds
+ * Signature: (IIIIII)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_hal_PWMJNI_setPWMConfig
-  (JNIEnv* env, jclass, jint id, jdouble maxPwm, jdouble deadbandMaxPwm,
-   jdouble centerPwm, jdouble deadbandMinPwm, jdouble minPwm)
+Java_edu_wpi_first_hal_PWMJNI_setPWMConfigMicroseconds
+  (JNIEnv* env, jclass, jint id, jint maxPwm, jint deadbandMaxPwm,
+   jint centerPwm, jint deadbandMinPwm, jint minPwm)
 {
   int32_t status = 0;
-  HAL_SetPWMConfig((HAL_DigitalHandle)id, maxPwm, deadbandMaxPwm, centerPwm,
+  HAL_SetPWMConfigMicroseconds((HAL_DigitalHandle)id, maxPwm, deadbandMaxPwm, centerPwm,
                    deadbandMinPwm, minPwm, &status);
   CheckStatus(env, status);
 }
 
 /*
  * Class:     edu_wpi_first_hal_PWMJNI
- * Method:    getPWMConfig
+ * Method:    getPWMConfigMicroseconds
  * Signature: (I)Ljava/lang/Object;
  */
 JNIEXPORT jobject JNICALL
-Java_edu_wpi_first_hal_PWMJNI_getPWMConfig
+Java_edu_wpi_first_hal_PWMJNI_getPWMConfigMicroseconds
   (JNIEnv* env, jclass, jint id)
 {
   int32_t status = 0;
-  double maxPwm = 0;
-  double deadbandMaxPwm = 0;
-  double centerPwm = 0;
-  double deadbandMinPwm = 0;
-  double minPwm = 0;
-  HAL_GetPWMConfig((HAL_DigitalHandle)id, &maxPwm, &deadbandMaxPwm,
+  int32_t maxPwm = 0;
+  int32_t deadbandMaxPwm = 0;
+  int32_t centerPwm = 0;
+  int32_t deadbandMinPwm = 0;
+  int32_t minPwm = 0;
+  HAL_GetPWMConfigMicroseconds((HAL_DigitalHandle)id, &maxPwm, &deadbandMaxPwm,
                       &centerPwm, &deadbandMinPwm, &minPwm, &status);
   CheckStatus(env, status);
   return CreatePWMConfigDataResult(env, maxPwm, deadbandMaxPwm, centerPwm,
@@ -130,15 +130,15 @@ Java_edu_wpi_first_hal_PWMJNI_getPWMEliminateDeadband
 
 /*
  * Class:     edu_wpi_first_hal_PWMJNI
- * Method:    setPulseTimeMilliseconds
- * Signature: (ID)V
+ * Method:    setPulseTimeMicroseconds
+ * Signature: (II)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_hal_PWMJNI_setPulseTimeMilliseconds
-  (JNIEnv* env, jclass, jint id, jdouble value)
+Java_edu_wpi_first_hal_PWMJNI_setPulseTimeMicroseconds
+  (JNIEnv* env, jclass, jint id, jint value)
 {
   int32_t status = 0;
-  HAL_SetPWMPulseTime((HAL_DigitalHandle)id, value, &status);
+  HAL_SetPWMPulseTimeMicroseconds((HAL_DigitalHandle)id, value, &status);
   CheckStatus(env, status);
 }
 
@@ -172,15 +172,15 @@ Java_edu_wpi_first_hal_PWMJNI_setPWMPosition
 
 /*
  * Class:     edu_wpi_first_hal_PWMJNI
- * Method:    getPulseTimeMilliseconds
- * Signature: (I)D
+ * Method:    getPulseTimeMicroseconds
+ * Signature: (I)I
  */
-JNIEXPORT jdouble JNICALL
-Java_edu_wpi_first_hal_PWMJNI_getPulseTimeMilliseconds
+JNIEXPORT jint JNICALL
+Java_edu_wpi_first_hal_PWMJNI_getPulseTimeMicroseconds
   (JNIEnv* env, jclass, jint id)
 {
   int32_t status = 0;
-  jshort returnValue = HAL_GetPWMPulseTime((HAL_DigitalHandle)id, &status);
+  int32_t returnValue = HAL_GetPWMPulseTimeMicroseconds((HAL_DigitalHandle)id, &status);
   CheckStatus(env, status);
   return returnValue;
 }

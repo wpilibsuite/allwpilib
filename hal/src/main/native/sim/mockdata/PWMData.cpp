@@ -17,7 +17,7 @@ void InitializePWMData() {
 PWMData* hal::SimPWMData;
 void PWMData::ResetData() {
   initialized.Reset(false);
-  pulseMillisecondValue.Reset(0);
+  pulseMicrosecondValue.Reset(0);
   speed.Reset(0);
   position.Reset(0);
   periodScale.Reset(0);
@@ -34,7 +34,7 @@ void HALSIM_ResetPWMData(int32_t index) {
                                LOWERNAME)
 
 DEFINE_CAPI(HAL_Bool, Initialized, initialized)
-DEFINE_CAPI(double, PulseMillisecondValue, pulseMillisecondValue)
+DEFINE_CAPI(int32_t, PulseMicrosecondValue, pulseMicrosecondValue)
 DEFINE_CAPI(double, Speed, speed)
 DEFINE_CAPI(double, Position, position)
 DEFINE_CAPI(int32_t, PeriodScale, periodScale)
@@ -46,7 +46,7 @@ DEFINE_CAPI(HAL_Bool, ZeroLatch, zeroLatch)
 void HALSIM_RegisterPWMAllCallbacks(int32_t index, HAL_NotifyCallback callback,
                                     void* param, HAL_Bool initialNotify) {
   REGISTER(initialized);
-  REGISTER(pulseMillisecondValue);
+  REGISTER(pulseMicrosecondValue);
   REGISTER(speed);
   REGISTER(position);
   REGISTER(periodScale);

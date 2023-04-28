@@ -19,18 +19,9 @@ class DMA;
  * Class implements the PWM generation in the FPGA.
  *
  * The values supplied as arguments for PWM outputs range from -1.0 to 1.0. They
- * are mapped to the hardware dependent values, in this case 0-2000 for the
- * FPGA. Changes are immediately sent to the FPGA, and the update occurs at the
- * next FPGA cycle (5.005ms). There is no delay.
- *
- * As of revision 0.1.10 of the FPGA, the FPGA interprets the 0-2000 values as
- * follows:
- *   - 2000 = maximum pulse width
- *   - 1999 to 1001 = linear scaling from "full forward" to "center"
- *   - 1000 = center value
- *   - 999 to 2 = linear scaling from "center" to "full reverse"
- *   - 1 = minimum pulse width (currently 0.5ms)
- *   - 0 = disabled (i.e. PWM output is held low)
+ * are mapped to the microseconds to keep the pulse high, with a range of 0
+ * (off) to 4096. Changes are immediately sent to the FPGA, and the update
+ * occurs at the next FPGA cycle (5.05ms). There is no delay.
  */
 class PWM : public wpi::Sendable, public wpi::SendableHelper<PWM> {
  public:
@@ -41,15 +32,15 @@ class PWM : public wpi::Sendable, public wpi::SendableHelper<PWM> {
    */
   enum PeriodMultiplier {
     /**
-     * Don't skip pulses. PWM pulses occur every 5.005 ms
+     * Don't skip pulses. PWM pulses occur every 5.05 ms
      */
     kPeriodMultiplier_1X = 1,
     /**
-     * Skip every other pulse. PWM pulses occur every 10.010 ms
+     * Skip every other pulse. PWM pulses occur every 10.10 ms
      */
     kPeriodMultiplier_2X = 2,
     /**
-     * Skip three out of four pulses. PWM pulses occur every 20.020 ms
+     * Skip three out of four pulses. PWM pulses occur every 20.20 ms
      */
     kPeriodMultiplier_4X = 4
   };
@@ -85,7 +76,7 @@ class PWM : public wpi::Sendable, public wpi::SendableHelper<PWM> {
    *
    * @param time Millisecond PWM value.
    */
-  virtual void SetPulseTime(units::millisecond_t time);
+  virtual void SetPulseTime(units::microsecond_t time);
 
   /**
    * Get the PWM pulse time directly from the hardware.
@@ -94,7 +85,7 @@ class PWM : public wpi::Sendable, public wpi::SendableHelper<PWM> {
    *
    * @return Millisond PWM control value.
    */
-  virtual units::millisecond_t GetPulseTime() const;
+  virtual units::microsecond_t GetPulseTime() const;
 
   /**
    * Set the PWM value based on a position.
@@ -187,14 +178,14 @@ class PWM : public wpi::Sendable, public wpi::SendableHelper<PWM> {
    * @param deadbandMin The low end of the deadband pulse width in ms
    * @param min         The minimum pulse width in ms
    */
-  void SetBounds(units::millisecond_t max, units::millisecond_t deadbandMax,
-                 units::millisecond_t center, units::millisecond_t deadbandMin,
-                 units::millisecond_t min);
+  void SetBounds(units::microsecond_t max, units::microsecond_t deadbandMax,
+                 units::microsecond_t center, units::microsecond_t deadbandMin,
+                 units::microsecond_t min);
 
   /**
    * Get the bounds on the PWM values.
    *
-   * This Gets the bounds on the PWM values for a particular each type of
+   * This gets the bounds on the PWM values for a particular each type of
    * controller. The values determine the upper and lower speeds as well as the
    * deadband bracket.
    *
@@ -204,9 +195,9 @@ class PWM : public wpi::Sendable, public wpi::SendableHelper<PWM> {
    * @param deadbandMin The low end of the deadband range
    * @param min         The minimum pwm value
    */
-  void GetBounds(units::millisecond_t* max, units::millisecond_t* deadbandMax,
-                 units::millisecond_t* center,
-                 units::millisecond_t* deadbandMin, units::millisecond_t* min);
+  void GetBounds(units::microsecond_t* max, units::microsecond_t* deadbandMax,
+                 units::microsecond_t* center,
+                 units::microsecond_t* deadbandMin, units::microsecond_t* min);
 
   /**
    * Sets the PWM output to be a continous high signal while enabled.

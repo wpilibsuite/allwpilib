@@ -19,8 +19,8 @@ public class Servo extends PWM {
   private static final double kMaxServoAngle = 180.0;
   private static final double kMinServoAngle = 0.0;
 
-  protected static final double kDefaultMaxServoPWM = 2.4;
-  protected static final double kDefaultMinServoPWM = 0.6;
+  protected static final int kDefaultMaxServoPWM = 2400;
+  protected static final int kDefaultMinServoPWM = 600;
 
   /**
    * Constructor.<br>
@@ -33,7 +33,7 @@ public class Servo extends PWM {
    */
   public Servo(final int channel) {
     super(channel);
-    setBounds(kDefaultMaxServoPWM, 0, 0, 0, kDefaultMinServoPWM);
+    setBoundsMicroseconds(kDefaultMaxServoPWM, 0, 0, 0, kDefaultMinServoPWM);
     setPeriodMultiplier(PeriodMultiplier.k4X);
 
     HAL.report(tResourceType.kResourceType_Servo, getChannel() + 1);

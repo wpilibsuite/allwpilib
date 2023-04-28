@@ -40,15 +40,15 @@ class PWMSimTest {
     sim.resetData();
     assertFalse(sim.getInitialized());
 
-    DoubleCallback callback = new DoubleCallback();
+    IntCallback callback = new IntCallback();
 
-    try (CallbackStore cb = sim.registerPulseMillisecondValueCallback(callback, false);
+    try (CallbackStore cb = sim.registerPulseMicrosecondValueCallback(callback, false);
         PWM pwm = new PWM(0)) {
-      sim.setPulseMillisecondValue(2.29);
-      assertEquals(2.29, sim.getPulseMillisecondValue(), 0.001);
-      assertEquals(2.29, pwm.getPulseTimeMilliseconds(), 0.001);
+      sim.setPulseMicrosecondValue(2290);
+      assertEquals(2290, sim.getPulseMicrosecondValue());
+      assertEquals(2290, pwm.getPulseTimeMicroseconds());
       assertTrue(callback.wasTriggered());
-      assertEquals(2.29, callback.getSetValue(), 0.001);
+      assertEquals(2290, callback.getSetValue());
     }
   }
 

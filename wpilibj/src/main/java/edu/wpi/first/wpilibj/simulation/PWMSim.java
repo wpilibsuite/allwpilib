@@ -79,10 +79,10 @@ public class PWMSim {
    * @return the {@link CallbackStore} object associated with this callback. Save a reference to
    *     this object so GC doesn't cancel the callback.
    */
-  public CallbackStore registerPulseMillisecondValueCallback(
+  public CallbackStore registerPulseMicrosecondValueCallback(
       NotifyCallback callback, boolean initialNotify) {
-    int uid = PWMDataJNI.registerPulseMillisecondValueCallback(m_index, callback, initialNotify);
-    return new CallbackStore(m_index, uid, PWMDataJNI::cancelPulseMillisecondValueCallback);
+    int uid = PWMDataJNI.registerPulseMicrosecondValueCallback(m_index, callback, initialNotify);
+    return new CallbackStore(m_index, uid, PWMDataJNI::cancelPulseMicrosecondValueCallback);
   }
 
   /**
@@ -90,8 +90,8 @@ public class PWMSim {
    *
    * @return the PWM raw value
    */
-  public double getPulseMillisecondValue() {
-    return PWMDataJNI.getPulseMillisecondValue(m_index);
+  public int getPulseMicrosecondValue() {
+    return PWMDataJNI.getPulseMicrosecondValue(m_index);
   }
 
   /**
@@ -99,8 +99,8 @@ public class PWMSim {
    *
    * @param rawValue the PWM raw value
    */
-  public void setPulseMillisecondValue(double rawValue) {
-    PWMDataJNI.setPulseMillisecondValue(m_index, rawValue);
+  public void setPulseMicrosecondValue(int rawValue) {
+    PWMDataJNI.setPulseMicrosecondValue(m_index, rawValue);
   }
 
   /**
