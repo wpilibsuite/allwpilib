@@ -243,7 +243,7 @@ Vectord<4> PoseTo4dVector(const Pose2d& pose);
  *
  * (A, B) is stabilizable if and only if the uncontrollable eigenvalues of A, if
  * any, have absolute values less than one, where an eigenvalue is
- * uncontrollable if rank(λI - A, B) < n where n is the number of states.
+ * uncontrollable if rank([λI - A, B]) < n where n is the number of states.
  *
  * @tparam States The number of states.
  * @tparam Inputs The number of inputs.
@@ -261,7 +261,7 @@ bool IsStabilizable(const Matrixd<States, States>& A,
  *
  * (A, C) is detectable if and only if the unobservable eigenvalues of A, if
  * any, have absolute values less than one, where an eigenvalue is unobservable
- * if rank(λI - A; C) < n where n is the number of states.
+ * if rank([λI - A; C]) < n where n is the number of states.
  *
  * @tparam States The number of states.
  * @tparam Outputs The number of outputs.
