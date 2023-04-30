@@ -33,7 +33,7 @@ class PWMSimTest {
   }
 
   @Test
-  void testSetRawValue() {
+  void testSetPulseTime() {
     HAL.initialize(500, 0);
 
     PWMSim sim = new PWMSim(0);
@@ -42,10 +42,10 @@ class PWMSimTest {
 
     IntCallback callback = new IntCallback();
 
-    try (CallbackStore cb = sim.registerPulseMicrosecondValueCallback(callback, false);
+    try (CallbackStore cb = sim.registerPulseMicrosecondCallback(callback, false);
         PWM pwm = new PWM(0)) {
-      sim.setPulseMicrosecondValue(2290);
-      assertEquals(2290, sim.getPulseMicrosecondValue());
+      sim.setPulseMicrosecond(2290);
+      assertEquals(2290, sim.getPulseMicrosecond());
       assertEquals(2290, pwm.getPulseTimeMicroseconds());
       assertTrue(callback.wasTriggered());
       assertEquals(2290, callback.getSetValue());

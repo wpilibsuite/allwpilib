@@ -73,7 +73,7 @@ class PWMSim {
    * @return the CallbackStore object associated with this callback
    */
   [[nodiscard]] std::unique_ptr<CallbackStore>
-  RegisterPulseMicrosecondValueCallback(NotifyCallback callback,
+  RegisterPulseMicrosecondCallback(NotifyCallback callback,
                                         bool initialNotify);
 
   /**
@@ -81,14 +81,14 @@ class PWMSim {
    *
    * @return the PWM pulse microsecond value
    */
-  int32_t GetPulseMicrosecondValue() const;
+  int32_t GetPulseMicrosecond() const;
 
   /**
    * Set the PWM pulse microsecond value.
    *
-   * @param rawValue the PWM pulse microsecond value
+   * @param raw the PWM pulse microsecond value
    */
-  void SetPulseMicrosecondValue(int32_t rawValue);
+  void SetPulseMicrosecond(int32_t microsecondPulseTime);
 
   /**
    * Register a callback to be run when the PWM speed changes.

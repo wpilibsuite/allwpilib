@@ -72,18 +72,18 @@ class PWM : public wpi::Sendable, public wpi::SendableHelper<PWM> {
   /**
    * Set the PWM pulse time directly to the hardware.
    *
-   * Write a millisecond value to a PWM channel.
+   * Write a microsecond value to a PWM channel.
    *
-   * @param time Millisecond PWM value.
+   * @param time Microsecond PWM value.
    */
   virtual void SetPulseTime(units::microsecond_t time);
 
   /**
    * Get the PWM pulse time directly from the hardware.
    *
-   * Read a millisecond value from a PWM channel.
+   * Read a microsecond value from a PWM channel.
    *
-   * @return Millisond PWM control value.
+   * @return Microsecond PWM control value.
    */
   virtual units::microsecond_t GetPulseTime() const;
 
@@ -172,11 +172,11 @@ class PWM : public wpi::Sendable, public wpi::SendableHelper<PWM> {
    * The values determine the upper and lower speeds as well as the deadband
    * bracket.
    *
-   * @param max         The max PWM pulse width in ms
-   * @param deadbandMax The high end of the deadband range pulse width in ms
-   * @param center      The center (off) pulse width in ms
-   * @param deadbandMin The low end of the deadband pulse width in ms
-   * @param min         The minimum pulse width in ms
+   * @param max         The max PWM pulse width in us
+   * @param deadbandMax The high end of the deadband range pulse width in us
+   * @param center      The center (off) pulse width in us
+   * @param deadbandMin The low end of the deadband pulse width in us
+   * @param min         The minimum pulse width in us
    */
   void SetBounds(units::microsecond_t max, units::microsecond_t deadbandMax,
                  units::microsecond_t center, units::microsecond_t deadbandMin,

@@ -98,11 +98,11 @@ public class PWM implements Sendable, AutoCloseable {
    * type of controller. The values determine the upper and lower speeds as well as the deadband
    * bracket.
    *
-   * @param max The max PWM pulse width in ms
-   * @param deadbandMax The high end of the deadband range pulse width in ms
-   * @param center The center (off) pulse width in ms
-   * @param deadbandMin The low end of the deadband pulse width in ms
-   * @param min The minimum pulse width in ms
+   * @param max The max PWM pulse width in us
+   * @param deadbandMax The high end of the deadband range pulse width in us
+   * @param center The center (off) pulse width in us
+   * @param deadbandMin The low end of the deadband pulse width in us
+   * @param min The minimum pulse width in us
    */
   public void setBoundsMicroseconds(
       int max, int deadbandMax, int center, int deadbandMin, int min) {
@@ -191,10 +191,10 @@ public class PWM implements Sendable, AutoCloseable {
    *
    * <p>Write a microsecond pulse value to a PWM channel.
    *
-   * @param millisecondPulseTime Microsecond pulse PWM value. Range 0 - 4.096.
+   * @param microsecondPulseTime Microsecond pulse PWM value. Range 0 - 4096.
    */
-  public void setPulseTimeMicroseconds(int millisecondPulseTime) {
-    PWMJNI.setPulseTimeMicroseconds(m_handle, millisecondPulseTime);
+  public void setPulseTimeMicroseconds(int microsecondPulseTime) {
+    PWMJNI.setPulseTimeMicroseconds(m_handle, microsecondPulseTime);
   }
 
   /**
@@ -202,7 +202,7 @@ public class PWM implements Sendable, AutoCloseable {
    *
    * <p>Read a raw value from a PWM channel.
    *
-   * @return Microsecond pulse PWM control value. Range: 0 - 4.096.
+   * @return Microsecond pulse PWM control value. Range: 0 - 4096.
    */
   public int getPulseTimeMicroseconds() {
     return PWMJNI.getPulseTimeMicroseconds(m_handle);

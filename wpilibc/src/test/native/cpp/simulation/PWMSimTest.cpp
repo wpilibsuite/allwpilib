@@ -26,7 +26,7 @@ TEST(PWMSimTest, Initialize) {
   EXPECT_TRUE(sim.GetInitialized());
 }
 
-TEST(PWMSimTest, SetRawValue) {
+TEST(PWMSimTest, SetPulseTime) {
   HAL_Initialize(500, 0);
 
   PWMSim sim{0};
@@ -35,11 +35,11 @@ TEST(PWMSimTest, SetRawValue) {
 
   IntCallback callback;
 
-  auto cb = sim.RegisterPulseMicrosecondValueCallback(callback.GetCallback(), false);
+  auto cb = sim.RegisterPulseMicrosecondCallback(callback.GetCallback(), false);
   PWM pwm{0};
-  sim.SetPulseMicrosecondValue(2290);
-  EXPECT_EQ(2290, sim.GetPulseMicrosecondValue());
-  EXPECT_EQ(2290, pwm.GetPulseTime().value());
+  sim.SetPulseMicrosecond(2290);
+  EXPECT_EQ(2290, sim.GetPulseMicrosecond());
+  EXPECT_EQ(2290, std::lround(pwm.GetPulseTime().value()));
   EXPECT_TRUE(callback.WasTriggered());
   EXPECT_EQ(2290, callback.GetLastValue());
 }

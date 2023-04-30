@@ -144,7 +144,7 @@ void HAL_SetPWMPulseTimeMicroseconds(HAL_DigitalHandle pwmPortHandle, int32_t va
     return;
   }
 
-  SimPWMData[port->channel].pulseMicrosecondValue = value;
+  SimPWMData[port->channel].pulseMicrosecond = value;
 }
 
 void HAL_SetPWMSpeed(HAL_DigitalHandle pwmPortHandle, double speed,
@@ -195,7 +195,7 @@ void HAL_SetPWMDisabled(HAL_DigitalHandle pwmPortHandle, int32_t* status) {
     *status = HAL_HANDLE_ERROR;
     return;
   }
-  SimPWMData[port->channel].pulseMicrosecondValue = 0;
+  SimPWMData[port->channel].pulseMicrosecond = 0;
   SimPWMData[port->channel].position = 0;
   SimPWMData[port->channel].speed = 0;
 }
@@ -207,7 +207,7 @@ int32_t HAL_GetPWMPulseTimeMicroseconds(HAL_DigitalHandle pwmPortHandle, int32_t
     return 0;
   }
 
-  return SimPWMData[port->channel].pulseMicrosecondValue;
+  return SimPWMData[port->channel].pulseMicrosecond;
 }
 
 double HAL_GetPWMSpeed(HAL_DigitalHandle pwmPortHandle, int32_t* status) {
@@ -270,7 +270,7 @@ void HAL_SetPWMAlwaysHighMode(HAL_DigitalHandle pwmPortHandle, int32_t* status) 
     return;
   }
 
-  SimPWMData[port->channel].pulseMicrosecondValue = 0xFFFF;
+  SimPWMData[port->channel].pulseMicrosecond = 0xFFFF;
   SimPWMData[port->channel].position = 0xFFFF;
   SimPWMData[port->channel].speed = 0xFFFF;
 }

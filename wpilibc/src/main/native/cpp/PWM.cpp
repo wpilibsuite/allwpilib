@@ -65,7 +65,7 @@ units::microsecond_t PWM::GetPulseTime() const {
   double value = HAL_GetPWMPulseTimeMicroseconds(m_handle, &status);
   FRC_CheckErrorStatus(status, "Channel {}", m_channel);
 
-  return units::millisecond_t{value};
+  return units::microsecond_t{value};
 }
 
 void PWM::SetPosition(double pos) {
