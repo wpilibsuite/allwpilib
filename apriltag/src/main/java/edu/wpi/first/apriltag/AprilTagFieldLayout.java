@@ -214,9 +214,9 @@ public class AprilTagFieldLayout {
    * <p>Users should use {@link AprilTagFields#loadAprilTagLayoutField()} to load official layouts
    * and {@link #AprilTagFieldLayout(String)} for custom layouts.
    *
-   * @param resourcePath The absolute path of the resource
-   * @return The deserialized layout
-   * @throws IOException If the resource could not be loaded
+   * @param resourcePath The absolute path of the resource.
+   * @return The deserialized layout.
+   * @throws IOException If the resource could not be loaded.
    */
   @Deprecated
   public static AprilTagFieldLayout loadFromResource(String resourcePath) {
@@ -224,7 +224,7 @@ public class AprilTagFieldLayout {
         InputStreamReader reader = new InputStreamReader(stream)) {
       return new ObjectMapper().readerFor(AprilTagFieldLayout.class).readValue(reader);
     } catch (IOException e) {
-      throw new RuntimeException("AprilTagFieldLayout failed to load from internal resource", e);
+      throw new RuntimeException("AprilTagFi eldLayout failed to load from internal resource", e);
     }
   }
 
