@@ -41,6 +41,10 @@ CommandPtr Command::Until(std::function<bool()> condition) && {
   return std::move(*this).ToPtr().Until(std::move(condition));
 }
 
+CommandPtr Command::OnlyWhile(std::function<bool()> condition) && {
+  return std::move(*this).ToPtr().OnlyWhile(std::move(condition));
+}
+
 CommandPtr Command::IgnoringDisable(bool doesRunWhenDisabled) && {
   return std::move(*this).ToPtr().IgnoringDisable(doesRunWhenDisabled);
 }
@@ -94,6 +98,10 @@ CommandPtr Command::AsProxy() && {
 
 CommandPtr Command::Unless(std::function<bool()> condition) && {
   return std::move(*this).ToPtr().Unless(std::move(condition));
+}
+
+CommandPtr Command::OnlyIf(std::function<bool()> condition) && {
+  return std::move(*this).ToPtr().OnlyIf(std::move(condition));
 }
 
 CommandPtr Command::FinallyDo(std::function<void(bool)> end) && {
