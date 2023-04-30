@@ -102,6 +102,20 @@ class WPILIB_DLLEXPORT AprilTagFieldLayout {
    */
   void Serialize(std::string_view path);
 
+  /**
+  * Loads the field layout for the 2022 Charged Up field.
+  *
+  * @return AprilTagFieldLayout for the 2022 field.
+  */
+  AprilTagFieldLayout Load2022RapidReactFieldLayout() const;
+
+  /**
+  * Loads the field layout for the 2023 Charged Up field.
+  *
+  * @return AprilTagFieldLayout for the 2023 field.
+  */
+  AprilTagFieldLayout Load2023ChargedUpFieldLayout() const;
+
   /*
    * Checks equality between this AprilTagFieldLayout and another object.
    */
