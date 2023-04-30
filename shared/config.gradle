@@ -138,7 +138,7 @@ ext.createComponentZipTasks = { components, names, base, type, project, func ->
         def task = project.tasks.create(base + "-${key}", type) {
             description = 'Creates component archive for platform ' + key
             destinationDirectory = outputsFolder
-            classifier = key
+            archiveClassifier = key
             archiveBaseName = '_M_' + base
             duplicatesStrategy = 'exclude'
 
