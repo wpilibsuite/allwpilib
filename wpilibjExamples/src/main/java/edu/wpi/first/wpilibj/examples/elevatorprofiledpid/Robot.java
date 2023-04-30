@@ -4,6 +4,7 @@
 
 package edu.wpi.first.wpilibj.examples.elevatorprofiledpid;
 
+import edu.wpi.first.math.controller.ElevatorFeedforward;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj.Encoder;
@@ -25,6 +26,8 @@ public class Robot extends TimedRobot {
       new TrapezoidProfile.Constraints(1.75, 0.75);
   private final ProfiledPIDController m_controller =
       new ProfiledPIDController(1.3, 0.0, 0.7, m_constraints, kDt);
+  private final ElevatorFeedforward m_feedforward = 
+      new ElevatorFeedforward(1, 1.1, 1.2);
 
   @Override
   public void robotInit() {
@@ -40,6 +43,6 @@ public class Robot extends TimedRobot {
     }
 
     // Run controller and update motor output
-    m_motor.set(m_controller.calculate(m_encoder.getDistance()));
+    m_motor.setVoltage(m_controller.calculate(m_encoder.getDistance()) + m_feedforward.calculate(m_controller.getSetpoint().velocity));
   }
 }
