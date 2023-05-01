@@ -48,15 +48,15 @@ public class ElevatorSim extends LinearSystemSim<N2, N1, N1> {
    * @param measurementStdDevs The standard deviations of the measurements.
    */
   public ElevatorSim(
-          LinearSystem<N2, N1, N1> plant,
-          DCMotor gearbox,
-          double gearing,
-          double drumRadiusMeters,
-          double minHeightMeters,
-          double maxHeightMeters,
-          boolean simulateGravity,
-          double startingHeightMeters,
-          Matrix<N1, N1> measurementStdDevs) {
+      LinearSystem<N2, N1, N1> plant,
+      DCMotor gearbox,
+      double gearing,
+      double drumRadiusMeters,
+      double minHeightMeters,
+      double maxHeightMeters,
+      boolean simulateGravity,
+      double startingHeightMeters,
+      Matrix<N1, N1> measurementStdDevs) {
     super(plant, measurementStdDevs);
     m_gearbox = gearbox;
     m_gearing = gearing;
@@ -65,7 +65,8 @@ public class ElevatorSim extends LinearSystemSim<N2, N1, N1> {
     m_maxHeight = maxHeightMeters;
     m_simulateGravity = simulateGravity;
 
-    setState(VecBuilder.fill(MathUtil.clamp(startingHeightMeters, minHeightMeters, maxHeightMeters), 0));
+    setState(
+        VecBuilder.fill(MathUtil.clamp(startingHeightMeters, minHeightMeters, maxHeightMeters), 0));
   }
 
   /**
@@ -125,15 +126,15 @@ public class ElevatorSim extends LinearSystemSim<N2, N1, N1> {
       double startingHeightMeters,
       Matrix<N1, N1> measurementStdDevs) {
     this(
-            LinearSystemId.createElevatorSystem(gearbox, carriageMassKg, drumRadiusMeters, gearing),
-            gearbox,
-            gearing,drumRadiusMeters,
-            minHeightMeters,
-            maxHeightMeters,
-            simulateGravity,
-            startingHeightMeters,
-            measurementStdDevs
-    );
+        LinearSystemId.createElevatorSystem(gearbox, carriageMassKg, drumRadiusMeters, gearing),
+        gearbox,
+        gearing,
+        drumRadiusMeters,
+        minHeightMeters,
+        maxHeightMeters,
+        simulateGravity,
+        startingHeightMeters,
+        measurementStdDevs);
   }
 
   /**
@@ -149,24 +150,24 @@ public class ElevatorSim extends LinearSystemSim<N2, N1, N1> {
    * @param startingHeightMeters The starting height of the elevator.
    */
   public ElevatorSim(
-          DCMotor gearbox,
-          double gearing,
-          double carriageMassKg,
-          double drumRadiusMeters,
-          double minHeightMeters,
-          double maxHeightMeters,
-          boolean simulateGravity,
-          double startingHeightMeters) {
+      DCMotor gearbox,
+      double gearing,
+      double carriageMassKg,
+      double drumRadiusMeters,
+      double minHeightMeters,
+      double maxHeightMeters,
+      boolean simulateGravity,
+      double startingHeightMeters) {
     this(
-            gearbox,
-            gearing,
-            carriageMassKg,
-            drumRadiusMeters,
-            minHeightMeters,
-            maxHeightMeters,
-            simulateGravity,
-            startingHeightMeters,
-            null);
+        gearbox,
+        gearing,
+        carriageMassKg,
+        drumRadiusMeters,
+        minHeightMeters,
+        maxHeightMeters,
+        simulateGravity,
+        startingHeightMeters,
+        null);
   }
 
   /**
