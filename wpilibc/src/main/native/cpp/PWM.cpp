@@ -140,8 +140,9 @@ void PWM::SetBounds(units::microsecond_t max, units::microsecond_t deadbandMax,
                     units::microsecond_t deadbandMin,
                     units::microsecond_t min) {
   int32_t status = 0;
-  HAL_SetPWMConfigMicroseconds(m_handle, max.value(), deadbandMax.value(), center.value(),
-                   deadbandMin.value(), min.value(), &status);
+  HAL_SetPWMConfigMicroseconds(m_handle, max.value(), deadbandMax.value(),
+                               center.value(), deadbandMin.value(), min.value(),
+                               &status);
   FRC_CheckErrorStatus(status, "Channel {}", m_channel);
 }
 
@@ -153,7 +154,7 @@ void PWM::GetBounds(units::microsecond_t* max,
   int32_t status = 0;
   int32_t rawMax, rawDeadbandMax, rawCenter, rawDeadbandMin, rawMin;
   HAL_GetPWMConfigMicroseconds(m_handle, &rawMax, &rawDeadbandMax, &rawCenter,
-                   &rawDeadbandMin, &rawMin, &status);
+                               &rawDeadbandMin, &rawMin, &status);
   *max = units::microsecond_t{static_cast<double>(rawMax)};
   *deadbandMax = units::microsecond_t{static_cast<double>(rawDeadbandMax)};
   *center = units::microsecond_t{static_cast<double>(rawCenter)};

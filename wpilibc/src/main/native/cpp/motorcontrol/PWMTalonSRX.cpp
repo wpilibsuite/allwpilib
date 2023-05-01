@@ -10,7 +10,7 @@ using namespace frc;
 
 PWMTalonSRX::PWMTalonSRX(int channel)
     : PWMMotorController("PWMTalonSRX", channel) {
-  m_pwm.SetBounds(2.004_ms,  1.52_ms,  1.50_ms,  1.48_ms,  0.997_ms);
+  m_pwm.SetBounds(2.004_ms, 1.52_ms, 1.50_ms, 1.48_ms, 0.997_ms);
   m_pwm.SetPeriodMultiplier(PWM::kPeriodMultiplier_1X);
   m_pwm.SetSpeed(0.0);
   m_pwm.SetZeroLatch();

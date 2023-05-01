@@ -43,8 +43,8 @@ std::unique_ptr<CallbackStore> PWMSim::RegisterPulseMicrosecondCallback(
     NotifyCallback callback, bool initialNotify) {
   auto store = std::make_unique<CallbackStore>(
       m_index, -1, callback, &HALSIM_CancelPWMPulseMicrosecondCallback);
-  store->SetUid(HALSIM_RegisterPWMPulseMicrosecondCallback(m_index, &CallbackStoreThunk,
-                                                   store.get(), initialNotify));
+  store->SetUid(HALSIM_RegisterPWMPulseMicrosecondCallback(
+      m_index, &CallbackStoreThunk, store.get(), initialNotify));
   return store;
 }
 

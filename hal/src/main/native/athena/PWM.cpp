@@ -4,11 +4,12 @@
 
 #include "hal/PWM.h"
 
-#include <fmt/format.h>
 #include <algorithm>
 #include <cmath>
 #include <cstdio>
 #include <thread>
+
+#include <fmt/format.h>
 
 #include "ConstantsInternal.h"
 #include "DigitalInternal.h"

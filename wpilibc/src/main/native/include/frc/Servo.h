@@ -4,9 +4,9 @@
 
 #pragma once
 
-#include "frc/PWM.h"
-
 #include <units/angle.h>
+
+#include "frc/PWM.h"
 
 namespace frc {
 

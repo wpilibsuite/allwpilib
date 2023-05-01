@@ -72,9 +72,8 @@ class PWMSim {
    * @param initialNotify whether to run the callback with the initial value
    * @return the CallbackStore object associated with this callback
    */
-  [[nodiscard]] std::unique_ptr<CallbackStore>
-  RegisterPulseMicrosecondCallback(NotifyCallback callback,
-                                        bool initialNotify);
+  [[nodiscard]] std::unique_ptr<CallbackStore> RegisterPulseMicrosecondCallback(
+      NotifyCallback callback, bool initialNotify);
 
   /**
    * Get the PWM pulse microsecond value.

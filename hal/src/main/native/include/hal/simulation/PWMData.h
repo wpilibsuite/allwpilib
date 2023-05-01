@@ -21,8 +21,9 @@ HAL_Bool HALSIM_GetPWMInitialized(int32_t index);
 void HALSIM_SetPWMInitialized(int32_t index, HAL_Bool initialized);
 
 int32_t HALSIM_RegisterPWMPulseMicrosecondCallback(int32_t index,
-                                           HAL_NotifyCallback callback,
-                                           void* param, HAL_Bool initialNotify);
+                                                   HAL_NotifyCallback callback,
+                                                   void* param,
+                                                   HAL_Bool initialNotify);
 void HALSIM_CancelPWMPulseMicrosecondCallback(int32_t index, int32_t uid);
 int32_t HALSIM_GetPWMPulseMicrosecond(int32_t index);
 void HALSIM_SetPWMPulseMicrosecond(int32_t index, int32_t microsecondPulseTime);

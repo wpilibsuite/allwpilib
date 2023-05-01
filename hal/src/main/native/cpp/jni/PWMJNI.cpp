@@ -72,8 +72,8 @@ Java_edu_wpi_first_hal_PWMJNI_setPWMConfigMicroseconds
    jint centerPwm, jint deadbandMinPwm, jint minPwm)
 {
   int32_t status = 0;
-  HAL_SetPWMConfigMicroseconds((HAL_DigitalHandle)id, maxPwm, deadbandMaxPwm, centerPwm,
-                   deadbandMinPwm, minPwm, &status);
+  HAL_SetPWMConfigMicroseconds((HAL_DigitalHandle)id, maxPwm, deadbandMaxPwm,
+                               centerPwm, deadbandMinPwm, minPwm, &status);
   CheckStatus(env, status);
 }
 
@@ -93,7 +93,7 @@ Java_edu_wpi_first_hal_PWMJNI_getPWMConfigMicroseconds
   int32_t deadbandMinPwm = 0;
   int32_t minPwm = 0;
   HAL_GetPWMConfigMicroseconds((HAL_DigitalHandle)id, &maxPwm, &deadbandMaxPwm,
-                      &centerPwm, &deadbandMinPwm, &minPwm, &status);
+                               &centerPwm, &deadbandMinPwm, &minPwm, &status);
   CheckStatus(env, status);
   return CreatePWMConfigDataResult(env, maxPwm, deadbandMaxPwm, centerPwm,
                                    deadbandMinPwm, minPwm);
@@ -180,7 +180,8 @@ Java_edu_wpi_first_hal_PWMJNI_getPulseTimeMicroseconds
   (JNIEnv* env, jclass, jint id)
 {
   int32_t status = 0;
-  int32_t returnValue = HAL_GetPWMPulseTimeMicroseconds((HAL_DigitalHandle)id, &status);
+  int32_t returnValue =
+      HAL_GetPWMPulseTimeMicroseconds((HAL_DigitalHandle)id, &status);
   CheckStatus(env, status);
   return returnValue;
 }
