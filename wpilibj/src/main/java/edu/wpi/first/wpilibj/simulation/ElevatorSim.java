@@ -4,6 +4,7 @@
 
 package edu.wpi.first.wpilibj.simulation;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.numbers.N1;
@@ -43,6 +44,7 @@ public class ElevatorSim extends LinearSystemSim<N2, N1, N1> {
    * @param minHeightMeters The min allowable height of the elevator.
    * @param maxHeightMeters The max allowable height of the elevator.
    * @param simulateGravity Whether gravity should be simulated or not.
+   * @param startingHeightMeters The starting height of the elevator.
    * @param measurementStdDevs The standard deviations of the measurements.
    */
   public ElevatorSim(
@@ -53,6 +55,7 @@ public class ElevatorSim extends LinearSystemSim<N2, N1, N1> {
           double minHeightMeters,
           double maxHeightMeters,
           boolean simulateGravity,
+          double startingHeightMeters,
           Matrix<N1, N1> measurementStdDevs) {
     super(plant, measurementStdDevs);
     m_gearbox = gearbox;
@@ -61,6 +64,8 @@ public class ElevatorSim extends LinearSystemSim<N2, N1, N1> {
     m_minHeight = minHeightMeters;
     m_maxHeight = maxHeightMeters;
     m_simulateGravity = simulateGravity;
+
+    setState(VecBuilder.fill(MathUtil.clamp(startingHeightMeters, minHeightMeters, maxHeightMeters), 0));
   }
 
   /**
@@ -72,6 +77,7 @@ public class ElevatorSim extends LinearSystemSim<N2, N1, N1> {
    * @param drumRadiusMeters The radius of the drum that the elevator spool is wrapped around.
    * @param minHeightMeters The min allowable height of the elevator.
    * @param maxHeightMeters The max allowable height of the elevator.
+   * @param startingHeightMeters The starting height of the elevator.
    * @param simulateGravity Whether gravity should be simulated or not.
    */
   public ElevatorSim(
@@ -81,7 +87,8 @@ public class ElevatorSim extends LinearSystemSim<N2, N1, N1> {
       double drumRadiusMeters,
       double minHeightMeters,
       double maxHeightMeters,
-      boolean simulateGravity) {
+      boolean simulateGravity,
+      double startingHeightMeters) {
     this(
         plant,
         gearbox,
@@ -90,6 +97,7 @@ public class ElevatorSim extends LinearSystemSim<N2, N1, N1> {
         minHeightMeters,
         maxHeightMeters,
         simulateGravity,
+        startingHeightMeters,
         null);
   }
 
@@ -103,6 +111,7 @@ public class ElevatorSim extends LinearSystemSim<N2, N1, N1> {
    * @param minHeightMeters The min allowable height of the elevator.
    * @param maxHeightMeters The max allowable height of the elevator.
    * @param simulateGravity Whether gravity should be simulated or not.
+   * @param startingHeightMeters The starting height of the elevator.
    * @param measurementStdDevs The standard deviations of the measurements.
    */
   public ElevatorSim(
@@ -113,6 +122,7 @@ public class ElevatorSim extends LinearSystemSim<N2, N1, N1> {
       double minHeightMeters,
       double maxHeightMeters,
       boolean simulateGravity,
+      double startingHeightMeters,
       Matrix<N1, N1> measurementStdDevs) {
     this(
             LinearSystemId.createElevatorSystem(gearbox, carriageMassKg, drumRadiusMeters, gearing),
@@ -121,6 +131,7 @@ public class ElevatorSim extends LinearSystemSim<N2, N1, N1> {
             minHeightMeters,
             maxHeightMeters,
             simulateGravity,
+            startingHeightMeters,
             measurementStdDevs
     );
   }
@@ -135,6 +146,7 @@ public class ElevatorSim extends LinearSystemSim<N2, N1, N1> {
    * @param minHeightMeters The min allowable height of the elevator.
    * @param maxHeightMeters The max allowable height of the elevator.
    * @param simulateGravity Whether gravity should be simulated or not.
+   * @param startingHeightMeters The starting height of the elevator.
    */
   public ElevatorSim(
           DCMotor gearbox,
@@ -143,7 +155,8 @@ public class ElevatorSim extends LinearSystemSim<N2, N1, N1> {
           double drumRadiusMeters,
           double minHeightMeters,
           double maxHeightMeters,
-          boolean simulateGravity) {
+          boolean simulateGravity,
+          double startingHeightMeters) {
     this(
             gearbox,
             gearing,
@@ -152,6 +165,7 @@ public class ElevatorSim extends LinearSystemSim<N2, N1, N1> {
             minHeightMeters,
             maxHeightMeters,
             simulateGravity,
+            startingHeightMeters,
             null);
   }
 
