@@ -85,7 +85,7 @@ class PWMSim {
   /**
    * Set the PWM pulse microsecond value.
    *
-   * @param raw the PWM pulse microsecond value
+   * @param microsecondPulseTime the PWM pulse microsecond value
    */
   void SetPulseMicrosecond(int32_t microsecondPulseTime);
 
