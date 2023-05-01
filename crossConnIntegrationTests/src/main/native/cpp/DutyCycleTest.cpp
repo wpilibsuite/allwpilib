@@ -21,10 +21,10 @@ TEST_P(DutyCycleTest, DutyCycle) {
   ASSERT_EQ(0, status);
 
   // Ensure our PWM is disabled, and set up properly
-  HAL_SetPWMRaw(pwmHandle, 0, &status);
+  HAL_SetPWMPulseTimeMicroseconds(pwmHandle, 0, &status);
   ASSERT_EQ(0, status);
-  HAL_SetPWMConfig(pwmHandle, 2.0, 1.0, 1.0, 0, 0, &status);
-  HAL_SetPWMConfig(pwmHandle, 5.05, 2.525, 2.525, 2.525, 0, &status);
+  HAL_SetPWMConfigMicroseconds(pwmHandle, 2000, 1000, 1000, 0, 0, &status);
+  HAL_SetPWMConfigMicroseconds(pwmHandle, 5050, 2525, 2525, 2525, 0, &status);
   ASSERT_EQ(0, status);
   HAL_SetPWMPeriodScale(pwmHandle, 0, &status);
   ASSERT_EQ(0, status);
