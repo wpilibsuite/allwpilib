@@ -1143,8 +1143,8 @@ public final class DriverStation {
   /**
    * Gets the raw alliance station of the teams driver station.
    *
-   * <p>This returns the raw low level value. Prefer getLocation or
-   * getAlliance unless necessary for performance.
+   * <p>This returns the raw low level value. Prefer getLocation or getAlliance unless necessary for
+   * performance.
    *
    * @return The raw alliance station id.
    */

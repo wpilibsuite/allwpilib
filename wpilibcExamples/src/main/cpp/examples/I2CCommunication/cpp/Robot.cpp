@@ -25,12 +25,11 @@ void Robot::RobotPeriodic() {
     allianceString = alliance == frc::DriverStation::Alliance::kRed ? "R" : "B";
   }
 
-  auto string = fmt::format(
-      "{}{}{}{:03}",
-      allianceString,
-      frc::DriverStation::IsEnabled() ? "E" : "D",
-      frc::DriverStation::IsAutonomous() ? "A" : "T",
-      static_cast<int>(frc::Timer::GetMatchTime().value()));
+  auto string =
+      fmt::format("{}{}{}{:03}", allianceString,
+                  frc::DriverStation::IsEnabled() ? "E" : "D",
+                  frc::DriverStation::IsAutonomous() ? "A" : "T",
+                  static_cast<int>(frc::Timer::GetMatchTime().value()));
 
   arduino.WriteBulk(reinterpret_cast<uint8_t*>(string.data()), string.size());
 }
