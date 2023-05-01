@@ -31,7 +31,7 @@ class SingleJointedArmSim : public LinearSystemSim<2, 1, 1> {
    * @param minAngle           The minimum angle that the arm is capable of.
    * @param maxAngle           The maximum angle that the arm is capable of.
    * @param simulateGravity    Whether gravity should be simulated or not.
-   * @param startingAngle   The initial position of the arm.
+   * @param startingAngle      The initial position of the arm.
    * @param measurementStdDevs The standard deviations of the measurements.
    */
   SingleJointedArmSim(const LinearSystem<2, 1, 1>& system,
@@ -52,7 +52,7 @@ class SingleJointedArmSim : public LinearSystemSim<2, 1, 1> {
    * @param minAngle           The minimum angle that the arm is capable of.
    * @param maxAngle           The maximum angle that the arm is capable of.
    * @param simulateGravity    Whether gravity should be simulated or not.
-   * @param startingAngle   The initial position of the arm.
+   * @param startingAngle      The initial position of the arm.
    * @param measurementStdDevs The standard deviation of the measurement noise.
    */
   SingleJointedArmSim(const DCMotor& gearbox, double gearing,
