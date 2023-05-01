@@ -89,8 +89,16 @@ model {
                             description("Creates a macOS application bundle for Glass")
                             from(file("$project.projectDir/Info.plist"))
                             into(file("$project.buildDir/outputs/bundles/$binary.targetPlatform.architecture.name/Glass.app/Contents"))
-                            into("MacOS") { with copySpec { from binary.executable.file } }
-                            into("Resources") { with copySpec { from icon } }
+                            into("MacOS") {
+                                with copySpec {
+                                    from binary.executable.file
+                                }
+                            }
+                            into("Resources") {
+                                with copySpec {
+                                    from icon
+                                }
+                            }
 
                             inputs.property "HasDeveloperId", project.hasProperty("developerID")
 

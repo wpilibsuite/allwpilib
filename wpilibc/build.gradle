@@ -152,7 +152,6 @@ model {
                     lib project: ':cameraserver', library: 'cameraserver', linkage: 'shared'
                     nativeUtils.useRequiredLibrary(it, 'opencv_shared')
                 }
-
             }
             appendDebugPathToBinaries(binaries)
         }
