@@ -97,7 +97,7 @@ public class PWMSim {
   /**
    * Set the PWM pulse microsecond value.
    *
-   * @param raw the PWM pulse microsecond value
+   * @param microsecondPulseTime the PWM pulse microsecond value
    */
   public void setPulseMicrosecond(int microsecondPulseTime) {
     PWMDataJNI.setPulseMicrosecond(m_index, microsecondPulseTime);
