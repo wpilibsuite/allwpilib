@@ -38,8 +38,7 @@ class ElevatorSim : public LinearSystemSim<2, 1, 1> {
   ElevatorSim(const LinearSystem<2, 1, 1>& plant, const DCMotor& gearbox,
               double gearing, units::meter_t drumRadius,
               units::meter_t minHeight, units::meter_t maxHeight,
-              bool simulateGravity,
-              units::meter_t startingHeight,
+              bool simulateGravity, units::meter_t startingHeight,
               const std::array<double, 1>& measurementStdDevs = {0.0});
 
   /**
@@ -61,8 +60,7 @@ class ElevatorSim : public LinearSystemSim<2, 1, 1> {
   ElevatorSim(const DCMotor& gearbox, double gearing,
               units::kilogram_t carriageMass, units::meter_t drumRadius,
               units::meter_t minHeight, units::meter_t maxHeight,
-              bool simulateGravity,
-              units::meter_t startingHeight,
+              bool simulateGravity, units::meter_t startingHeight,
               const std::array<double, 1>& measurementStdDevs = {0.0});
 
   /**
