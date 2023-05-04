@@ -7,7 +7,7 @@ include(FetchContent)
 FetchContent_Declare(
     apriltaglib
     GIT_REPOSITORY  https://github.com/wpilibsuite/apriltag.git
-    GIT_TAG         ad31e33d20f9782b7239cb15cde57c56c91383ad
+    GIT_TAG         aecca0a1994a74f31ddda20a4ab4c595f346a175
 )
 
 # Don't use apriltag's CMakeLists.txt due to conflicting naming and JNI
@@ -16,7 +16,6 @@ if(NOT apriltaglib_POPULATED)
     FetchContent_Populate(apriltaglib)
 endif()
 
-aux_source_directory(${apriltaglib_SOURCE_DIR}/common APRILTAGLIB_COMMON_SRC)
 file(GLOB TAG_FILES ${apriltaglib_SOURCE_DIR}/tag*.c)
 set(APRILTAGLIB_SRCS ${apriltaglib_SOURCE_DIR}/apriltag.c ${apriltaglib_SOURCE_DIR}/apriltag_pose.c ${apriltaglib_SOURCE_DIR}/apriltag_quad_thresh.c)
 
@@ -74,7 +73,7 @@ GENERATE_RESOURCES(src/main/native/resources/edu/wpi/first/apriltag generated/ma
 
 file(GLOB apriltag_native_src src/main/native/cpp/*.cpp)
 
-add_library(apriltag ${apriltag_native_src} ${apriltag_resources_src} ${APRILTAGLIB_SRCS} ${APRILTAGLIB_COMMON_SRC} ${TAG_FILES})
+add_library(apriltag ${apriltag_native_src} ${apriltag_resources_src} ${APRILTAGLIB_SRCS} ${TAG_FILES})
 set_target_properties(apriltag PROPERTIES DEBUG_POSTFIX "d")
 
 set_property(TARGET apriltag PROPERTY FOLDER "libraries")

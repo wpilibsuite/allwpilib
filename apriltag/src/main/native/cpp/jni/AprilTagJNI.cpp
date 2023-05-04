@@ -518,12 +518,13 @@ Java_edu_wpi_first_apriltag_jni_AprilTagJNI_estimatePoseHomography
 /*
  * Class:     edu_wpi_first_apriltag_jni_AprilTagJNI
  * Method:    estimatePoseOrthogonalIteration
- * Signature: ([D[DDDDDDI)Ljava/lang/Object;
+ * Signature: ([D[DDDDDDID)Ljava/lang/Object;
  */
 JNIEXPORT jobject JNICALL
 Java_edu_wpi_first_apriltag_jni_AprilTagJNI_estimatePoseOrthogonalIteration
   (JNIEnv* env, jclass, jdoubleArray homography, jdoubleArray corners,
-   jdouble tagSize, jdouble fx, jdouble fy, jdouble cx, jdouble cy, jint nIters)
+   jdouble tagSize, jdouble fx, jdouble fy, jdouble cx, jdouble cy, jint nIters,
+   jdouble min_improvement)
 {
   // homography
   if (!homography) {
@@ -548,10 +549,10 @@ Java_edu_wpi_first_apriltag_jni_AprilTagJNI_estimatePoseOrthogonalIteration
   }
 
   AprilTagPoseEstimator estimator({units::meter_t{tagSize}, fx, fy, cx, cy});
-  return MakeJObject(env,
-                     estimator.EstimateOrthogonalIteration(
-                         std::span<const double, 9>{harr.array()},
-                         std::span<const double, 8>{carr.array()}, nIters));
+  return MakeJObject(env, estimator.EstimateOrthogonalIteration(
+                              std::span<const double, 9>{harr.array()},
+                              std::span<const double, 8>{carr.array()}, nIters,
+                              min_improvement));
 }
 
 /*

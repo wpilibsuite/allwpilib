@@ -98,10 +98,13 @@ class WPILIB_DLLEXPORT AprilTagPoseEstimator {
    *
    * @param detection Tag detection
    * @param nIters Number of iterations
+   * @param min_improvement_per_iteration Min object-space error improvement; if
+   * less than this, solver will exit early
    * @return Initial and (possibly) second pose estimates
    */
   AprilTagPoseEstimate EstimateOrthogonalIteration(
-      const AprilTagDetection& detection, int nIters) const;
+      const AprilTagDetection& detection, int nIters,
+      double min_improvement_per_iteration) const;
 
   /**
    * Estimates the pose of the tag. This returns one or two possible poses for
@@ -110,11 +113,13 @@ class WPILIB_DLLEXPORT AprilTagPoseEstimator {
    * @param homography Homography 3x3 matrix data
    * @param corners Corner point array (X and Y for each corner in order)
    * @param nIters Number of iterations
+   * @param min_improvement_per_iteration Min object-space error improvement; if
+   * less than this, solver will exit early
    * @return Initial and (possibly) second pose estimates
    */
   AprilTagPoseEstimate EstimateOrthogonalIteration(
       std::span<const double, 9> homography, std::span<const double, 8> corners,
-      int nIters) const;
+      int nIters, double min_improvement_per_iteration) const;
 
   /**
    * Estimates tag pose. This method is an easier to use interface to
