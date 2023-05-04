@@ -12,17 +12,15 @@ import org.junit.jupiter.api.Test;
 class RunCommandTest extends CommandTestBase {
   @Test
   void runCommandScheduleTest() {
-    try (CommandScheduler scheduler = new CommandScheduler()) {
-      AtomicInteger counter = new AtomicInteger(0);
+    AtomicInteger counter = new AtomicInteger(0);
 
-      RunCommand command = new RunCommand(counter::incrementAndGet);
+    RunCommand command = new RunCommand(counter::incrementAndGet);
 
-      scheduler.schedule(command);
-      scheduler.run();
-      scheduler.run();
-      scheduler.run();
+    command.schedule();
+    CommandScheduler.getInstance().run();
+    CommandScheduler.getInstance().run();
+    CommandScheduler.getInstance().run();
 
-      assertEquals(3, counter.get());
-    }
+    assertEquals(3, counter.get());
   }
 }

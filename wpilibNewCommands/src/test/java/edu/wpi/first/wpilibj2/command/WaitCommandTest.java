@@ -34,49 +34,45 @@ class WaitCommandTest extends CommandTestBase {
   @Test
   @ResourceLock("timing")
   void waitCommandTest() {
-    try (CommandScheduler scheduler = new CommandScheduler()) {
-      WaitCommand waitCommand = new WaitCommand(2);
+    WaitCommand waitCommand = new WaitCommand(2);
 
-      scheduler.schedule(waitCommand);
-      scheduler.run();
-      SimHooks.stepTiming(1);
-      scheduler.run();
+    waitCommand.schedule();
+    CommandScheduler.getInstance().run();
+    SimHooks.stepTiming(1);
+    CommandScheduler.getInstance().run();
 
-      assertTrue(scheduler.isScheduled(waitCommand));
+    assertTrue(waitCommand.isScheduled());
 
-      SimHooks.stepTiming(2);
+    SimHooks.stepTiming(2);
 
-      scheduler.run();
+    CommandScheduler.getInstance().run();
 
-      assertFalse(scheduler.isScheduled(waitCommand));
-    }
+    assertFalse(waitCommand.isScheduled());
   }
 
   @Test
   @ResourceLock("timing")
   void withTimeoutTest() {
-    try (CommandScheduler scheduler = new CommandScheduler()) {
-      MockCommandHolder command1Holder = new MockCommandHolder(true);
-      Command command1 = command1Holder.getMock();
-      when(command1.withTimeout(anyDouble())).thenCallRealMethod();
-      when(command1.raceWith(notNull())).thenCallRealMethod();
+    MockCommandHolder command1Holder = new MockCommandHolder(true);
+    Command command1 = command1Holder.getMock();
+    when(command1.withTimeout(anyDouble())).thenCallRealMethod();
+    when(command1.raceWith(notNull())).thenCallRealMethod();
 
-      Command timeout = command1.withTimeout(2);
+    Command timeout = command1.withTimeout(2);
 
-      scheduler.schedule(timeout);
-      scheduler.run();
+    timeout.schedule();
+    CommandScheduler.getInstance().run();
 
-      verify(command1).initialize();
-      verify(command1).execute();
-      assertFalse(scheduler.isScheduled(command1));
-      assertTrue(scheduler.isScheduled(timeout));
+    verify(command1).initialize();
+    verify(command1).execute();
+    assertFalse(command1.isScheduled());
+    assertTrue(timeout.isScheduled());
 
-      SimHooks.stepTiming(3);
-      scheduler.run();
+    SimHooks.stepTiming(3);
+    CommandScheduler.getInstance().run();
 
-      verify(command1).end(true);
-      verify(command1, never()).end(false);
-      assertFalse(scheduler.isScheduled(timeout));
-    }
+    verify(command1).end(true);
+    verify(command1, never()).end(false);
+    assertFalse(timeout.isScheduled());
   }
 }

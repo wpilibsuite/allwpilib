@@ -42,6 +42,13 @@ class CommandScheduler final : public nt::NTSendable,
    */
   static CommandScheduler& GetInstance();
 
+  /**
+   * Reset the scheduler singleton for tests.
+   *
+   * <p>This should not be used on a real robot!
+   */
+  void ResetInstance();
+
   ~CommandScheduler() override;
   CommandScheduler(const CommandScheduler&) = delete;
   CommandScheduler& operator=(const CommandScheduler&) = delete;

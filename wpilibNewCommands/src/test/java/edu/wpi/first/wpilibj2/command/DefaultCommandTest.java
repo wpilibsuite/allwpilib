@@ -13,68 +13,62 @@ import org.junit.jupiter.api.Test;
 class DefaultCommandTest extends CommandTestBase {
   @Test
   void defaultCommandScheduleTest() {
-    try (CommandScheduler scheduler = new CommandScheduler()) {
-      Subsystem hasDefaultCommand = new SubsystemBase() {};
+    Subsystem hasDefaultCommand = new SubsystemBase() {};
 
-      MockCommandHolder defaultHolder = new MockCommandHolder(true, hasDefaultCommand);
-      Command defaultCommand = defaultHolder.getMock();
+    MockCommandHolder defaultHolder = new MockCommandHolder(true, hasDefaultCommand);
+    Command defaultCommand = defaultHolder.getMock();
 
-      scheduler.setDefaultCommand(hasDefaultCommand, defaultCommand);
-      scheduler.run();
+    hasDefaultCommand.setDefaultCommand(defaultCommand);
+    CommandScheduler.getInstance().run();
 
-      assertTrue(scheduler.isScheduled(defaultCommand));
-    }
+    assertTrue(defaultCommand.isScheduled());
   }
 
   @Test
   void defaultCommandInterruptResumeTest() {
-    try (CommandScheduler scheduler = new CommandScheduler()) {
-      Subsystem hasDefaultCommand = new SubsystemBase() {};
+    Subsystem hasDefaultCommand = new SubsystemBase() {};
 
-      MockCommandHolder defaultHolder = new MockCommandHolder(true, hasDefaultCommand);
-      Command defaultCommand = defaultHolder.getMock();
-      MockCommandHolder interrupterHolder = new MockCommandHolder(true, hasDefaultCommand);
-      Command interrupter = interrupterHolder.getMock();
+    MockCommandHolder defaultHolder = new MockCommandHolder(true, hasDefaultCommand);
+    Command defaultCommand = defaultHolder.getMock();
+    MockCommandHolder interrupterHolder = new MockCommandHolder(true, hasDefaultCommand);
+    Command interrupter = interrupterHolder.getMock();
 
-      scheduler.setDefaultCommand(hasDefaultCommand, defaultCommand);
-      scheduler.run();
-      scheduler.schedule(interrupter);
+    hasDefaultCommand.setDefaultCommand(defaultCommand);
+    CommandScheduler.getInstance().run();
+    interrupter.schedule();
 
-      assertFalse(scheduler.isScheduled(defaultCommand));
-      assertTrue(scheduler.isScheduled(interrupter));
+    assertFalse(defaultCommand.isScheduled());
+    assertTrue(interrupter.isScheduled());
 
-      scheduler.cancel(interrupter);
-      scheduler.run();
+    interrupter.cancel();
+    CommandScheduler.getInstance().run();
 
-      assertTrue(scheduler.isScheduled(defaultCommand));
-      assertFalse(scheduler.isScheduled(interrupter));
-    }
+    assertTrue(defaultCommand.isScheduled());
+    assertFalse(interrupter.isScheduled());
   }
 
   @Test
   void defaultCommandDisableResumeTest() {
-    try (CommandScheduler scheduler = new CommandScheduler()) {
-      Subsystem hasDefaultCommand = new SubsystemBase() {};
+    Subsystem hasDefaultCommand = new SubsystemBase() {};
 
-      MockCommandHolder defaultHolder = new MockCommandHolder(false, hasDefaultCommand);
-      Command defaultCommand = defaultHolder.getMock();
+    MockCommandHolder defaultHolder = new MockCommandHolder(false, hasDefaultCommand);
+    Command defaultCommand = defaultHolder.getMock();
 
-      scheduler.setDefaultCommand(hasDefaultCommand, defaultCommand);
-      scheduler.run();
+    hasDefaultCommand.setDefaultCommand(defaultCommand);
+    CommandScheduler.getInstance().run();
 
-      assertTrue(scheduler.isScheduled(defaultCommand));
+    assertTrue(defaultCommand.isScheduled());
 
-      setDSEnabled(false);
-      scheduler.run();
+    setDSEnabled(false);
+    CommandScheduler.getInstance().run();
 
-      assertFalse(scheduler.isScheduled(defaultCommand));
+    assertFalse(defaultCommand.isScheduled());
 
-      setDSEnabled(true);
-      scheduler.run();
+    setDSEnabled(true);
+    CommandScheduler.getInstance().run();
 
-      assertTrue(scheduler.isScheduled(defaultCommand));
+    assertTrue(defaultCommand.isScheduled());
 
-      verify(defaultCommand).end(true);
-    }
+    verify(defaultCommand).end(true);
   }
 }

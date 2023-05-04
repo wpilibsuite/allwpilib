@@ -13,17 +13,19 @@ CommandTestBase::CommandTestBase() {
   scheduler.GetActiveButtonLoop()->Clear();
 }
 
-CommandScheduler CommandTestBase::GetScheduler() {
-  return CommandScheduler();
+CommandScheduler& CommandTestBase::GetScheduler() {
+  return CommandScheduler::GetInstance();
 }
 
 void CommandTestBase::SetUp() {
   frc::sim::DriverStationSim::SetEnabled(true);
   frc::sim::DriverStationSim::NotifyNewData();
+  CommandScheduler::GetInstance().ResetInstance();
 }
 
 void CommandTestBase::TearDown() {
   CommandScheduler::GetInstance().GetActiveButtonLoop()->Clear();
+  CommandScheduler::GetInstance().ResetInstance();
 }
 
 void CommandTestBase::SetDSEnabled(bool enabled) {

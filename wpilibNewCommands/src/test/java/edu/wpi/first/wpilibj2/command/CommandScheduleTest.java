@@ -16,104 +16,95 @@ import org.junit.jupiter.api.Test;
 class CommandScheduleTest extends CommandTestBase {
   @Test
   void instantScheduleTest() {
-    try (CommandScheduler scheduler = new CommandScheduler()) {
-      MockCommandHolder holder = new MockCommandHolder(true);
-      holder.setFinished(true);
-      Command mockCommand = holder.getMock();
+    MockCommandHolder holder = new MockCommandHolder(true);
+    holder.setFinished(true);
+    Command mockCommand = holder.getMock();
 
-      scheduler.schedule(mockCommand);
-      assertTrue(scheduler.isScheduled(mockCommand));
-      verify(mockCommand).initialize();
+    mockCommand.schedule();
+    assertTrue(mockCommand.isScheduled());
+    verify(mockCommand).initialize();
 
-      scheduler.run();
+    CommandScheduler.getInstance().run();
 
-      verify(mockCommand).execute();
-      verify(mockCommand).end(false);
+    verify(mockCommand).execute();
+    verify(mockCommand).end(false);
 
-      assertFalse(scheduler.isScheduled(mockCommand));
-    }
+    assertFalse(mockCommand.isScheduled());
   }
 
   @Test
   void singleIterationScheduleTest() {
-    try (CommandScheduler scheduler = new CommandScheduler()) {
-      MockCommandHolder holder = new MockCommandHolder(true);
-      Command mockCommand = holder.getMock();
+    MockCommandHolder holder = new MockCommandHolder(true);
+    Command mockCommand = holder.getMock();
 
-      scheduler.schedule(mockCommand);
+    mockCommand.schedule();
 
-      assertTrue(scheduler.isScheduled(mockCommand));
+    assertTrue(mockCommand.isScheduled());
 
-      scheduler.run();
-      holder.setFinished(true);
-      scheduler.run();
+    CommandScheduler.getInstance().run();
+    holder.setFinished(true);
+    CommandScheduler.getInstance().run();
 
-      verify(mockCommand).initialize();
-      verify(mockCommand, times(2)).execute();
-      verify(mockCommand).end(false);
+    verify(mockCommand).initialize();
+    verify(mockCommand, times(2)).execute();
+    verify(mockCommand).end(false);
 
-      assertFalse(scheduler.isScheduled(mockCommand));
-    }
+    assertFalse(mockCommand.isScheduled());
   }
 
   @Test
   void multiScheduleTest() {
-    try (CommandScheduler scheduler = new CommandScheduler()) {
-      MockCommandHolder command1Holder = new MockCommandHolder(true);
-      Command command1 = command1Holder.getMock();
-      MockCommandHolder command2Holder = new MockCommandHolder(true);
-      Command command2 = command2Holder.getMock();
-      MockCommandHolder command3Holder = new MockCommandHolder(true);
-      Command command3 = command3Holder.getMock();
+    CommandScheduler scheduler = CommandScheduler.getInstance();
+    MockCommandHolder command1Holder = new MockCommandHolder(true);
+    Command command1 = command1Holder.getMock();
+    MockCommandHolder command2Holder = new MockCommandHolder(true);
+    Command command2 = command2Holder.getMock();
+    MockCommandHolder command3Holder = new MockCommandHolder(true);
+    Command command3 = command3Holder.getMock();
 
-      scheduler.schedule(command1, command2, command3);
-      assertTrue(scheduler.isScheduled(command1, command2, command3));
-      scheduler.run();
-      assertTrue(scheduler.isScheduled(command1, command2, command3));
+    scheduler.schedule(command1, command2, command3);
+    assertTrue(scheduler.isScheduled(command1, command2, command3));
+    CommandScheduler.getInstance().run();
+    assertTrue(scheduler.isScheduled(command1, command2, command3));
 
-      command1Holder.setFinished(true);
-      scheduler.run();
-      assertTrue(scheduler.isScheduled(command2, command3));
-      assertFalse(scheduler.isScheduled(command1));
+    command1Holder.setFinished(true);
+    CommandScheduler.getInstance().run();
+    assertTrue(scheduler.isScheduled(command2, command3));
+    assertFalse(command1.isScheduled());
 
-      command2Holder.setFinished(true);
-      scheduler.run();
-      assertTrue(scheduler.isScheduled(command3));
-      assertFalse(scheduler.isScheduled(command1, command2));
+    command2Holder.setFinished(true);
+    CommandScheduler.getInstance().run();
+    assertTrue(command3.isScheduled());
+    assertFalse(scheduler.isScheduled(command1, command2));
 
-      command3Holder.setFinished(true);
-      scheduler.run();
-      assertFalse(scheduler.isScheduled(command1, command2, command3));
-    }
+    command3Holder.setFinished(true);
+    CommandScheduler.getInstance().run();
+    assertFalse(scheduler.isScheduled(command1, command2, command3));
   }
 
   @Test
   void schedulerCancelTest() {
-    try (CommandScheduler scheduler = new CommandScheduler()) {
-      MockCommandHolder holder = new MockCommandHolder(true);
-      Command mockCommand = holder.getMock();
+    MockCommandHolder holder = new MockCommandHolder(true);
+    Command mockCommand = holder.getMock();
 
-      scheduler.schedule(mockCommand);
+    mockCommand.schedule();
 
-      scheduler.run();
-      scheduler.cancel(mockCommand);
-      scheduler.run();
+    CommandScheduler.getInstance().run();
+    mockCommand.cancel();
+    CommandScheduler.getInstance().run();
 
-      verify(mockCommand).execute();
-      verify(mockCommand).end(true);
-      verify(mockCommand, never()).end(false);
+    verify(mockCommand).execute();
+    verify(mockCommand).end(true);
+    verify(mockCommand, never()).end(false);
 
-      assertFalse(scheduler.isScheduled(mockCommand));
-    }
+    assertFalse(mockCommand.isScheduled());
   }
 
   @Test
   void notScheduledCancelTest() {
-    try (CommandScheduler scheduler = new CommandScheduler()) {
-      MockCommandHolder holder = new MockCommandHolder(true);
-      Command mockCommand = holder.getMock();
+    MockCommandHolder holder = new MockCommandHolder(true);
+    Command mockCommand = holder.getMock();
 
-      assertDoesNotThrow(() -> scheduler.cancel(mockCommand));
-    }
+    assertDoesNotThrow(mockCommand::cancel);
   }
 }

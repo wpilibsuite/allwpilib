@@ -9,7 +9,7 @@ using namespace frc2;
 class DefaultCommandTest : public CommandTestBase {};
 
 TEST_F(DefaultCommandTest, DefaultCommandSchedule) {
-  CommandScheduler scheduler = GetScheduler();
+  auto& scheduler = GetScheduler();
 
   TestSubsystem subsystem;
 
@@ -23,7 +23,7 @@ TEST_F(DefaultCommandTest, DefaultCommandSchedule) {
 }
 
 TEST_F(DefaultCommandTest, DefaultCommandInterruptResume) {
-  CommandScheduler scheduler = GetScheduler();
+  auto& scheduler = GetScheduler();
 
   TestSubsystem subsystem;
 

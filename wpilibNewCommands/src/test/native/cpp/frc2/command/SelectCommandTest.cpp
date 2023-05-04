@@ -12,7 +12,7 @@ using namespace frc2;
 class SelectCommandTest : public CommandTestBase {};
 
 TEST_F(SelectCommandTest, SelectCommand) {
-  CommandScheduler scheduler = GetScheduler();
+  auto& scheduler = GetScheduler();
 
   std::unique_ptr<MockCommand> mock = std::make_unique<MockCommand>();
   MockCommand* mockptr = mock.get();
@@ -38,7 +38,7 @@ TEST_F(SelectCommandTest, SelectCommand) {
 }
 
 TEST_F(SelectCommandTest, SelectCommandRequirement) {
-  CommandScheduler scheduler = GetScheduler();
+  auto& scheduler = GetScheduler();
 
   TestSubsystem requirement1;
   TestSubsystem requirement2;

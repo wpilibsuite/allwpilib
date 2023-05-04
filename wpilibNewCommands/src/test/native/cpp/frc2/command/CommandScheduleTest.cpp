@@ -8,7 +8,7 @@ using namespace frc2;
 class CommandScheduleTest : public CommandTestBase {};
 
 TEST_F(CommandScheduleTest, InstantSchedule) {
-  CommandScheduler scheduler = GetScheduler();
+  auto& scheduler = GetScheduler();
   MockCommand command;
 
   EXPECT_CALL(command, Initialize());
@@ -23,7 +23,7 @@ TEST_F(CommandScheduleTest, InstantSchedule) {
 }
 
 TEST_F(CommandScheduleTest, SingleIterationSchedule) {
-  CommandScheduler scheduler = GetScheduler();
+  auto& scheduler = GetScheduler();
   MockCommand command;
 
   EXPECT_CALL(command, Initialize());
@@ -39,7 +39,7 @@ TEST_F(CommandScheduleTest, SingleIterationSchedule) {
 }
 
 TEST_F(CommandScheduleTest, MultiSchedule) {
-  CommandScheduler scheduler = GetScheduler();
+  auto& scheduler = GetScheduler();
   MockCommand command1;
   MockCommand command2;
   MockCommand command3;
@@ -76,7 +76,7 @@ TEST_F(CommandScheduleTest, MultiSchedule) {
 }
 
 TEST_F(CommandScheduleTest, SchedulerCancel) {
-  CommandScheduler scheduler = GetScheduler();
+  auto& scheduler = GetScheduler();
   MockCommand command;
 
   EXPECT_CALL(command, Initialize());
@@ -93,7 +93,7 @@ TEST_F(CommandScheduleTest, SchedulerCancel) {
 }
 
 TEST_F(CommandScheduleTest, NotScheduledCancel) {
-  CommandScheduler scheduler = GetScheduler();
+  auto& scheduler = GetScheduler();
   MockCommand command;
 
   EXPECT_NO_FATAL_FAILURE(scheduler.Cancel(&command));

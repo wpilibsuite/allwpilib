@@ -20,74 +20,68 @@ class ParallelRaceGroupTest extends CommandTestBase
     implements MultiCompositionTestBase<ParallelRaceGroup> {
   @Test
   void parallelRaceScheduleTest() {
-    try (CommandScheduler scheduler = new CommandScheduler()) {
-      MockCommandHolder command1Holder = new MockCommandHolder(true);
-      Command command1 = command1Holder.getMock();
-      MockCommandHolder command2Holder = new MockCommandHolder(true);
-      Command command2 = command2Holder.getMock();
+    MockCommandHolder command1Holder = new MockCommandHolder(true);
+    Command command1 = command1Holder.getMock();
+    MockCommandHolder command2Holder = new MockCommandHolder(true);
+    Command command2 = command2Holder.getMock();
 
-      Command group = new ParallelRaceGroup(command1, command2);
+    Command group = new ParallelRaceGroup(command1, command2);
 
-      scheduler.schedule(group);
+    group.schedule();
 
-      verify(command1).initialize();
-      verify(command2).initialize();
+    verify(command1).initialize();
+    verify(command2).initialize();
 
-      command1Holder.setFinished(true);
-      scheduler.run();
-      command2Holder.setFinished(true);
-      scheduler.run();
+    command1Holder.setFinished(true);
+    CommandScheduler.getInstance().run();
+    command2Holder.setFinished(true);
+    CommandScheduler.getInstance().run();
 
-      verify(command1).execute();
-      verify(command1).end(false);
-      verify(command2).execute();
-      verify(command2).end(true);
-      verify(command2, never()).end(false);
+    verify(command1).execute();
+    verify(command1).end(false);
+    verify(command2).execute();
+    verify(command2).end(true);
+    verify(command2, never()).end(false);
 
-      assertFalse(scheduler.isScheduled(group));
-    }
+    assertFalse(group.isScheduled());
   }
 
   @Test
   void parallelRaceInterruptTest() {
-    try (CommandScheduler scheduler = new CommandScheduler()) {
-      MockCommandHolder command1Holder = new MockCommandHolder(true);
-      Command command1 = command1Holder.getMock();
-      MockCommandHolder command2Holder = new MockCommandHolder(true);
-      Command command2 = command2Holder.getMock();
+    MockCommandHolder command1Holder = new MockCommandHolder(true);
+    Command command1 = command1Holder.getMock();
+    MockCommandHolder command2Holder = new MockCommandHolder(true);
+    Command command2 = command2Holder.getMock();
 
-      Command group = new ParallelRaceGroup(command1, command2);
+    Command group = new ParallelRaceGroup(command1, command2);
 
-      scheduler.schedule(group);
+    group.schedule();
 
-      scheduler.run();
-      scheduler.run();
-      scheduler.cancel(group);
+    CommandScheduler.getInstance().run();
+    CommandScheduler.getInstance().run();
+    group.cancel();
 
-      verify(command1, times(2)).execute();
-      verify(command1, never()).end(false);
-      verify(command1).end(true);
+    verify(command1, times(2)).execute();
+    verify(command1, never()).end(false);
+    verify(command1).end(true);
 
-      verify(command2, times(2)).execute();
-      verify(command2, never()).end(false);
-      verify(command2).end(true);
+    verify(command2, times(2)).execute();
+    verify(command2, never()).end(false);
+    verify(command2).end(true);
 
-      assertFalse(scheduler.isScheduled(group));
-    }
+    assertFalse(group.isScheduled());
   }
 
   @Test
   void notScheduledCancelTest() {
-    try (CommandScheduler scheduler = new CommandScheduler()) {
-      MockCommandHolder command1Holder = new MockCommandHolder(true);
-      Command command1 = command1Holder.getMock();
-      MockCommandHolder command2Holder = new MockCommandHolder(true);
-      Command command2 = command2Holder.getMock();
+    MockCommandHolder command1Holder = new MockCommandHolder(true);
+    Command command1 = command1Holder.getMock();
+    MockCommandHolder command2Holder = new MockCommandHolder(true);
+    Command command2 = command2Holder.getMock();
 
-      Command group = new ParallelRaceGroup(command1, command2);
+    Command group = new ParallelRaceGroup(command1, command2);
 
-      assertDoesNotThrow(() -> scheduler.cancel(group));
-    }
+    assertDoesNotThrow(group::cancel);
   }
 
   @Test
@@ -97,22 +91,20 @@ class ParallelRaceGroupTest extends CommandTestBase
     Subsystem system3 = new SubsystemBase() {};
     Subsystem system4 = new SubsystemBase() {};
 
-    try (CommandScheduler scheduler = new CommandScheduler()) {
-      MockCommandHolder command1Holder = new MockCommandHolder(true, system1, system2);
-      Command command1 = command1Holder.getMock();
-      MockCommandHolder command2Holder = new MockCommandHolder(true, system3);
-      Command command2 = command2Holder.getMock();
-      MockCommandHolder command3Holder = new MockCommandHolder(true, system3, system4);
-      Command command3 = command3Holder.getMock();
+    MockCommandHolder command1Holder = new MockCommandHolder(true, system1, system2);
+    Command command1 = command1Holder.getMock();
+    MockCommandHolder command2Holder = new MockCommandHolder(true, system3);
+    Command command2 = command2Holder.getMock();
+    MockCommandHolder command3Holder = new MockCommandHolder(true, system3, system4);
+    Command command3 = command3Holder.getMock();
 
-      Command group = new ParallelRaceGroup(command1, command2);
+    Command group = new ParallelRaceGroup(command1, command2);
 
-      scheduler.schedule(group);
-      scheduler.schedule(command3);
+    group.schedule();
+    command3.schedule();
 
-      assertFalse(scheduler.isScheduled(group));
-      assertTrue(scheduler.isScheduled(command3));
-    }
+    assertFalse(group.isScheduled());
+    assertTrue(command3.isScheduled());
   }
 
   @Test
@@ -146,62 +138,58 @@ class ParallelRaceGroupTest extends CommandTestBase
     assertNotNull(command3);
     Command group2 = new ParallelRaceGroup(group1, command3);
 
-    try (CommandScheduler scheduler = new CommandScheduler()) {
-      scheduler.schedule(group2);
-      scheduler.run();
-      command1Holder.setFinished(true);
-      scheduler.run();
-      command2Holder.setFinished(true);
-      // at this point the sequential group should be done
-      assertDoesNotThrow(() -> scheduler.run());
-      assertFalse(scheduler.isScheduled(group2));
-    }
+    group2.schedule();
+    CommandScheduler.getInstance().run();
+    command1Holder.setFinished(true);
+    CommandScheduler.getInstance().run();
+    command2Holder.setFinished(true);
+    // at this point the sequential group should be done
+    assertDoesNotThrow(() -> CommandScheduler.getInstance().run());
+    assertFalse(group2.isScheduled());
   }
 
   @Test
   void parallelRaceScheduleTwiceTest() {
-    try (CommandScheduler scheduler = new CommandScheduler()) {
-      MockCommandHolder command1Holder = new MockCommandHolder(true);
-      Command command1 = command1Holder.getMock();
-      MockCommandHolder command2Holder = new MockCommandHolder(true);
-      Command command2 = command2Holder.getMock();
+    MockCommandHolder command1Holder = new MockCommandHolder(true);
+    Command command1 = command1Holder.getMock();
+    MockCommandHolder command2Holder = new MockCommandHolder(true);
+    Command command2 = command2Holder.getMock();
 
-      Command group = new ParallelRaceGroup(command1, command2);
+    Command group = new ParallelRaceGroup(command1, command2);
 
-      scheduler.schedule(group);
+    group.schedule();
 
-      verify(command1).initialize();
-      verify(command2).initialize();
+    verify(command1).initialize();
+    verify(command2).initialize();
 
-      command1Holder.setFinished(true);
-      scheduler.run();
-      command2Holder.setFinished(true);
-      scheduler.run();
+    command1Holder.setFinished(true);
+    CommandScheduler.getInstance().run();
+    command2Holder.setFinished(true);
+    CommandScheduler.getInstance().run();
 
-      verify(command1).execute();
-      verify(command1).end(false);
-      verify(command2).execute();
-      verify(command2).end(true);
-      verify(command2, never()).end(false);
+    verify(command1).execute();
+    verify(command1).end(false);
+    verify(command2).execute();
+    verify(command2).end(true);
+    verify(command2, never()).end(false);
 
-      assertFalse(scheduler.isScheduled(group));
+    assertFalse(group.isScheduled());
 
-      reset(command1);
-      reset(command2);
+    reset(command1);
+    reset(command2);
 
-      scheduler.schedule(group);
+    group.schedule();
 
-      verify(command1).initialize();
-      verify(command2).initialize();
+    verify(command1).initialize();
+    verify(command2).initialize();
 
-      scheduler.run();
-      scheduler.run();
-      assertTrue(scheduler.isScheduled(group));
-      command2Holder.setFinished(true);
-      scheduler.run();
+    CommandScheduler.getInstance().run();
+    CommandScheduler.getInstance().run();
+    assertTrue(group.isScheduled());
+    command2Holder.setFinished(true);
+    CommandScheduler.getInstance().run();
 
-      assertFalse(scheduler.isScheduled(group));
-    }
+    assertFalse(group.isScheduled());
   }
 
   @Override

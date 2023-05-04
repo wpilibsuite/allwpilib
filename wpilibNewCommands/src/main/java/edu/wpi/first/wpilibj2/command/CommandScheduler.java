@@ -95,7 +95,7 @@ public final class CommandScheduler implements NTSendable, AutoCloseable {
 
   private final Watchdog m_watchdog = new Watchdog(TimedRobot.kDefaultPeriod, () -> {});
 
-  CommandScheduler() {
+  private CommandScheduler() {
     HAL.report(tResourceType.kResourceType_Command, tInstances.kCommand2_Scheduler);
     SendableRegistry.addLW(this, "Scheduler");
     LiveWindow.setEnabledListener(
@@ -121,6 +121,7 @@ public final class CommandScheduler implements NTSendable, AutoCloseable {
     SendableRegistry.remove(this);
     LiveWindow.setEnabledListener(null);
     LiveWindow.setDisabledListener(null);
+    instance = null;
   }
 
   /**

@@ -12,13 +12,11 @@ class PerpetualCommandTest extends CommandTestBase {
   @SuppressWarnings("removal") // PerpetualCommand
   @Test
   void perpetualCommandScheduleTest() {
-    try (CommandScheduler scheduler = new CommandScheduler()) {
-      PerpetualCommand command = new PerpetualCommand(new InstantCommand());
+    PerpetualCommand command = new PerpetualCommand(new InstantCommand());
 
-      scheduler.schedule(command);
-      scheduler.run();
+    command.schedule();
+    CommandScheduler.getInstance().run();
 
-      assertTrue(scheduler.isScheduled(command));
-    }
+    assertTrue(command.isScheduled());
   }
 }
