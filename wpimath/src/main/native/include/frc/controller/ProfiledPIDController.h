@@ -107,6 +107,13 @@ class ProfiledPIDController
   void SetD(double Kd) { m_controller.SetD(Kd); }
 
   /**
+   * Sets the IZone range.
+   *
+   * @param izone izone range
+   */ 
+  void SetIZone(double izone) { m_controller.SetIZone(izone); }
+
+  /**
    * Gets the proportional coefficient.
    *
    * @return proportional coefficient
@@ -126,6 +133,13 @@ class ProfiledPIDController
    * @return differential coefficient
    */
   double GetD() const { return m_controller.GetD(); }
+
+  /**
+   * Get the IZone range.
+   *
+   * @return izone range
+   */
+  double GetIZone() const { return m_controller.GetIZone(); };
 
   /**
    * Gets the period of this controller.

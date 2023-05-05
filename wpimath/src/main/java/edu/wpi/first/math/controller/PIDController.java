@@ -24,6 +24,9 @@ public class PIDController implements Sendable, AutoCloseable {
   // Factor for "derivative" control
   private double m_kd;
 
+  // The error range where "integral" control applies
+  private double m_izone;
+
   // The period (in seconds) of the loop that calls the controller
   private final double m_period;
 
@@ -142,6 +145,18 @@ public class PIDController implements Sendable, AutoCloseable {
   }
 
   /**
+   * Sets the IZone range.
+   *
+   * @param izone izone range
+   */
+  public void setIZone(double izone) {
+    if (izone < 0) {
+      throw new IllegalArgumentException("IZone must be a non-zero positive number!");
+    }
+    m_izone = izone;
+  }
+
+  /**
    * Get the Proportional coefficient.
    *
    * @return proportional coefficient
@@ -166,6 +181,15 @@ public class PIDController implements Sendable, AutoCloseable {
    */
   public double getD() {
     return m_kd;
+  }
+
+  /**
+   * Get the IZone range.
+   *
+   * @return izone range
+   */
+  public double getIZone() {
+    return m_izone;
   }
 
   /**
@@ -351,7 +375,10 @@ public class PIDController implements Sendable, AutoCloseable {
 
     m_velocityError = (m_positionError - m_prevError) / m_period;
 
-    if (m_ki != 0) {
+    // If an IZone has been set and the position error is outside of it, reset the total error
+    if (m_izone > 0 && Math.abs(m_positionError) > m_izone) {
+      m_totalError = 0;
+    } else if (m_ki != 0) {
       m_totalError =
           MathUtil.clamp(
               m_totalError + m_positionError * m_period,
@@ -377,6 +404,7 @@ public class PIDController implements Sendable, AutoCloseable {
     builder.addDoubleProperty("p", this::getP, this::setP);
     builder.addDoubleProperty("i", this::getI, this::setI);
     builder.addDoubleProperty("d", this::getD, this::setD);
+    builder.addDoubleProperty("izone", this::getIZone, this::setIZone);
     builder.addDoubleProperty("setpoint", this::getSetpoint, this::setSetpoint);
   }
 }

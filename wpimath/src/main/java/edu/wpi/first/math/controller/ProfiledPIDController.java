@@ -99,6 +99,15 @@ public class ProfiledPIDController implements Sendable {
   }
 
   /**
+   * Sets the IZone range.
+   *
+   * @param izone izone range
+   */
+  public void setIZone(double izone) {
+    m_controller.setIZone(izone);
+  }
+
+  /**
    * Gets the proportional coefficient.
    *
    * @return proportional coefficient
@@ -123,6 +132,15 @@ public class ProfiledPIDController implements Sendable {
    */
   public double getD() {
     return m_controller.getD();
+  }
+
+  /**
+   * Get the IZone range.
+   *
+   * @return izone range
+   */
+  public double getIZone() {
+    return m_controller.getIZone();
   }
 
   /**
@@ -400,6 +418,7 @@ public class ProfiledPIDController implements Sendable {
     builder.addDoubleProperty("p", this::getP, this::setP);
     builder.addDoubleProperty("i", this::getI, this::setI);
     builder.addDoubleProperty("d", this::getD, this::setD);
+    builder.addDoubleProperty("izone", this::getIZone, this::setIZone);
     builder.addDoubleProperty("goal", () -> getGoal().position, this::setGoal);
   }
 }

@@ -55,4 +55,24 @@ class PIDInputOutputTest {
 
     assertEquals(-0.01 / m_controller.getPeriod(), m_controller.calculate(0.0025, 0), 1e-5);
   }
+
+  @Test
+  void izoneNoOutputTest() {
+    m_controller.setI(1);
+    m_controller.setIZone(1);
+
+    double out = m_controller.calculate(2, 0);
+
+    assertEquals(0 * m_controller.getPeriod(), out, 1e-5);
+  }
+
+  @Test
+  void izoneOutputTest() {
+    m_controller.setI(1);
+    m_controller.setIZone(1);
+
+    double out = m_controller.calculate(1, 0);
+
+    assertEquals(-1 * m_controller.getPeriod(), out, 1e-5);
+  }
 }

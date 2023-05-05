@@ -72,7 +72,14 @@ class WPILIB_DLLEXPORT PIDController
    * @param Kd differential coefficient
    */
   void SetD(double Kd);
-
+  
+  /**
+   * Sets the IZone range.
+   *
+   * @param izone izone range
+   */ 
+  void SetIZone(double izone);
+  
   /**
    * Gets the proportional coefficient.
    *
@@ -93,6 +100,13 @@ class WPILIB_DLLEXPORT PIDController
    * @return differential coefficient
    */
   double GetD() const;
+  
+  /**
+   * Get the IZone range.
+   *
+   * @return izone range
+   */
+  double GetIZone() const;
 
   /**
    * Gets the period of this controller.
@@ -220,6 +234,9 @@ class WPILIB_DLLEXPORT PIDController
 
   // Factor for "derivative" control
   double m_Kd;
+
+  // The error range where "integral" control applies
+  double m_izone;
 
   // The period (in seconds) of the control loop running this controller
   units::second_t m_period;

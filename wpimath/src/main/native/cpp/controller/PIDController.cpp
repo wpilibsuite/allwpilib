@@ -52,6 +52,14 @@ void PIDController::SetD(double Kd) {
   m_Kd = Kd;
 }
 
+void PIDController::SetIZone(double izone) {
+  if (izone < 0) {
+    wpi::math::MathSharedStore::ReportError(
+        "IZone must be a non-zero positive number, got {}!", izone);
+  }
+  m_izone = izone;
+}
+
 double PIDController::GetP() const {
   return m_Kp;
 }
@@ -62,6 +70,10 @@ double PIDController::GetI() const {
 
 double PIDController::GetD() const {
   return m_Kd;
+}
+
+double PIDController::GetIZone() const {
+  return m_izone;
 }
 
 units::second_t PIDController::GetPeriod() const {
@@ -151,7 +163,10 @@ double PIDController::Calculate(double measurement) {
 
   m_velocityError = (m_positionError - m_prevError) / m_period.value();
 
-  if (m_Ki != 0) {
+  // If an IZone has been set and the position error is outside of it, reset the total error
+  if (m_izone > 0 && std::abs(m_positionError) > m_izone) {
+    m_totalError = 0;
+  } else if (m_Ki != 0) {
     m_totalError =
         std::clamp(m_totalError + m_positionError * m_period.value(),
                    m_minimumIntegral / m_Ki, m_maximumIntegral / m_Ki);
@@ -182,6 +197,9 @@ void PIDController::InitSendable(wpi::SendableBuilder& builder) {
       "i", [this] { return GetI(); }, [this](double value) { SetI(value); });
   builder.AddDoubleProperty(
       "d", [this] { return GetD(); }, [this](double value) { SetD(value); });
+  builder.AddDoubleProperty(
+      "izone", [this] { return GetIZone(); },
+      [this](double value) { SetIZone(value); });
   builder.AddDoubleProperty(
       "setpoint", [this] { return GetSetpoint(); },
       [this](double value) { SetSetpoint(value); });
