@@ -103,6 +103,10 @@ public final class RobotController {
     return HAL.getBrownedOut();
   }
 
+  public static boolean getRSLState() {
+    return HAL.getRSLState();
+  }
+
   /**
    * Get the input voltage to the robot controller.
    *

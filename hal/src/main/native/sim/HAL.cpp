@@ -328,7 +328,7 @@ HAL_Bool HAL_GetBrownedOut(int32_t* status) {
   return false;  // Figure out if we need to detect a brownout condition
 }
 
-HAL_Bool HAL_GetRSL(int32_t* status) {
+HAL_Bool HAL_GetRSLState(int32_t* status) {
   return false;
 }
 
