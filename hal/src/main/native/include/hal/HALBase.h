@@ -176,7 +176,7 @@ uint64_t HAL_ExpandFPGATime(uint32_t unexpandedLower, int32_t* status);
  * Gets the current state of the Robot Signal Light (RSL)
  * @param[out] status the error code, or 0 for success
  * @return The current state of the RSL- true if on, false if off
-*/
+ */
 HAL_Bool HAL_GetRSLState(int32_t* status);
 
 /**

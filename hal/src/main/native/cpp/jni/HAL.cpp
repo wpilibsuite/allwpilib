@@ -136,14 +136,20 @@ Java_edu_wpi_first_hal_HAL_getBrownedOut
   return val;
 }
 
+/*
+ * Class:     edu_wpi_first_hal_HAL
+ * Method:    getRSLState
+ * Signature: ()Z
+ */
 JNIEXPORT jboolean JNICALL
 Java_edu_wpi_first_hal_HAL_getRSLState
-  (JNIEnv* env, jclass) {
-    int32_t status = 0;
-    bool val = HAL_GetRSLState(&status);
-    CheckStatus(env, status);
-    return val;
-  }
+  (JNIEnv* env, jclass)
+{
+  int32_t status = 0;
+  bool val = HAL_GetRSLState(&status);
+  CheckStatus(env, status);
+  return val;
+}
 
 /*
  * Class:     edu_wpi_first_hal_HAL

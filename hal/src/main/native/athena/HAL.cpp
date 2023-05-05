@@ -425,7 +425,7 @@ HAL_Bool HAL_GetBrownedOut(int32_t* status) {
 
 HAL_Bool HAL_GetRSLState(int32_t* status) {
   hal::init::CheckInit();
-    if (!global) {
+  if (!global) {
     *status = NiFpga_Status_ResourceNotInitialized;
     return false;
   }

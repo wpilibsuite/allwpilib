@@ -104,8 +104,8 @@ class RobotController {
   /**
    * Gets the current state of the Robot Signal Light (RSL)
    * @return The current state of the RSL- true if on, false if off
-  */
-  static bool GetRSLState();  
+   */
+  static bool GetRSLState();
 
   /**
    * Get the input voltage to the robot controller.
