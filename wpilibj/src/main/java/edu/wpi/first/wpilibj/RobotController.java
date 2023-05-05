@@ -103,6 +103,11 @@ public final class RobotController {
     return HAL.getBrownedOut();
   }
 
+  /**
+   * Gets the current state of the Robot Signal Light (RSL).
+   *
+   * @return The current state of the RSL- true if on, false if off
+   */
   public static boolean getRSLState() {
     return HAL.getRSLState();
   }
