@@ -25,7 +25,7 @@ public class PIDController implements Sendable, AutoCloseable {
   private double m_kd;
 
   // The error range where "integral" control applies
-  private double m_izone;
+  private double m_izone = Double.POSITIVE_INFINITY;
 
   // The period (in seconds) of the loop that calls the controller
   private final double m_period;
@@ -148,6 +148,7 @@ public class PIDController implements Sendable, AutoCloseable {
    * Sets the IZone range. When the absolute value of the position error is outside IZone, the total
    * accumulated error will reset to zero, disabling integral gain until the absolute value of the
    * position error is within IZone. This is used to prevent integral windup. Must be non-negative.
+   * Setting to zero disables integral gain, setting to infinity disables IZone
    *
    * @param izone izone range
    */
@@ -377,8 +378,8 @@ public class PIDController implements Sendable, AutoCloseable {
 
     m_velocityError = (m_positionError - m_prevError) / m_period;
 
-    // If an IZone has been set and the position error is outside of it, reset the total error
-    if (m_izone > 0 && Math.abs(m_positionError) > m_izone) {
+    // If the absolute value of the position error is outside of IZone, reset the total error
+    if (Math.abs(m_positionError) > m_izone) {
       m_totalError = 0;
     } else if (m_ki != 0) {
       m_totalError =

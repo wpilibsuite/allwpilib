@@ -163,9 +163,9 @@ double PIDController::Calculate(double measurement) {
 
   m_velocityError = (m_positionError - m_prevError) / m_period.value();
 
-  // If an IZone has been set and the position error is outside of it, reset the
+  // If the absolute value of the position error is outside of IZone, reset the
   // total error
-  if (m_izone > 0 && std::abs(m_positionError) > m_izone) {
+  if (std::abs(m_positionError) > m_izone) {
     m_totalError = 0;
   } else if (m_Ki != 0) {
     m_totalError =
