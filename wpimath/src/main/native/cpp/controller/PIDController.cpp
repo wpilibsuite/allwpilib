@@ -55,7 +55,7 @@ void PIDController::SetD(double Kd) {
 void PIDController::SetIZone(double izone) {
   if (izone < 0) {
     wpi::math::MathSharedStore::ReportError(
-        "IZone must be a non-zero positive number, got {}!", izone);
+        "IZone must be a non-negative number, got {}!", izone);
   }
   m_izone = izone;
 }
@@ -163,7 +163,8 @@ double PIDController::Calculate(double measurement) {
 
   m_velocityError = (m_positionError - m_prevError) / m_period.value();
 
-  // If an IZone has been set and the position error is outside of it, reset the total error
+  // If an IZone has been set and the position error is outside of it, reset the
+  // total error
   if (m_izone > 0 && std::abs(m_positionError) > m_izone) {
     m_totalError = 0;
   } else if (m_Ki != 0) {

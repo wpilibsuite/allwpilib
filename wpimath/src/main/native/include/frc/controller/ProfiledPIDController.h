@@ -107,7 +107,9 @@ class ProfiledPIDController
   void SetD(double Kd) { m_controller.SetD(Kd); }
 
   /**
-   * Sets the IZone range.
+   * Sets the IZone range. When the absolute value of the position error is outside IZone, the total
+   * accumulated error will reset to zero, disabling integral gain until the absolute value of the
+   * position error is within IZone. This is used to prevent integral windup. Must be non-negative.
    *
    * @param izone izone range
    */ 

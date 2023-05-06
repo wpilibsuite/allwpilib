@@ -145,13 +145,15 @@ public class PIDController implements Sendable, AutoCloseable {
   }
 
   /**
-   * Sets the IZone range.
+   * Sets the IZone range. When the absolute value of the position error is outside IZone, the total
+   * accumulated error will reset to zero, disabling integral gain until the absolute value of the
+   * position error is within IZone. This is used to prevent integral windup. Must be non-negative.
    *
    * @param izone izone range
    */
   public void setIZone(double izone) {
     if (izone < 0) {
-      throw new IllegalArgumentException("IZone must be a non-zero positive number!");
+      throw new IllegalArgumentException("IZone must be a non-negative number!");
     }
     m_izone = izone;
   }
