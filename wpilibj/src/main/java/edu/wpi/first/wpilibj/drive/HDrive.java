@@ -83,7 +83,6 @@ public class HDrive extends RobotDriveBase implements Sendable, AutoCloseable {
    */
   public void arcadeDrive(double xSpeed, double zRotation, double ySpeed, boolean squareInputs) {
     if (!m_reported) {
-      // TODO add HDrive reporting support instead of dif drive.
       HAL.report(tResourceType.kResourceType_RobotDrive, tInstances.kRobotDrive2_HDriveArcade, 2);
       m_reported = true;
     }
@@ -150,10 +149,10 @@ public class HDrive extends RobotDriveBase implements Sendable, AutoCloseable {
    * @param leftSpeed The robot's left side speed along the X axis [-1.0..1.0]. Forward is positive.
    * @param rightSpeed The robot's right side speed along the X axis [-1.0..1.0]. Forward is
    *     positive.
-   * @param ySpeed The robot's speed along the Y axis [-1.0..1.0]. Right is positive
+   * @param lateralSpeed The robot's speed along the Y axis [-1.0..1.0]. Right is positive
    */
-  public void tankDrive(double leftSpeed, double rightSpeed, double ySpeed) {
-    tankDrive(leftSpeed, rightSpeed, ySpeed, true);
+  public void tankDrive(double leftSpeed, double rightSpeed, double lateralSpeed) {
+    tankDrive(leftSpeed, rightSpeed, lateralSpeed, true);
   }
 
   /**
@@ -162,10 +161,10 @@ public class HDrive extends RobotDriveBase implements Sendable, AutoCloseable {
    * @param leftSpeed The robot left side's speed along the X axis [-1.0..1.0]. Forward is positive.
    * @param rightSpeed The robot right side's speed along the X axis [-1.0..1.0]. Forward is
    *     positive.
-   * @param ySpeed The robot's speed along the Y axis [-1.0..1.0]. Right is positive
+   * @param lateralSpeed The robot's speed along the Y axis [-1.0..1.0]. Right is positive
    * @param squareInputs If set, decreases the input sensitivity at low speeds.
    */
-  public void tankDrive(double leftSpeed, double rightSpeed, double ySpeed, boolean squareInputs) {
+  public void tankDrive(double leftSpeed, double rightSpeed, double lateralSpeed, boolean squareInputs) {
     if (!m_reported) {
       HAL.report(tResourceType.kResourceType_RobotDrive, tInstances.kRobotDrive2_HDriveTank, 2);
       m_reported = true;
@@ -174,7 +173,7 @@ public class HDrive extends RobotDriveBase implements Sendable, AutoCloseable {
     leftSpeed = MathUtil.applyDeadband(leftSpeed, m_deadband);
     rightSpeed = MathUtil.applyDeadband(rightSpeed, m_deadband);
 
-    var speeds = tankDriveIK(leftSpeed, rightSpeed, ySpeed, squareInputs);
+    var speeds = tankDriveIK(leftSpeed, rightSpeed, lateralSpeed, squareInputs);
 
     m_leftMotor.set(speeds.left * m_maxOutput);
     m_rightMotor.set(speeds.right * m_maxOutput);
