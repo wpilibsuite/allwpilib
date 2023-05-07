@@ -15,11 +15,13 @@ namespace wpi::math {
 
 enum class MathUsageId {
   kKinematics_DifferentialDrive,
+  kKinematics_HDrive,
   kKinematics_MecanumDrive,
   kKinematics_SwerveDrive,
   kTrajectory_TrapezoidProfile,
   kFilter_Linear,
   kOdometry_DifferentialDrive,
+  kOdometry_HDrive,
   kOdometry_SwerveDrive,
   kOdometry_MecanumDrive,
   kController_PIDController2,

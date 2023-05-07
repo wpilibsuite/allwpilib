@@ -95,6 +95,9 @@ public abstract class RobotBase implements AutoCloseable {
                     tResourceType.kResourceType_Kinematics,
                     tInstances.kKinematics_DifferentialDrive);
                 break;
+              case kKinematics_HDrive:
+                HAL.report(tResourceType.kResourceType_Kinematics, tInstances.kKinematics_HDrive);
+                break;
               case kKinematics_MecanumDrive:
                 HAL.report(
                     tResourceType.kResourceType_Kinematics, tInstances.kKinematics_MecanumDrive);
@@ -112,6 +115,9 @@ public abstract class RobotBase implements AutoCloseable {
               case kOdometry_DifferentialDrive:
                 HAL.report(
                     tResourceType.kResourceType_Odometry, tInstances.kOdometry_DifferentialDrive);
+                break;
+              case kOdometry_HDrive:
+                HAL.report(tResourceType.kResourceType_Odometry, tInstances.kOdometry_HDrive);
                 break;
               case kOdometry_SwerveDrive:
                 HAL.report(tResourceType.kResourceType_Odometry, tInstances.kOdometry_SwerveDrive);

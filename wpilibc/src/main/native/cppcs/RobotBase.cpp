@@ -104,6 +104,10 @@ class WPILibMathShared : public wpi::math::MathShared {
         HAL_Report(HALUsageReporting::kResourceType_Kinematics,
                    HALUsageReporting::kKinematics_DifferentialDrive);
         break;
+      case wpi::math::MathUsageId::kKinematics_HDrive:
+        HAL_Report(HALUsageReporting::kResourceType_Kinematics,
+                   HALUsageReporting::kKinematics_HDrive);
+        break;
       case wpi::math::MathUsageId::kKinematics_MecanumDrive:
         HAL_Report(HALUsageReporting::kResourceType_Kinematics,
                    HALUsageReporting::kKinematics_MecanumDrive);
@@ -121,6 +125,10 @@ class WPILibMathShared : public wpi::math::MathShared {
       case wpi::math::MathUsageId::kOdometry_DifferentialDrive:
         HAL_Report(HALUsageReporting::kResourceType_Odometry,
                    HALUsageReporting::kOdometry_DifferentialDrive);
+        break;
+      case wpi::math::MathUsageId::kOdometry_HDrive:
+        HAL_Report(HALUsageReporting::kResourceType_Odometry,
+                   HALUsageReporting::kOdometry_HDrive);
         break;
       case wpi::math::MathUsageId::kOdometry_SwerveDrive:
         HAL_Report(HALUsageReporting::kResourceType_Odometry,
