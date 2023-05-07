@@ -106,8 +106,9 @@ public class HDrivetrainSim {
    *     LinearSystemId#identifyDrivetrainSystem(double, double, double, double)}.
    * @param lateralDrivetrainPlant The {@link LinearSystem} representing the lateral movement system
    *     of the robot. This can be created with {@link
-   *     edu.wpi.first.math.system.plant.HDrivetrainLateralSystemId#createHDrivetrainLateralVelocitySystem(
-   *     DCMotor, double, double, double, double, double)} or {@link
+   *     edu.wpi.first.math.system.plant.HDrivetrainLateralSystemId
+   *     #createHDrivetrainLateralVelocitySystem( DCMotor, double, double, double, double, double)}
+   *     or {@link
    *     edu.wpi.first.math.system.plant.HDrivetrainLateralSystemId#identifyLateralVelocitySystem(
    *     double, double, double, double)}
    * @param driveMotor A {@link DCMotor} representing the drivetrain.

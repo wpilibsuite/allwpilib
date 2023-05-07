@@ -27,14 +27,16 @@ public class HDrive extends RobotDriveBase implements Sendable, AutoCloseable {
    * edu.wpi.first.wpilibj.motorcontrol.MotorControllerGroup}. If a motor needs to be inverted, do
    * so before passing it in.
    *
+   * <p>Inputs smaller then {@value edu.wpi.first.wpilibj.drive.RobotDriveBase#kDefaultDeadband}
+   * will be set to 0, and larger values will be scaled so that the full range is still used. This
+   * deadband value can be changed with {@link #setDeadband}.
+   *
+   * <p>{@link edu.wpi.first.wpilibj.MotorSafety} is enabled by default. The tankDrive or
+   * arcadeDrive, methods should be called periodically to avoid Motor Safety timeouts.
+   *
    * @param leftMotor Left motor.
    * @param rightMotor Right motor.
    * @param lateralMotor Lateral motor.
-   *     <p>Inputs smaller then {@value edu.wpi.first.wpilibj.drive.RobotDriveBase#kDefaultDeadband}
-   *     will be set to 0, and larger values will be scaled so that the full range is still used.
-   *     This deadband value can be changed with {@link #setDeadband}.
-   *     <p>{@link edu.wpi.first.wpilibj.MotorSafety} is enabled by default. The tankDrive or
-   *     arcadeDrive, methods should be called periodically to avoid Motor Safety timeouts.
    */
   public HDrive(
       MotorController leftMotor, MotorController rightMotor, MotorController lateralMotor) {
