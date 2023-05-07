@@ -105,7 +105,11 @@ def main():
 
     # Apply patches to upstream Git repo
     os.chdir(upstream_root)
-    for f in ["0001-Disable-warnings.patch", "0002-Intellisense-fix.patch"]:
+    for f in [
+        "0001-Disable-warnings.patch",
+        "0002-Intellisense-fix.patch",
+        "0003-Eigen-Sparse-fix-warnings-Wunused-but-set-variable.patch",
+    ]:
         git_am(os.path.join(wpilib_root, "upstream_utils/eigen_patches", f))
 
     # Delete old install

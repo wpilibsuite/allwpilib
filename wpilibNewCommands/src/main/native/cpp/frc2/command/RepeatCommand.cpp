@@ -39,7 +39,12 @@ bool RepeatCommand::IsFinished() {
 }
 
 void RepeatCommand::End(bool interrupted) {
-  m_command->End(interrupted);
+  // Make sure we didn't already call end() (which would happen if the command
+  // finished in the last call to our execute())
+  if (!m_ended) {
+    m_command->End(interrupted);
+    m_ended = true;
+  }
 }
 
 bool RepeatCommand::RunsWhenDisabled() const {
