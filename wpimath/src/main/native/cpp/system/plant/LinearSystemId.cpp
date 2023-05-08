@@ -218,8 +218,8 @@ LinearSystem<1, 1, 1> LinearSystemId::CreateHDriveLateralVelocitySystem(
   auto C2 = G * motor.Kt / (motor.R * radius);
   auto C3 = 1 / mass + offsetFromCenterOfGravity * offsetFromCenterOfGravity / J;
   
-  Matrixd<1, 1> A{C3 * C1};
-  Matrixd<1, 1> B{C3 * C2};
+  Matrixd<1, 1> A{C3.value() * C1.value()};
+  Matrixd<1, 1> B{C3.value() * C2.value()};
   Matrixd<1, 1> C{1.0};
   Matrixd<1, 1> D{0.0};
 

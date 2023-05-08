@@ -12,7 +12,7 @@ public class HDriveWheelSpeeds {
   /** Speed of the right side of the robot. */
   public double rightMetersPerSecond;
 
-  /** Speed of the lateral movement of the robot */
+  /** Speed of the lateral movement of the robot. */
   public double lateralMetersPerSecond;
 
   /** Constructs a HDriveWheelSpeeds with zeros for left, right and lateral speeds. */
@@ -25,7 +25,8 @@ public class HDriveWheelSpeeds {
    * @param rightMetersPerSecond The right speed.
    * @param lateralMetersPerSecond The lateral speed.
    */
-  public HDriveWheelSpeeds(double leftMetersPerSecond, double rightMetersPerSecond, double lateralMetersPerSecond) {
+  public HDriveWheelSpeeds(
+      double leftMetersPerSecond, double rightMetersPerSecond, double lateralMetersPerSecond) {
     this.leftMetersPerSecond = leftMetersPerSecond;
     this.rightMetersPerSecond = rightMetersPerSecond;
     this.lateralMetersPerSecond = lateralMetersPerSecond;

@@ -11,8 +11,8 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Twist2d;
 
 /**
- * Class for H-drive odometry. Odometry allows you to track the robot's position on the
- * field over the course of a match using readings from 3 encoders and a gyroscope.
+ * Class for H-drive odometry. Odometry allows you to track the robot's position on the field over
+ * the course of a match using readings from 3 encoders and a gyroscope.
  *
  * <p>Teams can use odometry during the autonomous period for complex tasks like path following.
  * Furthermore, odometry can be used for latency compensation when using computer-vision systems.
@@ -65,7 +65,10 @@ public class HDriveOdometry {
    * @param lateralDistanceMeters The distance traveled by the lateral encoder.
    */
   public HDriveOdometry(
-      Rotation2d gyroAngle, double leftDistanceMeters, double rightDistanceMeters, double lateralDistanceMeters) {
+      Rotation2d gyroAngle,
+      double leftDistanceMeters,
+      double rightDistanceMeters,
+      double lateralDistanceMeters) {
     this(gyroAngle, leftDistanceMeters, rightDistanceMeters, lateralDistanceMeters, new Pose2d());
   }
 
@@ -117,21 +120,26 @@ public class HDriveOdometry {
    * @return The new pose of the robot.
    */
   public Pose2d update(
-      Rotation2d gyroAngle, double leftDistanceMeters, double rightDistanceMeters, double lateralDistanceMeters) {
-    double deltaLeftDistance = leftDistanceMeters - m_prevLeftDistance;
-    double deltaRightDistance = rightDistanceMeters - m_prevRightDistance;
-    double deltaLateralDistance = lateralDistanceMeters - m_prevLateralDistance;
+      Rotation2d gyroAngle,
+      double leftDistanceMeters,
+      double rightDistanceMeters,
+      double lateralDistanceMeters) {
+    final double deltaLeftDistance = leftDistanceMeters - m_prevLeftDistance;
+    final double deltaRightDistance = rightDistanceMeters - m_prevRightDistance;
+    final double deltaLateralDistance = lateralDistanceMeters - m_prevLateralDistance;
 
     m_prevLeftDistance = leftDistanceMeters;
     m_prevRightDistance = rightDistanceMeters;
     m_prevLateralDistance = lateralDistanceMeters;
-    
-    double averageDeltaDistance = (deltaLeftDistance + deltaRightDistance) / 2.0;
-    var angle = gyroAngle.plus(m_gyroOffset);
 
+    final double averageDeltaDistance = (deltaLeftDistance + deltaRightDistance) / 2.0;
+    var angle = gyroAngle.plus(m_gyroOffset);
     var newPose =
         m_poseMeters.exp(
-            new Twist2d(averageDeltaDistance, deltaLateralDistance, angle.minus(m_previousAngle).getRadians()));
+            new Twist2d(
+                averageDeltaDistance,
+                deltaLateralDistance,
+                angle.minus(m_previousAngle).getRadians()));
 
     m_previousAngle = angle;
 
@@ -139,4 +147,3 @@ public class HDriveOdometry {
     return m_poseMeters;
   }
 }
-

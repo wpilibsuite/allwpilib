@@ -296,17 +296,17 @@ class WPILIB_DLLEXPORT LinearSystemId {
       decltype(1_V / Acceleration_t<Distance>(1)) kALinear,
       decltype(1_V / Velocity_t<Distance>(1)) kVAngluar,
       decltype(1_V / Acceleration_t<Distance>(1)) kAAngular) {
-    if (kVLinear <= decltype(kV){0}) {
-      throw std::domain_error("Kv, linear must be greater than zero.");
+    if (kVLinear <= decltype(kVLinear){0}) {
+      throw std::domain_error("kVLinear, linear must be greater than zero.");
     }
-    if (kALinear <= decltype(kA){0}) {
-      throw std::domain_error("Ka, linear must be greater than zero.");
+    if (kALinear <= decltype(kALinear){0}) {
+      throw std::domain_error("kALinear, linear must be greater than zero.");
     }
-    if (kVAngluar <= decltype(kV){0}) {
-      throw std::domain_error("Kv, angular must be greater than zero.");
+    if (kVAngluar <= decltype(kVAngluar){0}) {
+      throw std::domain_error("kVAngluar, angular must be greater than zero.");
     }
-    if (kAAngluar <= decltype(kA){0}) {
-      throw std::domain_error("Ka, angular must be greater than zero.");
+    if (kAAngular <= decltype(kAAngular){0}) {
+      throw std::domain_error("kAAngular, angular must be greater than zero.");
     }
 
     double A1 = 0.5 * -(kVLinear / kALinear + kVAngluar / kAAngular);

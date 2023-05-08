@@ -8,30 +8,48 @@ import edu.wpi.first.math.MathSharedStore;
 import edu.wpi.first.math.MathUsageId;
 import edu.wpi.first.math.geometry.Twist2d;
 
+/**
+ * Helper class that converts a chassis velocity (dx, dy, and dtheta components) into individual
+ * wheel speeds.
+ */
 public class HDriveKinematics {
-    public final double trackWidthMeters;
+  public final double trackWidthMeters;
 
-    public HDriveKinematics(double trackWidthMeters) {
-        this.trackWidthMeters = trackWidthMeters;
-        MathSharedStore.reportUsage(MathUsageId.kKinematics_HDrive, 1);
-    }
+  /** Constructor for the kinematics of an HDrive. */
+  public HDriveKinematics(double trackWidthMeters) {
+    this.trackWidthMeters = trackWidthMeters;
+    MathSharedStore.reportUsage(MathUsageId.kKinematics_HDrive, 1);
+  }
 
-    public ChassisSpeeds toChassisSpeeds(HDriveWheelSpeeds wheelSpeeds){
-        return new ChassisSpeeds(
+  /**
+   * Takes in wheel speeds and returns the system chasis speeds.
+   *
+   * @param wheelSpeeds The speeds of the left right and lateral wheels.
+   * @return The chasis speeds of the robot.
+   */
+  public ChassisSpeeds toChassisSpeeds(HDriveWheelSpeeds wheelSpeeds) {
+    return new ChassisSpeeds(
         (wheelSpeeds.leftMetersPerSecond + wheelSpeeds.rightMetersPerSecond) / 2,
         wheelSpeeds.lateralMetersPerSecond,
         (wheelSpeeds.rightMetersPerSecond - wheelSpeeds.leftMetersPerSecond) / trackWidthMeters);
-    }
+  }
 
-    public HDriveWheelSpeeds toWheelSpeeds(ChassisSpeeds chassisSpeeds){
-        return new HDriveWheelSpeeds(
-            chassisSpeeds.vxMetersPerSecond
-                - trackWidthMeters / 2 * chassisSpeeds.omegaRadiansPerSecond,
-            chassisSpeeds.vxMetersPerSecond
-                + trackWidthMeters / 2 * chassisSpeeds.omegaRadiansPerSecond, 
-            chassisSpeeds.vyMetersPerSecond);
-    }
-    /**
+  /**
+   * Converts chasis speeds to the individual wheel speeds of the drive.
+   *
+   * @param chassisSpeeds The speed of the robot vx, vy, and omega.
+   * @return The individual wheel speeds of the robot.
+   */
+  public HDriveWheelSpeeds toWheelSpeeds(ChassisSpeeds chassisSpeeds) {
+    return new HDriveWheelSpeeds(
+        chassisSpeeds.vxMetersPerSecond
+            - trackWidthMeters / 2 * chassisSpeeds.omegaRadiansPerSecond,
+        chassisSpeeds.vxMetersPerSecond
+            + trackWidthMeters / 2 * chassisSpeeds.omegaRadiansPerSecond,
+        chassisSpeeds.vyMetersPerSecond);
+  }
+
+  /**
    * Performs forward kinematics to return the resulting Twist2d from the given left and right side
    * distance deltas. This method is often used for odometry -- determining the robot's position on
    * the field using changes in the distance driven by each wheel on the robot.
@@ -41,7 +59,11 @@ public class HDriveKinematics {
    * @param lateralDistanceMeters The distance measured by the lateral wheels encoder.
    * @return The resulting Twist2d.
    */
-  public Twist2d toTwist2d(double leftDistanceMeters, double rightDistanceMeters, double lateralDistanceMeters, double trackWidthMeters) {
+  public Twist2d toTwist2d(
+      double leftDistanceMeters,
+      double rightDistanceMeters,
+      double lateralDistanceMeters,
+      double trackWidthMeters) {
     return new Twist2d(
         (leftDistanceMeters + rightDistanceMeters) / 2,
         lateralDistanceMeters,

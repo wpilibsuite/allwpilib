@@ -18,22 +18,20 @@ import edu.wpi.first.math.kinematics.HDriveOdometry;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.util.WPIUtilJNI;
-
 import java.util.Map;
 import java.util.Objects;
 
 /**
- * This class wraps {@link HDriveOdometry H-Drive Odometry} to fuse
- * latency-compensated vision measurements with H-Drive encoder measurements. It is
- * intended to be a drop-in replacement for {@link HDriveOdometry}; in fact, if you never
- * call {@link HDrivePoseEstimator#addVisionMeasurement} and only call {@link
- * HDrivePoseEstimator#update} then this will behave exactly the same as
- * HDriveOdometry.
+ * This class wraps {@link HDriveOdometry H-Drive Odometry} to fuse latency-compensated vision
+ * measurements with H-Drive encoder measurements. It is intended to be a drop-in replacement for
+ * {@link HDriveOdometry}; in fact, if you never call {@link
+ * HDrivePoseEstimator#addVisionMeasurement} and only call {@link HDrivePoseEstimator#update} then
+ * this will behave exactly the same as HDriveOdometry.
  *
  * <p>{@link HDrivePoseEstimator#update} should be called every robot loop.
  *
- * <p>{@link HDrivePoseEstimator#addVisionMeasurement} can be called as infrequently as
- * you want; if you never call it then this class will behave exactly like regular encoder odometry.
+ * <p>{@link HDrivePoseEstimator#addVisionMeasurement} can be called as infrequently as you want; if
+ * you never call it then this class will behave exactly like regular encoder odometry.
  */
 public class HDrivePoseEstimator {
   private final HDriveKinematics m_kinematics;
@@ -47,8 +45,8 @@ public class HDrivePoseEstimator {
       TimeInterpolatableBuffer.createBuffer(1.5);
 
   /**
-   * Constructs a HDrivePoseEstimator with default standard deviations for the model and
-   * vision measurements.
+   * Constructs a HDrivePoseEstimator with default standard deviations for the model and vision
+   * measurements.
    *
    * <p>The default standard deviations of the model states are 0.02 meters for x, 0.02 meters for
    * y, and 0.01 radians for heading. The default standard deviations of the vision measurements are
@@ -62,8 +60,8 @@ public class HDrivePoseEstimator {
    * @param initialPoseMeters The starting pose estimate.
    */
   public HDrivePoseEstimator(
-    HDriveKinematics kinematics,
-    double trackWidthMeters,
+      HDriveKinematics kinematics,
+      double trackWidthMeters,
       Rotation2d gyroAngle,
       double leftDistanceMeters,
       double rightDistanceMeters,
@@ -99,8 +97,8 @@ public class HDrivePoseEstimator {
    *     the vision pose measurement less.
    */
   public HDrivePoseEstimator(
-        HDriveKinematics kinematics,
-        double trackWidthMeters,
+      HDriveKinematics kinematics,
+      double trackWidthMeters,
       Rotation2d gyroAngle,
       double leftDistanceMeters,
       double rightDistanceMeters,
@@ -108,11 +106,15 @@ public class HDrivePoseEstimator {
       Pose2d initialPoseMeters,
       Matrix<N3, N1> stateStdDevs,
       Matrix<N3, N1> visionMeasurementStdDevs) {
-        this.trackWidthMeters = trackWidthMeters;
+    this.trackWidthMeters = trackWidthMeters;
     m_kinematics = kinematics;
     m_odometry =
         new HDriveOdometry(
-            gyroAngle, leftDistanceMeters, rightDistanceMeters, lateralDistanceMeters, initialPoseMeters);
+            gyroAngle,
+            leftDistanceMeters,
+            rightDistanceMeters,
+            lateralDistanceMeters,
+            initialPoseMeters);
 
     for (int i = 0; i < 3; ++i) {
       m_q.set(i, 0, stateStdDevs.get(i, 0) * stateStdDevs.get(i, 0));
@@ -168,7 +170,8 @@ public class HDrivePoseEstimator {
       double lateralPositionMeters,
       Pose2d poseMeters) {
     // Reset state estimate and error covariance
-    m_odometry.resetPosition(gyroAngle, leftPositionMeters, rightPositionMeters, lateralPositionMeters, poseMeters);
+    m_odometry.resetPosition(
+        gyroAngle, leftPositionMeters, rightPositionMeters, lateralPositionMeters, poseMeters);
     m_poseBuffer.clear();
   }
 
@@ -195,11 +198,11 @@ public class HDrivePoseEstimator {
    * @param visionRobotPoseMeters The pose of the robot as measured by the vision camera.
    * @param timestampSeconds The timestamp of the vision measurement in seconds. Note that if you
    *     don't use your own time source by calling {@link
-   *     HDrivePoseEstimator#updateWithTime(double,Rotation2d,double,double,double)} then you
-   *     must use a timestamp with an epoch since FPGA startup (i.e., the epoch of this timestamp is
-   *     the same epoch as {@link edu.wpi.first.wpilibj.Timer#getFPGATimestamp()}.) This means that
-   *     you should use {@link edu.wpi.first.wpilibj.Timer#getFPGATimestamp()} as your time source
-   *     or sync the epochs.
+   *     HDrivePoseEstimator#updateWithTime(double,Rotation2d,double,double,double)} then you must
+   *     use a timestamp with an epoch since FPGA startup (i.e., the epoch of this timestamp is the
+   *     same epoch as {@link edu.wpi.first.wpilibj.Timer#getFPGATimestamp()}.) This means that you
+   *     should use {@link edu.wpi.first.wpilibj.Timer#getFPGATimestamp()} as your time source or
+   *     sync the epochs.
    */
   public void addVisionMeasurement(Pose2d visionRobotPoseMeters, double timestampSeconds) {
     // Step 1: Get the pose odometry measured at the moment the vision measurement was made.
@@ -259,11 +262,11 @@ public class HDrivePoseEstimator {
    * @param visionRobotPoseMeters The pose of the robot as measured by the vision camera.
    * @param timestampSeconds The timestamp of the vision measurement in seconds. Note that if you
    *     don't use your own time source by calling {@link
-   *     HDrivePoseEstimator#updateWithTime(double,Rotation2d,double,double, double)}, then you
-   *     must use a timestamp with an epoch since FPGA startup (i.e., the epoch of this timestamp is
-   *     the same epoch as {@link edu.wpi.first.wpilibj.Timer#getFPGATimestamp()}). This means that
-   *     you should use {@link edu.wpi.first.wpilibj.Timer#getFPGATimestamp()} as your time source
-   *     in this case.
+   *     HDrivePoseEstimator#updateWithTime(double,Rotation2d,double,double, double)}, then you must
+   *     use a timestamp with an epoch since FPGA startup (i.e., the epoch of this timestamp is the
+   *     same epoch as {@link edu.wpi.first.wpilibj.Timer#getFPGATimestamp()}). This means that you
+   *     should use {@link edu.wpi.first.wpilibj.Timer#getFPGATimestamp()} as your time source in
+   *     this case.
    * @param visionMeasurementStdDevs Standard deviations of the vision pose measurement (x position
    *     in meters, y position in meters, and heading in radians). Increase these numbers to trust
    *     the vision pose measurement less.
@@ -287,9 +290,16 @@ public class HDrivePoseEstimator {
    * @return The estimated pose of the robot in meters.
    */
   public Pose2d update(
-      Rotation2d gyroAngle, double distanceLeftMeters, double distanceRightMeters, double distanceLateralMeters) {
+      Rotation2d gyroAngle,
+      double distanceLeftMeters,
+      double distanceRightMeters,
+      double distanceLateralMeters) {
     return updateWithTime(
-        WPIUtilJNI.now() * 1.0e-6, gyroAngle, distanceLeftMeters, distanceRightMeters, distanceLateralMeters);
+        WPIUtilJNI.now() * 1.0e-6,
+        gyroAngle,
+        distanceLeftMeters,
+        distanceRightMeters,
+        distanceLateralMeters);
   }
 
   /**
@@ -313,7 +323,11 @@ public class HDrivePoseEstimator {
     m_poseBuffer.addSample(
         currentTimeSeconds,
         new InterpolationRecord(
-            getEstimatedPosition(), gyroAngle, distanceLeftMeters, distanceRightMeters, distanceLateralMeters));
+            getEstimatedPosition(),
+            gyroAngle,
+            distanceLeftMeters,
+            distanceRightMeters,
+            distanceLateralMeters));
 
     return getEstimatedPosition();
   }
@@ -348,7 +362,11 @@ public class HDrivePoseEstimator {
      * @param lateralMeters The distanced traveled by the lateral encoder.
      */
     private InterpolationRecord(
-        Pose2d poseMeters, Rotation2d gyro, double leftMeters, double rightMeters, double lateralMeters) {
+        Pose2d poseMeters,
+        Rotation2d gyro,
+        double leftMeters,
+        double rightMeters,
+        double lateralMeters) {
       this.poseMeters = poseMeters;
       this.gyroAngle = gyro;
       this.leftMeters = leftMeters;
@@ -384,10 +402,16 @@ public class HDrivePoseEstimator {
         var gyro_lerp = gyroAngle.interpolate(endValue.gyroAngle, t);
 
         // Create a twist to represent this change based on the interpolated sensor inputs.
-        Twist2d twist = m_kinematics.toTwist2d(left_lerp - leftMeters, right_lerp - rightMeters, lateral_lerp - lateralMeters, trackWidthMeters);
+        Twist2d twist =
+            m_kinematics.toTwist2d(
+                left_lerp - leftMeters,
+                right_lerp - rightMeters,
+                lateral_lerp - lateralMeters,
+                trackWidthMeters);
         twist.dtheta = gyro_lerp.minus(gyroAngle).getRadians();
 
-        return new InterpolationRecord(poseMeters.exp(twist), gyro_lerp, left_lerp, right_lerp, lateral_lerp);
+        return new InterpolationRecord(
+            poseMeters.exp(twist), gyro_lerp, left_lerp, right_lerp, lateral_lerp);
       }
     }
 
