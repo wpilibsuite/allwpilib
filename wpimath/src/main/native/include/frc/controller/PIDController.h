@@ -72,17 +72,18 @@ class WPILIB_DLLEXPORT PIDController
    * @param Kd differential coefficient
    */
   void SetD(double Kd);
-  
+
   /**
-   * Sets the IZone range. When the absolute value of the position error is outside IZone, the total
-   * accumulated error will reset to zero, disabling integral gain until the absolute value of the
-   * position error is within IZone. This is used to prevent integral windup. Must be non-negative.
+   * Sets the IZone range. When the absolute value of the position error is
+   * outside IZone, the total accumulated error will reset to zero, disabling
+   * integral gain until the absolute value of the position error is within
+   * IZone. This is used to prevent integral windup. Must be non-negative.
    * Setting to zero disables integral gain, setting to infinity disables IZone
    *
    * @param izone izone range
-   */ 
+   */
   void SetIZone(double izone);
-  
+
   /**
    * Gets the proportional coefficient.
    *
@@ -103,7 +104,7 @@ class WPILIB_DLLEXPORT PIDController
    * @return differential coefficient
    */
   double GetD() const;
-  
+
   /**
    * Get the IZone range.
    *
