@@ -191,3 +191,37 @@ LinearSystem<2, 2, 2> LinearSystemId::DrivetrainVelocitySystem(
 
   return LinearSystem<2, 2, 2>(A, B, C, D);
 }
+
+LinearSystem<1, 1, 1> LinearSystemId::CreateHDriveLateralVelocitySystem(
+  DCMotor motor,
+  units::kilogram_t mass,
+  units::meter_t radius, 
+  units::meter_t offsetFromCenterOfGravity,
+  units::kilogram_square_meter_t J,
+  double G) {
+     if (mass <= 0_kg) {
+    throw std::domain_error("mass must be greater than zero.");
+  }
+  if (radius <= 0_m) {
+    throw std::domain_error("radius must be greater than zero.");
+  }
+  if (offsetFromCenterOfGravity <= 0_m) {
+    throw std::domain_error("offsetFromCenterOfGravity must be greater than zero.");
+  }
+  if (J <= 0_kg_sq_m) {
+    throw std::domain_error("J must be greater than zero.");
+  }
+  if (G <= 0.0) {
+    throw std::domain_error("G must be greater than zero.");
+  }
+  auto C1 = -(G * G) * motor.Kt / (motor.Kv * motor.R * radius * radius);
+  auto C2 = G * motor.Kt / (motor.R * radius);
+  auto C3 = 1 / mass + offsetFromCenterOfGravity * offsetFromCenterOfGravity / J;
+  
+  Matrixd<1, 1> A{C3 * C1};
+  Matrixd<1, 1> B{C3 * C2};
+  Matrixd<1, 1> C{1.0};
+  Matrixd<1, 1> D{0.0};
+
+  return LinearSystem<1, 1, 1>(A, B, C, D);
+}

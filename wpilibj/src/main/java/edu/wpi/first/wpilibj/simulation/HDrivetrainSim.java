@@ -18,7 +18,6 @@ import edu.wpi.first.math.numbers.N9;
 import edu.wpi.first.math.system.LinearSystem;
 import edu.wpi.first.math.system.NumericalIntegration;
 import edu.wpi.first.math.system.plant.DCMotor;
-import edu.wpi.first.math.system.plant.HDrivetrainLateralSystemId;
 import edu.wpi.first.math.system.plant.LinearSystemId;
 import edu.wpi.first.wpilibj.RobotController;
 
@@ -87,7 +86,7 @@ public class HDrivetrainSim {
             trackWidthMeters / 2.0,
             jKgMetersSquared,
             gearing),
-        HDrivetrainLateralSystemId.createHDrivetrainLateralVelocitySystem(
+        LinearSystemId.createHDrivetrainLateralVelocitySystem(
             driveMotor,
             massKg,
             wheelRadiusMeters,
@@ -104,16 +103,14 @@ public class HDrivetrainSim {
   /**
    * Create a SimDrivetrain .
    *
-   * @param drivetrainPlant The {@link LinearSystem} representing the robot's drivetrain. This
+   * @param differentialPlant The {@link LinearSystem} representing the robot's drivetrain. This
    *     system can be created with {@link LinearSystemId#createDrivetrainVelocitySystem(DCMotor,
    *     double, double, double, double, double)} or {@link
    *     LinearSystemId#identifyDrivetrainSystem(double, double, double, double)}.
-   * @param lateralDrivetrainPlant The {@link LinearSystem} representing the lateral movement system
-   *     of the robot. This can be created with {@link
-   *     edu.wpi.first.math.system.plant.HDrivetrainLateralSystemId
-   *     #createHDrivetrainLateralVelocitySystem( DCMotor, double, double, double, double, double)}
-   *     or {@link
-   *     edu.wpi.first.math.system.plant.HDrivetrainLateralSystemId#identifyLateralVelocitySystem(
+   * @param lateralPlant The {@link LinearSystem} representing the lateral movement system
+   *     of the robot. This can be created with {@link 
+   * LinearSystemId#createHDrivetrainLateralVelocitySystem( DCMotor, double, double, double, double, double)}
+   *     or {@link LinearSystemId#identifyHDriveLateralVelocitySystem(
    *     double, double, double, double)}
    * @param driveMotor A {@link DCMotor} representing the drivetrain.
    * @param gearing The gearingRatio ratio of the robot, as output over input. This must be the same
@@ -128,15 +125,15 @@ public class HDrivetrainSim {
    *     0.005 meters are a reasonable starting point.
    */
   public HDrivetrainSim(
-      LinearSystem<N2, N2, N2> drivetrainPlant,
-      LinearSystem<N1, N1, N1> lateralDrivetrainPlant,
+      LinearSystem<N2, N2, N2> differentialPlant,
+      LinearSystem<N1, N1, N1> lateralPlant,
       DCMotor driveMotor,
       double gearing,
       double trackWidthMeters,
       double wheelRadiusMeters,
       Matrix<N9, N1> measurementStdDevs) {
-    this.m_plant = drivetrainPlant;
-    this.m_lateralPlant = lateralDrivetrainPlant;
+    this.m_plant = differentialPlant;
+    this.m_lateralPlant = lateralPlant;
     this.m_rb = trackWidthMeters / 2.0;
     this.m_motor = driveMotor;
     this.m_measurementStdDevs = measurementStdDevs;
@@ -315,7 +312,7 @@ public class HDrivetrainSim {
    * @return the drivetrain's lateral plant current draw, in amps
    */
   public double getLateralCurrentDrawAmps() {
-    return -m_motor.getCurrent(
+    return m_motor.getCurrent(
             getState(State.kLeftVelocity) * m_currentGearing / m_wheelRadiusMeters, m_u.get(2, 0))
         * Math.signum(m_u.get(2, 0));
   }

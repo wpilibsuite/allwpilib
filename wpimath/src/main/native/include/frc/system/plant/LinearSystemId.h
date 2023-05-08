@@ -235,6 +235,90 @@ class WPILIB_DLLEXPORT LinearSystemId {
   static LinearSystem<2, 2, 2> DrivetrainVelocitySystem(
       const DCMotor& motor, units::kilogram_t mass, units::meter_t r,
       units::meter_t rb, units::kilogram_square_meter_t J, double G);
+
+    /**
+   * Create the lateral plant of a state-space model of a H-drive. In this model,
+   * the states are
+   * [left velocity, right velocity, lateral velocity]ᵀ, inputs are [left voltage, right voltage, lateral voltage]ᵀ,
+   * and outputs are
+   * [left velocity, right velocity, lateral velocity]ᵀ.
+   *
+   * @param motor                           The motor (or gearbox) driving the
+   *                                        drivetrain.
+   * @param massKg                          The mass of the robot in kilograms.
+   * @param rMeters                         The radius of the wheels in meters.
+   * @param offsetFromCenterOfGravity       The distance of the lateral movement
+   *                                        wheel from the center of gravity.
+   * @param JKgMetersSquared                The moment of inertia of the robot.
+   * @param G                               The gearing reduction as output over
+   *                                        input.
+   * @return A LinearSystem representing a H-drive's lateral plant.
+   * @throws IllegalArgumentException if m &lt;= 0, r &lt;= 0, ocfg &lt; 0, J
+   *                                  &lt;= 0, or G &lt;= 0.
+   */
+  static LinearSystem<1, 1, 1> CreateHDriveLateralVelocitySystem(DCMotor motor,
+                                              units::kilogram_t mass,
+                                              units::meter_t radius, 
+                                              units::meter_t offsetFromCenterOfGravity,
+                                              units::kilogram_square_meter_t J,
+                                              double G);
+
+ /**
+   * Identify a H-drive lateral plant given the lateral plants's kV and kA in
+   * both linear, This is used in combination with a regular Differential Drive
+   * Velocity System to create an H-Drive
+   * {(volts/(meter/sec), (volts/(meter/sec²))} and angular {(volts/(radian/sec)),
+   * (volts/(radian/sec²))} cases. These constants can be found using SysId.
+   *
+   * <p>
+   * States: [[lateral velocity]]<br>
+   * Inputs: [[lateral voltage]]<br>
+   * Outputs: [[lateral velocity]]
+   *
+   * @param kVLinear  The linear velocity gain in volts per (meters per second).
+   * @param kALinear  The linear acceleration gain in volts per (meters per second
+   *                  squared).
+   * @param kVAngular The angular velocity gain in volts per (meters per second).
+   * @param kAAngular The angular acceleration gain in volts per (meters per
+   *                  second squared).
+   * @return A LinearSystem representing a H-drive's lateral plant.
+   * @throws IllegalArgumentException if kVLinear &lt;= 0, kALinear &lt;= 0,
+   *                                  kVAngular &lt;= 0, or
+   *                                  kAAngular &lt;= 0.
+   * @see <a href=
+   *      "https://github.com/wpilibsuite/sysid">https://github.com/wpilibsuite/sysid</a>
+   */
+  template <typename Distance, typename = std::enable_if_t<
+                                   std::is_same_v<units::meter, Distance> ||
+                                   std::is_same_v<units::radian, Distance>>>
+  static LinearSystem<1, 1, 1> IdentifyHDriveLateralVelocitySystem(
+      decltype(1_V / Velocity_t<Distance>(1)) kVLinear,
+      decltype(1_V / Acceleration_t<Distance>(1)) kALinear,
+      decltype(1_V / Velocity_t<Distance>(1)) kVAngluar,
+      decltype(1_V / Acceleration_t<Distance>(1)) kAAngular) {
+    if (kVLinear <= decltype(kV){0}) {
+      throw std::domain_error("Kv, linear must be greater than zero.");
+    }
+    if (kALinear <= decltype(kA){0}) {
+      throw std::domain_error("Ka, linear must be greater than zero.");
+    }
+    if (kVAngluar <= decltype(kV){0}) {
+      throw std::domain_error("Kv, angular must be greater than zero.");
+    }
+    if (kAAngluar <= decltype(kA){0}) {
+      throw std::domain_error("Ka, angular must be greater than zero.");
+    }
+
+    double A1 = 0.5 * -(kVLinear / kALinear + kVAngluar / kAAngular);
+    double B1 = 0.5 * (1.0 / kALinear + 1.0 / kAAngular);
+
+    Matrixd<1, 1> A{A1};
+    Matrixd<1, 1> B{B1};
+    Matrixd<1, 1> C{1.0};
+    Matrixd<1, 1> D{0.0};
+
+    return LinearSystem<1, 1, 1>(A, B, C, D);
+  }
 };
 
 }  // namespace frc
