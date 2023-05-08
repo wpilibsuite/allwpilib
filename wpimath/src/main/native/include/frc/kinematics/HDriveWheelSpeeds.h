@@ -10,9 +10,9 @@
 
 namespace frc {
 /**
- * Represents the wheel speeds for a differential drive drivetrain.
+ * Represents the wheel speeds for a H-drive drivetrain.
  */
-struct WPILIB_DLLEXPORT DifferentialDriveWheelSpeeds {
+struct WPILIB_DLLEXPORT HDriveWheelSpeeds {
   /**
    * Speed of the left side of the robot.
    */
