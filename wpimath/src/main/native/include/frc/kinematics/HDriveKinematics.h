@@ -16,7 +16,7 @@
 namespace frc {
 /**
  * Helper class that converts a chassis velocity (dx and dtheta components) to
- * left and right wheel velocities for a differential drive.
+ * left and right wheel velocities for a H-drive.
  *
  * Inverse kinematics converts a desired chassis speed into left and right
  * velocity components whereas forward kinematics converts left and right
@@ -25,7 +25,7 @@ namespace frc {
 class WPILIB_DLLEXPORT HDriveKinematics {
  public:
   /**
-   * Constructs a differential drive kinematics object.
+   * Constructs a H-drive kinematics object.
    *
    * @param trackWidth The track width of the drivetrain. Theoretically, this is
    * the distance between the left wheels and right wheels. However, the
