@@ -47,7 +47,7 @@ git rebase 2.0
 
 Generate patch files for the new version.
 ```bash
-git format-patch 2.0..HEAD
+git format-patch 2.0..HEAD --no-signature
 ```
 
 Move the patch files to `upstream_utils`.
