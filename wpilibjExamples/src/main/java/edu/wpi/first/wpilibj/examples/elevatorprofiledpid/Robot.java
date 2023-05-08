@@ -34,8 +34,7 @@ public class Robot extends TimedRobot {
       new TrapezoidProfile.Constraints(kMaxVelocity, kMaxAcceleration);
   private final ProfiledPIDController m_controller =
       new ProfiledPIDController(kP, kI, kD, m_constraints, kDt);
-  private final ElevatorFeedforward m_feedforward = 
-      new ElevatorFeedforward(kS, kG, kV);
+  private final ElevatorFeedforward m_feedforward = new ElevatorFeedforward(kS, kG, kV);
 
   @Override
   public void robotInit() {
@@ -52,7 +51,7 @@ public class Robot extends TimedRobot {
 
     // Run controller and update motor output
     m_motor.setVoltage(
-      m_controller.calculate(m_encoder.getDistance()) + 
-      m_feedforward.calculate(m_controller.getSetpoint().velocity));
+        m_controller.calculate(m_encoder.getDistance())
+            + m_feedforward.calculate(m_controller.getSetpoint().velocity));
   }
 }
