@@ -241,7 +241,7 @@ void HAL_SetFilterPeriod(int32_t filterIndex, int64_t value, int32_t* status);
  *
  * Gets the filter period in FPGA cycles.  Even though there are 2 different
  * filter index domains (MXP vs HDR), ignore that distinction for now since it
- * compilicates the interface.  Set status to NiFpga_Status_SoftwareFault if the
+ * complicates the interface.  Set status to NiFpga_Status_SoftwareFault if the
  * filter values miss-match.
  *
  * @param[in] filterIndex the filter index, 0 - 2
