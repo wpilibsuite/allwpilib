@@ -143,7 +143,7 @@ class ProfiledPIDController
    *
    * @return izone range
    */
-  double GetIZone() const { return m_controller.GetIZone(); };
+  double GetIZone() const { return m_controller.GetIZone(); }
 
   /**
    * Gets the period of this controller.
