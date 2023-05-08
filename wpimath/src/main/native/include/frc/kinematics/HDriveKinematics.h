@@ -76,8 +76,9 @@ class WPILIB_DLLEXPORT HDriveKinematics {
    * @return The resulting Twist2d.
    */
   constexpr Twist2d ToTwist2d(const units::meter_t leftDistance,
-                              const units::meter_t rightDistance) const {
-    return {(leftDistance + rightDistance) / 2, 0_m,
+                              const units::meter_t rightDistance,
+                              const units::meter_t lateralDistance) const {
+    return {(leftDistance + rightDistance) / 2, lateralDistance,
             (rightDistance - leftDistance) / trackWidth * 1_rad};
   }
 
