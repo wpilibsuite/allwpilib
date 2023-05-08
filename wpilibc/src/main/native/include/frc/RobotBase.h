@@ -199,7 +199,7 @@ class RobotBase {
    */
   virtual void StartCompetition() = 0;
 
-  /** Ends the main loop in startCompetition(). */
+  /** Ends the main loop in StartCompetition(). */
   virtual void EndCompetition() = 0;
 
   /**
@@ -227,7 +227,9 @@ class RobotBase {
    *
    * @return If the robot is running in simulation.
    */
-  static constexpr bool IsSimulation() { return !IsReal(); }
+  static constexpr bool IsSimulation() {
+    return !IsReal();
+  }
 
   /**
    * Constructor for a generic robot program.

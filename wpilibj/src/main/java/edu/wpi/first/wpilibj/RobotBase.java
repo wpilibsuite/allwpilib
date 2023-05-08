@@ -296,7 +296,7 @@ public abstract class RobotBase implements AutoCloseable {
    */
   public abstract void startCompetition();
 
-  /** Ends the main loop in startCompetition(). */
+  /** Ends the main loop in {@link #startCompetition()}. */
   public abstract void endCompetition();
 
   private static final ReentrantLock m_runMutex = new ReentrantLock();
