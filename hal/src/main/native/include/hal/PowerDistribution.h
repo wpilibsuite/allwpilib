@@ -17,7 +17,7 @@
 
 // clang-format off
 /**
- * The acceptable accelerometer ranges.
+ * The types of power distribution devices.
  */
 HAL_ENUM(HAL_PowerDistributionType) {
   HAL_PowerDistributionType_kAutomatic = 0,
@@ -39,7 +39,7 @@ extern "C" {
  * @param[in] type               the type of module to initialize
  * @param[in] allocationLocation the location where the allocation is occurring
  * @param[out] status            Error status variable. 0 on success.
- * @return the created PowerDistribution
+ * @return the created PowerDistribution handle
  */
 HAL_PowerDistributionHandle HAL_InitializePowerDistribution(
     int32_t moduleNumber, HAL_PowerDistributionType type,
