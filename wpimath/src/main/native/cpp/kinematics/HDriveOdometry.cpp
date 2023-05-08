@@ -10,12 +10,10 @@ using namespace frc;
 
 HDriveOdometry::HDriveOdometry(
     const Rotation2d& gyroAngle, units::meter_t leftDistance,
-    units::meter_t rightDistance, units::meter_t lateralDistance,
-    const Pose2d& initialPose)
+    units::meter_t rightDistance, units::meter_t lateralDistance, const Pose2d& initialPose)
     : m_pose(initialPose),
       m_prevLeftDistance(leftDistance),
-      m_prevRightDistance(rightDistance),
-      m_prevLateralDistance(lateralDistance) {
+      m_prevRightDistance(rightDistance) {
   m_previousAngle = m_pose.Rotation();
   m_gyroOffset = m_pose.Rotation() - gyroAngle;
   wpi::math::MathSharedStore::ReportUsage(
@@ -32,13 +30,13 @@ const Pose2d& HDriveOdometry::Update(const Rotation2d& gyroAngle,
 
   m_prevLeftDistance = leftDistance;
   m_prevRightDistance = rightDistance;
-  m_prevLateralDistance = lateralDistance;
+  m_prevLeftDistance = lateralDistance;
 
-  auto averageDeltaDifferentialDistance = (deltaLeftDistance + deltaRightDistance) / 2.0;
+  auto averageDeltaDistance = (deltaLeftDistance + deltaRightDistance) / 2.0;
   auto angle = gyroAngle + m_gyroOffset;
 
   auto newPose = m_pose.Exp(
-      {averageDeltaDifferentialDistance, deltaLateralDistance, 0_m, (angle - m_previousAngle).Radians()});
+      {averageDeltaDistance, deltaLateralDistance, (angle - m_previousAngle).Radians()});
 
   m_previousAngle = angle;
   m_pose = {newPose.Translation(), angle};
