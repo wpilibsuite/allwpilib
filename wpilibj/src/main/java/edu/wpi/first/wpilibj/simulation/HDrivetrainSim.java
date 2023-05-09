@@ -107,11 +107,11 @@ public class HDrivetrainSim {
    *     system can be created with {@link LinearSystemId#createDrivetrainVelocitySystem(DCMotor,
    *     double, double, double, double, double)} or {@link
    *     LinearSystemId#identifyDrivetrainSystem(double, double, double, double)}.
-   * @param lateralPlant The {@link LinearSystem} representing the lateral movement system
-   *     of the robot. This can be created with {@link 
-   * LinearSystemId#createHDrivetrainLateralVelocitySystem( DCMotor, double, double, double, double, double)}
-   *     or {@link LinearSystemId#identifyHDriveLateralVelocitySystem(
-   *     double, double, double, double)}
+   * @param lateralPlant The {@link LinearSystem} representing the lateral movement system of the
+   *     robot. This can be created with {@link
+   *     LinearSystemId#createHDrivetrainLateralVelocitySystem( DCMotor, double, double, double,
+   *     double, double)} or {@link LinearSystemId#identifyHDriveLateralVelocitySystem( double,
+   *     double, double, double)}
    * @param driveMotor A {@link DCMotor} representing the drivetrain.
    * @param gearing The gearingRatio ratio of the robot, as output over input. This must be the same
    *     ratio as the ratio used to identify or create the drivetrainPlant.

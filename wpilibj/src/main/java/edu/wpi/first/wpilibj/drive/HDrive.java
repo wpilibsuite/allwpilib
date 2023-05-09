@@ -168,7 +168,8 @@ public class HDrive extends RobotDriveBase implements Sendable, AutoCloseable {
    * @param lateralSpeed The robot's speed along the Y axis [-1.0..1.0]. Right is positive
    * @param squareInputs If set, decreases the input sensitivity at low speeds.
    */
-  public void tankDrive(double leftSpeed, double rightSpeed, double lateralSpeed, boolean squareInputs) {
+  public void tankDrive(
+      double leftSpeed, double rightSpeed, double lateralSpeed, boolean squareInputs) {
     if (!m_reported) {
       HAL.report(tResourceType.kResourceType_RobotDrive, tInstances.kRobotDrive2_HDriveTank, 2);
       m_reported = true;
