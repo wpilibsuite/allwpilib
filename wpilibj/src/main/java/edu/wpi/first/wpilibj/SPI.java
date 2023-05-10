@@ -29,9 +29,13 @@ public class SPI implements AutoCloseable {
   }
 
   public enum Mode {
+    /** Clock idle low, data sampled on rising edge. */
     kMode0(SPIJNI.SPI_MODE0),
+    /** Clock idle low, data sampled on falling edge. */
     kMode1(SPIJNI.SPI_MODE1),
+    /** Clock idle high, data sampled on falling edge. */
     kMode2(SPIJNI.SPI_MODE2),
+    /** Clock idle high, data sampled on rising edge. */
     kMode3(SPIJNI.SPI_MODE3);
 
     public final int value;
