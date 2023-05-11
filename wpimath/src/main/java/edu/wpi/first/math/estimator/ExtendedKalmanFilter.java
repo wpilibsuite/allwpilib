@@ -4,7 +4,7 @@
 
 package edu.wpi.first.math.estimator;
 
-import edu.wpi.first.math.Drake;
+import edu.wpi.first.math.DARE;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.Nat;
 import edu.wpi.first.math.Num;
@@ -145,8 +145,7 @@ public class ExtendedKalmanFilter<States extends Num, Inputs extends Num, Output
     final var discR = Discretization.discretizeR(m_contR, dtSeconds);
 
     if (StateSpaceUtil.isDetectable(discA, C) && outputs.getNum() <= states.getNum()) {
-      m_initP =
-          Drake.discreteAlgebraicRiccatiEquation(discA.transpose(), C.transpose(), discQ, discR);
+      m_initP = DARE.dare(discA.transpose(), C.transpose(), discQ, discR);
     } else {
       m_initP = new Matrix<>(states, states);
     }

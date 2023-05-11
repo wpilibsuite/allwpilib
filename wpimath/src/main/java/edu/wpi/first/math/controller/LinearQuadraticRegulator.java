@@ -4,7 +4,7 @@
 
 package edu.wpi.first.math.controller;
 
-import edu.wpi.first.math.Drake;
+import edu.wpi.first.math.DARE;
 import edu.wpi.first.math.MathSharedStore;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.Num;
@@ -111,7 +111,7 @@ public class LinearQuadraticRegulator<States extends Num, Inputs extends Num, Ou
       throw new IllegalArgumentException(msg);
     }
 
-    var S = Drake.discreteAlgebraicRiccatiEquation(discA, discB, Q, R);
+    var S = DARE.dare(discA, discB, Q, R);
 
     // K = (BᵀSB + R)⁻¹BᵀSA
     m_K =
@@ -150,7 +150,7 @@ public class LinearQuadraticRegulator<States extends Num, Inputs extends Num, Ou
     var discA = discABPair.getFirst();
     var discB = discABPair.getSecond();
 
-    var S = Drake.discreteAlgebraicRiccatiEquation(discA, discB, Q, R, N);
+    var S = DARE.dare(discA, discB, Q, R, N);
 
     // K = (BᵀSB + R)⁻¹(BᵀSA + Nᵀ)
     m_K =
