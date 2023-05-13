@@ -48,7 +48,7 @@ class HDrivetrainSim {
       LinearSystem<2, 2, 2> differentialPlant, LinearSystem<1, 1, 1> lateralPlant, 
       units::meter_t trackWidth,
       DCMotor driveMotor, double gearingRatio, units::meter_t wheelRadius,
-      const std::array<double, 7>& measurementStdDevs = {});
+      const std::array<double, 9>& measurementStdDevs = {});
 
   /**
    * Create a SimDrivetrain.
@@ -79,7 +79,7 @@ class HDrivetrainSim {
       units::kilogram_t mass, units::meter_t wheelRadius,
       units::meter_t trackWidth,
       units::meter_t lateralWheelOffsetFromCenterOfGravity,
-      const std::array<double, 7>& measurementStdDevs = {});
+      const std::array<double, 9>& measurementStdDevs = {});
 
   /**
    * Clamp the input vector such that no element exceeds the battery voltage.
@@ -310,6 +310,6 @@ class HDrivetrainSim {
   Vectord<9> m_x;
   Vectord<3> m_u;
   Vectord<9> m_y;
-  std::array<double, 7> m_measurementStdDevs;
+  std::array<double, 9> m_measurementStdDevs;
 };
 }  // namespace frc::sim

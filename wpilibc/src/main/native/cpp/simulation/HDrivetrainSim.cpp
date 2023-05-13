@@ -19,7 +19,7 @@ using namespace frc::sim;
 HDrivetrainSim::HDrivetrainSim(
     LinearSystem<2, 2, 2> differentialPlant, LinearSystem<1, 1, 1> lateralPlant, units::meter_t trackWidth, DCMotor driveMotor,
     double gearRatio, units::meter_t wheelRadius,
-    const std::array<double, 7>& measurementStdDevs)
+    const std::array<double, 9>& measurementStdDevs)
     : m_differentialPlant(std::move(differentialPlant)),
       m_lateralPlant(std::move(lateralPlant)),
       m_rb(trackWidth / 2.0),
@@ -37,7 +37,7 @@ HDrivetrainSim::HDrivetrainSim(
     frc::DCMotor driveMotor, double gearing, units::kilogram_square_meter_t J,
     units::kilogram_t mass, units::meter_t wheelRadius,
     units::meter_t trackWidth, units::meter_t lateralWheelOffsetFromCenterOfGravity,
-    const std::array<double, 7>& measurementStdDevs)
+    const std::array<double, 9>& measurementStdDevs)
     : HDrivetrainSim(
           frc::LinearSystemId::DrivetrainVelocitySystem(
               driveMotor, mass, wheelRadius, trackWidth / 2.0, J, gearing),
@@ -65,7 +65,7 @@ void HDrivetrainSim::SetGearing(double newGearing) {
 
 void HDrivetrainSim::Update(units::second_t dt) {
   m_x = RK4([this](auto& x, auto& u) { return Dynamics(x, u); }, m_x, m_u, dt);
-  m_y = m_x + frc::MakeWhiteNoiseVector<7>(m_measurementStdDevs);
+  m_y = m_x + frc::MakeWhiteNoiseVector<9>(m_measurementStdDevs);
 }
 
 double HDrivetrainSim::GetGearing() const {
@@ -151,26 +151,27 @@ Vectord<9> HDrivetrainSim::Dynamics(const Vectord<9>& x,
   // Because G² can be factored out of A, we can divide by the old ratio
   // squared and multiply by the new ratio squared to get a new drivetrain
   // model.
-  Matrixd<6, 3> B;
-  B.block<3, 3>(0, 0) = m_differentialPlant.B() * m_currentGearing * m_currentGearing /
-                        m_originalGearing / m_originalGearing;
-  B.block<3, 3>(2, 2) = m_lateralPlant.B() * m_currentGearing * m_currentGearing / 
-                        m_originalGearing / m_originalGearing;
+  Matrixd<6, 3, 0 ,6 , 3> B;
+  
+  B.block<2, 2>(0, 0) = m_differentialPlant.B();
+  B.block<1, 1>(2, 0) = m_lateralPlant.B();
 
   // Because G can be factored out of B, we can divide by the old ratio and
   // multiply by the new ratio to get a new drivetrain model.
-  Matrixd<6, 6> A;
-  A.block<2, 2>(0, 0) = m_differentialPlant.A() * m_currentGearing / m_originalGearing;
+  Matrixd<6, 6, 0, 6 ,6> A;
+  A.setIdentity();
+  A.block<2, 2>(0, 0) = m_differentialPlant.A();
 
-  A.block<1, 1>(2, 2) = m_lateralPlant.A() * m_currentGearing / m_originalGearing;;
+  A.block<1, 1>(2, 2) = m_lateralPlant.A();
   A.block<3, 3>(3, 0).setIdentity();
 
   double v = (x(State::kLeftVelocity) + x(State::kRightVelocity)) / 2.0;
 
   Vectord<9> xdot;
-  xdot(0) = v * std::cos(x(State::kHeading)) + (x(State::kLateralVelocity) * std::sin(x(State::kHeading)));
-  xdot(1) = v * std::sin(x(State::kHeading)) + (x(State::kLateralVelocity) * std::cos(x(State::kHeading)));
-  xdot(2) =
+  xdot.setIdentity();
+  xdot(0, 0) = v * std::cos(x(State::kHeading)) + (x(State::kLateralVelocity) * std::sin(x(State::kHeading)));
+  xdot(1, 0) = v * std::sin(x(State::kHeading)) + (x(State::kLateralVelocity) * std::cos(x(State::kHeading)));
+  xdot(2, 0) =
       ((x(State::kRightVelocity) - x(State::kLeftVelocity)) / (2.0 * m_rb))
           .value();
   xdot.block<6, 1>(3, 0) = A * x.block<6, 1>(3, 0) + B * u;
