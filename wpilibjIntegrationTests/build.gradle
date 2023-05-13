@@ -44,7 +44,7 @@ def testOutputFolder = file("${project(':').buildDir}/integrationTestFiles")
 task copyWpilibJIntegrationTestJarToOutput(type: Copy) {
     destinationDir testOutputFolder
     dependsOn shadowJar
-    inputs.file shadowJar.archivePath
+    inputs.file shadowJar.archiveFile
     from(shadowJar) {
         into 'java'
     }
