@@ -28,10 +28,12 @@ class SPI {
  public:
   enum Port { kOnboardCS0 = 0, kOnboardCS1, kOnboardCS2, kOnboardCS3, kMXP };
   enum Mode {
-    kMode0 = HAL_SPI_kMode0,
-    kMode1 = HAL_SPI_kMode1,
-    kMode2 = HAL_SPI_kMode2,
-    kMode3 = HAL_SPI_kMode3
+    kMode0 = HAL_SPI_kMode0, /*!< Clock idle low, data sampled on rising edge */
+    kMode1 =
+        HAL_SPI_kMode1, /*!< Clock idle low, data sampled on falling edge */
+    kMode2 =
+        HAL_SPI_kMode2, /*!< Clock idle high, data sampled on falling edge */
+    kMode3 = HAL_SPI_kMode3 /*!< Clock idle high, data sampled on rising edge */
   };
 
   /**
