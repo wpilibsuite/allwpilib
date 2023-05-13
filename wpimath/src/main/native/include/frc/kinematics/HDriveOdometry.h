@@ -39,7 +39,7 @@ class WPILIB_DLLEXPORT HDriveOdometry {
   explicit HDriveOdometry(const Rotation2d& gyroAngle,
                                      units::meter_t leftDistance,
                                      units::meter_t rightDistance,
-                                     units::meter_t strafeDistance,
+                                     units::meter_t lateralDistance,
                                      const Pose2d& initialPose = Pose2d{});
 
   /**

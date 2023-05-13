@@ -73,6 +73,7 @@ class WPILIB_DLLEXPORT HDriveKinematics {
    *
    * @param leftDistance The distance measured by the left encoder.
    * @param rightDistance The distance measured by the right encoder.
+   * @param lateralDistance The distance measured by the lateral encoder.
    * @return The resulting Twist2d.
    */
   constexpr Twist2d ToTwist2d(const units::meter_t leftDistance,

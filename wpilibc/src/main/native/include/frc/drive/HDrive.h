@@ -104,7 +104,7 @@ class HDrive : public RobotDriveBase,
    * @param leftSpeed The robot left side's speed along the X axis [-1.0..1.0]. Forward is positive.
    * @param rightSpeed The robot right side's speed along the X axis [-1.0..1.0]. Forward is
    *     positive.
-   * @param ySpeed The robot's speed along the Y axis [-1.0..1.0]. right is negative
+   * @param lateralSpeed The robot's speed along the Y axis [-1.0..1.0]. right is negative
    * @param squareInputs If set, decreases the input sensitivity at low speeds.
    * @return Wheel speeds [-1.0..1.0].
    */

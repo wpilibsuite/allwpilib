@@ -245,11 +245,11 @@ class WPILIB_DLLEXPORT LinearSystemId {
    *
    * @param motor                           The motor (or gearbox) driving the
    *                                        drivetrain.
-   * @param massKg                          The mass of the robot in kilograms.
-   * @param rMeters                         The radius of the wheels in meters.
+   * @param mass                            The mass of the robot in kilograms.
+   * @param radius                          The radius of the wheels in meters.
    * @param offsetFromCenterOfGravity       The distance of the lateral movement
    *                                        wheel from the center of gravity.
-   * @param JKgMetersSquared                The moment of inertia of the robot.
+   * @param J                               The moment of inertia of the robot.
    * @param G                               The gearing reduction as output over
    *                                        input.
    * @return A LinearSystem representing a H-drive's lateral plant.
@@ -294,7 +294,7 @@ class WPILIB_DLLEXPORT LinearSystemId {
   static LinearSystem<1, 1, 1> IdentifyHDriveLateralVelocitySystem(
       decltype(1_V / Velocity_t<Distance>(1)) kVLinear,
       decltype(1_V / Acceleration_t<Distance>(1)) kALinear,
-      decltype(1_V / Velocity_t<Distance>(1)) kVAngluar,
+      decltype(1_V / Velocity_t<Distance>(1)) kVAngular,
       decltype(1_V / Acceleration_t<Distance>(1)) kAAngular) {
     if (kVLinear <= decltype(kVLinear){0}) {
       throw std::domain_error("kVLinear, linear must be greater than zero.");
@@ -302,14 +302,14 @@ class WPILIB_DLLEXPORT LinearSystemId {
     if (kALinear <= decltype(kALinear){0}) {
       throw std::domain_error("kALinear, linear must be greater than zero.");
     }
-    if (kVAngluar <= decltype(kVAngluar){0}) {
+    if (kVAngular <= decltype(kVAngular){0}) {
       throw std::domain_error("kVAngluar, angular must be greater than zero.");
     }
     if (kAAngular <= decltype(kAAngular){0}) {
       throw std::domain_error("kAAngular, angular must be greater than zero.");
     }
 
-    double A1 = 0.5 * -(kVLinear / kALinear + kVAngluar / kAAngular);
+    double A1 = 0.5 * -(kVLinear / kALinear + kVAngular / kAAngular);
     double B1 = 0.5 * (1.0 / kALinear + 1.0 / kAAngular);
 
     Matrixd<1, 1> A{A1};
