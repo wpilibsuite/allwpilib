@@ -139,7 +139,7 @@ void HAL_WriteAddressableLEDData(HAL_AddressableLEDHandle handle,
         status,
         fmt::format(
             "Data length must be less than or equal to {}. {} was requested",
-            SimAddressableLEDData[led->index].length, length));
+            SimAddressableLEDData[led->index].length.Get(), length));
     return;
   }
   SimAddressableLEDData[led->index].SetData(data, length);
