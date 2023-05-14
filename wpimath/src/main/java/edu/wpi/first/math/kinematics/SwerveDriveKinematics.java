@@ -10,7 +10,6 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Twist2d;
 import java.util.Arrays;
-import java.util.Collections;
 import org.ejml.simple.SimpleMatrix;
 
 /**
@@ -233,7 +232,10 @@ public class SwerveDriveKinematics {
    */
   public static void desaturateWheelSpeeds(
       SwerveModuleState[] moduleStates, double attainableMaxSpeedMetersPerSecond) {
-    double realMaxSpeed = Collections.max(Arrays.asList(moduleStates)).speedMetersPerSecond;
+    double realMaxSpeed = 0;
+    for (SwerveModuleState moduleState : moduleStates) {
+      realMaxSpeed = Math.max(realMaxSpeed, Math.abs(moduleState.speedMetersPerSecond));
+    }
     if (realMaxSpeed > attainableMaxSpeedMetersPerSecond) {
       for (SwerveModuleState moduleState : moduleStates) {
         moduleState.speedMetersPerSecond =
@@ -266,7 +268,10 @@ public class SwerveDriveKinematics {
       double attainableMaxModuleSpeedMetersPerSecond,
       double attainableMaxTranslationalSpeedMetersPerSecond,
       double attainableMaxRotationalVelocityRadiansPerSecond) {
-    double realMaxSpeed = Collections.max(Arrays.asList(moduleStates)).speedMetersPerSecond;
+    double realMaxSpeed = 0;
+    for (SwerveModuleState moduleState : moduleStates) {
+      realMaxSpeed = Math.max(realMaxSpeed, Math.abs(moduleState.speedMetersPerSecond));
+    }
 
     if (attainableMaxTranslationalSpeedMetersPerSecond == 0
         || attainableMaxRotationalVelocityRadiansPerSecond == 0

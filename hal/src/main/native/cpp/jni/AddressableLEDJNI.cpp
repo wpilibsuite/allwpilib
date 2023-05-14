@@ -85,12 +85,12 @@ Java_edu_wpi_first_hal_AddressableLEDJNI_setData
  */
 JNIEXPORT void JNICALL
 Java_edu_wpi_first_hal_AddressableLEDJNI_setBitTiming
-  (JNIEnv* env, jclass, jint handle, jint lowTime0, jint highTime0,
-   jint lowTime1, jint highTime1)
+  (JNIEnv* env, jclass, jint handle, jint highTime0, jint lowTime0,
+   jint highTime1, jint lowTime1)
 {
   int32_t status = 0;
   HAL_SetAddressableLEDBitTiming(static_cast<HAL_AddressableLEDHandle>(handle),
-                                 lowTime0, highTime0, lowTime1, highTime1,
+                                 highTime0, lowTime0, highTime1, lowTime1,
                                  &status);
   CheckStatus(env, status);
 }

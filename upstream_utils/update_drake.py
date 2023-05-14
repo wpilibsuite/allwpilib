@@ -13,7 +13,7 @@ from upstream_utils import (
 
 
 def main():
-    upstream_root = clone_repo("https://github.com/RobotLocomotion/drake", "v1.6.0")
+    upstream_root = clone_repo("https://github.com/RobotLocomotion/drake", "v1.15.0")
     wpilib_root = get_repo_root()
     wpimath = os.path.join(wpilib_root, "wpimath")
 
@@ -63,10 +63,14 @@ def main():
         os.path.join(wpimath, "src/test/native/cpp/drake"),
     )
     os.chdir(upstream_root)
+    test_src_files += walk_cwd_and_copy_if(
+        lambda dp, f: f == "fmt_eigen.cc",
+        os.path.join(wpimath, "src/test/native/cpp/drake"),
+    )
 
     # Copy drake test header files into allwpilib
     test_include_files = walk_cwd_and_copy_if(
-        lambda dp, f: f == "eigen_matrix_compare.h",
+        lambda dp, f: f in ["eigen_matrix_compare.h", "fmt.h", "fmt_eigen.h"],
         os.path.join(wpimath, "src/test/native/include/drake"),
     )
 

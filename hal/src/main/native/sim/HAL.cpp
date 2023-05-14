@@ -328,6 +328,10 @@ HAL_Bool HAL_GetBrownedOut(int32_t* status) {
   return false;  // Figure out if we need to detect a brownout condition
 }
 
+HAL_Bool HAL_GetRSLState(int32_t* status) {
+  return false;
+}
+
 HAL_Bool HAL_Initialize(int32_t timeout, int32_t mode) {
   static std::atomic_bool initialized{false};
   static wpi::mutex initializeMutex;
