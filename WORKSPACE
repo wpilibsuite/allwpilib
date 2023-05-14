@@ -26,29 +26,29 @@ rules_jvm_external_deps()
 
 # local_repository(
 #     name = "bzlmodRio",
-#     path = "../bzlmodRio/bzlmodRio",
+#     path = "../bzlmodRio/monorepo/bzlmodRio",
 # )
 http_archive(
     name = "bzlmodRio",
-    sha256 = "4d2fab5423f47df9bb7f2b697104f1cf1794823de9b8501e50aa14d4338bd3a4",
-    strip_prefix = "bzlmodRio-6145f3f8e26590740cce628aba10348c1f64c3bd",
-    url = "https://github.com/bzlmodRio/bzlmodRio/archive/6145f3f8e26590740cce628aba10348c1f64c3bd.tar.gz",
+    sha256 = "0a7f80a644bf7cced089c7e537e1480060e461638279541f235268ec47fe59ae",
+    strip_prefix = "bzlmodRio-413eb5f372d929dc4066f52d4a5f35acc76a86ea",
+    url = "https://github.com/bzlmodRio/bzlmodRio/archive/413eb5f372d929dc4066f52d4a5f35acc76a86ea.tar.gz",
 )
 
 load("@bzlmodRio//private/non_bzlmod:download_dependencies.bzl", "download_dependencies")
 
 download_dependencies(
-    # allwpilib_version = "local",
+    allwpilib_version = None,
     apriltaglib_version = "3.2.0-3",
     imgui_version = "1.89.1-1",
     libssh_version = "0.95-6",
-    # navx_version = "local",
+    navx_version = None,
     ni_version = "2023.3.0",
     opencv_version = "4.6.0-4",  # TODO different than wpilib
-    # phoenix_version = "local",
-    # revlib_version = "local",
-    rules_bazelrio_version = "0.0.9",
-    rules_roborio_toolchain_version = "2023-7",
+    phoenix_version = None,
+    revlib_version = None,
+    rules_bazelrio_version = "0.0.10",
+    rules_toolchains_version = "2023-7",
 )
 
 load("@bzlmodRio//private/non_bzlmod:setup_dependencies.bzl", "setup_dependencies")

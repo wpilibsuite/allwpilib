@@ -13,6 +13,7 @@ wpilib_cc_library(
     ],
     visibility = ["//visibility:public"],
     deps = [
+        "//fieldImages/src/main/native:fieldImages-cpp",
         "//wpigui/src/main/native:wpigui",
         "//wpimath/src/main/native:wpimath.shared",
         "//wpiutil/src/main/native:wpiutil.shared",
