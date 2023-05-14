@@ -11,8 +11,6 @@ wpilib_cc_shared_library(
     srcs = glob(["cpp/**"]),
     features = ["windows_export_all_symbols"],
     tags = [
-        "no-bionic",
-        "no-raspbian",
         "no-roborio",
     ],
     visibility = ["//visibility:public"],

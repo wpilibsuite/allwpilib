@@ -4,8 +4,6 @@ wpilib_cc_binary(
     name = "DevMain",
     srcs = ["main.cpp"],
     tags = [
-        "no-bionic",
-        "no-raspbian",
         "no-roborio",
         "wpi-cpp-gui",
     ],

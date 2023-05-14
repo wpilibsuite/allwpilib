@@ -11,7 +11,10 @@ wpilib_cc_test(
     name = "halsim_ws_server-test",
     size = "small",
     srcs = glob(["**/*.cpp"]),
-    tags = ["no-asan"],
+    tags = [
+        "no-asan",
+        "no-roborio",
+    ],
     deps = [
         ":test_headers",
         "//simulation/halsim_ws_server/src/main/native:halsim_ws_server.shared",

@@ -1,0 +1,12 @@
+
+build:bullseye32 --copt=-std=c++20
+build:bullseye32 --platforms=@rules_bzlmodrio_toolchains//platforms/bullseye32
+build:bullseye32 --build_tag_filters=-no-bullseye
+build:bullseye32 --features=compiler_param_file
+build:bullseye32 --platform_suffix=bullseye32
+
+build:bullseye64 --copt=-std=c++20
+build:bullseye64 --platforms=@rules_bzlmodrio_toolchains//platforms/bullseye64
+build:bullseye64 --build_tag_filters=-no-bullseye
+build:bullseye64 --features=compiler_param_file
+build:bullseye64 --platform_suffix=bullseye64

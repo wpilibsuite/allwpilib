@@ -60,12 +60,13 @@ wpilib_cc_library(
 filegroup(
     name = "libuv-srcs",
     srcs = select({
-        "@bazel_tools//src/conditions:darwin": UNIX_UV_SRCS + MAC_UV_SRCS,
-        "@bazel_tools//src/conditions:linux_x86_64": UNIX_UV_SRCS + LINUX_UV_SRCS,
-        "@bazel_tools//src/conditions:windows": WIN_UV_SRCS,
-        # "//shared/bazel/toolchains/conditions:raspbian": UNIX_UV_SRCS + LINUX_UV_SRCS,
-        # "//shared/bazel/toolchains/conditions:bionic": UNIX_UV_SRCS + LINUX_UV_SRCS,
-        "@rules_bzlmodrio_toolchains//constraints/is_roborio:roborio": UNIX_UV_SRCS + LINUX_UV_SRCS,
-    }) + glob(["src/*"]),
+               "@rules_bzlmodrio_toolchains//constraints/combined:is_unix": UNIX_UV_SRCS,
+               "//conditions:default": [],
+           }) +
+           select({
+               "@bazel_tools//src/conditions:darwin": MAC_UV_SRCS,
+               "@bazel_tools//src/conditions:windows": WIN_UV_SRCS,
+               "@rules_bzlmodrio_toolchains//constraints/combined:is_linux": LINUX_UV_SRCS,
+           }) + glob(["src/*"]),
     visibility = ["//wpinet:__subpackages__"],
 )

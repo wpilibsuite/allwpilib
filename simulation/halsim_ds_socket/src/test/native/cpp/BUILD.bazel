@@ -7,6 +7,7 @@ wpilib_cc_test(
         "**/*.cpp",
         "**/*.h",
     ]),
+    tags = ["no-roborio"],
     deps = [
         "//simulation/halsim_ds_socket/src/main/native:halsim_ds_socket.shared",
         "@gtest",

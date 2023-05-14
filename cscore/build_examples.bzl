@@ -19,8 +19,5 @@ def build_cpp_examples():
             deps = ["//wpigui/src/main/native:wpigui", "//cscore/src/main/native:cscore.static"],
             tags = [
                 "wpi-example",
-                "no-bionic",
-                "no-raspbian",
-                "no-roborio",
             ],
         )

@@ -3,21 +3,17 @@ load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 # Rules Python
 http_archive(
     name = "rules_python",
-    sha256 = "48a838a6e1983e4884b26812b2c748a35ad284fd339eb8e2a6f3adf95307fbcd",
-    strip_prefix = "rules_python-0.16.2",
-    url = "https://github.com/bazelbuild/rules_python/archive/refs/tags/0.16.2.tar.gz",
+    sha256 = "94750828b18044533e98a129003b6a68001204038dc4749f40b195b24c38f49f",
+    strip_prefix = "rules_python-0.21.0",
+    url = "https://github.com/bazelbuild/rules_python/releases/download/0.21.0/rules_python-0.21.0.tar.gz",
 )
 
 # Download Extra java rules
-RULES_JVM_EXTERNAL_TAG = "4.5"
-
-RULES_JVM_EXTERNAL_SHA = "b17d7388feb9bfa7f2fa09031b32707df529f26c91ab9e5d909eb1676badd9a6"
-
 http_archive(
     name = "rules_jvm_external",
-    sha256 = RULES_JVM_EXTERNAL_SHA,
-    strip_prefix = "rules_jvm_external-%s" % RULES_JVM_EXTERNAL_TAG,
-    url = "https://github.com/bazelbuild/rules_jvm_external/archive/refs/tags/%s.zip" % RULES_JVM_EXTERNAL_TAG,
+    sha256 = "f86fd42a809e1871ca0aabe89db0d440451219c3ce46c58da240c7dcdc00125f",
+    strip_prefix = "rules_jvm_external-5.2",
+    url = "https://github.com/bazelbuild/rules_jvm_external/releases/download/5.2/rules_jvm_external-5.2.tar.gz",
 )
 
 load("@rules_jvm_external//:repositories.bzl", "rules_jvm_external_deps")
@@ -42,13 +38,19 @@ download_dependencies(
     apriltaglib_version = "3.2.0-3",
     imgui_version = "1.89.1-1",
     libssh_version = "0.95-6",
+    local_monorepo_base = "../bzlmodRio/monorepo",
     navx_version = None,
     ni_version = "2023.3.0",
-    opencv_version = "4.6.0-4",  # TODO different than wpilib
+    opencv_version = "4.6.0-4",
     phoenix_version = None,
     revlib_version = None,
     rules_bazelrio_version = "0.0.10",
+    rules_checkstyle_version = None,
+    rules_pmd_version = None,
+    rules_spotless_version = None,
     rules_toolchains_version = "2023-7",
+    rules_wpi_styleguide_version = None,
+    rules_wpiformat_version = None,
 )
 
 load("@bzlmodRio//private/non_bzlmod:setup_dependencies.bzl", "setup_dependencies")

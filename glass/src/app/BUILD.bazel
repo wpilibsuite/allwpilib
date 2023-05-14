@@ -24,8 +24,6 @@ wpilib_cc_binary(
     ] + glob(["native/cpp/**"]),
     linkopts = get_wpigui_linker_flags(console = False),
     tags = [
-        "no-bionic",
-        "no-raspbian",
         "no-roborio",
         "wpi-cpp-gui",
     ],

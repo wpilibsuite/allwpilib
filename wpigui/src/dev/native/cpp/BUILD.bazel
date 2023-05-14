@@ -6,8 +6,6 @@ wpilib_cc_binary(
     srcs = ["main.cpp"],
     linkopts = get_wpigui_linker_flags(console = True),
     tags = [
-        "no-bionic",
-        "no-raspbian",
         "no-roborio",
         "wpi-cpp-gui",
     ],

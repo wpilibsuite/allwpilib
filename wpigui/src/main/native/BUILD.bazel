@@ -27,13 +27,11 @@ wpilib_cc_library(
     srcs = glob(["cpp/**/*.cpp"]) +
            select({
                "@bazel_tools//src/conditions:darwin": [],
-               "@bazel_tools//src/conditions:linux_x86_64": LINUX_SRCS,
                "@bazel_tools//src/conditions:windows": WIN_SRCS,
+               "@rules_bzlmodrio_toolchains//constraints/combined:is_linux": LINUX_SRCS,
            }),
     strip_include_prefix = "include",
     tags = [
-        "no-bionic",
-        "no-raspbian",
         "no-roborio",
         "wpi-cpp-gui",
     ],

@@ -12,12 +12,11 @@ generate_resources(
 filegroup(
     name = "native-srcs",
     srcs = select({
-        "@bazel_tools//src/conditions:darwin": glob(["unix/*.cpp"]),
-        "@bazel_tools//src/conditions:linux_x86_64": glob(["unix/*.cpp"]),
         "@bazel_tools//src/conditions:windows": glob([
             "windows/*.cpp",
             "windows/*.h",
         ]),
+        "@rules_bzlmodrio_toolchains//constraints/combined:is_unix": glob(["unix/*.cpp"]),
     }),
 )
 

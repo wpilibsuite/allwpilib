@@ -12,21 +12,40 @@ jobs:
       fail-fast: false
       matrix:
         include:
+          # Windows
           - { os: windows-2022, action: "test", config: "--config=windows", wpimath_config: "--local_cpu_resources=1" }
-          # - { os: windows-2022, action: "test", config: "--config=windows --enable_bzlmod", wpimath_config: "--local_cpu_resources=1" }
-#          - { os: windows-2022, config: "--config=roborio" }
-#          - { os: windows-2022, config: "--config=bionic" }
-#          - { os: windows-2022, config: "--config=raspbian" }
+          - { os: windows-2022, action: "test", config: "--config=windows --enable_bzlmod", wpimath_config: "--local_cpu_resources=1" }
+          # - { name: "Windows (bzlmod)",             os: windows-latest, action: "test", config: "--config=windows --enable_bzlmod",     wpimath_config: "--local_cpu_resources=1" }
 
+          # - {  name: "Windows (roborio)",           os: windows-latest, action: "build", config: "--config=roborio",                    wpimath_config: "" }
+          # - {  name: "Windows (roborio bzlmod)",    os: windows-latest, action: "build", config: "--config=roborio --enable_bzlmod",    wpimath_config: "" }
+
+          # - {  name: "Windows (bullseye32)",        os: windows-latest, action: "build", config: "--config=bullseye32",                 wpimath_config: "" }
+          # - {  name: "Windows (bullseye32 bzlmod)", os: windows-latest, action: "build", config: "--config=bullseye32 --enable_bzlmod", wpimath_config: "" }
+
+          # - {  name: "Windows (bullseye64)",        os: windows-latest, action: "build", config: "--config=bullseye64",                 wpimath_config: "" }
+          # - {  name: "Windows (bullseye64 bzlmod)", os: windows-latest, action: "build", config: "--config=bullseye64 --enable_bzlmod", wpimath_config: "" }
+
+          # - {  name: "Windows (raspi32)",           os: windows-latest, action: "build", config: "--config=raspi32",                    wpimath_config: "" }
+          # - {  name: "Windows (raspi32 bzlmod)",    os: windows-latest, action: "build", config: "--config=raspi32 --enable_bzlmod",    wpimath_config: "" }
+
+          # Mac
           - { os: macos-latest,   action: "test", config: "--config=osx -c opt --config=no_example", wpimath_config: "" }
-          # - { os: macos-latest,   action: "test", config: "--config=osx -c opt --config=no_example --enable_bzlmod", wpimath_config: "" }
-#          - { os: macos-latest, config: "--config=roborio" }
-#          - { os: macos-latest, config: "--config=bionic" }
-#          - { os: macos-latest, config: "--config=raspbian" }
-#
-#          - { os: ubuntu-latest, config: "--config=roborio" }
-#          - { os: ubuntu-latest, config: "--config=bionic" }
-#          - { os: ubuntu-latest, config: "--config=raspbian" }
+          - { os: macos-latest,   action: "test", config: "--config=osx -c opt --config=no_example --enable_bzlmod", wpimath_config: "" }
+          # - { name: "Mac (bzlmod)",                 os: macos-latest,   action: "test", config: "--config=osx -c opt --config=no_example --enable_bzlmod",        wpimath_config: "" }
+
+          # - { name: "Mac (roborio)",                os: macos-latest,   action: "build", config: "--config=roborio -c opt --config=no_example",                    wpimath_config: "" }
+          # - { name: "Mac (roborio bzlmod)",         os: macos-latest,   action: "build", config: "--config=roborio -c opt --config=no_example --enable_bzlmod",    wpimath_config: "" }
+
+          # - { name: "Mac (bullseye32)",             os: macos-latest,   action: "build", config: "--config=bullseye32 -c opt --config=no_example",                 wpimath_config: "" }
+          # - { name: "Mac (bullseye32 bzlmod)",      os: macos-latest,   action: "build", config: "--config=bullseye32 -c opt --config=no_example --enable_bzlmod", wpimath_config: "" }
+
+          # - { name: "Mac (bullseye64)",             os: macos-latest,   action: "build", config: "--config=bullseye64 -c opt --config=no_example",                 wpimath_config: "" }
+          # - { name: "Mac (bullseye64 bzlmod)",      os: macos-latest,   action: "build", config: "--config=bullseye64 -c opt --config=no_example --enable_bzlmod", wpimath_config: "" }
+
+          # - { name: "Mac (raspi32)",                os: macos-latest,   action: "build", config: "--config=raspi32 -c opt --config=no_example",                    wpimath_config: "" }
+          # - { name: "Mac (raspi32 bzlmod)",         os: macos-latest,   action: "build", config: "--config=raspi32 -c opt --config=no_example --enable_bzlmod",    wpimath_config: "" }
+
     name: "Build - ${{ matrix.os }} ${{ matrix.config }}"
     runs-on: ${{ matrix.os }}
     steps:
@@ -39,15 +58,19 @@ jobs:
       - uses: bazelbuild/setup-bazelisk@v1
 
       - name: Build wpimath dependencies
-        run: bazel ${{ matrix.action }} -k wpiutil/... --config=remote ${{ matrix.config }} --nojava_header_compilation --verbose_failures --test_verbose_timeout_warnings
+        run: bazel ${{ matrix.action }} -k wpiutil/... --config=remote ${{ matrix.config }} --nojava_header_compilation --verbose_failures
         shell: bash
 
       - name: Build wpimath
         run: bazel build -k wpimath/... --config=remote ${{ matrix.config }} ${{ matrix.wpimath_config }} --nojava_header_compilation --verbose_failures
         shell: bash
 
+      - name: Build allowing failures
+        run: bazel build -k ...   --config=remote ${{ matrix.config }} --nojava_header_compilation --verbose_failures || true
+        shell: bash
+
       - name: Build
-        run: bazel ${{ matrix.action }} -k ...   --config=remote ${{ matrix.config }} --nojava_header_compilation --verbose_failures --test_verbose_timeout_warnings
+        run: bazel ${{ matrix.action }} -k ...   --config=remote ${{ matrix.config }} --nojava_header_compilation --verbose_failures
         shell: bash
 
   build-linux:
@@ -55,17 +78,33 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - { container: "wpilib/ubuntu-base:22.04", artifact-name: "Linux Release", config: "" }
+          - { container: "wpilib/ubuntu-base:22.04", action: "test", artifact-name: "Linux (native)",         config: "--config=linux " }
+          - { container: "wpilib/ubuntu-base:22.04", action: "test", artifact-name: "Linux (bzlmod)",         config: "--config=linux  --enable_bzlmod" }
+
+          # - { container: "wpilib/ubuntu-base:22.04", action: "build", artifact-name: "Linux (roborio)",        config: "--config=roborio " }
+          # - { container: "wpilib/ubuntu-base:22.04", action: "build", artifact-name: "Linux (roborio bzlmod)", config: "--config=roborio --enable_bzlmod" }
+
+          # - { container: "wpilib/ubuntu-base:22.04", action: "build", artifact-name: "Linux (bullseye32)",        config: "--config=bullseye32" }
+          # - { container: "wpilib/ubuntu-base:22.04", action: "build", artifact-name: "Linux (bullseye32 bzlmod)", config: "--config=bullseye32 --enable_bzlmod" }
+
+          # - { container: "wpilib/ubuntu-base:22.04", action: "build", artifact-name: "Linux (bullseye64)",        config: "--config=bullseye64" }
+          # - { container: "wpilib/ubuntu-base:22.04", action: "build", artifact-name: "Linux (bullseye64 bzlmod)", config: "--config=bullseye64 --enable_bzlmod" }
+
+          # - { container: "wpilib/ubuntu-base:22.04", action: "build", artifact-name: "Linux (raspi32)",           config: "--config=raspi32" }
+          # - { container: "wpilib/ubuntu-base:22.04", action: "build", artifact-name: "Linux (raspi32 bzlmod)",    config: "--config=raspi32 --enable_bzlmod" }
     runs-on: ubuntu-latest
-    name: "Build - ${{ matrix.artifact-name }}${{ matrix.architecture }} ${{ matrix.config }}"
+    name: "Build - ${{ matrix.artifact-name }}"
     container: ${{ matrix.container }}
     steps:
       - uses: actions/checkout@v3
         with: { fetch-depth: 0 }
       - uses: bazelbuild/setup-bazelisk@v1
 
+      - name: Build and allow failures
+        run: bazel build ... --config=remote ${{ matrix.config }} -k --verbose_failures || true
+
       - name: Build and Test
-        run: bazel test ... --config=remote --config=linux ${{ matrix.config }} -k --verbose_failures --test_verbose_timeout_warnings
+        run: bazel ${{ matrix.action }} ... --config=remote ${{ matrix.config }} -k --verbose_failures
 
 
   repin-maven:
@@ -98,7 +137,7 @@ jobs:
         with: { fetch-depth: 0 }
       - uses: bazelbuild/setup-bazelisk@v1
       - name: Build and Test
-        run: bazel test  -k --config=remote --config=linux --config=${{ matrix.config }} --test_verbose_timeout_warnings //...
+        run: bazel test  -k --config=remote --config=linux --config=${{ matrix.config }} //...
 
   build-coverage:
     runs-on: ubuntu-22.04

@@ -13,11 +13,8 @@ filegroup(
     name = "native-srcs",
     srcs = ["generate-resources"] + select({
         "@bazel_tools//src/conditions:darwin": glob(["macOS/*"]),
-        "@bazel_tools//src/conditions:linux_x86_64": glob(["linux/*"]),
         "@bazel_tools//src/conditions:windows": glob(["windows/*"]),
-        # "//shared/bazel/toolchains/conditions:raspbian": glob(["linux/*"]),
-        # "//shared/bazel/toolchains/conditions:bionic": glob(["linux/*"]),
-        "@rules_bzlmodrio_toolchains//constraints/is_roborio:roborio": glob(["linux/*"]),
+        "@rules_bzlmodrio_toolchains//constraints/combined:is_linux": glob(["linux/*"]),
     }),
 )
 

@@ -1,6 +1,6 @@
 
-build:raspbian --crosstool_top=@local_raspbian//:compiler
-build:raspbian --cpu=raspbian
-build:raspbian --host_crosstool_top=@bazel_tools//tools/cpp:toolchain
-build:raspbian --build_tag_filters=-no-raspbian
-build:raspbian --test_tag_filters=-no-raspbian
+build:raspi32 --copt=-std=c++20
+build:raspi32 --platforms=@rules_bzlmodrio_toolchains//platforms/raspi32
+build:raspi32 --build_tag_filters=-no-raspi
+build:raspi32 --features=compiler_param_file
+build:raspi32 --platform_suffix=raspi32

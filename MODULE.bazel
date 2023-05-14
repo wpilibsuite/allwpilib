@@ -4,17 +4,17 @@ module(
     compatibility_level = 2023,
 )
 
-bazel_dep(name = "rules_cc", version = "0.0.4")
-bazel_dep(name = "rules_java", version = "5.3.5")
-bazel_dep(name = "rules_python", version = "0.16.2")
+bazel_dep(name = "rules_cc", version = "0.0.6")
+bazel_dep(name = "rules_java", version = "5.5.0")
+bazel_dep(name = "rules_python", version = "0.21.0")
 bazel_dep(name = "googletest", version = "1.12.1", repo_name = "gtest")
-bazel_dep(name = "rules_jvm_external", version = "4.5")
+bazel_dep(name = "rules_jvm_external", version = "5.2")
 bazel_dep(name = "bzlmodrio-apriltaglib", version = "3.2.0-3")
 bazel_dep(name = "bzlmodrio-imgui", version = "1.89.1-1")
 bazel_dep(name = "bzlmodrio-libssh", version = "0.95-6")
 bazel_dep(name = "bzlmodrio-ni", version = "2023.3.0")
 bazel_dep(name = "bzlmodrio-opencv", version = "4.6.0-4")
-bazel_dep(name = "rules_roborio_toolchain", version = "2023-7")
+bazel_dep(name = "rules_bzlmodrio_toolchains", version = "2023-7")
 
 maven = use_extension("@rules_jvm_external//:extensions.bzl", "maven")
 maven.install(
@@ -57,6 +57,7 @@ use_repo(pip, "allwpilib_pip_deps")
 python = use_extension("@rules_python//python:extensions.bzl", "python")
 python.toolchain(
     name = "python3_10",
+    ignore_root_user_error = True,
     python_version = "3.10",
 )
 use_repo(python, "python3_10_toolchains")

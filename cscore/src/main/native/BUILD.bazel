@@ -18,8 +18,8 @@ filegroup(
     name = "native-srcs",
     srcs = select({
         "@bazel_tools//src/conditions:darwin": MAC_SRCS,
-        "@bazel_tools//src/conditions:linux_x86_64": LINUX_SRCS,
         "@bazel_tools//src/conditions:windows": WIN_SRCS,
+        "@rules_bzlmodrio_toolchains//constraints/combined:is_linux": LINUX_SRCS,
     }),
 )
 

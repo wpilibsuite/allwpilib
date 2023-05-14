@@ -11,8 +11,6 @@ wpilib_cc_shared_library(
     includes = ["include"],
     linkopts = get_wpigui_linker_flags(console = True),
     tags = [
-        "no-bionic",
-        "no-raspbian",
         "no-roborio",
         "wpi-cpp-gui",
     ],

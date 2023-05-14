@@ -30,6 +30,7 @@ def get_wpigui_linker_flags(console):
         "@bazel_tools//src/conditions:darwin": DARWIN_FLAGS,
         "@bazel_tools//src/conditions:linux_x86_64": ["-lX11"],
         "@bazel_tools//src/conditions:windows": WINDOWS_FLAGS,
+        "@rules_bzlmodrio_toolchains//constraints/combined:is_cross_compiler": [],
     })
 
 def get_libssh_linker_flags():
@@ -44,4 +45,5 @@ def get_libssh_linker_flags():
         "@bazel_tools//src/conditions:darwin": ["-framework", "Kerberos"],
         "@bazel_tools//src/conditions:linux_x86_64": [],
         "@bazel_tools//src/conditions:windows": WINDOWS_FLAGS,
+        "@rules_bzlmodrio_toolchains//constraints/combined:is_cross_compiler": [],
     })

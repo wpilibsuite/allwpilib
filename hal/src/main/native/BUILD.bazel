@@ -13,7 +13,7 @@ ATHENA_SRCS = glob([
     "athena/mockdata/*.cpp",
 ])
 
-ATHENA_DEPS = []
+ATHENA_DEPS = ["@bzlmodrio-ni//libraries/cpp/ni:shared"]
 
 SIM_SRCS = glob([
     "sim/*.cpp",
@@ -45,7 +45,7 @@ wpilib_cc_static_and_shared_library(
     ),
     hdrs = glob(["include/**/*"]),
     includes = ["include"],
-    standard_deps = ["//hal/src/generate:gen-cpp"],
+    standard_deps = ["//hal/src/generate:gen-cpp"] + HAL_DEPS,
     strip_include_prefix = "include",
     visibility = ["//visibility:public"],
     wpi_maybe_shared_deps = [

@@ -4,7 +4,7 @@ wpilib_cc_binary(
     name = "netconsoleServer",
     srcs = ["main.cpp"],
     linkopts = select({
-        "@bazel_tools//src/conditions:linux_x86_64": ["-lutil"],
+        "@rules_bzlmodrio_toolchains//constraints/combined:is_linux": ["-lutil"],
         "//conditions:default": [],
     }),
     deps = [

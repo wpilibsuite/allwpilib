@@ -26,7 +26,7 @@ def wpilib_cc_test(
         **kwargs):
     cc_test(
         name = name,
-        tags = tags + ["allwpilib-build-cpp", "no-roborio", "no-bionic", "no-raspbian"],
+        tags = tags + ["allwpilib-build-cpp"],
         **kwargs
     )
 
