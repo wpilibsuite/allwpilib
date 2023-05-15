@@ -15,7 +15,9 @@ import edu.wpi.first.math.geometry.Twist2d;
 public class HDriveKinematics {
   public final double trackWidthMeters;
 
-  /** Constructor for the kinematics of an HDrive. */
+  /** Constructor for the kinematics of an HDrive. 
+   * @param trackWidthMeters The width of the wheel base in meters for the differential drive/
+  */
   public HDriveKinematics(double trackWidthMeters) {
     this.trackWidthMeters = trackWidthMeters;
     MathSharedStore.reportUsage(MathUsageId.kKinematics_HDrive, 1);
@@ -57,6 +59,7 @@ public class HDriveKinematics {
    * @param leftDistanceMeters The distance measured by the left side encoder.
    * @param rightDistanceMeters The distance measured by the right side encoder.
    * @param lateralDistanceMeters The distance measured by the lateral wheels encoder.
+   * @param trackWidthMeters The width of the wheel base in meters for the differential drive.
    * @return The resulting Twist2d.
    */
   public Twist2d toTwist2d(

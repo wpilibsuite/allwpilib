@@ -53,6 +53,7 @@ public class HDrivePoseEstimator {
    * 0.1 meters for x, 0.1 meters for y, and 0.1 radians for heading.
    *
    * @param kinematics A correctly-configured kinematics object for your drivetrain.
+   * @param trackWidthMeters The width of the wheel base in meters for the differential drive.
    * @param gyroAngle The current gyro angle.
    * @param leftDistanceMeters The distance traveled by the left encoder.
    * @param rightDistanceMeters The distance traveled by the right encoder.

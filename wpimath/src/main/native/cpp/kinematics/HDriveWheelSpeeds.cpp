@@ -16,6 +16,5 @@ void HDriveWheelSpeeds::Desaturate(
   if (realMaxSpeed > attainableMaxSpeed) {
     left = left / realMaxSpeed * attainableMaxSpeed;
     right = right / realMaxSpeed * attainableMaxSpeed;
-    lateral = lateral;
   }
 }
