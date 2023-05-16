@@ -302,7 +302,7 @@ public class ExtendedKalmanFilter<States extends Num, Inputs extends Num, Output
       Matrix<Rows, N1> y,
       BiFunction<Matrix<States, N1>, Matrix<Inputs, N1>, Matrix<Rows, N1>> h,
       Matrix<Rows, Rows> contR) {
-    correct(rows, u, y, h, contR, Matrix::minus, Matrix::plus);
+    correct(rows, u, y, h, contR, m_residualFuncY, m_addFuncX);
   }
 
   /**
