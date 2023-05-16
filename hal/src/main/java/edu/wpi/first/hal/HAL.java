@@ -117,6 +117,8 @@ public final class HAL extends JNIWrapper {
 
   public static native boolean getSystemActive();
 
+  public static native boolean getRSLState();
+
   public static native int getPortWithModule(byte module, byte channel);
 
   public static native int getPort(byte channel);

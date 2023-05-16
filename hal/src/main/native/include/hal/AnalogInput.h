@@ -162,9 +162,9 @@ int32_t HAL_GetAnalogValue(HAL_AnalogInputHandle analogPortHandle,
  * The sample is 12-bit + the value configured in SetOversampleBits().
  * The value configured in SetAverageBits() will cause this value to be averaged
  * 2**bits number of samples. This is not a sliding window.  The sample will not
- * change until 2**(OversamplBits + AverageBits) samples have been acquired from
- * the module on this channel. Use GetAverageVoltage() to get the analog value
- * in calibrated units.
+ * change until 2**(OversampleBits + AverageBits) samples have been acquired
+ * from the module on this channel. Use GetAverageVoltage() to get the analog
+ * value in calibrated units.
  *
  * @param[in] analogPortHandle Handle to the analog port to use.
  * @param[out] status the error code, or 0 for success
