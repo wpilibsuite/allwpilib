@@ -1,4 +1,4 @@
-From e685209746aabbbed0a9db54694b8ea1ca504163 Mon Sep 17 00:00:00 2001
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Tyler Veness <calcmogul@gmail.com>
 Date: Wed, 18 May 2022 10:21:49 -0700
 Subject: [PATCH 1/2] Don't throw on write failure
@@ -10,7 +10,7 @@ Subject: [PATCH 1/2] Don't throw on write failure
  3 files changed, 3 insertions(+), 7 deletions(-)
 
 diff --git a/include/fmt/format-inl.h b/include/fmt/format-inl.h
-index 22b1ec8..abe4ff1 100644
+index 22b1ec8df0eb14b3f7f21797a19586b50b8423fd..abe4ff13db6287f9c5229df6c4b46beeed020bce 100644
 --- a/include/fmt/format-inl.h
 +++ b/include/fmt/format-inl.h
 @@ -79,9 +79,7 @@ FMT_FUNC void report_error(format_func func, int error_code,
@@ -25,7 +25,7 @@ index 22b1ec8..abe4ff1 100644
  
  #ifndef FMT_STATIC_THOUSANDS_SEPARATOR
 diff --git a/include/fmt/xchar.h b/include/fmt/xchar.h
-index 3b5bc15..fc3c67f 100644
+index 3b5bc15ca0a1d92d721611ddc70e80f098fb79ae..fc3c67f21c2294b8e73d6ea53f25c877f733082c 100644
 --- a/include/fmt/xchar.h
 +++ b/include/fmt/xchar.h
 @@ -200,8 +200,7 @@ inline void vprint(std::FILE* f, wstring_view fmt, wformat_args args) {
@@ -39,7 +39,7 @@ index 3b5bc15..fc3c67f 100644
  
  inline void vprint(wstring_view fmt, wformat_args args) {
 diff --git a/src/os.cc b/src/os.cc
-index f388ead..2c49951 100644
+index f388ead0191b61ae0e5c24692c1f523aae3c9fbb..2c499512b5396830d7f1eb8fb5874586898802dd 100644
 --- a/src/os.cc
 +++ b/src/os.cc
 @@ -277,8 +277,7 @@ std::size_t file::read(void* buffer, std::size_t count) {
