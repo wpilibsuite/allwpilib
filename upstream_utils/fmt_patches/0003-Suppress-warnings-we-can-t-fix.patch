@@ -1,0 +1,65 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Tyler Veness <calcmogul@gmail.com>
+Date: Sat, 13 May 2023 15:18:52 -0700
+Subject: [PATCH 3/3] Suppress warnings we can't fix
+
+---
+ include/fmt/core.h   |  7 +++++++
+ include/fmt/format.h | 15 +++++++++++++++
+ 2 files changed, 22 insertions(+)
+
+diff --git a/include/fmt/core.h b/include/fmt/core.h
+index 5c210bcb8428dba6419a055b2dd47bd717f5dbab..962115af6db9904fc5ae8f4b2c094ada7de7a8a1 100644
+--- a/include/fmt/core.h
++++ b/include/fmt/core.h
+@@ -1732,7 +1732,14 @@ constexpr auto encode_types() -> unsigned long long {
+ 
+ template <typename Context, typename T>
+ FMT_CONSTEXPR FMT_INLINE auto make_value(T&& val) -> value<Context> {
++#if FMT_GCC_VERSION && FMT_GCC_VERSION >= 1300
++#  pragma GCC diagnostic push
++#  pragma GCC diagnostic ignored "-Wdangling-reference"
++#endif
+   const auto& arg = arg_mapper<Context>().map(FMT_FORWARD(val));
++#if FMT_GCC_VERSION && FMT_GCC_VERSION >= 1300
++#  pragma GCC diagnostic pop
++#endif
+ 
+   constexpr bool formattable_char =
+       !std::is_same<decltype(arg), const unformattable_char&>::value;
+diff --git a/include/fmt/format.h b/include/fmt/format.h
+index 7c607dbd30421b5bc57aaafc1edabeafdf2a3ea0..60b806d5e65441f9aed8a410f0f88ceac4f4fb32 100644
+--- a/include/fmt/format.h
++++ b/include/fmt/format.h
+@@ -922,8 +922,16 @@ FMT_CONSTEXPR20 void basic_memory_buffer<T, SIZE, Allocator>::grow(
+   T* new_data =
+       std::allocator_traits<Allocator>::allocate(alloc_, new_capacity);
+   // The following code doesn't throw, so the raw pointer above doesn't leak.
++#if FMT_GCC_VERSION && FMT_GCC_VERSION >= 1300
++#  pragma GCC diagnostic push
++#  pragma GCC diagnostic ignored "-Warray-bounds"
++#  pragma GCC diagnostic ignored "-Wstringop-overflow"
++#endif
+   std::uninitialized_copy(old_data, old_data + this->size(),
+                           detail::make_checked(new_data, new_capacity));
++#if FMT_GCC_VERSION && FMT_GCC_VERSION >= 1300
++#  pragma GCC diagnostic pop
++#endif
+   this->set(new_data, new_capacity);
+   // deallocate must not throw according to the standard, but even if it does,
+   // the buffer already uses the new storage and will deallocate it in
+@@ -2804,7 +2812,14 @@ class bigint {
+     auto size = other.bigits_.size();
+     bigits_.resize(size);
+     auto data = other.bigits_.data();
++#if FMT_GCC_VERSION && FMT_GCC_VERSION >= 1300
++#  pragma GCC diagnostic push
++#  pragma GCC diagnostic ignored "-Warray-bounds"
++#endif
+     std::copy(data, data + size, make_checked(bigits_.data(), size));
++#if FMT_GCC_VERSION && FMT_GCC_VERSION >= 1300
++#  pragma GCC diagnostic pop
++#endif
+     exp_ = other.exp_;
+   }
+ 
