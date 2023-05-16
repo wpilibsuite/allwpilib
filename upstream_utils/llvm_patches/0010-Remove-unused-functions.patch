@@ -1,4 +1,4 @@
-From df2dc9fdb3d57e01423104a71a6a1d1d6382644a Mon Sep 17 00:00:00 2001
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Sun, 8 May 2022 13:43:50 -0400
 Subject: [PATCH 10/28] Remove unused functions
@@ -12,7 +12,7 @@ Subject: [PATCH 10/28] Remove unused functions
  5 files changed, 8 insertions(+), 564 deletions(-)
 
 diff --git a/llvm/include/llvm/ADT/SmallString.h b/llvm/include/llvm/ADT/SmallString.h
-index 50cbdade4..bfa965fd6 100644
+index 50cbdade405770e80a6a45521a446a28e4177d11..bfa965fd68a09d7ca3b332e38585ae37a5982ed0 100644
 --- a/llvm/include/llvm/ADT/SmallString.h
 +++ b/llvm/include/llvm/ADT/SmallString.h
 @@ -88,48 +88,12 @@ public:
@@ -116,7 +116,7 @@ index 50cbdade4..bfa965fd6 100644
    // Extra methods.
  
 diff --git a/llvm/include/llvm/Support/Errno.h b/llvm/include/llvm/Support/Errno.h
-index 07df6765d..d9bf68bb3 100644
+index 07df6765d9dbf5d6b88092737e081b441b1ccdc4..d9bf68bb369e524be5453c738ab9faa42f4b8cb8 100644
 --- a/llvm/include/llvm/Support/Errno.h
 +++ b/llvm/include/llvm/Support/Errno.h
 @@ -20,15 +20,6 @@
@@ -136,7 +136,7 @@ index 07df6765d..d9bf68bb3 100644
  inline decltype(auto) RetryAfterSignal(const FailT &Fail, const Fun &F,
                                         const Args &... As) {
 diff --git a/llvm/include/llvm/Support/VersionTuple.h b/llvm/include/llvm/Support/VersionTuple.h
-index 3d6573bf5..a28e12adc 100644
+index 3d6573bf5a96e115ef264c7885b91aa3b32ac91e..a28e12adcc251bc3673f6a7c07d96d447aa0da98 100644
 --- a/llvm/include/llvm/Support/VersionTuple.h
 +++ b/llvm/include/llvm/Support/VersionTuple.h
 @@ -16,7 +16,6 @@
@@ -194,7 +194,7 @@ index 3d6573bf5..a28e12adc 100644
  
  } // end namespace llvm
 diff --git a/llvm/include/llvm/Support/raw_ostream.h b/llvm/include/llvm/Support/raw_ostream.h
-index a25ca5b7b..d4521c8e2 100644
+index a25ca5b7b556fd9ccd08ad13a6ceae6bedbcb09e..d4521c8e285f3fc404d27a6c528c410121c71f83 100644
 --- a/llvm/include/llvm/Support/raw_ostream.h
 +++ b/llvm/include/llvm/Support/raw_ostream.h
 @@ -248,32 +248,6 @@ public:
@@ -381,7 +381,7 @@ index a25ca5b7b..d4521c8e2 100644
  
  #endif // LLVM_SUPPORT_RAW_OSTREAM_H
 diff --git a/llvm/lib/Support/raw_ostream.cpp b/llvm/lib/Support/raw_ostream.cpp
-index ee01a9522..875eda7ba 100644
+index ee01a95220806c500d2c0149e9f1e667ea8bf28b..875eda7ba440f2ae64dc32ebb0502ad3ad8d2c74 100644
 --- a/llvm/lib/Support/raw_ostream.cpp
 +++ b/llvm/lib/Support/raw_ostream.cpp
 @@ -19,7 +19,6 @@

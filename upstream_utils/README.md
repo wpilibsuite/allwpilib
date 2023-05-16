@@ -11,10 +11,9 @@ Each thirdparty library has a Python script for updating it. They generally:
 
 `upstream_utils.py` contains utilities common to these update scripts.
 
-Patches are generated in the thirdparty repo with
-`git format-patch --no-signature` so they can be applied as individual commits
-and easily rebased onto newer versions. Each library has its own patch directory
-(e.g., `lib_patches`).
+Patches are generated in the thirdparty repo with git's format-patch command so
+they can be applied as individual commits and easily rebased onto newer
+versions. Each library has its own patch directory (e.g., `lib_patches`).
 
 ## Updating thirdparty library version
 
@@ -47,7 +46,7 @@ git rebase 2.0
 
 Generate patch files for the new version.
 ```bash
-git format-patch 2.0..HEAD --no-signature
+git format-patch 2.0..HEAD --zero-commit --abbrev=40 --no-signature
 ```
 
 Move the patch files to `upstream_utils`.

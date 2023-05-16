@@ -1,7 +1,7 @@
-From 7846c7387c1cb09cef7329630012ea1aefe64cf9 Mon Sep 17 00:00:00 2001
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Laurent Rineau <laurent.rineau@cgal.org>
 Date: Tue, 11 Oct 2022 17:37:04 +0000
-Subject: [PATCH] Eigen/Sparse: fix warnings -Wunused-but-set-variable
+Subject: [PATCH 3/3] Eigen/Sparse: fix warnings -Wunused-but-set-variable
 
 ---
  Eigen/src/SparseCore/TriangularSolver.h        | 4 ++--
@@ -9,10 +9,10 @@ Subject: [PATCH] Eigen/Sparse: fix warnings -Wunused-but-set-variable
  2 files changed, 2 insertions(+), 7 deletions(-)
 
 diff --git a/Eigen/src/SparseCore/TriangularSolver.h b/Eigen/src/SparseCore/TriangularSolver.h
-index 79c867c25..a9fbeebc1 100644
+index f9c56ba79800e209dcf3f18ba37dbb8023488bca..7cb2c2665f0e24924da88f11c0fe3ca0c0af52e3 100644
 --- a/Eigen/src/SparseCore/TriangularSolver.h
 +++ b/Eigen/src/SparseCore/TriangularSolver.h
-@@ -272,11 +272,11 @@ struct sparse_solve_triangular_sparse_selector<Lhs,Rhs,Mode,UpLo,ColMajor>
+@@ -270,11 +270,11 @@ struct sparse_solve_triangular_sparse_selector<Lhs,Rhs,Mode,UpLo,ColMajor>
        }
  
  
@@ -27,10 +27,10 @@ index 79c867c25..a9fbeebc1 100644
  //         std::cout << it.value() << "  ";
          // FIXME use insertBack
 diff --git a/Eigen/src/SparseLU/SparseLU_heap_relax_snode.h b/Eigen/src/SparseLU/SparseLU_heap_relax_snode.h
-index 7bed85de5..2a8d80b24 100644
+index 6f75d500e5f831f414175ce46dbceffa0acd5539..7aecbcad8ed2703000d62cfd5d88d983c69a7423 100644
 --- a/Eigen/src/SparseLU/SparseLU_heap_relax_snode.h
 +++ b/Eigen/src/SparseLU/SparseLU_heap_relax_snode.h
-@@ -77,8 +77,6 @@ void SparseLUImpl<Scalar,StorageIndex>::heap_relax_snode (const Index n, IndexVe
+@@ -75,8 +75,6 @@ void SparseLUImpl<Scalar,StorageIndex>::heap_relax_snode (const Index n, IndexVe
    // Identify the relaxed supernodes by postorder traversal of the etree
    Index snode_start; // beginning of a snode 
    StorageIndex k;
@@ -39,7 +39,7 @@ index 7bed85de5..2a8d80b24 100644
    StorageIndex l; 
    for (j = 0; j < n; )
    {
-@@ -90,7 +88,6 @@ void SparseLUImpl<Scalar,StorageIndex>::heap_relax_snode (const Index n, IndexVe
+@@ -88,7 +86,6 @@ void SparseLUImpl<Scalar,StorageIndex>::heap_relax_snode (const Index n, IndexVe
        parent = et(j);
      }
      // Found a supernode in postordered etree, j is the last column 
@@ -47,7 +47,7 @@ index 7bed85de5..2a8d80b24 100644
      k = StorageIndex(n);
      for (Index i = snode_start; i <= j; ++i)
        k = (std::min)(k, inv_post(i));
-@@ -99,7 +96,6 @@ void SparseLUImpl<Scalar,StorageIndex>::heap_relax_snode (const Index n, IndexVe
+@@ -97,7 +94,6 @@ void SparseLUImpl<Scalar,StorageIndex>::heap_relax_snode (const Index n, IndexVe
      {
        // This is also a supernode in the original etree
        relax_end(k) = l; // Record last column 
@@ -55,7 +55,7 @@ index 7bed85de5..2a8d80b24 100644
      }
      else 
      {
-@@ -109,7 +105,6 @@ void SparseLUImpl<Scalar,StorageIndex>::heap_relax_snode (const Index n, IndexVe
+@@ -107,7 +103,6 @@ void SparseLUImpl<Scalar,StorageIndex>::heap_relax_snode (const Index n, IndexVe
          if (descendants(i) == 0) 
          {
            relax_end(l) = l;
@@ -63,6 +63,3 @@ index 7bed85de5..2a8d80b24 100644
          }
        }
      }
--- 
-2.40.0
-
