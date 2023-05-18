@@ -65,7 +65,7 @@ public class KalmanFilter<States extends Num, Inputs extends Num, Outputs extend
     var contQ = StateSpaceUtil.makeCovarianceMatrix(states, stateStdDevs);
     var contR = StateSpaceUtil.makeCovarianceMatrix(outputs, measurementStdDevs);
 
-    var pair = Discretization.discretizeAQTaylor(plant.getA(), contQ, dtSeconds);
+    var pair = Discretization.discretizeAQ(plant.getA(), contQ, dtSeconds);
     var discA = pair.getFirst();
     var discQ = pair.getSecond();
 
