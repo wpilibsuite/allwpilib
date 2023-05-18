@@ -22,6 +22,8 @@ static JClass timestamped{{ t.TypeName }}Cls;
 static JClass {{ t.jni.jtype }}Cls;
 {%- endif %}
 {%- endfor %}
+static JException illegalArgEx;
+static JException indexOobEx;
 static JException nullPointerEx;
 
 static const JClassInit classes[] = {
@@ -36,6 +38,8 @@ static const JClassInit classes[] = {
 };
 
 static const JExceptionInit exceptions[] = {
+    {"java/lang/IllegalArgumentException", &illegalArgEx},
+    {"java/lang/IndexOutOfBoundsException", &indexOobEx},
     {"java/lang/NullPointerException", &nullPointerEx},
 };
 
@@ -63,6 +67,9 @@ bool JNI_LoadTypes(JNIEnv* env) {
 void JNI_UnloadTypes(JNIEnv* env) {
   // Delete global references
   for (auto& c : classes) {
+    c.cls->free(env);
+  }
+  for (auto& c : exceptions) {
     c.cls->free(env);
   }
 }
@@ -185,7 +192,65 @@ Java_edu_wpi_first_networktables_NetworkTablesJNI_readQueueValues{{ t.TypeName }
 {
   return {{ t.jni.ToJavaArray }}(env, nt::ReadQueueValues{{ t.TypeName }}(subentry));
 }
+{% if t.TypeName == "Raw" %}
+/*
+ * Class:     edu_wpi_first_networktables_NetworkTablesJNI
+ * Method:    setRaw
+ * Signature: (IJ[BII)Z
+ */
+JNIEXPORT jboolean JNICALL
+Java_edu_wpi_first_networktables_NetworkTablesJNI_setRaw
+  (JNIEnv* env, jclass, jint entry, jlong time, jbyteArray value, jint start, jint len)
+{
+  if (!value) {
+    nullPointerEx.Throw(env, "value is null");
+    return false;
+  }
+  if (start < 0) {
+    indexOobEx.Throw(env, "start must be >= 0");
+    return false;
+  }
+  if (len < 0) {
+    indexOobEx.Throw(env, "len must be >= 0");
+    return false;
+  }
+  CriticalJByteArrayRef cvalue{env, value};
+  if (static_cast<unsigned int>(start + len) > cvalue.size()) {
+    indexOobEx.Throw(env, "start + len must be smaller than array length");
+    return false;
+  }
+  return nt::SetRaw(entry, cvalue.uarray().subspan(start, len), time);
+}
 
+/*
+ * Class:     edu_wpi_first_networktables_NetworkTablesJNI
+ * Method:    setRawBuffer
+ * Signature: (IJLjava/nio/ByteBuffer;II)Z
+ */
+JNIEXPORT jboolean JNICALL
+Java_edu_wpi_first_networktables_NetworkTablesJNI_setRawBuffer
+  (JNIEnv* env, jclass, jint entry, jlong time, jobject value, jint start, jint len)
+{
+  if (!value) {
+    nullPointerEx.Throw(env, "value is null");
+    return false;
+  }
+  if (start < 0) {
+    indexOobEx.Throw(env, "start must be >= 0");
+    return false;
+  }
+  if (len < 0) {
+    indexOobEx.Throw(env, "len must be >= 0");
+    return false;
+  }
+  JByteArrayRef cvalue{env, value, start + len};
+  if (!cvalue) {
+    illegalArgEx.Throw(env, "value must be a native ByteBuffer");
+    return false;
+  }
+  return nt::SetRaw(entry, cvalue.uarray().subspan(start, len), time);
+}
+{% else %}
 /*
  * Class:     edu_wpi_first_networktables_NetworkTablesJNI
  * Method:    set{{ t.TypeName }}
@@ -203,7 +268,7 @@ Java_edu_wpi_first_networktables_NetworkTablesJNI_set{{ t.TypeName }}
 {%- endif %}
   return nt::Set{{ t.TypeName }}(entry, {{ t.jni.FromJavaBegin }}value{{ t.jni.FromJavaEnd }}, time);
 }
-
+{% endif %}
 /*
  * Class:     edu_wpi_first_networktables_NetworkTablesJNI
  * Method:    get{{ t.TypeName }}
@@ -223,7 +288,65 @@ Java_edu_wpi_first_networktables_NetworkTablesJNI_get{{ t.TypeName }}
   return nt::Get{{ t.TypeName }}(entry, defaultValue);
 {%- endif %}
 }
+{% if t.TypeName == "Raw" %}
+/*
+ * Class:     edu_wpi_first_networktables_NetworkTablesJNI
+ * Method:    setDefaultRaw
+ * Signature: (IJ[BII)Z
+ */
+JNIEXPORT jboolean JNICALL
+Java_edu_wpi_first_networktables_NetworkTablesJNI_setDefaultRaw
+  (JNIEnv* env, jclass, jint entry, jlong, jbyteArray defaultValue, jint start, jint len)
+{
+  if (!defaultValue) {
+    nullPointerEx.Throw(env, "value is null");
+    return false;
+  }
+  if (start < 0) {
+    indexOobEx.Throw(env, "start must be >= 0");
+    return false;
+  }
+  if (len < 0) {
+    indexOobEx.Throw(env, "len must be >= 0");
+    return false;
+  }
+  CriticalJByteArrayRef cvalue{env, defaultValue};
+  if (static_cast<unsigned int>(start + len) > cvalue.size()) {
+    indexOobEx.Throw(env, "start + len must be smaller than array length");
+    return false;
+  }
+  return nt::SetDefaultRaw(entry, cvalue.uarray().subspan(start, len));
+}
 
+/*
+ * Class:     edu_wpi_first_networktables_NetworkTablesJNI
+ * Method:    setDefaultRawBuffer
+ * Signature: (IJLjava/nio/ByteBuffer;II)Z
+ */
+JNIEXPORT jboolean JNICALL
+Java_edu_wpi_first_networktables_NetworkTablesJNI_setDefaultRawBuffer
+  (JNIEnv* env, jclass, jint entry, jlong, jobject defaultValue, jint start, jint len)
+{
+  if (!defaultValue) {
+    nullPointerEx.Throw(env, "value is null");
+    return false;
+  }
+  if (start < 0) {
+    indexOobEx.Throw(env, "start must be >= 0");
+    return false;
+  }
+  if (len < 0) {
+    indexOobEx.Throw(env, "len must be >= 0");
+    return false;
+  }
+  JByteArrayRef cvalue{env, defaultValue, start + len};
+  if (!cvalue) {
+    illegalArgEx.Throw(env, "value must be a native ByteBuffer");
+    return false;
+  }
+  return nt::SetDefaultRaw(entry, cvalue.uarray().subspan(start, len));
+}
+{% else %}
 /*
  * Class:     edu_wpi_first_networktables_NetworkTablesJNI
  * Method:    setDefault{{ t.TypeName }}
@@ -241,5 +364,6 @@ Java_edu_wpi_first_networktables_NetworkTablesJNI_setDefault{{ t.TypeName }}
 {%- endif %}
   return nt::SetDefault{{ t.TypeName }}(entry, {{ t.jni.FromJavaBegin }}defaultValue{{ t.jni.FromJavaEnd }});
 }
+{% endif %}
 {% endfor %}
 }  // extern "C"
