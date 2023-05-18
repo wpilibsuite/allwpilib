@@ -31,7 +31,7 @@ KalmanFilter<States, Inputs, Outputs>::KalmanFilter(
 
   Matrixd<States, States> discA;
   Matrixd<States, States> discQ;
-  DiscretizeAQTaylor<States>(plant.A(), contQ, dt, &discA, &discQ);
+  DiscretizeAQ<States>(plant.A(), contQ, dt, &discA, &discQ);
 
   auto discR = DiscretizeR<Outputs>(contR, dt);
 
