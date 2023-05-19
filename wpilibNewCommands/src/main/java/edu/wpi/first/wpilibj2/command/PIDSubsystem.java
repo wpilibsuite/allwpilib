@@ -14,6 +14,7 @@ import edu.wpi.first.math.controller.PIDController;
  *
  * <p>This class is provided by the NewCommands VendorDep
  */
+@Deprecated
 public abstract class PIDSubsystem extends SubsystemBase {
   protected final PIDController m_controller;
   protected boolean m_enabled;
@@ -23,6 +24,8 @@ public abstract class PIDSubsystem extends SubsystemBase {
    *
    * @param controller the PIDController to use
    * @param initialPosition the initial setpoint of the subsystem
+   * @deprecated this class is cumbersome and unreadable without providing substantial benefit,
+   *     instead use {@link PIDController} in a subsystem
    */
   public PIDSubsystem(PIDController controller, double initialPosition) {
     m_controller = requireNonNullParam(controller, "controller", "PIDSubsystem");
@@ -34,6 +37,8 @@ public abstract class PIDSubsystem extends SubsystemBase {
    * Creates a new PIDSubsystem. Initial setpoint is zero.
    *
    * @param controller the PIDController to use
+   * @deprecated this class is cumbersome and unreadable without providing substantial benefit,
+   *     instead use {@link PIDController} in a subsystem
    */
   public PIDSubsystem(PIDController controller) {
     this(controller, 0);

@@ -14,6 +14,7 @@ import edu.wpi.first.math.trajectory.TrapezoidProfile;
  *
  * <p>This class is provided by the NewCommands VendorDep
  */
+@Deprecated
 public abstract class TrapezoidProfileSubsystem extends SubsystemBase {
   private final double m_period;
   private final TrapezoidProfile.Constraints m_constraints;
@@ -30,6 +31,8 @@ public abstract class TrapezoidProfileSubsystem extends SubsystemBase {
    * @param initialPosition The initial position of the controlled mechanism when the subsystem is
    *     constructed.
    * @param period The period of the main robot loop, in seconds.
+   * @deprecated This class is cumbersome and unreadable without providing substantial benefit,
+   *     instead use {@link TrapezoidProfile} in a subsystem.
    */
   public TrapezoidProfileSubsystem(
       TrapezoidProfile.Constraints constraints, double initialPosition, double period) {
@@ -45,6 +48,8 @@ public abstract class TrapezoidProfileSubsystem extends SubsystemBase {
    * @param constraints The constraints (maximum velocity and acceleration) for the profiles.
    * @param initialPosition The initial position of the controlled mechanism when the subsystem is
    *     constructed.
+   * @deprecated This class is cumbersome and unreadable without providing substantial benefit,
+   *     instead use {@link TrapezoidProfile} in a subsystem.
    */
   public TrapezoidProfileSubsystem(
       TrapezoidProfile.Constraints constraints, double initialPosition) {
@@ -55,6 +60,8 @@ public abstract class TrapezoidProfileSubsystem extends SubsystemBase {
    * Creates a new TrapezoidProfileSubsystem.
    *
    * @param constraints The constraints (maximum velocity and acceleration) for the profiles.
+   * @deprecated This class is cumbersome and unreadable without providing substantial benefit,
+   *     instead use {@link TrapezoidProfile} in a subsystem.
    */
   public TrapezoidProfileSubsystem(TrapezoidProfile.Constraints constraints) {
     this(constraints, 0, 0.02);

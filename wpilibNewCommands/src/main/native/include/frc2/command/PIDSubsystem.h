@@ -17,7 +17,9 @@ namespace frc2 {
  *
  * @see PIDController
  */
-class PIDSubsystem : public SubsystemBase {
+class WPI_DEPRECATED(
+    "This class is cumbersome and unreadable, use inline commands with a "
+    "PIDController instead.") PIDSubsystem : public SubsystemBase {
  public:
   /**
    * Creates a new PIDSubsystem.

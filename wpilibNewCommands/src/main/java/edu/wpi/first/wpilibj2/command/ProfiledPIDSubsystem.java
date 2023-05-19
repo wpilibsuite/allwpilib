@@ -16,6 +16,7 @@ import edu.wpi.first.math.trajectory.TrapezoidProfile;
  *
  * <p>This class is provided by the NewCommands VendorDep
  */
+@Deprecated
 public abstract class ProfiledPIDSubsystem extends SubsystemBase {
   protected final ProfiledPIDController m_controller;
   protected boolean m_enabled;
@@ -25,6 +26,8 @@ public abstract class ProfiledPIDSubsystem extends SubsystemBase {
    *
    * @param controller the ProfiledPIDController to use
    * @param initialPosition the initial goal position of the controller
+   * @deprecated this class is cumbersome and unreadable without providing substantial benefit,
+   *     instead use {@link ProfiledPIDController} in a subsystem
    */
   public ProfiledPIDSubsystem(ProfiledPIDController controller, double initialPosition) {
     m_controller = requireNonNullParam(controller, "controller", "ProfiledPIDSubsystem");
@@ -35,6 +38,8 @@ public abstract class ProfiledPIDSubsystem extends SubsystemBase {
    * Creates a new ProfiledPIDSubsystem. Initial goal position is zero.
    *
    * @param controller the ProfiledPIDController to use
+   * @deprecated this class is cumbersome and unreadable without providing substantial benefit,
+   *     instead use {@link ProfiledPIDController} in a subsystem
    */
   public ProfiledPIDSubsystem(ProfiledPIDController controller) {
     this(controller, 0);

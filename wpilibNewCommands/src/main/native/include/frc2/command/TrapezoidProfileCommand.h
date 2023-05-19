@@ -24,7 +24,9 @@ namespace frc2 {
  * @see TrapezoidProfile
  */
 template <class Distance>
-class TrapezoidProfileCommand
+class WPI_DEPRECATED(
+    "This class is cumbersome and unreadable, use inline commands with a "
+    "TrapezoidProfile instead.") TrapezoidProfileCommand
     : public CommandHelper<CommandBase, TrapezoidProfileCommand<Distance>> {
   using Distance_t = units::unit_t<Distance>;
   using Velocity =

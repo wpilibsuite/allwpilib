@@ -24,7 +24,10 @@ namespace frc2 {
  *
  * @see PIDController
  */
-class PIDCommand : public CommandHelper<CommandBase, PIDCommand> {
+class WPI_DEPRECATED(
+    "This class is cumbersome and unreadable, use inline commands with a "
+    "PIDController instead.") PIDCommand
+    : public CommandHelper<CommandBase, PIDCommand> {
  public:
   /**
    * Creates a new PIDCommand, which controls the given output with a

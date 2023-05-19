@@ -18,6 +18,7 @@ import java.util.function.DoubleSupplier;
  *
  * <p>This class is provided by the NewCommands VendorDep
  */
+@Deprecated
 public class PIDCommand extends CommandBase {
   protected final PIDController m_controller;
   protected DoubleSupplier m_measurement;
@@ -32,6 +33,10 @@ public class PIDCommand extends CommandBase {
    * @param setpointSource the controller's setpoint
    * @param useOutput the controller's output
    * @param requirements the subsystems required by this command
+   * @deprecated this class is cumbersome and unreadable without providing substantial benefit, see
+   *     instead <a href=
+   *     "https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#capturing-state-in-inline-commands">capturing
+   *     state in inline commands</a>
    */
   public PIDCommand(
       PIDController controller,
@@ -59,6 +64,10 @@ public class PIDCommand extends CommandBase {
    * @param setpoint the controller's setpoint
    * @param useOutput the controller's output
    * @param requirements the subsystems required by this command
+   * @deprecated this class is cumbersome and unreadable without providing substantial benefit, see
+   *     instead <a href=
+   *     "https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#capturing-state-in-inline-commands">capturing
+   *     state in inline commands</a>
    */
   public PIDCommand(
       PIDController controller,

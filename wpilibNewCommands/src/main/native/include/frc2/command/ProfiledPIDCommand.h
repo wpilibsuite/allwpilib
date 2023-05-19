@@ -27,7 +27,9 @@ namespace frc2 {
  * @see ProfiledPIDController<Distance>
  */
 template <class Distance>
-class ProfiledPIDCommand
+class WPI_DEPRECATED(
+    "This class is cumbersome and unreadable, use inline commands with a "
+    "ProfiledPIDController instead.") ProfiledPIDCommand
     : public CommandHelper<CommandBase, ProfiledPIDCommand<Distance>> {
   using Distance_t = units::unit_t<Distance>;
   using Velocity =
