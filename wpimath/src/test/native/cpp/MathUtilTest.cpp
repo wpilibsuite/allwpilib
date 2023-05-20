@@ -141,18 +141,18 @@ TEST(MathUtilTest, IsNear) {
   EXPECT_FALSE(frc::IsNear(42, -43, 2));
 
   // Floating point checks
-  EXPECT_TRUE(frc::IsNear(42, 41.5, 1));
-  EXPECT_TRUE(frc::IsNear(42, 42.5, 1));
-  EXPECT_TRUE(frc::IsNear(42, 41.5, 0.75));
-  EXPECT_TRUE(frc::IsNear(42, 42.5, 0.75));
+  EXPECT_TRUE(frc::IsNear<double>(42, 41.5, 1));
+  EXPECT_TRUE(frc::IsNear<double>(42, 42.5, 1));
+  EXPECT_TRUE(frc::IsNear<double>(42, 41.5, 0.75));
+  EXPECT_TRUE(frc::IsNear<double>(42, 42.5, 0.75));
 
   // Wraparound checks
-  EXPECT_TRUE(frc::IsNear(0, 356, 5, 0, 360));
+  EXPECT_TRUE(frc::IsNear(0_deg, 356_deg, 5_deg, 0_deg, 360_deg));
   EXPECT_TRUE(frc::IsNear(0, -356, 5, 0, 360));
   EXPECT_TRUE(frc::IsNear(0, 4, 5, 0, 360));
   EXPECT_TRUE(frc::IsNear(0, -4, 5, 0, 360));
-  EXPECT_FALSE(frc::IsNear(0, 356, 2.5, 0, 360));
-  EXPECT_FALSE(frc::IsNear(0, -356, 2.5, 0, 360));
-  EXPECT_FALSE(frc::IsNear(0, 4, 2.5, 0, 360));
-  EXPECT_FALSE(frc::IsNear(0, -4, 2.5, 0, 360));
+  EXPECT_FALSE(frc::IsNear<double>(0, 356, 2.5, 0, 360));
+  EXPECT_FALSE(frc::IsNear<double>(0, -356, 2.5, 0, 360));
+  EXPECT_FALSE(frc::IsNear<double>(0, 4, 2.5, 0, 360));
+  EXPECT_FALSE(frc::IsNear<double>(0, -4, 2.5, 0, 360));
 }

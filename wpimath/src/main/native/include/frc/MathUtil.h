@@ -119,6 +119,8 @@ template <typename T>
 constexpr bool IsNear(T expected, T actual, T tolerance) {
   if constexpr (std::is_floating_point_v<T>) {
     return std::abs(expected - actual) < tolerance;
+  } else if constexpr (std::is_integral_v<T>) {
+    return std::abs(expected - actual) < tolerance;
   } else {
     return units::math::abs(expected - actual) < tolerance;
   }
@@ -142,6 +144,8 @@ constexpr bool IsNear(T expected, T actual, T tolerance, T min, T max) {
   T error = frc::InputModulus<T>(expected - actual, -errorBound, errorBound);
 
   if constexpr (std::is_floating_point_v<T>) {
+    return std::abs(error) < tolerance;
+  } else if constexpr (std::is_integral_v<T>) {
     return std::abs(error) < tolerance;
   } else {
     return units::math::abs(error) < tolerance;
