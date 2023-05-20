@@ -96,70 +96,6 @@
     "commandversion": 2
   },
   {
-    "name": "PIDCommand",
-    "description": "A command that runs a PIDController.",
-    "tags": [
-      "pidcommand"
-    ],
-    "foldername": "pidcommand",
-    "headers": [
-      "ReplaceMePIDCommand.h"
-    ],
-    "source": [
-      "ReplaceMePIDCommand.cpp"
-    ],
-    "replacename": "ReplaceMePIDCommand",
-    "commandversion": 2
-  },
-  {
-    "name": "PIDSubsystem",
-    "description": "A subsystem that runs a PIDController.",
-    "tags": [
-      "pidsubsystem"
-    ],
-    "foldername": "pidsubsystem2",
-    "headers": [
-      "ReplaceMePIDSubsystem2.h"
-    ],
-    "source": [
-      "ReplaceMePIDSubsystem2.cpp"
-    ],
-    "replacename": "ReplaceMePIDSubsystem2",
-    "commandversion": 2
-  },
-  {
-    "name": "ProfiledPIDCommand",
-    "description": "A command that runs a ProfiledPIDController.",
-    "tags": [
-      "profiledpidcommand"
-    ],
-    "foldername": "profiledpidcommand",
-    "headers": [
-      "ReplaceMeProfiledPIDCommand.h"
-    ],
-    "source": [
-      "ReplaceMeProfiledPIDCommand.cpp"
-    ],
-    "replacename": "ReplaceMeProfiledPIDCommand",
-    "commandversion": 2
-  },
-  {
-    "name": "ProfiledPIDSubsystem",
-    "description": "A subsystem that runs a ProfiledPIDController.",
-    "tags": [
-      "profiledpidsubsystem"
-    ],
-    "foldername": "profiledpidsubsystem",
-    "headers": [
-      "ReplaceMeProfiledPIDSubsystem.h"
-    ],
-    "source": [
-      "ReplaceMeProfiledPIDSubsystem.cpp"
-    ],
-    "replacename": "ReplaceMeProfiledPIDSubsystem",
-    "commandversion": 2
-  },
-  {
     "name": "SequentialCommandGroup",
     "description": "A command group that runs commands in sequence.",
     "tags": [
@@ -189,38 +125,6 @@
       "ReplaceMeSubsystem2.cpp"
     ],
     "replacename": "ReplaceMeSubsystem2",
-    "commandversion": 2
-  },
-  {
-    "name": "TrapezoidProfileCommand",
-    "description": "A command that executes a trapezoidal motion profile.",
-    "tags": [
-      "trapezoidprofilecommand"
-    ],
-    "foldername": "trapezoidprofilecommand",
-    "headers": [
-      "ReplaceMeTrapezoidProfileCommand.h"
-    ],
-    "source": [
-      "ReplaceMeTrapezoidProfileCommand.cpp"
-    ],
-    "replacename": "ReplaceMeTrapezoidProfileCommand",
-    "commandversion": 2
-  },
-  {
-    "name": "TrapezoidProfileSubsystem",
-    "description": "A subsystem that executes a trapezoidal motion profile.",
-    "tags": [
-      "trapezoidprofilesubsystem"
-    ],
-    "foldername": "trapezoidprofilesubsystem",
-    "headers": [
-      "ReplaceMeTrapezoidProfileSubsystem.h"
-    ],
-    "source": [
-      "ReplaceMeTrapezoidProfileSubsystem.cpp"
-    ],
-    "replacename": "ReplaceMeTrapezoidProfileSubsystem",
     "commandversion": 2
   }
 ]
