@@ -1,4 +1,4 @@
-From 5fccde024bea117d90d215390f09c7d779195ea5 Mon Sep 17 00:00:00 2001
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Sat, 7 May 2022 22:12:41 -0400
 Subject: [PATCH 03/28] Wrap std::min/max calls in parens, for Windows warnings
@@ -12,7 +12,7 @@ Subject: [PATCH 03/28] Wrap std::min/max calls in parens, for Windows warnings
  5 files changed, 21 insertions(+), 21 deletions(-)
 
 diff --git a/llvm/include/llvm/ADT/DenseMap.h b/llvm/include/llvm/ADT/DenseMap.h
-index 7673b66ca..975c3b97e 100644
+index 7673b66ca42a0c9c16b7cadd6cc21c14a4d21d43..975c3b97e2cbf09225299c421406ad2bbe4ef125 100644
 --- a/llvm/include/llvm/ADT/DenseMap.h
 +++ b/llvm/include/llvm/ADT/DenseMap.h
 @@ -390,7 +390,7 @@ protected:
@@ -34,7 +34,7 @@ index 7673b66ca..975c3b97e 100644
        this->BaseT::initEmpty();
        return;
 diff --git a/llvm/include/llvm/ADT/SmallVector.h b/llvm/include/llvm/ADT/SmallVector.h
-index a4a790323..8686f7bb5 100644
+index a4a790323a6b80950de087f623668ab6ad3d935c..8686f7bb5407611979e8cecfe9da292d3a4b4160 100644
 --- a/llvm/include/llvm/ADT/SmallVector.h
 +++ b/llvm/include/llvm/ADT/SmallVector.h
 @@ -49,12 +49,12 @@ protected:
@@ -89,7 +89,7 @@ index a4a790323..8686f7bb5 100644
        std::uninitialized_fill_n(this->end(), NumElts - this->size(), Elt);
      else if (NumElts < this->size())
 diff --git a/llvm/include/llvm/Support/ConvertUTF.h b/llvm/include/llvm/Support/ConvertUTF.h
-index 7f1527f51..b085c8a17 100644
+index 7f1527f51cdf59238607becfb2fdaf4afc91d4b6..b085c8a179e8767a258f9feafc8d1111828f10b1 100644
 --- a/llvm/include/llvm/Support/ConvertUTF.h
 +++ b/llvm/include/llvm/Support/ConvertUTF.h
 @@ -112,7 +112,7 @@ namespace llvm {
@@ -102,7 +102,7 @@ index 7f1527f51..b085c8a17 100644
  /* Some fundamental constants */
  #define UNI_REPLACEMENT_CHAR (UTF32)0x0000FFFD
 diff --git a/llvm/include/llvm/Support/MathExtras.h b/llvm/include/llvm/Support/MathExtras.h
-index 753b1998c..db9fbc148 100644
+index 753b1998c40c0f9d2a178b5e748d620ffd23ac7e..db9fbc148ae3064faa94a23713d1def3b466e899 100644
 --- a/llvm/include/llvm/Support/MathExtras.h
 +++ b/llvm/include/llvm/Support/MathExtras.h
 @@ -97,7 +97,7 @@ template <typename T, std::size_t SizeOfT> struct TrailingZerosCounter {
@@ -194,7 +194,7 @@ index 753b1998c..db9fbc148 100644
  
  } // End llvm namespace
 diff --git a/llvm/lib/Support/SmallVector.cpp b/llvm/lib/Support/SmallVector.cpp
-index 8bad715e4..a2b4899e1 100644
+index 8bad715e45cdf894e811020f3c146fc234e8e9f0..a2b4899e1ffe0ae19d236f43e2e2e2fe1db14110 100644
 --- a/llvm/lib/Support/SmallVector.cpp
 +++ b/llvm/lib/Support/SmallVector.cpp
 @@ -104,7 +104,7 @@ static size_t getNewCapacity(size_t MinSize, size_t TSize, size_t OldCapacity) {

@@ -1,4 +1,4 @@
-From 2c53d8ac36f378fda347f36ef2bc7fbc2038cb93 Mon Sep 17 00:00:00 2001
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Sun, 8 May 2022 13:34:07 -0400
 Subject: [PATCH 09/28] Add compiler warning pragmas
@@ -17,7 +17,7 @@ Subject: [PATCH 09/28] Add compiler warning pragmas
  10 files changed, 72 insertions(+), 4 deletions(-)
 
 diff --git a/llvm/include/llvm/ADT/FunctionExtras.h b/llvm/include/llvm/ADT/FunctionExtras.h
-index 8a9d78f41..3efa73587 100644
+index 8a9d78f41f540f51559c11c1f9f40645165796e5..3efa73587071b12af07398a4879e7b38c114867f 100644
 --- a/llvm/include/llvm/ADT/FunctionExtras.h
 +++ b/llvm/include/llvm/ADT/FunctionExtras.h
 @@ -55,6 +55,13 @@ namespace llvm {
@@ -46,7 +46,7 @@ index 8a9d78f41..3efa73587 100644
  
  #endif // LLVM_ADT_FUNCTIONEXTRAS_H
 diff --git a/llvm/include/llvm/ADT/Hashing.h b/llvm/include/llvm/ADT/Hashing.h
-index 74a87a3d8..47ff1b2bc 100644
+index 74a87a3d8dbbd1b13604fac694ad0294c53ee11c..47ff1b2bcbc14bf522abb66a1728123581c148d8 100644
 --- a/llvm/include/llvm/ADT/Hashing.h
 +++ b/llvm/include/llvm/ADT/Hashing.h
 @@ -55,6 +55,11 @@
@@ -71,7 +71,7 @@ index 74a87a3d8..47ff1b2bc 100644
 +
  #endif
 diff --git a/llvm/include/llvm/ADT/SmallVector.h b/llvm/include/llvm/ADT/SmallVector.h
-index 8686f7bb5..1e311ea56 100644
+index 8686f7bb5407611979e8cecfe9da292d3a4b4160..1e311ea56fd1d35505ca6740922c713d97636f09 100644
 --- a/llvm/include/llvm/ADT/SmallVector.h
 +++ b/llvm/include/llvm/ADT/SmallVector.h
 @@ -14,6 +14,14 @@
@@ -90,7 +90,7 @@ index 8686f7bb5..1e311ea56 100644
  #include "llvm/Support/type_traits.h"
  #include <algorithm>
 diff --git a/llvm/include/llvm/Support/MathExtras.h b/llvm/include/llvm/Support/MathExtras.h
-index da843ef79..fac12dd0e 100644
+index da843ef79ff9fd1e2b702763fcdc6f33771bef94..fac12dd0e4c6316ff4887542dd59adc954f099e4 100644
 --- a/llvm/include/llvm/Support/MathExtras.h
 +++ b/llvm/include/llvm/Support/MathExtras.h
 @@ -435,6 +435,11 @@ inline uint64_t maxUIntN(uint64_t N) {
@@ -117,7 +117,7 @@ index da843ef79..fac12dd0e 100644
  inline int64_t maxIntN(int64_t N) {
    assert(N > 0 && N <= 64 && "integer width out of range");
 diff --git a/llvm/include/llvm/Support/MemAlloc.h b/llvm/include/llvm/Support/MemAlloc.h
-index d6012bd5a..01007deb8 100644
+index d6012bd5a6985d8405136039aa85931605cd8a40..01007deb89bba625b1b3ad3e703d0c16ed6f757b 100644
 --- a/llvm/include/llvm/Support/MemAlloc.h
 +++ b/llvm/include/llvm/Support/MemAlloc.h
 @@ -22,6 +22,14 @@
@@ -146,7 +146,7 @@ index d6012bd5a..01007deb8 100644
 +
  #endif
 diff --git a/llvm/lib/Support/raw_ostream.cpp b/llvm/lib/Support/raw_ostream.cpp
-index e4c318eb8..ee01a9522 100644
+index e4c318eb8265c588f1d84dd1abeafc7fd0d055de..ee01a95220806c500d2c0149e9f1e667ea8bf28b 100644
 --- a/llvm/lib/Support/raw_ostream.cpp
 +++ b/llvm/lib/Support/raw_ostream.cpp
 @@ -10,6 +10,10 @@
@@ -161,7 +161,7 @@ index e4c318eb8..ee01a9522 100644
  #include "llvm/ADT/STLArrayExtras.h"
  #include "llvm/ADT/StringExtras.h"
 diff --git a/llvm/unittests/ADT/DenseMapTest.cpp b/llvm/unittests/ADT/DenseMapTest.cpp
-index e505b1907..9fe83a45d 100644
+index e505b19070bfdc9af45e0c2ae017e6ea50d81c98..9fe83a45d751719b9f99d57f8f5e983824d108f0 100644
 --- a/llvm/unittests/ADT/DenseMapTest.cpp
 +++ b/llvm/unittests/ADT/DenseMapTest.cpp
 @@ -6,6 +6,10 @@
@@ -176,7 +176,7 @@ index e505b1907..9fe83a45d 100644
  #include "gtest/gtest.h"
  #include <map>
 diff --git a/llvm/unittests/ADT/MapVectorTest.cpp b/llvm/unittests/ADT/MapVectorTest.cpp
-index 552f9956b..20ebcd753 100644
+index 552f9956bdc2c6148f2e338b02074b7c479994a9..20ebcd753bcce0112f6a2d96ea23ccb6662996bb 100644
 --- a/llvm/unittests/ADT/MapVectorTest.cpp
 +++ b/llvm/unittests/ADT/MapVectorTest.cpp
 @@ -6,6 +6,13 @@
@@ -194,7 +194,7 @@ index 552f9956b..20ebcd753 100644
  #include "llvm/ADT/iterator_range.h"
  #include "gtest/gtest.h"
 diff --git a/llvm/unittests/ADT/SmallVectorTest.cpp b/llvm/unittests/ADT/SmallVectorTest.cpp
-index fe827546a..0e68bad6c 100644
+index fe827546aef2c26b8c5372b2643e84d60683a19a..0e68bad6c4d70737d42fdf385512d117ca7aac4c 100644
 --- a/llvm/unittests/ADT/SmallVectorTest.cpp
 +++ b/llvm/unittests/ADT/SmallVectorTest.cpp
 @@ -17,6 +17,10 @@
@@ -209,7 +209,7 @@ index fe827546a..0e68bad6c 100644
  
  namespace {
 diff --git a/llvm/unittests/Support/AlignOfTest.cpp b/llvm/unittests/Support/AlignOfTest.cpp
-index f84895c18..6a50205b1 100644
+index f84895c18602d3936d623ed79c5d9689cd57cc91..6a50205b143b7ff553066f048a45bf4e1ecc475b 100644
 --- a/llvm/unittests/Support/AlignOfTest.cpp
 +++ b/llvm/unittests/Support/AlignOfTest.cpp
 @@ -31,10 +31,9 @@ namespace {

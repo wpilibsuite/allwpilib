@@ -17,6 +17,7 @@ Welcome to the WPILib project. This repository contains the HAL, WPILibJ, and WP
     - [Custom toolchain location](#custom-toolchain-location)
     - [Formatting/Linting](#formattinglinting)
     - [CMake](#cmake)
+  - [Running examples in simulation](#running-examples-in-simulation)
   - [Publishing](#publishing)
   - [Structure and Organization](#structure-and-organization)
 - [Contributing to WPILib](#contributing-to-wpilib)
@@ -130,6 +131,16 @@ If you only want to run the Java autoformatter, run `./gradlew spotlessApply`.
 ### CMake
 
 CMake is also supported for building. See [README-CMAKE.md](README-CMAKE.md).
+
+## Running examples in simulation
+
+Examples can be run in simulation with the following command:
+
+```bash
+./gradlew wpilibcExamples:runExample
+./gradlew wpilibjExamples:runExample
+```
+where `Example` is the example's folder name.
 
 ## Publishing
 
