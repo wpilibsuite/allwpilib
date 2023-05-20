@@ -106,11 +106,13 @@ constexpr T InputModulus(T input, T minimumInput, T maximumInput) {
 }
 
 /**
- * Checks if the given value matches an expected value within a certain tolerance.
+ * Checks if the given value matches an expected value within a certain
+ * tolerance.
  *
  * @param expected The expected value
  * @param actual The actual value
- * @param tolerance The allowed difference between the actual and the expected value
+ * @param tolerance The allowed difference between the actual and the expected
+ * value
  * @return Whether or not the actual value is within the allowed tolerance
  */
 template <typename T>
@@ -123,12 +125,13 @@ constexpr bool IsNear(T expected, T actual, T tolerance) {
 }
 
 /**
- * Checks if the given value matches an expected value within a certain tolerance. Supports
- * continuous input for cases like absolute encoders
+ * Checks if the given value matches an expected value within a certain
+ * tolerance. Supports continuous input for cases like absolute encoders
  *
  * @param expected The expected value
  * @param actual The actual value
- * @param tolerance The allowed difference between the actual and the expected value
+ * @param tolerance The allowed difference between the actual and the expected
+ * value
  * @param min The minimum value expected from the input
  * @param max The maximum value expected from the input
  * @return Whether or not the actual value is within the allowed tolerance
