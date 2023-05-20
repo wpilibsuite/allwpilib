@@ -13,6 +13,7 @@
 #include "frc2/command/PrintCommand.h"
 #include "frc2/command/RunCommand.h"
 #include "frc2/command/SequentialCommandGroup.h"
+#include "frc2/command/TimedCommand.h"
 #include "frc2/command/WaitCommand.h"
 #include "frc2/command/WaitUntilCommand.h"
 
@@ -76,6 +77,16 @@ CommandPtr cmd::RunEnd(std::function<void()> run, std::function<void()> end,
                            [end = std::move(end)](bool interrupted) { end(); },
                            [] { return false; }, requirements)
       .ToPtr();
+}
+
+CommandPtr RunTimed(std::function<void(units::second_t)> toRun,
+                    std::initializer_list<Subsystem*> requirements) {
+  return TimedCommand(toRun, requirements).ToPtr();
+}
+
+CommandPtr RunTimed(std::function<void(units::second_t)> toRun,
+                    std::span<Subsystem* const> requirements) {
+  return TimedCommand(toRun, requirements).ToPtr();
 }
 
 CommandPtr cmd::Print(std::string_view msg) {

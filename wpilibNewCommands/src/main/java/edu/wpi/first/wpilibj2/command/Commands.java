@@ -8,6 +8,7 @@ import static edu.wpi.first.util.ErrorMessages.requireNonNullParam;
 
 import java.util.Map;
 import java.util.function.BooleanSupplier;
+import java.util.function.DoubleConsumer;
 import java.util.function.Supplier;
 
 /**
@@ -78,6 +79,19 @@ public final class Commands {
     requireNonNullParam(end, "end", "Command.runEnd");
     return new FunctionalCommand(
         () -> {}, run, interrupted -> end.run(), () -> false, requirements);
+  }
+
+  /**
+   * Constructs a command that runs an action every iteration based on elapsed time until
+   * interrupted.
+   *
+   * @param action the action to run based on elapsed time
+   * @param requirements the subsystems to require
+   * @return the command
+   * @see TimedCommand
+   */
+  public static CommandBase runTimed(DoubleConsumer action, Subsystem... requirements) {
+    return new TimedCommand(action, requirements);
   }
 
   /**
