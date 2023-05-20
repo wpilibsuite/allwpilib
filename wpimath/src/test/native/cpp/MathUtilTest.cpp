@@ -117,3 +117,42 @@ TEST(MathUtilTest, AngleModulus) {
   EXPECT_UNITS_EQ(frc::AngleModulus(units::radian_t{-std::numbers::pi / 2}),
                   units::radian_t{-std::numbers::pi / 2});
 }
+
+TEST(MathUtilTest, IsNear) {
+  // The answer is always 42
+  // Positive integer checks
+  EXPECT_TRUE(frc::IsNear(42, 42, 1));
+  EXPECT_TRUE(frc::IsNear(42, 41, 2));
+  EXPECT_TRUE(frc::IsNear(42, 43, 2));
+  EXPECT_FALSE(frc::IsNear(42, 44, 1));
+
+  // Negative integer checks
+  EXPECT_TRUE(frc::IsNear(-42, -42, 1));
+  EXPECT_TRUE(frc::IsNear(-42, -41, 2));
+  EXPECT_TRUE(frc::IsNear(-42, -43, 2));
+  EXPECT_FALSE(frc::IsNear(-42, -44, 1));
+
+  // Mixed sign integer checks
+  EXPECT_FALSE(frc::IsNear(-42, 42, 1));
+  EXPECT_FALSE(frc::IsNear(-42, 41, 2));
+  EXPECT_FALSE(frc::IsNear(-42, 43, 2));
+  EXPECT_FALSE(frc::IsNear(42, -42, 1));
+  EXPECT_FALSE(frc::IsNear(42, -41, 2));
+  EXPECT_FALSE(frc::IsNear(42, -43, 2));
+
+  // Floating point checks
+  EXPECT_TRUE(frc::IsNear(42, 41.5, 1));
+  EXPECT_TRUE(frc::IsNear(42, 42.5, 1));
+  EXPECT_TRUE(frc::IsNear(42, 41.5, 0.75));
+  EXPECT_TRUE(frc::IsNear(42, 42.5, 0.75));
+
+  // Wraparound checks
+  EXPECT_TRUE(frc::IsNear(0, 356, 5, 0, 360));
+  EXPECT_TRUE(frc::IsNear(0, -356, 5, 0, 360));
+  EXPECT_TRUE(frc::IsNear(0, 4, 5, 0, 360));
+  EXPECT_TRUE(frc::IsNear(0, -4, 5, 0, 360));
+  EXPECT_FALSE(frc::IsNear(0, 356, 2.5, 0, 360));
+  EXPECT_FALSE(frc::IsNear(0, -356, 2.5, 0, 360));
+  EXPECT_FALSE(frc::IsNear(0, 4, 2.5, 0, 360));
+  EXPECT_FALSE(frc::IsNear(0, -4, 2.5, 0, 360));
+}

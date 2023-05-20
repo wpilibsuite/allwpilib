@@ -5,6 +5,8 @@
 package edu.wpi.first.math;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import edu.wpi.first.wpilibj.UtilityClassTest;
 import org.junit.jupiter.api.Test;
@@ -92,5 +94,45 @@ class MathUtilTest extends UtilityClassTest<MathUtil> {
     assertEquals(MathUtil.angleModulus(-5 * Math.PI), Math.PI);
     assertEquals(MathUtil.angleModulus(Math.PI / 2), Math.PI / 2);
     assertEquals(MathUtil.angleModulus(-Math.PI / 2), -Math.PI / 2);
+  }
+
+  @Test
+  void testIsNear() {
+    // The answer is always 42
+    // Positive integer checks
+    assertTrue(MathUtil.isNear(42, 42, 1));
+    assertTrue(MathUtil.isNear(42, 41, 2));
+    assertTrue(MathUtil.isNear(42, 43, 2));
+    assertFalse(MathUtil.isNear(42, 44, 1));
+
+    // Negative integer checks
+    assertTrue(MathUtil.isNear(-42, -42, 1));
+    assertTrue(MathUtil.isNear(-42, -41, 2));
+    assertTrue(MathUtil.isNear(-42, -43, 2));
+    assertFalse(MathUtil.isNear(-42, -44, 1));
+
+    // Mixed sign integer checks
+    assertFalse(MathUtil.isNear(-42, 42, 1));
+    assertFalse(MathUtil.isNear(-42, 41, 2));
+    assertFalse(MathUtil.isNear(-42, 43, 2));
+    assertFalse(MathUtil.isNear(42, -42, 1));
+    assertFalse(MathUtil.isNear(42, -41, 2));
+    assertFalse(MathUtil.isNear(42, -43, 2));
+
+    // Floating point checks
+    assertTrue(MathUtil.isNear(42, 41.5, 1));
+    assertTrue(MathUtil.isNear(42, 42.5, 1));
+    assertTrue(MathUtil.isNear(42, 41.5, 0.75));
+    assertTrue(MathUtil.isNear(42, 42.5, 0.75));
+
+    // Wraparound checks
+    assertTrue(MathUtil.isNear(0, 356, 5, 0, 360));
+    assertTrue(MathUtil.isNear(0, -356, 5, 0, 360));
+    assertTrue(MathUtil.isNear(0, 4, 5, 0, 360));
+    assertTrue(MathUtil.isNear(0, -4, 5, 0, 360));
+    assertFalse(MathUtil.isNear(0, 356, 2.5, 0, 360));
+    assertFalse(MathUtil.isNear(0, -356, 2.5, 0, 360));
+    assertFalse(MathUtil.isNear(0, 4, 2.5, 0, 360));
+    assertFalse(MathUtil.isNear(0, -4, 2.5, 0, 360));
   }
 }

@@ -106,6 +106,46 @@ constexpr T InputModulus(T input, T minimumInput, T maximumInput) {
 }
 
 /**
+ * Checks if the given value matches an expected value within a certain tolerance.
+ *
+ * @param expected The expected value
+ * @param actual The actual value
+ * @param tolerance The allowed difference between the actual and the expected value
+ * @return Whether or not the actual value is within the allowed tolerance
+ */
+template <typename T>
+constexpr bool IsNear(T expected, T actual, T tolerance) {
+  if constexpr (std::is_floating_point_v<T>) {
+    return std::abs(expected - actual) < tolerance;
+  } else {
+    return units::math::abs(expected - actual) < tolerance;
+  }
+}
+
+/**
+ * Checks if the given value matches an expected value within a certain tolerance. Supports
+ * continuous input for cases like absolute encoders
+ *
+ * @param expected The expected value
+ * @param actual The actual value
+ * @param tolerance The allowed difference between the actual and the expected value
+ * @param min The minimum value expected from the input
+ * @param max The maximum value expected from the input
+ * @return Whether or not the actual value is within the allowed tolerance
+ */
+template <typename T>
+constexpr bool IsNear(T expected, T actual, T tolerance, T min, T max) {
+  T errorBound = (max - min) / 2.0;
+  T error = frc::InputModulus<T>(expected - actual, -errorBound, errorBound);
+
+  if constexpr (std::is_floating_point_v<T>) {
+    return std::abs(error) < tolerance;
+  } else {
+    return units::math::abs(error) < tolerance;
+  }
+}
+
+/**
  * Wraps an angle to the range -pi to pi radians (-180 to 180 degrees).
  *
  * @param angle Angle to wrap.
