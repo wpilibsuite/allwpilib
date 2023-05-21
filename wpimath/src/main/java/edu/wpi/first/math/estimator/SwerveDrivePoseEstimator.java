@@ -119,6 +119,7 @@ public class SwerveDrivePoseEstimator extends PoseEstimator {
    *
    * @return The estimated robot pose in meters.
    */
+  @Override
   public Pose2d getEstimatedPosition() {
     return m_odometry.getPoseMeters();
   }

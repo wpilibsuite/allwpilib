@@ -4,10 +4,8 @@ import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.Nat;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Twist2d;
 import edu.wpi.first.math.interpolation.TimeInterpolatableBuffer;
-import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import java.util.Map;
@@ -21,6 +19,15 @@ public abstract class PoseEstimator {
   protected final TimeInterpolatableBuffer<BaseInterpolationRecord> m_poseBuffer =
       TimeInterpolatableBuffer.createBuffer(kBufferDuration);
 
+  /**
+   * Sets the pose estimator's trust of global measurements. This might be used to change trust in
+   * vision measurements after the autonomous period, or to change trust as distance to a vision
+   * target increases.
+   *
+   * @param visionMeasurementStdDevs Standard deviations of the vision measurements. Increase these
+   *     numbers to trust global measurements from vision less. This matrix is in the form [x, y,
+   *     theta]ᵀ, with units in meters and radians.
+   */
   public void setVisionMeasurementStdDevs(Matrix<N3, N1> visionMeasurementStdDevs) {
     var r = new double[3];
     for (int i = 0; i < 3; ++i) {
@@ -39,6 +46,13 @@ public abstract class PoseEstimator {
     }
   }
 
+  /**
+   * Gets the estimated robot pose.
+   *
+   * @return The estimated robot pose in meters.
+   */
+  public abstract Pose2d getEstimatedPosition();
+
   protected abstract void resetOdometry(BaseInterpolationRecord sample, Twist2d scaledTwist);
 
   protected abstract void recordCurrentPose(
@@ -51,7 +65,7 @@ public abstract class PoseEstimator {
    * while still accounting for measurement noise.
    *
    * <p>This method can be called as infrequently as you want, as long as you are calling {@link
-   * SwerveDrivePoseEstimator#update} every loop.
+   * #update} every loop.
    *
    * <p>To promote stability of the pose estimate and make it robust to bad vision data, we
    * recommend only adding vision measurements that are already within one meter or so of the
@@ -59,12 +73,11 @@ public abstract class PoseEstimator {
    *
    * @param visionRobotPoseMeters The pose of the robot as measured by the vision camera.
    * @param timestampSeconds The timestamp of the vision measurement in seconds. Note that if you
-   *     don't use your own time source by calling {@link
-   *     SwerveDrivePoseEstimator#updateWithTime(double,Rotation2d,SwerveModulePosition[])} then you
-   *     must use a timestamp with an epoch since FPGA startup (i.e., the epoch of this timestamp is
-   *     the same epoch as {@link edu.wpi.first.wpilibj.Timer#getFPGATimestamp()}.) This means that
-   *     you should use {@link edu.wpi.first.wpilibj.Timer#getFPGATimestamp()} as your time source
-   *     or sync the epochs.
+   *     don't use your own time source by calling {@link #updateWithTime} then you must use a
+   *     timestamp with an epoch since FPGA startup (i.e., the epoch of this timestamp is the same
+   *     epoch as {@link edu.wpi.first.wpilibj.Timer#getFPGATimestamp()}.) This means that you
+   *     should use {@link edu.wpi.first.wpilibj.Timer#getFPGATimestamp()} as your time source or
+   *     sync the epochs.
    */
   public void addVisionMeasurement(Pose2d visionRobotPoseMeters, double timestampSeconds) {
     // Step 0: If this measurement is old enough to be outside the pose buffer's timespan, skip.
@@ -112,7 +125,7 @@ public abstract class PoseEstimator {
    * while still accounting for measurement noise.
    *
    * <p>This method can be called as infrequently as you want, as long as you are calling {@link
-   * SwerveDrivePoseEstimator#update} every loop.
+   * #update} every loop.
    *
    * <p>To promote stability of the pose estimate and make it robust to bad vision data, we
    * recommend only adding vision measurements that are already within one meter or so of the
@@ -120,16 +133,15 @@ public abstract class PoseEstimator {
    *
    * <p>Note that the vision measurement standard deviations passed into this method will continue
    * to apply to future measurements until a subsequent call to {@link
-   * SwerveDrivePoseEstimator#setVisionMeasurementStdDevs(Matrix)} or this method.
+   * #setVisionMeasurementStdDevs(Matrix)} or this method.
    *
    * @param visionRobotPoseMeters The pose of the robot as measured by the vision camera.
    * @param timestampSeconds The timestamp of the vision measurement in seconds. Note that if you
-   *     don't use your own time source by calling {@link
-   *     SwerveDrivePoseEstimator#updateWithTime(double,Rotation2d,SwerveModulePosition[])}, then
-   *     you must use a timestamp with an epoch since FPGA startup (i.e., the epoch of this
-   *     timestamp is the same epoch as {@link edu.wpi.first.wpilibj.Timer#getFPGATimestamp()}).
-   *     This means that you should use {@link edu.wpi.first.wpilibj.Timer#getFPGATimestamp()} as
-   *     your time source in this case.
+   *     don't use your own time source by calling {@link #updateWithTime}, then you must use a
+   *     timestamp with an epoch since FPGA startup (i.e., the epoch of this timestamp is the same
+   *     epoch as {@link edu.wpi.first.wpilibj.Timer#getFPGATimestamp()}). This means that you
+   *     should use {@link edu.wpi.first.wpilibj.Timer#getFPGATimestamp()} as your time source in
+   *     this case.
    * @param visionMeasurementStdDevs Standard deviations of the vision pose measurement (x position
    *     in meters, y position in meters, and heading in radians). Increase these numbers to trust
    *     the vision pose measurement less.
