@@ -41,7 +41,8 @@ public abstract class RobotPoseEstimator {
 
   protected abstract void resetOdometry(BaseInterpolationRecord sample, Twist2d scaledTwist);
 
-  protected abstract void recordCurrentPose(BaseInterpolationRecord sample, double timestampSeconds);
+  protected abstract void recordCurrentPose(
+      BaseInterpolationRecord sample, double timestampSeconds);
 
   protected abstract void replayOdometryInputs(Map.Entry<Double, BaseInterpolationRecord> entry);
 
