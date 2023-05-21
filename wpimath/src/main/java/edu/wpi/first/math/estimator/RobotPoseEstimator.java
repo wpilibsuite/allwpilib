@@ -14,7 +14,7 @@ import java.util.Map;
 import java.util.NoSuchElementException;
 
 public abstract class RobotPoseEstimator {
-  private final Matrix<N3, N1> m_q = new Matrix<>(Nat.N3(), Nat.N1());
+  protected final Matrix<N3, N1> m_q = new Matrix<>(Nat.N3(), Nat.N1());
   private Matrix<N3, N3> m_visionK = new Matrix<>(Nat.N3(), Nat.N3());
   private static final double kBufferDuration = 1.5;
 
@@ -39,11 +39,11 @@ public abstract class RobotPoseEstimator {
     }
   }
 
-  public abstract void resetOdometry(BaseInterpolationRecord sample, Twist2d scaledTwist);
+  protected abstract void resetOdometry(BaseInterpolationRecord sample, Twist2d scaledTwist);
 
-  public abstract void recordCurrentPose(BaseInterpolationRecord sample, double timestampSeconds);
+  protected abstract void recordCurrentPose(BaseInterpolationRecord sample, double timestampSeconds);
 
-  public abstract void replayOdometryInputs(Map.Entry<Double, BaseInterpolationRecord> entry);
+  protected abstract void replayOdometryInputs(Map.Entry<Double, BaseInterpolationRecord> entry);
 
   /**
    * Adds a vision measurement to the Kalman Filter. This will correct the odometry pose estimate

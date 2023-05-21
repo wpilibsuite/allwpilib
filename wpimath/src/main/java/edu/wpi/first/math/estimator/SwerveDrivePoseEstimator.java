@@ -35,14 +35,9 @@ import java.util.Objects;
 public class SwerveDrivePoseEstimator extends RobotPoseEstimator {
   private final SwerveDriveKinematics m_kinematics;
   private final SwerveDriveOdometry m_odometry;
-  private final Matrix<N3, N1> m_q = new Matrix<>(Nat.N3(), Nat.N1());
   private final int m_numModules;
-  private Matrix<N3, N3> m_visionK = new Matrix<>(Nat.N3(), Nat.N3());
 
   private static final double kBufferDuration = 1.5;
-
-  // private final TimeInterpolatableBuffer<InterpolationRecord> m_poseBuffer =
-  //     TimeInterpolatableBuffer.createBuffer(kBufferDuration);
 
   /**
    * Constructs a SwerveDrivePoseEstimator with default standard deviations for the model and vision
@@ -131,14 +126,14 @@ public class SwerveDrivePoseEstimator extends RobotPoseEstimator {
   }
 
   @Override
-  public void resetOdometry(BaseInterpolationRecord sample, Twist2d scaledTwist) {
+  protected void resetOdometry(BaseInterpolationRecord sample, Twist2d scaledTwist) {
     InterpolationRecord pose = (InterpolationRecord) sample;
     m_odometry.resetPosition(
         pose.gyroAngle, pose.modulePositions, pose.poseMeters.exp(scaledTwist));
   }
 
   @Override
-  public void recordCurrentPose(BaseInterpolationRecord sample, double timestampSeconds) {
+  protected void recordCurrentPose(BaseInterpolationRecord sample, double timestampSeconds) {
     InterpolationRecord pose = (InterpolationRecord) sample;
     m_poseBuffer.addSample(
         timestampSeconds,
@@ -146,7 +141,7 @@ public class SwerveDrivePoseEstimator extends RobotPoseEstimator {
   }
 
   @Override
-  public void replayOdometryInputs(Entry<Double, BaseInterpolationRecord> entry) {
+  protected void replayOdometryInputs(Entry<Double, BaseInterpolationRecord> entry) {
     updateWithTime(
         entry.getKey(),
         entry.getValue().gyroAngle,
