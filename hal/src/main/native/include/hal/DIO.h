@@ -227,7 +227,7 @@ int32_t HAL_GetFilterSelect(HAL_DigitalHandle dioPortHandle, int32_t* status);
  *
  * Sets the filter period in FPGA cycles.  Even though there are 2 different
  * filter index domains (MXP vs HDR), ignore that distinction for now since it
- * compilicates the interface.  That can be changed later.
+ * complicates the interface.  That can be changed later.
  *
  * @param[in] filterIndex the filter index, 0 - 2
  * @param[in] value       the number of cycles that the signal must not
@@ -242,10 +242,11 @@ void HAL_SetFilterPeriod(int32_t filterIndex, int64_t value, int32_t* status);
  * Gets the filter period in FPGA cycles.  Even though there are 2 different
  * filter index domains (MXP vs HDR), ignore that distinction for now since it
  * complicates the interface.  Set status to NiFpga_Status_SoftwareFault if the
- * filter values miss-match.
+ * filter values mismatch.
  *
  * @param[in] filterIndex the filter index, 0 - 2
  * @param[out] status     Error status variable. 0 on success.
+ * @return                The number of FPGA cycles of the filter period.
  */
 int64_t HAL_GetFilterPeriod(int32_t filterIndex, int32_t* status);
 #ifdef __cplusplus
