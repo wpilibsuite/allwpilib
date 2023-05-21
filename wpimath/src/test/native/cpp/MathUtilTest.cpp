@@ -155,4 +155,5 @@ TEST(MathUtilTest, IsNear) {
   EXPECT_FALSE(frc::IsNear<double>(0, -356, 2.5, 0, 360));
   EXPECT_FALSE(frc::IsNear<double>(0, 4, 2.5, 0, 360));
   EXPECT_FALSE(frc::IsNear<double>(0, -4, 2.5, 0, 360));
+  EXPECT_FALSE(frc::IsNear(0_deg, -4_deg, 2.5_deg, 0_deg, 360_deg));
 }
