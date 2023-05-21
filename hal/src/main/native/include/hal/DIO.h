@@ -37,7 +37,7 @@ HAL_DigitalHandle HAL_InitializeDIOPort(HAL_PortHandle portHandle,
  * Checks if a DIO channel is valid.
  *
  * @param channel the channel number to check
- * @return true if the channel is correct, otherwise false
+ * @return true if the channel is valid, otherwise false
  */
 HAL_Bool HAL_CheckDIOChannel(int32_t channel);
 
@@ -77,7 +77,7 @@ void HAL_FreeDigitalPWM(HAL_DigitalPWMHandle pwmGenerator, int32_t* status);
  *
  * The valid range is from 0.6 Hz to 19 kHz.
  *
- *  The frequency resolution is logarithmic.
+ * The frequency resolution is logarithmic.
  *
  * @param[in] rate the frequency to output all digital output PWM signals
  * @param[out] status Error status variable. 0 on success.
