@@ -13,7 +13,7 @@ import edu.wpi.first.math.numbers.N3;
 import java.util.Map;
 import java.util.NoSuchElementException;
 
-public abstract class RobotPoseEstimator {
+public abstract class PoseEstimator {
   protected final Matrix<N3, N1> m_q = new Matrix<>(Nat.N3(), Nat.N1());
   private Matrix<N3, N3> m_visionK = new Matrix<>(Nat.N3(), Nat.N3());
   private static final double kBufferDuration = 1.5;

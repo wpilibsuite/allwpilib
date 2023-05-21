@@ -30,7 +30,7 @@ import java.util.Objects;
  * <p>{@link SwerveDrivePoseEstimator#addVisionMeasurement} can be called as infrequently as you
  * want; if you never call it, then this class will behave as regular encoder odometry.
  */
-public class SwerveDrivePoseEstimator extends RobotPoseEstimator {
+public class SwerveDrivePoseEstimator extends PoseEstimator {
   private final SwerveDriveKinematics m_kinematics;
   private final SwerveDriveOdometry m_odometry;
   private final int m_numModules;
