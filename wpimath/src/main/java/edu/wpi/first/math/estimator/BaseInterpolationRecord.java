@@ -20,5 +20,6 @@ abstract class BaseInterpolationRecord implements Interpolatable<BaseInterpolati
     this.gyroAngle = gyro;
   }
 
-  abstract BaseInterpolationRecord interpolate(BaseInterpolationRecord endValue, double t);
+  @Override
+  public abstract BaseInterpolationRecord interpolate(BaseInterpolationRecord endValue, double t);
 }
