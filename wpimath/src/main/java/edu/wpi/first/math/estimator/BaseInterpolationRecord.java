@@ -15,12 +15,11 @@ abstract class BaseInterpolationRecord implements Interpolatable<BaseInterpolati
   // The current gyro angle.
   protected final Rotation2d gyroAngle;
 
-  public BaseInterpolationRecord(Pose2d poseMeters, Rotation2d gyro) {
+  BaseInterpolationRecord(Pose2d poseMeters, Rotation2d gyro) {
     this.poseMeters = poseMeters;
     this.gyroAngle = gyro;
   }
-  //CHECKSTYLE.OFF: RedundantModifier
+
   @Override
   public abstract BaseInterpolationRecord interpolate(BaseInterpolationRecord endValue, double t);
-  //CHECKSTYLE.ON
 }
