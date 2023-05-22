@@ -8,7 +8,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.interpolation.Interpolatable;
 
-abstract class BaseInterpolationRecord implements Interpolatable<BaseInterpolationRecord> {
+abstract class BaseInterpolationRecord<T> implements Interpolatable<T> {
   // The pose observed given the current sensor inputs and the previous pose.
   protected final Pose2d poseMeters;
 
@@ -21,5 +21,5 @@ abstract class BaseInterpolationRecord implements Interpolatable<BaseInterpolati
   }
 
   @Override
-  public abstract BaseInterpolationRecord interpolate(BaseInterpolationRecord endValue, double t);
+  public abstract T interpolate(T endValue, double t);
 }

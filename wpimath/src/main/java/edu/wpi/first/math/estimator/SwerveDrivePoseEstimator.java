@@ -8,9 +8,11 @@ import edu.wpi.first.math.MathSharedStore;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.VecBuilder;
+import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator.InterpolationRecord;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Twist2d;
+import edu.wpi.first.math.interpolation.Interpolatable;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
@@ -30,7 +32,7 @@ import java.util.Objects;
  * <p>{@link SwerveDrivePoseEstimator#addVisionMeasurement} can be called as infrequently as you
  * want; if you never call it, then this class will behave as regular encoder odometry.
  */
-public class SwerveDrivePoseEstimator extends PoseEstimator {
+public class SwerveDrivePoseEstimator extends PoseEstimator<InterpolationRecord> {
   private final SwerveDriveKinematics m_kinematics;
   private final SwerveDriveOdometry m_odometry;
   private final int m_numModules;
@@ -123,26 +125,21 @@ public class SwerveDrivePoseEstimator extends PoseEstimator {
   }
 
   @Override
-  protected void resetOdometry(BaseInterpolationRecord sample, Twist2d scaledTwist) {
-    InterpolationRecord pose = (InterpolationRecord) sample;
+  protected void resetOdometry(InterpolationRecord sample, Twist2d scaledTwist) {
     m_odometry.resetPosition(
-        pose.gyroAngle, pose.modulePositions, pose.poseMeters.exp(scaledTwist));
+        sample.gyroAngle, sample.modulePositions, sample.poseMeters.exp(scaledTwist));
   }
 
   @Override
-  protected void recordCurrentPose(BaseInterpolationRecord sample, double timestampSeconds) {
-    InterpolationRecord pose = (InterpolationRecord) sample;
+  protected void recordCurrentPose(InterpolationRecord sample, double timestampSeconds) {
     m_poseBuffer.addSample(
         timestampSeconds,
-        new InterpolationRecord(getEstimatedPosition(), pose.gyroAngle, pose.modulePositions));
+        new InterpolationRecord(getEstimatedPosition(), sample.gyroAngle, sample.modulePositions));
   }
 
   @Override
-  protected void replayOdometryInputs(Entry<Double, BaseInterpolationRecord> entry) {
-    updateWithTime(
-        entry.getKey(),
-        entry.getValue().gyroAngle,
-        ((InterpolationRecord) entry.getValue()).modulePositions);
+  protected void replayOdometryInputs(Entry<Double, InterpolationRecord> entry) {
+    updateWithTime(entry.getKey(), entry.getValue().gyroAngle, entry.getValue().modulePositions);
   }
 
   /**
@@ -194,13 +191,8 @@ public class SwerveDrivePoseEstimator extends PoseEstimator {
    * Represents an odometry record. The record contains the inputs provided as well as the pose that
    * was observed based on these inputs, as well as the previous record and its inputs.
    */
-  private class InterpolationRecord extends BaseInterpolationRecord {
-    // The pose observed given the current sensor inputs and the previous pose.
-    private final Pose2d poseMeters;
-
-    // The current gyro angle.
-    private final Rotation2d gyroAngle;
-
+  class InterpolationRecord extends BaseInterpolationRecord<InterpolationRecord>
+      implements Interpolatable<InterpolationRecord> {
     // The distances and rotations measured at each module.
     private final SwerveModulePosition[] modulePositions;
 
@@ -214,8 +206,6 @@ public class SwerveDrivePoseEstimator extends PoseEstimator {
     private InterpolationRecord(
         Pose2d poseMeters, Rotation2d gyro, SwerveModulePosition[] modulePositions) {
       super(poseMeters, gyro);
-      this.poseMeters = poseMeters;
-      this.gyroAngle = gyro;
       this.modulePositions = modulePositions;
     }
 
@@ -228,12 +218,11 @@ public class SwerveDrivePoseEstimator extends PoseEstimator {
      * @return The interpolated value.
      */
     @Override
-    public InterpolationRecord interpolate(BaseInterpolationRecord endValue, double t) {
-      InterpolationRecord endVal = (InterpolationRecord) endValue;
+    public InterpolationRecord interpolate(InterpolationRecord endValue, double t) {
       if (t < 0) {
         return this;
       } else if (t >= 1) {
-        return endVal;
+        return endValue;
       } else {
         // Find the new wheel distances.
         var modulePositions = new SwerveModulePosition[m_numModules];
@@ -245,17 +234,17 @@ public class SwerveDrivePoseEstimator extends PoseEstimator {
           double ds =
               MathUtil.interpolate(
                   this.modulePositions[i].distanceMeters,
-                  endVal.modulePositions[i].distanceMeters,
+                  endValue.modulePositions[i].distanceMeters,
                   t);
           Rotation2d theta =
-              this.modulePositions[i].angle.interpolate(endVal.modulePositions[i].angle, t);
+              this.modulePositions[i].angle.interpolate(endValue.modulePositions[i].angle, t);
           modulePositions[i] = new SwerveModulePosition(ds, theta);
           moduleDeltas[i] =
               new SwerveModulePosition(ds - this.modulePositions[i].distanceMeters, theta);
         }
 
         // Find the new gyro angle.
-        var gyro_lerp = gyroAngle.interpolate(endVal.gyroAngle, t);
+        var gyro_lerp = gyroAngle.interpolate(endValue.gyroAngle, t);
 
         // Create a twist to represent this change based on the interpolated sensor inputs.
         Twist2d twist = m_kinematics.toTwist2d(moduleDeltas);

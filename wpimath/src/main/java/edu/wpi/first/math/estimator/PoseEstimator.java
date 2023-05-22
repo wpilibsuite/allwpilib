@@ -15,12 +15,12 @@ import edu.wpi.first.math.numbers.N3;
 import java.util.Map;
 import java.util.NoSuchElementException;
 
-public abstract class PoseEstimator {
+public abstract class PoseEstimator<T extends BaseInterpolationRecord<T>> {
   protected final Matrix<N3, N1> m_q = new Matrix<>(Nat.N3(), Nat.N1());
   private Matrix<N3, N3> m_visionK = new Matrix<>(Nat.N3(), Nat.N3());
   private static final double kBufferDuration = 1.5;
 
-  protected final TimeInterpolatableBuffer<BaseInterpolationRecord> m_poseBuffer =
+  protected final TimeInterpolatableBuffer<T> m_poseBuffer =
       TimeInterpolatableBuffer.createBuffer(kBufferDuration);
 
   /**
@@ -57,12 +57,11 @@ public abstract class PoseEstimator {
    */
   public abstract Pose2d getEstimatedPosition();
 
-  protected abstract void resetOdometry(BaseInterpolationRecord sample, Twist2d scaledTwist);
+  protected abstract void resetOdometry(T sample, Twist2d scaledTwist);
 
-  protected abstract void recordCurrentPose(
-      BaseInterpolationRecord sample, double timestampSeconds);
+  protected abstract void recordCurrentPose(T sample, double timestampSeconds);
 
-  protected abstract void replayOdometryInputs(Map.Entry<Double, BaseInterpolationRecord> entry);
+  protected abstract void replayOdometryInputs(Map.Entry<Double, T> entry);
 
   /**
    * Adds a vision measurement to the Kalman Filter. This will correct the odometry pose estimate
@@ -119,7 +118,7 @@ public abstract class PoseEstimator {
 
     // Step 7: Replay odometry inputs between sample time and latest recorded sample to update the
     // pose buffer and correct odometry.
-    for (Map.Entry<Double, BaseInterpolationRecord> entry :
+    for (Map.Entry<Double, T> entry :
         m_poseBuffer.getInternalBuffer().tailMap(timestampSeconds).entrySet()) {
       replayOdometryInputs(entry);
     }
