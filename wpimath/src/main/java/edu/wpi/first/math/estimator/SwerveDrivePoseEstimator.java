@@ -12,7 +12,6 @@ import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator.InterpolationRecord
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Twist2d;
-import edu.wpi.first.math.interpolation.Interpolatable;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
@@ -191,8 +190,7 @@ public class SwerveDrivePoseEstimator extends PoseEstimator<InterpolationRecord>
    * Represents an odometry record. The record contains the inputs provided as well as the pose that
    * was observed based on these inputs, as well as the previous record and its inputs.
    */
-  class InterpolationRecord extends BaseInterpolationRecord<InterpolationRecord>
-      implements Interpolatable<InterpolationRecord> {
+  class InterpolationRecord extends BaseInterpolationRecord<InterpolationRecord> {
     // The distances and rotations measured at each module.
     private final SwerveModulePosition[] modulePositions;
 
