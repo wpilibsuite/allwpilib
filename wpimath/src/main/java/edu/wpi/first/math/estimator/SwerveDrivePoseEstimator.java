@@ -35,8 +35,6 @@ public class SwerveDrivePoseEstimator extends PoseEstimator {
   private final SwerveDriveOdometry m_odometry;
   private final int m_numModules;
 
-  private static final double kBufferDuration = 1.5;
-
   /**
    * Constructs a SwerveDrivePoseEstimator with default standard deviations for the model and vision
    * measurements.
