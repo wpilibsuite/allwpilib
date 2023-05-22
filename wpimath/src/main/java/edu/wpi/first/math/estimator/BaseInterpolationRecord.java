@@ -19,7 +19,8 @@ abstract class BaseInterpolationRecord implements Interpolatable<BaseInterpolati
     this.poseMeters = poseMeters;
     this.gyroAngle = gyro;
   }
-
+  //CHECKSTYLE.OFF: RedundantModifier
   @Override
   public abstract BaseInterpolationRecord interpolate(BaseInterpolationRecord endValue, double t);
+  //CHECKSTYLE.ON
 }
