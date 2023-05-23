@@ -7,20 +7,17 @@ package edu.wpi.first.math.estimator;
 import edu.wpi.first.math.MathSharedStore;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.Matrix;
-import edu.wpi.first.math.Nat;
 import edu.wpi.first.math.VecBuilder;
+import edu.wpi.first.math.estimator.MecanumDrivePoseEstimator.InterpolationRecord;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Twist2d;
-import edu.wpi.first.math.interpolation.Interpolatable;
-import edu.wpi.first.math.interpolation.TimeInterpolatableBuffer;
 import edu.wpi.first.math.kinematics.MecanumDriveKinematics;
 import edu.wpi.first.math.kinematics.MecanumDriveOdometry;
 import edu.wpi.first.math.kinematics.MecanumDriveWheelPositions;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
-import java.util.Map;
-import java.util.NoSuchElementException;
+import java.util.Map.Entry;
 import java.util.Objects;
 
 /**
@@ -34,16 +31,9 @@ import java.util.Objects;
  * <p>{@link MecanumDrivePoseEstimator#addVisionMeasurement} can be called as infrequently as you
  * want; if you never call it, then this class will behave mostly like regular encoder odometry.
  */
-public class MecanumDrivePoseEstimator {
+public class MecanumDrivePoseEstimator extends PoseEstimator<InterpolationRecord> {
   private final MecanumDriveKinematics m_kinematics;
   private final MecanumDriveOdometry m_odometry;
-  private final Matrix<N3, N1> m_q = new Matrix<>(Nat.N3(), Nat.N1());
-  private Matrix<N3, N3> m_visionK = new Matrix<>(Nat.N3(), Nat.N3());
-
-  private static final double kBufferDuration = 1.5;
-
-  private final TimeInterpolatableBuffer<InterpolationRecord> m_poseBuffer =
-      TimeInterpolatableBuffer.createBuffer(kBufferDuration);
 
   /**
    * Constructs a MecanumDrivePoseEstimator with default standard deviations for the model and
@@ -105,33 +95,6 @@ public class MecanumDrivePoseEstimator {
   }
 
   /**
-   * Sets the pose estimator's trust of global measurements. This might be used to change trust in
-   * vision measurements after the autonomous period, or to change trust as distance to a vision
-   * target increases.
-   *
-   * @param visionMeasurementStdDevs Standard deviations of the vision measurements. Increase these
-   *     numbers to trust global measurements from vision less. This matrix is in the form [x, y,
-   *     theta]ᵀ, with units in meters and radians.
-   */
-  public void setVisionMeasurementStdDevs(Matrix<N3, N1> visionMeasurementStdDevs) {
-    var r = new double[3];
-    for (int i = 0; i < 3; ++i) {
-      r[i] = visionMeasurementStdDevs.get(i, 0) * visionMeasurementStdDevs.get(i, 0);
-    }
-
-    // Solve for closed form Kalman gain for continuous Kalman filter with A = 0
-    // and C = I. See wpimath/algorithms.md.
-    for (int row = 0; row < 3; ++row) {
-      if (m_q.get(row, 0) == 0.0) {
-        m_visionK.set(row, row, 0.0);
-      } else {
-        m_visionK.set(
-            row, row, m_q.get(row, 0) / (m_q.get(row, 0) + Math.sqrt(m_q.get(row, 0) * r[row])));
-      }
-    }
-  }
-
-  /**
    * Resets the robot's position on the field.
    *
    * <p>The gyroscope angle does not need to be reset in the user's robot code. The library
@@ -153,111 +116,27 @@ public class MecanumDrivePoseEstimator {
    *
    * @return The estimated robot pose in meters.
    */
+  @Override
   public Pose2d getEstimatedPosition() {
     return m_odometry.getPoseMeters();
   }
 
-  /**
-   * Adds a vision measurement to the Kalman Filter. This will correct the odometry pose estimate
-   * while still accounting for measurement noise.
-   *
-   * <p>This method can be called as infrequently as you want, as long as you are calling {@link
-   * MecanumDrivePoseEstimator#update} every loop.
-   *
-   * <p>To promote stability of the pose estimate and make it robust to bad vision data, we
-   * recommend only adding vision measurements that are already within one meter or so of the
-   * current pose estimate.
-   *
-   * @param visionRobotPoseMeters The pose of the robot as measured by the vision camera.
-   * @param timestampSeconds The timestamp of the vision measurement in seconds. Note that if you
-   *     don't use your own time source by calling {@link
-   *     MecanumDrivePoseEstimator#updateWithTime(double,Rotation2d,MecanumDriveWheelPositions)}
-   *     then you must use a timestamp with an epoch since FPGA startup (i.e., the epoch of this
-   *     timestamp is the same epoch as {@link edu.wpi.first.wpilibj.Timer#getFPGATimestamp()}.)
-   *     This means that you should use {@link edu.wpi.first.wpilibj.Timer#getFPGATimestamp()} as
-   *     your time source or sync the epochs.
-   */
-  public void addVisionMeasurement(Pose2d visionRobotPoseMeters, double timestampSeconds) {
-    // Step 0: If this measurement is old enough to be outside the pose buffer's timespan, skip.
-    try {
-      if (m_poseBuffer.getInternalBuffer().lastKey() - kBufferDuration > timestampSeconds) {
-        return;
-      }
-    } catch (NoSuchElementException ex) {
-      return;
-    }
-
-    // Step 1: Get the pose odometry measured at the moment the vision measurement was made.
-    var sample = m_poseBuffer.getSample(timestampSeconds);
-
-    if (sample.isEmpty()) {
-      return;
-    }
-
-    // Step 2: Measure the twist between the odometry pose and the vision pose.
-    var twist = sample.get().poseMeters.log(visionRobotPoseMeters);
-
-    // Step 3: We should not trust the twist entirely, so instead we scale this twist by a Kalman
-    // gain matrix representing how much we trust vision measurements compared to our current pose.
-    var k_times_twist = m_visionK.times(VecBuilder.fill(twist.dx, twist.dy, twist.dtheta));
-
-    // Step 4: Convert back to Twist2d.
-    var scaledTwist =
-        new Twist2d(k_times_twist.get(0, 0), k_times_twist.get(1, 0), k_times_twist.get(2, 0));
-
-    // Step 5: Reset Odometry to state at sample with vision adjustment.
+  @Override
+  protected void resetOdometry(InterpolationRecord sample, Twist2d scaledTwist) {
     m_odometry.resetPosition(
-        sample.get().gyroAngle,
-        sample.get().wheelPositions,
-        sample.get().poseMeters.exp(scaledTwist));
-
-    // Step 6: Record the current pose to allow multiple measurements from the same timestamp
-    m_poseBuffer.addSample(
-        timestampSeconds,
-        new InterpolationRecord(
-            getEstimatedPosition(), sample.get().gyroAngle, sample.get().wheelPositions));
-
-    // Step 7: Replay odometry inputs between sample time and latest recorded sample to update the
-    // pose buffer and correct odometry.
-    for (Map.Entry<Double, InterpolationRecord> entry :
-        m_poseBuffer.getInternalBuffer().tailMap(timestampSeconds).entrySet()) {
-      updateWithTime(entry.getKey(), entry.getValue().gyroAngle, entry.getValue().wheelPositions);
-    }
+        sample.gyroAngle, sample.wheelPositions, sample.poseMeters.exp(scaledTwist));
   }
 
-  /**
-   * Adds a vision measurement to the Kalman Filter. This will correct the odometry pose estimate
-   * while still accounting for measurement noise.
-   *
-   * <p>This method can be called as infrequently as you want, as long as you are calling {@link
-   * MecanumDrivePoseEstimator#update} every loop.
-   *
-   * <p>To promote stability of the pose estimate and make it robust to bad vision data, we
-   * recommend only adding vision measurements that are already within one meter or so of the
-   * current pose estimate.
-   *
-   * <p>Note that the vision measurement standard deviations passed into this method will continue
-   * to apply to future measurements until a subsequent call to {@link
-   * MecanumDrivePoseEstimator#setVisionMeasurementStdDevs(Matrix)} or this method.
-   *
-   * @param visionRobotPoseMeters The pose of the robot as measured by the vision camera.
-   * @param timestampSeconds The timestamp of the vision measurement in seconds. Note that if you
-   *     don't use your own time source by calling {@link
-   *     MecanumDrivePoseEstimator#updateWithTime(double,Rotation2d,MecanumDriveWheelPositions)},
-   *     then you must use a timestamp with an epoch since FPGA startup (i.e., the epoch of this
-   *     timestamp is the same epoch as {@link edu.wpi.first.wpilibj.Timer#getFPGATimestamp()}).
-   *     This means that you should use {@link edu.wpi.first.wpilibj.Timer#getFPGATimestamp()} as
-   *     your time source in this case.
-   * @param visionMeasurementStdDevs Standard deviations of the vision pose measurement (x position
-   *     in meters, y position in meters, and heading in radians). Increase these numbers to trust
-   *     the vision pose measurement less.
-   */
-  public void addVisionMeasurement(
-      Pose2d visionRobotPoseMeters,
-      double timestampSeconds,
-      Matrix<N3, N1> visionMeasurementStdDevs) {
-    setVisionMeasurementStdDevs(visionMeasurementStdDevs);
-    addVisionMeasurement(visionRobotPoseMeters, timestampSeconds);
+  @Override
+  protected void recordCurrentPose(InterpolationRecord sample, double timestampSeconds) {
+    m_poseBuffer.addSample(
+        timestampSeconds,
+        new InterpolationRecord(getEstimatedPosition(), sample.gyroAngle, sample.wheelPositions));
+  }
+  
+  @Override
+  protected void replayOdometryInputs(Entry<Double, InterpolationRecord> entry) {
+    updateWithTime(entry.getKey(), entry.getValue().gyroAngle, entry.getValue().wheelPositions);
   }
 
   /**
@@ -303,13 +182,7 @@ public class MecanumDrivePoseEstimator {
    * Represents an odometry record. The record contains the inputs provided as well as the pose that
    * was observed based on these inputs, as well as the previous record and its inputs.
    */
-  private class InterpolationRecord implements Interpolatable<InterpolationRecord> {
-    // The pose observed given the current sensor inputs and the previous pose.
-    private final Pose2d poseMeters;
-
-    // The current gyro angle.
-    private final Rotation2d gyroAngle;
-
+  class InterpolationRecord extends BaseInterpolationRecord<InterpolationRecord> {
     // The distances traveled by each wheel encoder.
     private final MecanumDriveWheelPositions wheelPositions;
 
@@ -322,8 +195,7 @@ public class MecanumDrivePoseEstimator {
      */
     private InterpolationRecord(
         Pose2d poseMeters, Rotation2d gyro, MecanumDriveWheelPositions wheelPositions) {
-      this.poseMeters = poseMeters;
-      this.gyroAngle = gyro;
+      super(poseMeters, gyro);
       this.wheelPositions = wheelPositions;
     }
 
