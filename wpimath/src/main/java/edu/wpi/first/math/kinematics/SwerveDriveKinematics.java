@@ -32,7 +32,16 @@ import org.ejml.simple.SimpleMatrix;
  * <p>Forward kinematics is also used for odometry -- determining the position of the robot on the
  * field using encoders and a gyro.
  */
-public class SwerveDriveKinematics {
+public class SwerveDriveKinematics
+    implements Kinematics<SwerveDriveKinematics.SwerveDriveWheelStates, SwerveDriveWheelPositions> {
+  public static class SwerveDriveWheelStates {
+    public SwerveModuleState[] states;
+
+    public SwerveDriveWheelStates(SwerveModuleState[] states) {
+      this.states = states;
+    }
+  }
+
   private final SimpleMatrix m_inverseKinematics;
   private final SimpleMatrix m_forwardKinematics;
 
@@ -158,6 +167,16 @@ public class SwerveDriveKinematics {
     return toSwerveModuleStates(chassisSpeeds, new Translation2d());
   }
 
+  @Override
+  public SwerveDriveWheelStates toWheelSpeeds(ChassisSpeeds chassisSpeeds) {
+    return new SwerveDriveWheelStates(toSwerveModuleStates(chassisSpeeds));
+  }
+
+  @Override
+  public ChassisSpeeds toChassisSpeeds(SwerveDriveWheelStates wheelStates) {
+    return toChassisSpeeds(wheelStates.states);
+  }
+
   /**
    * Performs forward kinematics to return the resulting chassis state from the given module states.
    * This method is often used for odometry -- determining the robot's position on the field using
@@ -187,6 +206,11 @@ public class SwerveDriveKinematics {
         chassisSpeedsVector.get(0, 0),
         chassisSpeedsVector.get(1, 0),
         chassisSpeedsVector.get(2, 0));
+  }
+
+  @Override
+  public Twist2d toTwist2d(SwerveDriveWheelPositions wheelDeltas) {
+    return toTwist2d(wheelDeltas.positions);
   }
 
   /**
