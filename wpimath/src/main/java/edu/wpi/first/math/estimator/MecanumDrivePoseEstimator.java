@@ -133,7 +133,7 @@ public class MecanumDrivePoseEstimator extends PoseEstimator<InterpolationRecord
         timestampSeconds,
         new InterpolationRecord(getEstimatedPosition(), sample.gyroAngle, sample.wheelPositions));
   }
-  
+
   @Override
   protected void replayOdometryInputs(Entry<Double, InterpolationRecord> entry) {
     updateWithTime(entry.getKey(), entry.getValue().gyroAngle, entry.getValue().wheelPositions);
