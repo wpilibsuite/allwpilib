@@ -128,8 +128,15 @@ constexpr bool IsNear(T expected, T actual, T tolerance) {
 
 /**
  * Checks if the given value matches an expected value within a certain
- * tolerance. Supports continuous input for cases like absolute encoders
+ * tolerance. Supports continuous input for cases like absolute encoders.
  *
+ * Continuous input means that the min and max value are considered to be the
+ * same point, and tolerances can be checked across them. A common example
+ * would be for absolute encoders: calling isNear(2, 359, 5, 0, 360) returns
+ * true because 359 is 1 away from 360(which is treated as the same as 0,) and
+ * 2 is 2 away from 0, adding up to an error of 3 degrees, which is within the
+ * given tolerance of 5.
+ * 
  * @param expected The expected value
  * @param actual The actual value
  * @param tolerance The allowed difference between the actual and the expected

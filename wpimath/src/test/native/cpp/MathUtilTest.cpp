@@ -151,9 +151,15 @@ TEST(MathUtilTest, IsNear) {
   EXPECT_TRUE(frc::IsNear(0, -356, 5, 0, 360));
   EXPECT_TRUE(frc::IsNear(0, 4, 5, 0, 360));
   EXPECT_TRUE(frc::IsNear(0, -4, 5, 0, 360));
+  EXPECT_TRUE(frc::IsNear(400, 41, 5, 0, 360));
+  EXPECT_TRUE(frc::IsNear(400, -319, 5, 0, 360));
+  EXPECT_TRUE(frc::IsNear(400, 401, 5, 0, 360));
   EXPECT_FALSE(frc::IsNear<double>(0, 356, 2.5, 0, 360));
   EXPECT_FALSE(frc::IsNear<double>(0, -356, 2.5, 0, 360));
   EXPECT_FALSE(frc::IsNear<double>(0, 4, 2.5, 0, 360));
   EXPECT_FALSE(frc::IsNear<double>(0, -4, 2.5, 0, 360));
+  EXPECT_FALSE(frc::IsNear(400, 35, 5, 0, 360));
+  EXPECT_FALSE(frc::IsNear(400, -315, 5, 0, 360));
+  EXPECT_FALSE(frc::IsNear(400, 395, 5, 0, 360));
   EXPECT_FALSE(frc::IsNear(0_deg, -4_deg, 2.5_deg, 0_deg, 360_deg));
 }

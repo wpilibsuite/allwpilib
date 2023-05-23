@@ -130,9 +130,15 @@ class MathUtilTest extends UtilityClassTest<MathUtil> {
     assertTrue(MathUtil.isNear(0, -356, 5, 0, 360));
     assertTrue(MathUtil.isNear(0, 4, 5, 0, 360));
     assertTrue(MathUtil.isNear(0, -4, 5, 0, 360));
+    assertTrue(MathUtil.isNear(400, 41, 5, 0, 360));
+    assertTrue(MathUtil.isNear(400, -319, 5, 0, 360));
+    assertTrue(MathUtil.isNear(400, 401, 5, 0, 360));
     assertFalse(MathUtil.isNear(0, 356, 2.5, 0, 360));
     assertFalse(MathUtil.isNear(0, -356, 2.5, 0, 360));
     assertFalse(MathUtil.isNear(0, 4, 2.5, 0, 360));
     assertFalse(MathUtil.isNear(0, -4, 2.5, 0, 360));
+    assertFalse(MathUtil.isNear(400, 35, 5, 0, 360));
+    assertFalse(MathUtil.isNear(400, -315, 5, 0, 360));
+    assertFalse(MathUtil.isNear(400, 395, 5, 0, 360));
   }
 }
