@@ -18,7 +18,6 @@ import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import java.util.Arrays;
-import java.util.Map.Entry;
 import java.util.Objects;
 
 /**
@@ -137,8 +136,8 @@ public class SwerveDrivePoseEstimator extends PoseEstimator<InterpolationRecord>
   }
 
   @Override
-  protected void replayOdometryInputs(Entry<Double, InterpolationRecord> entry) {
-    updateWithTime(entry.getKey(), entry.getValue().gyroAngle, entry.getValue().modulePositions);
+  protected void replayOdometryInput(double timestampSeconds, InterpolationRecord sample) {
+    updateWithTime(timestampSeconds, sample.gyroAngle, sample.modulePositions);
   }
 
   /**
@@ -211,7 +210,7 @@ public class SwerveDrivePoseEstimator extends PoseEstimator<InterpolationRecord>
      * Return the interpolated record. This object is assumed to be the starting position, or lower
      * bound.
      *
-     * @param endVal The upper bound, or end.
+     * @param endValue The upper bound, or end.
      * @param t How far between the lower and upper bound we are. This should be bounded in [0, 1].
      * @return The interpolated value.
      */

@@ -17,7 +17,6 @@ import edu.wpi.first.math.kinematics.MecanumDriveOdometry;
 import edu.wpi.first.math.kinematics.MecanumDriveWheelPositions;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
-import java.util.Map.Entry;
 import java.util.Objects;
 
 /**
@@ -135,8 +134,8 @@ public class MecanumDrivePoseEstimator extends PoseEstimator<InterpolationRecord
   }
 
   @Override
-  protected void replayOdometryInputs(Entry<Double, InterpolationRecord> entry) {
-    updateWithTime(entry.getKey(), entry.getValue().gyroAngle, entry.getValue().wheelPositions);
+  protected void replayOdometryInput(double timestampSeconds, InterpolationRecord sample) {
+    updateWithTime(timestampSeconds, sample.gyroAngle, sample.wheelPositions);
   }
 
   /**

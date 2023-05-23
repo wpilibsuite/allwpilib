@@ -61,7 +61,7 @@ public abstract class PoseEstimator<T extends BaseInterpolationRecord<T>> {
 
   protected abstract void recordCurrentPose(T sample, double timestampSeconds);
 
-  protected abstract void replayOdometryInputs(Map.Entry<Double, T> entry);
+  protected abstract void replayOdometryInput(double timestampSeconds, T sample);
 
   /**
    * Adds a vision measurement to the Kalman Filter. This will correct the odometry pose estimate
@@ -120,7 +120,7 @@ public abstract class PoseEstimator<T extends BaseInterpolationRecord<T>> {
     // pose buffer and correct odometry.
     for (Map.Entry<Double, T> entry :
         m_poseBuffer.getInternalBuffer().tailMap(timestampSeconds).entrySet()) {
-      replayOdometryInputs(entry);
+      replayOdometryInput(entry.getKey(), entry.getValue());
     }
   }
 

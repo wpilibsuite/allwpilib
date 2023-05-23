@@ -16,7 +16,6 @@ import edu.wpi.first.math.kinematics.DifferentialDriveKinematics;
 import edu.wpi.first.math.kinematics.DifferentialDriveOdometry;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
-import java.util.Map.Entry;
 import java.util.Objects;
 
 /**
@@ -151,12 +150,8 @@ public class DifferentialDrivePoseEstimator extends PoseEstimator<InterpolationR
   }
 
   @Override
-  protected void replayOdometryInputs(Entry<Double, InterpolationRecord> entry) {
-    updateWithTime(
-        entry.getKey(),
-        entry.getValue().gyroAngle,
-        entry.getValue().leftMeters,
-        entry.getValue().rightMeters);
+  protected void replayOdometryInput(double timestampSeconds, InterpolationRecord sample) {
+    updateWithTime(timestampSeconds, sample.gyroAngle, sample.leftMeters, sample.rightMeters);
   }
 
   /**
