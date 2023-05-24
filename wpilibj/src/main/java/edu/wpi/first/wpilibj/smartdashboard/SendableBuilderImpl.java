@@ -315,12 +315,13 @@ public class SendableBuilderImpl implements NTSendableBuilder {
     BooleanTopic topic = m_table.getBooleanTopic(key);
     if (getter != null) {
       property.m_pub = topic.publish();
-      property.m_updateNetwork = (pub, time) -> {
-        boolean newVal = getter.getAsBoolean();
-        if (property.m_sub == null || newVal != property.m_sub.getAsBoolean()) {
-          pub.set(newVal, time);
-        }
-      };
+      property.m_updateNetwork =
+          (pub, time) -> {
+            boolean newVal = getter.getAsBoolean();
+            if (property.m_sub == null || newVal != property.m_sub.getAsBoolean()) {
+              pub.set(newVal, time);
+            }
+          };
     }
     if (setter != null) {
       property.m_sub = topic.subscribe(false, PubSubOption.excludePublisher(property.m_pub));
@@ -347,12 +348,13 @@ public class SendableBuilderImpl implements NTSendableBuilder {
     IntegerTopic topic = m_table.getIntegerTopic(key);
     if (getter != null) {
       property.m_pub = topic.publish();
-      property.m_updateNetwork = (pub, time) -> {
-        long newVal = getter.getAsLong();
-        if (property.m_sub == null || newVal != property.m_sub.getAsLong()) {
-          pub.set(newVal, time);
-        }
-      };
+      property.m_updateNetwork =
+          (pub, time) -> {
+            long newVal = getter.getAsLong();
+            if (property.m_sub == null || newVal != property.m_sub.getAsLong()) {
+              pub.set(newVal, time);
+            }
+          };
     }
     if (setter != null) {
       property.m_sub = topic.subscribe(0, PubSubOption.excludePublisher(property.m_pub));
@@ -379,12 +381,13 @@ public class SendableBuilderImpl implements NTSendableBuilder {
     FloatTopic topic = m_table.getFloatTopic(key);
     if (getter != null) {
       property.m_pub = topic.publish();
-      property.m_updateNetwork = (pub, time) -> {
-        float newVal = getter.getAsFloat();
-        if (property.m_sub == null || newVal != property.m_sub.getAsFloat()) {
-          pub.set(newVal, time);
-        }
-      };
+      property.m_updateNetwork =
+          (pub, time) -> {
+            float newVal = getter.getAsFloat();
+            if (property.m_sub == null || newVal != property.m_sub.getAsFloat()) {
+              pub.set(newVal, time);
+            }
+          };
     }
     if (setter != null) {
       property.m_sub = topic.subscribe(0.0f, PubSubOption.excludePublisher(property.m_pub));
@@ -411,12 +414,13 @@ public class SendableBuilderImpl implements NTSendableBuilder {
     DoubleTopic topic = m_table.getDoubleTopic(key);
     if (getter != null) {
       property.m_pub = topic.publish();
-      property.m_updateNetwork = (pub, time) -> {
-        double newVal = getter.getAsDouble();
-        if (property.m_sub == null || newVal != property.m_sub.getAsDouble()) {
-          pub.set(newVal, time);
-        }
-      };
+      property.m_updateNetwork =
+          (pub, time) -> {
+            double newVal = getter.getAsDouble();
+            if (property.m_sub == null || newVal != property.m_sub.getAsDouble()) {
+              pub.set(newVal, time);
+            }
+          };
     }
     if (setter != null) {
       property.m_sub = topic.subscribe(0.0, PubSubOption.excludePublisher(property.m_pub));
@@ -443,12 +447,13 @@ public class SendableBuilderImpl implements NTSendableBuilder {
     StringTopic topic = m_table.getStringTopic(key);
     if (getter != null) {
       property.m_pub = topic.publish();
-      property.m_updateNetwork = (pub, time) -> {
-        String newVal = getter.get();
-        if (property.m_sub == null || !newVal.equals(property.m_sub.get())) {
-          pub.set(newVal, time);
-        }
-      };
+      property.m_updateNetwork =
+          (pub, time) -> {
+            String newVal = getter.get();
+            if (property.m_sub == null || !newVal.equals(property.m_sub.get())) {
+              pub.set(newVal, time);
+            }
+          };
     }
     if (setter != null) {
       property.m_sub = topic.subscribe("", PubSubOption.excludePublisher(property.m_pub));
@@ -476,12 +481,13 @@ public class SendableBuilderImpl implements NTSendableBuilder {
     BooleanArrayTopic topic = m_table.getBooleanArrayTopic(key);
     if (getter != null) {
       property.m_pub = topic.publish();
-      property.m_updateNetwork = (pub, time) -> {
-        boolean[] newVal = getter.get();
-        if (property.m_sub == null || !Arrays.equals(newVal, property.m_sub.get())) {
-          pub.set(newVal, time);
-        }
-      };
+      property.m_updateNetwork =
+          (pub, time) -> {
+            boolean[] newVal = getter.get();
+            if (property.m_sub == null || !Arrays.equals(newVal, property.m_sub.get())) {
+              pub.set(newVal, time);
+            }
+          };
     }
     if (setter != null) {
       property.m_sub =
@@ -510,12 +516,13 @@ public class SendableBuilderImpl implements NTSendableBuilder {
     IntegerArrayTopic topic = m_table.getIntegerArrayTopic(key);
     if (getter != null) {
       property.m_pub = topic.publish();
-      property.m_updateNetwork = (pub, time) -> {
-        long[] newVal = getter.get();
-        if (property.m_sub == null || !Arrays.equals(newVal, property.m_sub.get())) {
-          pub.set(newVal, time);
-        }
-      };
+      property.m_updateNetwork =
+          (pub, time) -> {
+            long[] newVal = getter.get();
+            if (property.m_sub == null || !Arrays.equals(newVal, property.m_sub.get())) {
+              pub.set(newVal, time);
+            }
+          };
     }
     if (setter != null) {
       property.m_sub =
@@ -544,12 +551,13 @@ public class SendableBuilderImpl implements NTSendableBuilder {
     FloatArrayTopic topic = m_table.getFloatArrayTopic(key);
     if (getter != null) {
       property.m_pub = topic.publish();
-      property.m_updateNetwork = (pub, time) -> {
-        float[] newVal = getter.get();
-        if (property.m_sub == null || !Arrays.equals(newVal, property.m_sub.get())) {
-          pub.set(newVal, time);
-        }
-      };
+      property.m_updateNetwork =
+          (pub, time) -> {
+            float[] newVal = getter.get();
+            if (property.m_sub == null || !Arrays.equals(newVal, property.m_sub.get())) {
+              pub.set(newVal, time);
+            }
+          };
     }
     if (setter != null) {
       property.m_sub =
@@ -578,12 +586,13 @@ public class SendableBuilderImpl implements NTSendableBuilder {
     DoubleArrayTopic topic = m_table.getDoubleArrayTopic(key);
     if (getter != null) {
       property.m_pub = topic.publish();
-      property.m_updateNetwork = (pub, time) -> {
-        double[] newVal = getter.get();
-        if (property.m_sub == null || !Arrays.equals(newVal, property.m_sub.get())) {
-          pub.set(newVal, time);
-        }
-      };
+      property.m_updateNetwork =
+          (pub, time) -> {
+            double[] newVal = getter.get();
+            if (property.m_sub == null || !Arrays.equals(newVal, property.m_sub.get())) {
+              pub.set(newVal, time);
+            }
+          };
     }
     if (setter != null) {
       property.m_sub =
@@ -612,12 +621,13 @@ public class SendableBuilderImpl implements NTSendableBuilder {
     StringArrayTopic topic = m_table.getStringArrayTopic(key);
     if (getter != null) {
       property.m_pub = topic.publish();
-      property.m_updateNetwork = (pub, time) -> {
-        String[] newVal = getter.get();
-        if (property.m_sub == null || !Arrays.equals(newVal, property.m_sub.get())) {
-          pub.set(newVal, time);
-        }
-      };
+      property.m_updateNetwork =
+          (pub, time) -> {
+            String[] newVal = getter.get();
+            if (property.m_sub == null || !Arrays.equals(newVal, property.m_sub.get())) {
+              pub.set(newVal, time);
+            }
+          };
     }
     if (setter != null) {
       property.m_sub =
@@ -647,12 +657,13 @@ public class SendableBuilderImpl implements NTSendableBuilder {
     RawTopic topic = m_table.getRawTopic(key);
     if (getter != null) {
       property.m_pub = topic.publish(typeString);
-      property.m_updateNetwork = (pub, time) -> {
-        byte[] newVal = getter.get();
-        if (property.m_sub == null || !Arrays.equals(newVal, property.m_sub.get())) {
-          pub.set(newVal, time);
-        }
-      };
+      property.m_updateNetwork =
+          (pub, time) -> {
+            byte[] newVal = getter.get();
+            if (property.m_sub == null || !Arrays.equals(newVal, property.m_sub.get())) {
+              pub.set(newVal, time);
+            }
+          };
     }
     if (setter != null) {
       property.m_sub =
