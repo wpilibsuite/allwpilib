@@ -136,7 +136,7 @@ constexpr bool IsNear(T expected, T actual, T tolerance) {
  * true because 359 is 1 away from 360 (which is treated as the same as 0) and
  * 2 is 2 away from 0, adding up to an error of 3 degrees, which is within the
  * given tolerance of 5.
- * 
+ *
  * @param expected The expected value
  * @param actual The actual value
  * @param tolerance The allowed difference between the actual and the expected
