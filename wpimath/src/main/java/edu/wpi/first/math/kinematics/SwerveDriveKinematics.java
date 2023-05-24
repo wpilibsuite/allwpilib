@@ -37,8 +37,16 @@ public class SwerveDriveKinematics
   public static class SwerveDriveWheelStates {
     public SwerveModuleState[] states;
 
+    /**
+     * Creates a new SwerveDriveWheelStates instance.
+     *
+     * @param states The swerve module states. This will be deeply copied.
+     */
     public SwerveDriveWheelStates(SwerveModuleState[] states) {
-      this.states = states;
+      this.states = new SwerveModuleState[states.length];
+      for (int i = 0; i < states.length; i++) {
+        this.states[i] = new SwerveModuleState(states[i].speedMetersPerSecond, states[i].angle);
+      }
     }
   }
 

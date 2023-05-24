@@ -7,13 +7,20 @@ package edu.wpi.first.math.kinematics;
 import java.util.Arrays;
 import java.util.Objects;
 import java.util.function.BinaryOperator;
-import java.util.function.IntFunction;
 
 public class SwerveDriveWheelPositions implements WheelPositions<SwerveDriveWheelPositions> {
   public SwerveModulePosition[] positions;
 
+  /**
+   * Creates a new SwerveDriveWheelPositions instance.
+   *
+   * @param positions The swerve module positions. This will be deeply copied.
+   */
   public SwerveDriveWheelPositions(SwerveModulePosition[] positions) {
-    this.positions = positions;
+    this.positions = new SwerveModulePosition[positions.length];
+    for (int i = 0; i < positions.length; i++) {
+      this.positions[i] = positions[i].copy();
+    }
   }
 
   @Override
@@ -36,25 +43,21 @@ public class SwerveDriveWheelPositions implements WheelPositions<SwerveDriveWhee
     return String.format("SwerveDriveWheelPositions(%s)", Arrays.toString(positions));
   }
 
-  private SwerveDriveWheelPositions generate(IntFunction<SwerveModulePosition> generator) {
-    var newPositions = new SwerveModulePosition[positions.length];
-    for (int i = 0; i < positions.length; i++) {
-      newPositions[i] = generator.apply(i);
-    }
-    return new SwerveDriveWheelPositions(newPositions);
-  }
-
   private SwerveDriveWheelPositions generate(
       SwerveDriveWheelPositions other, BinaryOperator<SwerveModulePosition> generator) {
     if (other.positions.length != positions.length) {
       throw new IllegalArgumentException("Inconsistent number of modules!");
     }
-    return generate(i -> generator.apply(positions[i], other.positions[i]));
+    var newPositions = new SwerveModulePosition[positions.length];
+    for (int i = 0; i < positions.length; i++) {
+      newPositions[i] = generator.apply(positions[i], other.positions[i]);
+    }
+    return new SwerveDriveWheelPositions(newPositions);
   }
 
   @Override
   public SwerveDriveWheelPositions copy() {
-    return generate(i -> positions[i].copy());
+    return new SwerveDriveWheelPositions(positions);
   }
 
   @Override
