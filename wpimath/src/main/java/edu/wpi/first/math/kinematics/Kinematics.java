@@ -7,7 +7,7 @@ package edu.wpi.first.math.kinematics;
 import edu.wpi.first.math.geometry.Twist2d;
 
 /** Helper class that converts a chassis velocity (dx and dtheta components) into wheel speeds. */
-public interface Kinematics<T1, T2> {
+public interface Kinematics<S, P> {
   /**
    * Performs forward kinematics to return the resulting chassis speed from the wheel speeds. This
    * method is often used for odometry -- determining the robot's position on the field using data
@@ -16,7 +16,7 @@ public interface Kinematics<T1, T2> {
    * @param wheelSpeeds The speeds of the wheels.
    * @return The chassis speed.
    */
-  ChassisSpeeds toChassisSpeeds(T1 wheelSpeeds);
+  ChassisSpeeds toChassisSpeeds(S wheelSpeeds);
 
   /**
    * Performs inverse kinematics to return the wheel speeds from a desired chassis velocity. This
@@ -25,7 +25,7 @@ public interface Kinematics<T1, T2> {
    * @param chassisSpeeds The desired chassis speed.
    * @return The wheel speeds.
    */
-  T1 toWheelSpeeds(ChassisSpeeds chassisSpeeds);
+  S toWheelSpeeds(ChassisSpeeds chassisSpeeds);
 
   /**
    * Performs forward kinematics to return the resulting from the given wheel deltas. This method is
@@ -35,5 +35,5 @@ public interface Kinematics<T1, T2> {
    * @param wheelDeltas The distances driven by each wheel.
    * @return The resulting Twist2d in the robot's movement.
    */
-  Twist2d toTwist2d(T2 wheelDeltas);
+  Twist2d toTwist2d(P wheelDeltas);
 }
