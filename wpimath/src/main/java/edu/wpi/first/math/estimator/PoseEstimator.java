@@ -1,3 +1,7 @@
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
+
 package edu.wpi.first.math.estimator;
 
 import edu.wpi.first.math.MathSharedStore;
@@ -131,7 +135,7 @@ public class PoseEstimator<T extends WheelPositions<T>> {
    * @param visionRobotPoseMeters The pose of the robot as measured by the vision camera.
    * @param timestampSeconds The timestamp of the vision measurement in seconds. Note that if you
    *     don't use your own time source by calling {@link
-   *     PoseEstimator#updateWithTime(double,Rotation2d,double,double)} then you must use a
+   *     PoseEstimator#updateWithTime(double,Rotation2d,WheelPositions)} then you must use a
    *     timestamp with an epoch since FPGA startup (i.e., the epoch of this timestamp is the same
    *     epoch as {@link edu.wpi.first.wpilibj.Timer#getFPGATimestamp()}.) This means that you
    *     should use {@link edu.wpi.first.wpilibj.Timer#getFPGATimestamp()} as your time source or
@@ -202,8 +206,7 @@ public class PoseEstimator<T extends WheelPositions<T>> {
    *
    * @param visionRobotPoseMeters The pose of the robot as measured by the vision camera.
    * @param timestampSeconds The timestamp of the vision measurement in seconds. Note that if you
-   *     don't use your own time source by calling {@link
-   *     PoseEstimator#updateWithTime(double,Rotation2d,double,double)}, then you must use a
+   *     don't use your own time source by calling {@link #updateWithTime}, then you must use a
    *     timestamp with an epoch since FPGA startup (i.e., the epoch of this timestamp is the same
    *     epoch as {@link edu.wpi.first.wpilibj.Timer#getFPGATimestamp()}). This means that you
    *     should use {@link edu.wpi.first.wpilibj.Timer#getFPGATimestamp()} as your time source in

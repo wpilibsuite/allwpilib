@@ -90,6 +90,28 @@ public class DifferentialDrivePoseEstimator extends PoseEstimator<DifferentialDr
   }
 
   /**
+   * Resets the robot's position on the field.
+   *
+   * <p>The gyroscope angle does not need to be reset here on the user's robot code. The library
+   * automatically takes care of offsetting the gyro angle.
+   *
+   * @param gyroAngle The angle reported by the gyroscope.
+   * @param leftPositionMeters The distance traveled by the left encoder.
+   * @param rightPositionMeters The distance traveled by the right encoder.
+   * @param poseMeters The position on the field that your robot is at.
+   */
+  public void resetPosition(
+      Rotation2d gyroAngle,
+      double leftPositionMeters,
+      double rightPositionMeters,
+      Pose2d poseMeters) {
+    resetPosition(
+        gyroAngle,
+        new DifferentialDriveWheelPositions(leftPositionMeters, rightPositionMeters),
+        poseMeters);
+  }
+
+  /**
    * Updates the pose estimator with wheel encoder and gyro information. This should be called every
    * loop.
    *

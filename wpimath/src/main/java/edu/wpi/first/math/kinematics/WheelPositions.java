@@ -1,3 +1,7 @@
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
+
 package edu.wpi.first.math.kinematics;
 
 import edu.wpi.first.math.interpolation.Interpolatable;
@@ -14,7 +18,7 @@ public interface WheelPositions<T extends WheelPositions<T>> extends Interpolata
    * Returns the difference with another set of wheel positions.
    *
    * @param other The other instance to compare to.
-   * @return The representation of how the wheels moved from {@link other} to this.
+   * @return The representation of how the wheels moved from other to this.
    */
   T minus(T other);
 }
