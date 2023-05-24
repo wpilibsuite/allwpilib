@@ -6,7 +6,12 @@ package edu.wpi.first.math.kinematics;
 
 import edu.wpi.first.math.geometry.Twist2d;
 
-/** Helper class that converts a chassis velocity (dx and dtheta components) into wheel speeds. */
+/**
+ * Helper class that converts a chassis velocity (dx and dtheta components) into wheel speeds.
+ *
+ * @param <S> The type of the wheel speeds.
+ * @param <P> The type of the wheel positions.
+ */
 public interface Kinematics<S, P> {
   /**
    * Performs forward kinematics to return the resulting chassis speed from the wheel speeds. This
