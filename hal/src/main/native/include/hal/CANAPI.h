@@ -20,6 +20,14 @@ extern "C" {
 #endif
 
 /**
+ * Reads the millisecond-resolution timer that the CAN API functions use as a
+ * time base.
+ * @return Current value of timer used as a base time by the CAN API in
+ * milliseconds.
+ */
+uint32_t HAL_GetCANPacketBaseTime(void);
+
+/**
  * Initializes a CAN device.
  *
  * These follow the FIRST standard CAN layout.
