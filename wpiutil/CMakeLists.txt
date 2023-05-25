@@ -34,13 +34,27 @@ if (WITH_JAVA)
   file(GLOB JACKSON_JARS
         ${WPILIB_BINARY_DIR}/wpiutil/thirdparty/jackson/*.jar)
 
-  set(CMAKE_JAVA_INCLUDE_PATH wpiutil.jar ${JACKSON_JARS})
+  if(NOT EXISTS "${WPILIB_BINARY_DIR}/wpiutil/thirdparty/quickbuf/quickbuf-runtime-1.3.2.jar")
+        set(BASE_URL "https://search.maven.org/remotecontent?filepath=")
+        set(JAR_ROOT "${WPILIB_BINARY_DIR}/wpiutil/thirdparty/quickbuf")
+
+        message(STATUS "Downloading Quickbuf jarfile...")
+        file(DOWNLOAD "${BASE_URL}us/hebi/quickbuf/quickbuf-runtime/1.3.2/quickbuf-runtime-1.3.2.jar"
+            "${JAR_ROOT}/quickbuf-runtime-1.3.2.jar")
+
+        message(STATUS "Downloaded.")
+  endif()
+
+  file(GLOB QUICKBUF_JAR
+        ${WPILIB_BINARY_DIR}/wpiutil/thirdparty/quickbuf/*.jar)
+
+  set(CMAKE_JAVA_INCLUDE_PATH wpiutil.jar ${JACKSON_JARS} ${QUICKBUF_JAR})
 
   set(CMAKE_JNI_TARGET true)
 
   file(GLOB_RECURSE JAVA_SOURCES src/main/java/*.java)
 
-  add_jar(wpiutil_jar ${JAVA_SOURCES} INCLUDE_JARS ${JACKSON_JARS} OUTPUT_NAME wpiutil GENERATE_NATIVE_HEADERS wpiutil_jni_headers)
+  add_jar(wpiutil_jar ${JAVA_SOURCES} INCLUDE_JARS ${JACKSON_JARS} ${QUICKBUF_JAR} OUTPUT_NAME wpiutil GENERATE_NATIVE_HEADERS wpiutil_jni_headers)
 
   get_property(WPIUTIL_JAR_FILE TARGET wpiutil_jar PROPERTY JAR_FILE)
   install(FILES ${WPIUTIL_JAR_FILE} DESTINATION "${java_lib_dest}")
@@ -98,7 +112,7 @@ if (MSVC)
     target_compile_definitions(wpiutil PRIVATE -D_CRT_SECURE_NO_WARNINGS)
 endif()
 wpilib_target_warnings(wpiutil)
-target_link_libraries(wpiutil Threads::Threads ${CMAKE_DL_LIBS})
+target_link_libraries(wpiutil protobuf::libprotobuf Threads::Threads ${CMAKE_DL_LIBS})
 
 if (ATOMIC)
     target_link_libraries(wpiutil ${ATOMIC})

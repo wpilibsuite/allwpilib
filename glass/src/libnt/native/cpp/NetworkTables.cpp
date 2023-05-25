@@ -14,6 +14,8 @@
 #include <vector>
 
 #include <fmt/format.h>
+#include <google/protobuf/descriptor.h>
+#include <google/protobuf/message.h>
 #include <imgui.h>
 #include <imgui_stdlib.h>
 #include <networktables/NetworkTableInstance.h>
@@ -114,36 +116,37 @@ void NetworkTablesModel::Entry::UpdateInfo(nt::TopicInfo&& info_) {
   }
 }
 
-static void UpdateMsgpackValueSource(NetworkTablesModel::ValueSource* out,
+static void UpdateMsgpackValueSource(NetworkTablesModel& model,
+                                     NetworkTablesModel::ValueSource* out,
                                      mpack_reader_t& r, std::string_view name,
                                      int64_t time) {
   mpack_tag_t tag = mpack_read_tag(&r);
   switch (mpack_tag_type(&tag)) {
     case mpack::mpack_type_bool:
-      out->UpdateFromValue(
-          nt::Value::MakeBoolean(mpack_tag_bool_value(&tag), time), name, "");
+      out->value = nt::Value::MakeBoolean(mpack_tag_bool_value(&tag), time);
+      out->UpdateFromValue(model, name, "");
       break;
     case mpack::mpack_type_int:
-      out->UpdateFromValue(
-          nt::Value::MakeInteger(mpack_tag_int_value(&tag), time), name, "");
+      out->value = nt::Value::MakeInteger(mpack_tag_int_value(&tag), time);
+      out->UpdateFromValue(model, name, "");
       break;
     case mpack::mpack_type_uint:
-      out->UpdateFromValue(
-          nt::Value::MakeInteger(mpack_tag_uint_value(&tag), time), name, "");
+      out->value = nt::Value::MakeInteger(mpack_tag_uint_value(&tag), time);
+      out->UpdateFromValue(model, name, "");
       break;
     case mpack::mpack_type_float:
-      out->UpdateFromValue(
-          nt::Value::MakeFloat(mpack_tag_float_value(&tag), time), name, "");
+      out->value = nt::Value::MakeFloat(mpack_tag_float_value(&tag), time);
+      out->UpdateFromValue(model, name, "");
       break;
     case mpack::mpack_type_double:
-      out->UpdateFromValue(
-          nt::Value::MakeDouble(mpack_tag_double_value(&tag), time), name, "");
+      out->value = nt::Value::MakeDouble(mpack_tag_double_value(&tag), time);
+      out->UpdateFromValue(model, name, "");
       break;
     case mpack::mpack_type_str: {
       std::string str;
       mpack_read_str(&r, &tag, &str);
-      out->UpdateFromValue(nt::Value::MakeString(std::move(str), time), name,
-                           "");
+      out->value = nt::Value::MakeString(std::move(str), time);
+      out->UpdateFromValue(model, name, "");
       break;
     }
     case mpack::mpack_type_bin:
@@ -164,7 +167,8 @@ static void UpdateMsgpackValueSource(NetworkTablesModel::ValueSource* out,
           child.path = fmt::format("{}{}", name, child.name);
         }
         ++i;
-        UpdateMsgpackValueSource(&child, r, child.path, time);  // recurse
+        UpdateMsgpackValueSource(model, &child, r, child.path,
+                                 time);  // recurse
       }
       mpack_done_array(&r);
       break;
@@ -186,7 +190,7 @@ static void UpdateMsgpackValueSource(NetworkTablesModel::ValueSource* out,
           auto it = elems.find(key);
           if (it != elems.end()) {
             auto& child = out->valueChildren[it->second];
-            UpdateMsgpackValueSource(&child, r, child.path, time);
+            UpdateMsgpackValueSource(model, &child, r, child.path, time);
             elems.erase(it);
           } else {
             added = true;
@@ -194,7 +198,7 @@ static void UpdateMsgpackValueSource(NetworkTablesModel::ValueSource* out,
             auto& child = out->valueChildren.back();
             child.name = std::move(key);
             child.path = fmt::format("{}/{}", name, child.name);
-            UpdateMsgpackValueSource(&child, r, child.path, time);
+            UpdateMsgpackValueSource(model, &child, r, child.path, time);
           }
         }
       }
@@ -219,7 +223,318 @@ static void UpdateMsgpackValueSource(NetworkTablesModel::ValueSource* out,
   }
 }
 
-static void UpdateJsonValueSource(NetworkTablesModel::ValueSource* out,
+static void UpdateStructValueSource(NetworkTablesModel& model,
+                                    NetworkTablesModel::ValueSource* out,
+                                    const wpi::DynamicStruct& s,
+                                    std::string_view name, int64_t time) {
+  auto desc = s.GetDescriptor();
+  out->typeStr = "struct:" + desc->GetName();
+  auto& fields = desc->GetFields();
+  if (!out->valueChildrenMap || fields.size() != out->valueChildren.size()) {
+    out->valueChildren.clear();
+    out->valueChildrenMap = true;
+    out->valueChildren.reserve(fields.size());
+    for (auto&& field : fields) {
+      out->valueChildren.emplace_back();
+      auto& child = out->valueChildren.back();
+      child.name = field.GetName();
+      child.path = fmt::format("{}/{}", name, child.name);
+    }
+  }
+  auto outIt = out->valueChildren.begin();
+  for (auto&& field : fields) {
+    auto& child = *outIt++;
+    switch (field.GetType()) {
+      case wpi::StructFieldType::kBool:
+        if (field.IsArray()) {
+          std::vector<int> v;
+          v.reserve(field.GetArraySize());
+          for (size_t i = 0; i < field.GetArraySize(); ++i) {
+            v.emplace_back(s.GetBoolField(&field, i));
+          }
+          child.value = nt::Value::MakeBooleanArray(std::move(v), time);
+        } else {
+          child.value = nt::Value::MakeBoolean(s.GetBoolField(&field), time);
+        }
+        child.UpdateFromValue(model, child.path, "");
+        break;
+      case wpi::StructFieldType::kChar:
+        child.value = nt::Value::MakeString(s.GetStringField(&field), time);
+        child.UpdateFromValue(model, child.path, "");
+        break;
+      case wpi::StructFieldType::kInt8:
+      case wpi::StructFieldType::kInt16:
+      case wpi::StructFieldType::kInt32:
+      case wpi::StructFieldType::kInt64:
+      case wpi::StructFieldType::kUint8:
+      case wpi::StructFieldType::kUint16:
+      case wpi::StructFieldType::kUint32:
+      case wpi::StructFieldType::kUint64: {
+        bool isUint = field.IsUint();
+        if (field.IsArray()) {
+          std::vector<int64_t> v;
+          v.reserve(field.GetArraySize());
+          for (size_t i = 0; i < field.GetArraySize(); ++i) {
+            if (isUint) {
+              v.emplace_back(s.GetUintField(&field, i));
+            } else {
+              v.emplace_back(s.GetIntField(&field, i));
+            }
+          }
+          child.value = nt::Value::MakeIntegerArray(std::move(v), time);
+        } else {
+          if (isUint) {
+            child.value = nt::Value::MakeInteger(s.GetUintField(&field), time);
+          } else {
+            child.value = nt::Value::MakeInteger(s.GetIntField(&field), time);
+          }
+        }
+        child.UpdateFromValue(model, child.path, "");
+        break;
+      }
+      case wpi::StructFieldType::kFloat:
+        if (field.IsArray()) {
+          std::vector<float> v;
+          v.reserve(field.GetArraySize());
+          for (size_t i = 0; i < field.GetArraySize(); ++i) {
+            v.emplace_back(s.GetFloatField(&field, i));
+          }
+          child.value = nt::Value::MakeFloatArray(std::move(v), time);
+        } else {
+          child.value = nt::Value::MakeFloat(s.GetFloatField(&field), time);
+        }
+        child.UpdateFromValue(model, child.path, "");
+        break;
+      case wpi::StructFieldType::kDouble:
+        if (field.IsArray()) {
+          std::vector<double> v;
+          v.reserve(field.GetArraySize());
+          for (size_t i = 0; i < field.GetArraySize(); ++i) {
+            v.emplace_back(s.GetDoubleField(&field, i));
+          }
+          child.value = nt::Value::MakeDoubleArray(std::move(v), time);
+        } else {
+          child.value = nt::Value::MakeDouble(s.GetDoubleField(&field), time);
+        }
+        child.UpdateFromValue(model, child.path, "");
+        break;
+      case wpi::StructFieldType::kStruct:
+        if (field.IsArray()) {
+          if (child.valueChildrenMap) {
+            child.valueChildren.clear();
+            child.valueChildrenMap = false;
+          }
+          child.valueChildren.resize(field.GetArraySize());
+          unsigned int i = 0;
+          for (auto&& child2 : child.valueChildren) {
+            if (child2.name.empty()) {
+              child2.name = fmt::format("[{}]", i);
+              child2.path = fmt::format("{}{}", name, child.name);
+            }
+            UpdateStructValueSource(model, &child2, s.GetStructField(&field, i),
+                                    child2.path, time);  // recurse
+            ++i;
+          }
+        } else {
+          UpdateStructValueSource(model, &child, s.GetStructField(&field),
+                                  child.path, time);  // recurse
+        }
+        break;
+    }
+  }
+}
+
+static void UpdateProtobufValueSource(NetworkTablesModel& model,
+                                      NetworkTablesModel::ValueSource* out,
+                                      const google::protobuf::Message& msg,
+                                      std::string_view name, int64_t time) {
+  auto desc = msg.GetDescriptor();
+  out->typeStr = "proto:" + desc->full_name();
+  if (!out->valueChildrenMap ||
+      desc->field_count() != static_cast<int>(out->valueChildren.size())) {
+    out->valueChildren.clear();
+    out->valueChildrenMap = true;
+    out->valueChildren.reserve(desc->field_count());
+    for (int i = 0, end = desc->field_count(); i < end; ++i) {
+      out->valueChildren.emplace_back();
+      auto& child = out->valueChildren.back();
+      child.name = desc->field(i)->name();
+      child.path = fmt::format("{}/{}", name, child.name);
+    }
+  }
+  auto refl = msg.GetReflection();
+  auto outIt = out->valueChildren.begin();
+  for (int fieldNum = 0, end = desc->field_count(); fieldNum < end;
+       ++fieldNum) {
+    auto field = desc->field(fieldNum);
+    auto& child = *outIt++;
+    switch (field->cpp_type()) {
+      case google::protobuf::FieldDescriptor::CPPTYPE_BOOL:
+        if (field->is_repeated()) {
+          size_t size = refl->FieldSize(msg, field);
+          std::vector<int> v;
+          v.reserve(size);
+          for (size_t i = 0; i < size; ++i) {
+            v.emplace_back(refl->GetRepeatedBool(msg, field, i));
+          }
+          child.value = nt::Value::MakeBooleanArray(std::move(v), time);
+        } else {
+          child.value = nt::Value::MakeBoolean(refl->GetBool(msg, field), time);
+        }
+        child.UpdateFromValue(model, child.path, "");
+        break;
+      case google::protobuf::FieldDescriptor::CPPTYPE_STRING:
+        if (field->is_repeated()) {
+          size_t size = refl->FieldSize(msg, field);
+          std::vector<std::string> v;
+          v.reserve(size);
+          for (size_t i = 0; i < size; ++i) {
+            v.emplace_back(refl->GetRepeatedString(msg, field, i));
+          }
+          child.value = nt::Value::MakeStringArray(std::move(v), time);
+        } else {
+          child.value =
+              nt::Value::MakeString(refl->GetString(msg, field), time);
+          child.UpdateFromValue(model, child.path, "");
+        }
+        break;
+      case google::protobuf::FieldDescriptor::CPPTYPE_INT32:
+        if (field->is_repeated()) {
+          size_t size = refl->FieldSize(msg, field);
+          std::vector<int64_t> v;
+          v.reserve(size);
+          for (size_t i = 0; i < size; ++i) {
+            v.emplace_back(refl->GetRepeatedInt32(msg, field, i));
+          }
+          child.value = nt::Value::MakeIntegerArray(std::move(v), time);
+        } else {
+          child.value =
+              nt::Value::MakeInteger(refl->GetInt32(msg, field), time);
+        }
+        child.UpdateFromValue(model, child.path, "");
+        break;
+      case google::protobuf::FieldDescriptor::CPPTYPE_INT64:
+        if (field->is_repeated()) {
+          size_t size = refl->FieldSize(msg, field);
+          std::vector<int64_t> v;
+          v.reserve(size);
+          for (size_t i = 0; i < size; ++i) {
+            v.emplace_back(refl->GetRepeatedInt64(msg, field, i));
+          }
+          child.value = nt::Value::MakeIntegerArray(std::move(v), time);
+        } else {
+          child.value =
+              nt::Value::MakeInteger(refl->GetInt64(msg, field), time);
+        }
+        child.UpdateFromValue(model, child.path, "");
+        break;
+      case google::protobuf::FieldDescriptor::CPPTYPE_UINT32:
+        if (field->is_repeated()) {
+          size_t size = refl->FieldSize(msg, field);
+          std::vector<int64_t> v;
+          v.reserve(size);
+          for (size_t i = 0; i < size; ++i) {
+            v.emplace_back(refl->GetRepeatedUInt32(msg, field, i));
+          }
+          child.value = nt::Value::MakeIntegerArray(std::move(v), time);
+        } else {
+          child.value =
+              nt::Value::MakeInteger(refl->GetUInt32(msg, field), time);
+        }
+        child.UpdateFromValue(model, child.path, "");
+        break;
+      case google::protobuf::FieldDescriptor::CPPTYPE_UINT64:
+        if (field->is_repeated()) {
+          size_t size = refl->FieldSize(msg, field);
+          std::vector<int64_t> v;
+          v.reserve(size);
+          for (size_t i = 0; i < size; ++i) {
+            v.emplace_back(refl->GetRepeatedUInt64(msg, field, i));
+          }
+          child.value = nt::Value::MakeIntegerArray(std::move(v), time);
+        } else {
+          child.value =
+              nt::Value::MakeInteger(refl->GetUInt64(msg, field), time);
+        }
+        child.UpdateFromValue(model, child.path, "");
+        break;
+      case google::protobuf::FieldDescriptor::CPPTYPE_FLOAT:
+        if (field->is_repeated()) {
+          size_t size = refl->FieldSize(msg, field);
+          std::vector<float> v;
+          v.reserve(size);
+          for (size_t i = 0; i < size; ++i) {
+            v.emplace_back(refl->GetRepeatedFloat(msg, field, i));
+          }
+          child.value = nt::Value::MakeFloatArray(std::move(v), time);
+        } else {
+          child.value = nt::Value::MakeFloat(refl->GetFloat(msg, field), time);
+        }
+        child.UpdateFromValue(model, child.path, "");
+        break;
+      case google::protobuf::FieldDescriptor::CPPTYPE_DOUBLE:
+        if (field->is_repeated()) {
+          size_t size = refl->FieldSize(msg, field);
+          std::vector<double> v;
+          v.reserve(size);
+          for (size_t i = 0; i < size; ++i) {
+            v.emplace_back(refl->GetRepeatedDouble(msg, field, i));
+          }
+          child.value = nt::Value::MakeDoubleArray(std::move(v), time);
+        } else {
+          child.value =
+              nt::Value::MakeDouble(refl->GetDouble(msg, field), time);
+        }
+        child.UpdateFromValue(model, child.path, "");
+        break;
+      case google::protobuf::FieldDescriptor::CPPTYPE_ENUM:
+        if (field->is_repeated()) {
+          size_t size = refl->FieldSize(msg, field);
+          std::vector<std::string> v;
+          v.reserve(size);
+          for (size_t i = 0; i < size; ++i) {
+            v.emplace_back(refl->GetRepeatedEnum(msg, field, i)->name());
+          }
+          child.value = nt::Value::MakeStringArray(std::move(v), time);
+        } else {
+          child.value =
+              nt::Value::MakeString(refl->GetEnum(msg, field)->name(), time);
+        }
+        child.UpdateFromValue(model, child.path, "");
+        break;
+      case google::protobuf::FieldDescriptor::CPPTYPE_MESSAGE:
+        if (field->is_repeated()) {
+          if (child.valueChildrenMap) {
+            child.valueChildren.clear();
+            child.valueChildrenMap = false;
+          }
+          size_t size = refl->FieldSize(msg, field);
+          child.valueChildren.resize(size);
+          unsigned int i = 0;
+          for (auto&& child2 : child.valueChildren) {
+            if (child2.name.empty()) {
+              child2.name = fmt::format("[{}]", i);
+              child2.path = fmt::format("{}{}", name, child.name);
+            }
+            UpdateProtobufValueSource(model, &child2,
+                                      refl->GetRepeatedMessage(msg, field, i),
+                                      child2.path, time);  // recurse
+            ++i;
+          }
+        } else {
+          UpdateProtobufValueSource(
+              model, &child,
+              refl->GetMessage(msg, field,
+                               model.GetProtobufDatabase().GetMessageFactory()),
+              child.path, time);  // recurse
+        }
+        break;
+    }
+  }
+}
+
+static void UpdateJsonValueSource(NetworkTablesModel& model,
+                                  NetworkTablesModel::ValueSource* out,
                                   const wpi::json& j, std::string_view name,
                                   int64_t time) {
   switch (j.type()) {
@@ -237,7 +552,7 @@ static void UpdateJsonValueSource(NetworkTablesModel::ValueSource* out,
         auto it = elems.find(kv.key());
         if (it != elems.end()) {
           auto& child = out->valueChildren[it->second];
-          UpdateJsonValueSource(&child, kv.value(), child.path, time);
+          UpdateJsonValueSource(model, &child, kv.value(), child.path, time);
           elems.erase(it);
         } else {
           added = true;
@@ -245,7 +560,7 @@ static void UpdateJsonValueSource(NetworkTablesModel::ValueSource* out,
           auto& child = out->valueChildren.back();
           child.name = kv.key();
           child.path = fmt::format("{}/{}", name, child.name);
-          UpdateJsonValueSource(&child, kv.value(), child.path, time);
+          UpdateJsonValueSource(model, &child, kv.value(), child.path, time);
         }
       }
       // erase unmatched keys
@@ -273,30 +588,30 @@ static void UpdateJsonValueSource(NetworkTablesModel::ValueSource* out,
           child.name = fmt::format("[{}]", i);
           child.path = fmt::format("{}{}", name, child.name);
         }
-        UpdateJsonValueSource(&child, j[i++], child.path, time);  // recurse
+        // recurse
+        UpdateJsonValueSource(model, &child, j[i++], child.path, time);
       }
       break;
     }
     case wpi::json::value_t::string:
-      out->UpdateFromValue(
-          nt::Value::MakeString(j.get_ref<const std::string&>(), time), name,
-          "");
+      out->value = nt::Value::MakeString(j.get_ref<const std::string&>(), time);
+      out->UpdateFromValue(model, name, "");
       break;
     case wpi::json::value_t::boolean:
-      out->UpdateFromValue(nt::Value::MakeBoolean(j.get<bool>(), time), name,
-                           "");
+      out->value = nt::Value::MakeBoolean(j.get<bool>(), time);
+      out->UpdateFromValue(model, name, "");
       break;
     case wpi::json::value_t::number_integer:
-      out->UpdateFromValue(nt::Value::MakeInteger(j.get<int64_t>(), time), name,
-                           "");
+      out->value = nt::Value::MakeInteger(j.get<int64_t>(), time);
+      out->UpdateFromValue(model, name, "");
       break;
     case wpi::json::value_t::number_unsigned:
-      out->UpdateFromValue(nt::Value::MakeInteger(j.get<uint64_t>(), time),
-                           name, "");
+      out->value = nt::Value::MakeInteger(j.get<uint64_t>(), time);
+      out->UpdateFromValue(model, name, "");
       break;
     case wpi::json::value_t::number_float:
-      out->UpdateFromValue(nt::Value::MakeDouble(j.get<double>(), time), name,
-                           "");
+      out->value = nt::Value::MakeDouble(j.get<double>(), time);
+      out->UpdateFromValue(model, name, "");
       break;
     default:
       out->value = {};
@@ -336,8 +651,8 @@ void NetworkTablesModel::ValueSource::UpdateDiscreteArray(
 }
 
 void NetworkTablesModel::ValueSource::UpdateFromValue(
-    nt::Value&& v, std::string_view name, std::string_view typeStr) {
-  value = v;
+    NetworkTablesModel& model, std::string_view name,
+    std::string_view typeStr) {
   switch (value.type()) {
     case NT_BOOLEAN:
       UpdateDiscreteSource(name, value.GetBoolean() ? 1 : 0, value.time(),
@@ -381,15 +696,16 @@ void NetworkTablesModel::ValueSource::UpdateFromValue(
           child.name = fmt::format("[{}]", i);
           child.path = fmt::format("{}{}", name, child.name);
         }
-        child.UpdateFromValue(nt::Value::MakeString(arr[i++], value.time()),
-                              child.path, "");
+        child.value = nt::Value::MakeString(arr[i++], value.time());
+        child.UpdateFromValue(model, child.path, "");
       }
       break;
     }
     case NT_STRING:
       if (typeStr == "json") {
         try {
-          UpdateJsonValueSource(this, wpi::json::parse(value.GetString()), name,
+          UpdateJsonValueSource(model, this,
+                                wpi::json::parse(value.GetString()), name,
                                 value.last_change());
         } catch (wpi::json::exception&) {
           // ignore
@@ -407,9 +723,57 @@ void NetworkTablesModel::ValueSource::UpdateFromValue(
       if (typeStr == "msgpack") {
         mpack_reader_t r;
         mpack_reader_init_data(&r, value.GetRaw());
-        UpdateMsgpackValueSource(this, r, name, value.last_change());
-
+        UpdateMsgpackValueSource(model, this, r, name, value.last_change());
         mpack_reader_destroy(&r);
+      } else if (wpi::starts_with(typeStr, "struct:")) {
+        auto structName = wpi::drop_front(typeStr, 7);
+        bool isArray = structName.ends_with("[]");
+        if (isArray) {
+          structName = wpi::drop_back(structName, 2);
+        }
+        auto desc = model.m_structDb.Find(structName);
+        if (desc && desc->IsValid()) {
+          if (isArray) {
+            // array of struct at top level
+            if (valueChildrenMap) {
+              valueChildren.clear();
+              valueChildrenMap = false;
+            }
+            auto raw = value.GetRaw();
+            valueChildren.resize(raw.size() / desc->GetSize());
+            unsigned int i = 0;
+            for (auto&& child : valueChildren) {
+              if (child.name.empty()) {
+                child.name = fmt::format("[{}]", i);
+                child.path = fmt::format("{}{}", name, child.name);
+              }
+              wpi::DynamicStruct s{desc, raw};
+              UpdateStructValueSource(model, &child, s, child.path,
+                                      value.last_change());
+              ++i;
+              raw = wpi::drop_front(raw, desc->GetSize());
+            }
+          } else {
+            wpi::DynamicStruct s{desc, value.GetRaw()};
+            UpdateStructValueSource(model, this, s, name, value.last_change());
+          }
+        } else {
+          valueChildren.clear();
+        }
+      } else if (wpi::starts_with(typeStr, "proto:")) {
+        auto msg = model.m_protoDb.Find(wpi::drop_front(typeStr, 6));
+        if (msg) {
+          msg->Clear();
+          auto raw = value.GetRaw();
+          if (msg->ParseFromArray(raw.data(), raw.size())) {
+            UpdateProtobufValueSource(model, this, *msg, name,
+                                      value.last_change());
+          } else {
+            valueChildren.clear();
+          }
+        } else {
+          valueChildren.clear();
+        }
       } else {
         valueChildren.clear();
       }
@@ -473,8 +837,8 @@ void NetworkTablesModel::Update() {
     } else if (auto valueData = event.GetValueEventData()) {
       auto& entry = m_entries[valueData->topic];
       if (entry) {
-        entry->UpdateFromValue(std::move(valueData->value), entry->info.name,
-                               entry->info.type_str);
+        entry->value = std::move(valueData->value);
+        entry->UpdateFromValue(*this);
         if (wpi::starts_with(entry->info.name, '$') && entry->value.IsRaw() &&
             entry->info.type_str == "msgpack") {
           // meta topic handling
@@ -497,6 +861,46 @@ void NetworkTablesModel::Update() {
             auto it = m_clients.find(wpi::drop_front(entry->info.name, 11));
             if (it != m_clients.end()) {
               it->second.UpdateSubscribers(entry->value.GetRaw());
+            }
+          }
+        } else if (entry->value.IsRaw() &&
+                   wpi::starts_with(entry->info.name, "/.schema/struct:") &&
+                   entry->info.type_str == "structschema") {
+          // struct schema handling
+          auto typeStr = wpi::drop_front(entry->info.name, 16);
+          std::string_view schema{
+              reinterpret_cast<const char*>(entry->value.GetRaw().data()),
+              entry->value.GetRaw().size()};
+          std::string err;
+          auto desc = m_structDb.Add(typeStr, schema, &err);
+          if (!desc) {
+            fmt::print("could not decode struct '{}' schema '{}': {}\n",
+                       entry->info.name, schema, err);
+          } else if (desc->IsValid()) {
+            // loop over all entries with this type and update
+            for (auto&& entryPair : m_entries) {
+              auto ts = entryPair.second->info.type_str;
+              if (!wpi::starts_with(ts, "struct:")) {
+                continue;
+              }
+              ts = wpi::drop_front(ts, 7);
+              if (ts == typeStr || (wpi::ends_with(ts, "[]") &&
+                                    wpi::drop_back(ts, 2) == typeStr)) {
+                entryPair.second->UpdateFromValue(*this);
+              }
+            }
+          }
+        } else if (entry->value.IsRaw() &&
+                   wpi::starts_with(entry->info.name, "/.schema/proto:") &&
+                   entry->info.type_str == "proto:FileDescriptorProto") {
+          // protobuf descriptor handling
+          auto filename = wpi::drop_front(entry->info.name, 15);
+          m_protoDb.Add(filename, entry->value.GetRaw());
+          // loop over all protobuf entries and update (conservatively)
+          for (auto&& entryPair : m_entries) {
+            auto ts = entryPair.second->info.type_str;
+            if (wpi::starts_with(ts, "proto:")) {
+              entryPair.second->UpdateFromValue(*this);
             }
           }
         }
@@ -663,6 +1067,24 @@ void NetworkTablesModel::UpdateClients(std::span<const uint8_t> data) {
   m_clients = std::move(newClients);
 }
 
+static bool SimplifyTypeString(std::string_view* ts) {
+  if (wpi::starts_with(*ts, "proto:")) {
+    *ts = wpi::drop_front(*ts, 6);
+    auto lastdot = ts->rfind('.');
+    if (lastdot != std::string_view::npos) {
+      *ts = wpi::substr(*ts, lastdot + 1);
+    }
+    if (wpi::starts_with(*ts, "Protobuf")) {
+      *ts = wpi::drop_front(*ts, 8);
+    }
+    return true;
+  } else if (wpi::starts_with(*ts, "struct:")) {
+    *ts = wpi::drop_front(*ts, 7);
+    return true;
+  }
+  return false;
+}
+
 static void EmitEntryValueReadonly(const NetworkTablesModel::ValueSource& entry,
                                    const char* typeStr,
                                    NetworkTablesFlags flags) {
@@ -717,9 +1139,20 @@ static void EmitEntryValueReadonly(const NetworkTablesModel::ValueSource& entry,
     case NT_STRING_ARRAY:
       ImGui::LabelText(typeStr ? typeStr : "string[]", "[]");
       break;
-    case NT_RAW:
-      ImGui::LabelText(typeStr ? typeStr : "raw", "[...]");
+    case NT_RAW: {
+      std::string_view ts = typeStr ? typeStr : "raw";
+      bool partial = SimplifyTypeString(&ts);
+      ImGui::LabelText(val.GetRaw().empty() ? "[]" : "[...]", "%s", ts.data());
+      if (ImGui::IsItemHovered()) {
+        ImGui::BeginTooltip();
+        if (partial) {
+          ImGui::TextUnformatted(typeStr);
+        }
+        ImGui::Text("%u bytes", static_cast<unsigned int>(val.GetRaw().size()));
+        ImGui::EndTooltip();
+      }
       break;
+    }
     default:
       ImGui::LabelText(typeStr ? typeStr : "other", "?");
       break;
@@ -1022,10 +1455,20 @@ static void EmitEntryValueEditable(NetworkTablesModel* model,
         break;
       }
       break;
-    case NT_RAW:
-      ImGui::LabelText(typeStr ? typeStr : "raw",
-                       val.GetRaw().empty() ? "[]" : "[...]");
+    case NT_RAW: {
+      std::string_view ts = typeStr ? typeStr : "raw";
+      bool partial = SimplifyTypeString(&ts);
+      ImGui::LabelText(val.GetRaw().empty() ? "[]" : "[...]", "%s", ts.data());
+      if (ImGui::IsItemHovered()) {
+        ImGui::BeginTooltip();
+        if (partial) {
+          ImGui::TextUnformatted(typeStr);
+        }
+        ImGui::Text("%u bytes", static_cast<unsigned int>(val.GetRaw().size()));
+        ImGui::EndTooltip();
+      }
       break;
+    }
     case NT_RPC:
       ImGui::LabelText(typeStr ? typeStr : "rpc", "[...]");
       break;
@@ -1164,15 +1607,25 @@ static void EmitValueTree(
 
     ImGui::TableNextColumn();
     if (!child.valueChildren.empty()) {
-      char label[64];
-      if (child.valueChildrenMap) {
-        wpi::format_to_n_c_str(label, sizeof(label), "{{...}}##v_{}",
-                               child.name);
-      } else {
-        wpi::format_to_n_c_str(label, sizeof(label), "[...]##v_{}", child.name);
+      auto pos = ImGui::GetCursorPos();
+      char label[128];
+      std::string_view ts = child.typeStr;
+      bool havePopup = SimplifyTypeString(&ts);
+      wpi::format_to_n_c_str(label, sizeof(label), "{}##v_{}", ts.data(),
+                             child.name.c_str());
+      bool valueChildrenOpen =
+          TreeNodeEx(label, ImGuiTreeNodeFlags_SpanFullWidth);
+      if (havePopup) {
+        if (ImGui::IsItemHovered()) {
+          ImGui::BeginTooltip();
+          ImGui::TextUnformatted(child.typeStr.c_str());
+          ImGui::EndTooltip();
+        }
       }
-
-      if (TreeNodeEx(label, ImGuiTreeNodeFlags_SpanFullWidth)) {
+      // make it look like a normal label w/type
+      ImGui::SetCursorPos(pos);
+      ImGui::LabelText(child.valueChildrenMap ? "{...}" : "[...]", "%s", "");
+      if (valueChildrenOpen) {
         EmitValueTree(child.valueChildren, flags);
         TreePop();
       }
@@ -1197,19 +1650,21 @@ static void EmitEntry(NetworkTablesModel* model,
   ImGui::TableNextColumn();
   if (!entry.valueChildren.empty()) {
     auto pos = ImGui::GetCursorPos();
-
-    char label[64];
-    if (entry.valueChildrenMap) {
-      wpi::format_to_n_c_str(label, sizeof(label), "{{...}}##v_{}",
-                             entry.info.name.c_str());
-    } else {
-      wpi::format_to_n_c_str(label, sizeof(label), "[...]##v_{}",
-                             entry.info.name.c_str());
-    }
-
+    char label[128];
+    std::string_view ts = entry.info.type_str;
+    bool havePopup = SimplifyTypeString(&ts);
+    wpi::format_to_n_c_str(label, sizeof(label), "{}##v_{}", ts.data(),
+                           entry.info.name.c_str());
     valueChildrenOpen =
         TreeNodeEx(label, ImGuiTreeNodeFlags_SpanFullWidth |
                               ImGuiTreeNodeFlags_AllowItemOverlap);
+    if (havePopup) {
+      if (ImGui::IsItemHovered()) {
+        ImGui::BeginTooltip();
+        ImGui::TextUnformatted(entry.info.type_str.c_str());
+        ImGui::EndTooltip();
+      }
+    }
     // make it look like a normal label w/type
     ImGui::SetCursorPos(pos);
     ImGui::LabelText(entry.info.type_str.c_str(), "%s", "");

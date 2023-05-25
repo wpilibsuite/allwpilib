@@ -19,7 +19,8 @@ jobs:
           - os: macOS-12
             name: macOS
             container: ""
-            flags: "-DCMAKE_BUILD_TYPE=Release -DWITH_JAVA=OFF -DWITH_EXAMPLES=ON"
+            env: "PATH=\"/usr/local/opt/protobuf@3/bin:$PATH\""
+            flags: "-DCMAKE_BUILD_TYPE=Release -DWITH_JAVA=OFF -DWITH_EXAMPLES=ON -DCMAKE_LIBRARY_PATH=/usr/local/opt/protobuf@3/lib -DProtobuf_INCLUDE_DIR=/usr/local/opt/protobuf@3/include -DProtobuf_PROTOC_EXECUTABLE=/usr/local/opt/protobuf@3/bin/protoc"
 
     name: "Build - ${{ matrix.name }}"
     runs-on: ${{ matrix.os }}
@@ -27,10 +28,14 @@ jobs:
     steps:
       - name: Install dependencies (Linux)
         if: runner.os == 'Linux'
-        run: sudo apt-get update && sudo apt-get install -y libopencv-dev libopencv4.5-java python-is-python3 ninja-build
+        run: sudo apt-get update && sudo apt-get install -y libopencv-dev libopencv4.5-java python-is-python3 libprotobuf-dev protobuf-compiler ninja-build
+
+      - name: Install QuickBuffers (Linux)
+        if: runner.os == 'Linux'
+        run: wget https://github.com/HebiRobotics/QuickBuffers/releases/download/1.3.2/protoc-gen-quickbuf_1.3.2_amd64.deb && sudo apt install ./protoc-gen-quickbuf_1.3.2_amd64.deb
 
       - name: Install opencv (macOS)
-        run: brew install opencv ninja
+        run: brew install opencv protobuf@3 ninja
         if: runner.os == 'macOS'
 
       - name: Set up Python 3.8 (macOS)

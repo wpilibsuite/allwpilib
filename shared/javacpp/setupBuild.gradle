@@ -30,11 +30,11 @@ model {
             sources {
                 cpp {
                     source {
-                        srcDirs 'src/main/native/cpp'
-                        include '**/*.cpp'
+                        srcDirs 'src/main/native/cpp', "$buildDir/generated/source/proto/main/cpp"
+                        include '**/*.cpp', '**/*.cc'
                     }
                     exportedHeaders {
-                        srcDirs 'src/main/native/include'
+                        srcDirs 'src/main/native/include', "$buildDir/generated/source/proto/main/cpp"
                     }
                 }
             }
@@ -42,6 +42,9 @@ model {
                 if (it instanceof SharedLibraryBinarySpec) {
                     it.buildable = false
                     return
+                }
+                it.tasks.withType(CppCompile) {
+                    it.dependsOn generateProto
                 }
                 if (project.hasProperty('extraSetup')) {
                     extraSetup(it)
