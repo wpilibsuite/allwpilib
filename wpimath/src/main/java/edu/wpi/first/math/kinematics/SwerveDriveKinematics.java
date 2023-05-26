@@ -180,11 +180,6 @@ public class SwerveDriveKinematics
     return new SwerveDriveWheelStates(toSwerveModuleStates(chassisSpeeds));
   }
 
-  @Override
-  public ChassisSpeeds toChassisSpeeds(SwerveDriveWheelStates wheelStates) {
-    return toChassisSpeeds(wheelStates.states);
-  }
-
   /**
    * Performs forward kinematics to return the resulting chassis state from the given module states.
    * This method is often used for odometry -- determining the robot's position on the field using
@@ -217,8 +212,8 @@ public class SwerveDriveKinematics
   }
 
   @Override
-  public Twist2d toTwist2d(SwerveDriveWheelPositions wheelDeltas) {
-    return toTwist2d(wheelDeltas.positions);
+  public ChassisSpeeds toChassisSpeeds(SwerveDriveWheelStates wheelStates) {
+    return toChassisSpeeds(wheelStates.states);
   }
 
   /**
@@ -248,6 +243,11 @@ public class SwerveDriveKinematics
     var chassisDeltaVector = m_forwardKinematics.mult(moduleDeltaMatrix);
     return new Twist2d(
         chassisDeltaVector.get(0, 0), chassisDeltaVector.get(1, 0), chassisDeltaVector.get(2, 0));
+  }
+
+  @Override
+  public Twist2d toTwist2d(SwerveDriveWheelPositions wheelDeltas) {
+    return toTwist2d(wheelDeltas.positions);
   }
 
   /**
