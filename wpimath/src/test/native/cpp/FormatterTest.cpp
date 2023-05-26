@@ -7,7 +7,6 @@
 #include <fmt/format.h>
 
 #include "frc/fmt/Eigen.h"
-#include "frc/fmt/Units.h"
 #include "gtest/gtest.h"
 #include "units/velocity.h"
 
