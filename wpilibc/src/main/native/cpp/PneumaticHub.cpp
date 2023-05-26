@@ -17,7 +17,6 @@
 #include "frc/RobotBase.h"
 #include "frc/SensorUtil.h"
 #include "frc/Solenoid.h"
-#include "frc/fmt/Units.h"
 
 using namespace frc;
 
