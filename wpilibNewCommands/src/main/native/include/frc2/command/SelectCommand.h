@@ -9,9 +9,9 @@
 #pragma warning(disable : 4521)
 #endif
 
+#include <concepts>
 #include <memory>
 #include <string>
-#include <type_traits>
 #include <unordered_map>
 #include <utility>
 #include <vector>
@@ -43,17 +43,15 @@ class SelectCommand : public CommandHelper<CommandBase, SelectCommand<Key>> {
    * @param commands the map of commands to choose from
    * @param selector the selector to determine which command to run
    */
-  template <class... Types,
-            typename = std::enable_if_t<std::conjunction_v<
-                std::is_base_of<Command, std::remove_reference_t<Types>>...>>>
+  template <std::derived_from<Command>... Commands>
   explicit SelectCommand(std::function<Key()> selector,
-                         std::pair<Key, Types>... commands)
+                         std::pair<Key, Commands>... commands)
       : m_selector{std::move(selector)} {
     std::vector<std::pair<Key, std::unique_ptr<Command>>> foo;
 
-    ((void)foo.emplace_back(commands.first,
-                            std::make_unique<std::remove_reference_t<Types>>(
-                                std::move(commands.second))),
+    ((void)foo.emplace_back(
+         commands.first,
+         std::make_unique<std::decay_t<Commands>>(std::move(commands.second))),
      ...);
 
     for (auto&& command : foo) {

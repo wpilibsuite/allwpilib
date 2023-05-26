@@ -7,14 +7,15 @@
 
 #include <jni.h>
 
+#include <concepts>
 #include <queue>
 #include <span>
 #include <string>
 #include <string_view>
-#include <type_traits>
 #include <utility>
 #include <vector>
 
+#include "wpi/AppleClangConceptShims.h"
 #include "wpi/ConvertUTF.h"
 #include "wpi/SafeThread.h"
 #include "wpi/SmallString.h"
@@ -219,9 +220,8 @@ class JArrayRefInner<C, jbyte> {
 template <typename C>
 class JArrayRefInner<C, jlong> {
  public:
-  template <typename U,
-            typename = std::enable_if_t<sizeof(U) == sizeof(jlong) &&
-                                        std::is_integral_v<U>>>
+  template <typename U>
+    requires(sizeof(U) == sizeof(jlong) && std::integral<U>)
   operator std::span<const U>() const {  // NOLINT
     auto arr = static_cast<const C*>(this)->array();
     if (arr.empty()) {
@@ -397,46 +397,38 @@ inline jstring MakeJString(JNIEnv* env, std::string_view str) {
 // details for MakeJIntArray
 namespace detail {
 
-/**
- * Slow path (get primitive array and set individual elements).
- *
- * This is used if the input type is not an integer of the same size (note
- * signed/unsigned is ignored).
- */
-template <typename T,
-          bool = (std::is_integral<T>::value && sizeof(jint) == sizeof(T))>
+template <typename T>
 struct ConvertIntArray {
   static jintArray ToJava(JNIEnv* env, std::span<const T> arr) {
-    jintArray jarr = env->NewIntArray(arr.size());
-    if (!jarr) {
-      return nullptr;
+    if constexpr (sizeof(T) == sizeof(jint) && std::integral<T>) {
+      // Fast path (use SetIntArrayRegion).
+      jintArray jarr = env->NewIntArray(arr.size());
+      if (!jarr) {
+        return nullptr;
+      }
+      env->SetIntArrayRegion(jarr, 0, arr.size(),
+                             reinterpret_cast<const jint*>(arr.data()));
+      return jarr;
+    } else {
+      // Slow path (get primitive array and set individual elements).
+      //
+      // This is used if the input type is not an integer of the same size (note
+      // signed/unsigned is ignored).
+      jintArray jarr = env->NewIntArray(arr.size());
+      if (!jarr) {
+        return nullptr;
+      }
+      jint* elements =
+          static_cast<jint*>(env->GetPrimitiveArrayCritical(jarr, nullptr));
+      if (!elements) {
+        return nullptr;
+      }
+      for (size_t i = 0; i < arr.size(); ++i) {
+        elements[i] = static_cast<jint>(arr[i]);
+      }
+      env->ReleasePrimitiveArrayCritical(jarr, elements, 0);
+      return jarr;
     }
-    jint* elements =
-        static_cast<jint*>(env->GetPrimitiveArrayCritical(jarr, nullptr));
-    if (!elements) {
-      return nullptr;
-    }
-    for (size_t i = 0; i < arr.size(); ++i) {
-      elements[i] = static_cast<jint>(arr[i]);
-    }
-    env->ReleasePrimitiveArrayCritical(jarr, elements, 0);
-    return jarr;
-  }
-};
-
-/**
- * Fast path (use SetIntArrayRegion).
- */
-template <typename T>
-struct ConvertIntArray<T, true> {
-  static jintArray ToJava(JNIEnv* env, std::span<const T> arr) {
-    jintArray jarr = env->NewIntArray(arr.size());
-    if (!jarr) {
-      return nullptr;
-    }
-    env->SetIntArrayRegion(jarr, 0, arr.size(),
-                           reinterpret_cast<const jint*>(arr.data()));
-    return jarr;
   }
 };
 
@@ -574,9 +566,9 @@ WPI_JNI_MAKEJARRAY(jdouble, Double)
 
 #undef WPI_JNI_MAKEJARRAY
 
-template <class T, typename = std::enable_if_t<
-                       sizeof(typename T::value_type) == sizeof(jlong) &&
-                       std::is_integral_v<typename T::value_type>>>
+template <class T>
+  requires(sizeof(typename T::value_type) == sizeof(jlong) &&
+           std::integral<typename T::value_type>)
 inline jlongArray MakeJLongArray(JNIEnv* env, const T& arr) {
   jlongArray jarr = env->NewLongArray(arr.size());
   if (!jarr) {

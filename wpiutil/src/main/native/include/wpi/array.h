@@ -5,6 +5,7 @@
 #pragma once
 
 #include <array>
+#include <concepts>
 #include <cstddef>
 #include <tuple>
 #include <utility>
@@ -57,8 +58,7 @@ class array : public std::array<T, N> {
 };
 
 template <typename T, typename... Ts>
-array(T, Ts...) -> array<std::enable_if_t<(std::is_same_v<T, Ts> && ...), T>,
-                         1 + sizeof...(Ts)>;
+array(T, Ts...) -> array<T, 1 + sizeof...(Ts)>;
 
 }  // namespace wpi
 

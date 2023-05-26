@@ -4,8 +4,10 @@
 
 #pragma once
 
-#include <type_traits>
+#include <concepts>
 #include <utility>
+
+#include <wpi/AppleClangConceptShims.h>
 
 #include "frc2/command/CommandScheduler.h"
 
@@ -65,8 +67,7 @@ class Subsystem {
    *
    * @param defaultCommand the default command to associate with this subsystem
    */
-  template <class T, typename = std::enable_if_t<std::is_base_of_v<
-                         Command, std::remove_reference_t<T>>>>
+  template <std::derived_from<Command> T>
   void SetDefaultCommand(T&& defaultCommand) {
     CommandScheduler::GetInstance().SetDefaultCommand(
         this, std::forward<T>(defaultCommand));

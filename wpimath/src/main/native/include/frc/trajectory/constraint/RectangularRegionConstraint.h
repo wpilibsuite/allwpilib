@@ -4,7 +4,10 @@
 
 #pragma once
 
+#include <concepts>
 #include <limits>
+
+#include <wpi/AppleClangConceptShims.h>
 
 #include "frc/geometry/Rotation2d.h"
 #include "frc/geometry/Translation2d.h"
@@ -14,8 +17,7 @@ namespace frc {
 /**
  * Enforces a particular constraint only within a rectangular region.
  */
-template <typename Constraint, typename = std::enable_if_t<std::is_base_of_v<
-                                   TrajectoryConstraint, Constraint>>>
+template <std::derived_from<TrajectoryConstraint> Constraint>
 class RectangularRegionConstraint : public TrajectoryConstraint {
  public:
   /**

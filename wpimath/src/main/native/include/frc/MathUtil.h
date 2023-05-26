@@ -5,6 +5,7 @@
 #pragma once
 
 #include <numbers>
+#include <type_traits>
 
 #include <wpi/SymbolExports.h>
 
@@ -25,12 +26,11 @@ namespace frc {
  * be infinite.
  * @return The value after the deadband is applied.
  */
-template <typename T,
-          typename = std::enable_if_t<std::disjunction_v<
-              std::is_floating_point<T>, units::traits::is_unit_t<T>>>>
+template <typename T>
+  requires std::is_arithmetic_v<T> || units::traits::is_unit_t_v<T>
 T ApplyDeadband(T value, T deadband, T maxMagnitude = T{1.0}) {
   T magnitude;
-  if constexpr (std::is_floating_point_v<T>) {
+  if constexpr (std::is_arithmetic_v<T>) {
     magnitude = std::abs(value);
   } else {
     magnitude = units::math::abs(value);

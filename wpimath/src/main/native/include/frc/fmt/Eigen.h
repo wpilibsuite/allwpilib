@@ -4,9 +4,10 @@
 
 #pragma once
 
-#include <type_traits>
+#include <concepts>
 
 #include <fmt/format.h>
+#include <wpi/AppleClangConceptShims.h>
 
 #include "Eigen/Core"
 #include "Eigen/SparseCore"
@@ -16,12 +17,9 @@
  * Eigen::SparseCompressedBase<Derived>.
  */
 template <typename Derived, typename CharT>
-struct fmt::formatter<
-    Derived, CharT,
-    std::enable_if_t<
-        std::is_base_of_v<Eigen::MatrixBase<Derived>, Derived> ||
-            std::is_base_of_v<Eigen::SparseCompressedBase<Derived>, Derived>,
-        void>> {
+  requires std::derived_from<Derived, Eigen::MatrixBase<Derived>> ||
+           std::derived_from<Derived, Eigen::SparseCompressedBase<Derived>>
+struct fmt::formatter<Derived, CharT> {
   constexpr auto parse(fmt::format_parse_context& ctx) {
     return m_underlying.parse(ctx);
   }

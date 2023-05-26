@@ -4,9 +4,11 @@
 
 #pragma once
 
+#include <concepts>
 #include <memory>
 #include <string_view>
 
+#include <wpi/AppleClangConceptShims.h>
 #include <wpi/StringMap.h>
 
 #include "frc/smartdashboard/SendableChooserBase.h"
@@ -27,12 +29,9 @@ namespace frc {
  * @see SmartDashboard
  */
 template <class T>
+  requires std::copy_constructible<T> && std::default_initializable<T>
 class SendableChooser : public SendableChooserBase {
   wpi::StringMap<T> m_choices;
-  static_assert(std::is_copy_constructible_v<T>,
-                "T must be copy-constructible!");
-  static_assert(std::is_default_constructible_v<T>,
-                "T must be default-constructible!");
 
   template <class U>
   static U _unwrap_smart_ptr(const U& value);

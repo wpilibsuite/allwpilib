@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include <concepts>
 #include <initializer_list>
 #include <memory>
 #include <span>
@@ -14,6 +15,7 @@
 #include <frc/event/EventLoop.h>
 #include <networktables/NTSendable.h>
 #include <units/time.h>
+#include <wpi/AppleClangConceptShims.h>
 #include <wpi/FunctionExtras.h>
 #include <wpi/deprecated.h>
 #include <wpi/sendable/SendableHelper.h>
@@ -175,16 +177,14 @@ class CommandScheduler final : public nt::NTSendable,
    * @param subsystem      the subsystem whose default command will be set
    * @param defaultCommand the default command to associate with the subsystem
    */
-  template <class T, typename = std::enable_if_t<std::is_base_of_v<
-                         Command, std::remove_reference_t<T>>>>
+  template <std::derived_from<Command> T>
   void SetDefaultCommand(Subsystem* subsystem, T&& defaultCommand) {
     if (!defaultCommand.HasRequirement(subsystem)) {
       throw FRC_MakeError(frc::err::CommandIllegalUse,
                           "Default commands must require their subsystem!");
     }
-    SetDefaultCommandImpl(subsystem,
-                          std::make_unique<std::remove_reference_t<T>>(
-                              std::forward<T>(defaultCommand)));
+    SetDefaultCommandImpl(subsystem, std::make_unique<std::decay_t<T>>(
+                                         std::forward<T>(defaultCommand)));
   }
 
   /**
