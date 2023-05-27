@@ -115,9 +115,8 @@ constexpr T InputModulus(T input, T minimumInput, T maximumInput) {
  * value
  * @return Whether or not the actual value is within the allowed tolerance
  */
-template <typename T,
-          typename = std::enable_if_t<std::disjunction_v<
-              std::is_arithmetic<T>, units::traits::is_unit_t<T>>>>
+template <typename T, typename = std::enable_if_t<std::disjunction_v<
+                          std::is_arithmetic<T>, units::traits::is_unit_t<T>>>>
 constexpr bool IsNear(T expected, T actual, T tolerance) {
   if constexpr (std::is_arithmetic_v<T>) {
     return std::abs(expected - actual) < tolerance;
@@ -145,9 +144,8 @@ constexpr bool IsNear(T expected, T actual, T tolerance) {
  * @param max The maximum value expected from the input
  * @return Whether or not the actual value is within the allowed tolerance
  */
-template <typename T,
-          typename = std::enable_if_t<std::disjunction_v<
-              std::is_arithmetic<T>, units::traits::is_unit_t<T>>>>
+template <typename T, typename = std::enable_if_t<std::disjunction_v<
+                          std::is_arithmetic<T>, units::traits::is_unit_t<T>>>>
 constexpr bool IsNear(T expected, T actual, T tolerance, T min, T max) {
   T errorBound = (max - min) / 2.0;
   T error = frc::InputModulus<T>(expected - actual, -errorBound, errorBound);
