@@ -9,6 +9,7 @@ import edu.wpi.first.hal.FRCNetComm.tInstances;
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
 import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.util.datalog.DataLog;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -249,6 +250,33 @@ public abstract class IterativeRobotBase extends RobotBase {
    * test mode.
    */
   public void testExit() {}
+
+  /** Starts publishing added epochs to NetworkTables. Default topic is "Epochs" */
+  public void publishToNetworkTables() {
+    m_watchdog.publishToNetworkTables();
+  }
+
+  /** Starts publishing added epochs to NetworkTables. Default topic is "Epochs" 
+   * 
+   * @param topicName The NetworkTables topic to publish to
+  */
+  public void publishToNetworkTables(String topicName) {
+    m_watchdog.publishToNetworkTables(topicName);
+  }
+
+  /** Starts logging added epochs to the data log. Defaults to the default data log. */
+  public void startDataLog() {
+    m_watchdog.startDataLog();
+  }
+
+  /**
+   * Starts logging added epochs to the data log.
+   *
+   * @param dataLog The data log to log epochs to
+   */
+  public void startDataLog(DataLog dataLog) {
+    m_watchdog.startDataLog(dataLog);
+  }
 
   /**
    * Enables or disables flushing NetworkTables every loop iteration. By default, this is enabled.

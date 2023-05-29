@@ -4,6 +4,10 @@
 
 package edu.wpi.first.wpilibj;
 
+import edu.wpi.first.networktables.IntegerPublisher;
+import edu.wpi.first.networktables.IntegerTopic;
+import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.util.datalog.DataLog;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Consumer;
@@ -21,12 +25,47 @@ public class Tracer {
 
   private long m_lastEpochsPrintTime; // microseconds
   private long m_startTime; // microseconds
+  private boolean m_publishNT;
+  private boolean m_dataLogEnabled;
+  private DataLog m_dataLog;
+  private String m_topic = "Epochs";
 
   private final Map<String, Long> m_epochs = new HashMap<>(); // microseconds
 
   /** Tracer constructor. */
   public Tracer() {
     resetTimer();
+  }
+
+  /** Starts publishing added epochs to NetworkTables. Default topic is "Epochs" */
+  public void publishToNetworkTables() {
+    m_publishNT = true;
+  }
+
+  /**
+   * Starts publishing added epochs to NetworkTables.
+   *
+   * @param topicName The NetworkTables topic to publish to
+   */
+  public void publishToNetworkTables(String topicName) {
+    publishToNetworkTables();
+    m_topic = topicName;
+  }
+
+  /** Starts logging added epochs to the data log. Defaults to the default data log. */
+  public void startDataLog() {
+    m_dataLog = DataLogManager.getLog();
+    m_dataLogEnabled = true;
+  }
+
+  /**
+   * Starts logging added epochs to the data log.
+   *
+   * @param dataLog The data log to log epochs to
+   */
+  public void startDataLog(DataLog dataLog) {
+    m_dataLog = dataLog;
+    m_dataLogEnabled = true;
   }
 
   /** Clears all epochs. */
@@ -54,6 +93,19 @@ public class Tracer {
   public void addEpoch(String epochName) {
     long currentTime = RobotController.getFPGATime();
     m_epochs.put(epochName, currentTime - m_startTime);
+    if (m_publishNT) {
+      IntegerTopic topic =
+          NetworkTableInstance.getDefault().getIntegerTopic(m_topic + "/" + epochName);
+      IntegerPublisher pub = topic.publish();
+      pub.setDefault(0);
+      topic.setRetained(true);
+      pub.set(currentTime - m_startTime);
+      pub.close();
+    }
+    if (m_dataLogEnabled) {
+      m_dataLog.appendInteger(
+          m_dataLog.start("Epochs/" + epochName, "int64"), currentTime - m_startTime, 0);
+    }
     m_startTime = currentTime;
   }
 
