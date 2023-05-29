@@ -141,11 +141,11 @@ void Thread::Main() {
         }
       }
     } else if (freeSpace < 2 * kFreeSpaceThreshold) {
-      fmt::print(stderr,
+      FRC_ReportError(warn::Warning,
                  "DataLogManager: Log storage device has {} MB of free space "
-                 "remaining! Logs will get deleted below 50 MB of free space. "
+                 "remaining! Logs will get deleted below {} MB of free space. "
                  "Consider deleting logs off the storage device.",
-                 freeSpace / 1000000);
+                 freeSpace / 1000000, kFreeSpaceThreshold / 1000000);
     }
   }
 
