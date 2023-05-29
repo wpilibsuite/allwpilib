@@ -239,13 +239,7 @@ public final class DataLogManager {
     {
       File logDir = new File(m_logDir);
       long freeSpace = logDir.getFreeSpace();
-      if (freeSpace < 2 * kFreeSpaceThreshold) {
-        DriverStation.reportWarning(
-            "DataLogManager: Log storage device has "
-                + (freeSpace / 1000000)
-                + " MB of free space remaining! Logs will get deleted below 50 MB of free space. Consider deleting logs off the storage device.",
-            false);
-      } else if (freeSpace < kFreeSpaceThreshold) {
+      if (freeSpace < kFreeSpaceThreshold) {
         // Delete oldest FRC_*.wpilog files (ignore FRC_TBD_*.wpilog as we just created one)
         File[] files =
             logDir.listFiles(
@@ -263,7 +257,7 @@ public final class DataLogManager {
             }
             long length = file.length();
             if (file.delete()) {
-              System.err.println("DataLogManager: " + file.getName() + " has been deleted!");
+              System.err.println("DataLogManager: Deleted " + file.getName());
               freeSpace += length;
               if (freeSpace >= kFreeSpaceThreshold) {
                 break;
@@ -273,6 +267,12 @@ public final class DataLogManager {
             }
           }
         }
+      } else if (freeSpace < 2 * kFreeSpaceThreshold) {
+        DriverStation.reportWarning(
+            "DataLogManager: Log storage device has "
+                + (freeSpace / 1000000)
+                + " MB of free space remaining! Logs will get deleted below 50 MB of free space. Consider deleting logs off the storage device.",
+            false);
       }
     }
 
