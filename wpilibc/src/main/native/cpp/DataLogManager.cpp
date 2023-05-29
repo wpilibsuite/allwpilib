@@ -8,6 +8,7 @@
 #include <ctime>
 #include <random>
 
+#include <frc/Errors.h>
 #include <fmt/chrono.h>
 #include <fmt/format.h>
 #include <networktables/NetworkTableInstance.h>
