@@ -140,8 +140,8 @@ constexpr bool IsNear(T expected, T actual, T tolerance) {
  * @param actual The actual value
  * @param tolerance The allowed difference between the actual and the expected
  * value
- * @param min The minimum value expected from the input
- * @param max The maximum value expected from the input
+ * @param min Smallest value before wrapping around to the largest value
+ * @param max Largest value before wrapping around to the smallest value
  * @return Whether or not the actual value is within the allowed tolerance
  */
 template <typename T, typename = std::enable_if_t<std::disjunction_v<
