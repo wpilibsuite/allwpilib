@@ -129,7 +129,8 @@ void Thread::Main() {
         }
         auto size = entry.file_size();
         if (fs::remove(entry.path(), ec)) {
-          fmt::print(stderr, "DataLogManager: Deleted {}", entry.path().string());
+          fmt::print(stderr, "DataLogManager: Deleted {}",
+                     entry.path().string());
           freeSpace += size;
           if (freeSpace >= kFreeSpaceThreshold) {
             break;
@@ -140,7 +141,11 @@ void Thread::Main() {
         }
       }
     } else if (freeSpace < 2 * kFreeSpaceThreshold) {
-        fmt::print(stderr, "DataLogManager: Log storage device has {} MB of free space remaining! Logs will get deleted below 50 MB of free space. Consider deleting logs off the storage device.", freeSpace / 1000000);
+      fmt::print(stderr,
+                 "DataLogManager: Log storage device has {} MB of free space "
+                 "remaining! Logs will get deleted below 50 MB of free space. "
+                 "Consider deleting logs off the storage device.",
+                 freeSpace / 1000000);
     }
   }
 
