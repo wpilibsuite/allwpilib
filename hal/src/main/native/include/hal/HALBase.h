@@ -18,7 +18,7 @@
 
 /**
  * @defgroup hal_capi WPILib HAL API
- * Hardware Abstraction Layer to hardware or simulator
+ * Hardware Abstraction Layer (HAL) to hardware or simulator
  * @{
  */
 
@@ -108,7 +108,7 @@ HAL_RuntimeType HAL_GetRuntimeType(void);
 HAL_Bool HAL_GetFPGAButton(int32_t* status);
 
 /**
- * Gets if the system outputs are currently active
+ * Gets if the system outputs are currently active.
  *
  * @param[out] status the error code, or 0 for success
  * @return true if the system outputs are active, false if disabled
@@ -173,7 +173,8 @@ uint64_t HAL_GetFPGATime(int32_t* status);
 uint64_t HAL_ExpandFPGATime(uint32_t unexpandedLower, int32_t* status);
 
 /**
- * Gets the current state of the Robot Signal Light (RSL)
+ * Gets the current state of the Robot Signal Light (RSL).
+ *
  * @param[out] status the error code, or 0 for success
  * @return The current state of the RSL- true if on, false if off
  */
