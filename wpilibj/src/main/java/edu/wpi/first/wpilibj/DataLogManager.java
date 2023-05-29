@@ -271,7 +271,8 @@ public final class DataLogManager {
         DriverStation.reportWarning(
             "DataLogManager: Log storage device has "
                 + (freeSpace / 1000000)
-                + " MB of free space remaining! Logs will get deleted below 50 MB of free space. Consider deleting logs off the storage device.",
+                + " MB of free space remaining! Logs will get deleted below 50 MB of free space."
+                + "Consider deleting logs off the storage device.",
             false);
       }
     }
