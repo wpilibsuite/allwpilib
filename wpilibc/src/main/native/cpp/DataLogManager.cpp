@@ -4,11 +4,12 @@
 
 #include "frc/DataLogManager.h"
 
+#include <frc/Errors.h>
+
 #include <algorithm>
 #include <ctime>
 #include <random>
 
-#include <frc/Errors.h>
 #include <fmt/chrono.h>
 #include <fmt/format.h>
 #include <networktables/NetworkTableInstance.h>
@@ -142,11 +143,12 @@ void Thread::Main() {
         }
       }
     } else if (freeSpace < 2 * kFreeSpaceThreshold) {
-      FRC_ReportError(warn::Warning,
-                 "DataLogManager: Log storage device has {} MB of free space "
-                 "remaining! Logs will get deleted below {} MB of free space. "
-                 "Consider deleting logs off the storage device.",
-                 freeSpace / 1000000, kFreeSpaceThreshold / 1000000);
+      FRC_ReportError(
+          warn::Warning,
+          "DataLogManager: Log storage device has {} MB of free space "
+          "remaining! Logs will get deleted below {} MB of free space. "
+          "Consider deleting logs off the storage device.",
+          freeSpace / 1000000, kFreeSpaceThreshold / 1000000);
     }
   }
 
