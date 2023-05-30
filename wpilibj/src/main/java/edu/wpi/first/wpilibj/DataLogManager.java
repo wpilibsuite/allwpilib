@@ -257,7 +257,7 @@ public final class DataLogManager {
             }
             long length = file.length();
             if (file.delete()) {
-              System.err.println("DataLogManager: Deleted " + file.getName());
+              DriverStation.reportWarning("DataLogManager: Deleted " + file.getName(), false);
               freeSpace += length;
               if (freeSpace >= kFreeSpaceThreshold) {
                 break;

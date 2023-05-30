@@ -131,8 +131,8 @@ void Thread::Main() {
         }
         auto size = entry.file_size();
         if (fs::remove(entry.path(), ec)) {
-          fmt::print(stderr, "DataLogManager: Deleted {}",
-                     entry.path().string());
+          FRC_ReportError(warn::Warning, "DataLogManager: Deleted {}",
+                          entry.path().string());
           freeSpace += size;
           if (freeSpace >= kFreeSpaceThreshold) {
             break;
