@@ -75,9 +75,9 @@ int32_t HAL_GetFPGAVersion(int32_t* status);
 int64_t HAL_GetFPGARevision(int32_t* status);
 
 /**
- * Returns the serial number.
+ * Returns the roboRIO serial number.
  *
- * @param[out] buffer The serial number.
+ * @param[out] buffer The roboRIO serial number.
  * @param size The maximum characters to copy into buffer.
  * @return Number of characters copied into buffer.
  */
