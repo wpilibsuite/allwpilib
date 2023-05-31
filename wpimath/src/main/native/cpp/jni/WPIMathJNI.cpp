@@ -33,7 +33,7 @@ namespace {
  */
 bool IsStabilizable(const Eigen::Ref<const Eigen::MatrixXd>& A,
                     const Eigen::Ref<const Eigen::MatrixXd>& B) {
-  Eigen::EigenSolver<Eigen::MatrixXd> es{A};
+  Eigen::EigenSolver<Eigen::MatrixXd> es{A, false};
 
   for (int i = 0; i < A.rows(); ++i) {
     if (es.eigenvalues()[i].real() * es.eigenvalues()[i].real() +

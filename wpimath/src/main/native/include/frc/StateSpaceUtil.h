@@ -56,7 +56,7 @@ void WhiteNoiseVectorImpl(Matrix& result, T elem, Ts... elems) {
 template <int States, int Inputs>
 bool IsStabilizableImpl(const Matrixd<States, States>& A,
                         const Matrixd<States, Inputs>& B) {
-  Eigen::EigenSolver<Matrixd<States, States>> es{A};
+  Eigen::EigenSolver<Matrixd<States, States>> es{A, false};
 
   for (int i = 0; i < States; ++i) {
     if (es.eigenvalues()[i].real() * es.eigenvalues()[i].real() +
