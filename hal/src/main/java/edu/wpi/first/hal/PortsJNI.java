@@ -4,7 +4,11 @@
 
 package edu.wpi.first.hal;
 
-/** Ports HAL JNI functions. */
+/**
+ * Ports HAL JNI functions.
+ *
+ * @see "hal/Ports.h"
+ */
 public class PortsJNI extends JNIWrapper {
   /**
    * Gets the number of analog accumulators in the current system.
