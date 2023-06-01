@@ -12,6 +12,7 @@ import static org.junit.jupiter.api.Assertions.fail;
 import edu.wpi.first.hal.HAL;
 import edu.wpi.first.wpilibj.simulation.SimHooks;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicReference;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -135,44 +136,44 @@ class TimerTest {
   @Test
   @ResourceLock("timing")
   void delaySimTest() {
-    int waitSeconds = 5;
+    double waitSeconds = 1;
 
     AtomicBoolean hasFinished = new AtomicBoolean(false);
-
-    Object sync = new Object();
+    AtomicReference<Double> start = new AtomicReference<>(0.0);
+    AtomicReference<Double> end = new AtomicReference<>(0.0);
 
     Thread testThread =
         new Thread(
             () -> {
-              synchronized (sync) {
-                sync.notify();
-              }
+              start.set(Timer.getFPGATimestamp());
               Timer.delaySim(waitSeconds);
+              end.set(Timer.getFPGATimestamp());
               hasFinished.set(true);
             });
 
     testThread.start();
 
-    synchronized (sync) {
+    while (!hasFinished.get()) {
+      SimHooks.stepTiming(0.1);
       try {
-        // Wait for thread to start
-        sync.wait(1000);
-      } catch (InterruptedException ex) {
-        fail("Test thread was interrupted");
+        // Allows other thread to run; without this, the time measured by testThread is orders of
+        // magnitude larger than it should be.
+        Thread.sleep(1);
+      } catch (InterruptedException e) {
+        throw new RuntimeException(e);
       }
     }
 
-    for (int i = 0; i < 100; i++) {
+    while (!hasFinished.get()) {
       SimHooks.stepTiming(1);
     }
 
     try {
-      testThread.interrupt();
       testThread.join();
     } catch (InterruptedException ex) {
       fail("Test thread was interrupted");
     }
 
-    assertTrue(hasFinished.get());
+    assertEquals(waitSeconds, end.get() - start.get(), 1e-9);
   }
 }

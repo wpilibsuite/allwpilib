@@ -316,7 +316,7 @@ uint64_t HAL_ExpandFPGATime(uint32_t unexpandedLower, int32_t* status) {
   return (upper << 32) + static_cast<uint64_t>(unexpandedLower);
 }
 
-void HAL_WaitMicroseconds(uint64_t waitTime) {
+void HAL_WaitMicroseconds(uint64_t waitMicros) {
   int32_t status = 0;
 
   uint64_t startTime = HAL_GetFPGATime(&status);
@@ -331,7 +331,7 @@ void HAL_WaitMicroseconds(uint64_t waitTime) {
     return;
   }
 
-  HAL_UpdateNotifierAlarm(handle, startTime + waitTime, &status);
+  HAL_UpdateNotifierAlarm(handle, startTime + waitMicros, &status);
   uint64_t end = HAL_WaitForNotifierAlarm(handle, &status);
   HAL_CleanNotifier(handle, &status);
 }
