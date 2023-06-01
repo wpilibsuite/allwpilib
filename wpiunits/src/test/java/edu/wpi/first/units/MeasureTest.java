@@ -25,7 +25,7 @@ class MeasureTest {
 
   @Test
   void testMultiply() {
-    Measure<Distance> m = Measure.of(1, Units.Feet);
+    Measure<Distance> m = Units.Feet.of(1);
     Measure<Distance> m2 = m.times(10);
     assertEquals(10, m2.magnitude(), 1e-12);
     assertNotSame(m2, m); // make sure state wasn't changed
@@ -33,7 +33,7 @@ class MeasureTest {
 
   @Test
   void testDivide() {
-    Measure<Distance> m = Measure.of(1, Units.Meters);
+    Measure<Distance> m = Units.Meters.of(1);
     Measure<Distance> m2 = m.divide(10);
     assertEquals(0.1, m2.magnitude(), 0);
     assertNotSame(m2, m);
@@ -41,23 +41,23 @@ class MeasureTest {
 
   @Test
   void testAdd() {
-    Measure<Distance> m1 = Measure.of(1, Units.Feet);
-    Measure<Distance> m2 = Measure.of(2, Units.Inches);
-    assertTrue(m1.add(m2).isEquivalent(Measure.of(1 + 2 / 12d, Units.Feet)));
-    assertTrue(m2.add(m1).isEquivalent(Measure.of(14, Units.Inches)));
+    Measure<Distance> m1 = Units.Feet.of(1);
+    Measure<Distance> m2 = Units.Inches.of(2);
+    assertTrue(m1.add(m2).isEquivalent(Units.Feet.of(1 + 2 / 12d)));
+    assertTrue(m2.add(m1).isEquivalent(Units.Inches.of(14)));
   }
 
   @Test
   void testSubtract() {
-    Measure<Distance> m1 = Measure.of(1, Units.Feet);
-    Measure<Distance> m2 = Measure.of(2, Units.Inches);
-    assertTrue(m1.subtract(m2).isEquivalent(Measure.of(1 - 2 / 12d, Units.Feet)));
-    assertTrue(m2.subtract(m1).isEquivalent(Measure.of(-10, Units.Inches)));
+    Measure<Distance> m1 = Units.Feet.of(1);
+    Measure<Distance> m2 = Units.Inches.of(2);
+    assertTrue(m1.subtract(m2).isEquivalent(Units.Feet.of(1 - 2 / 12d)));
+    assertTrue(m2.subtract(m1).isEquivalent(Units.Inches.of(-10)));
   }
 
   @Test
   void testNegate() {
-    Measure<Distance> m = Measure.of(123, Units.Feet);
+    Measure<Distance> m = Units.Feet.of(123);
     Measure<Distance> n = m.negate();
     assertEquals(-m.magnitude(), n.magnitude(), 1e-12);
     assertEquals(m.unit(), n.unit());
@@ -65,22 +65,22 @@ class MeasureTest {
 
   @Test
   void testEquivalency() {
-    Measure<Distance> inches = Measure.of(12, Units.Inches);
-    Measure<Distance> feet = Measure.of(1, Units.Feet);
+    Measure<Distance> inches = Units.Inches.of(12);
+    Measure<Distance> feet = Units.Feet.of(1);
     assertTrue(inches.isEquivalent(feet));
     assertTrue(feet.isEquivalent(inches));
   }
 
   @Test
   void testAs() {
-    Measure<Distance> m = Measure.of(12, Units.Inches);
+    Measure<Distance> m = Units.Inches.of(12);
     assertEquals(1, m.in(Units.Feet), Measure.EQUIVALENCE_THRESHOLD);
   }
 
   @Test
   void testPerUnitTime() {
-    var measure = Measure.of(144, Units.Kilograms);
-    var dt = Measure.of(53, Units.Milliseconds);
+    var measure = Units.Kilograms.of(144);
+    var dt = Units.Milliseconds.of(53);
 
     // 144 Kg / (53 ms) = (1000 / 53) * 144 Kg/s = (144,000 / 53) Kg/s
 
@@ -100,7 +100,7 @@ class MeasureTest {
   @Test
   void testTimesUnitless() {
     var unit = new ExampleUnit(6);
-    var measure = Measure.of(2.5, unit);
+    var measure = unit.of(2.5);
     var multiplier = Units.Percent.of(125); // 125% or 1.25x
     Measure<?> result = measure.times(multiplier);
     assertSame(unit, result.unit());
@@ -143,7 +143,7 @@ class MeasureTest {
 
     // 19 ft/ms = 19,000 ft/s
     // 19,000 ft/s * 44s = 836,000 ft
-    assertEquals(Units.Feet.of(836_000), m1.times(m2));
+    assertTrue(Units.Feet.of(836_000).isNear(m1.times(m2), 1e-12));
 
     // 42 ex per foot * 17mm = 42 ex * 17mm / (304.8mm/ft) = 42 * 17 / 304.8 = 2.34252
     var exampleUnit = new ExampleUnit(1);
@@ -154,23 +154,23 @@ class MeasureTest {
 
   @Test
   void testToShortString() {
-    var measure = Measure.of(343, Units.Volts);
+    var measure = Units.Volts.of(343);
     assertEquals("3.430e+02 V", measure.toShortString());
   }
 
   @Test
   void testToLongString() {
-    var measure = Measure.of(343, Units.Volts);
+    var measure = Units.Volts.of(343);
     assertEquals("343.0 Volt", measure.toLongString());
-    assertEquals("343.0001 Volt", Measure.of(343.0001, Units.Volts).toLongString());
+    assertEquals("343.0001 Volt", Units.Volts.of(343.0001).toLongString());
     assertEquals(
-        "1.2345678912345679E8 Volt", Measure.of(123456789.123456789, Units.Volts).toLongString());
+        "1.2345678912345679E8 Volt", Units.Volts.of(123456789.123456789).toLongString());
   }
 
   @Test
   void testOfBaseUnits() {
     var unit = new ExampleUnit(16);
-    var measure = Measure.ofBaseUnits(1, unit);
+    var measure = unit.ofBaseUnits(1);
     assertEquals(unit, measure.unit());
     assertEquals(1, measure.baseUnitMagnitude());
     assertEquals(1 / 16.0, measure.magnitude());
@@ -179,9 +179,9 @@ class MeasureTest {
   @Test
   void testCompare() {
     var unit = new ExampleUnit(7);
-    var base = Measure.of(1, unit);
-    var less = Measure.of(0.5, unit);
-    var more = Measure.of(2, unit);
+    var base = unit.of(1);
+    var less = unit.of(0.5);
+    var more = unit.of(2);
 
     assertEquals(0, base.compareTo(base));
     assertEquals(-1, base.compareTo(more));
@@ -208,7 +208,7 @@ class MeasureTest {
   @Test
   void testTimesScalar() {
     var unit = new ExampleUnit(42);
-    var measure = Measure.of(4.2, unit);
+    var measure = unit.of(4.2);
     var scalar = 18;
     var result = measure.times(scalar);
     assertNotSame(measure, result);
@@ -221,7 +221,7 @@ class MeasureTest {
   void testPerUnit() {
     var unitA = new ExampleUnit(10);
     var unitB = new ExampleUnit(12);
-    var measure = Measure.of(1.2, unitA);
+    var measure = unitA.of(1.2);
     var result = measure.per(unitB);
     assertEquals(Per.combine(unitA, unitB), result.unit()); // A/B has base equivalent of 10/12
     assertEquals(1, result.baseUnitMagnitude()); // 10/12 * 12/10 = 1
@@ -231,8 +231,8 @@ class MeasureTest {
   @Test
   void testAddMeasureSameUnit() {
     var unit = new ExampleUnit(8.2);
-    var measureA = Measure.of(3.1, unit);
-    var measureB = Measure.of(91.6, unit);
+    var measureA = unit.of(3.1);
+    var measureB = unit.of(91.6);
     var result = measureA.add(measureB);
     assertEquals(unit, result.unit());
     assertEquals(94.7, result.magnitude(), 1e-12);
@@ -242,8 +242,8 @@ class MeasureTest {
   void testAddMeasuresDifferentUnits() {
     var unitA = new ExampleUnit(8.2);
     var unitB = new ExampleUnit(7.3);
-    var measureA = Measure.of(5, unitA);
-    var measureB = Measure.of(16, unitB);
+    var measureA = unitA.of(5);
+    var measureB = unitB.of(16);
     var aPlusB = measureA.add(measureB);
 
     assertEquals(unitA, aPlusB.unit());
@@ -265,10 +265,10 @@ class MeasureTest {
   @Test
   void testMin() {
     var unit = new ExampleUnit(56.1);
-    var one = Measure.of(1, unit);
-    var two = Measure.of(2, unit);
-    var zero = Measure.of(0, unit);
-    var veryNegative = Measure.of(-12839712, unit);
+    var one = unit.of(1);
+    var two = unit.of(2);
+    var zero = unit.of(0);
+    var veryNegative = unit.of(-12839712);
 
     var min = Measure.min(one, two, zero, veryNegative);
     assertSame(veryNegative, min);
@@ -283,10 +283,10 @@ class MeasureTest {
   @Test
   void testMax() {
     var unit = new ExampleUnit(6.551);
-    var one = Measure.of(1, unit);
-    var two = Measure.of(2, unit);
-    var zero = Measure.of(0, unit);
-    var veryLarge = Measure.of(8217234, unit);
+    var one = unit.of(1);
+    var two = unit.of(2);
+    var zero = unit.of(0);
+    var veryLarge = unit.of(8217234);
 
     var max = Measure.max(one, two, zero, veryLarge);
     assertSame(veryLarge, max);
@@ -295,8 +295,8 @@ class MeasureTest {
   @Test
   void testIsNear() {
     var unit = new ExampleUnit(92);
-    var measureA = Measure.of(1.21, unit);
-    var measureB = Measure.ofBaseUnits(64, unit);
+    var measureA = unit.of(1.21);
+    var measureB = unit.ofBaseUnits(64);
     // A = 1.21 * 92 base units, or 111.32
     // B = 64 base units
     // ratio = 111.32 / 64 = 1.739375 = 173.9375%

@@ -112,7 +112,7 @@ public class Unit<U extends Unit<U>> {
       // reuse static object
       return one();
     }
-    return Measure.of(magnitude, this);
+    return ImmutableMeasure.ofRelativeUnits(magnitude, this);
   }
 
   /**
@@ -123,8 +123,7 @@ public class Unit<U extends Unit<U>> {
    * @return the measure
    */
   public Measure<U> ofBaseUnits(double baseUnitMagnitude) {
-    double magnitude = this.fromBaseUnits(baseUnitMagnitude);
-    return of(magnitude);
+    return ImmutableMeasure.ofBaseUnits(baseUnitMagnitude, this);
   }
 
   /**

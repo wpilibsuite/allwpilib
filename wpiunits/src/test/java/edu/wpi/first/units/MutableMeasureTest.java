@@ -16,7 +16,7 @@ class MutableMeasureTest {
   @Test
   void testWrapper() {
     var unit = new ExampleUnit(1);
-    var measure = Measure.of(1234, unit);
+    var measure = unit.of(1234);
     var mutable = MutableMeasure.mutable(measure);
     assertEquals(measure.magnitude(), mutable.magnitude(), 0);
     assertEquals(measure.unit(), mutable.unit());
@@ -53,7 +53,7 @@ class MutableMeasureTest {
   @Test
   void testReplaceMeasure() {
     var measure = MutableMeasure.ofRelativeUnits(17.6, FeetPerSecond);
-    var replacer = Measure.of(94.872, Meters.per(Millisecond));
+    var replacer = Meters.per(Millisecond).of(94.872);
     var result = measure.mut_replace(replacer);
     assertSame(measure, result, "Replacing should return the mutable measure");
     assertSame(replacer.unit(), measure.unit());
@@ -72,7 +72,7 @@ class MutableMeasureTest {
   @Test
   void testAccMeasure() {
     var measure = MutableMeasure.ofRelativeUnits(8.5431, FeetPerSecond);
-    var acc = Measure.of(-23.62, Meters.per(Millisecond));
+    var acc = Meters.per(Millisecond).of(-23.62);
     var result = measure.mut_acc(acc);
     assertSame(measure, result, "Acc should return the mutable measure");
     assertSame(FeetPerSecond, measure.unit(), "Unit shouldn't change");

@@ -90,7 +90,7 @@ public class ImmutableMeasure<U extends Unit<U>> implements Measure<U> {
       return false;
     }
     Measure<?> that = (Measure<?>) o;
-    return Objects.equals(m_unit, that.unit()) && this.isEquivalent(that);
+    return Objects.equals(m_unit, that.unit()) && m_baseUnitMagnitude == that.baseUnitMagnitude();
   }
 
   @Override

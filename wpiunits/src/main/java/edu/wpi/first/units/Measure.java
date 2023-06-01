@@ -17,15 +17,6 @@ public interface Measure<U extends Unit<U>> extends Comparable<Measure<U>> {
    */
   double EQUIVALENCE_THRESHOLD = 1e-12;
 
-  /** Creates a new measure object with the given magnitude and unit. */
-  static <U extends Unit<U>> Measure<U> of(double magnitude, Unit<U> unit) {
-    return ImmutableMeasure.ofRelativeUnits(magnitude, unit);
-  }
-
-  static <U extends Unit<U>> Measure<U> ofBaseUnits(double baseUnitMagnitude, Unit<U> unit) {
-    return ImmutableMeasure.ofBaseUnits(baseUnitMagnitude, unit);
-  }
-
   /** Gets the unitless magnitude of this measure. */
   double magnitude();
 
@@ -136,12 +127,12 @@ public interface Measure<U extends Unit<U>> extends Comparable<Measure<U>> {
 
   default <U2 extends Unit<U2>> Measure<Per<U, U2>> per(U2 denominator) {
     var newUnit = unit().per(denominator);
-    return Measure.of(magnitude(), newUnit);
+    return newUnit.of(magnitude());
   }
 
   /** Adds another measure to this one. The resulting measure has the same unit as this one. */
   default Measure<U> add(Measure<U> other) {
-    return Measure.ofBaseUnits(baseUnitMagnitude() + other.baseUnitMagnitude(), unit());
+    return unit().ofBaseUnits(baseUnitMagnitude() + other.baseUnitMagnitude());
   }
 
   default Measure<U> subtract(Measure<U> other) {
@@ -175,7 +166,11 @@ public interface Measure<U extends Unit<U>> extends Comparable<Measure<U>> {
    *     checking if a value is within 1% means a value of 0.01 should be passed, and so on.
    * @return true if this unit is near the other other, otherwise false
    */
-  default boolean isNear(Measure<U> other, double varianceThreshold) {
+  default boolean isNear(Measure<?> other, double varianceThreshold) {
+    if (this.unit().m_baseType != other.unit().m_baseType) {
+      return false; // Disjoint units, not compatible
+    }
+
     // abs so negative inputs are calculated correctly
     var allowedVariance = Math.abs(varianceThreshold);
 
