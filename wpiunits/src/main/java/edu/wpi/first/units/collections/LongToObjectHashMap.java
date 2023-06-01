@@ -26,11 +26,31 @@ public class LongToObjectHashMap<V> {
    */
   private static final double kLoadFactor = 75.00 / 100;
 
+  /** The current number of key-value pairs in the map. */
   private int m_size = kInitialSize;
+
+  /**
+   * The current maximum capacity of the map. Note that it will be resized before m_size reaches
+   * this value.
+   * */
   private int m_capacity = kInitialCapacity;
+
+  /**
+   * The keys in the map. This is a sparse array, and the location of a key may not be equal to the
+   * result of calling {@link #bucket(long)} on that key. To handle hash collisions, if a bucket
+   * is already in use when trying to insert a value, the bucket number is incremented (wrapping
+   * around to 0 if it's equal to m_capacity) and <i>that</i> bucket is checked to see if it's
+   * available. This process continues until an empty bucket is found (which is guaranteed because
+   * m_size is always less than m_capacity).
+   */
   private long[] m_keys = new long[m_capacity];
+
+  /** Tracks which buckets are actually used (have a key-value mapping). */
   private boolean[] m_uses = new boolean[m_capacity];
 
+  /**
+   * The values in the map. See the documentation for m_keys for how indexing into this array works.
+   */
   @SuppressWarnings("unchecked")
   private V[] m_values = (V[]) new Object[m_capacity];
 
@@ -266,23 +286,49 @@ public class LongToObjectHashMap<V> {
   }
 
   private int maxSize() {
-    // limit to 75% fill before needing to resize
-    return (m_capacity * 3) / 4;
+    return (int) (m_capacity * kLoadFactor);
   }
 
+  /**
+   * Calculates a hashcode for an input key. Does some bit shuffling to account for poor hash
+   * functions.
+   *
+   * @param key the key to hash
+   *
+   * @return a hashcode for the input key
+   */
   private long hash(long key) {
     return 31 + (key ^ (key >>> 15) ^ (key >>> 31) ^ (key << 31));
   }
 
+  /**
+   * The mask to use when translating a hashcode to a bucket index. Relies on m_capacity being a
+   * power of two.
+   */
   private int mask() {
     return m_capacity - 1;
   }
 
+  /**
+   * Calculates the desired bucket index for a particular key. Does nothing to handle the case where
+   * the calculated index is already in use by another key.
+   *
+   * @param key the key to get the bucket for
+   *
+   * @return the desired bucket index
+   */
   private int bucket(long key) {
     var hash = hash(key);
     return (int) (hash & mask());
   }
 
+  /**
+   * Increments a bucket index by 1, wrapping around to 0 if the index is already at the maximum.
+   *
+   * @param bucket the index to increment
+   *
+   * @return the incremented bucket index
+   */
   private int safeIncrement(int bucket) {
     return (bucket + 1) & mask();
   }
