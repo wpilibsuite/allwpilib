@@ -121,7 +121,7 @@ void HAL_StopCANPacketRepeating(HAL_CANHandle handle, int32_t apiId,
  * @param[out] data              the packet data (8 bytes)
  * @param[out] length            the received length (0-8 bytes)
  * @param[out] receivedTimestamp the packet received timestamp in ms (based off
- * of CLOCK_MONOTONIC)
+ *                               of CLOCK_MONOTONIC)
  * @param[out] status            Error status variable. 0 on success.
  */
 void HAL_ReadCANPacketNew(HAL_CANHandle handle, int32_t apiId, uint8_t* data,
@@ -137,7 +137,7 @@ void HAL_ReadCANPacketNew(HAL_CANHandle handle, int32_t apiId, uint8_t* data,
  * @param[out] data              the packet data (8 bytes)
  * @param[out] length            the received length (0-8 bytes)
  * @param[out] receivedTimestamp the packet received timestamp in ms (based off
- * of CLOCK_MONOTONIC)
+ *                               of CLOCK_MONOTONIC)
  * @param[out] status            Error status variable. 0 on success.
  */
 void HAL_ReadCANPacketLatest(HAL_CANHandle handle, int32_t apiId, uint8_t* data,
@@ -154,7 +154,7 @@ void HAL_ReadCANPacketLatest(HAL_CANHandle handle, int32_t apiId, uint8_t* data,
  * @param[out] data              the packet data (8 bytes)
  * @param[out] length            the received length (0-8 bytes)
  * @param[out] receivedTimestamp the packet received timestamp in ms (based off
- * of CLOCK_MONOTONIC)
+ *                               of CLOCK_MONOTONIC)
  * @param[out] timeoutMs         the timeout time for the packet
  * @param[out] status            Error status variable. 0 on success.
  */
