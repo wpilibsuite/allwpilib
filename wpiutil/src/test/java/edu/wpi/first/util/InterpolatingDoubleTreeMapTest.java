@@ -8,10 +8,10 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.junit.jupiter.api.Test;
 
-class InterpolatingTreeMapTest {
+class InterpolatingDoubleTreeMapTest {
   @Test
   void testInterpolationDouble() {
-    InterpolatingTreeMap<Double, Double> table = new InterpolatingTreeMap<>();
+    InterpolatingDoubleTreeMap<Double, Double> table = new InterpolatingDoubleTreeMap<>();
 
     table.put(125.0, 450.0);
     table.put(200.0, 510.0);
@@ -40,7 +40,7 @@ class InterpolatingTreeMapTest {
 
   @Test
   void testInterpolationClear() {
-    InterpolatingTreeMap<Double, Double> table = new InterpolatingTreeMap<>();
+    InterpolatingDoubleTreeMap<Double, Double> table = new InterpolatingDoubleTreeMap<>();
 
     table.put(125.0, 450.0);
     table.put(200.0, 510.0);
@@ -76,7 +76,7 @@ class InterpolatingTreeMapTest {
 
   @Test
   void testInterpolationInteger() {
-    InterpolatingTreeMap<Integer, Integer> table = new InterpolatingTreeMap<>();
+    InterpolatingDoubleTreeMap<Integer, Integer> table = new InterpolatingDoubleTreeMap<>();
 
     table.put(125, 450);
     table.put(200, 510);
@@ -105,7 +105,7 @@ class InterpolatingTreeMapTest {
 
   @Test
   void testInterpolationLong() {
-    InterpolatingTreeMap<Long, Long> table = new InterpolatingTreeMap<>();
+    InterpolatingDoubleTreeMap<Long, Long> table = new InterpolatingDoubleTreeMap<>();
 
     table.put(125L, 450L);
     table.put(200L, 510L);
