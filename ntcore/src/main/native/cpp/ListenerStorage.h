@@ -50,14 +50,16 @@ class ListenerStorage final : public IListenerStorage {
   NT_ListenerPoller CreateListenerPoller();
 
   // returns listener handle and mask for each listener that was destroyed
-  [[nodiscard]] std::vector<std::pair<NT_Listener, unsigned int>>
-  DestroyListenerPoller(NT_ListenerPoller pollerHandle);
+  [[nodiscard]]
+  std::vector<std::pair<NT_Listener, unsigned int>> DestroyListenerPoller(
+      NT_ListenerPoller pollerHandle);
 
   std::vector<Event> ReadListenerQueue(NT_ListenerPoller pollerHandle);
 
   // returns listener handle and mask for each listener that was destroyed
-  [[nodiscard]] std::vector<std::pair<NT_Listener, unsigned int>>
-  RemoveListener(NT_Listener listenerHandle);
+  [[nodiscard]]
+  std::vector<std::pair<NT_Listener, unsigned int>> RemoveListener(
+      NT_Listener listenerHandle);
 
   bool WaitForListenerQueue(double timeout);
 

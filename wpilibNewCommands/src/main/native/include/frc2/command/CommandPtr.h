@@ -45,7 +45,8 @@ class CommandPtr final {
    *
    * @return the decorated command
    */
-  [[nodiscard]] CommandPtr Repeatedly() &&;
+  [[nodiscard]]
+  CommandPtr Repeatedly() &&;
 
   /**
    * Decorates this command to run "by proxy" by wrapping it in a
@@ -55,7 +56,8 @@ class CommandPtr final {
    *
    * @return the decorated command
    */
-  [[nodiscard]] CommandPtr AsProxy() &&;
+  [[nodiscard]]
+  CommandPtr AsProxy() &&;
 
   /**
    * Decorates this command to run or stop when disabled.
@@ -63,7 +65,8 @@ class CommandPtr final {
    * @param doesRunWhenDisabled true to run when disabled.
    * @return the decorated command
    */
-  [[nodiscard]] CommandPtr IgnoringDisable(bool doesRunWhenDisabled) &&;
+  [[nodiscard]]
+  CommandPtr IgnoringDisable(bool doesRunWhenDisabled) &&;
 
   /**
    * Decorates this command to run or stop when disabled.
@@ -71,7 +74,8 @@ class CommandPtr final {
    * @param interruptBehavior true to run when disabled.
    * @return the decorated command
    */
-  [[nodiscard]] CommandPtr WithInterruptBehavior(
+  [[nodiscard]]
+  CommandPtr WithInterruptBehavior(
       Command::InterruptionBehavior interruptBehavior) &&;
 
   /**
@@ -81,9 +85,9 @@ class CommandPtr final {
    * @param requirements the required subsystems
    * @return the decorated command
    */
-  [[nodiscard]] CommandPtr AndThen(
-      std::function<void()> toRun,
-      std::span<Subsystem* const> requirements = {}) &&;
+  [[nodiscard]]
+  CommandPtr AndThen(std::function<void()> toRun,
+                     std::span<Subsystem* const> requirements = {}) &&;
 
   /**
    * Decorates this command with a runnable to run after the command finishes.
@@ -92,9 +96,9 @@ class CommandPtr final {
    * @param requirements the required subsystems
    * @return the decorated command
    */
-  [[nodiscard]] CommandPtr AndThen(
-      std::function<void()> toRun,
-      std::initializer_list<Subsystem*> requirements) &&;
+  [[nodiscard]]
+  CommandPtr AndThen(std::function<void()> toRun,
+                     std::initializer_list<Subsystem*> requirements) &&;
 
   /**
    * Decorates this command with a set of commands to run after it in sequence.
@@ -104,7 +108,8 @@ class CommandPtr final {
    * @param next the commands to run next
    * @return the decorated command
    */
-  [[nodiscard]] CommandPtr AndThen(CommandPtr&& next) &&;
+  [[nodiscard]]
+  CommandPtr AndThen(CommandPtr&& next) &&;
 
   /**
    * Decorates this command with a runnable to run before this command starts.
@@ -113,9 +118,9 @@ class CommandPtr final {
    * @param requirements the required subsystems
    * @return the decorated command
    */
-  [[nodiscard]] CommandPtr BeforeStarting(
-      std::function<void()> toRun,
-      std::initializer_list<Subsystem*> requirements) &&;
+  [[nodiscard]]
+  CommandPtr BeforeStarting(std::function<void()> toRun,
+                            std::initializer_list<Subsystem*> requirements) &&;
 
   /**
    * Decorates this command with a runnable to run before this command starts.
@@ -124,9 +129,9 @@ class CommandPtr final {
    * @param requirements the required subsystems
    * @return the decorated command
    */
-  [[nodiscard]] CommandPtr BeforeStarting(
-      std::function<void()> toRun,
-      std::span<Subsystem* const> requirements = {}) &&;
+  [[nodiscard]]
+  CommandPtr BeforeStarting(std::function<void()> toRun,
+                            std::span<Subsystem* const> requirements = {}) &&;
 
   /**
    * Decorates this command with another command to run before this command
@@ -135,7 +140,8 @@ class CommandPtr final {
    * @param before the command to run before this one
    * @return the decorated command
    */
-  [[nodiscard]] CommandPtr BeforeStarting(CommandPtr&& before) &&;
+  [[nodiscard]]
+  CommandPtr BeforeStarting(CommandPtr&& before) &&;
 
   /**
    * Decorates this command with a timeout.  If the specified timeout is
@@ -146,7 +152,8 @@ class CommandPtr final {
    * @param duration the timeout duration
    * @return the command with the timeout added
    */
-  [[nodiscard]] CommandPtr WithTimeout(units::second_t duration) &&;
+  [[nodiscard]]
+  CommandPtr WithTimeout(units::second_t duration) &&;
 
   /**
    * Decorates this command with an interrupt condition.  If the specified
@@ -157,7 +164,8 @@ class CommandPtr final {
    * @param condition the interrupt condition
    * @return the command with the interrupt condition added
    */
-  [[nodiscard]] CommandPtr Until(std::function<bool()> condition) &&;
+  [[nodiscard]]
+  CommandPtr Until(std::function<bool()> condition) &&;
 
   /**
    * Decorates this command with a run condition.  If the specified condition
@@ -168,7 +176,8 @@ class CommandPtr final {
    * @param condition the interrupt condition
    * @return the command with the interrupt condition added
    */
-  [[nodiscard]] CommandPtr OnlyWhile(std::function<bool()> condition) &&;
+  [[nodiscard]]
+  CommandPtr OnlyWhile(std::function<bool()> condition) &&;
 
   /**
    * Decorates this command to only run if this condition is not met. If the
@@ -179,7 +188,8 @@ class CommandPtr final {
    * @param condition the condition that will prevent the command from running
    * @return the decorated command
    */
-  [[nodiscard]] CommandPtr Unless(std::function<bool()> condition) &&;
+  [[nodiscard]]
+  CommandPtr Unless(std::function<bool()> condition) &&;
 
   /**
    * Decorates this command to only run if this condition is met. If the command
@@ -190,7 +200,8 @@ class CommandPtr final {
    * @param condition the condition that will allow the command to run
    * @return the decorated command
    */
-  [[nodiscard]] CommandPtr OnlyIf(std::function<bool()> condition) &&;
+  [[nodiscard]]
+  CommandPtr OnlyIf(std::function<bool()> condition) &&;
 
   /**
    * Decorates this command with a set of commands to run parallel to it, ending
@@ -201,7 +212,8 @@ class CommandPtr final {
    * @param parallel the commands to run in parallel
    * @return the decorated command
    */
-  [[nodiscard]] CommandPtr DeadlineWith(CommandPtr&& parallel) &&;
+  [[nodiscard]]
+  CommandPtr DeadlineWith(CommandPtr&& parallel) &&;
 
   /**
    * Decorates this command with a set of commands to run parallel to it, ending
@@ -211,7 +223,8 @@ class CommandPtr final {
    * @param parallel the commands to run in parallel
    * @return the decorated command
    */
-  [[nodiscard]] CommandPtr AlongWith(CommandPtr&& parallel) &&;
+  [[nodiscard]]
+  CommandPtr AlongWith(CommandPtr&& parallel) &&;
 
   /**
    * Decorates this command with a set of commands to run parallel to it, ending
@@ -221,7 +234,8 @@ class CommandPtr final {
    * @param parallel the commands to run in parallel
    * @return the decorated command
    */
-  [[nodiscard]] CommandPtr RaceWith(CommandPtr&& parallel) &&;
+  [[nodiscard]]
+  CommandPtr RaceWith(CommandPtr&& parallel) &&;
 
   /**
    * Decorates this command with a lambda to call on interrupt or end, following
@@ -231,7 +245,8 @@ class CommandPtr final {
    * command was interrupted.
    * @return the decorated command
    */
-  [[nodiscard]] CommandPtr FinallyDo(std::function<void(bool)> end) &&;
+  [[nodiscard]]
+  CommandPtr FinallyDo(std::function<void(bool)> end) &&;
 
   /**
    * Decorates this command with a lambda to call on interrupt, following the
@@ -240,7 +255,8 @@ class CommandPtr final {
    * @param handler a lambda to run when the command is interrupted
    * @return the decorated command
    */
-  [[nodiscard]] CommandPtr HandleInterrupt(std::function<void()> handler) &&;
+  [[nodiscard]]
+  CommandPtr HandleInterrupt(std::function<void()> handler) &&;
 
   /**
    * Decorates this Command with a name. Is an inline function for
@@ -249,7 +265,8 @@ class CommandPtr final {
    * @param name name
    * @return the decorated Command
    */
-  [[nodiscard]] CommandPtr WithName(std::string_view name) &&;
+  [[nodiscard]]
+  CommandPtr WithName(std::string_view name) &&;
 
   /**
    * Get a raw pointer to the held command.
