@@ -21,6 +21,8 @@ import static edu.wpi.first.units.Units.Kilograms;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.MetersPerSecondPerSecond;
+import static edu.wpi.first.units.Units.Microsecond;
+import static edu.wpi.first.units.Units.Microseconds;
 import static edu.wpi.first.units.Units.Milli;
 import static edu.wpi.first.units.Units.Milliamps;
 import static edu.wpi.first.units.Units.Millimeters;
@@ -152,6 +154,13 @@ class UnitsTest {
     assertEquals(1000, Milliseconds.convert(1, Seconds), thresh);
     assertEquals("Millisecond", Milliseconds.name());
     assertEquals("ms", Milliseconds.symbol());
+  }
+
+  @Test
+  void testMicrosecond() {
+    assertEquals(1e6, Microseconds.convert(1, Second), 0);
+    assertEquals("Microsecond", Microseconds.name());
+    assertEquals("us", Microseconds.symbol());
   }
 
   @Test

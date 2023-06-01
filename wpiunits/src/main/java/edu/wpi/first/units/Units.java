@@ -34,6 +34,8 @@ public final class Units {
   public static final Time Second = Seconds; // singularized alias
   public static final Time Milliseconds = Milli(Seconds);
   public static final Time Millisecond = Milliseconds; // singularized alias
+  public static final Time Microseconds = Micro(Seconds);
+  public static final Time Microsecond = Microseconds; // singularized alias
   public static final Time Minutes =
       derive(Seconds).aggregate(60).named("Minute").symbol("min").make();
   public static final Time Minute = Minutes; // singularized alias
@@ -108,6 +110,11 @@ public final class Units {
 
   /**
    * Creates a unit equal to a thousandth of the base unit, eg Milliseconds = Milli(Units.Seconds).
+   *
+   * @param <U> the type of the unit
+   * @param baseUnit the unit being derived from. This does not have to be the base unit of measure
+   * @param name the name of the new derived unit
+   * @param symbol the symbol of the new derived unit
    */
   @SuppressWarnings({"PMD.MethodName", "checkstyle:methodname"})
   public static <U extends Unit<U>> U Milli(Unit<U> baseUnit, String name, String symbol) {
@@ -116,6 +123,9 @@ public final class Units {
 
   /**
    * Creates a unit equal to a thousandth of the base unit, eg Milliseconds = Milli(Units.Seconds).
+   *
+   * @param <U> the type of the unit
+   * @param baseUnit the unit being derived from. This does not have to be the base unit of measure
    */
   @SuppressWarnings({"PMD.MethodName", "checkstyle:methodname"})
   public static <U extends Unit<U>> U Milli(Unit<U> baseUnit) {
@@ -123,13 +133,51 @@ public final class Units {
         baseUnit, "Milli" + baseUnit.name().toLowerCase(Locale.ROOT), "m" + baseUnit.symbol());
   }
 
-  /** Creates a unit equal to a thousand of the base unit, eg Kilograms = Kilo(Units.Grams). */
+  /**
+   * Creates a unit equal to a millionth of the base unit, eg {@code Microseconds =
+   * Micro(Units.Seconds, "Microseconds", 'us")}.
+   *
+   * @param <U> the type of the unit
+   * @param baseUnit the unit being derived from. This does not have to be the base unit of measure
+   * @param name the name of the new derived unit
+   * @param symbol the symbol of the new derived unit
+   */
+  @SuppressWarnings({"PMD.MethodName", "checkstyle:methodname"})
+  public static <U extends Unit<U>> U Micro(Unit<U> baseUnit, String name, String symbol) {
+    return derive(baseUnit).splitInto(1_000_000).named(name).symbol(symbol).make();
+  }
+
+  /**
+   * Creates a unit equal to a millionth of the base unit, eg Microseconds = Micro(Units.Seconds).
+   *
+   * @param <U> the type of the unit
+   * @param baseUnit the unit being derived from. This does not have to be the base unit of measure
+   */
+  @SuppressWarnings({"PMD.MethodName", "checkstyle:methodname"})
+  public static <U extends Unit<U>> U Micro(Unit<U> baseUnit) {
+    return Micro(
+        baseUnit, "Micro" + baseUnit.name().toLowerCase(Locale.ROOT), "u" + baseUnit.symbol());
+  }
+
+  /**
+   * Creates a unit equal to a thousand of the base unit, eg Kilograms = Kilo(Units.Grams).
+   *
+   * @param <U> the type of the unit
+   * @param baseUnit the unit being derived from. This does not have to be the base unit of measure
+   * @param name the name of the new derived unit
+   * @param symbol the symbol of the new derived unit
+   */
   @SuppressWarnings({"PMD.MethodName", "checkstyle:methodname"})
   public static <U extends Unit<U>> U Kilo(Unit<U> baseUnit, String name, String symbol) {
     return derive(baseUnit).aggregate(1000).named(name).symbol(symbol).make();
   }
 
-  /** Creates a unit equal to a thousand of the base unit, eg Kilograms = Kilo(Units.Grams). */
+  /**
+   * Creates a unit equal to a thousand of the base unit, eg Kilograms = Kilo(Units.Grams).
+   *
+   * @param <U> the type of the unit
+   * @param baseUnit the unit being derived from. This does not have to be the base unit of measure
+   */
   @SuppressWarnings({"PMD.MethodName", "checkstyle:methodname"})
   public static <U extends Unit<U>> U Kilo(Unit<U> baseUnit) {
     return Kilo(
