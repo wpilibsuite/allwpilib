@@ -5,6 +5,7 @@
 #include "frc/Timer.h"  // NOLINT(build/include_order)
 
 #include <atomic>
+#include <thread>
 
 #include "frc/simulation/SimHooks.h"
 #include "gtest/gtest.h"
