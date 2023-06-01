@@ -4,6 +4,8 @@
 
 #include "frc/Timer.h"  // NOLINT(build/include_order)
 
+#include <atomic>
+
 #include "frc/simulation/SimHooks.h"
 #include "gtest/gtest.h"
 
@@ -112,4 +114,29 @@ TEST_F(TimerTest, GetFPGATimestamp) {
   frc::sim::StepTiming(500_ms);
   auto end = frc::Timer::GetFPGATimestamp();
   EXPECT_EQ(start + 500_ms, end);
+}
+
+TEST_F(TimerTest, SimWait) {
+  const units::second_t waitTime = 1_s;
+
+  std::atomic_bool hasFinished{false};
+
+  std::atomic<units::second_t> start;
+  std::atomic<units::second_t> end;
+
+  std::thread testThread{[waitTime, &hasFinished, &start, &end]() {
+    start = frc::Timer::GetFPGATimestamp();
+    frc::WaitSim(waitTime);
+    end = frc::Timer::GetFPGATimestamp();
+    hasFinished = true;
+  }};
+
+  while (!hasFinished) {
+    frc::sim::StepTiming(0.1_s);
+    std::this_thread::sleep_for(std::chrono::milliseconds(1));
+  }
+
+  testThread.join();
+
+  EXPECT_NEAR(waitTime.value(), (end.load() - start.load()).value(), 1e-9);
 }

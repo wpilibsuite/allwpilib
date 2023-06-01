@@ -156,8 +156,8 @@ class TimerTest {
     while (!hasFinished.get()) {
       SimHooks.stepTiming(0.1);
       try {
-        // Allows other thread to run; without this, the time measured by testThread is orders of
-        // magnitude larger than it should be.
+        // Allows other thread to catch up- without this, the sim time will continue to increase
+        // well after the delay function ends until it is able to set hasFinished.
         Thread.sleep(1);
       } catch (InterruptedException e) {
         throw new RuntimeException(e);

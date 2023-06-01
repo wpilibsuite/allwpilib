@@ -7,9 +7,10 @@
 #include <chrono>
 #include <thread>
 
+#include <hal/HALBase.h>
+
 #include "frc/DriverStation.h"
 #include "frc/RobotController.h"
-#include "hal/HALBase.h"
 
 namespace frc {
 

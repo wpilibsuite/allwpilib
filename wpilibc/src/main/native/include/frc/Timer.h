@@ -20,7 +20,7 @@ namespace frc {
  */
 void Wait(units::second_t seconds);
 
-void WaitSim(units::second_t seconds);
+void WaitSim(units::microsecond_t seconds);
 
 /**
  * @brief  Gives real-time clock system time with nanosecond resolution
