@@ -147,10 +147,10 @@ class SwerveDriveKinematics {
    * @return The resulting chassis speed.
    */
   template <typename... ModuleStates>
-  requires(std::is_same_v<std::remove_reference_t<ModuleStates>,
-                          SwerveModuleState>&&...) ChassisSpeeds
-      ToChassisSpeeds(ModuleStates&&... wheelStates)
-  const;
+    requires(std::is_same_v<std::remove_reference_t<ModuleStates>,
+                            SwerveModuleState> &&
+             ...)
+  ChassisSpeeds ToChassisSpeeds(ModuleStates&&... wheelStates) const;
 
   /**
    * Performs forward kinematics to return the resulting chassis state from the
