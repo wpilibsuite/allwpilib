@@ -4,8 +4,7 @@
 
 package edu.wpi.first.units;
 
-import java.util.HashMap;
-import java.util.Map;
+import edu.wpi.first.units.collections.LongToObjectHashMap;
 import java.util.Objects;
 
 public class Velocity<D extends Unit<D>> extends Unit<Velocity<D>> {
@@ -16,11 +15,10 @@ public class Velocity<D extends Unit<D>> extends Unit<Velocity<D>> {
    * Stores velocity units that were created ad-hoc using {@link #combine(Unit, Time, String,
    * String)}. Does not store objects created directly by constructors.
    */
-  // TODO: Move this to use primitive long keys instead of boxed values to avoid allocations
   @SuppressWarnings("rawtypes")
-  private static final Map<Long, Velocity> cache = new HashMap<>(32);
+  private static final LongToObjectHashMap<Velocity> cache = new LongToObjectHashMap<>();
 
-  /** Generates a cache key used for cache lookups. Still triggers an allocation of a Long. */
+  /** Generates a cache key used for cache lookups. */
   private static long cacheKey(Unit<?> numerator, Unit<?> denominator) {
     return ((long) numerator.hashCode()) << 32L | ((long) denominator.hashCode()) & 0xFFFFFFFFL;
   }
@@ -53,8 +51,7 @@ public class Velocity<D extends Unit<D>> extends Unit<Velocity<D>> {
   @SuppressWarnings("unchecked")
   public static <D extends Unit<D>> Velocity<D> combine(
       Unit<D> numerator, Time period, String name, String symbol) {
-    // intentionally boxing here to avoid autoboxing allocations later
-    Long key = cacheKey(numerator, period);
+    long key = cacheKey(numerator, period);
     if (cache.containsKey(key)) {
       return cache.get(key);
     }
@@ -91,8 +88,7 @@ public class Velocity<D extends Unit<D>> extends Unit<Velocity<D>> {
    */
   @SuppressWarnings("unchecked")
   public static <D extends Unit<D>> Velocity<D> combine(Unit<D> numerator, Time period) {
-    // intentionally boxing here to avoid autoboxing allocations later
-    Long key = cacheKey(numerator, period);
+    long key = cacheKey(numerator, period);
     if (cache.containsKey(key)) {
       return cache.get(key);
     }

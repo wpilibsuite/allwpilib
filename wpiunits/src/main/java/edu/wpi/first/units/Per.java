@@ -4,8 +4,7 @@
 
 package edu.wpi.first.units;
 
-import java.util.HashMap;
-import java.util.Map;
+import edu.wpi.first.units.collections.LongToObjectHashMap;
 import java.util.Objects;
 
 /**
@@ -28,7 +27,7 @@ public class Per<N extends Unit<N>, D extends Unit<D>> extends Unit<Per<N, D>> {
    * after the first.
    */
   @SuppressWarnings("rawtypes")
-  private static final Map<Long, Per> cache = new HashMap<>();
+  private static final LongToObjectHashMap<Per> cache = new LongToObjectHashMap<>();
 
   protected Per(Class<Per<N, D>> baseType, N numerator, D denominator) {
     super(
@@ -60,7 +59,7 @@ public class Per<N extends Unit<N>, D extends Unit<D>> extends Unit<Per<N, D>> {
   @SuppressWarnings({"unchecked", "rawtypes"})
   public static <N extends Unit<N>, D extends Unit<D>> Per<N, D> combine(
       N numerator, D denominator) {
-    final Long key =
+    final long key =
         ((long) numerator.hashCode()) << 32L | ((long) denominator.hashCode()) & 0xFFFFFFFFL;
 
     var existing = cache.get(key);

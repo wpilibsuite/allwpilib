@@ -4,6 +4,7 @@
 
 package edu.wpi.first.units;
 
+import edu.wpi.first.units.collections.LongToObjectHashMap;
 import java.util.Objects;
 
 /**
@@ -18,6 +19,9 @@ public class Mult<A extends Unit<A>, B extends Unit<B>> extends Unit<Mult<A, B>>
   private final A m_unitA;
   private final B m_unitB;
 
+  @SuppressWarnings("rawtypes")
+  private static final LongToObjectHashMap<Mult> cache = new LongToObjectHashMap<>();
+
   protected Mult(Class<? extends Mult<A, B>> baseType, A a, B b) {
     super(
         baseType,
@@ -28,9 +32,32 @@ public class Mult<A extends Unit<A>, B extends Unit<B>> extends Unit<Mult<A, B>>
     m_unitB = b;
   }
 
+  /**
+   * Creates a new Mult unit derived from an two arbitrary units multiplied together.
+   *
+   * <pre>
+   *   Mult.combine(Volts, Meters) // => Volt-Meters
+   * </pre>
+   *
+   * <p>It's recommended to use the convenience function {@link Unit#mult(Unit)} instead of calling
+   * this factory directly.
+   *
+   * @param <A> the type of the first unit
+   * @param <B> the type of the second unit
+   * @param a the first unit
+   * @param b the second unit
+   * @return the combined unit
+   */
   @SuppressWarnings({"unchecked", "rawtypes"})
   public static <A extends Unit<A>, B extends Unit<B>> Mult<A, B> combine(A a, B b) {
-    return new Mult<A, B>((Class) Mult.class, a, b);
+    final long key = ((long) a.hashCode()) << 32L | ((long) b.hashCode()) & 0xFFFFFFFFL;
+    if (cache.containsKey(key)) {
+      return cache.get(key);
+    }
+
+    var mult = new Mult<A, B>((Class) Mult.class, a, b);
+    cache.put(key, mult);
+    return mult;
   }
 
   public A unitA() {
