@@ -12,6 +12,7 @@ import static edu.wpi.first.units.Units.Fahrenheit;
 import static edu.wpi.first.units.Units.Feet;
 import static edu.wpi.first.units.Units.FeetPerSecond;
 import static edu.wpi.first.units.Units.Grams;
+import static edu.wpi.first.units.Units.Gs;
 import static edu.wpi.first.units.Units.Horsepower;
 import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.Kelvin;
@@ -19,6 +20,7 @@ import static edu.wpi.first.units.Units.Kilo;
 import static edu.wpi.first.units.Units.Kilograms;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.MetersPerSecond;
+import static edu.wpi.first.units.Units.MetersPerSecondPerSecond;
 import static edu.wpi.first.units.Units.Milli;
 import static edu.wpi.first.units.Units.Milliamps;
 import static edu.wpi.first.units.Units.Millimeters;
@@ -31,6 +33,7 @@ import static edu.wpi.first.units.Units.Percent;
 import static edu.wpi.first.units.Units.Pounds;
 import static edu.wpi.first.units.Units.Radians;
 import static edu.wpi.first.units.Units.Revolutions;
+import static edu.wpi.first.units.Units.Second;
 import static edu.wpi.first.units.Units.Seconds;
 import static edu.wpi.first.units.Units.Value;
 import static edu.wpi.first.units.Units.Volts;
@@ -112,6 +115,27 @@ class UnitsTest {
     assertEquals(1 / 3.28084, MetersPerSecond.convert(1, FeetPerSecond), thresh);
     assertEquals("Foot per Second", FeetPerSecond.name());
     assertEquals("ft/s", FeetPerSecond.symbol());
+  }
+
+  // Accelerations
+
+  @Test
+  void testMetersPerSecondPerSecond() {
+    testBaseUnit(MetersPerSecondPerSecond);
+    assertEquals("Meter per Second per Second", MetersPerSecondPerSecond.name());
+    assertEquals("m/s/s", MetersPerSecondPerSecond.symbol());
+    assertEquals(MetersPerSecond, MetersPerSecondPerSecond.getUnit());
+    assertEquals(Seconds, MetersPerSecondPerSecond.getPeriod());
+  }
+
+  @Test
+  void testGs() {
+    assertEquals(32.17405, Gs.of(1).in(FeetPerSecond.per(Second)), thresh);
+    assertEquals(9.80665, Gs.of(1).in(MetersPerSecondPerSecond), thresh);
+    assertEquals("G", Gs.name());
+    assertEquals("G", Gs.symbol());
+    assertEquals(Units.AnonymousBaseUnit, Gs.getUnit());
+    assertEquals(Seconds, Gs.getPeriod());
   }
 
   // Time

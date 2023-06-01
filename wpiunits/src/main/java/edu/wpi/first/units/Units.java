@@ -59,7 +59,7 @@ public final class Units {
   public static final Velocity<Velocity<Distance>> MetersPerSecondPerSecond =
       MetersPerSecond.per(Second);
   public static final Velocity<Velocity<Distance>> Gs =
-      derive(MetersPerSecondPerSecond).aggregate(9.807).named("G").symbol("G").make();
+      derive(MetersPerSecondPerSecond).aggregate(9.80665).named("G").symbol("G").make();
 
   // Mass
   public static final Mass Kilograms = BaseUnits.Mass;
