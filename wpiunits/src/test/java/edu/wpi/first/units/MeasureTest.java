@@ -43,16 +43,16 @@ class MeasureTest {
   void testAdd() {
     Measure<Distance> m1 = Units.Feet.of(1);
     Measure<Distance> m2 = Units.Inches.of(2);
-    assertTrue(m1.add(m2).isEquivalent(Units.Feet.of(1 + 2 / 12d)));
-    assertTrue(m2.add(m1).isEquivalent(Units.Inches.of(14)));
+    assertTrue(m1.plus(m2).isEquivalent(Units.Feet.of(1 + 2 / 12d)));
+    assertTrue(m2.plus(m1).isEquivalent(Units.Inches.of(14)));
   }
 
   @Test
   void testSubtract() {
     Measure<Distance> m1 = Units.Feet.of(1);
     Measure<Distance> m2 = Units.Inches.of(2);
-    assertTrue(m1.subtract(m2).isEquivalent(Units.Feet.of(1 - 2 / 12d)));
-    assertTrue(m2.subtract(m1).isEquivalent(Units.Inches.of(-10)));
+    assertTrue(m1.minus(m2).isEquivalent(Units.Feet.of(1 - 2 / 12d)));
+    assertTrue(m2.minus(m1).isEquivalent(Units.Inches.of(-10)));
   }
 
   @Test
@@ -233,7 +233,7 @@ class MeasureTest {
     var unit = new ExampleUnit(8.2);
     var measureA = unit.of(3.1);
     var measureB = unit.of(91.6);
-    var result = measureA.add(measureB);
+    var result = measureA.plus(measureB);
     assertEquals(unit, result.unit());
     assertEquals(94.7, result.magnitude(), 1e-12);
   }
@@ -244,13 +244,13 @@ class MeasureTest {
     var unitB = new ExampleUnit(7.3);
     var measureA = unitA.of(5);
     var measureB = unitB.of(16);
-    var aPlusB = measureA.add(measureB);
+    var aPlusB = measureA.plus(measureB);
 
     assertEquals(unitA, aPlusB.unit());
     assertEquals(8.2 * 5 + 7.3 * 16, aPlusB.baseUnitMagnitude(), 1e-12);
     assertEquals(5 + (16 * 7.3 / 8.2), aPlusB.magnitude(), 1e-12);
 
-    var bPlusA = measureB.add(measureA);
+    var bPlusA = measureB.plus(measureA);
     assertEquals(unitB, bPlusA.unit());
     assertEquals(8.2 * 5 + 7.3 * 16, bPlusA.baseUnitMagnitude(), 1e-12);
     assertEquals(16 + (5 * 8.2 / 7.3), bPlusA.magnitude(), 1e-12);

@@ -131,13 +131,12 @@ public interface Measure<U extends Unit<U>> extends Comparable<Measure<U>> {
   }
 
   /** Adds another measure to this one. The resulting measure has the same unit as this one. */
-  default Measure<U> add(Measure<U> other) {
+  default Measure<U> plus(Measure<U> other) {
     return unit().ofBaseUnits(baseUnitMagnitude() + other.baseUnitMagnitude());
   }
 
-  default Measure<U> subtract(Measure<U> other) {
-    // delegate implementation to `add`
-    return add(other.negate());
+  default Measure<U> minus(Measure<U> other) {
+    return unit().ofBaseUnits(baseUnitMagnitude() - other.baseUnitMagnitude());
   }
 
   /** Negates this measure and returns the result. */
