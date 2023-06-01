@@ -10,6 +10,7 @@
 #include <hal/FRCUsageReporting.h>
 #include <units/dimensionless.h>
 #include <units/math.h>
+#include <wpi/deprecated.h>
 
 #include "frc/event/BooleanEvent.h"
 

@@ -6,7 +6,6 @@
 
 #include <algorithm>
 
-#include <wpi/deprecated.h>
 #include <wpi/timestamp.h>
 
 #include "units/time.h"
@@ -65,10 +64,10 @@ class SlewRateLimiter {
    * @param rateLimit The rate-of-change limit.
    * @param initialValue The initial value of the input.
    */
-  WPI_DEPRECATED(
+  [[deprecated(
       "Use SlewRateLimiter(Rate_t positiveRateLimit, Rate_t negativeRateLimit, "
-      "Unit_t initalValue) instead")
-  SlewRateLimiter(Rate_t rateLimit, Unit_t initialValue)
+      "Unit_t initalValue) instead")]] SlewRateLimiter(Rate_t rateLimit,
+                                                       Unit_t initialValue)
       : SlewRateLimiter(rateLimit, -rateLimit, initialValue) {}
 
   /**

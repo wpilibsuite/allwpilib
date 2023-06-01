@@ -7,7 +7,6 @@
 #include <memory>
 
 #include <hal/Types.h>
-#include <wpi/deprecated.h>
 #include <wpi/sendable/Sendable.h>
 #include <wpi/sendable/SendableHelper.h>
 
@@ -66,9 +65,9 @@ class Compressor : public wpi::Sendable,
    * @deprecated To avoid confusion in thinking this (re)enables the compressor
    * use IsEnabled().
    */
-  WPI_DEPRECATED(
+  [[deprecated(
       "To avoid confusion in thinking this (re)enables the compressor use "
-      "IsEnabled()")
+      "IsEnabled()")]]
   bool Enabled() const;
 
   /**

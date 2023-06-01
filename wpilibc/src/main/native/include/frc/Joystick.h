@@ -7,7 +7,6 @@
 #include <array>
 
 #include <units/angle.h>
-#include <wpi/deprecated.h>
 
 #include "frc/GenericHID.h"
 
@@ -231,7 +230,7 @@ class Joystick : public GenericHID {
    * @return The direction of the vector in radians
    * @deprecated Use GetDirection() instead.
    */
-  WPI_DEPRECATED("Use GetDirection() instead.")
+  [[deprecated("Use GetDirection() instead.")]]
   double GetDirectionRadians() const;
 
   /**
@@ -241,7 +240,7 @@ class Joystick : public GenericHID {
    * @return The direction of the vector in degrees
    * @deprecated Use GetDirection() instead.
    */
-  WPI_DEPRECATED("Use GetDirection() instead.")
+  [[deprecated("Use GetDirection() instead.")]]
   double GetDirectionDegrees() const;
 
   /**

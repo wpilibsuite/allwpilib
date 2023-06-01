@@ -103,8 +103,8 @@ class SelectCommand : public CommandHelper<CommandBase, SelectCommand<Key>> {
    * @deprecated Replace with {@link ProxyCommand},
    * composing multiple of them in a {@link ParallelRaceGroup} if needed.
    */
-  WPI_DEPRECATED("Replace with ProxyCommand")
-  explicit SelectCommand(std::function<Command*()> toRun)
+  [[deprecated("Replace with ProxyCommand")]] explicit SelectCommand(
+      std::function<Command*()> toRun)
       : m_toRun{std::move(toRun)} {}
 
   SelectCommand(SelectCommand&& other) = default;

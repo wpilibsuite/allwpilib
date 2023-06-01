@@ -8,7 +8,6 @@
 #include <span>
 
 #include <wpi/SmallVector.h>
-#include <wpi/deprecated.h>
 
 #include "frc2/command/CommandBase.h"
 #include "frc2/command/CommandHelper.h"
@@ -34,8 +33,8 @@ class ProxyScheduleCommand
    * @deprecated Replace with {@link ProxyCommand},
    * composing multiple of them in a {@link ParallelRaceGroup} if needed.
    */
-  WPI_DEPRECATED("Replace with ProxyCommand")
-  explicit ProxyScheduleCommand(std::span<Command* const> toSchedule);
+  [[deprecated("Replace with ProxyCommand")]] explicit ProxyScheduleCommand(
+      std::span<Command* const> toSchedule);
 
   explicit ProxyScheduleCommand(Command* toSchedule);
 

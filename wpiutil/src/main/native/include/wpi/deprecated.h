@@ -5,10 +5,6 @@
 #ifndef WPIUTIL_WPI_DEPRECATED_H_
 #define WPIUTIL_WPI_DEPRECATED_H_
 
-#ifndef WPI_DEPRECATED
-#define WPI_DEPRECATED(msg) [[deprecated(msg)]]
-#endif
-
 #ifndef WPI_IGNORE_DEPRECATED
 #ifdef __GNUC__
 #define WPI_IGNORE_DEPRECATED    \

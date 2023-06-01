@@ -11,7 +11,6 @@
 #include <type_traits>
 
 #include <wpi/SymbolExports.h>
-#include <wpi/deprecated.h>
 
 #include "Eigen/Eigenvalues"
 #include "Eigen/QR"
