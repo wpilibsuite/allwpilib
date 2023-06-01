@@ -29,6 +29,9 @@ public interface Measure<U extends Unit<U>> extends Comparable<Measure<U>> {
   /** Gets the unitless magnitude of this measure. */
   double magnitude();
 
+  /** Gets the magnitude of this measure in terms of the base unit. */
+  double baseUnitMagnitude();
+
   /** Gets the units of this measure. */
   U unit();
 
@@ -156,9 +159,6 @@ public interface Measure<U extends Unit<U>> extends Comparable<Measure<U>> {
    * to change.
    */
   Measure<U> copy();
-
-  /** Gets the magnitude of this measure in terms of the base unit. */
-  double baseUnitMagnitude();
 
   /**
    * Checks if this measure is near another measure of the same unit. Provide a variance threshold
