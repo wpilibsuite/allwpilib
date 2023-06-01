@@ -332,7 +332,7 @@ void HAL_WaitMicroseconds(uint64_t waitMicros) {
   }
 
   HAL_UpdateNotifierAlarm(handle, startTime + waitMicros, &status);
-  uint64_t end = HAL_WaitForNotifierAlarm(handle, &status);
+  [[maybe_unused]] uint64_t end = HAL_WaitForNotifierAlarm(handle, &status);
   HAL_CleanNotifier(handle, &status);
 }
 
