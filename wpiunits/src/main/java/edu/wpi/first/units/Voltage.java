@@ -4,17 +4,17 @@
 
 package edu.wpi.first.units;
 
-public class ElectricPotential extends Unit<ElectricPotential> {
-  ElectricPotential(double baseUnitEquivalent, String name, String symbol) {
-    super(ElectricPotential.class, baseUnitEquivalent, name, symbol);
+public class Voltage extends Unit<Voltage> {
+  Voltage(double baseUnitEquivalent, String name, String symbol) {
+    super(Voltage.class, baseUnitEquivalent, name, symbol);
   }
 
-  ElectricPotential(
+  Voltage(
       UnaryFunction toBaseConverter, UnaryFunction fromBaseConverter, String name, String symbol) {
-    super(ElectricPotential.class, toBaseConverter, fromBaseConverter, name, symbol);
+    super(Voltage.class, toBaseConverter, fromBaseConverter, name, symbol);
   }
 
-  public Power times(Unit<ElectricCurrent> current, String name, String symbol) {
+  public Power times(Unit<Current> current, String name, String symbol) {
     return new Power(toBaseUnits(1) * current.toBaseUnits(1), name, symbol);
   }
 }

@@ -29,11 +29,11 @@ public final class BaseUnits {
   /** The standard "unitless" unit. */
   public static final Unitless Value = new Unitless(1, "<?>", "<?>");
 
-  /** The standard unit of electric potential, volts. */
-  public static final ElectricPotential ElectricPotential = new ElectricPotential(1, "Volt", "V");
+  /** The standard unit of voltage, volts. */
+  public static final Voltage Voltage = new Voltage(1, "Volt", "V");
 
   /** The standard unit of electric current, amperes. */
-  public static final ElectricCurrent ElectricCurrent = new ElectricCurrent(1, "Amp", "A");
+  public static final Current Current = new Current(1, "Amp", "A");
 
   /** The standard unit of energy, joules. */
   public static final Energy Energy = new Energy(1, "Joule", "J");

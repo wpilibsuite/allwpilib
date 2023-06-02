@@ -73,13 +73,13 @@ public final class Units {
   public static final Unitless Percent =
       derive(Value).splitInto(100).named("Percent").symbol("%").make();
 
-  // Electric potential
-  public static final ElectricPotential Volts = BaseUnits.ElectricPotential;
-  public static final ElectricPotential Millivolts = Milli(Volts);
+  // Voltage
+  public static final Voltage Volts = BaseUnits.Voltage;
+  public static final Voltage Millivolts = Milli(Volts);
 
-  // Electric current
-  public static final ElectricCurrent Amps = BaseUnits.ElectricCurrent;
-  public static final ElectricCurrent Milliamps = Milli(Amps);
+  // Current
+  public static final Current Amps = BaseUnits.Current;
+  public static final Current Milliamps = Milli(Amps);
 
   // Energy
   public static final Energy Joules = BaseUnits.Energy;
