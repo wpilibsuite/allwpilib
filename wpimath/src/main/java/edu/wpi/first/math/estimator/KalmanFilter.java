@@ -4,7 +4,7 @@
 
 package edu.wpi.first.math.estimator;
 
-import edu.wpi.first.math.Drake;
+import edu.wpi.first.math.DARE;
 import edu.wpi.first.math.MathSharedStore;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.Nat;
@@ -65,7 +65,7 @@ public class KalmanFilter<States extends Num, Inputs extends Num, Outputs extend
     var contQ = StateSpaceUtil.makeCovarianceMatrix(states, stateStdDevs);
     var contR = StateSpaceUtil.makeCovarianceMatrix(outputs, measurementStdDevs);
 
-    var pair = Discretization.discretizeAQTaylor(plant.getA(), contQ, dtSeconds);
+    var pair = Discretization.discretizeAQ(plant.getA(), contQ, dtSeconds);
     var discA = pair.getFirst();
     var discQ = pair.getSecond();
 
@@ -87,9 +87,7 @@ public class KalmanFilter<States extends Num, Inputs extends Num, Outputs extend
       throw new IllegalArgumentException(msg);
     }
 
-    var P =
-        new Matrix<>(
-            Drake.discreteAlgebraicRiccatiEquation(discA.transpose(), C.transpose(), discQ, discR));
+    var P = new Matrix<>(DARE.dare(discA.transpose(), C.transpose(), discQ, discR));
 
     // S = CPCᵀ + R
     var S = C.times(P).times(C.transpose()).plus(discR);

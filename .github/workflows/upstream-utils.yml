@@ -29,10 +29,6 @@ jobs:
         run: |
           git config --global user.email "you@example.com"
           git config --global user.name "Your Name"
-      - name: Run update_drake.py
-        run: |
-          cd upstream_utils
-          ./update_drake.py
       - name: Run update_eigen.py
         run: |
           cd upstream_utils

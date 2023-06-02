@@ -1,4 +1,4 @@
-From 2d06f216dec3abbeaaabb465b945e09856d1b687 Mon Sep 17 00:00:00 2001
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Tue, 26 Apr 2022 15:24:47 -0400
 Subject: [PATCH 4/9] Cleanup problematic language
@@ -8,7 +8,7 @@ Subject: [PATCH 4/9] Cleanup problematic language
  1 file changed, 11 insertions(+), 10 deletions(-)
 
 diff --git a/src/unix/tty.c b/src/unix/tty.c
-index b4150525..ed81e26a 100644
+index b41505258ff822ef31c62f4a44438b5525a02065..ed81e26a8dcbad52bc31fbd1964ab6de4ea85d13 100644
 --- a/src/unix/tty.c
 +++ b/src/unix/tty.c
 @@ -79,7 +79,7 @@ int uv__tcsetattr(int fd, int how, const struct termios *term) {

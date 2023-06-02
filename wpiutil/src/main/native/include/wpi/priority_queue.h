@@ -65,7 +65,10 @@ class priority_queue {
     std::make_heap(c.begin(), c.end(), comp);
   }
 
-  [[nodiscard]] bool empty() const { return c.empty(); }
+  [[nodiscard]]
+  bool empty() const {
+    return c.empty();
+  }
 
   size_type size() const { return c.size(); }
 

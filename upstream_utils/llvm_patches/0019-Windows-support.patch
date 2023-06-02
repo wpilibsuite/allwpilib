@@ -1,4 +1,4 @@
-From 36f7f08e257f2b58b2894f165a38ff2a831aed8f Mon Sep 17 00:00:00 2001
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Tue, 3 May 2022 20:22:38 -0400
 Subject: [PATCH 19/28] Windows support
@@ -9,7 +9,7 @@ Subject: [PATCH 19/28] Windows support
  2 files changed, 124 insertions(+), 16 deletions(-)
 
 diff --git a/llvm/include/llvm/Support/Windows/WindowsSupport.h b/llvm/include/llvm/Support/Windows/WindowsSupport.h
-index 180803fbd..31120cfa0 100644
+index 180803fbd3104ddf32c183684f226954c4fb8b0e..31120cfa0e8cafa8d4f332bf2374a88a3418f748 100644
 --- a/llvm/include/llvm/Support/Windows/WindowsSupport.h
 +++ b/llvm/include/llvm/Support/Windows/WindowsSupport.h
 @@ -35,8 +35,6 @@
@@ -90,7 +90,7 @@ index 180803fbd..31120cfa0 100644
  } // end namespace llvm.
  
 diff --git a/llvm/lib/Support/ConvertUTF.cpp b/llvm/lib/Support/ConvertUTF.cpp
-index e24a918c5..c906ded91 100644
+index e24a918c5c898206dc8b401c6214e4e9c652e9a9..c906ded91dfeaa07b782e1eccc28643d5497cb94 100644
 --- a/llvm/lib/Support/ConvertUTF.cpp
 +++ b/llvm/lib/Support/ConvertUTF.cpp
 @@ -51,6 +51,11 @@

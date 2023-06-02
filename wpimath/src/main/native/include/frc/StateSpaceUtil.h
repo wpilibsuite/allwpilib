@@ -21,16 +21,6 @@
 namespace frc {
 namespace detail {
 
-template <int Rows, int Cols, typename Matrix, typename T, typename... Ts>
-void MatrixImpl(Matrix& result, T elem, Ts... elems) {
-  constexpr int count = Rows * Cols - (sizeof...(Ts) + 1);
-
-  result(count / Cols, count % Cols) = elem;
-  if constexpr (sizeof...(Ts) > 0) {
-    MatrixImpl<Rows, Cols>(result, elems...);
-  }
-}
-
 template <typename Matrix, typename T, typename... Ts>
 void CostMatrixImpl(Matrix& result, T elem, Ts... elems) {
   if (elem == std::numeric_limits<double>::infinity()) {
