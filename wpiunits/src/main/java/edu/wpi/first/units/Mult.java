@@ -26,14 +26,14 @@ public class Mult<A extends Unit<A>, B extends Unit<B>> extends Unit<Mult<A, B>>
     super(
         baseType,
         a.toBaseUnits(1) * b.toBaseUnits(1),
-        a.name() + " " + b.name(),
+        a.name() + "-" + b.name(),
         a.symbol() + "*" + b.symbol());
     m_unitA = a;
     m_unitB = b;
   }
 
   /**
-   * Creates a new Mult unit derived from an two arbitrary units multiplied together.
+   * Creates a new Mult unit derived from two arbitrary units multiplied together.
    *
    * <pre>
    *   Mult.combine(Volts, Meters) // => Volt-Meters
