@@ -186,12 +186,11 @@ public final class UnitBuilder<U extends Unit<U>> {
     Class<? extends U> baseType = m_base.m_baseType;
     try {
       Constructor<? extends U> ctor =
-          baseType
-              .getDeclaredConstructor(
-                  UnaryFunction.class, // toBaseUnits
-                  UnaryFunction.class, // fromBaseUnits
-                  String.class, // name
-                  String.class); // symbol
+          baseType.getDeclaredConstructor(
+              UnaryFunction.class, // toBaseUnits
+              UnaryFunction.class, // fromBaseUnits
+              String.class, // name
+              String.class); // symbol
       // need to flag the constructor as accessible so we can use private, package-private, and
       // protected constructors
       ctor.setAccessible(true);
@@ -201,13 +200,11 @@ public final class UnitBuilder<U extends Unit<U>> {
           m_name,
           m_symbol);
     } catch (InstantiationException e) {
-      throw new RuntimeException(
-          "Could not instantiate class " + baseType.getName(), e);
+      throw new RuntimeException("Could not instantiate class " + baseType.getName(), e);
     } catch (IllegalAccessException e) {
       throw new RuntimeException("Could not access constructor", e);
     } catch (InvocationTargetException e) {
-      throw new RuntimeException(
-          "Constructing " + baseType.getName() + " raised an exception", e);
+      throw new RuntimeException("Constructing " + baseType.getName() + " raised an exception", e);
     } catch (NoSuchMethodException e) {
       throw new RuntimeException("No compatible constructor", e);
     }

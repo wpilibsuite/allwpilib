@@ -21,7 +21,6 @@ import static edu.wpi.first.units.Units.Kilograms;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.MetersPerSecondPerSecond;
-import static edu.wpi.first.units.Units.Microsecond;
 import static edu.wpi.first.units.Units.Microseconds;
 import static edu.wpi.first.units.Units.Milli;
 import static edu.wpi.first.units.Units.Milliamps;

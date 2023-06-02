@@ -32,16 +32,16 @@ public class LongToObjectHashMap<V> {
   /**
    * The current maximum capacity of the map. Note that it will be resized before m_size reaches
    * this value.
-   * */
+   */
   private int m_capacity = kInitialCapacity;
 
   /**
    * The keys in the map. This is a sparse array, and the location of a key may not be equal to the
-   * result of calling {@link #bucket(long)} on that key. To handle hash collisions, if a bucket
-   * is already in use when trying to insert a value, the bucket number is incremented (wrapping
-   * around to 0 if it's equal to m_capacity) and <i>that</i> bucket is checked to see if it's
-   * available. This process continues until an empty bucket is found (which is guaranteed because
-   * m_size is always less than m_capacity).
+   * result of calling {@link #bucket(long)} on that key. To handle hash collisions, if a bucket is
+   * already in use when trying to insert a value, the bucket number is incremented (wrapping around
+   * to 0 if it's equal to m_capacity) and <i>that</i> bucket is checked to see if it's available.
+   * This process continues until an empty bucket is found (which is guaranteed because m_size is
+   * always less than m_capacity).
    */
   private long[] m_keys = new long[m_capacity];
 
@@ -294,7 +294,6 @@ public class LongToObjectHashMap<V> {
    * functions.
    *
    * @param key the key to hash
-   *
    * @return a hashcode for the input key
    */
   private long hash(long key) {
@@ -314,7 +313,6 @@ public class LongToObjectHashMap<V> {
    * the calculated index is already in use by another key.
    *
    * @param key the key to get the bucket for
-   *
    * @return the desired bucket index
    */
   private int bucket(long key) {
@@ -326,7 +324,6 @@ public class LongToObjectHashMap<V> {
    * Increments a bucket index by 1, wrapping around to 0 if the index is already at the maximum.
    *
    * @param bucket the index to increment
-   *
    * @return the incremented bucket index
    */
   private int safeIncrement(int bucket) {
