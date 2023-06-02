@@ -256,10 +256,11 @@ public abstract class IterativeRobotBase extends RobotBase {
     m_watchdog.publishToNetworkTables();
   }
 
-  /** Starts publishing added epochs to NetworkTables. Default topic is "Epochs" 
-   * 
+  /**
+   * Starts publishing added epochs to NetworkTables. Default topic is "Epochs"
+   *
    * @param topicName The NetworkTables topic to publish to
-  */
+   */
   public void publishToNetworkTables(String topicName) {
     m_watchdog.publishToNetworkTables(topicName);
   }

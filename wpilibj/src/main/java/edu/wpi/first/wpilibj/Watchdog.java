@@ -86,8 +86,9 @@ public class Watchdog implements Closeable, Comparable<Watchdog> {
     m_tracer.publishToNetworkTables();
   }
 
-  /** Starts publishing added epochs to NetworkTables. Default topic is "Epochs"
-   * 
+  /**
+   * Starts publishing added epochs to NetworkTables. Default topic is "Epochs"
+   *
    * @param topicName The NetworkTables topic to publish to
    */
   public void publishToNetworkTables(String topicName) {
