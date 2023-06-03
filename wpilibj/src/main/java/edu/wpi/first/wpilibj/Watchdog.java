@@ -81,11 +81,6 @@ public class Watchdog implements Closeable, Comparable<Watchdog> {
     return Double.compare(m_expirationTimeSeconds, rhs.m_expirationTimeSeconds);
   }
 
-  /** Starts publishing added epochs to NetworkTables. Default topic is "Epochs" */
-  public void publishToNetworkTables() {
-    m_tracer.publishToNetworkTables();
-  }
-
   /**
    * Starts publishing added epochs to NetworkTables. Default topic is "Epochs"
    *
@@ -95,17 +90,22 @@ public class Watchdog implements Closeable, Comparable<Watchdog> {
     m_tracer.publishToNetworkTables(topicName);
   }
 
-  /** Starts logging added epochs to the data log. Defaults to the default data log. */
-  public void startDataLog() {
-    m_tracer.startDataLog();
+  /**
+   * Starts logging added epochs to the data log. Default entry is "Epochs"
+   *
+   * @param dataLog The data log to log epochs to
+   */
+  public void startDataLog(DataLog dataLog) {
+    m_tracer.startDataLog(dataLog);
   }
 
   /**
    * Starts logging added epochs to the data log.
    *
    * @param dataLog The data log to log epochs to
+   * @param entry The name of the entry to log to
    */
-  public void startDataLog(DataLog dataLog) {
+  public void startDataLog(DataLog dataLog, String entry) {
     m_tracer.startDataLog(dataLog);
   }
 

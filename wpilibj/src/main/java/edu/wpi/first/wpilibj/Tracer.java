@@ -28,7 +28,8 @@ public class Tracer {
   private boolean m_publishNT;
   private boolean m_dataLogEnabled;
   private DataLog m_dataLog;
-  private String m_topic = "Epochs";
+  private String m_ntTopic;
+  private String m_dataLogEntry = "Epochs";
 
   private final Map<String, Long> m_epochs = new HashMap<>(); // microseconds
 
@@ -37,24 +38,23 @@ public class Tracer {
     resetTimer();
   }
 
-  /** Starts publishing added epochs to NetworkTables. Default topic is "Epochs" */
-  public void publishToNetworkTables() {
-    m_publishNT = true;
-  }
-
   /**
    * Starts publishing added epochs to NetworkTables.
    *
    * @param topicName The NetworkTables topic to publish to
    */
   public void publishToNetworkTables(String topicName) {
-    publishToNetworkTables();
-    m_topic = topicName;
+    m_publishNT = true;
+    m_ntTopic = topicName;
   }
 
-  /** Starts logging added epochs to the data log. Defaults to the default data log. */
-  public void startDataLog() {
-    m_dataLog = DataLogManager.getLog();
+  /**
+   * Starts logging added epochs to the data log. Default entry is "Epochs"
+   *
+   * @param dataLog The data log to log epochs to
+   */
+  public void startDataLog(DataLog dataLog) {
+    m_dataLog = dataLog;
     m_dataLogEnabled = true;
   }
 
@@ -62,9 +62,11 @@ public class Tracer {
    * Starts logging added epochs to the data log.
    *
    * @param dataLog The data log to log epochs to
+   * @param entry The name of the entry to log to
    */
-  public void startDataLog(DataLog dataLog) {
+  public void startDataLog(DataLog dataLog, String entry) {
     m_dataLog = dataLog;
+    m_dataLogEntry = entry;
     m_dataLogEnabled = true;
   }
 
@@ -92,19 +94,19 @@ public class Tracer {
    */
   public void addEpoch(String epochName) {
     long currentTime = RobotController.getFPGATime();
-    m_epochs.put(epochName, currentTime - m_startTime);
+    long epoch = currentTime - m_startTime;
+    m_epochs.put(epochName, epoch);
     if (m_publishNT) {
       IntegerTopic topic =
-          NetworkTableInstance.getDefault().getIntegerTopic(m_topic + "/" + epochName);
+          NetworkTableInstance.getDefault().getIntegerTopic(m_ntTopic + "/" + epochName);
       IntegerPublisher pub = topic.publish();
       pub.setDefault(0);
       topic.setRetained(true);
-      pub.set(currentTime - m_startTime);
+      pub.set(epoch);
       pub.close();
     }
     if (m_dataLogEnabled) {
-      m_dataLog.appendInteger(
-          m_dataLog.start("Epochs/" + epochName, "int64"), currentTime - m_startTime, 0);
+      m_dataLog.appendInteger(m_dataLog.start(m_dataLogEntry + "/" + epochName, "int64"), epoch, 0);
     }
     m_startTime = currentTime;
   }
