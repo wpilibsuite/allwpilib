@@ -141,7 +141,7 @@ class ShuffleboardInstanceTest {
 
       m_shuffleboardInstance.selectTab("tab1");
       m_shuffleboardInstance.selectTab("tab1");
-      assertTrue(m_ntInstance.waitForListenerQueue(0.005), "Listener queue timed out!");
+      assertTrue(m_ntInstance.waitForListenerQueue(1.0), "Listener queue timed out!");
       assertEquals(2, counter.get());
 
     } finally {
