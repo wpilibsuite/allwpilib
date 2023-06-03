@@ -4,7 +4,6 @@
 
 #pragma once
 
-#include <concepts>
 #include <functional>
 #include <initializer_list>
 #include <memory>
@@ -15,7 +14,7 @@
 #include <frc/event/EventLoop.h>
 #include <frc/filter/Debouncer.h>
 #include <units/time.h>
-#include <wpi/AppleClangConceptShims.h>
+#include <wpi/concepts.h>
 #include <wpi/deprecated.h>
 
 #include "frc2/command/Command.h"

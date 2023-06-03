@@ -4,12 +4,12 @@
 
 #pragma once
 
-#include <concepts>
 #include <functional>
 #include <initializer_list>
 #include <span>
 #include <utility>
 
+#include <wpi/concepts.h>
 #include <wpi/deprecated.h>
 
 #include "Trigger.h"

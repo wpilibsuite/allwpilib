@@ -4,10 +4,11 @@
 
 #include <stdint.h>
 
-#include <concepts>
 #include <span>
 #include <string_view>
 #include <vector>
+
+#include <wpi/concepts.h>
 
 #include "../MockLogger.h"
 #include "../PubSubOptionsMatcher.h"

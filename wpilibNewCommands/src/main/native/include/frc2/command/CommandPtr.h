@@ -4,7 +4,6 @@
 
 #pragma once
 
-#include <concepts>
 #include <functional>
 #include <initializer_list>
 #include <memory>
@@ -13,7 +12,7 @@
 #include <utility>
 #include <vector>
 
-#include <wpi/AppleClangConceptShims.h>
+#include <wpi/concepts.h>
 
 #include "frc2/command/CommandBase.h"
 

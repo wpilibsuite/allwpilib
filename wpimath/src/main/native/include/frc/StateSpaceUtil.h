@@ -6,11 +6,11 @@
 
 #include <array>
 #include <cmath>
-#include <concepts>
 #include <limits>
 #include <random>
 
 #include <wpi/SymbolExports.h>
+#include <wpi/concepts.h>
 #include <wpi/deprecated.h>
 
 #include "Eigen/Eigenvalues"

@@ -5,11 +5,12 @@
 #pragma once
 
 #include <concepts>
+
+#if defined(__APPLE__) && !defined(__cpp_lib_concepts)
+
 #include <functional>
 #include <type_traits>
 #include <utility>
-
-#if defined(__APPLE__) && !defined(__cpp_lib_concepts)
 
 namespace std {
 
@@ -53,4 +54,4 @@ concept invocable = requires(F&& f, Args&&... args) {
 
 }  // namespace std
 
-#endif  // defined(__APPLE__)
+#endif  // defined(__APPLE__) && !defined(__cpp_lib_concepts)

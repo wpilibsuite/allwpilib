@@ -4,11 +4,9 @@
 
 #include "glass/Storage.h"
 
-#include <concepts>
-
 #include <imgui.h>
-#include <wpi/AppleClangConceptShims.h>
 #include <wpi/StringExtras.h>
+#include <wpi/concepts.h>
 #include <wpi/json.h>
 
 using namespace glass;

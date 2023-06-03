@@ -4,10 +4,9 @@
 
 #pragma once
 
-#include <concepts>
 #include <limits>
 
-#include <wpi/AppleClangConceptShims.h>
+#include <wpi/concepts.h>
 
 #include "frc/geometry/Rotation2d.h"
 #include "frc/geometry/Translation2d.h"

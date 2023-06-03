@@ -4,10 +4,9 @@
 
 #pragma once
 
-#include <concepts>
 #include <type_traits>
 
-#include "wpi/AppleClangConceptShims.h"
+#include "wpi/concepts.h"
 
 namespace wpi {
 

@@ -5,12 +5,11 @@
 #pragma once
 
 #include <array>
-#include <concepts>
 #include <cstddef>
 #include <tuple>
 #include <utility>
 
-#include "wpi/AppleClangConceptShims.h"
+#include "wpi/concepts.h"
 
 namespace wpi {
 

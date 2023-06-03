@@ -7,7 +7,6 @@
 #include <stdint.h>
 
 #include <atomic>
-#include <concepts>
 #include <functional>
 #include <string_view>
 #include <thread>
@@ -15,7 +14,7 @@
 
 #include <hal/Types.h>
 #include <units/time.h>
-#include <wpi/AppleClangConceptShims.h>
+#include <wpi/concepts.h>
 #include <wpi/mutex.h>
 
 namespace frc {

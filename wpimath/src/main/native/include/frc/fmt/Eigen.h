@@ -4,10 +4,8 @@
 
 #pragma once
 
-#include <concepts>
-
 #include <fmt/format.h>
-#include <wpi/AppleClangConceptShims.h>
+#include <wpi/concepts.h>
 
 #include "Eigen/Core"
 #include "Eigen/SparseCore"

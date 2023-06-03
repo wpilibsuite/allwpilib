@@ -4,12 +4,11 @@
 
 #pragma once
 
-#include <concepts>
 #include <cstddef>
 
-#include <wpi/AppleClangConceptShims.h>
 #include <wpi/SymbolExports.h>
 #include <wpi/array.h>
+#include <wpi/concepts.h>
 
 #include "Eigen/QR"
 #include "frc/EigenCore.h"

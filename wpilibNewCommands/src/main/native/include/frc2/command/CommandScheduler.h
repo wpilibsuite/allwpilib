@@ -4,7 +4,6 @@
 
 #pragma once
 
-#include <concepts>
 #include <initializer_list>
 #include <memory>
 #include <span>
@@ -15,8 +14,8 @@
 #include <frc/event/EventLoop.h>
 #include <networktables/NTSendable.h>
 #include <units/time.h>
-#include <wpi/AppleClangConceptShims.h>
 #include <wpi/FunctionExtras.h>
+#include <wpi/concepts.h>
 #include <wpi/deprecated.h>
 #include <wpi/sendable/SendableHelper.h>
 

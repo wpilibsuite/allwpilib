@@ -4,7 +4,6 @@
 
 #pragma once
 
-#include <concepts>
 #include <memory>
 #include <stdexcept>
 #include <string>
@@ -12,8 +11,8 @@
 #include <utility>
 
 #include <networktables/NetworkTable.h>
-#include <wpi/AppleClangConceptShims.h>
 #include <wpi/StringMap.h>
+#include <wpi/concepts.h>
 
 #include "frc/Errors.h"
 

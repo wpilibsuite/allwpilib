@@ -7,7 +7,6 @@
 #include <stdint.h>
 
 #include <cassert>
-#include <concepts>
 #include <initializer_list>
 #include <memory>
 #include <span>
@@ -15,6 +14,8 @@
 #include <string_view>
 #include <utility>
 #include <vector>
+
+#include <wpi/concepts.h>
 
 #include "ntcore_c.h"
 

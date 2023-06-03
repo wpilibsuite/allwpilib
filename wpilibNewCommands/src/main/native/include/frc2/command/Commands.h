@@ -4,7 +4,6 @@
 
 #pragma once
 
-#include <concepts>
 #include <functional>
 #include <initializer_list>
 #include <memory>
@@ -13,6 +12,8 @@
 #include <type_traits>
 #include <utility>
 #include <vector>
+
+#include <wpi/concepts.h>
 
 #include "frc2/command/CommandPtr.h"
 #include "frc2/command/SelectCommand.h"

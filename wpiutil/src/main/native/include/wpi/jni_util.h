@@ -7,7 +7,6 @@
 
 #include <jni.h>
 
-#include <concepts>
 #include <queue>
 #include <span>
 #include <string>
@@ -15,12 +14,12 @@
 #include <utility>
 #include <vector>
 
-#include "wpi/AppleClangConceptShims.h"
 #include "wpi/ConvertUTF.h"
 #include "wpi/SafeThread.h"
 #include "wpi/SmallString.h"
 #include "wpi/SmallVector.h"
 #include "wpi/StringExtras.h"
+#include "wpi/concepts.h"
 #include "wpi/mutex.h"
 #include "wpi/raw_ostream.h"
 
