@@ -502,7 +502,7 @@ bool LSImpl::SetValue(TopicData* topic, const Value& value,
     return false;
   }
   if (!topic->lastValue || topic->lastValue.time() == 0 ||
-      value.time() >= topic->lastValue.time()) {
+      (!isDuplicate && value.time() >= topic->lastValue.time())) {
     // TODO: notify option even if older value
     topic->type = value.type();
     topic->lastValue = value;

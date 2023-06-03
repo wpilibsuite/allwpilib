@@ -518,11 +518,12 @@ void LocalStorageDuplicatesTest::SetupPubSub(bool keepPub, bool keepSub) {
                           {.pollStorage = 10, .keepDuplicates = keepSub});
 }
 
-void LocalStorageDuplicatesTest::SetValues() {
+void LocalStorageDuplicatesTest::SetValues(bool expectDuplicates) {
   storage.SetEntryValue(pub, val1);
   storage.SetEntryValue(pub, val2);
   // verify the timestamp was updated
-  EXPECT_EQ(storage.GetEntryLastChange(sub), val2.time());
+  EXPECT_EQ(storage.GetEntryLastChange(sub), 
+            expectDuplicates ? val2.time() : val1.time());
   storage.SetEntryValue(pub, val3);
 }
 
@@ -531,7 +532,7 @@ TEST_F(LocalStorageDuplicatesTest, Defaults) {
 
   EXPECT_CALL(network, SetValue(pub, val1));
   EXPECT_CALL(network, SetValue(pub, val3));
-  SetValues();
+  SetValues(false);
 
   // verify 2nd update was dropped locally
   auto values = storage.ReadQueueDouble(sub);
@@ -548,7 +549,7 @@ TEST_F(LocalStorageDuplicatesTest, KeepPub) {
   EXPECT_CALL(network, SetValue(pub, val1)).Times(2);
   // EXPECT_CALL(network, SetValue(pub, val2));
   EXPECT_CALL(network, SetValue(pub, val3));
-  SetValues();
+  SetValues(true);
 
   // verify all 3 updates were received locally
   auto values = storage.ReadQueueDouble(sub);
@@ -561,7 +562,21 @@ TEST_F(LocalStorageDuplicatesTest, KeepSub) {
   // second update should NOT go to the network
   EXPECT_CALL(network, SetValue(pub, val1));
   EXPECT_CALL(network, SetValue(pub, val3));
-  SetValues();
+  SetValues(false);
+
+  // verify both updates were received locally
+  auto values = storage.ReadQueueDouble(sub);
+  ASSERT_EQ(values.size(), 2u);
+}
+
+TEST_F(LocalStorageDuplicatesTest, KeepPubSub) {
+  SetupPubSub(true, true);
+
+  // second update SHOULD go to the network
+  EXPECT_CALL(network, SetValue(pub, val1));
+  EXPECT_CALL(network, SetValue(pub, val2));
+  EXPECT_CALL(network, SetValue(pub, val3));
+  SetValues(true);
 
   // verify all 3 updates were received locally
   auto values = storage.ReadQueueDouble(sub);
@@ -576,7 +591,7 @@ TEST_F(LocalStorageDuplicatesTest, FromNetwork) {
   storage.NetworkSetValue(topic, val1);
   storage.NetworkSetValue(topic, val2);
   // verify the timestamp was updated
-  EXPECT_EQ(storage.GetEntryLastChange(sub), val2.time());
+  EXPECT_EQ(storage.GetEntryLastChange(sub), val1.time());
   storage.NetworkSetValue(topic, val3);
 
   // verify 2nd update was dropped locally
