@@ -125,6 +125,34 @@ public final class CommandScheduler implements Sendable, AutoCloseable {
   }
 
   /**
+   * Starts publishing added epochs to NetworkTables.
+   *
+   * @param topicName The NetworkTables topic to publish to
+   */
+  public void publishToNetworkTables(String topicName) {
+    m_watchdog.publishToNetworkTables(topicName);
+  }
+
+  /**
+   * Starts logging added epochs to the data log. Default entry is "Epochs"
+   *
+   * @param dataLog The data log to log epochs to
+   */
+  public void startDataLog(DataLog dataLog) {
+    m_watchdog.startDataLog(dataLog);
+  }
+
+  /**
+   * Starts logging added epochs to the data log.
+   *
+   * @param dataLog The data log to log epochs to
+   * @param entry The name of the entry to log to
+   */
+  public void startDataLog(DataLog dataLog, String entry) {
+    m_watchdog.startDataLog(dataLog);
+  }
+
+  /**
    * Get the default button poll.
    *
    * @return a reference to the default {@link EventLoop} object polling buttons.
