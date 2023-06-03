@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include <wpi/MathExtras.h>
 #include <wpi/SymbolExports.h>
 
 #include "frc/geometry/Rotation2d.h"
@@ -33,5 +34,13 @@ struct WPILIB_DLLEXPORT SwerveModulePosition {
    * @return Whether the two objects are equal.
    */
   bool operator==(const SwerveModulePosition& other) const;
+
+  SwerveModulePosition operator-(const SwerveModulePosition& other) const {
+    return {distance - other.distance, angle};
+  }
+
+  SwerveModulePosition Interpolate(const SwerveModulePosition& endValue, double t) const {
+    return {wpi::Lerp(distance, endValue.distance, t), wpi::Lerp(angle, endValue.angle, t)};
+  }
 };
 }  // namespace frc

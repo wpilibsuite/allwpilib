@@ -66,6 +66,7 @@ SwerveDriveKinematics<NumModules>::ToSwerveModuleStates(
 
 template <size_t NumModules>
 template <typename... ModuleStates>
+requires (std::is_same_v<std::remove_reference_t<ModuleStates>, SwerveModuleState>&&...)
 ChassisSpeeds SwerveDriveKinematics<NumModules>::ToChassisSpeeds(
     ModuleStates&&... wheelStates) const {
   static_assert(sizeof...(wheelStates) == NumModules,
@@ -79,7 +80,7 @@ ChassisSpeeds SwerveDriveKinematics<NumModules>::ToChassisSpeeds(
 
 template <size_t NumModules>
 ChassisSpeeds SwerveDriveKinematics<NumModules>::ToChassisSpeeds(
-    wpi::array<SwerveModuleState, NumModules> moduleStates) const {
+    const wpi::array<SwerveModuleState, NumModules>& moduleStates) const {
   Matrixd<NumModules * 2, 1> moduleStateMatrix;
 
   for (size_t i = 0; i < NumModules; ++i) {

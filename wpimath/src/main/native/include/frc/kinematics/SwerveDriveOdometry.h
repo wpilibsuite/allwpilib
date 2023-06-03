@@ -11,7 +11,9 @@
 #include <wpi/SymbolExports.h>
 #include <wpi/timestamp.h>
 
+#include "Odometry.h"
 #include "SwerveDriveKinematics.h"
+#include "SwerveDriveWheelPositions.h"
 #include "SwerveModulePosition.h"
 #include "frc/geometry/Pose2d.h"
 #include "units/time.h"
@@ -28,7 +30,7 @@ namespace frc {
  * when using computer-vision systems.
  */
 template <size_t NumModules>
-class SwerveDriveOdometry {
+class SwerveDriveOdometry : public Odometry<SwerveDriveWheelPositions<NumModules>> {
  public:
   /**
    * Constructs a SwerveDriveOdometry object.
@@ -56,13 +58,9 @@ class SwerveDriveOdometry {
   void ResetPosition(
       const Rotation2d& gyroAngle,
       const wpi::array<SwerveModulePosition, NumModules>& modulePositions,
-      const Pose2d& pose);
-
-  /**
-   * Returns the position of the robot on the field.
-   * @return The pose of the robot.
-   */
-  const Pose2d& GetPose() const { return m_pose; }
+      const Pose2d& pose) {
+    Odometry<SwerveDriveWheelPositions<NumModules>>::ResetPosition(gyroAngle, {modulePositions}, pose);
+  }
 
   /**
    * Updates the robot's position on the field using forward kinematics and
@@ -79,17 +77,12 @@ class SwerveDriveOdometry {
    */
   const Pose2d& Update(
       const Rotation2d& gyroAngle,
-      const wpi::array<SwerveModulePosition, NumModules>& modulePositions);
+      const wpi::array<SwerveModulePosition, NumModules>& modulePositions) {
+    return Odometry<SwerveDriveWheelPositions<NumModules>>::Update(gyroAngle, {modulePositions});
+  }
 
  private:
-  SwerveDriveKinematics<NumModules> m_kinematics;
-  Pose2d m_pose;
-
-  Rotation2d m_previousAngle;
-  Rotation2d m_gyroOffset;
-
-  wpi::array<SwerveModulePosition, NumModules> m_previousModulePositions{
-      wpi::empty_array};
+  SwerveDriveKinematics<NumModules> m_kinematicsImpl;
 };
 
 extern template class EXPORT_TEMPLATE_DECLARE(WPILIB_DLLEXPORT)

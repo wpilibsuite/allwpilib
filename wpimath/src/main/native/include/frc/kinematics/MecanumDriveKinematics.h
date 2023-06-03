@@ -11,6 +11,7 @@
 #include "frc/geometry/Translation2d.h"
 #include "frc/geometry/Twist2d.h"
 #include "frc/kinematics/ChassisSpeeds.h"
+#include "frc/kinematics/Kinematics.h"
 #include "frc/kinematics/MecanumDriveWheelPositions.h"
 #include "frc/kinematics/MecanumDriveWheelSpeeds.h"
 #include "wpimath/MathShared.h"
@@ -39,7 +40,7 @@ namespace frc {
  * Forward kinematics is also used for odometry -- determining the position of
  * the robot on the field using encoders and a gyro.
  */
-class WPILIB_DLLEXPORT MecanumDriveKinematics {
+class WPILIB_DLLEXPORT MecanumDriveKinematics : public Kinematics<MecanumDriveWheelPositions> {
  public:
   /**
    * Constructs a mecanum drive kinematics object.
@@ -126,7 +127,7 @@ class WPILIB_DLLEXPORT MecanumDriveKinematics {
    *
    * @return The resulting chassis speed.
    */
-  Twist2d ToTwist2d(const MecanumDriveWheelPositions& wheelDeltas) const;
+  Twist2d ToTwist2d(const MecanumDriveWheelPositions& wheelDeltas) const override;
 
  private:
   mutable Matrixd<4, 3> m_inverseKinematics;

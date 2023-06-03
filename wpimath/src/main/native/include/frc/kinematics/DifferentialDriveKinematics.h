@@ -9,6 +9,8 @@
 #include "frc/geometry/Twist2d.h"
 #include "frc/kinematics/ChassisSpeeds.h"
 #include "frc/kinematics/DifferentialDriveWheelSpeeds.h"
+#include "frc/kinematics/DifferentialDriveWheelPositions.h"
+#include "frc/kinematics/Kinematics.h"
 #include "units/angle.h"
 #include "units/length.h"
 #include "wpimath/MathShared.h"
@@ -22,7 +24,7 @@ namespace frc {
  * velocity components whereas forward kinematics converts left and right
  * component velocities into a linear and angular chassis speed.
  */
-class WPILIB_DLLEXPORT DifferentialDriveKinematics {
+class WPILIB_DLLEXPORT DifferentialDriveKinematics : public Kinematics<DifferentialDriveWheelPositions> {
  public:
   /**
    * Constructs a differential drive kinematics object.
@@ -77,6 +79,10 @@ class WPILIB_DLLEXPORT DifferentialDriveKinematics {
                               const units::meter_t rightDistance) const {
     return {(leftDistance + rightDistance) / 2, 0_m,
             (rightDistance - leftDistance) / trackWidth * 1_rad};
+  }
+
+  Twist2d ToTwist2d(const DifferentialDriveWheelPositions& wheelDeltas) const override {
+    return ToTwist2d(wheelDeltas.left, wheelDeltas.right);
   }
 
   units::meter_t trackWidth;

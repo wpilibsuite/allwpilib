@@ -15,6 +15,8 @@
 #include "frc/geometry/Translation2d.h"
 #include "frc/geometry/Twist2d.h"
 #include "frc/kinematics/ChassisSpeeds.h"
+#include "frc/kinematics/Kinematics.h"
+#include "frc/kinematics/SwerveDriveWheelPositions.h"
 #include "frc/kinematics/SwerveModulePosition.h"
 #include "frc/kinematics/SwerveModuleState.h"
 #include "units/velocity.h"
@@ -44,7 +46,7 @@ namespace frc {
  * the robot on the field using encoders and a gyro.
  */
 template <size_t NumModules>
-class SwerveDriveKinematics {
+class SwerveDriveKinematics : public Kinematics<SwerveDriveWheelPositions<NumModules>> {
  public:
   /**
    * Constructs a swerve drive kinematics object. This takes in a variable
@@ -146,6 +148,7 @@ class SwerveDriveKinematics {
    * @return The resulting chassis speed.
    */
   template <typename... ModuleStates>
+  requires (std::is_same_v<std::remove_reference_t<ModuleStates>, SwerveModuleState>&&...)
   ChassisSpeeds ToChassisSpeeds(ModuleStates&&... wheelStates) const;
 
   /**
@@ -162,7 +165,7 @@ class SwerveDriveKinematics {
    * @return The resulting chassis speed.
    */
   ChassisSpeeds ToChassisSpeeds(
-      wpi::array<SwerveModuleState, NumModules> moduleStates) const;
+      const wpi::array<SwerveModuleState, NumModules>& moduleStates) const;
 
   /**
    * Performs forward kinematics to return the resulting Twist2d from the
@@ -195,6 +198,10 @@ class SwerveDriveKinematics {
    */
   Twist2d ToTwist2d(
       wpi::array<SwerveModulePosition, NumModules> wheelDeltas) const;
+
+  Twist2d ToTwist2d(const SwerveDriveWheelPositions<NumModules>& wheelDeltas) const override {
+    return ToTwist2d(wheelDeltas.positions);
+  }
 
   /**
    * Renormalizes the wheel speeds if any individual speed is above the
