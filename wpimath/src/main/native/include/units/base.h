@@ -76,7 +76,7 @@
 	#include <locale>
 	#include <string>
 #endif
-#if !defined(UNIT_LIB_DISABLE_FMT)
+#if __has_include(<fmt/format.h>) && !defined(UNIT_LIB_DISABLE_FMT)
 	#include <locale>
 	#include <string>
 	#include <fmt/format.h>
@@ -176,7 +176,7 @@ namespace units
  * @param		abbrev - abbreviated unit name, e.g. 'm'
  * @note		When UNIT_LIB_ENABLE_IOSTREAM isn't defined, the macro does not generate any code
  */
-#if !defined(UNIT_LIB_DISABLE_FMT)
+#if __has_include(<fmt/format.h>) && !defined(UNIT_LIB_DISABLE_FMT)
 	#define UNIT_ADD_IO(namespaceName, nameSingular, abbrev)\
 	}\
 	template <>\
@@ -2875,7 +2875,7 @@ namespace units
 	}
 #endif
 }
-#if !defined(UNIT_LIB_DISABLE_FMT)
+#if __has_include(<fmt/format.h>) && !defined(UNIT_LIB_DISABLE_FMT)
 template <>
 struct fmt::formatter<units::dimensionless::dB_t> : fmt::formatter<double>
 {
@@ -3440,6 +3440,6 @@ namespace units::literals {}
 using namespace units::literals;
 #endif  // UNIT_HAS_LITERAL_SUPPORT
 
-#if !defined(UNIT_LIB_DISABLE_FMT)
-#include "frc/fmt/Units.h"
+#if __has_include(<fmt/format.h>) && !defined(UNIT_LIB_DISABLE_FMT)
+#include "units/formatter.h"
 #endif

@@ -54,7 +54,8 @@ class DigitalPWMSim {
    * @param initialNotify whether to run the callback with the initial state
    * @return the CallbackStore object associated with this callback
    */
-  [[nodiscard]] std::unique_ptr<CallbackStore> RegisterInitializedCallback(
+  [[nodiscard]]
+  std::unique_ptr<CallbackStore> RegisterInitializedCallback(
       NotifyCallback callback, bool initialNotify);
 
   /**
@@ -78,7 +79,8 @@ class DigitalPWMSim {
    * @param initialNotify whether to call the callback with the initial state
    * @return the CallbackStore object associated with this callback
    */
-  [[nodiscard]] std::unique_ptr<CallbackStore> RegisterDutyCycleCallback(
+  [[nodiscard]]
+  std::unique_ptr<CallbackStore> RegisterDutyCycleCallback(
       NotifyCallback callback, bool initialNotify);
 
   /**
@@ -102,8 +104,9 @@ class DigitalPWMSim {
    * @param initialNotify whether to call the callback with the initial state
    * @return the CallbackStore object associated with this callback
    */
-  [[nodiscard]] std::unique_ptr<CallbackStore> RegisterPinCallback(
-      NotifyCallback callback, bool initialNotify);
+  [[nodiscard]]
+  std::unique_ptr<CallbackStore> RegisterPinCallback(NotifyCallback callback,
+                                                     bool initialNotify);
 
   /**
    * Check the pin number.
