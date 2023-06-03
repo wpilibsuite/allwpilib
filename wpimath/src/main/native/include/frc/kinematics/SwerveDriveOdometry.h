@@ -30,7 +30,8 @@ namespace frc {
  * when using computer-vision systems.
  */
 template <size_t NumModules>
-class SwerveDriveOdometry : public Odometry<SwerveDriveWheelPositions<NumModules>> {
+class SwerveDriveOdometry
+    : public Odometry<SwerveDriveWheelPositions<NumModules>> {
  public:
   /**
    * Constructs a SwerveDriveOdometry object.
@@ -59,7 +60,8 @@ class SwerveDriveOdometry : public Odometry<SwerveDriveWheelPositions<NumModules
       const Rotation2d& gyroAngle,
       const wpi::array<SwerveModulePosition, NumModules>& modulePositions,
       const Pose2d& pose) {
-    Odometry<SwerveDriveWheelPositions<NumModules>>::ResetPosition(gyroAngle, {modulePositions}, pose);
+    Odometry<SwerveDriveWheelPositions<NumModules>>::ResetPosition(
+        gyroAngle, {modulePositions}, pose);
   }
 
   /**
@@ -78,7 +80,8 @@ class SwerveDriveOdometry : public Odometry<SwerveDriveWheelPositions<NumModules
   const Pose2d& Update(
       const Rotation2d& gyroAngle,
       const wpi::array<SwerveModulePosition, NumModules>& modulePositions) {
-    return Odometry<SwerveDriveWheelPositions<NumModules>>::Update(gyroAngle, {modulePositions});
+    return Odometry<SwerveDriveWheelPositions<NumModules>>::Update(
+        gyroAngle, {modulePositions});
   }
 
  private:

@@ -25,7 +25,8 @@ struct WPILIB_DLLEXPORT DifferentialDriveWheelPositions {
   units::meter_t right = 0_m;
 
   /**
-   * Checks equality between this DifferentialDriveWheelPositions and another object.
+   * Checks equality between this DifferentialDriveWheelPositions and another
+   * object.
    *
    * @param other The other object.
    * @return Whether the two objects are equal.
@@ -41,13 +42,15 @@ struct WPILIB_DLLEXPORT DifferentialDriveWheelPositions {
    */
   bool operator!=(const DifferentialDriveWheelPositions& other) const = default;
 
-  DifferentialDriveWheelPositions operator-(const DifferentialDriveWheelPositions& other) const {
+  DifferentialDriveWheelPositions operator-(
+      const DifferentialDriveWheelPositions& other) const {
     return {left - other.left, right - other.right};
   }
 
-  DifferentialDriveWheelPositions Interpolate(const DifferentialDriveWheelPositions& endValue, double t) const {
-    return {wpi::Lerp(left, endValue.left, t), wpi::Lerp(right, endValue.right, t)};
+  DifferentialDriveWheelPositions Interpolate(
+      const DifferentialDriveWheelPositions& endValue, double t) const {
+    return {wpi::Lerp(left, endValue.left, t),
+            wpi::Lerp(right, endValue.right, t)};
   }
 };
 }  // namespace frc
-

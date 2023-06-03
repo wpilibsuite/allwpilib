@@ -8,7 +8,9 @@
 
 namespace frc {
 template <WheelPositions T>
-Odometry<T>::Odometry(const Kinematics<T>& kinematics, const Rotation2d& gyroAngle, const T& wheelPositions, const Pose2d& initialPose)
+Odometry<T>::Odometry(const Kinematics<T>& kinematics,
+                      const Rotation2d& gyroAngle, const T& wheelPositions,
+                      const Pose2d& initialPose)
     : m_kinematics(kinematics),
       m_pose(initialPose),
       m_previousWheelPositions(wheelPositions) {
@@ -17,9 +19,8 @@ Odometry<T>::Odometry(const Kinematics<T>& kinematics, const Rotation2d& gyroAng
 }
 
 template <WheelPositions T>
-const Pose2d& Odometry<T>::Update(
-    const Rotation2d& gyroAngle,
-    const T& wheelPositions) {
+const Pose2d& Odometry<T>::Update(const Rotation2d& gyroAngle,
+                                  const T& wheelPositions) {
   auto angle = gyroAngle + m_gyroOffset;
 
   auto wheelDeltas = wheelPositions - m_previousWheelPositions;

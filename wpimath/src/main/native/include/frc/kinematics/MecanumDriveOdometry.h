@@ -25,7 +25,8 @@ namespace frc {
  * path following. Furthermore, odometry can be used for latency compensation
  * when using computer-vision systems.
  */
-class WPILIB_DLLEXPORT MecanumDriveOdometry : public Odometry<MecanumDriveWheelPositions> {
+class WPILIB_DLLEXPORT MecanumDriveOdometry
+    : public Odometry<MecanumDriveWheelPositions> {
  public:
   /**
    * Constructs a MecanumDriveOdometry object.

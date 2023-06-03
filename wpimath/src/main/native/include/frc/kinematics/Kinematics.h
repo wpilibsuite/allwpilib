@@ -14,15 +14,17 @@ namespace frc {
  * Helper class that converts a chassis velocity (dx, dy, and dtheta components)
  * into individual wheel speeds.
  *
- * Inverse kinematics converts a desired chassis speed into wheel speeds whereas forward kinematics converts wheel speeds into chassis speed.
+ * Inverse kinematics converts a desired chassis speed into wheel speeds whereas
+ * forward kinematics converts wheel speeds into chassis speed.
  */
 template <typename T>
 class WPILIB_DLLEXPORT Kinematics {
  public:
   /**
-   * Performs forward kinematics to return the resulting from the given wheel deltas. This method is
-   * often used for odometry -- determining the robot's position on the field using changes in the
-   * distance driven by each wheel on the robot.
+   * Performs forward kinematics to return the resulting from the given wheel
+   * deltas. This method is often used for odometry -- determining the robot's
+   * position on the field using changes in the distance driven by each wheel on
+   * the robot.
    *
    * @param wheelDeltas The distances driven by each wheel.
    *
@@ -30,4 +32,4 @@ class WPILIB_DLLEXPORT Kinematics {
    */
   virtual Twist2d ToTwist2d(const T& wheelDeltas) const = 0;
 };
-} // namespace frc
+}  // namespace frc

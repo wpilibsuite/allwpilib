@@ -31,7 +31,9 @@ class WPILIB_DLLEXPORT Odometry {
    * @param wheelPositions The current distances measured by each wheel.
    * @param initialPose The starting position of the robot on the field.
    */
-  explicit Odometry(const Kinematics<T>& kinematics, const Rotation2d& gyroAngle, const T& wheelPositions, const Pose2d& initialPose = Pose2d{});
+  explicit Odometry(const Kinematics<T>& kinematics,
+                    const Rotation2d& gyroAngle, const T& wheelPositions,
+                    const Pose2d& initialPose = Pose2d{});
 
   /**
    * Resets the robot's position on the field.
@@ -43,7 +45,8 @@ class WPILIB_DLLEXPORT Odometry {
    * @param wheelPositions The current distances measured by each wheel.
    * @param pose The position on the field that your robot is at.
    */
-  void ResetPosition(const Rotation2d& gyroAngle, const T& wheelPositions, const Pose2d& pose) {
+  void ResetPosition(const Rotation2d& gyroAngle, const T& wheelPositions,
+                     const Pose2d& pose) {
     m_pose = pose;
     m_previousAngle = pose.Rotation();
     m_gyroOffset = m_pose.Rotation() - gyroAngle;

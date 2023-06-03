@@ -47,7 +47,8 @@ namespace frc {
  * the robot on the field using encoders and a gyro.
  */
 template <size_t NumModules>
-class SwerveDriveKinematics : public Kinematics<SwerveDriveWheelPositions<NumModules>> {
+class SwerveDriveKinematics
+    : public Kinematics<SwerveDriveWheelPositions<NumModules>> {
  public:
   /**
    * Constructs a swerve drive kinematics object. This takes in a variable
@@ -202,7 +203,8 @@ class SwerveDriveKinematics : public Kinematics<SwerveDriveWheelPositions<NumMod
   Twist2d ToTwist2d(
       wpi::array<SwerveModulePosition, NumModules> wheelDeltas) const;
 
-  Twist2d ToTwist2d(const SwerveDriveWheelPositions<NumModules>& wheelDeltas) const override {
+  Twist2d ToTwist2d(
+      const SwerveDriveWheelPositions<NumModules>& wheelDeltas) const override {
     return ToTwist2d(wheelDeltas.positions);
   }
 

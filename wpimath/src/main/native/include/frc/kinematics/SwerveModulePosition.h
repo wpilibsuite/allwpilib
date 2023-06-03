@@ -39,8 +39,10 @@ struct WPILIB_DLLEXPORT SwerveModulePosition {
     return {distance - other.distance, angle};
   }
 
-  SwerveModulePosition Interpolate(const SwerveModulePosition& endValue, double t) const {
-    return {wpi::Lerp(distance, endValue.distance, t), wpi::Lerp(angle, endValue.angle, t)};
+  SwerveModulePosition Interpolate(const SwerveModulePosition& endValue,
+                                   double t) const {
+    return {wpi::Lerp(distance, endValue.distance, t),
+            wpi::Lerp(angle, endValue.angle, t)};
   }
 };
 }  // namespace frc

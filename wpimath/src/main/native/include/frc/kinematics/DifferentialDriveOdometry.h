@@ -25,7 +25,8 @@ namespace frc {
  * It is important that you reset your encoders to zero before using this class.
  * Any subsequent pose resets also require the encoders to be reset to zero.
  */
-class WPILIB_DLLEXPORT DifferentialDriveOdometry : public Odometry<DifferentialDriveWheelPositions> {
+class WPILIB_DLLEXPORT DifferentialDriveOdometry
+    : public Odometry<DifferentialDriveWheelPositions> {
  public:
   /**
    * Constructs a DifferentialDriveOdometry object.
@@ -59,7 +60,8 @@ class WPILIB_DLLEXPORT DifferentialDriveOdometry : public Odometry<DifferentialD
    */
   void ResetPosition(const Rotation2d& gyroAngle, units::meter_t leftDistance,
                      units::meter_t rightDistance, const Pose2d& pose) {
-    Odometry<DifferentialDriveWheelPositions>::ResetPosition(gyroAngle, {leftDistance, rightDistance}, pose);
+    Odometry<DifferentialDriveWheelPositions>::ResetPosition(
+        gyroAngle, {leftDistance, rightDistance}, pose);
   }
 
   /**
@@ -75,10 +77,11 @@ class WPILIB_DLLEXPORT DifferentialDriveOdometry : public Odometry<DifferentialD
    */
   const Pose2d& Update(const Rotation2d& gyroAngle, units::meter_t leftDistance,
                        units::meter_t rightDistance) {
-    return Odometry<DifferentialDriveWheelPositions>::Update(gyroAngle, {leftDistance, rightDistance});
+    return Odometry<DifferentialDriveWheelPositions>::Update(
+        gyroAngle, {leftDistance, rightDistance});
   }
 
  private:
-  DifferentialDriveKinematics m_kinematics = DifferentialDriveKinematics(units::meter_t{1});
+  DifferentialDriveKinematics m_kinematics{units::meter_t{1}};
 };
 }  // namespace frc

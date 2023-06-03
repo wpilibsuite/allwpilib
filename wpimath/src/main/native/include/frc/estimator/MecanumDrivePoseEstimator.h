@@ -33,7 +33,8 @@ namespace frc {
  * never call it, then this class will behave mostly like regular encoder
  * odometry.
  */
-class WPILIB_DLLEXPORT MecanumDrivePoseEstimator : public PoseEstimator<MecanumDriveWheelPositions> {
+class WPILIB_DLLEXPORT MecanumDrivePoseEstimator
+    : public PoseEstimator<MecanumDriveWheelPositions> {
  public:
   /**
    * Constructs a MecanumDrivePoseEstimator with default standard deviations

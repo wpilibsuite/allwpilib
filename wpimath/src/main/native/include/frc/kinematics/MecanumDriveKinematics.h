@@ -40,7 +40,8 @@ namespace frc {
  * Forward kinematics is also used for odometry -- determining the position of
  * the robot on the field using encoders and a gyro.
  */
-class WPILIB_DLLEXPORT MecanumDriveKinematics : public Kinematics<MecanumDriveWheelPositions> {
+class WPILIB_DLLEXPORT MecanumDriveKinematics
+    : public Kinematics<MecanumDriveWheelPositions> {
  public:
   /**
    * Constructs a mecanum drive kinematics object.
@@ -127,7 +128,8 @@ class WPILIB_DLLEXPORT MecanumDriveKinematics : public Kinematics<MecanumDriveWh
    *
    * @return The resulting chassis speed.
    */
-  Twist2d ToTwist2d(const MecanumDriveWheelPositions& wheelDeltas) const override;
+  Twist2d ToTwist2d(
+      const MecanumDriveWheelPositions& wheelDeltas) const override;
 
  private:
   mutable Matrixd<4, 3> m_inverseKinematics;

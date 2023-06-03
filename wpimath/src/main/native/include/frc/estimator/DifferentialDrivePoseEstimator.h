@@ -30,7 +30,8 @@ namespace frc {
  * AddVisionMeasurement() can be called as infrequently as you want; if you
  * never call it, then this class will behave like regular encoder odometry.
  */
-class WPILIB_DLLEXPORT DifferentialDrivePoseEstimator : public PoseEstimator<DifferentialDriveWheelPositions> {
+class WPILIB_DLLEXPORT DifferentialDrivePoseEstimator
+    : public PoseEstimator<DifferentialDriveWheelPositions> {
  public:
   /**
    * Constructs a DifferentialDrivePoseEstimator with default standard
@@ -87,7 +88,8 @@ class WPILIB_DLLEXPORT DifferentialDrivePoseEstimator : public PoseEstimator<Dif
    */
   void ResetPosition(const Rotation2d& gyroAngle, units::meter_t leftDistance,
                      units::meter_t rightDistance, const Pose2d& pose) {
-    PoseEstimator<DifferentialDriveWheelPositions>::ResetPosition(gyroAngle, {leftDistance, rightDistance}, pose);
+    PoseEstimator<DifferentialDriveWheelPositions>::ResetPosition(
+        gyroAngle, {leftDistance, rightDistance}, pose);
   }
 
   /**
@@ -102,7 +104,8 @@ class WPILIB_DLLEXPORT DifferentialDrivePoseEstimator : public PoseEstimator<Dif
    */
   Pose2d Update(const Rotation2d& gyroAngle, units::meter_t leftDistance,
                 units::meter_t rightDistance) {
-    return PoseEstimator<DifferentialDriveWheelPositions>::Update(gyroAngle, {leftDistance, rightDistance});
+    return PoseEstimator<DifferentialDriveWheelPositions>::Update(
+        gyroAngle, {leftDistance, rightDistance});
   }
 
   /**
@@ -120,7 +123,8 @@ class WPILIB_DLLEXPORT DifferentialDrivePoseEstimator : public PoseEstimator<Dif
                         const Rotation2d& gyroAngle,
                         units::meter_t leftDistance,
                         units::meter_t rightDistance) {
-    return PoseEstimator<DifferentialDriveWheelPositions>::UpdateWithTime(currentTime, gyroAngle, {leftDistance, rightDistance});
+    return PoseEstimator<DifferentialDriveWheelPositions>::UpdateWithTime(
+        currentTime, gyroAngle, {leftDistance, rightDistance});
   }
 
  private:

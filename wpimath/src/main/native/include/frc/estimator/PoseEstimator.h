@@ -46,9 +46,9 @@ class WPILIB_DLLEXPORT PoseEstimator {
    *     radians). Increase these numbers to trust the vision pose measurement
    *     less.
    */
-  PoseEstimator(
-      Kinematics<T>& kinematics, Odometry<T>& odometry, const wpi::array<double, 3>& stateStdDevs,
-      const wpi::array<double, 3>& visionMeasurementStdDevs);
+  PoseEstimator(Kinematics<T>& kinematics, Odometry<T>& odometry,
+                const wpi::array<double, 3>& stateStdDevs,
+                const wpi::array<double, 3>& visionMeasurementStdDevs);
 
   /**
    * Sets the pose estimator's trust in vision measurements. This might be used
@@ -73,7 +73,8 @@ class WPILIB_DLLEXPORT PoseEstimator {
    * @param wheelPositions The distances traveled by the encoders.
    * @param pose The estimated pose of the robot on the field.
    */
-  void ResetPosition(const Rotation2d& gyroAngle, const T& wheelPositions, const Pose2d& pose);
+  void ResetPosition(const Rotation2d& gyroAngle, const T& wheelPositions,
+                     const Pose2d& pose);
 
   /**
    * Gets the estimated robot pose.
@@ -162,8 +163,7 @@ class WPILIB_DLLEXPORT PoseEstimator {
    * @return The estimated pose of the robot in meters.
    */
   Pose2d UpdateWithTime(units::second_t currentTime,
-                        const Rotation2d& gyroAngle,
-                        const T& wheelPositions);
+                        const Rotation2d& gyroAngle, const T& wheelPositions);
 
  private:
   struct InterpolationRecord {

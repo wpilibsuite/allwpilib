@@ -9,7 +9,10 @@
 namespace frc {
 
 template <WheelPositions T>
-PoseEstimator<T>::PoseEstimator(Kinematics<T>& kinematics, Odometry<T>& odometry, const wpi::array<double, 3>& stateStdDevs, const wpi::array<double, 3>& visionMeasurementStdDevs)
+PoseEstimator<T>::PoseEstimator(
+    Kinematics<T>& kinematics, Odometry<T>& odometry,
+    const wpi::array<double, 3>& stateStdDevs,
+    const wpi::array<double, 3>& visionMeasurementStdDevs)
     : m_kinematics(kinematics), m_odometry(odometry) {
   for (size_t i = 0; i < 3; ++i) {
     m_q[i] = stateStdDevs[i] * stateStdDevs[i];
@@ -39,9 +42,9 @@ void PoseEstimator<T>::SetVisionMeasurementStdDevs(
 }
 
 template <WheelPositions T>
-void PoseEstimator<T>::ResetPosition(
-    const Rotation2d& gyroAngle,
-    const T& wheelPositions, const Pose2d& pose) {
+void PoseEstimator<T>::ResetPosition(const Rotation2d& gyroAngle,
+                                     const T& wheelPositions,
+                                     const Pose2d& pose) {
   // Reset state estimate and error covariance
   m_odometry.ResetPosition(gyroAngle, wheelPositions, pose);
   m_poseBuffer.Clear();
@@ -53,8 +56,8 @@ Pose2d PoseEstimator<T>::GetEstimatedPosition() const {
 }
 
 template <WheelPositions T>
-void PoseEstimator<T>::AddVisionMeasurement(
-    const Pose2d& visionRobotPose, units::second_t timestamp) {
+void PoseEstimator<T>::AddVisionMeasurement(const Pose2d& visionRobotPose,
+                                            units::second_t timestamp) {
   // Step 0: If this measurement is old enough to be outside the pose buffer's
   // timespan, skip.
   if (!m_poseBuffer.GetInternalBuffer().empty() &&
@@ -111,17 +114,16 @@ void PoseEstimator<T>::AddVisionMeasurement(
 }
 
 template <WheelPositions T>
-Pose2d PoseEstimator<T>::Update(
-    const Rotation2d& gyroAngle,
-    const T& wheelPositions) {
+Pose2d PoseEstimator<T>::Update(const Rotation2d& gyroAngle,
+                                const T& wheelPositions) {
   return UpdateWithTime(wpi::math::MathSharedStore::GetTimestamp(), gyroAngle,
                         wheelPositions);
 }
 
 template <WheelPositions T>
-Pose2d PoseEstimator<T>::UpdateWithTime(
-    units::second_t currentTime, const Rotation2d& gyroAngle,
-    const T& wheelPositions) {
+Pose2d PoseEstimator<T>::UpdateWithTime(units::second_t currentTime,
+                                        const Rotation2d& gyroAngle,
+                                        const T& wheelPositions) {
   m_odometry.Update(gyroAngle, wheelPositions);
 
   // Copy?
@@ -135,14 +137,17 @@ Pose2d PoseEstimator<T>::UpdateWithTime(
 
 template <WheelPositions T>
 typename PoseEstimator<T>::InterpolationRecord
-PoseEstimator<T>::InterpolationRecord::Interpolate(Kinematics<T>& kinematics, InterpolationRecord endValue, double i) const {
+PoseEstimator<T>::InterpolationRecord::Interpolate(Kinematics<T>& kinematics,
+                                                   InterpolationRecord endValue,
+                                                   double i) const {
   if (i < 0) {
     return *this;
   } else if (i > 1) {
     return endValue;
   } else {
     // Find the new wheel distance measurements.
-    T wheels_lerp = this->wheelPositions.Interpolate(endValue.wheelPositions, i);
+    T wheels_lerp =
+        this->wheelPositions.Interpolate(endValue.wheelPositions, i);
 
     // Find the distance between this measurement and the
     // interpolated measurement.
