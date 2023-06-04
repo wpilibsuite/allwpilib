@@ -25,7 +25,6 @@ HDrivetrainSim::HDrivetrainSim(
       m_rb(trackWidth / 2.0),
       m_wheelRadius(wheelRadius),
       m_motor(driveMotor),
-      m_originalGearing(gearRatio),
       m_currentGearing(gearRatio),
       m_measurementStdDevs(measurementStdDevs) {
   m_x.setZero();

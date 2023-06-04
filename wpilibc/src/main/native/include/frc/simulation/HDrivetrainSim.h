@@ -304,7 +304,6 @@ class HDrivetrainSim {
 
   DCMotor m_motor;
 
-  double m_originalGearing;
   double m_currentGearing;
 
   Vectord<9> m_x;
