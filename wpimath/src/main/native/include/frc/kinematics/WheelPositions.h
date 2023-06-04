@@ -11,5 +11,5 @@ template <typename T>
 concept WheelPositions = std::copyable<T> && requires(T a, T b, double t) {
   { a - b } -> std::convertible_to<T>;
   { a.Interpolate(b, t) } -> std::convertible_to<T>;
-};  // NOLINT
+};
 }  // namespace frc
