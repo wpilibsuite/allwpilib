@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include <concepts>
+#include <wpi/concepts.h>
 
 namespace frc {
 template <typename T>
