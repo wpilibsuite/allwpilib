@@ -8,9 +8,11 @@
 
 using namespace frc;
 
-HDriveOdometry::HDriveOdometry(
-    const Rotation2d& gyroAngle, units::meter_t leftDistance,
-    units::meter_t rightDistance, units::meter_t lateralDistance, const Pose2d& initialPose)
+HDriveOdometry::HDriveOdometry(const Rotation2d& gyroAngle,
+                               units::meter_t leftDistance,
+                               units::meter_t rightDistance,
+                               units::meter_t lateralDistance,
+                               const Pose2d& initialPose)
     : m_pose(initialPose),
       m_prevLeftDistance(leftDistance),
       m_prevRightDistance(rightDistance) {
@@ -21,9 +23,9 @@ HDriveOdometry::HDriveOdometry(
 }
 
 const Pose2d& HDriveOdometry::Update(const Rotation2d& gyroAngle,
-                                                units::meter_t leftDistance,
-                                                units::meter_t rightDistance,
-                                                units::meter_t lateralDistance) {
+                                     units::meter_t leftDistance,
+                                     units::meter_t rightDistance,
+                                     units::meter_t lateralDistance) {
   auto deltaLeftDistance = leftDistance - m_prevLeftDistance;
   auto deltaRightDistance = rightDistance - m_prevRightDistance;
   auto deltaLateralDistance = lateralDistance - m_prevLateralDistance;
@@ -35,8 +37,8 @@ const Pose2d& HDriveOdometry::Update(const Rotation2d& gyroAngle,
   auto averageDeltaDistance = (deltaLeftDistance + deltaRightDistance) / 2.0;
   auto angle = gyroAngle + m_gyroOffset;
 
-  auto newPose = m_pose.Exp(
-      {averageDeltaDistance, deltaLateralDistance, (angle - m_previousAngle).Radians()});
+  auto newPose = m_pose.Exp({averageDeltaDistance, deltaLateralDistance,
+                             (angle - m_previousAngle).Radians()});
 
   m_previousAngle = angle;
   m_pose = {newPose.Translation(), angle};

@@ -51,12 +51,10 @@ class WPILIB_DLLEXPORT HDrivePoseEstimator {
    * @param lateralDistance The distance traveled by the lateral encoder.
    * @param initialPose The estimated initial pose.
    */
-  HDrivePoseEstimator(HDriveKinematics& kinematics,
-                                 const Rotation2d& gyroAngle,
-                                 units::meter_t leftDistance,
-                                 units::meter_t rightDistance,
-                                 units::meter_t lateralDistance,
-                                 const Pose2d& initialPose);
+  HDrivePoseEstimator(HDriveKinematics& kinematics, const Rotation2d& gyroAngle,
+                      units::meter_t leftDistance, units::meter_t rightDistance,
+                      units::meter_t lateralDistance,
+                      const Pose2d& initialPose);
 
   /**
    * Constructs a HDrivePoseEstimator.
@@ -76,11 +74,11 @@ class WPILIB_DLLEXPORT HDrivePoseEstimator {
    *     radians). Increase these numbers to trust the vision pose measurement
    *     less.
    */
-  HDrivePoseEstimator(
-      HDriveKinematics& kinematics, const Rotation2d& gyroAngle,
-      units::meter_t leftDistance, units::meter_t rightDistance, units::meter_t lateralDistance,
-      const Pose2d& initialPose, const wpi::array<double, 3>& stateStdDevs,
-      const wpi::array<double, 3>& visionMeasurementStdDevs);
+  HDrivePoseEstimator(HDriveKinematics& kinematics, const Rotation2d& gyroAngle,
+                      units::meter_t leftDistance, units::meter_t rightDistance,
+                      units::meter_t lateralDistance, const Pose2d& initialPose,
+                      const wpi::array<double, 3>& stateStdDevs,
+                      const wpi::array<double, 3>& visionMeasurementStdDevs);
 
   /**
    * Sets the pose estimator's trust in vision measurements. This might be used
@@ -105,8 +103,8 @@ class WPILIB_DLLEXPORT HDrivePoseEstimator {
    * @param pose The estimated pose of the robot on the field.
    */
   void ResetPosition(const Rotation2d& gyroAngle, units::meter_t leftDistance,
-                     units::meter_t rightDistance, units::meter_t lateralDistance,
-                     const Pose2d& pose);
+                     units::meter_t rightDistance,
+                     units::meter_t lateralDistance, const Pose2d& pose);
 
   /**
    * Gets the estimated robot pose.

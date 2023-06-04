@@ -300,7 +300,6 @@ public class HDrivetrainSim {
    * @return the drivetrain's right side current draw, in amps
    */
   public double getRightCurrentDrawAmps() {
-
     return m_motor.getCurrent(
             getState(State.kRightVelocity) * m_currentGearing / m_wheelRadiusMeters, m_u.get(1, 0))
         * Math.signum(m_u.get(1, 0));

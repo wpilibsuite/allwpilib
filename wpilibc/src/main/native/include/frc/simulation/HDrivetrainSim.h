@@ -21,12 +21,12 @@ class HDrivetrainSim {
   /**
    * Create a SimDrivetrain.
    *
-   * @param differentialPlant The LinearSystem representing the robot's differential drivetrain.
-   *              This system can be created with
+   * @param differentialPlant The LinearSystem representing the robot's
+   * differential drivetrain. This system can be created with
    *              LinearSystemId::DrivetrainVelocitySystem() or
    *              LinearSystemId::IdentifyDrivetrainSystem().
-   * @param lateralPlant The LinearSystem representing the robot's lateral movement motors.
-   *              This system can be created with
+   * @param lateralPlant The LinearSystem representing the robot's lateral
+   * movement motors. This system can be created with
    *              LinearSystemId::CreateHDriveLateralVelocitySystem() or
    *              LinearSystemId::IdentifyHDriveLateralVelocitySystem().
    * @param trackWidth   The robot's track width.
@@ -44,11 +44,11 @@ class HDrivetrainSim {
    *                           deviations of 0.005 meters are a reasonable
    *                           starting point.
    */
-  HDrivetrainSim(
-      LinearSystem<2, 2, 2> differentialPlant, LinearSystem<1, 1, 1> lateralPlant, 
-      units::meter_t trackWidth,
-      DCMotor driveMotor, double gearingRatio, units::meter_t wheelRadius,
-      const std::array<double, 9>& measurementStdDevs = {});
+  HDrivetrainSim(LinearSystem<2, 2, 2> differentialPlant,
+                 LinearSystem<1, 1, 1> lateralPlant, units::meter_t trackWidth,
+                 DCMotor driveMotor, double gearingRatio,
+                 units::meter_t wheelRadius,
+                 const std::array<double, 9>& measurementStdDevs = {});
 
   /**
    * Create a SimDrivetrain.
@@ -63,8 +63,8 @@ class HDrivetrainSim {
    * @param wheelRadius The radius of the wheels on the drivetrain.
    * @param trackWidth  The robot's track width, or distance between left and
    *                    right wheels.
-   * @param lateralWheelOffsetFromCenterOfGravity The distance from the robots center of gravity
-   *     that the lateral wheel is placed in meters.
+   * @param lateralWheelOffsetFromCenterOfGravity The distance from the robots
+   * center of gravity that the lateral wheel is placed in meters.
    * @param measurementStdDevs Standard deviations for measurements, in the form
    *                           [x, y, heading, left velocity, right velocity,
    *                           left distance, right distance]ᵀ. Can be omitted
@@ -74,12 +74,11 @@ class HDrivetrainSim {
    *                           deviations of 0.005 meters are a reasonable
    *                           starting point.
    */
-  HDrivetrainSim(
-      frc::DCMotor driveMotor, double gearing, units::kilogram_square_meter_t J,
-      units::kilogram_t mass, units::meter_t wheelRadius,
-      units::meter_t trackWidth,
-      units::meter_t lateralWheelOffsetFromCenterOfGravity,
-      const std::array<double, 9>& measurementStdDevs = {});
+  HDrivetrainSim(frc::DCMotor driveMotor, double gearing,
+                 units::kilogram_square_meter_t J, units::kilogram_t mass,
+                 units::meter_t wheelRadius, units::meter_t trackWidth,
+                 units::meter_t lateralWheelOffsetFromCenterOfGravity,
+                 const std::array<double, 9>& measurementStdDevs = {});
 
   /**
    * Clamp the input vector such that no element exceeds the battery voltage.
@@ -98,7 +97,8 @@ class HDrivetrainSim {
    * @param rightVoltage The right voltage.
    * @param lateralVoltage The lateral voltage.
    */
-  void SetInputs(units::volt_t leftVoltage, units::volt_t rightVoltage, units::volt_t lateralVoltage);
+  void SetInputs(units::volt_t leftVoltage, units::volt_t rightVoltage,
+                 units::volt_t lateralVoltage);
 
   /**
    * Sets the gearing reduction on the drivetrain. This is commonly used for
@@ -193,7 +193,7 @@ class HDrivetrainSim {
    */
   units::ampere_t GetLeftCurrentDraw() const;
 
-    /**
+  /**
    * Returns the currently drawn current for the lateral motors.
    */
   units::ampere_t GetLateralCurrentDraw() const;

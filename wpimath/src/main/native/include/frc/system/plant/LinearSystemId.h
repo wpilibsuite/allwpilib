@@ -236,11 +236,10 @@ class WPILIB_DLLEXPORT LinearSystemId {
       const DCMotor& motor, units::kilogram_t mass, units::meter_t r,
       units::meter_t rb, units::kilogram_square_meter_t J, double G);
 
-    /**
-   * Create the lateral plant of a state-space model of a H-drive. In this model,
-   * the states are
-   * [left velocity, right velocity, lateral velocity]ᵀ, inputs are [left voltage, right voltage, lateral voltage]ᵀ,
-   * and outputs are
+  /**
+   * Create the lateral plant of a state-space model of a H-drive. In this
+   * model, the states are [left velocity, right velocity, lateral velocity]ᵀ,
+   * inputs are [left voltage, right voltage, lateral voltage]ᵀ, and outputs are
    * [left velocity, right velocity, lateral velocity]ᵀ.
    *
    * @param motor                           The motor (or gearbox) driving the
@@ -256,19 +255,18 @@ class WPILIB_DLLEXPORT LinearSystemId {
    * @throws IllegalArgumentException if m &lt;= 0, r &lt;= 0, ocfg &lt; 0, J
    *                                  &lt;= 0, or G &lt;= 0.
    */
-  static LinearSystem<1, 1, 1> CreateHDriveLateralVelocitySystem(DCMotor motor,
-                                              units::kilogram_t mass,
-                                              units::meter_t radius, 
-                                              units::meter_t offsetFromCenterOfGravity,
-                                              units::kilogram_square_meter_t J,
-                                              double G);
+  static LinearSystem<1, 1, 1> CreateHDriveLateralVelocitySystem(
+      DCMotor motor, units::kilogram_t mass, units::meter_t radius,
+      units::meter_t offsetFromCenterOfGravity,
+      units::kilogram_square_meter_t J, double G);
 
- /**
+  /**
    * Identify a H-drive lateral plant given the lateral plants's kV and kA in
    * both linear, This is used in combination with a regular Differential Drive
    * Velocity System to create an H-Drive
-   * {(volts/(meter/sec), (volts/(meter/sec²))} and angular {(volts/(radian/sec)),
-   * (volts/(radian/sec²))} cases. These constants can be found using SysId.
+   * {(volts/(meter/sec), (volts/(meter/sec²))} and angular
+   * {(volts/(radian/sec)), (volts/(radian/sec²))} cases. These constants can be
+   * found using SysId.
    *
    * <p>
    * States: [[lateral velocity]]<br>
@@ -276,9 +274,10 @@ class WPILIB_DLLEXPORT LinearSystemId {
    * Outputs: [[lateral velocity]]
    *
    * @param kVLinear  The linear velocity gain in volts per (meters per second).
-   * @param kALinear  The linear acceleration gain in volts per (meters per second
-   *                  squared).
-   * @param kVAngular The angular velocity gain in volts per (meters per second).
+   * @param kALinear  The linear acceleration gain in volts per (meters per
+   * second squared).
+   * @param kVAngular The angular velocity gain in volts per (meters per
+   * second).
    * @param kAAngular The angular acceleration gain in volts per (meters per
    *                  second squared).
    * @return A LinearSystem representing a H-drive's lateral plant.
