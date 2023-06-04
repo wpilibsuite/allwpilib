@@ -50,7 +50,7 @@ concept integral = is_integral_v<T>;
 template <typename F, typename... Args>
 concept invocable = requires(F&& f, Args&&... args) {
   invoke(forward<F>(f), forward<Args>(args)...);
-};  // NOLINT
+};
 
 }  // namespace std
 
