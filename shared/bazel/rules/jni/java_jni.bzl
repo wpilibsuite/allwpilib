@@ -115,7 +115,7 @@ def wpilib_java_jni_library(
         **java_library_args
     )
 
-    jni = "//shared/bazel/toolchains/jni:jni"
+    jni = "@rules_bzlmodrio_toolchains//jni"
     _jni_headers(
         name = headers_name,
         tags = ["manual"],

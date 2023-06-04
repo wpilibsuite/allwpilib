@@ -27,7 +27,6 @@ def Output(outPath, outfn, contents):
 
 
 def main():
-
     parser = argparse.ArgumentParser()
     parser.add_argument("--generate_java", action="store_true")
     parser.add_argument("--generate_cpp_includes", action="store_true")
@@ -103,7 +102,6 @@ def generate_java_files(dirname, generation_root, types):
 
 
 def generate_cpp_includes(dirname, generation_root, types):
-
     # C++ classes
     env = Environment(
         loader=FileSystemLoader(f"{dirname}/src/generate/include/networktables"),
@@ -144,7 +142,6 @@ def generate_cpp_includes(dirname, generation_root, types):
 
 
 def generate_cpp_srcs(dirname, generation_root, types):
-
     # C++ handle API (source)
     env = Environment(
         loader=FileSystemLoader(f"{dirname}/src/generate/cpp"), autoescape=False
@@ -163,7 +160,6 @@ def generate_cpp_srcs(dirname, generation_root, types):
 
 
 def generate_jni_files(dirname, generation_root, types):
-
     # JNI
     env = Environment(
         loader=FileSystemLoader(f"{dirname}/src/generate/cpp/jni"), autoescape=False

@@ -26,8 +26,8 @@ wpilib_cc_static_and_shared_library(
         ["cpp/**"],
         exclude = ["cpp/jni/**"],
     ) + [
-        ":native-srcs",
         ":generate-resources",
+        ":native-srcs",
         "//wpiutil/src/main/native/thirdparty/fmtlib:fmtlib-srcs",
         "//wpiutil/src/main/native/thirdparty/json:json-srcs",
         "//wpiutil/src/main/native/thirdparty/llvm:llvm-srcs",

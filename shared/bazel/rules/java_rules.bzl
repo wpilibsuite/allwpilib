@@ -118,14 +118,13 @@ def wpilib_java_junit5_test(
         main_class = "org.junit.platform.console.ConsoleLauncher",
         data = data + [native_shared_libraries_symlink],
         jvm_flags = select({
-            "@bazel_tools//src/conditions:darwin": ["-Djava.library.path=" + full_extracted_native_dir],
-            "@bazel_tools//src/conditions:linux_x86_64": ["-Djava.library.path=" + full_extracted_native_dir],
             "@bazel_tools//src/conditions:windows": ["-Djava.library.path=."],
+            "@rules_bzlmodrio_toolchains//constraints/combined:is_unix": ["-Djava.library.path=" + full_extracted_native_dir],
         }),
         env = select({
             "@bazel_tools//src/conditions:darwin": {"LD_LIBRARY_PATH": full_extracted_native_dir},
-            "@bazel_tools//src/conditions:linux_x86_64": {},
             "@bazel_tools//src/conditions:windows": {},
+            "@rules_bzlmodrio_toolchains//constraints/combined:is_linux": {},
         }),
         use_testrunner = False,
         tags = tags + ["no-roborio", "no-bionic", "no-raspbian", "allwpilib-build-java", "no-asan", "no-tsan", "no-ubsan"],

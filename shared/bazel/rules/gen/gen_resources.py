@@ -5,7 +5,6 @@ import binascii
 
 
 def generate_file(resource_file, output_file, prefix, namespace):
-
     func_name = "GetResource_" + os.path.basename(resource_file).replace(
         "-", "_"
     ).replace(".", "_")
