@@ -36,7 +36,7 @@ ExtendedKalmanFilter<States, Inputs, Outputs>::ExtendedKalmanFilter(
 
   StateMatrix discA;
   StateMatrix discQ;
-  DiscretizeAQTaylor<States>(contA, m_contQ, dt, &discA, &discQ);
+  DiscretizeAQ<States>(contA, m_contQ, dt, &discA, &discQ);
 
   Matrixd<Outputs, Outputs> discR = DiscretizeR<Outputs>(m_contR, dt);
 
@@ -71,7 +71,7 @@ ExtendedKalmanFilter<States, Inputs, Outputs>::ExtendedKalmanFilter(
 
   StateMatrix discA;
   StateMatrix discQ;
-  DiscretizeAQTaylor<States>(contA, m_contQ, dt, &discA, &discQ);
+  DiscretizeAQ<States>(contA, m_contQ, dt, &discA, &discQ);
 
   Matrixd<Outputs, Outputs> discR = DiscretizeR<Outputs>(m_contR, dt);
 
@@ -93,7 +93,7 @@ void ExtendedKalmanFilter<States, Inputs, Outputs>::Predict(
   // Find discrete A and Q
   StateMatrix discA;
   StateMatrix discQ;
-  DiscretizeAQTaylor<States>(contA, m_contQ, dt, &discA, &discQ);
+  DiscretizeAQ<States>(contA, m_contQ, dt, &discA, &discQ);
 
   m_xHat = RK4(m_f, m_xHat, u, dt);
 

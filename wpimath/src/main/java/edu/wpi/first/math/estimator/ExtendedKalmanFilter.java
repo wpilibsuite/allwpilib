@@ -138,7 +138,7 @@ public class ExtendedKalmanFilter<States extends Num, Inputs extends Num, Output
         NumericalJacobian.numericalJacobianX(
             outputs, states, h, m_xHat, new Matrix<>(inputs, Nat.N1()));
 
-    final var discPair = Discretization.discretizeAQTaylor(contA, m_contQ, dtSeconds);
+    final var discPair = Discretization.discretizeAQ(contA, m_contQ, dtSeconds);
     final var discA = discPair.getFirst();
     final var discQ = discPair.getSecond();
 
@@ -259,7 +259,7 @@ public class ExtendedKalmanFilter<States extends Num, Inputs extends Num, Output
     final var contA = NumericalJacobian.numericalJacobianX(m_states, m_states, f, m_xHat, u);
 
     // Find discrete A and Q
-    final var discPair = Discretization.discretizeAQTaylor(contA, m_contQ, dtSeconds);
+    final var discPair = Discretization.discretizeAQ(contA, m_contQ, dtSeconds);
     final var discA = discPair.getFirst();
     final var discQ = discPair.getSecond();
 

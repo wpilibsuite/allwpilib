@@ -1,4 +1,4 @@
-From ef26f059859d3a0d08b06a70519928bcd5f9bb79 Mon Sep 17 00:00:00 2001
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Thu, 5 May 2022 23:18:34 -0400
 Subject: [PATCH 11/28] Detemplatize SmallVectorBase
@@ -9,7 +9,7 @@ Subject: [PATCH 11/28] Detemplatize SmallVectorBase
  2 files changed, 13 insertions(+), 42 deletions(-)
 
 diff --git a/llvm/include/llvm/ADT/SmallVector.h b/llvm/include/llvm/ADT/SmallVector.h
-index 1e311ea56..4b6bbdeb2 100644
+index 1e311ea56fd1d35505ca6740922c713d97636f09..4b6bbdeb2ea3e602978733351e352968ccdca36d 100644
 --- a/llvm/include/llvm/ADT/SmallVector.h
 +++ b/llvm/include/llvm/ADT/SmallVector.h
 @@ -50,14 +50,14 @@ template <typename IteratorT> class iterator_range;
@@ -69,7 +69,7 @@ index 1e311ea56..4b6bbdeb2 100644
    }
  
 diff --git a/llvm/lib/Support/SmallVector.cpp b/llvm/lib/Support/SmallVector.cpp
-index a2b4899e1..bdfc963d7 100644
+index a2b4899e1ffe0ae19d236f43e2e2e2fe1db14110..bdfc963d7ff8ca684e37d08410b92a84d5d27730 100644
 --- a/llvm/lib/Support/SmallVector.cpp
 +++ b/llvm/lib/Support/SmallVector.cpp
 @@ -51,10 +51,6 @@ static_assert(sizeof(SmallVector<void *, 1>) ==

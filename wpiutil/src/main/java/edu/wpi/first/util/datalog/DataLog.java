@@ -188,10 +188,10 @@ public final class DataLog implements AutoCloseable {
   }
 
   /**
-   * Appends a record to the log.
+   * Appends a raw record to the log.
    *
-   * @param entry Entry index, as returned by Start()
-   * @param data Data to record
+   * @param entry Entry index, as returned by start()
+   * @param data Byte array to record
    * @param timestamp Time stamp (0 to indicate now)
    */
   public void appendRaw(int entry, byte[] data, long timestamp) {
@@ -204,42 +204,112 @@ public final class DataLog implements AutoCloseable {
     m_impl = 0;
   }
 
+  /**
+   * Appends a boolean record to the log.
+   *
+   * @param entry Entry index, as returned by start()
+   * @param value Boolean value to record
+   * @param timestamp Time stamp (0 to indicate now)
+   */
   public void appendBoolean(int entry, boolean value, long timestamp) {
     DataLogJNI.appendBoolean(m_impl, entry, value, timestamp);
   }
 
+  /**
+   * Appends an integer record to the log.
+   *
+   * @param entry Entry index, as returned by start()
+   * @param value Integer value to record
+   * @param timestamp Time stamp (0 to indicate now)
+   */
   public void appendInteger(int entry, long value, long timestamp) {
     DataLogJNI.appendInteger(m_impl, entry, value, timestamp);
   }
 
+  /**
+   * Appends a float record to the log.
+   *
+   * @param entry Entry index, as returned by start()
+   * @param value Float value to record
+   * @param timestamp Time stamp (0 to indicate now)
+   */
   public void appendFloat(int entry, float value, long timestamp) {
     DataLogJNI.appendFloat(m_impl, entry, value, timestamp);
   }
 
+  /**
+   * Appends a double record to the log.
+   *
+   * @param entry Entry index, as returned by start()
+   * @param value Double value to record
+   * @param timestamp Time stamp (0 to indicate now)
+   */
   public void appendDouble(int entry, double value, long timestamp) {
     DataLogJNI.appendDouble(m_impl, entry, value, timestamp);
   }
 
+  /**
+   * Appends a string record to the log.
+   *
+   * @param entry Entry index, as returned by start()
+   * @param value String value to record
+   * @param timestamp Time stamp (0 to indicate now)
+   */
   public void appendString(int entry, String value, long timestamp) {
     DataLogJNI.appendString(m_impl, entry, value, timestamp);
   }
 
+  /**
+   * Appends a boolean array record to the log.
+   *
+   * @param entry Entry index, as returned by start()
+   * @param arr Boolean array to record
+   * @param timestamp Time stamp (0 to indicate now)
+   */
   public void appendBooleanArray(int entry, boolean[] arr, long timestamp) {
     DataLogJNI.appendBooleanArray(m_impl, entry, arr, timestamp);
   }
 
+  /**
+   * Appends an integer array record to the log.
+   *
+   * @param entry Entry index, as returned by start()
+   * @param arr Integer array to record
+   * @param timestamp Time stamp (0 to indicate now)
+   */
   public void appendIntegerArray(int entry, long[] arr, long timestamp) {
     DataLogJNI.appendIntegerArray(m_impl, entry, arr, timestamp);
   }
 
+  /**
+   * Appends a float array record to the log.
+   *
+   * @param entry Entry index, as returned by start()
+   * @param arr Float array to record
+   * @param timestamp Time stamp (0 to indicate now)
+   */
   public void appendFloatArray(int entry, float[] arr, long timestamp) {
     DataLogJNI.appendFloatArray(m_impl, entry, arr, timestamp);
   }
 
+  /**
+   * Appends a double array record to the log.
+   *
+   * @param entry Entry index, as returned by start()
+   * @param arr Double array to record
+   * @param timestamp Time stamp (0 to indicate now)
+   */
   public void appendDoubleArray(int entry, double[] arr, long timestamp) {
     DataLogJNI.appendDoubleArray(m_impl, entry, arr, timestamp);
   }
 
+  /**
+   * Appends a string array record to the log.
+   *
+   * @param entry Entry index, as returned by start()
+   * @param arr String array to record
+   * @param timestamp Time stamp (0 to indicate now)
+   */
   public void appendStringArray(int entry, String[] arr, long timestamp) {
     DataLogJNI.appendStringArray(m_impl, entry, arr, timestamp);
   }

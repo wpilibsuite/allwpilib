@@ -50,8 +50,10 @@ class Robot : public frc::TimedRobot {
   // The observer fuses our encoder data and voltage inputs to reject noise.
   frc::KalmanFilter<2, 1, 1> m_observer{
       m_elevatorPlant,
-      {0.0508, 0.5},  // How accurate we think our model is
-      {0.001},        // How accurate we think our encoder position
+      {units::meter_t{2_in}.value(),
+       units::meters_per_second_t{40_in / 1_s}
+           .value()},  // How accurate we think our model is
+      {0.001},         // How accurate we think our encoder position
       // data is. In this case we very highly trust our encoder position
       // reading.
       20_ms};
@@ -62,7 +64,8 @@ class Robot : public frc::TimedRobot {
       // qelms. State error tolerance, in meters and meters per second.
       // Decrease this to more heavily penalize state excursion, or make the
       // controller behave more aggressively.
-      {0.0254, 0.254},
+      {units::meter_t{1_in}.value(),
+       units::meters_per_second_t{10_in / 1_s}.value()},
       // relms. Control effort (voltage) tolerance. Decrease this to more
       // heavily penalize control effort, or make the controller less
       // aggressive. 12 is a good starting point because that is the

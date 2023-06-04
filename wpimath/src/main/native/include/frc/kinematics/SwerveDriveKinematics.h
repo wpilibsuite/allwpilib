@@ -5,6 +5,7 @@
 #pragma once
 
 #include <cstddef>
+#include <type_traits>
 
 #include <wpi/SymbolExports.h>
 #include <wpi/array.h>
@@ -146,6 +147,9 @@ class SwerveDriveKinematics {
    * @return The resulting chassis speed.
    */
   template <typename... ModuleStates>
+    requires(std::is_same_v<std::remove_reference_t<ModuleStates>,
+                            SwerveModuleState> &&
+             ...)
   ChassisSpeeds ToChassisSpeeds(ModuleStates&&... wheelStates) const;
 
   /**
@@ -162,7 +166,7 @@ class SwerveDriveKinematics {
    * @return The resulting chassis speed.
    */
   ChassisSpeeds ToChassisSpeeds(
-      wpi::array<SwerveModuleState, NumModules> moduleStates) const;
+      const wpi::array<SwerveModuleState, NumModules>& moduleStates) const;
 
   /**
    * Performs forward kinematics to return the resulting Twist2d from the

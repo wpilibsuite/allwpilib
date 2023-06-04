@@ -58,6 +58,21 @@ typedef void *QUEUE[2];
   }                                                                           \
   while (0)
 
+#if defined(__GNUC__) && !defined(__clang__) && __GNUC__ >= 12
+#define QUEUE_SPLIT(h, q, n)                                                  \
+  do {                                                                        \
+    QUEUE_PREV(n) = QUEUE_PREV(h);                                            \
+    QUEUE_PREV_NEXT(n) = (n);                                                 \
+    QUEUE_NEXT(n) = (q);                                                      \
+    QUEUE_PREV(h) = QUEUE_PREV(q);                                            \
+    QUEUE_PREV_NEXT(h) = (h);                                                 \
+    _Pragma("GCC diagnostic push")                                            \
+    _Pragma("GCC diagnostic ignored \"-Wdangling-pointer=\"")                 \
+    QUEUE_PREV(q) = (n);                                                      \
+    _Pragma("GCC diagnostic pop")                                             \
+  }                                                                           \
+  while (0)
+#else
 #define QUEUE_SPLIT(h, q, n)                                                  \
   do {                                                                        \
     QUEUE_PREV(n) = QUEUE_PREV(h);                                            \
@@ -68,6 +83,7 @@ typedef void *QUEUE[2];
     QUEUE_PREV(q) = (n);                                                      \
   }                                                                           \
   while (0)
+#endif  // defined(__GNUC__) && !defined(__clang__)
 
 #define QUEUE_MOVE(h, n)                                                      \
   do {                                                                        \
