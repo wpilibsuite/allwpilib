@@ -34,7 +34,7 @@ void HDrive::ArcadeDrive(double xSpeed, double zRotation, double ySpeed,
   static bool reported = false;
   if (!reported) {
     HAL_Report(HALUsageReporting::kResourceType_RobotDrive,
-               HALUsageReporting::kRobotDrive2_HDriveArcade, 2);
+               HALUsageReporting::kRobotDrive2_HDriveArcade, 3);
     reported = true;
   }
 
@@ -57,7 +57,7 @@ void HDrive::TankDrive(double leftSpeed, double rightSpeed, double lateralSpeed,
   static bool reported = false;
   if (!reported) {
     HAL_Report(HALUsageReporting::kResourceType_RobotDrive,
-               HALUsageReporting::kRobotDrive2_HDriveTank, 2);
+               HALUsageReporting::kRobotDrive2_HDriveTank, 3);
     reported = true;
   }
 

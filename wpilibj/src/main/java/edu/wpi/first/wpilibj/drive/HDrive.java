@@ -87,7 +87,7 @@ public class HDrive extends RobotDriveBase implements Sendable, AutoCloseable {
    */
   public void arcadeDrive(double xSpeed, double zRotation, double ySpeed, boolean squareInputs) {
     if (!m_reported) {
-      HAL.report(tResourceType.kResourceType_RobotDrive, tInstances.kRobotDrive2_HDriveArcade, 2);
+      HAL.report(tResourceType.kResourceType_RobotDrive, tInstances.kRobotDrive2_HDriveArcade, 3);
       m_reported = true;
     }
 
@@ -171,7 +171,7 @@ public class HDrive extends RobotDriveBase implements Sendable, AutoCloseable {
   public void tankDrive(
       double leftSpeed, double rightSpeed, double lateralSpeed, boolean squareInputs) {
     if (!m_reported) {
-      HAL.report(tResourceType.kResourceType_RobotDrive, tInstances.kRobotDrive2_HDriveTank, 2);
+      HAL.report(tResourceType.kResourceType_RobotDrive, tInstances.kRobotDrive2_HDriveTank, 3);
       m_reported = true;
     }
 
