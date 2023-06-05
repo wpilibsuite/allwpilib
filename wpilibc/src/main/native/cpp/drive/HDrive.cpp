@@ -2,6 +2,8 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
+#include "frc/drive/HDrive.h"
+
 #include <algorithm>
 #include <cmath>
 
@@ -10,7 +12,6 @@
 #include <wpi/sendable/SendableRegistry.h>
 
 #include "frc/MathUtil.h"
-#include "frc/drive/HDrive.h"
 #include "frc/motorcontrol/MotorController.h"
 
 using namespace frc;
