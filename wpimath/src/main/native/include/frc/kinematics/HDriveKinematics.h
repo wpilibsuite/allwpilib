@@ -47,8 +47,7 @@ class WPILIB_DLLEXPORT HDriveKinematics {
    */
   constexpr ChassisSpeeds ToChassisSpeeds(
       const HDriveWheelSpeeds& wheelSpeeds) const {
-    return {(wheelSpeeds.left + wheelSpeeds.right) / 2.0,
-            wheelSpeeds.lateral,
+    return {(wheelSpeeds.left + wheelSpeeds.right) / 2.0, wheelSpeeds.lateral,
             (wheelSpeeds.right - wheelSpeeds.left) / trackWidth * 1_rad};
   }
 
@@ -56,8 +55,8 @@ class WPILIB_DLLEXPORT HDriveKinematics {
    * Returns left and right component velocities from a chassis speed using
    * inverse kinematics.
    *
-   * @param chassisSpeeds The linear and angular (dx, dy and dtheta) components that
-   * represent the chassis' speed.
+   * @param chassisSpeeds The linear and angular (dx, dy and dtheta) components
+   * that represent the chassis' speed.
    * @return The left and right velocities.
    */
   constexpr HDriveWheelSpeeds ToWheelSpeeds(

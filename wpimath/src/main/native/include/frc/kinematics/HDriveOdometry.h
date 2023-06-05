@@ -37,10 +37,10 @@ class WPILIB_DLLEXPORT HDriveOdometry {
    * @param initialPose The starting position of the robot on the field.
    */
   explicit HDriveOdometry(const Rotation2d& gyroAngle,
-                                     units::meter_t leftDistance,
-                                     units::meter_t rightDistance,
-                                     units::meter_t lateralDistance,
-                                     const Pose2d& initialPose = Pose2d{});
+                          units::meter_t leftDistance,
+                          units::meter_t rightDistance,
+                          units::meter_t lateralDistance,
+                          const Pose2d& initialPose = Pose2d{});
 
   /**
    * Resets the robot's position on the field.
@@ -58,8 +58,8 @@ class WPILIB_DLLEXPORT HDriveOdometry {
    * @param lateralDistance The distance travelled by the lateral encoder.
    */
   void ResetPosition(const Rotation2d& gyroAngle, units::meter_t leftDistance,
-                     units::meter_t rightDistance, units::meter_t lateralDistance,
-                     const Pose2d& pose) {
+                     units::meter_t rightDistance,
+                     units::meter_t lateralDistance, const Pose2d& pose) {
     m_pose = pose;
     m_previousAngle = pose.Rotation();
     m_gyroOffset = m_pose.Rotation() - gyroAngle;
@@ -88,7 +88,8 @@ class WPILIB_DLLEXPORT HDriveOdometry {
    * @return The new pose of the robot.
    */
   const Pose2d& Update(const Rotation2d& gyroAngle, units::meter_t leftDistance,
-                       units::meter_t rightDistance, units::meter_t lateralDistance);
+                       units::meter_t rightDistance,
+                       units::meter_t lateralDistance);
 
  private:
   Pose2d m_pose;
@@ -98,6 +99,6 @@ class WPILIB_DLLEXPORT HDriveOdometry {
 
   units::meter_t m_prevLeftDistance = 0_m;
   units::meter_t m_prevRightDistance = 0_m;
-        units::meter_t m_prevLateralDistance = 0_m;
+  units::meter_t m_prevLateralDistance = 0_m;
 };
 }  // namespace frc

@@ -16,10 +16,11 @@
 using namespace frc;
 using namespace frc::sim;
 
-HDrivetrainSim::HDrivetrainSim(
-    LinearSystem<2, 2, 2> differentialPlant, LinearSystem<1, 1, 1> lateralPlant, units::meter_t trackWidth, DCMotor driveMotor,
-    double gearRatio, units::meter_t wheelRadius,
-    const std::array<double, 9>& measurementStdDevs)
+HDrivetrainSim::HDrivetrainSim(LinearSystem<2, 2, 2> differentialPlant,
+                               LinearSystem<1, 1, 1> lateralPlant,
+                               units::meter_t trackWidth, DCMotor driveMotor,
+                               double gearRatio, units::meter_t wheelRadius,
+                               const std::array<double, 9>& measurementStdDevs)
     : m_differentialPlant(std::move(differentialPlant)),
       m_lateralPlant(std::move(lateralPlant)),
       m_rb(trackWidth / 2.0),
@@ -35,16 +36,16 @@ HDrivetrainSim::HDrivetrainSim(
 HDrivetrainSim::HDrivetrainSim(
     frc::DCMotor driveMotor, double gearing, units::kilogram_square_meter_t J,
     units::kilogram_t mass, units::meter_t wheelRadius,
-    units::meter_t trackWidth, units::meter_t lateralWheelOffsetFromCenterOfGravity,
+    units::meter_t trackWidth,
+    units::meter_t lateralWheelOffsetFromCenterOfGravity,
     const std::array<double, 9>& measurementStdDevs)
     : HDrivetrainSim(
           frc::LinearSystemId::DrivetrainVelocitySystem(
               driveMotor, mass, wheelRadius, trackWidth / 2.0, J, gearing),
           frc::LinearSystemId::CreateHDriveLateralVelocitySystem(
-            driveMotor, mass, wheelRadius, lateralWheelOffsetFromCenterOfGravity, J, gearing
-          ),
-          trackWidth, driveMotor, gearing, wheelRadius,
-          measurementStdDevs) {}
+              driveMotor, mass, wheelRadius,
+              lateralWheelOffsetFromCenterOfGravity, J, gearing),
+          trackWidth, driveMotor, gearing, wheelRadius, measurementStdDevs) {}
 
 Vectord<3> HDrivetrainSim::ClampInput(const Vectord<3>& u) {
   return frc::DesaturateInputVector<3>(u,
@@ -145,19 +146,18 @@ void HDrivetrainSim::SetPose(const frc::Pose2d& pose) {
   m_x(State::kRightPosition) = 0;
 }
 
-Vectord<9> HDrivetrainSim::Dynamics(const Vectord<9>& x,
-                                               const Vectord<3>& u) {
+Vectord<9> HDrivetrainSim::Dynamics(const Vectord<9>& x, const Vectord<3>& u) {
   // Because G² can be factored out of A, we can divide by the old ratio
   // squared and multiply by the new ratio squared to get a new drivetrain
   // model.
-  Matrixd<6, 3, 0 ,6 , 3> B;
-  
+  Matrixd<6, 3, 0, 6, 3> B;
+
   B.block<2, 2>(0, 0) = m_differentialPlant.B();
   B.block<1, 1>(2, 0) = m_lateralPlant.B();
 
   // Because G can be factored out of B, we can divide by the old ratio and
   // multiply by the new ratio to get a new drivetrain model.
-  Matrixd<6, 6, 0, 6 ,6> A;
+  Matrixd<6, 6, 0, 6, 6> A;
   A.setIdentity();
   A.block<2, 2>(0, 0) = m_differentialPlant.A();
 
@@ -168,8 +168,10 @@ Vectord<9> HDrivetrainSim::Dynamics(const Vectord<9>& x,
 
   Vectord<9> xdot;
   xdot.setIdentity();
-  xdot(0, 0) = v * std::cos(x(State::kHeading)) + (x(State::kLateralVelocity) * std::sin(x(State::kHeading)));
-  xdot(1, 0) = v * std::sin(x(State::kHeading)) + (x(State::kLateralVelocity) * std::cos(x(State::kHeading)));
+  xdot(0, 0) = v * std::cos(x(State::kHeading)) +
+               (x(State::kLateralVelocity) * std::sin(x(State::kHeading)));
+  xdot(1, 0) = v * std::sin(x(State::kHeading)) +
+               (x(State::kLateralVelocity) * std::cos(x(State::kHeading)));
   xdot(2, 0) =
       ((x(State::kRightVelocity) - x(State::kLeftVelocity)) / (2.0 * m_rb))
           .value();

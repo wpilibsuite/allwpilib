@@ -2,8 +2,6 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "frc/drive/HDrive.h"
-
 #include <algorithm>
 #include <cmath>
 
@@ -12,14 +10,16 @@
 #include <wpi/sendable/SendableRegistry.h>
 
 #include "frc/MathUtil.h"
+#include "frc/drive/HDrive.h"
 #include "frc/motorcontrol/MotorController.h"
 
 using namespace frc;
 
-HDrive::HDrive(MotorController& leftMotor,
-                                     MotorController& rightMotor,
+HDrive::HDrive(MotorController& leftMotor, MotorController& rightMotor,
                MotorController& lateralMotor)
-    : m_leftMotor(&leftMotor), m_rightMotor(&rightMotor), m_lateralMotor(&lateralMotor) {
+    : m_leftMotor(&leftMotor),
+      m_rightMotor(&rightMotor),
+      m_lateralMotor(&lateralMotor) {
   wpi::SendableRegistry::AddChild(this, m_leftMotor);
   wpi::SendableRegistry::AddChild(this, m_rightMotor);
   wpi::SendableRegistry::AddChild(this, m_lateralMotor);
@@ -29,7 +29,7 @@ HDrive::HDrive(MotorController& leftMotor,
 }
 
 void HDrive::ArcadeDrive(double xSpeed, double zRotation, double ySpeed,
-                                    bool squareInputs) {
+                         bool squareInputs) {
   static bool reported = false;
   if (!reported) {
     HAL_Report(HALUsageReporting::kResourceType_RobotDrive,
@@ -41,7 +41,8 @@ void HDrive::ArcadeDrive(double xSpeed, double zRotation, double ySpeed,
   zRotation = ApplyDeadband(zRotation, m_deadband);
   ySpeed = ApplyDeadband(ySpeed, m_deadband);
 
-  auto [left, right, lateral] = ArcadeDriveIK(xSpeed, zRotation, ySpeed, squareInputs);
+  auto [left, right, lateral] =
+      ArcadeDriveIK(xSpeed, zRotation, ySpeed, squareInputs);
 
   m_leftMotor->Set(left);
   m_rightMotor->Set(right);
@@ -51,7 +52,7 @@ void HDrive::ArcadeDrive(double xSpeed, double zRotation, double ySpeed,
 }
 
 void HDrive::TankDrive(double leftSpeed, double rightSpeed, double lateralSpeed,
-                                  bool squareInputs) {
+                       bool squareInputs) {
   static bool reported = false;
   if (!reported) {
     HAL_Report(HALUsageReporting::kResourceType_RobotDrive,
@@ -63,7 +64,8 @@ void HDrive::TankDrive(double leftSpeed, double rightSpeed, double lateralSpeed,
   rightSpeed = ApplyDeadband(rightSpeed, m_deadband);
   lateralSpeed = ApplyDeadband(lateralSpeed, m_deadband);
 
-  auto [left, right, lateral] = TankDriveIK(leftSpeed, rightSpeed, squareInputs);
+  auto [left, right, lateral] =
+      TankDriveIK(leftSpeed, rightSpeed, squareInputs);
 
   m_leftMotor->Set(left * m_maxOutput);
   m_rightMotor->Set(right * m_maxOutput);
@@ -72,8 +74,8 @@ void HDrive::TankDrive(double leftSpeed, double rightSpeed, double lateralSpeed,
   Feed();
 }
 
-HDrive::WheelSpeeds HDrive::ArcadeDriveIK(
-    double xSpeed, double zRotation, double ySpeed, bool squareInputs) {
+HDrive::WheelSpeeds HDrive::ArcadeDriveIK(double xSpeed, double zRotation,
+                                          double ySpeed, bool squareInputs) {
   xSpeed = std::clamp(xSpeed, -1.0, 1.0);
   zRotation = std::clamp(zRotation, -1.0, 1.0);
   ySpeed = std::clamp(ySpeed, -1.0, 1.0);
@@ -104,11 +106,12 @@ HDrive::WheelSpeeds HDrive::ArcadeDriveIK(
   return {leftSpeed, rightSpeed, lateralSpeed};
 }
 
-HDrive::WheelSpeeds HDrive::TankDriveIK(
-    double leftSpeed, double rightSpeed, double lateralSpeed, bool squareInputs) {
+HDrive::WheelSpeeds HDrive::TankDriveIK(double leftSpeed, double rightSpeed,
+                                        double lateralSpeed,
+                                        bool squareInputs) {
   leftSpeed = std::clamp(leftSpeed, -1.0, 1.0);
   rightSpeed = std::clamp(rightSpeed, -1.0, 1.0);
-        lateralSpeed = std::clamp(lateralSpeed, -1.0, 1.0);
+  lateralSpeed = std::clamp(lateralSpeed, -1.0, 1.0);
 
   // Square the inputs (while preserving the sign) to increase fine control
   // while permitting full power.

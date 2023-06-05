@@ -26,38 +26,41 @@ HDrivePoseEstimator::InterpolationRecord::Interpolate(
     // Find the interpolated right distance.
     auto right = wpi::Lerp(this->rightDistance, endValue.rightDistance, i);
     // Find the interpolated lateral distance.
-    auto lateral = wpi::Lerp(this->lateralDistance, endValue.lateralDistance, i);
+    auto lateral =
+        wpi::Lerp(this->lateralDistance, endValue.lateralDistance, i);
 
     // Find the new gyro angle.
     auto gyro = wpi::Lerp(this->gyroAngle, endValue.gyroAngle, i);
 
     // Create a twist to represent this changed based on the interpolated
     // sensor inputs.
-    auto twist =
-        kinematics.ToTwist2d(left - leftDistance, right - rightDistance, lateral - lateralDistance);
+    auto twist = kinematics.ToTwist2d(
+        left - leftDistance, right - rightDistance, lateral - lateralDistance);
     twist.dtheta = (gyro - gyroAngle).Radians();
 
     return {pose.Exp(twist), gyro, left, right, lateral};
   }
 }
 
-HDrivePoseEstimator::HDrivePoseEstimator(
-    HDriveKinematics& kinematics, const Rotation2d& gyroAngle,
-    units::meter_t leftDistance, units::meter_t rightDistance,
-    units::meter_t lateralDistance,
-    const Pose2d& initialPose)
-    : HDrivePoseEstimator{
-          kinematics,  gyroAngle, leftDistance, rightDistance, lateralDistance,
-          initialPose, {0.02, 0.02, 0.01}, {0.1, 0.1, 0.1}} {}
+HDrivePoseEstimator::HDrivePoseEstimator(HDriveKinematics& kinematics,
+                                         const Rotation2d& gyroAngle,
+                                         units::meter_t leftDistance,
+                                         units::meter_t rightDistance,
+                                         units::meter_t lateralDistance,
+                                         const Pose2d& initialPose)
+    : HDrivePoseEstimator{kinematics,         gyroAngle,       leftDistance,
+                          rightDistance,      lateralDistance, initialPose,
+                          {0.02, 0.02, 0.01}, {0.1, 0.1, 0.1}} {}
 
 HDrivePoseEstimator::HDrivePoseEstimator(
     HDriveKinematics& kinematics, const Rotation2d& gyroAngle,
     units::meter_t leftDistance, units::meter_t rightDistance,
-    units::meter_t lateralDistance,
-    const Pose2d& initialPose, const wpi::array<double, 3>& stateStdDevs,
+    units::meter_t lateralDistance, const Pose2d& initialPose,
+    const wpi::array<double, 3>& stateStdDevs,
     const wpi::array<double, 3>& visionMeasurementStdDevs)
     : m_kinematics{kinematics},
-      m_odometry{gyroAngle, leftDistance, rightDistance, lateralDistance, initialPose} {
+      m_odometry{gyroAngle, leftDistance, rightDistance, lateralDistance,
+                 initialPose} {
   for (size_t i = 0; i < 3; ++i) {
     m_q[i] = stateStdDevs[i] * stateStdDevs[i];
   }
@@ -85,12 +88,13 @@ void HDrivePoseEstimator::SetVisionMeasurementStdDevs(
 }
 
 void HDrivePoseEstimator::ResetPosition(const Rotation2d& gyroAngle,
-                                                   units::meter_t leftDistance,
-                                                   units::meter_t rightDistance,
-                                                   units::meter_t lateralDistance,
-                                                   const Pose2d& pose) {
+                                        units::meter_t leftDistance,
+                                        units::meter_t rightDistance,
+                                        units::meter_t lateralDistance,
+                                        const Pose2d& pose) {
   // Reset state estimate and error covariance
-  m_odometry.ResetPosition(gyroAngle, leftDistance, rightDistance, lateralDistance, pose);
+  m_odometry.ResetPosition(gyroAngle, leftDistance, rightDistance,
+                           lateralDistance, pose);
   m_poseBuffer.Clear();
 }
 
@@ -98,8 +102,8 @@ Pose2d HDrivePoseEstimator::GetEstimatedPosition() const {
   return m_odometry.GetPose();
 }
 
-void HDrivePoseEstimator::AddVisionMeasurement(
-    const Pose2d& visionRobotPose, units::second_t timestamp) {
+void HDrivePoseEstimator::AddVisionMeasurement(const Pose2d& visionRobotPose,
+                                               units::second_t timestamp) {
   // Step 0: If this measurement is old enough to be outside the pose buffer's
   // timespan, skip.
   if (!m_poseBuffer.GetInternalBuffer().empty() &&
@@ -160,17 +164,18 @@ void HDrivePoseEstimator::AddVisionMeasurement(
 }
 
 Pose2d HDrivePoseEstimator::Update(const Rotation2d& gyroAngle,
-                                              units::meter_t leftDistance,
-                                              units::meter_t rightDistance,
-                                              units::meter_t lateralDistance) {
+                                   units::meter_t leftDistance,
+                                   units::meter_t rightDistance,
+                                   units::meter_t lateralDistance) {
   return UpdateWithTime(wpi::math::MathSharedStore::GetTimestamp(), gyroAngle,
                         leftDistance, rightDistance, lateralDistance);
 }
 
-Pose2d HDrivePoseEstimator::UpdateWithTime(
-    units::second_t currentTime, const Rotation2d& gyroAngle,
-    units::meter_t leftDistance, units::meter_t rightDistance,
-    units::meter_t lateralDistance) {
+Pose2d HDrivePoseEstimator::UpdateWithTime(units::second_t currentTime,
+                                           const Rotation2d& gyroAngle,
+                                           units::meter_t leftDistance,
+                                           units::meter_t rightDistance,
+                                           units::meter_t lateralDistance) {
   m_odometry.Update(gyroAngle, leftDistance, rightDistance, lateralDistance);
 
   // fmt::print("odo, {}, {}, {}, {}, {}, {}\n",
@@ -182,8 +187,9 @@ Pose2d HDrivePoseEstimator::UpdateWithTime(
   //   GetEstimatedPosition().Rotation().Radians()
   // );
 
-  m_poseBuffer.AddSample(currentTime, {GetEstimatedPosition(), gyroAngle,
-                                       leftDistance, rightDistance, lateralDistance});
+  m_poseBuffer.AddSample(currentTime,
+                         {GetEstimatedPosition(), gyroAngle, leftDistance,
+                          rightDistance, lateralDistance});
 
   return GetEstimatedPosition();
 }
