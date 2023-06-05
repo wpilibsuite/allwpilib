@@ -5,6 +5,7 @@
 #include "frc/Tracer.h"
 
 #include <fmt/format.h>
+#include <networktables/IntegerTopic.h>
 #include <wpi/SmallString.h>
 #include <wpi/raw_ostream.h>
 
@@ -14,6 +15,22 @@ using namespace frc;
 
 Tracer::Tracer() {
   ResetTimer();
+}
+
+void Tracer::PublishToNetworkTables(std::string_view topicName) {
+  m_publishNT = true;
+  m_ntTopic = topicName;
+}
+
+void Tracer::StartDataLog(wpi::log::DataLog dataLog) {
+  m_dataLog = dataLog;
+  m_dataLogEnabled = true;
+}
+
+void Tracer::StartDataLog(wpi::log::DataLog dataLog, std::string_view entry) {
+  m_dataLog = dataLog;
+  m_dataLogEntry = entry;
+  m_dataLogEnabled = true;
 }
 
 void Tracer::ResetTimer() {
@@ -27,7 +44,20 @@ void Tracer::ClearEpochs() {
 
 void Tracer::AddEpoch(std::string_view epochName) {
   auto currentTime = hal::fpga_clock::now();
-  m_epochs[epochName] = currentTime - m_startTime;
+  auto epoch = currentTime - m_startTime;
+  m_epochs[epochName] = epoch;
+  if (m_publishNT) {
+    auto topic = nt::NetworkTableInstance::GetDefault().GetIntegerTopic(
+        m_ntTopic.data() + "/" + epochName.data());
+    auto pub = topic.Publish();
+    pub.SetDefault(0);
+    topic.SetRetained(true);
+    pub.Set(epoch.count());
+  }
+  if (m_dataLogEnabled) {
+    m_dataLog.AppendInteger(
+        m_dataLog.Start(m_dataLogEntry + "/" + epochName, "int64"), epoch, 0);
+  }
   m_startTime = currentTime;
 }
 

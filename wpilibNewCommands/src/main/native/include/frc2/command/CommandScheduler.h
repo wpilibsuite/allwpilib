@@ -16,6 +16,7 @@
 #include <frc/Watchdog.h>
 #include <frc/event/EventLoop.h>
 #include <units/time.h>
+#include <wpi/DataLog.h>
 #include <wpi/FunctionExtras.h>
 #include <wpi/sendable/Sendable.h>
 #include <wpi/sendable/SendableHelper.h>
@@ -57,6 +58,28 @@ class CommandScheduler final : public wpi::Sendable,
    * sync with the TimedRobot period.
    */
   void SetPeriod(units::second_t period);
+
+  /**
+   * Starts publishing added epochs to NetworkTables.
+   *
+   * @param topicName The NetworkTables topic to publish to
+   */
+  void PublishToNetworkTables(std::string_view topicName);
+
+  /**
+   * Starts logging added epochs to the data log. Default entry is "Epochs"
+   *
+   * @param dataLog The data log to log epochs to
+   */
+  void StartDataLog(wpi::log::DataLog dataLog);
+
+  /**
+   * Starts logging added epochs to the data log.
+   *
+   * @param dataLog The data log to log epochs to
+   * @param entry The name of the entry to log to
+   */
+  void StartDataLog(wpi::log::DataLog dataLog, std::string_view entry);
 
   /**
    * Get the active button poll.

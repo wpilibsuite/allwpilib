@@ -8,6 +8,7 @@
 #include <string_view>
 
 #include <hal/cpp/fpga_clock.h>
+#include <wpi/DataLog.h>
 #include <wpi/StringMap.h>
 
 namespace wpi {
@@ -29,6 +30,28 @@ class Tracer {
    * Constructs a Tracer instance.
    */
   Tracer();
+
+  /**
+   * Starts publishing added epochs to NetworkTables.
+   *
+   * @param topicName The NetworkTables topic to publish to
+   */
+  void PublishToNetworkTables(std::string_view topicName);
+
+  /**
+   * Starts logging added epochs to the data log. Default entry is "Epochs"
+   *
+   * @param dataLog The data log to log epochs to
+   */
+  void StartDataLog(wpi::log::DataLog dataLog);
+
+  /**
+   * Starts logging added epochs to the data log.
+   *
+   * @param dataLog The data log to log epochs to
+   * @param entry The name of the entry to log to
+   */
+  void StartDataLog(wpi::log::DataLog dataLog, std::string_view entry);
 
   /**
    * Restarts the epoch timer.
@@ -67,6 +90,11 @@ class Tracer {
 
   hal::fpga_clock::time_point m_startTime;
   hal::fpga_clock::time_point m_lastEpochsPrintTime = hal::fpga_clock::epoch();
+  bool m_publishNT;
+  bool m_dataLogEnabled;
+  wpi::log::DataLog m_dataLog;
+  std::string_view m_ntTopic;
+  std::string_view m_dataLogEntry = "Epochs";
 
   wpi::StringMap<std::chrono::nanoseconds> m_epochs;
 };
