@@ -29,7 +29,7 @@ public class Tracer {
   private boolean m_dataLogEnabled;
   private DataLog m_dataLog;
   private String m_ntTopic;
-  private String m_dataLogEntry = "Epochs";
+  private String m_dataLogEntry;
 
   private final Map<String, Long> m_epochs = new HashMap<>(); // microseconds
 
@@ -46,16 +46,6 @@ public class Tracer {
   public void publishToNetworkTables(String topicName) {
     m_publishNT = true;
     m_ntTopic = topicName;
-  }
-
-  /**
-   * Starts logging added epochs to the data log. Default entry is "Epochs"
-   *
-   * @param dataLog The data log to log epochs to
-   */
-  public void startDataLog(DataLog dataLog) {
-    m_dataLog = dataLog;
-    m_dataLogEnabled = true;
   }
 
   /**

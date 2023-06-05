@@ -97,10 +97,6 @@ void IterativeRobotBase::PublishToNetworkTables(std::string_view topicName) {
   m_watchdog.PublishToNetworkTables(topicName);
 }
 
-void IterativeRobotBase::StartDataLog(wpi::log::DataLog dataLog) {
-  m_watchdog.StartDataLog(dataLog);
-}
-
 void IterativeRobotBase::StartDataLog(wpi::log::DataLog dataLog,
                                       std::string_view entry) {
   m_watchdog.StartDataLog(dataLog, entry);

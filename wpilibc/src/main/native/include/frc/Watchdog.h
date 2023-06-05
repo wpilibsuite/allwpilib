@@ -53,13 +53,6 @@ class Watchdog {
   void PublishToNetworkTables(std::string_view topicName);
 
   /**
-   * Starts logging added epochs to the data log. Default entry is "Epochs"
-   *
-   * @param dataLog The data log to log epochs to
-   */
-  void StartDataLog(wpi::log::DataLog dataLog);
-
-  /**
    * Starts logging added epochs to the data log.
    *
    * @param dataLog The data log to log epochs to

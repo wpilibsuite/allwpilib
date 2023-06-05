@@ -261,22 +261,13 @@ public abstract class IterativeRobotBase extends RobotBase {
   }
 
   /**
-   * Starts logging added epochs to the data log. Default entry is "Epochs"
-   *
-   * @param dataLog The data log to log epochs to
-   */
-  public void startDataLog(DataLog dataLog) {
-    m_watchdog.startDataLog(dataLog);
-  }
-
-  /**
    * Starts logging added epochs to the data log.
    *
    * @param dataLog The data log to log epochs to
    * @param entry The name of the entry to log to
    */
   public void startDataLog(DataLog dataLog, String entry) {
-    m_watchdog.startDataLog(dataLog);
+    m_watchdog.startDataLog(dataLog, entry);
   }
 
   /**

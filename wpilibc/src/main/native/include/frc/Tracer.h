@@ -39,13 +39,6 @@ class Tracer {
   void PublishToNetworkTables(std::string_view topicName);
 
   /**
-   * Starts logging added epochs to the data log. Default entry is "Epochs"
-   *
-   * @param dataLog The data log to log epochs to
-   */
-  void StartDataLog(wpi::log::DataLog dataLog);
-
-  /**
    * Starts logging added epochs to the data log.
    *
    * @param dataLog The data log to log epochs to
@@ -94,7 +87,7 @@ class Tracer {
   bool m_dataLogEnabled;
   wpi::log::DataLog m_dataLog;
   std::string_view m_ntTopic;
-  std::string_view m_dataLogEntry = "Epochs";
+  std::string_view m_dataLogEntry;
 
   wpi::StringMap<std::chrono::nanoseconds> m_epochs;
 };

@@ -22,11 +22,6 @@ void Tracer::PublishToNetworkTables(std::string_view topicName) {
   m_ntTopic = topicName;
 }
 
-void Tracer::StartDataLog(wpi::log::DataLog dataLog) {
-  m_dataLog = dataLog;
-  m_dataLogEnabled = true;
-}
-
 void Tracer::StartDataLog(wpi::log::DataLog dataLog, std::string_view entry) {
   m_dataLog = dataLog;
   m_dataLogEntry = entry;
@@ -56,7 +51,7 @@ void Tracer::AddEpoch(std::string_view epochName) {
   }
   if (m_dataLogEnabled) {
     m_dataLog.AppendInteger(
-        m_dataLog.Start(m_dataLogEntry + "/" + epochName, "int64"), epoch, 0);
+        m_dataLog.Start(m_dataLogEntry + "/" + epochName, "int64"), epoch.count(), 0);
   }
   m_startTime = currentTime;
 }
