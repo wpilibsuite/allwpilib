@@ -26,9 +26,10 @@ public class Tracer {
   private long m_lastEpochsPrintTime; // microseconds
   private long m_startTime; // microseconds
   private boolean m_publishNT;
+  private NetworkTableInstance m_inst;
+  private String m_ntTopic;
   private boolean m_dataLogEnabled;
   private DataLog m_dataLog;
-  private String m_ntTopic;
   private String m_dataLogEntry;
 
   private final Map<String, Long> m_epochs = new HashMap<>(); // microseconds
@@ -45,6 +46,7 @@ public class Tracer {
    */
   public void publishToNetworkTables(String topicName) {
     m_publishNT = true;
+    m_inst = NetworkTableInstance.getDefault();
     m_ntTopic = topicName;
   }
 
@@ -87,8 +89,7 @@ public class Tracer {
     long epoch = currentTime - m_startTime;
     m_epochs.put(epochName, epoch);
     if (m_publishNT) {
-      IntegerTopic topic =
-          NetworkTableInstance.getDefault().getIntegerTopic(m_ntTopic + "/" + epochName);
+      IntegerTopic topic = m_inst.getIntegerTopic(m_ntTopic + "/" + epochName);
       IntegerPublisher pub = topic.publish();
       pub.setDefault(0);
       topic.setRetained(true);

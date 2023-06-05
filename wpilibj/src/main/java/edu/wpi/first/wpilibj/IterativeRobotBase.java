@@ -59,7 +59,7 @@ import java.util.ConcurrentModificationException;
  *   <li>testExit() -- called each and every time test is exited
  * </ul>
  */
-public abstract class IterativeRobotBase extends RobotBase {
+public abstract class IterativeRobotBase extends RobotBase, Loggable {
   private enum Mode {
     kNone,
     kDisabled,

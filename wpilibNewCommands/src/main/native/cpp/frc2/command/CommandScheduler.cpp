@@ -105,7 +105,7 @@ void CommandScheduler::StartDataLog(wpi::log::DataLog dataLog) {
 }
 
 void CommandScheduler::StartDataLog(wpi::log::DataLog dataLog,
-                                      std::string_view entry) {
+                                    std::string_view entry) {
   m_watchdog.StartDataLog(dataLog, entry);
 }
 
