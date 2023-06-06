@@ -5,7 +5,6 @@
 package edu.wpi.first.wpilibj;
 
 import edu.wpi.first.networktables.IntegerPublisher;
-import edu.wpi.first.networktables.IntegerTopic;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.util.datalog.DataLog;
 import java.util.HashMap;
@@ -95,7 +94,7 @@ public class Tracer {
     // Topics are cached with the epoch name as the key, and the publisher object as the value
     if (m_publishNT) {
       if (!m_publisherCache.containsKey(epochName)) {
-      // Create and prep the epoch publisher
+        // Create and prep the epoch publisher
         var topic = m_inst.getIntegerTopic(m_ntTopic + "/" + epochName);
         var pub = topic.publish();
         m_publisherCache.put(epochName, pub);
@@ -103,15 +102,15 @@ public class Tracer {
       m_publisherCache.get(epochName).set(epoch);
     }
     if (m_dataLogEnabled) {
-    // Epochs are cached with the epoch name as the key, and the entry index as
-    // the value
+      // Epochs are cached with the epoch name as the key, and the entry index as
+      // the value
       if (!m_entryCache.containsKey(epochName)) {
         // Start a data log entry
         int entryIndex = m_dataLog.start(m_dataLogEntry + "/" + epochName, "int64");
         // Cache the entry index with the epoch name as the key
         m_entryCache.put(epochName, entryIndex);
       }
-m_dataLog.appendInteger(m_entryCache.get(epochName), epoch, 0);
+      m_dataLog.appendInteger(m_entryCache.get(epochName), epoch, 0);
     }
     m_startTime = currentTime;
   }
