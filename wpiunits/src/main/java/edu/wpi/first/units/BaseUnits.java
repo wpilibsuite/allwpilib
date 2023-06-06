@@ -27,7 +27,7 @@ public final class BaseUnits {
   public static final Angle Angle = new Angle(1, "Revolution", "R");
 
   /** The standard "unitless" unit. */
-  public static final Unitless Value = new Unitless(1, "<?>", "<?>");
+  public static final Dimensionless Value = new Dimensionless(1, "<?>", "<?>");
 
   /** The standard unit of voltage, volts. */
   public static final Voltage Voltage = new Voltage(1, "Volt", "V");

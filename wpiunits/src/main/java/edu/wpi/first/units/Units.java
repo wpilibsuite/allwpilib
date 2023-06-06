@@ -14,7 +14,7 @@ public final class Units {
   // Pseudo-classes describing the more common units of measure.
 
   @SuppressWarnings("rawtypes")
-  public static final Unit AnonymousBaseUnit = new Unitless(1, "<?>", "<?>");
+  public static final Unit AnonymousBaseUnit = new Dimensionless(1, "<?>", "<?>");
 
   // Distance
   public static final Distance Meters = BaseUnits.Distance;
@@ -69,8 +69,8 @@ public final class Units {
       derive(Pounds).splitInto(16).named("Ounce").symbol("oz.").make();
 
   // Unitless
-  public static final Unitless Value = BaseUnits.Value;
-  public static final Unitless Percent =
+  public static final Dimensionless Value = BaseUnits.Value;
+  public static final Dimensionless Percent =
       derive(Value).splitInto(100).named("Percent").symbol("%").make();
 
   // Voltage

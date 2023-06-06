@@ -68,7 +68,7 @@ public interface Measure<U extends Unit<U>> extends Comparable<Measure<U>> {
    */
   @SuppressWarnings("unchecked")
   default <U2 extends Unit<U2>> Measure<?> times(Measure<U2> other) {
-    if (other.unit() instanceof Unitless) {
+    if (other.unit() instanceof Dimensionless) {
       // scalar multiplication
       return times(other.baseUnitMagnitude());
     }
@@ -116,7 +116,7 @@ public interface Measure<U extends Unit<U>> extends Comparable<Measure<U>> {
     return times(1 / divisor);
   }
 
-  default Measure<U> divide(Measure<Unitless> scalar) {
+  default Measure<U> divide(Measure<Dimensionless> scalar) {
     return divide(scalar.baseUnitMagnitude());
   }
 
