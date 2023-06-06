@@ -116,15 +116,46 @@ public interface Measure<U extends Unit<U>> extends Comparable<Measure<U>> {
     return times(1 / divisor);
   }
 
+  /**
+   * Divides this measurement by some constant divisor and returns the result. This is equivalent to
+   * {@code divide(scalar.baseUnitMagnitude())}
+   *
+   * @param divisor the dimensionless measure to divide by
+   * @see #divide(double)
+   * @see #times(double)
+   */
   default Measure<U> divide(Measure<Dimensionless> scalar) {
     return divide(scalar.baseUnitMagnitude());
   }
 
+  /**
+   * Creates a velocity measure by dividing this one by a time period measure.
+   *
+   * <pre>
+   *   Meters.of(1).per(Second) // => Measure&lt;Velocity&lt;Distance&gt;&gt;
+   *   Millimeters.of(1).per(Millisecond) // => Measure&lt;Velocity&lt;Distance&gt;&gt; equivalent to the first measure
+   * </pre>
+   *
+   * @param period the time period to divide by.
+   * @return the velocity result
+   */
   default Measure<Velocity<U>> per(Measure<Time> period) {
     var newUnit = unit().per(period.unit());
     return ImmutableMeasure.ofBaseUnits(baseUnitMagnitude() / period.baseUnitMagnitude(), newUnit);
   }
 
+  /**
+   * Creates a relational measure equivalent to this one per some other unit.
+   *
+   * <pre>
+   *   Volts.of(1.05).per(Meter) // => V/m, potential PID constant
+   * </pre>
+   *
+   * @param <U2> the type of the denominator unit
+   * @param denominator the denominator unit being divided by
+   *
+   * @return the relational measure
+   */
   default <U2 extends Unit<U2>> Measure<Per<U, U2>> per(U2 denominator) {
     var newUnit = unit().per(denominator);
     return newUnit.of(magnitude());
@@ -135,6 +166,7 @@ public interface Measure<U extends Unit<U>> extends Comparable<Measure<U>> {
     return unit().ofBaseUnits(baseUnitMagnitude() + other.baseUnitMagnitude());
   }
 
+  /** Subtracts another measure from this one. The resulting measure has the same unit as this one. */
   default Measure<U> minus(Measure<U> other) {
     return unit().ofBaseUnits(baseUnitMagnitude() - other.baseUnitMagnitude());
   }
@@ -163,7 +195,8 @@ public interface Measure<U extends Unit<U>> extends Comparable<Measure<U>> {
    * @param varianceThreshold the acceptable variance threshold, in terms of an acceptable +/- error
    *     range multiplier. Checking if a value is within 10% means a value of 0.1 should be passed;
    *     checking if a value is within 1% means a value of 0.01 should be passed, and so on.
-   * @return true if this unit is near the other other, otherwise false
+   *
+   * @return true if this unit is near the other measure, otherwise false
    */
   default boolean isNear(Measure<?> other, double varianceThreshold) {
     if (this.unit().m_baseType != other.unit().m_baseType) {
