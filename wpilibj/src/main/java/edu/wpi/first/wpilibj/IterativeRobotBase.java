@@ -259,7 +259,7 @@ public abstract class IterativeRobotBase extends RobotBase {
    * methods like robot periodic and init methods, various NT
    * updates (SmartDashboard.update(), Shuffleboard.updateValues(),
    * LiveWindow.updateValues(),) etc.
-   * 
+   *
    * @param topicName The NetworkTables topic to publish to
    */
   public void publishToNetworkTables(String topicName) {

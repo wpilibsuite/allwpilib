@@ -168,7 +168,8 @@ void Watchdog::PublishToNetworkTables(std::string_view topicName) {
   m_tracer.PublishToNetworkTables(topicName);
 }
 
-void Watchdog::StartDataLog(wpi::log::DataLog dataLog, std::string_view entry) {
+void Watchdog::StartDataLog(wpi::log::DataLog& dataLog,
+                            std::string_view entry) {
   m_tracer.StartDataLog(dataLog, entry);
 }
 

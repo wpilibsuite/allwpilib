@@ -45,7 +45,7 @@ class Tracer {
    * @param dataLog The data log to log epochs to
    * @param entry The name of the entry to log to
    */
-  void StartDataLog(wpi::log::DataLog dataLog, std::string_view entry);
+  void StartDataLog(wpi::log::DataLog& dataLog, std::string_view entry);
 
   /**
    * Restarts the epoch timer.
@@ -87,9 +87,9 @@ class Tracer {
   bool m_publishNT;
   nt::NetworkTableInstance m_inst;
   std::string_view m_ntTopic;
-  wpi::StringMap<nt::IntegerPublisher> m_publisherCache;
-  bool m_dataLogEnabled;
-  wpi::log::DataLog m_dataLog;
+  wpi::StringMap<nt::IntegerPublisher*> m_publisherCache;
+  bool m_dataLogEnabled = false;
+  wpi::log::DataLog* m_dataLog;
   std::string_view m_dataLogEntry;
   wpi::StringMap<int> m_entryCache;
 

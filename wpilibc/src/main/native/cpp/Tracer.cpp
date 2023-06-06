@@ -20,11 +20,11 @@ void Tracer::PublishToNetworkTables(std::string_view topicName) {
   m_publishNT = true;
   m_inst = nt::NetworkTableInstance::GetDefault();
   m_ntTopic = topicName;
-  m_publisherCache = wpi::StringMap<nt::IntegerPublisher>(10);
+  m_publisherCache = wpi::StringMap<nt::IntegerPublisher*>(10);
 }
 
-void Tracer::StartDataLog(wpi::log::DataLog dataLog, std::string_view entry) {
-  m_dataLog = dataLog;
+void Tracer::StartDataLog(wpi::log::DataLog& dataLog, std::string_view entry) {
+  m_dataLog = &dataLog;
   m_dataLogEntry = entry;
   m_dataLogEnabled = true;
   m_entryCache = wpi::StringMap<int>(10);
@@ -50,21 +50,22 @@ void Tracer::AddEpoch(std::string_view epochName) {
       // Create and prep the epoch publisher
       auto topic =
           m_inst.GetIntegerTopic(fmt::format("{}/{}", m_ntTopic, epochName));
-      m_publisherCache.insert(std::pair(epochName, topic.Publish()));
+      auto pub = topic.Publish();
+      m_publisherCache.insert(std::pair(epochName, &pub));
     }
-    m_publisherCache.lookup(epochName).Set(epoch.count());
+    m_publisherCache.lookup(epochName)->Set(epoch.count());
   }
   if (m_dataLogEnabled) {
     // Epochs are cached with the epoch name as the key, and the entry index as
     // the value
     if (m_entryCache.count(epochName) == 0) {
       // Start a data log entry
-      int entryIndex = m_dataLog.Start(
+      int entryIndex = m_dataLog->Start(
           fmt::format("{}/{}", m_dataLogEntry, epochName), "int64");
       // Cache the entry index with the epoch name as the key
       m_entryCache.insert(std::pair(epochName, entryIndex));
     }
-    m_dataLog.AppendInteger(m_entryCache.lookup(epochName), epoch.count(), 0);
+    m_dataLog->AppendInteger(m_entryCache.lookup(epochName), epoch.count(), 0);
   }
   m_startTime = currentTime;
 }

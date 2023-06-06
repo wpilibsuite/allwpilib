@@ -58,7 +58,7 @@ class Watchdog {
    * @param dataLog The data log to log epochs to
    * @param entry The name of the entry to log to
    */
-  void StartDataLog(wpi::log::DataLog dataLog, std::string_view entry);
+  void StartDataLog(wpi::log::DataLog& dataLog, std::string_view entry);
 
   /**
    * Returns the time since the watchdog was last fed.
