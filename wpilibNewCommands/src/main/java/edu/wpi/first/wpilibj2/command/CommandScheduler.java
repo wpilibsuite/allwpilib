@@ -125,7 +125,12 @@ public final class CommandScheduler implements Sendable, AutoCloseable {
   }
 
   /**
-   * Starts publishing added epochs to NetworkTables.
+   * Starts publishing loop timings to NetworkTables.
+   *
+   * <p>
+   * This will publish how long it takes for methods in the command-based
+   * framework to execute; periodic methods in subsystems, execute methods in
+   * commands, etc.
    *
    * @param topicName The NetworkTables topic to publish to
    */
@@ -134,9 +139,13 @@ public final class CommandScheduler implements Sendable, AutoCloseable {
   }
 
   /**
-   * Starts logging added epochs to the data log.
+   * Starts logging loop timings to the data log.
    *
-   * @param dataLog The data log to log epochs to
+   * <p>
+   * This will log how long it takes for methods in the command-based
+   * framework to execute; periodic methods in subsystems, execute methods in
+   * commands, etc.
+   * @param dataLog The data log to log loop timings to
    * @param entry The name of the entry to log to
    */
   public void startDataLog(DataLog dataLog, String entry) {

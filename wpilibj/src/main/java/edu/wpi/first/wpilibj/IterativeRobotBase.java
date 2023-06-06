@@ -252,8 +252,14 @@ public abstract class IterativeRobotBase extends RobotBase {
   public void testExit() {}
 
   /**
-   * Starts publishing added epochs to NetworkTables.
+   * Starts publishing loop timings to NetworkTables.
    *
+   * <p>
+   * This will publish the execution time of method calls in the robot loop;
+   * methods like robot periodic and init methods, various NT
+   * updates (SmartDashboard.update(), Shuffleboard.updateValues(),
+   * LiveWindow.updateValues(),) etc.
+   * 
    * @param topicName The NetworkTables topic to publish to
    */
   public void publishToNetworkTables(String topicName) {
@@ -263,6 +269,11 @@ public abstract class IterativeRobotBase extends RobotBase {
   /**
    * Starts logging added epochs to the data log.
    *
+   * <p>
+   * This will log the execution time of method calls in the robot loop;
+   * methods like robot periodic and init methods, various NT
+   * updates (SmartDashboard.update(), Shuffleboard.updateValues(),
+   * LiveWindow.updateValues(),) etc.
    * @param dataLog The data log to log epochs to
    * @param entry The name of the entry to log to
    */

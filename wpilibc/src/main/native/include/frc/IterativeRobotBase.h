@@ -208,6 +208,10 @@ class IterativeRobotBase : public RobotBase {
   /**
    * Starts publishing added epochs to NetworkTables.
    *
+   * This will publish the execution time of method calls in the robot loop;
+   * methods like robot periodic and init methods, various NT
+   * updates (SmartDashboard.update(), Shuffleboard.updateValues(),
+   * LiveWindow.updateValues(),) etc.
    * @param topicName The NetworkTables topic to publish to
    */
   void PublishToNetworkTables(std::string_view topicName);
@@ -215,6 +219,10 @@ class IterativeRobotBase : public RobotBase {
   /**
    * Starts logging added epochs to the data log.
    *
+   * This will publish the execution time of method calls in the robot loop;
+   * methods like robot periodic and init methods, various NT
+   * updates (SmartDashboard.update(), Shuffleboard.updateValues(),
+   * LiveWindow.updateValues(),) etc.
    * @param dataLog The data log to log epochs to
    * @param entry The name of the entry to log to
    */

@@ -60,22 +60,22 @@ class CommandScheduler final : public wpi::Sendable,
   void SetPeriod(units::second_t period);
 
   /**
-   * Starts publishing added epochs to NetworkTables.
+   * Starts publishing loop timings to NetworkTables.
    *
+   * This will publish how long it takes for methods in the command-based
+   * framework to execute; periodic methods in subsystems, execute methods in
+   * commands, etc.
    * @param topicName The NetworkTables topic to publish to
    */
   void PublishToNetworkTables(std::string_view topicName);
 
   /**
-   * Starts logging added epochs to the data log. Default entry is "Epochs"
+   * Starts logging loop timings to the data log.
    *
-   * @param dataLog The data log to log epochs to
-   */
-  void StartDataLog(wpi::log::DataLog dataLog);
-
-  /**
-   * Starts logging added epochs to the data log.
-   *
+   * <p>
+   * This will log how long it takes for methods in the command-based
+   * framework to execute; periodic methods in subsystems, execute methods in
+   * commands, etc.
    * @param dataLog The data log to log epochs to
    * @param entry The name of the entry to log to
    */
