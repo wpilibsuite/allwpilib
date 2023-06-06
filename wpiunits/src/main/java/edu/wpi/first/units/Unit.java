@@ -9,7 +9,7 @@ import java.util.Objects;
 /**
  * A unit is some unit of measurement that defines a quantity, such as grams, meters, or seconds.
  *
- * @param <U> the self type, eg {@code class SomeUnit extends Unit<SomeUnit>}
+ * @param <U> the self type, e.g. {@code class SomeUnit extends Unit<SomeUnit>}
  */
 public class Unit<U extends Unit<U>> {
   private final UnaryFunction m_toBaseConverter;
@@ -26,7 +26,7 @@ public class Unit<U extends Unit<U>> {
   /**
    * Creates a new unit defined by its relationship to some base unit.
    *
-   * @param baseType the base type of the unit, eg Distance.class for the distance unit
+   * @param baseType the base type of the unit, e.g. Distance.class for the distance unit
    * @param toBaseConverter a function for converting units of this type to the base unit
    * @param fromBaseConverter a function for converting units of the base unit to this one
    * @param name the name of the unit. This should be a singular noun (so "Meter", not "Meters")
@@ -48,7 +48,7 @@ public class Unit<U extends Unit<U>> {
   /**
    * Creates a new unit with the given name and multiplier to the base unit.
    *
-   * @param baseType the base type of the unit, eg Distance.class for the distance unit
+   * @param baseType the base type of the unit, e.g. Distance.class for the distance unit
    * @param baseUnitEquivalent the multiplier to convert this unit to the base unit of this type.
    *     For example, meters has a multiplier of 1, mm has a multiplier of 1e3, and km has
    *     multiplier of 1e-3.
@@ -81,7 +81,8 @@ public class Unit<U extends Unit<U>> {
   }
 
   /**
-   * Converts a magnitude in terms of another unit of the same dimension to a magnitude in terms of this unit.
+   * Converts a magnitude in terms of another unit of the same dimension to a magnitude in terms of
+   * this unit.
    *
    * <pre>
    *   Inches.convertFrom(12, Feet) // => 144.0
@@ -99,16 +100,29 @@ public class Unit<U extends Unit<U>> {
     return this.fromBaseUnits(otherUnit.toBaseUnits(magnitude));
   }
 
+  /**
+   * Gets the conversion function used to convert values to base unit terms. This generally
+   * shouldn't need to be used directly; prefer {@link #toBaseUnits(double)} instead.
+   *
+   * @return the conversion function
+   */
   public UnaryFunction getConverterToBase() {
     return m_toBaseConverter;
   }
 
+  /**
+   * Gets the conversion function used to convert values to terms of this unit. This generally
+   * shouldn't need to be used directly; prefer {@link #fromBaseUnits(double)} instead.
+   *
+   * @return the conversion function
+   */
   public UnaryFunction getConverterFromBase() {
     return m_fromBaseConverter;
   }
 
   /**
-   * Creates a new measure of this unit with the given value.
+   * Creates a new measure of this unit with the given value. The resulting measure is
+   * <i>immutable</i> and cannot have its value modified.
    *
    * @param magnitude the magnitude of the measure to create
    */
@@ -172,7 +186,7 @@ public class Unit<U extends Unit<U>> {
    * </pre>
    *
    * @param period the time period of the velocity, such as seconds or milliseconds
-   * @return a
+   * @return a velocity unit corresponding to the rate of change of this unit over time
    */
   public Velocity<U> per(Time period) {
     return Velocity.combine(this, period);
@@ -196,7 +210,8 @@ public class Unit<U extends Unit<U>> {
   }
 
   /**
-   *
+   * Takes this unit and creates a new combinatory unit equivalent to this unit multiplied by
+   * another.
    *
    * <pre>
    *   Volts.mult(Meter) // V*m
