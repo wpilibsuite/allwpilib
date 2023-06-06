@@ -6,6 +6,7 @@
 
 #include <wpi/MathExtras.h>
 #include <wpi/SymbolExports.h>
+#include <wpi/array.h>
 
 #include "frc/kinematics/SwerveModulePosition.h"
 
