@@ -69,34 +69,34 @@ class UnitsTest {
 
   @Test
   void testMillimeters() {
-    assertEquals(1000, Millimeters.convert(1, Meters), thresh);
-    assertEquals(1, Meters.convert(1000, Millimeters), thresh);
+    assertEquals(1000, Millimeters.convertFrom(1, Meters), thresh);
+    assertEquals(1, Meters.convertFrom(1000, Millimeters), thresh);
     assertEquals("Millimeter", Millimeters.name());
     assertEquals("mm", Millimeters.symbol());
   }
 
   @Test
   void testCentimeters() {
-    assertEquals(100, Centimeters.convert(1, Meters), thresh);
-    assertEquals(1, Meters.convert(100, Centimeters), thresh);
+    assertEquals(100, Centimeters.convertFrom(1, Meters), thresh);
+    assertEquals(1, Meters.convertFrom(100, Centimeters), thresh);
     assertEquals("Centimeter", Centimeters.name());
     assertEquals("cm", Centimeters.symbol());
   }
 
   @Test
   void testInches() {
-    assertEquals(1, Meters.convert(39.3701, Inches), thresh);
-    assertEquals(39.3701, Inches.convert(1, Meters), 1e-4);
-    assertEquals(1 / 25.4, Inches.convert(1, Millimeters), 0); // should be exact
-    assertEquals(12, Inches.convert(1, Feet), thresh);
+    assertEquals(1, Meters.convertFrom(39.3701, Inches), thresh);
+    assertEquals(39.3701, Inches.convertFrom(1, Meters), 1e-4);
+    assertEquals(1 / 25.4, Inches.convertFrom(1, Millimeters), 0); // should be exact
+    assertEquals(12, Inches.convertFrom(1, Feet), thresh);
     assertEquals("Inch", Inches.name());
     assertEquals("in", Inches.symbol());
   }
 
   @Test
   void testFeet() {
-    assertEquals(3.28084, Feet.convert(1, Meters), thresh);
-    assertEquals(1 / 12.0, Feet.convert(1, Inches), thresh);
+    assertEquals(3.28084, Feet.convertFrom(1, Meters), thresh);
+    assertEquals(1 / 12.0, Feet.convertFrom(1, Inches), thresh);
     assertEquals("Foot", Feet.name());
     assertEquals("ft", Feet.symbol());
   }
@@ -112,8 +112,8 @@ class UnitsTest {
 
   @Test
   void testFeetPerSecond() {
-    assertEquals(3.28084, FeetPerSecond.convert(1, MetersPerSecond), thresh);
-    assertEquals(1 / 3.28084, MetersPerSecond.convert(1, FeetPerSecond), thresh);
+    assertEquals(3.28084, FeetPerSecond.convertFrom(1, MetersPerSecond), thresh);
+    assertEquals(1 / 3.28084, MetersPerSecond.convertFrom(1, FeetPerSecond), thresh);
     assertEquals("Foot per Second", FeetPerSecond.name());
     assertEquals("ft/s", FeetPerSecond.symbol());
   }
@@ -150,21 +150,21 @@ class UnitsTest {
 
   @Test
   void testMillisecond() {
-    assertEquals(1000, Milliseconds.convert(1, Seconds), thresh);
+    assertEquals(1000, Milliseconds.convertFrom(1, Seconds), thresh);
     assertEquals("Millisecond", Milliseconds.name());
     assertEquals("ms", Milliseconds.symbol());
   }
 
   @Test
   void testMicrosecond() {
-    assertEquals(1e6, Microseconds.convert(1, Second), 0);
+    assertEquals(1e6, Microseconds.convertFrom(1, Second), 0);
     assertEquals("Microsecond", Microseconds.name());
     assertEquals("us", Microseconds.symbol());
   }
 
   @Test
   void testMinutes() {
-    assertEquals(60, Seconds.convert(1, Minutes), thresh);
+    assertEquals(60, Seconds.convertFrom(1, Minutes), thresh);
     assertEquals("Minute", Minutes.name());
     assertEquals("min", Minutes.symbol());
   }
@@ -180,21 +180,21 @@ class UnitsTest {
 
   @Test
   void testGrams() {
-    assertEquals(1000, Grams.convert(1, Kilograms), thresh);
+    assertEquals(1000, Grams.convertFrom(1, Kilograms), thresh);
     assertEquals("Gram", Grams.name());
     assertEquals("g", Grams.symbol());
   }
 
   @Test
   void testPounds() {
-    assertEquals(453.592, Grams.convert(1, Pounds), thresh);
+    assertEquals(453.592, Grams.convertFrom(1, Pounds), thresh);
     assertEquals("Pound", Pounds.name());
     assertEquals("lb.", Pounds.symbol());
   }
 
   @Test
   void testOunces() {
-    assertEquals(16, Ounces.convert(1, Pounds), thresh);
+    assertEquals(16, Ounces.convertFrom(1, Pounds), thresh);
     assertEquals("Ounce", Ounces.name());
     assertEquals("oz.", Ounces.symbol());
   }
@@ -210,16 +210,16 @@ class UnitsTest {
 
   @Test
   void testRadians() {
-    assertEquals(2 * Math.PI, Radians.convert(1, Revolutions), thresh);
-    assertEquals(2 * Math.PI, Radians.convert(360, Degrees), thresh);
+    assertEquals(2 * Math.PI, Radians.convertFrom(1, Revolutions), thresh);
+    assertEquals(2 * Math.PI, Radians.convertFrom(360, Degrees), thresh);
     assertEquals("Radian", Radians.name());
     assertEquals("rad", Radians.symbol());
   }
 
   @Test
   void testDegrees() {
-    assertEquals(360, Degrees.convert(1, Revolutions), thresh);
-    assertEquals(360, Degrees.convert(2 * Math.PI, Radians), thresh);
+    assertEquals(360, Degrees.convertFrom(1, Revolutions), thresh);
+    assertEquals(360, Degrees.convertFrom(2 * Math.PI, Radians), thresh);
     assertEquals("Degree", Degrees.name());
     assertEquals("°", Degrees.symbol());
   }
@@ -235,7 +235,7 @@ class UnitsTest {
 
   @Test
   void testPercent() {
-    assertEquals(100, Percent.convert(1, Value), thresh);
+    assertEquals(100, Percent.convertFrom(1, Value), thresh);
     assertEquals("Percent", Percent.name());
     assertEquals("%", Percent.symbol());
   }
@@ -251,7 +251,7 @@ class UnitsTest {
 
   @Test
   void testMillivolts() {
-    assertEquals(1000, Millivolts.convert(1, Volts), thresh);
+    assertEquals(1000, Millivolts.convertFrom(1, Volts), thresh);
     assertEquals("Millivolt", Millivolts.name());
     assertEquals("mV", Millivolts.symbol());
   }
@@ -267,7 +267,7 @@ class UnitsTest {
 
   @Test
   void testMilliamps() {
-    assertEquals(1000, Milliamps.convert(1, Amps), thresh);
+    assertEquals(1000, Milliamps.convertFrom(1, Amps), thresh);
     assertEquals("Milliamp", Milliamps.name());
     assertEquals("mA", Milliamps.symbol());
   }
@@ -283,14 +283,14 @@ class UnitsTest {
 
   @Test
   void testMilliwatts() {
-    assertEquals(1000, Milliwatts.convert(1, Watts), thresh);
+    assertEquals(1000, Milliwatts.convertFrom(1, Watts), thresh);
     assertEquals("Milliwatt", Milliwatts.name());
     assertEquals("mW", Milliwatts.symbol());
   }
 
   @Test
   void testHorsepower() {
-    assertEquals(745.7, Watts.convert(1, Horsepower), thresh);
+    assertEquals(745.7, Watts.convertFrom(1, Horsepower), thresh);
     assertEquals("Horsepower", Horsepower.name());
     assertEquals("HP", Horsepower.symbol());
   }
@@ -334,15 +334,15 @@ class UnitsTest {
   void testKilo() {
     ExampleUnit unit = new ExampleUnit(1);
     ExampleUnit kiloUnit = Kilo(unit);
-    assertEquals(1e3, unit.convert(1, kiloUnit), 0);
-    assertEquals(1e-3, kiloUnit.convert(1, unit), 0);
+    assertEquals(1e3, unit.convertFrom(1, kiloUnit), 0);
+    assertEquals(1e-3, kiloUnit.convertFrom(1, unit), 0);
   }
 
   @Test
   void testMilli() {
     ExampleUnit unit = new ExampleUnit(1);
     ExampleUnit milliUnit = Milli(unit);
-    assertEquals(1e-3, unit.convert(1, milliUnit), 0);
-    assertEquals(1e3, milliUnit.convert(1, unit), 0);
+    assertEquals(1e-3, unit.convertFrom(1, milliUnit), 0);
+    assertEquals(1e3, milliUnit.convertFrom(1, unit), 0);
   }
 }

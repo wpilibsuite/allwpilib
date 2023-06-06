@@ -81,13 +81,22 @@ public class Unit<U extends Unit<U>> {
   }
 
   /**
-   * Converts a value of this unit to a value of another unit of the same type.
+   * Converts a magnitude in terms of another unit of the same dimension to a magnitude in terms of this unit.
    *
-   * @param value a value measured in this unit
-   * @param otherUnit the unit to convert the value to
+   * <pre>
+   *   Inches.convertFrom(12, Feet) // => 144.0
+   *   Kilograms.convertFrom(2.2, Pounds) // => 0.9979024
+   * </pre>
+   *
+   * @param magnitude a magnitude measured in another unit
+   * @param otherUnit the unit to convert the magnitude to
    */
-  public double convert(double value, Unit<U> otherUnit) {
-    return this.fromBaseUnits(otherUnit.toBaseUnits(value));
+  public double convertFrom(double magnitude, Unit<U> otherUnit) {
+    if (this.equivalent(otherUnit)) {
+      // same unit, don't bother converting
+      return magnitude;
+    }
+    return this.fromBaseUnits(otherUnit.toBaseUnits(magnitude));
   }
 
   public UnaryFunction getConverterToBase() {
