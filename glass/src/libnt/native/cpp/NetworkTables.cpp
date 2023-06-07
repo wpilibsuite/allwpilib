@@ -24,6 +24,7 @@
 #include <wpi/SmallString.h>
 #include <wpi/SpanExtras.h>
 #include <wpi/StringExtras.h>
+#include <wpi/concepts.h>
 #include <wpi/mpack.h>
 #include <wpi/raw_ostream.h>
 
@@ -82,9 +83,8 @@ static std::string IntegerArrayToString(std::span<const int64_t> in) {
   return fmt::format("[{:d}]", fmt::join(in, ","));
 }
 
-template <typename T>
+template <std::floating_point T>
 static std::string FloatArrayToString(std::span<const T> in) {
-  static_assert(std::is_same_v<T, float> || std::is_same_v<T, double>);
   return fmt::format("[{:.6f}]", fmt::join(in, ","));
 }
 
@@ -729,9 +729,8 @@ static bool StringToIntegerArray(std::string_view in,
   return true;
 }
 
-template <typename T>
+template <std::floating_point T>
 static bool StringToFloatArray(std::string_view in, std::vector<T>* out) {
-  static_assert(std::is_same_v<T, float> || std::is_same_v<T, double>);
   in = wpi::trim(in);
   if (in.empty()) {
     return false;

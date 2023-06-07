@@ -13,6 +13,8 @@
 #include <utility>
 #include <vector>
 
+#include <wpi/concepts.h>
+
 #include "frc2/command/CommandPtr.h"
 #include "frc2/command/SelectCommand.h"
 
@@ -166,10 +168,10 @@ CommandPtr Either(CommandPtr&& onTrue, CommandPtr&& onFalse,
  * @param selector the selector function
  * @param commands map of commands to select from
  */
-template <typename Key, class... Types>
+template <typename Key, std::convertible_to<CommandPtr>... CommandPtrs>
 [[nodiscard]]
 CommandPtr Select(std::function<Key()> selector,
-                  std::pair<Key, Types>&&... commands) {
+                  std::pair<Key, CommandPtrs>&&... commands) {
   std::vector<std::pair<Key, std::unique_ptr<Command>>> vec;
 
   ((void)vec.emplace_back(commands.first, std::move(commands.second).Unwrap()),
@@ -185,7 +187,7 @@ namespace impl {
 /**
  * Create a vector of commands.
  */
-template <typename... Args>
+template <std::convertible_to<CommandPtr>... Args>
 std::vector<CommandPtr> MakeVector(Args&&... args) {
   std::vector<CommandPtr> data;
   data.reserve(sizeof...(Args));
@@ -204,10 +206,10 @@ CommandPtr Sequence(std::vector<CommandPtr>&& commands);
 /**
  * Runs a group of commands in series, one after the other.
  */
-template <typename... Args>
+template <std::convertible_to<CommandPtr>... CommandPtrs>
 [[nodiscard]]
-CommandPtr Sequence(Args&&... commands) {
-  return Sequence(impl::MakeVector(std::forward<Args>(commands)...));
+CommandPtr Sequence(CommandPtrs&&... commands) {
+  return Sequence(impl::MakeVector(std::forward<CommandPtrs>(commands)...));
 }
 
 /**
@@ -221,10 +223,11 @@ CommandPtr RepeatingSequence(std::vector<CommandPtr>&& commands);
  * Runs a group of commands in series, one after the other. Once the last
  * command ends, the group is restarted.
  */
-template <typename... Args>
+template <std::convertible_to<CommandPtr>... CommandPtrs>
 [[nodiscard]]
-CommandPtr RepeatingSequence(Args&&... commands) {
-  return RepeatingSequence(impl::MakeVector(std::forward<Args>(commands)...));
+CommandPtr RepeatingSequence(CommandPtrs&&... commands) {
+  return RepeatingSequence(
+      impl::MakeVector(std::forward<CommandPtrs>(commands)...));
 }
 
 /**
@@ -238,10 +241,10 @@ CommandPtr Parallel(std::vector<CommandPtr>&& commands);
  * Runs a group of commands at the same time. Ends once all commands in the
  * group finish.
  */
-template <typename... Args>
+template <std::convertible_to<CommandPtr>... CommandPtrs>
 [[nodiscard]]
-CommandPtr Parallel(Args&&... commands) {
-  return Parallel(impl::MakeVector(std::forward<Args>(commands)...));
+CommandPtr Parallel(CommandPtrs&&... commands) {
+  return Parallel(impl::MakeVector(std::forward<CommandPtrs>(commands)...));
 }
 
 /**
@@ -255,10 +258,10 @@ CommandPtr Race(std::vector<CommandPtr>&& commands);
  * Runs a group of commands at the same time. Ends once any command in the group
  * finishes, and cancels the others.
  */
-template <typename... Args>
+template <std::convertible_to<CommandPtr>... CommandPtrs>
 [[nodiscard]]
-CommandPtr Race(Args&&... commands) {
-  return Race(impl::MakeVector(std::forward<Args>(commands)...));
+CommandPtr Race(CommandPtrs&&... commands) {
+  return Race(impl::MakeVector(std::forward<CommandPtrs>(commands)...));
 }
 
 /**
@@ -272,11 +275,11 @@ CommandPtr Deadline(CommandPtr&& deadline, std::vector<CommandPtr>&& others);
  * Runs a group of commands at the same time. Ends once a specific command
  * finishes, and cancels the others.
  */
-template <typename... Args>
+template <std::convertible_to<CommandPtr>... CommandPtrs>
 [[nodiscard]]
-CommandPtr Deadline(CommandPtr&& deadline, Args&&... commands) {
+CommandPtr Deadline(CommandPtr&& deadline, CommandPtrs&&... commands) {
   return Deadline(std::move(deadline),
-                  impl::MakeVector(std::forward<Args>(commands)...));
+                  impl::MakeVector(std::forward<CommandPtrs>(commands)...));
 }
 
 }  // namespace cmd

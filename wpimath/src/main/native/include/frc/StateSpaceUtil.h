@@ -8,9 +8,10 @@
 #include <cmath>
 #include <limits>
 #include <random>
-#include <type_traits>
 
 #include <wpi/SymbolExports.h>
+#include <wpi/concepts.h>
+#include <wpi/deprecated.h>
 
 #include "Eigen/Eigenvalues"
 #include "Eigen/QR"
@@ -55,7 +56,7 @@ void WhiteNoiseVectorImpl(Matrix& result, T elem, Ts... elems) {
 template <int States, int Inputs>
 bool IsStabilizableImpl(const Matrixd<States, States>& A,
                         const Matrixd<States, Inputs>& B) {
-  Eigen::EigenSolver<Matrixd<States, States>> es{A};
+  Eigen::EigenSolver<Matrixd<States, States>> es{A, false};
 
   for (int i = 0; i < States; ++i) {
     if (es.eigenvalues()[i].real() * es.eigenvalues()[i].real() +
@@ -95,8 +96,7 @@ bool IsStabilizableImpl(const Matrixd<States, States>& A,
  *                   of the control inputs from no actuation.
  * @return State excursion or control effort cost matrix.
  */
-template <typename... Ts, typename = std::enable_if_t<
-                              std::conjunction_v<std::is_same<double, Ts>...>>>
+template <std::same_as<double>... Ts>
 Matrixd<sizeof...(Ts), sizeof...(Ts)> MakeCostMatrix(Ts... tolerances) {
   Eigen::DiagonalMatrix<double, sizeof...(Ts)> result;
   detail::CostMatrixImpl(result.diagonal(), tolerances...);
@@ -115,8 +115,7 @@ Matrixd<sizeof...(Ts), sizeof...(Ts)> MakeCostMatrix(Ts... tolerances) {
  *                output measurement.
  * @return Process noise or measurement noise covariance matrix.
  */
-template <typename... Ts, typename = std::enable_if_t<
-                              std::conjunction_v<std::is_same<double, Ts>...>>>
+template <std::same_as<double>... Ts>
 Matrixd<sizeof...(Ts), sizeof...(Ts)> MakeCovMatrix(Ts... stdDevs) {
   Eigen::DiagonalMatrix<double, sizeof...(Ts)> result;
   detail::CovMatrixImpl(result.diagonal(), stdDevs...);
@@ -172,8 +171,7 @@ Matrixd<N, N> MakeCovMatrix(const std::array<double, N>& stdDevs) {
   return result;
 }
 
-template <typename... Ts, typename = std::enable_if_t<
-                              std::conjunction_v<std::is_same<double, Ts>...>>>
+template <std::same_as<double>... Ts>
 Matrixd<sizeof...(Ts), 1> MakeWhiteNoiseVector(Ts... stdDevs) {
   Matrixd<sizeof...(Ts), 1> result;
   detail::WhiteNoiseVectorImpl(result, stdDevs...);

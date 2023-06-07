@@ -9,6 +9,7 @@
 #include <span>
 #include <utility>
 
+#include <wpi/concepts.h>
 #include <wpi/deprecated.h>
 
 #include "Trigger.h"
@@ -64,8 +65,7 @@ class Button : public Trigger {
    * @return The trigger, for chained calls.
    * @deprecated Replace with Trigger::OnTrue()
    */
-  template <class T, typename = std::enable_if_t<std::is_base_of_v<
-                         Command, std::remove_reference_t<T>>>>
+  template <std::derived_from<Command> T>
   [[deprecated("Replace with Trigger#OnTrue()")]]
   Button WhenPressed(T&& command) {
     WhenActive(std::forward<T>(command));
@@ -116,8 +116,7 @@ class Button : public Trigger {
    * @return The button, for chained calls.
    * @deprecated Replace with Trigger::WhileTrue(command.Repeatedly())
    */
-  template <class T, typename = std::enable_if_t<std::is_base_of_v<
-                         Command, std::remove_reference_t<T>>>>
+  template <std::derived_from<Command> T>
   [[deprecated("Replace with Trigger#WhileTrue(command.Repeatedly())")]]
   Button WhileHeld(T&& command) {
     WhileActiveContinous(std::forward<T>(command));
@@ -168,8 +167,7 @@ class Button : public Trigger {
    * @return The button, for chained calls.
    * @deprecated Replace with Trigger::WhileTrue()
    */
-  template <class T, typename = std::enable_if_t<std::is_base_of_v<
-                         Command, std::remove_reference_t<T>>>>
+  template <std::derived_from<Command> T>
   [[deprecated("Replace with Trigger#WhileTrue()")]]
   Button WhenHeld(T&& command) {
     WhileActiveOnce(std::forward<T>(command));
@@ -198,8 +196,7 @@ class Button : public Trigger {
    * @return The button, for chained calls.
    * @deprecated Replace with Trigger::OnFalse()
    */
-  template <class T, typename = std::enable_if_t<std::is_base_of_v<
-                         Command, std::remove_reference_t<T>>>>
+  template <std::derived_from<Command> T>
   [[deprecated("Replace with Trigger#OnFalse()")]]
   Button WhenReleased(T&& command) {
     WhenInactive(std::forward<T>(command));
@@ -250,8 +247,7 @@ class Button : public Trigger {
    * @return The button, for chained calls.
    * @deprecated Replace with Trigger::ToggleOnTrue()
    */
-  template <class T, typename = std::enable_if_t<std::is_base_of_v<
-                         Command, std::remove_reference_t<T>>>>
+  template <std::derived_from<Command> T>
   [[deprecated("Replace with Trigger#ToggleOnTrue()")]]
   Button ToggleWhenPressed(T&& command) {
     ToggleWhenActive(std::forward<T>(command));

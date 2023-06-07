@@ -12,6 +12,8 @@
 #include <utility>
 #include <vector>
 
+#include <wpi/concepts.h>
+
 #include "frc2/command/CommandBase.h"
 
 namespace frc2 {
@@ -30,11 +32,11 @@ class CommandPtr final {
   explicit CommandPtr(std::unique_ptr<CommandBase>&& command)
       : m_ptr(std::move(command)) {}
 
-  template <class T, typename = std::enable_if_t<std::is_base_of_v<
-                         Command, std::remove_reference_t<T>>>>
+  template <std::derived_from<Command> T>
+  // NOLINTNEXTLINE (bugprone-forwarding-reference-overload)
   explicit CommandPtr(T&& command)
-      : CommandPtr(std::make_unique<std::remove_reference_t<T>>(
-            std::forward<T>(command))) {}
+      : CommandPtr(
+            std::make_unique<std::decay_t<T>>(std::forward<T>(command))) {}
 
   CommandPtr(CommandPtr&&) = default;
   CommandPtr& operator=(CommandPtr&&) = default;
